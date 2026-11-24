@@ -29,7 +29,7 @@
 #ifndef __I386_MCONTEXT_H_
 #define __I386_MCONTEXT_H_
 
-#include <sys/cdefs.h> /* __DARWIN_UNIX03 */
+#include <sys/cdefs.h>                      
 #include <sys/appleapiopts.h>
 #include <mach/machine/_structs.h>
 
@@ -59,9 +59,9 @@ _STRUCT_MCONTEXT_AVX512_32
 	_STRUCT_X86_THREAD_STATE32      __ss;
 	_STRUCT_X86_AVX512_STATE32      __fs;
 };
-#endif /* _STRUCT_X86_AVX512_STATE32 */
+#endif                                 
 
-#else /* !__DARWIN_UNIX03 */
+#else                       
 #define _STRUCT_MCONTEXT32      struct mcontext32
 _STRUCT_MCONTEXT32
 {
@@ -86,10 +86,10 @@ _STRUCT_MCONTEXT_AVX512_32
 	_STRUCT_X86_THREAD_STATE32      ss;
 	_STRUCT_X86_AVX512_STATE32      fs;
 };
-#endif /* _STRUCT_X86_AVX512_STATE32 */
+#endif                                 
 
-#endif /* __DARWIN_UNIX03 */
-#endif /* _STRUCT_MCONTEXT32 */
+#endif                      
+#endif                         
 
 #ifndef _STRUCT_MCONTEXT64
 #if __DARWIN_UNIX03
@@ -141,9 +141,9 @@ _STRUCT_MCONTEXT_AVX512_64_FULL
 	_STRUCT_X86_THREAD_FULL_STATE64 __ss;
 	_STRUCT_X86_AVX512_STATE64      __fs;
 };
-#endif /* _STRUCT_X86_AVX512_STATE64 */
+#endif                                 
 
-#else /* !__DARWIN_UNIX03 */
+#else                       
 #define _STRUCT_MCONTEXT64      struct mcontext64
 _STRUCT_MCONTEXT64
 {
@@ -192,10 +192,10 @@ _STRUCT_MCONTEXT_AVX512_64_FULL
 	_STRUCT_X86_THREAD_FULL_STATE64 ss;
 	_STRUCT_X86_AVX512_STATE64      fs;
 };
-#endif /* _STRUCT_X86_AVX512_STATE64 */
+#endif                                 
 
-#endif /* __DARWIN_UNIX03 */
-#endif /* _STRUCT_MCONTEXT64 */
+#endif                      
+#endif                         
 
 
 #ifndef _MCONTEXT_T
@@ -207,6 +207,6 @@ typedef _STRUCT_MCONTEXT64      *mcontext_t;
 typedef _STRUCT_MCONTEXT32      *mcontext_t;
 #define _STRUCT_MCONTEXT        _STRUCT_MCONTEXT32
 #endif
-#endif /* _MCONTEXT_T */
+#endif                  
 
-#endif /* __I386_MCONTEXT_H_ */
+#endif                         

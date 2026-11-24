@@ -28,22 +28,22 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * HISTORY
- *
- * Revision 1.1.1.1  1998/09/22 21:05:41  wsanchez
- * Import of Mac OS X kernel (~semeria)
- *
- * Revision 1.1.1.1  1998/03/07 02:26:02  wsanchez
- * Import of OSF Mach kernel (~mburg)
- *
- * Revision 1.1.2.1  1996/12/09  16:55:05  stephen
- *      nmklinux_1.0b3_shared into pmk1.1
- *      New file based on hp_pa
- *      [1996/12/09  11:09:22  stephen]
- *
- * $EndLog$
- */
+  
+          
+  
+                                                  
+                                       
+  
+                                                  
+                                     
+  
+                                                  
+                                         
+                               
+                                       
+  
+           
+   
 /*
  * Copyright (c) 1988 The Regents of the University of California.
  * All rights reserved.
@@ -65,34 +65,34 @@
 #ifndef _MACH_MACHLIMITS_H_
 #define _MACH_MACHLIMITS_H_
 
-#define CHAR_BIT        8               /* number of bits in a char */
+#define CHAR_BIT        8                                             
 
-#define SCHAR_MAX       127             /* max value for a signed char */
-#define SCHAR_MIN       (-128)          /* min value for a signed char */
+#define SCHAR_MAX       127                                              
+#define SCHAR_MIN       (-128)                                           
 
-#define UCHAR_MAX       255U            /* max value for an unsigned char */
-#define CHAR_MAX        127             /* max value for a char */
-#define CHAR_MIN        (-128)          /* min value for a char */
+#define UCHAR_MAX       255U                                                
+#define CHAR_MAX        127                                       
+#define CHAR_MIN        (-128)                                    
 
-#define USHRT_MAX       65535U          /* max value for an unsigned short */
-#define SHRT_MAX        32767           /* max value for a short */
-#define SHRT_MIN        (-32768)        /* min value for a short */
+#define USHRT_MAX       65535U                                               
+#define SHRT_MAX        32767                                      
+#define SHRT_MIN        (-32768)                                   
 
-#define UINT_MAX        0xFFFFFFFFU     /* max value for an unsigned int */
-#define INT_MAX         2147483647      /* max value for an int */
-#define INT_MIN         (-2147483647-1) /* min value for an int */
+#define UINT_MAX        0xFFFFFFFFU                                        
+#define INT_MAX         2147483647                                
+#define INT_MIN         (-2147483647-1)                           
 
 #ifdef __LP64__
-#define ULONG_MAX       0xffffffffffffffffUL    /* max unsigned long */
-#define LONG_MAX        0x7fffffffffffffffL     /* max signed long */
-#define LONG_MIN        (-0x7fffffffffffffffL-1)/* min signed long */
-#else /* !__LP64__ */
-#define ULONG_MAX       0xffffffffUL            /* max value for an unsigned long */
-#define LONG_MAX        2147483647L             /* max value for a long */
-#define LONG_MIN        (-2147483647L-1)        /* min value for a long */
-#endif /* __LP64__ */
+#define ULONG_MAX       0xffffffffffffffffUL                           
+#define LONG_MAX        0x7fffffffffffffffL                          
+#define LONG_MIN        (-0x7fffffffffffffffL-1)                     
+#else                
+#define ULONG_MAX       0xffffffffUL                                                
+#define LONG_MAX        2147483647L                                       
+#define LONG_MIN        (-2147483647L-1)                                  
+#endif               
 
-/* Must be at least two, for internationalization (NLS/KJI) */
-#define MB_LEN_MAX      4               /* multibyte characters */
+                                                              
+#define MB_LEN_MAX      4                                         
 
-#endif /* _MACH_MACHLIMITS_H_ */
+#endif                          

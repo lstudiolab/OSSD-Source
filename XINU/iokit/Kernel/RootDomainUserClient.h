@@ -84,12 +84,12 @@ public:
 	virtual bool initWithTask(task_t owningTask, void *security_id,
 	    UInt32 type, OSDictionary * properties) APPLE_KEXT_OVERRIDE;
 
-// Unused - retained for symbol compatibility
+                                             
 	void setPreventative(UInt32 on_off, UInt32 types_of_sleep);
 
-// Unused - retained for symbol compatibility
+                                             
 	virtual IOExternalMethod * getTargetAndMethodForIndex( IOService ** targetP, UInt32 index ) APPLE_KEXT_OVERRIDE;
 	virtual void stop( IOService *provider) APPLE_KEXT_OVERRIDE;
 };
 
-#endif /* ! _IOKIT_ROOTDOMAINUSERCLIENT_H */
+#endif                                      

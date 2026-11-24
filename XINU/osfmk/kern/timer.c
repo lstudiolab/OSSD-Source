@@ -89,7 +89,7 @@ timer_advance(timer_t timer, uint64_t delta)
 {
 #if defined(__LP64__)
 	timer->all_bits += delta;
-#else /* defined(__LP64__) */
+#else                        
 	extern void timer_advance_internal_32(timer_t timer, uint32_t high,
 	    uint32_t low);
 	uint64_t low = delta + timer->low_bits;
@@ -99,7 +99,7 @@ timer_advance(timer_t timer, uint64_t delta)
 	} else {
 		timer->low_bits = (uint32_t)low;
 	}
-#endif /* defined(__LP64__) */
+#endif                        
 }
 
 void
@@ -128,23 +128,23 @@ timer_switch(timer_t timer, uint64_t tstamp, timer_t new_timer)
 	new_timer->tstamp = tstamp;
 }
 
-/*
- * Update the current processor's thread timer with `tstamp` and switch the
- * processor's thread timer to `new_timer`.
- *
- * Called with interrupts disabled.
- */
+  
+                                                                           
+                                           
+  
+                                   
+   
 void
 processor_timer_switch_thread(uint64_t tstamp, timer_t new_timer)
 {
 	processor_t processor = current_processor();
 	timer_t timer;
 
-	/* Update current timer. */
+	                           
 	timer = processor->thread_timer;
 	timer_advance(timer, tstamp - timer->tstamp);
 
-	/* Start new timer. */
+	                      
 	processor->thread_timer = new_timer;
 	new_timer->tstamp = tstamp;
 }

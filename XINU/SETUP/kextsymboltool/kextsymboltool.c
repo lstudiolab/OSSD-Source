@@ -40,9 +40,9 @@
 #include <stdbool.h>
 
 #pragma mark Typedefs, Enums, Constants
-/*********************************************************************
-* Typedefs, Enums, Constants
-*********************************************************************/
+                                                                      
+                            
+                                                                      
 typedef enum {
 	kErrorNone = 0,
 	kError,
@@ -52,9 +52,9 @@ typedef enum {
 } ToolError;
 
 #pragma mark Function Protos
-/*********************************************************************
-* Function Protos
-*********************************************************************/
+                                                                      
+                 
+                                                                      
 __private_extern__ ToolError
 readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize);
 
@@ -70,8 +70,8 @@ extern char* __cxa_demangle(const char* mangled_name,
     int* status);
 
 #pragma mark Functions
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 __private_extern__ ToolError
 writeFile(int fd, const void * data, size_t length)
 {
@@ -90,8 +90,8 @@ writeFile(int fd, const void * data, size_t length)
 	return err;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 __private_extern__ ToolError
 seekFile(int fd, off_t offset)
 {
@@ -110,8 +110,8 @@ seekFile(int fd, off_t offset)
 	return err;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 __private_extern__ ToolError
 readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 {
@@ -135,9 +135,9 @@ readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 			continue;
 		}
 
-		/* Don't try to map an empty file, it fails now due to conformance
-		 * stuff (PR 4611502).
-		 */
+		                                                                  
+                        
+     
 		if (0 == stat_buf.st_size) {
 			err = kErrorNone;
 			continue;
@@ -145,9 +145,9 @@ readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 
 		*objSize = stat_buf.st_size;
 
-		*objAddr = (vm_offset_t)mmap(NULL /* address */, *objSize,
-		    PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE /* flags */,
-		    fd, 0 /* offset */);
+		*objAddr = (vm_offset_t)mmap(NULL              , *objSize,
+		    PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE            ,
+		    fd, 0             );
 
 		if ((void *)*objAddr == MAP_FAILED) {
 			*objAddr = 0;
@@ -193,9 +193,9 @@ iswhitespace( char c )
 	return (c == ' ') || (c == '\t');
 }
 
-/*
- * Function for qsort for comparing symbol list names.
- */
+  
+                                                      
+   
 static int
 qsort_cmp(const void * _left, const void * _right)
 {
@@ -205,9 +205,9 @@ qsort_cmp(const void * _left, const void * _right)
 	return strcmp(left->name, right->name);
 }
 
-/*
- * Function for bsearch for finding a symbol name.
- */
+  
+                                                  
+   
 
 static int
 bsearch_cmp( const void * _key, const void * _cmp)
@@ -247,31 +247,31 @@ count_symbols(char * file, vm_size_t file_size)
 		}
 		next = eol + 1;
 
-		/* Skip empty lines.
-		 */
+		                    
+     
 		if (eol == scan) {
 			continue;
 		}
 
-		/* Skip comment lines.
-		 */
+		                      
+     
 		if (scan[0] == '#') {
 			continue;
 		}
 
-		/* Scan past any non-symbol characters at the beginning of the line. */
+		                                                                       
 		while ((scan < eol) && !issymchar(*scan)) {
 			scan++;
 		}
 
-		/* No symbol on line? Move along.
-		 */
+		                                 
+     
 		if (scan == eol) {
 			continue;
 		}
 
-		/* Skip symbols starting with '.'.
-		 */
+		                                  
+     
 		if (scan[0] == '.') {
 			continue;
 		}
@@ -312,55 +312,55 @@ store_symbols(char * file, vm_size_t file_size, struct symbol * symbols, uint32_
 		}
 		next = eol + 1;
 
-		/* Skip empty lines.
-		 */
+		                    
+     
 		if (eol == scan) {
 			continue;
 		}
 
 		*eol = '\0';
 
-		/* Skip comment lines.
-		 */
+		                      
+     
 		if (scan[0] == '#') {
 			continue;
 		}
 
-		/* Scan past any non-symbol characters at the beginning of the line. */
+		                                                                       
 		while ((scan < eol) && !issymchar(*scan)) {
 			scan++;
 		}
 
-		/* No symbol on line? Move along.
-		 */
+		                                 
+     
 		if (scan == eol) {
 			continue;
 		}
 
-		/* Skip symbols starting with '.'.
-		 */
+		                                  
+     
 		if (scan[0] == '.') {
 			continue;
 		}
 
 		name = scan;
 
-		/* Find the end of the symbol.
-		 */
+		                              
+     
 		while ((*scan != '\0') && issymchar(*scan)) {
 			scan++;
 		}
 
-		/* Note char past end of symbol.
-		 */
+		                                
+     
 		name_term = scan;
 
-		/* Stored length must include the terminating nul char.
-		 */
+		                                                       
+     
 		name_len = name_term - name + 1;
 
-		/* Now look for an indirect.
-		 */
+		                            
+     
 		if (*scan != '\0') {
 			while ((*scan != '\0') && iswhitespace(*scan)) {
 				scan++;
@@ -373,18 +373,18 @@ store_symbols(char * file, vm_size_t file_size, struct symbol * symbols, uint32_
 				if (issymchar(*scan)) {
 					indirect = scan;
 
-					/* Find the end of the symbol.
-					 */
+					                              
+        
 					while ((*scan != '\0') && issymchar(*scan)) {
 						scan++;
 					}
 
-					/* Note char past end of symbol.
-					 */
+					                                
+        
 					indirect_term = scan;
 
-					/* Stored length must include the terminating nul char.
-					 */
+					                                                       
+        
 					indirect_len = indirect_term - indirect + 1;
 				} else if (*scan == '\0') {
 					fprintf(stderr, "bad format in symbol line: %s\n", line);
@@ -396,8 +396,8 @@ store_symbols(char * file, vm_size_t file_size, struct symbol * symbols, uint32_
 			}
 		}
 
-		/* Look for options.
-		 */
+		                    
+     
 		if (*scan != '\0') {
 			while ((*scan != '\0') && iswhitespace(*scan)) {
 				scan++;
@@ -409,14 +409,14 @@ store_symbols(char * file, vm_size_t file_size, struct symbol * symbols, uint32_
 				if (isalpha(*scan)) {
 					option = scan;
 
-					/* Find the end of the option.
-					 */
+					                              
+        
 					while ((*scan != '\0') && isalpha(*scan)) {
 						scan++;
 					}
 
-					/* Note char past end of option.
-					 */
+					                                
+        
 					option_term = scan;
 					option_len = option_term - option;
 
@@ -427,8 +427,8 @@ store_symbols(char * file, vm_size_t file_size, struct symbol * symbols, uint32_
 					memcpy(optionstr, option, option_len);
 					optionstr[option_len] = '\0';
 
-					/* Find the option.
-					 */
+					                   
+        
 					if (!strncmp(optionstr, "obsolete", option_len)) {
 						obsolete = TRUE;
 					}
@@ -465,18 +465,18 @@ store_symbols(char * file, vm_size_t file_size, struct symbol * symbols, uint32_
 static const NXArchInfo *
 lookup_arch(const char *archstring)
 {
-	/*
-	 * As new architectures are supported by xnu, add a mapping function
-	 * without relying on host libraries.
-	 */
+	  
+                                                                     
+                                      
+    
 	static const NXArchInfo archlist[] = {
-		{ "x86_64", 0x01000007 /* CPU_TYPE_X86_64 */, 3 /* CPU_SUBTYPE_X86_64_ALL */, NX_LittleEndian, NULL },
-		{ "x86_64h", 0x01000007 /* CPU_TYPE_X86_64 */, 8 /* CPU_SUBTYPE_X86_64_H */, NX_LittleEndian, NULL },
-		{ "armv7", 12 /* CPU_TYPE_ARM */, 9 /* CPU_SUBTYPE_ARM_V7 */, NX_LittleEndian, NULL },
-		{ "armv7s", 12 /* CPU_TYPE_ARM */, 11 /* CPU_SUBTYPE_ARM_V7S */, NX_LittleEndian, NULL },
-		{ "armv7k", 12 /* CPU_TYPE_ARM */, 12 /* CPU_SUBTYPE_ARM_V7K */, NX_LittleEndian, NULL },
-		{ "arm64", 0x0100000c /* CPU_TYPE_ARM64 */, 0 /* CPU_SUBTYPE_ARM64_ALL */, NX_LittleEndian, NULL },
-		{ "arm64e", 0x0100000c /* CPU_TYPE_ARM64 */, 2 /* CPU_SUBTYPE_ARM64_E */, NX_LittleEndian, NULL },
+		{ "x86_64", 0x01000007                      , 3                             , NX_LittleEndian, NULL },
+		{ "x86_64h", 0x01000007                      , 8                           , NX_LittleEndian, NULL },
+		{ "armv7", 12                   , 9                         , NX_LittleEndian, NULL },
+		{ "armv7s", 12                   , 11                          , NX_LittleEndian, NULL },
+		{ "armv7k", 12                   , 12                          , NX_LittleEndian, NULL },
+		{ "arm64", 0x0100000c                     , 0                            , NX_LittleEndian, NULL },
+		{ "arm64e", 0x0100000c                     , 2                          , NX_LittleEndian, NULL },
 	};
 	unsigned long i;
 
@@ -489,8 +489,8 @@ lookup_arch(const char *archstring)
 	return NULL;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 int
 main(int argc, char * argv[])
 {
@@ -681,7 +681,7 @@ main(int argc, char * argv[])
 				    __cxa_demangle(export_symbols[export_idx].name + 1, NULL, NULL, &status);
 				fprintf(stderr, "exported name not in import list: %s\n",
 				    demangled_result ? demangled_result : export_symbols[export_idx].name);
-//		fprintf(stderr, "                                : %s\n", export_symbols[export_idx].name);
+                                                                                               
 				if (demangled_result) {
 					free(demangled_result);
 				}
@@ -949,7 +949,7 @@ main(int argc, char * argv[])
 
 finish:
 	for (filenum = 0; filenum < num_files; filenum++) {
-		// unmap file
+		             
 		if (files[filenum].mapped_size) {
 			munmap((caddr_t)files[filenum].mapped, files[filenum].mapped_size);
 			files[filenum].mapped     = 0;

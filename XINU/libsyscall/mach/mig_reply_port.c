@@ -45,12 +45,12 @@ _mig_set_reply_port(mach_port_t port)
 	_os_tsd_set_direct(__TSD_MIG_REPLY, (void *)(uintptr_t)port);
 }
 
-/*
- * Called by mig interface code whenever a reply port is needed.
- * Tracing is masked during this call; otherwise, a call to printf()
- * can result in a call to malloc() which eventually reenters
- * mig_get_reply_port() and deadlocks.
- */
+  
+                                                                
+                                                                    
+                                                             
+                                      
+   
 mach_port_t
 mig_get_reply_port(void)
 {
@@ -62,10 +62,10 @@ mig_get_reply_port(void)
 	return port;
 }
 
-/*
- * Called by mig interface code after a timeout on the reply port.
- * May also be called by user. The new mig calls with port passed in.
- */
+  
+                                                                  
+                                                                     
+   
 void
 mig_dealloc_reply_port(mach_port_t migport)
 {
@@ -80,10 +80,10 @@ mig_dealloc_reply_port(mach_port_t migport)
 	}
 }
 
-/*************************************************************
- *  Called by mig interfaces after each RPC.
- *  Could be called by user.
- ***********************************************************/
+                                                              
+                                            
+                            
+                                                             
 
 void
 mig_put_reply_port(mach_port_t reply_port __unused)

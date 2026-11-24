@@ -107,7 +107,7 @@ int64_t pgtrace_read_log(uint8_t *buf, uint32_t size);
 void pgtrace_write_log(pgtrace_run_result_t res);
 int pgtrace_get_stats(pgtrace_stats_t *stats);
 #endif
-#else // CONFIG_PGTRACE_NONKEXT
+#else                          
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -141,15 +141,15 @@ typedef struct {
 	write_func_t    write;
 } logger_t;
 
-//------------------------------------
-// for pmap fault handler
-//------------------------------------
+                                      
+                         
+                                      
 int pgtrace_decode_and_run(uint32_t inst, vm_offset_t fva, vm_map_offset_t *cva_page, arm_saved_state_t *ss, pgtrace_run_result_t *res);
 int pgtrace_write_log(pgtrace_run_result_t res);
 
-//------------------------------------
-// for kext
-//------------------------------------
+                                      
+           
+                                      
 int pgtrace_init(decoder_t *decoder, logger_t *logger);
 int pgtrace_add_probe(thread_t thread, vm_offset_t start, vm_offset_t end);
 void pgtrace_clear_probe(void);
@@ -159,5 +159,5 @@ bool pgtrace_active(void);
 #ifdef __cplusplus
 }
 #endif
-#endif // CONFIG_PGTRACE_NONKEXT
+#endif                          
 #endif

@@ -1,5 +1,5 @@
-// Do not include system headers in this file. Code in this file needs to be
-// self-contained, as it runs in a VM.
+                                                                            
+                                      
 #include "hvtest_x86_guest.h"
 #include <stdbool.h>
 #include <stdatomic.h>
@@ -18,9 +18,9 @@ simple_long_mode_vcpu_entry(uint64_t arg)
 void
 smp_vcpu_entry(uint64_t arg)
 {
-	// Performing this atomic operation on the same memory on all VCPUs confirms
-	// that they are running in the same IPA space, and that the space is
-	// shareable.
+	                                                                            
+	                                                                     
+	             
 	atomic_uint *count = (atomic_uint *)arg;
 
 	VMCALL(atomic_fetch_add_explicit(count, 1,

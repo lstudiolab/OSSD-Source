@@ -53,19 +53,19 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- * "Local" descriptor table. At the moment, all tasks use the
- * same LDT.
- */
+  
+                                                             
+            
+   
 #include <i386/seg.h>
 
 struct real_descriptor  master_ldt[LDTSZ] __attribute__ ((aligned(4096)))
 __attribute__ ((section("__HIB, __desc")))
         = {
-	[SEL_TO_INDEX(USER_CTHREAD)] = MAKE_REAL_DESCRIPTOR(    /* user cthread segment */
+	[SEL_TO_INDEX(USER_CTHREAD)] = MAKE_REAL_DESCRIPTOR(                              
 		0,
 		0xfffff,
 		SZ_32 | SZ_G,

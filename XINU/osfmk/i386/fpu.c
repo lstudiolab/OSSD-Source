@@ -76,15 +76,15 @@
 #include <i386/thread.h>
 #include <i386/trap.h>
 
-xstate_t        fpu_capability = UNDEFINED;     /* extended state capability */
-xstate_t        fpu_default = UNDEFINED;        /* default extended state */
+xstate_t        fpu_capability = UNDEFINED;                                    
+xstate_t        fpu_default = UNDEFINED;                                    
 
 #define ALIGNED(addr, size)      (((uintptr_t)(addr)&((size)-1))==0)
 #define VERIFY_SAVEAREA_ALIGNED(p, a) \
 	assertf(!(((uintptr_t)(p)) & ((a) - 1)), \
 	    "FP save area component @ 0x%lx not 8-byte aligned", ((uintptr_t)(p)))
 
-/* Forward */
+             
 
 extern void             fpinit(void);
 extern void             fp_save(
@@ -100,7 +100,7 @@ x86_ext_thread_state_t  default_avx512_state __attribute((aligned(64)));
 x86_ext_thread_state_t  default_avx_state __attribute((aligned(64)));
 x86_ext_thread_state_t  default_fx_state __attribute((aligned(64)));
 
-/* Global MXCSR capability bitmask */
+                                     
 static unsigned int mxcsr_capability_mask;
 
 #define fninit() \
@@ -170,33 +170,33 @@ static const char *const xstate_name[] = {
 
 #define fpu_ZMM_capable (fpu_capability == AVX512)
 #define fpu_YMM_capable (fpu_capability == AVX || fpu_capability == AVX512)
-/*
- * On-demand AVX512 support
- * ------------------------
- * On machines with AVX512 support, by default, threads are created with
- * AVX512 masked off in XCR0 and an AVX-sized savearea is used. However, AVX512
- * capabilities are advertised in the commpage and via sysctl. If a thread
- * opts to use AVX512 instructions, the first will result in a #UD exception.
- * Faulting AVX512 intructions are recognizable by their unique prefix.
- * This exception results in the thread being promoted to use an AVX512-sized
- * savearea and for the AVX512 bit masks being set in its XCR0. The faulting
- * instruction is re-driven and the thread can proceed to perform AVX512
- * operations.
- *
- * In addition to AVX512 instructions causing promotion, the thread_set_state()
- * primitive with an AVX512 state flavor result in promotion.
- *
- * AVX512 promotion of the first thread in a task causes the default xstate
- * of the task to be promoted so that any subsequently created or subsequently
- * DNA-faulted thread will have AVX512 xstate and it will not need to fault-in
- * a promoted xstate.
- *
- * Two savearea zones are used: the default pool of AVX-sized (832 byte) areas
- * and a second pool of larger AVX512-sized (2688 byte) areas.
- *
- * Note the initial state value is an AVX512 object but that the AVX initial
- * value is a subset of it.
- */
+  
+                           
+                           
+                                                                        
+                                                                               
+                                                                          
+                                                                             
+                                                                       
+                                                                             
+                                                                            
+                                                                        
+              
+  
+                                                                               
+                                                             
+  
+                                                                           
+                                                                              
+                                                                              
+                     
+  
+                                                                              
+                                                              
+  
+                                                                            
+                           
+   
 static uint32_t cpuid_reevaluated = 0;
 
 static void fpu_store_registers(void *, boolean_t);
@@ -238,13 +238,13 @@ vzeroupper(void)
 	__asm__ __volatile__ ("vzeroupper" ::);
 }
 
-static boolean_t fpu_thread_promote_avx512(thread_t);   /* Forward */
+static boolean_t fpu_thread_promote_avx512(thread_t);                
 
 
-/*
- * Furthermore, make compile-time asserts that no padding creeps into structures
- * for which we're doing this.
- */
+  
+                                                                                
+                              
+   
 #define ASSERT_PACKED(t, m1, m2, n, mt)                 \
 extern char assert_packed_ ## t ## _ ## m1 ## _ ## m2   \
 	[(offsetof(t,m2) - offsetof(t,m1) == (n - 1)*sizeof(mt)) ? 1 : -1]
@@ -289,7 +289,7 @@ DBG_AVX512_STATE(struct x86_avx512_thread_state *sp)
 	kprintf("XCR0:   0x%016llx\n", xgetbv(XCR0));
 	kprintf("XINUSE: 0x%016llx\n", xgetbv(1));
 
-	/* Print all ZMM registers */
+	                             
 	for (i = 0; i < 16; i++) {
 		kprintf("zmm%d:\t0x", i);
 		for (j = 0; j < 16; j++) {
@@ -328,7 +328,7 @@ DBG_AVX512_STATE(__unused struct x86_avx512_thread_state *sp)
 {
 	return;
 }
-#endif /* DEBUG_AVX512 */
+#endif                   
 
 #if     DEBUG
 static inline unsigned short
@@ -340,19 +340,19 @@ fnstsw(void)
 }
 #endif
 
-/*
- * Configure the initial FPU state presented to new threads.
- * Determine the MXCSR capability mask, which allows us to mask off any
- * potentially unsafe "reserved" bits before restoring the FPU context.
- * *Not* per-cpu, assumes symmetry.
- */
+  
+                                                            
+                                                                       
+                                                                       
+                                   
+   
 
 static void
 configure_mxcsr_capability_mask(x86_ext_thread_state_t *fps)
 {
-	/* XSAVE requires a 64 byte aligned store */
+	                                            
 	assert(ALIGNED(fps, 64));
-	/* Clear, to prepare for the diagnostic FXSAVE */
+	                                                 
 	bzero(fps, sizeof(*fps));
 
 	fpinit();
@@ -360,12 +360,12 @@ configure_mxcsr_capability_mask(x86_ext_thread_state_t *fps)
 
 	mxcsr_capability_mask = fps->fx.fx_MXCSR_MASK;
 
-	/* Set default mask value if necessary */
+	                                         
 	if (mxcsr_capability_mask == 0) {
 		mxcsr_capability_mask = 0xffbf;
 	}
 
-	/* Clear vector register store */
+	                                 
 	bzero(&fps->fx.fx_XMM_reg[0][0], sizeof(fps->fx.fx_XMM_reg));
 	bzero(fps->avx.x_YMM_Hi128, sizeof(fps->avx.x_YMM_Hi128));
 	if (fpu_ZMM_capable) {
@@ -387,19 +387,19 @@ configure_mxcsr_capability_mask(x86_ext_thread_state_t *fps)
 		fxsave64((struct x86_fx_thread_state *)&default_fx_state);
 	}
 
-	/* Poison values to trap unsafe usage */
+	                                        
 	fps->fx.fp_valid = 0xFFFFFFFF;
 	fps->fx.fp_save_layout = FP_UNUSED;
 
-	/* Re-enable FPU/SSE DNA exceptions */
+	                                      
 	set_ts();
 }
 
 int fpsimd_fault_popc = 0;
-/*
- * Look for FPU and initialize it.
- * Called on each CPU.
- */
+  
+                                  
+                      
+   
 void
 init_fpu(void)
 {
@@ -407,12 +407,12 @@ init_fpu(void)
 	unsigned short  status;
 	unsigned short  control;
 #endif
-	/*
-	 * Check for FPU by initializing it,
-	 * then trying to read the correct bit patterns from
-	 * the control and status registers.
-	 */
-	set_cr0((get_cr0() & ~(CR0_EM | CR0_TS)) | CR0_NE);       /* allow use of FPU */
+	  
+                                     
+                                                     
+                                     
+    
+	set_cr0((get_cr0() & ~(CR0_EM | CR0_TS)) | CR0_NE);                             
 	fninit();
 #if     DEBUG
 	status = fnstsw();
@@ -420,10 +420,10 @@ init_fpu(void)
 
 	assert(((status & 0xff) == 0) && ((control & 0x103f) == 0x3f));
 #endif
-	/* Advertise SSE support */
+	                           
 	if (cpuid_features() & CPUID_FEATURE_FXSR) {
 		set_cr4(get_cr4() | CR4_OSFXS);
-		/* And allow SIMD exceptions if present */
+		                                          
 		if (cpuid_features() & CPUID_FEATURE_SSE) {
 			set_cr4(get_cr4() | CR4_OSXMM);
 		}
@@ -444,9 +444,9 @@ init_fpu(void)
 		}
 	}
 
-	/* Configure the XSAVE context mechanism if the processor supports
-	 * AVX/YMM registers
-	 */
+	                                                                  
+                     
+    
 	if (cpuid_features() & CPUID_FEATURE_XSAVE) {
 		cpuid_xsave_leaf_t *xs0p = &cpuid_info()->cpuid_xsave_leaf[0];
 		if (is_avx512_enabled &&
@@ -454,33 +454,33 @@ init_fpu(void)
 			assert(xs0p->extended_state[eax] & XFEM_SSE);
 			assert(xs0p->extended_state[eax] & XFEM_YMM);
 			fpu_capability = AVX512;
-			/* XSAVE container size for all features */
+			                                           
 			set_cr4(get_cr4() | CR4_OSXSAVE);
 			xsetbv(0, AVX512_XMASK);
-			/* Re-evaluate CPUID, once, to reflect OSXSAVE */
+			                                                 
 			if (OSCompareAndSwap(0, 1, &cpuid_reevaluated)) {
 				cpuid_set_info();
 			}
-			/* Verify that now selected state can be accommodated */
+			                                                        
 			assert(xs0p->extended_state[ebx] == fp_state_size[AVX512]);
-			/*
-			 * AVX set until AVX512 is used.
-			 * See comment above about on-demand AVX512 support.
-			 */
+			  
+                                   
+                                                       
+      
 			xsetbv(0, AVX_XMASK);
 			fpu_default = AVX;
 		} else if (xs0p->extended_state[eax] & XFEM_YMM) {
 			assert(xs0p->extended_state[eax] & XFEM_SSE);
 			fpu_capability = AVX;
 			fpu_default = AVX;
-			/* XSAVE container size for all features */
+			                                           
 			set_cr4(get_cr4() | CR4_OSXSAVE);
 			xsetbv(0, AVX_XMASK);
-			/* Re-evaluate CPUID, once, to reflect OSXSAVE */
+			                                                 
 			if (OSCompareAndSwap(0, 1, &cpuid_reevaluated)) {
 				cpuid_set_info();
 			}
-			/* Verify that now selected state can be accommodated */
+			                                                        
 			assert(xs0p->extended_state[ebx] == fp_state_size[AVX]);
 		}
 	}
@@ -494,16 +494,16 @@ init_fpu(void)
 	fpinit();
 	current_cpu_datap()->cpu_xstate = fpu_default;
 
-	/*
-	 * Trap wait instructions.  Turn off FPU for now.
-	 */
+	  
+                                                  
+    
 	set_cr0(get_cr0() | CR0_TS | CR0_MP);
 }
 
-/*
- * Allocate and initialize FP state for specified xstate.
- * Don't load state.
- */
+  
+                                                         
+                    
+   
 static void *
 fp_state_alloc(xstate_t xs)
 {
@@ -555,7 +555,7 @@ fpu_load_registers(void *fstate)
 	if (layout == XSAVE32 || layout == XSAVE64) {
 		struct x86_avx_thread_state *iavx = fstate;
 		unsigned i;
-		/* Verify reserved bits in the XSAVE header*/
+		                                             
 		if (iavx->_xh.xstate_bv & ~xstate_xmask[current_xstate()]) {
 			panic("iavx->_xh.xstate_bv: 0x%llx", iavx->_xh.xstate_bv);
 		}
@@ -570,7 +570,7 @@ fpu_load_registers(void *fstate)
 			panic("Inappropriate layout: %u\n", layout);
 		}
 	}
-#endif  /* DEBUG */
+#endif             
 
 	switch (layout) {
 	case FXSAVE64:
@@ -621,9 +621,9 @@ fpu_store_registers(void *fstate, boolean_t is64)
 	}
 }
 
-/*
- * Initialize FP handling.
- */
+  
+                          
+   
 
 void
 fpu_module_init(void)
@@ -633,30 +633,30 @@ fpu_module_init(void)
 		    fpu_default);
 	}
 
-	/* To maintain the required alignment, disable
-	 * zone debugging for this zone as that appends
-	 * 16 bytes to each element.
-	 */
+	                                              
+                                                
+                             
+    
 	ifps_zone[fpu_default] = zone_create("x86 fpsave state",
 	    fp_state_size[fpu_default], ZC_ALIGNMENT_REQUIRED | ZC_ZFREE_CLEARMEM);
 
-	/*
-	 * If AVX512 is supported, create a separate savearea zone.
-	 */
+	  
+                                                            
+    
 	if (fpu_capability == AVX512) {
 		ifps_zone[AVX512] = zone_create("x86 avx512 save state",
 		    fp_state_size[AVX512], ZC_ALIGNMENT_REQUIRED | ZC_ZFREE_CLEARMEM);
 	}
 
-	/* Determine MXCSR reserved bits and configure initial FPU state*/
+	                                                                  
 	configure_mxcsr_capability_mask(&initial_fp_state);
 }
 
-/*
- * Context switch fpu state.
- * Always save old thread`s FPU context but don't load new .. allow that to fault-in.
- * Switch to the new task's xstate.
- */
+  
+                            
+                                                                                     
+                                   
+   
 
 void
 fpu_switch_context(thread_t old, thread_t new)
@@ -673,13 +673,13 @@ fpu_switch_context(thread_t old, thread_t new)
 	}
 #endif
 	if (ifps != 0 && (ifps->fp_valid == FALSE)) {
-		/* Clear CR0.TS in preparation for the FP context save. In
-		 * theory, this shouldn't be necessary since a live FPU should
-		 * indicate that TS is clear. However, various routines
-		 * (such as sendsig & sigreturn) manipulate TS directly.
-		 */
+		                                                          
+                                                                
+                                                         
+                                                          
+     
 		clear_ts();
-		/* registers are in FPU - save to memory */
+		                                           
 		boolean_t is64 = (thread_is_64bit_addr(old) &&
 		    is_saved_state64(old->machine.iss));
 
@@ -706,10 +706,10 @@ fpu_switch_context(thread_t old, thread_t new)
 }
 
 
-/*
- * Free a FPU save area.
- * Called only when thread terminating - no locking necessary.
- */
+  
+                        
+                                                              
+   
 void
 fpu_free(thread_t thread, void *fps)
 {
@@ -719,21 +719,21 @@ fpu_free(thread_t thread, void *fps)
 	pcb->xstate = UNDEFINED;
 }
 
-/*
- * Set the floating-point state for a thread based on the FXSave formatted data.
- * This is basically the same as fpu_set_state except it uses the expanded data
- * structure.
- * If the thread is not the current thread, it is not running (held).  Locking
- * needed against concurrent fpu_set_state or fpu_get_state.
- *
- * While translating between XNU FP state structures and the CPU-native XSAVE area,
- * if we detect state components that are all zeroes, we clear the corresponding
- * xstate_bv bit in the XSAVE area, because that allows the corresponding state to
- * be initialized to a "clean" state.  That's most important when clearing the YMM
- * bit, since an initialized "upper clean" state results in a massive performance
- * improvement due to elimination of false dependencies between the XMMs and the
- * upper bits of the YMMs.
- */
+  
+                                                                                
+                                                                               
+             
+                                                                              
+                                                            
+  
+                                                                                   
+                                                                                
+                                                                                  
+                                                                                  
+                                                                                 
+                                                                                
+                          
+   
 kern_return_t
 fpu_set_fxstate(
 	thread_t        thr_act,
@@ -765,7 +765,7 @@ fpu_set_fxstate(
 		if (!fpu_thread_promote_avx512(thr_act)) {
 			return KERN_FAILURE;
 		} else {
-			/* Reload thr_xstate after successful promotion */
+			                                                  
 			thr_xstate = thread_xstate(thr_act);
 		}
 	}
@@ -775,10 +775,10 @@ fpu_set_fxstate(
 	pcb = THREAD_TO_PCB(thr_act);
 
 	if (state == NULL) {
-		/*
-		 * new FPU state is 'invalid'.
-		 * Deallocate the fp state if it exists.
-		 */
+		  
+                                
+                                          
+     
 		simple_lock(&pcb->lock, LCK_GRP_NULL);
 
 		ifps = pcb->ifps;
@@ -790,9 +790,9 @@ fpu_set_fxstate(
 			fp_state_free(ifps, thr_xstate);
 		}
 	} else {
-		/*
-		 * Valid incoming state. Allocate the fp state if there is none.
-		 */
+		  
+                                                                  
+     
 		new_ifps = 0;
 Retry:
 		simple_lock(&pcb->lock, LCK_GRP_NULL);
@@ -811,9 +811,9 @@ Retry:
 			fresh_state = TRUE;
 		}
 
-		/*
-		 * now copy over the new data.
-		 */
+		  
+                                
+     
 
 		old_valid = ifps->fp_valid;
 
@@ -822,10 +822,10 @@ Retry:
 			panic("fpu_set_fxstate inconsistency, thread: %p not stopped", thr_act);
 		}
 #endif
-		/*
-		 * Clear any reserved bits in the MXCSR to prevent a GPF
-		 * when issuing an FXRSTOR.
-		 */
+		  
+                                                          
+                             
+     
 
 		state->fpu_mxcsr &= mxcsr_capability_mask;
 
@@ -851,15 +851,15 @@ Retry:
 
 			iavx->fp.fp_save_layout = thread_is_64bit_addr(thr_act) ? XSAVE64 : XSAVE32;
 
-			/* Sanitize XSAVE header */
+			                           
 			bzero(&iavx->_xh.xhrsvd[0], sizeof(iavx->_xh.xhrsvd));
 			iavx->_xh.xstate_bv = AVX_XMASK;
 			iavx->_xh.xcomp_bv  = 0;
 
-			/*
-			 * See the block comment at the top of the function for a description of why we're clearing
-			 * xstate_bv bits.
-			 */
+			  
+                                                                                              
+                     
+      
 			if (f == x86_AVX_STATE32) {
 				__nochk_bcopy(&xs->fpu_ymmh0, iavx->x_YMM_Hi128, 8 * sizeof(_STRUCT_XMM_REG));
 				if (fpu_allzeroes((uint64_t *)(void *)iavx->x_YMM_Hi128, 8 * sizeof(_STRUCT_XMM_REG)) == TRUE) {
@@ -885,15 +885,15 @@ Retry:
 
 			iavx->fp.fp_save_layout = thread_is_64bit_addr(thr_act) ? XSAVE64 : XSAVE32;
 
-			/* Sanitize XSAVE header */
+			                           
 			bzero(&iavx->_xh.xhrsvd[0], sizeof(iavx->_xh.xhrsvd));
 			iavx->_xh.xstate_bv = AVX512_XMASK;
 			iavx->_xh.xcomp_bv  = 0;
 
-			/*
-			 * See the block comment at the top of the function for a description of why we're clearing
-			 * xstate_bv bits.
-			 */
+			  
+                                                                                              
+                     
+      
 			switch (f) {
 			case x86_AVX512_STATE32:
 				__nochk_bcopy(&xs.s32->fpu_k0, iavx->x_Opmask, 8 * sizeof(_STRUCT_OPMASK_REG));
@@ -918,11 +918,11 @@ Retry:
 				__nochk_bcopy(&xs.s64->fpu_k0, iavx->x_Opmask, 8 * sizeof(_STRUCT_OPMASK_REG));
 				__nochk_bcopy(&xs.s64->fpu_zmm16, iavx->x_Hi16_ZMM, 16 * sizeof(_STRUCT_ZMM_REG));
 				__nochk_bcopy(&xs.s64->fpu_zmmh0, iavx->x_ZMM_Hi256, 16 * sizeof(_STRUCT_YMM_REG));
-				/*
-				 * Note that it is valid to have XFEM_ZMM set but XFEM_YMM cleared.  In that case,
-				 * the upper bits of the YMMs would be cleared and would result in a clean-upper
-				 * state, allowing SSE instruction to avoid false dependencies.
-				 */
+				  
+                                                                                      
+                                                                                    
+                                                                   
+       
 				if (fpu_allzeroes((uint64_t *)(void *)iavx->x_Hi16_ZMM, 16 * sizeof(_STRUCT_ZMM_REG)) == TRUE &&
 				    fpu_allzeroes((uint64_t *)(void *)iavx->x_ZMM_Hi256, 16 * sizeof(_STRUCT_YMM_REG)) == TRUE) {
 					iavx->_xh.xstate_bv &= ~XFEM_ZMM;
@@ -950,7 +950,7 @@ Retry:
 		if (old_valid == FALSE) {
 			boolean_t istate = ml_set_interrupts_enabled(FALSE);
 			ifps->fp_valid = TRUE;
-			/* If altering the current thread's state, disable FPU */
+			                                                         
 			if (thr_act == current_thread()) {
 				set_ts();
 			}
@@ -967,12 +967,12 @@ Retry:
 	return KERN_SUCCESS;
 }
 
-/*
- * Get the floating-point state for a thread.
- * If the thread is not the current thread, it is
- * not running (held).  Locking needed against
- * concurrent fpu_set_state or fpu_get_state.
- */
+  
+                                             
+                                                 
+                                              
+                                             
+   
 kern_return_t
 fpu_get_fxstate(
 	thread_t        thr_act,
@@ -1008,9 +1008,9 @@ fpu_get_fxstate(
 
 	ifps = pcb->ifps;
 	if (ifps == 0) {
-		/*
-		 * No valid floating-point state.
-		 */
+		  
+                                   
+     
 
 		__nochk_bcopy((char *)&initial_fp_state, (char *)&state->fpu_fcw,
 		    fp_state_size[FP]);
@@ -1019,10 +1019,10 @@ fpu_get_fxstate(
 
 		return KERN_SUCCESS;
 	}
-	/*
-	 * Make sure we`ve got the latest fp state info
-	 * If the live fpu state belongs to our target
-	 */
+	  
+                                                
+                                               
+    
 	if (thr_act == current_thread()) {
 		boolean_t       intr;
 
@@ -1048,7 +1048,7 @@ fpu_get_fxstate(
 			panic("fpu_get_fxstate() UNDEFINED xstate");
 			break;
 		case FP:
-			break;                  /* already done */
+			break;                                    
 		case AVX: {
 			struct x86_avx_thread_state *iavx = (void *) ifps;
 			x86_avx_state64_t *xs = (x86_avx_state64_t *) state;
@@ -1100,12 +1100,12 @@ fpu_get_fxstate(
 
 
 
-/*
- * the child thread is 'stopped' with the thread
- * mutex held and is currently not known by anyone
- * so no way for fpu state to get manipulated by an
- * outside agency -> no need for pcb lock
- */
+  
+                                                
+                                                  
+                                                   
+                                         
+   
 
 void
 fpu_dup_fxstate(
@@ -1133,9 +1133,9 @@ fpu_dup_fxstate(
 
 	if (ppcb->ifps != NULL) {
 		struct x86_fx_thread_state *ifps = ppcb->ifps;
-		/*
-		 * Make sure we`ve got the latest fp state info
-		 */
+		  
+                                                 
+     
 		if (current_thread() == parent) {
 			intr = ml_set_interrupts_enabled(FALSE);
 			assert(current_thread() == parent);
@@ -1153,15 +1153,15 @@ fpu_dup_fxstate(
 			    (char *)(child->machine.ifps),
 			    fp_state_size[xstate]);
 
-			/* Mark the new fp saved state as non-live. */
-			/* Temporarily disabled: radar 4647827
-			 * new_ifps->fp_valid = TRUE;
-			 */
+			                                              
+			                                      
+                                
+      
 
-			/*
-			 * Clear any reserved bits in the MXCSR to prevent a GPF
-			 * when issuing an FXRSTOR.
-			 */
+			  
+                                                           
+                              
+      
 			new_ifps->fx_MXCSR &= mxcsr_capability_mask;
 			new_ifps = NULL;
 		}
@@ -1173,11 +1173,11 @@ fpu_dup_fxstate(
 	}
 }
 
-/*
- * Initialize FPU.
- * FNINIT programs the x87 control word to 0x37f, which matches
- * the desired default for macOS.
- */
+  
+                  
+                                                               
+                                 
+   
 
 void
 fpinit(void)
@@ -1186,26 +1186,26 @@ fpinit(void)
 	clear_ts();
 	fninit();
 #if DEBUG
-	/* We skip this power-on-default verification sequence on
-	 * non-DEBUG, as dirtying the x87 control word may slow down
-	 * xsave/xrstor and affect energy use.
-	 */
+	                                                         
+                                                             
+                                       
+    
 	unsigned short  control, control2;
 	fnstcw(&control);
 	control2 = control;
-	control &= ~(FPC_PC | FPC_RC); /* Clear precision & rounding control */
-	control |= (FPC_PC_64 |         /* Set precision */
-	    FPC_RC_RN |                 /* round-to-nearest */
-	    FPC_ZE |                    /* Suppress zero-divide */
-	    FPC_OE |                    /*  and overflow */
-	    FPC_UE |                    /*  underflow */
-	    FPC_IE |                    /* Allow NaNQs and +-INF */
-	    FPC_DE |                    /* Allow denorms as operands  */
-	    FPC_PE);                    /* No trap for precision loss */
+	control &= ~(FPC_PC | FPC_RC);                                         
+	control |= (FPC_PC_64 |                            
+	    FPC_RC_RN |                                       
+	    FPC_ZE |                                              
+	    FPC_OE |                                       
+	    FPC_UE |                                    
+	    FPC_IE |                                               
+	    FPC_DE |                                                    
+	    FPC_PE);                                                    
 	assert(control == control2);
 	fldcw(control);
 #endif
-	/* Initialize SSE/SSE2 */
+	                         
 	__builtin_ia32_ldmxcsr(0x1f80);
 	if (fpu_YMM_capable) {
 		vzeroall();
@@ -1215,9 +1215,9 @@ fpinit(void)
 	ml_set_interrupts_enabled(istate);
 }
 
-/*
- * Coprocessor not present.
- */
+  
+                           
+   
 
 uint64_t x86_isr_fp_simd_use;
 
@@ -1246,17 +1246,17 @@ fpnoextflt(void)
 	}
 	intr = ml_set_interrupts_enabled(FALSE);
 
-	clear_ts();                     /*  Enable FPU use */
+	clear_ts();                                          
 
 	if (__improbable(get_interrupt_level())) {
-		/* Track number of #DNA traps at interrupt context,
-		 * which is likely suboptimal. Racy, but good enough.
-		 */
+		                                                   
+                                                       
+     
 		x86_isr_fp_simd_use++;
-		/*
-		 * Save current FP/SIMD context if valid
-		 * Initialize live FP/SIMD registers
-		 */
+		  
+                                          
+                                      
+     
 		if (pcb->ifps) {
 			fp_save(thr_act);
 		}
@@ -1267,9 +1267,9 @@ fpnoextflt(void)
 			pcb->xstate = xstate;
 			ifps = 0;
 		}
-		/*
-		 * Load this thread`s state into coprocessor live context.
-		 */
+		  
+                                                            
+     
 		fp_load(thr_act);
 	}
 	(void)ml_set_interrupts_enabled(intr);
@@ -1279,10 +1279,10 @@ fpnoextflt(void)
 	}
 }
 
-/*
- * FPU overran end of segment.
- * Re-initialize FPU.  Floating point state is not valid.
- */
+  
+                              
+                                                         
+   
 
 void
 fpextovrflt(void)
@@ -1302,25 +1302,25 @@ fpextovrflt(void)
 		panic("FPU segment overrun exception in kernel thread context\n");
 	}
 
-	/*
-	 * This is a non-recoverable error.
-	 * Invalidate the thread`s FPU state.
-	 */
+	  
+                                    
+                                      
+    
 	pcb = THREAD_TO_PCB(thr_act);
 	simple_lock(&pcb->lock, LCK_GRP_NULL);
 	ifps = pcb->ifps;
 	pcb->ifps = 0;
 	simple_unlock(&pcb->lock);
 
-	/*
-	 * Re-initialize the FPU.
-	 */
+	  
+                          
+    
 	clear_ts();
 	fninit();
 
-	/*
-	 * And disable access.
-	 */
+	  
+                       
+    
 	clear_fpu();
 
 	(void)ml_set_interrupts_enabled(intr);
@@ -1332,9 +1332,9 @@ fpextovrflt(void)
 
 extern void fpxlog(int, uint32_t, uint32_t, uint32_t);
 
-/*
- * FPU error. Called by AST.
- */
+  
+                            
+   
 
 void
 fpexterrflt(void)
@@ -1352,9 +1352,9 @@ fpexterrflt(void)
 		panic("FPU error exception in kernel thread context\n");
 	}
 
-	/*
-	 * Save the FPU state and turn off the FPU.
-	 */
+	  
+                                            
+    
 	fp_save(thr_act);
 
 	(void)ml_set_interrupts_enabled(intr);
@@ -1366,15 +1366,15 @@ fpexterrflt(void)
 	fpxlog(EXC_I386_EXTERR, ifps->fx_status, ifps->fx_control, xcpt);
 }
 
-/*
- * Save FPU state.
- *
- * Locking not needed:
- * .	if called from fpu_get_state, pcb already locked.
- * .	if called from fpnoextflt or fp_intr, we are single-cpu
- * .	otherwise, thread is running.
- * N.B.: Must be called with interrupts disabled
- */
+  
+                  
+  
+                      
+                                                      
+                                                            
+                                  
+                                                
+   
 
 void
 fp_save(
@@ -1386,17 +1386,17 @@ fp_save(
 	assert(ifps != 0);
 	if (ifps != 0 && !ifps->fp_valid) {
 		assert((get_cr0() & CR0_TS) == 0);
-		/* registers are in FPU */
+		                          
 		ifps->fp_valid = TRUE;
 		fpu_store_registers(ifps, thread_is_64bit_addr(thr_act));
 	}
 }
 
-/*
- * Restore FPU state from PCB.
- *
- * Locking not needed; always called on the current thread.
- */
+  
+                              
+  
+                                                           
+   
 
 void
 fp_load(
@@ -1418,13 +1418,13 @@ fp_load(
 	} else {
 		fpu_load_registers(ifps);
 	}
-	ifps->fp_valid = FALSE;         /* in FPU */
+	ifps->fp_valid = FALSE;                     
 }
 
-/*
- * SSE arithmetic exception handling code.
- * Basically the same as the x87 exception handler with a different subtype
- */
+  
+                                          
+                                                                           
+   
 
 void
 fpSSEexterrflt(void)
@@ -1442,17 +1442,17 @@ fpSSEexterrflt(void)
 		panic("SSE exception in kernel thread context\n");
 	}
 
-	/*
-	 * Save the FPU state and turn off the FPU.
-	 */
+	  
+                                            
+    
 	fp_save(thr_act);
 
 	(void)ml_set_interrupts_enabled(intr);
-	/*
-	 * Raise FPU exception.
-	 * Locking not needed on pcb->ifps,
-	 * since thread is running.
-	 */
+	  
+                        
+                                    
+                            
+    
 	const uint32_t mask = (ifps->fx_MXCSR >> 7) &
 	    (FPC_IM | FPC_DM | FPC_ZM | FPC_OM | FPC_UE | FPC_PE);
 	const uint32_t xcpt = ~mask & (ifps->fx_MXCSR &
@@ -1461,13 +1461,13 @@ fpSSEexterrflt(void)
 }
 
 
-/*
- * If a thread is using an AVX-sized savearea:
- * - allocate a new AVX512-sized  area,
- * - copy the 256-bit state into the 512-bit area,
- * - deallocate the smaller area
- * ASSUMES: thread is the current thread.
- */
+  
+                                              
+                                       
+                                                  
+                                
+                                         
+   
 static void
 fpu_savearea_promote_avx512(thread_t thread)
 {
@@ -1487,16 +1487,16 @@ fpu_savearea_promote_avx512(thread_t thread)
 	if (ifps == NULL) {
 		pcb->xstate = AVX512;
 		simple_unlock(&pcb->lock);
-		/*
-		 * Now that the PCB xstate has been promoted, set XCR0 so
-		 * that we don't re-trip #UD on the next AVX-512 instruction.
-		 *
-		 * Since this branch is taken when the first FP instruction
-		 * attempted by this thread is an AVX-512 instruction, we
-		 * call fpnoextflt() to allocate an appropriately-sized
-		 * AVX-512 save-area, thereby avoiding the overhead of another
-		 * fault that would be triggered immediately on return.
-		 */
+		  
+                                                           
+                                                               
+    
+                                                             
+                                                           
+                                                         
+                                                                
+                                                         
+     
 		intr = ml_set_interrupts_enabled(FALSE);
 		xsetbv(0, AVX512_XMASK);
 		current_cpu_datap()->cpu_xstate = AVX512;
@@ -1530,7 +1530,7 @@ fpu_savearea_promote_avx512(thread_t thread)
 
 	assert(ifps->fp.fp_valid);
 
-	/* Allocate an AVX512 savearea and copy AVX state into it */
+	                                                            
 	if (pcb->xstate != AVX512) {
 		__nochk_bcopy(ifps, ifps512, fp_state_size[AVX]);
 		pcb->ifps = ifps512;
@@ -1539,9 +1539,9 @@ fpu_savearea_promote_avx512(thread_t thread)
 	} else {
 		ifps = NULL;
 	}
-	/* The PCB lock is redundant in some scenarios given the higher level
-	 * thread mutex, but its pre-emption disablement is relied upon here
-	 */
+	                                                                     
+                                                                     
+    
 	simple_unlock(&pcb->lock);
 
 	if (ifps) {
@@ -1552,9 +1552,9 @@ fpu_savearea_promote_avx512(thread_t thread)
 	}
 }
 
-/*
- * Upgrade the calling thread to AVX512.
- */
+  
+                                        
+   
 boolean_t
 fpu_thread_promote_avx512(thread_t thread)
 {
@@ -1569,21 +1569,21 @@ fpu_thread_promote_avx512(thread_t thread)
 
 	fpu_savearea_promote_avx512(thread);
 
-	/* Racy but the task's xstate is only a hint */
+	                                               
 	task->xstate = AVX512;
 
 	return TRUE;
 }
 
 
-/*
- * Called from user_trap() when an invalid opcode fault is taken.
- * If the user is attempting an AVX512 instruction on a machine
- * that supports this, we switch the calling thread to use
- * a larger savearea, set its XCR0 bit mask to enable AVX512 and
- * return to user_trap() with a 0 return value.
- * Otherwise, simply return a nonzero value.
- */
+  
+                                                                 
+                                                               
+                                                          
+                                                                
+                                               
+                                            
+   
 
 #define MAX_X86_INSN_LENGTH (15)
 int
@@ -1593,36 +1593,36 @@ fpUDflt(user_addr_t rip)
 	boolean_t       is_AVX512_instruction = FALSE;
 	user_addr_t     original_rip = rip;
 	do {
-		/* TODO: as an optimisation, copy up to the lesser of the
-		 * next page boundary or maximal prefix length in one pass
-		 * rather than issue multiple copyins
-		 */
+		                                                         
+                                                            
+                                       
+     
 		if (copyin(rip, (char *) &instruction_prefix, 1)) {
 			return 1;
 		}
 		DBG("fpUDflt(0x%016llx) prefix: 0x%x\n",
 		    rip, instruction_prefix);
-		/* TODO: determine more specifically which prefixes
-		 * are sane possibilities for AVX512 insns
-		 */
+		                                                   
+                                            
+     
 		switch (instruction_prefix) {
-		case 0x2E:      /* CS segment override */
-		case 0x36:      /* SS segment override */
-		case 0x3E:      /* DS segment override */
-		case 0x26:      /* ES segment override */
-		case 0x64:      /* FS segment override */
-		case 0x65:      /* GS segment override */
-		case 0x66:      /* Operand-size override */
-		case 0x67:      /* address-size override */
-			/* Skip optional prefixes */
+		case 0x2E:                               
+		case 0x36:                               
+		case 0x3E:                               
+		case 0x26:                               
+		case 0x64:                               
+		case 0x65:                               
+		case 0x66:                                 
+		case 0x67:                                 
+			                            
 			rip++;
 			if ((rip - original_rip) > MAX_X86_INSN_LENGTH) {
 				return 1;
 			}
 			break;
-		case 0x62:      /* EVEX */
-		case 0xC5:      /* VEX 2-byte */
-		case 0xC4:      /* VEX 3-byte */
+		case 0x62:                
+		case 0xC5:                      
+		case 0xC4:                      
 			is_AVX512_instruction = TRUE;
 			break;
 		default:
@@ -1630,11 +1630,11 @@ fpUDflt(user_addr_t rip)
 		}
 	} while (!is_AVX512_instruction);
 
-	/* Here if we detect attempted execution of an AVX512 instruction */
+	                                                                    
 
-	/*
-	 * Fail if this machine doesn't support AVX512
-	 */
+	  
+                                               
+    
 	if (fpu_capability != AVX512) {
 		return 1;
 	}
@@ -1703,10 +1703,10 @@ current_xstate(void)
 	return thread_xstate(current_thread());
 }
 
-/*
- * Called when exec'ing between bitnesses.
- * If valid FPU state exists, adjust the layout.
- */
+  
+                                          
+                                                
+   
 void
 fpu_switch_addrmode(thread_t thread, boolean_t is_64bit)
 {

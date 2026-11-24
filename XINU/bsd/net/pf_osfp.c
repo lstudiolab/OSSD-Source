@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$apfw: pf_osfp.c,v 1.4 2008/08/27 00:01:32 jhw Exp $ */
-/*	$OpenBSD: pf_osfp.c,v 1.12 2006/12/13 18:14:10 itojun Exp $ */
+                                                          
+                                                                 
 
 /*
  * Copyright (c) 2003 Mike Frantzen <frantzen@w4g.org>
@@ -79,10 +79,10 @@ static struct pf_os_fingerprint *pf_osfp_find_exact(struct pf_osfp_list *,
 static void pf_osfp_insert(struct pf_osfp_list *, struct pf_os_fingerprint *);
 
 
-/*
- * Passively fingerprint the OS of the host (IPv4 TCP SYN packets only)
- * Returns the list of possible OSes.
- */
+  
+                                                                       
+                                     
+   
 struct pf_osfp_enlist *
 pf_osfp_fingerprint(struct pf_pdesc *pd, pbuf_t *pbuf, int off,
     const struct tcphdr *tcp)
@@ -141,7 +141,7 @@ pf_osfp_fingerprint_hdr(const struct ip *ip, const struct ip6_hdr *ip6,
 		(void) inet_ntop(AF_INET, &ip->ip_src, srcname,
 		    (socklen_t)sizeof(srcname));
 	} else if (ip6) {
-		/* jumbo payload? */
+		                    
 		fp.fp_psize = sizeof(struct ip6_hdr) + ntohs(ip6->ip6_plen);
 		fp.fp_ttl = ip6->ip6_hlim;
 		fp.fp_flags |= PF_OSFP_DF;
@@ -214,7 +214,7 @@ pf_osfp_fingerprint_hdr(const struct ip *ip, const struct ip6_hdr *ip6,
 				return NULL;
 			}
 		}
-		optlen = MAX(optlen, 1);        /* paranoia */
+		optlen = MAX(optlen, 1);                      
 	}
 
 	DPFPRINTF("fingerprinted %s:%d  %d:%d:%d:%d:%llx (%d) "
@@ -237,7 +237,7 @@ pf_osfp_fingerprint_hdr(const struct ip *ip, const struct ip6_hdr *ip6,
 	return NULL;
 }
 
-/* Match a fingerprint ID against a list of OSes */
+                                                   
 int
 pf_osfp_match(struct pf_osfp_enlist *list, pf_osfp_t os)
 {
@@ -268,7 +268,7 @@ pf_osfp_match(struct pf_osfp_enlist *list, pf_osfp_t os)
 	return 0;
 }
 
-/* Initialize the OS fingerprint system */
+                                          
 void
 pf_osfp_initialize(void)
 {
@@ -290,7 +290,7 @@ pf_osfp_destroy(void)
 }
 #endif
 
-/* Flush the fingerprint list */
+                                
 void
 pf_osfp_flush(void)
 {
@@ -308,7 +308,7 @@ pf_osfp_flush(void)
 }
 
 
-/* Add a fingerprint */
+                       
 int
 pf_osfp_add(struct pf_osfp_ioctl *fpioc)
 {
@@ -387,7 +387,7 @@ pf_osfp_add(struct pf_osfp_ioctl *fpioc)
 	}
 	memcpy(entry, &fpioc->fp_os, sizeof(*entry));
 
-	/* Make sure the strings are NUL terminated */
+	                                              
 	entry->fp_class_nm[sizeof(entry->fp_class_nm) - 1] = '\0';
 	entry->fp_version_nm[sizeof(entry->fp_version_nm) - 1] = '\0';
 	entry->fp_subtype_nm[sizeof(entry->fp_subtype_nm) - 1] = '\0';
@@ -398,12 +398,12 @@ pf_osfp_add(struct pf_osfp_ioctl *fpioc)
 	if ((fp = pf_osfp_validate())) {
 		printf("Invalid fingerprint list\n");
 	}
-#endif /* PFDEBUG */
+#endif              
 	return 0;
 }
 
 
-/* Find a fingerprint in the list */
+                                    
 struct pf_os_fingerprint *
 pf_osfp_find(struct pf_osfp_list *list, struct pf_os_fingerprint *find,
     u_int8_t ttldiff)
@@ -440,10 +440,10 @@ pf_osfp_find(struct pf_osfp_list *list, struct pf_os_fingerprint *find,
 					continue;
 				}
 
-/*
- * Some "smart" NAT devices and DSL routers will tweak the MSS size and
- * will set it to whatever is suitable for the link type.
- */
+  
+                                                                       
+                                                         
+   
 #define SMART_MSS       1460
 				if ((find->fp_wsize % find->fp_mss ||
 				    find->fp_wsize / find->fp_mss !=
@@ -485,7 +485,7 @@ pf_osfp_find(struct pf_osfp_list *list, struct pf_os_fingerprint *find,
 	return NULL;
 }
 
-/* Find an exact fingerprint in the list */
+                                           
 struct pf_os_fingerprint *
 pf_osfp_find_exact(struct pf_osfp_list *list, struct pf_os_fingerprint *find)
 {
@@ -507,13 +507,13 @@ pf_osfp_find_exact(struct pf_osfp_list *list, struct pf_os_fingerprint *find)
 	return NULL;
 }
 
-/* Insert a fingerprint into the list */
+                                        
 void
 pf_osfp_insert(struct pf_osfp_list *list, struct pf_os_fingerprint *ins)
 {
 	struct pf_os_fingerprint *f, *prev = NULL;
 
-	/* XXX need to go semi tree based.  can key on tcp options */
+	                                                             
 
 	SLIST_FOREACH(f, list, fp_next)
 	prev = f;
@@ -524,7 +524,7 @@ pf_osfp_insert(struct pf_osfp_list *list, struct pf_os_fingerprint *ins)
 	}
 }
 
-/* Fill a fingerprint by its number (from an ioctl) */
+                                                      
 int
 pf_osfp_get(struct pf_osfp_ioctl *fpioc)
 {
@@ -557,7 +557,7 @@ pf_osfp_get(struct pf_osfp_ioctl *fpioc)
 }
 
 
-/* Validate that each signature is reachable */
+                                               
 struct pf_os_fingerprint *
 pf_osfp_validate(void)
 {
@@ -566,7 +566,7 @@ pf_osfp_validate(void)
 	SLIST_FOREACH(f, &pf_osfp_list, fp_next) {
 		memcpy(&find, f, sizeof(find));
 
-		/* We do a few MSS/th_win percolations to make things unique */
+		                                                               
 		if (find.fp_mss == 0) {
 			find.fp_mss = 128;
 		}

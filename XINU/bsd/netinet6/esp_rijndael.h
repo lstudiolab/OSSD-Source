@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp_rijndael.h,v 1.1.2.1 2001/07/03 11:01:50 ume Exp $	*/
-/*	$KAME: esp_rijndael.h,v 1.1 2000/09/20 18:15:22 itojun Exp $	*/
+                                                                                       
+                                                                  
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -74,4 +74,4 @@ int esp_gcm_encrypt_aes(struct mbuf *, size_t, size_t, struct secasvar *, const 
 int esp_gcm_decrypt_aes(struct mbuf *, size_t, struct secasvar *, const struct esp_algorithm *, int);
 int esp_gcm_encrypt_finalize(struct secasvar *, unsigned char *, size_t);
 int esp_gcm_decrypt_finalize(struct secasvar *, unsigned char *, size_t);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         

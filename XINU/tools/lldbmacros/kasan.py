@@ -128,14 +128,14 @@ def print_alloc_info(_addr):
     _shbyte = get_shadow_byte(_shp)
     _shstr = shadow_byte_to_string(_shbyte)
 
-    # If we're in a left redzone, scan to the start of the real allocation, where
-    # the header should live
+                                                                                 
+                            
     shbyte = _shbyte
     while shbyte == 0xfa:
         addr += 8
         shbyte = get_shadow_byte(shadow_for_address(addr, shift))
 
-    # Search backwards for an allocation
+                                        
     searchbytes = 0
     while searchbytes < 8*4096:
 
@@ -147,7 +147,7 @@ def print_alloc_info(_addr):
         liveh = kern.GetValueFromAddress(headerp, 'struct kasan_alloc_header *')
         freeh = kern.GetValueFromAddress(addr, 'struct freelist_entry *')
 
-        # heap allocations should only ever have these shadow values
+                                                                    
         if shbyte not in (0,1,2,3,4,5,6,7, 0xfa, 0xfb, 0xfd, 0xf5):
             print "No allocation found at 0x{:x} (found shadow {:x})".format(_addr, shbyte)
             return
@@ -222,7 +222,7 @@ def print_whatis(_addr, ctx):
     if shbyte is 0xf8:
         extra = "Out-of-scope"
 
-    # look for the base of the object
+                                     
     while shbyte in [0,1,2,3,4,5,6,7,0xf8]:
         sz = 8 - shbyte
         if shbyte is 0xf8:
@@ -237,12 +237,12 @@ def print_whatis(_addr, ctx):
     base = addr + 8
     leftrz = shbyte
 
-    # If we did not find a left/mid redzone, we aren't in an object
+                                                                   
     if leftrz not in [0xf1, 0xf2, 0xfa, 0xf9]:
         print "No object found"
         return
 
-    # now size the object
+                         
     addr = (_addr & ~0x7) + 8
     shbyte = get_shadow_byte(shadow_for_address(addr, shift))
     while shbyte in [0,1,2,3,4,5,6,7,0xf8]:
@@ -258,7 +258,7 @@ def print_whatis(_addr, ctx):
             return
     rightrz = shbyte
 
-    # work out the type of the object from its redzone
+                                                      
     objtype = "Unknown"
     if leftrz == 0xf1 or leftrz == 0xf2:
         objtype = "stack"
@@ -347,8 +347,8 @@ def Kasan(cmd_args=None, cmd_options={}):
     global shift
     shift = unsigned(kern.globals.__asan_shadow_memory_dynamic_address)
 
-    # Since the VM is not aware of the KASan shadow mapping, accesses to it will
-    # fail. Setting kdp_read_io=1 avoids this check.
+                                                                                
+                                                    
     if GetConnectionProtocol() == "kdp" and unsigned(kern.globals.kdp_read_io) == 0:
         print "Setting kdp_read_io=1 to allow KASan shadow reads"
         if sizeof(kern.globals.kdp_read_io) == 4:

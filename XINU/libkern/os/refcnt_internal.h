@@ -11,12 +11,12 @@ struct os_refcnt {
 #if OS_REFCNT_DEBUG
 struct os_refgrp {
 	const char *const grp_name;
-	os_ref_atomic_t grp_children;  /* number of refcount objects in group */
-	os_ref_atomic_t grp_count;     /* current reference count of group */
+	os_ref_atomic_t grp_children;                                           
+	os_ref_atomic_t grp_count;                                           
 	_Atomic uint64_t grp_retain_total;
 	_Atomic uint64_t grp_release_total;
 	struct os_refgrp *grp_parent;
-	void *grp_log;                       /* refcount logging context */
+	void *grp_log;                                                     
 };
 #endif
 
@@ -56,7 +56,7 @@ bool os_ref_retain_try_internal(os_ref_atomic_t *, struct os_refgrp *);
 void os_ref_retain_locked_internal(os_ref_atomic_t *, struct os_refgrp *);
 os_ref_count_t os_ref_release_locked_internal(os_ref_atomic_t *, struct os_refgrp *);
 #else
-/* For now, the internal and external variants are identical */
+                                                               
 #define os_ref_init_count_internal      os_ref_init_count_external
 #define os_ref_retain_internal          os_ref_retain_external
 #define os_ref_retain_locked_internal   os_ref_retain_locked_external
@@ -122,20 +122,20 @@ os_ref_release_explicit(struct os_refcnt *rc, memory_order release_order, memory
 # define os_refgrp_decl_extern(var) \
 	extern struct os_refgrp var
 
-/* Create a default group based on the init() callsite if no explicit group
- * is provided. */
+                                                                           
+                  
 # define os_ref_init_count(rc, grp, count) ({ \
 	        os_refgrp_decl(static, __grp, __func__, NULL); \
 	        (os_ref_init_count)((rc), (grp) ? (grp) : &__grp, (count)); \
 	})
 
-#else /* OS_REFCNT_DEBUG */
+#else                      
 
 # define os_refgrp_decl(...) extern struct os_refgrp var __attribute__((unused))
 # define os_refgrp_decl_extern(var) os_refgrp_decl(var)
 # define os_ref_init_count(rc, grp, count) (os_ref_init_count)((rc), NULL, (count))
 
-#endif /* OS_REFCNT_DEBUG */
+#endif                      
 
 #if XNU_KERNEL_PRIVATE
 void os_ref_panic_live(void *rc) __abortlike;
@@ -185,9 +185,9 @@ os_ref_get_count(struct os_refcnt *rc)
 
 
 
-/*
- * Raw API
- */
+  
+          
+   
 
 static inline void
 os_ref_init_count_raw(os_ref_atomic_t *rc, struct os_refgrp *grp, os_ref_count_t count)
@@ -246,7 +246,7 @@ os_ref_get_count_raw(os_ref_atomic_t *rc)
 }
 
 #if !OS_REFCNT_DEBUG
-/* remove the group argument for non-debug */
+                                             
 #define os_ref_init_count_raw(rc, grp, count) (os_ref_init_count_raw)((rc), NULL, (count))
 #define os_ref_retain_raw(rc, grp) (os_ref_retain_raw)((rc), NULL)
 #define os_ref_release_raw(rc, grp) (os_ref_release_raw)((rc), NULL)
@@ -354,7 +354,7 @@ os_ref_release_live_mask(os_ref_atomic_t *rc, uint32_t b, struct os_refgrp *grp)
 }
 
 #if !OS_REFCNT_DEBUG
-/* remove the group argument for non-debug */
+                                             
 #define os_ref_init_count_mask(rc, b, grp, init_c, init_b) (os_ref_init_count_mask)(rc, b, NULL, init_c, init_b)
 #define os_ref_retain_mask(rc, b, grp) (os_ref_retain_mask)((rc), (b), NULL)
 #define os_ref_retain_acquire_mask(rc, b, grp) (os_ref_retain_acquire_mask)((rc), (b), NULL)
@@ -372,4 +372,4 @@ os_ref_release_live_mask(os_ref_atomic_t *rc, uint32_t b, struct os_refgrp *grp)
 
 __END_DECLS
 
-#endif /* _OS_REFCNT_INTERNAL_H */
+#endif                            

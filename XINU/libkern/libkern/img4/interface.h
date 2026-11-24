@@ -26,41 +26,41 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*!
- * @header
- * Interfaces to register the AppleImage4 interface with xnu-proper to avoid a
- * build-time layering inversion.
- */
+   
+          
+                                                                              
+                                 
+   
 #ifndef __IMG4_INTERFACE_H
 #define __IMG4_INTERFACE_H
 
 #include <os/base.h>
 #include <sys/cdefs.h>
 
-/*
- * We rely on firmware.h's logic for either including sys/types.h or declaring
- * errno_t ourselves. So when building the kernel, include firmware.h from our
- * external headers. Avoid this inclusion if we're building AppleImage4, which
- * will have included its own internal version of the header.
- */
+  
+                                                                              
+                                                                              
+                                                                              
+                                                             
+   
 #if MACH_KERNEL_PRIVATE || !_DARWIN_BUILDING_PROJECT_APPLEIMAGE4
 #include <img4/firmware.h>
 #endif
 
-/*!
- * @const IMG4_INTERFACE_VERSION
- * The version of the interface supported by the implementation. As new
- * functions are added to the interface, this value will be incremented so that
- * it can be tested at build-time and not require rev-locked submissions of xnu
- * and AppleImage4.
- */
+   
+                                
+                                                                       
+                                                                               
+                                                                               
+                   
+   
 #define IMG4_INTERFACE_VERSION (10u)
 
-/*!
- * @typegroup
- * Type definitions for all exported functions and constants in the AppleImage4
- * kext.
- */
+   
+             
+                                                                               
+        
+   
 typedef const void *img4_retired_t;
 
 typedef errno_t (*const img4_nonce_domain_copy_nonce_t)(
@@ -267,27 +267,27 @@ typedef struct _img4_interface {
 
 __BEGIN_DECLS
 
-/*!
- * @const img4if
- * The AppleImage4 interface that was registered.
- */
+   
+                
+                                                 
+   
 extern const img4_interface_t *img4if;
 
-/*!
- * @function img4_interface_register
- * Registers the AppleImage4 kext interface for use within the kernel proper.
- *
- * @param i4
- * The interface to register.
- *
- * @discussion
- * This routine may only be called once and must be called before late-const has
- * been applied to kernel memory.
- */
+   
+                                    
+                                                                             
+  
+            
+                             
+  
+              
+                                                                                
+                                 
+   
 OS_EXPORT OS_NONNULL1
 void
 img4_interface_register(const img4_interface_t *i4);
 
 __END_DECLS
 
-#endif // __IMG4_INTERFACE_H
+#endif                      

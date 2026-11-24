@@ -73,9 +73,9 @@ static const char *bootkc_path = "/System/Library/KernelCollections/BootKernelEx
 static const char *bootkc_path = "/System/Library/KernelCollections/BootKernelExtensions.kc";
 #endif
 
-/*
- * Rev1 chunklist handling
- */
+  
+                          
+   
 const struct chunklist_pubkey rev1_chunklist_pubkeys[] = {
 };
 const size_t rev1_chunklist_num_pubkeys = sizeof(rev1_chunklist_pubkeys) / sizeof(rev1_chunklist_pubkeys[0]);
@@ -101,7 +101,7 @@ construct_chunklist_path(char path[static MAXPATHLEN], const char *root_path)
 
 	len = strnlen(root_path, MAXPATHLEN);
 	if (len < MAXPATHLEN && len > strlen(".dmg")) {
-		/* correctly terminated string with space for extension */
+		                                                          
 	} else {
 		AUTHPRNT("malformed root path");
 		return EOVERFLOW;
@@ -174,7 +174,7 @@ out:
 	if (err) {
 		return err;
 	} else if (sig_valid == true) {
-		return 0; /* success */
+		return 0;              
 	} else {
 		return EAUTH;
 	}
@@ -211,15 +211,15 @@ validate_root_image(const char *root_path, void *chunklist)
 	}
 	doclose = true;
 
-	/*
-	 * Iterate the chunk list and check each chunk
-	 */
+	  
+                                               
+    
 	chk = chunklist + hdr->cl_chunk_offset;
 	for (ch = 0; ch < hdr->cl_chunk_count; ch++) {
 		int resid = 0;
 
 		if (!buf) {
-			/* allocate buffer based on first chunk size */
+			                                               
 			buf = kheap_alloc(KHEAP_TEMP, chk->chunk_size, Z_WAITOK);
 			if (buf == NULL) {
 				err = ENOMEM;
@@ -246,14 +246,14 @@ validate_root_image(const char *root_path, void *chunklist)
 			goto out;
 		}
 
-		/* calculate the SHA256 of this chunk */
+		                                        
 		uint8_t sha_digest[SHA256_DIGEST_LENGTH];
 		SHA256_CTX sha_ctx;
 		SHA256_Init(&sha_ctx);
 		SHA256_Update(&sha_ctx, buf, chk->chunk_size);
 		SHA256_Final(sha_digest, &sha_ctx);
 
-		/* Check the calculated SHA matches the chunk list */
+		                                                     
 		if (bcmp(sha_digest, chk->chunk_sha256, SHA256_DIGEST_LENGTH) != 0) {
 			AUTHPRNT("SHA mismatch on chunk %lu (offset %lld, size %u)", ch, offset, chk->chunk_size);
 			err = EINVAL;
@@ -292,19 +292,19 @@ getuuidfromheader_safe(const void *buf, size_t bufsz, size_t *uuidsz)
 	const struct uuid_command *cmd = NULL;
 	const kernel_mach_header_t *mh = buf;
 
-	/* space for the header and at least one load command? */
+	                                                         
 	if (bufsz < sizeof(kernel_mach_header_t) + sizeof(struct uuid_command)) {
 		AUTHPRNT("libkern image too small");
 		return NULL;
 	}
 
-	/* validate the mach header */
+	                              
 	if (mh->magic != MH_MAGIC_64 || (mh->sizeofcmds > bufsz - sizeof(kernel_mach_header_t))) {
 		AUTHPRNT("invalid MachO header");
 		return NULL;
 	}
 
-	/* iterate the load commands */
+	                               
 	size_t offset = sizeof(kernel_mach_header_t);
 	for (size_t i = 0; i < mh->ncmds; i++) {
 		cmd = buf + offset;
@@ -323,9 +323,9 @@ getuuidfromheader_safe(const void *buf, size_t bufsz, size_t *uuidsz)
 	return NULL;
 }
 
-/*
- * Rev2 chunklist handling
- */
+  
+                          
+   
 const struct chunklist_pubkey rev2_chunklist_pubkeys[] = {
 };
 const size_t rev2_chunklist_num_pubkeys = sizeof(rev2_chunklist_pubkeys) / sizeof(rev2_chunklist_pubkeys[0]);
@@ -336,41 +336,41 @@ static const struct efi_guid_t gEfiSignCertTypeRsa2048Sha256Guid = EFI_CERT_TYPE
 static boolean_t
 validate_rev2_certificate(struct rev2_chunklist_certificate *certificate)
 {
-	/* Default value of current security epoch MUST be CHUNKLIST_MIN_SECURITY_EPOCH */
+	                                                                                  
 	uint8_t current_security_epoch = CHUNKLIST_MIN_SECURITY_EPOCH;
 
-	/* Certificate.Length must be equal to sizeof(CERTIFICATE) */
+	                                                             
 	if (certificate->length != sizeof(struct rev2_chunklist_certificate)) {
 		AUTHDBG("invalid certificate length");
 		return FALSE;
 	}
 
-	/* Certificate.Revision MUST be equal to 2 */
+	                                             
 	if (certificate->revision != 2) {
 		AUTHDBG("invalid certificate revision");
 		return FALSE;
 	}
 
-	/* Certificate.SecurityEpoch MUST be current or higher */
+	                                                         
 	if (PE_parse_boot_argn(CHUNKLIST_SECURITY_EPOCH, &current_security_epoch, sizeof(current_security_epoch)) &&
 	    certificate->security_epoch < current_security_epoch) {
 		AUTHDBG("invalid certificate security epoch");
 		return FALSE;
 	}
 
-	/* Certificate.CertificateType MUST be equal to WIN_CERT_TYPE_EFI_GUID (0x0EF1) */
+	                                                                                  
 	if (certificate->certificate_type != WIN_CERT_TYPE_EFI_GUID) {
 		AUTHDBG("invalid certificate type");
 		return FALSE;
 	}
 
-	/* Certificate.CertificateGuid MUST be equal to 45E7BC51-913C-42AC-96A2-10712FFBEBA7 */
+	                                                                                       
 	if (0 != memcmp(&certificate->certificate_guid, &gEfiSignAppleCertTypeGuid, sizeof(struct efi_guid_t))) {
 		AUTHDBG("invalid certificate GUID");
 		return FALSE;
 	}
 
-	/* Certificate.HashTypeGuid MUST be equal to A7717414-C616-4977-9420-844712A735BF */
+	                                                                                    
 	if (0 != memcmp(&certificate->hash_type_guid, &gEfiSignCertTypeRsa2048Sha256Guid, sizeof(struct efi_guid_t))) {
 		AUTHDBG("invalid hash type GUID");
 		return FALSE;
@@ -385,13 +385,13 @@ validate_rev2_chunklist(uint8_t *buffer, size_t buffer_size)
 	struct rev2_chunklist_certificate *certificate;
 	size_t security_data_offset;
 
-	/* Check input parameters to be sane */
+	                                       
 	if (buffer == NULL || buffer_size == 0) {
 		AUTHDBG("invalid parameter");
 		return EINVAL;
 	}
 
-	/* Check for existing signature */
+	                                  
 	if (buffer_size < sizeof(struct rev2_chunklist_certificate)) {
 		AUTHDBG("no space for certificate");
 		return EINVAL;
@@ -400,41 +400,41 @@ validate_rev2_chunklist(uint8_t *buffer, size_t buffer_size)
 	security_data_offset = buffer_size - sizeof(struct rev2_chunklist_certificate);
 	certificate = (struct rev2_chunklist_certificate*)(buffer + security_data_offset);
 
-	/* Check signature candidate to be a valid rev2 chunklist certificate */
+	                                                                        
 	if (TRUE != validate_rev2_certificate(certificate)) {
 		return EINVAL;
 	}
 
-	/* Check public key to be trusted */
+	                                    
 	for (size_t i = 0; i < rev2_chunklist_num_pubkeys; i++) {
 		const struct chunklist_pubkey *key = &rev2_chunklist_pubkeys[i];
-		/* Production keys are always trusted */
+		                                        
 		if (key->is_production != TRUE) {
 			uint8_t no_rev2_dev = 0;
-			/* Do not trust rev2 development keys if CHUNKLIST_NO_REV2_DEV is present */
+			                                                                            
 			if (PE_parse_boot_argn(CHUNKLIST_NO_REV2_DEV, &no_rev2_dev, sizeof(no_rev2_dev))) {
 				AUTHDBG("rev2 development key is not trusted");
 				continue;
 			}
 		}
 
-		/* Check certificate public key to be the trusted one */
+		                                                        
 		if (0 == memcmp(key->key, certificate->rsa_public_key, sizeof(certificate->rsa_public_key))) {
 			AUTHDBG("certificate public key is trusted");
 
-			/* Hash everything but signature */
+			                                   
 			SHA256_CTX hash_ctx;
 			SHA256_Init(&hash_ctx);
 			SHA256_Update(&hash_ctx, buffer, security_data_offset);
 
-			/* Include Certificate.SecurityEpoch value */
+			                                             
 			SHA256_Update(&hash_ctx, &certificate->security_epoch, sizeof(certificate->security_epoch));
 
-			/* Finalize hashing into the output buffer */
+			                                             
 			uint8_t sha_digest[SHA256_DIGEST_LENGTH];
 			SHA256_Final(sha_digest, &hash_ctx);
 
-			/* Validate signature */
+			                        
 			return validate_signature(certificate->rsa_public_key,
 			           sizeof(certificate->rsa_public_key),
 			           certificate->rsa_signature,
@@ -447,9 +447,9 @@ validate_rev2_chunklist(uint8_t *buffer, size_t buffer_size)
 	return EINVAL;
 }
 
-/*
- * Main chunklist validation routine
- */
+  
+                                    
+   
 static int
 validate_chunklist(void *buf, size_t len)
 {
@@ -466,7 +466,7 @@ validate_chunklist(void *buf, size_t len)
 		return EINVAL;
 	}
 
-	/* recognized file format? */
+	                             
 	if (hdr->cl_magic != CHUNKLIST_MAGIC ||
 	    hdr->cl_file_ver != CHUNKLIST_FILE_VERSION_10 ||
 	    hdr->cl_chunk_method != CHUNKLIST_CHUNK_METHOD_10) {
@@ -474,7 +474,7 @@ validate_chunklist(void *buf, size_t len)
 		return EINVAL;
 	}
 
-	/* determine signature length based on signature method */
+	                                                          
 	if (hdr->cl_sig_method == CHUNKLIST_SIGNATURE_METHOD_REV1) {
 		AUTHPRNT("rev1 chunklist");
 		sig_len = CHUNKLIST_REV1_SIG_LEN;
@@ -486,7 +486,7 @@ validate_chunklist(void *buf, size_t len)
 		return EINVAL;
 	}
 
-	/* does the chunk list fall within the bounds of the buffer? */
+	                                                               
 	if (os_mul_and_add_overflow(hdr->cl_chunk_count, sizeof(struct chunklist_chunk), hdr->cl_chunk_offset, &chunks_end) ||
 	    hdr->cl_chunk_offset < sizeof(struct chunklist_hdr) || chunks_end > len) {
 		AUTHPRNT("invalid chunk_count (%llu) or chunk_offset (%llu)",
@@ -494,7 +494,7 @@ validate_chunklist(void *buf, size_t len)
 		return EINVAL;
 	}
 
-	/* does the signature fall within the bounds of the buffer? */
+	                                                              
 	if (os_add_overflow(hdr->cl_sig_offset, sig_len, &sig_end) ||
 	    hdr->cl_sig_offset < sizeof(struct chunklist_hdr) ||
 	    hdr->cl_sig_offset < chunks_end ||
@@ -506,20 +506,20 @@ validate_chunklist(void *buf, size_t len)
 	if (sig_end > len ||
 	    os_sub_overflow(len, hdr->cl_sig_offset, &sigsz) ||
 	    sigsz != sig_len) {
-		/* missing or incorrect signature size */
+		                                         
 		return EINVAL;
 	}
 
-	/* validate rev1 chunklist */
+	                             
 	if (hdr->cl_sig_method == CHUNKLIST_SIGNATURE_METHOD_REV1) {
-		/* Do not trust rev1 chunklists if CHUNKLIST_NO_REV1 is present */
+		                                                                  
 		uint8_t no_rev1;
 		if (PE_parse_boot_argn(CHUNKLIST_NO_REV1, &no_rev1, sizeof(no_rev1))) {
 			AUTHDBG("rev1 chunklists are not trusted");
 			return EINVAL;
 		}
 
-		/* hash the chunklist (excluding the signature) */
+		                                                  
 		AUTHDBG("hashing rev1 chunklist");
 		uint8_t sha_digest[SHA256_DIGEST_LENGTH];
 		SHA256_CTX sha_ctx;
@@ -536,7 +536,7 @@ validate_chunklist(void *buf, size_t len)
 				valid_sig = key->is_production;
 #if IMAGEBOOT_ALLOW_DEVKEYS
 				if (!key->is_production) {
-					/* allow dev keys in dev builds only */
+					                                       
 					AUTHDBG("*** allowing DEV rev1 key: this will fail in customer builds ***");
 					valid_sig = TRUE;
 				}
@@ -545,8 +545,8 @@ validate_chunklist(void *buf, size_t len)
 			}
 		}
 
-		/* At this point we tried all the keys: nothing went wrong but none of them
-		 * signed our chunklist. */
+		                                                                           
+                             
 		AUTHPRNT("rev1 signature did not verify against any known rev1 public key");
 	} else if (hdr->cl_sig_method == CHUNKLIST_SIGNATURE_METHOD_REV2) {
 		AUTHDBG("validating rev2 chunklist signature against rev2 pub keys");
@@ -561,15 +561,15 @@ out:
 	if (err) {
 		return err;
 	} else if (valid_sig == TRUE) {
-		return 0; /* signed, and everything checked out */
+		return 0;                                         
 	} else {
 		return EINVAL;
 	}
 }
 
-/*
- * Authenticate a given DMG file using chunklist
- */
+  
+                                                
+   
 int
 authenticate_root_with_chunklist(const char *rootdmg_path, boolean_t *out_enforced)
 {
@@ -588,10 +588,10 @@ authenticate_root_with_chunklist(const char *rootdmg_path, boolean_t *out_enforc
 
 	AUTHDBG("validating root against chunklist %s", chunklist_path);
 
-	/*
-	 * Read and authenticate the chunklist, then validate the root image against
-	 * the chunklist.
-	 */
+	  
+                                                                             
+                  
+    
 	AUTHDBG("reading chunklist");
 	err = imageboot_read_file(KHEAP_TEMP, chunklist_path, &chunklist_buf, &chunklist_len);
 	if (err) {
@@ -614,7 +614,7 @@ authenticate_root_with_chunklist(const char *rootdmg_path, boolean_t *out_enforc
 		goto out;
 	}
 
-	/* everything checked out - go ahead and mount this */
+	                                                      
 	AUTHDBG("root image authenticated");
 
 out:
@@ -645,9 +645,9 @@ authenticate_root_version_check(void)
 	}
 }
 
-/*
- * Check that the UUID of the boot KC currently loaded matches the one on disk.
- */
+  
+                                                                               
+   
 int
 authenticate_bootkc_uuid(void)
 {
@@ -655,7 +655,7 @@ authenticate_bootkc_uuid(void)
 	void *buf = NULL;
 	size_t bufsz = 1 * 1024 * 1024UL;
 
-	/* get the UUID of the bootkc in /S/L/KC */
+	                                           
 	err = imageboot_read_file(KHEAP_TEMP, bootkc_path, &buf, &bufsz);
 	if (err) {
 		goto out;
@@ -675,7 +675,7 @@ authenticate_bootkc_uuid(void)
 		goto out;
 	}
 
-	/* ... and compare them */
+	                          
 	if (bcmp(&kernelcache_uuid, img_uuid, uuidsz) != 0) {
 		AUTHPRNT("UUID of running bootkc does not match %s", bootkc_path);
 
@@ -689,15 +689,15 @@ authenticate_bootkc_uuid(void)
 		goto out;
 	}
 
-	/* UUID matches! */
+	                   
 out:
 	kheap_free_safe(KHEAP_TEMP, buf, bufsz);
 	return err;
 }
 
-/*
- * Check that the UUID of the libkern currently loaded matches the one on disk.
- */
+  
+                                                                               
+   
 int
 authenticate_libkern_uuid(void)
 {
@@ -705,7 +705,7 @@ authenticate_libkern_uuid(void)
 	void *buf = NULL;
 	size_t bufsz = 4 * 1024 * 1024UL;
 
-	/* get the UUID of the libkern in /S/L/E */
+	                                           
 	err = imageboot_read_file(KHEAP_TEMP, libkern_path, &buf, &bufsz);
 	if (err) {
 		goto out;
@@ -735,7 +735,7 @@ authenticate_libkern_uuid(void)
 		goto out;
 	}
 
-	/* Get the UUID of the loaded libkern */
+	                                        
 	uuid_t live_uuid;
 	err = OSKextGetUUIDForName(libkern_bundle, live_uuid);
 	if (err) {
@@ -743,7 +743,7 @@ authenticate_libkern_uuid(void)
 		goto out;
 	}
 
-	/* ... and compare them */
+	                          
 	if (bcmp(live_uuid, img_uuid, uuidsz) != 0) {
 		AUTHPRNT("UUID of running libkern does not match %s", libkern_path);
 
@@ -757,7 +757,7 @@ authenticate_libkern_uuid(void)
 		goto out;
 	}
 
-	/* UUID matches! */
+	                   
 out:
 	kheap_free_safe(KHEAP_TEMP, buf, bufsz);
 	return err;

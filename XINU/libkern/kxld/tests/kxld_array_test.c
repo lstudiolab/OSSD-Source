@@ -76,9 +76,9 @@ main(int argc __unused, char *argv[] __unused)
 	idx = titems;
 	item = kxld_array_get_item(&array, idx);
 	assert(!item);
-	/* We allocated the max number of items that could be stored in a page,
-	 * so get_slot() and get_item() are equivalent.
-	 */
+	                                                                       
+                                                
+    
 	assert(item == kxld_array_get_slot(&array, idx));
 
 	kxld_log(0, 0, "%d: Resize", ++test_num);
@@ -102,9 +102,9 @@ main(int argc __unused, char *argv[] __unused)
 	idx = titems;
 	item = kxld_array_get_item(&array, idx);
 	assert(!item);
-	/* We allocated fewer items than could fit in a page, so get_slot() will
-	 * return items even when get_item() does not.  See below for details.
-	 */
+	                                                                        
+                                                                       
+    
 	assert(item != kxld_array_get_slot(&array, idx));
 
 	kxld_log(0, 0, "%d: Clear and attempt to get an item", ++test_num);
@@ -113,10 +113,10 @@ main(int argc __unused, char *argv[] __unused)
 	assert(!item);
 
 	kxld_log(0, 0, "%d: Get slot", ++test_num);
-	/* The array allocates its internal storage in pages. Because get_slot()
-	 * fetches items based on the allocated size, not the logical size, we
-	 * calculate the max items get_slot() can retrieve based on page size.
-	 */
+	                                                                        
+                                                                       
+                                                                       
+    
 	titems = (u_int) (round_page(titems * sizeof(u_int)) / sizeof(u_int));
 	assert(!item);
 	item = kxld_array_get_slot(&array, 0);

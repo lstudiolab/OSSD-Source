@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/mld6_var.h,v 1.1.2.1 2000/07/15 07:14:36 kris Exp $	*/
-/*	$KAME: mld6_var.h,v 1.4 2000/03/25 07:23:54 sumikawa Exp $	*/
+                                                                                    
+                                                                
 
 /*
  * Copyright (C) 1998 WIDE Project.
@@ -62,43 +62,43 @@
 #define _NETINET6_MLD6_VAR_H_
 #include <sys/appleapiopts.h>
 
-/*
- * Multicast Listener Discovery (MLD)
- * implementation-specific definitions.
- */
+  
+                                     
+                                       
+   
 
 #ifdef PRIVATE
-/*
- * Per-link MLD state.
- */
+  
+                      
+   
 #ifndef XNU_KERNEL_PRIVATE
 struct mld_ifinfo {
 #else
 struct mld_ifinfo_u {
-#endif /* XNU_KERNEL_PRIVATE */
-	uint32_t mli_ifindex;   /* interface this instance belongs to */
-	uint32_t mli_version;   /* MLDv1 Host Compatibility Mode */
-	uint32_t mli_v1_timer;  /* MLDv1 Querier Present timer (s) */
-	uint32_t mli_v2_timer;  /* MLDv2 General Query (interface) timer (s)*/
-	uint32_t mli_flags;     /* MLD per-interface flags */
-	uint32_t mli_rv;        /* MLDv2 Robustness Variable */
-	uint32_t mli_qi;        /* MLDv2 Query Interval (s) */
-	uint32_t mli_qri;       /* MLDv2 Query Response Interval (s) */
-	uint32_t mli_uri;       /* MLDv2 Unsolicited Report Interval (s) */
+#endif                         
+	uint32_t mli_ifindex;                                           
+	uint32_t mli_version;                                      
+	uint32_t mli_v1_timer;                                       
+	uint32_t mli_v2_timer;                                                
+	uint32_t mli_flags;                                  
+	uint32_t mli_rv;                                       
+	uint32_t mli_qi;                                      
+	uint32_t mli_qri;                                              
+	uint32_t mli_uri;                                                  
 	uint32_t _pad;
 };
 
-#define MLIF_SILENT     0x00000001      /* Do not use MLD on this ifp */
-#define MLIF_USEALLOW   0x00000002      /* Use ALLOW/BLOCK for joins/leaves */
-#define MLIF_PROCESSED  0x00000004      /* Entry has been processed and can be skipped */
+#define MLIF_SILENT     0x00000001                                      
+#define MLIF_USEALLOW   0x00000002                                            
+#define MLIF_PROCESSED  0x00000004                                                       
 
-/*
- * MLD version tag.
- */
-#define MLD_VERSION_NONE                0 /* Invalid */
+  
+                   
+   
+#define MLD_VERSION_NONE                0              
 #define MLD_VERSION_1                   1
-#define MLD_VERSION_2                   2 /* Default */
-#endif /* PRIVATE */
+#define MLD_VERSION_2                   2              
+#endif              
 
 #ifdef BSD_KERNEL_PRIVATE
 #include <sys/syslog.h>
@@ -112,85 +112,85 @@ extern int mld_debug;
 #endif
 
 #define MLD_RANDOM_DELAY(X)             (RandomULong() % (X) + 1)
-#define MLD_MAX_STATE_CHANGES           24 /* Max pending changes per group */
+#define MLD_MAX_STATE_CHANGES           24                                    
 
-/*
- * MLD per-group states.
- */
-#define MLD_NOT_MEMBER                  0 /* Can garbage collect group */
-#define MLD_SILENT_MEMBER               1 /* Do not perform MLD for group */
-#define MLD_REPORTING_MEMBER            2 /* MLDv1 we are reporter */
-#define MLD_IDLE_MEMBER                 3 /* MLDv1 we reported last */
-#define MLD_LAZY_MEMBER                 4 /* MLDv1 other member reporting */
-#define MLD_SLEEPING_MEMBER             5 /* MLDv1 start query response */
-#define MLD_AWAKENING_MEMBER            6 /* MLDv1 group timer will start */
-#define MLD_G_QUERY_PENDING_MEMBER      7 /* MLDv2 group query pending */
-#define MLD_SG_QUERY_PENDING_MEMBER     8 /* MLDv2 source query pending */
-#define MLD_LEAVING_MEMBER              9 /* MLDv2 dying gasp (pending last */
-                                          /* retransmission of INCLUDE {}) */
-/*
- * MLDv2 protocol control variables.
- */
-#define MLD_RV_INIT             2       /* Robustness Variable */
+  
+                        
+   
+#define MLD_NOT_MEMBER                  0                                
+#define MLD_SILENT_MEMBER               1                                   
+#define MLD_REPORTING_MEMBER            2                            
+#define MLD_IDLE_MEMBER                 3                             
+#define MLD_LAZY_MEMBER                 4                                   
+#define MLD_SLEEPING_MEMBER             5                                 
+#define MLD_AWAKENING_MEMBER            6                                   
+#define MLD_G_QUERY_PENDING_MEMBER      7                                
+#define MLD_SG_QUERY_PENDING_MEMBER     8                                 
+#define MLD_LEAVING_MEMBER              9                                     
+                                                                             
+  
+                                    
+   
+#define MLD_RV_INIT             2                                
 #define MLD_RV_MIN              1
 #define MLD_RV_MAX              7
 
-#define MLD_QI_INIT             125     /* Query Interval (s) */
+#define MLD_QI_INIT             125                             
 #define MLD_QI_MIN              1
 #define MLD_QI_MAX              255
 
-#define MLD_QRI_INIT            10      /* Query Response Interval (s) */
+#define MLD_QRI_INIT            10                                       
 #define MLD_QRI_MIN             1
 #define MLD_QRI_MAX             255
 
-#define MLD_URI_INIT            3       /* Unsolicited Report Interval (s) */
+#define MLD_URI_INIT            3                                            
 #define MLD_URI_MIN             0
 #define MLD_URI_MAX             10
 
-#define MLD_MAX_GS_SOURCES              256 /* # of sources in rx GS query */
-#define MLD_MAX_G_GS_PACKETS            8 /* # of packets to answer G/GS */
-#define MLD_MAX_STATE_CHANGE_PACKETS    8 /* # of packets per state change */
-#define MLD_MAX_RESPONSE_PACKETS        16 /* # of packets for general query */
-#define MLD_MAX_RESPONSE_BURST          4 /* # of responses to send at once */
-#define MLD_RESPONSE_BURST_INTERVAL     1 /* 1 second */
+#define MLD_MAX_GS_SOURCES              256                                  
+#define MLD_MAX_G_GS_PACKETS            8                                  
+#define MLD_MAX_STATE_CHANGE_PACKETS    8                                    
+#define MLD_MAX_RESPONSE_PACKETS        16                                     
+#define MLD_MAX_RESPONSE_BURST          4                                     
+#define MLD_RESPONSE_BURST_INTERVAL     1               
 
-/*
- * MLD-specific mbuf flags.
- */
-#define M_MLDV1         M_PROTO1        /* Packet is MLDv1 */
-#define M_GROUPREC      M_PROTO3        /* mbuf chain is a group record */
+  
+                           
+   
+#define M_MLDV1         M_PROTO1                             
+#define M_GROUPREC      M_PROTO3                                          
 
-/*
- * Leading space for MLDv2 reports inside MTU.
- *
- * NOTE: This differs from IGMPv3 significantly. KAME IPv6 requires
- * that a fully formed mbuf chain *without* the Router Alert option
- * is passed to ip6_output(), however we must account for it in the
- * MTU if we need to split an MLDv2 report into several packets.
- *
- * We now put the MLDv2 report header in the initial mbuf containing
- * the IPv6 header.
- */
+  
+                                              
+  
+                                                                   
+                                                                   
+                                                                   
+                                                                
+  
+                                                                    
+                   
+   
 #define MLD_MTUSPACE    (sizeof(struct ip6_hdr) + sizeof(struct mld_raopt) + \
 	                 sizeof(struct icmp6_hdr))
 
 struct mld_ifinfo {
 	decl_lck_mtx_data(, mli_lock);
-	uint32_t mli_refcnt;    /* reference count */
-	uint32_t mli_debug;     /* see ifa_debug flags */
+	uint32_t mli_refcnt;                         
+	uint32_t mli_debug;                              
 	LIST_ENTRY(mld_ifinfo) mli_link;
-	struct ifnet *mli_ifp;  /* interface this instance belongs to */
-	uint32_t mli_version;   /* MLDv1 Host Compatibility Mode */
-	uint32_t mli_v1_timer;  /* MLDv1 Querier Present timer (s) */
-	uint32_t mli_v2_timer;  /* MLDv2 General Query (interface) timer (s)*/
-	uint32_t mli_flags;     /* MLD per-interface flags */
-	uint32_t mli_rv;        /* MLDv2 Robustness Variable */
-	uint32_t mli_qi;        /* MLDv2 Query Interval (s) */
-	uint32_t mli_qri;       /* MLDv2 Query Response Interval (s) */
-	uint32_t mli_uri;       /* MLDv2 Unsolicited Report Interval (s) */
-	SLIST_HEAD(, in6_multi)  mli_relinmhead; /* released groups */
-	struct ifqueue   mli_gq;        /* queue of general query responses */
-	struct ifqueue   mli_v1q; /* MLDv1 message queue */
+	struct ifnet *mli_ifp;                                          
+	uint32_t mli_version;                                      
+	uint32_t mli_v1_timer;                                       
+	uint32_t mli_v2_timer;                                                
+	uint32_t mli_flags;                                  
+	uint32_t mli_rv;                                       
+	uint32_t mli_qi;                                      
+	uint32_t mli_qri;                                              
+	uint32_t mli_uri;                                                  
+	SLIST_HEAD(, in6_multi)  mli_relinmhead;                      
+	struct ifqueue   mli_gq;                                              
+	struct ifqueue   mli_v1q;                          
 };
 
 #define MLI_LOCK_ASSERT_HELD(_mli)                                      \
@@ -222,19 +222,19 @@ struct mld_ifinfo {
 #define MLI_REMREF(_mli)                                                \
 	mli_remref(_mli)
 
-/*
- * Per-link MLD context.
- */
+  
+                        
+   
 #define MLD_IFINFO(ifp) ((ifp)->if_mli)
 
-/*
- * MLD timer schedule parameters
- */
+  
+                                
+   
 struct mld_tparams {
-	int     qpt;    /* querier_present_timers_running6 */
-	int     it;     /* interface_timers_running6 */
-	int     cst;    /* current_state_timers_running6 */
-	int     sct;    /* state_change_timers_running6 */
+	int     qpt;                                         
+	int     it;                                    
+	int     cst;                                       
+	int     sct;                                      
 };
 
 extern int mld_change_state(struct in6_multi *, struct mld_tparams *,
@@ -255,5 +255,5 @@ __private_extern__ void mld6_initsilent(struct ifnet *, struct mld_ifinfo *);
 SYSCTL_DECL(_net_inet6_mld);
 #endif
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET6_MLD6_VAR_H_ */
+#endif                         
+#endif                            

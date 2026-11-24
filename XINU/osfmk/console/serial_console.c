@@ -33,7 +33,7 @@
 #include <i386/machine_routines.h>
 #include <i386/misc_protos.h>
 #include <i386/serial_io.h>
-#endif /* __x86_64__ */
+#endif                 
 
 #include <machine/machine_cpu.h>
 #include <libkern/OSAtomic.h>
@@ -74,19 +74,19 @@ static struct {
 	lck_ticket_t write_lock;
 } console_ring;
 
-/*
- * New allocation mechanism for console buffers
- * Total allocation: 1 * PAGE_SIZE
- * - Each cpu gets CPU_CONS_BUF_SIZE buffer
- * - Kernel wide console ring gets PAGE_SIZE - MAX_CPU_SLOTS * CPU_CONS_BUF_SIZE
- *
- * At the return from console_init() the memory is setup as follows:
- *  +----------------------------+-------------+-------------+-------------+-------------+
- *  |console ring buffer---------|f2eec075-----|f2eec075-----|f2eec075-----|f2eec075-----|
- *  +----------------------------+-------------+-------------+-------------+-------------+
- * Each cpu allocation will find the first (f2eec075) and use that buffer.
- *
- */
+  
+                                               
+                                  
+                                           
+                                                                                
+  
+                                                                    
+                                                                                          
+                                                                                          
+                                                                                          
+                                                                          
+  
+   
 
 #define CPU_CONS_BUF_SIZE 256
 #define CPU_BUF_FREE_HEX 0xf2eec075
@@ -94,15 +94,15 @@ static struct {
 #define KERN_CONSOLE_BUF_SIZE vm_map_round_page(CPU_CONS_BUF_SIZE *(MAX_CPU_SLOTS + 1), PAGE_SIZE - 1)
 #define KERN_CONSOLE_RING_SIZE (KERN_CONSOLE_BUF_SIZE - (CPU_CONS_BUF_SIZE * MAX_CPU_SLOTS))
 
-/*
- * A serial line running at 115200 bps can output ~11.5 characters per millisecond.
- * Synchronous serial logging with preemption disabled fundamentally prevents us
- * from hitting expected scheduling deadlines, but we can at least tone it down a bit.
- *
- * TODO: IOLog should use asynchronous serial logging instead of the synchronous serial console. (26555148)
- *
- * Keep interrupt disabled periods shorter than 1ms
- */
+  
+                                                                                   
+                                                                                
+                                                                                      
+  
+                                                                                                           
+  
+                                                   
+   
 #define MAX_NO_PREEMPT_FLUSH_SIZE 8
 #define MAX_TOTAL_FLUSH_SIZE (MAX(2, MAX_CPU_SLOTS) * CPU_CONS_BUF_SIZE)
 
@@ -144,7 +144,7 @@ SECURITY_READ_ONLY_LATE(uint32_t) cons_ops_index = VC_CONS_OPS;
 
 LCK_GRP_DECLARE(console_lck_grp, "console");
 
-// NMI static variables
+                       
 #define NMI_STRING_SIZE 32
 char nmi_string[NMI_STRING_SIZE] = "afDIGHr84A84jh19Kphgp428DNPdnapq";
 static int nmi_counter           = 0;
@@ -196,7 +196,7 @@ console_init(void)
 
 	console_ring.buffer += PAGE_SIZE;
 
-	/* setup memory for per cpu console buffers */
+	                                              
 	for (i = 0; i < MAX_CPU_SLOTS; i++) {
 		p  = (uint32_t *)((uintptr_t)console_ring.buffer + console_ring.len + (i * sizeof(console_buf_t)));
 		*p = CPU_BUF_FREE_HEX;
@@ -219,7 +219,7 @@ console_cpu_alloc(__unused boolean_t boot_processor)
 	console_init();
 	assert(console_ring.buffer != NULL);
 
-	/* select the next slot from the per cpu buffers at end of console_ring.buffer */
+	                                                                                 
 	for (i = 0; i < MAX_CPU_SLOTS; i++) {
 		p = (uint32_t *)((uintptr_t)console_ring.buffer + console_ring.len + (i * sizeof(console_buf_t)));
 		if (OSCompareAndSwap(CPU_BUF_FREE_HEX, 0, (UInt32 *)p)) {
@@ -257,7 +257,7 @@ console_ring_reserve_space(int nchars)
 	lck_ticket_lock(&console_ring.write_lock, &console_lck_grp);
 	if ((console_ring.len - console_ring.used) >= nchars) {
 		console_ring.used += nchars;
-		mp_disable_preemption(); // Don't allow preemption while holding a reservation; otherwise console_ring_try_empty() could take arbitrarily long
+		mp_disable_preemption();                                                                                                                      
 		os_atomic_inc(&console_ring.nreserved, relaxed);
 		write_ptr = console_ring.write_ptr;
 		console_ring.write_ptr =
@@ -371,10 +371,10 @@ console_ring_try_empty(void)
 	}
 
 	do {
-		/*
-		 * Try to get the read lock on the ring buffer to empty it.
-		 * If this fails someone else is already emptying...
-		 */
+		  
+                                                             
+                                                      
+     
 		if (!in_debugger && !simple_lock_try(&console_ring.read_lock, &console_lck_grp)) {
 			return;
 		}
@@ -386,10 +386,10 @@ console_ring_try_empty(void)
 			}
 		}
 
-		/* try small chunk at a time, so we allow writes from other cpus into the buffer */
+		                                                                                   
 		nchars_out = MIN(console_ring.used, (int)sizeof(flush_buf));
 
-		/* account for data to be read before wrap around */
+		                                                    
 		size_before_wrap = (int)((console_ring.buffer + console_ring.len) - console_ring.read_ptr);
 		if (nchars_out > size_before_wrap) {
 			nchars_out = size_before_wrap;
@@ -415,11 +415,11 @@ console_ring_try_empty(void)
 			simple_unlock(&console_ring.read_lock);
 		}
 
-		/*
-		 * In case we end up being the console drain thread
-		 * for far too long, break out. Except in panic/suspend cases
-		 * where we should clear out full buffer.
-		 */
+		  
+                                                     
+                                                               
+                                           
+     
 		if (!console_suspended && (total_chars_out >= MAX_TOTAL_FLUSH_SIZE)) {
 			break;
 		}
@@ -451,12 +451,12 @@ console_write(char * str, int size)
 	if (__improbable(!console_io_allowed())) {
 		return;
 	} else if (__improbable(console_suspended)) {
-		/*
-		 * Put directly to console if we're heading into suspend or if we're in
-		 * the kernel debugger for a panic/stackshot. If any of the other cores
-		 * happened to halt while holding any of the console locks, attempting
-		 * to use the normal path will result in sadness.
-		 */
+		  
+                                                                         
+                                                                         
+                                                                        
+                                                   
+     
 		_cnputs(str, size);
 		return;
 	}
@@ -496,22 +496,22 @@ restart:
 	cbp = (console_buf_t *)cpu_data_p->cpu_console_buf;
 	if (console_suspended || cbp == NULL) {
 		mp_enable_preemption();
-		/*
-		 * Put directly if console ring is not initialized or we're heading into suspend.
-		 * Also do this if we're in the kernel debugger for a panic or stackshot.
-		 * If any of the other cores happened to halt while holding any of the console
-		 * locks, attempting to use the normal path will result in sadness.
-		 */
+		  
+                                                                                   
+                                                                           
+                                                                                
+                                                                     
+     
 		_cnputs(&c, 1);
 		return;
 	}
 
-	/*
-	 * add to stack buf
-	 * If the cpu buffer is full, we'll flush, then try
-	 * another put.  If it fails a second time... screw
-	 * it.
-	 */
+	  
+                    
+                                                    
+                                                    
+       
+    
 	if (needs_print && !cpu_buffer_put(cbp, c)) {
 		write_ptr = console_ring_reserve_space(cpu_buffer_size(cbp));
 		if (write_ptr == NULL) {
@@ -537,14 +537,14 @@ restart:
 		return;
 	}
 
-	/* We printed a newline, time to flush the CPU buffer to the global buffer */
+	                                                                             
 
-	/*
-	 * Is there enough space in the shared ring buffer?
-	 * Try to empty if not.
-	 * Note, we want the entire local buffer to fit to
-	 * avoid another cpu interjecting.
-	 */
+	  
+                                                    
+                        
+                                                   
+                                   
+    
 
 	write_ptr = console_ring_reserve_space(cpu_buffer_size(cbp));
 	if (write_ptr == NULL) {
@@ -576,11 +576,11 @@ _serial_getc(__unused int a, __unused int b, boolean_t wait, __unused boolean_t 
 		c = serial_getc();
 	} while (wait && c < 0);
 
-	// Check for the NMI string
+	                           
 	if (c == nmi_string[nmi_counter]) {
 		nmi_counter++;
 		if (nmi_counter == NMI_STRING_SIZE) {
-			// We've got the NMI string, now do an NMI
+			                                          
 			Debugger("Automatic NMI");
 			nmi_counter = 0;
 			return '\n';
@@ -627,10 +627,10 @@ vcgetc(__unused int l, __unused int u, __unused boolean_t wait, __unused boolean
 #ifdef CONFIG_XNUPOST
 static uint32_t cons_test_ops_count = 0;
 
-/*
- * Try to do multiple cpu buffer allocs and free and intentionally
- * allow for pre-emption.
- */
+  
+                                                                  
+                         
+   
 static void
 alloc_free_func(void * arg, wait_result_t wres __unused)
 {
@@ -647,14 +647,14 @@ alloc_free_func(void * arg, wait_result_t wres __unused)
 		}
 		console_cpu_free(cbp);
 		cbp = NULL;
-		/* give chance to another thread to come in */
+		                                              
 		delay(10);
 	}
 }
 
-/*
- * Log to console by multiple methods - printf, unbuffered write, console_write()
- */
+  
+                                                                                 
+   
 static void
 log_to_console_func(void * arg __unused, wait_result_t wres __unused)
 {
@@ -685,7 +685,7 @@ console_serial_parallel_log_tests(void)
 
 	log_to_console_func(NULL, 0);
 
-	/* wait until other thread has also finished */
+	                                               
 	while (cons_test_ops_count < 52) {
 		delay(1000);
 	}
@@ -709,7 +709,7 @@ console_serial_alloc_rel_tests(void)
 	for (i = 0; i < MAX_CPU_SLOTS; i++) {
 		p   = (uint32_t *)((uintptr_t)console_ring.buffer + console_ring.len + (i * sizeof(console_buf_t)));
 		cbp = (console_buf_t *)(void *)p;
-		/* p should either be allocated cpu buffer or have CPU_BUF_FREE_HEX in it */
+		                                                                            
 		T_ASSERT(*p == CPU_BUF_FREE_HEX || cbp->buf_base == &cbp->buf[0], "");
 		if (*p == CPU_BUF_FREE_HEX) {
 			free_buf_count++;
@@ -722,23 +722,23 @@ console_serial_alloc_rel_tests(void)
 	kr = kernel_thread_start(alloc_free_func, (void *)1000, &thread);
 	T_ASSERT_EQ_INT(kr, KERN_SUCCESS, "kernel_thread_start returned successfully");
 
-	/* yeild cpu to give other thread chance to get on-core */
+	                                                          
 	delay(100);
 
 	alloc_free_func((void *)1000, 0);
 
-	/* wait until other thread finishes its tasks */
+	                                                
 	while (cons_test_ops_count < 2000) {
 		delay(1000);
 	}
 
 	thread_deallocate(thread);
-	/* verify again that atleast 2 slots are free */
+	                                                
 	free_buf_count = 0;
 	for (i = 0; i < MAX_CPU_SLOTS; i++) {
 		p   = (uint32_t *)((uintptr_t)console_ring.buffer + console_ring.len + (i * sizeof(console_buf_t)));
 		cbp = (console_buf_t *)(void *)p;
-		/* p should either be allocated cpu buffer or have CPU_BUF_FREE_HEX in it */
+		                                                                            
 		T_ASSERT(*p == CPU_BUF_FREE_HEX || cbp->buf_base == &cbp->buf[0], "");
 		if (*p == CPU_BUF_FREE_HEX) {
 			free_buf_count++;
@@ -761,15 +761,15 @@ console_serial_test(void)
 	T_ASSERT_EQ_INT(console_ring.len, KERN_CONSOLE_RING_SIZE, "Console ring size is not correct.");
 	T_ASSERT_GT_INT(KERN_CONSOLE_BUF_SIZE, KERN_CONSOLE_RING_SIZE, "kernel console buffer size is < allocation.");
 
-	/* select the next slot from the per cpu buffers at end of console_ring.buffer */
+	                                                                                 
 	for (i = 0; i < MAX_CPU_SLOTS; i++) {
 		p   = (uint32_t *)((uintptr_t)console_ring.buffer + console_ring.len + (i * sizeof(console_buf_t)));
 		cbp = (console_buf_t *)(void *)p;
-		/* p should either be allocated cpu buffer or have CPU_BUF_FREE_HEX in it */
+		                                                                            
 		T_ASSERT(*p == CPU_BUF_FREE_HEX || cbp->buf_base == &cbp->buf[0], "verified initialization of cpu buffers p=%p", (void *)p);
 	}
 
-	/* setup buffer to be chars */
+	                              
 	for (i = 0; i < CPU_BUFFER_LEN; i++) {
 		buffer[i] = (char)('0' + (i % 10));
 	}

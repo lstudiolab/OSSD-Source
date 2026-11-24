@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTE: Internal ipcs.h header; all interfaces are private; if you want this
- * same information from your own program, popen(3) the ipcs(2) command and
- * parse its output, or your program may not work on future OS releases.
- */
+  
+                                                                             
+                                                                           
+                                                                        
+   
 
 #ifndef _SYS_IPCS_H_
 #define _SYS_IPCS_H_
@@ -37,64 +37,64 @@
 #include <sys/appleapiopts.h>
 #include <sys/cdefs.h>
 
-#define IPCS_MAGIC      0x00000001      /* Version */
+#define IPCS_MAGIC      0x00000001                   
 
-/*
- * IPCS_command
- *
- * This is the IPCS command structure used for obtaining status about the
- * System V IPC mechanisms.  All other operations are based on the per
- * subsystem (shm, msg, ipc) *ctl entry point, which can be called once
- * this information is known.
- */
+  
+               
+  
+                                                                         
+                                                                      
+                                                                       
+                             
+   
 
 struct IPCS_command {
-	int             ipcs_magic;     /* Magic number for struct layout */
-	int             ipcs_op;        /* Operation to perform */
-	int             ipcs_cursor;    /* Cursor for iteration functions */
-	int             ipcs_datalen;   /* Length of ipcs_data area */
-	void            *ipcs_data;     /* OP specific data */
+	int             ipcs_magic;                                         
+	int             ipcs_op;                                  
+	int             ipcs_cursor;                                        
+	int             ipcs_datalen;                                 
+	void            *ipcs_data;                           
 };
 
 #ifdef KERNEL_PRIVATE
 #include <machine/types.h>
 
 struct user_IPCS_command {
-	int             ipcs_magic;     /* Magic number for struct layout */
-	int             ipcs_op;        /* Operation to perform */
-	int             ipcs_cursor;    /* Cursor for iteration functions */
-	int             ipcs_datalen;   /* Length of ipcs_data area */
-	user_addr_t     ipcs_data;      /* OP specific data */
+	int             ipcs_magic;                                         
+	int             ipcs_op;                                  
+	int             ipcs_cursor;                                        
+	int             ipcs_datalen;                                 
+	user_addr_t     ipcs_data;                            
 };
 
 struct user32_IPCS_command {
-	int             ipcs_magic;     /* Magic number for struct layout */
-	int             ipcs_op;        /* Operation to perform */
-	int             ipcs_cursor;    /* Cursor for iteration functions */
-	int             ipcs_datalen;   /* Length of ipcs_data area */
-	user32_addr_t   ipcs_data;      /* OP specific data */
+	int             ipcs_magic;                                         
+	int             ipcs_op;                                  
+	int             ipcs_cursor;                                        
+	int             ipcs_datalen;                                 
+	user32_addr_t   ipcs_data;                            
 };
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * OP code values for 'ipcs_op'
- */
-#define IPCS_SHM_CONF   0x00000001      /* Obtain shared memory config */
-#define IPCS_SHM_ITER   0x00000002      /* Iterate shared memory info */
+  
+                               
+   
+#define IPCS_SHM_CONF   0x00000001                                       
+#define IPCS_SHM_ITER   0x00000002                                      
 
-#define IPCS_SEM_CONF   0x00000010      /* Obtain semaphore config */
-#define IPCS_SEM_ITER   0x00000020      /* Iterate semaphore info */
+#define IPCS_SEM_CONF   0x00000010                                   
+#define IPCS_SEM_ITER   0x00000020                                  
 
-#define IPCS_MSG_CONF   0x00000100      /* Obtain message queue config */
-#define IPCS_MSG_ITER   0x00000200      /* Iterate message queue info */
+#define IPCS_MSG_CONF   0x00000100                                       
+#define IPCS_MSG_ITER   0x00000200                                      
 
-/*
- * Sysctl oid name values
- */
+  
+                         
+   
 #define IPCS_SHM_SYSCTL "kern.sysv.ipcs.shm"
 #define IPCS_SEM_SYSCTL "kern.sysv.ipcs.sem"
 #define IPCS_MSG_SYSCTL "kern.sysv.ipcs.msg"
 
 
-#endif  /* _SYS_IPCS_H_ */
+#endif                    

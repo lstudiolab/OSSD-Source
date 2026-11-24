@@ -59,4 +59,4 @@ cpu_pause(void)
 	__builtin_ia32_pause();
 }
 
-#endif /* _I386_MACHINE_CPU_H_ */
+#endif                           

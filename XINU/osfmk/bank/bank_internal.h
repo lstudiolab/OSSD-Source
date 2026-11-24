@@ -41,7 +41,7 @@
 #include <ipc/ipc_voucher.h>
 #include <bank/bank_types.h>
 
-/* Default value for Voucher Attribute Manager for BANK */
+                                                          
 #define BANK_DEFAULT_VALUE NULL
 #define BANK_DEFAULT_TASK_VALUE ((void *) 1)
 
@@ -51,12 +51,12 @@ typedef mach_voucher_attr_value_handle_t bank_handle_t;
 #define BANK_ACCOUNT     1
 
 struct bank_element {
-	unsigned int  be_type:31,                /* Type of element */
-	    be_voucher_ref:1;                    /* Voucher system holds a ref */
-	int           be_refs;                   /* Ref count */
-	unsigned int  be_made;                   /* Made refs for voucher, Actual ref is only taken for voucher ref transition (0 to 1) */
+	unsigned int  be_type:31,                                     
+	    be_voucher_ref:1;                                                    
+	int           be_refs;                                  
+	unsigned int  be_made;                                                                                                            
 #if DEVELOPMENT || DEBUG
-	task_t        be_task;                   /* Customer task, do not use it since ref is not taken on task */
+	task_t        be_task;                                                                                    
 #endif
 };
 
@@ -64,19 +64,19 @@ typedef struct bank_element * bank_element_t;
 #define BANK_ELEMENT_NULL ((bank_element_t) 0)
 
 struct bank_task {
-	struct bank_element       bt_elem;                 /* Bank element */
-	struct proc_persona_info  bt_proc_persona;         /* Persona of the process */
-	ledger_t                  bt_ledger;               /* Ledger of the customer task */
-	queue_head_t              bt_accounts_to_pay;      /* List of accounts worked for me and need to pay */
-	queue_head_t              bt_accounts_to_charge;   /* List of accounts I did work and need to charge */
-	decl_lck_mtx_data(, bt_acc_to_pay_lock);           /* Lock to protect accounts to pay list */
-	decl_lck_mtx_data(, bt_acc_to_charge_lock);        /* Lock to protect accounts to charge list */
-	boolean_t                 bt_hasentitlement;       /* If the secure persona entitlement is set on the task */
+	struct bank_element       bt_elem;                                   
+	struct proc_persona_info  bt_proc_persona;                                     
+	ledger_t                  bt_ledger;                                                
+	queue_head_t              bt_accounts_to_pay;                                                          
+	queue_head_t              bt_accounts_to_charge;                                                       
+	decl_lck_mtx_data(, bt_acc_to_pay_lock);                                                     
+	decl_lck_mtx_data(, bt_acc_to_charge_lock);                                                     
+	boolean_t                 bt_hasentitlement;                                                                 
 #if CONFIG_THREAD_GROUPS
-	struct thread_group *         bt_thread_group;         /* Task's home thread group pointer */
+	struct thread_group *         bt_thread_group;                                               
 #endif
 #if DEVELOPMENT || DEBUG
-	queue_chain_t             bt_global_elt;           /* Element on the global bank task chain */
+	queue_chain_t             bt_global_elt;                                                      
 #endif
 };
 
@@ -121,22 +121,22 @@ typedef struct bank_task * bank_task_t;
 
 
 struct bank_account {
-	struct bank_element ba_elem;                 /* Bank element */
-	ledger_t            ba_bill;                 /* Temporary ledger i.e. chit */
-	bank_task_t         ba_merchant;             /* Task who worked for me, who will charge me on behalf of */
-	bank_task_t         ba_holder;               /* Credit Card task holder */
-	bank_task_t         ba_secureoriginator;     /* Bank task of the secure originator */
-	bank_task_t         ba_proximateprocess;     /* Process who propagated the voucher to us */
-	queue_chain_t       ba_next_acc_to_pay;      /* Next account I need to pay to */
-	queue_chain_t       ba_next_acc_to_charge;   /* Next account I need to charge to */
+	struct bank_element ba_elem;                                   
+	ledger_t            ba_bill;                                                 
+	bank_task_t         ba_merchant;                                                                          
+	bank_task_t         ba_holder;                                            
+	bank_task_t         ba_secureoriginator;                                             
+	bank_task_t         ba_proximateprocess;                                                   
+	queue_chain_t       ba_next_acc_to_pay;                                         
+	queue_chain_t       ba_next_acc_to_charge;                                         
 #if CONFIG_THREAD_GROUPS
-	struct thread_group * ba_thread_group;       /* thread group to be adopted */
+	struct thread_group * ba_thread_group;                                       
 #endif
 #if DEVELOPMENT || DEBUG
-	queue_chain_t       ba_global_elt;           /* Element on the global account chain */
+	queue_chain_t       ba_global_elt;                                                    
 #endif
-	uint32_t            ba_so_persona_id;        /* Persona ID of ba_secureoriginator,
-	                                              *  unless modified by a entitled process */
+	uint32_t            ba_so_persona_id;                                             
+                                                                                          
 };
 
 #define ba_type             ba_elem.be_type
@@ -187,5 +187,5 @@ extern kern_return_t bank_get_bank_ledger_thread_group_and_persona(ipc_voucher_t
     ledger_t *bankledger, struct thread_group **banktg, uint32_t *persona_id);
 extern void bank_swap_thread_bank_ledger(thread_t thread, ledger_t ledger);
 
-#endif /* MACH_KERNEL_PRIVATE */
-#endif /* _BANK_BANK_INTERNAL_H_ */
+#endif                          
+#endif                             

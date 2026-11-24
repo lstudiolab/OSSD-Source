@@ -1,8 +1,8 @@
-//
-// Tests for
-//  template <size_t N>
-//  bounded_array_ref(T (&array)[N]);
-//
+  
+            
+                       
+                                     
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"
@@ -40,7 +40,7 @@ tests()
 		CHECK(view[0] == T{11});
 	}
 
-	// Also test implicit construction
+	                                  
 	{
 		T array[1] = {T{11}};
 		test_bounded_array_ref<T> view = array;

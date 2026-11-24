@@ -1,9 +1,9 @@
-//
-//  vmremaptest.c
-//
-//  Created by Lionel Desai on 9/16/19.
+  
+                 
+  
+                                       
 //  Copyright © 2019 Apple. All rights reserved.
-//
+  
 
 #include "mach_vm_tests.h"
 #include <sys/sysctl.h>
@@ -40,7 +40,7 @@ mach_vm_client(mach_port_t port)
 	message->header.msgh_local_port = port;
 
 	while (1) {
-		/* Awaiting the pid/src. addr/size from the server so we know what to remap from where */
+		                                                                                         
 		ret = mach_msg(&message->header, MACH_RCV_MSG | MACH_RCV_LARGE, 0, messageSize, port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 		if (ret == KERN_SUCCESS) {
 			if (debug) {
@@ -159,14 +159,14 @@ mach_vm_client(mach_port_t port)
 
 				cur_prot = max_prot = VM_PROT_READ;
 #if 0
-				/* This + VM_FLAGS_FIXED in mach_vm_map() will return KERN_INVALID_ARG expectedly */
+				                                                                                    
 				ret = mach_vm_allocate(mach_task_self(), &tmp, size + 16384, VM_FLAGS_ANYWHERE);
 				dest = tmp + 4095;
 				mach_vm_deallocate(mach_task_self(), tmp, size + 16384);
 #endif
-				ret = mach_vm_map(mach_task_self(), &dest, size, 0 /*mask*/,
+				ret = mach_vm_map(mach_task_self(), &dest, size, 0         ,
 				    VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR,
-				    memport, 0 /*offset*/, copy, cur_prot, max_prot, VM_INHERIT_NONE);
+				    memport, 0           , copy, cur_prot, max_prot, VM_INHERIT_NONE);
 
 				if (ret) {
 					T_LOG("CLIENT: mach_vm_map FAILED: %s -- port 0x%x\n", mach_error_string(ret), memport);
@@ -183,7 +183,7 @@ mach_vm_client(mach_port_t port)
 					T_LOG("CLIENT: mach_vm_deallocate FAILED: %s -- dest 0x%llx, size 0x%llx\n", mach_error_string(ret), dest, size);
 					T_FAIL("CLIENT: mach_vm_deallocate FAILED");
 				}
-				/* No message to send here */
+				                             
 				continue;
 
 			case VM_OP_NONE:
@@ -212,9 +212,9 @@ mach_vm_client(mach_port_t port)
 
 			if (debug) {
 				T_LOG("CLIENT: dest 0x%llx -> 0x%llx (0x%llx), *dest %s\n", dest, dest + misoffset, misoffset, dstval);
-				/*memcpy(dstval, (void*) (dest + misoffset), 64);
-				 *  dstval[63]='\0';
-				 *  T_LOG("*dest %s\n", dstval);*/
+				                                                 
+                        
+                                      
 			}
 
 			message->header.msgh_local_port = MACH_PORT_NULL;
@@ -262,10 +262,10 @@ mach_server_make_memory_entry(mach_port_t replyPort)
 	reply = calloc(1, replySize);
 
 test_different_mementry_mode:
-	/* create message to send over rights/address/pid/size */
+	                                                         
 	mach_server_construct_header(&message, replyPort);
 
-	/* allocation that we plan to remap in the client */
+	                                                    
 	mach_server_create_allocation(&src, size, buffer);
 
 	memsz = 8191;
@@ -297,13 +297,13 @@ test_different_mementry_mode:
 		server_error_out(replyPort);
 	}
 
-	mach_server_contruct_payload(&message, lsrc, memport, memsz, misoffset, ((flags & MAP_MEM_VM_COPY) == MAP_MEM_VM_COPY) /*copy*/, VM_OP_MEMENTRY);
+	mach_server_contruct_payload(&message, lsrc, memport, memsz, misoffset, ((flags & MAP_MEM_VM_COPY) == MAP_MEM_VM_COPY)         , VM_OP_MEMENTRY);
 
 	memcpy(src_val, (void*) lsrc, 64);
 	src_val[63] = '\0';
 
 check_again:
-	/* Sending over pid/src address/size */
+	                                       
 	kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
 	if (kr != KERN_SUCCESS) {
@@ -311,7 +311,7 @@ check_again:
 		server_error_out(replyPort);
 	}
 
-	/* Ack from client that it worked */
+	                                    
 
 	bzero(reply, replySize);
 
@@ -349,7 +349,7 @@ check_again:
 	}
 
 	if (modified_in_server == FALSE) {
-		/* Now we change our data that has been mapped elsewhere */
+		                                                           
 		if (perm_changed) {
 			kr = mach_vm_protect(mach_task_self(), (mach_vm_address_t) lsrc, (mach_vm_size_t)getpagesize(), FALSE, VM_PROT_READ | VM_PROT_WRITE);
 			assert(kr == KERN_SUCCESS);
@@ -367,12 +367,12 @@ check_again:
 		modified_in_server = TRUE;
 		message.vm_op = VM_OP_NONE;
 
-		/* Check to see if the data in the other process is as expected */
+		                                                                  
 		goto check_again;
 	}
 
 	if (mementry_pass_idx < 2) {
-		/* Next remap mode...so ask the other process to unmap the older mapping. */
+		                                                                            
 		message.vm_op = VM_OP_UNMAP;
 		kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 		if (kr != KERN_SUCCESS) {
@@ -394,7 +394,7 @@ check_again:
 
 	T_LOG("PASSED\n");
 
-	/* Unmap old mapping in the other process. */
+	                                             
 	message.vm_op = VM_OP_UNMAP;
 	kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 	if (kr != KERN_SUCCESS) {
@@ -460,27 +460,27 @@ mach_server_read(mach_port_t replyPort, int op)
 	replySize = sizeof(ipc_message_t) + sizeof(mach_msg_trailer_t) + 64;
 	reply = calloc(1, replySize);
 
-	/* create message to send over rights/address/pid/size */
+	                                                         
 	mach_server_construct_header(&message, replyPort);
 
-	/* allocation that we plan to remap in the client */
+	                                                    
 	mach_server_create_allocation(&src, size, buffer);
 
-	mach_server_contruct_payload(&message, src, MACH_PORT_NULL /* port */, size, 0, TRUE /*copy*/, op);
+	mach_server_contruct_payload(&message, src, MACH_PORT_NULL           , size, 0, TRUE         , op);
 	if (debug) {
 		T_LOG("server COPY: Sending 0x%llx, %d, 0x%llx\n", message.address, getpid(), message.size);
 	}
 	memcpy(src_val, (void*)message.address, 64);
 
 check_again:
-	/* Sending over pid/src address/size */
+	                                       
 	kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 	if (kr != KERN_SUCCESS) {
 		T_LOG("ERROR: Failed to send message to client: (%d) %s\n", kr, mach_error_string(kr));
 		server_error_out(replyPort);
 	}
 
-	/* Ack from client that it worked */
+	                                    
 
 	bzero(reply, replySize);
 
@@ -505,17 +505,17 @@ check_again:
 	}
 
 	if (modified_in_server == FALSE) {
-		/* Now we change our data that has been mapped elsewhere */
+		                                                           
 		memcpy((void*)message.address, "THIS IS DIFFERENT -- BUT WE DON'T know if that's expecTED", 64);
 		memcpy(src_val, (void*)message.address, 64);
 		modified_in_server = TRUE;
 		message.vm_op = VM_OP_NONE;
 
-		/* Check to see if the data in the other process is as expected */
+		                                                                  
 		goto check_again;
 	}
 
-	/* Unmap old mapping in the other process. */
+	                                             
 	message.vm_op = VM_OP_UNMAP;
 	kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 	if (kr != KERN_SUCCESS) {
@@ -570,15 +570,15 @@ remap_again:
 
 	T_LOG("vm_remap (copy = %s) test...", ((remap_copy_pass_idx == 0) ? "FALSE" : "TRUE"));
 
-	/* create message to send over rights/address/pid/size */
+	                                                         
 	mach_server_construct_header(&message, replyPort);
 
-	/* server allocation that we plan to remap in the client */
+	                                                           
 	mach_server_create_allocation(&src, size, buffer);
 
 	lsrc = src + 8193;
 
-	mach_server_contruct_payload(&message, lsrc, MACH_PORT_NULL /* port */, size - 9000, 0, remap_copy_pass_idx /*copy*/, VM_OP_REMAP);
+	mach_server_contruct_payload(&message, lsrc, MACH_PORT_NULL           , size - 9000, 0, remap_copy_pass_idx         , VM_OP_REMAP);
 	if (debug) {
 		T_LOG("server COPY: Sending 0x%llx, %d, 0x%llx\n", message.address, getpid(), message.size);
 	}
@@ -587,14 +587,14 @@ remap_again:
 	src_val[63] = '\0';
 
 check_again:
-	/* Sending over pid/src address/size */
+	                                       
 	kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 	if (kr != KERN_SUCCESS) {
 		T_LOG("ERROR: Failed to send message to client: (%d) %s\n", kr, mach_error_string(kr));
 		server_error_out(replyPort);
 	}
 
-	/* Ack from client that it worked */
+	                                    
 
 	bzero(reply, replySize);
 
@@ -631,7 +631,7 @@ check_again:
 	}
 
 	if (modified_in_server == FALSE) {
-		/* Now we change our data that has been mapped elsewhere */
+		                                                           
 		memcpy((void*)message.address, "THIS IS DIFFERENT -- BUT WE DON'T know if that's expecTED", 64);
 		memcpy(src_val, (void*)message.address, 64);
 		src_val[63] = '\0';
@@ -639,12 +639,12 @@ check_again:
 		modified_in_server = TRUE;
 		message.vm_op = VM_OP_NONE;
 
-		/* Check to see if the data in the other process is as expected */
+		                                                                  
 		goto check_again;
 	}
 
 	if (remap_copy_pass_idx == 0) {
-		/* Next remap mode...so ask the other process to unmap the older mapping. */
+		                                                                            
 		message.vm_op = VM_OP_UNMAP;
 		kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 		if (kr != KERN_SUCCESS) {
@@ -659,13 +659,13 @@ check_again:
 		remap_copy_pass_idx++;
 		modified_in_server = FALSE;
 
-		/* Next remap pass to test (copy == TRUE). Send data out again to the other process to remap. */
+		                                                                                                
 		goto remap_again;
 	}
 
 	T_LOG("PASSED\n");
 
-	/* Unmap old mapping in the other process. */
+	                                             
 	message.vm_op = VM_OP_UNMAP;
 	kr = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 	if (kr != KERN_SUCCESS) {

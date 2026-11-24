@@ -58,9 +58,9 @@
 
 #include <mach_ldebug.h>
 
-/*
- * Pass field offsets to assembly code.
- */
+  
+                                       
+   
 #include <kern/ast.h>
 #include <kern/thread.h>
 #include <kern/task.h>
@@ -86,18 +86,18 @@
 #include <machine/commpage.h>
 #include <pexpert/i386/boot.h>
 
-/*
- * genassym.c is used to produce an
- * assembly file which, intermingled with unuseful assembly code,
- * has all the necessary definitions emitted. This assembly file is
- * then postprocessed with sed to extract only these definitions
- * and thus the final assyms.s is created.
- *
- * This convoluted means is necessary since the structure alignment
- * and packing may be different between the host machine and the
- * target so we are forced into using the cross compiler to generate
- * the values, but we cannot run anything on the target machine.
- */
+  
+                                   
+                                                                 
+                                                                   
+                                                                
+                                          
+  
+                                                                   
+                                                                
+                                                                    
+                                                                
+   
 
 #define DECLARE(SYM, VAL) \
 	__asm("DEFINITION__define__" SYM ":\t .ascii \"%0\"" : : "n"  ((u_int)(VAL)))
@@ -119,7 +119,7 @@ main(
 
 	DECLARE("MAX_CPUS", MAX_CPUS);
 
-	/* Simple Lock structure */
+	                           
 	DECLARE("SLOCK_ILK", offsetof(usimple_lock_data_t, interlock));
 #if     MACH_LDEBUG
 	DECLARE("SLOCK_TYPE", offsetof(usimple_lock_data_t, lock_type));
@@ -128,9 +128,9 @@ main(
 	DECLARE("SLOCK_DURATIONH", offsetof(usimple_lock_data_t, debug.duration[0]));
 	DECLARE("SLOCK_DURATIONL", offsetof(usimple_lock_data_t, debug.duration[1]));
 	DECLARE("USLOCK_TAG", USLOCK_TAG);
-#endif  /* MACH_LDEBUG */
+#endif                   
 
-	/* Mutex structure */
+	                     
 	DECLARE("MUTEX_OWNER", offsetof(lck_mtx_t, lck_mtx_owner));
 	DECLARE("MUTEX_PTR", offsetof(lck_mtx_t, lck_mtx_ptr));
 	DECLARE("MUTEX_STATE", offsetof(lck_mtx_t, lck_mtx_state));
@@ -138,13 +138,13 @@ main(
 	DECLARE("MUTEX_ASSERT_OWNED", LCK_MTX_ASSERT_OWNED);
 	DECLARE("MUTEX_ASSERT_NOTOWNED", LCK_MTX_ASSERT_NOTOWNED);
 
-	/* x86 only */
+	              
 	DECLARE("MUTEX_DESTROYED", LCK_MTX_TAG_DESTROYED);
 
-	/* Per-mutex statistic element */
+	                                 
 	DECLARE("MTX_ACQ_TSC", offsetof(lck_mtx_ext_t, lck_mtx_stat));
 
-	/* Reader writer lock types */
+	                              
 	DECLARE("RW_SHARED", LCK_RW_TYPE_SHARED);
 	DECLARE("RW_EXCL", LCK_RW_TYPE_EXCLUSIVE);
 
@@ -161,7 +161,7 @@ main(
 
 	DECLARE("TASK_VTIMERS", offsetof(struct task, vtimers));
 
-	/* These fields are being added on demand */
+	                                            
 	DECLARE("TH_TASK", offsetof(struct thread, task));
 	DECLARE("TH_AST", offsetof(struct thread, ast));
 	DECLARE("TH_MAP", offsetof(struct thread, map));
@@ -177,9 +177,9 @@ main(
 #define IEL_SIZE                (sizeof(struct i386_exception_link *))
 	DECLARE("IKS_SIZE", sizeof(struct thread_kernel_state));
 
-	/*
-	 * KSS_* are offsets from the top of the kernel stack (cpu_kernel_stack)
-	 */
+	  
+                                                                         
+    
 	DECLARE("KSS_RBX", offsetof(struct thread_kernel_state, machine.k_rbx));
 	DECLARE("KSS_RSP", offsetof(struct thread_kernel_state, machine.k_rsp));
 	DECLARE("KSS_RBP", offsetof(struct thread_kernel_state, machine.k_rbp));
@@ -445,9 +445,9 @@ main(
 	DECLARE("U_INTR_GATE", ACC_P | ACC_PL_U | ACC_INTR_GATE);
 	DECLARE("K_TSS", ACC_P | ACC_PL_K | ACC_TSS);
 
-	/*
-	 *	usimple_lock fields
-	 */
+	  
+                       
+    
 	DECLARE("USL_INTERLOCK", offsetof(usimple_lock_data_t, interlock));
 
 	DECLARE("INTSTACK_SIZE", INTSTACK_SIZE);
@@ -467,7 +467,7 @@ main(
 	DECLARE("RNT_GENERATION",
 	    offsetof(pal_rtc_nanotime_t, generation));
 
-	/* values from kern/timer.h */
+	                              
 #ifdef __LP64__
 	DECLARE("TIMER_ALL", offsetof(struct timer, all_bits));
 #else

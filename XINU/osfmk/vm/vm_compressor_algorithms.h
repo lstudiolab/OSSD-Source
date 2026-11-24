@@ -29,8 +29,8 @@
 #pragma once
 
 #if XNU_KERNEL_PRIVATE
-//DRKTODO: the decompression side stats should be either made optional or
-//per-CPU to avoid cacheline contention
+                                                                         
+                                       
 
 typedef struct {
 	uint64_t lz4_compressions;
@@ -96,8 +96,8 @@ bool metadecompressor(const uint8_t *source, uint8_t *dest, uint32_t csize,
     uint16_t ccodec, void *compressor_dscratch, uint32_t *pop_count_p);
 
 typedef enum {
-	CCWK = 0, // must be 0 or 1
-	CCLZ4 = 1, //must be 0 or 1
+	CCWK = 0,                  
+	CCLZ4 = 1,                 
 	CINVALID = 0xFFFF
 } vm_compressor_codec_t;
 
@@ -111,4 +111,4 @@ typedef enum {
 
 void vm_compressor_algorithm_init(void);
 int vm_compressor_algorithm(void);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         

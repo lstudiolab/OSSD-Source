@@ -29,15 +29,15 @@ struct blacklist_entry {
 	const char *func_name;
 	access_t type_mask;
 
-	/* internal */
+	              
 	uint64_t count;
 };
 
 #include "kasan_blacklist_dynamic.h"
-/* defines 'blacklist' and 'blacklist_entries' */
+                                                 
 
 decl_simple_lock_data(static, _dybl_lock);
-static access_t blacklisted_types; /* bitmap of access types with blacklist entries */
+static access_t blacklisted_types;                                                    
 
 static void
 dybl_lock(boolean_t *b)
@@ -54,15 +54,15 @@ dybl_unlock(boolean_t b)
 }
 
 
-/*
- * blacklist call site hash table
- */
+  
+                                 
+   
 
 struct blacklist_hash_entry {
-	SLIST_ENTRY(blacklist_hash_entry) chain; // next element in chain
-	struct blacklist_entry *ble;             // blacklist entry that this caller is an instance of
-	uintptr_t addr;                          // callsite address
-	uint64_t count;                          // hit count
+	SLIST_ENTRY(blacklist_hash_entry) chain;                         
+	struct blacklist_entry *ble;                                                                  
+	uintptr_t addr;                                             
+	uint64_t count;                                      
 };
 
 struct hash_chain_head {
@@ -78,7 +78,7 @@ alloc_hash_entry(void)
 {
 	unsigned idx = cache_next_entry++;
 	if (idx >= HASH_CACHE_NENTRIES) {
-		cache_next_entry = HASH_CACHE_NENTRIES; // avoid overflow
+		cache_next_entry = HASH_CACHE_NENTRIES;                  
 		return NULL;
 	}
 	return &blhe_cache[idx];
@@ -87,7 +87,7 @@ alloc_hash_entry(void)
 static unsigned
 hash_addr(uintptr_t addr)
 {
-	addr ^= (addr >> 7); /* mix in some of the bits likely to select the kext */
+	addr ^= (addr >> 7);                                                        
 	return (unsigned)addr & HASH_MASK;
 }
 
@@ -135,9 +135,9 @@ hash_drop(void)
 	}
 }
 
-/*
- * kext range lookup tree
- */
+  
+                         
+   
 
 struct range_tree_entry {
 	RB_ENTRY(range_tree_entry) tree;
@@ -146,13 +146,13 @@ struct range_tree_entry {
 
 	struct {
 		uint64_t size : 63;
-		uint64_t accessed : 1; // blacklist entry exists in this range
+		uint64_t accessed : 1;                                        
 	};
 
-	/* kext name */
+	               
 	const char *bundleid;
 
-	/* mach header for corresponding kext */
+	                                        
 	kernel_mach_header_t *mh;
 };
 
@@ -160,7 +160,7 @@ static int NOINLINE
 range_tree_cmp(const struct range_tree_entry *e1, const struct range_tree_entry *e2)
 {
 	if (e1->size == 0 || e2->size == 0) {
-		/* lookup */
+		            
 		if (e1->base + e1->size < e2->base) {
 			return -1;
 		} else if (e1->base > e2->base + e2->size) {
@@ -169,7 +169,7 @@ range_tree_cmp(const struct range_tree_entry *e1, const struct range_tree_entry 
 			return 0;
 		}
 	} else {
-		/* compare */
+		             
 		if (e1->base + e1->size <= e2->base) {
 			return -1;
 		} else if (e1->base >= e2->base + e2->size) {
@@ -185,7 +185,7 @@ RB_HEAD(range_tree, range_tree_entry) range_tree_root;
 RB_PROTOTYPE(range_tree, range_tree_entry, tree, range_tree_cmp);
 RB_GENERATE(range_tree, range_tree_entry, tree, range_tree_cmp);
 
-/* for each executable section, insert a range tree entry */
+                                                            
 void
 kasan_dybl_load_kext(uintptr_t addr, const char *kextname)
 {
@@ -256,7 +256,7 @@ kasan_dybl_unload_kext(uintptr_t addr)
 				if (e) {
 					RB_REMOVE(range_tree, &range_tree_root, e);
 					if (e->accessed) {
-						/* there was a blacklist entry in this range */
+						                                               
 						hash_drop();
 					}
 				}
@@ -272,9 +272,9 @@ kasan_dybl_unload_kext(uintptr_t addr)
 	}
 }
 
-/*
- * return the closest function name at or before addr
- */
+  
+                                                     
+   
 static const NOINLINE char *
 addr_to_func(uintptr_t addr, const kernel_mach_header_t *mh)
 {
@@ -290,9 +290,9 @@ addr_to_func(uintptr_t addr, const kernel_mach_header_t *mh)
 
 	cmd = (const struct load_command *)&mh[1];
 
-	/*
-	 * find the symtab command and linkedit segment
-	 */
+	  
+                                                
+    
 	for (i = 0; i < (int)mh->ncmds; i++) {
 		if (cmd->cmd == LC_SYMTAB) {
 			st = (const struct symtab_command *)cmd;
@@ -305,25 +305,25 @@ addr_to_func(uintptr_t addr, const kernel_mach_header_t *mh)
 		cmd = (const void *)((uintptr_t)cmd + cmd->cmdsize);
 	}
 
-	/* locate the symbols and strings in the symtab */
+	                                                  
 	strings = (const void *)((le->vmaddr - le->fileoff) + st->stroff);
 	syms    = (const void *)((le->vmaddr - le->fileoff) + st->symoff);
 
-	/*
-	 * iterate the symbols, looking for the closest one to `addr'
-	 */
+	  
+                                                              
+    
 	for (i = 0; i < (int)st->nsyms; i++) {
 		uint8_t n_type = syms[i].n_type;
 		const char *name = strings + syms[i].n_un.n_strx;
 
 		if (n_type & N_STAB) {
-			/* ignore debug entries */
+			                          
 			continue;
 		}
 
 		n_type &= N_TYPE;
 		if (syms[i].n_un.n_strx == 0 || !(n_type == N_SECT || n_type == N_ABS)) {
-			/* only use named and defined symbols */
+			                                        
 			continue;
 		}
 
@@ -337,14 +337,14 @@ addr_to_func(uintptr_t addr, const kernel_mach_header_t *mh)
 			name += 1;
 		}
 
-		/* this symbol is closer than the one we had */
+		                                               
 		if (syms[i].n_value <= addr && syms[i].n_value > cur_addr) {
 			cur_name = name;
 			cur_addr = syms[i].n_value;
 		}
 	}
 
-	/* best guess for name of function at addr */
+	                                             
 	return cur_name;
 }
 
@@ -358,7 +358,7 @@ kasan_is_blacklisted(access_t type)
 	assert(__builtin_popcount(type) == 1);
 
 	if ((type & blacklisted_types) == 0) {
-		/* early exit for types with no blacklist entries */
+		                                                    
 		return false;
 	}
 
@@ -367,7 +367,7 @@ kasan_is_blacklisted(access_t type)
 	boolean_t flag;
 
 	if (nframes >= 1) {
-		/* ignore direct caller */
+		                          
 		nframes -= 1;
 		bt += 1;
 	}
@@ -376,26 +376,26 @@ kasan_is_blacklisted(access_t type)
 
 	dybl_lock(&flag);
 
-	/* First check if any frame hits in the hash */
+	                                               
 	for (uint32_t i = 0; i < nframes; i++) {
 		blhe = blacklist_hash_lookup(bt[i]);
 		if (blhe) {
 			if ((blhe->ble->type_mask & type) != type) {
-				/* wrong type */
+				                
 				continue;
 			}
 
-			/* hit */
+			         
 			blhe->count++;
 			blhe->ble->count++;
-			// printf("KASan: blacklist cache hit (%s:%s [0x%lx] 0x%x)\n",
-			//              ble->kext_name ?: "" , ble->func_name ?: "", VM_KERNEL_UNSLIDE(bt[i]), mask);
+			                                                              
+			                                                                                             
 			dybl_unlock(flag);
 			return true;
 		}
 	}
 
-	/* no hits - slowpath */
+	                        
 	for (uint32_t i = 0; i < nframes; i++) {
 		const char *kextname = NULL;
 		const char *funcname = NULL;
@@ -404,11 +404,11 @@ kasan_is_blacklisted(access_t type)
 		struct range_tree_entry *e = RB_FIND(range_tree, &range_tree_root, &key);
 
 		if (!e) {
-			/* no match at this address - kinda weird? */
+			                                             
 			continue;
 		}
 
-		/* get the function and bundle name for the current frame */
+		                                                            
 		funcname = addr_to_func(bt[i], e->mh);
 		if (e->bundleid) {
 			kextname = strrchr(e->bundleid, '.');
@@ -419,29 +419,29 @@ kasan_is_blacklisted(access_t type)
 			}
 		}
 
-		// printf("%s: a = 0x%016lx,0x%016lx f = %s, k = %s\n", __func__, bt[i], VM_KERNEL_UNSLIDE(bt[i]), funcname, kextname);
+		                                                                                                                       
 
-		/* check if kextname or funcname are in the blacklist */
+		                                                        
 		for (size_t j = 0; j < blacklist_entries; j++) {
 			struct blacklist_entry *ble = &blacklist[j];
 			uint64_t count;
 
 			if ((ble->type_mask & type) != type) {
-				/* wrong type */
+				                
 				continue;
 			}
 
 			if (ble->kext_name && kextname && strncmp(kextname, ble->kext_name, KMOD_MAX_NAME) != 0) {
-				/* wrong kext name */
+				                     
 				continue;
 			}
 
 			if (ble->func_name && funcname && strncmp(funcname, ble->func_name, 128) != 0) {
-				/* wrong func name */
+				                     
 				continue;
 			}
 
-			/* found a matching function or kext */
+			                                       
 			blhe = blacklist_hash_add(bt[i], ble);
 			count = ble->count++;
 			e->accessed = 1;
@@ -521,7 +521,7 @@ static const struct {
 	TS(POISON),
 	TS(ALL),
 
-	/* convenience aliases */
+	                         
 	{ .type = TYPE_POISON_GLOBAL, .str = "GLOB" },
 	{ .type = TYPE_POISON_HEAP, .str = "HEAP" },
 };
@@ -534,7 +534,7 @@ map_type(const char *str)
 		return TYPE_NORMAL;
 	}
 
-	/* convert type string to integer ID */
+	                                       
 	for (size_t i = 0; i < typemap_sz; i++) {
 		if (strcasecmp(str, typemap[i].str) == 0) {
 			return typemap[i].type;
@@ -550,10 +550,10 @@ kasan_init_dybl(void)
 {
 	simple_lock_init(&_dybl_lock, 0);
 
-	/*
-	 * dynamic blacklist entries via boot-arg. Syntax is:
-	 *  kasan.bl=kext1:func1:type1,kext2:func2:type2,...
-	 */
+	  
+                                                      
+                                                     
+    
 	char buf[256] = {};
 	char *bufp = buf;
 	if (PE_parse_boot_arg_str("kasan.bl", bufp, sizeof(buf))) {
@@ -573,17 +573,17 @@ kasan_init_dybl(void)
 		}
 	}
 
-	/* collect bitmask of blacklisted types */
+	                                          
 	for (size_t j = 0; j < blacklist_entries; j++) {
 		struct blacklist_entry *ble = &blacklist[j];
 		blacklisted_types |= ble->type_mask;
 	}
 
-	/* add the fake kernel kext */
+	                              
 	kasan_dybl_load_kext((uintptr_t)&_mh_execute_header, "__kernel__");
 }
 
-#else /* KASAN_DYNAMIC_BLACKLIST */
+#else                              
 
 bool
 kasan_is_blacklisted(access_t __unused type)

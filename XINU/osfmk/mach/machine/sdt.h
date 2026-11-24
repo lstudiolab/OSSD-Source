@@ -36,11 +36,11 @@
 
 #if CONFIG_DTRACE
 
-/*
- * The following macros are used to create static probes. The argument types
- * should be no greater than uintptr_t in size each. The behavior of larger
- * types is undefined.
- */
+  
+                                                                            
+                                                                           
+                      
+   
 
 #define DTRACE_PROBE(provider, name) {                                                          \
 	DTRACE_CALL0ARGS(provider, name)                                                        \
@@ -164,7 +164,7 @@
 #define DTRACE_PROBE9(provider, name, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) do {} while(0)
 #define DTRACE_PROBE10(provider, name, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) do {} while(0)
 
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 #define DTRACE_SCHED(name)                                              \
 	DTRACE_PROBE(__sched_, name);
@@ -443,10 +443,10 @@
 #define DTRACE_KASAN5(name, type1, arg1, type2, arg2,                   \
 	    type3, arg3, type4, arg4, type5, arg5)                          \
 	DTRACE_PROBE5(__kasan_, name, arg1, arg2, arg3, arg4, arg5);
-#endif /* KASAN */
+#endif            
 
 #if PRIVATE
-#endif /* PRIVATE */
+#endif              
 
 #ifdef PRIVATE
 #define DTRACE_HV(name)                                            \
@@ -472,8 +472,8 @@
 #define DTRACE_HV6(name, type1, arg1, type2, arg2, type3, arg3,    \
 	    type4, arg4, type5, arg5, type6, arg6)                      \
 	DTRACE_PROBE6(__hv_, name, arg1, arg2, arg3, arg4, arg5, arg6)
-#endif /* PRIVATE */
+#endif              
 
-#endif /* KERNEL */
+#endif             
 
-#endif  /* _MACH_MACHINE_SYS_SDT_H */
+#endif                               

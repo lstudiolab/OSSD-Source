@@ -34,14 +34,14 @@ extern "C" {
 
 #include <IOKit/IOInterruptController.h>
 
-/*!
- * @class       PassthruInterruptController
- * @abstract    Trivial IOInterruptController class that passes all IRQs through to a
- *              "child" driver.
- * @discussion  Waits for a "child" driver (typically loaded in a kext) to register itself,
- *              then passes the child driver's IOService pointer back via
- *              waitForChildController() so that XNU can operate on it directly.
- */
+   
+                                           
+                                                                                     
+                               
+                                                                                           
+                                                                         
+                                                                                
+   
 class PassthruInterruptController : public IOInterruptController
 {
 	OSDeclareDefaultStructors(PassthruInterruptController);

@@ -116,7 +116,7 @@ mac_proc_check_getauid(struct proc *curp)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -140,7 +140,7 @@ mac_proc_check_setauid(struct proc *curp, uid_t auid)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -163,7 +163,7 @@ mac_proc_check_getaudit(struct proc *curp)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -186,7 +186,7 @@ mac_proc_check_setaudit(struct proc *curp, struct auditinfo_addr *ai)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -203,13 +203,13 @@ mac_proc_check_setaudit(struct proc *curp, struct auditinfo_addr *ai)
 }
 
 #if 0
-/*
- * This is the framework entry point for MAC policies to use to add
- * arbitrary data to the current audit record.
- * (Currently not supported, as no existing audit viewers would
- * display this format)
- *
- */
+  
+                                                                   
+                                              
+                                                               
+                       
+  
+   
 int
 mac_audit_data(int len, u_char *data, mac_policy_handle_t handle)
 {
@@ -226,10 +226,10 @@ mac_audit_data(int len, u_char *data, mac_policy_handle_t handle)
 }
 #endif
 
-/*
- * This is the entry point a MAC policy will call to add NULL-
- * terminated ASCII text to the current audit record.
- */
+  
+                                                              
+                                                     
+   
 int
 mac_audit_text(char *text, mac_policy_handle_t handle)
 {
@@ -244,10 +244,10 @@ mac_audit_text(char *text, mac_policy_handle_t handle)
 		return EINVAL;
 	}
 
-	/*
-	 * Make sure the text is only composed of only ASCII printable
-	 * characters.
-	 */
+	  
+                                                               
+               
+    
 	for (i = 0; i < text_len; i++) {
 		if (text[i] < (char) 32 || text[i] > (char) 126) {
 			return EINVAL;
@@ -311,10 +311,10 @@ mac_audit_check_postselect(struct ucred *cred, unsigned short syscode,
 	int ret, mac_error;
 	u_int i;
 
-	/*
-	 * If the audit was forced by a MAC policy by mac_audit_check_preselect(),
-	 * echo that.
-	 */
+	  
+                                                                           
+              
+    
 	if (mac_forced) {
 		return MAC_AUDIT_YES;
 	}
@@ -351,11 +351,11 @@ mac_audit_check_postselect(struct ucred *cred, unsigned short syscode,
 	return ret;
 }
 
-#else   /* !CONFIG_AUDIT */
+#else                      
 
-/*
- * Function stubs for when AUDIT isn't defined.
- */
+  
+                                               
+   
 
 int
 mac_system_check_audit(__unused struct ucred *cred, __unused void *record, __unused int length)
@@ -419,4 +419,4 @@ mac_audit_text(__unused char *text, __unused mac_policy_handle_t handle)
 {
 	return 0;
 }
-#endif  /* !CONFIG_AUDIT */
+#endif                     

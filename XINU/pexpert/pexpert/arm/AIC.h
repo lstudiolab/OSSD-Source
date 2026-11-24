@@ -26,7 +26,7 @@ _aic_write32(unsigned long addr, unsigned long data)
 
 #endif
 
-// AIC
+      
 #define kAICAicRev                      (0x0000)
 #define kAICAicCap0                     (0x0004)
 #define kAICAicCap0Int(n)               ((n) & 0x3FF)
@@ -87,4 +87,4 @@ _aic_write32(unsigned long addr, unsigned long data)
 #define kAICExtIntShift                 (5)
 #define kAICExtIntMask                  (0x1F)
 
-#endif /* ! _PEXPERT_ARM_AIC_H */
+#endif                           

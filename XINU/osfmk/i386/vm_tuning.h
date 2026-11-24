@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	i386/vm_tuning.h
- *
- *	VM tuning parameters for the i386 (without reference bits).
- */
+  
+   
+  
+                         
+  
+                                                              
+   
 
 #ifndef _I386_VM_TUNING_H_
 #define _I386_VM_TUNING_H_
 
-#endif  /* _I386_VM_TUNING_H_ */
+#endif                          

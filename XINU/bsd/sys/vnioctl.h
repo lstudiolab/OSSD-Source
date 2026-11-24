@@ -76,68 +76,68 @@
 #include <sys/cdefs.h>
 
 
-/*
- * Ioctl definitions for file (vnode) disk pseudo-device.
- */
+  
+                                                         
+   
 
-#define _PATH_VNTAB     "/etc/vntab"    /* default config file */
+#define _PATH_VNTAB     "/etc/vntab"                             
 
 typedef enum {
 	vncontrol_readwrite_io_e = 0
 } vncontrol_t;
 
 struct vn_ioctl {
-	char *          vn_file;        /* pathname of file to mount */
-	int                     vn_size;        /* (returned) size of disk */
+	char *          vn_file;                                       
+	int                     vn_size;                                     
 	vncontrol_t     vn_control;
 };
 
 #ifdef KERNEL_PRIVATE
 
 struct vn_ioctl_64 {
-	u_int64_t       vn_file;        /* pathname of file to mount */
-	int                     vn_size;        /* (returned) size of disk */
+	u_int64_t       vn_file;                                       
+	int                     vn_size;                                     
 	vncontrol_t     vn_control;
 };
 
 struct vn_ioctl_32 {
-	u_int32_t       vn_file;        /* pathname of file to mount */
-	int                     vn_size;        /* (returned) size of disk */
+	u_int32_t       vn_file;                                       
+	int                     vn_size;                                     
 	vncontrol_t     vn_control;
 };
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * Before you can use a unit, it must be configured with VNIOCSET.
- * The configuration persists across opens and closes of the device;
- * an VNIOCCLR must be used to reset a configuration.  An attempt to
- * VNIOCSET an already active unit will return EBUSY.
- */
-#define VNIOCATTACH     _IOWR('F', 0, struct vn_ioctl)  /* attach file */
-#define VNIOCDETACH     _IOWR('F', 1, struct vn_ioctl)  /* detach disk */
-#define VNIOCGSET       _IOWR('F', 2, u_int32_t )               /* set global option */
-#define VNIOCGCLEAR     _IOWR('F', 3, u_int32_t )               /* reset --//-- */
-#define VNIOCUSET       _IOWR('F', 4, u_int32_t )               /* set unit option */
-#define VNIOCUCLEAR     _IOWR('F', 5, u_int32_t )               /* reset --//-- */
-#define VNIOCSHADOW     _IOWR('F', 6, struct vn_ioctl)  /* attach shadow */
+  
+                                                                  
+                                                                    
+                                                                    
+                                                     
+   
+#define VNIOCATTACH     _IOWR('F', 0, struct vn_ioctl)                   
+#define VNIOCDETACH     _IOWR('F', 1, struct vn_ioctl)                   
+#define VNIOCGSET       _IOWR('F', 2, u_int32_t )                                      
+#define VNIOCGCLEAR     _IOWR('F', 3, u_int32_t )                                 
+#define VNIOCUSET       _IOWR('F', 4, u_int32_t )                                    
+#define VNIOCUCLEAR     _IOWR('F', 5, u_int32_t )                                 
+#define VNIOCSHADOW     _IOWR('F', 6, struct vn_ioctl)                     
 #ifdef KERNEL_PRIVATE
-#define VNIOCATTACH64   _IOWR('F', 0, struct vn_ioctl_64)       /* attach file - LP64 */
-#define VNIOCDETACH64   _IOWR('F', 1, struct vn_ioctl_64)       /* detach disk - LP64 */
-#define VNIOCSHADOW64   _IOWR('F', 6, struct vn_ioctl_64)       /* attach shadow - LP64 */
+#define VNIOCATTACH64   _IOWR('F', 0, struct vn_ioctl_64)                               
+#define VNIOCDETACH64   _IOWR('F', 1, struct vn_ioctl_64)                               
+#define VNIOCSHADOW64   _IOWR('F', 6, struct vn_ioctl_64)                                 
 #ifdef __LP64__
-#define VNIOCATTACH32   _IOWR('F', 0, struct vn_ioctl_32)       /* attach file - U32 version for K64 */
-#define VNIOCDETACH32   _IOWR('F', 1, struct vn_ioctl_32)       /* detach disk - U32 version for K64 */
-#define VNIOCSHADOW32   _IOWR('F', 6, struct vn_ioctl_32)       /* attach shadow - U32 version for K64 */
+#define VNIOCATTACH32   _IOWR('F', 0, struct vn_ioctl_32)                                              
+#define VNIOCDETACH32   _IOWR('F', 1, struct vn_ioctl_32)                                              
+#define VNIOCSHADOW32   _IOWR('F', 6, struct vn_ioctl_32)                                                
 #endif
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#define VN_LABELS       0x1     /* Use disk(/slice) labels */
-#define VN_FOLLOW       0x2     /* Debug flow in vn driver */
-#define VN_DEBUG        0x4     /* Debug data in vn driver */
-#define VN_IO           0x8     /* Debug I/O in vn driver */
-#define VN_DONTCLUSTER  0x10    /* Don't cluster */
-#define VN_RESERVE      0x20    /* Pre-reserve swap */
+#define VN_LABELS       0x1                                  
+#define VN_FOLLOW       0x2                                  
+#define VN_DEBUG        0x4                                  
+#define VN_IO           0x8                                 
+#define VN_DONTCLUSTER  0x10                       
+#define VN_RESERVE      0x20                          
 
 
-#endif  /* _SYS_VNIOCTL_H_*/
+#endif                      

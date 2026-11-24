@@ -60,97 +60,97 @@
 #define _SYS_QUEUE_H_
 
 #ifdef KERNEL_PRIVATE
-#include <kern/debug.h> /* panic function call */
-#include <sys/cdefs.h>  /* __improbable in kernelspace */
+#include <kern/debug.h>                          
+#include <sys/cdefs.h>                                   
 #else
 #ifndef __improbable
-#define __improbable(x) (x)             /* noop in userspace */
-#endif /* __improbable */
-#endif /* KERNEL_PRIVATE */
+#define __improbable(x) (x)                                    
+#endif                   
+#endif                     
 
-/*
- * This file defines five types of data structures: singly-linked lists,
- * singly-linked tail queues, lists, tail queues, and circular queues.
- *
- * A singly-linked list is headed by a single forward pointer. The elements
- * are singly linked for minimum space and pointer manipulation overhead at
- * the expense of O(n) removal for arbitrary elements. New elements can be
- * added to the list after an existing element or at the head of the list.
- * Elements being removed from the head of the list should use the explicit
- * macro for this purpose for optimum efficiency. A singly-linked list may
- * only be traversed in the forward direction.  Singly-linked lists are ideal
- * for applications with large datasets and few or no removals or for
- * implementing a LIFO queue.
- *
- * A singly-linked tail queue is headed by a pair of pointers, one to the
- * head of the list and the other to the tail of the list. The elements are
- * singly linked for minimum space and pointer manipulation overhead at the
- * expense of O(n) removal for arbitrary elements. New elements can be added
- * to the list after an existing element, at the head of the list, or at the
- * end of the list. Elements being removed from the head of the tail queue
- * should use the explicit macro for this purpose for optimum efficiency.
- * A singly-linked tail queue may only be traversed in the forward direction.
- * Singly-linked tail queues are ideal for applications with large datasets
- * and few or no removals or for implementing a FIFO queue.
- *
- * A list is headed by a single forward pointer (or an array of forward
- * pointers for a hash table header). The elements are doubly linked
- * so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before
- * or after an existing element or at the head of the list. A list
- * may only be traversed in the forward direction.
- *
- * A tail queue is headed by a pair of pointers, one to the head of the
- * list and the other to the tail of the list. The elements are doubly
- * linked so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before or
- * after an existing element, at the head of the list, or at the end of
- * the list. A tail queue may be traversed in either direction.
- *
- * A circle queue is headed by a pair of pointers, one to the head of the
- * list and the other to the tail of the list. The elements are doubly
- * linked so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before or after
- * an existing element, at the head of the list, or at the end of the list.
- * A circle queue may be traversed in either direction, but has a more
- * complex end of list detection.
- * Note that circle queues are deprecated, because, as the removal log
- * in FreeBSD states, "CIRCLEQs are a disgrace to everything Knuth taught
- * us in Volume 1 Chapter 2. [...] Use TAILQ instead, it provides the same
- * functionality." Code using them will continue to compile, but they
- * are no longer documented on the man page.
- *
- * For details on the use of these macros, see the queue(3) manual page.
- *
- *
- *				SLIST	LIST	STAILQ	TAILQ	CIRCLEQ
- * _HEAD			+	+	+	+	+
- * _HEAD_INITIALIZER		+	+	+	+	-
- * _ENTRY			+	+	+	+	+
- * _INIT			+	+	+	+	+
- * _EMPTY			+	+	+	+	+
- * _FIRST			+	+	+	+	+
- * _NEXT			+	+	+	+	+
- * _PREV			-	-	-	+	+
- * _LAST			-	-	+	+	+
- * _FOREACH			+	+	+	+	+
- * _FOREACH_SAFE		+	+	+	+	-
- * _FOREACH_REVERSE		-	-	-	+	-
- * _FOREACH_REVERSE_SAFE	-	-	-	+	-
- * _INSERT_HEAD			+	+	+	+	+
- * _INSERT_BEFORE		-	+	-	+	+
- * _INSERT_AFTER		+	+	+	+	+
- * _INSERT_TAIL			-	-	+	+	+
- * _CONCAT			-	-	+	+	-
- * _REMOVE_AFTER		+	-	+	-	-
- * _REMOVE_HEAD			+	-	+	-	-
- * _REMOVE_HEAD_UNTIL		-	-	+	-	-
- * _REMOVE			+	+	+	+	+
- * _SWAP			-	+	+	+	-
- *
- */
+  
+                                                                        
+                                                                      
+  
+                                                                           
+                                                                           
+                                                                          
+                                                                          
+                                                                           
+                                                                          
+                                                                             
+                                                                     
+                             
+  
+                                                                         
+                                                                           
+                                                                           
+                                                                            
+                                                                            
+                                                                          
+                                                                         
+                                                                             
+                                                                           
+                                                           
+  
+                                                                       
+                                                                    
+                                                                
+                                                                  
+                                                                  
+                                                  
+  
+                                                                       
+                                                                      
+                                                                       
+                                                                     
+                                                                       
+                                                               
+  
+                                                                         
+                                                                      
+                                                                       
+                                                                           
+                                                                           
+                                                                      
+                                 
+                                                                      
+                                                                         
+                                                                          
+                                                                     
+                                            
+  
+                                                                        
+  
+  
+                                     
+                    
+                               
+                     
+                    
+                     
+                     
+                    
+                    
+                    
+                       
+                           
+                              
+                                  
+                           
+                            
+                           
+                           
+                      
+                           
+                           
+                                
+                      
+                    
+  
+   
 #ifdef QUEUE_MACRO_DEBUG
-/* Store the last 2 places the queue element or head was altered */
+                                                                   
 struct qm_trace {
 	char * lastfile;
 	int lastline;
@@ -180,22 +180,22 @@ struct qm_trace {
 #define QMD_TRACE_HEAD(head)
 #define TRACEBUF
 #define TRASHIT(x)
-#endif  /* QUEUE_MACRO_DEBUG */
+#endif                         
 
-/*
- * Horrible macros to enable use of code that was meant to be C-specific
- *   (and which push struct onto type) in C++; without these, C++ code
- *   that uses these macros in the context of a class will blow up
- *   due to "struct" being preprended to "type" by the macros, causing
- *   inconsistent use of tags.
- *
- * This approach is necessary because these are macros; we have to use
- *   these on a per-macro basis (because the queues are implemented as
- *   macros, disabling this warning in the scope of the header file is
- *   insufficient), whuch means we can't use #pragma, and have to use
- *   _Pragma.  We only need to use these for the queue macros that
- *   prepend "struct" to "type" and will cause C++ to blow up.
- */
+  
+                                                                        
+                                                                      
+                                                                  
+                                                                      
+                              
+  
+                                                                      
+                                                                      
+                                                                      
+                                                                     
+                                                                  
+                                                              
+   
 #if defined(__clang__) && defined(__cplusplus)
 #define __MISMATCH_TAGS_PUSH                                            \
 	_Pragma("clang diagnostic push")                                \
@@ -207,23 +207,23 @@ struct qm_trace {
 #define __MISMATCH_TAGS_POP
 #endif
 
-/*!
- * Ensures that these macros can safely be used in structs when compiling with
- * clang. The macros do not allow for nullability attributes to be specified due
- * to how they are expanded. For example:
- *
- *     SLIST_HEAD(, foo _Nullable) bar;
- *
- * expands to
- *
- *     struct {
- *         struct foo _Nullable *slh_first;
- *     }
- *
- * which is not valid because the nullability specifier has to apply to the
- * pointer. So just ignore nullability completeness in all the places where this
- * is an issue.
- */
+   
+                                                                              
+                                                                                
+                                         
+  
+                                       
+  
+             
+  
+               
+                                           
+        
+  
+                                                                           
+                                                                                
+               
+   
 #if defined(__clang__)
 #define __NULLABILITY_COMPLETENESS_PUSH \
 	_Pragma("clang diagnostic push") \
@@ -235,14 +235,14 @@ struct qm_trace {
 #define __NULLABILITY_COMPLETENESS_POP
 #endif
 
-/*
- * Singly-linked List declarations.
- */
+  
+                                   
+   
 #define SLIST_HEAD(name, type)                                          \
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct name {                                                           \
-	struct type *slh_first; /* first element */                     \
+	struct type *slh_first;                                         \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
@@ -254,14 +254,14 @@ __MISMATCH_TAGS_POP
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct {                                                                \
-	struct type *sle_next;  /* next element */                      \
+	struct type *sle_next;                                          \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
 
-/*
- * Singly-linked List functions.
- */
+  
+                                
+   
 #define SLIST_EMPTY(head)       ((head)->slh_first == NULL)
 
 #define SLIST_FIRST(head)       ((head)->slh_first)
@@ -324,15 +324,15 @@ __MISMATCH_TAGS_POP
 	SLIST_FIRST((head)) = SLIST_NEXT(SLIST_FIRST((head)), field);   \
 } while (0)
 
-/*
- * Singly-linked Tail queue declarations.
- */
+  
+                                         
+   
 #define STAILQ_HEAD(name, type)                                         \
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct name {                                                           \
-	struct type *stqh_first;/* first element */                     \
-	struct type **stqh_last;/* addr of last next element */         \
+	struct type *stqh_first;                                        \
+	struct type **stqh_last;                                        \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
@@ -344,14 +344,14 @@ __MISMATCH_TAGS_POP
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct {                                                                \
-	struct type *stqe_next; /* next element */                      \
+	struct type *stqe_next;                                         \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                         \
 __MISMATCH_TAGS_POP
 
-/*
- * Singly-linked Tail queue functions.
- */
+  
+                                      
+   
 #define STAILQ_CONCAT(head1, head2) do {                                \
 	if (!STAILQ_EMPTY((head2))) {                                   \
 	        *(head1)->stqh_last = (head2)->stqh_first;              \
@@ -464,14 +464,14 @@ __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
 
 
-/*
- * List declarations.
- */
+  
+                     
+   
 #define LIST_HEAD(name, type)                                           \
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct name {                                                           \
-	struct type *lh_first;  /* first element */                     \
+	struct type *lh_first;                                          \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
@@ -483,15 +483,15 @@ __MISMATCH_TAGS_POP
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct {                                                                \
-	struct type *le_next;   /* next element */                      \
-	struct type **le_prev;  /* address of previous next element */  \
+	struct type *le_next;                                           \
+	struct type **le_prev;                                          \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
 
-/*
- * List functions.
- */
+  
+                  
+   
 
 #ifdef KERNEL_PRIVATE
 #define LIST_CHECK_HEAD(head, field) do {                               \
@@ -521,7 +521,7 @@ __MISMATCH_TAGS_POP
 #define LIST_CHECK_HEAD(head, field)
 #define LIST_CHECK_NEXT(elm, field)
 #define LIST_CHECK_PREV(elm, field)
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #define LIST_EMPTY(head)        ((head)->lh_first == NULL)
 
@@ -594,15 +594,15 @@ do {                                                                    \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
 
-/*
- * Tail queue declarations.
- */
+  
+                           
+   
 #define TAILQ_HEAD(name, type)                                          \
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct name {                                                           \
-	struct type *tqh_first; /* first element */                     \
-	struct type **tqh_last; /* addr of last next element */         \
+	struct type *tqh_first;                                         \
+	struct type **tqh_last;                                         \
 	TRACEBUF                                                        \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
@@ -615,16 +615,16 @@ __MISMATCH_TAGS_POP
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct {                                                                \
-	struct type *tqe_next;  /* next element */                      \
-	struct type **tqe_prev; /* address of previous next element */  \
+	struct type *tqe_next;                                          \
+	struct type **tqe_prev;                                         \
 	TRACEBUF                                                        \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
 
-/*
- * Tail queue functions.
- */
+  
+                        
+   
 #ifdef KERNEL_PRIVATE
 #define TAILQ_CHECK_HEAD(head, field) do {                              \
        if (__improbable(                                                \
@@ -653,7 +653,7 @@ __MISMATCH_TAGS_POP
 #define TAILQ_CHECK_HEAD(head, field)
 #define TAILQ_CHECK_NEXT(elm, field)
 #define TAILQ_CHECK_PREV(elm, field)
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #define TAILQ_CONCAT(head1, head2, field) do {                          \
 	if (!TAILQ_EMPTY(head2)) {                                      \
@@ -691,15 +691,15 @@ __MISMATCH_TAGS_POP
 	    (var) = (tvar))
 
 #if XNU_KERNEL_PRIVATE
-/*
- * Can be used when the initialized HEAD was just bzeroed
- * Works around deficiencies in clang analysis of initialization patterns.
- * See: <rdar://problem/47939050>
- */
+  
+                                                         
+                                                                          
+                                 
+   
 #define TAILQ_INIT_AFTER_BZERO(head) do {                               \
 	(head)->tqh_last = &TAILQ_FIRST((head));                        \
 } while (0)
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #define TAILQ_INIT(head) do {                                           \
 	TAILQ_FIRST((head)) = NULL;                                     \
@@ -787,9 +787,9 @@ __MISMATCH_TAGS_POP
 	QMD_TRACE_ELEM(&(elm)->field);                                  \
 } while (0)
 
-/*
- * Why did they switch to spaces for this one macro?
- */
+  
+                                                    
+   
 #define TAILQ_SWAP(head1, head2, type, field)                           \
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
@@ -812,15 +812,15 @@ do {                                                                    \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
 
-/*
- * Circular queue definitions.
- */
+  
+                              
+   
 #define CIRCLEQ_HEAD(name, type)                                        \
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct name {                                                           \
-	struct type *cqh_first;         /* first element */             \
-	struct type *cqh_last;          /* last element */              \
+	struct type *cqh_first;                                         \
+	struct type *cqh_last;                                          \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                          \
 __MISMATCH_TAGS_POP
@@ -829,15 +829,15 @@ __MISMATCH_TAGS_POP
 __MISMATCH_TAGS_PUSH                                                    \
 __NULLABILITY_COMPLETENESS_PUSH                                         \
 struct {                                                                \
-	struct type *cqe_next;          /* next element */              \
-	struct type *cqe_prev;          /* previous element */          \
+	struct type *cqe_next;                                          \
+	struct type *cqe_prev;                                          \
 }                                                                       \
 __NULLABILITY_COMPLETENESS_POP                                         \
 __MISMATCH_TAGS_POP
 
-/*
- * Circular queue functions.
- */
+  
+                            
+   
 #ifdef KERNEL_PRIVATE
 #define CIRCLEQ_CHECK_HEAD(head, field) do {                            \
        if (__improbable(                                                \
@@ -864,7 +864,7 @@ __MISMATCH_TAGS_POP
 #define CIRCLEQ_CHECK_HEAD(head, field)
 #define CIRCLEQ_CHECK_NEXT(head, elm, field)
 #define CIRCLEQ_CHECK_PREV(head, elm, field)
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #define CIRCLEQ_EMPTY(head) ((head)->cqh_first == (void *)(head))
 
@@ -948,10 +948,10 @@ __MISMATCH_TAGS_POP
 
 #if NOTFB31
 
-/*
- * XXX insque() and remque() are an old way of handling certain queues.
- * They bogusly assumes that all queue heads look alike.
- */
+  
+                                                                       
+                                                        
+   
 
 struct quehead {
 	struct quehead *qh_link;
@@ -979,10 +979,10 @@ chkqueprev(void *a)
 		panic("Bad que elm %p prev->next != elm", a);
 	}
 }
-#else /* !KERNEL_PRIVATE */
+#else                      
 #define chkquenext(a)
 #define chkqueprev(a)
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 static __inline void
 insque(void *a, void *b)
@@ -1009,14 +1009,14 @@ remque(void *a)
 	element->qh_rlink = 0;
 }
 
-#else /* !__GNUC__ */
+#else                
 
 void    insque(void *a, void *b);
 void    remque(void *a);
 
-#endif /* __GNUC__ */
+#endif               
 
-#endif /* NOTFB31 */
-#endif /* _KERNEL */
+#endif              
+#endif              
 
-#endif /* !_SYS_QUEUE_H_ */
+#endif                     

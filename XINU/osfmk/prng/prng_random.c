@@ -57,10 +57,10 @@ bootseed_init_bootloader(const struct ccdigest_info * di, ccdigest_ctx_t ctx)
 
 	n = PE_get_random_seed(seed, sizeof(seed));
 	if (n < sizeof(seed)) {
-		/*
-		 * Insufficient entropy is fatal.  We must fill the
-		 * entire entropy buffer during initializaton.
-		 */
+		  
+                                                     
+                                                
+     
 		panic("Expected %lu seed bytes from bootloader, but got %u.\n", sizeof(seed), n);
 	}
 
@@ -88,12 +88,12 @@ bootseed_init_native(const struct ccdigest_info * di, ccdigest_ctx_t ctx)
 				ccdigest_update(di, ctx, sizeof(x), &x);
 				i += 1;
 			} else {
-				// Intel recommends to pause between unsuccessful rdseed attempts.
+				                                                                  
 				cpu_pause();
 			}
 		}
 	} else if (cpuid_features() & CPUID_FEATURE_RDRAND) {
-		// The Intel documentation guarantees a reseed every 512 rdrand calls.
+		                                                                      
 		n = (SEED_SIZE / sizeof(x)) * 512;
 
 		while (i < n) {
@@ -102,7 +102,7 @@ bootseed_init_native(const struct ccdigest_info * di, ccdigest_ctx_t ctx)
 				ccdigest_update(di, ctx, sizeof(x), &x);
 				i += 1;
 			} else {
-				// Intel does not recommend pausing between unsuccessful rdrand attempts.
+				                                                                         
 			}
 		}
 	}
@@ -147,41 +147,41 @@ static struct {
 
 static void read_erandom(void * buf, size_t nbytes);
 
-/*
- * Return a uniformly distributed 64-bit random number.
- *
- * This interface should have minimal dependencies on kernel services,
- * and thus be available very early in the life of the kernel.
- *
- * This provides cryptographically secure randomness contingent on the
- * quality of the seed. It is seeded (lazily) with entropy provided by
- * the Booter.
- *
- * The implementation is a NIST HMAC-SHA256 DRBG instance used as
- * follows:
- *
- *  - When first called (on macOS this is very early while page tables
- *    are being built) early_random() calls ccdrbg_factory_hmac() to
- *    set-up a ccdbrg info structure.
- *
- *  - The boot seed (64 bytes) is hashed with SHA256. Where available,
- *    hardware RNG outputs are mixed into the seed. (See
- *    bootseed_init.) The resulting seed is 32 bytes.
- *
- *  - The ccdrbg state structure is a statically allocated area which
- *    is then initialized by calling the ccdbrg_init method. The
- *    initial entropy is the 32-byte seed described above. The nonce
- *    is an 8-byte timestamp from ml_get_timebase(). The
- *    personalization data provided is a fixed string.
- *
- *  - 64-bit outputs are generated via read_erandom, a wrapper around
- *    the ccdbrg_generate method. (Since "strict FIPS" is disabled,
- *    the DRBG will never request a reseed.)
- *
- *  - After the kernel PRNG is initialized, read_erandom defers
- *    generation to it via read_random_generate. (Note that this
- *    function acquires a per-processor mutex.)
- */
+  
+                                                       
+  
+                                                                      
+                                                              
+  
+                                                                      
+                                                                      
+              
+  
+                                                                 
+           
+  
+                                                                      
+                                                                    
+                                     
+  
+                                                                      
+                                                        
+                                                     
+  
+                                                                     
+                                                                
+                                                                    
+                                                        
+                                                      
+  
+                                                                     
+                                                                   
+                                            
+  
+                                                               
+                                                                
+                                               
+   
 uint64_t
 early_random(void)
 {
@@ -194,14 +194,14 @@ early_random(void)
 	if (init == 0) {
 		bootseed_init();
 
-		/* Init DRBG for NIST HMAC */
+		                             
 		ccdrbg_factory_nisthmac(&erandom.drbg_info, &erandom.drbg_custom);
 		assert(erandom.drbg_info.size <= sizeof(erandom.drbg_state));
 
-		/*
-		 * Init our DBRG from the boot entropy and a timestamp as nonce
-		 * and the cpu number as personalization.
-		 */
+		  
+                                                                 
+                                           
+     
 		assert(sizeof(bootseed) > sizeof(nonce));
 		nonce = ml_get_timebase();
 		rc = ccdrbg_init(&erandom.drbg_info, (struct ccdrbg_state *)erandom.drbg_state, sizeof(bootseed), bootseed, sizeof(nonce), &nonce, sizeof(ps) - 1, ps);
@@ -229,21 +229,21 @@ read_erandom(void * buf, size_t nbytes)
 	size_t n;
 	int rc;
 
-	// We defer to the kernel PRNG after it has been installed and
-	// initialized. This happens during corecrypto kext
-	// initialization.
+	                                                              
+	                                                   
+	                  
 	if (prng_ready) {
 		read_random_generate(buf, nbytes);
 		return;
 	}
 
-	// The DBRG request size is limited, so we break the request into
-	// chunks.
+	                                                                 
+	          
 	while (nbytes > 0) {
 		n = MIN(nbytes, PAGE_SIZE);
 
-		// Since "strict FIPS" is disabled, the DRBG will never
-		// request a reseed; therefore, we panic on any error
+		                                                       
+		                                                     
 		rc = ccdrbg_generate(&erandom.drbg_info, (struct ccdrbg_state *)erandom.drbg_state, n, buffer_bytes, 0, NULL);
 		if (rc != CCDRBG_STATUS_OK) {
 			panic("read_erandom ccdrbg error %d\n", rc);
@@ -292,7 +292,7 @@ random_cpu_init(int cpu)
 	prng_funcs.initgen(prng_ctx, cpu);
 }
 
-/* export good random numbers to the rest of the kernel */
+                                                          
 void
 read_random(void * buffer, u_int numbytes)
 {
@@ -304,18 +304,18 @@ static void
 ensure_gsbase(void)
 {
 #if defined(__x86_64__) && (DEVELOPMENT || DEBUG)
-	/*
-	 * Calling cpu_number() before gsbase is initialized is potentially
-	 * catastrophic, so assert that it's not set to the magic value set
-	 * in i386_init.c before proceeding with the call.  We cannot use
-	 * assert here because it ultimately calls panic, which executes
-	 * operations that involve accessing %gs-relative data (and additionally
-	 * causes a debug trap which will not work properly this early in boot.)
-	 */
+	  
+                                                                    
+                                                                    
+                                                                  
+                                                                 
+                                                                         
+                                                                         
+    
 	if (rdmsr64(MSR_IA32_GS_BASE) == EARLY_GSBASE_MAGIC) {
 		kprintf("[early_random] Cannot proceed: GSBASE is not initialized\n");
 		hlt();
-		/*NOTREACHED*/
+		              
 	}
 #endif
 }
@@ -341,7 +341,7 @@ write_random(void * buffer, u_int numbytes)
 	uint8_t seed[SHA256_DIGEST_LENGTH];
 	SHA256_CTX ctx;
 
-	/* hash the input to minimize the time we need to hold the lock */
+	                                                                  
 	SHA256_Init(&ctx);
 	SHA256_Update(&ctx, buffer, numbytes);
 	SHA256_Final(seed, &ctx);
@@ -352,27 +352,27 @@ write_random(void * buffer, u_int numbytes)
 	return 0;
 }
 
-/*
- * Boolean PRNG for generating booleans to randomize order of elements
- * in certain kernel data structures. The algorithm is a
- * modified version of the KISS RNG proposed in the paper:
- * http://stat.fsu.edu/techreports/M802.pdf
- * The modifications have been documented in the technical paper
- * paper from UCL:
- * http://www0.cs.ucl.ac.uk/staff/d.jones/GoodPracticeRNG.pdf
- */
+  
+                                                                      
+                                                        
+                                                          
+                                           
+                                                                
+                  
+                                                             
+   
 
-/* Initialize the PRNG structures. */
+                                     
 void
 random_bool_init(struct bool_gen * bg)
 {
-	/* Seed the random boolean generator */
+	                                       
 	read_frandom(bg->seed, sizeof(bg->seed));
 	bg->state = 0;
 	simple_lock_init(&bg->lock, 0);
 }
 
-/* Generate random bits and add them to an entropy pool. */
+                                                           
 void
 random_bool_gen_entropy(struct bool_gen * bg, unsigned int * buffer, int count)
 {
@@ -392,28 +392,28 @@ random_bool_gen_entropy(struct bool_gen * bg, unsigned int * buffer, int count)
 	simple_unlock(&bg->lock);
 }
 
-/* Get some number of bits from the entropy pool, refilling if necessary. */
+                                                                            
 unsigned int
 random_bool_gen_bits(struct bool_gen * bg, unsigned int * buffer, unsigned int count, unsigned int numbits)
 {
 	unsigned int index = 0;
 	unsigned int rbits = 0;
 	for (unsigned int bitct = 0; bitct < numbits; bitct++) {
-		/*
-		 * Find a portion of the buffer that hasn't been emptied.
-		 * We might have emptied our last index in the previous iteration.
-		 */
+		  
+                                                           
+                                                                    
+     
 		while (index < count && buffer[index] == 0) {
 			index++;
 		}
 
-		/* If we've exhausted the pool, refill it. */
+		                                             
 		if (index == count) {
 			random_bool_gen_entropy(bg, buffer, count);
 			index = 0;
 		}
 
-		/* Collect-a-bit */
+		                   
 		unsigned int bit = buffer[index] & 1;
 		buffer[index]    = buffer[index] >> 1;
 		rbits            = bit | (rbits << 1);

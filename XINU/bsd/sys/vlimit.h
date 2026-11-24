@@ -64,19 +64,19 @@
 #ifndef _SYS_VLIMIT_H_
 #define _SYS_VLIMIT_H_
 
-/*
- * Limits for u.u_limit[i], per process, inherited.
- */
-#define LIM_NORAISE     0       /* if <> 0, can't raise limits */
-#define LIM_CPU         1       /* max secs cpu time */
-#define LIM_FSIZE       2       /* max size of file created */
-#define LIM_DATA        3       /* max growth of data space */
-#define LIM_STACK       4       /* max growth of stack */
-#define LIM_CORE        5       /* max size of ``core'' file */
-#define LIM_MAXRSS      6       /* max desired data+stack core usage */
+  
+                                                   
+   
+#define LIM_NORAISE     0                                        
+#define LIM_CPU         1                              
+#define LIM_FSIZE       2                                     
+#define LIM_DATA        3                                     
+#define LIM_STACK       4                                
+#define LIM_CORE        5                                      
+#define LIM_MAXRSS      6                                              
 
 #define NLIMITS         6
 
 #define INFINITY        0x7fffffff
 
-#endif  /* !_SYS_VLIMIT_H_ */
+#endif                       

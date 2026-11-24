@@ -20,7 +20,7 @@ class TaskNode(object):
             out_arr.append(GetTaskSummary(self.task) + " " + GetProcSummary(Cast(self.task.bsd_info, 'proc *')) + " {: <#018x}".format(self.task.task_imp_base) )
         else:
             out_arr.append("Unknown task.")
-        #out_arr.append("TASK: {: <#018x} {: <s}".format(self.task, GetProcNameForTask(self.task))
+                                                                                                  
         for i in self.importance_refs:
             out_arr.append("\t" + i.GetBackRefChain())
         return "\n".join(out_arr)
@@ -73,8 +73,8 @@ class IIINode(object):
         cur_elem = self.elem
         out_str += self.GetShortSummary()
         from_elem = Cast(cur_elem.iii_from_elem, 'ipc_importance_inherit *')
-        # NOTE: We are exploiting the layout of iit and iii to have iie at the begining.
-        # so casting one to another is fine as long as we tread carefully.
+                                                                                        
+                                                                          
         
         while unsigned(from_elem.iii_elem.iie_bits) & 0x80000000:
             out_str += " <- {: <#018x} INH ({:d}){: <s}".format(from_elem, GetProcPIDForTask(from_elem.iii_to_task.iit_task), GetProcNameForTask(from_elem.iii_to_task.iit_task))
@@ -86,7 +86,7 @@ class IIINode(object):
         
         return out_str
 
-        #unused
+               
         cur_elem = self
         while cur_elem.parent:
             out_str += "<-" + cur_elem.GetShortSummary()

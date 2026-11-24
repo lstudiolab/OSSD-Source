@@ -52,8 +52,8 @@
 #define ESP_CHACHAPOLY_KEY_LEN          32
 #define ESP_CHACHAPOLY_NONCE_LEN        12
 
-// The minimum alignment is documented in KALLOC_LOG2_MINALIGN
-// which isn't accessible from here. Current minimum is 8.
+                                                              
+                                                          
 _Static_assert(_Alignof(chacha20poly1305_ctx) <= 8,
     "Alignment guarantee is broken");
 
@@ -261,24 +261,24 @@ esp_chachapoly_decrypt_finalize(struct secasvar *sav,
 }
 
 int
-esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
-    size_t off,                                        // offset to ESP header
+esp_chachapoly_encrypt(struct mbuf *m,                      
+    size_t off,                                                               
     __unused size_t plen,
     struct secasvar *sav,
     __unused const struct esp_algorithm *algo,
     int ivlen)
 {
-	struct mbuf *s = m; // this mbuf
-	int32_t soff = 0; // offset from the head of mbuf chain (m) to head of this mbuf (s)
-	int32_t sn = 0; // offset from the head of this mbuf (s) to the body
-	uint8_t *sp; // buffer of a given encryption round
-	size_t len; // length of a given encryption round
-	const int32_t ivoff = (int32_t)off + (int32_t)sizeof(struct newesp); // IV offset
-	const size_t bodyoff = ivoff + ivlen; // body offset
-	int rc = 0; // return code of corecrypto operations
-	struct newesp esp_hdr; // ESP header for AAD
+	struct mbuf *s = m;             
+	int32_t soff = 0;                                                                   
+	int32_t sn = 0;                                                     
+	uint8_t *sp;                                      
+	size_t len;                                      
+	const int32_t ivoff = (int32_t)off + (int32_t)sizeof(struct newesp);             
+	const size_t bodyoff = ivoff + ivlen;               
+	int rc = 0;                                        
+	struct newesp esp_hdr;                      
 	_Static_assert(sizeof(esp_hdr) == 8, "Bad size");
-	uint32_t nonce[ESP_CHACHAPOLY_NONCE_LEN / 4]; // ensure 32bit alignment
+	uint32_t nonce[ESP_CHACHAPOLY_NONCE_LEN / 4];                          
 	_Static_assert(sizeof(nonce) == ESP_CHACHAPOLY_NONCE_LEN, "Bad nonce length");
 	esp_chachapoly_ctx_t esp_ccp_ctx;
 
@@ -300,7 +300,7 @@ esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
 		return EINVAL;
 	}
 
-	// check if total packet length is enough to contain ESP + IV
+	                                                             
 	if (m->m_pkthdr.len < bodyoff) {
 		esp_log_err("ChaChaPoly Packet too short %d < %zu, SPI 0x%08x",
 		    m->m_pkthdr.len, bodyoff, ntohl(sav->spi));
@@ -316,15 +316,15 @@ esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
 		return rc;
 	}
 
-	// esp_hdr is used for nonce and AAD
+	                                    
 	m_copydata(m, (int)off, sizeof(esp_hdr), (void *)&esp_hdr);
 
-	// RFC 7634 dictates that the 12 byte nonce must be
-	// the 4 byte salt followed by the 8 byte IV.
-	// The IV MUST be non-repeating but does not need to be unpredictable,
-	// so we use 4 bytes of 0 followed by the 4 byte ESP sequence number.
-	// this allows us to use implicit IV -- draft-ietf-ipsecme-implicit-iv
-	// Note that sav->seq is zero here so we must get esp_seq from esp_hdr
+	                                                   
+	                                             
+	                                                                      
+	                                                                     
+	                                                                      
+	                                                                      
 	memcpy(nonce, esp_ccp_ctx->ccp_salt, ESP_CHACHAPOLY_SALT_LEN);
 	memset(((uint8_t *)nonce) + ESP_CHACHAPOLY_SALT_LEN, 0, 4);
 	memcpy(((uint8_t *)nonce) + ESP_CHACHAPOLY_SALT_LEN + 4,
@@ -349,7 +349,7 @@ esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
 	}
 	cc_clear(sizeof(nonce), nonce);
 
-	// Set Additional Authentication Data (AAD)
+	                                           
 	rc = chacha20poly1305_aad(&esp_ccp_ctx->ccp_ctx,
 	    sizeof(esp_hdr),
 	    (void *)&esp_hdr);
@@ -360,7 +360,7 @@ esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
 		return rc;
 	}
 
-	// skip headers/IV
+	                  
 	while (s != NULL && soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = bodyoff - soff;
@@ -374,7 +374,7 @@ esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
 	while (s != NULL && soff < m->m_pkthdr.len) {
 		len = (size_t)(s->m_len - sn);
 		if (len == 0) {
-			// skip empty mbufs
+			                   
 			continue;
 		}
 		sp = mtod(s, uint8_t *) + sn;
@@ -402,23 +402,23 @@ esp_chachapoly_encrypt(struct mbuf *m, // head of mbuf chain
 }
 
 int
-esp_chachapoly_decrypt(struct mbuf *m, // head of mbuf chain
-    size_t off,                                        // offset to ESP header
+esp_chachapoly_decrypt(struct mbuf *m,                      
+    size_t off,                                                               
     struct secasvar *sav,
     __unused const struct esp_algorithm *algo,
     int ivlen)
 {
-	struct mbuf *s = m; // this mbuf
-	int32_t soff = 0; // offset from the head of mbuf chain (m) to head of this mbuf (s)
-	int32_t sn = 0; // offset from the head of this mbuf (s) to the body
-	uint8_t *sp; // buffer of a given encryption round
-	size_t len; // length of a given encryption round
-	const int32_t ivoff = (int32_t)off + (int32_t)sizeof(struct newesp); // IV offset
-	const int32_t bodyoff = ivoff + ivlen; // body offset
-	int rc = 0; // return code of corecrypto operations
-	struct newesp esp_hdr; // ESP header for AAD
+	struct mbuf *s = m;             
+	int32_t soff = 0;                                                                   
+	int32_t sn = 0;                                                     
+	uint8_t *sp;                                      
+	size_t len;                                      
+	const int32_t ivoff = (int32_t)off + (int32_t)sizeof(struct newesp);             
+	const int32_t bodyoff = ivoff + ivlen;               
+	int rc = 0;                                        
+	struct newesp esp_hdr;                      
 	_Static_assert(sizeof(esp_hdr) == 8, "Bad size");
-	uint32_t nonce[ESP_CHACHAPOLY_NONCE_LEN / 4]; // ensure 32bit alignment
+	uint32_t nonce[ESP_CHACHAPOLY_NONCE_LEN / 4];                          
 	_Static_assert(sizeof(nonce) == ESP_CHACHAPOLY_NONCE_LEN, "Bad nonce length");
 	esp_chachapoly_ctx_t esp_ccp_ctx;
 
@@ -440,7 +440,7 @@ esp_chachapoly_decrypt(struct mbuf *m, // head of mbuf chain
 		return EINVAL;
 	}
 
-	// check if total packet length is enough to contain ESP + IV
+	                                                             
 	if (m->m_pkthdr.len < bodyoff) {
 		esp_packet_log_err("ChaChaPoly Packet too short %d < %u, SPI 0x%08x",
 		    m->m_pkthdr.len, bodyoff, ntohl(sav->spi));
@@ -458,17 +458,17 @@ esp_chachapoly_decrypt(struct mbuf *m, // head of mbuf chain
 
 	m_copydata(m, (int)off, sizeof(esp_hdr), (void *)&esp_hdr);
 
-	// RFC 7634 dictates that the 12 byte nonce must be
-	// the 4 byte salt followed by the 8 byte IV.
+	                                                   
+	                                             
 	memcpy(nonce, esp_ccp_ctx->ccp_salt, ESP_CHACHAPOLY_SALT_LEN);
 	if (esp_ccp_ctx->ccp_implicit_iv) {
-		// IV is implicit (4 zero bytes followed by the ESP sequence number)
+		                                                                    
 		memset(((uint8_t *)nonce) + ESP_CHACHAPOLY_SALT_LEN, 0, 4);
 		memcpy(((uint8_t *)nonce) + ESP_CHACHAPOLY_SALT_LEN + 4,
 		    &esp_hdr.esp_seq, sizeof(esp_hdr.esp_seq));
 		_Static_assert(4 + sizeof(esp_hdr.esp_seq) == ESP_CHACHAPOLY_IV_LEN, "Bad IV length");
 	} else {
-		// copy IV from packet
+		                      
 		m_copydata(m, ivoff, ESP_CHACHAPOLY_IV_LEN, ((uint8_t *)nonce) + ESP_CHACHAPOLY_SALT_LEN);
 	}
 	_Static_assert(ESP_CHACHAPOLY_SALT_LEN + ESP_CHACHAPOLY_IV_LEN == sizeof(nonce),
@@ -483,7 +483,7 @@ esp_chachapoly_decrypt(struct mbuf *m, // head of mbuf chain
 	}
 	cc_clear(sizeof(nonce), nonce);
 
-	// Set Additional Authentication Data (AAD)
+	                                           
 	rc = chacha20poly1305_aad(&esp_ccp_ctx->ccp_ctx,
 	    sizeof(esp_hdr),
 	    (void *)&esp_hdr);
@@ -494,7 +494,7 @@ esp_chachapoly_decrypt(struct mbuf *m, // head of mbuf chain
 		return rc;
 	}
 
-	// skip headers/IV
+	                  
 	while (s != NULL && soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = bodyoff - soff;
@@ -508,7 +508,7 @@ esp_chachapoly_decrypt(struct mbuf *m, // head of mbuf chain
 	while (s != NULL && soff < m->m_pkthdr.len) {
 		len = (size_t)(s->m_len - sn);
 		if (len == 0) {
-			// skip empty mbufs
+			                   
 			continue;
 		}
 		sp = mtod(s, uint8_t *) + sn;

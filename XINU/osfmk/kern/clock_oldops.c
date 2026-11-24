@@ -28,14 +28,14 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- *	DEPRECATED INTERFACES - Should be removed
- *
- *	Purpose:	Routines for the creation and use of kernel
- *			alarm clock services. This file and the ipc
- *			routines in kern/ipc_clock.c constitute the
- *			machine-independent clock service layer.
- */
+  
+                                            
+  
+                                                       
+                                                
+                                                
+                                             
+   
 
 #include <mach/mach_types.h>
 
@@ -61,48 +61,48 @@
 #include <mach/host_priv_server.h>
 #include <libkern/section_keywords.h>
 
-/*
- * Actual clock alarm structure. Used for user clock_sleep() and
- * clock_alarm() calls. Alarms are allocated from the alarm free
- * list and entered in time priority order into the active alarm
- * chain of the target clock.
- */
+  
+                                                                
+                                                                
+                                                                
+                             
+   
 struct  alarm {
-	struct  alarm   *al_next;               /* next alarm in chain */
-	struct  alarm   *al_prev;               /* previous alarm in chain */
-	int                             al_status;              /* alarm status */
-	mach_timespec_t al_time;                /* alarm time */
-	struct {                                /* message alarm data */
-		int                             type;           /* alarm type */
-		ipc_port_t              port;           /* alarm port */
+	struct  alarm   *al_next;                                        
+	struct  alarm   *al_prev;                                            
+	int                             al_status;                                
+	mach_timespec_t al_time;                                
+	struct {                                                        
+		int                             type;                           
+		ipc_port_t              port;                           
 		mach_msg_type_name_t
-		    port_type;                                  /* alarm port type */
-		struct  clock   *clock;         /* alarm clock */
-		void                    *data;          /* alarm data */
+		    port_type;                                                       
+		struct  clock   *clock;                          
+		void                    *data;                          
 	} al_alrm;
 #define al_type         al_alrm.type
 #define al_port         al_alrm.port
 #define al_port_type    al_alrm.port_type
 #define al_clock        al_alrm.clock
 #define al_data         al_alrm.data
-	long                    al_seqno;               /* alarm sequence number */
+	long                    al_seqno;                                          
 };
 typedef struct alarm    alarm_data_t;
 
-/* alarm status */
-#define ALARM_FREE      0               /* alarm is on free list */
-#define ALARM_SLEEP     1               /* active clock_sleep() */
-#define ALARM_CLOCK     2               /* active clock_alarm() */
-#define ALARM_DONE      4               /* alarm has expired */
+                  
+#define ALARM_FREE      0                                          
+#define ALARM_SLEEP     1                                         
+#define ALARM_CLOCK     2                                         
+#define ALARM_DONE      4                                      
 
-/* local data declarations */
-decl_simple_lock_data(static, alarm_lock);       /* alarm synchronization */
-/* zone for user alarms */
+                             
+decl_simple_lock_data(static, alarm_lock);                                  
+                          
 static ZONE_DECLARE(alarm_zone, "alarms", sizeof(struct alarm), ZC_NONE);
-static struct   alarm           *alrmfree;              /* alarm free list pointer */
-static struct   alarm           *alrmdone;              /* alarm done list pointer */
+static struct   alarm           *alrmfree;                                           
+static struct   alarm           *alrmdone;                                           
 static struct   alarm           *alrmlist;
-static long                     alrm_seqno;             /* uniquely identifies alarms */
+static long                     alrm_seqno;                                             
 static thread_call_data_t       alarm_done_call;
 static timer_call_data_t        alarm_expire_timer;
 
@@ -161,9 +161,9 @@ SECURITY_READ_ONLY_EARLY(struct clock_ops) calend_ops = {
 	.c_getattr  = calend_getattr,
 };
 
-/*
- * List of clock devices.
- */
+  
+                         
+   
 SECURITY_READ_ONLY_LATE(struct clock) clock_list[] = {
 	[SYSTEM_CLOCK] = {
 		.cl_ops     = &sysclk_ops,
@@ -178,9 +178,9 @@ SECURITY_READ_ONLY_LATE(struct clock) clock_list[] = {
 };
 int     clock_count = sizeof(clock_list) / sizeof(clock_list[0]);
 
-/*
- *	Macros to lock/unlock clock system.
- */
+  
+                                      
+   
 #define LOCK_ALARM(s)                   \
 	s = splclock();                 \
 	simple_lock(&alarm_lock, LCK_GRP_NULL);
@@ -199,9 +199,9 @@ clock_oldconfig(void)
 	thread_call_setup(&alarm_done_call, (thread_call_func_t)alarm_done, NULL);
 	timer_call_setup(&alarm_expire_timer, (timer_call_func_t)alarm_expire, NULL);
 
-	/*
-	 * Configure clock devices.
-	 */
+	  
+                            
+    
 	for (i = 0; i < clock_count; i++) {
 		clock = &clock_list[i];
 		if (clock->cl_ops && clock->cl_ops->c_config) {
@@ -211,7 +211,7 @@ clock_oldconfig(void)
 		}
 	}
 
-	/* start alarm sequence numbers at 0 */
+	                                       
 	alrm_seqno = 0;
 }
 
@@ -221,9 +221,9 @@ clock_oldinit(void)
 	clock_t                 clock;
 	int     i;
 
-	/*
-	 * Initialize basic clock structures.
-	 */
+	  
+                                      
+    
 	for (i = 0; i < clock_count; i++) {
 		clock = &clock_list[i];
 		if (clock->cl_ops && clock->cl_ops->c_init) {
@@ -232,15 +232,15 @@ clock_oldinit(void)
 	}
 }
 
-/*
- * Initialize the clock ipc service facility.
- */
+  
+                                             
+   
 void
 clock_service_create(void)
 {
-	/*
-	 * Initialize ipc clock services.
-	 */
+	  
+                                  
+    
 	for (int i = 0; i < clock_count; i++) {
 		clock_t clock = &clock_list[i];
 		if (clock->cl_ops) {
@@ -250,14 +250,14 @@ clock_service_create(void)
 	}
 }
 
-/*
- * Get the service port on a clock.
- */
+  
+                                   
+   
 kern_return_t
 host_get_clock_service(
 	host_t                  host,
 	clock_id_t              clock_id,
-	clock_t                 *clock)         /* OUT */
+	clock_t                 *clock)                  
 {
 	if (host == HOST_NULL || clock_id < 0 || clock_id >= clock_count) {
 		*clock = CLOCK_NULL;
@@ -271,14 +271,14 @@ host_get_clock_service(
 	return KERN_SUCCESS;
 }
 
-/*
- * Get the control port on a clock.
- */
+  
+                                   
+   
 kern_return_t
 host_get_clock_control(
 	host_priv_t             host_priv,
 	clock_id_t              clock_id,
-	clock_t                 *clock)         /* OUT */
+	clock_t                 *clock)                  
 {
 	if (host_priv == HOST_PRIV_NULL ||
 	    clock_id < 0 || clock_id >= clock_count) {
@@ -293,13 +293,13 @@ host_get_clock_control(
 	return KERN_SUCCESS;
 }
 
-/*
- * Get the current clock time.
- */
+  
+                              
+   
 kern_return_t
 clock_get_time(
 	clock_t                 clock,
-	mach_timespec_t *cur_time)      /* OUT */
+	mach_timespec_t *cur_time)               
 {
 	if (clock == CLOCK_NULL) {
 		return KERN_INVALID_ARGUMENT;
@@ -309,7 +309,7 @@ clock_get_time(
 
 kern_return_t
 rtclock_gettime(
-	mach_timespec_t         *time)  /* OUT */
+	mach_timespec_t         *time)           
 {
 	clock_sec_t             secs;
 	clock_nsec_t    nsecs;
@@ -323,7 +323,7 @@ rtclock_gettime(
 
 kern_return_t
 calend_gettime(
-	mach_timespec_t         *time)  /* OUT */
+	mach_timespec_t         *time)           
 {
 	clock_sec_t             secs;
 	clock_nsec_t    nsecs;
@@ -335,15 +335,15 @@ calend_gettime(
 	return KERN_SUCCESS;
 }
 
-/*
- * Get clock attributes.
- */
+  
+                        
+   
 kern_return_t
 clock_get_attributes(
 	clock_t                                 clock,
 	clock_flavor_t                  flavor,
-	clock_attr_t                    attr,           /* OUT */
-	mach_msg_type_number_t  *count)         /* IN/OUT */
+	clock_attr_t                    attr,                    
+	mach_msg_type_number_t  *count)                     
 {
 	if (clock == CLOCK_NULL) {
 		return KERN_INVALID_ARGUMENT;
@@ -357,16 +357,16 @@ clock_get_attributes(
 kern_return_t
 rtclock_getattr(
 	clock_flavor_t                  flavor,
-	clock_attr_t                    attr,           /* OUT */
-	mach_msg_type_number_t  *count)         /* IN/OUT */
+	clock_attr_t                    attr,                    
+	mach_msg_type_number_t  *count)                     
 {
 	if (*count != 1) {
 		return KERN_FAILURE;
 	}
 
 	switch (flavor) {
-	case CLOCK_GET_TIME_RES:        /* >0 res */
-	case CLOCK_ALARM_CURRES:        /* =0 no alarm */
+	case CLOCK_GET_TIME_RES:                    
+	case CLOCK_ALARM_CURRES:                         
 	case CLOCK_ALARM_MINRES:
 	case CLOCK_ALARM_MAXRES:
 		*(clock_res_t *) attr = NSEC_PER_SEC / 100;
@@ -382,19 +382,19 @@ rtclock_getattr(
 kern_return_t
 calend_getattr(
 	clock_flavor_t                  flavor,
-	clock_attr_t                    attr,           /* OUT */
-	mach_msg_type_number_t  *count)         /* IN/OUT */
+	clock_attr_t                    attr,                    
+	mach_msg_type_number_t  *count)                     
 {
 	if (*count != 1) {
 		return KERN_FAILURE;
 	}
 
 	switch (flavor) {
-	case CLOCK_GET_TIME_RES:        /* >0 res */
+	case CLOCK_GET_TIME_RES:                    
 		*(clock_res_t *) attr = NSEC_PER_SEC / 100;
 		break;
 
-	case CLOCK_ALARM_CURRES:        /* =0 no alarm */
+	case CLOCK_ALARM_CURRES:                         
 	case CLOCK_ALARM_MINRES:
 	case CLOCK_ALARM_MAXRES:
 		*(clock_res_t *) attr = 0;
@@ -407,9 +407,9 @@ calend_getattr(
 	return KERN_SUCCESS;
 }
 
-/*
- * Set the current clock time.
- */
+  
+                              
+   
 kern_return_t
 clock_set_time(
 	clock_t                                 clock,
@@ -421,9 +421,9 @@ clock_set_time(
 	return KERN_FAILURE;
 }
 
-/*
- * Set the clock alarm resolution.
- */
+  
+                                  
+   
 kern_return_t
 clock_set_attributes(
 	clock_t                                         clock,
@@ -437,9 +437,9 @@ clock_set_attributes(
 	return KERN_FAILURE;
 }
 
-/*
- * Setup a clock alarm.
- */
+  
+                       
+   
 kern_return_t
 clock_alarm(
 	clock_t                                 clock,
@@ -464,10 +464,10 @@ clock_alarm(
 		return KERN_INVALID_CAPABILITY;
 	}
 
-	/*
-	 * Check alarm parameters. If parameters are invalid,
-	 * send alarm message immediately.
-	 */
+	  
+                                                      
+                                   
+    
 	(*clock->cl_ops->c_gettime)(&clock_time);
 	chkstat = check_time(alarm_type, &alarm_time, &clock_time);
 	if (chkstat <= 0) {
@@ -477,9 +477,9 @@ clock_alarm(
 		return KERN_SUCCESS;
 	}
 
-	/*
-	 * Get alarm and add to clock alarm list.
-	 */
+	  
+                                          
+    
 
 	LOCK_ALARM(s);
 	if ((alarm = alrmfree) == 0) {
@@ -506,12 +506,12 @@ clock_alarm(
 	return KERN_SUCCESS;
 }
 
-/*
- * Sleep on a clock. System trap. User-level libmach clock_sleep
- * interface call takes a mach_timespec_t sleep_time argument which it
- * converts to sleep_sec and sleep_nsec arguments which are then
- * passed to clock_sleep_trap.
- */
+  
+                                                                
+                                                                      
+                                                                
+                              
+   
 kern_return_t
 clock_sleep_trap(
 	struct clock_sleep_trap_args *args)
@@ -525,9 +525,9 @@ clock_sleep_trap(
 	mach_timespec_t         swtime = {};
 	kern_return_t           rvalue;
 
-	/*
-	 * Convert the trap parameters.
-	 */
+	  
+                                
+    
 	if (clock_name == MACH_PORT_NULL) {
 		clock = &clock_list[SYSTEM_CLOCK];
 	} else {
@@ -537,14 +537,14 @@ clock_sleep_trap(
 	swtime.tv_sec  = sleep_sec;
 	swtime.tv_nsec = sleep_nsec;
 
-	/*
-	 * Call the actual clock_sleep routine.
-	 */
+	  
+                                        
+    
 	rvalue = clock_sleep_internal(clock, sleep_type, &swtime);
 
-	/*
-	 * Return current time as wakeup time.
-	 */
+	  
+                                       
+    
 	if (rvalue != KERN_INVALID_ARGUMENT && rvalue != KERN_FAILURE) {
 		copyout((char *)&swtime, wakeup_time_addr, sizeof(mach_timespec_t));
 	}
@@ -571,10 +571,10 @@ clock_sleep_internal(
 		return KERN_FAILURE;
 	}
 
-	/*
-	 * Check sleep parameters. If parameters are invalid
-	 * return an error, otherwise post alarm request.
-	 */
+	  
+                                                     
+                                                  
+    
 	(*clock->cl_ops->c_gettime)(&clock_time);
 
 	chkstat = check_time(sleep_type, sleep_time, &clock_time);
@@ -585,9 +585,9 @@ clock_sleep_internal(
 	if (chkstat > 0) {
 		wait_result_t wait_result;
 
-		/*
-		 * Get alarm and add to clock alarm list.
-		 */
+		  
+                                           
+     
 
 		LOCK_ALARM(s);
 		if ((alarm = alrmfree) == 0) {
@@ -601,9 +601,9 @@ clock_sleep_internal(
 			alrmfree = alarm->al_next;
 		}
 
-		/*
-		 * Wait for alarm to occur.
-		 */
+		  
+                             
+     
 		wait_result = assert_wait((event_t)alarm, THREAD_ABORTSAFE);
 		if (wait_result == THREAD_WAITING) {
 			alarm->al_time = *sleep_time;
@@ -613,11 +613,11 @@ clock_sleep_internal(
 
 			wait_result = thread_block(THREAD_CONTINUE_NULL);
 
-			/*
-			 * Note if alarm expired normally or whether it
-			 * was aborted. If aborted, delete alarm from
-			 * clock alarm list. Return alarm to free list.
-			 */
+			  
+                                                  
+                                                
+                                                  
+      
 			LOCK_ALARM(s);
 			if (alarm->al_status != ALARM_DONE) {
 				assert(wait_result != THREAD_AWAKENED);
@@ -643,9 +643,9 @@ clock_sleep_internal(
 	return rvalue;
 }
 
-/*
- * Service clock alarm expirations.
- */
+  
+                                   
+   
 static void
 alarm_expire(void)
 {
@@ -659,10 +659,10 @@ alarm_expire(void)
 	clock = &clock_list[SYSTEM_CLOCK];
 	(*clock->cl_ops->c_gettime)(&clock_time);
 
-	/*
-	 * Update clock alarm list. Alarms that are due are moved
-	 * to the alarmdone list to be serviced by a thread callout.
-	 */
+	  
+                                                          
+                                                             
+    
 	LOCK_ALARM(s);
 	alrm1 = (alarm_t)&alrmlist;
 	while ((alrm2 = alrm1->al_next) != NULL) {
@@ -671,29 +671,29 @@ alarm_expire(void)
 			break;
 		}
 
-		/*
-		 * Alarm has expired, so remove it from the
-		 * clock alarm list.
-		 */
+		  
+                                             
+                      
+     
 		if ((alrm1->al_next = alrm2->al_next) != NULL) {
 			(alrm1->al_next)->al_prev = alrm1;
 		}
 
-		/*
-		 * If a clock_sleep() alarm, wakeup the thread
-		 * which issued the clock_sleep() call.
-		 */
+		  
+                                                
+                                         
+     
 		if (alrm2->al_status == ALARM_SLEEP) {
 			alrm2->al_next = NULL;
 			alrm2->al_status = ALARM_DONE;
 			alrm2->al_time = clock_time;
 			thread_wakeup((event_t)alrm2);
 		}
-		/*
-		 * If a clock_alarm() alarm, place the alarm on
-		 * the alarm done list and schedule the alarm
-		 * delivery mechanism.
-		 */
+		  
+                                                 
+                                               
+                        
+     
 		else {
 			assert(alrm2->al_status == ALARM_CLOCK);
 			if ((alrm2->al_next = alrmdone) != NULL) {
@@ -708,9 +708,9 @@ alarm_expire(void)
 		}
 	}
 
-	/*
-	 * Setup to expire for the next pending alarm.
-	 */
+	  
+                                               
+    
 	if (alrm2) {
 		set_alarm(alarm_time);
 	}
@@ -733,7 +733,7 @@ alarm_done(void)
 
 		code = (alrm->al_status == ALARM_DONE? KERN_SUCCESS: KERN_ABORTED);
 		if (alrm->al_port != IP_NULL) {
-			/* Deliver message to designated port */
+			                                        
 			if (IP_VALID(alrm->al_port)) {
 				clock_alarm_reply(alrm->al_port, alrm->al_port_type, code,
 				    alrm->al_type, alrm->al_time);
@@ -751,11 +751,11 @@ alarm_done(void)
 	UNLOCK_ALARM(s);
 }
 
-/*
- * Post an alarm on the active alarm list.
- *
- * Always called from within a LOCK_ALARM() code section.
- */
+  
+                                          
+  
+                                                         
+   
 static void
 post_alarm(
 	alarm_t                         alarm)
@@ -764,10 +764,10 @@ post_alarm(
 	mach_timespec_t         *alarm_time;
 	mach_timespec_t         *queue_time;
 
-	/*
-	 * Traverse alarm list until queue time is greater
-	 * than alarm time, then insert alarm.
-	 */
+	  
+                                                   
+                                       
+    
 	alarm_time = &alarm->al_time;
 	alrm1 = (alarm_t)&alrmlist;
 	while ((alrm2 = alrm1->al_next) != NULL) {
@@ -784,10 +784,10 @@ post_alarm(
 		alrm2->al_prev  = alarm;
 	}
 
-	/*
-	 * If the inserted alarm is the 'earliest' alarm,
-	 * reset the device layer alarm time accordingly.
-	 */
+	  
+                                                  
+                                                  
+    
 	if (alrmlist == alarm) {
 		set_alarm(alarm_time);
 	}
@@ -803,12 +803,12 @@ set_alarm(
 	timer_call_enter_with_leeway(&alarm_expire_timer, NULL, abstime, 0, TIMER_CALL_USER_NORMAL, FALSE);
 }
 
-/*
- * Check the validity of 'alarm_time' and 'alarm_type'. If either
- * argument is invalid, return a negative value. If the 'alarm_time'
- * is now, return a 0 value. If the 'alarm_time' is in the future,
- * return a positive value.
- */
+  
+                                                                 
+                                                                    
+                                                                  
+                           
+   
 static int
 check_time(
 	alarm_type_t            alarm_type,
@@ -856,4 +856,4 @@ clock_get_calendar_value(void)
 	return value;
 }
 
-#endif  /* __LP64__ */
+#endif                

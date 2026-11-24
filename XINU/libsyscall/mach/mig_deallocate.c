@@ -51,9 +51,9 @@
  * the rights to redistribute these changes.
  */
 
-/*
- * Memory deallocation routine for MiG interfaces.
- */
+  
+                                                  
+   
 #include <mach/mach.h>
 
 void

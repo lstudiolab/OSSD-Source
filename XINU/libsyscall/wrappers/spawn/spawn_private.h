@@ -45,12 +45,12 @@ int     posix_spawnattr_setcpumonitor_default(posix_spawnattr_t * __restrict) __
 #if (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)
 int     posix_spawnattr_setjetsam(posix_spawnattr_t * __restrict attr,
     short flags, int priority, int memlimit) __API_UNAVAILABLE(macos) __API_AVAILABLE(ios(5.0));
-#endif /* (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR) */
+#endif                                                 
 
 int     posix_spawnattr_setjetsam_ext(posix_spawnattr_t * __restrict attr,
     short flags, int priority, int memlimit_active, int memlimit_inactive) __API_AVAILABLE(macos(10.11), ios(9.0));
 
-// time-to-relaunch after jetsam, set by launchd
+                                                
 int     posix_spawnattr_set_jetsam_ttr_np(const posix_spawnattr_t * __restrict attr, uint32_t count, uint32_t *ttrs_millis) __OSX_AVAILABLE_STARTING(__MAC_10_15, __IPHONE_13_0);
 
 int     posix_spawnattr_set_threadlimit_ext(posix_spawnattr_t * __restrict attr,
@@ -100,4 +100,4 @@ int     posix_spawn_file_actions_add_fileportdup2_np(posix_spawn_file_actions_t 
 
 __END_DECLS
 
-#endif /* !defined _SPAWN_PRIVATE_H_*/
+#endif                                

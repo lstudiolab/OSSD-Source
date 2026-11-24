@@ -26,16 +26,16 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * ieee8023ad.h
- */
+  
+               
+   
 
-/*
- * Modification History
- *
- * May 14, 2004	Dieter Siegmund (dieter@apple.com)
- * - created
- */
+  
+                       
+  
+                                                  
+            
+   
 
 
 #ifndef _NET_IEEE8023AD_H_
@@ -50,4 +50,4 @@
 #define IEEE8023AD_SLOW_PROTO_SUBTYPE_LA_MARKER_PROTOCOL        2
 #define IEEE8023AD_SLOW_PROTO_SUBTYPE_RESERVED_START            3
 #define IEEE8023AD_SLOW_PROTO_SUBTYPE_RESERVED_END              10
-#endif /* _NET_IEEE8023AD_H_ */
+#endif                         

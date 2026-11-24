@@ -122,12 +122,12 @@ KCDBasicTypeDescription () {
 	if (length <= _subtype_desc.kcs_elem_offset)
 		return retval;
 	uint8_t * data = (uint8_t *)dataBuffer;
-	/*
-	 * Calculate the maximum number of data elements we can parse, Taking into
-	 * account the maximum size specified by the type description, and also the
-	 * actual length of the data buffer and the offset into the buffer where we
-	 * begin parsing.
-	 */
+	  
+                                                                           
+                                                                            
+                                                                            
+                  
+    
 	uint32_t elem_count = MIN(_count, (length - _subtype_desc.kcs_elem_offset) / (_size / _count));
 	uint32_t elem_size = _size / _count;
 	if (elem_count == 0) {
@@ -158,7 +158,7 @@ KCDBasicTypeDescription () {
     }else {
         return [NSString stringWithFormat:@"[%d,%d] %s  %s;", _subtype_desc.kcs_elem_offset, kcs_get_elem_size(&_subtype_desc), name_for_subtype(_subtype_desc.kcs_elem_type), _subtype_desc.kcs_name ];
     }
-	//return [NSString stringWithFormat:@"type: %d => \"%@\" ", [self typeID], [self name]];
+	                                                                                        
 }
 
 - (NSString *)name

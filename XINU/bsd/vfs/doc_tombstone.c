@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-// -- Document ID Tombstone Support --
+                                      
 
 #include <stdint.h>
 #include <sys/resource.h>
@@ -39,11 +39,11 @@
 #include <kern/kalloc.h>
 #include <string.h>
 
-//
-// This function gets the doc_tombstone structure for the
-// current thread.  If the thread doesn't have one, the
-// structure is allocated.
-//
+  
+                                                         
+                                                       
+                          
+  
 struct doc_tombstone *
 doc_tombstone_get(void)
 {
@@ -58,14 +58,14 @@ doc_tombstone_get(void)
 	return ut->t_tombstone;
 }
 
-//
-// This routine clears out the current tombstone for the
-// current thread and if necessary passes the doc-id of
-// the tombstone on to the dst_cnode.
-//
-// The caller is responsible for generating the appropriate
-// fsevents.
-//
+  
+                                                        
+                                                       
+                                     
+  
+                                                           
+            
+  
 void
 doc_tombstone_clear(struct doc_tombstone *ut, vnode_t *old_vpp)
 {
@@ -76,18 +76,18 @@ doc_tombstone_clear(struct doc_tombstone *ut, vnode_t *old_vpp)
 	ut->t_lastop_parent_vid = 0;
 	ut->t_lastop_filename[0] = '\0';
 
-	//
-	// If the lastop item is still the same and needs to be cleared,
-	// clear it.  The following isn't ideal because the vnode might
-	// have been recycled.
-	//
+	  
+	                                                                
+	                                                               
+	                      
+	  
 	if (old_vpp) {
 		*old_vpp = NULL;
 		if (old_id && ut->t_lastop_item
 		    && vnode_vid(ut->t_lastop_item) == ut->t_lastop_item_vid) {
 			int res = vnode_get(ut->t_lastop_item);
 			if (!res) {
-				// Need to check vid again
+				                          
 				if (vnode_vid(ut->t_lastop_item) == ut->t_lastop_item_vid
 				    && !ISSET(ut->t_lastop_item->v_lflag, VL_TERMINATE)) {
 					*old_vpp = ut->t_lastop_item;
@@ -98,19 +98,19 @@ doc_tombstone_clear(struct doc_tombstone *ut, vnode_t *old_vpp)
 		}
 	}
 
-	// last, clear these now that we're all done
+	                                            
 	ut->t_lastop_item     = NULL;
 	ut->t_lastop_fileid   = 0;
 	ut->t_lastop_item_vid = 0;
 }
 
 
-//
-// This function is used to filter out operations on temp
-// filenames.  We have to filter out operations on certain
-// temp filenames to work-around questionable application
-// behavior from apps like Autocad that perform unusual
-// sequences of file system operations for a "safe save".
+  
+                                                         
+                                                          
+                                                         
+                                                       
+                                                         
 bool
 doc_tombstone_should_ignore_name(const char *nameptr, int len)
 {
@@ -130,11 +130,11 @@ doc_tombstone_should_ignore_name(const char *nameptr, int len)
 	return false;
 }
 
-//
-// Decide if we need to save a tombstone or not.  Normally we always
-// save a tombstone - but if there already is one and the name we're
-// given is an ignorable name, then we will not save a tombstone.
-//
+  
+                                                                    
+                                                                    
+                                                                 
+  
 bool
 doc_tombstone_should_save(struct doc_tombstone *ut, struct vnode *vp,
     struct componentname *cnp)
@@ -151,19 +151,19 @@ doc_tombstone_should_save(struct doc_tombstone *ut, struct vnode *vp,
 	return true;
 }
 
-//
-// This function saves a tombstone for the given vnode and name.  The
-// tombstone represents the parent directory and name where the document
-// used to live and the document-id of that file.  This info is recorded
-// in the doc_tombstone structure hanging off the uthread (which assumes
-// that all safe-save operations happen on the same thread).
-//
-// If later on the same parent/name combo comes back into existence then
-// we'll preserve the doc-id from this vnode onto the new vnode.
-//
-// The caller is responsible for generating the appropriate
-// fsevents.
-//
+  
+                                                                     
+                                                                        
+                                                                        
+                                                                        
+                                                            
+  
+                                                                        
+                                                                
+  
+                                                           
+            
+  
 void
 doc_tombstone_save(struct vnode *dvp, struct vnode *vp,
     struct componentname *cnp, uint64_t doc_id,

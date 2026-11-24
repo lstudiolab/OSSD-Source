@@ -33,20 +33,20 @@
 
 #include <i386/cpu_data.h>
 
-/*
- * This header defines the machine check architecture for Pentium4 and Xeon.
- */
+  
+                                                                            
+   
 
-/*
- * Macro BITS(n,m) returns the number of bits between bit(n) and bit(m),
- * where (n>m). Macro BIT1(n) is cosmetic and returns 1.
- */
+  
+                                                                        
+                                                        
+   
 #define BITS(n, m)       ((n)-(m)+1)
 #define BIT1(n)         (1)
 
-/*
- * IA32 SDM 14.3.1 Machine-Check Global Control MSRs:
- */
+  
+                                                     
+   
 #define IA32_MCG_CAP            (0x179)
 typedef union {
 	struct {
@@ -79,9 +79,9 @@ typedef uint64_t        ia32_mcg_ctl_t;
 #define IA32_MCG_CTL_DISABLE    (0x0ULL)
 
 
-/*
- * IA32 SDM 14.3.2 Error-Reporting Register Banks:
- */
+  
+                                                  
+   
 #define IA32_MCi_CTL(i)         (0x400 + 4*(i))
 #define IA32_MCi_STATUS(i)      (0x401 + 4*(i))
 #define IA32_MCi_ADDR(i)        (0x402 + 4*(i))
@@ -129,7 +129,7 @@ typedef union {
 		uint64_t        over                    :BIT1(62);
 		uint64_t        val                     :BIT1(63);
 	}           bits;
-	struct {        /* Variant if threshold-based error status present: */
+	struct {                                                              
 		uint64_t        mca_error               :BITS(15, 0);
 		uint64_t        model_specific_error    :BITS(31, 16);
 		uint64_t        other_information       :BITS(52, 32);
@@ -147,7 +147,7 @@ typedef union {
 	uint64_t    u64;
 } ia32_mci_status_t;
 
-/* Values for threshold_status if mcg_tes_p == 1 and uc == 0 */
+                                                               
 #define THRESHOLD_STATUS_NO_TRACKING    0
 #define THRESHOLD_STATUS_GREEN          1
 #define THRESHOLD_STATUS_YELLOW         2
@@ -162,5 +162,5 @@ extern void             mca_dump(void);
 extern void             mca_check_save(void);
 extern boolean_t        mca_is_cmci_present(void);
 
-#endif  /* _I386_MACHINE_CHECK_H_ */
-#endif  /* KERNEL_PRIVATE */
+#endif                              
+#endif                      

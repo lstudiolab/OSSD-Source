@@ -32,4 +32,4 @@
 #ifndef _MACH_ARM_RPC_H_
 #define _MACH_ARM_RPC_H_
 
-#endif /* _MACH_ARM_RPC_H_ */
+#endif                       

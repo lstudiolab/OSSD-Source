@@ -31,11 +31,11 @@
 /*
  * @APPLE_FREE_COPYRIGHT@
  */
-/*
- *	File:		rtclock_protos.h
- *	Purpose:	C Routines for handling the machine dependent
- *				real-time clock.
- */
+  
+                          
+                                                         
+                      
+   
 
 #ifndef _I386_RTCLOCK_PROTOS_H_
 #define _I386_RTCLOCK_PROTOS_H_
@@ -57,9 +57,9 @@ extern uint64_t _rtc_tsc_to_nanoseconds(
 extern void     rtclock_intr(x86_saved_state_t *regs);
 
 
-/*
- * Timer control.
- */
+  
+                 
+   
 typedef struct {
 	void     (*rtc_config)(void);
 	uint64_t (*rtc_set)(uint64_t, uint64_t);
@@ -71,4 +71,4 @@ extern void             rtc_timer_init(void);
 extern void             rtclock_early_init(void);
 extern void             rtc_nanotime_init(uint64_t);
 extern void             rtc_decrementer_configure(void);
-#endif /* _I386_RTCLOCK_PROTOS_H_ */
+#endif                              

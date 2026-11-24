@@ -50,49 +50,49 @@
 #include <sys/msgbuf.h>
 #include <sys/kern_memorystatus.h>
 
-/* Mutex for global system override state */
+                                            
 static LCK_GRP_DECLARE(sys_override_mtx_grp, "system_override");
 static LCK_MTX_DECLARE(sys_override_lock, &sys_override_mtx_grp);
 
-/*
- * Assertion counts for system properties (add new ones for each new mechanism)
- *
- * The assertion count management for system overrides is as follows:
- *
- * - All assertion counts are protected by the sys_override_lock.
- *
- * - Each caller of system_override() increments the assertion count for the
- *   mechanism it specified in the flags. The caller then blocks for the
- *   timeout specified in the system call.
- *
- * - At the end of the timeout, the caller thread wakes up and decrements the
- *   assertion count for the mechanism it originally took an assertion on.
- *
- * - If another caller calls the system_override() to disable the override
- *   for a mechanism, it simply disables the mechanism without changing any
- *   assertion counts. That way, the assertion counts are properly balanced.
- *
- * One thing to note is that a SYS_OVERRIDE_DISABLE disables the overrides
- * for a mechanism irrespective of how many clients requested that override.
- * That makes the implementation simpler and avoids keeping a lot of process
- * specific state in the kernel.
- *
- */
+  
+                                                                               
+  
+                                                                     
+  
+                                                                 
+  
+                                                                            
+                                                                        
+                                          
+  
+                                                                             
+                                                                          
+  
+                                                                          
+                                                                           
+                                                                            
+  
+                                                                          
+                                                                            
+                                                                            
+                                
+  
+   
 static int64_t          io_throttle_assert_cnt;
 static int64_t          cpu_throttle_assert_cnt;
 static int64_t          fast_jetsam_assert_cnt;
 
-/* Wait Channel for system override */
+                                      
 static uint64_t         sys_override_wait;
 
-/* Helper routines */
+                     
 static void system_override_begin(uint64_t flags);
 static void system_override_end(uint64_t flags);
 static void system_override_abort(uint64_t flags);
 static void system_override_callouts(uint64_t flags, boolean_t enable_override);
 static __attribute__((noinline)) int PROCESS_OVERRIDING_SYSTEM_DEFAULTS(uint64_t timeout);
 
-/* system call implementation */
+                                
 int
 system_override(__unused struct proc *p, struct system_override_args * uap, __unused int32_t *retval)
 {
@@ -100,12 +100,12 @@ system_override(__unused struct proc *p, struct system_override_args * uap, __un
 	uint64_t flags = uap->flags;
 	int error = 0;
 
-	/* Check credentials for caller. Only entitled processes are allowed to make this call. */
+	                                                                                          
 	if ((error = priv_check_cred(kauth_cred_get(), PRIV_SYSTEM_OVERRIDE, 0))) {
 		goto out;
 	}
 
-	/* Check to see if sane flags are specified. */
+	                                               
 	if ((flags & ~SYS_OVERRIDE_FLAGS_MASK) != 0) {
 		error = EINVAL;
 		goto out;
@@ -128,24 +128,24 @@ out:
 	return error;
 }
 
-/*
- * Helper routines for enabling/disabling system overrides for various mechanisms.
- * These routines should be called with the sys_override_lock held. Each subsystem
- * which is hooked into the override service provides two routines:
- *
- * - void sys_override_foo_init(void);
- * Routine to initialize the subsystem or the data needed for the override to work.
- * This routine is optional and if a subsystem needs it, it should be invoked from
- * init_system_override().
- *
- * - void sys_override_foo(boolean_t enable_override);
- * Routine to enable/disable the override mechanism for that subsystem. A value of
- * true indicates that the mechanism should be overridden and the special behavior
- * should begin. A false value indicates that the subsystem should return to default
- * behavior. This routine is mandatory and should be invoked as part of the helper
- * routines if the flags passed in the syscall match the subsystem. Also, this
- * routine should preferably be idempotent.
- */
+  
+                                                                                  
+                                                                                  
+                                                                   
+  
+                                      
+                                                                                   
+                                                                                  
+                          
+  
+                                                      
+                                                                                  
+                                                                                  
+                                                                                    
+                                                                                  
+                                                                              
+                                           
+   
 
 static void
 system_override_callouts(uint64_t flags, boolean_t enable_override)
@@ -183,7 +183,7 @@ system_override_callouts(uint64_t flags, boolean_t enable_override)
 		}
 #if CONFIG_JETSAM
 		memorystatus_fast_jetsam_override(enable_override);
-#endif /* CONFIG_JETSAM */
+#endif                    
 		break;
 
 	default:
@@ -191,12 +191,12 @@ system_override_callouts(uint64_t flags, boolean_t enable_override)
 	}
 }
 
-/*
- * system_override_begin(uint64_t flags)
- *
- * Routine to start a system override if the assertion count
- * transitions from 0->1 for a specified mechanism.
- */
+  
+                                        
+  
+                                                            
+                                                   
+   
 static void
 system_override_begin(uint64_t flags)
 {
@@ -224,12 +224,12 @@ system_override_begin(uint64_t flags)
 	}
 }
 
-/*
- * system_override_end(uint64_t flags)
- *
- * Routine to end a system override if the assertion count
- * transitions from 1->0 for a specified mechanism.
- */
+  
+                                      
+  
+                                                          
+                                                   
+   
 static void
 system_override_end(uint64_t flags)
 {
@@ -260,13 +260,13 @@ system_override_end(uint64_t flags)
 	}
 }
 
-/*
- * system_override_abort(uint64_t flags)
- *
- * Routine to abort a system override (if one was active)
- * irrespective of the assertion counts and number of blocked
- * requestors.
- */
+  
+                                        
+  
+                                                         
+                                                             
+              
+   
 static void
 system_override_abort(uint64_t flags)
 {
@@ -292,6 +292,6 @@ PROCESS_OVERRIDING_SYSTEM_DEFAULTS(uint64_t timeout)
 	ts.tv_sec = timeout / NSEC_PER_SEC;
 	ts.tv_nsec = timeout - ((long)ts.tv_sec * NSEC_PER_SEC);
 	int error = msleep((caddr_t)&sys_override_wait, &sys_override_lock, PRIBIO | PCATCH, "system_override", &ts);
-	/* msleep returns EWOULDBLOCK if timeout expires, treat that as success */
+	                                                                          
 	return (error == EWOULDBLOCK) ? 0 : error;
 }

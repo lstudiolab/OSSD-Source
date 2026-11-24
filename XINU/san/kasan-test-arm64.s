@@ -20,7 +20,7 @@
 .align 5
 .globl EXT(_setjmp)
 LEXT(_setjmp)
-        add             x1, sp, #0      /* can't STP from sp */
+        add             x1, sp, #0                             
         stp             x19, x20,       [x0, JMP_r19_20]
         stp             x21, x22,       [x0, JMP_r21_22]
         stp             x23, x24,       [x0, JMP_r23_24]
@@ -51,7 +51,7 @@ LEXT(_longjmp)
         ldp             d14, d15,       [x0, JMP_d14_d15]
         add             sp, x2, #0
         mov             x0, x1
-        cmp             x0, #0          /* longjmp returns 1 if val is 0 */
+        cmp             x0, #0                                             
         b.ne    1f
         add             x0, x0, #1
 1:      ret

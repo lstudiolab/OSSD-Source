@@ -30,13 +30,13 @@
 
 #include <stdint.h>
 
-/*
- * What the booter leaves behind for the kernel.
- */
+  
+                                                
+   
 
-/*
- * Types of boot driver that may be loaded by the booter.
- */
+  
+                                                         
+   
 enum {
 	kBootDriverTypeInvalid = 0,
 	kBootDriverTypeKEXT    = 1,
@@ -61,9 +61,9 @@ enum {
 	kEfiMaxMemoryType           = 14
 };
 
-/*
- * Memory range descriptor.
- */
+  
+                           
+   
 typedef struct EfiMemoryRange {
 	uint32_t Type;
 	uint32_t Pad;
@@ -76,39 +76,39 @@ typedef struct EfiMemoryRange {
 #define BOOT_LINE_LENGTH        1024
 #define BOOT_STRING_LEN         BOOT_LINE_LENGTH
 
-/*
- * Video information..
- */
+  
+                      
+   
 
 struct Boot_VideoV1 {
-	uint32_t        v_baseAddr;     /* Base address of video memory */
-	uint32_t        v_display;      /* Display Code (if Applicable */
-	uint32_t        v_rowBytes;     /* Number of bytes per pixel row */
-	uint32_t        v_width;        /* Width */
-	uint32_t        v_height;       /* Height */
-	uint32_t        v_depth;        /* Pixel Depth */
+	uint32_t        v_baseAddr;                                       
+	uint32_t        v_display;                                       
+	uint32_t        v_rowBytes;                                        
+	uint32_t        v_width;                   
+	uint32_t        v_height;                   
+	uint32_t        v_depth;                         
 };
 typedef struct Boot_VideoV1     Boot_VideoV1;
 
 struct Boot_Video {
-	uint32_t        v_display;      /* Display Code (if Applicable */
-	uint32_t        v_rowBytes;     /* Number of bytes per pixel row */
-	uint32_t        v_width;        /* Width */
-	uint32_t        v_height;       /* Height */
-	uint32_t        v_depth;        /* Pixel Depth */
-	uint8_t         v_rotate;       /* Rotation */
-	uint8_t         v_resv_byte[3]; /* Reserved */
-	uint32_t        v_resv[6];      /* Reserved */
-	uint64_t        v_baseAddr;     /* Base address of video memory */
+	uint32_t        v_display;                                       
+	uint32_t        v_rowBytes;                                        
+	uint32_t        v_width;                   
+	uint32_t        v_height;                   
+	uint32_t        v_depth;                         
+	uint8_t         v_rotate;                     
+	uint8_t         v_resv_byte[3];               
+	uint32_t        v_resv[6];                    
+	uint64_t        v_baseAddr;                                       
 };
 typedef struct Boot_Video       Boot_Video;
 
-/* Values for v_display */
+                          
 
 #define GRAPHICS_MODE         1
 #define FB_TEXT_MODE          2
 
-/* Struct describing an image passed in by the booter */
+                                                        
 struct boot_icon_element {
 	unsigned int    width;
 	unsigned int    height;
@@ -119,15 +119,15 @@ struct boot_icon_element {
 };
 typedef struct boot_icon_element boot_icon_element;
 
-/* Boot argument structure - passed into Mach kernel at boot time.
- * "Revision" can be incremented for compatible changes
- */
+                                                                  
+                                                       
+   
 #define kBootArgsRevision               0
 #define kBootArgsRevision0              kBootArgsRevision
-#define kBootArgsRevision1              1 /* added KC_hdrs_addr */
+#define kBootArgsRevision1              1                         
 #define kBootArgsVersion                2
 
-/* Snapshot constants of previous revisions that are supported */
+                                                                 
 #define kBootArgsVersion1               1
 #define kBootArgsVersion2               2
 #define kBootArgsRevision2_0            0
@@ -135,7 +135,7 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsEfiMode32              32
 #define kBootArgsEfiMode64              64
 
-/* Bitfields for boot_args->flags */
+                                    
 #define kBootArgsFlagRebootOnPanic      (1 << 0)
 #define kBootArgsFlagHiDPI              (1 << 1)
 #define kBootArgsFlagBlack              (1 << 2)
@@ -148,39 +148,39 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsFlagRecoveryBoot       (1 << 10)
 
 typedef struct boot_args {
-	uint16_t    Revision;   /* Revision of boot_args structure */
-	uint16_t    Version;    /* Version of boot_args structure */
+	uint16_t    Revision;                                        
+	uint16_t    Version;                                        
 
-	uint8_t     efiMode;/* 32 = 32-bit, 64 = 64-bit */
-	uint8_t     debugMode;/* Bit field with behavior changes */
+	uint8_t     efiMode;                              
+	uint8_t     debugMode;                                     
 	uint16_t    flags;
 
-	char        CommandLine[BOOT_LINE_LENGTH];/* Passed in command line */
+	char        CommandLine[BOOT_LINE_LENGTH];                            
 
-	uint32_t    MemoryMap;/* Physical address of memory map */
+	uint32_t    MemoryMap;                                    
 	uint32_t    MemoryMapSize;
 	uint32_t    MemoryMapDescriptorSize;
 	uint32_t    MemoryMapDescriptorVersion;
 
-	Boot_VideoV1 VideoV1;   /* Video Information */
+	Boot_VideoV1 VideoV1;                          
 
-	uint32_t    deviceTreeP;  /* Physical address of flattened device tree */
-	uint32_t    deviceTreeLength;/* Length of flattened tree */
+	uint32_t    deviceTreeP;                                                 
+	uint32_t    deviceTreeLength;                              
 
-	uint32_t    kaddr;        /* Physical address of beginning of kernel text */
-	uint32_t    ksize;        /* Size of combined kernel text+data+efi */
+	uint32_t    kaddr;                                                          
+	uint32_t    ksize;                                                   
 
-	uint32_t    efiRuntimeServicesPageStart;/* physical address of defragmented runtime pages */
+	uint32_t    efiRuntimeServicesPageStart;                                                    
 	uint32_t    efiRuntimeServicesPageCount;
-	uint64_t    efiRuntimeServicesVirtualPageStart;/* virtual address of defragmented runtime pages */
+	uint64_t    efiRuntimeServicesVirtualPageStart;                                                   
 
-	uint32_t    efiSystemTable;/* physical address of system table in runtime area */
+	uint32_t    efiSystemTable;                                                      
 	uint32_t    kslide;
 
-	uint32_t    performanceDataStart;/* physical address of log */
+	uint32_t    performanceDataStart;                             
 	uint32_t    performanceDataSize;
 
-	uint32_t    keyStoreDataStart;/* physical address of key store data */
+	uint32_t    keyStoreDataStart;                                        
 	uint32_t    keyStoreDataSize;
 	uint64_t    bootMemStart;
 	uint64_t    bootMemSize;
@@ -194,30 +194,30 @@ typedef struct boot_args {
 	uint32_t    boot_SMC_plimit;
 	uint16_t    bootProgressMeterStart;
 	uint16_t    bootProgressMeterEnd;
-	Boot_Video  Video;      /* Video Information */
+	Boot_Video  Video;                             
 
-	uint32_t    apfsDataStart;/* Physical address of apfs volume key structure */
+	uint32_t    apfsDataStart;                                                   
 	uint32_t    apfsDataSize;
 
-	/* Version 2, Revision 1 */
+	                           
 	uint64_t    KC_hdrs_vaddr;
 
-	uint64_t    arvRootHashStart; /* Physical address of system volume root hash file */
+	uint64_t    arvRootHashStart;                                                       
 	uint64_t    arvRootHashSize;
 
-	uint64_t    arvManifestStart; /* Physical address of system volume manifest file */
+	uint64_t    arvManifestStart;                                                      
 	uint64_t    arvManifestSize;
 
-	uint64_t    bsARVRootHashStart;/* Physical address of base system root hash file */
+	uint64_t    bsARVRootHashStart;                                                    
 	uint64_t    bsARVRootHashSize;
 
-	uint64_t    bsARVManifestStart;/* Physical address of base system manifest file */
+	uint64_t    bsARVManifestStart;                                                   
 	uint64_t    bsARVManifestSize;
 
-	/* Reserved */
+	              
 	uint32_t    __reserved4[692];
 } boot_args;
 
 extern char assert_boot_args_size_is_4096[sizeof(boot_args) == 4096 ? 1 : -1];
 
-#endif /* _PEXPERT_I386_BOOT_H */
+#endif                           

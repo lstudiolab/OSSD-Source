@@ -15,6 +15,6 @@ struct test_policy {
 
 template <typename T>
 using test_bounded_ptr = libkern::bounded_ptr<T, test_policy>;
-} // end anonymous namespace
+}                           
 
-#endif // !TESTS_BOUNDED_PTR_TEST_UTILS_H
+#endif                                   

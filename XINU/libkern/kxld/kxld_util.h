@@ -36,13 +36,13 @@
     #include <architecture/byte_order.h>
     #include "kxld_types.h"
 
-/* Get machine.h from the kernel source so we can support all platforms
- * that the kernel supports. Otherwise we're at the mercy of the host.
- */
+                                                                       
+                                                                      
+   
     #include "../../osfmk/mach/machine.h"
 #endif
 
-/* 64-bit helpers */
+                    
 #if !defined(KERNEL)
 
     #define KXLD_3264_FUNC(cond32, rval, func32, func64, ...) \
@@ -70,7 +70,7 @@
 
 #endif
 
-/* Misc string functions */
+                           
 #define streq(str1, str2) (((str1) && (str2)) ? !strcmp((str1), (str2)) : 0)
 #define streq_safe(str1, str2, len) (((str1) && (str2)) ? \
     !strncmp((str1), (str2), (len)) : 0)
@@ -78,14 +78,14 @@
 
 #define const_array_len(array) sizeof(array) / sizeof(*array)
 
-/* Timing */
+            
 #define DECL_TIMER()   struct timeval start, end;
 #define START_TIMER()  gettimeofday(&start, NULL);
 #define END_TIMER()    gettimeofday(&end, NULL);
 #define PRINT_TIMER(msg)  kxld_log("%s: %ds, %dus\n", (msg), \
 	(end.tv_sec - start.tv_sec), (end.tv_usec - start.tv_usec));
 
-/* Misc definitions */
+                      
 #define KXLD_MAX_NAME_LEN                       256
 #define KXLD_SEG_GOT                            "__DATA"
 #define KXLD_SECT_GOT                           "__kxld_got"
@@ -102,9 +102,9 @@ struct kxld_section_name {
 };
 typedef struct kxld_section_name KXLDSectionName;
 
-/*******************************************************************************
-* Logging
-*******************************************************************************/
+                                                                                
+         
+                                                                                
 
 void kxld_set_logging_callback(KXLDLoggingCallback logging_callback)
 __attribute__((visibility("hidden")));
@@ -116,7 +116,7 @@ void kxld_log(KXLDLogSubsystem subsystem, KXLDLogLevel level,
     const char *format, ...)
 __attribute__((visibility("hidden"), format(printf, 3, 4)));
 
-/* Common logging strings */
+                            
 #define kKxldLogArchNotSupported        "The target architecture (cputype 0x%x) is not supported by kxld."
 #define kKxldLogArchNotFound            "The kext does not contain a fat slice for the target architecture."
 #define kKxldLogFiletypeNotSupported    "The Mach-O filetype 0x%x is not supported on the target architecture."
@@ -135,9 +135,9 @@ __attribute__((visibility("hidden"), format(printf, 3, 4)));
     "references %s, which has been patched with another symbol for binary compatibility. "      \
     "Please make sure all classes that inherit from OSObject use these macros."
 
-/*******************************************************************************
-* Allocators
-*******************************************************************************/
+                                                                                
+            
+                                                                                
 
 void * kxld_calloc(size_t size)
 __attribute__((malloc, visibility("hidden")));
@@ -154,9 +154,9 @@ __attribute__((malloc, visibility("hidden")));
 void * kxld_alloc_pageable(size_t size)
 __attribute__((malloc, visibility("hidden")));
 
-/*******************************************************************************
-* Deallocators
-*******************************************************************************/
+                                                                                
+              
+                                                                                
 
 void kxld_free(void *ptr, size_t size)
 __attribute__((visibility("hidden")));
@@ -167,31 +167,31 @@ __attribute__((visibility("hidden")));
 void kxld_page_free_untracked(void *ptr, size_t size)
 __attribute__((visibility("hidden")));
 
-/*******************************************************************************
-* Mach-O Functions
-*******************************************************************************/
+                                                                                
+                  
+                                                                                
 
 kern_return_t validate_and_swap_macho_32(u_char *file, u_long size
 #if !KERNEL
     , enum NXByteOrder host_order
-#endif /* !KERNEL */
+#endif              
     ) __attribute__((visibility("hidden")));
 
 kern_return_t validate_and_swap_macho_64(u_char *file, u_long size
 #if !KERNEL
     , enum NXByteOrder host_order
-#endif /* !KERNEL */
+#endif              
     ) __attribute__((visibility("hidden")));
 
 #if !KERNEL
 void unswap_macho(u_char *file, enum NXByteOrder host_order,
     enum NXByteOrder target_order)
 __attribute__((visibility("hidden")));
-#endif /* !KERNEL */
+#endif              
 
-/*******************************************************************************
-* Miscellaneous
-*******************************************************************************/
+                                                                                
+               
+                                                                                
 
 kxld_addr_t kxld_align_address(kxld_addr_t address, u_int align)
 __attribute__((const, visibility("hidden")));
@@ -199,19 +199,19 @@ __attribute__((const, visibility("hidden")));
 boolean_t kxld_is_32_bit(cpu_type_t)
 __attribute__((const, visibility("hidden")));
 
-/*******************************************************************************
-* Debugging
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 void kxld_print_memory_report(void)
 __attribute__((visibility("hidden")));
 
-/*******************************************************************************
-* Cross Linking
-*******************************************************************************/
+                                                                                
+               
+                                                                                
 #if !KERNEL
 boolean_t kxld_set_cross_link_page_size(kxld_size_t target_page_size);
-#endif /* !KERNEL */
+#endif              
 kxld_size_t kxld_get_effective_page_size(void);
 kxld_addr_t kxld_round_page_cross_safe(kxld_addr_t addr);
 
@@ -219,4 +219,4 @@ kxld_addr_t kxld_round_page_cross_safe(kxld_addr_t addr);
 void kxld_show_split_info(splitKextLinkInfo *info);
 #endif
 
-#endif /* _KXLD_UTIL_H_ */
+#endif                    

@@ -34,10 +34,10 @@ T_DECL(invalid,
     T_META_ENVVAR("VM_KERNEL_PAGE_SIZE=4K"),
     T_META_ENVVAR("VM_KERNEL_PAGE_SIZE="))
 {
-	/*
-	 * This test just verifies that libkernel_init doesn't
-	 * crash when handling invalid overrides.
-	 * So if we got here, we can pass the test.
-	 */
+	  
+                                                       
+                                          
+                                            
+    
 	T_PASS("Test process spawned");
 }

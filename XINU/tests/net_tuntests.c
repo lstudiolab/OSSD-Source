@@ -1,4 +1,4 @@
-/* -*- compile-command: "xcrun --sdk iphoneos.internal make net_tuntests" -*- */
+                                                                                
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -31,11 +31,11 @@
 #include <darwintest.h>
 #include <darwintest_utils.h>
 
-#include <skywalk/os_skywalk_private.h> // for SK_FEATURE_*
+#include <skywalk/os_skywalk_private.h>                    
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.net.tun"));
 
-/* Disable all these test until <rdar://problem/49124468> is fixed */
+                                                                     
 T_GLOBAL_META(T_META_ENABLED(false));
 
 #if 0
@@ -159,12 +159,12 @@ check_enables(int tunsock, int enable_netif, int enable_flowswitch, int channel_
 		uuid = scratchuuid;
 	}
 
-	//T_LOG("checking tunsock %d", tunsock);
+	                                        
 
 	if (g_is_ipsec_test && channel_count && !enable_netif) {
-		/* Unfortunately, the connect incorrectly unwinds the bind if it get an error.
-		 * until that is fixed, expect EINVAL here
-		 */
+		                                                                              
+                                            
+     
 		scratchlen = sizeof(scratch);
 		T_QUIET; T_EXPECT_POSIX_FAILURE(getsockopt(tunsock, SYSPROTO_CONTROL, g_OPT_ENABLE_NETIF,
 		    &scratch, &scratchlen), EINVAL, NULL);
@@ -309,10 +309,10 @@ create_sa(const char ifname[IFXNAMSIZ], uint8_t type, uint32_t spi, struct in_ad
 		T_QUIET; T_EXPECT_POSIX_SUCCESS(g_pfkeyso = socket(PF_KEY, SOCK_RAW, PF_KEY_V2), NULL);
 	}
 
-	/*
-	 *       <base, SA, (lifetime(HS),) address(SD), (address(P),)
-	 *       key(AE), (identity(SD),) (sensitivity)>
-	 */
+	  
+                                                               
+                                                 
+    
 
 	struct {
 		struct sadb_msg msg __attribute((aligned(sizeof(uint64_t))));
@@ -374,7 +374,7 @@ create_sa(const char ifname[IFXNAMSIZ], uint8_t type, uint32_t spi, struct in_ad
 	addcmd.src.addr.sadb_address_len = PFKEY_UNIT64(sizeof(addcmd.src));
 	addcmd.src.addr.sadb_address_exttype = SADB_EXT_ADDRESS_SRC;
 	addcmd.src.addr.sadb_address_proto = IPSEC_ULPROTO_ANY;
-	addcmd.src.addr.sadb_address_prefixlen = sizeof(struct in_addr) << 3; //XXX Why?
+	addcmd.src.addr.sadb_address_prefixlen = sizeof(struct in_addr) << 3;           
 	addcmd.src.addr.sadb_address_reserved = 0;
 	addcmd.src.saddr.sin_len = sizeof(addcmd.src.saddr);
 	addcmd.src.saddr.sin_family = AF_INET;
@@ -384,7 +384,7 @@ create_sa(const char ifname[IFXNAMSIZ], uint8_t type, uint32_t spi, struct in_ad
 	addcmd.dst.addr.sadb_address_len = PFKEY_UNIT64(sizeof(addcmd.dst));
 	addcmd.dst.addr.sadb_address_exttype = SADB_EXT_ADDRESS_DST;
 	addcmd.dst.addr.sadb_address_proto = IPSEC_ULPROTO_ANY;
-	addcmd.dst.addr.sadb_address_prefixlen = sizeof(struct in_addr) << 3; //XXX Why?
+	addcmd.dst.addr.sadb_address_prefixlen = sizeof(struct in_addr) << 3;           
 	addcmd.dst.addr.sadb_address_reserved = 0;
 	addcmd.dst.saddr.sin_len = sizeof(addcmd.dst.saddr);
 	addcmd.dst.saddr.sin_family = AF_INET;
@@ -398,9 +398,9 @@ create_sa(const char ifname[IFXNAMSIZ], uint8_t type, uint32_t spi, struct in_ad
 	T_QUIET; T_EXPECT_EQ(slen, (ssize_t)sizeof(addcmd), NULL);
 }
 
-/* This version of the test expects channels to be enabled after connect.
- * Once the utun driver is converted, switch to create_tunsock_new
- */
+                                                                         
+                                                                  
+   
 static int
 create_tunsock_old(int enable_netif, int enable_flowswitch, int channel_count, uuid_t uuid[])
 {
@@ -469,9 +469,9 @@ startover:
 
 	int error = connect(tunsock, (struct sockaddr *)&kernctl_addr, sizeof(kernctl_addr));
 	if (error == -1 && errno == EBUSY) {
-		/* XXX remove this retry nonsense when this is fixed:
-		 * <rdar://problem/37340313> creating an interface without specifying specific interface name should not return EBUSY
-		 */
+		                                                     
+                                                                                                                       
+     
 		close(tunsock);
 		T_LOG("connect got EBUSY, sleeping 1 second before retry");
 		sleep(1);
@@ -497,7 +497,7 @@ startover:
 
 	if (channel_count) {
 		if (g_is_ipsec_test && !enable_netif) {
-			/* ipsec doesn't support channels without a netif */
+			                                                    
 			T_QUIET; T_EXPECT_POSIX_FAILURE(setsockopt(tunsock, SYSPROTO_CONTROL, g_OPT_ENABLE_CHANNEL,
 			    &channel_count, sizeof(channel_count)), EOPNOTSUPP, NULL);
 			for (int i = 0; i < channel_count; i++) {
@@ -541,14 +541,14 @@ startover:
 
 	check_enables(tunsock, enable_netif, enable_flowswitch, channel_count, uuid);
 
-	//T_LOG("Returning tunsock %d", tunsock);
+	                                         
 
 	return tunsock;
 }
 
-/* This version of the test expects channels to be enabled before connect
- * Once the utun driver is converted, rename this to just create_tunsock
- */
+                                                                         
+                                                                        
+   
 static int
 create_tunsock_new(int enable_netif, int enable_flowswitch, int channel_count, uuid_t uuid[])
 {
@@ -618,16 +618,16 @@ startover:
 
 	int error = connect(tunsock, (struct sockaddr *)&kernctl_addr, sizeof(kernctl_addr));
 	if (error == -1 && errno == EBUSY) {
-		/* XXX remove this retry nonsense when this is fixed:
-		 * <rdar://problem/37340313> creating an interface without specifying specific interface name should not return EBUSY
-		 */
+		                                                     
+                                                                                                                       
+     
 		close(tunsock);
 		T_LOG("connect got EBUSY, sleeping 1 second before retry");
 		sleep(1);
 		goto startover;
 	}
 	if (g_is_ipsec_test && channel_count && !enable_netif) {
-		/* ipsec doesn't support channels without a netif */
+		                                                    
 		T_QUIET; T_EXPECT_POSIX_FAILURE(error, ENOTSUP, "connect() == -1 && errno == ENOTSUP");
 	} else {
 		T_QUIET; T_WITH_ERRNO; T_EXPECT_POSIX_ZERO(error, "connect() == 0");
@@ -637,7 +637,7 @@ startover:
 	    &enable_netif, sizeof(enable_netif)), EINVAL, NULL);
 
 	if (g_is_ipsec_test && channel_count && !enable_netif) {
-		/* Connect failed above, so we get EINVAL */
+		                                            
 		T_QUIET; T_WITH_ERRNO; T_EXPECT_POSIX_FAILURE(setsockopt(tunsock, SYSPROTO_CONTROL, g_OPT_ENABLE_FLOWSWITCH,
 		    &enable_flowswitch, sizeof(enable_flowswitch)), EINVAL, NULL);
 	} else {
@@ -663,11 +663,11 @@ startover:
 	}
 	uuidlen = sizeof(uuid_t) * (unsigned int)channel_count;
 	if (!channel_count || (g_is_ipsec_test && channel_count && !enable_netif)) {
-		/* ipsec doesn't support channels without a netif */
+		                                                    
 		if (g_is_ipsec_test && channel_count && !enable_netif) {
-			/* Unfortunately, the connect incorrectly unwinds the bind if it get an error.
-			 * until that is fixed, expect EINVAL here
-			 */
+			                                                                              
+                                             
+      
 			T_QUIET; T_EXPECT_POSIX_FAILURE(getsockopt(tunsock, SYSPROTO_CONTROL, g_OPT_GET_CHANNEL_UUID,
 			    uuid, &uuidlen), EINVAL, NULL);
 		} else {
@@ -690,7 +690,7 @@ startover:
 
 	check_enables(tunsock, enable_netif, enable_flowswitch, channel_count, uuid);
 
-	//T_LOG("Returning tunsock %d", tunsock);
+	                                         
 
 	return tunsock;
 }
@@ -798,19 +798,19 @@ T_DECL(setup_utun, "This test sets up a utun interface")
 }
 
 static const int SOCKET_TRAFFIC_CLASSES[] = {
-	SO_TC_BK_SYS, // BK
-	SO_TC_BK,  // BK
-	SO_TC_BE,  // BE
-	SO_TC_RD,  // BE
-	SO_TC_OAM, // BE
-	SO_TC_AV,  // VI
-	SO_TC_RV,  // VI
-	SO_TC_VI,  // VI
-	SO_TC_VO,  // VO
-	SO_TC_CTL, // VO
+	SO_TC_BK_SYS,      
+	SO_TC_BK,       
+	SO_TC_BE,       
+	SO_TC_RD,       
+	SO_TC_OAM,      
+	SO_TC_AV,       
+	SO_TC_RV,       
+	SO_TC_VI,       
+	SO_TC_VO,       
+	SO_TC_CTL,      
 };
 
-// this should match ipsec_find_tx_ring_by_svc in ipsec driver
+                                                              
 static const int SOCKET_TC_TO_RING[] = {
 	3,
 	3,
@@ -824,7 +824,7 @@ static const int SOCKET_TC_TO_RING[] = {
 	0,
 };
 
-/* How many sockets map to this ring */
+                                       
 static const int RING_TO_TC_COUNT[] = {
 	2, 3, 3, 2,
 };
@@ -835,7 +835,7 @@ setup_channels_and_rings(int kq, int channel_count, channel_t channels[], channe
 	setup_tunsock(channel_count, uuids);
 
 #if 0
-	// give time to enable a tcpdump if desired
+	                                           
 	T_LOG("Sleeping 10");
 	sleep(10);
 	T_LOG("Done");
@@ -885,7 +885,7 @@ setup_sockets(int sockets[SO_TC_MAX], int type)
 		T_QUIET; T_WITH_ERRNO; T_EXPECT_POSIX_ZERO(setsockopt(sockets[si], SOL_SOCKET,
 		    SO_TRAFFIC_CLASS, &SOCKET_TRAFFIC_CLASSES[si], sizeof(SOCKET_TRAFFIC_CLASSES[si])), NULL);
 
-		// XXX setsockopt(IP_BOUND_IF) here?
+		                                    
 
 		struct sockaddr_in sin;
 		memset(&sin, 0, sizeof(sin));
@@ -960,7 +960,7 @@ send_one_packet(int s, int type)
 static void
 expect_empty_rings(int channel_count, channel_ring_t rings[])
 {
-	/* Check all the rings and make sure there are no packets */
+	                                                            
 	for (int ri = 0; ri < channel_count; ri++) {
 		T_QUIET; T_EXPECT_EQ_UINT(0U, os_channel_available_slot_count(rings[ri]), NULL);
 	}
@@ -989,11 +989,11 @@ xfer_1_packet_singly(int channel_count, int type)
 
 		int expected_ring = channel_count == 1 ? 0 : SOCKET_TC_TO_RING[si];
 
-		/* Wait for the packet delivery and check that it's only one packet and on the correct ring */
+		                                                                                              
 		struct kevent kev[channel_count + 1];
 		int nev;
 		memset(kev, 0, sizeof(kev));
-		struct timespec to = { 0, 100 * NSEC_PER_MSEC }; // 100 ms
+		struct timespec to = { 0, 100 * NSEC_PER_MSEC };          
 		T_QUIET; T_EXPECT_POSIX_SUCCESS(nev = kevent(kq, NULL, 0, kev, channel_count + 1, &to), NULL);
 		T_QUIET; T_EXPECT_EQ_INT(nev, 1, NULL);
 		T_QUIET; T_EXPECT_EQ_PTR((void *)kev[0].ident, (void *)(uintptr_t)cfds[expected_ring], NULL);
@@ -1001,15 +1001,15 @@ xfer_1_packet_singly(int channel_count, int type)
 		T_QUIET; T_EXPECT_EQ_SHORT(kev[0].filter, (short)EVFILT_READ, NULL);
 		T_QUIET; T_EXPECT_FALSE(kev[0].flags & EV_ERROR, NULL);
 
-		/* Make sure it comes out the expected interface */
+		                                                   
 		for (int ri = 0; ri < channel_count; ri++) {
 			errno = 0;
 
 			uint32_t sc = os_channel_available_slot_count(rxrings[ri]);
 
-			/* Check that the packet appears only on the expected ring and
-			 * is the only packet on the expected ring.
-			 */
+			                                                              
+                                              
+      
 			T_QUIET; T_EXPECT_EQ_UINT(ri == expected_ring, sc, NULL);
 
 			if ((ri == expected_ring) == sc) {
@@ -1049,9 +1049,9 @@ T_DECL(ipsec35889979t1s, "transfers 1 packet at a time of each sevice class over
 
 
 T_DECL(ipsec35889979t4s, "transfers 1 packet at a time of each sevice class over tcp to 4 rings",
-    /* This test will fail because tcp syn packets get elevated
-     * due to ack prioritization
-     */
+                                                               
+                                
+       
     T_META_ENABLED(false))
 {
 	setup_ipsec_test();
@@ -1080,11 +1080,11 @@ xfer_1_packet_together(int channel_count, int type)
 		send_one_packet(sockets[si], type);
 	}
 
-	/* Sleep to make sure all packets get delivered */
-	struct timespec to = { 0, 100 * NSEC_PER_MSEC }; // 100 ms
+	                                                  
+	struct timespec to = { 0, 100 * NSEC_PER_MSEC };          
 	nanosleep(&to, NULL);
 
-	/* Wait for the packet delivery and check that all rings event */
+	                                                                 
 	struct kevent kev[channel_count + 1];
 	int nev;
 	memset(kev, 0, sizeof(kev));
@@ -1114,12 +1114,12 @@ xfer_1_packet_together(int channel_count, int type)
 
 		found[ri] += (uint32_t)kev[e].data;
 	}
-	/* Check that something came out of all rings */
+	                                                
 	for (int ri = 0; ri < channel_count; ri++) {
 		T_QUIET; T_EXPECT_NE_UINT(found[ri], 0U, NULL);
 	}
 
-	/* Make sure it comes out the expected interface */
+	                                                   
 	for (int ri = 0; ri < channel_count; ri++) {
 		uint32_t sc = os_channel_available_slot_count(rxrings[ri]);
 		if (channel_count == 1) {
@@ -1165,9 +1165,9 @@ T_DECL(ipsec35889979t1m, "transfers 1 packet together of each sevice class over 
 }
 
 T_DECL(ipsec35889979t4m, "transfers 1 packet together of each sevice class over tcp to 4 rings",
-    /* This test will fail because tcp syn packets get elevated
-     * due to ack prioritization
-     */
+                                                               
+                                
+       
     T_META_ENABLED(false))
 {
 	setup_ipsec_test();

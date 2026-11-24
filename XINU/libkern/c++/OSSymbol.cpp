@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOSymbol.cpp created by gvdl on Fri 1998-11-17 */
+                                                    
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -82,7 +82,7 @@ private:
 		unsigned int hash = 0;
 		unsigned int len = 0;
 
-		/* Unroll the loop. */
+		                      
 		for (;;) {
 			if (!*s) {
 				break;
@@ -200,7 +200,7 @@ OSSymbolPool::OSSymbolPool(const OSSymbolPool *old)
 	nBuckets = old->nBuckets;
 	buckets = old->buckets;
 
-	poolGate = NULL; // Do not duplicate the poolGate
+	poolGate = NULL;                                 
 }
 
 OSSymbolPool::~OSSymbolPool()
@@ -284,24 +284,24 @@ OSSymbolPool::reconstructSymbols(bool grow)
 	if (grow) {
 		new_nBuckets += new_nBuckets + 1;
 	} else {
-		/* Don't shrink the pool below the default initial size.
-		 */
+		                                                        
+     
 		if (nBuckets <= INITIAL_POOL_SIZE) {
 			return;
 		}
 		new_nBuckets = (new_nBuckets - 1) / 2;
 	}
 
-	/* Create old pool to iterate after doing above check, cause it
-	 * gets finalized at return.
-	 */
+	                                                               
+                             
+    
 	OSSymbolPool old(this);
 
 	count = 0;
 	nBuckets = new_nBuckets;
 	buckets = (Bucket *) kalloc_tag(nBuckets * sizeof(Bucket), VM_KERN_MEMORY_LIBKERN);
 	OSMETA_ACCUMSIZE(nBuckets * sizeof(Bucket));
-	/* @@@ gvdl: Zero test and panic if can't set up pool */
+	                                                        
 	bzero(buckets, nBuckets * sizeof(Bucket));
 
 	state = old.initHashState();
@@ -383,7 +383,7 @@ OSSymbolPool::insertSymbol(OSSymbol *sym)
 
 		list = (OSSymbol **) kalloc_tag(2 * sizeof(OSSymbol *), VM_KERN_MEMORY_LIBKERN);
 		OSMETA_ACCUMSIZE(2 * sizeof(OSSymbol *));
-		/* @@@ gvdl: Zero test and panic if can't set up pool */
+		                                                        
 		list[0] = sym;
 		list[1] = probeSymbol;
 		thisBucket->symbolP = list;
@@ -408,7 +408,7 @@ OSSymbolPool::insertSymbol(OSSymbol *sym)
 	count++;
 	list = (OSSymbol **) kalloc_tag(thisBucket->count * sizeof(OSSymbol *), VM_KERN_MEMORY_LIBKERN);
 	OSMETA_ACCUMSIZE(thisBucket->count * sizeof(OSSymbol *));
-	/* @@@ gvdl: Zero test and panic if can't set up pool */
+	                                                        
 	list[0] = sym;
 	bcopy(thisBucket->symbolP, list + 1, j * sizeof(OSSymbol *));
 	kfree(thisBucket->symbolP, j * sizeof(OSSymbol *));
@@ -432,7 +432,7 @@ OSSymbolPool::removeSymbol(OSSymbol *sym)
 	list = thisBucket->symbolP;
 
 	if (!j) {
-		// couldn't find the symbol; probably means string hash changed
+		                                                               
 		panic("removeSymbol %s count %d ", sym->string ? sym->string : "no string", count);
 		return;
 	}
@@ -447,7 +447,7 @@ OSSymbolPool::removeSymbol(OSSymbol *sym)
 			SHRINK_POOL();
 			return;
 		}
-		// couldn't find the symbol; probably means string hash changed
+		                                                               
 		panic("removeSymbol %s count %d ", sym->string ? sym->string : "no string", count);
 		return;
 	}
@@ -474,7 +474,7 @@ OSSymbolPool::removeSymbol(OSSymbol *sym)
 			SHRINK_POOL();
 			return;
 		}
-		// couldn't find the symbol; probably means string hash changed
+		                                                               
 		panic("removeSymbol %s count %d ", sym->string ? sym->string : "no string", count);
 		return;
 	}
@@ -502,15 +502,15 @@ OSSymbolPool::removeSymbol(OSSymbol *sym)
 			return;
 		}
 	}
-	// couldn't find the symbol; probably means string hash changed
+	                                                               
 	panic("removeSymbol %s count %d ", sym->string ? sym->string : "no string", count);
 }
 
-/*
- *********************************************************************
- * From here on we are actually implementing the OSSymbol class
- *********************************************************************
- */
+  
+                                                                      
+                                                               
+                                                                      
+   
 OSDefineMetaClassAndStructorsWithInitAndZone(OSSymbol, OSString,
     OSSymbol::initialize(), ZC_ZFREE_CLEARMEM)
 OSMetaClassDefineReservedUnused(OSSymbol, 0);
@@ -556,7 +556,7 @@ OSSymbol::initWithString(const OSString *)
 OSSharedPtr<const OSSymbol>
 OSSymbol::withString(const OSString *aString)
 {
-	// This string may be a OSSymbol already, cheap check.
+	                                                      
 	if (OSDynamicCast(OSSymbol, aString)) {
 		OSSharedPtr<const OSSymbol> aStringNew((const OSSymbol *)aString, OSRetain);
 		return aStringNew;
@@ -572,8 +572,8 @@ OSSymbol::withCString(const char *cString)
 {
 	OSSharedPtr<const OSSymbol> symbol;
 
-	// Check if the symbol exists already, we don't need to take a lock here,
-	// since existingSymbolForCString will take the shared lock.
+	                                                                         
+	                                                            
 	symbol = OSSymbol::existingSymbolForCString(cString);
 	if (symbol) {
 		return symbol;
@@ -590,13 +590,13 @@ OSSymbol::withCString(const char *cString)
 		pool->openWriteGate();
 
 		if (symbol) {
-			// Somebody must have inserted the new symbol so free our copy
+			                                                              
 			newSymb.detach()->OSString::free();
 			return symbol;
 		}
 	}
 
-	return os::move(newSymb); // return the newly created & inserted symbol.
+	return os::move(newSymb);                                               
 }
 
 OSSharedPtr<const OSSymbol>
@@ -605,8 +605,8 @@ OSSymbol::withCStringNoCopy(const char *cString)
 	OSSharedPtr<const OSSymbol> symbol;
 	OSSharedPtr<OSSymbol> newSymb;
 
-	// Check if the symbol exists already, we don't need to take a lock here,
-	// since existingSymbolForCString will take the shared lock.
+	                                                                         
+	                                                            
 	symbol = OSSymbol::existingSymbolForCString(cString);
 	if (symbol) {
 		return symbol;
@@ -624,12 +624,12 @@ OSSymbol::withCStringNoCopy(const char *cString)
 
 		if (symbol) {
 			newSymb.detach()->OSString::free();
-			// Somebody must have inserted the new symbol so free our copy
+			                                                              
 			return symbol;
 		}
 	}
 
-	return os::move(newSymb); // return the newly created & inserted symbol.
+	return os::move(newSymb);                                               
 }
 
 OSSharedPtr<const OSSymbol>
@@ -736,12 +736,12 @@ OSSymbol::bsearch(
 			return baseIdx + (lim >> 1);
 		}
 		if (key > *p) {
-			// move right
+			             
 			baseIdx += (lim >> 1) + 1;
 			lim--;
 		}
-		// else move left
+		                 
 	}
-	// not found, insertion point here
+	                                  
 	return baseIdx + (lim >> 1);
 }

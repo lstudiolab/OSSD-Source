@@ -76,4 +76,4 @@ public:
 	OSMetaClassDeclareReservedUnused(AppleMacIO, 3);
 };
 
-#endif /* ! _IOKIT_APPLEMACIO_H */
+#endif                            

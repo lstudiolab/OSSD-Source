@@ -56,17 +56,17 @@
  * $FreeBSD: src/sys/net/if_vlan.c,v 1.54 2003/10/31 18:32:08 brooks Exp $
  */
 
-/*
- * if_vlan.c - pseudo-device driver for IEEE 802.1Q virtual LANs.
- * Might be extended some day to also handle IEEE 802.1p priority
- * tagging.  This is sort of sneaky in the implementation, since
- * we need to pretend to be enough of an Ethernet implementation
- * to make arp work.  The way we do this is by telling everyone
- * that we are an Ethernet, and then catch the packets that
- * ether_output() left on our output queue when it calls
- * if_start(), rewrite them for use by the real outgoing interface,
- * and ask it to send them.
- */
+  
+                                                                 
+                                                                 
+                                                                
+                                                                
+                                                               
+                                                           
+                                                        
+                                                                   
+                           
+   
 
 
 #include <sys/param.h>
@@ -110,9 +110,9 @@
 
 #define VLANNAME        "vlan"
 
-/**
-** vlan locks
-**/
+   
+             
+   
 static __inline__ lck_grp_t *
 my_lck_grp_alloc_init(const char * grp_name)
 {
@@ -176,9 +176,9 @@ vlan_unlock(void)
 	return;
 }
 
-/**
-** vlan structures, types
-**/
+   
+                         
+   
 struct vlan_parent;
 LIST_HEAD(vlan_parent_list, vlan_parent);
 struct ifvlan;
@@ -191,9 +191,9 @@ ifvlan_entry;
 
 #define VLP_SIGNATURE           0xfaceface
 typedef struct vlan_parent {
-	vlan_parent_entry           vlp_parent_list;/* list of parents */
-	struct ifnet *              vlp_ifp;    /* interface */
-	struct ifvlan_list          vlp_vlan_list;/* list of VLAN's */
+	vlan_parent_entry           vlp_parent_list;                     
+	struct ifnet *              vlp_ifp;                   
+	struct ifvlan_list          vlp_vlan_list;                    
 #define VLPF_SUPPORTS_VLAN_MTU          0x00000001
 #define VLPF_CHANGE_IN_PROGRESS         0x00000002
 #define VLPF_DETACHING                  0x00000004
@@ -202,28 +202,28 @@ typedef struct vlan_parent {
 	u_int32_t                   vlp_event_code;
 	struct ifdevmtu             vlp_devmtu;
 	int32_t                     vlp_retain_count;
-	u_int32_t                   vlp_signature;/* VLP_SIGNATURE */
+	u_int32_t                   vlp_signature;                   
 } vlan_parent, * vlan_parent_ref;
 
 #define IFV_SIGNATURE           0xbeefbeef
 struct ifvlan {
 	ifvlan_entry                ifv_vlan_list;
-	char                        ifv_name[IFNAMSIZ];/* our unique id */
-	struct ifnet *              ifv_ifp;    /* our interface */
-	vlan_parent_ref             ifv_vlp;    /* parent information */
+	char                        ifv_name[IFNAMSIZ];                   
+	struct ifnet *              ifv_ifp;                       
+	vlan_parent_ref             ifv_vlp;                            
 	struct      ifv_linkmib {
-		u_int16_t ifvm_encaplen;/* encapsulation length */
-		u_int16_t ifvm_mtufudge;/* MTU fudged by this much */
-		u_int16_t ifvm_proto; /* encapsulation ethertype */
-		u_int16_t ifvm_tag; /* tag to apply on packets leaving if */
+		u_int16_t ifvm_encaplen;                          
+		u_int16_t ifvm_mtufudge;                             
+		u_int16_t ifvm_proto;                              
+		u_int16_t ifvm_tag;                                         
 	}   ifv_mib;
 	struct multicast_list       ifv_multicast;
-#define IFVF_PROMISC            0x1             /* promiscuous mode enabled */
-#define IFVF_DETACHING          0x2             /* interface is detaching */
-#define IFVF_READY              0x4             /* interface is ready */
+#define IFVF_PROMISC            0x1                                           
+#define IFVF_DETACHING          0x2                                         
+#define IFVF_READY              0x4                                     
 	u_int32_t                   ifv_flags;
 	int32_t                     ifv_retain_count;
-	u_int32_t                   ifv_signature;/* IFV_SIGNATURE */
+	u_int32_t                   ifv_signature;                   
 };
 
 typedef struct ifvlan * ifvlan_ref;
@@ -245,9 +245,9 @@ vlan_parent_retain(vlan_parent_ref vlp);
 static void
 vlan_parent_release(vlan_parent_ref vlp);
 
-/**
-** vlan_parent_ref vlp_flags in-lines
-**/
+   
+                                     
+   
 static __inline__ int
 vlan_parent_flags_supports_vlan_mtu(vlan_parent_ref vlp)
 {
@@ -315,9 +315,9 @@ vlan_parent_flags_clear_link_event_required(vlan_parent_ref vlp)
 }
 
 
-/**
-** ifvlan_flags in-lines routines
-**/
+   
+                                 
+   
 static __inline__ int
 ifvlan_flags_promisc(ifvlan_ref ifv)
 {
@@ -401,9 +401,9 @@ static  void vlan_parent_link_event(struct ifnet * p,
 
 static  int ifvlan_new_mtu(ifvlan_ref ifv, int mtu);
 
-/**
-** ifvlan_ref routines
-**/
+   
+                      
+   
 static void
 ifvlan_retain(ifvlan_ref ifv)
 {
@@ -454,9 +454,9 @@ ifvlan_get_vlan_parent_retained(ifvlan_ref ifv)
 	return vlp;
 }
 
-/**
-** ifnet_* routines
-**/
+   
+                   
+   
 
 static ifvlan_ref
 ifnet_get_ifvlan(struct ifnet * ifp)
@@ -491,23 +491,23 @@ ifnet_ifvlan_vlan_parent_ok(struct ifnet * ifp, ifvlan_ref ifv,
 
 	check_ifv = ifnet_get_ifvlan(ifp);
 	if (check_ifv != ifv || ifvlan_flags_detaching(ifv)) {
-		/* ifvlan_ref no longer valid */
+		                                
 		return FALSE;
 	}
 	if (ifv->ifv_vlp != vlp) {
-		/* vlan_parent no longer valid */
+		                                 
 		return FALSE;
 	}
 	if (vlan_parent_flags_detaching(vlp)) {
-		/* parent is detaching */
+		                         
 		return FALSE;
 	}
 	return TRUE;
 }
 
-/**
-** vlan, etc. routines
-**/
+   
+                      
+   
 
 static int
 vlan_globals_init(void)
@@ -564,9 +564,9 @@ siocsifaltmtu(struct ifnet * ifp, int mtu)
 	return ifnet_ioctl(ifp, 0, SIOCSIFALTMTU, &ifr);
 }
 
-/**
-** vlan_parent synchronization routines
-**/
+   
+                                       
+   
 static void
 vlan_parent_retain(vlan_parent_ref vlp)
 {
@@ -607,24 +607,24 @@ vlan_parent_release(vlan_parent_ref vlp)
 	return;
 }
 
-/*
- * Function: vlan_parent_wait
- * Purpose:
- *   Allows a single thread to gain exclusive access to the vlan_parent
- *   data structure.  Some operations take a long time to complete,
- *   and some have side-effects that we can't predict.  Holding the
- *   vlan_lock() across such operations is not possible.
- *
- * Notes:
- *   Before calling, you must be holding the vlan_lock and have taken
- *   a reference on the vlan_parent_ref.
- */
+  
+                             
+           
+                                                                       
+                                                                   
+                                                                   
+                                                        
+  
+         
+                                                                     
+                                        
+   
 static void
 vlan_parent_wait(vlan_parent_ref vlp, const char * msg)
 {
 	int         waited = 0;
 
-	/* other add/remove/multicast-change in progress */
+	                                                   
 	while (vlan_parent_flags_change_in_progress(vlp)) {
 		if (g_vlan->verbose) {
 			struct ifnet * ifp = vlp->vlp_ifp;
@@ -634,7 +634,7 @@ vlan_parent_wait(vlan_parent_ref vlp, const char * msg)
 		waited = 1;
 		(void)msleep(vlp, vlan_lck_mtx, PZERO, msg, 0);
 	}
-	/* prevent other vlan parent remove/add from taking place */
+	                                                            
 	vlan_parent_flags_set_change_in_progress(vlp);
 	if (g_vlan->verbose && waited) {
 		struct ifnet * ifp = vlp->vlp_ifp;
@@ -644,16 +644,16 @@ vlan_parent_wait(vlan_parent_ref vlp, const char * msg)
 	return;
 }
 
-/*
- * Function: vlan_parent_signal
- * Purpose:
- *   Allows the thread that previously invoked vlan_parent_wait() to
- *   give up exclusive access to the vlan_parent data structure, and wake up
- *   any other threads waiting to access
- * Notes:
- *   Before calling, you must be holding the vlan_lock and have taken
- *   a reference on the vlan_parent_ref.
- */
+  
+                               
+           
+                                                                    
+                                                                            
+                                        
+         
+                                                                     
+                                        
+   
 static void
 vlan_parent_signal(vlan_parent_ref vlp, const char * msg)
 {
@@ -667,7 +667,7 @@ vlan_parent_signal(vlan_parent_ref vlp, const char * msg)
 
 			vlan_unlock();
 
-			/* we can safely walk the list unlocked */
+			                                          
 			LIST_FOREACH(ifv, &vlp->vlp_vlan_list, ifv_vlan_list) {
 				struct ifnet *  ifp = ifv->ifv_ifp;
 
@@ -689,14 +689,14 @@ vlan_parent_signal(vlan_parent_ref vlp, const char * msg)
 	return;
 }
 
-/*
- * Program our multicast filter. What we're actually doing is
- * programming the multicast filter of the parent. This has the
- * side effect of causing the parent interface to receive multicast
- * traffic that it doesn't really want, which ends up being discarded
- * later by the upper protocol layers. Unfortunately, there's no way
- * to avoid this: there really is only one physical interface.
- */
+  
+                                                             
+                                                               
+                                                                   
+                                                                     
+                                                                    
+                                                              
+   
 static int
 vlan_setmulti(struct ifnet * ifp)
 {
@@ -712,19 +712,19 @@ vlan_setmulti(struct ifnet * ifp)
 	}
 	vlp = ifvlan_get_vlan_parent_retained(ifv);
 	if (vlp == NULL) {
-		/* no parent, no need to program the multicast filter */
+		                                                        
 		goto unlock_done;
 	}
 	vlan_parent_wait(vlp, "vlan_setmulti");
 
-	/* check again, things could have changed */
+	                                            
 	if (ifnet_ifvlan_vlan_parent_ok(ifp, ifv, vlp) == FALSE) {
 		goto signal_done;
 	}
 	p = vlp->vlp_ifp;
 	vlan_unlock();
 
-	/* update parent interface with our multicast addresses */
+	                                                          
 	error = multicast_list_program(&ifv->ifv_multicast, ifp, p);
 
 	vlan_lock();
@@ -743,9 +743,9 @@ unlock_done:
 	return error;
 }
 
-/**
-** vlan_parent list manipulation/lookup routines
-**/
+   
+                                                
+   
 static vlan_parent_ref
 parent_list_lookup(struct ifnet * p)
 {
@@ -804,12 +804,12 @@ vlan_parent_find_max_mtu(vlan_parent_ref vlp, ifvlan_ref exclude_ifv)
 	return max_mtu;
 }
 
-/*
- * Function: vlan_parent_create
- * Purpose:
- *   Create a vlan_parent structure to hold the VLAN's for the given
- *   interface.  Add it to the list of VLAN parents.
- */
+  
+                               
+           
+                                                                    
+                                                    
+   
 static int
 vlan_parent_create(struct ifnet * p, vlan_parent_ref * ret_vlp)
 {
@@ -851,7 +851,7 @@ vlan_parent_remove_all_vlans(struct ifnet * p)
 	vlan_lock();
 	vlp = parent_list_lookup(p);
 	if (vlp == NULL || vlan_parent_flags_detaching(vlp)) {
-		/* no VLAN's */
+		               
 		vlan_unlock();
 		return;
 	}
@@ -860,7 +860,7 @@ vlan_parent_remove_all_vlans(struct ifnet * p)
 	vlan_parent_wait(vlp, "vlan_parent_remove_all_vlans");
 	need_vlp_release++;
 
-	/* check again */
+	                 
 	if (parent_list_lookup(p) != vlp) {
 		goto signal_done;
 	}
@@ -878,12 +878,12 @@ vlan_parent_remove_all_vlans(struct ifnet * p)
 		}
 	}
 
-	/* the vlan parent has no more VLAN's */
-	if_clear_eflags(p, IFEF_VLAN); /* clear IFEF_VLAN */
+	                                        
+	if_clear_eflags(p, IFEF_VLAN);                      
 
 	LIST_REMOVE(vlp, vlp_parent_list);
-	need_vlp_release++; /* one for being in the list */
-	need_vlp_release++; /* final reference */
+	need_vlp_release++;                                
+	need_vlp_release++;                      
 
 signal_done:
 	vlan_parent_signal(vlp, "vlan_parent_remove_all_vlans");
@@ -951,7 +951,7 @@ vlan_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	ifv->ifv_signature = IFV_SIGNATURE;
 	multicast_list_init(&ifv->ifv_multicast);
 
-	/* use the interface name as the unique id for ifp recycle */
+	                                                             
 	if ((unsigned int)
 	    snprintf(ifv->ifv_name, sizeof(ifv->ifv_name), "%s%d",
 	    ifc->ifc_name, unit) >= sizeof(ifv->ifv_name)) {
@@ -989,7 +989,7 @@ vlan_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	}
 
 	ifnet_set_offload(ifp, 0);
-	ifnet_set_addrlen(ifp, ETHER_ADDR_LEN); /* XXX ethernet specific */
+	ifnet_set_addrlen(ifp, ETHER_ADDR_LEN);                            
 	ifnet_set_baudrate(ifp, 0);
 	ifnet_set_hdrlen(ifp, ETHER_VLAN_ENCAP_LEN);
 	ifnet_set_mtu(ifp, ETHERMTU);
@@ -1002,7 +1002,7 @@ vlan_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	}
 	ifv->ifv_ifp = ifp;
 
-	/* attach as ethernet */
+	                        
 	bpfattach(ifp, DLT_EN10MB, sizeof(struct ether_header));
 	return 0;
 }
@@ -1084,20 +1084,20 @@ vlan_output(struct ifnet * ifp, struct mbuf * m)
 
 	bpf_tap_out(ifp, DLT_EN10MB, m, NULL, 0);
 
-	/* do not run parent's if_output() if the parent is not up */
+	                                                             
 	if ((ifnet_flags(p) & (IFF_UP | IFF_RUNNING)) != (IFF_UP | IFF_RUNNING)) {
 		m_freem(m);
 		atomic_add_64(&ifp->if_collisions, 1);
 		return 0;
 	}
-	/*
-	 * If underlying interface can do VLAN tag insertion itself,
-	 * just pass the packet along. However, we need some way to
-	 * tell the interface where the packet came from so that it
-	 * knows how to find the VLAN tag to use.  We use a field in
-	 * the mbuf header to store the VLAN tag, and a bit in the
-	 * csum_flags field to mark the field as valid.
-	 */
+	  
+                                                             
+                                                            
+                                                            
+                                                             
+                                                           
+                                                
+    
 	if (soft_vlan == 0) {
 		m->m_pkthdr.csum_flags |= CSUM_VLAN_TAG_VALID;
 		m->m_pkthdr.vlan_tag = tag;
@@ -1109,7 +1109,7 @@ vlan_output(struct ifnet * ifp, struct mbuf * m)
 			atomic_add_64(&ifp->if_oerrors, 1);
 			return 0;
 		}
-		/* M_PREPEND takes care of m_len, m_pkthdr.len for us */
+		                                                        
 		if (m->m_len < (int)sizeof(*evl)) {
 			m = m_pullup(m, sizeof(*evl));
 			if (m == NULL) {
@@ -1120,10 +1120,10 @@ vlan_output(struct ifnet * ifp, struct mbuf * m)
 			}
 		}
 
-		/*
-		 * Transform the Ethernet header into an Ethernet header
-		 * with 802.1Q encapsulation.
-		 */
+		  
+                                                          
+                               
+     
 		bcopy(mtod(m, char *) + encaplen,
 		    mtod(m, char *), ETHER_HDR_LEN);
 		evl = mtod(m, struct ether_vlan_header *);
@@ -1131,7 +1131,7 @@ vlan_output(struct ifnet * ifp, struct mbuf * m)
 		evl->evl_encap_proto = htons(ETHERTYPE_VLAN);
 		evl->evl_tag = htons(tag);
 
-		/* adjust partial checksum offload offsets */
+		                                             
 		if ((m->m_pkthdr.csum_flags & (CSUM_DATA_VALID |
 		    CSUM_PARTIAL)) == (CSUM_DATA_VALID | CSUM_PARTIAL)) {
 			m->m_pkthdr.csum_tx_start += ETHER_VLAN_ENCAP_LEN;
@@ -1174,10 +1174,10 @@ vlan_input(ifnet_t p, __unused protocol_family_t protocol,
 	u_int                       tag = 0;
 
 	if (m->m_pkthdr.csum_flags & CSUM_VLAN_TAG_VALID) {
-		/*
-		 * Packet is tagged, m contains a normal
-		 * Ethernet frame; the tag is stored out-of-band.
-		 */
+		  
+                                          
+                                                   
+     
 		m->m_pkthdr.csum_flags &= ~CSUM_VLAN_TAG_VALID;
 		tag = EVL_VLANOFTAG(m->m_pkthdr.vlan_tag);
 		m->m_pkthdr.vlan_tag = 0;
@@ -1192,17 +1192,17 @@ vlan_input(ifnet_t p, __unused protocol_family_t protocol,
 			}
 			evl = (struct ether_vlan_header *)(void *)frame_header;
 			if (ntohs(evl->evl_proto) == ETHERTYPE_VLAN) {
-				/* don't allow VLAN within VLAN */
+				                                  
 				m_freem(m);
 				return 0;
 			}
 			tag = EVL_VLANOFTAG(ntohs(evl->evl_tag));
 
-			/*
-			 * Restore the original ethertype.  We'll remove
-			 * the encapsulation after we've found the vlan
-			 * interface corresponding to the tag.
-			 */
+			  
+                                                   
+                                                  
+                                         
+      
 			evl->evl_encap_proto = evl->evl_proto;
 			break;
 		default:
@@ -1216,7 +1216,7 @@ vlan_input(ifnet_t p, __unused protocol_family_t protocol,
 		ifvlan_ref              ifv;
 
 		if ((ifnet_eflags(p) & IFEF_VLAN) == 0) {
-			/* don't bother looking through the VLAN list */
+			                                                
 			m_freem(m);
 			return 0;
 		}
@@ -1235,15 +1235,15 @@ vlan_input(ifnet_t p, __unused protocol_family_t protocol,
 		vlan_unlock();
 	}
 	if (soft_vlan) {
-		/*
-		 * Packet had an in-line encapsulation header;
-		 * remove it.  The original header has already
-		 * been fixed up above.
-		 */
+		  
+                                                
+                                                
+                         
+     
 		m->m_len -= ETHER_VLAN_ENCAP_LEN;
 		m->m_data += ETHER_VLAN_ENCAP_LEN;
 		m->m_pkthdr.len -= ETHER_VLAN_ENCAP_LEN;
-		m->m_pkthdr.csum_flags = 0; /* can't trust hardware checksum */
+		m->m_pkthdr.csum_flags = 0;                                    
 	}
 	if (tag != 0) {
 		m->m_pkthdr.rcvif = ifp;
@@ -1251,11 +1251,11 @@ vlan_input(ifnet_t p, __unused protocol_family_t protocol,
 		(void)ifnet_stat_increment_in(ifp, 1,
 		    m->m_pkthdr.len + ETHER_HDR_LEN, 0);
 		bpf_tap_in(ifp, DLT_EN10MB, m, frame_header, ETHER_HDR_LEN);
-		/* We found a vlan interface, inject on that interface. */
+		                                                          
 		dlil_input_packet_list(ifp, m);
 	} else {
 		m->m_pkthdr.pkt_hdr = frame_header;
-		/* Send priority-tagged packet up through the parent */
+		                                                       
 		dlil_input_packet_list(p, m);
 	}
 	return 0;
@@ -1275,7 +1275,7 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 	u_int16_t           parent_flags;
 	vlan_parent_ref     vlp = NULL;
 
-	/* pre-allocate space for vlan_parent, in case we're first */
+	                                                             
 	error = vlan_parent_create(p, &new_vlp);
 	if (error != 0) {
 		return error;
@@ -1296,15 +1296,15 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		vlan_parent_retain(vlp);
 		need_vlp_release++;
 		if (vlan_parent_lookup_tag(vlp, tag) != NULL) {
-			/* already a VLAN with that tag on this interface */
+			                                                    
 			error = EADDRINUSE;
 			goto unlock_done;
 		}
 	} else {
-		/* one for being in the list */
+		                               
 		vlan_parent_retain(new_vlp);
 
-		/* we're the first VLAN on this interface */
+		                                            
 		LIST_INSERT_HEAD(&g_vlan->parent_list, new_vlp, vlp_parent_list);
 		vlp = new_vlp;
 
@@ -1312,7 +1312,7 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		need_vlp_release++;
 	}
 
-	/* need to wait to ensure no one else is trying to add/remove */
+	                                                                
 	vlan_parent_wait(vlp, "vlan_config");
 
 	if (ifnet_get_ifvlan(ifp) != ifv) {
@@ -1320,7 +1320,7 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		goto signal_done;
 	}
 
-	/* check again because someone might have gotten in */
+	                                                      
 	if (parent_list_lookup(p) != vlp) {
 		error = EBUSY;
 		goto signal_done;
@@ -1332,9 +1332,9 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		goto signal_done;
 	}
 
-	/* check again because someone might have gotten the tag */
+	                                                           
 	if (vlan_parent_lookup_tag(vlp, tag) != NULL) {
-		/* already a VLAN with that tag on this interface */
+		                                                    
 		error = EADDRINUSE;
 		goto signal_done;
 	}
@@ -1343,18 +1343,18 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		first_vlan = TRUE;
 	}
 	vlan_parent_add_vlan(vlp, ifv, tag);
-	ifvlan_retain(ifv); /* parent references ifv */
+	ifvlan_retain(ifv);                            
 	ifv_added = TRUE;
 
-	/* don't allow VLAN on interface that's part of a bond */
+	                                                         
 	if ((ifnet_eflags(p) & IFEF_BOND) != 0) {
 		error = EBUSY;
 		goto signal_done;
 	}
-	/* mark it as in use by VLAN */
+	                               
 	eflags = if_set_eflags(p, IFEF_VLAN);
 	if ((eflags & IFEF_BOND) != 0) {
-		/* bond got in ahead of us */
+		                             
 		if_clear_eflags(p, IFEF_VLAN);
 		error = EBUSY;
 		goto signal_done;
@@ -1362,7 +1362,7 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 	vlan_unlock();
 
 	if (first_vlan) {
-		/* attach our VLAN "protocol" to the interface */
+		                                                 
 		error = vlan_attach_protocol(p);
 		if (error) {
 			vlan_lock();
@@ -1370,7 +1370,7 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		}
 	}
 
-	/* configure parent to receive our multicast addresses */
+	                                                         
 	error = multicast_list_program(&ifv->ifv_multicast, ifp, p);
 	if (error != 0) {
 		if (first_vlan) {
@@ -1380,10 +1380,10 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 		goto signal_done;
 	}
 
-	/* set our ethernet address to that of the parent */
+	                                                    
 	ifnet_set_lladdr_and_type(ifp, IF_LLADDR(p), ETHER_ADDR_LEN, IFT_ETHER);
 
-	/* no failures past this point */
+	                                 
 	vlan_lock();
 
 	ifv->ifv_encaplen = ETHER_VLAN_ENCAP_LEN;
@@ -1391,27 +1391,27 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 	if (vlan_parent_flags_supports_vlan_mtu(vlp)) {
 		ifv->ifv_mtufudge = 0;
 	} else {
-		/*
-		 * Fudge the MTU by the encapsulation size.  This
-		 * makes us incompatible with strictly compliant
-		 * 802.1Q implementations, but allows us to use
-		 * the feature with other NetBSD implementations,
-		 * which might still be useful.
-		 */
+		  
+                                                   
+                                                  
+                                                 
+                                                   
+                                 
+     
 		ifv->ifv_mtufudge = ifv->ifv_encaplen;
 	}
 	ifnet_set_mtu(ifp, ETHERMTU - ifv->ifv_mtufudge);
 
-	/*
-	 * Copy only a selected subset of flags from the parent.
-	 * Other flags are none of our business.
-	 */
+	  
+                                                         
+                                         
+    
 	parent_flags = ifnet_flags(p)
 	    & (IFF_BROADCAST | IFF_MULTICAST | IFF_SIMPLEX);
 	ifnet_set_flags(ifp, parent_flags,
 	    IFF_BROADCAST | IFF_MULTICAST | IFF_SIMPLEX);
 
-	/* use hwassist bits from parent interface, but exclude VLAN bits */
+	                                                                    
 	offload = ifnet_offload(p) & ~(IFNET_VLAN_TAGGING | IFNET_VLAN_MTU);
 	ifnet_set_offload(ifp, offload);
 
@@ -1420,14 +1420,14 @@ vlan_config(struct ifnet * ifp, struct ifnet * p, int tag)
 	vlan_parent_signal(vlp, "vlan_config");
 	vlan_unlock();
 	if (new_vlp != vlp) {
-		/* throw it away, it wasn't needed */
+		                                     
 		vlan_parent_release(new_vlp);
 	}
 	if (ifv != NULL) {
 		ifvlan_release(ifv);
 	}
 	if (first_vlan) {
-		/* mark the parent interface up */
+		                                  
 		ifnet_set_flags(p, IFF_UP, IFF_UP);
 		(void)ifnet_ioctl(p, 0, SIOCSIFFLAGS, (caddr_t)NULL);
 	}
@@ -1439,13 +1439,13 @@ signal_done:
 	if (ifv_added) {
 		vlan_parent_remove_vlan(vlp, ifv);
 		if (!vlan_parent_flags_detaching(vlp) && vlan_parent_no_vlans(vlp)) {
-			/* the vlan parent has no more VLAN's */
+			                                        
 			if_clear_eflags(p, IFEF_VLAN);
 			LIST_REMOVE(vlp, vlp_parent_list);
-			/* release outside of the lock below */
+			                                       
 			need_vlp_release++;
 
-			/* one for being in the list */
+			                               
 			need_vlp_release++;
 		}
 	}
@@ -1474,7 +1474,7 @@ vlan_link_event(struct ifnet * ifp, struct ifnet * p)
 {
 	struct ifmediareq ifmr;
 
-	/* generate a link event based on the state of the underlying interface */
+	                                                                          
 	bzero(&ifmr, sizeof(ifmr));
 	snprintf(ifmr.ifm_name, sizeof(ifmr.ifm_name),
 	    "%s%d", ifnet_name(p), ifnet_unit(p));
@@ -1509,21 +1509,21 @@ vlan_unconfig(ifvlan_ref ifv, int need_to_wait)
 		vlan_parent_retain(vlp);
 		vlan_parent_wait(vlp, "vlan_unconfig");
 
-		/* check again because another thread could be in vlan_unconfig */
+		                                                                  
 		if (ifv != ifnet_get_ifvlan(ifp)) {
 			goto signal_done;
 		}
 		if (ifv->ifv_vlp != vlp) {
-			/* vlan parent changed */
+			                         
 			goto signal_done;
 		}
 	}
 
-	/* ifv has a reference on vlp, need to remove it */
+	                                                   
 	need_vlp_release++;
 	p = vlp->vlp_ifp;
 
-	/* remember whether we're the last VLAN on the parent */
+	                                                        
 	if (LIST_NEXT(LIST_FIRST(&vlp->vlp_vlan_list), ifv_vlan_list) == NULL) {
 		if (g_vlan->verbose) {
 			printf("vlan_unconfig: last vlan on %s%d\n",
@@ -1532,48 +1532,48 @@ vlan_unconfig(ifvlan_ref ifv, int need_to_wait)
 		last_vlan = TRUE;
 	}
 
-	/* back-out any effect our mtu might have had on the parent */
+	                                                              
 	(void)ifvlan_new_mtu(ifv, ETHERMTU - ifv->ifv_mtufudge);
 
 	vlan_unlock();
 
-	/* un-join multicast on parent interface */
+	                                           
 	(void)multicast_list_remove(&ifv->ifv_multicast);
 
-	/* Clear our MAC address. */
+	                            
 	ifnet_set_lladdr_and_type(ifp, NULL, 0, IFT_L2VLAN);
 
-	/* detach VLAN "protocol" */
+	                            
 	if (last_vlan) {
 		(void)vlan_detach_protocol(p);
 	}
 
 	vlan_lock();
 
-	/* return to the state we were in before SIFVLAN */
+	                                                   
 	ifnet_set_mtu(ifp, ETHERMTU);
 	ifnet_set_flags(ifp, 0,
 	    IFF_BROADCAST | IFF_MULTICAST | IFF_SIMPLEX | IFF_RUNNING);
 	ifnet_set_offload(ifp, 0);
 	ifv->ifv_mtufudge = 0;
 
-	/* Disconnect from parent. */
+	                             
 	vlan_parent_remove_vlan(vlp, ifv);
 	ifv->ifv_flags = 0;
 
-	/* vlan_parent has reference to ifv, remove it */
+	                                                 
 	need_ifv_release++;
 
-	/* from this point on, no more referencing ifv */
+	                                                 
 	if (last_vlan && !vlan_parent_flags_detaching(vlp)) {
-		/* the vlan parent has no more VLAN's */
+		                                        
 		if_clear_eflags(p, IFEF_VLAN);
 		LIST_REMOVE(vlp, vlp_parent_list);
 
-		/* one for being in the list */
+		                               
 		need_vlp_release++;
 
-		/* release outside of the lock below */
+		                                       
 		need_vlp_release++;
 	}
 
@@ -1585,7 +1585,7 @@ signal_done:
 	while (need_ifv_release--) {
 		ifvlan_release(ifv);
 	}
-	while (need_vlp_release--) {    /* references to vlp */
+	while (need_vlp_release--) {                           
 		vlan_parent_release(vlp);
 	}
 	vlan_lock();
@@ -1699,14 +1699,14 @@ vlan_set_mtu(struct ifnet * ifp, int mtu)
 	}
 	vlan_parent_wait(vlp, "vlan_set_mtu");
 
-	/* check again, something might have changed */
+	                                               
 	if (ifnet_get_ifvlan(ifp) != ifv
 	    || ifvlan_flags_detaching(ifv)) {
 		error = EBUSY;
 		goto signal_done;
 	}
 	if (ifv->ifv_vlp != vlp) {
-		/* vlan parent changed */
+		                         
 		goto signal_done;
 	}
 	if (vlan_parent_flags_detaching(vlp)) {
@@ -1777,7 +1777,7 @@ vlan_ioctl(ifnet_t ifp, u_long cmd, void * data)
 				ifmr->ifm_mask = p_ifmr.ifm_mask;
 				ifmr->ifm_status = p_ifmr.ifm_status;
 				ifmr->ifm_count = p_ifmr.ifm_count;
-				/* Limit the result to the parent's current config. */
+				                                                      
 				if (ifmr->ifm_count >= 1 && user_addr != USER_ADDR_NULL) {
 					ifmr->ifm_count = 1;
 					error = copyout(&ifmr->ifm_current, user_addr,
@@ -1834,14 +1834,14 @@ vlan_ioctl(ifnet_t ifp, u_long cmd, void * data)
 			break;
 		}
 		p = NULL;
-		/* ensure nul termination */
+		                            
 		vlr.vlr_parent[IFNAMSIZ - 1] = '\0';
 		if (vlr.vlr_parent[0] != '\0') {
 			if (vlr.vlr_tag & ~EVL_VLID_MASK) {
-				/*
-				 * Don't let the caller set up a VLAN tag with
-				 * anything except VLID bits.
-				 */
+				  
+                                                  
+                                 
+       
 				error = EINVAL;
 				break;
 			}
@@ -1855,7 +1855,7 @@ vlan_ioctl(ifnet_t ifp, u_long cmd, void * data)
 				break;
 			}
 
-			/* can't do VLAN over anything but ethernet or ethernet aggregate */
+			                                                                    
 			if (ifnet_type(p) != IFT_ETHER
 			    && ifnet_type(p) != IFT_IEEE8023ADLAG) {
 				error = EPROTONOSUPPORT;
@@ -1866,10 +1866,10 @@ vlan_ioctl(ifnet_t ifp, u_long cmd, void * data)
 				break;
 			}
 
-			/* Update promiscuous mode, if necessary. */
+			                                            
 			(void)vlan_set_promisc(ifp);
 
-			/* generate a link event based on the state of the parent */
+			                                                            
 			vlan_link_event(ifp, p);
 		} else {
 			int         need_link_event = FALSE;
@@ -1912,10 +1912,10 @@ vlan_ioctl(ifnet_t ifp, u_long cmd, void * data)
 		break;
 
 	case SIOCSIFFLAGS:
-		/*
-		 * For promiscuous mode, we enable promiscuous mode on
-		 * the parent if we need promiscuous on the VLAN interface.
-		 */
+		  
+                                                        
+                                                             
+     
 		error = vlan_set_promisc(ifp);
 		break;
 
@@ -1952,7 +1952,7 @@ vlan_event(struct ifnet * p, __unused protocol_family_t protocol,
 {
 	int                 event_code;
 
-	/* Check if the interface we are attached to is being detached */
+	                                                                 
 	if (event->vendor_code != KEV_VENDOR_APPLE
 	    || event->kev_class != KEV_NETWORK_CLASS
 	    || event->kev_subclass != KEV_DL_SUBCLASS) {
@@ -1974,7 +1974,7 @@ static errno_t
 vlan_detached(ifnet_t p, __unused protocol_family_t protocol)
 {
 	if (ifnet_is_attached(p, 0) == 0) {
-		/* if the parent isn't attached, remove all VLANs */
+		                                                    
 		vlan_parent_remove_all_vlans(p);
 	}
 	return 0;
@@ -2011,19 +2011,19 @@ vlan_parent_link_event(struct ifnet * p, u_int32_t event_code)
 	vlan_lock();
 	if ((ifnet_eflags(p) & IFEF_VLAN) == 0) {
 		vlan_unlock();
-		/* no VLAN's */
+		               
 		return;
 	}
 	vlp = parent_list_lookup(p);
 	if (vlp == NULL) {
-		/* no VLAN's */
+		               
 		vlan_unlock();
 		return;
 	}
 	vlan_parent_flags_set_link_event_required(vlp);
 	vlp->vlp_event_code = event_code;
 	if (vlan_parent_flags_change_in_progress(vlp)) {
-		/* don't block waiting to generate an event */
+		                                              
 		vlan_unlock();
 		return;
 	}
@@ -2035,16 +2035,16 @@ vlan_parent_link_event(struct ifnet * p, u_int32_t event_code)
 	return;
 }
 
-/*
- * Function: vlan_attach_protocol
- * Purpose:
- *   Attach a DLIL protocol to the interface, using the ETHERTYPE_VLAN
- *   demux ether type.
- *
- *	 The ethernet demux actually special cases VLAN to support hardware.
- *	 The demux here isn't used. The demux will return PF_VLAN for the
- *	 appropriate packets and our vlan_input function will be called.
- */
+  
+                                 
+           
+                                                                      
+                      
+  
+                                                                       
+                                                                    
+                                                                   
+   
 static int
 vlan_attach_protocol(struct ifnet *ifp)
 {
@@ -2063,11 +2063,11 @@ vlan_attach_protocol(struct ifnet *ifp)
 	return error;
 }
 
-/*
- * Function: vlan_detach_protocol
- * Purpose:
- *   Detach our DLIL protocol from an interface
- */
+  
+                                 
+           
+                                               
+   
 static int
 vlan_detach_protocol(struct ifnet *ifp)
 {
@@ -2082,13 +2082,13 @@ vlan_detach_protocol(struct ifnet *ifp)
 	return error;
 }
 
-/*
- * DLIL interface family functions
- *   We use the ethernet plumb functions, since that's all we support.
- *   If we wanted to handle multiple LAN types (tokenring, etc.), we'd
- *   call the appropriate routines for that LAN type instead of hard-coding
- *   ethernet.
- */
+  
+                                  
+                                                                      
+                                                                      
+                                                                           
+              
+   
 static errno_t
 vlan_attach_inet(struct ifnet *ifp, protocol_family_t protocol_family)
 {

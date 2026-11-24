@@ -68,11 +68,11 @@
 #include <nfs/nfs_conf.h>
 #if CONFIG_NFS
 
-/*
- * These functions support the macros and help fiddle mbuf chains for
- * the nfs op functions. They do things like create the rpc header and
- * copy data between mbuf chains and uio lists.
- */
+  
+                                                                     
+                                                                      
+                                               
+   
 #include <sys/param.h>
 #include <sys/proc.h>
 #include <sys/kauth.h>
@@ -105,7 +105,7 @@
 #include <nfs/nfs.h>
 #include <nfs/nfsnode.h>
 #if CONFIG_NFS_CLIENT
-#define _NFS_XDR_SUBS_FUNCS_ /* define this to get xdrbuf function definitions */
+#define _NFS_XDR_SUBS_FUNCS_                                                     
 #endif
 #include <nfs/xdr_subs.h>
 #include <nfs/nfsm_subs.h>
@@ -120,15 +120,15 @@
 
 #include <sys/utfconv.h>
 
-/*
- * NFS globals
- */
+  
+              
+   
 struct nfsstats __attribute__((aligned(8))) nfsstats;
 size_t nfs_mbuf_mhlen = 0, nfs_mbuf_minclsize = 0;
 
-/*
- * functions to convert between NFS and VFS types
- */
+  
+                                                 
+   
 nfstype
 vtonfs_type(enum vtype vtype, int nfsvers)
 {
@@ -228,9 +228,9 @@ vtonfsv2_mode(enum vtype vtype, mode_t m)
 
 #if CONFIG_NFS_SERVER
 
-/*
- * Mapping of old NFS Version 2 RPC numbers to generic numbers.
- */
+  
+                                                               
+   
 int nfsv3_procid[NFS_NPROCS] = {
 	NFSPROC_NULL,
 	NFSPROC_GETATTR,
@@ -257,11 +257,11 @@ int nfsv3_procid[NFS_NPROCS] = {
 	NFSPROC_NOOP
 };
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
-/*
- * and the reverse mapping from generic to Version 2 procedure numbers
- */
+  
+                                                                      
+   
 int nfsv2_procid[NFS_NPROCS] = {
 	NFSV2PROC_NULL,
 	NFSV2PROC_GETATTR,
@@ -289,9 +289,9 @@ int nfsv2_procid[NFS_NPROCS] = {
 };
 
 
-/*
- * initialize NFS's cache of mbuf constants
- */
+  
+                                           
+   
 void
 nfs_mbuf_init(void)
 {
@@ -304,9 +304,9 @@ nfs_mbuf_init(void)
 
 #if CONFIG_NFS_SERVER
 
-/*
- * allocate a list of mbufs to hold the given amount of data
- */
+  
+                                                            
+   
 int
 nfsm_mbuf_get_list(size_t size, mbuf_t *mp, int *mbcnt)
 {
@@ -347,13 +347,13 @@ nfsm_mbuf_get_list(size_t size, mbuf_t *mp, int *mbcnt)
 	return error;
 }
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
-/*
- * nfsm_chain_new_mbuf()
- *
- * Add a new mbuf to the given chain.
- */
+  
+                        
+  
+                                     
+   
 int
 nfsm_chain_new_mbuf(struct nfsm_chain *nmc, size_t sizehint)
 {
@@ -364,7 +364,7 @@ nfsm_chain_new_mbuf(struct nfsm_chain *nmc, size_t sizehint)
 		sizehint = nfs_mbuf_minclsize;
 	}
 
-	/* allocate a new mbuf */
+	                         
 	nfsm_mbuf_getcluster(error, &mb, sizehint);
 	if (error) {
 		return error;
@@ -373,11 +373,11 @@ nfsm_chain_new_mbuf(struct nfsm_chain *nmc, size_t sizehint)
 		panic("got NULL mbuf?");
 	}
 
-	/* do we have a current mbuf? */
+	                                
 	if (nmc->nmc_mcur) {
-		/* first cap off current mbuf */
+		                                
 		mbuf_setlen(nmc->nmc_mcur, nmc->nmc_ptr - (caddr_t)mbuf_data(nmc->nmc_mcur));
-		/* then append the new mbuf */
+		                              
 		error = mbuf_setnext(nmc->nmc_mcur, mb);
 		if (error) {
 			mbuf_free(mb);
@@ -385,7 +385,7 @@ nfsm_chain_new_mbuf(struct nfsm_chain *nmc, size_t sizehint)
 		}
 	}
 
-	/* set up for using the new mbuf */
+	                                   
 	nmc->nmc_mcur = mb;
 	nmc->nmc_ptr = mbuf_data(mb);
 	nmc->nmc_left = mbuf_trailingspace(mb);
@@ -393,11 +393,11 @@ nfsm_chain_new_mbuf(struct nfsm_chain *nmc, size_t sizehint)
 	return 0;
 }
 
-/*
- * nfsm_chain_add_opaque_f()
- *
- * Add "len" bytes of opaque data pointed to by "buf" to the given chain.
- */
+  
+                            
+  
+                                                                         
+   
 int
 nfsm_chain_add_opaque_f(struct nfsm_chain *nmc, const u_char *buf, size_t len)
 {
@@ -435,12 +435,12 @@ nfsm_chain_add_opaque_f(struct nfsm_chain *nmc, const u_char *buf, size_t len)
 	return 0;
 }
 
-/*
- * nfsm_chain_add_opaque_nopad_f()
- *
- * Add "len" bytes of opaque data pointed to by "buf" to the given chain.
- * Do not XDR pad.
- */
+  
+                                  
+  
+                                                                         
+                  
+   
 int
 nfsm_chain_add_opaque_nopad_f(struct nfsm_chain *nmc, const u_char *buf, size_t len)
 {
@@ -464,11 +464,11 @@ nfsm_chain_add_opaque_nopad_f(struct nfsm_chain *nmc, const u_char *buf, size_t 
 	return 0;
 }
 
-/*
- * nfsm_chain_add_uio()
- *
- * Add "len" bytes of data from "uio" to the given chain.
- */
+  
+                       
+  
+                                                         
+   
 int
 nfsm_chain_add_uio(struct nfsm_chain *nmc, uio_t uio, size_t len)
 {
@@ -503,10 +503,10 @@ nfsm_chain_add_uio(struct nfsm_chain *nmc, uio_t uio, size_t len)
 	return 0;
 }
 
-/*
- * Find the length of the NFS mbuf chain
- * up to the current encoding/decoding offset.
- */
+  
+                                        
+                                              
+   
 size_t
 nfsm_chain_offset(struct nfsm_chain *nmc)
 {
@@ -523,11 +523,11 @@ nfsm_chain_offset(struct nfsm_chain *nmc)
 	return len;
 }
 
-/*
- * nfsm_chain_advance()
- *
- * Advance an nfsm_chain by "len" bytes.
- */
+  
+                       
+  
+                                        
+   
 int
 nfsm_chain_advance(struct nfsm_chain *nmc, size_t len)
 {
@@ -551,11 +551,11 @@ nfsm_chain_advance(struct nfsm_chain *nmc, size_t len)
 	return 0;
 }
 
-/*
- * nfsm_chain_reverse()
- *
- * Reverse decode offset in an nfsm_chain by "len" bytes.
- */
+  
+                       
+  
+                                                         
+   
 int
 nfsm_chain_reverse(struct nfsm_chain *nmc, size_t len)
 {
@@ -578,15 +578,15 @@ nfsm_chain_reverse(struct nfsm_chain *nmc, size_t len)
 	return nfsm_chain_advance(nmc, new_offset);
 }
 
-/*
- * nfsm_chain_get_opaque_pointer_f()
- *
- * Return a pointer to the next "len" bytes of contiguous data in
- * the mbuf chain.  If the next "len" bytes are not contiguous, we
- * try to manipulate the mbuf chain so that it is.
- *
- * The nfsm_chain is advanced by nfsm_rndup("len") bytes.
- */
+  
+                                    
+  
+                                                                 
+                                                                  
+                                                  
+  
+                                                         
+   
 int
 nfsm_chain_get_opaque_pointer_f(struct nfsm_chain *nmc, uint32_t len, u_char **pptr)
 {
@@ -596,7 +596,7 @@ nfsm_chain_get_opaque_pointer_f(struct nfsm_chain *nmc, uint32_t len, u_char **p
 	u_char *ptr;
 	int error = 0;
 
-	/* move to next mbuf with data */
+	                                 
 	while (nmc->nmc_mcur && (nmc->nmc_left == 0)) {
 		mb = mbuf_next(nmc->nmc_mcur);
 		nmc->nmc_mcur = mb;
@@ -606,14 +606,14 @@ nfsm_chain_get_opaque_pointer_f(struct nfsm_chain *nmc, uint32_t len, u_char **p
 		nmc->nmc_ptr = mbuf_data(mb);
 		nmc->nmc_left = mbuf_len(mb);
 	}
-	/* check if we've run out of data */
+	                                    
 	if (!nmc->nmc_mcur) {
 		return EBADRPC;
 	}
 
-	/* do we already have a contiguous buffer? */
+	                                             
 	if (nmc->nmc_left >= len) {
-		/* the returned pointer will be the current pointer */
+		                                                      
 		*pptr = (u_char*)nmc->nmc_ptr;
 		error = nfsm_chain_advance(nmc, nfsm_rndup(len));
 		return error;
@@ -621,35 +621,35 @@ nfsm_chain_get_opaque_pointer_f(struct nfsm_chain *nmc, uint32_t len, u_char **p
 
 	padlen = nfsm_rndup(len) - len;
 
-	/* we need (len - left) more bytes */
+	                                     
 	mbcur = nmc->nmc_mcur;
 	left = nmc->nmc_left;
 	need = len - left;
 
 	if (need > mbuf_trailingspace(mbcur)) {
-		/*
-		 * The needed bytes won't fit in the current mbuf so we'll
-		 * allocate a new mbuf to hold the contiguous range of data.
-		 */
+		  
+                                                            
+                                                              
+     
 		nfsm_mbuf_getcluster(error, &mb, len);
 		if (error) {
 			return error;
 		}
-		/* double check that this mbuf can hold all the data */
+		                                                       
 		if (mbuf_maxlen(mb) < len) {
 			mbuf_free(mb);
 			return EOVERFLOW;
 		}
 
-		/* the returned pointer will be the new mbuf's data pointer */
+		                                                              
 		*pptr = ptr = mbuf_data(mb);
 
-		/* copy "left" bytes to the new mbuf */
+		                                       
 		bcopy(nmc->nmc_ptr, ptr, left);
 		ptr += left;
 		mbuf_setlen(mb, left);
 
-		/* insert the new mbuf between the current and next mbufs */
+		                                                            
 		error = mbuf_setnext(mb, mbuf_next(mbcur));
 		if (!error) {
 			error = mbuf_setnext(mbcur, mb);
@@ -659,84 +659,84 @@ nfsm_chain_get_opaque_pointer_f(struct nfsm_chain *nmc, uint32_t len, u_char **p
 			return error;
 		}
 
-		/* reduce current mbuf's length by "left" */
+		                                            
 		mbuf_setlen(mbcur, mbuf_len(mbcur) - left);
 
-		/*
-		 * update nmc's state to point at the end of the mbuf
-		 * where the needed data will be copied to.
-		 */
+		  
+                                                       
+                                             
+     
 		nmc->nmc_mcur = mbcur = mb;
 		nmc->nmc_left = 0;
 		nmc->nmc_ptr = (caddr_t)ptr;
 	} else {
-		/* The rest of the data will fit in this mbuf. */
+		                                                 
 
-		/* the returned pointer will be the current pointer */
+		                                                      
 		*pptr = (u_char*)nmc->nmc_ptr;
 
-		/*
-		 * update nmc's state to point at the end of the mbuf
-		 * where the needed data will be copied to.
-		 */
+		  
+                                                       
+                                             
+     
 		nmc->nmc_ptr += left;
 		nmc->nmc_left = 0;
 	}
 
-	/*
-	 * move the next "need" bytes into the current
-	 * mbuf from the mbufs that follow
-	 */
+	  
+                                               
+                                   
+    
 
-	/* extend current mbuf length */
+	                                
 	mbuf_setlen(mbcur, mbuf_len(mbcur) + need);
 
-	/* mb follows mbufs we're copying/compacting data from */
+	                                                         
 	mb = mbuf_next(mbcur);
 
 	while (need && mb) {
-		/* copy as much as we need/can */
+		                                 
 		ptr = mbuf_data(mb);
 		mblen = mbuf_len(mb);
 		cplen = MIN(mblen, need);
 		if (cplen) {
 			bcopy(ptr, nmc->nmc_ptr, cplen);
-			/*
-			 * update the mbuf's pointer and length to reflect that
-			 * the data was shifted to an earlier mbuf in the chain
-			 */
+			  
+                                                          
+                                                          
+      
 			error = mbuf_setdata(mb, ptr + cplen, mblen - cplen);
 			if (error) {
 				mbuf_setlen(mbcur, mbuf_len(mbcur) - need);
 				return error;
 			}
-			/* update pointer/need */
+			                         
 			nmc->nmc_ptr += cplen;
 			need -= cplen;
 		}
-		/* if more needed, go to next mbuf */
+		                                     
 		if (need) {
 			mb = mbuf_next(mb);
 		}
 	}
 
-	/* did we run out of data in the mbuf chain? */
+	                                               
 	if (need) {
 		mbuf_setlen(mbcur, mbuf_len(mbcur) - need);
 		return EBADRPC;
 	}
 
-	/*
-	 * update nmc's state to point after this contiguous data
-	 *
-	 * "mb" points to the last mbuf we copied data from so we
-	 * just set nmc to point at whatever remains in that mbuf.
-	 */
+	  
+                                                          
+   
+                                                          
+                                                           
+    
 	nmc->nmc_mcur = mb;
 	nmc->nmc_ptr = mbuf_data(mb);
 	nmc->nmc_left = mbuf_len(mb);
 
-	/* move past any padding */
+	                           
 	if (padlen) {
 		error = nfsm_chain_advance(nmc, padlen);
 	}
@@ -744,12 +744,12 @@ nfsm_chain_get_opaque_pointer_f(struct nfsm_chain *nmc, uint32_t len, u_char **p
 	return error;
 }
 
-/*
- * nfsm_chain_get_opaque_f()
- *
- * Read the next "len" bytes in the chain into "buf".
- * The nfsm_chain is advanced by nfsm_rndup("len") bytes.
- */
+  
+                            
+  
+                                                     
+                                                         
+   
 int
 nfsm_chain_get_opaque_f(struct nfsm_chain *nmc, size_t len, u_char *buf)
 {
@@ -758,9 +758,9 @@ nfsm_chain_get_opaque_f(struct nfsm_chain *nmc, size_t len, u_char *buf)
 
 	padlen = nfsm_rndup(len) - len;
 
-	/* loop through mbufs copying all the data we need */
+	                                                     
 	while (len && nmc->nmc_mcur) {
-		/* copy as much as we need/can */
+		                                 
 		cplen = MIN(nmc->nmc_left, len);
 		if (cplen) {
 			bcopy(nmc->nmc_ptr, buf, cplen);
@@ -769,7 +769,7 @@ nfsm_chain_get_opaque_f(struct nfsm_chain *nmc, size_t len, u_char *buf)
 			buf += cplen;
 			len -= cplen;
 		}
-		/* if more needed, go to next mbuf */
+		                                     
 		if (len) {
 			mbuf_t mb = mbuf_next(nmc->nmc_mcur);
 			nmc->nmc_mcur = mb;
@@ -778,7 +778,7 @@ nfsm_chain_get_opaque_f(struct nfsm_chain *nmc, size_t len, u_char *buf)
 		}
 	}
 
-	/* did we run out of data in the mbuf chain? */
+	                                               
 	if (len) {
 		return EBADRPC;
 	}
@@ -790,12 +790,12 @@ nfsm_chain_get_opaque_f(struct nfsm_chain *nmc, size_t len, u_char *buf)
 	return error;
 }
 
-/*
- * nfsm_chain_get_uio()
- *
- * Read the next "len" bytes in the chain into the given uio.
- * The nfsm_chain is advanced by nfsm_rndup("len") bytes.
- */
+  
+                       
+  
+                                                             
+                                                         
+   
 int
 nfsm_chain_get_uio(struct nfsm_chain *nmc, size_t len, uio_t uio)
 {
@@ -804,9 +804,9 @@ nfsm_chain_get_uio(struct nfsm_chain *nmc, size_t len, uio_t uio)
 
 	padlen = nfsm_rndup(len) - len;
 
-	/* loop through mbufs copying all the data we need */
+	                                                     
 	while (len && nmc->nmc_mcur) {
-		/* copy as much as we need/can */
+		                                 
 		cplen = MIN(nmc->nmc_left, len);
 		if (cplen) {
 			cplen = MIN(cplen, INT32_MAX);
@@ -818,7 +818,7 @@ nfsm_chain_get_uio(struct nfsm_chain *nmc, size_t len, uio_t uio)
 			nmc->nmc_left -= cplen;
 			len -= cplen;
 		}
-		/* if more needed, go to next mbuf */
+		                                     
 		if (len) {
 			mbuf_t mb = mbuf_next(nmc->nmc_mcur);
 			nmc->nmc_mcur = mb;
@@ -827,7 +827,7 @@ nfsm_chain_get_uio(struct nfsm_chain *nmc, size_t len, uio_t uio)
 		}
 	}
 
-	/* did we run out of data in the mbuf chain? */
+	                                               
 	if (len) {
 		return EBADRPC;
 	}
@@ -856,7 +856,7 @@ nfsm_chain_add_string_nfc(struct nfsm_chain *nmc, const uint8_t *s, size_t slen)
 		error = utf8_normalizestr(s, slen, nfcname, &nfclen, buflen, UTF_PRECOMPOSED | UTF_NO_NULL_TERM);
 	}
 
-	/* if we got an error, just use the original string */
+	                                                      
 	if (error) {
 		nfsm_chain_add_string(error, nmc, s, slen);
 	} else {
@@ -869,9 +869,9 @@ nfsm_chain_add_string_nfc(struct nfsm_chain *nmc, const uint8_t *s, size_t slen)
 	return error;
 }
 
-/*
- * Add an NFSv2 "sattr" structure to an mbuf chain
- */
+  
+                                                  
+   
 int
 nfsm_chain_add_v2sattr_f(struct nfsm_chain *nmc, struct vnode_attr *vap, uint32_t szrdev)
 {
@@ -894,9 +894,9 @@ nfsm_chain_add_v2sattr_f(struct nfsm_chain *nmc, struct vnode_attr *vap, uint32_
 	return error;
 }
 
-/*
- * Add an NFSv3 "sattr" structure to an mbuf chain
- */
+  
+                                                  
+   
 int
 nfsm_chain_add_v3sattr_f(
 	__unused struct nfsmount *nmp,
@@ -954,11 +954,11 @@ nfsm_chain_add_v3sattr_f(
 }
 
 
-/*
- * nfsm_chain_get_fh_attr()
- *
- * Get the file handle and attributes from an mbuf chain. (NFSv2/v3)
- */
+  
+                           
+  
+                                                                    
+   
 int
 nfsm_chain_get_fh_attr(
 	struct nfsmount *nmp,
@@ -974,26 +974,26 @@ nfsm_chain_get_fh_attr(
 
 	gotfh = gotattr = 1;
 
-	if (nfsvers == NFS_VER3) { /* check for file handle */
+	if (nfsvers == NFS_VER3) {                            
 		nfsm_chain_get_32(error, nmc, gotfh);
 	}
-	if (!error && gotfh) { /* get file handle */
+	if (!error && gotfh) {                      
 		nfsm_chain_get_fh(error, nmc, nfsvers, fhp);
 	} else {
 		fhp->fh_len = 0;
 	}
-	if (nfsvers == NFS_VER3) { /* check for file attributes */
+	if (nfsvers == NFS_VER3) {                                
 		nfsm_chain_get_32(error, nmc, gotattr);
 	}
 	nfsmout_if(error);
 	if (gotattr) {
-		if (!gotfh) { /* skip attributes */
+		if (!gotfh) {                      
 			nfsm_chain_adv(error, nmc, NFSX_V3FATTR);
-		} else { /* get attributes */
+		} else {                     
 			error = nfs_parsefattr(nmp, nmc, nfsvers, nvap);
 		}
 	} else if (gotfh) {
-		/* we need valid attributes in order to call nfs_nget() */
+		                                                          
 		if (nfs3_getattr_rpc(NULL, NFSTOMP(dnp), fhp->fh_data, fhp->fh_len, 0, ctx, nvap, xidp)) {
 			gotattr = 0;
 			fhp->fh_len = 0;
@@ -1003,9 +1003,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * Get and process NFSv3 WCC data from an mbuf chain
- */
+  
+                                                    
+   
 int
 nfsm_chain_get_wcc_data_f(
 	struct nfsm_chain *nmc,
@@ -1032,9 +1032,9 @@ nfsm_chain_get_wcc_data_f(
 	return error;
 }
 
-/*
- * Get the next RPC transaction ID (XID)
- */
+  
+                                        
+   
 void
 nfs_get_xid(uint64_t *xidp)
 {
@@ -1042,19 +1042,19 @@ nfs_get_xid(uint64_t *xidp)
 
 	lck_mtx_lock(&nfs_request_mutex);
 	if (!nfs_xid) {
-		/*
-		 * Derive initial xid from system time.
-		 *
-		 * Note: it's OK if this code inits nfs_xid to 0 (for example,
-		 * due to a broken clock) because we immediately increment it
-		 * and we guarantee to never use xid 0.  So, nfs_xid should only
-		 * ever be 0 the first time this function is called.
-		 */
+		  
+                                         
+    
+                                                                
+                                                               
+                                                                  
+                                                      
+     
 		microtime(&tv);
 		nfs_xid = tv.tv_sec << 12;
 	}
 	if (++nfs_xid == 0) {
-		/* Skip zero xid if it should ever happen. */
+		                                             
 		nfs_xidwrap++;
 		nfs_xid++;
 	}
@@ -1062,10 +1062,10 @@ nfs_get_xid(uint64_t *xidp)
 	lck_mtx_unlock(&nfs_request_mutex);
 }
 
-/*
- * Build the RPC header and fill in the authorization info.
- * Returns the head of the mbuf list and the xid.
- */
+  
+                                                           
+                                                 
+   
 
 int
 nfsm_rpchead(
@@ -1082,18 +1082,18 @@ nfsm_rpchead(
 	           req->r_auth, req->r_cred, req, mrest, xidp, mreqp);
 }
 
-/*
- * get_auiliary_groups:	Gets the supplementary groups from a credential.
- *
- * IN:		cred:	credential to get the associated groups from.
- * OUT:		groups:	An array of gids of NGROUPS size.
- * IN:		count:	The number of groups to get; i.e.; the number of groups the server supports
- *
- * returns:	The number of groups found.
- *
- * Just a wrapper around kauth_cred_getgroups to handle the case of a server supporting less
- * than NGROUPS.
- */
+  
+                                                                        
+  
+                                                           
+                                                  
+                                                                                          
+  
+                                       
+  
+                                                                                            
+                
+   
 static size_t
 get_auxiliary_groups(kauth_cred_t cred, gid_t groups[NGROUPS], size_t count)
 {
@@ -1102,19 +1102,19 @@ get_auxiliary_groups(kauth_cred_t cred, gid_t groups[NGROUPS], size_t count)
 	size_t i;
 
 	for (i = 0; i < NGROUPS; i++) {
-		groups[i] = -2; /* Initialize to the nobody group */
+		groups[i] = -2;                                     
 	}
 	(void)kauth_cred_getgroups(cred, groups, &maxcount);
 	if (maxcount < 1) {
 		return maxcount;
 	}
 
-	/*
-	 * kauth_get_groups returns the primary group followed by the
-	 * users auxiliary groups. If the number of groups the server supports
-	 * is less than NGROUPS, then we will drop the first group so that
-	 * we can send one more group over the wire.
-	 */
+	  
+                                                              
+                                                                       
+                                                                   
+                                             
+    
 
 
 	if (count < NGROUPS) {
@@ -1142,7 +1142,7 @@ nfsm_rpchead2(__unused struct nfsmount *nmp, int sotype, int prog, int vers, int
 	gid_t grouplist[NGROUPS];
 	size_t groupcount = 0;
 
-	/* calculate expected auth length */
+	                                    
 	switch (auth_type) {
 	case RPCAUTH_NONE:
 		auth_len = 0;
@@ -1165,17 +1165,17 @@ nfsm_rpchead2(__unused struct nfsmount *nmp, int sotype, int prog, int vers, int
 		if (!req || !cred) {
 			return EINVAL;
 		}
-		auth_len = 5 * NFSX_UNSIGNED + 0;         // zero context handle for now
+		auth_len = 5 * NFSX_UNSIGNED + 0;                                       
 		break;
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	default:
 		return EINVAL;
 	}
 	authsiz = nfsm_rndup(auth_len);
 
-	/* allocate the packet */
+	                         
 	headlen = authsiz + 10 * NFSX_UNSIGNED;
-	if (sotype == SOCK_STREAM) { /* also include room for any RPC Record Mark */
+	if (sotype == SOCK_STREAM) {                                                
 		headlen += NFSX_UNSIGNED;
 	}
 	if (headlen >= nfs_mbuf_minclsize) {
@@ -1191,29 +1191,29 @@ nfsm_rpchead2(__unused struct nfsmount *nmp, int sotype, int prog, int vers, int
 		}
 	}
 	if (error) {
-		/* unable to allocate packet */
-		/* XXX should we keep statistics for these errors? */
+		                               
+		                                                     
 		return error;
 	}
 
-	/*
-	 * If the caller gave us a non-zero XID then use it because
-	 * it may be a higher-level resend with a GSSAPI credential.
-	 * Otherwise, allocate a new one.
-	 */
+	  
+                                                            
+                                                             
+                                  
+    
 	if (*xidp == 0) {
 		nfs_get_xid(xidp);
 	}
 
-	/* build the header(s) */
+	                         
 	nfsm_chain_init(&nmreq, mreq);
 
-	/* First, if it's a TCP stream insert space for an RPC record mark */
+	                                                                     
 	if (sotype == SOCK_STREAM) {
 		nfsm_chain_add_32(error, &nmreq, 0);
 	}
 
-	/* Then the RPC header. */
+	                          
 	nfsm_chain_add_32(error, &nmreq, (*xidp & 0xffffffff));
 	nfsm_chain_add_32(error, &nmreq, RPC_CALL);
 	nfsm_chain_add_32(error, &nmreq, RPC_VER2);
@@ -1226,12 +1226,12 @@ add_cred:
 #endif
 	switch (auth_type) {
 	case RPCAUTH_NONE:
-		nfsm_chain_add_32(error, &nmreq, RPCAUTH_NONE); /* auth */
-		nfsm_chain_add_32(error, &nmreq, 0);            /* length */
-		nfsm_chain_add_32(error, &nmreq, RPCAUTH_NONE); /* verf */
-		nfsm_chain_add_32(error, &nmreq, 0);            /* length */
+		nfsm_chain_add_32(error, &nmreq, RPCAUTH_NONE);           
+		nfsm_chain_add_32(error, &nmreq, 0);                        
+		nfsm_chain_add_32(error, &nmreq, RPCAUTH_NONE);           
+		nfsm_chain_add_32(error, &nmreq, 0);                        
 		nfsm_chain_build_done(error, &nmreq);
-		/* Append the args mbufs */
+		                           
 		if (!error) {
 			error = mbuf_setnext(nmreq.nmc_mcur, mrest);
 		}
@@ -1240,22 +1240,22 @@ add_cred:
 		nfsm_chain_add_32(error, &nmreq, RPCAUTH_SYS);
 		nfsm_chain_add_32(error, &nmreq, authsiz);
 		{
-			nfsm_chain_add_32(error, &nmreq, 0);    /* stamp */
+			nfsm_chain_add_32(error, &nmreq, 0);               
 		}
-		nfsm_chain_add_32(error, &nmreq, 0);    /* zero-length hostname */
-		nfsm_chain_add_32(error, &nmreq, kauth_cred_getuid(cred));      /* UID */
-		nfsm_chain_add_32(error, &nmreq, kauth_cred_getgid(cred));      /* GID */
-		nfsm_chain_add_32(error, &nmreq, groupcount);/* additional GIDs */
+		nfsm_chain_add_32(error, &nmreq, 0);                              
+		nfsm_chain_add_32(error, &nmreq, kauth_cred_getuid(cred));               
+		nfsm_chain_add_32(error, &nmreq, kauth_cred_getgid(cred));               
+		nfsm_chain_add_32(error, &nmreq, groupcount);                     
 		for (i = 0; i < groupcount; i++) {
 			nfsm_chain_add_32(error, &nmreq, grouplist[i]);
 		}
 
-		/* And the verifier... */
-		nfsm_chain_add_32(error, &nmreq, RPCAUTH_NONE); /* flavor */
-		nfsm_chain_add_32(error, &nmreq, 0);            /* length */
+		                         
+		nfsm_chain_add_32(error, &nmreq, RPCAUTH_NONE);             
+		nfsm_chain_add_32(error, &nmreq, 0);                        
 		nfsm_chain_build_done(error, &nmreq);
 
-		/* Append the args mbufs */
+		                           
 		if (!error) {
 			error = mbuf_setnext(nmreq.nmc_mcur, mrest);
 		}
@@ -1269,9 +1269,9 @@ add_cred:
 		if (error == ENEEDAUTH) {
 			size_t count = nmp->nm_numgrps < NGROUPS ? nmp->nm_numgrps : NGROUPS;
 
-			/*
-			 * Use sec=sys for this user
-			 */
+			  
+                               
+      
 			error = 0;
 			req->r_auth = auth_type = RPCAUTH_SYS;
 			groupcount = get_auxiliary_groups(cred, grouplist, count);
@@ -1280,11 +1280,11 @@ add_cred:
 			goto add_cred;
 		}
 		break;
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	}
 	;
 
-	/* finish setting up the packet */
+	                                  
 	if (!error) {
 		error = mbuf_pkthdr_setrcvif(mreq, 0);
 	}
@@ -1294,7 +1294,7 @@ add_cred:
 		return error;
 	}
 
-	/* Calculate the size of the request */
+	                                       
 	reqlen = 0;
 	for (mb = nmreq.nmc_mhead; mb; mb = mbuf_next(mb)) {
 		reqlen += mbuf_len(mb);
@@ -1302,12 +1302,12 @@ add_cred:
 
 	mbuf_pkthdr_setlen(mreq, reqlen);
 
-	/*
-	 * If the request goes on a TCP stream,
-	 * set its size in the RPC record mark.
-	 * The record mark count doesn't include itself
-	 * and the last fragment bit is set.
-	 */
+	  
+                                        
+                                        
+                                                
+                                     
+    
 	if (sotype == SOCK_STREAM) {
 		nfsm_chain_set_recmark(error, &nmreq,
 		    (reqlen - NFSX_UNSIGNED) | 0x80000000);
@@ -1317,9 +1317,9 @@ add_cred:
 	return 0;
 }
 
-/*
- * Parse an NFS file attribute structure out of an mbuf chain.
- */
+  
+                                                              
+   
 int
 nfs_parsefattr(
 	__unused struct nfsmount *nmp,
@@ -1357,23 +1357,23 @@ nfs_parsefattr(
 	if (nfsvers == NFS_VER3) {
 		nvap->nva_type = vtype = nfstov_type(nvtype, nfsvers);
 	} else {
-		/*
-		 * The duplicate information returned in fa_type and fa_mode
-		 * is an ambiguity in the NFS version 2 protocol.
-		 *
-		 * VREG should be taken literally as a regular file.  If a
-		 * server intends to return some type information differently
-		 * in the upper bits of the mode field (e.g. for sockets, or
-		 * FIFOs), NFSv2 mandates fa_type to be VNON.  Anyway, we
-		 * leave the examination of the mode bits even in the VREG
-		 * case to avoid breakage for bogus servers, but we make sure
-		 * that there are actually type bits set in the upper part of
-		 * fa_mode (and failing that, trust the va_type field).
-		 *
-		 * NFSv3 cleared the issue, and requires fa_mode to not
-		 * contain any type information (while also introducing
-		 * sockets and FIFOs for fa_type).
-		 */
+		  
+                                                              
+                                                   
+    
+                                                            
+                                                               
+                                                              
+                                                           
+                                                            
+                                                               
+                                                               
+                                                         
+    
+                                                         
+                                                         
+                                    
+     
 		vtype = nfstov_type(nvtype, nfsvers);
 		if ((vtype == VNON) || ((vtype == VREG) && ((vmode & S_IFMT) != 0))) {
 			vtype = IFTOVT(vmode);
@@ -1403,7 +1403,7 @@ nfs_parsefattr(
 		nfsmout_if(error);
 		nvap->nva_rawdev.specdata1 = major(rdev);
 		nvap->nva_rawdev.specdata2 = minor(rdev);
-		nfsm_chain_get_32(error, nmc, val); /* blocks */
+		nfsm_chain_get_32(error, nmc, val);             
 		nfsmout_if(error);
 		nvap->nva_bytes = val * NFS_FABLKSIZE;
 		nfsm_chain_get_32(error, nmc, val);
@@ -1413,7 +1413,7 @@ nfs_parsefattr(
 		nfsm_chain_get_32(error, nmc, val);
 		nfsmout_if(error);
 		nvap->nva_fileid = (uint64_t)val;
-		/* Really ugly NFSv2 kludge. */
+		                               
 		if ((vtype == VCHR) && (rdev == (dev_t)0xffffffff)) {
 			nvap->nva_type = VFIFO;
 		}
@@ -1433,15 +1433,15 @@ nfsmout:
 }
 
 
-/*
- * Load the attribute cache (that lives in the nfsnode entry) with
- * the value pointed to by nvap, unless the file type in the attribute
- * cache doesn't match the file type in the nvap, in which case log a
- * warning and return ESTALE.
- *
- * If the dontshrink flag is set, then it's not safe to call ubc_setsize()
- * to shrink the size of the file.
- */
+  
+                                                                  
+                                                                      
+                                                                     
+                             
+  
+                                                                          
+                                  
+   
 int
 nfs_loadattrcache(
 	nfsnode_t np,
@@ -1477,16 +1477,16 @@ nfs_loadattrcache(
 	}
 
 	if (*xidp < np->n_xid) {
-		/*
-		 * We have already updated attributes with a response from
-		 * a later request.  The attributes we have here are probably
-		 * stale so we drop them (just return).  However, our
-		 * out-of-order receipt could be correct - if the requests were
-		 * processed out of order at the server.  Given the uncertainty
-		 * we invalidate our cached attributes.  *xidp is zeroed here
-		 * to indicate the attributes were dropped - only getattr
-		 * cares - it needs to retry the rpc.
-		 */
+		  
+                                                            
+                                                               
+                                                       
+                                                                 
+                                                                 
+                                                               
+                                                           
+                                       
+     
 		NATTRINVALIDATE(np);
 		FSDBG_BOT(527, 0, np, np->n_xid, *xidp);
 		*xidp = 0;
@@ -1494,27 +1494,27 @@ nfs_loadattrcache(
 	}
 
 	if (vp && (nvap->nva_type != vnode_vtype(vp))) {
-		/*
-		 * The filehandle has changed type on us.  This can be
-		 * caused by either the server not having unique filehandles
-		 * or because another client has removed the previous
-		 * filehandle and a new object (of a different type)
-		 * has been created with the same filehandle.
-		 *
-		 * We can't simply switch the type on the vnode because
-		 * there may be type-specific fields that need to be
-		 * cleaned up or set up.
-		 *
-		 * So, what should we do with this vnode?
-		 *
-		 * About the best we can do is log a warning and return
-		 * an error.  ESTALE is about the closest error, but it
-		 * is a little strange that we come up with this error
-		 * internally instead of simply passing it through from
-		 * the server.  Hopefully, the vnode will be reclaimed
-		 * soon so the filehandle can be reincarnated as the new
-		 * object type.
-		 */
+		  
+                                                        
+                                                              
+                                                       
+                                                      
+                                               
+    
+                                                         
+                                                      
+                          
+    
+                                           
+    
+                                                         
+                                                         
+                                                        
+                                                         
+                                                        
+                                                          
+                 
+     
 		printf("nfs loadattrcache vnode changed type, was %d now %d\n",
 		    vnode_vtype(vp), nvap->nva_type);
 		error = ESTALE;
@@ -1526,24 +1526,24 @@ nfs_loadattrcache(
 
 	npnvap = &np->n_vattr;
 
-	/*
-	 * The ACL cache needs special handling because it is not
-	 * always updated.  Save current ACL cache state so it can
-	 * be restored after copying the new attributes into place.
-	 */
+	  
+                                                          
+                                                           
+                                                            
+    
 	aclbit = NFS_BITMAP_ISSET(npnvap->nva_bitmap, NFS_FATTR_ACL);
 	acl = npnvap->nva_acl;
 
 	if (monitored) {
-		/*
-		 * For monitored nodes, check for attribute changes that should generate events.
-		 */
+		  
+                                                                                  
+     
 		if (NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_NUMLINKS) &&
 		    (nvap->nva_nlink != npnvap->nva_nlink)) {
 			events |= VNODE_EVENT_ATTRIB | VNODE_EVENT_LINK;
 		}
 		if (events & VNODE_EVENT_PERMS) {
-			/* no need to do all the checking if it's already set */;
+			                                                        ;
 		} else if (NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_MODE) &&
 		    (nvap->nva_mode != npnvap->nva_mode)) {
 			events |= VNODE_EVENT_ATTRIB | VNODE_EVENT_PERMS;
@@ -1569,7 +1569,7 @@ nfs_loadattrcache(
 			}
 #endif
 		}
-		if (/* Oh, C... */
+		if (              
 #if CONFIG_NFS4
 			((nmp->nm_vers >= NFS_VER4) && NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_CHANGE) && (nvap->nva_change != npnvap->nva_change)) ||
 #endif
@@ -1608,19 +1608,19 @@ nfs_loadattrcache(
 	}
 
 #if CONFIG_NFS4
-	/* Copy the attributes to the attribute cache */
+	                                                
 	if (nmp->nm_vers >= NFS_VER4 && npnvap->nva_flags & NFS_FFLAG_PARTIAL_WRITE) {
-		/*
-		 * NFSv4 WRITE RPCs contain partial GETATTR requests - only type, change, size, metadatatime and modifytime are requested.
-		 * In such cases,  we do not update the time stamp - but the requested attributes.
-		 */
+		  
+                                                                                                                            
+                                                                                    
+     
 		NFS_BITMAP_COPY_ATTR(nvap, npnvap, TYPE, type);
 		NFS_BITMAP_COPY_ATTR(nvap, npnvap, CHANGE, change);
 		NFS_BITMAP_COPY_ATTR(nvap, npnvap, SIZE, size);
 		NFS_BITMAP_COPY_TIME(nvap, npnvap, METADATA, CHANGE);
 		NFS_BITMAP_COPY_TIME(nvap, npnvap, MODIFY, MODIFY);
 	} else
-#endif /* CONFIG_NFS4 */
+#endif                  
 	{
 		bcopy((caddr_t)nvap, (caddr_t)npnvap, sizeof(*nvap));
 		microuptime(&now);
@@ -1628,7 +1628,7 @@ nfs_loadattrcache(
 	}
 
 	np->n_xid = *xidp;
-	/* NFS_FFLAG_IS_ATTR and NFS_FFLAG_TRIGGER_REFERRAL need to be sticky... */
+	                                                                           
 	if (vp && xattr) {
 		nvap->nva_flags |= xattr;
 	}
@@ -1637,14 +1637,14 @@ nfs_loadattrcache(
 	}
 
 	if (NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_ACL)) {
-		/* we're updating the ACL */
+		                            
 		if (nvap->nva_acl) {
-			/* make a copy of the acl for the cache */
+			                                          
 			npnvap->nva_acl = kauth_acl_alloc(nvap->nva_acl->acl_entrycount);
 			if (npnvap->nva_acl) {
 				bcopy(nvap->nva_acl, npnvap->nva_acl, KAUTH_ACL_COPYSIZE(nvap->nva_acl));
 			} else {
-				/* can't make a copy to cache, invalidate ACL cache */
+				                                                      
 				NFS_BITMAP_CLR(npnvap->nva_bitmap, NFS_FATTR_ACL);
 				NACLINVALIDATE(np);
 				aclbit = 0;
@@ -1656,10 +1656,10 @@ nfs_loadattrcache(
 		}
 	}
 	if (NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_ACL)) {
-		/* update the ACL timestamp */
+		                              
 		np->n_aclstamp = now.tv_sec;
 	} else {
-		/* we aren't updating the ACL, so restore original values */
+		                                                            
 		if (aclbit) {
 			NFS_BITMAP_SET(npnvap->nva_bitmap, NFS_FATTR_ACL);
 		}
@@ -1668,40 +1668,40 @@ nfs_loadattrcache(
 
 #if CONFIG_TRIGGERS
 #if CONFIG_NFS4
-	/*
-	 * For NFSv4, if the fsid doesn't match the fsid for the mount, then
-	 * this node is for a different file system on the server.  So we mark
-	 * this node as a trigger node that will trigger the mirror mount.
-	 */
+	  
+                                                                     
+                                                                       
+                                                                   
+    
 	if ((nmp->nm_vers >= NFS_VER4) && (nvap->nva_type == VDIR) &&
 	    ((np->n_vattr.nva_fsid.major != nmp->nm_fsid.major) ||
 	    (np->n_vattr.nva_fsid.minor != nmp->nm_fsid.minor))) {
 		np->n_vattr.nva_flags |= NFS_FFLAG_TRIGGER;
 	}
-#endif /* CONFIG_NFS4 */
-#endif /* CONFIG_TRIGGERS */
+#endif                  
+#endif                      
 
 	if (!vp || (nvap->nva_type != VREG)) {
 		np->n_size = nvap->nva_size;
 	} else if (nvap->nva_size != np->n_size) {
 		FSDBG(527, np, nvap->nva_size, np->n_size, (nvap->nva_type == VREG) | (np->n_flag & NMODIFIED ? 6 : 4));
 		if (!UBCINFOEXISTS(vp) || (dontshrink && (nvap->nva_size < np->n_size))) {
-			/* asked not to shrink, so stick with current size */
+			                                                     
 			FSDBG(527, np, np->n_size, np->n_vattr.nva_size, 0xf00d0001);
 			nvap->nva_size = np->n_size;
 			NATTRINVALIDATE(np);
 		} else if ((np->n_flag & NMODIFIED) && (nvap->nva_size < np->n_size)) {
-			/* if we've modified, stick with larger size */
+			                                               
 			FSDBG(527, np, np->n_size, np->n_vattr.nva_size, 0xf00d0002);
 			nvap->nva_size = np->n_size;
 			npnvap->nva_size = np->n_size;
 		} else {
-			/*
-			 * n_size is protected by the data lock, so we need to
-			 * defer updating it until it's safe.  We save the new size
-			 * and set a flag and it'll get updated the next time we get/drop
-			 * the data lock or the next time we do a getattr.
-			 */
+			  
+                                                         
+                                                              
+                                                                    
+                                                     
+      
 			np->n_newsize = nvap->nva_size;
 			SET(np->n_flag, NUPDATESIZE);
 			if (monitored) {
@@ -1729,10 +1729,10 @@ out:
 	return error;
 }
 
-/*
- * Calculate the attribute timeout based on
- * how recently the file has been modified.
- */
+  
+                                           
+                                           
+   
 long
 nfs_attrcachetimeout(nfsnode_t np)
 {
@@ -1749,17 +1749,17 @@ nfs_attrcachetimeout(nfsnode_t np)
 	isdir = vnode_isdir(NFSTOV(np));
 #if CONFIG_NFS4
 	if ((nmp->nm_vers >= NFS_VER4) && (np->n_openflags & N_DELEG_MASK)) {
-		/* If we have a delegation, we always use the max timeout. */
+		                                                             
 		timeo = isdir ? nmp->nm_acdirmax : nmp->nm_acregmax;
 	} else
 #endif
 	if ((np)->n_flag & NMODIFIED) {
-		/* If we have modifications, we always use the min timeout. */
+		                                                              
 		timeo = isdir ? nmp->nm_acdirmin : nmp->nm_acregmin;
 	} else {
-		/* Otherwise, we base the timeout on how old the file seems. */
-		/* Note that if the client and server clocks are way out of sync, */
-		/* timeout will probably get clamped to a min or max value */
+		                                                               
+		                                                                    
+		                                                             
 		microtime(&now);
 		timeo = (now.tv_sec - (np)->n_vattr.nva_timesec[NFSTIME_MODIFY]) / 10;
 		if (isdir) {
@@ -1780,12 +1780,12 @@ nfs_attrcachetimeout(nfsnode_t np)
 	return timeo;
 }
 
-/*
- * Check the attribute cache time stamp.
- * If the cache is valid, copy contents to *nvaper and return 0
- * otherwise return an error.
- * Must be called with the node locked.
- */
+  
+                                        
+                                                               
+                             
+                                       
+   
 int
 nfs_getattrcache(nfsnode_t np, struct nfs_vattr *nvaper, int flags)
 {
@@ -1794,7 +1794,7 @@ nfs_getattrcache(nfsnode_t np, struct nfs_vattr *nvaper, int flags)
 	long timeo;
 	struct nfsmount *nmp;
 
-	/* Check if the attributes are valid. */
+	                                        
 	if (!NATTRVALID(np) || ((flags & NGA_ACL) && !NACLVALID(np))) {
 		FSDBG(528, np, 0, 0xffffff01, ENOENT);
 		OSAddAtomic64(1, &nfsstats.attrcache_misses);
@@ -1805,11 +1805,11 @@ nfs_getattrcache(nfsnode_t np, struct nfs_vattr *nvaper, int flags)
 	if (nfs_mount_gone(nmp)) {
 		return ENXIO;
 	}
-	/*
-	 * Verify the cached attributes haven't timed out.
-	 * If the server isn't responding, skip the check
-	 * and return cached attributes.
-	 */
+	  
+                                                   
+                                                  
+                                 
+    
 	if (!nfs_use_cache(nmp)) {
 		microuptime(&nowup);
 		if (np->n_attrstamp > nowup.tv_sec) {
@@ -1841,15 +1841,15 @@ nfs_getattrcache(nfsnode_t np, struct nfs_vattr *nvaper, int flags)
 	} else if (nvap->nva_size != np->n_size) {
 		FSDBG(528, np, nvap->nva_size, np->n_size, (nvap->nva_type == VREG) | (np->n_flag & NMODIFIED ? 6 : 4));
 		if ((np->n_flag & NMODIFIED) && (nvap->nva_size < np->n_size)) {
-			/* if we've modified, stick with larger size */
+			                                               
 			nvap->nva_size = np->n_size;
 		} else {
-			/*
-			 * n_size is protected by the data lock, so we need to
-			 * defer updating it until it's safe.  We save the new size
-			 * and set a flag and it'll get updated the next time we get/drop
-			 * the data lock or the next time we do a getattr.
-			 */
+			  
+                                                         
+                                                              
+                                                                    
+                                                     
+      
 			np->n_newsize = nvap->nva_size;
 			SET(np->n_flag, NUPDATESIZE);
 		}
@@ -1880,11 +1880,11 @@ nfs_getattrcache(nfsnode_t np, struct nfs_vattr *nvaper, int flags)
 	return 0;
 }
 
-/*
- * When creating file system objects:
- * Don't bother setting UID if it's the same as the credential performing the create.
- * Don't bother setting GID if it's the same as the directory or credential.
- */
+  
+                                     
+                                                                                     
+                                                                            
+   
 void
 nfs_avoid_needless_id_setting_on_create(nfsnode_t dnp, struct vnode_attr *vap, vfs_context_t ctx)
 {
@@ -1903,38 +1903,38 @@ nfs_avoid_needless_id_setting_on_create(nfsnode_t dnp, struct vnode_attr *vap, v
 	}
 }
 
-/*
- * Convert a universal address string to a sockaddr structure.
- *
- * Universal addresses can be in the following formats:
- *
- * d = decimal (IPv4)
- * x = hexadecimal (IPv6)
- * p = port (decimal)
- *
- * d.d.d.d
- * d.d.d.d.p.p
- * x:x:x:x:x:x:x:x
- * x:x:x:x:x:x:x:x.p.p
- * x:x:x:x:x:x:d.d.d.d
- * x:x:x:x:x:x:d.d.d.d.p.p
- *
- * IPv6 strings can also have a series of zeroes elided
- * IPv6 strings can also have a %scope suffix at the end (after any port)
- *
- * rules & exceptions:
- * - value before : is hex
- * - value before . is dec
- * - once . hit, all values are dec
- * - hex+port case means value before first dot is actually hex
- * - . is always preceded by digits except if last hex was double-colon
- *
- * scan, converting #s to bytes
- * first time a . is encountered, scan the rest to count them.
- * 2 dots = just port
- * 3 dots = just IPv4 no port
- * 5 dots = IPv4 and port
- */
+  
+                                                              
+  
+                                                       
+  
+                     
+                         
+                     
+  
+          
+              
+                  
+                      
+                      
+                          
+  
+                                                       
+                                                                         
+  
+                      
+                          
+                          
+                                   
+                                                               
+                                                                       
+  
+                               
+                                                              
+                     
+                             
+                         
+   
 
 #define IS_DIGIT(C) \
 	(((C) >= '0') && ((C) <= '9'))
@@ -1947,21 +1947,21 @@ nfs_avoid_needless_id_setting_on_create(nfsnode_t dnp, struct vnode_attr *vap, v
 int
 nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 {
-	const char *p, *pd;     /* pointers to current character in scan */
-	const char *pnum;       /* pointer to current number to decode */
-	const char *pscope;     /* pointer to IPv6 scope ID */
-	uint8_t a[18];          /* octet array to store address bytes */
-	int i;                  /* index of next octet to decode */
-	int dci;                /* index of octet to insert double-colon zeroes */
-	int dcount, xdcount;    /* count of digits in current number */
-	int needmore;           /* set when we know we need more input (e.g. after colon, period) */
-	int dots;               /* # of dots */
-	int hex;                /* contains hex values */
-	unsigned long val;      /* decoded value */
-	int s;                  /* index used for sliding array to insert elided zeroes */
+	const char *p, *pd;                                                
+	const char *pnum;                                                
+	const char *pscope;                                   
+	uint8_t a[18];                                                  
+	int i;                                                     
+	int dci;                                                                  
+	int dcount, xdcount;                                           
+	int needmore;                                                                               
+	int dots;                              
+	int hex;                                         
+	unsigned long val;                         
+	int s;                                                                            
 
-	/* AF_LOCAL address are paths that start with '/' or are empty */
-	if (*uaddr == '/' || *uaddr == '\0') { /* AF_LOCAL address */
+	                                                                 
+	if (*uaddr == '/' || *uaddr == '\0') {                       
 		struct sockaddr_un *sun = (struct sockaddr_un *)addr;
 		sun->sun_family = AF_LOCAL;
 		sun->sun_len = sizeof(struct sockaddr_un);
@@ -1982,7 +1982,7 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 	        val = strtoul(pnum, NULL, ((TYPE) == DECIMALVALUE) ? 10 : 16); \
 	        if (((TYPE) == DECIMALVALUE) && (val >= 256)) \
 	                return (0); \
-	/* check if there is room left in the array */ \
+	                                               \
 	        if (i > (int)(sizeof(a) - (((TYPE) == HEXVALUE) ? 2 : 1) - ((dci != -1) ? 2 : 0))) \
 	                return (0); \
 	        if ((TYPE) == HEXVALUE) \
@@ -1997,7 +1997,7 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 	pnum = p = uaddr;
 	pscope = NULL;
 	needmore = 1;
-	if ((*p == ':') && (*++p != ':')) { /* if it starts with colon, gotta be a double */
+	if ((*p == ':') && (*++p != ':')) {                                                 
 		return 0;
 	}
 
@@ -2010,9 +2010,9 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 			needmore = 0;
 			p++;
 		} else if (*p == '.') {
-			/* rest is decimal IPv4 dotted quad and/or port */
+			                                                  
 			if (!dots) {
-				/* this is the first, so count them */
+				                                      
 				for (pd = p; *pd; pd++) {
 					if (*pd == '.') {
 						if (++dots > 5) {
@@ -2027,11 +2027,11 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 				if ((dots != 2) && (dots != 3) && (dots != 5)) {
 					return 0;
 				}
-				if (hex && (dots == 2)) { /* hex+port */
+				if (hex && (dots == 2)) {               
 					if (!dcount && needmore) {
 						return 0;
 					}
-					if (dcount) { /* last hex may be elided zero */
+					if (dcount) {                                  
 						GET(HEXVALUE);
 					}
 				} else {
@@ -2048,8 +2048,8 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 			if (dots) {
 				return 0;
 			}
-			if (!dcount) { /* missing number, probably double colon */
-				if (dci >= 0) { /* can only have one double colon */
+			if (!dcount) {                                            
+				if (dci >= 0) {                                     
 					return 0;
 				}
 				dci = i;
@@ -2060,45 +2060,45 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 				needmore = 1;
 			}
 			pnum = ++p;
-		} else if (*p == '%') { /* scope ID delimiter */
+		} else if (*p == '%') {                         
 			if (!hex) {
 				return 0;
 			}
 			p++;
 			pscope = p;
 			break;
-		} else { /* unexpected character */
+		} else {                           
 			return 0;
 		}
 	}
 	if (needmore && !dcount) {
 		return 0;
 	}
-	if (dcount) { /* decode trailing number */
+	if (dcount) {                             
 		GET(dots ? DECIMALVALUE : HEXVALUE);
 	}
-	if (dci >= 0) {  /* got a double-colon at i, need to insert a range of zeroes */
-		/* if we got a port, slide to end of array */
-		/* otherwise, slide to end of address (non-port) values */
+	if (dci >= 0) {                                                                 
+		                                             
+		                                                          
 		int end = ((dots == 2) || (dots == 5)) ? sizeof(a) : (sizeof(a) - 2);
-		if (i % 2) { /* length of zero range must be multiple of 2 */
+		if (i % 2) {                                                 
 			return 0;
 		}
-		if (i >= end) { /* no room? */
+		if (i >= end) {               
 			return 0;
 		}
-		/* slide (i-dci) numbers up from index dci */
+		                                             
 		for (s = 0; s < (i - dci); s++) {
 			a[end - 1 - s] = a[i - 1 - s];
 		}
-		/* zero (end-i) numbers at index dci */
+		                                       
 		for (s = 0; s < (end - i); s++) {
 			a[dci + s] = 0;
 		}
 		i = end;
 	}
 
-	/* copy out resulting socket address */
+	                                       
 	if (hex) {
 		struct sockaddr_in6 *sin6 = (struct sockaddr_in6*)addr;
 		if ((((dots == 0) || (dots == 3)) && (i != (sizeof(a) - 2)))) {
@@ -2118,7 +2118,7 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 			for (p = pscope; IS_DIGIT(*p); p++) {
 				;
 			}
-			if (*p && !IS_DIGIT(*p)) { /* name */
+			if (*p && !IS_DIGIT(*p)) {           
 				ifnet_t interface = NULL;
 				if (ifnet_find_by_name(pscope, &interface) == 0) {
 					sin6->sin6_scope_id = ifnet_index(interface);
@@ -2126,10 +2126,10 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 				if (interface) {
 					ifnet_release(interface);
 				}
-			} else { /* decimal number */
+			} else {                     
 				sin6->sin6_scope_id = (uint32_t)strtoul(pscope, NULL, 10);
 			}
-			/* XXX should we also embed scope id for linklocal? */
+			                                                      
 		}
 	} else {
 		struct sockaddr_in *sin = (struct sockaddr_in*)addr;
@@ -2154,7 +2154,7 @@ nfs_uaddr2sockaddr(const char *uaddr, struct sockaddr *addr)
 }
 
 
-/* NFS Client debugging support */
+                                  
 uint32_t nfs_debug_ctl;
 
 #include <libkern/libkern.h>
@@ -2214,17 +2214,17 @@ nfs_dump_mbuf(const char *func, int lineno, const char *msg, mbuf_t mb)
 	}
 }
 
-/* Is a mount gone away? */
+                           
 int
 nfs_mount_gone(struct nfsmount *nmp)
 {
 	return !nmp || vfs_isforce(nmp->nm_mountp) || (nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD));
 }
 
-/*
- * Return some of the more significant mount options
- * as a string, e.g. "'ro,hard,intr,tcp,vers=3,sec=krb5,deadtimeout=0'
- */
+  
+                                                    
+                                                                      
+   
 int
 nfs_mountopts(struct nfsmount *nmp, char *buf, int buflen)
 {
@@ -2248,12 +2248,12 @@ nfs_mountopts(struct nfsmount *nmp, char *buf, int buflen)
 	return c > buflen ? ENOMEM : 0;
 }
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        
 
-/*
- * Schedule a callout thread to run an NFS timer function
- * interval milliseconds in the future.
- */
+  
+                                                         
+                                       
+   
 void
 nfs_interval_timer_start(thread_call_t call, time_t interval)
 {
@@ -2276,9 +2276,9 @@ struct nfs_user_stat_node *nfsrv_get_user_stat_node(struct nfs_active_user_list 
 void nfsrv_init_user_list(struct nfs_active_user_list *);
 void nfsrv_free_user_list(struct nfs_active_user_list *);
 
-/*
- * add NFSv3 WCC data to an mbuf chain
- */
+  
+                                      
+   
 int
 nfsm_chain_add_wcc_data_f(
 	struct nfsrv_descript *nd,
@@ -2303,10 +2303,10 @@ nfsm_chain_add_wcc_data_f(
 	return error;
 }
 
-/*
- * Extract a lookup path from the given mbufs and store it in
- * a newly allocated buffer saved in the given nameidata structure.
- */
+  
+                                                             
+                                                                   
+   
 int
 nfsm_chain_get_path_namei(
 	struct nfsm_chain *nmc,
@@ -2321,15 +2321,15 @@ nfsm_chain_get_path_namei(
 		return ENAMETOOLONG;
 	}
 
-	/*
-	 * Get a buffer for the name to be translated, and copy the
-	 * name into the buffer.
-	 */
+	  
+                                                            
+                         
+    
 	cnp->cn_pnbuf = zalloc(ZV_NAMEI);
 	cnp->cn_pnlen = MAXPATHLEN;
 	cnp->cn_flags |= HASBUF;
 
-	/* Copy the name from the mbuf list to the string */
+	                                                    
 	cp = cnp->cn_pnbuf;
 	nfsm_chain_get_opaque(error, nmc, len, cp);
 	if (error) {
@@ -2337,7 +2337,7 @@ nfsm_chain_get_path_namei(
 	}
 	cnp->cn_pnbuf[len] = '\0';
 
-	/* sanity check the string */
+	                             
 	if ((strlen(cp) != len) || strchr(cp, '/')) {
 		error = EACCES;
 	}
@@ -2353,9 +2353,9 @@ out:
 	return error;
 }
 
-/*
- * Set up nameidata for a lookup() call and do it.
- */
+  
+                                                  
+   
 int
 nfsrv_namei(
 	struct nfsrv_descript *nd,
@@ -2374,9 +2374,9 @@ nfsrv_namei(
 
 	*retdirp = NULL;
 
-	/*
-	 * Extract and set starting directory.
-	 */
+	  
+                                       
+    
 	error = nfsrv_fhtovp(nfhp, nd, &dp, nxp, nxop);
 	if (error) {
 		goto out;
@@ -2400,10 +2400,10 @@ nfsrv_namei(
 	nip->ni_usedvp = nip->ni_startdir = dp;
 	nip->ni_rootdir = rootvnode;
 
-	/*
-	 * And call lookup() to do the real work
-	 */
-	cnflags = nip->ni_cnd.cn_flags; /* store in case we have to restore */
+	  
+                                         
+    
+	cnflags = nip->ni_cnd.cn_flags;                                       
 	while ((error = lookup(nip)) == ERECYCLE) {
 		nip->ni_cnd.cn_flags = cnflags;
 		cnp->cn_nameptr = cnp->cn_pnbuf;
@@ -2413,7 +2413,7 @@ nfsrv_namei(
 		goto out;
 	}
 
-	/* Check for encountering a symbolic link */
+	                                            
 	if (cnp->cn_flags & ISSYMLINK) {
 		if (cnp->cn_flags & (LOCKPARENT | WANTPARENT)) {
 			vnode_put(nip->ni_dvp);
@@ -2434,10 +2434,10 @@ out:
 	return error;
 }
 
-/*
- * A fiddled version of m_adj() that ensures null fill to a 4-byte
- * boundary and only trims off the back end
- */
+  
+                                                                  
+                                           
+   
 void
 nfsm_adj(mbuf_t mp, int len, int nul)
 {
@@ -2446,13 +2446,13 @@ nfsm_adj(mbuf_t mp, int len, int nul)
 	long mlen;
 	char *cp;
 
-	/*
-	 * Trim from tail.  Scan the mbuf chain,
-	 * calculating its length and finding the last mbuf.
-	 * If the adjustment only affects this mbuf, then just
-	 * adjust and return.  Otherwise, rescan and truncate
-	 * after the remaining size.
-	 */
+	  
+                                         
+                                                     
+                                                       
+                                                      
+                             
+    
 	count = 0;
 	m = mp;
 	for (;;) {
@@ -2479,11 +2479,11 @@ nfsm_adj(mbuf_t mp, int len, int nul)
 	if (count < 0) {
 		count = 0;
 	}
-	/*
-	 * Correct length for chain is "count".
-	 * Find the mbuf with last data, adjust its length,
-	 * and toss data from remaining mbufs on chain.
-	 */
+	  
+                                        
+                                                    
+                                                
+    
 	for (m = mp; m; m = mbuf_next(m)) {
 		mlen = mbuf_len(m);
 		if (mlen >= count) {
@@ -2504,10 +2504,10 @@ nfsm_adj(mbuf_t mp, int len, int nul)
 	}
 }
 
-/*
- * Trim the header out of the mbuf list and trim off any trailing
- * junk so that the mbuf list has only the write data.
- */
+  
+                                                                 
+                                                      
+   
 int
 nfsm_chain_trim_data(struct nfsm_chain *nmc, int len, int *mlen)
 {
@@ -2520,7 +2520,7 @@ nfsm_chain_trim_data(struct nfsm_chain *nmc, int len, int *mlen)
 		*mlen = 0;
 	}
 
-	/* trim header */
+	                 
 	for (m = nmc->nmc_mhead; m && (m != nmc->nmc_mcur); m = mbuf_next(m)) {
 		mbuf_setlen(m, 0);
 	}
@@ -2528,7 +2528,7 @@ nfsm_chain_trim_data(struct nfsm_chain *nmc, int len, int *mlen)
 		return EIO;
 	}
 
-	/* trim current mbuf */
+	                       
 	data = mbuf_data(m);
 	dlen = mbuf_len(m);
 	adjust = nmc->nmc_ptr - data;
@@ -2541,12 +2541,12 @@ nfsm_chain_trim_data(struct nfsm_chain *nmc, int len, int *mlen)
 		mbuf_setlen(m, dlen);
 	}
 
-	/* skip next len bytes  */
+	                          
 	for (; m && (cnt < len); m = mbuf_next(m)) {
 		dlen = mbuf_len(m);
 		cnt += dlen;
 		if (cnt > len) {
-			/* truncate to end of data */
+			                             
 			mbuf_setlen(m, dlen - (cnt - len));
 			if (m == nmc->nmc_mcur) {
 				nmc->nmc_left -= (cnt - len);
@@ -2558,7 +2558,7 @@ nfsm_chain_trim_data(struct nfsm_chain *nmc, int len, int *mlen)
 		*mlen = cnt;
 	}
 
-	/* trim any trailing data */
+	                            
 	if (m == nmc->nmc_mcur) {
 		nmc->nmc_left = 0;
 	}
@@ -2577,7 +2577,7 @@ nfsm_chain_add_fattr(
 {
 	int error = 0;
 
-	// XXX Should we assert here that all fields are supported?
+	                                                           
 
 	nfsm_chain_add_32(error, nmc, vtonfs_type(vap->va_type, nd->nd_vers));
 	if (nd->nd_vers == NFS_VER3) {
@@ -2626,15 +2626,15 @@ nfsm_chain_get_sattr(
 	struct timespec now;
 
 	if (nd->nd_vers == NFS_VER2) {
-		/*
-		 * There is/was a bug in the Sun client that puts 0xffff in the mode
-		 * field of sattr when it should put in 0xffffffff.  The u_short
-		 * doesn't sign extend.  So check the low order 2 bytes for 0xffff.
-		 */
+		  
+                                                                      
+                                                                  
+                                                                     
+     
 		nfsm_chain_get_32(error, nmc, val);
 		if ((val & 0xffff) != 0xffff) {
 			VATTR_SET(vap, va_mode, val & 07777);
-			/* save the "type" bits for NFSv2 create */
+			                                           
 			VATTR_SET(vap, va_type, IFTOVT(val));
 			VATTR_CLEAR_ACTIVE(vap, va_type);
 		}
@@ -2646,7 +2646,7 @@ nfsm_chain_get_sattr(
 		if (val != (uint32_t)-1) {
 			VATTR_SET(vap, va_gid, val);
 		}
-		/* save the "size" bits for NFSv2 create (even if they appear unset) */
+		                                                                       
 		nfsm_chain_get_32(error, nmc, val);
 		VATTR_SET(vap, va_data_size, val);
 		if (val == (uint32_t)-1) {
@@ -2667,7 +2667,7 @@ nfsm_chain_get_sattr(
 		return error;
 	}
 
-	/* NFSv3 */
+	           
 	nfsm_chain_get_32(error, nmc, val);
 	if (val) {
 		nfsm_chain_get_32(error, nmc, val);
@@ -2723,9 +2723,9 @@ nfsm_chain_get_sattr(
 	return error;
 }
 
-/*
- * Compare two security flavor structs
- */
+  
+                                      
+   
 int
 nfsrv_cmp_secflavs(struct nfs_sec *sf1, struct nfs_sec *sf2)
 {
@@ -2742,10 +2742,10 @@ nfsrv_cmp_secflavs(struct nfs_sec *sf1, struct nfs_sec *sf2)
 	return 0;
 }
 
-/*
- * Build hash lists of net addresses and hang them off the NFS export.
- * Called by nfsrv_export() to set up the lists of export addresses.
- */
+  
+                                                                      
+                                                                    
+   
 int
 nfsrv_hang_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 {
@@ -2795,7 +2795,7 @@ nfsrv_hang_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 		}
 
 		if (nxna.nxna_addr.ss_len == 0) {
-			/* No address means this is a default/world export */
+			                                                     
 			if (nx->nx_flags & NX_DEFAULTEXPORT) {
 				if (IS_VALID_CRED(cred)) {
 					kauth_cred_unref(&cred);
@@ -2834,10 +2834,10 @@ nfsrv_hang_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 		}
 		sa_family_t family = saddr->sa_family;
 		if ((rnh = nx->nx_rtable[family]) == 0) {
-			/*
-			 * Seems silly to initialize every AF when most are not
-			 * used, do so on demand here
-			 */
+			  
+                                                          
+                                
+      
 			TAILQ_FOREACH(dom, &domains, dom_entry) {
 				if (dom->dom_family == family && dom->dom_rtattach) {
 					dom->dom_rtattach((void **)&nx->nx_rtable[family],
@@ -2855,14 +2855,14 @@ nfsrv_hang_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 		}
 		rn = (*rnh->rnh_addaddr)((caddr_t)saddr, (caddr_t)smask, rnh, no->no_rnodes);
 		if (rn == 0) {
-			/*
-			 * One of the reasons that rnh_addaddr may fail is that
-			 * the entry already exists. To check for this case, we
-			 * look up the entry to see if it is there. If so, we
-			 * do not need to make a new entry but do continue.
-			 *
-			 * XXX should this be rnh_lookup() instead?
-			 */
+			  
+                                                          
+                                                          
+                                                        
+                                                      
+     
+                                              
+      
 			int matched = 0;
 			rn = (*rnh->rnh_matchaddr)((caddr_t)saddr, rnh);
 			rn_no = (struct nfs_netopt *)rn;
@@ -2871,22 +2871,22 @@ nfsrv_hang_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 			    (!nfsrv_cmp_secflavs(&rn_no->no_opt.nxo_sec, &nxna.nxna_sec))) {
 				kauth_cred_t cred2 = rn_no->no_opt.nxo_cred;
 				if (cred == cred2) {
-					/* creds are same (or both NULL) */
+					                                   
 					matched = 1;
 				} else if (cred && cred2 && (kauth_cred_getuid(cred) == kauth_cred_getuid(cred2))) {
-					/*
-					 * Now compare the effective and
-					 * supplementary groups...
-					 *
-					 * Note: This comparison, as written,
-					 * does not correctly indicate that
-					 * the groups are equivalent, since
-					 * other than the first supplementary
-					 * group, which is also the effective
-					 * group, order on the remaining groups
-					 * doesn't matter, and this is an
-					 * ordered compare.
-					 */
+					  
+                                     
+                               
+       
+                                          
+                                        
+                                        
+                                          
+                                          
+                                            
+                                      
+                        
+        
 					gid_t groups[NGROUPS];
 					gid_t groups2[NGROUPS];
 					size_t groupcount = NGROUPS;
@@ -2921,11 +2921,11 @@ nfsrv_hang_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 	return 0;
 }
 
-/*
- * In order to properly track an export's netopt count, we need to pass
- * an additional argument to nfsrv_free_netopt() so that it can decrement
- * the export's netopt count.
- */
+  
+                                                                       
+                                                                         
+                             
+   
 struct nfsrv_free_netopt_arg {
 	uint32_t *cnt;
 	struct radix_node_head *rnh;
@@ -2948,9 +2948,9 @@ nfsrv_free_netopt(struct radix_node *rn, void *w)
 	return 0;
 }
 
-/*
- * Free the net address hash lists that are hanging off the mount points.
- */
+  
+                                                                         
+   
 int
 nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 {
@@ -2965,7 +2965,7 @@ nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 	int i, error;
 
 	if (!unxa || !unxa->nxa_netcount) {
-		/* delete everything */
+		                       
 		for (i = 0; i <= AF_MAX; i++) {
 			if ((rnh = nx->nx_rtable[i])) {
 				fna.rnh = rnh;
@@ -2978,7 +2978,7 @@ nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 		return 0;
 	}
 
-	/* delete only the exports specified */
+	                                       
 	uaddr = unxa->nxa_nets;
 	ss_minsize = sizeof(((struct sockaddr_storage *)0)->ss_len) + sizeof(((struct sockaddr_storage *)0)->ss_family);
 	for (net = 0; net < unxa->nxa_netcount; net++, uaddr += sizeof(nxna)) {
@@ -2988,7 +2988,7 @@ nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 		}
 
 		if (nxna.nxna_addr.ss_len == 0) {
-			/* No address means this is a default/world export */
+			                                                     
 			if (nx->nx_flags & NX_DEFAULTEXPORT) {
 				nx->nx_flags &= ~NX_DEFAULTEXPORT;
 				if (IS_VALID_CRED(nx->nx_defopt.nxo_cred)) {
@@ -3014,7 +3014,7 @@ nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 		}
 
 		if ((rnh = nx->nx_rtable[nxna.nxna_addr.ss_family]) == 0) {
-			/* AF not initialized? */
+			                         
 			if (!(unxa->nxa_flags & NXA_ADD)) {
 				printf("nfsrv_free_addrlist: address not found (0)\n");
 			}
@@ -3039,7 +3039,7 @@ nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 
 		nx->nx_expcnt--;
 		if (nx->nx_expcnt == ((nx->nx_flags & NX_DEFAULTEXPORT) ? 1 : 0)) {
-			/* no more entries in rnh, so free it up */
+			                                           
 			_FREE((caddr_t)rnh, M_RTABLE);
 			nx->nx_rtable[nxna.nxna_addr.ss_family] = 0;
 		}
@@ -3048,9 +3048,9 @@ nfsrv_free_addrlist(struct nfs_export *nx, struct user_nfs_export_args *unxa)
 	return 0;
 }
 
-void enablequotas(struct mount *mp, vfs_context_t ctx); // XXX
+void enablequotas(struct mount *mp, vfs_context_t ctx);       
 
-#define DATA_VOLUME_MP "/System/Volumes/Data" // PLATFORM_DATA_VOLUME_MOUNT_POINT
+#define DATA_VOLUME_MP "/System/Volumes/Data"                                    
 
 int
 nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
@@ -3070,7 +3070,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 	size_t datavol_len = strlen(DATA_VOLUME_MP);
 
 	if (unxa->nxa_flags == NXA_CHECK) {
-		/* just check if the path is an NFS-exportable file system */
+		                                                             
 		error = copyinstr(unxa->nxa_fspath, path, MAXPATHLEN, &pathlen);
 		if (error) {
 			return error;
@@ -3083,11 +3083,11 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 		}
 		mvp = mnd.ni_vp;
 		mp = vnode_mount(mvp);
-		/* make sure it's the root of a file system */
+		                                              
 		if (!vnode_isvroot(mvp)) {
 			error = EINVAL;
 		}
-		/* make sure the file system is NFS-exportable */
+		                                                 
 		if (!error) {
 			nfh.nfh_len = NFSV3_MAX_FID_SIZE;
 			error = VFS_VPTOFH(mvp, (int*)&nfh.nfh_len, &nfh.nfh_fid[0], NULL);
@@ -3103,13 +3103,13 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 		return error;
 	}
 
-	/* all other operations: must be super user */
+	                                              
 	if ((error = vfs_context_suser(ctx))) {
 		return error;
 	}
 
 	if (unxa->nxa_flags & NXA_DELETE_ALL) {
-		/* delete all exports on all file systems */
+		                                            
 		lck_rw_lock_exclusive(&nfsrv_export_rwlock);
 		while ((nxfs = LIST_FIRST(&nfsrv_exports))) {
 			mp = vfs_getvfs_by_mntonname(nxfs->nxfs_path);
@@ -3118,17 +3118,17 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				mount_iterdrop(mp);
 				mp = NULL;
 			}
-			/* delete all exports on this file system */
+			                                            
 			while ((nx = LIST_FIRST(&nxfs->nxfs_exports))) {
 				LIST_REMOVE(nx, nx_next);
 				LIST_REMOVE(nx, nx_hash);
-				/* delete all netopts for this export */
+				                                        
 				nfsrv_free_addrlist(nx, NULL);
 				nx->nx_flags &= ~NX_DEFAULTEXPORT;
 				if (IS_VALID_CRED(nx->nx_defopt.nxo_cred)) {
 					kauth_cred_unref(&nx->nx_defopt.nxo_cred);
 				}
-				/* free active user list for this export */
+				                                           
 				nfsrv_free_user_list(&nx->nx_user_list);
 				FREE(nx->nx_path, M_TEMP);
 				FREE(nx, M_TEMP);
@@ -3138,7 +3138,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			FREE(nxfs, M_TEMP);
 		}
 		if (nfsrv_export_hashtbl) {
-			/* all exports deleted, clean up export hash table */
+			                                                     
 			FREE(nfsrv_export_hashtbl, M_TEMP);
 			nfsrv_export_hashtbl = NULL;
 		}
@@ -3153,7 +3153,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 
 	lck_rw_lock_exclusive(&nfsrv_export_rwlock);
 
-	/* init export hash table if not already */
+	                                           
 	if (!nfsrv_export_hashtbl) {
 		if (nfsrv_export_hash_size <= 0) {
 			nfsrv_export_hash_size = NFSRVEXPHASHSZ;
@@ -3161,21 +3161,21 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 		nfsrv_export_hashtbl = hashinit(nfsrv_export_hash_size, M_TEMP, &nfsrv_export_hash);
 	}
 
-	// first check if we've already got an exportfs with the given ID
+	                                                                 
 	LIST_FOREACH(nxfs, &nfsrv_exports, nxfs_next) {
 		if (nxfs->nxfs_id == unxa->nxa_fsid) {
 			break;
 		}
 	}
 	if (nxfs) {
-		/* verify exported FS path matches given path */
+		                                                
 		if (strncmp(path, nxfs->nxfs_path, MAXPATHLEN) &&
 		    (strncmp(path, DATA_VOLUME_MP, datavol_len) || strncmp(path + datavol_len, nxfs->nxfs_path, MAXPATHLEN - datavol_len))) {
 			error = EEXIST;
 			goto unlock_out;
 		}
 		if ((unxa->nxa_flags & (NXA_ADD | NXA_OFFLINE)) == NXA_ADD) {
-			/* find exported FS root vnode */
+			                                 
 			NDINIT(&mnd, LOOKUP, OP_LOOKUP, FOLLOW | LOCKLEAF | AUDITVNPATH1,
 			    UIO_SYSSPACE, CAST_USER_ADDR_T(nxfs->nxfs_path), ctx);
 			error = namei(&mnd);
@@ -3183,15 +3183,15 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				goto unlock_out;
 			}
 			mvp = mnd.ni_vp;
-			/* make sure it's (still) the root of a file system */
+			                                                      
 			if (!vnode_isvroot(mvp)) {
 				error = EINVAL;
 				goto out;
 			}
-			/* if adding, verify that the mount is still what we expect */
+			                                                              
 			mp = vfs_getvfs_by_mntonname(nxfs->nxfs_path);
 			if (!mp) {
-				/* check for firmlink-free path */
+				                                  
 				if (vn_getpath_no_firmlink(mvp, fl_pathbuff, &fl_pathbuff_len) == 0 &&
 				    fl_pathbuff_len > 0 &&
 				    !strncmp(nxfs->nxfs_path, fl_pathbuff, MAXPATHLEN)) {
@@ -3202,20 +3202,20 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				mount_ref(mp, 0);
 				mount_iterdrop(mp);
 			}
-			/* sanity check: this should be same mount */
+			                                             
 			if (mp != vnode_mount(mvp)) {
 				error = EINVAL;
 				goto out;
 			}
 		}
 	} else {
-		/* no current exported file system with that ID */
+		                                                  
 		if (!(unxa->nxa_flags & NXA_ADD)) {
 			error = ENOENT;
 			goto unlock_out;
 		}
 
-		/* find exported FS root vnode */
+		                                 
 		NDINIT(&mnd, LOOKUP, OP_LOOKUP, FOLLOW | LOCKLEAF | AUDITVNPATH1,
 		    UIO_SYSSPACE, CAST_USER_ADDR_T(path), ctx);
 		error = namei(&mnd);
@@ -3225,9 +3225,9 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			}
 		} else {
 			mvp = mnd.ni_vp;
-			/* make sure it's the root of a file system */
+			                                              
 			if (!vnode_isvroot(mvp)) {
-				/* bail if not marked offline */
+				                                
 				if (!(unxa->nxa_flags & NXA_OFFLINE)) {
 					error = EINVAL;
 					goto out;
@@ -3239,7 +3239,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				mp = vnode_mount(mvp);
 				mount_ref(mp, 0);
 
-				/* make sure the file system is NFS-exportable */
+				                                                 
 				nfh.nfh_len = NFSV3_MAX_FID_SIZE;
 				error = VFS_VPTOFH(mvp, (int*)&nfh.nfh_len, &nfh.nfh_fid[0], NULL);
 				if (!error && (nfh.nfh_len > (int)NFSV3_MAX_FID_SIZE)) {
@@ -3254,7 +3254,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			}
 		}
 
-		/* add an exportfs for it */
+		                            
 		MALLOC(nxfs, struct nfs_exportfs *, sizeof(struct nfs_exportfs), M_TEMP, M_WAITOK);
 		if (!nxfs) {
 			error = ENOMEM;
@@ -3276,7 +3276,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			goto out;
 		}
 		bcopy(nxfs_path, nxfs->nxfs_path, nxfs_pathlen);
-		/* insert into list in reverse-sorted order */
+		                                              
 		nxfs3 = NULL;
 		LIST_FOREACH(nxfs2, &nfsrv_exports, nxfs_next) {
 			if (strncmp(nxfs->nxfs_path, nxfs2->nxfs_path, MAXPATHLEN) > 0) {
@@ -3292,7 +3292,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			LIST_INSERT_HEAD(&nfsrv_exports, nxfs, nxfs_next);
 		}
 
-		/* make sure any quotas are enabled before we export the file system */
+		                                                                       
 		if (mp) {
 			enablequotas(mp, ctx);
 		}
@@ -3309,18 +3309,18 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			}
 		}
 		if (nx) {
-			/* verify exported FS path matches given path */
+			                                                
 			if (strncmp(path, nx->nx_path, MAXPATHLEN)) {
 				error = EEXIST;
 				goto out;
 			}
 		} else {
-			/* no current export with that ID */
+			                                    
 			if (!(unxa->nxa_flags & NXA_ADD)) {
 				error = ENOENT;
 				goto out;
 			}
-			/* add an export for it */
+			                          
 			MALLOC(nx, struct nfs_export *, sizeof(struct nfs_export), M_TEMP, M_WAITOK);
 			if (!nx) {
 				error = ENOMEM;
@@ -3338,9 +3338,9 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				goto out1;
 			}
 			bcopy(path, nx->nx_path, pathlen);
-			/* initialize the active user list */
+			                                     
 			nfsrv_init_user_list(&nx->nx_user_list);
-			/* insert into list in reverse-sorted order */
+			                                              
 			nx3 = NULL;
 			LIST_FOREACH(nx2, &nxfs->nxfs_exports, nx_next) {
 				if (strncmp(nx->nx_path, nx2->nx_path, MAXPATHLEN) > 0) {
@@ -3355,14 +3355,14 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			} else {
 				LIST_INSERT_HEAD(&nxfs->nxfs_exports, nx, nx_next);
 			}
-			/* insert into hash */
+			                      
 			LIST_INSERT_HEAD(NFSRVEXPHASH(nxfs->nxfs_id, nx->nx_id), nx, nx_hash);
 
-			/*
-			 * We don't allow/support nested exports.  Check if the new entry
-			 * nests with the entries before and after or if there's an
-			 * entry for the file system root and subdirs.
-			 */
+			  
+                                                                    
+                                                              
+                                                 
+      
 			error = 0;
 			if ((nx3 && !strncmp(nx3->nx_path, nx->nx_path, pathlen - 1) &&
 			    (nx3->nx_path[pathlen - 1] == '/')) ||
@@ -3371,7 +3371,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				error = EINVAL;
 			}
 			if (!error) {
-				/* check export conflict with fs root export and vice versa */
+				                                                              
 				expisroot = !nx->nx_path[0] ||
 				    ((nx->nx_path[0] == '.') && !nx->nx_path[1]);
 				LIST_FOREACH(nx2, &nxfs->nxfs_exports, nx_next) {
@@ -3390,25 +3390,25 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 				}
 			}
 			if (error) {
-				/*
-				 * Don't actually return an error because mountd is
-				 * probably about to delete the conflicting export.
-				 * This can happen when a new export momentarily conflicts
-				 * with an old export while the transition is being made.
-				 * Theoretically, mountd could be written to avoid this
-				 * transient situation - but it would greatly increase the
-				 * complexity of mountd for very little overall benefit.
-				 */
+				  
+                                                       
+                                                       
+                                                              
+                                                             
+                                                           
+                                                              
+                                                            
+       
 				printf("nfsrv_export: warning: nested exports: %s/%s\n",
 				    nxfs->nxfs_path, nx->nx_path);
 				error = 0;
 			}
 			nx->nx_fh.nfh_xh.nxh_flags = NXHF_INVALIDFH;
 		}
-		/* make sure file handle is set up */
+		                                     
 		if ((nx->nx_fh.nfh_xh.nxh_version != htonl(NFS_FH_VERSION)) ||
 		    (nx->nx_fh.nfh_xh.nxh_flags & NXHF_INVALIDFH)) {
-			/* try to set up export root file handle */
+			                                           
 			nx->nx_fh.nfh_xh.nxh_version = htonl(NFS_FH_VERSION);
 			nx->nx_fh.nfh_xh.nxh_fsid = htonl(nx->nx_fs->nxfs_id);
 			nx->nx_fh.nfh_xh.nxh_expid = htonl(nx->nx_id);
@@ -3417,9 +3417,9 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 			nx->nx_fh.nfh_fhp = (u_char*)&nx->nx_fh.nfh_xh;
 			bzero(&nx->nx_fh.nfh_fid[0], NFSV2_MAX_FID_SIZE);
 			if (mvp) {
-				/* find export root vnode */
+				                            
 				if (!nx->nx_path[0] || ((nx->nx_path[0] == '.') && !nx->nx_path[1])) {
-					/* exporting file system's root directory */
+					                                            
 					xvp = mvp;
 					vnode_get(xvp);
 				} else {
@@ -3428,7 +3428,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 					xnd.ni_op = OP_LOOKUP;
 #endif
 					xnd.ni_cnd.cn_flags = LOCKLEAF;
-					xnd.ni_pathlen = (uint32_t)pathlen - 1; // pathlen max value is equal to MAXPATHLEN
+					xnd.ni_pathlen = (uint32_t)pathlen - 1;                                            
 					xnd.ni_cnd.cn_nameptr = xnd.ni_cnd.cn_pnbuf = path;
 					xnd.ni_startdir = mvp;
 					xnd.ni_usedvp   = mvp;
@@ -3451,7 +3451,7 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 					goto out1;
 				}
 
-				/* grab file handle */
+				                      
 				nx->nx_fh.nfh_len = NFSV3_MAX_FID_SIZE;
 				error = VFS_VPTOFH(xvp, (int*)&nx->nx_fh.nfh_len, &nx->nx_fh.nfh_fid[0], NULL);
 				if (!error && (nx->nx_fh.nfh_len > (int)NFSV3_MAX_FID_SIZE)) {
@@ -3475,34 +3475,34 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 		nx = NULL;
 	}
 
-	/* perform the export changes */
+	                                
 	if (unxa->nxa_flags & NXA_DELETE) {
 		if (!nx) {
-			/* delete all exports on this file system */
+			                                            
 			while ((nx = LIST_FIRST(&nxfs->nxfs_exports))) {
 				LIST_REMOVE(nx, nx_next);
 				LIST_REMOVE(nx, nx_hash);
-				/* delete all netopts for this export */
+				                                        
 				nfsrv_free_addrlist(nx, NULL);
 				nx->nx_flags &= ~NX_DEFAULTEXPORT;
 				if (IS_VALID_CRED(nx->nx_defopt.nxo_cred)) {
 					kauth_cred_unref(&nx->nx_defopt.nxo_cred);
 				}
-				/* delete active user list for this export */
+				                                             
 				nfsrv_free_user_list(&nx->nx_user_list);
 				FREE(nx->nx_path, M_TEMP);
 				FREE(nx, M_TEMP);
 			}
 			goto out1;
 		} else if (!unxa->nxa_netcount) {
-			/* delete all netopts for this export */
+			                                        
 			nfsrv_free_addrlist(nx, NULL);
 			nx->nx_flags &= ~NX_DEFAULTEXPORT;
 			if (IS_VALID_CRED(nx->nx_defopt.nxo_cred)) {
 				kauth_cred_unref(&nx->nx_defopt.nxo_cred);
 			}
 		} else {
-			/* delete only the netopts for the given addresses */
+			                                                     
 			error = nfsrv_free_addrlist(nx, unxa);
 			if (error) {
 				goto out1;
@@ -3510,11 +3510,11 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 		}
 	}
 	if (unxa->nxa_flags & NXA_ADD) {
-		/*
-		 * If going offline set the export time so that when
-		 * coming back on line we will present a new write verifier
-		 * to the client.
-		 */
+		  
+                                                      
+                                                             
+                   
+     
 		if (unxa->nxa_flags & NXA_OFFLINE) {
 			microtime(&nx->nx_exptime);
 		}
@@ -3527,16 +3527,16 @@ nfsrv_export(struct user_nfs_export_args *unxa, vfs_context_t ctx)
 
 out1:
 	if (nx && !nx->nx_expcnt) {
-		/* export has no export options */
+		                                  
 		LIST_REMOVE(nx, nx_next);
 		LIST_REMOVE(nx, nx_hash);
-		/* delete active user list for this export */
+		                                             
 		nfsrv_free_user_list(&nx->nx_user_list);
 		FREE(nx->nx_path, M_TEMP);
 		FREE(nx, M_TEMP);
 	}
 	if (LIST_EMPTY(&nxfs->nxfs_exports)) {
-		/* exported file system has no more exports */
+		                                              
 		LIST_REMOVE(nxfs, nxfs_next);
 		FREE(nxfs->nxfs_path, M_TEMP);
 		FREE(nxfs, M_TEMP);
@@ -3558,12 +3558,12 @@ unlock_out:
 	return error;
 }
 
-/*
- * Check if there is a least one export that will allow this address.
- *
- * Return 0, if there is an export that will allow this address,
- * else return EACCES
- */
+  
+                                                                     
+  
+                                                                
+                     
+   
 int
 nfsrv_check_exports_allow_address(mbuf_t nam)
 {
@@ -3578,7 +3578,7 @@ nfsrv_check_exports_allow_address(mbuf_t nam)
 	lck_rw_lock_shared(&nfsrv_export_rwlock);
 	LIST_FOREACH(nxfs, &nfsrv_exports, nxfs_next) {
 		LIST_FOREACH(nx, &nxfs->nxfs_exports, nx_next) {
-			/* A little optimizing by checking for the default first */
+			                                                           
 			if (nx->nx_flags & NX_DEFAULTEXPORT) {
 				nxo = &nx->nx_defopt;
 			}
@@ -3601,11 +3601,11 @@ nfsrv_export_lookup(struct nfs_export *nx, mbuf_t nam)
 	struct radix_node_head *rnh;
 	struct sockaddr *saddr;
 
-	/* Lookup in the export list first. */
+	                                      
 	if (nam != NULL) {
 		saddr = mbuf_data(nam);
 		if (saddr->sa_family > AF_MAX) {
-			/* Bogus sockaddr?  Don't match anything. */
+			                                            
 			return NULL;
 		}
 		rnh = nx->nx_rtable[saddr->sa_family];
@@ -3620,14 +3620,14 @@ nfsrv_export_lookup(struct nfs_export *nx, mbuf_t nam)
 			}
 		}
 	}
-	/* If no address match, use the default if it exists. */
+	                                                        
 	if ((nxo == NULL) && (nx->nx_flags & NX_DEFAULTEXPORT)) {
 		nxo = &nx->nx_defopt;
 	}
 	return nxo;
 }
 
-/* find an export for the given handle */
+                                         
 struct nfs_export *
 nfsrv_fhtoexport(struct nfs_filehandle *nfhp)
 {
@@ -3654,8 +3654,8 @@ nfsrv_fhtoexport(struct nfs_filehandle *nfhp)
 }
 
 struct nfsrv_getvfs_by_mntonname_callback_args {
-	const char      *path;          /* IN */
-	mount_t         mp;             /* OUT */
+	const char      *path;                  
+	mount_t         mp;                      
 };
 
 static int
@@ -3712,9 +3712,9 @@ nfsrv_getvfs_by_mntonname(char *path)
 	return mp;
 }
 
-/*
- * nfsrv_fhtovp() - convert FH to vnode and export info
- */
+  
+                                                       
+   
 int
 nfsrv_fhtovp(
 	struct nfs_filehandle *nfhp,
@@ -3742,7 +3742,7 @@ nfsrv_fhtovp(
 
 	v = ntohl(nxh->nxh_version);
 	if (v != NFS_FH_VERSION) {
-		/* file handle format not supported */
+		                                      
 		return ESTALE;
 	}
 	if (nfhp->nfh_len > NFSV3_MAX_FH_SIZE) {
@@ -3761,14 +3761,14 @@ nfsrv_fhtovp(
 		return ESTALE;
 	}
 
-	/* Get the export option structure for this <export, client> tuple. */
+	                                                                      
 	*nxop = nxo = nfsrv_export_lookup(*nxp, nam);
 	if (nam && (*nxop == NULL)) {
 		return EACCES;
 	}
 
 	if (nd != NULL) {
-		/* Validate the security flavor of the request */
+		                                                 
 		for (i = 0, valid = 0; i < nxo->nxo_sec.count; i++) {
 			if (nd->nd_sec == nxo->nxo_sec.flavors[i]) {
 				valid = 1;
@@ -3776,12 +3776,12 @@ nfsrv_fhtovp(
 			}
 		}
 		if (!valid) {
-			/*
-			 * RFC 2623 section 2.3.2 recommends no authentication
-			 * requirement for certain NFS procedures used for mounting.
-			 * This allows an unauthenticated superuser on the client
-			 * to do mounts for the benefit of authenticated users.
-			 */
+			  
+                                                         
+                                                               
+                                                            
+                                                          
+      
 			if (nd->nd_vers == NFS_VER2) {
 				if (nd->nd_procnum == NFSV2PROC_GETATTR ||
 				    nd->nd_procnum == NFSV2PROC_STATFS) {
@@ -3804,13 +3804,13 @@ nfsrv_fhtovp(
 		return (nd == NULL || nd->nd_vers == NFS_VER2) ? ESTALE : NFSERR_TRYLATER;
 	}
 
-	/* find mount structure */
+	                          
 	mp = nfsrv_getvfs_by_mntonname((*nxp)->nx_fs->nxfs_path);
 	if (!mp) {
-		/*
-		 * We have an export, but no mount?
-		 * Perhaps the export just hasn't been marked offline yet.
-		 */
+		  
+                                     
+                                                            
+     
 		return (nd == NULL || nd->nd_vers == NFS_VER2) ? ESTALE : NFSERR_TRYLATER;
 	}
 
@@ -3820,17 +3820,17 @@ nfsrv_fhtovp(
 	if (error) {
 		return error;
 	}
-	/* vnode pointer should be good at this point or ... */
+	                                                       
 	if (*vpp == NULL) {
 		return ESTALE;
 	}
 	return 0;
 }
 
-/*
- * nfsrv_credcheck() - check/map credentials according
- * to given export options.
- */
+  
+                                                      
+                           
+   
 int
 nfsrv_credcheck(
 	struct nfsrv_descript *nd,
@@ -3850,14 +3850,14 @@ nfsrv_credcheck(
 	return 0;
 }
 
-/*
- * nfsrv_vptofh() - convert vnode to file handle for given export
- *
- * If the caller is passing in a vnode for a ".." directory entry,
- * they can pass a directory NFS file handle (dnfhp) which will be
- * checked against the root export file handle.  If it matches, we
- * refuse to provide the file handle for the out-of-export directory.
- */
+  
+                                                                 
+  
+                                                                  
+                                                                  
+                                                                  
+                                                                     
+   
 int
 nfsrv_vptofh(
 	struct nfs_export *nx,
@@ -3881,7 +3881,7 @@ nfsrv_vptofh(
 		bzero(&nfhp->nfh_fid[0], NFSV2_MAX_FID_SIZE);
 	}
 
-	/* if directory FH matches export root, return invalid FH */
+	                                                            
 	if (dnfhp && nfsrv_fhmatch(dnfhp, &nx->nx_fh)) {
 		if (nfsvers == NFS_VER2) {
 			nfhp->nfh_len = NFSX_V2FH;
@@ -3916,11 +3916,11 @@ nfsrv_vptofh(
 	return 0;
 }
 
-/*
- * Compare two file handles to see it they're the same.
- * Note that we don't use nfh_len because that may include
- * padding in an NFSv2 file handle.
- */
+  
+                                                       
+                                                          
+                                   
+   
 int
 nfsrv_fhmatch(struct nfs_filehandle *fh1, struct nfs_filehandle *fh2)
 {
@@ -3940,19 +3940,19 @@ nfsrv_fhmatch(struct nfs_filehandle *fh1, struct nfs_filehandle *fh2)
 	return 1;
 }
 
-/*
- * Functions for dealing with active user lists
- */
+  
+                                               
+   
 
-/*
- * Search the hash table for a user node with a matching IP address and uid field.
- * If found, the node's tm_last timestamp is updated and the node is returned.
- *
- * If not found, a new node is allocated (or reclaimed via LRU), initialized, and returned.
- * Returns NULL if a new node could not be allocated OR saddr length exceeds sizeof(unode->sock).
- *
- * The list's user_mutex lock MUST be held.
- */
+  
+                                                                                  
+                                                                              
+  
+                                                                                           
+                                                                                                 
+  
+                                           
+   
 struct nfs_user_stat_node *
 nfsrv_get_user_stat_node(struct nfs_active_user_list *list, struct sockaddr *saddr, uid_t uid)
 {
@@ -3960,33 +3960,33 @@ nfsrv_get_user_stat_node(struct nfs_active_user_list *list, struct sockaddr *sad
 	struct timeval                          now;
 	struct nfs_user_stat_hashtbl_head       *head;
 
-	/* seach the hash table */
+	                          
 	head = NFS_USER_STAT_HASH(list->user_hashtbl, uid);
 	LIST_FOREACH(unode, head, hash_link) {
 		if ((uid == unode->uid) && (nfs_sockaddr_cmp(saddr, (struct sockaddr*)&unode->sock) == 0)) {
-			/* found matching node */
+			                         
 			break;
 		}
 	}
 
 	if (unode) {
-		/* found node in the hash table, now update lru position */
+		                                                           
 		TAILQ_REMOVE(&list->user_lru, unode, lru_link);
 		TAILQ_INSERT_TAIL(&list->user_lru, unode, lru_link);
 
-		/* update time stamp */
+		                       
 		microtime(&now);
 		unode->tm_last = (uint32_t)now.tv_sec;
 		return unode;
 	}
 
 	if (saddr->sa_len > sizeof(((struct nfs_user_stat_node *)0)->sock)) {
-		/* saddr length exceeds maximum value */
+		                                        
 		return NULL;
 	}
 
 	if (list->node_count < nfsrv_user_stat_max_nodes) {
-		/* Allocate a new node */
+		                         
 		MALLOC(unode, struct nfs_user_stat_node *, sizeof(struct nfs_user_stat_node),
 		    M_TEMP, M_WAITOK | M_ZERO);
 
@@ -3994,23 +3994,23 @@ nfsrv_get_user_stat_node(struct nfs_active_user_list *list, struct sockaddr *sad
 			return NULL;
 		}
 
-		/* increment node count */
+		                          
 		OSAddAtomic(1, &nfsrv_user_stat_node_count);
 		list->node_count++;
 	} else {
-		/* reuse the oldest node in the lru list */
+		                                           
 		unode = TAILQ_FIRST(&list->user_lru);
 
 		if (!unode) {
 			return NULL;
 		}
 
-		/* Remove the node */
+		                     
 		TAILQ_REMOVE(&list->user_lru, unode, lru_link);
 		LIST_REMOVE(unode, hash_link);
 	}
 
-	/* Initialize the node */
+	                         
 	unode->uid = uid;
 	bcopy(saddr, &unode->sock, MIN(saddr->sa_len, sizeof(unode->sock)));
 	microtime(&now);
@@ -4020,7 +4020,7 @@ nfsrv_get_user_stat_node(struct nfs_active_user_list *list, struct sockaddr *sad
 	unode->tm_start = (uint32_t)now.tv_sec;
 	unode->tm_last = (uint32_t)now.tv_sec;
 
-	/* insert the node  */
+	                      
 	TAILQ_INSERT_TAIL(&list->user_lru, unode, lru_link);
 	LIST_INSERT_HEAD(head, unode, hash_link);
 
@@ -4040,17 +4040,17 @@ nfsrv_update_user_stat(struct nfs_export *nx, struct nfsrv_descript *nd, uid_t u
 
 	saddr = (struct sockaddr *)mbuf_data(nd->nd_nam);
 
-	/* check address family before going any further */
+	                                                   
 	if ((saddr->sa_family != AF_INET) && (saddr->sa_family != AF_INET6)) {
 		return;
 	}
 
 	ulist = &nx->nx_user_list;
 
-	/* lock the active user list */
+	                               
 	lck_mtx_lock(&ulist->user_mutex);
 
-	/* get the user node */
+	                       
 	unode = nfsrv_get_user_stat_node(ulist, saddr, uid);
 
 	if (!unode) {
@@ -4058,25 +4058,25 @@ nfsrv_update_user_stat(struct nfs_export *nx, struct nfsrv_descript *nd, uid_t u
 		return;
 	}
 
-	/* update counters */
+	                     
 	unode->ops += ops;
 	unode->bytes_read += rd_bytes;
 	unode->bytes_written += wr_bytes;
 
-	/* done */
+	          
 	lck_mtx_unlock(&ulist->user_mutex);
 }
 
-/* initialize an active user list */
+                                    
 void
 nfsrv_init_user_list(struct nfs_active_user_list *ulist)
 {
 	uint i;
 
-	/* initialize the lru */
+	                        
 	TAILQ_INIT(&ulist->user_lru);
 
-	/* initialize the hash table */
+	                               
 	for (i = 0; i < NFS_USER_STAT_HASH_SIZE; i++) {
 		LIST_INIT(&ulist->user_hashtbl[i]);
 	}
@@ -4085,7 +4085,7 @@ nfsrv_init_user_list(struct nfs_active_user_list *ulist)
 	lck_mtx_init(&ulist->user_mutex, &nfsrv_active_user_mutex_group, LCK_ATTR_NULL);
 }
 
-/* Free all nodes in an active user list */
+                                           
 void
 nfsrv_free_user_list(struct nfs_active_user_list *ulist)
 {
@@ -4096,12 +4096,12 @@ nfsrv_free_user_list(struct nfs_active_user_list *ulist)
 	}
 
 	while ((unode = TAILQ_FIRST(&ulist->user_lru))) {
-		/* Remove node and free */
+		                          
 		TAILQ_REMOVE(&ulist->user_lru, unode, lru_link);
 		LIST_REMOVE(unode, hash_link);
 		FREE(unode, M_TEMP);
 
-		/* decrement node count */
+		                          
 		OSAddAtomic(-1, &nfsrv_user_stat_node_count);
 	}
 	ulist->node_count = 0;
@@ -4109,7 +4109,7 @@ nfsrv_free_user_list(struct nfs_active_user_list *ulist)
 	lck_mtx_destroy(&ulist->user_mutex, &nfsrv_active_user_mutex_group);
 }
 
-/* Reclaim old expired user nodes from active user lists. */
+                                                            
 void
 nfsrv_active_user_list_reclaim(void)
 {
@@ -4128,46 +4128,46 @@ nfsrv_active_user_list_reclaim(void)
 	tstale = now.tv_sec - nfsrv_user_stat_max_idle_sec;
 	LIST_FOREACH(nxfs, &nfsrv_exports, nxfs_next) {
 		LIST_FOREACH(nx, &nxfs->nxfs_exports, nx_next) {
-			/* Scan through all user nodes of this export */
+			                                                
 			ulist = &nx->nx_user_list;
 			lck_mtx_lock(&ulist->user_mutex);
 			for (unode = TAILQ_FIRST(&ulist->user_lru); unode; unode = unode_next) {
 				unode_next = TAILQ_NEXT(unode, lru_link);
 
-				/* check if this node has expired */
+				                                    
 				if (unode->tm_last >= tstale) {
 					break;
 				}
 
-				/* Remove node from the active user list */
+				                                           
 				TAILQ_REMOVE(&ulist->user_lru, unode, lru_link);
 				LIST_REMOVE(unode, hash_link);
 
-				/* Add node to temp list */
+				                           
 				LIST_INSERT_HEAD(&oldlist, unode, hash_link);
 
-				/* decrement node count */
+				                          
 				OSAddAtomic(-1, &nfsrv_user_stat_node_count);
 				ulist->node_count--;
 			}
-			/* can unlock this export's list now */
+			                                       
 			lck_mtx_unlock(&ulist->user_mutex);
 		}
 	}
 	lck_rw_done(&nfsrv_export_rwlock);
 
-	/* Free expired nodes */
+	                        
 	while ((unode = LIST_FIRST(&oldlist))) {
 		LIST_REMOVE(unode, hash_link);
 		FREE(unode, M_TEMP);
 	}
 }
 
-/*
- * Maps errno values to nfs error numbers.
- * Use NFSERR_IO as the catch all for ones not specifically defined in
- * RFC 1094.
- */
+  
+                                          
+                                                                      
+            
+   
 static u_char nfsrv_v2errmap[] = {
 	NFSERR_PERM, NFSERR_NOENT, NFSERR_IO, NFSERR_IO, NFSERR_IO,
 	NFSERR_NXIO, NFSERR_IO, NFSERR_IO, NFSERR_IO, NFSERR_IO,
@@ -4185,17 +4185,17 @@ static u_char nfsrv_v2errmap[] = {
 	NFSERR_NOTEMPTY, NFSERR_IO, NFSERR_IO, NFSERR_DQUOT, NFSERR_STALE,
 };
 
-/*
- * Maps errno values to nfs error numbers.
- * Although it is not obvious whether or not NFS clients really care if
- * a returned error value is in the specified list for the procedure, the
- * safest thing to do is filter them appropriately. For Version 2, the
- * X/Open XNFS document is the only specification that defines error values
- * for each RPC (The RFC simply lists all possible error values for all RPCs),
- * so I have decided to not do this for Version 2.
- * The first entry is the default error return and the rest are the valid
- * errors for that RPC in increasing numeric order.
- */
+  
+                                          
+                                                                       
+                                                                         
+                                                                      
+                                                                           
+                                                                              
+                                                  
+                                                                         
+                                                   
+   
 static short nfsv3err_null[] = {
 	0,
 	0,
@@ -4538,10 +4538,10 @@ static short *nfsrv_v3errmap[] = {
 	nfsv3err_commit,
 };
 
-/*
- * Map errnos to NFS error numbers. For Version 3 also filter out error
- * numbers not specified for the associated procedure.
- */
+  
+                                                                       
+                                                      
+   
 int
 nfsrv_errmap(struct nfsrv_descript *nd, int err)
 {
@@ -4553,7 +4553,7 @@ nfsrv_errmap(struct nfsrv_descript *nd, int err)
 		}
 		return NFSERR_IO;
 	}
-	/* NFSv3 */
+	           
 	if (nd->nd_procnum > NFSPROC_COMMIT) {
 		return err & 0xffff;
 	}
@@ -4568,6 +4568,6 @@ nfsrv_errmap(struct nfsrv_descript *nd, int err)
 	return (int)*defaulterrp;
 }
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
-#endif /* CONFIG_NFS */
+#endif                 

@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_classq.h,v 1.7 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_classq.h,v 1.6 2003/01/07 07:33:38 kjc Exp $	*/
+                                                                  
+                                                              
 
 /*
  * Copyright (c) 1991-1997 Regents of the University of California.
@@ -61,9 +61,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/*
- * class queue definitions extracted from rm_class.h.
- */
+  
+                                                     
+   
 #ifndef _NET_CLASSQ_CLASSQ_H_
 #define _NET_CLASSQ_CLASSQ_H_
 
@@ -72,20 +72,20 @@
 extern "C" {
 #endif
 
-/*
- * Packet types
- */
+  
+               
+   
 typedef enum classq_pkt_type {
 	QP_INVALID = 0,
-	QP_MBUF,        /* mbuf packet */
+	QP_MBUF,                         
 } classq_pkt_type_t;
 
-/*
- * Packet
- */
+  
+         
+   
 typedef struct classq_pkt {
 	union {
-		struct mbuf             *cp_mbuf;       /* mbuf packet */
+		struct mbuf             *cp_mbuf;                        
 	};
 	classq_pkt_type_t       cp_ptype;
 } classq_pkt_t;
@@ -104,31 +104,31 @@ typedef struct classq_pkt {
 } while (0)
 
 
-/*
- * Packet Queue types
- */
+  
+                     
+   
 typedef enum classq_type {
 	Q_DROPHEAD,
 	Q_DROPTAIL,
 	Q_SFB
 } classq_type_t;
 
-/*
- * Packet Queue states
- */
+  
+                      
+   
 typedef enum classq_state {
 	QS_RUNNING,
 	QS_SUSPENDED
 } classq_state_t;
 
-#define DEFAULT_QLIMIT  128 /* default */
+#define DEFAULT_QLIMIT  128              
 
 #define CLASSQ_DEQUEUE_MAX_PKT_LIMIT    2048
 #define CLASSQ_DEQUEUE_MAX_BYTE_LIMIT   (1024 * 1024)
 
-/*
- * generic packet counter
- */
+  
+                         
+   
 struct pktcntr {
 	u_int64_t       packets;
 	u_int64_t       bytes;
@@ -139,36 +139,36 @@ struct pktcntr {
 #include <sys/mbuf.h>
 #include <sys/sysctl.h>
 
-/*
- * Packet Queue structures and macros to manipulate them.
- */
+  
+                                                         
+   
 typedef struct _class_queue_ {
 	union {
-		MBUFQ_HEAD(mq_head) __mbufq; /* mbuf packet queue */
+		MBUFQ_HEAD(mq_head) __mbufq;                        
 	} __pktq_u;
-	u_int32_t       qlen;   /* Queue length (in number of packets) */
-	u_int32_t       qlim;   /* Queue limit (in number of packets*) */
-	u_int64_t       qsize;  /* Approx. queue size (in number of bytes) */
-	classq_type_t   qtype;  /* Queue type */
-	classq_state_t  qstate; /* Queue state */
-	classq_pkt_type_t       qptype; /* Packet type */
+	u_int32_t       qlen;                                            
+	u_int32_t       qlim;                                            
+	u_int64_t       qsize;                                               
+	classq_type_t   qtype;                  
+	classq_state_t  qstate;                  
+	classq_pkt_type_t       qptype;                  
 } class_queue_t;
 
-#define qmbufq(q)       (q)->__pktq_u.__mbufq   /* Get mbuf packet queue */
-#define qptype(q)       (q)->qptype             /* Get queue packet type */
-#define qtype(q)        (q)->qtype              /* Get queue type */
-#define qstate(q)       (q)->qstate             /* Get queue state */
-#define qlimit(q)       (q)->qlim               /* Max packets to be queued */
-#define qlen(q)         (q)->qlen               /* Current queue length. */
-#define qsize(q)        (q)->qsize              /* Approx. bytes in queue */
+#define qmbufq(q)       (q)->__pktq_u.__mbufq                              
+#define qptype(q)       (q)->qptype                                        
+#define qtype(q)        (q)->qtype                                  
+#define qstate(q)       (q)->qstate                                  
+#define qlimit(q)       (q)->qlim                                             
+#define qlen(q)         (q)->qlen                                          
+#define qsize(q)        (q)->qsize                                          
 
 #define qhead(q)        MBUFQ_FIRST(&qmbufq(q))
 
-#define qempty(q)       (qlen(q) == 0)  /* Is the queue empty?? */
-#define q_is_red(q)     (qtype(q) == Q_RED)     /* Is the queue a RED queue */
-#define q_is_rio(q)     (qtype(q) == Q_RIO)     /* Is the queue a RIO queue */
-#define q_is_blue(q)    (qtype(q) == Q_BLUE)    /* Is the queue a BLUE queue */
-#define q_is_sfb(q)     (qtype(q) == Q_SFB)     /* Is the queue a SFB queue */
+#define qempty(q)       (qlen(q) == 0)                            
+#define q_is_red(q)     (qtype(q) == Q_RED)                                   
+#define q_is_rio(q)     (qtype(q) == Q_RIO)                                   
+#define q_is_blue(q)    (qtype(q) == Q_BLUE)                                   
+#define q_is_sfb(q)     (qtype(q) == Q_SFB)                                   
 #define q_is_red_or_rio(q) (qtype(q) == Q_RED || qtype(q) == Q_RIO)
 #define q_is_suspended(q) (qstate(q) == QS_SUSPENDED)
 
@@ -182,15 +182,15 @@ typedef struct _class_queue_ {
 	(_cntr)->bytes = 0;                                             \
 } while (0)
 
-/* flags for mark_ecn() */
-#define CLASSQF_ECN4    0x01    /* use packet marking for IPv4 packets */
-#define CLASSQF_ECN6    0x02    /* use packet marking for IPv6 packets */
+                          
+#define CLASSQF_ECN4    0x01                                             
+#define CLASSQF_ECN6    0x02                                             
 #define CLASSQF_ECN     (CLASSQF_ECN4 | CLASSQF_ECN6)
 
 extern u_int32_t classq_verbose;
 #if DEBUG || DEVELOPMENT
 extern uint16_t fq_codel_quantum;
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 SYSCTL_DECL(_net_classq);
 
@@ -215,11 +215,11 @@ extern void classq_init(void);
 extern u_int8_t read_dsfield(struct mbuf *, struct pf_mtag *);
 extern void     write_dsfield(struct mbuf *, struct pf_mtag *, u_int8_t);
 extern int      mark_ecn(struct mbuf *, struct pf_mtag *, int);
-#endif /* PF_ECN */
-#endif /* BSD_KERNEL_PRIVATE */
+#endif             
+#endif                         
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_CLASSQ_H_ */
+#endif              
+#endif                            

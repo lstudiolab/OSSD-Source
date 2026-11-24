@@ -16,8 +16,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-/* ASN.1 types for on the fly ASN.1 BER/DER encoding/decoding. Don't use
-   these with the ccder interface, use the CCDER_ types instead. */
+                                                                        
+                                                                   
 enum {
     CCASN1_EOL               = 0x00,
     CCASN1_BOOLEAN           = 0x01,
@@ -27,14 +27,14 @@ enum {
     CCASN1_NULL              = 0x05,
     CCASN1_OBJECT_IDENTIFIER = 0x06,
     CCASN1_OBJECT_DESCRIPTOR = 0x07,
-    /* External or instance-of 0x08 */
+                                      
     CCASN1_REAL              = 0x09,
     CCASN1_ENUMERATED        = 0x0a,
     CCASN1_EMBEDDED_PDV      = 0x0b,
     CCASN1_UTF8_STRING       = 0x0c,
-    /*                         0x0d */
-    /*                         0x0e */
-    /*                         0x0f */
+                                      
+                                      
+                                      
     CCASN1_SEQUENCE          = 0x10,
     CCASN1_SET               = 0x11,
     CCASN1_NUMERIC_STRING    = 0x12,
@@ -48,7 +48,7 @@ enum {
     CCASN1_VISIBLE_STRING    = 0x1a,
     CCASN1_GENERAL_STRING    = 0x1b,
     CCASN1_UNIVERSAL_STRING  = 0x1c,
-    /*                         0x1d */
+                                      
     CCASN1_BMP_STRING        = 0x1e,
     CCASN1_HIGH_TAG_NUMBER   = 0x1f,
     CCASN1_TELETEX_STRING    = CCASN1_T61_STRING,
@@ -73,7 +73,7 @@ enum {
 typedef const unsigned char * ccoid_t;
 #define CCOID(oid) (oid)
 
-/* Returns the size of an oid including it's tag and length. */
+                                                               
 CC_INLINE CC_PURE CC_NONNULL((1))
 size_t ccoid_size(ccoid_t oid) {
     return 2 + CCOID(oid)[1];
@@ -85,4 +85,4 @@ bool ccoid_equal(ccoid_t oid1, ccoid_t oid2) {
             && memcmp(CCOID(oid1), CCOID(oid2), ccoid_size(oid1))== 0);
 }
 
-#endif /* _CORECRYPTO_CCASN1_H_ */
+#endif                            

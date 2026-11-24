@@ -28,11 +28,11 @@ T_DECL(compression_sweep,
     T_META_ASROOT(true),
     T_META_ENABLED(!TARGET_OS_OSX && !TARGET_OS_WATCH && !TARGET_OS_TV))
 {
-	/*
-	 * Change the system to sweep out compressed pages that are older than
-	 * `compressed_page_target_age_secs` seconds and induce `sweep_count` sweeps
-	 * every `sleep_dur_secs` seconds.
-	 */
+	  
+                                                                       
+                                                                             
+                                   
+    
 
 	int compressed_page_target_age_secs = 1;
 	const int sweep_period_secs = 10;
@@ -71,7 +71,7 @@ T_DECL(compression_sweep,
 	    vm_stat_after.compressions - vm_stat_before.swapouts);
 	T_EXPECT_GT(vm_stat_after.compressions, vm_stat_before.compressions,
 	    "should have compressed some pages during sweeps");
-	// rdar://71454311 (Compression sweep swap outs are flaky, should induce compressions)
+	                                                                                      
 	T_MAYFAIL;
 	T_EXPECT_GT(vm_stat_after.swapouts, vm_stat_before.swapouts,
 	    "should have swapped out some pages during sweeps");

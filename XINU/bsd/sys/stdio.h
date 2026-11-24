@@ -47,11 +47,11 @@ int     renameat(int, const char *, int, const char *) __OSX_AVAILABLE_STARTING(
 int renamex_np(const char *, const char *, unsigned int) __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0) __WATCHOS_AVAILABLE(3.0);
 int renameatx_np(int, const char *, int, const char *, unsigned int) __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0) __WATCHOS_AVAILABLE(3.0);
 
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          
 
 __END_DECLS
 
-#endif /* __DARWIN_C_LEVEL >= 200809L */
+#endif                                  
 
-#endif /* !KERNEL */
-#endif /* _SYS_STDIO_H_ */
+#endif              
+#endif                    

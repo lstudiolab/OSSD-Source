@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_MACHINE_RPC_H */
+#endif                             

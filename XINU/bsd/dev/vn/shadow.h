@@ -53,5 +53,5 @@ shadow_map_create(off_t file_size, off_t shadow_size,
 void
 shadow_map_free(shadow_map_t * map);
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* __VN_SHADOW_H__ */
+#endif                          
+#endif                      

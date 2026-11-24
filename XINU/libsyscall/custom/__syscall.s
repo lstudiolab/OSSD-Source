@@ -32,12 +32,12 @@
 #if defined(__i386__)
 
 LEAF(___syscall, 0)
-	popl	%ecx		// ret addr
-	popl	%eax		// syscall number
+	popl	%ecx		           
+	popl	%eax		                 
 	pushl	%ecx
 	UNIX_SYSCALL_TRAP
-	movl	(%esp),%edx	// add one element to stack so
-	pushl	%ecx		// caller "pop" will work
+	movl	(%esp),%edx	                              
+	pushl	%ecx		                         
 	jnb	2f
 	BRANCH_EXTERN(tramp_cerror)
 2:
@@ -45,10 +45,10 @@ END(___syscall)
 
 #elif defined(__x86_64__)
 
-// For x86-64, the kernel slides the argument list for us.
-// The number of arguments here is variable, but our macros ignore
-// that value anyway.
-__SYSCALL(___syscall, syscall, 0);
+                                                          
+                                                                  
+                     
+__SYSCALL(___syscall, syscall, 0) 
 
 #elif defined(__arm__)
 
@@ -56,10 +56,10 @@ __SYSCALL(___syscall, syscall, 7)
 
 #elif defined(__arm64__)
 
-/* 
- * Ignore nominal number of arguments: just pop from stack and let the kernel 
- * interpret.
- */
+   
+                                                                              
+             
+   
 #include <mach/arm64/asm.h>
 MI_ENTRY_POINT(___syscall)
 		ldp x1, x2, [sp]

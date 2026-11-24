@@ -46,8 +46,8 @@
 
 #include <ptrauth.h>
 
-/* #include <machine/trap.h> */
-struct savearea_t; /* Used anonymously */
+                               
+struct savearea_t;                       
 
 #if defined(__arm__) || defined(__arm64__)
 typedef kern_return_t (*perfCallback)(int, struct savearea_t *, __unused int, __unused int);
@@ -66,7 +66,7 @@ void
 qsort(void *a, size_t n, size_t es, int (*cmp)(const void *, const void *));
 
 #define FBT_ADDR2NDX(addr)      ((((uintptr_t)(addr)) >> 4) & fbt_probetab_mask)
-#define FBT_PROBETAB_SIZE       0x8000          /* 32k entries -- 128K total */
+#define FBT_PROBETAB_SIZE       0x8000                                         
 
 static int                              fbt_probetab_size;
 dtrace_provider_id_t    fbt_id;
@@ -81,7 +81,7 @@ extern int dtrace_kernel_symbol_mode;
 
 void fbt_init( void );
 
-/*ARGSUSED*/
+            
 static void
 fbt_destroy(void *arg, dtrace_id_t id, void *parg)
 {
@@ -90,9 +90,9 @@ fbt_destroy(void *arg, dtrace_id_t id, void *parg)
 	int ndx;
 
 	do {
-		/*
-		 * Now we need to remove this probe from the fbt_probetab.
-		 */
+		  
+                                                            
+     
 		ndx = FBT_ADDR2NDX(fbt->fbtp_patchpoint);
 		last = NULL;
 		hash = fbt_probetab[ndx];
@@ -116,7 +116,7 @@ fbt_destroy(void *arg, dtrace_id_t id, void *parg)
 	} while (fbt != NULL);
 }
 
-/*ARGSUSED*/
+            
 int
 fbt_enable(void *arg, dtrace_id_t id, void *parg)
 {
@@ -137,11 +137,11 @@ fbt_enable(void *arg, dtrace_id_t id, void *parg)
 			continue;
 		}
 
-		/*
-		 * Now check that our modctl has the expected load count.  If it
-		 * doesn't, this module must have been unloaded and reloaded -- and
-		 * we're not going to touch it.
-		 */
+		  
+                                                                  
+                                                                     
+                                 
+     
 		if (ctl->mod_loadcnt != fbt->fbtp_loadcnt) {
 			if (fbt_verbose) {
 				cmn_err(CE_NOTE, "fbt is failing for probe %s "
@@ -164,18 +164,18 @@ fbt_enable(void *arg, dtrace_id_t id, void *parg)
 
 		if (fbt->fbtp_currentval != fbt->fbtp_patchval) {
 #if KASAN
-			/* Since dtrace probes can call into KASan and vice versa, things can get
-			 * very slow if we have a lot of probes. This call will disable the KASan
-			 * fakestack after a threshold of probes is reached. */
+			                                                                         
+                                                                            
+                                                          
 			kasan_fakestack_suspend();
 #endif
 
 			(void)ml_nofault_copy((vm_offset_t)&fbt->fbtp_patchval, (vm_offset_t)fbt->fbtp_patchpoint,
 			    sizeof(fbt->fbtp_patchval));
-			/*
-			 * Make the patched instruction visible via a data + instruction
-			 * cache flush for the platforms that need it
-			 */
+			  
+                                                                   
+                                                
+      
 			flush_dcache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_patchval), 0);
 			invalidate_icache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_patchval), 0);
 			fbt->fbtp_currentval = fbt->fbtp_patchval;
@@ -189,7 +189,7 @@ fbt_enable(void *arg, dtrace_id_t id, void *parg)
 	return 0;
 }
 
-/*ARGSUSED*/
+            
 static void
 fbt_disable(void *arg, dtrace_id_t id, void *parg)
 {
@@ -207,10 +207,10 @@ fbt_disable(void *arg, dtrace_id_t id, void *parg)
 		if (fbt->fbtp_currentval != fbt->fbtp_savedval) {
 			(void)ml_nofault_copy((vm_offset_t)&fbt->fbtp_savedval, (vm_offset_t)fbt->fbtp_patchpoint,
 			    sizeof(fbt->fbtp_savedval));
-			/*
-			 * Make the patched instruction visible via a data + instruction
-			 * cache flush for the platforms that need it
-			 */
+			  
+                                                                   
+                                                
+      
 			flush_dcache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_patchval), 0);
 			invalidate_icache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_patchval), 0);
 
@@ -226,7 +226,7 @@ fbt_disable(void *arg, dtrace_id_t id, void *parg)
 	dtrace_membar_consumer();
 }
 
-/*ARGSUSED*/
+            
 static void
 fbt_suspend(void *arg, dtrace_id_t id, void *parg)
 {
@@ -245,10 +245,10 @@ fbt_suspend(void *arg, dtrace_id_t id, void *parg)
 		(void)ml_nofault_copy((vm_offset_t)&fbt->fbtp_savedval, (vm_offset_t)fbt->fbtp_patchpoint,
 		    sizeof(fbt->fbtp_savedval));
 
-		/*
-		 * Make the patched instruction visible via a data + instruction
-		 * cache flush for the platforms that need it
-		 */
+		  
+                                                                  
+                                               
+     
 		flush_dcache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_savedval), 0);
 		invalidate_icache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_savedval), 0);
 
@@ -258,7 +258,7 @@ fbt_suspend(void *arg, dtrace_id_t id, void *parg)
 	dtrace_membar_consumer();
 }
 
-/*ARGSUSED*/
+            
 static void
 fbt_resume(void *arg, dtrace_id_t id, void *parg)
 {
@@ -287,9 +287,9 @@ fbt_resume(void *arg, dtrace_id_t id, void *parg)
 		(void)ml_nofault_copy((vm_offset_t)&fbt->fbtp_patchval, (vm_offset_t)fbt->fbtp_patchpoint,
 		    sizeof(fbt->fbtp_patchval));
 
-		/*
-		 * Make the patched instruction visible via a data + instruction cache flush.
-		 */
+		  
+                                                                               
+     
 		flush_dcache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_patchval), 0);
 		invalidate_icache((vm_offset_t)fbt->fbtp_patchpoint, (vm_size_t)sizeof(fbt->fbtp_patchval), 0);
 
@@ -308,15 +308,15 @@ fbt_provide_module_user_syms(struct modctl *ctl)
 	dtrace_module_symbols_t* module_symbols = ctl->mod_user_symbols;
 	if (module_symbols) {
 		for (i = 0; i < module_symbols->dtmodsyms_count; i++) {
-			/*
-			 * symbol->dtsym_addr (the symbol address) passed in from
-			 * user space, is already slid for both kexts and kernel.
-			 */
+			  
+                                                            
+                                                            
+      
 			dtrace_symbol_t* symbol = &module_symbols->dtmodsyms_symbols[i];
 
 			char* name = symbol->dtsym_name;
 
-			/* Lop off omnipresent leading underscore. */
+			                                             
 			if (*name == '_') {
 				name += 1;
 			}
@@ -325,16 +325,16 @@ fbt_provide_module_user_syms(struct modctl *ctl)
 				continue;
 			}
 
-			/*
-			 * Ignore symbols with a null address
-			 */
+			  
+                                        
+      
 			if (!symbol->dtsym_addr) {
 				continue;
 			}
 
-			/*
-			 * Ignore symbols not part of this module
-			 */
+			  
+                                            
+      
 			if (!dtrace_addr_in_module((void*)symbol->dtsym_addr, ctl)) {
 				continue;
 			}
@@ -363,35 +363,35 @@ fbt_provide_kernel_section(struct modctl *ctl, kernel_section_t *sect, kernel_nl
 			continue;
 		}
 
-		/* Check that the symbol is a global and that it has a name. */
+		                                                               
 		if (((N_SECT | N_EXT) != n_type && (N_ABS | N_EXT) != n_type)) {
 			continue;
 		}
 
-		if (0 == sym[i].n_un.n_strx) {  /* iff a null, "", name. */
+		if (0 == sym[i].n_un.n_strx) {                             
 			continue;
 		}
 
-		/* Lop off omnipresent leading underscore. */
+		                                             
 		if (*name == '_') {
 			name += 1;
 		}
 
 #if defined(__arm__)
-		// Skip non-thumb functions on arm32
+		                                    
 		if (sym[i].n_sect == 1 && !(sym[i].n_desc & N_ARM_THUMB_DEF)) {
 			continue;
 		}
-#endif /* defined(__arm__) */
+#endif                       
 
 		if (fbt_excluded(name)) {
 			continue;
 		}
 
-		/*
-		 * Find the function boundary by looking at either the
-		 * end of the section or the beginning of the next symbol
-		 */
+		  
+                                                        
+                                                           
+     
 		if (i == nsyms - 1) {
 			limit = sect_end;
 		} else {
@@ -448,10 +448,10 @@ fbt_provide_module_kernel_syms(struct modctl *ctl)
 	syms = (kernel_nlist_t *)(linkedit->vmaddr + symtab->symoff - linkedit->fileoff);
 	strings = (const char *)(linkedit->vmaddr + symtab->stroff - linkedit->fileoff);
 
-	/*
-	 * Make a copy of the symbol table and sort it to not cross into the next function
-	 * when disassembling the function
-	 */
+	  
+                                                                                   
+                                   
+    
 	symlen = sizeof(kernel_nlist_t) * symtab->nsyms;
 	sorted_syms = kmem_alloc(symlen, KM_SLEEP);
 	bcopy(syms, sorted_syms, symlen);
@@ -484,7 +484,7 @@ fbt_provide_module(void *arg, struct modctl *ctl)
 		return;
 	}
 
-	// Update the "ignore blacklist" bit
+	                                    
 	if (ignore_fbt_blacklist) {
 		ctl->mod_flags |= MODCTL_FBT_PROVIDE_BLACKLISTED_PROBES;
 	}
@@ -532,7 +532,7 @@ static dtrace_pops_t fbt_pops = {
 	.dtps_disable =         fbt_disable,
 	.dtps_suspend =         fbt_suspend,
 	.dtps_resume =          fbt_resume,
-	.dtps_getargdesc =      NULL, /* APPLE NOTE: fbt_getargdesc implemented in userspace */
+	.dtps_getargdesc =      NULL,                                                          
 	.dtps_getargval =       NULL,
 	.dtps_usermode =        NULL,
 	.dtps_destroy =         fbt_destroy
@@ -581,7 +581,7 @@ _fbt_open(dev_t dev, int flags, int devtype, struct proc *p)
 	return 0;
 }
 
-#define FBT_MAJOR  -24 /* let the kernel pick the device number */
+#define FBT_MAJOR  -24                                            
 
 static const struct cdevsw fbt_cdevsw =
 {
@@ -599,8 +599,8 @@ static const struct cdevsw fbt_cdevsw =
 	.d_reserved_2 = eno_putc,
 };
 
-#undef kmem_alloc /* from its binding to dt_kmem_alloc glue */
-#undef kmem_free /* from its binding to dt_kmem_free glue */
+#undef kmem_alloc                                             
+#undef kmem_free                                            
 #include <vm/vm_kern.h>
 
 

@@ -5,18 +5,18 @@
 #include <stdio.h>
 #include <assert.h>
 
-/*
- * DO NOT run this test file by itself.
- * This test is meant to be invoked by control_port_options darwintest.
- *
- * If hard enforcement for pinned control port is on, pinned_test_main_thread_mod_ref-5 are
- * expected to generate fatal EXC_GUARD.
- *
- * If hard enforcement for immovable control port is on, immovable_test_move_send_task_self-13 are
- * expected to generate fatal EXC_GUARD.
- *
- * The type of exception raised (if any) is checked on control_port_options side.
- */
+  
+                                       
+                                                                       
+  
+                                                                                           
+                                        
+  
+                                                                                                  
+                                        
+  
+                                                                                 
+   
 #define MAX_TEST_NUM 13
 
 static int

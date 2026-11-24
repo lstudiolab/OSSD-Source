@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_kern.c
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Kernel memory management.
- */
+  
+   
+  
+                     
+                                                    
+             
+  
+                            
+   
 
 #include <mach/kern_return.h>
 #include <mach/vm_param.h>
@@ -88,16 +88,16 @@
 
 #include <san/kasan.h>
 
-/*
- *	Variables exported by this module.
- */
+  
+                                     
+   
 
 SECURITY_READ_ONLY_LATE(vm_map_t) kernel_map;
 vm_map_t         kernel_pageable_map;
 
-/*
- * Forward declarations for internal functions.
- */
+  
+                                               
+   
 extern kern_return_t kmem_alloc_pages(
 	vm_object_t             object,
 	vm_object_offset_t      offset,
@@ -133,17 +133,17 @@ kmem_alloc_contig(
 	    VM_MAP_PAGE_MASK(map));
 	map_mask = (vm_map_offset_t)mask;
 
-	/* Check for zero allocation size (either directly or via overflow) */
+	                                                                      
 	if (map_size == 0) {
 		*addrp = 0;
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 *	Allocate a new object (if necessary) and the reference we
-	 *	will be donating to the map entry.  We must do this before
-	 *	locking the map, or risk deadlock with the default pager.
-	 */
+	  
+                                                             
+                                                              
+                                                             
+    
 	if ((flags & KMA_KOBJECT) != 0) {
 		object = kernel_object;
 		vm_object_reference(object);
@@ -166,7 +166,7 @@ kmem_alloc_contig(
 	VME_OBJECT_SET(entry, object);
 	VME_OFFSET_SET(entry, offset);
 
-	/* Take an extra object ref in case the map entry gets deleted */
+	                                                                 
 	vm_object_reference(object);
 	vm_map_unlock(map);
 
@@ -229,22 +229,22 @@ kmem_alloc_contig(
 	return KERN_SUCCESS;
 }
 
-/*
- * Master entry point for allocating kernel memory.
- * NOTE: this routine is _never_ interrupt safe.
- *
- * map		: map to allocate into
- * addrp	: pointer to start address of new memory
- * size		: size of memory requested
- * flags	: options
- *		  KMA_HERE		*addrp is base address, else "anywhere"
- *		  KMA_NOPAGEWAIT	don't wait for pages if unavailable
- *		  KMA_KOBJECT		use kernel_object
- *		  KMA_LOMEM		support for 32 bit devices in a 64 bit world
- *					if set and a lomemory pool is available
- *					grab pages from it... this also implies
- *					KMA_NOPAGEWAIT
- */
+  
+                                                   
+                                                
+  
+                              
+                                                 
+                                   
+                  
+                                                       
+                                                        
+                                    
+                                                             
+                                              
+                                              
+                     
+   
 
 kern_return_t
 kernel_memory_allocate(
@@ -280,41 +280,41 @@ kernel_memory_allocate(
 	    VM_MAP_PAGE_MASK(map));
 	map_mask = (vm_map_offset_t) mask;
 
-	vm_alloc_flags = 0; //VM_MAKE_TAG(tag);
+	vm_alloc_flags = 0;                    
 	vmk_flags = VM_MAP_KERNEL_FLAGS_NONE;
 
-	/* Check for zero allocation size (either directly or via overflow) */
+	                                                                      
 	if (map_size == 0) {
 		*addrp = 0;
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 * limit the size of a single extent of wired memory
-	 * to try and limit the damage to the system if
-	 * too many pages get wired down
-	 * limit raised to 2GB with 128GB max physical limit,
-	 * but scaled by installed memory above this
-	 */
+	  
+                                                     
+                                                
+                                 
+                                                      
+                                             
+    
 	if (!(flags & (KMA_VAONLY | KMA_PAGEABLE)) &&
 	    map_size > MAX(1ULL << 31, sane_size / 64)) {
 		return KERN_RESOURCE_SHORTAGE;
 	}
 
-	/*
-	 * Guard pages:
-	 *
-	 * Guard pages are implemented as ficticious pages.  By placing guard pages
-	 * on either end of a stack, they can help detect cases where a thread walks
-	 * off either end of its stack.  They are allocated and set up here and attempts
-	 * to access those pages are trapped in vm_fault_page().
-	 *
-	 * The map_size we were passed may include extra space for
-	 * guard pages.  If those were requested, then back it out of fill_size
-	 * since vm_map_find_space() takes just the actual size not including
-	 * guard pages.  Similarly, fill_start indicates where the actual pages
-	 * will begin in the range.
-	 */
+	  
+                
+   
+                                                                            
+                                                                             
+                                                                                 
+                                                         
+   
+                                                           
+                                                                        
+                                                                      
+                                                                        
+                            
+    
 
 	fill_start = 0;
 	fill_size = map_size;
@@ -324,7 +324,7 @@ kernel_memory_allocate(
 		fill_start += PAGE_SIZE_64;
 		fill_size -= PAGE_SIZE_64;
 		if (map_size < fill_start + fill_size) {
-			/* no space for a guard page */
+			                               
 			*addrp = 0;
 			return KERN_INVALID_ARGUMENT;
 		}
@@ -334,7 +334,7 @@ kernel_memory_allocate(
 		vmk_flags.vmkf_guard_after = TRUE;
 		fill_size -= PAGE_SIZE_64;
 		if (map_size <= fill_start + fill_size) {
-			/* no space for a guard page */
+			                               
 			*addrp = 0;
 			return KERN_INVALID_ARGUMENT;
 		}
@@ -366,10 +366,10 @@ kernel_memory_allocate(
 		}
 	}
 
-	/*
-	 *	Allocate a new object (if necessary).  We must do this before
-	 *	locking the map, or risk deadlock with the default pager.
-	 */
+	  
+                                                                 
+                                                             
+    
 	if ((flags & KMA_KOBJECT) != 0) {
 		object = kernel_object;
 		vm_object_reference(object);
@@ -440,7 +440,7 @@ kernel_memory_allocate(
 
 #if KASAN
 	if (!(flags & KMA_VAONLY)) {
-		/* for VAONLY mappings we notify in populate only */
+		                                                    
 		kasan_notify_address(map_addr, size);
 	}
 #endif
@@ -474,7 +474,7 @@ kernel_memory_allocate(
 			mem->vmp_wpmapped = TRUE;
 
 			PMAP_ENTER_OPTIONS(kernel_pmap, map_addr + pg_offset,
-			    0, /* fault_phys_offset */
+			    0,                        
 			    mem,
 			    kma_prot, VM_PROT_NONE, ((flags & KMA_KSTACK) ? VM_MEM_STACK : 0), TRUE,
 			    PMAP_OPTIONS_NOWAIT, pe_result);
@@ -526,9 +526,9 @@ kernel_memory_allocate(
 
 	vm_object_unlock(object);
 
-	/*
-	 * now that the pages are wired, we no longer have to fear coalesce
-	 */
+	  
+                                                                    
+    
 	if (object == kernel_object || object == compressor_object) {
 		vm_map_simplify(map, map_addr);
 	} else {
@@ -539,9 +539,9 @@ kernel_memory_allocate(
 	VM_DEBUG_CONSTANT_EVENT(vm_kern_request, VM_KERN_REQUEST, DBG_FUNC_END,
 	    wired_page_count, 0, 0, 0);
 #endif
-	/*
-	 *	Return the memory, not zeroed.
-	 */
+	  
+                                  
+    
 	*addrp = CAST_DOWN(vm_offset_t, map_addr);
 	return KERN_SUCCESS;
 
@@ -585,14 +585,14 @@ kernel_memory_populate_with_pages(
 
 		vm_object_lock(object);
 	} else {
-		/*
-		 * If it's not the kernel object, we need to:
-		 *      lock map;
-		 *      lookup entry;
-		 *      lock object;
-		 *	take reference on object;
-		 *      unlock map;
-		 */
+		  
+                                               
+                   
+                       
+                      
+                              
+                     
+     
 		panic("%s(%p,0x%llx,0x%llx,0x%x): !KMA_KOBJECT", __func__,
 		    map, (uint64_t) addr, (uint64_t) size, flags);
 	}
@@ -622,7 +622,7 @@ kernel_memory_populate_with_pages(
 		mem->vmp_wpmapped = TRUE;
 
 		PMAP_ENTER_OPTIONS(kernel_pmap, addr + pg_offset,
-		    0, /* fault_phys_offset */
+		    0,                        
 		    mem,
 		    VM_PROT_READ | VM_PROT_WRITE, VM_PROT_NONE,
 		    ((flags & KMA_KSTACK) ? VM_MEM_STACK : 0), TRUE,
@@ -795,13 +795,13 @@ kernel_memory_depopulate(
 	} else {
 		offset = 0;
 		object = NULL;
-		/*
-		 * If it's not the kernel object, we need to:
-		 *      lock map;
-		 *      lookup entry;
-		 *      lock object;
-		 *      unlock map;
-		 */
+		  
+                                               
+                   
+                       
+                      
+                     
+     
 		panic("kernel_memory_depopulate(%p,0x%llx,0x%llx,0x%x): "
 		    "!KMA_KOBJECT",
 		    map, (uint64_t) addr, (uint64_t) size, flags);
@@ -848,12 +848,12 @@ kernel_memory_depopulate(
 	}
 }
 
-/*
- *	kmem_alloc:
- *
- *	Allocate wired-down memory in the kernel's address map
- *	or a submap.  The memory is not zero-filled.
- */
+  
+              
+  
+                                                         
+                                               
+   
 
 kern_return_t
 kmem_alloc_external(
@@ -890,16 +890,16 @@ kmem_alloc_flags(
 	return kr;
 }
 
-/*
- *	kmem_realloc:
- *
- *	Reallocate wired-down memory in the kernel's address map
- *	or a submap.  Newly allocated pages are not zeroed.
- *	This can only be used on regions allocated with kmem_alloc.
- *
- *	If successful, the pages in the old region are mapped twice.
- *	The old region is unchanged.  Use kmem_free to get rid of it.
- */
+  
+                
+  
+                                                           
+                                                      
+                                                              
+  
+                                                               
+                                                                
+   
 kern_return_t
 kmem_realloc(
 	vm_map_t                map,
@@ -929,14 +929,14 @@ kmem_realloc(
 	newmapsize = vm_map_round_page(newsize,
 	    VM_MAP_PAGE_MASK(map));
 	if (newmapsize < newsize) {
-		/* overflow */
+		              
 		*newaddrp = 0;
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 *	Find the VM object backing the old region.
-	 */
+	  
+                                              
+    
 
 	vm_map_lock(map);
 
@@ -945,15 +945,15 @@ kmem_realloc(
 	}
 	object = VME_OBJECT(oldentry);
 
-	/*
-	 *	Increase the size of the object and
-	 *	fill in the new region.
-	 */
+	  
+                                       
+                           
+    
 
 	vm_object_reference(object);
-	/* by grabbing the object lock before unlocking the map */
-	/* we guarantee that we will panic if more than one     */
-	/* attempt is made to realloc a kmem_alloc'd area       */
+	                                                          
+	                                                          
+	                                                          
 	vm_object_lock(object);
 	vm_map_unlock(map);
 	if (object->vo_size != oldmapsize) {
@@ -962,14 +962,14 @@ kmem_realloc(
 	object->vo_size = newmapsize;
 	vm_object_unlock(object);
 
-	/* allocate the new pages while expanded portion of the */
-	/* object is still not mapped */
+	                                                          
+	                                
 	kmem_alloc_pages(object, vm_object_round_page(oldmapsize),
 	    vm_object_round_page(newmapsize - oldmapsize));
 
-	/*
-	 *	Find space for the new region.
-	 */
+	  
+                                  
+    
 
 	kr = vm_map_find_space(map, &newmapaddr, newmapsize,
 	    (vm_map_offset_t) 0, 0,
@@ -994,8 +994,8 @@ kmem_realloc(
 	assert(newentry->wired_count == 0);
 
 
-	/* add an extra reference in case we have someone doing an */
-	/* unexpected deallocate */
+	                                                             
+	                           
 	vm_object_reference(object);
 	vm_map_unlock(map);
 
@@ -1024,16 +1024,16 @@ kmem_realloc(
 	return KERN_SUCCESS;
 }
 
-/*
- *	kmem_alloc_kobject:
- *
- *	Allocate wired-down memory in the kernel's address map
- *	or a submap.  The memory is not zero-filled.
- *
- *	The memory is allocated in the kernel_object.
- *	It may not be copied with vm_map_copy, and
- *	it may not be reallocated with kmem_realloc.
- */
+  
+                      
+  
+                                                         
+                                               
+  
+                                                
+                                             
+                                               
+   
 
 kern_return_t
 kmem_alloc_kobject_external(
@@ -1054,12 +1054,12 @@ kmem_alloc_kobject(
 	return kernel_memory_allocate(map, addrp, size, 0, KMA_KOBJECT, tag);
 }
 
-/*
- *	kmem_alloc_aligned:
- *
- *	Like kmem_alloc_kobject, except that the memory is aligned.
- *	The size should be a power-of-2.
- */
+  
+                      
+  
+                                                              
+                                   
+   
 
 kern_return_t
 kmem_alloc_aligned(
@@ -1074,11 +1074,11 @@ kmem_alloc_aligned(
 	return kernel_memory_allocate(map, addrp, size, size - 1, KMA_KOBJECT, tag);
 }
 
-/*
- *	kmem_alloc_pageable:
- *
- *	Allocate pageable memory in the kernel's address map.
- */
+  
+                       
+  
+                                                        
+   
 
 kern_return_t
 kmem_alloc_pageable_external(
@@ -1108,7 +1108,7 @@ kmem_alloc_pageable(
 	map_size = vm_map_round_page(size,
 	    VM_MAP_PAGE_MASK(map));
 	if (map_size < size) {
-		/* overflow */
+		              
 		*addrp = 0;
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -1132,13 +1132,13 @@ kmem_alloc_pageable(
 	return KERN_SUCCESS;
 }
 
-/*
- *	kmem_free:
- *
- *	Release a region of kernel virtual memory allocated
- *	with kmem_alloc, kmem_alloc_kobject, or kmem_alloc_pageable,
- *	and return the physical pages associated with that region.
- */
+  
+             
+  
+                                                      
+                                                               
+                                                             
+   
 
 void
 kmem_free(
@@ -1170,9 +1170,9 @@ kmem_free(
 	}
 }
 
-/*
- *	Allocate new pages in an object.
- */
+  
+                                   
+   
 
 kern_return_t
 kmem_alloc_pages(
@@ -1188,9 +1188,9 @@ kmem_alloc_pages(
 		vm_page_t   mem;
 
 
-		/*
-		 *	Allocate a page
-		 */
+		  
+                    
+     
 		while (VM_PAGE_NULL ==
 		    (mem = vm_page_alloc(object, offset))) {
 			vm_object_unlock(object);
@@ -1206,21 +1206,21 @@ kmem_alloc_pages(
 	return KERN_SUCCESS;
 }
 
-/*
- *	kmem_suballoc:
- *
- *	Allocates a map to manage a subrange
- *	of the kernel virtual address space.
- *
- *	Arguments are as follows:
- *
- *	parent		Map to take range from
- *	addr		Address of start of range (IN/OUT)
- *	size		Size of range to find
- *	pageable	Can region be paged
- *	anywhere	Can region be located anywhere in map
- *	new_map		Pointer to new submap
- */
+  
+                 
+  
+                                       
+                                       
+  
+                            
+  
+                                 
+                                           
+                              
+                               
+                                                 
+                                 
+   
 kern_return_t
 kmem_suballoc(
 	vm_map_t        parent,
@@ -1240,16 +1240,16 @@ kmem_suballoc(
 	map_size = vm_map_round_page(size,
 	    VM_MAP_PAGE_MASK(parent));
 	if (map_size < size) {
-		/* overflow */
+		              
 		*addr = 0;
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 *	Need reference on submap object because it is internal
-	 *	to the vm_system.  vm_object_enter will never be called
-	 *	on it (usual source of reference for vm_map_enter).
-	 */
+	  
+                                                          
+                                                           
+                                                       
+    
 	vm_object_reference(vm_submap_object);
 
 	map_addr = ((flags & VM_FLAGS_ANYWHERE)
@@ -1269,19 +1269,19 @@ kmem_suballoc(
 	pmap_reference(vm_map_pmap(parent));
 	map = vm_map_create(vm_map_pmap(parent), map_addr, map_addr + map_size, pageable);
 	if (map == VM_MAP_NULL) {
-		panic("kmem_suballoc: vm_map_create failed");   /* "can't happen" */
+		panic("kmem_suballoc: vm_map_create failed");                       
 	}
-	/* inherit the parent map's page size */
+	                                        
 	vm_map_set_page_shift(map, VM_MAP_PAGE_SHIFT(parent));
 
 	kr = vm_map_submap(parent, map_addr, map_addr + map_size, map, map_addr, FALSE);
 	if (kr != KERN_SUCCESS) {
-		/*
-		 * See comment preceding vm_map_submap().
-		 */
+		  
+                                           
+     
 		vm_map_remove(parent, map_addr, map_addr + map_size,
 		    VM_MAP_REMOVE_NO_FLAGS);
-		vm_map_deallocate(map); /* also removes ref to pmap */
+		vm_map_deallocate(map);                               
 		vm_object_deallocate(vm_submap_object);
 		return kr;
 	}
@@ -1289,28 +1289,28 @@ kmem_suballoc(
 	*new_map = map;
 	return KERN_SUCCESS;
 }
-/*
- * The default percentage of memory that can be mlocked is scaled based on the total
- * amount of memory in the system. These percentages are caclulated
- * offline and stored in this table. We index this table by
- * log2(max_mem) - VM_USER_WIREABLE_MIN_CONFIG. We clamp this index in the range
- * [0, sizeof(wire_limit_percents) / sizeof(vm_map_size_t))
- *
- * Note that these values were picked for mac.
- * If we ever have very large memory config arm devices, we may want to revisit
- * since the kernel overhead is smaller there due to the larger page size.
- */
+  
+                                                                                    
+                                                                   
+                                                           
+                                                                                
+                                                           
+  
+                                              
+                                                                               
+                                                                          
+   
 
-/* Start scaling iff we're managing > 2^32 = 4GB of RAM. */
+                                                           
 #define VM_USER_WIREABLE_MIN_CONFIG 32
 static vm_map_size_t wire_limit_percents[] =
 { 70, 73, 76, 79, 82, 85, 88, 91, 94, 97};
 
-/*
- * Sets the default global user wire limit which limits the amount of
- * memory that can be locked via mlock() based on the above algorithm..
- * This can be overridden via a sysctl.
- */
+  
+                                                                     
+                                                                       
+                                       
+   
 static void
 kmem_set_user_wire_limits(void)
 {
@@ -1322,7 +1322,7 @@ kmem_set_user_wire_limits(void)
 	uint64_t config_memsize = max_mem;
 #if defined(XNU_TARGET_OS_OSX)
 	config_memsize = max_mem_actual;
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 
 
 	available_mem_log = bit_floor(config_memsize);
 
@@ -1337,25 +1337,25 @@ kmem_set_user_wire_limits(void)
 	max_wire_percent = wire_limit_percents[available_mem_log];
 
 	limit = config_memsize * max_wire_percent / 100;
-	/* Cap the number of non lockable bytes at VM_NOT_USER_WIREABLE_MAX */
+	                                                                      
 	if (config_memsize - limit > VM_NOT_USER_WIREABLE_MAX) {
 		limit = config_memsize - VM_NOT_USER_WIREABLE_MAX;
 	}
 
 	vm_global_user_wire_limit = limit;
-	/* the default per task limit is the same as the global limit */
+	                                                                
 	vm_per_task_user_wire_limit = limit;
 	vm_add_wire_count_over_global_limit = 0;
 	vm_add_wire_count_over_user_limit = 0;
 }
 
 
-/*
- *	kmem_init:
- *
- *	Initialize the kernel's virtual memory map, taking
- *	into account all memory allocated up to this time.
- */
+  
+             
+  
+                                                     
+                                                     
+   
 __startup_func
 void
 kmem_init(
@@ -1378,9 +1378,9 @@ kmem_init(
 #if     defined(__arm__) || defined(__arm64__)
 	kernel_map = vm_map_create(pmap_kernel(), VM_MIN_KERNEL_AND_KEXT_ADDRESS,
 	    VM_MAX_KERNEL_ADDRESS, FALSE);
-	/*
-	 *	Reserve virtual memory allocated up to this time.
-	 */
+	  
+                                                     
+    
 	{
 		unsigned int    region_select = 0;
 		vm_map_offset_t region_start;
@@ -1413,9 +1413,9 @@ kmem_init(
 #else
 	kernel_map = vm_map_create(pmap_kernel(), VM_MIN_KERNEL_AND_KEXT_ADDRESS,
 	    map_end, FALSE);
-	/*
-	 *	Reserve virtual memory allocated up to this time.
-	 */
+	  
+                                                     
+    
 	if (start != VM_MIN_KERNEL_AND_KEXT_ADDRESS) {
 		vm_map_offset_t map_addr;
 		kern_return_t kr;
@@ -1449,14 +1449,14 @@ kmem_init(
 	kmem_set_user_wire_limits();
 }
 
-/*
- *	Routine:	copyinmap
- *	Purpose:
- *		Like copyin, except that fromaddr is an address
- *		in the specified VM map.  This implementation
- *		is incomplete; it handles the current user map
- *		and the kernel map/submaps.
- */
+  
+                     
+           
+                                                   
+                                                 
+                                                  
+                               
+   
 kern_return_t
 copyinmap(
 	vm_map_t                map,
@@ -1468,7 +1468,7 @@ copyinmap(
 	vm_map_t oldmap;
 
 	if (vm_map_pmap(map) == pmap_kernel()) {
-		/* assume a correct copy */
+		                           
 		memcpy(todata, CAST_DOWN(void *, fromaddr), length);
 	} else if (current_map() == map) {
 		if (copyin(fromaddr, todata, length) != 0) {
@@ -1486,12 +1486,12 @@ copyinmap(
 	return kr;
 }
 
-/*
- *	Routine:	copyoutmap
- *	Purpose:
- *		Like copyout, except that toaddr is an address
- *		in the specified VM map.
- */
+  
+                      
+           
+                                                  
+                            
+   
 kern_return_t
 copyoutmap(
 	vm_map_t                map,
@@ -1503,7 +1503,7 @@ copyoutmap(
 	vm_map_t        oldmap;
 
 	if (vm_map_pmap(map) == pmap_kernel()) {
-		/* assume a correct copy */
+		                           
 		memcpy(CAST_DOWN(void *, toaddr), fromdata, length);
 	} else if (current_map() == map) {
 		if (copyout(fromdata, toaddr, length) != 0) {
@@ -1521,12 +1521,12 @@ copyoutmap(
 	return kr;
 }
 
-/*
- *	Routine:	copyoutmap_atomic{32, 64}
- *	Purpose:
- *		Like copyoutmap, except that the operation is atomic.
- *      Takes in value rather than *fromdata pointer.
- */
+  
+                                     
+           
+                                                         
+                                                     
+   
 kern_return_t
 copyoutmap_atomic32(
 	vm_map_t                map,
@@ -1537,7 +1537,7 @@ copyoutmap_atomic32(
 	vm_map_t        oldmap;
 
 	if (vm_map_pmap(map) == pmap_kernel()) {
-		/* assume a correct toaddr */
+		                             
 		*(uint32_t *)toaddr = value;
 	} else if (current_map() == map) {
 		if (copyout_atomic32(value, toaddr) != 0) {
@@ -1565,7 +1565,7 @@ copyoutmap_atomic64(
 	vm_map_t        oldmap;
 
 	if (vm_map_pmap(map) == pmap_kernel()) {
-		/* assume a correct toaddr */
+		                             
 		*(uint64_t *)toaddr = value;
 	} else if (current_map() == map) {
 		if (copyout_atomic64(value, toaddr) != 0) {
@@ -1583,16 +1583,16 @@ copyoutmap_atomic64(
 	return kr;
 }
 
-/*
- *
- *	The following two functions are to be used when exposing kernel
- *	addresses to userspace via any of the various debug or info
- *	facilities that exist. These are basically the same as VM_KERNEL_ADDRPERM()
- *	and VM_KERNEL_UNSLIDE_OR_PERM() except they use a different random seed and
- *	are exported to KEXTs.
- *
- *	NOTE: USE THE MACRO VERSIONS OF THESE FUNCTIONS (in vm_param.h) FROM WITHIN THE KERNEL
- */
+  
+  
+                                                                  
+                                                              
+                                                                              
+                                                                              
+                         
+  
+                                                                                         
+   
 
 static void
 vm_kernel_addrhash_internal(
@@ -1647,13 +1647,13 @@ vm_kernel_addrhide(
 	*hide_addr = VM_KERNEL_ADDRHIDE(addr);
 }
 
-/*
- *	vm_kernel_addrperm_external:
- *	vm_kernel_unslide_or_perm_external:
- *
- *	Use these macros when exposing an address to userspace that could come from
- *	either kernel text/data *or* the heap.
- */
+  
+                               
+                                      
+  
+                                                                              
+                                         
+   
 void
 vm_kernel_addrperm_external(
 	vm_offset_t addr,

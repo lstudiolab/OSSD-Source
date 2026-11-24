@@ -50,7 +50,7 @@
 
 #include <mach/mach_time.h>
 
-#define RANDOM_MAJOR  -1 /* let the kernel pick the device number */
+#define RANDOM_MAJOR  -1                                            
 #define RANDOM_MINOR   0
 #define URANDOM_MINOR  1
 
@@ -73,10 +73,10 @@ static const struct cdevsw random_cdevsw =
 };
 
 
-/*
- * Called to initialize our device,
- * and to register ourselves with devfs
- */
+  
+                                   
+                                       
+   
 void
 random_init(void)
 {
@@ -90,10 +90,10 @@ random_init(void)
 	devfs_make_node(makedev(ret, RANDOM_MINOR), DEVFS_CHAR,
 	    UID_ROOT, GID_WHEEL, 0666, "random", 0);
 
-	/*
-	 * also make urandom
-	 * (which is exactly the same thing in our context)
-	 */
+	  
+                     
+                                                    
+    
 	devfs_make_node(makedev(ret, URANDOM_MINOR), DEVFS_CHAR,
 	    UID_ROOT, GID_WHEEL, 0666, "urandom", 0);
 }
@@ -113,18 +113,18 @@ random_ioctl(   __unused dev_t dev, u_long cmd, __unused caddr_t data,
 	return 0;
 }
 
-/*
- * Open the device.  Make sure init happened, and make sure the caller is
- * authorized.
- */
+  
+                                                                         
+              
+   
 
 int
 random_open(__unused dev_t dev, int flags, __unused int devtype, __unused struct proc *p)
 {
-	/*
-	 * if we are being opened for write,
-	 * make sure that we have privledges do so
-	 */
+	  
+                                     
+                                           
+    
 	if (flags & FWRITE) {
 		if (securelevel >= 2) {
 			return EPERM;
@@ -133,16 +133,16 @@ random_open(__unused dev_t dev, int flags, __unused int devtype, __unused struct
 		if ((securelevel >= 1) && proc_suser(p)) {
 			return EPERM;
 		}
-#endif  /* !__APPLE__ */
+#endif                  
 	}
 
 	return 0;
 }
 
 
-/*
- * close the device.
- */
+  
+                    
+   
 
 int
 random_close(__unused dev_t dev, __unused int flags, __unused int mode, __unused struct proc *p)
@@ -151,10 +151,10 @@ random_close(__unused dev_t dev, __unused int flags, __unused int mode, __unused
 }
 
 
-/*
- * Get entropic data from the Security Server, and use it to reseed the
- * prng.
- */
+  
+                                                                       
+        
+   
 int
 random_write(dev_t dev, struct uio *uio, __unused int ioflag)
 {
@@ -165,10 +165,10 @@ random_write(dev_t dev, struct uio *uio, __unused int ioflag)
 		return EPERM;
 	}
 
-	/* Security server is sending us entropy */
+	                                           
 
 	while ((size_t)uio_resid(uio) > 0 && retCode == 0) {
-		/* get the user's data */
+		                         
 		size_t bytesToInput = MIN((size_t)uio_resid(uio), sizeof(rdBuffer));
 		retCode = uiomove(rdBuffer, (int)bytesToInput, uio);
 		if (retCode != 0) {
@@ -183,9 +183,9 @@ random_write(dev_t dev, struct uio *uio, __unused int ioflag)
 	return retCode;
 }
 
-/*
- * return data to the caller.  Results unpredictable.
- */
+  
+                                                     
+   
 int
 random_read(__unused dev_t dev, struct uio *uio, __unused int ioflag)
 {
@@ -208,9 +208,9 @@ random_read(__unused dev_t dev, struct uio *uio, __unused int ioflag)
 	return retCode;
 }
 
-/*
- * Return an u_int32_t pseudo-random number.
- */
+  
+                                            
+   
 u_int32_t
 RandomULong(void)
 {
@@ -229,9 +229,9 @@ getentropy(__unused struct proc * p, struct getentropy_args *gap, __unused int *
 
 	user_addr = (user_addr_t)gap->buffer;
 	user_size = gap->size;
-	/* Can't request more than 256 random bytes
-	 * at once. Complying with openbsd getentropy()
-	 */
+	                                           
+                                                
+    
 	if (user_size > sizeof(buffer)) {
 		return EINVAL;
 	}

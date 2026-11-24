@@ -76,7 +76,7 @@ split_address(vm_offset_t address)
 	addr.pdpt   = (address >> 30) & 0x1ff;
 	addr.pd     = (address >> 21) & 0x1ff;
 	addr.pt     = (address >> 12) & 0x1ff;
-	// addr.offset = address & PAGE_MASK;
+	                                     
 
 	return addr;
 }
@@ -106,7 +106,7 @@ alloc_superpage(void)
 	mem = shadow_pnext;
 	shadow_pnext += I386_LPGBYTES;
 	shadow_pages_used += I386_LPGBYTES / I386_PGBYTES;
-	/* XXX: not accounting for superpage rounding */
+	                                                
 	return mem;
 }
 
@@ -169,7 +169,7 @@ kasan_map_shadow_superpage_zero(vm_offset_t address, vm_size_t size)
 			    address, size);
 		}
 
-		/* adding a new entry, this is not strictly required */
+		                                                       
 		invlpg(virt_shadow_target);
 	}
 }
@@ -217,7 +217,7 @@ kasan_map_shadow(vm_offset_t address, vm_size_t size, bool is_zero)
 
 		uint64_t pde = L2[addr.pd];
 		if ((pde & (INTEL_PTE_VALID | INTEL_PTE_PS)) == (INTEL_PTE_VALID | INTEL_PTE_PS)) {
-			/* Already mapped as a superpage */
+			                                   
 			continue;
 		}
 
@@ -245,7 +245,7 @@ kasan_map_shadow(vm_offset_t address, vm_size_t size, bool is_zero)
 			    | INTEL_PTE_VALID
 			    | INTEL_PTE_NX;
 
-			/* adding a new entry, this is not strictly required */
+			                                                       
 			invlpg(shadow_base);
 		}
 	}
@@ -256,13 +256,13 @@ kasan_arch_init(void)
 {
 	__nosan_bzero((void *)phys2virt(zero_superpage_phys), I386_LPGBYTES);
 
-	/* Map the physical aperture */
+	                               
 	kasan_map_shadow_superpage_zero(physmap_base, physmap_max - physmap_base);
 }
 
-/*
- * Steal some memory from EFI for the shadow map.
- */
+  
+                                                 
+   
 void
 kasan_reserve_memory(void *_args)
 {
@@ -284,7 +284,7 @@ kasan_reserve_memory(void *_args)
 	msize = args->MemoryMapDescriptorSize;
 	mcount = args->MemoryMapSize / msize;
 
-	/* sum total physical memory */
+	                               
 	total_pages = 0;
 	for (i = 0, mptr_tmp = mptr; i < mcount; i++, mptr_tmp = (EfiMemoryRange *)(((vm_offset_t)mptr_tmp) + msize)) {
 		total_pages += mptr_tmp->NumberOfPages;
@@ -292,14 +292,14 @@ kasan_reserve_memory(void *_args)
 
 	to_steal = (unsigned long)(total_pages * STOLEN_MEM_PERCENT) / 100 + (STOLEN_MEM_BYTES / I386_PGBYTES);
 
-	/* Search for a range large enough to steal from */
+	                                                   
 	for (i = 0, mptr_tmp = mptr; i < mcount; i++, mptr_tmp = (EfiMemoryRange *)(((vm_offset_t)mptr_tmp) + msize)) {
 		ppnum_t base, top;
 		base = (ppnum_t)(mptr_tmp->PhysicalStart >> I386_PGSHIFT);
 		top = (ppnum_t)((mptr_tmp->PhysicalStart >> I386_PGSHIFT) + mptr_tmp->NumberOfPages - 1);
 
 		if ((mptr_tmp->Type == kEfiConventionalMemory) && (mptr_tmp->NumberOfPages > to_steal)) {
-			/* Found a region with sufficient space - steal from the end */
+			                                                               
 			mptr_tmp->NumberOfPages -= to_steal;
 
 			shadow_pbase = mptr_tmp->PhysicalStart + (mptr_tmp->NumberOfPages << I386_PGSHIFT);
@@ -308,7 +308,7 @@ kasan_reserve_memory(void *_args)
 			shadow_pages_total = (unsigned int)to_steal;
 			shadow_stolen_idx = i;
 
-			/* Set aside a page of zeros we can use for dummy shadow mappings */
+			                                                                    
 			zero_superpage_phys = alloc_superpage();
 
 			return;
@@ -343,7 +343,7 @@ kasan_is_shadow_mapped(uintptr_t shadowp)
 
 	uint64_t pde = L2[addr.pd];
 	if ((pde & (INTEL_PTE_VALID | INTEL_PTE_PS)) == (INTEL_PTE_VALID | INTEL_PTE_PS)) {
-		/* mapped as superpage */
+		                         
 		return true;
 	}
 	L1 = (uint64_t *)(pde & ~PAGE_MASK);

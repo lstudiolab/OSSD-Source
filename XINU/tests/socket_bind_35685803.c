@@ -1,4 +1,4 @@
-/* -*- Mode: c; tab-width: 8; indent-tabs-mode: 1; c-basic-offset: 8; -*- */
+                                                                            
 
 #include <darwintest.h>
 #include <stdio.h>
@@ -154,7 +154,7 @@ multithreaded_bind_test(bool v6, int socket_count)
 	T_QUIET;
 	T_ASSERT_POSIX_ZERO(error, "pthread_create");
 
-	/* compete with second thread */
+	                                
 	bind_sockets(&info, "main");
 	error = pthread_join(thread, NULL);
 	T_QUIET;
@@ -172,12 +172,12 @@ run_multithreaded_bind_test(int number_of_runs, bool v6, int socket_count)
 {
 #if TARGET_OS_BRIDGE
 	T_SKIP("Not enough memory to handle this test");
-#else /* TARGET_OS_BRIDGE */
+#else                       
 	for (int i = 0; i < number_of_runs; i++) {
 		multithreaded_bind_test(v6, socket_count);
 	}
 	T_PASS("multithreaded_bind_test %s", v6 ? "IPv6" : "IPv4");
-#endif /* TARGET_OS_BRIDGE */
+#endif                       
 }
 
 T_DECL(socket_bind_35685803,

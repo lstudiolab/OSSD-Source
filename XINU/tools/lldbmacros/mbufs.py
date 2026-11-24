@@ -9,7 +9,7 @@ from utils import *
 from mbufdefines import *
 import xnudefines
 
-# Macro: mbuf_stat
+                  
 @lldb_command('mbuf_stat')
 def MBufStat(cmd_args=None):
     """ Print extended mbuf allocator statistics.
@@ -40,9 +40,9 @@ def MBufStat(cmd_args=None):
                                   mcs.mbcl_fail_cnt, mbuf.mtbl_cache.mc_waiter_cnt,
                                   mcs.mbcl_notified, mcs.mbcl_purge_cnt,
                                   mbuf.mtbl_maxlimit)
-# EndMacro: mbuf_stat
+                     
 
-# Macro: mbuf_walkpkt
+                     
 @lldb_command('mbuf_walkpkt')
 def MbufWalkPacket(cmd_args=None):
     """ Walk the mbuf packet chain (m_nextpkt)
@@ -64,9 +64,9 @@ def MbufWalkPacket(cmd_args=None):
         print out_string
         mp = mp.m_hdr.mh_nextpkt
         cnt += 1
-# EndMacro: mbuf_walkpkt
+                        
 
-# Macro: mbuf_walk
+                  
 @lldb_command('mbuf_walk')
 def MbufWalk(cmd_args=None):
     """ Walk the mbuf chain (m_next)
@@ -85,9 +85,9 @@ def MbufWalk(cmd_args=None):
         print out_string
         mp = mp.m_hdr.mh_next
         cnt += 1
-# EndMacro: mbuf_walk
+                     
 
-# Macro: mbuf_buf2slab
+                      
 @lldb_command('mbuf_buf2slab')
 def MbufBuf2Slab(cmd_args=None):
     """ Given an mbuf object, find its corresponding slab address
@@ -103,9 +103,9 @@ def MbufBuf2Slab(cmd_args=None):
     else:
         mbuf_slab_format = "0x{0:<8x}"
         print mbuf_slab_format.format(slab)
-# EndMacro: mbuf_buf2slab
+                         
 
-# Macro: mbuf_buf2mca
+                     
 @lldb_command('mbuf_buf2mca')
 def MbufBuf2Mca(cmd_args=None):
     """ Find the mcache audit structure of the corresponding mbuf
@@ -113,9 +113,9 @@ def MbufBuf2Mca(cmd_args=None):
     m = kern.GetValueFromAddress(cmd_args[0], 'mbuf *')
     print GetMbufBuf2Mca(m)
     return
-# EndMacro: mbuf_buf2mca
+                        
 
-# Macro: mbuf_slabs
+                   
 @lldb_command('mbuf_slabs')
 def MbufSlabs(cmd_args=None):
     """ Print all slabs in the group
@@ -185,9 +185,9 @@ def MbufSlabs(cmd_args=None):
                 z += 1
         x += 1
     print out_string
-# EndMacro: mbuf_slabs
+                      
 
-# Macro: mbuf_slabstbl
+                      
 @lldb_command('mbuf_slabstbl')
 def MbufSlabsTbl(cmd_args=None):
     """ Print slabs table
@@ -219,7 +219,7 @@ def MbufSlabsTbl(cmd_args=None):
 
         x += 1
     print out_string
-# EndMacro: mbuf_slabstbl
+                         
 
 def GetMbufMcaPtr(m, cl):
     pgshift = int(kern.globals.page_shift)
@@ -469,7 +469,7 @@ def GetPc(kgm_pc):
     return out_string
 
 
-# Macro: mbuf_showactive
+                        
 @lldb_command('mbuf_showactive')
 def MbufShowActive(cmd_args=None):
     """ Print all active/in-use mbuf objects
@@ -478,19 +478,19 @@ def MbufShowActive(cmd_args=None):
         print GetMbufWalkAllSlabs(1, 0, cmd_args[0])
     else:
         print GetMbufWalkAllSlabs(1, 0, 0)
-# EndMacro: mbuf_showactive
+                           
 
 
-# Macro: mbuf_showinactive
+                          
 @lldb_command('mbuf_showinactive')
 def MbufShowInactive(cmd_args=None):
     """ Print all freed/in-cache mbuf objects
     """
     print GetMbufWalkAllSlabs(0, 1, 0)
-# EndMacro: mbuf_showinactive
+                             
 
 
-# Macro: mbuf_showmca
+                     
 @lldb_command('mbuf_showmca')
 def MbufShowMca(cmd_args=None):
     """ Print the contents of an mbuf mcache audit structure
@@ -555,18 +555,18 @@ def MbufShowMca(cmd_args=None):
         out_string += "Missing argument 0 in user function."
 
     print out_string
-# EndMacro: mbuf_showmca
+                        
 
 
-# Macro: mbuf_showall
+                     
 @lldb_command('mbuf_showall')
 def MbufShowAll(cmd_args=None):
     """ Print all mbuf objects
     """
     print GetMbufWalkAllSlabs(1, 1, 1)
-# EndMacro: mbuf_showall
+                        
 
-# Macro: mbuf_countchain
+                        
 @lldb_command('mbuf_countchain')
 def MbufCountChain(cmd_args=None):
     """ Count the length of an mbuf chain
@@ -592,11 +592,11 @@ def MbufCountChain(cmd_args=None):
             print " ..." + str(pkt_nxt)
 
     print "Total: " + str(pkt + nxt) + " (via m_next: " + str(nxt) + ")"
-# EndMacro: mbuf_countchain
+                           
 
 
 
-# Macro: mbuf_topleak
+                     
 @lldb_command('mbuf_topleak')
 def MbufTopLeak(cmd_args=None):
     """ Print the top suspected mbuf leakers
@@ -610,7 +610,7 @@ def MbufTopLeak(cmd_args=None):
         print GetMbufTraceLeak(kern.globals.mleak_top_trace[topcnt])
         topcnt += 1
 
-# EndMacro: mbuf_topleak
+                        
 
 def GetMbufTraceLeak(trace):
     out_string = ""
@@ -649,7 +649,7 @@ def MbufLargeFailures(cmd_args=None):
         topcnt += 1
 
 
-# Macro: mbuf_traceleak
+                       
 @lldb_command('mbuf_traceleak')
 def MbufTraceLeak(cmd_args=None):
     """ Print the leak information for a given leak address
@@ -662,10 +662,10 @@ def MbufTraceLeak(cmd_args=None):
 
     trace = kern.GetValueFromAddress(cmd_args[0], 'mtrace *')
     print GetMbufTraceLeak(trace)
-# EndMacro: mbuf_traceleak
+                          
 
 
-# Macro: mcache_walkobj
+                       
 @lldb_command('mcache_walkobj')
 def McacheWalkObject(cmd_args=None):
     """ Given a mcache object address, walk its obj_next pointer
@@ -683,9 +683,9 @@ def McacheWalkObject(cmd_args=None):
         p = p.obj_next
         cnt += 1
     print out_string
-# EndMacro: mcache_walkobj
+                          
 
-# Macro: mcache_stat
+                    
 @lldb_command('mcache_stat')
 def McacheStat(cmd_args=None):
     """ Print all mcaches in the system.
@@ -741,9 +741,9 @@ def McacheStat(cmd_args=None):
         out_string += "\n"
         mc = cast(mc.mc_list.le_next, 'mcache *')
     print out_string
-# EndMacro: mcache_stat
+                       
 
-# Macro: mcache_showcache
+                         
 @lldb_command('mcache_showcache')
 def McacheShowCache(cmd_args=None):
     """Display the number of objects in cache.
@@ -779,13 +779,13 @@ def McacheShowCache(cmd_args=None):
     out_string += "Total # of full buckets (" + str(int(bktsize)) + " objs/bkt):\t" + str(int(cp.mc_full.bl_total)) + "\n"
     out_string += "Total # of objects cached:\t\t" + str(total) + "\n"
     print out_string
-# EndMacro: mcache_showcache
+                            
 
-# Macro: mbuf_wdlog
+                   
 @lldb_command('mbuf_wdlog')
 def McacheShowCache(cmd_args=None):
     """Display the watchdog log
     """
     lldb_run_command('settings set max-string-summary-length 4096')
     print('%s' % lldb_run_command('p/s mbwdog_logging').replace("\\n","\n"))
-# EndMacro: mbuf_wdlog
+                      

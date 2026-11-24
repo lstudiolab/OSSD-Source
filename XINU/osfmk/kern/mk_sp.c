@@ -30,7 +30,7 @@
  *
  */
 
-/* The routines in this module are all obsolete */
+                                                  
 
 #include <mach/boolean.h>
 #include <mach/thread_switch.h>
@@ -61,13 +61,13 @@
 #include <mach/host_priv_server.h>
 
 
-/*
- *	thread_set_policy
- *
- *	Set scheduling policy and parameters, both base and limit, for
- *	the given thread. Policy can be any policy implemented by the
- *	processor set, whether enabled or not.
- */
+  
+                    
+  
+                                                                 
+                                                                
+                                         
+   
 kern_return_t
 thread_set_policy(
 	thread_t                                thread,
@@ -163,7 +163,7 @@ thread_set_policy(
 		return result;
 	}
 
-	/* Note that we do not pass on max priority. */
+	                                               
 	if (result == KERN_SUCCESS) {
 		result = thread_set_mode_and_absolute_pri(thread, policy, bas);
 	}
@@ -172,13 +172,13 @@ thread_set_policy(
 }
 
 
-/*
- *      thread_policy
- *
- *	Set scheduling policy and parameters, both base and limit, for
- *	the given thread. Policy must be a policy which is enabled for the
- *	processor set. Change contained threads if requested.
- */
+  
+                     
+  
+                                                                 
+                                                                     
+                                                        
+   
 kern_return_t
 thread_policy(
 	thread_t                                thread,
@@ -209,9 +209,9 @@ thread_policy(
 	}
 
 	if (set_limit) {
-		/*
-		 *      Set scheduling limits to base priority.
-		 */
+		  
+                                                 
+     
 		switch (policy) {
 		case POLICY_RR:
 		{
@@ -269,10 +269,10 @@ thread_policy(
 			break;
 		}
 	} else {
-		/*
-		 *	Use current scheduling limits. Ensure that the
-		 *	new base priority will not exceed current limits.
-		 */
+		  
+                                                   
+                                                      
+     
 		switch (policy) {
 		case POLICY_RR:
 		{

@@ -24,19 +24,19 @@
 #define IKOT_TASK_NAME                  20
 
 
-/*
- * This test verifies various security properties for task and thread
- * read/inspect interfaces. Specifically, it checks and makes sure:
- *
- * 1. Task/thread can't get higher priv'ed ports from lower ones through
- * {task, thread}_get_special_port()
- * 2. Correct level of thread ports are returned from task_threads() with
- * a given task port flavor
- * 3. Correct level of task ports are returned from processor_set_tasks()
- * 4. MIG intrans conversion and enforcement for task/thread port does not break.
- * 5. task_{, read, inspect, name}_for_pid() works for self and other process
- * 6. The new mach_vm_remap_new interface behaves correctly
- */
+  
+                                                                     
+                                                                   
+  
+                                                                        
+                                    
+                                                                         
+                           
+                                                                         
+                                                                                 
+                                                                             
+                                                           
+   
 
 T_GLOBAL_META(
 	T_META_NAMESPACE("xnu.ipc"),
@@ -45,8 +45,8 @@ T_GLOBAL_META(
 static void
 RESULT_CHECK(
 	kern_return_t kr,
-	unsigned int flavor,  /* task_flavor_t or thread_flavor_t */
-	unsigned int required, /* task_flavor_t or thread_flavor_t */
+	unsigned int flavor,                                        
+	unsigned int required,                                       
 	char *f_name)
 {
 	if (flavor <= required) {
@@ -66,7 +66,7 @@ test_task_get_special_port(
 	mach_port_t tfp_port = MACH_PORT_NULL;
 
 	T_LOG("Testing task_get_special_port() with task flavor %d", flavor);
-	/* gettable with at least control port */
+	                                         
 	kr = task_get_special_port(tport, TASK_KERNEL_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, TASK_FLAVOR_CONTROL, "task_get_special_port(TASK_KERNEL_PORT)");
 	mach_port_deallocate(mach_task_self(), special_port);
@@ -82,7 +82,7 @@ test_task_get_special_port(
 	mach_port_deallocate(mach_task_self(), special_port);
 	special_port = MACH_PORT_NULL;
 
-	/* gettable with at least read port */
+	                                      
 	kr = task_get_special_port(tport, TASK_READ_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, TASK_FLAVOR_READ, "task_get_special_port(TASK_READ_PORT)");
 	if (KERN_SUCCESS == kr) {
@@ -94,7 +94,7 @@ test_task_get_special_port(
 	mach_port_deallocate(mach_task_self(), special_port);
 	special_port = MACH_PORT_NULL;
 
-	/* gettable with at least inspect port */
+	                                         
 	kr = task_get_special_port(tport, TASK_INSPECT_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, TASK_FLAVOR_INSPECT, "task_get_special_port(TASK_INSPECT_PORT)");
 	if (KERN_SUCCESS == kr) {
@@ -106,7 +106,7 @@ test_task_get_special_port(
 	mach_port_deallocate(mach_task_self(), special_port);
 	special_port = MACH_PORT_NULL;
 
-	/* gettable with at least name port */
+	                                      
 	kr = task_get_special_port(tport, TASK_NAME_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, TASK_FLAVOR_INSPECT, "task_get_special_port(TASK_NAME_PORT)");
 	if (KERN_SUCCESS == kr) {
@@ -128,19 +128,19 @@ test_thread_get_special_port(
 	mach_port_t special_port = MACH_PORT_NULL;
 
 	T_LOG("Testing thread_get_special_port() with thread flavor %d", flavor);
-	/* gettable with at least control port */
+	                                         
 	kr = thread_get_special_port(tport, THREAD_KERNEL_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, THREAD_FLAVOR_CONTROL, "thread_get_special_port(THREAD_KERNEL_PORT)");
 	mach_port_deallocate(mach_task_self(), special_port);
 	special_port = MACH_PORT_NULL;
 
-	/* gettable with at least read port */
+	                                      
 	kr = thread_get_special_port(tport, THREAD_READ_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, THREAD_FLAVOR_READ, "thread_get_special_port(THREAD_READ_PORT)");
 	mach_port_deallocate(mach_task_self(), special_port);
 	special_port = MACH_PORT_NULL;
 
-	/* gettable with at least inspect port */
+	                                         
 	kr = thread_get_special_port(tport, THREAD_INSPECT_PORT, &special_port);
 	RESULT_CHECK(kr, flavor, THREAD_FLAVOR_INSPECT, "thread_get_special_port(THREAD_INSPECT_PORT)");
 	mach_port_deallocate(mach_task_self(), special_port);
@@ -171,16 +171,16 @@ test_task_threads(
 
 	T_QUIET; T_ASSERT_GE(threadCount, 1, "threadCount should be at least 1");
 
-	/*
-	 * TASK_FLAVOR_CONTROL -> THREAD_FLAVOR_CONTROL
-	 * TASK_FLAVOR_READ    -> THREAD_FLAVOR_READ
-	 * TASK_FLAVOR_INSPECT -> THREAD_FLAVOR_INSPECT
-	 * TASK_FLAOVR_NAME    -> KERN_FAILURE
-	 */
+	  
+                                                
+                                             
+                                                
+                                       
+    
 	for (size_t i = 0; i < threadCount; i++) {
 		kr = mach_port_kernel_object(mach_task_self(), threadList[i], &kotype, &kaddr);
 		if (kr == KERN_INVALID_RIGHT) {
-			/* thread port is inactive */
+			                             
 			T_LOG("thread port name 0x%x is inactive", threadList[i]);
 			continue;
 		} else if (kr) {
@@ -242,7 +242,7 @@ test_processor_set_tasks(
 	for (size_t i = 0; i < tcnt; i++) {
 		kr = mach_port_kernel_object(mach_task_self(), taskList[i], &kotype, &kaddr);
 		if (kr == KERN_INVALID_RIGHT) {
-			/* task port is inactive */
+			                           
 			T_LOG("task port name 0x%x is inactive", taskList[i]);
 			continue;
 		} else if (kr) {
@@ -282,7 +282,7 @@ test_task_port_mig_intrans(
 	T_LOG("Testing various MIG/manual intrans task interfaces with task flavor %d", flavor);
 
 	{
-		/* 1. Test some control port interfaces */
+		                                          
 		int data = 0x41;
 		int new_value = 0x42;
 		kr = mach_vm_write(tport,
@@ -291,18 +291,18 @@ test_task_port_mig_intrans(
 		    (mach_msg_type_number_t)sizeof(int));
 		RESULT_CHECK(kr, flavor, TASK_FLAVOR_CONTROL, "mach_vm_write");
 
-		/* mach_vm_remap_new with max_protection VM_PROT_WRITE | VM_PROT_READ */
+		                                                                        
 		int *localAddress = 0;
 		mach_vm_address_t localMachVMAddress = 0;
 		vm_prot_t cur_protection = VM_PROT_WRITE | VM_PROT_READ;
 		vm_prot_t max_protection = VM_PROT_WRITE | VM_PROT_READ;
-		/* rdar://67706101 (mach_vm_remap flag that allows restricting protection of remapped region) */
+		                                                                                                
 		kr = mach_vm_remap_new(mach_task_self(),
 		    &localMachVMAddress,
 		    sizeof(int),
 		    0,
 		    VM_FLAGS_ANYWHERE,
-		    tport, /* remote task, use self task port */
+		    tport,                                      
 		    (mach_vm_address_t)&data,
 		    false,
 		    &cur_protection,
@@ -314,8 +314,8 @@ test_task_port_mig_intrans(
 		if (KERN_SUCCESS == kr) {
 			T_QUIET; T_EXPECT_EQ(max_protection, VM_PROT_READ | VM_PROT_WRITE, NULL);
 			T_QUIET; T_EXPECT_EQ(cur_protection, VM_PROT_READ | VM_PROT_WRITE, NULL);
-			T_QUIET; T_EXPECT_EQ(*localAddress, data, NULL); /* read */
-			*localAddress = 0; /* write */
+			T_QUIET; T_EXPECT_EQ(*localAddress, data, NULL);           
+			*localAddress = 0;            
 		}
 
 		exception_mask_t masks[EXC_TYPES_COUNT] = {};
@@ -332,7 +332,7 @@ test_task_port_mig_intrans(
 	}
 
 	{
-		/* 2. Test some read port interfaces */
+		                                       
 		vm_offset_t read_value = 0;
 		mach_msg_type_number_t read_cnt = 0;
 		int data = 0x41;
@@ -343,18 +343,18 @@ test_task_port_mig_intrans(
 		    &read_cnt);
 		RESULT_CHECK(kr, flavor, TASK_FLAVOR_READ, "mach_vm_read");
 
-		/* mach_vm_remap_new with max_protection VM_PROT_READ */
+		                                                        
 		int *localAddress = 0;
 		mach_vm_address_t localMachVMAddress = 0;
 		vm_prot_t cur_protection = VM_PROT_READ;
 		vm_prot_t max_protection = VM_PROT_READ;
-		/* rdar://67706101 (mach_vm_remap flag that allows restricting protection of remapped region) */
+		                                                                                                
 		kr = mach_vm_remap_new(mach_task_self(),
 		    &localMachVMAddress,
 		    sizeof(int),
 		    0,
 		    VM_FLAGS_ANYWHERE,
-		    tport, /* remote task, use self task port */
+		    tport,                                      
 		    (mach_vm_address_t)&data,
 		    false,
 		    &cur_protection,
@@ -366,10 +366,10 @@ test_task_port_mig_intrans(
 		if (KERN_SUCCESS == kr) {
 			T_QUIET; T_EXPECT_EQ(max_protection, VM_PROT_READ, NULL);
 			T_QUIET; T_EXPECT_EQ(cur_protection, VM_PROT_READ, NULL);
-			T_QUIET; T_EXPECT_EQ(*localAddress, data, NULL); /* read */
+			T_QUIET; T_EXPECT_EQ(*localAddress, data, NULL);           
 		}
 
-		/* mach_vm_remap_new with copy == TRUE */
+		                                         
 		int data2 = 0x42;
 		localAddress = 0;
 		localMachVMAddress = 0;
@@ -381,7 +381,7 @@ test_task_port_mig_intrans(
 		    sizeof(int),
 		    0,
 		    VM_FLAGS_ANYWHERE,
-		    tport, /* remote task, use self task port */
+		    tport,                                      
 		    (mach_vm_address_t)&data2,
 		    true,
 		    &cur_protection,
@@ -393,36 +393,36 @@ test_task_port_mig_intrans(
 		if (KERN_SUCCESS == kr) {
 			T_QUIET; T_EXPECT_EQ(max_protection, VM_PROT_READ | VM_PROT_WRITE, NULL);
 			T_QUIET; T_EXPECT_EQ(cur_protection, VM_PROT_READ | VM_PROT_WRITE, NULL);
-			/* Following is causing bus error tracked by rdar://71616700 (Unexpected BUS ERROR in mach_vm_remap_new()) */
-			// T_QUIET; T_EXPECT_EQ(*localAddress, data2, NULL); /* read */
-			// *localAddress = 0; /* write */
+			                                                                                                             
+			                                                               
+			                                 
 		}
 
-		/* */
+		     
 		mach_port_t voucher = MACH_PORT_NULL;
 		kr = task_get_mach_voucher(tport, 0, &voucher);
 		RESULT_CHECK(kr, flavor, TASK_FLAVOR_READ, "task_get_mach_voucher");
 		mach_port_deallocate(mach_task_self(), voucher);
 
-		/* */
+		     
 		ipc_info_space_t space_info;
 		ipc_info_name_array_t table;
 		mach_msg_type_number_t tableCount;
-		ipc_info_tree_name_array_t tree; /* unused */
-		mach_msg_type_number_t treeCount; /* unused */
+		ipc_info_tree_name_array_t tree;             
+		mach_msg_type_number_t treeCount;             
 		kr = mach_port_space_info(tport, &space_info, &table, &tableCount, &tree, &treeCount);
 		RESULT_CHECK(kr, flavor, TASK_FLAVOR_READ, "mach_port_space_info");
 	}
 
 	{
-		/* 3. Test some inspect port interfaces */
+		                                          
 		task_exc_guard_behavior_t exc_behavior;
 		kr = task_get_exc_guard_behavior(tport, &exc_behavior);
 		RESULT_CHECK(kr, flavor, TASK_FLAVOR_INSPECT, "task_get_exc_guard_behavior");
 	}
 
 	{
-		/* 4. Test some name port interfaces */
+		                                       
 		struct task_basic_info info;
 		mach_msg_type_number_t size = sizeof(info);
 		kr = task_info(tport,
@@ -443,7 +443,7 @@ test_thread_port_mig_intrans(
 	T_LOG("Testing various MIG/manual intrans thread interfaces with thread flavor %d", flavor);
 
 	{
-		/* 1. Test some control port interfaces */
+		                                          
 		exception_mask_t masks[EXC_TYPES_COUNT] = {};
 		mach_msg_type_number_t nmasks = 0;
 		exception_port_t ports[EXC_TYPES_COUNT] = {};
@@ -458,7 +458,7 @@ test_thread_port_mig_intrans(
 	}
 
 	{
-		/* 2. Test some read port interfaces */
+		                                       
 		mach_voucher_t voucher = MACH_PORT_NULL;
 		kr = thread_get_mach_voucher(tport, 0, &voucher);
 		RESULT_CHECK(kr, flavor, THREAD_FLAVOR_READ, "thread_get_mach_voucher");
@@ -466,7 +466,7 @@ test_thread_port_mig_intrans(
 	}
 
 	{
-		/* 3. Test some inspect port interfaces */
+		                                          
 		processor_set_name_t name = MACH_PORT_NULL;
 		kr = thread_get_assignment(tport, &name);
 		RESULT_CHECK(kr, flavor, THREAD_FLAVOR_INSPECT, "thread_get_assignment");
@@ -490,7 +490,7 @@ test_get_child_task_port(void)
 	}
 
 	if (child_pid == 0) {
-		/* hang the child */
+		                    
 		while (1) {
 			sleep(10);
 		}
@@ -530,7 +530,7 @@ T_DECL(read_inspect, "Test critical read and inspect port interfaces")
 	thread_flavor_t thread_flavors[THREAD_PORT_COUNT];
 	kern_return_t kr;
 
-	/* first, try getting all flavors of task port for self */
+	                                                          
 	kr = task_for_pid(mach_task_self(), getpid(), &control_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "task_for_pid()");
 	task_ports[0] = control_port;
@@ -558,27 +558,27 @@ T_DECL(read_inspect, "Test critical read and inspect port interfaces")
 
 
 	for (size_t i = 0; i < TASK_PORT_COUNT; i++) {
-		/*
-		 * 1. Make sure can't get higher priv'ed ports from lower ones through
-		 * task_get_special_port()
-		 */
+		  
+                                                                        
+                            
+     
 		test_task_get_special_port(task_ports[i], task_flavors[i]);
 
-		/*
-		 * 2. Make sure correct level of thread ports are returned from task_threads
-		 */
+		  
+                                                                              
+     
 		test_task_threads(task_ports[i], task_flavors[i]);
 
-		/*
-		 * 3. Make sure correct level of task ports are returned from processor_set_tasks
-		 */
+		  
+                                                                                   
+     
 		if (i >= 1) {
 			test_processor_set_tasks(task_flavors[i]);
 		}
 
-		/*
-		 * 4. Make sure our MIG intrans enforcement for tasks does not break.
-		 */
+		  
+                                                                       
+     
 		test_task_port_mig_intrans(task_ports[i], task_flavors[i]);
 	}
 
@@ -587,10 +587,10 @@ T_DECL(read_inspect, "Test critical read and inspect port interfaces")
 		mach_port_deallocate(mach_task_self(), task_ports[i]);
 	}
 
-	/* 4. Try spawning a child an get its task ports */
+	                                                   
 	test_get_child_task_port();
 
-	/* Now, test thread read/inspect ports */
+	                                         
 	th_control_port = mach_thread_self();
 	thread_ports[0] = th_control_port;
 	thread_flavors[0] = THREAD_FLAVOR_CONTROL;
@@ -612,15 +612,15 @@ T_DECL(read_inspect, "Test critical read and inspect port interfaces")
 
 
 	for (size_t i = 0; i < THREAD_PORT_COUNT; i++) {
-		/*
-		 * 1. Make sure can't get higher priv'ed ports from lower ones through
-		 * thread_get_special_port()
-		 */
+		  
+                                                                        
+                              
+     
 		test_thread_get_special_port(thread_ports[i], thread_flavors[i]);
 
-		/*
-		 * 2. Make sure our MIG intrans enforcement for threads does not break.
-		 */
+		  
+                                                                         
+     
 		test_thread_port_mig_intrans(thread_ports[i], thread_flavors[i]);
 	}
 

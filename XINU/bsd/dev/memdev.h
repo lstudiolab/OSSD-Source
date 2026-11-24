@@ -9,8 +9,8 @@
 
 void mdevinit(vm_offset_t base, unsigned int size);
 
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif  /* _SYS_MEMDEV_H_*/
+#endif                     

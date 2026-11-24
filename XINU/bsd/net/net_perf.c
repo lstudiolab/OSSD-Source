@@ -78,7 +78,7 @@ void
 net_perf_initialize(net_perf_t *npp, uint64_t bins)
 {
 	bzero(npp, sizeof(net_perf_t));
-	/* initialize np_hist_bars array */
+	                                   
 	update_bins(npp, bins);
 }
 

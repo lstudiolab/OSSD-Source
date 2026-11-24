@@ -78,17 +78,17 @@ work_interval_ctl(__unused proc_t p, struct work_interval_ctl_args *uap,
 
 		kret = kern_work_interval_create(current_thread(), &create_args);
 
-		/* thread already has a work interval */
+		                                        
 		if (kret == KERN_FAILURE) {
 			return EALREADY;
 		}
 
-		/* port copyout failed */
+		                         
 		if (kret == KERN_RESOURCE_SHORTAGE) {
 			return ENOMEM;
 		}
 
-		/* some other failure */
+		                        
 		if (kret != KERN_SUCCESS) {
 			return EINVAL;
 		}
@@ -132,11 +132,11 @@ work_interval_ctl(__unused proc_t p, struct work_interval_ctl_args *uap,
 			return EINVAL;
 		}
 
-		/*
-		 * No privilege check, we assume a previous WORK_INTERVAL_OPERATION_CREATE
-		 * operation would have allocated a work interval ID for the current
-		 * thread, which the scheduler will validate.
-		 */
+		  
+                                                                            
+                                                                      
+                                               
+     
 		kret = kern_work_interval_destroy(current_thread(), uap->work_interval_id);
 		if (kret != KERN_SUCCESS) {
 			return EINVAL;
@@ -152,11 +152,11 @@ work_interval_ctl(__unused proc_t p, struct work_interval_ctl_args *uap,
 			return EINVAL;
 		}
 
-		/*
-		 * No privilege check, we assume a previous WORK_INTERVAL_OPERATION_CREATE
-		 * operation would have allocated a work interval ID for the current
-		 * thread, which the scheduler will validate.
-		 */
+		  
+                                                                            
+                                                                      
+                                               
+     
 		if ((error = copyin(uap->arg, &notification, sizeof(notification)))) {
 			return error;
 		}
@@ -182,10 +182,10 @@ work_interval_ctl(__unused proc_t p, struct work_interval_ctl_args *uap,
 			return EINVAL;
 		}
 
-		/*
-		 * No privilege check, because the work interval port
-		 * is a capability.
-		 */
+		  
+                                                       
+                     
+     
 		kret = kern_work_interval_join(current_thread(),
 		    (mach_port_name_t)uap->work_interval_id);
 		if (kret != KERN_SUCCESS) {

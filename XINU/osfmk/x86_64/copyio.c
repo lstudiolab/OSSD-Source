@@ -52,33 +52,33 @@
 static int copyio(int, user_addr_t, char *, vm_size_t, vm_size_t *, int);
 static int copyio_phys(addr64_t, addr64_t, vm_size_t, int);
 
-/*
- * Copy sizes bigger than this value will cause a kernel panic.
- *
- * Yes, this is an arbitrary fixed limit, but it's almost certainly
- * a programming error to be copying more than this amount between
- * user and wired kernel memory in a single invocation on this
- * platform.
- */
+  
+                                                               
+  
+                                                                   
+                                                                  
+                                                              
+            
+   
 const int copysize_limit_panic = (64 * MB);
 
-/*
- * The copy engine has the following characteristics
- *   - copyio() handles copies to/from user or kernel space
- *   - copypv() deals with physical or virtual addresses
- *
- * Readers familiar with the 32-bit kernel will expect Joe's thesis at this
- * point describing the full glory of the copy window implementation. In K64,
- * however, there is no need for windowing. Thanks to the vast shared address
- * space, the kernel has direct access to userspace and to physical memory.
- *
- * User virtual addresses are accessible provided the user's cr3 is loaded.
- * Physical addresses are accessible via the direct map and the PHYSMAP_PTOV()
- * translation.
- *
- * Copyin/out variants all boil done to just these 2 routines in locore.s which
- * provide fault-recoverable copying:
- */
+  
+                                                    
+                                                           
+                                                        
+  
+                                                                           
+                                                                             
+                                                                             
+                                                                           
+  
+                                                                           
+                                                                              
+               
+  
+                                                                               
+                                     
+   
 extern int _bcopy(const void *, void *, vm_size_t);
 extern int _bcopystr(const void *, void *, vm_size_t, vm_size_t *);
 extern int _copyin_atomic32(const char *src, uint32_t *dst);
@@ -86,18 +86,18 @@ extern int _copyin_atomic64(const char *src, uint64_t *dst);
 extern int _copyout_atomic32(const uint32_t *u32, char *src);
 extern int _copyout_atomic64(const uint64_t *u64, char *src);
 
-/*
- * Types of copies:
- */
-#define COPYIN          0       /* from user virtual to kernel virtual */
-#define COPYOUT         1       /* from kernel virtual to user virtual */
-#define COPYINSTR       2       /* string variant of copyout */
-#define COPYINPHYS      3       /* from user virtual to kernel physical */
-#define COPYOUTPHYS     4       /* from kernel physical to user virtual */
-#define COPYINATOMIC32  5       /* from user virtual to kernel virtual */
-#define COPYINATOMIC64  6       /* from user virtual to kernel virtual */
-#define COPYOUTATOMIC32 7       /* from user virtual to kernel virtual */
-#define COPYOUTATOMIC64 8       /* from user virtual to kernel virtual */
+  
+                   
+   
+#define COPYIN          0                                                
+#define COPYOUT         1                                                
+#define COPYINSTR       2                                      
+#define COPYINPHYS      3                                                 
+#define COPYOUTPHYS     4                                                 
+#define COPYINATOMIC32  5                                                
+#define COPYINATOMIC64  6                                                
+#define COPYOUTATOMIC32 7                                                
+#define COPYOUTATOMIC64 8                                                
 
 #if ENABLE_SMAPLOG
 typedef struct {
@@ -134,7 +134,7 @@ smaplog_add_entry(boolean_t enabling)
 	smaplog_cbuf[index].smap_state = enabling;
 	smaplog_cbuf[index].copyio_active = (thread->machine.specFlags & CopyIOActive) ? 1 : 0;
 }
-#endif /* ENABLE_SMAPLOG */
+#endif                     
 
 extern boolean_t pmap_smap_enabled;
 static inline void
@@ -202,10 +202,10 @@ copyio(int copy_type, user_addr_t user_addr, char *kernel_addr,
 		if (__probable(!zalloc_disable_copyio_check)) {
 			zone_t src_zone = NULL;
 			kernel_buf_size = zone_element_size(kernel_addr, &src_zone);
-			/*
-			 * Size of elements in the permanent zone is not saved as a part of the
-			 * zone's info
-			 */
+			  
+                                                                          
+                 
+      
 			if (__improbable(src_zone && !src_zone->z_permanent &&
 			    kernel_buf_size < nbytes)) {
 				panic("copyio: kernel buffer %p has size %lu < nbytes %lu", kernel_addr, kernel_buf_size, nbytes);
@@ -213,7 +213,7 @@ copyio(int copy_type, user_addr_t user_addr, char *kernel_addr,
 		}
 	}
 
-	/* Sanity and security check for addresses to/from a user */
+	                                                            
 
 	if (__improbable(((pmap != kernel_pmap) && (use_kernel_map == 0)) &&
 	    ((nbytes && (user_addr + nbytes <= user_addr)) || ((user_addr + nbytes) > vm_map_max(thread->map))))) {
@@ -245,14 +245,14 @@ copyio(int copy_type, user_addr_t user_addr, char *kernel_addr,
 	}
 #endif
 
-	/*
-	 * If the no_shared_cr3 boot-arg is set (true), the kernel runs on
-	 * its own pmap and cr3 rather than the user's -- so that wild accesses
-	 * from kernel or kexts can be trapped. So, during copyin and copyout,
-	 * we need to switch back to the user's map/cr3. The thread is flagged
-	 * "CopyIOActive" at this time so that if the thread is pre-empted,
-	 * we will later restore the correct cr3.
-	 */
+	  
+                                                                   
+                                                                        
+                                                                       
+                                                                       
+                                                                    
+                                          
+    
 	recursive_CopyIOActive = thread->machine.specFlags & CopyIOActive;
 
 	boolean_t pdswitch = no_shared_cr3 || nopagezero;
@@ -272,9 +272,9 @@ copyio(int copy_type, user_addr_t user_addr, char *kernel_addr,
 	user_access_enable();
 
 #if DEVELOPMENT || DEBUG
-	/*
-	 * Ensure that we're running on the target thread's cr3.
-	 */
+	  
+                                                         
+    
 	if ((pmap != kernel_pmap) && !use_kernel_map &&
 	    (get_cr3_base() != pmap->pm_cr3)) {
 		panic("copyio(%d,%p,%p,%ld,%p,%d) cr3 is %p expects %p",
@@ -341,10 +341,10 @@ copyio(int copy_type, user_addr_t user_addr, char *kernel_addr,
 		    (int) nbytes,
 		    &bytes_copied);
 
-		/*
-		 * lencopied should be updated on success
-		 * or ENAMETOOLONG...  but not EFAULT
-		 */
+		  
+                                           
+                                       
+     
 		if (error != EFAULT) {
 			*lencopied = bytes_copied;
 		}
@@ -356,18 +356,18 @@ copyio(int copy_type, user_addr_t user_addr, char *kernel_addr,
 			break;
 		}
 		if (*(kernel_addr + bytes_copied - 1) == 0) {
-			/*
-			 * we found a NULL terminator... we're done
-			 */
+			  
+                                              
+      
 #if KDEBUG
 			nbytes = *lencopied;
 #endif
 			break;
 		} else {
-			/*
-			 * no more room in the buffer and we haven't
-			 * yet come across a NULL terminator
-			 */
+			  
+                                               
+                                       
+      
 #if KDEBUG
 			nbytes = *lencopied;
 #endif
@@ -435,15 +435,15 @@ copyin(const user_addr_t user_addr, void *kernel_addr, vm_size_t nbytes)
 	return copyio(COPYIN, user_addr, kernel_addr, nbytes, NULL, 0);
 }
 
-/*
- * copy{in,out}_atomic{32,64}
- * Read or store an aligned value from userspace as a single memory transaction.
- * These functions support userspace synchronization features
- */
+  
+                             
+                                                                                
+                                                             
+   
 int
 copyin_atomic32(const user_addr_t user_addr, uint32_t *kernel_addr)
 {
-	/* Test alignment */
+	                    
 	if (user_addr & 3) {
 		return EINVAL;
 	}
@@ -468,7 +468,7 @@ copyin_atomic32_wait_if_equals(const user_addr_t user_addr, uint32_t value)
 int
 copyin_atomic64(const user_addr_t user_addr, uint64_t *kernel_addr)
 {
-	/* Test alignment */
+	                    
 	if (user_addr & 7) {
 		return EINVAL;
 	}
@@ -478,7 +478,7 @@ copyin_atomic64(const user_addr_t user_addr, uint64_t *kernel_addr)
 int
 copyout_atomic32(uint32_t value, user_addr_t user_addr)
 {
-	/* Test alignment */
+	                    
 	if (user_addr & 3) {
 		return EINVAL;
 	}
@@ -488,7 +488,7 @@ copyout_atomic32(uint32_t value, user_addr_t user_addr)
 int
 copyout_atomic64(uint64_t value, user_addr_t user_addr)
 {
-	/* Test alignment */
+	                    
 	if (user_addr & 7) {
 		return EINVAL;
 	}
@@ -527,52 +527,52 @@ copypv(addr64_t src64, addr64_t snk64, unsigned int size, int which)
 	KERNEL_DEBUG(0xeff7004c | DBG_FUNC_START, (unsigned)src64,
 	    (unsigned)snk64, size, which, 0);
 
-	if ((which & (cppvPsrc | cppvPsnk)) == 0) {                             /* Make sure that only one is virtual */
-		panic("copypv: no more than 1 parameter may be virtual\n");     /* Not allowed */
+	if ((which & (cppvPsrc | cppvPsnk)) == 0) {                                                                     
+		panic("copypv: no more than 1 parameter may be virtual\n");                      
 	}
 	if ((which & (cppvPsrc | cppvPsnk)) == (cppvPsrc | cppvPsnk)) {
-		bothphys = 1;                                                   /* both are physical */
+		bothphys = 1;                                                                          
 	}
 	while (size) {
 		if (bothphys) {
-			lop = (unsigned int)(PAGE_SIZE - (snk64 & (PAGE_SIZE - 1)));            /* Assume sink smallest */
+			lop = (unsigned int)(PAGE_SIZE - (snk64 & (PAGE_SIZE - 1)));                                      
 
 			if (lop > (unsigned int)(PAGE_SIZE - (src64 & (PAGE_SIZE - 1)))) {
-				lop = (unsigned int)(PAGE_SIZE - (src64 & (PAGE_SIZE - 1)));    /* No, source is smaller */
+				lop = (unsigned int)(PAGE_SIZE - (src64 & (PAGE_SIZE - 1)));                               
 			}
 		} else {
-			/*
-			 * only need to compute the resid for the physical page
-			 * address... we don't care about where we start/finish in
-			 * the virtual since we just call the normal copyin/copyout
-			 */
+			  
+                                                          
+                                                             
+                                                              
+      
 			if (which & cppvPsrc) {
 				lop = (unsigned int)(PAGE_SIZE - (src64 & (PAGE_SIZE - 1)));
 			} else {
 				lop = (unsigned int)(PAGE_SIZE - (snk64 & (PAGE_SIZE - 1)));
 			}
 		}
-		csize = size;                                           /* Assume we can copy it all */
+		csize = size;                                                                          
 		if (lop < size) {
-			csize = lop;                                    /* Nope, we can't do it all */
+			csize = lop;                                                                  
 		}
 #if 0
-		/*
-		 * flush_dcache64 is currently a nop on the i386...
-		 * it's used when copying to non-system memory such
-		 * as video capture cards... on PPC there was a need
-		 * to flush due to how we mapped this memory... not
-		 * sure if it's needed on i386.
-		 */
+		  
+                                                     
+                                                     
+                                                      
+                                                     
+                                 
+     
 		if (which & cppvFsrc) {
-			flush_dcache64(src64, csize, 1);                /* If requested, flush source before move */
+			flush_dcache64(src64, csize, 1);                                                            
 		}
 		if (which & cppvFsnk) {
-			flush_dcache64(snk64, csize, 1);                /* If requested, flush sink before move */
+			flush_dcache64(snk64, csize, 1);                                                          
 		}
 #endif
 		if (bothphys) {
-			bcopy_phys(src64, snk64, csize);                /* Do a physical copy, virtually */
+			bcopy_phys(src64, snk64, csize);                                                   
 		} else {
 			if (copyio_phys(src64, snk64, csize, which)) {
 				return KERN_FAILURE;
@@ -580,15 +580,15 @@ copypv(addr64_t src64, addr64_t snk64, unsigned int size, int which)
 		}
 #if 0
 		if (which & cppvFsrc) {
-			flush_dcache64(src64, csize, 1);        /* If requested, flush source after move */
+			flush_dcache64(src64, csize, 1);                                                   
 		}
 		if (which & cppvFsnk) {
-			flush_dcache64(snk64, csize, 1);        /* If requested, flush sink after move */
+			flush_dcache64(snk64, csize, 1);                                                 
 		}
 #endif
-		size   -= csize;                                        /* Calculate what is left */
-		snk64 += csize;                                 /* Bump sink to next physical address */
-		src64 += csize;                                 /* Bump source to next physical address */
+		size   -= csize;                                                                    
+		snk64 += csize;                                                                         
+		src64 += csize;                                                                           
 	}
 	KERNEL_DEBUG(0xeff7004c | DBG_FUNC_END, (unsigned)src64,
 	    (unsigned)snk64, size, which, 0);

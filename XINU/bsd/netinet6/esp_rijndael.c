@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp_rijndael.c,v 1.1.2.1 2001/07/03 11:01:50 ume Exp $	*/
-/*	$KAME: esp_rijndael.c,v 1.4 2001/03/02 05:53:05 itojun Exp $	*/
+                                                                                       
+                                                                  
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -83,7 +83,7 @@
 
 #define MAX_REALIGN_LEN 2000
 #define AES_BLOCKLEN 16
-#define ESP_GCM_SALT_LEN 4   // RFC 4106 Section 4
+#define ESP_GCM_SALT_LEN 4                        
 #define ESP_GCM_IVLEN 8
 #define ESP_GCM_ALIGN 16
 
@@ -117,32 +117,32 @@ esp_aes_schedule(
 }
 
 
-/* The following 2 functions decrypt or encrypt the contents of
- * the mbuf chain passed in keeping the IP and ESP header's in place,
- * along with the IV.
- * The code attempts to call the crypto code with the largest chunk
- * of data it can based on the amount of source data in
- * the current source mbuf and the space remaining in the current
- * destination mbuf.  The crypto code requires data to be a multiples
- * of 16 bytes.  A separate buffer is used when a 16 byte block spans
- * mbufs.
- *
- * m = mbuf chain
- * off = offset to ESP header
- *
- * local vars for source:
- * soff = offset from beginning of the chain to the head of the
- *			current mbuf.
- * scut = last mbuf that contains headers to be retained
- * scutoff = offset to end of the headers in scut
- * s = the current mbuf
- * sn = current offset to data in s (next source data to process)
- *
- * local vars for dest:
- * d0 = head of chain
- * d = current mbuf
- * dn = current offset in d (next location to store result)
- */
+                                                               
+                                                                     
+                     
+                                                                   
+                                                       
+                                                                 
+                                                                     
+                                                                     
+         
+  
+                 
+                             
+  
+                         
+                                                               
+                  
+                                                        
+                                                 
+                       
+                                                                 
+  
+                       
+                     
+                   
+                                                           
+   
 
 
 int
@@ -155,8 +155,8 @@ esp_cbc_decrypt_aes(
 {
 	struct mbuf *s;
 	struct mbuf *d, *d0, *dp;
-	int soff;       /* offset from the head of chain, to head of this mbuf */
-	int sn, dn;     /* offset from the head of the mbuf, to meat */
+	int soff;                                                                
+	int sn, dn;                                                    
 	size_t ivoff, bodyoff;
 	u_int8_t iv[AES_BLOCKLEN] __attribute__((aligned(4))), *dptr;
 	u_int8_t sbuf[AES_BLOCKLEN] __attribute__((aligned(4))), *sp, *sp_unaligned, *sp_aligned = NULL;
@@ -173,7 +173,7 @@ esp_cbc_decrypt_aes(
 	}
 
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		ivoff = off + sizeof(struct esp);
 		bodyoff = off + sizeof(struct esp) + ivlen;
 	} else {
@@ -197,7 +197,7 @@ esp_cbc_decrypt_aes(
 
 	VERIFY(ivoff <= INT_MAX);
 
-	/* grab iv */
+	             
 	m_copydata(m, (int)ivoff, ivlen, (caddr_t) iv);
 
 	s = m;
@@ -205,7 +205,7 @@ esp_cbc_decrypt_aes(
 	d = d0 = dp = NULL;
 	sp = dptr = NULL;
 
-	/* skip header/IV offset */
+	                           
 	while (soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = (int)(bodyoff - soff);
@@ -218,26 +218,26 @@ esp_cbc_decrypt_aes(
 	scut = s;
 	scutoff = sn;
 
-	/* skip over empty mbuf */
+	                          
 	while (s && s->m_len == 0) {
 		s = s->m_next;
 	}
 
 	while (soff < m->m_pkthdr.len) {
-		/* source */
+		            
 		if (sn + AES_BLOCKLEN <= s->m_len) {
-			/* body is continuous */
+			                        
 			sp = mtod(s, u_int8_t *) + sn;
 			len = s->m_len - sn;
-			len -= len % AES_BLOCKLEN;      // full blocks only
+			len -= len % AES_BLOCKLEN;                         
 		} else {
-			/* body is non-continuous */
+			                            
 			m_copydata(s, sn, AES_BLOCKLEN, (caddr_t) sbuf);
 			sp = sbuf;
-			len = AES_BLOCKLEN;                     // 1 block only in sbuf
+			len = AES_BLOCKLEN;                                            
 		}
 
-		/* destination */
+		                 
 		if (!d || dn + AES_BLOCKLEN > d->m_len) {
 			if (d) {
 				dp = d;
@@ -268,7 +268,7 @@ esp_cbc_decrypt_aes(
 				dp->m_next = d;
 			}
 
-			// try to make mbuf data aligned
+			                                
 			if (!IPSEC_IS_P2ALIGNED(d->m_data)) {
 				m_adj(d, IPSEC_GET_P2UNALIGNED_OFS(d->m_data));
 			}
@@ -282,13 +282,13 @@ esp_cbc_decrypt_aes(
 			dn = 0;
 		}
 
-		/* adjust len if greater than space available in dest */
+		                                                        
 		if (len > d->m_len - dn) {
 			len = d->m_len - dn;
 		}
 
-		/* decrypt */
-		// check input pointer alignment and use a separate aligned buffer (if sp is unaligned on 4-byte boundary).
+		             
+		                                                                                                           
 		if (IPSEC_IS_P2ALIGNED(sp)) {
 			sp_unaligned = NULL;
 		} else {
@@ -317,23 +317,23 @@ esp_cbc_decrypt_aes(
 			sp = sp_aligned;
 			memcpy(sp, sp_unaligned, len);
 		}
-		// no need to check output pointer alignment
+		                                            
 		aes_decrypt_cbc(sp, iv, len >> 4, dptr + dn,
 		    (aes_decrypt_ctx*)(&(((aes_ctx*)sav->sched)->decrypt)));
 
-		// update unaligned pointers
+		                            
 		if (!IPSEC_IS_P2ALIGNED(sp_unaligned)) {
 			sp = sp_unaligned;
 		}
 
-		/* udpate offsets */
+		                    
 		sn += len;
 		dn += len;
 
-		// next iv
+		          
 		bcopy(sp + len - AES_BLOCKLEN, iv, AES_BLOCKLEN);
 
-		/* find the next source block */
+		                                
 		while (s && sn >= s->m_len) {
 			sn -= s->m_len;
 			soff += s->m_len;
@@ -341,18 +341,18 @@ esp_cbc_decrypt_aes(
 		}
 	}
 
-	/* free un-needed source mbufs and add dest mbufs to chain */
+	                                                             
 	m_freem(scut->m_next);
 	scut->m_len = scutoff;
 	scut->m_next = d0;
 
-	// free memory
+	              
 	if (sp_aligned != NULL) {
 		FREE(sp_aligned, M_SECA);
 		sp_aligned = NULL;
 	}
 
-	/* just in case */
+	                  
 	bzero(iv, sizeof(iv));
 	bzero(sbuf, sizeof(sbuf));
 
@@ -370,8 +370,8 @@ esp_cbc_encrypt_aes(
 {
 	struct mbuf *s;
 	struct mbuf *d, *d0, *dp;
-	int soff;       /* offset from the head of chain, to head of this mbuf */
-	int sn, dn;     /* offset from the head of the mbuf, to meat */
+	int soff;                                                                
+	int sn, dn;                                                    
 	size_t ivoff, bodyoff;
 	u_int8_t *ivp, *dptr, *ivp_unaligned;
 	u_int8_t sbuf[AES_BLOCKLEN] __attribute__((aligned(4))), *sp, *sp_unaligned, *sp_aligned = NULL;
@@ -388,7 +388,7 @@ esp_cbc_encrypt_aes(
 	}
 
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		ivoff = off + sizeof(struct esp);
 		bodyoff = off + sizeof(struct esp) + ivlen;
 	} else {
@@ -398,7 +398,7 @@ esp_cbc_encrypt_aes(
 
 	VERIFY(ivoff <= INT_MAX);
 
-	/* put iv into the packet */
+	                            
 	m_copyback(m, (int)ivoff, ivlen, sav->iv);
 	ivp = (u_int8_t *) sav->iv;
 
@@ -421,7 +421,7 @@ esp_cbc_encrypt_aes(
 	d = d0 = dp = NULL;
 	sp = dptr = NULL;
 
-	/* skip headers/IV */
+	                     
 	while (soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = (int)(bodyoff - soff);
@@ -434,26 +434,26 @@ esp_cbc_encrypt_aes(
 	scut = s;
 	scutoff = sn;
 
-	/* skip over empty mbuf */
+	                          
 	while (s && s->m_len == 0) {
 		s = s->m_next;
 	}
 
 	while (soff < m->m_pkthdr.len) {
-		/* source */
+		            
 		if (sn + AES_BLOCKLEN <= s->m_len) {
-			/* body is continuous */
+			                        
 			sp = mtod(s, u_int8_t *) + sn;
 			len = s->m_len - sn;
-			len -= len % AES_BLOCKLEN;      // full blocks only
+			len -= len % AES_BLOCKLEN;                         
 		} else {
-			/* body is non-continuous */
+			                            
 			m_copydata(s, sn, AES_BLOCKLEN, (caddr_t) sbuf);
 			sp = sbuf;
-			len = AES_BLOCKLEN;                     // 1 block only in sbuf
+			len = AES_BLOCKLEN;                                            
 		}
 
-		/* destination */
+		                 
 		if (!d || dn + AES_BLOCKLEN > d->m_len) {
 			if (d) {
 				dp = d;
@@ -484,7 +484,7 @@ esp_cbc_encrypt_aes(
 				dp->m_next = d;
 			}
 
-			// try to make mbuf data aligned
+			                                
 			if (!IPSEC_IS_P2ALIGNED(d->m_data)) {
 				m_adj(d, IPSEC_GET_P2UNALIGNED_OFS(d->m_data));
 			}
@@ -498,13 +498,13 @@ esp_cbc_encrypt_aes(
 			dn = 0;
 		}
 
-		/* adjust len if greater than space available */
+		                                                
 		if (len > d->m_len - dn) {
 			len = d->m_len - dn;
 		}
 
-		/* encrypt */
-		// check input pointer alignment and use a separate aligned buffer (if sp is not aligned on 4-byte boundary).
+		             
+		                                                                                                             
 		if (IPSEC_IS_P2ALIGNED(sp)) {
 			sp_unaligned = NULL;
 		} else {
@@ -533,7 +533,7 @@ esp_cbc_encrypt_aes(
 			sp = sp_aligned;
 			memcpy(sp, sp_unaligned, len);
 		}
-		// check ivp pointer alignment and use a separate aligned buffer (if ivp is not aligned on 4-byte boundary).
+		                                                                                                            
 		if (IPSEC_IS_P2ALIGNED(ivp)) {
 			ivp_unaligned = NULL;
 		} else {
@@ -541,11 +541,11 @@ esp_cbc_encrypt_aes(
 			ivp = ivp_aligned_buf;
 			memcpy(ivp, ivp_unaligned, AES_BLOCKLEN);
 		}
-		// no need to check output pointer alignment
+		                                            
 		aes_encrypt_cbc(sp, ivp, len >> 4, dptr + dn,
 		    (aes_encrypt_ctx*)(&(((aes_ctx*)sav->sched)->encrypt)));
 
-		// update unaligned pointers
+		                            
 		if (!IPSEC_IS_P2ALIGNED(sp_unaligned)) {
 			sp = sp_unaligned;
 		}
@@ -553,14 +553,14 @@ esp_cbc_encrypt_aes(
 			ivp = ivp_unaligned;
 		}
 
-		/* update offsets */
+		                    
 		sn += len;
 		dn += len;
 
-		/* next iv */
-		ivp = dptr + dn - AES_BLOCKLEN; // last block encrypted
+		             
+		ivp = dptr + dn - AES_BLOCKLEN;                        
 
-		/* find the next source block and skip empty mbufs */
+		                                                     
 		while (s && sn >= s->m_len) {
 			sn -= s->m_len;
 			soff += s->m_len;
@@ -568,18 +568,18 @@ esp_cbc_encrypt_aes(
 		}
 	}
 
-	/* free un-needed source mbufs and add dest mbufs to chain */
+	                                                             
 	m_freem(scut->m_next);
 	scut->m_len = scutoff;
 	scut->m_next = d0;
 
-	// free memory
+	              
 	if (sp_aligned != NULL) {
 		FREE(sp_aligned, M_SECA);
 		sp_aligned = NULL;
 	}
 
-	/* just in case */
+	                  
 	bzero(sbuf, sizeof(sbuf));
 	key_sa_stir_iv(sav);
 
@@ -655,8 +655,8 @@ esp_gcm_encrypt_aes(
 {
 	struct mbuf *s;
 	struct mbuf *d, *d0, *dp;
-	int soff;       /* offset from the head of chain, to head of this mbuf */
-	int sn, dn;     /* offset from the head of the mbuf, to meat */
+	int soff;                                                                
+	int sn, dn;                                                    
 	size_t ivoff, bodyoff;
 	u_int8_t *dptr, *sp, *sp_unaligned, *sp_aligned = NULL;
 	aes_gcm_ctx *ctx;
@@ -672,7 +672,7 @@ esp_gcm_encrypt_aes(
 	}
 
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		ivoff = off + sizeof(struct esp);
 		bodyoff = off + sizeof(struct esp) + ivlen;
 	} else {
@@ -681,7 +681,7 @@ esp_gcm_encrypt_aes(
 	}
 
 	bzero(nonce, ESP_GCM_SALT_LEN + ivlen);
-	/* generate new iv */
+	                     
 	ctx = (aes_gcm_ctx *)P2ROUNDUP(sav->sched, ESP_GCM_ALIGN);
 
 	if (aes_encrypt_reset_gcm(ctx->encrypt)) {
@@ -698,14 +698,14 @@ esp_gcm_encrypt_aes(
 
 	VERIFY(ivoff <= INT_MAX);
 
-	/*
-	 * The IV is now generated within corecrypto and
-	 * is provided to ESP using aes_encrypt_inc_iv_gcm().
-	 * This makes the sav->iv redundant and is no longer
-	 * used in GCM operations. But we still copy the IV
-	 * back to sav->iv to ensure that any future code reading
-	 * this value will get the latest IV.
-	 */
+	  
+                                                 
+                                                      
+                                                     
+                                                    
+                                                          
+                                      
+    
 	memcpy(sav->iv, (nonce + ESP_GCM_SALT_LEN), ivlen);
 	m_copyback(m, (int)ivoff, ivlen, sav->iv);
 	bzero(nonce, ESP_GCM_SALT_LEN + ivlen);
@@ -719,7 +719,7 @@ esp_gcm_encrypt_aes(
 
 	VERIFY(off <= INT_MAX);
 
-	/* Set Additional Authentication Data */
+	                                        
 	if (!(sav->flags & SADB_X_EXT_OLD)) {
 		struct newesp esp;
 		m_copydata(m, (int)off, sizeof(esp), (caddr_t) &esp);
@@ -735,7 +735,7 @@ esp_gcm_encrypt_aes(
 	d = d0 = dp = NULL;
 	sp = dptr = NULL;
 
-	/* skip headers/IV */
+	                     
 	while (soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = (int)(bodyoff - soff);
@@ -748,17 +748,17 @@ esp_gcm_encrypt_aes(
 	scut = s;
 	scutoff = sn;
 
-	/* skip over empty mbuf */
+	                          
 	while (s && s->m_len == 0) {
 		s = s->m_next;
 	}
 
 	while (soff < m->m_pkthdr.len) {
-		/* source */
+		            
 		sp = mtod(s, u_int8_t *) + sn;
 		len = s->m_len - sn;
 
-		/* destination */
+		                 
 		if (!d || (dn + len > d->m_len)) {
 			if (d) {
 				dp = d;
@@ -789,7 +789,7 @@ esp_gcm_encrypt_aes(
 				dp->m_next = d;
 			}
 
-			// try to make mbuf data aligned
+			                                
 			if (!IPSEC_IS_P2ALIGNED(d->m_data)) {
 				m_adj(d, IPSEC_GET_P2UNALIGNED_OFS(d->m_data));
 			}
@@ -804,13 +804,13 @@ esp_gcm_encrypt_aes(
 			dn = 0;
 		}
 
-		/* adjust len if greater than space available */
+		                                                
 		if (len > d->m_len - dn) {
 			len = d->m_len - dn;
 		}
 
-		/* encrypt */
-		// check input pointer alignment and use a separate aligned buffer (if sp is not aligned on 4-byte boundary).
+		             
+		                                                                                                             
 		if (IPSEC_IS_P2ALIGNED(sp)) {
 			sp_unaligned = NULL;
 		} else {
@@ -846,16 +846,16 @@ esp_gcm_encrypt_aes(
 			return EINVAL;
 		}
 
-		// update unaligned pointers
+		                            
 		if (!IPSEC_IS_P2ALIGNED(sp_unaligned)) {
 			sp = sp_unaligned;
 		}
 
-		/* update offsets */
+		                    
 		sn += len;
 		dn += len;
 
-		/* find the next source block and skip empty mbufs */
+		                                                     
 		while (s && sn >= s->m_len) {
 			sn -= s->m_len;
 			soff += s->m_len;
@@ -863,12 +863,12 @@ esp_gcm_encrypt_aes(
 		}
 	}
 
-	/* free un-needed source mbufs and add dest mbufs to chain */
+	                                                             
 	m_freem(scut->m_next);
 	scut->m_len = scutoff;
 	scut->m_next = d0;
 
-	// free memory
+	              
 	if (sp_aligned != NULL) {
 		FREE(sp_aligned, M_SECA);
 		sp_aligned = NULL;
@@ -887,8 +887,8 @@ esp_gcm_decrypt_aes(
 {
 	struct mbuf *s;
 	struct mbuf *d, *d0, *dp;
-	int soff;       /* offset from the head of chain, to head of this mbuf */
-	int sn, dn;     /* offset from the head of the mbuf, to meat */
+	int soff;                                                                
+	int sn, dn;                                                    
 	size_t ivoff, bodyoff;
 	u_int8_t iv[ESP_GCM_IVLEN] __attribute__((aligned(4))), *dptr;
 	u_int8_t *sp, *sp_unaligned, *sp_aligned = NULL;
@@ -905,7 +905,7 @@ esp_gcm_decrypt_aes(
 	}
 
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		ivoff = off + sizeof(struct esp);
 		bodyoff = off + sizeof(struct esp) + ivlen;
 	} else {
@@ -922,10 +922,10 @@ esp_gcm_decrypt_aes(
 
 	VERIFY(ivoff <= INT_MAX);
 
-	/* grab iv */
+	             
 	m_copydata(m, (int)ivoff, ivlen, (caddr_t) iv);
 
-	/* Set IV */
+	            
 	memcpy(nonce, _KEYBUF(sav->key_enc) + _KEYLEN(sav->key_enc) - ESP_GCM_SALT_LEN, ESP_GCM_SALT_LEN);
 	memcpy(nonce + ESP_GCM_SALT_LEN, iv, ivlen);
 
@@ -940,7 +940,7 @@ esp_gcm_decrypt_aes(
 
 	VERIFY(off <= INT_MAX);
 
-	/* Set Additional Authentication Data */
+	                                        
 	if (!(sav->flags & SADB_X_EXT_OLD)) {
 		struct newesp esp;
 		m_copydata(m, (int)off, sizeof(esp), (caddr_t) &esp);
@@ -955,7 +955,7 @@ esp_gcm_decrypt_aes(
 	d = d0 = dp = NULL;
 	sp = dptr = NULL;
 
-	/* skip header/IV offset */
+	                           
 	while (soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = (int)(bodyoff - soff);
@@ -968,17 +968,17 @@ esp_gcm_decrypt_aes(
 	scut = s;
 	scutoff = sn;
 
-	/* skip over empty mbuf */
+	                          
 	while (s && s->m_len == 0) {
 		s = s->m_next;
 	}
 
 	while (soff < m->m_pkthdr.len) {
-		/* source */
+		            
 		sp = mtod(s, u_int8_t *) + sn;
 		len = s->m_len - sn;
 
-		/* destination */
+		                 
 		if (!d || (dn + len > d->m_len)) {
 			if (d) {
 				dp = d;
@@ -1009,7 +1009,7 @@ esp_gcm_decrypt_aes(
 				dp->m_next = d;
 			}
 
-			// try to make mbuf data aligned
+			                                
 			if (!IPSEC_IS_P2ALIGNED(d->m_data)) {
 				m_adj(d, IPSEC_GET_P2UNALIGNED_OFS(d->m_data));
 			}
@@ -1024,13 +1024,13 @@ esp_gcm_decrypt_aes(
 			dn = 0;
 		}
 
-		/* adjust len if greater than space available in dest */
+		                                                        
 		if (len > d->m_len - dn) {
 			len = d->m_len - dn;
 		}
 
-		/* Decrypt */
-		// check input pointer alignment and use a separate aligned buffer (if sp is unaligned on 4-byte boundary).
+		             
+		                                                                                                           
 		if (IPSEC_IS_P2ALIGNED(sp)) {
 			sp_unaligned = NULL;
 		} else {
@@ -1059,7 +1059,7 @@ esp_gcm_decrypt_aes(
 			sp = sp_aligned;
 			memcpy(sp, sp_unaligned, len);
 		}
-		// no need to check output pointer alignment
+		                                            
 
 		if (aes_decrypt_gcm(sp, len, dptr + dn, ctx->decrypt)) {
 			ipseclog((LOG_ERR, "%s: failed to decrypt\n", __FUNCTION__));
@@ -1067,16 +1067,16 @@ esp_gcm_decrypt_aes(
 			return EINVAL;
 		}
 
-		// update unaligned pointers
+		                            
 		if (!IPSEC_IS_P2ALIGNED(sp_unaligned)) {
 			sp = sp_unaligned;
 		}
 
-		/* udpate offsets */
+		                    
 		sn += len;
 		dn += len;
 
-		/* find the next source block */
+		                                
 		while (s && sn >= s->m_len) {
 			sn -= s->m_len;
 			soff += s->m_len;
@@ -1084,18 +1084,18 @@ esp_gcm_decrypt_aes(
 		}
 	}
 
-	/* free un-needed source mbufs and add dest mbufs to chain */
+	                                                             
 	m_freem(scut->m_next);
 	scut->m_len = scutoff;
 	scut->m_next = d0;
 
-	// free memory
+	              
 	if (sp_aligned != NULL) {
 		FREE(sp_aligned, M_SECA);
 		sp_aligned = NULL;
 	}
 
-	/* just in case */
+	                  
 	bzero(iv, sizeof(iv));
 
 	return 0;

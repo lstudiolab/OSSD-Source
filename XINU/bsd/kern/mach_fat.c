@@ -39,24 +39,24 @@
 #include <libkern/OSByteOrder.h>
 #include <machine/exec.h>
 
-/**********************************************************************
-* Routine:	fatfile_getarch()
-*
-* Function:	Locate the architecture-dependant contents of a fat
-*		file that match this CPU.
-*
-* Args: header:		A pointer to the fat file header.
-*		size:			How large the fat file header is (including fat_arch array)
-*		req_cpu_type:	The required cpu type.
-*		mask_bits:	Bits to mask from the sub-image type when
-*				grading it vs. the req_cpu_type
-*		imgp:		Image params
-*		archret (out):	Pointer to fat_arch structure to hold
-*				the results.
-*
-* Returns:	KERN_SUCCESS:	Valid architecture found.
-*		KERN_FAILURE:	No valid architecture found.
-**********************************************************************/
+                                                                       
+                            
+ 
+                                                               
+                            
+ 
+                                                  
+                                                                      
+                                       
+                                                       
+                                    
+                      
+                                                       
+                 
+ 
+                                                  
+                                             
+                                                                       
 static load_return_t
 fatfile_getarch(
 	vm_offset_t              data_ptr,
@@ -87,12 +87,12 @@ fatfile_getarch(
 
 	max_nfat_arch = (data_size - sizeof(struct fat_header)) / sizeof(struct fat_arch);
 	if (nfat_arch > max_nfat_arch) {
-		/* nfat_arch would cause us to read off end of buffer */
+		                                                        
 		return LOAD_BADMACHO;
 	}
 
-	/*
-	 * Scan the fat_arch's looking for the best one.  */
+	  
+                                                     
 	best_arch = NULL;
 	best_grade = 0;
 	arch = (struct fat_arch *) (data_ptr + sizeof(struct fat_header));
@@ -101,31 +101,31 @@ fatfile_getarch(
 		testsubtype = OSSwapBigToHostInt32(arch->cpusubtype) & ~CPU_SUBTYPE_MASK;
 		testfeatures = OSSwapBigToHostInt32(arch->cpusubtype) & CPU_SUBTYPE_MASK;
 
-		/*
-		 *	Check to see if right cpu/subcpu type.
-		 */
+		  
+                                           
+     
 		if (!binary_match(mask_bits, req_cpu_type, req_subcpu_type, testtype, testsubtype)) {
 			continue;
 		}
 
-		/*
-		 *      Get the grade of the cpu subtype
-		 */
+		  
+                                          
+     
 		grade = grade_binary(testtype, testsubtype, testfeatures, TRUE);
 
-		/*
-		 *	Remember it if it's the best we've seen.
-		 */
+		  
+                                             
+     
 		if (grade > best_grade) {
 			best_grade = grade;
 			best_arch = arch;
 		}
 	}
 
-	/* On X86_64, allow 32 bit exec only for simulator binaries.
-	 * Failing here without re-running the grading algorithm is safe because i386
-	 * has the lowest possible grade value (so there can't be a lower best grade
-	 * that would be allowed if this check denied the i386 slice). */
+	                                                            
+                                                                              
+                                                                             
+                                                                  
 	if (best_arch != NULL &&
 	    validate_potential_simulator_binary(OSSwapBigToHostInt32(best_arch->cputype),
 	    imgp, OSSwapBigToHostInt32(best_arch->offset),
@@ -134,9 +134,9 @@ fatfile_getarch(
 		best_grade = 0;
 	}
 
-	/*
-	 *	Return our results.
-	 */
+	  
+                       
+    
 	if (best_arch == NULL) {
 		lret = LOAD_BADARCH;
 	} else {
@@ -154,9 +154,9 @@ fatfile_getarch(
 		lret = LOAD_SUCCESS;
 	}
 
-	/*
-	 * Free the memory we allocated and return.
-	 */
+	  
+                                            
+    
 	return lret;
 }
 
@@ -171,10 +171,10 @@ fatfile_getbestarch(
 	int primary_type = cpu_type();
 
 
-	/*
-	 * Ignore all architectural bits when determining if an image
-	 * in a fat file should be skipped or graded.
-	 */
+	  
+                                                              
+                                              
+    
 	load_return_t ret = fatfile_getarch(data_ptr, data_size, primary_type, CPU_ARCH_MASK, CPU_SUBTYPE_ANY, imgp, archret);
 	return ret;
 }
@@ -188,27 +188,27 @@ fatfile_getbestarch_for_cputype(
 	struct image_params *imgp,
 	struct fat_arch *archret)
 {
-	/*
-	 * Scan the fat_arch array for exact matches for this cpu_type_t only
-	 */
+	  
+                                                                      
+    
 	return fatfile_getarch(data_ptr, data_size, cputype, 0, cpusubtype, imgp, archret);
 }
 
-/**********************************************************************
-* Routine:	fatfile_getarch_with_bits()
-*
-* Function:	Locate the architecture-dependant contents of a fat
-*		file that match this CPU.
-*
-* Args:	vp:		The vnode for the fat file.
-*		archbits:	Architecture specific feature bits
-*		header:		A pointer to the fat file header.
-*		archret (out):	Pointer to fat_arch structure to hold
-*				the results.
-*
-* Returns:	KERN_SUCCESS:	Valid architecture found.
-*		KERN_FAILURE:	No valid architecture found.
-**********************************************************************/
+                                                                       
+                                      
+ 
+                                                               
+                            
+ 
+                                        
+                                               
+                                             
+                                                       
+                 
+ 
+                                                  
+                                             
+                                                                       
 load_return_t
 fatfile_getarch_with_bits(
 	integer_t               archbits,
@@ -216,22 +216,22 @@ fatfile_getarch_with_bits(
 	vm_size_t               data_size,
 	struct fat_arch         *archret)
 {
-	/*
-	 * Scan the fat_arch array for matches with the requested
-	 * architectural bits set, and for the current hardware cpu CPU.
-	 */
+	  
+                                                          
+                                                                 
+    
 	return fatfile_getarch(data_ptr, data_size, (archbits & CPU_ARCH_MASK) | (cpu_type() & ~CPU_ARCH_MASK), 0, CPU_SUBTYPE_ANY, NULL, archret);
 }
 
-/*
- * Validate the fat_header and fat_arch array in memory. We check that:
- *
- * 1) arch count would not exceed the data buffer
- * 2) arch list does not contain duplicate cputype/cpusubtype tuples
- * 3) arch list does not have two overlapping slices. The area
- *    at the front of the file containing the fat headers is implicitly
- *    a range that a slice should also not try to cover
- */
+  
+                                                                       
+  
+                                                 
+                                                                    
+                                                              
+                                                                       
+                                                       
+   
 load_return_t
 fatfile_validate_fatarches(vm_offset_t data_ptr, vm_size_t data_size)
 {
@@ -251,17 +251,17 @@ fatfile_validate_fatarches(vm_offset_t data_ptr, vm_size_t data_size)
 	nfat_arch = OSSwapBigToHostInt32(header->nfat_arch);
 
 	if (magic != FAT_MAGIC) {
-		/* must be FAT_MAGIC big endian */
+		                                  
 		return LOAD_FAILURE;
 	}
 
 	max_nfat_arch = (data_size - sizeof(struct fat_header)) / sizeof(struct fat_arch);
 	if (nfat_arch > max_nfat_arch) {
-		/* nfat_arch would cause us to read off end of buffer */
+		                                                        
 		return LOAD_BADMACHO;
 	}
 
-	/* now that we know the fat_arch list fits in the buffer, how much does it use? */
+	                                                                                  
 	fat_header_size = sizeof(struct fat_header) + nfat_arch * sizeof(struct fat_arch);
 	arches = (struct fat_arch *)(data_ptr + sizeof(struct fat_header));
 
@@ -272,12 +272,12 @@ fatfile_validate_fatarches(vm_offset_t data_ptr, vm_size_t data_size)
 		uint32_t i_cpusubtype = OSSwapBigToHostInt32(arches[i].cpusubtype);
 
 		if (i_begin < fat_header_size) {
-			/* slice is trying to claim part of the file used by fat headers themselves */
+			                                                                              
 			return LOAD_BADMACHO;
 		}
 
 		if ((UINT32_MAX - i_size) < i_begin) {
-			/* start + size would overflow */
+			                                 
 			return LOAD_BADMACHO;
 		}
 		uint32_t i_end = i_begin + i_size;
@@ -289,28 +289,28 @@ fatfile_validate_fatarches(vm_offset_t data_ptr, vm_size_t data_size)
 			uint32_t j_cpusubtype = OSSwapBigToHostInt32(arches[j].cpusubtype);
 
 			if ((i_cputype == j_cputype) && (i_cpusubtype == j_cpusubtype)) {
-				/* duplicate cputype/cpusubtype, results in ambiguous references */
+				                                                                   
 				return LOAD_BADMACHO;
 			}
 
 			if ((UINT32_MAX - j_size) < j_begin) {
-				/* start + size would overflow */
+				                                 
 				return LOAD_BADMACHO;
 			}
 			uint32_t j_end = j_begin + j_size;
 
 			if (i_begin <= j_begin) {
 				if (i_end <= j_begin) {
-					/* I completely precedes J */
+					                             
 				} else {
-					/* I started before J, but ends somewhere in or after J */
+					                                                          
 					return LOAD_BADMACHO;
 				}
 			} else {
 				if (i_begin >= j_end) {
-					/* I started after J started but also after J ended */
+					                                                      
 				} else {
-					/* I started after J started but before it ended, so there is overlap */
+					                                                                        
 					return LOAD_BADMACHO;
 				}
 			}

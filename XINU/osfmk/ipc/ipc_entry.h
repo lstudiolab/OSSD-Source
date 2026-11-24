@@ -53,16 +53,16 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_entry.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Definitions for translation entries, which represent
- *	tasks' capabilities for ports and port sets.
- */
+  
+   
+  
+                        
+                      
+             
+  
+                                                       
+                                               
+   
 
 #ifndef _IPC_IPC_ENTRY_H_
 #define _IPC_IPC_ENTRY_H_
@@ -76,27 +76,27 @@
 
 #include <ipc/ipc_types.h>
 
-/*
- *	Spaces hold capabilities for ipc_object_t's.
- *	Each ipc_entry_t records a capability.  Most capabilities have
- *	small names, and the entries are elements of a table.
- *
- *	The ie_index field of entries in the table implements
- *	a ordered hash table with open addressing and linear probing.
- *
- *	The ie_dist field holds the distance to the desired spot,
- *	which is used to implement robin-hood hashing.
- *
- *	This hash table converts (space, object) -> name.
- *	It is used independently of the other fields.
- *
- *	Free (unallocated) entries in the table have null ie_object
- *	fields.  The ie_bits field is zero except for IE_BITS_GEN.
- *	The ie_next (ie_request) field links free entries into a free list.
- *
- *	The first entry in the table (index 0) is always free.
- *	It is used as the head of the free list.
- */
+  
+                                               
+                                                                 
+                                                        
+  
+                                                        
+                                                                
+  
+                                                            
+                                                 
+  
+                                                    
+                                                
+  
+                                                              
+                                                             
+                                                                      
+  
+                                                         
+                                           
+   
 
 #define IPC_ENTRY_DIST_BITS   12
 #define IPC_ENTRY_DIST_MAX    ((1 << IPC_ENTRY_DIST_BITS) - 1)
@@ -114,42 +114,42 @@ struct ipc_entry {
 	uint32_t            ie_dist  : IPC_ENTRY_DIST_BITS;
 	mach_port_index_t   ie_index : IPC_ENTRY_INDEX_BITS;
 	union {
-		mach_port_index_t next;         /* next in freelist, or...  */
-		ipc_table_index_t request;      /* dead name request notify */
+		mach_port_index_t next;                                       
+		ipc_table_index_t request;                                    
 	} index;
 };
 
 #define ie_request      index.request
 #define ie_next         index.next
 
-#define IE_REQ_NONE             0               /* no request */
+#define IE_REQ_NONE             0                               
 
-#define IE_BITS_UREFS_MASK      0x0000ffff      /* 16 bits of user-reference */
+#define IE_BITS_UREFS_MASK      0x0000ffff                                     
 #define IE_BITS_UREFS(bits)     ((bits) & IE_BITS_UREFS_MASK)
 
-#define IE_BITS_TYPE_MASK       0x001f0000      /* 5 bits of capability type */
+#define IE_BITS_TYPE_MASK       0x001f0000                                     
 #define IE_BITS_TYPE(bits)      ((bits) & IE_BITS_TYPE_MASK)
 
-#define IE_BITS_EXTYPE_MASK     0x00200000      /* 1 bit for extended capability */
+#define IE_BITS_EXTYPE_MASK     0x00200000                                         
 
 #ifndef NO_PORT_GEN
-#define IE_BITS_GEN_MASK        0xff000000      /* 8 bits for generation */
+#define IE_BITS_GEN_MASK        0xff000000                                 
 #define IE_BITS_GEN(bits)       ((bits) & IE_BITS_GEN_MASK)
-#define IE_BITS_GEN_ONE         0x04000000      /* low bit of generation */
-#define IE_BITS_ROLL_POS        22              /* LSB pos of generation rollover */
-#define IE_BITS_ROLL_BITS       2               /* number of generation rollover bits */
+#define IE_BITS_GEN_ONE         0x04000000                                 
+#define IE_BITS_ROLL_POS        22                                                  
+#define IE_BITS_ROLL_BITS       2                                                       
 #define IE_BITS_ROLL_MASK       (((1 << IE_BITS_ROLL_BITS) - 1) << IE_BITS_ROLL_POS)
 #define IE_BITS_ROLL(bits)      ((((bits) & IE_BITS_ROLL_MASK) << 8) ^ IE_BITS_GEN_MASK)
 
-/*
- * Restart a generation counter with the specified bits for the rollover point.
- * There are 4 different rollover points:
- * bits    rollover period
- * 0 0     64
- * 0 1     48
- * 1 0     32
- * 1 1     16
- */
+  
+                                                                               
+                                         
+                          
+             
+             
+             
+             
+   
 static inline ipc_entry_bits_t
 ipc_entry_new_rollpoint(
 	ipc_entry_bits_t rollbits)
@@ -159,10 +159,10 @@ ipc_entry_new_rollpoint(
 	return newgen | rollbits;
 }
 
-/*
- * Get the next gencount, modulo the entry's rollover point. If the sum rolls over,
- * the caller should re-start the generation counter with a different rollpoint.
- */
+  
+                                                                                   
+                                                                                
+   
 static inline ipc_entry_bits_t
 ipc_entry_new_gen(
 	ipc_entry_bits_t oldgen)
@@ -173,7 +173,7 @@ ipc_entry_new_gen(
 	return newgen;
 }
 
-/* Determine if a gencount has rolled over or not. */
+                                                     
 static inline boolean_t
 ipc_entry_gen_rolled(
 	ipc_entry_bits_t oldgen,
@@ -212,59 +212,59 @@ ipc_entry_gen_rolled(
 	return FALSE;
 }
 
-#endif  /* !USE_PORT_GEN */
+#endif                     
 
-#define IE_BITS_RIGHT_MASK      0x007fffff      /* relevant to the right */
-/*
- * Exported interfaces
- */
+#define IE_BITS_RIGHT_MASK      0x007fffff                                 
+  
+                      
+   
 
-/* Search for entry in a space by name */
+                                         
 extern ipc_entry_t ipc_entry_lookup(
 	ipc_space_t             space,
 	mach_port_name_t        name);
 
-/* Hold a number of entries in a locked space */
+                                                
 extern kern_return_t ipc_entries_hold(
 	ipc_space_t             space,
 	natural_t               count);
 
-/* claim and initialize a held entry in a locked space */
+                                                         
 extern kern_return_t ipc_entry_claim(
 	ipc_space_t             space,
 	mach_port_name_t        *namep,
 	ipc_entry_t             *entryp);
 
-/* Allocate an entry in a space, growing the space if necessary */
+                                                                  
 extern kern_return_t ipc_entry_alloc(
 	ipc_space_t             space,
 	mach_port_name_t        *namep,
 	ipc_entry_t             *entryp);
 
-/* Allocate/find an entry in a space with a specific name */
+                                                            
 extern kern_return_t ipc_entry_alloc_name(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_entry_t             *entryp);
 
-/* Deallocate an entry from a space */
+                                      
 extern void ipc_entry_dealloc(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_entry_t             entry);
 
-/* Mark and entry modified in a space */
+                                        
 extern void ipc_entry_modified(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_entry_t             entry);
 
-/* Grow the table in a space */
+                               
 extern kern_return_t ipc_entry_grow_table(
 	ipc_space_t             space,
 	ipc_table_elems_t       target_size);
 
-/* mask on/off default entry generation bits */
+                                               
 extern mach_port_name_t ipc_entry_name_mask(
 	mach_port_name_t name);
-#endif  /* _IPC_IPC_ENTRY_H_ */
+#endif                         

@@ -29,91 +29,91 @@
 #ifndef _PTHREAD_PRIORITY_PRIVATE_H_
 #define _PTHREAD_PRIORITY_PRIVATE_H_
 
-/*!
- * @typedef pthread_priority_t
- *
- * @abstract
- * pthread_priority_t is an on opaque integer that is guaranteed to be ordered
- * such that combations of QoS classes and relative priorities are ordered
- * numerically, according to their combined priority.
- *
- * <b>xnu, pthread & libdispatch flags</b>
- *
- * @const _PTHREAD_PRIORITY_OVERCOMMIT_FLAG
- * The thread this priority is applied to is overcommit (affects the workqueue
- * creation policy for this priority).
- *
- * @const _PTHREAD_PRIORITY_FALLBACK_FLAG
- * Indicates that this priority is is used only when incoming events have no
- * priority at all. It is merely used as a fallback (hence the name) instead of
- * a floor.
- *
- * This is usually used with QOS_CLASS_DEFAULT and a 0 relative priority.
- *
- * @const _PTHREAD_PRIORITY_EVENT_MANAGER_FLAG
- * The event manager flag indicates that this thread/request is for a event
- * manager thread.  There can only ever be one event manager thread at a time
- * and it is brought up at the highest of all event manager priorities pthread
- * knows about.
- *
- * <b>pthread & dispatch only flags</b>
- *
- * @const _PTHREAD_PRIORITY_SCHED_PRI_FLAG
- * @const _PTHREAD_PRIORITY_SCHED_PRI_MASK
- * This flag indicates that the bits extracted using
- * _PTHREAD_PRIORITY_SCHED_PRI_MASK represent a scheduler priority instead of
- * a {qos, relative priority} pair.
- *
- * This flag is only used by the pthread kext to indicate libdispatch that the
- * event manager queue priority is a scheduling priority and not a QoS. This
- * flag is never used as an input by anything else and is why it can perform
- * a double duty with _PTHREAD_PRIORITY_ROOTQUEUE_FLAG.
- *
- * @const _PTHREAD_PRIORITY_NEEDS_UNBIND_FLAG
- * This flag is used for the priority of event delivery threads to indicate
- * to libdispatch that this thread is bound to a kqueue.
- *
- * <b>dispatch only flags</b>
- *
- * @const _PTHREAD_PRIORITY_INHERIT_FLAG
- * This flag is meaningful to libdispatch only and has no meanting for the
- * kernel and/or pthread.
- *
- * @const _PTHREAD_PRIORITY_ROOTQUEUE_FLAG
- * This flag is meaningful to libdispatch only and has no meanting for the
- * kernel and/or pthread.
- *
- * @const _PTHREAD_PRIORITY_ENFORCE_FLAG
- * This flag is used to indicate that this priority should be prefered for work
- * submited asynchronously over the intrinsic priority of the queue/thread the
- * work is submitted to.
- *
- * @const _PTHREAD_PRIORITY_OVERRIDE_FLAG
- * No longer used
- */
+   
+                              
+  
+            
+                                                                              
+                                                                          
+                                                     
+  
+                                          
+  
+                                           
+                                                                              
+                                      
+  
+                                         
+                                                                            
+                                                                               
+           
+  
+                                                                         
+  
+                                              
+                                                                           
+                                                                             
+                                                                              
+               
+  
+                                       
+  
+                                          
+                                          
+                                                    
+                                                                             
+                                   
+  
+                                                                              
+                                                                            
+                                                                            
+                                                       
+  
+                                             
+                                                                           
+                                                        
+  
+                             
+  
+                                        
+                                                                          
+                         
+  
+                                          
+                                                                          
+                         
+  
+                                        
+                                                                               
+                                                                              
+                        
+  
+                                         
+                 
+   
 typedef unsigned long pthread_priority_t;
 
 #define _PTHREAD_PRIORITY_FLAGS_MASK                    0xff000000u
 #define _PTHREAD_PRIORITY_FLAGS_SHIFT                   (24ull)
 
 #define _PTHREAD_PRIORITY_OVERCOMMIT_FLAG               0x80000000u
-#define _PTHREAD_PRIORITY_INHERIT_FLAG                  0x40000000u /* dispatch only */
-#define _PTHREAD_PRIORITY_ROOTQUEUE_FLAG                0x20000000u /* dispatch only */
+#define _PTHREAD_PRIORITY_INHERIT_FLAG                  0x40000000u                    
+#define _PTHREAD_PRIORITY_ROOTQUEUE_FLAG                0x20000000u                    
 #define _PTHREAD_PRIORITY_SCHED_PRI_FLAG                0x20000000u
 #define _PTHREAD_PRIORITY_SCHED_PRI_MASK                0x0000ffffu
-#define _PTHREAD_PRIORITY_ENFORCE_FLAG                  0x10000000u /* dispatch only */
-#define _PTHREAD_PRIORITY_OVERRIDE_FLAG                 0x08000000u /* unused */
+#define _PTHREAD_PRIORITY_ENFORCE_FLAG                  0x10000000u                    
+#define _PTHREAD_PRIORITY_OVERRIDE_FLAG                 0x08000000u             
 #define _PTHREAD_PRIORITY_FALLBACK_FLAG                 0x04000000u
 #define _PTHREAD_PRIORITY_EVENT_MANAGER_FLAG            0x02000000u
 #define _PTHREAD_PRIORITY_NEEDS_UNBIND_FLAG             0x01000000u
-#define _PTHREAD_PRIORITY_DEFAULTQUEUE_FLAG             _PTHREAD_PRIORITY_FALLBACK_FLAG // compat
+#define _PTHREAD_PRIORITY_DEFAULTQUEUE_FLAG             _PTHREAD_PRIORITY_FALLBACK_FLAG          
 
 #define _PTHREAD_PRIORITY_ENCODING_MASK                 0x00a00000u
 #define _PTHREAD_PRIORITY_ENCODING_SHIFT                (22ull)
 #define _PTHREAD_PRIORITY_ENCODING_V0                   0x00000000u
-#define _PTHREAD_PRIORITY_ENCODING_V1                   0x00400000u /* unused */
-#define _PTHREAD_PRIORITY_ENCODING_V2                   0x00800000u /* unused */
-#define _PTHREAD_PRIORITY_ENCODING_V3                   0x00a00000u /* unused */
+#define _PTHREAD_PRIORITY_ENCODING_V1                   0x00400000u             
+#define _PTHREAD_PRIORITY_ENCODING_V2                   0x00800000u             
+#define _PTHREAD_PRIORITY_ENCODING_V3                   0x00a00000u             
 
 #define _PTHREAD_PRIORITY_QOS_CLASS_MASK                0x003fff00u
 #define _PTHREAD_PRIORITY_VALID_QOS_CLASS_MASK          0x00003f00u
@@ -125,17 +125,17 @@ typedef unsigned long pthread_priority_t;
 #if PRIVATE
 #if XNU_KERNEL_PRIVATE && !defined(__PTHREAD_EXPOSE_INTERNALS__)
 #define __PTHREAD_EXPOSE_INTERNALS__ 1
-#endif // XNU_KERNEL_PRIVATE
+#endif                      
 #ifdef __PTHREAD_EXPOSE_INTERNALS__
-/*
- * This exposes the encoding used for pthread_priority_t
- * and is meant to be used by pthread and XNU only
- */
-#include <mach/thread_policy.h> // THREAD_QOS_*
+  
+                                                        
+                                                  
+   
+#include <mach/thread_policy.h>                
 #include <stdbool.h>
 
-// pthread_priority_t's type is unfortunately 64bits on LP64
-// so we use this type for people who need to store it in structs
+                                                            
+                                                                 
 typedef unsigned int pthread_priority_compact_t;
 
 __attribute__((always_inline, const))
@@ -215,33 +215,33 @@ _pthread_priority_relpri(pthread_priority_t pp)
 }
 
 #if KERNEL
-// Interfaces only used by the kernel and not implemented in userspace.
+                                                                       
 
-/*
- * Keep managerness, overcomitness and fallback, discard other flags.
- * Normalize and validate QoS/relpri
- */
+  
+                                                                     
+                                    
+   
 __attribute__((const))
 pthread_priority_compact_t
 _pthread_priority_normalize(pthread_priority_t pp);
 
-/*
- * Keep managerness, discard other flags.
- * Normalize and validate QoS/relpri
- */
+  
+                                         
+                                    
+   
 __attribute__((const))
 pthread_priority_compact_t
 _pthread_priority_normalize_for_ipc(pthread_priority_t pp);
 
-/*
- * Keep the flags from base_pp and return the priority with the maximum priority
- * of base_pp and _pthread_priority_make_from_thread_qos(qos, 0, 0)
- */
+  
+                                                                                
+                                                                   
+   
 __attribute__((const))
 pthread_priority_compact_t
 _pthread_priority_combine(pthread_priority_t base_pp, thread_qos_t qos);
 
-#endif // KERNEL
-#endif // __PTHREAD_EXPOSE_INTERNALS__
-#endif // PRIVATE
-#endif // _PTHREAD_PRIORITY_PRIVATE_H_
+#endif          
+#endif                                
+#endif           
+#endif                                

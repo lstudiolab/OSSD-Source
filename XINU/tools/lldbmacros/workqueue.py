@@ -68,10 +68,10 @@ def GetWQThreadSummary(th, uth):
     kqr = uth.uu_kqr_bound
     if not kqr:
         kq = 0
-    elif kqr.tr_flags & 0x1: # kevent
+    elif kqr.tr_flags & 0x1:         
         kq = p.p_fd.fd_wqkqueue
         kind = "kqwq[%s]" % (xnudefines.thread_qos_short_strings[int(kqr.tr_kq_qos_index)])
-    elif kqr.tr_flags & 0x2: # workloop
+    elif kqr.tr_flags & 0x2:           
         kq = ContainerOf(kqr, 'struct kqworkloop', 'kqwl_request')
         kind = "workloop"
     else:
@@ -100,7 +100,7 @@ def GetWorkqueueThreadRequestSummary(proc, req):
     if req.tr_kq_wakeup: state += "*"
 
     thread = 0
-    if int(req.tr_state) in [4, 5]: # BINDING or BOUND
+    if int(req.tr_state) in [4, 5]:                   
         thread = req.tr_thread
 
     qos = int(req.tr_qos)

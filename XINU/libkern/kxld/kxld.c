@@ -27,7 +27,7 @@
  */
 #include <string.h>
 #include <sys/types.h>
-#include <mach/vm_param.h>  /* For PAGE_SIZE */
+#include <mach/vm_param.h>                     
 
 #define DEBUG_ASSERT_COMPONENT_NAME_STRING "kxld"
 #include <AssertMacros.h>
@@ -44,7 +44,7 @@
 #else
     #include <libkern/kxld.h>
     #include <libkern/kxld_types.h>
-#endif /* KERNEL */
+#endif             
 
 #include "kxld_array.h"
 #include "kxld_dict.h"
@@ -72,26 +72,26 @@ struct kxld_context {
 	cpu_subtype_t cpusubtype;
 };
 
-// set to TRUE if the kext has a vmaddr_TEXT_EXEC != 0
+                                                      
 boolean_t   isSplitKext         = FALSE;
 
-// set to TRUE is we come in via kxld_link_file
+                                               
 boolean_t   isOldInterface      = FALSE;
 uint32_t    kaslr_offsets_count = 0;
 uint32_t   *kaslr_offsets = NULL;
 uint32_t    kaslr_offsets_index = 0;
 
-/*******************************************************************************
-* Globals
-*******************************************************************************/
+                                                                                
+         
+                                                                                
 
-/* Certain architectures alter the order of a kext's sections from its input
- * binary, so we track that order in a dictionary of arrays, with one array for
- * each architecture.  Since the kernel only has one architecture, we can
- * eliminate the dictionary and use a simple array.
- * XXX: If we ever use the linker in a multithreaded environment, we will need
- * locks around these global structures.
- */
+                                                                            
+                                                                               
+                                                                         
+                                                   
+                                                                              
+                                        
+   
 #if KXLD_USER_OR_OBJECT
 #if KERNEL
 static KXLDArray *s_section_order;
@@ -100,9 +100,9 @@ static KXLDDict *s_order_dict;
 #endif
 #endif
 
-/*******************************************************************************
-* Prototypes
-*******************************************************************************/
+                                                                                
+            
+                                                                                
 
 static kern_return_t init_context(KXLDContext *context, u_int ndependencies);
 static KXLDObject * get_object_for_file(KXLDContext *context,
@@ -115,8 +115,8 @@ static kern_return_t init_kext_objects(KXLDContext *context, u_char *file,
     u_int ndependencies);
 static void clear_context(KXLDContext *context);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_create_context(KXLDContext **_context,
     KXLDAllocateCallback allocate_callback, KXLDLoggingCallback logging_callback,
@@ -149,20 +149,20 @@ kxld_create_context(KXLDContext **_context,
 	if (pagesize) {
 		kxld_set_cross_link_page_size(pagesize);
 	}
-#endif /* !KERNEL */
+#endif              
 
 	kxld_set_logging_callback(logging_callback);
 
 	context->kext = kxld_calloc(kxld_kext_sizeof());
 	require_action(context->kext, finish, rval = KERN_RESOURCE_SHORTAGE);
 
-	/* Check if we already have an order array for this arch */
+	                                                           
 
 #if KXLD_USER_OR_OBJECT
 #if KERNEL
 	context->section_order = s_section_order;
 #else
-	/* In userspace, create the dictionary if it doesn't already exist */
+	                                                                     
 	if (!s_order_dict) {
 		s_order_dict = kxld_calloc(sizeof(*s_order_dict));
 		require_action(s_order_dict, finish, rval = KERN_RESOURCE_SHORTAGE);
@@ -173,9 +173,9 @@ kxld_create_context(KXLDContext **_context,
 	}
 
 	context->section_order = kxld_dict_find(s_order_dict, &cputype);
-#endif /* KERNEL */
+#endif             
 
-	/* Create an order array for this arch if needed */
+	                                                   
 
 	if (!context->section_order) {
 		section_order = kxld_calloc(sizeof(*section_order));
@@ -184,7 +184,7 @@ kxld_create_context(KXLDContext **_context,
 #if KERNEL
 		s_section_order = section_order;
 #else
-		/* In userspace, add the new array to the order dictionary */
+		                                                             
 		cputype_p = kxld_alloc(sizeof(*cputype_p));
 		require_action(cputype_p, finish, rval = KERN_RESOURCE_SHORTAGE);
 		*cputype_p = cputype;
@@ -193,13 +193,13 @@ kxld_create_context(KXLDContext **_context,
 		require_noerr(rval, finish);
 
 		cputype_p = NULL;
-#endif /* KERNEL */
+#endif             
 
 		context->section_order = section_order;
 
 		section_order = NULL;
 	}
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
 	rval = KERN_SUCCESS;
 	*_context = context;
@@ -221,8 +221,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_destroy_context(KXLDContext *context)
 {
@@ -257,8 +257,8 @@ kxld_destroy_context(KXLDContext *context)
 	kxld_print_memory_report();
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_link_split_file(
 	KXLDContext       * context,
@@ -306,7 +306,7 @@ kxld_link_split_file(
 	    name);
 	require_action(kext_object, finish, rval = KERN_FAILURE);
 
-	// copy vmaddrs and fileoffsets for split segments into kext_object
+	                                                                   
 	kxld_object_set_link_info(kext_object, link_info);
 
 	my_link_info = kxld_object_get_link_info(kext_object);
@@ -317,7 +317,7 @@ kxld_link_split_file(
 #if SPLIT_KEXTS_DEBUG
 	kxld_log(kKxldLogLinking, kKxldLogErr, "Linking kext %s", name);
 	kxld_show_split_info(link_info);
-#endif // SPLIT_KEXTS_DEBUG
+#endif                     
 
 	rval = kxld_kext_relocate(context->kext,
 	    (kxld_addr_t)my_link_info,
@@ -332,7 +332,7 @@ kxld_link_split_file(
 	    kmod_info_kern);
 	require_noerr(rval, finish);
 
-	// pass back info about linked kext
+	                                   
 	link_info->kaslr_offsets_count = kaslr_offsets_count;
 	link_info->kaslr_offsets = kaslr_offsets;
 	link_info->linkedKext = my_link_info->linkedKext;
@@ -344,7 +344,7 @@ kxld_link_split_file(
 		goto finish;
 	}
 
-	// the values are now the responsibility of the caller
+	                                                      
 	kaslr_offsets_count = 0;
 	kaslr_offsets_index = 0;
 	kaslr_offsets = NULL;
@@ -357,8 +357,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_link_file(
 	KXLDContext       * context,
@@ -437,15 +437,15 @@ finish:
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_context(KXLDContext *context, u_int ndependencies)
 {
 	kern_return_t rval = KERN_FAILURE;
 
-	/* Create an array of objects large enough to hold an object
-	 * for every dependency, an interface for each dependency, and a kext. */
+	                                                            
+                                                                          
 	rval = kxld_array_init(&context->objects,
 	    kxld_object_sizeof(), 2 * ndependencies + 1);
 	require_noerr(rval, finish);
@@ -475,8 +475,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_kext_objects(KXLDContext *context,
     u_char *file,
@@ -491,10 +491,10 @@ init_kext_objects(KXLDContext *context,
 	KXLDObject *interface_object = NULL;
 	u_int i = 0;
 
-	/* Create a kext object for each dependency.  If it's a direct dependency,
-	 * export its symbols by name by value.  If it's indirect, just export the
-	 * C++ symbols by value.
-	 */
+	                                                                          
+                                                                           
+                         
+    
 	for (i = 0; i < ndependencies; ++i) {
 		kext = kxld_array_get_item(&context->dependencies, i);
 		kext_object = NULL;
@@ -522,13 +522,13 @@ init_kext_objects(KXLDContext *context,
 			require_noerr(rval, finish);
 		} else {
 			rval = kxld_kext_export_symbols(kext,
-			    /* defined_symbols */ NULL, /* obsolete_symbols */ NULL,
+			                          NULL,                        NULL,
 			    &context->defined_cxx_symbols_by_value);
 			require_noerr(rval, finish);
 		}
 	}
 
-	/* Export the vtables for all of the dependencies. */
+	                                                     
 	for (i = 0; i < context->dependencies.nitems; ++i) {
 		kext = kxld_array_get_item(&context->dependencies, i);
 
@@ -539,17 +539,17 @@ init_kext_objects(KXLDContext *context,
 		require_noerr(rval, finish);
 	}
 
-	/* Create a kext object for the kext we're linking and export its locally
-	 * defined C++ symbols.
-	 */
+	                                                                         
+                        
+    
 	kext_object = get_object_for_file(context, file, size, name);
 	require_action(kext_object, finish, rval = KERN_FAILURE);
 
-	rval = kxld_kext_init(context->kext, kext_object, /* interface */ NULL);
+	rval = kxld_kext_init(context->kext, kext_object,                 NULL);
 	require_noerr(rval, finish);
 
 	rval = kxld_kext_export_symbols(context->kext,
-	    /* defined_symbols */ NULL, /* obsolete_symbols */ NULL,
+	                          NULL,                        NULL,
 	    &context->defined_cxx_symbols_by_value);
 	require_noerr(rval, finish);
 
@@ -558,8 +558,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static KXLDObject *
 get_object_for_file(KXLDContext *context, u_char *file, u_long size,
     const char *name)
@@ -593,8 +593,8 @@ finish:
 
 #include <mach-o/loader.h>
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 allocate_split_kext(KXLDContext *context, splitKextLinkInfo * link_info)
 {
@@ -606,9 +606,9 @@ allocate_split_kext(KXLDContext *context, splitKextLinkInfo * link_info)
 	kxld_kext_get_vmsize(context->kext, &header_size, &vmsize);
 
 	if (isSplitKext) {
-		/* get __LINKEDIT vmsize */
+		                           
 		kxld_kext_get_vmsize_for_seg_by_name(context->kext, SEG_LINKEDIT, &vmsize);
-		// add in the gaps
+		                  
 		vmsize += (link_info->vmaddr_LINKEDIT - link_info->vmaddr_TEXT);
 	}
 	link_info->linkedKextSize = vmsize;
@@ -622,8 +622,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static u_char *
 allocate_kext(KXLDContext *context,
     void *callback_data,
@@ -647,11 +647,11 @@ allocate_kext(KXLDContext *context,
 	    "Load address %p is not page-aligned.",
 	    (void *) (uintptr_t) vmaddr));
 
-	/* Zero out the memory before we fill it.  We fill this buffer in a
-	 * sparse fashion, and it's simpler to clear it now rather than
-	 * track and zero any pieces we didn't touch after we've written
-	 * all of the sections to memory.
-	 */
+	                                                                   
+                                                                
+                                                                 
+                                  
+    
 	if (flags & kKxldAllocateWritable) {
 		linked_object = (u_char *) (u_long) vmaddr;
 		bzero(linked_object, vmsize);
@@ -671,8 +671,8 @@ finish:
 	return linked_object;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 clear_context(KXLDContext *context)
 {

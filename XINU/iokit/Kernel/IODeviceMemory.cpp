@@ -29,7 +29,7 @@
 #include <IOKit/IODeviceMemory.h>
 #include <IOKit/IOSubMemoryDescriptor.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IODeviceMemory *
 IODeviceMemory::withRange(

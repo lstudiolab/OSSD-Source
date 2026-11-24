@@ -59,87 +59,87 @@
 
 #ifdef __APPLE_API_PRIVATE
 
-/*
- * lockd uses the nfsclnt system call for the unique kernel services it needs.
- * It passes in a request structure with a version number at the start.
- * This prevents libc from needing to change if the information passed
- * between lockd and the kernel needs to change.
- *
- * If a structure changes, you must bump the version number.
- */
+  
+                                                                              
+                                                                       
+                                                                      
+                                                
+  
+                                                            
+   
 
 #include <sys/mount.h>
 
-/*
- * The structure that the kernel hands lockd for each lock request.
- */
+  
+                                                                   
+   
 #define LOCKD_MSG_VERSION       3
 typedef struct nfs_lock_msg {
-	int                     lm_version;             /* LOCKD_MSG version */
-	int                     lm_flags;               /* request flags */
-	u_int64_t               lm_xid;                 /* unique message transaction ID */
-	struct flock            lm_fl;                  /* The lock request. */
-	struct sockaddr_storage lm_addr;                /* The address. */
-	int                     lm_fh_len;              /* The file handle length. */
-	struct xucred           lm_cred;                /* user cred for lock req */
-	u_int8_t                lm_fh[NFSV3_MAX_FH_SIZE]; /* The file handle. */
+	int                     lm_version;                                    
+	int                     lm_flags;                                  
+	u_int64_t               lm_xid;                                                    
+	struct flock            lm_fl;                                         
+	struct sockaddr_storage lm_addr;                                  
+	int                     lm_fh_len;                                           
+	struct xucred           lm_cred;                                            
+	u_int8_t                lm_fh[NFSV3_MAX_FH_SIZE];                       
 } LOCKD_MSG;
 
-/* lm_flags */
-#define LOCKD_MSG_BLOCK         0x0001  /* a blocking request */
-#define LOCKD_MSG_TEST          0x0002  /* just a lock test */
-#define LOCKD_MSG_NFSV3         0x0004  /* NFSv3 request */
-#define LOCKD_MSG_CANCEL        0x0008  /* cancelling blocked request */
-#define LOCKD_MSG_DENIED_GRACE  0x0010  /* lock denied due to grace period */
-#define LOCKD_MSG_RECLAIM       0x0020  /* lock reclaim request */
-#define LOCKD_MSG_TCP           0x0040  /* (try to) use TCP for request */
+              
+#define LOCKD_MSG_BLOCK         0x0001                          
+#define LOCKD_MSG_TEST          0x0002                        
+#define LOCKD_MSG_NFSV3         0x0004                     
+#define LOCKD_MSG_CANCEL        0x0008                                  
+#define LOCKD_MSG_DENIED_GRACE  0x0010                                       
+#define LOCKD_MSG_RECLAIM       0x0020                            
+#define LOCKD_MSG_TCP           0x0040                                    
 
-/* The structure used to maintain the pending request queue */
+                                                              
 typedef struct nfs_lock_msg_request {
-	TAILQ_ENTRY(nfs_lock_msg_request) lmr_next;     /* in-kernel pending request list */
-	int                     lmr_answered;           /* received an answer? */
-	int                     lmr_errno;              /* return status */
-	int                     lmr_saved_errno;        /* original return status */
-	LOCKD_MSG               lmr_msg;                /* the message */
+	TAILQ_ENTRY(nfs_lock_msg_request) lmr_next;                                         
+	int                     lmr_answered;                                    
+	int                     lmr_errno;                                 
+	int                     lmr_saved_errno;                                    
+	LOCKD_MSG               lmr_msg;                                 
 } LOCKD_MSG_REQUEST;
 
 TAILQ_HEAD(nfs_lock_msg_queue, nfs_lock_msg_request);
 typedef struct nfs_lock_msg_queue LOCKD_MSG_QUEUE;
 
 
-/*
- * The structure that lockd hands the kernel for each lock answer.
- */
+  
+                                                                  
+   
 #define LOCKD_ANS_VERSION       2
 struct lockd_ans {
-	int             la_version;             /* lockd_ans version */
-	int             la_errno;               /* return status */
-	u_int64_t       la_xid;                 /* unique message transaction ID */
-	int             la_flags;               /* answer flags */
-	pid_t           la_pid;                 /* pid of lock requester/owner */
-	off_t           la_start;               /* lock starting offset */
-	off_t           la_len;                 /* lock length */
-	int             la_fh_len;              /* The file handle length. */
-	u_int8_t        la_fh[NFSV3_MAX_FH_SIZE];/* The file handle. */
+	int             la_version;                                    
+	int             la_errno;                                  
+	u_int64_t       la_xid;                                                    
+	int             la_flags;                                 
+	pid_t           la_pid;                                                  
+	off_t           la_start;                                         
+	off_t           la_len;                                  
+	int             la_fh_len;                                           
+	u_int8_t        la_fh[NFSV3_MAX_FH_SIZE];                      
 };
 
-/* la_flags */
-#define LOCKD_ANS_GRANTED       0x0001  /* NLM_GRANTED request */
-#define LOCKD_ANS_LOCK_INFO     0x0002  /* lock info valid */
-#define LOCKD_ANS_LOCK_EXCL     0x0004  /* lock is exclusive */
-#define LOCKD_ANS_DENIED_GRACE  0x0008  /* lock denied due to grace period */
+              
+#define LOCKD_ANS_GRANTED       0x0001                           
+#define LOCKD_ANS_LOCK_INFO     0x0002                       
+#define LOCKD_ANS_LOCK_EXCL     0x0004                         
+#define LOCKD_ANS_DENIED_GRACE  0x0008                                       
 
 
-/*
- * The structure that lockd hands the kernel for each notify.
- */
+  
+                                                             
+   
 #define LOCKD_NOTIFY_VERSION    1
 struct lockd_notify {
-	int                     ln_version;             /* lockd_notify version */
-	int                     ln_flags;               /* notify flags */
-	int                     ln_pad;                 /* (for alignment) */
-	int                     ln_addrcount;           /* # of addresss */
-	struct sockaddr_storage ln_addr[1];             /* List of addresses. */
+	int                     ln_version;                                       
+	int                     ln_flags;                                 
+	int                     ln_pad;                                      
+	int                     ln_addrcount;                              
+	struct sockaddr_storage ln_addr[1];                                     
 };
 
 
@@ -151,4 +151,4 @@ int     nfslockdans(proc_t p, struct lockd_ans *ansp);
 int     nfslockdnotify(proc_t p, user_addr_t argp);
 
 #endif
-#endif /* __APPLE_API_PRIVATE */
+#endif                          

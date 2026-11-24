@@ -68,10 +68,10 @@ __BEGIN_DECLS
 #ifdef BSD_KERNEL_PRIVATE
 
 
-/*
- * This structure is associated with the FIFO vnode and stores
- * the state associated with the FIFO.
- */
+  
+                                                              
+                                      
+   
 struct fifoinfo {
 	unsigned int    fi_flags;
 	struct socket   *fi_readsock;
@@ -89,11 +89,11 @@ int     fifo_close_internal(vnode_t, int, vfs_context_t, int);
 int fifo_freespace(struct vnode *vp, long *count);
 int fifo_charcount(struct vnode *vp, int *count);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 #ifdef KERNEL
-/*
- * Prototypes for fifo operations on vnodes.
- */
+  
+                                            
+   
 int     fifo_ebadf(void *);
 
 #define fifo_create (int (*) (struct  vnop_create_args *))err_create
@@ -130,8 +130,8 @@ int     fifo_inactive(struct  vnop_inactive_args *);
 int     fifo_pathconf(struct vnop_pathconf_args *);
 int     fifo_advlock(struct vnop_advlock_args *);
 
-#endif /* KERNEL */
+#endif             
 
 __END_DECLS
 
-#endif /* __FIFOFS_FOFO_H__ */
+#endif                        

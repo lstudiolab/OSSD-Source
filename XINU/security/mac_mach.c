@@ -44,7 +44,7 @@
 
 #if CONFIG_CSR
 #include <sys/csr.h>
-// Panic on internal builds, just log otherwise.
+                                                
 #define MAC_MACH_UNEXPECTED(fmt...) \
 	if (csr_check(CSR_ALLOW_APPLE_INTERNAL) == 0) { panic(fmt); } else { printf(fmt); }
 #else
@@ -58,10 +58,10 @@ mac_task_get_proc(struct task *task)
 		return proc_self();
 	}
 
-	/*
-	 * Tasks don't really hold a reference on a proc unless the
-	 * calling thread belongs to the task in question.
-	 */
+	  
+                                                            
+                                                   
+    
 	int pid = task_pid(task);
 	struct proc *p = proc_find(pid);
 
@@ -90,7 +90,7 @@ mac_task_check_expose_task(struct task *task, mach_task_flavor_t flavor)
 	struct ucred *cred = kauth_cred_get();
 	proc_rele(p);
 
-	/* Also call the old hook for compatability, deprecating in rdar://66356944. */
+	                                                                               
 	if (flavor == TASK_FLAVOR_CONTROL) {
 		MAC_CHECK(proc_check_expose_task, cred, &pident);
 		if (error) {
@@ -219,27 +219,27 @@ mac_proc_notify_exec_complete(struct proc *proc)
 {
 	thread_t thread = current_thread();
 
-	/*
-	 * Since this MAC hook was designed to support upcalls, make sure the hook
-	 * is called with kernel importance propagation enabled so any daemons
-	 * can get any appropriate importance donations.
-	 */
+	  
+                                                                           
+                                                                       
+                                                 
+    
 	thread_enable_send_importance(thread, TRUE);
 	MAC_PERFORM(proc_notify_exec_complete, proc);
 	thread_enable_send_importance(thread, FALSE);
 }
 
-/**** Exception Policy
- *
- * Note that the functions below do not fully follow the usual convention for mac policy functions
- * in the kernel. Besides avoiding confusion in how the mac function names are mixed with the actual
- * policy function names, we diverge because the exception policy is somewhat special:
- * It is used in places where allocation and association must be separate, and its labels do not
- * only belong to one type of object as usual, but to two (on exception actions and on tasks as
- * crash labels).
- */
+                      
+  
+                                                                                                  
+                                                                                                    
+                                                                                      
+                                                                                                
+                                                                                               
+                 
+   
 
-// Label allocation and deallocation, may sleep.
+                                                
 
 struct label *
 mac_exc_create_label(void)
@@ -250,8 +250,8 @@ mac_exc_create_label(void)
 		return NULL;
 	}
 
-	// Policy initialization of the label, typically performs allocations as well.
-	// (Unless the policy's full data really fits into a pointer size.)
+	                                                                              
+	                                                                   
 	MAC_PERFORM(exc_action_label_init, label);
 
 	return label;
@@ -264,7 +264,7 @@ mac_exc_free_label(struct label *label)
 	mac_labelzone_free(label);
 }
 
-// Action label initialization and teardown, may sleep.
+                                                       
 
 void
 mac_exc_associate_action_label(struct exception_action *action, struct label *label)
@@ -280,7 +280,7 @@ mac_exc_free_action_label(struct exception_action *action)
 	action->label = NULL;
 }
 
-// Action label update and inheritance, may NOT sleep and must be quick.
+                                                                        
 
 int
 mac_exc_update_action_label(struct exception_action *action,
@@ -314,7 +314,7 @@ mac_exc_update_task_crash_label(struct task *task, struct label *label)
 	return error;
 }
 
-// Process label creation, may sleep.
+                                     
 
 struct label *
 mac_exc_create_label_for_proc(struct proc *proc)
@@ -330,7 +330,7 @@ mac_exc_create_label_for_current_proc(void)
 	return mac_exc_create_label_for_proc(current_proc());
 }
 
-// Exception handler policy checking, may sleep.
+                                                
 
 int
 mac_exc_action_check_exception_send(struct task *victim_task, struct exception_action *action)
@@ -342,10 +342,10 @@ mac_exc_action_check_exception_send(struct task *victim_task, struct exception_a
 	struct label *label = NULL;
 
 	if (p != NULL) {
-		// Create a label from the still existing bsd process...
+		                                                        
 		label = bsd_label = mac_exc_create_label_for_proc(p);
 	} else {
-		// ... otherwise use the crash label on the task.
+		                                                 
 		label = get_task_crash_label(victim_task);
 	}
 

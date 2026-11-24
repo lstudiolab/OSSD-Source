@@ -9,9 +9,9 @@ T_GLOBAL_META(T_META_RUN_CONCURRENTLY(false));
 
 static int after_regions = 0;
 
-/*
- * No system(3c) on watchOS, so provide our own.
- */
+  
+                                                
+   
 static int
 my_system(const char *command)
 {
@@ -27,7 +27,7 @@ my_system(const char *command)
 	if (dt_launch_tool(&pid, (char **)(void *)argv, FALSE, NULL, NULL)) {
 		return -1;
 	}
-	sleep(2); /* let the child start running */
+	sleep(2);                                  
 
 	size_t size = sizeof(after_regions);
 	int ret = sysctlbyname("vm.shared_region_pager_count", &after_regions, &size, NULL, 0);
@@ -42,9 +42,9 @@ my_system(const char *command)
 	return status;
 }
 
-/*
- * If shared regions by entitlement was not originally active, turn it back off.
- */
+  
+                                                                                
+   
 static int orig_setting = 0;
 static void
 cleanup(void)
@@ -59,14 +59,14 @@ cleanup(void)
 	}
 }
 
-/*
- * This test:
- * - looks at the number of shared region pagers,
- * - launches a helper app that has entitlement for unique signing
- * - gets the number of shared region pagers again.
- * It expects to see additional shared region pager(s) to exist.
- *
- */
+  
+             
+                                                 
+                                                                  
+                                                   
+                                                                
+  
+   
 T_DECL(sr_entitlement, "shared region by entitlement test")
 {
 	int ret;
@@ -79,10 +79,10 @@ T_DECL(sr_entitlement, "shared region by entitlement test")
 	T_SKIP("No pointer authentication support");
 #endif
 
-	/*
-	 * Check if the sysctl vm_shared_region_by_entitlement exists and if so make
-	 * sure it is set.
-	 */
+	  
+                                                                             
+                   
+    
 	size = sizeof(orig_setting);
 	ret = sysctlbyname("vm.vm_shared_region_by_entitlement", &orig_setting, &size, &on, size_on);
 	if (ret != 0) {

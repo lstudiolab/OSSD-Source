@@ -1,7 +1,7 @@
-//
-// Tests for
-//      explicit operator bool() const;
-//
+  
+            
+                                       
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

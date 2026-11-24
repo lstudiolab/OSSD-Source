@@ -35,9 +35,9 @@
 #include <i386/vmx/vmx_asm.h>
 #include <i386/vmx/vmx_shims.h>
 #include <i386/vmx/vmx_cpu.h>
-#include <mach/mach_host.h>             /* for host_info() */
+#include <mach/mach_host.h>                                  
 
-#define VMX_KPRINTF(x...) /* kprintf("vmx: " x) */
+#define VMX_KPRINTF(x...)                         
 
 int vmx_use_count = 0;
 boolean_t vmx_exclusive = FALSE;
@@ -45,20 +45,20 @@ boolean_t vmx_exclusive = FALSE;
 static LCK_GRP_DECLARE(vmx_lck_grp, "vmx");
 static LCK_MTX_DECLARE(vmx_lck_mtx, &vmx_lck_grp);
 
-/* -----------------------------------------------------------------------------
-*  vmx_is_available()
-*       Is the VMX facility available on this CPU?
-*  -------------------------------------------------------------------------- */
+                                                                                
+                     
+                                                  
+                                                                                
 static inline boolean_t
 vmx_is_available(void)
 {
 	return 0 != (cpuid_features() & CPUID_FEATURE_VMX);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmxon_is_enabled()
-*       Is the VMXON instruction enabled on this CPU?
-*  -------------------------------------------------------------------------- */
+                                                                                
+                     
+                                                     
+                                                                                
 static inline boolean_t
 vmxon_is_enabled(void)
 {
@@ -67,10 +67,10 @@ vmxon_is_enabled(void)
 }
 
 #if MACH_ASSERT
-/* -----------------------------------------------------------------------------
-*  vmx_is_cr0_valid()
-*       Is CR0 valid for executing VMXON on this CPU?
-*  -------------------------------------------------------------------------- */
+                                                                                
+                     
+                                                     
+                                                                                
 static inline boolean_t
 vmx_is_cr0_valid(vmx_specs_t *specs)
 {
@@ -78,10 +78,10 @@ vmx_is_cr0_valid(vmx_specs_t *specs)
 	return 0 == ((~cr0 & specs->cr0_fixed_0) | (cr0 & ~specs->cr0_fixed_1));
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_is_cr4_valid()
-*       Is CR4 valid for executing VMXON on this CPU?
-*  -------------------------------------------------------------------------- */
+                                                                                
+                     
+                                                     
+                                                                                
 static inline boolean_t
 vmx_is_cr4_valid(vmx_specs_t *specs)
 {
@@ -100,10 +100,10 @@ vmx_enable(void)
 		return;
 	}
 
-	/*
-	 * We don't count on EFI initializing MSR_IA32_FEATURE_CONTROL
-	 * and turning VMXON on and locking the bit, so we do that now.
-	 */
+	  
+                                                               
+                                                                
+    
 	msr_image = rdmsr64(MSR_IA32_FEATURE_CONTROL);
 	if (0 == ((msr_image & MSR_IA32_FEATCTL_LOCK))) {
 		wrmsr64(MSR_IA32_FEATURE_CONTROL,
@@ -115,13 +115,13 @@ vmx_enable(void)
 	set_cr4(get_cr4() | CR4_VMXE);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_get_specs()
-*       Obtain VMX facility specifications for this CPU and
-*       enter them into the vmx_specs_t structure. If VMX is not available or
-*       disabled on this CPU, set vmx_present to false and return leaving
-*       the remainder of the vmx_specs_t uninitialized.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                  
+                                                           
+                                                                             
+                                                                         
+                                                       
+                                                                                
 void
 vmx_cpu_init()
 {
@@ -132,14 +132,14 @@ vmx_cpu_init()
 	VMX_KPRINTF("[%d]vmx_cpu_init() initialized: %d\n",
 	    cpu_number(), specs->initialized);
 
-	/* if we have read the data on boot, we won't read it again on wakeup */
+	                                                                        
 	if (specs->initialized) {
 		return;
 	} else {
 		specs->initialized = TRUE;
 	}
 
-	/* See if VMX is present, return if it is not */
+	                                                
 	specs->vmx_present = vmx_is_available() && vmxon_is_enabled();
 	VMX_KPRINTF("[%d]vmx_cpu_init() vmx_present: %d\n",
 	    cpu_number(), specs->vmx_present);
@@ -150,19 +150,19 @@ vmx_cpu_init()
 #define rdmsr_mask(msr, mask) (uint32_t)(rdmsr64(msr) & (mask))
 	specs->vmcs_id = rdmsr_mask(MSR_IA32_VMX_BASIC, VMX_VCR_VMCS_REV_ID);
 
-	/* Obtain VMX-fixed bits in CR0 */
+	                                  
 	specs->cr0_fixed_0 = rdmsr_mask(MSR_IA32_VMX_CR0_FIXED0, 0xFFFFFFFF);
 	specs->cr0_fixed_1 = rdmsr_mask(MSR_IA32_VMX_CR0_FIXED1, 0xFFFFFFFF);
 
-	/* Obtain VMX-fixed bits in CR4 */
+	                                  
 	specs->cr4_fixed_0 = rdmsr_mask(MSR_IA32_VMX_CR4_FIXED0, 0xFFFFFFFF);
 	specs->cr4_fixed_1 = rdmsr_mask(MSR_IA32_VMX_CR4_FIXED1, 0xFFFFFFFF);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_on()
-*       Enter VMX root operation on this CPU.
-*  -------------------------------------------------------------------------- */
+                                                                                
+           
+                                             
+                                                                                
 static void
 vmx_on(void *arg __unused)
 {
@@ -180,9 +180,9 @@ vmx_on(void *arg __unused)
 	}
 	vmxon_region_paddr = vmx_paddr(cpu->vmxon_region);
 
-	/*
-	 * Enable VMX operation.
-	 */
+	  
+                         
+    
 	if (FALSE == cpu->specs.vmx_on) {
 		assert(vmx_is_cr0_valid(&cpu->specs));
 		assert(vmx_is_cr4_valid(&cpu->specs));
@@ -199,10 +199,10 @@ vmx_on(void *arg __unused)
 	    cpu_number(), cpu->specs.vmx_on);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_off()
-*       Leave VMX root operation on this CPU.
-*  -------------------------------------------------------------------------- */
+                                                                                
+            
+                                             
+                                                                                
 static void
 vmx_off(void *arg __unused)
 {
@@ -213,7 +213,7 @@ vmx_off(void *arg __unused)
 	    cpu_number(), cpu->specs.vmx_on);
 
 	if (TRUE == cpu->specs.vmx_on) {
-		/* Tell the CPU to release the VMXON region */
+		                                              
 		result = __vmxoff();
 
 		if (result != VMX_SUCCEED) {
@@ -227,10 +227,10 @@ vmx_off(void *arg __unused)
 	    cpu_number(), cpu->specs.vmx_on);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_allocate_vmxon_regions()
-*       Allocate, clear and init VMXON regions for all CPUs.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                               
+                                                            
+                                                                                
 static void
 vmx_allocate_vmxon_regions(void)
 {
@@ -239,7 +239,7 @@ vmx_allocate_vmxon_regions(void)
 	for (i = 0; i < real_ncpus; i++) {
 		vmx_cpu_t *cpu = &cpu_datap(i)->cpu_vmx;
 
-		/* The size is defined to be always <= 4K, so we just allocate a page */
+		                                                                        
 		cpu->vmxon_region = vmx_pcalloc();
 		if (NULL == cpu->vmxon_region) {
 			panic("vmx_allocate_vmxon_regions: unable to allocate VMXON region");
@@ -248,10 +248,10 @@ vmx_allocate_vmxon_regions(void)
 	}
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_free_vmxon_regions()
-*       Free VMXON regions for all CPUs.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                           
+                                        
+                                                                                
 static void
 vmx_free_vmxon_regions(void)
 {
@@ -265,10 +265,10 @@ vmx_free_vmxon_regions(void)
 	}
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_globally_available()
-*       Checks whether VT can be turned on for all CPUs.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                           
+                                                        
+                                                                                
 static boolean_t
 vmx_globally_available(void)
 {
@@ -288,10 +288,10 @@ vmx_globally_available(void)
 }
 
 
-/* -----------------------------------------------------------------------------
-*  vmx_turn_on()
-*       Turn on VT operation on all CPUs.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                
+                                         
+                                                                                
 int
 host_vmxon(boolean_t exclusive)
 {
@@ -326,10 +326,10 @@ host_vmxon(boolean_t exclusive)
 	return error;
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_turn_off()
-*       Turn off VT operation on all CPUs.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                 
+                                          
+                                                                                
 void
 host_vmxoff()
 {
@@ -351,11 +351,11 @@ host_vmxoff()
 	VMX_KPRINTF("VMX use count: %d\n", vmx_use_count);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_suspend()
-*       Turn off VT operation on this CPU if it was on.
-*       Called when a CPU goes offline.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                
+                                                       
+                                       
+                                                                                
 void
 vmx_suspend()
 {
@@ -366,10 +366,10 @@ vmx_suspend()
 	}
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_suspend()
-*       Restore the previous VT state. Called when CPU comes back online.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                
+                                                                         
+                                                                                
 void
 vmx_resume(boolean_t is_wake_from_hibernate)
 {
@@ -381,12 +381,12 @@ vmx_resume(boolean_t is_wake_from_hibernate)
 		return;
 	}
 
-	/*
-	 * When resuming from hiberate on the boot cpu,
-	 * we must mark VMX as off since that's the state at wake-up
-	 * because the restored state in memory records otherwise.
-	 * This results in vmx_on() doing the right thing.
-	 */
+	  
+                                                
+                                                             
+                                                           
+                                                   
+    
 	if (is_wake_from_hibernate) {
 		vmx_cpu_t *cpu = &current_cpu_datap()->cpu_vmx;
 		cpu->specs.vmx_on = FALSE;
@@ -395,10 +395,10 @@ vmx_resume(boolean_t is_wake_from_hibernate)
 	vmx_on(NULL);
 }
 
-/* -----------------------------------------------------------------------------
-*  vmx_hv_support()
-*       Determine if the VMX feature set is sufficent for kernel HV support.
-*  -------------------------------------------------------------------------- */
+                                                                                
+                   
+                                                                            
+                                                                                
 boolean_t
 vmx_hv_support()
 {
@@ -408,12 +408,12 @@ vmx_hv_support()
 
 #define CHK(msr, shift, mask) if (!VMX_CAP(msr, shift, mask)) return FALSE;
 
-	/* 'EPT' and 'Unrestricted Mode' are part of the secondary processor-based
-	 * VM-execution controls */
+	                                                                          
+                            
 	CHK(MSR_IA32_VMX_BASIC, 0, VMX_BASIC_TRUE_CTLS)
 	CHK(MSR_IA32_VMX_TRUE_PROCBASED_CTLS, 32, VMX_TRUE_PROCBASED_SECONDARY_CTLS)
 
-	/* if we have these, check for 'EPT' and 'Unrestricted Mode' */
+	                                                               
 	CHK(MSR_IA32_VMX_PROCBASED_CTLS2, 32, VMX_PROCBASED_CTLS2_EPT)
 	CHK(MSR_IA32_VMX_PROCBASED_CTLS2, 32, VMX_PROCBASED_CTLS2_UNRESTRICTED)
 

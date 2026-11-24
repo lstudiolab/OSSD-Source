@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*!
- * i386/x86_64-specific functions required to support hibernation entry, and also to
- * support hibernation exit after wired pages have already been restored.
- */
+   
+                                                                                    
+                                                                         
+   
 
 #include <kern/machine.h>
 #include <kern/misc_protos.h>
@@ -54,7 +54,7 @@ extern ppnum_t max_ppnum;
 
 #define MAX_BANKS       32
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                       
 
 hibernate_page_list_t *
 hibernate_page_list_allocate(boolean_t log)
@@ -81,7 +81,7 @@ hibernate_page_list_allocate(boolean_t log)
 	mcount = args->MemoryMapSize / msize;
 
 #if KASAN
-	/* adjust max page number to include stolen memory */
+	                                                     
 	if (atop(shadow_ptop) > pnmax) {
 		pnmax = (ppnum_t)atop(shadow_ptop);
 	}
@@ -95,10 +95,10 @@ hibernate_page_list_allocate(boolean_t log)
 
 #if KASAN
 		if (i == shadow_stolen_idx) {
-			/*
-			 * Add all stolen pages to the bitmap. Later we will prune the unused
-			 * pages.
-			 */
+			  
+                                                                        
+            
+      
 			num += shadow_pages_total;
 		}
 #endif
@@ -114,13 +114,13 @@ hibernate_page_list_allocate(boolean_t log)
 		}
 
 		switch (mptr->Type) {
-		// any kind of dram
+		                   
 		case kEfiACPIMemoryNVS:
 		case kEfiPalCode:
 			non_os_pagecount += num;
 			OS_FALLTHROUGH;
 
-		// OS used dram
+		               
 		case kEfiLoaderCode:
 		case kEfiLoaderData:
 		case kEfiBootServicesCode:
@@ -156,12 +156,12 @@ hibernate_page_list_allocate(boolean_t log)
 			dram_ranges[bank].last_page = base + num - 1;
 			break;
 
-		// runtime services will be restarted, so no save
+		                                                 
 		case kEfiRuntimeServicesCode:
 		case kEfiRuntimeServicesData:
-		// contents are volatile once the platform expert starts
+		                                                        
 		case kEfiACPIReclaimMemory:
-		// non dram
+		           
 		case kEfiReservedMemoryType:
 		case kEfiUnusableMemory:
 		case kEfiMemoryMappedIO:
@@ -176,7 +176,7 @@ hibernate_page_list_allocate(boolean_t log)
 		return NULL;
 	}
 
-	// size the hibernation bitmap
+	                              
 
 	size = sizeof(hibernate_page_list_t);
 	page_count = 0;
@@ -195,7 +195,7 @@ hibernate_page_list_allocate(boolean_t log)
 	list->page_count = page_count;
 	list->bank_count = num_banks;
 
-	// convert to hibernation bitmap.
+	                                 
 
 	bitmap = &list->bank_bitmap[0];
 	for (bank = 0; bank < num_banks; bank++) {
@@ -216,7 +216,7 @@ hibernate_page_list_allocate(boolean_t log)
 	return list;
 }
 
-// mark pages not to be saved, but available for scratch usage during restore
+                                                                             
 
 void
 hibernate_page_list_setall_machine( __unused hibernate_page_list_t * page_list,
@@ -226,7 +226,7 @@ hibernate_page_list_setall_machine( __unused hibernate_page_list_t * page_list,
 {
 }
 
-// mark pages not to be saved and not for scratch usage during restore
+                                                                      
 void
 hibernate_page_list_set_volatile( hibernate_page_list_t * page_list,
     hibernate_page_list_t * page_list_wired,
@@ -280,9 +280,9 @@ hibernate_vm_unlock(void)
 	ml_set_is_quiescing(TRUE);
 }
 
-// ACPI calls hibernate_vm_lock(), interrupt disable, hibernate_vm_unlock() on sleep,
-// hibernate_vm_lock_end() and interrupt enable on wake.
-// VM locks are safely single threaded between hibernate_vm_lock() and hibernate_vm_lock_end().
+                                                                                     
+                                                        
+                                                                                               
 
 void
 hibernate_vm_lock_end(void)

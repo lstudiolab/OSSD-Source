@@ -67,9 +67,9 @@
  *	@(#)mem.c	8.1 (Berkeley) 6/11/93
  */
 
-/*
- * Memory special file
- */
+  
+                      
+   
 
 #include <sys/param.h>
 #include <sys/dir.h>
@@ -83,10 +83,10 @@
 
 #include <mach/vm_types.h>
 #include <mach/vm_param.h>
-#include <vm/vm_kern.h>         /* for kernel_map */
+#include <vm/vm_kern.h>                             
 #include <libkern/section_keywords.h>
 
-#include <pexpert/pexpert.h>    /* for PE_parse_boot_argn */
+#include <pexpert/pexpert.h>                                
 
 boolean_t iskmemdev(dev_t dev);
 
@@ -131,7 +131,7 @@ mmioctl(dev_t dev, u_long cmd, __unused caddr_t data,
 	int minnum = minor(dev);
 
 	if (0 == minnum || 1 == minnum) {
-		/* /dev/mem and /dev/kmem */
+		                            
 #if CONFIG_DEV_KMEM
 		if (!dev_kmem_enabled) {
 			return ENODEV;
@@ -144,7 +144,7 @@ mmioctl(dev_t dev, u_long cmd, __unused caddr_t data,
 	switch (cmd) {
 	case FIONBIO:
 	case FIOASYNC:
-		/* OK to do nothing: we always return immediately */
+		                                                    
 		break;
 	default:
 		return ENODEV;
@@ -163,30 +163,30 @@ mmrw(dev_t dev, struct uio *uio, enum uio_rw rw)
 		uio_update(uio, 0);
 
 		switch (minor(dev)) {
-		/* minor device 0 is physical memory */
+		                                       
 		case 0:
 			return ENODEV;
 
-		/* minor device 1 is kernel memory */
+		                                     
 		case 1:
 #if !CONFIG_DEV_KMEM
 			return ENODEV;
-#else /* CONFIG_DEV_KMEM */
+#else                      
 			if (!dev_kmem_enabled) {
 				return ENODEV;
 			}
 
 			vm_address_t kaddr = (vm_address_t)uio->uio_offset;
 			if (dev_kmem_mask_top_bit) {
-				/*
-				 * KVA addresses of the form 0xFFFFFF80AABBCCDD can't be
-				 * represented as a signed off_t correctly. In these cases,
-				 * 0x7FFFFF80AABBCCDD is passed in, and the top bit OR-ed
-				 * on.
-				 */
+				  
+                                                            
+                                                               
+                                                             
+          
+       
 				const vm_address_t top_bit = (~((vm_address_t)0)) ^ (~((vm_address_t)0) >> 1UL);
 				if (kaddr & top_bit) {
-					/* top bit should not be set already */
+					                                       
 					return EFAULT;
 				}
 				kaddr |= top_bit;
@@ -194,7 +194,7 @@ mmrw(dev_t dev, struct uio *uio, enum uio_rw rw)
 
 			c = uio_curriovlen(uio);
 
-			/* Do some sanity checking */
+			                             
 			if ((kaddr > (VM_MAX_KERNEL_ADDRESS - c)) ||
 			    (kaddr <= VM_MIN_KERNEL_AND_KEXT_ADDRESS)) {
 				goto fault;
@@ -208,17 +208,17 @@ mmrw(dev_t dev, struct uio *uio, enum uio_rw rw)
 				break;
 			}
 
-			continue; /* Keep going until UIO is done */
-#endif /* CONFIG_DEV_KMEM */
+			continue;                                   
+#endif                      
 
-		/* minor device 2 is EOF/RATHOLE */
+		                                   
 		case 2:
 			if (rw == UIO_READ) {
 				return 0;
 			}
 			c = uio_curriovlen(uio);
 
-			error = 0; /* Always succeeds, always consumes all input */
+			error = 0;                                                 
 			break;
 		case 3:
 			assert(devzerobuf != NULL);
@@ -226,7 +226,7 @@ mmrw(dev_t dev, struct uio *uio, enum uio_rw rw)
 			if (uio->uio_rw == UIO_WRITE) {
 				c = uio_curriovlen(uio);
 
-				error = 0; /* Always succeeds, always consumes all input */
+				error = 0;                                                 
 				break;
 			}
 
@@ -236,7 +236,7 @@ mmrw(dev_t dev, struct uio *uio, enum uio_rw rw)
 				break;
 			}
 
-			continue; /* Keep going until UIO is done */
+			continue;                                   
 		default:
 			return ENODEV;
 		}
@@ -258,7 +258,7 @@ __startup_func
 static void
 devzerobuf_init(void)
 {
-	devzerobuf = zalloc_permanent(PAGE_SIZE, ZALIGN_NONE); /* zeroed */
+	devzerobuf = zalloc_permanent(PAGE_SIZE, ZALIGN_NONE);             
 }
 STARTUP(ZALLOC, STARTUP_RANK_LAST, devzerobuf_init);
 
@@ -301,11 +301,11 @@ kernacc(
 	return TRUE;
 }
 
-#endif /* CONFIG_DEV_KMEM */
+#endif                      
 
-/*
- * Returns true if dev is /dev/mem or /dev/kmem.
- */
+  
+                                                
+   
 boolean_t
 iskmemdev(dev_t dev)
 {

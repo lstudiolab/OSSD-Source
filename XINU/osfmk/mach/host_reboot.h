@@ -36,4 +36,4 @@
 #define HOST_REBOOT_UPSDELAY    0x0100
 #define HOST_REBOOT_DEBUGGER    0x1000
 
-#endif  /* _MACH_HOST_REBOOT_ */
+#endif                          

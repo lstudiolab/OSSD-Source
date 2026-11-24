@@ -38,7 +38,7 @@ void
 dsmos_page_transform_hook(dsmos_page_transform_hook_t hook)
 {
 	printf("DSMOS has arrived\n");
-	/* set the hook now - new callers will run with it */
+	                                                     
 	dsmos_hook = hook;
 }
 

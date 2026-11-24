@@ -82,7 +82,7 @@ PE_install_interrupt_handler(void *nub,
 
 	vector = &PE_interrupt_handler;
 
-	/*vector->source = source; IGNORED */
+	                                     
 	vector->handler = handler;
 	vector->nub = nub;
 	vector->target = target;

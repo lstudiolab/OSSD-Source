@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *
- */
+  
+  
+   
 
 #define TEST_HEADERS    0
 
@@ -100,7 +100,7 @@
 #include <IOKit/IOCommandQueue.h>
 #include <IOKit/IOConditionLock.h>
 #include <IOKit/IOCPU.h>
-//#include <IOKit/IODataQueue.h>
+                                
 #include <IOKit/IODataQueueShared.h>
 #include <IOKit/IODeviceMemory.h>
 #include <IOKit/IODeviceTreeSupport.h>
@@ -175,7 +175,7 @@
 #include <IOKit/system.h>
 #include <IOKit/system_management/IOWatchDogTimer.h>
 
-#endif /* TEST_HEADERS */
+#endif                   
 
 #include <sys/sysctl.h>
 #include <libkern/c++/OSData.h>
@@ -331,7 +331,7 @@ OSAllocationTests(int)
 		}
 	}
 
-	// Make sure we can have two-level OSAllocations
+	                                                
 	{
 		OSAllocation<OSAllocation<int> > testArray(10, OSAllocateMemory);
 		for (int i = 0; i < 10; i++) {
@@ -432,13 +432,13 @@ IOSharedDataQueue_44636964(__unused int newValue)
 	UInt64 data = 0x11223344aa55aa55;
 	UInt32 data2 = 0x44332211;
 	UInt32 size = sizeof(UInt32);
-	/* enqueue moves tail to end */
+	                               
 	sd->enqueue(&data, sizeof(UInt64));
-	/* dequeue moves head to end */
+	                               
 	sd->dequeue(&data, &size);
-	/* Tail wraps around, head is still at end */
+	                                             
 	sd->enqueue(&data2, sizeof(UInt32));
-	/* something in the queue so peek() should return non-null */
+	                                                             
 	assert(sd->peek() != NULL);
 	return KERN_SUCCESS;
 }
@@ -531,7 +531,7 @@ IOServiceTest(int newValue)
 static void
 OSStaticPtrCastTests()
 {
-	// const& overload
+	                  
 	{
 		OSSharedPtr<OSDictionary> const dict = OSMakeShared<OSDictionary>();
 		OSSharedPtr<OSCollection> collection = OSStaticPtrCast<OSCollection>(dict);
@@ -542,7 +542,7 @@ OSStaticPtrCastTests()
 		OSSharedPtr<OSCollection> collection = OSStaticPtrCast<OSCollection>(dict);
 		assert(collection == nullptr);
 	}
-	// && overload
+	              
 	{
 		OSSharedPtr<OSDictionary> dict = OSMakeShared<OSDictionary>();
 		OSDictionary* oldDict = dict.get();
@@ -561,7 +561,7 @@ OSStaticPtrCastTests()
 static void
 OSConstPtrCastTests()
 {
-	// const& overload
+	                  
 	{
 		OSSharedPtr<OSDictionary const> const dict = OSMakeShared<OSDictionary>();
 		OSSharedPtr<OSDictionary> dict2 = OSConstPtrCast<OSDictionary>(dict);
@@ -583,7 +583,7 @@ OSConstPtrCastTests()
 		assert(dict2 == nullptr);
 	}
 
-	// && overload
+	              
 	{
 		OSSharedPtr<OSDictionary const> dict = OSMakeShared<OSDictionary>();
 		OSDictionary const* oldDict = dict.get();
@@ -642,11 +642,11 @@ OSSharedPtrTests(int)
 	return 0;
 }
 
-#endif  /* DEVELOPMENT || DEBUG */
+#endif                            
 
 #ifndef __clang_analyzer__
-// All the scary things that this function is doing, such as the intentional
-// overrelease of an OSData, are hidden from the static analyzer.
+                                                                            
+                                                                 
 static int
 sysctl_iokittest(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
 {
@@ -732,7 +732,7 @@ sysctl_iokittest(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused
 		error = IOSharedDataQueue_44636964(newValue);
 		assert(KERN_SUCCESS == error);
 	}
-#endif  /* DEVELOPMENT || DEBUG */
+#endif                            
 
 	return error;
 }
@@ -740,4 +740,4 @@ sysctl_iokittest(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused
 SYSCTL_PROC(_kern, OID_AUTO, iokittest,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_KERN | CTLFLAG_LOCKED,
     NULL, 0, sysctl_iokittest, "I", "");
-#endif // __clang_analyzer__
+#endif                      

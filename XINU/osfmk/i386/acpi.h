@@ -29,16 +29,16 @@
 #ifndef _I386_ACPI_H_
 #define _I386_ACPI_H_
 
-/*
- * ACPI (Advanced Configuration and Power Interface) support.
- */
+  
+                                                             
+   
 
-/*
- * Wake up code linear address. Wake and MP startup copy
- * code to this physical address and then jump to the
- * address started at PROT_MODE_START. Some small amount
- * below PROT_MODE_START is used as scratch space
- */
+  
+                                                        
+                                                     
+                                                        
+                                                 
+   
 #define PROT_MODE_START 0x800
 #define REAL_MODE_BOOTSTRAP_OFFSET 0x2000
 
@@ -49,6 +49,6 @@ extern void        acpi_sleep_kernel(acpi_sleep_callback func, void * refcon);
 extern void        acpi_idle_kernel(acpi_sleep_callback func, void * refcon);
 void install_real_mode_bootstrap(void *prot_entry);
 extern uint32_t    acpi_count_enabled_logical_processors(void);
-#endif  /* ASSEMBLER */
+#endif                 
 
-#endif /* !_I386_ACPI_H_ */
+#endif                     

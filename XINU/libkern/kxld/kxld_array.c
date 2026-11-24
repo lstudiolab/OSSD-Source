@@ -44,8 +44,8 @@ static KXLDArrayPool * pool_create(size_t capacity);
 static void pool_destroy(KXLDArrayPool *pool, size_t capacity);
 static u_int reinit_pools(KXLDArray *array, u_int nitems);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_array_init(KXLDArray *array, size_t itemsize, u_int nitems)
 {
@@ -65,25 +65,25 @@ kxld_array_init(KXLDArray *array, size_t itemsize, u_int nitems)
 
 	require_action(itemsize, finish, rval = KERN_INVALID_ARGUMENT);
 
-	/* If the array has some pools, we need to see if there is enough space in
-	 * those pools to accomodate the requested size array.  If there isn't
-	 * enough space, we save the existing pools to a temporary STAILQ and zero
-	 * out the array structure.  This will cause a new pool of sufficient size
-	 * to be created, and we then copy the data from the old pools into the new
-	 * pool.
-	 */
+	                                                                          
+                                                                       
+                                                                           
+                                                                           
+                                                                            
+         
+    
 	if (array->npools) {
-		/* Update the array's maxitems based on the new itemsize */
+		                                                           
 		array->pool_maxitems = (u_int) (array->pool_capacity / itemsize);
 		array->maxitems = 0;
 		STAILQ_FOREACH(srcpool, &array->pools, entries) {
 			array->maxitems += array->pool_maxitems;
 		}
 
-		/* If there's not enough space, save the pools to a temporary STAILQ
-		 * and zero out the array structure.  Otherwise, rescan the pools to
-		 * update their internal nitems counts.
-		 */
+		                                                                    
+                                                                      
+                                         
+     
 		if (array->maxitems < nitems) {
 			STAILQ_FOREACH_SAFE(srcpool, &array->pools, entries, tmp) {
 				STAILQ_REMOVE(&array->pools, srcpool, kxld_array_pool, entries);
@@ -99,12 +99,12 @@ kxld_array_init(KXLDArray *array, size_t itemsize, u_int nitems)
 
 	array->itemsize = itemsize;
 
-	/* If array->maxitems is zero, it means we are either rebuilding an array
-	 * that was too small, or we're initializing an array for the first time.
-	 * In either case, we need to set up a pool of the requested size, and
-	 * if we're rebuilding an old array, we'll also copy the data from the old
-	 * pools into the new pool.
-	 */
+	                                                                         
+                                                                          
+                                                                       
+                                                                           
+                            
+    
 	if (array->maxitems == 0) {
 		rval = array_init(array, itemsize, nitems);
 		require_noerr(rval, finish);
@@ -129,11 +129,11 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* This may only be called to initialize (or reinitialize) an array with exactly
-* zero or one pool.  Calling this on an array with more than one pool is an
-* error.
-*******************************************************************************/
+                                                                                
+                                                                               
+                                                                           
+        
+                                                                                
 static kern_return_t
 array_init(KXLDArray *array, size_t itemsize, u_int nitems)
 {
@@ -170,8 +170,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static KXLDArrayPool *
 pool_create(size_t capacity)
 {
@@ -193,8 +193,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 pool_destroy(KXLDArrayPool *pool, size_t capacity)
 {
@@ -206,8 +206,8 @@ pool_destroy(KXLDArrayPool *pool, size_t capacity)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_array_copy(KXLDArray *dstarray, const KXLDArray *srcarray)
 {
@@ -221,10 +221,10 @@ kxld_array_copy(KXLDArray *dstarray, const KXLDArray *srcarray)
 	check(dstarray);
 	check(srcarray);
 
-	/* When copying array, we only want to copy to an array with a single
-	 * pool.  If the array has more than one pool or the array is too small,
-	 * we destroy the array and build it from scratch for the copy.
-	 */
+	                                                                     
+                                                                         
+                                                                
+    
 	needed_capacity = round_page(srcarray->nitems * srcarray->itemsize);
 	current_capacity = dstarray->npools * dstarray->pool_capacity;
 	if (dstarray->npools > 1 || needed_capacity > current_capacity) {
@@ -237,7 +237,7 @@ kxld_array_copy(KXLDArray *dstarray, const KXLDArray *srcarray)
 	dstpool = STAILQ_FIRST(&dstarray->pools);
 	require_action(dstpool, finish, rval = KERN_FAILURE);
 
-	/* Copy the data from the source pools to the single destination pool. */
+	                                                                         
 	STAILQ_FOREACH(srcpool, &srcarray->pools, entries) {
 		copysize = srcpool->nitems * srcarray->itemsize;
 		memcpy(dstpool->buffer + offset, srcpool->buffer, copysize);
@@ -249,8 +249,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_array_reset(KXLDArray *array)
 {
@@ -264,8 +264,8 @@ kxld_array_reset(KXLDArray *array)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_array_clear(KXLDArray *array)
 {
@@ -279,8 +279,8 @@ kxld_array_clear(KXLDArray *array)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_array_deinit(KXLDArray *array)
 {
@@ -295,8 +295,8 @@ kxld_array_deinit(KXLDArray *array)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_array_get_item(const KXLDArray *array, u_int idx)
 {
@@ -322,8 +322,8 @@ finish:
 	return item;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_array_get_slot(const KXLDArray *array, u_int idx)
 {
@@ -349,8 +349,8 @@ finish:
 	return item;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_array_get_index(const KXLDArray *array, const void *item, u_int *_idx)
 {
@@ -387,15 +387,15 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_array_resize(KXLDArray *array, u_int nitems)
 {
 	kern_return_t rval = KERN_FAILURE;
 	KXLDArrayPool *pool = NULL;
 
-	/* Grow the list of pools until we have enough to fit all of the entries */
+	                                                                           
 
 	while (nitems > array->maxitems) {
 		pool = pool_create(array->pool_capacity);
@@ -415,18 +415,18 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* Sets the number of items for the array and each pool.  Returns zero if there
-* is enough space for all items, and the number of additional items needed
-* if there is not enough space.
-*******************************************************************************/
+                                                                                
+                                                                              
+                                                                          
+                               
+                                                                                
 static u_int
 reinit_pools(KXLDArray *array, u_int nitems)
 {
 	KXLDArrayPool *pool = NULL;
 	u_int pool_nitems = 0;
 
-	/* Set the number of items for each pool */
+	                                           
 
 	pool_nitems = nitems;
 	STAILQ_FOREACH(pool, &array->pools, entries) {
@@ -443,8 +443,8 @@ reinit_pools(KXLDArray *array, u_int nitems)
 	return pool_nitems;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_array_remove(KXLDArray *array, u_int idx)
 {
@@ -461,9 +461,9 @@ kxld_array_remove(KXLDArray *array, u_int idx)
 		goto finish;
 	}
 
-	/* We only support removing an item if all the items are contained in a
-	 * single pool (for now).
-	 */
+	                                                                       
+                          
+    
 	require_action(array->npools < 2 || array->nitems < array->pool_maxitems,
 	    finish, rval = KERN_NOT_SUPPORTED);
 

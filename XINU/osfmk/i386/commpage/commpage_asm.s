@@ -31,8 +31,8 @@
 #include <machine/asm.h>
 #include <assym.s>
 
-/* pointers to the 32-bit commpage routine descriptors */
-/* WARNING: these must be sorted by commpage address! */
+                                                         
+                                                        
 	.const_data
 	.align	3
 	.globl	_commpage_32_routines
@@ -45,8 +45,8 @@ _commpage_32_routines:
 	.quad	0
 
 
-/* pointers to the 64-bit commpage routine descriptors */
-/* WARNING: these must be sorted by commpage address! */
+                                                         
+                                                        
 	.const_data
 	.align	3
 	.globl	_commpage_64_routines

@@ -54,8 +54,8 @@ struct thread_group {
 	queue_chain_t           tg_queue_chain;
 #if CONFIG_SCHED_CLUTCH
 	struct sched_clutch     tg_sched_clutch;
-#endif /* CONFIG_SCHED_CLUTCH */
-	// 16 bytes of padding here
+#endif                          
+	                           
 	uint8_t                 tg_machine_data[] __attribute__((aligned(CACHELINE_SIZE)));
 } __attribute__((aligned(8)));
 
@@ -79,20 +79,20 @@ int tg_set_by_bankvoucher;
 
 static bool thread_group_retain_try(struct thread_group *tg);
 
-/*
- * Initialize thread groups at boot
- */
+  
+                                   
+   
 void
 thread_group_init(void)
 {
-	// Get thread group structure extension from EDT or boot-args (which can override EDT)
+	                                                                                      
 	if (!PE_parse_boot_argn("kern.thread_group_extra_bytes", &tg_machine_data_size, sizeof(tg_machine_data_size))) {
 		if (!PE_get_default("kern.thread_group_extra_bytes", &tg_machine_data_size, sizeof(tg_machine_data_size))) {
 			tg_machine_data_size = 8;
 		}
 	}
 
-	// Check if thread group can be set by voucher adoption from EDT or boot-args (which can override EDT)
+	                                                                                                      
 	if (!PE_parse_boot_argn("kern.thread_group_set_by_bankvoucher", &tg_set_by_bankvoucher, sizeof(tg_set_by_bankvoucher))) {
 		if (!PE_get_default("kern.thread_group_set_by_bankvoucher", &tg_set_by_bankvoucher, sizeof(tg_set_by_bankvoucher))) {
 			tg_set_by_bankvoucher = 1;
@@ -104,7 +104,7 @@ thread_group_init(void)
 		tg_size += CACHELINE_SIZE - (tg_size % CACHELINE_SIZE);
 	}
 	tg_machine_data_size = tg_size - sizeof(struct thread_group);
-	// printf("tg_size=%d(%lu+%d)\n", tg_size, sizeof(struct thread_group), tg_machine_data_size);
+	                                                                                              
 	assert(offsetof(struct thread_group, tg_machine_data) % CACHELINE_SIZE == 0);
 	tg_zone = zone_create("thread_groups", tg_size, ZC_NOENCRYPT | ZC_ALIGNMENT_REQUIRED);
 
@@ -122,14 +122,14 @@ thread_group_init(void)
 	tg_perf_controller = thread_group_create_and_retain();
 	thread_group_set_name(tg_perf_controller, "perf_controller");
 
-	/*
-	 * If CLPC is disabled, it would recommend SMP for all thread groups.
-	 * In that mode, the scheduler would like to restrict the kernel thread
-	 * groups to the E-cluster while all other thread groups are run on the
-	 * P-cluster. To identify the kernel thread groups, mark them with a
-	 * special flag THREAD_GROUP_FLAGS_SMP_RESTRICT which is looked at by
-	 * recommended_pset_type().
-	 */
+	  
+                                                                      
+                                                                        
+                                                                        
+                                                                     
+                                                                      
+                            
+    
 	tg_system->tg_flags |= THREAD_GROUP_FLAGS_SMP_RESTRICT;
 	tg_vm->tg_flags |= THREAD_GROUP_FLAGS_SMP_RESTRICT;
 	tg_io_storage->tg_flags |= THREAD_GROUP_FLAGS_SMP_RESTRICT;
@@ -137,17 +137,17 @@ thread_group_init(void)
 }
 
 #if CONFIG_SCHED_CLUTCH
-/*
- * sched_clutch_for_thread
- *
- * The routine provides a back linkage from the thread to the
- * sched_clutch it belongs to. This relationship is based on the
- * thread group membership of the thread. Since that membership is
- * changed from the thread context with the thread lock held, this
- * linkage should be looked at only with the thread lock held or
- * when the thread cannot be running (for eg. the thread is in the
- * runq and being removed as part of thread_select().
- */
+  
+                          
+  
+                                                             
+                                                                
+                                                                  
+                                                                  
+                                                                
+                                                                  
+                                                     
+   
 sched_clutch_t
 sched_clutch_for_thread(thread_t thread)
 {
@@ -161,11 +161,11 @@ sched_clutch_for_thread_group(struct thread_group *thread_group)
 	return &(thread_group->tg_sched_clutch);
 }
 
-/*
- * Translate the TG flags to a priority boost for the sched_clutch.
- * This priority boost will apply to the entire clutch represented
- * by the thread group.
- */
+  
+                                                                   
+                                                                  
+                       
+   
 static void
 sched_clutch_update_tg_flags(sched_clutch_t clutch, uint8_t flags)
 {
@@ -180,17 +180,17 @@ sched_clutch_update_tg_flags(sched_clutch_t clutch, uint8_t flags)
 	os_atomic_store(&clutch->sc_tg_priority, sc_tg_pri, relaxed);
 }
 
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 
-/*
- * Use a spinlock to protect all thread group flag updates.
- * The lock should not have heavy contention since these flag updates should
- * be infrequent. If this lock has contention issues, it should be changed to
- * a per thread-group lock.
- *
- * The lock protects the flags field in the thread_group structure. It is also
- * held while doing callouts to CLPC to reflect these flag changes.
- */
+  
+                                                           
+                                                                            
+                                                                             
+                           
+  
+                                                                              
+                                                                   
+   
 
 void
 thread_group_flags_update_lock(void)
@@ -204,10 +204,10 @@ thread_group_flags_update_unlock(void)
 	lck_spin_unlock(&tg_flags_update_lock);
 }
 
-/*
- * Inform platform code about already existing thread groups
- * or ask it to free state for all thread groups
- */
+  
+                                                            
+                                                
+   
 void
 thread_group_resync(boolean_t create)
 {
@@ -224,9 +224,9 @@ thread_group_resync(boolean_t create)
 	lck_mtx_unlock(&tg_lock);
 }
 
-/*
- * Create new thread group and add new reference to it.
- */
+  
+                                                       
+   
 struct thread_group *
 thread_group_create_and_retain(void)
 {
@@ -240,30 +240,30 @@ thread_group_create_and_retain(void)
 	bzero(tg, sizeof(struct thread_group));
 
 #if CONFIG_SCHED_CLUTCH
-	/*
-	 * The clutch scheduler maintains a bunch of runqs per thread group. For
-	 * each thread group it maintains a sched_clutch structure. The lifetime
-	 * of that structure is tied directly to the lifetime of the thread group.
-	 */
+	  
+                                                                         
+                                                                         
+                                                                           
+    
 	sched_clutch_init_with_thread_group(&(tg->tg_sched_clutch), tg);
 
-	/*
-	 * Since the thread group flags are used to determine any priority promotions
-	 * for the threads in the thread group, initialize them to 0.
-	 */
+	  
+                                                                              
+                                                              
+    
 	sched_clutch_update_tg_flags(&(tg->tg_sched_clutch), 0);
 
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 
 	lck_mtx_lock(&tg_lock);
 	tg->tg_id = tg_next_id++;
-	tg->tg_recommendation = CLUSTER_TYPE_SMP; // no recommendation yet
+	tg->tg_recommendation = CLUSTER_TYPE_SMP;                         
 	os_ref_init(&tg->tg_refcount, NULL);
 	tg_count++;
 	enqueue_tail(&tg_queue, &tg->tg_queue_chain);
 	lck_mtx_unlock(&tg_lock);
 
-	// call machine layer init before this thread group becomes visible
+	                                                                   
 	machine_thread_group_init(tg);
 
 	KDBG_RELEASE(MACHDBG_CODE(DBG_MACH_THREAD_GROUP, MACH_THREAD_GROUP_NEW), tg->tg_id);
@@ -271,9 +271,9 @@ thread_group_create_and_retain(void)
 	return tg;
 }
 
-/*
- * Point newly created thread to its home thread group
- */
+  
+                                                      
+   
 void
 thread_group_init_thread(thread_t t, task_t task)
 {
@@ -283,9 +283,9 @@ thread_group_init_thread(thread_t t, task_t task)
 	    THREAD_GROUP_INVALID, tg->tg_id, (uintptr_t)thread_tid(t));
 }
 
-/*
- * Set thread group name
- */
+  
+                        
+   
 void
 thread_group_set_name(__unused struct thread_group *tg, __unused const char *name)
 {
@@ -303,13 +303,13 @@ thread_group_set_name(__unused struct thread_group *tg, __unused const char *nam
 		    *(uint64_t*)(void*)&tg->tg_name[0],
 		    *(uint64_t*)(void*)&tg->tg_name[sizeof(uint64_t)]
 		    );
-#else /* defined(__LP64__) */
+#else                        
 		KDBG(MACHDBG_CODE(DBG_MACH_THREAD_GROUP, MACH_THREAD_GROUP_NAME),
 		    tg->tg_id,
 		    *(uint32_t*)(void*)&tg->tg_name[0],
 		    *(uint32_t*)(void*)&tg->tg_name[sizeof(uint32_t)]
 		    );
-#endif /* defined(__LP64__) */
+#endif                        
 	}
 	thread_group_release(tg);
 }
@@ -330,13 +330,13 @@ thread_group_clear_flags(struct thread_group *tg, uint64_t flags)
 	thread_group_flags_update_unlock();
 }
 
-/*
- * Set thread group flags and perform related actions.
- * The tg_flags_update_lock should be held.
- * Currently supported flags are:
- * - THREAD_GROUP_FLAGS_EFFICIENT
- * - THREAD_GROUP_FLAGS_UI_APP
- */
+  
+                                                      
+                                           
+                                 
+                                 
+                              
+   
 
 void
 thread_group_set_flags_locked(struct thread_group *tg, uint64_t flags)
@@ -354,18 +354,18 @@ thread_group_set_flags_locked(struct thread_group *tg, uint64_t flags)
 	machine_thread_group_flags_update(tg, tg->tg_flags);
 #if CONFIG_SCHED_CLUTCH
 	sched_clutch_update_tg_flags(&(tg->tg_sched_clutch), tg->tg_flags);
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 	KDBG(MACHDBG_CODE(DBG_MACH_THREAD_GROUP, MACH_THREAD_GROUP_FLAGS),
 	    tg->tg_id, tg->tg_flags, old_flags);
 }
 
-/*
- * Clear thread group flags and perform related actions
- * The tg_flags_update_lock should be held.
- * Currently supported flags are:
- * - THREAD_GROUP_FLAGS_EFFICIENT
- * - THREAD_GROUP_FLAGS_UI_APP
- */
+  
+                                                       
+                                           
+                                 
+                                 
+                              
+   
 
 void
 thread_group_clear_flags_locked(struct thread_group *tg, uint64_t flags)
@@ -382,7 +382,7 @@ thread_group_clear_flags_locked(struct thread_group *tg, uint64_t flags)
 	tg->tg_flags &= ~flags;
 #if CONFIG_SCHED_CLUTCH
 	sched_clutch_update_tg_flags(&(tg->tg_sched_clutch), tg->tg_flags);
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 	machine_thread_group_flags_update(tg, tg->tg_flags);
 	KDBG(MACHDBG_CODE(DBG_MACH_THREAD_GROUP, MACH_THREAD_GROUP_FLAGS),
 	    tg->tg_id, tg->tg_flags, old_flags);
@@ -390,9 +390,9 @@ thread_group_clear_flags_locked(struct thread_group *tg, uint64_t flags)
 
 
 
-/*
- * Find thread group with specified name and put new reference to it.
- */
+  
+                                                                     
+   
 struct thread_group *
 thread_group_find_by_name_and_retain(char *name)
 {
@@ -425,9 +425,9 @@ thread_group_find_by_name_and_retain(char *name)
 	return result;
 }
 
-/*
- * Find thread group with specified ID and add new reference to it.
- */
+  
+                                                                   
+   
 struct thread_group *
 thread_group_find_by_id_and_retain(uint64_t id)
 {
@@ -472,9 +472,9 @@ thread_group_find_by_id_and_retain(uint64_t id)
 	return result;
 }
 
-/*
- * Add new reference to specified thread group
- */
+  
+                                              
+   
 struct thread_group *
 thread_group_retain(struct thread_group *tg)
 {
@@ -482,19 +482,19 @@ thread_group_retain(struct thread_group *tg)
 	return tg;
 }
 
-/*
- * Similar to thread_group_retain, but fails for thread groups with a
- * zero reference count. Returns true if retained successfully.
- */
+  
+                                                                     
+                                                               
+   
 static bool
 thread_group_retain_try(struct thread_group *tg)
 {
 	return os_ref_retain_try(&tg->tg_refcount);
 }
 
-/*
- * Drop a reference to specified thread group
- */
+  
+                                             
+   
 void
 thread_group_release(struct thread_group *tg)
 {
@@ -511,25 +511,25 @@ thread_group_release(struct thread_group *tg)
 		    *(uint64_t*)(void*)&tg->tg_name[0],
 		    *(uint64_t*)(void*)&tg->tg_name[sizeof(uint64_t)]
 		    );
-#else /* defined(__LP64__) */
+#else                        
 		KDBG(MACHDBG_CODE(DBG_MACH_THREAD_GROUP, MACH_THREAD_GROUP_NAME_FREE),
 		    tg->tg_id,
 		    *(uint32_t*)(void*)&tg->tg_name[0],
 		    *(uint32_t*)(void*)&tg->tg_name[sizeof(uint32_t)]
 		    );
-#endif /* defined(__LP64__) */
+#endif                        
 		KDBG_RELEASE(MACHDBG_CODE(DBG_MACH_THREAD_GROUP, MACH_THREAD_GROUP_FREE), tg->tg_id);
 #if CONFIG_SCHED_CLUTCH
 		sched_clutch_destroy(&(tg->tg_sched_clutch));
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 		machine_thread_group_deinit(tg);
 		zfree(tg_zone, tg);
 	}
 }
 
-/*
- * Get thread's current thread group
- */
+  
+                                    
+   
 inline struct thread_group *
 thread_group_get(thread_t t)
 {
@@ -544,26 +544,26 @@ thread_group_get_home_group(thread_t t)
 
 #if CONFIG_SCHED_AUTO_JOIN
 
-/*
- * thread_set_thread_group_auto_join()
- *
- * Sets the thread group of a thread based on auto-join rules.
- *
- * Preconditions:
- * - Thread must not be part of a runq (freshly made runnable threads or terminating only)
- * - Thread must be locked by the caller already
- */
+  
+                                      
+  
+                                                              
+  
+                 
+                                                                                          
+                                                
+   
 static void
 thread_set_thread_group_auto_join(thread_t t, struct thread_group *tg, __unused struct thread_group *old_tg)
 {
 	assert(t->runq == PROCESSOR_NULL);
 	t->thread_group = tg;
 
-	/*
-	 * If the thread group is being changed for the current thread, callout to
-	 * CLPC to update the thread's information at that layer. This makes sure CLPC
-	 * has consistent state when the current thread is going off-core.
-	 */
+	  
+                                                                           
+                                                                               
+                                                                   
+    
 	if (t == current_thread()) {
 		uint64_t ctime = mach_approximate_time();
 		uint64_t arg1, arg2;
@@ -572,29 +572,29 @@ thread_set_thread_group_auto_join(thread_t t, struct thread_group *tg, __unused 
 	}
 }
 
-#endif /* CONFIG_SCHED_AUTO_JOIN */
+#endif                             
 
-/*
- * thread_set_thread_group_explicit()
- *
- * Sets the thread group of a thread based on default non auto-join rules.
- *
- * Preconditions:
- * - Thread must be the current thread
- * - Caller must not have the thread locked
- * - Interrupts must be disabled
- */
+  
+                                     
+  
+                                                                          
+  
+                 
+                                      
+                                           
+                                
+   
 static void
 thread_set_thread_group_explicit(thread_t t, struct thread_group *tg, __unused struct thread_group *old_tg)
 {
 	assert(t == current_thread());
-	/*
-	 * In the clutch scheduler world, the runq membership of the thread
-	 * is based on its thread group membership and its scheduling bucket.
-	 * In order to synchronize with the priority (and therefore bucket)
-	 * getting updated concurrently, it is important to perform the
-	 * thread group change also under the thread lock.
-	 */
+	  
+                                                                    
+                                                                      
+                                                                    
+                                                                
+                                                   
+    
 	thread_lock(t);
 	t->thread_group = tg;
 
@@ -604,7 +604,7 @@ thread_set_thread_group_explicit(thread_t t, struct thread_group *tg, __unused s
 	if (SCHED_CLUTCH_THREAD_ELIGIBLE(t)) {
 		sched_clutch_thread_clutch_update(t, old_clutch, new_clutch);
 	}
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 
 	thread_unlock(t);
 
@@ -614,21 +614,21 @@ thread_set_thread_group_explicit(thread_t t, struct thread_group *tg, __unused s
 	machine_switch_perfcontrol_state_update(THREAD_GROUP_UPDATE, ctime, 0, t);
 }
 
-/*
- * thread_set_thread_group()
- *
- * Overrides the current home thread group with an override group. However,
- * an adopted work interval overrides the override. Does not take a reference
- * on the group, so caller must guarantee group lifetime lasts as long as the
- * group is set.
- *
- * The thread group is set according to a hierarchy:
- *
- * 1) work interval specified group (explicit API)
- * 2) Auto-join thread group (wakeup tracking for special work intervals)
- * 3) bank voucher carried group (implicitly set)
- * 4) coalition default thread group (ambient)
- */
+  
+                            
+  
+                                                                           
+                                                                             
+                                                                             
+                
+  
+                                                    
+  
+                                                  
+                                                                         
+                                                 
+                                              
+   
 static void
 thread_set_thread_group(thread_t t, struct thread_group *tg, bool auto_join)
 {
@@ -636,7 +636,7 @@ thread_set_thread_group(thread_t t, struct thread_group *tg, bool auto_join)
 	struct thread_group *old_tg = NULL;
 
 	if (tg == NULL) {
-		/* when removing an override, revert to home group */
+		                                                     
 		tg = home_tg;
 	}
 
@@ -649,28 +649,28 @@ thread_set_thread_group(thread_t t, struct thread_group *tg, bool auto_join)
 		    t->thread_group ? t->thread_group->tg_id : 0,
 		    tg->tg_id, (uintptr_t)thread_tid(t), home_tg->tg_id);
 
-		/*
-		 * Based on whether this is a change due to auto-join, the join does
-		 * different things and has different expectations.
-		 */
+		  
+                                                                      
+                                                     
+     
 		if (auto_join) {
 #if CONFIG_SCHED_AUTO_JOIN
-			/*
-			 * set thread group with auto-join rules. This has the
-			 * implicit assumption that the thread lock is already held.
-			 * Also this could happen to any thread (current or thread
-			 * being context switched).
-			 */
+			  
+                                                         
+                                                               
+                                                             
+                              
+      
 			thread_set_thread_group_auto_join(t, tg, old_tg);
-#else /* CONFIG_SCHED_AUTO_JOIN */
+#else                             
 			panic("Auto-Join unsupported on this platform");
-#endif /* CONFIG_SCHED_AUTO_JOIN */
+#endif                             
 		} else {
-			/*
-			 * set thread group with the explicit join rules. This has
-			 * the implicit assumption that the thread is not locked. Also
-			 * this would be done only to the current thread.
-			 */
+			  
+                                                             
+                                                                 
+                                                    
+      
 			thread_set_thread_group_explicit(t, tg, old_tg);
 		}
 	}
@@ -681,12 +681,12 @@ thread_set_thread_group(thread_t t, struct thread_group *tg, bool auto_join)
 void
 thread_group_set_bank(thread_t t, struct thread_group *tg)
 {
-	/* work interval group overrides any bank override group */
+	                                                           
 	if (t->th_work_interval) {
 		return;
 	}
 
-	/* boot arg disables groups in bank */
+	                                      
 	if (tg_set_by_bankvoucher == FALSE) {
 		return;
 	}
@@ -694,34 +694,34 @@ thread_group_set_bank(thread_t t, struct thread_group *tg)
 	thread_set_thread_group(t, tg, false);
 }
 
-/*
- * thread_set_work_interval_thread_group()
- *
- * Sets the thread's group to the work interval thread group.
- * If auto_join == true, thread group is being overriden through scheduler
- * auto-join policies.
- *
- * Preconditions for auto-join case:
- * - t is not current_thread and t should be locked.
- * - t should not be running on a remote core; thread context switching is a valid state for this.
- */
+  
+                                          
+  
+                                                             
+                                                                          
+                      
+  
+                                    
+                                                    
+                                                                                                  
+   
 void
 thread_set_work_interval_thread_group(thread_t t, struct thread_group *tg, bool auto_join)
 {
 	if (tg == NULL) {
-		/*
-		 * when removing a work interval override, fall back
-		 * to the current voucher override.
-		 *
-		 * In the auto_join case, the thread is already locked by the caller so
-		 * its unsafe to get the thread group from the current voucher (since
-		 * that might require taking task lock and ivac lock). However, the
-		 * auto-join policy does not allow threads to switch thread groups based
-		 * on voucher overrides.
-		 *
-		 * For the normal case, lookup the thread group from the currently adopted
-		 * voucher and use that as the fallback tg.
-		 */
+		  
+                                                      
+                                     
+    
+                                                                         
+                                                                       
+                                                                     
+                                                                          
+                          
+    
+                                                                            
+                                             
+     
 
 		if (auto_join == false) {
 			tg = thread_get_current_voucher_thread_group(t);
@@ -753,9 +753,9 @@ thread_group_count(void)
 	return tg_count;
 }
 
-/*
- * Can only be called while tg cannot be destroyed
- */
+  
+                                                  
+   
 inline const char*
 thread_group_get_name(struct thread_group *tg)
 {
@@ -818,10 +818,10 @@ thread_group_get_flags(struct thread_group *tg)
 	return tg->tg_flags;
 }
 
-/*
- * Returns whether the thread group is restricted to the E-cluster when CLPC is
- * turned off.
- */
+  
+                                                                               
+              
+   
 boolean_t
 thread_group_smp_restricted(struct thread_group *tg)
 {
@@ -835,11 +835,11 @@ thread_group_smp_restricted(struct thread_group *tg)
 void
 thread_group_update_recommendation(struct thread_group *tg, cluster_type_t new_recommendation)
 {
-	/*
-	 * Since the tg->tg_recommendation field is read by CPUs trying to determine
-	 * where a thread/thread group needs to be placed, it is important to use
-	 * atomic operations to update the recommendation.
-	 */
+	  
+                                                                             
+                                                                          
+                                                   
+    
 	os_atomic_store(&tg->tg_recommendation, new_recommendation, relaxed);
 }
 
@@ -852,24 +852,24 @@ void
 sched_perfcontrol_thread_group_recommend(__unused void *machine_data, __unused cluster_type_t new_recommendation)
 {
 	struct thread_group *tg = (struct thread_group *)((uintptr_t)machine_data - offsetof(struct thread_group, tg_machine_data));
-	/*
-	 * CLUSTER_TYPE_SMP was used for some debugging support when CLPC dynamic control was turned off.
-	 * In more recent implementations, CLPC simply recommends "P-spill" when dynamic control is turned off. So it should
-	 * never be recommending CLUSTER_TYPE_SMP for thread groups.
-	 */
+	  
+                                                                                                  
+                                                                                                                     
+                                                             
+    
 	assert(new_recommendation != CLUSTER_TYPE_SMP);
-	/*
-	 * The Edge scheduler expects preferred cluster recommendations for each QoS level within a TG. Until the new CLPC
-	 * routine is being called, fake out the call from the old CLPC interface.
-	 */
+	  
+                                                                                                                   
+                                                                           
+    
 	uint32_t tg_bucket_preferred_cluster[TH_BUCKET_SCHED_MAX] = {0};
-	/*
-	 * For all buckets higher than UT, apply the recommendation to the thread group bucket
-	 */
+	  
+                                                                                       
+    
 	for (sched_bucket_t bucket = TH_BUCKET_FIXPRI; bucket < TH_BUCKET_SHARE_UT; bucket++) {
 		tg_bucket_preferred_cluster[bucket] = (new_recommendation == pset_type_for_id(0)) ? 0 : 1;
 	}
-	/* For UT & BG QoS, set the recommendation only if they havent been restricted via sysctls */
+	                                                                                             
 	if (!sched_edge_restrict_ut) {
 		tg_bucket_preferred_cluster[TH_BUCKET_SHARE_UT] = (new_recommendation == pset_type_for_id(0)) ? 0 : 1;
 	}
@@ -911,7 +911,7 @@ sched_perfcontrol_thread_group_preferred_clusters_set(void *machine_data, uint32
 	sched_edge_tg_preferred_cluster_change(tg, tg_bucket_preferred_cluster, options);
 }
 
-#else /* CONFIG_SCHED_EDGE */
+#else                        
 
 void
 sched_perfcontrol_thread_group_recommend(__unused void *machine_data, __unused cluster_type_t new_recommendation)
@@ -936,6 +936,6 @@ sched_perfcontrol_thread_group_preferred_clusters_set(__unused void *machine_dat
 {
 }
 
-#endif /* CONFIG_SCHED_EDGE */
+#endif                        
 
-#endif /* CONFIG_THREAD_GROUPS */
+#endif                           

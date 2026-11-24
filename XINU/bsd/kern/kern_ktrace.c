@@ -26,26 +26,26 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * This file manages the ownership of ktrace and its subsystems, like kdebug
- * and kperf, as well as the overall state of the system, whether it is in
- * foreground or background mode.
- *
- * When unconfigured or in background mode, any root process can take ownership
- * of ktrace and configure it, changing the state to foreground and, in the case
- * of a transition out of background, resetting the background configuration.
- *
- * When in foreground mode, if the owning process is still running, only it may
- * configure ktrace.  If it exits, ktrace keeps running but any root process can
- * change the configuration.  When ktrace is reset, the state changes back to
- * unconfigured and a notification is sent on the ktrace_background host special
- * port.
- *
- * If a process has set itself as the background tool, using the init_background
- * sysctl, it can configure ktrace only when ktrace is off or already in
- * background mode.  The first attempt to configure ktrace by the background pid
- * when it is off results in the transition to background mode.
- */
+  
+                                                                            
+                                                                          
+                                 
+  
+                                                                               
+                                                                                
+                                                                             
+  
+                                                                               
+                                                                                
+                                                                             
+                                                                                
+        
+  
+                                                                                
+                                                                        
+                                                                                
+                                                               
+   
 
 #include <sys/ktrace.h>
 
@@ -73,76 +73,76 @@ kern_return_t ktrace_background_available_notify_user(void);
 static LCK_GRP_DECLARE(ktrace_grp, "ktrace");
 static LCK_MTX_DECLARE(ktrace_mtx, &ktrace_grp);
 
-/*
- * The overall state of ktrace, whether it is unconfigured, in foreground mode,
- * or in background mode.  The state determines which processes can configure
- * ktrace.
- */
+  
+                                                                               
+                                                                             
+          
+   
 static enum ktrace_state ktrace_state = KTRACE_STATE_OFF;
 
-/* The true owner of ktrace, checked by ktrace_access_check(). */
+                                                                 
 static uint64_t ktrace_owning_unique_id = 0;
 static pid_t ktrace_owning_pid = 0;
 
-/*
- * The background pid of ktrace, automatically made the owner when
- * transitioning to background mode.
- */
+  
+                                                                  
+                                    
+   
 static uint64_t ktrace_bg_unique_id = 0;
 static pid_t ktrace_bg_pid = 0;
 
-/* The name of the last process to configure ktrace. */
+                                                       
 static char ktrace_last_owner_execname[MAXCOMLEN + 1] = { 0 };
 
-/*
- * Which subsystems of ktrace (currently kdebug and kperf) are active.
- */
+  
+                                                                      
+   
 static uint32_t ktrace_active_mask = 0;
 
-/*
- * At boot or when a daemon has been newly loaded, it's necessary to bootstrap
- * user space background tools by sending a background available notification
- * when the init_background sysctl is made.
- *
- * Background tools must be RunAtLoad daemons.
- */
+  
+                                                                              
+                                                                             
+                                           
+  
+                                              
+   
 static bool should_notify_on_init = true;
 
-/* Set the owning process of ktrace. */
+                                       
 static void ktrace_set_owning_proc(proc_t p);
 
-/* Reset ktrace ownership back to unowned. */
+                                             
 static void ktrace_release_ownership(void);
 
-/* Make the background tool the owner of ktrace. */
+                                                   
 static void ktrace_promote_background(void);
 
-/*
- * If user space sets a pid manually (through kperf "blessing"), ktrace should
- * not treat resets as releasing ownership.  At that point, ownership is only
- * released when the owner is set to an invalid pid.
- *
- * This is managed by the user space-oriented function ktrace_set_owning_pid
- * and ktrace_unset_owning_pid.
- */
+  
+                                                                              
+                                                                             
+                                                    
+  
+                                                                            
+                               
+   
 bool ktrace_keep_ownership_on_reset = false;
 
-/* Whether the kernel is the owner of ktrace. */
+                                                
 bool ktrace_owner_kernel = false;
 
-/* Allow user space to unset the owning pid and potentially reset ktrace. */
+                                                                            
 static void ktrace_set_invalid_owning_pid(void);
 
-/*
- * This flag allows any root process to set a new ktrace owner.  It is
- * currently used by Instruments.
- */
+  
+                                                                      
+                                 
+   
 int ktrace_root_set_owner_allowed = 0;
 
-/*
- * If ktrace is guaranteed that it's the only thread running on the system
- * (e.g., during boot or wake) this flag disables locking requirements.
- */
+  
+                                                                          
+                                                                       
+   
 static bool ktrace_single_threaded = false;
 
 void
@@ -197,10 +197,10 @@ ktrace_reset_internal(uint32_t reset_mask)
 
 	if (ktrace_active_mask == 0) {
 		if (ktrace_state == KTRACE_STATE_FG) {
-			/* transition from foreground to background */
+			                                              
 			ktrace_promote_background();
 		} else if (ktrace_state == KTRACE_STATE_BG) {
-			/* background tool is resetting ktrace */
+			                                         
 			should_notify_on_init = true;
 			ktrace_release_ownership();
 			ktrace_state = KTRACE_STATE_OFF;
@@ -228,11 +228,11 @@ ktrace_promote_background(void)
 {
 	assert(ktrace_state != KTRACE_STATE_BG);
 
-	/*
-	 * Remember to send a background available notification on the next init
-	 * if the notification failed (meaning no task holds the receive right
-	 * for the host special port).
-	 */
+	  
+                                                                         
+                                                                       
+                               
+    
 	if (ktrace_background_available_notify_user() == KERN_FAILURE) {
 		should_notify_on_init = true;
 	} else {
@@ -261,23 +261,23 @@ ktrace_read_check(void)
 	return kauth_cred_issuser(kauth_cred_get()) ? 0 : EPERM;
 }
 
-/* If an owning process has exited, reset the ownership. */
+                                                           
 static void
 ktrace_ownership_maintenance(void)
 {
 	ktrace_assert_lock_held();
 
-	/* do nothing if ktrace is not owned */
+	                                       
 	if (ktrace_owning_unique_id == 0) {
 		return;
 	}
 
-	/* reset ownership if process cannot be found */
+	                                                
 
 	proc_t owning_proc = proc_find(ktrace_owning_pid);
 
 	if (owning_proc != NULL) {
-		/* make sure the pid was not recycled */
+		                                        
 		if (proc_uniqueid(owning_proc) != ktrace_owning_unique_id) {
 			ktrace_release_ownership();
 		}
@@ -296,13 +296,13 @@ ktrace_configure(uint32_t config_mask)
 
 	proc_t p = current_proc();
 
-	/* if process clearly owns ktrace, allow */
+	                                           
 	if (proc_uniqueid(p) == ktrace_owning_unique_id) {
 		ktrace_active_mask |= config_mask;
 		return 0;
 	}
 
-	/* background configure while foreground is active is not allowed */
+	                                                                    
 	if (proc_uniqueid(p) == ktrace_bg_unique_id &&
 	    ktrace_state == KTRACE_STATE_FG) {
 		return EBUSY;
@@ -310,7 +310,7 @@ ktrace_configure(uint32_t config_mask)
 
 	ktrace_ownership_maintenance();
 
-	/* allow process to gain control when unowned or background */
+	                                                              
 	if (ktrace_owning_unique_id == 0 || ktrace_state == KTRACE_STATE_BG) {
 		if (!kauth_cred_issuser(kauth_cred_get())) {
 			return EPERM;
@@ -322,7 +322,7 @@ ktrace_configure(uint32_t config_mask)
 		return 0;
 	}
 
-	/* owned by an existing, different process */
+	                                             
 	return EBUSY;
 }
 
@@ -383,18 +383,18 @@ ktrace_init_background(void)
 		return err;
 	}
 
-	/*
-	 * When a background tool first checks in, send a notification if ktrace
-	 * is available.
-	 */
+	  
+                                                                         
+                 
+    
 	if (should_notify_on_init) {
 		if (ktrace_state == KTRACE_STATE_OFF) {
-			/*
-			 * This notification can only fail if a process does not
-			 * hold the receive right for the host special port.
-			 * Return an error and don't make the current process
-			 * the background tool.
-			 */
+			  
+                                                           
+                                                       
+                                                        
+                          
+      
 			if (ktrace_background_available_notify_user() == KERN_FAILURE) {
 				return EINVAL;
 			}
@@ -428,13 +428,13 @@ ktrace_set_owning_pid(int pid)
 {
 	ktrace_assert_lock_held();
 
-	/* allow user space to successfully unset owning pid */
+	                                                       
 	if (pid == -1) {
 		ktrace_set_invalid_owning_pid();
 		return 0;
 	}
 
-	/* use ktrace_reset or ktrace_release_ownership, not this */
+	                                                            
 	if (pid == 0) {
 		ktrace_set_invalid_owning_pid();
 		return EINVAL;

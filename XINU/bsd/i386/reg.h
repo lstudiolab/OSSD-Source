@@ -38,6 +38,6 @@
 #define _BSD_I386_REG_H_
 
 
-#endif  /* _BSD_I386_REG_H_ */
+#endif                        
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

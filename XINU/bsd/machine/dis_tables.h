@@ -34,4 +34,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _BSD_MACHINE_DIS_TABLES_H_ */
+#endif                                 

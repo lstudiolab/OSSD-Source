@@ -37,7 +37,7 @@
 
 #include <IOKit/IOLib.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #if 0
 #define DEBG(fmt, args ...)  { kprintf(fmt, args); }
@@ -45,7 +45,7 @@
 #define DEBG(fmt, args ...)      {}
 #endif
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 OSSerialize *
 OSSerialize::binaryWithCapacity(unsigned int inCapacity,
@@ -118,7 +118,7 @@ OSSerialize::addBinaryObject(const OSMetaClassBase * o, uint32_t key,
 	size_t       alignSize;
 	size_t       headerSize;
 
-	// add to tag array
+	                   
 	tags->setObject(o);
 
 	headerSize = sizeof(key);
@@ -223,7 +223,7 @@ OSSerialize::binarySerializeInternal(const OSMetaClassBase *o)
 	bool       ok;
 
 	tagIdx = tags->getNextIndexOfObject(o, 0);
-	// does it exist?
+	                 
 	if (-1U != tagIdx) {
 		if (indexData) {
 			assert(indexData->getLength() > (tagIdx * sizeof(uint32_t)));
@@ -268,7 +268,7 @@ OSSerialize::binarySerializeInternal(const OSMetaClassBase *o)
 			if (nvalue) {
 				nvalue->release();
 			}
-//			if (!ok) ok = binarySerialize(kOSBooleanFalse);
+                                                    
 		}
 		endBinaryCollection(startCollection);
 	} else if ((array = OSDynamicCast(OSArray, o))) {
@@ -281,7 +281,7 @@ OSSerialize::binarySerializeInternal(const OSMetaClassBase *o)
 			if (!ok) {
 				ok = array->array[i - 1]->serialize(this);
 			}
-//			if (!ok) ok = binarySerialize(kOSBooleanFalse);
+                                                    
 		}
 		endBinaryCollection(startCollection);
 	} else if ((set = OSDynamicCast(OSSet, o))) {
@@ -294,7 +294,7 @@ OSSerialize::binarySerializeInternal(const OSMetaClassBase *o)
 			if (!ok) {
 				ok = set->members->array[i - 1]->serialize(this);
 			}
-//			if (!ok) ok = binarySerialize(kOSBooleanFalse);
+                                                    
 		}
 		endBinaryCollection(startCollection);
 	} else if ((num = OSDynamicCast(OSNumber, o))) {
@@ -325,7 +325,7 @@ OSSerialize::binarySerializeInternal(const OSMetaClassBase *o)
 	return ok;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #define setAtIndex(v, idx, o)                                                                                                           \
 	if (idx >= v##Capacity)                                                                                                                 \
@@ -350,7 +350,7 @@ OSSerialize::binarySerializeInternal(const OSMetaClassBase *o)
 	}                                                                                                                                                               \
 	if (ok) v##Array[idx] = o;
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 OSObject *
 OSUnserializeBinary(const char *buffer, size_t bufferSize, OSString **errorString)

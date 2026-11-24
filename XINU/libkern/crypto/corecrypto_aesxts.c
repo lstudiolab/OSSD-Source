@@ -33,17 +33,17 @@
 #include <corecrypto/ccpad.h>
 #include <kern/debug.h>
 
-/*
- * These are the interfaces required for XTS-AES support
- */
+  
+                                                        
+   
 
 uint32_t
-xts_start(uint32_t cipher __unused, // ignored - we're doing this for xts-aes only
-    const uint8_t *IV __unused,               // ignored
+xts_start(uint32_t cipher __unused,                                               
+    const uint8_t *IV __unused,                         
     const uint8_t *key1, int keylen,
-    const uint8_t *key2, int tweaklen __unused,               // both keys are the same size for xts
-    uint32_t num_rounds __unused,               // ignored
-    uint32_t options __unused,                  // ignored
+    const uint8_t *key2, int tweaklen __unused,                                                     
+    uint32_t num_rounds __unused,                         
+    uint32_t options __unused,                            
     symmetric_xts *xts)
 {
 	const struct ccmode_xts *enc, *dec;
@@ -59,7 +59,7 @@ xts_start(uint32_t cipher __unused, // ignored - we're doing this for xts-aes on
 		panic("%s: xts mode not registered? enc=%p, dec=%p\n", __FUNCTION__, enc, dec);
 	}
 
-	/* Make sure the context size for the mode fits in the one we have */
+	                                                                     
 	if ((enc->size > sizeof(xts->enc)) || (dec->size > sizeof(xts->dec))) {
 		panic("%s: inconsistent size for AES-XTS context", __FUNCTION__);
 	}
@@ -73,7 +73,7 @@ xts_start(uint32_t cipher __unused, // ignored - we're doing this for xts-aes on
 int
 xts_encrypt(const uint8_t *pt, unsigned long ptlen,
     uint8_t *ct,
-    const uint8_t *iv,                     // this can be considered the sector IV for this use
+    const uint8_t *iv,                                                                         
     symmetric_xts *xts)
 {
 	const struct ccmode_xts *xtsenc = g_crypto_funcs->ccaes_xts_encrypt;
@@ -95,7 +95,7 @@ xts_encrypt(const uint8_t *pt, unsigned long ptlen,
 int
 xts_decrypt(const uint8_t *ct, unsigned long ptlen,
     uint8_t *pt,
-    const uint8_t *iv,                             // this can be considered the sector IV for this use
+    const uint8_t *iv,                                                                                 
     symmetric_xts *xts)
 {
 	const struct ccmode_xts *xtsdec = g_crypto_funcs->ccaes_xts_decrypt;

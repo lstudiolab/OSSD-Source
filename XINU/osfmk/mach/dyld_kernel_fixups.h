@@ -26,17 +26,17 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * This file contains static dyld helper functions for
- * exclusive use in platform startup code.
- */
+  
+                                                      
+                                          
+   
 
 #include <mach-o/fixup-chains.h>
 #include <mach-o/loader.h>
 
 #if defined(HAS_APPLE_PAC)
 #include <ptrauth.h>
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 #ifndef dyldLogFunc
 #define dyldLogFunc(msg, ...) kprintf(msg, ## __VA_ARGS__)
@@ -47,7 +47,7 @@
 #endif
 #define LogFixups 0
 
-// cannot safely callout out to functions like strcmp before initial fixup
+                                                                          
 static inline int
 strings_are_equal(const char* a, const char* b)
 {
@@ -61,10 +61,10 @@ strings_are_equal(const char* a, const char* b)
 	return *a == *b;
 }
 
-/*
- * Functions from dyld to rebase, fixup and sign the contents of MH_FILESET
- * kernel collections.
- */
+  
+                                                                           
+                      
+   
 
 union ChainedFixupPointerOnDisk {
 	uint64_t raw64;
@@ -86,13 +86,13 @@ sign_pointer(struct dyld_chained_ptr_64_kernel_cache_rebase pointer __unused,
 		}
 	}
 	switch (pointer.key) {
-	case 0:         // IA
+	case 0:              
 		return (uint64_t)__builtin_ptrauth_sign_unauthenticated((void*)target, 0, discriminator);
-	case 1:         // IB
+	case 1:              
 		return (uint64_t)__builtin_ptrauth_sign_unauthenticated((void*)target, 1, discriminator);
-	case 2:         // DA
+	case 2:              
 		return (uint64_t)__builtin_ptrauth_sign_unauthenticated((void*)target, 2, discriminator);
-	case 3:         // DB
+	case 3:              
 		return (uint64_t)__builtin_ptrauth_sign_unauthenticated((void*)target, 3, discriminator);
 	}
 #endif
@@ -134,11 +134,11 @@ fixup_value(union ChainedFixupPointerOnDisk* fixupLoc __unused,
 			*stop = 1;
 			return;
 		}
-#endif // HAS_APPLE_PAC
+#endif                 
 		fixupLoc->raw64 = slidValue;
 		break;
 	}
-#endif // __LP64__
+#endif            
 	default:
 		dyldLogFunc("unsupported pointer chain format: 0x%04X", segInfo->pointer_format);
 		*stop = 1;
@@ -168,7 +168,7 @@ walk_chain(const struct mach_header_64* mh,
 		dyldLogFunc("[LOG] kernel-fixups: segInfo pointer format %d\n", segInfo->pointer_format);
 	}
 	while (!stop && !chainEnd) {
-		// copy chain content, in case handler modifies location to final value
+		                                                                       
 		if (LogFixups) {
 			dyldLogFunc("[LOG] kernel-fixups: value of chain %p", chain);
 		}
@@ -197,7 +197,7 @@ walk_chain(const struct mach_header_64* mh,
 					chain = (union ChainedFixupPointerOnDisk*)((uintptr_t)chain + chainContent.fixup64.next);
 				}
 				break;
-#endif // __LP64__
+#endif            
 			default:
 				dyldLogFunc("unknown pointer format 0x%04X", segInfo->pointer_format);
 				stop = 1;
@@ -210,7 +210,7 @@ walk_chain(const struct mach_header_64* mh,
 static inline __attribute__((__always_inline__)) int
 kernel_collection_slide(const struct mach_header_64* mh, const void* basePointers[KCNumKinds])
 {
-	// First find the slide and chained fixups load command
+	                                                       
 	uint64_t textVMAddr     = 0;
 	const struct linkedit_data_command* chainedFixups = 0;
 	uint64_t linkeditVMAddr         = 0;
@@ -226,9 +226,9 @@ kernel_collection_slide(const struct mach_header_64* mh, const void* basePointer
 	} else if (mh->magic == MH_MAGIC) {
 		startCmds = (struct load_command*)((uintptr_t)mh + sizeof(struct mach_header));
 	} else {
-		//const uint32_t* h = (uint32_t*)mh;
-		//diag.error("file does not start with MH_MAGIC[_64]: 0x%08X 0x%08X", h[0], h [1]);
-		return 1;  // not a mach-o file
+		                                    
+		                                                                                   
+		return 1;                      
 	}
 	const struct load_command* const cmdsEnd = (struct load_command*)((uintptr_t)startCmds + mh->sizeofcmds);
 	const struct load_command* cmd = startCmds;
@@ -238,11 +238,11 @@ kernel_collection_slide(const struct mach_header_64* mh, const void* basePointer
 		}
 		const struct load_command* nextCmd = (struct load_command*)((uintptr_t)cmd + cmd->cmdsize);
 		if (cmd->cmdsize < 8) {
-			//diag.error("malformed load command #%d of %d at %p with mh=%p, size (0x%X) too small", i, this->ncmds, cmd, this, cmd->cmdsize);
+			                                                                                                                                  
 			return 1;
 		}
 		if ((nextCmd > cmdsEnd) || (nextCmd < startCmds)) {
-			//diag.error("malformed load command #%d of %d at %p with mh=%p, size (0x%X) is too large, load commands end at %p", i, this->ncmds, cmd, this, cmd->cmdsize, cmdsEnd);
+			                                                                                                                                                                       
 			return 1;
 		}
 		if (cmd->cmd == LC_DYLD_CHAINED_FIXUPS) {
@@ -280,7 +280,7 @@ kernel_collection_slide(const struct mach_header_64* mh, const void* basePointer
 		dyldLogFunc("[LOG] kernel-fixups: found linkeditFileOffset %p\n", (void*)linkeditFileOffset);
 	}
 
-	// Now we have the chained fixups, walk it to apply all the rebases
+	                                                                   
 	uint64_t offsetInLinkedit   = chainedFixups->dataoff - linkeditFileOffset;
 	uintptr_t linkeditStartAddr = (uintptr_t)linkeditVMAddr + slide;
 	if (LogFixups) {
@@ -310,10 +310,10 @@ kernel_collection_slide(const struct mach_header_64* mh, const void* basePointer
 				continue;
 			}
 			if (offsetInPage & DYLD_CHAINED_PTR_START_MULTI) {
-				// FIXME: Implement this
+				                        
 				return 1;
 			} else {
-				// one chain per page
+				                     
 				if (walk_chain(mh, segInfo, pageIndex, offsetInPage, slide, basePointers)) {
 					stopped = 1;
 				}
@@ -324,10 +324,10 @@ kernel_collection_slide(const struct mach_header_64* mh, const void* basePointer
 	return stopped;
 }
 
-/*
- * Utility functions to adjust the load command vmaddrs in constituent MachO's
- * of an MH_FILESET kernel collection.
- */
+  
+                                                                              
+                                      
+   
 
 static void
 kernel_collection_adjust_fileset_entry_addrs(struct mach_header_64 *mh, uintptr_t adj)
@@ -354,7 +354,7 @@ kernel_collection_adjust_fileset_entry_addrs(struct mach_header_64 *mh, uintptr_
 
 		seg = (struct segment_command_64 *)(uintptr_t)lc;
 		seg->vmaddr += adj;
-		/* slide/adjust every section in the segment */
+		                                               
 		sec = (struct section_64 *)((uintptr_t)seg + sizeof(*seg));
 		for (j = 0; j < seg->nsects; j++, sec++) {
 			sec->addr += adj;
@@ -410,38 +410,38 @@ kernel_collection_adjust_mh_addrs(struct mach_header_64 *kc_mh, uintptr_t adj,
 	uint32_t i, j;
 	int is_linkedit = 0;
 
-	/*
-	 * Slide (offset/adjust) every segment/section of every kext contained
-	 * in this MH_FILESET mach-o.
-	 */
+	  
+                                                                       
+                              
+    
 	lc = (struct load_command *)((uintptr_t)kc_mh + sizeof(*kc_mh));
 	for (i = 0; i < kc_mh->ncmds; i++,
 	    lc = (struct load_command *)((uintptr_t)lc + lc->cmdsize)) {
 		if (lc->cmd == LC_FILESET_ENTRY) {
 			fse = (struct fileset_entry_command *)(uintptr_t)lc;
-			/*
-			 * The fileset_entry contains a pointer to the mach-o
-			 * of a kext (or the kernel). Slide/adjust this command, and
-			 * then slide/adjust all the sub-commands in the mach-o.
-			 */
+			  
+                                                        
+                                                               
+                                                           
+      
 			if (LogFixups) {
 				dyldLogFunc("[MH] sliding %s", (char *)((uintptr_t)fse +
 				    (uintptr_t)(fse->entry_id.offset)));
 			}
 			mh = (struct mach_header_64 *)((uintptr_t)fse->vmaddr + adj);
 			if (!pageable) {
-				/*
-				 * Do not adjust mach headers of entries in pageable KC as that
-				 * would pull those pages in prematurely
-				 */
+				  
+                                                                   
+                                            
+       
 				kernel_collection_adjust_fileset_entry_addrs(mh, adj);
 			}
 			fse->vmaddr += adj;
 		} else if (lc->cmd == LC_SEGMENT_64) {
-			/*
-			 * Slide/adjust all LC_SEGMENT_64 commands in the fileset
-			 * (and any sections in those segments)
-			 */
+			  
+                                                            
+                                          
+      
 			seg = (struct segment_command_64 *)(uintptr_t)lc;
 			seg->vmaddr += adj;
 			sec = (struct section_64 *)((uintptr_t)seg + sizeof(*seg));
@@ -451,10 +451,10 @@ kernel_collection_adjust_mh_addrs(struct mach_header_64 *kc_mh, uintptr_t adj,
 			if (seg->vmsize == 0) {
 				continue;
 			}
-			/*
-			 * Record vmaddr range covered by all non-empty segments in the
-			 * kernel collection.
-			 */
+			  
+                                                                  
+                        
+      
 			if (seg->vmaddr < lowest_vmaddr) {
 				lowest_vmaddr = (uintptr_t)seg->vmaddr;
 			}
@@ -471,10 +471,10 @@ kernel_collection_adjust_mh_addrs(struct mach_header_64 *kc_mh, uintptr_t adj,
 			if ((seg->maxprot & VM_PROT_WRITE) || is_linkedit) {
 				continue;
 			}
-			/*
-			 * Record vmaddr range covered by non-empty read-only segments
-			 * in the kernel collection (excluding LINKEDIT).
-			 */
+			  
+                                                                 
+                                                    
+      
 			if (seg->vmaddr < lowest_ro_vmaddr) {
 				lowest_ro_vmaddr = (uintptr_t)seg->vmaddr;
 			}
@@ -485,10 +485,10 @@ kernel_collection_adjust_mh_addrs(struct mach_header_64 *kc_mh, uintptr_t adj,
 			if (!(seg->maxprot & VM_PROT_EXECUTE)) {
 				continue;
 			}
-			/*
-			 * Record vmaddr range covered by contiguous execute segments
-			 * in the kernel collection.
-			 */
+			  
+                                                                
+                               
+      
 			if (seg->vmaddr < lowest_rx_vmaddr && (lowest_rx_vmaddr <= seg->vmaddr + seg->vmsize || lowest_rx_vmaddr == UINTPTR_MAX)) {
 				lowest_rx_vmaddr = (uintptr_t)seg->vmaddr;
 			}
@@ -520,10 +520,10 @@ kernel_collection_adjust_mh_addrs(struct mach_header_64 *kc_mh, uintptr_t adj,
 	}
 }
 
-/*
- * Rebaser functions for the traditional arm64e static kernelcache with
- * threaded rebase.
- */
+  
+                                                                       
+                   
+   
 
 static void
 rebase_chain(uintptr_t chainStartAddress, uint64_t stepMultiplier, uintptr_t baseAddress __unused, uint64_t slide)
@@ -542,16 +542,16 @@ rebase_chain(uintptr_t chainStartAddress, uint64_t stepMultiplier, uintptr_t bas
 		bool isRebase = (value & (1ULL << 62)) == 0;
 		if (isRebase) {
 			if (isAuthenticated) {
-				// The new value for a rebase is the low 32-bits of the threaded value plus the slide.
+				                                                                                      
 				uint64_t newValue = (value & 0xFFFFFFFF) + slide;
-				// Add in the offset from the mach_header
+				                                         
 				newValue += baseAddress;
 #if HAS_APPLE_PAC
-				// We have bits to merge in to the discriminator
+				                                                
 				uintptr_t discriminator = diversity;
 				if (hasAddressDiversity) {
-					// First calculate a new discriminator using the address of where we are trying to store the value
-					// Only blend if we have a discriminator
+					                                                                                                  
+					                                        
 					if (discriminator) {
 						discriminator = __builtin_ptrauth_blend_discriminator((void*)address, discriminator);
 					} else {
@@ -575,9 +575,9 @@ rebase_chain(uintptr_t chainStartAddress, uint64_t stepMultiplier, uintptr_t bas
 #endif
 				*(uint64_t*)address = newValue;
 			} else {
-				// Regular pointer which needs to fit in 51-bits of value.
-				// C++ RTTI uses the top bit, so we'll allow the whole top-byte
-				// and the bottom 43-bits to be fit in to 51-bits.
+				                                                          
+				                                                               
+				                                                  
 				uint64_t top8Bits = value & 0x0007F80000000000ULL;
 				uint64_t bottom43Bits = value & 0x000007FFFFFFFFFFULL;
 				uint64_t targetValue = (top8Bits << 13) | (((intptr_t)(bottom43Bits << 21) >> 21) & 0x00FFFFFFFFFFFFFF);
@@ -586,8 +586,8 @@ rebase_chain(uintptr_t chainStartAddress, uint64_t stepMultiplier, uintptr_t bas
 			}
 		}
 
-		// The delta is bits [51..61]
-		// And bit 62 is to tell us if we are a rebase (0) or bind (1)
+		                             
+		                                                              
 		value &= ~(1ULL << 62);
 		delta = (value & 0x3FF8000000000000) >> 51;
 		address += delta * stepMultiplier;

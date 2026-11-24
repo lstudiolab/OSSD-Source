@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* $FreeBSD: src/sys/netinet6/in6_gif.c,v 1.2.2.3 2001/07/03 11:01:52 ume Exp $ */
-/* $KAME: in6_gif.c,v 1.49 2001/05/14 14:02:17 itojun Exp $ */
+                                                                                  
+                                                              
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -94,7 +94,7 @@
 int
 in6_gif_output(
 	struct ifnet *ifp,
-	int family, /* family of the packet to be encapsulate. */
+	int family,                                              
 	struct mbuf *m,
 	__unused struct rtentry *rt)
 {
@@ -157,7 +157,7 @@ in6_gif_output(
 		return EAFNOSUPPORT;
 	}
 
-	/* prepend new IP header */
+	                           
 	M_PREPEND(m, sizeof(struct ip6_hdr), M_DONTWAIT, 1);
 	if (m && mbuf_len(m) < sizeof(struct ip6_hdr)) {
 		m = m_pullup(m, sizeof(struct ip6_hdr));
@@ -175,7 +175,7 @@ in6_gif_output(
 	ip6->ip6_nxt    = proto;
 	ip6->ip6_hlim   = ip6_gif_hlim;
 	ip6->ip6_src    = sin6_src->sin6_addr;
-	/* bidirectional configured tunnel mode */
+	                                          
 	if (!IN6_IS_ADDR_UNSPECIFIED(&sin6_dst->sin6_addr)) {
 		ip6->ip6_dst = sin6_dst->sin6_addr;
 	} else {
@@ -191,7 +191,7 @@ in6_gif_output(
 	    dst->sin6_family != sin6_dst->sin6_family ||
 	    !IN6_ARE_ADDR_EQUAL(&dst->sin6_addr, &sin6_dst->sin6_addr) ||
 	    (sc->gif_ro6.ro_rt != NULL && sc->gif_ro6.ro_rt->rt_ifp == ifp)) {
-		/* cache route doesn't match or recursive route */
+		                                                  
 		bzero(dst, sizeof(*dst));
 		dst->sin6_family = sin6_dst->sin6_family;
 		dst->sin6_len = sizeof(struct sockaddr_in6);
@@ -209,11 +209,11 @@ in6_gif_output(
 			return ENETUNREACH;
 		}
 		RT_LOCK(sc->gif_ro6.ro_rt);
-		/* if it constitutes infinite encapsulation, punt. */
+		                                                     
 		if (sc->gif_ro6.ro_rt->rt_ifp == ifp) {
 			RT_UNLOCK(sc->gif_ro6.ro_rt);
 			m_freem(m);
-			return ENETUNREACH; /* XXX */
+			return ENETUNREACH;          
 		}
 #if 0
 		ifp->if_mtu = sc->gif_ro6.ro_rt->rt_ifp->if_mtu
@@ -223,11 +223,11 @@ in6_gif_output(
 	}
 
 #if IPV6_MINMTU
-	/*
-	 * force fragmentation to minimum MTU, to avoid path MTU discovery.
-	 * it is too painful to ask for resend of inner packet, to achieve
-	 * path MTU discovery for encapsulated packets.
-	 */
+	  
+                                                                    
+                                                                   
+                                                
+    
 	return ip6_output(m, 0, &sc->gif_ro6, IPV6_MINMTU, 0, NULL, NULL);
 #else
 	return ip6_output(m, 0, &sc->gif_ro6, 0, 0, NULL, NULL);
@@ -280,7 +280,7 @@ in6_gif_input(struct mbuf **mp, int *offp, int proto)
 				sum = ~ntohs(ip->ip_sum) & 0xffff;
 				sum += (~old_tos & 0xffff) + ip->ip_tos;
 				sum = (sum >> 16) + (sum & 0xffff);
-				sum += (sum >> 16); /* add carry */
+				sum += (sum >> 16);                
 				ip->ip_sum = htons(~sum & 0xffff);
 			}
 		} else {
@@ -317,7 +317,7 @@ in6_gif_input(struct mbuf **mp, int *offp, int proto)
 		return IPPROTO_DONE;
 	}
 
-	/* Replace the rcvif by gifp for ifnet_input to route it correctly */
+	                                                                     
 	if (m->m_pkthdr.rcvif) {
 		m->m_pkthdr.rcvif = gifp;
 	}
@@ -326,9 +326,9 @@ in6_gif_input(struct mbuf **mp, int *offp, int proto)
 	return IPPROTO_DONE;
 }
 
-/*
- * validate outer address.
- */
+  
+                          
+   
 static int
 gif_validate6(
 	const struct ip6_hdr *ip6,
@@ -340,19 +340,19 @@ gif_validate6(
 	src = (struct sockaddr_in6 *)(void *)sc->gif_psrc;
 	dst = (struct sockaddr_in6 *)(void *)sc->gif_pdst;
 
-	/*
-	 * Check for address match.  Note that the check is for an incoming
-	 * packet.  We should compare the *source* address in our configuration
-	 * and the *destination* address of the packet, and vice versa.
-	 */
+	  
+                                                                    
+                                                                        
+                                                                
+    
 	if (!IN6_ARE_ADDR_EQUAL(&src->sin6_addr, &ip6->ip6_dst) ||
 	    !IN6_ARE_ADDR_EQUAL(&dst->sin6_addr, &ip6->ip6_src)) {
 		return 0;
 	}
 
-	/* martian filters on outer source - done in ip6_input */
+	                                                         
 
-	/* ingress filters on outer source */
+	                                     
 	if ((ifnet_flags(sc->gif_if) & IFF_LINK2) == 0 && ifp) {
 		struct sockaddr_in6 sin6;
 		struct rtentry *rt;
@@ -385,11 +385,11 @@ gif_validate6(
 	return 128 * 2;
 }
 
-/*
- * we know that we are in IFF_UP, outer address available, and outer family
- * matched the physical addr family.  see gif_encapcheck().
- * sanity check for arg should have been done in the caller.
- */
+  
+                                                                           
+                                                           
+                                                            
+   
 int
 gif_encapcheck6(
 	const struct mbuf *m,
@@ -401,7 +401,7 @@ gif_encapcheck6(
 	struct gif_softc *sc;
 	struct ifnet *ifp;
 
-	/* sanity check done in caller */
+	                                 
 	sc = (struct gif_softc *)arg;
 
 	GIF_LOCK_ASSERT(sc);

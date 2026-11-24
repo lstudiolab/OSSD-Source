@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_debug.c.
- *	Author:	Rich Draves
- *	Date:	March, 1990
- *
- *	Exported kernel calls.  See mach_debug/mach_debug.defs.
- */
+  
+   
+  
+                       
+                      
+                    
+  
+                                                          
+   
 #include <mach_vm_debug.h>
 #include <mach/kern_return.h>
 #include <mach/mach_host_server.h>
@@ -87,28 +87,28 @@
 
 #if !MACH_VM_DEBUG
 #define __DEBUG_ONLY __unused
-#else /* !MACH_VM_DEBUG */
+#else                     
 #define __DEBUG_ONLY
-#endif /* !MACH_VM_DEBUG */
+#endif                     
 
 #ifdef VM32_SUPPORT
 
 #include <mach/vm32_map_server.h>
 #include <mach/vm_map.h>
 
-/*
- *	Routine:	mach_vm_region_info [kernel call]
- *	Purpose:
- *		Retrieve information about a VM region,
- *		including info about the object chain.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Retrieve region/object info.
- *		KERN_INVALID_TASK	The map is null.
- *		KERN_NO_SPACE		There is no entry at/after the address.
- *		KERN_RESOURCE_SHORTAGE	Can't allocate memory.
- */
+  
+                                             
+           
+                                           
+                                          
+              
+                   
+           
+                                              
+                                      
+                                                          
+                                                 
+   
 
 kern_return_t
 vm32_region_info(
@@ -122,10 +122,10 @@ vm32_region_info(
 	return KERN_FAILURE;
 #else
 	vm_map_copy_t copy;
-	vm_offset_t addr = 0;   /* memory for OOL data */
-	vm_size_t size;         /* size of the memory */
-	unsigned int room;      /* room for this many objects */
-	unsigned int used;      /* actually this many objects */
+	vm_offset_t addr = 0;                            
+	vm_size_t size;                                 
+	unsigned int room;                                      
+	unsigned int used;                                      
 	vm_info_region_t region;
 	kern_return_t kr;
 
@@ -133,19 +133,19 @@ vm32_region_info(
 		return KERN_INVALID_TASK;
 	}
 
-	size = 0;               /* no memory allocated yet */
+	size = 0;                                            
 
 	for (;;) {
-		vm_map_t cmap;  /* current map in traversal */
-		vm_map_t nmap;  /* next map to look at */
+		vm_map_t cmap;                                
+		vm_map_t nmap;                           
 		vm_map_entry_t entry;
 		vm_object_t object, cobject, nobject;
 
-		/* nothing is locked */
+		                       
 
 		vm_map_lock_read(map);
 		for (cmap = map;; cmap = nmap) {
-			/* cmap is read-locked */
+			                         
 
 			if (!vm_map_lookup_entry(cmap,
 			    (vm_map_address_t)address, &entry)) {
@@ -166,13 +166,13 @@ vm32_region_info(
 				break;
 			}
 
-			/* move down to the lower map */
+			                                
 
 			vm_map_lock_read(nmap);
 			vm_map_unlock_read(cmap);
 		}
 
-		/* cmap is read-locked; we have a real entry */
+		                                               
 
 		object = VME_OBJECT(entry);
 		region.vir_start = (natural_t) entry->vme_start;
@@ -191,7 +191,7 @@ vm32_region_info(
 
 		if (object == VM_OBJECT_NULL) {
 			vm_map_unlock_read(cmap);
-			/* no memory needed */
+			                      
 			break;
 		}
 
@@ -199,7 +199,7 @@ vm32_region_info(
 		vm_map_unlock_read(cmap);
 
 		for (cobject = object;; cobject = nobject) {
-			/* cobject is locked */
+			                       
 
 			if (used < room) {
 				vm_info_object_t *vio =
@@ -260,13 +260,13 @@ vm32_region_info(
 			vm_object_unlock(cobject);
 		}
 
-		/* nothing locked */
+		                    
 
 		if (used <= room) {
 			break;
 		}
 
-		/* must allocate more memory */
+		                               
 
 		if (size != 0) {
 			kmem_free(ipc_kernel_map, addr, size);
@@ -291,7 +291,7 @@ vm32_region_info(
 		assert(kr == KERN_SUCCESS);
 	}
 
-	/* free excess memory; make remaining memory pageable */
+	                                                        
 
 	if (used == 0) {
 		copy = VM_MAP_COPY_NULL;
@@ -327,12 +327,12 @@ vm32_region_info(
 	*objectsp = (vm_info_object_array_t) copy;
 	*objectsCntp = used;
 	return KERN_SUCCESS;
-#endif /* MACH_VM_DEBUG */
+#endif                    
 }
 
-/*
- *  Temporary call for 64 bit data path interface transiotion
- */
+  
+                                                             
+   
 
 kern_return_t
 vm32_region_info_64(
@@ -346,10 +346,10 @@ vm32_region_info_64(
 	return KERN_FAILURE;
 #else
 	vm_map_copy_t copy;
-	vm_offset_t addr = 0;   /* memory for OOL data */
-	vm_size_t size;         /* size of the memory */
-	unsigned int room;      /* room for this many objects */
-	unsigned int used;      /* actually this many objects */
+	vm_offset_t addr = 0;                            
+	vm_size_t size;                                 
+	unsigned int room;                                      
+	unsigned int used;                                      
 	vm_info_region_64_t region;
 	kern_return_t kr;
 
@@ -357,19 +357,19 @@ vm32_region_info_64(
 		return KERN_INVALID_TASK;
 	}
 
-	size = 0;               /* no memory allocated yet */
+	size = 0;                                            
 
 	for (;;) {
-		vm_map_t cmap;  /* current map in traversal */
-		vm_map_t nmap;  /* next map to look at */
+		vm_map_t cmap;                                
+		vm_map_t nmap;                           
 		vm_map_entry_t entry;
 		vm_object_t object, cobject, nobject;
 
-		/* nothing is locked */
+		                       
 
 		vm_map_lock_read(map);
 		for (cmap = map;; cmap = nmap) {
-			/* cmap is read-locked */
+			                         
 
 			if (!vm_map_lookup_entry(cmap, address, &entry)) {
 				entry = entry->vme_next;
@@ -389,13 +389,13 @@ vm32_region_info_64(
 				break;
 			}
 
-			/* move down to the lower map */
+			                                
 
 			vm_map_lock_read(nmap);
 			vm_map_unlock_read(cmap);
 		}
 
-		/* cmap is read-locked; we have a real entry */
+		                                               
 
 		object = VME_OBJECT(entry);
 		region.vir_start = (natural_t) entry->vme_start;
@@ -414,7 +414,7 @@ vm32_region_info_64(
 
 		if (object == VM_OBJECT_NULL) {
 			vm_map_unlock_read(cmap);
-			/* no memory needed */
+			                      
 			break;
 		}
 
@@ -422,7 +422,7 @@ vm32_region_info_64(
 		vm_map_unlock_read(cmap);
 
 		for (cobject = object;; cobject = nobject) {
-			/* cobject is locked */
+			                       
 
 			if (used < room) {
 				vm_info_object_t *vio =
@@ -483,13 +483,13 @@ vm32_region_info_64(
 			vm_object_unlock(cobject);
 		}
 
-		/* nothing locked */
+		                    
 
 		if (used <= room) {
 			break;
 		}
 
-		/* must allocate more memory */
+		                               
 
 		if (size != 0) {
 			kmem_free(ipc_kernel_map, addr, size);
@@ -514,7 +514,7 @@ vm32_region_info_64(
 		assert(kr == KERN_SUCCESS);
 	}
 
-	/* free excess memory; make remaining memory pageable */
+	                                                        
 
 	if (used == 0) {
 		copy = VM_MAP_COPY_NULL;
@@ -550,11 +550,11 @@ vm32_region_info_64(
 	*objectsp = (vm_info_object_array_t) copy;
 	*objectsCntp = used;
 	return KERN_SUCCESS;
-#endif /* MACH_VM_DEBUG */
+#endif                    
 }
-/*
- * Return an array of virtual pages that are mapped to a task.
- */
+  
+                                                              
+   
 kern_return_t
 vm32_mapped_pages_info(
 	__DEBUG_ONLY vm_map_t                   map,
@@ -599,14 +599,14 @@ vm32_mapped_pages_info(
 			break;
 		}
 
-		/*
-		 * Free memory if not enough
-		 */
+		  
+                              
+     
 		(void) kmem_free(ipc_kernel_map, addr, size);
 
-		/*
-		 * Try again, doubling the size
-		 */
+		  
+                                 
+     
 		size = vm_map_round_page(actual * sizeof(vm_offset_t),
 		    VM_MAP_PAGE_MASK(ipc_kernel_map));
 	}
@@ -642,22 +642,22 @@ vm32_mapped_pages_info(
 	}
 
 	return KERN_SUCCESS;
-#endif /* MACH_VM_DEBUG */
+#endif                    
 }
 
-#endif /* VM32_SUPPORT */
+#endif                   
 
-/*
- *	Routine:	host_virtual_physical_table_info
- *	Purpose:
- *		Return information about the VP table.
- *	Conditions:
- *		Nothing locked.  Obeys CountInOut protocol.
- *	Returns:
- *		KERN_SUCCESS		Returned information.
- *		KERN_INVALID_HOST	The host is null.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                                            
+           
+                                          
+              
+                                               
+           
+                                       
+                                       
+                                                    
+   
 
 kern_return_t
 host_virtual_physical_table_info(
@@ -678,7 +678,7 @@ host_virtual_physical_table_info(
 		return KERN_INVALID_HOST;
 	}
 
-	/* start with in-line data */
+	                             
 
 	info = *infop;
 	potential = *countp;
@@ -689,7 +689,7 @@ host_virtual_physical_table_info(
 			break;
 		}
 
-		/* allocate more memory */
+		                          
 
 		if (info != *infop) {
 			kmem_free(ipc_kernel_map, addr, size);
@@ -708,7 +708,7 @@ host_virtual_physical_table_info(
 	}
 
 	if (info == *infop) {
-		/* data fit in-line; nothing to deallocate */
+		                                             
 
 		*countp = actual;
 	} else if (actual == 0) {
@@ -735,5 +735,5 @@ host_virtual_physical_table_info(
 	}
 
 	return KERN_SUCCESS;
-#endif /* MACH_VM_DEBUG */
+#endif                    
 }

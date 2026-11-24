@@ -38,12 +38,12 @@
 OSDefineMetaClassAndStructors(IOStateReporter, IOReporter);
 
 
-/* static */
+            
 OSSharedPtr<IOStateReporter>
 IOStateReporter::with(IOService *reportingService,
     IOReportCategories categories,
     int nstates,
-    IOReportUnit unit /* = kIOReportUnitHWTicks*/)
+    IOReportUnit unit                            )
 {
 	OSSharedPtr<IOStateReporter> reporter;
 
@@ -116,7 +116,7 @@ IOStateReporter::handleSwapPrepare(int newNChannels)
 	IOReturn res = kIOReturnError;
 	size_t newCurStatesSize, newTSSize;
 
-	//IORLOG("handleSwapPrepare (state) _nChannels before = %u", _nChannels);
+	                                                                         
 
 	IOREPORTER_CHECK_CONFIG_LOCK();
 
@@ -124,16 +124,16 @@ IOStateReporter::handleSwapPrepare(int newNChannels)
 		panic("IOStateReporter::_swap* already in use");
 	}
 
-	// new currentStates buffer
+	                           
 	PREFL_MEMOP_FAIL(newNChannels, int);
 	newCurStatesSize = (size_t)newNChannels * sizeof(int);
 	_swapCurrentStates = (int*)IOMalloc(newCurStatesSize);
 	if (_swapCurrentStates == NULL) {
 		res = kIOReturnNoMemory; goto finish;
 	}
-	memset(_swapCurrentStates, -1, newCurStatesSize); // init w/"no state"
+	memset(_swapCurrentStates, -1, newCurStatesSize);                     
 
-	// new timestamps buffer
+	                        
 	PREFL_MEMOP_FAIL(newNChannels, uint64_t);
 	newTSSize = (size_t)newNChannels * sizeof(uint64_t);
 	_swapLastUpdateTimes = (uint64_t *)IOMalloc(newTSSize);
@@ -169,7 +169,7 @@ IOStateReporter::handleAddChannelSwap(uint64_t channelID,
 	uint64_t *tmpTimestamps;
 	bool swapComplete = false;
 
-	//IORLOG("IOStateReporter::handleSwap");
+	                                        
 
 	if (!_swapCurrentStates || !_swapLastUpdateTimes) {
 		IORLOG("IOReporter::handleSwap ERROR swap variables uninitialized!");
@@ -179,7 +179,7 @@ IOStateReporter::handleAddChannelSwap(uint64_t channelID,
 	IOREPORTER_CHECK_CONFIG_LOCK();
 	IOREPORTER_CHECK_LOCK();
 
-	// Copy any existing buffers
+	                            
 	if (_currentStates) {
 		PREFL_MEMOP_FAIL(_nChannels, int);
 		memcpy(_swapCurrentStates, _currentStates,
@@ -193,7 +193,7 @@ IOStateReporter::handleAddChannelSwap(uint64_t channelID,
 		    (size_t)_nChannels * sizeof(uint64_t));
 	}
 
-	// Update principal instance variables, keep old values in _swap* for cleanup
+	                                                                             
 	tmpCurStates = _currentStates;
 	_currentStates = _swapCurrentStates;
 	_swapCurrentStates = tmpCurStates;
@@ -204,23 +204,23 @@ IOStateReporter::handleAddChannelSwap(uint64_t channelID,
 
 	swapComplete = true;
 
-	// subclass success
+	                   
 
-	// invoke superclass(es): base class updates _nChannels & _nElements
+	                                                                    
 	res = super::handleAddChannelSwap(channelID, symChannelName);
 	if (res) {
 		IORLOG("handleSwap(state) ERROR super::handleSwap failed!");
 		goto finish;
 	}
 
-	// Channel added successfully, initialize the new channel's state_ids to 0..nStates-1
+	                                                                                     
 	for (cnt = 0; cnt < _channelDimension; cnt++) {
 		handleSetStateID(channelID, cnt, (uint64_t)cnt);
 	}
 
 finish:
 	if (res && swapComplete) {
-		// unswap so the unused buffers get cleaned up
+		                                              
 		tmpCurStates = _currentStates;
 		_currentStates = _swapCurrentStates;
 		_swapCurrentStates = tmpCurStates;
@@ -336,7 +336,7 @@ IOStateReporter::overrideChannelState(uint64_t channel_id,
     uint64_t state_id,
     uint64_t time_in_state,
     uint64_t intransitions,
-    uint64_t last_intransition /*=0*/)
+    uint64_t last_intransition       )
 {
 	IOReturn res = kIOReturnError;
 	int channel_index, state_index;
@@ -367,7 +367,7 @@ IOStateReporter::handleOverrideChannelStateByIndices(int channel_index,
     int state_index,
     uint64_t time_in_state,
     uint64_t intransitions,
-    uint64_t last_intransition /*=0*/)
+    uint64_t last_intransition       )
 {
 	IOReturn kerr, result = kIOReturnError;
 	IOStateReportValues state_values;
@@ -388,18 +388,18 @@ IOStateReporter::handleOverrideChannelStateByIndices(int channel_index,
 		result = kerr; goto finish;
 	}
 
-	// last_intransition = 0 -> no current state ("residency summary only")
+	                                                                       
 	state_values.last_intransition = last_intransition;
 	state_values.intransitions = intransitions;
 	state_values.upticks = time_in_state;
 
-	// determines current time for metadata
+	                                       
 	kerr = setElementValues(element_index, (IOReportElementValues *)&state_values);
 	if (kerr) {
 		result = kerr; goto finish;
 	}
 
-	// success
+	          
 	result = kIOReturnSuccess;
 
 finish:
@@ -412,7 +412,7 @@ IOStateReporter::incrementChannelState(uint64_t channel_id,
     uint64_t state_id,
     uint64_t time_in_state,
     uint64_t intransitions,
-    uint64_t last_intransition /*=0*/)
+    uint64_t last_intransition       )
 {
 	IOReturn res = kIOReturnError;
 	int channel_index, state_index;
@@ -443,7 +443,7 @@ IOStateReporter::handleIncrementChannelStateByIndices(int channel_index,
     int state_index,
     uint64_t time_in_state,
     uint64_t intransitions,
-    uint64_t last_intransition /*=0*/)
+    uint64_t last_intransition       )
 {
 	IOReturn kerr, result = kIOReturnError;
 	IOStateReportValues state_values;
@@ -469,14 +469,14 @@ IOStateReporter::handleIncrementChannelStateByIndices(int channel_index,
 	state_values.intransitions += intransitions;
 	state_values.upticks += time_in_state;
 
-	// determines current time for metadata
+	                                       
 	kerr = setElementValues(element_index, (IOReportElementValues *)&state_values);
 	if (kerr) {
 		result = kerr;
 		goto finish;
 	}
 
-	// success
+	          
 	result = kIOReturnSuccess;
 
 finish:
@@ -578,8 +578,8 @@ IOStateReporter::handleSetStateID(uint64_t channel_id,
 		res = setElementValues(element_index, (IOReportElementValues *)&state_values);
 	}
 
-	// FIXME: set a bit somewhere (reporter-wide?) that state_ids can no longer be
-	// assumed to be contiguous
+	                                                                              
+	                           
 finish:
 	return res;
 }
@@ -631,16 +631,16 @@ IOStateReporter::handleSetStateByIndices(int channel_index,
 		res = kIOReturnBadArgument; goto finish;
 	}
 
-	// if no timestamp provided, last_intransition = time of recording (now)
+	                                                                        
 	if (last_intransition == 0) {
 		last_intransition = recordTime;
 	}
 
-	// First update target state if different than the current state
-	// _currentStates[] initialized to -1 to detect first state transition
+	                                                                
+	                                                                      
 	curr_state_index = _currentStates[channel_index];
 	if (new_state_index != curr_state_index) {
-		// fetch element data
+		                     
 		if (channel_index < 0 || channel_index > (_nElements - new_state_index)
 		    / _channelDimension) {
 			res = kIOReturnOverrun; goto finish;
@@ -652,11 +652,11 @@ IOStateReporter::handleSetStateByIndices(int channel_index,
 			goto finish;
 		}
 
-		// Update new state's transition info
+		                                     
 		new_state_values.intransitions += 1;
 		new_state_values.last_intransition = last_intransition;
 
-		// and store the values
+		                       
 		res = setElementValues(new_element_index,
 		    (IOReportElementValues *)&new_state_values,
 		    recordTime);
@@ -668,17 +668,17 @@ IOStateReporter::handleSetStateByIndices(int channel_index,
 		_currentStates[channel_index] = new_state_index;
 	}
 
-	/* Now update time spent in any previous state
-	 *  If new_state_index = curr_state_index, this updates time in the
-	 *  current state.  If this is the channel's first state transition,
-	 *  the last update time will be zero.
-	 *
-	 *  Note: While setState() should never be called on a channel being
-	 *  updated with increment/overrideChannelState(), that's another way
-	 *  that the last update time might not exist.  Regardless, if there
-	 *  is no basis for determining time spent in previous state, there's
-	 *  nothing to update!
-	 */
+	                                              
+                                                                    
+                                                                     
+                                       
+   
+                                                                     
+                                                                      
+                                                                     
+                                                                      
+                       
+    
 	last_ch_update_time = _lastUpdateTimes[channel_index];
 	if (last_ch_update_time != 0) {
 		if (channel_index < 0 || channel_index > (_nElements - curr_state_index)
@@ -691,7 +691,7 @@ IOStateReporter::handleSetStateByIndices(int channel_index,
 			res = kIOReturnBadArgument;
 			goto finish;
 		}
-		// compute the time spent in previous state, unless provided
+		                                                            
 		if (prev_state_residency == 0) {
 			prev_state_residency = last_intransition - last_ch_update_time;
 		}
@@ -707,8 +707,8 @@ IOStateReporter::handleSetStateByIndices(int channel_index,
 		}
 	}
 
-	// record basis for next "time in prior state" calculation
-	// (also arms a panic in override/incrementChannelState())
+	                                                          
+	                                                          
 	_lastUpdateTimes[channel_index] = last_intransition;
 
 finish:
@@ -716,7 +716,7 @@ finish:
 }
 
 
-// blocks might make this slightly easier?
+                                          
 uint64_t
 IOStateReporter::getStateInTransitions(uint64_t channel_id,
     uint64_t state_id)
@@ -800,10 +800,10 @@ IOStateReporter::getStateLastChannelUpdateTime(uint64_t channel_id)
 }
 
 
-/* updateChannelValues() is called to refresh state before being
- *  reported outside the reporter.  In the case of IOStateReporter,
- *  this is primarily an update to the "time in state" data.
- */
+                                                                
+                                                                   
+                                                            
+   
 IOReturn
 IOStateReporter::updateChannelValues(int channel_index)
 {
@@ -821,40 +821,40 @@ IOStateReporter::updateChannelValues(int channel_index)
 		result = kIOReturnBadArgument; goto finish;
 	}
 
-	/* First check to see whether this channel has begun self-
-	 *  calculation of time in state.  It's possible this channel
-	 *  has yet to be initialized or that the driver is updating
-	 *  the channel with override/incrementChannelState() which
-	 *  never enable automatic time-in-state updates.  In that case,
-	 *  there is nothing to update and we return success.
-	 */
+	                                                          
+                                                              
+                                                             
+                                                            
+                                                                 
+                                                      
+    
 	last_ch_update_time = _lastUpdateTimes[channel_index];
 	if (last_ch_update_time == 0) {
 		result = kIOReturnSuccess; goto finish;
 	}
 
-	// figure out the current state (if any)
+	                                        
 	state_index = _currentStates[channel_index];
 
-	// e.g. given 4 4-state channels, the boundary is ch[3].st[3] <- _elems[15]
+	                                                                           
 	if (channel_index < 0 || channel_index > (_nElements - state_index)
 	    / _channelDimension) {
 		result = kIOReturnOverrun; goto finish;
 	}
 	element_idx = channel_index * _channelDimension + state_index;
 
-	// get the current values
+	                         
 	kerr = copyElementValues(element_idx, (IOReportElementValues*)&state_values);
 	if (kerr) {
 		result = kerr; goto finish;
 	}
 
-	// calculate time in state
+	                          
 	currentTime = mach_absolute_time();
 	time_in_state = currentTime - last_ch_update_time;
 	state_values.upticks += time_in_state;
 
-	// and store the values
+	                       
 	kerr = setElementValues(element_idx,
 	    (IOReportElementValues *)&state_values,
 	    currentTime);
@@ -862,11 +862,11 @@ IOStateReporter::updateChannelValues(int channel_index)
 		result = kerr; goto finish;
 	}
 
-	// Record basis for next "prior time" calculation
+	                                                 
 	_lastUpdateTimes[channel_index] = currentTime;
 
 
-	// success
+	          
 	result = kIOReturnSuccess;
 
 finish:

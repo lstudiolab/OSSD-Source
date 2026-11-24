@@ -29,4 +29,4 @@
 #define _FILESEC_T
 struct _filesec;
 typedef struct _filesec *filesec_t;
-#endif /* _FILESEC_T */
+#endif                 

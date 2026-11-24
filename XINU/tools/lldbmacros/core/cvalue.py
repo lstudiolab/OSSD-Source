@@ -29,8 +29,8 @@ class value(object):
     print rectangle_array[12]
     print rectangle_array[5].origin.x'''
     def __init__(self, sbvalue):
-        #_sbval19k84obscure747 is specifically chosen to be obscure.
-        #This avoids conflicts when attributes could mean any field value in code
+                                                                    
+                                                                                 
         self._sbval19k84obscure747 = sbvalue
         self._sbval19k84obscure747_type = sbvalue.GetType()
         self._sbval19k84obscure747_is_ptr = sbvalue.GetType().IsPointerType()
@@ -51,7 +51,7 @@ class value(object):
         if type(other) is value:
             try:
                 return int(self).__cmp__(int(other))
-            except TypeError: # Try promoting to long
+            except TypeError:                        
                 return long(self).__cmp__(long(other))
         raise TypeError("Cannot compare value with type {}".format(type(other)))
 
@@ -66,7 +66,7 @@ class value(object):
         return self._sbval19k84obscure747.__str__()
 
     def __getitem__(self, key):
-        # Allow array access if this value has children...
+                                                          
         if type(key) is slice:
             _start = int(key.start)
             _end = int(key.stop)
@@ -245,7 +245,7 @@ class value(object):
         if tname.find('uint') >= 0 or tname.find('unsigned') >= 0:
             return self._GetValueAsUnsigned()
         retval = self._sbval19k84obscure747.GetValueAsSigned()
-        # <rdar://problem/12481949> lldb python: GetValueAsSigned does not return the correct value
+                                                                                                   
         if (retval & 0x80000000):
             retval = retval - 0x100000000
         return retval
@@ -330,7 +330,7 @@ class value(object):
         retval = ''
         bytesize = sbdata.GetByteSize()
         if bytesize == 0 :
-            #raise ValueError('Unable to read value as string')
+                                                               
             return ''
         for i in range(0, bytesize) :
             serr.Clear()
@@ -344,7 +344,7 @@ class value(object):
 
     def __format__(self, format_spec):
         ret_format = "{0:"+format_spec+"}"
-        # typechar is last char. see http://www.python.org/dev/peps/pep-3101/
+                                                                             
         type_spec=format_spec.strip().lower()[-1]
         if type_spec == 'x':
             return ret_format.format(self._GetValueAsUnsigned())
@@ -469,15 +469,15 @@ def gettype(target_type):
     if target_type.endswith('*') :
         requested_type_is_pointer = True
 
-    # tmp_type = LazyTarget.GetTarget().FindFirstType(target_type.rstrip('*').strip())
+                                                                                      
     search_type = target_type.rstrip('*').strip()
     type_arr = [t for t in LazyTarget.GetTarget().FindTypes(search_type)]
 
     if requested_type_is_struct:
         type_arr = [t for t in type_arr if t.type == lldb.eTypeClassStruct]
 
-    # After the sort, the struct type with more fields will be at index [0].
-    # This hueristic helps selecting struct type with more fields compared to ones with "opaque" members
+                                                                            
+                                                                                                        
     type_arr.sort(reverse=True, key=lambda x: x.GetNumberOfFields())
     if len(type_arr) > 0:
         tmp_type = type_arr[0]
@@ -510,7 +510,7 @@ def getfieldoffset(struct_type, field_name):
         struct_type = gettype(struct_type)
 
     if '.' in field_name :
-        # Handle recursive fields in sub-structs
+                                                
         components = field_name.split('.', 1)
         for field in struct_type.get_fields_array():
             if str(field.GetName()) == components[0]:
@@ -522,7 +522,7 @@ def getfieldoffset(struct_type, field_name):
         if str(field.GetName()) == field_name:
             return field.GetOffsetInBytes()
 
-        # Hack for anonymous unions - the compiler does this, so cvalue should too
+                                                                                  
         if field.GetName() is None and field.GetType().GetTypeClass() == lldb.eTypeClassUnion :
             for union_field in field.GetType().get_fields_array():
                 if str(union_field.GetName()) == field_name:

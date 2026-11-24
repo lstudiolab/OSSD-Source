@@ -67,12 +67,12 @@
  *	@(#)vfs_bio.c	8.6 (Berkeley) 1/11/94
  */
 
-/*
- * Some references:
- *	Bach: The Design of the UNIX Operating System (Prentice Hall, 1986)
- *	Leffler, et al.: The Design and Implementation of the 4.3BSD
- *		UNIX Operating System (Addison Welley, 1989)
- */
+  
+                   
+                                                                      
+                                                               
+                                                
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -88,18 +88,18 @@
 #include <sys/kauth.h>
 #if DIAGNOSTIC
 #include <kern/assert.h>
-#endif /* DIAGNOSTIC */
+#endif                 
 #include <kern/task.h>
 #include <kern/zalloc.h>
 #include <kern/locks.h>
 #include <kern/thread.h>
 
-#include <sys/fslog.h>          /* fslog_io_error() */
-#include <sys/disk.h>           /* dk_error_description_t */
+#include <sys/fslog.h>                                
+#include <sys/disk.h>                                       
 
 #include <mach/mach_types.h>
 #include <mach/memory_object_types.h>
-#include <kern/sched_prim.h>    /* thread_block() */
+#include <kern/sched_prim.h>                        
 
 #include <vm/vm_kern.h>
 #include <vm/vm_pageout.h>
@@ -115,7 +115,7 @@
 int     bcleanbuf(buf_t bp, boolean_t discard);
 static int      brecover_data(buf_t bp);
 static boolean_t incore(vnode_t vp, daddr64_t blkno);
-/* timeout is in msecs */
+                         
 static buf_t    getnewbuf(int slpflag, int slptimeo, int *queue);
 static void     bremfree_locked(buf_t bp);
 static void     buf_reassign(buf_t bp, vnode_t newvp);
@@ -134,7 +134,7 @@ int  bdwrite_internal(buf_t, int);
 
 extern void disk_conditioner_delay(buf_t, int, int, uint64_t);
 
-/* zone allocated buffer headers */
+                                   
 static void     bcleanbuf_thread_init(void);
 static void     bcleanbuf_thread(void);
 
@@ -142,9 +142,9 @@ static ZONE_DECLARE(buf_hdr_zone, "buf headers", sizeof(struct buf), ZC_NONE);
 static int      buf_hdr_count;
 
 
-/*
- * Definitions for the buffer hash lists.
- */
+  
+                                         
+   
 #define BUFHASH(dvp, lbn)       \
 	(&bufhashtbl[((long)(dvp) / sizeof(*(dvp)) + (int)(lbn)) & bufhash])
 LIST_HEAD(bufhashhdr, buf) * bufhashtbl, invalhash;
@@ -152,10 +152,10 @@ u_long  bufhash;
 
 static buf_t    incore_locked(vnode_t vp, daddr64_t blkno, struct bufhashhdr *dp);
 
-/* Definitions for the buffer stats. */
+                                       
 struct bufstats bufstats;
 
-/* Number of delayed write buffers */
+                                     
 long nbdwrite = 0;
 int blaundrycnt = 0;
 static int boot_nbuf_headers = 0;
@@ -191,9 +191,9 @@ buf_timestamp(void)
 	return (int)t.tv_sec;
 }
 
-/*
- * Insq/Remq for the buffer free lists.
- */
+  
+                                       
+   
 #define binsheadfree(bp, dp, whichq)    do { \
 	                            TAILQ_INSERT_HEAD(dp, bp, b_freelist); \
 	                        } while (0)
@@ -210,22 +210,22 @@ buf_timestamp(void)
 	(bp)->b_hash.le_next = (struct buf *)0; \
 	(bp)->b_hash.le_prev = (struct buf **)0xdeadbeef;
 
-/*
- * Insq/Remq for the vnode usage lists.
- */
+  
+                                       
+   
 #define bufinsvn(bp, dp)        LIST_INSERT_HEAD(dp, bp, b_vnbufs)
 #define bufremvn(bp) {                                                  \
 	LIST_REMOVE(bp, b_vnbufs);                                      \
 	(bp)->b_vnbufs.le_next = NOLIST;                                \
 }
 
-/*
- * Time in seconds before a buffer on a list is
- * considered as a stale buffer
- */
-#define LRU_IS_STALE 120 /* default value for the LRU */
-#define AGE_IS_STALE 60  /* default value for the AGE */
-#define META_IS_STALE 180 /* default value for the BQ_META */
+  
+                                               
+                               
+   
+#define LRU_IS_STALE 120                                
+#define AGE_IS_STALE 60                                 
+#define META_IS_STALE 180                                    
 
 int lru_is_stale = LRU_IS_STALE;
 int age_is_stale = AGE_IS_STALE;
@@ -233,7 +233,7 @@ int meta_is_stale = META_IS_STALE;
 
 #define MAXLAUNDRY      10
 
-/* LIST_INSERT_HEAD() with assertions */
+                                        
 static __inline__ void
 blistenterhead(struct bufhashhdr * head, buf_t bp)
 {
@@ -252,7 +252,7 @@ binshash(buf_t bp, struct bufhashhdr *dp)
 {
 #if DIAGNOSTIC
 	buf_t   nbp;
-#endif /* DIAGNOSTIC */
+#endif                 
 
 	BHASHENTCHECK(bp);
 
@@ -263,7 +263,7 @@ binshash(buf_t bp, struct bufhashhdr *dp)
 			panic("buf already in hashlist");
 		}
 	}
-#endif /* DIAGNOSTIC */
+#endif                 
 
 	blistenterhead(dp, bp);
 }
@@ -284,9 +284,9 @@ bremhash(buf_t  bp)
 	*bp->b_hash.le_prev = (bp)->b_hash.le_next;
 }
 
-/*
- * buf_mtx held.
- */
+  
+                
+   
 static __inline__ void
 bmovelaundry(buf_t bp)
 {
@@ -414,7 +414,7 @@ bufattr_setcpoff(bufattr_t bap, uint64_t foffset)
 	bap->ba_cp_file_off = foffset;
 }
 
-#else // !CONTECT_PROTECT
+#else                    
 
 uint64_t
 bufattr_cpoff(bufattr_t bap __unused)
@@ -439,7 +439,7 @@ bufattr_setcpx(__unused bufattr_t bap, __unused struct cpx *cpx)
 {
 }
 
-#endif /* !CONFIG_PROTECT */
+#endif                      
 
 bufattr_t
 bufattr_alloc(void)
@@ -464,7 +464,7 @@ bufattr_dup(bufattr_t bap)
 		return NULL;
 	}
 
-	/* Copy the provided one into the new copy */
+	                                             
 	memcpy(new_bufattr, bap, sizeof(struct bufattr));
 	return new_bufattr;
 }
@@ -1147,17 +1147,17 @@ buf_map(buf_t bp, caddr_t *io_addr)
 	real_bp = (buf_t)(bp->b_real_bp);
 
 	if (real_bp && real_bp->b_datap) {
-		/*
-		 * b_real_bp is only valid if B_CLUSTER is SET
-		 * if it's non-zero, than someone did a cluster_bp call
-		 * if the backing physical pages were already mapped
-		 * in before the call to cluster_bp (non-zero b_datap),
-		 * than we just use that mapping
-		 */
+		  
+                                                
+                                                         
+                                                      
+                                                         
+                                  
+     
 		*io_addr = (caddr_t)real_bp->b_datap;
 		return 0;
 	}
-	kret = ubc_upl_map(bp->b_upl, &vaddr);    /* Map it in */
+	kret = ubc_upl_map(bp->b_upl, &vaddr);                   
 
 	if (kret != KERN_SUCCESS) {
 		*io_addr = NULL;
@@ -1180,9 +1180,9 @@ buf_unmap(buf_t bp)
 	if (!(bp->b_flags & B_CLUSTER)) {
 		return 0;
 	}
-	/*
-	 * see buf_map for the explanation
-	 */
+	  
+                                   
+    
 	real_bp = (buf_t)(bp->b_real_bp);
 
 	if (real_bp && real_bp->b_datap) {
@@ -1191,16 +1191,16 @@ buf_unmap(buf_t bp)
 
 	if ((bp->b_lflags & BL_IOBUF) &&
 	    ((bp->b_flags & (B_PAGEIO | B_READ)) != (B_PAGEIO | B_READ))) {
-		/*
-		 * ignore pageins... the 'right' thing will
-		 * happen due to the way we handle speculative
-		 * clusters...
-		 *
-		 * when we commit these pages, we'll hit
-		 * it with UPL_COMMIT_INACTIVE which
-		 * will clear the reference bit that got
-		 * turned on when we touched the mapping
-		 */
+		  
+                                             
+                                                
+                
+    
+                                          
+                                      
+                                          
+                                          
+     
 		bp->b_flags |= B_AGE;
 	}
 	kret = ubc_upl_unmap(bp->b_upl);
@@ -1224,15 +1224,15 @@ buf_clear(buf_t bp)
 	bp->b_resid = 0;
 }
 
-/*
- * Read or write a buffer that is not contiguous on disk.
- * buffer is marked done/error at the conclusion
- */
+  
+                                                         
+                                                
+   
 static int
 buf_strategy_fragmented(vnode_t devvp, buf_t bp, off_t f_offset, size_t contig_bytes)
 {
 	vnode_t vp = buf_vnode(bp);
-	buf_t   io_bp;                   /* For reading or writing a single block */
+	buf_t   io_bp;                                                              
 	int     io_direction;
 	int     io_resid;
 	size_t  io_contig_bytes;
@@ -1240,21 +1240,21 @@ buf_strategy_fragmented(vnode_t devvp, buf_t bp, off_t f_offset, size_t contig_b
 	int     error = 0;
 	int     bmap_flags;
 
-	/*
-	 * save our starting point... the bp was already mapped
-	 * in buf_strategy before we got called
-	 * no sense doing it again.
-	 */
+	  
+                                                        
+                                        
+                            
+    
 	io_blkno = bp->b_blkno;
-	/*
-	 * Make sure we redo this mapping for the next I/O
-	 * i.e. this can never be a 'permanent' mapping
-	 */
+	  
+                                                   
+                                                
+    
 	bp->b_blkno = bp->b_lblkno;
 
-	/*
-	 * Get an io buffer to do the deblocking
-	 */
+	  
+                                         
+    
 	io_bp = alloc_io_buf(devvp, 0);
 
 	io_bp->b_lblkno = bp->b_lblkno;
@@ -1271,9 +1271,9 @@ buf_strategy_fragmented(vnode_t devvp, buf_t bp, off_t f_offset, size_t contig_b
 
 	for (;;) {
 		if (io_blkno == -1) {
-			/*
-			 * this is unexepected, but we'll allow for it
-			 */
+			  
+                                                 
+      
 			bzero((caddr_t)io_bp->b_datap, (int)io_contig_bytes);
 		} else {
 			io_bp->b_bcount  = (uint32_t)io_contig_bytes;
@@ -1283,9 +1283,9 @@ buf_strategy_fragmented(vnode_t devvp, buf_t bp, off_t f_offset, size_t contig_b
 
 			buf_reset(io_bp, io_direction);
 
-			/*
-			 * Call the device to do the I/O and wait for it.  Make sure the appropriate party is charged for write
-			 */
+			  
+                                                                                                          
+      
 
 			if (!ISSET(bp->b_flags, B_READ)) {
 				OSAddAtomic(1, &devvp->v_numoutput);
@@ -1308,9 +1308,9 @@ buf_strategy_fragmented(vnode_t devvp, buf_t bp, off_t f_offset, size_t contig_b
 		f_offset       += io_contig_bytes;
 		io_bp->b_datap += io_contig_bytes;
 
-		/*
-		 * Map the current position to a physical block number
-		 */
+		  
+                                                        
+     
 		if ((error = VNOP_BLOCKMAP(vp, f_offset, io_resid, &io_blkno, &io_contig_bytes, NULL, bmap_flags, NULL))) {
 			break;
 		}
@@ -1321,20 +1321,20 @@ buf_strategy_fragmented(vnode_t devvp, buf_t bp, off_t f_offset, size_t contig_b
 		buf_seterror(bp, error);
 	}
 	bp->b_resid = io_resid;
-	/*
-	 * This I/O is now complete
-	 */
+	  
+                            
+    
 	buf_biodone(bp);
 
 	return error;
 }
 
 
-/*
- * struct vnop_strategy_args {
- *      struct buf *a_bp;
- * } *ap;
- */
+  
+                              
+                         
+         
+   
 errno_t
 buf_strategy(vnode_t devvp, void *ap)
 {
@@ -1343,21 +1343,21 @@ buf_strategy(vnode_t devvp, void *ap)
 	int     bmap_flags;
 	errno_t error;
 #if CONFIG_DTRACE
-	int dtrace_io_start_flag = 0;    /* We only want to trip the io:::start
-	                                  * probe once, with the true physical
-	                                  * block in place (b_blkno)
-	                                  */
+	int dtrace_io_start_flag = 0;                                          
+                                                                       
+                                                             
+                                     
 
 #endif
 
 	if (vp == NULL || vp->v_type == VCHR || vp->v_type == VBLK) {
 		panic("buf_strategy: b_vp == NULL || vtype == VCHR | VBLK\n");
 	}
-	/*
-	 * associate the physical device with
-	 * with this buf_t even if we don't
-	 * end up issuing the I/O...
-	 */
+	  
+                                      
+                                    
+                             
+    
 	bp->b_dev = devvp->v_rdev;
 
 	if (bp->b_flags & B_READ) {
@@ -1368,12 +1368,12 @@ buf_strategy(vnode_t devvp, void *ap)
 
 	if (!(bp->b_flags & B_CLUSTER)) {
 		if ((bp->b_upl)) {
-			/*
-			 * we have a UPL associated with this bp
-			 * go through cluster_bp which knows how
-			 * to deal with filesystem block sizes
-			 * that aren't equal to the page size
-			 */
+			  
+                                           
+                                           
+                                         
+                                        
+      
 			DTRACE_IO1(start, buf_t, bp);
 			return cluster_bp(bp);
 		}
@@ -1400,10 +1400,10 @@ buf_strategy(vnode_t devvp, void *ap)
 			DTRACE_IO1(start, buf_t, bp);
 #if CONFIG_DTRACE
 			dtrace_io_start_flag = 1;
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 			if ((bp->b_blkno == -1) || (contig_bytes == 0)) {
-				/* Set block number to force biodone later */
+				                                             
 				bp->b_blkno = -1;
 				buf_clear(bp);
 			} else if (contig_bytes < (size_t)bp->b_bcount) {
@@ -1416,7 +1416,7 @@ buf_strategy(vnode_t devvp, void *ap)
 			DTRACE_IO1(start, buf_t, bp);
 			dtrace_io_start_flag = 1;
 		}
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 		if (bp->b_blkno == -1) {
 			buf_biodone(bp);
@@ -1428,52 +1428,52 @@ buf_strategy(vnode_t devvp, void *ap)
 	if (dtrace_io_start_flag == 0) {
 		DTRACE_IO1(start, buf_t, bp);
 	}
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 #if CONFIG_PROTECT
-	/* Capture f_offset in the bufattr*/
+	                                    
 	cpx_t cpx = bufattr_cpx(buf_attr(bp));
 	if (cpx) {
-		/* No need to go here for older EAs */
+		                                      
 		if (cpx_use_offset_for_iv(cpx) && !cpx_synthetic_offset_for_iv(cpx)) {
 			off_t f_offset;
 			if ((error = VNOP_BLKTOOFF(bp->b_vp, bp->b_lblkno, &f_offset))) {
 				return error;
 			}
 
-			/*
-			 * Attach the file offset to this buffer.  The
-			 * bufattr attributes will be passed down the stack
-			 * until they reach the storage driver (whether
-			 * IOFlashStorage, ASP, or IONVMe). The driver
-			 * will retain the offset in a local variable when it
-			 * issues its I/Os to the NAND controller.
-			 *
-			 * Note that LwVM may end up splitting this I/O
-			 * into sub-I/Os if it crosses a chunk boundary.  In this
-			 * case, LwVM will update this field when it dispatches
-			 * each I/O to IOFlashStorage.  But from our perspective
-			 * we have only issued a single I/O.
-			 *
-			 * In the case of APFS we do not bounce through another
-			 * intermediate layer (such as CoreStorage). APFS will
-			 * issue the I/Os directly to the block device / IOMedia
-			 * via buf_strategy on the specfs node.
-			 */
+			  
+                                                 
+                                                      
+                                                  
+                                                 
+                                                        
+                                             
+     
+                                                  
+                                                            
+                                                          
+                                                           
+                                       
+     
+                                                          
+                                                         
+                                                           
+                                          
+      
 			buf_setcpoff(bp, f_offset);
 			CP_DEBUG((CPDBG_OFFSET_IO | DBG_FUNC_NONE), (uint32_t) f_offset, (uint32_t) bp->b_lblkno, (uint32_t) bp->b_blkno, (uint32_t) bp->b_bcount, 0);
 		}
 	}
 #endif
 
-	/*
-	 * we can issue the I/O because...
-	 * either B_CLUSTER is set which
-	 * means that the I/O is properly set
-	 * up to be a multiple of the page size, or
-	 * we were able to successfully set up the
-	 * physical block mapping
-	 */
+	  
+                                   
+                                 
+                                      
+                                            
+                                           
+                          
+    
 	error = VOCALL(devvp->v_op, VOFFSET(vnop_strategy), ap);
 	DTRACE_FSINFO(strategy, vnode_t, vp);
 	return error;
@@ -1494,13 +1494,13 @@ buf_free(buf_t bp)
 }
 
 
-/*
- * iterate buffers for the specified vp.
- *   if BUF_SCAN_DIRTY is set, do the dirty list
- *   if BUF_SCAN_CLEAN is set, do the clean list
- *   if neither flag is set, default to BUF_SCAN_DIRTY
- *   if BUF_NOTIFY_BUSY is set, call the callout function using a NULL bp for busy pages
- */
+  
+                                        
+                                                
+                                                
+                                                      
+                                                                                        
+   
 
 struct buf_iterate_info_t {
 	int flag;
@@ -1585,17 +1585,17 @@ buf_iterate(vnode_t vp, int (*callout)(buf_t, void *), int flags, void *arg)
 				goto out;
 			}
 			lck_mtx_lock(&buf_mtx);
-		} /* while list has more nodes */
+		}                                
 out:
 		buf_itercomplete(vp, &local_iterblkhd, list[i].flag);
 		lck_mtx_unlock(&buf_mtx);
-	} /* for each list */
-} /* buf_iterate */
+	}                    
+}                  
 
 
-/*
- * Flush out and invalidate all buffers associated with a vnode.
- */
+  
+                                                                
+   
 int
 buf_invalidateblks(vnode_t vp, int flags, int slpflag, int slptimeo)
 {
@@ -1614,22 +1614,22 @@ buf_invalidateblks(vnode_t vp, int flags, int slpflag, int slptimeo)
 
 	for (;;) {
 		if (must_rescan == 0) {
-			/*
-			 * the lists may not be empty, but all that's left at this
-			 * point are metadata or B_LOCKED buffers which are being
-			 * skipped... we know this because we made it through both
-			 * the clean and dirty lists without dropping buf_mtx...
-			 * each time we drop buf_mtx we bump "must_rescan"
-			 */
+			  
+                                                             
+                                                            
+                                                             
+                                                           
+                                                     
+      
 			break;
 		}
 		if (LIST_EMPTY(&vp->v_cleanblkhd) && LIST_EMPTY(&vp->v_dirtyblkhd)) {
 			break;
 		}
 		must_rescan = 0;
-		/*
-		 * iterate the clean list
-		 */
+		  
+                           
+     
 		if (buf_iterprepare(vp, &local_iterblkhd, VBI_CLEAN)) {
 			goto try_dirty_list;
 		}
@@ -1639,9 +1639,9 @@ buf_invalidateblks(vnode_t vp, int flags, int slpflag, int slptimeo)
 			LIST_REMOVE(bp, b_vnbufs);
 			LIST_INSERT_HEAD(&vp->v_cleanblkhd, bp, b_vnbufs);
 
-			/*
-			 * some filesystems distinguish meta data blocks with a negative logical block #
-			 */
+			  
+                                                                                   
+      
 			if ((flags & BUF_SKIP_META) && (bp->b_lblkno < 0 || ISSET(bp->b_flags, B_META))) {
 				continue;
 			}
@@ -1654,26 +1654,26 @@ buf_invalidateblks(vnode_t vp, int flags, int slpflag, int slptimeo)
 
 			if ((error = (int)buf_acquire_locked(bp, aflags, slpflag, slptimeo))) {
 				if (error == EDEADLK) {
-					/*
-					 * this buffer was marked B_LOCKED...
-					 * we didn't drop buf_mtx, so we
-					 * we don't need to rescan
-					 */
+					  
+                                          
+                                     
+                               
+        
 					continue;
 				}
 				if (error == EAGAIN) {
-					/*
-					 * found a busy buffer... we blocked and
-					 * dropped buf_mtx, so we're going to
-					 * need to rescan after this pass is completed
-					 */
+					  
+                                             
+                                          
+                                                   
+        
 					must_rescan++;
 					continue;
 				}
-				/*
-				 * got some kind of 'real' error out of the msleep
-				 * in buf_acquire_locked, terminate the scan and return the error
-				 */
+				  
+                                                      
+                                                                     
+       
 				buf_itercomplete(vp, &local_iterblkhd, VBI_CLEAN);
 
 				lck_mtx_unlock(&buf_mtx);
@@ -1691,20 +1691,20 @@ buf_invalidateblks(vnode_t vp, int flags, int slpflag, int slptimeo)
 
 			lck_mtx_lock(&buf_mtx);
 
-			/*
-			 * by dropping buf_mtx, we allow new
-			 * buffers to be added to the vnode list(s)
-			 * we'll have to rescan at least once more
-			 * if the queues aren't empty
-			 */
+			  
+                                       
+                                              
+                                             
+                                
+      
 			must_rescan++;
 		}
 		buf_itercomplete(vp, &local_iterblkhd, VBI_CLEAN);
 
 try_dirty_list:
-		/*
-		 * Now iterate on dirty blks
-		 */
+		  
+                              
+     
 		if (buf_iterprepare(vp, &local_iterblkhd, VBI_DIRTY)) {
 			continue;
 		}
@@ -1714,9 +1714,9 @@ try_dirty_list:
 			LIST_REMOVE(bp, b_vnbufs);
 			LIST_INSERT_HEAD(&vp->v_dirtyblkhd, bp, b_vnbufs);
 
-			/*
-			 * some filesystems distinguish meta data blocks with a negative logical block #
-			 */
+			  
+                                                                                   
+      
 			if ((flags & BUF_SKIP_META) && (bp->b_lblkno < 0 || ISSET(bp->b_flags, B_META))) {
 				continue;
 			}
@@ -1729,26 +1729,26 @@ try_dirty_list:
 
 			if ((error = (int)buf_acquire_locked(bp, aflags, slpflag, slptimeo))) {
 				if (error == EDEADLK) {
-					/*
-					 * this buffer was marked B_LOCKED...
-					 * we didn't drop buf_mtx, so we
-					 * we don't need to rescan
-					 */
+					  
+                                          
+                                     
+                               
+        
 					continue;
 				}
 				if (error == EAGAIN) {
-					/*
-					 * found a busy buffer... we blocked and
-					 * dropped buf_mtx, so we're going to
-					 * need to rescan after this pass is completed
-					 */
+					  
+                                             
+                                          
+                                                   
+        
 					must_rescan++;
 					continue;
 				}
-				/*
-				 * got some kind of 'real' error out of the msleep
-				 * in buf_acquire_locked, terminate the scan and return the error
-				 */
+				  
+                                                      
+                                                                     
+       
 				buf_itercomplete(vp, &local_iterblkhd, VBI_DIRTY);
 
 				lck_mtx_unlock(&buf_mtx);
@@ -1770,12 +1770,12 @@ try_dirty_list:
 			}
 
 			lck_mtx_lock(&buf_mtx);
-			/*
-			 * by dropping buf_mtx, we allow new
-			 * buffers to be added to the vnode list(s)
-			 * we'll have to rescan at least once more
-			 * if the queues aren't empty
-			 */
+			  
+                                       
+                                              
+                                             
+                                
+      
 			must_rescan++;
 		}
 		buf_itercomplete(vp, &local_iterblkhd, VBI_DIRTY);
@@ -1822,16 +1822,16 @@ loop:
 				busy++;
 			}
 			if (error) {
-				/*
-				 * If we passed in BUF_SKIP_LOCKED or BUF_SKIP_NONLOCKED,
-				 * we may want to do somethign differently if a locked or unlocked
-				 * buffer was encountered (depending on the arg specified).
-				 * In this case, we know that one of those two was set, and the
-				 * buf acquisition failed above.
-				 *
-				 * If it failed with EDEADLK, then save state which can be emitted
-				 * later on to the caller.  Most callers should not care.
-				 */
+				  
+                                                             
+                                                                      
+                                                               
+                                                                   
+                                    
+      
+                                                                      
+                                                             
+       
 				if (error == EDEADLK) {
 					any_locked++;
 				}
@@ -1841,10 +1841,10 @@ loop:
 
 			bp->b_flags &= ~B_LOCKED;
 
-			/*
-			 * Wait for I/O associated with indirect blocks to complete,
-			 * since there is no way to quickly wait for them below.
-			 */
+			  
+                                                               
+                                                           
+      
 			if ((bp->b_vp == vp) || (wait == 0)) {
 				(void) buf_bawrite(bp);
 			} else {
@@ -1862,17 +1862,17 @@ loop:
 		(void)vnode_waitforwrites(vp, 0, 0, 0, msg);
 
 		if (vp->v_dirtyblkhd.lh_first && busy) {
-			/*
-			 * we had one or more BUSY buffers on
-			 * the dirtyblock list... most likely
-			 * these are due to delayed writes that
-			 * were moved to the bclean queue but
-			 * have not yet been 'written'.
-			 * if we issued some writes on the
-			 * previous pass, we try again immediately
-			 * if we didn't, we'll sleep for some time
-			 * to allow the state to change...
-			 */
+			  
+                                        
+                                        
+                                          
+                                        
+                                  
+                                     
+                                             
+                                             
+                                     
+      
 			if (writes_issued == 0) {
 				(void)tsleep((caddr_t)&vp->v_numoutput,
 				    PRIBIO + 1, "vnode_flushdirtyblks", hz / 20);
@@ -1888,10 +1888,10 @@ loop:
 }
 
 
-/*
- * called with buf_mtx held...
- * this lock protects the queue manipulation
- */
+  
+                              
+                                            
+   
 static int
 buf_iterprepare(vnode_t vp, struct buflists *iterheadp, int flags)
 {
@@ -1920,10 +1920,10 @@ buf_iterprepare(vnode_t vp, struct buflists *iterheadp, int flags)
 	return 0;
 }
 
-/*
- * called with buf_mtx held...
- * this lock protects the queue manipulation
- */
+  
+                              
+                                            
+   
 static void
 buf_itercomplete(vnode_t vp, struct buflists *iterheadp, int flags)
 {
@@ -1962,20 +1962,20 @@ bremfree_locked(buf_t bp)
 		if (bp->b_shadow_ref == 0) {
 			panic("bremfree_locked: %p not on freelist", bp);
 		}
-		/*
-		 * there are clones pointing to 'bp'...
-		 * therefore, it was not put on a freelist
-		 * when buf_brelse was last called on 'bp'
-		 */
+		  
+                                         
+                                            
+                                            
+     
 		return;
 	}
-	/*
-	 * We only calculate the head of the freelist when removing
-	 * the last element of the list as that is the only time that
-	 * it is needed (e.g. to reset the tail pointer).
-	 *
-	 * NB: This makes an assumption about how tailq's are implemented.
-	 */
+	  
+                                                            
+                                                              
+                                                  
+   
+                                                                   
+    
 	if (bp->b_freelist.tqe_next == NULL) {
 		dp = &bufqueues[whichq];
 
@@ -1994,10 +1994,10 @@ bremfree_locked(buf_t bp)
 	bp->b_shadow = 0;
 }
 
-/*
- * Associate a buffer with a vnode.
- * buf_mtx must be locked on entry
- */
+  
+                                   
+                                  
+   
 static void
 bgetvp_locked(vnode_t vp, buf_t bp)
 {
@@ -2010,22 +2010,22 @@ bgetvp_locked(vnode_t vp, buf_t bp)
 	} else {
 		bp->b_dev = NODEV;
 	}
-	/*
-	 * Insert onto list for new vnode.
-	 */
+	  
+                                   
+    
 	bufinsvn(bp, &vp->v_cleanblkhd);
 }
 
-/*
- * Disassociate a buffer from a vnode.
- * buf_mtx must be locked on entry
- */
+  
+                                      
+                                  
+   
 static void
 brelvp_locked(buf_t bp)
 {
-	/*
-	 * Delete from old vnode list, if on one.
-	 */
+	  
+                                          
+    
 	if (bp->b_vnbufs.le_next != NOLIST) {
 		bufremvn(bp);
 	}
@@ -2033,11 +2033,11 @@ brelvp_locked(buf_t bp)
 	bp->b_vp = (vnode_t)NULL;
 }
 
-/*
- * Reassign a buffer from one vnode to another.
- * Used to assign file specific control information
- * (indirect blocks) to the vnode to which they belong.
- */
+  
+                                               
+                                                   
+                                                       
+   
 static void
 buf_reassign(buf_t bp, vnode_t newvp)
 {
@@ -2049,16 +2049,16 @@ buf_reassign(buf_t bp, vnode_t newvp)
 	}
 	lck_mtx_lock_spin(&buf_mtx);
 
-	/*
-	 * Delete from old vnode list, if on one.
-	 */
+	  
+                                          
+    
 	if (bp->b_vnbufs.le_next != NOLIST) {
 		bufremvn(bp);
 	}
-	/*
-	 * If dirty, put on list of dirty buffers;
-	 * otherwise insert onto list of clean buffers.
-	 */
+	  
+                                           
+                                                
+    
 	if (ISSET(bp->b_flags, B_DELWRI)) {
 		listheadp = &newvp->v_dirtyblkhd;
 	} else {
@@ -2082,9 +2082,9 @@ bufhdrinit(buf_t bp)
 	return;
 }
 
-/*
- * Initialize buffers and hash links for buffers.
- */
+  
+                                                 
+   
 __private_extern__ void
 bufinit(void)
 {
@@ -2093,7 +2093,7 @@ bufinit(void)
 	int     i;
 
 	nbuf_headers = 0;
-	/* Initialize the buffer queues ('freelists') and the hash table */
+	                                                                   
 	for (dp = bufqueues; dp < &bufqueues[BQUEUES]; dp++) {
 		TAILQ_INIT(dp);
 	}
@@ -2101,7 +2101,7 @@ bufinit(void)
 
 	buf_busycount = 0;
 
-	/* Initialize the buffer headers */
+	                                   
 	for (i = 0; i < max_nbuf_headers; i++) {
 		nbuf_headers++;
 		bp = &buf_headers[i];
@@ -2126,26 +2126,26 @@ bufinit(void)
 		binsheadfree(bp, &iobufqueue, -1);
 	}
 
-	/*
-	 * allocate and initialize cluster specific global locks...
-	 */
+	  
+                                                            
+    
 	cluster_init();
 
 	printf("using %d buffer headers and %d cluster IO buffer headers\n",
 	    nbuf_headers, niobuf_headers);
 
-	/* start the bcleanbuf() thread */
+	                                  
 	bcleanbuf_thread_init();
 
-	/* Register a callout for relieving vm pressure */
+	                                                  
 	if (vm_set_buffer_cleanup_callout(buffer_cache_gc) != KERN_SUCCESS) {
 		panic("Couldn't register buffer cache callout for vm pressure!\n");
 	}
 }
 
-/*
- * Zones for the meta data buffers
- */
+  
+                                  
+   
 
 #define MINMETA 512
 #define MAXMETA 16384
@@ -2159,17 +2159,17 @@ bio_doread(vnode_t vp, daddr64_t blkno, int size, kauth_cred_t cred, int async, 
 
 	bp = buf_getblk(vp, blkno, size, 0, 0, queuetype);
 
-	/*
-	 * If buffer does not have data valid, start a read.
-	 * Note that if buffer is B_INVAL, buf_getblk() won't return it.
-	 * Therefore, it's valid if it's I/O has completed or been delayed.
-	 */
+	  
+                                                     
+                                                                 
+                                                                    
+    
 	if (!ISSET(bp->b_flags, (B_DONE | B_DELWRI))) {
 		struct proc *p;
 
 		p = current_proc();
 
-		/* Start I/O for the buffer (keeping credentials). */
+		                                                     
 		SET(bp->b_flags, B_READ | async);
 		if (IS_VALID_CRED(cred) && !IS_VALID_CRED(bp->b_rcred)) {
 			kauth_cred_ref(cred);
@@ -2180,18 +2180,18 @@ bio_doread(vnode_t vp, daddr64_t blkno, int size, kauth_cred_t cred, int async, 
 
 		trace(TR_BREADMISS, pack(vp, size), blkno);
 
-		/* Pay for the read. */
+		                       
 		if (p && p->p_stats) {
-			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_inblock);            /* XXX */
+			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_inblock);                     
 		}
 
 		if (async) {
-			/*
-			 * since we asked for an ASYNC I/O
-			 * the biodone will do the brelse
-			 * we don't want to pass back a bp
-			 * that we don't 'own'
-			 */
+			  
+                                     
+                                    
+                                     
+                         
+      
 			bp = NULL;
 		}
 	} else if (async) {
@@ -2204,10 +2204,10 @@ bio_doread(vnode_t vp, daddr64_t blkno, int size, kauth_cred_t cred, int async, 
 	return bp;
 }
 
-/*
- * Perform the reads for buf_breadn() and buf_meta_breadn().
- * Trivial modification to the breada algorithm presented in Bach (p.55).
- */
+  
+                                                            
+                                                                         
+   
 static errno_t
 do_breadn_for_type(vnode_t vp, daddr64_t blkno, int size, daddr64_t *rablks, int *rasizes,
     int nrablks, kauth_cred_t cred, buf_t *bpp, int queuetype)
@@ -2217,78 +2217,78 @@ do_breadn_for_type(vnode_t vp, daddr64_t blkno, int size, daddr64_t *rablks, int
 
 	bp = *bpp = bio_doread(vp, blkno, size, cred, 0, queuetype);
 
-	/*
-	 * For each of the read-ahead blocks, start a read, if necessary.
-	 */
+	  
+                                                                  
+    
 	for (i = 0; i < nrablks; i++) {
-		/* If it's in the cache, just go on to next one. */
+		                                                   
 		if (incore(vp, rablks[i])) {
 			continue;
 		}
 
-		/* Get a buffer for the read-ahead block */
+		                                           
 		(void) bio_doread(vp, rablks[i], rasizes[i], cred, B_ASYNC, queuetype);
 	}
 
-	/* Otherwise, we had to start a read for it; wait until it's valid. */
+	                                                                      
 	return buf_biowait(bp);
 }
 
 
-/*
- * Read a disk block.
- * This algorithm described in Bach (p.54).
- */
+  
+                     
+                                           
+   
 errno_t
 buf_bread(vnode_t vp, daddr64_t blkno, int size, kauth_cred_t cred, buf_t *bpp)
 {
 	buf_t   bp;
 
-	/* Get buffer for block. */
+	                           
 	bp = *bpp = bio_doread(vp, blkno, size, cred, 0, BLK_READ);
 
-	/* Wait for the read to complete, and return result. */
+	                                                       
 	return buf_biowait(bp);
 }
 
-/*
- * Read a disk block. [bread() for meta-data]
- * This algorithm described in Bach (p.54).
- */
+  
+                                             
+                                           
+   
 errno_t
 buf_meta_bread(vnode_t vp, daddr64_t blkno, int size, kauth_cred_t cred, buf_t *bpp)
 {
 	buf_t   bp;
 
-	/* Get buffer for block. */
+	                           
 	bp = *bpp = bio_doread(vp, blkno, size, cred, 0, BLK_META);
 
-	/* Wait for the read to complete, and return result. */
+	                                                       
 	return buf_biowait(bp);
 }
 
-/*
- * Read-ahead multiple disk blocks. The first is sync, the rest async.
- */
+  
+                                                                      
+   
 errno_t
 buf_breadn(vnode_t vp, daddr64_t blkno, int size, daddr64_t *rablks, int *rasizes, int nrablks, kauth_cred_t cred, buf_t *bpp)
 {
 	return do_breadn_for_type(vp, blkno, size, rablks, rasizes, nrablks, cred, bpp, BLK_READ);
 }
 
-/*
- * Read-ahead multiple disk blocks. The first is sync, the rest async.
- * [buf_breadn() for meta-data]
- */
+  
+                                                                      
+                               
+   
 errno_t
 buf_meta_breadn(vnode_t vp, daddr64_t blkno, int size, daddr64_t *rablks, int *rasizes, int nrablks, kauth_cred_t cred, buf_t *bpp)
 {
 	return do_breadn_for_type(vp, blkno, size, rablks, rasizes, nrablks, cred, bpp, BLK_META);
 }
 
-/*
- * Block write.  Described in Bach (p.56)
- */
+  
+                                         
+   
 errno_t
 buf_bwrite(buf_t bp)
 {
@@ -2302,7 +2302,7 @@ buf_bwrite(buf_t bp)
 			return 0;
 		}
 	}
-	/* Remember buffer type, to switch on it later. */
+	                                                  
 	sync = !ISSET(bp->b_flags, B_ASYNC);
 	wasdelayed = ISSET(bp->b_flags, B_DELWRI);
 	CLR(bp->b_flags, (B_READ | B_DONE | B_ERROR | B_DELWRI));
@@ -2312,44 +2312,44 @@ buf_bwrite(buf_t bp)
 	}
 
 	if (!sync) {
-		/*
-		 * If not synchronous, pay for the I/O operation and make
-		 * sure the buf is on the correct vnode queue.  We have
-		 * to do this now, because if we don't, the vnode may not
-		 * be properly notified that its I/O has completed.
-		 */
+		  
+                                                           
+                                                         
+                                                           
+                                                     
+     
 		if (wasdelayed) {
 			buf_reassign(bp, vp);
 		} else if (p && p->p_stats) {
-			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_oublock);            /* XXX */
+			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_oublock);                     
 		}
 	}
 	trace(TR_BUFWRITE, pack(vp, bp->b_bcount), bp->b_lblkno);
 
-	/* Initiate disk write.  Make sure the appropriate party is charged. */
+	                                                                       
 
 	OSAddAtomic(1, &vp->v_numoutput);
 
 	VNOP_STRATEGY(bp);
 
 	if (sync) {
-		/*
-		 * If I/O was synchronous, wait for it to complete.
-		 */
+		  
+                                                     
+     
 		rv = buf_biowait(bp);
 
-		/*
-		 * Pay for the I/O operation, if it's not been paid for, and
-		 * make sure it's on the correct vnode queue. (async operatings
-		 * were payed for above.)
-		 */
+		  
+                                                              
+                                                                 
+                           
+     
 		if (wasdelayed) {
 			buf_reassign(bp, vp);
 		} else if (p && p->p_stats) {
-			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_oublock);            /* XXX */
+			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_oublock);                     
 		}
 
-		/* Release the buffer. */
+		                         
 		buf_brelse(bp);
 
 		return rv;
@@ -2364,74 +2364,74 @@ vn_bwrite(struct vnop_bwrite_args *ap)
 	return buf_bwrite(ap->a_bp);
 }
 
-/*
- * Delayed write.
- *
- * The buffer is marked dirty, but is not queued for I/O.
- * This routine should be used when the buffer is expected
- * to be modified again soon, typically a small write that
- * partially fills a buffer.
- *
- * NB: magnetic tapes cannot be delayed; they must be
- * written in the order that the writes are requested.
- *
- * Described in Leffler, et al. (pp. 208-213).
- *
- * Note: With the ability to allocate additional buffer
- * headers, we can get in to the situation where "too" many
- * buf_bdwrite()s can create situation where the kernel can create
- * buffers faster than the disks can service. Doing a buf_bawrite() in
- * cases where we have "too many" outstanding buf_bdwrite()s avoids that.
- */
+  
+                 
+  
+                                                         
+                                                          
+                                                          
+                            
+  
+                                                     
+                                                      
+  
+                                              
+  
+                                                       
+                                                           
+                                                                  
+                                                                      
+                                                                         
+   
 int
 bdwrite_internal(buf_t bp, int return_error)
 {
 	proc_t  p  = current_proc();
 	vnode_t vp = bp->b_vp;
 
-	/*
-	 * If the block hasn't been seen before:
-	 *	(1) Mark it as having been seen,
-	 *	(2) Charge for the write.
-	 *	(3) Make sure it's on its vnode's correct block list,
-	 */
+	  
+                                         
+                                    
+                             
+                                                         
+    
 	if (!ISSET(bp->b_flags, B_DELWRI)) {
 		SET(bp->b_flags, B_DELWRI);
 		if (p && p->p_stats) {
-			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_oublock);    /* XXX */
+			OSIncrementAtomicLong(&p->p_stats->p_ru.ru_oublock);             
 		}
 		OSAddAtomicLong(1, &nbdwrite);
 		buf_reassign(bp, vp);
 	}
 
-	/*
-	 * if we're not LOCKED, but the total number of delayed writes
-	 * has climbed above 75% of the total buffers in the system
-	 * return an error if the caller has indicated that it can
-	 * handle one in this case, otherwise schedule the I/O now
-	 * this is done to prevent us from allocating tons of extra
-	 * buffers when dealing with virtual disks (i.e. DiskImages),
-	 * because additional buffers are dynamically allocated to prevent
-	 * deadlocks from occurring
-	 *
-	 * however, can't do a buf_bawrite() if the LOCKED bit is set because the
-	 * buffer is part of a transaction and can't go to disk until
-	 * the LOCKED bit is cleared.
-	 */
+	  
+                                                               
+                                                            
+                                                           
+                                                           
+                                                            
+                                                              
+                                                                   
+                            
+   
+                                                                          
+                                                              
+                              
+    
 	if (!ISSET(bp->b_flags, B_LOCKED) && nbdwrite > ((nbuf_headers / 4) * 3)) {
 		if (return_error) {
 			return EAGAIN;
 		}
-		/*
-		 * If the vnode has "too many" write operations in progress
-		 * wait for them to finish the IO
-		 */
+		  
+                                                             
+                                   
+     
 		(void)vnode_waitforwrites(vp, VNODE_ASYNC_THROTTLE, 0, 0, "buf_bdwrite");
 
 		return buf_bawrite(bp);
 	}
 
-	/* Otherwise, the "write" is done, so mark and release the buffer. */
+	                                                                     
 	SET(bp->b_flags, B_DONE);
 	buf_brelse(bp);
 	return 0;
@@ -2444,16 +2444,16 @@ buf_bdwrite(buf_t bp)
 }
 
 
-/*
- * Asynchronous block write; just an asynchronous buf_bwrite().
- *
- * Note: With the abilitty to allocate additional buffer
- * headers, we can get in to the situation where "too" many
- * buf_bawrite()s can create situation where the kernel can create
- * buffers faster than the disks can service.
- * We limit the number of "in flight" writes a vnode can have to
- * avoid this.
- */
+  
+                                                               
+  
+                                                        
+                                                           
+                                                                  
+                                             
+                                                                
+              
+   
 static int
 bawrite_internal(buf_t bp, int throttle)
 {
@@ -2461,16 +2461,16 @@ bawrite_internal(buf_t bp, int throttle)
 
 	if (vp) {
 		if (throttle) {
-			/*
-			 * If the vnode has "too many" write operations in progress
-			 * wait for them to finish the IO
-			 */
+			  
+                                                              
+                                    
+      
 			(void)vnode_waitforwrites(vp, VNODE_ASYNC_THROTTLE, 0, 0, (const char *)"buf_bawrite");
 		} else if (vp->v_numoutput >= VNODE_ASYNC_THROTTLE) {
-			/*
-			 * return to the caller and
-			 * let him decide what to do
-			 */
+			  
+                              
+                               
+      
 			return EWOULDBLOCK;
 		}
 	}
@@ -2497,10 +2497,10 @@ buf_free_meta_store(buf_t bp)
 		bp->b_datap = (uintptr_t)NULL;
 		bp->b_bufsize = 0;
 
-		/*
-		 * Ensure the assignment of b_datap has global visibility
-		 * before we free the region.
-		 */
+		  
+                                                           
+                               
+     
 		OSMemoryBarrier();
 
 		if (ISSET(bp->b_flags, B_ZALLOC)) {
@@ -2535,11 +2535,11 @@ buf_brelse_shadow(buf_t bp)
 #ifdef BUF_MAKE_PRIVATE
 	if (bp_data = bp->b_data_store) {
 		bp_data->b_data_ref--;
-		/*
-		 * snapshot the ref count so that we can check it
-		 * outside of the lock... we only want the guy going
-		 * from 1 -> 0 to try and release the storage
-		 */
+		  
+                                                   
+                                                      
+                                               
+     
 		data_ref = bp_data->b_data_ref;
 	}
 #endif
@@ -2558,11 +2558,11 @@ buf_brelse_shadow(buf_t bp)
 	bp_temp->b_shadow = bp_temp->b_shadow->b_shadow;
 
 #ifdef BUF_MAKE_PRIVATE
-	/*
-	 * we're about to free the current 'owner' of the data buffer and
-	 * there is at least one other shadow buf_t still pointing at it
-	 * so transfer it to the first shadow buf left in the chain
-	 */
+	  
+                                                                  
+                                                                 
+                                                            
+    
 	if (bp == bp_data && data_ref) {
 		if ((bp_data = bp_head->b_shadow) == NULL) {
 			panic("buf_brelse_shadow: data_ref mismatch bp(%p)", bp);
@@ -2622,10 +2622,10 @@ buf_brelse_shadow(buf_t bp)
 }
 
 
-/*
- * Release a buffer on to the free lists.
- * Described in Bach (p. 46).
- */
+  
+                                         
+                             
+   
 void
 buf_brelse(buf_t bp)
 {
@@ -2669,19 +2669,19 @@ buf_brelse(buf_t bp)
 
 	trace(TR_BRELSE, pack(bp->b_vp, bp->b_bufsize), bp->b_lblkno);
 
-	/*
-	 * if we're invalidating a buffer that has the B_FILTER bit
-	 * set then call the b_iodone function so it gets cleaned
-	 * up properly.
-	 *
-	 * the HFS journal code depends on this
-	 */
+	  
+                                                            
+                                                          
+                
+   
+                                        
+    
 	if (ISSET(bp->b_flags, B_META) && ISSET(bp->b_flags, B_INVAL)) {
-		if (ISSET(bp->b_flags, B_FILTER)) {     /* if necessary, call out */
+		if (ISSET(bp->b_flags, B_FILTER)) {                                 
 			void    (*iodone_func)(struct buf *, void *) = bp->b_iodone;
 			void    *arg = bp->b_transaction;
 
-			CLR(bp->b_flags, B_FILTER);     /* but note callout done */
+			CLR(bp->b_flags, B_FILTER);                                
 			bp->b_iodone = NULL;
 			bp->b_transaction = NULL;
 
@@ -2691,9 +2691,9 @@ buf_brelse(buf_t bp)
 			(*iodone_func)(bp, arg);
 		}
 	}
-	/*
-	 * I/O is done. Cleanup the UPL state
-	 */
+	  
+                                      
+    
 	upl = bp->b_upl;
 
 	if (!ISSET(bp->b_flags, B_META) && UBCINFOEXISTS(bp->b_vp) && bp->b_bufsize) {
@@ -2715,7 +2715,7 @@ buf_brelse(buf_t bp)
 				}
 #if  UPL_DEBUG
 				upl_ubc_alias_set(upl, (uintptr_t) bp, (uintptr_t) 5);
-#endif /* UPL_DEBUG */
+#endif                
 			}
 		} else {
 			if (bp->b_datap) {
@@ -2754,15 +2754,15 @@ buf_brelse(buf_t bp)
 		}
 	}
 
-	/*
-	 * If it's locked, don't report an error; try again later.
-	 */
+	  
+                                                           
+    
 	if (ISSET(bp->b_flags, (B_LOCKED | B_ERROR)) == (B_LOCKED | B_ERROR)) {
 		CLR(bp->b_flags, B_ERROR);
 	}
-	/*
-	 * If it's not cacheable, or an error, mark it invalid.
-	 */
+	  
+                                                        
+    
 	if (ISSET(bp->b_flags, (B_NOCACHE | B_ERROR))) {
 		SET(bp->b_flags, B_INVAL);
 	}
@@ -2772,11 +2772,11 @@ buf_brelse(buf_t bp)
 	    (ISSET(bp->b_lflags, BL_WANTDEALLOC) && !ISSET(bp->b_flags, B_DELWRI))) {
 		boolean_t       delayed_buf_free_meta_store = FALSE;
 
-		/*
-		 * If it's invalid or empty, dissociate it from its vnode,
-		 * release its storage if B_META, and
-		 * clean it up a bit and put it on the EMPTY queue
-		 */
+		  
+                                                            
+                                       
+                                                    
+     
 		if (ISSET(bp->b_flags, B_DELWRI)) {
 			OSAddAtomicLong(-1, &nbdwrite);
 		}
@@ -2788,9 +2788,9 @@ buf_brelse(buf_t bp)
 				buf_free_meta_store(bp);
 			}
 		}
-		/*
-		 * nuke any credentials we were holding
-		 */
+		  
+                                         
+     
 		buf_release_credentials(bp);
 
 		lck_mtx_lock_spin(&buf_mtx);
@@ -2822,18 +2822,18 @@ finish_shadow_master:
 		bp->b_whichq = BQ_EMPTY;
 		binsheadfree(bp, &bufqueues[BQ_EMPTY], BQ_EMPTY);
 	} else {
-		/*
-		 * It has valid data.  Put it on the end of the appropriate
-		 * queue, so that it'll stick around for as long as possible.
-		 */
+		  
+                                                             
+                                                               
+     
 		if (ISSET(bp->b_flags, B_LOCKED)) {
-			whichq = BQ_LOCKED;             /* locked in core */
+			whichq = BQ_LOCKED;                                 
 		} else if (ISSET(bp->b_flags, B_META)) {
-			whichq = BQ_META;               /* meta-data */
+			whichq = BQ_META;                              
 		} else if (ISSET(bp->b_flags, B_AGE)) {
-			whichq = BQ_AGE;                /* stale but valid data */
+			whichq = BQ_AGE;                                          
 		} else {
-			whichq = BQ_LRU;                /* valid data */
+			whichq = BQ_LRU;                                
 		}
 		bufq = &bufqueues[whichq];
 
@@ -2841,77 +2841,77 @@ finish_shadow_master:
 
 		lck_mtx_lock_spin(&buf_mtx);
 
-		/*
-		 * the buf_brelse_shadow routine doesn't take 'ownership'
-		 * of the parent buf_t... it updates state that is protected by
-		 * the buf_mtx, and checks for BL_BUSY to determine whether to
-		 * put the buf_t back on a free list.  b_shadow_ref is protected
-		 * by the lock, and since we have not yet cleared B_BUSY, we need
-		 * to check it while holding the lock to insure that one of us
-		 * puts this buf_t back on a free list when it is safe to do so
-		 */
+		  
+                                                           
+                                                                 
+                                                                
+                                                                  
+                                                                   
+                                                                
+                                                                 
+     
 		if (bp->b_shadow_ref == 0) {
 			CLR(bp->b_flags, (B_AGE | B_ASYNC | B_NOCACHE));
 			bp->b_whichq = whichq;
 			binstailfree(bp, bufq, whichq);
 		} else {
-			/*
-			 * there are still cloned buf_t's pointing
-			 * at this guy... need to keep it off the
-			 * freelists until a buf_brelse is done on
-			 * the last clone
-			 */
+			  
+                                             
+                                            
+                                             
+                    
+      
 			CLR(bp->b_flags, (B_ASYNC | B_NOCACHE));
 		}
 	}
 	if (needbuffer) {
-		/*
-		 * needbuffer is a global
-		 * we're currently using buf_mtx to protect it
-		 * delay doing the actual wakeup until after
-		 * we drop buf_mtx
-		 */
+		  
+                           
+                                                
+                                              
+                    
+     
 		needbuffer = 0;
 		need_wakeup = 1;
 	}
 	if (ISSET(bp->b_lflags, BL_WANTED)) {
-		/*
-		 * delay the actual wakeup until after we
-		 * clear BL_BUSY and we've dropped buf_mtx
-		 */
+		  
+                                           
+                                            
+     
 		need_bp_wakeup = 1;
 	}
-	/*
-	 * Unlock the buffer.
-	 */
+	  
+                      
+    
 	CLR(bp->b_lflags, (BL_BUSY | BL_WANTED));
 	buf_busycount--;
 
 	lck_mtx_unlock(&buf_mtx);
 
 	if (need_wakeup) {
-		/*
-		 * Wake up any processes waiting for any buffer to become free.
-		 */
+		  
+                                                                 
+     
 		wakeup(&needbuffer);
 	}
 	if (need_bp_wakeup) {
-		/*
-		 * Wake up any proceeses waiting for _this_ buffer to become free.
-		 */
+		  
+                                                                    
+     
 		wakeup(bp);
 	}
 	KERNEL_DEBUG((FSDBG_CODE(DBG_FSRW, 388)) | DBG_FUNC_END,
 	    bp, bp->b_datap, bp->b_flags, 0, 0);
 }
 
-/*
- * Determine if a block is in the cache.
- * Just look on what would be its hash chain.  If it's there, return
- * a pointer to it, unless it's marked invalid.  If it's marked invalid,
- * we normally don't return the buffer, unless the caller explicitly
- * wants us to.
- */
+  
+                                        
+                                                                    
+                                                                        
+                                                                    
+               
+   
 static boolean_t
 incore(vnode_t vp, daddr64_t blkno)
 {
@@ -2938,7 +2938,7 @@ incore_locked(vnode_t vp, daddr64_t blkno, struct bufhashhdr *dp)
 {
 	struct buf *bp;
 
-	/* Search hash chain */
+	                       
 	for (bp = dp->lh_first; bp != NULL; bp = bp->b_hash.le_next) {
 		if (bp->b_lblkno == blkno && bp->b_vp == vp &&
 		    !ISSET(bp->b_flags, B_INVAL)) {
@@ -2975,15 +2975,15 @@ buf_wait_for_shadow_io(vnode_t vp, daddr64_t blkno)
 	lck_mtx_unlock(&buf_mtx);
 }
 
-/* XXX FIXME -- Update the comment to reflect the UBC changes (please) -- */
-/*
- * Get a block of requested size that is associated with
- * a given vnode and block offset. If it is found in the
- * block cache, mark it as having been found, make it busy
- * and return it. Otherwise, return an empty block of the
- * correct size. It is up to the caller to insure that the
- * cached blocks be of the correct size.
- */
+                                                                            
+  
+                                                        
+                                                        
+                                                          
+                                                         
+                                                          
+                                        
+   
 buf_t
 buf_getblk(vnode_t vp, daddr64_t blkno, int size, int slpflag, int slptimeo, int operation)
 {
@@ -3007,13 +3007,13 @@ start:
 	lck_mtx_lock_spin(&buf_mtx);
 
 	if ((bp = incore_locked(vp, blkno, dp))) {
-		/*
-		 * Found in the Buffer Cache
-		 */
+		  
+                              
+     
 		if (ISSET(bp->b_lflags, BL_BUSY)) {
-			/*
-			 * but is busy
-			 */
+			  
+                 
+      
 			switch (operation) {
 			case BLK_READ:
 			case BLK_WRITE:
@@ -3021,10 +3021,10 @@ start:
 				SET(bp->b_lflags, BL_WANTED);
 				bufstats.bufs_busyincore++;
 
-				/*
-				 * don't retake the mutex after being awakened...
-				 * the time out is in msecs
-				 */
+				  
+                                                     
+                               
+       
 				ts.tv_sec = (slptimeo / 1000);
 				ts.tv_nsec = (slptimeo % 1000) * 10  * NSEC_PER_USEC * 1000;
 
@@ -3033,30 +3033,30 @@ start:
 
 				err = msleep(bp, &buf_mtx, slpflag | PDROP | (PRIBIO + 1), "buf_getblk", &ts);
 
-				/*
-				 * Callers who call with PCATCH or timeout are
-				 * willing to deal with the NULL pointer
-				 */
+				  
+                                                  
+                                            
+       
 				if (err && ((slpflag & PCATCH) || ((err == EWOULDBLOCK) && slptimeo))) {
 					return NULL;
 				}
 				goto start;
-			/*NOTREACHED*/
+			              
 
 			default:
-				/*
-				 * unknown operation requested
-				 */
+				  
+                                  
+       
 				panic("getblk: paging or unknown operation for incore busy buffer - %x\n", operation);
-				/*NOTREACHED*/
+				              
 				break;
 			}
 		} else {
 			int clear_bdone;
 
-			/*
-			 * buffer in core and not busy
-			 */
+			  
+                                 
+      
 			SET(bp->b_lflags, BL_BUSY);
 			SET(bp->b_flags, B_CACHE);
 			buf_busycount++;
@@ -3075,33 +3075,33 @@ start:
 
 			clear_bdone = FALSE;
 			if (!ret_only_valid) {
-				/*
-				 * If the number bytes that are valid is going
-				 * to increase (even if we end up not doing a
-				 * reallocation through allocbuf) we have to read
-				 * the new size first.
-				 *
-				 * This is required in cases where we doing a read
-				 * modify write of a already valid data on disk but
-				 * in cases where the data on disk beyond (blkno + b_bcount)
-				 * is invalid, we may end up doing extra I/O.
-				 */
+				  
+                                                  
+                                                 
+                                                     
+                          
+      
+                                                      
+                                                       
+                                                                
+                                                 
+       
 				if (operation == BLK_META && bp->b_bcount < (uint32_t)size) {
-					/*
-					 * Since we are going to read in the whole size first
-					 * we first have to ensure that any pending delayed write
-					 * is flushed to disk first.
-					 */
+					  
+                                                          
+                                                              
+                                 
+        
 					if (ISSET(bp->b_flags, B_DELWRI)) {
 						CLR(bp->b_flags, B_CACHE);
 						buf_bwrite(bp);
 						goto start;
 					}
-					/*
-					 * clear B_DONE before returning from
-					 * this function so that the caller can
-					 * can issue a read for the new size.
-					 */
+					  
+                                          
+                                            
+                                          
+        
 					clear_bdone = TRUE;
 				}
 
@@ -3113,11 +3113,11 @@ start:
 			upl_flags = 0;
 			switch (operation) {
 			case BLK_WRITE:
-				/*
-				 * "write" operation:  let the UPL subsystem
-				 * know that we intend to modify the buffer
-				 * cache pages we're gathering.
-				 */
+				  
+                                                
+                                               
+                                   
+       
 				upl_flags |= UPL_WILL_MODIFY;
 				OS_FALLTHROUGH;
 			case BLK_READ:
@@ -3155,15 +3155,15 @@ start:
 				break;
 
 			case BLK_META:
-				/*
-				 * VM is not involved in IO for the meta data
-				 * buffer already has valid data
-				 */
+				  
+                                                 
+                                    
+       
 				break;
 
 			default:
 				panic("getblk: paging or unknown operation for incore buffer- %d\n", operation);
-				/*NOTREACHED*/
+				              
 				break;
 			}
 
@@ -3171,14 +3171,14 @@ start:
 				CLR(bp->b_flags, B_DONE);
 			}
 		}
-	} else { /* not incore() */
-		int queue = BQ_EMPTY; /* Start with no preference */
+	} else {                   
+		int queue = BQ_EMPTY;                               
 
 		if (ret_only_valid) {
 			lck_mtx_unlock(&buf_mtx);
 			return NULL;
 		}
-		if ((vnode_isreg(vp) == 0) || (UBCINFOEXISTS(vp) == 0) /*|| (vnode_issystem(vp) == 1)*/) {
+		if ((vnode_isreg(vp) == 0) || (UBCINFOEXISTS(vp) == 0)                                 ) {
 			operation = BLK_META;
 		}
 
@@ -3186,13 +3186,13 @@ start:
 			goto start;
 		}
 
-		/*
-		 * getnewbuf may block for a number of different reasons...
-		 * if it does, it's then possible for someone else to
-		 * create a buffer for the same block and insert it into
-		 * the hash... if we see it incore at this point we dump
-		 * the buffer we were working on and start over
-		 */
+		  
+                                                             
+                                                       
+                                                          
+                                                          
+                                                 
+     
 		if (incore_locked(vp, blkno, dp)) {
 			SET(bp->b_flags, B_INVAL);
 			binshash(bp, &invalhash);
@@ -3202,15 +3202,15 @@ start:
 			buf_brelse(bp);
 			goto start;
 		}
-		/*
-		 * NOTE: YOU CAN NOT BLOCK UNTIL binshash() HAS BEEN
-		 *       CALLED!  BE CAREFUL.
-		 */
+		  
+                                                      
+                               
+     
 
-		/*
-		 * mark the buffer as B_META if indicated
-		 * so that when buffer is released it will goto META queue
-		 */
+		  
+                                           
+                                                            
+     
 		if (operation == BLK_META) {
 			SET(bp->b_flags, B_META);
 		}
@@ -3218,9 +3218,9 @@ start:
 		bp->b_blkno = bp->b_lblkno = blkno;
 		bp->b_vp = vp;
 
-		/*
-		 * Insert in the hash so that incore() can find it
-		 */
+		  
+                                                    
+     
 		binshash(bp, BUFHASH(vp, blkno));
 
 		bgetvp_locked(vp, bp);
@@ -3232,24 +3232,24 @@ start:
 		upl_flags = 0;
 		switch (operation) {
 		case BLK_META:
-			/*
-			 * buffer data is invalid...
-			 *
-			 * I don't want to have to retake buf_mtx,
-			 * so the miss and vmhits counters are done
-			 * with Atomic updates... all other counters
-			 * in bufstats are protected with either
-			 * buf_mtx or iobuffer_mtxp
-			 */
+			  
+                               
+     
+                                             
+                                              
+                                               
+                                           
+                              
+      
 			OSAddAtomicLong(1, &bufstats.bufs_miss);
 			break;
 
 		case BLK_WRITE:
-			/*
-			 * "write" operation:  let the UPL subsystem know
-			 * that we intend to modify the buffer cache pages
-			 * we're gathering.
-			 */
+			  
+                                                    
+                                                     
+                      
+      
 			upl_flags |= UPL_WILL_MODIFY;
 			OS_FALLTHROUGH;
 		case BLK_READ:
@@ -3258,10 +3258,10 @@ start:
 		      int     bmap_flags;
 
 #if DEVELOPMENT || DEBUG
-			/*
-			 * Apple implemented file systems use UBC excludively; they should
-			 * not call in here."
-			 */
+			  
+                                                                     
+                        
+      
 		      const char* excldfs[] = {"hfs", "afpfs", "smbfs", "acfs",
 			                       "exfat", "msdos", "webdav", NULL};
 
@@ -3296,7 +3296,7 @@ start:
 		      }
 #if  UPL_DEBUG
 		      upl_ubc_alias_set(upl, (uintptr_t) bp, (uintptr_t) 4);
-#endif /* UPL_DEBUG */
+#endif                
 		      bp->b_upl = upl;
 
 		      if (upl_valid_page(pl, 0)) {
@@ -3314,29 +3314,29 @@ start:
 			      bp->b_dirtyoff = 0;
 
 			      if (upl_dirty_page(pl, 0)) {
-				      /* page is dirty */
+				                         
 				      SET(bp->b_flags, B_WASDIRTY);
 
 				      bp->b_validend = bp->b_bcount;
 				      bp->b_dirtyend = bp->b_bcount;
 			      } else {
-				      /* page is clean */
+				                         
 				      bp->b_validend = bp->b_bcount;
 				      bp->b_dirtyend = 0;
 			      }
-			      /*
-			       * try to recreate the physical block number associated with
-			       * this buffer...
-			       */
+			        
+                                                                     
+                          
+            
 			      if (VNOP_BLOCKMAP(vp, f_offset, bp->b_bcount, &bp->b_blkno, &contig_bytes, NULL, bmap_flags, NULL)) {
 				      panic("getblk: VNOP_BLOCKMAP failed");
 			      }
-			      /*
-			       * if the extent represented by this buffer
-			       * is not completely physically contiguous on
-			       * disk, than we can't cache the physical mapping
-			       * in the buffer header
-			       */
+			        
+                                                    
+                                                      
+                                                          
+                                
+            
 			      if ((uint32_t)contig_bytes < bp->b_bcount) {
 				      bp->b_blkno = bp->b_lblkno;
 			      }
@@ -3348,13 +3348,13 @@ start:
 		      if (kret != KERN_SUCCESS) {
 			      panic("getblk: ubc_upl_map() failed with (%d)", kret);
 		      }
-		      break;} // end BLK_READ
+		      break;}                
 		default:
 			panic("getblk: paging or unknown operation - %x", operation);
-			/*NOTREACHED*/
+			              
 			break;
-		} // end switch
-	} //end buf_t !incore
+		}              
+	}                    
 
 	KERNEL_DEBUG((FSDBG_CODE(DBG_FSRW, 386)) | DBG_FUNC_END,
 	    bp, bp->b_datap, bp->b_flags, 3, 0);
@@ -3365,9 +3365,9 @@ start:
 	return bp;
 }
 
-/*
- * Get an empty, disassociated buffer of given size.
- */
+  
+                                                    
+   
 buf_t
 buf_geteblk(int size)
 {
@@ -3384,8 +3384,8 @@ buf_geteblk(int size)
 
 #if DIAGNOSTIC
 	assert(queue == BQ_EMPTY);
-#endif /* DIAGNOSTIC */
-	/* XXX need to implement logic to deal with other queues */
+#endif                 
+	                                                           
 
 	binshash(bp, &invalhash);
 	bufstats.bufs_eblk++;
@@ -3452,13 +3452,13 @@ grab_memory_for_meta_buf(int nsize)
 	boolean_t was_vmpriv;
 
 
-	/*
-	 * make sure we're NOT priviliged so that
-	 * if a vm_page_grab is needed, it won't
-	 * block if we're out of free pages... if
-	 * it blocks, then we can't honor the
-	 * nopagewait request
-	 */
+	  
+                                          
+                                         
+                                          
+                                      
+                      
+    
 	was_vmpriv = set_vm_privilege(FALSE);
 
 	ptr = kheap_alloc(KHEAP_VFS_BIO, nsize, Z_NOPAGEWAIT);
@@ -3489,17 +3489,17 @@ grab_memory_for_meta_buf(int nsize)
 	return ptr;
 }
 
-/*
- * With UBC, there is no need to expand / shrink the file data
- * buffer. The VM uses the same pages, hence no waste.
- * All the file data buffers can have one size.
- * In fact expand / shrink would be an expensive operation.
- *
- * Only exception to this is meta-data buffers. Most of the
- * meta data operations are smaller than PAGE_SIZE. Having the
- * meta-data buffers grow and shrink as needed, optimizes use
- * of the kernel wired memory.
- */
+  
+                                                              
+                                                      
+                                               
+                                                           
+  
+                                                           
+                                                              
+                                                             
+                              
+   
 
 int
 allocbuf(buf_t bp, int size)
@@ -3523,12 +3523,12 @@ allocbuf(buf_t bp, int size)
 
 			if (ISSET(bp->b_flags, B_ZALLOC)) {
 				if (bp->b_bufsize < (uint32_t)nsize) {
-					/* reallocate to a bigger size */
+					                                 
 
 					if (nsize <= MAXMETA) {
 						desired_size = nsize;
 
-						/* b_datap not really a ptr */
+						                              
 						*(void **)(&bp->b_datap) = grab_memory_for_meta_buf(nsize);
 					} else {
 						bp->b_datap = (uintptr_t)NULL;
@@ -3542,7 +3542,7 @@ allocbuf(buf_t bp, int size)
 				}
 			} else {
 				if ((vm_size_t)bp->b_bufsize < desired_size) {
-					/* reallocate to a bigger size */
+					                                 
 					bp->b_datap = (uintptr_t)NULL;
 					kmem_alloc_kobject(kernel_map, (vm_offset_t *)&bp->b_datap, desired_size, VM_KERN_MEMORY_FILE);
 					bcopy(elem, (caddr_t)bp->b_datap, bp->b_bufsize);
@@ -3552,11 +3552,11 @@ allocbuf(buf_t bp, int size)
 				}
 			}
 		} else {
-			/* new allocation */
+			                    
 			if (nsize <= MAXMETA) {
 				desired_size = nsize;
 
-				/* b_datap not really a ptr */
+				                              
 				*(void **)(&bp->b_datap) = grab_memory_for_meta_buf(nsize);
 				SET(bp->b_flags, B_ZALLOC);
 			} else {
@@ -3574,27 +3574,27 @@ allocbuf(buf_t bp, int size)
 	return 0;
 }
 
-/*
- *	Get a new buffer from one of the free lists.
- *
- *	Request for a queue is passes in. The queue from which the buffer was taken
- *	from is returned. Out of range queue requests get BQ_EMPTY. Request for
- *	BQUEUE means no preference. Use heuristics in that case.
- *	Heuristics is as follows:
- *	Try BQ_AGE, BQ_LRU, BQ_EMPTY, BQ_META in that order.
- *	If none available block till one is made available.
- *	If buffers available on both BQ_AGE and BQ_LRU, check the timestamps.
- *	Pick the most stale buffer.
- *	If found buffer was marked delayed write, start the async. write
- *	and restart the search.
- *	Initialize the fields and disassociate the buffer from the vnode.
- *	Remove the buffer from the hash. Return the buffer and the queue
- *	on which it was found.
- *
- *	buf_mtx is held upon entry
- *	returns with buf_mtx locked if new buf available
- *	returns with buf_mtx UNlocked if new buf NOT available
- */
+  
+                                               
+  
+                                                                              
+                                                                          
+                                                           
+                            
+                                                       
+                                                      
+                                                                        
+                              
+                                                                   
+                          
+                                                                    
+                                                                   
+                         
+  
+                             
+                                                   
+                                                         
+   
 
 static buf_t
 getnewbuf(int slpflag, int slptimeo, int * queue)
@@ -3604,13 +3604,13 @@ getnewbuf(int slpflag, int slptimeo, int * queue)
 	buf_t   age_bp;
 	buf_t   meta_bp;
 	int     age_time, lru_time, bp_time, meta_time;
-	int     req = *queue;   /* save it for restarts */
+	int     req = *queue;                             
 	struct timespec ts;
 
 start:
-	/*
-	 * invalid request gets empty queue
-	 */
+	  
+                                    
+    
 	if ((*queue >= BQUEUES) || (*queue < 0)
 	    || (*queue == BQ_LAUNDRY) || (*queue == BQ_LOCKED)) {
 		*queue = BQ_EMPTY;
@@ -3621,49 +3621,49 @@ start:
 		goto found;
 	}
 
-	/*
-	 * need to grow number of bufs, add another one rather than recycling
-	 */
+	  
+                                                                      
+    
 	if (nbuf_headers < max_nbuf_headers) {
-		/*
-		 * Increment  count now as lock
-		 * is dropped for allocation.
-		 * That avoids over commits
-		 */
+		  
+                                 
+                               
+                             
+     
 		nbuf_headers++;
 		goto add_newbufs;
 	}
-	/* Try for the requested queue first */
+	                                       
 	bp = bufqueues[*queue].tqh_first;
 	if (bp) {
 		goto found;
 	}
 
-	/* Unable to use requested queue */
+	                                   
 	age_bp = bufqueues[BQ_AGE].tqh_first;
 	lru_bp = bufqueues[BQ_LRU].tqh_first;
 	meta_bp = bufqueues[BQ_META].tqh_first;
 
 	if (!age_bp && !lru_bp && !meta_bp) {
-		/*
-		 * Unavailble on AGE or LRU or META queues
-		 * Try the empty list first
-		 */
+		  
+                                            
+                             
+     
 		bp = bufqueues[BQ_EMPTY].tqh_first;
 		if (bp) {
 			*queue = BQ_EMPTY;
 			goto found;
 		}
-		/*
-		 * We have seen is this is hard to trigger.
-		 * This is an overcommit of nbufs but needed
-		 * in some scenarios with diskiamges
-		 */
+		  
+                                             
+                                              
+                                      
+     
 
 add_newbufs:
 		lck_mtx_unlock(&buf_mtx);
 
-		/* Create a new temporary buffer header */
+		                                          
 		bp = (struct buf *)zalloc(buf_hdr_zone);
 
 		if (bp) {
@@ -3682,45 +3682,45 @@ add_newbufs:
 			buf_hdr_count++;
 			goto found;
 		}
-		/* subtract already accounted bufcount */
+		                                         
 		nbuf_headers--;
 
 		bufstats.bufs_sleeps++;
 
-		/* wait for a free buffer of any kind */
+		                                        
 		needbuffer = 1;
-		/* hz value is 100 */
+		                     
 		ts.tv_sec = (slptimeo / 1000);
-		/* the hz value is 100; which leads to 10ms */
+		                                              
 		ts.tv_nsec = (slptimeo % 1000) * NSEC_PER_USEC * 1000 * 10;
 
 		msleep(&needbuffer, &buf_mtx, slpflag | PDROP | (PRIBIO + 1), "getnewbuf", &ts);
 		return NULL;
 	}
 
-	/* Buffer available either on AGE or LRU or META */
+	                                                   
 	bp = NULL;
 	*queue = -1;
 
-	/* Buffer available either on AGE or LRU */
+	                                           
 	if (!age_bp) {
 		bp = lru_bp;
 		*queue = BQ_LRU;
 	} else if (!lru_bp) {
 		bp = age_bp;
 		*queue = BQ_AGE;
-	} else { /* buffer available on both AGE and LRU */
+	} else {                                           
 		int             t = buf_timestamp();
 
 		age_time = t - age_bp->b_timestamp;
 		lru_time = t - lru_bp->b_timestamp;
-		if ((age_time < 0) || (lru_time < 0)) { /* time set backwards */
+		if ((age_time < 0) || (lru_time < 0)) {                         
 			bp = age_bp;
 			*queue = BQ_AGE;
-			/*
-			 * we should probably re-timestamp eveything in the
-			 * queues at this point with the current time
-			 */
+			  
+                                                      
+                                                
+      
 		} else {
 			if ((lru_time >= lru_is_stale) && (age_time < age_is_stale)) {
 				bp = lru_bp;
@@ -3732,7 +3732,7 @@ add_newbufs:
 		}
 	}
 
-	if (!bp) { /* Neither on AGE nor on LRU */
+	if (!bp) {                                
 		bp = meta_bp;
 		*queue = BQ_META;
 	} else if (meta_bp) {
@@ -3742,7 +3742,7 @@ add_newbufs:
 		meta_time = t - meta_bp->b_timestamp;
 
 		if (!(bp_time < 0) && !(meta_time < 0)) {
-			/* time not set backwards */
+			                            
 			int bp_is_stale;
 			bp_is_stale = (*queue == BQ_LRU) ?
 			    lru_is_stale : age_is_stale;
@@ -3759,11 +3759,11 @@ found:
 		panic("getnewbuf: bp @ %p is LOCKED or BUSY! (flags 0x%x)\n", bp, bp->b_flags);
 	}
 
-	/* Clean it */
+	              
 	if (bcleanbuf(bp, FALSE)) {
-		/*
-		 * moved to the laundry thread, buffer not ready
-		 */
+		  
+                                                  
+     
 		*queue = req;
 		goto start;
 	}
@@ -3771,29 +3771,29 @@ found:
 }
 
 
-/*
- * Clean a buffer.
- * Returns 0 if buffer is ready to use,
- * Returns 1 if issued a buf_bawrite() to indicate
- * that the buffer is not ready.
- *
- * buf_mtx is held upon entry
- * returns with buf_mtx locked
- */
+  
+                  
+                                       
+                                                  
+                                
+  
+                             
+                              
+   
 int
 bcleanbuf(buf_t bp, boolean_t discard)
 {
-	/* Remove from the queue */
+	                           
 	bremfree_locked(bp);
 
 #ifdef JOE_DEBUG
 	bp->b_owner = current_thread();
 	bp->b_tag   = 2;
 #endif
-	/*
-	 * If buffer was a delayed write, start the IO by queuing
-	 * it on the LAUNDRY queue, and return 1
-	 */
+	  
+                                                          
+                                         
+    
 	if (ISSET(bp->b_flags, B_DELWRI)) {
 		if (discard) {
 			SET(bp->b_lflags, BL_WANTDEALLOC);
@@ -3804,9 +3804,9 @@ bcleanbuf(buf_t bp, boolean_t discard)
 		lck_mtx_unlock(&buf_mtx);
 
 		wakeup(&bufqueues[BQ_LAUNDRY]);
-		/*
-		 * and give it a chance to run
-		 */
+		  
+                                
+     
 		(void)thread_block(THREAD_CONTINUE_NULL);
 
 		lck_mtx_lock_spin(&buf_mtx);
@@ -3817,17 +3817,17 @@ bcleanbuf(buf_t bp, boolean_t discard)
 	bp->b_owner = current_thread();
 	bp->b_tag   = 8;
 #endif
-	/*
-	 * Buffer is no longer on any free list... we own it
-	 */
+	  
+                                                     
+    
 	SET(bp->b_lflags, BL_BUSY);
 	buf_busycount++;
 
 	bremhash(bp);
 
-	/*
-	 * disassociate us from our vnode, if we had one...
-	 */
+	  
+                                                    
+    
 	if (bp->b_vp) {
 		brelvp_locked(bp);
 	}
@@ -3844,7 +3844,7 @@ bcleanbuf(buf_t bp, boolean_t discard)
 
 	buf_release_credentials(bp);
 
-	/* If discarding, just move to the empty queue */
+	                                                 
 	if (discard) {
 		lck_mtx_lock_spin(&buf_mtx);
 		CLR(bp->b_flags, (B_META | B_ZALLOC | B_DELWRI | B_LOCKED | B_AGE | B_ASYNC | B_NOCACHE | B_FUA));
@@ -3854,17 +3854,17 @@ bcleanbuf(buf_t bp, boolean_t discard)
 		CLR(bp->b_lflags, BL_BUSY);
 		buf_busycount--;
 	} else {
-		/* Not discarding: clean up and prepare for reuse */
+		                                                    
 		bp->b_bufsize = 0;
 		bp->b_datap = (uintptr_t)NULL;
 		bp->b_upl = (void *)NULL;
 		bp->b_fsprivate = (void *)NULL;
-		/*
-		 * preserve the state of whether this buffer
-		 * was allocated on the fly or not...
-		 * the only other flag that should be set at
-		 * this point is BL_BUSY...
-		 */
+		  
+                                              
+                                       
+                                              
+                             
+     
 #ifdef JOE_DEBUG
 		bp->b_owner = current_thread();
 		bp->b_tag   = 3;
@@ -3942,28 +3942,28 @@ buf_drop(buf_t bp)
 	lck_mtx_lock_spin(&buf_mtx);
 
 	if (ISSET(bp->b_lflags, BL_WANTED)) {
-		/*
-		 * delay the actual wakeup until after we
-		 * clear BL_BUSY and we've dropped buf_mtx
-		 */
+		  
+                                           
+                                            
+     
 		need_wakeup = 1;
 	}
 #ifdef JOE_DEBUG
 	bp->b_owner = current_thread();
 	bp->b_tag   = 9;
 #endif
-	/*
-	 * Unlock the buffer.
-	 */
+	  
+                      
+    
 	CLR(bp->b_lflags, (BL_BUSY | BL_WANTED));
 	buf_busycount--;
 
 	lck_mtx_unlock(&buf_mtx);
 
 	if (need_wakeup) {
-		/*
-		 * Wake up any proceeses waiting for _this_ buffer to become free.
-		 */
+		  
+                                                                    
+     
 		wakeup(bp);
 	}
 }
@@ -4000,17 +4000,17 @@ buf_acquire_locked(buf_t bp, int flags, int slpflag, int slptimeo)
 		}
 	}
 	if (ISSET(bp->b_lflags, BL_BUSY)) {
-		/*
-		 * since the lck_mtx_lock may block, the buffer
-		 * may become BUSY, so we need to
-		 * recheck for a NOWAIT request
-		 */
+		  
+                                                 
+                                   
+                                 
+     
 		if (flags & BAC_NOWAIT) {
 			return EBUSY;
 		}
 		SET(bp->b_lflags, BL_WANTED);
 
-		/* the hz value is 100; which leads to 10ms */
+		                                              
 		ts.tv_sec = (slptimeo / 100);
 		ts.tv_nsec = (slptimeo % 100) * 10  * NSEC_PER_USEC * 1000;
 		error = msleep((caddr_t)bp, &buf_mtx, slpflag | (PRIBIO + 1), "buf_acquire", &ts);
@@ -4034,10 +4034,10 @@ buf_acquire_locked(buf_t bp, int flags, int slpflag, int slptimeo)
 }
 
 
-/*
- * Wait for operations on the buffer to complete.
- * When they do, extract and return the I/O's error value.
- */
+  
+                                                 
+                                                          
+   
 errno_t
 buf_biowait(buf_t bp)
 {
@@ -4052,7 +4052,7 @@ buf_biowait(buf_t bp)
 			lck_mtx_unlock(&buf_mtx);
 		}
 	}
-	/* check for interruption of I/O (e.g. via NFS), then errors. */
+	                                                                
 	if (ISSET(bp->b_flags, B_EINTR)) {
 		CLR(bp->b_flags, B_EINTR);
 		return EINTR;
@@ -4064,22 +4064,22 @@ buf_biowait(buf_t bp)
 }
 
 
-/*
- * Mark I/O complete on a buffer.
- *
- * If a callback has been requested, e.g. the pageout
- * daemon, do so. Otherwise, awaken waiting processes.
- *
- * [ Leffler, et al., says on p.247:
- *	"This routine wakes up the blocked process, frees the buffer
- *	for an asynchronous write, or, for a request by the pagedaemon
- *	process, invokes a procedure specified in the buffer structure" ]
- *
- * In real life, the pagedaemon (or other system processes) wants
- * to do async stuff to, and doesn't want the buffer buf_brelse()'d.
- * (for swap pager, that puts swap buffers on the free lists (!!!),
- * for the vn device, that puts malloc'd buffers on the free lists!)
- */
+  
+                                 
+  
+                                                     
+                                                      
+  
+                                    
+                                                               
+                                                                 
+                                                                    
+  
+                                                                 
+                                                                    
+                                                                   
+                                                                    
+   
 
 void
 buf_biodone(buf_t bp)
@@ -4169,12 +4169,12 @@ buf_biodone(buf_t bp)
 	real_elapsed_usec = real_elapsed.tv_sec * USEC_PER_SEC + real_elapsed.tv_usec;
 	disk_conditioner_delay(bp, 1, bp->b_bcount, real_elapsed_usec);
 
-	/*
-	 * I/O was done, so don't believe
-	 * the DIRTY state from VM anymore...
-	 * and we need to reset the THROTTLED/PASSIVE
-	 * indicators
-	 */
+	  
+                                  
+                                      
+                                              
+              
+    
 	CLR(bp->b_flags, (B_WASDIRTY | B_PASSIVE));
 	CLR(bap->ba_flags, (BA_META | BA_NOCACHE | BA_DELAYIDLESLEEP | BA_IO_TIER_UPGRADE));
 
@@ -4183,15 +4183,15 @@ buf_biodone(buf_t bp)
 	DTRACE_IO1(done, buf_t, bp);
 
 	if (!ISSET(bp->b_flags, B_READ) && !ISSET(bp->b_flags, B_RAW)) {
-		/*
-		 * wake up any writer's blocked
-		 * on throttle or waiting for I/O
-		 * to drain
-		 */
+		  
+                                 
+                                   
+             
+     
 		vnode_writedone(bp->b_vp);
 	}
 
-	if (ISSET(bp->b_flags, (B_CALL | B_FILTER))) {  /* if necessary, call out */
+	if (ISSET(bp->b_flags, (B_CALL | B_FILTER))) {                              
 		void    (*iodone_func)(struct buf *, void *) = bp->b_iodone;
 		void    *arg = bp->b_transaction;
 		int     callout = ISSET(bp->b_flags, B_CALL);
@@ -4200,53 +4200,53 @@ buf_biodone(buf_t bp)
 			panic("biodone: bp @ %p has NULL b_iodone!\n", bp);
 		}
 
-		CLR(bp->b_flags, (B_CALL | B_FILTER));  /* filters and callouts are one-shot */
+		CLR(bp->b_flags, (B_CALL | B_FILTER));                                         
 		bp->b_iodone = NULL;
 		bp->b_transaction = NULL;
 
 		if (callout) {
-			SET(bp->b_flags, B_DONE);       /* note that it's done */
+			SET(bp->b_flags, B_DONE);                                
 		}
 		(*iodone_func)(bp, arg);
 
 		if (callout) {
-			/*
-			 * assumes that the callback function takes
-			 * ownership of the bp and deals with releasing it if necessary
-			 */
+			  
+                                              
+                                                                  
+      
 			goto biodone_done;
 		}
-		/*
-		 * in this case the call back function is acting
-		 * strictly as a filter... it does not take
-		 * ownership of the bp and is expecting us
-		 * to finish cleaning up... this is currently used
-		 * by the HFS journaling code
-		 */
+		  
+                                                  
+                                             
+                                            
+                                                    
+                               
+     
 	}
-	if (ISSET(bp->b_flags, B_ASYNC)) {      /* if async, release it */
-		SET(bp->b_flags, B_DONE);       /* note that it's done */
+	if (ISSET(bp->b_flags, B_ASYNC)) {                                
+		SET(bp->b_flags, B_DONE);                                
 
 		buf_brelse(bp);
-	} else {                                /* or just wakeup the buffer */
-		/*
-		 * by taking the mutex, we serialize
-		 * the buf owner calling buf_biowait so that we'll
-		 * only see him in one of 2 states...
-		 * state 1: B_DONE wasn't set and he's
-		 * blocked in msleep
-		 * state 2: he's blocked trying to take the
-		 * mutex before looking at B_DONE
-		 * BL_WANTED is cleared in case anyone else
-		 * is blocked waiting for the buffer... note
-		 * that we haven't cleared B_BUSY yet, so if
-		 * they do get to run, their going to re-set
-		 * BL_WANTED and go back to sleep
-		 */
+	} else {                                                               
+		  
+                                      
+                                                    
+                                       
+                                        
+                      
+                                             
+                                   
+                                             
+                                              
+                                              
+                                              
+                                   
+     
 		lck_mtx_lock_spin(&buf_mtx);
 
 		CLR(bp->b_lflags, BL_WANTED);
-		SET(bp->b_flags, B_DONE);               /* note that it's done */
+		SET(bp->b_flags, B_DONE);                                        
 
 		lck_mtx_unlock(&buf_mtx);
 
@@ -4257,9 +4257,9 @@ biodone_done:
 	    (uintptr_t)bp, (uintptr_t)bp->b_datap, bp->b_flags, 0, 0);
 }
 
-/*
- * Obfuscate buf pointers.
- */
+  
+                          
+   
 vm_offset_t
 buf_kernel_addrperm_addr(void * addr)
 {
@@ -4270,9 +4270,9 @@ buf_kernel_addrperm_addr(void * addr)
 	}
 }
 
-/*
- * Return a count of buffers on the "locked" queue.
- */
+  
+                                                   
+   
 int
 count_lock_queue(void)
 {
@@ -4290,10 +4290,10 @@ count_lock_queue(void)
 	return n;
 }
 
-/*
- * Return a count of 'busy' buffers. Used at the time of shutdown.
- * note: This is also called from the mach side in debug context in kdp.c
- */
+  
+                                                                  
+                                                                         
+   
 uint32_t
 count_busy_buffers(void)
 {
@@ -4301,11 +4301,11 @@ count_busy_buffers(void)
 }
 
 #if DIAGNOSTIC
-/*
- * Print out statistics on the current allocation of the buffer pool.
- * Can be enabled to print out on every ``sync'' by setting "syncprt"
- * in vfs_syscalls.c using sysctl.
- */
+  
+                                                                     
+                                                                     
+                                  
+   
 void
 vfs_bufstats()
 {
@@ -4339,7 +4339,7 @@ vfs_bufstats()
 		printf("\n");
 	}
 }
-#endif /* DIAGNOSTIC */
+#endif                 
 
 #define NRESERVEDIOBUFS 128
 
@@ -4355,15 +4355,15 @@ alloc_io_buf(vnode_t vp, int priv)
 
 	lck_mtx_lock_spin(&iobuffer_mtxp);
 
-	/*
-	 * We subject iobuf requests for diskimages to additional restrictions.
-	 *
-	 * a) A single diskimage mount cannot use up more than
-	 * MNT_VIRTUALDEV_MAX_IOBUFS. However,vm privileged (pageout) requests
-	 * are not subject to this restriction.
-	 * b) iobuf headers used by all diskimage headers by all mount
-	 * points cannot exceed  VIRTUALDEV_MAX_IOBUFS.
-	 */
+	  
+                                                                        
+   
+                                                       
+                                                                       
+                                        
+                                                               
+                                                
+    
 	if (vp && ((mp = vp->v_mount)) && mp != dead_mountp &&
 	    mp->mnt_kern_flag & MNTK_VIRTUALDEV) {
 		alloc_for_virtualdev = TRUE;
@@ -4400,12 +4400,12 @@ alloc_io_buf(vnode_t vp, int priv)
 
 	lck_mtx_unlock(&iobuffer_mtxp);
 
-	/*
-	 * initialize various fields
-	 * we don't need to hold the mutex since the buffer
-	 * is now private... the vp should have a reference
-	 * on it and is not protected by this mutex in any event
-	 */
+	  
+                             
+                                                    
+                                                    
+                                                         
+    
 	bp->b_timestamp = 0;
 	bp->b_proc = NULL;
 
@@ -4448,7 +4448,7 @@ free_io_buf(buf_t bp)
 	int free_for_virtualdev = FALSE;
 	mount_t mp = NULL;
 
-	/* Was this iobuf for a diskimage ? */
+	                                      
 	if (bp->b_lflags & BL_IOBUF_VDEV) {
 		free_for_virtualdev = TRUE;
 		if (bp->b_vp) {
@@ -4456,13 +4456,13 @@ free_io_buf(buf_t bp)
 		}
 	}
 
-	/*
-	 * put buffer back on the head of the iobufqueue
-	 */
+	  
+                                                 
+    
 	bp->b_vp = NULL;
 	bp->b_flags = B_INVAL;
 
-	/* Zero out the bufattr and its flags before relinquishing this iobuf */
+	                                                                        
 	bzero(&bp->b_attr, sizeof(struct bufattr));
 
 	lck_mtx_lock_spin(&iobuffer_mtxp);
@@ -4470,15 +4470,15 @@ free_io_buf(buf_t bp)
 	binsheadfree(bp, &iobufqueue, -1);
 
 	if (need_iobuffer) {
-		/*
-		 * Wake up any processes waiting because they need an io buffer
-		 *
-		 * do the wakeup after we drop the mutex... it's possible that the
-		 * wakeup will be superfluous if need_iobuffer gets set again and
-		 * another thread runs this path, but it's highly unlikely, doesn't
-		 * hurt, and it means we don't hold up I/O progress if the wakeup blocks
-		 * trying to grab a task related lock...
-		 */
+		  
+                                                                 
+    
+                                                                    
+                                                                   
+                                                                     
+                                                                          
+                                          
+     
 		need_iobuffer = 0;
 		need_wakeup = 1;
 	}
@@ -4515,11 +4515,11 @@ buf_list_unlock(void)
 	lck_mtx_unlock(&buf_mtx);
 }
 
-/*
- * If getnewbuf() calls bcleanbuf() on the same thread
- * there is a potential for stack overrun and deadlocks.
- * So we always handoff the work to a worker thread for completion
- */
+  
+                                                      
+                                                        
+                                                                  
+   
 
 
 static void
@@ -4527,7 +4527,7 @@ bcleanbuf_thread_init(void)
 {
 	thread_t        thread = THREAD_NULL;
 
-	/* create worker thread */
+	                          
 	kernel_thread_start((thread_continue_t)bcleanbuf_thread, NULL, &thread);
 	thread_deallocate(thread);
 }
@@ -4549,14 +4549,14 @@ bcleanbuf_thread(void)
 			(void)msleep0(&bufqueues[BQ_LAUNDRY], &buf_mtx, PRIBIO | PDROP, "blaundry", 0, (bcleanbufcontinuation)bcleanbuf_thread);
 		}
 
-		/*
-		 * Remove from the queue
-		 */
+		  
+                          
+     
 		bremfree_locked(bp);
 
-		/*
-		 * Buffer is no longer on any free list
-		 */
+		  
+                                         
+     
 		SET(bp->b_lflags, BL_BUSY);
 		buf_busycount++;
 
@@ -4566,9 +4566,9 @@ bcleanbuf_thread(void)
 #endif
 
 		lck_mtx_unlock(&buf_mtx);
-		/*
-		 * do the IO
-		 */
+		  
+              
+     
 		error = bawrite_internal(bp, 0);
 
 		if (error) {
@@ -4580,7 +4580,7 @@ bcleanbuf_thread(void)
 			binstailfree(bp, &bufqueues[BQ_LAUNDRY], BQ_LAUNDRY);
 			blaundrycnt++;
 
-			/* we never leave a busy page on the laundry queue */
+			                                                     
 			CLR(bp->b_lflags, BL_BUSY);
 			buf_busycount--;
 #ifdef JOE_DEBUG
@@ -4591,15 +4591,15 @@ bcleanbuf_thread(void)
 			lck_mtx_unlock(&buf_mtx);
 
 			if (loopcnt > MAXLAUNDRY) {
-				/*
-				 * bawrite_internal() can return errors if we're throttled. If we've
-				 * done several I/Os and failed, give the system some time to unthrottle
-				 * the vnode
-				 */
+				  
+                                                                        
+                                                                            
+                
+       
 				(void)tsleep((void *)&bufqueues[BQ_LAUNDRY], PRIBIO, "blaundry", 1);
 				loopcnt = 0;
 			} else {
-				/* give other threads a chance to run */
+				                                        
 				(void)thread_block(THREAD_CONTINUE_NULL);
 				loopcnt++;
 			}
@@ -4625,11 +4625,11 @@ brecover_data(buf_t bp)
 
 	upl_flags = UPL_PRECIOUS;
 	if (!(buf_flags(bp) & B_READ)) {
-		/*
-		 * "write" operation:  let the UPL subsystem know
-		 * that we intend to modify the buffer cache pages we're
-		 * gathering.
-		 */
+		  
+                                                   
+                                                          
+               
+     
 		upl_flags |= UPL_WILL_MODIFY;
 	}
 
@@ -4725,15 +4725,15 @@ buffer_cache_gc(int all)
 	if (all) {
 		thresh_hold = 0;
 	}
-	/*
-	 * We only care about metadata (incore storage comes from zalloc()).
-	 * Unless "all" is set (used to evict meta data buffers in preparation
-	 * for deep sleep), we only evict up to BUF_MAX_GC_BATCH_SIZE buffers
-	 * that have not been accessed in the last BUF_STALE_THRESHOLD seconds.
-	 * BUF_MAX_GC_BATCH_SIZE controls both the hold time of the global lock
-	 * "buf_mtx" and the length of time we spend compute bound in the GC
-	 * thread which calls this function
-	 */
+	  
+                                                                     
+                                                                       
+                                                                      
+                                                                        
+                                                                        
+                                                                     
+                                    
+    
 	lck_mtx_lock(&buf_mtx);
 
 	do {
@@ -4745,7 +4745,7 @@ buffer_cache_gc(int all)
 		    (now > bp->b_timestamp) &&
 		    (now - bp->b_timestamp > thresh_hold) &&
 		    (found < BUF_MAX_GC_BATCH_SIZE)) {
-			/* Remove from free list */
+			                           
 			bremfree_locked(bp);
 			found++;
 
@@ -4754,7 +4754,7 @@ buffer_cache_gc(int all)
 			bp->b_tag   = 12;
 #endif
 
-			/* If dirty, move to laundry queue and remember to do wakeup */
+			                                                               
 			if (ISSET(bp->b_flags, B_DELWRI)) {
 				SET(bp->b_lflags, BL_WANTDEALLOC);
 
@@ -4764,16 +4764,16 @@ buffer_cache_gc(int all)
 				continue;
 			}
 
-			/*
-			 * Mark busy and put on private list.  We could technically get
-			 * away without setting BL_BUSY here.
-			 */
+			  
+                                                                  
+                                        
+      
 			SET(bp->b_lflags, BL_BUSY);
 			buf_busycount++;
 
-			/*
-			 * Remove from hash and dissociate from vp.
-			 */
+			  
+                                              
+      
 			bremhash(bp);
 			if (bp->b_vp) {
 				brelvp_locked(bp);
@@ -4786,31 +4786,31 @@ buffer_cache_gc(int all)
 			break;
 		}
 
-		/* Drop lock for batch processing */
+		                                    
 		lck_mtx_unlock(&buf_mtx);
 
-		/* Wakeup and yield for laundry if need be */
+		                                             
 		if (need_wakeup) {
 			wakeup(&bufqueues[BQ_LAUNDRY]);
 			(void)thread_block(THREAD_CONTINUE_NULL);
 		}
 
-		/* Clean up every buffer on private list */
+		                                           
 		TAILQ_FOREACH(bp, &privq, b_freelist) {
-			/* Take note if we've definitely freed at least a page to a zone */
+			                                                                   
 			if ((ISSET(bp->b_flags, B_ZALLOC)) && (buf_size(bp) >= PAGE_SIZE)) {
 				did_large_zfree = TRUE;
 			}
 
 			trace(TR_BRELSE, pack(bp->b_vp, bp->b_bufsize), bp->b_lblkno);
 
-			/* Free Storage */
+			                  
 			buf_free_meta_store(bp);
 
-			/* Release credentials */
+			                         
 			buf_release_credentials(bp);
 
-			/* Prepare for moving to empty queue */
+			                                       
 			CLR(bp->b_flags, (B_META | B_ZALLOC | B_DELWRI | B_LOCKED
 			    | B_AGE | B_ASYNC | B_NOCACHE | B_FUA));
 			bp->b_whichq = BQ_EMPTY;
@@ -4818,7 +4818,7 @@ buffer_cache_gc(int all)
 		}
 		lck_mtx_lock(&buf_mtx);
 
-		/* Back under lock, move them all to invalid hash and clear busy */
+		                                                                   
 		TAILQ_FOREACH(bp, &privq, b_freelist) {
 			binshash(bp, &invalhash);
 			CLR(bp->b_lflags, BL_BUSY);
@@ -4833,7 +4833,7 @@ buffer_cache_gc(int all)
 #endif
 		}
 
-		/* And do a big bulk move to the empty queue */
+		                                               
 		TAILQ_CONCAT(&bufqueues[BQ_EMPTY], &privq, b_freelist);
 	} while (all && (found == BUF_MAX_GC_BATCH_SIZE));
 
@@ -4845,9 +4845,9 @@ buffer_cache_gc(int all)
 }
 
 
-/*
- * disabled for now
- */
+  
+                   
+   
 
 #if FLUSH_QUEUES
 
@@ -4860,9 +4860,9 @@ bp_cmp(void *a, void *b)
 	    *bp_b = *(buf_t **)b;
 	daddr64_t res;
 
-	// don't have to worry about negative block
-	// numbers so this is ok to do.
-	//
+	                                           
+	                               
+	  
 	res = (bp_a->b_blkno - bp_b->b_blkno);
 
 	return (int)res;

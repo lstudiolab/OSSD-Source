@@ -33,7 +33,7 @@
 #include <libc.h>
 #include <libkern/OSKextLib.h>
 #include <System/libkern/OSKextLibPrivate.h>
-#endif /* KERNEL */
+#endif             
 
 #include <libkern/OSKextLibPrivate.h>
 
@@ -62,8 +62,8 @@ typedef enum {
 } OSKextVersionStage;
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static int
 __vers_isdigit(char c)
 {
@@ -73,8 +73,8 @@ __vers_isdigit(char c)
 	       c == '7' || c == '8' || c == '9';
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static int
 __vers_isspace(char c)
 {
@@ -84,8 +84,8 @@ __vers_isspace(char c)
 	       c == '\n';
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static int
 __vers_digit_for_char(char c)
 {
@@ -104,8 +104,8 @@ __vers_digit_for_char(char c)
 	}
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static int
 __VERS_isreleasestate(char c)
 {
@@ -113,8 +113,8 @@ __VERS_isreleasestate(char c)
 }
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static OSKextVersionStage
 __OSKextVersionStageForString(const char ** string_p)
 {
@@ -166,8 +166,8 @@ __OSKextVersionStageForString(const char ** string_p)
 	return kOSKextVersionStageInvalid;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static const char *
 __OSKextVersionStringForStage(OSKextVersion stage)
 {
@@ -183,8 +183,8 @@ __OSKextVersionStringForStage(OSKextVersion stage)
 	}
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSKextVersion
 OSKextParseVersionString(const char * versionString)
 {
@@ -204,9 +204,9 @@ OSKextParseVersionString(const char * versionString)
 
 	current_char_p = (const char *)&versionString[0];
 
-	/*****
-	 * Check for an initial digit of the major release number.
-	 */
+	      
+                                                           
+    
 	vers_major = __vers_digit_for_char(*current_char_p);
 	if (vers_major < 0) {
 		return -1;
@@ -215,9 +215,9 @@ OSKextParseVersionString(const char * versionString)
 	current_char_p++;
 	num_digits_scanned = 1;
 
-	/* Complete scan for major version number. Legal characters are
-	 * any digit, period, any buildstage letter.
-	 */
+	                                                               
+                                             
+    
 	while (num_digits_scanned < VERS_MAJOR_DIGITS) {
 		if (__vers_isspace(*current_char_p) || *current_char_p == '\0') {
 			vers_stage = kOSKextVersionStageRelease;
@@ -240,8 +240,8 @@ OSKextParseVersionString(const char * versionString)
 		}
 	}
 
-	/* Check for too many digits.
-	 */
+	                             
+    
 	if (num_digits_scanned == VERS_MAJOR_DIGITS) {
 		if (*current_char_p == '.') {
 			current_char_p++;
@@ -254,9 +254,9 @@ minor_version:
 
 	num_digits_scanned = 0;
 
-	/* Scan for minor version number. Legal characters are
-	 * any digit, period, any buildstage letter.
-	 */
+	                                                      
+                                             
+    
 	while (num_digits_scanned < VERS_MINOR_DIGITS) {
 		if (__vers_isspace(*current_char_p) || *current_char_p == '\0') {
 			vers_stage = kOSKextVersionStageRelease;
@@ -279,8 +279,8 @@ minor_version:
 		}
 	}
 
-	/* Check for too many digits.
-	 */
+	                             
+    
 	if (num_digits_scanned == VERS_MINOR_DIGITS) {
 		if (*current_char_p == '.') {
 			current_char_p++;
@@ -293,9 +293,9 @@ revision:
 
 	num_digits_scanned = 0;
 
-	/* Scan for revision version number. Legal characters are
-	 * any digit, any buildstage letter (NOT PERIOD).
-	 */
+	                                                         
+                                                  
+    
 	while (num_digits_scanned < VERS_REVISION_DIGITS) {
 		if (__vers_isspace(*current_char_p) || *current_char_p == '\0') {
 			vers_stage = kOSKextVersionStageRelease;
@@ -315,8 +315,8 @@ revision:
 		}
 	}
 
-	/* Check for too many digits.
-	 */
+	                             
+    
 	if (num_digits_scanned == VERS_REVISION_DIGITS) {
 		if (*current_char_p == '.') {
 			current_char_p++;
@@ -327,9 +327,9 @@ revision:
 
 release_state:
 
-	/*****
-	 * Check for the release state.
-	 */
+	      
+                                
+    
 	if (__vers_isspace(*current_char_p) || *current_char_p == '\0') {
 		vers_stage = kOSKextVersionStageRelease;
 		goto finish;
@@ -341,13 +341,13 @@ release_state:
 	}
 
 
-// stage level
+              
 
 	num_digits_scanned = 0;
 
-	/* Scan for stage level number. Legal characters are
-	 * any digit only.
-	 */
+	                                                    
+                   
+    
 	while (num_digits_scanned < VERS_STAGE_LEVEL_DIGITS) {
 		if (__vers_isspace(*current_char_p) || *current_char_p == '\0') {
 			if (num_digits_scanned) {
@@ -368,8 +368,8 @@ release_state:
 		}
 	}
 
-	/* Check for too many digits.
-	 */
+	                             
+    
 	if ((num_digits_scanned == VERS_STAGE_LEVEL_DIGITS) &&
 	    !(__vers_isspace(*current_char_p) || (*current_char_p == '\0'))) {
 		return -1;
@@ -394,9 +394,9 @@ finish:
 	return result;
 }
 
-/*********************************************************************
-* This function must be safe to call in panic context.
-*********************************************************************/
+                                                                      
+                                                      
+                                                                      
 Boolean
 OSKextVersionGetString(
 	OSKextVersion   aVersion,
@@ -409,11 +409,11 @@ OSKextVersionGetString(
 	OSKextVersion   vers_revision = 0;
 	OSKextVersion   vers_stage = 0;
 	OSKextVersion   vers_stage_level = 0;
-	const char    * stage_string = NULL;// don't free
+	const char    * stage_string = NULL;             
 
-	/* No buffer or length less than longest possible vers string,
-	 * return 0.
-	 */
+	                                                              
+             
+    
 	if (!buffer || bufferLength < kOSKextVersionMaxLength) {
 		return FALSE;
 	}
@@ -457,14 +457,14 @@ OSKextVersionGetString(
 
 	cpos = scnprintf(buffer, bufferLength, "%u", (uint32_t)vers_major);
 
-	/* Always include the minor version; it just looks weird without.
-	 */
+	                                                                 
+    
 	buffer[cpos] = '.';
 	cpos++;
 	cpos += scnprintf(buffer + cpos, bufferLength - cpos, "%u", (uint32_t)vers_minor);
 
-	/* The revision is displayed only if nonzero.
-	 */
+	                                             
+    
 	if (vers_revision) {
 		buffer[cpos] = '.';
 		cpos++;
@@ -489,8 +489,8 @@ OSKextVersionGetString(
 	return TRUE;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 #ifndef KERNEL
 OSKextVersion
 OSKextParseVersionCFString(CFStringRef versionString)

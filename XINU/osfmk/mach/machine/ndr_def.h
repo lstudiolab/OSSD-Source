@@ -37,4 +37,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACH_MACHINE_NDR_DEF_H */
+#endif                              

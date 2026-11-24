@@ -30,23 +30,23 @@ cleanup(void)
 	(void) rmdir(TEST_DIR);
 }
 
-/*
- * This unit-test validates the behavior of renamex_np() with RENAME_EXCL flag.
- * On either a case-insensitve/case-sensitive volume:
- * 1. rename from source to existing target should succeed when the change is
- *    only case-variant (for e.g rename_dir/file1 -> rename_dir/FILE1)
- * 2. rename from source to existing target should fail with EEXIST
- * 3. rename from source to existing target which is a hardlink of the source
- *    should fail with EEXIST
- *
- * On case-insensitive volume:
- * 1. rename from source to itself should succeed
- *    (rename_dir/file1 -> rename_dir/file1)
- *
- * On case-sensitive volume:
- * 1. rename from source to itself should fail with EEXIST
- *    (rename_dir/file1 -> rename_dir/file1)
- */
+  
+                                                                               
+                                                     
+                                                                             
+                                                                      
+                                                                   
+                                                                             
+                             
+  
+                              
+                                                 
+                                            
+  
+                            
+                                                          
+                                            
+   
 
 T_DECL(rename_excl_with_case_variant,
     "test renamex_np() with RENAME_EXCL flag for files with case variants")

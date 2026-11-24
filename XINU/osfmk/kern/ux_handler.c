@@ -50,21 +50,21 @@
 
 #include <libkern/section_keywords.h>
 
-/*
- * Mach kobject port to reflect Mach exceptions into Unix signals.
- *
- * This is the default Mach exception handler for initproc, which
- * then filters to all subprocesses as the host level exception handler for
- * most Mach exceptions.
- */
+  
+                                                                  
+  
+                                                                 
+                                                                           
+                        
+   
 
 static SECURITY_READ_ONLY_LATE(const void *)    ux_handler_kobject    = NULL;
 SECURITY_READ_ONLY_LATE(ipc_port_t)             ux_handler_port       = IP_NULL;
 
-/*
- * init is called early in Mach initialization
- * when we can initialize read-only memory
- */
+  
+                                              
+                                          
+   
 void
 ux_handler_init(void)
 {
@@ -72,11 +72,11 @@ ux_handler_init(void)
 	    IKOT_UX_HANDLER, IPC_KOBJECT_ALLOC_NONE);
 }
 
-/*
- * setup is called late in BSD initialization from initproc's context
- * so the MAC hook goo inside host_set_exception_ports will be able to
- * set up labels without falling over.
- */
+  
+                                                                     
+                                                                      
+                                      
+   
 void
 ux_handler_setup(void)
 {
@@ -88,11 +88,11 @@ ux_handler_setup(void)
 
 	kern_return_t kr = KERN_SUCCESS;
 
-	/*
-	 * Consumes 1 send right.
-	 *
-	 * Instruments uses the RPC_ALERT port, so don't register for that.
-	 */
+	  
+                          
+   
+                                                                    
+    
 	kr = host_set_exception_ports(host_priv_self(),
 	    EXC_MASK_ALL & ~(EXC_MASK_RPC_ALERT),
 	    ux_handler_send_right,
@@ -104,10 +104,10 @@ ux_handler_setup(void)
 	}
 }
 
-/*
- * Is this port the ux_handler?
- * If so, it's safe to send an exception without checking labels.
- */
+  
+                               
+                                                                 
+   
 boolean_t
 is_ux_handler_port(mach_port_t port)
 {
@@ -150,14 +150,14 @@ catch_mach_exception_raise(
 
 out:
 	if (kr == KERN_SUCCESS) {
-		/*
-		 * Following the MIG 'consume on success' protocol,
-		 * consume references to the port arguments.
-		 * (but NOT the exception_port, as the first argument is borrowed)
-		 *
-		 * If we return non-success, the kobject server will eat the port
-		 * references for us.
-		 */
+		  
+                                                     
+                                              
+                                                                    
+    
+                                                                   
+                       
+     
 
 		ipc_port_release_send(thread_port);
 		ipc_port_release_send(task_port);

@@ -70,4 +70,4 @@ typedef struct hslock hw_lock_data_t, *hw_lock_t;
 
 #define hw_lock_addr(hwl)       (&((hwl).lock_data))
 
-#endif  /* _ARM_HW_LOCK_TYPES_H_ */
+#endif                             

@@ -41,8 +41,8 @@ static void usage(void);
 static void printFormat(void);
 static char *convert_cfstring(CFStringRef the_string);
 
-/******************************************************************************
-******************************************************************************/
+                                                                               
+                                                                               
 static void
 usage(void)
 {
@@ -53,8 +53,8 @@ usage(void)
 	printFormat();
 }
 
-/******************************************************************************
-******************************************************************************/
+                                                                               
+                                                                               
 static void
 printFormat(void)
 {
@@ -71,8 +71,8 @@ printFormat(void)
 	    "\tCopyright © 1998,2000-2002,2004,2006-2008 Apple Inc. All rights reserved.\n");
 }
 
-/******************************************************************************
-******************************************************************************/
+                                                                               
+                                                                               
 char *
 convert_cfstring(CFStringRef the_string)
 {
@@ -96,7 +96,7 @@ convert_cfstring(CFStringRef the_string)
 		goto finish;
 	}
 
-	converted_len = strlen((const char *)data_bytes) + 1; // +1 for nul
+	converted_len = strlen((const char *)data_bytes) + 1;              
 	converted_string = malloc(converted_len);
 	if (!converted_string) {
 		fprintf(stderr, "Failed to allocate memory\n");
@@ -104,7 +104,7 @@ convert_cfstring(CFStringRef the_string)
 	}
 
 	bytes_copied = strlcpy(converted_string, (const char *) data_bytes,
-	    converted_len) + 1; // +1 for nul
+	    converted_len) + 1;              
 	if (bytes_copied != converted_len) {
 		fprintf(stderr, "Failed to copy converted string\n");
 		goto finish;
@@ -118,21 +118,21 @@ finish:
 	return result;
 }
 
-/******************************************************************************
-******************************************************************************/
+                                                                               
+                                                                               
 int
 main(int argc, const char *argv[])
 {
 	int result = 1;
 	boolean_t infoCopyrightIsValid = false;
 	boolean_t readableCopyrightIsValid = false;
-	CFURLRef anURL = NULL;                  // must release
-	CFBundleRef aBundle = NULL;             // must release
-	CFDictionaryRef aDict = NULL;           // do not release
-	CFStringRef infoCopyrightString = NULL; // do not release
-	CFStringRef readableCopyrightString = NULL; // do not release
-	char *infoStr = NULL;                   // must free
-	char *readableStr = NULL;               // must free
+	CFURLRef anURL = NULL;                                 
+	CFBundleRef aBundle = NULL;                            
+	CFDictionaryRef aDict = NULL;                            
+	CFStringRef infoCopyrightString = NULL;                  
+	CFStringRef readableCopyrightString = NULL;                  
+	char *infoStr = NULL;                               
+	char *readableStr = NULL;                           
 
 	gProgname = argv[0];
 
@@ -142,7 +142,7 @@ main(int argc, const char *argv[])
 	}
 
 	anURL = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
-	    (const UInt8 *) argv[1], strlen(argv[1]), /* isDirectory */ FALSE);
+	    (const UInt8 *) argv[1], strlen(argv[1]),                   FALSE);
 	if (!anURL) {
 		fprintf(stderr, "Can't create path from %s\n", argv[1]);
 		goto finish;

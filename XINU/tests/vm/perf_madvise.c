@@ -1,7 +1,7 @@
-/*
- * Madvise benchmark.
- * Currently only times various types of madvise frees.
- */
+  
+                     
+                                                       
+   
 
 #include <assert.h>
 #include <errno.h>
@@ -18,7 +18,7 @@ typedef enum test_variant {
 	VARIANT_MADVISE_FREE
 } test_variant_t;
 
-/* Arguments parsed from the command line */
+                                            
 typedef struct test_args {
 	uint64_t ta_duration_seconds;
 	uint64_t ta_size;
@@ -29,22 +29,22 @@ typedef struct test_args {
 static void print_help(char **argv);
 static void parse_arguments(int argc, char** argv, test_args_t *args);
 static double madvise_free_test(const test_args_t* args);
-/*
- * Allocate a buffer of the given size and fault in all of its pages.
- */
+  
+                                                                     
+   
 static void *allocate_and_init_buffer(uint64_t size);
-/*
- * Fault in the pages in the given buffer.
- */
+  
+                                          
+   
 static void fault_pages(unsigned char *buffer, size_t size, size_t stride);
-/*
- * Output the results of the test in pages / CPU second.
- */
+  
+                                                        
+   
 static void output_throughput(double throughput);
 
-/* Test Variants */
+                   
 static const char* kMadviseFreeArgument = "MADV_FREE";
-/* The VM page size */
+                      
 static size_t kPageSize = 0;
 static const clockid_t kThreadCPUTimeClock = CLOCK_THREAD_CPUTIME_ID;
 

@@ -245,10 +245,10 @@ lck_mtx_test_init(void)
 {
 	static int first = 0;
 
-	/*
-	 * This should be substituted with a version
-	 * of dispatch_once for kernel (rdar:39537874)
-	 */
+	  
+                                             
+                                               
+    
 	if (os_atomic_load(&first, acquire) >= 2) {
 		return;
 	}
@@ -389,7 +389,7 @@ lck_mtx_test_mtx_uncontended_loop_time(
 	uint64_t start;
 	uint64_t start_run;
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_lock(&test_mtx);
 		lck_mtx_unlock(&test_mtx);
@@ -406,7 +406,7 @@ lck_mtx_test_mtx_uncontended_loop_time(
 	absolutetime_to_nanoseconds(mach_absolute_time() - start, &tot_time[TEST_MTX_LOCK_STATS]);
 	absolutetime_to_nanoseconds(thread_get_runtime_self() - start_run, &run_time[TEST_MTX_LOCK_STATS]);
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_try_lock(&test_mtx);
 		lck_mtx_unlock(&test_mtx);
@@ -423,7 +423,7 @@ lck_mtx_test_mtx_uncontended_loop_time(
 	absolutetime_to_nanoseconds(mach_absolute_time() - start, &tot_time[TEST_MTX_TRY_LOCK_STATS]);
 	absolutetime_to_nanoseconds(thread_get_runtime_self() - start_run, &run_time[TEST_MTX_TRY_LOCK_STATS]);
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_lock_spin(&test_mtx);
 		lck_mtx_unlock(&test_mtx);
@@ -440,7 +440,7 @@ lck_mtx_test_mtx_uncontended_loop_time(
 	absolutetime_to_nanoseconds(mach_absolute_time() - start, &tot_time[TEST_MTX_LOCK_SPIN_STATS]);
 	absolutetime_to_nanoseconds(thread_get_runtime_self() - start_run, &run_time[TEST_MTX_LOCK_SPIN_STATS]);
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_lock_spin_always(&test_mtx);
 		lck_mtx_unlock(&test_mtx);
@@ -457,7 +457,7 @@ lck_mtx_test_mtx_uncontended_loop_time(
 	absolutetime_to_nanoseconds(mach_absolute_time() - start, &tot_time[TEST_MTX_LOCK_SPIN_ALWAYS_STATS]);
 	absolutetime_to_nanoseconds(thread_get_runtime_self() - start_run, &run_time[TEST_MTX_LOCK_SPIN_ALWAYS_STATS]);
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_try_lock_spin(&test_mtx);
 		lck_mtx_unlock(&test_mtx);
@@ -474,7 +474,7 @@ lck_mtx_test_mtx_uncontended_loop_time(
 	absolutetime_to_nanoseconds(mach_absolute_time() - start, &tot_time[TEST_MTX_TRY_LOCK_SPIN_STATS]);
 	absolutetime_to_nanoseconds(thread_get_runtime_self() - start_run, &run_time[TEST_MTX_TRY_LOCK_SPIN_STATS]);
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_try_lock_spin_always(&test_mtx);
 		lck_mtx_unlock(&test_mtx);
@@ -523,7 +523,7 @@ lck_mtx_test_mtx_lock_uncontended(
 
 	disable_all_test_mtx_stats();
 
-	//warming up the test for lock
+	                              
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_lock();
 		lck_mtx_test_unlock_mtx();
@@ -538,7 +538,7 @@ lck_mtx_test_mtx_lock_uncontended(
 
 	disable_all_test_mtx_stats();
 
-	//warming up the test for try_lock
+	                                  
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_try_lock();
 		lck_mtx_test_unlock_mtx();
@@ -562,7 +562,7 @@ lck_mtx_test_mtx_spin_uncontended(
 
 	disable_all_test_mtx_stats();
 
-	//warming up the test for lock_spin
+	                                   
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_lock_spin();
 		lck_mtx_test_unlock_spin();
@@ -577,7 +577,7 @@ lck_mtx_test_mtx_spin_uncontended(
 
 	disable_all_test_mtx_stats();
 
-	//warming up the test for try_lock_spin
+	                                       
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_try_lock_spin();
 		lck_mtx_test_unlock_spin();
@@ -592,7 +592,7 @@ lck_mtx_test_mtx_spin_uncontended(
 
 	disable_all_test_mtx_stats();
 
-	//warming up the test for lock_spin_always
+	                                          
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_lock_spin_always();
 		lck_mtx_test_unlock_spin();
@@ -607,7 +607,7 @@ lck_mtx_test_mtx_spin_uncontended(
 
 	disable_all_test_mtx_stats();
 
-	//warming up the test for try_lock_spin_always
+	                                              
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_try_lock_spin_always();
 		lck_mtx_test_unlock_spin();
@@ -683,7 +683,7 @@ test_mtx_lock_unlock_contended_thread(
 		;
 	}
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_test_lock();
 		int prev = os_atomic_load(other_locked, relaxed);
@@ -717,16 +717,16 @@ test_mtx_lock_unlock_contended_thread(
 		;
 	}
 
-	//erase statistics
+	                  
 	if (val == 1) {
 		erase_all_test_mtx_stats();
 	}
 
 	*my_locked = 0;
-	/*
-	 * synch the threads so they start
-	 * concurrently.
-	 */
+	  
+                                   
+                 
+    
 	os_atomic_inc(&synch, relaxed);
 	while (os_atomic_load(&synch, relaxed) < 6) {
 		;
@@ -801,13 +801,13 @@ lck_mtx_test_mtx_contended(
 		return 0;
 	}
 
-	/* this are t1 args */
+	                      
 	targs[0].my_locked = 0;
 	targs[0].other_locked = &targs[1].my_locked;
 
 	os_atomic_xchg(&targs[0].other_thread, thread2, release);
 
-	/* this are t2 args */
+	                      
 	targs[1].my_locked = 0;
 	targs[1].other_locked = &targs[0].my_locked;
 
@@ -860,7 +860,7 @@ test_mtx_lck_unlock_contended_loop_time_thread(
 		;
 	}
 
-	//warming up the test
+	                     
 	for (i = 0; i < WARMUP_ITER; i++) {
 		lck_mtx_lock(&test_mtx);
 
@@ -898,10 +898,10 @@ test_mtx_lck_unlock_contended_loop_time_thread(
 
 	*my_locked = 0;
 
-	/*
-	 * synch the threads so they start
-	 * concurrently.
-	 */
+	  
+                                   
+                 
+    
 	os_atomic_inc(&synch, relaxed);
 	while (os_atomic_load(&synch, relaxed) < 6) {
 		;
@@ -986,7 +986,7 @@ lck_mtx_test_mtx_contended_loop_time(
 		return 0;
 	}
 
-	/* this are t1 args */
+	                      
 	targs[0].my_locked = 0;
 	targs[0].other_locked = &targs[1].my_locked;
 	targs[0].type = type;
@@ -994,7 +994,7 @@ lck_mtx_test_mtx_contended_loop_time(
 
 	os_atomic_xchg(&targs[0].other_thread, thread2, release);
 
-	/* this are t2 args */
+	                      
 	targs[1].my_locked = 0;
 	targs[1].other_locked = &targs[0].my_locked;
 

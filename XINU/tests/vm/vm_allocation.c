@@ -1,29 +1,29 @@
-/* Mach virtual memory unit tests
- *
- * The main goal of this code is to facilitate the construction,
- * running, result logging and clean up of a test suite, taking care
- * of all the scaffolding. A test suite is a sequence of very targeted
- * unit tests, each running as a separate process to isolate its
- * address space.
- * A unit test is abstracted as a unit_test_t structure, consisting of
- * a test function and a logging identifier. A test suite is a suite_t
- * structure, consisting of an unit_test_t array, fixture set up and
- * tear down functions.
- * Test suites are created dynamically. Each of its unit test runs in
- * its own fork()d process, with the fixture set up and tear down
- * running before and after each test. The parent process will log a
- * pass result if the child exits normally, and a fail result in any
- * other case (non-zero exit status, abnormal signal). The suite
- * results are then aggregated and logged after the [SUMMARY] keyword,
- * and finally the test suite is destroyed.
- * The included test suites cover the Mach memory allocators,
- * mach_vm_allocate() and mach_vm_map() with various options, and
- * mach_vm_deallocate(), mach_vm_read(), mach_vm_write(),
- * mach_vm_protect(), mach_vm_copy().
- *
- * Author: Renaud Dreyer (rdreyer@apple.com)
- *
- * Transformed to libdarwintest by Tristan Ye (tristan_ye@apple.com) */
+                                 
+  
+                                                                
+                                                                    
+                                                                      
+                                                                
+                 
+                                                                      
+                                                                      
+                                                                    
+                       
+                                                                     
+                                                                 
+                                                                    
+                                                                    
+                                                                
+                                                                      
+                                           
+                                                             
+                                                                 
+                                                         
+                                     
+  
+                                            
+  
+                                                                       
 
 #include <darwintest.h>
 
@@ -43,28 +43,28 @@
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.vm"));
 
-/**************************/
-/**************************/
-/* Unit Testing Framework */
-/**************************/
-/**************************/
+                            
+                            
+                            
+                            
+                            
 
-/*********************/
-/* Private interface */
-/*********************/
+                       
+                       
+                       
 
 static const char frameworkname[] = "vm_unitester";
 
-/* Type for test, fixture set up and fixture tear down functions. */
+                                                                    
 typedef void (*test_fn_t)();
 
-/* Unit test structure. */
+                          
 typedef struct {
 	const char * name;
 	test_fn_t test;
 } unit_test_t;
 
-/* Test suite structure. */
+                           
 typedef struct {
 	const char * name;
 	int numoftests;
@@ -141,8 +141,8 @@ log_test_result(unit_test_t * unit_test, boolean_t test_passed, unsigned test_nu
 	logr("[%s] #%04d: %s\n", test_passed ? "PASS" : "FAIL", test_num, unit_test->name);
 }
 
-/* Run a test with fixture set up and teardown, while enforcing the
- * time out constraint. */
+                                                                   
+                          
 static void
 run_test(suite_t * suite, unit_test_t * unit_test, unsigned test_num)
 {
@@ -153,7 +153,7 @@ run_test(suite_t * suite, unit_test_t * unit_test, unsigned test_num)
 	suite->tear_down();
 }
 
-/* Check a child return status. */
+                                  
 static boolean_t
 child_terminated_normally(int child_status)
 {
@@ -187,7 +187,7 @@ child_terminated_normally(int child_status)
 	return normal_exit;
 }
 
-/* Run a test in its own process, and report the result. */
+                                                           
 static boolean_t
 child_test_passed(suite_t * suite, unit_test_t * unit_test)
 {
@@ -210,7 +210,7 @@ child_test_passed(suite_t * suite, unit_test_t * unit_test)
 	return test_result;
 }
 
-/* Run each test in a suite, and report the results. */
+                                                       
 static int
 count_passed_suite_tests(suite_t * suite)
 {
@@ -223,13 +223,13 @@ count_passed_suite_tests(suite_t * suite)
 	return passed_tests;
 }
 
-/********************/
-/* Public interface */
-/********************/
+                      
+                      
+                      
 
-#define DEFAULT_QUIETNESS    0 /* verbose */
-#define RESULT_ERR_QUIETNESS 1 /* result and error */
-#define ERROR_ONLY_QUIETNESS 2 /* error only */
+#define DEFAULT_QUIETNESS    0              
+#define RESULT_ERR_QUIETNESS 1                       
+#define ERROR_ONLY_QUIETNESS 2                 
 
 #define run_suite(set_up, tests, tear_down, ...) \
 	_run_suite((sizeof(tests) / sizeof(tests[0])), (set_up), (tests), (tear_down), __VA_ARGS__)
@@ -255,11 +255,11 @@ _run_suite(int numoftests, test_fn_t set_up, UnitTests tests, test_fn_t tear_dow
 	destroy_suite(suite);
 }
 
-/* Setters and getters for various test framework global
- * variables. Should only be used outside of the test, set up and tear
- * down functions. */
+                                                        
+                                                                      
+                     
 
-/* Expected signal for a test, default is 0. */
+                                               
 void
 set_expected_signal(int signal)
 {
@@ -272,7 +272,7 @@ get_expected_signal()
 	return _expected_signal;
 }
 
-/* Logging verbosity. */
+                        
 void
 set_quietness(int value)
 {
@@ -285,7 +285,7 @@ get_quietness()
 	return _quietness;
 }
 
-/* For fixture set up and tear down functions, and units tests. */
+                                                                  
 void
 do_nothing()
 {
@@ -304,17 +304,17 @@ log_aggregated_results()
 	    results.passed_tests, results.numoftests);
 }
 
-/*******************************/
-/*******************************/
-/* Virtual memory unit testing */
-/*******************************/
-/*******************************/
+                                 
+                                 
+                                 
+                                 
+                                 
 
-/* Test exit values:
- * 0: pass
- * 1: fail, generic unexpected failure
- * 2: fail, unexpected Mach return value
- * 3: fail, time out */
+                    
+          
+                                      
+                                        
+                       
 
 #define DEFAULT_VM_SIZE ((mach_vm_size_t)(1024ULL * 4096ULL))
 
@@ -325,11 +325,11 @@ static int vm_address_size = sizeof(mach_vm_address_t);
 
 static char *progname = "";
 
-/*************************/
-/* xnu version functions */
-/*************************/
+                           
+                           
+                           
 
-/* Find the xnu version string. */
+                                  
 char *
 xnu_version_string()
 {
@@ -357,7 +357,7 @@ xnu_version_string()
 	return xnu_string;
 }
 
-/* Find the xnu major version number. */
+                                        
 unsigned int
 xnu_major_version()
 {
@@ -372,9 +372,9 @@ xnu_major_version()
 	return xnu_version;
 }
 
-/*************************/
-/* Mach assert functions */
-/*************************/
+                           
+                           
+                           
 
 static inline void
 assert_mach_return(kern_return_t kr, kern_return_t expected_kr, const char * mach_routine)
@@ -386,26 +386,26 @@ assert_mach_return(kern_return_t kr, kern_return_t expected_kr, const char * mac
 	    mach_error_string(expected_kr));
 }
 
-/*******************************/
-/* Arrays for test suite loops */
-/*******************************/
+                                 
+                                 
+                                 
 
-/* Memory allocators */
+                       
 typedef kern_return_t (*allocate_fn_t)(vm_map_t, mach_vm_address_t *, mach_vm_size_t, int);
 
 
-/*
- * Remember any pre-reserved fixed address, which needs to be released prior to an allocation.
- */
+  
+                                                                                              
+   
 static mach_vm_address_t fixed_vm_address = 0x0;
 static mach_vm_size_t fixed_vm_size = 0;
 
-/* forward decl */
+                  
 void assert_deallocate_success(mach_vm_address_t address, mach_vm_size_t size);
 
-/*
- * If trying to allocate at a fixed address, we need to do the delayed deallocate first.
- */
+  
+                                                                                        
+   
 static void
 check_fixed_address(mach_vm_address_t *address, mach_vm_size_t size)
 {
@@ -433,7 +433,7 @@ wrapper_mach_vm_map(vm_map_t map, mach_vm_address_t * address, mach_vm_size_t si
 	           VM_PROT_DEFAULT, VM_PROT_ALL, VM_INHERIT_DEFAULT);
 }
 
-/* Should have the same behavior as when mask is zero. */
+                                                         
 kern_return_t
 wrapper_mach_vm_map_4kB(vm_map_t map, mach_vm_address_t * address, mach_vm_size_t size, int flags)
 {
@@ -499,7 +499,7 @@ static int numofallocators = sizeof(allocators) / sizeof(allocators[0]);
 static int allocators_idx;
 enum { MACH_VM_ALLOCATE, MACH_VM_MAP, MACH_VM_MAP_4kB, MACH_VM_MAP_2MB, MACH_VM_MAP_NAMED_ENTRY };
 
-/* VM size */
+             
 static struct {
 	mach_vm_size_t size;
 	const char * description;
@@ -516,7 +516,7 @@ static int sizes_idx;
 static int buffer_sizes_idx;
 enum { DEFAULT_INPUT, ZERO_BYTES, ONE_PAGE, ONE_BYTE, ONE_PAGE_MINUS_ONE_BYTE, ONE_PAGE_AND_ONE_BYTE };
 
-/* Unspecified/fixed address */
+                               
 static struct {
 	int flag;
 	const char * description;
@@ -527,7 +527,7 @@ static int numofflags = sizeof(address_flags) / sizeof(address_flags[0]);
 static int flags_idx;
 enum { ANYWHERE, FIXED };
 
-/* Address alignment */
+                       
 static struct {
 	boolean_t alignment;
 	const char * description;
@@ -538,7 +538,7 @@ static int numofalignments = sizeof(address_alignments) / sizeof(*address_alignm
 static int alignments_idx;
 enum { ALIGNED, UNALIGNED };
 
-/* Buffer offset */
+                   
 static struct {
 	int offset;
 	const char * description;
@@ -549,7 +549,7 @@ static int numofoffsets = sizeof(buffer_offsets) / sizeof(buffer_offsets[0]);
 static int offsets_idx;
 enum { ZERO, ONE, TWO };
 
-/* mach_vm_copy() post actions */
+                                 
 enum { VMCOPY_MODIFY_SRC, VMCOPY_MODIFY_DST, VMCOPY_MODIFY_SHARED_COPIED };
 
 static struct {
@@ -565,23 +565,23 @@ static struct {
 static int numofvmcopyactions = sizeof(vmcopy_actions) / sizeof(vmcopy_actions[0]);
 static int vmcopy_action_idx;
 
-/************************************/
-/* Setters and getters for fixtures */
-/************************************/
+                                      
+                                      
+                                      
 
-/* Allocation memory range. */
+                              
 static allocate_fn_t _allocator      = wrapper_mach_vm_allocate;
 static mach_vm_size_t _vm_size       = DEFAULT_VM_SIZE;
 static int _address_flag             = VM_FLAGS_ANYWHERE;
 static boolean_t _address_alignment  = TRUE;
 static mach_vm_address_t _vm_address = 0x0;
 
-/* Buffer for mach_vm_write(). */
+                                 
 static mach_vm_size_t _buffer_size       = DEFAULT_VM_SIZE;
 static mach_vm_address_t _buffer_address = 0x0;
 static int _buffer_offset                = 0;
 
-/* Post action for mach_vm_copy(). */
+                                     
 static int _vmcopy_post_action = VMCOPY_MODIFY_SRC;
 
 static void
@@ -692,9 +692,9 @@ get_vmcopy_post_action()
 	return _vmcopy_post_action;
 }
 
-/*******************************/
-/* Usage and option processing */
-/*******************************/
+                                 
+                                 
+                                 
 static boolean_t flag_run_allocate_test = FALSE;
 static boolean_t flag_run_deallocate_test = FALSE;
 static boolean_t flag_run_read_test = FALSE;
@@ -796,11 +796,11 @@ process_options(test_option_t options)
 	}
 }
 
-/*****************/
-/* Various tools */
-/*****************/
+                   
+                   
+                   
 
-/* Find the allocator address alignment mask. */
+                                                
 mach_vm_address_t
 get_mask()
 {
@@ -814,19 +814,19 @@ get_mask()
 	return mask;
 }
 
-/* Find the size of the smallest aligned region containing a given
- * memory range. */
+                                                                  
+                   
 mach_vm_size_t
 aligned_size(mach_vm_address_t address, mach_vm_size_t size)
 {
 	return round_page_kernel(address - mach_vm_trunc_page(address) + size);
 }
 
-/********************/
-/* Assert functions */
-/********************/
+                      
+                      
+                      
 
-/* Address is aligned on allocator boundary. */
+                                               
 static inline void
 assert_aligned_address(mach_vm_address_t address)
 {
@@ -836,7 +836,7 @@ assert_aligned_address(mach_vm_address_t address)
 	    (uintmax_t)address);
 }
 
-/* Address is truncated to allocator boundary. */
+                                                 
 static inline void
 assert_trunc_address(mach_vm_address_t address, mach_vm_address_t trunc_address)
 {
@@ -849,9 +849,9 @@ assert_trunc_address(mach_vm_address_t address, mach_vm_address_t trunc_address)
 static inline void
 assert_address_value(mach_vm_address_t address, mach_vm_address_t marker)
 {
-	/* this assert is used so frequently so that we simply judge on
-	 * its own instead of leaving this to LD macro for efficiency
-	 */
+	                                                               
+                                                              
+    
 	if (MACH_VM_ADDRESS_T(address) != marker) {
 		T_ASSERT_FAIL("Address 0x%jx unexpectedly has value 0x%jx, "
 		    "instead of 0x%jx.", (uintmax_t)address,
@@ -940,15 +940,15 @@ assert_copy_success(mach_vm_address_t source, mach_vm_size_t size, mach_vm_addre
 	assert_copy_return(source, size, dest, KERN_SUCCESS);
 }
 
-/*******************/
-/* Memory patterns */
-/*******************/
+                     
+                     
+                     
 
 typedef boolean_t (*address_filter_t)(mach_vm_address_t);
 typedef void (*address_action_t)(mach_vm_address_t, mach_vm_address_t);
 
-/* Map over a memory region pattern and its complement, through a
- * (possibly reversed) boolean filter and a starting value. */
+                                                                 
+                                                              
 void
 filter_addresses_do_else(address_filter_t filter,
     boolean_t reversed,
@@ -968,7 +968,7 @@ filter_addresses_do_else(address_filter_t filter,
 	}
 }
 
-/* Various pattern actions. */
+                              
 void
 no_action(mach_vm_address_t i, mach_vm_address_t value)
 {
@@ -992,7 +992,7 @@ write_address(mach_vm_address_t i, mach_vm_address_t value)
 	MACH_VM_ADDRESS_T(i) = value;
 }
 
-/* Various patterns. */
+                       
 boolean_t
 empty(mach_vm_address_t i)
 {
@@ -1013,9 +1013,9 @@ page_ends(mach_vm_address_t i)
 	return residue == 0 || residue == vm_page_size - vm_address_size;
 }
 
-/*************************************/
-/* Global variables set up functions */
-/*************************************/
+                                       
+                                       
+                                       
 
 void
 set_up_allocator()
@@ -1024,29 +1024,29 @@ set_up_allocator()
 	set_allocator(allocators[allocators_idx].allocate);
 }
 
-/* Find a fixed allocatable address by retrieving the address
- * populated by mach_vm_allocate() with VM_FLAGS_ANYWHERE. */
+                                                             
+                                                             
 mach_vm_address_t
 get_fixed_address(mach_vm_size_t size)
 {
-	/* mach_vm_map() starts looking for an address at 0x0. */
+	                                                         
 	mach_vm_address_t address = 0x0;
 
-	/*
-	 * The tests seem to have some funky off by one allocations. To avoid problems, we'll bump anything
-	 * non-zero to have at least an extra couple pages.
-	 */
+	  
+                                                                                                    
+                                                    
+    
 	if (size != 0) {
 		size = round_page_kernel(size + 2 * vm_page_size);
 	}
 
 	assert_allocate_success(&address, size, VM_FLAGS_ANYWHERE);
 
-	/*
-	 * Keep the memory allocated, otherwise the logv()/printf() activity sprinkled in these tests can
-	 * cause malloc() to use the desired range and tests will randomly fail. The allocate routines will
-	 * do the delayed vm_deallocate() to free the fixed memory just before allocation testing in the wrapper.
-	 */
+	  
+                                                                                                  
+                                                                                                    
+                                                                                                          
+    
 	T_QUIET; T_ASSERT_EQ(fixed_vm_address, 0, "previous fixed address not used");
 	T_QUIET; T_ASSERT_EQ(fixed_vm_size, 0, "previous fixed size not used");
 	fixed_vm_address = address;
@@ -1056,8 +1056,8 @@ get_fixed_address(mach_vm_size_t size)
 	return address;
 }
 
-/* If needed, find an address at which a region of the specified size
- * can be allocated. Otherwise, set the address to 0x0. */
+                                                                     
+                                                          
 void
 set_up_vm_address(mach_vm_size_t size)
 {
@@ -1079,9 +1079,9 @@ set_up_vm_address(mach_vm_size_t size)
 		set_vm_address(address);
 		logv("Found %saligned fixed address 0x%jx.", aligned ? "" : "un", (uintmax_t)address);
 	} else {
-		/* mach_vm_map() with VM_FLAGS_ANYWHERE starts looking for
-		 *  an address at the one supplied and goes up, without
-		 *  wrapping around. */
+		                                                          
+                                                         
+                         
 		set_vm_address(0x0);
 	}
 }
@@ -1149,11 +1149,11 @@ set_up_copy_shared_mode_variables()
 	set_up_vmcopy_action();
 }
 
-/*******************************/
-/* Allocation set up functions */
-/*******************************/
+                                 
+                                 
+                                 
 
-/* Allocate VM region of given size. */
+                                       
 void
 allocate(mach_vm_size_t size)
 {
@@ -1170,8 +1170,8 @@ allocate(mach_vm_size_t size)
 		"Memory of rounded size 0x%jx (%ju) allocated at "
 		"address 0x%jx.",
 		(uintmax_t)round_page_kernel(size), (uintmax_t)round_page_kernel(size), (uintmax_t)address);
-	/* Fixed allocation address is truncated to the allocator
-	 *  boundary. */
+	                                                         
+                 
 	if (!(flag & VM_FLAGS_ANYWHERE)) {
 		mach_vm_address_t old_address = get_vm_address();
 		assert_trunc_address(old_address, address);
@@ -1203,9 +1203,9 @@ allocate_buffer(mach_vm_size_t buffer_size)
 	set_buffer_address(data);
 }
 
-/****************************************************/
-/* Global variables and allocation set up functions */
-/****************************************************/
+                                                      
+                                                      
+                                                      
 
 void
 set_up_vm_variables_and_allocate()
@@ -1225,14 +1225,14 @@ void
 set_up_vm_variables_and_allocate_extra_page()
 {
 	set_up_vm_size();
-	/* Increment the size to insure we get an extra allocated page
-	 *  for unaligned start addresses. */
+	                                                              
+                                      
 	mach_vm_size_t allocation_size = get_vm_size() + 1;
 	set_up_vm_address(allocation_size);
 
 	allocate(allocation_size);
-	/* In the fixed unaligned address case, restore the returned
-	*  (truncated) allocation address to its unaligned value. */
+	                                                            
+                                                             
 	if (!get_address_alignment()) {
 		set_vm_address(get_vm_address() + 1);
 	}
@@ -1242,13 +1242,13 @@ void
 set_up_buffer_variables_and_allocate_extra_page()
 {
 	set_up_buffer_variables();
-	/* Increment the size to insure we get an extra allocated page
-	 *  for unaligned start addresses. */
+	                                                              
+                                      
 	allocate_buffer(get_buffer_size() + get_buffer_offset());
 }
 
-/* Allocate some destination and buffer memory for subsequent
- * writing, including extra pages for non-aligned start addresses. */
+                                                             
+                                                                     
 void
 set_up_vm_and_buffer_variables_allocate_for_writing()
 {
@@ -1256,17 +1256,17 @@ set_up_vm_and_buffer_variables_allocate_for_writing()
 	set_up_buffer_variables_and_allocate_extra_page();
 }
 
-/* Allocate some destination and source regions for subsequent
- * copying, including extra pages for non-aligned start addresses. */
+                                                              
+                                                                     
 void
 set_up_vm_and_buffer_variables_allocate_for_copying()
 {
 	set_up_vm_and_buffer_variables_allocate_for_writing();
 }
 
-/************************************/
-/* Deallocation tear down functions */
-/************************************/
+                                      
+                                      
+                                      
 
 void
 deallocate_range(mach_vm_address_t address, mach_vm_size_t size)
@@ -1282,18 +1282,18 @@ deallocate()
 	deallocate_range(get_vm_address(), get_vm_size());
 }
 
-/* Deallocate source memory, including the extra page for unaligned
- * start addresses. */
+                                                                   
+                      
 void
 deallocate_extra_page()
 {
-	/* Set the address and size to their original allocation
-	 *  values. */
+	                                                        
+               
 	deallocate_range(mach_vm_trunc_page(get_vm_address()), get_vm_size() + 1);
 }
 
-/* Deallocate buffer and destination memory for mach_vm_write(),
- * including the extra page for unaligned start addresses. */
+                                                                
+                                                             
 void
 deallocate_vm_and_buffer()
 {
@@ -1301,12 +1301,12 @@ deallocate_vm_and_buffer()
 	deallocate_range(mach_vm_trunc_page(get_buffer_address()), get_buffer_size() + get_buffer_offset());
 }
 
-/***********************************/
-/* mach_vm_read() set up functions */
-/***********************************/
+                                     
+                                     
+                                     
 
-/* Read the source memory into a buffer, deallocate the source, set
- * the global address and size from the buffer's. */
+                                                                   
+                                                    
 void
 read_deallocate()
 {
@@ -1322,13 +1322,13 @@ read_deallocate()
 		"Memory of size 0x%jx (%ju) read into buffer of "
 		"address 0x%jx.",
 		(uintmax_t)read_size, (uintmax_t)read_size, (uintmax_t)read_address);
-	/* Deallocate the originally allocated memory, including the
-	 *  extra allocated page in
-	 *  set_up_vm_variables_and_allocate_extra_page(). */
+	                                                            
+                            
+                                                      
 	deallocate_range(mach_vm_trunc_page(address), size + 1);
 
-	/* Promoting to mach_vm types after checking for overflow, and
-	 *  setting the global address from the buffer's. */
+	                                                              
+                                                     
 	T_QUIET; T_ASSERT_EQ((mach_vm_address_t)read_address, read_address,
 	    "Address 0x%jx unexpectedly overflows to 0x%jx when cast "
 	    "as mach_vm_address_t type.",
@@ -1341,8 +1341,8 @@ read_deallocate()
 	set_vm_size((mach_vm_size_t)read_size);
 }
 
-/* Allocate some source memory, read it into a buffer, deallocate the
- * source, set the global address and size from the buffer's. */
+                                                                     
+                                                                
 void
 set_up_vm_variables_allocate_read_deallocate()
 {
@@ -1350,11 +1350,11 @@ set_up_vm_variables_allocate_read_deallocate()
 	read_deallocate();
 }
 
-/************************************/
-/* mach_vm_write() set up functions */
-/************************************/
+                                      
+                                      
+                                      
 
-/* Write the buffer into the destination memory. */
+                                                   
 void
 write_buffer()
 {
@@ -1370,8 +1370,8 @@ write_buffer()
 	logv("Buffer written.");
 }
 
-/* Allocate some destination and buffer memory, and write the buffer
- * into the destination memory. */
+                                                                    
+                                  
 void
 set_up_vm_and_buffer_variables_allocate_write()
 {
@@ -1379,9 +1379,9 @@ set_up_vm_and_buffer_variables_allocate_write()
 	write_buffer();
 }
 
-/***********************************/
-/* mach_vm_copy() set up functions */
-/***********************************/
+                                     
+                                     
+                                     
 
 void
 copy_deallocate(void)
@@ -1397,12 +1397,12 @@ copy_deallocate(void)
 		"Memory of size 0x%jx (%ju) copy into region of "
 		"address 0x%jx.",
 		(uintmax_t)size, (uintmax_t)size, (uintmax_t)dest);
-	/* Deallocate the originally allocated memory, including the
-	 *  extra allocated page in
-	 *  set_up_vm_variables_and_allocate_extra_page(). */
+	                                                            
+                            
+                                                      
 	deallocate_range(mach_vm_trunc_page(source), size + 1);
-	/* Promoting to mach_vm types after checking for overflow, and
-	 *  setting the global address from the buffer's. */
+	                                                              
+                                                     
 	T_QUIET; T_ASSERT_EQ((vm_offset_t)dest, dest,
 	    "Address 0x%jx unexpectedly overflows to 0x%jx when cast "
 	    "as mach_vm_address_t type.",
@@ -1411,7 +1411,7 @@ copy_deallocate(void)
 	set_vm_size(size);
 }
 
-/* Copy the source region into the destination region. */
+                                                         
 void
 copy_region()
 {
@@ -1427,8 +1427,8 @@ copy_region()
 	logv("Buffer written.");
 }
 
-/* Allocate some source memory, copy it to another region, deallocate the
-* source, set the global address and size from the designation region. */
+                                                                         
+                                                                         
 void
 set_up_vm_variables_allocate_copy_deallocate()
 {
@@ -1436,8 +1436,8 @@ set_up_vm_variables_allocate_copy_deallocate()
 	copy_deallocate();
 }
 
-/* Allocate some destination and source memory, and copy the source
- * into the destination memory. */
+                                                                   
+                                  
 void
 set_up_source_and_dest_variables_allocate_copy()
 {
@@ -1445,9 +1445,9 @@ set_up_source_and_dest_variables_allocate_copy()
 	copy_region();
 }
 
-/**************************************/
-/* mach_vm_protect() set up functions */
-/**************************************/
+                                        
+                                        
+                                        
 
 void
 set_up_vm_variables_allocate_protect(vm_prot_t protection, const char * protection_name)
@@ -1476,11 +1476,11 @@ set_up_vm_variables_allocate_writeprotect()
 	set_up_vm_variables_allocate_protect(VM_PROT_READ, "write");
 }
 
-/*****************/
-/* Address tests */
-/*****************/
+                   
+                   
+                   
 
-/* Allocated address is nonzero iff size is nonzero. */
+                                                       
 void
 test_nonzero_address_iff_nonzero_size()
 {
@@ -1492,7 +1492,7 @@ test_nonzero_address_iff_nonzero_size()
 	logv("Address 0x%jx is %szero as expected.", (uintmax_t)address, size ? "non" : "");
 }
 
-/* Allocated address is aligned. */
+                                   
 void
 test_aligned_address()
 {
@@ -1502,9 +1502,9 @@ test_aligned_address()
 	logv("Address 0x%jx is aligned.", (uintmax_t)address);
 }
 
-/************************/
-/* Read and write tests */
-/************************/
+                          
+                          
+                          
 
 void
 verify_pattern(
@@ -1543,8 +1543,8 @@ write_and_verify_pattern(
 	logv("Pattern written and verified.");
 }
 
-/* Verify that the smallest aligned region containing the
- * given range is zero-filled. */
+                                                         
+                                 
 void
 test_zero_filled()
 {
@@ -1582,12 +1582,12 @@ test_write_page_interiors()
 	write_and_verify_pattern(page_ends, TRUE, get_vm_address(), round_page_kernel(get_vm_size()), "page interiors");
 }
 
-/*********************************/
-/* Allocation error return tests */
-/*********************************/
+                                   
+                                   
+                                   
 
-/* Reallocating a page in the smallest aligned region containing the
- * given allocated range fails. */
+                                                                    
+                                  
 void
 test_reallocate_pages()
 {
@@ -1613,7 +1613,7 @@ test_reallocate_pages()
 	logv("Returned expected error at each page: %s.", mach_error_string(KERN_NO_SPACE));
 }
 
-/* Allocating in VM_MAP_NULL fails. */
+                                      
 void
 test_allocate_in_null_map()
 {
@@ -1630,7 +1630,7 @@ test_allocate_in_null_map()
 	logv("Returned expected error: %s.", mach_error_string(MACH_SEND_INVALID_DEST));
 }
 
-/* Allocating with non-user flags fails. */
+                                           
 void
 test_allocate_with_kernel_flags()
 {
@@ -1661,12 +1661,12 @@ test_allocate_with_kernel_flags()
 	logv("Returned expected error with each kernel flag: %s.", mach_error_string(KERN_INVALID_ARGUMENT));
 }
 
-/*****************************/
-/* mach_vm_map() error tests */
-/*****************************/
+                               
+                               
+                               
 
-/* mach_vm_map() fails with invalid protection or inheritance
- *  arguments. */
+                                                             
+                 
 void
 test_mach_vm_map_protection_inheritance_error()
 {
@@ -1695,7 +1695,7 @@ test_mach_vm_map_protection_inheritance_error()
 	for (i = 0; i < 4; i++) {
 		for (j = 0; j < 4; j++) {
 			for (k = 0; k < 3; k++) {
-				/* Skip the case with all valid arguments. */
+				                                             
 				if (i == (j == (k == 0))) {
 					continue;
 				}
@@ -1714,16 +1714,16 @@ test_mach_vm_map_protection_inheritance_error()
 	logv("Returned expected error in each case: %s.", mach_error_string(KERN_INVALID_ARGUMENT));
 }
 
-/* mach_vm_map() with unspecified address fails if the starting
- *  address overflows when rounded up to a boundary value. */
+                                                               
+                                                             
 void
 test_mach_vm_map_large_mask_overflow_error()
 {
 	mach_vm_address_t address = 0x1;
 	mach_vm_size_t size       = get_vm_size();
 	mach_vm_offset_t mask     = (mach_vm_offset_t)UINTMAX_MAX;
-	/* mach_vm_map() cannot allocate 0 bytes at an unspecified
-	 *  address, see 8003930. */
+	                                                          
+                             
 	kern_return_t kr_expected = size ? KERN_NO_SPACE : KERN_INVALID_ARGUMENT;
 
 	logv(
@@ -1736,9 +1736,9 @@ test_mach_vm_map_large_mask_overflow_error()
 	logv("Returned expected error: %s.", mach_error_string(kr_expected));
 }
 
-/************************/
-/* Size edge case tests */
-/************************/
+                          
+                          
+                          
 
 void
 allocate_edge_size(mach_vm_address_t * address, mach_vm_size_t size, kern_return_t expected_kr)
@@ -1752,8 +1752,8 @@ void
 test_allocate_zero_size()
 {
 	mach_vm_address_t address = 0x0;
-	/* mach_vm_map() cannot allocate 0 bytes at an unspecified
-	 *  address, see 8003930. Other allocators succeed. */
+	                                                          
+                                                       
 	kern_return_t kr_expected = (get_allocator() != wrapper_mach_vm_allocate) ? KERN_INVALID_ARGUMENT : KERN_SUCCESS;
 
 	allocate_edge_size(&address, 0, kr_expected);
@@ -1762,8 +1762,8 @@ test_allocate_zero_size()
 	}
 }
 
-/* Testing the allocation of the largest size that does not overflow
- * when rounded up to a page-aligned value. */
+                                                                    
+                                              
 void
 test_allocate_invalid_large_size()
 {
@@ -1772,8 +1772,8 @@ test_allocate_invalid_large_size()
 		mach_vm_address_t address = 0x0;
 		allocate_edge_size(&address, size, KERN_NO_SPACE);
 	} else {
-		/* Named entries cannot currently be bigger than 4 GB
-		 *  - 4 kb. */
+		                                                     
+                
 		mach_port_t object_handle = MACH_PORT_NULL;
 		logv("Creating named entry of 0x%jx (%ju) bytes...", (uintmax_t)size, (uintmax_t)size);
 		assert_mach_return(mach_make_memory_entry_64(mach_task_self(), &size, (memory_object_offset_t)0,
@@ -1783,8 +1783,8 @@ test_allocate_invalid_large_size()
 	}
 }
 
-/* A UINTMAX_MAX VM size will overflow to 0 when rounded up to a
- * page-aligned value. */
+                                                                
+                         
 void
 test_allocate_overflowing_size()
 {
@@ -1793,11 +1793,11 @@ test_allocate_overflowing_size()
 	allocate_edge_size(&address, (mach_vm_size_t)UINTMAX_MAX, KERN_INVALID_ARGUMENT);
 }
 
-/****************************/
-/* Address allocation tests */
-/****************************/
+                              
+                              
+                              
 
-/* Allocation at address zero fails iff size is nonzero. */
+                                                           
 void
 test_allocate_at_zero()
 {
@@ -1820,8 +1820,8 @@ test_allocate_at_zero()
 	}
 }
 
-/* Allocation at page-aligned but 2 MB boundary-unaligned address
- *  fails with KERN_NO_SPACE. */
+                                                                 
+                                
 void
 test_allocate_2MB_boundary_unaligned_page_aligned_address()
 {
@@ -1833,8 +1833,8 @@ test_allocate_2MB_boundary_unaligned_page_aligned_address()
 		"0x%jx.",
 		(uintmax_t)address);
 
-	/* mach_vm_allocate() cannot allocate 0 bytes, and fails with a
-	 *  fixed boundary-unaligned truncated address. */
+	                                                               
+                                                   
 	kern_return_t kr_expected = (!size && get_allocator() != wrapper_mach_vm_allocate)
 	    ? KERN_INVALID_ARGUMENT
 	    : (get_allocator() == wrapper_mach_vm_map_2MB) ? KERN_NO_SPACE : KERN_SUCCESS;
@@ -1847,13 +1847,13 @@ test_allocate_2MB_boundary_unaligned_page_aligned_address()
 	}
 }
 
-/* With VM_FLAGS_ANYWHERE set, mach_vm_allocate() starts looking for
- *  an allocation address at 0x0, while mach_vm_map() starts at the
- *  supplied address and does not wrap around. See 8016663. */
+                                                                    
+                                                                   
+                                                              
 void
 test_allocate_page_with_highest_address_hint()
 {
-	/* Highest valid page-aligned address. */
+	                                         
 	mach_vm_address_t address = (mach_vm_size_t)UINTMAX_MAX - vm_page_size + 1;
 
 	logv(
@@ -1861,20 +1861,20 @@ test_allocate_page_with_highest_address_hint()
 		"0x%jx...",
 		(uintmax_t)address);
 	if (get_allocator() == wrapper_mach_vm_allocate) {
-		/* mach_vm_allocate() starts from 0x0 and succeeds. */
+		                                                      
 		assert_allocate_success(&address, vm_page_size, VM_FLAGS_ANYWHERE);
 		logv("Memory allocated at address 0x%jx.", (uintmax_t)address);
 		assert_aligned_address(address);
 		deallocate_range(address, vm_page_size);
 	} else {
-		/* mach_vm_map() starts from the supplied address, and fails
-		 *  with KERN_NO_SPACE, see 8016663. */
+		                                                            
+                                         
 		assert_allocate_return(&address, vm_page_size, VM_FLAGS_ANYWHERE, KERN_NO_SPACE);
 		logv("Returned expected error: %s.", mach_error_string(KERN_NO_SPACE));
 	}
 }
 
-/* Allocators find an allocation address with a first fit strategy. */
+                                                                      
 void
 test_allocate_first_fit_pages()
 {
@@ -1915,14 +1915,14 @@ test_allocate_first_fit_pages()
 	deallocate_range(address2, vm_page_size);
 }
 
-/*******************************/
-/* Deallocation segfault tests */
-/*******************************/
+                                 
+                                 
+                                 
 
-/* mach_vm_deallocate() deallocates the smallest aligned region
- * (integral number of pages) containing the given range. */
+                                                               
+                                                            
 
-/* Addresses in deallocated range are inaccessible. */
+                                                      
 void
 access_deallocated_range_address(mach_vm_address_t address, const char * position)
 {
@@ -1934,30 +1934,30 @@ access_deallocated_range_address(mach_vm_address_t address, const char * positio
 	    (uintmax_t)bad_value, (uintmax_t)address);
 }
 
-/* Start of deallocated range is inaccessible. */
+                                                 
 void
 test_access_deallocated_range_start()
 {
 	access_deallocated_range_address(get_vm_address(), "start");
 }
 
-/* Middle of deallocated range is inaccessible. */
+                                                  
 void
 test_access_deallocated_range_middle()
 {
 	access_deallocated_range_address(get_vm_address() + (round_page_kernel(get_vm_size()) >> 1), "middle");
 }
 
-/* End of deallocated range is inaccessible. */
+                                               
 void
 test_access_deallocated_range_end()
 {
 	access_deallocated_range_address(round_page_kernel(get_vm_size()) - vm_address_size + get_vm_address(), "end");
 }
 
-/* Deallocating almost the whole address space causes a SIGSEGV or SIGBUS. We
- * deallocate the largest valid aligned size to avoid overflowing when
- * rounding up. */
+                                                                             
+                                                                      
+                  
 void
 test_deallocate_suicide()
 {
@@ -1972,11 +1972,11 @@ test_deallocate_suicide()
 	    (uintmax_t)address, (uintmax_t)size, (uintmax_t)size, mach_error_string(kr));
 }
 
-/***************************************/
-/* Deallocation and reallocation tests */
-/***************************************/
+                                         
+                                         
+                                         
 
-/* Deallocating memory twice succeeds. */
+                                         
 void
 test_deallocate_twice()
 {
@@ -1984,8 +1984,8 @@ test_deallocate_twice()
 	deallocate();
 }
 
-/* Deallocated and reallocated memory is zero-filled. Deallocated
- * memory is inaccessible since it can be reallocated. */
+                                                                 
+                                                         
 void
 test_write_pattern_deallocate_reallocate_zero_filled()
 {
@@ -2002,11 +2002,11 @@ test_write_pattern_deallocate_reallocate_zero_filled()
 	deallocate();
 }
 
-/********************************/
-/* Deallocation edge case tests */
-/********************************/
+                                  
+                                  
+                                  
 
-/* Zero size deallocation always succeeds. */
+                                             
 void
 test_deallocate_zero_size_ranges()
 {
@@ -2034,7 +2034,7 @@ test_deallocate_zero_size_ranges()
 	logv("Deallocations successful.");
 }
 
-/* Deallocation succeeds if the end of the range rounds to 0x0. */
+                                                                  
 void
 test_deallocate_rounded_zero_end_ranges()
 {
@@ -2071,7 +2071,7 @@ test_deallocate_rounded_zero_end_ranges()
 	logv("Deallocations successful.");
 }
 
-/* Deallocating a range wrapped around the address space fails. */
+                                                                  
 void
 test_deallocate_wrapped_around_ranges()
 {
@@ -2104,7 +2104,7 @@ test_deallocate_wrapped_around_ranges()
 	logv("Returned expected error on each range: %s.", mach_error_string(KERN_INVALID_ARGUMENT));
 }
 
-/* Deallocating in VM_MAP_NULL fails. */
+                                        
 void
 test_deallocate_in_null_map()
 {
@@ -2121,13 +2121,13 @@ test_deallocate_in_null_map()
 	logv("Returned expected error: %s.", mach_error_string(MACH_SEND_INVALID_DEST));
 }
 
-/*****************************/
-/* mach_vm_read() main tests */
-/*****************************/
+                               
+                               
+                               
 
-/* Read memory of size less than a page has aligned starting
- * address. Otherwise, the destination buffer's starting address has
- * the same boundary offset as the source region's. */
+                                                            
+                                                                    
+                                                      
 void
 test_read_address_offset()
 {
@@ -2150,7 +2150,7 @@ test_read_address_offset()
 	}
 }
 
-/* Reading from VM_MAP_NULL fails. */
+                                     
 void
 test_read_null_map()
 {
@@ -2168,7 +2168,7 @@ test_read_null_map()
 	logv("Returned expected error: %s.", mach_error_string(MACH_SEND_INVALID_DEST));
 }
 
-/* Reading partially deallocated memory fails. */
+                                                 
 void
 test_read_partially_deallocated_range()
 {
@@ -2188,7 +2188,7 @@ test_read_partially_deallocated_range()
 	logv("Returned expected error: %s.", mach_error_string(KERN_INVALID_ADDRESS));
 }
 
-/* Reading partially read-protected memory fails. */
+                                                    
 void
 test_read_partially_unreadable_range()
 {
@@ -2198,9 +2198,9 @@ test_read_partially_unreadable_range()
 	vm_offset_t read_address;
 	mach_msg_type_number_t read_size;
 
-	/*  For sizes < msg_ool_size_small, vm_map_copyin_common() uses
-	 *  vm_map_copyin_kernel_buffer() to read in the memory,
-	 *  returning different errors, see 8182239. */
+	                                                               
+                                                         
+                                                
 	kern_return_t kr_expected = (size < vm_page_size * 2) ? KERN_INVALID_ADDRESS : KERN_PROTECTION_FAILURE;
 
 	logv("Read-protecting a mid-range page at address 0x%jx...", (uintmax_t)mid_point);
@@ -2213,9 +2213,9 @@ test_read_partially_unreadable_range()
 	logv("Returned expected error: %s.", mach_error_string(kr_expected));
 }
 
-/**********************************/
-/* mach_vm_read() edge case tests */
-/**********************************/
+                                    
+                                    
+                                    
 
 void
 read_edge_size(mach_vm_size_t size, kern_return_t expected_kr)
@@ -2249,21 +2249,21 @@ read_edge_size(mach_vm_size_t size, kern_return_t expected_kr)
 		mach_error_string(expected_kr));
 }
 
-/* Reading 0 bytes always succeeds. */
+                                      
 void
 test_read_zero_size()
 {
 	read_edge_size(0, KERN_SUCCESS);
 }
 
-/* Reading 4GB or higher always fails. */
+                                         
 void
 test_read_invalid_large_size()
 {
 	read_edge_size((mach_vm_size_t)UINT_MAX + 1, KERN_INVALID_ARGUMENT);
 }
 
-/* Reading a range wrapped around the address space fails. */
+                                                             
 void
 test_read_wrapped_around_ranges()
 {
@@ -2298,12 +2298,12 @@ test_read_wrapped_around_ranges()
 	logv("Returned expected error on each range: %s.", mach_error_string(KERN_INVALID_ADDRESS));
 }
 
-/********************************/
-/* mach_vm_read() pattern tests */
-/********************************/
+                                  
+                                  
+                                  
 
-/* Write a pattern on pre-allocated memory, read into a buffer and
- * verify the pattern on the buffer. */
+                                                                  
+                                       
 void
 write_read_verify_pattern(address_filter_t filter, boolean_t reversed, const char * pattern_name)
 {
@@ -2311,7 +2311,7 @@ write_read_verify_pattern(address_filter_t filter, boolean_t reversed, const cha
 
 	write_pattern(filter, reversed, address, get_vm_size(), pattern_name);
 	read_deallocate();
-	/* Getting the address and size of the read buffer. */
+	                                                      
 	mach_vm_address_t read_address = get_vm_address();
 	mach_vm_size_t read_size = get_vm_size();
 	logv(
@@ -2340,11 +2340,11 @@ test_read_reverse_checkerboard()
 	write_read_verify_pattern(checkerboard, TRUE, "reverse checkerboard");
 }
 
-/***********************************/
-/* mach_vm_write() edge case tests */
-/***********************************/
+                                     
+                                     
+                                     
 
-/* Writing in VM_MAP_NULL fails. */
+                                   
 void
 test_write_null_map()
 {
@@ -2360,7 +2360,7 @@ test_write_null_map()
 	logv("Returned expected error: %s.", mach_error_string(MACH_SEND_INVALID_DEST));
 }
 
-/* Writing 0 bytes always succeeds. */
+                                      
 void
 test_write_zero_size()
 {
@@ -2368,11 +2368,11 @@ test_write_zero_size()
 	write_buffer();
 }
 
-/*****************************************/
-/* mach_vm_write() inaccessibility tests */
-/*****************************************/
+                                           
+                                           
+                                           
 
-/* Writing a partially deallocated buffer fails. */
+                                                   
 void
 test_write_partially_deallocated_buffer()
 {
@@ -2396,7 +2396,7 @@ test_write_partially_deallocated_buffer()
 	logv("Returned expected error: %s.", mach_error_string(MACH_SEND_INVALID_MEMORY));
 }
 
-/* Writing a partially read-protected buffer fails. */
+                                                      
 void
 test_write_partially_unreadable_buffer()
 {
@@ -2421,7 +2421,7 @@ test_write_partially_unreadable_buffer()
 	logv("Returned expected error: %s.", mach_error_string(MACH_SEND_INVALID_MEMORY));
 }
 
-/* Writing on partially deallocated memory fails. */
+                                                    
 void
 test_write_on_partially_deallocated_range()
 {
@@ -2445,7 +2445,7 @@ test_write_on_partially_deallocated_range()
 	logv("Returned expected error: %s.", mach_error_string(KERN_INVALID_ADDRESS));
 }
 
-/* Writing on partially unwritable memory fails. */
+                                                   
 void
 test_write_on_partially_unwritable_range()
 {
@@ -2454,10 +2454,10 @@ test_write_on_partially_unwritable_range()
 	vm_offset_t data                   = (vm_offset_t)get_buffer_address();
 	mach_msg_type_number_t buffer_size = (mach_msg_type_number_t)get_buffer_size();
 
-	/*  For sizes < msg_ool_size_small,
-	 *  vm_map_copy_overwrite_nested() uses
-	 *  vm_map_copyout_kernel_buffer() to read in the memory,
-	 *  returning different errors, see 8217123. */
+	                                   
+                                        
+                                                          
+                                                
 	kern_return_t kr_expected = (buffer_size < vm_page_size * 2) ? KERN_INVALID_ADDRESS : KERN_PROTECTION_FAILURE;
 
 	logv(
@@ -2475,12 +2475,12 @@ test_write_on_partially_unwritable_range()
 	logv("Returned expected error: %s.", mach_error_string(kr_expected));
 }
 
-/*********************************/
-/* mach_vm_write() pattern tests */
-/*********************************/
+                                   
+                                   
+                                   
 
-/* Verify that a zero-filled buffer and destination memory are still
- * zero-filled after writing. */
+                                                                    
+                                
 void
 test_zero_filled_write()
 {
@@ -2489,8 +2489,8 @@ test_zero_filled_write()
 	    round_page_kernel(get_buffer_size() + get_buffer_offset()), "zero-filled");
 }
 
-/* Write a pattern on a buffer, write the buffer into some destination
- * memory, and verify the pattern on both buffer and destination. */
+                                                                      
+                                                                    
 void
 pattern_write(address_filter_t filter, boolean_t reversed, const char * pattern_name)
 {
@@ -2528,11 +2528,11 @@ test_reverse_checkerboard_write()
 	pattern_write(checkerboard, TRUE, "reverse checkerboard");
 }
 
-/**********************************/
-/* mach_vm_copy() edge case tests */
-/**********************************/
+                                    
+                                    
+                                    
 
-/* Copying in VM_MAP_NULL fails. */
+                                   
 void
 test_copy_null_map()
 {
@@ -2585,21 +2585,21 @@ copy_edge_size(mach_vm_size_t size, kern_return_t expected_kr)
 	deallocate_range(dest, 4096);
 }
 
-/* Copying 0 bytes always succeeds. */
+                                      
 void
 test_copy_zero_size()
 {
 	copy_edge_size(0, KERN_SUCCESS);
 }
 
-/* Copying 4GB or higher always fails. */
+                                         
 void
 test_copy_invalid_large_size()
 {
 	copy_edge_size((mach_vm_size_t)UINT_MAX - 1, KERN_INVALID_ADDRESS);
 }
 
-/* Reading a range wrapped around the address space fails. */
+                                                             
 void
 test_copy_wrapped_around_ranges()
 {
@@ -2638,19 +2638,19 @@ test_copy_wrapped_around_ranges()
 	deallocate_range(dest, 4096);
 }
 
-/********************************/
-/* mach_vm_copy() pattern tests */
-/********************************/
+                                  
+                                  
+                                  
 
-/* Write a pattern on pre-allocated region, copy into another region
- * and verify the pattern in the region. */
+                                                                    
+                                           
 void
 write_copy_verify_pattern(address_filter_t filter, boolean_t reversed, const char * pattern_name)
 {
 	mach_vm_address_t source = get_vm_address();
 	mach_vm_size_t src_size = get_vm_size();
 	write_pattern(filter, reversed, source, src_size, pattern_name);
-	/* Getting the address and size of the dest region */
+	                                                     
 	mach_vm_address_t dest  = get_buffer_address();
 	mach_vm_size_t dst_size = get_buffer_size();
 
@@ -2685,8 +2685,8 @@ test_copy_reverse_checkerboard()
 	write_copy_verify_pattern(checkerboard, TRUE, "reverse checkerboard");
 }
 
-/* Verify that a zero-filled source and destination memory are still
- * zero-filled after writing. */
+                                                                    
+                                
 void
 test_zero_filled_copy_dest()
 {
@@ -2695,11 +2695,11 @@ test_zero_filled_copy_dest()
 	    round_page_kernel(get_buffer_size() + get_buffer_offset()), "zero-filled");
 }
 
-/****************************************/
-/* mach_vm_copy() inaccessibility tests */
-/****************************************/
+                                          
+                                          
+                                          
 
-/* Copying partially deallocated memory fails. */
+                                                 
 void
 test_copy_partially_deallocated_range()
 {
@@ -2722,7 +2722,7 @@ test_copy_partially_deallocated_range()
 	deallocate_range(dest, size);
 }
 
-/* Copy partially read-protected memory fails. */
+                                                 
 void
 test_copy_partially_unreadable_range()
 {
@@ -2731,9 +2731,9 @@ test_copy_partially_unreadable_range()
 	mach_vm_address_t mid_point = mach_vm_trunc_page(source + size / 2);
 	mach_vm_address_t dest      = 0;
 
-	/*  For sizes < 1 page, vm_map_copyin_common() uses
-	 *  vm_map_copyin_kernel_buffer() to read in the memory,
-	 *  returning different errors, see 8182239. */
+	                                                   
+                                                         
+                                                
 	kern_return_t kr_expected = (size < vm_page_size) ? KERN_INVALID_ADDRESS : KERN_PROTECTION_FAILURE;
 
 	logv("Read-protecting a mid-range page at address 0x%jx...", (uintmax_t)mid_point);
@@ -2748,7 +2748,7 @@ test_copy_partially_unreadable_range()
 	deallocate_range(dest, size);
 }
 
-/* Copying to a partially deallocated region fails. */
+                                                      
 void
 test_copy_dest_partially_deallocated_region()
 {
@@ -2774,10 +2774,10 @@ test_copy_dest_partially_deallocated_region()
 	logv(
 		"Bypassing partially deallocated region test "
 		"(See <rdar://problem/12190999>)");
-#endif /* __MAC_OX_X_VERSION_MIN_REQUIRED > 1080 */
+#endif                                             
 }
 
-/* Copying from a partially deallocated region fails. */
+                                                        
 void
 test_copy_source_partially_deallocated_region()
 {
@@ -2801,7 +2801,7 @@ test_copy_source_partially_deallocated_region()
 	logv("Returned expected error: %s.", mach_error_string(KERN_INVALID_ADDRESS));
 }
 
-/* Copying from a partially read-protected region fails. */
+                                                           
 void
 test_copy_source_partially_unreadable_region()
 {
@@ -2827,7 +2827,7 @@ test_copy_source_partially_unreadable_region()
 	logv("Returned expected error: %s.", mach_error_string(kr));
 }
 
-/* Copying to a partially write-protected region fails. */
+                                                          
 void
 test_copy_dest_partially_unwriteable_region()
 {
@@ -2859,10 +2859,10 @@ test_copy_dest_partially_unwriteable_region()
 	logv(
 		"Bypassing partially unwriteable region test "
 		"(See <rdar://problem/12190999>)");
-#endif /* __MAC_OX_X_VERSION_MIN_REQUIRED > 1080 */
+#endif                                             
 }
 
-/* Copying on partially deallocated memory fails. */
+                                                    
 void
 test_copy_source_on_partially_deallocated_range()
 {
@@ -2886,7 +2886,7 @@ test_copy_source_on_partially_deallocated_range()
 	logv("Returned expected error: %s.", mach_error_string(KERN_INVALID_ADDRESS));
 }
 
-/* Copying on partially deallocated memory fails. */
+                                                    
 void
 test_copy_dest_on_partially_deallocated_range()
 {
@@ -2910,7 +2910,7 @@ test_copy_dest_on_partially_deallocated_range()
 	logv("Returned expected error: %s.", mach_error_string(KERN_INVALID_ADDRESS));
 }
 
-/* Copying on partially unwritable memory fails. */
+                                                   
 void
 test_copy_dest_on_partially_unwritable_range()
 {
@@ -2919,10 +2919,10 @@ test_copy_dest_on_partially_unwritable_range()
 	mach_vm_address_t start     = mach_vm_trunc_page(dest);
 	mach_msg_type_number_t size = (mach_msg_type_number_t)get_buffer_size();
 
-	/*  For sizes < msg_ool_size_small,
-	 *  vm_map_copy_overwrite_nested() uses
-	 *  vm_map_copyout_kernel_buffer() to read in the memory,
-	 *  returning different errors, see 8217123. */
+	                                   
+                                        
+                                                          
+                                                
 	kern_return_t kr_expected = (size < vm_page_size * 2) ? KERN_INVALID_ADDRESS : KERN_PROTECTION_FAILURE;
 
 	logv(
@@ -2940,7 +2940,7 @@ test_copy_dest_on_partially_unwritable_range()
 	logv("Returned expected error: %s.", mach_error_string(kr_expected));
 }
 
-/* Copying on partially unreadable memory fails. */
+                                                   
 void
 test_copy_source_on_partially_unreadable_range()
 {
@@ -2949,10 +2949,10 @@ test_copy_source_on_partially_unreadable_range()
 	mach_vm_address_t start     = mach_vm_trunc_page(source);
 	mach_msg_type_number_t size = (mach_msg_type_number_t)get_buffer_size();
 
-	/*  For sizes < msg_ool_size_small,
-	 *  vm_map_copy_overwrite_nested() uses
-	 *  vm_map_copyout_kernel_buffer() to read in the memory,
-	 *  returning different errors, see 8217123. */
+	                                   
+                                        
+                                                          
+                                                
 	kern_return_t kr_expected = (size < vm_page_size * 2) ? KERN_INVALID_ADDRESS : KERN_PROTECTION_FAILURE;
 
 	logv(
@@ -2970,9 +2970,9 @@ test_copy_source_on_partially_unreadable_range()
 	logv("Returned expected error: %s.", mach_error_string(kr_expected));
 }
 
-/********************************/
-/* mach_vm_protect() main tests */
-/********************************/
+                                  
+                                  
+                                  
 
 void
 test_zero_filled_extended()
@@ -2980,8 +2980,8 @@ test_zero_filled_extended()
 	verify_pattern(empty, FALSE, mach_vm_trunc_page(get_vm_address()), round_page_kernel(get_vm_size() + 1), "zero-filled");
 }
 
-/* Allocated region is still zero-filled after read-protecting it and
- * then restoring read-access. */
+                                                                     
+                                 
 void
 test_zero_filled_readprotect()
 {
@@ -3039,14 +3039,14 @@ test_verify_writeprotection()
 	verify_protection(VM_PROT_WRITE, "write");
 }
 
-/******************************/
-/* Protection bus error tests */
-/******************************/
+                                
+                                
+                                
 
-/* mach_vm_protect() affects the smallest aligned region (integral
- * number of pages) containing the given range. */
+                                                                  
+                                                  
 
-/* Addresses in read-protected range are inaccessible. */
+                                                         
 void
 access_readprotected_range_address(mach_vm_address_t address, const char * position)
 {
@@ -3057,14 +3057,14 @@ access_readprotected_range_address(mach_vm_address_t address, const char * posit
 	    (uintmax_t)bad_value, (uintmax_t)address);
 }
 
-/* Start of read-protected range is inaccessible. */
+                                                    
 void
 test_access_readprotected_range_start()
 {
 	access_readprotected_range_address(mach_vm_trunc_page(get_vm_address()), "start");
 }
 
-/* Middle of read-protected range is inaccessible. */
+                                                     
 void
 test_access_readprotected_range_middle()
 {
@@ -3072,14 +3072,14 @@ test_access_readprotected_range_middle()
 	access_readprotected_range_address(mach_vm_trunc_page(address) + (aligned_size(address, get_vm_size()) >> 1), "middle");
 }
 
-/* End of read-protected range is inaccessible. */
+                                                  
 void
 test_access_readprotected_range_end()
 {
 	access_readprotected_range_address(round_page_kernel(get_vm_address() + get_vm_size()) - vm_address_size, "end");
 }
 
-/* Addresses in write-protected range are unwritable. */
+                                                        
 void
 write_writeprotected_range_address(mach_vm_address_t address, const char * position)
 {
@@ -3090,14 +3090,14 @@ write_writeprotected_range_address(mach_vm_address_t address, const char * posit
 	    (uintmax_t)address);
 }
 
-/* Start of write-protected range is unwritable. */
+                                                   
 void
 test_write_writeprotected_range_start()
 {
 	write_writeprotected_range_address(mach_vm_trunc_page(get_vm_address()), "start");
 }
 
-/* Middle of write-protected range is unwritable. */
+                                                    
 void
 test_write_writeprotected_range_middle()
 {
@@ -3105,16 +3105,16 @@ test_write_writeprotected_range_middle()
 	write_writeprotected_range_address(mach_vm_trunc_page(address) + (aligned_size(address, get_vm_size()) >> 1), "middle");
 }
 
-/* End of write-protected range is unwritable. */
+                                                 
 void
 test_write_writeprotected_range_end()
 {
 	write_writeprotected_range_address(round_page_kernel(get_vm_address() + get_vm_size()) - vm_address_size, "end");
 }
 
-/*************************************/
-/* mach_vm_protect() edge case tests */
-/*************************************/
+                                       
+                                       
+                                       
 
 void
 protect_zero_size(vm_prot_t protection, const char * protection_name)
@@ -3156,7 +3156,7 @@ test_writeprotect_zero_size()
 	protect_zero_size(VM_PROT_WRITE, "Write");
 }
 
-/* Protecting a range wrapped around the address space fails. */
+                                                                
 void
 protect_wrapped_around_ranges(vm_prot_t protection, const char * protection_name)
 {
@@ -3202,11 +3202,11 @@ test_writeprotect_wrapped_around_ranges()
 	protect_wrapped_around_ranges(VM_PROT_WRITE, "Write");
 }
 
-/*******************/
-/* vm_copy() tests */
-/*******************/
+                     
+                     
+                     
 
-/* Verify the address space is being shared. */
+                                               
 void
 assert_share_mode(mach_vm_address_t address, unsigned share_mode, const char * share_mode_name)
 {
@@ -3215,10 +3215,10 @@ assert_share_mode(mach_vm_address_t address, unsigned share_mode, const char * s
 	mach_msg_type_number_t count = VM_REGION_EXTENDED_INFO_COUNT;
 	mach_port_t unused;
 
-/*
- * XXX Fails on UVM kernel.  See <rdar://problem/12164664>
- */
-#if notyet /* __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 */
+  
+                                                          
+   
+#if notyet                                             
 	logv(
 		"Verifying %s share mode on region of address 0x%jx and "
 		"size 0x%jx (%ju)...",
@@ -3233,10 +3233,10 @@ assert_share_mode(mach_vm_address_t address, unsigned share_mode, const char * s
 	logv("Region has a share mode of %s as expected.", share_mode_name);
 #else
 	logv("Bypassing share_mode verification (See <rdar://problem/12164664>)");
-#endif /* __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 */
+#endif                                             
 }
 
-/* Do the vm_copy() and verify its success. */
+                                              
 void
 assert_vmcopy_success(vm_address_t src, vm_address_t dst, const char * source_name)
 {
@@ -3270,14 +3270,14 @@ verify_region(mach_vm_address_t address, mach_vm_address_t start)
 	filter_addresses_do_else(empty, FALSE, address, size, verify_address, verify_address, start);
 }
 
-/* Perform the post vm_copy() action and verify its results. */
+                                                               
 void
 modify_one_and_verify_all_regions(vm_address_t src, vm_address_t dst, vm_address_t shared_copied, boolean_t shared)
 {
 	mach_vm_size_t size = get_vm_size();
 	int action          = get_vmcopy_post_action();
 
-	/* Do the post vm_copy() action. */
+	                                   
 	switch (action) {
 	case VMCOPY_MODIFY_SRC:
 		logv("Modifying: source%s...", shared ? " (shared with other region)" : "");
@@ -3290,7 +3290,7 @@ modify_one_and_verify_all_regions(vm_address_t src, vm_address_t dst, vm_address
 		break;
 
 	case VMCOPY_MODIFY_SHARED_COPIED:
-		/* If no shared_copied then no need to verify (nothing changed). */
+		                                                                   
 		if (!shared_copied) {
 			return;
 		}
@@ -3303,7 +3303,7 @@ modify_one_and_verify_all_regions(vm_address_t src, vm_address_t dst, vm_address
 	}
 	logv("Modification was successful as expected.");
 
-	/* Verify all the regions with what is expected. */
+	                                                   
 	logv("Verifying: source... ");
 	verify_region(src, (VMCOPY_MODIFY_SRC == action || (shared && VMCOPY_MODIFY_SHARED_COPIED == action)) ? 1 : 0);
 	logv("destination... ");
@@ -3315,7 +3315,7 @@ modify_one_and_verify_all_regions(vm_address_t src, vm_address_t dst, vm_address
 	logv("Verification was successful as expected.");
 }
 
-/* Test source being a simple fresh region. */
+                                              
 void
 test_vmcopy_fresh_source()
 {
@@ -3323,7 +3323,7 @@ test_vmcopy_fresh_source()
 	mach_vm_address_t src, dst;
 
 	if (get_vmcopy_post_action() == VMCOPY_MODIFY_SHARED_COPIED) {
-		/* No shared/copied region to modify so just return. */
+		                                                       
 		logv("No shared/copied region as expected.");
 		return;
 	}
@@ -3344,7 +3344,7 @@ test_vmcopy_fresh_source()
 	assert_deallocate_success(dst, size);
 }
 
-/* Test source copied from a shared region. */
+                                              
 void
 test_vmcopy_shared_source()
 {
@@ -3361,8 +3361,8 @@ test_vmcopy_shared_source()
 
 	pid = fork();
 	if (pid == 0) {
-		/* Verify that the child's 'src' is shared with the
-		 *  parent's src */
+		                                                   
+                     
 		assert_share_mode(src, SM_SHARED, "SM_SHARED");
 		assert_allocate_success(&dst, size, TRUE);
 		assert_vmcopy_success(src, dst, "shared");
@@ -3381,13 +3381,13 @@ test_vmcopy_shared_source()
 		assert_deallocate_success(dst, size);
 		exit(0);
 	} else if (pid > 0) {
-		/* In the parent the src becomes the shared */
+		                                              
 		shared = src;
 		wait(&status);
 		if (WEXITSTATUS(status) != 0) {
 			exit(status);
 		}
-		/* verify shared (shared with child's src) */
+		                                             
 		logv("Verifying: shared...");
 		verify_region(shared, (VMCOPY_MODIFY_SHARED_COPIED == action || VMCOPY_MODIFY_SRC == action) ? 1 : 0);
 		logv("Verification was successful as expected.");
@@ -3398,7 +3398,7 @@ test_vmcopy_shared_source()
 	assert_deallocate_success(src, size);
 }
 
-/* Test source copied from another mapping. */
+                                              
 void
 test_vmcopy_copied_from_source()
 {
@@ -3425,7 +3425,7 @@ test_vmcopy_copied_from_source()
 	assert_deallocate_success(copied, size);
 }
 
-/* Test source copied to another mapping. */
+                                            
 void
 test_vmcopy_copied_to_source()
 {
@@ -3452,7 +3452,7 @@ test_vmcopy_copied_to_source()
 	assert_deallocate_success(copied, size);
 }
 
-/* Test a truedshared source copied. */
+                                       
 void
 test_vmcopy_trueshared_source()
 {
@@ -3485,7 +3485,7 @@ test_vmcopy_trueshared_source()
 	assert_deallocate_success(shared, size);
 }
 
-/* Test a private aliazed source copied. */
+                                           
 void
 test_vmcopy_private_aliased_source()
 {
@@ -3514,16 +3514,16 @@ test_vmcopy_private_aliased_source()
 	assert_deallocate_success(shared, size);
 }
 
-/*************/
-/* VM Suites */
-/*************/
+               
+               
+               
 
 void
 run_allocate_test_suites()
 {
-	/* <rdar://problem/10304215> CoreOSZin 12Z30: VMUnitTest fails:
-	 * error finding xnu major version number. */
-	/* unsigned int xnu_version = xnu_major_version(); */
+	                                                               
+                                              
+	                                                     
 
 	UnitTests allocate_main_tests = {
 		{"Allocated address is nonzero iff size is nonzero", test_nonzero_address_iff_nonzero_size},
@@ -3563,17 +3563,17 @@ run_allocate_test_suites()
 		{"mach_vm_map() with large address mask", test_mach_vm_map_large_mask_overflow_error},
 	};
 
-	/* Run the test suites with various allocators and VM sizes, and
-	 *  unspecified or fixed (page-aligned or page-unaligned),
-	 *  addresses. */
+	                                                                
+                                                           
+                  
 	for (allocators_idx = 0; allocators_idx < numofallocators; allocators_idx++) {
 		for (sizes_idx = 0; sizes_idx < numofsizes; sizes_idx++) {
 			for (flags_idx = 0; flags_idx < numofflags; flags_idx++) {
 				for (alignments_idx = 0; alignments_idx < numofalignments; alignments_idx++) {
-					/* An allocated address will be page-aligned. */
-					/* Only run the zero size mach_vm_map() error tests in the
-					 *  unspecified address case, since we won't be able to retrieve a
-					 *  fixed address for allocation. See 8003930. */
+					                                                
+					                                                          
+                                                                       
+                                                      
 					if ((flags_idx == ANYWHERE && alignments_idx == UNALIGNED) ||
 					    (allocators_idx != MACH_VM_ALLOCATE && sizes_idx == ZERO_BYTES && flags_idx == FIXED)) {
 						continue;
@@ -3585,8 +3585,8 @@ run_allocate_test_suites()
 					    (flags_idx == ANYWHERE) ? "" : address_alignments[alignments_idx].description,
 					    vm_sizes[sizes_idx].description, (uintmax_t)vm_sizes[sizes_idx].size,
 					    (uintmax_t)vm_sizes[sizes_idx].size);
-					/* mach_vm_map() only protection and inheritance error
-					 *  tests. */
+					                                                      
+                  
 					if (allocators_idx != MACH_VM_ALLOCATE) {
 						run_suite(set_up_allocator_and_vm_variables, mach_vm_map_protection_inheritance_error_test, do_nothing,
 						    "%s protection and inheritance "
@@ -3597,7 +3597,7 @@ run_allocate_test_suites()
 						    vm_sizes[sizes_idx].description, (uintmax_t)vm_sizes[sizes_idx].size,
 						    (uintmax_t)vm_sizes[sizes_idx].size);
 					}
-					/* mach_vm_map() cannot allocate 0 bytes, see 8003930. */
+					                                                         
 					if (allocators_idx == MACH_VM_ALLOCATE || sizes_idx != ZERO_BYTES) {
 						run_suite(set_up_allocator_and_vm_variables_and_allocate, allocate_main_tests, deallocate,
 						    "%s main "
@@ -3618,18 +3618,18 @@ run_allocate_test_suites()
 		}
 		run_suite(set_up_allocator, allocate_fixed_size_tests, do_nothing, "%s fixed size allocation tests",
 		    allocators[allocators_idx].description);
-		/* <rdar://problem/10304215> CoreOSZin 12Z30: VMUnitTest fails:
-		 * error finding xnu major version number. */
-		/* mach_vm_map() with a named entry triggers a panic with this test
-		 *  unless under xnu-1598 or later, see 8048580. */
-		/* if (allocators_idx != MACH_VM_MAP_NAMED_ENTRY
-		|| xnu_version >= 1598) { */
+		                                                               
+                                               
+		                                                                   
+                                                     
+		                                                
+                              
 		if (allocators_idx != MACH_VM_MAP_NAMED_ENTRY) {
 			run_suite(set_up_allocator, allocate_invalid_large_size_test, do_nothing, "%s invalid large size allocation test",
 			    allocators[allocators_idx].description);
 		}
 	}
-	/* mach_vm_map() only large mask overflow tests. */
+	                                                   
 	for (sizes_idx = 0; sizes_idx < numofsizes; sizes_idx++) {
 		run_suite(set_up_vm_size, mach_vm_map_large_mask_overflow_error_test, do_nothing,
 		    "mach_vm_map() large mask overflow "
@@ -3665,21 +3665,21 @@ run_deallocate_test_suites()
 		{"Deallocate whole address space", test_deallocate_suicide},
 	};
 
-	/* All allocations done with mach_vm_allocate(). */
+	                                                   
 	set_allocator(wrapper_mach_vm_allocate);
 
-	/* Run the test suites with various VM sizes, and unspecified or
-	 *  fixed (page-aligned or page-unaligned), addresses. */
+	                                                                
+                                                          
 	for (sizes_idx = 0; sizes_idx < numofsizes; sizes_idx++) {
 		for (flags_idx = 0; flags_idx < numofflags; flags_idx++) {
 			for (alignments_idx = 0; alignments_idx < numofalignments; alignments_idx++) {
-				/* An allocated address will be page-aligned. */
+				                                                
 				if (flags_idx == ANYWHERE && alignments_idx == UNALIGNED) {
 					continue;
 				}
-				/* Accessing deallocated memory should cause a segmentation
-				 *  fault. */
-				/* Nothing gets deallocated if size is zero. */
+				                                                           
+                 
+				                                               
 				if (sizes_idx != ZERO_BYTES) {
 					set_expected_signal(SIGSEGV);
 					run_suite(set_up_vm_variables_and_allocate, access_deallocated_memory_tests, do_nothing,
@@ -3710,7 +3710,7 @@ run_deallocate_test_suites()
 	}
 	run_suite(do_nothing, deallocate_edge_case_tests, do_nothing, "Edge case deallocation tests");
 
-	set_expected_signal(-1);        /* SIGSEGV or SIGBUS */
+	set_expected_signal(-1);                               
 	run_suite(do_nothing, deallocate_suicide_test, do_nothing, "Whole address space deallocation test");
 	set_expected_signal(0);
 }
@@ -3742,15 +3742,15 @@ run_read_test_suites()
 		{"Read partially read-protected memory", test_read_partially_unreadable_range},
 	};
 
-	/* All allocations done with mach_vm_allocate(). */
+	                                                   
 	set_allocator(wrapper_mach_vm_allocate);
 
-	/* Run the test suites with various VM sizes, and unspecified or
-	 *  fixed (page-aligned or page-unaligned) addresses. */
+	                                                                
+                                                         
 	for (sizes_idx = 0; sizes_idx < numofsizes; sizes_idx++) {
 		for (flags_idx = 0; flags_idx < numofflags; flags_idx++) {
 			for (alignments_idx = 0; alignments_idx < numofalignments; alignments_idx++) {
-				/* An allocated address will be page-aligned. */
+				                                                
 				if (flags_idx == ANYWHERE && alignments_idx == UNALIGNED) {
 					continue;
 				}
@@ -3775,7 +3775,7 @@ run_read_test_suites()
 				    (flags_idx == ANYWHERE) ? "" : address_alignments[alignments_idx].description,
 				    vm_sizes[sizes_idx].description, (uintmax_t)vm_sizes[sizes_idx].size,
 				    (uintmax_t)vm_sizes[sizes_idx].size);
-				/* A zero size range is always accessible. */
+				                                             
 				if (sizes_idx != ZERO_BYTES) {
 					run_suite(set_up_vm_variables_and_allocate_extra_page, read_inaccessible_tests, deallocate_extra_page,
 					    "mach_vm_read() inaccessibility tests, %s%s "
@@ -3812,18 +3812,18 @@ run_write_test_suites()
 		{"Write on partially write-protected range", test_write_on_partially_unwritable_range},
 	};
 
-	/* All allocations done with mach_vm_allocate(). */
+	                                                   
 	set_allocator(wrapper_mach_vm_allocate);
 
-	/* Run the test suites with various destination sizes and
-	 *  unspecified or fixed (page-aligned or page-unaligned)
-	 *  addresses, and various buffer sizes and boundary offsets. */
+	                                                         
+                                                          
+                                                                 
 	for (sizes_idx = 0; sizes_idx < numofsizes; sizes_idx++) {
 		for (flags_idx = 0; flags_idx < numofflags; flags_idx++) {
 			for (alignments_idx = 0; alignments_idx < numofalignments; alignments_idx++) {
 				for (buffer_sizes_idx = 0; buffer_sizes_idx < numofsizes; buffer_sizes_idx++) {
 					for (offsets_idx = 0; offsets_idx < numofoffsets; offsets_idx++) {
-						/* An allocated address will be page-aligned. */
+						                                                
 						if ((flags_idx == ANYWHERE && alignments_idx == UNALIGNED)) {
 							continue;
 						}
@@ -3838,7 +3838,7 @@ run_write_test_suites()
 						    (uintmax_t)vm_sizes[sizes_idx].size, vm_sizes[buffer_sizes_idx].description,
 						    (uintmax_t)vm_sizes[buffer_sizes_idx].size, (uintmax_t)vm_sizes[buffer_sizes_idx].size,
 						    buffer_offsets[offsets_idx].offset);
-						/* A zero size buffer is always accessible. */
+						                                              
 						if (buffer_sizes_idx != ZERO_BYTES) {
 							run_suite(set_up_vm_and_buffer_variables_allocate_for_writing, write_inaccessible_tests,
 							    deallocate_vm_and_buffer,
@@ -3853,7 +3853,7 @@ run_write_test_suites()
 							    (uintmax_t)vm_sizes[buffer_sizes_idx].size, (uintmax_t)vm_sizes[buffer_sizes_idx].size,
 							    buffer_offsets[offsets_idx].offset);
 						}
-						/* The buffer cannot be larger than the destination. */
+						                                                       
 						if (vm_sizes[sizes_idx].size < vm_sizes[buffer_sizes_idx].size) {
 							continue;
 						}
@@ -3917,15 +3917,15 @@ run_protect_test_suites()
 		{"Write-protect wrapped around memory ranges", test_writeprotect_wrapped_around_ranges},
 	};
 
-	/* All allocations done with mach_vm_allocate(). */
+	                                                   
 	set_allocator(wrapper_mach_vm_allocate);
 
-	/* Run the test suites with various VM sizes, and unspecified or
-	 *  fixed (page-aligned or page-unaligned), addresses. */
+	                                                                
+                                                          
 	for (sizes_idx = 0; sizes_idx < numofsizes; sizes_idx++) {
 		for (flags_idx = 0; flags_idx < numofflags; flags_idx++) {
 			for (alignments_idx = 0; alignments_idx < numofalignments; alignments_idx++) {
-				/* An allocated address will be page-aligned. */
+				                                                
 				if (flags_idx == ANYWHERE && alignments_idx == UNALIGNED) {
 					continue;
 				}
@@ -3943,11 +3943,11 @@ run_protect_test_suites()
 				    (flags_idx == ANYWHERE) ? "" : address_alignments[alignments_idx].description,
 				    vm_sizes[sizes_idx].description, (uintmax_t)vm_sizes[sizes_idx].size,
 				    (uintmax_t)vm_sizes[sizes_idx].size);
-				/* Nothing gets protected if size is zero. */
+				                                             
 				if (sizes_idx != ZERO_BYTES) {
 					set_expected_signal(SIGBUS);
-					/* Accessing read-protected memory should cause a bus
-					 *  error. */
+					                                                     
+                  
 					run_suite(set_up_vm_variables_allocate_readprotect, access_readprotected_memory_tests, deallocate_extra_page,
 					    "Read-protected memory access tests, %s%s "
 					    "address, %s size: 0x%jx (%ju)",
@@ -3955,8 +3955,8 @@ run_protect_test_suites()
 					    (flags_idx == ANYWHERE) ? "" : address_alignments[alignments_idx].description,
 					    vm_sizes[sizes_idx].description, (uintmax_t)vm_sizes[sizes_idx].size,
 					    (uintmax_t)vm_sizes[sizes_idx].size);
-					/* Writing on write-protected memory should cause a bus
-					 *  error. */
+					                                                       
+                  
 					run_suite(set_up_vm_variables_allocate_writeprotect, write_writeprotected_memory_tests, deallocate_extra_page,
 					    "Write-protected memory writing tests, %s%s "
 					    "address, %s size: 0x%jx (%ju)",
@@ -3975,7 +3975,7 @@ run_protect_test_suites()
 void
 run_copy_test_suites()
 {
-	/* Copy tests */
+	                
 	UnitTests copy_main_tests = {
 		{"Copy and verify zero-filled memory", test_zero_filled_copy_dest},
 	};
@@ -3992,10 +3992,10 @@ run_copy_test_suites()
 	};
 	UnitTests copy_inaccessible_tests = {
 		{"Copy source partially decallocated region", test_copy_source_partially_deallocated_region},
-		/* XXX */
+		         
 		{"Copy destination partially decallocated region", test_copy_dest_partially_deallocated_region},
 		{"Copy source partially read-protected region", test_copy_source_partially_unreadable_region},
-		/* XXX */
+		         
 		{"Copy destination partially write-protected region", test_copy_dest_partially_unwriteable_region},
 		{"Copy source on partially deallocated range", test_copy_source_on_partially_deallocated_range},
 		{"Copy destination on partially deallocated range", test_copy_dest_on_partially_deallocated_range},
@@ -4012,13 +4012,13 @@ run_copy_test_suites()
 		{"Copy using a private aliased source", test_vmcopy_private_aliased_source},
 	};
 
-	/* All allocations done with mach_vm_allocate(). */
+	                                                   
 	set_allocator(wrapper_mach_vm_allocate);
 
-	/* All the tests are done with page size regions. */
+	                                                    
 	set_vm_size(vm_page_size);
 
-	/* Run the test suites with various shared modes for source */
+	                                                              
 	for (vmcopy_action_idx = 0; vmcopy_action_idx < numofvmcopyactions; vmcopy_action_idx++) {
 		run_suite(set_up_copy_shared_mode_variables, copy_shared_mode_tests, do_nothing, "Copy shared mode tests, %s",
 		    vmcopy_actions[vmcopy_action_idx].description);
@@ -4029,7 +4029,7 @@ run_copy_test_suites()
 			for (alignments_idx = 0; alignments_idx < numofalignments; alignments_idx++) {
 				for (buffer_sizes_idx = 0; buffer_sizes_idx < numofsizes; buffer_sizes_idx++) {
 					for (offsets_idx = 0; offsets_idx < numofoffsets; offsets_idx++) {
-						/* An allocated address will be page-aligned. */
+						                                                
 						if ((flags_idx == ANYWHERE && alignments_idx == UNALIGNED)) {
 							continue;
 						}
@@ -4044,12 +4044,12 @@ run_copy_test_suites()
 						    (uintmax_t)vm_sizes[sizes_idx].size, vm_sizes[buffer_sizes_idx].description,
 						    (uintmax_t)vm_sizes[buffer_sizes_idx].size, (uintmax_t)vm_sizes[buffer_sizes_idx].size,
 						    buffer_offsets[offsets_idx].offset);
-						/* The buffer cannot be larger than the destination. */
+						                                                       
 						if (vm_sizes[sizes_idx].size < vm_sizes[buffer_sizes_idx].size) {
 							continue;
 						}
 
-						/* A zero size buffer is always accessible. */
+						                                              
 						if (buffer_sizes_idx != ZERO_BYTES) {
 							run_suite(set_up_vm_and_buffer_variables_allocate_for_copying, copy_inaccessible_tests,
 							    deallocate_vm_and_buffer,
@@ -4096,9 +4096,9 @@ perform_test_with_options(test_option_t options)
 {
 	process_options(options);
 
-	/* <rdar://problem/10304215> CoreOSZin 12Z30: VMUnitTest fails:
-	 * error finding xnu major version number. */
-	/* printf("xnu version is %s.\n\n", xnu_version_string()); */
+	                                                               
+                                              
+	                                                             
 
 	if (flag_run_allocate_test) {
 		run_allocate_test_suites();

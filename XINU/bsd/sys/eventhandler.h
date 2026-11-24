@@ -76,8 +76,8 @@ struct eventhandler_lists_ctxt {
 };
 
 struct eventhandler_entry_arg {
-	uuid_t ee_fm_uuid;      /* Flow manager UUID */
-	uuid_t ee_fr_uuid;      /* Flow route UUID */
+	uuid_t ee_fm_uuid;                             
+	uuid_t ee_fr_uuid;                           
 };
 
 struct eventhandler_entry {
@@ -111,9 +111,9 @@ typedef struct eventhandler_entry       *eventhandler_tag;
 
 #define evhlog(x)       do { if (evh_debug >= 1) log x; } while (0)
 
-/*
- * Macro to invoke the handlers for a given event.
- */
+  
+                                                  
+   
 #define _EVENTHANDLER_INVOKE(name, list, ...) do {                      \
 	struct eventhandler_entry *_ep;                                 \
 	struct eventhandler_entry_ ## name *_t;                         \
@@ -142,13 +142,13 @@ typedef struct eventhandler_entry       *eventhandler_tag;
 	EHL_UNLOCK((list));                                             \
 } while (0)
 
-/*
- * Slow handlers are entirely dynamic; lists are created
- * when entries are added to them, and thus have no concept of "owner",
- *
- * Slow handlers need to be declared, but do not need to be defined. The
- * declaration must be in scope wherever the handler is to be invoked.
- */
+  
+                                                        
+                                                                       
+  
+                                                                        
+                                                                      
+   
 #define EVENTHANDLER_DECLARE(name, type)                                \
 struct eventhandler_entry_ ## name                                      \
 {                                                                       \
@@ -157,12 +157,12 @@ struct eventhandler_entry_ ## name                                      \
 };                                                                      \
 struct __hack
 
-/*
- * XXX EVENTHANDLER_DEFINE by itself doesn't do much on XNU
- * All it does is that it declares the static eventhandler_tag
- * and defines an init routine that still needs to called to put the
- * event and callback on the list.
- */
+  
+                                                           
+                                                              
+                                                                    
+                                  
+   
 #define EVENTHANDLER_DEFINE(evthdlr_ref, name, func, arg, priority)                     \
 	static eventhandler_tag name ## _tag;                           \
 	static void name ## _evh_init(void *ctx)                        \
@@ -205,9 +205,9 @@ void eventhandler_prune_list(struct eventhandler_list *list);
 void eventhandler_lists_ctxt_init(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt);
 void eventhandler_lists_ctxt_destroy(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt);
 
-/* Generic priority levels */
+                             
 #define EVENTHANDLER_PRI_FIRST  0
 #define EVENTHANDLER_PRI_ANY    10000
 #define EVENTHANDLER_PRI_LAST   20000
 
-#endif /* _SYS_EVENTHANDLER_H_ */
+#endif                           

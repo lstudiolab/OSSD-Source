@@ -158,8 +158,8 @@ void check_python(void *stackshot, const char *fmt, ...)
 }
 
 
-// waitinfo can be NULL, but len must be non-null and point to the length of the waitinfo array.
-// when the function returns, len will be set to the number of waitinfo structs found in the stackshot.
+                                                                                                
+                                                                                                       
 static void
 find_blocking_info(void * stackshot, struct stackshot_thread_waitinfo *waitinfo, int *len)
 {
@@ -204,7 +204,7 @@ find_blocking_info(void * stackshot, struct stackshot_thread_waitinfo *waitinfo,
 
 		parsed_waitinfo = parsed_container[@"task_snapshots"][@"thread_waitinfo"];
 		for (id elem in parsed_waitinfo) {
-			/* check to see that tid matches expected idle status */
+			                                                        
 			uint8_t type = [elem[@"wait_type"] unsignedCharValue];
 			if (type != kThreadWaitNone) {
 				if (waitinfo && *len < oldlen) {
@@ -221,12 +221,12 @@ find_blocking_info(void * stackshot, struct stackshot_thread_waitinfo *waitinfo,
 	}
 }
 
-/* perform various actions with a mutex in kernel memory. note that, since we aren't allowed
- * to go to user space while still holding a mutex, the lock-acquiring actions in this kernel
- * sysctl will either lock and immediately release the lock, or lock and wait until a semaphore
- * is signalled, then unlock. if called with CHECK_EXISTS, returns whether or not the sysctl
- * exist in the kernel (to determine if we're running with CONFIG_XNUPOST defined). Else,
- * returns 1. */
+                                                                                            
+                                                                                             
+                                                                                               
+                                                                                            
+                                                                                         
+                
 static int kmutex_action(int action)
 {
 	int ret = 0;
@@ -273,7 +273,7 @@ sysctl_kmutex_test_match(uint64_t context)
 			"Context should match unslid location of mutex in kernel memory");
 }
 
-/* We don't really care what goes into these messages, we're just sending something to a port. */
+                                                                                                 
 static void
 msg_send_helper(mach_port_t remote_port)
 {
@@ -328,12 +328,12 @@ msg_recv_helper(mach_port_t local_port)
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "Deallocating page %p", (void*)msg);
 }
 
-/* perform various actions with a rwlock in kernel memory. note that, since we aren't allowed
- * to go to user space while still holding a rwlock, the lock-acquiring actions in this kernel
- * sysctl will either lock and immediately release the lock, or lock and wait until a semaphore
- * is signalled, then unlock. if called with CHECK_EXISTS, returns whether or not the sysctl
- * exist in the kernel (to determine if we're running with CONFIG_XNUPOST defined). Else,
- * returns 1. */
+                                                                                             
+                                                                                              
+                                                                                               
+                                                                                            
+                                                                                         
+                
 static int
 krwlck_action(int action)
 {
@@ -385,7 +385,7 @@ sysctl_krwlck_test_match(uint64_t context)
 	T_EXPECT_EQ(context, unslid_krwlck_address, "Context should match unslid location of rwlock in kernel memory");
 }
 
-/* "Grabbing" threads: only purpose is to grab a sync primitive and hang. */
+                                                                            
 
 static void *
 kmutex_grabbing_thread(void * arg)
@@ -418,7 +418,7 @@ msg_blocking_thread(void * arg)
 	msg_recv_helper(send);
 
 	for (int i = 0; i < SENDS_TO_BLOCK; i++)
-		msg_send_helper(recv); // will block on send until message is received
+		msg_send_helper(recv);                                                
 	return NULL;
 }
 
@@ -431,7 +431,7 @@ ulock_blocking_thread(void * arg)
 	return NULL;
 }
 
-// acquires a kernel rwlock for writing, and then waits on a kernel semaphore.
+                                                                              
 static void *
 krwlck_write_waiting_thread(void * arg)
 {
@@ -440,7 +440,7 @@ krwlck_write_waiting_thread(void * arg)
 	return NULL;
 }
 
-// attempts to acquire a kernel rwlock for reading, and doesn't wait on a semaphore afterwards.
+                                                                                               
 static void *
 krwlck_read_grabbing_thread(void * arg)
 {
@@ -487,16 +487,16 @@ waitpid_blocking_thread(void * arg)
 	return NULL;
 }
 
-/*
- * Uses a debug sysctl to initialize a kernel mutex.
- *
- * The 'waiting' thread grabs this kernel mutex, and immediately waits on a kernel semaphore.
- * The 'grabbing' thread just attempts to lock the kernel mutex.
- * When the semaphore is signalled, the 'waiting' thread will unlock the kernel mutex,
- * giving the opportunity for the 'grabbing' thread to lock it and then immediately unlock it.
- * This allows us to create a situation in the kernel where we know a thread to be blocked
- * on a kernel mutex.
- */
+  
+                                                    
+  
+                                                                                             
+                                                                
+                                                                                      
+                                                                                              
+                                                                                          
+                     
+   
 static void
 test_kmutex_blocking(void)
 {
@@ -507,16 +507,16 @@ test_kmutex_blocking(void)
 	pthread_t grabbing, waiting;
 
 	T_LOG("Starting %s", __FUNCTION__);
-	ret = pthread_create(&waiting, NULL, kmutex_grab_and_wait_thread, NULL); // thread will block until we signal it
+	ret = pthread_create(&waiting, NULL, kmutex_grab_and_wait_thread, NULL);                                        
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Spawning grab and wait thread");
-	sleep(1); // give time for thread to block
-	ret = pthread_create(&grabbing, NULL, kmutex_grabbing_thread, NULL); // thread should immediately block
+	sleep(1);                                 
+	ret = pthread_create(&grabbing, NULL, kmutex_grabbing_thread, NULL);                                   
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Spawning waiting thread");
-	sleep(3); // give (lots of) time for thread to give up spinning on lock
+	sleep(3);                                                              
 
 	void * stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 
-	ret = pthread_threadid_np(waiting, &thread_id); // this is the thread that currently holds the kernel mutex
+	ret = pthread_threadid_np(waiting, &thread_id);                                                            
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Getting integer value of thread id");
 
 	check_python(stackshot, "thread \\d+: semaphore port \\w+ with unknown owner");
@@ -535,7 +535,7 @@ test_kmutex_blocking(void)
 		check_python(stackshot, "thread \\d+: kernel mutex %llx owned by thread %lld", curr->context, thread_id);
 	}
 
-	kmutex_action(KMUTEX_SYSCTL_SIGNAL); // waiting thread should now unblock.
+	kmutex_action(KMUTEX_SYSCTL_SIGNAL);                                      
 	ret = pthread_join(waiting, NULL);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Joining on waiting thread");
 	ret = pthread_join(grabbing, NULL);
@@ -544,7 +544,7 @@ test_kmutex_blocking(void)
 	stackshot_config_dealloc(stackshot);
 }
 
-/* Initialize a userspace semaphore, and spawn a thread to block on it. */
+                                                                          
 static void
 test_semaphore_blocking(void)
 {
@@ -558,10 +558,10 @@ test_semaphore_blocking(void)
 	ret = semaphore_create(mach_task_self(), &sem, SYNC_POLICY_FIFO, 0);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "Creating semaphore");
 	pthread_t tid;
-	ret = pthread_create(&tid, NULL, sem_grabbing_thread, (void*)&sem); // thread should immediately block
+	ret = pthread_create(&tid, NULL, sem_grabbing_thread, (void*)&sem);                                   
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating semaphore grabbing thread");
 
-	sleep(1); // give time for thread to block
+	sleep(1);                                 
 
 	void * stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 	find_blocking_info(stackshot, (struct stackshot_thread_waitinfo *)&waitinfo, &len);
@@ -582,7 +582,7 @@ test_semaphore_blocking(void)
 	stackshot_config_dealloc(stackshot);
 }
 
-/* Spawn a process to send a message to, and block while both sending and receiving in different contexts. */
+                                                                                                             
 static void
 test_mach_msg_blocking(void)
 {
@@ -602,10 +602,10 @@ test_mach_msg_blocking(void)
 	ret = mach_port_insert_right(mach_task_self(), recv, recv, MACH_MSG_TYPE_MAKE_SEND);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "Getting send right to recv port");
 
-	ret = pthread_create(&tid, NULL, msg_blocking_thread, (void*)&send); // thread should block on recv soon
+	ret = pthread_create(&tid, NULL, msg_blocking_thread, (void*)&send);                                    
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating message blocking thread");
 
-	sleep(1); // give time for thread to block
+	sleep(1);                                 
 	stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 	find_blocking_info(stackshot, (struct stackshot_thread_waitinfo *)&waitinfo, &len);
 
@@ -616,9 +616,9 @@ test_mach_msg_blocking(void)
 
 	stackshot_config_dealloc(stackshot);
 
-	msg_send_helper(send); // ping! msg_blocking_thread will now try to send us stuff, and block until we receive.
+	msg_send_helper(send);                                                                                        
 
-	sleep(1); // give time for thread to block
+	sleep(1);                                 
 	stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 	find_blocking_info(stackshot, (struct stackshot_thread_waitinfo *)&waitinfo, &len);
 	T_EXPECT_EQ(len, 1, "Only one blocking thread should exist");
@@ -628,7 +628,7 @@ test_mach_msg_blocking(void)
 
 	stackshot_config_dealloc(stackshot);
 
-	msg_recv_helper(recv); // thread should block until we receive one of its messages
+	msg_recv_helper(recv);                                                            
 	ret = pthread_join(tid, NULL);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Joining on blocking thread");
 }
@@ -649,7 +649,7 @@ test_ulock_blocking(void)
 	os_unfair_lock_lock(oul);
 	ret = pthread_create(&tid, NULL, ulock_blocking_thread, (void*)oul);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating ulock blocking thread");
-	sleep(3); // give time for thread to spawn, fall back to kernel for contention, and block
+	sleep(3);                                                                                
 
 	stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 
@@ -658,10 +658,10 @@ test_ulock_blocking(void)
 	T_EXPECT_EQ(waitinfo.wait_type, kThreadWaitUserLock, "Wait type should match expected UserLock value");
 
 	os_unfair_lock_unlock(oul);
-	ret = pthread_join(tid, NULL); // wait for thread to unblock and exit
+	ret = pthread_join(tid, NULL);                                       
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Joining on blocking thread");
 
-	ret = pthread_threadid_np(NULL, &thread_id); // this thread is the "owner" of the ulock
+	ret = pthread_threadid_np(NULL, &thread_id);                                           
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Getting integer value of thread id");
 	T_EXPECT_EQ(waitinfo.owner, thread_id, "Thread ID of blocking thread should match 'owner' field in stackshot");
 
@@ -681,14 +681,14 @@ test_krwlock_blocking(void)
 	struct stackshot_thread_waitinfo waitinfo[2] = { { 0 }, { 0 } };
 
 	T_LOG("Starting %s", __FUNCTION__);
-	// this thread should spawn, acquire a kernel rwlock for write, and then wait on a semaphore
+	                                                                                            
 	ret = pthread_create(&waiting, NULL, krwlck_write_waiting_thread, NULL);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating krwlck write waiting thread");
-	sleep(1); // give time for thread to block
-	// this thread should spawn and try to acquire the same kernel rwlock for read, but block
+	sleep(1);                                 
+	                                                                                         
 	ret = pthread_create(&grabbing, NULL, krwlck_read_grabbing_thread, NULL);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating krwlck read grabbing thread");
-	sleep(1); // give time for thread to block
+	sleep(1);                                 
 
 	stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 
@@ -706,16 +706,16 @@ test_krwlock_blocking(void)
 
 		check_python(stackshot, "thread \\d+: krwlock %llx for reading", curr->context);
 
-#if KRWLCK_STORES_EXCL_OWNER /* A future planned enhancement */
-		ret = pthread_threadid_np(waiting, &thread_id); // this is the thread that currently holds the kernel mutex
+#if KRWLCK_STORES_EXCL_OWNER                                   
+		ret = pthread_threadid_np(waiting, &thread_id);                                                            
 		T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Getting integer value of thread id");
 		T_EXPECT_EQ(curr->owner, thread_id, "Thread ID of blocking thread should match 'owner' field in stackshot");
 #else
-		(void)thread_id; // suppress compiler warning about unused variable
-#endif /* RWLCK_STORES_EXCL_OWNER */
+		(void)thread_id;                                                   
+#endif                              
 	}
 
-	krwlck_action(KRWLCK_SYSCTL_SIGNAL); // pthread should now unblock & finish
+	krwlck_action(KRWLCK_SYSCTL_SIGNAL);                                       
 	ret = pthread_join(waiting, NULL);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Joining on waiting thread");
 	ret = pthread_join(grabbing, NULL);
@@ -738,13 +738,13 @@ test_pthread_mutex_blocking(void)
 
 	T_LOG("Starting %s", __FUNCTION__);
 
-	ret = pthread_threadid_np(NULL, &thread_id); // this thread is the "owner" of the mutex
+	ret = pthread_threadid_np(NULL, &thread_id);                                           
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Getting integer value of thread id");
 
 	pthread_mutex_lock(&mtx);
 	ret = pthread_create(&tid, NULL, pthread_mutex_blocking_thread, (void*)&mtx);
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating pthread mutex blocking thread");
-	sleep(2); // give time for thread to block
+	sleep(2);                                 
 
 	stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 
@@ -757,7 +757,7 @@ test_pthread_mutex_blocking(void)
 	stackshot_config_dealloc(stackshot);
 
 	pthread_mutex_unlock(&mtx);
-	ret = pthread_join(tid, NULL); // wait for thread to unblock and exit
+	ret = pthread_join(tid, NULL);                                       
 
 
 	T_EXPECT_EQ(waitinfo.owner, thread_id,
@@ -793,7 +793,7 @@ test_pthread_rwlck_blocking(void)
 	stackshot_config_dealloc(stackshot);
 
 	pthread_rwlock_unlock(&rwlck);
-	ret = pthread_join(tid, NULL); // wait for thread to unblock and exit
+	ret = pthread_join(tid, NULL);                                       
 	T_EXPECT_EQ(waitinfo.context, (uint64_t)&rwlck,
 			"Userspace address of rwlck should match 'context' field in stackshot");
 }
@@ -826,7 +826,7 @@ test_pthread_cond_blocking(void)
 	stackshot_config_dealloc(stackshot);
 
 	pthread_cond_signal(&cond);
-	ret = pthread_join(tid, NULL); // wait for thread to unblock and exit
+	ret = pthread_join(tid, NULL);                                       
 	T_EXPECT_EQ(waitinfo.context, (uint64_t)&cond,
 			"Userspace address of condvar should match 'context' field in stackshot");
 	pthread_cond_destroy(&cond);
@@ -848,11 +848,11 @@ test_waitpid_blocking(void)
 	} else {
 		T_ASSERT_POSIX_SUCCESS(ret, "Running in parent. Child pid is %d", pid);
 
-		sleep(1); // allow enough time for child to run & sleep
+		sleep(1);                                              
 		ret = pthread_create(&tid, NULL, waitpid_blocking_thread, (void*)pid);
 		T_QUIET; T_ASSERT_POSIX_ZERO(ret, "Creating waitpid blocking thread");
 
-		sleep(1); // allow enough time for reaping thread to waitpid & block
+		sleep(1);                                                           
 		stackshot = take_stackshot(STACKSHOT_THREAD_WAITINFO, 0);
 		find_blocking_info(stackshot, (struct stackshot_thread_waitinfo *)&waitinfo, &len);
 		T_EXPECT_EQ(len, 1, "Only one blocking thread should exist");
@@ -865,24 +865,24 @@ test_waitpid_blocking(void)
 		T_EXPECT_EQ(waitinfo.owner, pid,
 			"Process ID of blocking process should match 'owner' field in stackshot");
 
-		ret = kill(pid, SIGUSR1); // wake up child so waitpid thread can reap it & exit
+		ret = kill(pid, SIGUSR1);                                                      
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "Send SIGUSR1 to child process");
 		ret = pthread_join(tid, NULL);
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "Join on waitpid thread");
 	}
 }
 
-/*
- *
- * Test declarations
- *
- */
+  
+  
+                    
+  
+   
 
 T_DECL(stackshot_block_owner_klocks, "tests stackshot block owner for kernel locks") {
-	/* check to see if kmutex sysctl exists before running kmutex test */
+	                                                                     
 	if (kmutex_action(KMUTEX_SYSCTL_CHECK_EXISTS))
 		test_kmutex_blocking();
-	/* check to see if krwlck sysctl exists before running krwlck test */
+	                                                                     
 	if (krwlck_action(KRWLCK_SYSCTL_CHECK_EXISTS))
 		test_krwlock_blocking();
 	test_ulock_blocking();

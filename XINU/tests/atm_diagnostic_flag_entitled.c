@@ -7,10 +7,10 @@
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.debugging"));
 
-/*
- * The low 8 bits may be in use, so modify one
- * of the upper 8 bits to ensure round-tripping.
- */
+  
+                                              
+                                                
+   
 #define LIBTRACE_PRIVATE_DATA  0x01000000
 
 static bool _needs_reset;

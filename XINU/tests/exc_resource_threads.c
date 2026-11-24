@@ -75,10 +75,10 @@ catch_mach_exception_raise_state_identity(mach_port_t exception_port,
 }
 
 
-/*
- * setup exception handling port for EXC_CORPSE_NOTIFY.
- * runs mach_msg_server once for receiving exception messages from kernel.
- */
+  
+                                                       
+                                                                          
+   
 static void *
 exc_handler(void * arg)
 {

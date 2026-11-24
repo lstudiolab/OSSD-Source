@@ -61,16 +61,16 @@
  *	@(#)dirent.h	8.3 (Berkeley) 8/10/94
  */
 
-/*
- * The dirent structure defines the format of directory entries.
- *
- * A directory entry has a struct dirent at the front of it, containing its
- * inode number, the length of the entry, and the length of the name
- * contained in the entry.  These are followed by the name padded to a 4
- * byte boundary with null bytes.  All names are guaranteed null terminated.
- * The maximum length of a name in a directory is MAXNAMLEN when 32-bit
- * ino_t is in effect; (MAXPATHLEN - 1) when 64-bit ino_t is in effect.
- */
+  
+                                                                
+  
+                                                                           
+                                                                    
+                                                                        
+                                                                            
+                                                                       
+                                                                       
+   
 
 #ifndef _SYS_DIRENT_H
 #define _SYS_DIRENT_H
@@ -87,43 +87,43 @@
 
 #if !__DARWIN_64_BIT_INO_T
 struct dirent {
-	ino_t d_ino;                    /* file number of entry */
-	__uint16_t d_reclen;            /* length of this record */
-	__uint8_t  d_type;              /* file type, see below */
-	__uint8_t  d_namlen;            /* length of string in d_name */
-	char d_name[__DARWIN_MAXNAMLEN + 1];    /* name must be no longer than this */
+	ino_t d_ino;                                              
+	__uint16_t d_reclen;                                       
+	__uint8_t  d_type;                                        
+	__uint8_t  d_namlen;                                            
+	char d_name[__DARWIN_MAXNAMLEN + 1];                                          
 };
-#endif /* !__DARWIN_64_BIT_INO_T */
+#endif                             
 
 #pragma pack()
 
 #define __DARWIN_MAXPATHLEN     1024
 
 #define __DARWIN_STRUCT_DIRENTRY { \
-	__uint64_t  d_ino;      /* file number of entry */ \
-	__uint64_t  d_seekoff;  /* seek offset (optional, used by servers) */ \
-	__uint16_t  d_reclen;   /* length of this record */ \
-	__uint16_t  d_namlen;   /* length of string in d_name */ \
-	__uint8_t   d_type;     /* file type, see below */ \
-	char      d_name[__DARWIN_MAXPATHLEN]; /* entry name (up to MAXPATHLEN bytes) */ \
+	__uint64_t  d_ino;                                 \
+	__uint64_t  d_seekoff;                                                \
+	__uint16_t  d_reclen;                               \
+	__uint16_t  d_namlen;                                    \
+	__uint8_t   d_type;                                \
+	char      d_name[__DARWIN_MAXPATHLEN];                                           \
 }
 
 #if __DARWIN_64_BIT_INO_T
 struct dirent __DARWIN_STRUCT_DIRENTRY;
-#endif /* __DARWIN_64_BIT_INO_T */
+#endif                            
 
 #ifdef KERNEL
-/* Extended directory entry */
+                              
 struct direntry __DARWIN_STRUCT_DIRENTRY;
 #endif
 
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-#define d_fileno        d_ino           /* backward compatibility */
+#define d_fileno        d_ino                                       
 #define MAXNAMLEN       __DARWIN_MAXNAMLEN
-/*
- * File types
- */
+  
+             
+   
 #define DT_UNKNOWN       0
 #define DT_FIFO          1
 #define DT_CHR           2
@@ -134,24 +134,24 @@ struct direntry __DARWIN_STRUCT_DIRENTRY;
 #define DT_SOCK         12
 #define DT_WHT          14
 
-/*
- * Convert between stat structure types and directory types.
- */
+  
+                                                            
+   
 #define IFTODT(mode)    (((mode) & 0170000) >> 12)
 #define DTTOIF(dirtype) ((dirtype) << 12)
 #endif
 
 #if PRIVATE
-/*
- * If a buffer at least this size is passed to __getdirentries64,
- * the the last 4 bytes will be the flags below.
- */
+  
+                                                                 
+                                                
+   
 #define GETDIRENTRIES64_EXTENDED_BUFSIZE  1024
 
 __options_decl(getdirentries64_flags_t, unsigned, {
-	/* the __getdirentries64 returned all entries */
+	                                                
 	GETDIRENTRIES64_EOF = 1U << 0,
 });
 #endif
 
-#endif /* _SYS_DIRENT_H  */
+#endif                     

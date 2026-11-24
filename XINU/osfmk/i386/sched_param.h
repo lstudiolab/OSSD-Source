@@ -54,14 +54,14 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- *	Scheduler parameters.
- */
+  
+                        
+   
 
 #ifndef _I386_SCHED_PARAM_H_
 #define _I386_SCHED_PARAM_H_
 
-#endif /* _I386_SCHED_PARAM_H_ */
+#endif                           

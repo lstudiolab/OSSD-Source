@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$KAME: ip_encap.h,v 1.6 2000/03/06 04:34:21 itojun Exp $	*/
+                                                              
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -63,14 +63,14 @@
 struct encaptab {
 	LIST_ENTRY(encaptab) chain;
 	int af;
-	int proto;                      /* -1: don't care, I'll check myself */
-	struct sockaddr_storage src;    /* my addr */
+	int proto;                                                             
+	struct sockaddr_storage src;                 
 	struct sockaddr_storage srcmask;
-	struct sockaddr_storage dst;    /* remote addr */
+	struct sockaddr_storage dst;                     
 	struct sockaddr_storage dstmask;
 	int (*func)(const struct mbuf *, int, int, void *);
-	const struct protosw *psw;      /* only pr_input will be used */
-	void *arg;                      /* passed via m->m_pkthdr.aux */
+	const struct protosw *psw;                                      
+	void *arg;                                                      
 };
 
 struct protosw;
@@ -92,5 +92,5 @@ int     encap_detach(const struct encaptab *);
 void    *encap_getarg(struct mbuf *);
 __END_DECLS
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /*_NETINET_IP_ENCAP_H_*/
+#endif                         
+#endif                         

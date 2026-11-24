@@ -86,39 +86,39 @@
 #include <nfs/rpcv2.h>
 #include <nfs/krpc.h>
 
-/*
- * Kernel support for Sun RPC
- *
- * Used currently for bootstrapping in nfs diskless configurations.
- *
- * Note: will not work on variable-sized rpc args/results.
- *       implicit size-limit of an mbuf.
- */
+  
+                             
+  
+                                                                   
+  
+                                                          
+                                        
+   
 
-/*
- * Generic RPC headers
- */
+  
+                      
+   
 
 struct auth_info {
-	u_int32_t       rp_atype;       /* auth type */
-	u_int32_t       rp_alen;        /* auth length */
+	u_int32_t       rp_atype;                      
+	u_int32_t       rp_alen;                         
 };
 
 struct rpc_call {
-	u_int32_t       rp_xid;         /* request transaction id */
-	int32_t         rp_direction;   /* call direction (0) */
-	u_int32_t       rp_rpcvers;     /* rpc version (2) */
-	u_int32_t       rp_prog;        /* program */
-	u_int32_t       rp_vers;        /* version */
-	u_int32_t       rp_proc;        /* procedure */
+	u_int32_t       rp_xid;                                     
+	int32_t         rp_direction;                           
+	u_int32_t       rp_rpcvers;                          
+	u_int32_t       rp_prog;                     
+	u_int32_t       rp_vers;                     
+	u_int32_t       rp_proc;                       
 	struct  auth_info rp_auth;
 	struct  auth_info rp_verf;
 };
 
 struct rpc_reply {
-	u_int32_t rp_xid;               /* request transaction id */
-	int32_t  rp_direction;          /* call direction (1) */
-	int32_t  rp_astatus;            /* accept status (0: accepted) */
+	u_int32_t rp_xid;                                           
+	int32_t  rp_direction;                                  
+	int32_t  rp_astatus;                                             
 	union {
 		u_int32_t rpu_errno;
 		struct {
@@ -128,38 +128,38 @@ struct rpc_reply {
 	} rp_u;
 };
 
-#define MIN_REPLY_HDR 16        /* xid, dir, astat, errno */
-#define REPLY_SIZE 24           /* xid, dir, astat, rpu_ok */
+#define MIN_REPLY_HDR 16                                    
+#define REPLY_SIZE 24                                        
 
-/*
- * What is the longest we will wait before re-sending a request?
- * Note this is also the frequency of "RPC timeout" messages.
- * The re-send loop count sup linearly to this maximum, so the
- * first complaint will happen after (1+2+3+4+5)=15 seconds.
- */
-#define MAX_RESEND_DELAY 5      /* seconds */
+  
+                                                                
+                                                             
+                                                              
+                                                            
+   
+#define MAX_RESEND_DELAY 5                   
 
-/* copied over from nfs_boot.c for printf format. could put in .h file... */
+                                                                            
 #define IP_FORMAT       "%d.%d.%d.%d"
 #define IP_CH(ip)       ((u_char *)ip)
 #define IP_LIST(ip)     IP_CH(ip)[0],IP_CH(ip)[1],IP_CH(ip)[2],IP_CH(ip)[3]
 
 
-/*
- * Call portmap to lookup a port number for a particular rpc program
- * Returns non-zero error on failure.
- */
+  
+                                                                    
+                                     
+   
 int
 krpc_portmap(
-	struct sockaddr_in *sin,        /* server address */
-	u_int prog, u_int vers, u_int proto,    /* host order */
-	u_int16_t *portp)               /* network order */
+	struct sockaddr_in *sin,                            
+	u_int prog, u_int vers, u_int proto,                    
+	u_int16_t *portp)                                  
 {
 	struct sdata {
-		u_int32_t prog;         /* call program */
-		u_int32_t vers;         /* call version */
-		u_int32_t proto;        /* call protocol */
-		u_int32_t port;         /* call port (unused) */
+		u_int32_t prog;                           
+		u_int32_t vers;                           
+		u_int32_t proto;                           
+		u_int32_t port;                                 
 	} *sdata;
 	struct rdata {
 		u_int16_t pad;
@@ -168,7 +168,7 @@ krpc_portmap(
 	mbuf_t m;
 	int error;
 
-	/* The portmapper port is fixed. */
+	                                   
 	if (prog == PMAPPROG) {
 		*portp = htons(PMAPPORT);
 		return 0;
@@ -182,7 +182,7 @@ krpc_portmap(
 	mbuf_pkthdr_setlen(m, sizeof(*sdata));
 	sdata = mbuf_data(m);
 
-	/* Do the RPC to get it. */
+	                           
 	sdata->prog = htonl(prog);
 	sdata->vers = htonl(vers);
 	sdata->proto = htonl(proto);
@@ -208,17 +208,17 @@ krpc_portmap(
 	return error;
 }
 
-/*
- * Do a remote procedure call (RPC) and wait for its reply.
- * If from_p is non-null, then we are doing broadcast, and
- * the address from whence the response came is saved there.
- */
+  
+                                                           
+                                                          
+                                                            
+   
 int
 krpc_call(
 	struct sockaddr_in *sa,
 	u_int sotype, u_int prog, u_int vers, u_int func,
-	mbuf_t *data,                   /* input/output */
-	struct sockaddr_in *from_p)     /* output */
+	mbuf_t *data,                                     
+	struct sockaddr_in *from_p)                 
 {
 	socket_t so;
 	struct sockaddr_in *sin;
@@ -231,20 +231,20 @@ krpc_call(
 	u_int16_t tport;
 	size_t maxpacket = 1 << 16;
 
-	/*
-	 * Validate address family.
-	 * Sorry, this is INET specific...
-	 */
+	  
+                            
+                                   
+    
 	if (sa->sin_family != AF_INET) {
 		return EAFNOSUPPORT;
 	}
 
-	/* Free at end if not null. */
+	                              
 	nam = mhead = NULL;
 
-	/*
-	 * Create socket and set its recieve timeout.
-	 */
+	  
+                                              
+    
 	if ((error = sock_socket(AF_INET, sotype, 0, 0, 0, &so))) {
 		goto out1;
 	}
@@ -260,9 +260,9 @@ krpc_call(
 		}
 	}
 
-	/*
-	 * Enable broadcast if necessary.
-	 */
+	  
+                                  
+    
 
 	if (from_p && (sotype == SOCK_DGRAM)) {
 		int on = 1;
@@ -271,11 +271,11 @@ krpc_call(
 		}
 	}
 
-	/*
-	 * Bind the local endpoint to a reserved port,
-	 * because some NFS servers refuse requests from
-	 * non-reserved (non-privileged) ports.
-	 */
+	  
+                                               
+                                                 
+                                        
+    
 	if ((error = mbuf_get(MBUF_WAITOK, MBUF_TYPE_SONAME, &m))) {
 		goto out;
 	}
@@ -299,9 +299,9 @@ krpc_call(
 		goto out;
 	}
 
-	/*
-	 * Setup socket address for the server.
-	 */
+	  
+                                        
+    
 	if ((error = mbuf_get(MBUF_WAITOK, MBUF_TYPE_SONAME, &nam))) {
 		goto out;
 	}
@@ -327,9 +327,9 @@ krpc_call(
 		}
 	}
 
-	/*
-	 * Prepend RPC message header.
-	 */
+	  
+                               
+    
 	m = *data;
 	*data = NULL;
 #if     DIAGNOSTIC
@@ -342,7 +342,7 @@ krpc_call(
 #endif
 	len = sizeof(*call);
 	if (sotype == SOCK_STREAM) {
-		len += 4;  /* account for RPC record marker */
+		len += 4;                                     
 	}
 	mhead = m;
 	if ((error = mbuf_prepend(&mhead, len, MBUF_WAITOK))) {
@@ -352,11 +352,11 @@ krpc_call(
 		goto out;
 	}
 
-	/*
-	 * Fill in the RPC header
-	 */
+	  
+                          
+    
 	if (sotype == SOCK_STREAM) {
-		/* first, fill in RPC record marker */
+		                                      
 		u_int32_t *recmark = mbuf_data(mhead);
 		size_t pkthdr_len = mbuf_pkthdr_len(mhead);
 		assert(pkthdr_len <= UINT32_MAX);
@@ -368,24 +368,24 @@ krpc_call(
 	bzero((caddr_t)call, sizeof(*call));
 	xid++;
 	call->rp_xid = htonl(xid);
-	/* call->rp_direction = 0; */
+	                             
 	call->rp_rpcvers = htonl(2);
 	call->rp_prog = htonl(prog);
 	call->rp_vers = htonl(vers);
 	call->rp_proc = htonl(func);
-	/* call->rp_auth = 0; */
-	/* call->rp_verf = 0; */
+	                        
+	                        
 
-	/*
-	 * Send it, repeatedly, until a reply is received,
-	 * but delay each re-send by an increasing amount.
-	 * If the delay hits the maximum, start complaining.
-	 */
+	  
+                                                   
+                                                   
+                                                     
+    
 	timo = 0;
 	for (;;) {
 		struct msghdr msg;
 
-		/* Send RPC request (or re-send). */
+		                                    
 		if ((error = mbuf_copym(mhead, 0, MBUF_COPYALL, MBUF_WAITOK, &m))) {
 			goto out;
 		}
@@ -409,7 +409,7 @@ krpc_call(
 		}
 		m = NULL;
 
-		/* Determine new timeout. */
+		                            
 		if (timo < MAX_RESEND_DELAY) {
 			timo++;
 		} else {
@@ -417,10 +417,10 @@ krpc_call(
 			    IP_LIST(&(sin->sin_addr.s_addr)));
 		}
 
-		/*
-		 * Wait for up to timo seconds for a reply.
-		 * The socket receive timeout was set to 1 second.
-		 */
+		  
+                                             
+                                                    
+     
 		secs = timo;
 		while (secs > 0) {
 			size_t readlen;
@@ -444,7 +444,7 @@ krpc_call(
 					}
 				} while (error == EWOULDBLOCK);
 				if (!error && readlen < aio.iov_len) {
-					/* only log a message if we got a partial word */
+					                                                 
 					if (readlen != 0) {
 						printf("short receive (%ld/%ld) from server " IP_FORMAT "\n",
 						    readlen, sizeof(u_int32_t), IP_LIST(&(sin->sin_addr.s_addr)));
@@ -455,10 +455,10 @@ krpc_call(
 					goto out;
 				}
 				len = ntohll(len) & ~0x80000000;
-				/*
-				 * This is SERIOUS! We are out of sync with the sender
-				 * and forcing a disconnect/reconnect is all I can do.
-				 */
+				  
+                                                          
+                                                          
+       
 				if (len > maxpacket) {
 					printf("impossible packet length (%ld) from server " IP_FORMAT "\n",
 					    len, IP_LIST(&(sin->sin_addr.s_addr)));
@@ -494,7 +494,7 @@ krpc_call(
 			}
 			len = readlen;
 
-			/* Does the reply contain at least a header? */
+			                                               
 			if (len < MIN_REPLY_HDR) {
 				continue;
 			}
@@ -503,7 +503,7 @@ krpc_call(
 			}
 			reply = mbuf_data(m);
 
-			/* Is it the right reply? */
+			                            
 			if (reply->rp_direction != htonl(RPC_REPLY)) {
 				continue;
 			}
@@ -512,11 +512,11 @@ krpc_call(
 				continue;
 			}
 
-			/* Was RPC accepted? (authorization OK) */
+			                                          
 			if (reply->rp_astatus != 0) {
 				error = ntohl(reply->rp_u.rpu_errno);
 				printf("rpc denied, error=%d\n", error);
-				/* convert rpc error to errno */
+				                                
 				switch (error) {
 				case RPC_MISMATCH:
 					error = ERPCMISMATCH;
@@ -535,10 +535,10 @@ krpc_call(
 				error = ntohl(reply->rp_u.rpu_ok.rp_rstatus);
 			}
 
-			/* Did the call succeed? */
+			                           
 			if (error != 0) {
 				printf("rpc status=%d\n", error);
-				/* convert rpc error to errno */
+				                                
 				switch (error) {
 				case RPC_PROGUNAVAIL:
 					error = EPROGUNAVAIL;
@@ -559,22 +559,22 @@ krpc_call(
 				goto out;
 			}
 
-			goto gotreply;  /* break two levels */
-		} /* while secs */
-	} /* forever send/receive */
+			goto gotreply;                        
+		}                 
+	}                           
 
 	error = ETIMEDOUT;
 	goto out;
 
 gotreply:
 
-	/*
-	 * Pull as much as we can into first mbuf, to make
-	 * result buffer contiguous.  Note that if the entire
-	 * result won't fit into one mbuf, you're out of luck.
-	 * XXX - Should not rely on making the entire reply
-	 * contiguous (fix callers instead). -gwr
-	 */
+	  
+                                                   
+                                                      
+                                                       
+                                                    
+                                          
+    
 #if     DIAGNOSTIC
 	if ((mbuf_flags(m) & MBUF_PKTHDR) == 0) {
 		panic("krpc_call: received pkt w/o header?");
@@ -582,7 +582,7 @@ gotreply:
 #endif
 	len = mbuf_pkthdr_len(m);
 	if (sotype == SOCK_STREAM) {
-		len -= 4;  /* the RPC record marker was read separately */
+		len -= 4;                                                 
 	}
 	if (mbuf_len(m) < len) {
 		if ((error = mbuf_pullup(&m, len))) {
@@ -591,13 +591,13 @@ gotreply:
 		reply = mbuf_data(m);
 	}
 
-	/*
-	 * Strip RPC header
-	 */
+	  
+                    
+    
 	len = sizeof(*reply);
 	if (reply->rp_u.rpu_ok.rp_auth.rp_atype != 0) {
 		len += ntohl(reply->rp_u.rpu_ok.rp_auth.rp_alen);
-		len = (len + 3) & ~3; /* XXX? */
+		len = (len + 3) & ~3;           
 	}
 
 	if (len > INT_MAX) {
@@ -607,7 +607,7 @@ gotreply:
 
 	mbuf_adj(m, (int)len);
 
-	/* result */
+	            
 	*data = m;
 out:
 	sock_close(so);
@@ -621,4 +621,4 @@ out1:
 	return error;
 }
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        

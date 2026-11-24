@@ -27,12 +27,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/fcntl.h>
@@ -92,16 +92,16 @@ extern zone_t audit_mac_label_zone;
 #include <netinet/in_pcb.h>
 
 #if CONFIG_AUDIT
-/*
- * Calls to manipulate elements of the audit record structure from system
- * call code.  Macro wrappers will prevent this functions from being entered
- * if auditing is disabled, avoiding the function call cost.  We check the
- * thread audit record pointer anyway, as the audit condition could change,
- * and pre-selection may not have allocated an audit record for this event.
- *
- * XXXAUDIT: Should we assert, in each case, that this field of the record
- * hasn't already been filled in?
- */
+  
+                                                                         
+                                                                            
+                                                                          
+                                                                           
+                                                                           
+  
+                                                                          
+                                 
+   
 void
 audit_arg_addr(struct kaudit_record *ar, user_addr_t addr)
 {
@@ -109,9 +109,9 @@ audit_arg_addr(struct kaudit_record *ar, user_addr_t addr)
 
 	ar->k_ar.ar_arg_addr = addr;
 
-	/*
-	 * If the process is 64-bit then flag the address as such.
-	 */
+	  
+                                                           
+    
 	if (proc_is64bit(p)) {
 		ARG_SET_VALID(ar, ARG_ADDR64);
 	} else {
@@ -324,13 +324,13 @@ audit_arg_socket(struct kaudit_record *ar, int sodomain, int sotype,
 	ARG_SET_VALID(ar, ARG_SOCKINFO);
 }
 
-/*
- * Note that the current working directory vp must be supplied at the audit
- * call site to permit per thread current working directories, and that it
- * must take a upath starting with '/' into account for chroot if the path
- * is absolute.  This results in the real (non-chroot) path being recorded
- * in the audit record.
- */
+  
+                                                                           
+                                                                          
+                                                                          
+                                                                          
+                       
+   
 void
 audit_arg_sockaddr(struct kaudit_record *ar, struct vnode *cwd_vp,
     struct sockaddr *sa)
@@ -364,16 +364,16 @@ audit_arg_sockaddr(struct kaudit_record *ar, struct vnode *cwd_vp,
 		sun = (struct sockaddr_un *)sa;
 		namelen = sun->sun_len - offsetof(struct sockaddr_un, sun_path);
 		if (namelen > 0 && (size_t)namelen < sizeof(path)) {
-			/*
-			 * Make sure the path is NUL-terminated
-			 */
+			  
+                                          
+      
 			bcopy(sun->sun_path, path, namelen);
 			path[namelen] = 0;
 			audit_arg_upath(ar, cwd_vp, path, ARG_UPATH1);
 		}
 		ARG_SET_VALID(ar, ARG_SADDRUNIX);
 		break;
-		/* XXXAUDIT: default:? */
+		                         
 	}
 }
 
@@ -418,7 +418,7 @@ audit_arg_text(struct kaudit_record *ar, char *text)
 {
 	KASSERT(text != NULL, ("audit_arg_text: text == NULL"));
 
-	/* Invalidate the text string */
+	                                
 	ar->k_ar.ar_valid_arg &= (ARG_ALL ^ ARG_TEXT);
 	if (text == NULL) {
 		return;
@@ -562,10 +562,10 @@ audit_arg_auditon(struct kaudit_record *ar, union auditon_udata *udata)
 	ARG_SET_VALID(ar, ARG_AUDITON);
 }
 
-/*
- * Audit information about a file, either the file's vnode info, or its
- * socket address info.
- */
+  
+                                                                       
+                       
+   
 void
 audit_arg_file(struct kaudit_record *ar, __unused proc_t p,
     struct fileproc *fp)
@@ -577,7 +577,7 @@ audit_arg_file(struct kaudit_record *ar, __unused proc_t p,
 
 	switch (FILEGLOB_DTYPE(fp->fp_glob)) {
 	case DTYPE_VNODE:
-		/* case DTYPE_FIFO: */
+		                      
 		audit_arg_vnpath_withref(ar,
 		    (struct vnode *)fp->fp_glob->fg_data, ARG_VNODE1);
 		break;
@@ -625,25 +625,25 @@ audit_arg_file(struct kaudit_record *ar, __unused proc_t p,
 		break;
 
 	default:
-		/* XXXAUDIT: else? */
+		                     
 		break;
 	}
 }
 
-/*
- * Store a path as given by the user process for auditing into the audit
- * record stored on the user thread.  This function will allocate the memory
- * to store the path info if not already available.  This memory will be
- * freed when the audit record is freed.
- *
- * Note that the current working directory vp must be supplied at the audit call
- * site to permit per thread current working directories, and that it must take
- * a upath starting with '/' into account for chroot if the path is absolute.
- * This results in the real (non-chroot) path being recorded in the audit
- * record.
- *
- * XXXAUDIT: Possibly assert that the memory isn't already allocated?
- */
+  
+                                                                        
+                                                                            
+                                                                        
+                                        
+  
+                                                                                
+                                                                               
+                                                                             
+                                                                         
+          
+  
+                                                                     
+   
 void
 audit_arg_upath(struct kaudit_record *ar, struct vnode *cwd_vp, char *upath, u_int64_t flag)
 {
@@ -702,24 +702,24 @@ audit_arg_kpath(struct kaudit_record *ar, char *kpath, u_int64_t flag)
 	ARG_SET_VALID(ar, flag);
 }
 
-/*
- * Function to save the path and vnode attr information into the audit
- * record.
- *
- * It is assumed that the caller will hold any vnode locks necessary to
- * perform a VNOP_GETATTR() on the passed vnode.
- *
- * XXX: The attr code is very similar to vfs_vnops.c:vn_stat(), but always
- * provides access to the generation number as we need that to construct the
- * BSM file ID.
- *
- * XXX: We should accept the process argument from the caller, since it's
- * very likely they already have a reference.
- *
- * XXX: Error handling in this function is poor.
- *
- * XXXAUDIT: Possibly KASSERT the path pointer is NULL?
- */
+  
+                                                                      
+          
+  
+                                                                       
+                                                
+  
+                                                                          
+                                                                            
+               
+  
+                                                                         
+                                             
+  
+                                                
+  
+                                                       
+   
 void
 audit_arg_vnpath(struct kaudit_record *ar, struct vnode *vp, u_int64_t flags)
 {
@@ -740,11 +740,11 @@ audit_arg_vnpath(struct kaudit_record *ar, struct vnode *vp, u_int64_t flags)
 
 	p = current_proc();
 
-	/*
-	 * XXXAUDIT: The below clears, and then resets the flags for valid
-	 * arguments.  Ideally, either the new vnode is used, or the old one
-	 * would be.
-	 */
+	  
+                                                                   
+                                                                     
+             
+    
 	if (flags & ARG_VNODE1) {
 		ar->k_ar.ar_valid_arg &= (ARG_ALL ^ ARG_KPATH1);
 		ar->k_ar.ar_valid_arg &= (ARG_ALL ^ ARG_VNODE1);
@@ -769,11 +769,11 @@ audit_arg_vnpath(struct kaudit_record *ar, struct vnode *vp, u_int64_t flags)
 		return;
 	}
 
-	/*
-	 * If vn_getpath() succeeds, place it in a string buffer
-	 * attached to the audit record, and set a flag indicating
-	 * it is present.
-	 */
+	  
+                                                         
+                                                           
+                  
+    
 	len = MAXPATHLEN;
 	if (vn_getpath(vp, *pathp, &len) == 0) {
 		if (flags & ARG_VNODE1) {
@@ -796,7 +796,7 @@ audit_arg_vnpath(struct kaudit_record *ar, struct vnode *vp, u_int64_t flags)
 	VATTR_WANTED(&va, va_gen);
 	error = vnode_getattr(vp, &va, vfs_context_current());
 	if (error) {
-		/* XXX: How to handle this case? */
+		                                   
 		return;
 	}
 
@@ -813,9 +813,9 @@ audit_arg_vnpath(struct kaudit_record *ar, struct vnode *vp, u_int64_t flags)
 	}
 #endif
 
-	/*
-	 * XXX do we want to fall back here when these aren't supported?
-	 */
+	  
+                                                                 
+    
 	vnp->vn_mode = va.va_mode;
 	vnp->vn_uid = va.va_uid;
 	vnp->vn_gid = va.va_gid;
@@ -855,9 +855,9 @@ audit_arg_mach_port2(struct kaudit_record *ar, mach_port_name_t port)
 }
 
 
-/*
- * Audit the argument strings passed to exec.
- */
+  
+                                             
+   
 void
 audit_arg_argv(struct kaudit_record *ar, char *argv, int argc, size_t length)
 {
@@ -873,9 +873,9 @@ audit_arg_argv(struct kaudit_record *ar, char *argv, int argc, size_t length)
 	ARG_SET_VALID(ar, ARG_ARGV);
 }
 
-/*
- * Audit the environment strings passed to exec.
- */
+  
+                                                
+   
 void
 audit_arg_envv(struct kaudit_record *ar, char *envv, int envc, size_t length)
 {
@@ -891,11 +891,11 @@ audit_arg_envv(struct kaudit_record *ar, char *envv, int envc, size_t length)
 	ARG_SET_VALID(ar, ARG_ENVV);
 }
 
-/*
- * The close() system call uses it's own audit call to capture the path/vnode
- * information because those pieces are not easily obtained within the system
- * call itself.
- */
+  
+                                                                             
+                                                                             
+               
+   
 void
 audit_sysclose(struct kaudit_record *ar, proc_t p, int fd)
 {
@@ -1002,4 +1002,4 @@ audit_arg_identity(struct kaudit_record *ar)
 	ARG_SET_VALID(ar, ARG_IDENTITY);
 }
 
-#endif /* CONFIG_AUDIT */
+#endif                   

@@ -53,116 +53,116 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/vm_prot.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *
- *	Virtual memory protection definitions.
- *
- */
+  
+   
+  
+                       
+                                                    
+  
+                                         
+  
+   
 
 #ifndef _MACH_VM_PROT_H_
 #define _MACH_VM_PROT_H_
 
-/*
- *	Types defined:
- *
- *	vm_prot_t		VM protection values.
- */
+  
+                 
+  
+                                   
+   
 
 typedef int             vm_prot_t;
 
-/*
- *	Protection values, defined as bits within the vm_prot_t type
- */
+  
+                                                               
+   
 
 #define VM_PROT_NONE    ((vm_prot_t) 0x00)
 
-#define VM_PROT_READ    ((vm_prot_t) 0x01)      /* read permission */
-#define VM_PROT_WRITE   ((vm_prot_t) 0x02)      /* write permission */
-#define VM_PROT_EXECUTE ((vm_prot_t) 0x04)      /* execute permission */
+#define VM_PROT_READ    ((vm_prot_t) 0x01)                           
+#define VM_PROT_WRITE   ((vm_prot_t) 0x02)                            
+#define VM_PROT_EXECUTE ((vm_prot_t) 0x04)                              
 
-/*
- *	The default protection for newly-created virtual memory
- */
+  
+                                                          
+   
 
 #define VM_PROT_DEFAULT (VM_PROT_READ|VM_PROT_WRITE)
 
-/*
- *	The maximum privileges possible, for parameter checking.
- */
+  
+                                                           
+   
 
 #define VM_PROT_ALL     (VM_PROT_READ|VM_PROT_WRITE|VM_PROT_EXECUTE)
 
-/*
- *	An invalid protection value.
- *	Used only by memory_object_lock_request to indicate no change
- *	to page locks.  Using -1 here is a bad idea because it
- *	looks like VM_PROT_ALL and then some.
- */
+  
+                               
+                                                                
+                                                         
+                                        
+   
 
 #define VM_PROT_NO_CHANGE       ((vm_prot_t) 0x08)
 
-/*
- *      When a caller finds that he cannot obtain write permission on a
- *      mapped entry, the following flag can be used.  The entry will
- *      be made "needs copy" effectively copying the object (using COW),
- *      and write permission will be added to the maximum protections
- *      for the associated entry.
- */
+  
+                                                                       
+                                                                     
+                                                                        
+                                                                     
+                                 
+   
 
 #define VM_PROT_COPY            ((vm_prot_t) 0x10)
 
 
-/*
- *	Another invalid protection value.
- *	Used only by memory_object_data_request upon an object
- *	which has specified a copy_call copy strategy. It is used
- *	when the kernel wants a page belonging to a copy of the
- *	object, and is only asking the object as a result of
- *	following a shadow chain. This solves the race between pages
- *	being pushed up by the memory manager and the kernel
- *	walking down the shadow chain.
- */
+  
+                                    
+                                                         
+                                                            
+                                                          
+                                                       
+                                                               
+                                                       
+                                 
+   
 
 #define VM_PROT_WANTS_COPY      ((vm_prot_t) 0x10)
 
 #ifdef PRIVATE
-/*
- *	The caller wants this memory region treated as if it had a valid
- *	code signature.
- */
+  
+                                                                   
+                  
+   
 
 #define VM_PROT_TRUSTED         ((vm_prot_t) 0x20)
-#endif /* PRIVATE */
+#endif              
 
-/*
- *      Another invalid protection value.
- *	Indicates that the other protection bits are to be applied as a mask
- *	against the actual protection bits of the map entry.
- */
+  
+                                         
+                                                                       
+                                                       
+   
 #define VM_PROT_IS_MASK         ((vm_prot_t) 0x40)
 
-/*
- * Another invalid protection value to support execute-only protection.
- * VM_PROT_STRIP_READ is a special marker that tells mprotect to not
- * set VM_PROT_READ. We have to do it this way because existing code
- * expects the system to set VM_PROT_READ if VM_PROT_EXECUTE is set.
- * VM_PROT_EXECUTE_ONLY is just a convenience value to indicate that
- * the memory should be executable and explicitly not readable. It will
- * be ignored on platforms that do not support this type of protection.
- */
+  
+                                                                       
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                       
+                                                                       
+   
 #define VM_PROT_STRIP_READ              ((vm_prot_t) 0x80)
 #define VM_PROT_EXECUTE_ONLY    (VM_PROT_EXECUTE|VM_PROT_STRIP_READ)
 
 #ifdef PRIVATE
-/*
- * When using VM_PROT_COPY, fail instead of copying an executable mapping,
- * since that could cause code-signing violations.
- */
+  
+                                                                          
+                                                  
+   
 #define VM_PROT_COPY_FAIL_IF_EXECUTABLE ((vm_prot_t)0x100)
-#endif /* PRIVATE */
+#endif              
 
-#endif  /* _MACH_VM_PROT_H_ */
+#endif                        

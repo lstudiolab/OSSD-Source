@@ -25,12 +25,12 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/types.h>
 #include <sys/vnode_internal.h>
@@ -68,21 +68,21 @@ static void     audit_sys_auditon(struct audit_record *ar,
 static void     audit_sys_fcntl(struct kaudit_record *kar,
     struct au_record *rec);
 
-/*
- * Initialize the BSM auditing subsystem.
- */
+  
+                                         
+   
 void
 kau_init(void)
 {
 	au_evclassmap_init();
 }
 
-/*
- * This call reserves memory for the audit record.  Memory must be guaranteed
- * before any auditable event can be generated.  The au_record structure
- * maintains a reference to the memory allocated above and also the list of
- * tokens associated with this record.
- */
+  
+                                                                             
+                                                                        
+                                                                           
+                                      
+   
 static struct au_record *
 kau_open(void)
 {
@@ -97,9 +97,9 @@ kau_open(void)
 	return rec;
 }
 
-/*
- * Store the token with the record descriptor.
- */
+  
+                                              
+   
 static void
 kau_write(struct au_record *rec, struct au_token *tok)
 {
@@ -109,10 +109,10 @@ kau_write(struct au_record *rec, struct au_token *tok)
 	rec->len += tok->len;
 }
 
-/*
- * Close out the audit record by adding the header token, identifying any
- * missing tokens.  Write out the tokens to the record memory.
- */
+  
+                                                                         
+                                                              
+   
 static void
 kau_close(struct au_record *rec, struct timespec *ctime, short event)
 {
@@ -162,16 +162,16 @@ kau_close(struct au_record *rec, struct timespec *ctime, short event)
 	}
 }
 
-/*
- * Free a BSM audit record by releasing all the tokens and clearing the audit
- * record information.
- */
+  
+                                                                             
+                      
+   
 void
 kau_free(struct au_record *rec)
 {
 	struct au_token *tok;
 
-	/* Free the token list. */
+	                          
 	while ((tok = TAILQ_FIRST(&rec->token_q))) {
 		TAILQ_REMOVE(&rec->token_q, tok, tokens);
 		free(tok->t_data, M_AUDITBSM);
@@ -184,13 +184,13 @@ kau_free(struct au_record *rec)
 	free(rec, M_AUDITBSM);
 }
 
-/*
- * XXX: May want turn some (or all) of these macros into functions in order
- * to reduce the generated code size.
- *
- * XXXAUDIT: These macros assume that 'kar', 'ar', 'rec', and 'tok' in the
- * caller are OK with this.
- */
+  
+                                                                           
+                                     
+  
+                                                                          
+                           
+   
 #if CONFIG_MACF
 #define MAC_VNODE1_LABEL_TOKEN   do {                                     \
 	if (ar->ar_vnode1_mac_labels != NULL &&                           \
@@ -304,7 +304,7 @@ kau_free(struct au_record *rec)
 } while (0)
 
 #define PROCESS_PID_TOKENS(argn) do {                                   \
-	if ((ar->ar_arg_pid > 0) /* Reference a single process */       \
+	if ((ar->ar_arg_pid > 0)                                        \
 	    && (ARG_IS_VALID(kar, ARG_PROCESS))) {                      \
 	        tok = au_to_process32_ex(ar->ar_arg_auid,               \
 	            ar->ar_arg_euid, ar->ar_arg_egid,                   \
@@ -334,7 +334,7 @@ kau_free(struct au_record *rec)
 	        }                                                       \
 	        kau_write(rec, tok);                                    \
 	}                                                               \
-	/* attrname is in the text field */                             \
+	                                                                \
 	if (ARG_IS_VALID(kar, ARG_TEXT)) {                              \
 	        tok = au_to_text(ar->ar_arg_text);                      \
 	        kau_write(rec, tok);                                    \
@@ -342,7 +342,7 @@ kau_free(struct au_record *rec)
 } while (0)
 
 #define EXTENDED_TOKENS(n) do {                                         \
-	/* ACL data */                                          \
+	                                                        \
 	        if (ARG_IS_VALID(kar, ARG_OPAQUE)) {                    \
 	                tok = au_to_opaque(ar->ar_arg_opaque,           \
 	                    ar->ar_arg_opq_size);                       \
@@ -369,11 +369,11 @@ kau_free(struct au_record *rec)
 	}                                                               \
 } while (0)
 
-/*
- * Implement auditing for the auditon() system call. The audit tokens that
- * are generated depend on the command that was sent into the auditon()
- * system call.
- */
+  
+                                                                          
+                                                                       
+               
+   
 static void
 audit_sys_auditon(struct audit_record *ar, struct au_record *rec)
 {
@@ -526,11 +526,11 @@ audit_sys_auditon(struct audit_record *ar, struct au_record *rec)
 	kau_write(rec, tok);
 }
 
-/*
- * Implement auditing for the fcntl() system call. The audit tokens that
- * are generated depend on the command that was sent into the fcntl()
- * system call.
- */
+  
+                                                                        
+                                                                     
+               
+   
 static void
 audit_sys_fcntl(struct kaudit_record *kar, struct au_record *rec)
 {
@@ -574,7 +574,7 @@ audit_sys_fcntl(struct kaudit_record *kar, struct au_record *rec)
 			kau_write(rec, tok);
 		}
 		break;
-#endif /* F_SETSIZE */
+#endif                
 
 #ifdef  F_PATHPKG_CHECK
 	case F_PATHPKG_CHECK:
@@ -592,16 +592,16 @@ audit_sys_fcntl(struct kaudit_record *kar, struct au_record *rec)
 	kau_write(rec, tok);
 }
 
-/*
- * Convert an internal kernel audit record to a BSM record and return a
- * success/failure indicator. The BSM record is passed as an out parameter to
- * this function.
- *
- * Return conditions:
- *   BSM_SUCCESS: The BSM record is valid
- *   BSM_FAILURE: Failure; the BSM record is NULL.
- *   BSM_NOAUDIT: The event is not auditable for BSM; the BSM record is NULL.
- */
+  
+                                                                       
+                                                                             
+                 
+  
+                     
+                                         
+                                                  
+                                                                             
+   
 int
 kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 {
@@ -618,20 +618,20 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 	ar = &kar->k_ar;
 	rec = kau_open();
 
-	/*
-	 * Create the subject token.
-	 */
+	  
+                             
+    
 	switch (ar->ar_subj_term_addr.at_type) {
 	case AU_IPv4:
 		tid.port = ar->ar_subj_term_addr.at_port;
 		tid.machine = ar->ar_subj_term_addr.at_addr[0];
-		subj_tok = au_to_subject32(ar->ar_subj_auid,  /* audit ID */
-		    ar->ar_subj_cred.cr_uid, /* eff uid */
-		    ar->ar_subj_egid,   /* eff group id */
-		    ar->ar_subj_ruid,   /* real uid */
-		    ar->ar_subj_rgid,   /* real group id */
-		    ar->ar_subj_pid,    /* process id */
-		    ar->ar_subj_asid,   /* session ID */
+		subj_tok = au_to_subject32(ar->ar_subj_auid,                
+		    ar->ar_subj_cred.cr_uid,              
+		    ar->ar_subj_egid,                     
+		    ar->ar_subj_ruid,                 
+		    ar->ar_subj_rgid,                      
+		    ar->ar_subj_pid,                    
+		    ar->ar_subj_asid,                   
 		    &tid);
 		break;
 	case AU_IPv6:
@@ -656,15 +656,15 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		    &tid);
 	}
 
-	/*
-	 * The logic inside each case fills in the tokens required for the
-	 * event, except for the header, trailer, and return tokens.  The
-	 * header and trailer tokens are added by the kau_close() function.
-	 * The return token is added outside of the switch statement.
-	 */
+	  
+                                                                   
+                                                                  
+                                                                    
+                                                              
+    
 	switch (ar->ar_event) {
 	case AUE_SENDFILE:
-		/* For sendfile the file and socket descriptor are both saved */
+		                                                                
 		if (ARG_IS_VALID(kar, ARG_VALUE32)) {
 			tok = au_to_arg32(2, "sd", ar->ar_arg_value32);
 			kau_write(rec, tok);
@@ -678,9 +678,9 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 	case AUE_RECVMSG:
 	case AUE_SENDMSG:
 	case AUE_SENDTO:
-		/*
-		 * Socket-related events.
-		 */
+		  
+                           
+     
 		if (ARG_IS_VALID(kar, ARG_FD)) {
 			tok = au_to_arg32(1, "fd", ar->ar_arg_fd);
 			kau_write(rec, tok);
@@ -807,9 +807,9 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		break;
 
 	case AUE_AUDITON:
-		/*
-		 * For AUDITON commands without own event, audit the cmd.
-		 */
+		  
+                                                           
+     
 		if (ARG_IS_VALID(kar, ARG_CMD)) {
 			tok = au_to_arg32(1, "cmd", ar->ar_arg_cmd);
 			kau_write(rec, tok);
@@ -859,7 +859,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 	case AUE_KQUEUE:
 	case AUE_LSEEK:
 #if 0
-/*  XXXss replace with kext  */
+                               
 	case AUE_MODLOAD:
 	case AUE_MODUNLOAD:
 #endif
@@ -874,9 +874,9 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 	case AUE_SETTIMEOFDAY:
 	case AUE_KDEBUGTRACE:
 	case AUE_PTHREADSIGMASK:
-		/*
-		 * Header, subject, and return tokens added at end.
-		 */
+		  
+                                                     
+     
 		break;
 
 	case AUE_MKFIFO:
@@ -888,19 +888,19 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		break;
 
 	case AUE_ACCESS_EXTENDED:
-		/*
-		 * The access_extended() argument vector is stored in an
-		 * opaque token.
-		 */
+		  
+                                                          
+                  
+     
 		if (ARG_IS_VALID(kar, ARG_OPAQUE)) {
 			tok = au_to_opaque(ar->ar_arg_opaque,
 			    ar->ar_arg_opq_size);
 			kau_write(rec, tok);
 		}
-		/*
-		 * The access_extended() result vector is stored in an arbitrary
-		 * data token.
-		 */
+		  
+                                                                  
+                
+     
 		if (ARG_IS_VALID(kar, ARG_DATA)) {
 			tok = au_to_data(AUP_DECIMAL, ar->ar_arg_data_type,
 			    ar->ar_arg_data_count, ar->ar_arg_data);
@@ -1035,13 +1035,13 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		}
 		break;
 
-	/*
-	 * XXXRW: Some of these need to handle non-vnode cases as well.
-	 */
+	  
+                                                                
+    
 	case AUE_FSTAT_EXTENDED:
 	case AUE_FCHDIR:
 	case AUE_FPATHCONF:
-	case AUE_FSTAT:         /* XXX Need to handle sockets and shm */
+	case AUE_FSTAT:                                                 
 	case AUE_FSTATFS:
 	case AUE_FSYNC:
 	case AUE_FTRUNCATE:
@@ -1049,7 +1049,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 	case AUE_GETDIRENTRIES:
 	case AUE_GETDIRENTRIESATTR:
 	case AUE_GETATTRLISTBULK:
-#if 0  /* XXXss new */
+#if 0                 
 	case AUE_POLL:
 #endif
 	case AUE_READ:
@@ -1274,7 +1274,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		OS_FALLTHROUGH;
 #endif
 	case AUE_MOUNT:
-		/* XXX Need to handle NFS mounts */
+		                                   
 		if (ARG_IS_VALID(kar, ARG_FFLAGS)) {
 			tok = au_to_arg32(3, "flags", ar->ar_arg_fflags);
 			kau_write(rec, tok);
@@ -1652,12 +1652,12 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		}
 		break;
 
-	/* AUE_SHMAT, AUE_SHMCTL, AUE_SHMDT and AUE_SHMGET are SysV IPC */
+	                                                                  
 	case AUE_SHMAT:
 		if (ARG_IS_VALID(kar, ARG_SVIPC_ID)) {
 			tok = au_to_arg32(1, "shmid", ar->ar_arg_svipc_id);
 			kau_write(rec, tok);
-			/* XXXAUDIT: Does having the ipc token make sense? */
+			                                                     
 			tok = au_to_ipc(AT_IPC_SHM, ar->ar_arg_svipc_id);
 			kau_write(rec, tok);
 		}
@@ -1675,7 +1675,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		if (ARG_IS_VALID(kar, ARG_SVIPC_ID)) {
 			tok = au_to_arg32(1, "shmid", ar->ar_arg_svipc_id);
 			kau_write(rec, tok);
-			/* XXXAUDIT: Does having the ipc token make sense? */
+			                                                     
 			tok = au_to_ipc(AT_IPC_SHM, ar->ar_arg_svipc_id);
 			kau_write(rec, tok);
 		}
@@ -1694,7 +1694,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 			}
 			break;
 		default:
-			break;  /* We will audit a bad command */
+			break;                                   
 		}
 		break;
 
@@ -1707,7 +1707,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		break;
 
 	case AUE_SHMGET:
-		/* This is unusual; the return value is in an argument token */
+		                                                               
 		if (ARG_IS_VALID(kar, ARG_SVIPC_ID)) {
 			tok = au_to_arg32(0, "shmid", ar->ar_arg_svipc_id);
 			kau_write(rec, tok);
@@ -1720,8 +1720,8 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		}
 		break;
 
-	/* AUE_SHMOPEN, AUE_SHMUNLINK, AUE_SEMOPEN, AUE_SEMCLOSE
-	 * and AUE_SEMUNLINK are Posix IPC */
+	                                                        
+                                      
 	case AUE_SHMOPEN:
 		if (ARG_IS_VALID(kar, ARG_SVIPC_ADDR)) {
 			tok = au_to_arg32(2, "flags", ar->ar_arg_fflags);
@@ -1823,7 +1823,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		break;
 
 	case AUE_UMASK_EXTENDED:
-		/* ACL data */
+		              
 		if (ARG_IS_VALID(kar, ARG_OPAQUE)) {
 			tok = au_to_opaque(ar->ar_arg_opaque,
 			    ar->ar_arg_opq_size);
@@ -1841,7 +1841,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		break;
 
 	case AUE_WAIT4:
-#if 0 /* XXXss - new  */
+#if 0                   
 	case AUE_WAITID:
 #endif
 		if (ARG_IS_VALID(kar, ARG_PID)) {
@@ -1884,9 +1884,9 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		}
 		break;
 
-	/************************
-	* Mach system calls    *
-	************************/
+	                         
+                         
+                          
 	case AUE_INITPROCESS:
 		break;
 
@@ -2000,9 +2000,9 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 		    ar->ar_event);
 #endif
 
-		/*
-		 * Write the subject token so it is properly freed here.
-		 */
+		  
+                                                          
+     
 		kau_write(rec, subj_tok);
 		kau_free(rec);
 		return BSM_NOAUDIT;
@@ -2010,7 +2010,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 
 #if CONFIG_MACF
 	if (NULL != ar->ar_mac_records) {
-		/* Convert the audit data from the MAC policies */
+		                                                  
 		struct mac_audit_record *mar;
 
 		LIST_FOREACH(mar, ar->ar_mac_records, records) {
@@ -2024,12 +2024,12 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 				tok = au_to_text((char*) mar->data);
 				break;
 			default:
-				/*
-				 * XXX: we can either continue,
-				 * skipping this particular entry,
-				 * or we can pre-verify the list and
-				 * abort before writing any records
-				 */
+				  
+                                   
+                                      
+                                        
+                                       
+       
 				printf("kaudit_to_bsm(): "
 				    "BSM conversion requested for"
 				    "unknown mac_audit data type %d\n",
@@ -2052,7 +2052,7 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 #endif
 
 	tok = au_to_return32(au_errno_to_bsm(ar->ar_errno), ar->ar_retval);
-	kau_write(rec, tok);  /* Every record gets a return token */
+	kau_write(rec, tok);                                        
 
 	if (ARG_IS_VALID(kar, ARG_IDENTITY)) {
 		struct au_identity_info *id = &ar->ar_arg_identity;
@@ -2068,44 +2068,44 @@ kaudit_to_bsm(struct kaudit_record *kar, struct au_record **pau)
 	return BSM_SUCCESS;
 }
 
-/*
- * Verify that a record is a valid BSM record. Return 1 if the
- * record is good, 0 otherwise.
- */
+  
+                                                              
+                               
+   
 int
 bsm_rec_verify(void *rec, int length, boolean_t kern_events_allowed)
 {
-	/* Used to partially deserialize the buffer */
+	                                              
 	struct hdr_tok_partial *hdr;
 	struct trl_tok_partial *trl;
 
-	/* A record requires a complete header and trailer token */
+	                                                           
 	if (length < (AUDIT_HEADER_SIZE + AUDIT_TRAILER_SIZE)) {
 		return 0;
 	}
 
 	hdr = (struct hdr_tok_partial*)rec;
 
-	/* Ensure the provided length matches what the record shows */
+	                                                              
 	if ((uint32_t)length != ntohl(hdr->len)) {
 		return 0;
 	}
 
 	trl = (struct trl_tok_partial*)(rec + (length - AUDIT_TRAILER_SIZE));
 
-	/* Ensure the buffer contains what look like header and trailer tokens */
+	                                                                         
 	if (((hdr->type != AUT_HEADER32) && (hdr->type != AUT_HEADER32_EX) &&
 	    (hdr->type != AUT_HEADER64) && (hdr->type != AUT_HEADER64_EX)) ||
 	    (trl->type != AUT_TRAILER)) {
 		return 0;
 	}
 
-	/* Ensure the header and trailer agree on the length */
+	                                                       
 	if (hdr->len != trl->len) {
 		return 0;
 	}
 
-	/* Ensure the trailer token has a proper magic value */
+	                                                       
 	if (ntohs(trl->magic) != AUT_TRAILER_MAGIC) {
 		return 0;
 	}
@@ -2116,4 +2116,4 @@ bsm_rec_verify(void *rec, int length, boolean_t kern_events_allowed)
 
 	return 1;
 }
-#endif /* CONFIG_AUDIT */
+#endif                   

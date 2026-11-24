@@ -34,7 +34,7 @@
 	console_write(buf, size); \
 	} while(0)
 
-/* TODO: intelligently truncate messages if possible */
+                                                       
 #define BOUNDS_CHECK_AND_UPDATE(ret, size) do {\
 	if(ret < 0 || ret >= size) {\
 	        panic("Internal ktest error in %s", __func__);\
@@ -66,18 +66,18 @@ ktest_emit_testbegin(const char * test_name)
 	int size = sizeof(ktest_output_buf);
 	int ret;
 
-	/* left trim the file path for readability */
+	                                             
 	const char *fname = strnstr((char *)(uintptr_t)ktest_current_file, "xnu", 100);
 
 	ret = snprintf(msg,
 	    size,
-	    "\n[KTEST]\t"                 /* header */
-	    "TESTBEGIN\t"               /* type */
-	    "%lld\t"                    /* time */
-	    "%d\t"                      /* index */
-	    "%s\t"                      /* file */
-	    "%d\t"                      /* line */
-	    "%s\n",                     /* name */
+	    "\n[KTEST]\t"                             
+	    "TESTBEGIN\t"                         
+	    "%lld\t"                              
+	    "%d\t"                                 
+	    "%s\t"                                
+	    "%d\t"                                
+	    "%s\n",                               
 	    ktest_current_time,
 	    ktest_test_index,
 	    fname,
@@ -99,11 +99,11 @@ ktest_emit_testskip(const char * skip_msg, va_list args)
 
 	ret = snprintf(msg,
 	    size,
-	    "\n[KTEST]\t"                /* header */
-	    "TESTSKIP\t"               /* type */
-	    "%lld\t"                   /* time */
-	    "%s\t"                     /* file */
-	    "%d\t",                    /* line */
+	    "\n[KTEST]\t"                            
+	    "TESTSKIP\t"                         
+	    "%lld\t"                             
+	    "%s\t"                               
+	    "%d\t",                              
 	    ktest_current_time,
 	    fname,
 	    ktest_current_line);
@@ -129,13 +129,13 @@ ktest_emit_testend()
 
 	ret = snprintf(msg,
 	    size,
-	    "\n[KTEST]\t"                 /* header */
-	    "TESTEND\t"                 /* type */
-	    "%lld\t"                    /* time */
-	    "%d\t"                      /* index */
-	    "%s\t"                      /* file */
-	    "%d\t"                      /* line */
-	    "%s\n",                     /* name */
+	    "\n[KTEST]\t"                             
+	    "TESTEND\t"                           
+	    "%lld\t"                              
+	    "%d\t"                                 
+	    "%s\t"                                
+	    "%d\t"                                
+	    "%s\n",                               
 	    ktest_current_time,
 	    ktest_test_index,
 	    fname,
@@ -157,11 +157,11 @@ ktest_emit_log(const char * log_msg, va_list args)
 
 	ret = snprintf(msg,
 	    size,
-	    "\n[KTEST]\t"            /* header */
-	    "LOG\t"                /* type */
-	    "%lld\t"               /* time */
-	    "%s\t"                 /* file */
-	    "%d\t",                /* line */
+	    "\n[KTEST]\t"                        
+	    "LOG\t"                          
+	    "%lld\t"                         
+	    "%s\t"                           
+	    "%d\t",                          
 	    ktest_current_time,
 	    fname,
 	    ktest_current_line);
@@ -188,11 +188,11 @@ ktest_emit_perfdata(const char * metric, const char * unit, double value, const 
 	const char *fname = strnstr((char *)(uintptr_t)ktest_current_file, "xnu", 100);
 
 	ret = snprintf(msg, size,
-	    "\n[KTEST]\t"            /* header */
-	    "PERF\t"               /* type */
-	    "%lld\t"               /* time */
-	    "%s\t"                 /* file */
-	    "%d\t",                /* line */
+	    "\n[KTEST]\t"                        
+	    "PERF\t"                         
+	    "%lld\t"                         
+	    "%s\t"                           
+	    "%d\t",                          
 	    ktest_current_time,
 	    fname,
 	    ktest_current_line);
@@ -218,14 +218,14 @@ ktest_emit_testcase(void)
 
 	ret = snprintf(msg,
 	    size,
-	    "\n[KTEST]\t"            /* header */
-	    "%s\t"                 /* type */
-	    "%lld\t"               /* time */
-	    "%d\t"                 /* index */
-	    "%s\t"                 /* file */
-	    "%d\t"                 /* line */
-	    "%s\t"                 /* message */
-	    "%s",                  /* current_expr */
+	    "\n[KTEST]\t"                        
+	    "%s\t"                           
+	    "%lld\t"                         
+	    "%d\t"                            
+	    "%s\t"                           
+	    "%d\t"                           
+	    "%s\t"                              
+	    "%s",                                    
 	    ktest_testcase_result_tokens[ktest_testcase_mode]
 	    [ktest_testcase_result],
 	    ktest_current_time,

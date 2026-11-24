@@ -34,4 +34,4 @@
 #include <mach/mach_right_private.h>
 #endif
 
-#endif // __MACH_RIGHT_H
+#endif                  

@@ -57,14 +57,14 @@ kpersona_copyin(user_addr_t infop, struct kpersona_info *kinfo)
 		return error;
 	}
 
-	/* only support a single version of the struct for now */
+	                                                         
 	if (info_v != PERSONA_INFO_V1) {
 		return EINVAL;
 	}
 
 	error = copyin(infop, kinfo, sizeof(*kinfo));
 
-	/* enforce NULL termination on strings */
+	                                         
 	kinfo->persona_name[MAXLOGNAME] = 0;
 
 	return error;
@@ -81,8 +81,8 @@ kpersona_copyout(struct kpersona_info *kinfo, user_addr_t infop)
 		return error;
 	}
 
-	/* only support a single version of the struct for now */
-	/* TODO: in the future compare info_v to kinfo->persona_info_version */
+	                                                         
+	                                                                       
 	if (info_v != PERSONA_INFO_V1) {
 		return EINVAL;
 	}
@@ -136,7 +136,7 @@ kpersona_alloc_syscall(user_addr_t infop, user_addr_t idp, user_addr_t path)
 		return error;
 	}
 
-	/* persona struct contains a reference to pna_path */
+	                                                     
 	pna_path = NULL;
 
 	error = persona_init_begin(persona);
@@ -152,7 +152,7 @@ kpersona_alloc_syscall(user_addr_t infop, user_addr_t idp, user_addr_t path)
 	}
 
 	if (kinfo.persona_ngroups > 0) {
-		/* force gmuid 0 to *opt-out* of memberd */
+		                                           
 		if (kinfo.persona_gmuid == 0) {
 			kinfo.persona_gmuid = KAUTH_UID_NONE;
 		}
@@ -183,11 +183,11 @@ kpersona_alloc_syscall(user_addr_t infop, user_addr_t idp, user_addr_t path)
 
 	persona_init_end(persona, error);
 
-	/*
-	 * On success, we have a persona structure in the global list with a
-	 * single reference count on it. The corresponding _dealloc() call
-	 * will release this reference.
-	 */
+	  
+                                                                     
+                                                                   
+                                
+    
 	return error;
 
 out_persona_err:
@@ -219,17 +219,17 @@ kpersona_dealloc_syscall(user_addr_t idp)
 		return error;
 	}
 
-	/* invalidate the persona (deny subsequent spawn/fork) */
+	                                                         
 	persona = persona_lookup_and_invalidate(persona_id);
 
 	if (!persona) {
 		return ESRCH;
 	}
 
-	/* one reference from the _lookup() */
+	                                      
 	persona_put(persona);
 
-	/* one reference from the _alloc() */
+	                                     
 	persona_put(persona);
 
 	return error;
@@ -271,16 +271,16 @@ kpersona_getpath_syscall(user_addr_t idp, user_addr_t path)
 		return error;
 	}
 
-	/* Get current thread's persona id to compare if the
-	 * input persona_id matches the current persona id
-	 */
+	                                                    
+                                                   
+    
 	persona = current_persona_get();
 	if (persona) {
 		current_persona_id = persona->pna_id;
 	}
 
 	if (persona_id && persona_id != current_persona_id) {
-		/* Release the reference on the current persona id's persona */
+		                                                               
 		persona_put(persona);
 		if (!kauth_cred_issuser(kauth_cred_get()) &&
 		    !IOTaskHasEntitlement(current_task(), PERSONA_MGMT_ENTITLEMENT)) {
@@ -316,16 +316,16 @@ kpersona_info_syscall(user_addr_t idp, user_addr_t infop)
 		return error;
 	}
 
-	/* Get current thread's persona id to compare if the
-	 * input persona_id matches the current persona id
-	 */
+	                                                    
+                                                   
+    
 	persona = current_persona_get();
 	if (persona) {
 		current_persona_id = persona->pna_id;
 	}
 
 	if (persona_id && persona_id != current_persona_id) {
-		/* Release the reference on the current persona id's persona */
+		                                                               
 		persona_put(persona);
 		if (!kauth_cred_issuser(kauth_cred_get()) &&
 		    !IOTaskHasEntitlement(current_task(), PERSONA_MGMT_ENTITLEMENT)) {
@@ -352,10 +352,10 @@ kpersona_info_syscall(user_addr_t idp, user_addr_t infop)
 	kinfo.persona_ngroups = (uint32_t)ngroups;
 	kinfo.persona_gmuid = persona_get_gmuid(persona);
 
-	/*
-	 * NULL termination is assured b/c persona_name is
-	 * exactly MAXLOGNAME + 1 bytes (and has been memset to 0)
-	 */
+	  
+                                                   
+                                                           
+    
 	strncpy(kinfo.persona_name, persona->pna_login, MAXLOGNAME);
 
 	persona_put(persona);
@@ -447,7 +447,7 @@ kpersona_find_syscall(user_addr_t infop, user_addr_t idp, user_addr_t idlenp)
 		goto out;
 	}
 
-	/* copyout all the IDs of each persona we found */
+	                                                  
 	for (size_t i = 0; i < k_idlen; i++) {
 		if (i >= u_idlen) {
 			break;
@@ -473,15 +473,15 @@ out:
 	return error;
 }
 
-/*
- * Syscall entry point / demux.
- */
+  
+                               
+   
 int
 persona(__unused proc_t p, struct persona_args *pargs, __unused int32_t *retval)
 {
 	int error;
 	uint32_t op = pargs->operation;
-	/* uint32_t flags = pargs->flags; */
+	                                    
 	user_addr_t infop = pargs->info;
 	user_addr_t idp = pargs->id;
 	user_addr_t path = pargs->path;

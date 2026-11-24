@@ -34,8 +34,8 @@
 
 #include <corecrypto/cc_priv.h>
 
-//cc_abort() is implemented to comply with by FIPS 140-2, when DRBG produces
-//two equal consecutive blocks.
+                                                                            
+                               
 
 #if !CC_PROVIDES_ABORT
 

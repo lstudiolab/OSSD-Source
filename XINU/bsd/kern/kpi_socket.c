@@ -135,29 +135,29 @@ check_again:
 
 	so_release_accept_list(sock);
 
-	/*
-	 * Count the accepted socket as an in-kernel socket
-	 */
+	  
+                                                    
+    
 	new_so->so_flags1 |= SOF1_IN_KERNEL_SOCKET;
 	INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_in_kernel_total);
 	if (is_internal) {
 		INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_in_kernel_os_total);
 	}
 
-	/*
-	 * Pass the pre-accepted socket to any interested socket filter(s).
-	 * Upon failure, the socket would have been closed by the callee.
-	 */
+	  
+                                                                    
+                                                                  
+    
 	if (new_so->so_filt != NULL) {
-		/*
-		 * Temporarily drop the listening socket's lock before we
-		 * hand off control over to the socket filter(s), but keep
-		 * a reference so that it won't go away.  We'll grab it
-		 * again once we're done with the filter(s).
-		 */
+		  
+                                                           
+                                                            
+                                                         
+                                              
+     
 		socket_unlock(sock, 0);
 		if ((error = soacceptfilter(new_so, sock)) != 0) {
-			/* Drop reference on listening socket */
+			                                        
 			sodereference(sock);
 			return error;
 		}
@@ -172,15 +172,15 @@ check_again:
 
 	(void) soacceptlock(new_so, &sa, 0);
 
-	socket_unlock(sock, 1); /* release the head */
+	socket_unlock(sock, 1);                       
 
-	/* see comments in sock_setupcall() */
+	                                      
 	if (callback != NULL) {
 #if (defined(__arm__) || defined(__arm64__))
 		sock_setupcalls_locked(new_so, callback, cookie, callback, cookie, 0);
-#else /* (defined(__arm__) || defined(__arm64__)) */
+#else                                               
 		sock_setupcalls_locked(new_so, callback, cookie, NULL, NULL, 0);
-#endif /* (defined(__arm__) || defined(__arm64__)) */
+#endif                                               
 	}
 
 	if (sa != NULL && from != NULL) {
@@ -193,10 +193,10 @@ check_again:
 		FREE(sa, M_SONAME);
 	}
 
-	/*
-	 * If the socket has been marked as inactive by sosetdefunct(),
-	 * disallow further operations on it.
-	 */
+	  
+                                                                
+                                      
+    
 	if (new_so->so_flags & SOF_DEFUNCT) {
 		(void) sodefunct(current_proc(), new_so,
 		    SHUTDOWN_SOCKET_LEVEL_DISCONNECT_INTERNAL);
@@ -247,7 +247,7 @@ sock_bind(socket_t sock, const struct sockaddr *to)
 	}
 	memcpy(sa, to, to->sa_len);
 
-	error = sobindlock(sock, sa, 1);        /* will lock socket */
+	error = sobindlock(sock, sa, 1);                              
 
 	if (sa != NULL && want_free == TRUE) {
 		kheap_free(KHEAP_TEMP, sa, sa->sa_len);
@@ -338,7 +338,7 @@ sock_connectwait(socket_t sock, const struct timeval *tv)
 
 	socket_lock(sock, 1);
 
-	/* Check if we're already connected or if we've already errored out */
+	                                                                      
 	if ((sock->so_state & SS_ISCONNECTING) == 0 || sock->so_error != 0) {
 		if (sock->so_error != 0) {
 			retval = sock->so_error;
@@ -353,7 +353,7 @@ sock_connectwait(socket_t sock, const struct timeval *tv)
 		goto done;
 	}
 
-	/* copied translation from timeval to hertz from SO_RCVTIMEO handling */
+	                                                                        
 	if (tv->tv_sec < 0 || tv->tv_sec > SHRT_MAX / hz ||
 	    tv->tv_usec < 0 || tv->tv_usec >= 1000000) {
 		retval = EDOM;
@@ -376,7 +376,7 @@ sock_connectwait(socket_t sock, const struct timeval *tv)
 	msleep((caddr_t)&sock->so_timeo, mutex_held,
 	    PSOCK, "sock_connectwait", &ts);
 
-	/* Check if we're still waiting to connect */
+	                                             
 	if ((sock->so_state & SS_ISCONNECTING) && sock->so_error == 0) {
 		retval = EINPROGRESS;
 		goto done;
@@ -398,11 +398,11 @@ sock_nointerrupt(socket_t sock, int on)
 	socket_lock(sock, 1);
 
 	if (on) {
-		sock->so_rcv.sb_flags |= SB_NOINTR;     /* This isn't safe */
-		sock->so_snd.sb_flags |= SB_NOINTR;     /* This isn't safe */
+		sock->so_rcv.sb_flags |= SB_NOINTR;                          
+		sock->so_snd.sb_flags |= SB_NOINTR;                          
 	} else {
-		sock->so_rcv.sb_flags &= ~SB_NOINTR;    /* This isn't safe */
-		sock->so_snd.sb_flags &= ~SB_NOINTR;    /* This isn't safe */
+		sock->so_rcv.sb_flags &= ~SB_NOINTR;                         
+		sock->so_snd.sb_flags &= ~SB_NOINTR;                         
 	}
 
 	socket_unlock(sock, 1);
@@ -520,7 +520,7 @@ sock_getsockopt(socket_t sock, int level, int optname, void *optval,
 	sopt.sopt_val = CAST_USER_ADDR_T(optval);
 	sopt.sopt_valsize = *optlen;
 	sopt.sopt_p = kernproc;
-	error = sogetoptlock(sock, &sopt, 1);   /* will lock socket */
+	error = sogetoptlock(sock, &sopt, 1);                         
 	if (error == 0) {
 		*optlen = (uint32_t)sopt.sopt_valsize;
 	}
@@ -530,7 +530,7 @@ sock_getsockopt(socket_t sock, int level, int optname, void *optval,
 errno_t
 sock_ioctl(socket_t sock, unsigned long request, void *argp)
 {
-	return soioctl(sock, request, argp, kernproc); /* will lock socket */
+	return soioctl(sock, request, argp, kernproc);                       
 }
 
 errno_t
@@ -549,13 +549,13 @@ sock_setsockopt(socket_t sock, int level, int optname, const void *optval,
 	sopt.sopt_val = CAST_USER_ADDR_T(optval);
 	sopt.sopt_valsize = optlen;
 	sopt.sopt_p = kernproc;
-	return sosetoptlock(sock, &sopt, 1); /* will lock socket */
+	return sosetoptlock(sock, &sopt, 1);                       
 }
 
-/*
- * This follows the recommended mappings between DSCP code points
- * and WMM access classes.
- */
+  
+                                                                 
+                          
+   
 static uint32_t
 so_tc_from_dscp(uint8_t dscp)
 {
@@ -587,11 +587,11 @@ sock_settclassopt(socket_t sock, const void *optval, size_t optlen)
 
 	socket_lock(sock, 1);
 	if (!(sock->so_state & SS_ISCONNECTED)) {
-		/*
-		 * If the socket is not connected then we don't know
-		 * if the destination is on LAN  or not. Skip
-		 * setting traffic class in this case
-		 */
+		  
+                                                      
+                                               
+                                       
+     
 		error = ENOTCONN;
 		goto out;
 	}
@@ -602,10 +602,10 @@ sock_settclassopt(socket_t sock, const void *optval, size_t optlen)
 		goto out;
 	}
 
-	/*
-	 * Set the socket traffic class based on the passed DSCP code point
-	 * regardless of the scope of the destination
-	 */
+	  
+                                                                    
+                                              
+    
 	sotc = so_tc_from_dscp((uint8_t)((*(const int *)optval) >> 2));
 
 	sopt.sopt_dir = SOPT_SET;
@@ -615,7 +615,7 @@ sock_settclassopt(socket_t sock, const void *optval, size_t optlen)
 	sopt.sopt_level = SOL_SOCKET;
 	sopt.sopt_name = SO_TRAFFIC_CLASS;
 
-	error = sosetoptlock(sock, &sopt, 0);   /* already locked */
+	error = sosetoptlock(sock, &sopt, 0);                       
 
 	if (error != 0) {
 		printf("%s: sosetopt SO_TRAFFIC_CLASS failed %d\n",
@@ -623,11 +623,11 @@ sock_settclassopt(socket_t sock, const void *optval, size_t optlen)
 		goto out;
 	}
 
-	/*
-	 * Check if the destination address is LAN or link local address.
-	 * We do not want to set traffic class bits if the destination
-	 * is not local.
-	 */
+	  
+                                                                  
+                                                               
+                 
+    
 	if (!so_isdstlocal(sock)) {
 		goto out;
 	}
@@ -651,7 +651,7 @@ sock_settclassopt(socket_t sock, const void *optval, size_t optlen)
 		goto out;
 	}
 
-	error = sosetoptlock(sock, &sopt, 0);   /* already locked */
+	error = sosetoptlock(sock, &sopt, 0);                       
 	socket_unlock(sock, 1);
 	return error;
 out:
@@ -693,7 +693,7 @@ sock_gettclassopt(socket_t sock, void *optval, size_t *optlen)
 		socket_unlock(sock, 1);
 		return EINVAL;
 	}
-	error = sogetoptlock(sock, &sopt, 0);   /* already locked */
+	error = sogetoptlock(sock, &sopt, 0);                       
 	socket_unlock(sock, 1);
 	if (error == 0) {
 		*optlen = sopt.sopt_valsize;
@@ -708,7 +708,7 @@ sock_listen(socket_t sock, int backlog)
 		return EINVAL;
 	}
 
-	return solisten(sock, backlog); /* will lock socket */
+	return solisten(sock, backlog);                       
 }
 
 errno_t
@@ -749,7 +749,7 @@ sock_receive_internal(socket_t sock, struct msghdr *msg, mbuf_t *data,
 		*recvdlen = 0;
 	}
 
-	/* let pru_soreceive handle the socket locking */
+	                                                 
 	error = sock->so_proto->pr_usrreqs->pru_soreceive(sock, &fromsa, auio,
 	    data, (msg && msg->msg_control) ? &control : NULL, &flags);
 	if (error != 0) {
@@ -902,13 +902,13 @@ sock_send_internal(socket_t sock, const struct msghdr *msg, mbuf_t data,
 	    (struct sockaddr *)msg->msg_name : NULL, auio, data,
 	    control, flags);
 
-	/*
-	 * Residual data is possible in the case of IO vectors but not
-	 * in the mbuf case since the latter is treated as atomic send.
-	 * If pru_sosend() consumed a portion of the iovecs data and
-	 * the error returned is transient, treat it as success; this
-	 * is consistent with sendit() behavior.
-	 */
+	  
+                                                               
+                                                                
+                                                             
+                                                              
+                                         
+    
 	if (auio != NULL && uio_resid(auio) != datalen &&
 	    (error == ERESTART || error == EINTR || error == EWOULDBLOCK)) {
 		error = 0;
@@ -924,11 +924,11 @@ sock_send_internal(socket_t sock, const struct msghdr *msg, mbuf_t data,
 
 	return error;
 
-/*
- * In cases where we detect an error before returning, we need to
- * free the mbuf chain if there is one. sosend (and pru_sosend) will
- * free the mbuf chain if they encounter an error.
- */
+  
+                                                                 
+                                                                    
+                                                  
+   
 errorout:
 	if (control) {
 		m_freem(control);
@@ -986,26 +986,26 @@ sock_socket_common(int domain, int type, int protocol, sock_upcall callback,
 		return EINVAL;
 	}
 
-	/* socreate will create an initial so_count */
+	                                              
 	error = socreate(domain, new_so, type, protocol);
 	if (error == 0) {
-		/*
-		 * This is an in-kernel socket
-		 */
+		  
+                                
+     
 		(*new_so)->so_flags1 |= SOF1_IN_KERNEL_SOCKET;
 		INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_in_kernel_total);
 		if (is_internal) {
 			INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_in_kernel_os_total);
 		}
 
-		/* see comments in sock_setupcall() */
+		                                      
 		if (callback != NULL) {
 			sock_setupcall(*new_so, callback, context);
 		}
-		/*
-		 * last_pid and last_upid should be zero for sockets
-		 * created using sock_socket
-		 */
+		  
+                                                      
+                              
+     
 		(*new_so)->last_pid = 0;
 		(*new_so)->last_upid = 0;
 	}
@@ -1038,7 +1038,7 @@ sock_close(socket_t sock)
 	soclose(sock);
 }
 
-/* Do we want this to be APPLE_PRIVATE API?: YES (LD 12/23/04) */
+                                                                 
 void
 sock_retain(socket_t sock)
 {
@@ -1048,11 +1048,11 @@ sock_retain(socket_t sock)
 
 	socket_lock(sock, 1);
 	sock->so_retaincnt++;
-	sock->so_usecount++;    /* add extra reference for holding the socket */
+	sock->so_usecount++;                                                    
 	socket_unlock(sock, 1);
 }
 
-/* Do we want this to be APPLE_PRIVATE API? */
+                                              
 void
 sock_release(socket_t sock)
 {
@@ -1069,19 +1069,19 @@ sock_release(socket_t sock)
 	if (sock->so_retaincnt < 0) {
 		panic("%s: negative retain count (%d) for sock=%p\n",
 		    __func__, sock->so_retaincnt, sock);
-		/* NOTREACHED */
+		                
 	}
-	/*
-	 * Check SS_NOFDREF in case a close happened as sock_retain()
-	 * was grabbing the lock
-	 */
+	  
+                                                              
+                         
+    
 	if ((sock->so_retaincnt == 0) && (sock->so_usecount == 2) &&
 	    (!(sock->so_state & SS_NOFDREF) ||
 	    (sock->so_flags & SOF_MP_SUBFLOW))) {
-		/* close socket only if the FD is not holding it */
+		                                                   
 		soclose_locked(sock);
 	} else {
-		/* remove extra reference holding the socket */
+		                                               
 		VERIFY(sock->so_usecount > 1);
 		sock->so_usecount--;
 	}
@@ -1144,14 +1144,14 @@ sock_gettype(socket_t sock, int *outDomain, int *outType, int *outProtocol)
 	return 0;
 }
 
-/*
- * Return the listening socket of a pre-accepted socket.  It returns the
- * listener (so_head) value of a given socket.  This is intended to be
- * called by a socket filter during a filter attach (sf_attach) callback.
- * The value returned by this routine is safe to be used only in the
- * context of that callback, because we hold the listener's lock across
- * the sflt_initsock() call.
- */
+  
+                                                                        
+                                                                      
+                                                                         
+                                                                    
+                                                                       
+                            
+   
 socket_t
 sock_getlistener(socket_t sock)
 {
@@ -1167,9 +1167,9 @@ sock_set_tcp_stream_priority(socket_t sock)
 	}
 }
 
-/*
- * Caller must have ensured socket is valid and won't be going away.
- */
+  
+                                                                    
+   
 void
 socket_set_traffic_mgt_flags_locked(socket_t sock, u_int8_t flags)
 {
@@ -1195,9 +1195,9 @@ socket_set_traffic_mgt_flags(socket_t sock, u_int8_t flags)
 	socket_unlock(sock, 1);
 }
 
-/*
- * Caller must have ensured socket is valid and won't be going away.
- */
+  
+                                                                    
+   
 void
 socket_clear_traffic_mgt_flags_locked(socket_t sock, u_int8_t flags)
 {
@@ -1224,9 +1224,9 @@ socket_clear_traffic_mgt_flags(socket_t sock, u_int8_t flags)
 }
 
 
-/*
- * Caller must have ensured socket is valid and won't be going away.
- */
+  
+                                                                    
+   
 errno_t
 socket_defunct(struct proc *p, socket_t so, int level)
 {
@@ -1238,13 +1238,13 @@ socket_defunct(struct proc *p, socket_t so, int level)
 	}
 
 	socket_lock(so, 1);
-	/*
-	 * SHUTDOWN_SOCKET_LEVEL_DISCONNECT_SVC level is meant to tear down
-	 * all of mDNSResponder IPC sockets, currently those of AF_UNIX; note
-	 * that this is an implementation artifact of mDNSResponder.  We do
-	 * a quick test against the socket buffers for SB_UNIX, since that
-	 * would have been set by unp_attach() at socket creation time.
-	 */
+	  
+                                                                    
+                                                                      
+                                                                    
+                                                                   
+                                                                
+    
 	if (level == SHUTDOWN_SOCKET_LEVEL_DISCONNECT_SVC &&
 	    (so->so_rcv.sb_flags & so->so_snd.sb_flags & SB_UNIX) != SB_UNIX) {
 		socket_unlock(so, 1);
@@ -1296,21 +1296,21 @@ sock_setupcall(socket_t sock, sock_upcall callback, void *context)
 		return EINVAL;
 	}
 
-	/*
-	 * Note that we don't wait for any in progress upcall to complete.
-	 * On embedded, sock_setupcall() causes both read and write
-	 * callbacks to be set; on desktop, only read callback is set
-	 * to maintain legacy KPI behavior.
-	 *
-	 * The newer sock_setupcalls() KPI should be used instead to set
-	 * the read and write callbacks and their respective parameters.
-	 */
+	  
+                                                                   
+                                                            
+                                                              
+                                    
+   
+                                                                 
+                                                                 
+    
 	socket_lock(sock, 1);
 #if (defined(__arm__) || defined(__arm64__))
 	sock_setupcalls_locked(sock, callback, context, callback, context, 0);
-#else /* (defined(__arm__) || defined(__arm64__)) */
+#else                                               
 	sock_setupcalls_locked(sock, callback, context, NULL, NULL, 0);
-#endif /* (defined(__arm__) || defined(__arm64__)) */
+#endif                                               
 	socket_unlock(sock, 1);
 
 	return 0;
@@ -1324,9 +1324,9 @@ sock_setupcalls(socket_t sock, sock_upcall rcallback, void *rcontext,
 		return EINVAL;
 	}
 
-	/*
-	 * Note that we don't wait for any in progress upcall to complete.
-	 */
+	  
+                                                                   
+    
 	socket_lock(sock, 1);
 	sock_setupcalls_locked(sock, rcallback, rcontext, wcallback, wcontext, 0);
 	socket_unlock(sock, 1);
@@ -1340,9 +1340,9 @@ sock_catchevents_locked(socket_t sock, sock_evupcall ecallback, void *econtext,
 {
 	socket_lock_assert_owned(sock);
 
-	/*
-	 * Note that we don't wait for any in progress upcall to complete.
-	 */
+	  
+                                                                   
+    
 	if (ecallback != NULL) {
 		sock->so_event = ecallback;
 		sock->so_eventarg = econtext;
@@ -1369,9 +1369,9 @@ sock_catchevents(socket_t sock, sock_evupcall ecallback, void *econtext,
 	return 0;
 }
 
-/*
- * Returns true whether or not a socket belongs to the kernel.
- */
+  
+                                                              
+   
 int
 sock_iskernel(socket_t so)
 {

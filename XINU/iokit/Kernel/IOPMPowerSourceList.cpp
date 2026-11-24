@@ -32,10 +32,10 @@
 #define super OSObject
 OSDefineMetaClassAndStructors(IOPMPowerSourceList, OSObject)
 
-//******************************************************************************
-// init
-//
-//******************************************************************************
+                                                                                
+       
+  
+                                                                                
 void
 IOPMPowerSourceList::initialize( void )
 {
@@ -43,27 +43,27 @@ IOPMPowerSourceList::initialize( void )
 	length = 0;
 }
 
-//******************************************************************************
-// addToList
-//
-//******************************************************************************
+                                                                                
+            
+  
+                                                                                
 
 IOReturn
 IOPMPowerSourceList::addToList(IOPMPowerSource *newPowerSource)
 {
 	IOPMPowerSource * nextPowerSource;
 
-	// Is new object already in the list?
+	                                     
 	nextPowerSource = firstItem;
 	while (nextPowerSource != NULL) {
 		if (nextPowerSource == newPowerSource) {
-			// yes, just return
+			                   
 			return IOPMNoErr;
 		}
 		nextPowerSource = nextInList(nextPowerSource);
 	}
 
-	// add it to list
+	                 
 	newPowerSource->nextInList = firstItem;
 	firstItem = newPowerSource;
 	length++;
@@ -71,10 +71,10 @@ IOPMPowerSourceList::addToList(IOPMPowerSource *newPowerSource)
 }
 
 
-//******************************************************************************
-// firstInList
-//
-//******************************************************************************
+                                                                                
+              
+  
+                                                                                
 
 IOPMPowerSource *
 IOPMPowerSourceList::firstInList( void )
@@ -82,10 +82,10 @@ IOPMPowerSourceList::firstInList( void )
 	return firstItem;
 }
 
-//******************************************************************************
-// nextInList
-//
-//******************************************************************************
+                                                                                
+             
+  
+                                                                                
 
 IOPMPowerSource *
 IOPMPowerSourceList::nextInList(IOPMPowerSource *currentItem)
@@ -96,10 +96,10 @@ IOPMPowerSourceList::nextInList(IOPMPowerSource *currentItem)
 	return NULL;
 }
 
-//******************************************************************************
-// numberOfItems
-//
-//******************************************************************************
+                                                                                
+                
+  
+                                                                                
 
 unsigned long
 IOPMPowerSourceList::numberOfItems( void )
@@ -107,11 +107,11 @@ IOPMPowerSourceList::numberOfItems( void )
 	return length;
 }
 
-//******************************************************************************
-// removeFromList
-//
-// Find the item in the list, unlink it, and free it.
-//******************************************************************************
+                                                                                
+                 
+  
+                                                     
+                                                                                
 
 IOReturn
 IOPMPowerSourceList::removeFromList( IOPMPowerSource * theItem )
@@ -145,11 +145,11 @@ exit:
 }
 
 
-//******************************************************************************
-// free
-//
-// Free all items in the list, and then free the list itself
-//******************************************************************************
+                                                                                
+       
+  
+                                                            
+                                                                                
 
 void
 IOPMPowerSourceList::free(void )

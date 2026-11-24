@@ -44,14 +44,14 @@
 #error IOStatisticsPrivate.h is for kernel use only
 #endif
 
-/* Defines */
+             
 #define IOKIT_STATISTICS_RECORDED_USERCLIENT_PROCS 20
 
 #ifndef __probable
 #define __probable(x) x
 #endif
 
-/* Forward declarations */
+                          
 class IOWorkLoop;
 class IOUserClient;
 class IOEventSource;
@@ -63,7 +63,7 @@ struct IOUserClientProcessEntry;
 
 struct KextNode;
 
-/* Allocation tracking */
+                         
 
 enum {
 	kIOStatisticsMalloc = 0,
@@ -79,7 +79,7 @@ enum {
 
 TAILQ_HEAD(ProcessEntryList, IOUserClientProcessEntry);
 
-/* Tree and list structs */
+                           
 
 typedef struct ClassNode {
 	RB_ENTRY(ClassNode) tLink;
@@ -106,7 +106,7 @@ typedef struct KextNode {
 	ProcessEntryList userClientCallList;
 } KextNode;
 
-/* User client tracing */
+                         
 
 typedef struct IOUserClientProcessEntry {
 	TAILQ_ENTRY(IOUserClientProcessEntry) link;
@@ -115,7 +115,7 @@ typedef struct IOUserClientProcessEntry {
 	uint32_t calls;
 } IOUserClientProcessEntry;
 
-/* Counters */
+              
 
 typedef struct IOInterruptEventSourceCounter {
 	uint32_t produced;
@@ -263,14 +263,14 @@ public:
 	static int getWorkLoopStatistics(sysctl_req *req);
 	static int getUserClientStatistics(sysctl_req *req);
 
-/* Inlines for counter manipulation.
- *
- * NOTE: counter access is not expressly guarded here so as not to incur performance penalties
- * in the instrumented parent objects. Writes are arranged so as to be protected by pre-existing
- * locks in the parent where appropriate, but reads have no such guarantee. Counters should
- * therefore be regarded as providing an indication of current state, rather than precisely
- * accurate statistics.
- */
+                                    
+  
+                                                                                              
+                                                                                                
+                                                                                           
+                                                                                           
+                       
+   
 
 	static inline void
 	setCounterType(IOEventSourceCounter *counter, IOStatisticsCounterType type)
@@ -298,7 +298,7 @@ public:
 		}
 	}
 
-/* Interrupt */
+               
 	static inline void
 	countInterruptCheckForWork(IOEventSourceCounter *counter)
 	{
@@ -315,7 +315,7 @@ public:
 		}
 	}
 
-/* CommandQueue */
+                  
 	static inline void
 	countCommandQueueActionCall(IOEventSourceCounter *counter)
 	{
@@ -324,7 +324,7 @@ public:
 		}
 	}
 
-/* CommandGate */
+                 
 	static inline void
 	countCommandGateActionCall(IOEventSourceCounter *counter)
 	{
@@ -333,7 +333,7 @@ public:
 		}
 	}
 
-/* Timer */
+           
 	static inline void
 	countTimerTimeout(IOEventSourceCounter *counter)
 	{
@@ -342,7 +342,7 @@ public:
 		}
 	}
 
-/* WorkLoop */
+              
 	static void attachWorkLoopEventSource(IOWorkLoopCounter *wlc, IOEventSourceCounter *esc);
 	static void detachWorkLoopEventSource(IOWorkLoopCounter *wlc, IOEventSourceCounter *esc);
 
@@ -364,16 +364,16 @@ public:
 		}
 	}
 
-/* IOLib allocations */
+                       
 	static void countAlloc(uint32_t index, vm_size_t size);
 
-/* UserClient */
+                
 	static void countUserClientCall(IOUserClient *client);
 };
 
 #else
 
-/* Statistics disabled */
+                         
 
 class IOStatistics {
 public:
@@ -383,6 +383,6 @@ public:
 	}
 };
 
-#endif /* IOKITSTATS */
+#endif                 
 
-#endif /* __IOKIT_STATISTICS_PRIVATE_H */
+#endif                                   

@@ -57,9 +57,9 @@ main(int argc, char * argv[])
 	dst = argv[1];
 
 	for (i = 2; i < argc; i++) {
-		newcontentlength += strlen(argv[i]) + 1 /* space or newline */;
+		newcontentlength += strlen(argv[i]) + 1                       ;
 	}
-	newcontentlength += 1; /* NUL */
+	newcontentlength += 1;          
 
 	newcontent = malloc(newcontentlength);
 	if (newcontent == NULL) {
@@ -92,7 +92,7 @@ main(int argc, char * argv[])
 	}
 
 	if (sb.st_size != newcontentlength) {
-		/* obvious new content must be different than old */
+		                                                    
 		goto replace;
 	}
 
@@ -109,7 +109,7 @@ main(int argc, char * argv[])
 	}
 
 	if (0 == memcmp(oldcontent, newcontent, newcontentlength)) {
-		/* binary comparison succeeded, just exit */
+		                                            
 		free(oldcontent);
 		ret = close(dstfd);
 		if (ret < 0) {

@@ -47,13 +47,13 @@
 #include <arm/cpu_data_internal.h>
 #endif
 
-/* global for whether to read PMCs on context switch */
+                                                       
 int kpc_threads_counting = 0;
 
-/* whether to call into KPC when a thread goes off CPU */
+                                                         
 boolean_t kpc_off_cpu_active = FALSE;
 
-/* current config and number of counters in that config */
+                                                          
 static uint32_t kpc_thread_classes = 0;
 static uint32_t kpc_thread_classes_count = 0;
 
@@ -66,7 +66,7 @@ kpc_get_thread_counting(void)
 	uint32_t kpc_thread_classes_tmp;
 	int kpc_threads_counting_tmp;
 
-	/* Make sure we get a consistent snapshot of these values */
+	                                                            
 	lck_mtx_lock(&kpc_thread_lock);
 
 	kpc_thread_classes_tmp = kpc_thread_classes;
@@ -92,20 +92,20 @@ kpc_set_thread_counting(uint32_t classes)
 
 	if ((classes == 0)
 	    || (count == 0)) {
-		/* shut down */
+		               
 		kpc_threads_counting = FALSE;
 	} else {
-		/* stash the config */
+		                      
 		kpc_thread_classes = classes;
 
-		/* work out the size */
+		                       
 		kpc_thread_classes_count = count;
 		assert(kpc_thread_classes_count <= KPC_MAX_COUNTERS);
 
-		/* enable switch */
+		                   
 		kpc_threads_counting = TRUE;
 
-		/* and schedule an AST for this thread... */
+		                                            
 		if (!current_thread()->kpc_buf) {
 			current_thread()->kperf_ast |= T_KPC_ALLOC;
 			act_set_kperf(current_thread());
@@ -118,7 +118,7 @@ kpc_set_thread_counting(uint32_t classes)
 	return 0;
 }
 
-/* snapshot current PMCs and update counters in the current thread */
+                                                                     
 static void
 kpc_update_thread_counters( thread_t thread )
 {
@@ -128,52 +128,52 @@ kpc_update_thread_counters( thread_t thread )
 
 	cpu = current_cpu_datap();
 
-	/* 1. stash current PMCs into latest CPU block */
+	                                                 
 	kpc_get_cpu_counters( FALSE, kpc_thread_classes,
 	    NULL, cpu->cpu_kpc_buf[1] );
 
-	/* 2. apply delta to old thread */
+	                                  
 	if (thread->kpc_buf) {
 		for (i = 0; i < kpc_thread_classes_count; i++) {
 			thread->kpc_buf[i] += cpu->cpu_kpc_buf[1][i] - cpu->cpu_kpc_buf[0][i];
 		}
 	}
 
-	/* schedule any necessary allocations */
+	                                        
 	if (!current_thread()->kpc_buf) {
 		current_thread()->kperf_ast |= T_KPC_ALLOC;
 		act_set_kperf(current_thread());
 	}
 
-	/* 3. switch the PMC block pointers */
+	                                      
 	tmp = cpu->cpu_kpc_buf[1];
 	cpu->cpu_kpc_buf[1] = cpu->cpu_kpc_buf[0];
 	cpu->cpu_kpc_buf[0] = tmp;
 }
 
-/* get counter values for a thread */
+                                     
 int
 kpc_get_curthread_counters(uint32_t *inoutcount, uint64_t *buf)
 {
 	thread_t thread = current_thread();
 	boolean_t enabled;
 
-	/* buffer too small :( */
+	                         
 	if (*inoutcount < kpc_thread_classes_count) {
 		return EINVAL;
 	}
 
-	/* copy data and actual size */
+	                               
 	if (!thread->kpc_buf) {
 		return EINVAL;
 	}
 
 	enabled = ml_set_interrupts_enabled(FALSE);
 
-	/* snap latest version of counters for this thread */
+	                                                     
 	kpc_update_thread_counters( current_thread());
 
-	/* copy out */
+	              
 	memcpy( buf, thread->kpc_buf,
 	    kpc_thread_classes_count * sizeof(*buf));
 	*inoutcount = kpc_thread_classes_count;
@@ -200,12 +200,12 @@ kpc_off_cpu_internal(thread_t thread)
 void
 kpc_thread_create(thread_t thread)
 {
-	/* nothing to do if we're not counting */
+	                                         
 	if (!kpc_threads_counting) {
 		return;
 	}
 
-	/* give the new thread a counterbuf */
+	                                      
 	thread->kpc_buf = kpc_counterbuf_alloc();
 }
 
@@ -214,12 +214,12 @@ kpc_thread_destroy(thread_t thread)
 {
 	uint64_t *buf = NULL;
 
-	/* usual case: no kpc buf, just return */
+	                                         
 	if (!thread->kpc_buf) {
 		return;
 	}
 
-	/* otherwise, don't leak */
+	                           
 	buf = thread->kpc_buf;
 	thread->kpc_buf = NULL;
 	kpc_counterbuf_free(buf);

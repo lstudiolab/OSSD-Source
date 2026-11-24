@@ -27,11 +27,11 @@
  */
 #ifndef _KAUTH_GUID
 #define _KAUTH_GUID
-/* Apple-style globally unique identifier */
+                                            
 typedef union {
-#define KAUTH_GUID_SIZE 16      /* 128-bit identifier */
+#define KAUTH_GUID_SIZE 16                              
 	unsigned char g_guid[KAUTH_GUID_SIZE];
 	unsigned int g_guid_asint[KAUTH_GUID_SIZE / sizeof(unsigned int)];
 } guid_t;
 #define _GUID_T
-#endif /* _KAUTH_GUID */
+#endif                  

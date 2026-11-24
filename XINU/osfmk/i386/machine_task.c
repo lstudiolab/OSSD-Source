@@ -223,10 +223,10 @@ machine_task_get_state(task_t task,
 	}
 }
 
-/*
- * This is called when a task is terminated, and also on exec().
- * Clear machine-dependent state that is stored on the task.
- */
+  
+                                                                
+                                                            
+   
 void
 machine_task_terminate(task_t task)
 {
@@ -255,10 +255,10 @@ machine_task_terminate(task_t task)
 	}
 }
 
-/*
- * Set initial default state on a thread as stored in the MACHINE_TASK data.
- * Note: currently only debug state is supported.
- */
+  
+                                                                            
+                                                 
+   
 kern_return_t
 machine_thread_inherit_taskwide(
 	thread_t thread,

@@ -48,13 +48,13 @@
 #include <mach/vm_map.h>
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * Raw EMMI interfaces are private to xnu
- * and subject to change.
- */
+  
+                                         
+                         
+   
 #include <mach/memory_object_default_server.h>
 #include <mach/memory_object_control.h>
 #include <mach/upl.h>
 #endif
 
-#endif /* _MACH_INTERFACE_H_ */
+#endif                         

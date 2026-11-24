@@ -36,4 +36,4 @@
 template <typename T, size_t N>
 using OSBoundedArray = libkern::bounded_array<T, N, os_detail::panic_trapping_policy>;
 
-#endif /* !XNU_LIBKERN_LIBKERN_CXX_OS_BOUNDED_ARRAY_H */
+#endif                                                  

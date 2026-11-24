@@ -33,7 +33,7 @@
 #include <libkern/i386/_OSByteOrder.h>
 #include <sys/_types/_os_inline.h>
 
-/* Functions for byte reversed loads. */
+                                        
 
 OS_INLINE
 uint16_t
@@ -74,7 +74,7 @@ OSReadSwapInt64(
 	return _OSSwapInt64(result);
 }
 
-/* Functions for byte reversed stores. */
+                                         
 
 OS_INLINE
 void
@@ -109,4 +109,4 @@ OSWriteSwapInt64(
 	*(volatile uint64_t *)((uintptr_t)base + byteOffset) = _OSSwapInt64(data);
 }
 
-#endif /* ! _OS_OSBYTEORDERI386_H */
+#endif                              

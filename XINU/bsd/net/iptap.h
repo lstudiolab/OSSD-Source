@@ -41,8 +41,8 @@
 
 extern void iptap_init(void);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* PRIVATE */
+#endif              
 
-#endif /* IPTAP_H */
+#endif              

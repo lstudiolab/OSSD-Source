@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_rio.h,v 1.5 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_rio.h,v 1.9 2003/07/10 12:07:49 kjc Exp $	*/
+                                                               
+                                                           
 
 /*
  * Copyright (C) 1998-2003
@@ -61,20 +61,20 @@
 #ifdef PRIVATE
 #ifdef BSD_KERNEL_PRIVATE
 #include <net/classq/if_classq.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * RIO: RED with IN/OUT bit
- * (extended to support more than 2 drop precedence values)
- */
-#define RIO_NDROPPREC   3       /* number of drop precedence values */
+  
+                           
+                                                           
+   
+#define RIO_NDROPPREC   3                                             
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_CLASSQ_RIO_H_ */
+#endif              
+#endif                                

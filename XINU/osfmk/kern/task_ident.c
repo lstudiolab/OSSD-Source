@@ -78,7 +78,7 @@ tidt_release(task_id_token_t token)
 		return;
 	}
 
-	/* last ref */
+	              
 	port = token->port;
 
 	require_ip_active(port);
@@ -107,7 +107,7 @@ task_id_token_notify(mach_msg_header_t *msg)
 	assert(IKOT_TASK_ID_TOKEN == ip_kotype(port));
 	assert(port->ip_srights == 0);
 
-	tidt_release(token); /* consumes ref given by notification */
+	tidt_release(token);                                         
 }
 
 kern_return_t
@@ -127,7 +127,7 @@ task_create_identity_token(
 	if (task->bsd_info) {
 		token->port = IP_NULL;
 		token->ident = proc_ident(task->bsd_info);
-		/* this reference will be donated to no-senders notification */
+		                                                               
 		os_ref_init_count(&token->tidt_refs, NULL, 1);
 	} else {
 		task_unlock(task);
@@ -185,7 +185,7 @@ task_identity_token_get_task_port(
 	}
 
 	if (flavor == TASK_FLAVOR_CONTROL && task == current_task()) {
-		*portp = convert_task_to_port_pinned(task); /* consumes task ref */
+		*portp = convert_task_to_port_pinned(task);                        
 		return KERN_SUCCESS;
 	}
 	if (flavor <= TASK_FLAVOR_INSPECT && task_conversion_eval(current_task(), task)) {
@@ -207,7 +207,7 @@ task_identity_token_get_task_port(
 	return kr;
 }
 
-/* Produces token ref */
+                        
 task_id_token_t
 convert_port_to_task_id_token(
 	ipc_port_t              port)
@@ -229,7 +229,7 @@ convert_port_to_task_id_token(
 	return token;
 }
 
-/* Consumes token ref */
+                        
 ipc_port_t
 convert_task_id_token_to_port(
 	task_id_token_t token)
@@ -244,7 +244,7 @@ convert_task_id_token_to_port(
 
 	kr = ipc_kobject_make_send_lazy_alloc_port(&token->port,
 	    (ipc_kobject_t) token, IKOT_TASK_ID_TOKEN, IPC_KOBJECT_ALLOC_NONE, false, 0);
-	assert(kr == TRUE); /* no-senders notification is armed, consumes token ref */
+	assert(kr == TRUE);                                                           
 
 	return token->port;
 }

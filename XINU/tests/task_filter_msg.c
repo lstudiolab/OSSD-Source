@@ -65,7 +65,7 @@ T_DECL(test_task_filter_msg_flag, "Set the filter msg flag on the task and check
 		T_ASSERT_EQ(exit_code, 0, "Child inherited the filter msg flag");
 	}
 
-	/* Turn off task msg filtering */
+	                                 
 	cur_filter_flag = 1;
 	new_filter_flag = 0;
 	ret = sysctlbyname("kern.task_set_filter_msg_flag", &cur_filter_flag, &sysctl_size, &new_filter_flag, sizeof(new_filter_flag));

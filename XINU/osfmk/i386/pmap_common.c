@@ -30,17 +30,17 @@
 #include <i386/pmap_internal.h>
 
 
-/*
- *	Each entry in the pv_head_table is locked by a bit in the
- *	pv_lock_table.  The lock bits are accessed by the physical
- *	address of the page they lock.
- */
+  
+                                                            
+                                                             
+                                 
+   
 
-char    *pv_lock_table;         /* pointer to array of bits */
+char    *pv_lock_table;                                       
 char    *pv_hash_lock_table;
 
-pv_rooted_entry_t       pv_head_table;          /* array of entries, one per
-                                                 * page */
+pv_rooted_entry_t       pv_head_table;                                      
+                                                          
 uint32_t                        pv_hashed_free_count = 0;
 uint32_t                        pv_hashed_kern_free_count = 0;
 
@@ -71,7 +71,7 @@ pmap_cache_attributes(ppnum_t pn)
 
 	if (cacheattr & INTEL_PTE_NCACHE) {
 		if (cacheattr & INTEL_PTE_PAT) {
-			/* WC */
+			        
 			return VM_WIMG_WCOMB;
 		}
 		return VM_WIMG_IO;
@@ -103,10 +103,10 @@ pmap_set_cache_attributes(ppnum_t pn, unsigned int cacheattr)
 		return;
 	}
 
-	/* override cache attributes for this phys page
-	 * Does not walk through existing mappings to adjust,
-	 * assumes page is disconnected
-	 */
+	                                               
+                                                      
+                                
+    
 
 	LOCK_PVH(pai);
 
@@ -134,23 +134,23 @@ pmap_get_cache_attributes(ppnum_t pn, boolean_t is_ept)
 		return PTE_NCACHE(is_ept);
 	}
 
-	/*
-	 * The cache attributes are read locklessly for efficiency.
-	 */
+	  
+                                                            
+    
 	unsigned int attr = pmap_phys_attributes[ppn_to_pai(pn)];
 	unsigned int template = 0;
 
-	/*
-	 * The PTA bit is currently unsupported for EPT PTEs.
-	 */
+	  
+                                                      
+    
 	if ((attr & PHYS_PAT) && !is_ept) {
 		template |= INTEL_PTE_PAT;
 	}
 
-	/*
-	 * If the page isn't marked as NCACHE, the default for EPT entries
-	 * is WB.
-	 */
+	  
+                                                                   
+          
+    
 	if (attr & PHYS_NCACHE) {
 		template |= PTE_NCACHE(is_ept);
 	} else if (is_ept) {
@@ -169,9 +169,9 @@ pmap_has_managed_page(ppnum_t first, ppnum_t last)
 
 	args        = (boot_args *) PE_state.bootArgs;
 
-	// Allow pages that the booter added to the end of the kernel.
-	// We may miss reporting some pages in this range that were freed
-	// with ml_static_free()
+	                                                              
+	                                                                 
+	                        
 	kdata_start = atop_32(args->kaddr);
 	kdata_end   = atop_32(args->kaddr + args->ksize);
 
@@ -236,10 +236,10 @@ pmap_clear_noencrypt(ppnum_t pn)
 	pai = ppn_to_pai(pn);
 
 	if (IS_MANAGED_PAGE(pai)) {
-		/*
-		 * synchronization at VM layer prevents PHYS_NOENCRYPT
-		 * from changing state, so we don't need the lock to inspect
-		 */
+		  
+                                                        
+                                                              
+     
 		if (pmap_phys_attributes[pai] & PHYS_NOENCRYPT) {
 			LOCK_PVH(pai);
 
@@ -331,10 +331,10 @@ mapping_free_prime(void)
 	pv_hashed_entry_t       pvh_et;
 	int                     pv_cnt;
 
-	/* Scale based on DRAM size */
+	                              
 	pv_hashed_low_water_mark = MAX(PV_HASHED_LOW_WATER_MARK_DEFAULT, ((uint32_t)(sane_size >> 30)) * 2000);
 	pv_hashed_low_water_mark = MIN(pv_hashed_low_water_mark, 16000);
-	/* Alterable via sysctl */
+	                          
 	pv_hashed_kern_low_water_mark = MAX(PV_HASHED_KERN_LOW_WATER_MARK_DEFAULT, ((uint32_t)(sane_size >> 30)) * 1000);
 	pv_hashed_kern_low_water_mark = MIN(pv_hashed_kern_low_water_mark, 16000);
 	pv_hashed_kern_alloc_chunk = PV_HASHED_KERN_ALLOC_CHUNK_INITIAL;
@@ -403,7 +403,7 @@ mapping_replenish(void)
 	int                     pv_cnt;
 	unsigned                i;
 
-	/* We qualify for VM privileges...*/
+	                                    
 	current_thread()->options |= TH_OPT_VMPRIV;
 
 	for (;;) {
@@ -443,19 +443,19 @@ mapping_replenish(void)
 			pmap_user_reserve_replenish_stat += pv_cnt;
 			PV_HASHED_FREE_LIST(pvh_eh, pvh_et, pv_cnt);
 		}
-/* Wake threads throttled while the kernel reserve was being replenished.
- */
+                                                                         
+   
 		if (pmap_pv_throttled_waiters) {
 			pmap_pv_throttled_waiters = 0;
 			thread_wakeup(&pmap_user_pv_throttle_event);
 		}
-		/* Check if the kernel pool has been depleted since the
-		 * first pass, to reduce refill latency.
-		 */
+		                                                       
+                                          
+     
 		if (pv_hashed_kern_free_count < pv_hashed_kern_low_water_mark) {
 			continue;
 		}
-		/* Block sans continuation to avoid yielding kernel stack */
+		                                                            
 		assert_wait(&mapping_replenish_event, THREAD_UNINT);
 		mappingrecurse = 0;
 		thread_block(THREAD_CONTINUE_NULL);
@@ -463,9 +463,9 @@ mapping_replenish(void)
 	}
 }
 
-/*
- *	Set specified attribute bits.
- */
+  
+                                
+   
 
 void
 phys_attribute_set(
@@ -483,7 +483,7 @@ phys_attribute_set(
 	pai = ppn_to_pai(pn);
 
 	if (!IS_MANAGED_PAGE(pai)) {
-		/* Not a managed page.  */
+		                          
 		return;
 	}
 
@@ -492,9 +492,9 @@ phys_attribute_set(
 	UNLOCK_PVH(pai);
 }
 
-/*
- *	Set the modify bit on the specified physical page.
- */
+  
+                                                     
+   
 
 void
 pmap_set_modify(ppnum_t pn)
@@ -502,9 +502,9 @@ pmap_set_modify(ppnum_t pn)
 	phys_attribute_set(pn, PHYS_MODIFIED);
 }
 
-/*
- *	Clear the modify bits on the specified physical page.
- */
+  
+                                                        
+   
 
 void
 pmap_clear_modify(ppnum_t pn)
@@ -512,12 +512,12 @@ pmap_clear_modify(ppnum_t pn)
 	phys_attribute_clear(pn, PHYS_MODIFIED, 0, NULL);
 }
 
-/*
- *	pmap_is_modified:
- *
- *	Return whether or not the specified physical page is modified
- *	by any physical maps.
- */
+  
+                    
+  
+                                                                
+                        
+   
 
 boolean_t
 pmap_is_modified(ppnum_t pn)
@@ -529,11 +529,11 @@ pmap_is_modified(ppnum_t pn)
 }
 
 
-/*
- *	pmap_clear_reference:
- *
- *	Clear the reference bit on the specified physical page.
- */
+  
+                        
+  
+                                                          
+   
 
 void
 pmap_clear_reference(ppnum_t pn)
@@ -547,12 +547,12 @@ pmap_set_reference(ppnum_t pn)
 	phys_attribute_set(pn, PHYS_REFERENCED);
 }
 
-/*
- *	pmap_is_referenced:
- *
- *	Return whether or not the specified physical page is referenced
- *	by any physical maps.
- */
+  
+                      
+  
+                                                                  
+                        
+   
 
 boolean_t
 pmap_is_referenced(ppnum_t pn)
@@ -564,11 +564,11 @@ pmap_is_referenced(ppnum_t pn)
 }
 
 
-/*
- * pmap_get_refmod(phys)
- *  returns the referenced and modified bits of the specified
- *  physical page.
- */
+  
+                        
+                                                             
+                  
+   
 unsigned int
 pmap_get_refmod(ppnum_t pn)
 {
@@ -599,11 +599,11 @@ pmap_clear_refmod_options(ppnum_t pn, unsigned int mask, unsigned int options, v
 	phys_attribute_clear(pn, x86Mask, options, arg);
 }
 
-/*
- * pmap_clear_refmod(phys, mask)
- *  clears the referenced and modified bits as specified by the mask
- *  of the specified physical page.
- */
+  
+                                
+                                                                    
+                                   
+   
 void
 pmap_clear_refmod(ppnum_t pn, unsigned int mask)
 {
@@ -621,21 +621,21 @@ pmap_disconnect(ppnum_t pa)
 	return pmap_disconnect_options(pa, 0, NULL);
 }
 
-/*
- *	Routine:
- *		pmap_disconnect_options
- *
- *	Function:
- *		Disconnect all mappings for this page and return reference and change status
- *		in generic format.
- *
- */
+  
+           
+                           
+  
+            
+                                                                                
+                      
+  
+   
 unsigned int
 pmap_disconnect_options(ppnum_t pa, unsigned int options, void *arg)
 {
 	unsigned refmod, vmrefmod = 0;
 
-	pmap_page_protect_options(pa, 0, options, arg);         /* disconnect the page */
+	pmap_page_protect_options(pa, 0, options, arg);                                  
 
 	pmap_assert(pa != vm_page_fictitious_addr);
 	if ((pa == vm_page_guard_addr) || !IS_MANAGED_PAGE(pa) || (options & PMAP_OPTIONS_NOREFMOD)) {

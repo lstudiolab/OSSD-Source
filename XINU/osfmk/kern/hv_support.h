@@ -45,4 +45,4 @@ extern int hv_disable;
 }
 #endif
 
-#endif /* _KERN_HV_SUPPORT_H_ */
+#endif                          

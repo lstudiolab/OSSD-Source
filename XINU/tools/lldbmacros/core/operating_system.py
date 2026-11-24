@@ -1,7 +1,7 @@
 #!/usr/bin/python
-#
+ 
 
-#source of register info is from http://opensource.apple.com/source/gdb/gdb-962/src/gdb/arm-tdep.c
+                                                                                                  
 import lldb
 import struct
 osplugin_target_obj = None
@@ -175,7 +175,7 @@ class Armv8_RegisterSet(object):
         self.fp = saved_state.GetChildMemberWithName('fp').GetValueAsUnsigned()
         self.lr = saved_state.GetChildMemberWithName('lr').GetValueAsUnsigned()
         self.sp = saved_state.GetChildMemberWithName('sp').GetValueAsUnsigned()
-        # pc for a blocked thread is treated to be the next instruction it would run after thread switch.
+                                                                                                         
         self.pc = self.switch_context_address
         self.cpsr = saved_state.GetChildMemberWithName('cpsr').GetValueAsUnsigned()
         return self
@@ -342,7 +342,7 @@ class Armv7_RegisterSet(object):
         self.r12 = saved_state.GetChildMemberWithName('r').GetChildAtIndex(12).GetValueAsUnsigned()
         self.sp = saved_state.GetChildMemberWithName('sp').GetValueAsUnsigned()
         self.lr = saved_state.GetChildMemberWithName('lr').GetValueAsUnsigned()
-        # pc for a blocked thread is treated to be the next instruction it would run after thread switch.
+                                                                                                         
         self.pc = self.switch_context_address
         self.cpsr = saved_state.GetChildMemberWithName('cpsr').GetValueAsUnsigned()
         self.fsr = saved_state.GetChildMemberWithName('fsr').GetValueAsUnsigned()
@@ -674,16 +674,16 @@ class OperatingSystemPlugIn(object):
             self.kernel_stack_size = self._target.FindGlobalVariables('kernel_stack_size', 1).GetValueAtIndex(0).GetValueAsUnsigned()
             self.kernel_context_size = 0
             self.connected_over_kdp = False
-            # connected_to_debugserver signifies if we are connected to astris or other gdbserver instance
-            # that has the correct thread state for on core threads. For kdp and coredumps we rely on in memory
-            # state of threads.
+                                                                                                          
+                                                                                                               
+                               
             self.connected_to_debugserver = True
             plugin_string = self.process.GetPluginName().lower()
             if plugin_string.find("kdp") >=0:
                 self.connected_over_kdp = True
                 self.connected_to_debugserver = False
-            #print "version", self.version, "kernel_stack_size", self.kernel_stack_size, "context_size", self.kernel_context_size
-            self.threads = None # Will be an dictionary containing info for each thread
+                                                                                                                                 
+            self.threads = None                                                        
             triple = self.process.target.triple
             arch = triple.split('-')[0].lower()
             self.target_arch = ""
@@ -702,10 +702,10 @@ class OperatingSystemPlugIn(object):
                 self.target_arch = arch
                 print "Target arch: " + self.target_arch
                 self.register_set = Armv8_RegisterSet()
-            #  connection     intel         arm
-            #  kdp            Memory        Memory
-            #  gdb            Server        Server
-            #  coredump       Memory        Server
+                                               
+                                                  
+                                                  
+                                                  
             if not self.connected_over_kdp :
                 if plugin_string.find('core') >= 0 and self.target_arch == archX86_64:
                     self.connected_to_debugserver = False
@@ -716,9 +716,9 @@ class OperatingSystemPlugIn(object):
                 print "Instantiating threads completely from saved state in memory."
 
     def create_thread(self, tid, context):
-        # tid == deadbeef means its a custom thread which kernel does not know of.
+                                                                                  
         if tid == 0xdeadbeef :
-            # tid manipulation should be the same as in "switchtoregs" code in lldbmacros/process.py .
+                                                                                                      
             tid = 0xdead0000 | (context & ~0xffff0000)
             tid = tid & 0xdeadffff
             thread_obj = { 'tid'   : tid,
@@ -772,7 +772,7 @@ class OperatingSystemPlugIn(object):
                 return []
 
         num_threads = self._target.FindGlobalVariables('threads_count',1).GetValueAtIndex(0).GetValueAsUnsigned()
-        #In case we are caught before threads are initialized. Fallback to threads known by astris/gdb server.
+                                                                                                              
         if num_threads <=0 :
             return []
 
@@ -802,7 +802,7 @@ class OperatingSystemPlugIn(object):
         if hasattr(self.process, 'CreateOSPluginThread'):
             return self.threads
 
-        # FIXME remove legacy code
+                                  
         try:
             thread_q_head = self._target.FindGlobalVariables('threads', 1).GetValueAtIndex(0)
             thread_type = self._target.FindFirstType('thread')
@@ -818,7 +818,7 @@ class OperatingSystemPlugIn(object):
         except KeyboardInterrupt, ke:
             print "OS Plugin Interrupted during thread loading process. \nWARNING:Thread registers and backtraces may not be accurate."
             return self.threads
-        # end legacy code
+                         
         return self.threads
 
     def get_register_info(self):
@@ -835,7 +835,7 @@ class OperatingSystemPlugIn(object):
                 self.current_session_id = GetUniqueSessionID(self.process)
             if tid in self.thread_cache.keys():
                 
-                #Check if the thread is a fake one. Then create and return registers directly
+                                                                                             
                 if self.thread_cache[tid]['name'].find('switchtoregs') == 0:
                     savedstateobj = self.version.CreateValueFromExpression(None, '(uintptr_t *) ' + str(self.thread_cache[tid]['ptr']))
                     regs.ReadRegisterDataFromKDPSavedState(savedstateobj, self.version)
@@ -853,12 +853,12 @@ class OperatingSystemPlugIn(object):
                 return regs.GetPackedRegisterState()
             if int(PluginValue(thobj).GetChildMemberWithName('kernel_stack').GetValueAsUnsigned()) != 0 :
                 if self.target_arch == archX86_64 :
-                    # we do have a stack so lets get register information
+                                                                         
                     saved_state_addr = PluginValue(thobj).GetChildMemberWithName('kernel_stack').GetValueAsUnsigned() + self.kernel_stack_size - self.kernel_thread_state_size
                     regs.ReadRegisterDataFromKernelStack(saved_state_addr, self.version)
                     return regs.GetPackedRegisterState()
                 elif self.target_arch.startswith(archARMv7) and int(PluginValue(thobj).GetChildMemberWithName('machine').GetChildMemberWithName('kstackptr').GetValueAsUnsigned()) != 0:
-                    #we have stack on the machine.kstackptr.
+                                                            
                     saved_state_addr = PluginValue(thobj).GetChildMemberWithName('machine').GetChildMemberWithName('kstackptr').GetValueAsUnsigned()
                     regs.ReadRegisterDataFromKernelStack(saved_state_addr, self.version)
                     return regs.GetPackedRegisterState()
@@ -871,7 +871,7 @@ class OperatingSystemPlugIn(object):
             elif self.target_arch == archX86_64 or self.target_arch.startswith(archARMv7) or self.target_arch.startswith(archARMv8):
                 regs.ReadRegisterDataFromContinuation( PluginValue(thobj).GetChildMemberWithName('continuation').GetValueAsAddress())
                 return regs.GetPackedRegisterState()
-            #incase we failed very miserably
+                                            
         except KeyboardInterrupt, ke:
             print "OS Plugin Interrupted during thread register load. \nWARNING:Thread registers and backtraces may not be accurate. for tid = %d" % tid
         regs.ResetRegisterValues()

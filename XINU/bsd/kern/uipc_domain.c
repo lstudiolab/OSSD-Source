@@ -81,7 +81,7 @@
 #include <mach/boolean.h>
 #include <pexpert/pexpert.h>
 
-/* Eventhandler context for protocol events */
+                                              
 struct eventhandler_lists_ctxt protoctl_evhdlr_ctxt;
 
 static void pr_init_old(struct protosw *, struct domain *);
@@ -95,7 +95,7 @@ static void detach_domain(struct domain *);
 static struct protosw *pffindprotonotype_locked(int, int, int);
 static struct domain *pffinddomain_locked(int);
 
-static boolean_t domain_timeout_run;    /* domain timer is scheduled to run */
+static boolean_t domain_timeout_run;                                          
 static boolean_t domain_draining;
 static void domain_sched_timeout(void);
 static void domain_timeout(void *);
@@ -121,7 +121,7 @@ SYSCTL_PROC(_kern_ipc, OID_AUTO, do_drain_domains,
     0, 0,
     sysctl_do_drain_domains, "I", "force manual drain domains");
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 static void
 pr_init_old(struct protosw *pp, struct domain *dp)
@@ -162,7 +162,7 @@ attach_proto(struct protosw *pp, struct domain *dp)
 	pp->pr_domain = dp;
 	pp->pr_protosw = pp;
 
-	/* do some cleaning up on user request callbacks */
+	                                                   
 	pru_sanitize(pp->pr_usrreqs);
 }
 
@@ -207,16 +207,16 @@ init_domain(struct domain *dp)
 		dp->dom_flags |= DOM_INITIALIZED;
 	}
 
-	/* Recompute for new protocol */
-	if (_max_linkhdr < 16) {        /* XXX - Sheesh; everything's ether? */
+	                                
+	if (_max_linkhdr < 16) {                                               
 		_max_linkhdr = 16;
 	}
-	_max_linkhdr = max_linkhdr;     /* round it up */
+	_max_linkhdr = max_linkhdr;                      
 
 	if (dp->dom_protohdrlen > _max_protohdr) {
 		_max_protohdr = dp->dom_protohdrlen;
 	}
-	_max_protohdr = max_protohdr;   /* round it up */
+	_max_protohdr = max_protohdr;                    
 
 	max_hdr = max_linkhdr + max_protohdr;
 	max_datalen = MHLEN - max_hdr;
@@ -250,9 +250,9 @@ detach_domain(struct domain *dp)
 	}
 }
 
-/*
- * Exported (private) routine, indirection of net_add_domain.
- */
+  
+                                                             
+   
 void
 net_add_domain_old(struct domain_old *odp)
 {
@@ -263,24 +263,24 @@ net_add_domain_old(struct domain_old *odp)
 
 	guard = domain_guard_deploy();
 	if ((dp = pffinddomain_locked(odp->dom_family)) != NULL) {
-		/*
-		 * There is really nothing better than to panic here,
-		 * as the caller would not have been able to handle
-		 * any failures otherwise.
-		 */
+		  
+                                                       
+                                                     
+                            
+     
 		panic("%s: domain (%d,%s) already exists for %s\n", __func__,
 		    dp->dom_family, dp->dom_name, odp->dom_name);
-		/* NOTREACHED */
+		                
 	}
 
-	/* Make sure nothing is currently pointing to the odp. */
+	                                                         
 	TAILQ_FOREACH(dp, &domains, dom_entry) {
 		if (dp->dom_old == odp) {
 			panic("%s: domain %p (%d,%s) is already "
 			    "associated with %p (%d,%s)\n", __func__,
 			    odp, odp->dom_family, odp->dom_name, dp,
 			    dp->dom_family, dp->dom_name);
-			/* NOTREACHED */
+			                
 		}
 	}
 
@@ -288,22 +288,22 @@ net_add_domain_old(struct domain_old *odp)
 		panic("%s: domain (%d,%s) protocols need to added "
 		    "via net_add_proto\n", __func__, odp->dom_family,
 		    odp->dom_name);
-		/* NOTREACHED */
+		                
 	}
 
 	dp = kheap_alloc(KHEAP_DEFAULT, sizeof(struct domain), Z_WAITOK | Z_ZERO);
 	if (dp == NULL) {
-		/*
-		 * There is really nothing better than to panic here,
-		 * as the caller would not have been able to handle
-		 * any failures otherwise.
-		 */
+		  
+                                                       
+                                                     
+                            
+     
 		panic("%s: unable to allocate memory for domain family "
 		    "%d (%s)\n", __func__, odp->dom_family, odp->dom_name);
-		/* NOTREACHED */
+		                
 	}
 
-	/* Copy everything but dom_init, dom_mtx, dom_next and dom_refs */
+	                                                                  
 	dp->dom_family          = odp->dom_family;
 	dp->dom_flags           = (odp->dom_flags & DOMF_USERFLAGS) | DOM_OLD;
 	dp->dom_name            = odp->dom_name;
@@ -319,14 +319,14 @@ net_add_domain_old(struct domain_old *odp)
 	attach_domain(dp);
 	init_domain(dp);
 
-	/* Point the mutex back to the internal structure's */
+	                                                      
 	odp->dom_mtx            = dp->dom_mtx;
 	domain_guard_release(guard);
 }
 
-/*
- * Exported (private) routine, indirection of net_del_domain.
- */
+  
+                                                             
+   
 int
 net_del_domain_old(struct domain_old *odp)
 {
@@ -357,7 +357,7 @@ net_del_domain_old(struct domain_old *odp)
 		VERIFY(dp1->dom_flags & DOM_OLD);
 		VERIFY(dp1->dom_old == odp);
 
-		/* Remove all protocols attached to this domain */
+		                                                  
 		TAILQ_FOREACH_SAFE(pp1, &dp1->dom_protosw, pr_entry, pp2) {
 			detach_proto(pp1, dp1);
 			if (pp1->pr_usrreqs->pru_flags & PRUF_OLD) {
@@ -378,36 +378,36 @@ done:
 	return error;
 }
 
-/*
- * Internal routine, not exported.
- *
- * net_add_proto - link a protosw into a domain's protosw chain
- *
- * NOTE: Caller must have acquired domain_proto_mtx
- */
+  
+                                  
+  
+                                                               
+  
+                                                   
+   
 int
 net_add_proto(struct protosw *pp, struct domain *dp, int doinit)
 {
 	struct protosw *pp1;
 
-	/*
-	 * This could be called as part of initializing the domain,
-	 * and thus DOM_INITIALIZED may not be set (yet).
-	 */
+	  
+                                                            
+                                                  
+    
 	domain_proto_mtx_lock_assert_held();
 	VERIFY(!(pp->pr_flags & PR_ATTACHED));
 
-	/* pr_domain is set only after the protocol is attached */
+	                                                          
 	if (pp->pr_domain != NULL) {
 		panic("%s: domain (%d,%s), proto %d has non-NULL pr_domain!\n",
 		    __func__, dp->dom_family, dp->dom_name, pp->pr_protocol);
-		/* NOTREACHED */
+		                
 	}
 
 	if (pp->pr_usrreqs == NULL) {
 		panic("%s: domain (%d,%s), proto %d has no usrreqs!\n",
 		    __func__, dp->dom_family, dp->dom_name, pp->pr_protocol);
-		/* NOTREACHED */
+		                
 	}
 
 	TAILQ_FOREACH(pp1, &dp->dom_protosw, pr_entry) {
@@ -428,20 +428,20 @@ net_add_proto(struct protosw *pp, struct domain *dp, int doinit)
 void
 net_init_proto(struct protosw *pp, struct domain *dp)
 {
-	/*
-	 * This could be called as part of initializing the domain,
-	 * and thus DOM_INITIALIZED may not be set (yet).  The protocol
-	 * must have been attached via net_addr_protosw() by now.
-	 */
+	  
+                                                            
+                                                                
+                                                          
+    
 	domain_proto_mtx_lock_assert_held();
 	VERIFY(pp->pr_flags & PR_ATTACHED);
 
 	init_proto(pp, dp);
 }
 
-/*
- * Exported (private) routine, indirection of net_add_proto.
- */
+  
+                                                            
+   
 int
 net_add_proto_old(struct protosw_old *opp, struct domain_old *odp)
 {
@@ -452,13 +452,13 @@ net_add_proto_old(struct protosw_old *opp, struct domain_old *odp)
 	struct domain *dp;
 	domain_guard_t guard;
 
-	/*
-	 * This could be called as part of initializing the domain,
-	 * and thus DOM_INITIALIZED may not be set (yet).
-	 */
+	  
+                                                            
+                                                  
+    
 	guard = domain_guard_deploy();
 
-	/* Make sure the domain has been added via net_add_domain */
+	                                                            
 	TAILQ_FOREACH(dp, &domains, dom_entry) {
 		if (!(dp->dom_flags & DOM_OLD)) {
 			continue;
@@ -483,7 +483,7 @@ net_add_proto_old(struct protosw_old *opp, struct domain_old *odp)
 	if ((opru = opp->pr_usrreqs) == NULL) {
 		panic("%s: domain (%d,%s), proto %d has no usrreqs!\n",
 		    __func__, odp->dom_family, odp->dom_name, opp->pr_protocol);
-		/* NOTREACHED */
+		                
 	}
 
 	pru = kheap_alloc(KHEAP_DEFAULT, sizeof(struct pr_usrreqs),
@@ -521,9 +521,9 @@ net_add_proto_old(struct protosw_old *opp, struct domain_old *odp)
 		goto done;
 	}
 
-	/*
-	 * Protocol fast and slow timers are now deprecated.
-	 */
+	  
+                                                     
+    
 	if (opp->pr_unused != NULL) {
 		printf("%s: domain (%d,%s), proto %d: pr_fasttimo is "
 		    "deprecated and won't be called\n", __func__,
@@ -535,7 +535,7 @@ net_add_proto_old(struct protosw_old *opp, struct domain_old *odp)
 		    odp->dom_family, odp->dom_name, opp->pr_protocol);
 	}
 
-	/* Copy everything but pr_init, pr_next, pr_domain, pr_protosw */
+	                                                                 
 	pp->pr_type             = opp->pr_type;
 	pp->pr_protocol         = opp->pr_protocol;
 	pp->pr_flags            = (opp->pr_flags & PRF_USERFLAGS) | PR_OLD;
@@ -552,7 +552,7 @@ net_add_proto_old(struct protosw_old *opp, struct domain_old *odp)
 	pp->pr_getlock          = opp->pr_getlock;
 	pp->pr_old              = opp;
 
-	/* attach as well as initialize */
+	                                  
 	attach_proto(pp, dp);
 	net_init_proto(pp, dp);
 done:
@@ -569,24 +569,24 @@ done:
 	return error;
 }
 
-/*
- * Internal routine, not exported.
- *
- * net_del_proto - remove a protosw from a domain's protosw chain.
- * Search the protosw chain for the element with matching data.
- * Then unlink and return.
- *
- * NOTE: Caller must have acquired domain_proto_mtx
- */
+  
+                                  
+  
+                                                                  
+                                                               
+                          
+  
+                                                   
+   
 int
 net_del_proto(int type, int protocol, struct domain *dp)
 {
 	struct protosw *pp;
 
-	/*
-	 * This could be called as part of initializing the domain,
-	 * and thus DOM_INITIALIZED may not be set (yet).
-	 */
+	  
+                                                            
+                                                  
+    
 	domain_proto_mtx_lock_assert_held();
 
 	TAILQ_FOREACH(pp, &dp->dom_protosw, pr_entry) {
@@ -609,9 +609,9 @@ net_del_proto(int type, int protocol, struct domain *dp)
 	return 0;
 }
 
-/*
- * Exported (private) routine, indirection of net_del_proto.
- */
+  
+                                                            
+   
 int
 net_del_proto_old(int type, int protocol, struct domain_old *odp)
 {
@@ -620,13 +620,13 @@ net_del_proto_old(int type, int protocol, struct domain_old *odp)
 	struct domain *dp;
 	domain_guard_t guard;
 
-	/*
-	 * This could be called as part of initializing the domain,
-	 * and thus DOM_INITIALIZED may not be set (yet).
-	 */
+	  
+                                                            
+                                                  
+    
 	guard = domain_guard_deploy();
 
-	/* Make sure the domain has been added via net_add_domain */
+	                                                            
 	TAILQ_FOREACH(dp, &domains, dom_entry) {
 		if (!(dp->dom_flags & DOM_OLD)) {
 			continue;
@@ -693,7 +693,7 @@ extern struct domain vsockdomain_s;
 
 #if MULTIPATH
 extern struct domain mpdomain_s;
-#endif /* MULTIPATH */
+#endif                
 
 static void
 domain_timeout(void *arg)
@@ -721,7 +721,7 @@ domain_timeout(void *arg)
 		lck_mtx_lock(&domain_timeout_mtx);
 	}
 
-	/* re-arm the timer if there's work to do */
+	                                            
 	domain_timeout_run = FALSE;
 	domain_sched_timeout();
 	lck_mtx_unlock(&domain_timeout_mtx);
@@ -736,31 +736,31 @@ domaininit(void)
 	eventhandler_lists_ctxt_init(&protoctl_evhdlr_ctxt);
 
 	guard = domain_guard_deploy();
-	/*
-	 * Add all the static domains to the domains list.  route domain
-	 * gets added and initialized last, since we need it to attach
-	 * rt_tables[] to everything that's already there.  This also
-	 * means that domains added after this point won't get their
-	 * dom_rtattach() called on rt_tables[].
-	 */
+	  
+                                                                 
+                                                               
+                                                              
+                                                             
+                                         
+    
 	attach_domain(&inetdomain_s);
 	attach_domain(&inet6domain_s);
 #if MULTIPATH
 	attach_domain(&mpdomain_s);
-#endif /* MULTIPATH */
+#endif                
 	attach_domain(&systemdomain_s);
 	attach_domain(&localdomain_s);
 #if IPSEC
 	attach_domain(&keydomain_s);
-#endif /* IPSEC */
+#endif            
 	attach_domain(&ndrvdomain_s);
 	attach_domain(&vsockdomain_s);
-	attach_domain(&routedomain_s);  /* must be last domain */
+	attach_domain(&routedomain_s);                           
 
-	/*
-	 * Now ask them all to init (XXX including the routing domain,
-	 * see above)
-	 */
+	  
+                                                               
+              
+    
 	TAILQ_FOREACH(dp, &domains, dom_entry)
 	init_domain(dp);
 
@@ -804,9 +804,9 @@ done:
 	return pp;
 }
 
-/*
- * Internal routine, not exported.
- */
+  
+                                  
+   
 struct domain *
 pffinddomain(int pf)
 {
@@ -819,9 +819,9 @@ pffinddomain(int pf)
 	return dp;
 }
 
-/*
- * Exported (private) routine, indirection of pffinddomain.
- */
+  
+                                                           
+   
 struct domain_old *
 pffinddomain_old(int pf)
 {
@@ -837,9 +837,9 @@ pffinddomain_old(int pf)
 	return odp;
 }
 
-/*
- * Internal routine, not exported.
- */
+  
+                                  
+   
 struct protosw *
 pffindproto(int family, int protocol, int type)
 {
@@ -883,9 +883,9 @@ pffindproto_locked(int family, int protocol, int type)
 	return maybe;
 }
 
-/*
- * Exported (private) routine, indirection of pffindproto.
- */
+  
+                                                          
+   
 struct protosw_old *
 pffindproto_old(int family, int protocol, int type)
 {
@@ -976,15 +976,15 @@ void
 net_update_uptime_with_time(const struct timeval *tvp)
 {
 	_net_uptime = tvp->tv_sec;
-	/*
-	 * Round up the timer to the nearest integer value because otherwise
-	 * we might setup networking timers that are off by almost 1 second.
-	 */
+	  
+                                                                     
+                                                                     
+    
 	if (tvp->tv_usec > 500000) {
 		_net_uptime++;
 	}
 
-	/* update milliseconds variant */
+	                                 
 	_net_uptime_ms = (((u_int64_t)tvp->tv_sec * 1000) +
 	    ((u_int64_t)tvp->tv_usec / 1000));
 }
@@ -999,9 +999,9 @@ net_update_uptime(void)
 	net_update_uptime_with_time(&tv);
 }
 
-/*
- * Convert our uin64_t net_uptime to a struct timeval.
- */
+  
+                                                      
+   
 void
 net_uptime2timeval(struct timeval *tv)
 {
@@ -1013,11 +1013,11 @@ net_uptime2timeval(struct timeval *tv)
 	tv->tv_sec = (time_t)net_uptime();
 }
 
-/*
- * An alternative way to obtain the coarse-grained uptime (in seconds)
- * for networking code which do not require high-precision timestamp,
- * as this is significantly cheaper than microuptime().
- */
+  
+                                                                      
+                                                                     
+                                                       
+   
 u_int64_t
 net_uptime(void)
 {
@@ -1130,4 +1130,4 @@ sysctl_do_drain_domains SYSCTL_HANDLER_ARGS
 	return 0;
 }
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           

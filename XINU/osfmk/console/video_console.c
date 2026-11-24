@@ -112,10 +112,10 @@
 
 #include "sys/msgbuf.h"
 
-/*
- * Generic Console (Front-End)
- * ---------------------------
- */
+  
+                              
+                              
+   
 
 struct vc_info vinfo;
 
@@ -171,14 +171,14 @@ MACRO_BEGIN                                             \
 MACRO_END
 
 
-/*
- # Attribute codes:
- # 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
- # Text color codes:
- # 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
- # Background color codes:
- # 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
- */
+  
+                   
+                                                                 
+                    
+                                                                         
+                          
+                                                                         
+   
 
 #define ATTR_NONE       0
 #define ATTR_BOLD       1
@@ -193,32 +193,32 @@ MACRO_END
 
 static unsigned char gc_color_code;
 
-/* VT100 state: */
+                  
 #define MAXPARS 16
 static unsigned int gc_x, gc_y, gc_savex, gc_savey;
 static unsigned int gc_par[MAXPARS], gc_numpars, gc_hanging_cursor, gc_attr, gc_saveattr;
 
-/* VT100 scroll region */
+                         
 static unsigned int gc_scrreg_top, gc_scrreg_bottom;
 
 enum vt100state_e {
-	ESnormal,               /* Nothing yet                             */
-	ESesc,                  /* Got ESC                                 */
-	ESsquare,               /* Got ESC [				   */
-	ESgetpars,              /* About to get or getting the parameters  */
-	ESgotpars,              /* Finished getting the parameters         */
-	ESfunckey,              /* Function key                            */
-	EShash,                 /* DEC-specific stuff (screen align, etc.) */
-	ESsetG0,                /* Specify the G0 character set            */
-	ESsetG1,                /* Specify the G1 character set            */
+	ESnormal,                                                            
+	ESesc,                                                               
+	ESsquare,                                    
+	ESgetpars,                                                           
+	ESgotpars,                                                           
+	ESfunckey,                                                           
+	EShash,                                                              
+	ESsetG0,                                                             
+	ESsetG1,                                                             
 	ESask,
 	EScharsize,
-	ESignore                /* Ignore this sequence                    */
+	ESignore                                                             
 } gc_vt100state = ESnormal;
 
 
 enum{
-	/* secs */
+	          
 	kProgressAcquireDelay   = 0,
 #if !defined(XNU_TARGET_OS_OSX)
 	kProgressReacquireDelay = 5,
@@ -275,23 +275,23 @@ gc_clear_line(unsigned int xx, unsigned int yy, int which)
 {
 	unsigned int start, end, i;
 
-	/*
-	 * This routine runs extremely slowly.  I don't think it's
-	 * used all that often, except for To end of line.  I'll go
-	 * back and speed this up when I speed up the whole vc
-	 * module. --LK
-	 */
+	  
+                                                           
+                                                            
+                                                       
+                
+    
 
 	switch (which) {
-	case 0:         /* To end of line	 */
+	case 0:                              
 		start = xx;
 		end = vinfo.v_columns - 1;
 		break;
-	case 1:         /* To start of line	 */
+	case 1:                                
 		start = 0;
 		end = xx;
 		break;
-	case 2:         /* Whole line		 */
+	case 2:                           
 		start = 0;
 		end = vinfo.v_columns - 1;
 		break;
@@ -316,15 +316,15 @@ gc_clear_screen(unsigned int xx, unsigned int yy, int top, unsigned int bottom,
 		uint32_t start, end;
 
 		switch (which) {
-		case 0:                 /* To end of screen	 */
+		case 0:                                        
 			start = (yy * gc_buffer_columns) + xx;
 			end = (bottom * gc_buffer_columns) - 1;
 			break;
-		case 1:                 /* To start of screen	 */
+		case 1:                                          
 			start = (top * gc_buffer_columns);
 			end = (yy * gc_buffer_columns) + xx;
 			break;
-		case 2:                 /* Whole screen		 */
+		case 2:                                     
 			start = (top * gc_buffer_columns);
 			end = (bottom * gc_buffer_columns) - 1;
 			break;
@@ -355,7 +355,7 @@ gc_enable( boolean_t enable )
 	spl_t s;
 
 	if (enable == FALSE) {
-		// only disable console output if it goes to the graphics console
+		                                                                 
 		if (console_is_serial() == FALSE) {
 			disableConsoleOutput = TRUE;
 		}
@@ -491,7 +491,7 @@ static void
 gc_initialize(struct vc_info * info)
 {
 	if (gc_initialized == FALSE) {
-		/* Init our lock */
+		                   
 		VCPUTC_LOCK_INIT();
 
 		gc_initialized = TRUE;
@@ -521,7 +521,7 @@ static void
 gc_putchar(char ch)
 {
 	if (!ch) {
-		return; /* ignore null characters */
+		return;                             
 	}
 	switch (gc_vt100state) {
 	default:
@@ -585,7 +585,7 @@ gc_putc_askcmd(unsigned char ch)
 	case 6:
 		gc_relative_origin = ch == 'h';
 		break;
-	case 7:         /* wrap around mode h=1, l=0*/
+	case 7:                                       
 		gc_wrap_mode = ch == 'h';
 		break;
 	default:
@@ -604,7 +604,7 @@ gc_putc_charsetcmd(int charset, unsigned char ch)
 	default:
 		gc_charset[charset] = 0;
 		break;
-	case '0':               /* Graphic characters */
+	case '0':                                       
 	case '2':
 		gc_charset[charset] = 0x21;
 		break;
@@ -622,7 +622,7 @@ gc_putc_charsizecmd(unsigned char ch)
 	case '5':
 	case '6':
 		break;
-	case '8':               /* fill 'E's */
+	case '8':                              
 	{
 		unsigned int xx, yy;
 		for (yy = 0; yy < vinfo.v_rows; yy++) {
@@ -644,12 +644,12 @@ gc_putc_esc(unsigned char ch)
 	case '[':
 		gc_vt100state = ESsquare;
 		break;
-	case 'c':               /* Reset terminal        */
+	case 'c':                                          
 		gc_reset_vt100();
 		gc_clear_screen(gc_x, gc_y, 0, vinfo.v_rows, 2);
 		gc_x = gc_y = 0;
 		break;
-	case 'D':               /* Line feed		 */
+	case 'D':                                
 	case 'E':
 		if (gc_y >= gc_scrreg_bottom - 1) {
 			gc_scroll_up(1, gc_scrreg_top, gc_scrreg_bottom);
@@ -661,10 +661,10 @@ gc_putc_esc(unsigned char ch)
 			gc_x = 0;
 		}
 		break;
-	case 'H':               /* Set tab stop		 */
+	case 'H':                                   
 		gc_set_tab_stop(gc_x, TRUE);
 		break;
-	case 'M':               /* Cursor up		 */
+	case 'M':                                
 		if (gc_y <= gc_scrreg_top) {
 			gc_scroll_down(1, gc_scrreg_top, gc_scrreg_bottom);
 			gc_y = gc_scrreg_top;
@@ -675,7 +675,7 @@ gc_putc_esc(unsigned char ch)
 	case '>':
 		gc_reset_vt100();
 		break;
-	case '7':               /* Save cursor		 */
+	case '7':                                  
 		gc_savex = gc_x;
 		gc_savey = gc_y;
 		gc_saveattr = gc_attr;
@@ -683,7 +683,7 @@ gc_putc_esc(unsigned char ch)
 		gc_charset_save[0] = gc_charset[0];
 		gc_charset_save[1] = gc_charset[1];
 		break;
-	case '8':               /* Restore cursor	 */
+	case '8':                                    
 		gc_x = gc_savex;
 		gc_y = gc_savey;
 		gc_attr = gc_saveattr;
@@ -691,21 +691,21 @@ gc_putc_esc(unsigned char ch)
 		gc_charset[0] = gc_charset_save[0];
 		gc_charset[1] = gc_charset_save[1];
 		break;
-	case 'Z':               /* return terminal ID */
+	case 'Z':                                       
 		break;
-	case '#':               /* change characters height */
+	case '#':                                             
 		gc_vt100state = EScharsize;
 		break;
 	case '(':
 		gc_vt100state = ESsetG0;
 		break;
-	case ')':               /* character set sequence */
+	case ')':                                           
 		gc_vt100state = ESsetG1;
 		break;
 	case '=':
 		break;
 	default:
-		/* Rest not supported */
+		                        
 		break;
 	}
 }
@@ -719,7 +719,7 @@ gc_putc_getpars(unsigned char ch)
 	}
 	if (ch == '[') {
 		gc_vt100state = ESnormal;
-		/* Not supported */
+		                   
 		return;
 	}
 	if (ch == ';' && gc_numpars < MAXPARS - 1) {
@@ -740,33 +740,33 @@ gc_putc_gotpars(unsigned char ch)
 	unsigned int i;
 
 	if (ch < ' ') {
-		/* special case for vttest for handling cursor
-		 *  movement in escape sequences */
+		                                              
+                                     
 		gc_putc_normal(ch);
 		gc_vt100state = ESgotpars;
 		return;
 	}
 	gc_vt100state = ESnormal;
 	switch (ch) {
-	case 'A':               /* Up			 */
+	case 'A':                          
 		gc_y -= gc_par[0] ? gc_par[0] : 1;
 		if (gc_y < gc_scrreg_top) {
 			gc_y = gc_scrreg_top;
 		}
 		break;
-	case 'B':               /* Down			 */
+	case 'B':                            
 		gc_y += gc_par[0] ? gc_par[0] : 1;
 		if (gc_y >= gc_scrreg_bottom) {
 			gc_y = gc_scrreg_bottom - 1;
 		}
 		break;
-	case 'C':               /* Right		 */
+	case 'C':                            
 		gc_x += gc_par[0] ? gc_par[0] : 1;
 		if (gc_x >= vinfo.v_columns) {
 			gc_x = vinfo.v_columns - 1;
 		}
 		break;
-	case 'D':               /* Left			 */
+	case 'D':                            
 		if (gc_par[0] > gc_x) {
 			gc_x = 0;
 		} else if (gc_par[0]) {
@@ -775,7 +775,7 @@ gc_putc_gotpars(unsigned char ch)
 			--gc_x;
 		}
 		break;
-	case 'H':               /* Set cursor position	 */
+	case 'H':                                         
 	case 'f':
 		gc_x = gc_par[1] ? gc_par[1] - 1 : 0;
 		gc_y = gc_par[0] ? gc_par[0] - 1 : 0;
@@ -784,26 +784,26 @@ gc_putc_gotpars(unsigned char ch)
 		}
 		gc_hanging_cursor = 0;
 		break;
-	case 'X':               /* clear p1 characters */
+	case 'X':                                        
 		if (gc_numpars) {
 			for (i = gc_x; i < gc_x + gc_par[0]; i++) {
 				gc_paint_char(i, gc_y, ' ', ATTR_NONE);
 			}
 		}
 		break;
-	case 'J':               /* Clear part of screen	 */
+	case 'J':                                          
 		gc_clear_screen(gc_x, gc_y, 0, vinfo.v_rows, gc_par[0]);
 		break;
-	case 'K':               /* Clear part of line	 */
+	case 'K':                                        
 		gc_clear_line(gc_x, gc_y, gc_par[0]);
 		break;
-	case 'g':               /* tab stops	         */
+	case 'g':                                       
 		switch (gc_par[0]) {
 		case 1:
-		case 2:         /* reset tab stops */
-			        /* gc_reset_tabs(); */
+		case 2:                              
+			                              
 			break;
-		case 3:         /* Clear every tabs */
+		case 3:                               
 		{
 			for (i = 0; i <= vinfo.v_columns; i++) {
 				gc_set_tab_stop(i, FALSE);
@@ -815,7 +815,7 @@ gc_putc_gotpars(unsigned char ch)
 			break;
 		}
 		break;
-	case 'm':               /* Set attribute	 */
+	case 'm':                                   
 		for (i = 0; i < gc_numpars; i++) {
 			switch (gc_par[i]) {
 			case 0:
@@ -842,7 +842,7 @@ gc_putc_gotpars(unsigned char ch)
 				gc_attr &= ~ATTR_REVERSE;
 				break;
 			case 5:
-			case 25:        /* blink/no blink */
+			case 25:                            
 				break;
 			default:
 				if (gc_par[i] >= 30 && gc_par[i] <= 37) {
@@ -855,9 +855,9 @@ gc_putc_gotpars(unsigned char ch)
 			}
 		}
 		break;
-	case 'r':               /* Set scroll region	 */
+	case 'r':                                       
 		gc_x = gc_y = 0;
-		/* ensure top < bottom, and both within limits */
+		                                                 
 		if ((gc_numpars > 0) && (gc_par[0] < vinfo.v_rows)) {
 			gc_scrreg_top = gc_par[0] ? gc_par[0] - 1 : 0;
 		} else {
@@ -882,17 +882,17 @@ static void
 gc_putc_normal(unsigned char ch)
 {
 	switch (ch) {
-	case '\a':              /* Beep			 */
+	case '\a':                           
 		break;
-	case 127:               /* Delete		 */
-	case '\b':              /* Backspace		 */
+	case 127:                             
+	case '\b':                               
 		if (gc_hanging_cursor) {
 			gc_hanging_cursor = 0;
 		} else if (gc_x > 0) {
 			gc_x--;
 		}
 		break;
-	case '\t':              /* Tab			 */
+	case '\t':                          
 		if (gc_buffer_tab_stops) {
 			while (gc_x < vinfo.v_columns && !gc_is_tab_stop(++gc_x)) {
 				;
@@ -905,7 +905,7 @@ gc_putc_normal(unsigned char ch)
 		break;
 	case 0x0b:
 	case 0x0c:
-	case '\n':              /* Line feed		 */
+	case '\n':                               
 		if (gc_y >= gc_scrreg_bottom - 1) {
 			gc_scroll_up(1, gc_scrreg_top, gc_scrreg_bottom);
 			gc_y = gc_scrreg_bottom - 1;
@@ -913,21 +913,21 @@ gc_putc_normal(unsigned char ch)
 			gc_y++;
 		}
 		break;
-	case '\r':              /* Carriage return	 */
+	case '\r':                                    
 		gc_x = 0;
 		gc_hanging_cursor = 0;
 		break;
-	case 0x0e:  /* Select G1 charset (Control-N) */
+	case 0x0e:                                     
 		gc_charset_select = 1;
 		break;
-	case 0x0f:  /* Select G0 charset (Control-O) */
+	case 0x0f:                                     
 		gc_charset_select = 0;
 		break;
-	case 0x18:  /* CAN : cancel */
-	case 0x1A:  /* like cancel */
-		/* well, i do nothing here, may be later */
+	case 0x18:                    
+	case 0x1A:                   
+		                                           
 		break;
-	case '\033':            /* Escape		 */
+	case '\033':                          
 		gc_vt100state = ESesc;
 		gc_hanging_cursor = 0;
 		break;
@@ -1054,19 +1054,19 @@ gc_scroll_down(int num, unsigned int top, unsigned int bottom)
 					}
 
 					if (gc_buffer_colorcodes[index] != gc_buffer_colorcodes[index - jump]) {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ gc_buffer_characters[index - jump],
-						    /* attrs          */ gc_buffer_attributes[index - jump],
-						    /* ch_previous    */ 0,
-						    /* attrs_previous */ 0 );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         gc_buffer_characters[index - jump],
+						                         gc_buffer_attributes[index - jump],
+						                         0,
+						                         0 );
 					} else {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ gc_buffer_characters[index - jump],
-						    /* attrs          */ gc_buffer_attributes[index - jump],
-						    /* ch_previous    */ gc_buffer_characters[index],
-						    /* attrs_previous */ gc_buffer_attributes[index] );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         gc_buffer_characters[index - jump],
+						                         gc_buffer_attributes[index - jump],
+						                         gc_buffer_characters[index],
+						                         gc_buffer_attributes[index] );
 					}
 
 					gc_buffer_attributes[index] = gc_buffer_attributes[index - jump];
@@ -1081,7 +1081,7 @@ gc_scroll_down(int num, unsigned int top, unsigned int bottom)
 			gc_update_color(COLOR_CODE_GET(colorcodesave, FALSE), FALSE);
 		}
 
-		/* Now set the freed up lines to the background colour */
+		                                                         
 
 		for (row = top; row < top + num; row++) {
 			index = row * gc_buffer_columns;
@@ -1091,19 +1091,19 @@ gc_scroll_down(int num, unsigned int top, unsigned int bottom)
 				    gc_buffer_characters[index] != ' ' ||
 				    gc_buffer_colorcodes[index] != gc_color_code) {
 					if (gc_buffer_colorcodes[index] != gc_color_code) {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ ' ',
-						    /* attrs          */ ATTR_NONE,
-						    /* ch_previous    */ 0,
-						    /* attrs_previous */ 0 );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         ' ',
+						                         ATTR_NONE,
+						                         0,
+						                         0 );
 					} else {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ ' ',
-						    /* attrs          */ ATTR_NONE,
-						    /* ch_previous    */ gc_buffer_characters[index],
-						    /* attrs_previous */ gc_buffer_attributes[index] );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         ' ',
+						                         ATTR_NONE,
+						                         gc_buffer_characters[index],
+						                         gc_buffer_attributes[index] );
 					}
 
 					gc_buffer_attributes[index] = ATTR_NONE;
@@ -1115,7 +1115,7 @@ gc_scroll_down(int num, unsigned int top, unsigned int bottom)
 	} else {
 		gc_ops.scroll_down(num, top, bottom);
 
-		/* Now set the freed up lines to the background colour */
+		                                                         
 
 		gc_clear_screen(vinfo.v_columns - 1, top + num - 1, top, bottom, 1);
 	}
@@ -1148,19 +1148,19 @@ gc_scroll_up(int num, unsigned int top, unsigned int bottom)
 					}
 
 					if (gc_buffer_colorcodes[index] != gc_buffer_colorcodes[index + jump]) {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ gc_buffer_characters[index + jump],
-						    /* attrs          */ gc_buffer_attributes[index + jump],
-						    /* ch_previous    */ 0,
-						    /* attrs_previous */ 0 );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         gc_buffer_characters[index + jump],
+						                         gc_buffer_attributes[index + jump],
+						                         0,
+						                         0 );
 					} else {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ gc_buffer_characters[index + jump],
-						    /* attrs          */ gc_buffer_attributes[index + jump],
-						    /* ch_previous    */ gc_buffer_characters[index],
-						    /* attrs_previous */ gc_buffer_attributes[index] );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         gc_buffer_characters[index + jump],
+						                         gc_buffer_attributes[index + jump],
+						                         gc_buffer_characters[index],
+						                         gc_buffer_attributes[index] );
 					}
 
 					gc_buffer_attributes[index] = gc_buffer_attributes[index + jump];
@@ -1175,7 +1175,7 @@ gc_scroll_up(int num, unsigned int top, unsigned int bottom)
 			gc_update_color(COLOR_CODE_GET(colorcodesave, FALSE), FALSE);
 		}
 
-		/* Now set the freed up lines to the background colour */
+		                                                         
 
 		for (row = bottom - num; row < bottom; row++) {
 			index = row * gc_buffer_columns;
@@ -1185,19 +1185,19 @@ gc_scroll_up(int num, unsigned int top, unsigned int bottom)
 				    gc_buffer_characters[index] != ' ' ||
 				    gc_buffer_colorcodes[index] != gc_color_code) {
 					if (gc_buffer_colorcodes[index] != gc_color_code) {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ ' ',
-						    /* attrs          */ ATTR_NONE,
-						    /* ch_previous    */ 0,
-						    /* attrs_previous */ 0 );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         ' ',
+						                         ATTR_NONE,
+						                         0,
+						                         0 );
 					} else {
-						gc_ops.paint_char( /* xx             */ column,
-						    /* yy             */ row,
-						    /* ch             */ ' ',
-						    /* attrs          */ ATTR_NONE,
-						    /* ch_previous    */ gc_buffer_characters[index],
-						    /* attrs_previous */ gc_buffer_attributes[index] );
+						gc_ops.paint_char(                      column,
+						                         row,
+						                         ' ',
+						                         ATTR_NONE,
+						                         gc_buffer_characters[index],
+						                         gc_buffer_attributes[index] );
 					}
 
 					gc_buffer_attributes[index] = ATTR_NONE;
@@ -1209,7 +1209,7 @@ gc_scroll_up(int num, unsigned int top, unsigned int bottom)
 	} else {
 		gc_ops.scroll_up(num, top, bottom);
 
-		/* Now set the freed up lines to the background colour */
+		                                                         
 
 		gc_clear_screen(0, bottom - num, top, bottom, 0);
 	}
@@ -1260,44 +1260,44 @@ vcputc(__unused int l, __unused int u, int c)
 	}
 }
 
-/*
- * Video Console (Back-End)
- * ------------------------
- */
+  
+                           
+                           
+   
 
-/*
- * For the color support (Michel Pollet)
- */
+  
+                                        
+   
 static unsigned char vc_color_index_table[33] =
 {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2 };
 
 static uint32_t vc_colors[8][4] = {
-	{ 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000 },     /* black */
-	{ 0x23232323, 0x7C007C00, 0x00FF0000, 0x3FF00000 },     /* red	*/
-	{ 0xb9b9b9b9, 0x03e003e0, 0x0000FF00, 0x000FFC00 },     /* green */
-	{ 0x05050505, 0x7FE07FE0, 0x00FFFF00, 0x3FFFFC00 },     /* yellow */
-	{ 0xd2d2d2d2, 0x001f001f, 0x000000FF, 0x000003FF },     /* blue	 */
-//	{ 0x80808080, 0x31933193, 0x00666699, 0x00000000 },	/* blue	 */
-	{ 0x18181818, 0x7C1F7C1F, 0x00FF00FF, 0x3FF003FF },     /* magenta */
-	{ 0xb4b4b4b4, 0x03FF03FF, 0x0000FFFF, 0x000FFFFF },     /* cyan	*/
-	{ 0x00000000, 0x7FFF7FFF, 0x00FFFFFF, 0x3FFFFFFF }      /* white */
+	{ 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000 },                
+	{ 0x23232323, 0x7C007C00, 0x00FF0000, 0x3FF00000 },              
+	{ 0xb9b9b9b9, 0x03e003e0, 0x0000FF00, 0x000FFC00 },                
+	{ 0x05050505, 0x7FE07FE0, 0x00FFFF00, 0x3FFFFC00 },                 
+	{ 0xd2d2d2d2, 0x001f001f, 0x000000FF, 0x000003FF },                
+                                                                  
+	{ 0x18181818, 0x7C1F7C1F, 0x00FF00FF, 0x3FF003FF },                  
+	{ 0xb4b4b4b4, 0x03FF03FF, 0x0000FFFF, 0x000FFFFF },               
+	{ 0x00000000, 0x7FFF7FFF, 0x00FFFFFF, 0x3FFFFFFF }                 
 };
 
 static uint32_t vc_color_fore = 0;
 static uint32_t vc_color_back = 0;
 
-/*
- * New Rendering code from Michel Pollet
- */
+  
+                                        
+   
 
-/* Rendered Font Buffer */
+                          
 static unsigned char *vc_rendered_font = NULL;
 
-/* Rendered Font Size */
+                        
 static uint32_t vc_rendered_font_size = 0;
 
-/* Size of a character in the table (bytes) */
+                                              
 static int vc_rendered_char_size = 0;
 
 #define REN_MAX_DEPTH   32
@@ -1305,7 +1305,7 @@ static unsigned char vc_rendered_char[ISO_CHAR_HEIGHT * ((REN_MAX_DEPTH / 8) * I
 
 #if defined(XNU_TARGET_OS_OSX)
 #define CONFIG_VC_PROGRESS_METER_SUPPORT        1
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 #if defined(XNU_TARGET_OS_OSX)
 static void
@@ -1323,14 +1323,14 @@ enum{
 	kProgressMeterEnd    = 512,
 };
 
-#endif  /* defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 static boolean_t vc_progress_white =
 #ifdef CONFIG_VC_PROGRESS_WHITE
     TRUE;
-#else /* !CONFIG_VC_PROGRESS_WHITE */
+#else                                
     FALSE;
-#endif /* !CONFIG_VC_PROGRESS_WHITE */
+#endif                                
 
 static int vc_acquire_delay = kProgressAcquireDelay;
 
@@ -1354,21 +1354,21 @@ vc_clear_screen(unsigned int xx, unsigned int yy, unsigned int scrreg_top,
 	endp = (uint32_t*) vinfo.v_baseaddr;
 
 	switch (which) {
-	case 0:         /* To end of screen	 */
+	case 0:                                
 		gc_clear_line(xx, yy, 0);
 		if (yy < scrreg_bottom - 1) {
 			p += (yy + 1) * linelongs;
 			endp += scrreg_bottom * linelongs;
 		}
 		break;
-	case 1:         /* To start of screen	 */
+	case 1:                                  
 		gc_clear_line(xx, yy, 1);
 		if (yy > scrreg_top) {
 			p += scrreg_top * linelongs;
 			endp += yy * linelongs;
 		}
 		break;
-	case 2:         /* Whole screen		 */
+	case 2:                             
 		p += scrreg_top * linelongs;
 		if (scrreg_bottom == vinfo.v_rows) {
 			endp += rowlongs * vinfo.v_height;
@@ -1392,8 +1392,8 @@ vc_render_char(unsigned char ch, unsigned char *renderptr, short newdepth)
 		unsigned char  *charptr;
 		unsigned short *shortptr;
 		uint32_t  *longptr;
-	} current;      /* current place in rendered font, multiple types. */
-	unsigned char *theChar; /* current char in iso_font */
+	} current;                                                           
+	unsigned char *theChar;                               
 	int line;
 
 	current.charptr = renderptr;
@@ -1416,7 +1416,7 @@ vc_render_char(unsigned char ch, unsigned char *renderptr, short newdepth)
 				break;
 			}
 			mask <<= 1;
-		} while (mask); /* while the single bit drops to the right */
+		} while (mask);                                              
 		theChar++;
 	}
 }
@@ -1440,7 +1440,7 @@ vc_paint_char_8(unsigned int xx, unsigned int yy, unsigned char ch, int attrs,
 	    (xx * ISO_CHAR_WIDTH));
 
 	if (!attrs) {
-		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {         /* No attr? FLY !*/
+		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {                            
 			uint32_t *store = where;
 			int x;
 			for (x = 0; x < 2; x++) {
@@ -1452,12 +1452,12 @@ vc_paint_char_8(unsigned int xx, unsigned int yy, unsigned char ch, int attrs,
 			where = (uint32_t*)(((unsigned char*)where) + vinfo.v_rowbytes);
 		}
 	} else {
-		for (i = 0; i < ISO_CHAR_HEIGHT; i++) { /* a little slower */
+		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {                      
 			uint32_t *store = where, lastpixel = 0;
 			int x;
 			for (x = 0; x < 2; x++) {
 				uint32_t val = *theChar++, save = val;
-				if (attrs & ATTR_BOLD) { /* bold support */
+				if (attrs & ATTR_BOLD) {                   
 					if (lastpixel && !(save & 0xFF000000)) {
 						val |= 0xff000000;
 					}
@@ -1508,7 +1508,7 @@ vc_paint_char_16(unsigned int xx, unsigned int yy, unsigned char ch, int attrs,
 	    (xx * ISO_CHAR_WIDTH * 2));
 
 	if (!attrs) {
-		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {         /* No attrs ? FLY ! */
+		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {                               
 			uint32_t *store = where;
 			int x;
 			for (x = 0; x < 4; x++) {
@@ -1520,12 +1520,12 @@ vc_paint_char_16(unsigned int xx, unsigned int yy, unsigned char ch, int attrs,
 			where = (uint32_t*)(((unsigned char*)where) + vinfo.v_rowbytes);
 		}
 	} else {
-		for (i = 0; i < ISO_CHAR_HEIGHT; i++) { /* a little bit slower */
+		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {                          
 			uint32_t *store = where, lastpixel = 0;
 			int x;
 			for (x = 0; x < 4; x++) {
 				uint32_t val = *theChar++, save = val;
-				if (attrs & ATTR_BOLD) { /* bold support */
+				if (attrs & ATTR_BOLD) {                   
 					if (save == 0xFFFF0000) {
 						val |= 0xFFFF;
 					} else if (lastpixel && !(save & 0xFFFF0000)) {
@@ -1578,7 +1578,7 @@ vc_paint_char_32(unsigned int xx, unsigned int yy, unsigned char ch, int attrs,
 	    (xx * ISO_CHAR_WIDTH * 4));
 
 	if (!attrs) {
-		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {         /* No attrs ? FLY ! */
+		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {                               
 			uint32_t *store = where;
 			int x;
 			for (x = 0; x < 8; x++) {
@@ -1594,12 +1594,12 @@ vc_paint_char_32(unsigned int xx, unsigned int yy, unsigned char ch, int attrs,
 			where = (uint32_t *)(((unsigned char*)where) + vinfo.v_rowbytes);
 		}
 	} else {
-		for (i = 0; i < ISO_CHAR_HEIGHT; i++) { /* a little slower */
+		for (i = 0; i < ISO_CHAR_HEIGHT; i++) {                      
 			uint32_t *store = where, lastpixel = 0;
 			int x;
 			for (x = 0; x < 8; x++) {
 				uint32_t val = *theChar++, save = val;
-				if (attrs & ATTR_BOLD) { /* bold support */
+				if (attrs & ATTR_BOLD) {                   
 					if (lastpixel && !save) {
 						val = 0xFFFFFFFF;
 					}
@@ -1650,17 +1650,17 @@ vc_render_font(short newdepth)
 {
 	static short olddepth = 0;
 
-	int charindex;  /* index in ISO font */
+	int charindex;                         
 	unsigned char *rendered_font;
 	unsigned int rendered_font_size;
 	int rendered_char_size;
 	spl_t s;
 
 	if (vm_initialized == FALSE) {
-		return; /* nothing to do */
+		return;                    
 	}
 	if (olddepth == newdepth && vc_rendered_font) {
-		return; /* nothing to do */
+		return;                    
 	}
 
 	s = splhigh();
@@ -1727,7 +1727,7 @@ vc_reverse_cursor(unsigned int xx, unsigned int yy)
 
 	where = (uint32_t*)(vinfo.v_baseaddr +
 	    (yy * ISO_CHAR_HEIGHT * vinfo.v_rowbytes) +
-	    (xx /** ISO_CHAR_WIDTH*/ * vinfo.v_depth));
+	    (xx                      * vinfo.v_depth));
 	for (line = 0; line < ISO_CHAR_HEIGHT; line++) {
 		switch (vinfo.v_depth) {
 		case 8:
@@ -1764,15 +1764,15 @@ vc_scroll_down(int num, unsigned int scrreg_top, unsigned int scrreg_bottom)
 
 	to = (uint32_t *) vinfo.v_baseaddr + (linelongs * scrreg_bottom)
 	    - (rowline - rowscanline);
-	from = to - (linelongs * num);  /* handle multiple line scroll (Michel Pollet) */
+	from = to - (linelongs * num);                                                   
 
 	i = (scrreg_bottom - scrreg_top) - num;
 
 	while (i-- > 0) {
 		for (line = 0; line < ISO_CHAR_HEIGHT; line++) {
-			/*
-			 * Only copy what is displayed
-			 */
+			  
+                                 
+      
 			video_scroll_down(from,
 			    (from - (vinfo.v_rowscanbytes >> 2)),
 			    to);
@@ -1797,15 +1797,15 @@ vc_scroll_up(int num, unsigned int scrreg_top, unsigned int scrreg_bottom)
 	rowscanline = vinfo.v_rowscanbytes >> 2;
 
 	to = (uint32_t *) vinfo.v_baseaddr + (scrreg_top * linelongs);
-	from = to + (linelongs * num);  /* handle multiple line scroll (Michel Pollet) */
+	from = to + (linelongs * num);                                                   
 
 	i = (scrreg_bottom - scrreg_top) - num;
 
 	while (i-- > 0) {
 		for (line = 0; line < ISO_CHAR_HEIGHT; line++) {
-			/*
-			 * Only copy what is displayed
-			 */
+			  
+                                 
+      
 			video_scroll_up(from,
 			    (from + (vinfo.v_rowscanbytes >> 2)),
 			    to);
@@ -1829,10 +1829,10 @@ vc_update_color(int color, boolean_t fore)
 	}
 }
 
-/*
- * Video Console (Back-End): Icon Control
- * --------------------------------------
- */
+  
+                                         
+                                         
+   
 
 static vc_progress_element *    vc_progress;
 enum { kMaxProgressData = 3 };
@@ -1870,7 +1870,7 @@ static thread_call_data_t       vc_progressmeter_call;
 static void *                   vc_progressmeter_backbuffer;
 static uint32_t                 vc_progressmeter_diskspeed = 256;
 
-#endif  /* defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 enum {
 	kSave          = 0x10,
@@ -1918,7 +1918,7 @@ static void vc_blit_rect_30(int x, int y, int bx,
 static void vc_progress_task( void * arg0, void * arg );
 #if defined(XNU_TARGET_OS_OSX)
 static void vc_progressmeter_task( void * arg0, void * arg );
-#endif  /* defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 static void
 vc_blit_rect(int x, int y, int bx,
@@ -2005,7 +2005,7 @@ vc_blit_rect_8(int x, int y, __unused int bx,
 	}
 }
 
-/* For ARM, 16-bit is 565 (RGB); it is 1555 (XRGB) on other platforms */
+                                                                        
 
 #ifdef __arm__
 #define CLUT_MASK_R     0xf8
@@ -2266,7 +2266,7 @@ static void
 vc_clean_boot_graphics(void)
 {
 #if defined(XNU_TARGET_OS_OSX)
-	// clean up possible FDE login graphics
+	                                       
 	vc_progress_set(FALSE, 0);
 	const unsigned char *
 	    color = (typeof(color))(uintptr_t)(vc_progress_white ? 0x00000000 : 0xBFBFBFBF);
@@ -2274,9 +2274,9 @@ vc_clean_boot_graphics(void)
 #endif
 }
 
-/*
- * Routines to render the lzss image format
- */
+  
+                                           
+   
 
 struct lzss_image_state {
 	uint32_t col;
@@ -2289,7 +2289,7 @@ struct lzss_image_state {
 };
 typedef struct lzss_image_state lzss_image_state;
 
-// returns 0 if OK, 1 if error
+                              
 static inline int
 vc_decompress_lzss_next_pixel(int next_data, lzss_image_state* state)
 {
@@ -2315,36 +2315,36 @@ vc_decompress_lzss_next_pixel(int next_data, lzss_image_state* state)
 }
 
 
-/*
- * Blit an lzss compressed image to the framebuffer
- * Assumes 32 bit screen (which is everything we ship at the moment)
- * The function vc_display_lzss_icon was copied from libkern/mkext.c, then modified.
- */
+  
+                                                   
+                                                                    
+                                                                                    
+   
 
-/*
- * TODO: Does lzss use too much stack? 4096 plus bytes...
- *      Can probably chop it down by 1/2.
- */
+  
+                                                         
+                                         
+   
 
-/**************************************************************
-*   LZSS.C -- A Data Compression Program
-***************************************************************
-*    4/6/1989 Haruhiko Okumura
-*    Use, distribute, and modify this program freely.
-*    Please send me your improved versions.
-*        PC-VAN      SCIENCE
-*        NIFTY-Serve PAF01022
-*        CompuServe  74050,1022
-*
-**************************************************************/
+                                                               
+                                        
+                                                               
+                              
+                                                     
+                                           
+                            
+                             
+                               
+ 
+                                                               
 
-#define N         4096  /* size of ring buffer - must be power of 2 */
-#define F         18    /* upper limit for match_length */
-#define THRESHOLD 2     /* encode string into position and length
-	                 *  if match_length is greater than this */
+#define N         4096                                                
+#define F         18                                      
+#define THRESHOLD 2                                              
+                                                            
 
-// returns 0 if OK, 1 if error
-// x and y indicate upper left corner of image location on screen
+                              
+                                                                 
 int
 vc_display_lzss_icon(uint32_t dst_x, uint32_t dst_y,
     uint32_t image_width, uint32_t image_height,
@@ -2367,7 +2367,7 @@ vc_display_lzss_icon(uint32_t dst_x, uint32_t dst_y,
 	const uint8_t *src = compressed_image;
 	uint32_t srclen = compressed_size;
 
-	/* ring buffer of size N, with extra F-1 bytes to aid string comparison */
+	                                                                          
 	uint8_t text_buf[N + F - 1];
 	const uint8_t *srcend = src + srclen;
 	int  i, j, k, r, c;
@@ -2386,8 +2386,8 @@ vc_display_lzss_icon(uint32_t dst_x, uint32_t dst_y,
 			} else {
 				break;
 			}
-			flags = c | 0xFF00; /* uses higher byte cleverly */
-		} /* to count eight */
+			flags = c | 0xFF00;                                
+		}                     
 		if (flags & 1) {
 			if (src < srcend) {
 				c = *src++;
@@ -2495,7 +2495,7 @@ vc_progress_initialize( vc_progress_element * desc,
 	thread_call_setup(&vc_progressmeter_call, vc_progressmeter_task, NULL);
 	clock_interval_to_absolutetime_interval(1000 / 8, 1000 * 1000, &abstime);
 	vc_progressmeter_interval = (uint32_t)abstime;
-#endif  /* defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 }
 
 void
@@ -2522,7 +2522,7 @@ vc_progress_set(boolean_t enable, uint32_t vc_delay)
 	if (kBootArgsFlagBlack & ((boot_args *) PE_state.bootArgs)->flags) {
 		return;
 	}
-#endif /* defined (__x86_64__) */
+#endif                           
 
 	if (1 & vc_progress_withmeter) {
 		if (enable) {
@@ -2537,7 +2537,7 @@ vc_progress_set(boolean_t enable, uint32_t vc_delay)
 			if (enable) {
 				vc_progressmeter_count = 0;
 				clock_interval_to_deadline(vc_delay,
-				    1000 * 1000 * 1000 /*second scale*/,
+				    1000 * 1000 * 1000                 ,
 				    &vc_progressmeter_deadline);
 				thread_call_enter_delayed(&vc_progressmeter_call, vc_progressmeter_deadline);
 			} else {
@@ -2554,7 +2554,7 @@ vc_progress_set(boolean_t enable, uint32_t vc_delay)
 		return;
 	}
 
-#endif /* defined(CONFIG_VC_PROGRESS_METER_SUPPORT) */
+#endif                                                
 
 	if (enable) {
 		saveLen = (vc_progress->width * vc_uiscale) * (vc_progress->height * vc_uiscale) * ((vinfo.v_depth + 7) / 8);
@@ -2614,7 +2614,7 @@ vc_progress_set(boolean_t enable, uint32_t vc_delay)
 			vc_progress_angle = 0;
 
 			clock_interval_to_deadline(vc_delay,
-			    1000 * 1000 * 1000 /*second scale*/,
+			    1000 * 1000 * 1000                 ,
 			    &vc_progress_deadline);
 			thread_call_enter_delayed(&vc_progress_call, vc_progress_deadline);
 		} else {
@@ -2685,7 +2685,7 @@ vc_progress_setdiskspeed(uint32_t speed)
 	vc_progressmeter_diskspeed = speed;
 }
 
-#endif  /* defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 static void
 vc_progress_task(__unused void *arg0, __unused void *arg)
@@ -2714,7 +2714,7 @@ vc_progress_task(__unused void *arg0, __unused void *arg)
 			}
 
 			if (kVCUsePosition & vc_progress_options.options) {
-				/* Rotation: 0:normal, 1:right 90, 2:left 180, 3:left 90 */
+				                                                           
 				switch (3 & vinfo.v_rotate) {
 				case kDataRotate0:
 					x_pos = vc_progress_options.x_pos;
@@ -2771,10 +2771,10 @@ vc_progress_task(__unused void *arg0, __unused void *arg)
 	splx(s);
 }
 
-/*
- * Generic Console (Front-End): Master Control
- * -------------------------------------------
- */
+  
+                                              
+                                              
+   
 
 #if defined (__i386__) || defined (__x86_64__)
 #include <pexpert/i386/boot.h>
@@ -2816,7 +2816,7 @@ gc_pause( boolean_t pause, boolean_t graphics_now )
 		if (1 & vc_progress_withmeter) {
 			thread_call_enter_delayed(&vc_progressmeter_call, vc_progressmeter_deadline);
 		} else
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 
 		thread_call_enter_delayed(&vc_progress_call, vc_progress_deadline);
 	}
 
@@ -2865,16 +2865,16 @@ initialize_screen(PE_Video * boot_vinfo, unsigned int op)
 		struct vc_info new_vinfo = vinfo;
 		boolean_t makeMapping = FALSE;
 
-		/*
-		 *	Copy parameters
-		 */
+		  
+                    
+     
 		if (kPEBaseAddressChange != op) {
 			new_vinfo.v_width    = (unsigned int)boot_vinfo->v_width;
 			new_vinfo.v_height   = (unsigned int)boot_vinfo->v_height;
 			new_vinfo.v_depth    = (unsigned int)boot_vinfo->v_depth;
 			new_vinfo.v_rowbytes = (unsigned int)boot_vinfo->v_rowBytes;
 			if (kernel_map == VM_MAP_NULL) {
-				// only booter supplies HW rotation
+				                                   
 				new_vinfo.v_rotate   = (unsigned int)boot_vinfo->v_rotate;
 			}
 #if defined(__i386__) || defined(__x86_64__)
@@ -2888,35 +2888,35 @@ initialize_screen(PE_Video * boot_vinfo, unsigned int op)
 			} else if (scale == kPEScaleFactor2x) {
 				new_vinfo.v_scale = kPEScaleFactor2x;
 			}
-			else { /* Scale factor not set, default to 1x */
+			else {                                          
 				new_vinfo.v_scale = kPEScaleFactor1x;
 			}
 		}
 		new_vinfo.v_name[0]  = 0;
 		new_vinfo.v_physaddr = 0;
 
-		/*
-		 *  Check if we are have to map the framebuffer
-		 *  If VM is up, we are given a virtual address, unless b0 is set to indicate physical.
-		 */
+		  
+                                                 
+                                                                                         
+     
 		newVideoVirt = boot_vinfo->v_baseAddr;
 		makeMapping = (kernel_map == VM_MAP_NULL) || (0 != (1 & newVideoVirt));
 		if (makeMapping) {
 			newVideoVirt = 0;
-			new_vinfo.v_physaddr = boot_vinfo->v_baseAddr & ~3UL;           /* Get the physical address */
+			new_vinfo.v_physaddr = boot_vinfo->v_baseAddr & ~3UL;                                         
 #ifndef __LP64__
 			new_vinfo.v_physaddr |= (((uint64_t) boot_vinfo->v_baseAddrHigh) << 32);
 #endif
-			kprintf("initialize_screen: b=%08llX, w=%08X, h=%08X, r=%08X, d=%08X\n",                  /* (BRINGUP) */
-			    new_vinfo.v_physaddr, new_vinfo.v_width, new_vinfo.v_height, new_vinfo.v_rowbytes, new_vinfo.v_type);       /* (BRINGUP) */
+			kprintf("initialize_screen: b=%08llX, w=%08X, h=%08X, r=%08X, d=%08X\n",                                 
+			    new_vinfo.v_physaddr, new_vinfo.v_width, new_vinfo.v_height, new_vinfo.v_rowbytes, new_vinfo.v_type);                      
 		}
 
-		if (!newVideoVirt && !new_vinfo.v_physaddr) {                                                   /* Check to see if we have a framebuffer */
-			kprintf("initialize_screen: No video - forcing serial mode\n");         /* (BRINGUP) */
-			new_vinfo.v_depth = 0;                                          /* vc routines are nop */
-			(void)switch_to_serial_console();                               /* Switch into serial mode */
-			gc_graphics_boot = FALSE;                                       /* Say we are not in graphics mode */
-			disableConsoleOutput = FALSE;                                   /* Allow printfs to happen */
+		if (!newVideoVirt && !new_vinfo.v_physaddr) {                                                                                              
+			kprintf("initialize_screen: No video - forcing serial mode\n");                        
+			new_vinfo.v_depth = 0;                                                                   
+			(void)switch_to_serial_console();                                                            
+			gc_graphics_boot = FALSE;                                                                            
+			disableConsoleOutput = FALSE;                                                                
 			gc_acquired = TRUE;
 		} else {
 			if (makeMapping) {
@@ -2924,19 +2924,19 @@ initialize_screen(PE_Video * boot_vinfo, unsigned int op)
 				if (boot_vinfo->v_length != 0) {
 					newMapSize = (unsigned int) round_page(boot_vinfo->v_length);
 				} else {
-					newMapSize = (unsigned int) round_page(new_vinfo.v_height * new_vinfo.v_rowbytes);                      /* Remember size */
+					newMapSize = (unsigned int) round_page(new_vinfo.v_height * new_vinfo.v_rowbytes);                                         
 				}
-				newVideoVirt = io_map_spec((vm_map_offset_t)new_vinfo.v_physaddr, newMapSize, flags);   /* Allocate address space for framebuffer */
+				newVideoVirt = io_map_spec((vm_map_offset_t)new_vinfo.v_physaddr, newMapSize, flags);                                               
 			}
-			new_vinfo.v_baseaddr = newVideoVirt + boot_vinfo->v_offset;                     /* Set the new framebuffer address */
+			new_vinfo.v_baseaddr = newVideoVirt + boot_vinfo->v_offset;                                                          
 		}
 
 #if defined(__x86_64__)
-		// Adjust the video buffer pointer to point to where it is in high virtual (above the hole)
+		                                                                                           
 		new_vinfo.v_baseaddr |= (VM_MIN_KERNEL_ADDRESS & ~LOW_4GB_MASK);
 #endif
 
-		/* Update the vinfo structure atomically with respect to the vc_progress task if running */
+		                                                                                           
 		if (vc_progress) {
 			simple_lock(&vc_progress_lock, LCK_GRP_NULL);
 			vinfo = new_vinfo;
@@ -2945,26 +2945,26 @@ initialize_screen(PE_Video * boot_vinfo, unsigned int op)
 			vinfo = new_vinfo;
 		}
 
-		// If we changed the virtual address, remove the old mapping
+		                                                            
 		if (newVideoVirt != 0) {
-			if (lastVideoVirt && lastVideoMapSize) {                                                /* Was the framebuffer mapped before? */
-				/* XXX why only !4K? */
+			if (lastVideoVirt && lastVideoMapSize) {                                                                                        
+				                       
 				if (!TEST_PAGE_SIZE_4K && lastVideoMapSize) {
 					pmap_remove(kernel_pmap, trunc_page_64(lastVideoVirt),
-					    round_page_64(lastVideoVirt + lastVideoMapSize));           /* Toss mappings */
+					    round_page_64(lastVideoVirt + lastVideoMapSize));                              
 				}
-				/* Was this not a special pre-VM mapping? */
+				                                            
 				if (lastVideoMapKmap) {
-					kmem_free(kernel_map, lastVideoVirt, lastVideoMapSize); /* Toss kernel addresses */
+					kmem_free(kernel_map, lastVideoVirt, lastVideoMapSize);                            
 				}
 			}
-			lastVideoMapKmap = (NULL != kernel_map);                /* Remember how mapped */
-			lastVideoMapSize = newMapSize;                                  /* Remember the size */
-			lastVideoVirt    = newVideoVirt;                                /* Remember the virtual framebuffer address */
+			lastVideoMapKmap = (NULL != kernel_map);                                         
+			lastVideoMapSize = newMapSize;                                                         
+			lastVideoVirt    = newVideoVirt;                                                                              
 		}
 
 		if (kPEBaseAddressChange != op) {
-			// Graphics mode setup by the booter.
+			                                     
 
 			gc_ops.initialize   = vc_initialize;
 			gc_ops.enable       = vc_enable;
@@ -3014,7 +3014,7 @@ initialize_screen(PE_Video * boot_vinfo, unsigned int op)
 
 #if !defined(XNU_TARGET_OS_BRIDGE)
 		vc_progress_set( graphics_now, delay );
-#endif /* !defined(XNU_TARGET_OS_BRIDGE) */
+#endif                                     
 		gc_enable( !graphics_now );
 		gc_acquired = TRUE;
 		gc_desire_text = FALSE;
@@ -3102,7 +3102,7 @@ initialize_screen(PE_Video * boot_vinfo, unsigned int op)
 	}
 }
 
-void vcattach(void); /* XXX gcc 4 warning cleanup */
+void vcattach(void);                                
 
 void
 vcattach(void)
@@ -3127,8 +3127,8 @@ vcattach(void)
 #else
 	vc_progress_meter_start = 0;
 	vc_progress_meter_end   = kProgressMeterEnd;
-#endif /* defined(__x86_64__ */
-#endif /* defined(CONFIG_VC_PROGRESS_METER_SUPPORT) */
+#endif                         
+#endif                                                
 	simple_lock_init(&vc_progress_lock, 0);
 
 	if (gc_graphics_boot == FALSE) {
@@ -3156,8 +3156,8 @@ vcattach(void)
 
 #if defined(XNU_TARGET_OS_OSX)
 
-// redraw progress meter between pixels start, end, position at pos,
-// options (including rotation) passed in flags
+                                                                    
+                                               
 static void
 vc_draw_progress_meter(unsigned int flags, int start, int end, int pos)
 {
@@ -3168,29 +3168,29 @@ vc_draw_progress_meter(unsigned int flags, int start, int end, int pos)
 	int barWidth  = kProgressBarWidth * vc_uiscale;
 	int barHeight = kProgressBarHeight * vc_uiscale;
 	int capWidth  = kProgressBarCapWidth * vc_uiscale;
-	// 1 rounded fill, 0 square end
+	                               
 	int style = (0 == (2 & vc_progress_withmeter));
-	// 1 white, 0 greyed out
+	                        
 	int onoff;
 
 	for (i = start; i < end; i += width) {
 		onoff       = (i < pos);
 		endCapPos   = ((style && onoff) ? pos : barWidth);
 		endCapStart = endCapPos - capWidth;
-		if (flags & kDataBack) { // restore back bits
-			width   = end;// loop done after this iteration
+		if (flags & kDataBack) {                     
+			width   = end;                                 
 			data    = NULL;
 			srcRow  = 0;
-		} else if (i < capWidth) { // drawing the left cap
+		} else if (i < capWidth) {                        
 			width   = (end < capWidth) ? (end - i) : (capWidth - i);
 			data    = progressmeter_leftcap[vc_uiscale >= 2][onoff];
 			data    += i;
 			srcRow  = capWidth;
-		} else if (i < endCapStart) { // drawing the middle
+		} else if (i < endCapStart) {                      
 			width   = (end < endCapStart) ? (end - i) : (endCapStart - i);
 			data    = progressmeter_middle[vc_uiscale >= 2][onoff];
 			srcRow  = 1;
-		} else { // drawing the right cap
+		} else {                         
 			width   = endCapPos - i;
 			data    = progressmeter_rightcap[vc_uiscale >= 2][onoff];
 			data    += i - endCapStart;
@@ -3198,7 +3198,7 @@ vc_draw_progress_meter(unsigned int flags, int start, int end, int pos)
 		}
 
 		switch (flags & kDataRotate) {
-		case kDataRotate90: // left middle, bar goes down
+		case kDataRotate90:                              
 			rectW   = barHeight;
 			rectH   = width;
 			rectX   = ((vinfo.v_width / 3) - (barHeight / 2));
@@ -3206,7 +3206,7 @@ vc_draw_progress_meter(unsigned int flags, int start, int end, int pos)
 			bx      = i * barHeight;
 			backRow = barHeight;
 			break;
-		case kDataRotate180: // middle upper, bar goes left
+		case kDataRotate180:                               
 			rectW   = width;
 			rectH   = barHeight;
 			rectX   = ((vinfo.v_width - barWidth) / 2) + barWidth - width - i;
@@ -3214,7 +3214,7 @@ vc_draw_progress_meter(unsigned int flags, int start, int end, int pos)
 			bx      = barWidth - width - i;
 			backRow = barWidth;
 			break;
-		case kDataRotate270: // right middle, bar goes up
+		case kDataRotate270:                             
 			rectW   = barHeight;
 			rectH   = width;
 			rectX   = (vinfo.v_width - (vinfo.v_width / 3) - (barHeight / 2));
@@ -3223,7 +3223,7 @@ vc_draw_progress_meter(unsigned int flags, int start, int end, int pos)
 			backRow = barHeight;
 			break;
 		default:
-		case kDataRotate0: // middle lower, bar goes right
+		case kDataRotate0:                                
 			rectW   = width;
 			rectH   = barHeight;
 			rectX   = ((vinfo.v_width - barWidth) / 2) + i;
@@ -3307,7 +3307,7 @@ internal_set_progressmeter(int new_value)
 {
 	int x1, x3;
 	int capRedraw;
-	// 1 rounded fill, 0 square end
+	                               
 	int style = (0 == (2 & vc_progress_withmeter));
 	int flags = kDataAlpha | vinfo.v_rotate;
 
@@ -3361,4 +3361,4 @@ vc_set_progressmeter(int new_value)
 	splx(s);
 }
 
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 

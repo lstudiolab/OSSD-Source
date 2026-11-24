@@ -26,17 +26,17 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * devtimer.c
- * - timer source based on <kern/thread_call.h>
- */
+  
+             
+                                               
+   
 
-/*
- * Modification History:
- *
- * June 22, 2004	Dieter Siegmund (dieter@apple.com)
- * - created
- */
+  
+                        
+  
+                                                   
+            
+   
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
@@ -46,12 +46,12 @@
 
 #ifdef DEVTIMER_DEBUG
 #define _devtimer_printf        printf
-#else /* !DEVTIMER_DEBUG */
+#else                      
 static __inline__ void
 _devtimer_printf(__unused const char * fmt, ...)
 {
 }
-#endif /* !DEVTIMER_DEBUG */
+#endif                      
 
 struct devtimer_s {
 	void *                      dt_callout;

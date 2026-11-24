@@ -45,10 +45,10 @@
 #ifndef __ASSEMBLER__
 #include <arm/_types.h>
 #include <sys/cdefs.h>
-/*
- * Basic integral types.  Omit the typedef if
- * not possible for a machine/compiler combination.
- */
+  
+                                             
+                                                   
+   
 #include <sys/_types/_int8_t.h>
 #include <sys/_types/_int16_t.h>
 #include <sys/_types/_int32_t.h>
@@ -69,7 +69,7 @@ typedef int32_t                 register_t;
 #include <sys/_types/_uintptr_t.h>
 
 #if !defined(_ANSI_SOURCE) && (!defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE))
-/* These types are used for reserving the largest possible size. */
+                                                                   
 #ifdef __arm64__
 typedef u_int64_t               user_addr_t;
 typedef u_int64_t               user_size_t;
@@ -93,26 +93,26 @@ typedef int64_t                 user_off_t;
 
 #ifdef KERNEL
 
-/*
- * These types are used when you know the word size of the target
- * user process. They can be used to create struct layouts independent
- * of the types and alignment requirements of the current running
- * kernel.
- */
+  
+                                                                 
+                                                                      
+                                                                 
+          
+   
 
-/*
- * The user64_ types are not used on the ARM platform, but exist
- * so that APIs that conditionalize their behavior based on the
- * size of an input structure (like many ioctl(2) implementations)
- * can differentiate those structures without a duplicate case
- * value.
- */
+  
+                                                                
+                                                               
+                                                                  
+                                                              
+         
+   
 
-/*
- * The default ABI for the ARM platform aligns fundamental integral
- * data types to their natural boundaries, with a maximum alignment
- * of 4, even for 8-byte quantites.
- */
+  
+                                                                   
+                                                                   
+                                   
+   
 
 typedef __uint64_t              user64_addr_t;
 typedef __uint64_t              user64_size_t;
@@ -129,23 +129,23 @@ typedef __int32_t               user32_long_t;
 typedef __uint32_t              user32_ulong_t;
 typedef __int32_t               user32_time_t;
 
-/*
- * This alignment is required to ensure symmetry between userspace and kernelspace
- * when the kernel is 64-bit and the user application is 32-bit. All currently
- * supported ARM slices (arm64/armv7k/arm64_32) contain the same type alignment
- * ABI so this alignment isn't needed for ARM.
- */
+  
+                                                                                  
+                                                                              
+                                                                               
+                                              
+   
 #if defined(__x86_64__)
 typedef __int64_t               user32_off_t __attribute__((aligned(4)));
 #else
 typedef __int64_t               user32_off_t;
 #endif
 
-#endif /* KERNEL */
+#endif             
 
-#endif /* !_ANSI_SOURCE && (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                                              
 
-/* This defines the size of syscall arguments after copying into the kernel: */
+                                                                               
 #if defined(__arm__)
 typedef u_int32_t               syscall_arg_t;
 #elif defined(__arm64__)
@@ -154,5 +154,5 @@ typedef u_int64_t               syscall_arg_t;
 #error Unknown architecture.
 #endif
 
-#endif /* __ASSEMBLER__ */
-#endif  /* _MACHTYPES_H_ */
+#endif                    
+#endif                     

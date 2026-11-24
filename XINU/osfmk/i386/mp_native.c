@@ -27,15 +27,15 @@
  */
 
 #include <mach/vm_types.h>
-#include <i386/acpi.h> /* install_real_mode_bootstrap */
+#include <i386/acpi.h>                                  
 #include <i386/mp.h>
-#include <i386/lapic.h> /* lapic_* functions */
+#include <i386/lapic.h>                        
 #include <i386/machine_routines.h>
 #include <i386/cpu_data.h>
 #include <i386/pmap.h>
 #include <i386/bit_routines.h>
 
-/* PAL-related routines */
+                          
 void i386_cpu_IPI(int cpu);
 boolean_t i386_smp_init(int nmi_vector, i386_intr_func_t nmi_handler,
     int ipi_vector, i386_intr_func_t ipi_handler);
@@ -47,13 +47,13 @@ void NMIPI_enable(boolean_t);
 extern void     slave_pstart(void);
 
 #ifdef  MP_DEBUG
-int     trappedalready = 0;     /* (BRINGUP) */
-#endif  /* MP_DEBUG */
+int     trappedalready = 0;                    
+#endif                
 
 boolean_t
 i386_smp_init(int nmi_vector, i386_intr_func_t nmi_handler, int ipi_vector, i386_intr_func_t ipi_handler)
 {
-	/* Local APIC? */
+	                 
 	if (!lapic_probe()) {
 		return FALSE;
 	}
@@ -93,10 +93,10 @@ i386_send_NMI(int cpu)
 	if (NMIPIs_enabled == FALSE) {
 		i386_cpu_IPI(cpu);
 	} else {
-		/* Program the interrupt command register */
-		/* The vector is ignored in this case--the target CPU will enter on the
-		 * NMI vector.
-		 */
+		                                            
+		                                                                       
+                
+     
 		LAPIC_WRITE_ICR(cpu_to_lapic[cpu],
 		    LAPIC_VECTOR(INTERPROCESSOR) | LAPIC_ICR_DM_NMI);
 	}
@@ -119,10 +119,10 @@ void
 i386_cpu_IPI(int cpu)
 {
 #ifdef  MP_DEBUG
-	if (cpu_datap(cpu)->cpu_signals & 6) {   /* (BRINGUP) */
+	if (cpu_datap(cpu)->cpu_signals & 6) {                  
 		kprintf("i386_cpu_IPI: sending enter debugger signal (%08X) to cpu %d\n", cpu_datap(cpu)->cpu_signals, cpu);
 	}
-#endif  /* MP_DEBUG */
+#endif                
 
 	lapic_send_ipi(cpu, LAPIC_VECTOR(INTERPROCESSOR));
 }

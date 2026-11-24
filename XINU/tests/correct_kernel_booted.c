@@ -22,7 +22,7 @@ get_macho_uuid(const char *cwd, const char *path, uuid_t uuid)
 
 	T_SETUPBEGIN;
 
-	// Skip irregular files (directories, devices, etc.).
+	                                                     
 	struct stat stbuf = {};
 	int ret = stat(path, &stbuf);
 	if (ret < 0 && errno == ENOENT) {
@@ -50,11 +50,11 @@ get_macho_uuid(const char *cwd, const char *path, uuid_t uuid)
 	    cwd, path);
 	(void)close(fd);
 
-	// Mach-O parsing boilerplate.
+	                              
 	uint32_t magic = *(uint32_t *)mapped;
 	bool should_swap = false;
 	bool b32 = false;
-	// XXX This does not handle fat binaries.
+	                                         
 	switch (magic) {
 	case MH_CIGAM:
 		should_swap = true;
@@ -83,7 +83,7 @@ get_macho_uuid(const char *cwd, const char *path, uuid_t uuid)
 	}
 	ncmds = should_swap ? OSSwapInt32(ncmds) : ncmds;
 
-	// Scan through load commands to find LC_UUID.
+	                                              
 	for (unsigned int i = 0; i < ncmds; i++) {
 		if ((should_swap ? OSSwapInt32(lcmd->cmd) : lcmd->cmd) == LC_UUID) {
 			const struct uuid_command *uuid_cmd = (const void *)lcmd;
@@ -129,9 +129,9 @@ T_DECL(correct_kernel_booted,
 
 #if TARGET_OS_OSX
 	const char *kernels_path = "/System/Library/Kernels/";
-#else // TARGET_OS_OSX
+#else                 
 	const char *kernels_path = "/";
-#endif // !TARGET_OS_OSX
+#endif                  
 	T_LOG("searching for kernels at %s", kernels_path);
 
 	ret = chdir(kernels_path);

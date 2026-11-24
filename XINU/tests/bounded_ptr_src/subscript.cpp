@@ -1,7 +1,7 @@
-//
-// Tests for
-//  T& operator[](std::ptrdiff_t n) const;
-//
+  
+            
+                                          
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -40,10 +40,10 @@ tests()
 	std::array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                                ^
-		//   |                                                |
-		// begin, ptr                                        end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<QualT> ptr(array.begin() + 0, array.begin(), array.end());
 		QualT& ref0 = ptr[0];
 		_assert(&ref0 == &array[0]);
@@ -61,10 +61,10 @@ tests()
 		_assert(&ref4 == &array[4]);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^        ^                                       ^
-		//   |        |                                       |
-		// begin     ptr                                     end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<QualT> ptr(array.begin() + 1, array.begin(), array.end());
 		QualT& ref0 = ptr[-1];
 		_assert(&ref0 == &array[0]);
@@ -82,10 +82,10 @@ tests()
 		_assert(&ref4 == &array[4]);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                 ^                              ^
-		//   |                 |                              |
-		// begin              ptr                            end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<QualT> ptr(array.begin() + 2, array.begin(), array.end());
 		QualT& ref0 = ptr[-2];
 		_assert(&ref0 == &array[0]);
@@ -103,10 +103,10 @@ tests()
 		_assert(&ref4 == &array[4]);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                   ^            ^
-		//   |                                   |            |
-		// begin                                ptr          end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<QualT> ptr(array.begin() + 4, array.begin(), array.end());
 		QualT& ref0 = ptr[-4];
 		_assert(&ref0 == &array[0]);
@@ -124,10 +124,10 @@ tests()
 		_assert(&ref4 == &array[4]);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                                ^
-		//   |                                                |
-		// begin                                           end,ptr
+		                                                               
+		                                                       
+		                                                       
+		                                                          
 		test_bounded_ptr<QualT> ptr(array.end(), array.begin(), array.end());
 		QualT& ref0 = ptr[-5];
 		_assert(&ref0 == &array[0]);
@@ -145,12 +145,12 @@ tests()
 		_assert(&ref4 == &array[4]);
 	}
 
-	// Make sure we trap when we subscript a pointer at an out-of-bounds offset
+	                                                                           
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                          ^        ^
-		//   |                          |        |
-		// begin                       end      ptr
+		                                                               
+		                                          
+		                                          
+		                                           
 		libkern::bounded_ptr<QualT, tracking_policy> ptr(array.end() - 1, array.begin(), array.end() - 2);
 
 		tracking_policy::did_trap = false;
@@ -166,18 +166,18 @@ tests()
 		_assert(!tracking_policy::did_trap);
 
 		tracking_policy::did_trap = false;
-		(void)ptr[-1]; // trap
+		(void)ptr[-1];        
 		_assert(tracking_policy::did_trap);
 
 		tracking_policy::did_trap = false;
-		(void)ptr[0]; // trap
+		(void)ptr[0];        
 		_assert(tracking_policy::did_trap);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^        ^                                        ^
-		//   |        |                                        |
-		// begin     ptr                                      end
+		                                                               
+		                                                        
+		                                                        
+		                                                         
 		libkern::bounded_ptr<QualT, tracking_policy> ptr(array.begin() + 1, array.begin(), array.end());
 
 		tracking_policy::did_trap = false;
@@ -201,18 +201,18 @@ tests()
 		_assert(!tracking_policy::did_trap);
 
 		tracking_policy::did_trap = false;
-		(void)ptr[4]; // trap
+		(void)ptr[4];        
 		_assert(tracking_policy::did_trap);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^        ^                          ^
-		//   |        |                          |
-		//  ptr     begin                       end
+		                                                               
+		                                          
+		                                          
+		                                           
 		libkern::bounded_ptr<QualT, tracking_policy> ptr(array.begin(), array.begin() + 1, array.end() - 1);
 
 		tracking_policy::did_trap = false;
-		(void)ptr[0]; // trap
+		(void)ptr[0];        
 		_assert(tracking_policy::did_trap);
 
 		tracking_policy::did_trap = false;
@@ -228,11 +228,11 @@ tests()
 		_assert(!tracking_policy::did_trap);
 
 		tracking_policy::did_trap = false;
-		(void)ptr[4]; // trap
+		(void)ptr[4];        
 		_assert(tracking_policy::did_trap);
 
 		tracking_policy::did_trap = false;
-		(void)ptr[5]; // trap
+		(void)ptr[5];        
 		_assert(tracking_policy::did_trap);
 	}
 }
@@ -243,8 +243,8 @@ T_DECL(subscript, "bounded_ptr.subscript") {
 	tests<T, T volatile>();
 	tests<T, T const volatile>();
 
-	// Make sure that we don't hard-error in the definition of operator[]
-	// when instantiating a `bounded_ptr<cv-void>`
+	                                                                     
+	                                              
 	test_bounded_ptr<void> p1;
 	test_bounded_ptr<void const> p2;
 	test_bounded_ptr<void volatile> p3;

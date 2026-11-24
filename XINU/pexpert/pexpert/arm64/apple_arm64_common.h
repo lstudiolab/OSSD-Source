@@ -56,7 +56,7 @@
 #endif
 
 #if defined(CPU_HAS_APPLE_PAC) && defined(__arm64e__)
-#define HAS_APPLE_PAC                        1 /* Has Apple ARMv8.3a pointer authentication */
+#define HAS_APPLE_PAC                        1                                                
 #endif
 
 #include <pexpert/arm64/apple_arm64_regs.h>
@@ -70,16 +70,16 @@
 #if !defined(APPLETYPHOON) && !defined(APPLETWISTER) && !defined(APPLEVIRTUALPLATFORM)
 #include <pexpert/arm/dockchannel.h>
 
-// AOP_CLOCK frequency * 30 ms
+                              
 #define DOCKCHANNEL_DRAIN_PERIOD             (192000000 * 0.03)
 #endif
 
-#endif /* ASSEMBLER */
+#endif                
 
-/*
- * See arm64/proc_reg.h for how these values are constructed from the MIDR.
- * The chip-revision property from EDT also uses these constants.
- */
+  
+                                                                           
+                                                                 
+   
 #define CPU_VERSION_A0                       0x00
 #define CPU_VERSION_A1                       0x01
 #define CPU_VERSION_B0                       0x10
@@ -87,4 +87,4 @@
 #define CPU_VERSION_C0                       0x20
 #define CPU_VERSION_UNKNOWN                  0xff
 
-#endif /* !_PEXPERT_ARM64_APPLE_ARM64_COMMON_H */
+#endif                                           

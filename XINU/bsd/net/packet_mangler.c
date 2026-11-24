@@ -21,20 +21,20 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/*
- * THEORY OF OPERATION
- *
- * The packet mangler subsystem provides a limited way for user space
- * applications to apply certain actions on certain flows.
- *
- * A user space applications opens a kernel control socket with the name
- * PACKET_MANGLER_CONTROL_NAME to attach to the packet mangler subsystem.
- * When connected, a "struct packet_mangler" is created and set as the
- * "unitinfo" of the corresponding kernel control socket instance.
- * Connect call for packet mangler's kernel control socket also registers
- * ip filers with cookie set to the packet_mangler instance.
- * The ip filters are removed when control socket is disconnected.
- */
+  
+                      
+  
+                                                                     
+                                                          
+  
+                                                                        
+                                                                         
+                                                                      
+                                                                  
+                                                                         
+                                                            
+                                                                  
+   
 #include <sys/types.h>
 #include <sys/kern_control.h>
 #include <sys/domain.h>
@@ -62,20 +62,20 @@
 SYSCTL_NODE(_net, OID_AUTO, pktmnglr, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "pktmnglr");
 SYSCTL_INT(_net_pktmnglr, OID_AUTO, log, CTLFLAG_RW | CTLFLAG_LOCKED,
     &pkt_mnglr_log_level, 0, "");
-/*
- * The structure packet_mangler represents a user space packet filter
- * It's created and associated with a kernel control socket instance
- */
+  
+                                                                     
+                                                                    
+   
 struct packet_mangler {
 	kern_ctl_ref                    pkt_mnglr_kcref;
 	uint32_t                        pkt_mnglr_kcunit;
 	uint32_t                        pkt_mnglr_flags;
-	/* IP filter related params */
+	                              
 	ipfilter_t                      pkt_mnglr_ipfref;
 	ipfilter_t                      pkt_mnglr_ipfrefv6;
 	struct ipf_filter               pkt_mnglr_ipfilter;
 
-	/* Options */
+	             
 	uint8_t                         activate;
 	Pkt_Mnglr_Flow                  dir;
 	struct sockaddr_storage         lsaddr;
@@ -89,11 +89,11 @@ struct packet_mangler {
 	uint32_t                        proto_action_mask;
 };
 
-/* Array of all the packet mangler instancesi */
+                                                
 struct packet_mangler **packet_manglers = NULL;
 
-uint32_t pkt_mnglr_active_count = 0;    /* Number of active packet filters */
-uint32_t pkt_mnglr_close_wait_timeout = 1000; /* in milliseconds */
+uint32_t pkt_mnglr_active_count = 0;                                         
+uint32_t pkt_mnglr_close_wait_timeout = 1000;                      
 
 static kern_ctl_ref pkt_mnglr_kctlref = NULL;
 
@@ -101,7 +101,7 @@ static lck_grp_attr_t *pkt_mnglr_lck_grp_attr = NULL;
 static lck_attr_t *pkt_mnglr_lck_attr = NULL;
 static lck_grp_t *pkt_mnglr_lck_grp = NULL;
 
-/* The lock below protects packet_manglers DS, packet_mangler DS */
+                                                                   
 decl_lck_rw_data(static, pkt_mnglr_lck_rw);
 
 #define PKT_MNGLR_RW_LCK_MAX    8
@@ -115,15 +115,15 @@ void* pkt_mnglr_rw_unlock_history[PKT_MNGLR_RW_LCK_MAX];
 static ZONE_DECLARE(packet_mangler_zone, "packet_mangler",
     sizeof(struct packet_mangler), ZC_NONE);
 
-/*
- * For troubleshooting
- */
+  
+                      
+   
 int pkt_mnglr_log_level = LOG_ERR;
 int pkt_mnglr_debug = 1;
 
-/*
- * Forward declaration to appease the compiler
- */
+  
+                                              
+   
 static void pkt_mnglr_rw_lock_exclusive(lck_rw_t *);
 static void pkt_mnglr_rw_unlock_exclusive(lck_rw_t *);
 static void pkt_mnglr_rw_lock_shared(lck_rw_t *);
@@ -149,9 +149,9 @@ static void chksm_update(mbuf_t data);
 #define MPTCP_SUBTYPE_MP_FAIL           0x6
 #define MPTCP_SUBTYPE_MP_FASTCLOSE      0x7
 
-/*
- * packet filter global read write lock
- */
+  
+                                       
+   
 
 static void
 pkt_mnglr_rw_lock_exclusive(lck_rw_t *lck)
@@ -207,9 +207,9 @@ pkt_mnglr_rw_unlock_shared(lck_rw_t *lck)
 	pkt_mnglr_rw_nxt_unlck = (pkt_mnglr_rw_nxt_unlck + 1) % PKT_MNGLR_RW_LCK_MAX;
 }
 
-/*
- * Packet Mangler's Kernel control socket callbacks
- */
+  
+                                                   
+   
 static errno_t
 pkt_mnglr_ctl_connect(kern_ctl_ref kctlref, struct sockaddr_ctl *sac,
     void **unitinfo)
@@ -247,7 +247,7 @@ pkt_mnglr_ctl_connect(kern_ctl_ref kctlref, struct sockaddr_ctl *sac,
 			pkt_mnglr_rw_unlock_exclusive(&pkt_mnglr_lck_rw);
 			goto done;
 		}
-		/* Another thread may have won the race */
+		                                          
 		if (packet_manglers != NULL) {
 			FREE(tmp, M_TEMP);
 		} else {
@@ -262,9 +262,9 @@ pkt_mnglr_ctl_connect(kern_ctl_ref kctlref, struct sockaddr_ctl *sac,
 		PKT_MNGLR_LOG(LOG_ERR, "sc_unit %u in use", sac->sc_unit);
 		error = EADDRINUSE;
 	} else {
-		/*
-		 * kernel control socket kcunit numbers start at 1
-		 */
+		  
+                                                    
+     
 		packet_manglers[sac->sc_unit - 1] = p_pkt_mnglr;
 
 		p_pkt_mnglr->pkt_mnglr_kcref = kctlref;
@@ -341,9 +341,9 @@ pkt_mnglr_ctl_disconnect(kern_ctl_ref kctlref, u_int32_t kcunit, void *unitinfo)
 		goto done;
 	}
 
-	/*
-	 * Make filter inactive
-	 */
+	  
+                        
+    
 	packet_manglers[kcunit - 1] = NULL;
 	pkt_mnglr_active_count--;
 	if (p_pkt_mnglr->pkt_mnglr_flags & PKT_MNGLR_FLG_IPFILTER_ATTACHED) {
@@ -702,35 +702,35 @@ pkt_mnglr_init(void)
 
 	PKT_MNGLR_LOG(LOG_NOTICE, "");
 
-	/*
-	 * Compile time verifications
-	 */
+	  
+                              
+    
 	_CASSERT(PKT_MNGLR_MAX_FILTER_COUNT == MAX_PACKET_MANGLER);
 
-	/*
-	 * Allocate locks
-	 */
+	  
+                  
+    
 	pkt_mnglr_lck_grp_attr = lck_grp_attr_alloc_init();
 	if (pkt_mnglr_lck_grp_attr == NULL) {
 		panic("%s: lck_grp_attr_alloc_init failed", __func__);
-		/* NOTREACHED */
+		                
 	}
 	pkt_mnglr_lck_grp = lck_grp_alloc_init("packet manglerr",
 	    pkt_mnglr_lck_grp_attr);
 	if (pkt_mnglr_lck_grp == NULL) {
 		panic("%s: lck_grp_alloc_init failed", __func__);
-		/* NOTREACHED */
+		                
 	}
 	pkt_mnglr_lck_attr = lck_attr_alloc_init();
 	if (pkt_mnglr_lck_attr == NULL) {
 		panic("%s: lck_attr_alloc_init failed", __func__);
-		/* NOTREACHED */
+		                
 	}
 	lck_rw_init(&pkt_mnglr_lck_rw, pkt_mnglr_lck_grp, pkt_mnglr_lck_attr);
 
-	/*
-	 * Register kernel control
-	 */
+	  
+                           
+    
 	bzero(&kern_ctl, sizeof(kern_ctl));
 	strlcpy(kern_ctl.ctl_name, PACKET_MANGLER_CONTROL_NAME,
 	    sizeof(kern_ctl.ctl_name));
@@ -774,7 +774,7 @@ pktmnglr_ipfilter_output(void *cookie, mbuf_t *data, ipf_pktopts_t options)
 		goto output_done;
 	}
 
-	/* Check for IP filter options */
+	                                 
 	error = mbuf_copydata(*data, 0, sizeof(ip), &ip);
 	if (error) {
 		PKT_MNGLR_LOG(LOG_ERR, "Could not make local IP header copy");
@@ -811,7 +811,7 @@ pktmnglr_ipfilter_output(void *cookie, mbuf_t *data, ipf_pktopts_t options)
 	}
 
 output_done:
-	/* Not handling output flow */
+	                              
 	return 0;
 }
 
@@ -846,7 +846,7 @@ pktmnglr_ipfilter_input(void *cookie, mbuf_t *data, int offset, u_int8_t protoco
 		goto input_done;
 	}
 
-	/* Check for IP filter options */
+	                                 
 	error = mbuf_copydata(*data, 0, sizeof(ip), &ip);
 	if (error) {
 		PKT_MNGLR_LOG(LOG_ERR, "Could not make local IP header copy");
@@ -904,7 +904,7 @@ pktmnglr_ipfilter_input(void *cookie, mbuf_t *data, int offset, u_int8_t protoco
 		ip_pld_len = ntohs(ip.ip_len) - (ip.ip_hl << 2);
 	} else if (ip.ip_v == 6) {
 		if (ip6.ip6_nxt != p_pkt_mnglr->proto) {
-			/* Don't support IPv6 extension headers */
+			                                          
 			goto input_done;
 		}
 		ip_pld_len = ntohs(ip6.ip6_plen) + sizeof(struct ip6_hdr);
@@ -951,10 +951,10 @@ pktmnglr_ipfilter_input(void *cookie, mbuf_t *data, int offset, u_int8_t protoco
 		goto input_done;
 	}
 
-	/* XXX Do IP actions here */
+	                            
 	PKT_MNGLR_LOG(LOG_INFO, "Proceeding with packet mangler actions on the packet");
 
-	/* Protocol actions */
+	                      
 	switch (protocol) {
 	case IPPROTO_TCP:
 		if (p_pkt_mnglr->proto_action_mask) {
@@ -993,7 +993,7 @@ pktmnglr_ipfilter_input(void *cookie, mbuf_t *data, int offset, u_int8_t protoco
 				} else if ((tcp_opt_buf[i] != 0) && (tcp_opt_buf[i] != TCP_OPT_MULTIPATH_TCP)) {
 					PKT_MNGLR_LOG(LOG_INFO, "Skipping option %x\n", tcp_opt_buf[i]);
 
-					/* Minimum TCP option size is 2 */
+					                                  
 					if (tcp_opt_buf[i + 1] < 2) {
 						PKT_MNGLR_LOG(LOG_ERR, "Received suspicious TCP option");
 						goto drop_it;
@@ -1048,7 +1048,7 @@ pktmnglr_ipfilter_input(void *cookie, mbuf_t *data, int offset, u_int8_t protoco
 		}
 		break;
 	case IPPROTO_UDP:
-		/* Don't handle UDP */
+		                      
 		break;
 	case IPPROTO_ICMP:
 		break;
@@ -1074,7 +1074,7 @@ pktmnglr_ipfilter_detach(void *cookie)
 	return;
 }
 
-/* XXX Still need to modify this to use mbuf_copy* macros */
+                                                            
 static void
 chksm_update(mbuf_t data)
 {
@@ -1090,7 +1090,7 @@ chksm_update(mbuf_t data)
 	}
 
 	ip->ip_sum = 0;
-	err = mbuf_inet_cksum(data, 0, 0, ip->ip_hl << 2, &ip_sum); // ip sum
+	err = mbuf_inet_cksum(data, 0, 0, ip->ip_hl << 2, &ip_sum);          
 	if (err == 0) {
 		ip->ip_sum = ip_sum;
 	}
@@ -1105,7 +1105,7 @@ chksm_update(mbuf_t data)
 		}
 		break;
 	case IPPROTO_UDP:
-		/* Don't handle UDP */
+		                      
 		break;
 	case IPPROTO_ICMP:
 		break;

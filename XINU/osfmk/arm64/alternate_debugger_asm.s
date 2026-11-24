@@ -30,7 +30,7 @@
 
 #if ALTERNATE_DEBUGGER
 	.text
-/* void alternate_debugger_just_return(__unused mach_vm_size_t size, __unused mach_vm_address_t pages, __unused mach_vm_size_t pages_size, t_putc_fn putc_address) */
+                                                                                                                                                                     
 	.align 2
 	.globl EXT(alternate_debugger_just_return)
 LEXT(alternate_debugger_just_return)
@@ -40,26 +40,26 @@ LEXT(alternate_debugger_just_return)
 	str		x3, [sp, #0x8]
 	mov		w0, #0xa
 	mov		x1, x3
-	blr		x1				// (*putc_address)('\n');
+	blr		x1				                         
 	orr		w0, wzr, #0x3e
 	ldr		x1, [sp, #0x8]
-	blr		x1				// (*putc_address)('>');
+	blr		x1				                        
 	mov		w0, #0x4d
 	ldr		x1, [sp, #0x8]
-	blr		x1				// (*putc_address)('M');
+	blr		x1				                        
 	mov		w0, #0x54
 	ldr		x1, [sp, #0x8]
-	blr		x1				// (*putc_address)('T');
+	blr		x1				                        
 	orr		w0, wzr, #0x3c
 	ldr		x1, [sp, #0x8]
-	blr		x1				// (*putc_address)('<');
+	blr		x1				                        
 	mov		w0, #0xa
 	ldr		x1, [sp, #0x8]
 	ldp		x29, x30, [sp, #0x10]
 	add		sp, sp, #0x20 
-	br		x1				// (*putc_address)('\n');
+	br		x1				                         
 	.align 2
 	.globl EXT(alternate_debugger_just_return_end)
 LEXT(alternate_debugger_just_return_end)
 
-#endif /* ALTERNATE_DEBUGGER */
+#endif                         

@@ -45,9 +45,9 @@ struct kxld_symtab;
 
 typedef struct kxld_object KXLDObject;
 
-/*******************************************************************************
-* Constructors and destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 size_t kxld_object_sizeof(void)
 __attribute__((const, visibility("hidden")));
@@ -64,9 +64,9 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_object_deinit(KXLDObject *object)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 const u_char * kxld_object_get_file(const KXLDObject *object)
 __attribute__((pure, nonnull, visibility("hidden")));
@@ -136,16 +136,16 @@ void kxld_object_set_link_info(KXLDObject *object,
 __attribute__((nonnull, visibility("hidden")));
 
 
-/* This will be the same size as kxld_kext_get_vmsize */
+                                                        
 kern_return_t kxld_object_export_linked_object(const KXLDObject *object,
     void *linked_object
     )
 __attribute__((nonnull, visibility("hidden")));
 
 
-/*******************************************************************************
-* Modifiers
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 kern_return_t kxld_object_index_symbols_by_name(KXLDObject *object)
 __attribute__((nonnull, visibility("hidden")));
@@ -172,4 +172,4 @@ kern_return_t kxld_object_process_relocations(KXLDObject *object,
     const struct kxld_dict *patched_vtables)
 __attribute__((nonnull, visibility("hidden")));
 
-#endif /* _KXLD_OBJECT_H_ */
+#endif                      

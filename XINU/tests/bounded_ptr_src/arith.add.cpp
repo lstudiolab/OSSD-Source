@@ -1,10 +1,10 @@
-//
-// Tests for
-//  friend bounded_ptr operator+(bounded_ptr p, std::ptrdiff_t n);
-//  friend bounded_ptr operator+(std::ptrdiff_t n, bounded_ptr p);
-//
-// The heavy lifting is done in operator+=, so we only check basic functioning.
-//
+  
+            
+                                                                  
+                                                                  
+  
+                                                                               
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -24,11 +24,11 @@ tests()
 {
 	std::array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// Add positive offsets
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^                                                ^
-	//   |                                                |
-	// begin, ptr                                        end
+	                       
+	                                                               
+	                                                       
+	                                                       
+	                                                        
 	{
 		test_bounded_ptr<QualT> const ptr(array.begin(), array.begin(), array.end());
 
@@ -58,11 +58,11 @@ tests()
 		}
 	}
 
-	// Add negative offsets
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^                                                ^
-	//   |                                                |
-	// begin                                           end,ptr
+	                       
+	                                                               
+	                                                       
+	                                                       
+	                                                          
 	{
 		test_bounded_ptr<QualT> const ptr(array.end(), array.begin(), array.end());
 
@@ -92,14 +92,14 @@ tests()
 		}
 	}
 
-	// Make sure the original pointer isn't modified
+	                                                
 	{
 		test_bounded_ptr<QualT> const ptr(array.begin() + 1, array.begin(), array.end());
 		(void)(ptr + 3);
 		_assert(&*ptr == &array[1]);
 	}
 
-	// Make sure the operator is commutative
+	                                        
 	{
 		{
 			test_bounded_ptr<QualT> const ptr(array.begin(), array.begin(), array.end());

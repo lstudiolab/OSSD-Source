@@ -56,7 +56,7 @@ main(int argc, char * argv[])
 		switch (ch) {
 		case 'c':
 		case 'S':
-			/* ignored for compatibility */
+			                               
 			break;
 		case 'm':
 			gotmode = true;

@@ -4,7 +4,7 @@ from macholib import MachO as macho
 from collections import namedtuple
 import re
 
-# some fixups in macholib that are required for kext support
+                                                            
 macholib.mach_o.MH_KEXT_BUNDLE = 0xB
 
 macholib.mach_o.MH_FILETYPE_NAMES[macholib.mach_o.MH_KEXT_BUNDLE] = "kext bundle"
@@ -72,12 +72,12 @@ class MemMacho(macho.MachO):
         if size is None:
             super(MemMacho,self).__init__(memdata)
             return
-        #
-        # supports the ObjectGraph protocol
+         
+                                           
         self.graphident = 'mem:%d//'.format(size)
         self.filename = 'mem:%d//'.format(size)
 
-        # initialized by load
+                             
         self.fat = None
         self.headers = []
         fp = MemFile(memdata, size)
@@ -94,7 +94,7 @@ class MemMacho(macho.MachO):
         retval = []
         for h in self.headers:
             for cmd in h.commands:
-                # cmds is [(load_command, segment, [sections..])]
+                                                                 
                 (lc, segment, sections) = cmd
                 if isinstance(segment, SEGMENT_TYPES):
                     segname = segment.segname[:segment.segname.find('\x00')]
@@ -113,7 +113,7 @@ class MemMacho(macho.MachO):
         retval = []
         for h in self.headers:
             for cmd in h.commands:
-                # cmds is [(load_command, segment, [sections..])]
+                                                                 
                 (lc, segment, sections) = cmd
                 if isinstance(segment, SEGMENT_TYPES):
                     segname = segment.segname[:segment.segname.find('\x00')]
@@ -129,7 +129,7 @@ class MemMacho(macho.MachO):
         retval = ''
         for h in self.headers:
             for cmd in h.commands:
-                # cmds is [(load_command, segment, [sections..])]
+                                                                 
                 (lc, segment, sections) = cmd
                 if isinstance(segment, macholib.mach_o.uuid_command):
                     retval = GetUUIDSummary(segment.uuid)
@@ -217,15 +217,15 @@ class VisualMachoMap(object):
         for hdr in mobj.headers:
             cmd_index = 0
             for cmd in hdr.commands:
-                # cmds is [(load_command, segment, [sections..])]
+                                                                 
                 (lc, segment, sections) = cmd
                 lc_cmd_str = get_load_command_human_name(lc.cmd)
                 lc_str_rep = "\n\t LC: {:s} size:{:d} nsects:{:d}".format(lc_cmd_str, lc.cmdsize, len(sections))
-                # print lc_str_rep
+                                  
                 if isinstance(segment, SEGMENT_TYPES):
                     segname = segment.segname[:segment.segname.find('\x00')]
-                    # print "\tsegment: {:s} vmaddr: {:x} vmsize:{:d} fileoff: {:x} filesize: {:d}".format(
-                    #             segname, segment.vmaddr, segment.vmsize, segment.fileoff, segment.filesize)
+                                                                                                           
+                                                                                                             
                     blocks.append(MapBlock(segname, segment.vmaddr, segment.vmsize, segment.fileoff, segment.filesize,
                                             ' LC:{} : {} init:{:#0X} max:{:#0X}'.format(lc_cmd_str, segname, segment.initprot, segment.maxprot),
                                             True))
@@ -233,7 +233,7 @@ class VisualMachoMap(object):
                         section_name = section.sectname[:section.sectname.find('\x00')]
                         blocks.append(MapBlock(section_name, section.addr, section.size, section.offset,
                                                 section.size, 'al:{} flags:{:#0X}'.format(section.align, section.flags), False))
-                        #print "\t\tsection:{:s} addr:{:x} off:{:x} size:{:d}".format(section_name, section.addr, section.offset, section.size)
+                                                                                                                                               
                 elif isinstance(segment, macholib.mach_o.uuid_command):
                     other_cmds += "\n\t uuid: {:s}".format(GetUUIDSummary(segment.uuid))
                 elif isinstance(segment, macholib.mach_o.rpath_command):
@@ -244,7 +244,7 @@ class VisualMachoMap(object):
                     other_cmds += lc_str_rep
                 cmd_index += 1
 
-        # fixup the self.width param
+                                    
         for _b in blocks:
             if self.default_side_padding + len(_b.name) + 2 > self.width:
                 self.width = self.default_side_padding + len(_b.name) + 2
@@ -255,7 +255,7 @@ class VisualMachoMap(object):
         mstr = [self.get_header_line()]
         prev_block = MapBlock('', 0, 0, 0, 0, '', False)
         for b in sorted_blocks:
-            # TODO add separator blocks if vmaddr is large from prev_block
+                                                                          
             if b.is_segment:
                 s = self.get_dashed_line()
             else:
@@ -272,7 +272,7 @@ class VisualMachoMap(object):
                 mstr.append(self.get_space_line())
                 mstr.extend(self.get_separator_lines())
                 mstr.append(self.get_space_line())
-            #mstr.append(self.get_space_line())
+                                               
             prev_block = b
         mstr.append(self.get_space_line())
         if prev_block.vmsize > VisualMachoMap.KB_16:

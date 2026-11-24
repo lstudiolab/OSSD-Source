@@ -36,12 +36,12 @@
 int (*dtrace_pid_probe_ptr)(x86_saved_state_t *);
 int (*dtrace_return_probe_ptr)(x86_saved_state_t *);
 
-/*
- * HACK! There doesn't seem to be an easy way to include trap.h from
- * here. FIXME!
- */
-#define	T_INT3			3		/* int 3 instruction */
-#define T_DTRACE_RET		0x7f		/* DTrace pid return */
+  
+                                                                    
+               
+   
+#define	T_INT3			3		                       
+#define T_DTRACE_RET		0x7f		                       
 
 kern_return_t
 dtrace_user_probe(x86_saved_state_t *);
@@ -53,19 +53,19 @@ dtrace_user_probe(x86_saved_state_t *regs)
 	x86_saved_state32_t *regs32;
         int trapno;
 
-	/*
-	 * FIXME!
-	 *
-	 * The only call path into this method is always a user trap.
-	 * We don't need to test for user trap, but should assert it.
-	 */
+	  
+          
+   
+                                                              
+                                                              
+    
 	boolean_t user_mode = TRUE;
 
         if (is_saved_state64(regs) == TRUE) {
                 regs64 = saved_state64(regs);
 		regs32 = NULL;
                 trapno = regs64->isf.trapno;
-                user_mode = TRUE; // By default, because xnu is 32 bit only
+                user_mode = TRUE;                                          
         } else {
 		regs64 = NULL;
                 regs32 = saved_state32(regs);
@@ -77,12 +77,12 @@ dtrace_user_probe(x86_saved_state_t *regs)
 	struct proc *p = current_proc();
 
 	uthread_t uthread = (uthread_t)get_bsdthread_info(current_thread());
-	if (user_mode /*|| (rp->r_ps & PS_VM)*/) {
-		/*
-		 * DTrace accesses t_cred in probe context.  t_cred
-		 * must always be either NULL, or point to a valid,
-		 * allocated cred structure.
-		 */
+	if (user_mode                          ) {
+		  
+                                                     
+                                                     
+                              
+     
 		kauth_cred_uthread_update(uthread, p);
 	}
 
@@ -93,35 +93,35 @@ dtrace_user_probe(x86_saved_state_t *regs)
 
 		if (uthread->t_dtrace_ast) {
 			printf("dtrace_user_probe() should be calling aston()\n");
-			// aston(uthread);
-			// uthread->t_sig_check = 1;
+			                  
+			                            
 		}
 
-		/*
-		 * Clear all user tracing flags.
-		 */
+		  
+                                  
+     
 		uthread->t_dtrace_ft = 0;
 
-		/*
-		 * If we weren't expecting to take a return probe trap, kill
-		 * the process as though it had just executed an unassigned
-		 * trap instruction.
-		 */
+		  
+                                                              
+                                                             
+                      
+     
 		if (step == 0) {
-			/*
-			 * APPLE NOTE: We're returning KERN_FAILURE, which causes 
-			 * the generic signal handling code to take over, which will effectively
-			 * deliver a EXC_BAD_INSTRUCTION to the user process.
-			 */
+			  
+                                                             
+                                                                           
+                                                        
+      
 	 		return KERN_FAILURE;
 		}
 
-		/*
-		 * If we hit this trap unrelated to a return probe, we're
-		 * just here to reset the AST flag since we deferred a signal
-		 * until after we logically single-stepped the instruction we
-		 * copied out.
-		 */
+		  
+                                                           
+                                                               
+                                                               
+                
+     
 		if (ret == 0) {
 			if (regs64) {
 				regs64->isf.rip = npc;
@@ -131,10 +131,10 @@ dtrace_user_probe(x86_saved_state_t *regs)
 			return KERN_SUCCESS;
 		}
 
-		/*
-		 * We need to wait until after we've called the
-		 * dtrace_return_probe_ptr function pointer to set %pc.
-		 */
+		  
+                                                 
+                                                         
+     
 		rwp = &CPU->cpu_ft_lock;
 		lck_rw_lock_shared(rwp);
 
@@ -153,22 +153,22 @@ dtrace_user_probe(x86_saved_state_t *regs)
 		uint8_t instr, instr2;
 		rwp = &CPU->cpu_ft_lock;
 
-		/*
-		 * The DTrace fasttrap provider uses the breakpoint trap
-		 * (int 3). We let DTrace take the first crack at handling
-		 * this trap; if it's not a probe that DTrace knowns about,
-		 * we call into the trap() routine to handle it like a
-		 * breakpoint placed by a conventional debugger.
-		 */
+		  
+                                                          
+                                                            
+                                                             
+                                                        
+                                                  
+     
 
-		/*
-		 * APPLE NOTE: I believe the purpose of the reader/writers lock
-		 * is thus: There are times which dtrace needs to prevent calling
-		 * dtrace_pid_probe_ptr(). Sun's original impl grabbed a plain
-		 * mutex here. However, that serialized all probe calls, and
-		 * destroyed MP behavior. So now they use a RW lock, with probes
-		 * as readers, and the top level synchronization as a writer.
-		 */
+		  
+                                                                 
+                                                                   
+                                                                
+                                                              
+                                                                  
+                                                               
+     
 		lck_rw_lock_shared(rwp);
 		if (dtrace_pid_probe_ptr != NULL && 
 		    (*dtrace_pid_probe_ptr)(regs) == 0) {
@@ -178,15 +178,15 @@ dtrace_user_probe(x86_saved_state_t *regs)
 		lck_rw_unlock_shared(rwp);
 
 
-		/*
-		 * If the instruction that caused the breakpoint trap doesn't
-		 * look like an int 3 anymore, it may be that this tracepoint
-		 * was removed just after the user thread executed it. In
-		 * that case, return to user land to retry the instuction.
-		 */
+		  
+                                                               
+                                                               
+                                                           
+                                                            
+     
 		user_addr_t pc = (regs64) ? regs64->isf.rip : (user_addr_t)regs32->eip;
-		if (fuword8(pc - 1, &instr) == 0 && instr != FASTTRAP_INSTR && // neither single-byte INT3 (0xCC)
-			!(instr == 3 && fuword8(pc - 2, &instr2) == 0 && instr2 == 0xCD)) { // nor two-byte INT 3 (0xCD03)
+		if (fuword8(pc - 1, &instr) == 0 && instr != FASTTRAP_INSTR &&                                   
+			!(instr == 3 && fuword8(pc - 2, &instr2) == 0 && instr2 == 0xCD)) {                               
 			if (regs64) {
 				regs64->isf.rip--;
 			} else {

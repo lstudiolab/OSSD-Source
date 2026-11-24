@@ -28,7 +28,7 @@
 #ifndef __AT386_MP_EVENTS__
 #define __AT386_MP_EVENTS__
 
-/* Interrupt types */
+                     
 
 #ifndef ASSEMBLER
 
@@ -66,7 +66,7 @@ __BEGIN_DECLS
 extern void     i386_signal_cpu(int cpu, mp_event_t event, mp_sync_t mode);
 extern void     i386_activate_cpu(void);
 extern void     i386_deactivate_cpu(void);
-extern void     cpu_NMI_interrupt(int /* cpu */);
+extern void     cpu_NMI_interrupt(int          );
 
 __END_DECLS
 

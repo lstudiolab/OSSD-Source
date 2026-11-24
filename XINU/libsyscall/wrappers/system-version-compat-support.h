@@ -34,4 +34,4 @@ typedef enum system_version_compat_mode {
 	SYSTEM_VERSION_COMPAT_MODE_IOS = 2,
 } system_version_compat_mode_t;
 
-#endif /* __SYSTEM_VERSION_COMPAT_SUPPORT_H */
+#endif                                        

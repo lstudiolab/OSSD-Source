@@ -31,7 +31,7 @@
 
 #include <sys/cdefs.h>
 
-// pthread opaque structures
+                            
 #if defined(__LP64__)
 #define __PTHREAD_SIZE__		8176
 #define __PTHREAD_ATTR_SIZE__		56
@@ -42,7 +42,7 @@
 #define __PTHREAD_ONCE_SIZE__		8
 #define __PTHREAD_RWLOCK_SIZE__		192
 #define __PTHREAD_RWLOCKATTR_SIZE__	16
-#else // !__LP64__
+#else             
 #define __PTHREAD_SIZE__		4088
 #define __PTHREAD_ATTR_SIZE__		36
 #define __PTHREAD_MUTEXATTR_SIZE__	8
@@ -52,11 +52,11 @@
 #define __PTHREAD_ONCE_SIZE__		4
 #define __PTHREAD_RWLOCK_SIZE__		124
 #define __PTHREAD_RWLOCKATTR_SIZE__	12
-#endif // !__LP64__
+#endif             
 
 struct __darwin_pthread_handler_rec {
-	void (*__routine)(void *);	// Routine to call
-	void *__arg;			// Argument to pass
+	void (*__routine)(void *);	                  
+	void *__arg;			                   
 	struct __darwin_pthread_handler_rec *__next;
 };
 
@@ -117,4 +117,4 @@ typedef struct _opaque_pthread_rwlock_t __darwin_pthread_rwlock_t;
 typedef struct _opaque_pthread_rwlockattr_t __darwin_pthread_rwlockattr_t;
 typedef struct _opaque_pthread_t *__darwin_pthread_t;
 
-#endif // _SYS__PTHREAD_TYPES_H_
+#endif                          

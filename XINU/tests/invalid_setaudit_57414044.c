@@ -29,11 +29,11 @@ T_DECL(invalid_setaudit_57414044,
 		T_SKIP("auditing is not enabled; can't test");
 	}
 
-	/* set up auditing to audit `setaudit_addr` */
+	                                              
 	auditpinfo_addr_t pinfo_addr = {.ap_pid = getpid()};
 	T_ASSERT_POSIX_SUCCESS(auditon(A_GETPINFO_ADDR, &pinfo_addr, sizeof(pinfo_addr)), NULL);
 	auditpinfo_t pinfo = {.ap_pid = getpid(), .ap_mask = pinfo_addr.ap_mask};
-	pinfo.ap_mask.am_failure |= 0x800; /* man 5 audit_class */
+	pinfo.ap_mask.am_failure |= 0x800;                        
 	T_ASSERT_POSIX_SUCCESS(auditon(A_SETPMASK, &pinfo, sizeof(pinfo)), NULL);
 
 	T_SETUPEND;

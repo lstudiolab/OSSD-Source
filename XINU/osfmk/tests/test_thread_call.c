@@ -69,13 +69,13 @@ test_once_callback(thread_call_param_t param0,
 	clock_interval_to_deadline(10, NSEC_PER_SEC, &deadline);
 
 	kern_return_t kr;
-	/* wait for the main thread to finish, time out after 10s */
+	                                                            
 	kr = lck_mtx_sleep_deadline(&test_lock, LCK_SLEEP_DEFAULT, &wait_for_main, THREAD_UNINT, deadline);
 	T_ASSERT_EQ_INT(kr, THREAD_AWAKENED, " callback woken by main function");
 
 	lck_mtx_unlock(&test_lock);
 
-	/* sleep for 1s to let the main thread begin the cancel and wait */
+	                                                                   
 	delay_for_interval(1, NSEC_PER_SEC);
 }
 
@@ -101,13 +101,13 @@ test_once_thread_call(void)
 	clock_interval_to_deadline(10, NSEC_PER_SEC, &deadline);
 
 	kern_return_t kr;
-	/* wait for the call to execute, time out after 10s */
+	                                                      
 	kr = lck_mtx_sleep_deadline(&test_lock, LCK_SLEEP_DEFAULT, &wait_for_callback, THREAD_UNINT, deadline);
 	T_ASSERT_EQ_INT(kr, THREAD_AWAKENED, "main function woken by callback");
 
 	lck_mtx_unlock(&test_lock);
 
-	/* at this point the callback is stuck waiting */
+	                                                 
 
 	T_ASSERT_EQ_INT(once_callback_counter, 1, "callback fired");
 
@@ -119,7 +119,7 @@ test_once_thread_call(void)
 	pending = thread_call_enter1(call, arg2_param);
 	T_ASSERT_EQ_INT(pending, FALSE, "call should not be pending");
 
-	/* sleep for 10ms, the call should not execute */
+	                                                 
 	delay_for_interval(10, NSEC_PER_MSEC);
 
 	canceled = thread_call_cancel(call);
@@ -152,11 +152,11 @@ static void
 test_signal_callback(__unused thread_call_param_t param0,
     __unused thread_call_param_t param1)
 {
-	/*
-	 * ktest sometimes panics if you assert from interrupt context,
-	 * and the serial logging will blow past the delay to wait for the interrupt
-	 * so don't print in this context.
-	 */
+	  
+                                                                
+                                                                             
+                                   
+    
 
 	signal_callback_counter++;
 }
@@ -187,7 +187,7 @@ test_signal_thread_call(void)
 	pending = thread_call_enter1_delayed(call, arg2_param, deadline);
 	T_ASSERT_EQ_INT(pending, FALSE, "call should not be pending");
 
-	/* sleep for 50ms to let the interrupt fire */
+	                                              
 	delay_for_interval(50, NSEC_PER_MSEC);
 
 	T_ASSERT_EQ_INT(signal_callback_counter, 1, "callback fired");

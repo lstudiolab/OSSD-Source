@@ -27,19 +27,19 @@
  */
 
 #include <IOKit/IOLib.h>
-#include <kern/debug.h> // for panic()
+#include <kern/debug.h>               
 
 #include <libkern/ptrauth_utils.h>
 
 
 #if __has_feature(ptrauth_calls)
 
-/*
- * ptrauth_utils_sign_blob_generic
- *
- * Sign a blob of data with the GA key
- *
- */
+  
+                                  
+  
+                                      
+  
+   
 __attribute__((noinline))
 ptrauth_generic_signature_t
 ptrauth_utils_sign_blob_generic(const void * ptr, size_t len_bytes, uint64_t data, int flags)
@@ -54,25 +54,25 @@ ptrauth_utils_sign_blob_generic(const void * ptr, size_t len_bytes, uint64_t dat
 		return 0;
 	}
 
-	/* If address diversification is requested, mix the blob address with the salt */
+	                                                                                 
 	if (flags & PTRAUTH_ADDR_DIVERSIFY) {
 		data ^= (uint64_t)ptr;
 	}
 
-	/* First round adds ptrauth_utils_sign_blob_generic discrimination. */
+	                                                                      
 	sig = ptrauth_sign_generic_data(sig, ptrauth_string_discriminator("ptrauth_utils_sign_blob_generic-prologue") | 0x01);
 
-	/* Second round adds salt */
+	                            
 	sig = ptrauth_sign_generic_data(sig, data);
 
-	/* Calculate an additive signature of the buffer */
+	                                                   
 	for (uint64_t i = 0; i < rounds; i++) {
 		sig = ptrauth_sign_generic_data(*(const uintptr_t *)ptr, sig);
 		ptr += sizeof(uintptr_t);
 	}
 
-	/* ptrauth_sign_generic_data operates on pointer-sized values only,
-	 * so we need to handle trailing bytes for the non-pointer-aligned case */
+	                                                                   
+                                                                           
 	if (ntrailing) {
 		for (int i = 0; i < ntrailing; i++) {
 			((uint8_t *)&trailing)[i] = ((const uint8_t *)ptr)[i];
@@ -81,17 +81,17 @@ ptrauth_utils_sign_blob_generic(const void * ptr, size_t len_bytes, uint64_t dat
 	}
 
 
-	/* Final round to add an additional cookie */
+	                                             
 	sig = ptrauth_sign_generic_data(sig, ptrauth_string_discriminator("ptrauth_utils_sign_blob_generic-epilogue") | 0x01);
 
 	return sig;
 }
 
-/*
- * ptrauth_utils_auth_blob_generic
- *
- * Authenticate signature produced by ptrauth_utils_sign_blob_generic
- */
+  
+                                  
+  
+                                                                     
+   
 __attribute__((noinline))
 void
 ptrauth_utils_auth_blob_generic(const void * ptr, size_t len_bytes, uint64_t data, int flags, ptrauth_generic_signature_t signature)
@@ -116,4 +116,4 @@ ptrauth_utils_auth_blob_generic(const void * ptr, size_t len_bytes, uint64_t dat
 	}
 }
 
-#endif //!ptrauth_calls
+#endif                 

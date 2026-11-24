@@ -28,11 +28,11 @@
 #ifndef _STRUCT_TIMEVAL32
 #define _STRUCT_TIMEVAL32       struct timeval32
 
-#include <machine/types.h> /* __int32_t */
+#include <machine/types.h>                
 
 _STRUCT_TIMEVAL32
 {
-	__int32_t               tv_sec;         /* seconds */
-	__int32_t               tv_usec;        /* and microseconds */
+	__int32_t               tv_sec;                      
+	__int32_t               tv_usec;                              
 };
-#endif /* _STRUCT_TIMEVAL32 */
+#endif                        

@@ -1,9 +1,9 @@
-//
-// Tests for
-//  friend std::ptrdiff_t operator-(bounded_ptr const& a, bounded_ptr const& b);
-//  friend std::ptrdiff_t operator-(bounded_ptr const& a, T* b);
-//  friend std::ptrdiff_t operator-(T* a, bounded_ptr const& b);
-//
+  
+            
+                                                                                
+                                                                
+                                                                
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -23,7 +23,7 @@ tests()
 {
 	std::array<Stored, 5> array = {Stored{0}, Stored{1}, Stored{2}, Stored{3}, Stored{4}};
 
-	// a >= b
+	         
 	{
 		test_bounded_ptr<Left> const a(array.begin(), array.begin(), array.end());
 		test_bounded_ptr<Right> const b(array.begin(), array.begin(), array.end());
@@ -61,7 +61,7 @@ tests()
 		_assert(diff == 5);
 	}
 
-	// a < b
+	        
 	{
 		test_bounded_ptr<Left> const a(array.begin(), array.begin(), array.end());
 		test_bounded_ptr<Right> const b(array.begin() + 1, array.begin(), array.end());
@@ -93,7 +93,7 @@ tests()
 		_assert(diff == -5);
 	}
 
-	// Subtract pointers with different bounds
+	                                          
 	{
 		test_bounded_ptr<Left> const a(array.begin() + 2, array.begin() + 1, array.end() - 1);
 		test_bounded_ptr<Right> const b(array.begin() + 4, array.begin() + 3, array.end());
@@ -101,7 +101,7 @@ tests()
 		_assert(b - a == 2);
 	}
 
-	// Subtract with raw pointers
+	                             
 	{
 		test_bounded_ptr<Left> const a(array.begin() + 2, array.begin() + 1, array.end() - 1);
 		Right* b = array.begin() + 4;

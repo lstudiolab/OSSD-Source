@@ -26,16 +26,16 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *       WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
- *
- *       THIS FILE IS NEEDED TO PASS FIPS ACCEPTANCE FOR THE RANDOM NUMBER GENERATOR.
- *       IF YOU ALTER IT IN ANY WAY, WE WILL NEED TO GO THOUGH FIPS ACCEPTANCE AGAIN,
- *       AN OPERATION THAT IS VERY EXPENSIVE AND TIME CONSUMING.  IN OTHER WORDS,
- *       DON'T MESS WITH THIS FILE.
- *
- *       WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
- */
+  
+                                                                                         
+  
+                                                                                     
+                                                                                     
+                                                                                 
+                                   
+  
+                                                                                         
+   
 
 #ifndef __DEV_RANDOMDEV_H__
 #define __DEV_RANDOMDEV_H__
@@ -55,5 +55,5 @@ int random_write(dev_t dev, struct uio *uio, int ioflag);
 
 u_int32_t RandomULong( void );
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* __DEV_RANDOMDEV_H__ */
+#endif                          
+#endif                          

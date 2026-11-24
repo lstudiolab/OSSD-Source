@@ -37,59 +37,59 @@
 #include <netinet/in.h>
 #include <os/log.h>
 
-/*
- * Entitlement required for using the port of the test entry
- */
+  
+                                                            
+   
 #define ENTITLEMENT_TEST_PORT "com.apple.private.network.restricted.port.test"
 
-/*
- * Entitlement required for setting the test sysctl variables
- */
+  
+                                                             
+   
 #define ENTITLEMENT_TEST_CONTROL "com.apple.private.network.restricted.port.control"
 
-/*
- * Use a single bitmap for quickly checking if a TCP or UDP port is restricted
- */
+  
+                                                                              
+   
 bitmap_t *restricted_port_bitmap = NULL;
 
 struct restricted_port_entry {
-	const char      *rpe_entitlement;   // entitlement to check for this port
-	in_port_t       rpe_port;           // restricted port number (host byte order)
-	uint16_t        rpe_flags;          // RPE_FLAG_xxx
+	const char      *rpe_entitlement;                                        
+	in_port_t       rpe_port;                                                      
+	uint16_t        rpe_flags;                         
 };
 
-/*
- * Possible values for the field rpe_flags
- */
-#define RPE_FLAG_SUPERUSER     0x01    // superuser can use the port
-#define RPE_FLAG_ENTITLEMENT   0x02    // can use the port with the required entitlement
-#define RPE_FLAG_TCP           0x04    // require entitlement for TCP
-#define RPE_FLAG_UDP           0x08    // require entitlement for TCP
-#define RPE_FLAG_TEST          0x10    // entry for testing
+  
+                                          
+   
+#define RPE_FLAG_SUPERUSER     0x01                                 
+#define RPE_FLAG_ENTITLEMENT   0x02                                                     
+#define RPE_FLAG_TCP           0x04                                  
+#define RPE_FLAG_UDP           0x08                                  
+#define RPE_FLAG_TEST          0x10                        
 
 static struct restricted_port_entry restricted_port_list[] = {
 #if !XNU_TARGET_OS_OSX
-	/*
-	 * Network relay proxy
-	 */
+	  
+                       
+    
 	{
 		.rpe_port = 62742,
 		.rpe_flags = RPE_FLAG_ENTITLEMENT | RPE_FLAG_TCP | RPE_FLAG_UDP,
 		.rpe_entitlement = "com.apple.private.network.restricted.port.nr_proxy",
 	},
 
-	/*
-	 * Network relay control
-	 */
+	  
+                         
+    
 	{
 		.rpe_port = 62743,
 		.rpe_flags = RPE_FLAG_ENTITLEMENT | RPE_FLAG_UDP,
 		.rpe_entitlement = "com.apple.private.network.restricted.port.nr_control",
 	},
 
-	/*
-	 * Entries for identityservicesd
-	 */
+	  
+                                 
+    
 	{
 		.rpe_port = 61314,
 		.rpe_flags = RPE_FLAG_ENTITLEMENT | RPE_FLAG_TCP | RPE_FLAG_UDP,
@@ -100,11 +100,11 @@ static struct restricted_port_entry restricted_port_list[] = {
 		.rpe_flags = RPE_FLAG_ENTITLEMENT | RPE_FLAG_TCP | RPE_FLAG_UDP,
 		.rpe_entitlement = "com.apple.private.network.restricted.port.ids_cloud_service_connector",
 	},
-#endif /* !XNU_TARGET_OS_OSX */
+#endif                         
 
-	/*
-	 * For RDC
-	 */
+	  
+           
+    
 	{
 		.rpe_port = 55555,
 		.rpe_flags = RPE_FLAG_ENTITLEMENT | RPE_FLAG_TCP,
@@ -112,9 +112,9 @@ static struct restricted_port_entry restricted_port_list[] = {
 	},
 
 #if (DEBUG || DEVELOPMENT)
-	/*
-	 * Entries reserved for unit testing
-	 */
+	  
+                                     
+    
 	{
 		.rpe_port = 0,
 		.rpe_flags = RPE_FLAG_TCP | RPE_FLAG_TEST,
@@ -125,11 +125,11 @@ static struct restricted_port_entry restricted_port_list[] = {
 		.rpe_flags = RPE_FLAG_UDP | RPE_FLAG_TEST,
 		.rpe_entitlement = ENTITLEMENT_TEST_PORT,
 	},
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
-	/*
-	 * Sentinel to mark the actual end of the list (rpe_entitlement == NULL)
-	 */
+	  
+                                                                         
+    
 	{
 		.rpe_port = 0,
 		.rpe_flags = 0,
@@ -150,21 +150,21 @@ SYSCTL_PROC(_net_restricted_port, OID_AUTO, bitmap,
     CTLTYPE_STRUCT | CTLFLAG_RD | CTLFLAG_LOCKED,
     0, 0, &sysctl_restricted_port_bitmap, "", "");
 
-/*
- * In order to set the following sysctl variables the process needs to run as superuser
- * or have the entitlement ENTITLEMENT_TEST_CONTROL
- */
+  
+                                                                                       
+                                                   
+   
 #if (DEBUG || DEVELOPMENT)
 static int restricted_port_enforced = 1;
 SYSCTL_PROC(_net_restricted_port, OID_AUTO, enforced,
     CTLTYPE_INT | CTLFLAG_LOCKED | CTLFLAG_RW | CTLFLAG_ANYBODY,
     0, 0, &sysctl_restricted_port_enforced, "I", "");
-#else /* (DEBUG || DEVELOPMENT) */
+#else                             
 const int restricted_port_enforced = 1;
 SYSCTL_PROC(_net_restricted_port, OID_AUTO, enforced,
     CTLTYPE_INT | CTLFLAG_LOCKED | CTLFLAG_RD,
     0, 0, &sysctl_restricted_port_enforced, "I", "");
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 static int restricted_port_verbose = 0;
 SYSCTL_PROC(_net_restricted_port, OID_AUTO, verbose,
@@ -173,11 +173,11 @@ SYSCTL_PROC(_net_restricted_port, OID_AUTO, verbose,
 
 #if (DEBUG || DEVELOPMENT)
 
-/*
- * Register dynamically a test port set by the unit test program to avoid conflict with
- * a restricted port currently used by its legetimate process.
- * The value must be passed is in host byte order.
- */
+  
+                                                                                       
+                                                              
+                                                  
+   
 static uint16_t restricted_port_test = 0;
 
 static int sysctl_restricted_port_test_entitlement SYSCTL_HANDLER_ARGS;
@@ -190,7 +190,7 @@ SYSCTL_PROC(_net_restricted_port, OID_AUTO, test_entitlement,
 SYSCTL_PROC(_net_restricted_port, OID_AUTO, test_superuser,
     CTLTYPE_INT | CTLFLAG_LOCKED | CTLFLAG_RW | CTLFLAG_ANYBODY,
     0, 0, &sysctl_restricted_port_test_superuser, "UI", "");
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 static int
 sysctl_restricted_port_bitmap SYSCTL_HANDLER_ARGS
@@ -229,7 +229,7 @@ sysctl_restricted_port_enforced SYSCTL_HANDLER_ARGS
 	return error;
 #else
 	return EPERM;
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 }
 
 static int
@@ -278,9 +278,9 @@ sysctl_restricted_port_test_common(struct sysctl_oid *oidp,
 		return EINVAL;
 	}
 	if (value == 0) {
-		/*
-		 * Clear the current test port entries
-		 */
+		  
+                                        
+     
 		if (restricted_port_test != 0) {
 			for (i = 0; i < RPE_ENTRY_COUNT; i++) {
 				struct restricted_port_entry *rpe = &restricted_port_list[i];
@@ -357,7 +357,7 @@ sysctl_restricted_port_test_superuser SYSCTL_HANDLER_ARGS
 	return error;
 }
 
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 void
 restricted_in_port_init(void)
@@ -400,9 +400,9 @@ port_flag_str(uint32_t port_flags)
 	return "?";
 }
 
-/*
- * The port is passed in network byte order
- */
+  
+                                           
+   
 bool
 current_task_can_use_restricted_in_port(in_port_t port, uint8_t protocol, uint32_t port_flags)
 {
@@ -410,9 +410,9 @@ current_task_can_use_restricted_in_port(in_port_t port, uint8_t protocol, uint32
 	struct proc *p = current_proc();
 	pid_t pid = proc_pid(p);
 
-	/*
-	 * Quick check that does not take in account the protocol
-	 */
+	  
+                                                          
+    
 	if (!IS_RESTRICTED_IN_PORT(port) || restricted_port_enforced == 0) {
 		if (restricted_port_verbose > 1) {
 			os_log(OS_LOG_DEFAULT,
@@ -438,14 +438,14 @@ current_task_can_use_restricted_in_port(in_port_t port, uint8_t protocol, uint32
 		if (rpe->rpe_port != ntohs(port)) {
 			continue;
 		}
-		/*
-		 * Found an entry in the list of restricted ports
-		 *
-		 * A process can use a restricted port if it meets at least one of
-		 * the following conditions:
-		 * - The process has the required entitlement
-		 * - The port is marked as usable by root
-		 */
+		  
+                                                   
+    
+                                                                    
+                              
+                                               
+                                           
+     
 		task_t task = current_task();
 		if (rpe->rpe_flags & RPE_FLAG_SUPERUSER) {
 			if (task == kernel_task || proc_suser(current_proc()) == 0) {
@@ -456,10 +456,10 @@ current_task_can_use_restricted_in_port(in_port_t port, uint8_t protocol, uint32
 			}
 		}
 		if (rpe->rpe_flags & RPE_FLAG_ENTITLEMENT) {
-			/*
-			 * Do not let the kernel use the port because there is
-			 * no entitlement for kernel extensions
-			 */
+			  
+                                                         
+                                          
+      
 			if (task == kernel_task) {
 				os_log(OS_LOG_DEFAULT,
 				    "entitlement restricted port %u for protocol %u via %s cannot be used by kernel",

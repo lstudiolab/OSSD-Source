@@ -56,17 +56,17 @@ struct ksyn_waitq_element;
 typedef void (*sched_call_t)(int type, thread_t thread);
 #endif
 
-/*
- * Increment each time new reserved slots are used. When the pthread
- * kext registers this table, it will include the version of the xnu
- * headers that it was built against.
- */
+  
+                                                                    
+                                                                    
+                                     
+   
 #define PTHREAD_FUNCTIONS_TABLE_VERSION 1
 
 typedef const struct pthread_functions_s {
 	int version;
 
-	/* internal calls, kernel core -> kext */
+	                                         
 	void (*pthread_init)(void);
 
 	void *__unused_was_fill_procworkqueue;
@@ -79,7 +79,7 @@ typedef const struct pthread_functions_s {
 	void (*pth_proc_hashinit)(proc_t p);
 	void (*pth_proc_hashdelete)(proc_t p);
 
-	/* syscall stubs */
+	                   
 	int (*bsdthread_create)(struct proc *p, user_addr_t user_func, user_addr_t user_funcarg, user_addr_t user_stack, user_addr_t user_pthread, uint32_t flags, user_addr_t *retval);
 	int (*bsdthread_register)(struct proc *p, user_addr_t threadstart, user_addr_t wqthread, int pthsize, user_addr_t dummy_value, user_addr_t targetconc_ptr, uint64_t dispatchqueue_offset, int32_t *retval);
 	int (*bsdthread_terminate)(struct proc *p, user_addr_t stackaddr, size_t size, uint32_t kthport, uint32_t sem, int32_t *retval);
@@ -87,7 +87,7 @@ typedef const struct pthread_functions_s {
 	void *__unused_was_workq_kernreturn;
 	void *__unused_was_workq_open;
 
-	/* psynch syscalls */
+	                     
 	int (*psynch_mutexwait)(proc_t p, user_addr_t mutex, uint32_t mgen, uint32_t  ugen, uint64_t tid, uint32_t flags, uint32_t *retval);
 	int (*psynch_mutexdrop)(proc_t p, user_addr_t mutex, uint32_t mgen, uint32_t  ugen, uint64_t tid, uint32_t flags, uint32_t *retval);
 	int (*psynch_cvbroad)(proc_t p, user_addr_t cv, uint64_t cvlsgen, uint64_t cvudgen, uint32_t flags, user_addr_t mutex, uint64_t mugen, uint64_t tid, uint32_t *retval);
@@ -102,7 +102,7 @@ typedef const struct pthread_functions_s {
 
 	void *__unused_was_workqueue_get_sched_callback;
 
-	/* New register function with TSD offset */
+	                                           
 	int (*bsdthread_register2)(struct proc *p, user_addr_t threadstart, user_addr_t wqthread, uint32_t flags, user_addr_t stack_addr_hint, user_addr_t targetconc_ptr, uint32_t dispatchqueue_offset, uint32_t tsd_offset, int32_t *retval);
 
 	void *__unused_was_bsdthread_ctl;
@@ -136,18 +136,18 @@ typedef const struct pthread_functions_s {
 	void (*workq_markfree_threadstack)(proc_t p, thread_t, vm_map_t map,
 	    user_addr_t stackaddr);
 
-	/* padding for future */
+	                        
 	void * _pad[83];
 } * pthread_functions_t;
 
 typedef const struct pthread_callbacks_s {
 	int version;
 
-	/* config information */
+	                        
 	uint32_t config_thread_max;
 	uint32_t (*get_task_threadmax)(void);
 
-	/* proc.h accessors */
+	                      
 	uint64_t (*proc_get_register)(struct proc *t);
 	void (*proc_set_register)(struct proc *t);
 
@@ -185,7 +185,7 @@ typedef const struct pthread_callbacks_s {
 	void* (*proc_get_pthhash)(struct proc *t);
 	void (*proc_set_pthhash)(struct proc *t, void* ptr);
 
-	/* bsd/sys/user.h */
+	                    
 	void *__unused_was_uthread_get_threadlist;
 	void *__unused_was_uthread_set_threadlist;
 	void *__unused_was_uthread_get_sigmask;
@@ -196,21 +196,21 @@ typedef const struct pthread_callbacks_s {
 	void (*uthread_set_returnval)(struct uthread *t, int val);
 	int (*uthread_is_cancelled)(struct uthread *t);
 
-	/* vm_protos.h calls */
+	                       
 	ipc_space_t (*task_get_ipcspace)(task_t t);
 	mach_port_name_t (*ipc_port_copyout_send)(ipc_port_t sright, ipc_space_t space);
 
-	/* osfmk/vm/vm_map.h */
+	                       
 	kern_return_t (*vm_map_page_info)(vm_map_t map, vm_map_offset_t offset, vm_page_info_flavor_t flavor, vm_page_info_t info, mach_msg_type_number_t *count);
 	mach_port_name_t (*ipc_port_copyout_send_pinned)(ipc_port_t sright, ipc_space_t space);
 
-	/* wq functions */
+	                  
 	kern_return_t (*thread_set_wq_state32)(thread_t thread, thread_state_t state);
 #if !defined(__arm__)
 	kern_return_t (*thread_set_wq_state64)(thread_t thread, thread_state_t state);
 #endif
 
-	/* sched_prim.h */
+	                  
 	void (*thread_exception_return)(void);
 	void (*thread_bootstrap_return)(void);
 
@@ -218,7 +218,7 @@ typedef const struct pthread_callbacks_s {
 	void *__unused_was_thread_set_workq_pri;
 	void *__unused_was_thread_set_workq_qos;
 
-	/* osfmk/kern/thread.h */
+	                         
 	struct uthread* (*get_bsdthread_info)(thread_t th);
 	void *__unused_was_thread_sched_call;
 	void *__unused_was_thread_static_param;
@@ -227,31 +227,31 @@ typedef const struct pthread_callbacks_s {
 
 	void *__unused_was_thread_affinity_set;
 
-	/* bsd/sys/systm.h */
+	                     
 	void (*unix_syscall_return)(int error);
 
 	void *__unused_was_zalloc;
 	void *__unused_was_zfree;
 	void *__unused_was_zinit;
 
-	/* bsd/kern/kern_sig.c */
+	                         
 	void (*__pthread_testcancel)(int);
 
-	/* calls without portfolio */
+	                             
 	kern_return_t (*mach_port_deallocate)(ipc_space_t space, mach_port_name_t name);
 	kern_return_t (*semaphore_signal_internal_trap)(mach_port_name_t sema_name);
 	vm_map_t (*current_map)(void);
 
-	/* osfmk/kern/thread.h */
+	                         
 	ipc_port_t (*convert_thread_to_port)(thread_t th);
 
-	/* mach/task.h */
+	                 
 	kern_return_t (*thread_create)(task_t parent_task, thread_act_t *child_act);
 
-	/* mach/thread_act.h */
+	                       
 	kern_return_t (*thread_resume)(thread_act_t target_act);
 
-	/* bsd/sys/event.h */
+	                     
 	int (*kevent_workq_internal)(struct proc *p,
 	    user_addr_t changelist, int nchanges,
 	    user_addr_t eventlist, int nevents,
@@ -306,11 +306,11 @@ typedef const struct pthread_callbacks_s {
 
 	void *__unused_was_qos_max_parallelism;
 
-	/* proc_internal.h: struct proc user_stack accessor */
+	                                                      
 	user_addr_t (*proc_get_user_stack)(struct proc *p);
 	void *__unused_was_proc_set_user_stack;
 
-	/* padding for future */
+	                        
 	void* _pad[69];
 } *pthread_callbacks_t;
 
@@ -324,6 +324,6 @@ extern pthread_callbacks_t pthread_kern;
 extern pthread_functions_t pthread_functions;
 #endif
 
-#endif /* ASSEMBLER */
-#endif /* _PTHREAD_SHIMS_H_ */
-#endif /* KERNEL_PRIVATE */
+#endif                
+#endif                        
+#endif                     

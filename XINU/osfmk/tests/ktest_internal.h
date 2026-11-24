@@ -88,4 +88,4 @@ void ktest_emit_log(const char * log_msg, va_list args);
 void ktest_emit_perfdata(const char * metric, const char * unit, double value, const char * desc);
 void ktest_emit_testcase(void);
 
-#endif /* _TESTS_KTEST_INTERNAL_H */
+#endif                              

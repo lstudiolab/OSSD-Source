@@ -19,10 +19,10 @@
 #define CCSHA1_OUTPUT_SIZE  20
 #define CCSHA1_STATE_SIZE   20
 
-/* sha1 selector */
+                   
 const struct ccdigest_info *ccsha1_di(void);
 
-/* Implementations */
+                     
 extern const struct ccdigest_info ccsha1_ltc_di;
 extern const struct ccdigest_info ccsha1_eay_di;
 
@@ -37,4 +37,4 @@ extern const struct ccdigest_info ccsha1_vng_arm_di;
 #define ccoid_sha1 ((unsigned char *)"\x06\x05\x2b\x0e\x03\x02\x1a")
 #define ccoid_sha1_len 7
 
-#endif /* _CORECRYPTO_CCSHA1_H_ */
+#endif                            

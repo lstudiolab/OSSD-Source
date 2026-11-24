@@ -32,26 +32,26 @@
  * the terms and conditions for use and redistribution.
  */
 
-/*
- * Definitions for the mig interface to the network name service.
- */
+  
+                                                                 
+   
 
-/*
- * HISTORY:
- * 28-Jul-88  Mary R. Thompson (mrt) at Carnegie Mellon
- *	Copied definitions of NAME_NOT_YOURS and NAME_NOT_CHECKED_IN
- *	from the old netname_defs.h so that old code would not break
- *
- *  8-Mar-88  Daniel Julin (dpj) at Carnegie-Mellon University
- *	Added NETNAME_INVALID_PORT.
- *
- * 28-Feb-88  Daniel Julin (dpj) at Carnegie-Mellon University
- *	Added NETNAME_PENDING.
- *
- * 23-Dec-86  Robert Sansom (rds) at Carnegie Mellon University
- *	Copied from the previous version of the network server.
- *
- */
+  
+           
+                                                       
+                                                               
+                                                               
+  
+                                                              
+                              
+  
+                                                              
+                         
+  
+                                                               
+                                                          
+  
+   
 
 #ifndef _NETNAME_DEFS_
 #define _NETNAME_DEFS_
@@ -68,4 +68,4 @@
 
 typedef char netname_name_t[80];
 
-#endif /* NETNAME_DEFS_ */
+#endif                    

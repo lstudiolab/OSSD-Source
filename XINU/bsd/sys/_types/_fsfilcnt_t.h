@@ -27,6 +27,6 @@
  */
 #ifndef _FSFILCNT_T
 #define _FSFILCNT_T
-#include <sys/_types.h> /* __darwin_fsfilcnt_t */
+#include <sys/_types.h>                          
 typedef __darwin_fsfilcnt_t             fsfilcnt_t;
-#endif /* _FSFILCNT_T */
+#endif                  

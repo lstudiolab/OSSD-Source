@@ -38,4 +38,4 @@ typedef unsigned spl_t;
 #define splx(x)         (void) ml_set_interrupts_enabled(x)
 #define spllo()         (void) ml_set_interrupts_enabled(TRUE)
 
-#endif  /* _KERN_SPL_H_ */
+#endif                    

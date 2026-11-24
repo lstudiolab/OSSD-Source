@@ -24,12 +24,12 @@ test_fault_setup()
 	memblock = (char *)mmap(NULL, MEMSIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 	VERIFY(memblock != MAP_FAILED, "mmap failed");
 
-	/* make sure memory is paged */
+	                               
 	for (ptr = memblock; ptr < memblock + MEMSIZE; ptr += pgsz) {
 		*ptr = 1;
 	}
 
-	/* set to read only, then back to read write so it faults on first write */
+	                                                                           
 	retval = mprotect(memblock, MEMSIZE, PROT_READ);
 	VERIFY(retval == 0, "mprotect failed");
 

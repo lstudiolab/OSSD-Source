@@ -53,11 +53,11 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Mach kernel debugging interface type declarations
- */
+  
+   
+  
+                                                    
+   
 
 #ifndef _MACH_DEBUG_MACH_DEBUG_TYPES_H_
 #define _MACH_DEBUG_MACH_DEBUG_TYPES_H_
@@ -92,4 +92,4 @@ struct mach_core_fileheader {
 #define KOBJECT_DESCRIPTION_LENGTH      512
 typedef char kobject_description_t[KOBJECT_DESCRIPTION_LENGTH];
 
-#endif  /* _MACH_DEBUG_MACH_DEBUG_TYPES_H_ */
+#endif                                       

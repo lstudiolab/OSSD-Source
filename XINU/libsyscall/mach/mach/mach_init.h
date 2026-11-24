@@ -51,9 +51,9 @@
  * the rights to redistribute these changes.
  */
 
-/*
- *	Items provided by the Mach environment initialization.
- */
+  
+                                                         
+   
 
 #ifndef _MACH_INIT_
 #define _MACH_INIT_     1
@@ -68,9 +68,9 @@
 #include <Availability.h>
 #endif
 
-/*
- *	Kernel-related ports; how a task/thread controls itself
- */
+  
+                                                          
+   
 
 __BEGIN_DECLS
 extern mach_port_t mach_host_self(void);
@@ -87,16 +87,16 @@ __END_DECLS
 #include <mach/mach_traps.h>
 __BEGIN_DECLS
 
-/*
- *	Other important ports in the Mach user environment
- */
+  
+                                                     
+   
 
 extern  mach_port_t     bootstrap_port;
 
-/*
- *	Where these ports occur in the "mach_ports_register"
- *	collection... only servers or the runtime library need know.
- */
+  
+                                                       
+                                                               
+   
 
 #define NAME_SERVER_SLOT        0
 #define ENVIRONMENT_SLOT        1
@@ -104,13 +104,13 @@ extern  mach_port_t     bootstrap_port;
 
 #define MACH_PORTS_SLOTS_USED   3
 
-/*
- *	fprintf_stderr uses vprintf_stderr_func to produce
- *	error messages, this can be overridden by a user
- *	application to point to a user-specified output function
- */
+  
+                                                     
+                                                   
+                                                           
+   
 extern int (*vprintf_stderr_func)(const char *format, va_list ap);
 
 __END_DECLS
 
-#endif  /* _MACH_INIT_ */
+#endif                   

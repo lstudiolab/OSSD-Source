@@ -1,4 +1,4 @@
-#!/bin/sh
+
 
 set -e
 
@@ -10,8 +10,8 @@ fi
 OUTPUT="$1"
 shift
 
-# Note: we used to export both sides of the alias since forever
-# for now keep doing this
+
+
 
 ( grep -h -v ":" "$@"; grep -h ":" "$@" | awk -F: '{print $1; print $2}' ) | sort -u > "$OUTPUT"
 

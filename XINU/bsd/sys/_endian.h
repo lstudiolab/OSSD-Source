@@ -92,9 +92,9 @@
 
 #include <sys/cdefs.h>
 
-/*
- * Macros for network/external number representation conversion.
- */
+  
+                                                                
+   
 
 #if defined(lint)
 
@@ -123,9 +123,9 @@ __END_DECLS
 #define HTONL(x)        (x)
 #define HTONS(x)        (x)
 #define HTONLL(x)       (x)
-#endif /* defined(KERNEL) || (!defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)) */
+#endif                                                                                  
 
-#else   /* __DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN */
+#else                                                      
 
 #ifndef DRIVERKIT
 #include <libkern/_OSByteOrder.h>
@@ -135,23 +135,23 @@ __END_DECLS
 
 #define ntohl(x)        __DARWIN_OSSwapInt32(x)
 #define htonl(x)        __DARWIN_OSSwapInt32(x)
-#else /* DRIVERKIT */
+#else                
 #define ntohs(x)        ((__uint16_t)__builtin_bswap16((__uint16_t)(x)))
 #define htons(x)        ((__uint16_t)__builtin_bswap16((__uint16_t)(x)))
 
 #define ntohl(x)        ((__uint32_t)__builtin_bswap32((__uint32_t)(x)))
 #define htonl(x)        ((__uint32_t)__builtin_bswap32((__uint32_t)(x)))
-#endif /* DRIVERKIT */
+#endif                
 
 #if     defined(KERNEL) || (!defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE))
 
 #ifndef DRIVERKIT
 #define ntohll(x)       __DARWIN_OSSwapInt64(x)
 #define htonll(x)       __DARWIN_OSSwapInt64(x)
-#else /* DRIVERKIT */
+#else                
 #define ntohll(x)       ((__uint64_t)__builtin_bswap64((__uint64_t)(x)))
 #define htonll(x)       ((__uint64_t)__builtin_bswap64((__uint64_t)(x)))
-#endif /* DRIVERKIT */
+#endif                
 
 #define NTOHL(x)        (x) = ntohl((__uint32_t)x)
 #define NTOHS(x)        (x) = ntohs((__uint16_t)x)
@@ -159,6 +159,6 @@ __END_DECLS
 #define HTONL(x)        (x) = htonl((__uint32_t)x)
 #define HTONS(x)        (x) = htons((__uint16_t)x)
 #define HTONLL(x)       (x) = htonll((__uint64_t)x)
-#endif /* defined(KERNEL) || (!defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)) */
-#endif /* __DARWIN_BYTE_ORDER */
-#endif /* !_SYS__ENDIAN_H_ */
+#endif                                                                                  
+#endif                          
+#endif                       

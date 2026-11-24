@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_notify.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Notification-sending functions.
- */
+  
+   
+  
+                         
+                      
+             
+  
+                                  
+   
 
 #include <mach/port.h>
 #include <mach/message.h>
@@ -70,14 +70,14 @@
 #include <ipc/ipc_notify.h>
 #include <ipc/ipc_port.h>
 
-/*
- *	Routine:	ipc_notify_port_deleted
- *	Purpose:
- *		Send a port-deleted notification.
- *	Conditions:
- *		Nothing locked.
- *		Consumes a ref/soright for port.
- */
+  
+                                   
+           
+                                     
+              
+                   
+                                    
+   
 
 void
 ipc_notify_port_deleted(
@@ -85,17 +85,17 @@ ipc_notify_port_deleted(
 	mach_port_name_t        name)
 {
 	(void)mach_notify_port_deleted(port, name);
-	/* send-once right consumed */
+	                              
 }
 
-/*
- *	Routine:	ipc_notify_send_possible
- *	Purpose:
- *		Send a send-possible notification.
- *	Conditions:
- *		Nothing locked.
- *		Consumes a ref/soright for port.
- */
+  
+                                    
+           
+                                      
+              
+                   
+                                    
+   
 
 void
 ipc_notify_send_possible(
@@ -103,20 +103,20 @@ ipc_notify_send_possible(
 	mach_port_name_t        name)
 {
 	(void)mach_notify_send_possible(port, name);
-	/* send-once right consumed */
+	                              
 }
 
-/*
- *	Routine:	ipc_notify_port_destroyed
- *	Purpose:
- *		Send a port-destroyed notification.
- *	Conditions:
- *		Nothing locked.
- *		Consumes a ref/soright for port.
- *		Consumes a ref for right, which should be a receive right
- *		prepped for placement into a message.  (In-transit,
- *		or in-limbo if a circularity was detected.)
- */
+  
+                                     
+           
+                                       
+              
+                   
+                                    
+                                                             
+                                                       
+                                               
+   
 
 void
 ipc_notify_port_destroyed(
@@ -124,17 +124,17 @@ ipc_notify_port_destroyed(
 	ipc_port_t      right)
 {
 	mach_notify_port_destroyed(port, right);
-	/* send-once and receive rights consumed */
+	                                           
 }
 
-/*
- *	Routine:	ipc_notify_no_senders
- *	Purpose:
- *		Send a no-senders notification.
- *	Conditions:
- *		Nothing locked.
- *		Consumes a ref/soright for port.
- */
+  
+                                 
+           
+                                   
+              
+                   
+                                    
+   
 
 void
 ipc_notify_no_senders(
@@ -142,34 +142,34 @@ ipc_notify_no_senders(
 	mach_port_mscount_t     mscount)
 {
 	(void)mach_notify_no_senders(port, mscount);
-	/* send-once right consumed */
+	                              
 }
 
-/*
- *	Routine:	ipc_notify_send_once
- *	Purpose:
- *		Send a send-once notification.
- *	Conditions:
- *		Nothing locked.
- *		Consumes a ref/soright for port.
- */
+  
+                                
+           
+                                  
+              
+                   
+                                    
+   
 
 void
 ipc_notify_send_once(
 	ipc_port_t      port)
 {
 	(void)mach_notify_send_once(port);
-	/* send-once right consumed */
+	                              
 }
 
-/*
- *	Routine:	ipc_notify_dead_name
- *	Purpose:
- *		Send a dead-name notification.
- *	Conditions:
- *		Nothing locked.
- *		Consumes a ref/soright for port.
- */
+  
+                                
+           
+                                  
+              
+                   
+                                    
+   
 
 void
 ipc_notify_dead_name(
@@ -177,5 +177,5 @@ ipc_notify_dead_name(
 	mach_port_name_t        name)
 {
 	(void)mach_notify_dead_name(port, name);
-	/* send-once right consumed */
+	                              
 }

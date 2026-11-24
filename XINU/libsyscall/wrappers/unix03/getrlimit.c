@@ -31,11 +31,11 @@
 
 extern int __getrlimit(int resource, struct rlimit *rlp);
 
-/*
- * getrlimit stub, for conformance, OR in _RLIMIT_POSIX_FLAG
- *
- * This is for UNIX03 only.
- */
+  
+                                                            
+  
+                           
+   
 int
 getrlimit(int resource, struct rlimit *rlp)
 {
@@ -43,4 +43,4 @@ getrlimit(int resource, struct rlimit *rlp)
 	return __getrlimit(resource, rlp);
 }
 
-#endif /* __DARWIN_UNIX03 */
+#endif                      

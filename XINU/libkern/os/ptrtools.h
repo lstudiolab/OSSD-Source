@@ -28,12 +28,12 @@
 #ifndef _OS_PTRTOOLS_H
 #define _OS_PTRTOOLS_H
 
-/* dereference unaligned pointer 'p' */
+                                       
 #define os_unaligned_deref(p) ((__os_unaligned_type(p))(p))->val
 
-/* ensure the compiler emits at most one access to 'val' */
+                                                           
 #define os_access_once(val) (*((volatile __typeof__((val)) *)&(val)))
 
 #define __os_unaligned_type(p) struct { __typeof__(*(p)) val; } __attribute__((packed)) *
 
-#endif /* _OS_PTRTOOLS_H */
+#endif                     

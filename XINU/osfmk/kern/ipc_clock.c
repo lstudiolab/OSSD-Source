@@ -28,11 +28,11 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- *	File:		kern/ipc_clock.c
- *	Purpose:	Routines to support ipc semantics of new kernel
- *			alarm clock facility.
- */
+  
+                          
+                                                           
+                          
+   
 
 #include <mach/message.h>
 #include <kern/host.h>
@@ -46,11 +46,11 @@
 #include <ipc/ipc_port.h>
 #include <ipc/ipc_space.h>
 
-/*
- *	Routine:	ipc_clock_init
- *	Purpose:
- *		Initialize ipc control of a clock.
- */
+  
+                          
+           
+                                      
+   
 void
 ipc_clock_init(
 	clock_t         clock)
@@ -70,11 +70,11 @@ ipc_clock_init(
 	clock->cl_control = port;
 }
 
-/*
- *	Routine:	ipc_clock_enable
- *	Purpose:
- *		Enable ipc access to a clock.
- */
+  
+                            
+           
+                                 
+   
 void
 ipc_clock_enable(
 	clock_t         clock)
@@ -85,15 +85,15 @@ ipc_clock_enable(
 	    (ipc_kobject_t) clock, IKOT_CLOCK_CTRL);
 }
 
-/*
- *	Routine:	convert_port_to_clock
- *	Purpose:
- *		Convert from a port to a clock.
- *		Doesn't consume the port ref; produces a clock ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                 
+           
+                                   
+                                                       
+                      
+              
+                   
+   
 clock_t
 convert_port_to_clock(
 	ipc_port_t      port)
@@ -112,15 +112,15 @@ convert_port_to_clock(
 	return clock;
 }
 
-/*
- *	Routine:	convert_port_to_clock_ctrl
- *	Purpose:
- *		Convert from a port to a clock.
- *		Doesn't consume the port ref; produces a clock ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                      
+           
+                                   
+                                                       
+                      
+              
+                   
+   
 clock_t
 convert_port_to_clock_ctrl(
 	ipc_port_t      port)
@@ -138,14 +138,14 @@ convert_port_to_clock_ctrl(
 	return clock;
 }
 
-/*
- *	Routine:	convert_clock_to_port
- *	Purpose:
- *		Convert from a clock to a port.
- *		Produces a naked send right which may be invalid.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                 
+           
+                                   
+                                                     
+              
+                   
+   
 ipc_port_t
 convert_clock_to_port(
 	clock_t         clock)
@@ -156,14 +156,14 @@ convert_clock_to_port(
 	return port;
 }
 
-/*
- *	Routine:	convert_clock_ctrl_to_port
- *	Purpose:
- *		Convert from a clock to a port.
- *		Produces a naked send right which may be invalid.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                      
+           
+                                   
+                                                     
+              
+                   
+   
 ipc_port_t
 convert_clock_ctrl_to_port(
 	clock_t         clock)
@@ -174,11 +174,11 @@ convert_clock_ctrl_to_port(
 	return port;
 }
 
-/*
- *	Routine:	port_name_to_clock
- *	Purpose:
- *		Convert from a clock name to a clock pointer.
- */
+  
+                              
+           
+                                                 
+   
 clock_t
 port_name_to_clock(
 	mach_port_name_t clock_name)

@@ -1,6 +1,6 @@
-//
-// Make sure `safe_allocation` works nicely with the range-based for-loop.
-//
+  
+                                                                          
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

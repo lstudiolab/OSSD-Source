@@ -28,7 +28,7 @@
 #include <kern/thread.h>
 #include <mach/thread_status.h>
 
-/* XXX All of these should really be derived from syscall_sw.h */
+                                                                 
 #if defined (__x86_64__)
 #define SYSCALL_CLASS_SHIFT 24
 #define SYSCALL_CLASS_MASK  (0xFF << SYSCALL_CLASS_SHIFT)
@@ -70,8 +70,8 @@
 #define SYSTRACE_NARGS (int)(sizeof(((uthread_t)NULL)->uu_arg) / sizeof(((uthread_t)NULL)->uu_arg[0]))
 
 #include <sys/sysent.h>
-#define sy_callc sy_call /* Map Solaris slot name to Darwin's */
-#define NSYSCALL nsysent /* and is less than 500 or so */
+#define sy_callc sy_call                                        
+#define NSYSCALL nsysent                                 
 
 extern const char *syscallnames[];
 
@@ -79,11 +79,11 @@ extern const char *syscallnames[];
 #define casptr dtrace_casptr
 #define membar_enter dtrace_membar_producer
 
-#define LOADABLE_SYSCALL(a) 0 /* Not pertinent to Darwin. */
-#define LOADED_SYSCALL(a) 1 /* Not pertinent to Darwin. */
+#define LOADABLE_SYSCALL(a) 0                               
+#define LOADED_SYSCALL(a) 1                               
 
 static LCK_MTX_DECLARE_ATTR(dtrace_systrace_lock,
-    &dtrace_lck_grp, &dtrace_lck_attr);           /* probe state lock */
+    &dtrace_lck_grp, &dtrace_lck_attr);                                 
 
 systrace_sysent_t *systrace_sysent = NULL;
 void (*systrace_probe)(dtrace_id_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
@@ -101,7 +101,7 @@ systrace_stub(dtrace_id_t id, uint64_t arg0, uint64_t arg1,
 int32_t
 dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 {
-	unsigned short      code;       /* The system call number */
+	unsigned short      code;                                   
 
 	systrace_sysent_t *sy;
 	dtrace_id_t id;
@@ -117,10 +117,10 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 		if (is_saved_state64(tagged_regs)) {
 			x86_saved_state64_t *regs = saved_state64(tagged_regs);
 			code = regs->rax & SYSCALL_NUMBER_MASK;
-			/*
-			 * Check for indirect system call... system call number
-			 * passed as 'arg0'
-			 */
+			  
+                                                          
+                      
+      
 			if (code == 0) {
 				code = regs->rdi;
 			}
@@ -135,15 +135,15 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 	}
 #elif defined(__arm__)
 	{
-		/*
-		 * On arm, syscall numbers depend on a flavor (indirect or not)
-		 * and can be in either r0 or r12  (always u32)
-		 */
+		  
+                                                                 
+                                                 
+     
 
-		/* See bsd/dev/arm/systemcalls.c:arm_get_syscall_number */
+		                                                          
 		arm_saved_state_t *arm_regs = (arm_saved_state_t *) find_user_regs(current_thread());
 
-		/* Check for indirect system call */
+		                                    
 		if (arm_regs->r[12] != 0) {
 			code = arm_regs->r[12];
 		} else {
@@ -152,24 +152,24 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 	}
 #elif defined(__arm64__)
 	{
-		/*
-		 * On arm64, syscall numbers depend on a flavor (indirect or not)
-		 * ... and for u32 can be in either r0 or r12
-		 * ... and for u64 can be in either x0 or x16
-		 */
+		  
+                                                                   
+                                               
+                                               
+     
 
-		/* see bsd/dev/arm/systemcalls.c:arm_get_syscall_number */
+		                                                          
 		arm_saved_state_t *arm_regs = (arm_saved_state_t *) find_user_regs(current_thread());
 
 		if (is_saved_state32(arm_regs)) {
-			/* Check for indirect system call */
+			                                    
 			if (saved_state32(arm_regs)->r[12] != 0) {
 				code = saved_state32(arm_regs)->r[12];
 			} else {
 				code = saved_state32(arm_regs)->r[0];
 			}
 		} else {
-			/* Check for indirect system call */
+			                                    
 			if (saved_state64(arm_regs)->x[ARM64_SYSCALL_CODE_REG_NUM] != 0) {
 				code = saved_state64(arm_regs)->x[ARM64_SYSCALL_CODE_REG_NUM];
 			} else {
@@ -181,7 +181,7 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 #error Unknown Architecture
 #endif
 
-	// Bounds "check" the value of code a la unix_syscall
+	                                                     
 	sy = (code >= nsysent) ? &systrace_sysent[SYS_invalid] : &systrace_sysent[code];
 
 	systrace_args(code, ip, uargs);
@@ -202,12 +202,12 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 
 
 
-#if 0 /* XXX */
-	/*
-	 * APPLE NOTE: Not implemented.
-	 * We want to explicitly allow DTrace consumers to stop a process
-	 * before it actually executes the meat of the syscall.
-	 */
+#if 0          
+	  
+                                
+                                                                  
+                                                        
+    
 	p = ttoproc(curthread);
 	mutex_enter(&p->p_lock);
 	if (curthread->t_dtrace_stop && !curthread->t_lwp->lwp_nostop) {
@@ -224,17 +224,17 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 		uthread_t uthread = (uthread_t)get_bsdthread_info(current_thread());
 
 		if (uthread) {
-			uthread->t_dtrace_errno = rval; /* Establish t_dtrace_errno now in case this enabling refers to it. */
+			uthread->t_dtrace_errno = rval;                                                                       
 		}
-		/*
-		 * "Decode" rv for use in the call to dtrace_probe()
-		 */
+		  
+                                                      
+     
 		if (rval == ERESTART) {
-			munged_rv0 = -1LL; /* System call will be reissued in user mode. Make DTrace report a -1 return. */
+			munged_rv0 = -1LL;                                                                                 
 			munged_rv1 = -1LL;
 		} else if (rval != EJUSTRETURN) {
 			if (rval) {
-				munged_rv0 = -1LL; /* Mimic what libc will do. */
+				munged_rv0 = -1LL;                               
 				munged_rv1 = -1LL;
 			} else {
 				switch (sy->stsy_return_type) {
@@ -272,22 +272,22 @@ dtrace_systrace_syscall(struct proc *pp, void *uap, int *rv)
 			munged_rv1 = 0LL;
 		}
 
-		/*
-		 * <http://mail.opensolaris.org/pipermail/dtrace-discuss/2007-January/003276.html> says:
-		 *
-		 * "This is a bit of an historical artifact. At first, the syscall provider just
-		 * had its return value in arg0, and the fbt and pid providers had their return
-		 * values in arg1 (so that we could use arg0 for the offset of the return site).
-		 *
-		 * We inevitably started writing scripts where we wanted to see the return
-		 * values from probes in all three providers, and we made this script easier
-		 * to write by replicating the syscall return values in arg1 to match fbt and
-		 * pid. We debated briefly about removing the return value from arg0, but
-		 * decided that it would be less confusing to have the same data in two places
-		 * than to have some non-helpful, non-intuitive value in arg0.
-		 *
-		 * This change was made 4/23/2003 according to the DTrace project's putback log."
-		 */
+		  
+                                                                                          
+    
+                                                                                  
+                                                                                 
+                                                                                  
+    
+                                                                            
+                                                                              
+                                                                               
+                                                                           
+                                                                                
+                                                                
+    
+                                                                                   
+     
 		(*systrace_probe)(id, munged_rv0, munged_rv0, munged_rv1, (uint64_t)rval, 0);
 	}
 
@@ -300,7 +300,7 @@ dtrace_systrace_syscall_return(unsigned short code, int rval, int *rv)
 	systrace_sysent_t *sy;
 	dtrace_id_t id;
 
-	// Bounds "check" the value of code a la unix_syscall_return
+	                                                            
 	sy = (code >= nsysent) ? &systrace_sysent[SYS_invalid] : &systrace_sysent[code];
 
 	if ((id = sy->stsy_return) != DTRACE_IDNONE) {
@@ -308,17 +308,17 @@ dtrace_systrace_syscall_return(unsigned short code, int rval, int *rv)
 		uthread_t uthread = (uthread_t)get_bsdthread_info(current_thread());
 
 		if (uthread) {
-			uthread->t_dtrace_errno = rval; /* Establish t_dtrace_errno now in case this enabling refers to it. */
+			uthread->t_dtrace_errno = rval;                                                                       
 		}
-		/*
-		 * "Decode" rv for use in the call to dtrace_probe()
-		 */
+		  
+                                                      
+     
 		if (rval == ERESTART) {
-			munged_rv0 = -1LL; /* System call will be reissued in user mode. Make DTrace report a -1 return. */
+			munged_rv0 = -1LL;                                                                                 
 			munged_rv1 = -1LL;
 		} else if (rval != EJUSTRETURN) {
 			if (rval) {
-				munged_rv0 = -1LL; /* Mimic what libc will do. */
+				munged_rv0 = -1LL;                               
 				munged_rv1 = -1LL;
 			} else {
 				switch (sy->stsy_return_type) {
@@ -372,17 +372,17 @@ dtrace_systrace_syscall_return(unsigned short code, int rval, int *rv)
 
 static dtrace_provider_id_t systrace_id;
 
-/*
- * APPLE NOTE: Avoid name clash with Darwin automagic conf symbol.
- * See balanced undef below.
- */
+  
+                                                                  
+                            
+   
 #define systrace_init _systrace_init
 
 static void
 systrace_init(const struct sysent *actual, systrace_sysent_t **interposed)
 {
-	systrace_sysent_t *ssysent = *interposed;  /* Avoid sysent shadow warning
-	                                            *       from bsd/sys/sysent.h */
+	systrace_sysent_t *ssysent = *interposed;                                
+                                                                             
 	unsigned int i;
 
 	if (ssysent == NULL) {
@@ -408,11 +408,11 @@ systrace_init(const struct sysent *actual, systrace_sysent_t **interposed)
 }
 
 
-/*ARGSUSED*/
+            
 static void
 systrace_provide(void *arg, const dtrace_probedesc_t *desc)
 {
-#pragma unused(arg) /* __APPLE__ */
+#pragma unused(arg)                
 	unsigned int i;
 
 	if (desc != NULL) {
@@ -444,19 +444,19 @@ systrace_provide(void *arg, const dtrace_probedesc_t *desc)
 }
 #undef systrace_init
 
-/*ARGSUSED*/
+            
 static void
 systrace_destroy(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg,id) /* __APPLE__ */
+#pragma unused(arg,id)                
 
 	int sysnum = SYSTRACE_SYSNUM((uintptr_t)parg);
 
-#pragma unused(sysnum)  /* __APPLE__ */
-	/*
-	 * There's nothing to do here but assert that we have actually been
-	 * disabled.
-	 */
+#pragma unused(sysnum)                 
+	  
+                                                                    
+             
+    
 	if (SYSTRACE_ISENTRY((uintptr_t)parg)) {
 		ASSERT(systrace_sysent[sysnum].stsy_entry == DTRACE_IDNONE);
 	} else {
@@ -464,11 +464,11 @@ systrace_destroy(void *arg, dtrace_id_t id, void *parg)
 	}
 }
 
-/*ARGSUSED*/
+            
 static int
 systrace_enable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg) /* __APPLE__ */
+#pragma unused(arg)                
 
 	int sysnum = SYSTRACE_SYSNUM((uintptr_t)parg);
 	int enabled = (systrace_sysent[sysnum].stsy_entry != DTRACE_IDNONE ||
@@ -487,7 +487,7 @@ systrace_enable(void *arg, dtrace_id_t id, void *parg)
 
 	lck_mtx_lock(&dtrace_systrace_lock);
 	if (sysent[sysnum].sy_callc == systrace_sysent[sysnum].stsy_underlying) {
-		/* It is not possible to write to sysent[] directly because it is const. */
+		                                                                           
 		vm_offset_t dss = ptrauth_nop_cast(vm_offset_t, &dtrace_systrace_syscall);
 		ml_nofault_copy((vm_offset_t)&dss, (vm_offset_t)&sysent[sysnum].sy_callc, sizeof(vm_offset_t));
 	}
@@ -496,25 +496,25 @@ systrace_enable(void *arg, dtrace_id_t id, void *parg)
 	return 0;
 }
 
-/*ARGSUSED*/
+            
 static void
 systrace_disable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg,id) /* __APPLE__ */
+#pragma unused(arg,id)                
 
 	int sysnum = SYSTRACE_SYSNUM((uintptr_t)parg);
 	int disable = (systrace_sysent[sysnum].stsy_entry == DTRACE_IDNONE ||
 	    systrace_sysent[sysnum].stsy_return == DTRACE_IDNONE);
 
 	if (disable) {
-		/*
-		 * Usage of volatile protects the if statement below from being optimized away.
-		 *
-		 * Compilers are clever and know that const array values can't change in time
-		 * and the if below is always false. That is because it can't see that DTrace
-		 * injects dtrace_systrace_syscall dynamically and violates constness of the
-		 * array.
-		 */
+		  
+                                                                                 
+    
+                                                                               
+                                                                               
+                                                                              
+           
+     
 		volatile const struct sysent *syscallent = &sysent[sysnum];
 
 		lck_mtx_lock(&dtrace_systrace_lock);
@@ -572,9 +572,9 @@ systrace_attach(dev_info_t *devi)
 }
 
 
-/*
- * APPLE NOTE:  systrace_detach not implemented
- */
+  
+                                               
+   
 #if !defined(__APPLE__)
 static int
 systrace_detach(dev_info_t *devi, ddi_detach_cmd_t cmd)
@@ -596,32 +596,32 @@ systrace_detach(dev_info_t *devi, ddi_detach_cmd_t cmd)
 	systrace_probe = systrace_stub;
 	return DDI_SUCCESS;
 }
-#endif /* __APPLE__ */
+#endif                
 
 
 typedef kern_return_t (*mach_call_t)(void *);
 
-/* APPLE NOTE: From #include <kern/syscall_sw.h> which may be changed for 64 bit! */
+                                                                                    
 typedef void    mach_munge_t(void *);
 
 typedef struct {
 	int                     mach_trap_arg_count;
 	kern_return_t           (*mach_trap_function)(void *);
 #if defined(__arm64__) || defined(__x86_64__)
-	mach_munge_t            *mach_trap_arg_munge32; /* system call arguments for 32-bit */
+	mach_munge_t            *mach_trap_arg_munge32;                                       
 #endif
 	int                     mach_trap_u32_words;
 #if     MACH_ASSERT
 	const char*             mach_trap_name;
-#endif /* MACH_ASSERT */
+#endif                  
 } mach_trap_t;
 
-extern const mach_trap_t mach_trap_table[]; /* syscall_sw.h now declares this as const */
+extern const mach_trap_t mach_trap_table[];                                              
 extern const int         mach_trap_count;
 
 extern const char *const mach_syscall_name_table[];
 
-/* XXX From osfmk/i386/bsd_i386.c */
+                                    
 struct mach_call_args {
 	syscall_arg_t arg1;
 	syscall_arg_t arg2;
@@ -660,12 +660,12 @@ static dtrace_provider_id_t machtrace_id;
 static kern_return_t
 dtrace_machtrace_syscall(struct mach_call_args *args)
 {
-	int code;       /* The mach call number */
+	int code;                                 
 
 	machtrace_sysent_t *sy;
 	dtrace_id_t id;
 	kern_return_t rval;
-#if 0 /* XXX */
+#if 0          
 	proc_t *p;
 #endif
 	syscall_arg_t *ip = (syscall_arg_t *)args;
@@ -684,15 +684,15 @@ dtrace_machtrace_syscall(struct mach_call_args *args)
 	}
 #elif defined(__arm__)
 	{
-		/* r12 has the machcall number, but it is -ve */
+		                                                
 		arm_saved_state_t *arm_regs = (arm_saved_state_t *) find_user_regs(current_thread());
 		code = (int)arm_regs->r[12];
-		ASSERT(code < 0);    /* Otherwise it would be a Unix syscall */
+		ASSERT(code < 0);                                              
 		code = -code;
 	}
 #elif defined(__arm64__)
 	{
-		/* From arm/thread_status.h:get_saved_state_svc_number */
+		                                                         
 		arm_saved_state_t *arm_regs = (arm_saved_state_t *) find_user_regs(current_thread());
 		if (is_saved_state32(arm_regs)) {
 			code = (int)saved_state32(arm_regs)->r[12];
@@ -700,8 +700,8 @@ dtrace_machtrace_syscall(struct mach_call_args *args)
 			code = (int)saved_state64(arm_regs)->x[ARM64_SYSCALL_CODE_REG_NUM];
 		}
 
-		/* From bsd/arm64.c:mach_syscall */
-		ASSERT(code < 0);    /* Otherwise it would be a Unix syscall */
+		                                   
+		ASSERT(code < 0);                                              
 		code = -code;
 	}
 #else
@@ -724,12 +724,12 @@ dtrace_machtrace_syscall(struct mach_call_args *args)
 		}
 	}
 
-#if 0 /* XXX */
-	/*
-	 * APPLE NOTE:  Not implemented.
-	 * We want to explicitly allow DTrace consumers to stop a process
-	 * before it actually executes the meat of the syscall.
-	 */
+#if 0          
+	  
+                                 
+                                                                  
+                                                        
+    
 	p = ttoproc(curthread);
 	mutex_enter(&p->p_lock);
 	if (curthread->t_dtrace_stop && !curthread->t_lwp->lwp_nostop) {
@@ -776,11 +776,11 @@ machtrace_init(const mach_trap_t *actual, machtrace_sysent_t **interposed)
 	}
 }
 
-/*ARGSUSED*/
+            
 static void
 machtrace_provide(void *arg, const dtrace_probedesc_t *desc)
 {
-#pragma unused(arg) /* __APPLE__ */
+#pragma unused(arg)                
 
 	int i;
 
@@ -812,19 +812,19 @@ machtrace_provide(void *arg, const dtrace_probedesc_t *desc)
 	}
 }
 
-/*ARGSUSED*/
+            
 static void
 machtrace_destroy(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg,id) /* __APPLE__ */
+#pragma unused(arg,id)                
 	int sysnum = SYSTRACE_SYSNUM((uintptr_t)parg);
 
-#pragma unused(sysnum) /* __APPLE__ */
+#pragma unused(sysnum)                
 
-	/*
-	 * There's nothing to do here but assert that we have actually been
-	 * disabled.
-	 */
+	  
+                                                                    
+             
+    
 	if (SYSTRACE_ISENTRY((uintptr_t)parg)) {
 		ASSERT(machtrace_sysent[sysnum].stsy_entry == DTRACE_IDNONE);
 	} else {
@@ -832,11 +832,11 @@ machtrace_destroy(void *arg, dtrace_id_t id, void *parg)
 	}
 }
 
-/*ARGSUSED*/
+            
 static int
 machtrace_enable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg) /* __APPLE__ */
+#pragma unused(arg)                
 
 	int sysnum = SYSTRACE_SYSNUM((uintptr_t)parg);
 	int enabled = (machtrace_sysent[sysnum].stsy_entry != DTRACE_IDNONE ||
@@ -856,7 +856,7 @@ machtrace_enable(void *arg, dtrace_id_t id, void *parg)
 	lck_mtx_lock(&dtrace_systrace_lock);
 
 	if (mach_trap_table[sysnum].mach_trap_function == machtrace_sysent[sysnum].stsy_underlying) {
-		/* It is not possible to write to mach_trap_table[] directly because it is const. */
+		                                                                                    
 		vm_offset_t dss = ptrauth_nop_cast(vm_offset_t, &dtrace_machtrace_syscall);
 		ml_nofault_copy((vm_offset_t)&dss, (vm_offset_t)&mach_trap_table[sysnum].mach_trap_function, sizeof(vm_offset_t));
 	}
@@ -866,25 +866,25 @@ machtrace_enable(void *arg, dtrace_id_t id, void *parg)
 	return 0;
 }
 
-/*ARGSUSED*/
+            
 static void
 machtrace_disable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg,id) /* __APPLE__ */
+#pragma unused(arg,id)                
 
 	int sysnum = SYSTRACE_SYSNUM((uintptr_t)parg);
 	int disable = (machtrace_sysent[sysnum].stsy_entry == DTRACE_IDNONE ||
 	    machtrace_sysent[sysnum].stsy_return == DTRACE_IDNONE);
 
 	if (disable) {
-		/*
-		 * Usage of volatile protects the if statement below from being optimized away.
-		 *
-		 * Compilers are clever and know that const array values can't change in time
-		 * and the if below is always false. That is because it can't see that DTrace
-		 * injects dtrace_machtrace_syscall dynamically and violates constness of the
-		 * array.
-		 */
+		  
+                                                                                 
+    
+                                                                               
+                                                                               
+                                                                               
+           
+     
 		volatile const mach_trap_t *machtrap = &mach_trap_table[sysnum];
 
 		lck_mtx_lock(&dtrace_systrace_lock);
@@ -950,7 +950,7 @@ _systrace_open(dev_t dev, int flags, int devtype, struct proc *p)
 	return 0;
 }
 
-#define SYSTRACE_MAJOR  -24 /* let the kernel pick the device number */
+#define SYSTRACE_MAJOR  -24                                            
 
 static struct cdevsw systrace_cdevsw =
 {
@@ -992,7 +992,7 @@ systrace_init( void )
 static uint64_t
 systrace_getargval(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 {
-#pragma unused(arg,id,parg,aframes)     /* __APPLE__ */
+#pragma unused(arg,id,parg,aframes)                    
 	uint64_t val = 0;
 	uint64_t *uargs = NULL;
 
@@ -1046,7 +1046,7 @@ systrace_getargdesc(void *arg, dtrace_id_t id, void *parg,
 static uint64_t
 machtrace_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 {
-#pragma unused(arg,id,parg,aframes)     /* __APPLE__ */
+#pragma unused(arg,id,parg,aframes)                    
 	uint64_t val = 0;
 	syscall_arg_t *stack = (syscall_arg_t *)NULL;
 
@@ -1061,7 +1061,7 @@ machtrace_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 	}
 
 	DTRACE_CPUFLAG_SET(CPU_DTRACE_NOFAULT);
-	/* dtrace_probe arguments arg0 .. arg4 are 64bits wide */
+	                                                         
 	val = (uint64_t)*(stack + argno);
 	DTRACE_CPUFLAG_CLEAR(CPU_DTRACE_NOFAULT);
 	return val;

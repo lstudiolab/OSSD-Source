@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* -*- compile-command: "xcrun --sdk iphoneos.internal make recvmsg_x_test" -*- */
+                                                                                  
 
 
 #include <sys/errno.h>
@@ -76,7 +76,7 @@ sendPackets(int s, struct sockaddr *dst, unsigned int numMsg, size_t bufferLen)
 		count += 1;
 	}
 
-	// Wait a bit to make sure the packets reach the receiver
+	                                                         
 	usleep(100000);
 
 	T_LOG("Sent %ld packet\n", count);
@@ -101,9 +101,9 @@ recvPackets_x(int s, unsigned int numMsg, size_t buflen, socklen_t cmsgLen)
 
 	u_int count = 0;
 	while (true) {
-		/*
-		 * Wrap around when we've exhausted the list
-		 */
+		  
+                                              
+     
 		if ((count % numMsg) == 0) {
 			for (unsigned int i = 0; i < numMsg; i++) {
 				struct msghdr_x *msg = &msgList[i];

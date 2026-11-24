@@ -28,19 +28,19 @@
 
 #include <sys/cdefs.h>
 
-/* whence values for lseek(2) */
+                                
 #ifndef SEEK_SET
-#define SEEK_SET        0       /* set file offset to offset */
-#define SEEK_CUR        1       /* set file offset to current plus offset */
-#define SEEK_END        2       /* set file offset to EOF plus offset */
-#endif  /* !SEEK_SET */
+#define SEEK_SET        0                                      
+#define SEEK_CUR        1                                                   
+#define SEEK_END        2                                               
+#endif                 
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
 #ifndef SEEK_HOLE
-#define SEEK_HOLE       3       /* set file offset to the start of the next hole greater than or equal to the supplied offset */
+#define SEEK_HOLE       3                                                                                                       
 #endif
 
 #ifndef SEEK_DATA
-#define SEEK_DATA       4       /* set file offset to the start of the next non-hole file region greater than or equal to the supplied offset */
+#define SEEK_DATA       4                                                                                                                       
 #endif
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          

@@ -62,46 +62,46 @@
 #define dprintf(...) do { } while(0)
 #endif
 
-/*
- * SFI (Selective Forced Idle) operates by enabling a global
- * timer on the SFI window interval. When it fires, all processors
- * running a thread that should be SFI-ed are sent an AST.
- * As threads become runnable while in their "off phase", they
- * are placed on a deferred ready queue. When a per-class
- * "on timer" fires, the ready threads for that class are
- * re-enqueued for running. As an optimization to avoid spurious
- * wakeups, the timer may be lazily programmed.
- */
+  
+                                                            
+                                                                  
+                                                          
+                                                              
+                                                         
+                                                         
+                                                                
+                                               
+   
 
-/*
- * The "sfi_lock" simple lock guards access to static configuration
- * parameters (as specified by userspace), dynamic state changes
- * (as updated by the timer event routine), and timer data structures.
- * Since it can be taken with interrupts disabled in some cases, all
- * uses should be taken with interrupts disabled at splsched(). The
- * "sfi_lock" also guards the "sfi_wait_class" field of thread_t, and
- * must only be accessed with it held.
- *
- * When an "on timer" fires, we must deterministically be able to drain
- * the wait queue, since if any threads are added to the queue afterwards,
- * they may never get woken out of SFI wait. So sfi_lock must be
- * taken before the wait queue's own spinlock.
- *
- * The wait queue will take the thread's scheduling lock. We may also take
- * the thread_lock directly to update the "sfi_class" field and determine
- * if the thread should block in the wait queue, but the lock will be
- * released before doing so.
- *
- * The pset lock may also be taken, but not while any other locks are held.
- *
- * The task and thread mutex may also be held while reevaluating sfi state.
- *
- * splsched ---> sfi_lock ---> waitq ---> thread_lock
- *        \  \              \__ thread_lock (*)
- *         \  \__ pset_lock
- *          \
- *           \__ thread_lock
- */
+  
+                                                                   
+                                                                
+                                                                      
+                                                                    
+                                                                   
+                                                                     
+                                      
+  
+                                                                       
+                                                                          
+                                                                
+                                              
+  
+                                                                          
+                                                                         
+                                                                     
+                            
+  
+                                                                           
+  
+                                                                           
+  
+                                                     
+                                               
+                           
+             
+                            
+   
 
 decl_simple_lock_data(static, sfi_lock);
 static timer_call_data_t        sfi_timer_call_entry;
@@ -119,15 +119,15 @@ typedef struct {
 	const char *    class_ledger_name;
 } sfi_class_registration_t;
 
-/*
- * To add a new SFI class:
- *
- * 1) Raise MAX_SFI_CLASS_ID in mach/sfi_class.h
- * 2) Add a #define for it to mach/sfi_class.h. It need not be inserted in order of restrictiveness.
- * 3) Add a call to SFI_CLASS_REGISTER below
- * 4) Augment sfi_thread_classify to categorize threads as early as possible for as restrictive as possible.
- * 5) Modify thermald to use the SFI class
- */
+  
+                          
+  
+                                                
+                                                                                                    
+                                            
+                                                                                                            
+                                          
+   
 
 static inline void _sfi_wait_cleanup(void);
 
@@ -154,7 +154,7 @@ SFI_ ## clsid ## _registration = {                                              
 STARTUP_ARG(TUNABLES, STARTUP_RANK_MIDDLE,                                      \
     sfi_class_register, &SFI_ ## clsid ## _registration)
 
-/* SFI_CLASS_UNSPECIFIED not included here */
+                                             
 SFI_CLASS_REGISTER(MAINTENANCE, MAINTENANCE);
 SFI_CLASS_REGISTER(DARWIN_BG, DARWIN_BG);
 SFI_CLASS_REGISTER(APP_NAP, APP_NAP);
@@ -183,17 +183,17 @@ struct sfi_class_state {
 	boolean_t       class_sfi_is_enabled;
 	volatile boolean_t      class_in_on_phase;
 
-	struct waitq            waitq;  /* threads in ready state */
+	struct waitq            waitq;                              
 	thread_continue_t       continuation;
 
 	const char *    class_name;
 	const char *    class_ledger_name;
 };
 
-/* Static configuration performed in sfi_early_init() */
+                                                        
 struct sfi_class_state sfi_classes[MAX_SFI_CLASS_ID];
 
-int sfi_enabled_class_count; // protected by sfi_lock and used atomically
+int sfi_enabled_class_count;                                             
 
 static void sfi_timer_global_off(
 	timer_call_param_t      param0,
@@ -203,7 +203,7 @@ static void sfi_timer_per_class_on(
 	timer_call_param_t      param0,
 	timer_call_param_t      param1);
 
-/* Called early in boot, when kernel is single-threaded */
+                                                          
 __startup_func
 static void
 sfi_class_register(sfi_class_registration_t *reg)
@@ -236,7 +236,7 @@ sfi_init(void)
 	sfi_is_enabled = FALSE;
 
 	for (i = 0; i < MAX_SFI_CLASS_ID; i++) {
-		/* If the class was set up in sfi_early_init(), initialize remaining fields */
+		                                                                              
 		if (sfi_classes[i].continuation) {
 			timer_call_setup(&sfi_classes[i].on_timer, sfi_timer_per_class_on, (void *)(uintptr_t)i);
 			sfi_classes[i].on_timer_programmed = FALSE;
@@ -244,7 +244,7 @@ sfi_init(void)
 			kret = waitq_init(&sfi_classes[i].waitq, SYNC_POLICY_FIFO | SYNC_POLICY_DISABLE_IRQ);
 			assert(kret == KERN_SUCCESS);
 		} else {
-			/* The only allowed gap is for SFI_CLASS_UNSPECIFIED */
+			                                                       
 			if (i != SFI_CLASS_UNSPECIFIED) {
 				panic("Gap in registered SFI classes");
 			}
@@ -252,7 +252,7 @@ sfi_init(void)
 	}
 }
 
-/* Can be called before sfi_init() by task initialization, but after sfi_early_init() */
+                                                                                        
 sfi_class_id_t
 sfi_get_ledger_alias_for_class(sfi_class_id_t class_id)
 {
@@ -261,7 +261,7 @@ sfi_get_ledger_alias_for_class(sfi_class_id_t class_id)
 
 	ledger_name = sfi_classes[class_id].class_ledger_name;
 
-	/* Find the first class in the registration table with this ledger name */
+	                                                                          
 	if (ledger_name) {
 		for (i = SFI_CLASS_UNSPECIFIED + 1; i < class_id; i++) {
 			if (0 == strcmp(sfi_classes[i].class_ledger_name, ledger_name)) {
@@ -270,12 +270,12 @@ sfi_get_ledger_alias_for_class(sfi_class_id_t class_id)
 			}
 		}
 
-		/* This class is the primary one for the ledger, so there is no alias */
+		                                                                        
 		dprintf("sfi_get_ledger_alias_for_class(0x%x) -> 0x%x\n", class_id, SFI_CLASS_UNSPECIFIED);
 		return SFI_CLASS_UNSPECIFIED;
 	}
 
-	/* We are permissive on SFI class lookup failures. In sfi_init(), we assert more */
+	                                                                                   
 	return SFI_CLASS_UNSPECIFIED;
 }
 
@@ -306,7 +306,7 @@ sfi_timer_global_off(
 
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 	if (!sfi_is_enabled) {
-		/* If SFI has been disabled, let all "on" timers drain naturally */
+		                                                                   
 		KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SFI, SFI_OFF_TIMER) | DBG_FUNC_NONE, 1, 0, 0, 0, 0);
 
 		simple_unlock(&sfi_lock);
@@ -316,7 +316,7 @@ sfi_timer_global_off(
 
 	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SFI, SFI_OFF_TIMER) | DBG_FUNC_START, 0, 0, 0, 0, 0);
 
-	/* First set all configured classes into the off state, and program their "on" timer */
+	                                                                                       
 	for (i = 0; i < MAX_SFI_CLASS_ID; i++) {
 		if (sfi_classes[i].class_sfi_is_enabled) {
 			uint64_t on_timer_deadline;
@@ -324,13 +324,13 @@ sfi_timer_global_off(
 			sfi_classes[i].class_in_on_phase = FALSE;
 			sfi_classes[i].on_timer_programmed = TRUE;
 
-			/* Push out on-timer */
+			                       
 			on_timer_deadline = now + sfi_classes[i].off_time_interval;
 			sfi_classes[i].on_timer_deadline = on_timer_deadline;
 
 			timer_call_enter1(&sfi_classes[i].on_timer, NULL, on_timer_deadline, TIMER_CALL_SYS_CRITICAL);
 		} else {
-			/* If this class no longer needs SFI, make sure the timer is cancelled */
+			                                                                         
 			sfi_classes[i].class_in_on_phase = TRUE;
 			if (sfi_classes[i].on_timer_programmed) {
 				sfi_classes[i].on_timer_programmed = FALSE;
@@ -341,7 +341,7 @@ sfi_timer_global_off(
 	}
 	simple_unlock(&sfi_lock);
 
-	/* Iterate over processors, call cause_ast_check() on ones running a thread that should be in an off phase */
+	                                                                                                             
 	processor = processor_list;
 	pset = processor->processor_set;
 
@@ -355,7 +355,7 @@ sfi_timer_global_off(
 			pset_lock(pset);
 		}
 
-		/* "processor" and its pset are locked */
+		                                         
 		if (processor->state == PROCESSOR_RUNNING) {
 			if (AST_NONE != sfi_processor_needs_ast(processor)) {
 				needs_cause_ast_mask |= (1U << processor->cpu_id);
@@ -374,7 +374,7 @@ sfi_timer_global_off(
 		}
 	}
 
-	/* Re-arm timer if still enabled */
+	                                   
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 	if (sfi_is_enabled) {
 		clock_deadline_for_periodic_event(sfi_window_interval,
@@ -409,11 +409,11 @@ sfi_timer_per_class_on(
 
 	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SFI, SFI_ON_TIMER) | DBG_FUNC_START, sfi_class_id, 0, 0, 0, 0);
 
-	/*
-	 * Any threads that may have accumulated in the ready queue for this class should get re-enqueued.
-	 * Since we have the sfi_lock held and have changed "class_in_on_phase", we expect
-	 * no new threads to be put on this wait queue until the global "off timer" has fired.
-	 */
+	  
+                                                                                                   
+                                                                                   
+                                                                                       
+    
 
 	sfi_class->class_in_on_phase = TRUE;
 	sfi_class->on_timer_programmed = FALSE;
@@ -457,36 +457,36 @@ sfi_set_window(uint64_t window_usecs)
 
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 
-	/* Check that we are not bringing in the SFI window smaller than any class */
+	                                                                             
 	for (i = 0; i < MAX_SFI_CLASS_ID; i++) {
 		if (sfi_classes[i].class_sfi_is_enabled) {
 			largest_class_off_interval = MAX(largest_class_off_interval, sfi_classes[i].off_time_interval);
 		}
 	}
 
-	/*
-	 * Off window must be strictly greater than all enabled classes,
-	 * otherwise threads would build up on ready queue and never be able to run.
-	 */
+	  
+                                                                 
+                                                                             
+    
 	if (interval <= largest_class_off_interval) {
 		simple_unlock(&sfi_lock);
 		splx(s);
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 * If the new "off" deadline is further out than the current programmed timer,
-	 * just let the current one expire (and the new cadence will be established thereafter).
-	 * If the new "off" deadline is nearer than the current one, bring it in, so we
-	 * can start the new behavior sooner. Note that this may cause the "off" timer to
-	 * fire before some of the class "on" timers have fired.
-	 */
+	  
+                                                                               
+                                                                                         
+                                                                                
+                                                                                  
+                                                         
+    
 	sfi_window_usecs = window_usecs;
 	sfi_window_interval = interval;
 	sfi_window_is_set = TRUE;
 
 	if (os_atomic_load(&sfi_enabled_class_count, relaxed) == 0) {
-		/* Can't program timer yet */
+		                             
 	} else if (!sfi_is_enabled) {
 		sfi_is_enabled = TRUE;
 		sfi_next_off_deadline = deadline;
@@ -519,7 +519,7 @@ sfi_window_cancel(void)
 
 	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SFI, SFI_CANCEL_WINDOW), 0, 0, 0, 0, 0);
 
-	/* Disable globals so that global "off-timer" is not re-armed */
+	                                                                
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 	sfi_window_is_set = FALSE;
 	sfi_window_usecs = 0;
@@ -533,13 +533,13 @@ sfi_window_cancel(void)
 	return KERN_SUCCESS;
 }
 
-/* Defers SFI off and per-class on timers (if live) by the specified interval
- * in Mach Absolute Time Units. Currently invoked to align with the global
- * forced idle mechanism. Making some simplifying assumptions, the iterative GFI
- * induced SFI on+off deferrals form a geometric series that converges to yield
- * an effective SFI duty cycle that is scaled by the GFI duty cycle. Initial phase
- * alignment and congruency of the SFI/GFI periods can distort this to some extent.
- */
+                                                                             
+                                                                          
+                                                                                
+                                                                               
+                                                                                  
+                                                                                   
+   
 
 kern_return_t
 sfi_defer(uint64_t sfi_defer_matus)
@@ -629,14 +629,14 @@ sfi_set_class_offtime(sfi_class_id_t class_id, uint64_t offtime_usecs)
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 	off_window_interval = sfi_window_interval;
 
-	/* Check that we are not bringing in class off-time larger than the SFI window */
+	                                                                                 
 	if (off_window_interval && (interval >= off_window_interval)) {
 		simple_unlock(&sfi_lock);
 		splx(s);
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/* We never re-program the per-class on-timer, but rather just let it expire naturally */
+	                                                                                         
 	if (!sfi_classes[class_id].class_sfi_is_enabled) {
 		os_atomic_inc(&sfi_enabled_class_count, relaxed);
 	}
@@ -645,7 +645,7 @@ sfi_set_class_offtime(sfi_class_id_t class_id, uint64_t offtime_usecs)
 	sfi_classes[class_id].class_sfi_is_enabled = TRUE;
 
 	if (sfi_window_is_set && !sfi_is_enabled) {
-		/* start global off timer */
+		                            
 		sfi_is_enabled = TRUE;
 		sfi_next_off_deadline = mach_absolute_time() + sfi_window_interval;
 		timer_call_enter1(&sfi_timer_call_entry,
@@ -676,7 +676,7 @@ sfi_class_offtime_cancel(sfi_class_id_t class_id)
 
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 
-	/* We never re-program the per-class on-timer, but rather just let it expire naturally */
+	                                                                                         
 	if (sfi_classes[class_id].class_sfi_is_enabled) {
 		os_atomic_dec(&sfi_enabled_class_count, relaxed);
 	}
@@ -718,24 +718,24 @@ sfi_get_class_offtime(sfi_class_id_t class_id, uint64_t *offtime_usecs)
 	return KERN_SUCCESS;
 }
 
-/*
- * sfi_thread_classify and sfi_processor_active_thread_classify perform the critical
- * role of quickly categorizing a thread into its SFI class so that an AST_SFI can be
- * set. As the thread is unwinding to userspace, sfi_ast() performs full locking
- * and determines whether the thread should enter an SFI wait state. Because of
- * the inherent races between the time the AST is set and when it is evaluated,
- * thread classification can be inaccurate (but should always be safe). This is
- * especially the case for sfi_processor_active_thread_classify, which must
- * classify the active thread on a remote processor without taking the thread lock.
- * When in doubt, classification should err on the side of *not* classifying a
- * thread at all, and wait for the thread itself to either hit a quantum expiration
- * or block inside the kernel.
- */
+  
+                                                                                    
+                                                                                     
+                                                                                
+                                                                               
+                                                                               
+                                                                               
+                                                                           
+                                                                                   
+                                                                              
+                                                                                   
+                              
+   
 
-/*
- * Thread must be locked. Ultimately, the real decision to enter
- * SFI wait happens at the AST boundary.
- */
+  
+                                                                
+                                        
+   
 sfi_class_id_t
 sfi_thread_classify(thread_t thread)
 {
@@ -744,12 +744,12 @@ sfi_thread_classify(thread_t thread)
 	sched_mode_t thmode = thread->sched_mode;
 	boolean_t focal = FALSE;
 
-	/* kernel threads never reach the user AST boundary, and are in a separate world for SFI */
+	                                                                                           
 	if (is_kernel_thread) {
 		return SFI_CLASS_KERNEL;
 	}
 
-	/* no need to re-classify threads unless there is at least one enabled SFI class */
+	                                                                                   
 	if (os_atomic_load(&sfi_enabled_class_count, relaxed) == 0) {
 		return SFI_CLASS_OPTED_OUT;
 	}
@@ -777,17 +777,17 @@ sfi_thread_classify(thread_t thread)
 		}
 	}
 
-	/*
-	 * Realtime and fixed priority threads express their duty cycle constraints
-	 * via other mechanisms, and are opted out of (most) forms of SFI
-	 */
+	  
+                                                                            
+                                                                  
+    
 	if (thmode == TH_MODE_REALTIME || thmode == TH_MODE_FIXED || task_role == TASK_GRAPHICS_SERVER) {
 		return SFI_CLASS_OPTED_OUT;
 	}
 
-	/*
-	 * Threads with unspecified, legacy, or user-initiated QOS class can be individually managed.
-	 */
+	  
+                                                                                              
+    
 	switch (task_role) {
 	case TASK_CONTROL_APPLICATION:
 	case TASK_FOREGROUND_APPLICATION:
@@ -796,7 +796,7 @@ sfi_thread_classify(thread_t thread)
 	case TASK_BACKGROUND_APPLICATION:
 	case TASK_DEFAULT_APPLICATION:
 	case TASK_UNSPECIFIED:
-		/* Focal if the task is in a coalition with a FG/focal app */
+		                                                             
 		if (task_coalition_focal_count(thread->task) > 0) {
 			focal = TRUE;
 		}
@@ -804,7 +804,7 @@ sfi_thread_classify(thread_t thread)
 	case TASK_THROTTLE_APPLICATION:
 	case TASK_DARWINBG_APPLICATION:
 	case TASK_NONUI_APPLICATION:
-	/* Definitely not focal */
+	                          
 	default:
 		break;
 	}
@@ -828,9 +828,9 @@ sfi_thread_classify(thread_t thread)
 		return SFI_CLASS_UTILITY;
 	}
 
-	/*
-	 * Classify threads in non-managed tasks
-	 */
+	  
+                                         
+    
 	if (focal) {
 		switch (thread_qos) {
 		case THREAD_QOS_USER_INTERACTIVE:
@@ -856,20 +856,20 @@ sfi_thread_classify(thread_t thread)
 	}
 }
 
-/*
- * pset must be locked.
- */
+  
+                       
+   
 sfi_class_id_t
 sfi_processor_active_thread_classify(processor_t processor)
 {
 	return processor->current_sfi_class;
 }
 
-/*
- * thread must be locked. This is inherently racy, with the intent that
- * at the AST boundary, it will be fully evaluated whether we need to
- * perform an AST wait
- */
+  
+                                                                       
+                                                                     
+                      
+   
 ast_t
 sfi_thread_needs_ast(thread_t thread, sfi_class_id_t *out_class)
 {
@@ -881,7 +881,7 @@ sfi_thread_needs_ast(thread_t thread, sfi_class_id_t *out_class)
 		*out_class = class_id;
 	}
 
-	/* No lock taken, so a stale value may be used. */
+	                                                  
 	if (!sfi_classes[class_id].class_in_on_phase) {
 		return AST_SFI;
 	} else {
@@ -889,14 +889,14 @@ sfi_thread_needs_ast(thread_t thread, sfi_class_id_t *out_class)
 	}
 }
 
-/*
- * pset must be locked. We take the SFI class for
- * the currently running thread which is cached on
- * the processor_t, and assume it is accurate. In the
- * worst case, the processor will get an IPI and be asked
- * to evaluate if the current running thread at that
- * later point in time should be in an SFI wait.
- */
+  
+                                                 
+                                                  
+                                                     
+                                                         
+                                                    
+                                                
+   
 ast_t
 sfi_processor_needs_ast(processor_t processor)
 {
@@ -904,7 +904,7 @@ sfi_processor_needs_ast(processor_t processor)
 
 	class_id = sfi_processor_active_thread_classify(processor);
 
-	/* No lock taken, so a stale value may be used. */
+	                                                  
 	if (!sfi_classes[class_id].class_in_on_phase) {
 		return AST_SFI;
 	} else {
@@ -930,20 +930,20 @@ _sfi_wait_cleanup(void)
 	simple_unlock(&sfi_lock);
 	splx(s);
 
-	/*
-	 * It's possible for the thread to be woken up due to the SFI period
-	 * ending *before* it finishes blocking. In that case,
-	 * wait_sfi_begin_time won't be set.
-	 *
-	 * Derive the time sacrificed to SFI by looking at when this thread was
-	 * awoken by the on-timer, to avoid counting the time this thread spent
-	 * waiting to get scheduled.
-	 *
-	 * Note that last_made_runnable_time could be reset if this thread
-	 * gets preempted before we read the value. To fix that, we'd need to
-	 * track wait time in a thread timer, sample the timer before blocking,
-	 * pass the value through thread->parameter, and subtract that.
-	 */
+	  
+                                                                     
+                                                       
+                                     
+   
+                                                                        
+                                                                        
+                             
+   
+                                                                   
+                                                                      
+                                                                        
+                                                                
+    
 
 	if (self->wait_sfi_begin_time != 0) {
 		uint64_t made_runnable = os_atomic_load(&self->last_made_runnable_time, relaxed);
@@ -957,12 +957,12 @@ _sfi_wait_cleanup(void)
 	}
 }
 
-/*
- * Called at AST context to fully evaluate if the current thread
- * (which is obviously running) should instead block in an SFI wait.
- * We must take the sfi_lock to check whether we are in the "off" period
- * for the class, and if so, block.
- */
+  
+                                                                
+                                                                    
+                                                                        
+                                   
+   
 void
 sfi_ast(thread_t thread)
 {
@@ -978,12 +978,12 @@ sfi_ast(thread_t thread)
 	simple_lock(&sfi_lock, LCK_GRP_NULL);
 
 	if (!sfi_is_enabled) {
-		/*
-		 * SFI is not enabled, or has recently been disabled.
-		 * There is no point putting this thread on a deferred ready
-		 * queue, even if it were classified as needing it, since
-		 * SFI will truly be off at the next global off timer
-		 */
+		  
+                                                       
+                                                              
+                                                           
+                                                       
+     
 		simple_unlock(&sfi_lock);
 		splx(s);
 
@@ -994,19 +994,19 @@ sfi_ast(thread_t thread)
 	thread->sfi_class = class_id = sfi_thread_classify(thread);
 	thread_unlock(thread);
 
-	/*
-	 * Once the sfi_lock is taken and the thread's ->sfi_class field is updated, we
-	 * are committed to transitioning to whatever state is indicated by "->class_in_on_phase".
-	 * If another thread tries to call sfi_reevaluate() after this point, it will take the
-	 * sfi_lock and see the thread in this wait state. If another thread calls
-	 * sfi_reevaluate() before this point, it would see a runnable thread and at most
-	 * attempt to send an AST to this processor, but we would have the most accurate
-	 * classification.
-	 */
+	  
+                                                                                
+                                                                                           
+                                                                                       
+                                                                           
+                                                                                  
+                                                                                 
+                   
+    
 
 	sfi_class = &sfi_classes[class_id];
 	if (!sfi_class->class_in_on_phase) {
-		/* Need to block thread in wait queue */
+		                                        
 		KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SFI, SFI_THREAD_DEFER),
 		    thread_tid(thread), class_id, 0, 0, 0);
 
@@ -1018,7 +1018,7 @@ sfi_ast(thread_t thread)
 			did_wait = TRUE;
 			continuation = sfi_class->continuation;
 		} else {
-			/* thread may be exiting already, all other errors are unexpected */
+			                                                                    
 			assert(waitret == THREAD_INTERRUPTED);
 		}
 	}
@@ -1033,7 +1033,7 @@ sfi_ast(thread_t thread)
 	}
 }
 
-/* Thread must be unlocked */
+                             
 void
 sfi_reevaluate(thread_t thread)
 {
@@ -1050,25 +1050,25 @@ sfi_reevaluate(thread_t thread)
 	sfi_ast = sfi_thread_needs_ast(thread, &class_id);
 	thread->sfi_class = class_id;
 
-	/*
-	 * This routine chiefly exists to boost threads out of an SFI wait
-	 * if their classification changes before the "on" timer fires.
-	 *
-	 * If we calculate that a thread is in a different ->sfi_wait_class
-	 * than we think it should be (including no-SFI-wait), we need to
-	 * correct that:
-	 *
-	 * If the thread is in SFI wait and should not be (or should be waiting
-	 * on a different class' "on" timer), we wake it up. If needed, the
-	 * thread may immediately block again in the different SFI wait state.
-	 *
-	 * If the thread is not in an SFI wait state and it should be, we need
-	 * to get that thread's attention, possibly by sending an AST to another
-	 * processor.
-	 */
+	  
+                                                                   
+                                                                
+   
+                                                                    
+                                                                  
+                 
+   
+                                                                        
+                                                                    
+                                                                       
+   
+                                                                       
+                                                                         
+              
+    
 
 	if ((current_class_id = thread->sfi_wait_class) != SFI_CLASS_UNSPECIFIED) {
-		thread_unlock(thread); /* not needed anymore */
+		thread_unlock(thread);                         
 
 		assert(current_class_id < MAX_SFI_CLASS_ID);
 
@@ -1084,10 +1084,10 @@ sfi_reevaluate(thread_t thread)
 			assert(kret == KERN_SUCCESS || kret == KERN_NOT_WAITING);
 		}
 	} else {
-		/*
-		 * Thread's current SFI wait class is not set, and because we
-		 * have the sfi_lock, it won't get set.
-		 */
+		  
+                                                               
+                                         
+     
 
 		if ((thread->state & (TH_RUN | TH_IDLE)) == TH_RUN) {
 			if (sfi_ast != AST_NONE) {
@@ -1101,11 +1101,11 @@ sfi_reevaluate(thread_t thread)
 					    processor->active_thread == thread) {
 						cause_ast_check(processor);
 					} else {
-						/*
-						 * Runnable thread that's not on a CPU currently. When a processor
-						 * does context switch to it, the AST will get set based on whether
-						 * the thread is in its "off time".
-						 */
+						  
+                                                                        
+                                                                         
+                                         
+         
 					}
 				}
 			}
@@ -1118,7 +1118,7 @@ sfi_reevaluate(thread_t thread)
 	splx(s);
 }
 
-#else /* !CONFIG_SCHED_SFI */
+#else                        
 
 kern_return_t
 sfi_set_window(uint64_t window_usecs __unused)
@@ -1177,4 +1177,4 @@ sfi_thread_classify(thread_t thread)
 	return SFI_CLASS_OPTED_OUT;
 }
 
-#endif /* !CONFIG_SCHED_SFI */
+#endif                        

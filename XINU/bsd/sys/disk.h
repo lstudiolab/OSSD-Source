@@ -34,55 +34,55 @@
 
 #ifdef XNU_KERNEL_PRIVATE
 #include <mach/boolean.h>
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Definitions
- *
- * ioctl                                 description
- * ------------------------------------- ---------------------------------------
- * DKIOCEJECT                            eject media
- * DKIOCSYNCHRONIZE                      flush media
- *
- * DKIOCFORMAT                           format media
- * DKIOCGETFORMATCAPACITIES              get media's formattable capacities
- *
- * DKIOCGETBLOCKSIZE                     get media's block size
- * DKIOCGETBLOCKCOUNT                    get media's block count
- * DKIOCGETFIRMWAREPATH                  get media's firmware path
- *
- * DKIOCISFORMATTED                      is media formatted?
- * DKIOCISWRITABLE                       is media writable?
- *
- * DKIOCREQUESTIDLE                      idle media
- * DKIOCUNMAP                            delete unused data
- *
- * DKIOCGETLOCATION                      get device's physical location
- *
- * DKIOCGETMAXBLOCKCOUNTREAD             get maximum block count for reads
- * DKIOCGETMAXBLOCKCOUNTWRITE            get maximum block count for writes
- * DKIOCGETMAXBYTECOUNTREAD              get maximum byte count for reads
- * DKIOCGETMAXBYTECOUNTWRITE             get maximum byte count for writes
- *
- * DKIOCGETMAXSEGMENTCOUNTREAD           get maximum segment count for reads
- * DKIOCGETMAXSEGMENTCOUNTWRITE          get maximum segment count for writes
- * DKIOCGETMAXSEGMENTBYTECOUNTREAD       get maximum segment byte count for reads
- * DKIOCGETMAXSEGMENTBYTECOUNTWRITE      get maximum segment byte count for writes
- *
- * DKIOCGETMINSEGMENTALIGNMENTBYTECOUNT  get minimum segment alignment in bytes
- * DKIOCGETMAXSEGMENTADDRESSABLEBITCOUNT get maximum segment width in bits
- *
- * DKIOCGETFEATURES                      get device's feature set
- * DKIOCGETPHYSICALBLOCKSIZE             get device's block size
- * DKIOCGETCOMMANDPOOLSIZE               get device's queue depth
- *
- * DKIOCGETPROVISIONSTATUS               get device's block provision status
- * DKIOCGETIOMINSATURATIONBYTECOUNT      get minimum byte count to saturate storage bandwidth
- *
- * DKIOCGETERRORDESCRIPTION              get description of any drive error
- *
- * DKIOCGETMAXSWAPWRITE                  get maximum swap file write per day in bytes
- */
+  
+              
+  
+                                                    
+                                                                                
+                                                    
+                                                    
+  
+                                                     
+                                                                           
+  
+                                                               
+                                                                
+                                                                  
+  
+                                                            
+                                                           
+  
+                                                   
+                                                           
+  
+                                                                       
+  
+                                                                          
+                                                                           
+                                                                         
+                                                                          
+  
+                                                                            
+                                                                             
+                                                                                 
+                                                                                  
+  
+                                                                               
+                                                                          
+  
+                                                                 
+                                                                
+                                                                 
+  
+                                                                            
+                                                                                             
+  
+                                                                           
+  
+                                                                                     
+   
 
 #define DK_FEATURE_BARRIER                    0x00000002
 #define DK_FEATURE_PRIORITY                   0x00000004
@@ -103,18 +103,18 @@ typedef struct{
 	uint64_t               blockCount;
 	uint32_t               blockSize;
 
-	uint8_t                reserved0096[4];    /* reserved, clear to zero */
+	uint8_t                reserved0096[4];                                 
 } dk_format_capacity_t;
 
 typedef struct{
 	dk_format_capacity_t * capacities;
-	uint32_t               capacitiesCount;    /* use zero to probe count */
+	uint32_t               capacitiesCount;                                 
 
 #ifdef __LP64__
-	uint8_t                reserved0096[4];    /* reserved, clear to zero */
-#else /* !__LP64__ */
-	uint8_t                reserved0064[8];    /* reserved, clear to zero */
-#endif /* !__LP64__ */
+	uint8_t                reserved0096[4];                                 
+#else                
+	uint8_t                reserved0064[8];                                 
+#endif                
 } dk_format_capacities_t;
 
 typedef struct{
@@ -123,7 +123,7 @@ typedef struct{
 
 	uint32_t               options;
 
-	uint8_t                reserved0160[4];    /* reserved, clear to zero */
+	uint8_t                reserved0160[4];                                 
 } dk_synchronize_t;
 
 typedef struct{
@@ -133,13 +133,13 @@ typedef struct{
 	uint32_t               options;
 
 #ifndef __LP64__
-	uint8_t                reserved0096[4];    /* reserved, clear to zero */
-#endif /* !__LP64__ */
+	uint8_t                reserved0096[4];                                 
+#endif                
 } dk_unmap_t;
 
 typedef struct{
 	uint64_t           flags;
-	uint64_t           hotfile_size;           /* in bytes */
+	uint64_t           hotfile_size;                         
 	uint64_t           hibernate_minsize;
 	uint64_t           swapfile_pinning;
 
@@ -162,17 +162,17 @@ typedef struct{
 } dk_provision_extent_t;
 
 typedef struct{
-	uint64_t                offset;         /* input:        logical byte offset */
-	uint64_t                length;         /* input:        byte length, 0 for whole length */
-	uint64_t                options;        /*               reserved, clear to zero */
-	uint32_t                reserved;       /*               not used */
-	uint32_t                extentsCount;   /* input/output: count for extents */
-	dk_provision_extent_t * extents;        /* output:       provision extents */
+	uint64_t                offset;                                                
+	uint64_t                length;                                                            
+	uint64_t                options;                                                   
+	uint32_t                reserved;                                   
+	uint32_t                extentsCount;                                        
+	dk_provision_extent_t * extents;                                             
 } dk_provision_status_t;
 
 typedef struct{
-	uint64_t               options;        /*               reserved, clear to zero */
-	uint64_t               reserved;       /*               reserved, clear to zero */
+	uint64_t               options;                                                   
+	uint64_t               reserved;                                                  
 	uint64_t               description_size;
 	char *                 description;
 } dk_error_description_t;
@@ -183,11 +183,11 @@ typedef struct{
 #ifdef KERNEL
 #ifdef PRIVATE
 
-/* Definitions of option bits for dk_unmap_t */
+                                               
 #define _DK_UNMAP_INITIALIZE                   0x00000100
 
-#endif /* PRIVATE */
-#endif /* KERNEL */
+#endif              
+#endif             
 
 #define DKIOCEJECT                            _IO('d', 21)
 #define DKIOCSYNCHRONIZE                      _IOW('d', 22, dk_synchronize_t)
@@ -248,7 +248,7 @@ typedef struct{
 	uint64_t               offset;
 	uint64_t               length;
 
-	uint8_t                reserved0128[12];   /* reserved, clear to zero */
+	uint8_t                reserved0128[12];                                
 
 	dev_t                  dev;
 } dk_physical_extent_t;
@@ -260,10 +260,10 @@ typedef struct{
 	uint8_t                tier;
 
 #ifdef __LP64__
-	uint8_t                reserved0104[3];    /* reserved, clear to zero */
-#else /* !__LP64__ */
-	uint8_t                reserved0072[7];    /* reserved, clear to zero */
-#endif /* !__LP64__ */
+	uint8_t                reserved0104[3];                                 
+#else                
+	uint8_t                reserved0072[7];                                 
+#endif                
 } dk_set_tier_t;
 
 #define DKIOCSETBLOCKSIZE                     _IOW('d', 24, uint32_t)
@@ -282,29 +282,29 @@ typedef struct{
 
 #ifdef XNU_KERNEL_PRIVATE
 typedef struct{
-	boolean_t mi_mdev; /* Is this a memdev device? */
-	boolean_t mi_phys; /* Physical memory? */
-	uint32_t mi_base; /* Base page number of the device? */
-	uint64_t mi_size; /* Size of the device (in ) */
+	boolean_t mi_mdev;                               
+	boolean_t mi_phys;                       
+	uint32_t mi_base;                                      
+	uint64_t mi_size;                               
 } dk_memdev_info_t;
 
 typedef dk_memdev_info_t memdev_info_t;
 
 #define DKIOCGETMEMDEVINFO                    _IOR('d', 90, dk_memdev_info_t)
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 #ifdef PRIVATE
 typedef struct _dk_cs_pin {
 	dk_extent_t     cp_extent;
 	int64_t         cp_flags;
 } _dk_cs_pin_t;
-/* The following are modifiers to _DKIOCCSPINEXTENT/cp_flags operation */
-#define _DKIOCCSPINTOFASTMEDIA          (0)                     /* Pin extent to the fast (SSD) media             */
-#define _DKIOCCSPINFORHIBERNATION       (1 << 0)        /* Pin of hibernation file, content not preserved */
-#define _DKIOCCSPINDISCARDBLACKLIST     (1 << 1)        /* Hibernation complete/error, stop blacklisting  */
-#define _DKIOCCSPINTOSLOWMEDIA          (1 << 2)        /* Pin extent to the slow (HDD) media             */
-#define _DKIOCCSTEMPORARYPIN            (1 << 3)        /* Relocate, but do not pin, to indicated media   */
-#define _DKIOCCSHIBERNATEIMGSIZE        (1 << 4)        /* Anticipate/Max size of the upcoming hibernate  */
-#define _DKIOCCSPINFORSWAPFILE          (1 << 5)        /* Pin of swap file, content not preserved        */
+                                                                         
+#define _DKIOCCSPINTOFASTMEDIA          (0)                                                                         
+#define _DKIOCCSPINFORHIBERNATION       (1 << 0)                                                            
+#define _DKIOCCSPINDISCARDBLACKLIST     (1 << 1)                                                            
+#define _DKIOCCSPINTOSLOWMEDIA          (1 << 2)                                                            
+#define _DKIOCCSTEMPORARYPIN            (1 << 3)                                                            
+#define _DKIOCCSHIBERNATEIMGSIZE        (1 << 4)                                                            
+#define _DKIOCCSPINFORSWAPFILE          (1 << 5)                                                            
 
 #define _DKIOCCSSETLVNAME                     _IOW('d', 198, char[256])
 #define _DKIOCCSPINEXTENT                     _IOW('d', 199, _dk_cs_pin_t)
@@ -323,7 +323,7 @@ typedef struct _dk_cs_unmap {
 } _dk_cs_unmap_t;
 
 #define _DKIOCCSMAP                           _IOWR('d', 202, _dk_cs_map_t)
-// No longer used: _DKIOCCSSETFSVNODE (203) & _DKIOCCSGETFREEBYTES (204)
+                                                                        
 #define _DKIOCCSUNMAP                         _IOWR('d', 205, _dk_cs_unmap_t)
 
 typedef enum {
@@ -333,11 +333,11 @@ typedef enum {
 
 #define DKIOCGETAPFSFLAVOUR     _IOR('d', 91, dk_apfs_flavour_t)
 
-// Extent's offset and length returned in bytes
+                                               
 typedef struct dk_apfs_wbc_range {
-	dev_t dev;              // Physical device for extents
-	uint32_t count;         // Number of extents
-	dk_extent_t extents[2]; // Addresses are relative to device we return
+	dev_t dev;                                            
+	uint32_t count;                             
+	dk_extent_t extents[2];                                              
 } dk_apfs_wbc_range_t;
 
 #define DKIOCAPFSGETWBCRANGE           _IOR('d', 92, dk_apfs_wbc_range_t)
@@ -345,11 +345,11 @@ typedef struct dk_apfs_wbc_range {
 
 #define DKIOCGETMAXSWAPWRITE           _IOR('d', 94, uint64_t)
 
-#endif /* PRIVATE */
-#endif /* KERNEL */
+#endif              
+#endif             
 
 #ifdef PRIVATE
 #define _DKIOCSETSTATIC                       _IO('d', 84)
-#endif /* PRIVATE */
+#endif              
 
-#endif  /* _SYS_DISK_H_ */
+#endif                    

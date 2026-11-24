@@ -1,24 +1,24 @@
-//
-//  Tests.swift
-//
-//  Some of these tests here verify that kdd is able to parse old
-//  kcdata files and generate the correct output. To do so, we include
-//  compressed versions of the raw kcdata and as well as the expected
-//  plist output.
-//
-//  NOTE: If you're adding sample data/plist files, you'll need to first
-//        add them to the project and then make sure each is part of the
-//        tests target.
-//
-//  Other tests verify the expected behavior of libkdd for certain
-//  situations.
-//
-//
+  
+               
+  
+                                                                 
+                                                                      
+                                                                     
+                 
+  
+                                                                        
+                                                                        
+                       
+  
+                                                                  
+               
+  
+  
 
 import XCTest
 import Foundation
 
-// Swift's bridging to uuid_t is awkward.
+                                         
 
 func nsuuid2uuid_t(_ nsuuid : NSUUID) -> uuid_t {
     let dat = nsuuid2array(nsuuid)
@@ -101,7 +101,7 @@ class Tests: XCTestCase {
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+                                                                                                               
         super.tearDown()
     }
     
@@ -246,7 +246,7 @@ class Tests: XCTestCase {
     }
 
     func testLoadInfoWrongSize() {
-        // test what happens when a struct size is short
+                                                        
 
         let buffer = NSMutableData(capacity:1000)!
 
@@ -281,7 +281,7 @@ class Tests: XCTestCase {
     }
 
     func testLoadInfoWayWrongSize() {
-        // test what happens when a struct size is short
+                                                        
 
         let buffer = NSMutableData(capacity:1000)!
 
@@ -313,7 +313,7 @@ class Tests: XCTestCase {
     }
 
     func testLoadInfoPreposterousWrongSize() {
-        // test what happens when a struct size is short
+                                                        
 
         let buffer = NSMutableData(capacity:1000)!
 
@@ -441,7 +441,7 @@ class Tests: XCTestCase {
     }
 
     func testArrayLoadInfoWrongSize() {
-        // test what happens when array element sizes are too short
+                                                                   
 
         let n = 7
         let wrong = 1
@@ -488,7 +488,7 @@ class Tests: XCTestCase {
 
 
     func testArrayLoadInfoWayWrongSize() {
-        // test what happens when array element sizes are too short
+                                                                   
 
         let n = 7
         let wrong = 16
@@ -532,7 +532,7 @@ class Tests: XCTestCase {
     }
 
     func testArrayLoadInfoPreposterouslyWrongSize() {
-        // test what happens when array element sizes are too short
+                                                                   
 
         let n = 7
         let wrong = 19
@@ -653,7 +653,7 @@ class Tests: XCTestCase {
 
 
     func testRepeatedKey() {
-        // test a repeated item of the same key causes error
+                                                            
 
         let buffer = NSMutableData(capacity:1000)!
 
@@ -795,7 +795,7 @@ class Tests: XCTestCase {
     }
 
     func testRepeatedContainer() {
-        //repeated container of same name and key shoudl fail
+                                                             
 
         let buffer = NSMutableData(capacity:1000)!
 
@@ -974,7 +974,7 @@ class Tests: XCTestCase {
     }
 
     func testReadRepeatedArray() {
-        // repeated arrays should be concatenated
+                                                 
         let n = 10
 
         let buffer = NSMutableData(capacity:1000)!
@@ -1066,7 +1066,7 @@ class Tests: XCTestCase {
     }
 
     func testReadThreadidArray() {
-        // test that we can correctly read old arrays with a variety of sizes and paddings
+                                                                                          
         self.testReadThreadidArray(n: 0, pad:0)
         for n in 1..<100 {
             for pad in 0..<16 {
@@ -1076,7 +1076,7 @@ class Tests: XCTestCase {
     }
 
     func testReadThreadidArrayWrongSize1() {
-        /// for old style arrays, if the element size is determined by the type.   If the array of that size element at the given count doesn't fit, then parsing should fail
+                                                                                                                                                                             
 
         let n = 1
 
@@ -1106,7 +1106,7 @@ class Tests: XCTestCase {
     }
 
     func testReadThreadidArrayWrongSize5() {
-        /// if the count is bigger than the buffer, parsing will just fail
+                                                                          
 
         let n = 5
 
@@ -1137,7 +1137,7 @@ class Tests: XCTestCase {
 
 
     func testReadThreadidArrayPaddedSize() {
-        // test that we can tolerate a little padding at the end of an array
+                                                                            
         let n = 5
 
         let buffer = NSMutableData(capacity:1000)!
@@ -1178,7 +1178,7 @@ class Tests: XCTestCase {
     }
 
     func testReadThreadidArrayPaddedSize15() {
-        // test that we can tolerate a little padding at the end of an array
+                                                                            
         let n = 5
 
         let buffer = NSMutableData(capacity:1000)!
@@ -1265,7 +1265,7 @@ class Tests: XCTestCase {
     }
 
     func testSampleStackshot(_ name : String) {
-        // check that we agree with sample file
+                                               
 
         guard let sampledata = self.dataWithResource(name)
             else { XCTFail("failed to open bundle resource named " + name); return }
@@ -1302,9 +1302,9 @@ class Tests: XCTestCase {
 
         XCTAssertEqual(dict, dict2 as! NSDictionary);
 
-        //XCTAssert(dict == dict2 as? NSDictionary)
+                                                   
 
-        // check that we agree with python
+                                          
 
         #if os(OSX)
 

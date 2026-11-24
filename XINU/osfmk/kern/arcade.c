@@ -58,16 +58,16 @@ extern int proc_pidpathinfo_internal(struct proc *p, uint64_t arg,
     int32_t *retval);
 extern off_t proc_getexecutableoffset(struct proc *p);
 
-/*
- * Simple structure to represent a handle for the Arcade registration.
- *
- * This registration is done with an independent kobject callback, rather
- * than a reply, so that we execute it in the context of the user-space
- * server replying (in order to do an entitlement check on the reply).
- *
- * We cache the resulting upcall port until it fails, and then we go
- * get another one.
- */
+  
+                                                                      
+  
+                                                                         
+                                                                       
+                                                                      
+  
+                                                                    
+                   
+   
 struct arcade_register {
 	ipc_port_t ar_port;
 };
@@ -78,17 +78,17 @@ static struct arcade_register arcade_register_global;
 void
 arcade_prepare(task_t task, thread_t thread)
 {
-	/* Platform binaries are exempt */
+	                                  
 	if (task->t_flags & TF_PLATFORM) {
 		return;
 	}
 
-	/* Check to see if the task has the arcade entitlement */
+	                                                         
 	if (!IOTaskHasEntitlement(task, "com.apple.developer.arcade-operations")) {
 		return;
 	}
 
-	/* Others will stop in the AST to make an upcall */
+	                                                   
 	thread_ast_set(thread, AST_ARCADE);
 }
 
@@ -104,7 +104,7 @@ arcade_init(void)
 {
 	ipc_port_t port;
 
-	/* Initialize the global arcade_register kobject and associated port */
+	                                                                       
 	port = ipc_kobject_alloc_port((ipc_kobject_t)&arcade_register_global,
 	    IKOT_ARCADE_REG, IPC_KOBJECT_ALLOC_MAKE_SEND);
 	os_atomic_store(&arcade_register_global.ar_port, port, release);
@@ -117,7 +117,7 @@ convert_port_to_arcade_register(
 	arcade_register_t arcade_reg = ARCADE_REG_NULL;
 
 	if (IP_VALID(port)) {
-		/* No need to lock port because of how refs managed */
+		                                                      
 		if (ip_kotype(port) == IKOT_ARCADE_REG) {
 			assert(ip_active(port));
 			arcade_reg = (arcade_register_t)ip_get_kobject(port);
@@ -150,7 +150,7 @@ arcade_register_new_upcall(
 	}
 	assert(arcade_reg == &arcade_register_global);
 
-	/* Check to see if this is the real arcade subscription service */
+	                                                                  
 	if (!IOTaskHasEntitlement(current_task(), "com.apple.arcade.fpsd")) {
 		return KERN_INVALID_VALUE;
 	}
@@ -158,14 +158,14 @@ arcade_register_new_upcall(
 	lck_mtx_lock(&arcade_upcall_mutex);
 
 	if (arcade_upcall_refresh_in_progress) {
-		/* If we have an old arcade upcall port, discard it */
+		                                                      
 		if (IP_VALID(arcade_upcall_port)) {
 			ipc_port_release_send(arcade_upcall_port);
 			arcade_upcall_port = IP_NULL;
 		}
-		arcade_upcall_port = port; /* owns send right */
+		arcade_upcall_port = port;                      
 
-		/* Wake up anyone waiting for the update */
+		                                           
 		lck_mtx_unlock(&arcade_upcall_mutex);
 		thread_wakeup(&arcade_upcall_port);
 		return KERN_SUCCESS;
@@ -185,7 +185,7 @@ arcade_upcall_refresh(uint64_t deadline)
 
 	LCK_MTX_ASSERT(&arcade_upcall_mutex, LCK_MTX_ASSERT_OWNED);
 
-	/* If someone else is doing the update, wait for them */
+	                                                        
 	if (arcade_upcall_refresh_in_progress) {
 		arcade_upcall_refresh_waiters = TRUE;
 		wr = lck_mtx_sleep(&arcade_upcall_mutex, LCK_SLEEP_DEFAULT,
@@ -195,7 +195,7 @@ arcade_upcall_refresh(uint64_t deadline)
 
 	arcade_upcall_refresh_in_progress = TRUE;
 
-	/* If we have an old arcade upcall port, discard it */
+	                                                      
 	if (IP_VALID(arcade_upcall_port)) {
 		ipc_port_release_send(arcade_upcall_port);
 		arcade_upcall_port = IP_NULL;
@@ -205,16 +205,16 @@ arcade_upcall_refresh(uint64_t deadline)
 		panic("arcade_upcall_refresh(get fairplayd)");
 	}
 
-	/* If no valid fairplayd port registered, we're done */
+	                                                       
 	if (!IP_VALID(fairplayd_port)) {
 		goto finish_in_progress;
 	}
 
-	/*
-	 * Send a fairplayd notification to request a new arcade upcall port.
-	 * Pass along a send right to the arcade_register kobject to complete
-	 * the registration.
-	 */
+	  
+                                                                      
+                                                                      
+                     
+    
 	ipc_port_t port = convert_arcade_register_to_port(&arcade_register_global);
 	kr = fairplayd_arcade_request(fairplayd_port, port);
 
@@ -227,17 +227,17 @@ arcade_upcall_refresh(uint64_t deadline)
 		goto finish_in_progress;
 	}
 
-	/*
-	 * Wait on the arcade upcall port to get registered through the
-	 * registration kobject waiting with a deadline here.
-	 */
+	  
+                                                                
+                                                      
+    
 	wr = lck_mtx_sleep_deadline(&arcade_upcall_mutex, LCK_SLEEP_DEFAULT,
 	    &arcade_upcall_port, THREAD_INTERRUPTIBLE, deadline);
 
 finish_in_progress:
 	arcade_upcall_refresh_in_progress = FALSE;
 
-	/* Wakeup any waiters */
+	                        
 	if (arcade_upcall_refresh_waiters) {
 		arcade_upcall_refresh_waiters = FALSE;
 		thread_wakeup_with_result(&arcade_upcall_refresh_in_progress, wr);
@@ -271,22 +271,22 @@ arcade_ast(__unused thread_t thread)
 	kern_return_t kr;
 	int retval;
 
-	/* Determine the deadline */
+	                            
 	clock_interval_to_deadline(10, NSEC_PER_SEC, &deadline);
 
 restart:
 	lck_mtx_lock(&arcade_upcall_mutex);
 	port = ipc_port_copy_send(arcade_upcall_port);
-	/*
-	 * if the arcade_upcall_port was inactive, "port" will be IP_DEAD.
-	 * Otherwise, it holds a send right to the arcade_upcall_port.
-	 */
+	  
+                                                                   
+                                                               
+    
 
 	while (!IP_VALID(port)) {
-		/*
-		 * Refresh the arcade upcall port. If that gives up,
-		 * give up ourselves.
-		 */
+		  
+                                                      
+                       
+     
 		kr = arcade_upcall_refresh(deadline);
 		if (kr != KERN_SUCCESS) {
 			lck_mtx_unlock(&arcade_upcall_mutex);
@@ -296,9 +296,9 @@ restart:
 	}
 	lck_mtx_unlock(&arcade_upcall_mutex);
 
-	/* We have an upcall port send right */
+	                                       
 
-	/* Gather the data we need to send in the upcall */
+	                                                   
 	off_t offset;
 	struct proc *p = current_proc();
 	char *path;
@@ -322,7 +322,7 @@ restart:
 
 	offset = proc_getexecutableoffset(p);
 
-	/* MAKE THE UPCALL */
+	                     
 	boolean_t should_kill = TRUE;
 	kr = __MAKING_UPCALL_TO_ARCADE_VALIDATION_SERVICE__(port, copy, MAXPATHLEN, offset, &should_kill);
 	ipc_port_release_send(port);
@@ -335,21 +335,21 @@ restart:
 		goto restart;
 	case KERN_SUCCESS:
 		if (should_kill == TRUE) {
-			/*
-			 * Invalid subscription. UI already presented as to why it did not
-			 * launch.
-			 */
+			  
+                                                                     
+             
+      
 			task_terminate_internal(current_task());
 		}
 		break;
 	default:
 fail:
-		/*
-		 * Failure of the subscription validation mechanism, not a rejection.
-		 * for a missing subscription. There will be no indication WHY this
-		 * process didn't launch. We might want this to be an exit_with_reason()
-		 * in the future.
-		 */
+		  
+                                                                       
+                                                                     
+                                                                          
+                   
+     
 		task_terminate_internal(current_task());
 		break;
 	}

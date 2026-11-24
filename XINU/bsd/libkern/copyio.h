@@ -36,7 +36,7 @@ int     copyin(const user_addr_t uaddr, void *kaddr, size_t len) OS_WARN_RESULT;
 int     copyout(const void *kaddr, user_addr_t udaddr, size_t len);
 
 #if defined (_FORTIFY_SOURCE) && _FORTIFY_SOURCE == 0
-/* FORTIFY_SOURCE disabled */
+                             
 #else
 OS_ALWAYS_INLINE OS_WARN_RESULT static inline int
 __copyin_chk(const user_addr_t uaddr, void *kaddr, size_t len, size_t chk_size)
@@ -59,4 +59,4 @@ __copyout_chk(const void *kaddr, user_addr_t uaddr, size_t len, size_t chk_size)
 #define copyout(kaddr, uaddr, len) __copyout_chk(kaddr, uaddr, len, __builtin_object_size(kaddr, 0))
 #endif
 __END_DECLS
-#endif /* _LIBKERN_COPYIO_H_ */
+#endif                         

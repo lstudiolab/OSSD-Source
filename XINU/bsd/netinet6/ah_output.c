@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/ah_output.c,v 1.1.2.3 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: ah_output.c,v 1.30 2001/02/21 00:50:53 itojun Exp $	*/
+                                                                                    
+                                                                
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -58,9 +58,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1826/2402 authentication header.
- */
+  
+                                      
+   
 
 #define _IP_VHL
 
@@ -105,15 +105,15 @@ static struct in_addr *ah4_finaldst(struct mbuf *);
 
 extern lck_mtx_t *sadb_mutex;
 
-/*
- * compute AH header size.
- * transport mode only.  for tunnel mode, we should implement
- * virtual interface, and control MTU/MSS by the interface MTU.
- */
+  
+                          
+                                                             
+                                                               
+   
 size_t
 ah_hdrsiz(struct ipsecrequest *isr)
 {
-	/* sanity check */
+	                  
 	if (isr == NULL) {
 		panic("ah_hdrsiz: NULL was passed.\n");
 	}
@@ -128,7 +128,7 @@ ah_hdrsiz(struct ipsecrequest *isr)
 		const struct ah_algorithm *algo;
 		size_t hdrsiz;
 
-		/*%%%%% this needs to change - no sav in ipsecrequest any more */
+		                                                                 
 		if (isr->sav == NULL) {
 			goto estimate;
 		}
@@ -137,19 +137,19 @@ ah_hdrsiz(struct ipsecrequest *isr)
 			goto estimate;
 		}
 
-		/* we need transport mode AH. */
+		                                
 		algo = ah_algorithm_lookup(isr->sav->alg_auth);
 		if (!algo) {
 			goto estimate;
 		}
 
-		/*
-		 * XXX
-		 * right now we don't calcurate the padding size.  simply
-		 * treat the padding size as constant, for simplicity.
-		 *
-		 * XXX variable size padding support
-		 */
+		  
+        
+                                                           
+                                                        
+    
+                                      
+     
 		hdrsiz = (((*algo->sumsiz)(isr->sav) + 3) & ~(4 - 1));
 		if (isr->sav->flags & SADB_X_EXT_OLD) {
 			hdrsiz += sizeof(struct ah);
@@ -164,22 +164,22 @@ ah_hdrsiz(struct ipsecrequest *isr)
 estimate:
 #endif
 
-	//lck_mtx_unlock(sadb_mutex);
-	/* ASSUMING:
-	 *	sizeof(struct newah) > sizeof(struct ah).
-	 *	16 = (16 + 3) & ~(4 - 1).
-	 */
+	                             
+	            
+                                             
+                             
+    
 	return sizeof(struct newah) + 16;
 }
 
 #if INET
-/*
- * Modify the packet so that it includes the authentication data.
- * The mbuf passed must start with IPv4 header.
- *
- * assumes that the first mbuf contains IPv4 header + option only.
- * the function does not modify m.
- */
+  
+                                                                 
+                                               
+  
+                                                                  
+                                  
+   
 int
 ah4_output(struct mbuf *m, struct secasvar *sav)
 {
@@ -187,15 +187,15 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 	u_int32_t spi;
 	u_char *ahdrpos;
 	u_char *ahsumpos = NULL;
-	size_t hlen = 0;        /*IP header+option in bytes*/
-	size_t plen = 0;        /*AH payload size in bytes*/
-	size_t ahlen = 0;       /*plen + sizeof(ah)*/
+	size_t hlen = 0;                                     
+	size_t plen = 0;                                    
+	size_t ahlen = 0;                            
 	struct ip *ip;
 	struct in_addr dst = { .s_addr = 0 };
 	struct in_addr *finaldst;
 	int error;
 
-	/* sanity checks */
+	                   
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[0] == NULL) {
 		ip = mtod(m, struct ip *);
 		ipseclog((LOG_DEBUG, "ah4_output: internal error: "
@@ -218,24 +218,24 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 	}
 	spi = sav->spi;
 
-	/*
-	 * determine the size to grow.
-	 */
+	  
+                               
+    
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1826 */
-		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1); /*XXX pad to 8byte?*/
+		              
+		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1);                      
 		ahlen = plen + sizeof(struct ah);
 	} else {
-		/* RFC 2402 */
-		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1); /*XXX pad to 8byte?*/
+		              
+		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1);                      
 		ahlen = plen + sizeof(struct newah);
 	}
 
 	VERIFY(ahlen <= UINT16_MAX);
 
-	/*
-	 * grow the mbuf to accomodate AH.
-	 */
+	  
+                                   
+    
 	ip = mtod(m, struct ip *);
 #ifdef _IP_VHL
 	hlen = IP_VHL_HL(ip->ip_vhl) << 2;
@@ -267,11 +267,11 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 		ahdrpos = mtod(m->m_next, u_char *);
 	}
 
-	ip = mtod(m, struct ip *);      /*just to be sure*/
+	ip = mtod(m, struct ip *);                         
 
-	/*
-	 * initialize AH.
-	 */
+	  
+                  
+    
 	if (sav->flags & SADB_X_EXT_OLD) {
 		struct ah *ahdr;
 
@@ -289,13 +289,13 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 		VERIFY(((plen >> 2) + 1) <= UINT8_MAX);
 		ahdr = (struct newah *)(void *)ahdrpos;
 		ahsumpos = (u_char *)(ahdr + 1);
-		ahdr->ah_len = (u_int8_t)((plen >> 2) + 1); /* plus one for seq# */
+		ahdr->ah_len = (u_int8_t)((plen >> 2) + 1);                        
 		ahdr->ah_nxt = ip->ip_p;
 		ahdr->ah_reserve = htons(0);
 		ahdr->ah_spi = spi;
 		if (sav->replay[0]->count == ~0) {
 			if ((sav->flags & SADB_X_EXT_CYCSEQ) == 0) {
-				/* XXX Is it noisy ? */
+				                       
 				ipseclog((LOG_WARNING,
 				    "replay counter overflowed. %s\n",
 				    ipsec_logsastr(sav)));
@@ -307,17 +307,17 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 		lck_mtx_lock(sadb_mutex);
 		sav->replay[0]->count++;
 		lck_mtx_unlock(sadb_mutex);
-		/*
-		 * XXX sequence number must not be cycled, if the SA is
-		 * installed by IKE daemon.
-		 */
+		  
+                                                         
+                             
+     
 		ahdr->ah_seq = htonl(sav->replay[0]->count);
 		bzero(ahdr + 1, plen);
 	}
 
-	/*
-	 * modify IPv4 header.
-	 */
+	  
+                       
+    
 	ip->ip_p = IPPROTO_AH;
 	if (ahlen < (IP_MAXPACKET - ntohs(ip->ip_len))) {
 		ip->ip_len = htons(ntohs(ip->ip_len) + (u_int16_t)ahlen);
@@ -328,23 +328,23 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 		return EMSGSIZE;
 	}
 
-	/*
-	 * If there is source routing option, update destination field in
-	 * the IPv4 header to the final destination.
-	 * Note that we do not need to update source routing option itself
-	 * (as done in IPv4 AH processing -- see ip6_output()), since
-	 * source routing option is not part of the ICV computation.
-	 */
+	  
+                                                                  
+                                             
+                                                                   
+                                                              
+                                                             
+    
 	finaldst = ah4_finaldst(m);
 	if (finaldst) {
 		dst.s_addr = ip->ip_dst.s_addr;
 		ip->ip_dst.s_addr = finaldst->s_addr;
 	}
 
-	/*
-	 * calcurate the checksum, based on security association
-	 * and the algorithm specified.
-	 */
+	  
+                                                         
+                                
+    
 	error = ah4_calccksum(m, (caddr_t)ahsumpos, plen, algo, sav);
 	if (error) {
 		ipseclog((LOG_ERR,
@@ -356,7 +356,7 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 	}
 
 	if (finaldst) {
-		ip = mtod(m, struct ip *);      /*just to make sure*/
+		ip = mtod(m, struct ip *);                           
 		ip->ip_dst.s_addr = dst.s_addr;
 	}
 	lck_mtx_lock(sadb_stat_mutex);
@@ -369,7 +369,7 @@ ah4_output(struct mbuf *m, struct secasvar *sav)
 }
 #endif
 
-/* Calculate AH length */
+                         
 size_t
 ah_hdrlen(struct secasvar *sav)
 {
@@ -381,21 +381,21 @@ ah_hdrlen(struct secasvar *sav)
 		return 0;
 	}
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1826 */
-		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1);   /*XXX pad to 8byte?*/
+		              
+		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1);                        
 		ahlen = plen + sizeof(struct ah);
 	} else {
-		/* RFC 2402 */
-		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1);   /*XXX pad to 8byte?*/
+		              
+		plen = ((*algo->sumsiz)(sav) + 3) & ~(4 - 1);                        
 		ahlen = plen + sizeof(struct newah);
 	}
 
 	return ahlen;
 }
 
-/*
- * Fill in the Authentication Header and calculate checksum.
- */
+  
+                                                            
+   
 int
 ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
     struct secasvar *sav)
@@ -405,7 +405,7 @@ ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
 	const struct ah_algorithm *algo;
 	u_int32_t spi;
 	u_char *ahsumpos = NULL;
-	size_t plen;    /*AH payload size in bytes*/
+	size_t plen;                                
 	int error = 0;
 	size_t ahlen;
 	struct ip6_hdr *ip6;
@@ -450,7 +450,7 @@ ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
 	mprev->m_next = mah;
 	m->m_pkthdr.len += ahlen;
 
-	/* fix plen */
+	              
 	if (m->m_pkthdr.len - sizeof(struct ip6_hdr) > IPV6_MAXPACKET) {
 		ipseclog((LOG_ERR,
 		    "ip6_output: AH with IPv6 jumbogram is not supported\n"));
@@ -480,9 +480,9 @@ ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
 	}
 	spi = sav->spi;
 
-	/*
-	 * initialize AH.
-	 */
+	  
+                  
+    
 	if (sav->flags & SADB_X_EXT_OLD) {
 		struct ah *ahdr = mtod(mah, struct ah *);
 
@@ -503,12 +503,12 @@ ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
 		ahsumpos = (u_char *)(ahdr + 1);
 		ahdr->ah_nxt = *nexthdrp;
 		*nexthdrp = IPPROTO_AH;
-		ahdr->ah_len = (u_int8_t)((plen >> 2) + 1); /* plus one for seq# */
+		ahdr->ah_len = (u_int8_t)((plen >> 2) + 1);                        
 		ahdr->ah_reserve = htons(0);
 		ahdr->ah_spi = spi;
 		if (sav->replay[0]->count == ~0) {
 			if ((sav->flags & SADB_X_EXT_CYCSEQ) == 0) {
-				/* XXX Is it noisy ? */
+				                       
 				ipseclog((LOG_WARNING,
 				    "replay counter overflowed. %s\n",
 				    ipsec_logsastr(sav)));
@@ -520,18 +520,18 @@ ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
 		lck_mtx_lock(sadb_mutex);
 		sav->replay[0]->count++;
 		lck_mtx_unlock(sadb_mutex);
-		/*
-		 * XXX sequence number must not be cycled, if the SA is
-		 * installed by IKE daemon.
-		 */
+		  
+                                                         
+                             
+     
 		ahdr->ah_seq = htonl(sav->replay[0]->count);
 		bzero(ahdr + 1, plen);
 	}
 
-	/*
-	 * calcurate the checksum, based on security association
-	 * and the algorithm specified.
-	 */
+	  
+                                                         
+                                
+    
 	error = ah6_calccksum(m, (caddr_t)ahsumpos, plen, algo, sav);
 	if (error) {
 		IPSEC_STAT_INCREMENT(ipsec6stat.out_inval);
@@ -545,14 +545,14 @@ ah6_output(struct mbuf *m, u_char *nexthdrp, struct mbuf *md,
 	return error;
 }
 
-/*
- * Find the final destination if there is loose/strict source routing option.
- * Returns NULL if there's no source routing options.
- * Returns NULL on errors too.
- * Note that this function will return a pointer INTO the given parameter,
- * struct mbuf *m.
- * The mbuf must be pulled up toward, at least, ip option part.
- */
+  
+                                                                             
+                                                     
+                              
+                                                                          
+                  
+                                                               
+   
 static struct in_addr *
 ah4_finaldst(struct mbuf *m)
 {
@@ -605,7 +605,7 @@ ah4_finaldst(struct mbuf *m)
 
 		switch (q[i + IPOPT_OPTVAL]) {
 		case IPOPT_EOL:
-			i = optlen;     /* bye */
+			i = optlen;              
 			break;
 		case IPOPT_NOP:
 			i++;

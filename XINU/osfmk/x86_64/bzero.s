@@ -53,57 +53,57 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #include <i386/asm.h>
 
-/*
- * void *secure_memset(void * addr, int pattern, size_t length)
- *
- * It is important that this function remains defined in assembly to avoid
- * compiler optimizations.
- */
+  
+                                                               
+  
+                                                                          
+                          
+   
 ENTRY(secure_memset)
-/*
- * void *memset(void * addr, int pattern, size_t length)
- */
-/* TODO: add variants for use with non-cacheable ranges */
+  
+                                                        
+   
+                                                          
 ENTRY(memset)
 	movq	%rdi, %r8
-	movq	%rsi, %rax		/* move pattern (arg2) to rax */
-	movq	%rdx, %rcx		/* mov bytes */
-	cld				/* reset direction flag */
+	movq	%rsi, %rax		                                
+	movq	%rdx, %rcx		               
+	cld				                          
 	rep
 	stosb
-	movq	%r8 ,%rax		/* returns its first argument */
+	movq	%r8 ,%rax		                                
 	ret
 
-/*
- * void *memset_word(void * addr, int pattern, size_t length)
- */
+  
+                                                             
+   
 
 ENTRY(memset_word)
 	movq	%rdi, %r8
-	movq	%rsi, %rax		/* move pattern (arg2) to rax */
+	movq	%rsi, %rax		                                
 	mov	%eax, %ecx
 	shlq	$32,%rax
 	orq	%rcx, %rax 
-	cld				/* reset direction flag */
-	movq 	%rdx, %rcx		/* mov quads first */
+	cld				                          
+	movq 	%rdx, %rcx		                     
 	shrq	$1, %rcx
 	rep
 	stosq
-	movq	%rdx,%rcx		/* if necessary, mov 32 bit word */
+	movq	%rdx,%rcx		                                   
 	andq	$1,%rcx
 	rep
 	stosl
-	movq	%r8 ,%rax		/* returns its first argument */
+	movq	%r8 ,%rax		                                
 	ret
 
-/*
- * void bzero(char * addr, size_t length)
- */
+  
+                                         
+   
 Entry(blkclr)
 ENTRY2(bzero,__bzero)
 	movq	%rsi,%rcx

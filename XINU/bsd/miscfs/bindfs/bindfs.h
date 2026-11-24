@@ -78,7 +78,7 @@
 #include <System/libkern/tree.h>
 #endif
 
-//#define BINDFS_DEBUG 0
+                        
 
 #define BINDM_CACHE 0x0001
 #define BINDM_CASEINSENSITIVE 0x0000000000000002
@@ -86,11 +86,11 @@
 typedef int (*vop_t)(void *);
 
 struct bind_mount {
-	struct vnode * bindm_rootvp;       /* Reference to root bind_node (inode 1) */
-	struct vnode * bindm_lowerrootvp;  /* reference to the root of the tree we are
-	                                    * relocating (in the other file system) */
-	uint32_t bindm_lowerrootvid;       /* store the lower root vid so we can check
-	                                    * before we build the shadow vnode lazily */
+	struct vnode * bindm_rootvp;                                                  
+	struct vnode * bindm_lowerrootvp;                                             
+                                                                               
+	uint32_t bindm_lowerrootvid;                                                  
+                                                                                 
 	uint64_t bindm_flags;
 };
 
@@ -98,15 +98,15 @@ struct bind_mount {
 
 #define BIND_FLAG_HASHED 0x000000001
 
-/*
- * A cache of vnode references
- */
+  
+                              
+   
 struct bind_node {
-	LIST_ENTRY(bind_node) bind_hash; /* Hash list */
-	struct vnode * bind_lowervp;     /* VREFed once */
-	struct vnode * bind_vnode;       /* Back pointer */
-	uint32_t bind_lowervid;          /* vid for lowervp to detect lowervp getting recycled out
-	                                  *  from under us */
+	LIST_ENTRY(bind_node) bind_hash;                
+	struct vnode * bind_lowervp;                      
+	struct vnode * bind_vnode;                         
+	uint32_t bind_lowervid;                                                                   
+                                                      
 	uint32_t bind_myvid;
 	uint32_t bind_flags;
 };
@@ -114,7 +114,7 @@ struct bind_node {
 struct vnodeop_desc_fake {
 	int vdesc_offset;
 	const char * vdesc_name;
-	/* other stuff */
+	                 
 };
 
 #define BINDV_NOUNLOCK 0x0001
@@ -151,10 +151,10 @@ __END_DECLS
 #define BINDFSDEBUG(format, args...) printf("DEBUG: BindFS %s: " format, __FUNCTION__, ##args)
 #else
 #define BINDFSDEBUG(format, args...)
-#endif /* BINDFS_DEBUG */
+#endif                   
 
 #define BINDFSERROR(format, args...) printf("ERROR: BindFS %s: " format, __FUNCTION__, ##args)
 
-#endif /* KERNEL */
+#endif             
 
 #endif

@@ -65,9 +65,9 @@
  *
  *	@(#)kern_clock.c	8.5 (Berkeley) 1/21/94
  */
-/*
- * HISTORY
- */
+  
+          
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -89,39 +89,39 @@
 void bsd_uprofil(struct time_value *syst, user_addr_t pc);
 int tvtohz(struct timeval *tv);
 
-/*
- * Clock handling routines.
- *
- * This code is written to operate with two timers which run
- * independently of each other. The main clock, running at hz
- * times per second, is used to do scheduling and timeout calculations.
- * The second timer does resource utilization estimation statistically
- * based on the state of the machine phz times a second. Both functions
- * can be performed by a single clock (ie hz == phz), however the
- * statistics will be much more prone to errors. Ideally a machine
- * would have separate clocks measuring time spent in user state, system
- * state, interrupt state, and idle state. These clocks would allow a non-
- * approximate measure of resource utilization.
- */
+  
+                           
+  
+                                                            
+                                                             
+                                                                       
+                                                                      
+                                                                       
+                                                                 
+                                                                  
+                                                                        
+                                                                          
+                                               
+   
 
-/*
- * The hz hardware interval timer.
- */
+  
+                                  
+   
 
-int             hz = 100;                /* GET RID OF THIS !!! */
-int             tick = (1000000 / 100);  /* GET RID OF THIS !!! */
+int             hz = 100;                                         
+int             tick = (1000000 / 100);                           
 
-/*
- * Kernel timeout services.
- */
+  
+                           
+   
 
-/*
- *	Set a timeout.
- *
- *	fcn:		function to call
- *	param:		parameter to pass to function
- *	interval:	timeout interval, in hz.
- */
+  
+                 
+  
+                         
+                                        
+                                     
+   
 void
 timeout(
 	timeout_fcn_t                   fcn,
@@ -134,14 +134,14 @@ timeout(
 	thread_call_func_delayed((thread_call_func_t)fcn, param, deadline);
 }
 
-/*
- *	Set a timeout with leeway.
- *
- *	fcn:		function to call
- *	param:		parameter to pass to function
- *	interval:	timeout interval, in hz.
- *	leeway_interval:	leeway interval, in hz.
- */
+  
+                             
+  
+                         
+                                        
+                                     
+                                           
+   
 void
 timeout_with_leeway(
 	timeout_fcn_t                   fcn,
@@ -159,11 +159,11 @@ timeout_with_leeway(
 	thread_call_func_delayed_with_leeway((thread_call_func_t)fcn, param, deadline, leeway, THREAD_CALL_DELAY_LEEWAY);
 }
 
-/*
- * Cancel a timeout.
- * Deprecated because it's very inefficient.
- * Switch to an allocated thread call instead.
- */
+  
+                    
+                                            
+                                              
+   
 void
 untimeout(
 	timeout_fcn_t           fcn,
@@ -173,13 +173,13 @@ untimeout(
 }
 
 
-/*
- *	Set a timeout.
- *
- *	fcn:		function to call
- *	param:		parameter to pass to function
- *	ts:		timeout interval, in timespec
- */
+  
+                 
+  
+                         
+                                        
+                                     
+   
 void
 bsd_timeout(
 	timeout_fcn_t                   fcn,
@@ -195,11 +195,11 @@ bsd_timeout(
 	thread_call_func_delayed((thread_call_func_t)fcn, param, deadline);
 }
 
-/*
- * Cancel a timeout.
- * Deprecated because it's very inefficient.
- * Switch to an allocated thread call instead.
- */
+  
+                    
+                                            
+                                              
+   
 void
 bsd_untimeout(
 	timeout_fcn_t           fcn,
@@ -209,11 +209,11 @@ bsd_untimeout(
 }
 
 
-/*
- * Compute number of hz until specified time.
- * Used to compute third argument to timeout() from an
- * absolute time.
- */
+  
+                                             
+                                                      
+                 
+   
 int
 hzto(struct timeval *tv)
 {
@@ -222,15 +222,15 @@ hzto(struct timeval *tv)
 	long sec;
 
 	microtime(&now);
-	/*
-	 * If number of milliseconds will fit in 32 bit arithmetic,
-	 * then compute number of milliseconds to time and scale to
-	 * ticks.  Otherwise just compute number of hz in time, rounding
-	 * times greater than representible to maximum value.
-	 *
-	 * Delta times less than 25 days can be computed ``exactly''.
-	 * Maximum value for any timeout in 10ms ticks is 250 days.
-	 */
+	  
+                                                            
+                                                            
+                                                                 
+                                                      
+   
+                                                              
+                                                            
+    
 	sec = tv->tv_sec - now.tv_sec;
 	if (sec <= 0x7fffffff / 1000 - 1000) {
 		ticks = ((tv->tv_sec - now.tv_sec) * 1000 +
@@ -245,9 +245,9 @@ hzto(struct timeval *tv)
 	return (int)ticks;
 }
 
-/*
- * Return information about system clocks.
- */
+  
+                                          
+   
 static int
 sysctl_clockrate
 (__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, __unused struct sysctl_req *req)
@@ -268,35 +268,35 @@ SYSCTL_PROC(_kern, KERN_CLOCKRATE, clockrate,
     0, 0, sysctl_clockrate, "S,clockinfo", "");
 
 
-/*
- * Compute number of ticks in the specified amount of time.
- */
+  
+                                                           
+   
 int
 tvtohz(struct timeval *tv)
 {
 	unsigned long ticks;
 	long sec, usec;
 
-	/*
-	 * If the number of usecs in the whole seconds part of the time
-	 * difference fits in a long, then the total number of usecs will
-	 * fit in an unsigned long.  Compute the total and convert it to
-	 * ticks, rounding up and adding 1 to allow for the current tick
-	 * to expire.  Rounding also depends on unsigned long arithmetic
-	 * to avoid overflow.
-	 *
-	 * Otherwise, if the number of ticks in the whole seconds part of
-	 * the time difference fits in a long, then convert the parts to
-	 * ticks separately and add, using similar rounding methods and
-	 * overflow avoidance.  This method would work in the previous
-	 * case but it is slightly slower and assumes that hz is integral.
-	 *
-	 * Otherwise, round the time difference down to the maximum
-	 * representable value.
-	 *
-	 * If ints have 32 bits, then the maximum value for any timeout in
-	 * 10ms ticks is 248 days.
-	 */
+	  
+                                                                
+                                                                  
+                                                                 
+                                                                 
+                                                                 
+                      
+   
+                                                                  
+                                                                 
+                                                                
+                                                               
+                                                                   
+   
+                                                            
+                        
+   
+                                                                   
+                           
+    
 	sec = tv->tv_sec;
 	usec = tv->tv_usec;
 	if (usec < 0) {
@@ -328,7 +328,7 @@ tvtohz(struct timeval *tv)
 	return (int)ticks;
 }
 
-/* TBD locking user profiling is not resolved yet */
+                                                    
 void
 get_procrustime(time_value_t *tv)
 {
@@ -342,9 +342,9 @@ get_procrustime(time_value_t *tv)
 		return;
 	}
 
-	//proc_lock(p);
+	               
 	st = p->p_stats->p_ru.ru_stime;
-	//proc_unlock(p);
+	                 
 
 	tv->seconds = (integer_t)st.tv_sec;
 	tv->microseconds = st.tv_usec;

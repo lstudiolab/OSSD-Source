@@ -37,12 +37,12 @@ __BEGIN_DECLS
 
 void random_cpu_init(int cpu);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 void register_and_init_prng(struct cckprng_ctx *ctx, const struct cckprng_funcs *funcs);
 
 #include <kern/simple_lock.h>
-/* Definitions for boolean PRNG */
+                                  
 #define RANDOM_BOOL_GEN_SEED_COUNT 4
 struct bool_gen {
 	unsigned int seed[RANDOM_BOOL_GEN_SEED_COUNT];
@@ -58,4 +58,4 @@ extern unsigned int random_bool_gen_bits(struct bool_gen * bg, unsigned int * bu
 
 __END_DECLS
 
-#endif /* _PRNG_RANDOM_H_ */
+#endif                      

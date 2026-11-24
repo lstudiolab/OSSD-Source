@@ -31,4 +31,4 @@ __BEGIN_DECLS
 int pe_shmcon_set_child(uint64_t paddr, uint32_t entry);
 __END_DECLS
 
-#endif /* _PEXPERT_ARM_PROTOS_H */
+#endif                            

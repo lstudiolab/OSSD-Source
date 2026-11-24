@@ -77,7 +77,7 @@ dump_pqueue(struct priority_queue_sched_max *pq)
 
 T_DECL(priority_queue_sched_max, "Basic sched priority queue testing")
 {
-	/* Configuration for the test */
+	                                
 	static uint16_t priority_list[] = { 20, 3, 7, 6, 50, 2, 8, 12};
 
 	struct priority_queue_sched_max pq;
@@ -89,7 +89,7 @@ T_DECL(priority_queue_sched_max, "Basic sched priority queue testing")
 
 	priority_queue_init(&pq);
 
-	/* Add all priorities to the first priority queue */
+	                                                    
 	for (int i = 0; i < PRIORITY_QUEUE_NODES; i++) {
 		node = new test_node;
 		T_QUIET; T_ASSERT_NOTNULL(node, NULL);
@@ -99,31 +99,31 @@ T_DECL(priority_queue_sched_max, "Basic sched priority queue testing")
 		priority_queue_insert(&pq, &node->ke);
 	}
 
-	/* Test the priority increase operation by updating the last node added (7) */
+	                                                                              
 	priority_queue_entry_set_sched_pri(&pq, &node->ke, increase_pri, 0);
 	update_result = priority_queue_entry_increased(&pq, &node->ke);
 	T_ASSERT_TRUE(update_result, "increase key updated root");
 	key = priority_queue_max_sched_pri(&pq);
 	T_ASSERT_EQ(key, increase_pri, "verify priority_queue_entry_increased() operation");
 
-	/* Test the priority decrease operation by updating the last node added */
+	                                                                          
 	priority_queue_entry_set_sched_pri(&pq, &node->ke, decrease_pri, 0);
 	update_result = priority_queue_entry_decreased(&pq, &node->ke);
 	T_ASSERT_TRUE(update_result, "decrease key updated root");
 	key = priority_queue_max_sched_pri(&pq);
 	T_ASSERT_EQ(key, decrease_pri, "verify priority_queue_entry_decreased() operation");
 
-	/* Update our local priority list as well */
+	                                            
 	priority_list[PRIORITY_QUEUE_NODES - 1] = decrease_pri;
 
-	/* Sort the local list in descending order */
+	                                             
 	qsort(priority_list, PRIORITY_QUEUE_NODES, sizeof(priority_list[0]), compare_numbers_descending);
 
 	priority_queue_entry_sched_t k = NULL;
 
 	node = pqe_element_fast(k, test_node, ke);
 
-	/* Test the maximum operation by comparing max node with local list */
+	                                                                      
 	for (int i = 0; i < PRIORITY_QUEUE_NODES; i++) {
 		key = priority_queue_max_sched_pri(&pq);
 		T_ASSERT_EQ(key, priority_list[i], "[%d] priority queue max node removal", i);
@@ -139,7 +139,7 @@ T_DECL(priority_queue_sched_max, "Basic sched priority queue testing")
 
 T_DECL(priority_queue_max, "Basic generic priority queue testing")
 {
-	/* Configuration for the test */
+	                                
 	static uint16_t priority_list[] = { 20, 3, 7, 6, 50, 2, 8, 12};
 
 	struct priority_queue_max pq;
@@ -159,7 +159,7 @@ T_DECL(priority_queue_max, "Basic generic priority queue testing")
 
 	priority_queue_init(&pq, cmp_fn);
 
-	/* Add all priorities to the first priority queue */
+	                                                    
 	for (int i = 0; i < PRIORITY_QUEUE_NODES; i++) {
 		node = new test_node;
 		T_QUIET; T_ASSERT_NOTNULL(node, NULL);
@@ -169,7 +169,7 @@ T_DECL(priority_queue_max, "Basic generic priority queue testing")
 		priority_queue_insert(&pq, &node->e);
 	}
 
-	/* Test the priority increase operation by updating the last node added (8) */
+	                                                                              
 	node->node_key = increase_pri;
 	update_result = priority_queue_entry_increased(&pq, &node->e);
 	T_ASSERT_TRUE(update_result, "increase key updated root");
@@ -177,20 +177,20 @@ T_DECL(priority_queue_max, "Basic generic priority queue testing")
 	T_ASSERT_EQ(result->node_key, increase_pri, "verify priority_queue_entry_increased() operation");
 
 
-	/* Test the priority decrease operation by updating the last node added */
+	                                                                          
 	node->node_key = decrease_pri;
 	update_result = priority_queue_entry_decreased(&pq, &node->e);
 	T_ASSERT_TRUE(update_result, "decrease key updated root");
 	result = priority_queue_max(&pq, union test_node, e);
 	T_ASSERT_EQ(result->node_key, decrease_pri, "verify priority_queue_entry_decreased() operation");
 
-	/* Update our local priority list as well */
+	                                            
 	priority_list[PRIORITY_QUEUE_NODES - 1] = decrease_pri;
 
-	/* Sort the local list in descending order */
+	                                             
 	qsort(priority_list, PRIORITY_QUEUE_NODES, sizeof(priority_list[0]), compare_numbers_descending);
 
-	/* Test the maximum operation by comparing max node with local list */
+	                                                                      
 	for (int i = 0; i < PRIORITY_QUEUE_NODES; i++) {
 		result = priority_queue_remove_max(&pq, union test_node, e);
 		T_ASSERT_EQ(result->node_key, priority_list[i],
@@ -206,7 +206,7 @@ T_DECL(priority_queue_max, "Basic generic priority queue testing")
 
 T_DECL(priority_queue_sched_stable_max, "Basic stable sched priority queue testing")
 {
-	/* Configuration for the test */
+	                                
 	static struct config {
 		uint16_t pri;
 		priority_queue_entry_sched_modifier_t modifier;
@@ -227,7 +227,7 @@ T_DECL(priority_queue_sched_stable_max, "Basic stable sched priority queue testi
 
 	priority_queue_init(&pq);
 
-	/* Add all priorities to the first priority queue */
+	                                                    
 	for (int i = 0; i < PRIORITY_QUEUE_NODES; i++) {
 		node = new test_node;
 		T_QUIET; T_ASSERT_NOTNULL(node, NULL);
@@ -239,7 +239,7 @@ T_DECL(priority_queue_sched_stable_max, "Basic stable sched priority queue testi
 		priority_queue_insert(&pq, &node->se);
 	}
 
-	/* Sort the local list in descending order */
+	                                             
 	qsort_b(config, PRIORITY_QUEUE_NODES, sizeof(struct config), ^(const void *a, const void *b){
 		const struct config &c1 = *(const struct config *)a;
 		const struct config &c2 = *(const struct config *)b;
@@ -251,17 +251,17 @@ T_DECL(priority_queue_sched_stable_max, "Basic stable sched priority queue testi
 		}
 		if (c1.stamp != c2.stamp) {
 		        if (c1.modifier) {
-		                /* younger is better */
+		                                       
 		                return c1.stamp < c1.stamp ? 1 : -1;
 			} else {
-		                /* older is better */
+		                                     
 		                return c1.stamp > c2.stamp ? 1 : -1;
 			}
 		}
 		return 0;
 	});
 
-	/* Test the maximum operation by comparing max node with local list */
+	                                                                      
 	for (int i = 0; i < PRIORITY_QUEUE_NODES; i++) {
 		node = priority_queue_max(&pq, union test_node, se);
 		T_LOG("[%d]: { pri: %2d, modifier: %d, stamp: %lld }\n",

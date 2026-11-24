@@ -61,7 +61,7 @@
 extern int net_qos_policy_restricted;
 extern int net_qos_policy_restrict_avapps;
 
-/* Kernel Control functions */
+                              
 static errno_t  ipsec_ctl_setup(u_int32_t *unit, void **unitinfo);
 static errno_t  ipsec_ctl_bind(kern_ctl_ref kctlref, struct sockaddr_ctl *sac,
     void **unitinfo);
@@ -76,7 +76,7 @@ static errno_t  ipsec_ctl_getopt(kern_ctl_ref kctlref, u_int32_t unit, void *uni
 static errno_t  ipsec_ctl_setopt(kern_ctl_ref kctlref, u_int32_t unit, void *unitinfo,
     int opt, void *data, size_t len);
 
-/* Network Interface functions */
+                                 
 static void     ipsec_start(ifnet_t     interface);
 static errno_t  ipsec_output(ifnet_t interface, mbuf_t data);
 static errno_t  ipsec_demux(ifnet_t interface, mbuf_t data, char *frame_header,
@@ -88,7 +88,7 @@ static errno_t  ipsec_del_proto(ifnet_t interface, protocol_family_t protocol);
 static errno_t  ipsec_ioctl(ifnet_t interface, u_long cmd, void *data);
 static void             ipsec_detached(ifnet_t interface);
 
-/* Protocol handlers */
+                       
 static errno_t  ipsec_attach_proto(ifnet_t interface, protocol_family_t proto);
 static errno_t  ipsec_proto_input(ifnet_t interface, protocol_family_t protocol,
     mbuf_t m, char *frame_header);
@@ -170,18 +170,18 @@ static nexus_controller_t ipsec_ncd;
 static int ipsec_ncd_refcount;
 static uuid_t ipsec_kpipe_uuid;
 
-#endif // IPSEC_NEXUS
+#endif               
 
-/* Control block allocated for each kernel control connection */
+                                                                
 struct ipsec_pcb {
 	TAILQ_ENTRY(ipsec_pcb)  ipsec_chain;
 	kern_ctl_ref            ipsec_ctlref;
 	ifnet_t                 ipsec_ifp;
 	u_int32_t               ipsec_unit;
 	u_int32_t               ipsec_unique_id;
-	// These external flags can be set with IPSEC_OPT_FLAGS
+	                                                       
 	u_int32_t               ipsec_external_flags;
-	// These internal flags are only used within this driver
+	                                                        
 	u_int32_t               ipsec_internal_flags;
 	u_int32_t               ipsec_input_frag_size;
 	bool                    ipsec_frag_size_set;
@@ -189,13 +189,13 @@ struct ipsec_pcb {
 	mbuf_svc_class_t        ipsec_output_service_class;
 	char                    ipsec_if_xname[IFXNAMSIZ];
 	char                    ipsec_unique_name[IFXNAMSIZ];
-	// PCB lock protects state fields, like ipsec_kpipe_count
+	                                                         
 	decl_lck_rw_data(, ipsec_pcb_lock);
-	// lock to protect ipsec_pcb_data_move & ipsec_pcb_drainers
+	                                                           
 	decl_lck_mtx_data(, ipsec_pcb_data_move_lock);
-	u_int32_t               ipsec_pcb_data_move; /* number of data moving contexts */
-	u_int32_t               ipsec_pcb_drainers; /* number of threads waiting to drain */
-	u_int32_t               ipsec_pcb_data_path_state; /* internal state of interface data path */
+	u_int32_t               ipsec_pcb_data_move;                                     
+	u_int32_t               ipsec_pcb_drainers;                                         
+	u_int32_t               ipsec_pcb_data_path_state;                                            
 
 #if IPSEC_NEXUS
 	lck_mtx_t               ipsec_input_chain_lock;
@@ -204,8 +204,8 @@ struct ipsec_pcb {
 	struct mbuf *           ipsec_input_chain;
 	struct mbuf *           ipsec_input_chain_last;
 	u_int32_t               ipsec_input_chain_count;
-	// Input chain lock protects the list of input mbufs
-	// The input chain lock must be taken AFTER the PCB lock if both are held
+	                                                    
+	                                                                         
 	struct ipsec_nx         ipsec_nx;
 	u_int32_t               ipsec_kpipe_count;
 	pid_t                   ipsec_kpipe_pid;
@@ -228,25 +228,25 @@ struct ipsec_pcb {
 	u_int32_t               ipsec_rx_fsw_ring_size;
 	bool                    ipsec_use_netif;
 	bool                    ipsec_needs_netagent;
-#endif // IPSEC_NEXUS
+#endif               
 };
 
-/* These are internal flags not exposed outside this file */
+                                                            
 #define IPSEC_FLAGS_KPIPE_ALLOCATED 1
 
-/* data movement refcounting functions */
+                                         
 static void ipsec_wait_data_move_drain(struct ipsec_pcb *pcb);
 
-/* Data path states */
+                      
 #define IPSEC_PCB_DATA_PATH_READY    0x1
 
-/* Macros to set/clear/test data path states */
+                                               
 #define IPSEC_SET_DATA_PATH_READY(_pcb) ((_pcb)->ipsec_pcb_data_path_state |= IPSEC_PCB_DATA_PATH_READY)
 #define IPSEC_CLR_DATA_PATH_READY(_pcb) ((_pcb)->ipsec_pcb_data_path_state &= ~IPSEC_PCB_DATA_PATH_READY)
 #define IPSEC_IS_DATA_PATH_READY(_pcb) (((_pcb)->ipsec_pcb_data_path_state & IPSEC_PCB_DATA_PATH_READY) != 0)
 
 #if IPSEC_NEXUS
-/* Macros to clear/set/test flags. */
+                                     
 static inline void
 ipsec_flag_set(struct ipsec_pcb *pcb, uint32_t flag)
 {
@@ -263,7 +263,7 @@ ipsec_flag_isset(struct ipsec_pcb *pcb, uint32_t flag)
 {
 	return !!(pcb->ipsec_internal_flags & flag);
 }
-#endif // IPSEC_NEXUS
+#endif               
 
 TAILQ_HEAD(ipsec_list, ipsec_pcb) ipsec_head;
 
@@ -343,7 +343,7 @@ ipsec_in_wmm_mode(struct ipsec_pcb *pcb)
 	return pcb->ipsec_kpipe_count == IPSEC_IF_WMM_RING_COUNT;
 }
 
-#endif // IPSEC_NEXUS
+#endif               
 
 errno_t
 ipsec_register_control(void)
@@ -353,14 +353,14 @@ ipsec_register_control(void)
 
 #if IPSEC_NEXUS
 	ipsec_register_nexus();
-#endif // IPSEC_NEXUS
+#endif               
 
 	TAILQ_INIT(&ipsec_head);
 
 	bzero(&kern_ctl, sizeof(kern_ctl));
 	strlcpy(kern_ctl.ctl_name, IPSEC_CONTROL_NAME, sizeof(kern_ctl.ctl_name));
 	kern_ctl.ctl_name[sizeof(kern_ctl.ctl_name) - 1] = 0;
-	kern_ctl.ctl_flags = CTL_FLAG_PRIVILEGED | CTL_FLAG_REG_SETUP; /* Require root */
+	kern_ctl.ctl_flags = CTL_FLAG_PRIVILEGED | CTL_FLAG_REG_SETUP;                   
 	kern_ctl.ctl_sendsize = 64 * 1024;
 	kern_ctl.ctl_recvsize = 64 * 1024;
 	kern_ctl.ctl_setup = ipsec_ctl_setup;
@@ -377,7 +377,7 @@ ipsec_register_control(void)
 		return result;
 	}
 
-	/* Register the protocol plumbers */
+	                                    
 	if ((result = proto_register_plumber(PF_INET, IFNET_FAMILY_IPSEC,
 	    ipsec_attach_proto, NULL)) != 0) {
 		os_log_error(OS_LOG_DEFAULT, "ipsec_register_control - proto_register_plumber(PF_INET, IFNET_FAMILY_IPSEC) failed: %d\n",
@@ -386,7 +386,7 @@ ipsec_register_control(void)
 		return result;
 	}
 
-	/* Register the protocol plumbers */
+	                                    
 	if ((result = proto_register_plumber(PF_INET6, IFNET_FAMILY_IPSEC,
 	    ipsec_attach_proto, NULL)) != 0) {
 		proto_unregister_plumber(PF_INET, IFNET_FAMILY_IPSEC);
@@ -404,7 +404,7 @@ ipsec_register_control(void)
 	return 0;
 }
 
-/* Helpers */
+             
 int
 ipsec_interface_isvalid(ifnet_t interface)
 {
@@ -420,7 +420,7 @@ ipsec_interface_isvalid(ifnet_t interface)
 		return 0;
 	}
 
-	/* When ctl disconnects, ipsec_unit is set to 0 */
+	                                                  
 	if (pcb->ipsec_unit == 0) {
 		return 0;
 	}
@@ -446,26 +446,26 @@ ipsec_interface_needs_netagent(ifnet_t interface)
 
 	return pcb->ipsec_needs_netagent == true;
 }
-#endif // IPSEC_NEXUS
+#endif               
 
 static errno_t
 ipsec_ifnet_set_attrs(ifnet_t ifp)
 {
-	/* Set flags and additional information. */
+	                                           
 	ifnet_set_mtu(ifp, 1500);
 	ifnet_set_flags(ifp, IFF_UP | IFF_MULTICAST | IFF_POINTOPOINT, 0xffff);
 
-	/* The interface must generate its own IPv6 LinkLocal address,
-	 * if possible following the recommendation of RFC2472 to the 64bit interface ID
-	 */
+	                                                              
+                                                                                 
+    
 	ifnet_set_eflags(ifp, IFEF_NOAUTOIPV6LL, IFEF_NOAUTOIPV6LL);
 
 #if !IPSEC_NEXUS
-	/* Reset the stats in case as the interface may have been recycled */
+	                                                                     
 	struct ifnet_stats_param stats;
 	bzero(&stats, sizeof(struct ifnet_stats_param));
 	ifnet_set_stat(ifp, &stats);
-#endif // !IPSEC_NEXUS
+#endif                
 
 	return 0;
 }
@@ -483,7 +483,7 @@ ipsec_nxdp_init(__unused kern_nexus_domain_provider_t domprov)
 static void
 ipsec_nxdp_fini(__unused kern_nexus_domain_provider_t domprov)
 {
-	// Ignore
+	         
 }
 
 static errno_t
@@ -497,7 +497,7 @@ ipsec_register_nexus(void)
 	};
 	errno_t err = 0;
 
-	/* ipsec_nxdp_init() is called before this function returns */
+	                                                              
 	err = kern_nexus_register_domain_provider(NEXUS_TYPE_NET_IF,
 	    (const uint8_t *) "com.apple.ipsec",
 	    &dp_init, sizeof(dp_init),
@@ -534,7 +534,7 @@ ipsec_nexus_connected(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 #pragma unused(nxprov, channel)
 	struct ipsec_pcb *pcb = kern_nexus_get_context(nexus);
 	boolean_t ok = ifnet_is_attached(pcb->ipsec_ifp, 1);
-	/* Mark the data path as ready */
+	                                 
 	if (ok) {
 		lck_mtx_lock(&pcb->ipsec_pcb_data_move_lock);
 		IPSEC_SET_DATA_PATH_READY(pcb);
@@ -552,7 +552,7 @@ ipsec_nexus_pre_disconnect(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	VERIFY(pcb->ipsec_kpipe_count != 0);
 
-	/* Wait until all threads in the data paths are done. */
+	                                                        
 	ipsec_wait_data_move_drain(pcb);
 }
 
@@ -563,7 +563,7 @@ ipsec_netif_pre_disconnect(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 #pragma unused(nxprov, channel)
 	struct ipsec_pcb *pcb = kern_nexus_get_context(nexus);
 
-	/* Wait until all threads in the data paths are done. */
+	                                                        
 	ipsec_wait_data_move_drain(pcb);
 }
 
@@ -659,13 +659,13 @@ ipsec_kpipe_sync_tx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	kern_channel_slot_t tx_slot = kern_channel_get_next_slot(tx_ring, NULL, NULL);
 	if (tx_slot == NULL) {
-		// Nothing to write, bail
+		                         
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		ipsec_data_move_end(pcb);
 		return 0;
 	}
 
-	// Signal the netif ring to read
+	                                
 	kern_channel_ring_t rx_ring = pcb->ipsec_netif_rxring[0];
 	lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 
@@ -685,13 +685,13 @@ ipsec_encrypt_mbuf(ifnet_t interface,
 	int error = 0;
 	uint32_t af;
 
-	// Make sure this packet isn't looping through the interface
+	                                                            
 	if (necp_get_last_interface_index_from_packet(data) == interface->if_index) {
 		error = -1;
 		goto ipsec_output_err;
 	}
 
-	// Mark the interface so NECP can evaluate tunnel policy
+	                                                        
 	necp_mark_packet_from_interface(data, interface);
 
 	struct ip *ip = mtod(data, struct ip *);
@@ -708,8 +708,8 @@ ipsec_encrypt_mbuf(ifnet_t interface,
 
 		error = ipsec4_interface_output(&ipsec_state, interface);
 		if (error == 0 && ipsec_state.tunneled == 6) {
-			// Tunneled in IPv6 - packet is gone
-			// TODO: Don't lose mbuf
+			                                    
+			                        
 			data = NULL;
 			goto done;
 		}
@@ -741,8 +741,8 @@ ipsec_encrypt_mbuf(ifnet_t interface,
 
 		error = ipsec6_interface_output(&ipsec_state, interface, &ip6->ip6_nxt, ipsec_state.m);
 		if (error == 0 && ipsec_state.tunneled == 4) {
-			// Tunneled in IPv4 - packet is gone
-			// TODO: Don't lose mbuf
+			                                    
+			                        
 			data = NULL;
 			goto done;
 		}
@@ -798,7 +798,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 	VERIFY(pcb->ipsec_kpipe_count);
 	VERIFY(ring_idx <= pcb->ipsec_kpipe_count);
 
-	// Reclaim user-released slots
+	                              
 	(void) kern_channel_reclaim(rx_ring);
 
 	uint32_t avail = kern_channel_available_slot_count(rx_ring);
@@ -812,7 +812,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	kern_channel_ring_t tx_ring = pcb->ipsec_netif_txring[ring_idx];
 	if (tx_ring == NULL) {
-		// Net-If TX ring not set up yet, nothing to read
+		                                                 
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		os_log_error(OS_LOG_DEFAULT, "%s: %s ring %s index %d bad netif_txring 1\n", __func__,
 		    pcb->ipsec_if_xname, rx_ring->ckr_name, ring_idx);
@@ -822,16 +822,16 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	struct netif_stats *nifs = &NX_NETIF_PRIVATE(pcb->ipsec_netif_nexus)->nif_stats;
 
-	// Unlock ipsec before entering ring
+	                                    
 	lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 
 	(void)kr_enter(tx_ring, TRUE);
 
-	// Lock again after entering and validate
+	                                         
 	lck_rw_lock_shared(&pcb->ipsec_pcb_lock);
 	if (tx_ring != pcb->ipsec_netif_txring[ring_idx]) {
-		// Ring no longer valid
-		// Unlock first, then exit ring
+		                       
+		                               
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		kr_exit(tx_ring);
 		os_log_error(OS_LOG_DEFAULT, "%s: %s ring %s index %d bad netif_txring 2\n", __func__,
@@ -845,8 +845,8 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 	kern_channel_slot_t tx_pslot = NULL;
 	kern_channel_slot_t tx_slot = kern_channel_get_next_slot(tx_ring, NULL, NULL);
 	if (tx_slot == NULL) {
-		// Nothing to read, don't bother signalling
-		// Unlock first, then exit ring
+		                                           
+		                               
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		kr_exit(tx_ring);
 		ipsec_data_move_end(pcb);
@@ -864,7 +864,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		mbuf_t data = NULL;
 		errno_t error = 0;
 
-		// Allocate rx packet
+		                     
 		kern_packet_t rx_ph = 0;
 		error = kern_pbufpool_alloc_nosleep(rx_pp, 1, &rx_ph);
 		if (__improbable(error != 0)) {
@@ -875,7 +875,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 		kern_packet_t tx_ph = kern_channel_slot_get_packet(tx_ring, tx_slot);
 
-		// Advance TX ring
+		                  
 		tx_pslot = tx_slot;
 		tx_slot = kern_channel_get_next_slot(tx_ring, tx_slot, NULL);
 
@@ -895,7 +895,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		length = MIN(kern_packet_get_data_length(tx_ph),
 		    pcb->ipsec_slot_size);
 
-		// Increment TX stats
+		                     
 		tx_ring_stats.kcrsi_slots_transferred++;
 		tx_ring_stats.kcrsi_bytes_transferred += length;
 
@@ -904,7 +904,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			if (error == 0) {
 				error = mbuf_copyback(data, 0, length, tx_baddr, MBUF_DONTWAIT);
 				if (error == 0) {
-					// Encrypt and send packet
+					                          
 					lck_mtx_lock(&pcb->ipsec_kpipe_encrypt_lock);
 					data = ipsec_encrypt_mbuf(pcb->ipsec_ifp, data);
 					lck_mtx_unlock(&pcb->ipsec_kpipe_encrypt_lock);
@@ -934,7 +934,7 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 		length = mbuf_pkthdr_len(data);
 		if (length > rx_pp->pp_buflet_size) {
-			// Flush data
+			             
 			mbuf_freem(data);
 			kern_pbufpool_free(rx_pp, rx_ph);
 			os_log_error(OS_LOG_DEFAULT, "ipsec_kpipe_sync_rx %s: encrypted packet length %zu > %u\n",
@@ -942,17 +942,17 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			continue;
 		}
 
-		// Fillout rx packet
+		                    
 		kern_buflet_t rx_buf = kern_packet_get_next_buflet(rx_ph, NULL);
 		VERIFY(rx_buf != NULL);
 		void *rx_baddr = kern_buflet_get_data_address(rx_buf);
 		VERIFY(rx_baddr != NULL);
 
-		// Copy-in data from mbuf to buflet
+		                                   
 		mbuf_copydata(data, 0, length, (void *)rx_baddr);
-		kern_packet_clear_flow_uuid(rx_ph);     // Zero flow id
+		kern_packet_clear_flow_uuid(rx_ph);                    
 
-		// Finalize and attach the packet
+		                                 
 		error = kern_buflet_set_data_offset(rx_buf, 0);
 		VERIFY(error == 0);
 		error = kern_buflet_set_data_length(rx_buf, length);
@@ -989,13 +989,13 @@ ipsec_kpipe_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		(void)kern_channel_reclaim(tx_ring);
 	}
 
-	/* always reenable output */
+	                            
 	errno_t error = ifnet_enable_output(pcb->ipsec_ifp);
 	if (error != 0) {
 		os_log_error(OS_LOG_DEFAULT, "ipsec_kpipe_sync_rx: ifnet_enable_output returned error %d\n", error);
 	}
 
-	// Unlock first, then exit ring
+	                               
 	lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 
 	if (tx_pslot != NULL) {
@@ -1095,7 +1095,7 @@ ipsec_netif_check_policy(ifnet_t interface, mbuf_t data)
 	struct ip_out_args args4 = { };
 	struct ip6_out_args args6 = { };
 
-	// This packet has been marked with IP level policy, do not mark again.
+	                                                                       
 	if (data && data->m_pkthdr.necp_mtag.necp_policy_id >= NECP_KERNEL_POLICY_ID_FIRST_VALID_IP) {
 		return true;
 	}
@@ -1133,7 +1133,7 @@ ipsec_netif_check_policy(ifnet_t interface, mbuf_t data)
 
 	if (necp_result == NECP_KERNEL_POLICY_RESULT_DROP ||
 	    necp_result == NECP_KERNEL_POLICY_RESULT_SOCKET_DIVERT) {
-		/* Drop and flow divert packets should be blocked at the IP layer */
+		                                                                    
 		return false;
 	}
 
@@ -1166,7 +1166,7 @@ ipsec_netif_sync_tx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 	STATS_INC(nifs, NETIF_STATS_TX_SYNC);
 
 	if (tx_slot == NULL) {
-		// Nothing to write, don't bother signalling
+		                                            
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		ipsec_data_move_end(pcb);
 		return 0;
@@ -1174,15 +1174,15 @@ ipsec_netif_sync_tx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	if (pcb->ipsec_kpipe_count &&
 	    ipsec_flag_isset(pcb, IPSEC_FLAGS_KPIPE_ALLOCATED)) {
-		// Select the corresponding kpipe rx ring
+		                                         
 		uint8_t ring_idx = (uint8_t)(uintptr_t)kern_channel_ring_get_context(tx_ring);
 		VERIFY(ring_idx < IPSEC_IF_MAX_RING_COUNT);
 		kern_channel_ring_t rx_ring = pcb->ipsec_kpipe_rxring[ring_idx];
 
-		// Unlock while calling notify
+		                              
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 
-		// Signal the kernel pipe ring to read
+		                                      
 		if (rx_ring != NULL) {
 			kern_channel_notify(rx_ring, 0);
 		}
@@ -1191,14 +1191,14 @@ ipsec_netif_sync_tx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		return 0;
 	}
 
-	// If we're here, we're injecting into the BSD stack
+	                                                    
 	while (tx_slot != NULL) {
 		size_t length = 0;
 		mbuf_t data = NULL;
 
 		kern_packet_t tx_ph = kern_channel_slot_get_packet(tx_ring, tx_slot);
 
-		// Advance TX ring
+		                  
 		tx_pslot = tx_slot;
 		tx_slot = kern_channel_get_next_slot(tx_ring, tx_slot, NULL);
 
@@ -1222,18 +1222,18 @@ ipsec_netif_sync_tx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			if (error == 0) {
 				error = mbuf_copyback(data, 0, length, tx_baddr, MBUF_DONTWAIT);
 				if (error == 0) {
-					// Mark packet from policy
+					                          
 					uint32_t policy_id = kern_packet_get_policy_id(tx_ph);
 					necp_mark_packet_from_ip(data, policy_id);
 
-					// Check policy with NECP
+					                         
 					if (!ipsec_netif_check_policy(pcb->ipsec_ifp, data)) {
 						os_log_error(OS_LOG_DEFAULT, "ipsec_netif_sync_tx %s - failed policy check\n", pcb->ipsec_ifp->if_xname);
 						STATS_INC(nifs, NETIF_STATS_DROP);
 						mbuf_freem(data);
 						data = NULL;
 					} else {
-						// Send through encryption
+						                          
 						error = ipsec_output(pcb->ipsec_ifp, data);
 						if (error != 0) {
 							os_log_error(OS_LOG_DEFAULT, "ipsec_netif_sync_tx %s - ipsec_output error %d\n", pcb->ipsec_ifp->if_xname, error);
@@ -1292,11 +1292,11 @@ ipsec_netif_tx_doorbell_one(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	VERIFY((flags & KERN_NEXUS_TXDOORBELLF_ASYNC_REFILL) == 0);
 
-	/*
-	 * Refill and sync the ring; we may be racing against another thread doing
-	 * an RX sync that also wants to do kr_enter(), and so use the blocking
-	 * variant here.
-	 */
+	  
+                                                                           
+                                                                        
+                 
+    
 	rc = kern_channel_tx_refill_canblock(ring, UINT32_MAX, UINT32_MAX, true, &more);
 	if (rc != 0 && rc != EAGAIN && rc != EBUSY) {
 		os_log_error(OS_LOG_DEFAULT, "%s: %s ring %s tx refill failed %d\n", __func__,
@@ -1306,7 +1306,7 @@ ipsec_netif_tx_doorbell_one(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 	(void) kr_enter(ring, TRUE);
 	lck_rw_lock_shared(&pcb->ipsec_pcb_lock);
 	if (ring != pcb->ipsec_netif_txring[ring_idx]) {
-		// ring no longer valid
+		                       
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		kr_exit(ring);
 		os_log_error(OS_LOG_DEFAULT, "%s: %s ring %s index %d bad netif_txring 3\n", __func__,
@@ -1318,7 +1318,7 @@ ipsec_netif_tx_doorbell_one(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		uint32_t tx_available = kern_channel_available_slot_count(ring);
 		if (pcb->ipsec_netif_txring_size > 0 &&
 		    tx_available >= pcb->ipsec_netif_txring_size - 1) {
-			// No room left in tx ring, disable output for now
+			                                                  
 			errno_t error = ifnet_disable_output(pcb->ipsec_ifp);
 			if (error != 0) {
 				os_log_error(OS_LOG_DEFAULT, "ipsec_netif_tx_doorbell: ifnet_disable_output returned error %d\n", error);
@@ -1329,9 +1329,9 @@ ipsec_netif_tx_doorbell_one(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 	if (pcb->ipsec_kpipe_count) {
 		kern_channel_ring_t rx_ring = pcb->ipsec_kpipe_rxring[ring_idx];
 
-		// Unlock while calling notify
+		                              
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
-		// Signal the kernel pipe ring to read
+		                                      
 		if (rx_ring != NULL) {
 			kern_channel_notify(rx_ring, 0);
 		}
@@ -1390,7 +1390,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 	lck_rw_lock_shared(&pcb->ipsec_pcb_lock);
 
-	// Reclaim user-released slots
+	                              
 	(void) kern_channel_reclaim(rx_ring);
 
 	STATS_INC(nifs, NETIF_STATS_RX_SYNC);
@@ -1409,7 +1409,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 	kern_channel_slot_t rx_slot = kern_channel_get_next_slot(rx_ring, NULL, NULL);
 
 	while (rx_slot != NULL) {
-		// Check for a waiting packet
+		                             
 		lck_mtx_lock(&pcb->ipsec_input_chain_lock);
 		mbuf_t data = pcb->ipsec_input_chain;
 		if (data == NULL) {
@@ -1417,7 +1417,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			break;
 		}
 
-		// Allocate rx packet
+		                     
 		kern_packet_t rx_ph = 0;
 		errno_t error = kern_pbufpool_alloc_nosleep(rx_pp, 1, &rx_ph);
 		if (__improbable(error != 0)) {
@@ -1427,7 +1427,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			break;
 		}
 
-		// Advance waiting packets
+		                          
 		if (pcb->ipsec_input_chain_count > 0) {
 			pcb->ipsec_input_chain_count--;
 		}
@@ -1441,7 +1441,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		size_t length = mbuf_pkthdr_len(data);
 
 		if (length < sizeof(struct ip)) {
-			// Flush data
+			             
 			mbuf_freem(data);
 			kern_pbufpool_free(rx_pp, rx_ph);
 			STATS_INC(nifs, NETIF_STATS_DROP_BADLEN);
@@ -1472,7 +1472,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 		if (length > rx_pp->pp_buflet_size ||
 		    (pcb->ipsec_frag_size_set && length > pcb->ipsec_input_frag_size)) {
-			// We need to fragment to send up into the netif
+			                                                
 
 			u_int32_t fragment_mtu = rx_pp->pp_buflet_size;
 			if (pcb->ipsec_frag_size_set &&
@@ -1483,10 +1483,10 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			mbuf_t fragment_chain = NULL;
 			switch (af) {
 			case AF_INET: {
-				// ip_fragment expects the length in host order
+				                                               
 				ip->ip_len = ntohs(ip->ip_len);
 
-				// ip_fragment will modify the original data, don't free
+				                                                        
 				int fragment_error = ip_fragment(data, pcb->ipsec_ifp, fragment_mtu, TRUE);
 				if (fragment_error == 0 && data != NULL) {
 					fragment_chain = data;
@@ -1506,7 +1506,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 					os_log_error(OS_LOG_DEFAULT, "ipsec_netif_sync_rx %s: failed to fragment IPv6 packet of length %zu < %zu\n",
 					    pcb->ipsec_ifp->if_xname, length, sizeof(struct ip6_hdr));
 				} else {
-					// ip6_do_fragmentation will free the original data on success only
+					                                                                   
 					struct ip6_hdr *ip6 = mtod(data, struct ip6_hdr *);
 
 					int fragment_error = ip6_do_fragmentation(&data, 0, pcb->ipsec_ifp, sizeof(struct ip6_hdr),
@@ -1524,7 +1524,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 				break;
 			}
 			default: {
-				// Cannot fragment unknown families
+				                                   
 				mbuf_freem(data);
 				STATS_INC(nifs, NETIF_STATS_DROP_BADLEN);
 				STATS_INC(nifs, NETIF_STATS_DROP);
@@ -1535,7 +1535,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			}
 
 			if (fragment_chain != NULL) {
-				// Add fragments to chain before continuing
+				                                           
 				lck_mtx_lock(&pcb->ipsec_input_chain_lock);
 				if (pcb->ipsec_input_chain != NULL) {
 					pcb->ipsec_input_chain_last->m_nextpkt = fragment_chain;
@@ -1552,7 +1552,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 				lck_mtx_unlock(&pcb->ipsec_input_chain_lock);
 			}
 
-			// Make sure to free unused rx packet
+			                                     
 			kern_pbufpool_free(rx_pp, rx_ph);
 
 			continue;
@@ -1560,17 +1560,17 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 		mbuf_pkthdr_setrcvif(data, pcb->ipsec_ifp);
 
-		// Fillout rx packet
+		                    
 		kern_buflet_t rx_buf = kern_packet_get_next_buflet(rx_ph, NULL);
 		VERIFY(rx_buf != NULL);
 		void *rx_baddr = kern_buflet_get_data_address(rx_buf);
 		VERIFY(rx_baddr != NULL);
 
-		// Copy-in data from mbuf to buflet
+		                                   
 		mbuf_copydata(data, 0, length, (void *)rx_baddr);
-		kern_packet_clear_flow_uuid(rx_ph);     // Zero flow id
+		kern_packet_clear_flow_uuid(rx_ph);                    
 
-		// Finalize and attach the packet
+		                                 
 		error = kern_buflet_set_data_offset(rx_buf, 0);
 		VERIFY(error == 0);
 		error = kern_buflet_set_data_length(rx_buf, length);
@@ -1595,7 +1595,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 		mbuf_freem(data);
 
-		// Advance ring
+		               
 		rx_pslot = rx_slot;
 		rx_slot = kern_channel_get_next_slot(rx_ring, rx_slot, NULL);
 	}
@@ -1607,17 +1607,17 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 		kern_channel_slot_t tx_pslot = NULL;
 		kern_channel_slot_t tx_slot = NULL;
 		if (tx_ring == NULL) {
-			// Net-If TX ring not set up yet, nothing to read
+			                                                 
 			goto done;
 		}
 
 
-		// Unlock ipsec before entering ring
+		                                    
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 
 		(void)kr_enter(tx_ring, TRUE);
 
-		// Lock again after entering and validate
+		                                         
 		lck_rw_lock_shared(&pcb->ipsec_pcb_lock);
 
 		if (tx_ring != pcb->ipsec_kpipe_txring[ring_idx]) {
@@ -1626,7 +1626,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 		tx_slot = kern_channel_get_next_slot(tx_ring, NULL, NULL);
 		if (tx_slot == NULL) {
-			// Nothing to read, don't bother signalling
+			                                           
 			goto done;
 		}
 
@@ -1636,7 +1636,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			errno_t error = 0;
 			uint32_t af;
 
-			// Allocate rx packet
+			                     
 			kern_packet_t rx_ph = 0;
 			error = kern_pbufpool_alloc_nosleep(rx_pp, 1, &rx_ph);
 			if (__improbable(error != 0)) {
@@ -1647,7 +1647,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 			kern_packet_t tx_ph = kern_channel_slot_get_packet(tx_ring, tx_slot);
 
-			// Advance TX ring
+			                  
 			tx_pslot = tx_slot;
 			tx_slot = kern_channel_get_next_slot(tx_ring, tx_slot, NULL);
 
@@ -1665,7 +1665,7 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			length = MIN(kern_packet_get_data_length(tx_ph),
 			    pcb->ipsec_slot_size);
 
-			// Increment TX stats
+			                     
 			tx_ring_stats.kcrsi_slots_transferred++;
 			tx_ring_stats.kcrsi_bytes_transferred += length;
 
@@ -1750,14 +1750,14 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 			}
 
 			if (data == NULL) {
-				// Failed to get decrypted data data
+				                                    
 				kern_pbufpool_free(rx_pp, rx_ph);
 				continue;
 			}
 
 			length = mbuf_pkthdr_len(data);
 			if (length > rx_pp->pp_buflet_size) {
-				// Flush data
+				             
 				mbuf_freem(data);
 				kern_pbufpool_free(rx_pp, rx_ph);
 				STATS_INC(nifs, NETIF_STATS_DROP_BADLEN);
@@ -1769,17 +1769,17 @@ ipsec_netif_sync_rx(kern_nexus_provider_t nxprov, kern_nexus_t nexus,
 
 			mbuf_pkthdr_setrcvif(data, pcb->ipsec_ifp);
 
-			// Fillout rx packet
+			                    
 			kern_buflet_t rx_buf = kern_packet_get_next_buflet(rx_ph, NULL);
 			VERIFY(rx_buf != NULL);
 			void *rx_baddr = kern_buflet_get_data_address(rx_buf);
 			VERIFY(rx_baddr != NULL);
 
-			// Copy-in data from mbuf to buflet
+			                                   
 			mbuf_copydata(data, 0, length, (void *)rx_baddr);
-			kern_packet_clear_flow_uuid(rx_ph);     // Zero flow id
+			kern_packet_clear_flow_uuid(rx_ph);                    
 
-			// Finalize and attach the packet
+			                                 
 			error = kern_buflet_set_data_offset(rx_buf, 0);
 			VERIFY(error == 0);
 			error = kern_buflet_set_data_length(rx_buf, length);
@@ -1817,7 +1817,7 @@ done:
 			(void)kern_channel_reclaim(tx_ring);
 		}
 
-		// Unlock first, then exit ring
+		                               
 		lck_rw_unlock_shared(&pcb->ipsec_pcb_lock);
 		if (tx_ring != NULL) {
 			if (tx_pslot != NULL) {
@@ -1884,7 +1884,7 @@ ipsec_nexus_ifattach(struct ipsec_pcb *pcb,
 	err = kern_nexus_attr_set(nxa, NEXUS_ATTR_SLOT_BUF_SIZE, slot_buffer_size);
 	VERIFY(err == 0);
 
-	// Reset ring size for netif nexus to limit memory usage
+	                                                        
 	uint64_t ring_size = pcb->ipsec_netif_ring_size;
 	err = kern_nexus_attr_set(nxa, NEXUS_ATTR_TX_SLOTS, ring_size);
 	VERIFY(err == 0);
@@ -1915,8 +1915,8 @@ ipsec_nexus_ifattach(struct ipsec_pcb *pcb,
 	bzero(&pp_init, sizeof(pp_init));
 	pp_init.kbi_version = KERN_PBUFPOOL_CURRENT_VERSION;
 	pp_init.kbi_flags |= KBIF_VIRTUAL_DEVICE;
-	// Note: we need more packets than can be held in the tx and rx rings because
-	// packets can also be in the AQM queue(s)
+	                                                                             
+	                                          
 	pp_init.kbi_packets = pcb->ipsec_netif_ring_size * (2 * pcb->ipsec_kpipe_count + 1);
 	pp_init.kbi_bufsize = pcb->ipsec_slot_size;
 	pp_init.kbi_buf_seg_size = IPSEC_IF_DEFAULT_BUF_SEG_SIZE;
@@ -2081,17 +2081,17 @@ ipsec_create_fs_provider_and_instance(struct ipsec_pcb *pcb,
 	err = kern_nexus_attr_set(attr, NEXUS_ATTR_SLOT_BUF_SIZE, slot_buffer_size);
 	VERIFY(err == 0);
 
-	// Reset ring size for flowswitch nexus to limit memory usage. Larger RX than netif.
+	                                                                                    
 	uint64_t tx_ring_size = pcb->ipsec_tx_fsw_ring_size;
 	err = kern_nexus_attr_set(attr, NEXUS_ATTR_TX_SLOTS, tx_ring_size);
 	VERIFY(err == 0);
 	uint64_t rx_ring_size = pcb->ipsec_rx_fsw_ring_size;
 	err = kern_nexus_attr_set(attr, NEXUS_ATTR_RX_SLOTS, rx_ring_size);
 	VERIFY(err == 0);
-	/*
-	 * Configure flowswitch to use super-packet (multi-buflet).
-	 * This allows flowswitch to perform intra-stack packet aggregation.
-	 */
+	  
+                                                            
+                                                                     
+    
 	err = kern_nexus_attr_set(attr, NEXUS_ATTR_MAX_FRAGS,
 	    sk_fsw_rx_agg_tcp ? NX_PBUF_FRAGS_MAX : 1);
 	VERIFY(err == 0);
@@ -2138,7 +2138,7 @@ ipsec_flowswitch_attach(struct ipsec_pcb *pcb)
 	errno_t err = 0;
 	ipsec_nx_t nx = &pcb->ipsec_nx;
 
-	// Allocate flowswitch
+	                      
 	err = ipsec_create_fs_provider_and_instance(pcb,
 	    "flowswitch",
 	    pcb->ipsec_ifp->if_xname,
@@ -2150,7 +2150,7 @@ ipsec_flowswitch_attach(struct ipsec_pcb *pcb)
 		goto failed;
 	}
 
-	// Attach flowswitch to device port
+	                                   
 	err = kern_nexus_ifattach(controller, nx->fsw_instance,
 	    NULL, nx->if_instance,
 	    FALSE, &nx->fsw_device);
@@ -2159,7 +2159,7 @@ ipsec_flowswitch_attach(struct ipsec_pcb *pcb)
 		goto failed;
 	}
 
-	// Attach flowswitch to host port
+	                                 
 	err = kern_nexus_ifattach(controller, nx->fsw_instance,
 	    NULL, nx->if_instance,
 	    TRUE, &nx->fsw_host);
@@ -2168,7 +2168,7 @@ ipsec_flowswitch_attach(struct ipsec_pcb *pcb)
 		goto failed;
 	}
 
-	// Extract the agent UUID and save for later
+	                                            
 	struct kern_nexus *flowswitch_nx = nx_find(nx->fsw_instance, false);
 	if (flowswitch_nx != NULL) {
 		struct nx_flowswitch *flowswitch = NX_FSW_PRIVATE(flowswitch_nx);
@@ -2192,7 +2192,7 @@ failed:
 	errno_t detach_error = 0;
 	if ((detach_error = ifnet_detach(pcb->ipsec_ifp)) != 0) {
 		panic("ipsec_flowswitch_attach - ifnet_detach failed: %d\n", detach_error);
-		/* NOT REACHED */
+		                 
 	}
 
 	return err;
@@ -2255,9 +2255,9 @@ ipsec_register_kernel_pipe_nexus(struct ipsec_pcb *pcb)
 	result = kern_nexus_attr_set(nxa, NEXUS_ATTR_SLOT_BUF_SIZE, slot_buffer_size);
 	VERIFY(result == 0);
 
-	// Reset ring size for kernel pipe nexus to limit memory usage
-	// Note: It's better to have less on slots on the kpipe TX ring than the netif
-	// so back pressure is applied at the AQM layer
+	                                                              
+	                                                                              
+	                                               
 	uint64_t ring_size =
 	    pcb->ipsec_kpipe_tx_ring_size != 0 ? pcb->ipsec_kpipe_tx_ring_size :
 	    pcb->ipsec_netif_ring_size != 0 ? pcb->ipsec_netif_ring_size :
@@ -2318,9 +2318,9 @@ ipsec_unregister_kernel_pipe_nexus(void)
 	lck_mtx_unlock(&ipsec_lock);
 }
 
-/* This structure only holds onto kpipe channels that need to be
- * freed in the future, but are cleared from the pcb under lock
- */
+                                                                
+                                                               
+   
 struct ipsec_detached_channels {
 	int count;
 	kern_pbufpool_t pp;
@@ -2419,7 +2419,7 @@ ipsec_enable_channel(struct ipsec_pcb *pcb, struct proc *proc)
 	bzero(&pp_init, sizeof(pp_init));
 	pp_init.kbi_version = KERN_PBUFPOOL_CURRENT_VERSION;
 	pp_init.kbi_flags |= KBIF_VIRTUAL_DEVICE;
-	// Note: We only needs are many packets as can be held in the tx and rx rings
+	                                                                             
 	pp_init.kbi_packets = pcb->ipsec_netif_ring_size * 2 * pcb->ipsec_kpipe_count;
 	pp_init.kbi_bufsize = pcb->ipsec_slot_size;
 	pp_init.kbi_buf_seg_size = IPSEC_IF_DEFAULT_BUF_SEG_SIZE;
@@ -2460,7 +2460,7 @@ ipsec_enable_channel(struct ipsec_pcb *pcb, struct proc *proc)
 		}
 
 		if (result) {
-			/* Unwind all of them on error */
+			                                 
 			for (int j = 0; j < IPSEC_IF_MAX_RING_COUNT; j++) {
 				if (!uuid_is_null(pcb->ipsec_kpipe_uuid[j])) {
 					kern_nexus_controller_free_provider_instance(ipsec_ncd,
@@ -2488,10 +2488,10 @@ done:
 	return result;
 }
 
-#endif // IPSEC_NEXUS
+#endif               
 
 
-/* Kernel control functions */
+                              
 
 static inline int
 ipsec_find_by_unit(u_int32_t unit)
@@ -2518,7 +2518,7 @@ ipsec_free_pcb(struct ipsec_pcb *pcb, bool locked)
 	lck_mtx_destroy(&pcb->ipsec_input_chain_lock, ipsec_lck_grp);
 	lck_mtx_destroy(&pcb->ipsec_kpipe_encrypt_lock, ipsec_lck_grp);
 	lck_mtx_destroy(&pcb->ipsec_kpipe_decrypt_lock, ipsec_lck_grp);
-#endif // IPSEC_NEXUS
+#endif               
 	lck_mtx_destroy(&pcb->ipsec_pcb_data_move_lock, ipsec_lck_grp);
 	lck_rw_destroy(&pcb->ipsec_pcb_lock, ipsec_lck_grp);
 	if (!locked) {
@@ -2540,7 +2540,7 @@ ipsec_ctl_setup(u_int32_t *unit, void **unitinfo)
 
 	lck_mtx_lock(&ipsec_lock);
 
-	/* Find next available unit */
+	                              
 	if (*unit == 0) {
 		*unit = 1;
 		while (*unit != ctl_maxunit) {
@@ -2559,24 +2559,24 @@ ipsec_ctl_setup(u_int32_t *unit, void **unitinfo)
 		return EBUSY;
 	}
 
-	/* Find some open interface id */
+	                                 
 	u_int32_t chosen_unique_id = 1;
 	struct ipsec_pcb *next_pcb = TAILQ_LAST(&ipsec_head, ipsec_list);
 	if (next_pcb != NULL) {
-		/* List was not empty, add one to the last item */
+		                                                  
 		chosen_unique_id = next_pcb->ipsec_unique_id + 1;
 		next_pcb = NULL;
 
-		/*
-		 * If this wrapped the id number, start looking at
-		 * the front of the list for an unused id.
-		 */
+		  
+                                                    
+                                            
+     
 		if (chosen_unique_id == 0) {
-			/* Find the next unused ID */
+			                             
 			chosen_unique_id = 1;
 			TAILQ_FOREACH(next_pcb, &ipsec_head, ipsec_chain) {
 				if (next_pcb->ipsec_unique_id > chosen_unique_id) {
-					/* We found a gap */
+					                    
 					break;
 				}
 
@@ -2617,7 +2617,7 @@ ipsec_ctl_bind(kern_ctl_ref kctlref,
 		return EINVAL;
 	}
 
-	/* Setup the protocol control block */
+	                                      
 	pcb->ipsec_ctlref = kctlref;
 	pcb->ipsec_unit = sac->sc_unit;
 	pcb->ipsec_output_service_class = MBUF_SC_OAM;
@@ -2628,7 +2628,7 @@ ipsec_ctl_bind(kern_ctl_ref kctlref,
 	pcb->ipsec_netif_ring_size = if_ipsec_ring_size;
 	pcb->ipsec_tx_fsw_ring_size = if_ipsec_tx_fsw_ring_size;
 	pcb->ipsec_rx_fsw_ring_size = if_ipsec_rx_fsw_ring_size;
-#endif // IPSEC_NEXUS
+#endif               
 
 	lck_rw_init(&pcb->ipsec_pcb_lock, ipsec_lck_grp, ipsec_lck_attr);
 	lck_mtx_init(&pcb->ipsec_pcb_data_move_lock, ipsec_lck_grp, ipsec_lck_attr);
@@ -2637,7 +2637,7 @@ ipsec_ctl_bind(kern_ctl_ref kctlref,
 	lck_mtx_init(&pcb->ipsec_input_chain_lock, ipsec_lck_grp, ipsec_lck_attr);
 	lck_mtx_init(&pcb->ipsec_kpipe_encrypt_lock, ipsec_lck_grp, ipsec_lck_attr);
 	lck_mtx_init(&pcb->ipsec_kpipe_decrypt_lock, ipsec_lck_grp, ipsec_lck_attr);
-#endif // IPSEC_NEXUS
+#endif               
 
 	return 0;
 }
@@ -2659,7 +2659,7 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 		return EINVAL;
 	}
 
-	/* Handle case where ipsec_ctl_setup() was called, but ipsec_ctl_bind() was not */
+	                                                                                  
 	if (pcb->ipsec_ctlref == NULL) {
 		(void)ipsec_ctl_bind(kctlref, sac, unitinfo);
 	}
@@ -2668,7 +2668,7 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 	snprintf(pcb->ipsec_unique_name, sizeof(pcb->ipsec_unique_name), "ipsecid%d", pcb->ipsec_unique_id - 1);
 	os_log(OS_LOG_DEFAULT, "ipsec_ctl_connect: creating interface %s (id %s)\n", pcb->ipsec_if_xname, pcb->ipsec_unique_name);
 
-	/* Create the interface */
+	                          
 	bzero(&ipsec_init, sizeof(ipsec_init));
 	ipsec_init.ver = IFNET_INIT_CURRENT_VERSION;
 	ipsec_init.len = sizeof(ipsec_init);
@@ -2677,7 +2677,7 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 	if (pcb->ipsec_use_netif) {
 		ipsec_init.flags = (IFNET_INIT_SKYWALK_NATIVE | IFNET_INIT_NX_NOAUTO);
 	} else
-#endif // IPSEC_NEXUS
+#endif               
 	{
 		ipsec_init.flags = IFNET_INIT_NX_NOAUTO;
 		ipsec_init.start = ipsec_start;
@@ -2696,7 +2696,7 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 	ipsec_init.free = ipsec_detached;
 
 #if IPSEC_NEXUS
-	/* We don't support kpipes without a netif */
+	                                             
 	if (pcb->ipsec_kpipe_count && !pcb->ipsec_use_netif) {
 		result = ENOTSUP;
 		os_log_error(OS_LOG_DEFAULT, "ipsec_ctl_connect - kpipe requires netif: failed %d\n", result);
@@ -2740,16 +2740,16 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 		result = ipsec_flowswitch_attach(pcb);
 		if (result != 0) {
 			os_log_error(OS_LOG_DEFAULT, "ipsec_ctl_connect - ipsec_flowswitch_attach failed: %d\n", result);
-			// Do not call ipsec_free_pcb(). We will be attached already, and will be freed later
-			// in ipsec_detached().
+			                                                                                     
+			                       
 			*unitinfo = NULL;
 			return result;
 		}
 
-		/* Attach to bpf */
+		                   
 		bpfattach(pcb->ipsec_ifp, DLT_RAW, 0);
 	} else
-#endif // IPSEC_NEXUS
+#endif               
 	{
 		result = ifnet_allocate_extended(&ipsec_init, &pcb->ipsec_ifp);
 		if (result != 0) {
@@ -2760,7 +2760,7 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 		}
 		ipsec_ifnet_set_attrs(pcb->ipsec_ifp);
 
-		/* Attach the interface */
+		                          
 		result = ifnet_attach(pcb->ipsec_ifp, NULL);
 		if (result != 0) {
 			os_log_error(OS_LOG_DEFAULT, "ipsec_ctl_connect - ifnet_attach failed: %d\n", result);
@@ -2770,15 +2770,15 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 			return result;
 		}
 
-		/* Attach to bpf */
+		                   
 		bpfattach(pcb->ipsec_ifp, DLT_NULL, 0);
 	}
 
 #if IPSEC_NEXUS
-	/*
-	 * Mark the data path as ready.
-	 * If kpipe nexus is being used then the data path is marked ready only when a kpipe channel is connected.
-	 */
+	  
+                                
+                                                                                                           
+    
 	if (pcb->ipsec_kpipe_count == 0) {
 		lck_mtx_lock(&pcb->ipsec_pcb_data_move_lock);
 		IPSEC_SET_DATA_PATH_READY(pcb);
@@ -2786,7 +2786,7 @@ ipsec_ctl_connect(kern_ctl_ref kctlref,
 	}
 #endif
 
-	/* The interfaces resoures allocated, mark it as running */
+	                                                           
 	ifnet_set_flags(pcb->ipsec_ifp, IFF_RUNNING, IFF_RUNNING);
 
 	return 0;
@@ -2799,7 +2799,7 @@ ipsec_detach_ip(ifnet_t                         interface,
 {
 	errno_t result = EPROTONOSUPPORT;
 
-	/* Attempt a detach */
+	                      
 	if (protocol == PF_INET) {
 		struct ifreq    ifr;
 
@@ -2829,7 +2829,7 @@ ipsec_remove_address(ifnet_t                            interface,
 {
 	errno_t result = 0;
 
-	/* Attempt a detach */
+	                      
 	if (protocol == PF_INET) {
 		struct ifreq    ifr;
 
@@ -2880,7 +2880,7 @@ ipsec_cleanup_family(ifnet_t                            interface,
 		return;
 	}
 
-	/* Create a socket for removing addresses and detaching the protocol */
+	                                                                       
 	result = sock_socket(protocol, SOCK_DGRAM, 0, NULL, NULL, &pf_socket);
 	if (result != 0) {
 		if (result != EAFNOSUPPORT) {
@@ -2890,23 +2890,23 @@ ipsec_cleanup_family(ifnet_t                            interface,
 		goto cleanup;
 	}
 
-	/* always set SS_PRIV, we want to close and detach regardless */
+	                                                                
 	sock_setpriv(pf_socket, 1);
 
 	result = ipsec_detach_ip(interface, protocol, pf_socket);
 	if (result == 0 || result == ENXIO) {
-		/* We are done! We either detached or weren't attached. */
+		                                                          
 		goto cleanup;
 	} else if (result != EBUSY) {
-		/* Uh, not really sure what happened here... */
+		                                               
 		os_log_error(OS_LOG_DEFAULT, "ipsec_cleanup_family - ipsec_detach_ip failed: %d\n", result);
 		goto cleanup;
 	}
 
-	/*
-	 * At this point, we received an EBUSY error. This means there are
-	 * addresses attached. We should detach them and then try again.
-	 */
+	  
+                                                                   
+                                                                 
+    
 	result = ifnet_get_address_list_family(interface, &addresses, protocol);
 	if (result != 0) {
 		os_log_error(OS_LOG_DEFAULT, "fnet_get_address_list_family(%s%d, 0xblah, %s) - failed: %d\n",
@@ -2921,9 +2921,9 @@ ipsec_cleanup_family(ifnet_t                            interface,
 	ifnet_free_address_list(addresses);
 	addresses = NULL;
 
-	/*
-	 * The addresses should be gone, we should try the remove again.
-	 */
+	  
+                                                                 
+    
 	result = ipsec_detach_ip(interface, protocol, pf_socket);
 	if (result != 0 && result != ENXIO) {
 		os_log_error(OS_LOG_DEFAULT, "ipsec_cleanup_family - ipsec_detach_ip failed: %d\n", result);
@@ -2952,15 +2952,15 @@ ipsec_ctl_disconnect(__unused kern_ctl_ref      kctlref,
 		return EINVAL;
 	}
 
-	/* Wait until all threads in the data paths are done. */
+	                                                        
 	ipsec_wait_data_move_drain(pcb);
 
 #if IPSEC_NEXUS
-	// Tell the nexus to stop all rings
+	                                   
 	if (pcb->ipsec_netif_nexus != NULL) {
 		kern_nexus_stop(pcb->ipsec_netif_nexus);
 	}
-#endif // IPSEC_NEXUS
+#endif               
 
 	lck_rw_lock_exclusive(&pcb->ipsec_pcb_lock);
 
@@ -2972,7 +2972,7 @@ ipsec_ctl_disconnect(__unused kern_ctl_ref      kctlref,
 
 	struct ipsec_detached_channels dc;
 	ipsec_detach_channels(pcb, &dc);
-#endif // IPSEC_NEXUS
+#endif               
 
 	pcb->ipsec_ctlref = NULL;
 
@@ -2980,24 +2980,24 @@ ipsec_ctl_disconnect(__unused kern_ctl_ref      kctlref,
 	if (ifp != NULL) {
 #if IPSEC_NEXUS
 		if (pcb->ipsec_netif_nexus != NULL) {
-			/*
-			 * Quiesce the interface and flush any pending outbound packets.
-			 */
+			  
+                                                                   
+      
 			if_down(ifp);
 
-			/* Increment refcnt, but detach interface */
+			                                            
 			ifnet_incr_iorefcnt(ifp);
 			if ((result = ifnet_detach(ifp)) != 0) {
 				panic("ipsec_ctl_disconnect - ifnet_detach failed: %d\n", result);
-				/* NOT REACHED */
+				                 
 			}
 
-			/*
-			 * We want to do everything in our power to ensure that the interface
-			 * really goes away when the socket is closed. We must remove IP/IPv6
-			 * addresses and detach the protocols. Finally, we can remove and
-			 * release the interface.
-			 */
+			  
+                                                                        
+                                                                        
+                                                                    
+                            
+      
 			key_delsp_for_ipsec_if(ifp);
 
 			ipsec_cleanup_family(ifp, AF_INET);
@@ -3009,39 +3009,39 @@ ipsec_ctl_disconnect(__unused kern_ctl_ref      kctlref,
 
 			ipsec_nexus_detach(pcb);
 
-			/* Decrement refcnt to finish detaching and freeing */
+			                                                      
 			ifnet_decr_iorefcnt(ifp);
 		} else
-#endif // IPSEC_NEXUS
+#endif               
 		{
 			lck_rw_unlock_exclusive(&pcb->ipsec_pcb_lock);
 
 #if IPSEC_NEXUS
 			ipsec_free_channels(&dc);
-#endif // IPSEC_NEXUS
+#endif               
 
-			/*
-			 * We want to do everything in our power to ensure that the interface
-			 * really goes away when the socket is closed. We must remove IP/IPv6
-			 * addresses and detach the protocols. Finally, we can remove and
-			 * release the interface.
-			 */
+			  
+                                                                        
+                                                                        
+                                                                    
+                            
+      
 			key_delsp_for_ipsec_if(ifp);
 
 			ipsec_cleanup_family(ifp, AF_INET);
 			ipsec_cleanup_family(ifp, AF_INET6);
 
-			/*
-			 * Detach now; ipsec_detach() will be called asynchronously once
-			 * the I/O reference count drops to 0.  There we will invoke
-			 * ifnet_release().
-			 */
+			  
+                                                                   
+                                                               
+                      
+      
 			if ((result = ifnet_detach(ifp)) != 0) {
 				os_log_error(OS_LOG_DEFAULT, "ipsec_ctl_disconnect - ifnet_detach failed: %d\n", result);
 			}
 		}
 	} else {
-		// Bound, but not connected
+		                           
 		lck_rw_unlock_exclusive(&pcb->ipsec_pcb_lock);
 		ipsec_free_pcb(pcb, false);
 	}
@@ -3056,7 +3056,7 @@ ipsec_ctl_send(__unused kern_ctl_ref    kctlref,
     mbuf_t                  m,
     __unused int                 flags)
 {
-	/* Receive messages from the control socket. Currently unused. */
+	                                                                 
 	mbuf_freem(m);
 	return 0;
 }
@@ -3075,7 +3075,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 		return EINVAL;
 	}
 
-	/* check for privileges for privileged options */
+	                                                 
 	switch (opt) {
 	case IPSEC_OPT_FLAGS:
 	case IPSEC_OPT_EXT_IFDATA_STATS:
@@ -3103,7 +3103,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp == NULL) {
-			// Only can set after connecting
+			                                
 			result = EINVAL;
 			break;
 		}
@@ -3120,7 +3120,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp == NULL) {
-			// Only can set after connecting
+			                                
 			result = EINVAL;
 			break;
 		}
@@ -3147,11 +3147,11 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp == NULL) {
-			// Only can set after connecting
+			                                
 			result = EINVAL;
 			break;
 		}
-		if (len != 0) {                   /* if len==0, del_ifp will be NULL causing the delegate to be removed */
+		if (len != 0) {                                                                                           
 			bcopy(data, name, len);
 			name[len] = 0;
 			result = ifnet_find_by_name(name, &del_ifp);
@@ -3175,7 +3175,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp == NULL) {
-			// Only can set after connecting
+			                                
 			result = EINVAL;
 			break;
 		}
@@ -3198,7 +3198,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3220,7 +3220,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3236,7 +3236,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp == NULL) {
-			// Only can set after connecting
+			                                
 			result = EINVAL;
 			break;
 		}
@@ -3286,7 +3286,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3301,7 +3301,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3322,7 +3322,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3343,7 +3343,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3364,7 +3364,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3385,7 +3385,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3406,7 +3406,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 			break;
 		}
 		if (pcb->ipsec_ifp != NULL) {
-			// Only can set before connecting
+			                                 
 			result = EINVAL;
 			break;
 		}
@@ -3422,7 +3422,7 @@ ipsec_ctl_setopt(__unused kern_ctl_ref  kctlref,
 		break;
 	}
 
-#endif // IPSEC_NEXUS
+#endif               
 
 	default: {
 		result = ENOPROTOOPT;
@@ -3471,7 +3471,7 @@ ipsec_ctl_getopt(__unused kern_ctl_ref kctlref,
 			result = EMSGSIZE;
 		} else {
 			if (pcb->ipsec_ifp == NULL) {
-				// Only can get after connecting
+				                                
 				result = EINVAL;
 				break;
 			}
@@ -3605,7 +3605,7 @@ ipsec_ctl_getopt(__unused kern_ctl_ref kctlref,
 		break;
 	}
 
-#endif // IPSEC_NEXUS
+#endif               
 
 	default: {
 		result = ENOPROTOOPT;
@@ -3616,7 +3616,7 @@ ipsec_ctl_getopt(__unused kern_ctl_ref kctlref,
 	return result;
 }
 
-/* Network Interface functions */
+                                 
 static errno_t
 ipsec_output(ifnet_t interface,
     mbuf_t data)
@@ -3635,13 +3635,13 @@ ipsec_output(ifnet_t interface,
 	int flags = 0;
 	struct flowadv *adv = NULL;
 
-	// Make sure this packet isn't looping through the interface
+	                                                            
 	if (necp_get_last_interface_index_from_packet(data) == interface->if_index) {
 		error = EINVAL;
 		goto ipsec_output_err;
 	}
 
-	// Mark the interface so NECP can evaluate tunnel policy
+	                                                        
 	necp_mark_packet_from_interface(data, interface);
 
 	if (data->m_len < sizeof(*ip)) {
@@ -3670,20 +3670,20 @@ ipsec_output(ifnet_t interface,
 		}
 #if IPSEC_NEXUS
 		if (!pcb->ipsec_use_netif)
-#endif // IPSEC_NEXUS
+#endif               
 		{
 			int af = AF_INET;
 			bpf_tap_out(pcb->ipsec_ifp, DLT_NULL, data, &af, sizeof(af));
 		}
 
-		/* Apply encryption */
+		                      
 		memset(&ipsec_state, 0, sizeof(ipsec_state));
 		ipsec_state.m = data;
 		ipsec_state.dst = (struct sockaddr *)&ip->ip_dst;
 		memset(&ipsec_state.ro, 0, sizeof(ipsec_state.ro));
 
 		error = ipsec4_interface_output(&ipsec_state, interface);
-		/* Tunneled in IPv6 - packet is gone */
+		                                       
 		if (error == 0 && ipsec_state.tunneled == 6) {
 			goto done;
 		}
@@ -3696,27 +3696,27 @@ ipsec_output(ifnet_t interface,
 			goto ipsec_output_err;
 		}
 
-		/* Set traffic class, set flow */
+		                                 
 		m_set_service_class(data, pcb->ipsec_output_service_class);
 		data->m_pkthdr.pkt_flowsrc = FLOWSRC_IFNET;
 		data->m_pkthdr.pkt_flowid = interface->if_flowhash;
 		data->m_pkthdr.pkt_proto = ip->ip_p;
 		data->m_pkthdr.pkt_flags = (PKTF_FLOW_ID | PKTF_FLOW_ADV | PKTF_FLOW_LOCALSRC);
 
-		/* Flip endian-ness for ip_output */
+		                                    
 		ip = mtod(data, struct ip *);
 		NTOHS(ip->ip_len);
 		NTOHS(ip->ip_off);
 
-		/* Increment statistics */
+		                          
 		length = mbuf_pkthdr_len(data);
 		ifnet_stat_increment_out(interface, 1, length, 0);
 
-		/* Send to ip_output */
+		                       
 		memset(&ro, 0, sizeof(ro));
 
-		flags = (IP_OUTARGS |   /* Passing out args to specify interface */
-		    IP_NOIPSEC);                        /* To ensure the packet doesn't go through ipsec twice */
+		flags = (IP_OUTARGS |                                              
+		    IP_NOIPSEC);                                                                                 
 
 		memset(&ipoa, 0, sizeof(ipoa));
 		ipoa.ipoa_flowadv.code = 0;
@@ -3748,7 +3748,7 @@ ipsec_output(ifnet_t interface,
 		}
 #if IPSEC_NEXUS
 		if (!pcb->ipsec_use_netif)
-#endif // IPSEC_NEXUS
+#endif               
 		{
 			int af = AF_INET6;
 			bpf_tap_out(pcb->ipsec_ifp, DLT_NULL, data, &af, sizeof(af));
@@ -3768,7 +3768,7 @@ ipsec_output(ifnet_t interface,
 		memset(&ipsec_state.ro, 0, sizeof(ipsec_state.ro));
 
 		error = ipsec6_interface_output(&ipsec_state, interface, &ip6->ip6_nxt, ipsec_state.m);
-		if (error == 0 && ipsec_state.tunneled == 4) {          /* tunneled in IPv4 - packet is gone */
+		if (error == 0 && ipsec_state.tunneled == 4) {                                                 
 			goto done;
 		}
 		data = ipsec_state.m;
@@ -3779,18 +3779,18 @@ ipsec_output(ifnet_t interface,
 			goto ipsec_output_err;
 		}
 
-		/* Set traffic class, set flow */
+		                                 
 		m_set_service_class(data, pcb->ipsec_output_service_class);
 		data->m_pkthdr.pkt_flowsrc = FLOWSRC_IFNET;
 		data->m_pkthdr.pkt_flowid = interface->if_flowhash;
 		data->m_pkthdr.pkt_proto = ip6->ip6_nxt;
 		data->m_pkthdr.pkt_flags = (PKTF_FLOW_ID | PKTF_FLOW_ADV | PKTF_FLOW_LOCALSRC);
 
-		/* Increment statistics */
+		                          
 		length = mbuf_pkthdr_len(data);
 		ifnet_stat_increment_out(interface, 1, length, 0);
 
-		/* Send to ip6_output */
+		                        
 		memset(&ro6, 0, sizeof(ro6));
 
 		flags = IPV6_OUTARGS;
@@ -3850,7 +3850,7 @@ ipsec_start(ifnet_t     interface)
 	}
 }
 
-/* Network Interface functions */
+                                 
 static errno_t
 ipsec_demux(__unused ifnet_t    interface,
     mbuf_t                          data,
@@ -3924,14 +3924,14 @@ ipsec_ioctl(ifnet_t interface,
 	case SIOCSIFMTU: {
 #if IPSEC_NEXUS
 		if (pcb->ipsec_use_netif) {
-			// Make sure we can fit packets in the channel buffers
+			                                                      
 			if (((uint64_t)((struct ifreq*)data)->ifr_mtu) > pcb->ipsec_slot_size) {
 				result = EINVAL;
 			} else {
 				ifnet_set_mtu(interface, (uint32_t)((struct ifreq*)data)->ifr_mtu);
 			}
 		} else
-#endif // IPSEC_NEXUS
+#endif               
 		{
 			ifnet_set_mtu(interface, ((struct ifreq*)data)->ifr_mtu);
 		}
@@ -3939,7 +3939,7 @@ ipsec_ioctl(ifnet_t interface,
 	}
 
 	case SIOCSIFFLAGS:
-		/* ifioctl() takes care of it */
+		                                
 		break;
 
 	case SIOCSIFSUBFAMILY: {
@@ -3985,7 +3985,7 @@ ipsec_detached(ifnet_t interface)
 	lck_mtx_unlock(&ipsec_lock);
 }
 
-/* Protocol Handlers */
+                       
 
 static errno_t
 ipsec_proto_input(ifnet_t interface,
@@ -3998,7 +3998,7 @@ ipsec_proto_input(ifnet_t interface,
 #if IPSEC_NEXUS
 	struct ipsec_pcb *pcb = ifnet_softc(interface);
 	if (!pcb->ipsec_use_netif)
-#endif // IPSEC_NEXUS
+#endif               
 	{
 		uint32_t af = 0;
 		struct ip *ip = mtod(m, struct ip *);
@@ -4104,7 +4104,7 @@ ipsec_inject_inbound_packet(ifnet_t     interface,
 		ipsec_data_move_end(pcb);
 		return 0;
 	} else
-#endif // IPSEC_NEXUS
+#endif               
 	{
 		errno_t error;
 		protocol_family_t protocol;
@@ -4122,7 +4122,7 @@ ipsec_set_pkthdr_for_interface(ifnet_t interface, mbuf_t packet, int family)
 	if (packet != NULL && interface != NULL) {
 		struct ipsec_pcb *pcb = ifnet_softc(interface);
 		if (pcb != NULL) {
-			/* Set traffic class, set flow */
+			                                 
 			m_set_service_class(packet, pcb->ipsec_output_service_class);
 			packet->m_pkthdr.pkt_flowsrc = FLOWSRC_IFNET;
 			packet->m_pkthdr.pkt_flowid = interface->if_flowhash;
@@ -4187,7 +4187,7 @@ static void
 ipsec_data_move_drain(struct ipsec_pcb *pcb)
 {
 	lck_mtx_lock(&pcb->ipsec_pcb_data_move_lock);
-	/* data path must already be marked as not ready */
+	                                                   
 	VERIFY(!IPSEC_IS_DATA_PATH_READY(pcb));
 	pcb->ipsec_pcb_drainers++;
 	while (pcb->ipsec_pcb_data_move != 0) {
@@ -4203,13 +4203,13 @@ ipsec_data_move_drain(struct ipsec_pcb *pcb)
 static void
 ipsec_wait_data_move_drain(struct ipsec_pcb *pcb)
 {
-	/*
-	 * Mark the data path as not usable.
-	 */
+	  
+                                     
+    
 	lck_mtx_lock(&pcb->ipsec_pcb_data_move_lock);
 	IPSEC_CLR_DATA_PATH_READY(pcb);
 	lck_mtx_unlock(&pcb->ipsec_pcb_data_move_lock);
 
-	/* Wait until all threads in the data paths are done. */
+	                                                        
 	ipsec_data_move_drain(pcb);
 }

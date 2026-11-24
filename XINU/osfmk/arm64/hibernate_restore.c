@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*!
- * ARM64-specific functions required to support hibernation exit.
- */
+   
+                                                                 
+   
 
 #include <mach/mach_types.h>
 #include <kern/misc_protos.h>
@@ -43,8 +43,8 @@
 pal_hib_tramp_result_t gHibTramp;
 pal_hib_globals_t gHibernateGlobals MARK_AS_HIBERNATE_DATA_CONST_LATE;
 
-// as a workaround for <rdar://problem/70121432> References between different compile units in xnu shouldn't go through GOT
-// all of the extern symbols that we refer to in this file have to be declared with hidden visibility
+                                                                                                                           
+                                                                                                     
 extern IOHibernateImageHeader *gIOHibernateCurrentHeader __attribute__((visibility("hidden")));
 extern const uint32_t ccsha256_initial_state[8] __attribute__((visibility("hidden")));
 extern void AccelerateCrypto_SHA256_compress(ccdigest_state_t state, size_t numBlocks, const void *data) __attribute__((visibility("hidden")));
@@ -97,21 +97,21 @@ void
 pal_hib_patchup(pal_hib_ctx_t *ctx)
 {
 
-	/* Reinit the ppl hib lock as it was saved to the hibernation image held. */
+	                                                                            
 	ppl_hib_lock_reinit();
 
-	// DRAM pages are captured from a PPL context, so here we restore all cpu_data structures to a non-PPL context
+	                                                                                                              
 	for (int i = 0; i < MAX_CPUS; i++) {
 		pmap_cpu_data_array[i].cpu_data.ppl_state = PPL_STATE_KERNEL;
 		pmap_cpu_data_array[i].cpu_data.ppl_kern_saved_sp = 0;
 	}
 
-	// cluster CTRR state needs to be reconfigured
+	                                              
 	init_ctrr_cluster_states();
 
-	// Calls into the pmap that could potentially modify pmap data structures
-	// during image copying were explicitly blocked on hibernation entry.
-	// Resetting this variable to false allows those calls to be made again.
+	                                                                         
+	                                                                     
+	                                                                        
 	hib_entry_pmap_lockdown = false;
 }
 
@@ -120,7 +120,7 @@ pal_hib_decompress_page(void *src, void *dst, void *scratch, unsigned int compre
 {
 	const void *wkdmSrc;
 	if (((uint64_t)src) & 63) {
-		// the wkdm instruction requires that our source buffer be aligned, so copy into an aligned buffer if necessary
+		                                                                                                               
 		__nosan_memcpy(scratch, src, compressedSize);
 		wkdmSrc = scratch;
 	} else {
@@ -139,7 +139,7 @@ pal_hib_decompress_page(void *src, void *dst, void *scratch, unsigned int compre
 	HIB_ASSERT(result.status == 0);
 }
 
-// proc_reg's ARM_TTE_TABLE_NS has both NSTABLE and NS set
+                                                          
 #define ARM_LPAE_NSTABLE             0x8000000000000000ULL
 
 #define TOP_LEVEL                    1
@@ -160,7 +160,7 @@ typedef struct {
 static void
 hib_bzero(volatile void *s, size_t n)
 {
-	// can't use __nosan_bzero while the MMU is off, so do it manually
+	                                                                  
 	while (n > sizeof(uint64_t)) {
 		*(volatile uint64_t *)s = 0;
 		s += sizeof(uint64_t);
@@ -181,10 +181,10 @@ hib_bzero(volatile void *s, size_t n)
 static uint64_t
 allocate_page(map_ctx *ctx)
 {
-	// pages that were unnecessary for preservation when we entered hibernation are
-	// marked as free in ctx->bitmap, so they are available for scratch usage during
-	// resume; here, we "borrow" one of these free pages to use as part of our temporary
-	// page tables
+	                                                                               
+	                                                                                
+	                                                                                    
+	              
 	ppnum_t ppnum = hibernate_page_list_grab(ctx->bitmap, &ctx->nextFree);
 	hibernate_page_bitset(ctx->bitmap, FALSE, ppnum);
 	uint64_t result = ptoa_64(ppnum);
@@ -195,14 +195,14 @@ allocate_page(map_ctx *ctx)
 static void
 create_map_entries(map_ctx *ctx, uint64_t vaddr, uint64_t paddr, uint64_t size, uint64_t map_flags)
 {
-	// if we've set gHibTramp.memSlide, we should already be running with the MMU on;
-	// in this case, we don't permit further modification to the page table
+	                                                                                 
+	                                                                       
 	HIB_ASSERT(!gHibTramp.memSlide);
 
 	int level = TOP_LEVEL;
 	volatile uint64_t *table_base = (uint64_t *)ctx->page_table_base;
 	if (map_flags == 0) {
-		paddr = 0; // no physical address for none mappings
+		paddr = 0;                                         
 	}
 
 	while (size) {
@@ -214,13 +214,13 @@ create_map_entries(map_ctx *ctx, uint64_t vaddr, uint64_t paddr, uint64_t size, 
 		size_t level_size = 1ull << level_shift;
 		size_t level_mask = level_size - 1;
 		size_t index = (vaddr >> level_shift) & (level_entries - 1);
-		// Can we make block entries here? Must be permitted at this
-		// level, have enough bytes remaining, and both virtual and
-		// physical addresses aligned to a block.
+		                                                            
+		                                                           
+		                                         
 		if ((level >= 2) &&
 		    size >= level_size &&
 		    ((vaddr | paddr) & level_mask) == 0) {
-			// Map contiguous blocks.
+			                         
 			size_t num_entries = MIN(size / level_size, level_entries - index);
 			if (map_flags) {
 				uint64_t entry = map_flags | ((level < LAST_TABLE_LEVEL) ? ARM_TTE_TYPE_BLOCK : ARM_TTE_TYPE_L3BLOCK);
@@ -230,7 +230,7 @@ create_map_entries(map_ctx *ctx, uint64_t vaddr, uint64_t paddr, uint64_t size, 
 					paddr += level_size;
 				}
 			} else {
-				// make sure all the corresponding entries are empty
+				                                                    
 				for (size_t i = 0; i < num_entries; i++) {
 					HIB_ASSERT(PTE_EMPTY(table_base[index + i]));
 				}
@@ -238,24 +238,24 @@ create_map_entries(map_ctx *ctx, uint64_t vaddr, uint64_t paddr, uint64_t size, 
 			size_t mapped = num_entries * level_size;
 			size -= mapped;
 			if (size) {
-				// map the remaining at the top level
+				                                     
 				level = TOP_LEVEL;
 				table_base = (uint64_t *)ctx->page_table_base;
 				vaddr += mapped;
-				// paddr already incremented above if necessary
+				                                               
 			}
 		} else {
-			// Sub-divide into a next level table.
+			                                      
 			HIB_ASSERT(level < LAST_TABLE_LEVEL);
 			uint64_t entry = table_base[index];
-			HIB_ASSERT((entry & (ARM_TTE_VALID | ARM_TTE_TYPE_MASK)) != (ARM_TTE_VALID | ARM_TTE_TYPE_BLOCK)); // Breaking down blocks not implemented
+			HIB_ASSERT((entry & (ARM_TTE_VALID | ARM_TTE_TYPE_MASK)) != (ARM_TTE_VALID | ARM_TTE_TYPE_BLOCK));                                        
 			uint64_t sub_base = entry & ARM_TTE_TABLE_MASK;
 			if (!sub_base) {
 				sub_base = allocate_page(ctx);
 				HIB_ASSERT((sub_base & PAGE_GRANULE_MASK) == 0);
 				table_base[index] = sub_base | ARM_LPAE_NSTABLE | ARM_TTE_TYPE_TABLE | ARM_TTE_VALID;
 			}
-			// map into the sub table
+			                         
 			level++;
 			table_base = (uint64_t *)sub_base;
 		}
@@ -296,10 +296,10 @@ iterate_bitmaps(const map_ctx *ctx, bool (^callback)(const hibernate_bitmap_t *b
 	}
 }
 
-// during hibernation resume, we can't use the original kernel page table (because we don't know what it was), so we instead
-// create a temporary page table to use during hibernation resume; since the original kernel page table was part of DRAM,
-// it will be restored by the time we're done with hibernation resume, at which point we can jump through the reset vector
-// to reload the original page table
+                                                                                                                            
+                                                                                                                         
+                                                                                                                          
+                                    
 void
 pal_hib_resume_tramp(uint32_t headerPpnum)
 {
@@ -316,7 +316,7 @@ pal_hib_resume_tramp(uint32_t headerPpnum)
 	    + header->previewSize);
 	ctx.bitmap = (hibernate_page_list_t *)map_phys;
 
-	// find the bank describing xnu's map
+	                                     
 	__block uint64_t phys_start = 0, phys_end = 0;
 	iterate_bitmaps(&ctx, ^bool (const hibernate_bitmap_t *bank_bitmap) {
 		if ((bank_bitmap->first_page <= header->restore1CodePhysPage) &&
@@ -333,21 +333,21 @@ pal_hib_resume_tramp(uint32_t headerPpnum)
 
 	hib_bzero(&gHibTramp, sizeof(gHibTramp));
 
-	// During hibernation resume, we create temporary mappings that do not collide with where any of the kernel mappings were originally.
-	// Technically, non-collision isn't a requirement, but doing this means that if some code accidentally jumps to a VA in the original
-	// kernel map, it won't be present in our temporary map and we'll get an exception when jumping to an unmapped address.
-	// The base address of our temporary mappings is adjusted by a random amount as a "poor-man's ASLR". We don’t have a good source of random
-	// numbers in this context, so we just use some of the bits from one of imageHeaderHMMAC, which should be random enough.
+	                                                                                                                                     
+	                                                                                                                                    
+	                                                                                                                       
+	                                                                                                                                          
+	                                                                                                                        
 	uint16_t rand = (uint16_t)(((header->imageHeaderHMAC[0]) << 8) | header->imageHeaderHMAC[1]);
 	uint64_t mem_slide = gHibernateGlobals.kernelSlide - (phys_end - phys_start) * 4 - rand * 256 * PAGE_SIZE;
 
-	// make sure we don't clobber any of the pages we need for restore
+	                                                                  
 	hibernate_reserve_restore_pages(header_phys, header, ctx.bitmap);
 
-	// init nextFree
+	                
 	hibernate_page_list_grab(ctx.bitmap, &ctx.nextFree);
 
-	// map ttbr1 pages
+	                  
 	ctx.page_table_base = allocate_page(&ctx);
 	gHibTramp.ttbr1 = ctx.page_table_base;
 
@@ -359,7 +359,7 @@ pal_hib_resume_tramp(uint32_t headerPpnum)
 			uint64_t seg_end = seg_start + size;
 			uint32_t protection = seg_info->segments[i].protection;
 			if (protection != VM_PROT_NONE) {
-				// make sure the segment is in bounds
+				                                     
 				HIB_ASSERT(seg_start >= phys_start);
 				HIB_ASSERT(seg_end <= phys_end);
 
@@ -367,10 +367,10 @@ pal_hib_resume_tramp(uint32_t headerPpnum)
 					first_seg_start = seg_start;
 				}
 				if (last_seg_end) {
-					// map the "hole" as RW
+					                       
 					map_range_start_end(&ctx, last_seg_end, seg_start, mem_slide, MAP_RW);
 				}
-				// map the segments described in machine_header at their original locations
+				                                                                           
 				bool executable = (protection & VM_PROT_EXECUTE);
 				bool writeable = (protection & VM_PROT_WRITE);
 				uint64_t map_flags = executable ? MAP_RX : writeable ? MAP_RW : MAP_RO;
@@ -378,46 +378,46 @@ pal_hib_resume_tramp(uint32_t headerPpnum)
 				last_seg_end = seg_end;
 			}
 			if (seg_info->segments[i].physPage == header->restore1CodePhysPage) {
-				// this is the hibtext segment, so remember where it ends
+				                                                         
 				hib_text_end = seg_end;
 			}
 		}
 	}
-	// map the rest of kernel memory (the pages that come before and after our segments) as RW
+	                                                                                          
 	map_range_start_end(&ctx, phys_start, first_seg_start, mem_slide, MAP_RW);
 	map_range_start_end(&ctx, last_seg_end, phys_end, mem_slide, MAP_RW);
 
-	// map all of the remaining banks that we didn't already deal with
+	                                                                  
 	iterate_bitmaps(&ctx, ^bool (const hibernate_bitmap_t *bank_bitmap) {
 		uint64_t bank_start = ptoa_64(bank_bitmap->first_page);
 		uint64_t bank_end = ptoa_64(bank_bitmap->last_page) + PAGE_SIZE;
 		if (bank_start == phys_start) {
-		        // skip this bank since we already covered it above
+		                                                           
 		} else {
-		        // map the bank RW
+		                          
 		        map_range_start_end(&ctx, bank_start, bank_end, mem_slide, MAP_RW);
 		}
 		return true;
 	});
 
-	// map ttbr0 pages
+	                  
 	ctx.page_table_base = allocate_page(&ctx);
 	gHibTramp.ttbr0 = ctx.page_table_base;
 
-	// map hib text P=V so that we can still execute at its physical address
+	                                                                        
 	map_range_start_end(&ctx, hib_text_start, hib_text_end, 0, MAP_RX);
 
-	// map the hib image P=V, RW
+	                            
 	uint64_t image_start = trunc_page(header_phys);
 	uint64_t image_end = round_page(header_phys + header->image1Size);
 	map_range_start_end(&ctx, image_start, image_end, 0, MAP_RW);
 
-	// map the handoff pages P=V, RO
+	                                
 	image_start = ptoa_64(header->handoffPages);
 	image_end = image_start + ptoa_64(header->handoffPageCount);
 	map_range_start_end(&ctx, image_start, image_end, 0, MAP_RO);
 
-	// map some device register pages
+	                                 
 	if (gHibernateGlobals.dockChannelRegBase) {
 #define dockchannel_uart_base gHibernateGlobals.dockChannelRegBase
 		vm_address_t dockChannelRegBase = trunc_page(&rDOCKCHANNELS_DEV_WSTAT(DOCKCHANNEL_UART_CHANNEL));

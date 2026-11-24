@@ -27,9 +27,9 @@
 #include <stdarg.h>
 
 int __ioctl(int, unsigned long, void *);
-/*
- * Stub function to account for the third argument being void *
- */
+  
+                                                               
+   
 int
 ioctl(int d, unsigned long request, ...)
 {

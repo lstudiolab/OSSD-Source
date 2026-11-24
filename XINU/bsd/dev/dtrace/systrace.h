@@ -56,4 +56,4 @@ extern void dtrace_systrace_syscall_return(unsigned short, int, int *);
 }
 #endif
 
-#endif  /* _SYS_SYSTRACE_H */
+#endif                       

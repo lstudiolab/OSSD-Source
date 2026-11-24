@@ -26,46 +26,46 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Profile Every Thread (PET) provides a profile of all threads on the system
- * when a timer fires.  PET supports the "record waiting threads" mode in
- * Instruments, and used to be called All Thread States (ATS).  New tools should
- * adopt the lightweight PET mode, which provides the same information, but with
- * much less overhead.
- *
- * When traditional (non-lightweight) PET is active, a migrating timer call
- * causes the PET thread to wake up.  The timer handler also issues a broadcast
- * IPI to the other CPUs, to provide a (somewhat) synchronized set of on-core
- * samples.  This is provided for backwards-compatibility with clients that
- * expect on-core samples, when PET's timer was based off the on-core timers.
- * Because PET sampling can take on the order of milliseconds, the PET thread
- * will enter a new timer deadline after it finished sampling This perturbs the
- * timer cadence by the duration of PET sampling, but it leaves the system to
- * work on non-profiling tasks for the duration of the timer period.
- *
- * Lightweight PET samples the system less-intrusively than normal PET
- * mode.  Instead of iterating tasks and threads on each sample, it increments
- * a global generation count, `kppet_gencount`, which is checked as threads are
- * context switched on-core.  If the thread's local generation count is older
- * than the global generation, the thread samples itself.
- *
- *            |  |
- * thread A   +--+---------|
- *            |  |
- * thread B   |--+---------------|
- *            |  |
- * thread C   |  |         |-------------------------------------
- *            |  |         |
- * thread D   |  |         |     |-------------------------------
- *            |  |         |     |
- *            +--+---------+-----+--------------------------------> time
- *               |         │     |
- *               |         +-----+--- threads sampled when they come on-core in
- *               |                    kperf_pet_switch_context
- *               |
- *               +--- PET timer fire, sample on-core threads A and B,
- *                    increment kppet_gencount
- */
+  
+                                                                             
+                                                                         
+                                                                                
+                                                                                
+                      
+  
+                                                                           
+                                                                               
+                                                                             
+                                                                           
+                                                                             
+                                                                             
+                                                                               
+                                                                             
+                                                                    
+  
+                                                                      
+                                                                              
+                                                                               
+                                                                             
+                                                         
+  
+                  
+                            
+                  
+                                  
+                  
+                                                                 
+                            
+                                                                 
+                                  
+                                                                        
+                                  
+                                                                               
+                                                              
+                  
+                                                                     
+                                              
+   
 
 #include <mach/mach_types.h>
 #include <sys/errno.h>
@@ -82,16 +82,16 @@
 #include <kern/kalloc.h>
 #if defined(__x86_64__)
 #include <i386/mp.h>
-#endif /* defined(__x86_64__) */
+#endif                          
 
 static LCK_MTX_DECLARE(kppet_mtx, &kperf_lck_grp);
 
 static struct {
 	unsigned int g_actionid;
-	/*
-	 * The idle rate controls how many sampling periods to skip if a thread
-	 * is idle.
-	 */
+	  
+                                                                        
+            
+    
 	uint32_t g_idle_rate;
 	bool g_setup:1;
 	bool g_lightweight:1;
@@ -99,9 +99,9 @@ static struct {
 
 	thread_t g_sample_thread;
 
-	/*
-	 * Used by the PET thread to manage which threads and tasks to sample.
-	 */
+	  
+                                                                       
+    
 	thread_t *g_threads;
 	unsigned int g_nthreads;
 	size_t g_threads_size;
@@ -162,10 +162,10 @@ kppet_on_cpu(thread_t thread, thread_continue_t continuation,
 			.cur_pid = task_pid(task),
 			.starting_fp = starting_fp,
 		};
-		/*
-		 * Use a per-CPU interrupt buffer, since this is only called
-		 * while interrupts are disabled, from the scheduler.
-		 */
+		  
+                                                              
+                                                       
+     
 		struct kperf_sample *sample = kperf_intr_sample_buffer();
 		if (!sample) {
 			BUF_VERB(PERF_PET_SAMPLE_THREAD | DBG_FUNC_END, 1);
@@ -187,10 +187,10 @@ kppet_on_cpu(thread_t thread, thread_continue_t continuation,
 
 #pragma mark - state transitions
 
-/*
- * Lazily initialize PET.  The PET thread never exits once PET has been used
- * once.
- */
+  
+                                                                            
+        
+   
 static void
 kppet_setup(void)
 {
@@ -211,9 +211,9 @@ kppet_setup(void)
 void
 kppet_config(unsigned int actionid)
 {
-	/*
-	 * Resetting kperf shouldn't get the PET thread started.
-	 */
+	  
+                                                         
+    
 	if (actionid == 0 && !kppet.g_setup) {
 		return;
 	}
@@ -309,10 +309,10 @@ kppet_sample_thread(int pid, task_t task, thread_t thread, uint32_t idle_rate)
 
 	boolean_t thread_dirty = kperf_thread_get_dirty(thread);
 
-	/*
-	 * Clean a dirty thread and skip callstack sample if the thread was not
-	 * dirty and thread had skipped less than `idle_rate` samples.
-	 */
+	  
+                                                                        
+                                                               
+    
 	if (thread_dirty) {
 		kperf_thread_set_dirty(thread, FALSE);
 	} else if ((thread->kperf_pet_cnt % idle_rate) != 0) {
@@ -342,18 +342,18 @@ kppet_threads_prepare(task_t task)
 			return KERN_FAILURE;
 		}
 
-		/*
-		 * With the task locked, figure out if enough space has been allocated to
-		 * contain all of the thread references.
-		 */
+		  
+                                                                           
+                                          
+     
 		threads_size_needed = task->thread_count * sizeof(thread_t);
 		if (threads_size_needed <= kppet.g_threads_size) {
 			break;
 		}
 
-		/*
-		 * Otherwise, allocate more and try again.
-		 */
+		  
+                                            
+     
 		task_unlock(task);
 
 		if (kppet.g_threads_size != 0) {
@@ -382,12 +382,12 @@ kppet_threads_prepare(task_t task)
 	return (kppet.g_nthreads > 0) ? KERN_SUCCESS : KERN_FAILURE;
 }
 
-/*
- * Sample a `task`, using `idle_rate` to control whether idle threads need to be
- * re-sampled.
- *
- * The task must be referenced.
- */
+  
+                                                                                
+              
+  
+                               
+   
 static void
 kppet_sample_task(task_t task, uint32_t idle_rate)
 {
@@ -415,10 +415,10 @@ kppet_sample_task(task_t task, uint32_t idle_rate)
 		return;
 	}
 
-	/*
-	 * Suspend the task to see an atomic snapshot of all its threads.  This
-	 * is expensive and disruptive.
-	 */
+	  
+                                                                        
+                                
+    
 	kern_return_t kr = task_suspend_internal(task);
 	if (kr != KERN_SUCCESS) {
 		BUF_VERB(PERF_PET_SAMPLE_TASK | DBG_FUNC_END, 1);
@@ -446,10 +446,10 @@ out:
 	BUF_VERB(PERF_PET_SAMPLE_TASK | DBG_FUNC_END, kppet.g_nthreads);
 }
 
-/*
- * Store and reference all tasks on the system, so they can be safely inspected
- * outside the `tasks_threads_lock`.
- */
+  
+                                                                               
+                                    
+   
 static kern_return_t
 kppet_tasks_prepare(void)
 {
@@ -460,18 +460,18 @@ kppet_tasks_prepare(void)
 	for (;;) {
 		lck_mtx_lock(&tasks_threads_lock);
 
-		/*
-		 * With the lock held, break out of the lock/unlock loop if
-		 * there's enough space to store all the tasks.
-		 */
+		  
+                                                             
+                                                 
+     
 		size_needed = tasks_count * sizeof(task_t);
 		if (size_needed <= kppet.g_tasks_size) {
 			break;
 		}
 
-		/*
-		 * Otherwise, allocate more memory outside of the lock.
-		 */
+		  
+                                                         
+     
 		lck_mtx_unlock(&tasks_threads_lock);
 
 		if (size_needed > kppet.g_tasks_size) {

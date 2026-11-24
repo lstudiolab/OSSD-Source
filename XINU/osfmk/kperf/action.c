@@ -26,15 +26,15 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Called from a trigger. Actually takes the data from the different
- * modules and puts them in a buffer
- */
+  
+                                                                    
+                                    
+   
 
 #include <mach/mach_types.h>
 #include <machine/machine_routines.h>
 #include <kern/kalloc.h>
-#include <kern/debug.h> /* panic */
+#include <kern/debug.h>            
 #include <kern/thread.h>
 #include <sys/errno.h>
 #include <sys/vm.h>
@@ -57,7 +57,7 @@
 
 #define ACTION_MAX (32)
 
-/* the list of different actions to take */
+                                           
 struct action {
 	uint32_t sample;
 	uint32_t ucallstack_depth;
@@ -66,11 +66,11 @@ struct action {
 	int pid_filter;
 };
 
-/* the list of actions */
+                         
 static unsigned int actionc = 0;
 static struct action *actionv = NULL;
 
-/* should emit tracepoint on context switch */
+                                              
 int kperf_kdebug_cswitch = 0;
 
 bool
@@ -137,9 +137,9 @@ kperf_sample_user_internal(struct kperf_usample *sbuf,
 
 	boolean_t intren = ml_set_interrupts_enabled(FALSE);
 
-	/*
-	 * No userdata or sample_flags for this one.
-	 */
+	  
+                                             
+    
 	BUF_DATA(PERF_GEN_EVENT | DBG_FUNC_START, sample_what, actionid);
 
 	if (sample_what & SAMPLER_USTACK) {
@@ -168,7 +168,7 @@ kperf_sample_user(struct kperf_usample *sbuf, struct kperf_context *context,
 	unsigned int sample_what = actionv[actionid - 1].sample;
 	unsigned int ucallstack_depth = actionv[actionid - 1].ucallstack_depth;
 
-	/* callstacks should be explicitly ignored */
+	                                             
 	if (sample_flags & SAMPLE_FLAG_EMPTY_CALLSTACK) {
 		sample_what &= ~(SAMPLER_KSTACK | SAMPLER_USTACK);
 	}
@@ -210,7 +210,7 @@ kperf_sample_internal(struct kperf_sample *sbuf,
 		return SAMPLE_CONTINUE;
 	}
 
-	/* callstacks should be explicitly ignored */
+	                                             
 	if (sample_flags & SAMPLE_FLAG_EMPTY_CALLSTACK) {
 		sample_what &= ~(SAMPLER_KSTACK | SAMPLER_USTACK);
 	}
@@ -267,7 +267,7 @@ kperf_sample_internal(struct kperf_sample *sbuf,
 		if (sample_flags & SAMPLE_FLAG_CONTINUATION) {
 			kperf_continuation_sample(&(sbuf->kcallstack), context);
 		} else if (sample_flags & SAMPLE_FLAG_NON_INTERRUPT) {
-			/* outside of interrupt context, backtrace the current thread */
+			                                                                
 			kperf_backtrace_sample(&(sbuf->kcallstack), context);
 		} else {
 			kperf_kcallstack_sample(&(sbuf->kcallstack), context);
@@ -302,20 +302,20 @@ kperf_sample_internal(struct kperf_sample *sbuf,
 	}
 
 log_sample:
-	/* lookup the user tag, if any */
+	                                 
 	if (actionid && (actionid <= actionc)) {
 		userdata = actionv[actionid - 1].userdata;
 	}
 
-	/* avoid logging if this sample only pended samples */
+	                                                      
 	if (sample_flags & SAMPLE_FLAG_PEND_USER &&
 	    !(sample_what & ~(SAMPLER_USTACK | SAMPLER_TH_DISPATCH))) {
 		return SAMPLE_CONTINUE;
 	}
 
-	/* stash the data into the buffer
-	 * interrupts off to ensure we don't get split
-	 */
+	                                 
+                                               
+    
 	boolean_t enabled = ml_set_interrupts_enabled(FALSE);
 
 	BUF_DATA(PERF_GEN_EVENT | DBG_FUNC_START, sample_what,
@@ -352,9 +352,9 @@ log_sample:
 		kperf_task_info_log(context);
 	}
 
-	/* dump user stuff */
+	                     
 	if (!is_kernel) {
-		/* dump meminfo */
+		                  
 		if (sample_what & SAMPLER_MEMINFO) {
 			kperf_meminfo_log(&(sbuf->meminfo));
 		}
@@ -382,36 +382,36 @@ log_sample:
 log_sample_end:
 	BUF_DATA(PERF_GEN_EVENT | DBG_FUNC_END, sample_what, on_idle_thread ? 1 : 0);
 
-	/* intrs back on */
+	                   
 	ml_set_interrupts_enabled(enabled);
 
 	return SAMPLE_CONTINUE;
 }
 
-/* Translate actionid into sample bits and take a sample */
+                                                           
 kern_return_t
 kperf_sample(struct kperf_sample *sbuf,
     struct kperf_context *context,
     unsigned actionid, unsigned sample_flags)
 {
-	/* work out what to sample, if anything */
+	                                          
 	if ((actionid > actionc) || (actionid == 0)) {
 		return SAMPLE_SHUTDOWN;
 	}
 
-	/* check the pid filter against the context's current pid.
-	 * filter pid == -1 means any pid
-	 */
+	                                                          
+                                  
+    
 	int pid_filter = actionv[actionid - 1].pid_filter;
 	if ((pid_filter != -1) && (pid_filter != context->cur_pid)) {
 		return SAMPLE_CONTINUE;
 	}
 
-	/* the samplers to run */
+	                         
 	unsigned int sample_what = actionv[actionid - 1].sample;
 	unsigned int ucallstack_depth = actionv[actionid - 1].ucallstack_depth;
 
-	/* do the actual sample operation */
+	                                    
 	return kperf_sample_internal(sbuf, context, sample_what,
 	           sample_flags, actionid, ucallstack_depth);
 }
@@ -455,11 +455,11 @@ kperf_kdebug_handler(uint32_t debugid, uintptr_t *starting_fp)
 	BUF_VERB(PERF_KDBG_HNDLR | DBG_FUNC_END, kr);
 }
 
-/*
- * This function allocates >2.3KB of the stack.  Prevent the compiler from
- * inlining this function into ast_taken and ensure the stack memory is only
- * allocated for the kperf AST.
- */
+  
+                                                                          
+                                                                            
+                               
+   
 __attribute__((noinline))
 void
 kperf_thread_ast_handler(thread_t thread)
@@ -488,7 +488,7 @@ kperf_thread_ast_handler(thread_t thread)
 		sample_what |= SAMPLER_TH_DISPATCH;
 	}
 	if (ast & T_KPERF_AST_CALLSTACK) {
-		/* TH_INFO for backwards compatibility */
+		                                         
 		sample_what |= SAMPLER_USTACK | SAMPLER_TH_INFO;
 	}
 
@@ -518,7 +518,7 @@ kperf_ast_pend(thread_t thread, uint32_t set_flags, unsigned int set_actionid)
 
 		thread->kperf_ast = ast;
 
-		/* set the actual AST */
+		                        
 		act_set_kperf(thread);
 		return 1;
 	}
@@ -553,9 +553,9 @@ kperf_kdbg_cswitch_set(int newval)
 	return 0;
 }
 
-/*
- * Action configuration
- */
+  
+                       
+   
 unsigned int
 kperf_action_get_count(void)
 {
@@ -569,8 +569,8 @@ kperf_action_set_samplers(unsigned actionid, uint32_t samplers)
 		return EINVAL;
 	}
 
-	/* disallow both CPU and thread counters to be sampled in the same
-	 * action */
+	                                                                  
+             
 	if ((samplers & SAMPLER_PMC_THREAD) && (samplers & SAMPLER_PMC_CPU)) {
 		return EINVAL;
 	}
@@ -588,7 +588,7 @@ kperf_action_get_samplers(unsigned actionid, uint32_t *samplers_out)
 	}
 
 	if (actionid == 0) {
-		*samplers_out = 0; /* "NULL" action */
+		*samplers_out = 0;                    
 	} else {
 		*samplers_out = actionv[actionid - 1].sample;
 	}
@@ -616,7 +616,7 @@ kperf_action_get_userdata(unsigned actionid, uint32_t *userdata_out)
 	}
 
 	if (actionid == 0) {
-		*userdata_out = 0; /* "NULL" action */
+		*userdata_out = 0;                    
 	} else {
 		*userdata_out = actionv[actionid - 1].userdata;
 	}
@@ -644,7 +644,7 @@ kperf_action_get_filter(unsigned actionid, int *pid_out)
 	}
 
 	if (actionid == 0) {
-		*pid_out = -1; /* "NULL" action */
+		*pid_out = -1;                    
 	} else {
 		*pid_out = actionv[actionid - 1].pid_filter;
 	}
@@ -670,29 +670,29 @@ kperf_action_set_count(unsigned count)
 	struct action *new_actionv = NULL, *old_actionv = NULL;
 	unsigned old_count;
 
-	/* easy no-op */
+	                
 	if (count == actionc) {
 		return 0;
 	}
 
-	/* TODO: allow shrinking? */
+	                            
 	if (count < actionc) {
 		return EINVAL;
 	}
 
-	/* cap it for good measure */
+	                             
 	if (count > ACTION_MAX) {
 		return EINVAL;
 	}
 
-	/* creating the action arror for the first time. create a few
-	 * more things, too.
-	 */
+	                                                             
+                     
+    
 	if (actionc == 0) {
 		kperf_setup();
 	}
 
-	/* create a new array */
+	                        
 	new_actionv = kalloc_tag(count * sizeof(*new_actionv), VM_KERN_MEMORY_DIAG);
 	if (new_actionv == NULL) {
 		return ENOMEM;

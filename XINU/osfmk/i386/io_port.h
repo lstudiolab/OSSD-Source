@@ -54,22 +54,22 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
 #ifndef _I386_IO_PORT_H_
 #define _I386_IO_PORT_H_
-/*
- * IO register definitions.
- */
+  
+                           
+   
 typedef unsigned short  io_reg_t;
 
-#define IO_REG_NULL     (0x00ff)        /* reserved */
+#define IO_REG_NULL     (0x00ff)                      
 
-/*
- * Allocate and destroy io port sets for users to map into
- * threads.
- */
+  
+                                                          
+           
+   
 
 #if 0
 extern void     io_port_create(
@@ -79,4 +79,4 @@ extern void     io_port_destroy(
 	device_t                device);
 
 #endif
-#endif  /* _I386_IO_PORT_H_ */
+#endif                        

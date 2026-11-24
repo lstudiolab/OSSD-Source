@@ -43,14 +43,14 @@
 
 extern kern_return_t ptrauth_data_tests(void);
 
-/*
- * Given an existing PAC pointer (ptr), its declaration type (decl), the (key)
- * used to sign it and the string discriminator (discr), extract the raw pointer
- * along with the signature and compare it with one computed on the fly
- * via ptrauth_sign_unauthenticated().
- *
- * If the two mismatch, return an error and fail the test.
- */
+  
+                                                                              
+                                                                                
+                                                                       
+                                      
+  
+                                                          
+   
 #define VALIDATE_PTR(decl, ptr, key, discr) { \
 	decl raw = *(decl *)&(ptr);      \
 	decl cmp = ptrauth_sign_unauthenticated(ptr, key, \
@@ -61,10 +61,10 @@ extern kern_return_t ptrauth_data_tests(void);
 	} \
 }
 
-/*
- * Allocate the containing structure, and store a pointer to the desired member,
- * which should be subject to pointer signing.
- */
+  
+                                                                                
+                                              
+   
 #define ALLOC_VALIDATE_DATA_PTR(structure, decl, member, discr) { \
 	structure *tmp =  kheap_alloc(KHEAP_TEMP, sizeof(structure), Z_WAITOK | Z_ZERO); \
 	if (!tmp) return ENOMEM; \
@@ -75,10 +75,10 @@ extern kern_return_t ptrauth_data_tests(void);
 
 #define VALIDATE_DATA_PTR(decl, ptr, discr) VALIDATE_PTR(decl, ptr, ptrauth_key_process_independent_data, discr)
 
-/*
- * Validate that a pointer that is supposed to be signed, is, and that the signature
- * matches based on signing key, location and discriminator
- */
+  
+                                                                                    
+                                                           
+   
 static int
 sysctl_run_ptrauth_data_tests SYSCTL_HANDLER_ARGS
 {
@@ -91,20 +91,20 @@ sysctl_run_ptrauth_data_tests SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-	/* proc_t */
+	            
 	ALLOC_VALIDATE_DATA_PTR(struct proc, void *, task, "proc.task");
 	ALLOC_VALIDATE_DATA_PTR(struct proc, struct proc *, p_pptr, "proc.p_pptr");
 	ALLOC_VALIDATE_DATA_PTR(struct proc, struct vnode *, p_textvp, "proc.p_textvp");
 	ALLOC_VALIDATE_DATA_PTR(struct proc, struct pgrp *, p_pgrp, "proc.p_pgrp");
 
-	/* cs_blob */
+	             
 	ALLOC_VALIDATE_DATA_PTR(struct cs_blob, struct cs_blob *, csb_next, "cs_blob.csb_next");
 	ALLOC_VALIDATE_DATA_PTR(struct cs_blob, const CS_CodeDirectory *, csb_cd, "cs_blob.csb_cd");
 	ALLOC_VALIDATE_DATA_PTR(struct cs_blob, const char *, csb_teamid, "cs_blob.csb_teamid");
 	ALLOC_VALIDATE_DATA_PTR(struct cs_blob, const CS_GenericBlob *, csb_entitlements_blob, "cs_blob.csb_entitlements_blob");
 	ALLOC_VALIDATE_DATA_PTR(struct cs_blob, void *, csb_entitlements, "cs_blob.csb_entitlements");
 
-	/* The rest of the tests live in osfmk/ */
+	                                          
 	kr = ptrauth_data_tests();
 
 	if (error == 0) {
@@ -118,5 +118,5 @@ SYSCTL_PROC(_kern, OID_AUTO, run_ptrauth_data_tests,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED | CTLFLAG_MASKED,
     0, 0, sysctl_run_ptrauth_data_tests, "I", "");
 
-#endif /*  __has_feature(ptrauth_calls) */
-#endif /* DEVELOPMENT || DEBUG */
+#endif                                    
+#endif                           

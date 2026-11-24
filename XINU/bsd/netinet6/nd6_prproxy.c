@@ -26,58 +26,58 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Prefix-based Neighbor Discovery Proxy
- *
- * When an interface is marked with the ND6_IFF_PROXY_PREFIXES flag, all
- * of current and future non-scoped on-link prefixes configured on the
- * interface will be shared with the scoped variant of such prefixes on
- * other interfaces.  This allows for one or more prefixes to be shared
- * across multiple links, with full support for Duplicate Addres Detection,
- * Address Resolution and Neighbor Unreachability Detection.
- *
- * A non-scoped prefix may be configured statically, or dynamically via
- * Router Advertisement.  An interface is said to be an "upstream" interface
- * when it is marked with ND6_IFF_PROXY_PREFIXES and has at least one prefix
- * that is non-scoped (global, not scoped.)  Such prefixes are marked with
- * the NDPRF_PRPROXY flag.
- *
- * A scoped prefix typically gets configured by way of adding an address
- * to a "downstream" interface, when the added address is part of an existing
- * prefix that is allowed to be shared (i.e. NDPRF_PRPROXY prefixes.)  Unlike
- * non-scoped prefixes, however, scoped prefixes will never be marked with
- * the NDPRF_PRPROXY flag.
- *
- * The setting of NDPRF_PRPROXY depends on whether the prefix is on-link;
- * an off-link prefix on an interface marked with ND6_IFF_PROXY_PREFIXES
- * will not cause NDPRF_PRPROXY to be set (it will only happen when that
- * prefix goes on-link.)  Likewise, a previously on-link prefix that has
- * transitioned to off-link will cause its NDPRF_PRPROXY flag to be cleared.
- *
- * Prefix proxying relies on IPv6 Scoped Routing to be in effect, as it would
- * otherwise be impossible to install scoped prefix route entries in the
- * routing table.  By default, such cloning prefix routes will generate cloned
- * routes that are scoped according to their interfaces.  Because prefix
- * proxying is essentially creating a larger network comprised of multiple
- * links sharing a prefix, we need to treat the cloned routes as if they
- * weren't scoped route entries.  This requires marking such cloning prefix
- * routes with the RTF_PROXY flag, which serves as an indication that the
- * route entry (and its clones) are part of a proxied prefix, and that the
- * entries are non-scoped.
- *
- * In order to handle solicited-node destined ND packets (Address Resolution,
- * Neighbor Unreachability Detection), prefix proxying also requires that the
- * "upstream" and "downstream" interfaces be configured for all-multicast mode.
- *
- * The setting and clearing of RTF_PROXY flag, as well as the entering and
- * exiting of all-multicast mode on those interfaces happen when a prefix
- * transitions between on-link and off-link (vice versa.)
- *
- * Note that this is not a strict implementation of RFC 4389, but rather a
- * derivative based on similar concept.  In particular, we only proxy NS and
- * NA packets; RA packets are never proxied.  Care should be taken to enable
- * prefix proxying only on non-looping network topology.
- */
+  
+                                        
+  
+                                                                        
+                                                                      
+                                                                       
+                                                                       
+                                                                           
+                                                            
+  
+                                                                       
+                                                                            
+                                                                            
+                                                                          
+                          
+  
+                                                                        
+                                                                             
+                                                                             
+                                                                          
+                          
+  
+                                                                         
+                                                                        
+                                                                        
+                                                                        
+                                                                            
+  
+                                                                             
+                                                                        
+                                                                              
+                                                                        
+                                                                          
+                                                                        
+                                                                           
+                                                                         
+                                                                          
+                          
+  
+                                                                             
+                                                                             
+                                                                               
+  
+                                                                          
+                                                                         
+                                                         
+  
+                                                                          
+                                                                            
+                                                                            
+                                                        
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -108,32 +108,32 @@
 
 struct nd6_prproxy_prelist {
 	SLIST_ENTRY(nd6_prproxy_prelist) ndprl_le;
-	struct nd_prefix *ndprl_pr;             /* prefix */
-	struct nd_prefix *ndprl_up;             /* non-NULL for upstream */
-	struct ifnet    *ndprl_fwd_ifp;         /* outgoing interface */
-	boolean_t       ndprl_sol;              /* unicast solicitor? */
-	struct in6_addr ndprl_sol_saddr;        /* solicitor's address */
+	struct nd_prefix *ndprl_pr;                         
+	struct nd_prefix *ndprl_up;                                        
+	struct ifnet    *ndprl_fwd_ifp;                                 
+	boolean_t       ndprl_sol;                                      
+	struct in6_addr ndprl_sol_saddr;                                 
 };
 
-/*
- * Soliciting node (source) record.
- */
+  
+                                   
+   
 struct nd6_prproxy_solsrc {
 	TAILQ_ENTRY(nd6_prproxy_solsrc) solsrc_tqe;
-	struct in6_addr solsrc_saddr;           /* soliciting (src) address */
-	struct ifnet    *solsrc_ifp;            /* iface where NS arrived on */
+	struct in6_addr solsrc_saddr;                                         
+	struct ifnet    *solsrc_ifp;                                           
 };
 
-/*
- * Solicited node (target) record.
- */
+  
+                                  
+   
 struct nd6_prproxy_soltgt {
-	RB_ENTRY(nd6_prproxy_soltgt) soltgt_link; /* RB tree links */
+	RB_ENTRY(nd6_prproxy_soltgt) soltgt_link;                    
 	struct soltgt_key_s {
-		struct in6_addr taddr;          /* solicited (tgt) address */
+		struct in6_addr taddr;                                       
 	} soltgt_key;
-	u_int64_t       soltgt_expire;          /* expiration time */
-	u_int32_t       soltgt_cnt;             /* total # of solicitors */
+	u_int64_t       soltgt_expire;                               
+	u_int32_t       soltgt_cnt;                                        
 	TAILQ_HEAD(, nd6_prproxy_solsrc) soltgt_q;
 };
 
@@ -159,38 +159,38 @@ static void nd6_prproxy_sols_purge(struct nd_prefix *, u_int64_t);
 RB_PROTOTYPE_SC_PREV(__private_extern__, prproxy_sols_tree, nd6_prproxy_soltgt,
     soltgt_link, soltgt_cmp);
 
-/*
- * Time (in seconds) before a target record expires (is idle).
- */
+  
+                                                              
+   
 #define ND6_TGT_SOLS_EXPIRE                     5
 
-/*
- * Maximum number of queued soliciting (source) records per target.
- */
+  
+                                                                   
+   
 #define ND6_MAX_SRC_SOLS_DEFAULT                4
 
-/*
- * Maximum number of queued solicited (target) records per prefix.
- */
+  
+                                                                  
+   
 #define ND6_MAX_TGT_SOLS_DEFAULT                8
 
 static u_int32_t nd6_max_tgt_sols = ND6_MAX_TGT_SOLS_DEFAULT;
 static u_int32_t nd6_max_src_sols = ND6_MAX_SRC_SOLS_DEFAULT;
 
 static ZONE_DECLARE(ndprl_zone, "nd6_prproxy_prelist",
-    sizeof(struct nd6_prproxy_prelist), ZC_ZFREE_CLEARMEM);    /* nd6_prproxy_prelist zone */
+    sizeof(struct nd6_prproxy_prelist), ZC_ZFREE_CLEARMEM);                                  
 
 static ZONE_DECLARE(solsrc_zone, "nd6_prproxy_solsrc",
-    sizeof(struct nd6_prproxy_solsrc), ZC_ZFREE_CLEARMEM);     /* nd6_prproxy_solsrc zone */
+    sizeof(struct nd6_prproxy_solsrc), ZC_ZFREE_CLEARMEM);                                  
 
 static ZONE_DECLARE(soltgt_zone, "nd6_prproxy_soltgt",
-    sizeof(struct nd6_prproxy_soltgt), ZC_ZFREE_CLEARMEM);     /* nd6_prproxy_soltgt zone */
+    sizeof(struct nd6_prproxy_soltgt), ZC_ZFREE_CLEARMEM);                                  
 
-/* The following is protected by ndpr_lock */
+                                             
 RB_GENERATE_PREV(prproxy_sols_tree, nd6_prproxy_soltgt,
     soltgt_link, soltgt_cmp);
 
-/* The following is protected by proxy6_lock (for updates) */
+                                                             
 u_int32_t nd6_prproxy;
 
 extern lck_mtx_t *nd6_mutex;
@@ -221,12 +221,12 @@ nd6_ndprl_free(struct nd6_prproxy_prelist *ndprl)
 	zfree(ndprl_zone, ndprl);
 }
 
-/*
- * Apply routing function on the affected upstream and downstream prefixes,
- * i.e. either set or clear RTF_PROXY on the cloning prefix route; all route
- * entries that were cloned off these prefixes will be blown away.  Caller
- * must have acquired proxy6_lock and must not be holding nd6_mutex.
- */
+  
+                                                                           
+                                                                            
+                                                                          
+                                                                    
+   
 static void
 nd6_prproxy_prelist_setroute(boolean_t enable,
     struct nd6_prproxy_prelist_head *up_head,
@@ -281,7 +281,7 @@ nd6_prproxy_prelist_setroute(boolean_t enable,
 			NDPR_UNLOCK(pr);
 		}
 
-		/* Call the following ioctl after releasing NDPR lock */
+		                                                        
 		if (set_allmulti && ifp != NULL) {
 			if_allmulti(ifp, allmulti_sw);
 		}
@@ -349,10 +349,10 @@ nd6_prproxy_prelist_setroute(boolean_t enable,
 	}
 }
 
-/*
- * Enable/disable prefix proxying on an interface; typically called
- * as part of handling SIOCSIFINFO_FLAGS[SETROUTERMODE_IN6]
- */
+  
+                                                                   
+                                                           
+   
 int
 nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 {
@@ -361,7 +361,7 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 	struct nd6_prproxy_prelist *up, *down;
 	struct nd_prefix *pr;
 
-	/* Can't be enabled if we are an advertising router on the interface */
+	                                                                       
 	ifnet_lock_shared(ifp);
 	if (enable && (ifp->if_ipv6_router_mode == IPV6_ROUTER_MODE_EXCLUSIVE)) {
 		ifnet_lock_done(ifp);
@@ -372,15 +372,15 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 	SLIST_INIT(&up_head);
 	SLIST_INIT(&down_head);
 
-	/*
-	 * Serialize the clearing/setting of NDPRF_PRPROXY.
-	 */
+	  
+                                                    
+    
 	lck_mtx_lock(&proxy6_lock);
 
-	/*
-	 * First build a list of upstream prefixes on this interface for
-	 * which we need to enable/disable prefix proxy functionality.
-	 */
+	  
+                                                                 
+                                                               
+    
 	lck_mtx_lock(nd6_mutex);
 	for (pr = nd_prefix.lh_first; pr; pr = pr->ndpr_next) {
 		NDPR_LOCK(pr);
@@ -393,13 +393,13 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 			continue;
 		}
 
-		/*
-		 * At present, in order for the prefix to be eligible
-		 * as a proxying/proxied prefix, we require that the
-		 * prefix route entry be marked as a cloning route with
-		 * RTF_PROXY; i.e. nd6_need_cache() needs to return
-		 * true for the interface type.
-		 */
+		  
+                                                       
+                                                      
+                                                         
+                                                     
+                                 
+     
 		if (enable && (pr->ndpr_stateflags & NDPRF_ONLINK) &&
 		    nd6_need_cache(ifp)) {
 			pr->ndpr_stateflags |= NDPRF_PRPROXY;
@@ -411,7 +411,7 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 			NDPR_UNLOCK(pr);
 		} else {
 			NDPR_UNLOCK(pr);
-			pr = NULL;      /* don't go further */
+			pr = NULL;                            
 		}
 
 		if (pr == NULL) {
@@ -424,15 +424,15 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 			continue;
 		}
 
-		up->ndprl_pr = pr;      /* keep reference from above */
+		up->ndprl_pr = pr;                                     
 		SLIST_INSERT_HEAD(&up_head, up, ndprl_le);
 	}
 
-	/*
-	 * Now build a list of matching (scoped) downstream prefixes on other
-	 * interfaces which need to be enabled/disabled accordingly.  Note that
-	 * the NDPRF_PRPROXY is never set/cleared on the downstream prefixes.
-	 */
+	  
+                                                                      
+                                                                        
+                                                                      
+    
 	SLIST_FOREACH(up, &up_head, ndprl_le) {
 		struct nd_prefix *fwd;
 		struct in6_addr pr_addr;
@@ -471,9 +471,9 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 	}
 	lck_mtx_unlock(nd6_mutex);
 
-	/*
-	 * Apply routing function on prefixes; callee will free resources.
-	 */
+	  
+                                                                   
+    
 	nd6_prproxy_prelist_setroute(enable,
 	    (struct nd6_prproxy_prelist_head *)&up_head,
 	    (struct nd6_prproxy_prelist_head *)&down_head);
@@ -486,11 +486,11 @@ nd6_if_prproxy(struct ifnet *ifp, boolean_t enable)
 	return 0;
 }
 
-/*
- * Called from the input path to determine whether the packet is destined
- * to a proxied node; if so, mark the mbuf with PKTFF_PROXY_DST so that
- * icmp6_input() knows that this is not to be delivered to socket(s).
- */
+  
+                                                                         
+                                                                       
+                                                                     
+   
 boolean_t
 nd6_prproxy_isours(struct mbuf *m, struct ip6_hdr *ip6, struct route_in6 *ro6,
     unsigned int ifscope)
@@ -526,7 +526,7 @@ nd6_prproxy_isours(struct mbuf *m, struct ip6_hdr *ip6, struct route_in6 *ro6,
 
 		ROUTE_RELEASE(ro6);
 
-		/* Caller must have ensured this condition (not srcrt) */
+		                                                         
 		VERIFY(IN6_ARE_ADDR_EQUAL(&ip6->ip6_dst,
 		    &ro6->ro_dst.sin6_addr));
 
@@ -549,11 +549,11 @@ done:
 	return ours;
 }
 
-/*
- * Called from the input path to determine whether or not the proxy
- * route entry is pointing to the correct interface, and to perform
- * the necessary route fixups otherwise.
- */
+  
+                                                                   
+                                                                   
+                                        
+   
 void
 nd6_proxy_find_fwdroute(struct ifnet *ifp, struct route_in6 *ro6)
 {
@@ -570,25 +570,25 @@ nd6_proxy_find_fwdroute(struct ifnet *ifp, struct route_in6 *ro6)
 			    ip6_sprintf(dst6),
 			    if_name(rt->rt_ifp));
 			RT_UNLOCK(rt);
-			/* look it up below */
+			                      
 		} else {
 			RT_UNLOCK(rt);
-			/*
-			 * The route is already marked with RTF_PRPROXY and
-			 * it isn't pointing back to the inbound interface;
-			 * optimistically return (see notes below).
-			 */
+			  
+                                                      
+                                                      
+                                              
+      
 			return;
 		}
 	}
 
-	/*
-	 * Find out where we should forward this packet to, by searching
-	 * for another interface that is proxying for the prefix.  Our
-	 * current implementation assumes that the proxied prefix is shared
-	 * to no more than one downstream interfaces (typically a bridge
-	 * interface).
-	 */
+	  
+                                                                 
+                                                               
+                                                                    
+                                                                 
+               
+    
 	lck_mtx_lock(nd6_mutex);
 	for (pr = nd_prefix.lh_first; pr; pr = pr->ndpr_next) {
 		struct in6_addr pr_addr;
@@ -631,11 +631,11 @@ nd6_proxy_find_fwdroute(struct ifnet *ifp, struct route_in6 *ro6)
 	lck_mtx_lock(rnh_lock);
 	ROUTE_RELEASE_LOCKED(ro6);
 
-	/*
-	 * Lookup a forwarding route; delete the route if it's incorrect,
-	 * or return to caller if the correct one got created prior to
-	 * our acquiring the rnh_lock.
-	 */
+	  
+                                                                  
+                                                               
+                               
+    
 	if ((rt = rtalloc1_scoped_locked(SA(&ro6->ro_dst), 0,
 	    RTF_CLONING | RTF_PRCLONING, IFSCOPE_NONE)) != NULL) {
 		RT_LOCK(rt);
@@ -651,16 +651,16 @@ nd6_proxy_find_fwdroute(struct ifnet *ifp, struct route_in6 *ro6)
 			    "for dst %s\n", if_name(rt->rt_ifp),
 			    ip6_sprintf(dst6));
 			RT_UNLOCK(rt);
-			ro6->ro_rt = rt;        /* refcnt held by rtalloc1 */
+			ro6->ro_rt = rt;                                     
 			lck_mtx_unlock(rnh_lock);
 			return;
 		}
 	}
 	VERIFY(rt == NULL && ro6->ro_rt == NULL);
 
-	/*
-	 * Clone a route from the correct parent prefix route and return it.
-	 */
+	  
+                                                                     
+    
 	if (fwd_ifp != NULL && (rt = rtalloc1_scoped_locked(SA(&ro6->ro_dst), 1,
 	    RTF_PRCLONING, fwd_ifp->if_index)) != NULL) {
 		RT_LOCK(rt);
@@ -673,7 +673,7 @@ nd6_proxy_find_fwdroute(struct ifnet *ifp, struct route_in6 *ro6)
 			    "route for dst %s\n", if_name(rt->rt_ifp),
 			    ip6_sprintf(dst6));
 			RT_UNLOCK(rt);
-			ro6->ro_rt = rt;        /* refcnt held by rtalloc1 */
+			ro6->ro_rt = rt;                                     
 		}
 	}
 	VERIFY(rt != NULL || ro6->ro_rt == NULL);
@@ -686,11 +686,11 @@ nd6_proxy_find_fwdroute(struct ifnet *ifp, struct route_in6 *ro6)
 	lck_mtx_unlock(rnh_lock);
 }
 
-/*
- * Called when a prefix transitions between on-link and off-link.  Perform
- * routing (RTF_PROXY) and interface (all-multicast) related operations on
- * the affected prefixes.
- */
+  
+                                                                          
+                                                                          
+                         
+   
 void
 nd6_prproxy_prelist_update(struct nd_prefix *pr_cur, struct nd_prefix *pr_up)
 {
@@ -708,11 +708,11 @@ nd6_prproxy_prelist_update(struct nd_prefix *pr_cur, struct nd_prefix *pr_up)
 
 	LCK_MTX_ASSERT(&proxy6_lock, LCK_MTX_ASSERT_OWNED);
 
-	/*
-	 * Upstream prefix.  If caller did not specify one, search for one
-	 * based on the information in current prefix.  Caller is expected
-	 * to have held an extra reference for the passed-in prefixes.
-	 */
+	  
+                                                                   
+                                                                   
+                                                               
+    
 	lck_mtx_lock(nd6_mutex);
 	if (pr_up == NULL) {
 		NDPR_LOCK(pr_cur);
@@ -747,11 +747,11 @@ nd6_prproxy_prelist_update(struct nd_prefix *pr_cur, struct nd_prefix *pr_up)
 		pr_len = pr_up->ndpr_plen;
 	}
 	NDPR_LOCK_ASSERT_HELD(pr_up);
-	/*
-	 * Upstream prefix could be offlink by now; therefore we cannot
-	 * assert that NDPRF_PRPROXY is set; however, we can insist that
-	 * it must not be a scoped prefix.
-	 */
+	  
+                                                                
+                                                                 
+                                   
+    
 	VERIFY(!(pr_up->ndpr_stateflags & NDPRF_IFSCOPE));
 	enable = (pr_up->ndpr_stateflags & NDPRF_PRPROXY);
 	NDPR_UNLOCK(pr_up);
@@ -766,11 +766,11 @@ nd6_prproxy_prelist_update(struct nd_prefix *pr_cur, struct nd_prefix *pr_up)
 	up->ndprl_pr = pr_up;
 	SLIST_INSERT_HEAD(&up_head, up, ndprl_le);
 
-	/*
-	 * Now build a list of matching (scoped) downstream prefixes on other
-	 * interfaces which need to be enabled/disabled accordingly.  Note that
-	 * the NDPRF_PRPROXY is never set/cleared on the downstream prefixes.
-	 */
+	  
+                                                                      
+                                                                        
+                                                                      
+    
 	for (pr = nd_prefix.lh_first; pr; pr = pr->ndpr_next) {
 		NDPR_LOCK(pr);
 		if (!(pr->ndpr_stateflags & NDPRF_ONLINK) ||
@@ -796,9 +796,9 @@ nd6_prproxy_prelist_update(struct nd_prefix *pr_cur, struct nd_prefix *pr_up)
 	}
 	lck_mtx_unlock(nd6_mutex);
 
-	/*
-	 * Apply routing function on prefixes; callee will free resources.
-	 */
+	  
+                                                                   
+    
 	nd6_prproxy_prelist_setroute(enable,
 	    (struct nd6_prproxy_prelist_head *)&up_head,
 	    (struct nd6_prproxy_prelist_head *)&down_head);
@@ -808,10 +808,10 @@ done:
 	VERIFY(SLIST_EMPTY(&down_head));
 }
 
-/*
- * Given an interface address, determine whether or not the address
- * is part of of a proxied prefix.
- */
+  
+                                                                   
+                                  
+   
 boolean_t
 nd6_prproxy_ifaddr(struct in6_ifaddr *ia)
 {
@@ -846,15 +846,15 @@ nd6_prproxy_ifaddr(struct in6_ifaddr *ia)
 	return proxied;
 }
 
-/*
- * Perform automatic proxy function with NS output.
- *
- * If the target address matches a global prefix obtained from a router
- * advertisement received on an interface with the ND6_IFF_PROXY_PREFIXES
- * flag set, then we send solicitations for the target address to all other
- * interfaces where a matching prefix is currently on-link, in addition to
- * the original interface.
- */
+  
+                                                   
+  
+                                                                       
+                                                                         
+                                                                           
+                                                                          
+                          
+   
 void
 nd6_prproxy_ns_output(struct ifnet *ifp, struct ifnet *exclifp,
     struct in6_addr *daddr, struct in6_addr *taddr, struct llinfo_nd6 *ln)
@@ -866,10 +866,10 @@ nd6_prproxy_ns_output(struct ifnet *ifp, struct ifnet *exclifp,
 	struct in6_addr pr_addr;
 	u_char pr_len;
 
-	/*
-	 * Ignore excluded interface if it's the same as the original;
-	 * we always send a NS on the original interface down below.
-	 */
+	  
+                                                               
+                                                             
+    
 	if (exclifp != NULL && exclifp == ifp) {
 		exclifp = NULL;
 	}
@@ -965,14 +965,14 @@ nd6_prproxy_ns_output(struct ifnet *ifp, struct ifnet *exclifp,
 	nd6_ns_output(ifp, daddr, taddr, ln, NULL);
 }
 
-/*
- * Perform automatic proxy function with NS input.
- *
- * If the target address matches a global prefix obtained from a router
- * advertisement received on an interface with the ND6_IFF_PROXY_PREFIXES
- * flag set, then we send solicitations for the target address to all other
- * interfaces where a matching prefix is currently on-link.
- */
+  
+                                                  
+  
+                                                                       
+                                                                         
+                                                                           
+                                                           
+   
 void
 nd6_prproxy_ns_input(struct ifnet *ifp, struct in6_addr *saddr,
     char *lladdr, int lladdrlen, struct in6_addr *daddr,
@@ -1004,16 +1004,16 @@ nd6_prproxy_ns_input(struct ifnet *ifp, struct in6_addr *saddr,
 		bcopy(&pr->ndpr_prefix.sin6_addr, &pr_addr, sizeof(pr_addr));
 		pr_len = pr->ndpr_plen;
 
-		/*
-		 * If this is a NS for NUD/AR, record it so that we know
-		 * how to forward the NA reply later on (if/when it arrives.)
-		 * Give up if we fail to save the NS info.
-		 */
+		  
+                                                          
+                                                               
+                                            
+     
 		if ((solrec = !IN6_IS_ADDR_UNSPECIFIED(saddr)) &&
 		    !nd6_solsrc_enq(pr, ifp, saddr, taddr)) {
 			NDPR_UNLOCK(pr);
 			solrec = FALSE;
-			break;                  /* bail out */
+			break;                                
 		} else {
 			NDPR_UNLOCK(pr);
 		}
@@ -1049,15 +1049,15 @@ nd6_prproxy_ns_input(struct ifnet *ifp, struct in6_addr *saddr,
 
 	lck_mtx_unlock(nd6_mutex);
 
-	/*
-	 * If this is a recorded solicitation (NS for NUD/AR), create
-	 * or update the neighbor cache entry for the soliciting node.
-	 * Later on, when the NA reply arrives, we will need this cache
-	 * entry in order to send the NA back to the original solicitor.
-	 * Without a neighbor cache entry, we'd end up with an endless
-	 * cycle of NS ping-pong between the us (the proxy) and the node
-	 * which is soliciting for the address.
-	 */
+	  
+                                                              
+                                                               
+                                                                
+                                                                 
+                                                               
+                                                                 
+                                        
+    
 	if (solrec) {
 		VERIFY(!IN6_IS_ADDR_UNSPECIFIED(saddr));
 		nd6_cache_lladdr(ifp, saddr, lladdr, lladdrlen,
@@ -1098,14 +1098,14 @@ nd6_prproxy_ns_input(struct ifnet *ifp, struct in6_addr *saddr,
 	VERIFY(SLIST_EMPTY(&ndprl_head));
 }
 
-/*
- * Perform automatic proxy function with NA input.
- *
- * If the target address matches a global prefix obtained from a router
- * advertisement received on an interface with the ND6_IFF_PROXY_PREFIXES flag
- * set, then we send neighbor advertisements for the target address on all
- * other interfaces where a matching prefix is currently on link.
- */
+  
+                                                  
+  
+                                                                       
+                                                                              
+                                                                          
+                                                                 
+   
 void
 nd6_prproxy_na_input(struct ifnet *ifp, struct in6_addr *saddr,
     struct in6_addr *daddr0, struct in6_addr *taddr, int flags)
@@ -1132,25 +1132,25 @@ nd6_prproxy_na_input(struct ifnet *ifp, struct in6_addr *saddr,
 		}
 
 		VERIFY(!(pr->ndpr_stateflags & NDPRF_IFSCOPE));
-		/*
-		 * If this is a NA for NUD, see if there is a record created
-		 * for the corresponding NS; upon success, we get back the
-		 * interface where the NS originally arrived on, as well as
-		 * the soliciting node's address.  Give up if we can't find it.
-		 */
+		  
+                                                              
+                                                            
+                                                             
+                                                                 
+     
 		if (!IN6_IS_ADDR_MULTICAST(daddr0)) {
 			fwd_ifp = NULL;
 			bzero(&daddr, sizeof(daddr));
 			if (!nd6_solsrc_deq(pr, taddr, &daddr, &fwd_ifp)) {
 				NDPR_UNLOCK(pr);
-				break;          /* bail out */
+				break;                        
 			}
 			VERIFY(!IN6_IS_ADDR_UNSPECIFIED(&daddr) && fwd_ifp);
 			NDPR_UNLOCK(pr);
 
 			ndprl = nd6_ndprl_alloc(Z_WAITOK);
 			if (ndprl == NULL) {
-				break;          /* bail out */
+				break;                        
 			}
 			ndprl->ndprl_fwd_ifp = fwd_ifp;
 			ndprl->ndprl_sol = TRUE;
@@ -1272,7 +1272,7 @@ nd6_prproxy_sols_purge(struct nd_prefix *pr, u_int64_t max_stgt)
 
 	NDPR_LOCK_ASSERT_HELD(pr);
 
-	/* Either trim all or those that have expired or are idle */
+	                                                            
 	RB_FOREACH_SAFE(soltgt, prproxy_sols_tree,
 	    &pr->ndpr_prproxy_sols, tmp) {
 		VERIFY(pr->ndpr_prproxy_sols_cnt > 0);
@@ -1291,7 +1291,7 @@ nd6_prproxy_sols_purge(struct nd_prefix *pr, u_int64_t max_stgt)
 		return;
 	}
 
-	/* Brute force; mercilessly evict entries until we are under limit */
+	                                                                     
 	RB_FOREACH_SAFE(soltgt, prproxy_sols_tree,
 	    &pr->ndpr_prproxy_sols, tmp) {
 		VERIFY(pr->ndpr_prproxy_sols_cnt > 0);
@@ -1304,29 +1304,29 @@ nd6_prproxy_sols_purge(struct nd_prefix *pr, u_int64_t max_stgt)
 	}
 }
 
-/*
- * Purges all solicitation records on a given prefix.
- * Caller is responsible for holding prefix lock.
- */
+  
+                                                     
+                                                 
+   
 void
 nd6_prproxy_sols_reap(struct nd_prefix *pr)
 {
 	nd6_prproxy_sols_purge(pr, 0);
 }
 
-/*
- * Purges expired or idle solicitation records on a given prefix.
- * Caller is responsible for holding prefix lock.
- */
+  
+                                                                 
+                                                 
+   
 void
 nd6_prproxy_sols_prune(struct nd_prefix *pr, u_int32_t max_stgt)
 {
 	nd6_prproxy_sols_purge(pr, max_stgt);
 }
 
-/*
- * Enqueue a soliciation record in the target record of a prefix.
- */
+  
+                                                                 
+   
 static boolean_t
 nd6_solsrc_enq(struct nd_prefix *pr, struct ifnet *ifp,
     struct in6_addr *saddr, struct in6_addr *taddr)
@@ -1350,7 +1350,7 @@ nd6_solsrc_enq(struct nd_prefix *pr, struct ifnet *ifp,
 	ssrc->solsrc_saddr = *saddr;
 	ssrc->solsrc_ifp = ifp;
 
-	find.soltgt_key.taddr = *taddr;         /* search key */
+	find.soltgt_key.taddr = *taddr;                         
 
 	soltgt = RB_FIND(prproxy_sols_tree, &pr->ndpr_prproxy_sols, &find);
 	if (soltgt == NULL) {
@@ -1391,9 +1391,9 @@ nd6_solsrc_enq(struct nd_prefix *pr, struct ifnet *ifp,
 	return TRUE;
 }
 
-/*
- * Dequeue a solicitation record from a target record of a prefix.
- */
+  
+                                                                  
+   
 static boolean_t
 nd6_solsrc_deq(struct nd_prefix *pr, struct in6_addr *taddr,
     struct in6_addr *daddr, struct ifnet **ifp)
@@ -1409,7 +1409,7 @@ nd6_solsrc_deq(struct nd_prefix *pr, struct in6_addr *taddr,
 	bzero(daddr, sizeof(*daddr));
 	*ifp = NULL;
 
-	find.soltgt_key.taddr = *taddr;         /* search key */
+	find.soltgt_key.taddr = *taddr;                         
 
 	soltgt = RB_FIND(prproxy_sols_tree, &pr->ndpr_prproxy_sols, &find);
 	if (soltgt == NULL || soltgt->soltgt_cnt == 0) {
@@ -1474,12 +1474,12 @@ nd6_soltgt_prune(struct nd6_prproxy_soltgt *soltgt, u_int32_t max_ssrc)
 	}
 }
 
-/*
- * Solicited target tree comparison function.
- *
- * An ordered predicate is necessary; bcmp() is not documented to return
- * an indication of order, memcmp() is, and is an ISO C99 requirement.
- */
+  
+                                             
+  
+                                                                        
+                                                                      
+   
 static __inline int
 soltgt_cmp(const struct nd6_prproxy_soltgt *a,
     const struct nd6_prproxy_soltgt *b)

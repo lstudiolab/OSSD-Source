@@ -74,8 +74,8 @@ extern void bootprofile_wake_from_sleep(void);
 extern void bootprofile_get(void **buffer, uint32_t *length);
 extern int bootprofile_gather(user_addr_t buffer, uint32_t *length);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
-#endif /* _KERNEL_TELEMETRY_H_ */
+#endif                           

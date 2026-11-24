@@ -33,43 +33,43 @@
 extern "C" {
 #endif
 
-/*
- * The pid provider needs a small per thread scratch space,
- * in the address space of the user task. This code is used to
- * manage that space.
- *
- * High level design:
- *
- * To avoid serialization, this is a (mostly) lockless allocator. If
- * a new page has to be allocated, the process's sprlock will be acquired.
- *
- * NOTE: The dtrace copyin/copyout code is still the shared code that
- * can handle unmapped pages, so the scratch space isn't wired for now.
- * * Each page in user space is wired. It cannot be paged out, because
- * * dtrace's copyin/copyout is only guaranteed to handle pages already
- * * in memory.
- *
- * Each page in user space is represented by a dt_ptss_page. Page entries
- * are chained. Once allocated, a page is not freed until dtrace "cleans up"
- * that process.
- *
- * Clean up works like this:
- *
- * At process exit, free all kernel allocated memory, but ignore user pages.
- * At process exec, free all kernel allocated memory, but ignore user pages.
- * At process fork, free user pages copied from parent, and do not allocate kernel memory.
- *
- * This is making the assumption that it is faster to let the bulk vm_map
- * operations in exec/exit do their work, instead of explicit page free(s)
- * via mach_vm_deallocate.
- *
- * As each page is allocated, its entries are chained and added to the
- * free_list. To claim an entry, cas it off the list. When a thread exits,
- * cas its entry onto the list. We could potentially optimize this by
- * keeping a head/tail, and cas'ing the frees to the tail instead of the
- * head. Without evidence to support such a need, it seems better to keep
- * things simple for now.
- */
+  
+                                                           
+                                                              
+                     
+  
+                     
+  
+                                                                    
+                                                                          
+  
+                                                                     
+                                                                       
+                                                                      
+                                                                       
+               
+  
+                                                                         
+                                                                            
+                
+  
+                            
+  
+                                                                            
+                                                                            
+                                                                                          
+  
+                                                                         
+                                                                          
+                          
+  
+                                                                      
+                                                                          
+                                                                     
+                                                                        
+                                                                         
+                         
+   
 
 
 #define DTRACE_PTSS_SCRATCH_SPACE_PER_THREAD (64)
@@ -87,8 +87,8 @@ struct dtrace_ptss_page {
 	struct dtrace_ptss_page_entry  entries[DTRACE_PTSS_ENTRIES_PER_PAGE];
 };
 
-struct dtrace_ptss_page_entry*  dtrace_ptss_claim_entry(struct proc* p); /* sprlock not held */
-struct dtrace_ptss_page_entry*  dtrace_ptss_claim_entry_locked(struct proc* p); /* sprlock held */
+struct dtrace_ptss_page_entry*  dtrace_ptss_claim_entry(struct proc* p);                       
+struct dtrace_ptss_page_entry*  dtrace_ptss_claim_entry_locked(struct proc* p);                   
 void                            dtrace_ptss_release_entry(struct proc* p, struct dtrace_ptss_page_entry* e);
 
 struct dtrace_ptss_page*        dtrace_ptss_allocate_page(struct proc* p);
@@ -102,4 +102,4 @@ void                            dtrace_ptss_fork(struct proc* parent, struct pro
 }
 #endif
 
-#endif  /* _DTRACE_PTSS_H_ */
+#endif                       

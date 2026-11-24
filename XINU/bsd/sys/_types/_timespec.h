@@ -28,11 +28,11 @@
 #ifndef _STRUCT_TIMESPEC
 #define _STRUCT_TIMESPEC        struct timespec
 
-#include <machine/types.h> /* __darwin_time_t */
+#include <machine/types.h>                      
 
 _STRUCT_TIMESPEC
 {
 	__darwin_time_t tv_sec;
 	long            tv_nsec;
 };
-#endif /* _STRUCT_TIMESPEC */
+#endif                       

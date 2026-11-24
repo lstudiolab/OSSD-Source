@@ -117,9 +117,9 @@ mach_right_send_retain(mach_right_send_t s)
 		rs.mrs_name = MACH_PORT_DEAD;
 		break;
 	case KERN_INVALID_NAME:
-	// mach_port_mod_refs() will return success when given either
-	// MACH_PORT_DEAD or MACH_PORT_NULL with send or send-once right
-	// operations, so this is always fatal.
+	                                                             
+	                                                                
+	                                       
 	default:
 		_mach_assert("retain send right", kr);
 	}

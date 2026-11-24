@@ -29,13 +29,13 @@
 #ifndef KERN_CAMBRIA_LAYOUT_H
 #define KERN_CAMBRIA_LAYOUT_H
 
-/*
- * xnu's current understanding of Cambria's structure layout.  Cambria
- * should include static_asserts to check that these values are accurate.
- */
+  
+                                                                      
+                                                                         
+   
 
 #define KCAMBRIA_THCTX_RSP_OFFSET (96)
 #define KCAMBRIA_THCTX_RBP_OFFSET (104)
 #define KCAMBRIA_THCTX_LR_OFFSET  (344)
 
-#endif /* !defined(KERN_CAMBRIA_LAYOUT_H) */
+#endif                                      

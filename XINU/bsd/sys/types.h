@@ -74,7 +74,7 @@
 #ifndef __ASSEMBLER__
 #include <sys/cdefs.h>
 
-/* Machine type dependent parameters. */
+                                        
 #include <machine/types.h>
 #include <sys/_types.h>
 
@@ -88,21 +88,21 @@
 typedef unsigned long           u_long;
 #define _U_LONG
 #endif
-typedef unsigned short          ushort;         /* Sys V compatibility */
-typedef unsigned int            uint;           /* Sys V compatibility */
+typedef unsigned short          ushort;                                  
+typedef unsigned int            uint;                                    
 #endif
 
-typedef u_int64_t               u_quad_t;       /* quads */
+typedef u_int64_t               u_quad_t;                  
 typedef int64_t                 quad_t;
 typedef quad_t *                qaddr_t;
 
-#include <sys/_types/_caddr_t.h>        /* core address */
+#include <sys/_types/_caddr_t.h>                          
 
-typedef int32_t                 daddr_t;        /* disk address */
+typedef int32_t                 daddr_t;                          
 
-#include <sys/_types/_dev_t.h>                  /* device number */
+#include <sys/_types/_dev_t.h>                                     
 
-typedef u_int32_t               fixpt_t;        /* fixed point number */
+typedef u_int32_t               fixpt_t;                                
 
 #include <sys/_types/_blkcnt_t.h>
 #include <sys/_types/_blksize_t.h>
@@ -112,8 +112,8 @@ typedef u_int32_t               fixpt_t;        /* fixed point number */
 #include <sys/_types/_ino_t.h>
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-#include <sys/_types/_ino64_t.h>                        /* 64bit inode number */
-#endif /* !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE) */
+#include <sys/_types/_ino64_t.h>                                                
+#endif                                                             
 
 #include <sys/_types/_key_t.h>
 #include <sys/_types/_mode_t.h>
@@ -122,18 +122,18 @@ typedef u_int32_t               fixpt_t;        /* fixed point number */
 #include <sys/_types/_pid_t.h>
 #include <sys/_types/_off_t.h>
 
-typedef int32_t                 segsz_t;        /* segment size */
-typedef int32_t                 swblk_t;        /* swap offset */
+typedef int32_t                 segsz_t;                          
+typedef int32_t                 swblk_t;                         
 
 #include <sys/_types/_uid_t.h>
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-/* Major, minor numbers, dev_t's. */
+                                    
 #if defined(__cplusplus)
-/*
- * These lowercase macros tend to match member functions in some C++ code,
- * so for C++, we must use inline functions instead.
- */
+  
+                                                                          
+                                                    
+   
 
 static inline __int32_t
 major(__uint32_t _x)
@@ -153,14 +153,14 @@ makedev(__uint32_t _major, __uint32_t _minor)
 	return (dev_t)(((_major) << 24) | (_minor));
 }
 
-#else   /* !__cplusplus */
+#else                     
 
 #define major(x)        ((int32_t)(((u_int32_t)(x) >> 24) & 0xff))
 #define minor(x)        ((int32_t)((x) & 0xffffff))
 #define makedev(x, y)    ((dev_t)(((x) << 24) | (y)))
 
-#endif  /* !__cplusplus */
-#endif  /* !_POSIX_C_SOURCE */
+#endif                    
+#endif                        
 
 #include <sys/_types/_clock_t.h>
 #include <sys/_types/_size_t.h>
@@ -176,24 +176,24 @@ makedev(__uint32_t _major, __uint32_t _minor)
 #endif
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-/*
- * This code is present here in order to maintain historical backward
- * compatability, and is intended to be removed at some point in the
- * future; please include <sys/select.h> instead.
- */
+  
+                                                                     
+                                                                    
+                                                 
+   
 #include <sys/_types/_fd_def.h>
 
-#define NBBY            __DARWIN_NBBY           /* bits in a byte */
-#define NFDBITS         __DARWIN_NFDBITS        /* bits per mask */
-#define howmany(x, y)   __DARWIN_howmany(x, y)  /* # y's == x bits? */
+#define NBBY            __DARWIN_NBBY                               
+#define NFDBITS         __DARWIN_NFDBITS                           
+#define howmany(x, y)   __DARWIN_howmany(x, y)                        
 typedef __int32_t       fd_mask;
 
-/*
- * Select uses bit masks of file descriptors in longs.  These macros
- * manipulate such bit fields (the filesystem macros use chars).  The
- * extra protection here is to permit application redefinition above
- * the default size.
- */
+  
+                                                                    
+                                                                     
+                                                                    
+                    
+   
 #include <sys/_types/_fd_setsize.h>
 #include <sys/_types/_fd_set.h>
 #include <sys/_types/_fd_clr.h>
@@ -202,15 +202,15 @@ typedef __int32_t       fd_mask;
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 #include <sys/_types/_fd_copy.h>
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
 
 #if defined(__STDC__) && defined(KERNEL)
-/*
- * Forward structure declarations for function prototypes.  We include the
- * common structures that cross subsystem boundaries here; others are mostly
- * used in the same place that the structure is defined.
- */
+  
+                                                                          
+                                                                            
+                                                        
+   
 struct  proc;
 struct  pgrp;
 struct  ucred;
@@ -221,8 +221,8 @@ struct  tty;
 struct  uio;
 #endif
 
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
-#endif /* __ASSEMBLER__ */
+#endif                                             
+#endif                    
 
 #ifndef KERNEL
 
@@ -238,15 +238,15 @@ struct  uio;
 #include <sys/_pthread/_pthread_rwlockattr_t.h>
 #include <sys/_pthread/_pthread_t.h>
 
-#endif /* __POSIX_LIB__ */
+#endif                    
 
 #include <sys/_pthread/_pthread_key_t.h>
 
-#endif /* KERNEL */
+#endif             
 
-/* statvfs and fstatvfs */
+                          
 
 #include <sys/_types/_fsblkcnt_t.h>
 #include <sys/_types/_fsfilcnt_t.h>
 
-#endif /* !_SYS_TYPES_H_ */
+#endif                     

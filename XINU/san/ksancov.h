@@ -36,26 +36,26 @@
 #define KSANCOV_DEVNODE "ksancov"
 #define KSANCOV_PATH "/dev/" KSANCOV_DEVNODE
 
-/*
- * ioctl
- */
+  
+        
+   
 
 struct ksancov_buf_desc {
-	uintptr_t ptr;  /* ptr to shared buffer [out] */
-	size_t sz;      /* size of shared buffer [out] */
+	uintptr_t ptr;                                  
+	size_t sz;                                       
 };
 
-/* Set mode */
-#define KSANCOV_IOC_TRACE        _IOW('K', 1, size_t) /* number of pcs */
+              
+#define KSANCOV_IOC_TRACE        _IOW('K', 1, size_t)                    
 #define KSANCOV_IOC_COUNTERS     _IO('K', 2)
 
-/* Establish a shared mapping of the coverage buffer. */
+                                                        
 #define KSANCOV_IOC_MAP          _IOWR('K', 8, struct ksancov_buf_desc)
 
-/* Establish a shared mapping of the edge address buffer. */
+                                                            
 #define KSANCOV_IOC_MAP_EDGEMAP  _IOWR('K', 9, struct ksancov_buf_desc)
 
-/* Log the current thread */
+                            
 #define KSANCOV_IOC_START        _IOW('K', 10, uintptr_t)
 
 #define KSANCOV_IOC_NEDGES       _IOR('K', 50, size_t)
@@ -63,9 +63,9 @@ struct ksancov_buf_desc {
 #define KSANCOV_IOC_TESTPANIC    _IOW('K', 20, uint64_t)
 
 
-/*
- * shared kernel-user mapping
- */
+  
+                             
+   
 
 #define KSANCOV_MAX_EDGES       512UL*1024
 #define KSANCOV_MAX_HITS        UINT8_MAX
@@ -79,7 +79,7 @@ struct ksancov_header {
 };
 
 struct ksancov_trace {
-	/* userspace R/O fields */
+	                          
 	union {
 		struct ksancov_header hdr;
 		struct {
@@ -88,7 +88,7 @@ struct ksancov_trace {
 		};
 	};
 
-	uintptr_t offset; /* pc entries relative to this */
+	uintptr_t offset;                                  
 	uint32_t maxpcs;
 	_Atomic uint32_t head;
 	uint32_t pcs[];
@@ -103,23 +103,23 @@ struct ksancov_counters {
 		};
 	};
 
-	uint32_t nedges; /* total number of edges */
-	uint8_t hits[];  /* hits on each edge (8bit saturating) */
+	uint32_t nedges;                            
+	uint8_t hits[];                                           
 };
 
 struct ksancov_edgemap {
 	uint32_t magic;
 	uint32_t nedges;
-	uintptr_t offset; /* edge addrs relative to this */
-	uint32_t addrs[]; /* address of each edge relative to 'offset' */
+	uintptr_t offset;                                  
+	uint32_t addrs[];                                                
 };
 
 #if XNU_KERNEL_PRIVATE
-/*
- * On arm64 the VIM_MIN_KERNEL_ADDRESS is too far from %pc to fit into 32-bit value. As a result
- * ksancov reports invalid %pcs. To make at least kernel %pc values corect a different base has
- * to be used for arm.
- */
+  
+                                                                                                
+                                                                                               
+                      
+   
 #if defined(__x86_64__) || defined(__i386__)
 #define KSANCOV_PC_OFFSET VM_MIN_KERNEL_ADDRESS
 #elif defined(__arm__) || defined(__arm64__)
@@ -131,9 +131,9 @@ struct ksancov_edgemap {
 int ksancov_init_dev(void);
 void **__sanitizer_get_thread_data(thread_t);
 
-/*
- * SanitizerCoverage ABI
- */
+  
+                        
+   
 extern void __sanitizer_cov_trace_pc_guard(uint32_t *guard);
 extern void __sanitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop);
 extern void __sanitizer_cov_pcs_init(uintptr_t *start, uintptr_t *stop);
@@ -147,16 +147,16 @@ extern void __sanitizer_cov_trace_pc_indirect(void *callee);
 #include <assert.h>
 #include <unistd.h>
 
-/*
- * ksancov userspace API
- *
- * Usage:
- * 1) open the ksancov device
- * 2) set the coverage mode (trace or edge counters)
- * 3) map the coverage buffer
- * 4) start the trace on a thread
- * 5) flip the enable bit
- */
+  
+                        
+  
+         
+                             
+                                                    
+                             
+                                 
+                         
+   
 
 static inline int
 ksancov_open(void)
@@ -329,4 +329,4 @@ ksancov_trace_entry(struct ksancov_trace *trace, size_t i)
 
 #endif
 
-#endif /* _KSANCOV_H_ */
+#endif                  

@@ -30,12 +30,12 @@ workq_block(void *unused __unused)
 {
 	workq_thread = pthread_self();
 
-	/*
-	 *  sigset_t set;
-	 *  sigemptyset(&set);
-	 *  sigaddset(&set, SIGPROF);
-	 *  pthread_sigmask(SIG_UNBLOCK, &set, NULL);
-	 */
+	  
+                  
+                       
+                              
+                                              
+    
 
 	uint64_t spin_start = mach_absolute_time();
 	while (mach_absolute_time() - spin_start < 30 * NSEC_PER_SEC) {
@@ -66,7 +66,7 @@ T_DECL(workq_sigprof, "test that workqueue threads can receive sigprof")
 	dispatch_main();
 }
 
-#else //!defined(__arm__)
+#else                    
 
 T_DECL(workq_sigprof, "test that workqueue threads can receive sigprof")
 {
@@ -74,4 +74,4 @@ T_DECL(workq_sigprof, "test that workqueue threads can receive sigprof")
 	T_FAIL("<rdar://problem/25864196> setitimer/sigprof not supported on 32bit arm platforms");
 }
 
-#endif //!defined(__arm__)
+#endif                    

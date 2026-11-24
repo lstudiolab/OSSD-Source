@@ -29,11 +29,11 @@
 #ifndef _VM_VM_MAP_STORE_H
 #define _VM_VM_MAP_STORE_H
 
-/*
- #ifndef VM_MAP_STORE_USE_LL
- #define VM_MAP_STORE_USE_LL
- #endif
- */
+  
+                            
+                            
+       
+   
 #ifndef VM_MAP_STORE_USE_RB
 #define VM_MAP_STORE_USE_RB
 #endif
@@ -89,30 +89,30 @@ RB_HEAD( rb_head, vm_map_store );
 	start = VMHE_start;                                             \
 	MACRO_END
 
-/*
- *	SAVE_HINT_MAP_READ:
- *
- *	Saves the specified entry as the hint for
- *	future lookups.  only a read lock is held on map,
- *      so make sure the store is atomic... OSCompareAndSwap
- *	guarantees this... also, we don't care if we collide
- *	and someone else wins and stores their 'hint'
- */
+  
+                      
+  
+                                            
+                                                    
+                                                            
+                                                       
+                                                
+   
 #define SAVE_HINT_MAP_READ(map, value) \
 	MACRO_BEGIN                                                     \
 	OSCompareAndSwapPtr((map)->hint, value, &(map)->hint); \
 	MACRO_END
 
 
-/*
- *	SAVE_HINT_MAP_WRITE:
- *
- *	Saves the specified entry as the hint for
- *	future lookups.  write lock held on map,
- *      so no one else can be writing or looking
- *      until the lock is dropped, so it's safe
- *      to just do an assignment
- */
+  
+                       
+  
+                                            
+                                           
+                                                
+                                               
+                                
+   
 #define SAVE_HINT_MAP_WRITE(map, value) \
 	MACRO_BEGIN                    \
 	(map)->hint = (value);         \
@@ -143,4 +143,4 @@ boolean_t first_free_is_valid_store( struct _vm_map*);
 #endif
 boolean_t vm_map_store_has_RB_support( struct vm_map_header *hdr );
 
-#endif /* _VM_VM_MAP_STORE_H */
+#endif                         

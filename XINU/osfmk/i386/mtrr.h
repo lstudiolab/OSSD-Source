@@ -29,9 +29,9 @@
 #ifndef _I386_MTRR_H_
 #define _I386_MTRR_H_
 
-/*
- * Memory type range register (MTRR) support.
- */
+  
+                                             
+   
 
 #include <mach/std_types.h>
 #include <sys/appleapiopts.h>
@@ -65,6 +65,6 @@ extern void          pat_init(void);
 
 __END_DECLS
 
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
-#endif /* !_I386_MTRR_H_ */
+#endif                     

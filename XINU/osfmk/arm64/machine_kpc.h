@@ -40,12 +40,12 @@ typedef uint64_t kpc_config_t;
 #define KPC_ARM64_COUNTER_OVF_BIT  (47)
 #define KPC_ARM64_COUNTER_OVF_MASK (UINT64_C(1) << KPC_ARM64_COUNTER_OVF_BIT)
 
-/* arm64 uses fixed counter shadows */
+                                      
 #define FIXED_COUNTER_SHADOW (1)
 
 #define KPC_ARM64_PMC_COUNT (KPC_ARM64_FIXED_COUNT + KPC_ARM64_CONFIGURABLE_COUNT)
 
-/* Size to the maximum number of counters we could read from every class in one go */
+                                                                                     
 #define KPC_MAX_COUNTERS (KPC_ARM64_FIXED_COUNT + KPC_ARM64_CONFIGURABLE_COUNT + 1)
 
-#endif /* _MACHINE_ARM64_KPC_H */
+#endif                           

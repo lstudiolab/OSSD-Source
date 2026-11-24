@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * process policy syscall implementation
- */
+  
+                                        
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -72,12 +72,12 @@
 
 #if !defined(XNU_TARGET_OS_OSX)
 #include <sys/kern_memorystatus.h>
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 #if CONFIG_MACF
 #include <security/mac.h>
 #include <security/mac_framework.h>
-#endif /* CONFIG_MACF */
+#endif                  
 
 static int handle_lowresource(int scope, int action, int policy, int policy_subtype, user_addr_t attrp, proc_t proc, uint64_t target_threadid);
 static int handle_cpuuse(int action, user_addr_t attrp, proc_t proc, uint64_t target_threadid);
@@ -91,19 +91,19 @@ extern kern_return_t task_resume(task_t);
 
 #if !defined(XNU_TARGET_OS_OSX)
 static int handle_applifecycle(int scope, int action, int policy, int policy_subtype, user_addr_t attrp, proc_t proc, uint64_t target_threadid);
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
-/***************************** process_policy ********************/
+                                                                   
 
-/*
- * int process_policy(int scope, int action, int policy, int policy_subtype,
- *                   proc_policy_attribute_t * attrp, pid_t target_pid,
- *                   uint64_t target_threadid)
- *{ int process_policy(int scope, int action, int policy, int policy_subtype,
- * user_addr_t attrp, pid_t target_pid, uint64_t target_threadid); }
- */
+  
+                                                                            
+                                                                       
+                                              
+                                                                             
+                                                                    
+   
 
-/* system call implementation */
+                                
 int
 process_policy(__unused struct proc *p, struct process_policy_args * uap, __unused int32_t *retval)
 {
@@ -147,10 +147,10 @@ process_policy(__unused struct proc *p, struct process_policy_args * uap, __unus
 	    kauth_cred_getuid(my_cred) != kauth_cred_getuid(target_cred) &&
 	    kauth_cred_getruid(my_cred) != kauth_cred_getuid(target_cred))
 #else
-	/*
-	 * Resoure starvation control can be used by unpriv resource owner but priv at the time of ownership claim. This is
-	 * checked in low resource handle routine. So bypass the checks here.
-	 */
+	  
+                                                                                                                    
+                                                                      
+    
 	if ((policy != PROC_POLICY_RESOURCE_STARVATION) &&
 	    (policy != PROC_POLICY_APPTYPE) &&
 	    (!kauth_cred_issuser(my_cred) && curp != target_proc))
@@ -168,7 +168,7 @@ process_policy(__unused struct proc *p, struct process_policy_args * uap, __unus
 	case PROC_POLICY_APPTYPE:
 	case PROC_POLICY_APP_LIFECYCLE:
 #endif
-		/* These policies do their own appropriate mac checks */
+		                                                        
 		break;
 	default:
 		error = mac_proc_check_sched(curp, target_proc);
@@ -177,7 +177,7 @@ process_policy(__unused struct proc *p, struct process_policy_args * uap, __unus
 		}
 		break;
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 
 	switch (policy) {
 	case PROC_POLICY_BACKGROUND:
@@ -212,7 +212,7 @@ process_policy(__unused struct proc *p, struct process_policy_args * uap, __unus
 	case PROC_POLICY_APP_LIFECYCLE:
 		error = handle_applifecycle(scope, action, policy, policy_subtype, attrp, target_proc, target_threadid);
 		break;
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 	case PROC_POLICY_APPTYPE:
 		error = handle_apptype(scope, action, policy, policy_subtype, attrp, target_proc, target_threadid);
 		break;
@@ -275,27 +275,27 @@ handle_cpuuse(int action, user_addr_t attrp, proc_t proc, __unused uint64_t targ
 	uint8_t                         percentage;
 
 #if defined(XNU_TARGET_OS_OSX)
-	/* On macOS, tasks can only set and clear their own CPU limits. */
+	                                                                  
 	if ((action == PROC_POLICY_ACTION_APPLY || action == PROC_POLICY_ACTION_RESTORE)
 	    && curp != proc) {
 		return EPERM;
 	}
-	/* No privilege required on macOS. */
+	                                     
 	privileged = TRUE;
 #endif
 
 #if CONFIG_MACF
-	/* Is caller privileged to set less-restrictive scheduling parameters? */
+	                                                                         
 	if (!privileged) {
 		privileged = (priv_check_cred(kauth_cred_get(), PRIV_PROC_CPUMON_OVERRIDE, 0) == 0);
 	}
 	canEnable = (privileged && action == PROC_POLICY_ACTION_ENABLE);
 
 	if (!canEnable && curp != proc) {
-		/*
-		 * Can the current process change scheduling parameters for
-		 * the target process?
-		 */
+		  
+                                                             
+                        
+     
 		error = mac_proc_check_sched(curp, proc);
 		if (error) {
 			return error;
@@ -323,11 +323,11 @@ handle_cpuuse(int action, user_addr_t attrp, proc_t proc, __unused uint64_t targ
 			return error;
 		}
 
-		/*
-		 * The process_policy API uses seconds as the units for the interval,
-		 * but the mach task policy SPI uses nanoseconds. Do the conversion,
-		 * but preserve -1 as it has special meaning.
-		 */
+		  
+                                                                       
+                                                                      
+                                               
+     
 		if (cpuattr.ppattr_cpu_attr_interval != -1ULL) {
 			interval = cpuattr.ppattr_cpu_attr_interval * NSEC_PER_SEC;
 		} else {
@@ -341,12 +341,12 @@ handle_cpuuse(int action, user_addr_t attrp, proc_t proc, __unused uint64_t targ
 		    privileged);
 		break;
 
-	/* restore process to prior state */
+	                                    
 	case PROC_POLICY_ACTION_RESTORE:
 		error = proc_clear_task_ruse_cpu(proc->task, privileged);
 		break;
 
-	/* re-enable suspended monitor */
+	                                 
 	case PROC_POLICY_ACTION_ENABLE:
 		error = task_resume_cpumon(proc->task);
 		break;
@@ -380,13 +380,13 @@ handle_applifecycle(__unused int scope,
 		break;
 
 	case PROC_POLICY_APPLIFE_STATE:
-		/* appstate is no longer supported */
+		                                     
 		error = ENOTSUP;
 		break;
 
 	case PROC_POLICY_APPLIFE_DEVSTATUS:
 #if CONFIG_MACF
-		/* ToDo - this should be a generic check, since we could potentially hang other behaviours here. */
+		                                                                                                   
 		error = mac_proc_check_suspend_resume(proc, MAC_PROC_CHECK_HIBERNATE);
 		if (error) {
 			error = EPERM;
@@ -395,10 +395,10 @@ handle_applifecycle(__unused int scope,
 #endif
 #if CONFIG_MEMORYSTATUS
 		if (action == PROC_POLICY_ACTION_APPLY) {
-			/* Used as a freeze hint */
+			                           
 			memorystatus_on_inactivity(proc);
 
-			/* in future use devicestatus for pid_socketshutdown() */
+			                                                         
 			error = 0;
 		} else
 #endif
@@ -421,10 +421,10 @@ handle_applifecycle(__unused int scope,
 		}
 #if CONFIG_TASKWATCH
 		if (action == PROC_POLICY_ACTION_APPLY) {
-			/* bind the thread in target_thread in current process to target_proc */
+			                                                                        
 			error = proc_lf_pidbind(current_task(), target_threadid, proc->task, state);
 		} else
-#endif /* CONFIG_TASKWATCH */
+#endif                       
 		{
 			error = EINVAL;
 		}
@@ -437,7 +437,7 @@ handle_applifecycle(__unused int scope,
 out:
 	return error;
 }
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 static int
 handle_apptype(         int scope,
@@ -454,7 +454,7 @@ handle_apptype(         int scope,
 		return EINVAL;
 	}
 
-	/* Temporary compatibility with old importance donation interface until libproc is moved to new boost calls */
+	                                                                                                              
 	switch (policy_subtype) {
 	case PROC_POLICY_IOS_DONATEIMP:
 		if (action != PROC_POLICY_ACTION_ENABLE) {
@@ -464,7 +464,7 @@ handle_apptype(         int scope,
 			return EINVAL;
 		}
 
-		/* PROCESS ENABLE APPTYPE DONATEIMP */
+		                                      
 		task_importance_mark_donor(target_proc->task, TRUE);
 
 		return 0;
@@ -477,7 +477,7 @@ handle_apptype(         int scope,
 			return EINVAL;
 		}
 
-		/* PROCESS ENABLE APPTYPE HOLDIMP */
+		                                    
 		error = task_importance_hold_legacy_external_assertion(current_task(), 1);
 
 		return error;
@@ -490,7 +490,7 @@ handle_apptype(         int scope,
 			return EINVAL;
 		}
 
-		/* PROCESS ENABLE APPTYPE DROPIMP */
+		                                    
 		error = task_importance_drop_legacy_external_assertion(current_task(), 1);
 
 		return error;
@@ -529,11 +529,11 @@ handle_boost(int scope,
 
 		switch (action) {
 		case PROC_POLICY_ACTION_HOLD:
-			/* PROCESS HOLD BOOST IMPORTANT */
+			                                  
 			error = task_importance_hold_legacy_external_assertion(current_task(), 1);
 			break;
 		case PROC_POLICY_ACTION_DROP:
-			/* PROCESS DROP BOOST IMPORTANT */
+			                                  
 			error = task_importance_drop_legacy_external_assertion(current_task(), 1);
 			break;
 		default:
@@ -551,7 +551,7 @@ handle_boost(int scope,
 #endif
 		switch (action) {
 		case PROC_POLICY_ACTION_SET:
-			/* PROCESS SET BOOST DONATION */
+			                                
 			task_importance_mark_donor(target_proc->task, TRUE);
 			break;
 		default:
@@ -620,12 +620,12 @@ handle_tecs(int scope, int action, proc_t target_proc, uint64_t target_threadid)
 	return 0;
 }
 
-/*
- * KPI to determine if a pid is currently backgrounded.
- * Returns ESRCH if pid cannot be found or has started exiting.
- * Returns EINVAL if state is NULL.
- * Sets *state to 1 if pid is backgrounded, and 0 otherwise.
- */
+  
+                                                       
+                                                               
+                                   
+                                                            
+   
 int
 proc_pidbackgrounded(pid_t pid, uint32_t* state)
 {
@@ -651,12 +651,12 @@ proc_pidbackgrounded(pid_t pid, uint32_t* state)
 	return 0;
 }
 
-/*
- * Get the darwin background state of the originator. If the current
- * process app type is App, then it is the originator, else if it is
- * a Daemon, then creator of the Resource Accounting attribute of
- * the current thread voucher is the originator of the work.
- */
+  
+                                                                    
+                                                                    
+                                                                 
+                                                            
+   
 int
 proc_get_originatorbgstate(uint32_t *is_backgrounded)
 {
@@ -670,23 +670,23 @@ proc_get_originatorbgstate(uint32_t *is_backgrounded)
 
 	bgstate = proc_get_effective_thread_policy(thread, TASK_POLICY_DARWIN_BG);
 
-	/* If current thread or task backgrounded, return background */
+	                                                               
 	if (bgstate) {
 		*is_backgrounded = 1;
 		return 0;
 	}
 
-	/* Check if current process app type is App, then return foreground */
+	                                                                      
 	proc_get_darwinbgstate(p->task, &flagsp);
 	if ((flagsp & PROC_FLAG_APPLICATION) == PROC_FLAG_APPLICATION) {
 		*is_backgrounded = 0;
 		return 0;
 	}
 
-	/*
-	 * Get the current voucher origin pid and it's bgstate.The pid
-	 * returned here might not be valid or may have been recycled.
-	 */
+	  
+                                                               
+                                                               
+    
 	kr = thread_get_current_voucher_origin_pid(&pid);
 	if (kr != KERN_SUCCESS) {
 		if (kr == KERN_INVALID_TASK) {
@@ -709,7 +709,7 @@ proc_apply_resource_actions(void * bsdinfo, __unused int type, int action)
 
 	switch (action) {
 	case PROC_POLICY_RSRCACT_THROTTLE:
-		/* no need to do anything */
+		                            
 		break;
 
 	case PROC_POLICY_RSRCACT_SUSPEND:
@@ -721,7 +721,7 @@ proc_apply_resource_actions(void * bsdinfo, __unused int type, int action)
 		break;
 
 	case PROC_POLICY_RSRCACT_NOTIFY_KQ:
-		/* not implemented */
+		                     
 		break;
 
 	case PROC_POLICY_RSRCACT_NOTIFY_EXC:
@@ -742,7 +742,7 @@ proc_restore_resource_actions(void * bsdinfo, __unused int type, int action)
 	case PROC_POLICY_RSRCACT_TERMINATE:
 	case PROC_POLICY_RSRCACT_NOTIFY_KQ:
 	case PROC_POLICY_RSRCACT_NOTIFY_EXC:
-		/* no need to do anything */
+		                            
 		break;
 
 	case PROC_POLICY_RSRCACT_SUSPEND:

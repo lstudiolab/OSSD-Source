@@ -64,9 +64,9 @@ struct mhdr {
 	char                     mh_data[0];
 };
 
-/*
- * The lock group for the audit subsystem.
- */
+  
+                                          
+   
 static LCK_GRP_DECLARE(audit_lck_grp, "Audit");
 
 #define AUDIT_MHMAGIC   0x4D656C53
@@ -98,13 +98,13 @@ SYSCTL_PROC(_kern, OID_AUTO, audit_malloc_debug, CTLFLAG_RD, NULL, 0,
 #define AU_MALLOC_DBINFO_SZ \
     (NUM_MALLOC_TYPES * sizeof(au_malloc_debug_info_t))
 
-/*
- * Copy out the malloc debug info via the sysctl interface.  The userland code
- * is something like the following:
- *
- *  error = sysctlbyname("kern.audit_malloc_debug", buffer_ptr, &buffer_len,
- *             NULL, 0);
- */
+  
+                                                                              
+                                   
+  
+                                                                            
+                        
+   
 static int
 audit_sysctl_malloc_debug(__unused struct sysctl_oid *oidp, __unused void *arg1,
     __unused int arg2, struct sysctl_req *req)
@@ -114,24 +114,24 @@ audit_sysctl_malloc_debug(__unused struct sysctl_oid *oidp, __unused void *arg1,
 	au_malloc_debug_info_t *amdi_ptr, *nxt_ptr;
 	int err;
 
-	/*
-	 * This provides a read-only node.
-	 */
+	  
+                                   
+    
 	if (req->newptr != USER_ADDR_NULL) {
 		return EPERM;
 	}
 
-	/*
-	 * If just querying then return the space required.
-	 */
+	  
+                                                    
+    
 	if (req->oldptr == USER_ADDR_NULL) {
 		req->oldidx = AU_MALLOC_DBINFO_SZ;
 		return 0;
 	}
 
-	/*
-	 *  Alloc a temporary buffer.
-	 */
+	  
+                              
+    
 	if (req->oldlen < AU_MALLOC_DBINFO_SZ) {
 		return ENOMEM;
 	}
@@ -140,9 +140,9 @@ audit_sysctl_malloc_debug(__unused struct sysctl_oid *oidp, __unused void *arg1,
 		return ENOMEM;
 	}
 
-	/*
-	 * Build the record array.
-	 */
+	  
+                           
+    
 	sz = 0;
 	nxt_ptr = amdi_ptr;
 	for (i = 0; i < NUM_MALLOC_TYPES; i++) {
@@ -172,14 +172,14 @@ audit_sysctl_malloc_debug(__unused struct sysctl_oid *oidp, __unused void *arg1,
 
 	return err;
 }
-#endif /* AUDIT_MALLOC_DEBUG */
+#endif                         
 
-/*
- * BSD malloc()
- *
- * If the M_NOWAIT flag is set then it may not block and return NULL.
- * If the M_ZERO flag is set then zero out the buffer.
- */
+  
+               
+  
+                                                                     
+                                                      
+   
 void *
 #if AUDIT_MALLOC_DEBUG
 _audit_malloc(size_t size, au_malloc_type_t *type, int flags, const char *fn)
@@ -212,13 +212,13 @@ _audit_malloc(size_t size, au_malloc_type_t * type, int flags)
 		type->mt_lastcaller = fn;
 		audit_malloc_types[type->mt_type] = type;
 	}
-#endif /* AUDIT_MALLOC_DEBUG */
+#endif                         
 	return hdr->mh_data;
 }
 
-/*
- * BSD free()
- */
+  
+             
+   
 void
 #if AUDIT_MALLOC_DEBUG
 _audit_free(void *addr, au_malloc_type_t *type)
@@ -242,13 +242,13 @@ _audit_free(void *addr, __unused au_malloc_type_t *type)
 		OSAddAtomic64(-hdr->mh_size, &type->mt_size);
 		OSAddAtomic(-1, &type->mt_inuse);
 	}
-#endif /* AUDIT_MALLOC_DEBUG */
+#endif                         
 	kheap_free(KHEAP_AUDIT, hdr, hdr->mh_size);
 }
 
-/*
- * Initialize a condition variable.  Must be called before use.
- */
+  
+                                                               
+   
 void
 _audit_cv_init(struct cv *cvp, const char *desc)
 {
@@ -260,9 +260,9 @@ _audit_cv_init(struct cv *cvp, const char *desc)
 	cvp->cv_waiters = 0;
 }
 
-/*
- *  Destory a condition variable.
- */
+  
+                                 
+   
 void
 _audit_cv_destroy(struct cv *cvp)
 {
@@ -270,9 +270,9 @@ _audit_cv_destroy(struct cv *cvp)
 	cvp->cv_waiters = 0;
 }
 
-/*
- * Signal a condition variable, wakes up one waiting thread.
- */
+  
+                                                            
+   
 void
 _audit_cv_signal(struct cv *cvp)
 {
@@ -282,9 +282,9 @@ _audit_cv_signal(struct cv *cvp)
 	}
 }
 
-/*
- * Broadcast a signal to a condition variable.
- */
+  
+                                              
+   
 void
 _audit_cv_broadcast(struct cv *cvp)
 {
@@ -294,11 +294,11 @@ _audit_cv_broadcast(struct cv *cvp)
 	}
 }
 
-/*
- * Wait on a condition variable. A cv_signal or cv_broadcast on the same
- * condition variable will resume the thread. It is recommended that the mutex
- * be held when cv_signal or cv_broadcast are called.
- */
+  
+                                                                        
+                                                                              
+                                                     
+   
 void
 _audit_cv_wait(struct cv *cvp, lck_mtx_t *mp, const char *desc)
 {
@@ -306,12 +306,12 @@ _audit_cv_wait(struct cv *cvp, lck_mtx_t *mp, const char *desc)
 	(void) msleep(cvp, mp, PZERO, desc, 0);
 }
 
-/*
- * Wait on a condition variable, allowing interruption by signals.  Return 0
- * if the thread was resumed with cv_signal or cv_broadcast, EINTR or
- * ERESTART if a signal was caught.  If ERESTART is returned the system call
- * should be restarted if possible.
- */
+  
+                                                                            
+                                                                     
+                                                                            
+                                   
+   
 int
 _audit_cv_wait_sig(struct cv *cvp, lck_mtx_t *mp, const char *desc)
 {
@@ -319,9 +319,9 @@ _audit_cv_wait_sig(struct cv *cvp, lck_mtx_t *mp, const char *desc)
 	return msleep(cvp, mp, PSOCK | PCATCH, desc, 0);
 }
 
-/*
- * BSD Mutexes.
- */
+  
+               
+   
 void
 #if DIAGNOSTIC
 _audit_mtx_init(struct mtx *mp, const char *lckname)
@@ -346,9 +346,9 @@ _audit_mtx_destroy(struct mtx *mp)
 	}
 }
 
-/*
- * BSD rw locks.
- */
+  
+                
+   
 void
 #if DIAGNOSTIC
 _audit_rw_init(struct rwlock *lp, const char *lckname)
@@ -372,11 +372,11 @@ _audit_rw_destroy(struct rwlock *lp)
 		lp->rw_lock = NULL;
 	}
 }
-/*
- * Wait on a condition variable in a continuation (i.e. yield kernel stack).
- * A cv_signal or cv_broadcast on the same condition variable will cause
- * the thread to be scheduled.
- */
+  
+                                                                            
+                                                                        
+                              
+   
 int
 _audit_cv_wait_continuation(struct cv *cvp, lck_mtx_t *mp, thread_continue_t function)
 {
@@ -388,15 +388,15 @@ _audit_cv_wait_continuation(struct cv *cvp, lck_mtx_t *mp, thread_continue_t fun
 
 	status = thread_block(function);
 
-	/* should not be reached, but just in case, re-lock */
+	                                                      
 	lck_mtx_lock(mp);
 
 	return status;
 }
 
-/*
- * Simple recursive lock.
- */
+  
+                         
+   
 void
 #if DIAGNOSTIC
 _audit_rlck_init(struct rlck *lp, const char *lckname)
@@ -414,9 +414,9 @@ _audit_rlck_init(struct rlck *lp, __unused const char *lckname)
 	lp->rl_recurse = 0;
 }
 
-/*
- * Recursive lock.  Allow same thread to recursively lock the same lock.
- */
+  
+                                                                        
+   
 void
 _audit_rlck_lock(struct rlck *lp)
 {
@@ -431,16 +431,16 @@ _audit_rlck_lock(struct rlck *lp)
 	}
 }
 
-/*
- * Recursive unlock.  It should be the same thread that does the unlock.
- */
+  
+                                                                        
+   
 void
 _audit_rlck_unlock(struct rlck *lp)
 {
 	KASSERT(lp->rl_thread == current_thread(),
 	    ("_audit_rlck_unlock(): Don't own lock."));
 
-	/* Note: OSAddAtomic returns old value. */
+	                                          
 	if (OSAddAtomic(-1, &lp->rl_recurse) == 1) {
 		lp->rl_thread = 0;
 		lck_mtx_unlock(lp->rl_mtx);
@@ -456,9 +456,9 @@ _audit_rlck_destroy(struct rlck *lp)
 	}
 }
 
-/*
- * Recursive lock assert.
- */
+  
+                         
+   
 void
 _audit_rlck_assert(struct rlck *lp, u_int assert)
 {
@@ -474,9 +474,9 @@ _audit_rlck_assert(struct rlck *lp, u_int assert)
 	}
 }
 
-/*
- * Simple sleep lock.
- */
+  
+                     
+   
 void
 #if DIAGNOSTIC
 _audit_slck_init(struct slck *lp, const char *lckname)
@@ -494,10 +494,10 @@ _audit_slck_init(struct slck *lp, __unused const char *lckname)
 	lp->sl_waiting = 0;
 }
 
-/*
- * Sleep lock lock.  The 'intr' flag determines if the lock is interruptible.
- * If 'intr' is true then signals or other events can interrupt the sleep lock.
- */
+  
+                                                                             
+                                                                               
+   
 wait_result_t
 _audit_slck_lock(struct slck *lp, int intr)
 {
@@ -517,9 +517,9 @@ _audit_slck_lock(struct slck *lp, int intr)
 	return res;
 }
 
-/*
- * Sleep lock unlock.  Wake up all the threads waiting for this lock.
- */
+  
+                                                                     
+   
 void
 _audit_slck_unlock(struct slck *lp)
 {
@@ -528,15 +528,15 @@ _audit_slck_unlock(struct slck *lp)
 	if (lp->sl_waiting) {
 		lp->sl_waiting = 0;
 
-		/* Wake up *all* sleeping threads. */
+		                                     
 		wakeup((event_t) lp);
 	}
 	lck_mtx_unlock(lp->sl_mtx);
 }
 
-/*
- * Sleep lock try.  Don't sleep if it doesn't get the lock.
- */
+  
+                                                           
+   
 int
 _audit_slck_trylock(struct slck *lp)
 {
@@ -552,9 +552,9 @@ _audit_slck_trylock(struct slck *lp)
 	return result;
 }
 
-/*
- * Sleep lock assert.
- */
+  
+                     
+   
 void
 _audit_slck_assert(struct slck *lp, u_int assert)
 {
@@ -575,10 +575,10 @@ _audit_slck_destroy(struct slck *lp)
 	}
 }
 
-/*
- * XXXss - This code was taken from bsd/netinet6/icmp6.c.  Maybe ppsratecheck()
- * should be made global in icmp6.c.
- */
+  
+                                                                               
+                                    
+   
 #ifndef timersub
 #define timersub(tvp, uvp, vvp)                                         \
 	do {                                                            \
@@ -591,9 +591,9 @@ _audit_slck_destroy(struct slck *lp)
 	} while (0)
 #endif
 
-/*
- * Packets (or events) per second limitation.
- */
+  
+                                             
+   
 int
 _audit_ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 {
@@ -604,14 +604,14 @@ _audit_ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 
 	timersub(&tv, lasttime, &delta);
 
-	/*
-	 * Check for 0,0 so that the message will be seen at least once.
-	 * If more than one second has passed since the last update of
-	 * lasttime, reset the counter.
-	 *
-	 * we do increment *curpps even in *curpps < maxpps case, as some may
-	 * try to use *curpps for stat purposes as well.
-	 */
+	  
+                                                                 
+                                                               
+                                
+   
+                                                                      
+                                                 
+    
 	if ((lasttime->tv_sec == 0 && lasttime->tv_usec == 0) ||
 	    delta.tv_sec >= 1) {
 		*lasttime = tv;
@@ -665,4 +665,4 @@ audit_send_analytics(char* signing_id, char* process_name)
 	}
 }
 
-#endif /* CONFIG_AUDIT */
+#endif                   

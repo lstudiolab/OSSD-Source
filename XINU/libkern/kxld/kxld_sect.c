@@ -52,8 +52,8 @@ static kern_return_t sect_export_macho_header_64(const KXLDSect *sect, u_char *b
 extern boolean_t isSplitKext;
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_sect_init_from_macho_32(KXLDSect *sect, u_char *macho, u_long *sect_offset,
     u_int sectnum, const KXLDRelocator *relocator)
@@ -99,11 +99,11 @@ finish:
 
 	return rval;
 }
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_sect_init_from_macho_64(KXLDSect *sect, u_char *macho, u_long *sect_offset,
     u_int sectnum, const KXLDRelocator *relocator)
@@ -149,12 +149,12 @@ finish:
 
 	return rval;
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
 #if KXLD_USER_OR_GOT
-/*******************************************************************************
-* Assumes GOT is comprised of kxld_addr_t entries
-*******************************************************************************/
+                                                                                
+                                                 
+                                                                                
 kern_return_t
 kxld_sect_init_got(KXLDSect *sect, u_int ngots)
 {
@@ -182,11 +182,11 @@ kxld_sect_init_got(KXLDSect *sect, u_int ngots)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
 #if KXLD_USER_OR_COMMON
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_sect_init_zerofill(KXLDSect *sect, const char *segname,
     const char *sectname, kxld_size_t size, u_int align)
@@ -203,10 +203,10 @@ kxld_sect_init_zerofill(KXLDSect *sect, const char *segname,
 	sect->link_addr = 0;
 	sect->flags = S_ZEROFILL;
 }
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_sect_clear(KXLDSect *sect)
 {
@@ -230,8 +230,8 @@ kxld_sect_clear(KXLDSect *sect)
 	kxld_array_clear(&sect->relocs);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_sect_deinit(KXLDSect *sect)
 {
@@ -245,8 +245,8 @@ kxld_sect_deinit(KXLDSect *sect)
 	bzero(sect, sizeof(*sect));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_int
 kxld_sect_get_num_relocs(const KXLDSect *sect)
 {
@@ -255,8 +255,8 @@ kxld_sect_get_num_relocs(const KXLDSect *sect)
 	return sect->relocs.nitems;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_sect_get_macho_header_size(boolean_t is_32_bit)
 {
@@ -267,8 +267,8 @@ kxld_sect_get_macho_header_size(boolean_t is_32_bit)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_sect_get_macho_data_size(const KXLDSect *sect)
 {
@@ -284,8 +284,8 @@ kxld_sect_get_macho_data_size(const KXLDSect *sect)
 }
 
 #if KXLD_USER_OR_GOT
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_int
 kxld_sect_get_ngots(const KXLDSect *sect, const KXLDRelocator *relocator,
     const KXLDSymtab *symtab)
@@ -299,9 +299,9 @@ kxld_sect_get_ngots(const KXLDSect *sect, const KXLDRelocator *relocator,
 		reloc = kxld_array_get_item(&sect->relocs, i);
 
 		if (relocator->reloc_has_got(reloc->reloc_type)) {
-			/* @TODO This assumes 64-bit symbols (which is valid at the
-			 * moment since only x86_64 has a GOT)
-			 */
+			                                                           
+                                         
+      
 			sym = kxld_reloc_get_symbol(relocator, reloc, sect->data, symtab);
 			if (!kxld_sym_is_got(sym)) {
 				kxld_sym_set_got(sym);
@@ -312,22 +312,22 @@ kxld_sect_get_ngots(const KXLDSect *sect, const KXLDRelocator *relocator,
 
 	return ngots;
 }
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
-/*******************************************************************************
-* Each section must be aligned at a certain power of two.  To figure out that
-* alignment, we mask for the low bits that may need to be adjusted.  If they are
-* non zero, we then subtract them from the target alignment to find the offset,
-* and then add that offset to the link address.
-*******************************************************************************/
+                                                                                
+                                                                             
+                                                                                
+                                                                               
+                                               
+                                                                                
 kxld_addr_t
 kxld_sect_align_address(const KXLDSect *sect, kxld_addr_t address)
 {
 	return kxld_align_address(address, sect->align);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_sect_export_macho_to_file_buffer(const KXLDSect *sect, u_char *buf,
     u_long *header_offset, u_long header_size, u_long *data_offset,
@@ -340,13 +340,13 @@ kxld_sect_export_macho_to_file_buffer(const KXLDSect *sect, u_char *buf,
 	check(header_offset);
 	check(data_offset);
 
-	/* If there is no data to export, we only need to write the header.  We
-	 * make it a separate call so that we don't modify data_offset.
-	 */
+	                                                                       
+                                                                
+    
 	if (!sect->data) {
 		KXLD_3264_FUNC(is_32_bit, rval,
 		    sect_export_macho_header_32, sect_export_macho_header_64,
-		    sect, buf, header_offset, header_size, /* data_offset */ 0);
+		    sect, buf, header_offset, header_size,                   0);
 		require_noerr(rval, finish);
 	} else {
 		*data_offset = (u_long) kxld_sect_align_address(sect, *data_offset);
@@ -367,8 +367,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_sect_export_macho_to_vm(const KXLDSect *sect,
     u_char *buf,
@@ -401,8 +401,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 export_macho(const KXLDSect *sect, u_char *buf, u_long offset, u_long bufsize)
 {
@@ -417,7 +417,7 @@ export_macho(const KXLDSect *sect, u_char *buf, u_long offset, u_long bufsize)
 	}
 
 	if (!isSplitKext) {
-		/* Verify that the section is properly aligned */
+		                                                 
 		if (kxld_sect_align_address(sect, offset) != offset) {
 			kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
 			    "Alignment error: %llu != %lu for %s %s <%s>",
@@ -427,7 +427,7 @@ export_macho(const KXLDSect *sect, u_char *buf, u_long offset, u_long bufsize)
 		}
 	}
 
-	/* Verify that we have enough space to copy */
+	                                              
 	if (buf + offset + sect->size > buf + bufsize) {
 		kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
 		    "Overflow: offset %lu + sect->size %llu > bufsize %lu for %s %s",
@@ -436,7 +436,7 @@ export_macho(const KXLDSect *sect, u_char *buf, u_long offset, u_long bufsize)
 		goto finish;
 	}
 
-	/* Copy section data */
+	                       
 	switch (sect->flags & SECTION_TYPE) {
 	case S_NON_LAZY_SYMBOL_POINTERS:
 	case S_MOD_INIT_FUNC_POINTERS:
@@ -474,7 +474,7 @@ export_macho(const KXLDSect *sect, u_char *buf, u_long offset, u_long bufsize)
 #endif
 		memcpy(buf + offset, sect->data, (size_t)sect->size);
 		break;
-	case S_ZEROFILL: /* sect->data should be NULL, so we'll never get here */
+	case S_ZEROFILL:                                                         
 	case S_LAZY_SYMBOL_POINTERS:
 	case S_GB_ZEROFILL:
 	case S_INTERPOSING:
@@ -493,8 +493,8 @@ finish:
 }
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 sect_export_macho_header_32(const KXLDSect *sect, u_char *buf,
     u_long *header_offset, u_long header_size, u_long data_offset)
@@ -511,7 +511,7 @@ sect_export_macho_header_32(const KXLDSect *sect, u_char *buf,
 	secthdr = (struct section *) ((void *) (buf + *header_offset));
 	*header_offset += sizeof(*secthdr);
 
-	/* Initalize header */
+	                      
 
 	strlcpy(secthdr->sectname, sect->sectname, sizeof(secthdr->sectname));
 	strlcpy(secthdr->segname, sect->segname, sizeof(secthdr->segname));
@@ -545,11 +545,11 @@ sect_export_macho_header_32(const KXLDSect *sect, u_char *buf,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 sect_export_macho_header_64(const KXLDSect *sect, u_char *buf,
     u_long *header_offset, u_long header_size, u_long data_offset)
@@ -567,7 +567,7 @@ sect_export_macho_header_64(const KXLDSect *sect, u_char *buf,
 	secthdr = (struct section_64 *) ((void *) (buf + *header_offset));
 	*header_offset += sizeof(*secthdr);
 
-	/* Initalize header */
+	                      
 
 	strlcpy(secthdr->sectname, sect->sectname, sizeof(secthdr->sectname));
 	strlcpy(secthdr->segname, sect->segname, sizeof(secthdr->segname));
@@ -607,11 +607,11 @@ sect_export_macho_header_64(const KXLDSect *sect, u_char *buf,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
 #if KXLD_USER_OR_COMMON
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kxld_size_t
 kxld_sect_grow(KXLDSect *sect, kxld_size_t nbytes, u_int align)
 {
@@ -624,10 +624,10 @@ kxld_sect_grow(KXLDSect *sect, kxld_size_t nbytes, u_int align)
 
 	return size;
 }
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_sect_relocate(KXLDSect *sect, kxld_addr_t link_addr)
 {
@@ -652,8 +652,8 @@ kxld_sect_relocate(KXLDSect *sect, kxld_addr_t link_addr)
 }
 
 #if KXLD_USER_OR_GOT
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_sect_populate_got(KXLDSect *sect, KXLDSymtab *symtab,
     boolean_t swap __unused)
@@ -683,7 +683,7 @@ kxld_sect_populate_got(KXLDSect *sect, KXLDSymtab *symtab,
 		if (swap) {
 			*entry = OSSwapInt64(*entry);
 		}
-#endif /* !KERNEL */
+#endif              
 
 		++entry;
 		entry_addr += sizeof(*entry);
@@ -694,10 +694,10 @@ kxld_sect_populate_got(KXLDSect *sect, KXLDSymtab *symtab,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_sect_process_relocs(KXLDSect *sect, KXLDRelocator *relocator)
 {

@@ -34,15 +34,15 @@ class Interface(object):
 
     def read(self):
         if self.isblocking:
-            #BUG TODO make this unblocking soon
-            #logging.warn("blocking read bug")
+                                               
+                                              
             self.connection.settimeout(15)
             self.isblocking = False
         r_bytes = ''
         try:
             r_bytes = self.connection.recv(self.pkt_size)
         except Exception, e:
-            #logging.debug("Found exception in recv. %s " % (str(e)))
+                                                                     
             pass
 
         return r_bytes

@@ -53,59 +53,59 @@ static  boolean_t       cpuid_dbg
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define quad(hi, lo)     (((uint64_t)(hi)) << 32 | (lo))
 
-/*
- * Leaf 2 cache descriptor encodings.
- */
+  
+                                     
+   
 typedef enum {
-	_NULL_,         /* NULL (empty) descriptor */
-	CACHE,          /* Cache */
-	TLB,            /* TLB */
-	STLB,           /* Shared second-level unified TLB */
-	PREFETCH        /* Prefetch size */
+	_NULL_,                                      
+	CACHE,                     
+	TLB,                     
+	STLB,                                                
+	PREFETCH                           
 } cpuid_leaf2_desc_type_t;
 
 typedef enum {
-	NA,             /* Not Applicable */
-	FULLY,          /* Fully-associative */
-	TRACE,          /* Trace Cache (P4 only) */
-	INST,           /* Instruction TLB */
-	DATA,           /* Data TLB */
-	DATA0,          /* Data TLB, 1st level */
-	DATA1,          /* Data TLB, 2nd level */
-	L1,             /* L1 (unified) cache */
-	L1_INST,        /* L1 Instruction cache */
-	L1_DATA,        /* L1 Data cache */
-	L2,             /* L2 (unified) cache */
-	L3,             /* L3 (unified) cache */
-	L2_2LINESECTOR, /* L2 (unified) cache with 2 lines per sector */
-	L3_2LINESECTOR, /* L3(unified) cache with 2 lines per sector */
-	SMALL,          /* Small page TLB */
-	LARGE,          /* Large page TLB */
-	BOTH            /* Small and Large page TLB */
+	NA,                                 
+	FULLY,                                 
+	TRACE,                                     
+	INST,                                
+	DATA,                         
+	DATA0,                                   
+	DATA1,                                   
+	L1,                                     
+	L1_INST,                                  
+	L1_DATA,                           
+	L2,                                     
+	L3,                                     
+	L2_2LINESECTOR,                                                 
+	L3_2LINESECTOR,                                                
+	SMALL,                              
+	LARGE,                              
+	BOTH                                          
 } cpuid_leaf2_qualifier_t;
 
 typedef struct cpuid_cache_descriptor {
-	uint8_t         value;          /* descriptor code */
-	uint8_t         type;           /* cpuid_leaf2_desc_type_t */
-	uint8_t         level;          /* level of cache/TLB hierachy */
-	uint8_t         ways;           /* wayness of cache */
-	uint16_t        size;           /* cachesize or TLB pagesize */
-	uint16_t        entries;        /* number of TLB entries or linesize */
+	uint8_t         value;                               
+	uint8_t         type;                                        
+	uint8_t         level;                                           
+	uint8_t         ways;                                 
+	uint16_t        size;                                          
+	uint16_t        entries;                                               
 } cpuid_cache_descriptor_t;
 
-/*
- * These multipliers are used to encode 1*K .. 64*M in a 16 bit size field
- */
+  
+                                                                          
+   
 #define K       (1)
 #define M       (1024)
 
-/*
- * Intel cache descriptor table:
- */
+  
+                                
+   
 static cpuid_cache_descriptor_t intel_cpuid_leaf2_descriptor_table[] = {
-//	-------------------------------------------------------
-//	value	type	level		ways	size	entries
-//	-------------------------------------------------------
+                                                          
+                                      
+                                                          
 	{ 0x00, _NULL_, NA, NA, NA, NA  },
 	{ 0x01, TLB, INST, 4, SMALL, 32  },
 	{ 0x02, TLB, INST, FULLY, LARGE, 2   },
@@ -213,7 +213,7 @@ static cpuid_cache_descriptor_t intel_cpuid_leaf2_descriptor_table[] = {
 #define INTEL_LEAF2_DESC_NUM (sizeof(intel_cpuid_leaf2_descriptor_table) / \
 	                        sizeof(cpuid_cache_descriptor_t))
 
-boolean_t cpuid_tsx_disabled = false;   /* true if XNU disabled TSX */
+boolean_t cpuid_tsx_disabled = false;                                 
 boolean_t cpuid_tsx_supported = false;
 
 static void do_cwas(i386_cpu_info_t *cpuinfo, boolean_t on_slave);
@@ -223,7 +223,7 @@ static void cpuid_do_precpuid_was(void);
 static void cpuid_vmm_detect_pv_interface(i386_vmm_info_t *info_p, const char *signature,
     bool (*)(i386_vmm_info_t*, const uint32_t, const uint32_t));
 static bool cpuid_vmm_detect_applepv_features(i386_vmm_info_t *info_p, const uint32_t base, const uint32_t max_leaf);
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 static inline cpuid_cache_descriptor_t *
 cpuid_leaf2_find(uint8_t value)
@@ -238,9 +238,9 @@ cpuid_leaf2_find(uint8_t value)
 	return NULL;
 }
 
-/*
- * CPU identification routines.
- */
+  
+                               
+   
 
 static i386_cpu_info_t  cpuid_cpu_info;
 static i386_cpu_info_t  *cpuid_cpu_infop = NULL;
@@ -263,19 +263,19 @@ do_cwas(i386_cpu_info_t *cpuinfo, boolean_t on_slave)
 	extern int force_thread_policy_tecs;
 	cwa_classifier_e wa_reqd;
 
-	/*
-	 * Workaround for reclaiming perf counter 3 due to TSX memory ordering erratum.
-	 * This workaround does not support being forcibly set (since an MSR must be
-	 * enumerated, lest we #GP when forced to access it.)
-	 *
-	 * Note that if disabling TSX is supported, disablement is prefered over forcing
-	 * TSX transactions to abort.
-	 */
+	  
+                                                                                
+                                                                             
+                                                      
+   
+                                                                                 
+                              
+    
 	if (cpuid_wa_required(CPU_INTEL_TSXDA) == CWA_ON) {
-		/* This must be executed on all logical processors */
+		                                                     
 		wrmsr64(MSR_IA32_TSX_CTRL, MSR_IA32_TSXCTRL_TSX_CPU_CLEAR | MSR_IA32_TSXCTRL_RTM_DISABLE);
 	} else if (cpuid_wa_required(CPU_INTEL_TSXFA) == CWA_ON) {
-		/* This must be executed on all logical processors */
+		                                                     
 		wrmsr64(MSR_IA32_TSX_FORCE_ABORT,
 		    rdmsr64(MSR_IA32_TSX_FORCE_ABORT) | MSR_IA32_TSXFA_RTM_FORCE_ABORT);
 	}
@@ -283,7 +283,7 @@ do_cwas(i386_cpu_info_t *cpuinfo, boolean_t on_slave)
 	if (((wa_reqd = cpuid_wa_required(CPU_INTEL_SRBDS)) & CWA_ON) != 0 &&
 	    ((wa_reqd & CWA_FORCE_ON) == CWA_ON ||
 	    (cpuinfo->cpuid_leaf7_extfeatures & CPUID_LEAF7_EXTFEATURE_SRBDS_CTRL) != 0)) {
-		/* This must be executed on all logical processors */
+		                                                     
 		uint64_t mcuoptctrl = rdmsr64(MSR_IA32_MCU_OPT_CTRL);
 		mcuoptctrl |= MSR_IA32_MCUOPTCTRL_RNGDS_MITG_DIS;
 		wrmsr64(MSR_IA32_MCU_OPT_CTRL, mcuoptctrl);
@@ -297,7 +297,7 @@ do_cwas(i386_cpu_info_t *cpuinfo, boolean_t on_slave)
 	case CWA_FORCE_ON:
 		force_thread_policy_tecs = 1;
 
-		/* If hyperthreaded, enable idle workaround */
+		                                              
 		if (cpuinfo->thread_count > cpuinfo->core_count) {
 			force_tecs_at_idle = 1;
 		}
@@ -325,7 +325,7 @@ cpuid_do_was(void)
 	do_cwas(cpuid_info(), TRUE);
 }
 
-/* this function is Intel-specific */
+                                     
 static void
 cpuid_set_cache_info( i386_cpu_info_t * info_p )
 {
@@ -341,17 +341,17 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 
 	bzero( linesizes, sizeof(linesizes));
 
-	/* Get processor cache descriptor info using leaf 2.  We don't use
-	 * this internally, but must publish it for KEXTs.
-	 */
+	                                                                  
+                                                   
+    
 	cpuid_fn(2, cpuid_result);
 	for (j = 0; j < 4; j++) {
-		if ((cpuid_result[j] >> 31) == 1) {     /* bit31 is validity */
+		if ((cpuid_result[j] >> 31) == 1) {                            
 			continue;
 		}
 		((uint32_t *)(void *)info_p->cache_info)[j] = cpuid_result[j];
 	}
-	/* first byte gives number of cpuid calls to get all descriptors */
+	                                                                   
 	for (i = 1; i < info_p->cache_info[0]; i++) {
 		if (i * 16 > sizeof(info_p->cache_info)) {
 			break;
@@ -366,11 +366,11 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 		}
 	}
 
-	/*
-	 * Get cache info using leaf 4, the "deterministic cache parameters."
-	 * Most processors Mac OS X supports implement this flavor of CPUID.
-	 * Loop over each cache on the processor.
-	 */
+	  
+                                                                      
+                                                                     
+                                          
+    
 	cpuid_fn(0, cpuid_result);
 	if (cpuid_result[eax] >= 4) {
 		cpuid_deterministic_supported = TRUE;
@@ -388,13 +388,13 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 		uint32_t        cache_partitions;
 		uint32_t        colors;
 
-		reg[eax] = 4;           /* cpuid request 4 */
-		reg[ecx] = index;       /* index starting at 0 */
+		reg[eax] = 4;                                
+		reg[ecx] = index;                                
 		cpuid(reg);
 		DBG("cpuid(4) index=%d eax=0x%x\n", index, reg[eax]);
 		cache_type = bitfield32(reg[eax], 4, 0);
 		if (cache_type == 0) {
-			break;          /* no more caches */
+			break;                              
 		}
 		cache_level             = bitfield32(reg[eax], 7, 5);
 		cache_sharing           = bitfield32(reg[eax], 25, 14) + 1;
@@ -405,7 +405,7 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 		cache_associativity     = bitfield32(reg[ebx], 31, 22) + 1;
 		cache_sets              = bitfield32(reg[ecx], 31, 0) + 1;
 
-		/* Map type/levels returned by CPUID into cache_type_t */
+		                                                         
 		switch (cache_level) {
 		case 1:
 			type = cache_type == 1 ? L1D :
@@ -424,9 +424,9 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 			type = Lnone;
 		}
 
-		/* The total size of a cache is:
-		 *	( linesize * sets * associativity * partitions )
-		 */
+		                                
+                                                     
+     
 		if (type != Lnone) {
 			cache_size = cache_linesize * cache_sets *
 			    cache_associativity * cache_partitions;
@@ -442,43 +442,43 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 			DBG(" cache_partitions[%s]: %d\n",
 			    cache_type_str[type], cache_partitions);
 
-			/*
-			 * Overwrite associativity determined via
-			 * CPUID.0x80000006 -- this leaf is more
-			 * accurate
-			 */
+			  
+                                            
+                                           
+              
+      
 			if (type == L2U) {
 				info_p->cpuid_cache_L2_associativity = cache_associativity;
 			}
-			/*
-			 * Adjust #sets to account for the N CBos
-			 * This is because addresses are hashed across CBos
-			 */
+			  
+                                            
+                                                      
+      
 			if (type == L3U && info_p->core_count) {
 				cache_sets = cache_sets / info_p->core_count;
 			}
 
-			/* Compute the number of page colors for this cache,
-			 * which is:
-			 *	( linesize * sets ) / page_size
-			 *
-			 * To help visualize this, consider two views of a
-			 * physical address.  To the cache, it is composed
-			 * of a line offset, a set selector, and a tag.
-			 * To VM, it is composed of a page offset, a page
-			 * color, and other bits in the pageframe number:
-			 *
-			 *           +-----------------+---------+--------+
-			 *  cache:   |       tag       |   set   | offset |
-			 *           +-----------------+---------+--------+
-			 *
-			 *           +-----------------+-------+----------+
-			 *  VM:      |    don't care   | color | pg offset|
-			 *           +-----------------+-------+----------+
-			 *
-			 * The color is those bits in (set+offset) not covered
-			 * by the page offset.
-			 */
+			                                                    
+               
+                                     
+     
+                                                     
+                                                     
+                                                  
+                                                    
+                                                    
+     
+                                                      
+                                                      
+                                                      
+     
+                                                      
+                                                      
+                                                      
+     
+                                                         
+                         
+      
 			colors = (cache_linesize * cache_sets) >> 12;
 
 			if (colors > vm_cache_geometry_colors) {
@@ -488,14 +488,14 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 	}
 	DBG(" vm_cache_geometry_colors: %d\n", vm_cache_geometry_colors);
 
-	/*
-	 * If deterministic cache parameters are not available, use
-	 * something else
-	 */
+	  
+                                                            
+                  
+    
 	if (info_p->cpuid_cores_per_package == 0) {
 		info_p->cpuid_cores_per_package = 1;
 
-		/* cpuid define in 1024 quantities */
+		                                     
 		info_p->cache_size[L2U] = info_p->cpuid_cache_size * 1024;
 		info_p->cache_sharing[L2U] = 1;
 		info_p->cache_partitions[L2U] = 1;
@@ -510,10 +510,10 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 		    info_p->cpuid_cache_linesize);
 	}
 
-	/*
-	 * What linesize to publish?  We use the L2 linesize if any,
-	 * else the L1D.
-	 */
+	  
+                                                             
+                 
+    
 	if (linesizes[L2U]) {
 		info_p->cache_linesize = linesizes[L2U];
 	} else if (linesizes[L1D]) {
@@ -523,9 +523,9 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 	}
 	DBG(" cache_linesize    : %d\n", info_p->cache_linesize);
 
-	/*
-	 * Extract and publish TLB information from Leaf 2 descriptors.
-	 */
+	  
+                                                                
+    
 	DBG(" %ld leaf2 descriptors:\n", sizeof(info_p->cache_info));
 	for (i = 1; i < sizeof(info_p->cache_info); i++) {
 		cpuid_cache_descriptor_t        *descp;
@@ -542,7 +542,7 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 		switch (descp->type) {
 		case TLB:
 			page = (descp->size == SMALL) ? TLB_SMALL : TLB_LARGE;
-			/* determine I or D: */
+			                       
 			switch (descp->level) {
 			case INST:
 				id = TLB_INST;
@@ -555,7 +555,7 @@ cpuid_set_cache_info( i386_cpu_info_t * info_p )
 			default:
 				continue;
 			}
-			/* determine level: */
+			                      
 			switch (descp->level) {
 			case DATA1:
 				level = 1;
@@ -580,24 +580,24 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 
 	DBG("cpuid_set_generic_info(%p)\n", info_p);
 
-	/* do cpuid 0 to get vendor */
+	                              
 	cpuid_fn(0, reg);
 	info_p->cpuid_max_basic = reg[eax];
-	bcopy((char *)&reg[ebx], &info_p->cpuid_vendor[0], 4); /* ug */
+	bcopy((char *)&reg[ebx], &info_p->cpuid_vendor[0], 4);         
 	bcopy((char *)&reg[ecx], &info_p->cpuid_vendor[8], 4);
 	bcopy((char *)&reg[edx], &info_p->cpuid_vendor[4], 4);
 	info_p->cpuid_vendor[12] = 0;
 
-	/* get extended cpuid results */
+	                                
 	cpuid_fn(0x80000000, reg);
 	info_p->cpuid_max_ext = reg[eax];
 
-	/* check to see if we can get brand string */
+	                                             
 	if (info_p->cpuid_max_ext >= 0x80000004) {
-		/*
-		 * The brand string 48 bytes (max), guaranteed to
-		 * be NUL terminated.
-		 */
+		  
+                                                   
+                       
+     
 		cpuid_fn(0x80000002, reg);
 		bcopy((char *)reg, &str[0], 16);
 		cpuid_fn(0x80000003, reg);
@@ -615,27 +615,27 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 		if (!strncmp(info_p->cpuid_brand_string, CPUID_STRING_UNKNOWN,
 		    min(sizeof(info_p->cpuid_brand_string),
 		    strlen(CPUID_STRING_UNKNOWN) + 1))) {
-			/*
-			 * This string means we have a firmware-programmable brand string,
-			 * and the firmware couldn't figure out what sort of CPU we have.
-			 */
+			  
+                                                                     
+                                                                    
+      
 			info_p->cpuid_brand_string[0] = '\0';
 		}
 	}
 
-	/* Get cache and addressing info. */
+	                                    
 	if (info_p->cpuid_max_ext >= 0x80000006) {
 		uint32_t assoc;
 		cpuid_fn(0x80000006, reg);
 		info_p->cpuid_cache_linesize   = bitfield32(reg[ecx], 7, 0);
 		assoc = bitfield32(reg[ecx], 15, 12);
-		/*
-		 * L2 associativity is encoded, though in an insufficiently
-		 * descriptive fashion, e.g. 24-way is mapped to 16-way.
-		 * Represent a fully associative cache as 0xFFFF.
-		 * Overwritten by associativity as determined via CPUID.4
-		 * if available.
-		 */
+		  
+                                                             
+                                                          
+                                                   
+                                                           
+                  
+     
 		if (assoc == 6) {
 			assoc = 8;
 		} else if (assoc == 8) {
@@ -652,11 +652,11 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 		    bitfield32(reg[eax], 15, 8);
 	}
 
-	/*
-	 * Get processor signature and decode
-	 * and bracket this with the approved procedure for reading the
-	 * the microcode version number a.k.a. signature a.k.a. BIOS ID
-	 */
+	  
+                                      
+                                                                
+                                                                
+    
 	wrmsr64(MSR_IA32_BIOS_SIGN_ID, 0);
 	cpuid_fn(1, reg);
 	info_p->cpuid_microcode_version =
@@ -671,10 +671,10 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	info_p->cpuid_brand     = bitfield32(reg[ebx], 7, 0);
 	info_p->cpuid_features  = quad(reg[ecx], reg[edx]);
 
-	/* Get "processor flag"; necessary for microcode update matching */
+	                                                                   
 	info_p->cpuid_processor_flag = (rdmsr64(MSR_IA32_PLATFORM_ID) >> 50) & 0x7;
 
-	/* Fold extensions into family/model */
+	                                       
 	if (info_p->cpuid_family == 0x0f) {
 		info_p->cpuid_family += info_p->cpuid_extfamily;
 	}
@@ -712,7 +712,7 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	DBG(" logical_per_package : %d\n", info_p->cpuid_logical_per_package);
 	DBG(" microcode_version   : 0x%08x\n", info_p->cpuid_microcode_version);
 
-	/* Fold in the Invariant TSC feature bit, if present */
+	                                                       
 	if (info_p->cpuid_max_ext >= 0x80000007) {
 		cpuid_fn(0x80000007, reg);
 		info_p->cpuid_extfeatures |=
@@ -724,9 +724,9 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	if (info_p->cpuid_max_basic >= 0x5) {
 		cpuid_mwait_leaf_t      *cmp = &info_p->cpuid_mwait_leaf;
 
-		/*
-		 * Extract the Monitor/Mwait Leaf info:
-		 */
+		  
+                                         
+     
 		cpuid_fn(5, reg);
 		cmp->linesize_min = reg[eax];
 		cmp->linesize_max = reg[ebx];
@@ -744,9 +744,9 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	if (info_p->cpuid_max_basic >= 0x6) {
 		cpuid_thermal_leaf_t    *ctp = &info_p->cpuid_thermal_leaf;
 
-		/*
-		 * The thermal and Power Leaf:
-		 */
+		  
+                                
+     
 		cpuid_fn(6, reg);
 		ctp->sensor               = bitfield32(reg[eax], 0, 0);
 		ctp->dynamic_acceleration = bitfield32(reg[eax], 1, 1);
@@ -776,9 +776,9 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	if (info_p->cpuid_max_basic >= 0xa) {
 		cpuid_arch_perf_leaf_t  *capp = &info_p->cpuid_arch_perf_leaf;
 
-		/*
-		 * Architectural Performance Monitoring Leaf:
-		 */
+		  
+                                               
+     
 		cpuid_fn(0xa, reg);
 		capp->version       = bitfield32(reg[eax], 7, 0);
 		capp->number        = bitfield32(reg[eax], 15, 8);
@@ -801,9 +801,9 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 
 	if (info_p->cpuid_max_basic >= 0xd) {
 		cpuid_xsave_leaf_t      *xsp;
-		/*
-		 * XSAVE Features:
-		 */
+		  
+                    
+     
 		xsp = &info_p->cpuid_xsave_leaf[0];
 		info_p->cpuid_xsave_leafp = xsp;
 		xsp->extended_state[eax] = 0xd;
@@ -827,9 +827,9 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	}
 
 	if (info_p->cpuid_model >= CPUID_MODEL_IVYBRIDGE) {
-		/*
-		 * Leaf7 Features:
-		 */
+		  
+                    
+     
 		cpuid_fn(0x7, reg);
 		info_p->cpuid_leaf7_features = quad(reg[ecx], reg[ebx]);
 		info_p->cpuid_leaf7_extfeatures = reg[edx];
@@ -843,9 +843,9 @@ cpuid_set_generic_info(i386_cpu_info_t *info_p)
 	}
 
 	if (info_p->cpuid_max_basic >= 0x15) {
-		/*
-		 * TCS/CCC frequency leaf:
-		 */
+		  
+                            
+     
 		cpuid_fn(0x15, reg);
 		info_p->cpuid_tsc_leaf.denominator = reg[eax];
 		info_p->cpuid_tsc_leaf.numerator   = reg[ebx];
@@ -920,22 +920,22 @@ cpuid_set_cpufamily(i386_cpu_info_t *info_p)
 	DBG("cpuid_set_cpufamily(%p) returning 0x%x\n", info_p, cpufamily);
 	return cpufamily;
 }
-/*
- * Must be invoked either when executing single threaded, or with
- * independent synchronization.
- */
+  
+                                                                 
+                               
+   
 void
 cpuid_set_info(void)
 {
 	i386_cpu_info_t         *info_p = &cpuid_cpu_info;
 	boolean_t               enable_x86_64h = TRUE;
 
-	/* Perform pre-cpuid workarounds (since their effects impact values returned via cpuid) */
+	                                                                                          
 	cpuid_do_precpuid_was();
 
 	cpuid_set_generic_info(info_p);
 
-	/* verify we are running on a supported CPU */
+	                                              
 	if ((strncmp(CPUID_VID_INTEL, info_p->cpuid_vendor,
 	    min(strlen(CPUID_STRING_UNKNOWN) + 1,
 	    sizeof(info_p->cpuid_vendor)))) ||
@@ -961,16 +961,16 @@ cpuid_set_info(void)
 	} else {
 		info_p->cpuid_cpu_subtype = CPU_SUBTYPE_X86_ARCH1;
 	}
-	/* cpuid_set_cache_info must be invoked after set_generic_info */
+	                                                                 
 
-	/*
-	 * Find the number of enabled cores and threads
-	 * (which determines whether SMT/Hyperthreading is active).
-	 */
+	  
+                                                
+                                                            
+    
 
-	/*
-	 * Not all VMMs emulate MSR_CORE_THREAD_COUNT (0x35).
-	 */
+	  
+                                                      
+    
 	if (0 != (info_p->cpuid_features & CPUID_FEATURE_VMM) &&
 	    PE_parse_boot_argn("-nomsr35h", NULL, 0)) {
 		info_p->core_count = 1;
@@ -984,14 +984,14 @@ cpuid_set_info(void)
 			info_p->thread_count = info_p->cpuid_logical_per_package;
 			break;
 		case CPUFAMILY_INTEL_WESTMERE: {
-			/*
-			 * This should be the same as Nehalem but an A0 silicon bug returns
-			 * invalid data in the top 12 bits. Hence, we use only bits [19..16]
-			 * rather than [31..16] for core count - which actually can't exceed 8.
-			 */
+			  
+                                                                      
+                                                                       
+                                                                          
+      
 			uint64_t msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 			if (0 == msr) {
-				/* Provide a non-zero default for some VMMs */
+				                                              
 				msr = (1 << 16) | 1;
 			}
 			info_p->core_count   = bitfield32((uint32_t)msr, 19, 16);
@@ -1002,7 +1002,7 @@ cpuid_set_info(void)
 		default: {
 			uint64_t msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 			if (0 == msr) {
-				/* Provide a non-zero default for some VMMs */
+				                                              
 				msr = (1 << 16) | 1;
 			}
 			info_p->core_count   = bitfield32((uint32_t)msr, 31, 16);
@@ -1019,9 +1019,9 @@ cpuid_set_info(void)
 	DBG("       cpu_type: 0x%08x\n", info_p->cpuid_cpu_type);
 	DBG("    cpu_subtype: 0x%08x\n", info_p->cpuid_cpu_subtype);
 
-	info_p->cpuid_model_string = ""; /* deprecated */
+	info_p->cpuid_model_string = "";                 
 
-	/* Init CPU LBRs */
+	                   
 	i386_lbr_init(info_p, true);
 
 	do_cwas(info_p, FALSE);
@@ -1196,7 +1196,7 @@ cpuid_get_names(struct table *map, uint64_t bits, char *buf, unsigned buf_len)
 i386_cpu_info_t *
 cpuid_info(void)
 {
-	/* Set-up the cpuid_info stucture lazily */
+	                                           
 	if (cpuid_cpu_infop == NULL) {
 		PE_parse_boot_argn("-cpuid", &cpuid_dbg, sizeof(cpuid_dbg));
 		cpuid_set_info();
@@ -1309,7 +1309,7 @@ cpuid_features(void)
 
 	(void) cpuid_info();
 	if (!checked) {
-		/* check for boot-time fpu limitations */
+		                                         
 		if (PE_parse_boot_argn("_fpu", &fpu_arg[0], sizeof(fpu_arg))) {
 			printf("limiting fpu features to: %s\n", fpu_arg);
 			if (!strncmp("387", fpu_arg, sizeof("387")) || !strncmp("mmx", fpu_arg, sizeof("mmx"))) {
@@ -1366,7 +1366,7 @@ cpuid_vmm_family_string(void)
 		return "KVM";
 
 	case CPUID_VMM_FAMILY_UNKNOWN:
-	/*FALLTHROUGH*/
+	               
 	default:
 		return "Unknown VMM";
 	}
@@ -1389,21 +1389,21 @@ cpuid_init_vmm_info(i386_vmm_info_t *info_p)
 
 	DBG("cpuid_init_vmm_info(%p)\n", info_p);
 
-	/*
-	 * Get the highest basic leaf value, then save the cpuid details for that leaf
-	 * for comparison with the [ostensible] VMM leaf.
-	 */
+	  
+                                                                               
+                                                  
+    
 	cpuid_fn(0, reg);
 	cpuid_fn(reg[eax], maxbasic_regs);
 
-	/* do cpuid 0x40000000 to get VMM vendor */
+	                                           
 	cpuid_fn(0x40000000, reg);
 
-	/*
-	 * If leaf 0x40000000 is non-existent, cpuid will return the values as
-	 * if the highest basic leaf was requested, so compare to those values
-	 * we just retrieved to see if no vmm is present.
-	 */
+	  
+                                                                       
+                                                                       
+                                                  
+    
 	if (bcmp(reg, maxbasic_regs, sizeof(reg)) == 0) {
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_NONE;
 		DBG(" vmm_vendor          : NONE\n");
@@ -1417,25 +1417,25 @@ cpuid_init_vmm_info(i386_vmm_info_t *info_p)
 	info_p->cpuid_vmm_vendor[12] = '\0';
 
 	if (0 == strcmp(info_p->cpuid_vmm_vendor, CPUID_VMM_ID_VMWARE)) {
-		/* VMware identification string: kb.vmware.com/kb/1009458 */
+		                                                            
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_VMWARE;
 	} else if (0 == bcmp(info_p->cpuid_vmm_vendor, CPUID_VMM_ID_PARALLELS, 12)) {
-		/* Parallels identification string */
+		                                     
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_PARALLELS;
 	} else if (0 == bcmp(info_p->cpuid_vmm_vendor, CPUID_VMM_ID_HYVE, 12)) {
-		/* bhyve/xhyve identification string */
+		                                       
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_HYVE;
 	} else if (0 == bcmp(info_p->cpuid_vmm_vendor, CPUID_VMM_ID_HVF, 12)) {
-		/* HVF identification string */
+		                               
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_HVF;
 	} else if (0 == bcmp(info_p->cpuid_vmm_vendor, CPUID_VMM_ID_KVM, 12)) {
-		/* KVM identification string */
+		                               
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_KVM;
 	} else {
 		info_p->cpuid_vmm_family = CPUID_VMM_FAMILY_UNKNOWN;
 	}
 
-	/* VMM generic leaves: https://lkml.org/lkml/2008/10/1/246 */
+	                                                             
 	if (max_vmm_leaf >= 0x40000010) {
 		cpuid_fn(0x40000010, reg);
 
@@ -1481,7 +1481,7 @@ cpuid_vmm_get_applepv_features(void)
 {
 	return cpuid_vmm_info()->cpuid_vmm_applepv_features;
 }
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 cwa_classifier_e
 cpuid_wa_required(cpu_wa_e wa)
@@ -1513,12 +1513,12 @@ cpuid_wa_required(cpu_wa_e wa)
 
 	switch (wa) {
 	case CPU_INTEL_SEGCHK:
-		/* First, check to see if this CPU requires the workaround */
+		                                                             
 		if ((info_p->cpuid_leaf7_extfeatures & CPUID_LEAF7_EXTFEATURE_ACAPMSR) != 0) {
-			/* We have ARCHCAP, so check it for either RDCL_NO or MDS_NO */
+			                                                               
 			uint64_t archcap_msr = rdmsr64(MSR_IA32_ARCH_CAPABILITIES);
 			if ((archcap_msr & (MSR_IA32_ARCH_CAPABILITIES_RDCL_NO | MSR_IA32_ARCH_CAPABILITIES_MDS_NO)) != 0) {
-				/* Workaround not needed */
+				                           
 				return CWA_OFF;
 			}
 		}
@@ -1527,24 +1527,24 @@ cpuid_wa_required(cpu_wa_e wa)
 			return CWA_ON;
 		}
 
-		/*
-		 * If the CPU supports the ARCHCAP MSR and neither the RDCL_NO bit nor the MDS_NO
-		 * bit are set, OR the CPU does not support the ARCHCAP MSR and the CPU does
-		 * not enumerate the presence of the enhanced VERW instruction, report
-		 * that the workaround should not be enabled.
-		 */
+		  
+                                                                                   
+                                                                              
+                                                                        
+                                               
+     
 		break;
 
 	case CPU_INTEL_TSXFA:
-		/*
-		 * Note that if TSX was disabled in cpuid_do_precpuid_was(), the cached cpuid
-		 * info will indicate that RTM is *not* supported and this workaround will not
-		 * be enabled.
-		 */
-		/*
-		 * Otherwise, if the CPU supports both TSX(HLE) and FORCE_ABORT, return that
-		 * the workaround should be enabled.
-		 */
+		  
+                                                                               
+                                                                                
+                
+     
+		  
+                                                                              
+                                      
+     
 		if ((info_p->cpuid_leaf7_extfeatures & CPUID_LEAF7_EXTFEATURE_TSXFA) != 0 &&
 		    (info_p->cpuid_leaf7_features & CPUID_LEAF7_FEATURE_RTM) != 0) {
 			return CWA_ON;
@@ -1552,18 +1552,18 @@ cpuid_wa_required(cpu_wa_e wa)
 		break;
 
 	case CPU_INTEL_TSXDA:
-		/*
-		 * Since this workaround might be requested before cpuid_set_info() is complete,
-		 * we need to invoke cpuid directly when looking for the required bits.
-		 */
+		  
+                                                                                  
+                                                                         
+     
 		cpuid_fn(0x7, reg);
 		if (reg[edx] & CPUID_LEAF7_EXTFEATURE_ACAPMSR) {
 			uint64_t archcap_msr = rdmsr64(MSR_IA32_ARCH_CAPABILITIES);
-			/*
-			 * If this CPU supports TSX (HLE being the proxy for TSX detection) AND it does
-			 * not include a hardware fix for TAA and it supports the TSX_CTRL MSR, disable TSX entirely.
-			 * (Note this can be overridden (above) if the cwad boot-arg's value has bit 2 set.)
-			 */
+			  
+                                                                                  
+                                                                                                
+                                                                                       
+      
 			if ((reg[ebx] & CPUID_LEAF7_FEATURE_HLE) != 0 &&
 			    (archcap_msr & (MSR_IA32_ARCH_CAPABILITIES_TAA_NO | MSR_IA32_ARCH_CAPABILITIES_TSX_CTRL))
 			    == MSR_IA32_ARCH_CAPABILITIES_TSX_CTRL) {
@@ -1573,12 +1573,12 @@ cpuid_wa_required(cpu_wa_e wa)
 		break;
 
 	case CPU_INTEL_SRBDS:
-		/*
-		 * SRBDS mitigations are enabled by default.  CWA_ON returned here indicates
-		 * the caller should disable the mitigation.  Mitigations should be disabled
-		 * at least for CPUs that advertise MDS_NO *and* (either TAA_NO is set OR TSX
-		 * has been disabled).
-		 */
+		  
+                                                                              
+                                                                              
+                                                                               
+                        
+     
 		if ((info_p->cpuid_leaf7_extfeatures & CPUID_LEAF7_EXTFEATURE_SRBDS_CTRL) != 0) {
 			if ((info_p->cpuid_leaf7_extfeatures & CPUID_LEAF7_EXTFEATURE_ACAPMSR) != 0) {
 				uint64_t archcap_msr = rdmsr64(MSR_IA32_ARCH_CAPABILITIES);
@@ -1601,15 +1601,15 @@ cpuid_wa_required(cpu_wa_e wa)
 static void
 cpuid_do_precpuid_was(void)
 {
-	/*
-	 * Note that care must be taken not to use any data from the cached cpuid data since it is
-	 * likely uninitialized at this point.  That includes calling functions that make use of
-	 * that data as well.
-	 */
+	  
+                                                                                           
+                                                                                         
+                      
+    
 
-	/* Note the TSX disablement, we do not support force-on since it depends on MSRs being present */
+	                                                                                                 
 	if (cpuid_wa_required(CPU_INTEL_TSXDA) == CWA_ON) {
-		/* This must be executed on all logical processors */
+		                                                     
 		wrmsr64(MSR_IA32_TSX_CTRL, MSR_IA32_TSXCTRL_TSX_CPU_CLEAR | MSR_IA32_TSXCTRL_RTM_DISABLE);
 		cpuid_tsx_disabled = true;
 	}
@@ -1618,10 +1618,10 @@ cpuid_do_precpuid_was(void)
 
 #if DEBUG || DEVELOPMENT
 
-/*
- * Hunt for Apple Paravirtualization support in the hypervisor class leaves [0x4000_0000-0x4001_0000].
- * Hypervisor interfaces are expected to be found at 0x100 boundaries for compatibility.
- */
+  
+                                                                                                      
+                                                                                        
+   
 
 static bool
 cpuid_vmm_detect_applepv_features(i386_vmm_info_t *info_p, const uint32_t base, const uint32_t max_leaf)
@@ -1630,10 +1630,10 @@ cpuid_vmm_detect_applepv_features(i386_vmm_info_t *info_p, const uint32_t base, 
 		return false;
 	}
 
-	/*
-	 * Issue cpuid to make sure the interface supports "AH#1" features.
-	 * This avoids a possible collision with "Hv#1" used by Hyper-V.
-	 */
+	  
+                                                                    
+                                                                 
+    
 	uint32_t reg[4];
 	char interface[5];
 	cpuid_fn(base + APPLEPV_INTERFACE_LEAF_INDEX, reg);
@@ -1658,9 +1658,9 @@ cpuid_vmm_detect_pv_interface(i386_vmm_info_t *info_p, const char *signature,
 	}
 
 	assert(info_p);
-	/*
-	 * Look for PV interface matching signature
-	 */
+	  
+                                            
+    
 	for (uint32_t base = 0x40000100; base < 0x40010000; base += 0x100) {
 		uint32_t reg[4];
 		char vendor[13];
@@ -1678,4 +1678,4 @@ cpuid_vmm_detect_pv_interface(i386_vmm_info_t *info_p, const char *signature,
 	}
 }
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           

@@ -21,5 +21,5 @@ T_DECL(remote_time_syscall, "test mach_bridge_remote_time syscall",
 	T_ASSERT_EQ(remote_time1, remote_time2, "syscall works");
 #else
 	T_SKIP("Skipping test");
-#endif /* TARGET_OS_BRIDGE */
+#endif                       
 }

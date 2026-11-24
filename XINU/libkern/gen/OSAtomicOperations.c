@@ -47,13 +47,13 @@ enum {
 #define ALIGN_TEST(p, t) do{}while(0)
 #endif
 
-/*
- * atomic operations
- *	These are _the_ atomic operations, now implemented via compiler built-ins.
- *	It is expected that this C implementation is a candidate for Link-Time-
- *	Optimization inlining, whereas the assembler implementations they replace
- *	were not.
- */
+  
+                    
+                                                                             
+                                                                          
+                                                                            
+            
+   
 
 #undef OSCompareAndSwap8
 Boolean
@@ -81,11 +81,11 @@ OSCompareAndSwap(UInt32 oldValue, UInt32 newValue, volatile UInt32 *address)
 Boolean
 OSCompareAndSwap64(UInt64 oldValue, UInt64 newValue, volatile UInt64 *address)
 {
-	/*
-	 * _Atomic uint64 requires 8-byte alignment on all architectures.
-	 * This silences the compiler cast warning.  ALIGN_TEST() verifies
-	 * that the cast was legal, if defined.
-	 */
+	  
+                                                                  
+                                                                   
+                                        
+    
 	_Atomic UInt64 *aligned_addr = (_Atomic UInt64 *)(uintptr_t)address;
 
 	ALIGN_TEST(address, UInt64);
@@ -203,9 +203,9 @@ OSTestAndClear(UInt32 bit, volatile UInt8 * startAddress)
 	return OSTestAndSetClear(bit, false, startAddress);
 }
 
-/*
- * silly unaligned versions
- */
+  
+                           
+   
 
 SInt8
 OSIncrementAtomic8(volatile SInt8 * value)

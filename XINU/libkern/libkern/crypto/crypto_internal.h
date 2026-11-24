@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* To access the corecrypto functions */
+                                        
 #ifndef _CRYPTO_CRYPTO_INTERNAL_H_
 #define _CRYPTO_CRYPTO_INTERNAL_H_
 
@@ -42,4 +42,4 @@ extern crypto_functions_t g_crypto_funcs;
 }
 #endif
 
-#endif /*_CRYPTO_CRYPTO_INTERNAL_H_*/
+#endif                               

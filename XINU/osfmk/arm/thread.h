@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _ARM_THREAD_H_
 #define _ARM_THREAD_H_
@@ -74,9 +74,9 @@ struct perfcontrol_state {
 	uint64_t opaque[8] __attribute__((aligned(8)));
 };
 
-/*
- * Maps state flavor to number of words in the state:
- */
+  
+                                                     
+   
 extern unsigned int _MachineStateCount[];
 
 #ifdef MACH_KERNEL_PRIVATE
@@ -99,10 +99,10 @@ struct machine_thread {
 #endif
 
 #if __arm64__
-	arm_context_t *           contextData;             /* allocated user context */
-	arm_saved_state_t *       XNU_PTRAUTH_SIGNED_PTR("machine_thread.upcb") upcb;   /* pointer to user GPR state */
-	arm_neon_saved_state_t *  uNeon;                   /* pointer to user VFP state */
-	arm_saved_state_t *       kpcb;                    /* pointer to kernel GPR state */
+	arm_context_t *           contextData;                                         
+	arm_saved_state_t *       XNU_PTRAUTH_SIGNED_PTR("machine_thread.upcb") upcb;                                  
+	arm_neon_saved_state_t *  uNeon;                                                  
+	arm_saved_state_t *       kpcb;                                                     
 	void *                    reserved3;
 	long                      reserved4;
 	uint64_t                  recover_far;
@@ -113,20 +113,20 @@ struct machine_thread {
 #endif
 
 #if defined(__arm__) && defined(__ARM_VFP__)
-	// for packing reasons chtread_self and DebugData
-	// are inside the the PcbData when __ARM_VFP__ is set
+	                                                 
+	                                                     
 #define DebugData    PcbData.VFPpadding_DebugData
 #define cthread_self PcbData.VFPpadding_cthread_self
 #else
 	arm_debug_state_t        *DebugData;
-	vm_address_t              cthread_self;               /* for use of cthread package */
+	vm_address_t              cthread_self;                                               
 #endif
 
 #if __arm64__
 	uint32_t                  recover_esr;
-#endif /* __arm64__ */
+#endif                
 
-	vm_offset_t               kstackptr;                  /* top of kernel stack */
+	vm_offset_t               kstackptr;                                           
 	struct perfcontrol_state  perfctrl_state;
 #if __arm64__
 	uint64_t                  energy_estimate_nj;
@@ -134,11 +134,11 @@ struct machine_thread {
 	uint64_t                  reserved5;
 
 #if INTERRUPT_MASKED_DEBUG
-	uint64_t                  intmask_timestamp;          /* timestamp of when interrupts were manually masked */
-	uint64_t                  inthandler_timestamp;       /* timestamp of when interrupt handler started */
-	unsigned int              int_type;                   /* interrupt type of the interrupt that was processed */
-	uintptr_t                 int_handler_addr;           /* slid, ptrauth-stripped virtual address of the interrupt handler */
-	uintptr_t                 int_vector;                 /* IOInterruptVector */
+	uint64_t                  intmask_timestamp;                                                                 
+	uint64_t                  inthandler_timestamp;                                                        
+	unsigned int              int_type;                                                                           
+	uintptr_t                 int_handler_addr;                                                                                
+	uintptr_t                 int_vector;                                        
 #endif
 
 #if __arm64__ && defined(CONFIG_XNUPOST)
@@ -148,8 +148,8 @@ struct machine_thread {
 
 	uint64_t                  reserved6;
 	vm_offset_t               pcpu_data_base;
-	struct cpu_data *         CpuDatap;               /* current per cpu data */
-	unsigned int              preemption_count;       /* preemption count */
+	struct cpu_data *         CpuDatap;                                         
+	unsigned int              preemption_count;                             
 #if __arm64__
 	uint16_t                  exception_trace_code;
 #endif
@@ -189,23 +189,23 @@ extern arm_neon_saved_state_t *    get_user_neon_regs(thread_t);
 extern void vfp_state_initialize(struct arm_vfpsaved_state *vfp_state);
 extern void vfp_save(struct arm_vfpsaved_state *vfp_ss);
 extern void vfp_load(struct arm_vfpsaved_state *vfp_ss);
-#endif /* __ARM_VFP__ */
+#endif                  
 extern void arm_debug_set(arm_debug_state_t *debug_state);
 #if defined(__arm64__)
 extern void arm_debug_set32(arm_debug_state_t *debug_state);
 extern void arm_debug_set64(arm_debug_state_t *debug_state);
 #endif
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 extern void *act_thread_csave(void);
 extern void act_thread_catt(void *ctx);
 extern void act_thread_cfree(void *ctx);
 
 
-/*
- * Return address of the function that called current function, given
- * address of the first parameter of current function.
- */
+  
+                                                                     
+                                                      
+   
 #define GET_RETURN_PC(addr) (__builtin_return_address(0))
 
-#endif /* _ARM_THREAD_H_ */
+#endif                     

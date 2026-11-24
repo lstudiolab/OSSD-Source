@@ -59,7 +59,7 @@ void ccsha512_vng_intel_avx1_compress(ccdigest_state_t state, size_t nblocks, co
 void ccsha512_vng_intel_ssse3_compress(ccdigest_state_t state, size_t nblocks, const void *in) __asm__("_ccsha512_vng_intel_ssse3_compress");
 
 #if CC_ACCELERATECRYPTO
-// AccelerateCrypto
+                   
 extern const struct ccdigest_info ccsha224_vng_intel_di;
 extern const struct ccdigest_info ccsha256_vng_intel_di;
 extern const struct ccdigest_info ccsha384_vng_intel_di;
@@ -96,4 +96,4 @@ extern const uint64_t ccsha384_initial_state[8];
 extern const uint64_t ccsha512_initial_state[8];
 extern const uint64_t ccsha512_256_initial_state[8];
 
-#endif /* _CORECRYPTO_CCSHA2_INTERNAL_H_ */
+#endif                                     

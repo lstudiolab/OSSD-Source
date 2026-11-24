@@ -26,10 +26,10 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Make sure we don't accidentally include the external definitions of
- * the routines we're interposing on below.
- */
+  
+                                                                      
+                                           
+   
 #define _vm_map_user_
 #define _mach_vm_user_
 #include <mach/mach.h>
@@ -41,7 +41,7 @@
 
 #include "stack_logging_internal.h"
 
-malloc_logger_t *__syscall_logger = NULL;   // This may get set by Libc's malloc stack logging initialization code.
+malloc_logger_t *__syscall_logger = NULL;                                                                          
 
 kern_return_t
 mach_vm_allocate(
@@ -238,7 +238,7 @@ mach_vm_remap_new(
 {
 	kern_return_t rv;
 
-	/* {max,cur}_protection is inout */
+	                                   
 	rv = _kernelrpc_mach_vm_remap_new(target, address, size, mask, flags,
 	    src_task, src_address, copy, cur_protection, max_protection,
 	    inheritance);
@@ -266,8 +266,8 @@ mach_vm_read(
 
 	if (__syscall_logger && rv == KERN_SUCCESS) {
 		int eventTypeFlags = stack_logging_type_vm_allocate | stack_logging_type_mapped_file_or_shared_mem;
-		// The target argument is the remote task from which data is being read,
-		// so pass mach_task_self() as the destination task receiving the allocation.
+		                                                                        
+		                                                                             
 		__syscall_logger(eventTypeFlags, (uintptr_t)mach_task_self(), (uintptr_t)*dataCnt, 0, *data, 0);
 	}
 
@@ -347,7 +347,7 @@ vm_remap_new(
 {
 	kern_return_t rv;
 
-	/* {max,cur}_protection is inout */
+	                                   
 	rv = _kernelrpc_vm_remap_new(target, address, size, mask, flags,
 	    src_task, src_address, copy, cur_protection, max_protection,
 	    inheritance);
@@ -375,8 +375,8 @@ vm_read(
 
 	if (__syscall_logger && rv == KERN_SUCCESS) {
 		int eventTypeFlags = stack_logging_type_vm_allocate | stack_logging_type_mapped_file_or_shared_mem;
-		// The target argument is the remote task from which data is being read,
-		// so pass mach_task_self() as the destination task receiving the allocation.
+		                                                                        
+		                                                                             
 		__syscall_logger(eventTypeFlags, (uintptr_t)mach_task_self(), (uintptr_t)*dataCnt, 0, *data, 0);
 	}
 

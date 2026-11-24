@@ -79,25 +79,25 @@
 static void thread_depress_abstime(uint64_t interval);
 static void thread_depress_ms(mach_msg_timeout_t interval);
 
-/* Called from commpage to take a delayed preemption when exiting
- * the "Preemption Free Zone" (PFZ).
- */
+                                                                 
+                                    
+   
 kern_return_t
 pfz_exit(
 	__unused        struct pfz_exit_args *args)
 {
-	/* For now, nothing special to do.  We'll pick up the ASTs on kernel exit. */
+	                                                                             
 
 	return KERN_SUCCESS;
 }
 
 
-/*
- *	swtch and swtch_pri both attempt to context switch (logic in
- *	thread_block no-ops the context switch if nothing would happen).
- *	A boolean is returned that indicates whether there is anything
- *	else runnable.  That's no excuse to spin, though.
- */
+  
+                                                               
+                                                                   
+                                                                 
+                                                    
+   
 
 static void
 swtch_continue(void)
@@ -113,7 +113,7 @@ swtch_continue(void)
 	ml_delay_on_yield();
 
 	thread_syscall_return(result);
-	/*NOTREACHED*/
+	              
 }
 
 boolean_t
@@ -150,7 +150,7 @@ swtch_pri_continue(void)
 	ml_delay_on_yield();
 
 	thread_syscall_return(result);
-	/*NOTREACHED*/
+	              
 }
 
 boolean_t
@@ -186,14 +186,14 @@ thread_switch_continue(void *parameter, __unused int ret)
 	ml_delay_on_yield();
 
 	thread_syscall_return(KERN_SUCCESS);
-	/*NOTREACHED*/
+	              
 }
 
-/*
- *	thread_switch:
- *
- *	Context switch.  User may supply thread hint.
- */
+  
+                 
+  
+                                                
+   
 kern_return_t
 thread_switch(
 	struct thread_switch_args *args)
@@ -209,13 +209,13 @@ thread_switch(
 	wait_interrupt_t                interruptible = THREAD_ABORTSAFE;
 	port_to_thread_options_t        ptt_options = PORT_TO_THREAD_NOT_CURRENT_THREAD;
 
-	/*
-	 *	Validate and process option.
-	 *
-	 * OSLock boosting only applies to other threads
-	 * in your same task (even if you have a port for
-	 * a thread in another task)
-	 */
+	  
+                                
+   
+                                                 
+                                                  
+                             
+    
 	switch (option) {
 	case SWITCH_OPTION_NONE:
 		break;
@@ -244,35 +244,35 @@ thread_switch(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 * Translate the port name if supplied.
-	 */
+	  
+                                        
+    
 	if (thread_name != MACH_PORT_NULL) {
 		thread = port_name_to_thread(thread_name, ptt_options);
 	}
 
 	if (option == SWITCH_OPTION_OSLOCK_DEPRESS || option == SWITCH_OPTION_OSLOCK_WAIT) {
 		if (thread != THREAD_NULL) {
-			/*
-			 * Attempt to kick the lock owner up to our same IO throttling tier.
-			 * If the thread is currently blocked in throttle_lowpri_io(),
-			 * it will immediately break out.
-			 *
-			 * TODO: SFI break out?
-			 */
+			  
+                                                                       
+                                                                 
+                                    
+     
+                          
+      
 			int new_policy = proc_get_effective_thread_policy(self, TASK_POLICY_IO);
 
 			set_thread_iotier_override(thread, new_policy);
 		}
 	}
 
-	/*
-	 * Try to handoff if supplied.
-	 */
+	  
+                               
+    
 	if (thread != THREAD_NULL) {
 		spl_t s = splsched();
 
-		/* This may return a different thread if the target is pushing on something */
+		                                                                              
 		thread_t pulled_thread = thread_run_queue_remove_for_handoff(thread);
 
 		KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_SCHED_THREAD_SWITCH) | DBG_FUNC_NONE,
@@ -280,7 +280,7 @@ thread_switch(
 		    pulled_thread ? TRUE : FALSE, 0, 0);
 
 		if (pulled_thread != THREAD_NULL) {
-			/* We can't be dropping the last ref here */
+			                                            
 			thread_deallocate_safe(thread);
 
 			if (wait_option) {
@@ -307,7 +307,7 @@ thread_switch(
 		enable_preemption();
 
 		if (should_yield == false) {
-			/* Early-return if yielding to the scheduler will not be beneficial */
+			                                                                      
 			return KERN_SUCCESS;
 		}
 
@@ -330,30 +330,30 @@ thread_yield_with_continuation(
 	__builtin_unreachable();
 }
 
-/* This function is called after an assert_wait(), therefore it must not
- * cause another wait until after the thread_run() or thread_block()
- *
- * Following are the calling convention for thread ref deallocation.
- *
- * 1) If no continuation is provided, then thread ref is consumed.
- * (thread_handoff_deallocate convention).
- *
- * 2) If continuation is provided with option THREAD_HANDOFF_SETRUN_NEEDED
- * then thread ref is always consumed.
- *
- * 3) If continuation is provided with option THREAD_HANDOFF_NONE then thread
- * ref is not consumed and it is upto the continuation to deallocate
- * the thread reference.
- */
+                                                                        
+                                                                    
+  
+                                                                    
+  
+                                                                  
+                                          
+  
+                                                                          
+                                      
+  
+                                                                             
+                                                                    
+                        
+   
 static wait_result_t
 thread_handoff_internal(thread_t thread, thread_continue_t continuation,
     void *parameter, thread_handoff_option_t option)
 {
 	thread_t self = current_thread();
 
-	/*
-	 * Try to handoff if supplied.
-	 */
+	  
+                               
+    
 	if (thread != THREAD_NULL) {
 		spl_t s = splsched();
 
@@ -363,9 +363,9 @@ thread_handoff_internal(thread_t thread, thread_continue_t continuation,
 		    thread_tid(thread), thread->state,
 		    pulled_thread ? TRUE : FALSE, 0, 0);
 
-		/* Deallocate thread ref if needed */
+		                                     
 		if (continuation == NULL || (option & THREAD_HANDOFF_SETRUN_NEEDED)) {
-			/* Use the safe version of thread deallocate */
+			                                               
 			thread_deallocate_safe(thread);
 		}
 
@@ -398,27 +398,27 @@ thread_handoff_deallocate(thread_t thread, thread_handoff_option_t option)
 	return thread_handoff_internal(thread, NULL, NULL, option);
 }
 
-/*
- * Thread depression
- *
- * This mechanism drops a thread to priority 0 in order for it to yield to
- * all other runnnable threads on the system.  It can be canceled or timed out,
- * whereupon the thread goes back to where it was.
- *
- * Note that TH_SFLAG_DEPRESS and TH_SFLAG_POLLDEPRESS are never set at the
- * same time.  DEPRESS always defers to POLLDEPRESS.
- *
- * DEPRESS only lasts across a single thread_block call, and never returns
- * to userspace.
- * POLLDEPRESS can be active anywhere up until thread termination.
- */
+  
+                    
+  
+                                                                          
+                                                                               
+                                                  
+  
+                                                                           
+                                                    
+  
+                                                                          
+                
+                                                                  
+   
 
-/*
- * Depress thread's priority to lowest possible for the specified interval,
- * with an interval of zero resulting in no timeout being scheduled.
- *
- * Must block with AST_YIELD afterwards to take effect
- */
+  
+                                                                           
+                                                                    
+  
+                                                      
+   
 void
 thread_depress_abstime(uint64_t interval)
 {
@@ -456,9 +456,9 @@ thread_depress_ms(mach_msg_timeout_t interval)
 	thread_depress_abstime(abstime);
 }
 
-/*
- *	Priority depression expiration.
- */
+  
+                                  
+   
 void
 thread_depress_expire(void      *p0,
     __unused void      *p1)
@@ -482,9 +482,9 @@ thread_depress_expire(void      *p0,
 	splx(s);
 }
 
-/*
- * Prematurely abort priority depression if there is one.
- */
+  
+                                                         
+   
 kern_return_t
 thread_depress_abort(thread_t thread)
 {
@@ -495,10 +495,10 @@ thread_depress_abort(thread_t thread)
 
 	assert((thread->sched_flags & TH_SFLAG_DEPRESSED_MASK) != TH_SFLAG_DEPRESSED_MASK);
 
-	/*
-	 * User-triggered depress-aborts should not get out
-	 * of the poll-depress, but they should cancel a regular depress.
-	 */
+	  
+                                                    
+                                                                  
+    
 	if ((thread->sched_flags & TH_SFLAG_POLLDEPRESS) == 0) {
 		result = thread_depress_abort_locked(thread);
 	}
@@ -509,10 +509,10 @@ thread_depress_abort(thread_t thread)
 	return result;
 }
 
-/*
- * Prematurely abort priority depression or poll depression if one is active.
- * Called with the thread locked.
- */
+  
+                                                                             
+                                 
+   
 kern_return_t
 thread_depress_abort_locked(thread_t thread)
 {
@@ -536,11 +536,11 @@ thread_depress_abort_locked(thread_t thread)
 	return KERN_SUCCESS;
 }
 
-/*
- * Invoked as part of a polling operation like a no-timeout port receive
- *
- * Forces a fixpri thread to yield if it is detected polling without blocking for too long.
- */
+  
+                                                                        
+  
+                                                                                           
+   
 void
 thread_poll_yield(thread_t self)
 {
@@ -579,11 +579,11 @@ thread_poll_yield(thread_t self)
 	splx(s);
 }
 
-/*
- * Kernel-internal interface to yield for a specified period
- *
- * WARNING: Will still yield to priority 0 even if the thread is holding a contended lock!
- */
+  
+                                                            
+  
+                                                                                          
+   
 void
 thread_yield_internal(mach_msg_timeout_t ms)
 {
@@ -609,20 +609,20 @@ thread_yield_internal(mach_msg_timeout_t ms)
 	thread_depress_abort(self);
 }
 
-/*
- * This yields to a possible non-urgent preemption pending on the current processor.
- *
- * This is useful when doing a long computation in the kernel without returning to userspace.
- *
- * As opposed to other yielding mechanisms, this does not drop the priority of the current thread.
- */
+  
+                                                                                    
+  
+                                                                                             
+  
+                                                                                                  
+   
 void
 thread_yield_to_preemption()
 {
-	/*
-	 * ast_pending() should ideally be called with interrupts disabled, but
-	 * the check here is fine because csw_check() will do the right thing.
-	 */
+	  
+                                                                        
+                                                                       
+    
 	ast_t *pending_ast = ast_pending();
 	ast_t ast = AST_NONE;
 	processor_t p;

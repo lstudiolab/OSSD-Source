@@ -72,9 +72,9 @@ union kxld_vtable_entry {
 	struct kxld_vtable_unpatched_entry unpatched;
 };
 
-/*******************************************************************************
-* Constructors and destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 kern_return_t kxld_vtable_init(KXLDVTable *vtable,
     const struct kxld_sym *vtable_sym, const struct kxld_object *object,
@@ -87,21 +87,21 @@ __attribute__((visibility("hidden")));
 void kxld_vtable_deinit(KXLDVTable *vtable)
 __attribute__((visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 KXLDVTableEntry * kxld_vtable_get_entry_for_offset(const KXLDVTable *vtable,
     u_long offset, boolean_t is_32_bit)
 __attribute__((pure, nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Modifiers
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
-/* With strict patching, the vtable patcher with only patch pad slots */
+                                                                        
 kern_return_t kxld_vtable_patch(KXLDVTable *vtable, const KXLDVTable *super_vtable,
     struct kxld_object *object)
 __attribute__((nonnull, visibility("hidden")));
 
-#endif /* _KXLD_VTABLE_H_ */
+#endif                      

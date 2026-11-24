@@ -63,10 +63,10 @@
 #error Why are we  including this?
 #endif 
 
-/* There is another definition of ALIGN for .c sources */
+                                                         
 #ifdef __ASSEMBLER__
 #define ALIGN 2
-#endif /* ASSEMBLER */
+#endif                
 
 #ifndef FALIGN
 #define FALIGN ALIGN
@@ -86,20 +86,20 @@
 #define LBc(x,n) n ## :
 #define LBb(x,n) n ## b
 #define LBf(x,n) n ## f
-#else /* __STDC__ */
+#else               
 #ifndef __NO_UNDERSCORES__
-#define LCL(x) L/**/x
-#define EXT(x) _/**/x
-#define LEXT(x) _/**/x/**/:
-#else /* __NO_UNDERSCORES__ */
-#define	LCL(x)	.L/**/x
+#define LCL(x) L    x
+#define EXT(x) _    x
+#define LEXT(x) _    x    :
+#else                         
+#define	LCL(x)	.L    x
 #define EXT(x) x
-#define LEXT(x) x/**/:
-#endif /* __NO_UNDERSCORES__ */
-#define LBc(x,n) n/**/:
-#define LBb(x,n) n/**/b
-#define LBf(x,n) n/**/f
-#endif /* __STDC__ */
+#define LEXT(x) x    :
+#endif                         
+#define LBc(x,n) n    :
+#define LBb(x,n) n    b
+#define LBf(x,n) n    f
+#endif               
 
 #define String	.asciz
 #define Value	.word
@@ -109,16 +109,16 @@
 #ifdef __ASSEMBLER__
 #if	MACH_KDB
 #include <ddb/stab.h>
-/*
- * This pseudo-assembler line is added so that there will be at least
- *	one N_SO entry in the symbol stable to define the current file name.
- */
-#endif	/* MACH_KDB */
+  
+                                                                     
+                                                                       
+   
+#endif	              
 
-/*
- * Multiline macros must use .macro syntax for now,
- * as there is no ARM64 statement separator.
- */
+  
+                                                   
+                                            
+   
 .macro ENTRY 
 	.align FALIGN
 	.globl _$0 
@@ -187,22 +187,22 @@
 .endmacro
 #endif
 
-#else /* NOT __ASSEMBLER__ */
+#else                        
 
-/* These defines are here for .c files that wish to reference global symbols
- * within __asm__ statements. 
- */
+                                                                            
+                              
+   
 #ifndef __NO_UNDERSCORES__
 #define CC_SYM_PREFIX "_"
 #else
 #define CC_SYM_PREFIX ""
-#endif /* __NO_UNDERSCORES__ */
-#endif /* __ASSEMBLER__ */
+#endif                         
+#endif                    
 
 #ifdef __ASSEMBLER__
 
 # define BRANCH_EXTERN(x)	b	EXT(x)
 
-#endif /* __ASSEMBLER__ */
+#endif                    
 
-#endif /* _ARM_ASM_H_ */
+#endif                  

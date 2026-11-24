@@ -25,14 +25,14 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	codesign_internal.h
- *	Author:	Greg Kerr
- *		05-Dec-2013
- *
- *	Header file for Code Directory Functions.
- *
- */
+  
+                            
+                    
+               
+  
+                                            
+  
+   
 #ifndef _SYS_CODEDIR_INTERNAL_H_
 #define _SYS_CODEDIR_INTERNAL_H_
 

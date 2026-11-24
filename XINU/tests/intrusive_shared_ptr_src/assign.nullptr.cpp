@@ -1,7 +1,7 @@
-//
-// Tests for
-//  intrusive_shared_ptr& operator=(std::nullptr_t);
-//
+  
+            
+                                                    
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <darwintest.h>
@@ -17,7 +17,7 @@ tests()
 {
 	T obj{3};
 
-	// Assign nullptr to non-null
+	                             
 	{
 		tracked_shared_ptr<T> ptr(&obj, libkern::retain);
 		tracking_policy::reset();
@@ -28,7 +28,7 @@ tests()
 		CHECK(ptr.get() == nullptr);
 	}
 
-	// Assign nullptr to null
+	                         
 	{
 		tracked_shared_ptr<T> ptr = nullptr;
 		tracking_policy::reset();

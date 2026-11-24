@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *
- */
+  
+  
+   
 
 #ifndef __IOKIT_IOLOCKS_PRIVATE_H
 #define __IOKIT_IOLOCKS_PRIVATE_H
@@ -53,7 +53,7 @@ IORecursiveLockAllocWithLockGroup( lck_grp_t * lockGroup );
 
 
 #ifdef __cplusplus
-} /* extern "C" */
+}                 
 #endif
 
-#endif /* !__IOKIT_IOLOCKS_PRIVATE_H */
+#endif                                 

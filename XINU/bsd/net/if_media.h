@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$NetBSD: if_media.h,v 1.3 1997/03/26 01:19:27 thorpej Exp $	*/
-/* $FreeBSD: src/sys/net/if_media.h,v 1.9.2.1 2001/07/04 00:12:38 brooks Exp $ */
+                                                                 
+                                                                                 
 
 /*
  * Copyright (c) 1997
@@ -66,257 +66,257 @@
 #define _NET_IF_MEDIA_H_
 #ifndef DRIVERKIT
 #include <sys/appleapiopts.h>
-#endif /* DRIVERKIT */
+#endif                
 
-/*
- * Prototypes and definitions for BSD/OS-compatible network interface
- * media selection.
- *
- * Where it is safe to do so, this code strays slightly from the BSD/OS
- * design.  Software which uses the API (device drivers, basically)
- * shouldn't notice any difference.
- *
- * Many thanks to Matt Thomas for providing the information necessary
- * to implement this interface.
- */
+  
+                                                                     
+                   
+  
+                                                                       
+                                                                   
+                                   
+  
+                                                                     
+                               
+   
 
 #ifdef KERNEL_PRIVATE
-/* sigh; some modules are lazy and thus rely on this */
+                                                       
 #include <sys/queue.h>
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * if_media Options word:
- *	Bits	Use
- *	----	-------
- *	0-4	Media variant
- *	5-7     Media type
- *	8-15	Type specific options
- *	16-19	Extended media variant bits
- *	20-27	Shared (global) options
- *	28-31	Instance
- */
+  
+                         
+           
+               
+                    
+                     
+                             
+                                    
+                                
+                 
+   
 
-/*
- * Ethernet
- *
- * In order to use more than 31 subtypes, Ethernet uses the extended media
- * variant bits
- *
- * The extended media variant bits are not backward compatible so they
- * must not be used by kernel extensions like ifnet and drivers that
- * are to be deployed on older system versions
- */
-#define IFM_X(x) IFM_X_SUBTYPE(x)   /* internal shorthand */
+  
+           
+  
+                                                                          
+               
+  
+                                                                      
+                                                                    
+                                              
+   
+#define IFM_X(x) IFM_X_SUBTYPE(x)                           
 
 #define IFM_ETHER       0x00000020
-#define IFM_10_T        3               /* 10BaseT - RJ45 */
-#define IFM_10_2        4               /* 10Base2 - Thinnet */
-#define IFM_10_5        5               /* 10Base5 - AUI */
-#define IFM_100_TX      6               /* 100BaseTX - RJ45 */
-#define IFM_100_FX      7               /* 100BaseFX - Fiber */
-#define IFM_100_T4      8               /* 100BaseT4 - 4 pair cat 3 */
-#define IFM_100_VG      9               /* 100VG-AnyLAN */
-#define IFM_100_T2      10              /* 100BaseT2 */
-#define IFM_1000_SX     11              /* 1000BaseSX - multi-mode fiber */
-#define IFM_10_STP      12              /* 10BaseT over shielded TP */
-#define IFM_10_FL       13              /* 10baseFL - Fiber */
-#define IFM_1000_LX     14              /* 1000baseLX - single-mode fiber */
-#define IFM_1000_CX     15              /* 1000baseCX - 150ohm STP */
-#define IFM_1000_T      16              /* 1000baseT - 4 pair cat 5 */
+#define IFM_10_T        3                                   
+#define IFM_10_2        4                                      
+#define IFM_10_5        5                                  
+#define IFM_100_TX      6                                     
+#define IFM_100_FX      7                                      
+#define IFM_100_T4      8                                             
+#define IFM_100_VG      9                                 
+#define IFM_100_T2      10                             
+#define IFM_1000_SX     11                                                 
+#define IFM_10_STP      12                                            
+#define IFM_10_FL       13                                    
+#define IFM_1000_LX     14                                                  
+#define IFM_1000_CX     15                                           
+#define IFM_1000_T      16                                            
 #ifdef PRIVATE
-#define IFM_1000_TX     IFM_1000_T      /* For compatibility */
-#endif /* PRIVATE */
-#define IFM_HPNA_1      17              /* HomePNA 1.0 (1Mb/s) */
-#define IFM_10G_SR      18              /* 10GbaseSR - multi-mode fiber */
-#define IFM_10G_LR      19              /* 10GbaseLR - single-mode fiber */
-#define IFM_10G_CX4     20              /* 10GbaseCX4 - copper */
-#define IFM_10G_T       21              /* 10GbaseT - 4 pair cat 6 */
-#define IFM_2500_T      22              /* 2500baseT - 4 pair cat 5 */
-#define IFM_5000_T      23              /* 5000baseT - 4 pair cat 5 */
-#define IFM_1000_CX_SGMII    24         /* 1000Base-CX-SGMII */
-#define IFM_1000_KX     25              /* 1000Base-KX backplane */
-#define IFM_10G_KX4     26              /* 10GBase-KX4 backplane */
-#define IFM_10G_KR      27              /* 10GBase-KR backplane */
-#define IFM_10G_CR1     28              /* 10GBase-CR1 Twinax splitter */
-#define IFM_10G_ER      29              /* 10GBase-ER */
-#define IFM_20G_KR2     30              /* 20GBase-KR2 backplane */
-#define IFM_OTHER       31              /* Other: one of the following */
+#define IFM_1000_TX     IFM_1000_T                             
+#endif              
+#define IFM_HPNA_1      17                                       
+#define IFM_10G_SR      18                                                
+#define IFM_10G_LR      19                                                 
+#define IFM_10G_CX4     20                                       
+#define IFM_10G_T       21                                           
+#define IFM_2500_T      22                                            
+#define IFM_5000_T      23                                            
+#define IFM_1000_CX_SGMII    24                                
+#define IFM_1000_KX     25                                         
+#define IFM_10G_KX4     26                                         
+#define IFM_10G_KR      27                                        
+#define IFM_10G_CR1     28                                               
+#define IFM_10G_ER      29                              
+#define IFM_20G_KR2     30                                         
+#define IFM_OTHER       31                                               
 
-/* following types are not visible to old binaries using the low bits of IFM_TMASK */
-#define IFM_2500_SX     IFM_X(32)       /* 2500BaseSX - multi-mode fiber */
-#define IFM_10G_TWINAX  IFM_X(33)       /* 10GBase Twinax copper */
-#define IFM_10G_TWINAX_LONG     IFM_X(34)       /* 10GBase Twinax Long copper */
-#define IFM_10G_LRM     IFM_X(35)       /* 10GBase-LRM 850nm Multi-mode */
-#define IFM_2500_KX     IFM_X(36)       /* 2500Base-KX backplane */
-#define IFM_40G_CR4     IFM_X(37)       /* 40GBase-CR4 */
-#define IFM_40G_SR4     IFM_X(38)       /* 40GBase-SR4 */
-#define IFM_50G_PCIE    IFM_X(39)       /* 50G Ethernet over PCIE */
-#define IFM_25G_PCIE    IFM_X(40)       /* 25G Ethernet over PCIE */
-#define IFM_1000_SGMII  IFM_X(41)       /* 1G media interface */
-#define IFM_10G_SFI     IFM_X(42)       /* 10G media interface */
-#define IFM_40G_XLPPI   IFM_X(43)       /* 40G media interface */
-#define IFM_40G_LR4     IFM_X(44)       /* 40GBase-LR4 */
-#define IFM_40G_KR4     IFM_X(45)       /* 40GBase-KR4 */
-#define IFM_100G_CR4    IFM_X(47)       /* 100GBase-CR4 */
-#define IFM_100G_SR4    IFM_X(48)       /* 100GBase-SR4 */
-#define IFM_100G_KR4    IFM_X(49)       /* 100GBase-KR4 */
-#define IFM_100G_LR4    IFM_X(50)       /* 100GBase-LR4 */
-#define IFM_56G_R4      IFM_X(51)       /* 56GBase-R4 */
-#define IFM_100_T       IFM_X(52)       /* 100BaseT - RJ45 */
-#define IFM_25G_CR      IFM_X(53)       /* 25GBase-CR */
-#define IFM_25G_KR      IFM_X(54)       /* 25GBase-KR */
-#define IFM_25G_SR      IFM_X(55)       /* 25GBase-SR */
-#define IFM_50G_CR2     IFM_X(56)       /* 50GBase-CR2 */
-#define IFM_50G_KR2     IFM_X(57)       /* 50GBase-KR2 */
-#define IFM_25G_LR      IFM_X(58)       /* 25GBase-LR */
-#define IFM_10G_AOC     IFM_X(59)       /* 10G active optical cable */
-#define IFM_25G_ACC     IFM_X(60)       /* 25G active copper cable */
-#define IFM_25G_AOC     IFM_X(61)       /* 25G active optical cable */
-#define IFM_100_SGMII   IFM_X(62)       /* 100M media interface */
-#define IFM_2500_X      IFM_X(63)       /* 2500BaseX */
-#define IFM_5000_KR     IFM_X(64)       /* 5GBase-KR backplane */
-#define IFM_25G_T       IFM_X(65)       /* 25GBase-T - RJ45 */
-#define IFM_25G_CR_S    IFM_X(66)       /* 25GBase-CR (short) */
-#define IFM_25G_CR1     IFM_X(67)       /* 25GBase-CR1 DA cable */
-#define IFM_25G_KR_S    IFM_X(68)       /* 25GBase-KR (short) */
-#define IFM_5000_KR_S   IFM_X(69)       /* 5GBase-KR backplane (short) */
-#define IFM_5000_KR1    IFM_X(70)       /* 5GBase-KR backplane */
-#define IFM_25G_AUI     IFM_X(71)       /* 25G-AUI-C2C (chip to chip) */
-#define IFM_40G_XLAUI   IFM_X(72)       /* 40G-XLAUI */
-#define IFM_40G_XLAUI_AC IFM_X(73)      /* 40G active copper/optical */
-#define IFM_40G_ER4     IFM_X(74)       /* 40GBase-ER4 */
-#define IFM_50G_SR2     IFM_X(75)       /* 50GBase-SR2 */
-#define IFM_50G_LR2     IFM_X(76)       /* 50GBase-LR2 */
-#define IFM_50G_LAUI2_AC IFM_X(77)      /* 50G active copper/optical */
-#define IFM_50G_LAUI2   IFM_X(78)       /* 50G-LAUI2 */
-#define IFM_50G_AUI2_AC IFM_X(79)       /* 50G active copper/optical */
-#define IFM_50G_AUI2    IFM_X(80)       /* 50G-AUI2 */
-#define IFM_50G_CP      IFM_X(81)       /* 50GBase-CP */
-#define IFM_50G_SR      IFM_X(82)       /* 50GBase-SR */
-#define IFM_50G_LR      IFM_X(83)       /* 50GBase-LR */
-#define IFM_50G_FR      IFM_X(84)       /* 50GBase-FR */
-#define IFM_50G_KR_PAM4 IFM_X(85)       /* 50GBase-KR PAM4 */
-#define IFM_25G_KR1     IFM_X(86)       /* 25GBase-KR1 */
-#define IFM_50G_AUI1_AC IFM_X(87)       /* 50G active copper/optical */
-#define IFM_50G_AUI1    IFM_X(88)       /* 50G-AUI1 */
-#define IFM_100G_CAUI4_AC IFM_X(89)     /* 100G-CAUI4 active copper/optical */
-#define IFM_100G_CAUI4 IFM_X(90)        /* 100G-CAUI4 */
-#define IFM_100G_AUI4_AC IFM_X(91)      /* 100G-AUI4 active copper/optical */
-#define IFM_100G_AUI4   IFM_X(92)       /* 100G-AUI4 */
-#define IFM_100G_CR_PAM4 IFM_X(93)      /* 100GBase-CR PAM4 */
-#define IFM_100G_KR_PAM4 IFM_X(94)      /* 100GBase-CR PAM4 */
-#define IFM_100G_CP2    IFM_X(95)       /* 100GBase-CP2 */
-#define IFM_100G_SR2    IFM_X(96)       /* 100GBase-SR2 */
-#define IFM_100G_DR     IFM_X(97)       /* 100GBase-DR */
-#define IFM_100G_KR2_PAM4 IFM_X(98)     /* 100GBase-KR2 PAM4 */
-#define IFM_100G_CAUI2_AC IFM_X(99)     /* 100G-CAUI2 active copper/optical */
-#define IFM_100G_CAUI2  IFM_X(100)      /* 100G-CAUI2 */
-#define IFM_100G_AUI2_AC IFM_X(101)     /* 100G-AUI2 active copper/optical */
-#define IFM_100G_AUI2   IFM_X(102)      /* 100G-AUI2 */
-#define IFM_200G_CR4_PAM4 IFM_X(103)    /* 200GBase-CR4 PAM4 */
-#define IFM_200G_SR4    IFM_X(104)      /* 200GBase-SR4 */
-#define IFM_200G_FR4    IFM_X(105)      /* 200GBase-FR4 */
-#define IFM_200G_LR4    IFM_X(106)      /* 200GBase-LR4 */
-#define IFM_200G_DR4    IFM_X(107)      /* 200GBase-DR4 */
-#define IFM_200G_KR4_PAM4 IFM_X(108)    /* 200GBase-KR4 PAM4 */
-#define IFM_200G_AUI4_AC IFM_X(109)     /* 200G-AUI4 active copper/optical */
-#define IFM_200G_AUI4   IFM_X(110)      /* 200G-AUI4 */
-#define IFM_200G_AUI8_AC IFM_X(111)     /* 200G-AUI8 active copper/optical */
-#define IFM_200G_AUI8   IFM_X(112)      /* 200G-AUI8 */
-#define IFM_400G_FR8    IFM_X(113)      /* 400GBase-FR8 */
-#define IFM_400G_LR8    IFM_X(114)      /* 400GBase-LR8 */
-#define IFM_400G_DR4    IFM_X(115)      /* 400GBase-DR4 */
-#define IFM_400G_AUI8_AC IFM_X(116)     /* 400G-AUI8 active copper/optical */
-#define IFM_400G_AUI8   IFM_X(117)      /* 400G-AUI8 */
+                                                                                     
+#define IFM_2500_SX     IFM_X(32)                                          
+#define IFM_10G_TWINAX  IFM_X(33)                                  
+#define IFM_10G_TWINAX_LONG     IFM_X(34)                                       
+#define IFM_10G_LRM     IFM_X(35)                                         
+#define IFM_2500_KX     IFM_X(36)                                  
+#define IFM_40G_CR4     IFM_X(37)                        
+#define IFM_40G_SR4     IFM_X(38)                        
+#define IFM_50G_PCIE    IFM_X(39)                                   
+#define IFM_25G_PCIE    IFM_X(40)                                   
+#define IFM_1000_SGMII  IFM_X(41)                               
+#define IFM_10G_SFI     IFM_X(42)                                
+#define IFM_40G_XLPPI   IFM_X(43)                                
+#define IFM_40G_LR4     IFM_X(44)                        
+#define IFM_40G_KR4     IFM_X(45)                        
+#define IFM_100G_CR4    IFM_X(47)                         
+#define IFM_100G_SR4    IFM_X(48)                         
+#define IFM_100G_KR4    IFM_X(49)                         
+#define IFM_100G_LR4    IFM_X(50)                         
+#define IFM_56G_R4      IFM_X(51)                       
+#define IFM_100_T       IFM_X(52)                            
+#define IFM_25G_CR      IFM_X(53)                       
+#define IFM_25G_KR      IFM_X(54)                       
+#define IFM_25G_SR      IFM_X(55)                       
+#define IFM_50G_CR2     IFM_X(56)                        
+#define IFM_50G_KR2     IFM_X(57)                        
+#define IFM_25G_LR      IFM_X(58)                       
+#define IFM_10G_AOC     IFM_X(59)                                     
+#define IFM_25G_ACC     IFM_X(60)                                    
+#define IFM_25G_AOC     IFM_X(61)                                     
+#define IFM_100_SGMII   IFM_X(62)                                 
+#define IFM_2500_X      IFM_X(63)                      
+#define IFM_5000_KR     IFM_X(64)                                
+#define IFM_25G_T       IFM_X(65)                             
+#define IFM_25G_CR_S    IFM_X(66)                               
+#define IFM_25G_CR1     IFM_X(67)                                 
+#define IFM_25G_KR_S    IFM_X(68)                               
+#define IFM_5000_KR_S   IFM_X(69)                                        
+#define IFM_5000_KR1    IFM_X(70)                                
+#define IFM_25G_AUI     IFM_X(71)                                       
+#define IFM_40G_XLAUI   IFM_X(72)                      
+#define IFM_40G_XLAUI_AC IFM_X(73)                                     
+#define IFM_40G_ER4     IFM_X(74)                        
+#define IFM_50G_SR2     IFM_X(75)                        
+#define IFM_50G_LR2     IFM_X(76)                        
+#define IFM_50G_LAUI2_AC IFM_X(77)                                     
+#define IFM_50G_LAUI2   IFM_X(78)                      
+#define IFM_50G_AUI2_AC IFM_X(79)                                      
+#define IFM_50G_AUI2    IFM_X(80)                     
+#define IFM_50G_CP      IFM_X(81)                       
+#define IFM_50G_SR      IFM_X(82)                       
+#define IFM_50G_LR      IFM_X(83)                       
+#define IFM_50G_FR      IFM_X(84)                       
+#define IFM_50G_KR_PAM4 IFM_X(85)                            
+#define IFM_25G_KR1     IFM_X(86)                        
+#define IFM_50G_AUI1_AC IFM_X(87)                                      
+#define IFM_50G_AUI1    IFM_X(88)                     
+#define IFM_100G_CAUI4_AC IFM_X(89)                                           
+#define IFM_100G_CAUI4 IFM_X(90)                        
+#define IFM_100G_AUI4_AC IFM_X(91)                                           
+#define IFM_100G_AUI4   IFM_X(92)                      
+#define IFM_100G_CR_PAM4 IFM_X(93)                            
+#define IFM_100G_KR_PAM4 IFM_X(94)                            
+#define IFM_100G_CP2    IFM_X(95)                         
+#define IFM_100G_SR2    IFM_X(96)                         
+#define IFM_100G_DR     IFM_X(97)                        
+#define IFM_100G_KR2_PAM4 IFM_X(98)                            
+#define IFM_100G_CAUI2_AC IFM_X(99)                                           
+#define IFM_100G_CAUI2  IFM_X(100)                      
+#define IFM_100G_AUI2_AC IFM_X(101)                                          
+#define IFM_100G_AUI2   IFM_X(102)                     
+#define IFM_200G_CR4_PAM4 IFM_X(103)                           
+#define IFM_200G_SR4    IFM_X(104)                        
+#define IFM_200G_FR4    IFM_X(105)                        
+#define IFM_200G_LR4    IFM_X(106)                        
+#define IFM_200G_DR4    IFM_X(107)                        
+#define IFM_200G_KR4_PAM4 IFM_X(108)                           
+#define IFM_200G_AUI4_AC IFM_X(109)                                          
+#define IFM_200G_AUI4   IFM_X(110)                     
+#define IFM_200G_AUI8_AC IFM_X(111)                                          
+#define IFM_200G_AUI8   IFM_X(112)                     
+#define IFM_400G_FR8    IFM_X(113)                        
+#define IFM_400G_LR8    IFM_X(114)                        
+#define IFM_400G_DR4    IFM_X(115)                        
+#define IFM_400G_AUI8_AC IFM_X(116)                                          
+#define IFM_400G_AUI8   IFM_X(117)                     
 
-/*
- * Token ring
- */
+  
+             
+   
 #define IFM_TOKEN       0x00000040
-#define IFM_TOK_STP4    3               /* Shielded twisted pair 4m - DB9 */
-#define IFM_TOK_STP16   4               /* Shielded twisted pair 16m - DB9 */
-#define IFM_TOK_UTP4    5               /* Unshielded twisted pair 4m - RJ45 */
-#define IFM_TOK_UTP16   6               /* Unshielded twisted pair 16m - RJ45 */
-#define IFM_TOK_STP100  7               /* Shielded twisted pair 100m - DB9 */
-#define IFM_TOK_UTP100  8               /* Unshielded twisted pair 100m - RJ45 */
-#define IFM_TOK_ETR     0x00000200      /* Early token release */
-#define IFM_TOK_SRCRT   0x00000400      /* Enable source routing features */
-#define IFM_TOK_ALLR    0x00000800      /* All routes / Single route bcast */
-#define IFM_TOK_DTR     0x00002000      /* Dedicated token ring */
-#define IFM_TOK_CLASSIC 0x00004000      /* Classic token ring */
-#define IFM_TOK_AUTO    0x00008000      /* Automatic Dedicate/Classic token ring */
+#define IFM_TOK_STP4    3                                                   
+#define IFM_TOK_STP16   4                                                    
+#define IFM_TOK_UTP4    5                                                      
+#define IFM_TOK_UTP16   6                                                       
+#define IFM_TOK_STP100  7                                                     
+#define IFM_TOK_UTP100  8                                                        
+#define IFM_TOK_ETR     0x00000200                               
+#define IFM_TOK_SRCRT   0x00000400                                          
+#define IFM_TOK_ALLR    0x00000800                                           
+#define IFM_TOK_DTR     0x00002000                                
+#define IFM_TOK_CLASSIC 0x00004000                              
+#define IFM_TOK_AUTO    0x00008000                                                 
 
-/*
- * FDDI
- */
+  
+       
+   
 #define IFM_FDDI        0x00000060
-#define IFM_FDDI_SMF    3               /* Single-mode fiber */
-#define IFM_FDDI_MMF    4               /* Multi-mode fiber */
-#define IFM_FDDI_UTP    5               /* CDDI / UTP */
-#define IFM_FDDI_DA     0x00000100      /* Dual attach / single attach */
+#define IFM_FDDI_SMF    3                                      
+#define IFM_FDDI_MMF    4                                     
+#define IFM_FDDI_UTP    5                               
+#define IFM_FDDI_DA     0x00000100                                       
 
-/*
- * IEEE 802.11 Wireless
- */
+  
+                       
+   
 #define IFM_IEEE80211   0x00000080
-#define IFM_IEEE80211_FH1       3       /* Frequency Hopping 1Mbps */
-#define IFM_IEEE80211_FH2       4       /* Frequency Hopping 2Mbps */
-#define IFM_IEEE80211_DS2       5       /* Direct Sequence 2Mbps */
-#define IFM_IEEE80211_DS5       6       /* Direct Sequence 5Mbps*/
-#define IFM_IEEE80211_DS11      7       /* Direct Sequence 11Mbps*/
-#define IFM_IEEE80211_DS1       8       /* Direct Sequence 1Mbps */
-#define IFM_IEEE80211_DS22      9       /* Direct Sequence 22Mbps */
-#define IFM_IEEE80211_ADHOC     0x00000100      /* Operate in Adhoc mode */
+#define IFM_IEEE80211_FH1       3                                    
+#define IFM_IEEE80211_FH2       4                                    
+#define IFM_IEEE80211_DS2       5                                  
+#define IFM_IEEE80211_DS5       6                                 
+#define IFM_IEEE80211_DS11      7                                  
+#define IFM_IEEE80211_DS1       8                                  
+#define IFM_IEEE80211_DS22      9                                   
+#define IFM_IEEE80211_ADHOC     0x00000100                                 
 
-/*
- * Shared media sub-types
- */
-#define IFM_AUTO        0               /* Autoselect best media */
-#define IFM_MANUAL      1               /* Jumper/dipswitch selects media */
-#define IFM_NONE        2               /* Deselect all media */
+  
+                         
+   
+#define IFM_AUTO        0                                          
+#define IFM_MANUAL      1                                                   
+#define IFM_NONE        2                                       
 
-/*
- * Shared options
- */
-#define IFM_FDX         0x00100000      /* Force full duplex */
-#define IFM_HDX         0x00200000      /* Force half duplex */
-#define IFM_FLOW        0x00400000      /* enable hardware flow control */
-#define IFM_EEE         0x00800000      /* Support energy efficient ethernet */
-#define IFM_FLAG0       0x01000000      /* Driver defined flag */
-#define IFM_FLAG1       0x02000000      /* Driver defined flag */
-#define IFM_FLAG2       0x04000000      /* Driver defined flag */
-#define IFM_LOOP        0x08000000      /* Put hardware in loopback */
+  
+                 
+   
+#define IFM_FDX         0x00100000                             
+#define IFM_HDX         0x00200000                             
+#define IFM_FLOW        0x00400000                                        
+#define IFM_EEE         0x00800000                                             
+#define IFM_FLAG0       0x01000000                               
+#define IFM_FLAG1       0x02000000                               
+#define IFM_FLAG2       0x04000000                               
+#define IFM_LOOP        0x08000000                                    
 
-/*
- * Macros to access bits of extended media sub-types (media variants)
- */
-#define IFM_TMASK_COMPAT        0x0000001f      /* Lower bits of media sub-type */
-#define IFM_TMASK_EXT           0x000f0000      /* For extended media sub-type */
-#define IFM_TMASK_EXT_SHIFT     11              /* to extract high bits */
+  
+                                                                     
+   
+#define IFM_TMASK_COMPAT        0x0000001f                                        
+#define IFM_TMASK_EXT           0x000f0000                                       
+#define IFM_TMASK_EXT_SHIFT     11                                        
 #define IFM_X_SUBTYPE(x) (((x) & IFM_TMASK_COMPAT) | \
 	(((x) & (IFM_TMASK_EXT >> IFM_TMASK_EXT_SHIFT)) << IFM_TMASK_EXT_SHIFT))
 
-/*
- * Masks
- */
-#define IFM_NMASK       0x000000e0      /* Network type */
-#define IFM_TMASK       (IFM_TMASK_COMPAT|IFM_TMASK_EXT)    /* Media sub-type */
-#define IFM_IMASK       0xf0000000      /* Instance */
-#define IFM_ISHIFT      28              /* Instance shift */
-#define IFM_OMASK       0x0000ff00      /* Type specific options */
-#define IFM_GMASK       0x0ff00000      /* Global options */
+  
+        
+   
+#define IFM_NMASK       0x000000e0                        
+#define IFM_TMASK       (IFM_TMASK_COMPAT|IFM_TMASK_EXT)                        
+#define IFM_IMASK       0xf0000000                    
+#define IFM_ISHIFT      28                                  
+#define IFM_OMASK       0x0000ff00                                 
+#define IFM_GMASK       0x0ff00000                          
 
-/*
- * Status bits
- */
-#define IFM_AVALID      0x00000001      /* Active bit valid */
-#define IFM_ACTIVE      0x00000002      /* Interface attached to working net */
-#define IFM_WAKESAMENET 0x00000004      /* No link transition while asleep */
+  
+              
+   
+#define IFM_AVALID      0x00000001                            
+#define IFM_ACTIVE      0x00000002                                             
+#define IFM_WAKESAMENET 0x00000004                                           
 
-/*
- * Macros to extract various bits of information from the media word.
- */
+  
+                                                                     
+   
 #define IFM_TYPE(x)         ((x) & IFM_NMASK)
 #define IFM_SUBTYPE(x)      ((x) & IFM_TMASK)
 #define IFM_TYPE_OPTIONS(x) ((x) & IFM_OMASK)
@@ -325,22 +325,22 @@
 
 #define IFM_INST_MAX    IFM_INST(IFM_IMASK)
 
-/*
- * Macro to create a media word.
- */
+  
+                                
+   
 #define IFM_MAKEWORD(type, subtype, options, instance)                  \
 	((type) | (subtype) | (options) | ((instance) << IFM_ISHIFT))
 
-/*
- * NetBSD extension not defined in the BSDI API.  This is used in various
- * places to get the canonical description for a given type/subtype.
- *
- * NOTE: all but the top-level type descriptions must contain NO whitespace!
- * Otherwise, parsing these in ifconfig(8) would be a nightmare.
- */
+  
+                                                                         
+                                                                    
+  
+                                                                            
+                                                                
+   
 struct ifmedia_description {
-	int     ifmt_word;              /* word value; may be masked */
-	const char *ifmt_string;        /* description */
+	int     ifmt_word;                                             
+	const char *ifmt_string;                         
 };
 
 #define IFM_TYPE_DESCRIPTIONS {                     \
@@ -583,4 +583,4 @@ struct ifmedia_description {
     { 0, NULL },                                    \
 }
 
-#endif  /* _NET_IF_MEDIA_H_ */
+#endif                        

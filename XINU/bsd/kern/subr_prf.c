@@ -65,21 +65,21 @@
  *
  *	@(#)subr_prf.c	8.4 (Berkeley) 5/4/95
  */
-/* HISTORY
- * 22-Sep-1997 Umesh Vaishampayan (umeshv@apple.com)
- *	Cleaned up m68k crud. Fixed vlog() to do logpri() for ppc, too.
- *
- * 17-July-97  Umesh Vaishampayan (umeshv@apple.com)
- *	Eliminated multiple definition of constty which is defined
- *	in bsd/dev/XXX/cons.c
- *
- * 26-MAR-1997 Umesh Vaishampayan (umeshv@NeXT.com
- *      Fixed tharshing format in many functions. Cleanup.
- *
- * 17-Jun-1995 Mac Gillon (mgillon) at NeXT
- *	Purged old history
- *	New version based on 4.4 and NS3.3
- */
+          
+                                                    
+                                                                  
+  
+                                                    
+                                                             
+                        
+  
+                                                  
+                                                          
+  
+                                           
+                     
+                                     
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -97,18 +97,18 @@
 #include <sys/lock.h>
 #include <sys/subr_prf.h>
 
-#include <kern/cpu_number.h>    /* for cpu_number() */
+#include <kern/cpu_number.h>                          
 #include <libkern/libkern.h>
 #include <os/log_private.h>
 
-/* for vaddlog(): the following are implemented in osfmk/kern/printf.c  */
+                                                                          
 extern bool bsd_log_lock(bool);
 extern void bsd_log_unlock(void);
 
 uint32_t vaddlog_msgcount = 0;
 uint32_t vaddlog_msgcount_dropped = 0;
 
-/* Keep this around only because it's exported */
+                                                 
 void _printf(int, struct tty *, const char *, ...);
 
 struct snprintf_arg {
@@ -117,17 +117,17 @@ struct snprintf_arg {
 };
 
 
-/*
- * In case console is off,
- * debugger_panic_str contains argument to last
- * call to panic.
- */
+  
+                          
+                                               
+                 
+   
 extern const char       *debugger_panic_str;
 
-extern  void cnputc(char);              /* standard console putc */
+extern  void cnputc(char);                                         
 
-extern  struct tty cons;                /* standard console tty */
-extern struct   tty *constty;           /* pointer to console "window" tty */
+extern  struct tty cons;                                          
+extern struct   tty *constty;                                                
 extern int  __doprnt(const char *fmt,
     va_list    argp,
     void       (*)(int, void *),
@@ -135,9 +135,9 @@ extern int  __doprnt(const char *fmt,
     int        radix,
     int        is_log);
 
-/*
- *	Record cpu that panic'd and lock around panic data
- */
+  
+                                                     
+   
 
 extern  void logwakeup(struct msgbuf *);
 extern  void halt_cpu(void);
@@ -153,11 +153,11 @@ struct putchar_args {
 static void putchar(int c, void *arg);
 
 
-/*
- * Uprintf prints to the controlling terminal for the current process.
- * It may block if the tty queue is overfull.  No message is printed if
- * the queue does not clear in a reasonable time.
- */
+  
+                                                                      
+                                                                       
+                                                 
+   
 void
 uprintf(const char *fmt, ...)
 {
@@ -211,12 +211,12 @@ tprintf_close(tpr_t sessp)
 	}
 }
 
-/*
- * tprintf prints on the controlling terminal associated
- * with the given session.
- *
- * NOTE:	No one else should call this function!!!
- */
+  
+                                                        
+                          
+  
+                                                 
+   
 void
 tprintf(tpr_t tpr, const char *fmt, ...)
 {
@@ -226,11 +226,11 @@ tprintf(tpr_t tpr, const char *fmt, ...)
 	struct putchar_args pca;
 
 	if (sess && (tp = SESSION_TP(sess)) != TTY_NULL) {
-		/* ttycheckoutq(), tputchar() require a locked tp */
+		                                                    
 		tty_lock(tp);
 		if (ttycheckoutq(tp, 0)) {
 			pca.flags = TOTTY;
-			/* going to the tty; leave locked */
+			                                    
 			pca.tty = tp;
 			va_start(ap, fmt);
 			__doprnt(fmt, ap, putchar, &pca, 10, FALSE);
@@ -244,15 +244,15 @@ tprintf(tpr_t tpr, const char *fmt, ...)
 	va_end(ap);
 }
 
-/*
- * Ttyprintf displays a message on a tty; it should be used only by
- * the tty driver, or anything that knows the underlying tty will not
- * be revoke(2)'d away.  Other callers should use tprintf.
- *
- * Locks:	It is assumed that the tty_lock() is held over the call
- *		to this function.  Ensuring this is the responsibility
- *		of the caller.
- */
+  
+                                                                   
+                                                                     
+                                                          
+  
+                                                                 
+                                                          
+                  
+   
 void
 ttyprintf(struct tty *tp, const char *fmt, ...)
 {
@@ -286,9 +286,9 @@ putchar_asl(int c, void *arg)
 	putchar(c, arg);
 }
 
-/*
- * Vestigial support for kern_asl_msg() via /dev/klog
- */
+  
+                                                     
+   
 int
 vaddlog(const char *fmt, va_list ap)
 {
@@ -343,24 +343,24 @@ prf(const char *fmt, va_list ap, int flags, struct tty *ttyp)
 	return 0;
 }
 
-/*
- * Warn that a system table is full.
- */
+  
+                                    
+   
 void
 tablefull(const char *tab)
 {
 	log(LOG_ERR, "%s: table is full\n", tab);
 }
 
-/*
- * Print a character on console or users terminal.
- * If destination is console then the last MSGBUFS characters
- * are saved in msgbuf for inspection later.
- *
- * Locks:	If TOTTY is set, we assume that the tty lock is held
- *		over the call to this function.
- */
-/*ARGSUSED*/
+  
+                                                  
+                                                             
+                                            
+  
+                                                              
+                                   
+   
+            
 void
 putchar(int c, void *arg)
 {
@@ -424,12 +424,12 @@ vprintf_log_locked(const char *fmt, va_list ap, bool addcr)
 }
 
 #if CONFIG_VSPRINTF
-/*
- * Scaled down version of vsprintf(3).
- *
- * Deprecation Warning:
- *	vsprintf() is being deprecated. Please use vsnprintf() instead.
- */
+  
+                                      
+  
+                       
+                                                                  
+   
 int
 vsprintf(char *buf, const char *cfmt, va_list ap)
 {
@@ -445,11 +445,11 @@ vsprintf(char *buf, const char *cfmt, va_list ap)
 	}
 	return 0;
 }
-#endif  /* CONFIG_VSPRINTF */
+#endif                       
 
-/*
- * Scaled down version of snprintf(3).
- */
+  
+                                      
+   
 int
 snprintf(char *str, size_t size, const char *format, ...)
 {
@@ -462,9 +462,9 @@ snprintf(char *str, size_t size, const char *format, ...)
 	return retval;
 }
 
-/*
- * Scaled down version of vsnprintf(3).
- */
+  
+                                       
+   
 int
 vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {

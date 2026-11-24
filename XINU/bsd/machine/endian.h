@@ -39,4 +39,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _BSD_MACHINE_ENDIAN_H_ */
+#endif                             

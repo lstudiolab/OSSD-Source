@@ -248,10 +248,10 @@ sched_dualq_choose_thread(
 			return THREAD_NULL;
 		}
 		if (processor->processor_primary != processor) {
-			/*
-			 * Secondary processor may not run a NO_SMT thread,
-			 * nor any thread if the primary is running a NO_SMT thread.
-			 */
+			  
+                                                      
+                                                               
+      
 			if (thread_no_smt(potential_thread)) {
 				processor->must_idle = true;
 				return THREAD_NULL;
@@ -265,10 +265,10 @@ sched_dualq_choose_thread(
 			}
 		} else if (processor->processor_secondary != PROCESSOR_NULL) {
 			processor_t secondary = processor->processor_secondary;
-			/*
-			 * Primary processor may not run a NO_SMT thread if
-			 * its secondary is running a bound thread.
-			 */
+			  
+                                                      
+                                              
+      
 			if (secondary->state == PROCESSOR_RUNNING) {
 				if (thread_no_smt(potential_thread) && secondary->current_is_bound) {
 					processor->must_idle = true;
@@ -389,7 +389,7 @@ sched_dualq_processor_queue_shutdown(processor_t processor)
 	thread_t        thread;
 	queue_head_t    tqueue;
 
-	/* We only need to migrate threads if this is the last active processor in the pset */
+	                                                                                      
 	if (pset->online_processor_count > 0) {
 		pset_unlock(pset);
 		return;
@@ -428,16 +428,16 @@ sched_dualq_processor_queue_remove(
 	rq = dualq_runq_for_thread(processor, thread);
 
 	if (processor == thread->runq) {
-		/*
-		 * Thread is on a run queue and we have a lock on
-		 * that run queue.
-		 */
+		  
+                                                   
+                    
+     
 		run_queue_remove(rq, thread);
 	} else {
-		/*
-		 * The thread left the run queue before we could
-		 * lock the run queue.
-		 */
+		  
+                                                  
+                        
+     
 		assert(thread->runq == PROCESSOR_NULL);
 		processor = PROCESSOR_NULL;
 	}
@@ -454,7 +454,7 @@ sched_dualq_steal_thread(processor_set_t pset)
 	processor_set_t nset = next_pset(cset);
 	thread_t        thread;
 
-	/* Secondary processors on SMT systems never steal */
+	                                                     
 	assert(current_processor()->processor_primary == current_processor());
 
 	while (nset != pset) {
@@ -463,7 +463,7 @@ sched_dualq_steal_thread(processor_set_t pset)
 		pset_lock(cset);
 
 		if (pset_has_stealable_threads(cset)) {
-			/* Need task_restrict logic here */
+			                                   
 			thread = run_queue_dequeue(&cset->pset_runq, SCHED_HEADQ);
 			pset_unlock(cset);
 			return thread;
@@ -486,10 +486,10 @@ sched_dualq_thread_update_scan(sched_update_scan_context_t scan_context)
 	thread_t                thread;
 	spl_t                   s;
 
-	/*
-	 *  We update the threads associated with each processor (bound and idle threads)
-	 *  and then update the threads in each pset runqueue.
-	 */
+	  
+                                                                                  
+                                                       
+    
 
 	do {
 		do {
@@ -516,7 +516,7 @@ sched_dualq_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while ((processor = processor->processor_list) != NULL);
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 
@@ -537,50 +537,50 @@ sched_dualq_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while ((pset = pset->pset_list) != NULL);
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 }
 
 extern int sched_allow_rt_smt;
 
-/* Return true if this thread should not continue running on this processor */
+                                                                              
 static bool
 sched_dualq_thread_avoid_processor(processor_t processor, thread_t thread)
 {
 	if (thread->bound_processor == processor) {
-		/* Thread is bound here */
+		                          
 		return false;
 	}
 
 	if (processor->processor_primary != processor) {
-		/*
-		 * This is a secondary SMT processor.  If the primary is running
-		 * a realtime thread, only allow realtime threads on the secondary.
-		 */
+		  
+                                                                  
+                                                                     
+     
 		processor_t primary = processor->processor_primary;
 		if ((primary->current_pri >= BASEPRI_RTQUEUES) && ((thread->sched_pri < BASEPRI_RTQUEUES) || !sched_allow_rt_smt)) {
 			return true;
 		}
 
-		/* NO_SMT threads are not allowed on secondary processors */
+		                                                            
 		if (thread_no_smt(thread)) {
 			return true;
 		}
 
 		if (primary->state == PROCESSOR_RUNNING) {
 			if (processor_active_thread_no_smt(primary)) {
-				/* No threads allowed on secondary if primary has NO_SMT */
+				                                                           
 				return true;
 			}
 		}
 	}
 
 	if (processor->processor_secondary != PROCESSOR_NULL) {
-		/*
-		 * This is a primary SMT processor.  If the secondary is running
-		 * a bound thread, the primary may not run a NO_SMT thread.
-		 */
+		  
+                                                                  
+                                                             
+     
 		processor_t secondary = processor->processor_secondary;
 
 		if (secondary->state == PROCESSOR_RUNNING) {

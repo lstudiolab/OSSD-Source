@@ -44,7 +44,7 @@
 #include <sys/dtrace_impl.h>
 #include <machine/atomic.h>
 #include <kern/simple_lock.h>
-#include <kern/sched_prim.h>            /* for thread_wakeup() */
+#include <kern/sched_prim.h>                                     
 #include <kern/thread_call.h>
 #include <kern/task.h>
 #include <miscfs/devfs/devfs.h>
@@ -52,14 +52,14 @@
 
 extern struct arm_saved_state *find_kern_regs(thread_t);
 
-extern dtrace_id_t      dtrace_probeid_error;   /* special ERROR probe */
+extern dtrace_id_t      dtrace_probeid_error;                            
 typedef arm_saved_state_t savearea_t;
 
 int dtrace_arm_condition_true(int condition, int cpsr);
 
-/*
- * Atomicity and synchronization
- */
+  
+                                
+   
 inline void
 dtrace_membar_producer(void)
 {
@@ -72,24 +72,24 @@ dtrace_membar_consumer(void)
 	__asm__ volatile ("dmb ish" : : : "memory");
 }
 
-/*
- * Interrupt manipulation
- * XXX dtrace_getipl() can be called from probe context.
- */
+  
+                         
+                                                        
+   
 int
 dtrace_getipl(void)
 {
-	/*
-	 * XXX Drat, get_interrupt_level is MACH_KERNEL_PRIVATE
-	 * in osfmk/kern/cpu_data.h
-	 */
-	/* return get_interrupt_level(); */
+	  
+                                                        
+                            
+    
+	                                   
 	return ml_at_interrupt_context() ? 1 : 0;
 }
 
-/*
- * MP coordination
- */
+  
+                  
+   
 
 static LCK_MTX_DECLARE_ATTR(dt_xc_lock, &dtrace_lck_grp, &dtrace_lck_attr);
 static uint32_t dt_xc_sync;
@@ -114,13 +114,13 @@ xcRemote(void *foo)
 	}
 }
 
-/*
- * dtrace_xcall() is not called from probe context.
- */
+  
+                                                   
+   
 void
 dtrace_xcall(processorid_t cpu, dtrace_xcall_t f, void *arg)
 {
-	/* Only one dtrace_xcall in flight allowed */
+	                                             
 	lck_mtx_lock(&dt_xc_lock);
 
 	xcArg_t xcArg;
@@ -135,9 +135,9 @@ dtrace_xcall(processorid_t cpu, dtrace_xcall_t f, void *arg)
 	return;
 }
 
-/*
- * Runtime and ABI
- */
+  
+                  
+   
 uint64_t
 dtrace_getreg(struct regs * savearea, uint_t reg)
 {
@@ -146,7 +146,7 @@ dtrace_getreg(struct regs * savearea, uint_t reg)
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 		return 0;
 	}
-	/* beyond register limit? */
+	                            
 	if (reg > ARM_SAVED_STATE32_COUNT - 1) {
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 		return 0;
@@ -191,7 +191,7 @@ dtrace_getustack_common(uint64_t * pcstack, int pcstack_limit, user_addr_t pc,
 		pc = dtrace_fuword32((sp + RETURN_OFFSET));
 		sp = dtrace_fuword32(sp);
 
-		/* Truncate ustack if the iterator causes fault. */
+		                                                   
 		if (*flags & CPU_DTRACE_FAULT) {
 			*flags &= ~CPU_DTRACE_FAULT;
 			break;
@@ -218,9 +218,9 @@ dtrace_getupcstack(uint64_t * pcstack, int pcstack_limit)
 		return;
 	}
 
-	/*
-	 * If there's no user context we still need to zero the stack.
-	 */
+	  
+                                                               
+    
 	if (thread == NULL) {
 		goto zero;
 	}
@@ -293,12 +293,12 @@ dtrace_getustackdepth(void)
 		pc = regs->lr;
 	}
 
-	/*
-	 * Note that unlike ppc, the arm code does not use
-	 * CPU_DTRACE_USTACK_FP. This is because arm always
-	 * traces from the sp, even in syscall/profile/fbt
-	 * providers.
-	 */
+	  
+                                                   
+                                                    
+                                                   
+              
+    
 
 	n += dtrace_getustack_common(NULL, 0, pc, regs->r[7]);
 
@@ -308,7 +308,7 @@ dtrace_getustackdepth(void)
 void
 dtrace_getufpstack(uint64_t * pcstack, uint64_t * fpstack, int pcstack_limit)
 {
-	/* XXX ARMTODO 64vs32 */
+	                        
 	thread_t        thread = current_thread();
 	savearea_t      *regs;
 	user_addr_t     pc, sp;
@@ -328,9 +328,9 @@ dtrace_getufpstack(uint64_t * pcstack, uint64_t * fpstack, int pcstack_limit)
 		return;
 	}
 
-	/*
-	 * If there's no user context we still need to zero the stack.
-	 */
+	  
+                                                               
+    
 	if (thread == NULL) {
 		goto zero;
 	}
@@ -350,7 +350,7 @@ dtrace_getufpstack(uint64_t * pcstack, uint64_t * fpstack, int pcstack_limit)
 	pc = regs->pc;
 	sp = regs->sp;
 
-#if 0                           /* XXX signal stack crawl */
+#if 0                                                       
 	oldcontext = lwp->lwp_oldcontext;
 
 	if (p->p_model == DATAMODEL_NATIVE) {
@@ -380,7 +380,7 @@ dtrace_getufpstack(uint64_t * pcstack, uint64_t * fpstack, int pcstack_limit)
 			break;
 		}
 
-#if 0                           /* XXX signal stack crawl */
+#if 0                                                       
 		if (oldcontext == sp + s1 || oldcontext == sp + s2) {
 			if (p->p_model == DATAMODEL_NATIVE) {
 				ucontext_t     *ucp = (ucontext_t *) oldcontext;
@@ -406,7 +406,7 @@ dtrace_getufpstack(uint64_t * pcstack, uint64_t * fpstack, int pcstack_limit)
 			sp = dtrace_fuword32(sp);
 		}
 
-		/* Truncate ustack if the iterator causes fault. */
+		                                                   
 		if (*flags & CPU_DTRACE_FAULT) {
 			*flags &= ~CPU_DTRACE_FAULT;
 			break;
@@ -451,9 +451,9 @@ dtrace_getpcstack(pc_t * pcstack, int pcstack_limit, int aframes,
 
 		if (nextfp <= minfp || nextfp >= stacktop) {
 			if (on_intr) {
-				/*
-				 * Hop from interrupt stack to thread stack.
-				 */
+				  
+                                                
+       
 				arm_saved_state_t *arm_kern_regs = (arm_saved_state_t *) find_kern_regs(current_thread());
 				if (arm_kern_regs) {
 					nextfp = (struct frame *)arm_kern_regs->r[7];
@@ -469,28 +469,28 @@ dtrace_getpcstack(pc_t * pcstack, int pcstack_limit, int aframes,
 						last = 1;
 					}
 				} else {
-					/*
-					 * If this thread was on the interrupt stack, but did not
-					 * take an interrupt (i.e, the idle thread), there is no
-					 * explicit saved state for us to use.
-					 */
+					  
+                                                              
+                                                             
+                                           
+        
 					last = 1;
 				}
 			} else {
-				/*
-				 * This is the last frame we can process; indicate
-				 * that we should return after processing this frame.
-				 */
+				  
+                                                      
+                                                         
+       
 				last = 1;
 			}
 		}
 		if (aframes > 0) {
 			if (--aframes == 0 && caller != (uintptr_t)NULL) {
-				/*
-				 * We've just run out of artificial frames,
-				 * and we have a valid caller -- fill it in
-				 * now.
-				 */
+				  
+                                               
+                                               
+           
+       
 				ASSERT(depth < pcstack_limit);
 				pcstack[depth++] = (pc_t) caller;
 				caller = (uintptr_t)NULL;
@@ -532,7 +532,7 @@ dtrace_getarg(int arg, int aframes, dtrace_mstate_t *mstate, dtrace_vstate_t *vs
 {
 #pragma unused(arg, aframes, mstate, vstate)
 #if 0
-	/* XXX ARMTODO */
+	                 
 	uint64_t val;
 	uintptr_t *fp = (uintptr_t *)__builtin_frame_address(0);
 	uintptr_t *stack;
@@ -546,16 +546,16 @@ dtrace_getarg(int arg, int aframes, dtrace_mstate_t *mstate, dtrace_vstate_t *vs
 		if (dtrace_invop_callsite_pre != NULL
 		    && pc > (uintptr_t)dtrace_invop_callsite_pre
 		    && pc <= (uintptr_t)dtrace_invop_callsite_post) {
-			/*
-			 * If we pass through the invalid op handler, we will
-			 * use the pointer that it passed to the stack as the
-			 * second argument to dtrace_invop() as the pointer to
-			 * the frame we're hunting for.
-			 */
+			  
+                                                        
+                                                        
+                                                         
+                                  
+      
 
-			stack = (uintptr_t *)&fp[1]; /* Find marshalled arguments */
-			fp = (struct frame *)stack[1]; /* Grab *second* argument */
-			stack = (uintptr_t *)&fp[1]; /* Find marshalled arguments */
+			stack = (uintptr_t *)&fp[1];                                
+			fp = (struct frame *)stack[1];                             
+			stack = (uintptr_t *)&fp[1];                                
 			DTRACE_CPUFLAG_SET(CPU_DTRACE_NOFAULT);
 			val = (uint64_t)(stack[arg]);
 			DTRACE_CPUFLAG_CLEAR(CPU_DTRACE_NOFAULT);
@@ -563,14 +563,14 @@ dtrace_getarg(int arg, int aframes, dtrace_mstate_t *mstate, dtrace_vstate_t *vs
 		}
 	}
 
-	/*
-	 * Arrive here when provider has called dtrace_probe directly.
-	 */
-	stack = (uintptr_t *)&fp[1]; /* Find marshalled arguments */
-	stack++; /* Advance past probeID */
+	  
+                                                               
+    
+	stack = (uintptr_t *)&fp[1];                                
+	stack++;                           
 
 	DTRACE_CPUFLAG_SET(CPU_DTRACE_NOFAULT);
-	val = *(((uint64_t *)stack) + arg); /* dtrace_probe arguments arg0 .. arg4 are 64bits wide */
+	val = *(((uint64_t *)stack) + arg);                                                          
 	DTRACE_CPUFLAG_CLEAR(CPU_DTRACE_NOFAULT);
 	return val;
 #endif
@@ -581,11 +581,11 @@ void
 dtrace_probe_error(dtrace_state_t *state, dtrace_epid_t epid, int which,
     int fltoffs, int fault, uint64_t illval)
 {
-	/* XXX ARMTODO */
-	/*
-	 * For the case of the error probe firing lets
-	 * stash away "illval" here, and special-case retrieving it in DIF_VARIABLE_ARG.
-	 */
+	                 
+	  
+                                               
+                                                                                 
+    
 	state->dts_arg_error_illval = illval;
 	dtrace_probe( dtrace_probeid_error, (uint64_t)(uintptr_t)state, epid, which, fltoffs, fault );
 }
@@ -593,11 +593,11 @@ dtrace_probe_error(dtrace_state_t *state, dtrace_epid_t epid, int which,
 void
 dtrace_toxic_ranges(void (*func)(uintptr_t base, uintptr_t limit))
 {
-	/* XXX ARMTODO check copied from ppc/x86*/
-	/*
-	 * "base" is the smallest toxic address in the range, "limit" is the first
-	 * VALID address greater than "base".
-	 */
+	                                          
+	  
+                                                                           
+                                      
+    
 	func(0x0, VM_MIN_KERNEL_ADDRESS);
 	if (VM_MAX_KERNEL_ADDRESS < ~(uintptr_t)0) {
 		func(VM_MAX_KERNEL_ADDRESS + 1, ~(uintptr_t)0);
@@ -629,7 +629,7 @@ dtrace_arm_condition_true(int cond, int cpsr)
 	case 12: taken = (!zf && (nf == vf)); break;
 	case 13: taken = (zf || (nf != vf)); break;
 	case 14: taken = 1; break;
-	case 15: taken = 1; break;         /* always "true" for ARM, unpredictable for THUMB. */
+	case 15: taken = 1; break;                                                              
 	}
 
 	return taken;
@@ -638,9 +638,9 @@ dtrace_arm_condition_true(int cond, int cpsr)
 void
 dtrace_flush_caches(void)
 {
-	/* TODO There were some problems with flushing just the cache line that had been modified.
-	 * For now, we'll flush the entire cache, until we figure out how to flush just the patched block.
-	 */
+	                                                                                          
+                                                                                                   
+    
 	FlushPoU_Dcache();
 	InvalidatePoU_Icache();
 }

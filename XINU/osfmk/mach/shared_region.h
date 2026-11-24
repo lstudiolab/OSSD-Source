@@ -20,12 +20,12 @@
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-/*
- *
- *	File: mach/shared_region.h
- *
- *      protos and struct definitions for shared region
- */
+  
+  
+                             
+  
+                                                       
+   
 
 #ifndef _MACH_SHARED_REGION_H_
 #define _MACH_SHARED_REGION_H_
@@ -81,7 +81,7 @@
 #define SHARED_REGION_NESTING_MAX_ARM64_32      ?
 
 #ifdef XNU_KERNEL_PRIVATE
-/* ARM64_TODO: move to higher memory */
+                                       
 #endif
 #define SHARED_REGION_BASE_ARM64                0x180000000ULL
 #define SHARED_REGION_SIZE_ARM64                0x100000000ULL
@@ -129,24 +129,24 @@
 
 #ifdef KERNEL_PRIVATE
 
-/*
- * This is routine sets  the current source of power.
- * Arguments:
- * 0 if it is external source (connected to power )
- * 1 if it is internal power source ie battery
- */
+  
+                                                     
+             
+                                                   
+                                              
+   
 
 void post_sys_powersource(int);
 
-#endif /* KERNEL_PRIVATE */
-/*
- * The shared_region_* declarations are a private interface between dyld and the kernel.
- */
+#endif                     
+  
+                                                                                        
+   
 
-/*
- * This is used by legacy shared_region_map_and_slide_np() interface.
- * We build a shared_file_mapping_slide_np from this.
- */
+  
+                                                                     
+                                                     
+   
 struct shared_file_mapping_np {
 	mach_vm_address_t       sfm_address;
 	mach_vm_size_t          sfm_size;
@@ -156,35 +156,35 @@ struct shared_file_mapping_np {
 };
 
 struct shared_file_mapping_slide_np {
-	mach_vm_address_t       sms_address;     /* address at which to create mapping */
-	mach_vm_size_t          sms_size;        /* size of region to map */
-	mach_vm_offset_t        sms_file_offset; /* offset into file to be mapped */
-	user_addr_t             sms_slide_size;  /* size of data at sms_slide_start */
-	user_addr_t             sms_slide_start; /* address from which to get relocation data */
-	vm_prot_t               sms_max_prot;    /* protections, plus flags, see below */
+	mach_vm_address_t       sms_address;                                             
+	mach_vm_size_t          sms_size;                                   
+	mach_vm_offset_t        sms_file_offset;                                    
+	user_addr_t             sms_slide_size;                                       
+	user_addr_t             sms_slide_start;                                                
+	vm_prot_t               sms_max_prot;                                            
 	vm_prot_t               sms_init_prot;
 };
 struct shared_file_np {
-	int                     sf_fd;             /* file to be mapped into shared region */
-	uint32_t                sf_mappings_count; /* number of mappings */
-	uint32_t                sf_slide;          /* distance in bytes of the slide */
+	int                     sf_fd;                                                       
+	uint32_t                sf_mappings_count;                         
+	uint32_t                sf_slide;                                              
 };
 
-/*
- * Extensions to sfm_max_prot that identify how to handle each mapping.
- * These must not interfere with normal prot assignments.
- *
- * VM_PROT_COW    - copy on write pages
- *
- * VM_PROT_ZF     - zero fill pages
- *
- * VM_PROT_SLIDE  - file pages which require relocation and, on arm64e, signing
- *                  these will be unique per shared region.
- *
- * VM_PROT_NOAUTH - file pages which don't require signing. When combined
- *                  with VM_PROT_SLIDE, pages are shareable across different
- *                  shared regions which map the same file with the same relocation info.
- */
+  
+                                                                       
+                                                         
+  
+                                       
+  
+                                   
+  
+                                                                               
+                                                           
+  
+                                                                         
+                                                                            
+                                                                                         
+   
 #define VM_PROT_COW                      0x08
 #define VM_PROT_ZF                       0x10
 #define VM_PROT_SLIDE                    0x20
@@ -201,6 +201,6 @@ int     shared_region_map_np(int fd,
 int     shared_region_slide_np(void);
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
-#endif /* _MACH_SHARED_REGION_H_ */
+#endif                             

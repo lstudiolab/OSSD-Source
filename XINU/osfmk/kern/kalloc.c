@@ -53,16 +53,16 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	kern/kalloc.c
- *	Author:	Avadis Tevanian, Jr.
- *	Date:	1985
- *
- *	General kernel memory allocator.  This allocator is designed
- *	to be used by the kernel to manage dynamic memory fast.
- */
+  
+   
+  
+                      
+                               
+             
+  
+                                                               
+                                                          
+   
 
 #include <mach/boolean.h>
 #include <mach/sdt.h>
@@ -81,7 +81,7 @@
 #include <san/kasan.h>
 #include <libkern/section_keywords.h>
 
-/* #define KALLOC_DEBUG            1 */
+                                       
 
 #define KALLOC_MAP_SIZE_MIN  (16 * 1024 * 1024)
 #define KALLOC_MAP_SIZE_MAX  (128 * 1024 * 1024)
@@ -90,7 +90,7 @@ static SECURITY_READ_ONLY_LATE(vm_offset_t) kalloc_map_min;
 static SECURITY_READ_ONLY_LATE(vm_offset_t) kalloc_map_max;
 static SECURITY_READ_ONLY_LATE(vm_size_t) kalloc_max;
 SECURITY_READ_ONLY_LATE(vm_size_t) kalloc_max_prerounded;
-/* size of kallocs that can come from kernel map */
+                                                   
 SECURITY_READ_ONLY_LATE(vm_size_t) kalloc_kernmap_size;
 SECURITY_READ_ONLY_LATE(vm_map_t)  kalloc_map;
 #if DEBUG || DEVELOPMENT
@@ -103,7 +103,7 @@ struct kheap_temp_header {
 };
 #endif
 
-/* how many times we couldn't allocate out of kalloc_map and fell back to kernel_map */
+                                                                                       
 unsigned long kalloc_fallback_count;
 
 uint_t     kalloc_large_inuse;
@@ -120,77 +120,77 @@ LCK_SPIN_DECLARE(kalloc_lock, &kalloc_lck_grp);
 
 #pragma mark initialization
 
-/*
- * All allocations of size less than kalloc_max are rounded to the next nearest
- * sized zone.  This allocator is built on top of the zone allocator.  A zone
- * is created for each potential size that we are willing to get in small
- * blocks.
- *
- * We assume that kalloc_max is not greater than 64K;
- *
- * Note that kalloc_max is somewhat confusingly named.	It represents the first
- * power of two for which no zone exists.  kalloc_max_prerounded is the
- * smallest allocation size, before rounding, for which no zone exists.
- *
- * Also if the allocation size is more than kalloc_kernmap_size then allocate
- * from kernel map rather than kalloc_map.
- */
+  
+                                                                               
+                                                                             
+                                                                         
+          
+  
+                                                     
+  
+                                                                              
+                                                                       
+                                                                       
+  
+                                                                             
+                                          
+   
 
 #define KiB(x) (1024 * (x))
 
-/*
- * The k_zone_cfg table defines the configuration of zones on various platforms.
- * The currently defined list of zones and their per-CPU caching behavior are as
- * follows
- *
- *     X:zone not present
- *     N:zone present no cpu-caching
- *     Y:zone present with cpu-caching
- *
- * Size       macOS(64-bit)       embedded(32-bit)    embedded(64-bit)
- *--------    ----------------    ----------------    ----------------
- *
- * 8          X                    Y                   X
- * 16         Y                    Y                   Y
- * 24         X                    Y                   X
- * 32         Y                    Y                   Y
- * 40         X                    Y                   X
- * 48         Y                    Y                   Y
- * 64         Y                    Y                   Y
- * 72         X                    Y                   X
- * 80         Y                    X                   Y
- * 88         X                    Y                   X
- * 96         Y                    X                   Y
- * 112        X                    Y                   X
- * 128        Y                    Y                   Y
- * 160        Y                    X                   Y
- * 192        Y                    Y                   Y
- * 224        Y                    X                   Y
- * 256        Y                    Y                   Y
- * 288        Y                    Y                   Y
- * 368        Y                    X                   Y
- * 384        X                    Y                   X
- * 400        Y                    X                   Y
- * 440        X                    Y                   X
- * 512        Y                    Y                   Y
- * 576        Y                    N                   N
- * 768        Y                    N                   N
- * 1024       Y                    Y                   Y
- * 1152       N                    N                   N
- * 1280       N                    N                   N
- * 1536       X                    N                   X
- * 1664       N                    X                   N
- * 2048       Y                    N                   N
- * 2128       X                    N                   X
- * 3072       X                    N                   X
- * 4096       Y                    N                   N
- * 6144       N                    N                   N
- * 8192       Y                    N                   N
- * 12288      N                    X                   X
- * 16384      N                    X                   N
- * 32768      X                    X                   N
- *
- */
+  
+                                                                                
+                                                                                
+          
+  
+                         
+                                    
+                                      
+  
+                                                                      
+                                                                      
+  
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+  
+   
 struct kalloc_zone_cfg {
 	bool kzc_caching;
 	uint32_t kzc_size;
@@ -206,7 +206,7 @@ static SECURITY_READ_ONLY_LATE(struct kalloc_zone_cfg) k_zone_cfg[] = {
 #if !defined(XNU_TARGET_OS_OSX)
 
 #if KALLOC_MINSIZE == 16 && KALLOC_LOG2_MINALIGN == 4
-	/* Zone config for embedded 64-bit platforms */
+	                                               
 	KZC_ENTRY(16, true),
 	KZC_ENTRY(32, true),
 	KZC_ENTRY(48, true),
@@ -236,7 +236,7 @@ static SECURITY_READ_ONLY_LATE(struct kalloc_zone_cfg) k_zone_cfg[] = {
 	KZC_ENTRY(32768, false),
 
 #elif KALLOC_MINSIZE == 8 && KALLOC_LOG2_MINALIGN == 3
-	/* Zone config for embedded 32-bit platforms */
+	                                               
 	KZC_ENTRY(8, true),
 	KZC_ENTRY(16, true),
 	KZC_ENTRY(24, true),
@@ -266,23 +266,23 @@ static SECURITY_READ_ONLY_LATE(struct kalloc_zone_cfg) k_zone_cfg[] = {
 	KZC_ENTRY(4096, false),
 	KZC_ENTRY(6144, false),
 	KZC_ENTRY(8192, false),
-	/* To limit internal fragmentation, only add the following zones if the
-	 * page size is greater than 4K.
-	 * Note that we use ARM_PGBYTES here (instead of one of the VM macros)
-	 * since it's guaranteed to be a compile time constant.
-	 */
+	                                                                       
+                                 
+                                                                       
+                                                        
+    
 #if ARM_PGBYTES > 4096
 	KZC_ENTRY(16384, false),
 	KZC_ENTRY(32768, false),
-#endif /* ARM_PGBYTES > 4096 */
+#endif                         
 
 #else
 #error missing or invalid zone size parameters for kalloc
 #endif
 
-#else /* !defined(XNU_TARGET_OS_OSX) */
+#else                                  
 
-	/* Zone config for macOS 64-bit platforms */
+	                                            
 	KZC_ENTRY(16, true),
 	KZC_ENTRY(32, true),
 	KZC_ENTRY(48, true),
@@ -311,19 +311,19 @@ static SECURITY_READ_ONLY_LATE(struct kalloc_zone_cfg) k_zone_cfg[] = {
 	KZC_ENTRY(12288, false),
 	KZC_ENTRY(16384, false)
 
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 #undef KZC_ENTRY
 };
 
 #define MAX_K_ZONE(kzc) (uint32_t)(sizeof(kzc) / sizeof(kzc[0]))
 
-/*
- * Many kalloc() allocations are for small structures containing a few
- * pointers and longs - the dlut[] direct lookup table, indexed by
- * size normalized to the minimum alignment, finds the right zone index
- * for them in one dereference.
- */
+  
+                                                                      
+                                                                  
+                                                                       
+                               
+   
 
 #define INDEX_ZDLUT(size)  (((size) + KALLOC_MINALIGN - 1) / KALLOC_MINALIGN)
 #define MAX_SIZE_ZDLUT     ((KALLOC_DLUT_SIZE - 1) * KALLOC_MINALIGN)
@@ -348,9 +348,9 @@ const char * const kalloc_heap_names[] = {
 	[KHEAP_ID_KEXT]          = "kext.",
 };
 
-/*
- * Default kalloc heap configuration
- */
+  
+                                    
+   
 static SECURITY_READ_ONLY_LATE(struct kheap_zones) kalloc_zones_default = {
 	.cfg         = k_zone_cfg,
 	.heap_id     = KHEAP_ID_DEFAULT,
@@ -368,9 +368,9 @@ SECURITY_READ_ONLY_LATE(struct kalloc_heap) KHEAP_DEFAULT[1] = {
 KALLOC_HEAP_DEFINE(KHEAP_TEMP, "temp allocations", KHEAP_ID_DEFAULT);
 
 
-/*
- * Bag of bytes heap configuration
- */
+  
+                                  
+   
 static SECURITY_READ_ONLY_LATE(struct kheap_zones) kalloc_zones_data_buffers = {
 	.cfg         = k_zone_cfg,
 	.heap_id     = KHEAP_ID_DATA_BUFFERS,
@@ -386,9 +386,9 @@ SECURITY_READ_ONLY_LATE(struct kalloc_heap) KHEAP_DATA_BUFFERS[1] = {
 };
 
 
-/*
- * Kext heap configuration
- */
+  
+                          
+   
 static SECURITY_READ_ONLY_LATE(struct kheap_zones) kalloc_zones_kext = {
 	.cfg         = k_zone_cfg,
 	.heap_id     = KHEAP_ID_KEXT,
@@ -405,10 +405,10 @@ SECURITY_READ_ONLY_LATE(struct kalloc_heap) KHEAP_KEXT[1] = {
 
 KALLOC_HEAP_DEFINE(KERN_OS_MALLOC, "kern_os_malloc", KHEAP_ID_KEXT);
 
-/*
- * Initialize kalloc heap: Create zones, generate direct lookup table and
- * do a quick test on lookups
- */
+  
+                                                                         
+                             
+   
 __startup_func
 static void
 kalloc_zones_init(struct kheap_zones *zones)
@@ -417,9 +417,9 @@ kalloc_zones_init(struct kheap_zones *zones)
 	zone_t *k_zone = zones->k_zone;
 	vm_size_t size;
 
-	/*
-	 * Allocate a zone for each size we are going to handle.
-	 */
+	  
+                                                         
+    
 	for (uint32_t i = 0; i < zones->max_k_zone &&
 	    (size = cfg[i].kzc_size) < kalloc_max; i++) {
 		zone_create_flags_t flags = ZC_KASAN_NOREDZONE |
@@ -432,23 +432,23 @@ kalloc_zones_init(struct kheap_zones *zones)
 		    ZONE_ID_ANY, ^(zone_t z){
 			z->kalloc_heap = zones->heap_id;
 		});
-		/*
-		 * Set the updated elem size back to the config
-		 */
+		  
+                                                 
+     
 		cfg[i].kzc_size = k_zone[i]->z_elem_size;
 	}
 
-	/*
-	 * Count all the "raw" views for zones in the heap.
-	 */
+	  
+                                                    
+    
 	zone_view_count += zones->max_k_zone;
 
-	/*
-	 * Build the Direct LookUp Table for small allocations
-	 * As k_zone_cfg is shared between the heaps the
-	 * Direct LookUp Table is also shared and doesn't need to
-	 * be rebuilt per heap.
-	 */
+	  
+                                                       
+                                                 
+                                                          
+                        
+    
 	size = 0;
 	for (int i = 0; i <= KALLOC_DLUT_SIZE; i++, size += KALLOC_MINALIGN) {
 		uint8_t zindex = 0;
@@ -467,33 +467,33 @@ kalloc_zones_init(struct kheap_zones *zones)
 #ifdef KALLOC_DEBUG
 	printf("kalloc_init: k_zindex_start %d\n", zones->k_zindex_start);
 
-	/*
-	 * Do a quick synthesis to see how well/badly we can
-	 * find-a-zone for a given size.
-	 * Useful when debugging/tweaking the array of zone sizes.
-	 * Cache misses probably more critical than compare-branches!
-	 */
+	  
+                                                     
+                                 
+                                                           
+                                                              
+    
 	for (uint32_t i = 0; i < zones->max_k_zone; i++) {
 		vm_size_t testsize = (vm_size_t)(cfg[i].kzc_size - 1);
 		int compare = 0;
 		uint8_t zindex;
 
 		if (testsize < MAX_SIZE_ZDLUT) {
-			compare += 1;   /* 'if' (T) */
+			compare += 1;                 
 
 			long dindex = INDEX_ZDLUT(testsize);
 			zindex = (int)zones->dlut[dindex];
 		} else if (testsize < kalloc_max_prerounded) {
-			compare += 2;   /* 'if' (F), 'if' (T) */
+			compare += 2;                           
 
 			zindex = zones->k_zindex_start;
 			while ((vm_size_t)(cfg[zindex].kzc_size) < testsize) {
 				zindex++;
-				compare++;      /* 'while' (T) */
+				compare++;                       
 			}
-			compare++;      /* 'while' (F) */
+			compare++;                       
 		} else {
-			break;  /* not zone-backed */
+			break;                       
 		}
 		zone_t z = k_zone[zindex];
 		printf("kalloc_init: req size %4lu: %8s.%16s took %d compare%s\n",
@@ -503,13 +503,13 @@ kalloc_zones_init(struct kheap_zones *zones)
 #endif
 }
 
-/*
- *	Initialize the memory allocator.  This should be called only
- *	once on a system wide basis (i.e. first processor to get here
- *	does the initialization).
- *
- *	This initializes all of the zones.
- */
+  
+                                                               
+                                                                
+                            
+  
+                                     
+   
 
 __startup_func
 static void
@@ -520,16 +520,16 @@ kalloc_init(void)
 	vm_size_t kalloc_map_size;
 	vm_map_kernel_flags_t vmk_flags;
 
-	/*
-	 * Scale the kalloc_map_size to physical memory size: stay below
-	 * 1/8th the total zone map size, or 128 MB (for a 32-bit kernel).
-	 */
+	  
+                                                                 
+                                                                   
+    
 	kalloc_map_size = (vm_size_t)(sane_size >> 5);
 #if !__LP64__
 	if (kalloc_map_size > KALLOC_MAP_SIZE_MAX) {
 		kalloc_map_size = KALLOC_MAP_SIZE_MAX;
 	}
-#endif /* !__LP64__ */
+#endif                
 	if (kalloc_map_size < KALLOC_MAP_SIZE_MIN) {
 		kalloc_map_size = KALLOC_MAP_SIZE_MIN;
 	}
@@ -553,24 +553,24 @@ kalloc_init(void)
 	if (kalloc_max < KiB(16)) {
 		kalloc_max = KiB(16);
 	}
-	assert(kalloc_max <= KiB(64)); /* assumption made in size arrays */
+	assert(kalloc_max <= KiB(64));                                     
 
 	kalloc_max_prerounded = kalloc_max / 2 + 1;
-	/* allocations larger than 16 times kalloc_max go directly to kernel map */
+	                                                                           
 	kalloc_kernmap_size = (kalloc_max * 16) + 1;
 	kalloc_largest_allocated = kalloc_kernmap_size;
 
-	/* Initialize kalloc default heap */
+	                                    
 	kalloc_zones_init(&kalloc_zones_default);
 
-	/* Initialize kalloc data buffers heap */
+	                                         
 	if (ZSECURITY_OPTIONS_SUBMAP_USER_DATA & zsecurity_options) {
 		kalloc_zones_init(&kalloc_zones_data_buffers);
 	} else {
 		*KHEAP_DATA_BUFFERS = *KHEAP_DEFAULT;
 	}
 
-	/* Initialize kalloc kext heap */
+	                                 
 	if (ZSECURITY_OPTIONS_SEQUESTER_KEXT_KALLOC & zsecurity_options) {
 		kalloc_zones_init(&kalloc_zones_kext);
 	} else {
@@ -658,14 +658,14 @@ vm_map_lookup_kalloc_entry_locked(vm_map_t map, void *addr)
 }
 
 #if KASAN_KALLOC
-/*
- * KASAN kalloc stashes the original user-requested size away in the poisoned
- * area. Return that directly.
- */
+  
+                                                                             
+                              
+   
 vm_size_t
 kalloc_size(void *addr)
 {
-	(void)vm_map_lookup_kalloc_entry_locked; /* silence warning */
+	(void)vm_map_lookup_kalloc_entry_locked;                      
 	return kasan_user_size((vm_offset_t)addr);
 }
 #else
@@ -727,10 +727,10 @@ kheap_temp_leak_panic(thread_t self)
 	panic("KHEAP_TEMP leak on thread %p (%d) "
 	    "(boot with kheap_temp_debug=1 to debug)",
 	    self, self->t_temp_alloc_count);
-#else /* !DEBUG && !DEVELOPMENT */
+#else                             
 	panic("KHEAP_TEMP leak on thread %p (%d)",
 	    self, self->t_temp_alloc_count);
-#endif /* !DEBUG && !DEVELOPMENT */
+#endif                             
 }
 
 __abortlike
@@ -759,19 +759,19 @@ kalloc_large(
 		panic("trying to kalloc(Z_NOFAIL) with a large size (%zd)",
 		    (size_t)size);
 	}
-	/* kmem_alloc could block so we return if noblock */
+	                                                    
 	if (flags & Z_NOWAIT) {
 		return (struct kalloc_result){ };
 	}
 
 #ifndef __x86_64__
-	/*
-	 * (73465472) on Intel we didn't use to pass this flag,
-	 * which in turned allowed kalloc_large() memory to be shared
-	 * with user directly.
-	 *
-	 * We're bound by this unfortunate ABI.
-	 */
+	  
+                                                        
+                                                              
+                       
+   
+                                        
+    
 	kma_flags |= KMA_KOBJECT;
 #endif
 	if (flags & Z_NOPAGEWAIT) {
@@ -782,7 +782,7 @@ kalloc_large(
 	}
 
 #if KASAN_KALLOC
-	/* large allocation - use guard pages instead of small redzones */
+	                                                                  
 	size = round_page(req_size + 2 * PAGE_SIZE);
 	assert(size >= MAX_SIZE_ZDLUT && size >= kalloc_max_prerounded);
 #else
@@ -815,16 +815,16 @@ kalloc_large(
 
 	if (addr != 0) {
 		kalloc_spin_lock();
-		/*
-		 * Thread-safe version of the workaround for 4740071
-		 * (a double FREE())
-		 */
+		  
+                                                      
+                      
+     
 		if (size > kalloc_largest_allocated) {
 			kalloc_largest_allocated = size;
 		}
 
 		kalloc_large_inuse++;
-		assert(kalloc_large_total + size >= kalloc_large_total); /* no wrap around */
+		assert(kalloc_large_total + size >= kalloc_large_total);                     
 		kalloc_large_total += size;
 		kalloc_large_sum += size;
 
@@ -837,12 +837,12 @@ kalloc_large(
 		KALLOC_ZINFO_SALLOC(size);
 	}
 #if KASAN_KALLOC
-	/* fixup the return address to skip the redzone */
+	                                                  
 	addr = kasan_alloc(addr, size, req_size, PAGE_SIZE);
-	/*
-	 * Initialize buffer with unique pattern only if memory
-	 * wasn't expected to be zeroed.
-	 */
+	  
+                                                        
+                                 
+    
 	if (!(flags & Z_ZERO)) {
 		kasan_leak_init(addr, req_size);
 	}
@@ -865,7 +865,7 @@ kalloc_large(
 			req_size -= sizeof(struct kheap_temp_header);
 			addr     += sizeof(struct kheap_temp_header);
 		}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	}
 
 	DTRACE_VM3(kalloc, vm_size_t, size, vm_size_t, req_size, void*, addr);
@@ -889,14 +889,14 @@ kalloc_ext(
 			req_size += sizeof(struct kheap_temp_header);
 		}
 	}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
-	/*
-	 * Kasan for kalloc heaps will put the redzones *inside*
-	 * the allocation, and hence augment its size.
-	 *
-	 * kalloc heaps do not use zone_t::z_kasan_redzone.
-	 */
+	  
+                                                         
+                                               
+   
+                                                    
+    
 #if KASAN_KALLOC
 	size = kasan_alloc_resize(req_size);
 #else
@@ -953,7 +953,7 @@ kalloc_ext(
 			req_size -= sizeof(struct kheap_temp_header);
 			addr     += sizeof(struct kheap_temp_header);
 		}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	}
 
 	DTRACE_VM3(kalloc, vm_size_t, size, vm_size_t, req_size, void*, addr);
@@ -1076,7 +1076,7 @@ kfree_temp_imbalance_panic(void *data, size_t size)
 	    data, size);
 }
 
-/* used to implement kheap_free_addr() */
+                                         
 #define KFREE_UNKNOWN_SIZE  ((vm_size_t)~0)
 #define KFREE_ABSURD_SIZE \
 	((VM_MAX_KERNEL_ADDRESS - VM_MIN_KERNEL_AND_KEXT_ADDRESS) / 2)
@@ -1103,14 +1103,14 @@ kfree_ext(kalloc_heap_t kheap, void *data, vm_size_t size)
 			data -= sizeof(struct kheap_temp_header);
 			remqueue(&((struct kheap_temp_header *)data)->kht_hdr_link);
 		}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	}
 
 #if KASAN_KALLOC
-	/*
-	 * Resize back to the real allocation size and hand off to the KASan
-	 * quarantine. `data` may then point to a different allocation.
-	 */
+	  
+                                                                     
+                                                                
+    
 	vm_size_t user_size = size;
 	if (size == KFREE_UNKNOWN_SIZE) {
 		user_size = size = kalloc_size(data);
@@ -1198,11 +1198,11 @@ _krealloc_ext(
 		return kalloc_ext(kheap, new_size, flags, site);
 	}
 
-	/*
-	 * Find out the size of the bucket in which the new sized allocation
-	 * would land. If it matches the bucket of the original allocation,
-	 * simply return the same address.
-	 */
+	  
+                                                                     
+                                                                    
+                                   
+    
 	new_bucket_size = kalloc_bucket_size(new_size);
 	if (old_size == KFREE_UNKNOWN_SIZE) {
 		old_size = old_bucket_size = kalloc_size(addr);
@@ -1290,10 +1290,10 @@ kheap_startup_init(kalloc_heap_t kheap)
 }
 
 #pragma mark OSMalloc
-/*
- * This is a deprecated interface, here only for legacy reasons.
- * There is no internal variant of any of these symbols on purpose.
- */
+  
+                                                                
+                                                                   
+   
 #define OSMallocDeprecated
 #include <libkern/OSMalloc.h>
 
@@ -1417,7 +1417,7 @@ OSMalloc_nowait_external(uint32_t size, OSMallocTag tag)
 	}
 
 	OSMalloc_Tagref(tag);
-	/* XXX: use non-blocking kalloc for now */
+	                                          
 	addr = kheap_alloc_tag_bt(OSMALLOC, (vm_size_t)size,
 	    Z_NOWAIT, VM_KERN_MEMORY_KALLOC);
 	if (addr == NULL) {
@@ -1502,10 +1502,10 @@ kern_os_zfree(zone_t zone, void *addr, vm_size_t size)
 	    || zone_owns(zone, addr)) {
 		zfree(zone, addr);
 	} else {
-		/*
-		 * Third party kexts might not know about the operator new
-		 * and be allocated from the KEXT heap
-		 */
+		  
+                                                            
+                                        
+     
 		printf("kern_os_zfree: kheap_free called for object from zone %s\n",
 		    zone->z_name);
 		kheap_free(KHEAP_KEXT, addr, size);
@@ -1518,14 +1518,14 @@ kern_os_kfree(void *addr, vm_size_t size)
 	if (zsecurity_options & ZSECURITY_OPTIONS_STRICT_IOKIT_FREE) {
 		kheap_free(KHEAP_DEFAULT, addr, size);
 	} else {
-		/*
-		 * Third party kexts may not know about newly added operator
-		 * default new/delete. If they call new for any iokit object
-		 * it will end up coming from the KEXT heap. If these objects
-		 * are freed by calling release() or free(), the internal
-		 * version of operator delete is called and the kernel ends
-		 * up freeing the object to the DEFAULT heap.
-		 */
+		  
+                                                              
+                                                              
+                                                               
+                                                           
+                                                             
+                                               
+     
 		kheap_free(KHEAP_ANY, addr, size);
 	}
 }

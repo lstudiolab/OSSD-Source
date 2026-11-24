@@ -53,21 +53,21 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Author: David B. Golub, Carnegie Mellon University
- *	Date:   8/89
- */
+  
+   
+  
+                                                     
+               
+   
 
 #ifndef _DEVICE_DEVICE_PORT_H_
 #define _DEVICE_DEVICE_PORT_H_
 
 #include <device/device_types.h>
 
-/*
- *	Master privileged I/O object for this host
- */
+  
+                                             
+   
 extern mach_port_t      master_device_port;
 
 #define DEVICE_PAGER_GUARDED            0x1
@@ -83,12 +83,12 @@ extern mach_port_t      master_device_port;
 _Static_assert(((DEVICE_PAGER_CONTIGUOUS | DEVICE_PAGER_NOPHYSCACHE) & VM_WIMG_MASK) == 0,
     "device pager flags overlap WIMG mask");
 
-/* Assert on the backwards-compatible DEVICE_PAGER* values */
+                                                             
 _Static_assert(DEVICE_PAGER_GUARDED == VM_MEM_GUARDED, "DEVICE_PAGER_GUARDED != VM_MEM_GUARDED");
 _Static_assert(DEVICE_PAGER_COHERENT == VM_MEM_COHERENT, "DEVICE_PAGER_COHERENT != VM_MEM_COHERENT");
 _Static_assert(DEVICE_PAGER_CACHE_INHIB == VM_MEM_NOT_CACHEABLE, "DEVICE_PAGER_CACHE_INHIB != VM_MEM_NOT_CACHEABLE");
 _Static_assert(DEVICE_PAGER_WRITE_THROUGH == VM_MEM_WRITE_THROUGH, "DEVICE_PAGER_WRITE_THROUGH != VM_MEM_WRITE_THROUGH");
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif  /* _DEVICE_DEVICE_PORT_H_ */
+#endif                              

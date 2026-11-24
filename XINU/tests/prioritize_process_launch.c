@@ -1,6 +1,6 @@
-/*
- * prioritize process launch: Tests prioritized process launch across posix spawn and exec.
- */
+  
+                                                                                           
+   
 
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
@@ -229,7 +229,7 @@ thread_sync_rcv(void *arg)
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
 	sr_port = special_reply_port;
-	/* Do a sync rcv on special reply port and push on given arg port */
+	                                                                    
 	receive(special_reply_port, port);
 	return NULL;
 }
@@ -264,7 +264,7 @@ get_sync_push_port_at_qos(qos_class_t qos)
 	pthread_t pthread;
 	thread_t thread;
 
-	/* Create a rcv right to have a sync ipc push from a thread */
+	                                                              
 	kr = mach_port_allocate(mach_task_self(),
 	    MACH_PORT_RIGHT_RECEIVE,
 	    &port);
@@ -278,7 +278,7 @@ get_sync_push_port_at_qos(qos_class_t qos)
 
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "sync push port mach_port_insert_right");
 
-	/* Create a thread at given qos and start a sync push on given port */
+	                                                                      
 	pthread = thread_create_at_qos(qos, thread_sync_rcv, (void *)(uintptr_t)port);
 	thread = pthread_mach_thread_np(pthread);
 	thread_wait_to_block(thread);
@@ -292,7 +292,7 @@ create_port_and_copyin_a_port(mach_port_t port)
 	mach_port_t new_port;
 	kern_return_t kr;
 
-	/* Create a rcv right */
+	                        
 	kr = mach_port_allocate(mach_task_self(),
 	    MACH_PORT_RIGHT_RECEIVE,
 	    &new_port);
@@ -368,13 +368,13 @@ workloop_cb_test_intransit(uint64_t *workloop_id __unused, void **eventslist, in
 
 	pid = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "WAIT", &port, 1);
 
-	/* Make sure our priority has dropped */
+	                                        
 	priority = get_pri(mach_thread_self());
 	T_EXPECT_EQ(priority, 31, "Priority of servicer is %d", priority);
 
 	sleep(2);
 
-	/*enqueue the port to sever the temp onwer boost */
+	                                                   
 	create_port_and_copyin_a_port(port);
 
 	waitpid(pid, &stat, 0);
@@ -407,7 +407,7 @@ workloop_cb_test_knote_kill(uint64_t *workloop_id __unused, void **eventslist, i
 
 	sleep(2);
 
-	/* Make sure our priority is boosted again */
+	                                             
 	priority = get_pri(mach_thread_self());
 	T_EXPECT_EQ(priority, 47, "Priority of servicer is %d", priority);
 
@@ -433,7 +433,7 @@ workloop_cb_test_sync_bootstrap(uint64_t *workloop_id __unused, void **eventslis
 	T_LOG("Workloop handler workloop_cb_test_knote_kill called. ");
 	T_LOG("The total events returned is %d", *events);
 
-	/* Check if called for peek */
+	                              
 	if (hdr == NULL) {
 		priority = get_pri(mach_thread_self());
 		T_EXPECT_EQ(priority, 47, "Priority of servicer is %d", priority);
@@ -441,7 +441,7 @@ workloop_cb_test_sync_bootstrap(uint64_t *workloop_id __unused, void **eventslis
 		port = (mach_port_t)kev->ident;
 		pid = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "MSGSYNC", &port, 1);
 	} else {
-		/* Wait till the priority of servicer is 47 */
+		                                              
 		T_LOG("Waiting for the servicer to be boosted");
 		do {
 			sleep(1);
@@ -450,14 +450,14 @@ workloop_cb_test_sync_bootstrap(uint64_t *workloop_id __unused, void **eventslis
 
 		T_EXPECT_EQ(priority, 47, "Priority of servicer is %d", priority);
 
-		/* Get the reply port and send the receive right in it */
+		                                                         
 		mach_port_t reply_port = hdr->msgh_remote_port;
 		T_LOG("The rcv right to send is %d", port);
 		send(reply_port, MACH_PORT_NULL, port, 0, 0, MACH_MSG_TYPE_MOVE_SEND_ONCE);
 
 		waitpid(pid, &stat, 0);
 
-		/* The handler priority should not be boosted anymore */
+		                                                        
 		priority = get_pri(mach_thread_self());
 		T_EXPECT_EQ(priority, 31, "Priority of servicer is %d", priority);
 
@@ -476,14 +476,14 @@ register_workloop_for_port(
 {
 	int r;
 
-	/* register workloop handler with pthread */
+	                                            
 	if (func != NULL) {
 		T_QUIET; T_ASSERT_POSIX_ZERO(_pthread_workqueue_init_with_workloop(
 			    worker_cb, event_cb,
 			    (pthread_workqueue_function_workloop_t)func, 0, 0), NULL);
 	}
 
-	/* attach port to workloop */
+	                             
 	struct kevent_qos_s kev[] = {{
 					     .ident = port,
 					     .filter = EVFILT_MACHPORT,
@@ -495,7 +495,7 @@ register_workloop_for_port(
 
 	struct kevent_qos_s kev_err[] = {{ 0 }};
 
-	/* Setup workloop for mach msg rcv */
+	                                     
 	r = kevent_id(25, kev, 1, kev_err, 1, NULL,
 	    NULL, KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_ERROR_EVENTS);
 
@@ -503,12 +503,12 @@ register_workloop_for_port(
 	T_QUIET; T_ASSERT_EQ(r, 0, "no errors returned from kevent_id");
 }
 
-/*
- * Test 1: Test turnstile boosting for temp owner ports for posix_spawn.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port.
- */
+  
+                                                                        
+  
+                                                                                             
+                                                                
+   
 T_DECL(posix_spawn_basic_priority, "Basic posix spawn temp owner priority test", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -525,13 +525,13 @@ T_DECL(posix_spawn_basic_priority, "Basic posix spawn temp owner priority test",
 	T_END;
 }
 
-/*
- * Test 2: Test turnstile boosting for temp owner ports for posix_spawn and exec.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port. The spawned binary will exec
- * and verify that it still has the push.
- */
+  
+                                                                                 
+  
+                                                                                             
+                                                                                             
+                                         
+   
 T_DECL(posix_spawn_exec_basic_priority, "Basic posix spawn/exec temp owner priority test", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -548,13 +548,13 @@ T_DECL(posix_spawn_exec_basic_priority, "Basic posix spawn/exec temp owner prior
 	T_END;
 }
 
-/*
- * Test 3: Test turnstile boosting for temp owner ports for posix_spawn and set exec.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port. The spawned binary will
- * posix_spawn set exec and verify that it still has the push.
- */
+  
+                                                                                     
+  
+                                                                                             
+                                                                                        
+                                                              
+   
 T_DECL(posix_spawn_set_exec_basic_priority, "Basic posix spawn set exec temp owner priority test", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -571,13 +571,13 @@ T_DECL(posix_spawn_set_exec_basic_priority, "Basic posix spawn set exec temp own
 	T_END;
 }
 
-/*
- * Test 4: Test turnstile boosting for temp owner ports for posix_spawn and set exec.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port. The spawned binary already
- * having the temp owner push will try to do set exec with watchports which should fail.
- */
+  
+                                                                                     
+  
+                                                                                             
+                                                                                           
+                                                                                        
+   
 T_DECL(posix_spawn_set_exec_with_more_ports, "posix spawn set exec with more watch ports", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -594,13 +594,13 @@ T_DECL(posix_spawn_set_exec_with_more_ports, "posix spawn set exec with more wat
 	T_END;
 }
 
-/*
- * Test 5: Test turnstile boosting for temp owner ports for multiple posix_spawns.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port, then
- * pass the same port as a watchport to another posix_spawn and verify that the boost was
- * transferred to the new process.
- */
+  
+                                                                                  
+  
+                                                                                               
+                                                                                         
+                                  
+   
 T_DECL(posix_spawn_multiple, "multiple posix_spawn with same watchport", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -610,7 +610,7 @@ T_DECL(posix_spawn_multiple, "multiple posix_spawn with same watchport", T_META_
 	port = get_sync_push_port_at_qos(QOS_CLASS_USER_INTERACTIVE);
 	pid1 = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "WAIT", &port, 1);
 
-	/* Let the child 1 execute a little, the sleep here is optional */
+	                                                                  
 	sleep(2);
 
 	pid2 = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "EXIT", &port, 1);
@@ -625,13 +625,13 @@ T_DECL(posix_spawn_multiple, "multiple posix_spawn with same watchport", T_META_
 	T_END;
 }
 
-/*
- * Test 6: Test turnstile boosting for temp owner ports for posix_spawn for dead port.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port. Destroy the port and verify
- * the temp owner push has gone away.
- */
+  
+                                                                                      
+  
+                                                                                             
+                                                                                            
+                                     
+   
 T_DECL(posix_spawn_dead_reply_port, "posix spawn with reply port destory", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -642,10 +642,10 @@ T_DECL(posix_spawn_dead_reply_port, "posix spawn with reply port destory", T_MET
 	port = get_sync_push_port_at_qos(QOS_CLASS_USER_INTERACTIVE);
 	pid = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "WAIT", &port, 1);
 
-	/* Let the child execute a little, the sleep here is optional */
+	                                                                
 	sleep(2);
 
-	/* Destory the special reply port */
+	                                    
 	kr = mach_port_mod_refs(mach_task_self(), sr_port, MACH_PORT_RIGHT_RECEIVE, -1);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "posix_spaw_dead_port  mach_port_mod_refs");
 
@@ -656,13 +656,13 @@ T_DECL(posix_spawn_dead_reply_port, "posix spawn with reply port destory", T_MET
 	T_END;
 }
 
-/*
- * Test 7: Test turnstile boosting for temp owner ports for posix_spawn for dead port.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port. Destroy the port and verify
- * the temp owner push has gone.
- */
+  
+                                                                                      
+  
+                                                                                             
+                                                                                            
+                                
+   
 T_DECL(posix_spawn_dead_port, "posix spawn with port destory", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -673,7 +673,7 @@ T_DECL(posix_spawn_dead_port, "posix spawn with port destory", T_META_ASROOT(YES
 	port = get_sync_push_port_at_qos(QOS_CLASS_USER_INTERACTIVE);
 	pid = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "WAIT", &port, 1);
 
-	/* Destory the port */
+	                      
 	kr = mach_port_mod_refs(mach_task_self(), port, MACH_PORT_RIGHT_RECEIVE, -1);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "posix_spaw_dead_port  mach_port_mod_refs");
 
@@ -684,13 +684,13 @@ T_DECL(posix_spawn_dead_port, "posix spawn with port destory", T_META_ASROOT(YES
 	T_END;
 }
 
-/*
- * Test 8: Test turnstile boosting for temp owner ports for posix_spawn when port is copied in.
- *
- * Create a port with sync IPC push and then pass the port to posix_spawn as a watch port and
- * test that spawned binary has the temp owner push of the port. Copyin the port and verify
- * the temp owner push has gone.
- */
+  
+                                                                                               
+  
+                                                                                             
+                                                                                           
+                                
+   
 T_DECL(posix_spawn_copyin_port, "posix spawn with copyin port", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -700,10 +700,10 @@ T_DECL(posix_spawn_copyin_port, "posix spawn with copyin port", T_META_ASROOT(YE
 	port = get_sync_push_port_at_qos(QOS_CLASS_USER_INTERACTIVE);
 	pid = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "WAIT", &port, 1);
 
-	/* Let the child execute a little, the sleep here is optional */
+	                                                                
 	sleep(2);
 
-	/* Copyin the port in another port */
+	                                     
 	create_port_and_copyin_a_port(port);
 
 	waitpid(pid, &stat, 0);
@@ -713,13 +713,13 @@ T_DECL(posix_spawn_copyin_port, "posix spawn with copyin port", T_META_ASROOT(YE
 	T_END;
 }
 
-/*
- * Test 9: Test turnstile boosting for temp owner ports for posix_spawn with multiple ports.
- *
- * Create multiple ports with sync IPC push and then pass the port to posix_spawn as watch ports and
- * test that spawned binary has the temp owner push of the ports. Copyin ports one by one and verify
- * the push has gone.
- */
+  
+                                                                                            
+  
+                                                                                                    
+                                                                                                    
+                     
+   
 T_DECL(posix_spawn_multiple_port, "posix spawn with multiple ports", T_META_ASROOT(YES))
 {
 	mach_port_t port[2];
@@ -730,16 +730,16 @@ T_DECL(posix_spawn_multiple_port, "posix spawn with multiple ports", T_META_ASRO
 	port[1] = get_sync_push_port_at_qos(QOS_CLASS_USER_INITIATED);
 	pid = posix_spawn_child_with_watch_ports("prioritize_process_launch_helper", "MULTIWAIT", port, 2);
 
-	/* Let the child execute a little, the sleep here is optional */
+	                                                                
 	sleep(2);
 
-	/* Copyin the port in another port */
+	                                     
 	create_port_and_copyin_a_port(port[0]);
 
-	/* Let the child execute a little, the sleep here is optional */
+	                                                                
 	sleep(2);
 
-	/* Copyin the port in another port */
+	                                     
 	create_port_and_copyin_a_port(port[1]);
 
 	waitpid(pid, &stat, 0);
@@ -749,35 +749,35 @@ T_DECL(posix_spawn_multiple_port, "posix spawn with multiple ports", T_META_ASRO
 	T_END;
 }
 
-/*
- * Test 10: Test turnstile boosting for temp owner ports for posix_spawn when port attached to a knote.
- *
- * Create a port with sync IPC push attach a workloop knote to it, send a message on the port, then in the
- * servicer pass the port to posix_spawn as a watch port and test that spawned binary has the temp owner
- * push of the port and the servicer looses the boost.
- */
+  
+                                                                                                       
+  
+                                                                                                          
+                                                                                                        
+                                                      
+   
 T_DECL(posix_spawn_knote, "posix spawn with temp owner port attached to knote", T_META_ASROOT(YES))
 {
 	mach_port_t port;
 
 	port = get_sync_push_port_at_qos(QOS_CLASS_USER_INTERACTIVE);
 
-	/* attach port to a workloop */
+	                               
 	register_workloop_for_port(port, workloop_cb_test_intransit, MACH_RCV_OPTIONS);
 
-	/* send a message on port to activate workloop handler */
+	                                                         
 	send(port, MACH_PORT_NULL, MACH_PORT_NULL, QOS_CLASS_DEFAULT, 0, MACH_MSG_TYPE_COPY_SEND);
 	sigsuspend(0);
 }
 
-/*
- * Test 11: Test turnstile boosting for temp owner ports for posix_spawn when port attached to a knote.
- *
- * Create a port with sync IPC push attach a workloop knote to it, send a message on the port, then in the
- * servicer pass the port to posix_spawn as a watch port and test that spawned binary has the temp owner
- * push of the port and the servicer looses the boost, verify that once the spawned binary dies, the servicer
- * gets the push.
- */
+  
+                                                                                                       
+  
+                                                                                                          
+                                                                                                        
+                                                                                                             
+                 
+   
 T_DECL(posix_spawn_knote_ret, "posix spawn with temp owner port attached to knote with spawned binary dead", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -786,19 +786,19 @@ T_DECL(posix_spawn_knote_ret, "posix spawn with temp owner port attached to knot
 
 	register_workloop_for_port(port, workloop_cb_test_knote_kill, MACH_RCV_OPTIONS);
 
-	/* send a message on port to activate workloop handler */
+	                                                         
 	send(port, MACH_PORT_NULL, MACH_PORT_NULL, QOS_CLASS_DEFAULT, 0, MACH_MSG_TYPE_COPY_SEND);
 	sigsuspend(0);
 }
 
-/*
- * Test 12: Test turnstile boosting for temp owner ports and mach msg option for sync bootstrap_checkin.
- *
- * Create a port with sync IPC push attach a workloop knote to it, send a message on the port, then in the
- * servicer pass the port to posix_spawn as a watch port and test that spawned binary has the temp owner
- * push of the port and the servicer looses the boost, the spawn binary then does a sync bootstrap_checkin
- * with test binary to get the receive right and verify that is still has the boost.
- */
+  
+                                                                                                        
+  
+                                                                                                          
+                                                                                                        
+                                                                                                          
+                                                                                    
+   
 T_DECL(mach_msg_sync_boostrap_checkin, "test mach msg option for sync bootstrap_checkin", T_META_ASROOT(YES))
 {
 	mach_port_t port;
@@ -809,7 +809,7 @@ T_DECL(mach_msg_sync_boostrap_checkin, "test mach msg option for sync bootstrap_
 
 	register_workloop_for_port(port, workloop_cb_test_sync_bootstrap, MACH_RCV_SYNC_PEEK);
 
-	/* Create a mach port for spawned binary to do bootstrap checkin */
+	                                                                   
 	kr = mach_port_allocate(mach_task_self(),
 	    MACH_PORT_RIGHT_RECEIVE,
 	    &sync_port);
@@ -828,11 +828,11 @@ T_DECL(mach_msg_sync_boostrap_checkin, "test mach msg option for sync bootstrap_
 
 	register_workloop_for_port(sync_port, NULL, MACH_RCV_OPTIONS);
 
-	/* Stash the port in task to make sure child also gets it */
+	                                                            
 	kr = mach_ports_register(mach_task_self(), &sync_port, 1);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_msg_sync_boostrap_checkin mach_ports_register");
 
-	/* send a message on port to activate workloop handler */
+	                                                         
 	send(port, MACH_PORT_NULL, MACH_PORT_NULL, QOS_CLASS_DEFAULT, 0, MACH_MSG_TYPE_COPY_SEND);
 	sigsuspend(0);
 }

@@ -91,7 +91,7 @@ iocpu_add_platform_action(queue_head_t * queue, iocpu_platform_action_entry_t * 
 			return;
 		}
 	}
-	queue_enter(queue, entry, iocpu_platform_action_entry_t *, link); // at tail
+	queue_enter(queue, entry, iocpu_platform_action_entry_t *, link);           
 }
 
 static void
@@ -112,7 +112,7 @@ iocpu_run_platform_actions(queue_head_t * queue, uint32_t first_priority, uint32
 	{
 		uint32_t pri = (next->priority < 0) ? -next->priority : next->priority;
 		if ((pri >= first_priority) && (pri <= last_priority)) {
-			//kprintf("[%p]", next->action);
+			                                
 			if (!allow_nested_callouts && !next->callout_in_progress) {
 				next->callout_in_progress = TRUE;
 				ret = (*next->action)(next->refcon0, next->refcon1, pri, param1, param2, param3, next->name);
@@ -160,7 +160,7 @@ IOCPURunPlatformHaltRestartActions(uint32_t message)
 extern "C" kern_return_t
 IOCPURunPlatformPanicActions(uint32_t message, uint32_t details)
 {
-	// Don't allow nested calls of panic actions
+	                                            
 	if (!gActionQueues[kQueuePanic].next) {
 		return kIOReturnNotReady;
 	}
@@ -177,7 +177,7 @@ IOCPURunPlatformPanicSyncAction(void *addr, uint32_t offset, uint32_t len)
 		.psc_length = len
 	};
 
-	// Don't allow nested calls of panic actions
+	                                            
 	if (!gActionQueues[kQueuePanic].next) {
 		return kIOReturnNotReady;
 	}

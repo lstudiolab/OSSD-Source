@@ -64,11 +64,11 @@
  *
  *	from: @(#)kern_physio.c	8.1 (Berkeley) 6/10/93
  */
-/*
- * HISTORY
- * 27-July-97  Umesh Vaishampayan  (umeshv@apple.com)
- *	Allow physio() to kernel space.
- */
+  
+          
+                                                     
+                                  
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -97,13 +97,13 @@ physio( void (*f_strategy)(buf_t),
 	flags &= B_READ | B_WRITE;
 	buf_allocated = 0;
 
-	/*
-	 * [check user read/write access to the data buffer]
-	 *
-	 * Check each iov one by one.  Note that we know if we're reading or
-	 * writing, so we ignore the uio's rw parameter.  Also note that if
-	 * we're doing a read, that's a *write* to user-space.
-	 */
+	  
+                                                     
+   
+                                                                     
+                                                                    
+                                                       
+    
 	for (i = 0; i < uio->uio_iovcnt; i++) {
 		if (UIO_SEG_IS_USER_SPACE(uio->uio_segflg)) {
 			user_addr_t base;
@@ -117,75 +117,75 @@ physio( void (*f_strategy)(buf_t),
 			}
 		}
 	}
-	/*
-	 * Make sure we have a buffer, creating one if necessary.
-	 */
+	  
+                                                          
+    
 	if (bp == NULL) {
 		bp = buf_alloc((vnode_t)0);
 		buf_allocated = 1;
 	} else {
 		orig_bflags = buf_flags(bp);
 	}
-	/*
-	 * at this point we should have a buffer
-	 * that is marked BL_BUSY... we either
-	 * acquired it via buf_alloc, or it was
-	 * passed into us... if it was passed
-	 * in, it needs to already be owned by
-	 * the caller (i.e. BL_BUSY is set)
-	 */
+	  
+                                         
+                                       
+                                        
+                                      
+                                       
+                                    
+    
 	assert(bp->b_lflags & BL_BUSY);
 
-	/*
-	 * [set up the fixed part of the buffer for a transfer]
-	 */
+	  
+                                                        
+    
 	bp->b_dev = dev;
 	bp->b_proc = p;
 
-	/*
-	 * [mark the buffer busy for physical I/O]
-	 * (i.e. set B_PHYS (because it's an I/O to user
-	 * memory, and B_RAW, because B_RAW is to be
-	 * "Set by physio for raw transfers.", in addition
-	 * to the read/write flag.)
-	 */
+	  
+                                           
+                                                 
+                                             
+                                                   
+                            
+    
 	buf_setflags(bp, B_PHYS | B_RAW);
 
-	/*
-	 * [while there is data to transfer and no I/O error]
-	 * Note that I/O errors are handled with a 'goto' at the bottom
-	 * of the 'while' loop.
-	 */
+	  
+                                                      
+                                                                
+                        
+    
 	while (uio_resid(uio) > 0) {
 		iosize = uio_curriovlen(uio);
 		if (iosize > MAXPHYSIO_WIRED) {
 			iosize = MAXPHYSIO_WIRED;
 		}
 
-		/*
-		 * make sure we're set to issue a fresh I/O
-		 * in the right direction
-		 */
+		  
+                                             
+                           
+     
 		buf_reset(bp, flags);
 
-		/* [set up the buffer for a maximum-sized transfer] */
+		                                                      
 		buf_setblkno(bp, uio_offset(uio) / blocksize);
 		assert(iosize <= UINT32_MAX);
 		buf_setcount(bp, (uint32_t)iosize);
 		buf_setdataptr(bp, (uintptr_t)CAST_DOWN(caddr_t, uio_curriovbase(uio)));
 
-		/*
-		 * [call f_minphys to bound the tranfer size]
-		 * and remember the amount of data to transfer,
-		 * for later comparison.
-		 */
+		  
+                                               
+                                                 
+                          
+     
 		(*f_minphys)(bp);
 		todo = buf_count(bp);
 
-		/*
-		 * [lock the part of the user address space involved
-		 *    in the transfer]
-		 */
+		  
+                                                      
+                        
+     
 
 		if (UIO_SEG_IS_USER_SPACE(uio->uio_segflg)) {
 			error = vslock(CAST_USER_ADDR_T(buf_dataptr(bp)),
@@ -195,35 +195,35 @@ physio( void (*f_strategy)(buf_t),
 			}
 		}
 
-		/* [call f_strategy to start the transfer] */
+		                                             
 		(*f_strategy)(bp);
 
 
-		/* [wait for the transfer to complete] */
+		                                         
 		error = (int)buf_biowait(bp);
 
-		/*
-		 * [unlock the part of the address space previously
-		 *    locked]
-		 */
+		  
+                                                     
+               
+     
 		if (UIO_SEG_IS_USER_SPACE(uio->uio_segflg)) {
 			vsunlock(CAST_USER_ADDR_T(buf_dataptr(bp)),
 			    (user_size_t)todo,
 			    (flags & B_READ));
 		}
 
-		/*
-		 * [deduct the transfer size from the total number
-		 *    of data to transfer]
-		 */
+		  
+                                                    
+                            
+     
 		done = buf_count(bp) - buf_resid(bp);
 		assert(0 <= done && done <= UINT32_MAX);
 		uio_update(uio, (user_size_t)done);
 
-		/*
-		 * Now, check for an error.
-		 * Also, handle weird end-of-disk semantics.
-		 */
+		  
+                             
+                                              
+     
 		if (error || done < todo) {
 			goto finished;
 		}
@@ -239,15 +239,15 @@ finished:
 	return error;
 }
 
-/*
- * Leffler, et al., says on p. 231:
- * "The minphys() routine is called by physio() to adjust the
- * size of each I/O transfer before the latter is passed to
- * the strategy routine..."
- *
- * so, just adjust the buffer's count accounting to MAXPHYS here,
- * and return the new count;
- */
+  
+                                   
+                                                             
+                                                           
+                           
+  
+                                                                 
+                            
+   
 u_int
 minphys(struct buf *bp)
 {

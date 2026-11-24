@@ -27,7 +27,7 @@ def IterateTAILQ_HEAD(headval, element_name):
     while unsigned(iter_val) != 0 :
         yield iter_val
         iter_val = iter_val.__getattr__(element_name).tqe_next
-    #end of yield loop
+                      
 
 def IterateLinkedList(element, field_name):
     """ iterate over a linked list.
@@ -45,7 +45,7 @@ def IterateLinkedList(element, field_name):
     while unsigned(elt) != 0:
         yield elt
         elt = elt.__getattr__(field_name)
-    #end of while loop
+                      
 
 def IterateListEntry(element, element_type, field_name, list_prefix=''):
     """ iterate over a list as defined with LIST_HEAD in bsd/sys/queue.h
@@ -103,8 +103,8 @@ def IterateLinkageChain(queue_head, element_type, field_name, field_ofst=0):
     link = queue_head.next
     while (unsigned(link) != unsigned(queue_head)):
         addr = unsigned(link) - elem_ofst;
-        # I can't use the GetValueFromAddress function of the kernel class
-        # because I have no instance of that class!
+                                                                          
+                                                   
         obj = value(link.GetSBValue().CreateValueFromExpression(None,'(void *)'+str(addr)))
         obj = cast(obj, element_type)
         yield obj
@@ -199,17 +199,17 @@ def IterateRBTreeEntry(element, element_type, field_name):
     if type(element_type) == str:
         element_type = gettype(element_type)
 
-    # Walk to find min
+                      
     parent = elt
     while unsigned(elt) != 0:
         parent = elt
         elt = cast(elt.__getattr__(field_name).__getattr__('rbe_left'), element_type)
     elt = parent
 
-    # Now elt is min
+                    
     while unsigned(elt) != 0:
         yield elt
-        # implementation cribbed from RB_NEXT in libkern/tree.h
+                                                               
         right = cast(elt.__getattr__(field_name).__getattr__('rbe_right'), element_type)
         if unsigned(right) != 0:
             elt = right
@@ -219,7 +219,7 @@ def IterateRBTreeEntry(element, element_type, field_name):
                 left = cast(elt.__getattr__(field_name).__getattr__('rbe_left'), element_type)
         else:
 
-            # avoid using GetValueFromAddress
+                                             
             addr = elt.__getattr__(field_name).__getattr__('rbe_parent')&~1
             parent = value(elt.GetSBValue().CreateValueFromExpression(None,'(void *)'+str(addr)))
             parent = cast(parent, element_type)
@@ -234,14 +234,14 @@ def IterateRBTreeEntry(element, element_type, field_name):
                 while unsigned(parent) != 0 and (unsigned(elt) == unsigned(right)):
                     elt = parent
 
-                    # avoid using GetValueFromAddress
+                                                     
                     addr = elt.__getattr__(field_name).__getattr__('rbe_parent')&~1
                     parent = value(elt.GetSBValue().CreateValueFromExpression(None,'(void *)'+str(addr)))
                     parent = cast(parent, element_type)
 
                     right = cast(parent.__getattr__(field_name).__getattr__('rbe_right'), element_type)
 
-                # avoid using GetValueFromAddress
+                                                 
                 addr = elt.__getattr__(field_name).__getattr__('rbe_parent')&~1
                 elt = value(elt.GetSBValue().CreateValueFromExpression(None,'(void *)'+str(addr)))
                 elt = cast(elt, element_type)
@@ -307,7 +307,7 @@ class KernelTarget(object):
         """ Initialize the kernel debugging environment.
             Target properties like architecture and connectedness are lazy-evaluted.
         """
-        self._debugger = debugger # This holds an lldb.SBDebugger object for debugger state
+        self._debugger = debugger                                                          
         self._threads_list = []
         self._tasks_list = []
         self._coalitions_list = []
@@ -317,10 +317,10 @@ class KernelTarget(object):
         self._terminated_threads_list = []
         self._zones_list = []
         self._zombproc_list = []
-        self._kernel_types_cache = {} #this will cache the Type objects as and when requested.
+        self._kernel_types_cache = {}                                                         
         self._version = None
         self._arch = None
-        self._ptrsize = None # pointer size of kernel, not userspace
+        self._ptrsize = None                                        
         self.symbolicator = None
         class _GlobalVariableFind(object):
             def __init__(self, kern):

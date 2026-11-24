@@ -47,4 +47,4 @@ kern_return_t kext_receipt_set_queried(void);
 
 __END_DECLS
 
-#endif /* _KEXT_ALLOC_H_ */
+#endif                     

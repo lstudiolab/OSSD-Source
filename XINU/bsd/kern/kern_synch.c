@@ -54,10 +54,10 @@
 #include <kern/locks.h>
 #include <kern/policy_internal.h>
 
-#include <sys/systm.h>                  /* for unix_syscall_return() */
+#include <sys/systm.h>                                                 
 #include <libkern/OSAtomic.h>
 
-extern void compute_averunnable(void *);        /* XXX */
+extern void compute_averunnable(void *);                 
 
 __attribute__((noreturn))
 static void
@@ -80,11 +80,11 @@ _sleep_continue( __unused void *parameter, wait_result_t wresult)
 		error = EWOULDBLOCK;
 		break;
 	case THREAD_AWAKENED:
-		/*
-		 * Posix implies any signal should be delivered
-		 * first, regardless of whether awakened due
-		 * to receiving event.
-		 */
+		  
+                                                 
+                                              
+                        
+     
 		if (!catch) {
 			break;
 		}
@@ -105,7 +105,7 @@ _sleep_continue( __unused void *parameter, wait_result_t wresult)
 					error = EINTR;
 				}
 			} else if ((ut->uu_flag & (UT_CANCELDISABLE | UT_CANCEL | UT_CANCELED)) == UT_CANCEL) {
-				/* due to thread cancel */
+				                          
 				error = EINTR;
 			}
 		} else {
@@ -131,26 +131,26 @@ _sleep_continue( __unused void *parameter, wait_result_t wresult)
 	unix_syscall_return((*ut->uu_continuation)(error));
 }
 
-/*
- * Give up the processor till a wakeup occurs
- * on chan, at which time the process
- * enters the scheduling queue at priority pri.
- * The most important effect of pri is that when
- * pri<=PZERO a signal cannot disturb the sleep;
- * if pri>PZERO signals will be processed.
- * If pri&PCATCH is set, signals will cause sleep
- * to return 1, rather than longjmp.
- * Callers of this routine must be prepared for
- * premature return, and check that the reason for
- * sleeping has gone away.
- *
- * if msleep was the entry point, than we have a mutex to deal with
- *
- * The mutex is unlocked before the caller is blocked, and
- * relocked before msleep returns unless the priority includes the PDROP
- * flag... if PDROP is specified, _sleep returns with the mutex unlocked
- * regardless of whether it actually blocked or not.
- */
+  
+                                             
+                                     
+                                               
+                                                
+                                                
+                                          
+                                                 
+                                    
+                                               
+                                                  
+                          
+  
+                                                                   
+  
+                                                          
+                                                                        
+                                                                        
+                                                    
+   
 
 static int
 _sleep(
@@ -174,7 +174,7 @@ _sleep(
 
 	p = current_proc();
 	p->p_priority = pri & PRIMASK;
-	/* It can still block in proc_exit() after the teardown. */
+	                                                           
 	if (p->p_stats != NULL) {
 		OSIncrementAtomicLong(&p->p_stats->p_ru.ru_nvcsw);
 	}
@@ -185,7 +185,7 @@ _sleep(
 		catch = THREAD_UNINT;
 	}
 
-	/* set wait message & channel */
+	                                
 	ut->uu_wchan = chan;
 	ut->uu_wmesg = wmsg ? wmsg : "unknown";
 
@@ -260,7 +260,7 @@ block:
 			ut->uu_pri  = (uint16_t)pri;
 			ut->uu_mtx  = mtx;
 			(void) thread_block(_sleep_continue);
-			/* NOTREACHED */
+			                
 		}
 
 		wait_result = thread_block(THREAD_CONTINUE_NULL);
@@ -280,11 +280,11 @@ block:
 		break;
 	case THREAD_AWAKENED:
 	case THREAD_RESTART:
-		/*
-		 * Posix implies any signal should be delivered
-		 * first, regardless of whether awakened due
-		 * to receiving event.
-		 */
+		  
+                                                 
+                                              
+                        
+     
 		if (catch != THREAD_ABORTSAFE) {
 			break;
 		}
@@ -305,7 +305,7 @@ block:
 					error = EINTR;
 				}
 			} else if ((ut->uu_flag & (UT_CANCELDISABLE | UT_CANCEL | UT_CANCELED)) == UT_CANCEL) {
-				/* due to thread cancel */
+				                          
 				error = EINTR;
 			}
 		} else {
@@ -420,32 +420,32 @@ tsleep1(
 	return _sleep((caddr_t)chan, pri, wmsg, abstime, continuation, (lck_mtx_t *)0);
 }
 
-/*
- * Wake up all processes sleeping on chan.
- */
+  
+                                          
+   
 void
 wakeup(void *chan)
 {
 	thread_wakeup((caddr_t)chan);
 }
 
-/*
- * Wake up the first process sleeping on chan.
- *
- * Be very sure that the first process is really
- * the right one to wakeup.
- */
+  
+                                              
+  
+                                                
+                           
+   
 void
 wakeup_one(caddr_t chan)
 {
 	thread_wakeup_one((caddr_t)chan);
 }
 
-/*
- * Compute the priority of a process when running in user mode.
- * Arrange to reschedule if the resulting priority is better
- * than that of the current process.
- */
+  
+                                                               
+                                                            
+                                    
+   
 void
 resetpriority(struct proc *p)
 {
@@ -453,15 +453,15 @@ resetpriority(struct proc *p)
 }
 
 struct loadavg averunnable =
-{ {0, 0, 0}, FSCALE };                  /* load average, of runnable procs */
-/*
- * Constants for averages over 1, 5, and 15 minutes
- * when sampling at 5 second intervals.
- */
+{ {0, 0, 0}, FSCALE };                                                       
+  
+                                                   
+                                       
+   
 static fixpt_t cexp[3] = {
-	(fixpt_t)(0.9200444146293232 * FSCALE), /* exp(-1/12) */
-	(fixpt_t)(0.9834714538216174 * FSCALE), /* exp(-1/60) */
-	(fixpt_t)(0.9944598480048967 * FSCALE), /* exp(-1/180) */
+	(fixpt_t)(0.9200444146293232 * FSCALE),                 
+	(fixpt_t)(0.9834714538216174 * FSCALE),                 
+	(fixpt_t)(0.9944598480048967 * FSCALE),                  
 };
 
 void

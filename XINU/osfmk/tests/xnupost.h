@@ -60,11 +60,11 @@ struct xnupost_test {
 };
 
 typedef kern_return_t xt_panic_return_t;
-#define XT_PANIC_UNRELATED  0x8  /* not related. continue panic */
-#define XT_RET_W_FAIL       0x9  /* report FAILURE and return from panic */
-#define XT_RET_W_SUCCESS    0xA  /* report SUCCESS and return from panic */
-#define XT_PANIC_W_FAIL     0xB  /* report FAILURE and continue to panic */
-#define XT_PANIC_W_SUCCESS  0xC  /* report SUCCESS and continue to panic */
+#define XT_PANIC_UNRELATED  0x8                                   
+#define XT_RET_W_FAIL       0x9                                            
+#define XT_RET_W_SUCCESS    0xA                                            
+#define XT_PANIC_W_FAIL     0xB                                            
+#define XT_PANIC_W_SUCCESS  0xC                                            
 
 typedef xt_panic_return_t (*xt_panic_widget_func)(const char * panicstr, void * context, void ** outval);
 struct xnupost_panic_widget {
@@ -74,7 +74,7 @@ struct xnupost_panic_widget {
 	xt_panic_widget_func xtp_func;
 };
 
-/* for internal use only. Use T_REGISTER_* macros */
+                                                    
 extern xt_panic_return_t _xt_generic_assert_check(const char * s, void * str_to_match, void ** outval);
 kern_return_t xnupost_register_panic_widget(xt_panic_widget_func funcp, const char * funcname, void * context, void ** outval);
 
@@ -116,10 +116,10 @@ extern uint32_t total_post_tests_count;
 	}
 
 void xnupost_init(void);
-/*
- * Parse boot-args specific to POST testing and setup enabled/disabled settings
- * returns: KERN_SUCCESS - if testing is enabled.
- */
+  
+                                                                               
+                                                 
+   
 kern_return_t xnupost_parse_config(void);
 kern_return_t xnupost_run_tests(xnupost_test_t test_list, uint32_t test_count);
 kern_return_t xnupost_list_tests(xnupost_test_t test_list, uint32_t test_count);
@@ -136,4 +136,4 @@ kern_return_t kernel_list_tests(void);
 int bsd_do_post(void);
 int bsd_list_tests(void);
 
-#endif /* _TESTS_XNUPOST_H */
+#endif                       

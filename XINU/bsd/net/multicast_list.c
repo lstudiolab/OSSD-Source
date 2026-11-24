@@ -26,19 +26,19 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * multicast_util.c:
- * - keep track of multicast addresses added to one interface based on the
- *   actual multicast addresses in another
- * - used by VLAN and BOND
- */
+  
+                    
+                                                                          
+                                          
+                          
+   
 
-/*
- * Modification History:
- *
- * April 29, 2004	Dieter Siegmund (dieter@apple.com)
- * - created
- */
+  
+                        
+  
+                                                    
+            
+   
 
 #include <net/multicast_list.h>
 #include <sys/param.h>
@@ -53,12 +53,12 @@ multicast_list_init(struct multicast_list * mc_list)
 	return;
 }
 
-/*
- * Function: multicast_list_remove
- * Purpose:
- *   Remove the given list of multicast addresses from the interface and from
- *   the multicast list structure.
- */
+  
+                                  
+           
+                                                                             
+                                  
+   
 __private_extern__ int
 multicast_list_remove(struct multicast_list * mc_list)
 {
@@ -78,19 +78,19 @@ multicast_list_remove(struct multicast_list * mc_list)
 	return result;
 }
 
-/*
- * Function: multicast_list_program
- * Purpose:
- *   Program the multicast filter on "target_ifp" using the values from
- *   "source_ifp", and saving the result in "mc_list"
- *
- *   We build a new list of multicast addresses while programming the new list.
- *   If that completes successfully, we remove the old list, and return the
- *   new list.
- *
- *   If it fails, we remove what we've added to the new list, and
- *   return an error.
- */
+  
+                                   
+           
+                                                                       
+                                                     
+  
+                                                                               
+                                                                           
+              
+  
+                                                                 
+                     
+   
 __private_extern__ int
 multicast_list_program(struct multicast_list * mc_list,
     struct ifnet * source_ifp,
@@ -113,7 +113,7 @@ multicast_list_program(struct multicast_list * mc_list,
 	target_sdl.sdl_alen = alen;
 	target_sdl.sdl_index = target_ifp->if_index;
 
-	/* build a new list */
+	                      
 	multicast_list_init(&new_mc_list);
 	error = ifnet_get_multicast_list(source_ifp, &source_multicast_list);
 	if (error != 0) {
@@ -144,10 +144,10 @@ multicast_list_program(struct multicast_list * mc_list,
 		SLIST_INSERT_HEAD(&new_mc_list, mc, mc_entries);
 	}
 	if (error != 0) {
-		/* restore previous state */
+		                            
 		(void)multicast_list_remove(&new_mc_list);
 	} else {
-		/* remove the old entries, and return the new list */
+		                                                     
 		(void)multicast_list_remove(mc_list);
 		*mc_list = new_mc_list;
 	}

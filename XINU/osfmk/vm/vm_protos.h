@@ -38,20 +38,20 @@
 extern "C" {
 #endif
 
-/*
- * This file contains various type definitions and routine prototypes
- * that are needed to avoid compilation warnings for VM code (in osfmk,
- * default_pager and bsd).
- * Most of these should eventually go into more appropriate header files.
- *
- * Include it after all other header files since it doesn't include any
- * type definitions and it works around some conflicts with other header
- * files.
- */
+  
+                                                                     
+                                                                       
+                          
+                                                                         
+  
+                                                                       
+                                                                        
+         
+   
 
-/*
- * iokit
- */
+  
+        
+   
 extern kern_return_t device_data_action(
 	uintptr_t               device_handle,
 	ipc_port_t              device_pager,
@@ -64,9 +64,9 @@ extern kern_return_t device_close(
 
 extern boolean_t vm_swap_files_pinned(void);
 
-/*
- * osfmk
- */
+  
+        
+   
 #ifndef _IPC_IPC_PORT_H_
 extern mach_port_name_t ipc_port_copyout_send(
 	ipc_port_t      sright,
@@ -82,16 +82,16 @@ extern task_t port_name_to_task_name(
 	mach_port_name_t name);
 extern void ipc_port_release_send(
 	ipc_port_t      port);
-#endif /* _IPC_IPC_PORT_H_ */
+#endif                       
 
 extern ipc_space_t  get_task_ipcspace(
 	task_t t);
 
 #if CONFIG_MEMORYSTATUS
-extern int max_task_footprint_mb;       /* Per-task limit on physical memory consumption in megabytes */
-#endif /* CONFIG_MEMORYSTATUS */
+extern int max_task_footprint_mb;                                                                       
+#endif                          
 
-/* Some loose-ends VM stuff */
+                              
 
 extern vm_map_t         kalloc_map;
 extern vm_size_t        msg_ool_size_small;
@@ -121,7 +121,7 @@ extern void vm_map_pmap_check_ledgers(
 	ledger_t        ledger,
 	int             pid,
 	char            *procname);
-#endif /* MACH_ASSERT */
+#endif                  
 
 extern kern_return_t
 vnode_pager_get_object_vnode(
@@ -133,14 +133,14 @@ vnode_pager_get_object_vnode(
 extern boolean_t coredumpok(vm_map_t map, mach_vm_offset_t va);
 #endif
 
-/*
- * VM routines that used to be published to
- * user space, and are now restricted to the kernel.
- *
- * They should eventually go away entirely -
- * to be replaced with standard vm_map() and
- * vm_deallocate() calls.
- */
+  
+                                           
+                                                    
+  
+                                            
+                                            
+                         
+   
 
 extern kern_return_t vm_upl_map
 (
@@ -169,7 +169,7 @@ extern mach_vm_offset_t mach_get_vm_end(vm_map_t);
 #define VM_MAP_DEBUG_APPLE_PROTECT      MACH_ASSERT
 #if VM_MAP_DEBUG_APPLE_PROTECT
 extern int vm_map_debug_apple_protect;
-#endif /* VM_MAP_DEBUG_APPLE_PROTECT */
+#endif                                 
 struct pager_crypt_info;
 extern kern_return_t vm_map_apple_protected(
 	vm_map_t                map,
@@ -186,7 +186,7 @@ extern memory_object_t apple_protect_pager_setup(
 	vm_object_offset_t      crypto_start,
 	vm_object_offset_t      crypto_end,
 	boolean_t               cache_pager);
-#endif  /* CONFIG_CODE_DECRYPTION */
+#endif                              
 
 struct vm_shared_region_slide_info;
 extern kern_return_t vm_map_shared_region(
@@ -215,7 +215,7 @@ extern void shared_region_key_dealloc(
 	char *shared_region_id);
 extern uint64_t generate_jop_key(void);
 extern void shared_region_pager_match_task_key(memory_object_t memobj, task_t task);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 extern bool vm_shared_region_is_reslide(struct task *task);
 
 struct vnode;
@@ -226,7 +226,7 @@ extern memory_object_control_t swapfile_pager_control(memory_object_t mem_obj);
 #define SIXTEENK_PAGE_SIZE      0x4000
 #define SIXTEENK_PAGE_MASK      0x3FFF
 #define SIXTEENK_PAGE_SHIFT     14
-#endif /* __arm64__ || (__ARM_ARCH_7K__ >= 2) */
+#endif                                          
 
 #define FOURK_PAGE_SIZE         0x1000
 #define FOURK_PAGE_MASK         0xFFF
@@ -239,7 +239,7 @@ extern unsigned int page_shift_user32;
 #define VM_MAP_DEBUG_FOURK      MACH_ASSERT
 #if VM_MAP_DEBUG_FOURK
 extern int vm_map_debug_fourk;
-#endif /* VM_MAP_DEBUG_FOURK */
+#endif                         
 extern memory_object_t fourk_pager_create(void);
 extern vm_object_t fourk_pager_to_vm_object(memory_object_t mem_obj);
 extern kern_return_t fourk_pager_populate(
@@ -250,11 +250,11 @@ extern kern_return_t fourk_pager_populate(
 	vm_object_offset_t new_backing_offset,
 	vm_object_t *old_backing_object,
 	vm_object_offset_t *old_backing_offset);
-#endif /* __arm64__ */
+#endif                
 
-/*
- * bsd
- */
+  
+      
+   
 struct vnode;
 extern void *upl_get_internal_page_list(
 	upl_t upl);
@@ -315,12 +315,12 @@ void vnode_pager_issue_reprioritize_io(
 #endif
 
 #if CHECK_CS_VALIDATION_BITMAP
-/* used by the vnode_pager_cs_validation_bitmap routine*/
+                                                         
 #define CS_BITMAP_SET   1
 #define CS_BITMAP_CLEAR 2
 #define CS_BITMAP_CHECK 3
 
-#endif /* CHECK_CS_VALIDATION_BITMAP */
+#endif                                 
 
 extern kern_return_t
 vnode_pager_data_unlock(
@@ -372,7 +372,7 @@ extern kern_return_t vnode_pager_cs_check_validation_bitmap(
 	memory_object_t mem_obj,
 	memory_object_offset_t  offset,
 	int             optype);
-#endif /*CHECK_CS_VALIDATION_BITMAP*/
+#endif                               
 
 extern  kern_return_t ubc_cs_check_validation_bitmap(
 	struct vnode *vp,
@@ -597,16 +597,16 @@ extern unsigned int mach_vm_ctl_page_free_wanted(void);
 
 extern int no_paging_space_action(void);
 
-/*
- * counts updated by revalidate_text_page()
- */
-extern unsigned int vmtc_total;        /* total # of text page corruptions detected */
-extern unsigned int vmtc_undiagnosed;  /* of that what wasn't diagnosed */
-extern unsigned int vmtc_not_eligible; /* failed to correct, due to page attributes */
-extern unsigned int vmtc_copyin_fail;  /* of undiagnosed, copyin failure count */
-extern unsigned int vmtc_not_found;    /* of diagnosed, no error found - code signing error? */
-extern unsigned int vmtc_one_bit_flip; /* of diagnosed, single bit errors */
-#define MAX_TRACK_POWER2 9             /* of diagnosed, counts of 1, 2, 4,... bytes corrupted */
+  
+                                           
+   
+extern unsigned int vmtc_total;                                                       
+extern unsigned int vmtc_undiagnosed;                                     
+extern unsigned int vmtc_not_eligible;                                                
+extern unsigned int vmtc_copyin_fail;                                            
+extern unsigned int vmtc_not_found;                                                            
+extern unsigned int vmtc_one_bit_flip;                                      
+#define MAX_TRACK_POWER2 9                                                                      
 extern unsigned int vmtc_byte_counts[MAX_TRACK_POWER2 + 1];
 
 extern kern_return_t revalidate_text_page(task_t, vm_map_offset_t);
@@ -616,9 +616,9 @@ extern kern_return_t revalidate_text_page(task_t, vm_map_offset_t);
 #define VM_TOGGLE_GETVALUE      999
 int vm_toggle_entry_reuse(int, int*);
 
-#define SWAP_WRITE              0x00000000      /* Write buffer (pseudo flag). */
-#define SWAP_READ               0x00000001      /* Read buffer. */
-#define SWAP_ASYNC              0x00000002      /* Start I/O, do not wait. */
+#define SWAP_WRITE              0x00000000                                       
+#define SWAP_READ               0x00000001                        
+#define SWAP_ASYNC              0x00000002                                   
 
 extern void vm_compressor_pager_init(void);
 extern kern_return_t compressor_memory_object_create(
@@ -631,10 +631,10 @@ extern int       vm_swap_low_on_space(void);
 void             do_fastwake_warmup_all(void);
 #if CONFIG_JETSAM
 extern int proc_get_memstat_priority(struct proc*, boolean_t);
-#endif /* CONFIG_JETSAM */
+#endif                    
 
-/* the object purger. purges the next eligible object from memory. */
-/* returns TRUE if an object was purged, otherwise FALSE. */
+                                                                     
+                                                            
 boolean_t vm_purgeable_object_purge_one_unlocked(int force_purge_below_group);
 void vm_purgeable_nonvolatile_owner_update(task_t       owner,
     int          delta);
@@ -652,7 +652,7 @@ struct trim_list {
 u_int32_t vnode_trim_list(struct vnode *vp, struct trim_list *tl, boolean_t route_only);
 
 #define MAX_SWAPFILENAME_LEN    1024
-#define SWAPFILENAME_INDEX_LEN  2       /* Doesn't include the terminating NULL character */
+#define SWAPFILENAME_INDEX_LEN  2                                                           
 
 extern char     swapfilename[MAX_SWAPFILENAME_LEN + 1];
 
@@ -684,7 +684,7 @@ extern struct vm_page_secluded_data vm_page_secluded;
 
 extern int num_tasks_can_use_secluded_mem;
 
-/* boot-args */
+               
 extern int secluded_for_apps;
 extern int secluded_for_iokit;
 extern int secluded_for_filecache;
@@ -697,9 +697,9 @@ extern void             memory_object_mark_eligible_for_secluded(
 	memory_object_control_t         control,
 	boolean_t                       eligible_for_secluded);
 
-#endif /* CONFIG_SECLUDED_MEMORY */
+#endif                             
 
-#define MAX_PAGE_RANGE_QUERY    (1ULL * 1024 * 1024 * 1024) /* 1 GB */
+#define MAX_PAGE_RANGE_QUERY    (1ULL * 1024 * 1024 * 1024)           
 
 extern kern_return_t mach_make_memory_entry_internal(
 	vm_map_t                target_map,
@@ -724,26 +724,26 @@ memory_entry_check_for_adjustment(
 }
 #endif
 
-/*
- * Flags for the VM swapper/reclaimer.
- * Used by vm_swap_consider_defragment()
- * to force defrag/reclaim by the swap
- * GC thread.
- */
+  
+                                      
+                                        
+                                      
+             
+   
 #define VM_SWAP_FLAGS_NONE             0
 #define VM_SWAP_FLAGS_FORCE_DEFRAG     1
 #define VM_SWAP_FLAGS_FORCE_RECLAIM    2
 
 #if __arm64__
-/*
- * Flags to control the behavior of
- * the legacy footprint entitlement.
- */
+  
+                                   
+                                    
+   
 #define LEGACY_FOOTPRINT_ENTITLEMENT_IGNORE             (1)
 #define LEGACY_FOOTPRINT_ENTITLEMENT_IOS11_ACCT         (2)
 #define LEGACY_FOOTPRINT_ENTITLEMENT_LIMIT_INCREASE     (3)
 
-#endif /* __arm64__ */
+#endif                
 
 #if MACH_ASSERT
 struct proc;
@@ -825,7 +825,7 @@ extern const char *debug4k_category_name[];
 #define DEBUG4K_EXC(...)        __DEBUG4K(__DEBUG4K_EXC, ##__VA_ARGS__)
 #define DEBUG4K_VFS(...)        __DEBUG4K(__DEBUG4K_VFS, ##__VA_ARGS__)
 
-#else /* MACH_ASSERT */
+#else                  
 
 #define DEBUG4K_ERROR(...)
 #define DEBUG4K_LIFE(...)
@@ -841,8 +841,8 @@ extern const char *debug4k_category_name[];
 #define DEBUG4K_EXC(...)
 #define DEBUG4K_VFS(...)
 
-#endif /* MACH_ASSERT */
+#endif                  
 
-#endif  /* _VM_VM_PROTOS_H_ */
+#endif                        
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

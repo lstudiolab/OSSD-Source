@@ -51,14 +51,14 @@
  * the rights to redistribute these changes.
  */
 
-/*
- *      File:	mach_error.c
- *	Author:	Douglas Orr, Carnegie Mellon University
- *	Date:	Mar 1988
- *
- *      interprets structured mach error codes and prints
- *      or returns a descriptive string.
- */
+  
+                          
+                                                  
+                 
+  
+                                                         
+                                        
+   
 
 #include <mach/mach_error.h>
 #include <mach/boolean.h>

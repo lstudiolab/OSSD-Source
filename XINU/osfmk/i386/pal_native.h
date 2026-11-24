@@ -30,7 +30,7 @@
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/* No-op on bare-metal */
+                         
 #define pal_dbg_page_fault(x, y, z)
 #define pal_dbg_set_task_name( x )
 #define pal_set_signal_delivery( x )
@@ -63,18 +63,18 @@ pal_stop_cpu(boolean_t cli)
 
 #define pal_pmc_swi() __asm__ __volatile__("int %0"::"i"(LAPIC_PMC_SWI_VECTOR):"memory")
 
-/* Macro used by non-native xnus for access to low globals when it may
- * have moved.
- */
+                                                                      
+              
+   
 #define PAL_KDP_ADDR(x) (x)
 
 struct pal_rtc_nanotime {
-	volatile uint64_t       tsc_base;       /* timestamp */
-	volatile uint64_t       ns_base;        /* nanoseconds */
-	uint32_t                scale;          /* tsc -> nanosec multiplier */
-	uint32_t                shift;          /* shift is nonzero only on "slow" machines, */
-	                                        /* ie where tscFreq <= SLOW_TSC_THRESHOLD */
-	volatile uint32_t       generation;     /* 0 == being updated */
+	volatile uint64_t       tsc_base;                      
+	volatile uint64_t       ns_base;                         
+	uint32_t                scale;                                         
+	uint32_t                shift;                                                         
+	                                                                                    
+	volatile uint32_t       generation;                             
 	uint32_t                spare1;
 };
 
@@ -90,8 +90,8 @@ struct pal_pcb {
 struct pal_apic_table {
 };
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _I386_PAL_I386_H */
+#endif                       

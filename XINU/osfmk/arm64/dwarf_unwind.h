@@ -30,12 +30,12 @@
 #ifndef _ARM64_DWARF_UNWIND_H_
 #define _ARM64_DWARF_UNWIND_H_
 
-/*
- * This file contains the architecture specific DWARF definitions needed for unwind
- * information added to trap handlers.
- */
+  
+                                                                                   
+                                      
+   
 
-/* DWARF Register numbers for ARM64 registers contained in the saved state */
+                                                                             
 
 #define DWARF_ARM64_X0 0
 #define DWARF_ARM64_X1 1
@@ -116,9 +116,9 @@
 #define DWARF_ARM64_PC_OFFSET 0x88, 0x02
 #define DWARF_ARM64_CPSR_OFFSET 0x90, 0x02
 
-/* The actual unwind directives added to trap handlers to let the debugger know where the register state is stored */
+                                                                                                                     
 
-/* Unwind Prologue added to each function to indicate the start of the unwind information. */
+                                                                                             
 
 #define UNWIND_PROLOGUE \
 .cfi_sections .eh_frame %%\
@@ -126,7 +126,7 @@
 .cfi_signal_frame       %%\
 
 
-/* Unwind Epilogue added to each function to indicate the end of the unwind information */
+                                                                                          
 
 #define UNWIND_EPILOGUE .cfi_endproc
 
@@ -167,4 +167,4 @@
 .cfi_escape DW_CFA_expression, DWARF_ARM64_PC, DW_FORM_LEN_TWO_BYTE_SLEB, DW_OP_breg21, DWARF_ARM64_PC_OFFSET %%\
 .cfi_escape DW_CFA_expression, DWARF_ARM64_CPSR, DW_FORM_LEN_TWO_BYTE_SLEB, DW_OP_breg21, DWARF_ARM64_CPSR_OFFSET %%\
 
-#endif /* _ARM64_DWARF_UNWIND_H_ */
+#endif                             

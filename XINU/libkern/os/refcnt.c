@@ -30,7 +30,7 @@ __enum_closed_decl(reflog_op_t, uint8_t, {
 #define __debug_only
 #else
 # define __debug_only __unused
-#endif /* OS_REFCNT_DEBUG */
+#endif                      
 
 void
 os_ref_panic_live(void *rc)
@@ -138,16 +138,16 @@ ref_log_init(struct os_refgrp *grp)
 		return;
 	}
 
-	/*
-	 * Enable refcount statistics if the rlog boot-arg is present,
-	 * even when no specific group is logged.
-	 */
+	  
+                                                               
+                                          
+    
 	ref_debug_enable = true;
 
 	const char *g;
 	while ((g = strsep(&refgrp, ",")) != NULL) {
 		if (strcmp(g, grp->grp_name) == 0) {
-			/* enable logging on this refgrp */
+			                                   
 			grp->grp_log = btlog_create(ref_log_nrecords, REFLOG_BTDEPTH, true);
 			return;
 		}
@@ -174,11 +174,11 @@ ref_log_drop(struct os_refgrp *grp __unused, void *rc __unused)
 }
 #endif
 
-#endif /* KERNEL */
+#endif             
 
-/*
- * attach a new refcnt to a group
- */
+  
+                                 
+   
 __attribute__((cold, noinline))
 static void
 ref_attach_to_group(os_ref_atomic_t *rc, struct os_refgrp *grp, os_ref_count_t init_count)
@@ -188,8 +188,8 @@ ref_attach_to_group(os_ref_atomic_t *rc, struct os_refgrp *grp, os_ref_count_t i
 	}
 
 	if (atomic_fetch_add_explicit(&grp->grp_children, 1, memory_order_relaxed) == 0) {
-		/* First reference count object in this group. Check if we should enable
-		 * refcount logging. */
+		                                                                        
+                         
 		ref_log_init(grp);
 	}
 
@@ -312,10 +312,10 @@ _os_ref_release_inline(os_ref_atomic_t *rc, os_ref_count_t n,
 
 #if OS_REFCNT_DEBUG
 	if (__improbable(grp && ref_debug_enable)) {
-		/*
-		 * Care not to use 'rc' after the decrement because it might be deallocated
-		 * under us.
-		 */
+		  
+                                                                             
+              
+     
 		ref_log_op(grp, (void *)rc, REFLOG_RELEASE);
 	}
 #endif
@@ -330,7 +330,7 @@ _os_ref_release_inline(os_ref_atomic_t *rc, os_ref_count_t n,
 #if OS_REFCNT_DEBUG
 	if (__improbable(grp && ref_debug_enable)) {
 		if (val < n) {
-			ref_log_drop(grp, (void *)rc); /* rc is only used as an identifier */
+			ref_log_drop(grp, (void *)rc);                                       
 		}
 		ref_release_group(grp, !val);
 	}
@@ -346,10 +346,10 @@ os_ref_release_n_internal(os_ref_atomic_t *rc, os_ref_count_t n,
     struct os_refgrp * __debug_only grp,
     memory_order release_order, memory_order dealloc_order)
 {
-	// Legacy exported interface with bad codegen due to the barriers
-	// not being immediate
-	//
-	// Also serves as the debug function
+	                                                                 
+	                      
+	  
+	                                    
 	return _os_ref_release_inline(rc, n, grp, release_order, dealloc_order);
 }
 #endif
@@ -359,10 +359,10 @@ os_ref_count_t
 os_ref_release_internal(os_ref_atomic_t *rc, struct os_refgrp * __debug_only grp,
     memory_order release_order, memory_order dealloc_order)
 {
-	// Legacy exported interface with bad codegen due to the barriers
-	// not being immediate
-	//
-	// Also serves as the debug function
+	                                                                 
+	                      
+	  
+	                                    
 	return _os_ref_release_inline(rc, 1, grp, release_order, dealloc_order);
 }
 
@@ -428,9 +428,9 @@ os_ref_release_locked_internal(os_ref_atomic_t *rc, struct os_refgrp * __debug_o
 	return val;
 }
 
-/*
- * Bitwise API
- */
+  
+              
+   
 
 #undef os_ref_init_count_mask
 void

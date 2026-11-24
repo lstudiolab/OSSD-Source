@@ -58,18 +58,18 @@
  * the rights to redistribute these changes.
  */
 
-/*
- * Bit-mask manipulation routines
- */
+  
+                                 
+   
 
 #ifndef	_I386_BIT_ROUTINES_H_
 #define	_I386_BIT_ROUTINES_H_
 
 #ifdef MACH_KERNEL_PRIVATE
 
-/*
- *	General bit-lock routines.
- */
+  
+                             
+   
 
 #define	bit_lock(bit,l)							\
 	__asm__ volatile("	jmp	1f	\n			\
@@ -88,11 +88,11 @@
 								:	\
 			"r" (bit), "m" (*(volatile int *)(l)));
 
-/*
- *      Set or clear individual bits in a long word.
- *      The locked access is needed only to lock access
- *      to the word, not to individual bits.
- */
+  
+                                                    
+                                                       
+                                            
+   
 
 #define	i_bit_set(bit,l)						\
 	__asm__ volatile("	lock		\n			\
@@ -134,6 +134,6 @@ static inline int	atomic_decl_and_test(volatile long * p, long delta)
 		: "r" (delta), "m" (*(volatile long *)p));
 	return ret;
 }
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif	/* _I386_BIT_ROUTINES_H_ */
+#endif	                           

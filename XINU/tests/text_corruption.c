@@ -6,12 +6,12 @@
 
 T_GLOBAL_META(T_META_RUN_CONCURRENTLY(false));
 
-/*
- * No system(3c) on watchOS, so provide our own.
- * returns -1 if fails to run
- * returns 0 if process exits normally.
- * returns +n if process exits due to signal N
- */
+  
+                                                
+                             
+                                       
+                                              
+   
 static int
 my_system(const char *command)
 {
@@ -39,21 +39,21 @@ my_system(const char *command)
 }
 
 
-/*
- * The tests are run in the following order:
- *
- * - call foo
- * - corrupt foo, then call foo
- * - call foo
- *
- * - call atan
- * - corrupt atan, then call atan
- * - call atan
- *
- * The first and last of each should exit normally. The middle one should exit with SIGILL.
- *
- * atan() was picked as a shared region function that isn't likely used by any normal daemons.
- */
+  
+                                            
+  
+             
+                               
+             
+  
+              
+                                 
+              
+  
+                                                                                           
+  
+                                                                                              
+   
 T_DECL(text_corruption_recovery, "test detection/recovery of text corruption",
     T_META_IGNORECRASHES(".*text_corruption_helper.*"),
     T_META_ASROOT(true))

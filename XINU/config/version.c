@@ -26,16 +26,16 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* version.c
- * This file is a C source template for version.c, which is generated
- * on every make of xnu.  This template is processed by the script
- * xnu/config/newvers.pl based on the version information in the file
- * xnu/config/MasterVersion.
- */
+            
+                                                                     
+                                                                  
+                                                                     
+                            
+   
 
 #include <libkern/version.h>
 
-// for what(1):
+               
 const char __kernelVersionString[] __attribute__((used)) = "@(#)VERSION: " OSTYPE " Kernel Version ###KERNEL_VERSION_LONG###: ###KERNEL_BUILD_DATE###; ###KERNEL_BUILDER###:###KERNEL_BUILD_OBJROOT###";
 const char version[] = OSTYPE " Kernel Version ###KERNEL_VERSION_LONG###: ###KERNEL_BUILD_DATE###; ###KERNEL_BUILDER###:###KERNEL_BUILD_OBJROOT###";
 const int  version_major = VERSION_MAJOR;

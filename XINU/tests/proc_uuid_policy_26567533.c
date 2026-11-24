@@ -23,7 +23,7 @@ T_DECL(proc_uuid_policy_26567533, "Tests passing a NULL uuid in (uap->uuid).", T
 	for (i = 0; i < NUM_PROC_UUID_POLICY_FLAGS; i++) {
 		T_LOG("Testing policy add with flag value 0x%x", policy_flags[i]);
 
-		/* Since UUID is null, this call should fail with errno = EINVAL. */
+		                                                                    
 		ret = proc_uuid_policy(PROC_UUID_POLICY_OPERATION_ADD, null_uuid, sizeof(uuid_t), policy_flags[i]);
 
 		T_ASSERT_TRUE(ret == -1, "proc_uuid_policy returned %d", ret);
@@ -34,7 +34,7 @@ T_DECL(proc_uuid_policy_26567533, "Tests passing a NULL uuid in (uap->uuid).", T
 	for (i = 0; i < NUM_PROC_UUID_POLICY_FLAGS; i++) {
 		T_LOG("Testing policy remove with flag value 0x%x", policy_flags[i]);
 
-		/* Since UUID is null, this call should fail with errno = EINVAL. */
+		                                                                    
 		ret = proc_uuid_policy(PROC_UUID_POLICY_OPERATION_REMOVE, null_uuid, sizeof(uuid_t), policy_flags[i]);
 
 		T_ASSERT_TRUE(ret == -1, "proc_uuid_policy returned %d", ret);

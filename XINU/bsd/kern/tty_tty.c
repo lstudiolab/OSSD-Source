@@ -60,9 +60,9 @@
  *	@(#)tty_tty.c	8.2 (Berkeley) 9/23/93
  */
 
-/*
- * Indirect driver for controlling tty.
- */
+  
+                                       
+   
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/conf.h>
@@ -73,8 +73,8 @@
 #include <sys/file_internal.h>
 #include <sys/kauth.h>
 
-/* Forward declarations for cdevsw[] entry */
-/* XXX we should consider making these static */
+                                             
+                                                
 int cttyopen(dev_t dev, int flag, int mode, proc_t p);
 int cttyread(dev_t dev, struct uio *uio, int flag);
 int cttywrite(dev_t dev, struct uio *uio, int flag);
@@ -103,15 +103,15 @@ cttyopen(dev_t dev, int flag, __unused int mode, proc_t p)
 	cttyflag = sessp->s_flags & S_CTTYREF;
 	session_unlock(sessp);
 
-	/*
-	 * A little hack--this device, used by many processes,
-	 * happens to do an open on another device, which can
-	 * cause unhappiness if the second-level open blocks indefinitely
-	 * (as could be the case if the master side has hung up).  Since
-	 * we know that this driver doesn't care about the serializing
-	 * opens and closes, we can drop the lock. To avoid opencount leak,
-	 * open the vnode only for the first time.
-	 */
+	  
+                                                       
+                                                      
+                                                                  
+                                                                 
+                                                               
+                                                                    
+                                           
+    
 	if (cttyflag == 0) {
 		devsw_unlock(dev, S_IFCHR);
 		error = VNOP_OPEN(ttyvp, flag, &context);
@@ -121,11 +121,11 @@ cttyopen(dev_t dev, int flag, __unused int mode, proc_t p)
 			goto out;
 		}
 
-		/*
-		 * If S_CTTYREF is set, some other thread did an open
-		 * and was able to set the flag, now perform a close, else
-		 * set the flag.
-		 */
+		  
+                                                       
+                                                            
+                  
+     
 		session_lock(sessp);
 		if (cttyflag == (sessp->s_flags & S_CTTYREF)) {
 			sessp->s_flags |= S_CTTYREF;
@@ -134,16 +134,16 @@ cttyopen(dev_t dev, int flag, __unused int mode, proc_t p)
 		}
 		session_unlock(sessp);
 
-		/*
-		 * We have to take a reference here to make sure a close
-		 * gets called during revoke. Note that once a controlling
-		 * tty gets opened by this driver, the only way close will
-		 * get called is when the session leader , whose controlling
-		 * tty is ttyvp, exits and vnode is revoked. We cannot
-		 * redirect close from this driver because underlying controlling
-		 * terminal might change and close may get redirected to a
-		 * wrong vnode causing panic.
-		 */
+		  
+                                                          
+                                                            
+                                                            
+                                                              
+                                                        
+                                                                   
+                                                            
+                               
+     
 		if (doclose) {
 			devsw_unlock(dev, S_IFCHR);
 			VNOP_CLOSE(ttyvp, flag, &context);
@@ -212,8 +212,8 @@ cttyioctl(__unused dev_t dev, u_long cmd, caddr_t addr, int flag, proc_t p)
 	if (ttyvp == NULL) {
 		return EIO;
 	}
-	if (cmd == TIOCSCTTY) {  /* don't allow controlling tty to be set    */
-		error = EINVAL; /* to controlling tty -- infinite recursion */
+	if (cmd == TIOCSCTTY) {                                                
+		error = EINVAL;                                               
 		goto out;
 	}
 	if (cmd == TIOCNOTTY) {
@@ -253,14 +253,14 @@ cttyselect(__unused dev_t dev, int flag, void* wql, __unused proc_t p)
 	context.vc_ucred = NOCRED;
 
 	if (ttyvp == NULL) {
-		return 1;     /* try operation to get EOF/failure */
+		return 1;                                           
 	}
 	error = VNOP_SELECT(ttyvp, flag, FREAD | FWRITE, wql, &context);
 	vnode_put(ttyvp);
 	return error;
 }
 
-/* This returns vnode with ioref */
+                                   
 static vnode_t
 cttyvp(proc_t p)
 {
@@ -278,7 +278,7 @@ cttyvp(proc_t p)
 	session_rele(sessp);
 
 	if (vp != NULLVP) {
-		/* cannot get an IO reference, return NULLVP */
+		                                               
 		if (vnode_getwithvid(vp, vid) != 0) {
 			vp = NULLVP;
 		}

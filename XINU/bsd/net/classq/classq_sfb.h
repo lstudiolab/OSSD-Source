@@ -35,16 +35,16 @@
 #include <sys/time.h>
 #include <net/flowadv.h>
 #include <net/classq/if_classq.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define SFB_FP_SHIFT    14                      /* fixed-point shift (Q14) */
-#define SFB_LEVELS      2                       /* L */
+#define SFB_FP_SHIFT    14                                                   
+#define SFB_LEVELS      2                              
 #define SFB_BINS_SHIFT  5
-#define SFB_BINS        (1 << SFB_BINS_SHIFT)   /* N */
+#define SFB_BINS        (1 << SFB_BINS_SHIFT)          
 
 struct sfbstats {
 	u_int64_t               drop_early;
@@ -64,9 +64,9 @@ struct sfbstats {
 };
 
 struct sfbbinstats {
-	int16_t         pmark;          /* marking probability in Q format */
-	u_int16_t       pkts;           /* number of packets */
-	u_int32_t       bytes;          /* number of bytes */
+	int16_t         pmark;                                               
+	u_int16_t       pkts;                                  
+	u_int32_t       bytes;                               
 };
 
 struct sfb_stats {
@@ -97,57 +97,57 @@ struct sfb_fcl {
 	struct flowadv_fclist   fclist;
 };
 
-/* SFB flags */
-#define SFBF_ECN4       0x01    /* use packet marking for IPv4 packets */
-#define SFBF_ECN6       0x02    /* use packet marking for IPv6 packets */
+               
+#define SFBF_ECN4       0x01                                             
+#define SFBF_ECN6       0x02                                             
 #define SFBF_ECN        (SFBF_ECN4 | SFBF_ECN6)
-#define SFBF_FLOWCTL    0x04    /* enable flow control advisories */
-#define SFBF_DELAYBASED 0x08    /* queueing is delay based */
-#define SFBF_DELAYHIGH  0x10    /* Estimated delay is greater than target */
-#define SFBF_LAST_PKT_DROPPED   0x20    /* Last packet dropped */
-#define SFBF_SUSPENDED  0x1000  /* queue is suspended */
+#define SFBF_FLOWCTL    0x04                                        
+#define SFBF_DELAYBASED 0x08                                 
+#define SFBF_DELAYHIGH  0x10                                                
+#define SFBF_LAST_PKT_DROPPED   0x20                             
+#define SFBF_SUSPENDED  0x1000                          
 
 #define SFBF_USERFLAGS                                                  \
 	(SFBF_ECN4 | SFBF_ECN6 | SFBF_FLOWCTL | SFBF_DELAYBASED)
 
 typedef struct sfb {
-	/* variables for internal use */
-	u_int32_t       sfb_flags;      /* SFB flags */
+	                                
+	u_int32_t       sfb_flags;                     
 	u_int32_t       sfb_qlim;
 	u_int32_t       sfb_qid;
 	u_int16_t       sfb_allocation;
 	u_int16_t       sfb_drop_thresh;
 	u_int32_t       sfb_clearpkts;
-	u_int64_t       sfb_eff_rate;   /* last known effective rate */
-	struct timespec sfb_getqtime;   /* last dequeue timestamp */
-	struct timespec sfb_holdtime;   /* random holdtime in nsec */
-	struct ifnet    *sfb_ifp;       /* back pointer to ifnet */
+	u_int64_t       sfb_eff_rate;                                  
+	struct timespec sfb_getqtime;                               
+	struct timespec sfb_holdtime;                                
+	struct ifnet    *sfb_ifp;                                  
 
-	/* target queue delay and interval for queue sizing */
+	                                                      
 	u_int64_t       sfb_target_qdelay;
 	struct timespec sfb_update_interval;
-	u_int64_t       sfb_fc_threshold; /* for flow control feedback */
+	u_int64_t       sfb_fc_threshold;                                
 
-	/* variables for computing estimated delay of the queue */
+	                                                          
 	u_int64_t       sfb_min_qdelay;
 	struct timespec sfb_update_time;
 
-	/* moving hash function */
-	struct timespec sfb_hinterval;  /* random reset interval in sec */
-	struct timespec sfb_nextreset;  /* reset deadline */
+	                          
+	struct timespec sfb_hinterval;                                    
+	struct timespec sfb_nextreset;                      
 
-	/* penalty box */
-	struct timespec sfb_pboxtime;   /* random pboxtime in nsec */
+	                 
+	struct timespec sfb_pboxtime;                                
 	struct timespec sfb_pboxfreeze;
 
-	/* B[L][N] bins (2 sets: current and warm-up) */
-	u_int32_t       sfb_current;    /* current set (0 or 1) */
+	                                                
+	u_int32_t       sfb_current;                              
 	struct sfb_bins (*sfb_bins)[ 2];
 
-	/* Flow control lists for current set */
+	                                        
 	struct sfb_fcl  (*sfb_fc_lists)[ SFB_BINS];
 
-	/* statistics */
+	                
 	struct sfbstats sfb_stats __attribute__((aligned(8)));
 } sfb_t;
 
@@ -161,10 +161,10 @@ extern void sfb_purgeq(struct sfb *, class_queue_t *, u_int32_t,
 extern void sfb_getstats(struct sfb *, struct sfb_stats *);
 extern void sfb_updateq(struct sfb *, cqev_t);
 extern int sfb_suspendq(struct sfb *, class_queue_t *, boolean_t);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_CLASSQ_SFB_H_ */
+#endif              
+#endif                                

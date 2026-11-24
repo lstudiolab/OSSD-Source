@@ -1,7 +1,7 @@
-//
-// Tests for
-//  explicit safe_allocation(size_t n, allocate_memory_t);
-//
+  
+            
+                                                          
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>
@@ -37,7 +37,7 @@ tests()
 		CHECK(tracking_allocator::deallocated_size == 10 * sizeof(T));
 	}
 
-	// Check with a huge number of elements that will overflow size_t
+	                                                                 
 	{
 		std::size_t max_n = std::numeric_limits<std::size_t>::max() / sizeof(T);
 		tracking_allocator::reset();
@@ -57,7 +57,7 @@ T_DECL(ctor_allocate, "safe_allocation.ctor.allocate") {
 	tests<T>();
 	tests<T const>();
 
-	// Make sure we value-initialize elements
+	                                         
 	{
 		tracked_safe_allocation<TrackInit> array(10, libkern::allocate_memory);
 		for (int i = 0; i != 10; ++i) {

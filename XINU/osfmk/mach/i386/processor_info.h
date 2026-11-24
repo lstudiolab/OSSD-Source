@@ -25,13 +25,13 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	mach/i386/processor_info.h
- *
- *	Data structure definitions for i386 specific processor control
- */
+  
+                                   
+  
+                                                                 
+   
 
 #ifndef _MACH_I386_PROCESSOR_INFO_H_
 #define _MACH_I386_PROCESSOR_INFO_H_
 
-#endif  /* _MACH_I386_PROCESSOR_INFO_H_ */
+#endif                                    

@@ -53,37 +53,37 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/host_special_ports.h
- *
- *	Defines codes for access to host-wide special ports.
- */
+  
+   
+  
+                                  
+  
+                                                       
+   
 
 #ifndef _MACH_HOST_SPECIAL_PORTS_H_
 #define _MACH_HOST_SPECIAL_PORTS_H_
 
-/*
- * Cannot be set or gotten from user space
- */
+  
+                                          
+   
 #define HOST_SECURITY_PORT               0
 
 #define HOST_MIN_SPECIAL_PORT            HOST_SECURITY_PORT
 
-/*
- * Always provided by kernel (cannot be set from user-space).
- */
+  
+                                                             
+   
 #define HOST_PORT                        1
 #define HOST_PRIV_PORT                   2
 #define HOST_IO_MASTER_PORT              3
-#define HOST_MAX_SPECIAL_KERNEL_PORT     7 /* room to grow */
+#define HOST_MAX_SPECIAL_KERNEL_PORT     7                   
 
 #define HOST_LAST_SPECIAL_KERNEL_PORT    HOST_IO_MASTER_PORT
 
-/*
- * Not provided by kernel
- */
+  
+                         
+   
 #define HOST_DYNAMIC_PAGER_PORT         (1 + HOST_MAX_SPECIAL_KERNEL_PORT)
 #define HOST_AUDIT_CONTROL_PORT         (2 + HOST_MAX_SPECIAL_KERNEL_PORT)
 #define HOST_USER_NOTIFICATION_PORT     (3 + HOST_MAX_SPECIAL_KERNEL_PORT)
@@ -111,23 +111,23 @@
 #define HOST_IOCOMPRESSIONSTATS_PORT    (25 + HOST_MAX_SPECIAL_KERNEL_PORT)
 
 #define HOST_MAX_SPECIAL_PORT           HOST_IOCOMPRESSIONSTATS_PORT
-/* MAX = last since rdar://59872249 */
+                                      
 
-/* obsolete name */
+                   
 #define HOST_CHUD_PORT HOST_LAUNCHCTL_PORT
 
-/*
- * Special node identifier to always represent the local node.
- */
+  
+                                                              
+   
 #define HOST_LOCAL_NODE                  -1
 
-/*
- * Definitions for ease of use.
- *
- * In the get call, the host parameter can be any host, but will generally
- * be the local node host port. In the set call, the host must the per-node
- * host port for the node being affected.
- */
+  
+                               
+  
+                                                                          
+                                                                           
+                                         
+   
 #define host_get_host_port(host, port)  \
 	(host_get_special_port((host),  \
 	HOST_LOCAL_NODE, HOST_PORT, (port)))
@@ -143,9 +143,9 @@
 	HOST_LOCAL_NODE, HOST_IO_MASTER_PORT, (port)))
 #define host_set_io_master_port(host, port) (KERN_INVALID_ARGUMENT)
 
-/*
- * User-settable special ports.
- */
+  
+                               
+   
 #define host_get_dynamic_pager_port(host, port) \
 	(host_get_special_port((host),                  \
 	HOST_LOCAL_NODE, HOST_DYNAMIC_PAGER_PORT, (port)))
@@ -282,8 +282,8 @@
 	(host_set_special_port((host), HOST_IOCOMPRESSIONSTATS_PORT, (port)))
 
 
-/* HOST_RESOURCE_NOTIFY_PORT doesn't #defines these conveniences.
- *  All lookups go through send_resource_violation()
- */
+                                                                 
+                                                    
+   
 
-#endif  /* _MACH_HOST_SPECIAL_PORTS_H_ */
+#endif                                   

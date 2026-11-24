@@ -1,4 +1,4 @@
-/* Per-cpu counter microbenchmarks. */
+                                      
 
 #include <assert.h>
 #include <inttypes.h>
@@ -27,7 +27,7 @@ static const char* kRacyCounterArgument = "racy";
 
 static const int64_t kChunkSize = 100000000;
 
-/* Arguments parsed from the command line */
+                                            
 typedef struct test_args {
 	size_t n_threads;
 	unsigned long long num_writes;
@@ -111,7 +111,7 @@ writer(void *arg)
 	const char* sysctl_name;
 	test_globals_t *globals = arg;
 	int64_t value = kChunkSize;
-	//size_t size = sizeof(value);
+	                              
 
 	sysctl_name = get_sysctl_name_for_test_variant(globals->tg_args.variant);
 	assert(sysctl_name != NULL);

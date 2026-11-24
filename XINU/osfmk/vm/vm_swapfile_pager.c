@@ -41,41 +41,41 @@
 #include <vm/vm_protos.h>
 
 
-/*
- * APPLE SWAPFILE MEMORY PAGER
- *
- * This external memory manager (EMM) handles mappings of the swap files.
- * Swap files are not regular files and are used solely to store contents of
- * anonymous memory mappings while not resident in memory.
- * There's no valid reason to map a swap file.  This just puts extra burden
- * on the system, is potentially a security issue and is not reliable since
- * the contents can change at any time with pageout operations.
- * Here are some of the issues with mapping a swap file.
- * * PERFORMANCE:
- *   Each page in the swap file belong to an anonymous memory object. Mapping
- *   the swap file makes those pages also accessible via a vnode memory
- *   object and each page can now be resident twice.
- * * SECURITY:
- *   Mapping a swap file allows access to other processes' memory.  Swap files
- *   are only accessible by the "root" super-user, who can already access any
- *   process's memory, so this is not a real issue but if permissions on the
- *   swap file got changed, it could become one.
- *   Swap files are not "zero-filled" on creation, so until their contents are
- *   overwritten with pageout operations, they still contain whatever was on
- *   the disk blocks they were allocated.  The "super-user" could see the
- *   contents of free blocks anyway, so this is not a new security issue but
- *   it may be perceive as one.
- *
- * We can't legitimately prevent a user process with appropriate privileges
- * from mapping a swap file, but we can prevent it from accessing its actual
- * contents.
- * This pager mostly handles page-in request (from memory_object_data_request())
- * for swap file mappings and just returns bogus data.
- * Pageouts are not handled, so mmap() has to make sure it does not allow
- * writable (i.e. MAP_SHARED and PROT_WRITE) mappings of swap files.
- */
+  
+                              
+  
+                                                                         
+                                                                            
+                                                          
+                                                                           
+                                                                           
+                                                               
+                                                        
+                 
+                                                                             
+                                                                       
+                                                    
+              
+                                                                              
+                                                                             
+                                                                            
+                                                
+                                                                              
+                                                                            
+                                                                         
+                                                                            
+                               
+  
+                                                                           
+                                                                            
+            
+                                                                                
+                                                      
+                                                                         
+                                                                    
+   
 
-/* forward declarations */
+                          
 void swapfile_pager_reference(memory_object_t mem_obj);
 void swapfile_pager_deallocate(memory_object_t mem_obj);
 kern_return_t swapfile_pager_init(memory_object_t mem_obj,
@@ -110,10 +110,10 @@ kern_return_t swapfile_pager_map(memory_object_t mem_obj,
     vm_prot_t prot);
 kern_return_t swapfile_pager_last_unmap(memory_object_t mem_obj);
 
-/*
- * Vector of VM operations for this EMM.
- * These routines are invoked by VM via the memory_object_*() interfaces.
- */
+  
+                                        
+                                                                         
+   
 const struct memory_object_pager_ops swapfile_pager_ops = {
 	.memory_object_reference = swapfile_pager_reference,
 	.memory_object_deallocate = swapfile_pager_deallocate,
@@ -131,42 +131,42 @@ const struct memory_object_pager_ops swapfile_pager_ops = {
 	.memory_object_pager_name = "swapfile pager"
 };
 
-/*
- * The "swapfile_pager" describes a memory object backed by
- * the "swapfile" EMM.
- */
+  
+                                                           
+                      
+   
 typedef struct swapfile_pager {
-	/* mandatory generic header */
+	                              
 	struct memory_object    swp_pgr_hdr;
 
-	/* pager-specific data */
-	queue_chain_t           pager_queue;    /* next & prev pagers */
+	                         
+	queue_chain_t           pager_queue;                            
 #if MEMORY_OBJECT_HAS_REFCOUNT
 #define swp_pgr_hdr_ref         swp_pgr_hdr.mo_ref
 #else
-	os_ref_atomic_t         swp_pgr_hdr_ref;      /* reference count */
+	os_ref_atomic_t         swp_pgr_hdr_ref;                           
 #endif
-	bool                    is_ready;       /* is this pager ready ? */
-	bool                    is_mapped;      /* is this pager mapped ? */
-	struct vnode            *swapfile_vnode;/* the swapfile's vnode */
+	bool                    is_ready;                                  
+	bool                    is_mapped;                                  
+	struct vnode            *swapfile_vnode;                          
 } *swapfile_pager_t;
 #define SWAPFILE_PAGER_NULL     ((swapfile_pager_t) NULL)
 
-/*
- * List of memory objects managed by this EMM.
- * The list is protected by the "swapfile_pager_lock" lock.
- */
-int swapfile_pager_count = 0;           /* number of pagers */
+  
+                                              
+                                                           
+   
+int swapfile_pager_count = 0;                                 
 queue_head_t swapfile_pager_queue = QUEUE_HEAD_INITIALIZER(swapfile_pager_queue);
 LCK_GRP_DECLARE(swapfile_pager_lck_grp, "swapfile pager");
 LCK_MTX_DECLARE(swapfile_pager_lock, &swapfile_pager_lck_grp);
 
-/*
- * Statistics & counters.
- */
+  
+                         
+   
 int swapfile_pager_count_max = 0;
 
-/* internal prototypes */
+                         
 swapfile_pager_t swapfile_pager_create(struct vnode *vp);
 swapfile_pager_t swapfile_pager_lookup(memory_object_t mem_obj);
 void swapfile_pager_dequeue(swapfile_pager_t pager);
@@ -192,11 +192,11 @@ int swapfile_pagerdebug = 0;
 #endif
 
 
-/*
- * swapfile_pager_init()
- *
- * Initialize the memory object and makes it ready to be used and mapped.
- */
+  
+                        
+  
+                                                                         
+   
 kern_return_t
 swapfile_pager_init(
 	memory_object_t         mem_obj,
@@ -242,14 +242,14 @@ swapfile_pager_init(
 	return KERN_SUCCESS;
 }
 
-/*
- * swapfile_data_return()
- *
- * Handles page-out requests from VM.  This should never happen since
- * the pages provided by this EMM are not supposed to be dirty or dirtied
- * and VM should simply discard the contents and reclaim the pages if it
- * needs to.
- */
+  
+                         
+  
+                                                                     
+                                                                         
+                                                                        
+            
+   
 kern_return_t
 swapfile_pager_data_return(
 	__unused memory_object_t        mem_obj,
@@ -285,11 +285,11 @@ swapfile_pager_data_unlock(
 	return KERN_FAILURE;
 }
 
-/*
- * swapfile_pager_data_request()
- *
- * Handles page-in requests from VM.
- */
+  
+                                
+  
+                                    
+   
 kern_return_t
 swapfile_pager_data_request(
 	memory_object_t         mem_obj,
@@ -324,13 +324,13 @@ swapfile_pager_data_request(
 
 	pager = swapfile_pager_lookup(mem_obj);
 	assert(pager->is_ready);
-	assert(os_ref_get_count_raw(&pager->swp_pgr_hdr_ref) > 1); /* pager is alive and mapped */
+	assert(os_ref_get_count_raw(&pager->swp_pgr_hdr_ref) > 1);                                
 
 	PAGER_DEBUG(PAGER_PAGEIN, ("swapfile_pager_data_request: %p, %llx, %x, %x, pager %p\n", mem_obj, offset, length, protection_required, pager));
 
-	/*
-	 * Gather in a UPL all the VM pages requested by VM.
-	 */
+	  
+                                                     
+    
 	mo_control = pager->swp_pgr_hdr.mo_control;
 
 	upl_size = length;
@@ -338,7 +338,7 @@ swapfile_pager_data_request(
 	    UPL_RET_ONLY_ABSENT |
 	    UPL_SET_LITE |
 	    UPL_NO_SYNC |
-	    UPL_CLEAN_IN_PLACE |        /* triggers UPL_CLEAR_DIRTY */
+	    UPL_CLEAN_IN_PLACE |                                      
 	    UPL_SET_INTERNAL;
 	pl_count = 0;
 	kr = memory_object_upl_request(mo_control,
@@ -352,11 +352,11 @@ swapfile_pager_data_request(
 	assert(dst_object != VM_OBJECT_NULL);
 
 
-	/*
-	 * Reserve a virtual page in the kernel address space to map each
-	 * destination physical page when it's its turn to be processed.
-	 */
-	vm_object_reference(kernel_object);     /* ref. for mapping */
+	  
+                                                                  
+                                                                 
+    
+	vm_object_reference(kernel_object);                           
 	kr = vm_map_find_space(kernel_map,
 	    &kernel_mapping,
 	    PAGE_SIZE_64,
@@ -376,25 +376,25 @@ swapfile_pager_data_request(
 	dst_vaddr = CAST_DOWN(vm_offset_t, kernel_mapping);
 	dst_ptr = (char *) dst_vaddr;
 
-	/*
-	 * Fill in the contents of the pages requested by VM.
-	 */
+	  
+                                                      
+    
 	upl_pl = UPL_GET_INTERNAL_PAGE_LIST(upl);
 	pl_count = length / PAGE_SIZE;
 	for (cur_offset = 0; cur_offset < length; cur_offset += PAGE_SIZE) {
 		ppnum_t dst_pnum;
 
 		if (!upl_page_present(upl_pl, (int)(cur_offset / PAGE_SIZE))) {
-			/* this page is not in the UPL: skip it */
+			                                          
 			continue;
 		}
 
-		/*
-		 * Establish an explicit pmap mapping of the destination
-		 * physical page.
-		 * We can't do a regular VM mapping because the VM page
-		 * is "busy".
-		 */
+		  
+                                                          
+                   
+                                                         
+               
+     
 		dst_pnum = (ppnum_t)
 		    upl_phys_page(upl_pl, (int)(cur_offset / PAGE_SIZE));
 		assert(dst_pnum != 0);
@@ -413,13 +413,13 @@ swapfile_pager_data_request(
 		}
 
 		memset(dst_ptr, '\0', PAGE_SIZE);
-		/* add an end-of-line to keep line counters happy */
+		                                                    
 		dst_ptr[PAGE_SIZE - 1] = '\n';
 
-		/*
-		 * Remove the pmap mapping of the destination page
-		 * in the kernel.
-		 */
+		  
+                                                    
+                   
+     
 		pmap_remove(kernel_pmap,
 		    (addr64_t) kernel_mapping,
 		    (addr64_t) (kernel_mapping + PAGE_SIZE_64));
@@ -428,18 +428,18 @@ swapfile_pager_data_request(
 	retval = KERN_SUCCESS;
 done:
 	if (upl != NULL) {
-		/* clean up the UPL */
+		                      
 
-		/*
-		 * The pages are currently dirty because we've just been
-		 * writing on them, but as far as we're concerned, they're
-		 * clean since they contain their "original" contents as
-		 * provided by us, the pager.
-		 * Tell the UPL to mark them "clean".
-		 */
+		  
+                                                          
+                                                            
+                                                          
+                               
+                                       
+     
 		upl_clear_dirty(upl, TRUE);
 
-		/* abort or commit the UPL */
+		                             
 		if (retval != KERN_SUCCESS) {
 			upl_abort(upl, 0);
 		} else {
@@ -452,12 +452,12 @@ done:
 			    upl_pl, pl_count, &empty);
 		}
 
-		/* and deallocate the UPL */
+		                            
 		upl_deallocate(upl);
 		upl = NULL;
 	}
 	if (kernel_mapping != 0) {
-		/* clean up the mapping of the source and destination pages */
+		                                                              
 		kr = vm_map_remove(kernel_map,
 		    kernel_mapping,
 		    kernel_mapping + PAGE_SIZE_64,
@@ -470,13 +470,13 @@ done:
 	return retval;
 }
 
-/*
- * swapfile_pager_reference()
- *
- * Get a reference on this memory object.
- * For external usage only.  Assumes that the initial reference count is not 0,
- * i.e one should not "revive" a dead pager this way.
- */
+  
+                             
+  
+                                         
+                                                                               
+                                                     
+   
 void
 swapfile_pager_reference(
 	memory_object_t         mem_obj)
@@ -491,13 +491,13 @@ swapfile_pager_reference(
 }
 
 
-/*
- * swapfile_pager_dequeue:
- *
- * Removes a pager from the list of pagers.
- *
- * The caller must hold "swapfile_pager_lock".
- */
+  
+                          
+  
+                                           
+  
+                                              
+   
 void
 swapfile_pager_dequeue(
 	swapfile_pager_t pager)
@@ -514,19 +514,19 @@ swapfile_pager_dequeue(
 	swapfile_pager_count--;
 }
 
-/*
- * swapfile_pager_terminate_internal:
- *
- * Trigger the asynchronous termination of the memory object associated
- * with this pager.
- * When the memory object is terminated, there will be one more call
- * to memory_object_deallocate() (i.e. swapfile_pager_deallocate())
- * to finish the clean up.
- *
- * "swapfile_pager_lock" should not be held by the caller.
- * We don't need the lock because the pager has already been removed from
- * the pagers' list and is now ours exclusively.
- */
+  
+                                     
+  
+                                                                       
+                   
+                                                                    
+                                                                   
+                          
+  
+                                                          
+                                                                         
+                                                
+   
 void
 swapfile_pager_terminate_internal(
 	swapfile_pager_t pager)
@@ -538,18 +538,18 @@ swapfile_pager_terminate_internal(
 		pager->swapfile_vnode = NULL;
 	}
 
-	/* trigger the destruction of the memory object */
+	                                                  
 	memory_object_destroy(pager->swp_pgr_hdr.mo_control, 0);
 }
 
-/*
- * swapfile_pager_deallocate_internal()
- *
- * Release a reference on this pager and free it when the last
- * reference goes away.
- * Can be called with swapfile_pager_lock held or not but always returns
- * with it unlocked.
- */
+  
+                                       
+  
+                                                              
+                       
+                                                                        
+                    
+   
 void
 swapfile_pager_deallocate_internal(
 	swapfile_pager_t        pager,
@@ -561,25 +561,25 @@ swapfile_pager_deallocate_internal(
 		lck_mtx_lock(&swapfile_pager_lock);
 	}
 
-	/* drop a reference on this pager */
+	                                    
 	ref_count = os_ref_release_locked_raw(&pager->swp_pgr_hdr_ref, NULL);
 
 	if (ref_count == 1) {
-		/*
-		 * Only the "named" reference is left, which means that
-		 * no one is really holding on to this pager anymore.
-		 * Terminate it.
-		 */
+		  
+                                                         
+                                                       
+                  
+     
 		swapfile_pager_dequeue(pager);
-		/* the pager is all ours: no need for the lock now */
+		                                                     
 		lck_mtx_unlock(&swapfile_pager_lock);
 		swapfile_pager_terminate_internal(pager);
 	} else if (ref_count == 0) {
-		/*
-		 * Dropped the existence reference;  the memory object has
-		 * been terminated.  Do some final cleanup and release the
-		 * pager structure.
-		 */
+		  
+                                                            
+                                                            
+                     
+     
 		lck_mtx_unlock(&swapfile_pager_lock);
 		if (pager->swp_pgr_hdr.mo_control != MEMORY_OBJECT_CONTROL_NULL) {
 			memory_object_control_deallocate(pager->swp_pgr_hdr.mo_control);
@@ -588,19 +588,19 @@ swapfile_pager_deallocate_internal(
 		kfree(pager, sizeof(*pager));
 		pager = SWAPFILE_PAGER_NULL;
 	} else {
-		/* there are still plenty of references:  keep going... */
+		                                                          
 		lck_mtx_unlock(&swapfile_pager_lock);
 	}
 
-	/* caution: lock is not held on return... */
+	                                            
 }
 
-/*
- * swapfile_pager_deallocate()
- *
- * Release a reference on this pager and free it when the last
- * reference goes away.
- */
+  
+                              
+  
+                                                              
+                       
+   
 void
 swapfile_pager_deallocate(
 	memory_object_t         mem_obj)
@@ -612,9 +612,9 @@ swapfile_pager_deallocate(
 	swapfile_pager_deallocate_internal(pager, FALSE);
 }
 
-/*
- *
- */
+  
+  
+   
 kern_return_t
 swapfile_pager_terminate(
 #if !DEBUG
@@ -627,9 +627,9 @@ swapfile_pager_terminate(
 	return KERN_SUCCESS;
 }
 
-/*
- *
- */
+  
+  
+   
 kern_return_t
 swapfile_pager_synchronize(
 	__unused memory_object_t        mem_obbj,
@@ -641,14 +641,14 @@ swapfile_pager_synchronize(
 	return KERN_FAILURE;
 }
 
-/*
- * swapfile_pager_map()
- *
- * This allows VM to let us, the EMM, know that this memory object
- * is currently mapped one or more times.  This is called by VM each time
- * the memory object gets mapped and we take one extra reference on the
- * memory object to account for all its mappings.
- */
+  
+                       
+  
+                                                                  
+                                                                         
+                                                                       
+                                                 
+   
 kern_return_t
 swapfile_pager_map(
 	memory_object_t         mem_obj,
@@ -662,13 +662,13 @@ swapfile_pager_map(
 
 	lck_mtx_lock(&swapfile_pager_lock);
 	assert(pager->is_ready);
-	assert(os_ref_get_count_raw(&pager->swp_pgr_hdr_ref) > 0); /* pager is alive */
+	assert(os_ref_get_count_raw(&pager->swp_pgr_hdr_ref) > 0);                     
 	if (pager->is_mapped == FALSE) {
-		/*
-		 * First mapping of this pager:  take an extra reference
-		 * that will remain until all the mappings of this pager
-		 * are removed.
-		 */
+		  
+                                                          
+                                                          
+                 
+     
 		pager->is_mapped = TRUE;
 		os_ref_retain_locked_raw(&pager->swp_pgr_hdr_ref, NULL);
 	}
@@ -677,11 +677,11 @@ swapfile_pager_map(
 	return KERN_SUCCESS;
 }
 
-/*
- * swapfile_pager_last_unmap()
- *
- * This is called by VM when this memory object is no longer mapped anywhere.
- */
+  
+                              
+  
+                                                                             
+   
 kern_return_t
 swapfile_pager_last_unmap(
 	memory_object_t         mem_obj)
@@ -695,13 +695,13 @@ swapfile_pager_last_unmap(
 
 	lck_mtx_lock(&swapfile_pager_lock);
 	if (pager->is_mapped) {
-		/*
-		 * All the mappings are gone, so let go of the one extra
-		 * reference that represents all the mappings of this pager.
-		 */
+		  
+                                                          
+                                                              
+     
 		pager->is_mapped = FALSE;
 		swapfile_pager_deallocate_internal(pager, TRUE);
-		/* caution: deallocate_internal() released the lock ! */
+		                                                        
 	} else {
 		lck_mtx_unlock(&swapfile_pager_lock);
 	}
@@ -710,9 +710,9 @@ swapfile_pager_last_unmap(
 }
 
 
-/*
- *
- */
+  
+  
+   
 swapfile_pager_t
 swapfile_pager_lookup(
 	memory_object_t  mem_obj)
@@ -738,24 +738,24 @@ swapfile_pager_create(
 		return SWAPFILE_PAGER_NULL;
 	}
 
-	/*
-	 * The vm_map call takes both named entry ports and raw memory
-	 * objects in the same parameter.  We need to make sure that
-	 * vm_map does not see this object as a named entry port.  So,
-	 * we reserve the second word in the object for a fake ip_kotype
-	 * setting - that will tell vm_map to use it as a memory object.
-	 */
+	  
+                                                               
+                                                             
+                                                               
+                                                                 
+                                                                 
+    
 	pager->swp_pgr_hdr.mo_ikot = IKOT_MEMORY_OBJECT;
 	pager->swp_pgr_hdr.mo_pager_ops = &swapfile_pager_ops;
 	pager->swp_pgr_hdr.mo_control = MEMORY_OBJECT_CONTROL_NULL;
 
-	pager->is_ready = FALSE;/* not ready until it has a "name" */
-	os_ref_init_raw(&pager->swp_pgr_hdr_ref, NULL);   /* setup reference */
+	pager->is_ready = FALSE;                                     
+	os_ref_init_raw(&pager->swp_pgr_hdr_ref, NULL);                        
 	pager->is_mapped = FALSE;
 	pager->swapfile_vnode = vp;
 
 	lck_mtx_lock(&swapfile_pager_lock);
-	/* see if anyone raced us to create a pager for the same object */
+	                                                                  
 	queue_iterate(&swapfile_pager_queue,
 	    pager2,
 	    swapfile_pager_t,
@@ -766,19 +766,19 @@ swapfile_pager_create(
 	}
 	if (!queue_end(&swapfile_pager_queue,
 	    (queue_entry_t) pager2)) {
-		/* while we hold the lock, transfer our setup ref to winner */
+		                                                              
 		os_ref_retain_locked_raw(&pager2->swp_pgr_hdr_ref, NULL);
-		/* we lost the race, down with the loser... */
+		                                              
 		lck_mtx_unlock(&swapfile_pager_lock);
 		pager->swapfile_vnode = NULL;
 		kfree(pager, sizeof(*pager));
-		/* ... and go with the winner */
+		                                
 		pager = pager2;
-		/* let the winner make sure the pager gets ready */
+		                                                   
 		return pager;
 	}
 
-	/* enter new pager at the head of our list of pagers */
+	                                                       
 	queue_enter_first(&swapfile_pager_queue,
 	    pager,
 	    swapfile_pager_t,
@@ -797,23 +797,23 @@ swapfile_pager_create(
 	memory_object_mark_trusted(control);
 
 	lck_mtx_lock(&swapfile_pager_lock);
-	/* the new pager is now ready to be used */
+	                                           
 	pager->is_ready = TRUE;
 	lck_mtx_unlock(&swapfile_pager_lock);
 
-	/* wakeup anyone waiting for this pager to be ready */
+	                                                      
 	thread_wakeup(&pager->is_ready);
 
 	return pager;
 }
 
-/*
- * swapfile_pager_setup()
- *
- * Provide the caller with a memory object backed by the provided
- * "backing_object" VM object.  If such a memory object already exists,
- * re-use it, otherwise create a new memory object.
- */
+  
+                         
+  
+                                                                 
+                                                                       
+                                                   
+   
 memory_object_t
 swapfile_pager_setup(
 	struct vnode *vp)
@@ -832,10 +832,10 @@ swapfile_pager_setup(
 	}
 	if (queue_end(&swapfile_pager_queue,
 	    (queue_entry_t) pager)) {
-		/* no existing pager for this backing object */
+		                                               
 		pager = SWAPFILE_PAGER_NULL;
 	} else {
-		/* make sure pager doesn't disappear */
+		                                       
 		os_ref_retain_raw(&pager->swp_pgr_hdr_ref, NULL);
 	}
 

@@ -1,7 +1,7 @@
-//
-// Tests for
-//  explicit bounded_ptr(T* pointer, T const* begin, T const* end);
-//
+  
+            
+                                                                   
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -46,34 +46,34 @@ tests()
 		_assert(*p == T{4});
 	}
 
-	// It must be valid to construct out-of-bounds pointers, but we obviously
-	// can't dereference them.
+	                                                                         
+	                          
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//            ^                 ^                     ^
-		//            |                 |                     |
-		//           ptr              begin                  end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<QualT> p(array.begin() + 1, array.begin() + 3, array.end());
 		_assert(p.unsafe_discard_bounds() == array.begin() + 1);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                          ^        ^
-		//   |                          |        |
-		// begin                       end      ptr
+		                                                               
+		                                          
+		                                          
+		                                           
 		test_bounded_ptr<QualT> p(array.begin() + 4, array.begin(), array.begin() + 3);
 		_assert(p.unsafe_discard_bounds() == array.begin() + 4);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                                ^
-		//   |                                                |
-		// begin                                             end,ptr
+		                                                               
+		                                                       
+		                                                       
+		                                                            
 		test_bounded_ptr<QualT> p(array.end(), array.begin(), array.end());
 		_assert(p.unsafe_discard_bounds() == array.end());
 	}
 
-	// Test creating a bounded_ptr from a null pointer.
+	                                                   
 	{
 		test_bounded_ptr<QualT> p(nullptr, nullptr, nullptr);
 		_assert(p.unsafe_discard_bounds() == nullptr);
@@ -89,7 +89,7 @@ T_DECL(ctor_begin_end, "bounded_ptr.ctor.begin_end") {
 	tests<T, T volatile>();
 	tests<T, T const volatile>();
 
-	// Make sure we can construct a `bounded_ptr<Base>` from `Derived*` pointers
+	                                                                            
 	{
 		std::array<Derived, 5> array = {};
 		test_bounded_ptr<Base> p(static_cast<Derived*>(array.begin()),

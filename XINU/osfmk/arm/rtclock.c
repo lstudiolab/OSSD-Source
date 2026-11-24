@@ -31,11 +31,11 @@
 /*
  * @APPLE_FREE_COPYRIGHT@
  */
-/*
- * File: arm/rtclock.c
- * Purpose: Routines for handling the machine dependent
- *   real-time clock.
- */
+  
+                      
+                                                       
+                     
+   
 
 #include <mach/mach_types.h>
 
@@ -80,9 +80,9 @@ timebase_callback(struct timebase_freq_t * freq);
 uint32_t absolute_time_validation = 0;
 #endif
 
-/*
- * Configure the real-time clock device at boot
- */
+  
+                                               
+   
 void
 rtclock_early_init(void)
 {
@@ -91,7 +91,7 @@ rtclock_early_init(void)
 	uint32_t tmp_mv = 1;
 
 #if defined(APPLE_ARM64_ARCH_FAMILY)
-	/* Enable MAT validation on A0 hardware by default. */
+	                                                      
 	absolute_time_validation = ml_get_topology_info()->chip_revision == CPU_VERSION_A0;
 #endif
 
@@ -119,7 +119,7 @@ timebase_callback(struct timebase_freq_t * freq)
 
 	denom = freq->timebase_num;
 	numer = freq->timebase_den * NSEC_PER_SEC;
-	// reduce by the greatest common denominator to minimize overflow
+	                                                                 
 	if (numer > denom) {
 		t64_1 = numer;
 		t64_2 = denom;
@@ -143,9 +143,9 @@ timebase_callback(struct timebase_freq_t * freq)
 	rtclock_usec_divisor = divisor / USEC_PER_SEC;
 }
 
-/*
- * Initialize the system clock device for the current cpu
- */
+  
+                                                         
+   
 int
 rtclock_init(void)
 {
@@ -161,8 +161,8 @@ rtclock_init(void)
 	cdp = getCpuDatap();
 
 	abstime = mach_absolute_time();
-	cdp->rtcPop = EndOfAllTime;                                     /* Init Pop time */
-	timer_resync_deadlines();                                       /* Start the timers going */
+	cdp->rtcPop = EndOfAllTime;                                                        
+	timer_resync_deadlines();                                                                   
 
 	return 1;
 }
@@ -176,23 +176,23 @@ mach_absolute_time(void)
 		uint64_t                 new_absolute_time, old_absolute_time;
 		int                      attempts = 0;
 
-		/* ARM 64: We need a dsb here to ensure that the load of s_last_absolute_time
-		 * completes before the timebase read. Were the load to complete after the
-		 * timebase read, there would be a window for another CPU to update
-		 * s_last_absolute_time and leave us in an inconsistent state. Consider the
-		 * following interleaving:
-		 *
-		 *   Let s_last_absolute_time = t0
-		 *   CPU0: Read timebase at t1
-		 *   CPU1: Read timebase at t2
-		 *   CPU1: Update s_last_absolute_time to t2
-		 *   CPU0: Load completes
-		 *   CPU0: Update s_last_absolute_time to t1
-		 *
-		 * This would cause the assertion to fail even though time did not go
-		 * backwards. Thus, we use a dsb to guarantee completion of the load before
-		 * the timebase read.
-		 */
+		                                                                             
+                                                                            
+                                                                     
+                                                                             
+                            
+    
+                                    
+                                
+                                
+                                              
+                           
+                                              
+    
+                                                                       
+                                                                             
+                       
+     
 		do {
 			attempts++;
 			old_absolute_time = s_last_absolute_time;
@@ -200,7 +200,7 @@ mach_absolute_time(void)
 #if __arm64__
 			__asm__ volatile ("dsb ld" ::: "memory");
 #else
-			OSSynchronizeIO(); // See osfmk/arm64/rtclock.c
+			OSSynchronizeIO();                             
 #endif
 
 			new_absolute_time = ml_get_timebase();
@@ -223,7 +223,7 @@ uint64_t
 mach_approximate_time(void)
 {
 #if __ARM_TIME__ || __ARM_TIME_TIMEBASE_ONLY__ || __arm64__
-	/* Hardware supports a fast timestamp, so grab it without asserting monotonicity */
+	                                                                                   
 	return ml_get_timebase();
 #else
 	processor_t processor;
@@ -275,9 +275,9 @@ clock_timebase_info(mach_timebase_info_t info)
 	*info = rtclock_timebase_const;
 }
 
-/*
- * Real-time clock device interrupt.
- */
+  
+                                    
+   
 void
 rtclock_intr(__unused unsigned int is_user_context)
 {
@@ -320,14 +320,14 @@ rtclock_intr(__unused unsigned int is_user_context)
 		user_mode = 0;
 	}
 	if (abstime >= cdp->rtcPop) {
-		/* Log the interrupt service latency (-ve value expected by tool) */
+		                                                                    
 		KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,
 		    MACHDBG_CODE(DBG_MACH_EXCP_DECI, 0) | DBG_FUNC_NONE,
 		    -(abstime - cdp->rtcPop),
 		    user_mode ? pc : VM_KERNEL_UNSLIDE(pc), user_mode, 0, 0);
 	}
 
-	/* call the generic etimer */
+	                             
 	timer_intr(user_mode, pc);
 }
 
@@ -346,9 +346,9 @@ deadline_to_decrementer(uint64_t deadline,
 	}
 }
 
-/*
- *	Request a decrementer pop
- */
+  
+                            
+   
 int
 setPop(uint64_t time)
 {
@@ -367,9 +367,9 @@ setPop(uint64_t time)
 	return delay_time;
 }
 
-/*
- *	Request decrementer Idle Pop. Return true if set
- */
+  
+                                                   
+   
 boolean_t
 SetIdlePop(void)
 {
@@ -395,9 +395,9 @@ SetIdlePop(void)
 	return TRUE;
 }
 
-/*
- *	Clear decrementer Idle Pop
- */
+  
+                             
+   
 void
 ClearIdlePop(
 	boolean_t wfi)
@@ -411,14 +411,14 @@ ClearIdlePop(
 	cdp->cpu_idle_pop = 0x0ULL;
 
 #if __arm64__
-	/*
-	 * Don't update the HW timer if there's a pending
-	 * interrupt (we can lose interrupt assertion);
-	 * we want to take the interrupt right now and update
-	 * the deadline from the handler).
-	 *
-	 * ARM64_TODO: consider this more carefully.
-	 */
+	  
+                                                  
+                                                
+                                                      
+                                   
+   
+                                             
+    
 	if (!(wfi && ml_get_timer_pending()))
 #endif
 	{
@@ -493,7 +493,7 @@ machine_delay_until(uint64_t interval,
 	do {
 #if     __ARM_ENABLE_WFE_
 		__builtin_arm_wfe();
-#endif /* __ARM_ENABLE_WFE_ */
+#endif                        
 
 		now = mach_absolute_time();
 	} while (now < deadline);

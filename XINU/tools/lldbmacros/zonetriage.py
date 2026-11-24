@@ -22,13 +22,13 @@ import xnudefines
 import re
 import os.path
 
-## Globals
+          
 panic_string = None
-## If the following panic strings are modified in xnu/osfmk/kern/zalloc.c, they must be updated here to reflect the change.
+                                                                                                                           
 zone_element_modified = ".*a freed zone element has been modified in zone (?P<zone>.+): expected (0x)?([0-9A-Fa-f]*)? but found (0x)?([0-9A-Fa-f]*)?, bits changed (0x)?([0-9A-Fa-f]*)?, at offset ([0-9]*)? of ([0-9]*)? in element (?P<element>0x[0-9A-Fa-f]*), cookies (0x)?([0-9A-Fa-f]*)? (0x)?([0-9A-Fa-f]*)?.*"
 zone_map_exhausted = ".*zalloc: zone map exhausted while allocating from zone .+, likely due to memory leak in zone (?P<zone>.+) \(([0-9]*)? total bytes, ([0-9]*)? elements allocated\).*"
 
-# Macro: zonetriage, zonetriage_freedelement, zonetriage_memoryleak
+                                                                   
 @lldb_command('zonetriage')
 def ZoneTriage(cmd_args=None):
     """ Calls function specific to type of zone panic based on the panic string
@@ -57,9 +57,9 @@ def ZoneTriageFreedElement(cmd_args=None):
         except:
             return
     CheckZoneBootArgs()
-    ## Run showzonesbeinglogged. 
+                                 
     print "(lldb) zstack_showzonesbeinglogged\n%s\n" % lldb_run_command("zstack_showzonesbeinglogged")
-    ## Capture zone and element from panic string.
+                                                  
     values = re.search(zone_element_modified, panic_string)
     if values is None or 'zone' not in values.group() or 'element' not in values.group():
         return
@@ -78,7 +78,7 @@ def ZoneTriageMemoryLeak(cmd_args=None):
     """
     global kern
     CheckZoneBootArgs()
-    ## Run showzonesbeinglogged. 
+                                 
     print "(lldb) zstack_showzonesbeinglogged\n%s\n" % lldb_run_command("zstack_showzonesbeinglogged")
     for zval in kern.zones:
         if zval.zlog_btlog:
@@ -121,4 +121,4 @@ def FindZoneBTLog(zone):
             if zone == "%s" % zval.z_name:
                 return "0x%lx" % zval.zlog_btlog
     return None
-# EndMacro: zonetriage, zonetriage_freedelement, zonetriage_memoryleak
+                                                                      

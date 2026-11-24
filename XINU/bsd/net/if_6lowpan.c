@@ -54,9 +54,9 @@
  * SUCH DAMAGE.
  *
  */
-/*
- * if_6lowpan.c - pseudo-device driver for IEEE 802.15.4 .
- */
+  
+                                                          
+   
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
@@ -183,17 +183,17 @@ if6lpan_entry;
 #define IF6LPAN_SIGNATURE       0x6666face
 struct if6lpan {
 	if6lpan_entry           if6lpan_list;
-	char                    if6lpan_name[IFNAMSIZ]; /* our unique id */
-	char                    if6lpan_addr[IEEE802154_ADDR_LEN]; /* our LL address */
-	struct ifnet *          if6lpan_ifp;    /* our interface */
-	struct ifnet *          if6lpan_pifp;   /* parent interface */
-#define IF6LPANF_DETACHING      0x1             /* interface is detaching */
-#define IF6LPANF_READY          0x2             /* interface is ready */
+	char                    if6lpan_name[IFNAMSIZ];                    
+	char                    if6lpan_addr[IEEE802154_ADDR_LEN];                     
+	struct ifnet *          if6lpan_ifp;                       
+	struct ifnet *          if6lpan_pifp;                         
+#define IF6LPANF_DETACHING      0x1                                         
+#define IF6LPANF_READY          0x2                                     
 	u_int32_t               if6lpan_flags;
 	bpf_packet_func         if6lpan_bpf_input;
 	bpf_packet_func         if6lpan_bpf_output;
 	int32_t                 if6lpan_retain_count;
-	u_int32_t               if6lpan_signature;      /* IF6LPAN_SIGNATURE */
+	u_int32_t               if6lpan_signature;                             
 	u_int8_t                if6lpan_ieee802154_seq;
 };
 
@@ -271,9 +271,9 @@ static struct if_clone sixlowpan_cloner = IF_CLONE_INITIALIZER(SIXLOWPANNAME,
     SIXLOWPAN_ZONE_MAX_ELEM,
     sizeof(struct if6lpan));
 
-/**
-** if6lpan_ref routines
-**/
+   
+                       
+   
 static void
 if6lpan_retain(if6lpan_ref ifl)
 {
@@ -390,7 +390,7 @@ sixlowpan_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *para
 	ifl->if6lpan_retain_count = 1;
 	ifl->if6lpan_signature = IF6LPAN_SIGNATURE;
 
-	/* use the interface name as the unique id for ifp recycle */
+	                                                             
 	if ((unsigned int)
 	    snprintf(ifl->if6lpan_name, sizeof(ifl->if6lpan_name), "%s%d",
 	    ifc->ifc_name, unit) >= sizeof(ifl->if6lpan_name)) {
@@ -427,7 +427,7 @@ sixlowpan_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *para
 	ifnet_set_offload(ifp, 0);
 	ifnet_set_addrlen(ifp, IEEE802154_ADDR_LEN);
 	ifnet_set_baudrate(ifp, 0);
-	// TODO: ifnet_set_hdrlen(ifp, IEEE802154_ENCAP_LEN);
+	                                                     
 
 	error = ifnet_attach(ifp, NULL);
 	if (error) {
@@ -438,7 +438,7 @@ sixlowpan_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *para
 	ifl->if6lpan_ifp = ifp;
 
 	p_6lowpan_ifnet = ifp;
-	/* TODO:  attach as IEEE 802.15.4 with no FCS */
+	                                                
 	bpfattach(ifp, DLT_IEEE802_15_4_NOFCS, IEEE802154_ENCAP_LEN);
 	return 0;
 }
@@ -514,12 +514,12 @@ sixlowpan_set_bpf_tap(ifnet_t ifp, bpf_tap_mode mode, bpf_packet_func func)
 	return 0;
 }
 
-/*
- * 6lowpan output routine.
- * Header compression on the protocol payload
- * Frame the compressed payload in 802.15.4 Data Frame
- * Encapsulate the 802.15.4 frame in an Ethernet frame.
- */
+  
+                          
+                                             
+                                                      
+                                                       
+   
 static int
 sixlowpan_output(struct ifnet * ifp, struct mbuf * m)
 {
@@ -548,7 +548,7 @@ sixlowpan_output(struct ifnet * ifp, struct mbuf * m)
 		goto unlock_done;
 	}
 
-	/* XXX parent interface equivalent? */
+	                                      
 	p_intf = ifl->if6lpan_pifp;
 	bpf_func = ifl->if6lpan_bpf_output;
 
@@ -557,18 +557,18 @@ sixlowpan_output(struct ifnet * ifp, struct mbuf * m)
 
 	(void)ifnet_stat_increment_out(ifp, 1, m->m_pkthdr.len, 0);
 
-	/*
-	 * We added a 2 byte length before the 802.15.4 data frame
-	 * We can play just with the length of the first mbuf in the
-	 * chain because bpf_tap_imp() disregards the packet length
-	 * of the mbuf packet header.
-	 */
+	  
+                                                           
+                                                             
+                                                            
+                              
+    
 	if (bpf_func && (mbuf_setdata(m, m->m_data + 2, m->m_len - 2) == 0)) {
 		bpf_func(ifp, m);
 		mbuf_setdata(m, m->m_data - 2, m->m_len + 2);
 	}
 
-	/* Append ethernet header */
+	                            
 	if ((err = ether_frameout_extended(p_intf, &m, NULL,
 	    link_layer_dest, (const char *)&ethertype,
 	    NULL, NULL))) {
@@ -595,12 +595,12 @@ unlock_done:
 	return err;
 }
 
-/*
- * 6lowpan input routine.
- * Decapsulate the 802.15.4 Data Frame
- * Header decompression on the payload
- * Pass the mbuf to the IPV6 protocol stack using proto_input()
- */
+  
+                         
+                                      
+                                      
+                                                               
+   
 static int
 sixlowpan_input(ifnet_t p, __unused protocol_family_t protocol,
     mbuf_t m, __unused char *frame_header)
@@ -613,7 +613,7 @@ sixlowpan_input(ifnet_t p, __unused protocol_family_t protocol,
 	int off, err = 0;
 	u_int16_t len;
 
-	/* Allocate an mbuf cluster for the 802.15.4 frame and uncompressed payload */
+	                                                                              
 	mc = m_getcl(M_WAITOK, MT_DATA, M_PKTHDR);
 	if (mc == NULL) {
 		err = -1;
@@ -623,7 +623,7 @@ sixlowpan_input(ifnet_t p, __unused protocol_family_t protocol,
 	memcpy(&len, mtod(m, u_int8_t *), sizeof(u_int16_t));
 	len = ntohs(len);
 	m_adj(m, sizeof(u_int16_t));
-	/* Copy the compressed 802.15.4 payload from source mbuf to allocated cluster mbuf */
+	                                                                                     
 	for (m_temp = m, off = 0; m_temp != NULL; m_temp = m_temp->m_next) {
 		if (m_temp->m_len > 0) {
 			m_copyback(mc, off, m_temp->m_len, mtod(m_temp, void *));
@@ -662,19 +662,19 @@ sixlowpan_input(ifnet_t p, __unused protocol_family_t protocol,
 		bpf_func(p, mc);
 	}
 
-	/* Parse the 802.15.4 frame header */
+	                                     
 	bzero(&ieee02154hdr, sizeof(ieee02154hdr));
-	/*
-	 * Use returned payload pointer to evaluate success
-	 * vs failure.
-	 */
+	  
+                                                    
+               
+    
 	(void)frame802154_parse(mtod(mc, uint8_t *), len, &ieee02154hdr, &payload);
 	if (payload == NULL) {
 		err = -1;
 		goto err_out;
 	}
 
-	/* XXX Add check for your link layer address being dest */
+	                                                          
 	if (sixxlowpan_input(&ieee02154hdr, payload) != 0) {
 		err = -1;
 		goto err_out;
@@ -686,7 +686,7 @@ sixlowpan_input(ifnet_t p, __unused protocol_family_t protocol,
 	}
 	mbuf_pkthdr_setlen(mc, ieee02154hdr.payload_len);
 
-	/* Post decompression */
+	                        
 	if (proto_input(PF_INET6, mc) != 0) {
 		ifnet_stat_increment_in(p, 0, 0, 1);
 		err = -1;
@@ -723,7 +723,7 @@ sixlowpan_config(struct ifnet *ifp, struct ifnet *p)
 	}
 	sixlowpan_attach_protocol(p);
 
-	/* set our LL address derived from that of the parent */
+	                                                        
 	if6lpan_set_addr(ifl, IF_LLADDR(p));
 	ifnet_set_lladdr_and_type(ifp, ifl->if6lpan_addr, IEEE802154_ADDR_LEN, IFT_6LOWPAN);
 
@@ -746,7 +746,7 @@ sixlowpan_unconfig(if6lpan_ref ifl)
 	struct ifnet *ifp = ifl->if6lpan_ifp;
 
 	sixlowpan_assert_lock_held();
-	/* Clear our MAC address. */
+	                            
 	ifnet_set_lladdr_and_type(ifp, NULL, 0, IFT_6LOWPAN);
 	sixlowpan_detach_protocol(ifl->if6lpan_pifp);
 	ifnet_set_mtu(ifp, 0);
@@ -825,14 +825,14 @@ sixlowpan_ioctl(ifnet_t ifp, u_long cmd, void * data)
 		error = copyout(&req, user_addr, sizeof(req));
 		break;
 
-#ifdef  SIOCSIFMTU /* xxx */
+#ifdef  SIOCSIFMTU          
 	case SIOCGIFMTU:
 		break;
 
 	case SIOCSIFMTU:
 		ifnet_set_mtu(ifp, ifr->ifr_mtu);
 		break;
-#endif /* SIOCSIFMTU */
+#endif                 
 
 	default:
 		error = EOPNOTSUPP;
@@ -861,20 +861,20 @@ static errno_t
 sixlowpan_detached(ifnet_t p, __unused protocol_family_t protocol)
 {
 	if (ifnet_is_attached(p, 0) == 0) {
-		// TODO: Find ifp from the parent p
-		// sixlowpan_if_free(ifp);
+		                                   
+		                          
 	}
 	return 0;
 }
 
-/*
- * Function: sixlowpan_attach_protocol
- * Purpose:
- *   Attach a DLIL protocol to the interface
- *	 The ethernet demux actually special cases 802.15.4.
- *	 The demux here isn't used. The demux will return PF_802154 for the
- *	 appropriate packets and our sixlowpan_input function will be called.
- */
+  
+                                      
+           
+                                            
+                                                       
+                                                                      
+                                                                        
+   
 static int
 sixlowpan_attach_protocol(struct ifnet *ifp)
 {
@@ -892,11 +892,11 @@ sixlowpan_attach_protocol(struct ifnet *ifp)
 	return error;
 }
 
-/*
- * Function: sixlowpan_detach_protocol
- * Purpose:
- *   Detach our DLIL protocol from an interface
- */
+  
+                                      
+           
+                                               
+   
 static int
 sixlowpan_detach_protocol(struct ifnet *ifp)
 {
@@ -931,14 +931,14 @@ sixlowpan_proto_pre_output(ifnet_t ifp,
 			bcopy(LLADDR(&sdl), ll_dest, sdl.sdl_alen);
 		}
 	} else {
-		/* map multicast address */
+		                           
 		ll_dest[0] = (dest6->sin6_addr.s6_addr8[14] & 0x1f) | 0x80;
 		ll_dest[1] = dest6->sin6_addr.s6_addr8[15];
 	}
 
-	/*
-	 * XXX This should be generic to the underlying hardware type
-	 */
+	  
+                                                              
+    
 	if (result == 0) {
 		u_int16_t ethertype = htons(ETHERTYPE_IEEE802154);
 		bcopy(&ethertype, type, sizeof(ethertype));
@@ -963,7 +963,7 @@ sixlowpan_framer_extended(struct ifnet *ifp, struct mbuf **m,
 	uint16_t len;
 	struct sockaddr_in6 *dest6 =  (struct sockaddr_in6 *)(uintptr_t)(size_t)ndest;
 
-	/* Initialize 802.15.4 frame header */
+	                                      
 	bzero(&ieee02154hdr, sizeof(ieee02154hdr));
 	if (!IN6_IS_ADDR_MULTICAST(&dest6->sin6_addr)) {
 		bcopy(edst, ieee02154hdr.dest_addr, sizeof(ieee02154hdr.dest_addr));
@@ -973,27 +973,27 @@ sixlowpan_framer_extended(struct ifnet *ifp, struct mbuf **m,
 		ieee02154hdr.fcf.dest_addr_mode = FRAME802154_SHORTADDRMODE;
 	}
 
-	/* Allocate a contiguous buffer for IPv6 header & payload */
-	/*
-	 * XXX As of now either we compress or we don't compress at all
-	 * adding another byte of dispatch to communicate that there's no
-	 * compression.
-	 *
-	 * Allocate for the worst case.
-	 */
+	                                                            
+	  
+                                                                
+                                                                  
+                
+   
+                                
+    
 	payload = _MALLOC(m_pktlen(*m) + 1, M_TEMP, M_WAITOK | M_ZERO);
 	if (payload == NULL) {
 		err = -1;
 		goto err_out;
 	}
 
-	/* Copy the IPv6 header & payload */
+	                                    
 	if (mbuf_copydata(*m, 0, m_pktlen(*m), payload)) {
 		err = -1;
 		goto err_out;
 	}
 
-	/* Allocate an mbuf cluster for the 802.15.4 frame and compressed payload */
+	                                                                            
 	mc = m_getcl(M_WAITOK, MT_DATA, M_PKTHDR);
 	if (mc == NULL) {
 		err = -1;
@@ -1011,37 +1011,37 @@ sixlowpan_framer_extended(struct ifnet *ifp, struct mbuf **m,
 		goto err_out;
 	}
 	bcopy(ifl->if6lpan_addr, ieee02154hdr.src_addr, sizeof(ieee02154hdr.src_addr));
-	ieee02154hdr.seq = ifl->if6lpan_ieee802154_seq++;   /**< Sequence number */
+	ieee02154hdr.seq = ifl->if6lpan_ieee802154_seq++;                          
 	if6lpan_release(ifl);
 	sixlowpan_unlock();
 
-	/* Initialize frame control field */
-	ieee02154hdr.fcf.frame_type = FRAME802154_DATAFRAME;  /**< 3 bit. Frame type field, see 802.15.4 */
-	ieee02154hdr.fcf.security_enabled = 0;  /**< 1 bit. True if security is used in this frame */
-	ieee02154hdr.fcf.frame_pending = 0;     /**< 1 bit. True if sender has more data to send */
-	ieee02154hdr.fcf.ack_required = 0;      /**< 1 bit. Is an ack frame required? */
-	ieee02154hdr.fcf.panid_compression = 0; /**< 1 bit. Is this a compressed header? */
-	ieee02154hdr.fcf.frame_version = FRAME802154_IEEE802154_2006; /**< 2 bit. 802.15.4 frame version */
-	ieee02154hdr.fcf.src_addr_mode = FRAME802154_LONGADDRMODE;    /**< 2 bit. Source address mode, see 802.15.4 */
-	ieee02154hdr.dest_pid = IEEE802154_PANID;   /**< Destination PAN ID */
-	ieee02154hdr.src_pid = IEEE802154_PANID;    /**< Source PAN ID */
-	ieee02154hdr.payload_len = m_pktlen(*m);    /**< Length of payload field */
+	                                    
+	ieee02154hdr.fcf.frame_type = FRAME802154_DATAFRAME;                                               
+	ieee02154hdr.fcf.security_enabled = 0;                                                       
+	ieee02154hdr.fcf.frame_pending = 0;                                                        
+	ieee02154hdr.fcf.ack_required = 0;                                              
+	ieee02154hdr.fcf.panid_compression = 0;                                            
+	ieee02154hdr.fcf.frame_version = FRAME802154_IEEE802154_2006;                                      
+	ieee02154hdr.fcf.src_addr_mode = FRAME802154_LONGADDRMODE;                                                    
+	ieee02154hdr.dest_pid = IEEE802154_PANID;                             
+	ieee02154hdr.src_pid = IEEE802154_PANID;                         
+	ieee02154hdr.payload_len = m_pktlen(*m);                                   
 
-	/* Create an 802.15.4 Data header frame */
+	                                          
 	buflen = frame802154_create(&ieee02154hdr, (uint8_t *)buf);
 
-	/* Perform inline compression of the IPv6 hdr & payload */
+	                                                          
 	sixxlowpan_output(&ieee02154hdr, payload);
 
-	/*
-	 * Add 2 bytes at the front of the frame indicating the total payload
-	 * length
-	 */
+	  
+                                                                      
+          
+    
 	len = htons((uint16_t)(buflen + ieee02154hdr.payload_len));
 	m_copyback(mc, 0, sizeof(len), &len);
-	/* Copy back the 802.15.4 Data frame header into mbuf */
+	                                                        
 	m_copyback(mc, sizeof(len), buflen, buf);
-	/* Copy back the compressed payload into mbuf */
+	                                                
 	m_copyback(mc, buflen + sizeof(len), ieee02154hdr.payload_len, payload);
 
 	if (prepend_len != NULL) {

@@ -54,12 +54,12 @@
  * the rights to redistribute these changes.
  */
 
-/*
- *	kern/host.h
- *
- *	Definitions for host data structures.
- *
- */
+  
+              
+  
+                                        
+  
+   
 
 #ifndef _KERN_HOST_H_
 #define _KERN_HOST_H_
@@ -77,7 +77,7 @@
 #include <mach/vm_statistics.h>
 
 struct  host {
-	decl_lck_mtx_data(, lock);               /* lock to protect exceptions */
+	decl_lck_mtx_data(, lock);                                               
 	ipc_port_t XNU_PTRAUTH_SIGNED_PTR("host.special") special[HOST_MAX_SPECIAL_PORT + 1];
 	struct exception_action exc_actions[EXC_TYPES_COUNT];
 };
@@ -110,11 +110,11 @@ extern kern_return_t host_set_special_port(host_priv_t host_priv, int id, ipc_po
 extern kern_return_t host_get_special_port(host_priv_t host_priv,
     __unused int node, int id, ipc_port_t * portp);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
-/*
- * Access routines for inside the kernel.
- */
+  
+                                         
+   
 
 __BEGIN_DECLS
 
@@ -123,4 +123,4 @@ extern host_priv_t              host_priv_self(void);
 extern host_security_t  host_security_self(void);
 __END_DECLS
 
-#endif  /* _KERN_HOST_H_ */
+#endif                     

@@ -31,10 +31,10 @@
 #include <mach/port.h>
 #include <mach/vm_param.h>
 #include <mach/notify.h>
-//#include <mach/mach_host_server.h>
+                                    
 #include <mach/mach_types.h>
 
-#include <machine/machparam.h>          /* spl definitions */
+#include <machine/machparam.h>                               
 
 #include <ipc/ipc_port.h>
 #include <ipc/ipc_space.h>
@@ -72,10 +72,10 @@
 LCK_GRP_DECLARE(dev_lck_grp, "device");
 LCK_MTX_DECLARE(iokit_obj_to_port_binding_lock, &dev_lck_grp);
 
-/*
- * Lookup a device by its port.
- * Doesn't consume the naked send right; produces a device reference.
- */
+  
+                               
+                                                                     
+   
 io_object_t
 iokit_lookup_io_object(ipc_port_t port, ipc_kobject_type_t type)
 {
@@ -204,10 +204,10 @@ iokit_unlock_port( __unused ipc_port_t port )
 	lck_mtx_unlock(&iokit_obj_to_port_binding_lock);
 }
 
-/*
- * Get the port for a device.
- * Consumes a device reference; produces a naked send right.
- */
+  
+                             
+                                                            
+   
 
 static ipc_port_t
 iokit_make_port_of_type(io_object_t obj, ipc_kobject_type_t type)
@@ -251,7 +251,7 @@ int gIOKitPortCount;
 EXTERN ipc_port_t
 iokit_alloc_object_port( io_object_t obj, ipc_kobject_type_t type )
 {
-	/* Allocate port, keeping a reference for it. */
+	                                                
 	gIOKitPortCount++;
 	ipc_kobject_alloc_options_t options = IPC_KOBJECT_ALLOC_NSREQUEST;
 	if (type == IKOT_IOKIT_CONNECT) {
@@ -271,7 +271,7 @@ iokit_destroy_object_port( ipc_port_t port )
 	iokit_lock_port(port);
 	ipc_kobject_set( port, IKO_NULL, IKOT_NONE);
 
-//    iokit_remove_reference( obj );
+                                    
 	iokit_unlock_port(port);
 	ipc_port_dealloc_kernel( port);
 	gIOKitPortCount--;
@@ -310,9 +310,9 @@ iokit_make_send_right( task_t task, io_object_t obj, ipc_kobject_type_t type )
 
 	if (IP_VALID( sendPort )) {
 		kern_return_t   kr;
-		// Remove once <rdar://problem/45522961> is fixed.
-		// We need to make ith_knote NULL as ipc_object_copyout() uses
-		// thread-argument-passing and its value should not be garbage
+		                                                  
+		                                                              
+		                                                              
 		current_thread()->ith_knote = ITH_KNOTE_NULL;
 		kr = ipc_object_copyout( task->itk_space, ip_to_object(sendPort),
 		    MACH_MSG_TYPE_PORT_SEND, IPC_OBJECT_COPYOUT_FLAGS_NONE, NULL, NULL, &name);
@@ -334,11 +334,11 @@ iokit_mod_send_right( task_t task, mach_port_name_t name, mach_port_delta_t delt
 	return mach_port_mod_refs( task->itk_space, name, MACH_PORT_RIGHT_SEND, delta );
 }
 
-/*
- * Handle the No-More_Senders notification generated from a device port destroy.
- * Since there are no longer any tasks which hold a send right to this device
- * port a NMS notification has been generated.
- */
+  
+                                                                                
+                                                                             
+                                              
+   
 
 static void
 iokit_no_senders( mach_no_senders_notification_t * notification )
@@ -350,7 +350,7 @@ iokit_no_senders( mach_no_senders_notification_t * notification )
 
 	port = notification->not_header.msgh_remote_port;
 
-	// convert a port to io_object_t.
+	                                 
 	if (IP_VALID(port)) {
 		iokit_lock_port(port);
 		if (ip_active(port)) {
@@ -371,12 +371,12 @@ iokit_no_senders( mach_no_senders_notification_t * notification )
 			mach_port_mscount_t mscount = notification->not_count;
 
 			if (KERN_SUCCESS != iokit_client_died( obj, port, type, &mscount )) {
-				/* Re-request no-senders notifications on the port (if still active) */
+				                                                                       
 				ip_lock(port);
 				if (ip_active(port)) {
 					notify = ipc_port_make_sonce_locked(port);
 					ipc_port_nsrequest( port, mscount + 1, notify, &notify);
-					/* port unlocked */
+					                   
 					if (notify != IP_NULL) {
 						ipc_port_release_sonce(notify);
 					}
@@ -415,7 +415,7 @@ iokit_label_dext_task(task_t task)
 	return ipc_space_add_label(task->itk_space, IPC_LABEL_DEXT);
 }
 
-/* need to create a pmap function to generalize */
+                                                  
 unsigned int
 IODefaultCacheBits(addr64_t pa)
 {
@@ -436,7 +436,7 @@ IOMapPages(vm_map_t map, mach_vm_address_t va, mach_vm_address_t pa,
 
 	pagenum = (ppnum_t)atop_64(pa);
 
-	switch (options & kIOMapCacheMask) {                    /* What cache mode do we need? */
+	switch (options & kIOMapCacheMask) {                                                     
 	case kIOMapDefaultCache:
 	default:
 		flags = IODefaultCacheBits(pa);
@@ -476,7 +476,7 @@ IOMapPages(vm_map_t map, mach_vm_address_t va, mach_vm_address_t pa,
 	vm_map_set_cache_attr(map, (vm_map_offset_t)va);
 
 
-	// Set up a block mapped area
+	                             
 	return pmap_map_block(pmap, va, pagenum, (uint32_t) atop_64(round_page_64(length)), prot, 0, 0);
 }
 
@@ -505,7 +505,7 @@ IOProtectCacheMode(vm_map_t __unused map, mach_vm_address_t __unused va,
 	    ? VM_PROT_READ : (VM_PROT_READ | VM_PROT_WRITE);
 
 	switch (options & kIOMapCacheMask) {
-	// what cache mode do we need?
+	                              
 	case kIOMapDefaultCache:
 	default:
 		return KERN_INVALID_ARGUMENT;
@@ -542,7 +542,7 @@ IOProtectCacheMode(vm_map_t __unused map, mach_vm_address_t __unused va,
 	pmap_flush_context_init(&pmap_flush_context_storage);
 	delayed_pmap_flush = FALSE;
 
-	//  enter each page's physical address in the target map
+	                                                        
 	for (off = 0; off < length; off += page_size) {
 		ppnum_t ppnum = pmap_find_phys(pmap, va + off);
 		if (ppnum) {

@@ -31,11 +31,11 @@
 /*
  * @APPLE_FREE_COPYRIGHT@
  */
-/*
- *	File:		etimer.c
- *	Purpose:	Routines for handling the machine independent
- *				event timer.
- */
+  
+                  
+                                                         
+                  
+   
 
 #include <mach/mach_types.h>
 
@@ -55,14 +55,14 @@
 #include <arm/cpu_data_internal.h>
 #include <arm/cpu_internal.h>
 
-/*
- *      Event timer interrupt.
- *
- * XXX a drawback of this implementation is that events serviced earlier must not set deadlines
- *     that occur before the entire chain completes.
- *
- * XXX a better implementation would use a set of generic callouts and iterate over them
- */
+  
+                              
+  
+                                                                                               
+                                                    
+  
+                                                                                        
+   
 void
 timer_intr(__unused int inuser, __unused uint64_t iaddr)
 {
@@ -72,10 +72,10 @@ timer_intr(__unused int inuser, __unused uint64_t iaddr)
 	processor_t     processor;
 
 	cpu_data_ptr = getCpuDatap();
-	mytimer = &cpu_data_ptr->rtclock_timer; /* Point to the event timer */
-	abstime = mach_absolute_time(); /* Get the time now */
+	mytimer = &cpu_data_ptr->rtclock_timer;                               
+	abstime = mach_absolute_time();                       
 
-	/* is it time for an idle timer event? */
+	                                         
 	if ((cpu_data_ptr->idle_timer_deadline > 0) && (cpu_data_ptr->idle_timer_deadline <= abstime)) {
 		cpu_data_ptr->idle_timer_deadline = 0x0ULL;
 		new_idle_timeout_ticks = 0x0ULL;
@@ -84,42 +84,42 @@ timer_intr(__unused int inuser, __unused uint64_t iaddr)
 		cpu_data_ptr->idle_timer_notify(cpu_data_ptr->idle_timer_refcon, &new_idle_timeout_ticks);
 		KERNEL_DEBUG_CONSTANT_IST(KDEBUG_COMMON, MACHDBG_CODE(DBG_MACH_EXCP_DECI, 3) | DBG_FUNC_END, 0, 0, 0, 0, 0);
 
-		/* if a new idle timeout was requested set the new idle timer deadline */
+		                                                                         
 		if (new_idle_timeout_ticks != 0x0ULL) {
 			clock_absolutetime_interval_to_deadline(new_idle_timeout_ticks, &cpu_data_ptr->idle_timer_deadline);
 		}
 
-		abstime = mach_absolute_time(); /* Get the time again since we ran a bit */
+		abstime = mach_absolute_time();                                            
 	}
 
-	/* has a pending clock timer expired? */
-	if (mytimer->deadline <= abstime) {     /* Have we expired the
-		                                 * deadline? */
-		mytimer->has_expired = TRUE;    /* Remember that we popped */
-		mytimer->deadline = EndOfAllTime;       /* Set timer request to
-		                                         * the end of all time
-		                                         * in case we have no
-		                                         * more events */
+	                                        
+	if (mytimer->deadline <= abstime) {                           
+                                                 
+		mytimer->has_expired = TRUE;                                 
+		mytimer->deadline = EndOfAllTime;                              
+                                                                
+                                                               
+                                                           
 		mytimer->deadline = timer_queue_expire(&mytimer->queue, abstime);
 		mytimer->has_expired = FALSE;
-		abstime = mach_absolute_time(); /* Get the time again since we ran a bit */
+		abstime = mach_absolute_time();                                            
 	}
 
 	processor = PERCPU_GET_RELATIVE(processor, cpu_data, cpu_data_ptr);
 	(void)running_timers_expire(processor, abstime);
-	/*
-	 * No need to update abstime.
-	 */
+	  
+                              
+    
 
-	/* Force reload our next deadline */
+	                                    
 	cpu_data_ptr->rtcPop = EndOfAllTime;
-	/* schedule our next deadline */
+	                                
 	timer_resync_deadlines();
 }
 
-/*
- * Set the clock deadline
- */
+  
+                         
+   
 void
 timer_set_deadline(uint64_t deadline)
 {
@@ -127,41 +127,41 @@ timer_set_deadline(uint64_t deadline)
 	spl_t           s;
 	cpu_data_t     *cpu_data_ptr;
 
-	s = splclock();         /* no interruptions */
+	s = splclock();                               
 	cpu_data_ptr = getCpuDatap();
 
-	mytimer = &cpu_data_ptr->rtclock_timer; /* Point to the timer itself */
-	mytimer->deadline = deadline;   /* Set the new expiration time */
+	mytimer = &cpu_data_ptr->rtclock_timer;                                
+	mytimer->deadline = deadline;                                    
 
 	timer_resync_deadlines();
 
 	splx(s);
 }
 
-/*
- * Re-evaluate the outstanding deadlines and select the most proximate.
- *
- * Should be called at splclock.
- */
+  
+                                                                       
+  
+                                
+   
 void
 timer_resync_deadlines(void)
 {
 	uint64_t        deadline;
 	rtclock_timer_t *mytimer;
-	spl_t           s = splclock(); /* No interruptions please */
+	spl_t           s = splclock();                              
 	cpu_data_t     *cpu_data_ptr;
 
 	cpu_data_ptr = getCpuDatap();
 
 	deadline = 0;
 
-	/* if we have a clock timer set sooner, pop on that */
-	mytimer = &cpu_data_ptr->rtclock_timer; /* Point to the timer itself */
+	                                                      
+	mytimer = &cpu_data_ptr->rtclock_timer;                                
 	if ((!mytimer->has_expired) && (mytimer->deadline > 0)) {
 		deadline = mytimer->deadline;
 	}
 
-	/* if we have a idle timer event coming up, how about that? */
+	                                                              
 	if ((cpu_data_ptr->idle_timer_deadline > 0)
 	    && (cpu_data_ptr->idle_timer_deadline < deadline)) {
 		deadline = cpu_data_ptr->idle_timer_deadline;
@@ -255,7 +255,7 @@ timer_call_cpu(int cpu, void (*fn)(void *), void *arg)
 void
 timer_call_nosync_cpu(int cpu, void (*fn)(void *), void *arg)
 {
-	/* XXX Needs error checking and retry */
+	                                        
 	cpu_signal(cpu_datap(cpu), SIGPxcall, (void *) fn, arg);
 }
 
@@ -280,12 +280,12 @@ static timer_coalescing_priority_params_ns_t tcoal_prio_params_init =
 	.latency_qos_ns_max = {1 * NSEC_PER_MSEC, 5 * NSEC_PER_MSEC, 20 * NSEC_PER_MSEC,
 		               75 * NSEC_PER_MSEC, 1 * NSEC_PER_MSEC, 1 * NSEC_PER_MSEC},
 	.latency_tier_rate_limited = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 	.latency_qos_scale = {3, 2, 1, -2, -15, -15},
 	.latency_qos_ns_max = {1 * NSEC_PER_MSEC, 5 * NSEC_PER_MSEC, 20 * NSEC_PER_MSEC,
 		               75 * NSEC_PER_MSEC, 10000 * NSEC_PER_MSEC, 10000 * NSEC_PER_MSEC},
 	.latency_tier_rate_limited = {FALSE, FALSE, FALSE, FALSE, TRUE, TRUE},
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 };
 timer_coalescing_priority_params_ns_t *
 timer_call_get_priority_params(void)

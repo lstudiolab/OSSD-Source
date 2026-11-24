@@ -55,17 +55,17 @@ static void pfkey_process_message_test_60687183_2(uint8_t **mhp, int pfkey_socke
 static void(*const process_pfkey_message_tests[])(uint8_t * *mhp, int pfkey_socket) =
 {
 	NULL,
-	pfkey_process_message_test_60822136,    // TEST_SADB_X_GET_OVERFLOW_60822136
-	pfkey_process_message_test_60822924,    // TEST_SADB_X_SPDENABLE_OVERFLOW_60822924
-	pfkey_process_message_test_60822956,    // TEST_SADB_X_SPDDISABLE_OVERFLOW_60822956
-	pfkey_process_message_test_60679513,    // TEST_SADB_UPDATE_USE_AFTER_FREE_60679513
-	pfkey_process_message_test_60768729,    // TEST_SADB_DUMP_HEAP_OVERFLOW_60768729
-	pfkey_process_message_test_60769680,    // TEST_SADB_POLICY_DUMP_HEAP_OVERFLOW_60769680
-	pfkey_process_message_test_60822823,    // TEST_SADB_GETSASTAT_OOB_READ_60822823
-	pfkey_process_message_test_60822823_1,  // TEST_SADB_GETSASTAT_OOB_READ_SUCCESS
-	pfkey_process_message_test_60687183,    // TEST_SADB_EXT_MIGRATE_ADDRESS_IPv4
-	pfkey_process_message_test_60687183_1,  // TEST_SADB_EXT_MIGRATE_ADDRESS_IPv6
-	pfkey_process_message_test_60687183_2,  // TEST_SADB_EXT_MIGRATE_BAD_ADDRESS
+	pfkey_process_message_test_60822136,                                        
+	pfkey_process_message_test_60822924,                                              
+	pfkey_process_message_test_60822956,                                               
+	pfkey_process_message_test_60679513,                                               
+	pfkey_process_message_test_60768729,                                            
+	pfkey_process_message_test_60769680,                                                   
+	pfkey_process_message_test_60822823,                                            
+	pfkey_process_message_test_60822823_1,                                         
+	pfkey_process_message_test_60687183,                                         
+	pfkey_process_message_test_60687183_1,                                       
+	pfkey_process_message_test_60687183_2,                                      
 };
 
 static void
@@ -74,24 +74,24 @@ pfkey_align(struct sadb_msg *msg, uint8_t **mhp)
 	struct sadb_ext *ext;
 	int i;
 	uint8_t *p;
-	uint8_t *ep;     /* XXX should be passed from upper layer */
+	uint8_t *ep;                                                
 
-	/* validity check */
+	                    
 	T_QUIET; T_ASSERT_NOTNULL(msg, "pfkey align msg");
 	T_QUIET; T_ASSERT_NOTNULL(mhp, "pfkey align mhp");
 
-	/* initialize */
+	                
 	for (i = 0; i < SADB_EXT_MAX + 1; i++) {
 		mhp[i] = NULL;
 	}
 
 	mhp[0] = (void *)msg;
 
-	/* initialize */
+	                
 	p = (void *) msg;
 	ep = p + PFKEY_UNUNIT64(msg->sadb_msg_len);
 
-	/* skip base header */
+	                      
 	p += sizeof(struct sadb_msg);
 
 	while (p < ep) {
@@ -102,7 +102,7 @@ pfkey_align(struct sadb_msg *msg, uint8_t **mhp)
 
 		T_QUIET; T_EXPECT_NULL(mhp[ext->sadb_ext_type], "duplicate extension type %u payload", ext->sadb_ext_type);
 
-		/* set pointer */
+		                 
 		switch (ext->sadb_ext_type) {
 		case SADB_EXT_SA:
 		case SADB_EXT_LIFETIME_CURRENT:
@@ -112,9 +112,9 @@ pfkey_align(struct sadb_msg *msg, uint8_t **mhp)
 		case SADB_EXT_ADDRESS_DST:
 		case SADB_EXT_ADDRESS_PROXY:
 		case SADB_EXT_KEY_AUTH:
-		/* XXX should to be check weak keys. */
+		                                       
 		case SADB_EXT_KEY_ENCRYPT:
-		/* XXX should to be check weak keys. */
+		                                       
 		case SADB_EXT_IDENTITY_SRC:
 		case SADB_EXT_IDENTITY_DST:
 		case SADB_EXT_SENSITIVITY:
@@ -258,7 +258,7 @@ send_pfkey_spd_add_message(int pfkey_socket, uint8_t proto)
 	policy_payload->sadb_x_policy_dir = IPSEC_DIR_OUTBOUND;
 	tlen += sizeof(*policy_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send spd add");
 }
@@ -287,7 +287,7 @@ send_pfkey_spd_get_message(int pfkey_socket, uint32_t policy_id)
 	policy_payload->sadb_x_policy_id = policy_id;
 	tlen += sizeof(*policy_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send spd get failed");
 }
@@ -316,7 +316,7 @@ send_pfkey_spd_enable_message(int pfkey_socket, uint32_t policy_id)
 	policy_payload->sadb_x_policy_id = policy_id;
 	tlen += sizeof(*policy_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send spd enable failed");
 }
@@ -345,7 +345,7 @@ send_pfkey_spd_disable_message(int pfkey_socket, uint32_t policy_id)
 	policy_payload->sadb_x_policy_id = policy_id;
 	tlen += sizeof(*policy_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send spd disable failed");
 }
@@ -374,7 +374,7 @@ send_pfkey_spd_delete_message(int pfkey_socket, uint32_t policy_id)
 	policy_payload->sadb_x_policy_id = policy_id;
 	tlen += sizeof(*policy_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send spd delete failed");
 }
@@ -397,7 +397,7 @@ send_pfkey_spd_dump_message(int pfkey_socket)
 	msg_payload->sadb_msg_pid = (uint32_t)getpid();
 	tlen += sizeof(*msg_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send spd dump failed");
 }
@@ -420,7 +420,7 @@ send_pfkey_flush_sp(int pfkey_socket)
 	msg_payload->sadb_msg_pid = (u_int32_t)getpid();
 	tlen += sizeof(*msg_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey flush security policies");
 }
@@ -480,7 +480,7 @@ send_pkey_get_spi(int pfkey_socket)
 	dst_address_payload->sadb_address_len = PFKEY_UNIT64(len);
 	tlen += PFKEY_ALIGN8(dst->sin_len);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send get spi");
 }
@@ -607,7 +607,7 @@ send_pkey_add_sa(int pfkey_socket, uint32_t spi, const char *src, const char *ds
 	soft_lifetime_payload->sadb_lifetime_exttype = SADB_EXT_LIFETIME_SOFT;
 	tlen += sizeof(*soft_lifetime_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send update sa");
 }
@@ -640,7 +640,7 @@ send_pkey_update_sa(int pfkey_socket, uint32_t spi)
 	sa2_payload->sa.sadb_sa_encrypt = SADB_X_EALG_AESCBC;
 	sa2_payload->sa.sadb_sa_flags |= (SADB_X_EXT_NATT | SADB_X_EXT_NATT_KEEPALIVE);
 	sa2_payload->sadb_sa_natt_src_port = htons(4500);
-	sa2_payload->sadb_sa_natt_port = 0;     // Bad value to trigger failure
+	sa2_payload->sadb_sa_natt_port = 0;                                    
 	sa2_payload->sadb_sa_natt_interval = 20;
 	sa2_payload->sadb_sa_natt_offload_interval = 0;
 	tlen += sizeof(*sa2_payload);
@@ -712,7 +712,7 @@ send_pkey_update_sa(int pfkey_socket, uint32_t spi)
 	soft_lifetime_payload->sadb_lifetime_exttype = SADB_EXT_LIFETIME_SOFT;
 	tlen += sizeof(*soft_lifetime_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send update sa");
 }
@@ -746,7 +746,7 @@ send_pkey_migrate_sa(int pfkey_socket, uint32_t spi, const char *src, const char
 	sa2_payload->sa.sadb_sa_encrypt = SADB_X_EALG_AESCBC;
 	sa2_payload->sa.sadb_sa_flags |= (SADB_X_EXT_NATT | SADB_X_EXT_NATT_KEEPALIVE);
 	sa2_payload->sadb_sa_natt_src_port = htons(4500);
-	sa2_payload->sadb_sa_natt_port = 0;     // Bad value to trigger failure
+	sa2_payload->sadb_sa_natt_port = 0;                                    
 	sa2_payload->sadb_sa_natt_interval = 20;
 	sa2_payload->sadb_sa_natt_offload_interval = 0;
 	tlen += sizeof(*sa2_payload);
@@ -839,7 +839,7 @@ send_pkey_migrate_sa(int pfkey_socket, uint32_t spi, const char *src, const char
 		struct sockaddr_in6 *migrate_src6 = (struct sockaddr_in6 *)(void *)(payload + tlen);
 		T_QUIET; T_ASSERT_EQ_INT(inet_pton(AF_INET6, migrate_src, &migrate_src6->sin6_addr), 1, "migrate src fail");
 		migrate_src6->sin6_family = AF_INET6;
-		migrate_src6->sin6_len = sizeof(*migrate_src6) + 100; // Bad value to trigger exploit
+		migrate_src6->sin6_len = sizeof(*migrate_src6) + 100;                                
 		uint16_t len = sizeof(*migrate_src_address_payload) + PFKEY_ALIGN8(migrate_src6->sin6_len);
 		migrate_src_address_payload->sadb_address_len = PFKEY_UNIT64(len);
 		tlen += PFKEY_ALIGN8(migrate_src6->sin6_len);
@@ -873,13 +873,13 @@ send_pkey_migrate_sa(int pfkey_socket, uint32_t spi, const char *src, const char
 		struct sockaddr_in6 *migrate_dst6 = (struct sockaddr_in6 *)(void *)(payload + tlen);
 		T_QUIET; T_ASSERT_EQ_INT(inet_pton(AF_INET6, migrate_dst, &migrate_dst6->sin6_addr), 1, "migrate dst fail");
 		migrate_dst6->sin6_family = AF_INET6;
-		migrate_dst6->sin6_len = sizeof(*migrate_dst6) + 100; // Bad value to trigger exploit
+		migrate_dst6->sin6_len = sizeof(*migrate_dst6) + 100;                                
 		uint16_t len = sizeof(*migrate_dst_address_payload) + PFKEY_ALIGN8(migrate_dst6->sin6_len);
 		migrate_dst_address_payload->sadb_address_len = PFKEY_UNIT64(len);
 		tlen += PFKEY_ALIGN8(migrate_dst6->sin6_len);
 	}
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send migrate sa");
 }
@@ -920,7 +920,7 @@ send_pfkey_get_sa_stat(int pfkey_socket, uint32_t spi, uint32_t stat_length)
 	sastat_payload->spi = htonl(spi);
 	tlen += PFKEY_ALIGN8(sizeof(*sastat_payload));
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send get sa stat");
 }
@@ -979,7 +979,7 @@ send_pkey_delete_sa(int pfkey_socket, uint32_t spi)
 	dst_address_payload->sadb_address_len = PFKEY_UNIT64(len);
 	tlen += PFKEY_ALIGN8(dst->sin_len);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send delete sa");
 }
@@ -1002,7 +1002,7 @@ send_pfkey_sa_dump_message(int pfkey_socket)
 	msg_payload->sadb_msg_pid = (uint32_t)getpid();
 	tlen += sizeof(*msg_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send sa dump failed");
 }
@@ -1025,7 +1025,7 @@ send_pfkey_flush_sa(int pfkey_socket)
 	msg_payload->sadb_msg_pid = (u_int32_t)getpid();
 	tlen += sizeof(*msg_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey flush sa");
 }
@@ -1057,7 +1057,7 @@ pfkey_setup_socket(void)
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pfkey_socket = socket(PF_KEY, SOCK_RAW, PF_KEY_V2), NULL);
 
 	if (sysctlbyname("kern.ipc.maxsockbuf", &oldmax, &oldmaxsize, &newmax, sizeof(newmax)) != 0) {
-		bufsiz = 233016;        /* Max allowed by default */
+		bufsiz = 233016;                                    
 	} else {
 		bufsiz = newbufk * 1024;
 	}

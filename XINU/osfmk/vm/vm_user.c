@@ -53,46 +53,46 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_user.c
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *
- *	User-exported virtual memory functions.
- */
+  
+   
+  
+                     
+                                                    
+  
+                                          
+   
 
-/*
- * There are three implementations of the "XXX_allocate" functionality in
- * the kernel: mach_vm_allocate (for any task on the platform), vm_allocate
- * (for a task with the same address space size, especially the current task),
- * and vm32_vm_allocate (for the specific case of a 32-bit task). vm_allocate
- * in the kernel should only be used on the kernel_task. vm32_vm_allocate only
- * makes sense on platforms where a user task can either be 32 or 64, or the kernel
- * task can be 32 or 64. mach_vm_allocate makes sense everywhere, and is preferred
- * for new code.
- *
- * The entrypoints into the kernel are more complex. All platforms support a
- * mach_vm_allocate-style API (subsystem 4800) which operates with the largest
- * size types for the platform. On platforms that only support U32/K32,
- * subsystem 4800 is all you need. On platforms that support both U32 and U64,
- * subsystem 3800 is used disambiguate the size of parameters, and they will
- * always be 32-bit and call into the vm32_vm_allocate APIs. On non-U32/K32 platforms,
- * the MIG glue should never call into vm_allocate directly, because the calling
- * task and kernel_task are unlikely to use the same size parameters
- *
- * New VM call implementations should be added here and to mach_vm.defs
- * (subsystem 4800), and use mach_vm_* "wide" types.
- */
+  
+                                                                         
+                                                                           
+                                                                              
+                                                                             
+                                                                              
+                                                                                   
+                                                                                  
+                
+  
+                                                                            
+                                                                              
+                                                                       
+                                                                              
+                                                                            
+                                                                                      
+                                                                                
+                                                                    
+  
+                                                                       
+                                                    
+   
 
 #include <debug.h>
 
 #include <vm_cpm.h>
 #include <mach/boolean.h>
 #include <mach/kern_return.h>
-#include <mach/mach_types.h>    /* to get vm_address_t */
+#include <mach/mach_types.h>                             
 #include <mach/memory_object.h>
-#include <mach/std_types.h>     /* to get pointer_t */
+#include <mach/std_types.h>                           
 #include <mach/upl.h>
 #include <mach/vm_attributes.h>
 #include <mach/vm_param.h>
@@ -128,12 +128,12 @@ vm_size_t        upl_offset_to_pagelist = 0;
 
 #if     VM_CPM
 #include <vm/cpm.h>
-#endif  /* VM_CPM */
+#endif              
 
-/*
- *	mach_vm_allocate allocates "zero fill" memory in the specfied
- *	map.
- */
+  
+                                                                
+       
+   
 kern_return_t
 mach_vm_allocate_external(
 	vm_map_t                map,
@@ -160,7 +160,7 @@ mach_vm_allocate_kernel(
 	kern_return_t   result;
 	boolean_t       anywhere;
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_ALLOCATE) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -175,16 +175,16 @@ mach_vm_allocate_kernel(
 
 	anywhere = ((VM_FLAGS_ANYWHERE & flags) != 0);
 	if (anywhere) {
-		/*
-		 * No specific address requested, so start candidate address
-		 * search at the minimum address in the map.  However, if that
-		 * minimum is 0, bump it up by PAGE_SIZE.  We want to limit
-		 * allocations of PAGEZERO to explicit requests since its
-		 * normal use is to catch dereferences of NULL and many
-		 * applications also treat pointers with a value of 0 as
-		 * special and suddenly having address 0 contain useable
-		 * memory would tend to confuse those applications.
-		 */
+		  
+                                                              
+                                                                
+                                                             
+                                                           
+                                                         
+                                                          
+                                                          
+                                                     
+     
 		map_addr = vm_map_min(map);
 		if (map_addr == 0) {
 			map_addr += VM_MAP_PAGE_SIZE(map);
@@ -218,11 +218,11 @@ mach_vm_allocate_kernel(
 	return result;
 }
 
-/*
- *	vm_allocate
- *	Legacy routine that allocates "zero fill" memory in the specfied
- *	map (which is limited to the same size as the kernel).
- */
+  
+              
+                                                                   
+                                                         
+   
 kern_return_t
 vm_allocate_external(
 	vm_map_t        map,
@@ -249,7 +249,7 @@ vm_allocate_kernel(
 	kern_return_t   result;
 	boolean_t       anywhere;
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_ALLOCATE) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -264,16 +264,16 @@ vm_allocate_kernel(
 
 	anywhere = ((VM_FLAGS_ANYWHERE & flags) != 0);
 	if (anywhere) {
-		/*
-		 * No specific address requested, so start candidate address
-		 * search at the minimum address in the map.  However, if that
-		 * minimum is 0, bump it up by PAGE_SIZE.  We want to limit
-		 * allocations of PAGEZERO to explicit requests since its
-		 * normal use is to catch dereferences of NULL and many
-		 * applications also treat pointers with a value of 0 as
-		 * special and suddenly having address 0 contain useable
-		 * memory would tend to confuse those applications.
-		 */
+		  
+                                                              
+                                                                
+                                                             
+                                                           
+                                                         
+                                                          
+                                                          
+                                                     
+     
 		map_addr = vm_map_min(map);
 		if (map_addr == 0) {
 			map_addr += VM_MAP_PAGE_SIZE(map);
@@ -313,11 +313,11 @@ vm_allocate_kernel(
 	return result;
 }
 
-/*
- *	mach_vm_deallocate -
- *	deallocates the specified range of addresses in the
- *	specified address map.
- */
+  
+                       
+                                                      
+                         
+   
 kern_return_t
 mach_vm_deallocate(
 	vm_map_t                map,
@@ -340,12 +340,12 @@ mach_vm_deallocate(
 	           VM_MAP_REMOVE_NO_FLAGS);
 }
 
-/*
- *	vm_deallocate -
- *	deallocates the specified range of addresses in the
- *	specified address map (limited to addresses the same
- *	size as the kernel).
- */
+  
+                  
+                                                      
+                                                       
+                       
+   
 kern_return_t
 vm_deallocate(
 	vm_map_t                map,
@@ -368,11 +368,11 @@ vm_deallocate(
 	           VM_MAP_REMOVE_NO_FLAGS);
 }
 
-/*
- *	mach_vm_inherit -
- *	Sets the inheritance of the specified range in the
- *	specified map.
- */
+  
+                    
+                                                     
+                 
+   
 kern_return_t
 mach_vm_inherit(
 	vm_map_t                map,
@@ -397,11 +397,11 @@ mach_vm_inherit(
 	           new_inheritance);
 }
 
-/*
- *	vm_inherit -
- *	Sets the inheritance of the specified range in the
- *	specified map (range limited to addresses
- */
+  
+               
+                                                     
+                                            
+   
 kern_return_t
 vm_inherit(
 	vm_map_t                map,
@@ -426,11 +426,11 @@ vm_inherit(
 	           new_inheritance);
 }
 
-/*
- *	mach_vm_protect -
- *	Sets the protection of the specified range in the
- *	specified map.
- */
+  
+                    
+                                                    
+                 
+   
 
 kern_return_t
 mach_vm_protect(
@@ -458,12 +458,12 @@ mach_vm_protect(
 	           set_maximum);
 }
 
-/*
- *	vm_protect -
- *	Sets the protection of the specified range in the
- *	specified map. Addressability of the range limited
- *	to the same size as the kernel.
- */
+  
+               
+                                                    
+                                                     
+                                  
+   
 
 kern_return_t
 vm_protect(
@@ -491,18 +491,18 @@ vm_protect(
 	           set_maximum);
 }
 
-/*
- * mach_vm_machine_attributes -
- * Handle machine-specific attributes for a mapping, such
- * as cachability, migrability, etc.
- */
+  
+                               
+                                                         
+                                    
+   
 kern_return_t
 mach_vm_machine_attribute(
 	vm_map_t                        map,
 	mach_vm_address_t               addr,
 	mach_vm_size_t          size,
 	vm_machine_attribute_t  attribute,
-	vm_machine_attribute_val_t* value)              /* IN/OUT */
+	vm_machine_attribute_val_t* value)                          
 {
 	if ((map == VM_MAP_NULL) || (addr + size < addr)) {
 		return KERN_INVALID_ARGUMENT;
@@ -522,19 +522,19 @@ mach_vm_machine_attribute(
 		value);
 }
 
-/*
- * vm_machine_attribute -
- * Handle machine-specific attributes for a mapping, such
- * as cachability, migrability, etc. Limited addressability
- * (same range limits as for the native kernel map).
- */
+  
+                         
+                                                         
+                                                           
+                                                    
+   
 kern_return_t
 vm_machine_attribute(
 	vm_map_t        map,
 	vm_address_t    addr,
 	vm_size_t       size,
 	vm_machine_attribute_t  attribute,
-	vm_machine_attribute_val_t* value)              /* IN/OUT */
+	vm_machine_attribute_val_t* value)                          
 {
 	if ((map == VM_MAP_NULL) || (addr + size < addr)) {
 		return KERN_INVALID_ARGUMENT;
@@ -554,19 +554,19 @@ vm_machine_attribute(
 		value);
 }
 
-/*
- * mach_vm_read -
- * Read/copy a range from one address space and return it to the caller.
- *
- * It is assumed that the address for the returned memory is selected by
- * the IPC implementation as part of receiving the reply to this call.
- * If IPC isn't used, the caller must deal with the vm_map_copy_t object
- * that gets returned.
- *
- * JMM - because of mach_msg_type_number_t, this call is limited to a
- * single 4GB region at this time.
- *
- */
+  
+                 
+                                                                        
+  
+                                                                        
+                                                                      
+                                                                        
+                      
+  
+                                                                     
+                                  
+  
+   
 kern_return_t
 mach_vm_read(
 	vm_map_t                map,
@@ -589,7 +589,7 @@ mach_vm_read(
 	error = vm_map_copyin(map,
 	    (vm_map_address_t)addr,
 	    (vm_map_size_t)size,
-	    FALSE,              /* src_destroy */
+	    FALSE,                               
 	    &ipc_address);
 
 	if (KERN_SUCCESS == error) {
@@ -600,16 +600,16 @@ mach_vm_read(
 	return error;
 }
 
-/*
- * vm_read -
- * Read/copy a range from one address space and return it to the caller.
- * Limited addressability (same range limits as for the native kernel map).
- *
- * It is assumed that the address for the returned memory is selected by
- * the IPC implementation as part of receiving the reply to this call.
- * If IPC isn't used, the caller must deal with the vm_map_copy_t object
- * that gets returned.
- */
+  
+            
+                                                                        
+                                                                           
+  
+                                                                        
+                                                                      
+                                                                        
+                      
+   
 kern_return_t
 vm_read(
 	vm_map_t                map,
@@ -627,19 +627,19 @@ vm_read(
 
 	mach_msg_type_number_t dsize;
 	if (os_convert_overflow(size, &dsize)) {
-		/*
-		 * The kernel could handle a 64-bit "size" value, but
-		 * it could not return the size of the data in "*data_size"
-		 * without overflowing.
-		 * Let's reject this "size" as invalid.
-		 */
+		  
+                                                       
+                                                             
+                         
+                                         
+     
 		return KERN_INVALID_ARGUMENT;
 	}
 
 	error = vm_map_copyin(map,
 	    (vm_map_address_t)addr,
 	    (vm_map_size_t)size,
-	    FALSE,              /* src_destroy */
+	    FALSE,                               
 	    &ipc_address);
 
 	if (KERN_SUCCESS == error) {
@@ -650,14 +650,14 @@ vm_read(
 	return error;
 }
 
-/*
- * mach_vm_read_list -
- * Read/copy a list of address ranges from specified map.
- *
- * MIG does not know how to deal with a returned array of
- * vm_map_copy_t structures, so we have to do the copyout
- * manually here.
- */
+  
+                      
+                                                         
+  
+                                                         
+                                                         
+                 
+   
 kern_return_t
 mach_vm_read_list(
 	vm_map_t                        map,
@@ -685,7 +685,7 @@ mach_vm_read_list(
 			error = vm_map_copyin(map,
 			    map_addr,
 			    map_size,
-			    FALSE,              /* src_destroy */
+			    FALSE,                               
 			    &copy);
 			if (KERN_SUCCESS == error) {
 				error = vm_map_copyout(
@@ -705,24 +705,24 @@ mach_vm_read_list(
 	return error;
 }
 
-/*
- * vm_read_list -
- * Read/copy a list of address ranges from specified map.
- *
- * MIG does not know how to deal with a returned array of
- * vm_map_copy_t structures, so we have to do the copyout
- * manually here.
- *
- * The source and destination ranges are limited to those
- * that can be described with a vm_address_t (i.e. same
- * size map as the kernel).
- *
- * JMM - If the result of the copyout is an address range
- * that cannot be described with a vm_address_t (i.e. the
- * caller had a larger address space but used this call
- * anyway), it will result in a truncated address being
- * returned (and a likely confused caller).
- */
+  
+                 
+                                                         
+  
+                                                         
+                                                         
+                 
+  
+                                                         
+                                                       
+                           
+  
+                                                         
+                                                         
+                                                       
+                                                       
+                                           
+   
 
 kern_return_t
 vm_read_list(
@@ -751,7 +751,7 @@ vm_read_list(
 			error = vm_map_copyin(map,
 			    map_addr,
 			    map_size,
-			    FALSE,              /* src_destroy */
+			    FALSE,                               
 			    &copy);
 			if (KERN_SUCCESS == error) {
 				error = vm_map_copyout(current_task()->map,
@@ -771,15 +771,15 @@ vm_read_list(
 	return error;
 }
 
-/*
- * mach_vm_read_overwrite -
- * Overwrite a range of the current map with data from the specified
- * map/address range.
- *
- * In making an assumption that the current thread is local, it is
- * no longer cluster-safe without a fully supportive local proxy
- * thread/task (but we don't support cluster's anymore so this is moot).
- */
+  
+                           
+                                                                    
+                     
+  
+                                                                  
+                                                                
+                                                                        
+   
 
 kern_return_t
 mach_vm_read_overwrite(
@@ -816,17 +816,17 @@ mach_vm_read_overwrite(
 	return error;
 }
 
-/*
- * vm_read_overwrite -
- * Overwrite a range of the current map with data from the specified
- * map/address range.
- *
- * This routine adds the additional limitation that the source and
- * destination ranges must be describable with vm_address_t values
- * (i.e. the same size address spaces as the kernel, or at least the
- * the ranges are in that first portion of the respective address
- * spaces).
- */
+  
+                      
+                                                                    
+                     
+  
+                                                                  
+                                                                  
+                                                                    
+                                                                 
+           
+   
 
 kern_return_t
 vm_read_overwrite(
@@ -864,11 +864,11 @@ vm_read_overwrite(
 }
 
 
-/*
- * mach_vm_write -
- * Overwrite the specified address range with the data provided
- * (from the current map).
- */
+  
+                  
+                                                               
+                          
+   
 kern_return_t
 mach_vm_write(
 	vm_map_t                        map,
@@ -881,19 +881,19 @@ mach_vm_write(
 	}
 
 	return vm_map_copy_overwrite(map, (vm_map_address_t)address,
-	           (vm_map_copy_t) data, size, FALSE /* interruptible XXX */);
+	           (vm_map_copy_t) data, size, FALSE                        );
 }
 
-/*
- * vm_write -
- * Overwrite the specified address range with the data provided
- * (from the current map).
- *
- * The addressability of the range of addresses to overwrite is
- * limited bu the use of a vm_address_t (same size as kernel map).
- * Either the target map is also small, or the range is in the
- * low addresses within it.
- */
+  
+             
+                                                               
+                          
+  
+                                                               
+                                                                  
+                                                              
+                           
+   
 kern_return_t
 vm_write(
 	vm_map_t                        map,
@@ -906,15 +906,15 @@ vm_write(
 	}
 
 	return vm_map_copy_overwrite(map, (vm_map_address_t)address,
-	           (vm_map_copy_t) data, size, FALSE /* interruptible XXX */);
+	           (vm_map_copy_t) data, size, FALSE                        );
 }
 
-/*
- * mach_vm_copy -
- * Overwrite one range of the specified map with the contents of
- * another range within that same map (i.e. both address ranges
- * are "over there").
- */
+  
+                 
+                                                                
+                                                               
+                     
+   
 kern_return_t
 mach_vm_copy(
 	vm_map_t                map,
@@ -939,7 +939,7 @@ mach_vm_copy(
 
 		kr = vm_map_copy_overwrite(map,
 		    (vm_map_address_t)dest_address,
-		    copy, (vm_map_size_t) size, FALSE /* interruptible XXX */);
+		    copy, (vm_map_size_t) size, FALSE                        );
 
 		if (KERN_SUCCESS != kr) {
 			vm_map_copy_discard(copy);
@@ -972,7 +972,7 @@ vm_copy(
 
 		kr = vm_map_copy_overwrite(map,
 		    (vm_map_address_t)dest_address,
-		    copy, (vm_map_size_t) size, FALSE /* interruptible XXX */);
+		    copy, (vm_map_size_t) size, FALSE                        );
 
 		if (KERN_SUCCESS != kr) {
 			vm_map_copy_discard(copy);
@@ -981,17 +981,17 @@ vm_copy(
 	return kr;
 }
 
-/*
- * mach_vm_map -
- * Map some range of an object into an address space.
- *
- * The object can be one of several types of objects:
- *	NULL - anonymous memory
- *	a named entry - a range within another address space
- *	                or a range within a memory object
- *	a whole memory object
- *
- */
+  
+                
+                                                     
+  
+                                                     
+                          
+                                                       
+                                                    
+                        
+  
+   
 kern_return_t
 mach_vm_map_external(
 	vm_map_t                target_map,
@@ -1037,7 +1037,7 @@ mach_vm_map_kernel(
 
 	vmmaddr = (vm_map_offset_t) *address;
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_MAP) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -1067,7 +1067,7 @@ mach_vm_map_kernel(
 }
 
 
-/* legacy interface */
+                      
 kern_return_t
 vm_map_64_external(
 	vm_map_t                target_map,
@@ -1125,7 +1125,7 @@ vm_map_64_kernel(
 	return kr;
 }
 
-/* temporary, until world build */
+                                  
 kern_return_t
 vm_map_external(
 	vm_map_t                target_map,
@@ -1184,11 +1184,11 @@ vm_map_kernel(
 	return kr;
 }
 
-/*
- * mach_vm_remap_new -
- * Behaves like mach_vm_remap, except that VM_FLAGS_RETURN_DATA_ADDR is always set
- * and {cur,max}_protection are in/out.
- */
+  
+                      
+                                                                                  
+                                       
+   
 kern_return_t
 mach_vm_remap_new_external(
 	vm_map_t                target_map,
@@ -1199,8 +1199,8 @@ mach_vm_remap_new_external(
 	mach_port_t             src_tport,
 	mach_vm_offset_t        memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,   /* IN/OUT */
-	vm_prot_t               *max_protection,   /* IN/OUT */
+	vm_prot_t               *cur_protection,               
+	vm_prot_t               *max_protection,               
 	vm_inherit_t            inheritance)
 {
 	vm_tag_t tag;
@@ -1211,7 +1211,7 @@ mach_vm_remap_new_external(
 	flags |= VM_FLAGS_RETURN_DATA_ADDR;
 	VM_GET_FLAGS_ALIAS(flags, tag);
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_REMAP) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -1227,10 +1227,10 @@ mach_vm_remap_new_external(
 	}
 	if ((*max_protection & (VM_PROT_WRITE | VM_PROT_EXECUTE)) ==
 	    (VM_PROT_WRITE | VM_PROT_EXECUTE)) {
-		/*
-		 * XXX FBDP TODO
-		 * enforce target's "wx" policies
-		 */
+		  
+                  
+                                   
+     
 		return KERN_PROTECTION_FAILURE;
 	}
 
@@ -1256,26 +1256,26 @@ mach_vm_remap_new_external(
 	    src_map,
 	    memory_address,
 	    copy,
-	    cur_protection,    /* IN/OUT */
-	    max_protection,    /* IN/OUT */
+	    cur_protection,                
+	    max_protection,                
 	    inheritance);
 
 	*address = map_addr;
 	vm_map_deallocate(src_map);
 
 	if (kr == KERN_SUCCESS) {
-		ipc_port_release_send(src_tport);  /* consume on success */
+		ipc_port_release_send(src_tport);                          
 	}
 	return kr;
 }
 
-/*
- * mach_vm_remap -
- * Remap a range of memory from one task into another,
- * to another address range within the same task, or
- * over top of itself (with altered permissions and/or
- * as an in-place copy of itself).
- */
+  
+                  
+                                                      
+                                                    
+                                                      
+                                  
+   
 kern_return_t
 mach_vm_remap_external(
 	vm_map_t                target_map,
@@ -1286,8 +1286,8 @@ mach_vm_remap_external(
 	vm_map_t                src_map,
 	mach_vm_offset_t        memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,    /* OUT */
-	vm_prot_t               *max_protection,    /* OUT */
+	vm_prot_t               *cur_protection,             
+	vm_prot_t               *max_protection,             
 	vm_inherit_t            inheritance)
 {
 	vm_tag_t tag;
@@ -1308,8 +1308,8 @@ mach_vm_remap_kernel(
 	vm_map_t                src_map,
 	mach_vm_offset_t        memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,   /* OUT */
-	vm_prot_t               *max_protection,   /* OUT */
+	vm_prot_t               *cur_protection,            
+	vm_prot_t               *max_protection,            
 	vm_inherit_t            inheritance)
 {
 	vm_map_offset_t         map_addr;
@@ -1319,7 +1319,7 @@ mach_vm_remap_kernel(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_REMAP) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -1339,18 +1339,18 @@ mach_vm_remap_kernel(
 	    src_map,
 	    memory_address,
 	    copy,
-	    cur_protection,    /* IN/OUT */
-	    max_protection,    /* IN/OUT */
+	    cur_protection,                
+	    max_protection,                
 	    inheritance);
 	*address = map_addr;
 	return kr;
 }
 
-/*
- * vm_remap_new -
- * Behaves like vm_remap, except that VM_FLAGS_RETURN_DATA_ADDR is always set
- * and {cur,max}_protection are in/out.
- */
+  
+                 
+                                                                             
+                                       
+   
 kern_return_t
 vm_remap_new_external(
 	vm_map_t                target_map,
@@ -1361,8 +1361,8 @@ vm_remap_new_external(
 	mach_port_t             src_tport,
 	vm_offset_t             memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,       /* IN/OUT */
-	vm_prot_t               *max_protection,       /* IN/OUT */
+	vm_prot_t               *cur_protection,                   
+	vm_prot_t               *max_protection,                   
 	vm_inherit_t            inheritance)
 {
 	vm_tag_t tag;
@@ -1373,7 +1373,7 @@ vm_remap_new_external(
 	flags |= VM_FLAGS_RETURN_DATA_ADDR;
 	VM_GET_FLAGS_ALIAS(flags, tag);
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_REMAP) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -1389,10 +1389,10 @@ vm_remap_new_external(
 	}
 	if ((*max_protection & (VM_PROT_WRITE | VM_PROT_EXECUTE)) ==
 	    (VM_PROT_WRITE | VM_PROT_EXECUTE)) {
-		/*
-		 * XXX FBDP TODO
-		 * enforce target's "wx" policies
-		 */
+		  
+                  
+                                   
+     
 		return KERN_PROTECTION_FAILURE;
 	}
 
@@ -1418,30 +1418,30 @@ vm_remap_new_external(
 	    src_map,
 	    memory_address,
 	    copy,
-	    cur_protection,   /* IN/OUT */
-	    max_protection,   /* IN/OUT */
+	    cur_protection,               
+	    max_protection,               
 	    inheritance);
 
 	*address = CAST_DOWN(vm_offset_t, map_addr);
 	vm_map_deallocate(src_map);
 
 	if (kr == KERN_SUCCESS) {
-		ipc_port_release_send(src_tport); /* consume on success */
+		ipc_port_release_send(src_tport);                         
 	}
 	return kr;
 }
 
-/*
- * vm_remap -
- * Remap a range of memory from one task into another,
- * to another address range within the same task, or
- * over top of itself (with altered permissions and/or
- * as an in-place copy of itself).
- *
- * The addressability of the source and target address
- * range is limited by the size of vm_address_t (in the
- * kernel context).
- */
+  
+             
+                                                      
+                                                    
+                                                      
+                                  
+  
+                                                      
+                                                       
+                   
+   
 kern_return_t
 vm_remap_external(
 	vm_map_t                target_map,
@@ -1452,8 +1452,8 @@ vm_remap_external(
 	vm_map_t                src_map,
 	vm_offset_t             memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,    /* OUT */
-	vm_prot_t               *max_protection,    /* OUT */
+	vm_prot_t               *cur_protection,             
+	vm_prot_t               *max_protection,             
 	vm_inherit_t            inheritance)
 {
 	vm_tag_t tag;
@@ -1474,8 +1474,8 @@ vm_remap_kernel(
 	vm_map_t                src_map,
 	vm_offset_t             memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,    /* OUT */
-	vm_prot_t               *max_protection,    /* OUT */
+	vm_prot_t               *cur_protection,             
+	vm_prot_t               *max_protection,             
 	vm_inherit_t            inheritance)
 {
 	vm_map_offset_t         map_addr;
@@ -1485,7 +1485,7 @@ vm_remap_kernel(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/* filter out any kernel-only flags */
+	                                      
 	if (flags & ~VM_FLAGS_USER_REMAP) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -1505,26 +1505,26 @@ vm_remap_kernel(
 	    src_map,
 	    memory_address,
 	    copy,
-	    cur_protection,   /* IN/OUT */
-	    max_protection,   /* IN/OUT */
+	    cur_protection,               
+	    max_protection,               
 	    inheritance);
 	*address = CAST_DOWN(vm_offset_t, map_addr);
 	return kr;
 }
 
-/*
- * NOTE: these routine (and this file) will no longer require mach_host_server.h
- * when mach_vm_wire and vm_wire are changed to use ledgers.
- */
+  
+                                                                                
+                                                            
+   
 #include <mach/mach_host_server.h>
-/*
- *	mach_vm_wire
- *	Specify that the range of the virtual address space
- *	of the target task must not cause page faults for
- *	the indicated accesses.
- *
- *	[ To unwire the pages, specify VM_PROT_NONE. ]
- */
+  
+               
+                                                      
+                                                    
+                          
+  
+                                                 
+   
 kern_return_t
 mach_vm_wire_external(
 	host_priv_t             host_priv,
@@ -1578,14 +1578,14 @@ mach_vm_wire_kernel(
 	return rc;
 }
 
-/*
- *	vm_wire -
- *	Specify that the range of the virtual address space
- *	of the target task must not cause page faults for
- *	the indicated accesses.
- *
- *	[ To unwire the pages, specify VM_PROT_NONE. ]
- */
+  
+            
+                                                      
+                                                    
+                          
+  
+                                                 
+   
 kern_return_t
 vm_wire(
 	host_priv_t             host_priv,
@@ -1629,36 +1629,36 @@ vm_wire(
 	return rc;
 }
 
-/*
- *	vm_msync
- *
- *	Synchronises the memory range specified with its backing store
- *	image by either flushing or cleaning the contents to the appropriate
- *	memory manager.
- *
- *	interpretation of sync_flags
- *	VM_SYNC_INVALIDATE	- discard pages, only return precious
- *				  pages to manager.
- *
- *	VM_SYNC_INVALIDATE & (VM_SYNC_SYNCHRONOUS | VM_SYNC_ASYNCHRONOUS)
- *				- discard pages, write dirty or precious
- *				  pages back to memory manager.
- *
- *	VM_SYNC_SYNCHRONOUS | VM_SYNC_ASYNCHRONOUS
- *				- write dirty or precious pages back to
- *				  the memory manager.
- *
- *	VM_SYNC_CONTIGUOUS	- does everything normally, but if there
- *				  is a hole in the region, and we would
- *				  have returned KERN_SUCCESS, return
- *				  KERN_INVALID_ADDRESS instead.
- *
- *	RETURNS
- *	KERN_INVALID_TASK		Bad task parameter
- *	KERN_INVALID_ARGUMENT		both sync and async were specified.
- *	KERN_SUCCESS			The usual.
- *	KERN_INVALID_ADDRESS		There was a hole in the region.
- */
+  
+           
+  
+                                                                 
+                                                                       
+                  
+  
+                               
+                                                           
+                         
+  
+                                                                    
+                                              
+                                     
+  
+                                             
+                                             
+                           
+  
+                                                              
+                                             
+                                          
+                                     
+  
+          
+                                        
+                                                             
+                            
+                                                        
+   
 
 kern_return_t
 mach_vm_msync(
@@ -1675,39 +1675,39 @@ mach_vm_msync(
 	           (vm_map_size_t)size, sync_flags);
 }
 
-/*
- *	vm_msync
- *
- *	Synchronises the memory range specified with its backing store
- *	image by either flushing or cleaning the contents to the appropriate
- *	memory manager.
- *
- *	interpretation of sync_flags
- *	VM_SYNC_INVALIDATE	- discard pages, only return precious
- *				  pages to manager.
- *
- *	VM_SYNC_INVALIDATE & (VM_SYNC_SYNCHRONOUS | VM_SYNC_ASYNCHRONOUS)
- *				- discard pages, write dirty or precious
- *				  pages back to memory manager.
- *
- *	VM_SYNC_SYNCHRONOUS | VM_SYNC_ASYNCHRONOUS
- *				- write dirty or precious pages back to
- *				  the memory manager.
- *
- *	VM_SYNC_CONTIGUOUS	- does everything normally, but if there
- *				  is a hole in the region, and we would
- *				  have returned KERN_SUCCESS, return
- *				  KERN_INVALID_ADDRESS instead.
- *
- *	The addressability of the range is limited to that which can
- *	be described by a vm_address_t.
- *
- *	RETURNS
- *	KERN_INVALID_TASK		Bad task parameter
- *	KERN_INVALID_ARGUMENT		both sync and async were specified.
- *	KERN_SUCCESS			The usual.
- *	KERN_INVALID_ADDRESS		There was a hole in the region.
- */
+  
+           
+  
+                                                                 
+                                                                       
+                  
+  
+                               
+                                                           
+                         
+  
+                                                                    
+                                              
+                                     
+  
+                                             
+                                             
+                           
+  
+                                                              
+                                             
+                                          
+                                     
+  
+                                                               
+                                  
+  
+          
+                                        
+                                                             
+                            
+                                                        
+   
 
 kern_return_t
 vm_msync(
@@ -1757,15 +1757,15 @@ vm_toggle_entry_reuse(int toggle, int *old_value)
 	return KERN_SUCCESS;
 }
 
-/*
- *	mach_vm_behavior_set
- *
- *	Sets the paging behavior attribute for the  specified range
- *	in the specified map.
- *
- *	This routine will fail with KERN_INVALID_ADDRESS if any address
- *	in [start,start+size) is not a valid allocated memory region.
- */
+  
+                       
+  
+                                                              
+                        
+  
+                                                                  
+                                                                
+   
 kern_return_t
 mach_vm_behavior_set(
 	vm_map_t                map,
@@ -1787,11 +1787,11 @@ mach_vm_behavior_set(
 	case VM_BEHAVIOR_REUSABLE:
 	case VM_BEHAVIOR_REUSE:
 	case VM_BEHAVIOR_CAN_REUSE:
-		/*
-		 * Align to the hardware page size, to allow
-		 * malloc() to maximize the amount of re-usability,
-		 * even on systems with larger software page size.
-		 */
+		  
+                                              
+                                                     
+                                                    
+     
 		align_mask = PAGE_MASK;
 		break;
 	default:
@@ -1805,19 +1805,19 @@ mach_vm_behavior_set(
 	           new_behavior);
 }
 
-/*
- *	vm_behavior_set
- *
- *	Sets the paging behavior attribute for the  specified range
- *	in the specified map.
- *
- *	This routine will fail with KERN_INVALID_ADDRESS if any address
- *	in [start,start+size) is not a valid allocated memory region.
- *
- *	This routine is potentially limited in addressibility by the
- *	use of vm_offset_t (if the map provided is larger than the
- *	kernel's).
- */
+  
+                  
+  
+                                                              
+                        
+  
+                                                                  
+                                                                
+  
+                                                               
+                                                             
+             
+   
 kern_return_t
 vm_behavior_set(
 	vm_map_t                map,
@@ -1835,29 +1835,29 @@ vm_behavior_set(
 	           new_behavior);
 }
 
-/*
- *	mach_vm_region:
- *
- *	User call to obtain information about a region in
- *	a task's address map. Currently, only one flavor is
- *	supported.
- *
- *	XXX The reserved and behavior fields cannot be filled
- *	    in until the vm merge from the IK is completed, and
- *	    vm_reserve is implemented.
- *
- *	XXX Dependency: syscall_vm_region() also supports only one flavor.
- */
+  
+                  
+  
+                                                    
+                                                      
+             
+  
+                                                        
+                                                          
+                                 
+  
+                                                                     
+   
 
 kern_return_t
 mach_vm_region(
 	vm_map_t                 map,
-	mach_vm_offset_t        *address,               /* IN/OUT */
-	mach_vm_size_t          *size,                  /* OUT */
-	vm_region_flavor_t       flavor,                /* IN */
-	vm_region_info_t         info,                  /* OUT */
-	mach_msg_type_number_t  *count,                 /* IN/OUT */
-	mach_port_t             *object_name)           /* OUT */
+	mach_vm_offset_t        *address,                           
+	mach_vm_size_t          *size,                           
+	vm_region_flavor_t       flavor,                        
+	vm_region_info_t         info,                           
+	mach_msg_type_number_t  *count,                             
+	mach_port_t             *object_name)                    
 {
 	vm_map_offset_t         map_addr;
 	vm_map_size_t           map_size;
@@ -1870,7 +1870,7 @@ mach_vm_region(
 	map_addr = (vm_map_offset_t)*address;
 	map_size = (vm_map_size_t)*size;
 
-	/* legacy conversion */
+	                       
 	if (VM_REGION_BASIC_INFO == flavor) {
 		flavor = VM_REGION_BASIC_INFO_64;
 	}
@@ -1885,29 +1885,29 @@ mach_vm_region(
 	return kr;
 }
 
-/*
- *	vm_region_64 and vm_region:
- *
- *	User call to obtain information about a region in
- *	a task's address map. Currently, only one flavor is
- *	supported.
- *
- *	XXX The reserved and behavior fields cannot be filled
- *	    in until the vm merge from the IK is completed, and
- *	    vm_reserve is implemented.
- *
- *	XXX Dependency: syscall_vm_region() also supports only one flavor.
- */
+  
+                              
+  
+                                                    
+                                                      
+             
+  
+                                                        
+                                                          
+                                 
+  
+                                                                     
+   
 
 kern_return_t
 vm_region_64(
 	vm_map_t                 map,
-	vm_offset_t             *address,               /* IN/OUT */
-	vm_size_t               *size,                  /* OUT */
-	vm_region_flavor_t       flavor,                /* IN */
-	vm_region_info_t         info,                  /* OUT */
-	mach_msg_type_number_t  *count,                 /* IN/OUT */
-	mach_port_t             *object_name)           /* OUT */
+	vm_offset_t             *address,                           
+	vm_size_t               *size,                           
+	vm_region_flavor_t       flavor,                        
+	vm_region_info_t         info,                           
+	mach_msg_type_number_t  *count,                             
+	mach_port_t             *object_name)                    
 {
 	vm_map_offset_t         map_addr;
 	vm_map_size_t           map_size;
@@ -1920,7 +1920,7 @@ vm_region_64(
 	map_addr = (vm_map_offset_t)*address;
 	map_size = (vm_map_size_t)*size;
 
-	/* legacy conversion */
+	                       
 	if (VM_REGION_BASIC_INFO == flavor) {
 		flavor = VM_REGION_BASIC_INFO_64;
 	}
@@ -1942,12 +1942,12 @@ vm_region_64(
 kern_return_t
 vm_region(
 	vm_map_t                        map,
-	vm_address_t                    *address,       /* IN/OUT */
-	vm_size_t                       *size,          /* OUT */
-	vm_region_flavor_t              flavor, /* IN */
-	vm_region_info_t                info,           /* OUT */
-	mach_msg_type_number_t  *count, /* IN/OUT */
-	mach_port_t                     *object_name)   /* OUT */
+	vm_address_t                    *address,                   
+	vm_size_t                       *size,                   
+	vm_region_flavor_t              flavor,         
+	vm_region_info_t                info,                    
+	mach_msg_type_number_t  *count,             
+	mach_port_t                     *object_name)            
 {
 	vm_map_address_t        map_addr;
 	vm_map_size_t           map_size;
@@ -1974,11 +1974,11 @@ vm_region(
 	return kr;
 }
 
-/*
- *	vm_region_recurse: A form of vm_region which follows the
- *	submaps in a target map
- *
- */
+  
+                                                           
+                          
+  
+   
 kern_return_t
 mach_vm_region_recurse(
 	vm_map_t                        map,
@@ -2012,11 +2012,11 @@ mach_vm_region_recurse(
 	return kr;
 }
 
-/*
- *	vm_region_recurse: A form of vm_region which follows the
- *	submaps in a target map
- *
- */
+  
+                                                           
+                          
+  
+   
 kern_return_t
 vm_region_recurse_64(
 	vm_map_t                        map,
@@ -2057,11 +2057,11 @@ vm_region_recurse_64(
 kern_return_t
 vm_region_recurse(
 	vm_map_t                        map,
-	vm_offset_t             *address,       /* IN/OUT */
-	vm_size_t                       *size,          /* OUT */
-	natural_t                       *depth, /* IN/OUT */
-	vm_region_recurse_info_t        info32, /* IN/OUT */
-	mach_msg_type_number_t  *infoCnt)       /* IN/OUT */
+	vm_offset_t             *address,                   
+	vm_size_t                       *size,                   
+	natural_t                       *depth,             
+	vm_region_recurse_info_t        info32,             
+	mach_msg_type_number_t  *infoCnt)                   
 {
 	vm_region_submap_info_data_64_t info64;
 	vm_region_submap_info_t info;
@@ -2085,7 +2085,7 @@ vm_region_recurse(
 	info->protection = info64.protection;
 	info->max_protection = info64.max_protection;
 	info->inheritance = info64.inheritance;
-	info->offset = (uint32_t)info64.offset; /* trouble-maker */
+	info->offset = (uint32_t)info64.offset;                    
 	info->user_tag = info64.user_tag;
 	info->pages_resident = info64.pages_resident;
 	info->pages_shared_now_private = info64.pages_shared_now_private;
@@ -2122,7 +2122,7 @@ mach_vm_purgable_control(
 	}
 
 	if (control == VM_PURGABLE_SET_STATE_FROM_KERNEL) {
-		/* not allowed from user-space */
+		                                 
 		return KERN_INVALID_ARGUMENT;
 	}
 
@@ -2144,7 +2144,7 @@ vm_purgable_control(
 	}
 
 	if (control == VM_PURGABLE_SET_STATE_FROM_KERNEL) {
-		/* not allowed from user-space */
+		                                 
 		return KERN_INVALID_ARGUMENT;
 	}
 
@@ -2155,24 +2155,24 @@ vm_purgable_control(
 }
 
 
-/*
- *	Ordinarily, the right to allocate CPM is restricted
- *	to privileged applications (those that can gain access
- *	to the host priv port).  Set this variable to zero if
- *	you want to let any application allocate CPM.
- */
+  
+                                                      
+                                                         
+                                                        
+                                                
+   
 unsigned int    vm_allocate_cpm_privileged = 0;
 
-/*
- *	Allocate memory in the specified map, with the caveat that
- *	the memory is physically contiguous.  This call may fail
- *	if the system can't find sufficient contiguous memory.
- *	This call may cause or lead to heart-stopping amounts of
- *	paging activity.
- *
- *	Memory obtained from this call should be freed in the
- *	normal way, viz., via vm_deallocate.
- */
+  
+                                                             
+                                                           
+                                                         
+                                                           
+                   
+  
+                                                        
+                                       
+   
 kern_return_t
 vm_allocate_cpm(
 	host_priv_t             host_priv,
@@ -2283,9 +2283,9 @@ mach_vm_page_range_query(
 	}
 
 	if ((end - start) < size) {
-		/*
-		 * Aligned size is less than unaligned size.
-		 */
+		  
+                                              
+     
 		return KERN_INVALID_ARGUMENT;
 	}
 
@@ -2293,10 +2293,10 @@ mach_vm_page_range_query(
 		return KERN_SUCCESS;
 	}
 
-	/*
-	 * For large requests, we will go through them
-	 * MAX_PAGE_RANGE_QUERY chunk at a time.
-	 */
+	  
+                                               
+                                         
+    
 
 	curr_sz = MIN(end - start, MAX_PAGE_RANGE_QUERY);
 	num_pages = (int) (curr_sz >> effective_page_shift);
@@ -2329,7 +2329,7 @@ mach_vm_page_range_query(
 			((int*)local_disp)[i] = ((vm_page_info_basic_t)info)[i].disposition;
 		}
 
-		copy_sz = MIN(disp_buf_req_size, num_pages * sizeof(int) /* an int per page */);
+		copy_sz = MIN(disp_buf_req_size, num_pages * sizeof(int)                      );
 		kr = copyout(local_disp, (mach_vm_address_t)dispositions_addr, copy_sz);
 
 		start += curr_sz;
@@ -2341,12 +2341,12 @@ mach_vm_page_range_query(
 		}
 
 		if ((disp_buf_req_size == 0) || (curr_sz >= size)) {
-			/*
-			 * We might have inspected the full range OR
-			 * more than it esp. if the user passed in
-			 * non-page aligned start/size and/or if we
-			 * descended into a submap. We are done here.
-			 */
+			  
+                                               
+                                             
+                                              
+                                                
+      
 
 			size = 0;
 		} else {
@@ -2389,7 +2389,7 @@ mach_vm_page_info(
 	return kr;
 }
 
-/* map a (whole) upl into an address space */
+                                             
 kern_return_t
 vm_upl_map(
 	vm_map_t                map,
@@ -2420,7 +2420,7 @@ vm_upl_unmap(
 	return vm_map_remove_upl(map, upl);
 }
 
-/* Retrieve a upl for an object underlying an address range in a map */
+                                                                       
 
 kern_return_t
 vm_map_get_upl(
@@ -2459,14 +2459,14 @@ vm_map_get_upl(
 	return kr;
 }
 
-/*
- * mach_make_memory_entry_64
- *
- * Think of it as a two-stage vm_remap() operation.  First
- * you get a handle.  Second, you get map that handle in
- * somewhere else. Rather than doing it all at once (and
- * without needing access to the other whole map).
- */
+  
+                            
+  
+                                                          
+                                                        
+                                                        
+                                                  
+   
 kern_return_t
 mach_make_memory_entry_64(
 	vm_map_t                target_map,
@@ -2479,9 +2479,9 @@ mach_make_memory_entry_64(
 	vm_named_entry_kernel_flags_t   vmne_kflags;
 
 	if ((permission & MAP_MEM_FLAGS_MASK) & ~MAP_MEM_FLAGS_USER) {
-		/*
-		 * Unknown flag: reject for forward compatibility.
-		 */
+		  
+                                                    
+     
 		return KERN_INVALID_VALUE;
 	}
 
@@ -2516,10 +2516,10 @@ mach_make_memory_entry_internal(
 	vm_map_size_t           map_size;
 	vm_map_offset_t         map_start, map_end;
 
-	/*
-	 * Stash the offset in the page for use by vm_map_enter_mem_object()
-	 * in the VM_FLAGS_RETURN_DATA_ADDR/MAP_MEM_USE_DATA_ADDR case.
-	 */
+	  
+                                                                     
+                                                                
+    
 	vm_object_offset_t      offset_in_page;
 
 	unsigned int            access;
@@ -2534,9 +2534,9 @@ mach_make_memory_entry_internal(
 	user_entry = NULL;
 
 	if ((permission & MAP_MEM_FLAGS_MASK) & ~MAP_MEM_FLAGS_ALL) {
-		/*
-		 * Unknown flag: reject for forward compatibility.
-		 */
+		  
+                                                    
+     
 		DEBUG4K_MEMENTRY("map %p offset 0x%llx size 0x%llx prot 0x%x -> entry %p kr 0x%x\n", target_map, offset, *size, permission, user_entry, KERN_INVALID_VALUE);
 		return KERN_INVALID_VALUE;
 	}
@@ -2634,15 +2634,15 @@ mach_make_memory_entry_internal(
 			return KERN_FAILURE;
 		}
 
-		/*
-		 * Force the creation of the VM object now.
-		 */
+		  
+                                             
+     
 		if (map_size > (vm_map_size_t) ANON_MAX_SIZE) {
-			/*
-			 * LP64todo - for now, we can only allocate 4GB-4096
-			 * internal objects because the default pager can't
-			 * page bigger ones.  Remove this when it can.
-			 */
+			  
+                                                       
+                                                      
+                                                 
+      
 			kr = KERN_FAILURE;
 			goto make_mem_done;
 		}
@@ -2650,15 +2650,15 @@ mach_make_memory_entry_internal(
 		object = vm_object_allocate(map_size);
 		assert(object != VM_OBJECT_NULL);
 
-		/*
-		 * XXX
-		 * We use this path when we want to make sure that
-		 * nobody messes with the object (coalesce, for
-		 * example) before we map it.
-		 * We might want to use these objects for transposition via
-		 * vm_object_transpose() too, so we don't want any copy or
-		 * shadow objects either...
-		 */
+		  
+        
+                                                    
+                                                 
+                               
+                                                             
+                                                            
+                             
+     
 		object->copy_strategy = MEMORY_OBJECT_COPY_NONE;
 		object->true_share = TRUE;
 
@@ -2675,7 +2675,7 @@ mach_make_memory_entry_internal(
 			}
 			if (permission & MAP_MEM_PURGABLE) {
 				if (!(permission & VM_PROT_WRITE)) {
-					/* if we can't write, we can't purge */
+					                                       
 					vm_object_deallocate(object);
 					kr = KERN_INVALID_ARGUMENT;
 					goto make_mem_done;
@@ -2686,15 +2686,15 @@ mach_make_memory_entry_internal(
 				}
 #if __arm64__
 				if (owner->task_legacy_footprint) {
-					/*
-					 * For ios11, we failed to account for
-					 * this memory.  Keep doing that for
-					 * legacy apps (built before ios12),
-					 * for backwards compatibility's sake...
-					 */
+					  
+                                           
+                                         
+                                         
+                                             
+        
 					owner = kernel_task;
 				}
-#endif /* __arm64__ */
+#endif                
 				vm_object_lock(object);
 				vm_purgeable_nonvolatile_enqueue(object, owner);
 				vm_object_unlock(object);
@@ -2702,10 +2702,10 @@ mach_make_memory_entry_internal(
 		}
 
 		if (vmne_kflags.vmnekf_ledger_tag) {
-			/*
-			 * Bill this object to the current task's
-			 * ledgers for the given tag.
-			 */
+			  
+                                            
+                                
+      
 			if (vmne_kflags.vmnekf_ledger_no_footprint) {
 				ledger_flags |= VM_LEDGER_FLAG_NO_FOOTPRINT;
 			}
@@ -2714,9 +2714,9 @@ mach_make_memory_entry_internal(
 			kr = vm_object_ownership_change(
 				object,
 				vmne_kflags.vmnekf_ledger_tag,
-				owner, /* new owner */
+				owner,                
 				ledger_flags,
-				FALSE); /* task_objq locked? */
+				FALSE);                        
 			vm_object_unlock(object);
 			if (kr != KERN_SUCCESS) {
 				vm_object_deallocate(object);
@@ -2725,10 +2725,10 @@ mach_make_memory_entry_internal(
 		}
 
 #if CONFIG_SECLUDED_MEMORY
-		if (secluded_for_iokit && /* global boot-arg */
+		if (secluded_for_iokit &&                      
 		    ((permission & MAP_MEM_GRAB_SECLUDED)
 #if 11
-		    /* XXX FBDP for my testing only */
+		                                      
 		    || (secluded_for_fbdp && map_size == 97550336)
 #endif
 		    )) {
@@ -2741,12 +2741,12 @@ mach_make_memory_entry_internal(
 			object->can_grab_secluded = TRUE;
 			assert(!object->eligible_for_secluded);
 		}
-#endif /* CONFIG_SECLUDED_MEMORY */
+#endif                             
 
-		/*
-		 * The VM object is brand new and nobody else knows about it,
-		 * so we don't need to lock it.
-		 */
+		  
+                                                               
+                                 
+     
 
 		wimg_mode = object->wimg_bits;
 		vm_prot_to_wimg(access, &wimg_mode);
@@ -2754,7 +2754,7 @@ mach_make_memory_entry_internal(
 			object->wimg_bits = wimg_mode;
 		}
 
-		/* the object has no pages, so no WIMG bits to update here */
+		                                                             
 
 		kr = vm_named_entry_from_vm_object(
 			user_entry,
@@ -2774,8 +2774,8 @@ mach_make_memory_entry_internal(
 		SET_MAP_MEM(access, user_entry->protection);
 		user_entry->size = map_size;
 
-		/* user_object pager and internal fields are not used */
-		/* when the object field is filled in.		      */
+		                                                        
+		                                                
 
 		*size = CAST_DOWN(vm_size_t, (user_entry->size -
 		    user_entry->data_offset));
@@ -2867,7 +2867,7 @@ mach_make_memory_entry_internal(
 			boolean_t wired;
 			bool contended;
 
-			/* resolve any pending submap copy-on-write... */
+			                                                 
 			if (protections & VM_PROT_WRITE) {
 				tmp_map = target_map;
 				vm_map_lock_read(tmp_map);
@@ -2880,7 +2880,7 @@ mach_make_memory_entry_internal(
 				    &obj_off,
 				    &prot,
 				    &wired,
-				    NULL,                       /* fault_info */
+				    NULL,                                       
 				    &real_map,
 				    &contended);
 				if (kr != KERN_SUCCESS) {
@@ -2893,9 +2893,9 @@ mach_make_memory_entry_internal(
 					}
 				}
 			}
-			/* ... and carry on */
+			                      
 
-			/* stop extracting if VM object changes */
+			                                          
 			vmk_flags.vmkf_copy_single_object = TRUE;
 			if ((permission & MAP_MEM_NAMED_REUSE) &&
 			    parent_entry != NULL &&
@@ -2924,27 +2924,27 @@ mach_make_memory_entry_internal(
 		}
 
 		if (mask_protections) {
-			/*
-			 * caller is asking for whichever proctections are
-			 * available: no required protections.
-			 */
+			  
+                                                     
+                                         
+      
 			cur_prot = VM_PROT_NONE;
 			max_prot = VM_PROT_NONE;
 		} else {
-			/*
-			 * Caller wants a memory entry with "protections".
-			 * Make sure we extract only memory that matches that.
-			 */
+			  
+                                                     
+                                                         
+      
 			cur_prot = protections;
 			max_prot = protections;
 		}
 		if (target_map->pmap == kernel_pmap) {
-			/*
-			 * Get "reserved" map entries to avoid deadlocking
-			 * on the kernel map or a kernel submap if we
-			 * run out of VM map entries and need to refill that
-			 * zone.
-			 */
+			  
+                                                     
+                                                
+                                                       
+           
+      
 			vmk_flags.vmkf_copy_pageable = FALSE;
 		} else {
 			vmk_flags.vmkf_copy_pageable = TRUE;
@@ -2954,7 +2954,7 @@ mach_make_memory_entry_internal(
 		kr = vm_map_copy_extract(target_map,
 		    map_start,
 		    map_size,
-		    FALSE,                      /* copy */
+		    FALSE,                                
 		    &copy,
 		    &cur_prot,
 		    &max_prot,
@@ -2963,38 +2963,38 @@ mach_make_memory_entry_internal(
 		if (kr != KERN_SUCCESS) {
 			DEBUG4K_MEMENTRY("map %p offset 0x%llx size 0x%llx prot 0x%x -> entry %p kr 0x%x\n", target_map, offset, *size, permission, user_entry, kr);
 			if (VM_MAP_PAGE_SHIFT(target_map) < PAGE_SHIFT) {
-//				panic("DEBUG4K %s:%d kr 0x%x\n", __FUNCTION__, __LINE__, kr);
+                                                                   
 			}
 			return kr;
 		}
 		assert(copy != VM_MAP_COPY_NULL);
 
 		if (mask_protections) {
-			/*
-			 * We just want as much of "original_protections"
-			 * as we can get out of the actual "cur_prot".
-			 */
+			  
+                                                    
+                                                 
+      
 			protections &= cur_prot;
 			if (protections == VM_PROT_NONE) {
-				/* no access at all: fail */
+				                            
 				DEBUG4K_MEMENTRY("map %p offset 0x%llx size 0x%llx prot 0x%x -> entry %p kr 0x%x\n", target_map, offset, *size, permission, user_entry, KERN_PROTECTION_FAILURE);
 				if (VM_MAP_PAGE_SHIFT(target_map) < PAGE_SHIFT) {
-//					panic("DEBUG4K %s:%d kr 0x%x\n", __FUNCTION__, __LINE__, kr);
+                                                                    
 				}
 				vm_map_copy_discard(copy);
 				return KERN_PROTECTION_FAILURE;
 			}
 		} else {
-			/*
-			 * We want exactly "original_protections"
-			 * out of "cur_prot".
-			 */
+			  
+                                            
+                        
+      
 			assert((cur_prot & protections) == protections);
 			assert((max_prot & protections) == protections);
-			/* XXX FBDP TODO: no longer needed? */
+			                                      
 			if ((cur_prot & protections) != protections) {
 				if (VM_MAP_PAGE_SHIFT(target_map) < PAGE_SHIFT) {
-//					panic("DEBUG4K %s:%d kr 0x%x\n", __FUNCTION__, __LINE__, KERN_PROTECTION_FAILURE);
+                                                                                         
 				}
 				vm_map_copy_discard(copy);
 				DEBUG4K_MEMENTRY("map %p offset 0x%llx size 0x%llx prot 0x%x -> entry %p kr 0x%x\n", target_map, offset, *size, permission, user_entry, KERN_PROTECTION_FAILURE);
@@ -3005,7 +3005,7 @@ mach_make_memory_entry_internal(
 		if (!(permission & MAP_MEM_VM_SHARE)) {
 			vm_map_entry_t copy_entry;
 
-			/* limit size to what's actually covered by "copy" */
+			                                                     
 			assert(copy->cpy_hdr.nentries == 1);
 			copy_entry = vm_map_copy_first_entry(copy);
 			map_size = copy_entry->vme_end - copy_entry->vme_start;
@@ -3017,11 +3017,11 @@ mach_make_memory_entry_internal(
 			    parent_entry->offset == 0 &&
 			    parent_entry->size == map_size &&
 			    (parent_entry->data_offset == offset_in_page)) {
-				/* we have a match: re-use "parent_entry" */
+				                                            
 
-				/* release our new "copy" */
+				                            
 				vm_map_copy_discard(copy);
-				/* get extra send right on handle */
+				                                    
 				ipc_port_copy_send(parent_handle);
 
 				*size = CAST_DOWN(vm_size_t,
@@ -3032,7 +3032,7 @@ mach_make_memory_entry_internal(
 				return KERN_SUCCESS;
 			}
 
-			/* no match: we need to create a new entry */
+			                                             
 			object = VME_OBJECT(copy_entry);
 			vm_object_lock(object);
 			wimg_mode = object->wimg_bits;
@@ -3048,7 +3048,7 @@ mach_make_memory_entry_internal(
 		kr = mach_memory_entry_allocate(&user_entry, &user_handle);
 		if (kr != KERN_SUCCESS) {
 			if (VM_MAP_PAGE_SHIFT(target_map) < PAGE_SHIFT) {
-//				panic("DEBUG4K %s:%d kr 0x%x\n", __FUNCTION__, __LINE__, kr);
+                                                                   
 			}
 			vm_map_copy_discard(copy);
 			DEBUG4K_MEMENTRY("map %p offset 0x%llx size 0x%llx prot 0x%x -> entry %p kr 0x%x\n", target_map, offset, *size, permission, user_entry, KERN_FAILURE);
@@ -3080,7 +3080,7 @@ mach_make_memory_entry_internal(
 		return KERN_SUCCESS;
 	}
 
-	/* The new object will be based on an existing named object */
+	                                                              
 	if (parent_entry == NULL) {
 		kr = KERN_INVALID_ARGUMENT;
 		goto make_mem_done;
@@ -3093,17 +3093,17 @@ mach_make_memory_entry_internal(
 	}
 
 	if (use_data_addr || use_4K_compat) {
-		/*
-		 * submaps and pagers should only be accessible from within
-		 * the kernel, which shouldn't use the data address flag, so can fail here.
-		 */
+		  
+                                                             
+                                                                             
+     
 		if (parent_entry->is_sub_map) {
 			panic("Shouldn't be using data address with a parent entry that is a submap.");
 		}
-		/*
-		 * Account for offset to data in parent entry and
-		 * compute our own offset to data.
-		 */
+		  
+                                                   
+                                    
+     
 		if ((offset + *size + parent_entry->data_offset) > parent_entry->size) {
 			kr = KERN_INVALID_ARGUMENT;
 			goto make_mem_done;
@@ -3128,11 +3128,11 @@ mach_make_memory_entry_internal(
 	}
 
 	if (mask_protections) {
-		/*
-		 * The caller asked us to use the "protections" as
-		 * a mask, so restrict "protections" to what this
-		 * mapping actually allows.
-		 */
+		  
+                                                    
+                                                   
+                             
+     
 		protections &= parent_entry->protection;
 	}
 	if ((protections & parent_entry->protection) != protections) {
@@ -3176,7 +3176,7 @@ mach_make_memory_entry_internal(
 			goto make_mem_done;
 		}
 		assert(user_entry->is_object);
-		/* we now point to this object, hold on */
+		                                          
 		vm_object_lock(object);
 		vm_object_reference_locked(object);
 #if VM_OBJECT_TRACKING_OP_TRUESHARE
@@ -3193,7 +3193,7 @@ mach_make_memory_entry_internal(
 			    bt,
 			    num);
 		}
-#endif /* VM_OBJECT_TRACKING_OP_TRUESHARE */
+#endif                                      
 
 		object->true_share = TRUE;
 		if (object->copy_strategy == MEMORY_OBJECT_COPY_SYMMETRIC) {
@@ -3209,11 +3209,11 @@ mach_make_memory_entry_internal(
 
 make_mem_done:
 	if (user_handle != IP_NULL) {
-		/*
-		 * Releasing "user_handle" causes the kernel object
-		 * associated with it ("user_entry" here) to also be
-		 * released and freed.
-		 */
+		  
+                                                     
+                                                      
+                        
+     
 		mach_memory_entry_port_release(user_handle);
 	}
 	DEBUG4K_MEMENTRY("map %p offset 0x%llx size 0x%llx prot 0x%x -> entry %p kr 0x%x\n", target_map, offset, *size, permission, user_entry, kr);
@@ -3260,14 +3260,14 @@ mach_make_memory_entry(
 	return kr;
 }
 
-/*
- *	task_wire
- *
- *	Set or clear the map's wiring_required flag.  This flag, if set,
- *	will cause all future virtual memory allocation to allocate
- *	user wired memory.  Unwiring pages wired down as a result of
- *	this routine is done with the vm_wire interface.
- */
+  
+            
+  
+                                                                   
+                                                              
+                                                               
+                                                   
+   
 kern_return_t
 task_wire(
 	vm_map_t        map,
@@ -3304,7 +3304,7 @@ queue_head_t    vm_named_entry_list = QUEUE_HEAD_INITIALIZER(vm_named_entry_list
 int             vm_named_entry_count = 0;
 LCK_MTX_EARLY_DECLARE_ATTR(vm_named_entry_list_lock_data,
     &vm_object_lck_grp, &vm_object_lck_attr);
-#endif /* VM_NAMED_ENTRY_LIST */
+#endif                          
 
 __private_extern__ kern_return_t
 mach_memory_entry_allocate(
@@ -3341,29 +3341,29 @@ mach_memory_entry_allocate(
 	*user_handle_p = user_handle;
 
 #if VM_NAMED_ENTRY_LIST
-	/* keep a loose (no reference) pointer to the Mach port, for debugging only */
+	                                                                              
 	user_entry->named_entry_port = user_handle;
-	/* backtrace at allocation time, for debugging only */
+	                                                      
 	OSBacktrace(&user_entry->named_entry_bt[0],
 	    NAMED_ENTRY_BT_DEPTH);
 
-	/* add this new named entry to the global list */
+	                                                 
 	lck_mtx_lock_spin(&vm_named_entry_list_lock_data);
 	queue_enter(&vm_named_entry_list, user_entry,
 	    vm_named_entry_t, named_entry_list);
 	vm_named_entry_count++;
 	lck_mtx_unlock(&vm_named_entry_list_lock_data);
-#endif /* VM_NAMED_ENTRY_LIST */
+#endif                          
 
 	return KERN_SUCCESS;
 }
 
-/*
- *	mach_memory_object_memory_entry_64
- *
- *	Create a named entry backed by the provided pager.
- *
- */
+  
+                                     
+  
+                                                     
+  
+   
 kern_return_t
 mach_memory_object_memory_entry_64(
 	host_t                  host,
@@ -3445,7 +3445,7 @@ mach_memory_entry_purgable_control(
 	int             *state)
 {
 	if (control == VM_PURGABLE_SET_STATE_FROM_KERNEL) {
-		/* not allowed from user-space */
+		                                 
 		return KERN_INVALID_ARGUMENT;
 	}
 
@@ -3498,7 +3498,7 @@ memory_entry_purgeable_control_internal(
 
 	vm_object_lock(object);
 
-	/* check that named entry covers entire object ? */
+	                                                   
 	if (mem_entry->offset != 0 || object->vo_size != mem_entry->size) {
 		vm_object_unlock(object);
 		named_entry_unlock(mem_entry);
@@ -3566,12 +3566,12 @@ memory_entry_access_tracking_internal(
 	    access_tracking_reads,
 	    access_tracking_writes);
 	kr = KERN_SUCCESS;
-#else /* VM_OBJECT_ACCESS_TRACKING */
+#else                                
 	(void) access_tracking;
 	(void) access_tracking_reads;
 	(void) access_tracking_writes;
 	kr = KERN_NOT_SUPPORTED;
-#endif /* VM_OBJECT_ACCESS_TRACKING */
+#endif                                
 
 	named_entry_unlock(mem_entry);
 
@@ -3595,12 +3595,12 @@ mach_memory_entry_ownership(
 	    (owner != cur_task ||
 	    (ledger_flags & VM_LEDGER_FLAG_NO_FOOTPRINT) ||
 	    ledger_tag == VM_LEDGER_TAG_NETWORK)) {
-		/*
-		 * An entitlement is required to:
-		 * + tranfer memory ownership to someone else,
-		 * + request that the memory not count against the footprint,
-		 * + tag as "network" (since that implies "no footprint")
-		 */
+		  
+                                   
+                                                
+                                                               
+                                                           
+     
 		if (!cur_task->task_can_transfer_memory_ownership &&
 		    IOTaskHasEntitlement(cur_task,
 		    "com.apple.private.memory.ownership_transfer")) {
@@ -3642,7 +3642,7 @@ mach_memory_entry_ownership(
 
 	vm_object_lock(object);
 
-	/* check that named entry covers entire object ? */
+	                                                   
 	if (mem_entry->offset != 0 || object->vo_size != mem_entry->size) {
 		vm_object_unlock(object);
 		named_entry_unlock(mem_entry);
@@ -3655,7 +3655,7 @@ mach_memory_entry_ownership(
 	    ledger_tag,
 	    owner,
 	    ledger_flags,
-	    FALSE);                             /* task_objq_locked */
+	    FALSE);                                                   
 	vm_object_unlock(object);
 
 	return kr;
@@ -3841,13 +3841,13 @@ mach_memory_entry_map_size(
 	return kr;
 }
 
-/*
- * mach_memory_entry_port_release:
- *
- * Release a send right on a named entry port.  This is the correct
- * way to destroy a named entry.  When the last right on the port is
- * released, ipc_kobject_destroy() will call mach_destroy_memory_entry().
- */
+  
+                                  
+  
+                                                                   
+                                                                    
+                                                                         
+   
 void
 mach_memory_entry_port_release(
 	ipc_port_t      port)
@@ -3856,18 +3856,18 @@ mach_memory_entry_port_release(
 	ipc_port_release_send(port);
 }
 
-/*
- * mach_destroy_memory_entry:
- *
- * Drops a reference on a memory entry and destroys the memory entry if
- * there are no more references on it.
- * NOTE: This routine should not be called to destroy a memory entry from the
- * kernel, as it will not release the Mach port associated with the memory
- * entry.  The proper way to destroy a memory entry in the kernel is to
- * call mach_memort_entry_port_release() to release the kernel's send-right on
- * the memory entry's port.  When the last send right is released, the memory
- * entry will be destroyed via ipc_kobject_destroy().
- */
+  
+                             
+  
+                                                                       
+                                      
+                                                                             
+                                                                          
+                                                                       
+                                                                              
+                                                                             
+                                                     
+   
 void
 mach_destroy_memory_entry(
 	ipc_port_t      port)
@@ -3875,7 +3875,7 @@ mach_destroy_memory_entry(
 	vm_named_entry_t        named_entry;
 #if MACH_ASSERT
 	assert(ip_kotype(port) == IKOT_NAMED_ENTRY);
-#endif /* MACH_ASSERT */
+#endif                  
 	named_entry = (vm_named_entry_t) ip_get_kobject(port);
 
 	named_entry_lock(named_entry);
@@ -3903,7 +3903,7 @@ mach_destroy_memory_entry(
 		assert(vm_named_entry_count > 0);
 		vm_named_entry_count--;
 		lck_mtx_unlock(&vm_named_entry_list_lock_data);
-#endif /* VM_NAMED_ENTRY_LIST */
+#endif                          
 
 		kfree(named_entry, sizeof(struct vm_named_entry));
 	} else {
@@ -3911,8 +3911,8 @@ mach_destroy_memory_entry(
 	}
 }
 
-/* Allow manipulation of individual page state.  This is actually part of */
-/* the UPL regimen but takes place on the memory entry rather than on a UPL */
+                                                                            
+                                                                              
 
 kern_return_t
 mach_memory_entry_page_op(
@@ -3958,15 +3958,15 @@ mach_memory_entry_page_op(
 	return kr;
 }
 
-/*
- * mach_memory_entry_range_op offers performance enhancement over
- * mach_memory_entry_page_op for page_op functions which do not require page
- * level state to be returned from the call.  Page_op was created to provide
- * a low-cost alternative to page manipulation via UPLs when only a single
- * page was involved.  The range_op call establishes the ability in the _op
- * family of functions to work on multiple pages where the lack of page level
- * state handling allows the caller to avoid the overhead of the upl structures.
- */
+  
+                                                                 
+                                                                            
+                                                                            
+                                                                          
+                                                                           
+                                                                             
+                                                                                
+   
 
 kern_return_t
 mach_memory_entry_range_op(
@@ -4016,7 +4016,7 @@ mach_memory_entry_range_op(
 	return kr;
 }
 
-/* ******* Temporary Internal calls to UPL for BSD ***** */
+                                                           
 
 extern int kernel_upl_map(
 	vm_map_t        map,
@@ -4147,11 +4147,11 @@ kernel_upl_abort(
 	return kr;
 }
 
-/*
- * Now a kernel-private interface (for BootCache
- * use only).  Need a cleaner way to create an
- * empty vm_map() and return a handle to it.
- */
+  
+                                                
+                                              
+                                            
+   
 
 kern_return_t
 vm_region_object_create(
@@ -4169,7 +4169,7 @@ vm_region_object_create(
 		return KERN_FAILURE;
 	}
 
-	/* Create a named object based on a submap of specified size */
+	                                                               
 
 	new_map = vm_map_create(PMAP_NULL, VM_MAP_MIN_ADDRESS,
 	    vm_map_round_page(size,
@@ -4189,7 +4189,7 @@ vm_region_object_create(
 	return KERN_SUCCESS;
 }
 
-ppnum_t vm_map_get_phys_page(           /* forward */
+ppnum_t vm_map_get_phys_page(                        
 	vm_map_t        map,
 	vm_offset_t     offset);
 
@@ -4223,15 +4223,15 @@ vm_map_get_phys_page(
 			continue;
 		}
 		if (VME_OBJECT(entry)->phys_contiguous) {
-			/* These are  not standard pageable memory mappings */
-			/* If they are not present in the object they will  */
-			/* have to be picked up from the pager through the  */
-			/* fault mechanism.  */
+			                                                      
+			                                                      
+			                                                      
+			                       
 			if (VME_OBJECT(entry)->vo_shadow_offset == 0) {
-				/* need to call vm_fault */
+				                           
 				vm_map_unlock(map);
 				vm_fault(map, map_offset, VM_PROT_NONE,
-				    FALSE /* change_wiring */, VM_KERN_MEMORY_NONE,
+				    FALSE                    , VM_KERN_MEMORY_NONE,
 				    THREAD_UNINT, NULL, 0);
 				vm_map_lock(map);
 				continue;
@@ -4274,7 +4274,7 @@ vm_map_get_phys_page(
 }
 
 #if 0
-kern_return_t kernel_object_iopl_request(       /* forward */
+kern_return_t kernel_object_iopl_request(                    
 	vm_named_entry_t        named_entry,
 	memory_object_offset_t  offset,
 	upl_size_t              *upl_size,
@@ -4301,14 +4301,14 @@ kernel_object_iopl_request(
 	caller_flags = *flags;
 
 	if (caller_flags & ~UPL_VALID_FLAGS) {
-		/*
-		 * For forward compatibility's sake,
-		 * reject any unknown flag.
-		 */
+		  
+                                      
+                             
+     
 		return KERN_INVALID_VALUE;
 	}
 
-	/* a few checks to make sure user is obeying rules */
+	                                                     
 	if (*upl_size == 0) {
 		if (offset >= named_entry->size) {
 			return KERN_INVALID_RIGHT;
@@ -4334,8 +4334,8 @@ kernel_object_iopl_request(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/* the callers parameter offset is defined to be the */
-	/* offset from beginning of named entry offset in object */
+	                                                       
+	                                                           
 	offset = offset + named_entry->offset;
 
 	if (named_entry->is_sub_map ||
@@ -4345,12 +4345,12 @@ kernel_object_iopl_request(
 
 	named_entry_lock(named_entry);
 
-	/* This is the case where we are going to operate */
-	/* on an already known object.  If the object is */
-	/* not ready it is internal.  An external     */
-	/* object cannot be mapped until it is ready  */
-	/* we can therefore avoid the ready check     */
-	/* in this case.  */
+	                                                    
+	                                                   
+	                                                
+	                                                
+	                                                
+	                    
 	assert(named_entry->is_object);
 	object = vm_named_entry_to_vm_object(named_entry);
 	vm_object_reference(object);
@@ -4381,10 +4381,10 @@ kernel_object_iopl_request(
 }
 #endif
 
-/*
- * These symbols are looked up at runtime by vmware, VirtualBox,
- * despite not being exported in the symbol sets.
- */
+  
+                                                                
+                                                 
+   
 
 #if defined(__x86_64__)
 
@@ -4444,8 +4444,8 @@ mach_vm_remap(
 	vm_map_t                src_map,
 	mach_vm_offset_t        memory_address,
 	boolean_t               copy,
-	vm_prot_t               *cur_protection,   /* OUT */
-	vm_prot_t               *max_protection,   /* OUT */
+	vm_prot_t               *cur_protection,            
+	vm_prot_t               *max_protection,            
 	vm_inherit_t            inheritance)
 {
 	return mach_vm_remap_external(target_map, address, size, mask, flags, src_map, memory_address,
@@ -4489,4 +4489,4 @@ vm_map(
 	           cur_protection, max_protection, inheritance);
 }
 
-#endif /* __x86_64__ */
+#endif                 

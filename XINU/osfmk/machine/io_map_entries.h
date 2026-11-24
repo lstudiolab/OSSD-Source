@@ -38,6 +38,6 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_IO_MAP_ENTRIES_H_ */
+#endif                                 
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

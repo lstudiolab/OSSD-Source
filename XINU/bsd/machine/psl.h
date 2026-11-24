@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _BSD_MACHINE_PSL_H_ */
+#endif                          

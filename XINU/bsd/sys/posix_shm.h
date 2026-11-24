@@ -29,17 +29,17 @@
  *	Copyright (c) 1990, 1996-1998 Apple Computer, Inc.
  *	All Rights Reserved.
  */
-/*
- * posix_shm.c : Support for POSIX shared memory APIs
- *
- *	File:	posix_shm.c
- *	Author:	Ananthakrishna Ramesh
- *
- * HISTORY
- * 2-Sep-1999	A.Ramesh
- *	Created for MacOSX
- *
- */
+  
+                                                     
+  
+                    
+                                
+  
+          
+                      
+                     
+  
+   
 
 #ifndef _SYS_POSIX_SHM_H_
 #define _SYS_POSIX_SHM_H_
@@ -50,7 +50,7 @@
 
 struct label;
 
-#define PSHMNAMLEN      31      /* maximum name segment length we bother with */
+#define PSHMNAMLEN      31                                                      
 
 struct pshminfo {
 	unsigned int pshm_flags;

@@ -57,108 +57,108 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 #ifndef _SYS_IMGACT_H_
 #define _SYS_IMGACT_H_
 
-#define IMG_SHSIZE      512     /* largest shell interpreter, in bytes */
+#define IMG_SHSIZE      512                                              
 
 struct label;
 struct proc;
 struct nameidata;
 
 struct image_params {
-	user_addr_t     ip_user_fname;          /* argument */
-	user_addr_t     ip_user_argv;           /* argument */
-	user_addr_t     ip_user_envv;           /* argument */
-	int             ip_seg;                 /* segment for arguments */
-	struct vnode    *ip_vp;                 /* file */
-	struct vnode_attr       *ip_vattr;      /* run file attributes */
-	struct vnode_attr       *ip_origvattr;  /* invocation file attributes */
-	cpu_type_t      ip_origcputype;         /* cputype of invocation file */
-	cpu_subtype_t   ip_origcpusubtype;      /* subtype of invocation file */
-	char            *ip_vdata;              /* file data (up to one page) */
-	int             ip_flags;               /* image flags */
-	int             ip_argc;                /* argument count */
-	int             ip_envc;                /* environment count */
-	int             ip_applec;              /* apple vector count */
+	user_addr_t     ip_user_fname;                        
+	user_addr_t     ip_user_argv;                         
+	user_addr_t     ip_user_envv;                         
+	int             ip_seg;                                            
+	struct vnode    *ip_vp;                           
+	struct vnode_attr       *ip_vattr;                               
+	struct vnode_attr       *ip_origvattr;                                  
+	cpu_type_t      ip_origcputype;                                         
+	cpu_subtype_t   ip_origcpusubtype;                                      
+	char            *ip_vdata;                                              
+	int             ip_flags;                                
+	int             ip_argc;                                    
+	int             ip_envc;                                       
+	int             ip_applec;                                      
 
-	char            *ip_startargv;          /* argument vector beginning */
-	char            *ip_endargv;    /* end of argv/start of envv */
-	char            *ip_endenvv;    /* end of envv/start of applev */
+	char            *ip_startargv;                                         
+	char            *ip_endargv;                                   
+	char            *ip_endenvv;                                     
 
-	char            *ip_strings;            /* base address for strings */
-	char            *ip_strendp;            /* current end pointer */
+	char            *ip_strings;                                          
+	char            *ip_strendp;                                     
 
-	char            *ip_subsystem_root_path;        /* filepath for the subsystem root */
+	char            *ip_subsystem_root_path;                                             
 
-	int             ip_argspace;    /* remaining space of NCARGS limit (argv+envv) */
-	int             ip_strspace;            /* remaining total string space */
+	int             ip_argspace;                                                     
+	int             ip_strspace;                                              
 
-	user_size_t     ip_arch_offset;         /* subfile offset in ip_vp */
-	user_size_t     ip_arch_size;           /* subfile length in ip_vp */
-	char            ip_interp_buffer[IMG_SHSIZE];   /* interpreter buffer space */
-	int             ip_interp_sugid_fd;             /* fd for sugid script */
+	user_size_t     ip_arch_offset;                                      
+	user_size_t     ip_arch_size;                                        
+	char            ip_interp_buffer[IMG_SHSIZE];                                 
+	int             ip_interp_sugid_fd;                                      
 
-	/* Next two fields are for support of architecture translation... */
-	struct vfs_context      *ip_vfs_context;        /* VFS context */
-	struct nameidata *ip_ndp;               /* current nameidata */
-	thread_t        ip_new_thread;          /* thread for spawn/vfork */
+	                                                                    
+	struct vfs_context      *ip_vfs_context;                         
+	struct nameidata *ip_ndp;                                      
+	thread_t        ip_new_thread;                                      
 
-	struct label    *ip_execlabelp;         /* label of the executable */
-	struct label    *ip_scriptlabelp;       /* label of the script */
-	struct vnode    *ip_scriptvp;           /* script */
-	unsigned int    ip_csflags;             /* code signing flags */
-	int             ip_mac_return;          /* return code from mac policy checks */
+	struct label    *ip_execlabelp;                                      
+	struct label    *ip_scriptlabelp;                                
+	struct vnode    *ip_scriptvp;                       
+	unsigned int    ip_csflags;                                     
+	int             ip_mac_return;                                                  
 	void            *ip_px_sa;
 	void            *ip_px_sfa;
 	void            *ip_px_spa;
-	void            *ip_px_smpx;            /* MAC-specific spawn attrs. */
-	void            *ip_px_persona;         /* persona args */
-	void            *ip_px_pcred_info;      /* posix cred args */
-	void            *ip_cs_error;           /* codesigning error reason */
-	char            *ip_inherited_shared_region_id;  /* inherited shared region id for ptr auth */
+	void            *ip_px_smpx;                                           
+	void            *ip_px_persona;                           
+	void            *ip_px_pcred_info;                           
+	void            *ip_cs_error;                                         
+	char            *ip_inherited_shared_region_id;                                               
 
 	uint64_t ip_dyld_fsid;
 	uint64_t ip_dyld_fsobjid;
 	uint64_t ip_inherited_jop_pid;
-	unsigned int    ip_simulator_binary;    /* simulator binary flags */
+	unsigned int    ip_simulator_binary;                                
 
-	ipc_port_t      ip_sc_port;             /* SUID port. */
+	ipc_port_t      ip_sc_port;                             
 };
 
-/*
- * Image flags
- */
-#define IMGPF_NONE                              0x00000000      /* No flags */
-#define IMGPF_INTERPRET                 0x00000001      /* Interpreter invoked */
+  
+              
+   
+#define IMGPF_NONE                              0x00000000                    
+#define IMGPF_INTERPRET                 0x00000001                               
 #define IMGPF_RESERVED                  0x00000002
-#define IMGPF_WAS_64BIT_ADDR    0x00000004      /* exec from a 64Bit address space */
-#define IMGPF_IS_64BIT_ADDR             0x00000008      /* exec to a 64Bit address space */
-#define IMGPF_SPAWN                             0x00000010      /* spawn (without setexec) */
-#define IMGPF_DISABLE_ASLR              0x00000020      /* disable ASLR */
-#define IMGPF_ALLOW_DATA_EXEC   0x00000040      /* forcibly disallow data execution */
-#define IMGPF_VFORK_EXEC                0x00000080      /* vfork followed by exec */
-#define IMGPF_EXEC                              0x00000100      /* exec */
-#define IMGPF_HIGH_BITS_ASLR    0x00000200      /* randomize high bits of ASLR slide */
-#define IMGPF_IS_64BIT_DATA             0x00000400      /* exec to a 64Bit register state */
-#define IMGPF_DRIVER             0x00000800      /* exec of a driver binary (no LC_MAIN) */
-#define IMGPF_RESLIDE           0x000001000     /* reslide the shared cache */
-#define IMGPF_PLUGIN_HOST_DISABLE_A_KEYS  0x000002000     /* process hosts plugins, disable ptr auth A keys */
+#define IMGPF_WAS_64BIT_ADDR    0x00000004                                           
+#define IMGPF_IS_64BIT_ADDR             0x00000008                                         
+#define IMGPF_SPAWN                             0x00000010                                   
+#define IMGPF_DISABLE_ASLR              0x00000020                        
+#define IMGPF_ALLOW_DATA_EXEC   0x00000040                                            
+#define IMGPF_VFORK_EXEC                0x00000080                                  
+#define IMGPF_EXEC                              0x00000100                
+#define IMGPF_HIGH_BITS_ASLR    0x00000200                                             
+#define IMGPF_IS_64BIT_DATA             0x00000400                                          
+#define IMGPF_DRIVER             0x00000800                                                
+#define IMGPF_RESLIDE           0x000001000                                   
+#define IMGPF_PLUGIN_HOST_DISABLE_A_KEYS  0x000002000                                                         
 #define IMGPF_NOJOP             0x80000000
 
 
-/*
- * Simulator binary flags
- */
-#define IMGPF_SB_DEFAULT         0               /* Default value, did not check if it is a simulator binary */
-#define IMGPF_SB_TRUE            1               /* Binary is a simulator binary */
-#define IMGPF_SB_FALSE           2               /* Binary is not a simulator binary */
+  
+                         
+   
+#define IMGPF_SB_DEFAULT         0                                                                             
+#define IMGPF_SB_TRUE            1                                                 
+#define IMGPF_SB_FALSE           2                                                     
 
 
-#endif  /* !_SYS_IMGACT */
+#endif                    

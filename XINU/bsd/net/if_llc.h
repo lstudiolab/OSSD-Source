@@ -60,13 +60,13 @@
 #define _NET_IF_LLC_H_
 #include <sys/appleapiopts.h>
 
-/*
- * IEEE 802.2 Link Level Control headers, for use in conjunction with
- * 802.{3,4,5} media access control methods.
- *
- * Headers here do not use bit fields due to shortcomings in many
- * compilers.
- */
+  
+                                                                     
+                                            
+  
+                                                                 
+             
+   
 
 struct llc {
 	u_int8_t llc_dsap;
@@ -88,10 +88,10 @@ struct llc {
 		} type_s;
 		struct {
 			u_int8_t control;
-			/*
-			 * We cannot put the following fields in a structure because
-			 * the structure rounding might cause padding.
-			 */
+			  
+                                                               
+                                                 
+      
 			u_int8_t frmr_rej_pdu0;
 			u_int8_t frmr_rej_pdu1;
 			u_int8_t frmr_control;
@@ -131,17 +131,17 @@ struct frmrinfo {
 #define llc_frmr_cause          llc_un.type_frmr.frmr_cause
 #define llc_snap                llc_un.type_snap
 
-/*
- * Don't use sizeof(struct llc_un) for LLC header sizes
- */
+  
+                                                       
+   
 #define LLC_ISFRAMELEN 4
 #define LLC_UFRAMELEN  3
 #define LLC_FRMRLEN    7
 #define LLC_SNAPFRAMELEN 8
 
-/*
- * Unnumbered LLC format commands
- */
+  
+                                 
+   
 #define LLC_UI          0x3
 #define LLC_UI_P        0x13
 #define LLC_DISC        0x43
@@ -159,29 +159,29 @@ struct frmrinfo {
 #define LLC_SABME       0x6f
 #define LLC_SABME_P     0x7f
 
-/*
- * Supervisory LLC commands
- */
+  
+                           
+   
 #define LLC_RR          0x01
 #define LLC_RNR         0x05
 #define LLC_REJ         0x09
 
-/*
- * Info format - dummy only
- */
+  
+                           
+   
 #define LLC_INFO        0x00
 
-/*
- * ISO PDTR 10178 contains among others
- */
+  
+                                       
+   
 #define LLC_8021D_LSAP  0x42
 #define LLC_X25_LSAP    0x7e
 #define LLC_SNAP_LSAP   0xaa
 #define LLC_ISO_LSAP    0xfe
 
-/*
- * LLC XID definitions from 802.2, as needed
- */
+  
+                                            
+   
 
 #define LLC_XID_FORMAT_BASIC    0x81
 #define LLC_XID_BASIC_MINLEN    (LLC_UFRAMELEN + 3)
@@ -192,4 +192,4 @@ struct frmrinfo {
 #define LLC_XID_CLASS_IV        0x7
 
 
-#endif /* !_NET_IF_LLC_H_ */
+#endif                      

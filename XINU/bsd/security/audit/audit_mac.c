@@ -30,12 +30,12 @@
  *
  * @APPLE_BSD_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/kernel.h>
 #include <sys/proc.h>
@@ -76,9 +76,9 @@ audit_mac_new(proc_t p, struct kaudit_record *ar)
 {
 	struct mac mac;
 
-	/*
-	 * Retrieve the MAC labels for the process.
-	 */
+	  
+                                            
+    
 	ar->k_ar.ar_cred_mac_labels = (char *)zalloc(audit_mac_label_zone);
 	if (ar->k_ar.ar_cred_mac_labels == NULL) {
 		return 1;
@@ -90,9 +90,9 @@ audit_mac_new(proc_t p, struct kaudit_record *ar)
 		return 1;
 	}
 
-	/*
-	 * grab space for the reconds.
-	 */
+	  
+                               
+    
 	ar->k_ar.ar_mac_records = (struct mac_audit_record_list_t *)
 	    kheap_alloc(KHEAP_AUDIT, sizeof(*ar->k_ar.ar_mac_records), Z_WAITOK);
 	if (ar->k_ar.ar_mac_records == NULL) {
@@ -124,9 +124,9 @@ audit_mac_free(struct kaudit_record *ar)
 		    MAC_MAX_LABEL_BUF_LEN + MAC_ARG_PREFIX_LEN);
 	}
 
-	/*
-	 * Free the audit data from the MAC policies.
-	 */
+	  
+                                              
+    
 	head = LIST_FIRST(ar->k_ar.ar_mac_records);
 	while (head != NULL) {
 		next = LIST_NEXT(head, records);
@@ -167,17 +167,17 @@ audit_mac_syscall_exit(unsigned short code, struct uthread *uthread, int error,
 {
 	int mac_error;
 
-	if (uthread->uu_ar == NULL) { /* syscall wasn't audited */
+	if (uthread->uu_ar == NULL) {                             
 		return 1;
 	}
 
-	/*
-	 * Note, no other postselect mechanism exists.  If
-	 * mac_audit_check_postselect returns MAC_AUDIT_NO, the record will be
-	 * suppressed.  Other values at this point result in the audit record
-	 * being committed.  This suppression behavior will probably go away in
-	 * the port to 10.3.4.
-	 */
+	  
+                                                   
+                                                                       
+                                                                      
+                                                                        
+                       
+    
 	mac_error = mac_audit_check_postselect(kauth_cred_get(), code,
 	    (void *) uthread->uu_arg, error, retval,
 	    uthread->uu_ar->k_ar.ar_forced_by_mac);
@@ -191,10 +191,10 @@ audit_mac_syscall_exit(unsigned short code, struct uthread *uthread, int error,
 	return 0;
 }
 
-/*
- * This function is called by the MAC Framework to add audit data
- * from a policy to the current audit record.
- */
+  
+                                                                 
+                                             
+   
 int
 audit_mac_data(int type, int len, u_char *data)
 {
@@ -212,11 +212,11 @@ audit_mac_data(int type, int len, u_char *data)
 		return ENOTSUP;
 	}
 
-	/*
-	 * XXX: Note that we silently drop the audit data if this
-	 * allocation fails - this is consistent with the rest of the
-	 * audit implementation.
-	 */
+	  
+                                                          
+                                                              
+                         
+    
 	record = kheap_alloc(KHEAP_AUDIT, sizeof(*record), Z_WAITOK);
 	if (record == NULL) {
 		zfree(mac_audit_data_zone, data);
@@ -239,12 +239,12 @@ audit_arg_mac_string(struct kaudit_record *ar, char *string)
 		    MAC_MAX_LABEL_BUF_LEN + MAC_ARG_PREFIX_LEN, Z_WAITOK);
 	}
 
-	/*
-	 * XXX This should be a rare event. If kheap_alloc() returns NULL,
-	 * the system is low on kernel virtual memory. To be
-	 * consistent with the rest of audit, just return
-	 * (may need to panic if required to for audit).
-	 */
+	  
+                                                                   
+                                                     
+                                                  
+                                                 
+    
 	if (ar->k_ar.ar_arg_mac_string == NULL) {
 		if (ar->k_ar.ar_arg_mac_string == NULL) {
 			return;
@@ -257,6 +257,6 @@ audit_arg_mac_string(struct kaudit_record *ar, char *string)
 	    MAC_MAX_LABEL_BUF_LEN);
 	ARG_SET_VALID(ar, ARG_MAC_STRING);
 }
-#endif  /* MAC */
+#endif           
 
-#endif /* CONFIG_AUDIT */
+#endif                   

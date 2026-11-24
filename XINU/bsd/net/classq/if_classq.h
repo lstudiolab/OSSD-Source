@@ -30,70 +30,70 @@
 #define _NET_CLASSQ_IF_CLASSQ_H_
 
 #ifdef PRIVATE
-#define IFCQ_SC_MAX             10              /* max number of queues */
+#define IFCQ_SC_MAX             10                                        
 
 #ifdef BSD_KERNEL_PRIVATE
 #include <net/classq/classq.h>
 
-/* maximum number of packets stored across all queues */
+                                                        
 #define IFCQ_DEFAULT_PKT_DROP_LIMIT     2048
 
-/* classq request types */
+                          
 typedef enum cqrq {
-	CLASSQRQ_PURGE =        1,      /* purge all packets */
-	CLASSQRQ_PURGE_SC =     2,      /* purge service class (and flow) */
-	CLASSQRQ_EVENT =        3,      /* interface events */
-	CLASSQRQ_THROTTLE =     4,      /* throttle packets */
-	CLASSQRQ_STAT_SC =      5,      /* get service class queue stats */
+	CLASSQRQ_PURGE =        1,                             
+	CLASSQRQ_PURGE_SC =     2,                                          
+	CLASSQRQ_EVENT =        3,                            
+	CLASSQRQ_THROTTLE =     4,                            
+	CLASSQRQ_STAT_SC =      5,                                         
 } cqrq_t;
 
-/* classq purge_sc request argument */
+                                      
 typedef struct cqrq_purge_sc {
-	mbuf_svc_class_t        sc;     /* (in) service class */
-	u_int32_t               flow;   /* (in) 0 means all flows */
-	u_int32_t               packets; /* (out) purged packets */
-	u_int32_t               bytes;  /* (out) purged bytes */
+	mbuf_svc_class_t        sc;                             
+	u_int32_t               flow;                               
+	u_int32_t               packets;                           
+	u_int32_t               bytes;                          
 } cqrq_purge_sc_t;
 
-/* classq throttle request argument */
+                                      
 typedef struct cqrq_throttle {
-	u_int32_t               set;    /* set or get */
-	u_int32_t               level;  /* (in/out) throttling level */
+	u_int32_t               set;                    
+	u_int32_t               level;                                 
 } cqrq_throttle_t;
 
-/* classq service class stats request argument */
+                                                 
 typedef struct cqrq_stat_sc {
-	mbuf_svc_class_t        sc;     /* (in) service class */
-	u_int32_t               packets; /* (out) packets enqueued */
-	u_int32_t               bytes;  /* (out) bytes enqueued */
+	mbuf_svc_class_t        sc;                             
+	u_int32_t               packets;                             
+	u_int32_t               bytes;                            
 } cqrq_stat_sc_t;
 
-/*
- * A token-bucket regulator limits the rate that a network driver can
- * dequeue packets from the output queue.  Modern cards are able to buffer
- * a large amount of packets and dequeue too many packets at a time.  This
- * bursty dequeue behavior makes it impossible to schedule packets by
- * queueing disciplines.  A token-bucket is used to control the burst size
- * in a device independent manner.
- */
+  
+                                                                     
+                                                                          
+                                                                          
+                                                                     
+                                                                          
+                                  
+   
 struct tb_regulator {
-	u_int64_t       tbr_rate_raw;   /* (unscaled) token bucket rate */
-	u_int32_t       tbr_percent;    /* token bucket rate in percentage */
-	int64_t         tbr_rate;       /* (scaled) token bucket rate */
-	int64_t         tbr_depth;      /* (scaled) token bucket depth */
+	u_int64_t       tbr_rate_raw;                                     
+	u_int32_t       tbr_percent;                                         
+	int64_t         tbr_rate;                                       
+	int64_t         tbr_depth;                                       
 
-	int64_t         tbr_token;      /* (scaled) current token */
-	int64_t         tbr_filluptime; /* (scaled) time to fill up bucket */
-	u_int64_t       tbr_last;       /* last time token was updated */
+	int64_t         tbr_token;                                  
+	int64_t         tbr_filluptime;                                      
+	u_int64_t       tbr_last;                                        
 
-	/*   needed for poll-and-dequeue */
+	                                   
 };
 
-/* simple token bucket meter profile */
+                                       
 struct tb_profile {
-	u_int64_t       rate;   /* rate in bit-per-sec */
-	u_int32_t       percent; /* rate in percentage */
-	u_int32_t       depth;  /* depth in bytes */
+	u_int64_t       rate;                            
+	u_int32_t       percent;                         
+	u_int32_t       depth;                      
 };
 
 struct ifclassq;
@@ -102,7 +102,7 @@ enum cqrq;
 
 #if DEBUG || DEVELOPMENT
 extern uint32_t ifclassq_flow_control_adv;
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 typedef int (*ifclassq_enq_func)(struct ifclassq *, classq_pkt_t *,
     boolean_t *);
@@ -116,86 +116,86 @@ typedef int (*ifclassq_deq_sc_multi_func)(struct ifclassq *,
     u_int32_t *, u_int32_t *);
 typedef int (*ifclassq_req_func)(struct ifclassq *, enum cqrq, void *);
 
-/*
- * Structure defining a queue for a network interface.
- */
+  
+                                                      
+   
 struct ifclassq {
 	decl_lck_mtx_data(, ifcq_lock);
 
-	struct ifnet    *ifcq_ifp;      /* back pointer to interface */
-	u_int32_t       ifcq_len;       /* packet count */
+	struct ifnet    *ifcq_ifp;                                     
+	u_int32_t       ifcq_len;                         
 	u_int32_t       ifcq_maxlen;
 	struct pktcntr  ifcq_xmitcnt;
 	struct pktcntr  ifcq_dropcnt;
 
-	u_int32_t       ifcq_type;      /* scheduler type */
-	u_int32_t       ifcq_flags;     /* flags */
-	u_int32_t       ifcq_sflags;    /* scheduler flags */
-	u_int32_t       ifcq_target_qdelay; /* target queue delay */
-	u_int32_t       ifcq_bytes;     /* bytes count */
+	u_int32_t       ifcq_type;                          
+	u_int32_t       ifcq_flags;                
+	u_int32_t       ifcq_sflags;                         
+	u_int32_t       ifcq_target_qdelay;                         
+	u_int32_t       ifcq_bytes;                      
 	u_int32_t       ifcq_pkt_drop_limit;
-	void            *ifcq_disc;     /* for scheduler-specific use */
-	/*
-	 * ifcq_disc_slots[] represents the leaf classes configured for the
-	 * corresponding discpline/scheduler, ordered by their corresponding
-	 * service class index.  Each slot holds the queue ID used to identify
-	 * the class instance, as well as the class instance pointer itself.
-	 * The latter is used during enqueue and dequeue in order to avoid the
-	 * costs associated with looking up the class pointer based on the
-	 * queue ID.  The queue ID is used when querying the statistics from
-	 * user space.
-	 *
-	 * Avoiding the use of queue ID during enqueue and dequeue is made
-	 * possible by virtue of knowing the particular mbuf service class
-	 * associated with the packets.  The service class index of the
-	 * packet is used as the index to ifcq_disc_slots[].
-	 *
-	 * ifcq_disc_slots[] therefore also acts as a lookup table which
-	 * provides for the mapping between MBUF_SC values and the actual
-	 * scheduler classes.
-	 */
+	void            *ifcq_disc;                                     
+	  
+                                                                    
+                                                                     
+                                                                       
+                                                                     
+                                                                       
+                                                                   
+                                                                     
+               
+   
+                                                                   
+                                                                   
+                                                                
+                                                     
+   
+                                                                 
+                                                                  
+                      
+    
 	struct ifclassq_disc_slot {
 		u_int32_t       qid;
 		void            *cl;
-	} ifcq_disc_slots[IFCQ_SC_MAX]; /* for discipline use */
+	} ifcq_disc_slots[IFCQ_SC_MAX];                         
 
-	/* token bucket regulator */
-	struct tb_regulator     ifcq_tbr;       /* TBR */
+	                            
+	struct tb_regulator     ifcq_tbr;                
 };
 
-/* ifcq_flags */
-#define IFCQF_READY      0x01           /* ifclassq supports discipline */
-#define IFCQF_ENABLED    0x02           /* ifclassq is in use */
-#define IFCQF_TBR        0x04           /* Token Bucket Regulator is in use */
+                
+#define IFCQF_READY      0x01                                             
+#define IFCQF_ENABLED    0x02                                   
+#define IFCQF_TBR        0x04                                                 
 
 #define IFCQ_IS_READY(_ifcq)            ((_ifcq)->ifcq_flags & IFCQF_READY)
 #define IFCQ_IS_ENABLED(_ifcq)          ((_ifcq)->ifcq_flags & IFCQF_ENABLED)
 #define IFCQ_TBR_IS_ENABLED(_ifcq)      ((_ifcq)->ifcq_flags & IFCQF_TBR)
 
-/* classq enqueue return value */
-/* packet has to be dropped */
+                                 
+                              
 #define CLASSQEQ_DROP           (-1)
-/* packet successfully enqueued */
+                                  
 #define CLASSQEQ_SUCCESS        0
-/* packet enqueued; give flow control feedback */
+                                                 
 #define CLASSQEQ_SUCCESS_FC     1
-/* packet needs to be dropped due to flowcontrol; give flow control feedback */
+                                                                               
 #define CLASSQEQ_DROP_FC        2
-/* packet needs to be dropped due to suspension; give flow control feedback */
+                                                                              
 #define CLASSQEQ_DROP_SP        3
-/* packet has been compressed with another one */
+                                                 
 #define CLASSQEQ_COMPRESSED     4
 
-/* interface event argument for CLASSQRQ_EVENT */
+                                                 
 typedef enum cqev {
 	CLASSQ_EV_INIT = 0,
-	CLASSQ_EV_LINK_BANDWIDTH = 1,   /* link bandwidth has changed */
-	CLASSQ_EV_LINK_LATENCY = 2,     /* link latency has changed */
-	CLASSQ_EV_LINK_MTU =    3,      /* link MTU has changed */
-	CLASSQ_EV_LINK_UP =     4,      /* link is now up */
-	CLASSQ_EV_LINK_DOWN =   5,      /* link is now down */
+	CLASSQ_EV_LINK_BANDWIDTH = 1,                                   
+	CLASSQ_EV_LINK_LATENCY = 2,                                   
+	CLASSQ_EV_LINK_MTU =    3,                                
+	CLASSQ_EV_LINK_UP =     4,                          
+	CLASSQ_EV_LINK_DOWN =   5,                            
 } cqev_t;
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #include <net/classq/classq.h>
 #include <net/pktsched/pktsched_fq_codel.h>
@@ -217,9 +217,9 @@ struct if_ifclassq_stats {
 #endif
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * For ifclassq lock
- */
+  
+                    
+   
 #define IFCQ_LOCK_ASSERT_HELD(_ifcq)                                    \
 	LCK_MTX_ASSERT(&(_ifcq)->ifcq_lock, LCK_MTX_ASSERT_OWNED)
 
@@ -240,9 +240,9 @@ struct if_ifclassq_stats {
 #define IFCQ_UNLOCK(_ifcq)                                              \
 	lck_mtx_unlock(&(_ifcq)->ifcq_lock)
 
-/*
- * For ifclassq operations
- */
+  
+                          
+   
 #define IFCQ_TBR_DEQUEUE(_ifcq, _p) do {                                \
 	ifclassq_tbr_dequeue(_ifcq, _p);                                \
 } while (0)
@@ -311,6 +311,6 @@ extern void ifclassq_set_packet_metadata(struct ifclassq *ifq,
     struct ifnet *ifp, classq_pkt_t *p);
 extern void ifclassq_reap_caches(boolean_t);
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_IF_CLASSQ_H_ */
+#endif                         
+#endif              
+#endif                               

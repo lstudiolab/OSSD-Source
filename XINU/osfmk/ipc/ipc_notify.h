@@ -53,50 +53,50 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_notify.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Declarations of notification-sending functions.
- */
+  
+   
+  
+                         
+                      
+             
+  
+                                                  
+   
 
 #ifndef _IPC_IPC_NOTIFY_H_
 #define _IPC_IPC_NOTIFY_H_
 
-/*
- * Exported interfaces
- */
+  
+                      
+   
 
-/* Send a port-deleted notification */
+                                      
 extern void ipc_notify_port_deleted(
 	ipc_port_t              port,
 	mach_port_name_t        name);
 
-/* Send a send-possible notification */
+                                       
 extern void ipc_notify_send_possible(
 	ipc_port_t              port,
 	mach_port_name_t        name);
 
-/* Send a port-destroyed notification */
+                                        
 extern void ipc_notify_port_destroyed(
 	ipc_port_t              port,
 	ipc_port_t              right);
 
-/* Send a no-senders notification */
+                                    
 extern void ipc_notify_no_senders(
 	ipc_port_t              port,
 	mach_port_mscount_t     mscount);
 
-/* Send a send-once notification */
+                                   
 extern void ipc_notify_send_once(
 	ipc_port_t              port);
 
-/* Send a dead-name notification */
+                                   
 extern void ipc_notify_dead_name(
 	ipc_port_t              port,
 	mach_port_name_t        name);
 
-#endif  /* _IPC_IPC_NOTIFY_H_ */
+#endif                          

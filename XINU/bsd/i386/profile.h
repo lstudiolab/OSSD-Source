@@ -38,19 +38,19 @@
 #ifdef KERNEL
 #ifdef __APPLE_API_UNSTABLE
 
-/*
- * Block interrupts during mcount so that those interrupts can also be
- * counted (as soon as we get done with the current counting).  On the
- * i386 platfom, can't do splhigh/splx as those are C routines and can
- * recursively invoke mcount.
- */
+  
+                                                                      
+                                                                      
+                                                                      
+                             
+   
 #warning MCOUNT_* not implemented yet.
 
 #define MCOUNT_INIT
-#define MCOUNT_ENTER    /* s = splhigh(); */ /* XXX TODO */
-#define MCOUNT_EXIT     /* (void) splx(s); */ /* XXX TODO */
+#define MCOUNT_ENTER                                       
+#define MCOUNT_EXIT                                         
 
-#endif /* __APPLE_API_UNSTABLE */
-#endif /* KERNEL */
+#endif                           
+#endif             
 
-#endif /* _BSD_I386_PROFILE_H_ */
+#endif                           

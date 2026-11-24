@@ -37,12 +37,12 @@ extern "C" {
 #include <corecrypto/ccdes.h>
 #include <corecrypto/ccn.h>
 
-/* must be 32bit quantity */
+                            
 #define DES_LONG u_int32_t
 
 typedef unsigned char des_cblock[8];
 
-/* Unholy hack: this is currently the size for the only implementation of DES in corecrypto */
+                                                                                              
 #define DES_ECB_CTX_MAX_SIZE (64*4)
 #define DES3_ECB_CTX_MAX_SIZE (64*4*3)
 
@@ -57,7 +57,7 @@ typedef struct{
 	ccecb_ctx_decl(DES3_ECB_CTX_MAX_SIZE, dec);
 } des3_ecb_key_schedule;
 
-/* Only here for backward compatibility with smb kext */
+                                                        
 typedef des_ecb_key_schedule des_key_schedule[1];
 #define des_set_key des_ecb_key_sched
 
@@ -65,11 +65,11 @@ typedef des_ecb_key_schedule des_key_schedule[1];
 #define DES_DECRYPT     0
 
 
-/* Single DES ECB - 1 block */
+                              
 int des_ecb_key_sched(des_cblock *key, des_ecb_key_schedule *ks);
 int des_ecb_encrypt(des_cblock * in, des_cblock *out, des_ecb_key_schedule *ks, int encrypt);
 
-/* Triple DES ECB - 1 block */
+                              
 int des3_ecb_key_sched(des_cblock *key, des3_ecb_key_schedule *ks);
 int des3_ecb_encrypt(des_cblock *block, des_cblock *, des3_ecb_key_schedule *ks, int encrypt);
 

@@ -52,27 +52,27 @@ extern int copyoutstr_prevalidate(const void *kaddr, user_addr_t uaddr, size_t l
 extern const vm_map_address_t physmap_base;
 extern const vm_map_address_t physmap_end;
 
-/*!
- * @typedef copyio_flags_t
- *
- * @const COPYIO_IN
- * The copy is user -> kernel.
- * One of COPYIO_IN or COPYIO_OUT should always be specified.
- *
- * @const COPYIO_OUT
- * The copy is kernel -> user
- * One of COPYIO_IN or COPYIO_OUT should always be specified.
- *
- * @const COPYIO_ALLOW_KERNEL_TO_KERNEL
- * The "user_address" is allowed to be in the VA space of the kernel.
- *
- * @const COPYIO_VALIDATE_USER_ONLY
- * There isn't really a kernel address used, and only the user address
- * needs to be validated.
- *
- * @const COPYIO_ATOMIC
- * The copyio operation is atomic, ensure that it is properly aligned.
- */
+   
+                          
+  
+                   
+                              
+                                                             
+  
+                    
+                             
+                                                             
+  
+                                       
+                                                                     
+  
+                                   
+                                                                      
+                         
+  
+                       
+                                                                      
+   
 __options_decl(copyio_flags_t, uint32_t, {
 	COPYIO_IN                       = 0x0001,
 	COPYIO_OUT                      = 0x0002,
@@ -87,7 +87,7 @@ user_access_enable(void)
 #if __ARM_PAN_AVAILABLE__
 	assert(__builtin_arm_rsr("pan") != 0);
 	__builtin_arm_wsr("pan", 0);
-#endif  /* __ARM_PAN_AVAILABLE__ */
+#endif                             
 }
 
 static inline void
@@ -95,17 +95,17 @@ user_access_disable(void)
 {
 #if __ARM_PAN_AVAILABLE__
 	__builtin_arm_wsr("pan", 1);
-#endif  /* __ARM_PAN_AVAILABLE__ */
+#endif                             
 }
 
-/*
- * Copy sizes bigger than this value will cause a kernel panic.
- *
- * Yes, this is an arbitrary fixed limit, but it's almost certainly
- * a programming error to be copying more than this amount between
- * user and wired kernel memory in a single invocation on this
- * platform.
- */
+  
+                                                               
+  
+                                                                   
+                                                                  
+                                                              
+            
+   
 const int copysize_limit_panic = (64 * 1024 * 1024);
 
 static inline bool
@@ -114,12 +114,12 @@ is_kernel_to_kernel_copy()
 	return current_thread()->map->pmap == kernel_pmap;
 }
 
-/*
- * Validate the arguments to copy{in,out} on this platform.
- *
- * Returns EXDEV when the current thread pmap is the kernel's
- * which is non fatal for certain routines.
- */
+  
+                                                           
+  
+                                                             
+                                           
+   
 static int
 copy_validate(const user_addr_t user_addr, uintptr_t kernel_addr,
     vm_size_t nbytes, copyio_flags_t flags)
@@ -176,10 +176,10 @@ copy_validate(const user_addr_t user_addr, uintptr_t kernel_addr,
 		if (__probable(!zalloc_disable_copyio_check)) {
 			zone_t src_zone = NULL;
 			vm_size_t kernel_buf_size = zone_element_size((void *)kernel_addr, &src_zone);
-			/*
-			 * Size of elements in the permanent zone is not saved as a part of the
-			 * zone's info
-			 */
+			  
+                                                                          
+                 
+      
 			if (__improbable(src_zone && !src_zone->z_permanent &&
 			    kernel_buf_size < nbytes)) {
 				panic("copyio_preflight: kernel buffer 0x%lx has size %lu < nbytes %lu",
@@ -188,7 +188,7 @@ copy_validate(const user_addr_t user_addr, uintptr_t kernel_addr,
 		}
 
 #if KASAN
-		/* For user copies, asan-check the kernel-side buffer */
+		                                                        
 		if (flags & COPYIO_IN) {
 			__asan_storeN(kernel_addr, nbytes);
 		} else {
@@ -240,11 +240,11 @@ copyin(const user_addr_t user_addr, void *kernel_addr, vm_size_t nbytes)
 	return result;
 }
 
-/*
- * copy{in,out}_atomic{32,64}
- * Read or store an aligned value from userspace as a single memory transaction.
- * These functions support userspace synchronization features
- */
+  
+                             
+                                                                                
+                                                             
+   
 int
 copyin_atomic32(const user_addr_t user_addr, uint32_t *kernel_addr)
 {

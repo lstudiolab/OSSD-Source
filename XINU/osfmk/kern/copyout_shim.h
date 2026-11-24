@@ -29,12 +29,12 @@
 #define   __COPYOUT_SHIM_X86_64_H__
 #ifdef KERNEL_PRIVATE
 
-// Osfmk includes libsa/types.h which causes massive conflicts
-// with sys/types.h
+                                                              
+                   
 #if defined (__i386__) || defined(__x86_64__)
 #include "i386/types.h"
 #elif defined (__arm__) || defined (__arm64__)
-//XXX when ready to turn on for arm: #include "arm/types.h"
+                                                           
 #error ARM/ARM64 not supported
 #else
 #error architecture not supported
@@ -42,9 +42,9 @@
 
 #include <mach/mach_types.h>
 
-#define CO_SRC_NORMAL 1       //copyout() called
-#define CO_SRC_MSG    (1<<1)    //copyoutmsg() called
-#define CO_SRC_PHYS   (1<<2)    //copyio(COPYOUTPHYS,...) called
+#define CO_SRC_NORMAL 1                         
+#define CO_SRC_MSG    (1<<1)                         
+#define CO_SRC_PHYS   (1<<2)                                    
 
 typedef void (*copyout_shim_fn_t)(const void *, user_addr_t, vm_size_t, unsigned co_src);
 
@@ -54,7 +54,7 @@ typedef void (*copyout_shim_fn_t)(const void *, user_addr_t, vm_size_t, unsigned
 extern copyout_shim_fn_t copyout_shim_fn;
 extern unsigned co_src_flags;
 
-// void call_copyout_shim(const void *kernel_addr,user_addr_t user_addr,vm_size_t nbytes,int copy_type,int copyout_flavors);
+                                                                                                                            
 
 #define CALL_COPYOUT_SHIM_NRML(ka, ua, nb) \
     if(copyout_shim_fn && (co_src_flags & CO_SRC_NORMAL)) {copyout_shim_fn(ka,ua,nb,CO_SRC_NORMAL); }
@@ -66,12 +66,12 @@ extern unsigned co_src_flags;
     if(copyout_shim_fn && (co_src_flags & CO_SRC_PHYS)){copyout_shim_fn(ka,ua,nb,CO_SRC_PHYS); }
 
 #else
-//Make these calls disappear if we're RELEASE or if COPYOUT_SHIM didn't get built
+                                                                                 
 #define CALL_COPYOUT_SHIM_NRML(ka, ua, nb)
 #define CALL_COPYOUT_SHIM_MSG(ka, ua, nb)
 #define CALL_COPYOUT_SHIM_PHYS(ka, ua, nb)
-#endif /* (DEVELOPMENT || DEBUG) && (COPYOUT_SHIM > 0) */
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                                                   
+#endif                          
 
 
 kern_return_t
@@ -86,5 +86,5 @@ cos_kernel_unslide(const void *);
 void *
 cos_kernel_reslide(const void *);
 
-#endif /* KERNEL_PRIVATE */
-#endif /* __COPYOUT_SHIM_X86_64_H__ */
+#endif                     
+#endif                                

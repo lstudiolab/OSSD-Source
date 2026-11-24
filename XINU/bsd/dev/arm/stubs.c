@@ -23,14 +23,14 @@
 #include <vm/vm_map.h>
 
 
-/*
- * copy a null terminated string from the kernel address space into the user
- * address space. - if the user is denied write access, return EFAULT. - if
- * the end of string isn't found before maxlen bytes are copied,  return
- * ENAMETOOLONG, indicating an incomplete copy. - otherwise, return 0,
- * indicating success. the number of bytes copied is always returned in
- * lencopied.
- */
+  
+                                                                            
+                                                                           
+                                                                        
+                                                                      
+                                                                       
+             
+   
 int
 copyoutstr(const void *from, user_addr_t to, size_t maxlen, size_t * lencopied)
 {
@@ -57,14 +57,14 @@ copyoutstr(const void *from, user_addr_t to, size_t maxlen, size_t * lencopied)
 }
 
 
-/*
- * copy a null terminated string from one point to another in the kernel
- * address space. - no access checks are performed. - if the end of string
- * isn't found before maxlen bytes are copied,  return ENAMETOOLONG,
- * indicating an incomplete copy. - otherwise, return 0, indicating success.
- * the number of bytes copied is always returned in lencopied.
- */
-/* from ppc/fault_copy.c -Titan1T4 VERSION  */
+  
+                                                                        
+                                                                          
+                                                                    
+                                                                            
+                                                              
+   
+                                              
 int
 copystr(const void *vfrom, void *vto, size_t maxlen, size_t * lencopied)
 {

@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Test to validate that _COMM_PAGE_CPU_QUIESCENT_COUNTER ticks at least once per second
- *
- * <rdar://problem/42433973>
- */
+  
+                                                                                        
+  
+                            
+   
 
 #include <System/machine/cpu_capabilities.h>
 
@@ -51,14 +51,14 @@ T_DECL(test_quiescent_counter, "Validate that _COMM_PAGE_CPU_QUIESCENT_COUNTER i
 	T_SKIP("_COMM_PAGE_CPU_QUIESCENT_COUNTER doesn't exist on this system");
 }
 
-#else /* _COMM_PAGE_CPU_QUIESCENT_COUNTER */
+#else                                       
 
 T_DECL(test_quiescent_counter, "Validate that _COMM_PAGE_CPU_QUIESCENT_COUNTER increments",
     T_META_CHECK_LEAKS(false))
 {
 	int rv;
 
-	uint32_t cpu_checkin_min_interval = 0; /* set by sysctl hw.ncpu */
+	uint32_t cpu_checkin_min_interval = 0;                            
 
 	size_t value_size = sizeof(cpu_checkin_min_interval);
 	rv = sysctlbyname("kern.cpu_checkin_interval", &cpu_checkin_min_interval, &value_size, NULL, 0);
@@ -88,4 +88,4 @@ T_DECL(test_quiescent_counter, "Validate that _COMM_PAGE_CPU_QUIESCENT_COUNTER i
 	}
 }
 
-#endif /* _COMM_PAGE_CPU_QUIESCENT_COUNTER */
+#endif                                       

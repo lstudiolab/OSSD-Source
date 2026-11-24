@@ -86,7 +86,7 @@ route6_input(struct mbuf **mp, int *offp, int proto)
 
 	ip6a = ip6_findaux(m);
 	if (ip6a) {
-		/* XXX reject home-address option before rthdr */
+		                                                 
 		if (ip6a->ip6a_flags & IP6A_SWAP) {
 			ip6stat.ip6s_badoptions++;
 			*mp = NULL;
@@ -95,11 +95,11 @@ route6_input(struct mbuf **mp, int *offp, int proto)
 		}
 	}
 	ip6a = NULL;
-#endif /* notyet */
+#endif             
 
 	IP6_EXTHDR_CHECK(m, off, sizeof(*rh), return IPPROTO_DONE);
 
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip6 = mtod(m, struct ip6_hdr *);
@@ -107,10 +107,10 @@ route6_input(struct mbuf **mp, int *offp, int proto)
 
 	switch (rh->ip6r_type) {
 	default:
-		/* unknown routing type */
+		                          
 		if (rh->ip6r_segleft == 0) {
 			rhlen = (rh->ip6r_len + 1) << 3;
-			break;  /* Final dst. Just ignore the header. */
+			break;                                          
 		}
 		ip6stat.ip6s_badoptions++;
 		icmp6_error(m, ICMP6_PARAM_PROB, ICMP6_PARAMPROB_HEADER,

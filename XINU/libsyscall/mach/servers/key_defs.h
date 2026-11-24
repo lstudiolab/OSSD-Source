@@ -32,32 +32,32 @@
  * the terms and conditions for use and redistribution.
  */
 
-/*
- * Definitions of encryption keys etc..
- */
+  
+                                       
+   
 
-/*
- * HISTORY:
- *  5-Jun-87  Robert Sansom (rds) at Carnegie Mellon University
- *	Added macros to convert keys between network and host order.
- *
- * 12-Apr-87  Robert Sansom (rds) at Carnegie Mellon University
- *	Added KEY_IS_NULL.
- *
- *  2-Feb-87  Robert Sansom (rds) at Carnegie Mellon University
- *	Added KEY_EQUAL.
- *
- *  5-Nov-86  Robert Sansom (rds) at Carnegie-Mellon University
- *	Started.
- *
- */
+  
+           
+                                                               
+                                                               
+  
+                                                               
+                     
+  
+                                                               
+                   
+  
+                                                               
+           
+  
+   
 
 #ifndef _KEY_DEFS_
 #define _KEY_DEFS_
 
-/*
- * An encrytion key.
- */
+  
+                    
+   
 typedef union {
 	unsigned char       key_bytes[16];
 	unsigned long       key_longs[4];
@@ -74,9 +74,9 @@ typedef union {
 	&& ((key).key_longs[2] == 0) && ((key).key_longs[3] == 0))
 
 
-/*
- * Macros to convert keys between network and host byte order.
- */
+  
+                                                              
+   
 #define NTOH_KEY(key) {                                                 \
     (key).key_longs[0] = ntohl((key).key_longs[0]);                     \
     (key).key_longs[1] = ntohl((key).key_longs[1]);                     \
@@ -91,18 +91,18 @@ typedef union {
     (key).key_longs[3] = htonl((key).key_longs[3]);                     \
 }
 
-/*
- * Structure used to transmit or store a token or a key.
- */
+  
+                                                        
+   
 typedef union {
 	key_t       si_key;
 	key_t       si_token;
 } secure_info_t, *secure_info_ptr_t;
 
-/*
- * Security Level of ports and messages.
- */
+  
+                                        
+   
 #define PORT_NOT_SECURE         0
 #define MESSAGE_NOT_SECURE      0
 
-#endif  /* _KEY_DEFS_ */
+#endif                  

@@ -1,17 +1,17 @@
-//
-// Tests for
-//  template <typename T, typename P, typename U>
-//  bool operator==(bounded_ptr<T, P> const& a, U* b);
-//
-//  template <typename T, typename P, typename U>
-//  bool operator==(U* a, bounded_ptr<T, P> const& b);
-//
-//  template <typename T, typename P, typename U>
-//  bool operator!=(bounded_ptr<T, P> const& a, U* b);
-//
-//  template <typename T, typename P, typename U>
-//  bool operator!=(U* a, bounded_ptr<T, P> const& b);
-//
+  
+            
+                                                 
+                                                      
+  
+                                                 
+                                                      
+  
+                                                 
+                                                      
+  
+                                                 
+                                                      
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -47,92 +47,92 @@ tests()
 {
 	std::array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// Compare pointers within the bounds
+	                                     
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                                ^
-		//   |                                                |
-		// begin,a,b                                         end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin(), array.end());
 		TQual* b = array.begin();
 		check_eq(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^        ^                                       ^
-		//   |        |                                       |
-		// begin     a,b                                     end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<TQual> const a(array.begin() + 1, array.begin(), array.end());
 		TQual* b = array.begin() + 1;
 		check_eq(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                 ^                              ^
-		//   |                 |                              |
-		// begin,a             b                             end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin(), array.end());
 		TQual* b = array.begin() + 2;
 		check_ne(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                                ^
-		//   |                                                |
-		// begin                                           end,a,b
+		                                                               
+		                                                       
+		                                                       
+		                                                          
 		test_bounded_ptr<TQual> const a(array.end(), array.begin(), array.end());
 		TQual* b = array.end();
 		check_eq(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                 ^        ^        ^
-		//   |                 |        |        |
-		// begin               a       end       b
+		                                                               
+		                                          
+		                                          
+		                                          
 		test_bounded_ptr<TQual> const a(array.begin() + 2, array.begin(), array.begin() + 3);
 		TQual* b = array.begin() + 4;
 		check_ne(a, b);
 	}
 
-	// Check when the bounded_ptr is outside of its bounds
+	                                                      
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                 ^                              ^
-		//   |                 |                              |
-		//  a,b              begin                           end
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin() + 2, array.end());
 		TQual* b = array.begin();
 		check_eq(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                          ^        ^
-		//   |                          |        |
-		// begin                       end      a,b
+		                                                               
+		                                          
+		                                          
+		                                           
 		test_bounded_ptr<TQual> const a(array.end() - 1, array.begin(), array.end() - 2);
 		TQual* b = array.end() - 1;
 		check_eq(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                                   ^            ^
-		//   |                                   |            |
-		// begin                                end          a,b
+		                                                               
+		                                                       
+		                                                       
+		                                                        
 		test_bounded_ptr<TQual> const a(array.end(), array.begin(), array.end() - 1);
 		TQual* b = array.end();
 		check_eq(a, b);
 	}
 	{
-		// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-		//   ^                          ^        ^            ^
-		//   |                          |        |            |
-		// begin                       end       a            b
+		                                                               
+		                                                       
+		                                                       
+		                                                       
 		test_bounded_ptr<TQual> const a(array.end() - 1, array.begin(), array.end() - 2);
 		TQual* b = array.end();
 		check_ne(a, b);
 	}
 
-	// Test comparing against a null pointer
+	                                        
 	{
 		test_bounded_ptr<TQual> a = nullptr;
 		TQual* b = nullptr;
@@ -170,7 +170,7 @@ tests_convert()
 		check_eq(a, b);
 	}
 
-	// Test comparisons against cv-void*
+	                                    
 	{
 		test_bounded_ptr<Related> const a(array.begin(), array.begin(), array.end() - 1);
 		void* b = array.begin();

@@ -1,4 +1,4 @@
-/*	$NetBSD: if_bridgevar.h,v 1.4 2003/07/08 07:13:50 itojun Exp $	*/
+                                                                    
 
 /*
  * Copyright (c) 2010 Apple Inc. All rights reserved.
@@ -101,13 +101,13 @@
 #ifndef __BRIDGESTP_H__
 #define __BRIDGESTP_H__
 
-/*
- * Data structure and control definitions for STP interfaces.
- */
+  
+                                                             
+   
 
 #include <sys/queue.h>
 #include <kern/locks.h>
-/* STP port states */
+                     
 #define BSTP_IFSTATE_DISABLED   0
 #define BSTP_IFSTATE_LISTENING  1
 #define BSTP_IFSTATE_LEARNING   2
@@ -132,7 +132,7 @@
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/* STP port flags */
+                    
 #define BSTP_PORT_CANMIGRATE    0x0001
 #define BSTP_PORT_NEWINFO       0x0002
 #define BSTP_PORT_DISPUTED      0x0004
@@ -142,33 +142,33 @@
 #define BSTP_PORT_ADMEDGE       0x0040
 #define BSTP_PORT_PNDCOST       0x0080
 
-/* BPDU priority */
+                   
 #define BSTP_PDU_SUPERIOR       1
 #define BSTP_PDU_REPEATED       2
 #define BSTP_PDU_INFERIOR       3
 #define BSTP_PDU_INFERIORALT    4
 #define BSTP_PDU_OTHER          5
 
-/* BPDU flags */
-#define BSTP_PDU_PRMASK         0x0c            /* Port Role */
-#define BSTP_PDU_PRSHIFT        2               /* Port Role offset */
-#define BSTP_PDU_F_UNKN         0x00            /* Unknown port    (00) */
-#define BSTP_PDU_F_ALT          0x01            /* Alt/Backup port (01) */
-#define BSTP_PDU_F_ROOT         0x02            /* Root port       (10) */
-#define BSTP_PDU_F_DESG         0x03            /* Designated port (11) */
+                
+#define BSTP_PDU_PRMASK         0x0c                           
+#define BSTP_PDU_PRSHIFT        2                                     
+#define BSTP_PDU_F_UNKN         0x00                                      
+#define BSTP_PDU_F_ALT          0x01                                      
+#define BSTP_PDU_F_ROOT         0x02                                      
+#define BSTP_PDU_F_DESG         0x03                                      
 
-#define BSTP_PDU_STPMASK        0x81            /* strip unused STP flags */
-#define BSTP_PDU_RSTPMASK       0x7f            /* strip unused RSTP flags */
-#define BSTP_PDU_F_TC           0x01            /* Topology change */
-#define BSTP_PDU_F_P            0x02            /* Proposal flag */
-#define BSTP_PDU_F_L            0x10            /* Learning flag */
-#define BSTP_PDU_F_F            0x20            /* Forwarding flag */
-#define BSTP_PDU_F_A            0x40            /* Agreement flag */
-#define BSTP_PDU_F_TCA          0x80            /* Topology change ack */
+#define BSTP_PDU_STPMASK        0x81                                        
+#define BSTP_PDU_RSTPMASK       0x7f                                         
+#define BSTP_PDU_F_TC           0x01                                 
+#define BSTP_PDU_F_P            0x02                               
+#define BSTP_PDU_F_L            0x10                               
+#define BSTP_PDU_F_F            0x20                                 
+#define BSTP_PDU_F_A            0x40                                
+#define BSTP_PDU_F_TCA          0x80                                     
 
-/*
- * Spanning tree defaults.
- */
+  
+                          
+   
 #define BSTP_DEFAULT_MAX_AGE            (20 * 256)
 #define BSTP_DEFAULT_HELLO_TIME         (2 * 256)
 #define BSTP_DEFAULT_FORWARD_DELAY      (15 * 256)
@@ -190,31 +190,31 @@
 #define BSTP_MAX_PORT_PRIORITY          240
 #define BSTP_MAX_PATH_COST              200000000
 
-/* BPDU message types */
-#define BSTP_MSGTYPE_CFG        0x00            /* Configuration */
-#define BSTP_MSGTYPE_RSTP       0x02            /* Rapid STP */
-#define BSTP_MSGTYPE_TCN        0x80            /* Topology chg notification */
+                        
+#define BSTP_MSGTYPE_CFG        0x00                               
+#define BSTP_MSGTYPE_RSTP       0x02                           
+#define BSTP_MSGTYPE_TCN        0x80                                           
 
-/* Protocol versions */
+                       
 #define BSTP_PROTO_ID           0x00
 #define BSTP_PROTO_STP          0x00
 #define BSTP_PROTO_RSTP         0x02
 #define BSTP_PROTO_MAX          BSTP_PROTO_RSTP
 
-#define BSTP_INFO_RECIEVED      1               /* compat */
+#define BSTP_INFO_RECIEVED      1                           
 #define BSTP_INFO_RECEIVED      1
 #define BSTP_INFO_MINE          2
 #define BSTP_INFO_AGED          3
 #define BSTP_INFO_DISABLED      4
 
 
-#define BSTP_MESSAGE_AGE_INCR   (1 * 256)       /* in 256ths of a second */
-#define BSTP_TICK_VAL           (1 * 256)       /* in 256ths of a second */
+#define BSTP_MESSAGE_AGE_INCR   (1 * 256)                                  
+#define BSTP_TICK_VAL           (1 * 256)                                  
 #define BSTP_LINK_TIMER         (BSTP_TICK_VAL * 15)
 
-/*
- * Driver callbacks for STP state changes
- */
+  
+                                         
+   
 typedef void (*bstp_state_cb_t)(struct ifnet *, int);
 typedef void (*bstp_rtage_cb_t)(struct ifnet *, int);
 struct bstp_cb_ops {
@@ -222,55 +222,55 @@ struct bstp_cb_ops {
 	bstp_rtage_cb_t bcb_rtage;
 };
 
-/*
- * Because BPDU's do not make nicely aligned structures, two different
- * declarations are used: bstp_?bpdu (wire representation, packed) and
- * bstp_*_unit (internal, nicely aligned version).
- */
+  
+                                                                      
+                                                                      
+                                                  
+   
 
-/* configuration bridge protocol data unit */
+                                             
 struct bstp_cbpdu {
-	uint8_t         cbu_dsap;               /* LLC: destination sap */
-	uint8_t         cbu_ssap;               /* LLC: source sap */
-	uint8_t         cbu_ctl;                /* LLC: control */
-	uint16_t        cbu_protoid;            /* protocol id */
-	uint8_t         cbu_protover;           /* protocol version */
-	uint8_t         cbu_bpdutype;           /* message type */
-	uint8_t         cbu_flags;              /* flags (below) */
+	uint8_t         cbu_dsap;                                         
+	uint8_t         cbu_ssap;                                    
+	uint8_t         cbu_ctl;                                  
+	uint16_t        cbu_protoid;                             
+	uint8_t         cbu_protover;                                 
+	uint8_t         cbu_bpdutype;                             
+	uint8_t         cbu_flags;                                 
 
-	/* root id */
-	uint16_t        cbu_rootpri;            /* root priority */
-	uint8_t         cbu_rootaddr[6];        /* root address */
+	             
+	uint16_t        cbu_rootpri;                               
+	uint8_t         cbu_rootaddr[6];                          
 
-	uint32_t        cbu_rootpathcost;       /* root path cost */
+	uint32_t        cbu_rootpathcost;                           
 
-	/* bridge id */
-	uint16_t        cbu_bridgepri;          /* bridge priority */
-	uint8_t         cbu_bridgeaddr[6];      /* bridge address */
+	               
+	uint16_t        cbu_bridgepri;                               
+	uint8_t         cbu_bridgeaddr[6];                          
 
-	uint16_t        cbu_portid;             /* port id */
-	uint16_t        cbu_messageage;         /* current message age */
-	uint16_t        cbu_maxage;             /* maximum age */
-	uint16_t        cbu_hellotime;          /* hello time */
-	uint16_t        cbu_forwarddelay;       /* forwarding delay */
-	uint8_t         cbu_versionlen;         /* version 1 length */
+	uint16_t        cbu_portid;                          
+	uint16_t        cbu_messageage;                                  
+	uint16_t        cbu_maxage;                              
+	uint16_t        cbu_hellotime;                          
+	uint16_t        cbu_forwarddelay;                             
+	uint8_t         cbu_versionlen;                               
 } __attribute__((__packed__));
-#define BSTP_BPDU_STP_LEN       (3 + 35)        /* LLC + STP pdu */
-#define BSTP_BPDU_RSTP_LEN      (3 + 36)        /* LLC + RSTP pdu */
+#define BSTP_BPDU_STP_LEN       (3 + 35)                           
+#define BSTP_BPDU_RSTP_LEN      (3 + 36)                            
 
-/* topology change notification bridge protocol data unit */
+                                                            
 struct bstp_tbpdu {
-	uint8_t         tbu_dsap;               /* LLC: destination sap */
-	uint8_t         tbu_ssap;               /* LLC: source sap */
-	uint8_t         tbu_ctl;                /* LLC: control */
-	uint16_t        tbu_protoid;            /* protocol id */
-	uint8_t         tbu_protover;           /* protocol version */
-	uint8_t         tbu_bpdutype;           /* message type */
+	uint8_t         tbu_dsap;                                         
+	uint8_t         tbu_ssap;                                    
+	uint8_t         tbu_ctl;                                  
+	uint16_t        tbu_protoid;                             
+	uint8_t         tbu_protover;                                 
+	uint8_t         tbu_bpdutype;                             
 } __attribute__((__packed__));
 
-/*
- * Timekeeping structure used in spanning tree code.
- */
+  
+                                                    
+   
 
 typedef void bstp_task_func_t(void *context, int count);
 
@@ -317,7 +317,7 @@ struct bstp_tcn_unit {
 
 struct bstp_port {
 	LIST_ENTRY(bstp_port)   bp_next;
-	struct ifnet            *bp_ifp;        /* parent if */
+	struct ifnet            *bp_ifp;                       
 	struct bstp_state       *bp_bs;
 	uint8_t                 bp_active;
 	uint8_t                 bp_protover;
@@ -367,19 +367,19 @@ struct bstp_port {
 	uint8_t                 bp_txcount;
 	struct bstp_task        bp_statetask;
 	struct bstp_task        bp_rtagetask;
-	uint32_t                bp_if_link_state;       /* cache of the parent if link state */
+	uint32_t                bp_if_link_state;                                              
 };
 
-/*
- * Values for bp_if_link_state.
- */
-#define LINK_STATE_UNKNOWN      0       /* link invalid/unknown */
-#define LINK_STATE_DOWN         1       /* link is down */
-#define LINK_STATE_UP           2       /* link is up */
+  
+                               
+   
+#define LINK_STATE_UNKNOWN      0                                 
+#define LINK_STATE_DOWN         1                         
+#define LINK_STATE_UP           2                       
 
-/*
- * Software state for each bridge STP.
- */
+  
+                                      
+   
 struct bstp_state {
 	LIST_ENTRY(bstp_state)  bs_list;
 	uint8_t                 bs_running;
@@ -433,6 +433,6 @@ struct mbuf *bstp_input(struct bstp_port *, struct ifnet *, struct mbuf *);
 
 void bstp_sys_init(void);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* __BRIDGESTP_H__ */
+#endif                      

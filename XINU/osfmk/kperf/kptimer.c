@@ -26,25 +26,25 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * This file manages the timers used for on-CPU samples and PET.
- *
- * Each timer configured by a tool is represented by a kptimer structure.
- * The timer calls present in each structure are used to schedule CPU-local
- * timers. As each timer fires, that CPU samples itself and schedules another
- * timer to fire at the next deadline.  The first timer to fire across all CPUs
- * determines that deadline.  This causes the timers to fire at a consistent
- * cadence.
- *
- * Traditional PET uses a timer call to wake up its sampling thread and take
- * on-CPU samples.
- *
- * Synchronization for start and stop is provided by the ktrace subsystem lock.
- * Global state is stored in a single struct, to ease debugging.
- */
+  
+                                                                
+  
+                                                                         
+                                                                           
+                                                                             
+                                                                               
+                                                                            
+           
+  
+                                                                            
+                  
+  
+                                                                               
+                                                                
+   
 
 #include <mach/mach_types.h>
-#include <kern/cpu_data.h> /* current_thread() */
+#include <kern/cpu_data.h>                       
 #include <kern/kalloc.h>
 #include <kern/timer_queue.h>
 #include <libkern/section_keywords.h>
@@ -56,7 +56,7 @@
 #include <machine/machine_routines.h>
 #if defined(__x86_64__)
 #include <i386/mp.h>
-#endif /* defined(__x86_64__) */
+#endif                          
 
 #include <kperf/kperf.h>
 #include <kperf/buffer.h>
@@ -72,23 +72,23 @@
 struct kptimer {
 	uint32_t kt_actionid;
 	uint64_t kt_period_abs;
-	/*
-	 * The `kt_cur_deadline` field represents when the timer should next fire.
-	 * It's used to synchronize between timers firing on each CPU.  In the timer
-	 * handler, each CPU will take the `kt_lock` and see if the
-	 * `kt_cur_deadline` still needs to be updated for the timer fire.  If so,
-	 * it updates it and logs the timer fire event under the lock.
-	 */
+	  
+                                                                           
+                                                                             
+                                                            
+                                                                           
+                                                               
+    
 	lck_spin_t kt_lock;
 	uint64_t kt_cur_deadline;
 
 #if DEVELOPMENT || DEBUG
-	/*
-	 * To be set by the timer leader as a debugging aid for timeouts, if kperf
-	 * happens to be on-CPU when they occur.
-	 */
+	  
+                                                                           
+                                         
+    
 	uint64_t kt_fire_time;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 };
 
 static struct {
@@ -108,12 +108,12 @@ static struct {
 
 SECURITY_READ_ONLY_LATE(static uint64_t) kptimer_minperiods_mtu[KTPL_MAX];
 
-/*
- * Enforce a minimum timer period to prevent interrupt storms.
- */
+  
+                                                              
+   
 const uint64_t kptimer_minperiods_ns[KTPL_MAX] = {
 #if defined(__x86_64__)
-	[KTPL_FG] = 20 * NSEC_PER_USEC, /* The minimum timer period in xnu, period. */
+	[KTPL_FG] = 20 * NSEC_PER_USEC,                                               
 	[KTPL_BG] = 1 * NSEC_PER_MSEC,
 	[KTPL_FG_PET] = 2 * NSEC_PER_MSEC,
 	[KTPL_BG_PET] = 5 * NSEC_PER_MSEC,
@@ -215,7 +215,7 @@ kptimer_sample_curcpu(unsigned int actionid, unsigned int timerid,
 	struct kperf_sample *intbuf = kperf_intr_sample_buffer();
 #if DEVELOPMENT || DEBUG
 	intbuf->sample_time = mach_absolute_time();
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 	BUF_DATA(PERF_TM_HNDLR | DBG_FUNC_START);
 
@@ -247,10 +247,10 @@ kptimer_unlock(struct kptimer *timer)
 	lck_spin_unlock(&timer->kt_lock);
 }
 
-/*
- * If the deadline expired in the past, find the next deadline to program,
- * locked into the cadence provided by the period.
- */
+  
+                                                                          
+                                                  
+   
 static inline uint64_t
 dead_reckon_deadline(uint64_t now, uint64_t deadline, uint64_t period)
 {
@@ -269,12 +269,12 @@ kptimer_fire(struct kptimer *timer, unsigned int timerid,
 	bool first = false;
 	uint64_t next_deadline = deadline + timer->kt_period_abs;
 
-	/*
-	 * It's not straightforward to replace this lock with a compare-exchange,
-	 * since the PERF_TM_FIRE event must be emitted *before* any subsequent
-	 * PERF_TM_HNDLR events, so tools can understand the handlers are responding
-	 * to this timer fire.
-	 */
+	  
+                                                                          
+                                                                        
+                                                                             
+                       
+    
 	kptimer_lock(timer);
 	if (timer->kt_cur_deadline < next_deadline) {
 		first = true;
@@ -284,29 +284,29 @@ kptimer_fire(struct kptimer *timer, unsigned int timerid,
 		BUF_DATA(PERF_TM_FIRE, timerid, timerid == kptimer.g_pet_timerid,
 		    timer->kt_period_abs, timer->kt_actionid);
 #if DEVELOPMENT || DEBUG
-		/*
-		 * Debugging aid to see the last time this timer fired.
-		 */
+		  
+                                                         
+     
 		timer->kt_fire_time = mach_absolute_time();
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 		if (timerid == kptimer.g_pet_timerid && kppet_get_lightweight_pet()) {
 			os_atomic_inc(&kppet_gencount, relaxed);
 		}
 	} else {
-		/*
-		 * In case this CPU has missed several timer fires, get it back on track
-		 * by synchronizing with the latest timer fire.
-		 */
+		  
+                                                                          
+                                                 
+     
 		next_deadline = timer->kt_cur_deadline;
 	}
 	kptimer_unlock(timer);
 
 	if (!first && !kperf_action_has_non_system(timer->kt_actionid)) {
-		/*
-		 * The first timer to fire will sample the system, so there's
-		 * no need to run other timers if those are the only samplers
-		 * for this action.
-		 */
+		  
+                                                               
+                                                               
+                     
+     
 		return next_deadline;
 	}
 
@@ -316,9 +316,9 @@ kptimer_fire(struct kptimer *timer, unsigned int timerid,
 	return next_deadline;
 }
 
-/*
- * Determine which of the timers fired.
- */
+  
+                                       
+   
 void
 kptimer_expire(processor_t processor, int cpuid, uint64_t now)
 {
@@ -369,11 +369,11 @@ kptimer_broadcast(void (*fn)(void *))
 
 #if defined(__x86_64__)
 	(void)mp_cpus_call(CPUMASK_ALL, ASYNC, fn, NULL);
-#else /* defined(__x86_64__) */
+#else                          
 	_Atomic uint32_t xcsync = 0;
-	cpu_broadcast_xcall((uint32_t *)&xcsync, TRUE /* include self */, fn,
+	cpu_broadcast_xcall((uint32_t *)&xcsync, TRUE                   , fn,
 	    &xcsync);
-#endif /* !defined(__x86_64__) */
+#endif                           
 }
 
 static void
@@ -381,13 +381,13 @@ kptimer_broadcast_ack(void *arg)
 {
 #if defined(__x86_64__)
 #pragma unused(arg)
-#else /* defined(__x86_64__) */
+#else                          
 	_Atomic uint32_t *xcsync = arg;
 	int pending = os_atomic_dec(xcsync, relaxed);
 	if (pending == 0) {
 		thread_wakeup(xcsync);
 	}
-#endif /* !defined(__x86_64__) */
+#endif                           
 }
 
 static void
@@ -411,7 +411,7 @@ kperf_signal_handler(void)
 	kptimer_sample_pet_remote(NULL);
 }
 
-#endif /* !defined(__x86_64__) */
+#endif                           
 
 #include <stdatomic.h>
 _Atomic uint64_t mycounter = 0;
@@ -423,14 +423,14 @@ kptimer_broadcast_pet(void)
 #if defined(__x86_64__)
 	(void)mp_cpus_call(CPUMASK_OTHERS, NOSYNC, kptimer_sample_pet_remote,
 	    NULL);
-#else /* defined(__x86_64__) */
+#else                          
 	int curcpu = cpu_number();
 	for (int i = 0; i < machine_info.logical_cpu_max; i++) {
 		if (i != curcpu) {
 			cpu_signal(cpu_datap(i), SIGPkppet, NULL, NULL);
 		}
 	}
-#endif /* !defined(__x86_64__) */
+#endif                           
 }
 
 static void
@@ -445,31 +445,31 @@ kptimer_pet_handler(void * __unused param1, void * __unused param2)
 	BUF_DATA(PERF_TM_FIRE, kptimer.g_pet_timerid, 1, timer->kt_period_abs,
 	    timer->kt_actionid);
 
-	/*
-	 * To get the on-CPU samples as close to this timer fire as possible, first
-	 * broadcast to them to sample themselves.
-	 */
+	  
+                                                                            
+                                           
+    
 	kptimer_broadcast_pet();
 
-	/*
-	 * Wakeup the PET thread afterwards so it's not inadvertently sampled (it's a
-	 * high-priority kernel thread).  If the scheduler needs to IPI to run it,
-	 * that IPI will be handled after the IPIs issued during the broadcast.
-	 */
+	  
+                                                                              
+                                                                           
+                                                                        
+    
 	kppet_wake_thread();
 
-	/*
-	 * Finally, sample this CPU, who's stacks and state have been preserved while
-	 * running this handler.  Make sure to include system measurements.
-	 */
+	  
+                                                                              
+                                                                    
+    
 	kptimer_sample_curcpu(timer->kt_actionid, kptimer.g_pet_timerid,
 	    SAMPLE_FLAG_SYSTEM);
 
 	BUF_INFO(PERF_TM_FIRE | DBG_FUNC_END);
 
-	/*
-	 * The PET thread will re-arm the timer when it's done.
-	 */
+	  
+                                                        
+    
 }
 
 void
@@ -570,9 +570,9 @@ kptimer_start(void)
 	for (unsigned int i = 0; i < kptimer.g_ntimers; i++) {
 		struct kptimer *timer = &kptimer.g_timers[i];
 		if (timer->kt_period_abs == 0 || timer->kt_actionid == 0) {
-			/*
-			 * No period or action means the timer is inactive.
-			 */
+			  
+                                                      
+      
 			continue;
 		} else if (!kppet_get_lightweight_pet() &&
 		    i == kptimer.g_pet_timerid) {

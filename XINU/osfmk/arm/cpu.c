@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	arm/cpu.c
- *
- *	cpu specific routines
- */
+  
+                  
+  
+                        
+   
 
 #include <kern/kalloc.h>
 #include <kern/machine.h>
@@ -79,20 +79,20 @@ void    *LowExceptionVectorsAddr;
 static const uint8_t suspend_signature[] = {'X', 'S', 'O', 'M', 'P', 'S', 'U', 'S'};
 static const uint8_t running_signature[] = {'X', 'S', 'O', 'M', 'N', 'N', 'U', 'R'};
 
-/*
- *	Routine:	cpu_bootstrap
- *	Function:
- */
+  
+                         
+            
+   
 void
 cpu_bootstrap(void)
 {
 }
 
 
-/*
- *	Routine:	cpu_sleep
- *	Function:
- */
+  
+                     
+            
+   
 void
 cpu_sleep(void)
 {
@@ -110,10 +110,10 @@ cpu_sleep(void)
 
 _Atomic uint32_t cpu_idle_count = 0;
 
-/*
- *	Routine:	cpu_idle
- *	Function:
- */
+  
+                    
+            
+   
 void __attribute__((noreturn))
 cpu_idle(void)
 {
@@ -141,25 +141,25 @@ cpu_idle(void)
 
 	if (cpu_data_ptr->idle_timer_notify != 0) {
 		if (new_idle_timeout_ticks == 0x0ULL) {
-			/* turn off the idle timer */
+			                             
 			cpu_data_ptr->idle_timer_deadline = 0x0ULL;
 		} else {
-			/* set the new idle timeout */
+			                              
 			clock_absolutetime_interval_to_deadline(new_idle_timeout_ticks, &cpu_data_ptr->idle_timer_deadline);
 		}
 		timer_resync_deadlines();
 		if (cpu_data_ptr->rtcPop != lastPop) {
-			/*
-			 * Ignore the return value here: this CPU has called idle_notify and
-			 * committed to going idle.
-			 */
+			  
+                                                                       
+                              
+      
 			SetIdlePop();
 		}
 	}
 
 #if KPC
 	kpc_idle();
-#endif /* KPC */
+#endif          
 
 	platform_cache_idle_enter();
 	cpu_idle_wfi((boolean_t) wfi_fast);
@@ -169,10 +169,10 @@ cpu_idle(void)
 	cpu_idle_exit(FALSE);
 }
 
-/*
- *	Routine:	cpu_idle_exit
- *	Function:
- */
+  
+                         
+            
+   
 void
 cpu_idle_exit(boolean_t from_reset __unused)
 {
@@ -192,10 +192,10 @@ cpu_idle_exit(boolean_t from_reset __unused)
 
 	if (cpu_data_ptr->idle_timer_notify != 0) {
 		if (new_idle_timeout_ticks == 0x0ULL) {
-			/* turn off the idle timer */
+			                             
 			cpu_data_ptr->idle_timer_deadline = 0x0ULL;
 		} else {
-			/* set the new idle timeout */
+			                              
 			clock_absolutetime_interval_to_deadline(new_idle_timeout_ticks, &cpu_data_ptr->idle_timer_deadline);
 		}
 		timer_resync_deadlines();
@@ -221,18 +221,18 @@ cpu_init(void)
 			do_cacheid();
 			do_mvfpid();
 		} else {
-			/*
-			 * We initialize non-boot CPUs here; the boot CPU is
-			 * dealt with as part of pmap_bootstrap.
-			 */
+			  
+                                                       
+                                           
+      
 			pmap_cpu_data_init();
 		}
-		/* ARM_SMP: Assuming identical cpu */
+		                                     
 		do_debugid();
 
 		cpu_info_p = cpuid_info();
 
-		/* switch based on CPU's reported architecture */
+		                                                 
 		switch (cpu_info_p->arm_info.arm_arch) {
 		case CPU_ARCH_ARMv4T:
 		case CPU_ARCH_ARMv5T:
@@ -319,7 +319,7 @@ cpu_data_free(cpu_data_t *cpu_data_ptr)
 		OSDecrementAtomic((SInt32*)&real_ncpus);
 		CpuDataEntries[cpu_number].cpu_data_vaddr = NULL;
 		CpuDataEntries[cpu_number].cpu_data_paddr = 0;
-		__builtin_arm_dmb(DMB_ISH); // Ensure prior stores to cpu array are visible
+		__builtin_arm_dmb(DMB_ISH);                                                
 	}
 	(kfree)((void *)(cpu_data_ptr->intstack_top - INTSTACK_SIZE), INTSTACK_SIZE);
 	(kfree)((void *)(cpu_data_ptr->fiqstack_top - FIQSTACK_SIZE), FIQSTACK_SIZE);
@@ -401,7 +401,7 @@ cpu_data_register(cpu_data_t *cpu_data_ptr)
 	}
 
 	cpu_data_ptr->cpu_number = cpu;
-	__builtin_arm_dmb(DMB_ISH); // Ensure prior stores to cpu data are visible
+	__builtin_arm_dmb(DMB_ISH);                                               
 	CpuDataEntries[cpu].cpu_data_vaddr = cpu_data_ptr;
 	CpuDataEntries[cpu].cpu_data_paddr = (void *)ml_vtophys((vm_offset_t)cpu_data_ptr);
 	return KERN_SUCCESS;
@@ -461,8 +461,8 @@ cpu_timebase_init(boolean_t from_boot __unused)
 	cdp->cpu_timebase_high = 0x0UL;
 
 #if __arm__ && (__BIGGEST_ALIGNMENT__ > 4)
-	/* For the newer ARMv7k ABI where 64-bit types are 64-bit aligned, but pointers
-	 * are 32-bit. */
+	                                                                               
+                  
 	cdp->cpu_base_timebase_low = rtclock_base_abstime_low;
 	cdp->cpu_base_timebase_high = rtclock_base_abstime_high;
 #else
@@ -497,8 +497,8 @@ ml_arm_sleep(void)
 			}
 		}
 
-		/* Now that the other cores have entered the sleep path, set
-		 * the abstime fixup we'll use when we resume.*/
+		                                                            
+                                                  
 		rtclock_base_abstime = ml_get_timebase();
 		wake_abstime = rtclock_base_abstime;
 	} else {
@@ -525,7 +525,7 @@ ml_arm_sleep(void)
 #if     __ARM_ENABLE_WFE_
 		__builtin_arm_wfe();
 #endif
-	} /* Spin */
+	}           
 }
 
 void
@@ -565,7 +565,7 @@ cpu_machine_idle_init(boolean_t from_boot)
 
 		LowExceptionVectorsAddr = (void *)ml_io_map(ml_vtophys((vm_offset_t)gPhysBase), PAGE_SIZE);
 
-		/* Copy Exception Vectors low, but don't touch the sleep token */
+		                                                                 
 		bcopy((void *)&ExceptionLowVectorsBase, (void *)LowExceptionVectorsAddr, 0x90);
 		bcopy(((void *)(((vm_offset_t)&ExceptionLowVectorsBase) + 0xA0)), ((void *)(((vm_offset_t)LowExceptionVectorsAddr) + 0xA0)), ARM_PGBYTES - 0xA0);
 

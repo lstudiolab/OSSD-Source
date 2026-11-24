@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _KERN_IPC_TT_H_
 #define _KERN_IPC_TT_H_
@@ -72,24 +72,24 @@
 #include <ipc/ipc_object.h>
 
 
-/* Initialize a task's IPC state */
+                                   
 extern void ipc_task_init(
 	task_t          task,
 	task_t          parent);
 
-/* Enable a task for IPC access */
+                                  
 extern void ipc_task_enable(
 	task_t          task);
 
-/* Disable IPC access to a task */
+                                  
 extern void ipc_task_disable(
 	task_t          task);
 
-/* Clear out a task's IPC state */
+                                  
 extern void ipc_task_reset(
 	task_t          task);
 
-/* Clean up and destroy a task's IPC state */
+                                             
 extern void ipc_task_terminate(
 	task_t          task);
 
@@ -99,7 +99,7 @@ __options_decl(ipc_thread_init_options_t, uint32_t, {
 	IPC_THREAD_INIT_IMMOVABLE = 0x02,
 });
 
-/* Initialize a thread's IPC state */
+                                     
 extern void ipc_thread_init(
 	thread_t        thread,
 	ipc_thread_init_options_t options);
@@ -110,72 +110,72 @@ extern void ipc_thread_init_exc_actions(
 extern void ipc_thread_destroy_exc_actions(
 	thread_t        thread);
 
-/* Disable IPC access to a thread */
+                                    
 extern void ipc_thread_disable(
 	thread_t        thread);
 
-/* Clean up and destroy a thread's IPC state */
+                                               
 extern void ipc_thread_terminate(
 	thread_t        thread);
 
-/* Clear out a thread's IPC state */
+                                    
 extern void ipc_thread_reset(
 	thread_t        thread);
 
-/* Return a send right for the task's user-visible self port */
+                                                               
 extern ipc_port_t retrieve_task_self_fast(
 	task_t          task);
 
-/* Return a send right for the thread's user-visible self port */
+                                                                 
 extern ipc_port_t retrieve_thread_self_fast(
 	thread_t        thread);
 
-/* Check port's type, and convert to correct task type */
+                                                         
 extern task_t convert_port_to_task_check_type(
 	ipc_port_t           port,
 	ipc_kobject_type_t  *kotype,
 	mach_task_flavor_t   at_most,
 	int                  eval_check);
 
-/* Check port's type, and convert to correct thread type */
+                                                           
 extern thread_t convert_port_to_thread_check_type(
 	ipc_port_t           port,
 	ipc_kobject_type_t  *kotype,
 	mach_thread_flavor_t at_most,
 	int                  eval_check);
 
-/* Check port's type, and convert to correct ipc_space type */
+                                                              
 extern ipc_space_t convert_port_to_space_check_type(
 	ipc_port_t           port,
 	ipc_kobject_type_t  *kotype,
 	mach_task_flavor_t   at_most,
 	int                  eval_check);
 
-/* Convert from a port to a task name */
+                                        
 extern task_name_t convert_port_to_task_name(
 	ipc_port_t      port);
 
-/* Convert from a port to a task for task_policy_set(). */
+                                                          
 extern task_policy_set_t convert_port_to_task_policy_set(
 	ipc_port_t      port);
 
-/* Convert from a port to a task for task_policy_get(). */
+                                                          
 extern task_policy_get_t convert_port_to_task_policy_get(
 	ipc_port_t      port);
 
-/* Convert from a port to a task inspect */
+                                           
 extern task_inspect_t convert_port_to_task_inspect(
 	ipc_port_t      port);
 
-/* Convert from a port to a task read */
+                                        
 extern task_read_t convert_port_to_task_read(
 	ipc_port_t      port);
 
-/* Convert from a port to a task */
+                                   
 extern task_t convert_port_to_task(
 	ipc_port_t      port);
 
-/* Convert from a port to a pinned task */
+                                          
 extern task_t convert_port_to_task_pinned(
 	ipc_port_t      port);
 
@@ -203,42 +203,42 @@ extern host_t port_name_to_host(
 extern boolean_t ref_task_port_locked(
 	ipc_port_t port, task_t *ptask);
 
-/* Convert from a port to a space */
+                                    
 extern ipc_space_t convert_port_to_space(
 	ipc_port_t      port);
 
-/* Convert from a port to a space inspection right */
+                                                     
 extern ipc_space_read_t convert_port_to_space_read(
 	ipc_port_t      port);
 
-/* Convert from a port to a space inspection right */
+                                                     
 extern ipc_space_inspect_t convert_port_to_space_inspect(
 	ipc_port_t      port);
 
 extern boolean_t ref_space_port_locked(
 	ipc_port_t port, ipc_space_t *pspace);
 
-/* Convert from a port to a map */
+                                  
 extern vm_map_t convert_port_to_map(
 	ipc_port_t      port);
 
-/* Convert from a port to a map read */
+                                       
 extern vm_map_read_t convert_port_to_map_read(
 	ipc_port_t      port);
 
-/* Convert from a port to a map inspect */
+                                          
 extern vm_map_inspect_t convert_port_to_map_inspect(
 	ipc_port_t      port);
 
-/* Convert from a port to a thread */
+                                     
 extern thread_t convert_port_to_thread(
 	ipc_port_t              port);
 
-/* Convert from a port to a thread inspect */
+                                             
 extern thread_inspect_t convert_port_to_thread_inspect(
 	ipc_port_t              port);
 
-/* Convert from a port to a thread read */
+                                          
 extern thread_read_t convert_port_to_thread_read(
 	ipc_port_t              port);
 
@@ -252,7 +252,7 @@ extern thread_t port_name_to_thread(
 	mach_port_name_t            port_name,
 	port_to_thread_options_t    options);
 
-/* Deallocate a space ref produced by convert_port_to_space */
+                                                              
 extern void space_deallocate(
 	ipc_space_t             space);
 
@@ -268,4 +268,4 @@ extern void ipc_thread_port_unpin(
 	bool check_bit);
 #endif
 
-#endif  /* _KERN_IPC_TT_H_ */
+#endif                       

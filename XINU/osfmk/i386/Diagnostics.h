@@ -32,10 +32,10 @@
  * @APPLE_FREE_COPYRIGHT@
  */
 
-/*
- *	Here are the Diagnostic interface interfaces
- *	Lovingly crafted by Bill Angell using traditional methods
- */
+  
+                                               
+                                                            
+   
 #ifdef  KERNEL_PRIVATE
 
 #ifndef _DIAGNOSTICS_H_
@@ -76,9 +76,9 @@ int diagCall64(x86_saved_state_t *regs);
 #define dgRuptStat 25
 #define dgPermCheck 26
 
-typedef struct diagWork {                       /* Diagnostic work area */
-	unsigned int dgLock;                    /* Lock if needed */
-	unsigned int dgFlags;                   /* Flags */
+typedef struct diagWork {                                                 
+	unsigned int dgLock;                                        
+	unsigned int dgFlags;                              
 #define enaExpTrace 0x00000001
 #define enaUsrFCall 0x00000002
 #define enaUsrPhyMp 0x00000004
@@ -114,6 +114,6 @@ read_pmc(uint32_t counter)
 	__asm__ volatile ("rdpmc" : "=a" (lo), "=d" (hi) : "c" (counter));
 	return (((uint64_t)hi) << 32) | ((uint64_t)lo);
 }
-#endif /* _DIAGNOSTICS_H_ */
+#endif                      
 
-#endif /* KERNEL_PRIVATE */
+#endif                     

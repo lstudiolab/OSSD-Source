@@ -71,26 +71,26 @@
 #include <sys/malloc.h>
 #include <sys/param.h>
 
-/*
- * user / kernel address space type flags.
- * WARNING - make sure to check when adding flags!  Be sure new flags
- * don't overlap the definitions in uio.h
- */
-//      UIO_USERSPACE           0       defined in uio.h
+  
+                                          
+                                                                     
+                                         
+   
+                                                        
 #define UIO_USERISPACE          ((enum uio_seg)1)
-//      UIO_SYSSPACE            2       defined in uio.h
+                                                        
 #define UIO_PHYS_USERSPACE      ((enum uio_seg)3)
 #define UIO_PHYS_SYSSPACE       ((enum uio_seg)4)
-//      UIO_USERSPACE32         5       defined in uio.h
+                                                        
 #define UIO_USERISPACE32        ((enum uio_seg)6)
 #define UIO_PHYS_USERSPACE32    ((enum uio_seg)7)
-//      UIO_USERSPACE64         8       defined in uio.h
+                                                        
 #define UIO_USERISPACE64        ((enum uio_seg)9)
 #define UIO_PHYS_USERSPACE64    ((enum uio_seg)10)
-//      UIO_SYSSPACE32          11      defined in uio.h
-//      UIO_PHYS_SYSSPACE32     12      reserved, never used. Use UIO_PHYS_SYSSPACE
-//      UIO_SYSSPACE64          13      reserved, never used. Use UIO_SYSSPACE
-//      UIO_PHYS_SYSSPACE64     14      reserved, never used. Use UIO_PHYS_SYSSPACE
+                                                        
+                                                                                   
+                                                                              
+                                                                                   
 
 __BEGIN_DECLS
 struct user_iovec;
@@ -102,33 +102,33 @@ __private_extern__ void uio_setcurriovlen( uio_t a_uio, user_size_t a_value );
 __private_extern__ int uio_spacetype( uio_t a_uio );
 __private_extern__ uio_t  uio_createwithbuffer( int a_iovcount, off_t a_offset, int a_spacetype, int a_iodirection, void *a_buf_p, size_t a_buffer_size );
 __private_extern__ int copyin_user_iovec_array(user_addr_t uaddr, int spacetype, int count, struct user_iovec *dst);
-/* reverse of uio_update to "undo" uncommited I/O. This only works in
- * limited cases */
+                                                                     
+                   
 __private_extern__ void uio_pushback( uio_t a_uio, user_size_t a_count );
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/* use kern_iovec for system space requests */
+                                              
 struct kern_iovec {
-	u_int64_t       iov_base;       /* Base address. */
-	u_int64_t       iov_len;        /* Length. */
+	u_int64_t       iov_base;                          
+	u_int64_t       iov_len;                     
 };
 
-/* use user_iovec for user space requests */
+                                            
 struct user_iovec {
-	user_addr_t     iov_base;       /* Base address. */
-	user_size_t     iov_len;        /* Length. */
+	user_addr_t     iov_base;                          
+	user_size_t     iov_len;                     
 };
 
-/* use user32_iovec/user64_iovec for representing
- * in-memory structures in 32-64 processes during copyin */
+                                                 
+                                                           
 struct user32_iovec {
-	uint32_t        iov_base;       /* Base address. */
-	uint32_t        iov_len;        /* Length. */
+	uint32_t        iov_base;                          
+	uint32_t        iov_len;                     
 };
 
 struct user64_iovec {
-	uint64_t        iov_base;       /* Base address. */
-	uint64_t        iov_len;        /* Length. */
+	uint64_t        iov_base;                          
+	uint64_t        iov_len;                     
 };
 
 union iovecs {
@@ -136,32 +136,32 @@ union iovecs {
 	struct user_iovec       *uiovp;
 };
 
-/* WARNING - use accessor calls for uio_iov and uio_resid since these */
-/* fields vary depending on the originating address space. */
+                                                                        
+                                                             
 struct uio {
-	union iovecs    uio_iovs;               /* current iovec */
-	int                             uio_iovcnt;             /* active iovecs */
+	union iovecs    uio_iovs;                                  
+	int                             uio_iovcnt;                                
 	off_t                   uio_offset;
 	enum uio_seg    uio_segflg;
 	enum uio_rw     uio_rw;
 	user_size_t     uio_resid_64;
-	int                             uio_size;               /* size for use with kfree */
-	int                             uio_max_iovs;   /* max number of iovecs this uio_t can hold */
+	int                             uio_size;                                            
+	int                             uio_max_iovs;                                                 
 	u_int32_t               uio_flags;
 };
 
-/* values for uio_flags */
+                          
 #define UIO_FLAGS_INITED                0x00000001
 #define UIO_FLAGS_WE_ALLOCED    0x00000002
 #define UIO_FLAGS_IS_COMPRESSED_FILE    0x00000004
 
 __END_DECLS
 
-/*
- * UIO_SIZEOF - return the amount of space a uio_t requires to
- *	contain the given number of iovecs.  Use this macro to
- *  create a stack buffer that can be passed to uio_createwithbuffer.
- */
+  
+                                                              
+                                                         
+                                                                     
+   
 #define UIO_SIZEOF( a_iovcount ) \
 	( sizeof(struct uio) + (MAX(sizeof(struct user_iovec), sizeof(struct kern_iovec)) * (a_iovcount)) )
 
@@ -181,5 +181,5 @@ __END_DECLS
 
 extern int ureadc(int c, struct uio *uio);
 
-#endif /* KERNEL_PRIVATE */
-#endif /* !_SYS_UIO_INTERNAL_H_ */
+#endif                     
+#endif                            

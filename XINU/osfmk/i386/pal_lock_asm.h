@@ -34,6 +34,6 @@
 #define POPF  popf
 #define CLI   cli
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _I386_PAL_LOCK_ASM_H */
+#endif                           

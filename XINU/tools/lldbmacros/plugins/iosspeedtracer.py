@@ -1,4 +1,4 @@
-# Feed user stacks to ios/speedtracer
+                                     
 
 def plugin_init(kernel_target, config, lldb_obj, isConnected):
     """ initialize the common data as required by plugin """

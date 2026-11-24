@@ -44,7 +44,7 @@ main()
 	mach_server_make_memory_entry(port);
 	mach_server_remap(port);
 	mach_server_read(port, VM_OP_READ);
-	//mach_server_read(port, VM_OP_WRITE);
+	                                      
 	mach_server_read(port, VM_OP_READ_OVERWRITE);
 
 

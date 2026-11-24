@@ -29,40 +29,40 @@
 #ifndef _MACH_RESOURCE_MONITORS_H_
 #define _MACH_RESOURCE_MONITORS_H_
 
-#include <sys/syslimits.h>      /* PATH_MAX */
+#include <sys/syslimits.h>                    
 #ifndef XNU_KERNEL_PRIVATE
 #include <TargetConditionals.h>
 #endif
 
 __BEGIN_DECLS
 
-/*
- * resource_notify_flags_t
- * The top 32 bits are common flags, the bottom for per-call flags.
- */
+  
+                          
+                                                                   
+   
 typedef uint64_t resource_notify_flags_t;
 #define kRNFlagsNone                0
 
-/* Flags applicable to any monitors. */
+                                       
 #define kRNFatalLimitFlag           (1ULL << 32)
 
-/* For the disk writes I/O monitor.
- *  The default is logical writes.  */
+                                   
+                                      
 #define kRNPhysicalWritesFlag       (1ULL < 1)
 
-/* TEMPORARY compatibility, to be removed */
+                                            
 #define kCPUTriggerFatalFlag kRNFatalLimitFlag
 
 
 
 
-/*
- * Process name types for proc_internal.h.
- * proc_name_t is used by resource_notify.defs clients in user space.
- *
- * MAXCOMLEN is defined in bsd/sys/param.h which we can neither include
- * (type conflicts) nor modify (POSIX).
- */
+  
+                                          
+                                                                     
+  
+                                                                       
+                                       
+   
 #define MAXCOMLEN 16
 
 typedef char command_t[MAXCOMLEN + 1];
@@ -71,4 +71,4 @@ typedef char posix_path_t[PATH_MAX];
 
 __END_DECLS
 
-#endif /* _MACH_RESOURCE_MONITORS_H_ */
+#endif                                 

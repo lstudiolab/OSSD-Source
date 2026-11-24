@@ -26,143 +26,143 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- This file contains x86_64 hand optimized implementation of WKdm memory page compressor. 
+  
+                                                                                         
 
- 	int WKdm_compress (WK_word* src_buf, WK_word* dest_buf, WK_word* scratch, unsigned int bytes_budget);
+                                                                                                       
 
-	input :
-		src_buf : address of input page (length = 1024 words)
-		dest_buf : address of output buffer (may not be 16-byte aligned)
-		scratch : a 16-byte aligned 4k bytes scratch memory provided by the caller, 
-		bytes_budget : a given byte target in compression
+        
+                                                       
+                                                                  
+                                                                              
+                                                   
 
-	output :
+         
 
-		if the input buffer can be compressed within the given byte budget, the dest_buf is written with compressed data and the function returns with number of bytes for the compressed data  
-		o.w., the function returns -1 to signal that the input data can not be compressed with the given byte budget.
-		During the scan and tag process, each word that can not be compressed will be written to dest_buf, followed by a 12-bytes header + 256-bytes tag area.
-		When the functions returns -1, dest_buf is filled with all those words that can not be compressed and should be considered undefined.
-		The worst-case scenario is that all words can not be compressed. Hence, the minimum size requirement for dest_buf should be 12+256+4096 = 4364 bytes to prevent from memory fault. 
+                                                                                                                                                                                          
+                                                                                                               
+                                                                                                                                                        
+                                                                                                                                       
+                                                                                                                                                                                     
 
- The 4th argument bytes_budget is the target compress budget in bytes.
- Should the input page can be compressed within the budget, the compressed data is written to *dest_buf, and the function returns the number of compressed bytes.
- Otherwise, the function returns -1 (to signal to the caller that the page can not be compressed).
+                                                                      
+                                                                                                                                                                 
+                                                                                                  
 
- WKdm Compression algorithm is briefly stated as follows:
+                                                         
 
-	There is a dynamically updated dictionary consisting of 16 words. Each dictionary word is initialized to 1 at the point of entry to the function.
-	For a nonzero input word x, its 8-bits (10-bits scaled up) is used to determine a corresponding word from the dictionary, represented by dict_index (4-bits) and dict_word (32-bits).
-		a. k = (x>>10)&255;						// 8-bit hash table index
-		b. dict_index = hashTable[k];			// 4-bit dictionary index, hashTable[] is fixed	
-		c. dict_word = dictionary[dict_index];	// 32-bit dictionary word, dictionary[] is dynamically updated 
+                                                                                                                                                  
+                                                                                                                                                                                      
+                                                    
+                                                                                  
+                                                                                                        
 
- 	Each input word x is classified/tagged into 4 classes :
-		0 : x = 0
-		1 : (x>>10) == (dict_word>>10), bits 10:31 of the input word match a dictionary word
-  		2 : (x>>10) != (dict_word>>10), the above condition (22 higher bits matched) is not met, meaning a dictionary miss
-  		3 : (x == dict_word), the exact input word is in the dictionary
+                                                         
+           
+                                                                                      
+                                                                                                                      
+                                                                   
 
-	For each class, different numbers of bits are needed for the decompressor to reproduce the original input word.
-		0 : 2-bits tag (32->2 compression)
-		1 : 2-bits tag + 4-bits dict_index + 10-bits lower bits (32->16 compression)
-		2 : 2-bits tag + 32-bits new word (32->34 expansion)
-		3 : 2-bits tag + 4-bits dict_index (32->6 compression)
+                                                                                                                
+                                    
+                                                                              
+                                                      
+                                                        
 
-	It is obvious now that WKdm compress algorithm works well for pages where there are lots of zero words (32->2) and/or there are freqeunt repeats of some word patterns (32->6). 
+                                                                                                                                                                                 
 
-	the output bit stream (*dest_buf) consists of 
-		a. 12 bytes header
-		b. 256 bytes for 1024 packed tags
-		c. (varying number of) words for new words not matched to dictionary word. 
-		d. (varying number of) 32-bit words for packed 4-bit dict_indices (for class 1 and 3)
-		e. (varying number of) 32-bit words for packed 10-bit low bits (for class 1)
+                                               
+                    
+                                   
+                                                                             
+                                                                                       
+                                                                              
 
-	the header is actually of 3 words that specify the ending offset (in 32-bit words) from the start of the bit stream of c,d,e, respectively.
-	Note that there might be padding bits in d (if the number of dict_indices does not divide by 8), and there are 2/12/22 padding bits for packing 3/2/1 low 10-bits in a 32-bit word.
+                                                                                                                                            
+                                                                                                                                                                                    
 
 
-	The WKdm compress algorithm 1st runs a scan and classification pass, tagging and write unpacked data into temporary buffers. It follows by packing those data into the output buffer.
+                                                                                                                                                                                      
 
-	The temp buffers are
+                     
 
-		uint8_t 	tempTagsArray[1024];			// temporary saving for tags before final packing
-		uint8_t 	tempQPosArray[1024];			// temporary saving for dict_indices before final packing
-		uint16_t 	tempLowBitsArray[1024];			// temporary saving for partially matched lower 10 bits before final packing
+                                                                                   
+                                                                                           
+                                                                                                                  
 
-	Since the new words (that can not matched fully or partially to the dictionary) are stored right after the header and the tags section and need no packing, we directly write them to
-	the destination buffer.
+                                                                                                                                                                                      
+                        
 
-		uint32_t	*new_word = dest_buf+3+64;		// 3 words for header, 64 words for tags, new words come right after the tags.
+                                                                                                                     
 
-	Now since we are given a byte budget for this compressor, we can monitor the byte usage on the fly in the scanning and tagging pass.
+                                                                                                                                     
 
-	bytes_budget -= 12 + 256; // header and tags (1024 * 2 /8 = 256 bytes) 
+                                                                        
 
-	whenever an input word is classified as class
+                                              
 
-		2 : bytes_budget-=4; if (bytes_budget<=0) exit -1;
+                                                    
 
-	when writing the 8 4-bits/3 10-bits, monitor bytes_budget and exit -1 when byte_budget <=0;
+                                                                                            
 
-	without showing the bit budget management, the pseudo code is given as follows:
+                                                                                
 
-	uint8_t 	*tags=tempTagsArray;
-	uint8_t 	*dict=tempQPosArray;
-	uint8_t 	*partial=tempLowBitsArray;
+                              
+                              
+                                    
 
-	for (i=0;i<1024;i++) {
-			x = *src_buf++;
-			if (x == 0) {		// zero, 2-bits tag
-					*tags++ = 0;
-			} else {
+                       
+                  
+                                     
+                 
+           
 
-				// find dict_index and dict_word from x
-				k = (x>>10)&255;
-				dict_index = hashTable[k];
-				dict_word = dictionary[dict_index];
+                                           
+                    
+                              
+                                       
 
-				if (dict_word == x) { // exactly match
-					// 2-bits tag + 4-bits table index
-					*tags++ = 3;
-					*dict++ = dict_index;
-				} else if (((x^dict_word)>>10)==0) {	// 22 higher bits matched
-					// 2-bits tag + 4-bits table index + 10-bits lower partial
-					*tags++ = 1;
-                    *dict++ = dict_index;
-					*partial++ = x &0x3ff;
-					dictionary[dict_index] = x;
-				} else {	// not matched
-					// 2-bits tag + 32-bits new word
-					*tags++ = 2;
-					*new_word++ = x;
-					dictionary[dict_index] = x;
-				}
-			}
-	}
+                                          
+                                       
+                 
+                          
+                                                                  
+                                                               
+                 
+                                         
+                           
+                                
+                           
+                                     
+                 
+                     
+                                
+     
+    
+  
 
-	after this classification/tagging pass is completed, the 3 temp buffers are packed into the output *dest_buf:
+                                                                                                              
 
-		1. 1024 tags are packed into 256 bytes right after the 12-bytes header
-		2. dictionary indices (4-bits each) are packed into are right after the new words section
-		3. 3 low 10-bits are packed into a 32-bit word, this is after the dictionary indices section.
+                                                                        
+                                                                                           
+                                                                                               
 
- 	cclee, 11/30/12
+                 
 
-    Added zero page, single value page, sparse page, early abort optimizations
-    rsrini, 09/14/14
+                                                                              
+                    
 
-*/
+  
 
 	.text
 	.align 4,0x90
 
-#define SV_RETURN           $0                      // return value when SV, ZV page is found
-#define MZV_MAGIC           $17185                  // magic value used to identify MZV page encoding
-#define CHKPT_BYTES         416                     // for early aborts: checkpoint after processing this many bytes. Must be in range [4..4096]
-#define CHKPT_TAG_BYTES     (CHKPT_BYTES/16)        // size of the tags for  CHKPT_BYTES of data
-#define CHKPT_SHRUNK_BYTES  426                     // for early aborts: max size of compressed stream to allow further processing ..
-                                                    //      .. to disable early aborts, set CHKPT_SHRUNK_BYTES to 4096
+#define SV_RETURN           $0                                                               
+#define MZV_MAGIC           $17185                                                                   
+#define CHKPT_BYTES         416                                                                                                                 
+#define CHKPT_TAG_BYTES     (CHKPT_BYTES/16)                                                    
+#define CHKPT_SHRUNK_BYTES  426                                                                                                      
+                                                                                                                      
 
 #if CHKPT_BYTES > 4096
     #error CHKPT_BYTES must be <= 4096
@@ -205,25 +205,25 @@ _WKdm_compress_new:
 	#define	next_low_bits		%rsi
 	#define	byte_count			%r9d
 
-	movq	%rsi, %r12						// dest_buf
+	movq	%rsi, %r12						           
 
-	movq	%rdx, tempTagsArray 			// &tempTagsArray[0]
-	movq	%rdx, next_tag					// next_tag always points to the one following the current tag 
+	movq	%rdx, tempTagsArray 			                    
+	movq	%rdx, next_tag					                                                               
 
-	leaq	1024(%rdx), tempQPosArray		// &tempQPosArray[0]
-	movq	tempQPosArray, next_qp			// next_qp
+	leaq	1024(%rdx), tempQPosArray		                    
+	movq	tempQPosArray, next_qp			          
 
-    leaq    CHKPT_BYTES(%rdi), checkpoint   // checkpoint = src_buf + CHKPT_BYTES
-	leaq	4096(%rdi), end_of_input		// end_of_input = src_buf + num_input_words
-	leaq	268(%rsi), %rbx					// dest_buf + [TAGS_AREA_OFFSET + (num_input_words / 16)]*4
+    leaq    CHKPT_BYTES(%rdi), checkpoint                                        
+	leaq	4096(%rdi), end_of_input		                                           
+	leaq	268(%rsi), %rbx					                                                           
 
 	movl	%ecx, byte_count
-	subl	$(12+256), byte_count			// header + tags
+	subl	$(12+256), byte_count			                
 	jle		L_budgetExhausted
 
-                                            // NOTE: ALL THE DICTIONARY VALUES MUST BE INITIALIZED TO ZERO
-                                            // THIS IS NEEDED TO EFFICIENTLY DETECT SINGLE VALUE PAGES
-	// PRELOAD_DICTIONARY;
+                                                                                                          
+                                                                                                      
+	                      
 	movl	$0, 0(dictionary)
 	movl	$0, 4(dictionary)
 	movl	$0, 8(dictionary)
@@ -241,102 +241,102 @@ _WKdm_compress_new:
 	movl	$0, 56(dictionary)
 	movl	$0, 60(dictionary)
 
-	leaq	2048(%rdx), %rax				// &tempLowBitsArray[0]
-	movq	%rax, tempLowBitsArray			// save for later reference
-	movq	%rax, next_low_bits				// next_low_bits	
+	leaq	2048(%rdx), %rax				                       
+	movq	%rax, tempLowBitsArray			                           
+	movq	%rax, next_low_bits				                 
 
-	leaq	_hashLookupTable_new(%rip), hashTable	// hash look up table
+	leaq	_hashLookupTable_new(%rip), hashTable	                     
 
     movq    next_full_patt, start_next_full_patt
     movq    next_input_word, start_next_input_word
-    movl    %ecx, byte_budget               // save the byte budget    
+    movl    %ecx, byte_budget                                          
 
 
 	jmp		L_scan_loop
 
 	.align 4,0x90
 L_RECORD_ZERO:
-	movb	$0, -1(next_tag)						// *next_tag = ZERO;
-	addq	$4, next_input_word 					// next_input_word++;
-	cmpq	next_input_word, checkpoint             // checkpoint time?
+	movb	$0, -1(next_tag)						                    
+	addq	$4, next_input_word 					                     
+	cmpq	next_input_word, checkpoint                                
 	je		CHECKPOINT
 
 L_scan_loop:
 	movl	(next_input_word), %edx
-	incq	next_tag								// next_tag++
+	incq	next_tag								             
 	testl	%edx, %edx
-	je		L_RECORD_ZERO							// if (input_word==0) RECORD_ZERO
-	movl	%edx, %eax								// a copy of input_word
-	shrl	$10, %eax								// input_high_bits = HIGH_BITS(input_word);
-	movzbl	%al, %eax								// 8-bit index to the Hash Table
-	movsbq	(hashTable,%rax),%rax					// HASH_TO_DICT_BYTE_OFFSET(input_word)
-	leaq	(dictionary, %rax), dict_location		// ((char*) dictionary) + HASH_TO_DICT_BYTE_OFFSET(input_word));
-	movl	(dict_location), %eax					// dict_word = *dict_location;
-	addq	$4, next_input_word						// next_input_word++
-	cmpl	%eax, %edx								// dict_word vs input_word
-	je		L_RECORD_EXACT							// if identical, RECORD_EXACT
+	je		L_RECORD_ZERO							                                 
+	movl	%edx, %eax								                       
+	shrl	$10, %eax								                                           
+	movzbl	%al, %eax								                                
+	movsbq	(hashTable,%rax),%rax					                                       
+	leaq	(dictionary, %rax), dict_location		                                                                
+	movl	(dict_location), %eax					                              
+	addq	$4, next_input_word						                    
+	cmpl	%eax, %edx								                          
+	je		L_RECORD_EXACT							                             
 	xorl	%edx, %eax
-	shrl	$10, %eax								// HIGH_BITS(dict_word)
-	je		L_RECORD_PARTIAL						// if identical, RECORD_PARTIAL
+	shrl	$10, %eax								                       
+	je		L_RECORD_PARTIAL						                               
 
 L_RECORD_MISS:
-	movl	%edx, (next_full_patt)					// *next_full_patt = input_word;
-	addq	$4, next_full_patt						// next_full_patt++ 
-	movl	%edx, (dict_location)					// *dict_location = input_word
-	movb	$2, -1(next_tag)						// *next_tag = 2 for miss
-	subl	$4, byte_count							// fill in a new 4-bytes word
+	movl	%edx, (next_full_patt)					                                
+	addq	$4, next_full_patt						                    
+	movl	%edx, (dict_location)					                              
+	movb	$2, -1(next_tag)						                         
+	subl	$4, byte_count							                             
 	jle		L_budgetExhausted
-	cmpq	next_input_word, checkpoint             // checkpoint time?
+	cmpq	next_input_word, checkpoint                                
 	jne     L_scan_loop
 	jmp	    CHECKPOINT	
 
 L_done_search:
 
-	// SET_QPOS_AREA_START(dest_buf,next_full_patt);
-	movq	next_full_patt, %rax					// next_full_patt
-	subq	dest_buf, %rax							// next_full_patt - dest_buf								
-	sarq	$2, %rax								// offset in 4-bytes
-	movl	%eax, %r13d								// r13d = (next_full_patt - dest_buf)
-	movl	%eax, 0(dest_buf)						// dest_buf[0] = next_full_patt - dest_buf
+	                                                
+	movq	next_full_patt, %rax					                 
+	subq	dest_buf, %rax							                                    
+	sarq	$2, %rax								                    
+	movl	%eax, %r13d								                                     
+	movl	%eax, 0(dest_buf)						                                          
 	decq	next_tag
-	cmpq	next_tag, tempTagsArray					// &tempTagsArray[0] vs next_tag
-	jae		L13										// if (&tempTagsArray[0] >= next_tag), skip the following
+	cmpq	next_tag, tempTagsArray					                                
+	jae		L13										                                                         
 
-	// boundary_tmp = WK_pack_2bits(tempTagsArray, (WK_word *) next_tag, dest_buf + HEADER_SIZE_IN_WORDS);
+	                                                                                                      
 
-	movq	dest_buf, %rdi							// dest_buf
-	movq	tempTagsArray, %rcx						// &tempTagsArray[0]
+	movq	dest_buf, %rdi							           
+	movq	tempTagsArray, %rcx						                    
 
 	.align 4,0x90
 L_pack_2bits:
-	movq	8(%rcx), %rax							// w3
-	addq	$16, %rcx								// tempTagsArray += 16;
+	movq	8(%rcx), %rax							     
+	addq	$16, %rcx								                       
 	shlq	$4, %rax
-	addq	$4, %rdi								// dest_buf += 4;
-	orq		-16(%rcx), %rax							// w3
+	addq	$4, %rdi								                 
+	orq		-16(%rcx), %rax							     
 	movq	%rax, %rdx
 	shrq	$30, %rax
 	orl		%edx, %eax
-	cmpq	%rcx, next_tag							// cmp next_tag vs dest_buf
-	movl	%eax, 8(%rdi)							// save at *(dest_buf + HEADER_SIZE_IN_WORDS)
-	ja		L_pack_2bits							// if (next_tag > dest_buf) repeat L_pack_2bits
+	cmpq	%rcx, next_tag							                           
+	movl	%eax, 8(%rdi)							                                             
+	ja		L_pack_2bits							                                               
 
-	/* Pack the queue positions into the area just after the full words. */
+	                                                                       
 
 L13:
-	mov		next_qp, %rax							// next_qp
-	sub		tempQPosArray, %rax						// num_bytes_to_pack = next_qp - (char *) tempQPosArray; 
-	addl	$7, %eax								// num_bytes_to_pack+7
-	shrl	$3, %eax								// num_packed_words = (num_bytes_to_pack + 7) >> 3
+	mov		next_qp, %rax							          
+	sub		tempQPosArray, %rax						                                                         
+	addl	$7, %eax								                      
+	shrl	$3, %eax								                                                  
 
-	shll	$2, %eax								// turn into bytes
-	subl	%eax, byte_count						// 
+	shll	$2, %eax								                  
+	subl	%eax, byte_count						   
 	jl		L_budgetExhausted
-	shrl	$1, %eax 								// num_source_words = num_packed_words * 2;
+	shrl	$1, %eax 								                                           
 
-	leaq	(tempQPosArray,%rax,4), %rcx			// endQPosArray = tempQPosArray + num_source_words
-	cmpq	%rcx, next_qp							// next_qp vs endQPosArray
-	jae		L16										// if (next_qp >= endQPosArray) skip the following zero paddings
+	leaq	(tempQPosArray,%rax,4), %rcx			                                                  
+	cmpq	%rcx, next_qp							                          
+	jae		L16										                                                                
 	movq	%rcx, %rax
 	subq	next_qp, %rax
 	subl	$4, %eax
@@ -356,79 +356,79 @@ L13:
 	addq	$1, next_qp
 1:
 L16:
-	movq	next_full_patt, %rdi					// next_full_patt
-	cmpq	tempQPosArray, %rcx						// endQPosArray vs tempQPosArray
-	jbe		L20										// if (endQPosArray <= tempQPosArray) skip the following
-	movq	tempQPosArray, %rdx						// tempQPosArray
+	movq	next_full_patt, %rdi					                 
+	cmpq	tempQPosArray, %rcx						                                
+	jbe		L20										                                                        
+	movq	tempQPosArray, %rdx						                
 
-	/* byte_count -= (rcx - tempQPosArray)/2 */
+	                                           
 
 	.align 4,0x90
 L_pack_4bits:
-	movl	4(%rdx), %eax							// src_next[1]
-	addq	$8, %rdx								// src_next += 2;
-	sall	$4, %eax								// (src_next[1] << 4)
-	addq	$4, %rdi								// dest_next++;
-	orl		-8(%rdx), %eax							// temp = src_next[0] | (src_next[1] << 4)
-	cmpq	%rdx, %rcx								// source_end vs src_next
-	movl	%eax, -4(%rdi)							// dest_next[0] = temp;
-	ja		L_pack_4bits							// while (src_next < source_end) repeat the loop
+	movl	4(%rdx), %eax							              
+	addq	$8, %rdx								                 
+	sall	$4, %eax								                     
+	addq	$4, %rdi								               
+	orl		-8(%rdx), %eax							                                          
+	cmpq	%rdx, %rcx								                         
+	movl	%eax, -4(%rdi)							                       
+	ja		L_pack_4bits							                                                
 
-	// SET_LOW_BITS_AREA_START(dest_buf,boundary_tmp);
-	movq	%rdi, %rax								// boundary_tmp
-	subq	dest_buf, %rax							// boundary_tmp - dest_buf
-	movq	%rax, %r13								// boundary_tmp - dest_buf
-	shrq	$2, %r13								// boundary_tmp - dest_buf in words
+	                                                  
+	movq	%rdi, %rax								               
+	subq	dest_buf, %rax							                          
+	movq	%rax, %r13								                          
+	shrq	$2, %r13								                                   
 L20:
-	movl	%r13d, 4(dest_buf)						// dest_buf[1] = boundary_tmp - dest_buf
+	movl	%r13d, 4(dest_buf)						                                        
 
-	movq	tempLowBitsArray, %rcx					// tempLowBitsArray
-	movq	next_low_bits, %rbx						// next_low_bits
-	subq	%rcx, %rbx								// next_low_bits - tempLowBitsArray (in bytes)
-	sarq	$1, %rbx								// num_tenbits_to_pack (in half-words)
+	movq	tempLowBitsArray, %rcx					                   
+	movq	next_low_bits, %rbx						                
+	subq	%rcx, %rbx								                                              
+	sarq	$1, %rbx								                                      
 
 	#define	size	%ebx
 
-	subl	$3, size								// pre-decrement num_tenbits_to_pack by 3
-	jl		1f										// if num_tenbits_to_pack < 3, skip the following loop
+	subl	$3, size								                                         
+	jl		1f										                                                      
 
 	.align	4,0x90
 0:
-	movzwl	4(%rcx), %eax							// w2	
-	addq	$6, %rcx								// next w0/w1/w2 triplet
-	sall	$10, %eax								// w1 << 10
-	or		-4(%rcx), %ax							// w1
-	addq	$4, %rdi								// dest_buf++
-	sall	$10, %eax								// w1 << 10
-	or		-6(%rcx), %ax							// (w0) | (w1<<10) | (w2<<20)
-	subl	$4, byte_count							// fill in a new 4-bytes word
+	movzwl	4(%rcx), %eax							      
+	addq	$6, %rcx								                        
+	sall	$10, %eax								           
+	or		-4(%rcx), %ax							     
+	addq	$4, %rdi								             
+	sall	$10, %eax								           
+	or		-6(%rcx), %ax							                             
+	subl	$4, byte_count							                             
 	jle		L_budgetExhausted
-	subl	$3, size								// num_tenbits_to_pack-=3
-	movl	%eax, -4(%rdi)							// pack w0,w1,w2 into 1 dest_buf word
-	jge		0b										// if no less than 3 elements, back to loop head
+	subl	$3, size								                         
+	movl	%eax, -4(%rdi)							                                     
+	jge		0b										                                                
 
-1: 	addl	$3, size								// post-increment num_tenbits_to_pack by 3
-	je		3f										// if num_tenbits_to_pack is a multiple of 3, skip the following
-	movzwl	(%rcx), %eax							// w0
-	subl	$1, size								// num_tenbits_to_pack--
-	je		2f										//
-	movzwl	2(%rcx), %edx							// w1
-	sall	$10, %edx								// w1 << 10
-	orl		%edx, %eax								// w0 | (w1<<10)
+1: 	addl	$3, size								                                          
+	je		3f										                                                                
+	movzwl	(%rcx), %eax							     
+	subl	$1, size								                        
+	je		2f										  
+	movzwl	2(%rcx), %edx							     
+	sall	$10, %edx								           
+	orl		%edx, %eax								                
 2:
-	subl	$4, byte_count							// fill in a new 4-bytes word
+	subl	$4, byte_count							                             
 	jle		L_budgetExhausted
-	movl	%eax, (%rdi)							// write the final dest_buf word
-	addq	$4, %rdi								// dest_buf++
+	movl	%eax, (%rdi)							                                
+	addq	$4, %rdi								             
 
-3:	movq	%rdi, %rax								// boundary_tmp
-	subq	dest_buf, %rax							// boundary_tmp - dest_buf
-	shrq	$2, %rax								// boundary_tmp - dest_buf in terms of words
-	movl	%eax, 8(dest_buf)						// SET_LOW_BITS_AREA_END(dest_buf,boundary_tmp)
-	shlq	$2, %rax								// boundary_tmp - dest_buf in terms of bytes
+3:	movq	%rdi, %rax								               
+	subq	dest_buf, %rax							                          
+	shrq	$2, %rax								                                            
+	movl	%eax, 8(dest_buf)						                                               
+	shlq	$2, %rax								                                            
 
 L_done:
-	// restore registers and return
+	                               
 	addq	$(48+64), %rsp
 	popq	%rbx
 	popq	%r12
@@ -446,177 +446,177 @@ L_budgetExhausted:
 
 	.align 4,0x90
 L_RECORD_EXACT:
-	subq	dictionary, %rcx					// dict_location - dictionary
-	sarq	$2, %rcx							// divide by 4 for word offset
-	movb	$3, -1(next_tag)					// *next_tag = 3 for exact
-	movb	%cl, (next_qp)						// *next_qp = word offset (4-bit)
-	incq	next_qp								// next_qp++
-	cmpq	next_input_word, checkpoint         // checkpoint time?
+	subq	dictionary, %rcx					                             
+	sarq	$2, %rcx							                              
+	movb	$3, -1(next_tag)					                          
+	movb	%cl, (next_qp)						                                 
+	incq	next_qp								            
+	cmpq	next_input_word, checkpoint                            
 	jne     L_scan_loop
 	jmp	    CHECKPOINT	
 
 	.align 4,0x90
 L_RECORD_PARTIAL:
-	movq	%rcx, %rax							// dict_location
-	movb	$1, -1(next_tag)					// *next_tag = 1 for partial matched
-	subq	dictionary, %rax					// dict_location - dictionary
-	movl	%edx, (%rcx)						// *dict_location = input_word;
-	sarq	$2, %rax							// offset in 32-bit word
-	movb	%al, (next_qp)						// update *next_qp
-	andl	$1023, %edx							// lower 10 bits
-	incq	next_qp								// next_qp++
-	mov		%dx, (next_low_bits)				// save next_low_bits
-	addq	$2, next_low_bits					// next_low_bits++
-	cmpq	next_input_word, checkpoint         // checkpoint time?
+	movq	%rcx, %rax							                
+	movb	$1, -1(next_tag)					                                    
+	subq	dictionary, %rax					                             
+	movl	%edx, (%rcx)						                               
+	sarq	$2, %rax							                        
+	movb	%al, (next_qp)						                  
+	andl	$1023, %edx							                
+	incq	next_qp								            
+	mov		%dx, (next_low_bits)				                     
+	addq	$2, next_low_bits					                  
+	cmpq	next_input_word, checkpoint                            
 	jne     L_scan_loop
 
 CHECKPOINT:
 
-    cmpq	end_of_input, checkpoint            // end of buffer or compression ratio check?
+    cmpq	end_of_input, checkpoint                                                        
     jne     L_check_compression_ratio
 
 L_check_zero_page:
-                                                // check if any dictionary misses in page
+                                                                                         
     cmpq    start_next_full_patt, next_full_patt
     jne     L_check_single_value_page
 
-    cmpq    start_next_qp, next_qp              // check if any partial or exact dictionary matches
+    cmpq    start_next_qp, next_qp                                                                 
     jne     L_check_single_value_page
 
-    mov     SV_RETURN, %rax                     // Magic return value
+    mov     SV_RETURN, %rax                                          
     jmp     L_done
 
 L_check_single_value_page:
 
-    movq    next_full_patt, %rax                // get # dictionary misses
+    movq    next_full_patt, %rax                                          
     subq    start_next_full_patt, %rax
     shrq    $2, %rax
     
-    movq    next_qp, %r11                       // get # dictionary hits (exact + partial)
+    movq    next_qp, %r11                                                                 
     subq    start_next_qp, %r11
     
-    movq    next_low_bits, %r13                 // get # dictionary partial hits
+    movq    next_low_bits, %r13                                                 
     subq    start_next_low_bits, %r13
     shrq    $1, %r13
 
-    movq    tempTagsArray, %r14                 // get the address of the first tag
+    movq    tempTagsArray, %r14                                                    
 
-    // Single value page if one of the follwoing is true:
-    //  partial == 0 AND hits == 1023 AND miss == 1 AND tag[0] == 2 (i.e. miss)
-    //  partial == 1 AND hits == 1024 AND tag[0] == 1 (i.e. partial)
-    //
-    cmpq    $0, %r13                            // were there 0 partial hits?
+                                                         
+                                                                               
+                                                                    
+      
+    cmpq    $0, %r13                                                         
     jne     1f
 
-    cmpq    $1023, %r11                         // were there 1023 dictionary hits
+    cmpq    $1023, %r11                                                           
     jne     1f
 
-    cmpq    $1, %rax                            // was there exacly 1 dictionary miss?
+    cmpq    $1, %rax                                                                  
     jne     1f 
 
-    cmpb    $2, 0(%r14)                         // was the very 1st tag a miss?
+    cmpb    $2, 0(%r14)                                                        
     je      L_is_single_value_page
 
 1:
-    cmpq    $1, %r13                            // was there 1 partial hit?
+    cmpq    $1, %r13                                                       
     jne     L_check_mostly_zero
 
-    cmpq    $1024, %r11                         // were there 1024 dictionary hits
+    cmpq    $1024, %r11                                                           
     jne     L_check_mostly_zero
 
-    cmpb    $1, 0(%r14)                         // was the very 1st tag a partial?
+    cmpb    $1, 0(%r14)                                                           
     jne     L_check_mostly_zero
      
 L_is_single_value_page:
     
-    mov     SV_RETURN, %rax                     // Magic return value
+    mov     SV_RETURN, %rax                                          
     jmp     L_done
 
 L_check_mostly_zero:
-                                                // how much space will the sparse packer take?
-    addq    %r11, %rax                          // rax += (next_qp - start_next_qp)
+                                                                                              
+    addq    %r11, %rax                                                             
     movq    $6, %rdx
-    mulq    %rdx                                // rax *= 6 (i.e. 4 byte word + 2 byte offset)
-    addq    $4, %rax                            // rax += 4 byte for header
+    mulq    %rdx                                                                              
+    addq    $4, %rax                                                       
     movq    %rax, %r11 
-                                                // how much space will the defaut packer take?
+                                                                                              
     movq    next_low_bits, %rax
-    subq    start_next_low_bits, %rax           // get bytes consumed by lower-10 bits
+    subq    start_next_low_bits, %rax                                                 
     movq    $1365, %rdx
     mulq    %rdx
-    shrq    $11, %rax                           // rax = 2/3*(next_low_bits - start_next_low_bits)
+    shrq    $11, %rax                                                                             
     movq    next_full_patt, %rdx
-    subq    start_next_full_patt, %rdx          // get bytes consumed by dictionary misses
-    addq    %rdx, %rax                          // rax += (next_full_patt - start_next_full_patt)
+    subq    start_next_full_patt, %rdx                                                    
+    addq    %rdx, %rax                                                                           
     movq    next_qp, %rdx
     subq    start_next_qp, %rdx
-    shrq    $1, %rdx                            // get bytes consumed by dictionary hits
-    addq    %rdx, %rax                          // rax += (next_qp - start_next_qp)/2
-    addq    $(12+256), %rax                     // rax += bytes taken by the header + tags
+    shrq    $1, %rdx                                                                    
+    addq    %rdx, %rax                                                               
+    addq    $(12+256), %rax                                                               
 
-    cmpq    %r11, %rax                          // is default packer the better option?
+    cmpq    %r11, %rax                                                                 
     jb      L_done_search
 
-    cmpl    byte_budget, %r11d                  // can the sparse packer fit into the given budget?
+    cmpl    byte_budget, %r11d                                                                     
     ja      L_budgetExhausted
 
 L_sparse_packer:
 
-    movl    MZV_MAGIC, 0(dest_buf)              // header to indicate a sparse packer
+    movl    MZV_MAGIC, 0(dest_buf)                                                   
     addq    $4, dest_buf
 
-    movq    $0, %rdx                            // rdx = byte offset in src of non-0 word
+    movq    $0, %rdx                                                                     
     movq    start_next_input_word, %r8
 1:
-    movq    0(%r8, %rdx), %rax                  // rax = read dword
-	testq	%rax, %rax                          // is dword == 0
+    movq    0(%r8, %rdx), %rax                                     
+	testq	%rax, %rax                                          
     jne     5f
 3:
-    addq    $8, %rdx                            // 8 more bytes have been processed
+    addq    $8, %rdx                                                               
 4:
     cmpq    $4096, %rdx
     jne     1b
-    movq    %r11, %rax                          // store the size of the compressed stream
+    movq    %r11, %rax                                                                    
     jmp     L_done
 
 5:
-    testl   %eax, %eax                          // is lower word == 0
+    testl   %eax, %eax                                               
     je      6f
-    movl    %eax, 0(dest_buf)                   // store the non-0 word in the dest buffer
-    mov     %dx, 4(dest_buf)                    // store the byte index
+    movl    %eax, 0(dest_buf)                                                             
+    mov     %dx, 4(dest_buf)                                           
     addq    $6, dest_buf
 6:
-    shrq    $32, %rax                           // get the upper word into position
-    testl   %eax, %eax                          // is upper word == 0
+    shrq    $32, %rax                                                              
+    testl   %eax, %eax                                               
     je      3b
     addq    $4, %rdx
-    movl    %eax, 0(dest_buf)                   // store the word in the dest buffer
-    mov     %dx, 4(dest_buf)                    // store the byte index
+    movl    %eax, 0(dest_buf)                                                       
+    mov     %dx, 4(dest_buf)                                           
     addq    $6, dest_buf
     addq    $4, %rdx
     jmp     4b
 
 L_check_compression_ratio:
 
-    movq    end_of_input, checkpoint            // checkpoint = end of buffer
+    movq    end_of_input, checkpoint                                         
 
     movq    next_low_bits, %rax
-    subq    start_next_low_bits, %rax           // get bytes consumed by lower-10 bits
+    subq    start_next_low_bits, %rax                                                 
     movq    $1365, %rdx
     mulq    %rdx
-    shrq    $11, %rax                           // rax = 2/3*(next_low_bits - start_next_low_bits)
+    shrq    $11, %rax                                                                             
     
     movq    next_full_patt, %rdx
-    subq    start_next_full_patt, %rdx          // get bytes consumed by dictionary misses
-    addq    %rdx, %rax                          // rax += (next_full_patt - start_next_full_patt)
+    subq    start_next_full_patt, %rdx                                                    
+    addq    %rdx, %rax                                                                           
 
     movq    next_qp, %rdx
     subq    start_next_qp, %rdx
     shrq    $1, %rdx
-    addq    %rdx, %rax                          // rax += (next_qp - start_next_qp)/2
+    addq    %rdx, %rax                                                               
 
-    addq    $CHKPT_TAG_BYTES, %rax              // rax += bytes taken by the tags
+    addq    $CHKPT_TAG_BYTES, %rax                                               
     cmpq    $CHKPT_SHRUNK_BYTES, %rax
-    ja      L_budgetExhausted                   // compressed size exceeds budget
+    ja      L_budgetExhausted                                                    
     jmp     L_scan_loop 
 

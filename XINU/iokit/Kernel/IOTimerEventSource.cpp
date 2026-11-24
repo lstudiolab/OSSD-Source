@@ -90,16 +90,16 @@ do { \
 #define IOStatisticsCloseGate()
 #define IOStatisticsTimeout()
 
-#endif /* IOKITSTATS */
+#endif                 
 
-//
-// reserved != 0 means IOTimerEventSource::timeoutAndRelease is being used,
-// not a subclassed implementation.
-//
+  
+                                                                           
+                                   
+  
 
-// Timeout handler function. This function is called by the kernel when
-// the timeout interval expires.
-//
+                                                                       
+                                
+  
 
 __inline__ void
 IOTimerEventSource::invokeAction(IOEventSource::Action _action, IOTimerEventSource * ts,
@@ -165,8 +165,8 @@ void
 IOTimerEventSource::timeoutAndRelease(void * self, void * c)
 {
 	IOTimerEventSource *me = (IOTimerEventSource *) self;
-	/* The second parameter (a pointer) gets abused to carry an SInt32, so on LP64, "count"
-	 *  must be cast to "long" before, in order to tell GCC we're not truncating a pointer. */
+	                                                                                       
+                                                                                           
 	SInt32 count = (SInt32) (long) c;
 
 	IOStatisticsTimeout();
@@ -192,7 +192,7 @@ IOTimerEventSource::timeoutAndRelease(void * self, void * c)
 	me->release();
 }
 
-// -- work loop delivery
+                        
 
 bool
 IOTimerEventSource::checkForWork()
@@ -220,7 +220,7 @@ IOTimerEventSource::timeoutSignaled(void * self, void * c)
 	}
 }
 
-// --
+     
 
 void
 IOTimerEventSource::setTimeoutFunc()
@@ -232,12 +232,12 @@ IOTimerEventSource::setTimeoutFunc()
 		panic("setTimeoutFunc already %p, %p", this, reserved);
 	}
 
-	// reserved != 0 means IOTimerEventSource::timeoutAndRelease is being used,
-	// not a subclassed implementation
+	                                                                           
+	                                  
 	reserved = IONewZero(ExpansionData, 1);
 
 	reserved->calloutGenerationSignaled = ~reserved->calloutGeneration;
-	// make use of an existing ivar for parameter passing
+	                                                     
 	options = (uint32_t) abstime;
 	abstime = 0;
 
@@ -285,7 +285,7 @@ IOTimerEventSource::setTimeoutFunc()
 
 	assertf(func, "IOTimerEventSource options 0x%x", options);
 	if (!func) {
-		return;                                              // init will fail
+		return;                                                               
 	}
 	if (THREAD_CALL_OPTIONS_SIGNAL & tcoptions) {
 		flags |= kActive;
@@ -322,7 +322,7 @@ IOTimerEventSource::init(OSObject *inOwner, Action inAction)
 bool
 IOTimerEventSource::init(uint32_t options, OSObject *inOwner, Action inAction)
 {
-	// make use of an existing ivar for parameter passing
+	                                                     
 	abstime = options;
 	return init(inOwner, inAction);
 }
@@ -400,7 +400,7 @@ IOTimerEventSource::enable()
 {
 	super::enable();
 	if (kIOReturnSuccess != wakeAtTime(abstime)) {
-		super::disable(); // Problem re-scheduling timeout ignore enable
+		super::disable();                                               
 	}
 }
 

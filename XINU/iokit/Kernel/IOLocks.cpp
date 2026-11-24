@@ -38,7 +38,7 @@ extern "C" {
 #include <kern/locks.h>
 
 #if defined(__x86_64__)
-/* Synthetic event if none is specified, for backwards compatibility only. */
+                                                                             
 static bool IOLockSleep_NO_EVENT __attribute__((used)) = 0;
 #endif
 
@@ -90,10 +90,10 @@ IOLockWakeup(IOLock * lock, void *event, bool oneThread)
 
 
 #if defined(__x86_64__)
-/*
- * For backwards compatibility, kexts built against pre-Darwin 14 headers will bind at runtime to this function,
- * which supports a NULL event,
- */
+  
+                                                                                                                
+                               
+   
 int     IOLockSleep_legacy_x86_64( IOLock * lock, void *event, UInt32 interType) __asm("_IOLockSleep");
 int     IOLockSleepDeadline_legacy_x86_64( IOLock * lock, void *event,
     AbsoluteTime deadline, UInt32 interType) __asm("_IOLockSleepDeadline");
@@ -129,7 +129,7 @@ IOLockWakeup_legacy_x86_64(IOLock * lock, void *event, bool oneThread)
 
 	IOLockWakeup(lock, event, oneThread);
 }
-#endif /* defined(__x86_64__) */
+#endif                          
 
 
 struct _IORecursiveLock {
@@ -253,8 +253,8 @@ IORecursiveLockSleep(IORecursiveLock *_lock, void *event, UInt32 interType)
 	lock->thread = NULL;
 	res = lck_mtx_sleep(&lock->mutex, LCK_SLEEP_PROMOTED_PRI, (event_t) event, (wait_interrupt_t) interType);
 
-	// Must re-establish the recursive lock no matter why we woke up
-	// otherwise we would potentially leave the return path corrupted.
+	                                                                
+	                                                                  
 	assert(lock->thread == NULL);
 	assert(lock->count == 0);
 	lock->thread = IOThreadSelf();
@@ -277,8 +277,8 @@ IORecursiveLockSleepDeadline( IORecursiveLock * _lock, void *event,
 	res = lck_mtx_sleep_deadline(&lock->mutex, LCK_SLEEP_PROMOTED_PRI, (event_t) event,
 	    (wait_interrupt_t) interType, __OSAbsoluteTime(deadline));
 
-	// Must re-establish the recursive lock no matter why we woke up
-	// otherwise we would potentially leave the return path corrupted.
+	                                                                
+	                                                                  
 	assert(lock->thread == NULL);
 	assert(lock->count == 0);
 	lock->thread = IOThreadSelf();
@@ -292,9 +292,9 @@ IORecursiveLockWakeup(IORecursiveLock *, void *event, bool oneThread)
 	thread_wakeup_prim((event_t) event, oneThread, THREAD_AWAKENED);
 }
 
-/*
- * Complex (read/write) lock operations
- */
+  
+                                       
+   
 
 IORWLock *
 IORWLockAlloc( void )
@@ -315,9 +315,9 @@ IORWLockGetMachLock( IORWLock * lock)
 }
 
 
-/*
- * Spin locks
- */
+  
+             
+   
 
 IOSimpleLock *
 IOSimpleLockAlloc( void )
@@ -350,9 +350,9 @@ IOSimpleLockGetMachLock( IOSimpleLock * lock)
 }
 
 #ifndef IOLOCKS_INLINE
-/*
- * Lock assertions
- */
+  
+                  
+   
 
 void
 IOLockAssert(IOLock * lock, IOLockAssertState type)
@@ -371,5 +371,5 @@ IOSimpleLockAssert(IOSimpleLock *lock, IOSimpleLockAssertState type)
 {
 	LCK_SPIN_ASSERT(l, type);
 }
-#endif /* !IOLOCKS_INLINE */
-} /* extern "C" */
+#endif                      
+}                 

@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_port.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Implementation specific complement to mach/port.h.
- */
+  
+   
+  
+                       
+                      
+             
+  
+                                                     
+   
 
 #ifndef _IPC_PORT_H_
 #define _IPC_PORT_H_
@@ -70,10 +70,10 @@
 
 #define MACH_PORT_NGEN(name)            MACH_PORT_MAKE(0, MACH_PORT_GEN(name))
 
-/*
- *	Typedefs for code cleanliness.  These must all have
- *	the same (unsigned) type as mach_port_name_t.
- */
+  
+                                                      
+                                                
+   
 
 
 #define MACH_PORT_UREFS_MAX     ((mach_port_urefs_t) ((1 << 16) - 1))
@@ -99,4 +99,4 @@ extern void mach_port_guard_exception_immovable(
 	uint64_t                portguard);
 __END_DECLS
 
-#endif  /* _IPC_PORT_H_ */
+#endif                    

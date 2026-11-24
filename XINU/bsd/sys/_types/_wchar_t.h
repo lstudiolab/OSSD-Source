@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* wchar_t is a built-in type in C++ */
+                                       
 #ifndef __cplusplus
 #ifndef _WCHAR_T
 #define _WCHAR_T
-#include <machine/_types.h> /* __darwin_wchar_t */
+#include <machine/_types.h>                       
 typedef __darwin_wchar_t wchar_t;
-#endif /* _WCHAR_T */
-#endif /* __cplusplus */
+#endif               
+#endif                  

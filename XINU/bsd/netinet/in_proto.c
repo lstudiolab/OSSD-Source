@@ -90,9 +90,9 @@
 #include <netinet/udp_var.h>
 #include <netinet/ip_encap.h>
 
-/*
- * TCP/IP protocol family: IP, ICMP, UDP, TCP.
- */
+  
+                                              
+   
 
 #if IPSEC
 #include <netinet6/ipsec.h>
@@ -100,7 +100,7 @@
 #if IPSEC_ESP
 #include <netinet6/esp.h>
 #endif
-#endif /* IPSEC */
+#endif            
 
 static void in_dinit(struct domain *);
 static void ip_proto_input(protocol_family_t, mbuf_t);
@@ -112,7 +112,7 @@ extern int icmp_dgram_ctloutput(struct socket *, struct sockopt *);
 
 struct domain *inetdomain = NULL;
 
-/* Thanks to PPP, this still needs to be exported */
+                                                    
 lck_mtx_t       *inet_domain_mutex;
 
 static struct protosw inetsw[] = {
@@ -231,8 +231,8 @@ static struct protosw inetsw[] = {
 		.pr_input =             esp4_input,
 		.pr_usrreqs =           &nousrreqs,
 	},
-#endif /* IPSEC_ESP */
-#endif /* IPSEC */
+#endif                
+#endif            
 	{
 		.pr_type =              SOCK_RAW,
 		.pr_protocol =          IPPROTO_IPV4,
@@ -257,7 +257,7 @@ static struct protosw inetsw[] = {
 		.pr_update_last_owner = inp_update_last_owner,
 		.pr_copy_last_owner =   inp_copy_last_owner,
 	},
-/* raw wildcard */
+                  
 	{
 		.pr_type =              SOCK_RAW,
 		.pr_flags =             PR_ATOMIC | PR_ADDR | PR_LASTHDR,
@@ -284,7 +284,7 @@ struct domain inetdomain_s = {
 	.dom_protohdrlen =      sizeof(struct tcpiphdr),
 };
 
-/* Initialize the PF_INET domain, and add in the pre-defined protos */
+                                                                      
 void
 in_dinit(struct domain *dp)
 {
@@ -297,16 +297,16 @@ in_dinit(struct domain *dp)
 
 	inetdomain = dp;
 
-	/*
-	 * Verify that the maximum possible tcp/ip header will still
-	 * fit in a small mbuf because m_pullup only puls into 256
-	 * byte mbuf
-	 */
+	  
+                                                             
+                                                           
+             
+    
 	_CASSERT((sizeof(struct tcpiphdr) + TCP_MAXOLEN) <= _MHLEN);
 
-	/*
-	 * Attach first, then initialize; ip_init() needs raw IP handler.
-	 */
+	  
+                                                                  
+    
 	for (i = 0, pr = &inetsw[0]; i < in_proto_count; i++, pr++) {
 		net_add_proto(pr, dp, 0);
 	}
@@ -321,7 +321,7 @@ in_dinit(struct domain *dp)
 	if (i != 0) {
 		panic("%s: failed to register PF_INET protocol: %d\n",
 		    __func__, i);
-		/* NOTREACHED */
+		                
 	}
 	domain_unguard_release(unguard);
 }
@@ -334,10 +334,10 @@ ip_proto_input(protocol_family_t protocol, mbuf_t packet_list)
 	if (packet_list->m_nextpkt != NULL) {
 		ip_input_process_list(packet_list);
 	} else {
-		/*
-		 * XXX remove this path if ip_input_process_list is proven
-		 * to be stable and has minimum overhead on most platforms.
-		 */
+		  
+                                                            
+                                                             
+     
 		ip_input(packet_list);
 	}
 }
@@ -358,6 +358,6 @@ SYSCTL_NODE(_net_inet, IPPROTO_IGMP, igmp,
 #if IPSEC
 SYSCTL_NODE(_net_inet, IPPROTO_AH, ipsec,
     CTLFLAG_RW | CTLFLAG_LOCKED, 0, "IPSEC");
-#endif /* IPSEC */
+#endif            
 SYSCTL_NODE(_net_inet, IPPROTO_RAW, raw,
     CTLFLAG_RW | CTLFLAG_LOCKED, 0, "RAW");

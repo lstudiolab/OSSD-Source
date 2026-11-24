@@ -63,7 +63,7 @@ typedef uint64_t gssd_ctx;
 typedef uint64_t gssd_cred;
 typedef int32_t *gssd_etype_list;
 
-/* The following need to correspond to GSS_C_*_FLAG in gssapi.h */
+                                                                  
 #define GSSD_DELEG_FLAG         1
 #define GSSD_MUTUAL_FLAG        2
 #define GSSD_REPLAY_FLAG        4
@@ -75,13 +75,13 @@ typedef int32_t *gssd_etype_list;
 #define GSSD_TRANS_FLAG         256
 #define GSSD_DELEG_POLICY_FLAG  32768
 
-#define GSSD_NO_DEFAULT         1  // Only use the supplied principal, do not fallback to the default.
-#define GSSD_NO_CANON           2  // Don't canononicalize host names
-#define GSSD_HOME_ACCESS_OK     4  // OK to access home directory
-#define GSSD_GUEST_ONLY         8  // NTLM Server is forcing guest access
-#define GSSD_RESTART            16 // Destroy the supplied context and start over
-#define GSSD_NFS_1DES           64 // Only get single DES session keys
-#define GSSD_WIN2K_HACK         128 // Hack for Win2K
-#define GSSD_LUCID_CONTEXT      256 // Export Lucid context
+#define GSSD_NO_DEFAULT         1                                                                     
+#define GSSD_NO_CANON           2                                    
+#define GSSD_HOME_ACCESS_OK     4                                
+#define GSSD_GUEST_ONLY         8                                        
+#define GSSD_RESTART            16                                               
+#define GSSD_NFS_1DES           64                                    
+#define GSSD_WIN2K_HACK         128                  
+#define GSSD_LUCID_CONTEXT      256                        
 
-#endif /* _GSSD_MACH_TYPES_H_ */
+#endif                          

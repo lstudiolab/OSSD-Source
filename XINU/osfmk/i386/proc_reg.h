@@ -28,7 +28,7 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/* CMU_ENDHIST */
+                 
 /*
  * Mach Operating System
  * Copyright (c) 1991,1990 Carnegie Mellon University
@@ -55,127 +55,127 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- * Processor registers for i386 and i486.
- */
+  
+                                         
+   
 #ifndef _I386_PROC_REG_H_
 #define _I386_PROC_REG_H_
 
-/*
- * Model Specific Registers
- */
-#define MSR_P5_TSC              0x10    /* Time Stamp Register */
-#define MSR_P5_CESR             0x11    /* Control and Event Select Register */
-#define MSR_P5_CTR0             0x12    /* Counter #0 */
-#define MSR_P5_CTR1             0x13    /* Counter #1 */
+  
+                           
+   
+#define MSR_P5_TSC              0x10                             
+#define MSR_P5_CESR             0x11                                           
+#define MSR_P5_CTR0             0x12                    
+#define MSR_P5_CTR1             0x13                    
 
-#define MSR_P5_CESR_PC          0x0200  /* Pin Control */
-#define MSR_P5_CESR_CC          0x01C0  /* Counter Control mask */
-#define MSR_P5_CESR_ES          0x003F  /* Event Control mask */
+#define MSR_P5_CESR_PC          0x0200                   
+#define MSR_P5_CESR_CC          0x01C0                            
+#define MSR_P5_CESR_ES          0x003F                          
 
-#define MSR_P5_CESR_SHIFT       16              /* Shift to get Counter 1 */
+#define MSR_P5_CESR_SHIFT       16                                          
 #define MSR_P5_CESR_MASK        (MSR_P5_CESR_PC|\
 	                         MSR_P5_CESR_CC|\
-	                         MSR_P5_CESR_ES) /* Mask Counter */
+	                         MSR_P5_CESR_ES)                   
 
-#define MSR_P5_CESR_CC_CLOCK    0x0100  /* Clock Counting (otherwise Event) */
-#define MSR_P5_CESR_CC_DISABLE  0x0000  /* Disable counter */
-#define MSR_P5_CESR_CC_CPL012   0x0040  /* Count if the CPL == 0, 1, 2 */
-#define MSR_P5_CESR_CC_CPL3     0x0080  /* Count if the CPL == 3 */
-#define MSR_P5_CESR_CC_CPL      0x00C0  /* Count regardless of the CPL */
+#define MSR_P5_CESR_CC_CLOCK    0x0100                                        
+#define MSR_P5_CESR_CC_DISABLE  0x0000                       
+#define MSR_P5_CESR_CC_CPL012   0x0040                                   
+#define MSR_P5_CESR_CC_CPL3     0x0080                             
+#define MSR_P5_CESR_CC_CPL      0x00C0                                   
 
-#define MSR_P5_CESR_ES_DATA_READ       0x000000 /* Data Read */
-#define MSR_P5_CESR_ES_DATA_WRITE      0x000001 /* Data Write */
-#define MSR_P5_CESR_ES_DATA_RW         0x101000 /* Data Read or Write */
-#define MSR_P5_CESR_ES_DATA_TLB_MISS   0x000010 /* Data TLB Miss */
-#define MSR_P5_CESR_ES_DATA_READ_MISS  0x000011 /* Data Read Miss */
-#define MSR_P5_CESR_ES_DATA_WRITE_MISS 0x000100 /* Data Write Miss */
-#define MSR_P5_CESR_ES_DATA_RW_MISS    0x101001 /* Data Read or Write Miss */
-#define MSR_P5_CESR_ES_HIT_EM          0x000101 /* Write (hit) to M|E state */
-#define MSR_P5_CESR_ES_DATA_CACHE_WB   0x000110 /* Cache lines written back */
-#define MSR_P5_CESR_ES_EXTERNAL_SNOOP  0x000111 /* External Snoop */
-#define MSR_P5_CESR_ES_CACHE_SNOOP_HIT 0x001000 /* Data cache snoop hits */
-#define MSR_P5_CESR_ES_MEM_ACCESS_PIPE 0x001001 /* Mem. access in both pipes */
-#define MSR_P5_CESR_ES_BANK_CONFLICTS  0x001010 /* Bank conflicts */
-#define MSR_P5_CESR_ES_MISALIGNED      0x001011 /* Misaligned Memory or I/O */
-#define MSR_P5_CESR_ES_CODE_READ       0x001100 /* Code Read */
-#define MSR_P5_CESR_ES_CODE_TLB_MISS   0x001101 /* Code TLB miss */
-#define MSR_P5_CESR_ES_CODE_CACHE_MISS 0x001110 /* Code Cache miss */
-#define MSR_P5_CESR_ES_SEGMENT_LOADED  0x001111 /* Any segment reg. loaded */
-#define MSR_P5_CESR_ES_BRANCHE         0x010010 /* Branches */
-#define MSR_P5_CESR_ES_BTB_HIT         0x010011 /* BTB Hits */
-#define MSR_P5_CESR_ES_BRANCHE_BTB     0x010100 /* Taken branch or BTB Hit */
-#define MSR_P5_CESR_ES_PIPELINE_FLUSH  0x010101 /* Pipeline Flushes */
-#define MSR_P5_CESR_ES_INSTRUCTION     0x010110 /* Instruction executed */
-#define MSR_P5_CESR_ES_INSTRUCTION_V   0x010111 /* Inst. executed (v-pipe) */
-#define MSR_P5_CESR_ES_BUS_CYCLE       0x011000 /* Clocks while bus cycle */
-#define MSR_P5_CESR_ES_FULL_WRITE_BUF  0x011001 /* Clocks while full wrt buf. */
-#define MSR_P5_CESR_ES_DATA_MEM_READ   0x011010 /* Pipeline waiting for read */
-#define MSR_P5_CESR_ES_WRITE_EM        0x011011 /* Stall on write E|M state */
-#define MSR_P5_CESR_ES_LOCKED_CYCLE    0x011100 /* Locked bus cycles */
-#define MSR_P5_CESR_ES_IO_CYCLE        0x011101 /* I/O Read or Write cycles */
-#define MSR_P5_CESR_ES_NON_CACHEABLE   0x011110 /* Non-cacheable Mem. read */
-#define MSR_P5_CESR_ES_AGI             0x011111 /* Stall because of AGI */
-#define MSR_P5_CESR_ES_FLOP            0x100010 /* Floating Point operations */
-#define MSR_P5_CESR_ES_BREAK_DR0       0x100011 /* Breakpoint matches on DR0 */
-#define MSR_P5_CESR_ES_BREAK_DR1       0x100100 /* Breakpoint matches on DR1 */
-#define MSR_P5_CESR_ES_BREAK_DR2       0x100101 /* Breakpoint matches on DR2 */
-#define MSR_P5_CESR_ES_BREAK_DR3       0x100110 /* Breakpoint matches on DR3 */
-#define MSR_P5_CESR_ES_HARDWARE_IT     0x100111 /* Hardware interrupts */
+#define MSR_P5_CESR_ES_DATA_READ       0x000000                
+#define MSR_P5_CESR_ES_DATA_WRITE      0x000001                 
+#define MSR_P5_CESR_ES_DATA_RW         0x101000                         
+#define MSR_P5_CESR_ES_DATA_TLB_MISS   0x000010                    
+#define MSR_P5_CESR_ES_DATA_READ_MISS  0x000011                     
+#define MSR_P5_CESR_ES_DATA_WRITE_MISS 0x000100                      
+#define MSR_P5_CESR_ES_DATA_RW_MISS    0x101001                              
+#define MSR_P5_CESR_ES_HIT_EM          0x000101                               
+#define MSR_P5_CESR_ES_DATA_CACHE_WB   0x000110                               
+#define MSR_P5_CESR_ES_EXTERNAL_SNOOP  0x000111                     
+#define MSR_P5_CESR_ES_CACHE_SNOOP_HIT 0x001000                            
+#define MSR_P5_CESR_ES_MEM_ACCESS_PIPE 0x001001                                
+#define MSR_P5_CESR_ES_BANK_CONFLICTS  0x001010                     
+#define MSR_P5_CESR_ES_MISALIGNED      0x001011                               
+#define MSR_P5_CESR_ES_CODE_READ       0x001100                
+#define MSR_P5_CESR_ES_CODE_TLB_MISS   0x001101                    
+#define MSR_P5_CESR_ES_CODE_CACHE_MISS 0x001110                      
+#define MSR_P5_CESR_ES_SEGMENT_LOADED  0x001111                              
+#define MSR_P5_CESR_ES_BRANCHE         0x010010               
+#define MSR_P5_CESR_ES_BTB_HIT         0x010011               
+#define MSR_P5_CESR_ES_BRANCHE_BTB     0x010100                              
+#define MSR_P5_CESR_ES_PIPELINE_FLUSH  0x010101                       
+#define MSR_P5_CESR_ES_INSTRUCTION     0x010110                           
+#define MSR_P5_CESR_ES_INSTRUCTION_V   0x010111                              
+#define MSR_P5_CESR_ES_BUS_CYCLE       0x011000                             
+#define MSR_P5_CESR_ES_FULL_WRITE_BUF  0x011001                                 
+#define MSR_P5_CESR_ES_DATA_MEM_READ   0x011010                                
+#define MSR_P5_CESR_ES_WRITE_EM        0x011011                               
+#define MSR_P5_CESR_ES_LOCKED_CYCLE    0x011100                        
+#define MSR_P5_CESR_ES_IO_CYCLE        0x011101                               
+#define MSR_P5_CESR_ES_NON_CACHEABLE   0x011110                              
+#define MSR_P5_CESR_ES_AGI             0x011111                           
+#define MSR_P5_CESR_ES_FLOP            0x100010                                
+#define MSR_P5_CESR_ES_BREAK_DR0       0x100011                                
+#define MSR_P5_CESR_ES_BREAK_DR1       0x100100                                
+#define MSR_P5_CESR_ES_BREAK_DR2       0x100101                                
+#define MSR_P5_CESR_ES_BREAK_DR3       0x100110                                
+#define MSR_P5_CESR_ES_HARDWARE_IT     0x100111                          
 
-/*
- * CR0
- */
-#define CR0_PG  0x80000000      /*	 Enable paging */
-#define CR0_CD  0x40000000      /* i486: Cache disable */
-#define CR0_NW  0x20000000      /* i486: No write-through */
-#define CR0_AM  0x00040000      /* i486: Alignment check mask */
-#define CR0_WP  0x00010000      /* i486: Write-protect kernel access */
-#define CR0_NE  0x00000020      /* i486: Handle numeric exceptions */
-#define CR0_ET  0x00000010      /*	 Extension type is 80387 */
-                                /*	 (not official) */
-#define CR0_TS  0x00000008      /*	 Task switch */
-#define CR0_EM  0x00000004      /*	 Emulate coprocessor */
-#define CR0_MP  0x00000002      /*	 Monitor coprocessor */
-#define CR0_PE  0x00000001      /*	 Enable protected mode */
+  
+      
+   
+#define CR0_PG  0x80000000                          
+#define CR0_CD  0x40000000                               
+#define CR0_NW  0x20000000                                  
+#define CR0_AM  0x00040000                                      
+#define CR0_WP  0x00010000                                             
+#define CR0_NE  0x00000020                                           
+#define CR0_ET  0x00000010                                    
+                                                     
+#define CR0_TS  0x00000008                        
+#define CR0_EM  0x00000004                                
+#define CR0_MP  0x00000002                                
+#define CR0_PE  0x00000001                                  
 
-/*
- * CR4
- */
-#define CR4_SEE         0x00008000      /* Secure Enclave Enable XXX */
-#define CR4_SMAP        0x00200000      /* Supervisor-Mode Access Protect */
-#define CR4_SMEP        0x00100000      /* Supervisor-Mode Execute Protect */
-#define CR4_OSXSAVE     0x00040000      /* OS supports XSAVE */
-#define CR4_PCIDE       0x00020000      /* PCID Enable */
-#define CR4_RDWRFSGS    0x00010000      /* RDWRFSGS Enable */
-#define CR4_SMXE        0x00004000      /* Enable SMX operation */
-#define CR4_VMXE        0x00002000      /* Enable VMX operation */
-#define CR4_OSXMM       0x00000400      /* SSE/SSE2 exception support in OS */
-#define CR4_OSFXS       0x00000200      /* SSE/SSE2 OS supports FXSave */
-#define CR4_PCE         0x00000100      /* Performance-Monitor Count Enable */
-#define CR4_PGE         0x00000080      /* Page Global Enable */
-#define CR4_MCE         0x00000040      /* Machine Check Exceptions */
-#define CR4_PAE         0x00000020      /* Physical Address Extensions */
-#define CR4_PSE         0x00000010      /* Page Size Extensions */
-#define CR4_DE          0x00000008      /* Debugging Extensions */
-#define CR4_TSD         0x00000004      /* Time Stamp Disable */
-#define CR4_PVI         0x00000002      /* Protected-mode Virtual Interrupts */
-#define CR4_VME         0x00000001      /* Virtual-8086 Mode Extensions */
+  
+      
+   
+#define CR4_SEE         0x00008000                                     
+#define CR4_SMAP        0x00200000                                          
+#define CR4_SMEP        0x00100000                                           
+#define CR4_OSXSAVE     0x00040000                             
+#define CR4_PCIDE       0x00020000                       
+#define CR4_RDWRFSGS    0x00010000                           
+#define CR4_SMXE        0x00004000                                
+#define CR4_VMXE        0x00002000                                
+#define CR4_OSXMM       0x00000400                                            
+#define CR4_OSFXS       0x00000200                                       
+#define CR4_PCE         0x00000100                                            
+#define CR4_PGE         0x00000080                              
+#define CR4_MCE         0x00000040                                    
+#define CR4_PAE         0x00000020                                       
+#define CR4_PSE         0x00000010                                
+#define CR4_DE          0x00000008                                
+#define CR4_TSD         0x00000004                              
+#define CR4_PVI         0x00000002                                             
+#define CR4_VME         0x00000001                                        
 
-/*
- * XCR0 - XFEATURE_ENABLED_MASK (a.k.a. XFEM) register
- */
-#define XCR0_X87        (1ULL << 0)     /* x87, FPU/MMX (always set) */
-#define XCR0_SSE        (1ULL << 1)     /* SSE supported by XSAVE/XRESTORE */
-#define XCR0_YMM        (1ULL << 2)     /* YMM state available */
-#define XCR0_BNDREGS    (1ULL << 3)     /* MPX Bounds register state */
-#define XCR0_BNDCSR     (1ULL << 4)     /* MPX Bounds configuration/state  */
-#define XCR0_OPMASK     (1ULL << 5)     /* Opmask register state */
-#define XCR0_ZMM_HI256  (1ULL << 6)     /* ZMM upper 256-bit state */
-#define XCR0_HI16_ZMM   (1ULL << 7)     /* ZMM16..ZMM31 512-bit state */
+  
+                                                      
+   
+#define XCR0_X87        (1ULL << 0)                                    
+#define XCR0_SSE        (1ULL << 1)                                          
+#define XCR0_YMM        (1ULL << 2)                              
+#define XCR0_BNDREGS    (1ULL << 3)                                    
+#define XCR0_BNDCSR     (1ULL << 4)                                          
+#define XCR0_OPMASK     (1ULL << 5)                                
+#define XCR0_ZMM_HI256  (1ULL << 6)                                  
+#define XCR0_HI16_ZMM   (1ULL << 7)                                     
 #define XFEM_X87        XCR0_X87
 #define XFEM_SSE        XCR0_SSE
 #define XFEM_YMM        XCR0_YMM
@@ -192,18 +192,18 @@
 
 #define EARLY_GSBASE_MAGIC 0xffffdeadbeefee00
 
-/*
- * If thread groups are needed for x86, set this to 1
- */
+  
+                                                     
+   
 #define CONFIG_THREAD_GROUPS 0
 
-/*
- * MAX_PSETS allows the scheduler to create statically sized
- * scheduling data structures (such as an array of processor sets, clutch
- * buckets in Edge scheduler etc.).
- *
- * <Edge Multi-cluster Support Needed>
- */
+  
+                                                            
+                                                                         
+                                   
+  
+                                      
+   
 #define MAX_PSETS 64
 #define MAX_CPUS 64
 
@@ -420,7 +420,7 @@ hlt(void)
 
 extern int rdmsr64_carefully(uint32_t msr, uint64_t *val);
 extern int wrmsr64_carefully(uint32_t msr, uint64_t val);
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 static inline void
 wbinvd(void)
@@ -446,11 +446,11 @@ stac(void)
 	__asm__  volatile ("stac");
 }
 
-/*
- * Access to machine-specific registers (available on 586 and better only)
- * Note: the rd* operations modify the parameters directly (without using
- * pointer indirection), this allows gcc to optimize better
- */
+  
+                                                                          
+                                                                         
+                                                           
+   
 
 #define rdmsr(msr, lo, hi) \
 	__asm__ volatile("rdmsr" : "=a" (lo), "=d" (hi) : "c" (msr))
@@ -473,12 +473,12 @@ stac(void)
 
 #define X86_MAX_LBRS    32
 struct x86_lbr_record {
-	/*
-	 * Note that some CPUs convey extra info in the upper bits of the from/to fields,
-	 * whereas others convey that information in the LBR_INFO companion MSRs.
-	 * The proper info will be extracted based on the CPU family detected at runtime
-	 * when LBR thread state is requested.
-	 */
+	  
+                                                                                  
+                                                                          
+                                                                                 
+                                       
+    
 	uint64_t        from_rip;
 	uint64_t        to_rip;
 	uint64_t        info;
@@ -543,17 +543,17 @@ rdtscp64(uint32_t *aux)
                                           : "ecx");
 	return ((hi) << 32) | (lo);
 }
-#endif /* __LP64__ */
+#endif               
 
-/*
- * rdmsr_carefully() returns 0 when the MSR has been read successfully,
- * or non-zero (1) if the MSR does not exist.
- * The implementation is in locore.s.
- */
+  
+                                                                       
+                                             
+                                     
+   
 extern int rdmsr_carefully(uint32_t msr, uint32_t *lo, uint32_t *hi);
 __END_DECLS
 
-#endif  /* ASSEMBLER */
+#endif                 
 
 #define MSR_IA32_P5_MC_ADDR                     0
 #define MSR_IA32_P5_MC_TYPE                     1
@@ -596,21 +596,21 @@ __END_DECLS
 #define         MSR_IA32_ARCH_CAPABILITIES_L1DF_NO      (1ULL << 3)
 #define         MSR_IA32_ARCH_CAPABILITIES_SSB_NO       (1ULL << 4)
 #define         MSR_IA32_ARCH_CAPABILITIES_MDS_NO       (1ULL << 5)
-#define         MSR_IA32_ARCH_CAPABILITIES_IFU_NO       (1ULL << 6)     /* This CPU is not susceptible to the instruction-fetch erratum */
-#define         MSR_IA32_ARCH_CAPABILITIES_TSX_CTRL     (1ULL << 7)     /* This CPU supports the TSX_CTRL MSR */
-#define         MSR_IA32_ARCH_CAPABILITIES_TAA_NO       (1ULL << 8)     /* This CPU is not susceptible to TAA */
+#define         MSR_IA32_ARCH_CAPABILITIES_IFU_NO       (1ULL << 6)                                                                       
+#define         MSR_IA32_ARCH_CAPABILITIES_TSX_CTRL     (1ULL << 7)                                             
+#define         MSR_IA32_ARCH_CAPABILITIES_TAA_NO       (1ULL << 8)                                             
 
 #define MSR_IA32_TSX_FORCE_ABORT                0x10f
-#define         MSR_IA32_TSXFA_RTM_FORCE_ABORT  (1ULL << 0)     /* Bit 0 */
+#define         MSR_IA32_TSXFA_RTM_FORCE_ABORT  (1ULL << 0)                
 
 #define MSR_IA32_BBL_CR_CTL                     0x119
 
 #define MSR_IA32_TSX_CTRL                       0x122
-#define         MSR_IA32_TSXCTRL_RTM_DISABLE            (1ULL << 0)     /* Bit 0 */
-#define         MSR_IA32_TSXCTRL_TSX_CPU_CLEAR          (1ULL << 1)     /* Bit 1 */
+#define         MSR_IA32_TSXCTRL_RTM_DISABLE            (1ULL << 0)                
+#define         MSR_IA32_TSXCTRL_TSX_CPU_CLEAR          (1ULL << 1)                
 
 #define MSR_IA32_MCU_OPT_CTRL                   0x123
-#define         MSR_IA32_MCUOPTCTRL_RNGDS_MITG_DIS      (1ULL << 0)     /* Bit 0 */
+#define         MSR_IA32_MCUOPTCTRL_RNGDS_MITG_DIS      (1ULL << 0)                
 
 #define MSR_IA32_SYSENTER_CS                    0x174
 #define MSR_IA32_SYSENTER_ESP                   0x175
@@ -635,21 +635,21 @@ __END_DECLS
 #define MSR_IA32_PACKAGE_THERM_INTERRUPT        0x1b2
 
 #define MSR_IA32_LBR_SELECT                     0x1c8
-#define         LBR_SELECT_CPL_EQ_0             (1ULL)          /* R/W When set, do not capture branches ending in ring 0 */
-#define         LBR_SELECT_CPL_NEQ_0            (1ULL << 1)     /* R/W When set, do not capture branches ending in ring >0 */
-#define         LBR_SELECT_JCC                  (1ULL << 2)     /* R/W When set, do not capture conditional branches */
-#define         LBR_SELECT_NEAR_REL_CALL        (1ULL << 3)     /* R/W When set, do not capture near relative calls */
-#define         LBR_SELECT_NEAR_IND_CALL        (1ULL << 4)     /* R/W When set, do not capture near indirect calls */
-#define         LBR_SELECT_NEAR_RET             (1ULL << 5)     /* R/W When set, do not capture near returns */
-#define         LBR_SELECT_NEAR_IND_JMP         (1ULL << 6)     /* R/W When set, do not capture near indirect jumps except near indirect calls and near returns */
-#define         LBR_SELECT_NEAR_REL_JMP         (1ULL << 7)     /* R/W When set, do not capture near relative jumps except near relative calls. */
-#define         LBR_SELECT_FAR_BRANCH           (1ULL << 8)     /* R/W When set, do not capture far branches */
-#define         LBR_SELECT_HSW_EN_CALLSTACK1    (1ULL << 9)     /* Enable LBR stack to use LIFO filtering to capture Call stack profile */
+#define         LBR_SELECT_CPL_EQ_0             (1ULL)                                                                      
+#define         LBR_SELECT_CPL_NEQ_0            (1ULL << 1)                                                                  
+#define         LBR_SELECT_JCC                  (1ULL << 2)                                                            
+#define         LBR_SELECT_NEAR_REL_CALL        (1ULL << 3)                                                           
+#define         LBR_SELECT_NEAR_IND_CALL        (1ULL << 4)                                                           
+#define         LBR_SELECT_NEAR_RET             (1ULL << 5)                                                    
+#define         LBR_SELECT_NEAR_IND_JMP         (1ULL << 6)                                                                                                       
+#define         LBR_SELECT_NEAR_REL_JMP         (1ULL << 7)                                                                                       
+#define         LBR_SELECT_FAR_BRANCH           (1ULL << 8)                                                    
+#define         LBR_SELECT_HSW_EN_CALLSTACK1    (1ULL << 9)                                                                               
 
 #define MSR_IA32_LASTBRANCH_TOS                 0x1c9
 
-/* LBR INFO MSR fields (SKL and later) */
-/* Same fields can be used for HSW in the FROM_x LBR MSRs */
+                                         
+                                                            
 #define MSR_IA32_LBRINFO_TSX_ABORT              (1ULL << 61)
 #define MSR_IA32_LBRINFO_IN_TSX                 (1ULL << 62)
 #define MSR_IA32_LBRINFO_MISPREDICT             (1ULL << 63)
@@ -686,10 +686,10 @@ __END_DECLS
 #define MSR_IA32_PERF_CAPABILITIES              0x345
 #define         PERFCAP_LBR_FMT_MASK            (0x3f)
 #define PERFCAP_LBR_TYPE(msrval) ((msrval) & PERFCAP_LBR_FMT_MASK)
-#define PERFCAP_LBR_TYPE_MISPRED                3       /* NHM */
-#define PERFCAP_LBR_TYPE_TSXINFO                4       /* HSW/BDW */
-#define PERFCAP_LBR_TYPE_EIP_WITH_LBRINFO       5       /* SKL+ */
-/* Types 6 & 7 are for Goldmont and Goldmont Plus, respectively */
+#define PERFCAP_LBR_TYPE_MISPRED                3                
+#define PERFCAP_LBR_TYPE_TSXINFO                4                    
+#define PERFCAP_LBR_TYPE_EIP_WITH_LBRINFO       5                 
+                                                                  
 
 #define LBR_TYPE_MISPRED_FROMRIP(from_rip)      (((from_rip) & 0xFFFFFFFFFFFFULL) | (((from_rip) & (1ULL << 47)) ? 0xFFFF000000000000ULL : 0))
 #define LBR_TYPE_MISPRED_MISPREDICT(from_rip)   (((from_rip) & MSR_IA32_LBRINFO_MISPREDICT) ? 1 : 0)
@@ -787,4 +787,4 @@ __END_DECLS
 #define HV_VMX_EPTP_WALK_LENGTH(wl)             (0ULL | ((((wl) - 1) & 0x7) << 3))
 #define HV_VMX_EPTP_ENABLE_AD_FLAGS             (1ULL << 6)
 
-#endif  /* _I386_PROC_REG_H_ */
+#endif                         

@@ -1,7 +1,7 @@
-//
-// Tests for
-//  void reset() noexcept;
-//
+  
+            
+                          
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <darwintest.h>
@@ -17,7 +17,7 @@ tests()
 {
 	T obj{3};
 
-	// reset() on a non-null shared pointer
+	                                       
 	{
 		tracked_shared_ptr<T> ptr(&obj, libkern::retain);
 		tracking_policy::reset();
@@ -27,7 +27,7 @@ tests()
 		CHECK(ptr.get() == nullptr);
 	}
 
-	// reset() on a null shared pointer
+	                                   
 	{
 		tracked_shared_ptr<T> ptr = nullptr;
 		tracking_policy::reset();
@@ -37,7 +37,7 @@ tests()
 		CHECK(ptr.get() == nullptr);
 	}
 
-	// reset() as a self-reference
+	                              
 	{
 		tracked_shared_ptr<T> ptr(&obj, libkern::retain);
 		tracked_shared_ptr<T> ptr2(&obj, libkern::retain);
@@ -45,7 +45,7 @@ tests()
 
 		CHECK(&ptr.reset() == &ptr);
 
-		// check short-circuiting
+		                         
 		bool ok =  (ptr.reset() && !ptr2.reset());
 		CHECK(ptr2.get() != nullptr);
 	}

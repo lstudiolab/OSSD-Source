@@ -32,10 +32,10 @@
  *
  */
 
-/*
- * Internal definitions used between the iokit user library and
- * server routines.
- */
+  
+                                                               
+                   
+   
 
 #ifndef _IOKIT_IOKITSERVER_H
 #define _IOKIT_IOKITSERVER_H
@@ -52,20 +52,20 @@ extern "C" {
 }
 #endif
 
-// IOCatalogueSendData
-/*!
- *   @enum IOCatalogueSendData user-client flags.
- *   @constant kIOCatalogAddDrivers  Signals a call to the addDrivers function in IOCatalogue.
- *   @constant kIOCatalogAddDriversNoMatch  Signals a call to the addDrivers function in IOCatalogue but does not start a matching thread.
- *   @constant kIOCatalogRemoveDrivers  Signals a call to the removeDrivers function in IOCatalogue.
- *   @constant kIOCatalogRemoveDriversNoMatch  Signals a call to the removedrivers function in IOCatalogue but does not start a matching thread.
- *   @constant kIOCatalogStartMatching  Signals the IOCatalogue to start an IOService matching thread.
- *   @constant kIOCatalogRemoveKernelLinker  Deprecated; does nothing.
- *   @constant kIOCatalogKextdActive  Signals the kernel that kextd is running.
- *   @constant kIOCatalogKextdFinishedLaunching  Signals the IOCatalogue that kextd has finished sending it information at startup.
- *   @constant kIOCatalogResetDrivers  Resets the IOCatalogue with a new set of personalities.
- *   @constant kIOCatalogResetDriversNoMatch  Resets the IOCatalogue with a new set of personalities but does not start a matching thread.
- */
+                      
+   
+                                                 
+                                                                                              
+                                                                                                                                          
+                                                                                                    
+                                                                                                                                                
+                                                                                                      
+                                                                      
+                                                                               
+                                                                                                                                   
+                                                                                              
+                                                                                                                                          
+   
 enum {
 	kIOCatalogAddDrivers        = 1,
 	kIOCatalogAddDriversNoMatch,
@@ -79,11 +79,11 @@ enum {
 	kIOCatalogResetDriversNoMatch
 };
 
-// IOCatalogueGetData
-/*!
- *   @enum IOCatalogueGetData user-client flags
- *   @constant kIOCatalogGetContents  Returns a snapshot of the database to the caller.
- */
+                     
+   
+                                               
+                                                                                       
+   
 enum {
 	kIOCatalogGetContents         = 1,
 	kIOCatalogGetModuleDemandList = 2,
@@ -91,22 +91,22 @@ enum {
 	kIOCatalogGetROMMkextList     = 4
 };
 
-// IOCatalogueReset
-/*!
- *   @enum IOCatalogueReset user-client flag
- *   @constant kIOCatalogResetDefault  Removes all entries from IOCatalogue except those used for booting the system.
- */
+                   
+   
+                                            
+                                                                                                                     
+   
 enum {
 	kIOCatalogResetDefault      = 1
 };
 
-// IOCatalogueTerminate
-/*!
- *   @enum IOCatalogueTerminate user-client flags.
- *   @constant kIOCatalogModuleUnload Terminates all services which depend on a particular module and unloads the module.
- *   @constant kIOCatalogModuleTerminate Terminates all services which depend on a particular module but does not unload the module.
- *   @constant kIOCatalogServiceTerminate Terminates a particular service by name.
- */
+                       
+   
+                                                  
+                                                                                                                         
+                                                                                                                                    
+                                                                                  
+   
 enum {
 	kIOCatalogModuleUnload      = 1,
 	kIOCatalogModuleTerminate,
@@ -118,13 +118,13 @@ enum {
 
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif                  
 
 #include <kern/ipc_kobject.h>
 
-/*
- * Functions in iokit:IOUserClient.cpp
- */
+  
+                                      
+   
 
 extern void iokit_add_reference( io_object_t obj, ipc_kobject_type_t type );
 
@@ -142,9 +142,9 @@ iokit_client_memory_for_type(
 	vm_address_t *  address,
 	vm_size_t    *  size );
 
-/*
- * Functions in osfmk:iokit_rpc.c
- */
+  
+                                 
+   
 
 extern ipc_port_t iokit_alloc_object_port( io_object_t obj,
     ipc_kobject_type_t type );
@@ -182,7 +182,7 @@ typedef struct ipc_kmsg * ipc_kmsg_t;
 extern ipc_kmsg_t ipc_kmsg_alloc(size_t);
 extern void ipc_kmsg_destroy(ipc_kmsg_t);
 extern mach_msg_header_t * ipc_kmsg_msg_header(ipc_kmsg_t);
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 extern kern_return_t
 uext_server(ipc_kmsg_t request, ipc_kmsg_t * preply);
@@ -190,9 +190,9 @@ uext_server(ipc_kmsg_t request, ipc_kmsg_t * preply);
 extern kern_return_t
 iokit_label_dext_task(task_t task);
 
-/*
- * Functions imported by iokit:IOMemoryDescriptor.cpp
- */
+  
+                                                     
+   
 
 extern ppnum_t IOGetLastPageNumber(void);
 
@@ -207,9 +207,9 @@ extern kern_return_t IOProtectCacheMode(vm_map_t map, mach_vm_address_t va,
 extern unsigned int IODefaultCacheBits(addr64_t pa);
 
 #ifdef __cplusplus
-} /* extern "C" */
-#endif /* __cplusplus */
+}                 
+#endif                  
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif /* ! _IOKIT_IOKITSERVER_H */
+#endif                             

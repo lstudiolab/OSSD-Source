@@ -70,13 +70,13 @@ static int tcp_check_cwnd_nonvalidated = 1;
 SYSCTL_INT(_net_inet_tcp, OID_AUTO, cwnd_nonvalidated,
     CTLFLAG_RW | CTLFLAG_LOCKED, &tcp_check_cwnd_nonvalidated, 0,
     "Check if congestion window is non-validated");
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
  #define SET_SNDSB_IDEAL_SIZE(sndsb, size) \
 	sndsb->sb_idealsize = min(max(tcp_sendspace, tp->snd_ssthresh), \
 	tcp_autosndbuf_max);
 
-/* Array containing pointers to currently implemented TCP CC algorithms */
+                                                                          
 struct tcp_cc_algo* tcp_cc_algo_list[TCP_CC_ALGO_COUNT];
 struct zone *tcp_cc_zone;
 
@@ -91,9 +91,9 @@ static errno_t tcp_ccdbg_control_connect(kern_ctl_ref kctl,
 static errno_t tcp_ccdbg_control_disconnect(kern_ctl_ref kctl,
     u_int32_t unit, void *uinfo);
 static struct tcp_cc_algo tcp_cc_algo_none;
-/*
- * Initialize TCP congestion control algorithms.
- */
+  
+                                                
+   
 
 void
 tcp_cc_init(void)
@@ -130,7 +130,7 @@ tcp_cc_control_register(void)
 	}
 }
 
-/* Allow only one socket to connect at any time for debugging */
+                                                                
 static errno_t
 tcp_ccdbg_control_connect(kern_ctl_ref kctl, struct sockaddr_ctl *sac,
     void **uinfo)
@@ -178,7 +178,7 @@ tcp_ccdbg_trace(struct tcpcb *tp, struct tcphdr *th, int32_t event)
 {
 #if !CONFIG_DTRACE
 #pragma unused(th)
-#endif /* !CONFIG_DTRACE */
+#endif                     
 	struct inpcb *inp = tp->t_inpcb;
 
 	if (tcp_cc_debug && tcp_ccdbg_unit > 0) {
@@ -188,7 +188,7 @@ tcp_ccdbg_trace(struct tcpcb *tp, struct tcphdr *th, int32_t event)
 		bzero(&dbg_state, sizeof(dbg_state));
 
 		nanotime(&tv);
-		/* Take time in seconds */
+		                          
 		dbg_state.ccd_tsns = (tv.tv_sec * 1000000000) + tv.tv_nsec;
 		inet_ntop(SOCK_DOM(inp->inp_socket),
 		    ((SOCK_DOM(inp->inp_socket) == PF_INET) ?
@@ -245,11 +245,11 @@ void
 tcp_cc_resize_sndbuf(struct tcpcb *tp)
 {
 	struct sockbuf *sb;
-	/*
-	 * If the send socket buffer size is bigger than ssthresh,
-	 * it is time to trim it because we do not want to hold
-	 * too many mbufs in the socket buffer
-	 */
+	  
+                                                           
+                                                        
+                                       
+    
 	sb = &tp->t_inpcb->inp_socket->so_snd;
 	if (sb->sb_hiwat > tp->snd_ssthresh &&
 	    (sb->sb_flags & SB_AUTOSIZE)) {
@@ -266,11 +266,11 @@ tcp_bad_rexmt_fix_sndbuf(struct tcpcb *tp)
 	struct sockbuf *sb;
 	sb = &tp->t_inpcb->inp_socket->so_snd;
 	if ((sb->sb_flags & (SB_TRIM | SB_AUTOSIZE)) == (SB_TRIM | SB_AUTOSIZE)) {
-		/*
-		 * If there was a retransmission that was not necessary
-		 * then the size of socket buffer can be restored to
-		 * what it was before
-		 */
+		  
+                                                         
+                                                      
+                       
+     
 		SET_SNDSB_IDEAL_SIZE(sb, tp->snd_ssthresh);
 		if (sb->sb_hiwat <= sb->sb_idealsize) {
 			sbreserve(sb, sb->sb_idealsize);
@@ -279,9 +279,9 @@ tcp_bad_rexmt_fix_sndbuf(struct tcpcb *tp)
 	}
 }
 
-/*
- * Calculate initial cwnd according to RFC3390.
- */
+  
+                                               
+   
 void
 tcp_cc_cwnd_init_or_reset(struct tcpcb *tp)
 {
@@ -291,32 +291,32 @@ tcp_cc_cwnd_init_or_reset(struct tcpcb *tp)
 		if (tcp_cubic_minor_fixes) {
 			tp->snd_cwnd = tcp_initial_cwnd(tp);
 		} else {
-			/* initial congestion window according to RFC 3390 */
+			                                                     
 			tp->snd_cwnd = min(4 * tp->t_maxseg,
 			    max(2 * tp->t_maxseg, TCP_CC_CWND_INIT_BYTES));
 		}
 	}
 }
 
-/*
- * Indicate whether this ack should be delayed.
- * Here is the explanation for different settings of tcp_delack_enabled:
- *  - when set to 1, the behavior is same as when set to 2. We kept this
- *    for binary compatibility.
- *  - when set to 2, will "ack every other packet"
- *      - if our last ack wasn't a 0-sized window.
- *      - if the peer hasn't sent us a TH_PUSH data packet (radar 3649245).
- *              If TH_PUSH is set, take this as a clue that we need to ACK
- *              with no delay. This helps higher level protocols who
- *              won't send us more data even if the window is open
- *              because their last "segment" hasn't been ACKed
- *  - when set to 3,  will do "streaming detection"
- *      - if we receive more than "maxseg_unacked" full packets
- *        in the last 100ms
- *      - if the connection is not in slow-start or idle or
- *        loss/recovery states
- *      - if those criteria aren't met, it will ack every other packet.
- */
+  
+                                               
+                                                                        
+                                                                        
+                               
+                                                  
+                                                  
+                                                                           
+                                                                          
+                                                                    
+                                                                  
+                                                              
+                                                   
+                                                               
+                           
+                                                           
+                              
+                                                                       
+   
 int
 tcp_cc_delay_ack(struct tcpcb *tp, struct tcphdr *th)
 {
@@ -341,29 +341,29 @@ tcp_cc_delay_ack(struct tcpcb *tp, struct tcphdr *th)
 		} else {
 			uint32_t recwin;
 
-			/* Get the receive-window we would announce */
+			                                              
 			recwin = tcp_sbspace(tp);
 			if (recwin > (uint32_t)(TCP_MAXWIN << tp->rcv_scale)) {
 				recwin = (uint32_t)(TCP_MAXWIN << tp->rcv_scale);
 			}
 
-			/* Delay ACK, if:
-			 *
-			 * 1. We are not sending a zero-window
-			 * 2. We are not forcing fast ACKs
-			 * 3. We have more than the low-water mark in receive-buffer
-			 * 4. The receive-window is not increasing
-			 * 5. We have less than or equal of an MSS unacked or
-			 *    Window actually has been growing larger than the initial value by half of it.
-			 *    (this makes sure that during ramp-up we ACK every second MSS
-			 *    until we pass the tcp_recvspace * 1.5-threshold)
-			 * 6. We haven't waited for half a BDP
-			 *
-			 * (a note on 6: The receive-window is
-			 * roughly 2 BDP. Thus, recwin / 4 means half a BDP and
-			 * thus we enforce an ACK roughly twice per RTT - even
-			 * if the app does not read)
-			 */
+			                 
+     
+                                         
+                                     
+                                                               
+                                             
+                                                        
+                                                                                      
+                                                                     
+                                                         
+                                         
+     
+                                         
+                                                          
+                                                         
+                               
+      
 			if ((tp->t_flags & TF_RXWIN0SENT) == 0 &&
 			    tp->t_forced_acks == 0 &&
 			    tp->t_inpcb->inp_socket->so_rcv.sb_cc > tp->t_inpcb->inp_socket->so_rcv.sb_lowat &&
@@ -387,11 +387,11 @@ tcp_cc_allocate_state(struct tcpcb *tp)
 	    tp->t_ccstate == NULL) {
 		tp->t_ccstate = (struct tcp_ccstate *)zalloc(tcp_cc_zone);
 
-		/*
-		 * If we could not allocate memory for congestion control
-		 * state, revert to using TCP NewReno as it does not
-		 * require any state
-		 */
+		  
+                                                           
+                                                      
+                      
+     
 		if (tp->t_ccstate == NULL) {
 			tp->tcp_cc_index = TCP_CC_ALGO_NEWRENO_INDEX;
 		} else {
@@ -400,10 +400,10 @@ tcp_cc_allocate_state(struct tcpcb *tp)
 	}
 }
 
-/*
- * If stretch ack was disabled automatically on long standing connections,
- * re-evaluate the situation after 15 minutes to enable it.
- */
+  
+                                                                          
+                                                           
+   
 #define TCP_STRETCHACK_DISABLE_WIN      (15 * 60 * TCP_RETRANSHZ)
 void
 tcp_cc_after_idle_stretchack(struct tcpcb *tp)
@@ -427,10 +427,10 @@ tcp_cc_after_idle_stretchack(struct tcpcb *tp)
 	}
 }
 
-/*
- * Detect if the congestion window is non-vlidated according to
- * draft-ietf-tcpm-newcwv-07
- */
+  
+                                                               
+                            
+   
 
 inline uint32_t
 tcp_cc_is_cwnd_nonvalidated(struct tcpcb *tp)
@@ -441,11 +441,11 @@ tcp_cc_is_cwnd_nonvalidated(struct tcpcb *tp)
 		return 0;
 	}
 
-	/*
-	 * The congestion window is validated if the number of bytes acked
-	 * is more than half of the current window or if there is more
-	 * data to send in the send socket buffer
-	 */
+	  
+                                                                   
+                                                               
+                                          
+    
 	if (tp->t_pipeack >= (tp->snd_cwnd >> 1) ||
 	    (so != NULL && so->so_snd.sb_cc > tp->snd_cwnd)) {
 		tp->t_flagsext &= ~TF_CWND_NONVALIDATED;
@@ -455,10 +455,10 @@ tcp_cc_is_cwnd_nonvalidated(struct tcpcb *tp)
 	return tp->t_flagsext & TF_CWND_NONVALIDATED;
 }
 
-/*
- * Adjust congestion window in response to congestion in non-validated
- * phase.
- */
+  
+                                                                      
+         
+   
 inline void
 tcp_cc_adjust_nonvalidated_cwnd(struct tcpcb *tp)
 {
@@ -474,11 +474,11 @@ tcp_cc_adjust_nonvalidated_cwnd(struct tcpcb *tp)
 	tp->t_flagsext &= ~TF_CWND_NONVALIDATED;
 }
 
-/*
- * Return maximum of all the pipeack samples. Since the number of samples
- * TCP_PIPEACK_SAMPLE_COUNT is 3 at this time, it will be simpler to do
- * a comparision. We should change ths if the number of samples increases.
- */
+  
+                                                                         
+                                                                       
+                                                                          
+   
 inline u_int32_t
 tcp_get_max_pipeack(struct tcpcb *tp)
 {

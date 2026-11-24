@@ -25,37 +25,37 @@
 #ifndef _SPAWN_H_
 #define _SPAWN_H_
 
-/*
- * [SPN] Support for _POSIX_SPAWN
- */
+  
+                                 
+   
 
 #include <sys/cdefs.h>
 #include <_types.h>
-#include <sys/spawn.h> /* shared types */
+#include <sys/spawn.h>                   
 
 #include <Availability.h>
 
-/*
- * [SPN] Inclusion of the <spawn.h> header may make visible symbols defined
- * in the <sched.h>, <signal.h>, and <sys/types.h> headers.
- */
+  
+                                                                           
+                                                           
+   
 #include <sys/_types/_pid_t.h>
 #include <sys/_types/_sigset_t.h>
 #include <sys/_types/_mode_t.h>
 
-/*
- * Opaque types for use with posix_spawn() family functions.  Internals are
- * not defined, and should not be accessed directly.  Types are defined as
- * mandated by POSIX.
- */
+  
+                                                                           
+                                                                          
+                     
+   
 typedef  void *posix_spawnattr_t;
 typedef  void *posix_spawn_file_actions_t;
 
 __BEGIN_DECLS
-/*
- * gcc under c99 mode won't compile "[ __restrict]" by itself.  As a workaround,
- * a dummy argument name is added.
- */
+  
+                                                                                
+                                  
+   
 
 int     posix_spawn(pid_t * __restrict, const char * __restrict,
     const posix_spawn_file_actions_t *,
@@ -108,7 +108,7 @@ int     posix_spawnattr_setpgroup(posix_spawnattr_t *, pid_t) __API_AVAILABLE(ma
 int     posix_spawnattr_setsigmask(posix_spawnattr_t * __restrict,
     const sigset_t * __restrict) __API_AVAILABLE(macos(10.5), ios(2.0)) __SPI_AVAILABLE(watchos(2.0), tvos(9.0), bridgeos(1.0));
 
-#if 0   /* _POSIX_PRIORITY_SCHEDULING [PS] : not supported */
+#if 0                                                        
 int     posix_spawnattr_setschedparam(posix_spawnattr_t * __restrict,
     const struct sched_param * __restrict);
 int     posix_spawnattr_setschedpolicy(posix_spawnattr_t *, int);
@@ -116,14 +116,14 @@ int     posix_spawnattr_getschedparam(const posix_spawnattr_t * __restrict,
     struct sched_param * __restrict);
 int     posix_spawnattr_getschedpolicy(const posix_spawnattr_t * __restrict,
     int * __restrict);
-#endif  /* 0 */
+#endif         
 
 __END_DECLS
 
 #if     !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-/*
- * Darwin-specific extensions below
- */
+  
+                                   
+   
 #include <mach/exception_types.h>
 #include <mach/machine.h>
 #include <mach/port.h>
@@ -158,16 +158,16 @@ int     posix_spawnattr_setsuidcredport_np(posix_spawnattr_t * __restrict, mach_
 
 int     posix_spawnattr_setnosmt_np(const posix_spawnattr_t * __restrict attr) __API_AVAILABLE(macos(10.16));
 
-/*
- * Set CPU Security Mitigation on the spawned process
- * This attribute affects all threads and is inherited on fork and exec
- */
+  
+                                                     
+                                                                       
+   
 int     posix_spawnattr_set_csm_np(const posix_spawnattr_t * __restrict attr, uint32_t flags) __API_AVAILABLE(macos(10.16));
-/*
- * flags for CPU Security Mitigation attribute
- * POSIX_SPAWN_NP_CSM_ALL should be used in most cases,
- * the individual flags are provided only for performance evaluation etc
- */
+  
+                                              
+                                                       
+                                                                        
+   
 #define POSIX_SPAWN_NP_CSM_ALL         0x0001
 #define POSIX_SPAWN_NP_CSM_NOSMT       0x0002
 #define POSIX_SPAWN_NP_CSM_TECS        0x0004
@@ -183,5 +183,5 @@ int     posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *,
 
 __END_DECLS
 
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
-#endif  /* _SPAWN_H_ */
+#endif                                             
+#endif                 

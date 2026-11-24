@@ -34,19 +34,19 @@
 #include "kxld_dict.h"
 #include "kxld_util.h"
 
-/*******************************************************************************
-* Types and macros
-*******************************************************************************/
+                                                                                
+                  
+                                                                                
 
-/* Ratio of num_entries:num_buckets that will cause a resize */
+                                                               
 #define RESIZE_NUMER 7
 #define RESIZE_DENOM 10
 #define RESIZE_THRESHOLD(x) (((x)*RESIZE_NUMER) / RESIZE_DENOM)
 #define MIN_BUCKETS(x) (((x)*RESIZE_DENOM) / RESIZE_NUMER)
 
-/* Selected for good scaling qualities when resizing dictionary
- * ... see: http://www.concentric.net/~ttwang/tech/hashsize.htm
- */
+                                                               
+                                                               
+   
 #define DEFAULT_DICT_SIZE 89
 
 typedef struct dict_entry DictEntry;
@@ -63,9 +63,9 @@ struct dict_entry {
 	DictEntryState state;
 };
 
-/*******************************************************************************
-* Function prototypes
-*******************************************************************************/
+                                                                                
+                     
+                                                                                
 
 static kern_return_t get_locate_index(const KXLDDict *dict, const void *key,
     u_int *idx);
@@ -73,8 +73,8 @@ static kern_return_t get_insert_index(const KXLDDict *dict, const void *key,
     u_int *idx);
 static kern_return_t resize_dict(KXLDDict *dict);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_dict_init(KXLDDict * dict, kxld_dict_hash hash, kxld_dict_cmp cmp,
     u_int num_entries)
@@ -87,19 +87,19 @@ kxld_dict_init(KXLDDict * dict, kxld_dict_hash hash, kxld_dict_cmp cmp,
 	check(hash);
 	check(cmp);
 
-	/* We want the number of allocated buckets to be at least twice that of the
-	 * number to be inserted.
-	 */
+	                                                                           
+                          
+    
 	while (min_buckets > num_buckets) {
 		num_buckets *= 2;
 		num_buckets++;
 	}
 
-	/* Allocate enough buckets for the anticipated number of entries */
+	                                                                   
 	rval = kxld_array_init(&dict->buckets, sizeof(DictEntry), num_buckets);
 	require_noerr(rval, finish);
 
-	/* Initialize */
+	                
 	dict->hash = hash;
 	dict->cmp = cmp;
 	dict->num_entries = 0;
@@ -111,8 +111,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_dict_clear(KXLDDict *dict)
 {
@@ -126,8 +126,8 @@ kxld_dict_clear(KXLDDict *dict)
 	kxld_array_clear(&dict->resize_buckets);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_dict_iterator_init(KXLDDictIterator *iter, const KXLDDict *dict)
 {
@@ -138,8 +138,8 @@ kxld_dict_iterator_init(KXLDDictIterator *iter, const KXLDDict *dict)
 	iter->dict = dict;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_dict_deinit(KXLDDict *dict)
 {
@@ -149,8 +149,8 @@ kxld_dict_deinit(KXLDDict *dict)
 	kxld_array_deinit(&dict->resize_buckets);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_int
 kxld_dict_get_num_entries(const KXLDDict *dict)
 {
@@ -159,8 +159,8 @@ kxld_dict_get_num_entries(const KXLDDict *dict)
 	return dict->num_entries;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_dict_find(const KXLDDict *dict, const void *key)
 {
@@ -181,14 +181,14 @@ kxld_dict_find(const KXLDDict *dict, const void *key)
 	return entry->value;
 }
 
-/*******************************************************************************
- * This dictionary uses linear probing, which means that when there is a
- * collision, we just walk along the buckets until a free bucket shows up.
- * A consequence of this is that when looking up an item, items that lie between
- * its hash value and its actual bucket may have been deleted since it was
- * inserted.  Thus, we should only stop a lookup when we've wrapped around the
- * dictionary or encountered an EMPTY bucket.
- ********************************************************************************/
+                                                                                
+                                                                        
+                                                                          
+                                                                                
+                                                                          
+                                                                              
+                                             
+                                                                                  
 static kern_return_t
 get_locate_index(const KXLDDict *dict, const void *key, u_int *_idx)
 {
@@ -198,7 +198,7 @@ get_locate_index(const KXLDDict *dict, const void *key, u_int *_idx)
 
 	base = idx = dict->hash(dict, key);
 
-	/* Iterate until we match the key, wrap, or hit an empty bucket */
+	                                                                  
 	entry = kxld_array_get_item(&dict->buckets, idx);
 	while (!dict->cmp(entry->key, key)) {
 		if (entry->state == EMPTY) {
@@ -222,8 +222,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_dict_insert(KXLDDict *dict, const void *key, void *value)
 {
@@ -235,24 +235,24 @@ kxld_dict_insert(KXLDDict *dict, const void *key, void *value)
 	check(key);
 	check(value);
 
-	/* Resize if we are greater than the capacity threshold.
-	 * Note: this is expensive, but the dictionary can be sized correctly at
-	 * construction to avoid ever having to do this.
-	 */
+	                                                        
+                                                                         
+                                                 
+    
 	while (dict->num_entries > dict->resize_threshold) {
 		rval = resize_dict(dict);
 		require_noerr(rval, finish);
 	}
 
-	/* If this function returns FULL after we've already resized appropriately
-	 * something is very wrong and we should return an error.
-	 */
+	                                                                          
+                                                          
+    
 	rval = get_insert_index(dict, key, &idx);
 	require_noerr(rval, finish);
 
-	/* Insert the new key-value pair into the bucket, but only count it as a
-	 * new entry if we are not overwriting an existing entry.
-	 */
+	                                                                        
+                                                          
+    
 	entry = kxld_array_get_item(&dict->buckets, idx);
 	if (entry->state != USED) {
 		dict->num_entries++;
@@ -267,10 +267,10 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* Increases the hash table's capacity by 2N+1.  Uses dictionary API.  Not
-* fast; just correct.
-*******************************************************************************/
+                                                                                
+                                                                         
+                     
+                                                                                
 static kern_return_t
 resize_dict(KXLDDict *dict)
 {
@@ -282,20 +282,20 @@ resize_dict(KXLDDict *dict)
 
 	check(dict);
 
-	/* Initialize a new set of buckets to hold more entries */
+	                                                          
 	rval = kxld_array_init(&dict->resize_buckets, sizeof(DictEntry), nbuckets);
 	require_noerr(rval, finish);
 
-	/* Swap the new buckets with the old buckets */
+	                                               
 	tmparray = dict->buckets;
 	dict->buckets = dict->resize_buckets;
 	dict->resize_buckets = tmparray;
 
-	/* Reset dictionary parameters */
+	                                 
 	dict->num_entries = 0;
 	dict->resize_threshold = RESIZE_THRESHOLD(dict->buckets.nitems);
 
-	/* Rehash all of the entries */
+	                               
 	for (i = 0; i < dict->resize_buckets.nitems; ++i) {
 		entry = kxld_array_get_item(&dict->resize_buckets, i);
 		if (entry->state == USED) {
@@ -304,7 +304,7 @@ resize_dict(KXLDDict *dict)
 		}
 	}
 
-	/* Clear the old buckets */
+	                           
 	kxld_array_clear(&dict->resize_buckets);
 
 	rval = KERN_SUCCESS;
@@ -313,9 +313,9 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* Simple function to find the first empty cell
-*******************************************************************************/
+                                                                                
+                                              
+                                                                                
 static kern_return_t
 get_insert_index(const KXLDDict *dict, const void *key, u_int *r_index)
 {
@@ -325,9 +325,9 @@ get_insert_index(const KXLDDict *dict, const void *key, u_int *r_index)
 
 	base = idx = dict->hash(dict, key);
 
-	/* Iterate through the buckets until we find an EMPTY bucket, a DELETED
-	 * bucket, or a key match.
-	 */
+	                                                                       
+                           
+    
 	entry = kxld_array_get_item(&dict->buckets, idx);
 	while (entry->state == USED && !dict->cmp(entry->key, key)) {
 		idx = (idx + 1) % dict->buckets.nitems;
@@ -342,8 +342,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_dict_remove(KXLDDict *dict, const void *key, void **value)
 {
@@ -354,7 +354,7 @@ kxld_dict_remove(KXLDDict *dict, const void *key, void **value)
 	check(dict);
 	check(key);
 
-	/* Find the item */
+	                   
 	rval = get_locate_index(dict, key, &idx);
 	if (rval) {
 		if (value) {
@@ -365,20 +365,20 @@ kxld_dict_remove(KXLDDict *dict, const void *key, void **value)
 
 	entry = kxld_array_get_item(&dict->buckets, idx);
 
-	/* Save the value if requested */
+	                                 
 	if (value) {
 		*value = entry->value;
 	}
 
-	/* Delete the item from the dictionary */
+	                                         
 	entry->key = NULL;
 	entry->value = NULL;
 	entry->state = DELETED;
 	dict->num_entries--;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_dict_iterator_get_next(KXLDDictIterator *iter, const void **key,
     void **value)
@@ -392,7 +392,7 @@ kxld_dict_iterator_get_next(KXLDDictIterator *iter, const void **key,
 	*key = NULL;
 	*value = NULL;
 
-	/* Walk over the dictionary looking for USED buckets */
+	                                                       
 	for (; iter->idx < iter->dict->buckets.nitems; ++(iter->idx)) {
 		entry = kxld_array_get_item(&iter->dict->buckets, iter->idx);
 		if (entry->state == USED) {
@@ -404,19 +404,19 @@ kxld_dict_iterator_get_next(KXLDDictIterator *iter, const void **key,
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_dict_iterator_reset(KXLDDictIterator *iter)
 {
 	iter->idx = 0;
 }
 
-/*******************************************************************************
-* This is Daniel Bernstein's hash algorithm from comp.lang.c
-* It's fast and distributes well.  Returns an idx into the symbol hash table.
-* NOTE: Will not check for a valid pointer - performance
-*******************************************************************************/
+                                                                                
+                                                            
+                                                                             
+                                                        
+                                                                                
 u_int
 kxld_dict_string_hash(const KXLDDict *dict, const void *_key)
 {
@@ -428,7 +428,7 @@ kxld_dict_string_hash(const KXLDDict *dict, const void *_key)
 	check(_key);
 
 	while ((c = *key++)) {
-		/* hash(i) = hash(i-1) *33 ^ name[i] */
+		                                       
 		hash_val = ((hash_val << 5) + hash_val) ^ c;
 	}
 

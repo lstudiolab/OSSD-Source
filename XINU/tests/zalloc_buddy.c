@@ -80,7 +80,7 @@ T_DECL(zone_buddy_allocator_encodings, "test the buddy allocator formulas")
 
 
 			if (o == 0) {
-				// leaf nodes aren't represented in the bitmap
+				                                              
 				continue;
 			}
 			T_QUIET; T_ASSERT_LT(node, 8 * sizeof(bits), "fits in bitfield: %zd", pos);

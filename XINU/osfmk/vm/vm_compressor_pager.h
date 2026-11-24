@@ -84,13 +84,13 @@ extern vm_external_state_t vm_compressor_pager_state_get(
 	        if (_num_pages_cleared) {                               \
 	                vm_compressor_pager_count((object)->pager,      \
 	                                          -_num_pages_cleared,  \
-	                                          FALSE, /* shared */   \
+	                                          FALSE,                \
 	                                          (object));            \
 	        }                                                       \
 	        if (_num_pages_cleared &&                               \
 	            ((object)->purgable != VM_PURGABLE_DENY ||          \
 	             (object)->vo_ledger_tag)) {                        \
-	/* less compressed purgeable/tagged pages */    \
+	                                                \
 	                assert(_num_pages_cleared == 1);                \
 	                vm_object_owner_compressed_update(              \
 	                        (object),                               \
@@ -125,14 +125,14 @@ extern void vm_compressor_transfer(int *dst_slot_p, int *src_slot_p);
 extern kern_return_t vm_compressor_pager_relocate(memory_object_t mem_obj, memory_object_offset_t mem_offset, void **current_chead);
 extern kern_return_t vm_compressor_relocate(void **current_chead, int *src_slot_p);
 extern void vm_compressor_finished_filling(void **current_chead);
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 #if DEVELOPMENT || DEBUG
 extern kern_return_t vm_compressor_pager_inject_error(memory_object_t pager,
     memory_object_offset_t offset);
 extern void vm_compressor_inject_error(int *slot);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-#endif  /* _VM_VM_COMPRESSOR_PAGER_H_ */
+#endif                                  
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

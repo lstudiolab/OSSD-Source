@@ -53,22 +53,22 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- *	File:	kern_return.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Machine-dependent kernel return definitions.
- */
+  
+                      
+                                                    
+             
+  
+                                               
+   
 
 #ifndef _MACH_ARM_KERN_RETURN_H_
 #define _MACH_ARM_KERN_RETURN_H_
 
 #ifndef ASSEMBLER
 typedef int             kern_return_t;
-#endif  /* ASSEMBLER */
+#endif                 
 
-#endif  /* _MACH_ARM_KERN_RETURN_H_ */
+#endif                                

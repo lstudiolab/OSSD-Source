@@ -29,10 +29,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * dhcp.h
- * - definitions for DHCP (as specified in RFC2132)
- */
+  
+         
+                                                   
+   
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
@@ -40,21 +40,21 @@
 #include <netinet/udp.h>
 
 struct dhcp {
-	u_char              dp_op;      /* packet opcode type */
-	u_char              dp_htype;   /* hardware addr type */
-	u_char              dp_hlen;    /* hardware addr length */
-	u_char              dp_hops;    /* gateway hops */
-	u_int32_t           dp_xid;     /* transaction ID */
-	u_int16_t           dp_secs;    /* seconds since boot began */
-	u_int16_t           dp_flags;   /* flags */
-	struct in_addr      dp_ciaddr;  /* client IP address */
-	struct in_addr      dp_yiaddr;  /* 'your' IP address */
-	struct in_addr      dp_siaddr;  /* server IP address */
-	struct in_addr      dp_giaddr;  /* gateway IP address */
-	u_char              dp_chaddr[16];/* client hardware address */
-	u_char              dp_sname[64];/* server host name */
-	u_char              dp_file[128];/* boot file name */
-	u_char              dp_options[0];/* variable-length options field */
+	u_char              dp_op;                              
+	u_char              dp_htype;                           
+	u_char              dp_hlen;                              
+	u_char              dp_hops;                      
+	u_int32_t           dp_xid;                         
+	u_int16_t           dp_secs;                                  
+	u_int16_t           dp_flags;              
+	struct in_addr      dp_ciaddr;                         
+	struct in_addr      dp_yiaddr;                         
+	struct in_addr      dp_siaddr;                         
+	struct in_addr      dp_giaddr;                          
+	u_char              dp_chaddr[16];                             
+	u_char              dp_sname[64];                      
+	u_char              dp_file[128];                    
+	u_char              dp_options[0];                                   
 };
 
 struct dhcp_packet {
@@ -67,7 +67,7 @@ struct dhcp_packet {
 #define DHCP_PACKET_MIN         (sizeof(struct dhcp_packet) + DHCP_OPTIONS_MIN)
 #define DHCP_PAYLOAD_MIN        (sizeof(struct dhcp) + DHCP_OPTIONS_MIN)
 
-/* dhcp message types */
+                        
 #define DHCPDISCOVER    1
 #define DHCPOFFER       2
 #define DHCPREQUEST     3
@@ -91,8 +91,8 @@ enum {
 
 typedef uint8_t dhcp_msgtype_t;
 
-typedef int32_t                 dhcp_time_secs_t; /* absolute time */
-typedef int32_t                 dhcp_lease_t;     /* relative time */
+typedef int32_t                 dhcp_time_secs_t;                    
+typedef int32_t                 dhcp_lease_t;                        
 #define dhcp_time_hton          htonl
 #define dhcp_time_ntoh          ntohl
 #define dhcp_lease_hton         htonl
@@ -103,4 +103,4 @@ typedef int32_t                 dhcp_lease_t;     /* relative time */
 
 #define DHCP_FLAGS_BROADCAST    ((u_int16_t)0x8000)
 
-#endif /* _NETINET_DHCP_H */
+#endif                      

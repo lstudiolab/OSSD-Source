@@ -31,12 +31,12 @@
 
 extern int __fchmod(int fd, mode_t mode);
 
-/*
- * fchmod stub, ignore S_ISUID and/or S_ISGID on EPERM,
- * mandated for conformance.
- *
- * This is for UNIX03 only.
- */
+  
+                                                       
+                            
+  
+                           
+   
 int
 fchmod(int fd, mode_t mode)
 {
@@ -63,4 +63,4 @@ fchmod(int fd, mode_t mode)
 	return res;
 }
 
-#endif /* __DARWIN_UNIX03 */
+#endif                      

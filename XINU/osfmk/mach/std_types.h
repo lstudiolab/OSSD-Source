@@ -53,12 +53,12 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Mach standard external interface type definitions.
- *
- */
+  
+   
+  
+                                                     
+  
+   
 
 #ifndef _MACH_STD_TYPES_H_
 #define _MACH_STD_TYPES_H_
@@ -72,4 +72,4 @@
 #include <sys/_types.h>
 #include <sys/_types/_uuid_t.h>
 
-#endif  /* _MACH_STD_TYPES_H_ */
+#endif                          

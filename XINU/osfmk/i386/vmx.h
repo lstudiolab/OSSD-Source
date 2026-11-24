@@ -35,14 +35,14 @@ extern "C" {
 
 #include <mach/boolean.h>
 
-/*
- * Error codes
- */
-#define VMX_OK                  0 /* all ok */
-#define VMX_UNSUPPORTED 1 /* VT unsupported or disabled on 1+ cores */
-#define VMX_INUSE               2 /* VT is being exclusively used already */
+  
+              
+   
+#define VMX_OK                  0             
+#define VMX_UNSUPPORTED 1                                             
+#define VMX_INUSE               2                                           
 
-/* SPI */
+         
 int host_vmxon(boolean_t exclusive);
 void host_vmxoff(void);
 

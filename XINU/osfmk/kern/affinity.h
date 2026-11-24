@@ -36,21 +36,21 @@
 #include <kern/queue.h>
 #include <kern/processor.h>
 
-/*
- * An affinity set object represents a set of threads identified by the user
- * to be sharing (cache) affinity. A task may have multiple affinity sets
- * defined. Each set has dis-affinity other sets. Tasks related by inheritance
- * may share the same affinity set namespace.
- * Affinity sets are used to advise (hint) thread placement.
- */
+  
+                                                                            
+                                                                         
+                                                                              
+                                             
+                                                            
+   
 struct affinity_set {
-	struct affinity_space *aset_space;      /* namespace */
-	queue_chain_t   aset_affinities;        /* links affinities in group */
-	queue_head_t    aset_threads;           /* threads in affinity set */
-	uint32_t        aset_thread_count;      /* num threads in set */
-	uint32_t        aset_tag;               /* user-assigned tag */
-	uint32_t        aset_num;               /* kernel-assigned affinity */
-	processor_set_t aset_pset;              /* processor set */
+	struct affinity_space *aset_space;                     
+	queue_chain_t   aset_affinities;                                       
+	queue_head_t    aset_threads;                                        
+	uint32_t        aset_thread_count;                              
+	uint32_t        aset_tag;                                      
+	uint32_t        aset_num;                                             
+	processor_set_t aset_pset;                                 
 };
 
 extern boolean_t        thread_affinity_is_supported(void);
@@ -66,12 +66,12 @@ extern kern_return_t    task_affinity_info(
 	task_info_t,
 	mach_msg_type_number_t  *);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 extern kern_return_t    thread_affinity_set(thread_t thread, uint32_t tag);
 extern uint32_t         thread_affinity_get(thread_t thread);
 extern void             thread_affinity_exec(thread_t thread);
 
-#endif  /* _KERN_AFFINITY_H_ */
+#endif                         
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

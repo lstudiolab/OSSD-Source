@@ -27,6 +27,6 @@
  */
 #ifndef _RSIZE_T
 #define _RSIZE_T
-#include <machine/types.h> /* __darwin_size_t */
+#include <machine/types.h>                      
 typedef __darwin_size_t        rsize_t;
-#endif  /* _RSIZE_T */
+#endif                

@@ -19,10 +19,10 @@
 #include <kern/simple_lock.h>
 #include <kern/cpu_number.h>
 #endif
-/* Local declarations */
+                        
 void            pe_identify_machine(boot_args * bootArgs);
 
-/* External declarations */
+                           
 extern void clean_mmu_dcache(void);
 
 static char    *gPESoCDeviceType;
@@ -36,11 +36,11 @@ static uint32_t pe_arm_init_timer(void *args);
 #if DEVELOPMENT || DEBUG
 decl_simple_lock_data(, panic_hook_lock);
 #endif
-/*
- * pe_identify_machine:
- *
- * Sets up platform parameters. Returns:    nothing
- */
+  
+                       
+  
+                                                   
+   
 void
 pe_identify_machine(boot_args * bootArgs)
 {
@@ -57,7 +57,7 @@ pe_identify_machine(boot_args * bootArgs)
 		return;
 	}
 
-	/* Clear the gPEClockFrequencyInfo struct */
+	                                            
 	bzero((void *)&gPEClockFrequencyInfo, sizeof(clock_frequency_info_t));
 
 	if (!strcmp(gPESoCDeviceType, "s3c2410-io")) {
@@ -69,9 +69,9 @@ pe_identify_machine(boot_args * bootArgs)
 
 		gTCFG0Value = tclk - 1;
 
-		tclk = pclk / (4 * tclk);       /* Calculate the "actual"
-		                                 * Timer0 frequency in fixed
-		                                 * point. */
+		tclk = pclk / (4 * tclk);                                
+                                                              
+                                              
 
 		mclk = (mclk >> 17) * (125 * 125);
 		hclk = (hclk >> 17) * (125 * 125);
@@ -96,13 +96,13 @@ pe_identify_machine(boot_args * bootArgs)
 		mclk = 400000000;
 		hclk = mclk / 4;
 		pclk = hclk / 2;
-		tclk = 100000;  /* timer is at 100khz */
+		tclk = 100000;                          
 	} else {
 		use_dt = 1;
 	}
 
 	if (use_dt) {
-		/* Start with default values. */
+		                                
 		gPEClockFrequencyInfo.timebase_frequency_hz = 24000000;
 		gPEClockFrequencyInfo.bus_clock_rate_hz = 100000000;
 		gPEClockFrequencyInfo.cpu_clock_rate_hz = 400000000;
@@ -119,13 +119,13 @@ pe_identify_machine(boot_args * bootArgs)
 				continue;
 			}
 
-			/* Find the time base frequency first. */
+			                                         
 			if (SecureDTGetProperty(cpu, "timebase-frequency", (void const **)&value, &size) == kSuccess) {
-				/*
-				 * timebase_frequency_hz is only 32 bits, and
-				 * the device tree should never provide 64
-				 * bits so this if should never be taken.
-				 */
+				  
+                                                 
+                                              
+                                             
+       
 				if (size == 8) {
 					gPEClockFrequencyInfo.timebase_frequency_hz = *(unsigned long long const *)value;
 				} else {
@@ -134,7 +134,7 @@ pe_identify_machine(boot_args * bootArgs)
 			}
 			gPEClockFrequencyInfo.dec_clock_rate_hz = gPEClockFrequencyInfo.timebase_frequency_hz;
 
-			/* Find the bus frequency next. */
+			                                  
 			if (SecureDTGetProperty(cpu, "bus-frequency", (void const **)&value, &size) == kSuccess) {
 				if (size == 8) {
 					gPEClockFrequencyInfo.bus_frequency_hz = *(unsigned long long const *)value;
@@ -151,7 +151,7 @@ pe_identify_machine(boot_args * bootArgs)
 				gPEClockFrequencyInfo.bus_clock_rate_hz = 0xFFFFFFFF;
 			}
 
-			/* Find the memory frequency next. */
+			                                     
 			if (SecureDTGetProperty(cpu, "memory-frequency", (void const **)&value, &size) == kSuccess) {
 				if (size == 8) {
 					gPEClockFrequencyInfo.mem_frequency_hz = *(unsigned long long const *)value;
@@ -162,7 +162,7 @@ pe_identify_machine(boot_args * bootArgs)
 			gPEClockFrequencyInfo.mem_frequency_min_hz = gPEClockFrequencyInfo.mem_frequency_hz;
 			gPEClockFrequencyInfo.mem_frequency_max_hz = gPEClockFrequencyInfo.mem_frequency_hz;
 
-			/* Find the peripheral frequency next. */
+			                                         
 			if (SecureDTGetProperty(cpu, "peripheral-frequency", (void const **)&value, &size) == kSuccess) {
 				if (size == 8) {
 					gPEClockFrequencyInfo.prf_frequency_hz = *(unsigned long long const *)value;
@@ -173,7 +173,7 @@ pe_identify_machine(boot_args * bootArgs)
 			gPEClockFrequencyInfo.prf_frequency_min_hz = gPEClockFrequencyInfo.prf_frequency_hz;
 			gPEClockFrequencyInfo.prf_frequency_max_hz = gPEClockFrequencyInfo.prf_frequency_hz;
 
-			/* Find the fixed frequency next. */
+			                                    
 			if (SecureDTGetProperty(cpu, "fixed-frequency", (void const **)&value, &size) == kSuccess) {
 				if (size == 8) {
 					gPEClockFrequencyInfo.fix_frequency_hz = *(unsigned long long const *)value;
@@ -181,7 +181,7 @@ pe_identify_machine(boot_args * bootArgs)
 					gPEClockFrequencyInfo.fix_frequency_hz = *value;
 				}
 			}
-			/* Find the cpu frequency last. */
+			                                  
 			if (SecureDTGetProperty(cpu, "clock-frequency", (void const **)&value, &size) == kSuccess) {
 				if (size == 8) {
 					gPEClockFrequencyInfo.cpu_frequency_hz = *(unsigned long long const *)value;
@@ -199,7 +199,7 @@ pe_identify_machine(boot_args * bootArgs)
 			}
 		}
 	} else {
-		/* Use the canned values. */
+		                            
 		gPEClockFrequencyInfo.timebase_frequency_hz = tclk;
 		gPEClockFrequencyInfo.fix_frequency_hz = tclk;
 		gPEClockFrequencyInfo.bus_frequency_hz = hclk;
@@ -218,7 +218,7 @@ pe_identify_machine(boot_args * bootArgs)
 		gPEClockFrequencyInfo.cpu_clock_rate_hz = gPEClockFrequencyInfo.cpu_frequency_hz;
 	}
 
-	/* Set the num / den pairs form the hz values. */
+	                                                 
 	gPEClockFrequencyInfo.bus_clock_rate_num = gPEClockFrequencyInfo.bus_clock_rate_hz;
 	gPEClockFrequencyInfo.bus_clock_rate_den = 1;
 
@@ -260,16 +260,16 @@ extern void     fleh_fiq_t8002(void);
 extern uint32_t t8002_get_decrementer(void);
 extern void     t8002_set_decrementer(uint32_t);
 static struct tbd_ops    t8002_funcs = {&fleh_fiq_t8002, &t8002_get_decrementer, &t8002_set_decrementer};
-#endif /* defined(ARM_BOARD_CLASS_T8002) */
+#endif                                     
 
 vm_offset_t     gPicBase;
 vm_offset_t     gTimerBase;
 vm_offset_t     gSocPhys;
 
 #if DEVELOPMENT || DEBUG
-// This block contains the panic trace implementation
+                                                     
 
-// These variables are local to this file, and contain the panic trace configuration information
+                                                                                                
 typedef enum{
 	panic_trace_disabled = 0,
 	panic_trace_unused,
@@ -280,7 +280,7 @@ static panic_trace_t bootarg_panic_trace;
 
 static int bootarg_stop_clocks;
 
-// The command buffer contains the converted commands from the device tree for commanding cpu_halt, enable_trace, etc.
+                                                                                                                      
 #define DEBUG_COMMAND_BUFFER_SIZE 256
 typedef struct command_buffer_element {
 	uintptr_t address;
@@ -289,34 +289,34 @@ typedef struct command_buffer_element {
 	uint16_t delay_us;
 	bool is_32bit;
 } command_buffer_element_t;
-static command_buffer_element_t debug_command_buffer[DEBUG_COMMAND_BUFFER_SIZE];                // statically allocate to prevent needing alloc at runtime
-static uint32_t  next_command_buffer_entry = 0;                                                                                // index of next unused slot in debug_command_buffer
+static command_buffer_element_t debug_command_buffer[DEBUG_COMMAND_BUFFER_SIZE];                                                                          
+static uint32_t  next_command_buffer_entry = 0;                                                                                                                                    
 
 #define CPU_SELECTOR_SHIFT              (16)
 #define CPU_SELECTOR_MASK               (0xFFFF << CPU_SELECTOR_SHIFT)
 #define REGISTER_OFFSET_MASK            ((1 << CPU_SELECTOR_SHIFT) - 1)
 #define REGISTER_OFFSET(register_prop)  (register_prop & REGISTER_OFFSET_MASK)
-#define CPU_SELECTOR(register_offset)   ((register_offset & CPU_SELECTOR_MASK) >> CPU_SELECTOR_SHIFT) // Upper 16bits holds the cpu selector
+#define CPU_SELECTOR(register_offset)   ((register_offset & CPU_SELECTOR_MASK) >> CPU_SELECTOR_SHIFT)                                       
 #define MAX_WINDOW_SIZE                 0xFFFF
 #define PE_ISSPACE(c)                   (c == ' ' || c == '\t' || c == '\n' || c == '\12')
 #define DELAY_SHIFT                     (32)
 #define DELAY_MASK                      (0xFFFFULL << DELAY_SHIFT)
 #define DELAY_US(register_offset)       ((register_offset & DELAY_MASK) >> DELAY_SHIFT)
 #define REGISTER_32BIT_MASK             (1ULL << 63)
-/*
- *  0x0000 - all cpus
- *  0x0001 - cpu 0
- *  0x0002 - cpu 1
- *  0x0004 - cpu 2
- *  0x0003 - cpu 0 and 1
- *  since it's 16bits, we can have up to 16 cpus
- */
+  
+                     
+                  
+                  
+                  
+                        
+                                                
+   
 #define ALL_CPUS 0x0000
 #define IS_CPU_SELECTED(cpu_number, cpu_selector) (cpu_selector == ALL_CPUS ||  (cpu_selector & (1<<cpu_number) ) != 0 )
 
 #define RESET_VIRTUAL_ADDRESS_WINDOW    0xFFFFFFFF
 
-// Pointers into debug_command_buffer for each operation. Assumes runtime will init them to zero.
+                                                                                                 
 static command_buffer_element_t *cpu_halt;
 static command_buffer_element_t *enable_trace;
 static command_buffer_element_t *enable_alt_trace;
@@ -324,7 +324,7 @@ static command_buffer_element_t *trace_halt;
 static command_buffer_element_t *enable_stop_clocks;
 static command_buffer_element_t *stop_clocks;
 
-// Record which CPU is currently running one of our debug commands, so we can trap panic reentrancy to PE_arm_debug_panic_hook.
+                                                                                                                               
 static int running_debug_command_on_cpu_number = -1;
 
 static void
@@ -342,27 +342,27 @@ pe_init_debug_command(DTEntry entryP, command_buffer_element_t **command_buffer,
 		panic("pe_init_debug_command: failed to read property %s\n", entry_name);
 	}
 
-	// make sure command will fit
+	                             
 	if (next_command_buffer_entry + prop_size / sizeof(uintptr_t) > DEBUG_COMMAND_BUFFER_SIZE - 1) {
 		panic("pe_init_debug_command: property %s is %u bytes, command buffer only has %lu bytes remaining\n",
 		    entry_name, prop_size, ((DEBUG_COMMAND_BUFFER_SIZE - 1) - next_command_buffer_entry) * sizeof(uintptr_t));
 	}
 
-	// Hold the pointer in a temp variable and later assign it to command buffer, in case we panic while half-initialized
+	                                                                                                                     
 	command_starting_index = next_command_buffer_entry;
 
-	// convert to real virt addresses and stuff commands into debug_command_buffer
+	                                                                              
 	for (; prop_size; reg_prop += 2, prop_size -= 2 * sizeof(uintptr_t)) {
 		if (*reg_prop == RESET_VIRTUAL_ADDRESS_WINDOW) {
-			debug_reg_window = 0; // Create a new window
+			debug_reg_window = 0;                       
 		} else if (debug_reg_window == 0) {
-			// create a window from virtual address to the specified physical address
+			                                                                         
 			reg_window_size = ((uint32_t)*(reg_prop + 1));
 			if (reg_window_size > MAX_WINDOW_SIZE) {
 				panic("pe_init_debug_command: Command page size is %0x, exceeds the Maximum allowed page size 0f 0%x\n", reg_window_size, MAX_WINDOW_SIZE );
 			}
 			debug_reg_window =  ml_io_map(gSocPhys + *reg_prop, reg_window_size);
-			// for debug -- kprintf("pe_init_debug_command: %s registers @ 0x%08lX for 0x%08lX\n", entry_name, debug_reg_window, *(reg_prop + 1) );
+			                                                                                                                                       
 		} else {
 			if ((REGISTER_OFFSET(*reg_prop) + sizeof(uintptr_t)) >= reg_window_size) {
 				panic("pe_init_debug_command: Command Offset is %lx, exceeds allocated size of %x\n", REGISTER_OFFSET(*reg_prop), reg_window_size );
@@ -380,17 +380,17 @@ pe_init_debug_command(DTEntry entryP, command_buffer_element_t **command_buffer,
 		}
 	}
 
-	// null terminate the address field of the command to end it
+	                                                            
 	debug_command_buffer[next_command_buffer_entry++].address = 0;
 
-	// save pointer into table for this command
+	                                           
 	*command_buffer = &debug_command_buffer[command_starting_index];
 }
 
 static void
 pe_run_debug_command(command_buffer_element_t *command_buffer)
 {
-	// When both the CPUs panic, one will get stuck on the lock and the other CPU will be halted when the first executes the debug command
+	                                                                                                                                      
 	simple_lock(&panic_hook_lock, LCK_GRP_NULL);
 
 	running_debug_command_on_cpu_number = cpu_number();
@@ -400,7 +400,7 @@ pe_run_debug_command(command_buffer_element_t *command_buffer)
 			if (command_buffer->is_32bit) {
 				*((volatile uint32_t*)(command_buffer->address)) = (uint32_t)(command_buffer->value);
 			} else {
-				*((volatile uintptr_t*)(command_buffer->address)) = command_buffer->value;      // register = value;
+				*((volatile uintptr_t*)(command_buffer->address)) = command_buffer->value;                          
 			}
 			if (command_buffer->delay_us != 0) {
 				uint64_t deadline;
@@ -439,19 +439,19 @@ PE_arm_debug_enable_trace(void)
 static void
 PE_arm_panic_hook(const char *str __unused)
 {
-	(void)str; // not used
+	(void)str;            
 	if (bootarg_stop_clocks != 0) {
 		pe_run_debug_command(stop_clocks);
 	}
-	// if panic trace is enabled
+	                            
 	if (bootarg_panic_trace != 0) {
 		if (running_debug_command_on_cpu_number == cpu_number()) {
-			// This is going to end badly if we don't trap, since we'd be panic-ing during our own code
+			                                                                                           
 			kprintf("## Panic Trace code caused the panic ##\n");
-			return;  // allow the normal panic operation to occur.
+			return;                                               
 		}
 
-		// Stop tracing to freeze the buffer and return to normal panic processing.
+		                                                                           
 		pe_run_debug_command(trace_halt);
 	}
 }
@@ -478,7 +478,7 @@ PE_init_cpu(void)
 	pe_init_fiq();
 }
 
-#endif  // DEVELOPMENT || DEBUG
+#endif                         
 
 void
 PE_panic_hook(const char *str __unused)
@@ -506,27 +506,27 @@ pe_arm_init_debug(void *args)
 				ml_init_arm_debug_interface(args, ml_io_map(gSocPhys + *reg_prop, *(reg_prop + 1)));
 			}
 #if DEVELOPMENT || DEBUG
-			// When args != NULL, this means we're being called from arm_init on the boot CPU.
-			// This controls one-time initialization of the Panic Trace infrastructure
+			                                                                                  
+			                                                                          
 
-			simple_lock_init(&panic_hook_lock, 0); //assuming single threaded mode
+			simple_lock_init(&panic_hook_lock, 0);                                
 
-			// Panic_halt is deprecated. Please use panic_trace istead.
+			                                                           
 			unsigned int temp_bootarg_panic_trace;
 			if (PE_parse_boot_argn("panic_trace", &temp_bootarg_panic_trace, sizeof(temp_bootarg_panic_trace)) ||
 			    PE_parse_boot_argn("panic_halt", &temp_bootarg_panic_trace, sizeof(temp_bootarg_panic_trace))) {
 				kprintf("pe_arm_init_debug: panic_trace=%d\n", temp_bootarg_panic_trace);
 
-				// Prepare debug command buffers.
+				                                 
 				pe_init_debug_command(entryP, &cpu_halt, "cpu_halt");
 				pe_init_debug_command(entryP, &enable_trace, "enable_trace");
 				pe_init_debug_command(entryP, &enable_alt_trace, "enable_alt_trace");
 				pe_init_debug_command(entryP, &trace_halt, "trace_halt");
 
-				// now that init's are done, enable the panic halt capture (allows pe_init_debug_command to panic normally if necessary)
+				                                                                                                                        
 				bootarg_panic_trace = temp_bootarg_panic_trace;
 
-				// start tracing now if enabled
+				                               
 				PE_arm_debug_enable_trace();
 			}
 			unsigned int temp_bootarg_stop_clocks;
@@ -588,7 +588,7 @@ pe_arm_init_interrupts(void *args)
 {
 	kprintf("pe_arm_init_interrupts: args: %p\n", args);
 
-	/* Set up mappings for interrupt controller and possibly timers (if they haven't been set up already) */
+	                                                                                                        
 	if (args != NULL) {
 		if (!pe_arm_map_interrupt_controller()) {
 			return 0;
@@ -610,7 +610,7 @@ pe_arm_init_timer(void *args)
 	struct tbd_ops  empty_funcs __unused = {NULL, NULL, NULL};
 	tbd_ops_t       tbd_funcs = &generic_funcs;
 
-	/* The SoC headers expect to use pic_base, timer_base, etc... */
+	                                                                
 	pic_base = gPicBase;
 	timer_base = gTimerBase;
 	soc_phys = gSocPhys;
@@ -618,16 +618,16 @@ pe_arm_init_timer(void *args)
 #if defined(ARM_BOARD_CLASS_T8002)
 	if (!strcmp(gPESoCDeviceType, "t8002-io") ||
 	    !strcmp(gPESoCDeviceType, "t8004-io")) {
-		/* Enable the Decrementer */
+		                            
 		aic_write32(kAICTmrCnt, 0x7FFFFFFF);
 		aic_write32(kAICTmrCfg, kAICTmrCfgEn);
 		aic_write32(kAICTmrIntStat, kAICTmrIntStatPct);
 #ifdef ARM_BOARD_WFE_TIMEOUT_NS
-		// Enable the WFE Timer
+		                       
 		rPMGR_EVENT_TMR_PERIOD = ((uint64_t)(ARM_BOARD_WFE_TIMEOUT_NS) *gPEClockFrequencyInfo.timebase_frequency_hz) / NSEC_PER_SEC;
 		rPMGR_EVENT_TMR = rPMGR_EVENT_TMR_PERIOD;
 		rPMGR_EVENT_TMR_CTL = PMGR_EVENT_TMR_CTL_EN;
-#endif /* ARM_BOARD_WFE_TIMEOUT_NS */
+#endif                               
 
 		eoi_addr = pic_base;
 		eoi_value = kAICTmrIntStatPct;

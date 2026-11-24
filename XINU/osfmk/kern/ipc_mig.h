@@ -43,10 +43,10 @@
 
 #include <sys/kdebug.h>
 
-/*
- * Define the trace points for MIG-generated calls.  One traces the input parameters
- * to MIG called things, another traces the outputs, and one traces bad message IDs.
- */
+  
+                                                                                    
+                                                                                    
+   
 #ifdef _MIG_TRACE_PARAMETERS_
 
 #define __BeforeRcvCallTrace(msgid, arg1, arg2, arg3, arg4)                               \
@@ -85,7 +85,7 @@
 	                      (unsigned int)(arg4),                                   \
 	                      (unsigned int)(0));
 
-#else /* !_MIG_TRACE_PARAMETERS_ */
+#else                              
 
 #define __BeforeRcvRpc(msgid, _NAME_)                                                 \
 	KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,          \
@@ -124,7 +124,7 @@
 	                      (unsigned int)(0),                                      \
 	                      (unsigned int)(0));
 
-#endif /* !_MIG_TRACE_PARAMETERS_ */
+#endif                              
 
 #define _MIG_MSGID_INVALID(msgid)                                                     \
 	KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,          \
@@ -135,11 +135,11 @@
 	                      (unsigned int)(0),                                      \
 	                      (unsigned int)(0))
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
 __BEGIN_DECLS
 
-/* Send a message from the kernel */
+                                    
 
 extern mach_msg_return_t mach_msg_send_from_kernel_proper(
 	mach_msg_header_t       *msg,
@@ -163,7 +163,7 @@ mach_msg_return_t kernel_mach_msg_rpc(
 	boolean_t                           legacy,
 	boolean_t                           interruptible,
 	boolean_t                           *message_moved);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 extern void
 mach_msg_destroy_from_kernel_proper(
@@ -197,7 +197,7 @@ extern mach_msg_return_t mach_msg_send_from_kernel_with_options(
 	mach_msg_size_t         send_size,
 	mach_msg_option_t       option,
 	mach_msg_timeout_t      timeout_val);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
@@ -205,29 +205,29 @@ __END_DECLS
 
 extern void mach_msg_receive_continue(void);
 
-/*
- * Kernel implementation of the MIG object base class
- *
- * Conforms to the MIGObjectInterface defined in <mach/mig.h>
- * Ports are automatically allocated for the duration of outstanding
- * cross-task references and then released.
- */
+  
+                                                     
+  
+                                                             
+                                                                    
+                                           
+   
 
 typedef struct mig_object {
-	const IMIGObjectVtbl    *pVtbl;                 /* our interface def */
-	mach_port_t             port;                    /* our port pointer  */
+	const IMIGObjectVtbl    *pVtbl;                                        
+	mach_port_t             port;                                           
 } mig_object_data_t;
 
 
-/*
- * MIG notify base class definition
- * These are chained off the mig object to which the are registered.
- * When that object triggers a notification delivery, we walk this
- * chain and deliver the appropriate notification.
- */
+  
+                                   
+                                                                    
+                                                                  
+                                                  
+   
 typedef struct mig_notify_object {
-	const IMIGNotifyObjectVtbl *pVtbl;                 /* our interface def */
-	mach_port_t             port;                    /* our port pointer  */
+	const IMIGNotifyObjectVtbl *pVtbl;                                        
+	mach_port_t             port;                                           
 } mig_notify_object_data_t;
 
 extern kern_return_t mig_object_init(
@@ -253,6 +253,6 @@ extern mig_object_t convert_port_to_mig_object(
 extern void mig_object_no_senders(
 	ipc_port_t              port);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
-#endif  /* _KERN_IPC_MIG_H_ */
+#endif                        

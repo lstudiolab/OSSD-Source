@@ -46,7 +46,7 @@ extern const struct ccmode_ofb ccaes_arm_ofb_crypt_mode;
 #endif
 
 #if CCAES_MUX
-/* Runtime check to see if hardware should be used */
+                                                     
 int ccaes_ios_hardware_enabled(int operation);
 
 extern const struct ccmode_cbc ccaes_ios_hardware_cbc_encrypt_mode;
@@ -91,7 +91,7 @@ extern const struct ccmode_ecb ccaes_skg_ecb_decrypt_mode;
 extern const struct ccmode_ecb ccaes_trng_ecb_encrypt_mode;
 #endif
 
-/* Implementation Selectors: */
+                               
 const struct ccmode_ecb *ccaes_ecb_encrypt_mode(void);
 const struct ccmode_cbc *ccaes_cbc_encrypt_mode(void);
 const struct ccmode_cfb *ccaes_cfb_encrypt_mode(void);
@@ -117,17 +117,17 @@ const struct ccmode_siv *ccaes_siv_decrypt_mode(void);
 const struct ccmode_siv_hmac *ccaes_siv_hmac_sha256_encrypt_mode(void);
 const struct ccmode_siv_hmac *ccaes_siv_hmac_sha256_decrypt_mode(void);
 
-/*!
-  @function ccaes_unwind
-  @abstract "Unwind" an AES encryption key to the equivalent decryption key.
+   
+                        
+                                                                            
 
-  @param key_nbytes Length in bytes of both the input and output keys
-  @param key The input AES encryption key
-  @param out The output AES decryption key
+                                                                     
+                                         
+                                          
 
-  @result @p CCERR_OK iff successful.
-  @discussion Only AES256 (i.e. 32-byte) keys are supported. This function is not necessary in typical AES usage; consult the maintainers before using it.
-*/
+                                     
+                                                                                                                                                          
+  
 int ccaes_unwind(size_t key_nbytes, const void *key, void *out);
 
-#endif /* _CORECRYPTO_CCAES_H_ */
+#endif                           

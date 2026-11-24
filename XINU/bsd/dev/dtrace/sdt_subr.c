@@ -107,9 +107,9 @@ sdt_provider_t sdt_providers[] = {
 	{ NULL, NULL, NULL, 0 }
 };
 
-/* Warning:  Need xnu cognate for disp_t.  */
+                                             
 sdt_argdesc_t sdt_args[] = {
-	/* provider probename arg# arg-mapping native-type translated-type */
+	                                                                     
 	{ "sched", "wakeup", 0, 0, "struct thread *", "lwpsinfo_t *" },
 	{ "sched", "wakeup", 1, 1, "struct proc *", "psinfo_t *" },
 	{ "sched", "dequeue", 0, 0, "struct thread *", "lwpsinfo_t *" },
@@ -119,8 +119,8 @@ sdt_argdesc_t sdt_args[] = {
 	{ "sched", "enqueue", 1, 0, "struct proc *", "psinfo_t *" },
 	{ "sched", "enqueue", 2, 1, "disp_t *", "cpuinfo_t *" },
 	{ "sched", "enqueue", 3, 2, "int", NULL },
-	/* sched:::sleep has no arguments */
-	/* sched:::on-cpu has no arguments */
+	                                    
+	                                     
 	{ "sched", "off-cpu", 0, 0, "struct thread *", "lwpsinfo_t *" },
 	{ "sched", "off-cpu", 1, 1, "struct proc *", "psinfo_t *" },
 	{ "sched", "tick", 0, 0, "struct thread *", "lwpsinfo_t *" },
@@ -145,15 +145,15 @@ sdt_argdesc_t sdt_args[] = {
 	{ "proc", "create", 0, 0, "struct proc *", "psinfo_t *" },
 	{ "proc", "exec", 0, 0, "string", NULL },
 	{ "proc", "exec-failure", 0, 0, "int", NULL },
-	/* proc:::exec-success has no arguments */
+	                                          
 	{ "proc", "exit", 0, 0, "int", NULL },
 	{ "proc", "exited", 0, 0, "struct proc *", "psinfo_t *"},
 	{ "proc", "fault", 0, 0, "int", NULL },
 	{ "proc", "fault", 1, 1, "siginfo_t *", NULL },
 	{ "proc", "lwp-create", 0, 0, "struct thread *", "lwpsinfo_t *" },
 	{ "proc", "lwp-create", 1, 0, "struct thread *", "psinfo_t *" },
-	/* proc:::lwp-start has no arguments */
-	/* proc:::lwp-exit has no arguments */
+	                                       
+	                                      
 	{ "proc", "signal-clear", 0, 0, "int", NULL },
 	{ "proc", "signal-clear", 1, 1, "siginfo_t *", NULL },
 	{ "proc", "signal-discard", 0, 0, "struct thread *", "lwpsinfo_t *" },
@@ -165,12 +165,12 @@ sdt_argdesc_t sdt_args[] = {
 	{ "proc", "signal-send", 0, 0, "struct thread *", "lwpsinfo_t *" },
 	{ "proc", "signal-send", 1, 1, "struct proc *", "psinfo_t *" },
 	{ "proc", "signal-send", 2, 2, "int", NULL },
-	/* proc:::spawn-success has no arguments */
+	                                           
 	{ "proc", "spawn-failure", 0, 0, "int", NULL },
 	{ "proc", "spawn-fd-failure", 0, 0, "int", NULL },
 	{ "proc", "spawn-open-failure", 0, 0, "string", NULL },
 	{ "proc", "spawn-port-failure", 0, 0, "int", NULL },
-	/* proc:::start has no arguments */
+	                                   
 
 	{ "io", "start", 0, 0, "struct buf *", "bufinfo_t *" },
 	{ "io", "start", 1, 0, "struct buf *", "devinfo_t *" },
@@ -185,7 +185,7 @@ sdt_argdesc_t sdt_args[] = {
 	{ "io", "wait-done", 1, 0, "struct buf *", "devinfo_t *" },
 	{ "io", "wait-done", 2, 0, "struct buf *", "fileinfo_t *" },
 
-	/* APPLE NOTE: add vfs journaling support */
+	                                            
 	{ "io", "journal-start", 0, 0, "struct buf *", "bufinfo_t *" },
 	{ "io", "journal-start", 1, 0, "struct buf *", "devinfo_t *" },
 	{ "io", "journal-start", 2, 0, "struct buf *", "fileinfo_t *" },
@@ -879,7 +879,7 @@ sdt_argdesc_t sdt_args[] = {
 	{ "tcp", "iaj", 2, 2, "uint32_t", NULL},
 	{ "sysevent", "post", 0, 0, "evch_bind_t *", "syseventchaninfo_t *" },
 	{ "sysevent", "post", 1, 1, "sysevent_impl_t *", "syseventinfo_t *" },
-	/* mptcp::input has no arguments */
+	                                   
 	{ "mptcp", "receive-degraded", 0, 0, "struct mbuf *", "pktinfo_t *" },
 	{ "mptcp", "receive-degraded", 1, 1, "struct socket *", "socketinfo_t *" },
 	{ "mptcp", "receive-degraded", 2, 2, "struct sockbuf *", "socketbuf_t *" },
@@ -978,7 +978,7 @@ sdt_argdesc_t sdt_args[] = {
 	{ NULL, NULL, 0, 0, NULL, NULL }
 };
 
-/*ARGSUSED*/
+            
 void
 sdt_getargdesc(void *arg, dtrace_id_t id, void *parg, dtrace_argdesc_t *desc)
 {

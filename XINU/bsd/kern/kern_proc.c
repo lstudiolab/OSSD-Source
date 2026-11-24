@@ -60,20 +60,20 @@
  *
  *	@(#)kern_proc.c	8.4 (Berkeley) 1/4/94
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/* HISTORY
- *  04-Aug-97  Umesh Vaishampayan (umeshv@apple.com)
- *	Added current_proc_EXTERNAL() function for the use of kernel
- *      lodable modules.
- *
- *  05-Jun-95 Mac Gillon (mgillon) at NeXT
- *	New version based on 3.3NS and 4.4
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
+          
+                                                    
+                                                               
+                        
+  
+                                          
+                                     
+   
 
 
 #include <sys/param.h>
@@ -103,7 +103,7 @@
 #include <sys/coalition.h>
 #include <kern/assert.h>
 #include <vm/vm_protos.h>
-#include <vm/vm_map.h>          /* vm_map_switch_protect() */
+#include <vm/vm_map.h>                                       
 #include <vm/vm_pageout.h>
 #include <mach/task.h>
 #include <mach/message.h>
@@ -114,12 +114,12 @@
 #include <sys/sysent.h>
 #include <sys/reason.h>
 #include <sys/proc_require.h>
-#include <IOKit/IOBSD.h>        /* IOTaskHasEntitlement() */
-#include <kern/ipc_kobject.h>   /* ipc_kobject_set_kobjidx() */
+#include <IOKit/IOBSD.h>                                    
+#include <kern/ipc_kobject.h>                                  
 
 #ifdef CONFIG_32BIT_TELEMETRY
 #include <sys/kasl.h>
-#endif /* CONFIG_32BIT_TELEMETRY */
+#endif                             
 
 #if CONFIG_CSR
 #include <sys/csr.h>
@@ -138,11 +138,11 @@
 
 #ifdef CONFIG_32BIT_TELEMETRY
 #define MAX_32BIT_EXEC_SIG_SIZE 160
-#endif /* CONFIG_32BIT_TELEMETRY */
+#endif                             
 
-/*
- * Structure associated with user cacheing.
- */
+  
+                                           
+   
 struct uidinfo {
 	LIST_ENTRY(uidinfo) ui_hash;
 	uid_t   ui_uid;
@@ -150,11 +150,11 @@ struct uidinfo {
 };
 #define UIHASH(uid)     (&uihashtbl[(uid) & uihash])
 LIST_HEAD(uihashhead, uidinfo) * uihashtbl;
-u_long uihash;          /* size of hash table - 1 */
+u_long uihash;                                      
 
-/*
- * Other process lists
- */
+  
+                      
+   
 struct pidhashhead *pidhashtbl;
 u_long pidhash;
 struct pgrphashhead *pgrphashtbl;
@@ -170,13 +170,13 @@ extern int cs_debug;
 
 #if DEVELOPMENT || DEBUG
 int syscallfilter_disable = 0;
-#endif // DEVELOPMENT || DEBUG
+#endif                        
 
 #if DEBUG
 #define __PROC_INTERNAL_DEBUG 1
 #endif
 #if CONFIG_COREDUMP
-/* Name to give to core files */
+                                
 #if defined(XNU_TARGET_OS_BRIDGE)
 __XNU_PRIVATE_EXTERN char corefilename[MAXPATHLEN + 1] = {"/private/var/internal/%N.core"};
 #elif defined(XNU_TARGET_OS_OSX)
@@ -196,10 +196,10 @@ ZONE_DECLARE(pgrp_zone, "pgrp",
     sizeof(struct pgrp), ZC_ZFREE_CLEARMEM);
 ZONE_DECLARE(session_zone, "session",
     sizeof(struct session), ZC_ZFREE_CLEARMEM);
-/*
- * If you need accounting for KM_PROC consider using
- * ZONE_VIEW_DEFINE to define a zone view.
- */
+  
+                                                    
+                                          
+   
 #define KM_PROC KHEAP_DEFAULT
 
 typedef uint64_t unaligned_u64 __attribute__((aligned(1)));
@@ -241,9 +241,9 @@ get_current_unique_pid(void)
 	}
 }
 
-/*
- * Initialize global process hashing structures.
- */
+  
+                                                
+   
 void
 procinit(void)
 {
@@ -258,11 +258,11 @@ procinit(void)
 #endif
 }
 
-/*
- * Change the count associated with number of processes
- * a given user is using. This routine protects the uihash
- * with the list lock
- */
+  
+                                                       
+                                                          
+                     
+   
 size_t
 chgproccnt(uid_t uid, int diff)
 {
@@ -321,9 +321,9 @@ out:
 	return retval;
 }
 
-/*
- * Is p an inferior of the current process?
- */
+  
+                                           
+   
 int
 inferior(proc_t p)
 {
@@ -341,9 +341,9 @@ out:
 	return retval;
 }
 
-/*
- * Is p an inferior of t ?
- */
+  
+                          
+   
 int
 isinferior(proc_t p, proc_t t)
 {
@@ -351,7 +351,7 @@ isinferior(proc_t p, proc_t t)
 	int nchecked = 0;
 	proc_t start = p;
 
-	/* if p==t they are not inferior */
+	                                   
 	if (p == t) {
 		return 0;
 	}
@@ -360,7 +360,7 @@ isinferior(proc_t p, proc_t t)
 	for (; p != t; p = p->p_pptr) {
 		nchecked++;
 
-		/* Detect here if we're in a cycle */
+		                                     
 		if ((p->p_pid == 0) || (p->p_pptr == start) || (nchecked >= nprocs)) {
 			goto out;
 		}
@@ -437,10 +437,10 @@ proc_findthread(thread_t thread)
 	return p;
 }
 
-/*
- * Returns process identity of a given process. Calling this function is not
- * racy for a current process or if a reference to the process is held.
- */
+  
+                                                                            
+                                                                       
+   
 struct proc_ident
 proc_ident(proc_t p)
 {
@@ -533,12 +533,12 @@ uthread_needs_to_wait_in_proc_refwait(void)
 {
 	uthread_t uth = current_uthread();
 
-	/*
-	 * Allow threads holding no proc refs to wait
-	 * in proc_refwait, allowing threads holding
-	 * proc refs to wait in proc_refwait causes
-	 * deadlocks and makes proc_find non-reentrant.
-	 */
+	  
+                                              
+                                             
+                                            
+                                                
+    
 	if (uth->uu_proc_refcount == 0) {
 		return TRUE;
 	}
@@ -579,22 +579,22 @@ proc_ref_locked(proc_t p)
 	int pid = proc_pid(p);
 
 retry:
-	/*
-	 * if process still in creation or proc got recycled
-	 * during msleep then return failure.
-	 */
+	  
+                                                     
+                                      
+    
 	if ((p == PROC_NULL) || (p1 != p) || ((p->p_listflag & P_LIST_INCREATE) != 0)) {
 		return PROC_NULL;
 	}
 
-	/*
-	 * Do not return process marked for termination
-	 * or proc_refdrain called without ref wait.
-	 * Wait for proc_refdrain_with_refwait to complete if
-	 * process in refdrain and refwait flag is set, unless
-	 * the current thread is holding to a proc_ref
-	 * for any proc.
-	 */
+	  
+                                                
+                                             
+                                                      
+                                                       
+                                               
+                 
+    
 	if ((p->p_stat != SZOMB) &&
 	    ((p->p_listflag & P_LIST_EXITED) == 0) &&
 	    ((p->p_listflag & P_LIST_DEAD) == 0) &&
@@ -602,10 +602,10 @@ retry:
 	    ((p->p_listflag & P_LIST_REFWAIT) != 0))) {
 		if ((p->p_listflag & P_LIST_REFWAIT) != 0 && uthread_needs_to_wait_in_proc_refwait()) {
 			msleep(&p->p_listflag, &proc_list_mlock, 0, "proc_refwait", 0);
-			/*
-			 * the proc might have been recycled since we dropped
-			 * the proc list lock, get the proc again.
-			 */
+			  
+                                                        
+                                             
+      
 			p = pfind_locked(pid);
 			goto retry;
 		}
@@ -643,15 +643,15 @@ proc_find_zombref(int pid)
 again:
 	p = pfind_locked(pid);
 
-	/* should we bail? */
-	if ((p == PROC_NULL)                                    /* not found */
-	    || ((p->p_listflag & P_LIST_INCREATE) != 0)         /* not created yet */
-	    || ((p->p_listflag & P_LIST_EXITED) == 0)) {        /* not started exit */
+	                     
+	if ((p == PROC_NULL)                                                   
+	    || ((p->p_listflag & P_LIST_INCREATE) != 0)                              
+	    || ((p->p_listflag & P_LIST_EXITED) == 0)) {                              
 		proc_list_unlock();
 		return PROC_NULL;
 	}
 
-	/* If someone else is controlling the (unreaped) zombie - wait */
+	                                                                 
 	if ((p->p_listflag & P_LIST_WAITING) != 0) {
 		(void)msleep(&p->p_stat, &proc_list_mlock, PWAIT, "waitcoll", 0);
 		goto again;
@@ -689,19 +689,19 @@ proc_refdrain_with_refwait(proc_t p, boolean_t get_ref_and_allow_wait)
 
 	p->p_listflag |= P_LIST_DRAIN;
 	if (get_ref_and_allow_wait) {
-		/*
-		 * All the calls to proc_ref_locked will wait
-		 * for the flag to get cleared before returning a ref,
-		 * unless the current thread is holding to a proc ref
-		 * for any proc.
-		 */
+		  
+                                               
+                                                        
+                                                       
+                  
+     
 		p->p_listflag |= P_LIST_REFWAIT;
 		if (p == initproc) {
 			initexec = TRUE;
 		}
 	}
 
-	/* Do not wait in ref drain for launchd exec */
+	                                               
 	while (p->p_refcount && !initexec) {
 		p->p_listflag |= P_LIST_DRAINWAIT;
 		msleep(&p->p_refcount, &proc_list_mlock, 0, "proc_refdrain", 0);
@@ -711,7 +711,7 @@ proc_refdrain_with_refwait(proc_t p, boolean_t get_ref_and_allow_wait)
 	if (!get_ref_and_allow_wait) {
 		p->p_listflag |= P_LIST_DEAD;
 	} else {
-		/* Return a ref to the caller */
+		                                
 		p->p_refcount++;
 		record_procref(p, 1);
 	}
@@ -802,7 +802,7 @@ proc_childdrainstart(proc_t p)
 	}
 #endif
 	p->p_listflag |= P_LIST_CHILDDRSTART;
-	/* wait for all that hold parentrefs to drop */
+	                                               
 	while (p->p_parentref > 0) {
 		p->p_listflag |= P_LIST_PARENTREFWAIT;
 		msleep(&p->p_parentref, &proc_list_mlock, 0, "proc_childdrainstart", 0);
@@ -964,11 +964,11 @@ dtrace_current_proc_vforking(void)
 
 	if (ut &&
 	    ((ut->uu_flag & (UT_VFORK | UT_VFORKING)) == (UT_VFORK | UT_VFORKING))) {
-		/*
-		 * Handle the narrow window where we're in the vfork syscall,
-		 * but we're not quite ready to claim (in particular, to DTrace)
-		 * that we're running as the child.
-		 */
+		  
+                                                               
+                                                                  
+                                     
+     
 		return get_bsdtask_info(get_threadtask(th));
 	}
 	return current_proc();
@@ -991,7 +991,7 @@ dtrace_proc_selfruid(void)
 {
 	return dtrace_current_proc_vforking()->p_ruid;
 }
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 proc_t
 proc_parent(proc_t p)
@@ -1075,10 +1075,10 @@ int
 proc_threadname_kdp(void * uth, char * buf, size_t size)
 {
 	if (size < MAXTHREADNAMESIZE) {
-		/* this is really just a protective measure for the future in
-		 * case the thread name size in stackshot gets out of sync with
-		 * the BSD max thread name size. Note that bsd_getthreadname
-		 * doesn't take input buffer size into account. */
+		                                                             
+                                                                 
+                                                              
+                                                    
 		return -1;
 	}
 
@@ -1089,10 +1089,10 @@ proc_threadname_kdp(void * uth, char * buf, size_t size)
 }
 
 
-/* note that this function is generally going to be called from stackshot,
- * and the arguments will be coming from a struct which is declared packed
- * thus the input arguments will in general be unaligned. We have to handle
- * that here. */
+                                                                          
+                                                                          
+                                                                           
+                
 void
 proc_starttime_kdp(void *p, unaligned_u64 *tv_sec, unaligned_u64 *tv_usec, unaligned_u64 *abstime)
 {
@@ -1242,14 +1242,14 @@ proc_task(proc_t proc)
 	return (task_t)proc->task;
 }
 
-/*
- * Obtain the first thread in a process
- *
- * XXX This is a bad thing to do; it exists predominantly to support the
- * XXX use of proc_t's in places that should really be using
- * XXX thread_t's instead.  This maintains historical behaviour, but really
- * XXX needs an audit of the context (proxy vs. not) to clean up.
- */
+  
+                                       
+  
+                                                                        
+                                                            
+                                                                           
+                                                                 
+   
 thread_t
 proc_thread(proc_t proc)
 {
@@ -1332,15 +1332,15 @@ proc_uniqueid(proc_t p)
 }
 
 uint64_t proc_uniqueid_task(void *p_arg, void *t);
-/*
- * During exec, two tasks point at the proc.  This function is used
- * to gives tasks a unique ID; we make the matching task have the
- * proc's uniqueid, and any other task gets the high-bit flipped.
- * (We need to try to avoid returning UINT64_MAX, which is the
- * which is the uniqueid of a task without a proc. (e.g. while exiting))
- *
- * Only used by get_task_uniqueid(); do not add additional callers.
- */
+  
+                                                                   
+                                                                 
+                                                                 
+                                                              
+                                                                        
+  
+                                                                   
+   
 uint64_t
 proc_uniqueid_task(void *p_arg, void *t)
 {
@@ -1398,7 +1398,7 @@ proc_getexecutableuuid(proc_t p, unsigned char *uuidbuf, unsigned long size)
 	}
 }
 
-/* Return vnode for executable with an iocount. Must be released with vnode_put() */
+                                                                                    
 vnode_t
 proc_getexecutablevnode(proc_t p)
 {
@@ -1475,12 +1475,12 @@ proc_selfexecutableargs(uint8_t *buf, size_t *buflen)
 {
 	proc_t p = current_proc();
 
-	// buflen must always be provided
+	                                 
 	if (buflen == NULL) {
 		return EINVAL;
 	}
 
-	// If a buf is provided, there must be at least enough room to fit argc
+	                                                                       
 	if (buf && *buflen < sizeof(p->p_argc)) {
 		return EINVAL;
 	}
@@ -1494,12 +1494,12 @@ proc_selfexecutableargs(uint8_t *buf, size_t *buflen)
 		return 0;
 	}
 
-	// Copy in argc to the first 4 bytes
+	                                    
 	memcpy(buf, &p->p_argc, sizeof(p->p_argc));
 
 	if (*buflen > sizeof(p->p_argc) && p->p_argslen > 0) {
-		// See memory layout comment in kern_exec.c:exec_copyout_strings()
-		// We want to copy starting from `p_argslen` bytes away from top of stack
+		                                                                  
+		                                                                         
 		return copyin(p->user_stack - p->p_argslen,
 		           buf + sizeof(p->p_argc),
 		           MIN(p->p_argslen, *buflen - sizeof(p->p_argc)));
@@ -1537,9 +1537,9 @@ IS_64BIT_PROCESS(proc_t p)
 }
 #endif
 
-/*
- * Locate a process by number
- */
+  
+                             
+   
 proc_t
 pfind_locked(pid_t pid)
 {
@@ -1567,9 +1567,9 @@ pfind_locked(pid_t pid)
 	return NULL;
 }
 
-/*
- * Locate a zombie by PID
- */
+  
+                         
+   
 __private_extern__ proc_t
 pzfind(pid_t pid)
 {
@@ -1589,9 +1589,9 @@ pzfind(pid_t pid)
 	return p;
 }
 
-/*
- * Locate a process group by number
- */
+  
+                                   
+   
 
 struct pgrp *
 pgfind(pid_t pgid)
@@ -1661,22 +1661,22 @@ session_find_internal(pid_t sessid)
 }
 
 
-/*
- * Make a new process ready to become a useful member of society by making it
- * visible in all the right places and initialize its own lists to empty.
- *
- * Parameters:	parent			The parent of the process to insert
- *		child			The child process to insert
- *
- * Returns:	(void)
- *
- * Notes:	Insert a child process into the parents process group, assign
- *		the child the parent process pointer and PPID of the parent,
- *		place it on the parents p_children list as a sibling,
- *		initialize its own child list, place it in the allproc list,
- *		insert it in the proper hash bucket, and initialize its
- *		event list.
- */
+  
+                                                                             
+                                                                         
+  
+                                                           
+                                       
+  
+                  
+  
+                                                                       
+                                                                
+                                                         
+                                                                
+                                                           
+               
+   
 void
 pinsertchild(proc_t parent, proc_t child)
 {
@@ -1703,18 +1703,18 @@ pinsertchild(proc_t parent, proc_t child)
 	LIST_INSERT_HEAD(&parent->p_children, child, p_sibling);
 
 	LIST_INSERT_HEAD(&allproc, child, p_list);
-	/* mark the completion of proc creation */
+	                                          
 	child->p_listflag &= ~P_LIST_INCREATE;
 
 	proc_list_unlock();
 }
 
-/*
- * Move p to a new or existing process group (and session)
- *
- * Returns:	0			Success
- *		ESRCH			No such process
- */
+  
+                                                          
+  
+                       
+                           
+   
 int
 enterpgrp(proc_t p, pid_t pgid, int mksess)
 {
@@ -1727,7 +1727,7 @@ enterpgrp(proc_t p, pid_t pgid, int mksess)
 	procsp = proc_session(p);
 
 #if DIAGNOSTIC
-	if (pgrp != NULL && mksess) {   /* firewalls */
+	if (pgrp != NULL && mksess) {                  
 		panic("enterpgrp: setsid into non-empty pgrp");
 	}
 	if (SESS_LEADER(p, procsp)) {
@@ -1737,9 +1737,9 @@ enterpgrp(proc_t p, pid_t pgid, int mksess)
 	if (pgrp == PGRP_NULL) {
 		pid_t savepid = p->p_pid;
 		proc_t np = PROC_NULL;
-		/*
-		 * new process group
-		 */
+		  
+                      
+     
 #if DIAGNOSTIC
 		if (p->p_pid != pgid) {
 			panic("enterpgrp: new pgrp and pid != pgid");
@@ -1763,9 +1763,9 @@ enterpgrp(proc_t p, pid_t pgid, int mksess)
 		if (mksess) {
 			struct session *sess;
 
-			/*
-			 * new session
-			 */
+			  
+                 
+      
 			sess = zalloc_flags(session_zone, Z_WAITOK | Z_ZERO);
 			sess->s_leader = p;
 			sess->s_sid = p->p_pid;
@@ -1821,11 +1821,11 @@ enterpgrp(proc_t p, pid_t pgid, int mksess)
 	if (procsp != SESSION_NULL) {
 		session_rele(procsp);
 	}
-	/*
-	 * Adjust eligibility of affected pgrps to participate in job control.
-	 * Increment eligibility counts before decrementing, otherwise we
-	 * could reach 0 spuriously during the first call.
-	 */
+	  
+                                                                       
+                                                                  
+                                                   
+    
 	fixjobc(p, pgrp, 1);
 	fixjobc(p, mypgrp, 0);
 
@@ -1838,9 +1838,9 @@ enterpgrp(proc_t p, pid_t pgid, int mksess)
 	return 0;
 }
 
-/*
- * remove process from process group
- */
+  
+                                    
+   
 int
 leavepgrp(proc_t p)
 {
@@ -1848,9 +1848,9 @@ leavepgrp(proc_t p)
 	return 0;
 }
 
-/*
- * delete a process group
- */
+  
+                         
+   
 static void
 pgdelete_dropref(struct pgrp *pgrp)
 {
@@ -1888,7 +1888,7 @@ pgdelete_dropref(struct pgrp *pgrp)
 	if (ttyp != TTY_NULL) {
 		if (ttyp->t_pgrp == pgrp) {
 			tty_lock(ttyp);
-			/* Re-check after acquiring the lock */
+			                                       
 			if (ttyp->t_pgrp == pgrp) {
 				ttyp->t_pgrp = NULL;
 				pgrp->pg_session->s_ttypgrpid = NO_PID;
@@ -1935,16 +1935,16 @@ pgdelete_dropref(struct pgrp *pgrp)
 }
 
 
-/*
- * Adjust pgrp jobc counters when specified process changes process group.
- * We count the number of processes in each process group that "qualify"
- * the group for terminal job control (those with a parent in a different
- * process group of the same session).  If that count reaches zero, the
- * process group becomes orphaned.  Check both the specified process'
- * process group and that of its children.
- * entering == 0 => p is leaving specified group.
- * entering == 1 => p is entering specified group.
- */
+  
+                                                                          
+                                                                        
+                                                                         
+                                                                       
+                                                                     
+                                          
+                                                 
+                                                  
+   
 int
 fixjob_callback(proc_t p, void * arg)
 {
@@ -1994,11 +1994,11 @@ fixjobc(proc_t p, struct pgrp *pgrp, int entering)
 	struct fixjob_iterargs fjarg;
 	boolean_t proc_parent_self;
 
-	/*
-	 * Check if p's parent is current proc, if yes then no need to take
-	 * a ref; calling proc_parent with current proc as parent may
-	 * deadlock if current proc is exiting.
-	 */
+	  
+                                                                    
+                                                              
+                                        
+    
 	proc_parent_self = proc_parent_is_currentproc(p);
 	if (proc_parent_self) {
 		parent = current_proc();
@@ -2015,10 +2015,10 @@ fixjobc(proc_t p, struct pgrp *pgrp, int entering)
 	}
 
 
-	/*
-	 * Check p's parent to see whether p qualifies its own process
-	 * group; if so, adjust count for p's process group.
-	 */
+	  
+                                                               
+                                                     
+    
 	if ((hispgrp != pgrp) &&
 	    (hissess == mysession)) {
 		pgrp_lock(pgrp);
@@ -2040,30 +2040,30 @@ fixjobc(proc_t p, struct pgrp *pgrp, int entering)
 		pg_rele(hispgrp);
 	}
 
-	/*
-	 * Check this process' children to see whether they qualify
-	 * their process groups; if so, adjust counts for children's
-	 * process groups.
-	 */
+	  
+                                                            
+                                                             
+                   
+    
 	fjarg.pg = pgrp;
 	fjarg.mysession = mysession;
 	fjarg.entering = entering;
 	proc_childrenwalk(p, fixjob_callback, &fjarg);
 }
 
-/*
- * The pidlist_* routines support the functions in this file that
- * walk lists of processes applying filters and callouts to the
- * elements of the list.
- *
- * A prior implementation used a single linear array, which can be
- * tricky to allocate on large systems. This implementation creates
- * an SLIST of modestly sized arrays of PIDS_PER_ENTRY elements.
- *
- * The array should be sized large enough to keep the overhead of
- * walking the list low, but small enough that blocking allocations of
- * pidlist_entry_t structures always succeed.
- */
+  
+                                                                 
+                                                               
+                        
+  
+                                                                  
+                                                                   
+                                                                
+  
+                                                                 
+                                                                      
+                                             
+   
 
 #define PIDS_PER_ENTRY 1021
 
@@ -2140,10 +2140,10 @@ pidlist_nalloc(const pidlist_t *pl)
 	return pl->pl_nalloc;
 }
 
-/*
- * A process group has become orphaned; if there are any stopped processes in
- * the group, hang-up all process in that group.
- */
+  
+                                                                             
+                                                
+   
 static void
 orphanpg(struct pgrp *pgrp)
 {
@@ -2151,7 +2151,7 @@ orphanpg(struct pgrp *pgrp)
 	u_int pid_count_available = 0;
 	proc_t p;
 
-	/* allocate outside of the pgrp_lock */
+	                                       
 	for (;;) {
 		pgrp_lock(pgrp);
 
@@ -2166,7 +2166,7 @@ orphanpg(struct pgrp *pgrp)
 		}
 		if (pid_count_available == 0 || !should_iterate) {
 			pgrp_unlock(pgrp);
-			goto out; /* no orphaned processes OR nothing stopped */
+			goto out;                                               
 		}
 		if (pidlist_nalloc(pl) >= pid_count_available) {
 			break;
@@ -2191,7 +2191,7 @@ orphanpg(struct pgrp *pgrp)
 		for (u_int i = 0; i < pe->pe_nused; i++) {
 			const pid_t pid = pe->pe_pid[i];
 			if (0 == pid) {
-				continue; /* skip kernproc */
+				continue;                    
 			}
 			p = proc_find(pid);
 			if (!p) {
@@ -2240,7 +2240,7 @@ proc_is_alien(
 	return task_is_alien(proc_task(p));
 }
 
-/* XXX Why does this function exist?  Need to kill it off... */
+                                                               
 proc_t
 current_proc_EXTERNAL(void)
 {
@@ -2272,23 +2272,23 @@ proc_skip_mtime_update(proc_t p)
 }
 
 #if CONFIG_COREDUMP
-/*
- * proc_core_name(name, uid, pid)
- * Expand the name described in corefilename, using name, uid, and pid.
- * corefilename is a printf-like string, with three format specifiers:
- *	%N	name of process ("name")
- *	%P	process id (pid)
- *	%U	user id (uid)
- * For example, "%N.core" is the default; they can be disabled completely
- * by using "/dev/null", or all core files can be stored in "/cores/%U/%N-%P".
- * This is controlled by the sysctl variable kern.corefile (see above).
- */
+  
+                                 
+                                                                       
+                                                                      
+                              
+                      
+                   
+                                                                         
+                                                                              
+                                                                       
+   
 __private_extern__ int
 proc_core_name(const char *name, uid_t uid, pid_t pid, char *cf_name,
     size_t cf_name_len)
 {
 	const char *format, *appendstr;
-	char id_buf[11];                /* Buffer for pid/uid -- max 4B */
+	char id_buf[11];                                                  
 	size_t i, l, n;
 
 	if (cf_name == NULL) {
@@ -2298,24 +2298,24 @@ proc_core_name(const char *name, uid_t uid, pid_t pid, char *cf_name,
 	format = corefilename;
 	for (i = 0, n = 0; n < cf_name_len && format[i]; i++) {
 		switch (format[i]) {
-		case '%':       /* Format character */
+		case '%':                             
 			i++;
 			switch (format[i]) {
 			case '%':
 				appendstr = "%";
 				break;
-			case 'N':       /* process name */
+			case 'N':                         
 				appendstr = name;
 				break;
-			case 'P':       /* process id */
+			case 'P':                       
 				snprintf(id_buf, sizeof(id_buf), "%u", pid);
 				appendstr = id_buf;
 				break;
-			case 'U':       /* user id */
+			case 'U':                    
 				snprintf(id_buf, sizeof(id_buf), "%u", uid);
 				appendstr = id_buf;
 				break;
-			case '\0': /* format string ended in % symbol */
+			case '\0':                                      
 				goto endofstring;
 			default:
 				appendstr = "";
@@ -2347,9 +2347,9 @@ endofstring:
 	    (long)pid, name, (uint32_t)uid);
 	return 1;
 }
-#endif /* CONFIG_COREDUMP */
+#endif                      
 
-/* Code Signing related routines */
+                                   
 
 int
 csops(__unused proc_t p, struct csops_args *uap, __unused int32_t *retval)
@@ -2378,18 +2378,18 @@ csops_copy_token(void *start, size_t length, user_size_t usize, user_addr_t uadd
 		return ERANGE;
 	}
 
-	/* if no blob, fill in zero header */
+	                                     
 	if (NULL == start) {
 		start = fakeheader;
 		length = sizeof(fakeheader);
 	} else if (usize < length) {
-		/* ... if input too short, copy out length of entitlement */
+		                                                            
 		uint32_t length32 = htonl((uint32_t)length);
 		memcpy(&fakeheader[4], &length32, sizeof(length32));
 
 		error = copyout(fakeheader, uaddr, sizeof(fakeheader));
 		if (error == 0) {
-			return ERANGE; /* input buffer to short, ERANGE signals that */
+			return ERANGE;                                                 
 		}
 		return error;
 	}
@@ -2428,7 +2428,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 	case CS_OPS_BLOB:
 	case CS_OPS_TEAMID:
 	case CS_OPS_CLEAR_LV:
-		break;          /* not restricted to root */
+		break;                                      
 	default:
 		if (forself == 0 && kauth_cred_issuser(kauth_cred_get()) != TRUE) {
 			return EPERM;
@@ -2448,7 +2448,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 		if (error != 0) {
 			goto out;
 		}
-		/* verify the audit token pid/idversion matches with proc */
+		                                                            
 		if ((token.val[5] != upid) || (token.val[7] != uidversion)) {
 			error = ESRCH;
 			goto out;
@@ -2491,7 +2491,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 		if (csproc_get_platform_path(pt)) {
 			retflags |= CS_PLATFORM_PATH;
 		}
-		//Don't return CS_REQUIRE_LV if we turned it on with CS_FORCED_LV but still report CS_FORCED_LV
+		                                                                                               
 		if ((pt->p_csflags & CS_FORCED_LV) == CS_FORCED_LV) {
 			retflags &= (~CS_REQUIRE_LV);
 		}
@@ -2504,8 +2504,8 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 	}
 	case CS_OPS_MARKINVALID:
 		proc_lock(pt);
-		if ((pt->p_csflags & CS_VALID) == CS_VALID) {           /* is currently valid */
-			pt->p_csflags &= ~CS_VALID;             /* set invalid */
+		if ((pt->p_csflags & CS_VALID) == CS_VALID) {                                   
+			pt->p_csflags &= ~CS_VALID;                              
 			cs_process_invalidated(pt);
 			if ((pt->p_csflags & CS_KILL) == CS_KILL) {
 				pt->p_csflags |= CS_KILLED;
@@ -2529,7 +2529,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 		proc_lock(pt);
 		pt->p_csflags |= CS_HARD;
 		if ((pt->p_csflags & CS_VALID) == 0) {
-			/* @@@ allow? reject? kill? @@@ */
+			                                  
 			proc_unlock(pt);
 			error = EINVAL;
 			goto out;
@@ -2557,7 +2557,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 
 	case CS_OPS_CDHASH:
 
-		/* pt already holds a reference on its p_textvp */
+		                                                  
 		tvp = pt->p_textvp;
 		toff = pt->p_textoff;
 
@@ -2615,7 +2615,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 			break;
 		}
 
-		/* only allow setting a subset of all code sign flags */
+		                                                        
 		flags &=
 		    CS_HARD | CS_EXEC_SET_HARD |
 		    CS_KILL | CS_EXEC_SET_KILL |
@@ -2638,33 +2638,33 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 		break;
 	}
 	case CS_OPS_CLEAR_LV: {
-		/*
-		 * This option is used to remove library validation from
-		 * a running process. This is used in plugin architectures
-		 * when a program needs to load untrusted libraries. This
-		 * allows the process to maintain library validation as
-		 * long as possible, then drop it only when required.
-		 * Once a process has loaded the untrusted library,
-		 * relying on library validation in the future will
-		 * not be effective. An alternative is to re-exec
-		 * your application without library validation, or
-		 * fork an untrusted child.
-		 */
+		  
+                                                          
+                                                            
+                                                           
+                                                         
+                                                       
+                                                     
+                                                     
+                                                   
+                                                    
+                             
+     
 #if !defined(XNU_TARGET_OS_OSX)
-		// We only support dropping library validation on macOS
+		                                                       
 		error = ENOTSUP;
 #else
-		/*
-		 * if we have the flag set, and the caller wants
-		 * to remove it, and they're entitled to, then
-		 * we remove it from the csflags
-		 *
-		 * NOTE: We are fine to poke into the task because
-		 * we get a ref to pt when we do the proc_find
-		 * at the beginning of this function.
-		 *
-		 * We also only allow altering ourselves.
-		 */
+		  
+                                                  
+                                                
+                                  
+    
+                                                    
+                                                
+                                       
+    
+                                           
+     
 		if (forself == 1 && IOTaskHasEntitlement(pt->task, CLEAR_LV_ENTITLEMENT)) {
 			proc_lock(pt);
 			pt->p_csflags &= (~(CS_REQUIRE_LV | CS_FORCED_LV));
@@ -2703,11 +2703,11 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 		uint32_t idlen;
 		size_t length;
 
-		/*
-		 * Make identity have a blob header to make it
-		 * easier on userland to guess the identity
-		 * length.
-		 */
+		  
+                                                
+                                             
+            
+     
 		if (usize < sizeof(fakeheader)) {
 			error = ERANGE;
 			break;
@@ -2728,7 +2728,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 			break;
 		}
 
-		length = strlen(identity) + 1;         /* include NUL */
+		length = strlen(identity) + 1;                          
 		idlen = htonl((uint32_t)(length + sizeof(fakeheader)));
 		memcpy(&fakeheader[4], &idlen, sizeof(idlen));
 
@@ -2774,7 +2774,7 @@ csops_internal(pid_t pid, int ops, user_addr_t uaddr, user_size_t usersize, user
 #else
 		error = ENOTSUP;
 		break;
-#endif /* !DEVELOPMENT || DEBUG */
+#endif                            
 
 	default:
 		error = EINVAL;
@@ -2798,10 +2798,10 @@ proc_iterate(
 
 	assert(callout != NULL);
 
-	/* allocate outside of the proc_list_lock */
+	                                            
 	for (;;) {
 		proc_list_lock();
-		pid_count_available = nprocs + 1; /* kernel_task not counted in nprocs */
+		pid_count_available = nprocs + 1;                                        
 		assert(pid_count_available > 0);
 		if (pidlist_nalloc(pl) >= pid_count_available) {
 			break;
@@ -2812,13 +2812,13 @@ proc_iterate(
 	}
 	pidlist_set_active(pl);
 
-	/* filter pids into the pid_list */
+	                                   
 
 	u_int pid_count = 0;
 	if (flags & PROC_ALLPROCLIST) {
 		proc_t p;
 		ALLPROC_FOREACH(p) {
-			/* ignore processes that are being forked */
+			                                            
 			if (p->p_stat == SIDL) {
 				continue;
 			}
@@ -2848,7 +2848,7 @@ proc_iterate(
 
 	proc_list_unlock();
 
-	/* call callout on processes in the pid_list */
+	                                               
 
 	const pidlist_entry_t *pe;
 	SLIST_FOREACH(pe, &(pl->pl_head), pe_link) {
@@ -3080,7 +3080,7 @@ pgrp_iterate(
 		for (u_int i = 0; i < pe->pe_nused; i++) {
 			const pid_t pid = pe->pe_pid[i];
 			if (0 == pid) {
-				continue; /* skip kernproc */
+				continue;                    
 			}
 			p = proc_find(pid);
 			if (!p) {
@@ -3123,12 +3123,12 @@ pgrp_add(struct pgrp * pgrp, struct proc * parent, struct proc * child)
 	child->p_pgrpid = pgrp->pg_id;
 	child->p_sessionid = pgrp->pg_session->s_sid;
 	child->p_listflag |= P_LIST_INPGRP;
-	/*
-	 * When pgrp is being freed , a process can still
-	 * request addition using setpgid from bash when
-	 * login is terminated (login cycler) return ESRCH
-	 * Safe to hold lock due to refcount on pgrp
-	 */
+	  
+                                                  
+                                                 
+                                                   
+                                             
+    
 	if ((pgrp->pg_listflags & (PGRP_FLAG_TERMINATE | PGRP_FLAG_DEAD)) == PGRP_FLAG_TERMINATE) {
 		pgrp->pg_listflags &= ~PGRP_FLAG_TERMINATE;
 	}
@@ -3193,7 +3193,7 @@ pgrp_remove(struct proc * p)
 }
 
 
-/* cannot use proc_pgrp as it maybe stalled */
+                                              
 static void
 pgrp_replace(struct proc * p, struct pgrp * newpg)
 {
@@ -3245,12 +3245,12 @@ pgrp_replace(struct proc * p, struct pgrp * newpg)
 	p->p_pgrpid = newpg->pg_id;
 	p->p_sessionid = newpg->pg_session->s_sid;
 	p->p_listflag |= P_LIST_INPGRP;
-	/*
-	 * When pgrp is being freed , a process can still
-	 * request addition using setpgid from bash when
-	 * login is terminated (login cycler) return ESRCH
-	 * Safe to hold lock due to refcount on pgrp
-	 */
+	  
+                                                  
+                                                 
+                                                   
+                                             
+    
 	if ((newpg->pg_listflags & (PGRP_FLAG_TERMINATE | PGRP_FLAG_DEAD)) == PGRP_FLAG_TERMINATE) {
 		newpg->pg_listflags &= ~PGRP_FLAG_TERMINATE;
 	}
@@ -3364,7 +3364,7 @@ proc_session(proc_t p)
 
 	proc_list_lock();
 
-	/* wait during transitions */
+	                             
 	while ((p->p_listflag & P_LIST_PGRPTRANS) == P_LIST_PGRPTRANS) {
 		p->p_listflag |= P_LIST_PGRPTRWAIT;
 		(void)msleep(&p->p_pgrpid, &proc_list_mlock, 0, "proc_pgrp", 0);
@@ -3512,9 +3512,9 @@ proc_knote_drain(struct proc *p)
 {
 	struct knote *kn = NULL;
 
-	/*
-	 * Clear the proc's klist to avoid references after the proc is reaped.
-	 */
+	  
+                                                                        
+    
 	proc_klist_lock();
 	while ((kn = SLIST_FIRST(&p->p_klist))) {
 		kn->kn_proc = PROC_NULL;
@@ -3578,7 +3578,7 @@ proc_selfpgrpid()
 }
 
 
-/* return control and action states */
+                                      
 int
 proc_getpcontrol(int pid, int * pcontrolp)
 {
@@ -3640,11 +3640,11 @@ proc_dopcontrol(proc_t p)
 }
 
 
-/*
- * Resume a throttled or suspended process.  This is an internal interface that's only
- * used by the user level code that presents the GUI when we run out of swap space and
- * hence is restricted to processes with superuser privileges.
- */
+  
+                                                                                      
+                                                                                      
+                                                              
+   
 
 int
 proc_resetpcontrol(int pid)
@@ -3654,7 +3654,7 @@ proc_resetpcontrol(int pid)
 	int error;
 	proc_t self = current_proc();
 
-	/* if the process has been validated to handle resource control or root is valid one */
+	                                                                                       
 	if (((self->p_lflag & P_LVMRSRCOWNER) == 0) && (error = suser(kauth_cred_get(), 0))) {
 		return error;
 	}
@@ -3684,7 +3684,7 @@ proc_resetpcontrol(int pid)
 			break;
 
 		case P_PCKILL:
-			/* Huh? */
+			          
 			PROC_SETACTION_STATE(p);
 			proc_unlock(p);
 			printf("low swap: attempt to unkill pid %d (%s) ignored\n", p->p_pid, p->p_comm);
@@ -3764,20 +3764,20 @@ proc_pcontrol_null(__unused proc_t p, __unused void *arg)
 }
 
 
-/*
- * Deal with the low on compressor pool space condition... this function
- * gets called when we are approaching the limits of the compressor pool or
- * we are unable to create a new swap file.
- * Since this eventually creates a memory deadlock situtation, we need to take action to free up
- * memory resources (both compressed and uncompressed) in order to prevent the system from hanging completely.
- * There are 2 categories of processes to deal with.  Those that have an action
- * associated with them by the task itself and those that do not.  Actionable
- * tasks can have one of three categories specified:  ones that
- * can be killed immediately, ones that should be suspended, and ones that should
- * be throttled.  Processes that do not have an action associated with them are normally
- * ignored unless they are utilizing such a large percentage of the compressor pool (currently 50%)
- * that only by killing them can we hope to put the system back into a usable state.
- */
+  
+                                                                        
+                                                                           
+                                           
+                                                                                                
+                                                                                                              
+                                                                               
+                                                                             
+                                                               
+                                                                                 
+                                                                                        
+                                                                                                   
+                                                                                    
+   
 
 #define NO_PAGING_SPACE_DEBUG   0
 
@@ -3799,25 +3799,25 @@ no_paging_space_action()
 	struct timeval  now;
 	os_reason_t kill_reason;
 
-	/*
-	 * Throttle how often we come through here.  Once every 5 seconds should be plenty.
-	 */
+	  
+                                                                                    
+    
 	microtime(&now);
 
 	if (now.tv_sec <= last_no_space_action.tv_sec + 5) {
 		return 0;
 	}
 
-	/*
-	 * Examine all processes and find the biggest (biggest is based on the number of pages this
-	 * task has in the compressor pool) that has been marked to have some action
-	 * taken when swap space runs out... we also find the biggest that hasn't been marked for
-	 * action.
-	 *
-	 * If the biggest non-actionable task is over the "dangerously big" threashold (currently 50% of
-	 * the total number of pages held by the compressor, we go ahead and kill it since no other task
-	 * can have any real effect on the situation.  Otherwise, we go after the actionable process.
-	 */
+	  
+                                                                                            
+                                                                             
+                                                                                          
+           
+   
+                                                                                                 
+                                                                                                 
+                                                                                              
+    
 	bzero(&nps, sizeof(nps));
 
 	proc_iterate(PROC_ALLPROCLIST, proc_pcontrol_null, (void *)NULL, proc_pcontrol_filter, (void *)&nps);
@@ -3831,17 +3831,17 @@ no_paging_space_action()
 	    nps.apcs_proc_count, nps.apcs_total_size);
 #endif
 	if (nps.npcs_max_size > (vm_compressor_pages_compressed() * 50) / 100) {
-		/*
-		 * for now we'll knock out any task that has more then 50% of the pages
-		 * held by the compressor
-		 */
+		  
+                                                                         
+                           
+     
 		if ((p = proc_find(nps.npcs_pid)) != PROC_NULL) {
 			if (nps.npcs_uniqueid == p->p_uniqueid) {
-				/*
-				 * verify this is still the same process
-				 * in case the proc exited and the pid got reused while
-				 * we were finishing the proc_iterate and getting to this point
-				 */
+				  
+                                            
+                                                           
+                                                                   
+       
 				last_no_space_action = now;
 
 				printf("low swap: killing largest compressed process with pid %d (%s) and size %llu MB\n", p->p_pid, p->p_comm, (nps.pcs_max_size / MB_SIZE));
@@ -3857,29 +3857,29 @@ no_paging_space_action()
 		}
 	}
 
-	/*
-	 * We have some processes within our jetsam bands of consideration and hence can be killed.
-	 * So we will invoke the memorystatus thread to go ahead and kill something.
-	 */
+	  
+                                                                                            
+                                                                             
+    
 	if (memorystatus_get_proccnt_upto_priority(max_kill_priority) > 0) {
 		last_no_space_action = now;
-		memorystatus_kill_on_VM_compressor_space_shortage(TRUE /* async */);
+		memorystatus_kill_on_VM_compressor_space_shortage(TRUE            );
 		return 1;
 	}
 
-	/*
-	 * No eligible processes to kill. So let's suspend/kill the largest
-	 * process depending on its policy control specifications.
-	 */
+	  
+                                                                    
+                                                           
+    
 
 	if (nps.pcs_max_size > 0) {
 		if ((p = proc_find(nps.pcs_pid)) != PROC_NULL) {
 			if (nps.pcs_uniqueid == p->p_uniqueid) {
-				/*
-				 * verify this is still the same process
-				 * in case the proc exited and the pid got reused while
-				 * we were finishing the proc_iterate and getting to this point
-				 */
+				  
+                                            
+                                                           
+                                                                   
+       
 				last_no_space_action = now;
 
 				proc_dopcontrol(p);
@@ -3968,7 +3968,7 @@ proc_shadow_max(void)
 	proc_list_unlock();
 	return max;
 }
-#endif /* VM_SCAN_FOR_SHADOW_CHAIN */
+#endif                               
 
 void proc_set_responsible_pid(proc_t target_proc, pid_t responsible_pid);
 void
@@ -4001,7 +4001,7 @@ proc_send_synchronous_EXC_RESOURCE(proc_t p)
 		return FALSE;
 	}
 
-	/* Send sync EXC_RESOURCE if the process is traced */
+	                                                     
 	if (ISSET(p->p_lflag, P_LTRACED)) {
 		return TRUE;
 	}
@@ -4032,7 +4032,7 @@ proc_set_syscall_filter_mask(proc_t p, int which, unsigned char *maskptr, size_t
 		printf("proc_set_syscall_filter_mask: attempt to set policy for pid %d, but disabled by boot-arg\n", proc_pid(p));
 		return 0;
 	}
-#endif // DEVELOPMENT || DEBUG
+#endif                        
 
 	switch (which) {
 	case SYSCALL_MASK_UNIX:
@@ -4067,7 +4067,7 @@ proc_set_syscall_filter_callbacks(syscall_filter_cbs_t cbs)
 		return EINVAL;
 	}
 
-	/* XXX register unix filter callback instead of using MACF hook. */
+	                                                                   
 
 	if (cbs->mach_filter_cbfunc || cbs->kobj_filter_cbfunc) {
 		if (mac_task_register_filter_callbacks(cbs->mach_filter_cbfunc,
@@ -4094,7 +4094,7 @@ proc_set_syscall_filter_index(int which, int num, int index)
 
 	return 0;
 }
-#endif /* CONFIG_MACF */
+#endif                  
 
 int
 proc_set_filter_message_flag(proc_t p, boolean_t flag)
@@ -4137,7 +4137,7 @@ proc_is_traced(proc_t p)
 void
 proc_log_32bit_telemetry(proc_t p)
 {
-	/* Gather info */
+	                 
 	char signature_buf[MAX_32BIT_EXEC_SIG_SIZE] = { 0 };
 	char * signature_cur_end = &signature_buf[0];
 	char * signature_buf_end = &signature_buf[MAX_32BIT_EXEC_SIG_SIZE - 1];
@@ -4149,10 +4149,10 @@ proc_log_32bit_telemetry(proc_t p)
 
 	proc_list_lock();
 
-	/*
-	 * Get proc name and parent proc name; if the parent execs, we'll get a
-	 * garbled name.
-	 */
+	  
+                                                                        
+                 
+    
 	bytes_printed = scnprintf(signature_cur_end,
 	    signature_buf_end - signature_cur_end,
 	    "%s,%s,", p->p_name,
@@ -4164,7 +4164,7 @@ proc_log_32bit_telemetry(proc_t p)
 
 	proc_list_unlock();
 
-	/* Get developer info. */
+	                         
 	vnode_t v = proc_getexecutablevnode(p);
 
 	if (v) {
@@ -4196,16 +4196,16 @@ proc_log_32bit_telemetry(proc_t p)
 		vnode_put(v);
 	}
 
-	/*
-	 * We may want to rate limit here, although the SUMMARIZE key should
-	 * help us aggregate events in userspace.
-	 */
+	  
+                                                                     
+                                          
+    
 
-	/* Emit log */
+	              
 	kern_asl_msg(LOG_DEBUG, "messagetracer", 3,
-	    /* 0 */ "com.apple.message.domain", "com.apple.kernel.32bit_exec",
-	    /* 1 */ "com.apple.message.signature", signature_buf,
-	    /* 2 */ "com.apple.message.summarize", "YES",
+	            "com.apple.message.domain", "com.apple.kernel.32bit_exec",
+	            "com.apple.message.signature", signature_buf,
+	            "com.apple.message.summarize", "YES",
 	    NULL);
 }
-#endif /* CONFIG_32BIT_TELEMETRY */
+#endif                             

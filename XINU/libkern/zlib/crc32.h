@@ -25,9 +25,9 @@
  * 
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* crc32.h -- tables for rapid CRC calculation
- * Generated automatically by crc32.c
- */
+                                              
+                                     
+   
 
 local const unsigned long FAR crc_table[TBLS][256] =
 {

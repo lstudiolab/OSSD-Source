@@ -1,7 +1,7 @@
-//
-// Tests for
-//  explicit operator bool() const;
-//
+  
+            
+                                   
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <darwintest.h>

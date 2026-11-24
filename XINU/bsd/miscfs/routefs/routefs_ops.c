@@ -70,7 +70,7 @@ LCK_MTX_DECLARE(routefs_mutex, &routefs_lck_grp);;
 
 #define ROUTEFS_LOCK()    lck_mtx_lock(&routefs_mutex)
 #define ROUTEFS_UNLOCK()  lck_mtx_unlock(&routefs_mutex)
-static boolean_t _fs_alreadyMounted = FALSE;  /* atleast a mount of this filesystem is present */
+static boolean_t _fs_alreadyMounted = FALSE;                                                     
 
 static int
 routefs_init(__unused struct vfsconf *vfsp)
@@ -81,19 +81,19 @@ routefs_init(__unused struct vfsconf *vfsp)
 static int
 routefs_mount(struct mount *mp, __unused vnode_t devvp, user_addr_t data, vfs_context_t ctx)
 {
-	struct routefs_mount *routefs_mp_p = NULL; /* routefs specific mount info */
+	struct routefs_mount *routefs_mp_p = NULL;                                  
 	int error = EINVAL;
 	struct routefs_args * rargs = (struct routefs_args *)data;
 
-	/*-
-	 *  If they just want to update, we don't need to do anything.
-	 */
+	   
+                                                               
+    
 	if (mp->mnt_flag & MNT_UPDATE) {
 		return 0;
 	}
 
 
-	/* check for root mount only */
+	                               
 	if ((error = proc_suser(current_proc())) != 0) {
 		goto out;
 	}
@@ -104,19 +104,19 @@ routefs_mount(struct mount *mp, __unused vnode_t devvp, user_addr_t data, vfs_co
 	}
 
 	if (_fs_alreadyMounted == TRUE) {
-		/* if a filesystem is mounted, it needs to be unmounted prior to mount again */
+		                                                                               
 		error = EPERM;
 		goto out;
 	}
 
-	/* Advisory locking should be handled at the VFS layer */
+	                                                         
 	vfs_setlocklocal(mp);
 
-	/*-
-	 *  Well, it's not an update, it's a real mount request.
-	 *  Time to get dirty.
-	 * HERE we should check to see if we are already mounted here.
-	 */
+	   
+                                                         
+                       
+                                                               
+    
 
 	MALLOC(routefs_mp_p, struct routefs_mount *, sizeof(struct routefs_mount),
 	    M_TEMP, M_WAITOK);
@@ -141,25 +141,25 @@ routefs_mount(struct mount *mp, __unused vnode_t devvp, user_addr_t data, vfs_co
 		goto out;
 	}
 
-	/*
-	 *  Fill out some fields
-	 */
+	  
+                         
+    
 	__IGNORE_WCASTALIGN(mp->mnt_data = (qaddr_t)routefs_mp_p);
 	mp->mnt_vfsstat.f_fsid.val[0] = (int32_t)VM_KERNEL_ADDRHASH(routefs_mp_p);
 	mp->mnt_vfsstat.f_fsid.val[1] = vfs_typenum(mp);
 	mp->mnt_flag |= MNT_LOCAL;
 
-	/*-
-	 *  Copy in the name of the directory the filesystem
-	 *  is to be mounted on.
-	 *  And we clear the remainder of the character strings
-	 *  to be tidy.
-	 */
+	   
+                                                     
+                         
+                                                        
+                
+    
 
 	bzero(mp->mnt_vfsstat.f_mntfromname, MAXPATHLEN);
 	bcopy("routefs", mp->mnt_vfsstat.f_mntfromname, 5);
 	(void)routefs_statfs(mp, &mp->mnt_vfsstat, ctx);
-	_fs_alreadyMounted = TRUE;  /* yep, fs is in play now */
+	_fs_alreadyMounted = TRUE;                              
 	error = 0;
 out:
 	if (error != 0) {
@@ -177,9 +177,9 @@ routefs_start(__unused struct mount *mp, __unused int flags, __unused vfs_contex
 	return 0;
 }
 
-/*-
- *  Unmount the filesystem described by mp.
- */
+   
+                                           
+   
 static int
 routefs_unmount( struct mount *mp, int mntflags, __unused vfs_context_t ctx)
 {
@@ -188,7 +188,7 @@ routefs_unmount( struct mount *mp, int mntflags, __unused vfs_context_t ctx)
 	int force = 0;
 	int error;
 
-	/* check for root unmount only */
+	                                 
 	if ((error = proc_suser(current_proc())) != 0) {
 		return error;
 	}
@@ -197,7 +197,7 @@ routefs_unmount( struct mount *mp, int mntflags, __unused vfs_context_t ctx)
 		flags |= FORCECLOSE;
 		force = 1;
 	}
-	/* giveup the ioref of vnode, no longer need it */
+	                                                  
 	if (routefs_mp_p->route_rvp != NULLVP) {
 		if (vnode_getwithref(routefs_mp_p->route_rvp) == 0) {
 			vnode_rele(routefs_mp_p->route_rvp);
@@ -205,23 +205,23 @@ routefs_unmount( struct mount *mp, int mntflags, __unused vfs_context_t ctx)
 			routefs_mp_p->route_rvp = NULLVP;
 		}
 	}
-	/* no vnodes, ignore any errors */
+	                                  
 	(void)vflush(mp, NULLVP, flags);
 	FREE(routefs_mp_p, M_TEMP);
 	mp->mnt_data = (qaddr_t)0;
 	mp->mnt_flag &= ~MNT_LOCAL;
-	_fs_alreadyMounted = FALSE; /* unmounted the fs, only one allowed at a time */
+	_fs_alreadyMounted = FALSE;                                                   
 	return 0;
 }
 
-/* return the address of the root vnode  in *vpp */
+                                                   
 static int
 routefs_root(struct mount *mp, struct vnode **vpp, __unused vfs_context_t ctx)
 {
 	struct routefs_mount *routefs_mp_p = (struct routefs_mount *)(mp->mnt_data);
 	int error = 0;
 
-	/* check for nullvp incase its being rolled */
+	                                              
 	if (routefs_mp_p->route_rvp == NULLVP) {
 		ROUTEFS_LOCK();
 		if (routefs_mp_p->route_rvp == NULLVP) {
@@ -232,7 +232,7 @@ routefs_root(struct mount *mp, struct vnode **vpp, __unused vfs_context_t ctx)
 		ROUTEFS_UNLOCK();
 	}
 	if (vnode_getwithvid(routefs_mp_p->route_rvp, routefs_mp_p->route_vpvid) != 0) {
-		/* only one in the path., since no vnodes with this, you can hold across this call */
+		                                                                                     
 		ROUTEFS_LOCK();
 		if (vnode_getwithref(routefs_mp_p->route_rvp) == 0) {
 			vnode_rele(routefs_mp_p->route_rvp);
@@ -262,11 +262,11 @@ routefs_statfs( struct mount *mp, struct vfsstatfs *sbp, __unused vfs_context_t 
 {
 	struct routefs_mount *routefs_mp_p = (struct routefs_mount *)mp->mnt_data;
 
-	/*-
-	 *  Fill in the stat block.
-	 */
-	//sbp->f_type   = mp->mnt_vfsstat.f_type;
-	sbp->f_flags  = 0;              /* XXX */
+	   
+                            
+    
+	                                         
+	sbp->f_flags  = 0;                       
 	sbp->f_bsize  = 512;
 	sbp->f_iosize = 512;
 	sbp->f_blocks = (sizeof(struct routefs_mount) + sbp->f_bsize) / sbp->f_bsize;
@@ -440,11 +440,11 @@ routefs_sysctl(__unused int *name, __unused u_int namelen, __unused user_addr_t 
 
 #include <sys/namei.h>
 #define MOBILE_DIR_PATH "/private/var/mobile"
-/*
- * Function: routefs_kernel_mount
- * Purpose:
- *   Mount routefs at the given mount point from within the kernel.
- */
+  
+                                 
+           
+                                                                   
+   
 int
 routefs_kernel_mount(char * routepath)
 {
@@ -452,7 +452,7 @@ routefs_kernel_mount(char * routepath)
 	vfs_context_t ctx = vfs_context_kernel();
 	char fsname[] = "routefs";
 	struct routefs_args args;
-	char mounthere[] = MOBILE_DIR_PATH; /* !const because of internal casting */
+	char mounthere[] = MOBILE_DIR_PATH;                                         
 
 	bzero(&args, sizeof(struct routefs_args));
 	strlcpy(args.route_path, routepath, MAXPATHLEN);
@@ -490,7 +490,7 @@ const struct vfsops routefs_vfsops = {
 	.vfs_vptofh = routefs_vptofh,
 	.vfs_init = routefs_init,
 	.vfs_sysctl = routefs_sysctl,
-	// There are other VFS ops that we do not support
+	                                                 
 };
 
 static int
@@ -507,47 +507,47 @@ routefserr_setlabel(__unused struct vnop_setlabel_args * args)
 
 #define VOPFUNC int (*)(void *)
 
-/* The following ops are used by directories and symlinks */
+                                                            
 int(**routefs_vnodeop_p)(void *);
 static const struct vnodeopv_entry_desc routefs_vnodeop_entries[] = {
 	{ .opve_op = &vnop_default_desc, .opve_impl = (VOPFUNC)vn_default_error },
-	{ .opve_op = &vnop_lookup_desc, .opve_impl = (VOPFUNC)routefserr_lookup },      /* lookup */
-	{ .opve_op = &vnop_create_desc, .opve_impl = (VOPFUNC)err_create },     /* create */
-	{ .opve_op = &vnop_whiteout_desc, .opve_impl = (VOPFUNC)err_whiteout },         /* whiteout */
-	{ .opve_op = &vnop_mknod_desc, .opve_impl = (VOPFUNC)err_mknod },       /* mknod */
-	{ .opve_op = &vnop_open_desc, .opve_impl = (VOPFUNC)err_open },                 /* open */
-	{ .opve_op = &vnop_close_desc, .opve_impl = (VOPFUNC)err_close },       /* close */
-	{ .opve_op = &vnop_getattr_desc, .opve_impl = (VOPFUNC)err_getattr },           /* getattr */
-	{ .opve_op = &vnop_setattr_desc, .opve_impl = (VOPFUNC)err_setattr },           /* setattr */
-	{ .opve_op = &vnop_read_desc, .opve_impl = (VOPFUNC)err_read },         /* read */
-	{ .opve_op = &vnop_write_desc, .opve_impl = (VOPFUNC)err_write },       /* write */
-	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (VOPFUNC)err_ioctl },       /* ioctl */
-	{ .opve_op = &vnop_select_desc, .opve_impl = (VOPFUNC)err_select },     /* select */
-	{ .opve_op = &vnop_revoke_desc, .opve_impl = (VOPFUNC)err_revoke },     /* revoke */
-	{ .opve_op = &vnop_mmap_desc, .opve_impl = (VOPFUNC)err_mmap },                 /* mmap */
-	{ .opve_op = &vnop_fsync_desc, .opve_impl = (VOPFUNC)nop_fsync },       /* fsync */
-	{ .opve_op = &vnop_remove_desc, .opve_impl = (VOPFUNC)err_remove }, /* remove */
-	{ .opve_op = &vnop_link_desc, .opve_impl = (VOPFUNC)err_link },         /* link */
-	{ .opve_op = &vnop_rename_desc, .opve_impl = (VOPFUNC)err_rename },     /* rename */
-	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (VOPFUNC)err_mkdir },       /* mkdir */
-	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (VOPFUNC)err_rmdir },       /* rmdir */
-	{ .opve_op = &vnop_symlink_desc, .opve_impl = (VOPFUNC)err_symlink },           /* symlink */
-	{ .opve_op = &vnop_readdir_desc, .opve_impl = (VOPFUNC)err_readdir },           /* readdir */
-	{ .opve_op = &vnop_readlink_desc, .opve_impl = (VOPFUNC)err_readlink }, /* readlink */
-	{ .opve_op = &vnop_inactive_desc, .opve_impl = (VOPFUNC)err_inactive }, /* inactive */
-	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (VOPFUNC)err_reclaim },           /* reclaim */
-	{ .opve_op = &vnop_strategy_desc, .opve_impl = (VOPFUNC)err_strategy },         /* strategy */
-	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (VOPFUNC)err_pathconf }, /* pathconf */
-	{ .opve_op = &vnop_advlock_desc, .opve_impl = (VOPFUNC)err_advlock },           /* advlock */
+	{ .opve_op = &vnop_lookup_desc, .opve_impl = (VOPFUNC)routefserr_lookup },                  
+	{ .opve_op = &vnop_create_desc, .opve_impl = (VOPFUNC)err_create },                 
+	{ .opve_op = &vnop_whiteout_desc, .opve_impl = (VOPFUNC)err_whiteout },                       
+	{ .opve_op = &vnop_mknod_desc, .opve_impl = (VOPFUNC)err_mknod },                  
+	{ .opve_op = &vnop_open_desc, .opve_impl = (VOPFUNC)err_open },                           
+	{ .opve_op = &vnop_close_desc, .opve_impl = (VOPFUNC)err_close },                  
+	{ .opve_op = &vnop_getattr_desc, .opve_impl = (VOPFUNC)err_getattr },                        
+	{ .opve_op = &vnop_setattr_desc, .opve_impl = (VOPFUNC)err_setattr },                        
+	{ .opve_op = &vnop_read_desc, .opve_impl = (VOPFUNC)err_read },                   
+	{ .opve_op = &vnop_write_desc, .opve_impl = (VOPFUNC)err_write },                  
+	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (VOPFUNC)err_ioctl },                  
+	{ .opve_op = &vnop_select_desc, .opve_impl = (VOPFUNC)err_select },                 
+	{ .opve_op = &vnop_revoke_desc, .opve_impl = (VOPFUNC)err_revoke },                 
+	{ .opve_op = &vnop_mmap_desc, .opve_impl = (VOPFUNC)err_mmap },                           
+	{ .opve_op = &vnop_fsync_desc, .opve_impl = (VOPFUNC)nop_fsync },                  
+	{ .opve_op = &vnop_remove_desc, .opve_impl = (VOPFUNC)err_remove },             
+	{ .opve_op = &vnop_link_desc, .opve_impl = (VOPFUNC)err_link },                   
+	{ .opve_op = &vnop_rename_desc, .opve_impl = (VOPFUNC)err_rename },                 
+	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (VOPFUNC)err_mkdir },                  
+	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (VOPFUNC)err_rmdir },                  
+	{ .opve_op = &vnop_symlink_desc, .opve_impl = (VOPFUNC)err_symlink },                        
+	{ .opve_op = &vnop_readdir_desc, .opve_impl = (VOPFUNC)err_readdir },                        
+	{ .opve_op = &vnop_readlink_desc, .opve_impl = (VOPFUNC)err_readlink },               
+	{ .opve_op = &vnop_inactive_desc, .opve_impl = (VOPFUNC)err_inactive },               
+	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (VOPFUNC)err_reclaim },                        
+	{ .opve_op = &vnop_strategy_desc, .opve_impl = (VOPFUNC)err_strategy },                       
+	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (VOPFUNC)err_pathconf },               
+	{ .opve_op = &vnop_advlock_desc, .opve_impl = (VOPFUNC)err_advlock },                        
 	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (VOPFUNC)err_bwrite },
-	{ .opve_op = &vnop_pagein_desc, .opve_impl = (VOPFUNC)err_pagein },     /* Pagein */
-	{ .opve_op = &vnop_pageout_desc, .opve_impl = (VOPFUNC)err_pageout },           /* Pageout */
-	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (VOPFUNC)err_copyfile },         /* Copyfile */
-	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)err_blktooff },         /* blktooff */
-	{ .opve_op = &vnop_offtoblk_desc, .opve_impl = (VOPFUNC)err_offtoblk },         /* offtoblk */
-	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (VOPFUNC)err_blockmap },         /* blockmap */
+	{ .opve_op = &vnop_pagein_desc, .opve_impl = (VOPFUNC)err_pagein },                 
+	{ .opve_op = &vnop_pageout_desc, .opve_impl = (VOPFUNC)err_pageout },                        
+	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (VOPFUNC)err_copyfile },                       
+	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)err_blktooff },                       
+	{ .opve_op = &vnop_offtoblk_desc, .opve_impl = (VOPFUNC)err_offtoblk },                       
+	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (VOPFUNC)err_blockmap },                       
 #if CONFIG_MACF
-	{ .opve_op = &vnop_setlabel_desc, .opve_impl = (VOPFUNC)routefserr_setlabel },   /* setlabel */
+	{ .opve_op = &vnop_setlabel_desc, .opve_impl = (VOPFUNC)routefserr_setlabel },                 
 #endif
 	{ .opve_op = (struct vnodeop_desc*)NULL, .opve_impl = (int (*)(void *))NULL }
 };

@@ -60,9 +60,9 @@
 
 #include <architecture/i386/asm_help.h>
 
-/*
- * Software interrupt codes for 32-bit system call entry:
- */
+  
+                                                         
+   
 #define UNIX_INT     0x80
 #define MACH_INT     0x81
 #define MACHDEP_INT  0x82
@@ -71,17 +71,17 @@
 #if defined(__i386__)
 
 #ifndef KERNEL
-/*
- * Syscall entry macros for use in libc:
- */
+  
+                                        
+   
 #define UNIX_SYSCALL_TRAP	\
 	int $(UNIX_INT)
 #define MACHDEP_SYSCALL_TRAP	\
 	int $(MACHDEP_INT)
 
-/*
- * Macro to generate Mach call stubs in libc:
- */
+  
+                                             
+   
 
 #define kernel_trap(trap_name,trap_number,number_args) \
 LEAF(_##trap_name,0) ;\
@@ -89,9 +89,9 @@ LEAF(_##trap_name,0) ;\
 	call	__sysenter_trap		;\
 END(_##trap_name)
 
-#endif /* !KERNEL */
+#endif              
 
-#endif /* defined(__i386__) */
+#endif                        
 
 #if defined(__x86_64__)
 
@@ -102,13 +102,13 @@ END(_##trap_name)
 #define MACHDEP_SYSCALL_TRAP	\
 	syscall
 
-/*
- * Macro to generate Mach call stubs in Libc.
- * Existing calls use negative numbers for Mach traps, so
- * until we change those and change the 32-bit kernel_trap
- * macro above, we negate those numbers here for the 64-bit
- * code path.
- */
+  
+                                             
+                                                         
+                                                          
+                                                           
+             
+   
 #define kernel_trap(trap_name,trap_number,number_args) \
 LEAF(_##trap_name,0) ;\
 	movq	%rcx, %r10	;\
@@ -116,22 +116,22 @@ LEAF(_##trap_name,0) ;\
 	syscall		;\
 END(_##trap_name)
 
-#endif /* !KERNEL */
+#endif              
 
-#endif /* defined(__x86_64__) */
+#endif                          
 
-/*
- * Syscall classes for 64-bit system call entry.
- * For 64-bit users, the 32-bit syscall number is partitioned
- * with the high-order bits representing the class and low-order
- * bits being the syscall number within that class.
- * The high-order 32-bits of the 64-bit syscall number are unused.
- * All system classes enter the kernel via the syscall instruction.
- *
- * These are not #ifdef'd for x86-64 because they might be used for
- * 32-bit someday and so the 64-bit comm page in a 32-bit kernel
- * can use them.
- */
+  
+                                                
+                                                             
+                                                                
+                                                   
+                                                                  
+                                                                   
+  
+                                                                   
+                                                                
+                
+   
 #define SYSCALL_CLASS_SHIFT	24
 #define SYSCALL_CLASS_MASK	(0xFF << SYSCALL_CLASS_SHIFT)
 #define SYSCALL_NUMBER_MASK	(~SYSCALL_CLASS_MASK)
@@ -139,19 +139,19 @@ END(_##trap_name)
 #define	I386_SYSCALL_CLASS_MASK		SYSCALL_CLASS_MASK
 #define	I386_SYSCALL_ARG_BYTES_SHIFT	(16)
 #define	I386_SYSCALL_ARG_DWORDS_SHIFT	(I386_SYSCALL_ARG_BYTES_SHIFT + 2)
-#define	I386_SYSCALL_ARG_BYTES_NUM	(64) /* Must be <= sizeof(uu_arg) */
+#define	I386_SYSCALL_ARG_BYTES_NUM	(64)                                
 #define	I386_SYSCALL_ARG_DWORDS_MASK	((I386_SYSCALL_ARG_BYTES_NUM >> 2) -1)
 #define	I386_SYSCALL_ARG_BYTES_MASK	(((I386_SYSCALL_ARG_BYTES_NUM -1)&~0x3) << I386_SYSCALL_ARG_BYTES_SHIFT)
 #define	I386_SYSCALL_NUMBER_MASK	(0xFFFF)
 
-#define SYSCALL_CLASS_NONE	0	/* Invalid */
-#define SYSCALL_CLASS_MACH	1	/* Mach */	
-#define SYSCALL_CLASS_UNIX	2	/* Unix/BSD */
-#define SYSCALL_CLASS_MDEP	3	/* Machine-dependent */
-#define SYSCALL_CLASS_DIAG	4	/* Diagnostics */
-#define SYSCALL_CLASS_IPC	5	/* Mach IPC */
+#define SYSCALL_CLASS_NONE	0	             
+#define SYSCALL_CLASS_MACH	1	          	
+#define SYSCALL_CLASS_UNIX	2	              
+#define SYSCALL_CLASS_MDEP	3	                       
+#define SYSCALL_CLASS_DIAG	4	                 
+#define SYSCALL_CLASS_IPC	5	              
 
-/* Macros to simpllfy constructing syscall numbers. */
+                                                      
 #define SYSCALL_CONSTRUCT_MACH(syscall_number) \
 			((SYSCALL_CLASS_MACH << SYSCALL_CLASS_SHIFT) | \
 			 (SYSCALL_NUMBER_MASK & (syscall_number)))
@@ -165,6 +165,6 @@ END(_##trap_name)
 			((SYSCALL_CLASS_DIAG << SYSCALL_CLASS_SHIFT) | \
 			 (SYSCALL_NUMBER_MASK & (syscall_number)))
 
-#endif	/* _MACH_I386_SYSCALL_SW_H_ */
+#endif	                              
 
-#endif	/* PRIVATE */
+#endif	             

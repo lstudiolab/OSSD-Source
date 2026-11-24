@@ -78,7 +78,7 @@ machine_read_isa_feat1(void)
 	isa.value = __builtin_arm_mrc(15, 0, 0, 2, 1);
 	return isa;
 }
-#endif // __arm__
+#endif           
 
 void
 machine_write_csselr(csselr_cache_level level, csselr_cache_type type)
@@ -100,9 +100,9 @@ machine_do_debugid(void)
 	arm_cpuid_id_dfr0 id_dfr0;
 	arm_debug_dbgdidr dbgdidr;
 
-	/* read CPUID ID_DFR0 */
+	                        
 	id_dfr0.value = __builtin_arm_mrc(15, 0, 0, 1, 2);
-	/* read DBGDIDR */
+	                  
 	dbgdidr.value = __builtin_arm_mrc(14, 0, 0, 0, 0);
 
 	cpuid_debug_info.coprocessor_core_debug = id_dfr0.debug_feature.coprocessor_core_debug != 0;
@@ -116,7 +116,7 @@ machine_do_debugid(void)
 #else
 	arm_cpuid_id_aa64dfr0_el1 id_dfr0;
 
-	/* read ID_AA64DFR0_EL1 */
+	                          
 	__asm__ volatile ("mrs %0, ID_AA64DFR0_EL1" : "=r"(id_dfr0.value));
 
 	if (id_dfr0.debug_feature.debug_arch_version) {
@@ -149,8 +149,8 @@ machine_do_mvfpid()
 	cpuid_mvfp_info.neon_hpfp = 1;
 #if defined(__ARM_ARCH_8_2__)
 	cpuid_mvfp_info.neon_fp16 = 1;
-#endif /* defined(__ARM_ARCH_8_2__) */
-#endif /* __arm__ */
+#endif                                
+#endif              
 }
 
 arm_mvfp_info_t *

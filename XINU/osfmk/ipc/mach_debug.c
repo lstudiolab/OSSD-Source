@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/mach_debug.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Exported IPC debug calls.
- */
+  
+   
+  
+                         
+                      
+             
+  
+                            
+   
 #include <mach_ipc_debug.h>
 
 #include <mach/vm_param.h>
@@ -89,20 +89,20 @@
 #include <device/device_types.h>
 #endif
 
-/*
- *	Routine:	mach_port_get_srights [kernel call]
- *	Purpose:
- *		Retrieve the number of extant send rights
- *		that a receive right has.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Retrieved number of send rights.
- *		KERN_INVALID_TASK	The space is null.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	The name doesn't denote a right.
- *		KERN_INVALID_RIGHT	Name doesn't denote receive rights.
- */
+  
+                                               
+           
+                                             
+                             
+              
+                   
+           
+                                                  
+                                        
+                                        
+                                                      
+                                                          
+   
 
 #if !MACH_IPC_DEBUG
 kern_return_t
@@ -132,7 +132,7 @@ mach_port_get_srights(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* port is locked and active */
+	                               
 
 	srights = port->ip_srights;
 	ip_unlock(port);
@@ -140,21 +140,21 @@ mach_port_get_srights(
 	*srightsp = srights;
 	return KERN_SUCCESS;
 }
-#endif /* MACH_IPC_DEBUG */
+#endif                     
 
 
-/*
- *	Routine:	mach_port_space_info
- *	Purpose:
- *		Returns information about an IPC space.
- *	Conditions:
- *		Nothing locked.  Obeys CountInOut protocol.
- *	Returns:
- *		KERN_SUCCESS		Returned information.
- *		KERN_INVALID_TASK	The space is null.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                                
+           
+                                           
+              
+                                               
+           
+                                       
+                                        
+                                        
+                                                    
+   
 
 #if !MACH_IPC_DEBUG
 kern_return_t
@@ -208,7 +208,7 @@ mach_port_space_info(
 	const boolean_t dbg_ok = TRUE;
 #endif
 
-	/* start with in-line memory */
+	                               
 
 	table_size = 0;
 
@@ -245,14 +245,14 @@ mach_port_space_info(
 			table_size = table_size_needed;
 		}
 	}
-	/* space is read-locked and active; we have enough wired memory */
+	                                                                  
 
-	/* get the overall space info */
+	                                
 	infop->iis_genno_mask = MACH_PORT_NGEN(MACH_PORT_DEAD);
 	infop->iis_table_size = space->is_table_size;
 	infop->iis_table_next = space->is_table_next->its_size;
 
-	/* walk the table for this space */
+	                                   
 	table = space->is_table;
 	tsize = space->is_table_size;
 	table_info = (ipc_info_name_array_t)table_addr;
@@ -283,7 +283,7 @@ mach_port_space_info(
 
 	is_read_unlock(space);
 
-	/* prepare the table out-of-line data for return */
+	                                                   
 	if (table_size > 0) {
 		vm_size_t used_table_size;
 
@@ -311,7 +311,7 @@ mach_port_space_info(
 		*tableCntp = 0;
 	}
 
-	/* splay tree is obsolete, no work to do... */
+	                                              
 	*treep = (ipc_info_tree_name_t *)0;
 	*treeCntp = 0;
 	return KERN_SUCCESS;
@@ -339,19 +339,19 @@ mach_port_space_info_from_user(
 	ipc_space_release(space);
 	return kr;
 }
-#endif /* MACH_IPC_DEBUG */
+#endif                     
 
-/*
- *	Routine:	mach_port_space_basic_info
- *	Purpose:
- *		Returns basic information about an IPC space.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Returned information.
- *		KERN_FAILURE		The call is not supported.
- *		KERN_INVALID_TASK	The space is dead.
- */
+  
+                                      
+           
+                                                 
+              
+                   
+           
+                                       
+                                            
+                                        
+   
 
 #if !MACH_IPC_DEBUG
 kern_return_t
@@ -378,7 +378,7 @@ mach_port_space_basic_info(
 		return KERN_INVALID_TASK;
 	}
 
-	/* get the basic space info */
+	                              
 	infop->iisb_genno_mask = MACH_PORT_NGEN(MACH_PORT_DEAD);
 	infop->iisb_table_size = space->is_table_size;
 	infop->iisb_table_next = space->is_table_next->its_size;
@@ -390,22 +390,22 @@ mach_port_space_basic_info(
 
 	return KERN_SUCCESS;
 }
-#endif /* MACH_IPC_DEBUG */
+#endif                     
 
-/*
- *	Routine:	mach_port_dnrequest_info
- *	Purpose:
- *		Returns information about the dead-name requests
- *		registered with the named receive right.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Retrieved information.
- *		KERN_INVALID_TASK	The space is null.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	The name doesn't denote a right.
- *		KERN_INVALID_RIGHT	Name doesn't denote receive rights.
- */
+  
+                                    
+           
+                                                    
+                                            
+              
+                   
+           
+                                        
+                                        
+                                        
+                                                      
+                                                          
+   
 
 #if !MACH_IPC_DEBUG
 kern_return_t
@@ -437,7 +437,7 @@ mach_port_dnrequest_info(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* port is locked and active */
+	                               
 
 	if (port->ip_requests == IPR_NULL) {
 		total = 0;
@@ -463,26 +463,26 @@ mach_port_dnrequest_info(
 	*usedp = used;
 	return KERN_SUCCESS;
 }
-#endif /* MACH_IPC_DEBUG */
+#endif                     
 
-/*
- *	Routine:	mach_port_kobject [kernel call]
- *	Purpose:
- *		Retrieve the type and address of the kernel object
- *		represented by a send or receive right. Returns
- *		the kernel address in a mach_vm_address_t to
- *		mask potential differences in kernel address space
- *		size.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Retrieved kernel object info.
- *		KERN_INVALID_TASK	The space is null.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	The name doesn't denote a right.
- *		KERN_INVALID_RIGHT	Name doesn't denote
- *					send or receive rights.
- */
+  
+                                           
+           
+                                                      
+                                                   
+                                                
+                                                      
+         
+              
+                   
+           
+                                               
+                                        
+                                        
+                                                      
+                                          
+                              
+   
 
 #if !MACH_IPC_DEBUG
 kern_return_t
@@ -536,7 +536,7 @@ mach_port_kobject_description(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is read-locked and active */
+	                                     
 
 	if ((entry->ie_bits & MACH_PORT_TYPE_SEND_RECEIVE) == 0) {
 		is_read_unlock(space);
@@ -636,25 +636,25 @@ mach_port_kobject_from_user(
 	return mach_port_kobject_description_from_user(port, name, typep, addrp, NULL);
 }
 
-#endif /* MACH_IPC_DEBUG */
+#endif                     
 
-/*
- *	Routine:	mach_port_kernel_object [Legacy kernel call]
- *	Purpose:
- *		Retrieve the type and address of the kernel object
- *		represented by a send or receive right. Hard-coded
- *		to return only the low-order 32-bits of the kernel
- *		object.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Retrieved kernel object info.
- *		KERN_INVALID_TASK	The space is null.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	The name doesn't denote a right.
- *		KERN_INVALID_RIGHT	Name doesn't denote
- *					send or receive rights.
- */
+  
+                                                        
+           
+                                                      
+                                                      
+                                                      
+           
+              
+                   
+           
+                                               
+                                        
+                                        
+                                                      
+                                          
+                              
+   
 
 #if !MACH_IPC_DEBUG
 kern_return_t
@@ -709,7 +709,7 @@ mach_port_kernel_object_from_user(
 	ipc_space_release(space);
 	return kr;
 }
-#endif /* MACH_IPC_DEBUG */
+#endif                     
 
 #if (DEVELOPMENT || DEBUG)
 kern_return_t

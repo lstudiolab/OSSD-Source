@@ -71,20 +71,20 @@
 #define MCACHE_SIZE(n) \
 	__builtin_offsetof(mcache_t, mc_cpu[n])
 
-/* Allocate extra in case we need to manually align the pointer */
+                                                                  
 #define MCACHE_ALLOC_SIZE \
 	(sizeof (void *) + MCACHE_SIZE(ncpu) + CPU_CACHE_LINE_SIZE)
 
 #define MCACHE_CPU(c) \
 	(mcache_cpu_t *)((void *)((char *)(c) + MCACHE_SIZE(cpu_number())))
 
-/*
- * MCACHE_LIST_LOCK() and MCACHE_LIST_UNLOCK() are macros used
- * to serialize accesses to the global list of caches in the system.
- * They also record the thread currently running in the critical
- * section, so that we can avoid recursive requests to reap the
- * caches when memory runs low.
- */
+  
+                                                              
+                                                                    
+                                                                
+                                                               
+                               
+   
 #define MCACHE_LIST_LOCK() {                            \
 	lck_mtx_lock(&mcache_llock);                     \
 	mcache_llock_owner = current_thread();          \
@@ -169,9 +169,9 @@ mcache_t *mcache_audit_cache;
 static thread_call_t mcache_reap_tcall;
 static thread_call_t mcache_update_tcall;
 
-/*
- * Initialize the framework; this is currently called as part of BSD init.
- */
+  
+                                                                          
+   
 __private_extern__ void
 mcache_init(void)
 {
@@ -182,13 +182,13 @@ mcache_init(void)
 	VERIFY(mca_trn_max >= 2);
 
 	ncpu = ml_wait_max_cpus();
-	(void) mcache_cache_line_size();        /* prime it */
+	(void) mcache_cache_line_size();                      
 
 	mcache_reap_tcall = thread_call_allocate(mcache_reap_timeout, NULL);
 	mcache_update_tcall = thread_call_allocate(mcache_update, NULL);
 	if (mcache_reap_tcall == NULL || mcache_update_tcall == NULL) {
 		panic("mcache_init: thread_call_allocate failed");
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -217,18 +217,18 @@ mcache_init(void)
 	    ncpu, CPU_CACHE_LINE_SIZE);
 }
 
-/*
- * Return the global mcache flags.
- */
+  
+                                  
+   
 __private_extern__ unsigned int
 mcache_getflags(void)
 {
 	return mcache_flags;
 }
 
-/*
- * Return the CPU cache line size.
- */
+  
+                                  
+   
 __private_extern__ unsigned int
 mcache_cache_line_size(void)
 {
@@ -240,11 +240,11 @@ mcache_cache_line_size(void)
 	return cache_line_size;
 }
 
-/*
- * Create a cache using the zone allocator as the backend slab allocator.
- * The caller may specify any alignment for the object; if it specifies 0
- * the default alignment (MCACHE_ALIGN) will be used.
- */
+  
+                                                                         
+                                                                         
+                                                     
+   
 __private_extern__ mcache_t *
 mcache_create(const char *name, size_t bufsize, size_t align,
     u_int32_t flags, int wait __unused)
@@ -253,11 +253,11 @@ mcache_create(const char *name, size_t bufsize, size_t align,
 	           mcache_slab_free, mcache_slab_audit, NULL, NULL, NULL, flags, 1);
 }
 
-/*
- * Create a cache using a custom backend slab allocator.  Since the caller
- * is responsible for allocation, no alignment guarantee will be provided
- * by this framework.
- */
+  
+                                                                          
+                                                                         
+                     
+   
 __private_extern__ mcache_t *
 mcache_create_ext(const char *name, size_t bufsize,
     mcache_allocfn_t allocfn, mcache_freefn_t freefn, mcache_auditfn_t auditfn,
@@ -268,9 +268,9 @@ mcache_create_ext(const char *name, size_t bufsize,
 	           freefn, auditfn, logfn, notifyfn, arg, flags, 0);
 }
 
-/*
- * Common cache creation routine.
- */
+  
+                                 
+   
 static mcache_t *
 mcache_create_common(const char *name, size_t bufsize, size_t align,
     mcache_allocfn_t allocfn, mcache_freefn_t freefn, mcache_auditfn_t auditfn,
@@ -289,26 +289,26 @@ mcache_create_common(const char *name, size_t bufsize, size_t align,
 		goto fail;
 	}
 
-	/*
-	 * In case we didn't get a cache-aligned memory, round it up
-	 * accordingly.  This is needed in order to get the rest of
-	 * structure members aligned properly.  It also means that
-	 * the memory span gets shifted due to the round up, but it
-	 * is okay since we've allocated extra space for this.
-	 */
+	  
+                                                             
+                                                            
+                                                           
+                                                            
+                                                       
+    
 	cp = (mcache_t *)
 	    P2ROUNDUP((intptr_t)buf + sizeof(void *), CPU_CACHE_LINE_SIZE);
 	pbuf = (void **)((intptr_t)cp - sizeof(void *));
 	*pbuf = buf;
 
-	/*
-	 * Guaranteed alignment is valid only when we use the internal
-	 * slab allocator (currently set to use the zone allocator).
-	 */
+	  
+                                                               
+                                                             
+    
 	if (!need_zone) {
 		align = 1;
 	} else {
-		/* Enforce 64-bit minimum alignment for zone-based buffers */
+		                                                             
 		if (align == 0) {
 			align = MCACHE_ALIGN;
 		}
@@ -317,7 +317,7 @@ mcache_create_common(const char *name, size_t bufsize, size_t align,
 
 	if ((align & (align - 1)) != 0) {
 		panic("mcache_create: bad alignment %lu", align);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -336,13 +336,13 @@ mcache_create_common(const char *name, size_t bufsize, size_t align,
 	(void) snprintf(lck_name, sizeof(lck_name), "%s.cpu", cp->mc_name);
 	cp->mc_cpu_lock_grp = lck_grp_alloc_init(lck_name, LCK_GRP_ATTR_NULL);
 
-	/*
-	 * Allocation chunk size is the object's size plus any extra size
-	 * needed to satisfy the object's alignment.  It is enforced to be
-	 * at least the size of an LP64 pointer to simplify auditing and to
-	 * handle multiple-element allocation requests, where the elements
-	 * returned are linked together in a list.
-	 */
+	  
+                                                                  
+                                                                   
+                                                                    
+                                                                   
+                                           
+    
 	chunksize = MAX(bufsize, sizeof(u_int64_t));
 	if (need_zone) {
 		VERIFY(align != 0 && (align % MCACHE_ALIGN) == 0);
@@ -352,9 +352,9 @@ mcache_create_common(const char *name, size_t bufsize, size_t align,
 	}
 	cp->mc_chunksize = chunksize;
 
-	/*
-	 * Initialize the bucket layer.
-	 */
+	  
+                                
+    
 	(void) snprintf(lck_name, sizeof(lck_name), "%s.bkt", cp->mc_name);
 	cp->mc_bkt_lock_grp = lck_grp_alloc_init(lck_name,
 	    LCK_GRP_ATTR_NULL);
@@ -371,10 +371,10 @@ mcache_create_common(const char *name, size_t bufsize, size_t align,
 
 	cp->cache_bkttype = btp;
 
-	/*
-	 * Initialize the CPU layer.  Each per-CPU structure is aligned
-	 * on the CPU cache line boundary to prevent false sharing.
-	 */
+	  
+                                                                
+                                                            
+    
 	for (c = 0; c < ncpu; c++) {
 		mcache_cpu_t *ccp = &cp->mc_cpu[c];
 
@@ -388,16 +388,16 @@ mcache_create_common(const char *name, size_t bufsize, size_t align,
 		mcache_cache_bkt_enable(cp);
 	}
 
-	/* TODO: dynamically create sysctl for stats */
+	                                               
 
 	MCACHE_LIST_LOCK();
 	LIST_INSERT_HEAD(&mcache_head, cp, mc_list);
 	MCACHE_LIST_UNLOCK();
 
-	/*
-	 * If cache buckets are enabled and this is the first cache
-	 * created, start the periodic cache update.
-	 */
+	  
+                                                            
+                                             
+    
 	if (!(mcache_flags & MCF_NOCPUCACHE) && !mcache_updating) {
 		mcache_updating = 1;
 		mcache_update_timeout(NULL);
@@ -416,9 +416,9 @@ fail:
 	return NULL;
 }
 
-/*
- * Allocate one or more objects from a cache.
- */
+  
+                                             
+   
 __private_extern__ unsigned int
 mcache_alloc_ext(mcache_t *cp, mcache_obj_t **list, unsigned int num, int wait)
 {
@@ -428,7 +428,7 @@ mcache_alloc_ext(mcache_t *cp, mcache_obj_t **list, unsigned int num, int wait)
 	unsigned int need = num;
 	boolean_t nwretry = FALSE;
 
-	/* MCR_NOSLEEP and MCR_FAILOK are mutually exclusive */
+	                                                       
 	VERIFY((wait & (MCR_NOSLEEP | MCR_FAILOK)) != (MCR_NOSLEEP | MCR_FAILOK));
 
 	ASSERT(list != NULL);
@@ -439,25 +439,25 @@ mcache_alloc_ext(mcache_t *cp, mcache_obj_t **list, unsigned int num, int wait)
 	}
 
 retry_alloc:
-	/* We may not always be running in the same CPU in case of retries */
+	                                                                     
 	ccp = MCACHE_CPU(cp);
 
 	MCACHE_LOCK(&ccp->cc_lock);
 	for (;;) {
-		/*
-		 * If we have an object in the current CPU's filled bucket,
-		 * chain the object to any previous objects and return if
-		 * we've satisfied the number of requested objects.
-		 */
+		  
+                                                             
+                                                           
+                                                     
+     
 		if (ccp->cc_objs > 0) {
 			mcache_obj_t *tail;
 			int objs;
 
-			/*
-			 * Objects in the bucket are already linked together
-			 * with the most recently freed object at the head of
-			 * the list; grab as many objects as we can.
-			 */
+			  
+                                                       
+                                                        
+                                               
+      
 			objs = MIN((unsigned int)ccp->cc_objs, need);
 			*list = ccp->cc_filled->bkt_obj[ccp->cc_objs - 1];
 			ccp->cc_objs -= objs;
@@ -467,7 +467,7 @@ retry_alloc:
 			list = &tail->obj_next;
 			*list = NULL;
 
-			/* If we got them all, return to caller */
+			                                          
 			if ((need -= objs) == 0) {
 				MCACHE_UNLOCK(&ccp->cc_lock);
 
@@ -484,29 +484,29 @@ retry_alloc:
 			}
 		}
 
-		/*
-		 * The CPU's filled bucket is empty.  If the previous filled
-		 * bucket was full, exchange and try again.
-		 */
+		  
+                                                              
+                                             
+     
 		if (ccp->cc_pobjs > 0) {
 			mcache_cpu_refill(ccp, ccp->cc_pfilled, ccp->cc_pobjs);
 			continue;
 		}
 
-		/*
-		 * If the bucket layer is disabled, allocate from slab.  This
-		 * can happen either because MCF_NOCPUCACHE is set, or because
-		 * the bucket layer is currently being resized.
-		 */
+		  
+                                                               
+                                                                
+                                                 
+     
 		if (ccp->cc_bktsize == 0) {
 			break;
 		}
 
-		/*
-		 * Both of the CPU's buckets are empty; try to get a full
-		 * bucket from the bucket layer.  Upon success, refill this
-		 * CPU and place any empty bucket into the empty list.
-		 */
+		  
+                                                           
+                                                             
+                                                        
+     
 		bkt = mcache_bkt_alloc(cp, &cp->mc_full);
 		if (bkt != NULL) {
 			if (ccp->cc_pfilled != NULL) {
@@ -517,20 +517,20 @@ retry_alloc:
 			continue;
 		}
 
-		/*
-		 * The bucket layer has no full buckets; allocate the
-		 * object(s) directly from the slab layer.
-		 */
+		  
+                                                       
+                                            
+     
 		break;
 	}
 	MCACHE_UNLOCK(&ccp->cc_lock);
 
 	need -= (*cp->mc_slab_alloc)(cp->mc_private, &list, need, wait);
 
-	/*
-	 * If this is a blocking allocation, or if it is non-blocking and
-	 * the cache's full bucket is non-empty, then retry the allocation.
-	 */
+	  
+                                                                  
+                                                                    
+    
 	if (need > 0) {
 		if (!(wait & MCR_NONBLOCKING)) {
 			atomic_add_32(&cp->mc_wretry_cnt, 1);
@@ -561,12 +561,12 @@ debug_alloc:
 		unsigned int n;
 
 		n = 0;
-		/*
-		 * Verify that the chain of objects have the same count as
-		 * what we are about to report to the caller.  Any mismatch
-		 * here means that the object list is insanely broken and
-		 * therefore we must panic.
-		 */
+		  
+                                                            
+                                                             
+                                                           
+                             
+     
 		while (*o != NULL) {
 			o = &(*o)->obj_next;
 			++n;
@@ -575,12 +575,12 @@ debug_alloc:
 			panic("mcache_alloc_ext: %s cp %p corrupted list "
 			    "(got %d actual %d)\n", cp->mc_name,
 			    (void *)cp, num - need, n);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		}
 	}
 
-	/* Invoke the slab layer audit callback if auditing is enabled */
+	                                                                 
 	if ((cp->mc_flags & MCF_DEBUG) && cp->mc_slab_audit != NULL) {
 		(*cp->mc_slab_audit)(cp->mc_private, *top, TRUE);
 	}
@@ -588,9 +588,9 @@ debug_alloc:
 	return num - need;
 }
 
-/*
- * Allocate a single object from a cache.
- */
+  
+                                         
+   
 __private_extern__ void *
 mcache_alloc(mcache_t *cp, int wait)
 {
@@ -615,17 +615,17 @@ mcache_waiter_dec(mcache_t *cp)
 __private_extern__ boolean_t
 mcache_bkt_isempty(mcache_t *cp)
 {
-	/*
-	 * This isn't meant to accurately tell whether there are
-	 * any full buckets in the cache; it is simply a way to
-	 * obtain "hints" about the state of the cache.
-	 */
+	  
+                                                         
+                                                        
+                                                
+    
 	return cp->mc_full.bl_total == 0;
 }
 
-/*
- * Notify the slab layer about an event.
- */
+  
+                                        
+   
 static void
 mcache_notify(mcache_t *cp, u_int32_t event)
 {
@@ -634,22 +634,22 @@ mcache_notify(mcache_t *cp, u_int32_t event)
 	}
 }
 
-/*
- * Purge the cache and disable its buckets.
- */
+  
+                                           
+   
 static void
 mcache_purge(void *arg)
 {
 	mcache_t *cp = arg;
 
 	mcache_bkt_purge(cp);
-	/*
-	 * We cannot simply call mcache_cache_bkt_enable() from here as
-	 * a bucket resize may be in flight and we would cause the CPU
-	 * layers of the cache to point to different sizes.  Therefore,
-	 * we simply increment the enable count so that during the next
-	 * periodic cache update the buckets can be reenabled.
-	 */
+	  
+                                                                
+                                                               
+                                                                
+                                                                
+                                                       
+    
 	lck_mtx_lock_spin(&cp->mc_sync_lock);
 	cp->mc_enable_cnt++;
 	lck_mtx_unlock(&cp->mc_sync_lock);
@@ -658,10 +658,10 @@ mcache_purge(void *arg)
 __private_extern__ boolean_t
 mcache_purge_cache(mcache_t *cp, boolean_t async)
 {
-	/*
-	 * Purging a cache that has no per-CPU caches or is already
-	 * in the process of being purged is rather pointless.
-	 */
+	  
+                                                            
+                                                       
+    
 	if (cp->mc_flags & MCF_NOCPUCACHE) {
 		return FALSE;
 	}
@@ -683,9 +683,9 @@ mcache_purge_cache(mcache_t *cp, boolean_t async)
 	return TRUE;
 }
 
-/*
- * Free a single object to a cache.
- */
+  
+                                   
+   
 __private_extern__ void
 mcache_free(mcache_t *cp, void *buf)
 {
@@ -693,9 +693,9 @@ mcache_free(mcache_t *cp, void *buf)
 	mcache_free_ext(cp, (mcache_obj_t *)buf);
 }
 
-/*
- * Free one or more objects to a cache.
- */
+  
+                                       
+   
 __private_extern__ void
 mcache_free_ext(mcache_t *cp, mcache_obj_t *list)
 {
@@ -708,26 +708,26 @@ mcache_free_ext(mcache_t *cp, mcache_obj_t *list)
 		(*cp->mc_slab_log)(0, list, FALSE);
 	}
 
-	/* Invoke the slab layer audit callback if auditing is enabled */
+	                                                                 
 	if ((cp->mc_flags & MCF_DEBUG) && cp->mc_slab_audit != NULL) {
 		(*cp->mc_slab_audit)(cp->mc_private, list, FALSE);
 	}
 
 	MCACHE_LOCK(&ccp->cc_lock);
 	for (;;) {
-		/*
-		 * If there is space in the current CPU's filled bucket, put
-		 * the object there and return once all objects are freed.
-		 * Note the cast to unsigned integer takes care of the case
-		 * where the bucket layer is disabled (when cc_objs is -1).
-		 */
+		  
+                                                              
+                                                            
+                                                             
+                                                             
+     
 		if ((unsigned int)ccp->cc_objs <
 		    (unsigned int)ccp->cc_bktsize) {
-			/*
-			 * Reverse the list while we place the object into the
-			 * bucket; this effectively causes the most recently
-			 * freed object(s) to be reused during allocation.
-			 */
+			  
+                                                         
+                                                       
+                                                     
+      
 			nlist = list->obj_next;
 			list->obj_next = (ccp->cc_objs == 0) ? NULL :
 			    ccp->cc_filled->bkt_obj[ccp->cc_objs - 1];
@@ -738,39 +738,39 @@ mcache_free_ext(mcache_t *cp, mcache_obj_t *list)
 				continue;
 			}
 
-			/* We are done; return to caller */
+			                                   
 			MCACHE_UNLOCK(&ccp->cc_lock);
 
-			/* If there is a waiter below, notify it */
+			                                           
 			if (cp->mc_waiter_cnt > 0) {
 				mcache_notify(cp, MCN_RETRYALLOC);
 			}
 			return;
 		}
 
-		/*
-		 * The CPU's filled bucket is full.  If the previous filled
-		 * bucket was empty, exchange and try again.
-		 */
+		  
+                                                             
+                                              
+     
 		if (ccp->cc_pobjs == 0) {
 			mcache_cpu_refill(ccp, ccp->cc_pfilled, ccp->cc_pobjs);
 			continue;
 		}
 
-		/*
-		 * If the bucket layer is disabled, free to slab.  This can
-		 * happen either because MCF_NOCPUCACHE is set, or because
-		 * the bucket layer is currently being resized.
-		 */
+		  
+                                                             
+                                                            
+                                                 
+     
 		if (ccp->cc_bktsize == 0) {
 			break;
 		}
 
-		/*
-		 * Both of the CPU's buckets are full; try to get an empty
-		 * bucket from the bucket layer.  Upon success, empty this
-		 * CPU and place any full bucket into the full list.
-		 */
+		  
+                                                            
+                                                            
+                                                      
+     
 		bkt = mcache_bkt_alloc(cp, &cp->mc_empty);
 		if (bkt != NULL) {
 			if (ccp->cc_pfilled != NULL) {
@@ -782,23 +782,23 @@ mcache_free_ext(mcache_t *cp, mcache_obj_t *list)
 		}
 		btp = cp->cache_bkttype;
 
-		/*
-		 * We need an empty bucket to put our freed objects into
-		 * but couldn't get an empty bucket from the bucket layer;
-		 * attempt to allocate one.  We do not want to block for
-		 * allocation here, and if the bucket allocation fails
-		 * we will simply fall through to the slab layer.
-		 */
+		  
+                                                          
+                                                            
+                                                          
+                                                        
+                                                   
+     
 		MCACHE_UNLOCK(&ccp->cc_lock);
 		bkt = mcache_alloc(btp->bt_cache, MCR_NOSLEEP);
 		MCACHE_LOCK(&ccp->cc_lock);
 
 		if (bkt != NULL) {
-			/*
-			 * We have an empty bucket, but since we drop the
-			 * CPU lock above, the cache's bucket size may have
-			 * changed.  If so, free the bucket and try again.
-			 */
+			  
+                                                    
+                                                      
+                                                     
+      
 			if (ccp->cc_bktsize != btp->bt_bktsize) {
 				MCACHE_UNLOCK(&ccp->cc_lock);
 				mcache_free(btp->bt_cache, bkt);
@@ -806,43 +806,43 @@ mcache_free_ext(mcache_t *cp, mcache_obj_t *list)
 				continue;
 			}
 
-			/*
-			 * Store it in the bucket object since we'll
-			 * need to refer to it during bucket destroy;
-			 * we can't safely refer to cache_bkttype as
-			 * the bucket lock may not be acquired then.
-			 */
+			  
+                                               
+                                                
+                                               
+                                               
+      
 			bkt->bkt_type = btp;
 
-			/*
-			 * We have an empty bucket of the right size;
-			 * add it to the bucket layer and try again.
-			 */
+			  
+                                                
+                                               
+      
 			mcache_bkt_free(cp, &cp->mc_empty, bkt);
 			continue;
 		}
 
-		/*
-		 * The bucket layer has no empty buckets; free the
-		 * object(s) directly to the slab layer.
-		 */
+		  
+                                                    
+                                          
+     
 		break;
 	}
 	MCACHE_UNLOCK(&ccp->cc_lock);
 
-	/* If there is a waiter below, notify it */
+	                                           
 	if (cp->mc_waiter_cnt > 0) {
 		mcache_notify(cp, MCN_RETRYALLOC);
 	}
 
-	/* Advise the slab layer to purge the object(s) */
+	                                                  
 	(*cp->mc_slab_free)(cp->mc_private, list,
 	    (cp->mc_flags & MCF_DEBUG) || cp->mc_purge_cnt);
 }
 
-/*
- * Cache destruction routine.
- */
+  
+                             
+   
 __private_extern__ void
 mcache_destroy(mcache_t *cp)
 {
@@ -854,10 +854,10 @@ mcache_destroy(mcache_t *cp)
 
 	mcache_bkt_purge(cp);
 
-	/*
-	 * This cache is dead; there should be no further transaction.
-	 * If it's still invoked, make sure that it induces a fault.
-	 */
+	  
+                                                               
+                                                             
+    
 	cp->mc_slab_alloc = NULL;
 	cp->mc_slab_free = NULL;
 	cp->mc_slab_audit = NULL;
@@ -866,28 +866,28 @@ mcache_destroy(mcache_t *cp)
 	lck_grp_free(cp->mc_cpu_lock_grp);
 	lck_grp_free(cp->mc_sync_lock_grp);
 
-	/*
-	 * TODO: We need to destroy the zone here, but cannot do it
-	 * because there is no such way to achieve that.  Until then
-	 * the memory allocated for the zone structure is leaked.
-	 * Once it is achievable, uncomment these lines:
-	 *
-	 *	if (cp->mc_slab_zone != NULL) {
-	 *		zdestroy(cp->mc_slab_zone);
-	 *		cp->mc_slab_zone = NULL;
-	 *	}
-	 */
+	  
+                                                            
+                                                             
+                                                          
+                                                 
+   
+                                   
+                                
+                             
+     
+    
 
-	/* Get the original address since we're about to free it */
+	                                                           
 	pbuf = (void **)((intptr_t)cp - sizeof(void *));
 
 	zfree(mcache_zone, *pbuf);
 }
 
-/*
- * Internal slab allocator used as a backend for simple caches.  The current
- * implementation uses the zone allocator for simplicity reasons.
- */
+  
+                                                                            
+                                                                 
+   
 static unsigned int
 mcache_slab_alloc(void *arg, mcache_obj_t ***plist, unsigned int num,
     int wait)
@@ -908,27 +908,27 @@ mcache_slab_alloc(void *arg, mcache_obj_t ***plist, unsigned int num,
 			break;
 		}
 
-		/* Get the aligned base address for this object */
+		                                                  
 		base = (void *)P2ROUNDUP((intptr_t)buf + sizeof(u_int64_t),
 		    cp->mc_align);
 
-		/*
-		 * Wind back a pointer size from the aligned base and
-		 * save the original address so we can free it later.
-		 */
+		  
+                                                       
+                                                       
+     
 		pbuf = (void **)((intptr_t)base - sizeof(void *));
 		*pbuf = buf;
 
 		VERIFY(((intptr_t)base + cp->mc_bufsize) <=
 		    ((intptr_t)buf + cp->mc_chunksize));
 
-		/*
-		 * If auditing is enabled, patternize the contents of
-		 * the buffer starting from the 64-bit aligned base to
-		 * the end of the buffer; the length is rounded up to
-		 * the nearest 64-bit multiply; this is because we use
-		 * 64-bit memory access to set/check the pattern.
-		 */
+		  
+                                                       
+                                                        
+                                                       
+                                                        
+                                                   
+     
 		if (flags & MCF_DEBUG) {
 			VERIFY(((intptr_t)base + rsize) <=
 			    ((intptr_t)buf + cp->mc_chunksize));
@@ -941,7 +941,7 @@ mcache_slab_alloc(void *arg, mcache_obj_t ***plist, unsigned int num,
 		(*list)->obj_next = NULL;
 		list = *plist = &(*list)->obj_next;
 
-		/* If we got them all, return to mcache */
+		                                          
 		if (--need == 0) {
 			break;
 		}
@@ -950,9 +950,9 @@ mcache_slab_alloc(void *arg, mcache_obj_t ***plist, unsigned int num,
 	return num - need;
 }
 
-/*
- * Internal slab deallocator used as a backend for simple caches.
- */
+  
+                                                                 
+   
 static void
 mcache_slab_free(void *arg, mcache_obj_t *list, __unused boolean_t purged)
 {
@@ -970,7 +970,7 @@ mcache_slab_free(void *arg, mcache_obj_t *list, __unused boolean_t purged)
 		base = list;
 		VERIFY(IS_P2ALIGNED(base, cp->mc_align));
 
-		/* Get the original address since we're about to free it */
+		                                                           
 		pbuf = (void **)((intptr_t)base - sizeof(void *));
 
 		VERIFY(((intptr_t)base + cp->mc_bufsize) <=
@@ -982,19 +982,19 @@ mcache_slab_free(void *arg, mcache_obj_t *list, __unused boolean_t purged)
 			mcache_audit_free_verify(NULL, base, 0, rsize);
 		}
 
-		/* Free it to zone */
+		                     
 		zfree(cp->mc_slab_zone, *pbuf);
 
-		/* No more objects to free; return to mcache */
+		                                               
 		if ((list = nlist) == NULL) {
 			break;
 		}
 	}
 }
 
-/*
- * Internal slab auditor for simple caches.
- */
+  
+                                           
+   
 static void
 mcache_slab_audit(void *arg, mcache_obj_t *list, boolean_t alloc)
 {
@@ -1008,7 +1008,7 @@ mcache_slab_audit(void *arg, mcache_obj_t *list, boolean_t alloc)
 		base = list;
 		VERIFY(IS_P2ALIGNED(base, cp->mc_align));
 
-		/* Get the original address */
+		                              
 		pbuf = (void **)((intptr_t)base - sizeof(void *));
 
 		VERIFY(((intptr_t)base + rsize) <=
@@ -1024,9 +1024,9 @@ mcache_slab_audit(void *arg, mcache_obj_t *list, boolean_t alloc)
 	}
 }
 
-/*
- * Refill the CPU's filled bucket with bkt and save the previous one.
- */
+  
+                                                                     
+   
 static void
 mcache_cpu_refill(mcache_cpu_t *ccp, mcache_bkt_t *bkt, int objs)
 {
@@ -1040,20 +1040,20 @@ mcache_cpu_refill(mcache_cpu_t *ccp, mcache_bkt_t *bkt, int objs)
 	ccp->cc_objs = objs;
 }
 
-/*
- * Allocate a bucket from the bucket layer.
- */
+  
+                                           
+   
 static mcache_bkt_t *
 mcache_bkt_alloc(mcache_t *cp, mcache_bktlist_t *blp)
 {
 	mcache_bkt_t *bkt;
 
 	if (!MCACHE_LOCK_TRY(&cp->mc_bkt_lock)) {
-		/*
-		 * The bucket layer lock is held by another CPU; increase
-		 * the contention count so that we can later resize the
-		 * bucket size accordingly.
-		 */
+		  
+                                                           
+                                                         
+                             
+     
 		MCACHE_LOCK(&cp->mc_bkt_lock);
 		cp->mc_bkt_contention++;
 	}
@@ -1071,9 +1071,9 @@ mcache_bkt_alloc(mcache_t *cp, mcache_bktlist_t *blp)
 	return bkt;
 }
 
-/*
- * Free a bucket to the bucket layer.
- */
+  
+                                     
+   
 static void
 mcache_bkt_free(mcache_t *cp, mcache_bktlist_t *blp, mcache_bkt_t *bkt)
 {
@@ -1086,9 +1086,9 @@ mcache_bkt_free(mcache_t *cp, mcache_bktlist_t *blp, mcache_bkt_t *bkt)
 	MCACHE_UNLOCK(&cp->mc_bkt_lock);
 }
 
-/*
- * Enable the bucket layer of a cache.
- */
+  
+                                      
+   
 static void
 mcache_cache_bkt_enable(mcache_t *cp)
 {
@@ -1107,9 +1107,9 @@ mcache_cache_bkt_enable(mcache_t *cp)
 	}
 }
 
-/*
- * Purge all buckets from a cache and disable its bucket layer.
- */
+  
+                                                               
+   
 static void
 mcache_bkt_purge(mcache_t *cp)
 {
@@ -1147,10 +1147,10 @@ mcache_bkt_purge(mcache_t *cp)
 	mcache_bkt_ws_reap(cp);
 }
 
-/*
- * Free one or more objects in the bucket to the slab layer,
- * and also free the bucket itself.
- */
+  
+                                                            
+                                   
+   
 static void
 mcache_bkt_destroy(mcache_t *cp, mcache_bkt_t *bkt, int nobjs)
 {
@@ -1161,11 +1161,11 @@ mcache_bkt_destroy(mcache_t *cp, mcache_bkt_t *bkt, int nobjs)
 			mcache_obj_t *o = top;
 			int cnt = 0;
 
-			/*
-			 * Verify that the chain of objects in the bucket is
-			 * valid.  Any mismatch here means a mistake when the
-			 * object(s) were freed to the CPU layer, so we panic.
-			 */
+			  
+                                                       
+                                                        
+                                                         
+      
 			while (o != NULL) {
 				o = o->obj_next;
 				++cnt;
@@ -1175,21 +1175,21 @@ mcache_bkt_destroy(mcache_t *cp, mcache_bkt_t *bkt, int nobjs)
 				    "list in bkt %p (nobjs %d actual %d)\n",
 				    cp->mc_name, (void *)cp, (void *)bkt,
 				    nobjs, cnt);
-				/* NOTREACHED */
+				                
 				__builtin_unreachable();
 			}
 		}
 
-		/* Advise the slab layer to purge the object(s) */
+		                                                  
 		(*cp->mc_slab_free)(cp->mc_private, top,
 		    (cp->mc_flags & MCF_DEBUG) || cp->mc_purge_cnt);
 	}
 	mcache_free(bkt->bkt_type->bt_cache, bkt);
 }
 
-/*
- * Update the bucket layer working set statistics.
- */
+  
+                                                  
+   
 static void
 mcache_bkt_ws_update(mcache_t *cp)
 {
@@ -1203,9 +1203,9 @@ mcache_bkt_ws_update(mcache_t *cp)
 	MCACHE_UNLOCK(&cp->mc_bkt_lock);
 }
 
-/*
- * Mark everything as eligible for reaping (working set is zero).
- */
+  
+                                                                 
+   
 static void
 mcache_bkt_ws_zero(mcache_t *cp)
 {
@@ -1219,9 +1219,9 @@ mcache_bkt_ws_zero(mcache_t *cp)
 	MCACHE_UNLOCK(&cp->mc_bkt_lock);
 }
 
-/*
- * Reap all buckets that are beyond the working set.
- */
+  
+                                                    
+   
 static void
 mcache_bkt_ws_reap(mcache_t *cp)
 {
@@ -1307,9 +1307,9 @@ mcache_cache_reap(mcache_t *cp)
 	mcache_bkt_ws_reap(cp);
 }
 
-/*
- * Performs period maintenance on a cache.
- */
+  
+                                          
+   
 static void
 mcache_cache_update(mcache_t *cp)
 {
@@ -1320,12 +1320,12 @@ mcache_cache_update(mcache_t *cp)
 
 	mcache_bkt_ws_update(cp);
 
-	/*
-	 * Cache resize and post-purge reenable are mutually exclusive.
-	 * If the cache was previously purged, there is no point of
-	 * increasing the bucket size as there was an indication of
-	 * memory pressure on the system.
-	 */
+	  
+                                                                
+                                                            
+                                                            
+                                  
+    
 	lck_mtx_lock_spin(&cp->mc_sync_lock);
 	if (!(cp->mc_flags & MCF_NOCPUCACHE) && cp->mc_enable_cnt) {
 		need_bkt_reenable = 1;
@@ -1333,12 +1333,12 @@ mcache_cache_update(mcache_t *cp)
 	lck_mtx_unlock(&cp->mc_sync_lock);
 
 	MCACHE_LOCK(&cp->mc_bkt_lock);
-	/*
-	 * If the contention count is greater than the threshold, and if
-	 * we are not already at the maximum bucket size, increase it.
-	 * Otherwise, if this cache was previously purged by the user
-	 * then we simply reenable it.
-	 */
+	  
+                                                                 
+                                                               
+                                                              
+                               
+    
 	if ((unsigned int)cp->mc_chunksize < cp->cache_bkttype->bt_maxbuf &&
 	    (int)(cp->mc_bkt_contention - cp->mc_bkt_contention_prev) >
 	    mcache_bkt_contention && !need_bkt_reenable) {
@@ -1355,12 +1355,12 @@ mcache_cache_update(mcache_t *cp)
 	}
 }
 
-/*
- * Recompute a cache's bucket size.  This is an expensive operation
- * and should not be done frequently; larger buckets provide for a
- * higher transfer rate with the bucket while smaller buckets reduce
- * the memory consumption.
- */
+  
+                                                                   
+                                                                  
+                                                                    
+                          
+   
 static void
 mcache_cache_bkt_resize(void *arg)
 {
@@ -1370,11 +1370,11 @@ mcache_cache_bkt_resize(void *arg)
 	if ((unsigned int)cp->mc_chunksize < btp->bt_maxbuf) {
 		mcache_bkt_purge(cp);
 
-		/*
-		 * Upgrade to the next bucket type with larger bucket size;
-		 * temporarily set the previous contention snapshot to a
-		 * negative number to prevent unnecessary resize request.
-		 */
+		  
+                                                             
+                                                          
+                                                           
+     
 		MCACHE_LOCK(&cp->mc_bkt_lock);
 		cp->cache_bkttype = ++btp;
 		cp->mc_bkt_contention_prev = cp->mc_bkt_contention + INT_MAX;
@@ -1384,9 +1384,9 @@ mcache_cache_bkt_resize(void *arg)
 	}
 }
 
-/*
- * Reenable a previously disabled cache due to purge.
- */
+  
+                                                     
+   
 static void
 mcache_cache_enable(void *arg)
 {
@@ -1464,7 +1464,7 @@ mcache_buffer_log(mcache_audit_t *mca, void *addr, mcache_t *cp,
 	if (base_ts != NULL) {
 		base = *base_ts;
 	}
-	/* tstamp is in ms relative to base_ts */
+	                                         
 	transaction->mca_tstamp = ((now.tv_usec - base.tv_usec) / 1000);
 	if ((now.tv_sec - base.tv_sec) > 0) {
 		transaction->mca_tstamp += ((now.tv_sec - base.tv_sec) * 1000);
@@ -1474,12 +1474,12 @@ mcache_buffer_log(mcache_audit_t *mca, void *addr, mcache_t *cp,
 	    (mca->mca_next_trn + 1) % mca_trn_max;
 }
 
-/*
- * N.B.: mcache_set_pattern(), mcache_verify_pattern() and
- * mcache_verify_set_pattern() are marked as noinline to prevent the
- * compiler from aliasing pointers when they are inlined inside the callers
- * (e.g. mcache_audit_free_verify_set()) which would be undefined behavior.
- */
+  
+                                                          
+                                                                    
+                                                                           
+                                                                           
+   
 __private_extern__ OS_NOINLINE void
 mcache_set_pattern(u_int64_t pattern, void *buf_arg, size_t size)
 {
@@ -1543,7 +1543,7 @@ mcache_audit_free_verify(mcache_audit_t *mca, void *base, size_t offset,
 	addr = (void *)((uintptr_t)base + offset);
 	next = ((mcache_obj_t *)addr)->obj_next;
 
-	/* For the "obj_next" pointer in the buffer */
+	                                              
 	oaddr64 = (u_int64_t *)P2ROUNDDOWN(addr, sizeof(u_int64_t));
 	*oaddr64 = MCACHE_FREE_PATTERN;
 
@@ -1551,7 +1551,7 @@ mcache_audit_free_verify(mcache_audit_t *mca, void *base, size_t offset,
 	    (caddr_t)base, size)) != NULL) {
 		mcache_audit_panic(mca, addr, (caddr_t)oaddr64 - (caddr_t)base,
 		    (int64_t)MCACHE_FREE_PATTERN, (int64_t)*oaddr64);
-		/* NOTREACHED */
+		                
 	}
 	((mcache_obj_t *)addr)->obj_next = next;
 }
@@ -1567,7 +1567,7 @@ mcache_audit_free_verify_set(mcache_audit_t *mca, void *base, size_t offset,
 	addr = (void *)((uintptr_t)base + offset);
 	next = ((mcache_obj_t *)addr)->obj_next;
 
-	/* For the "obj_next" pointer in the buffer */
+	                                              
 	oaddr64 = (u_int64_t *)P2ROUNDDOWN(addr, sizeof(u_int64_t));
 	*oaddr64 = MCACHE_FREE_PATTERN;
 
@@ -1575,7 +1575,7 @@ mcache_audit_free_verify_set(mcache_audit_t *mca, void *base, size_t offset,
 	    MCACHE_UNINITIALIZED_PATTERN, (caddr_t)base, size)) != NULL) {
 		mcache_audit_panic(mca, addr, (caddr_t)oaddr64 - (caddr_t)base,
 		    (int64_t)MCACHE_FREE_PATTERN, (int64_t)*oaddr64);
-		/* NOTREACHED */
+		                
 	}
 	((mcache_obj_t *)addr)->obj_next = next;
 }
@@ -1630,14 +1630,14 @@ mcache_audit_panic(mcache_audit_t *mca, void *addr, size_t offset,
 		panic("mcache_audit: buffer %p modified after free at "
 		    "offset 0x%lx (0x%llx instead of 0x%llx)\n", addr,
 		    offset, got, expected);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
 	panic("mcache_audit: buffer %p modified after free at offset 0x%lx "
 	    "(0x%llx instead of 0x%llx)\n%s\n",
 	    addr, offset, got, expected, mcache_dump_mca(buf, mca));
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -1646,6 +1646,6 @@ __private_extern__ int
 assfail(const char *a, const char *f, int l)
 {
 	panic("assertion failed: %s, file: %s, line: %d", a, f, l);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }

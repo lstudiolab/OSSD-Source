@@ -26,14 +26,14 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* wrapper around kdebug */
+                           
 
 #include <sys/kdebug.h>
 
-/* kdebug codes */
+                  
 #define PERF_CODE(SubClass, code) KDBG_CODE(DBG_PERF, SubClass, code)
 
-/* broad sub-classes */
+                       
 #define PERF_GENERIC    (0)
 #define PERF_THREADINFO (1)
 #define PERF_CALLSTACK  (2)
@@ -46,13 +46,13 @@
 #define PERF_LAZY       (9)
 #define PERF_MEMINFO    (10)
 
-/* helpers for 32-bit */
+                        
 #define UPPER_32(U64)        ((U64) >> 32)
 #define LOWER_32(U64)        ((U64) & (UINT32_MAX))
 #define ENCODE_UPPER_64(U32) (((uint64_t)(U32)) << 32)
 #define ENCODE_LOWER_64(U32) (((uint64_t)(U32)) & (UINT32_MAX))
 
-/* sub-class codes */
+                     
 #define PERF_GEN_CODE(code) PERF_CODE(PERF_GENERIC, code)
 #define PERF_GEN_EVENT      PERF_GEN_CODE(0)
 
@@ -151,7 +151,7 @@
 #define PERF_MI_SYS_DATA   PERF_MI_CODE(2)
 #define PERF_MI_SYS_DATA_2 PERF_MI_CODE(3)
 
-/* error sub-codes for trace data */
+                                    
 enum{
 	ERR_TASK,
 	ERR_THREAD,
@@ -161,20 +161,20 @@ enum{
 	ERR_NOMEM,
 };
 
-/* level of kperf's logging to kdebug */
+                                        
 #define KPERF_DEBUG_DATA    0
 #define KPERF_DEBUG_INFO    1
 #define KPERF_DEBUG_VERBOSE 2
 extern int kperf_debug_level;
 
-/* BUF_DATA tracepoints are for logging actual kperf results. */
+                                                                
 
 #define BUF_DATA(EVENTID, ...) KDBG_RELEASE(EVENTID, ## __VA_ARGS__)
 
-/*
- * BUF_INFO tracepoints are for logging debugging information relevant to
- * testing kperf's internal functions.
- */
+  
+                                                                         
+                                      
+   
 
 #if (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
 #define BUF_INFO_INT(EVENTID, A1, A2, A3, A4) if (__improbable(kperf_debug_level >= KPERF_DEBUG_INFO)) KERNEL_DEBUG_CONSTANT(EVENTID, A1, A2, A3, A4, 0)
@@ -190,10 +190,10 @@ extern int kperf_debug_level;
 #define BUF_INFO3(EVENTID, A1, A2, A3, A4)              BUF_INFO_INT(EVENTID, A1, A2, A3, 0)
 #define BUF_INFO4(EVENTID, A1, A2, A3, A4)              BUF_INFO_INT(EVENTID, A1, A2, A3, A4)
 
-/*
- * BUF_VERB tracepoints are for logging precise details of kperf's
- * internal functions, like timing information for samplers.
- */
+  
+                                                                  
+                                                            
+   
 
 #if (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
 #define BUF_VERB_INT(EVENTID, A1, A2, A3, A4) if (__improbable(kperf_debug_level >= KPERF_DEBUG_VERBOSE)) KERNEL_DEBUG_CONSTANT(EVENTID, A1, A2, A3, A4, 0)

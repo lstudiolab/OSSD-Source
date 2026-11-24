@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * catch_exception_raise_state_identity will be implemented by user programs
- * This implementation is provided to resolve the reference in
- * exc_server().
- */
+  
+                                                                            
+                                                              
+                
+   
 
 #include <mach/boolean.h>
 #include <mach/message.h>
@@ -60,7 +60,7 @@ internal_catch_exception_raise_state_identity(
 		exc_raise_state_identity_func = _dlsym(RTLD_DEFAULT, "catch_exception_raise_state_identity");
 	}
 	if (exc_raise_state_identity_func == 0) {
-		/* The user hasn't defined catch_exception_raise in their binary */
+		                                                                   
 		abort();
 	}
 	return (*exc_raise_state_identity_func)(exception_port, thread, task, exception, code, codeCnt, flavor, old_state, old_stateCnt, new_state, new_stateCnt);

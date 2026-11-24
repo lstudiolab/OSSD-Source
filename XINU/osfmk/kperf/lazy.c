@@ -54,7 +54,7 @@ kperf_lazy_reset(void)
 void
 kperf_lazy_off_cpu(thread_t thread)
 {
-	/* try to lazily sample the CPU if the thread was pre-empted */
+	                                                               
 	if ((thread->reason & AST_SCHEDULING) != 0) {
 		kperf_lazy_cpu_sample(thread, 0, 0);
 	}
@@ -64,7 +64,7 @@ void
 kperf_lazy_make_runnable(thread_t thread, bool in_interrupt)
 {
 	assert(thread->last_made_runnable_time != THREAD_NOT_RUNNABLE);
-	/* ignore threads that race to wait and in waking up */
+	                                                       
 	if (thread->last_run_time > thread->last_made_runnable_time) {
 		return;
 	}
@@ -80,16 +80,16 @@ void
 kperf_lazy_wait_sample(thread_t thread, thread_continue_t continuation,
     uintptr_t *starting_fp)
 {
-	/* ignore idle threads */
+	                         
 	if (thread->last_made_runnable_time == THREAD_NOT_RUNNABLE) {
 		return;
 	}
-	/* ignore invalid made runnable times */
+	                                        
 	if (thread->last_made_runnable_time < thread->last_run_time) {
 		return;
 	}
 
-	/* take a sample if thread was waiting for longer than threshold */
+	                                                                   
 	uint64_t wait_time = thread_get_last_wait_duration(thread);
 	if (wait_time > kperf_lazy_wait_time_threshold) {
 		uint64_t time_now = mach_absolute_time();
@@ -132,7 +132,7 @@ kperf_lazy_cpu_sample(thread_t thread, unsigned int flags, bool interrupt)
 		thread = current_thread();
 	}
 
-	/* take a sample if this CPU's last sample time is beyond the threshold */
+	                                                                          
 	processor_t processor = current_processor();
 	uint64_t time_now = mach_absolute_time();
 	uint64_t since_last_sample = time_now - processor->kperf_last_sample_time;
@@ -167,9 +167,9 @@ kperf_lazy_cpu_sample(thread_t thread, unsigned int flags, bool interrupt)
 	}
 }
 
-/*
- * Accessors for configuration.
- */
+  
+                               
+   
 
 int
 kperf_lazy_get_wait_action(void)

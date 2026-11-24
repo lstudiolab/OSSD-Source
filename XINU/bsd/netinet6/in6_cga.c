@@ -113,7 +113,7 @@ in6_cga_is_prepare_valid(const struct in6_cga_prepare *prepare,
 	    IN6_CGA_MODIFIER_LENGTH);
 	SHA1Update(&ctx, &zeroes, IN6_CGA_PREPARE_ZEROES);
 	SHA1Update(&ctx, pubkey->iov_base, pubkey->iov_len);
-	/* FUTURE: extension fields */
+	                              
 	SHA1Final(sha1, &ctx);
 
 	n = 2 * (u_int) prepare->cga_security_level;
@@ -127,30 +127,30 @@ in6_cga_is_prepare_valid(const struct in6_cga_prepare *prepare,
 	return TRUE;
 }
 
-/*
- * @brief Generate interface identifier for CGA
- *      XXX You may notice that following does not really
- *      mirror what is decribed in:
- *      https://tools.ietf.org/html/rfc3972#section-4
- *      By design kernel here will assume that that
- *      modifier has been converged on by userspace
- *      for first part of the algorithm for the given
- *      security level.
- *      We are not doing that yet but that's how the code
- *      below is written. So really we are starting
- *      from bullet 4 of the algorithm.
- *
- * @param prepare Pointer to object containing modifier,
- *      security level & extension to be used.
- * @param pubkey Public key used for IID generation
- * @param collisions Collission count on DAD failure
- *      XXX We are not really re-generating IID on DAD
- *      failures for now.
- * @param in6 Pointer to the address containing
- *      the prefix.
- *
- * @return void
- */
+  
+                                               
+                                                         
+                                   
+                                                     
+                                                   
+                                                   
+                                                     
+                       
+                                                         
+                                                   
+                                       
+  
+                                                        
+                                              
+                                                   
+                                                    
+                                                      
+                         
+                                               
+                   
+  
+               
+   
 static void
 in6_cga_generate_iid(const struct in6_cga_prepare *prepare,
     const struct iovec *pubkey, u_int8_t collisions,
@@ -172,7 +172,7 @@ in6_cga_generate_iid(const struct in6_cga_prepare *prepare,
 	if (ifp->network_id_len) {
 		SHA1Update(&ctx, &ifp->network_id, ifp->network_id_len);
 	}
-	/* FUTURE: extension fields */
+	                              
 	SHA1Final(sha1, &ctx);
 
 	in6->s6_addr8[8] =
@@ -305,13 +305,13 @@ in6_cga_parameters_prepare(void *output, size_t max,
 	in6_cga_node_lock_assert(LCK_MTX_ASSERT_OWNED);
 
 	if (in6_cga.cga_pubkey.iov_len == 0) {
-		/* No public key */
+		                   
 		return EINVAL;
 	}
 
 	if (output == NULL ||
 	    max < in6_cga.cga_pubkey.iov_len + sizeof(modifier->octets) + 9) {
-		/* Output buffer error */
+		                         
 		return EINVAL;
 	}
 
@@ -335,7 +335,7 @@ in6_cga_parameters_prepare(void *output, size_t max,
 	bcopy(in6_cga.cga_pubkey.iov_base, cursor, in6_cga.cga_pubkey.iov_len);
 	cursor += in6_cga.cga_pubkey.iov_len;
 
-	/* FUTURE: Extension fields */
+	                              
 
 	return (ssize_t)(cursor - (caddr_t)output);
 }
@@ -369,4 +369,4 @@ in6_cga_generate(struct in6_cga_prepare *prepare, u_int8_t collisions,
 	return error;
 }
 
-/* End of file */
+                 

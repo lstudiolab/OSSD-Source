@@ -8,12 +8,12 @@ __BEGIN_DECLS
 
 #include <kern/priority_queue.h>
 
-/*----------------------------------------------------------------*/
-/*
- *	Define macros for queues with locks.
- */
+                                                                    
+  
+                                       
+   
 struct mpqueue_head {
-	struct queue_entry      head;           /* header for queue */
+	struct queue_entry      head;                                 
 	struct priority_queue_deadline_min mpq_pqhead;
 	uint64_t                earliest_soft_deadline;
 	uint64_t                count;
@@ -69,9 +69,9 @@ MACRO_BEGIN                                             \
 	lck_mtx_unlock_always(&(q)->lock_data);         \
 MACRO_END
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 __END_DECLS
 
 
-#endif /* _KERN_QUEUE_H */
+#endif                    

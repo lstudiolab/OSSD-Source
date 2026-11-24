@@ -34,9 +34,9 @@
 SYSCTL_NODE(_net, OID_AUTO, mpklog,
     CTLFLAG_RW | CTLFLAG_LOCKED, 0, "Multi-layer packet logging");
 
-/*
- * Note:  net_mpklog_enabled allows to override the interface flags IFXF_MPK_LOG
- */
+  
+                                                                                
+   
 int net_mpklog_enabled = 1;
 static int sysctl_net_mpklog_enabled SYSCTL_HANDLER_ARGS;
 SYSCTL_PROC(_net_mpklog, OID_AUTO, enabled, CTLTYPE_INT | CTLFLAG_LOCKED | CTLFLAG_RW,

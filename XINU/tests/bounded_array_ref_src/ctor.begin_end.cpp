@@ -1,7 +1,7 @@
-//
-// Tests for
-//  explicit bounded_array_ref(T* first, T* last);
-//
+  
+            
+                                                  
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"
@@ -21,10 +21,10 @@ tests()
 {
 	T array[5] = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^                                                ^
-	//   |                                                |
-	// first                                             last
+	                                                               
+	                                                       
+	                                                       
+	                                                         
 	{
 		T* first = &array[0];
 		T* last = &array[5];
@@ -38,10 +38,10 @@ tests()
 		CHECK(view[4] == T{4});
 	}
 
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^        ^
-	//   |        |
-	// first     last
+	                                                               
+	               
+	               
+	                 
 	{
 		T* first = &array[0];
 		T* last = &array[1];
@@ -51,10 +51,10 @@ tests()
 		CHECK(view[0] == T{0});
 	}
 
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^
-	//   |
-	// first,last
+	                                                               
+	      
+	      
+	             
 	{
 		T* first = &array[0];
 		T* last = &array[0];
@@ -62,10 +62,10 @@ tests()
 		CHECK(view.size() == 0);
 	}
 
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//                                                    ^
-	//                                                    |
-	//                                               first,last
+	                                                               
+	                                                       
+	                                                       
+	                                                           
 	{
 		T* first = &array[5];
 		T* last = &array[5];

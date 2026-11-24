@@ -1,7 +1,7 @@
-//
-// Tests for
-//  friend bounded_ptr operator-(bounded_ptr p, std::ptrdiff_t n);
-//
+  
+            
+                                                                  
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include "test_utils.h"
@@ -22,11 +22,11 @@ tests()
 {
 	std::array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// Subtract positive offsets
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^                                                ^
-	//   |                                                |
-	// begin                                           end,ptr
+	                            
+	                                                               
+	                                                       
+	                                                       
+	                                                          
 	{
 		test_bounded_ptr<QualT> const ptr(array.end(), array.begin(), array.end());
 
@@ -56,11 +56,11 @@ tests()
 		}
 	}
 
-	// Subtract negative offsets
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^                                                ^
-	//   |                                                |
-	// begin,ptr                                         end
+	                            
+	                                                               
+	                                                       
+	                                                       
+	                                                        
 	{
 		test_bounded_ptr<QualT> const ptr(array.begin(), array.begin(), array.end());
 
@@ -90,7 +90,7 @@ tests()
 		}
 	}
 
-	// Make sure the original pointer isn't modified
+	                                                
 	{
 		test_bounded_ptr<QualT> const ptr(array.begin() + 4, array.begin(), array.end());
 		(void)(ptr - 2);

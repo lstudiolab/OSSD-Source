@@ -60,15 +60,15 @@ static LCK_MTX_DECLARE(proc_uuid_policy_subsys_mutex,
 #define PROC_UUID_POLICY_HASH_SIZE 64
 u_long proc_uuid_policy_hash_mask;
 
-/* Assume first byte of UUIDs are evenly distributed */
+                                                       
 #define UUIDHASH(uuid) (&proc_uuid_policy_hashtbl[uuid[0] & proc_uuid_policy_hash_mask])
 static LIST_HEAD(proc_uuid_policy_hashhead, proc_uuid_policy_entry) * proc_uuid_policy_hashtbl;
 
-/*
- * On modification, invalidate cached lookups by bumping the generation count.
- * Other calls will need to take the slowpath of taking
- * the subsystem lock.
- */
+  
+                                                                              
+                                                       
+                      
+   
 static volatile int32_t proc_uuid_policy_table_gencount;
 #define BUMP_PROC_UUID_POLICY_GENERATION_COUNT() do {                                                                   \
 	        if (OSIncrementAtomic(&proc_uuid_policy_table_gencount) == (INT32_MAX - 1)) {   \
@@ -81,14 +81,14 @@ static volatile int32_t proc_uuid_policy_count;
 
 struct proc_uuid_policy_entry {
 	LIST_ENTRY(proc_uuid_policy_entry) entries;
-	uuid_t          uuid;   /* Mach-O executable UUID */
-	uint32_t        flags;  /* policy flag for that UUID */
+	uuid_t          uuid;                               
+	uint32_t        flags;                                 
 };
 
-/*
- * If you need accounting for KM_PROC_UUID_POLICY consider using
- * KALLOC_HEAP_DEFINE to define a view.
- */
+  
+                                                                
+                                       
+   
 #define KM_PROC_UUID_POLICY KHEAP_DEFAULT
 
 static int
@@ -139,14 +139,14 @@ proc_uuid_policy_insert(uuid_t uuid, uint32_t flags)
 
 	foundentry = proc_uuid_policy_lookup_locked(uuid);
 	if (foundentry != NULL) {
-		/* The UUID is already in the list. Update the flags. */
+		                                                        
 		foundentry->flags |= flags;
 		error = 0;
 		kheap_free(KM_PROC_UUID_POLICY, entry, sizeof(struct proc_uuid_policy_entry));
 		entry = NULL;
 		BUMP_PROC_UUID_POLICY_GENERATION_COUNT();
 	} else {
-		/* Our target UUID is not in the list, insert it now */
+		                                                       
 		if (proc_uuid_policy_count < MAX_PROC_UUID_POLICY_COUNT) {
 			LIST_INSERT_HEAD(UUIDHASH(uuid), entry, entries);
 			proc_uuid_policy_count++;
@@ -222,7 +222,7 @@ proc_uuid_policy_remove(uuid_t uuid, uint32_t flags)
 
 	PROC_UUID_POLICY_SUBSYS_UNLOCK();
 
-	/* If we had found a pre-existing entry, deallocate its memory now */
+	                                                                     
 	if (delentry && should_delete) {
 		kheap_free(KM_PROC_UUID_POLICY, delentry, sizeof(struct proc_uuid_policy_entry));
 	}
@@ -267,11 +267,11 @@ proc_uuid_policy_lookup(uuid_t uuid, uint32_t *flags, int32_t *gencount)
 	}
 
 	if (*gencount == proc_uuid_policy_table_gencount) {
-		/*
-		 * Generation count hasn't changed, so old flags should be valid.
-		 * We avoid taking the lock here by assuming any concurrent modifications
-		 * to the table will invalidate the generation count.
-		 */
+		  
+                                                                   
+                                                                           
+                                                       
+     
 		return 0;
 	}
 
@@ -303,7 +303,7 @@ proc_uuid_policy_clear(uint32_t flags)
 	struct proc_uuid_policy_hashhead deletehead = LIST_HEAD_INITIALIZER(deletehead);
 	unsigned long hashslot;
 
-	/* If clear call includes no flags, infer 'No Cellular' flag */
+	                                                               
 	if (flags == PROC_UUID_POLICY_FLAGS_NONE) {
 		flags = PROC_UUID_NO_CELLULAR;
 	}
@@ -316,7 +316,7 @@ proc_uuid_policy_clear(uint32_t flags)
 
 			LIST_FOREACH_SAFE(searchentry, headp, entries, tmpentry) {
 				if ((searchentry->flags & flags) == searchentry->flags) {
-					/* We are clearing all flags for this entry, move entry to our delete list */
+					                                                                             
 					LIST_REMOVE(searchentry, entries);
 					proc_uuid_policy_count--;
 					LIST_INSERT_HEAD(&deletehead, searchentry, entries);
@@ -331,7 +331,7 @@ proc_uuid_policy_clear(uint32_t flags)
 
 	PROC_UUID_POLICY_SUBSYS_UNLOCK();
 
-	/* Memory deallocation happens after the hash lock is dropped */
+	                                                                
 	LIST_FOREACH_SAFE(searchentry, &deletehead, entries, tmpentry) {
 		LIST_REMOVE(searchentry, entries);
 		kheap_free(KM_PROC_UUID_POLICY, searchentry,
@@ -376,7 +376,7 @@ proc_uuid_policy(struct proc *p __unused, struct proc_uuid_policy_args *uap, int
 	uuid_t uuid;
 	memcpy(uuid, UUID_NULL, sizeof(uuid_t));
 
-	/* Need privilege for policy changes */
+	                                       
 	error = priv_check_cred(kauth_cred_get(), PRIV_PROC_UUID_POLICY, 0);
 	if (error) {
 		dprintf("%s failed privilege check for proc_uuid_policy: %d\n", p->p_comm, error);

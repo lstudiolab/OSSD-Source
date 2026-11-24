@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* $KAME: in_gif.h,v 1.3 2000/02/22 14:01:59 itojun Exp $ */
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -69,5 +69,5 @@ void in_gif_input(struct mbuf *, int);
 int in_gif_output(struct ifnet *, int, struct mbuf *, struct rtentry *);
 int gif_encapcheck4(const struct mbuf *, int, int, void *);
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET_IN_GIF_H_ */
+#endif                         
+#endif                         

@@ -28,9 +28,9 @@
 #ifndef _SAN_MEMINTRINSICS_H_
 #define _SAN_MEMINTRINSICS_H_
 
-/*
- * Non-sanitized versions of memory intrinsics
- */
+  
+                                              
+   
 static inline void *
 __nosan_memcpy(void *dst, const void *src, size_t sz)
 {
@@ -140,9 +140,9 @@ size_t __asan_strlen(const char *src);
 #define strncpy   __asan_strncpy
 #define strlcat   __asan_strlcat
 #define strncat   __asan_strncat
-// #define strnlen   __asan_strnlen
-// #define strlen    __asan_strlen
+                                   
+                                  
 
 #endif
 
-#endif /* _SAN_MEMINTRINSICS_H_ */
+#endif                            

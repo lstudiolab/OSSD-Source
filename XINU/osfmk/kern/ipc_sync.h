@@ -46,4 +46,4 @@ extern void semaphore_notify(mach_msg_header_t *msg);
 lock_set_t  convert_port_to_lock_set(ipc_port_t port);
 ipc_port_t  convert_lock_set_to_port(lock_set_t lock_set);
 
-#endif /* _KERN_IPC_SYNC_H_ */
+#endif                        

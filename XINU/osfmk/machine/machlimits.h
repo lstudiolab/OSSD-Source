@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_MACHLIMITS_H */
+#endif                            

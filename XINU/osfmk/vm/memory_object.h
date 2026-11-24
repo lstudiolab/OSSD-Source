@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie the
  * rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _VM_MEMORY_OBJECT_H_
 #define _VM_MEMORY_OBJECT_H_
@@ -147,6 +147,6 @@ extern void             memory_object_mark_trusted(
 extern void             memory_object_mark_eligible_for_secluded(
 	memory_object_control_t         control,
 	boolean_t                       eligible_for_secluded);
-#endif /* CONFIG_SECLUDED_MEMORY */
+#endif                             
 
-#endif  /* _VM_MEMORY_OBJECT_H_ */
+#endif                            

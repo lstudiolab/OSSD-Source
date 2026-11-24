@@ -45,9 +45,9 @@ struct kxld_symtab;
 struct kxld_vtable;
 typedef struct kxld_kext KXLDKext;
 
-/*******************************************************************************
-* Constructors and Destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 size_t kxld_kext_sizeof(void)
 __attribute__((const, visibility("hidden")));
@@ -62,9 +62,9 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_kext_deinit(KXLDKext *kext)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 kern_return_t kxld_kext_export_symbols(const KXLDKext *kext,
     struct kxld_dict *defined_symbols_by_name,
@@ -89,9 +89,9 @@ kern_return_t kxld_kext_export_linked_object(const KXLDKext *kext,
     kxld_addr_t *kmod_info)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Modifiers
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 kern_return_t kxld_kext_export_vtables(KXLDKext *kext,
     const struct kxld_dict *defined_cxx_symbols,
     const struct kxld_dict *defined_symbols,
@@ -107,4 +107,4 @@ kern_return_t kxld_kext_relocate(KXLDKext *kext,
 __attribute__((nonnull(1, 3, 4), visibility("hidden")));
 
 
-#endif /* _KXLD_KEXT_H_ */
+#endif                    

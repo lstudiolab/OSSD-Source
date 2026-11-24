@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * CPU-specific power management support.
- *
- * Implements the "wrappers" to the KEXT.
- */
+  
+                                         
+  
+                                         
+   
 #include <i386/asm.h>
 #include <i386/machine_cpu.h>
 #include <i386/mp.h>
@@ -61,9 +61,9 @@ extern int disableConsoleOutput;
 uint64_t cpu_itime_bins[CPU_ITIME_BINS] = {16 * NSEC_PER_USEC, 32 * NSEC_PER_USEC, 64 * NSEC_PER_USEC, 128 * NSEC_PER_USEC, 256 * NSEC_PER_USEC, 512 * NSEC_PER_USEC, 1024 * NSEC_PER_USEC, 2048 * NSEC_PER_USEC, 4096 * NSEC_PER_USEC, 8192 * NSEC_PER_USEC, 16384 * NSEC_PER_USEC, 32768 * NSEC_PER_USEC};
 uint64_t *cpu_rtime_bins = &cpu_itime_bins[0];
 
-/*
- * The following is set when the KEXT loads and initializes.
- */
+  
+                                                            
+   
 pmDispatch_t    *pmDispatch     = NULL;
 
 uint32_t                pmInitDone              = 0;
@@ -71,9 +71,9 @@ static boolean_t        earlyTopology           = FALSE;
 static uint64_t         earlyMaxBusDelay        = DELAY_UNSET;
 static uint64_t         earlyMaxIntDelay        = DELAY_UNSET;
 
-/*
- * Initialize the Cstate change code.
- */
+  
+                                     
+   
 void
 power_management_init(void)
 {
@@ -97,10 +97,10 @@ machine_classify_interval(uint64_t interval, uint64_t *bins, uint64_t *binvals, 
 uint64_t        idle_pending_timers_processed;
 uint32_t        idle_entry_timer_processing_hdeadline_threshold = 5000000;
 
-/*
- * Called when the CPU is idle.  It calls into the power management kext
- * to determine the best way to idle the CPU.
- */
+  
+                                                                        
+                                             
+   
 void
 machine_idle(void)
 {
@@ -110,14 +110,14 @@ machine_idle(void)
 #if CST_DEMOTION_DEBUG
 	processor_t             cproc = my_cpu->cpu_processor;
 	uint64_t                cwakeups = my_cpu->cpu_wakeups_issued_total;
-#endif /* CST_DEMOTION_DEBUG */
+#endif                         
 	uint64_t esdeadline, ehdeadline;
 	boolean_t do_process_pending_timers = FALSE;
 
 	ctime = mach_absolute_time();
 	esdeadline = my_cpu->rtclock_timer.queue.earliest_soft_deadline;
 	ehdeadline = my_cpu->rtclock_timer.deadline;
-/* Determine if pending timers exist */
+                                       
 	if ((ctime >= esdeadline) && (ctime < ehdeadline) &&
 	    ((ehdeadline - ctime) < idle_entry_timer_processing_hdeadline_threshold)) {
 		idle_pending_timers_processed++;
@@ -147,12 +147,12 @@ machine_idle(void)
 #endif
 
 	if (pmInitDone) {
-		/*
-		 * Handle case where ml_set_maxbusdelay() or ml_set_maxintdelay()
-		 * were called prior to the CPU PM kext being registered.  We do
-		 * this here since we know at this point the values will be first
-		 * used since idle is where the decisions using these values is made.
-		 */
+		  
+                                                                   
+                                                                  
+                                                                   
+                                                                       
+     
 		if (earlyMaxBusDelay != DELAY_UNSET) {
 			ml_set_maxbusdelay((uint32_t)(earlyMaxBusDelay & 0xFFFFFFFF));
 		}
@@ -166,21 +166,21 @@ machine_idle(void)
 	    && pmDispatch->MachineIdle != NULL) {
 		(*pmDispatch->MachineIdle)(0x7FFFFFFFFFFFFFFFULL);
 	} else {
-		/*
-		 * If no power management, re-enable interrupts and halt.
-		 * This will keep the CPU from spinning through the scheduler
-		 * and will allow at least some minimal power savings (but it
-		 * cause problems in some MP configurations w.r.t. the APIC
-		 * stopping during a GV3 transition).
-		 */
+		  
+                                                           
+                                                               
+                                                               
+                                                             
+                                       
+     
 		pal_hlt();
-		/* Once woken, re-disable interrupts. */
+		                                        
 		pal_cli();
 	}
 
-	/*
-	 * Mark the CPU as running again.
-	 */
+	  
+                                  
+    
 	MARK_CPU_ACTIVE(cnum);
 	DBGLOG(cpu_handle, cnum, MP_UNIDLE);
 	my_cpu->lcpu.state = LCPU_RUN;
@@ -206,18 +206,18 @@ machine_idle(void)
 #endif
 
 machine_idle_exit:
-	/*
-	 * Re-enable interrupts.
-	 */
+	  
+                         
+    
 
 	pal_sti();
 
 	if (do_process_pending_timers) {
 		TCOAL_DEBUG(0xBBBB0000 | DBG_FUNC_START, ctime, esdeadline, ehdeadline, idle_pending_timers_processed, 0);
 
-		/* Adjust to reflect that this isn't truly a package idle exit */
+		                                                                 
 		__sync_fetch_and_sub(&my_cpu->lcpu.package->num_idle, 1);
-		lapic_timer_swi(); /* Trigger software timer interrupt */
+		lapic_timer_swi();                                       
 		__sync_fetch_and_add(&my_cpu->lcpu.package->num_idle, 1);
 
 		TCOAL_DEBUG(0xBBBB0000 | DBG_FUNC_END, ctime, esdeadline, idle_pending_timers_processed, 0, 0);
@@ -231,10 +231,10 @@ machine_idle_exit:
 #endif
 }
 
-/*
- * Called when the CPU is to be halted.  It will choose the best C-State
- * to be in.
- */
+  
+                                                                        
+            
+   
 void
 pmCPUHalt(uint32_t reason)
 {
@@ -259,26 +259,26 @@ pmCPUHalt(uint32_t reason)
 		if (pmInitDone
 		    && pmDispatch != NULL
 		    && pmDispatch->pmCPUHalt != NULL) {
-			/*
-			 * Halt the CPU (and put it in a low power state.
-			 */
+			  
+                                                    
+      
 			(*pmDispatch->pmCPUHalt)();
 
-			/*
-			 * We've exited halt, so get the CPU schedulable again.
-			 * - by calling the fast init routine for a slave, or
-			 * - by returning if we're the master processor.
-			 */
+			  
+                                                          
+                                                        
+                                                   
+      
 			if (cpup->cpu_number != master_cpu) {
 				i386_init_slave_fast();
 				panic("init_slave_fast returned");
 			}
 		} else {
-			/*
-			 * If no power managment and a processor is taken off-line,
-			 * then invalidate the cache and halt it (it will not be able
-			 * to be brought back on-line without resetting the CPU).
-			 */
+			  
+                                                              
+                                                                
+                                                            
+      
 			__asm__ volatile ("wbinvd");
 			cpup->lcpu.state = LCPU_HALT;
 			pal_stop_cpu(FALSE);
@@ -378,12 +378,12 @@ pmLockCPUTopology(int lock)
 	}
 }
 
-/*
- * Called to get the next deadline that has been set by the
- * power management code.
- * Note: a return of 0 from AICPM and this routine signifies
- * that no deadline is set.
- */
+  
+                                                           
+                         
+                                                            
+                           
+   
 uint64_t
 pmCPUGetDeadline(cpu_data_t *cpu)
 {
@@ -398,10 +398,10 @@ pmCPUGetDeadline(cpu_data_t *cpu)
 	return deadline;
 }
 
-/*
- * Called to determine if the supplied deadline or the power management
- * deadline is sooner.  Returns which ever one is first.
- */
+  
+                                                                       
+                                                        
+   
 
 uint64_t
 pmCPUSetDeadline(cpu_data_t *cpu, uint64_t deadline)
@@ -415,9 +415,9 @@ pmCPUSetDeadline(cpu_data_t *cpu, uint64_t deadline)
 	return deadline;
 }
 
-/*
- * Called when a power management deadline expires.
- */
+  
+                                                   
+   
 void
 pmCPUDeadline(cpu_data_t *cpu)
 {
@@ -428,9 +428,9 @@ pmCPUDeadline(cpu_data_t *cpu)
 	}
 }
 
-/*
- * Called to get a CPU out of idle.
- */
+  
+                                   
+   
 boolean_t
 pmCPUExitIdle(cpu_data_t *cpu)
 {
@@ -475,9 +475,9 @@ pmCPUExitHaltToOff(int cpu)
 	return rc;
 }
 
-/*
- * Called to initialize the power management structures for the CPUs.
- */
+  
+                                                                     
+   
 void
 pmCPUStateInit(void)
 {
@@ -488,9 +488,9 @@ pmCPUStateInit(void)
 	}
 }
 
-/*
- * Called when a CPU is being restarted after being powered off (as in S3).
- */
+  
+                                                                           
+   
 void
 pmCPUMarkRunning(cpu_data_t *cpu)
 {
@@ -505,9 +505,9 @@ pmCPUMarkRunning(cpu_data_t *cpu)
 	}
 }
 
-/*
- * Called to get/set CPU power management state.
- */
+  
+                                                
+   
 int
 pmCPUControl(uint32_t cmd, void *datap)
 {
@@ -521,10 +521,10 @@ pmCPUControl(uint32_t cmd, void *datap)
 	return rc;
 }
 
-/*
- * Called to save the timer state used by power management prior
- * to "sleeping".
- */
+  
+                                                                
+                 
+   
 void
 pmTimerSave(void)
 {
@@ -534,10 +534,10 @@ pmTimerSave(void)
 	}
 }
 
-/*
- * Called to restore the timer state used by power management after
- * waking from "sleep".
- */
+  
+                                                                   
+                       
+   
 void
 pmTimerRestore(void)
 {
@@ -547,19 +547,19 @@ pmTimerRestore(void)
 	}
 }
 
-/*
- * Set the worst-case time for the C4 to C2 transition.
- * No longer does anything.
- */
+  
+                                                       
+                           
+   
 void
 ml_set_maxsnoop(__unused uint32_t maxdelay)
 {
 }
 
 
-/*
- * Get the worst-case time for the C4 to C2 transition.  Returns nanoseconds.
- */
+  
+                                                                             
+   
 unsigned
 ml_get_maxsnoop(void)
 {
@@ -589,9 +589,9 @@ ml_get_maxbusdelay(void)
 	return (uint32_t)(max_delay & 0xffffffff);
 }
 
-/*
- * Advertise a memory access latency tolerance of "mdelay" ns
- */
+  
+                                                             
+   
 void
 ml_set_maxbusdelay(uint32_t mdelay)
 {
@@ -619,9 +619,9 @@ ml_get_maxintdelay(void)
 	return max_delay;
 }
 
-/*
- * Set the maximum delay allowed for an interrupt.
- */
+  
+                                                  
+   
 void
 ml_set_maxintdelay(uint64_t mdelay)
 {
@@ -648,13 +648,13 @@ ml_get_interrupt_prewake_applicable()
 	return applicable;
 }
 
-/*
- * Put a CPU into "safe" mode with respect to power.
- *
- * Some systems cannot operate at a continuous "normal" speed without
- * exceeding the thermal design.  This is called per-CPU to place the
- * CPUs into a "safe" operating mode.
- */
+  
+                                                    
+  
+                                                                     
+                                                                     
+                                     
+   
 void
 pmSafeMode(x86_lcpu_t *lcpu, uint32_t flags)
 {
@@ -662,16 +662,16 @@ pmSafeMode(x86_lcpu_t *lcpu, uint32_t flags)
 	    && pmDispatch->pmCPUSafeMode != NULL) {
 		pmDispatch->pmCPUSafeMode(lcpu, flags);
 	} else {
-		/*
-		 * Do something reasonable if the KEXT isn't present.
-		 *
-		 * We only look at the PAUSE and RESUME flags.  The other flag(s)
-		 * will not make any sense without the KEXT, so just ignore them.
-		 *
-		 * We set the CPU's state to indicate that it's halted.  If this
-		 * is the CPU we're currently running on, then spin until the
-		 * state becomes non-halted.
-		 */
+		  
+                                                       
+    
+                                                                   
+                                                                   
+    
+                                                                  
+                                                               
+                              
+     
 		if (flags & PM_SAFE_FL_PAUSE) {
 			lcpu->state = LCPU_PAUSE;
 			if (lcpu == x86_lcpu()) {
@@ -681,10 +681,10 @@ pmSafeMode(x86_lcpu_t *lcpu, uint32_t flags)
 			}
 		}
 
-		/*
-		 * Clear the halted flag for the specified CPU, that will
-		 * get it out of it's spin loop.
-		 */
+		  
+                                                           
+                                  
+     
 		if (flags & PM_SAFE_FL_RESUME) {
 			lcpu->state = LCPU_RUN;
 		}
@@ -804,10 +804,10 @@ thread_tell_urgency(thread_urgency_t urgency,
 		delta = mach_absolute_time() - urgency_notification_time_start;
 
 		if (__improbable(delta > urgency_notification_max_recorded)) {
-			/* This is not synchronized, but it doesn't matter
-			 * if we (rarely) miss an event, as it is statistically
-			 * unlikely that it will never recur.
-			 */
+			                                                  
+                                                          
+                                        
+      
 			urgency_notification_max_recorded = delta;
 
 			if (__improbable((delta > urgency_notification_assert_abstime_threshold) && !machine_timeout_suspended())) {
@@ -892,9 +892,9 @@ pmGetSavedRunCount(void)
 	return saved_run_count;
 }
 
-/*
- * Returns the root of the package tree.
- */
+  
+                                        
+   
 x86_pkg_t *
 pmGetPkgRoot(void)
 {
@@ -939,11 +939,11 @@ pmSendIPI(int cpu)
 static void
 pmGetNanotimeInfo(pm_rtc_nanotime_t *rtc_nanotime)
 {
-	/*
-	 * Make sure that nanotime didn't change while we were reading it.
-	 */
+	  
+                                                                   
+    
 	do {
-		rtc_nanotime->generation = pal_rtc_nanotime_info.generation; /* must be first */
+		rtc_nanotime->generation = pal_rtc_nanotime_info.generation;                    
 		rtc_nanotime->tsc_base = pal_rtc_nanotime_info.tsc_base;
 		rtc_nanotime->ns_base = pal_rtc_nanotime_info.ns_base;
 		rtc_nanotime->scale = pal_rtc_nanotime_info.scale;
@@ -955,19 +955,19 @@ pmGetNanotimeInfo(pm_rtc_nanotime_t *rtc_nanotime)
 uint32_t
 pmTimerQueueMigrate(int target_cpu)
 {
-	/* Call the etimer code to do this. */
+	                                      
 	return (target_cpu != cpu_number())
 	       ? timer_queue_migrate_cpu(target_cpu)
 	       : 0;
 }
 
 
-/*
- * Called by the power management kext to register itself and to get the
- * callbacks it might need into other kernel functions.  This interface
- * is versioned to allow for slight mis-matches between the kext and the
- * kernel.
- */
+  
+                                                                        
+                                                                       
+                                                                        
+          
+   
 void
 pmKextRegister(uint32_t version, pmDispatch_t *cpuFuncs,
     pmCallBacks_t *callbacks)
@@ -1023,9 +1023,9 @@ pmKextRegister(uint32_t version, pmDispatch_t *cpuFuncs,
 	}
 }
 
-/*
- * Unregisters the power management functions from the kext.
- */
+  
+                                                            
+   
 void
 pmUnRegister(pmDispatch_t *cpuFuncs)
 {

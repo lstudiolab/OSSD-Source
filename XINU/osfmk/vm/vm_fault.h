@@ -53,13 +53,13 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_fault.h
- *
- *	Page fault handling module declarations.
- */
+  
+   
+  
+                      
+  
+                                           
+   
 
 #ifndef _VM_VM_FAULT_H_
 #define _VM_VM_FAULT_H_
@@ -80,11 +80,11 @@ typedef kern_return_t   vm_fault_return_t;
 #define VM_FAULT_INTERRUPTED            2
 #define VM_FAULT_MEMORY_SHORTAGE        3
 #define VM_FAULT_MEMORY_ERROR           5
-#define VM_FAULT_SUCCESS_NO_VM_PAGE     6       /* success but no VM page */
+#define VM_FAULT_SUCCESS_NO_VM_PAGE     6                                   
 
-/*
- *	Page fault handling based on vm_map (or entries therein)
- */
+  
+                                                           
+   
 
 extern kern_return_t vm_fault(
 	vm_map_t        map,
@@ -92,7 +92,7 @@ extern kern_return_t vm_fault(
 	vm_prot_t       fault_type,
 	boolean_t       change_wiring,
 #if XNU_KERNEL_PRIVATE
-	vm_tag_t        wire_tag,                   /* if wiring must pass tag != VM_KERN_MEMORY_NONE */
+	vm_tag_t        wire_tag,                                                                       
 #endif
 	int             interruptible,
 	pmap_t          pmap,
@@ -112,7 +112,7 @@ extern void vm_pre_fault(vm_map_offset_t, vm_prot_t);
 
 extern void vm_fault_init(void);
 
-/* exported kext version */
+                           
 extern kern_return_t vm_fault_external(
 	vm_map_t        map,
 	vm_map_offset_t vaddr,
@@ -122,29 +122,29 @@ extern kern_return_t vm_fault_external(
 	pmap_t          caller_pmap,
 	vm_map_offset_t caller_pmap_addr);
 
-/*
- *	Page fault handling based on vm_object only.
- */
+  
+                                               
+   
 
 extern vm_fault_return_t vm_fault_page(
-	/* Arguments: */
-	vm_object_t     first_object,           /* Object to begin search */
-	vm_object_offset_t first_offset,        /* Offset into object */
-	vm_prot_t       fault_type,             /* What access is requested */
-	boolean_t       must_be_resident,        /* Must page be resident? */
-	boolean_t       caller_lookup,          /* caller looked up page */
-	/* Modifies in place: */
-	vm_prot_t       *protection,            /* Protection for mapping */
-	vm_page_t       *result_page,           /* Page found, if successful */
-	/* Returns: */
-	vm_page_t       *top_page,              /* Page in top object, if
-                                                 * not result_page.  */
-	int             *type_of_fault,         /* if non-zero, return COW, zero-filled, etc...
-                                                 * used by kernel trace point in vm_fault */
-	/* More arguments: */
-	kern_return_t   *error_code,            /* code if page is in error */
-	boolean_t       no_zero_fill,           /* don't fill absent pages */
-	boolean_t       data_supply,            /* treat as data_supply */
+	                
+	vm_object_t     first_object,                                       
+	vm_object_offset_t first_offset,                                
+	vm_prot_t       fault_type,                                           
+	boolean_t       must_be_resident,                                    
+	boolean_t       caller_lookup,                                     
+	                        
+	vm_prot_t       *protection,                                        
+	vm_page_t       *result_page,                                          
+	              
+	vm_page_t       *top_page,                                       
+                                                                       
+	int             *type_of_fault,                                                        
+                                                                                            
+	                     
+	kern_return_t   *error_code,                                          
+	boolean_t       no_zero_fill,                                        
+	boolean_t       data_supply,                                      
 	vm_object_fault_info_t fault_info);
 
 extern void vm_fault_cleanup(
@@ -170,7 +170,7 @@ extern void vm_fault_unwire(
 extern kern_return_t    vm_fault_copy(
 	vm_object_t             src_object,
 	vm_object_offset_t      src_offset,
-	vm_map_size_t           *copy_size,             /* INOUT */
+	vm_map_size_t           *copy_size,                        
 	vm_object_t             dst_object,
 	vm_object_offset_t      dst_offset,
 	vm_map_t                dst_map,
@@ -187,7 +187,7 @@ extern kern_return_t vm_fault_enter(
 	vm_prot_t fault_type,
 	boolean_t wired,
 	boolean_t change_wiring,
-	vm_tag_t  wire_tag,             /* if wiring must pass tag != VM_KERN_MEMORY_NONE */
+	vm_tag_t  wire_tag,                                                                 
 	vm_object_fault_info_t fault_info,
 	boolean_t *need_retry,
 	int *type_of_fault);
@@ -196,7 +196,7 @@ extern vm_offset_t kdp_lightweight_fault(
 	vm_map_t map,
 	vm_offset_t cur_target_addr);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 #if XNU_KERNEL_PRIVATE
 
@@ -204,6 +204,6 @@ boolean_t NEED_TO_HARD_THROTTLE_THIS_TASK(void);
 
 #endif
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
-#endif  /* _VM_VM_FAULT_H_ */
+#endif                       

@@ -30,8 +30,8 @@
 #define _STRUCT_USER32_TIMEVAL          struct user32_timeval
 _STRUCT_USER32_TIMEVAL
 {
-	user32_time_t           tv_sec;         /* seconds */
-	__int32_t               tv_usec;        /* and microseconds */
+	user32_time_t           tv_sec;                      
+	__int32_t               tv_usec;                              
 };
-#endif /* _STRUCT_USER32_TIMEVAL */
-#endif /* KERNEL */
+#endif                             
+#endif             

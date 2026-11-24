@@ -57,12 +57,12 @@ struct IOInterruptSourcePrivate {
 };
 typedef struct IOInterruptSourcePrivate IOInterruptSourcePrivate;
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 
-#endif /* __cplusplus */
+#endif                  
 
 typedef void (*IOInterruptHandler)(void *target, void *refCon,
     void *nub, int source);
 
-#endif /* ! _IOKIT_IOINTERRUPTS_H */
+#endif                              

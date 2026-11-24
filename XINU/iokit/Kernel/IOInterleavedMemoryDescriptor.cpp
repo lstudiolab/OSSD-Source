@@ -36,17 +36,17 @@ IOInterleavedMemoryDescriptor * IOInterleavedMemoryDescriptor::withCapacity(
 	IOByteCount           capacity,
 	IODirection           direction )
 {
-	//
-	// Create a new IOInterleavedMemoryDescriptor.  The "buffer" will be made up
-	// of several memory descriptors, that are to be chained end-to-end to make up
-	// a single memory descriptor.
-	//
+	  
+	                                                                            
+	                                                                              
+	                              
+	  
 
 	IOInterleavedMemoryDescriptor * me = new IOInterleavedMemoryDescriptor;
 
 	if (me && !me->initWithCapacity(
-		    /* capacity  */ capacity,
-		    /* direction */ direction )) {
+		                    capacity,
+		                    direction )) {
 		me->release();
 		me = NULL;
 	}
@@ -59,25 +59,25 @@ IOInterleavedMemoryDescriptor::initWithCapacity(
 	IOByteCount           capacity,
 	IODirection           direction )
 {
-	//
-	// Initialize an IOInterleavedMemoryDescriptor. The "buffer" will be made up
-	// of several memory descriptors, that are to be chained end-to-end to make up
-	// a single memory descriptor.
-	//
+	  
+	                                                                            
+	                                                                              
+	                              
+	  
 
 	assert(capacity);
 
-	// Ask our superclass' opinion.
+	                               
 	if (super::init() == false) {
 		return false;
 	}
 
-	// Initialize our minimal state.
+	                                
 
 	_flags                  = direction;
 #ifndef __LP64__
 	_direction              = (IODirection) (_flags & kIOMemoryDirectionMask);
-#endif /* !__LP64__ */
+#endif                
 	_length                 = 0;
 	_mappings               = NULL;
 	_tag                    = 0;
@@ -116,7 +116,7 @@ IOInterleavedMemoryDescriptor::clearMemoryDescriptors( IODirection direction )
 		_flags = (_flags & ~kIOMemoryDirectionMask) | direction;
 #ifndef __LP64__
 		_direction = (IODirection) (_flags & kIOMemoryDirectionMask);
-#endif /* !__LP64__ */
+#endif                
 	}
 
 	_descriptorCount = 0;
@@ -139,8 +139,8 @@ IOInterleavedMemoryDescriptor::setMemoryDescriptor(
 		return false;
 	}
 
-//    if ( descriptor->getDirection() != getDirection() )
-//        return false;
+                                                         
+                       
 
 	descriptor->retain();
 	_descriptors[_descriptorCount] = descriptor;
@@ -157,9 +157,9 @@ IOInterleavedMemoryDescriptor::setMemoryDescriptor(
 void
 IOInterleavedMemoryDescriptor::free()
 {
-	//
-	// Free all of this object's outstanding resources.
-	//
+	  
+	                                                   
+	  
 
 	if (_descriptors) {
 		for (unsigned index = 0; index < _descriptorCount; index++) {
@@ -185,13 +185,13 @@ IOInterleavedMemoryDescriptor::free()
 IOReturn
 IOInterleavedMemoryDescriptor::prepare(IODirection forDirection)
 {
-	//
-	// Prepare the memory for an I/O transfer.
-	//
-	// This involves paging in the memory and wiring it down for the duration
-	// of the transfer.  The complete() method finishes the processing of the
-	// memory after the I/O transfer finishes.
-	//
+	  
+	                                          
+	  
+	                                                                         
+	                                                                         
+	                                          
+	  
 
 	unsigned index;
 	IOReturn status = kIOReturnSuccess;
@@ -225,13 +225,13 @@ IOInterleavedMemoryDescriptor::prepare(IODirection forDirection)
 IOReturn
 IOInterleavedMemoryDescriptor::complete(IODirection forDirection)
 {
-	//
-	// Complete processing of the memory after an I/O transfer finishes.
-	//
-	// This method shouldn't be called unless a prepare() was previously issued;
-	// the prepare() and complete() must occur in pairs, before and after an I/O
-	// transfer.
-	//
+	  
+	                                                                    
+	  
+	                                                                            
+	                                                                            
+	            
+	  
 
 	IOReturn status;
 	IOReturn statusFinal = kIOReturnSuccess;
@@ -259,11 +259,11 @@ IOInterleavedMemoryDescriptor::getPhysicalSegment(
 	IOByteCount * length,
 	IOOptionBits  options )
 {
-	//
-	// This method returns the physical address of the byte at the given offset
-	// into the memory,  and optionally the length of the physically contiguous
-	// segment from that offset.
-	//
+	  
+	                                                                           
+	                                                                           
+	                            
+	  
 
 	addr64_t pa;
 

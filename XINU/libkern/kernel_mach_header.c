@@ -25,29 +25,29 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File: libkern/kernel_mach_header.c
- *
- *	Functions for accessing mach-o headers.
- *
- * NOTE:	This file supports only kernel mach headers at the present
- *		time; it's primary use is by kld, and all externally
- *		referenced routines at the present time operate against
- *		the kernel mach header _mh_execute_header, which is the
- *		header for the currently executing kernel.
- *
- */
+  
+                                     
+  
+                                          
+  
+                                                                   
+                                                        
+                                                           
+                                                           
+                                              
+  
+   
 
 #include <vm/vm_map.h>
 #include <vm/vm_kern.h>
 #include <libkern/kernel_mach_header.h>
-#include <string.h>             // from libsa
+#include <string.h>                          
 
-/*
- * return the last address (first avail)
- *
- * This routine operates against the currently executing kernel only
- */
+  
+                                        
+  
+                                                                    
+   
 vm_offset_t
 getlastaddr(void)
 {
@@ -69,10 +69,10 @@ getlastaddr(void)
 	return last_addr;
 }
 
-/*
- * Find the specified load command in the Mach-O headers, and return
- * the command. If there is no such load command, NULL is returned.
- */
+  
+                                                                    
+                                                                   
+   
 void *
 getcommandfromheader(kernel_mach_header_t *mhp, uint32_t cmd)
 {
@@ -91,11 +91,11 @@ getcommandfromheader(kernel_mach_header_t *mhp, uint32_t cmd)
 	return NULL;
 }
 
-/*
- * Find the UUID load command in the Mach-O headers, and return
- * the address of the UUID blob and size in "*size". If the
- * Mach-O image is missing a UUID, NULL is returned.
- */
+  
+                                                               
+                                                           
+                                                    
+   
 void *
 getuuidfromheader(kernel_mach_header_t *mhp, unsigned long *size)
 {
@@ -112,14 +112,14 @@ getuuidfromheader(kernel_mach_header_t *mhp, unsigned long *size)
 	return NULL;
 }
 
-/*
- * This routine returns the a pointer to the data for the named section in the
- * named segment if it exist in the mach header passed to it.  Also it returns
- * the size of the section data indirectly through the pointer size.  Otherwise
- *  it returns zero for the pointer and the size.
- *
- * This routine can operate against any kernel mach header.
- */
+  
+                                                                              
+                                                                              
+                                                                               
+                                                 
+  
+                                                           
+   
 void *
 getsectdatafromheader(
 	kernel_mach_header_t *mhp,
@@ -140,13 +140,13 @@ getsectdatafromheader(
 	return result;
 }
 
-/*
- * This routine returns the offset for the named section in the
- * named segment if it exist in the mach header passed to it. Otherwise
- *  it returns zero.
- *
- * This routine can operate against any kernel mach header.
- */
+  
+                                                               
+                                                                       
+                    
+  
+                                                           
+   
 uint32_t
 getsectoffsetfromheader(
 	kernel_mach_header_t *mhp,
@@ -163,12 +163,12 @@ getsectoffsetfromheader(
 	return sp->offset;
 }
 
-/*
- * This routine returns the a pointer to the data for the named segment
- * if it exist in the mach header passed to it.  Also it returns
- * the size of the segment data indirectly through the pointer size.
- * Otherwise it returns zero for the pointer and the size.
- */
+  
+                                                                       
+                                                                
+                                                                    
+                                                          
+   
 void *
 getsegdatafromheader(
 	kernel_mach_header_t *mhp,
@@ -188,13 +188,13 @@ getsegdatafromheader(
 	return result;
 }
 
-/*
- * This routine returns the section structure for the named section in the
- * named segment for the mach_header pointer passed to it if it exist.
- * Otherwise it returns zero.
- *
- * This routine can operate against any kernel mach header.
- */
+  
+                                                                          
+                                                                      
+                             
+  
+                                                           
+   
 kernel_section_t *
 getsectbynamefromheader(
 	kernel_mach_header_t *mhp,
@@ -230,9 +230,9 @@ getsectbynamefromheader(
 	return (kernel_section_t *)NULL;
 }
 
-/*
- * This routine can operate against any kernel mach header.
- */
+  
+                                                           
+   
 kernel_segment_command_t *
 getsegbynamefromheader(
 	kernel_mach_header_t    *header,
@@ -253,9 +253,9 @@ getsegbynamefromheader(
 	return (kernel_segment_command_t *)NULL;
 }
 
-/*
- * Return the first segment_command in the header.
- */
+  
+                                                  
+   
 kernel_segment_command_t *
 firstseg(void)
 {
@@ -278,11 +278,11 @@ firstsegfromheader(kernel_mach_header_t *header)
 	return (kernel_segment_command_t *)NULL;
 }
 
-/*
- * This routine operates against any kernel mach segment_command structure
- * pointer and the provided kernel header, to obtain the sequentially next
- * segment_command structure in that header.
- */
+  
+                                                                          
+                                                                          
+                                            
+   
 kernel_segment_command_t *
 nextsegfromheader(
 	kernel_mach_header_t    *header,
@@ -292,16 +292,16 @@ nextsegfromheader(
 	kernel_segment_command_t *sgp = (kernel_segment_command_t *)
 	    ((uintptr_t)header + sizeof(*header));
 
-	/* Find the index of the passed-in segment */
+	                                             
 	for (i = 0; sgp != seg && i < header->ncmds; i++) {
 		sgp = (kernel_segment_command_t *)((uintptr_t)sgp + sgp->cmdsize);
 	}
 
-	/* Increment to the next load command */
+	                                        
 	i++;
 	sgp = (kernel_segment_command_t *)((uintptr_t)sgp + sgp->cmdsize);
 
-	/* Return the next segment command, if any */
+	                                             
 	for (; i < header->ncmds; i++) {
 		if (sgp->cmd == LC_SEGMENT_KERNEL) {
 			return sgp;
@@ -314,21 +314,21 @@ nextsegfromheader(
 }
 
 
-/*
- * Return the address of the named Mach-O segment from the currently
- * executing kernel kernel, or NULL.
- */
+  
+                                                                    
+                                    
+   
 kernel_segment_command_t *
 getsegbyname(const char *seg_name)
 {
 	return getsegbynamefromheader(&_mh_execute_header, seg_name);
 }
 
-/*
- * This routine returns the a pointer the section structure of the named
- * section in the named segment if it exists in the currently executing
- * kernel, which it is presumed to be linked into.  Otherwise it returns NULL.
- */
+  
+                                                                        
+                                                                       
+                                                                              
+   
 kernel_section_t *
 getsectbyname(
 	const char *segname,
@@ -338,12 +338,12 @@ getsectbyname(
 		(kernel_mach_header_t *)&_mh_execute_header, segname, sectname);
 }
 
-/*
- * This routine can operate against any kernel segment_command structure to
- * return the first kernel section immediately following that structure.  If
- * there are no sections associated with the segment_command structure, it
- * returns NULL.
- */
+  
+                                                                           
+                                                                            
+                                                                          
+                
+   
 kernel_section_t *
 firstsect(kernel_segment_command_t *sgp)
 {
@@ -354,12 +354,12 @@ firstsect(kernel_segment_command_t *sgp)
 	return (kernel_section_t *)(sgp + 1);
 }
 
-/*
- * This routine can operate against any kernel segment_command structure and
- * kernel section to return the next consecutive  kernel section immediately
- * following the kernel section provided.  If there are no sections following
- * the provided section, it returns NULL.
- */
+  
+                                                                            
+                                                                            
+                                                                             
+                                         
+   
 kernel_section_t *
 nextsect(kernel_segment_command_t *sgp, kernel_section_t *sp)
 {

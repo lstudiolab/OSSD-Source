@@ -42,7 +42,7 @@ cc_clear(size_t len, void *dst)
 	FIPSPOST_TRACE_EVENT;
 	memset_s(dst, len, 0, len);
 }
-#elif defined(_WIN32) && !defined(__clang__) //Clang with Microsoft CodeGen, doesn't support SecureZeroMemory
+#elif defined(_WIN32) && !defined(__clang__)                                                                 
 #include <windows.h>
 static void
 cc_clear(size_t len, void *dst)

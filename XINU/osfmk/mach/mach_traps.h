@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Definitions of general Mach system traps.
- *
- *	These are the definitions as seen from user-space.
- *	The kernel definitions are in <mach/syscall_sw.h>.
- *	Kernel RPC functions are defined in <mach/mach_interface.h>.
- */
+  
+   
+  
+                                            
+  
+                                                     
+                                                     
+                                                               
+   
 
 #ifndef _MACH_MACH_TRAPS_H_
 #define _MACH_MACH_TRAPS_H_
@@ -141,7 +141,7 @@ extern kern_return_t semaphore_timedwait_signal_trap(
 	unsigned int sec,
 	clock_res_t nsec);
 
-#endif  /* PRIVATE */
+#endif               
 
 extern kern_return_t clock_sleep_trap(
 	mach_port_name_t clock_name,
@@ -333,9 +333,9 @@ extern kern_return_t _kernelrpc_mach_port_request_notification_trap(
 	mach_msg_type_name_t notifyPoly,
 	mach_port_name_t *previous);
 
-/*
- *	Obsolete interfaces.
- */
+  
+                       
+   
 
 extern kern_return_t task_for_pid(
 	mach_port_name_t target_tport,
@@ -356,15 +356,15 @@ extern kern_return_t debug_control_port_for_pid(
 	int pid,
 	mach_port_name_t *t);
 
-#else   /* KERNEL */
+#else               
 
 #ifdef  XNU_KERNEL_PRIVATE
 
-/* Syscall data translations routines
- *
- * The kernel may support multiple userspace ABIs, and must use
- * argument structures with elements large enough for any of them.
- */
+                                     
+  
+                                                               
+                                                                  
+   
 #if CONFIG_REQUIRES_U32_MUNGING
 #define PAD_(t) (sizeof(uint64_t) <= sizeof(t) \
 	        ? 0 : sizeof(uint64_t) - sizeof(t))
@@ -390,12 +390,12 @@ extern kern_return_t debug_control_port_for_pid(
 #define PAD_ARG_(arg_type, arg_name) \
   char arg_name##_l_[PADL_(arg_type)]; arg_type arg_name; char arg_name##_r_[PADR_(arg_type)]
 
-/*
- * To support 32-bit clients as well as 64-bit clients, argument
- * structures may need to be munged to repack the arguments. All
- * active architectures do this inline in the code to dispatch Mach
- * traps, without calling out to the BSD system call mungers.
- */
+  
+                                                                
+                                                                
+                                                                   
+                                                             
+   
 
 struct kern_invalid_args {
 	int32_t dummy;
@@ -442,7 +442,7 @@ struct mach_msg_overwrite_trap_args {
 	PAD_ARG_(mach_msg_timeout_t, timeout);
 	PAD_ARG_(mach_msg_priority_t, priority);
 	PAD_ARG_8
-	    PAD_ARG_(user_addr_t, rcv_msg); /* Unused on mach_msg_trap */
+	    PAD_ARG_(user_addr_t, rcv_msg);                              
 };
 extern mach_msg_return_t mach_msg_trap(
 	struct mach_msg_overwrite_trap_args *args);
@@ -650,38 +650,38 @@ extern kern_return_t mk_timer_cancel_trap(
 	struct mk_timer_cancel_trap_args *args);
 
 struct _kernelrpc_mach_vm_allocate_trap_args {
-	PAD_ARG_(mach_port_name_t, target);     /* 1 word */
-	PAD_ARG_(user_addr_t, addr);            /* 1 word */
-	PAD_ARG_(mach_vm_size_t, size);         /* 2 words */
-	PAD_ARG_(int, flags);                   /* 1 word */
-};                                              /* Total: 5 */
+	PAD_ARG_(mach_port_name_t, target);                 
+	PAD_ARG_(user_addr_t, addr);                        
+	PAD_ARG_(mach_vm_size_t, size);                      
+	PAD_ARG_(int, flags);                               
+};                                                            
 
 extern kern_return_t _kernelrpc_mach_vm_allocate_trap(
 	struct _kernelrpc_mach_vm_allocate_trap_args *args);
 
 struct _kernelrpc_mach_vm_deallocate_args {
-	PAD_ARG_(mach_port_name_t, target);     /* 1 word */
-	PAD_ARG_(mach_vm_address_t, address);   /* 2 words */
-	PAD_ARG_(mach_vm_size_t, size);         /* 2 words */
-};                                              /* Total: 5 */
+	PAD_ARG_(mach_port_name_t, target);                 
+	PAD_ARG_(mach_vm_address_t, address);                
+	PAD_ARG_(mach_vm_size_t, size);                      
+};                                                            
 extern kern_return_t _kernelrpc_mach_vm_deallocate_trap(
 	struct _kernelrpc_mach_vm_deallocate_args *args);
 
 struct task_dyld_process_info_notify_get_trap_args {
-	PAD_ARG_(mach_vm_address_t, names_addr);     /* 2 words */
-	PAD_ARG_(mach_vm_address_t, names_count_addr);  /* 2 words */
-};                                               /* Total: 4 */
+	PAD_ARG_(mach_vm_address_t, names_addr);                  
+	PAD_ARG_(mach_vm_address_t, names_count_addr);               
+};                                                             
 
 extern kern_return_t task_dyld_process_info_notify_get_trap(
 	struct task_dyld_process_info_notify_get_trap_args *args);
 
 struct _kernelrpc_mach_vm_protect_args {
-	PAD_ARG_(mach_port_name_t, target);     /* 1 word */
-	PAD_ARG_(mach_vm_address_t, address);   /* 2 words */
-	PAD_ARG_(mach_vm_size_t, size);         /* 2 words */
-	PAD_ARG_(boolean_t, set_maximum);       /* 1 word */
-	PAD_ARG_(vm_prot_t, new_protection);    /* 1 word */
-};                                              /* Total: 7 */
+	PAD_ARG_(mach_port_name_t, target);                 
+	PAD_ARG_(mach_vm_address_t, address);                
+	PAD_ARG_(mach_vm_size_t, size);                      
+	PAD_ARG_(boolean_t, set_maximum);                   
+	PAD_ARG_(vm_prot_t, new_protection);                
+};                                                            
 extern kern_return_t _kernelrpc_mach_vm_protect_trap(
 	struct _kernelrpc_mach_vm_protect_args *args);
 
@@ -698,11 +698,11 @@ extern kern_return_t _kernelrpc_mach_vm_map_trap(
 	struct _kernelrpc_mach_vm_map_trap_args *args);
 
 struct _kernelrpc_mach_vm_purgable_control_trap_args {
-	PAD_ARG_(mach_port_name_t, target);     /* 1 word */
-	PAD_ARG_(mach_vm_offset_t, address);    /* 2 words */
-	PAD_ARG_(vm_purgable_t, control);       /* 1 word */
-	PAD_ARG_(user_addr_t, state);           /* 1 word */
-};                                              /* Total: 5 */
+	PAD_ARG_(mach_port_name_t, target);                 
+	PAD_ARG_(mach_vm_offset_t, address);                 
+	PAD_ARG_(vm_purgable_t, control);                   
+	PAD_ARG_(user_addr_t, state);                       
+};                                                            
 
 extern kern_return_t _kernelrpc_mach_vm_purgable_control_trap(
 	struct _kernelrpc_mach_vm_purgable_control_trap_args *args);
@@ -817,9 +817,9 @@ struct mach_generate_activity_id_args {
 extern kern_return_t mach_generate_activity_id(
 	struct mach_generate_activity_id_args *args);
 
-/*
- * Voucher trap interfaces
- */
+  
+                          
+   
 
 struct host_create_mach_voucher_args {
 	PAD_ARG_(mach_port_name_t, host);
@@ -861,7 +861,7 @@ extern kern_return_t _kernelrpc_mach_port_request_notification_trap(
 	struct _kernelrpc_mach_port_request_notification_args *args);
 
 
-/* not published to LP64 clients yet */
+                                       
 struct iokit_user_client_trap_args {
 	PAD_ARG_(void *, userClientRef);
 	PAD_ARG_(uint32_t, index);
@@ -882,10 +882,10 @@ kern_return_t iokit_user_client_trap(
 #undef PAD_ARG_
 #undef PAD_ARG_8
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* KERNEL */
+#endif              
 
 __END_DECLS
 
-#endif  /* _MACH_MACH_TRAPS_H_ */
+#endif                           

@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOContainers.h created by rsulack on Fri 26-Jun-1998 */
+                                                          
 
 #ifndef _OS_OSCONTAINERS_H
 #define _OS_OSCONTAINERS_H
@@ -46,4 +46,4 @@
 #include <libkern/c++/OSSerialize.h>
 #include <libkern/c++/OSUnserialize.h>
 
-#endif /* ! _OS_OSCONTAINERS_H */
+#endif                           

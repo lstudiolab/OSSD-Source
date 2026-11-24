@@ -34,37 +34,37 @@
 extern bool kppet_lightweight_active;
 extern _Atomic uint32_t kppet_gencount;
 
-/*
- * If `actionid` is non-zero, set up PET to sample the action.  Otherwise,
- * disable PET.
- */
+  
+                                                                          
+               
+   
 void kppet_config(unsigned int actionid);
 
-/*
- * Reset PET back to its default settings.
- */
+  
+                                          
+   
 void kppet_reset(void);
 
-/*
- * Notify PET that new threads are switching on-CPU.
- */
+  
+                                                    
+   
 void kppet_on_cpu(thread_t thread, thread_continue_t continuation,
     uintptr_t *starting_frame);
 
-/*
- * Wake the PET thread from its timer handler.
- */
+  
+                                              
+   
 void kppet_wake_thread(void);
 
-/*
- * For configuring PET from the sysctl interface.
- */
+  
+                                                 
+   
 int kppet_get_idle_rate(void);
 int kppet_set_idle_rate(int new_idle_rate);
 int kppet_get_lightweight_pet(void);
 int kppet_set_lightweight_pet(int on);
 
-/*
- * Update whether lightweight PET is active when turning sampling on and off.
- */
+  
+                                                                             
+   
 void kppet_lightweight_active_update(void);

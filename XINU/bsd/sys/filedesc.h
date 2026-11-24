@@ -66,22 +66,22 @@
 
 #include <sys/appleapiopts.h>
 
-/*
- * This structure is used for the management of descriptors.  It may be
- * shared by multiple processes.
- *
- * A process is initially started out with NDFILE descriptors [XXXstored within
- * this structureXXX], selected to be enough for typical applications based on
- * the historical limit of 20 open files (and the usage of descriptors by
- * shells).  If these descriptors are exhausted, a larger descriptor table
- * may be allocated, up to a process' resource limit; [XXXthe internal arrays
- * are then unusedXXX].  The initial expansion is set to NDEXTENT; each time
- * it runs out, it is doubled until the resource limit is reached. NDEXTENT
- * should be selected to be the biggest multiple of OFILESIZE (see below)
- * that will fit in a power-of-two sized piece of memory.
- */
-#define NDFILE          25              /* 125 bytes */
-#define NDEXTENT        50              /* 250 bytes in 256-byte alloc. */
+  
+                                                                       
+                                
+  
+                                                                               
+                                                                              
+                                                                         
+                                                                          
+                                                                             
+                                                                            
+                                                                           
+                                                                         
+                                                         
+   
+#define NDFILE          25                             
+#define NDEXTENT        50                                                
 
 #ifdef BSD_KERNEL_PRIVATE
 
@@ -91,142 +91,142 @@ struct klist;
 struct kqwllist;
 
 struct filedesc {
-	struct  fileproc **fd_ofiles;   /* file structures for open files */
-	lck_mtx_t fd_kqhashlock;        /* lock for dynamic kqueue hash */
-	u_long  fd_kqhashmask;          /* size of dynamic kqueue hash */
-	struct  kqwllist *fd_kqhash;    /* hash table for dynamic kqueues */
-	struct  kqworkq *fd_wqkqueue;   /* the workq kqueue */
-	char    *fd_ofileflags;         /* per-process open file flags */
-	struct  vnode *fd_cdir;         /* current directory */
-	struct  vnode *fd_rdir;         /* root directory */
-	int     fd_nfiles;              /* number of open files allocated */
-	int     fd_lastfile;            /* high-water mark of fd_ofiles */
-	int     fd_freefile;            /* approx. next free file */
-	mode_t  fd_cmask;               /* mask for file creation */
+	struct  fileproc **fd_ofiles;                                       
+	lck_mtx_t fd_kqhashlock;                                          
+	u_long  fd_kqhashmask;                                           
+	struct  kqwllist *fd_kqhash;                                        
+	struct  kqworkq *fd_wqkqueue;                         
+	char    *fd_ofileflags;                                          
+	struct  vnode *fd_cdir;                                
+	struct  vnode *fd_rdir;                             
+	int     fd_nfiles;                                                  
+	int     fd_lastfile;                                              
+	int     fd_freefile;                                        
+	mode_t  fd_cmask;                                           
 	int     fd_flags;
-	int     fd_knlistsize;          /* size of knlist */
-	struct  klist *fd_knlist;       /* list of attached knotes */
-	u_long  fd_knhashmask;          /* size of knhash */
-	struct  klist *fd_knhash;       /* hash table for attached knotes */
-	lck_mtx_t fd_knhashlock;        /* lock for hash table for attached knotes */
+	int     fd_knlistsize;                              
+	struct  klist *fd_knlist;                                    
+	u_long  fd_knhashmask;                              
+	struct  klist *fd_knhash;                                           
+	lck_mtx_t fd_knhashlock;                                                     
 };
 
-/*
- * definitions for fd_flags;
- */
-#define FD_CHROOT       0x01    /* process was chrooted... keep track even */
-                                /* if we're force unmounted and unable to */
-                                /* take a vnode_ref on fd_rdir during a fork */
+  
+                            
+   
+#define FD_CHROOT       0x01                                                 
+                                                                            
+                                                                               
 
-#define FD_WORKLOOP     0x02    /* process has created a kqworkloop that */
-                                /* requires manual cleanup on exit */
+#define FD_WORKLOOP     0x02                                               
+                                                                     
 
-/*
- * Per-process open flags.
- */
-#define UF_EXCLOSE      0x01            /* auto-close on exec */
-#define UF_FORKCLOSE    0x02            /* auto-close on fork */
-#define UF_RESERVED     0x04            /* open pending / in progress */
-#define UF_CLOSING      0x08            /* close in progress */
-#define UF_RESVWAIT     0x10            /* close in progress */
-#define UF_INHERIT      0x20            /* "inherit-on-exec" */
+  
+                          
+   
+#define UF_EXCLOSE      0x01                                    
+#define UF_FORKCLOSE    0x02                                    
+#define UF_RESERVED     0x04                                            
+#define UF_CLOSING      0x08                                   
+#define UF_RESVWAIT     0x10                                   
+#define UF_INHERIT      0x20                                   
 
 #define UF_VALID_FLAGS  \
 	(UF_EXCLOSE | UF_FORKCLOSE | UF_RESERVED | UF_CLOSING |\
 	UF_RESVWAIT | UF_INHERIT)
 
-/*
- * Storage required per open file descriptor.
- */
+  
+                                             
+   
 #define OFILESIZE (sizeof(struct file *) + sizeof(char))
 
-/*!
- * @struct fdt_iterator
- *
- * @brief
- * Type used to iterate a file descriptor table.
- */
+   
+                       
+  
+         
+                                                
+   
 struct fdt_iterator {
 	int              fdti_fd;
 	struct fileproc *fdti_fp;
 };
 
-/*!
- * @function fdt_next
- *
- * @brief
- * Seek the iterator forward.
- *
- * @param p
- * The process for which the file descriptor table is being iterated.
- *
- * @param fd
- * The current file file descriptor to scan from (exclusive).
- *
- * @param only_settled
- * When true, only fileprocs with @c UF_RESERVED set are returned.
- * If false, fileprocs that are in flux (@c UF_RESERVED is set) are returned.
- *
- * @returns
- * The next iterator position.
- * If @c fdti_fp is NULL, the iteration is done.
- */
+   
+                     
+  
+         
+                             
+  
+           
+                                                                     
+  
+            
+                                                             
+  
+                      
+                                                                  
+                                                                             
+  
+           
+                              
+                                                
+   
 extern struct fdt_iterator
 fdt_next(proc_t p, int fd, bool only_settled);
 
-/*!
- * @function fdt_next
- *
- * @brief
- * Seek the iterator backwards.
- *
- * @param p
- * The process for which the file descriptor table is being iterated.
- *
- * @param fd
- * The current file file descriptor to scan from (exclusive).
- *
- * @param only_settled
- * When true, only fileprocs with @c UF_RESERVED set are returned.
- * If false, fileprocs that are in flux (@c UF_RESERVED is set) are returned.
- *
- * @returns
- * The next iterator position.
- * If @c fdti_fp is NULL, the iteration is done.
- */
+   
+                     
+  
+         
+                               
+  
+           
+                                                                     
+  
+            
+                                                             
+  
+                      
+                                                                  
+                                                                             
+  
+           
+                              
+                                                
+   
 extern struct fdt_iterator
 fdt_prev(proc_t p, int fd, bool only_settled);
 
-/*!
- * @def fdt_foreach
- *
- * @brief
- * Convenience macro around @c fdt_next() to enumerates fileprocs in a process
- * file descriptor table.
- *
- * @param fp
- * The iteration variable.
- *
- * @param p
- * The process for which the file descriptor table is being iterated.
- */
+   
+                   
+  
+         
+                                                                              
+                         
+  
+            
+                          
+  
+           
+                                                                     
+   
 #define fdt_foreach(fp, p) \
 	for (struct fdt_iterator __fdt_it = fdt_next(p, -1, true); \
 	    ((fp) = __fdt_it.fdti_fp); \
 	    __fdt_it = fdt_next(p, __fdt_it.fdti_fd, true))
 
-/*!
- * @def fdt_foreach_fd
- *
- * @brief
- * When in an @c fdt_foreach() loop, return the current file descriptor
- * being inspected.
- */
+   
+                      
+  
+         
+                                                                       
+                   
+   
 #define fdt_foreach_fd()  __fdt_it.fdti_fd
 
-/*
- * Kernel global variables and routines.
- */
+  
+                                        
+   
 extern int      dupfdopen(struct filedesc *fdp,
     int indx, int dfd, int mode, int error);
 extern int      fdalloc(proc_t p, int want, int *result);
@@ -236,9 +236,9 @@ extern int      fdavail(proc_t p, int n);
 #define         fdflags(p, fd)                                  \
 	                (&(p)->p_fd->fd_ofileflags[(fd)])
 
-/*
- * Accesor macros for fd flags
- */
+  
+                              
+   
 #define FDFLAGS_GET(p, fd) (*fdflags(p, fd) & (UF_EXCLOSE|UF_FORKCLOSE))
 #define FDFLAGS_SET(p, fd, bits) \
 	   (*fdflags(p, fd) |= ((bits) & (UF_EXCLOSE|UF_FORKCLOSE)))
@@ -256,6 +256,6 @@ extern struct   filedesc *fdcopy(proc_t p, struct vnode *uth_cdir);
 extern void     fdfree(proc_t p);
 extern void     fdexec(proc_t p, short flags, int self_exec);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* !_SYS_FILEDESC_H_ */
+#endif                        

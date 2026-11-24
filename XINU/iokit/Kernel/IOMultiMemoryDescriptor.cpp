@@ -38,21 +38,21 @@ IOMultiMemoryDescriptor * IOMultiMemoryDescriptor::withDescriptors(
 	IODirection           withDirection,
 	bool                  asReference )
 {
-	//
-	// Create a new IOMultiMemoryDescriptor.  The "buffer" is made up of several
-	// memory descriptors, that are to be chained end-to-end to make up a single
-	// memory descriptor.
-	//
-	// Passing the ranges as a reference will avoid an extra allocation.
-	//
+	  
+	                                                                            
+	                                                                            
+	                     
+	  
+	                                                                    
+	  
 
 	IOMultiMemoryDescriptor * me = new IOMultiMemoryDescriptor;
 
 	if (me && me->initWithDescriptors(
-		    /* descriptors   */ descriptors,
-		    /* withCount     */ withCount,
-		    /* withDirection */ withDirection,
-		    /* asReference   */ asReference ) == false) {
+		                        descriptors,
+		                        withCount,
+		                        withDirection,
+		                        asReference ) == false) {
 		me->release();
 		me = NULL;
 	}
@@ -69,17 +69,17 @@ IOMultiMemoryDescriptor::initWithDescriptors(
 {
 	unsigned index;
 	IOOptionBits copyFlags;
-	//
-	// Initialize an IOMultiMemoryDescriptor. The "buffer" is made up of several
-	// memory descriptors, that are to be chained end-to-end to make up a single
-	// memory descriptor.
-	//
-	// Passing the ranges as a reference will avoid an extra allocation.
-	//
+	  
+	                                                                            
+	                                                                            
+	                     
+	  
+	                                                                    
+	  
 
 	assert(descriptors);
 
-	// Release existing descriptors, if any
+	                                       
 	if (_descriptors) {
 		for (unsigned index = 0; index < _descriptorsCount; index++) {
 			_descriptors[index]->release();
@@ -89,13 +89,13 @@ IOMultiMemoryDescriptor::initWithDescriptors(
 			IODelete(_descriptors, IOMemoryDescriptor *, _descriptorsCount);
 		}
 	} else {
-		// Ask our superclass' opinion.
+		                               
 		if (super::init() == false) {
 			return false;
 		}
 	}
 
-	// Initialize our minimal state.
+	                                
 
 	_descriptors            = NULL;
 	_descriptorsCount       = withCount;
@@ -103,7 +103,7 @@ IOMultiMemoryDescriptor::initWithDescriptors(
 	_flags                  = withDirection;
 #ifndef __LP64__
 	_direction              = (IODirection) (_flags & kIOMemoryDirectionMask);
-#endif /* !__LP64__ */
+#endif                
 	_length                 = 0;
 	_mappings               = NULL;
 	_tag                    = 0;
@@ -116,9 +116,9 @@ IOMultiMemoryDescriptor::initWithDescriptors(
 			return false;
 		}
 
-		bcopy( /* from  */ descriptors,
-		    /* to    */ _descriptors,
-		    /* bytes */ withCount * sizeof(IOMemoryDescriptor *));
+		bcopy(             descriptors,
+		                _descriptors,
+		                withCount * sizeof(IOMemoryDescriptor *));
 	}
 
 	for (index = 0; index < withCount; index++) {
@@ -151,9 +151,9 @@ IOMultiMemoryDescriptor::initWithDescriptors(
 void
 IOMultiMemoryDescriptor::free()
 {
-	//
-	// Free all of this object's outstanding resources.
-	//
+	  
+	                                                   
+	  
 
 	if (_descriptors) {
 		for (unsigned index = 0; index < _descriptorsCount; index++) {
@@ -171,13 +171,13 @@ IOMultiMemoryDescriptor::free()
 IOReturn
 IOMultiMemoryDescriptor::prepare(IODirection forDirection)
 {
-	//
-	// Prepare the memory for an I/O transfer.
-	//
-	// This involves paging in the memory and wiring it down for the duration
-	// of the transfer.  The complete() method finishes the processing of the
-	// memory after the I/O transfer finishes.
-	//
+	  
+	                                          
+	  
+	                                                                         
+	                                                                         
+	                                          
+	  
 
 	unsigned index;
 	IOReturn status = kIOReturnInternalError;
@@ -207,13 +207,13 @@ IOMultiMemoryDescriptor::prepare(IODirection forDirection)
 IOReturn
 IOMultiMemoryDescriptor::complete(IODirection forDirection)
 {
-	//
-	// Complete processing of the memory after an I/O transfer finishes.
-	//
-	// This method shouldn't be called unless a prepare() was previously issued;
-	// the prepare() and complete() must occur in pairs, before and after an I/O
-	// transfer.
-	//
+	  
+	                                                                    
+	  
+	                                                                            
+	                                                                            
+	            
+	  
 
 	IOReturn status;
 	IOReturn statusFinal = kIOReturnSuccess;
@@ -238,11 +238,11 @@ IOMultiMemoryDescriptor::getPhysicalSegment(IOByteCount   offset,
     IOByteCount * length,
     IOOptionBits  options)
 {
-	//
-	// This method returns the physical address of the byte at the given offset
-	// into the memory,  and optionally the length of the physically contiguous
-	// segment from that offset.
-	//
+	  
+	                                                                           
+	                                                                           
+	                            
+	  
 
 	assert(offset <= _length);
 
@@ -301,7 +301,7 @@ IOMultiMemoryDescriptor::doMap(vm_map_t           __addressMap,
 			ref.size    = length;
 			ref.prot    = prot;
 			if (options & kIOMapAnywhere) {
-				// vm_map looks for addresses above here, even when VM_FLAGS_ANYWHERE
+				                                                                     
 				ref.mapped = 0;
 			} else {
 				ref.mapped = mapping->fAddress;
@@ -342,7 +342,7 @@ IOMultiMemoryDescriptor::doMap(vm_map_t           __addressMap,
 			if (!subMap) {
 				break;
 			}
-			subMap->release(); // kIOMapOverwrite means it will not deallocate
+			subMap->release();                                                
 
 			bytesRemaining -= chunk;
 			nextAddress += chunk;

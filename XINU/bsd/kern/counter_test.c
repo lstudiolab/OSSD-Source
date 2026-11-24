@@ -25,7 +25,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* sysctl interface for testing percpu counters in DEBUG or DEVELOPMENT kernel only. */
+                                                                                       
 #if !(DEVELOPMENT || DEBUG)
 #error "Counter testing is not enabled on RELEASE configurations"
 #endif
@@ -41,7 +41,7 @@
 
 #ifdef CONFIG_XNUPOST
 #include <tests/xnupost.h>
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 static _Atomic boolean_t scalable_counter_test_running = FALSE;
 scalable_counter_t test_scalable_counter;
@@ -50,9 +50,9 @@ SCALABLE_COUNTER_DEFINE(test_static_scalable_counter);
 
 #ifdef CONFIG_XNUPOST
 kern_return_t counter_tests(void);
-/*
- * Sanity test that a counter can be modified before zalloc is initialized.
- */
+  
+                                                                           
+   
 static void
 bump_static_counter(void* arg)
 {
@@ -68,7 +68,7 @@ counter_tests()
 	T_ASSERT_EQ_ULLONG(counter_load(&test_static_scalable_counter), 1, "Counter was incremented");
 	return KERN_SUCCESS;
 }
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 static int
 sysctl_scalable_counter_test_start SYSCTL_HANDLER_ARGS
@@ -81,7 +81,7 @@ sysctl_scalable_counter_test_start SYSCTL_HANDLER_ARGS
 	if (error || !req->newptr) {
 		return error;
 	}
-	/* The test doesn't support being run multiple times in parallel. */
+	                                                                    
 	exclusive = os_atomic_cmpxchg(&scalable_counter_test_running, FALSE, TRUE, seq_cst);
 	if (!exclusive) {
 		os_log(OS_LOG_DEFAULT, "scalable_counter_test: Caught attempt to run the test in parallel.");
@@ -103,10 +103,10 @@ sysctl_scalable_counter_test_finish SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-	/* The test doesn't support being run multiple times in parallel. */
+	                                                                    
 	exclusive = os_atomic_cmpxchg(&scalable_counter_test_running, TRUE, FALSE, seq_cst);
 	if (!exclusive) {
-		/* Finish called without start. */
+		                                  
 		return EINVAL;
 	}
 	return 0;
@@ -119,7 +119,7 @@ sysctl_scalable_counter_add SYSCTL_HANDLER_ARGS
 	int64_t value = 0;
 	int error = 0;
 	if (!os_atomic_load(&scalable_counter_test_running, seq_cst)) {
-		/* Must call start */
+		                     
 		return EINVAL;
 	}
 	error = sysctl_io_number(req, value, sizeof(int64_t), &value, NULL);
@@ -137,7 +137,7 @@ sysctl_static_scalable_counter_add SYSCTL_HANDLER_ARGS
 	int64_t value = 0;
 	int error = 0;
 	if (!os_atomic_load(&scalable_counter_test_running, seq_cst)) {
-		/* Must call start */
+		                     
 		return EINVAL;
 	}
 	error = sysctl_io_number(req, value, sizeof(int64_t), &value, NULL);
@@ -154,7 +154,7 @@ sysctl_scalable_counter_load SYSCTL_HANDLER_ARGS
 #pragma unused(oidp, arg1, arg2)
 	uint64_t value;
 	if (!os_atomic_load(&scalable_counter_test_running, seq_cst)) {
-		/* Must call start */
+		                     
 		return EINVAL;
 	}
 	value = counter_load(&test_scalable_counter);
@@ -169,7 +169,7 @@ sysctl_scalable_counter_write_benchmark SYSCTL_HANDLER_ARGS
 	int64_t iterations;
 	int ret_val = 0;
 	if (!os_atomic_load(&scalable_counter_test_running, seq_cst)) {
-		/* Must call start */
+		                     
 		return EINVAL;
 	}
 	error = sysctl_io_number(req, ret_val, sizeof(int), &iterations, NULL);

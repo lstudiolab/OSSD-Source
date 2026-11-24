@@ -53,22 +53,22 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/*
- *	File:	mach/mach_types.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1986
- *
- *	Mach external interface definitions.
- *
- */
+  
+   
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
+  
+                          
+                                                    
+             
+  
+                                       
+  
+   
 
 #ifndef _MACH_MACH_TYPES_H_
 #define _MACH_MACH_TYPES_H_
@@ -114,10 +114,10 @@
 
 #include <mach/vm_param.h>
 
-/*
- * If we are in the kernel, then pick up the kernel definitions for
- * the basic mach types.
- */
+  
+                                                                   
+                        
+   
 typedef struct task                     *task_t, *task_name_t, *task_inspect_t, *task_read_t, *task_suspension_token_t, *task_policy_set_t, *task_policy_get_t;
 typedef struct thread                   *thread_t, *thread_act_t, *thread_inspect_t, *thread_read_t;
 typedef struct ipc_space                *ipc_space_t, *ipc_space_read_t, *ipc_space_inspect_t;
@@ -139,9 +139,9 @@ typedef struct ipc_port                 *eventlink_port_pair_t[2];
 typedef struct suid_cred                *suid_cred_t;
 typedef struct task_id_token            *task_id_token_t;
 
-/*
- * OBSOLETE: lock_set interfaces are obsolete.
- */
+  
+                                              
+   
 typedef struct lock_set                 *lock_set_t;
 struct lock_set;
 
@@ -165,14 +165,14 @@ struct suid_cred;
 
 __END_DECLS
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
-#else   /* KERNEL */
+#else               
 
-/*
- * If we are not in the kernel, then these will all be represented by
- * ports at user-space.
- */
+  
+                                                                     
+                       
+   
 typedef mach_port_t             task_t;
 typedef mach_port_t             task_name_t;
 typedef mach_port_t             task_policy_set_t;
@@ -206,18 +206,18 @@ typedef mach_port_t             eventlink_port_pair_t[2];
 typedef mach_port_t             suid_cred_t;
 typedef mach_port_t             task_id_token_t;
 
-#endif  /* KERNEL */
+#endif              
 
-/*
- * These aren't really unique types.  They are just called
- * out as unique types at one point in history.  So we list
- * them here for compatibility.
- */
+  
+                                                          
+                                                           
+                               
+   
 typedef processor_set_t         processor_set_name_t;
 
-/*
- * These types are just hard-coded as ports
- */
+  
+                                           
+   
 typedef mach_port_t             clock_reply_t;
 typedef mach_port_t             bootstrap_t;
 typedef mach_port_t             mem_entry_name_port_t;
@@ -230,13 +230,13 @@ typedef mach_port_t             mach_eventlink_t;
 
 typedef ipc_info_port_t         exception_handler_info_t;
 
-/*
- * Mig doesn't translate the components of an array.
- * For example, Mig won't use the thread_t translations
- * to translate a thread_array_t argument.  So, these definitions
- * are not completely accurate at the moment for other kernel
- * components.
- */
+  
+                                                    
+                                                       
+                                                                 
+                                                             
+              
+   
 typedef task_t                  *task_array_t;
 typedef thread_t                *thread_array_t;
 typedef processor_set_t         *processor_set_array_t;
@@ -245,12 +245,12 @@ typedef processor_t             *processor_array_t;
 typedef thread_act_t            *thread_act_array_t;
 typedef ledger_t                *ledger_array_t;
 
-/*
- * However the real mach_types got declared, we also have to declare
- * types with "port" in the name for compatability with the way OSF
- * had declared the user interfaces at one point.  Someday these should
- * go away.
- */
+  
+                                                                    
+                                                                   
+                                                                       
+           
+   
 typedef task_t                  task_port_t;
 typedef task_array_t            task_port_array_t;
 typedef thread_t                thread_port_t;
@@ -276,7 +276,7 @@ typedef clock_ctrl_t            clock_ctrl_port_t;
 typedef exception_handler_t     exception_port_t;
 typedef exception_handler_array_t exception_port_arrary_t;
 typedef char vfs_path_t[4096];
-typedef char nspace_path_t[1024]; /* 1024 == PATH_MAX */
+typedef char nspace_path_t[1024];                       
 typedef char suid_cred_path_t[1024];
 typedef uint32_t suid_cred_uid_t;
 
@@ -342,23 +342,23 @@ typedef uint32_t suid_cred_uid_t;
 #define TASK_ID_TOKEN_NULL      ((task_id_token_t) 0)
 #endif
 
-/* capability strictly _DECREASING_.
- * not ordered the other way around because we want TASK_FLAVOR_CONTROL
- * to be closest to the itk_lock. see task.h.
- */
+                                    
+                                                                       
+                                             
+   
 typedef unsigned int            mach_task_flavor_t;
-#define TASK_FLAVOR_CONTROL     0    /* a task_t */
-#define TASK_FLAVOR_READ        1    /* a task_read_t */
-#define TASK_FLAVOR_INSPECT     2    /* a task_inspect_t */
-#define TASK_FLAVOR_NAME        3    /* a task_name_t */
+#define TASK_FLAVOR_CONTROL     0                  
+#define TASK_FLAVOR_READ        1                       
+#define TASK_FLAVOR_INSPECT     2                          
+#define TASK_FLAVOR_NAME        3                       
 
-/* capability strictly _DECREASING_ */
+                                      
 typedef unsigned int            mach_thread_flavor_t;
-#define THREAD_FLAVOR_CONTROL   0    /* a thread_t */
-#define THREAD_FLAVOR_READ      1    /* a thread_read_t */
-#define THREAD_FLAVOR_INSPECT   2    /* a thread_inspect_t */
+#define THREAD_FLAVOR_CONTROL   0                    
+#define THREAD_FLAVOR_READ      1                         
+#define THREAD_FLAVOR_INSPECT   2                            
 
-/* DEPRECATED */
+                
 typedef natural_t               ledger_item_t;
 #define LEDGER_ITEM_INFINITY    ((ledger_item_t) (~0))
 
@@ -369,10 +369,10 @@ typedef mach_vm_offset_t        *emulation_vector_t;
 typedef char                    *user_subsystem_t;
 
 typedef char                    *labelstr_t;
-/*
- *	Backwards compatibility, for those programs written
- *	before mach/{std,mach}_types.{defs,h} were set up.
- */
+  
+                                                      
+                                                     
+   
 #include <mach/std_types.h>
 
-#endif  /* _MACH_MACH_TYPES_H_ */
+#endif                           

@@ -62,21 +62,21 @@ test_from_kernel_lock_unlock_contended(void)
 			type = "HALF_CONTENDED ";
 		}
 
-		/* first line is "STATS INNER LOOP" */
+		                                      
 		while (*buff_p != '\n') {
 			buff_p++;
 		}
 		buff_p++;
 
-		/*
-		 * Sequence of statistic lines like
-		 * { samples 100000, tot 3586175 ns, avg 35 ns, max 3997 ns, min 33 ns } TEST_MTX_LOCK_STATS
-		 * for all TEST_MTX_MAX_STATS statistics
-		 */
+		  
+                                     
+                                                                                              
+                                          
+     
 		for (i = 0; i < TEST_MTX_MAX_STATS; i++) {
 			avg_p = strstr(buff_p, "avg ");
 
-			/* contended test records statistics only for lock/unlock for now */
+			                                                                    
 			if (i == TEST_MTX_LOCK_STATS || i == TEST_MTX_UNLOCK_MTX_STATS) {
 				T_QUIET; T_ASSERT_NOTNULL(avg_p, "contended %i average not found", i);
 				sscanf(avg_p, "avg %llu", &avg);
@@ -106,13 +106,13 @@ test_from_kernel_lock_unlock_contended(void)
 		}
 		buff_p++;
 
-		/* next line is "STATS OUTER LOOP" */
+		                                     
 		while (*buff_p != '\n') {
 			buff_p++;
 		}
 		buff_p++;
 
-		/* contended test records statistics only for lock/unlock for now */
+		                                                                    
 		avg_p = strstr(buff_p, "run time ");
 		T_QUIET; T_ASSERT_NOTNULL(avg_p, "contended %d loop run time not found", 0);
 		sscanf(avg_p, "run time %llu", &run);
@@ -166,18 +166,18 @@ test_from_kernel_lock_unlock_uncontended(void)
 
 	T_LOG("%s stats:\n%s\n", __func__, buff);
 
-	/* first line is "STATS INNER LOOP" */
+	                                      
 	buff_p = buff;
 	while (*buff_p != '\n') {
 		buff_p++;
 	}
 	buff_p++;
 
-	/*
-	 * Sequence of statistic lines like
-	 * { samples 100000, tot 3586175 ns, avg 35 ns, max 3997 ns, min 33 ns } TEST_MTX_LOCK_STATS
-	 * for all TEST_MTX_MAX_STATS statistics
-	 */
+	  
+                                    
+                                                                                             
+                                         
+    
 	for (i = 0; i < TEST_MTX_MAX_STATS; i++) {
 		avg_p = strstr(buff_p, "avg ");
 		T_QUIET; T_ASSERT_NOTNULL(avg_p, "uncontended %i average not found", i);
@@ -207,17 +207,17 @@ test_from_kernel_lock_unlock_uncontended(void)
 	}
 	buff_p++;
 
-	/* next line is "STATS OUTER LOOP" */
+	                                     
 	while (*buff_p != '\n') {
 		buff_p++;
 	}
 	buff_p++;
 
-	/*
-	 * Sequence of statistic lines like
-	 * total time 4040673 ns total run time 3981080 ns TEST_MTX_LOCK_STATS
-	 * for all TEST_MTX_MAX_STATS statistics exept UNLOCK
-	 */
+	  
+                                    
+                                                                       
+                                                      
+    
 	for (i = 0; i < TEST_MTX_MAX_STATS - 2; i++) {
 		avg_p = strstr(buff_p, "run time ");
 		T_QUIET; T_ASSERT_NOTNULL(avg_p, "uncontended %d loop run time not found", i);
@@ -358,7 +358,7 @@ fix_cpu_frequency(void)
 	T_QUIET; T_ASSERT_EQ(waitpid(pid, &spawn_ret, 0), pid, "waitpid failed");
 	T_QUIET; T_ASSERT_EQ(spawn_ret, 0, " clpcctrl failed");
 
-#else /*(TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)*/
+#else                                               
 
 	int spawn_ret, pid;
 	int ret;
@@ -399,7 +399,7 @@ fix_cpu_frequency(void)
 
 	free(buffer);
 	return;
-#endif /*(TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)*/
+#endif                                               
 }
 
 static void

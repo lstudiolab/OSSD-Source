@@ -27,4 +27,4 @@
  */
 #ifndef _POSIX_VDISABLE
 #define _POSIX_VDISABLE         ((unsigned char)'\377')
-#endif /* POSIX_VDISABLE */
+#endif                     

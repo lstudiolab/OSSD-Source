@@ -90,9 +90,9 @@
 #include <sys/socketvar.h>
 #include <sys/vnode.h>
 
-/*
- * MAC Framework sysctl namespace.
- */
+  
+                                  
+   
 
 SYSCTL_DECL(_security);
 SYSCTL_DECL(_security_mac);
@@ -116,10 +116,10 @@ struct mac_policy_list {
 typedef struct mac_policy_list mac_policy_list_t;
 
 
-/*
- * Policy that has registered with the framework for a specific
- * label namespace name.
- */
+  
+                                                               
+                        
+   
 struct mac_label_listener {
 	mac_policy_handle_t             mll_handle;
 	LIST_ENTRY(mac_label_listener)  mll_list;
@@ -127,9 +127,9 @@ struct mac_label_listener {
 
 LIST_HEAD(mac_label_listeners_t, mac_label_listener);
 
-/*
- * Type of list used to manage label namespace names.
- */
+  
+                                                     
+   
 struct mac_label_element {
 	char                            mle_name[MAC_MAX_LABEL_ELEMENT_NAME];
 	struct mac_label_listeners_t    mle_listeners;
@@ -138,19 +138,19 @@ struct mac_label_element {
 
 LIST_HEAD(mac_label_element_list_t, mac_label_element);
 
-/*
- * MAC Framework global variables.
- */
+  
+                                  
+   
 
 extern struct mac_label_element_list_t mac_label_element_list;
 extern struct mac_label_element_list_t mac_static_label_element_list;
 
 extern struct mac_policy_list mac_policy_list;
 
-/*
- * global flags to control whether a MACF subsystem is configured
- * at all in the system.
- */
+  
+                                                                 
+                        
+   
 extern unsigned int mac_device_enforce;
 extern unsigned int mac_pipe_enforce;
 extern unsigned int mac_posixsem_enforce;
@@ -173,12 +173,12 @@ static __inline__ bool
 mac_proc_check_enforce(proc_t p)
 {
 #if CONFIG_MACF
-	// Don't apply policies to the kernel itself.
+	                                             
 	return p != kernproc;
 #else
 #pragma unused(p)
 	return false;
-#endif // CONFIG_MACF
+#endif               
 }
 
 static bool mac_cred_check_enforce(kauth_cred_t cred);
@@ -191,12 +191,12 @@ mac_cred_check_enforce(kauth_cred_t cred)
 #else
 #pragma unused(p)
 	return false;
-#endif // CONFIG_MACF
+#endif               
 }
 
-/*
- * MAC Framework infrastructure functions.
- */
+  
+                                          
+   
 
 int mac_error_select(int error1, int error2);
 
@@ -222,12 +222,12 @@ int mac_vnode_label_externalize(struct label *, char *e, char *out, size_t olen,
 int mac_cred_label_internalize(struct label *label, char *string);
 int mac_vnode_label_internalize(struct label *label, char *string);
 
-/*
- * MAC_CHECK performs the designated check by walking the policy
- * module list and checking with each as to how it feels about the
- * request.  Note that it returns its value via 'error' in the scope
- * of the caller.
- */
+  
+                                                                
+                                                                  
+                                                                    
+                 
+   
 #define MAC_CHECK(check, args...) do {                                  \
 	struct mac_policy_conf *mpc;                                    \
 	u_int i;                                                        \
@@ -258,13 +258,13 @@ int mac_vnode_label_internalize(struct label *label, char *string);
 	}                                                               \
 } while (0)
 
-/*
- * MAC_GRANT performs the designated check by walking the policy
- * module list and checking with each as to how it feels about the
- * request.  Unlike MAC_CHECK, it grants if any policies return '0',
- * and otherwise returns EPERM.  Note that it returns its value via
- * 'error' in the scope of the caller.
- */
+  
+                                                                
+                                                                  
+                                                                    
+                                                                   
+                                      
+   
 #define MAC_GRANT(check, args...) do {                                  \
 	struct mac_policy_conf *mpc;                                    \
 	u_int i;                                                        \
@@ -296,14 +296,14 @@ int mac_vnode_label_internalize(struct label *label, char *string);
 	}                                                               \
 } while (0)
 
-/*
- * MAC_BOOLEAN performs the designated boolean composition by walking
- * the module list, invoking each instance of the operation, and
- * combining the results using the passed C operator.  Note that it
- * returns its value via 'result' in the scope of the caller, which
- * should be initialized by the caller in a meaningful way to get
- * a meaningful result.
- */
+  
+                                                                     
+                                                                
+                                                                   
+                                                                   
+                                                                 
+                       
+   
 #define MAC_BOOLEAN(operation, composition, args...) do {               \
 	struct mac_policy_conf *mpc;                                    \
 	u_int i;                                                        \
@@ -342,10 +342,10 @@ int mac_vnode_label_internalize(struct label *label, char *string);
 #define MAC_EXTERNALIZE_AUDIT(obj, label, outbuf, outbuflen)    \
 	mac_externalize(offsetof(struct mac_policy_ops, mpo_ ## obj ## _label_externalize_audit), label, "*", outbuf, outbuflen)
 
-/*
- * MAC_PERFORM performs the designated operation by walking the policy
- * module list and invoking that operation for each policy.
- */
+  
+                                                                      
+                                                           
+   
 #define MAC_PERFORM(operation, args...) do {                            \
 	struct mac_policy_conf *mpc;                                    \
 	u_int i;                                                        \
@@ -389,4 +389,4 @@ int mac_externalize(size_t mpo_externalize_off, struct label *label,
     const char *elementlist, char *outbuf, size_t outbuflen);
 int mac_internalize(size_t mpo_internalize_off, struct label *label,
     char *elementlist);
-#endif  /* !_SECURITY_MAC_INTERNAL_H_ */
+#endif                                  

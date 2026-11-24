@@ -37,11 +37,11 @@ extern "C"
 #include <corecrypto/ccmode.h>
 #include <corecrypto/ccn.h>
 
-#define AES_BLOCK_SIZE  16  /* the AES block size in bytes          */
+#define AES_BLOCK_SIZE  16                                            
 
-//Unholy HACK: this works because we know the size of the context for every
-//possible corecrypto implementation is less than this.
-#if defined(__ARM_NEON__) && !defined(__arm64__)        // for expanded keys in bit slice format
+                                                                           
+                                                       
+#if defined(__ARM_NEON__) && !defined(__arm64__)                                                
 #define AES_CBC_CTX_MAX_SIZE (ccn_sizeof_size(sizeof(void *)) + ccn_sizeof_size(AES_BLOCK_SIZE) + ccn_sizeof_size(64*4) + (14-1)*128+32 )
 #else
 #define AES_CBC_CTX_MAX_SIZE (ccn_sizeof_size(sizeof(void *)) + ccn_sizeof_size(AES_BLOCK_SIZE) + ccn_sizeof_size(64*4))
@@ -61,7 +61,7 @@ typedef struct{
 } aes_ctx;
 
 
-/* for compatibility with old apis*/
+                                    
 #define aes_ret     int
 #define aes_good    0
 #define aes_error  -1
@@ -69,8 +69,8 @@ typedef struct{
 
 
 
-/* Key lengths in the range 16 <= key_len <= 32 are given in bytes, */
-/* those in the range 128 <= key_len <= 256 are given in bits       */
+                                                                      
+                                                                      
 
 aes_rval aes_encrypt_key(const unsigned char *key, int key_len, aes_encrypt_ctx cx[1]);
 aes_rval aes_encrypt_key128(const unsigned char *key, aes_encrypt_ctx cx[1]);

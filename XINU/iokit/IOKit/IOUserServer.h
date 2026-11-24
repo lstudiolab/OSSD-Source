@@ -36,7 +36,7 @@
 #define kIOUserServerClassKey  "IOUserServer"
 #define kIOUserServerNameKey   "IOUserServerName"
 #define kIOUserServerTagKey    "IOUserServerTag"
-// the expected cdhash value of the userspace driver executable
+                                                               
 #define kIOUserServerCDHashKey "IOUserServerCDHash"
 
 #if DRIVERKIT_PRIVATE
@@ -52,7 +52,7 @@ enum{
 };
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                                                       
 
 class OSObject;
 
@@ -91,10 +91,10 @@ struct OSObject_Instantiate_Rpl {
 
 typedef uint64_t IOTrapMessageBuffer[256];
 
-#endif /* DRIVERKIT_PRIVATE */
+#endif                        
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                                                       
+                                                                                                                       
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -134,7 +134,7 @@ extern IOLock *        gIOUserServerLock;
 
 typedef struct ipc_kmsg * ipc_kmsg_t;
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 namespace IOServicePH
 {
@@ -145,7 +145,7 @@ bool serverSlept(void);
 void systemHalt(void);
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 class IOUserServer : public IOUserClient
 {
@@ -219,8 +219,8 @@ public:
 	OSObjectUserVars     * varsForObject(OSObject * obj);
 	LIBKERN_RETURNS_NOT_RETAINED IODispatchQueue      * queueForObject(OSObject * obj, uint64_t msgid);
 
-	static ipc_port_t      copySendRightForObject(OSObject * object, natural_t /* ipc_kobject_type_t */ type);
-	static OSObject      * copyObjectForSendRight(ipc_port_t port, natural_t /* ipc_kobject_type_t */ type);
+	static ipc_port_t      copySendRightForObject(OSObject * object, natural_t                          type);
+	static OSObject      * copyObjectForSendRight(ipc_port_t port, natural_t                          type);
 
 	IOReturn               copyOutObjects(IORPCMessageMach * mach, IORPCMessage * message,
 	    size_t size, bool consume);
@@ -256,5 +256,5 @@ private:
 extern "C" kern_return_t
 IOUserServerUEXTTrap(OSObject * object, void * p1, void * p2, void * p3, void * p4, void * p5, void * p6);
 
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /* _IOUSERSERVER_H */
+#endif                         
+#endif                      

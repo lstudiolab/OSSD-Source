@@ -21,7 +21,7 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/* Get the cpu_capabilities bit vector out of the comm page */
+                                                              
 
 #define	__APPLE_API_PRIVATE
 #include <machine/cpu_capabilities.h>

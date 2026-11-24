@@ -40,15 +40,15 @@ MALLOC_DEFINE(M_NWKWQ, "nwkwq", "Network work-queue");
 static TAILQ_HEAD(, nwk_wq_entry) nwk_wq_head;
 decl_lck_mtx_data(static, nwk_wq_lock);
 
-/* Lock group and attributes */
+                               
 static lck_grp_attr_t *nwk_wq_lock_grp_attributes = NULL;
 static lck_grp_t *nwk_wq_lock_group = NULL;
 
-/* Lock and lock attributes */
+                              
 static lck_attr_t *nwk_wq_lock_attributes = NULL;
 decl_lck_mtx_data(static, nwk_wq_lock);
 
-/* Wait channel for Network work queue */
+                                         
 static void *nwk_wq_waitch = NULL;
 static void nwk_wq_thread_func(void *, wait_result_t);
 
@@ -70,7 +70,7 @@ nwk_wq_init(void)
 	if (kernel_thread_start(nwk_wq_thread_func,
 	    NULL, &nwk_wq_thread) != KERN_SUCCESS) {
 		panic_plain("%s: couldn't create network work queue thread", __func__);
-		/* NOTREACHED */
+		                
 	}
 	thread_deallocate(nwk_wq_thread);
 }
@@ -93,7 +93,7 @@ nwk_wq_thread_cont(int err)
 			(void) msleep0(&nwk_wq_waitch, &nwk_wq_lock,
 			    (PZERO - 1), "nwk_wq_thread_cont", 0,
 			    nwk_wq_thread_cont);
-			/* NOTREACHED */
+			                
 		}
 
 		TAILQ_SWAP(&temp_nwk_wq_head, &nwk_wq_head, nwk_wq_entry, nwk_wq_link);
@@ -120,10 +120,10 @@ nwk_wq_thread_func(void *v, wait_result_t w)
 	lck_mtx_lock(&nwk_wq_lock);
 	(void) msleep0(&nwk_wq_waitch, &nwk_wq_lock,
 	    (PZERO - 1), "nwk_wq_thread_func", 0, nwk_wq_thread_cont);
-	/*
-	 * msleep0() shouldn't have returned as PCATCH was not set;
-	 * therefore assert in this case.
-	 */
+	  
+                                                            
+                                  
+    
 	lck_mtx_unlock(&nwk_wq_lock);
 	VERIFY(0);
 }

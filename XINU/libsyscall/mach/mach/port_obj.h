@@ -29,11 +29,11 @@
  * @OSF_COPYRIGHT@
  */
 
-/*
- * Define a service to map from a kernel-generated port name
- * to server-defined "type" and "value" data to be associated
- * with the port.
- */
+  
+                                                            
+                                                             
+                 
+   
 
 #ifndef PORT_OBJ_H
 #define PORT_OBJ_H
@@ -73,7 +73,7 @@ do {                                                    \
 #define port_get_obj_type(pname)                        \
 	(port_obj_table[MACH_PORT_INDEX(pname)].pos_type)
 
-#else   /* PORT_OBJ_ASSERT */
+#else                        
 
 #define port_set_obj_value_type(pname, value, type)     \
 do {                                                    \
@@ -98,6 +98,6 @@ do {                                                    \
 	port_obj_table[MACH_PORT_INDEX(pname)].pos_type :       \
 	(panic("port_get_obj_type: index too big"), -1))
 
-#endif  /* PORT_OBJ_ASSERT */
+#endif                       
 
-#endif  /* PORT_OBJ_H */
+#endif                  

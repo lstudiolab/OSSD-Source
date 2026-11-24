@@ -37,18 +37,18 @@ void mach_bridge_send_timestamp(uint64_t timestamp);
 extern _Atomic uint32_t bt_init_flag;
 extern uint32_t bt_enable_flag;
 
-/*
- * Delay sending timestamps by certain interval to
- * avoid overwriting sentinel values
- */
+  
+                                                  
+                                    
+   
 #define DELAY_INTERVAL_NS (50 * NSEC_PER_MSEC)
 static uint64_t bt_delay_timestamp = 0;
 static mach_bridge_regwrite_timestamp_func_t bridge_regwrite_timestamp_callback = NULL;
 
-/*
- * This function should only be called by the kext
- * responsible for sending timestamps across the link
- */
+  
+                                                  
+                                                     
+   
 void
 mach_bridge_register_regwrite_timestamp_callback(mach_bridge_regwrite_timestamp_func_t func)
 {

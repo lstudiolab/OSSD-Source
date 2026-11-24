@@ -62,26 +62,26 @@ extern int dofilewrite(vfs_context_t ctx, struct fileproc *fp,
     int flags, user_ssize_t *retval );
 extern int do_uiowrite(struct proc *p, struct fileproc *fp, uio_t uio, int flags, user_ssize_t *retval);
 
-/*
- * Experimental guarded file descriptor support.
- */
+  
+                                                
+   
 
 kern_return_t task_exception_notify(exception_type_t exception,
     mach_exception_data_type_t code, mach_exception_data_type_t subcode);
 kern_return_t task_violated_guard(mach_exception_code_t, mach_exception_subcode_t, void *);
 
-/*
- * Most fd's have an underlying fileproc struct; but some may be
- * guarded_fileproc structs which implement guarded fds.  The latter
- * struct (below) embeds the former.
- *
- * The two types should be distinguished by the "type" portion of fp_flags.
- * There's also a magic number to help catch misuse and bugs.
- *
- * This is a bit unpleasant, but results from the desire to allow
- * alternate file behaviours for a few file descriptors without
- * growing the fileproc data structure.
- */
+  
+                                                                
+                                                                    
+                                    
+  
+                                                                           
+                                                             
+  
+                                                                 
+                                                               
+                                       
+   
 
 struct guarded_fileproc {
 	struct fileproc gf_fileproc;
@@ -153,7 +153,7 @@ fp_lookup_guarded(proc_t p, int fd, guardid_t guard,
 
 	if (guard != gfp->gf_guard) {
 		(void) fp_drop(p, fd, fp, locked);
-		return EPERM; /* *not* a mismatch exception */
+		return EPERM;                                 
 	}
 	if (gfpp) {
 		*gfpp = gfp;
@@ -161,17 +161,17 @@ fp_lookup_guarded(proc_t p, int fd, guardid_t guard,
 	return 0;
 }
 
-/*
- * Expected use pattern:
- *
- * if (fp_isguarded(fp, GUARD_CLOSE)) {
- *      error = fp_guard_exception(p, fd, fp, kGUARD_EXC_CLOSE);
- *      proc_fdunlock(p);
- *      return error;
- * }
- *
- * Passing `0` to `attrs` returns whether the fp is guarded at all.
- */
+  
+                        
+  
+                                       
+                                                                
+                         
+                     
+    
+  
+                                                                   
+   
 
 int
 fp_isguarded(struct fileproc *fp, u_int attrs)
@@ -192,7 +192,7 @@ fp_guard_exception(proc_t p, int fd, struct fileproc *fp, u_int flavor)
 	}
 
 	struct guarded_fileproc *gfp = FP_TO_GFP(fp);
-	/* all gfd fields protected via proc_fdlock() */
+	                                                
 	proc_fdlock_assert(p, LCK_MTX_ASSERT_OWNED);
 
 	mach_exception_code_t code = 0;
@@ -206,9 +206,9 @@ fp_guard_exception(proc_t p, int fd, struct fileproc *fp, u_int flavor)
 	return EPERM;
 }
 
-/*
- * (Invoked before returning to userland from the syscall handler.)
- */
+  
+                                                                   
+   
 void
 fd_guard_ast(
 	thread_t __unused t,
@@ -220,32 +220,32 @@ fd_guard_ast(
 	psignal(p, SIGKILL);
 }
 
-/*
- * Experimental guarded file descriptor SPIs
- */
+  
+                                            
+   
 
-/*
- * int guarded_open_np(const char *pathname, int flags,
- *     const guardid_t *guard, u_int guardflags, ...);
- *
- * In this initial implementation, GUARD_DUP must be specified.
- * GUARD_CLOSE, GUARD_SOCKET_IPC and GUARD_FILEPORT are optional.
- *
- * If GUARD_DUP wasn't specified, then we'd have to do the (extra) work
- * to allow dup-ing a descriptor to inherit the guard onto the new
- * descriptor.  (Perhaps GUARD_DUP behaviours should just always be true
- * for a guarded fd?  Or, more sanely, all the dup operations should
- * just always propagate the guard?)
- *
- * Guarded descriptors are always close-on-exec, and GUARD_CLOSE
- * requires close-on-fork; O_CLOEXEC must be set in flags.
- * This setting is immutable; attempts to clear the flag will
- * cause a guard exception.
- *
- * XXX	It's somewhat broken that change_fdguard_np() can completely
- *	remove the guard and thus revoke down the immutability
- *	promises above.  Ick.
- */
+  
+                                                       
+                                                      
+  
+                                                               
+                                                                 
+  
+                                                                       
+                                                                  
+                                                                        
+                                                                    
+                                    
+  
+                                                                
+                                                          
+                                                             
+                           
+  
+                                                                   
+                                                         
+                        
+   
 int
 guarded_open_np(proc_t p, struct guarded_open_np_args *uap, int32_t *retval)
 {
@@ -272,9 +272,9 @@ guarded_open_np(proc_t p, struct guarded_open_np_args *uap, int32_t *retval)
 		return error;
 	}
 
-	/*
-	 * Disallow certain guard values -- is zero enough?
-	 */
+	  
+                                                    
+    
 	if (crarg.gca_guard == 0) {
 		return EINVAL;
 	}
@@ -296,14 +296,14 @@ guarded_open_np(proc_t p, struct guarded_open_np_args *uap, int32_t *retval)
 	           guarded_fileproc_alloc_init, &crarg, retval);
 }
 
-/*
- * int guarded_open_dprotected_np(const char *pathname, int flags,
- *     const guardid_t *guard, u_int guardflags, int dpclass, int dpflags, ...);
- *
- * This SPI is extension of guarded_open_np() to include dataprotection class on creation
- * in "dpclass" and dataprotection flags 'dpflags'. Otherwise behaviors are same as in
- * guarded_open_np()
- */
+  
+                                                                  
+                                                                                
+  
+                                                                                         
+                                                                                      
+                    
+   
 int
 guarded_open_dprotected_np(proc_t p, struct guarded_open_dprotected_np_args *uap, int32_t *retval)
 {
@@ -326,9 +326,9 @@ guarded_open_dprotected_np(proc_t p, struct guarded_open_dprotected_np_args *uap
 		return error;
 	}
 
-	/*
-	 * Disallow certain guard values -- is zero enough?
-	 */
+	  
+                                                    
+    
 	if (crarg.gca_guard == 0) {
 		return EINVAL;
 	}
@@ -346,19 +346,19 @@ guarded_open_dprotected_np(proc_t p, struct guarded_open_dprotected_np_args *uap
 	NDINIT(&nd, LOOKUP, OP_OPEN, FOLLOW | AUDITVNPATH1, UIO_USERSPACE,
 	    uap->path, ctx);
 
-	/*
-	 * Initialize the extra fields in vnode_attr to pass down dataprotection
-	 * extra fields.
-	 * 1. target cprotect class.
-	 * 2. set a flag to mark it as requiring open-raw-encrypted semantics.
-	 */
+	  
+                                                                         
+                 
+                             
+                                                                       
+    
 	if (uap->flags & O_CREAT) {
 		VATTR_SET(&va, va_dataprotect_class, uap->dpclass);
 	}
 
 	if (uap->dpflags & (O_DP_GETRAWENCRYPTED | O_DP_GETRAWUNENCRYPTED)) {
 		if (uap->flags & (O_RDWR | O_WRONLY)) {
-			/* Not allowed to write raw encrypted bytes */
+			                                              
 			return EINVAL;
 		}
 		if (uap->dpflags & O_DP_GETRAWENCRYPTED) {
@@ -373,15 +373,15 @@ guarded_open_dprotected_np(proc_t p, struct guarded_open_dprotected_np_args *uap
 	           guarded_fileproc_alloc_init, &crarg, retval);
 }
 
-/*
- * int guarded_kqueue_np(const guardid_t *guard, u_int guardflags);
- *
- * Create a guarded kqueue descriptor with guardid and guardflags.
- *
- * Same restrictions on guardflags as for guarded_open_np().
- * All kqueues are -always- close-on-exec and close-on-fork by themselves
- * and are not sendable.
- */
+  
+                                                                   
+  
+                                                                  
+  
+                                                            
+                                                                         
+                        
+   
 int
 guarded_kqueue_np(proc_t p, struct guarded_kqueue_np_args *uap, int32_t *retval)
 {
@@ -407,9 +407,9 @@ guarded_kqueue_np(proc_t p, struct guarded_kqueue_np_args *uap, int32_t *retval)
 	return kqueue_internal(p, guarded_fileproc_alloc_init, &crarg, retval);
 }
 
-/*
- * int guarded_close_np(int fd, const guardid_t *guard);
- */
+  
+                                                        
+   
 int
 guarded_close_np(proc_t p, struct guarded_close_np_args *uap,
     __unused int32_t *retval)
@@ -434,63 +434,63 @@ guarded_close_np(proc_t p, struct guarded_close_np_args *uap,
 	return fp_close_and_unlock(p, fd, GFP_TO_FP(gfp), 0);
 }
 
-/*
- * int
- * change_fdguard_np(int fd, const guardid_t *guard, u_int guardflags,
- *    const guardid_t *nguard, u_int nguardflags, int *fdflagsp);
- *
- * Given a file descriptor, atomically exchange <guard, guardflags> for
- * a new guard <nguard, nguardflags>, returning the previous fd
- * flags (see fcntl:F_SETFD) in *fdflagsp.
- *
- * This syscall can be used to either (a) add a new guard to an existing
- * unguarded file descriptor (b) remove the old guard from an existing
- * guarded file descriptor or (c) change the guard (guardid and/or
- * guardflags) on a guarded file descriptor.
- *
- * If 'guard' is NULL, fd must be unguarded at entry. If the call completes
- * successfully the fd will be guarded with <nguard, nguardflags>.
- *
- * Guarding a file descriptor has some side-effects on the "fdflags"
- * associated with the descriptor - in particular FD_CLOEXEC is
- * forced ON unconditionally, and FD_CLOFORK is forced ON by GUARD_CLOSE.
- * Callers who wish to subsequently restore the state of the fd should save
- * the value of *fdflagsp after a successful invocation.
- *
- * If 'nguard' is NULL, fd must be guarded at entry, <guard, guardflags>
- * must match with what's already guarding the descriptor, and the
- * result will be to completely remove the guard.  Note also that the
- * fdflags are copied to the descriptor from the incoming *fdflagsp argument.
- *
- * If the descriptor is guarded, and neither 'guard' nor 'nguard' is NULL
- * and <guard, guardflags> matches what's already guarding the descriptor,
- * then <nguard, nguardflags> becomes the new guard.  In this case, even if
- * the GUARD_CLOSE flag is being cleared, it is still possible to continue
- * to keep FD_CLOFORK on the descriptor by passing FD_CLOFORK via fdflagsp.
- *
- * (File descriptors whose underlying fileglobs are marked FG_CONFINED are
- * still close-on-fork, regardless of the setting of FD_CLOFORK.)
- *
- * Example 1: Guard an unguarded descriptor during a set of operations,
- * then restore the original state of the descriptor.
- *
- * int sav_flags = 0;
- * change_fdguard_np(fd, NULL, 0, &myguard, GUARD_CLOSE, &sav_flags);
- * // do things with now guarded 'fd'
- * change_fdguard_np(fd, &myguard, GUARD_CLOSE, NULL, 0, &sav_flags);
- * // fd now unguarded.
- *
- * Example 2: Change the guard of a guarded descriptor during a set of
- * operations, then restore the original state of the descriptor.
- *
- * int sav_flags = (gdflags & GUARD_CLOSE) ? FD_CLOFORK : 0;
- * change_fdguard_np(fd, &gd, gdflags, &myguard, GUARD_CLOSE, &sav_flags);
- * // do things with 'fd' with a different guard
- * change_fdguard_np(fd, &myg, GUARD_CLOSE, &gd, gdflags, &sav_flags);
- * // back to original guarded state
- *
- * XXX	This SPI is too much of a chainsaw and should be revised.
- */
+  
+      
+                                                                      
+                                                                 
+  
+                                                                       
+                                                               
+                                          
+  
+                                                                        
+                                                                      
+                                                                  
+                                            
+  
+                                                                           
+                                                                  
+  
+                                                                    
+                                                               
+                                                                         
+                                                                           
+                                                        
+  
+                                                                        
+                                                                  
+                                                                     
+                                                                             
+  
+                                                                         
+                                                                          
+                                                                           
+                                                                          
+                                                                           
+  
+                                                                          
+                                                                 
+  
+                                                                       
+                                                     
+  
+                     
+                                                                     
+                                     
+                                                                     
+                       
+  
+                                                                      
+                                                                 
+  
+                                                            
+                                                                          
+                                                
+                                                                      
+                                    
+  
+                                                                
+   
 
 int
 change_fdguard_np(proc_t p, struct change_fdguard_np_args *uap,
@@ -504,15 +504,15 @@ change_fdguard_np(proc_t p, struct change_fdguard_np_args *uap,
 
 	if (0 != uap->guard &&
 	    0 != (error = copyin(uap->guard, &oldg, sizeof(oldg)))) {
-		return error; /* can't copyin current guard */
+		return error;                                 
 	}
 	if (0 != uap->nguard &&
 	    0 != (error = copyin(uap->nguard, &newg, sizeof(newg)))) {
-		return error; /* can't copyin new guard */
+		return error;                             
 	}
 	if (0 != uap->fdflagsp &&
 	    0 != (error = copyin(uap->fdflagsp, &nfdflags, sizeof(nfdflags)))) {
-		return error; /* can't copyin new fdflags */
+		return error;                               
 	}
 	proc_fdlock(p);
 restart:
@@ -528,20 +528,20 @@ restart:
 		proc_fdunlock(p);
 		if (0 != (error = copyout(&ofl, uap->fdflagsp, sizeof(ofl)))) {
 			proc_fdlock(p);
-			goto dropout; /* can't copyout old fdflags */
+			goto dropout;                                
 		}
 		proc_fdlock(p);
 	}
 
 	if (FILEPROC_TYPE(fp) == FTYPE_GUARDED) {
 		if (0 == uap->guard || 0 == uap->guardflags) {
-			error = EINVAL; /* missing guard! */
+			error = EINVAL;                     
 		} else if (0 == oldg) {
-			error = EPERM; /* guardids cannot be zero */
+			error = EPERM;                              
 		}
 	} else {
 		if (0 != uap->guard || 0 != uap->guardflags) {
-			error = EINVAL; /* guard provided, but none needed! */
+			error = EINVAL;                                       
 		}
 	}
 
@@ -550,33 +550,33 @@ restart:
 	}
 
 	if (0 != uap->nguard) {
-		/*
-		 * There's a new guard in town.
-		 */
+		  
+                                 
+     
 		if (0 == newg) {
-			error = EINVAL; /* guards cannot contain zero */
+			error = EINVAL;                                 
 		} else if (((uap->nguardflags & GUARD_REQUIRED) != GUARD_REQUIRED) ||
 		    ((uap->nguardflags & ~GUARD_ALL) != 0)) {
-			error = EINVAL; /* must have valid attributes too */
+			error = EINVAL;                                     
 		}
 		if (0 != error) {
 			goto dropout;
 		}
 
 		if (FILEPROC_TYPE(fp) == FTYPE_GUARDED) {
-			/*
-			 * Replace old guard with new guard
-			 */
+			  
+                                      
+      
 			struct guarded_fileproc *gfp = FP_TO_GFP(fp);
 
 			if (oldg == gfp->gf_guard &&
 			    uap->guardflags == gfp->gf_attrs) {
-				/*
-				 * Must match existing guard + attributes
-				 * before we'll swap them to new ones, managing
-				 * fdflags "side-effects" as we go.   Note that
-				 * userland can request FD_CLOFORK semantics.
-				 */
+				  
+                                             
+                                                   
+                                                   
+                                                 
+       
 				if (gfp->gf_attrs & GUARD_CLOSE) {
 					FDFLAGS_CLR(p, fd, UF_FORKCLOSE);
 				}
@@ -587,15 +587,15 @@ restart:
 				}
 				FDFLAGS_SET(p, fd,
 				    (nfdflags & FD_CLOFORK) ? UF_FORKCLOSE : 0);
-				/* FG_CONFINED enforced regardless */
+				                                     
 			} else {
 				error = EPERM;
 			}
 			goto dropout;
 		} else {
-			/*
-			 * Add a guard to a previously unguarded descriptor
-			 */
+			  
+                                                      
+      
 			switch (FILEGLOB_DTYPE(fp->fp_glob)) {
 			case DTYPE_VNODE:
 			case DTYPE_PIPE:
@@ -621,7 +621,7 @@ restart:
 			proc_fdlock(p);
 
 			switch (error = fp_tryswap(p, fd, nfp)) {
-			case 0: /* success; guarded-ness comes with side-effects */
+			case 0:                                                    
 				fp = NULL;
 				gfp = FP_TO_GFP(nfp);
 				if (gfp->gf_attrs & GUARD_CLOSE) {
@@ -630,7 +630,7 @@ restart:
 				FDFLAGS_SET(p, fd, UF_EXCLOSE);
 				(void) fp_drop(p, fd, nfp, 1);
 				break;
-			case EKEEPLOOKING: /* fp_iocount indicates a collision */
+			case EKEEPLOOKING:                                       
 				(void) fp_drop(p, fd, fp, 1);
 				fileproc_free(nfp);
 				goto restart;
@@ -643,13 +643,13 @@ restart:
 			return error;
 		}
 	} else {
-		/*
-		 * No new guard.
-		 */
+		  
+                  
+     
 		if (FILEPROC_TYPE(fp) == FTYPE_GUARDED) {
-			/*
-			 * Remove the guard altogether.
-			 */
+			  
+                                  
+      
 			struct guarded_fileproc *gfp = FP_TO_GFP(fp);
 
 			if (0 != uap->nguardflags) {
@@ -668,17 +668,17 @@ restart:
 			proc_fdlock(p);
 
 			switch (error = fp_tryswap(p, fd, nfp)) {
-			case 0: /* success; undo side-effects of guarded-ness */
+			case 0:                                                 
 				fp = NULL;
 				FDFLAGS_CLR(p, fd, UF_FORKCLOSE | UF_EXCLOSE);
 				FDFLAGS_SET(p, fd,
 				    (nfdflags & FD_CLOFORK) ? UF_FORKCLOSE : 0);
-				/* FG_CONFINED enforced regardless */
+				                                     
 				FDFLAGS_SET(p, fd,
 				    (nfdflags & FD_CLOEXEC) ? UF_EXCLOSE : 0);
 				(void) fp_drop(p, fd, nfp, 1);
 				break;
-			case EKEEPLOOKING: /* fp_iocount indicates collision */
+			case EKEEPLOOKING:                                     
 				(void) fp_drop(p, fd, fp, 1);
 				fileproc_free(nfp);
 				goto restart;
@@ -690,9 +690,9 @@ restart:
 			proc_fdunlock(p);
 			return error;
 		} else {
-			/*
-			 * Not already guarded, and no new guard?
-			 */
+			  
+                                            
+      
 			error = EINVAL;
 		}
 	}
@@ -703,12 +703,12 @@ dropout:
 	return error;
 }
 
-/*
- * user_ssize_t guarded_write_np(int fd, const guardid_t *guard,
- *                          user_addr_t cbuf, user_ssize_t nbyte);
- *
- * Initial implementation of guarded writes.
- */
+  
+                                                                
+                                                                  
+  
+                                            
+   
 int
 guarded_write_np(struct proc *p, struct guarded_write_np_args *uap, user_ssize_t *retval)
 {
@@ -745,12 +745,12 @@ guarded_write_np(struct proc *p, struct guarded_write_np_args *uap, user_ssize_t
 	return error;
 }
 
-/*
- * user_ssize_t guarded_pwrite_np(int fd, const guardid_t *guard,
- *                        user_addr_t buf, user_size_t nbyte, off_t offset);
- *
- * Initial implementation of guarded pwrites.
- */
+  
+                                                                 
+                                                                            
+  
+                                             
+   
 int
 guarded_pwrite_np(struct proc *p, struct guarded_pwrite_np_args *uap, user_ssize_t *retval)
 {
@@ -809,13 +809,13 @@ errout:
 	return error;
 }
 
-/*
- * user_ssize_t guarded_writev_np(int fd, const guardid_t *guard,
- *                                   struct iovec *iovp, u_int iovcnt);
- *
- * Initial implementation of guarded writev.
- *
- */
+  
+                                                                 
+                                                                       
+  
+                                            
+  
+   
 int
 guarded_writev_np(struct proc *p, struct guarded_writev_np_args *uap, user_ssize_t *retval)
 {
@@ -828,19 +828,19 @@ guarded_writev_np(struct proc *p, struct guarded_writev_np_args *uap, user_ssize
 
 	AUDIT_ARG(fd, uap->fd);
 
-	/* Verify range bedfore calling uio_create() */
+	                                               
 	if (uap->iovcnt <= 0 || uap->iovcnt > UIO_MAXIOV) {
 		return EINVAL;
 	}
 
-	/* allocate a uio large enough to hold the number of iovecs passed */
+	                                                                     
 	auio = uio_create(uap->iovcnt, 0,
 	    (IS_64BIT_PROCESS(p) ? UIO_USERSPACE64 : UIO_USERSPACE32),
 	    UIO_WRITE);
 
-	/* get location of iovecs within the uio.  then copyin the iovecs from
-	 * user space.
-	 */
+	                                                                      
+               
+    
 	iovp = uio_iovsaddr(auio);
 	if (iovp == NULL) {
 		error = ENOMEM;
@@ -853,8 +853,8 @@ guarded_writev_np(struct proc *p, struct guarded_writev_np_args *uap, user_ssize
 		goto ExitThisRoutine;
 	}
 
-	/* finalize uio_t for use and do the IO
-	 */
+	                                       
+    
 	error = uio_calculateresid(auio);
 	if (error) {
 		goto ExitThisRoutine;
@@ -884,13 +884,13 @@ ExitThisRoutine:
 	return error;
 }
 
-/*
- * int falloc_guarded(struct proc *p, struct fileproc **fp, int *fd,
- *     vfs_context_t ctx, const guardid_t *guard, u_int attrs);
- *
- * This SPI is the guarded variant of falloc().  It borrows the same
- * restrictions as those used by the rest of the guarded_* routines.
- */
+  
+                                                                    
+                                                               
+  
+                                                                    
+                                                                    
+   
 int
 falloc_guarded(struct proc *p, struct fileproc **fp, int *fd,
     vfs_context_t ctx, const guardid_t *guard, u_int attrs)
@@ -912,39 +912,39 @@ falloc_guarded(struct proc *p, struct fileproc **fp, int *fd,
 
 #if CONFIG_MACF && CONFIG_VNGUARD
 
-/*
- * Guarded vnodes
- *
- * Uses MAC hooks to guard operations on vnodes in the system. Given an fd,
- * add data to the label on the fileglob and the vnode it points at.
- * The data contains a pointer to the fileglob, the set of attributes to
- * guard, a guard value for uniquification, and the pid of the process
- * who set the guard up in the first place.
- *
- * The fd must have been opened read/write, and the underlying
- * fileglob is FG_CONFINED so that there's no ambiguity about the
- * owning process.
- *
- * When there's a callback for a vnode operation of interest (rename, unlink,
- * etc.) check to see if the guard permits that operation, and if not
- * take an action e.g. log a message or generate a crash report.
- *
- * The label is removed from the vnode and the fileglob when the fileglob
- * is closed.
- *
- * The initial action to be taken can be specified by a boot arg (vnguard=0x42)
- * and change via the "kern.vnguard.flags" sysctl.
- */
+  
+                 
+  
+                                                                           
+                                                                    
+                                                                        
+                                                                      
+                                           
+  
+                                                              
+                                                                 
+                  
+  
+                                                                             
+                                                                     
+                                                                
+  
+                                                                         
+             
+  
+                                                                               
+                                                  
+   
 
 struct vng_owner;
 
-struct vng_info { /* lives on the vnode label */
+struct vng_info {                               
 	guardid_t vgi_guard;
 	unsigned vgi_attrs;
 	TAILQ_HEAD(, vng_owner) vgi_owners;
 };
 
-struct vng_owner { /* lives on the fileglob label */
+struct vng_owner {                                  
 	proc_t vgo_p;
 	struct fileglob *vgo_fg;
 	struct vng_info *vgo_vgi;
@@ -1110,10 +1110,10 @@ vnguard_sysc_setguard(proc_t p, const struct vnguard_set *vns)
 		return error;
 	}
 	do {
-		/*
-		 * To avoid trivial DoS, insist that the caller
-		 * has read/write access to the file.
-		 */
+		  
+                                                 
+                                       
+     
 		if ((FREAD | FWRITE) != (fp->f_flag & (FREAD | FWRITE))) {
 			error = EBADF;
 			break;
@@ -1123,11 +1123,11 @@ vnguard_sysc_setguard(proc_t p, const struct vnguard_set *vns)
 			error = EBADF;
 			break;
 		}
-		/*
-		 * Confinement means there's only one fd pointing at
-		 * this fileglob, and will always be associated with
-		 * this pid.
-		 */
+		  
+                                                      
+                                                      
+              
+     
 		if (0 == (FG_CONFINED & fg->fg_lflags)) {
 			error = EBADF;
 			break;
@@ -1142,7 +1142,7 @@ vnguard_sysc_setguard(proc_t p, const struct vnguard_set *vns)
 			break;
 		}
 
-		/* Ensure the target vnode -has- a label */
+		                                           
 		struct vfs_context *ctx = vfs_context_current();
 		mac_vnode_label_update(ctx, vp, NULL);
 
@@ -1152,23 +1152,23 @@ vnguard_sysc_setguard(proc_t p, const struct vnguard_set *vns)
 		lck_rw_lock_exclusive(&llock);
 
 		do {
-			/*
-			 * A vnode guard is associated with one or more
-			 * fileglobs in one or more processes.
-			 */
+			  
+                                                  
+                                         
+      
 			struct vng_info *vgi = vng_lbl_get(vp->v_label);
 			struct vng_owner *vgo = vng_lbl_get(fg->fg_label);
 
 			if (NULL == vgi) {
-				/* vnode unguarded, add the first guard */
+				                                          
 				if (NULL != vgo) {
 					panic("vnguard label on fileglob "
 					    "but not vnode");
 				}
-				/* add a kusecount so we can unlabel later */
+				                                             
 				error = vnode_ref_ext(vp, O_EVTONLY, 0);
 				if (0 == error) {
-					/* add the guard */
+					                   
 					vgi_add_vgo(nvgi, nvgo);
 					vng_lbl_set(vp->v_label, nvgi);
 					vng_lbl_set(fg->fg_label, nvgo);
@@ -1177,27 +1177,27 @@ vnguard_sysc_setguard(proc_t p, const struct vnguard_set *vns)
 					free_vgi(nvgi);
 				}
 			} else {
-				/* vnode already guarded */
+				                           
 				free_vgi(nvgi);
 				if (vgi->vgi_guard != vns->vns_guard) {
-					error = EPERM; /* guard mismatch */
+					error = EPERM;                     
 				} else if (vgi->vgi_attrs != vns->vns_attrs) {
-					/*
-					 * Temporary workaround for older versions of SQLite:
-					 * allow newer guard attributes to be silently cleared.
-					 */
+					  
+                                                          
+                                                            
+        
 					const unsigned mask = ~(VNG_WRITE_OTHER | VNG_TRUNC_OTHER);
 					if ((vgi->vgi_attrs & mask) == (vns->vns_attrs & mask)) {
 						vgi->vgi_attrs &= vns->vns_attrs;
 					} else {
-						error = EACCES; /* attr mismatch */
+						error = EACCES;                    
 					}
 				}
 				if (0 != error || NULL != vgo) {
 					free_vgo(nvgo);
 					break;
 				}
-				/* record shared ownership */
+				                             
 				vgi_add_vgo(vgi, nvgo);
 				vng_lbl_set(fg->fg_label, nvgo);
 			}
@@ -1250,11 +1250,11 @@ vng_policy_syscall(proc_t p, int cmd, user_addr_t arg)
 	return error;
 }
 
-/*
- * This is called just before the fileglob disappears in fg_free().
- * Take the exclusive lock: no other thread can add or remove
- * a vng_info to any vnode in the system.
- */
+  
+                                                                   
+                                                             
+                                         
+   
 static void
 vng_file_label_destroy(struct label *label)
 {
@@ -1265,7 +1265,7 @@ vng_file_label_destroy(struct label *label)
 		struct vng_info *vgi = lvgo->vgo_vgi;
 		assert(vgi);
 		if (vgi_remove_vgo(vgi, lvgo)) {
-			/* that was the last reference */
+			                                 
 			vgi->vgi_attrs = 0;
 			struct fileglob *fg = lvgo->vgo_fg;
 			assert(fg);
@@ -1275,7 +1275,7 @@ vng_file_label_destroy(struct label *label)
 				if (0 == error) {
 					vng_lbl_set(vp->v_label, 0);
 					lck_rw_unlock_exclusive(&llock);
-					/* may trigger VNOP_INACTIVE */
+					                               
 					vnode_rele_ext(vp, O_EVTONLY, 0);
 					vnode_put(vp);
 					free_vgi(vgi);
@@ -1296,9 +1296,9 @@ vng_reason_from_pathname(const char *path, uint32_t pathlen)
 	if (NULL == r) {
 		return r;
 	}
-	/*
-	 * If the pathname is very long, just keep the trailing part
-	 */
+	  
+                                                             
+    
 	const uint32_t pathmax = 3 * EXIT_REASON_USER_DESC_MAX_LEN / 4;
 	if (pathlen > pathmax) {
 		path += (pathlen - pathmax);
@@ -1320,11 +1320,11 @@ vng_reason_from_pathname(const char *path, uint32_t pathlen)
 
 static int vng_policy_flags;
 
-/*
- * Note: if an EXC_GUARD is generated, llock will be dropped and
- * subsequently reacquired by this routine. Data derived from
- * any label in the caller should be regenerated.
- */
+  
+                                                                
+                                                             
+                                                 
+   
 static int
 vng_guard_violation(const struct vng_info *vgi,
     unsigned opval, vnode_t vp)
@@ -1332,12 +1332,12 @@ vng_guard_violation(const struct vng_info *vgi,
 	int retval = 0;
 
 	if (vng_policy_flags & kVNG_POLICY_EPERM) {
-		/* deny the operation */
+		                        
 		retval = EPERM;
 	}
 
 	if (vng_policy_flags & (kVNG_POLICY_LOGMSG | kVNG_POLICY_UPRINTMSG)) {
-		/* log a message */
+		                   
 		const char *op;
 		switch (opval) {
 		case VNG_RENAME_FROM:
@@ -1396,7 +1396,7 @@ vng_guard_violation(const struct vng_info *vgi,
 	}
 
 	if (vng_policy_flags & (kVNG_POLICY_EXC | kVNG_POLICY_EXC_CORPSE)) {
-		/* EXC_GUARD exception */
+		                         
 		const struct vng_owner *vgo = TAILQ_FIRST(&vgi->vgi_owners);
 		pid_t pid = vgo ? proc_pid(vgo->vgo_p) : 0;
 		mach_exception_code_t code;
@@ -1423,7 +1423,7 @@ vng_guard_violation(const struct vng_info *vgi,
 					r = vng_reason_from_pathname(path, len);
 				}
 			}
-			task_violated_guard(code, subcode, r); /* not fatal */
+			task_violated_guard(code, subcode, r);                
 			if (NULL != r) {
 				os_reason_free(r);
 			}
@@ -1443,11 +1443,11 @@ vng_guard_violation(const struct vng_info *vgi,
 	return retval;
 }
 
-/*
- * A fatal vnode guard was tripped on this thread.
- *
- * (Invoked before returning to userland from the syscall handler.)
- */
+  
+                                                  
+  
+                                                                   
+   
 void
 vn_guard_ast(thread_t __unused t,
     mach_exception_data_type_t code, mach_exception_data_type_t subcode)
@@ -1457,9 +1457,9 @@ vn_guard_ast(thread_t __unused t,
 	psignal(p, SIGKILL);
 }
 
-/*
- * vnode callbacks
- */
+  
+                  
+   
 
 static int
 vng_vnode_check_rename(kauth_cred_t __unused cred,
@@ -1526,9 +1526,9 @@ vng_vnode_check_unlink(kauth_cred_t __unused cred,
 	return error;
 }
 
-/*
- * Only check violations for writes performed by "other processes"
- */
+  
+                                                                  
+   
 static int
 vng_vnode_check_write(kauth_cred_t __unused actv_cred,
     kauth_cred_t __unused file_cred, struct vnode *vp, struct label *label)
@@ -1554,9 +1554,9 @@ done:
 	return error;
 }
 
-/*
- * Only check violations for truncates performed by "other processes"
- */
+  
+                                                                     
+   
 static int
 vng_vnode_check_truncate(kauth_cred_t __unused actv_cred,
     kauth_cred_t __unused file_cred, struct vnode *vp,
@@ -1608,7 +1608,7 @@ vng_vnode_check_exchangedata(kauth_cred_t __unused cred,
 	return error;
 }
 
-/* Intercept open-time truncations (by "other") of a guarded vnode */
+                                                                     
 
 static int
 vng_vnode_check_open(kauth_cred_t cred,
@@ -1620,9 +1620,9 @@ vng_vnode_check_open(kauth_cred_t cred,
 	return vng_vnode_check_truncate(cred, NULL, vp, label);
 }
 
-/*
- * Configuration gorp
- */
+  
+                     
+   
 
 SECURITY_READ_ONLY_EARLY(static struct mac_policy_ops) vng_policy_ops = {
 	.mpo_file_label_destroy = vng_file_label_destroy,
@@ -1680,4 +1680,4 @@ SYSCTL_INT(_kern_vnguard, OID_AUTO, flags, CTLFLAG_RW | CTLFLAG_LOCKED,
     &vng_policy_flags, 0, "vnguard policy flags");
 #endif
 
-#endif /* CONFIG_MACF && CONFIG_VNGUARD */
+#endif                                    

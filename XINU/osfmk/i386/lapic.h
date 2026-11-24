@@ -32,10 +32,10 @@
 #ifndef _I386_LAPIC_H_
 #define _I386_LAPIC_H_
 
-/*
- * Legacy mode definitions.
- * The register offsets are no longer used by XNU - see LAPIC_MMIO_OFFSET().
- */
+  
+                           
+                                                                            
+   
 #define LAPIC_START                     0xFEE00000
 #define LAPIC_SIZE                      0x00000400
 
@@ -116,7 +116,7 @@
 #define LAPIC_TIMER_INITIAL_COUNT       0x00000380
 #define LAPIC_TIMER_CURRENT_COUNT       0x00000390
 #define LAPIC_TIMER_DIVIDE_CONFIG       0x000003E0
-/* divisor encoded by bits 0,1,3 with bit 2 always 0: */
+                                                        
 #define         LAPIC_TIMER_DIVIDE_MASK 0x0000000F
 #define         LAPIC_TIMER_DIVIDE_2    0x00000000
 #define         LAPIC_TIMER_DIVIDE_4    0x00000001
@@ -162,8 +162,8 @@ typedef enum {
 	TIMER_DIVIDE_CONFIG     = 0x3E,
 } lapic_register_t;
 
-#define LAPIC_MMIO_PBASE        0xFEE00000      /* Default physical MMIO addr */
-#define LAPIC_MMIO_VBASE        lapic_vbase     /* Actual virtual mapped addr */
+#define LAPIC_MMIO_PBASE        0xFEE00000                                      
+#define LAPIC_MMIO_VBASE        lapic_vbase                                     
 #define LAPIC_MSR_BASE          0x800
 
 #define LAPIC_MMIO_OFFSET(reg)  (reg << 4)
@@ -205,19 +205,19 @@ typedef enum {
 } lapic_timer_divide_t;
 typedef uint32_t lapic_timer_count_t;
 
-/*
- * By default, use high vectors to leave vector space for systems
- * with multiple I/O APIC's. However some systems that boot with
- * local APIC disabled will hang in SMM when vectors greater than
- * 0x5F are used. Those systems are not expected to have I/O APIC
- * so 16 (0x50 - 0x40) vectors for legacy PIC support is perfect.
- */
+  
+                                                                 
+                                                                
+                                                                 
+                                                                 
+                                                                 
+   
 #define LAPIC_DEFAULT_INTERRUPT_BASE    0xD0
 #define LAPIC_REDUCED_INTERRUPT_BASE    0x50
-/*
- * Specific lapic interrupts are relative to this base
- * in priority order from high to low:
- */
+  
+                                                      
+                                      
+   
 
 #define LAPIC_PERFCNT_INTERRUPT         0xF
 #define LAPIC_INTERPROCESSOR_INTERRUPT  0xE
@@ -233,10 +233,10 @@ typedef uint32_t lapic_timer_count_t;
 #define LAPIC_PMC_SWI_VECTOR            (LAPIC_DEFAULT_INTERRUPT_BASE + LAPIC_PMC_SW_INTERRUPT)
 #define LAPIC_TIMER_VECTOR              (LAPIC_DEFAULT_INTERRUPT_BASE + LAPIC_TIMER_INTERRUPT)
 
-/* The vector field is ignored for NMI interrupts via the LAPIC
- * or otherwise, so this is not an offset from the interrupt
- * base.
- */
+                                                               
+                                                            
+        
+   
 #define LAPIC_NMI_INTERRUPT             0x2
 #define LAPIC_FUNC_TABLE_SIZE           (LAPIC_PERFCNT_INTERRUPT + 1)
 
@@ -306,9 +306,9 @@ lapic_set_timer_func(i386_intr_func_t func)
 {
 	lapic_set_intr_func(LAPIC_VECTOR(TIMER), func);
 }
-/* We don't support dynamic adjustment of the LAPIC timer base vector here
- * it's effectively incompletely supported elsewhere as well.
- */
+                                                                          
+                                                             
+   
 static inline void
 lapic_timer_swi(void)
 {
@@ -345,8 +345,8 @@ extern uint8_t          lapic_get_cmci_vector(void);
 #else
 #define LAPIC_CPU_MAP_DUMP()
 #define LAPIC_DUMP()
-#endif /* MP_DEBUG */
+#endif               
 
-#endif /* ASSEMBLER */
+#endif                
 
-#endif /* _I386_LAPIC_H_ */
+#endif                     

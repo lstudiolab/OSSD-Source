@@ -38,33 +38,33 @@
  *
  */
 
-/*!
- * @header IOCommand
- * @abstract
- * This header contains the IOCommand class definition.
- */
+   
+                    
+            
+                                                       
+   
 
 #ifndef _IOKIT_IO_COMMAND_H_
 #define _IOKIT_IO_COMMAND_H_
 
-/*
- * Kernel
- */
+  
+         
+   
 
 #if defined(KERNEL) && defined(__cplusplus)
 
 #include <kern/queue.h>
 #include <libkern/c++/OSObject.h>
 
-/*!
- * @class IOCommand
- * @abstract
- * This class is an abstract class which represents an I/O command.
- * @discussion
- * This class is an abstract class which represents an I/O command passed
- * from a device driver to a controller. All controller commands (e.g. IOATACommand)
- * should inherit from this class.
- */
+   
+                   
+            
+                                                                   
+              
+                                                                         
+                                                                                    
+                                  
+   
 
 class IOCommand : public OSObject
 {
@@ -73,11 +73,11 @@ class IOCommand : public OSObject
 public:
 	virtual bool init(void) APPLE_KEXT_OVERRIDE;
 
-/*! @var fCommandChain
- *   This variable is used by the current 'owner' to queue the command.  During the life cycle of a command it moves through a series of queues.  This is the queue pointer for it.  Only valid while 'ownership' is clear.  For instance a IOCommandPool uses this pointer to maintain its list of free commands.  May be manipulated using the kern/queue.h macros */
-	queue_chain_t fCommandChain;    /* used to queue commands */
+                      
+                                                                                                                                                                                                                                                                                                                                                                       
+	queue_chain_t fCommandChain;                                
 };
 
-#endif /* defined(KERNEL) && defined(__cplusplus) */
+#endif                                              
 
-#endif  /* _IOKIT_IO_COMMAND_H_ */
+#endif                            

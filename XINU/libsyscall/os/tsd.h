@@ -29,7 +29,7 @@
 #ifndef OS_TSD_H
 #define OS_TSD_H
 
-/* The low nine slots of the TSD are reserved for libsyscall usage. */
+                                                                      
 #define __TSD_RESERVED_BASE 0
 #define __TSD_RESERVED_MAX 9
 
@@ -39,7 +39,7 @@
 #define __TSD_MACH_THREAD_SELF 3
 #define __TSD_THREAD_QOS_CLASS 4
 #define __TSD_RETURN_TO_KERNEL 5
-/* slot 6 is reserved for Windows/WINE compatibility reasons */
+                                                               
 #define __TSD_PTR_MUNGE 7
 #define __TSD_MACH_SPECIAL_REPLY 8
 #define __TSD_SEMAPHORE_CACHE 9
@@ -120,12 +120,12 @@ _os_tsd_get_base(void)
 	uintptr_t tsd;
 	__asm__("mrc p15, 0, %0, c13, c0, 3\n"
                 "bic %0, %0, #0x3\n" : "=r" (tsd));
-	/* lower 2-bits contain CPU number */
+	                                     
 #elif defined(__arm64__)
 	uint64_t tsd;
 	__asm__("mrs %0, TPIDRRO_EL0\n"
                 "bic %0, %0, #0x7\n" : "=r" (tsd));
-	/* lower 3-bits contain CPU number */
+	                                     
 #endif
 
 	return (void**)(uintptr_t)tsd;
@@ -169,7 +169,7 @@ _os_ptr_munge(uintptr_t ptr)
 #define _OS_PTR_MUNGE(_ptr) _os_ptr_munge((uintptr_t)(_ptr))
 #define _OS_PTR_UNMUNGE(_ptr) _os_ptr_munge((uintptr_t)(_ptr))
 
-#else // __ASSEMBLER__
+#else                 
 
 #define _OS_TSD_OFFSET(_key) \
 	((__POINTER_WIDTH__/__CHAR_BIT__)*_key)
@@ -198,7 +198,7 @@ _os_ptr_munge(uintptr_t ptr)
 	and	_reg, _reg, #~0x7 %% \
 	ldr	_token, [ _reg,  #_OS_TSD_OFFSET(__TSD_PTR_MUNGE) ]
 
-#endif // defined(__arm64__)
+#endif                      
 
 #define _OS_PTR_MUNGE(_regdest, _regsrc, _token) \
 	eor _regdest, _regsrc, _token
@@ -206,8 +206,8 @@ _os_ptr_munge(uintptr_t ptr)
 #define _OS_PTR_UNMUNGE(_regdest, _regsrc, _token) \
 	_OS_PTR_MUNGE(_regdest, _regsrc, _token)
 
-#endif // defined(__arm__) || defined(__arm64__)
+#endif                                          
 
-#endif // __ASSEMBLER__
+#endif                 
 
-#endif // OS_TSD_H
+#endif            

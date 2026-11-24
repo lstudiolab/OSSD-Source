@@ -20,7 +20,7 @@
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-/*	@(#)sigsuspend.c	1.0	9/22/95	(c) 1995 NeXT	*/
+                                                
 
 #include <signal.h>
 #include <unistd.h>

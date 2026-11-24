@@ -67,9 +67,9 @@ mac_labelzone_free(struct label *l)
 	zfree(zone_label, l);
 }
 
-/*
- * Functions used by policy modules to get and set label values.
- */
+  
+                                                                
+   
 intptr_t
 mac_label_get(struct label *l, int slot)
 {

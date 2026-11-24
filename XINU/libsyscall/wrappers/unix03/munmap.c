@@ -29,11 +29,11 @@
 #include <mach/mach_init.h>
 #include "stack_logging_internal.h"
 
-/*
- * munmap stub, for stack logging of VM allocations.
- *
- * This is for UNIX03 only.
- */
+  
+                                                    
+  
+                           
+   
 extern int __munmap(void *, size_t);
 
 int
@@ -48,4 +48,4 @@ munmap(void *addr, size_t len)
 	return result;
 }
 
-#endif /* __DARWIN_UNIX03 */
+#endif                      

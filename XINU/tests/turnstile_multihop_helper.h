@@ -1,4 +1,4 @@
-// vim:noexpandtab
+                  
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -93,7 +93,7 @@ ull_lock(lock_t *lock, int id, uint opcode, uint flags)
 		prev = 0;
 		__c11_atomic_compare_exchange_strong(lock, &prev, new, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED);
 		if (prev == 0) {
-			/* Was unlocked, now locked */
+			                              
 			succeeded = true;
 			break;
 		}
@@ -103,20 +103,20 @@ ull_lock(lock_t *lock, int id, uint opcode, uint flags)
 			new = value | ULL_WAITERS;
 			__c11_atomic_compare_exchange_strong(lock, &prev, new, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
 			if (prev == value) {
-				/* succeeded in setting ULL_WAITERS */
+				                                      
 				value = new;
 			} else if (prev & ULL_WAITERS) {
-				/* Didn't succeed, but someone else already set ULL_WAITERS */
+				                                                              
 				value = prev;
 			} else {
-				/* Something changed under us, so try again */
+				                                              
 				if (count % 100000 == 0) {
 					printf("[%d,%d]%s>Something changed under us, prev=%d\n", id, mach_id, __FUNCTION__, prev);
 				}
 				continue;
 			}
 		}
-		/* Locked with waiters indication, so block */
+		                                              
 		int ret = __ulock_wait(flags | opcode, lock, value, 0);
 		called_wait = true;
 		if (ret < 0) {
@@ -167,7 +167,7 @@ ull_unlock(lock_t *lock, int id, uint opcode, uint flags)
 	}
 
 	if (prev == (ULL_WAITERS | ull_locked)) {
-		/* locked with waiters */
+		                         
 		__c11_atomic_store(lock, 0, __ATOMIC_SEQ_CST);
 
 		if ((flags & ULF_WAKE_THREAD) && (_os_get_self() == main_thread_name)) {

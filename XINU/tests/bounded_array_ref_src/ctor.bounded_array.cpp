@@ -1,8 +1,8 @@
-//
-// Tests for
-//  template <size_t N>
-//  bounded_array_ref(bounded_array<T, N, TrappingPolicy>& data);
-//
+  
+            
+                       
+                                                                 
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"
@@ -47,7 +47,7 @@ tests()
 		CHECK(view.size() == 0);
 	}
 
-	// Also test implicit construction
+	                                  
 	{
 		test_bounded_array<T, 1> array = {T{11}};
 		test_bounded_array_ref<T> view = array;

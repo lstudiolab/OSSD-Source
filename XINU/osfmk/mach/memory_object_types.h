@@ -53,22 +53,22 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	memory_object.h
- *	Author:	Michael Wayne Young
- *
- *	External memory management interface definition.
- */
+  
+   
+  
+                        
+                              
+  
+                                                   
+   
 
 #ifndef _MACH_MEMORY_OBJECT_TYPES_H_
 #define _MACH_MEMORY_OBJECT_TYPES_H_
 
-/*
- *	User-visible types used in the external memory
- *	management interface:
- */
+  
+                                                 
+                        
+   
 
 #include <mach/port.h>
 #include <mach/message.h>
@@ -86,7 +86,7 @@
 #else
 #define MEMORY_OBJECT_HAS_REFCOUNT 0
 #endif
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #define VM_64_BIT_DATA_OBJECTS
 
@@ -98,38 +98,38 @@ typedef natural_t *             memory_object_fault_info_t;
 typedef unsigned long long      vm_object_id_t;
 
 
-/*
- * Temporary until real EMMI version gets re-implemented
- */
+  
+                                                        
+   
 
 #ifdef  KERNEL_PRIVATE
 
-/* IMPORTANT: this type must match "ipc_object_bits_t" from ipc/ipc_port.h */
+                                                                             
 typedef natural_t mo_ipc_object_bits_t;
 
-struct memory_object_pager_ops; /* forward declaration */
+struct memory_object_pager_ops;                          
 
 typedef struct vm_object       *memory_object_control_t;
-/*
- * "memory_object" used to be a Mach port in user space and could be passed
- * as such to some kernel APIs.
- *
- * Its first field must match the "io_bits" field of a
- * "struct ipc_object" to identify them as a "IKOT_MEMORY_OBJECT".
- */
+  
+                                                                           
+                               
+  
+                                                      
+                                                                  
+   
 typedef struct memory_object {
-	mo_ipc_object_bits_t                    mo_ikot; /* DO NOT CHANGE */
+	mo_ipc_object_bits_t                    mo_ikot;                    
 #if __LP64__
 #if XNU_KERNEL_PRIVATE
-	/*
-	 * On LP64 there's a 4 byte hole that is perfect for a refcount.
-	 * Expose it so that all pagers can take advantage of it.
-	 */
+	  
+                                                                 
+                                                          
+    
 	os_ref_atomic_t                         mo_ref;
 #else
 	unsigned int                            __mo_padding;
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /* __LP64__ */
+#endif                         
+#endif               
 	const struct memory_object_pager_ops    *mo_pager_ops;
 	memory_object_control_t                 mo_control;
 } *memory_object_t;
@@ -190,30 +190,30 @@ typedef const struct memory_object_pager_ops {
 	const char *memory_object_pager_name;
 } * memory_object_pager_ops_t;
 
-#else   /* KERNEL_PRIVATE */
+#else                       
 
 typedef mach_port_t     memory_object_t;
-/*
- * vestigial, maintained for source compatibility,
- * no MIG interface will accept or return non NULL
- * objects for those.
- */
+  
+                                                  
+                                                  
+                     
+   
 typedef mach_port_t     memory_object_control_t;
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 typedef memory_object_t *memory_object_array_t;
-/* A memory object ... */
-/*  Used by the kernel to retrieve */
-/*  or store data */
+                         
+                                     
+                    
 
 typedef mach_port_t     memory_object_name_t;
-/* Used to describe the memory ... */
-/*  object in vm_regions() calls */
+                                     
+                                   
 
 typedef mach_port_t     memory_object_default_t;
-/* Registered with the host ... */
-/*  for creating new internal objects */
+                                  
+                                        
 
 #define MEMORY_OBJECT_NULL              ((memory_object_t) 0)
 #define MEMORY_OBJECT_CONTROL_NULL      ((memory_object_control_t) 0)
@@ -222,56 +222,56 @@ typedef mach_port_t     memory_object_default_t;
 
 
 typedef int             memory_object_copy_strategy_t;
-/* How memory manager handles copy: */
+                                      
 #define         MEMORY_OBJECT_COPY_NONE         0
-/* ... No special support */
+                            
 #define         MEMORY_OBJECT_COPY_CALL         1
-/* ... Make call on memory manager */
+                                     
 #define         MEMORY_OBJECT_COPY_DELAY        2
-/* ... Memory manager doesn't
- *     change data externally.
- */
+                             
+                              
+   
 #define         MEMORY_OBJECT_COPY_TEMPORARY    3
-/* ... Memory manager doesn't
- *     change data externally, and
- *     doesn't need to see changes.
- */
+                             
+                                  
+                                   
+   
 #define         MEMORY_OBJECT_COPY_SYMMETRIC    4
-/* ... Memory manager doesn't
- *     change data externally,
- *     doesn't need to see changes,
- *     and object will not be
- *     multiply mapped.
- *
- *     XXX
- *     Not yet safe for non-kernel use.
- */
+                             
+                              
+                                   
+                             
+                       
+  
+          
+                                       
+   
 
 #define         MEMORY_OBJECT_COPY_INVALID      5
-/* ...	An invalid copy strategy,
- *	for external objects which
- *	have not been initialized.
- *	Allows copy_strategy to be
- *	examined without also
- *	examining pager_ready and
- *	internal.
- */
+                                
+                             
+                             
+                             
+                        
+                            
+            
+   
 
 typedef int             memory_object_return_t;
-/* Which pages to return to manager
- *  this time (lock_request) */
+                                   
+                               
 #define         MEMORY_OBJECT_RETURN_NONE       0
-/* ... don't return any. */
+                           
 #define         MEMORY_OBJECT_RETURN_DIRTY      1
-/* ... only dirty pages. */
+                           
 #define         MEMORY_OBJECT_RETURN_ALL        2
-/* ... dirty and precious pages. */
+                                   
 #define         MEMORY_OBJECT_RETURN_ANYTHING   3
-/* ... any resident page. */
+                            
 
-/*
- *	Data lock request flags
- */
+  
+                          
+   
 
 #define         MEMORY_OBJECT_DATA_FLUSH        0x1
 #define         MEMORY_OBJECT_DATA_NO_CHANGE    0x2
@@ -281,9 +281,9 @@ typedef int             memory_object_return_t;
 #define         MEMORY_OBJECT_IO_SYNC           0x20
 #define         MEMORY_OBJECT_DATA_FLUSH_ALL    0x40
 
-/*
- *	Types for the memory object flavor interfaces
- */
+  
+                                                
+   
 
 #define MEMORY_OBJECT_INFO_MAX      (1024)
 typedef int     *memory_object_info_t;
@@ -306,7 +306,7 @@ struct old_memory_object_behave_info {
 	boolean_t                       invalidate;
 };
 
-struct old_memory_object_attr_info {                    /* old attr list */
+struct old_memory_object_attr_info {                                       
 	boolean_t                       object_ready;
 	boolean_t                       may_cache;
 	memory_object_copy_strategy_t   copy_strategy;
@@ -341,9 +341,9 @@ extern void memory_object_control_deallocate(memory_object_control_t control);
 extern int  memory_object_control_uiomove(memory_object_control_t, memory_object_offset_t, void *, int, int, int, int);
 __END_DECLS
 
-#endif  /* KERNEL */
+#endif              
 
-#endif  /* PRIVATE */
+#endif               
 
 struct memory_object_perf_info {
 	memory_object_cluster_size_t    cluster_size;
@@ -390,22 +390,22 @@ typedef struct memory_object_attr_info  memory_object_attr_info_data_t;
 	 f != OLD_MEMORY_OBJECT_ATTRIBUTE_INFO)
 
 
-/*
- * Used to support options on memory_object_release_name call
- */
+  
+                                                             
+   
 #define MEMORY_OBJECT_TERMINATE_IDLE    0x1
 #define MEMORY_OBJECT_RESPECT_CACHE     0x2
 #define MEMORY_OBJECT_RELEASE_NO_OP     0x4
 
 
-/* named entry processor mapping options */
-/* enumerated */
+                                           
+                
 #define MAP_MEM_NOOP                      0
 #define MAP_MEM_COPYBACK                  1
 #define MAP_MEM_IO                        2
 #define MAP_MEM_WTHRU                     3
-#define MAP_MEM_WCOMB                     4       /* Write combining mode */
-                                                  /* aka store gather     */
+#define MAP_MEM_WCOMB                     4                                 
+                                                                            
 #define MAP_MEM_INNERWBACK                5
 #define MAP_MEM_POSTED                    6
 #define MAP_MEM_RT                        7
@@ -419,18 +419,18 @@ typedef struct memory_object_attr_info  memory_object_attr_info_data_t;
 	((flags) = ((((unsigned int)(caching)) << 24) \
 	                & 0xFF000000) | ((flags) & 0xFFFFFF));
 
-/* leave room for vm_prot bits (0xFF ?) */
-#define MAP_MEM_LEDGER_TAGGED        0x002000 /* object owned by a specific task and ledger */
-#define MAP_MEM_PURGABLE_KERNEL_ONLY 0x004000 /* volatility controlled by kernel */
-#define MAP_MEM_GRAB_SECLUDED   0x008000 /* can grab secluded pages */
-#define MAP_MEM_ONLY            0x010000 /* change processor caching  */
-#define MAP_MEM_NAMED_CREATE    0x020000 /* create extant object      */
-#define MAP_MEM_PURGABLE        0x040000 /* create a purgable VM object */
-#define MAP_MEM_NAMED_REUSE     0x080000 /* reuse provided entry if identical */
-#define MAP_MEM_USE_DATA_ADDR   0x100000 /* preserve address of data, rather than base of page */
-#define MAP_MEM_VM_COPY         0x200000 /* make a copy of a VM range */
-#define MAP_MEM_VM_SHARE        0x400000 /* extract a VM range for remap */
-#define MAP_MEM_4K_DATA_ADDR    0x800000 /* preserve 4K aligned address of data */
+                                          
+#define MAP_MEM_LEDGER_TAGGED        0x002000                                                 
+#define MAP_MEM_PURGABLE_KERNEL_ONLY 0x004000                                      
+#define MAP_MEM_GRAB_SECLUDED   0x008000                              
+#define MAP_MEM_ONLY            0x010000                                
+#define MAP_MEM_NAMED_CREATE    0x020000                                
+#define MAP_MEM_PURGABLE        0x040000                                  
+#define MAP_MEM_NAMED_REUSE     0x080000                                        
+#define MAP_MEM_USE_DATA_ADDR   0x100000                                                         
+#define MAP_MEM_VM_COPY         0x200000                                
+#define MAP_MEM_VM_SHARE        0x400000                                   
+#define MAP_MEM_4K_DATA_ADDR    0x800000                                          
 
 #define MAP_MEM_FLAGS_MASK 0x00FFFF00
 #define MAP_MEM_FLAGS_USER (                               \
@@ -450,14 +450,14 @@ typedef struct memory_object_attr_info  memory_object_attr_info_data_t;
 
 #ifdef KERNEL
 
-/*
- *  Universal Page List data structures
- *
- *  A UPL describes a bounded set of physical pages
- *  associated with some range of an object or map
- *  and a snapshot of the attributes associated with
- *  each of those pages.
- */
+  
+                                       
+  
+                                                   
+                                                  
+                                                    
+                        
+   
 #ifdef PRIVATE
 #define MAX_UPL_TRANSFER_BYTES  (1024 * 1024)
 #define MAX_UPL_SIZE_BYTES      (1024 * 1024 * 64)
@@ -466,47 +466,47 @@ typedef struct memory_object_attr_info  memory_object_attr_info_data_t;
 #define MAX_UPL_TRANSFER        (MAX_UPL_TRANSFER_BYTES / PAGE_SIZE)
 
 struct upl_page_info {
-	ppnum_t         phys_addr;      /* physical page index number */
+	ppnum_t         phys_addr;                                      
 	unsigned int
 #ifdef  XNU_KERNEL_PRIVATE
-	    free_when_done:1,    /* page is to be freed on commit */
-	    absent:1,           /* No valid data in this page */
-	    dirty:1,            /* Page must be cleaned (O) */
-	    precious:1,         /* must be cleaned, we have only copy */
-	    device:1,           /* no page data, mapped dev memory */
-	    speculative:1,      /* page is valid, but not yet accessed */
+	    free_when_done:1,                                       
+	    absent:1,                                           
+	    dirty:1,                                          
+	    precious:1,                                                 
+	    device:1,                                                
+	    speculative:1,                                               
 #define VMP_CS_BITS 4
 #define VMP_CS_ALL_FALSE 0x0
 #define VMP_CS_ALL_TRUE 0xF
-	cs_validated:VMP_CS_BITS,     /* CODE SIGNING: page was validated */
-	    cs_tainted:VMP_CS_BITS,   /* CODE SIGNING: page is tainted */
-	    cs_nx:VMP_CS_BITS,        /* CODE SIGNING: page is NX */
+	cs_validated:VMP_CS_BITS,                                           
+	    cs_tainted:VMP_CS_BITS,                                      
+	    cs_nx:VMP_CS_BITS,                                      
 
-	    needed:1,           /* page should be left in cache on abort */
-	    mark:1,             /* a mark flag for the creator to use as they wish */
-	:0;                     /* force to long boundary */
+	    needed:1,                                                      
+	    mark:1,                                                                  
+	:0;                                                 
 #else
-	opaque;                 /* use upl_page_xxx() accessor funcs */
-#endif /* XNU_KERNEL_PRIVATE */
+	opaque;                                                        
+#endif                         
 };
 
 #else
 
 struct upl_page_info {
-	unsigned int    opaque[2];      /* use upl_page_xxx() accessor funcs */
+	unsigned int    opaque[2];                                             
 };
 
-#endif /* PRIVATE */
+#endif              
 
 typedef struct upl_page_info    upl_page_info_t;
 typedef upl_page_info_t         *upl_page_info_array_t;
 typedef upl_page_info_array_t   upl_page_list_ptr_t;
 
-typedef uint32_t        upl_offset_t;   /* page-aligned byte offset */
-typedef uint32_t        upl_size_t;     /* page-aligned byte size */
+typedef uint32_t        upl_offset_t;                                 
+typedef uint32_t        upl_size_t;                                 
 
-/* upl invocation flags */
-/* top nibble is used by super upl */
+                          
+                                     
 
 typedef uint64_t upl_control_flags_t;
 
@@ -519,7 +519,7 @@ typedef uint64_t upl_control_flags_t;
 #define UPL_RET_ONLY_DIRTY      0x00000020ULL
 #define UPL_SET_INTERNAL        0x00000040ULL
 #define UPL_QUERY_OBJECT_TYPE   0x00000080ULL
-#define UPL_RET_ONLY_ABSENT     0x00000100ULL /* used only for COPY_FROM = FALSE */
+#define UPL_RET_ONLY_ABSENT     0x00000100ULL                                      
 #define UPL_FILE_IO             0x00000200ULL
 #define UPL_SET_LITE            0x00000400ULL
 #define UPL_SET_INTERRUPTIBLE   0x00000800ULL
@@ -527,127 +527,127 @@ typedef uint64_t upl_control_flags_t;
 #define UPL_FOR_PAGEOUT         0x00002000ULL
 #define UPL_WILL_BE_DUMPED      0x00004000ULL
 #define UPL_FORCE_DATA_SYNC     0x00008000ULL
-/* continued after the ticket bits... */
+                                        
 
 #define UPL_PAGE_TICKET_MASK    0x000F0000ULL
 #define UPL_PAGE_TICKET_SHIFT   16
 
-/* ... flags resume here */
+                           
 #define UPL_BLOCK_ACCESS        0x00100000ULL
 #define UPL_ENCRYPT             0x00200000ULL
 #define UPL_NOZEROFILL          0x00400000ULL
-#define UPL_WILL_MODIFY         0x00800000ULL /* caller will modify the pages */
+#define UPL_WILL_MODIFY         0x00800000ULL                                   
 
 #define UPL_NEED_32BIT_ADDR     0x01000000ULL
 #define UPL_UBC_MSYNC           0x02000000ULL
 #define UPL_UBC_PAGEOUT         0x04000000ULL
 #define UPL_UBC_PAGEIN          0x08000000ULL
 #define UPL_REQUEST_SET_DIRTY   0x10000000ULL
-#define UPL_REQUEST_NO_FAULT    0x20000000ULL /* fail if pages not all resident */
-#define UPL_NOZEROFILLIO        0x40000000ULL /* allow non zerofill pages present */
+#define UPL_REQUEST_NO_FAULT    0x20000000ULL                                     
+#define UPL_NOZEROFILLIO        0x40000000ULL                                       
 #define UPL_REQUEST_FORCE_COHERENCY     0x80000000ULL
 
-/* UPL flags known by this kernel */
+                                    
 #define UPL_VALID_FLAGS         0xFFFFFFFFFFULL
 
 
-/* upl abort error flags */
+                           
 #define UPL_ABORT_RESTART               0x1
 #define UPL_ABORT_UNAVAILABLE   0x2
 #define UPL_ABORT_ERROR         0x4
-#define UPL_ABORT_FREE_ON_EMPTY 0x8  /* only implemented in wrappers */
+#define UPL_ABORT_FREE_ON_EMPTY 0x8                                    
 #define UPL_ABORT_DUMP_PAGES    0x10
 #define UPL_ABORT_NOTIFY_EMPTY  0x20
-/* deprecated: #define UPL_ABORT_ALLOW_ACCESS	0x40 */
+                                                     
 #define UPL_ABORT_REFERENCE     0x80
 
-/* upl pages check flags */
+                           
 #define UPL_CHECK_DIRTY         0x1
 
 
-/*
- *  upl pagein/pageout  flags
- *
- *
- * when I/O is issued from this UPL it should be done synchronously
- */
+  
+                             
+  
+  
+                                                                   
+   
 #define UPL_IOSYNC      0x1
 
-/*
- * the passed in UPL should not have either a commit or abort
- * applied to it by the underlying layers... the site that
- * created the UPL is responsible for cleaning it up.
- */
+  
+                                                             
+                                                          
+                                                     
+   
 #define UPL_NOCOMMIT    0x2
 
-/*
- * turn off any speculative read-ahead applied at the I/O layer
- */
+  
+                                                               
+   
 #define UPL_NORDAHEAD   0x4
 
-/*
- * pageout request is targeting a real file
- * as opposed to a swap file.
- */
+  
+                                           
+                             
+   
 
 #define UPL_VNODE_PAGER 0x8
-/*
- * this pageout is being originated as part of an explicit
- * memory synchronization operation... no speculative clustering
- * should be applied, only the range specified should be pushed.
- */
+  
+                                                          
+                                                                
+                                                                
+   
 #define UPL_MSYNC               0x10
 
-/*
- *
- */
+  
+  
+   
 #define UPL_PAGING_ENCRYPTED    0x20
 
-/*
- * this pageout is being originated as part of an explicit
- * memory synchronization operation that is checking for I/O
- * errors and taking it's own action... if an error occurs,
- * just abort the pages back into the cache unchanged
- */
+  
+                                                          
+                                                            
+                                                           
+                                                     
+   
 #define UPL_KEEPCACHED          0x40
 
-/*
- * this pageout originated from within cluster_io to deal
- * with a dirty page that hasn't yet been seen by the FS
- * that backs it... tag it so that the FS can take the
- * appropriate action w/r to its locking model since the
- * pageout will reenter the FS for the same file currently
- * being handled in this context.
- */
+  
+                                                         
+                                                        
+                                                      
+                                                        
+                                                          
+                                 
+   
 #define UPL_NESTED_PAGEOUT      0x80
 
-/*
- * we've detected a sequential access pattern and
- * we are speculatively and aggressively pulling
- * pages in... do not count these as real PAGEINs
- * w/r to our hard throttle maintenance
- */
+  
+                                                 
+                                                
+                                                 
+                                       
+   
 #define UPL_IOSTREAMING         0x100
 
-/*
- * Currently, it's only used for the swap pagein path.
- * Since the swap + compressed pager layer manage their
- * pages, these pages are not marked "absent" i.e. these
- * are "valid" pages. The pagein path will _not_ issue an
- * I/O (correctly) for valid pages. So, this flag is used
- * to override that logic in the vnode I/O path.
- */
+  
+                                                      
+                                                       
+                                                        
+                                                         
+                                                         
+                                                
+   
 #define UPL_IGNORE_VALID_PAGE_CHECK     0x200
 
 
 
-/* upl commit flags */
-#define UPL_COMMIT_FREE_ON_EMPTY        0x1 /* only implemented in wrappers */
+                      
+#define UPL_COMMIT_FREE_ON_EMPTY        0x1                                   
 #define UPL_COMMIT_CLEAR_DIRTY          0x2
 #define UPL_COMMIT_SET_DIRTY            0x4
 #define UPL_COMMIT_INACTIVATE           0x8
 #define UPL_COMMIT_NOTIFY_EMPTY         0x10
-/* deprecated: #define UPL_COMMIT_ALLOW_ACCESS		0x20 */
+                                                       
 #define UPL_COMMIT_CS_VALIDATED         0x40
 #define UPL_COMMIT_CLEAR_PRECIOUS       0x80
 #define UPL_COMMIT_SPECULATE            0x100
@@ -656,16 +656,16 @@ typedef uint64_t upl_control_flags_t;
 
 #define UPL_COMMIT_KERNEL_ONLY_FLAGS    (UPL_COMMIT_CS_VALIDATED | UPL_COMMIT_FREE_ABSENT)
 
-/* flags for return of state from vm_map_get_upl,  vm_upl address space */
-/* based call */
+                                                                          
+                
 #define UPL_DEV_MEMORY                  0x1
 #define UPL_PHYS_CONTIG                 0x2
 
 
-/*
- * Flags for the UPL page ops routine.  This routine is not exported
- * out of the kernel at the moment and so the defs live here.
- */
+  
+                                                                    
+                                                             
+   
 #define UPL_POP_DIRTY           0x1
 #define UPL_POP_PAGEOUT         0x2
 #define UPL_POP_PRECIOUS                0x4
@@ -677,24 +677,24 @@ typedef uint64_t upl_control_flags_t;
 #define UPL_POP_SET             0x40000000
 #define UPL_POP_CLR             0x80000000
 
-/*
- * Flags for the UPL range op routine.  This routine is not exported
- * out of the kernel at the moemet and so the defs live here.
- */
-/*
- * UPL_ROP_ABSENT: Returns the extent of the range presented which
- * is absent, starting with the start address presented
- */
+  
+                                                                    
+                                                             
+   
+  
+                                                                  
+                                                       
+   
 #define UPL_ROP_ABSENT          0x01
-/*
- * UPL_ROP_PRESENT: Returns the extent of the range presented which
- * is present (i.e. resident), starting with the start address presented
- */
+  
+                                                                   
+                                                                        
+   
 #define UPL_ROP_PRESENT         0x02
-/*
- * UPL_ROP_DUMP: Dump the pages which are found in the target object
- * for the target range.
- */
+  
+                                                                    
+                        
+   
 #define UPL_ROP_DUMP                    0x04
 
 #ifdef  PRIVATE
@@ -702,7 +702,7 @@ typedef uint64_t upl_control_flags_t;
 #define UPL_REPRIO_INFO_MASK    (0xFFFFFFFF)
 #define UPL_REPRIO_INFO_SHIFT   32
 
-/* access macros for upl_t */
+                             
 
 #define UPL_DEVICE_PAGE(upl) \
 	(((upl)[0].phys_addr != 0) ? ((upl)[0].device) : FALSE)
@@ -742,7 +742,7 @@ typedef uint64_t upl_control_flags_t;
 #define UPL_REPRIO_INFO_LEN(upl, index) \
 	((((upl)->upl_reprio_info[(index)]) >> UPL_REPRIO_INFO_SHIFT) & UPL_REPRIO_INFO_MASK)
 
-/* modifier macros for upl_t */
+                               
 
 #define UPL_SET_CS_VALIDATED(upl, index, value) \
 	((upl)[(index)].cs_validated = (value))
@@ -757,24 +757,24 @@ typedef uint64_t upl_control_flags_t;
 	((upl)->upl_reprio_info[(index)]) = (((uint64_t)(blkno) & UPL_REPRIO_INFO_MASK) | \
 	(((uint64_t)(len) & UPL_REPRIO_INFO_MASK) << UPL_REPRIO_INFO_SHIFT))
 
-/* The call prototyped below is used strictly by UPL_GET_INTERNAL_PAGE_LIST */
+                                                                              
 
 extern vm_size_t        upl_offset_to_pagelist;
 extern vm_size_t        upl_get_internal_pagelist_offset(void);
 extern void*            upl_get_internal_vectorupl(upl_t);
 extern upl_page_info_t*         upl_get_internal_vectorupl_pagelist(upl_t);
 
-/*Use this variant to get the UPL's page list iff:*/
-/*- the upl being passed in is already part of a vector UPL*/
-/*- the page list you want is that of this "sub-upl" and not that of the entire vector-upl*/
+                                                    
+                                                             
+                                                                                            
 
 #define UPL_GET_INTERNAL_PAGE_LIST_SIMPLE(upl) \
 	((upl_page_info_t *)((upl_offset_to_pagelist == 0) ?  \
 	(uintptr_t)upl + (unsigned int)(upl_offset_to_pagelist = upl_get_internal_pagelist_offset()): \
 	(uintptr_t)upl + (unsigned int)upl_offset_to_pagelist))
 
-/* UPL_GET_INTERNAL_PAGE_LIST is only valid on internal objects where the */
-/* list request was made with the UPL_INTERNAL flag */
+                                                                            
+                                                      
 
 
 #define UPL_GET_INTERNAL_PAGE_LIST(upl) \
@@ -798,7 +798,7 @@ extern void     upl_set_blkno(upl_t upl, vm_offset_t upl_offset, int size, int64
 
 __END_DECLS
 
-#endif /* PRIVATE */
+#endif              
 
 __BEGIN_DECLS
 
@@ -814,10 +814,10 @@ extern void             upl_unmark_decmp(upl_t upl);
 void upl_page_set_mark(upl_page_info_t *upl, int index, boolean_t v);
 boolean_t upl_page_get_mark(upl_page_info_t *upl, int index);
 
-#endif // KERNEL_PRIVATE
+#endif                  
 
 __END_DECLS
 
-#endif  /* KERNEL */
+#endif              
 
-#endif  /* _MACH_MEMORY_OBJECT_TYPES_H_ */
+#endif                                    

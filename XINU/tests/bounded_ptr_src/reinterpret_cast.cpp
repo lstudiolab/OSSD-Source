@@ -1,8 +1,8 @@
-//
-// Tests for
-//  template <typename T, typename U, typename Policy>
-//  bounded_ptr<T, Policy> reinterpret_pointer_cast(bounded_ptr<U, Policy> const& p) noexcept
-//
+  
+            
+                                                      
+                                                                                             
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -48,14 +48,14 @@ tests()
 		_assert(to.discard_bounds() == reinterpret_cast<To const volatile*>(from.discard_bounds()));
 	}
 
-	// Test `reinterpret_pointer_cast`ing a null pointer
+	                                                    
 	{
 		test_bounded_ptr<From> from(nullptr, nullptr, nullptr);
 		test_bounded_ptr<To> to = libkern::reinterpret_pointer_cast<To>(from);
 		_assert(to.unsafe_discard_bounds() == nullptr);
 	}
 
-	// Test with a non-default policy
+	                                 
 	{
 		libkern::bounded_ptr<From, non_default_policy> from(array.begin(), array.begin(), array.end());
 		libkern::bounded_ptr<To, non_default_policy> to = libkern::reinterpret_pointer_cast<To>(from);
@@ -64,23 +64,23 @@ tests()
 }
 
 T_DECL(reinterpret_cast_, "bounded_ptr.reinterpret_cast") {
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Base>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ Base const>();
-	tests</*stored*/ Derived, /*from*/ Derived volatile, /*to*/ Base volatile>();
-	tests</*stored*/ Derived, /*from*/ Derived const volatile, /*to*/ Base const volatile>();
+	tests<           Derived,          Derived,        Base>();
+	tests<           Derived,          Derived const,        Base const>();
+	tests<           Derived,          Derived volatile,        Base volatile>();
+	tests<           Derived,          Derived const volatile,        Base const volatile>();
 
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple, /*to*/ Base1>();
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple const, /*to*/ Base1 const>();
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple volatile, /*to*/ Base1 volatile>();
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple const volatile, /*to*/ Base1 const volatile>();
+	tests<           DerivedMultiple,          DerivedMultiple,        Base1>();
+	tests<           DerivedMultiple,          DerivedMultiple const,        Base1 const>();
+	tests<           DerivedMultiple,          DerivedMultiple volatile,        Base1 volatile>();
+	tests<           DerivedMultiple,          DerivedMultiple const volatile,        Base1 const volatile>();
 
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ void>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ void const>();
-	tests</*stored*/ Derived, /*from*/ Derived volatile, /*to*/ void volatile>();
-	tests</*stored*/ Derived, /*from*/ Derived const volatile, /*to*/ void const volatile>();
+	tests<           Derived,          Derived,        void>();
+	tests<           Derived,          Derived const,        void const>();
+	tests<           Derived,          Derived volatile,        void volatile>();
+	tests<           Derived,          Derived const volatile,        void const volatile>();
 
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ char>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ char const>();
-	tests</*stored*/ Derived, /*from*/ Derived volatile, /*to*/ char volatile>();
-	tests</*stored*/ Derived, /*from*/ Derived const volatile, /*to*/ char const volatile>();
+	tests<           Derived,          Derived,        char>();
+	tests<           Derived,          Derived const,        char const>();
+	tests<           Derived,          Derived volatile,        char volatile>();
+	tests<           Derived,          Derived const volatile,        char const volatile>();
 }

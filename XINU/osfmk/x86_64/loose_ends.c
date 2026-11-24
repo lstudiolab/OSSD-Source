@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 #include <mach_assert.h>
 
 #include <string.h>
@@ -83,7 +83,7 @@
 
 #if !MACH_KDP
 #include <kdp/kdp_callout.h>
-#endif /* !MACH_KDP */
+#endif                
 
 #include <architecture/i386/pio.h>
 
@@ -100,10 +100,10 @@
 
 #endif
 
-/* prevent infinite recursion when memmove calls bcopy; in string.h, bcopy is defined to call memmove */
+                                                                                                        
 #undef bcopy
 
-/* XXX - should be gone from here */
+                                    
 extern void             invalidate_icache64(addr64_t addr, unsigned cnt, int phys);
 extern void             flush_dcache64(addr64_t addr, unsigned count, int phys);
 extern boolean_t        phys_page_exists(ppnum_t);
@@ -123,36 +123,36 @@ void machine_callstack(uintptr_t *buf, vm_size_t callstack_max);
 
 #define INT_SIZE        (BYTE_SIZE * sizeof (int))
 
-/*
- * Set indicated bit in bit string.
- */
+  
+                                   
+   
 void
 setbit(int bitno, int *s)
 {
 	s[bitno / INT_SIZE] |= 1 << (bitno % INT_SIZE);
 }
 
-/*
- * Clear indicated bit in bit string.
- */
+  
+                                     
+   
 void
 clrbit(int bitno, int *s)
 {
 	s[bitno / INT_SIZE] &= ~(1 << (bitno % INT_SIZE));
 }
 
-/*
- * Test if indicated bit is set in bit string.
- */
+  
+                                              
+   
 int
 testbit(int bitno, int *s)
 {
 	return s[bitno / INT_SIZE] & (1 << (bitno % INT_SIZE));
 }
 
-/*
- * Find first bit set in bit string.
- */
+  
+                                    
+   
 int
 ffsbit(int *s)
 {
@@ -171,10 +171,10 @@ ffs(unsigned int mask)
 		return 0;
 	}
 
-	/*
-	 * NOTE: cannot use __builtin_ffs because it generates a call to
-	 * 'ffs'
-	 */
+	  
+                                                                 
+         
+    
 	return 1 + __builtin_ctz(mask);
 }
 
@@ -185,16 +185,16 @@ ffsll(unsigned long long mask)
 		return 0;
 	}
 
-	/*
-	 * NOTE: cannot use __builtin_ffsll because it generates a call to
-	 * 'ffsll'
-	 */
+	  
+                                                                   
+           
+    
 	return 1 + __builtin_ctzll(mask);
 }
 
-/*
- * Find last bit set in bit string.
- */
+  
+                                   
+   
 int
 fls(unsigned int mask)
 {
@@ -232,9 +232,9 @@ bzero_phys(
 }
 
 
-/*
- * bcopy_phys - like bcopy but copies from/to physical addresses.
- */
+  
+                                                                 
+   
 
 void
 bcopy_phys(
@@ -242,7 +242,7 @@ bcopy_phys(
 	addr64_t dst64,
 	vm_size_t bytes)
 {
-	/* Not necessary for K64 - but ensure we stay within a page */
+	                                                              
 	if (((((uint32_t)src64 & (NBPG - 1)) + bytes) > NBPG) ||
 	    ((((uint32_t)dst64 & (NBPG - 1)) + bytes) > NBPG)) {
 		panic("bcopy_phys alignment");
@@ -250,9 +250,9 @@ bcopy_phys(
 	bcopy(PHYSMAP_PTOV(src64), PHYSMAP_PTOV(dst64), bytes);
 }
 
-/*
- * allow a function to get a quick virtual mapping of a physical page
- */
+  
+                                                                     
+   
 
 int
 apply_func_phys(
@@ -261,7 +261,7 @@ apply_func_phys(
 	int (*func)(void * buffer, vm_size_t bytes, void * arg),
 	void * arg)
 {
-	/* Not necessary for K64 - but ensure we stay within a page */
+	                                                              
 	if (((((uint32_t)dst64 & (NBPG - 1)) + bytes) > NBPG)) {
 		panic("apply_func_phys alignment");
 	}
@@ -269,24 +269,24 @@ apply_func_phys(
 	return func(PHYSMAP_PTOV(dst64), bytes, arg);
 }
 
-/*
- * ovbcopy - like bcopy, but recognizes overlapping ranges and handles
- *           them correctly.
- */
+  
+                                                                      
+                            
+   
 
 void
 ovbcopy(
 	const char      *from,
 	char            *to,
-	vm_size_t       bytes)          /* num bytes to copy */
+	vm_size_t       bytes)                                 
 {
-	/* Assume that bcopy copies left-to-right (low addr first). */
+	                                                              
 	if (from + bytes <= to || to + bytes <= from || to == from) {
-		bcopy_no_overwrite(from, to, bytes);    /* non-overlapping or no-op*/
+		bcopy_no_overwrite(from, to, bytes);                                 
 	} else if (from > to) {
-		bcopy_no_overwrite(from, to, bytes);    /* overlapping but OK */
+		bcopy_no_overwrite(from, to, bytes);                            
 	} else {
-		/* to > from: overlapping, and must copy right-to-left. */
+		                                                          
 		from += bytes - 1;
 		to += bytes - 1;
 		while (bytes-- > 0) {
@@ -296,9 +296,9 @@ ovbcopy(
 }
 
 
-/*
- *  Read data from a physical address. Memory should not be cache inhibited.
- */
+  
+                                                                            
+   
 
 uint64_t reportphyreaddelayabs;
 uint64_t reportphywritedelayabs;
@@ -340,7 +340,7 @@ ml_phys_read_data(uint64_t paddr, int size)
 	if (__improbable(timeread && simulate_stretched_io)) {
 		sabs -= simulate_stretched_io;
 	}
-#endif /* x86_64 DEVELOPMENT || DEBUG */
+#endif                                  
 
 	switch (size) {
 	case 1:
@@ -387,7 +387,7 @@ ml_phys_read_data(uint64_t paddr, int size)
 #if CONFIG_DTRACE
 			DTRACE_PHYSLAT4(physread, uint64_t, (eabs - sabs),
 			    uint64_t, paddr, uint32_t, size, uint64_t, result);
-#endif /* CONFIG_DTRACE */
+#endif                    
 		} else if (__improbable(tracephyreaddelayabs > 0 && (eabs - sabs) > tracephyreaddelayabs)) {
 			KDBG(MACHDBG_CODE(DBG_MACH_IO, DBC_MACH_IO_PHYS_READ),
 			    (eabs - sabs), sabs, paddr, result);
@@ -469,9 +469,9 @@ ml_phys_read_double_64(addr64_t paddr64)
 
 
 
-/*
- *  Write data to a physical address. Memory should not be cache inhibited.
- */
+  
+                                                                           
+   
 
 __private_extern__ void
 ml_phys_write_data(uint64_t paddr, unsigned long long data, int size)
@@ -492,7 +492,7 @@ ml_phys_write_data(uint64_t paddr, unsigned long long data, int size)
 	if (__improbable(timewrite && simulate_stretched_io)) {
 		sabs -= simulate_stretched_io;
 	}
-#endif /* x86_64 DEVELOPMENT || DEBUG */
+#endif                                  
 
 	switch (size) {
 	case 1:
@@ -538,7 +538,7 @@ ml_phys_write_data(uint64_t paddr, unsigned long long data, int size)
 #if CONFIG_DTRACE
 			DTRACE_PHYSLAT4(physwrite, uint64_t, (eabs - sabs),
 			    uint64_t, paddr, uint32_t, size, uint64_t, data);
-#endif /* CONFIG_DTRACE */
+#endif                    
 		} else if (__improbable(tracephywritedelayabs > 0 && (eabs - sabs) > tracephywritedelayabs)) {
 			KDBG(MACHDBG_CODE(DBG_MACH_IO, DBC_MACH_IO_PHYS_WRITE),
 			    (eabs - sabs), sabs, paddr, data);
@@ -628,7 +628,7 @@ ml_port_io_read(uint16_t ioport, int size)
 	if (__improbable(timeread && simulate_stretched_io)) {
 		sabs -= simulate_stretched_io;
 	}
-#endif /* x86_64 DEVELOPMENT || DEBUG */
+#endif                                  
 
 	switch (size) {
 	case 1:
@@ -670,7 +670,7 @@ ml_port_io_read(uint16_t ioport, int size)
 #if CONFIG_DTRACE
 			DTRACE_PHYSLAT3(portioread, uint64_t, (eabs - sabs),
 			    uint16_t, ioport, uint32_t, size);
-#endif /* CONFIG_DTRACE */
+#endif                    
 		} else if (__improbable(tracephyreaddelayabs > 0 && (eabs - sabs) > tracephyreaddelayabs)) {
 			KDBG(MACHDBG_CODE(DBG_MACH_IO, DBC_MACH_IO_PORTIO_READ),
 			    (eabs - sabs), sabs, ioport, result);
@@ -699,7 +699,7 @@ ml_port_io_write(uint16_t ioport, uint32_t val, int size)
 	if (__improbable(timewrite && simulate_stretched_io)) {
 		sabs -= simulate_stretched_io;
 	}
-#endif /* x86_64 DEVELOPMENT || DEBUG */
+#endif                                  
 
 	switch (size) {
 	case 1:
@@ -743,7 +743,7 @@ ml_port_io_write(uint16_t ioport, uint32_t val, int size)
 #if CONFIG_DTRACE
 			DTRACE_PHYSLAT4(portiowrite, uint64_t, (eabs - sabs),
 			    uint16_t, ioport, uint32_t, size, uint64_t, val);
-#endif /* CONFIG_DTRACE */
+#endif                    
 		} else if (__improbable(tracephywritedelayabs > 0 && (eabs - sabs) > tracephywritedelayabs)) {
 			KDBG(MACHDBG_CODE(DBG_MACH_IO, DBC_MACH_IO_PORTIO_WRITE),
 			    (eabs - sabs), sabs, ioport, val);
@@ -791,13 +791,13 @@ ml_port_io_write32(uint16_t ioport, uint32_t val)
 	ml_port_io_write(ioport, val, 4);
 }
 
-/* PCI config cycle probing
- *
- *
- *      Read the memory location at physical address paddr.
- * *Does not* recover from machine checks, unlike the PowerPC implementation.
- * Should probably be deprecated.
- */
+                           
+  
+  
+                                                           
+                                                                             
+                                 
+   
 
 boolean_t
 ml_probe_read(vm_offset_t paddr, unsigned int *val)
@@ -811,12 +811,12 @@ ml_probe_read(vm_offset_t paddr, unsigned int *val)
 	return TRUE;
 }
 
-/*
- *  Read the memory location at physical address paddr.
- *  This is a part of a device probe, so there is a good chance we will
- *  have a machine check here. So we have to be able to handle that.
- *  We assume that machine checks are enabled both in MSR and HIDs
- */
+  
+                                                       
+                                                                       
+                                                                    
+                                                                  
+   
 boolean_t
 ml_probe_read_64(addr64_t paddr64, unsigned int *val)
 {
@@ -849,11 +849,11 @@ bcmp(
 		}
 	} while (--len);
 
-	/*
-	 * Check for the overflow case but continue to handle the non-overflow
-	 * case the same way just in case someone is using the return value
-	 * as more than zero/non-zero
-	 */
+	  
+                                                                       
+                                                                    
+                              
+    
 	if (__improbable(!(len & 0x00000000FFFFFFFFULL) && (len & 0xFFFFFFFF00000000ULL))) {
 		return 0xFFFFFFFF;
 	} else {
@@ -898,10 +898,10 @@ memcmp_zero_ptr_aligned(const void *addr, size_t size)
 		uint64_t c = p[2];
 		uint64_t d = p[3];
 
-		/*
-		 * note: for sizes not a multiple of 32 bytes, this will load
-		 * the bytes [size % 32 .. 32) twice which is ok
-		 */
+		  
+                                                               
+                                                  
+     
 		while (count > 4) {
 			count -= 4;
 			a |= p[count + 0];
@@ -924,11 +924,11 @@ memmove(void *dst, const void *src, size_t ulen)
 	return dst;
 }
 
-/*
- * Abstract:
- * strlen returns the number of characters in "string" preceeding
- * the terminating null character.
- */
+  
+            
+                                                                 
+                                  
+   
 
 #undef strlen
 size_t
@@ -945,10 +945,10 @@ strlen(
 
 #if     MACH_ASSERT
 
-/*
- * Machine-dependent routine to fill in an array with up to callstack_max
- * levels of return pc information.
- */
+  
+                                                                         
+                                   
+   
 void
 machine_callstack(
 	__unused uintptr_t      *buf,
@@ -956,7 +956,7 @@ machine_callstack(
 {
 }
 
-#endif  /* MACH_ASSERT */
+#endif                   
 
 void
 fillPage(ppnum_t pa, unsigned int fill)

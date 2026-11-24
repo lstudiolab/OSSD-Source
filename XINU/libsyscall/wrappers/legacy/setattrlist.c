@@ -26,10 +26,10 @@
 #define _NONSTD_SOURCE
 #include <sys/cdefs.h>
 
-/*
- * We need conformance on so that EOPNOTSUPP=102.  But the routine symbol
- * will still be the legacy (undecorated) one.
- */
+  
+                                                                         
+                                              
+   
 #undef __DARWIN_UNIX03
 #define __DARWIN_UNIX03 1
 
@@ -38,25 +38,25 @@
 
 #ifdef __LP64__
 extern int __setattrlist(const char *, void *, void *, size_t, unsigned int);
-#else /* !__LP64__ */
+#else                
 extern int __setattrlist(const char *, void *, void *, size_t, unsigned long);
-#endif /* __LP64__ */
+#endif               
 
-/*
- * setattrlist stub, legacy version
- */
+  
+                                   
+   
 int
 #ifdef __LP64__
 setattrlist(const char *path, void *attrList, void *attrBuf,
     size_t attrBufSize, unsigned int options)
-#else /* !__LP64__ */
+#else                
 setattrlist(const char *path, void *attrList, void *attrBuf,
     size_t attrBufSize, unsigned long options)
-#endif /* __LP64__ */
+#endif               
 {
 	int ret = __setattrlist(path, attrList, attrBuf, attrBufSize, options);
 
-	/* use ENOTSUP for legacy behavior */
+	                                     
 	if (ret < 0 && errno == EOPNOTSUPP) {
 		errno = ENOTSUP;
 	}

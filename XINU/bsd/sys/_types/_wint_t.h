@@ -28,6 +28,6 @@
 
 #ifndef _WINT_T
 #define _WINT_T
-#include <machine/_types.h> /* __darwin_wint_t */
+#include <machine/_types.h>                      
 typedef __darwin_wint_t wint_t;
-#endif /* _WINT_T */
+#endif              

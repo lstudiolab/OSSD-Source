@@ -41,12 +41,12 @@
 
 #include "net/net_str_id.h"
 
-/* mbuf flags visible to KPI clients; do not add private flags here */
+                                                                      
 static const mbuf_flags_t mbuf_flags_mask = (MBUF_EXT | MBUF_PKTHDR | MBUF_EOR |
     MBUF_LOOP | MBUF_BCAST | MBUF_MCAST | MBUF_FRAG | MBUF_FIRSTFRAG |
     MBUF_LASTFRAG | MBUF_PROMISC | MBUF_HASFCS);
 
-/* Unalterable mbuf flags */
+                            
 static const mbuf_flags_t mbuf_cflags_mask = (MBUF_EXT);
 
 #define MAX_MBUF_TX_COMPL_FUNC 32
@@ -71,7 +71,7 @@ SYSCTL_QUAD(_kern_ipc_mbtxcf, OID_AUTO, oustanding,
     CTLFLAG_RD | CTLFLAG_LOCKED, &mbuf_tx_compl_outstanding, "");
 SYSCTL_QUAD(_kern_ipc_mbtxcf, OID_AUTO, aborted,
     CTLFLAG_RD | CTLFLAG_LOCKED, &mbuf_tx_compl_aborted, "");
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 void *
 mbuf_data(mbuf_t mbuf)
@@ -119,11 +119,11 @@ mbuf_align_32(mbuf_t mbuf, size_t len)
 	return 0;
 }
 
-/*
- * This function is used to provide mcl_to_paddr via symbol indirection,
- * please avoid any change in behavior or remove the indirection in
- * config/Unsupported*
- */
+  
+                                                                        
+                                                                   
+                      
+   
 addr64_t
 mbuf_data_to_physical(void *ptr)
 {
@@ -133,7 +133,7 @@ mbuf_data_to_physical(void *ptr)
 errno_t
 mbuf_get(mbuf_how_t how, mbuf_type_t type, mbuf_t *mbuf)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	*mbuf = m_get(how, type);
 
 	return *mbuf == NULL ? ENOMEM : 0;
@@ -142,7 +142,7 @@ mbuf_get(mbuf_how_t how, mbuf_type_t type, mbuf_t *mbuf)
 errno_t
 mbuf_gethdr(mbuf_how_t how, mbuf_type_t type, mbuf_t *mbuf)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	*mbuf = m_gethdr(how, type);
 
 	return *mbuf == NULL ? ENOMEM : 0;
@@ -236,7 +236,7 @@ mbuf_alloccluster(mbuf_how_t how, size_t *size, caddr_t *addr)
 
 	*addr = NULL;
 
-	/* Jumbo cluster pool not available? */
+	                                       
 	if (*size > MBIGCLBYTES && njcl == 0) {
 		return ENOTSUP;
 	}
@@ -282,7 +282,7 @@ mbuf_freecluster(caddr_t addr, size_t size)
 errno_t
 mbuf_getcluster(mbuf_how_t how, mbuf_type_t type, size_t size, mbuf_t *mbuf)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	errno_t error = 0;
 	int     created = 0;
 
@@ -296,10 +296,10 @@ mbuf_getcluster(mbuf_how_t how, mbuf_type_t type, size_t size, mbuf_t *mbuf)
 		}
 		created = 1;
 	}
-	/*
-	 * At the time this code was written, m_{mclget,mbigget,m16kget}
-	 * would always return the same value that was passed in to it.
-	 */
+	  
+                                                                 
+                                                                
+    
 	if (size == MCLBYTES) {
 		*mbuf = m_mclget(*mbuf, how);
 	} else if (size == MBIGCLBYTES) {
@@ -308,7 +308,7 @@ mbuf_getcluster(mbuf_how_t how, mbuf_type_t type, size_t size, mbuf_t *mbuf)
 		if (njcl > 0) {
 			*mbuf = m_m16kget(*mbuf, how);
 		} else {
-			/* Jumbo cluster pool not available? */
+			                                       
 			error = ENOTSUP;
 			goto out;
 		}
@@ -330,7 +330,7 @@ out:
 errno_t
 mbuf_mclget(mbuf_how_t how, mbuf_type_t type, mbuf_t *mbuf)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	errno_t error = 0;
 	int             created = 0;
 	if (mbuf == NULL) {
@@ -344,10 +344,10 @@ mbuf_mclget(mbuf_how_t how, mbuf_type_t type, mbuf_t *mbuf)
 		created = 1;
 	}
 
-	/*
-	 * At the time this code was written, m_mclget would always
-	 * return the same value that was passed in to it.
-	 */
+	  
+                                                            
+                                                   
+    
 	*mbuf = m_mclget(*mbuf, how);
 
 	if (created && ((*mbuf)->m_flags & M_EXT) == 0) {
@@ -364,7 +364,7 @@ mbuf_mclget(mbuf_how_t how, mbuf_type_t type, mbuf_t *mbuf)
 errno_t
 mbuf_getpacket(mbuf_how_t how, mbuf_t *mbuf)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	errno_t error = 0;
 
 	*mbuf = m_getpacket_how(how);
@@ -380,20 +380,20 @@ mbuf_getpacket(mbuf_how_t how, mbuf_t *mbuf)
 	return error;
 }
 
-/*
- * This function is used to provide m_free via symbol indirection, please avoid
- * any change in behavior or remove the indirection in config/Unsupported*
- */
+  
+                                                                               
+                                                                          
+   
 mbuf_t
 mbuf_free(mbuf_t mbuf)
 {
 	return m_free(mbuf);
 }
 
-/*
- * This function is used to provide m_freem via symbol indirection, please avoid
- * any change in behavior or remove the indirection in config/Unsupported*
- */
+  
+                                                                                
+                                                                          
+   
 void
 mbuf_freem(mbuf_t mbuf)
 {
@@ -412,23 +412,23 @@ mbuf_leadingspace(const mbuf_t mbuf)
 	return M_LEADINGSPACE(mbuf);
 }
 
-/*
- * This function is used to provide m_trailingspace via symbol indirection,
- * please avoid any change in behavior or remove the indirection in
- * config/Unsupported*
- */
+  
+                                                                           
+                                                                   
+                      
+   
 size_t
 mbuf_trailingspace(const mbuf_t mbuf)
 {
 	return M_TRAILINGSPACE(mbuf);
 }
 
-/* Manipulation */
+                  
 errno_t
 mbuf_copym(const mbuf_t src, size_t offset, size_t len,
     mbuf_how_t how, mbuf_t *new_mbuf)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	*new_mbuf = m_copym(src, offset, len, how);
 
 	return *new_mbuf == NULL ? ENOMEM : 0;
@@ -437,7 +437,7 @@ mbuf_copym(const mbuf_t src, size_t offset, size_t len,
 errno_t
 mbuf_dup(const mbuf_t src, mbuf_how_t how, mbuf_t *new_mbuf)
 {
-	/* Must set *new_mbuf to NULL in failure case */
+	                                                
 	*new_mbuf = m_dup(src, how);
 
 	return *new_mbuf == NULL ? ENOMEM : 0;
@@ -446,7 +446,7 @@ mbuf_dup(const mbuf_t src, mbuf_how_t how, mbuf_t *new_mbuf)
 errno_t
 mbuf_prepend(mbuf_t *orig, size_t len, mbuf_how_t how)
 {
-	/* Must set *orig to NULL in failure case */
+	                                            
 	*orig = m_prepend_2(*orig, len, how, 0);
 
 	return *orig == NULL ? ENOMEM : 0;
@@ -456,7 +456,7 @@ errno_t
 mbuf_split(mbuf_t src, size_t offset,
     mbuf_how_t how, mbuf_t *new_mbuf)
 {
-	/* Must set *new_mbuf to NULL in failure case */
+	                                                
 	*new_mbuf = m_split(src, offset, how);
 
 	return *new_mbuf == NULL ? ENOMEM : 0;
@@ -465,7 +465,7 @@ mbuf_split(mbuf_t src, size_t offset,
 errno_t
 mbuf_pullup(mbuf_t *mbuf, size_t len)
 {
-	/* Must set *mbuf to NULL in failure case */
+	                                            
 	*mbuf = m_pullup(*mbuf, len);
 
 	return *mbuf == NULL ? ENOMEM : 0;
@@ -474,7 +474,7 @@ mbuf_pullup(mbuf_t *mbuf, size_t len)
 errno_t
 mbuf_pulldown(mbuf_t src, size_t *offset, size_t len, mbuf_t *location)
 {
-	/* Must set *location to NULL in failure case */
+	                                                
 	int new_offset;
 	*location = m_pulldown(src, *offset, len, &new_offset);
 	*offset = new_offset;
@@ -482,10 +482,10 @@ mbuf_pulldown(mbuf_t src, size_t *offset, size_t len, mbuf_t *location)
 	return *location == NULL ? ENOMEM : 0;
 }
 
-/*
- * This function is used to provide m_adj via symbol indirection, please avoid
- * any change in behavior or remove the indirection in config/Unsupported*
- */
+  
+                                                                              
+                                                                          
+   
 void
 mbuf_adj(mbuf_t mbuf, int len)
 {
@@ -495,7 +495,7 @@ mbuf_adj(mbuf_t mbuf, int len)
 errno_t
 mbuf_adjustlen(mbuf_t m, int amount)
 {
-	/* Verify m_len will be valid after adding amount */
+	                                                    
 	if (amount > 0) {
 		int used = (size_t)mbuf_data(m) - (size_t)mbuf_datastart(m) +
 		    m->m_len;
@@ -520,13 +520,13 @@ mbuf_concatenate(mbuf_t dst, mbuf_t src)
 
 	m_cat(dst, src);
 
-	/* return dst as is in the current implementation */
+	                                                    
 	return dst;
 }
 errno_t
 mbuf_copydata(const mbuf_t m0, size_t off, size_t len, void *out_data)
 {
-	/* Copied m_copydata, added error handling (don't just panic) */
+	                                                                
 	size_t count;
 	mbuf_t  m = m0;
 
@@ -570,7 +570,7 @@ mbuf_mclhasreference(mbuf_t mbuf)
 }
 
 
-/* mbuf header */
+                 
 mbuf_t
 mbuf_next(const mbuf_t mbuf)
 {
@@ -652,28 +652,28 @@ mbuf_setflags(mbuf_t mbuf, mbuf_flags_t flags)
 	errno_t ret = 0;
 	mbuf_flags_t oflags = mbuf->m_flags;
 
-	/*
-	 * 1. Return error if public but un-alterable flags are changed
-	 *    in flags argument.
-	 * 2. Return error if bits other than public flags are set in passed
-	 *    flags argument.
-	 *    Please note that private flag bits must be passed as reset by
-	 *    kexts, as they must use mbuf_flags KPI to get current set of
-	 *    mbuf flags and mbuf_flags KPI does not expose private flags.
-	 */
+	  
+                                                                
+                         
+                                                                     
+                      
+                                                                    
+                                                                   
+                                                                   
+    
 	if ((flags ^ oflags) & mbuf_cflags_mask) {
 		ret = EINVAL;
 	} else if (flags & ~mbuf_flags_mask) {
 		ret = EINVAL;
 	} else {
 		mbuf->m_flags = flags | (mbuf->m_flags & ~mbuf_flags_mask);
-		/*
-		 * If M_PKTHDR bit has changed, we have work to do;
-		 * m_reinit() will take care of setting/clearing the
-		 * bit, as well as the rest of bookkeeping.
-		 */
+		  
+                                                     
+                                                      
+                                             
+     
 		if ((oflags ^ mbuf->m_flags) & M_PKTHDR) {
-			mbuf->m_flags ^= M_PKTHDR;      /* restore */
+			mbuf->m_flags ^= M_PKTHDR;                   
 			ret = m_reinit(mbuf,
 			    (mbuf->m_flags & M_PKTHDR) ? 0 : 1);
 		}
@@ -692,13 +692,13 @@ mbuf_setflags_mask(mbuf_t mbuf, mbuf_flags_t flags, mbuf_flags_t mask)
 	} else {
 		mbuf_flags_t oflags = mbuf->m_flags;
 		mbuf->m_flags = (flags & mask) | (mbuf->m_flags & ~mask);
-		/*
-		 * If M_PKTHDR bit has changed, we have work to do;
-		 * m_reinit() will take care of setting/clearing the
-		 * bit, as well as the rest of bookkeeping.
-		 */
+		  
+                                                     
+                                                      
+                                             
+     
 		if ((oflags ^ mbuf->m_flags) & M_PKTHDR) {
-			mbuf->m_flags ^= M_PKTHDR;      /* restore */
+			mbuf->m_flags ^= M_PKTHDR;                   
 			ret = m_reinit(mbuf,
 			    (mbuf->m_flags & M_PKTHDR) ? 0 : 1);
 		}
@@ -725,11 +725,11 @@ mbuf_pkthdr_len(const mbuf_t mbuf)
 	if (((mbuf)->m_flags & M_PKTHDR) == 0) {
 		return 0;
 	}
-	/*
-	 * While we Assert for development or debug builds,
-	 * also make sure we never return negative length
-	 * for release build.
-	 */
+	  
+                                                    
+                                                  
+                      
+    
 	ASSERT(mbuf->m_pkthdr.len >= 0);
 	if (mbuf->m_pkthdr.len < 0) {
 		return 0;
@@ -769,17 +769,17 @@ mbuf_pkthdr_adjustlen(mbuf_t mbuf, int amount)
 ifnet_t
 mbuf_pkthdr_rcvif(const mbuf_t mbuf)
 {
-	/*
-	 * If we reference count ifnets, we should take a reference here
-	 * before returning
-	 */
+	  
+                                                                 
+                    
+    
 	return mbuf->m_pkthdr.rcvif;
 }
 
 errno_t
 mbuf_pkthdr_setrcvif(mbuf_t mbuf, ifnet_t ifnet)
 {
-	/* May want to walk ifnet list to determine if interface is valid */
+	                                                                    
 	mbuf->m_pkthdr.rcvif = (struct ifnet *)ifnet;
 	return 0;
 }
@@ -799,25 +799,25 @@ mbuf_pkthdr_setheader(mbuf_t mbuf, void *header)
 void
 mbuf_inbound_modified(mbuf_t mbuf)
 {
-	/* Invalidate hardware generated checksum flags */
+	                                                  
 	mbuf->m_pkthdr.csum_flags = 0;
 }
 
 void
 mbuf_outbound_finalize(struct mbuf *m, u_int32_t pf, size_t o)
 {
-	/* Generate the packet in software, client needs it */
+	                                                      
 	switch (pf) {
 	case PF_INET:
 		(void) in_finalize_cksum(m, o, m->m_pkthdr.csum_flags);
 		break;
 
 	case PF_INET6:
-		/*
-		 * Checksum offload should not have been enabled when
-		 * extension headers exist; indicate that the callee
-		 * should skip such case by setting optlen to -1.
-		 */
+		  
+                                                       
+                                                      
+                                                   
+     
 		(void) in6_finalize_cksum(m, o, -1, -1, m->m_pkthdr.csum_flags);
 		break;
 
@@ -843,7 +843,7 @@ mbuf_get_vlan_tag(
 	u_int16_t *vlan)
 {
 	if ((mbuf->m_pkthdr.csum_flags & CSUM_VLAN_TAG_VALID) == 0) {
-		return ENXIO; // No vlan tag set
+		return ENXIO;                   
 	}
 	*vlan = mbuf->m_pkthdr.vlan_tag;
 
@@ -993,9 +993,9 @@ mbuf_inet6_cksum(mbuf_t mbuf, int protocol, u_int32_t offset, u_int32_t length,
 	return 0;
 }
 
-/*
- * Mbuf tag KPIs
- */
+  
+                
+   
 
 #define MTAG_FIRST_ID FIRST_KPI_STR_ID
 
@@ -1023,7 +1023,7 @@ mbuf_tag_allocate(
 		*data_p = NULL;
 	}
 
-	/* Sanity check parameters */
+	                             
 	(void) net_str_id_first_last(&mtag_id_first, &mtag_id_last,
 	    NSI_MBUF_TAG);
 	if (mbuf == NULL || (mbuf->m_flags & M_PKTHDR) == 0 ||
@@ -1032,19 +1032,19 @@ mbuf_tag_allocate(
 		return EINVAL;
 	}
 
-	/* Make sure this mtag hasn't already been allocated */
+	                                                       
 	tag = m_tag_locate(mbuf, id, type, NULL);
 	if (tag != NULL) {
 		return EEXIST;
 	}
 
-	/* Allocate an mtag */
+	                      
 	tag = m_tag_create(id, type, length, how, mbuf);
 	if (tag == NULL) {
 		return how == M_WAITOK ? ENOMEM : EWOULDBLOCK;
 	}
 
-	/* Attach the mtag and set *data_p */
+	                                     
 	m_tag_prepend(mbuf, tag);
 	*data_p = tag + 1;
 
@@ -1069,7 +1069,7 @@ mbuf_tag_find(
 		*data_p = NULL;
 	}
 
-	/* Sanity check parameters */
+	                             
 	(void) net_str_id_first_last(&mtag_id_first, &mtag_id_last,
 	    NSI_MBUF_TAG);
 	if (mbuf == NULL || (mbuf->m_flags & M_PKTHDR) == 0 ||
@@ -1078,13 +1078,13 @@ mbuf_tag_find(
 		return EINVAL;
 	}
 
-	/* Locate an mtag */
+	                    
 	tag = m_tag_locate(mbuf, id, type, NULL);
 	if (tag == NULL) {
 		return ENOENT;
 	}
 
-	/* Copy out the pointer to the data and the lenght value */
+	                                                           
 	*length = tag->m_tag_len;
 	*data_p = tag + 1;
 
@@ -1100,7 +1100,7 @@ mbuf_tag_free(
 	struct m_tag *tag;
 	u_int32_t mtag_id_first, mtag_id_last;
 
-	/* Sanity check parameters */
+	                             
 	(void) net_str_id_first_last(&mtag_id_first, &mtag_id_last,
 	    NSI_MBUF_TAG);
 	if (mbuf == NULL || (mbuf->m_flags & M_PKTHDR) == 0 ||
@@ -1116,12 +1116,12 @@ mbuf_tag_free(
 	m_tag_delete(mbuf, tag);
 }
 
-/*
- * Maximum length of driver auxiliary data; keep this small to
- * fit in a single mbuf to avoid wasting memory, rounded down to
- * the nearest 64-bit boundary.  This takes into account mbuf
- * tag-related (m_taghdr + m_tag) as well m_drvaux_tag structs.
- */
+  
+                                                              
+                                                                
+                                                             
+                                                               
+   
 #define MBUF_DRVAUX_MAXLEN                                              \
 	P2ROUNDDOWN(MLEN - sizeof (struct m_taghdr) -                   \
 	M_TAG_ALIGN(sizeof (struct m_drvaux_tag)), sizeof (uint64_t))
@@ -1142,13 +1142,13 @@ mbuf_add_drvaux(mbuf_t mbuf, mbuf_how_t how, u_int32_t family,
 		*data_p = NULL;
 	}
 
-	/* Check if one is already associated */
+	                                        
 	if ((tag = m_tag_locate(mbuf, KERNEL_MODULE_TAG_ID,
 	    KERNEL_TAG_TYPE_DRVAUX, NULL)) != NULL) {
 		return EEXIST;
 	}
 
-	/* Tag is (m_drvaux_tag + module specific data) */
+	                                                  
 	if ((tag = m_tag_create(KERNEL_MODULE_TAG_ID, KERNEL_TAG_TYPE_DRVAUX,
 	    sizeof(*p) + length, how, mbuf)) == NULL) {
 		return (how == MBUF_WAITOK) ? ENOMEM : EWOULDBLOCK;
@@ -1159,7 +1159,7 @@ mbuf_add_drvaux(mbuf_t mbuf, mbuf_how_t how, u_int32_t family,
 	p->da_subfamily = subfamily;
 	p->da_length = length;
 
-	/* Associate the tag */
+	                       
 	m_tag_prepend(mbuf, tag);
 
 	if (data_p != NULL) {
@@ -1187,7 +1187,7 @@ mbuf_find_drvaux(mbuf_t mbuf, u_int32_t *family_p, u_int32_t *subfamily_p,
 		return ENOENT;
 	}
 
-	/* Must be at least size of m_drvaux_tag */
+	                                           
 	VERIFY(tag->m_tag_len >= sizeof(*p));
 
 	p = (struct m_drvaux_tag *)(tag + 1);
@@ -1223,7 +1223,7 @@ mbuf_del_drvaux(mbuf_t mbuf)
 	}
 }
 
-/* mbuf stats */
+                
 void
 mbuf_stats(struct mbuf_stat *stats)
 {
@@ -1339,13 +1339,13 @@ mbuf_pkt_list_maxlen(mbuf_t m)
 	return maxlen;
 }
 
-/*
- * mbuf_copyback differs from m_copyback in a few ways:
- * 1) mbuf_copyback will allocate clusters for new mbufs we append
- * 2) mbuf_copyback will grow the last mbuf in the chain if possible
- * 3) mbuf_copyback reports whether or not the operation succeeded
- * 4) mbuf_copyback allows the caller to specify M_WAITOK or M_NOWAIT
- */
+  
+                                                       
+                                                                  
+                                                                    
+                                                                  
+                                                                     
+   
 errno_t
 mbuf_copyback(
 	mbuf_t          m,
@@ -1404,10 +1404,10 @@ mbuf_copyback(
 				goto out;
 			}
 			if (len > MINCLSIZE) {
-				/*
-				 * cluster allocation failure is okay,
-				 * we can grow chain
-				 */
+				  
+                                          
+                        
+       
 				mbuf_mclget(how, m->m_type, &n);
 			}
 			n->m_len = MIN(mbuf_maxlen(n), len);
@@ -1548,7 +1548,7 @@ mbuf_pkthdr_aux_flags(mbuf_t m, mbuf_pkthdr_aux_flags_t *flagsp)
 		*flagsp |= MBUF_PKTAUXF_INET6_RESOLVE_RTR;
 	}
 
-	/* These 2 flags are mutually exclusive */
+	                                          
 	VERIFY((*flagsp &
 	    (MBUF_PKTAUXF_INET_RESOLVE_RTR | MBUF_PKTAUXF_INET6_RESOLVE_RTR)) !=
 	    (MBUF_PKTAUXF_INET_RESOLVE_RTR | MBUF_PKTAUXF_INET6_RESOLVE_RTR));
@@ -1824,7 +1824,7 @@ mbuf_register_tx_compl_callback(mbuf_tx_compl_func callback)
 		goto unlock;
 	}
 
-	/* assume the worst */
+	                      
 	error = ENOSPC;
 	for (i = 0; i < MAX_MBUF_TX_COMPL_FUNC; i++) {
 		if (mbuf_tx_compl_table[i] == NULL) {
@@ -1851,7 +1851,7 @@ mbuf_unregister_tx_compl_callback(mbuf_tx_compl_func callback)
 
 	lck_rw_lock_exclusive(&mbuf_tx_compl_tbl_lock);
 
-	/* assume the worst */
+	                      
 	error = ENOENT;
 	for (i = 0; i < MAX_MBUF_TX_COMPL_FUNC; i++) {
 		if (mbuf_tx_compl_table[i] == callback) {
@@ -1899,7 +1899,7 @@ mbuf_set_timestamp_requested(mbuf_t m, uintptr_t *pktid,
 
 #if (DEBUG || DEVELOPMENT)
 	VERIFY(i < sizeof(m->m_pkthdr.pkt_compl_callbacks));
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 	if ((m->m_pkthdr.pkt_flags & PKTF_TX_COMPL_TS_REQ) == 0) {
 		m->m_pkthdr.pkt_compl_callbacks = 0;
@@ -1911,7 +1911,7 @@ mbuf_set_timestamp_requested(mbuf_t m, uintptr_t *pktid,
 		if (mbuf_tx_compl_debug != 0) {
 			OSIncrementAtomic64(&mbuf_tx_compl_outstanding);
 		}
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 	}
 	m->m_pkthdr.pkt_compl_callbacks |= (1 << i);
 	*pktid = m->m_pkthdr.pkt_compl_context;
@@ -1941,7 +1941,7 @@ m_do_tx_compl_callback(struct mbuf *m, struct ifnet *ifp)
 		nanouptime(&now);
 		net_timernsec(&now, &m->m_pkthdr.pkt_timestamp);
 	}
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 	for (i = 0; i < MAX_MBUF_TX_COMPL_FUNC; i++) {
 		mbuf_tx_compl_func callback;
@@ -1973,7 +1973,7 @@ m_do_tx_compl_callback(struct mbuf *m, struct ifnet *ifp)
 			atomic_add_64(&mbuf_tx_compl_aborted, 1);
 		}
 	}
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 }
 
 errno_t

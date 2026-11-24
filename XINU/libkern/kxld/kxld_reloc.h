@@ -66,7 +66,7 @@ struct kxld_relocator {
 	const struct kxld_dict *vtables;
 	const struct kxld_vtable *current_vtable;
 	u_char *file;
-	u_int function_align; /* Power of two alignment of functions */
+	u_int function_align;                                          
 	boolean_t is_32_bit;
 	boolean_t swap;
 	boolean_t may_scatter;
@@ -84,9 +84,9 @@ struct kxld_reloc {
 	u_int pcrel:1;
 };
 
-/*******************************************************************************
-* Constructors and Destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 kern_return_t kxld_relocator_init(KXLDRelocator *relocator, u_char *file,
     const struct kxld_symtab *symtab, const struct kxld_array *sectarray,
     cpu_type_t cputype, cpu_subtype_t cpusubtype, boolean_t swap)
@@ -99,9 +99,9 @@ kern_return_t kxld_reloc_create_macho(struct kxld_array *relocarray,
 void kxld_relocator_clear(KXLDRelocator *relocator)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 boolean_t kxld_relocator_has_pair(const KXLDRelocator *relocator, u_int r_type)
 __attribute__((pure, nonnull, visibility("hidden")));
@@ -142,11 +142,11 @@ kern_return_t kxld_reloc_export_macho(const KXLDRelocator *relocator,
     u_char *buf, u_long *header_offset, u_long header_size,
     u_long *data_offset, u_long size)
 __attribute__((nonnull, visibility("hidden")));
-#endif /* KXLD_PIC_KEXTS */
+#endif                     
 
-/*******************************************************************************
-* Modifiers
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 kern_return_t kxld_reloc_update_symindex(KXLDReloc *reloc, u_int symindex)
 __attribute__((nonnull, visibility("hidden")));
@@ -165,4 +165,4 @@ kern_return_t kxld_relocator_process_table_reloc(KXLDRelocator *relocator,
     kxld_addr_t link_addr)
 __attribute__((nonnull, visibility("hidden")));
 
-#endif /* _KXLD_RELOC_H */
+#endif                    

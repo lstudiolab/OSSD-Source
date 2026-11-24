@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/udp6_usrreq.c,v 1.6.2.6 2001/07/29 19:32:40 ume Exp $	*/
-/*	$KAME: udp6_usrreq.c,v 1.27 2001/05/21 05:45:10 jinmei Exp $	*/
+                                                                                      
+                                                                  
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -136,24 +136,24 @@
 #include <netkey/key.h>
 extern int ipsec_bypass;
 extern int esp_udp_encap_port;
-#endif /* IPSEC */
+#endif            
 
 #if NECP
 #include <net/necp.h>
-#endif /* NECP */
+#endif           
 
 #if FLOW_DIVERT
 #include <netinet/flow_divert.h>
-#endif /* FLOW_DIVERT */
+#endif                  
 
 #if CONTENT_FILTER
 #include <net/content_filter.h>
-#endif /* CONTENT_FILTER */
+#endif                     
 
-/*
- * UDP protocol inplementation.
- * Per RFC 768, August, 1980.
- */
+  
+                               
+                             
+   
 
 static int udp6_abort(struct socket *);
 static int udp6_attach(struct socket *, int, struct proc *);
@@ -189,9 +189,9 @@ struct pr_usrreqs udp6_usrreqs = {
 	.pru_soreceive_list =   soreceive_list,
 };
 
-/*
- * subroutine of udp6_input(), mainly for source code readability.
- */
+  
+                                                                  
+   
 static void
 udp6_append(struct inpcb *last, struct ip6_hdr *ip6,
     struct sockaddr_in6 *udp_in6, struct mbuf *n, int off, struct ifnet *ifp)
@@ -205,7 +205,7 @@ udp6_append(struct inpcb *last, struct ip6_hdr *ip6,
 
 	if ((last->in6p_flags & INP_CONTROLOPTS) != 0 ||
 #if CONTENT_FILTER
-	    /* Content Filter needs to see local address */
+	                                                   
 	    (last->in6p_socket->so_cfil_db != NULL) ||
 #endif
 	    (last->in6p_socket->so_options & SO_TIMESTAMP) != 0 ||
@@ -253,7 +253,7 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 
 	IP6_EXTHDR_CHECK(m, off, sizeof(struct udphdr), return IPPROTO_DONE);
 
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ifp = m->m_pkthdr.rcvif;
@@ -278,22 +278,22 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 		goto bad;
 	}
 
-	/* destination port of 0 is illegal, based on RFC768. */
+	                                                        
 	if (uh->uh_dport == 0) {
 		IF_UDP_STATINC(ifp, port0);
 		goto bad;
 	}
 
-	/*
-	 * Checksum extended UDP header and data.
-	 */
+	  
+                                          
+    
 	if (udp6_input_checksum(m, uh, off, ulen)) {
 		goto bad;
 	}
 
-	/*
-	 * Construct sockaddr format source address.
-	 */
+	  
+                                             
+    
 	init_sin6(&fromsa, m);
 	fromsa.sin6_port = uh->uh_sport;
 
@@ -301,52 +301,52 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 		int reuse_sock = 0, mcast_delivered = 0;
 		struct ip6_moptions *imo;
 
-		/*
-		 * Deliver a multicast datagram to all sockets
-		 * for which the local and remote addresses and ports match
-		 * those of the incoming datagram.  This allows more than
-		 * one process to receive multicasts on the same port.
-		 * (This really ought to be done for unicast datagrams as
-		 * well, but that would cause problems with existing
-		 * applications that open both address-specific sockets and
-		 * a wildcard socket listening to the same port -- they would
-		 * end up receiving duplicates of every unicast datagram.
-		 * Those applications open the multiple sockets to overcome an
-		 * inadequacy of the UDP socket interface, but for backwards
-		 * compatibility we avoid the problem here rather than
-		 * fixing the interface.  Maybe 4.5BSD will remedy this?)
-		 */
+		  
+                                                
+                                                             
+                                                           
+                                                        
+                                                           
+                                                      
+                                                             
+                                                               
+                                                           
+                                                                
+                                                              
+                                                        
+                                                           
+     
 
-		/*
-		 * In a case that laddr should be set to the link-local
-		 * address (this happens in RIPng), the multicast address
-		 * specified in the received packet does not match with
-		 * laddr. To cure this situation, the matching is relaxed
-		 * if the receiving interface is the same as one specified
-		 * in the socket and if the destination multicast address
-		 * matches one of the multicast groups specified in the socket.
-		 */
+		  
+                                                         
+                                                           
+                                                         
+                                                           
+                                                            
+                                                           
+                                                                 
+     
 
-		/*
-		 * Construct sockaddr format source address.
-		 */
-		init_sin6(&udp_in6, m); /* general init */
+		  
+                                              
+     
+		init_sin6(&udp_in6, m);                   
 		udp_in6.sin6_port = uh->uh_sport;
-		/*
-		 * KAME note: usually we drop udphdr from mbuf here.
-		 * We need udphdr for IPsec processing so we do that later.
-		 */
+		  
+                                                      
+                                                             
+     
 
-		/*
-		 * Locate pcb(s) for datagram.
-		 * (Algorithm copied from raw_intr().)
-		 */
+		  
+                                
+                                        
+     
 		lck_rw_lock_shared(pcbinfo->ipi_lock);
 
 		LIST_FOREACH(in6p, &udb, inp_list) {
 #if IPSEC
 			int skipit;
-#endif /* IPSEC */
+#endif            
 
 			if ((in6p->inp_vflag & INP_IPV6) == 0) {
 				continue;
@@ -373,10 +373,10 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 				continue;
 			}
 
-			/*
-			 * Handle socket delivery policy for any-source
-			 * and source-specific multicast. [RFC3678]
-			 */
+			  
+                                                  
+                                              
+      
 			imo = in6p->in6p_moptions;
 			if (imo && IN6_IS_ADDR_MULTICAST(&ip6->ip6_dst)) {
 				struct sockaddr_in6 mcaddr;
@@ -416,20 +416,20 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 			if (!necp_socket_is_allowed_to_send_recv_v6(in6p,
 			    uh->uh_dport, uh->uh_sport, &ip6->ip6_dst,
 			    &ip6->ip6_src, ifp, pf_tag, NULL, NULL, NULL, NULL)) {
-				/* do not inject data to pcb */
+				                               
 				skipit = 1;
 			}
 			if (skipit == 0)
-#endif /* NECP */
+#endif           
 			{
 				struct mbuf *n = NULL;
-				/*
-				 * KAME NOTE: do not
-				 * m_copy(m, offset, ...) below.
-				 * sbappendaddr() expects M_PKTHDR,
-				 * and m_copy() will copy M_PKTHDR
-				 * only if offset is 0.
-				 */
+				  
+                        
+                                    
+                                       
+                                      
+                           
+       
 				if (reuse_sock) {
 					n = m_copy(m, 0, M_COPYALL);
 				}
@@ -440,45 +440,45 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 			}
 			udp_unlock(in6p->in6p_socket, 1, 0);
 
-			/*
-			 * Don't look for additional matches if this one does
-			 * not have either the SO_REUSEPORT or SO_REUSEADDR
-			 * socket options set.  This heuristic avoids searching
-			 * through all pcbs in the common case of a non-shared
-			 * port.  It assumes that an application will never
-			 * clear these options after setting them.
-			 */
+			  
+                                                        
+                                                      
+                                                          
+                                                         
+                                                      
+                                             
+      
 			if (reuse_sock == 0 || m == NULL) {
 				break;
 			}
 
-			/*
-			 * Expect 32-bit aligned data pointer on strict-align
-			 * platforms.
-			 */
+			  
+                                                        
+                
+      
 			MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
-			/*
-			 * Recompute IP and UDP header pointers for new mbuf
-			 */
+			  
+                                                       
+      
 			ip6 = mtod(m, struct ip6_hdr *);
 			uh = (struct udphdr *)(void *)((caddr_t)ip6 + off);
 		}
 		lck_rw_done(pcbinfo->ipi_lock);
 
 		if (mcast_delivered == 0) {
-			/*
-			 * No matching pcb found; discard datagram.
-			 * (No need to send an ICMP Port Unreachable
-			 * for a broadcast or multicast datgram.)
-			 */
+			  
+                                              
+                                               
+                                            
+      
 			udpstat.udps_noport++;
 			udpstat.udps_noportmcast++;
 			IF_UDP_STATINC(ifp, port_unreach);
 			goto bad;
 		}
 
-		/* free the extra copy of mbuf or skipped by NECP */
+		                                                    
 		if (m != NULL) {
 			m_freem(m);
 		}
@@ -486,22 +486,22 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 	}
 
 #if IPSEC
-	/*
-	 * UDP to port 4500 with a payload where the first four bytes are
-	 * not zero is a UDP encapsulated IPsec packet. Packets where
-	 * the payload is one byte and that byte is 0xFF are NAT keepalive
-	 * packets. Decapsulate the ESP packet and carry on with IPsec input
-	 * or discard the NAT keep-alive.
-	 */
+	  
+                                                                  
+                                                              
+                                                                   
+                                                                     
+                                  
+    
 	if (ipsec_bypass == 0 && (esp_udp_encap_port & 0xFFFF) != 0 &&
 	    (uh->uh_dport == ntohs((u_short)esp_udp_encap_port) ||
 	    uh->uh_sport == ntohs((u_short)esp_udp_encap_port))) {
-		/*
-		 * Check if ESP or keepalive:
-		 *      1. If the destination port of the incoming packet is 4500.
-		 *      2. If the source port of the incoming packet is 4500,
-		 *         then check the SADB to match IP address and port.
-		 */
+		  
+                               
+                                                                    
+                                                               
+                                                              
+     
 		bool check_esp = true;
 		if (uh->uh_dport != ntohs((u_short)esp_udp_encap_port)) {
 			check_esp = key_checksa_present(AF_INET6, (caddr_t)&ip6->ip6_dst,
@@ -519,33 +519,33 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 					udpstat.udps_hdrops++;
 					goto bad;
 				}
-				/*
-				 * Expect 32-bit aligned data pointer on strict-align
-				 * platforms.
-				 */
+				  
+                                                         
+                 
+       
 				MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 				ip6 = mtod(m, struct ip6_hdr *);
 				uh = (struct udphdr *)(void *)((caddr_t)ip6 + off);
 			}
-			/* Check for NAT keepalive packet */
+			                                    
 			if (payload_len == 1 && *(u_int8_t*)
 			    ((caddr_t)uh + sizeof(struct udphdr)) == 0xFF) {
 				goto bad;
 			} else if (payload_len == 4 && *(u_int32_t*)(void *)
 			    ((caddr_t)uh + sizeof(struct udphdr)) != 0) {
-				/* UDP encapsulated IPsec packet to pass through NAT */
-				/* preserve the udp header */
+				                                                       
+				                             
 				*offp = off + sizeof(struct udphdr);
 				return esp6_input(mp, offp, IPPROTO_UDP);
 			}
 		}
 	}
-#endif /* IPSEC */
+#endif            
 
-	/*
-	 * Locate pcb for datagram.
-	 */
+	  
+                            
+    
 	in6p = in6_pcblookup_hash(&udbinfo, &ip6->ip6_src, uh->uh_sport,
 	    &ip6->ip6_dst, uh->uh_dport, 1, m->m_pkthdr.rcvif);
 	if (in6p == NULL) {
@@ -587,12 +587,12 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 		IF_UDP_STATINC(ifp, badipsec);
 		goto bad;
 	}
-#endif /* NECP */
+#endif           
 
-	/*
-	 * Construct sockaddr format source address.
-	 * Stuff source address and datagram in user buffer.
-	 */
+	  
+                                             
+                                                     
+    
 	udp_lock(in6p->in6p_socket, 1, 0);
 
 	if (in_pcb_checkstate(in6p, WNT_RELEASE, 1) == WNT_STOPUSING) {
@@ -601,11 +601,11 @@ udp6_input(struct mbuf **mp, int *offp, int proto)
 		goto bad;
 	}
 
-	init_sin6(&udp_in6, m); /* general init */
+	init_sin6(&udp_in6, m);                   
 	udp_in6.sin6_port = uh->uh_sport;
 	if ((in6p->in6p_flags & INP_CONTROLOPTS) != 0 ||
 #if CONTENT_FILTER
-	    /* Content Filter needs to see local address */
+	                                                   
 	    (in6p->in6p_socket->so_cfil_db != NULL) ||
 #endif
 	    (in6p->in6p_socket->so_options & SO_TIMESTAMP) != 0 ||
@@ -680,7 +680,7 @@ udp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 		return;
 	}
 
-	/* if the parameter is from icmp6, decode it. */
+	                                                
 	if (d != NULL) {
 		ip6cp = (struct ip6ctlparam *)d;
 		icmp6 = ip6cp->ip6c_icmp6;
@@ -697,11 +697,11 @@ udp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 	}
 
 	if (ip6 != NULL) {
-		/*
-		 * XXX: We assume that when IPV6 is non NULL,
-		 * M and OFF are valid.
-		 */
-		/* check if we can safely examine src and dst ports */
+		  
+                                               
+                         
+     
+		                                                      
 		if (m->m_pkthdr.len < off + sizeof(*uhp)) {
 			return;
 		}
@@ -722,12 +722,12 @@ udp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 		    (struct sockaddr*)ip6cp->ip6c_src, uh.uh_sport,
 		    cmd, cmdarg, notify);
 	}
-	/*
-	 * XXX The else condition here was broken for a long time.
-	 * Fixing it made us deliver notification correctly but broke
-	 * some frameworks that didn't handle it well.
-	 * For now we have removed it and will revisit it later.
-	 */
+	  
+                                                           
+                                                              
+                                               
+                                                         
+    
 }
 
 static int
@@ -738,7 +738,7 @@ udp6_abort(struct socket *so)
 	inp = sotoinpcb(so);
 	if (inp == NULL) {
 		panic("%s: so=%p null inp\n", __func__, so);
-		/* NOTREACHED */
+		                
 	}
 	soisdisconnected(so);
 	in6_pcbdetach(inp);
@@ -773,14 +773,14 @@ udp6_attach(struct socket *so, int proto, struct proc *p)
 	if (ip6_mapped_addr_on) {
 		inp->inp_vflag |= INP_IPV4;
 	}
-	inp->in6p_hops = -1;    /* use kernel default */
-	inp->in6p_cksum = -1;   /* just to be sure */
-	/*
-	 * XXX: ugly!!
-	 * IPv4 TTL initialization is necessary for an IPv6 socket as well,
-	 * because the socket may be bound to an IPv6 wildcard address,
-	 * which may match an IPv4-mapped IPv6 address.
-	 */
+	inp->in6p_hops = -1;                            
+	inp->in6p_cksum = -1;                        
+	  
+               
+                                                                    
+                                                                
+                                                
+    
 	inp->inp_ip_ttl = (u_char)ip_defttl;
 	if (nstat_collect) {
 		nstat_udp_new_pcb(inp);
@@ -830,7 +830,7 @@ udp6_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 	int error;
 #if defined(NECP) && defined(FLOW_DIVERT)
 	int should_use_flow_divert = 0;
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 
 	inp = sotoinpcb(so);
 	if (inp == NULL) {
@@ -839,7 +839,7 @@ udp6_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 
 #if defined(NECP) && defined(FLOW_DIVERT)
 	should_use_flow_divert = necp_socket_should_use_flow_divert(inp);
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 
 	if ((inp->inp_flags & IN6P_IPV6_V6ONLY) == 0) {
 		struct sockaddr_in6 *sin6_p;
@@ -862,18 +862,18 @@ udp6_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 			if (should_use_flow_divert) {
 				goto do_flow_divert;
 			}
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 			error = in_pcbconnect(inp, (struct sockaddr *)&sin,
 			    p, IFSCOPE_NONE, NULL);
 			if (error == 0) {
 #if NECP
-				/* Update NECP client with connected five-tuple */
+				                                                  
 				if (!uuid_is_null(inp->necp_client_uuid)) {
 					socket_unlock(so, 0);
 					necp_client_assign_from_socket(so->last_pid, inp->necp_client_uuid, inp);
 					socket_lock(so, 0);
 				}
-#endif /* NECP */
+#endif           
 				inp->inp_vflag |= INP_IPV4;
 				inp->inp_vflag &= ~INP_IPV6;
 				soisconnected(so);
@@ -900,29 +900,29 @@ do_flow_divert:
 		}
 		return error;
 	}
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 
 	error = in6_pcbconnect(inp, nam, p);
 	if (error == 0) {
-		/* should be non mapped addr */
+		                               
 		if (ip6_mapped_addr_on ||
 		    (inp->inp_flags & IN6P_IPV6_V6ONLY) == 0) {
 			inp->inp_vflag &= ~INP_IPV4;
 			inp->inp_vflag |= INP_IPV6;
 		}
 #if NECP
-		/* Update NECP client with connected five-tuple */
+		                                                  
 		if (!uuid_is_null(inp->necp_client_uuid)) {
 			socket_unlock(so, 0);
 			necp_client_assign_from_socket(so->last_pid, inp->necp_client_uuid, inp);
 			socket_lock(so, 0);
 		}
-#endif /* NECP */
+#endif           
 		soisconnected(so);
 		if (inp->inp_flowhash == 0) {
 			inp->inp_flowhash = inp_calc_flowhash(inp);
 		}
-		/* update flowinfo - RFC 6437 */
+		                                
 		if (inp->inp_flow == 0 &&
 		    inp->in6p_flags & IN6P_AUTOFLOWLABEL) {
 			inp->inp_flow &= ~IPV6_FLOWLABEL_MASK;
@@ -965,7 +965,7 @@ udp6_disconnect(struct socket *so)
 	if (inp == NULL
 #if NECP
 	    || (necp_socket_should_use_flow_divert(inp))
-#endif /* NECP */
+#endif           
 	    ) {
 		return inp == NULL ? EINVAL : EPROTOTYPE;
 	}
@@ -983,13 +983,13 @@ udp6_disconnect(struct socket *so)
 
 	in6_pcbdisconnect(inp);
 
-	/* reset flow-controlled state, just in case */
+	                                               
 	inp_reset_fc_state(inp);
 
 	inp->in6p_laddr = in6addr_any;
 	inp->in6p_last_outifp = NULL;
 
-	so->so_state &= ~SS_ISCONNECTED;                /* XXX */
+	so->so_state &= ~SS_ISCONNECTED;                         
 	return 0;
 }
 
@@ -1012,7 +1012,7 @@ udp6_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
 	int error = 0;
 #if defined(NECP) && defined(FLOW_DIVERT)
 	int should_use_flow_divert = 0;
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 #if CONTENT_FILTER
 	struct m_tag *cfil_tag = NULL;
 	struct sockaddr *cfil_faddr = NULL;
@@ -1025,7 +1025,7 @@ udp6_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
 	}
 
 #if CONTENT_FILTER
-	//If socket is subject to UDP Content Filter and unconnected, get addr from tag.
+	                                                                                
 	if (so->so_cfil_db && !addr && IN6_IS_ADDR_UNSPECIFIED(&inp->in6p_faddr)) {
 		cfil_tag = cfil_dgram_get_socket_state(m, NULL, NULL, &cfil_faddr, NULL);
 		if (cfil_tag) {
@@ -1036,7 +1036,7 @@ udp6_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
 
 #if defined(NECP) && defined(FLOW_DIVERT)
 	should_use_flow_divert = necp_socket_should_use_flow_divert(inp);
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 
 	if (addr != NULL) {
 		if (addr->sa_len != sizeof(struct sockaddr_in6)) {
@@ -1070,7 +1070,7 @@ udp6_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
 			if (should_use_flow_divert) {
 				goto do_flow_divert;
 			}
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 			pru = ip_protox[IPPROTO_UDP]->pr_usrreqs;
 			error = ((*pru->pru_send)(so, flags, m, addr,
 			    control, p));
@@ -1079,7 +1079,7 @@ udp6_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
 				m_tag_free(cfil_tag);
 			}
 #endif
-			/* addr will just be freed in sendit(). */
+			                                          
 			return error;
 		}
 	}
@@ -1087,7 +1087,7 @@ udp6_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *addr,
 #if defined(NECP) && defined(FLOW_DIVERT)
 do_flow_divert:
 	if (should_use_flow_divert) {
-		/* Implicit connect */
+		                      
 		error = flow_divert_implicit_data_out(so, flags, m, addr, control, p);
 #if CONTENT_FILTER
 		if (cfil_tag) {
@@ -1096,7 +1096,7 @@ do_flow_divert:
 #endif
 		return error;
 	}
-#endif /* defined(NECP) && defined(FLOW_DIVERT) */
+#endif                                            
 
 	error = udp6_output(inp, m, addr, control, p);
 #if CONTENT_FILTER
@@ -1123,9 +1123,9 @@ bad:
 	return error;
 }
 
-/*
- * Checksum extended UDP header and data.
- */
+  
+                                         
+   
 static int
 udp6_input_checksum(struct mbuf *m, struct udphdr *uh, int off, int ulen)
 {
@@ -1134,14 +1134,14 @@ udp6_input_checksum(struct mbuf *m, struct udphdr *uh, int off, int ulen)
 
 	if (!(m->m_pkthdr.csum_flags & CSUM_DATA_VALID) &&
 	    uh->uh_sum == 0) {
-		/* UDP/IPv6 checksum is mandatory (RFC2460) */
+		                                              
 
-		/*
-		 * If checksum was already validated, ignore this check.
-		 * This is necessary for transport-mode ESP, which may be
-		 * getting UDP payloads without checksums when the network
-		 * has a NAT64.
-		 */
+		  
+                                                          
+                                                           
+                                                            
+                 
+     
 		udpstat.udps_nosum++;
 		goto badsum;
 	}
@@ -1156,13 +1156,13 @@ udp6_input_checksum(struct mbuf *m, struct udphdr *uh, int off, int ulen)
 			uint32_t start = m->m_pkthdr.csum_rx_start;
 			int32_t trailer = (m_pktlen(m) - (off + ulen));
 
-			/*
-			 * Perform 1's complement adjustment of octets
-			 * that got included/excluded in the hardware-
-			 * calculated checksum value.  Also take care
-			 * of any trailing bytes and subtract out
-			 * their partial sum.
-			 */
+			  
+                                                 
+                                                 
+                                                
+                                            
+                        
+      
 			ASSERT(trailer >= 0);
 			if ((m->m_pkthdr.csum_flags & CSUM_PARTIAL) &&
 			    (start != off || trailer != 0)) {
@@ -1178,7 +1178,7 @@ udp6_input_checksum(struct mbuf *m, struct udphdr *uh, int off, int ulen)
 					ip6->ip6_dst.s6_addr16[1] = 0;
 				}
 
-				/* callee folds in sum */
+				                         
 				sum = m_adj_sum16(m, start, off, ulen, sum);
 				if (off > start) {
 					swbytes += (off - start);

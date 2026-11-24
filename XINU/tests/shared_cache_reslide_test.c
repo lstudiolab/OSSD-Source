@@ -51,7 +51,7 @@ get_current_slide_address(bool reslide)
 	uintptr_t                       addr;
 
 	T_ASSERT_POSIX_SUCCESS(posix_spawnattr_init(&attr), "posix_spawnattr_init");
-	/* spawn the helper requesting a reslide */
+	                                           
 	if (reslide) {
 		T_ASSERT_POSIX_SUCCESS(posix_spawnattr_setflags(&attr, _POSIX_SPAWN_RESLIDE), "posix_spawnattr_setflags");
 	}
@@ -96,23 +96,23 @@ get_current_slide_address(bool reslide)
 	return (void *)addr;
 }
 
-/*
- * build_faulting_shared_cache_address creates a pointer to an address that is
- * within the shared_cache range but that is guaranteed to not be mapped.
- */
+  
+                                                                              
+                                                                         
+   
 static char *
 build_faulting_shared_cache_address(bool tbi)
 {
 	uintptr_t fault_address;
 
-	// Grab currently mapped shared cache location and size
+	                                                       
 	size_t shared_cache_len = 0;
 	const void *shared_cache_location = _dyld_get_shared_cache_range(&shared_cache_len);
 	if (shared_cache_location == NULL || shared_cache_len == 0) {
 		return NULL;
 	}
 
-	// Locate a mach_header in the shared cache
+	                                           
 	Dl_info info;
 	if (dladdr((const void *)fork, &info) == 0) {
 		return NULL;
@@ -176,7 +176,7 @@ cleanup_sysctl(void)
 		T_QUIET; T_EXPECT_POSIX_SUCCESS(ret, "set shared region resliding back off");
 	}
 }
-#endif  /* __arm64e && TARGET_OS_IPHONE */
+#endif                                    
 
 T_DECL(reslide_sharedcache, "crash induced reslide of the shared cache",
     T_META_CHECK_LEAKS(false), T_META_IGNORECRASHES(".*shared_cache_reslide_test.*"),
@@ -190,7 +190,7 @@ T_DECL(reslide_sharedcache, "crash induced reslide of the shared cache",
 	int  on = 1;
 	size_t size;
 
-	/* Force resliding on */
+	                        
 	T_ASSERT_POSIX_SUCCESS(sysctlbyname("vm.vm_shared_region_reslide_aslr", &saved_status, &size, &on, sizeof(on)), "force enable reslide");
 	T_ATEND(cleanup_sysctl);
 
@@ -203,7 +203,7 @@ T_DECL(reslide_sharedcache, "crash induced reslide of the shared cache",
 	T_ASSERT_NE_PTR(system_address, reslide_address, "system and reslide addresses should diverge %p %p", system_address, reslide_address);
 	T_ASSERT_EQ_PTR(reslide_address, confirm_address, "reslide and another reslide (no crash) shouldn't diverge %p %p", reslide_address, confirm_address);
 
-	/* Crash into the shared cache area */
+	                                      
 	ptr = build_faulting_shared_cache_address(false);
 	T_ASSERT_NOTNULL(ptr, "faulting on %p in the shared region", (void *)ptr);
 	induce_crash(ptr);
@@ -214,17 +214,17 @@ T_DECL(reslide_sharedcache, "crash induced reslide of the shared cache",
 	confirm_address = get_current_slide_address(true);
 	T_ASSERT_EQ_PTR(reslide_address, confirm_address, "reslide and another reslide shouldn't diverge (no crash) %p %p", reslide_address, confirm_address);
 
-	/* Crash somewhere else */
+	                          
 	ptr = NULL;
 	induce_crash(ptr);
 	confirm_address = get_current_slide_address(true);
 	T_ASSERT_EQ_PTR(reslide_address, confirm_address, "reslide and another reslide after a non-tracked crash shouldn't diverge %p %p", reslide_address, confirm_address);
 
-	/* Ensure we still get the system address */
+	                                            
 	confirm_address = get_current_slide_address(false);
 	T_ASSERT_EQ_PTR(system_address, confirm_address, "system address and new process without resliding shouldn't diverge %p %p", system_address, confirm_address);
 
-	/* Ensure we detect a crash into the shared area with a TBI tagged address */
+	                                                                             
 	ptr = build_faulting_shared_cache_address(true);
 	T_ASSERT_NOTNULL(ptr, "faulting on %p in the shared region", (void *)ptr);
 	confirm_address = get_current_slide_address(true);
@@ -232,7 +232,7 @@ T_DECL(reslide_sharedcache, "crash induced reslide of the shared cache",
 	reslide_address = get_current_slide_address(true);
 	T_ASSERT_NE_PTR(system_address, reslide_address, "system and reslide should diverge (after crash, TBI test) %p %p", system_address, reslide_address);
 	T_ASSERT_NE_PTR(confirm_address, reslide_address, "reslide and another reslide should diverge (after crash, TBI test) %p %p", confirm_address, reslide_address);
-#else   /* __arm64e__ && TARGET_OS_IPHONE */
+#else                                       
 	T_SKIP("shared cache reslide is currently only supported on arm64e iPhones");
-#endif /* __arm64e__ && TARGET_OS_IPHONE */
+#endif                                     
 }

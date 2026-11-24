@@ -35,117 +35,117 @@
 #define HalfwayToForever 0x7FFFFFFFFFFFFFFFULL
 #define century 790560000000000ULL
 
-typedef void (*pmsSetFunc_t)(uint32_t, uint32_t, uint32_t);     /* Function used to set hardware power state */
-typedef uint32_t (*pmsQueryFunc_t)(uint32_t, uint32_t); /* Function used to query hardware power state */
+typedef void (*pmsSetFunc_t)(uint32_t, uint32_t, uint32_t);                                                    
+typedef uint32_t (*pmsQueryFunc_t)(uint32_t, uint32_t);                                                  
 
 typedef struct pmsStat {
-	uint64_t        stTime[2];                      /* Total time until switch to next step */
-	uint32_t        stCnt[2];                       /* Number of times switched to next step */
+	uint64_t        stTime[2];                                                                
+	uint32_t        stCnt[2];                                                                  
 } pmsStat;
 
 typedef struct pmsDef {
-	uint64_t        pmsLimit;                       /* Max time in this state in microseconds */
-	uint32_t        pmsStepID;                      /* Unique ID for this step */
-	uint32_t        pmsSetCmd;                      /* Command to select power state */
-#define pmsCngXClk  0x80000000          /* Change external clock */
-#define pmsXUnk         0x7F                    /* External clock unknown  */
-#define pmsXClk     0x7F000000          /* External clock frequency */
-#define pmsCngCPU   0x00800000          /* Change CPU parameters */
-#define pmsSync     0x00400000          /* Make changes synchronously, i.e., spin until delay finished */
-#define pmsMustCmp  0x00200000          /* Delay must complete before next change */
-#define pmsCPU      0x001F0000          /* CPU frequency */
-#define pmsCPUUnk       0x1F                    /* CPU frequency unknown */
-#define pmsCngVolt  0x00008000          /* Change voltage */
-#define pmsVoltage  0x00007F00          /* Voltage */
-#define pmsVoltUnk      0x7F                    /* Voltage unknown */
-#define pmsPowerID  0x000000FF          /* Identify power state to HW */
+	uint64_t        pmsLimit;                                                                   
+	uint32_t        pmsStepID;                                                   
+	uint32_t        pmsSetCmd;                                                         
+#define pmsCngXClk  0x80000000                                     
+#define pmsXUnk         0x7F                                                 
+#define pmsXClk     0x7F000000                                        
+#define pmsCngCPU   0x00800000                                     
+#define pmsSync     0x00400000                                                                           
+#define pmsMustCmp  0x00200000                                                      
+#define pmsCPU      0x001F0000                             
+#define pmsCPUUnk       0x1F                                               
+#define pmsCngVolt  0x00008000                              
+#define pmsVoltage  0x00007F00                       
+#define pmsVoltUnk      0x7F                                         
+#define pmsPowerID  0x000000FF                                          
 
-/*	Special commands - various things */
-#define pmsDelay    0xFFFFFFFD          /* Delayed step, no processor or platform changes.  Timer expiration causes transition to pmsTDelay */
-#define pmsParkIt       0xFFFFFFFF              /* Enters the parked state.  No processor or platform changes.  Timers cancelled */
-#define pmsCInit        ((pmsXUnk << 24) | (pmsCPUUnk << 16) | (pmsVoltUnk << 8))       /* Initial current set command value */
-/*	Note:  pmsSetFuncInd is an index into a table of function pointers and pmsSetFunc is the address
- *	of a function.  Initially, when you create a step table, this field is set as an index into
- *	a table of function addresses that gets passed as a parameter to pmsBuild.  When pmsBuild
- *	internalizes the step and function tables, it converts the index to the function address.
- */
+                                       
+#define pmsDelay    0xFFFFFFFD                                                                                                                
+#define pmsParkIt       0xFFFFFFFF                                                                                                 
+#define pmsCInit        ((pmsXUnk << 24) | (pmsCPUUnk << 16) | (pmsVoltUnk << 8))                                              
+                                                                                                   
+                                                                                              
+                                                                                            
+                                                                                            
+   
 	union sf {
-		pmsSetFunc_t    pmsSetFunc;     /* Function used to set platform power state */
-		uint32_t        pmsSetFuncInd;  /* Index to function in function table */
+		pmsSetFunc_t    pmsSetFunc;                                                    
+		uint32_t        pmsSetFuncInd;                                           
 	} sf;
 
-	uint32_t        pmsDown;                        /* Next state if going lower */
-	uint32_t        pmsNext;                        /* Normal next state */
-	uint32_t        pmsTDelay;                      /* State if command was pmsDelay and timer expired */
+	uint32_t        pmsDown;                                                       
+	uint32_t        pmsNext;                                               
+	uint32_t        pmsTDelay;                                                                           
 } pmsDef;
 
 typedef struct pmsCtl {
-	pmsStat(*pmsStats)[pmsMaxStates];               /* Pointer to statistics information, 0 if not enabled */
-	pmsDef          *pmsDefs[pmsMaxStates]; /* Indexed pointers to steps */
+	pmsStat(*pmsStats)[pmsMaxStates];                                                                        
+	pmsDef          *pmsDefs[pmsMaxStates];                                
 } pmsCtl;
 
-/*
- *	Note that this block is in the middle of the per_proc and the size (32 bytes)
- *	can't be changed without moving it.
- */
+  
+                                                                                
+                                      
+   
 
 typedef struct pmsd {
-	uint32_t        pmsState;                       /* Current power management state */
-	uint32_t        pmsCSetCmd;                     /* Current select command */
-	uint64_t        pmsPop;                         /* Time of next step */
-	uint64_t        pmsStamp;                       /* Time of transition to current state */
-	uint64_t        pmsTime;                        /* Total time in this state */
+	uint32_t        pmsState;                                                           
+	uint32_t        pmsCSetCmd;                                                 
+	uint64_t        pmsPop;                                                
+	uint64_t        pmsStamp;                                                                
+	uint64_t        pmsTime;                                                      
 } pmsd;
 
-/*
- *	Required power management step programs
- */
+  
+                                          
+   
 
 enum {
-	pmsIdle      = 0,                               /* Power state in idle loop */
-	pmsNorm      = 1,                               /* Normal step - usually low power */
-	pmsNormHigh  = 2,                               /* Highest power in normal step */
-	pmsBoost     = 3,                               /* Boost/overdrive step */
-	pmsLow       = 4,                               /* Lowest non-idle power state, no transitions */
-	pmsHigh      = 5,                               /* Power step for full on, no transitions */
-	pmsPrepCng   = 6,                               /* Prepare for step table change */
-	pmsPrepSleep = 7,                               /* Prepare for sleep */
-	pmsOverTemp  = 8,                               /* Machine is too hot */
-	pmsEnterNorm = 9,                               /* Enter into the normal step program */
-	pmsFree      = 10,                              /* First available empty step */
-	pmsStartUp   = 0xFFFFFFFE,              /* Start stepping */
-	pmsParked    = 0xFFFFFFFF               /* Power parked - used when changing stepping table */
+	pmsIdle      = 0,                                                             
+	pmsNorm      = 1,                                                                    
+	pmsNormHigh  = 2,                                                                 
+	pmsBoost     = 3,                                                         
+	pmsLow       = 4,                                                                                
+	pmsHigh      = 5,                                                                           
+	pmsPrepCng   = 6,                                                                  
+	pmsPrepSleep = 7,                                                      
+	pmsOverTemp  = 8,                                                       
+	pmsEnterNorm = 9,                                                                       
+	pmsFree      = 10,                                                              
+	pmsStartUp   = 0xFFFFFFFE,                                  
+	pmsParked    = 0xFFFFFFFF                                                                     
 };
 
-/*
- *	Power Management Stepper Control requests
- */
+  
+                                            
+   
 
 enum {
-	pmsCPark = 0,                                   /* Parks the stepper */
-	pmsCStart = 1,                                  /* Starts normal steppping */
-	pmsCFLow = 2,                                   /* Forces low power */
-	pmsCFHigh = 3,                                  /* Forces high power */
-	pmsCCnfg = 4,                                   /* Loads new stepper program */
-	pmsCQuery = 5,                                  /* Query current step and state */
-	pmsCExperimental = 6,                   /* Enter experimental mode */
+	pmsCPark = 0,                                                          
+	pmsCStart = 1,                                                               
+	pmsCFLow = 2,                                                         
+	pmsCFHigh = 3,                                                         
+	pmsCCnfg = 4,                                                                  
+	pmsCQuery = 5,                                                                    
+	pmsCExperimental = 6,                                                
 	pmsGCtls = 7,
 	pmsGStats = 8,
 	pmsCVID = 9,
-	pmsCFree = 10                                   /* Next control command to be assigned */
+	pmsCFree = 10                                                                            
 };
 
-/*
- *	User request control structure passed to sysctl
- */
+  
+                                                  
+   
 typedef struct {
-	uint32_t        request;                        /* stepper control request */
-	uint32_t        reqsize;                        /* size of data */
-	void            *reqaddr;                       /* read/write data buffer */
+	uint32_t        request;                                                     
+	uint32_t        reqsize;                                          
+	void            *reqaddr;                                                   
 } pmsctl_t;
 
-extern pmsCtl pmsCtls;                          /* Power Management Stepper control */
-extern uint32_t pmsBroadcastWait;       /* Number of outstanding broadcasts */
+extern pmsCtl pmsCtls;                                                                
+extern uint32_t pmsBroadcastWait;                                             
 extern int pmsInstalled;
 extern int pmsExperimental;
 
@@ -179,11 +179,11 @@ extern kern_return_t pmsBuild(pmsDef *pd, uint32_t pdsize, pmsSetFunc_t *functab
 extern void pmsRun(uint32_t nstep);
 extern void pmsPark(void);
 extern void pmsStart(void);
-extern kern_return_t pmsCPULoadVIDTable(uint16_t *tablep, int nstates); /* i386 only */
+extern kern_return_t pmsCPULoadVIDTable(uint16_t *tablep, int nstates);                
 extern kern_return_t pmsCPUSetPStateLimit(uint32_t limit);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _KERN_PMS_H_ */
-#endif /* KERNEL_PRIVATE */
+#endif                   
+#endif                     

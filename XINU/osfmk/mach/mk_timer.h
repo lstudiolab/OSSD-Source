@@ -73,4 +73,4 @@ struct mk_timer_expire_msg {
 
 typedef struct mk_timer_expire_msg              mk_timer_expire_msg_t;
 
-#endif /* _MACH_MK_TIMER_H_ */
+#endif                        

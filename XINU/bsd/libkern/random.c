@@ -65,15 +65,15 @@
 #include <libkern/libkern.h>
 #include <dev/random/randomdev.h>
 
-/*
- * Pseudo-random number generator for randomizing the profiling clock,
- * and whatever else we might use it for.  The result is uniform on
- * [0, 2^31 - 1].
- */
+  
+                                                                      
+                                                                   
+                 
+   
 u_int32_t
 random(void)
 {
-	/* Zero all but bottom 31 bits, also works for 64-bit longs */
+	                                                              
 	u_int32_t mask = (u_int32_t)-1 >> ((sizeof(u_int32_t) * 8) - 31);
 	return mask & RandomULong();
 }

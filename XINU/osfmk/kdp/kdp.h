@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Exported interface to kdp module
- */
+  
+                                   
+   
 
-/* Raise exception in debugger. */
+                                  
 
 void
 kdp_raise_exception(
@@ -40,7 +40,7 @@ kdp_raise_exception(
 	void                        *saved_state
 	);
 
-/* Reset debugger state. */
+                           
 
 void
 kdp_reset(void);

@@ -29,7 +29,7 @@
 #ifndef _MACH_COALITION_H_
 #define _MACH_COALITION_H_
 
-/* code shared by userspace and xnu */
+                                      
 
 #define COALITION_SPAWN_ENTITLEMENT "com.apple.private.coalition-spawn"
 
@@ -62,9 +62,9 @@
 	       & COALITION_CREATE_FLAGS_ROLE_MASK); \
     } while (0)
 
-/*
- * Default scheduling policy of the lead/parent task in a coalition
- */
+  
+                                                                   
+   
 #define COALITION_ROLE_UNDEF       (0)
 #define COALITION_ROLE_SYSTEM      (1)
 #define COALITION_ROLE_BACKGROUND  (2)
@@ -78,7 +78,7 @@
 
 #define COALITION_NUM_TYPES      (COALITION_TYPE_MAX + 1)
 
-#define COALITION_TASKROLE_NONE   (-1) /* task plays no role in the given coalition */
+#define COALITION_TASKROLE_NONE   (-1)                                                
 #define COALITION_TASKROLE_UNDEF  (0)
 #define COALITION_TASKROLE_LEADER (1)
 #define COALITION_TASKROLE_XPC    (2)
@@ -103,19 +103,19 @@
 
 #define COALITION_NUM_THREAD_QOS_TYPES   7
 
-/* Coalition Efficiency Interface Support */
+                                            
 
-/* Flags for coalition efficiency */
+                                    
 #define COALITION_FLAGS_EFFICIENT       (0x1)
 
-/*
- * Mapping of launchd plist values to coalition efficiency flags.
- * Launchd uses this mapping to pass the correct flags to
- * coalition_info_set_efficiency(cid, flags);
- *
- * Current supported values mapping:
- * { "Efficient" : COALITION_FLAGS_EFFICIENT, }
- */
+  
+                                                                 
+                                                         
+                                             
+  
+                                    
+                                               
+   
 static const char *coalition_efficiency_names[] = {
 	"Efficient",
 };
@@ -147,7 +147,7 @@ struct coalition_resource_usage {
 	uint64_t energy_billed_to_me;
 	uint64_t energy_billed_to_others;
 	uint64_t cpu_ptime;
-	uint64_t cpu_time_eqos_len;     /* Stores the number of thread QoS types */
+	uint64_t cpu_time_eqos_len;                                                
 	uint64_t cpu_time_eqos[COALITION_NUM_THREAD_QOS_TYPES];
 	uint64_t cpu_instructions;
 	uint64_t cpu_cycles;
@@ -156,34 +156,34 @@ struct coalition_resource_usage {
 };
 
 #ifdef PRIVATE
-/* definitions shared by only xnu + Libsyscall */
+                                                 
 
-/* coalition id for kernel task */
+                                  
 #define COALITION_ID_KERNEL 1
 
-/* Syscall flavors */
+                     
 #define COALITION_OP_CREATE 1
 #define COALITION_OP_TERMINATE 2
 #define COALITION_OP_REAP 3
 
-/* coalition_info flavors */
+                            
 #define COALITION_INFO_RESOURCE_USAGE 1
 #define COALITION_INFO_SET_NAME 2
 #define COALITION_INFO_SET_EFFICIENCY 3
 
-/* coalition_ledger_set operations */
+                                     
 #define COALITION_LEDGER_SET_LOGICAL_WRITES_LIMIT 1
 
 #define COALITION_EFFICIENCY_VALID_FLAGS    (COALITION_FLAGS_EFFICIENT)
 
-/* structure returned from libproc coalition listing interface */
+                                                                 
 struct procinfo_coalinfo {
 	uint64_t coalition_id;
 	uint32_t coalition_type;
 	uint32_t coalition_tasks;
 };
 
-#endif /* PRIVATE */
+#endif              
 
 #ifdef XNU_KERNEL_PRIVATE
 #if COALITION_DEBUG
@@ -195,4 +195,4 @@ struct procinfo_coalinfo {
 
 #endif
 
-#endif /* _MACH_COALITION_H_ */
+#endif                         

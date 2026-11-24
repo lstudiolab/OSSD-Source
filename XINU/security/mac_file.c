@@ -201,15 +201,15 @@ mac_file_check_library_validation(struct proc *proc,
 	return error;
 }
 
-/*
- * On some platforms, VM_PROT_READ implies VM_PROT_EXECUTE. If that is true,
- * both prot and maxprot will have VM_PROT_EXECUTE set after file_check_mmap
- * if VM_PROT_READ is set.
- *
- * The type of maxprot in file_check_mmap must be equivalent to vm_prot_t *
- * (defined in <mach/vm_prot.h>). mac_policy.h does not include any header
- * files, so cannot use the typedef itself.
- */
+  
+                                                                            
+                                                                            
+                          
+  
+                                                                           
+                                                                          
+                                           
+   
 int
 mac_file_check_mmap(struct ucred *cred, struct fileglob *fg, int prot,
     int flags, uint64_t offset, int *maxprot)
@@ -245,9 +245,9 @@ mac_file_notify_close(struct ucred *cred, struct fileglob *fg)
 }
 
 
-/*
- * fileglob XATTR helpers.
- */
+  
+                          
+   
 
 int
 mac_file_setxattr(struct fileglob *fg, const char *name, char *buf, size_t len)

@@ -28,28 +28,28 @@
 #endif
 #include <os/base.h>
 
-/*!
- * @header
- *
- * @preprocinfo
- * By default, libSystem objects such as GCD and XPC objects are declared as
- * Objective-C types when building with an Objective-C compiler. This allows
- * them to participate in ARC, in RR management by the Blocks runtime and in
- * leaks checking by the static analyzer, and enables them to be added to Cocoa
- * collections.
- *
- * NOTE: this requires explicit cancellation of dispatch sources and xpc
- *       connections whose handler blocks capture the source/connection object,
- *       resp. ensuring that such captures do not form retain cycles (e.g. by
- *       declaring the source as __weak).
- *
- * To opt-out of this default behavior, add -DOS_OBJECT_USE_OBJC=0 to your
- * compiler flags.
- *
- * This mode requires a platform with the modern Objective-C runtime, the
- * Objective-C GC compiler option to be disabled, and at least a Mac OS X 10.8
- * or iOS 6.0 deployment target.
- */
+   
+          
+  
+               
+                                                                            
+                                                                            
+                                                                            
+                                                                               
+               
+  
+                                                                        
+                                                                               
+                                                                             
+                                         
+  
+                                                                          
+                  
+  
+                                                                         
+                                                                              
+                                
+   
 
 #ifndef OS_OBJECT_HAVE_OBJC_SUPPORT
 #if defined(__OBJC__) && defined(__OBJC2__) && !defined(__OBJC_GC__) && ( \
@@ -66,7 +66,7 @@
 #define OS_OBJECT_USE_OBJC 1
 #endif
 #elif defined(OS_OBJECT_USE_OBJC) && OS_OBJECT_USE_OBJC
-/* Unsupported platform for OS_OBJECT_USE_OBJC=1 */
+                                                   
 #undef OS_OBJECT_USE_OBJC
 #define OS_OBJECT_USE_OBJC 0
 #else
@@ -79,7 +79,7 @@
 #if __has_attribute(objc_independent_class)
 #define OS_OBJC_INDEPENDENT_CLASS __attribute__((objc_independent_class))
 #endif
-#endif // __has_attribute(objc_independent_class)
+#endif                                           
 #ifndef OS_OBJC_INDEPENDENT_CLASS
 #define OS_OBJC_INDEPENDENT_CLASS
 #endif
@@ -134,13 +134,13 @@
 #endif
 #endif
 #else
-/*! @parseOnly */
+                 
 #define OS_OBJECT_RETURNS_RETAINED
-/*! @parseOnly */
+                 
 #define OS_OBJECT_CONSUMED
-/*! @parseOnly */
+                 
 #define OS_OBJECT_BRIDGE
-/*! @parseOnly */
+                 
 #define OS_WARN_RESULT_NEEDS_RELEASE OS_WARN_RESULT
 #define OS_OBJECT_USE_OBJC_RETAIN_RELEASE 0
 #endif
@@ -149,22 +149,22 @@
 
 __BEGIN_DECLS
 
-/*!
- * @function os_retain
- *
- * @abstract
- * Increment the reference count of an os_object.
- *
- * @discussion
- * On a platform with the modern Objective-C runtime this is exactly equivalent
- * to sending the object the -[retain] message.
- *
- * @param object
- * The object to retain.
- *
- * @result
- * The retained object.
- */
+   
+                      
+  
+            
+                                                 
+  
+              
+                                                                               
+                                               
+  
+                
+                        
+  
+          
+                       
+   
     __OSX_AVAILABLE_STARTING(__MAC_10_12, __IPHONE_10_0)
 OS_EXPORT
 void*
@@ -174,19 +174,19 @@ os_retain(void *object);
 #define os_retain(object) [object retain]
 #endif
 
-/*!
- * @function os_release
- *
- * @abstract
- * Decrement the reference count of a os_object.
- *
- * @discussion
- * On a platform with the modern Objective-C runtime this is exactly equivalent
- * to sending the object the -[release] message.
- *
- * @param object
- * The object to release.
- */
+   
+                       
+  
+            
+                                                
+  
+              
+                                                                               
+                                                
+  
+                
+                         
+   
 __OSX_AVAILABLE_STARTING(__MAC_10_12, __IPHONE_10_0)
 OS_EXPORT
 void
@@ -201,11 +201,11 @@ os_release(void *object);
 
 __END_DECLS
 
-#endif /* OS_OBJECT file guard */
+#endif                           
 
-#else /* KERNEL */
+#else             
 
-/* This should use the libdispatch header */
+                                            
 #include_next <os/object.h>
 
-#endif /* KERNEL */
+#endif             

@@ -73,11 +73,11 @@
  * SUCH DAMAGE.
  */
 
-/*
- #include <string.h>
- #include <stdlib.h>
- #include <limits.h>
- */
+  
+                    
+                    
+                    
+   
 #include <sys/types.h>
 #include <machine/limits.h>
 
@@ -116,12 +116,12 @@ isdigit(char c)
 	return c >= '0' && c <= '9';
 }
 
-/*
- * Convert a string to a long integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
- */
+  
+                                      
+  
+                                                                 
+                                            
+   
 long
 strtol(const char *nptr, char **endptr, int base)
 {
@@ -131,11 +131,11 @@ strtol(const char *nptr, char **endptr, int base)
 	unsigned long cutoff;
 	int neg = 0, any, cutlim;
 
-	/*
-	 * Skip white space and pick up leading +/- sign if any.
-	 * If base is 0, allow 0x for hex and 0 for octal, else
-	 * assume decimal; if base is already 16, allow 0x.
-	 */
+	  
+                                                         
+                                                        
+                                                    
+    
 	do {
 		c = *s++;
 	} while (isspace(c));
@@ -160,23 +160,23 @@ strtol(const char *nptr, char **endptr, int base)
 		base = c == '0' ? 8 : 10;
 	}
 
-	/*
-	 * Compute the cutoff value between legal numbers and illegal
-	 * numbers.  That is the largest legal value, divided by the
-	 * base.  An input number that is greater than this value, if
-	 * followed by a legal input character, is too big.  One that
-	 * is equal to this value may be valid or not; the limit
-	 * between valid and invalid numbers is then based on the last
-	 * digit.  For instance, if the range for longs is
-	 * [-2147483648..2147483647] and the input base is 10,
-	 * cutoff will be set to 214748364 and cutlim to either
-	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
-	 * the number is too big, and we will return a range error.
-	 *
-	 * Set any if any `digits' consumed; make it negative to indicate
-	 * overflow.
-	 */
+	  
+                                                              
+                                                             
+                                                              
+                                                              
+                                                         
+                                                               
+                                                   
+                                                       
+                                                        
+                                                                 
+                                                                   
+                                                            
+   
+                                                                  
+             
+    
 	cutoff = neg ? -(unsigned long)LONG_MIN : LONG_MAX;
 	cutlim = ((int)(cutoff % (unsigned long)base));
 	cutoff /= (unsigned long)base;
@@ -201,7 +201,7 @@ strtol(const char *nptr, char **endptr, int base)
 	}
 	if (any < 0) {
 		acc = neg ? LONG_MIN : LONG_MAX;
-//		errno = ERANGE;
+                   
 	} else if (neg) {
 		acc = -acc;
 	}
@@ -224,9 +224,9 @@ strtoul(const char *nptr, char **endptr, int base)
 	unsigned long cutoff;
 	int neg = 0, any, cutlim;
 
-	/*
-	 * See strtol for comments as to the logic used.
-	 */
+	  
+                                                 
+    
 	do {
 		c = *s++;
 	} while (isspace(c));
@@ -273,7 +273,7 @@ strtoul(const char *nptr, char **endptr, int base)
 	}
 	if (any < 0) {
 		acc = ULONG_MAX;
-//		errno = ERANGE;
+                   
 	} else if (neg) {
 		acc = -acc;
 	}
@@ -288,12 +288,12 @@ strtoul(const char *nptr, char **endptr, int base)
 	return acc;
 }
 
-/*
- * Convert a string to a quad integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
- */
+  
+                                      
+  
+                                                                 
+                                            
+   
 quad_t
 strtoq(const char *nptr, char **endptr, int base)
 {
@@ -303,11 +303,11 @@ strtoq(const char *nptr, char **endptr, int base)
 	u_quad_t qbase, cutoff;
 	int neg, any, cutlim;
 
-	/*
-	 * Skip white space and pick up leading +/- sign if any.
-	 * If base is 0, allow 0x for hex and 0 for octal, else
-	 * assume decimal; if base is already 16, allow 0x.
-	 */
+	  
+                                                         
+                                                        
+                                                    
+    
 	s = nptr;
 	do {
 		c = *s++;
@@ -331,24 +331,24 @@ strtoq(const char *nptr, char **endptr, int base)
 		base = c == '0' ? 8 : 10;
 	}
 
-	/*
-	 * Compute the cutoff value between legal numbers and illegal
-	 * numbers.  That is the largest legal value, divided by the
-	 * base.  An input number that is greater than this value, if
-	 * followed by a legal input character, is too big.  One that
-	 * is equal to this value may be valid or not; the limit
-	 * between valid and invalid numbers is then based on the last
-	 * digit.  For instance, if the range for quads is
-	 * [-9223372036854775808..9223372036854775807] and the input base
-	 * is 10, cutoff will be set to 922337203685477580 and cutlim to
-	 * either 7 (neg==0) or 8 (neg==1), meaning that if we have
-	 * accumulated a value > 922337203685477580, or equal but the
-	 * next digit is > 7 (or 8), the number is too big, and we will
-	 * return a range error.
-	 *
-	 * Set any if any `digits' consumed; make it negative to indicate
-	 * overflow.
-	 */
+	  
+                                                              
+                                                             
+                                                              
+                                                              
+                                                         
+                                                               
+                                                   
+                                                                  
+                                                                 
+                                                            
+                                                              
+                                                                
+                         
+   
+                                                                  
+             
+    
 	qbase = (unsigned)base;
 	cutoff = neg ? -(u_quad_t)QUAD_MIN : QUAD_MAX;
 	cutlim = ((int)(cutoff % qbase));
@@ -374,7 +374,7 @@ strtoq(const char *nptr, char **endptr, int base)
 	}
 	if (any < 0) {
 		acc = neg ? QUAD_MIN : QUAD_MAX;
-//		errno = ERANGE;
+                   
 	} else if (neg) {
 		acc = -acc;
 	}
@@ -390,12 +390,12 @@ strtoq(const char *nptr, char **endptr, int base)
 }
 
 
-/*
- * Convert a string to an unsigned quad integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
- */
+  
+                                                
+  
+                                                                 
+                                            
+   
 u_quad_t
 strtouq(const char *nptr,
     char **endptr,
@@ -407,9 +407,9 @@ strtouq(const char *nptr,
 	u_quad_t qbase, cutoff;
 	int neg, any, cutlim;
 
-	/*
-	 * See strtoq for comments as to the logic used.
-	 */
+	  
+                                                 
+    
 	s = nptr;
 	do {
 		c = *s++;
@@ -456,7 +456,7 @@ strtouq(const char *nptr,
 	}
 	if (any < 0) {
 		acc = UQUAD_MAX;
-//		errno = ERANGE;
+                   
 	} else if (neg) {
 		acc = -acc;
 	}
@@ -472,9 +472,9 @@ strtouq(const char *nptr,
 }
 
 
-/*
- *
- */
+  
+  
+   
 
 char *
 strncat(char *s1, const char *s2, unsigned long n)

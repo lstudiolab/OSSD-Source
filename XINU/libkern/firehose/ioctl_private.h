@@ -24,21 +24,21 @@
 #include <sys/ioccom.h>
 #include "firehose_types_private.h"
 
-// Ioctls implemented by the oslog dev node
+                                           
 
-/* Flushed the log data. Return the updated pointers */
+                                                       
 #ifndef LOGFLUSHED
 #define LOGFLUSHED      _IOW('t', 81, firehose_push_reply_t)
 #endif
 
-/* <Reserved for later. Unused now> Map the kernel log buffers to logd's address space */
+                                                                                         
 #ifndef LOGREGISTER
 #define LOGREGISTER _IOR('t', 80, int)
 #endif
 
-/* Map the kernel log buffers to logd's address space */
+                                                        
 #ifndef LOGBUFFERMAP
 #define LOGBUFFERMAP _IOR('t', 79, firehose_buffer_map_info_t)
 #endif
 
-#endif // __FIREHOSE_IOCTL_PRIVATE__
+#endif                              

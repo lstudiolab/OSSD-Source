@@ -122,7 +122,7 @@ m_hdr_offset(struct mbuf **m_p, void * hdr, size_t hdrlen, bpf_u_int32 * k_p,
 	if (k >= hdrlen) {
 		struct mbuf *m = *m_p;
 
-		/* there's no header or the offset we want is past the header */
+		                                                                
 		k -= hdrlen;
 		len = m->m_len;
 		while (k >= len) {
@@ -135,10 +135,10 @@ m_hdr_offset(struct mbuf **m_p, void * hdr, size_t hdrlen, bpf_u_int32 * k_p,
 		}
 		cp = mtod(m, u_char *) + k;
 
-		/* return next mbuf, in case it's needed */
+		                                           
 		*m_p = m->m_next;
 
-		/* update the offset */
+		                       
 		*k_p = k;
 	} else {
 		len = hdrlen;
@@ -266,11 +266,11 @@ bp_xbyte(struct bpf_packet *bp, bpf_u_int32 k, int *err)
 
 #endif
 
-/*
- * Execute the filter program starting at pc on the packet p
- * wirelen is the length of the original packet
- * buflen is the amount of data present
- */
+  
+                                                            
+                                               
+                                       
+   
 u_int
 bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 {
@@ -280,14 +280,14 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 #ifdef KERNEL
 	int merr;
 	struct bpf_packet * bp = (struct bpf_packet *)(void *)p;
-#endif /* KERNEL */
+#endif             
 
 	bzero(mem, sizeof(mem));
 
 	if (pc == 0) {
-		/*
-		 * No filter means accept all.
-		 */
+		  
+                                
+     
 		return (u_int) - 1;
 	}
 
@@ -298,9 +298,9 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 		default:
 #ifdef KERNEL
 			return 0;
-#else /* KERNEL */
+#else             
 			abort();
-#endif /* KERNEL */
+#endif             
 		case BPF_RET | BPF_K:
 			return (u_int)pc->k;
 
@@ -319,15 +319,15 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 					return 0;
 				}
 				continue;
-#else /* KERNEL */
+#else             
 				return 0;
-#endif /* KERNEL */
+#endif             
 			}
 #if BPF_ALIGN
 			if (((intptr_t)(p + k) & 3) != 0) {
 				A = EXTRACT_LONG(&p[k]);
 			} else
-#endif /* BPF_ALIGN */
+#endif                
 			A = ntohl(*(int32_t *)(void *)(p + k));
 			continue;
 
@@ -343,9 +343,9 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 					return 0;
 				}
 				continue;
-#else /* KERNEL */
+#else             
 				return 0;
-#endif /* KERNEL */
+#endif             
 			}
 			A = EXTRACT_SHORT(&p[k]);
 			continue;
@@ -362,9 +362,9 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 					return 0;
 				}
 				continue;
-#else /* KERNEL */
+#else             
 				return 0;
-#endif /* KERNEL */
+#endif             
 			}
 			A = p[k];
 			continue;
@@ -390,15 +390,15 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 					return 0;
 				}
 				continue;
-#else /* KERNEL */
+#else             
 				return 0;
-#endif /* KERNEL */
+#endif             
 			}
 #if BPF_ALIGN
 			if (((intptr_t)(p + k) & 3) != 0) {
 				A = EXTRACT_LONG(&p[k]);
 			} else
-#endif /* BPF_ALIGN */
+#endif                
 			A = ntohl(*(int32_t *)(void *)(p + k));
 			continue;
 
@@ -415,9 +415,9 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 					return 0;
 				}
 				continue;
-#else /* KERNEL */
+#else             
 				return 0;
-#endif /* KERNEL */
+#endif             
 			}
 			A = EXTRACT_SHORT(&p[k]);
 			continue;
@@ -434,9 +434,9 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 					return 0;
 				}
 				continue;
-#else /* KERNEL */
+#else             
 				return 0;
-#endif /* KERNEL */
+#endif             
 			}
 			A = p[k];
 			continue;
@@ -616,17 +616,17 @@ bpf_filter(const struct bpf_insn *pc, u_char *p, u_int wirelen, u_int buflen)
 }
 
 #ifdef KERNEL
-/*
- * Return true if the 'fcode' is a valid filter program.
- * The constraints are that each jump be forward and to a valid
- * code, that memory accesses are within valid ranges (to the
- * extent that this can be checked statically; loads of packet data
- * have to be, and are, also checked at run time), and that
- * the code terminates with either an accept or reject.
- *
- * The kernel needs to be able to verify an application's filter code.
- * Otherwise, a bogus program could easily crash the system.
- */
+  
+                                                        
+                                                               
+                                                             
+                                                                   
+                                                           
+                                                       
+  
+                                                                      
+                                                            
+   
 int
 bpf_validate(const struct bpf_insn *f, int len)
 {
@@ -640,9 +640,9 @@ bpf_validate(const struct bpf_insn *f, int len)
 	for (i = 0; i < ((u_int)len); ++i) {
 		p = &f[i];
 		switch (BPF_CLASS(p->code)) {
-		/*
-		 * Check that memory operations use valid addresses
-		 */
+		  
+                                                     
+     
 		case BPF_LD:
 		case BPF_LDX:
 			switch (BPF_MODE(p->code)) {
@@ -651,10 +651,10 @@ bpf_validate(const struct bpf_insn *f, int len)
 			case BPF_ABS:
 			case BPF_IND:
 			case BPF_MSH:
-				/*
-				 * More strict check with actual packet length
-				 * is done runtime.
-				 */
+				  
+                                                  
+                       
+       
 				if (p->k >= bpf_maxbufsize) {
 					return 0;
 				}
@@ -688,9 +688,9 @@ bpf_validate(const struct bpf_insn *f, int len)
 			case BPF_NEG:
 				break;
 			case BPF_DIV:
-				/*
-				 * Check for constant division by 0
-				 */
+				  
+                                       
+       
 				if (BPF_SRC(p->code) == BPF_K && p->k == 0) {
 					return 0;
 				}
@@ -700,22 +700,22 @@ bpf_validate(const struct bpf_insn *f, int len)
 			}
 			break;
 		case BPF_JMP:
-			/*
-			 * Check that jumps are within the code block,
-			 * and that unconditional branches don't go
-			 * backwards as a result of an overflow.
-			 * Unconditional branches have a 32-bit offset,
-			 * so they could overflow; we check to make
-			 * sure they don't. Conditional branches have
-			 * an 8-bit offset, and the from address is
-			 * less than equal to BPF_MAXINSNS, and we assume that
-			 * BPF_MAXINSNS is sufficiently small that adding 255
-			 * to it won't overlflow
-			 *
-			 * We know that len is <= BPF_MAXINSNS, and we
-			 * assume that BPF_MAXINSNS is less than the maximum
-			 * size of a u_int, so that i+1 doesn't overflow
-			 */
+			  
+                                                 
+                                              
+                                           
+                                                  
+                                              
+                                                
+                                              
+                                                         
+                                                        
+                           
+     
+                                                 
+                                                       
+                                                   
+      
 			from = i + 1;
 			switch (BPF_OP(p->code)) {
 			case BPF_JA:

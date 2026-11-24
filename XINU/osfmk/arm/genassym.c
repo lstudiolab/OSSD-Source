@@ -58,9 +58,9 @@
 
 #include <mach_ldebug.h>
 
-/*
- * Pass field offsets to assembly code.
- */
+  
+                                       
+   
 #include <kern/ast.h>
 #include <kern/thread.h>
 #include <kern/task.h>
@@ -87,18 +87,18 @@
 #include <arm/proc_reg.h>
 #include <prng/entropy.h>
 
-/*
- * genassym.c is used to produce an
- * assembly file which, intermingled with unuseful assembly code,
- * has all the necessary definitions emitted. This assembly file is
- * then postprocessed with sed to extract only these definitions
- * and thus the final assyms.s is created.
- *
- * This convoluted means is necessary since the structure alignment
- * and packing may be different between the host machine and the
- * target so we are forced into using the cross compiler to generate
- * the values, but we cannot run anything on the target machine.
- */
+  
+                                   
+                                                                 
+                                                                   
+                                                                
+                                          
+  
+                                                                   
+                                                                
+                                                                    
+                                                                
+   
 
 #define DECLARE(SYM, VAL) \
 	__asm("DEFINITION__define__" SYM ":\t .ascii \"%0\"" : : "n"  ((u_int)(VAL)))
@@ -128,7 +128,7 @@ main(
 	DECLARE("TASK_MACH_EXC_PORT",
 	    offsetof(struct task, exc_actions[EXC_MACH_SYSCALL].port));
 
-	/* These fields are being added on demand */
+	                                            
 	DECLARE("ACT_TASK", offsetof(struct thread, task));
 	DECLARE("ACT_PCBDATA", offsetof(struct thread, machine.PcbData));
 #if __ARM_VFP__
@@ -310,7 +310,7 @@ main(
 
 	DECLARE("PAGE_MAX_SIZE", PAGE_MAX_SIZE);
 
-	/* values from kern/timer.h */
+	                              
 	DECLARE("TIMER_LOW",
 	    offsetof(struct timer, low_bits));
 	DECLARE("TIMER_HIGH",

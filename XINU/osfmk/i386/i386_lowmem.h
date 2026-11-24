@@ -32,18 +32,18 @@
 
 #ifdef __APPLE_API_PRIVATE
 
-/*
- * The kernel better be statically linked at VM_MIN_KERNEL_ADDRESS + 0x100000
- */
+  
+                                                                             
+   
 #define I386_KERNEL_IMAGE_BASE_PAGE     0x100
 
-/* For K64, only 3 pages are reserved
- * - physical page zero, a gap page, and then real-mode-bootstrap/lowGlo.
- * Note that the kernel virtual address KERNEL_BASE+0x2000 is re-mapped
- * to the low globals and that physical page, 0x2000, is used by the bootstrap.
- */
+                                     
+                                                                         
+                                                                       
+                                                                               
+   
 #define I386_LOWMEM_RESERVED            3
 
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
-#endif /* !_I386_LOWMEM_H_ */
+#endif                       

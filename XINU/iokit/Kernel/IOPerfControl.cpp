@@ -17,7 +17,7 @@ static IOPerfControlClient::IOPerfControlClientShared *_Atomic gIOPerfControlCli
 bool
 IOPerfControlClient::init(IOService *driver, uint64_t maxWorkCapacity)
 {
-	// TODO: Remove this limit and implement dynamic table growth if workloads are found that exceed this
+	                                                                                                     
 	if (maxWorkCapacity > kMaxWorkTableNumEntries) {
 		maxWorkCapacity = kMaxWorkTableNumEntries;
 	}
@@ -80,10 +80,10 @@ IOPerfControlClient::init(IOService *driver, uint64_t maxWorkCapacity)
 		}
 	}
 
-	// Note: driverIndex is not guaranteed to be unique if maxDriverIndex wraps around. It is intended for debugging only.
+	                                                                                                                      
 	driverIndex = atomic_fetch_add_explicit(&shared->maxDriverIndex, 1, memory_order_relaxed) + 1;
 
-	// + 1 since index 0 is unused for kIOPerfControlClientWorkUntracked
+	                                                                    
 	workTableLength = maxWorkCapacity + 1;
 	assertf(workTableLength <= kWorkTableMaxSize, "%zu exceeds max allowed capacity of %zu", workTableLength, kWorkTableMaxSize);
 	if (maxWorkCapacity > 0) {
@@ -134,26 +134,26 @@ IOPerfControlClient::copyClient(IOService *driver, uint64_t maxWorkCapacity)
 	return client;
 }
 
-/* Convert the per driver token into a globally unique token for the performance
- * controller's consumption. This is achieved by setting the driver's unique
- * index onto the high order bits. The performance controller is shared between
- * all drivers and must track all instances separately, while each driver has
- * its own token table, so this step is needed to avoid token collisions between
- * drivers.
- */
+                                                                                
+                                                                            
+                                                                               
+                                                                             
+                                                                                
+           
+   
 inline uint64_t
 IOPerfControlClient::tokenToGlobalUniqueToken(uint64_t token)
 {
 	return token | (static_cast<uint64_t>(driverIndex) << kWorkTableIndexBits);
 }
 
-/* With this implementation, tokens returned to the driver differ from tokens
- * passed to the performance controller. This implementation has the nice
- * property that tokens returns to the driver will aways be between 1 and
- * the value of maxWorkCapacity passed by the driver to copyClient. The tokens
- * the performance controller sees will match on the lower order bits and have
- * the driver index set on the high order bits.
- */
+                                                                             
+                                                                         
+                                                                         
+                                                                              
+                                                                              
+                                               
+   
 uint64_t
 IOPerfControlClient::allocateToken(thread_group *thread_group)
 {
@@ -164,31 +164,31 @@ IOPerfControlClient::allocateToken(thread_group *thread_group)
 
 	uint64_t num_tries = 0;
 	size_t index = workTableNextIndex;
-	// - 1 since entry 0 is for kIOPerfControlClientWorkUntracked
+	                                                             
 	while (num_tries < workTableLength - 1) {
 		if (workTable[index].thread_group == nullptr) {
 			thread_group_retain(thread_group);
 			workTable[index].thread_group = thread_group;
 			token = index;
-			// next integer between 1 and workTableLength - 1
+			                                                 
 			workTableNextIndex = (index % (workTableLength - 1)) + 1;
 			break;
 		}
-		// next integer between 1 and workTableLength - 1
+		                                                 
 		index = (index % (workTableLength - 1)) + 1;
 		num_tries += 1;
 	}
 #if (DEVELOPMENT || DEBUG)
 	if (token == kIOPerfControlClientWorkUntracked) {
-		/* When investigating a panic here, first check that the driver is not leaking tokens.
-		 * If the driver is not leaking tokens and maximum is less than kMaxWorkTableNumEntries,
-		 * the driver should be modified to pass a larger value to copyClient.
-		 * If the driver is not leaking tokens and maximum is equal to kMaxWorkTableNumEntries,
-		 * this code will have to be modified to support dynamic table growth to support larger
-		 * numbers of tokens.
-		 */
+		                                                                                      
+                                                                                          
+                                                                        
+                                                                                         
+                                                                                         
+                       
+     
 		panic("Tokens allocated for this device exceeded maximum of %zu.\n",
-		    workTableLength - 1); // - 1 since entry 0 is for kIOPerfControlClientWorkUntracked
+		    workTableLength - 1);                                                              
 	}
 #endif
 
@@ -213,8 +213,8 @@ IOPerfControlClient::deallocateToken(uint64_t token)
 
 	IOSimpleLockUnlockEnableInterrupt(workTableLock, s);
 
-	// This can call into the performance controller if the last reference is dropped here. Are we sure
-	// the driver isn't holding any locks? If not, we may want to async this to another context.
+	                                                                                                   
+	                                                                                            
 	thread_group_release(thread_group);
 #endif
 }
@@ -540,7 +540,7 @@ IOPerfControlClient::workBeginWithContext(IOService *device, OSObject *context, 
 	}
 
 	if (work_context->thread_group == nullptr) {
-		// This Work Context has not taken a refcount on a TG
+		                                                     
 		return;
 	}
 

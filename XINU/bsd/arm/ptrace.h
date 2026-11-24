@@ -36,8 +36,8 @@
  *	@(#)ptrace.h	8.1 (Berkeley) 6/11/93
  */
 
-/*
- * Machine dependent trace commands.
- *
- * None for the ARM at this time.
- */
+  
+                                    
+  
+                                 
+   

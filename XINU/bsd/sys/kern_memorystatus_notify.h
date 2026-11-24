@@ -53,7 +53,7 @@ boolean_t memorystatus_bg_pressure_eligible(proc_t p);
 void memorystatus_proc_flags_unsafe(void * v, boolean_t *is_dirty, boolean_t *is_dirty_tracked, boolean_t *allow_idle_exit);
 extern void memorystatus_issue_fg_band_notify(void);
 
-#endif /* CONFIG_MEMORYSTATUS */
+#endif                          
 
 #if DEBUG
 #define VM_PRESSURE_DEBUG(cond, format, ...)      \
@@ -64,6 +64,6 @@ if (cond) { printf(format, ##__VA_ARGS__); } \
 #define VM_PRESSURE_DEBUG(cond, format, ...)
 #endif
 
-#endif /* VM_PRESSURE_EVENTS */
+#endif                         
 
-#endif /* SYS_MEMORYSTATUS_NOTIFY_H */
+#endif                                

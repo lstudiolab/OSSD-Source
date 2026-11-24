@@ -40,16 +40,16 @@
 #include <corecrypto/ccsha2.h>
 #include <corecrypto/cc_macros.h>
 
-// This HMAC DRBG is described in:
+                                  
 
-// NIST SP 800-90A Rev. 1
-// Recommendation for Random Number Generation Using Deterministic Random Bit Generators
-// June 2015
+                         
+                                                                                        
+            
 
-// See in particular:
-// - 9 DRBG Mechanism Functions
-// - 10.1.2 HMAC_DRBG
-// - B.2 HMAC_DRBGExample
+                     
+                               
+                     
+                         
 
 #define NISTHMAC_MAX_OUTPUT_SIZE (CCSHA512_OUTPUT_SIZE)
 
@@ -77,14 +77,14 @@ dump_state(const char *label, struct ccdrbg_nisthmac_state *drbg_ctx)
 }
 #endif
 
-// See NIST SP 800-90A, Rev. 1, 9.4
+                                   
 static void
 done(struct ccdrbg_state *ctx)
 {
 	cc_clear(sizeof(struct ccdrbg_nisthmac_state), ctx);
 }
 
-// See NIST SP 800-90A, Rev. 1, 10.1.2.2
+                                        
 static void
 update(struct ccdrbg_state *ctx, unsigned ndata, ...)
 {
@@ -134,7 +134,7 @@ entropy_isvalid(size_t entropy_nbytes, const struct ccdigest_info *info)
 	return (entropy_nbytes <= CCDRBG_MAX_ENTROPY_SIZE) && (entropy_nbytes >= MIN_REQ_ENTROPY(info));
 }
 
-// See NIST SP 800-90A, Rev. 1, 9.1 and 10.1.2.3
+                                                
 static int
 init(const struct ccdrbg_info *info,
     struct ccdrbg_state *ctx,
@@ -174,7 +174,7 @@ add_isvalid(size_t add_nbytes)
 	return add_nbytes <= CCDRBG_MAX_ADDITIONALINPUT_SIZE;
 }
 
-// See NIST SP 800-90A, Rev. 1, 9.2 and 10.1.2.4
+                                                
 static int
 reseed(struct ccdrbg_state *ctx, size_t entropy_nbytes, const void *entropy, size_t add_nbytes, const void *add)
 {
@@ -195,7 +195,7 @@ out:
 	return status;
 }
 
-// See NIST SP 800-90A, Rev. 1, 9.3 and 10.1.2.5
+                                                
 static int
 generate(struct ccdrbg_state *ctx, size_t out_nbytes, void *out, size_t add_nbytes, const void *add)
 {
@@ -223,7 +223,7 @@ generate(struct ccdrbg_state *ctx, size_t out_nbytes, void *out, size_t add_nbyt
 		cc_memcpy(Vprev, drbg_ctx->V, outlen);
 		cchmac(info, outlen, drbg_ctx->key, outlen, drbg_ctx->V, drbg_ctx->V);
 
-		// See FIPS 140-2, 4.9.2 Conditional Tests
+		                                          
 		if (cc_cmp_safe(outlen, Vprev, drbg_ctx->V) == 0) {
 			done(ctx);
 			status = CCDRBG_STATUS_ABORT;

@@ -50,16 +50,16 @@
 
 #ifndef lint
 static char sccsid[] __attribute__((used)) = "@(#)mkmakefile.c	5.21 (Berkeley) 6/18/88";
-#endif /* not lint */
+#endif               
 
-/*
- * Build the makefile for the system, from
- * the information in the files files and the
- * additional files for the machine being compiled to.
- */
+  
+                                          
+                                             
+                                                      
+   
 
 #include <stdio.h>
-#include <unistd.h>     /* for unlink */
+#include <unistd.h>                     
 #include <ctype.h>
 #include "parser.h"
 #include "config.h"
@@ -90,9 +90,9 @@ static  struct file_list *fcur;
 const char *tail(const char *fn);
 char *allCaps(char *str);
 
-/*
- * Lookup a file, by name.
- */
+  
+                          
+   
 struct file_list *
 fl_lookup(char *file)
 {
@@ -106,9 +106,9 @@ fl_lookup(char *file)
 	return 0;
 }
 
-/*
- * Lookup a file, by final component name.
- */
+  
+                                          
+   
 struct file_list *
 fltail_lookup(char *file)
 {
@@ -122,9 +122,9 @@ fltail_lookup(char *file)
 	return 0;
 }
 
-/*
- * Make a new file list entry
- */
+  
+                             
+   
 struct file_list *
 new_fent(void)
 {
@@ -164,9 +164,9 @@ get_VPATH(void)
 }
 
 
-/*
- * Build the makefile from the skeleton
- */
+  
+                                       
+   
 void
 makefile(void)
 {
@@ -273,10 +273,10 @@ percent:
 	(void) fclose(ofp);
 }
 
-/*
- * Read in the information about files used in making the system.
- * Store it in the ftab linked list.
- */
+  
+                                                                 
+                                    
+   
 void
 read_files(void)
 {
@@ -306,10 +306,10 @@ openit:
 next:
 	options = 0;
 	rest = (char *) 0;
-	/*
-	 * filename	[ standard | optional ]
-	 *	[ dev* | profiling-routine ] [ device-driver]
-	 */
+	  
+                                    
+                                                 
+    
 	wd = get_word(fp);
 	if (wd == (char *)EOF) {
 		(void) fclose(fp);
@@ -323,9 +323,9 @@ next:
 	if (wd == 0) {
 		goto next;
 	}
-	/*
-	 *  Allow comment lines beginning witha '#' character.
-	 */
+	  
+                                                       
+    
 	if (*wd == '#') {
 		while ((wd = get_word(fp)) && wd != (char *)EOF) {
 			;
@@ -390,14 +390,14 @@ nextopt:
 		struct opt *lop = 0;
 		struct device tdev;
 
-		/*
-		 *  Allocate a pseudo-device entry which we will insert into
-		 *  the device list below.  The flags field is set non-zero to
-		 *  indicate an internal entry rather than one generated from
-		 *  the configuration file.  The slave field is set to define
-		 *  the corresponding symbol as 0 should we fail to find the
-		 *  option in the option list.
-		 */
+		  
+                                                              
+                                                                
+                                                               
+                                                               
+                                                              
+                                
+     
 		init_dev(&tdev);
 		tdev.d_name = ns(wd);
 		tdev.d_type = PSEUDO_DEVICE;
@@ -407,11 +407,11 @@ nextopt:
 		for (op = opt; op; lop = op, op = op->op_next) {
 			char *od = allCaps(ns(wd));
 
-			/*
-			 *  Found an option which matches the current device
-			 *  dependency identifier.  Set the slave field to
-			 *  define the option in the header file.
-			 */
+			  
+                                                       
+                                                     
+                                            
+      
 			if (strcmp(op->op_name, od) == 0) {
 				tdev.d_slave = 1;
 				if (lop == 0) {
@@ -432,14 +432,14 @@ nextopt:
 	for (dp = dtab; dp != 0; dp = dp->d_next) {
 		if (eq(dp->d_name, wd) && (dp->d_type != PSEUDO_DEVICE || dp->d_slave)) {
 			if (not_option) {
-				goto invis;     /* dont want file if option present */
+				goto invis;                                           
 			} else {
 				goto nextopt;
 			}
 		}
 	}
 	if (not_option) {
-		goto nextopt;           /* want file if option missing */
+		goto nextopt;                                            
 	}
 	for (op = opt; op != 0; op = op->op_next) {
 		if (op->op_value == 0 && opteq(op->op_name, wd)) {
@@ -518,7 +518,7 @@ getrest:
 	tp->f_flags = 0;
 	tp->f_needs = needs;
 	if (pf && pf->f_type == INVISIBLE) {
-		pf->f_flags = 1;                /* mark as duplicate */
+		pf->f_flags = 1;                                       
 	}
 	if (for_xnu_lib) {
 		tp->f_flags |= LIBRARYDEP;
@@ -571,16 +571,16 @@ do_objs(FILE *fp, const char *msg, int ext, int flags)
 			continue;
 		}
 
-		/*
-		 * Check flags (if any)
-		 */
+		  
+                         
+     
 		if (flags && ((tp->f_flags & flags) != flags)) {
 			continue;
 		}
 
-		/*
-		 *	Check for '.o' file in list
-		 */
+		  
+                                
+     
 		cp = tp->f_fn + (len = strlen(tp->f_fn)) - 1;
 		if (ext != -1 && *cp != ext) {
 			continue;
@@ -613,7 +613,7 @@ void
 do_files(FILE *fp, const char *msg, char ext)
 {
 	struct file_list *tp;
-	int lpos, len = 0; /* dvw: init to 0 */
+	int lpos, len = 0;                     
 
 	fprintf(fp, "%s", msg);
 	lpos = 8;
@@ -624,10 +624,10 @@ do_files(FILE *fp, const char *msg, char ext)
 		if (tp->f_fn[strlen(tp->f_fn) - 1] != ext) {
 			continue;
 		}
-		/*
-		 * Always generate a newline.
-		 * Our Makefile's aren't readable anyway.
-		 */
+		  
+                               
+                                           
+     
 
 		lpos = 8;
 		fprintf(fp, "\\\n\t");
@@ -637,9 +637,9 @@ do_files(FILE *fp, const char *msg, char ext)
 	putc('\n', fp);
 }
 
-/*
- *  Include machine dependent makefile in output
- */
+  
+                                                
+   
 
 void
 do_machdep(FILE *ofp)
@@ -676,13 +676,13 @@ tail(const char *fn)
 	return cp + 1;
 }
 
-/*
- * Create the makerules for each file
- * which is part of the system.
- * Devices are processed with the special c2 option -i
- * which avoids any problem areas with i/o addressing
- * (e.g. for the VAX); assembler files are processed by as.
- */
+  
+                                     
+                               
+                                                      
+                                                     
+                                                           
+   
 void
 do_rules(FILE *f)
 {
@@ -690,7 +690,7 @@ do_rules(FILE *f)
 	char *np, och;
 	const char *tp;
 	struct file_list *ftp;
-	const char *extras = ""; /* dvw: init to "" */
+	const char *extras = "";                      
 	char *source_dir;
 	char och_upper;
 	const char *nl = "";
@@ -701,15 +701,15 @@ do_rules(FILE *f)
 		}
 		cp = (np = ftp->f_fn) + strlen(ftp->f_fn) - 1;
 		och = *cp;
-		/*
-		 *	Don't compile '.o' files
-		 */
+		  
+                             
+     
 		if (och == 'o') {
 			continue;
 		}
-		/*
-		 *	Determine where sources should come from
-		 */
+		  
+                                             
+     
 		if ((np[0] == '.') && (np[1] == '/')) {
 			source_dir = "";
 			np += 2;
@@ -717,7 +717,7 @@ do_rules(FILE *f)
 			source_dir = "$(SOURCE_DIR)/";
 		}
 		*cp = '\0';
-		tp = tail(np);  /* dvw: init tp before 'if' */
+		tp = tail(np);                                
 		fprintf(f, "-include %sd\n", tp);
 		fprintf(f, "%so: %s%s%c\n", tp, source_dir, np, och);
 		if (och == 's') {
@@ -796,7 +796,7 @@ allCaps(char *str)
 #define OLDSALUTATION "# DO NOT DELETE THIS LINE"
 
 #define LINESIZE 1024
-static char makbuf[LINESIZE];           /* one line buffer for makefile */
+static char makbuf[LINESIZE];                                             
 
 void
 copy_dependencies(FILE *makin, FILE *makout)

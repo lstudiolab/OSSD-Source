@@ -37,40 +37,40 @@ SECURITY_READ_ONLY_LATE(zone_t) counters_zone;
 ZONE_INIT(&counters_zone, "per_cpu_counters", sizeof(uint64_t),
     ZC_PERCPU | ZC_ALIGNMENT_REQUIRED, ZONE_ID_ANY, NULL);
 
-/*
- * Tracks how many static scalable counters are in use since they won't show up
- * in the per_cpu_counters zone stats.
- */
+  
+                                                                               
+                                      
+   
 uint64_t num_static_scalable_counters;
 
-/*
- * Mangle the given scalable_counter_t so that it points to the early storage
- * regardless of which CPU # we're boot on.
- * Must be run before we go multi-core.
- */
+  
+                                                                             
+                                           
+                                       
+   
 __startup_func void
 scalable_counter_static_boot_mangle(scalable_counter_t *counter)
 {
 	*counter = __zpcpu_mangle_for_boot(*counter);
 }
 
-/*
- * Initializes a static counter in permanent per-cpu memory.
- * Run during startup for each static per-cpu counter
- * Must be run before we go multi-core.
- */
+  
+                                                            
+                                                     
+                                       
+   
 __startup_func void
 scalable_counter_static_init(scalable_counter_t *counter)
 {
-	/*
-	 * We pointed the counter to a single global value during early boot.
-	 * Grab that value now. We'll store it in our current CPU's value
-	 */
+	  
+                                                                      
+                                                                  
+    
 	uint64_t current_value = os_atomic_load_wide(zpercpu_get(*counter), relaxed);
-	/*
-	 * This counter can't be freed so we allocate it out of the permanent zone rather than
-	 * our counter zone.
-	 */
+	  
+                                                                                       
+                     
+    
 	*counter = zalloc_percpu_permanent(sizeof(uint64_t), ZALIGN_64);
 	os_atomic_store_wide(zpercpu_get(*counter), current_value, relaxed);
 	num_static_scalable_counters++;

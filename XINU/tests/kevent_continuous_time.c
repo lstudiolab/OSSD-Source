@@ -43,7 +43,7 @@ trigger_sleep(int for_secs)
 		return 0;
 	}
 
-	// sleep for 1 seconds each iteration
+	                                     
 	char buf[10];
 	snprintf(buf, 10, "%d", for_secs);
 
@@ -65,9 +65,9 @@ trigger_sleep(int for_secs)
 	return 0;
 }
 
-// waits up to 30 seconds for system to sleep
-// returns number of seconds it took for sleep to be entered
-// or -1 if sleep wasn't accomplished
+                                             
+                                                            
+                                     
 static int
 wait_for_sleep()
 {
@@ -80,8 +80,8 @@ wait_for_sleep()
 	for (int i = 0; i < 30; i++) {
 		uint64_t after_diff = time_delta_ms();
 
-		// on OSX, there's enough latency between calls to MCT and MAT
-		// when the system is going down for sleep for values to diverge a few ms
+		                                                              
+		                                                                         
 		if (llabs((int64_t)before_diff - (int64_t)after_diff) > 2) {
 			return i + 1;
 		}
@@ -194,14 +194,14 @@ T_DECL(kevent_continuous_time_absolute, "kevent(EVFILT_TIMER with NOTE_MACH_CONT
 	uint64_t elapsed_ms = tick_to_ms(mach_continuous_time() - cnt_now);
 	int64_t missed_by  = tick_to_ns((int64_t)mach_continuous_time() - (int64_t)cnt_then) / 1000000;
 
-	// ~1/2 second is about as good as we'll get
+	                                            
 	T_ASSERT_LT(llabs(missed_by), 500LL, "timer should pop 3 sec in the future, popped after %lldms", elapsed_ms);
 
 	T_ASSERT_EQ(event.data, 1LL, NULL);
 
 	T_ASSERT_EQ(event.ident, 2ULL, NULL);
 
-	// try getting a periodic tick out of kq
+	                                        
 	T_ASSERT_EQ(kevent64(kq, NULL, 0, &event, 1, 0, &timeout), 0, NULL);
 	T_ASSERT_EQ(event.flags & EV_ERROR, 0, "event should not have EV_ERROR set: %s", event.flags & EV_ERROR ? strerror((int)event.data) : "no error");
 
@@ -209,7 +209,7 @@ T_DECL(kevent_continuous_time_absolute, "kevent(EVFILT_TIMER with NOTE_MACH_CONT
 }
 
 T_DECL(kevent_continuous_time_pops, "kevent(EVFILT_TIMER with NOTE_MACH_CONTINUOUS_TIME with multiple pops)", T_META_LTEPHASE(LTE_POSTINIT)){
-	// have to throttle rate at which pmset is called
+	                                                 
 	sleep(2);
 
 	mach_timebase_info(&tb_info);
@@ -217,7 +217,7 @@ T_DECL(kevent_continuous_time_pops, "kevent(EVFILT_TIMER with NOTE_MACH_CONTINUO
 	int kq;
 	T_ASSERT_POSIX_SUCCESS((kq = kqueue()), NULL);
 
-	// test that periodic ticks accumulate while asleep
+	                                                   
 	struct kevent64_s kev = {
 		.ident = 3,
 		.filter = EVFILT_TIMER,
@@ -227,7 +227,7 @@ T_DECL(kevent_continuous_time_pops, "kevent(EVFILT_TIMER with NOTE_MACH_CONTINUO
 	};
 	T_LOG("EV_SET(&kev, 3, EVFILT_TIMER, EV_ADD, NOTE_MACH_CONTINUOUS_TIME, 100, 0);");
 
-	// wait for first pop, then sleep
+	                                 
 	T_ASSERT_EQ(kevent64(kq, &kev, 1, &kev, 1, 0, NULL), 1, NULL);
 	T_ASSERT_EQ(0ll, kev.data, "No error returned");
 
@@ -244,7 +244,7 @@ T_DECL(kevent_continuous_time_pops, "kevent(EVFILT_TIMER with NOTE_MACH_CONTINUO
 	if (run_sleep_tests) {
 		sleep_secs = wait_for_sleep();
 	} else {
-		// simulate 2 seconds of system "sleep"
+		                                       
 		sleep(2);
 	}
 

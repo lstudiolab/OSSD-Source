@@ -117,7 +117,7 @@ IOConditionLock::unlock()
 	want_lock = false;
 	if (waiting) {
 		waiting = false;
-		IOLockWakeup(sleep_interlock, this, /* one-thread */ false); // Wakeup everybody
+		IOLockWakeup(sleep_interlock, this,                  false);                    
 	}
 
 	IOUnlock(sleep_interlock);
@@ -161,7 +161,7 @@ IOConditionLock::lock()
 
 	IOTakeLock(sleep_interlock);
 
-	/* Try to acquire the want_lock bit. */
+	                                       
 	while (want_lock && thread_res == THREAD_AWAKENED) {
 		waiting = true;
 		thread_res = IOLockSleep(sleep_interlock, (void *) this, interruptible);
@@ -181,33 +181,33 @@ IOConditionLock::lockWhen(int inCondition)
 	int thread_res;
 
 	do{
-		/* First get the actual lock */
+		                               
 		thread_res = lock();
 		if (thread_res != THREAD_AWAKENED) {
-			break; // Failed to acquire lock
+			break;                          
 		}
 		if (inCondition == condition) {
-			break; // Hold lock and condition is expected value
+			break;                                             
 		}
-		/*
-		 * Need to hold a IOTakeLock when we call thread_sleep().
-		 * Both _cond_interlock and want_lock must be held to
-		 * change _condition.
-		 */
+		  
+                                                           
+                                                       
+                       
+     
 		IOTakeLock(cond_interlock);
-		unlock(); // Release lock and sleep
+		unlock();                          
 
-		/*
-		 * this is the critical section on a multi in which
-		 * another thread could hold _sleep_interlock, but they
-		 * can't change _condition. Holding _cond_interlock here
-		 * (until after assert_wait() is called from
-		 * thread_sleep()) ensures that we'll be notified
-		 * of changes in _condition.
-		 */
-		assert_wait((void *) &condition, interruptible); /* assert event */
-		IOUnlock(cond_interlock);                /* release the lock */
-		thread_res = thread_block(THREAD_CONTINUE_NULL); /* block ourselves */
+		  
+                                                     
+                                                         
+                                                          
+                                              
+                                                   
+                              
+     
+		assert_wait((void *) &condition, interruptible);                   
+		IOUnlock(cond_interlock);                                      
+		thread_res = thread_block(THREAD_CONTINUE_NULL);                      
 	} while (thread_res == THREAD_AWAKENED);
 
 	return thread_res;

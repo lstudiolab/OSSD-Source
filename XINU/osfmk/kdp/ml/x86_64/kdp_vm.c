@@ -68,9 +68,9 @@ kern_collectth_state(thread_t thread, void *buffer, uint64_t size, void ** iter)
 
 
 	*iter = NULL;
-	/*
-	 *	Fill in thread command structure.
-	 */
+	  
+                                     
+    
 	hoffset = 0;
 
 	if (hoffset + sizeof(struct thread_command) > size) {
@@ -82,11 +82,11 @@ kern_collectth_state(thread_t thread, void *buffer, uint64_t size, void ** iter)
 	tc->cmd = LC_THREAD;
 	tc->cmdsize = (uint32_t) tstate_size;
 	hoffset += sizeof(struct thread_command);
-	/*
-	 * Follow with a struct thread_state_flavor and
-	 * the appropriate thread state struct for each
-	 * thread state flavor.
-	 */
+	  
+                                                
+                                                
+                        
+    
 	for (i = 0; i < sizeof(thread_flavor_array) / sizeof(thread_flavor_array[0]); i++) {
 		if (hoffset + sizeof(x86_state_hdr_t) > size) {
 			return;
@@ -101,10 +101,10 @@ kern_collectth_state(thread_t thread, void *buffer, uint64_t size, void ** iter)
 			return;
 		}
 
-		/* Locate and obtain the non-volatile register context
-		 * for this kernel thread. This should ideally be
-		 * encapsulated in machine_thread_get_kern_state().
-		 */
+		                                                      
+                                                   
+                                                     
+     
 		if (thread_flavor_array[i].flavor == x86_THREAD_STATE64) {
 			x86_thread_state64_t *tstate = (x86_thread_state64_t *) ((uintptr_t)buffer + hoffset);
 			vm_offset_t kstack;
@@ -154,10 +154,10 @@ kern_collectth_state(thread_t thread, void *buffer, uint64_t size, void ** iter)
 	}
 }
 
-/* Intended to be called from the kernel trap handler if an unrecoverable fault
- * occurs during a crashdump (which shouldn't happen since we validate mappings
- * and so on). This should be reworked to attempt some form of recovery.
- */
+                                                                               
+                                                                               
+                                                                        
+   
 int
 kdp_dump_trap(
 	int type,
@@ -176,12 +176,12 @@ kdp_dump_trap(
 	return 0;
 }
 
-/*
- * kdp_core_start_addr
- *
- * return the address where the kernel core file starts
- *
- */
+  
+                      
+  
+                                                       
+  
+   
 vm_map_offset_t
 kdp_core_start_addr()
 {

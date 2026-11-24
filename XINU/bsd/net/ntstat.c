@@ -50,8 +50,8 @@
 #include <net/if_types.h>
 #include <net/route.h>
 
-// These includes appear in ntstat.h but we include them here first so they won't trigger
-// any clang diagnostic errors.
+                                                                                         
+                               
 #include <netinet/in.h>
 #include <netinet/in_stat.h>
 #include <netinet/tcp.h>
@@ -59,9 +59,9 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic error "-Wpadded"
 #pragma clang diagnostic error "-Wpacked"
-// This header defines structures shared with user space, so we need to ensure there is
-// no compiler inserted padding in case the user space process isn't using the same
-// architecture as the kernel (example: i386 process with x86_64 kernel).
+                                                                                       
+                                                                                   
+                                                                         
 #include <net/ntstat.h>
 #pragma clang diagnostic pop
 
@@ -81,13 +81,13 @@ __private_extern__ int  nstat_collect = 1;
 #if (DEBUG || DEVELOPMENT)
 SYSCTL_INT(_net, OID_AUTO, statistics, CTLFLAG_RW | CTLFLAG_LOCKED,
     &nstat_collect, 0, "Collect detailed statistics");
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 
 #if !XNU_TARGET_OS_OSX
 static int nstat_privcheck = 1;
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 static int nstat_privcheck = 0;
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 SYSCTL_INT(_net, OID_AUTO, statistics_privcheck, CTLFLAG_RW | CTLFLAG_LOCKED,
     &nstat_privcheck, 0, "Entitlement check");
 
@@ -110,7 +110,7 @@ static struct nstat_stats nstat_stats;
 SYSCTL_STRUCT(_net_stats, OID_AUTO, stats, CTLFLAG_RD | CTLFLAG_LOCKED,
     &nstat_stats, nstat_stats, "");
 
-static u_int32_t nstat_lim_interval = 30 * 60; /* Report interval, seconds */
+static u_int32_t nstat_lim_interval = 30 * 60;                               
 static u_int32_t nstat_lim_min_tx_pkts = 100;
 static u_int32_t nstat_lim_min_rx_pkts = 100;
 #if (DEBUG || DEVELOPMENT)
@@ -125,17 +125,17 @@ SYSCTL_INT(_net_stats, OID_AUTO, lim_min_tx_pkts,
 SYSCTL_INT(_net_stats, OID_AUTO, lim_min_rx_pkts,
     CTLFLAG_RW | CTLFLAG_LOCKED, &nstat_lim_min_rx_pkts, 0,
     "Low Internet, min receive packets threshold");
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 static struct net_api_stats net_api_stats_before;
 static u_int64_t net_api_stats_last_report_time;
-#define NET_API_STATS_REPORT_INTERVAL (12 * 60 * 60) /* 12 hours, in seconds */
+#define NET_API_STATS_REPORT_INTERVAL (12 * 60 * 60)                           
 static u_int32_t net_api_stats_report_interval = NET_API_STATS_REPORT_INTERVAL;
 
 #if (DEBUG || DEVELOPMENT)
 SYSCTL_UINT(_net_stats, OID_AUTO, api_report_interval,
     CTLFLAG_RW | CTLFLAG_LOCKED, &net_api_stats_report_interval, 0, "");
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 enum{
 	NSTAT_FLAG_CLEANUP              = (1 << 0),
@@ -146,9 +146,9 @@ enum{
 
 #if !XNU_TARGET_OS_OSX
 #define QUERY_CONTINUATION_SRC_COUNT 50
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 #define QUERY_CONTINUATION_SRC_COUNT 100
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 typedef TAILQ_HEAD(, nstat_src)     tailq_head_nstat_src;
 typedef TAILQ_ENTRY(nstat_src)      tailq_entry_nstat_src;
@@ -172,7 +172,7 @@ typedef struct nstat_control_state {
 	mbuf_t                  ncs_accumulated;
 	u_int32_t               ncs_flags;
 	nstat_provider_filter   ncs_provider_filters[NSTAT_PROVIDER_COUNT];
-	/* state maintained for partial query requests */
+	                                                 
 	u_int64_t               ncs_context;
 	u_int64_t               ncs_seq;
 } nstat_control_state;
@@ -201,8 +201,8 @@ typedef TAILQ_HEAD(, nstat_procdetails) tailq_head_procdetails;
 typedef TAILQ_ENTRY(nstat_procdetails)  tailq_entry_procdetails;
 
 typedef struct nstat_src {
-	tailq_entry_nstat_src   ns_control_link;        // All sources for the nstat_control_state, for iterating over.
-	nstat_control_state     *ns_control;            // The nstat_control_state that this is a source for
+	tailq_entry_nstat_src   ns_control_link;                                                                       
+	nstat_control_state     *ns_control;                                                                
 	nstat_src_ref_t         srcref;
 	nstat_provider          *provider;
 	nstat_provider_cookie_t cookie;
@@ -230,20 +230,20 @@ static u_int32_t    nstat_tcp_watchers = 0;
 
 static void nstat_control_register(void);
 
-/*
- * The lock order is as follows:
- *
- * socket_lock (inpcb)
- *     nstat_mtx
- *         state->ncs_mtx
- */
+  
+                                
+  
+                      
+                
+                         
+   
 static KALLOC_HEAP_DEFINE(KHEAP_NET_STAT, NET_STAT_CONTROL_NAME,
     KHEAP_ID_DEFAULT);
 static nstat_control_state      *nstat_controls = NULL;
 static uint64_t                  nstat_idle_time = 0;
 static decl_lck_mtx_data(, nstat_mtx);
 
-/* some extern definitions */
+                             
 extern void mbuf_report_peak_usage(void);
 extern void tcp_report_stats(void);
 
@@ -294,7 +294,7 @@ nstat_ifnet_to_flags(
 	u_int16_t flags = 0;
 	u_int32_t functional_type = if_functional_type(ifp, FALSE);
 
-	/* Panic if someone adds a functional type without updating ntstat. */
+	                                                                      
 	VERIFY(0 <= functional_type && functional_type <= IFRTYPE_FUNCTIONAL_LAST);
 
 	switch (functional_type) {
@@ -430,7 +430,7 @@ nstat_malloc_aligned(
 	struct align_header     *hdr = NULL;
 	size_t size = length + sizeof(*hdr) + alignment - 1;
 
-	// Arbitrary limit to prevent abuse
+	                                   
 	if (length > (64 * 1024)) {
 		return NULL;
 	}
@@ -467,8 +467,8 @@ nstat_route_lookup(
 	u_int32_t       length,
 	nstat_provider_cookie_t *out_cookie)
 {
-	// rt_lookup doesn't take const params but it doesn't modify the parameters for
-	// the lookup. So...we use a union to eliminate the warning.
+	                                                                               
+	                                                            
 	union{
 		struct sockaddr *sa;
 		const struct sockaddr *const_sa;
@@ -584,9 +584,9 @@ nstat_route_walktree_add(
 
 	LCK_MTX_ASSERT(rnh_lock, LCK_MTX_ASSERT_OWNED);
 
-	/* RTF_UP can't change while rnh_lock is held */
+	                                                
 	if ((rt->rt_flags & RTF_UP) != 0) {
-		/* Clear RTPRF_OURS if the route is still usable */
+		                                                   
 		RT_LOCK(rt);
 		if (rt_validate(rt)) {
 			RT_ADDREF_LOCKED(rt);
@@ -596,7 +596,7 @@ nstat_route_walktree_add(
 			rt = NULL;
 		}
 
-		/* Otherwise if RTF_CONDEMNED, treat it as if it were down */
+		                                                             
 		if (rt == NULL) {
 			return 0;
 		}
@@ -633,10 +633,10 @@ nstat_route_add_watcher(
 
 			result = rnh->rnh_walktree(rnh, nstat_route_walktree_add, state);
 			if (result != 0) {
-				// This is probably resource exhaustion.
-				// There currently isn't a good way to recover from this.
-				// Least bad seems to be to give up on the add-all but leave
-				// the watcher in place.
+				                                        
+				                                                         
+				                                                            
+				                        
 				break;
 			}
 		}
@@ -659,11 +659,11 @@ nstat_route_new_entry(
 		nstat_control_state     *state;
 		for (state = nstat_controls; state; state = state->ncs_next) {
 			if ((state->ncs_watching & (1 << NSTAT_PROVIDER_ROUTE)) != 0) {
-				// this client is watching routes
-				// acquire a reference for the route
+				                                 
+				                                    
 				RT_ADDREF(rt);
 
-				// add the source, if that fails, release the reference
+				                                                       
 				if (nstat_control_source_add(0, state, &nstat_route_provider, rt) != 0) {
 					RT_REMREF(rt);
 				}
@@ -698,18 +698,18 @@ nstat_route_copy_descriptor(
 	desc->gateway_id = (uint64_t)VM_KERNEL_ADDRPERM(rt->rt_gwroute);
 
 
-	// key/dest
+	           
 	struct sockaddr *sa;
 	if ((sa = rt_key(rt))) {
 		nstat_copy_sa_out(sa, &desc->dst.sa, sizeof(desc->dst));
 	}
 
-	// mask
+	       
 	if ((sa = rt_mask(rt)) && sa->sa_len <= sizeof(desc->mask)) {
 		memcpy(&desc->mask, sa, sa->sa_len);
 	}
 
-	// gateway
+	          
 	if ((sa = rt->rt_gateway)) {
 		nstat_copy_sa_out(sa, &desc->gateway.sa, sizeof(desc->gateway));
 	}
@@ -814,7 +814,7 @@ __private_extern__ void
 nstat_route_connect_success(
 	struct rtentry  *rte)
 {
-	// This route
+	             
 	while (rte) {
 		struct nstat_counts*    stats = nstat_route_attach(rte);
 		if (stats) {
@@ -874,7 +874,7 @@ nstat_route_rx(
 	}
 }
 
-/* atomically average current value at _val_addr with _new_val and store  */
+                                                                            
 #define NSTAT_EWMA_ATOMIC(_val_addr, _new_val, _decay) do {                                     \
 	volatile uint32_t _old_val;                                                                                             \
 	volatile uint32_t _avg;                                                                                                 \
@@ -892,7 +892,7 @@ nstat_route_rx(
 	} while (!OSCompareAndSwap(_old_val, _avg, _val_addr));                                 \
 } while (0);
 
-/* atomically compute minimum of current value at _val_addr with _new_val and store  */
+                                                                                       
 #define NSTAT_MIN_ATOMIC(_val_addr, _new_val) do {                              \
 	volatile uint32_t _old_val;                                                                     \
 	do {                                                                                                            \
@@ -965,17 +965,17 @@ nstat_route_update(
 
 #pragma mark -- TCP Kernel Provider --
 
-/*
- * Due to the way the kernel deallocates a process (the process structure
- * might be gone by the time we get the PCB detach notification),
- * we need to cache the process name. Without this, proc_name() would
- * return null and the process name would never be sent to userland.
- *
- * For UDP sockets, we also store the cached the connection tuples along with
- * the interface index. This is necessary because when UDP sockets are
- * disconnected, the connection tuples are forever lost from the inpcb, thus
- * we need to keep track of the last call to connect() in ntstat.
- */
+  
+                                                                         
+                                                                 
+                                                                     
+                                                                    
+  
+                                                                             
+                                                                      
+                                                                            
+                                                                 
+   
 struct nstat_tucookie {
 	struct inpcb    *inp;
 	char            pname[MAXCOMLEN + 1];
@@ -1015,10 +1015,10 @@ nstat_tucookie_alloc_internal(
 	cookie->inp = inp;
 	proc_name(inp->inp_socket->last_pid, cookie->pname,
 	    sizeof(cookie->pname));
-	/*
-	 * We only increment the reference count for UDP sockets because we
-	 * only cache UDP socket tuples.
-	 */
+	  
+                                                                    
+                                 
+    
 	if (SOCK_PROTO(inp->inp_socket) == IPPROTO_UDP) {
 		OSIncrementAtomic(&inp->inp_nstat_refcnt);
 	}
@@ -1085,13 +1085,13 @@ nstat_tcpudp_lookup(
 {
 	struct inpcb *inp = NULL;
 
-	// parameter validation
+	                       
 	const nstat_tcp_add_param       *param = (const nstat_tcp_add_param*)data;
 	if (length < sizeof(*param)) {
 		return EINVAL;
 	}
 
-	// src and dst must match
+	                         
 	if (param->remote.v4.sin_family != 0 &&
 	    param->remote.v4.sin_family != param->local.v4.sin_family) {
 		return EINVAL;
@@ -1141,7 +1141,7 @@ nstat_tcpudp_lookup(
 		return ENOENT;
 	}
 
-	// At this point we have a ref to the inpcb
+	                                           
 	*out_cookie = nstat_tucookie_alloc(inp);
 	if (*out_cookie == NULL) {
 		in_pcb_checkstate(inp, WNT_RELEASE, 0);
@@ -1189,7 +1189,7 @@ nstat_tcp_counts(
 		*out_gone = 0;
 	}
 
-	// if the pcb is in the dead state, we should stop using it
+	                                                           
 	if (nstat_tcp_gone(cookie)) {
 		if (out_gone) {
 			*out_gone = 1;
@@ -1242,15 +1242,15 @@ nstat_tcp_add_watcher(
 	nstat_control_state     *state,
 	nstat_msg_add_all_srcs  *req)
 {
-	// There is a tricky issue around getting all TCP sockets added once
-	// and only once.  nstat_tcp_new_pcb() is called prior to the new item
-	// being placed on any lists where it might be found.
-	// By locking the tcbinfo.ipi_lock prior to marking the state as a watcher,
-	// it should be impossible for a new socket to be added twice.
-	// On the other hand, there is still a timing issue where a new socket
-	// results in a call to nstat_tcp_new_pcb() before this watcher
-	// is instantiated and yet the socket doesn't make it into ipi_listhead
-	// prior to the scan.  <rdar://problem/30361716>
+	                                                                    
+	                                                                      
+	                                                     
+	                                                                           
+	                                                              
+	                                                                      
+	                                                               
+	                                                                       
+	                                                
 
 	errno_t result;
 
@@ -1259,7 +1259,7 @@ nstat_tcp_add_watcher(
 	if (result == 0) {
 		OSIncrementAtomic(&nstat_tcp_watchers);
 
-		// Add all current tcp inpcbs. Ignore those in timewait
+		                                                       
 		struct inpcb *inp;
 		struct nstat_tucookie *cookie;
 		LIST_FOREACH(inp, tcbinfo.ipi_listhead, inp_list)
@@ -1305,13 +1305,13 @@ nstat_tcp_new_pcb(
 	nstat_control_state     *state;
 	for (state = nstat_controls; state; state = state->ncs_next) {
 		if ((state->ncs_watching & (1 << NSTAT_PROVIDER_TCP_KERNEL)) != 0) {
-			// this client is watching tcp
-			// acquire a reference for it
+			                              
+			                             
 			cookie = nstat_tucookie_alloc_ref_locked(inp);
 			if (cookie == NULL) {
 				continue;
 			}
-			// add the source, if that fails, release the reference
+			                                                       
 			if (nstat_control_source_add(0, state,
 			    &nstat_tcp_provider, cookie) != 0) {
 				nstat_tucookie_release_locked(cookie);
@@ -1525,7 +1525,7 @@ nstat_tcp_copy_descriptor(
 	desc->ifindex = (inp->inp_last_outifp == NULL) ? 0 :
 	    inp->inp_last_outifp->if_index;
 
-	// danger - not locked, values could be bogus
+	                                             
 	desc->txunacked = tp->snd_max - tp->snd_una;
 	desc->txwindow = tp->snd_wnd;
 	desc->txcwindow = tp->snd_cwnd;
@@ -1537,8 +1537,8 @@ nstat_tcp_copy_descriptor(
 
 	struct socket *so = inp->inp_socket;
 	if (so) {
-		// TBD - take the socket lock around these to make sure
-		// they're in sync?
+		                                                       
+		                   
 		desc->upid = so->last_upid;
 		desc->pid = so->last_pid;
 		desc->traffic_class = so->so_traffic_class;
@@ -1592,15 +1592,15 @@ nstat_tcpudp_reporting_allowed(nstat_provider_cookie_t cookie, nstat_provider_fi
 		struct nstat_tucookie *tucookie = (struct nstat_tucookie *)cookie;
 		struct inpcb *inp = tucookie->inp;
 
-		/* Only apply interface filter if at least one is allowed. */
+		                                                             
 		if ((filter->npf_flags & NSTAT_FILTER_IFNET_FLAGS) != 0) {
 			uint16_t interface_properties = nstat_inpcb_to_flags(inp);
 
 			if ((filter->npf_flags & interface_properties) == 0) {
-				// For UDP, we could have an undefined interface and yet transfers may have occurred.
-				// We allow reporting if there have been transfers of the requested kind.
-				// This is imperfect as we cannot account for the expensive attribute over wifi.
-				// We also assume that cellular is expensive and we have no way to select for AWDL
+				                                                                                     
+				                                                                         
+				                                                                                
+				                                                                                  
 				if (is_UDP) {
 					do{
 						if ((filter->npf_flags & (NSTAT_FILTER_ACCEPT_CELLULAR | NSTAT_FILTER_ACCEPT_EXPENSIVE)) &&
@@ -1710,7 +1710,7 @@ nstat_udp_counts(
 		*out_gone = 0;
 	}
 
-	// if the pcb is in the dead state, we should stop using it
+	                                                           
 	if (nstat_udp_gone(cookie)) {
 		if (out_gone) {
 			*out_gone = 1;
@@ -1751,15 +1751,15 @@ nstat_udp_add_watcher(
 	nstat_control_state     *state,
 	nstat_msg_add_all_srcs  *req)
 {
-	// There is a tricky issue around getting all UDP sockets added once
-	// and only once.  nstat_udp_new_pcb() is called prior to the new item
-	// being placed on any lists where it might be found.
-	// By locking the udpinfo.ipi_lock prior to marking the state as a watcher,
-	// it should be impossible for a new socket to be added twice.
-	// On the other hand, there is still a timing issue where a new socket
-	// results in a call to nstat_udp_new_pcb() before this watcher
-	// is instantiated and yet the socket doesn't make it into ipi_listhead
-	// prior to the scan. <rdar://problem/30361716>
+	                                                                    
+	                                                                      
+	                                                     
+	                                                                           
+	                                                              
+	                                                                      
+	                                                               
+	                                                                       
+	                                               
 
 	errno_t result;
 
@@ -1772,7 +1772,7 @@ nstat_udp_add_watcher(
 
 		OSIncrementAtomic(&nstat_udp_watchers);
 
-		// Add all current UDP inpcbs.
+		                              
 		LIST_FOREACH(inp, udbinfo.ipi_listhead, inp_list)
 		{
 			cookie = nstat_tucookie_alloc_ref(inp);
@@ -1816,13 +1816,13 @@ nstat_udp_new_pcb(
 	nstat_control_state     *state;
 	for (state = nstat_controls; state; state = state->ncs_next) {
 		if ((state->ncs_watching & (1 << NSTAT_PROVIDER_UDP_KERNEL)) != 0) {
-			// this client is watching tcp
-			// acquire a reference for it
+			                              
+			                             
 			cookie = nstat_tucookie_alloc_ref_locked(inp);
 			if (cookie == NULL) {
 				continue;
 			}
-			// add the source, if that fails, release the reference
+			                                                       
 			if (nstat_control_source_add(0, state,
 			    &nstat_udp_provider, cookie) != 0) {
 				nstat_tucookie_release_locked(cookie);
@@ -1891,8 +1891,8 @@ nstat_udp_copy_descriptor(
 
 	struct socket *so = inp->inp_socket;
 	if (so) {
-		// TBD - take the socket lock around these to make sure
-		// they're in sync?
+		                                                       
+		                   
 		desc->upid = so->last_upid;
 		desc->pid = so->last_pid;
 		proc_name(desc->pid, desc->pname, sizeof(desc->pname));
@@ -1958,10 +1958,10 @@ nstat_init_udp_provider(void)
 
 static nstat_provider   nstat_ifnet_provider;
 
-/*
- * We store a pointer to the ifnet and the original threshold
- * requested by the client.
- */
+  
+                                                             
+                           
+   
 struct nstat_ifnet_cookie {
 	struct ifnet    *ifp;
 	uint64_t        threshold;
@@ -2016,12 +2016,12 @@ nstat_ifnet_lookup(
 	}
 	ifnet_head_done();
 
-	/*
-	 * When we change the threshold to something smaller, we notify
-	 * all of our clients with a description message.
-	 * We won't send a message to the client we are currently serving
-	 * because it has no `ifnet source' yet.
-	 */
+	  
+                                                                
+                                                  
+                                                                  
+                                         
+    
 	if (changed) {
 		lck_mtx_lock(&nstat_mtx);
 		for (state = nstat_controls; state; state = state->ncs_next) {
@@ -2078,7 +2078,7 @@ nstat_ifnet_counts(
 		*out_gone = 0;
 	}
 
-	// if the ifnet is gone, we should stop using it
+	                                                
 	if (nstat_ifnet_gone(cookie)) {
 		if (out_gone) {
 			*out_gone = 1;
@@ -2106,16 +2106,16 @@ nstat_ifnet_release(
 	nstat_src *src;
 	uint64_t minthreshold = UINT64_MAX;
 
-	/*
-	 * Find all the clients that requested a threshold
-	 * for this ifnet and re-calculate if_data_threshold.
-	 */
+	  
+                                                   
+                                                      
+    
 	lck_mtx_lock(&nstat_mtx);
 	for (state = nstat_controls; state; state = state->ncs_next) {
 		lck_mtx_lock(&state->ncs_mtx);
 		TAILQ_FOREACH(src, &state->ncs_src_queue, ns_control_link)
 		{
-			/* Skip the provider we are about to detach. */
+			                                               
 			if (src->provider != &nstat_ifnet_provider ||
 			    src->cookie == cookie) {
 				continue;
@@ -2128,9 +2128,9 @@ nstat_ifnet_release(
 		lck_mtx_unlock(&state->ncs_mtx);
 	}
 	lck_mtx_unlock(&nstat_mtx);
-	/*
-	 * Reset if_data_threshold or disable it.
-	 */
+	  
+                                          
+    
 	ifcookie = (struct nstat_ifnet_cookie *)cookie;
 	ifp = ifcookie->ifp;
 	if (ifnet_is_attached(ifp, 1)) {
@@ -2362,28 +2362,28 @@ extern int tcp_report_stats_interval;
 static void
 nstat_ifnet_compute_percentages(struct if_tcp_ecn_perf_stat *ifst)
 {
-	/* Retransmit percentage */
+	                           
 	if (ifst->total_rxmitpkts > 0 && ifst->total_txpkts > 0) {
-		/* shift by 10 for precision */
+		                               
 		ifst->rxmit_percent =
 		    ((ifst->total_rxmitpkts << 10) * 100) / ifst->total_txpkts;
 	} else {
 		ifst->rxmit_percent = 0;
 	}
 
-	/* Out-of-order percentage */
+	                             
 	if (ifst->total_oopkts > 0 && ifst->total_rxpkts > 0) {
-		/* shift by 10 for precision */
+		                               
 		ifst->oo_percent =
 		    ((ifst->total_oopkts << 10) * 100) / ifst->total_rxpkts;
 	} else {
 		ifst->oo_percent = 0;
 	}
 
-	/* Reorder percentage */
+	                        
 	if (ifst->total_reorderpkts > 0 &&
 	    (ifst->total_txpkts + ifst->total_rxpkts) > 0) {
-		/* shift by 10 for precision */
+		                               
 		ifst->reorder_percent =
 		    ((ifst->total_reorderpkts << 10) * 100) /
 		    (ifst->total_txpkts + ifst->total_rxpkts);
@@ -2406,10 +2406,10 @@ nstat_ifnet_normalize_counter(struct if_tcp_ecn_stat *if_st)
 	    (if_st->ecn_client_setup - if_st->ecn_client_success) +
 	    (if_st->ecn_server_setup - if_st->ecn_server_success);
 
-	/*
-	 * report sack episodes, rst_drop and rxmit_drop
-	 *  as a ratio per connection, shift by 10 for precision
-	 */
+	  
+                                                 
+                                                         
+    
 	if (ecn_on_conn > 0) {
 		if_st->ecn_on.sack_episodes =
 		    (if_st->ecn_on.sack_episodes << 10) / ecn_on_conn;
@@ -2418,7 +2418,7 @@ nstat_ifnet_normalize_counter(struct if_tcp_ecn_stat *if_st)
 		if_st->ecn_on.rxmit_drop =
 		    (if_st->ecn_on.rxmit_drop << 10) * 100 / ecn_on_conn;
 	} else {
-		/* set to zero, just in case */
+		                               
 		if_st->ecn_on.sack_episodes = 0;
 		if_st->ecn_on.rst_drop = 0;
 		if_st->ecn_on.rxmit_drop = 0;
@@ -2469,7 +2469,7 @@ nstat_ifnet_report_ecn_stats(void)
 			continue;
 		}
 
-		/* Limit reporting to Wifi, Ethernet and cellular. */
+		                                                     
 		if (!(IFNET_IS_ETHERNET(ifp) || IFNET_IS_CELLULAR(ifp))) {
 			continue;
 		}
@@ -2483,13 +2483,13 @@ nstat_ifnet_report_ecn_stats(void)
 			st->ifnet_type = NSTAT_IFNET_ECN_TYPE_ETHERNET;
 		}
 		data.unsent_data_cnt = ifp->if_unsent_data_cnt;
-		/* skip if there was no update since last report */
+		                                                   
 		if (ifp->if_ipv4_stat->timestamp <= 0 ||
 		    ifp->if_ipv4_stat->timestamp < last_report_time) {
 			goto v6;
 		}
 		st->ifnet_proto = NSTAT_IFNET_ECN_PROTO_IPV4;
-		/* compute percentages using packet counts */
+		                                             
 		nstat_ifnet_compute_percentages(&ifp->if_ipv4_stat->ecn_on);
 		nstat_ifnet_compute_percentages(&ifp->if_ipv4_stat->ecn_off);
 		nstat_ifnet_normalize_counter(ifp->if_ipv4_stat);
@@ -2499,14 +2499,14 @@ nstat_ifnet_report_ecn_stats(void)
 		bzero(ifp->if_ipv4_stat, sizeof(*ifp->if_ipv4_stat));
 
 v6:
-		/* skip if there was no update since last report */
+		                                                   
 		if (ifp->if_ipv6_stat->timestamp <= 0 ||
 		    ifp->if_ipv6_stat->timestamp < last_report_time) {
 			continue;
 		}
 		st->ifnet_proto = NSTAT_IFNET_ECN_PROTO_IPV6;
 
-		/* compute percentages using packet counts */
+		                                             
 		nstat_ifnet_compute_percentages(&ifp->if_ipv6_stat->ecn_on);
 		nstat_ifnet_compute_percentages(&ifp->if_ipv6_stat->ecn_off);
 		nstat_ifnet_normalize_counter(ifp->if_ipv6_stat);
@@ -2514,33 +2514,33 @@ v6:
 		    sizeof(st->ecn_stat));
 		nstat_sysinfo_send_data(&data);
 
-		/* Zero the stats in ifp */
+		                           
 		bzero(ifp->if_ipv6_stat, sizeof(*ifp->if_ipv6_stat));
 	}
 	ifnet_head_done();
 }
 
-/* Some thresholds to determine Low Iternet mode */
-#define NSTAT_LIM_DL_MAX_BANDWIDTH_THRESHOLD    1000000 /* 1 Mbps */
-#define NSTAT_LIM_UL_MAX_BANDWIDTH_THRESHOLD    500000  /* 500 Kbps */
-#define NSTAT_LIM_UL_MIN_RTT_THRESHOLD          1000    /* 1 second */
-#define NSTAT_LIM_CONN_TIMEOUT_PERCENT_THRESHOLD (10 << 10) /* 10 percent connection timeouts */
-#define NSTAT_LIM_PACKET_LOSS_PERCENT_THRESHOLD (2 << 10) /* 2 percent packet loss rate */
+                                                   
+#define NSTAT_LIM_DL_MAX_BANDWIDTH_THRESHOLD    1000000             
+#define NSTAT_LIM_UL_MAX_BANDWIDTH_THRESHOLD    500000                
+#define NSTAT_LIM_UL_MIN_RTT_THRESHOLD          1000                  
+#define NSTAT_LIM_CONN_TIMEOUT_PERCENT_THRESHOLD (10 << 10)                                     
+#define NSTAT_LIM_PACKET_LOSS_PERCENT_THRESHOLD (2 << 10)                                 
 
 static boolean_t
 nstat_lim_activity_check(struct if_lim_perf_stat *st)
 {
-	/* check that the current activity is enough to report stats */
+	                                                               
 	if (st->lim_total_txpkts < nstat_lim_min_tx_pkts ||
 	    st->lim_total_rxpkts < nstat_lim_min_rx_pkts ||
 	    st->lim_conn_attempts == 0) {
 		return FALSE;
 	}
 
-	/*
-	 * Compute percentages if there was enough activity. Use
-	 * shift-left by 10 to preserve precision.
-	 */
+	  
+                                                         
+                                           
+    
 	st->lim_packet_loss_percent = ((st->lim_total_retxpkts << 10) /
 	    st->lim_total_txpkts) * 100;
 
@@ -2550,15 +2550,15 @@ nstat_lim_activity_check(struct if_lim_perf_stat *st)
 	st->lim_conn_timeout_percent = ((st->lim_conn_timeouts << 10) /
 	    st->lim_conn_attempts) * 100;
 
-	/*
-	 * Is Low Internet detected? First order metrics are bandwidth
-	 * and RTT. If these metrics are below the minimum thresholds
-	 * defined then the network attachment can be classified as
-	 * having Low Internet capacity.
-	 *
-	 * High connection timeout rate also indicates Low Internet
-	 * capacity.
-	 */
+	  
+                                                               
+                                                              
+                                                            
+                                 
+   
+                                                            
+             
+    
 	if (st->lim_dl_max_bandwidth > 0 &&
 	    st->lim_dl_max_bandwidth <= NSTAT_LIM_DL_MAX_BANDWIDTH_THRESHOLD) {
 		st->lim_dl_detected = 1;
@@ -2575,11 +2575,11 @@ nstat_lim_activity_check(struct if_lim_perf_stat *st)
 	    NSTAT_LIM_CONN_TIMEOUT_PERCENT_THRESHOLD) {
 		st->lim_ul_detected = 1;
 	}
-	/*
-	 * Second order metrics: If there was high packet loss even after
-	 * using delay based algorithms then we classify it as Low Internet
-	 * again
-	 */
+	  
+                                                                  
+                                                                    
+         
+    
 	if (st->lim_bk_txpkts >= nstat_lim_min_tx_pkts &&
 	    st->lim_packet_loss_percent >=
 	    NSTAT_LIM_PACKET_LOSS_PERCENT_THRESHOLD) {
@@ -2616,7 +2616,7 @@ nstat_ifnet_report_lim_stats(void)
 			continue;
 		}
 
-		/* Limit reporting to Wifi, Ethernet and cellular */
+		                                                    
 		if (!(IFNET_IS_ETHERNET(ifp) || IFNET_IS_CELLULAR(ifp))) {
 			continue;
 		}
@@ -2649,7 +2649,7 @@ nstat_ifnet_report_lim_stats(void)
 		bcopy(&ifp->if_lim_stat, &st->lim_stat,
 		    sizeof(st->lim_stat));
 
-		/* Zero the stats in ifp */
+		                           
 		bzero(&ifp->if_lim_stat, sizeof(ifp->if_lim_stat));
 		ifnet_lock_done(ifp);
 		nstat_sysinfo_send_data(&data);
@@ -2781,7 +2781,7 @@ nstat_sysinfo_send_data_internal(
 	countsize = offsetof(nstat_sysinfo_counts, nstat_sysinfo_keyvals);
 	finalsize = allocsize;
 
-	/* get number of key-vals for each kind of stat */
+	                                                  
 	switch (data->flags) {
 	case NSTAT_SYSINFO_MBUF_STATS:
 		nkeyvals = sizeof(struct nstat_sysinfo_mbuf_stats) /
@@ -2794,10 +2794,10 @@ nstat_sysinfo_send_data_internal(
 		nkeyvals = (sizeof(struct if_tcp_ecn_stat) /
 		    sizeof(u_int64_t));
 
-		/* Two more keys for ifnet type and proto */
+		                                            
 		nkeyvals += 2;
 
-		/* One key for unsent data. */
+		                              
 		nkeyvals++;
 		break;
 	case NSTAT_SYSINFO_LIM_STATS:
@@ -3473,14 +3473,14 @@ nstat_net_api_report_stats(void)
 	data.flags = NSTAT_SYSINFO_NET_API_STATS;
 	data.unsent_data_cnt = 0;
 
-	/*
-	 * Some of the fields in the report are the current value and
-	 * other fields are the delta from the last report:
-	 * - Report difference for the per flow counters as they increase
-	 *   with time
-	 * - Report current value for other counters as they tend not to change
-	 *   much with time
-	 */
+	  
+                                                              
+                                                    
+                                                                  
+               
+                                                                        
+                    
+    
 #define STATCOPY(f) \
 	(st->net_api_stats.f = net_api_stats.f)
 #define STATDIFF(f) \
@@ -3554,9 +3554,9 @@ nstat_net_api_report_stats(void)
 
 	nstat_sysinfo_send_data(&data);
 
-	/*
-	 * Save a copy of the current fields so we can diff them the next time
-	 */
+	  
+                                                                       
+    
 	memcpy(&net_api_stats_before, &net_api_stats,
 	    sizeof(struct net_api_stats));
 	_CASSERT(sizeof(net_api_stats_before) == sizeof(net_api_stats));
@@ -3643,7 +3643,7 @@ nstat_control_send_goodbye(
 				}
 			}
 		} else {
-			// send one last counts notification
+			                                    
 			result = nstat_control_send_counts(state, src, 0, NSTAT_MSG_HDR_FLAG_CLOSING, NULL);
 			if (result != 0) {
 				failed = 1;
@@ -3652,7 +3652,7 @@ nstat_control_send_goodbye(
 				}
 			}
 
-			// send a last description
+			                          
 			result = nstat_control_send_description(state, src, 0, NSTAT_MSG_HDR_FLAG_CLOSING);
 			if (result != 0) {
 				failed = 1;
@@ -3663,7 +3663,7 @@ nstat_control_send_goodbye(
 		}
 	}
 
-	// send the source removed notification
+	                                       
 	result = nstat_control_send_removed(state, src);
 	if (result != 0 && nstat_debug) {
 		failed = 1;
@@ -3709,7 +3709,7 @@ nstat_accumulate_msg(
 	assert(length <= MAX_NSTAT_MSG_HDR_LENGTH);
 
 	if (state->ncs_accumulated && mbuf_trailingspace(state->ncs_accumulated) < length) {
-		// Will send the current mbuf
+		                             
 		nstat_flush_accumulated_msgs(state);
 	}
 
@@ -3770,12 +3770,12 @@ nstat_idle_check(
 				if (src->provider->nstat_gone(src->cookie)) {
 					errno_t result;
 
-					// Pull it off the list
+					                       
 					TAILQ_REMOVE(&control->ncs_src_queue, src, ns_control_link);
 
 					result = nstat_control_send_goodbye(control, src);
 
-					// Put this on the list to release later
+					                                        
 					TAILQ_INSERT_TAIL(&dead_list, src, ns_control_link);
 				}
 			}
@@ -3791,10 +3791,10 @@ nstat_idle_check(
 
 	lck_mtx_unlock(&nstat_mtx);
 
-	/* Generate any system level reports, if needed */
+	                                                  
 	nstat_sysinfo_generate_report();
 
-	// Release the sources now that we aren't holding lots of locks
+	                                                               
 	while ((src = TAILQ_FIRST(&dead_list))) {
 		TAILQ_REMOVE(&dead_list, src, ns_control_link);
 		nstat_control_cleanup_source(NULL, src, FALSE);
@@ -3807,7 +3807,7 @@ nstat_idle_check(
 static void
 nstat_control_register(void)
 {
-	// Create our lock group first
+	                              
 	lck_grp_attr_t  *grp_attr = lck_grp_attr_alloc_init();
 	lck_grp_attr_setdefault(grp_attr);
 	nstat_lck_grp = lck_grp_alloc_init("network statistics kctl", grp_attr);
@@ -3815,7 +3815,7 @@ nstat_control_register(void)
 
 	lck_mtx_init(&nstat_mtx, nstat_lck_grp, NULL);
 
-	// Register the control
+	                       
 	struct kern_ctl_reg     nstat_control;
 	bzero(&nstat_control, sizeof(nstat_control));
 	strlcpy(nstat_control.ctl_name, NET_STAT_CONTROL_NAME, sizeof(nstat_control.ctl_name));
@@ -3847,7 +3847,7 @@ nstat_control_cleanup_source(
 			}
 		}
 	}
-	// Cleanup the source if we found it.
+	                                     
 	src->provider->nstat_release(src->cookie, locked);
 	kheap_free(KHEAP_NET_STAT, src, sizeof(*src));
 }
@@ -3912,7 +3912,7 @@ nstat_control_disconnect(
 
 	TAILQ_INIT(&cleanup_list);
 
-	// pull it out of the global list of states
+	                                           
 	lck_mtx_lock(&nstat_mtx);
 	nstat_control_state     **statepp;
 	for (statepp = &nstat_controls; *statepp; statepp = &(*statepp)->ncs_next) {
@@ -3924,7 +3924,7 @@ nstat_control_disconnect(
 	lck_mtx_unlock(&nstat_mtx);
 
 	lck_mtx_lock(&state->ncs_mtx);
-	// Stop watching for sources
+	                            
 	nstat_provider  *provider;
 	watching = state->ncs_watching;
 	state->ncs_watching = 0;
@@ -3935,7 +3935,7 @@ nstat_control_disconnect(
 		}
 	}
 
-	// set cleanup flags
+	                    
 	state->ncs_flags |= NSTAT_FLAG_CLEANUP;
 
 	if (state->ncs_accumulated) {
@@ -3943,7 +3943,7 @@ nstat_control_disconnect(
 		state->ncs_accumulated = NULL;
 	}
 
-	// Copy out the list of sources
+	                               
 	TAILQ_CONCAT(&cleanup_list, &state->ncs_src_queue, ns_control_link);
 	lck_mtx_unlock(&state->ncs_mtx);
 
@@ -3976,7 +3976,7 @@ nstat_control_send_counts(
 	nstat_msg_src_counts counts;
 	errno_t result = 0;
 
-	/* Some providers may not have any counts to send */
+	                                                    
 	if (src->provider->nstat_counts == NULL) {
 		return 0;
 	}
@@ -4012,7 +4012,7 @@ nstat_control_append_counts(
 	nstat_src           *src,
 	int                 *gone)
 {
-	/* Some providers may not have any counts to send */
+	                                                    
 	if (!src->provider->nstat_counts) {
 		return 0;
 	}
@@ -4045,13 +4045,13 @@ nstat_control_send_description(
 	u_int64_t           context,
 	u_int16_t           hdr_flags)
 {
-	// Provider doesn't support getting the descriptor? Done.
+	                                                         
 	if (src->provider->nstat_descriptor_length == 0 ||
 	    src->provider->nstat_copy_descriptor == NULL) {
 		return EOPNOTSUPP;
 	}
 
-	// Allocate storage for the descriptor message
+	                                              
 	mbuf_t          msg;
 	unsigned int    one = 1;
 	size_t          size = offsetof(nstat_msg_src_description, data) + src->provider->nstat_descriptor_length;
@@ -4066,7 +4066,7 @@ nstat_control_send_description(
 	mbuf_setlen(msg, size);
 	mbuf_pkthdr_setlen(msg, mbuf_len(msg));
 
-	// Query the provider for the provider specific bits
+	                                                    
 	errno_t result = src->provider->nstat_copy_descriptor(src->cookie, desc->data, src->provider->nstat_descriptor_length);
 
 	if (result != 0) {
@@ -4102,8 +4102,8 @@ nstat_control_append_description(
 		return EOPNOTSUPP;
 	}
 
-	// Fill out a buffer on the stack, we will copy to the mbuf later
-	u_int64_t buffer[size / sizeof(u_int64_t)  + 1]; // u_int64_t to ensure alignment
+	                                                                 
+	u_int64_t buffer[size / sizeof(u_int64_t)  + 1];                                 
 	bzero(buffer, size);
 
 	nstat_msg_src_description *desc = (nstat_msg_src_description*)buffer;
@@ -4114,8 +4114,8 @@ nstat_control_append_description(
 	desc->provider = src->provider->nstat_provider_id;
 
 	errno_t result = 0;
-	// Fill in the description
-	// Query the provider for the provider specific bits
+	                          
+	                                                    
 	result = src->provider->nstat_copy_descriptor(src->cookie, desc->data,
 	    src->provider->nstat_descriptor_length);
 	if (result != 0) {
@@ -4134,14 +4134,14 @@ nstat_control_send_update(
 	u_int16_t           hdr_flags,
 	int                 *gone)
 {
-	// Provider doesn't support getting the descriptor or counts? Done.
+	                                                                   
 	if ((src->provider->nstat_descriptor_length == 0 ||
 	    src->provider->nstat_copy_descriptor == NULL) &&
 	    src->provider->nstat_counts == NULL) {
 		return EOPNOTSUPP;
 	}
 
-	// Allocate storage for the descriptor message
+	                                              
 	mbuf_t          msg;
 	unsigned int    one = 1;
 	size_t          size = offsetof(nstat_msg_src_update, data) +
@@ -4167,7 +4167,7 @@ nstat_control_send_update(
 
 	errno_t result = 0;
 	if (src->provider->nstat_descriptor_length != 0 && src->provider->nstat_copy_descriptor) {
-		// Query the provider for the provider specific bits
+		                                                    
 		result = src->provider->nstat_copy_descriptor(src->cookie, desc->data,
 		    src->provider->nstat_descriptor_length);
 		if (result != 0) {
@@ -4209,8 +4209,8 @@ nstat_control_append_update(
 		return EOPNOTSUPP;
 	}
 
-	// Fill out a buffer on the stack, we will copy to the mbuf later
-	u_int64_t buffer[size / sizeof(u_int64_t)  + 1]; // u_int64_t to ensure alignment
+	                                                                 
+	u_int64_t buffer[size / sizeof(u_int64_t)  + 1];                                 
 	bzero(buffer, size);
 
 	nstat_msg_src_update    *desc = (nstat_msg_src_update*)buffer;
@@ -4221,9 +4221,9 @@ nstat_control_append_update(
 	desc->provider = src->provider->nstat_provider_id;
 
 	errno_t result = 0;
-	// Fill in the description
+	                          
 	if (src->provider->nstat_descriptor_length != 0 && src->provider->nstat_copy_descriptor) {
-		// Query the provider for the provider specific bits
+		                                                    
 		result = src->provider->nstat_copy_descriptor(src->cookie, desc->data,
 		    src->provider->nstat_descriptor_length);
 		if (result != 0) {
@@ -4283,12 +4283,12 @@ nstat_control_handle_add_request(
 {
 	errno_t result;
 
-	// Verify the header fits in the first mbuf
+	                                           
 	if (mbuf_len(m) < offsetof(nstat_msg_add_src_req, param)) {
 		return EINVAL;
 	}
 
-	// Calculate the length of the parameter field
+	                                              
 	ssize_t paramlength = mbuf_pkthdr_len(m) - offsetof(nstat_msg_add_src_req, param);
 	if (paramlength < 0 || paramlength > 2 * 1024) {
 		return EINVAL;
@@ -4298,7 +4298,7 @@ nstat_control_handle_add_request(
 	nstat_provider_cookie_t cookie = NULL;
 	nstat_msg_add_src_req   *req = mbuf_data(m);
 	if (mbuf_pkthdr_len(m) > mbuf_len(m)) {
-		// parameter is too large, we need to make a contiguous copy
+		                                                            
 		void *data = kheap_alloc(KHEAP_TEMP, paramlength, Z_WAITOK);
 
 		if (!data) {
@@ -4353,7 +4353,7 @@ nstat_control_handle_add_all(
 {
 	errno_t result = 0;
 
-	// Verify the header fits in the first mbuf
+	                                           
 	if (mbuf_len(m) < sizeof(nstat_msg_add_all_srcs)) {
 		return EINVAL;
 	}
@@ -4382,15 +4382,15 @@ nstat_control_handle_add_all(
 
 	lck_mtx_lock(&state->ncs_mtx);
 	if (req->filter & NSTAT_FILTER_SUPPRESS_SRC_ADDED) {
-		// Suppression of source messages implicitly requires the use of update messages
+		                                                                                
 		state->ncs_flags |= NSTAT_FLAG_SUPPORTS_UPDATES;
 	}
 	lck_mtx_unlock(&state->ncs_mtx);
 
-	// rdar://problem/30301300   Different providers require different synchronization
-	// to ensure that a new entry does not get double counted due to being added prior
-	// to all current provider entries being added.  Hence pass the provider the details
-	// in the original request for this to be applied atomically
+	                                                                                  
+	                                                                                  
+	                                                                                    
+	                                                            
 
 	result = provider->nstat_watcher_add(state, req);
 
@@ -4408,7 +4408,7 @@ nstat_control_source_add(
 	nstat_provider          *provider,
 	nstat_provider_cookie_t cookie)
 {
-	// Fill out source added message if appropriate
+	                                               
 	mbuf_t                  msg = NULL;
 	nstat_src_ref_t         *srcrefp = NULL;
 
@@ -4444,7 +4444,7 @@ nstat_control_source_add(
 		srcrefp = &add->srcref;
 	}
 
-	// Allocate storage for the source
+	                                  
 	nstat_src *src = kheap_alloc(KHEAP_NET_STAT, sizeof(*src), Z_WAITOK);
 	if (src == NULL) {
 		if (msg) {
@@ -4453,7 +4453,7 @@ nstat_control_source_add(
 		return ENOMEM;
 	}
 
-	// Fill in the source, including picking an unused source ref
+	                                                             
 	lck_mtx_lock(&state->ncs_mtx);
 
 	src->srcref = nstat_control_next_src_ref(state);
@@ -4475,7 +4475,7 @@ nstat_control_source_add(
 	src->seq = 0;
 
 	if (msg) {
-		// send the source added message if appropriate
+		                                               
 		errno_t result = ctl_enqueuembuf(state->ncs_kctl, state->ncs_unit, msg,
 		    CTL_DATA_EOR);
 		if (result != 0) {
@@ -4486,7 +4486,7 @@ nstat_control_source_add(
 			return result;
 		}
 	}
-	// Put the source in the list
+	                             
 	TAILQ_INSERT_HEAD(&state->ncs_src_queue, src, ns_control_link);
 	src->ns_control = state;
 
@@ -4509,7 +4509,7 @@ nstat_control_handle_remove_request(
 
 	lck_mtx_lock(&state->ncs_mtx);
 
-	// Remove this source as we look for it
+	                                       
 	TAILQ_FOREACH(src, &state->ncs_src_queue, ns_control_link)
 	{
 		if (src->srcref == srcref) {
@@ -4534,14 +4534,14 @@ nstat_control_handle_query_request(
 	nstat_control_state *state,
 	mbuf_t              m)
 {
-	// TBD: handle this from another thread so we can enqueue a lot of data
-	// As written, if a client requests query all, this function will be
-	// called from their send of the request message. We will attempt to write
-	// responses and succeed until the buffer fills up. Since the clients thread
-	// is blocked on send, it won't be reading unless the client has two threads
-	// using this socket, one for read and one for write. Two threads probably
-	// won't work with this code anyhow since we don't have proper locking in
-	// place yet.
+	                                                                       
+	                                                                    
+	                                                                          
+	                                                                            
+	                                                                            
+	                                                                          
+	                                                                         
+	             
 	tailq_head_nstat_src    dead_list;
 	errno_t                                 result = ENOENT;
 	nstat_msg_query_src_req req;
@@ -4562,10 +4562,10 @@ nstat_control_handle_query_request(
 	u_int64_t       src_count = 0;
 	boolean_t       partial = FALSE;
 
-	/*
-	 * Error handling policy and sequence number generation is folded into
-	 * nstat_control_begin_query.
-	 */
+	  
+                                                                       
+                              
+    
 	partial = nstat_control_begin_query(state, &req.hdr);
 
 
@@ -4573,7 +4573,7 @@ nstat_control_handle_query_request(
 	{
 		int     gone = 0;
 
-		// XXX ignore IFACE types?
+		                          
 		if (all_srcs || src->srcref == req.srcref) {
 			if (nstat_control_reporting_allowed(state, src)
 			    && (!partial || !all_srcs || src->seq != state->ncs_seq)) {
@@ -4585,22 +4585,22 @@ nstat_control_handle_query_request(
 				}
 
 				if (ENOMEM == result || ENOBUFS == result) {
-					/*
-					 * If the counts message failed to
-					 * enqueue then we should clear our flag so
-					 * that a client doesn't miss anything on
-					 * idle cleanup.  We skip the "gone"
-					 * processing in the hope that we may
-					 * catch it another time.
-					 */
+					  
+                                       
+                                                
+                                              
+                                         
+                                          
+                              
+        
 					state->ncs_flags &= ~NSTAT_FLAG_REQCOUNTS;
 					break;
 				}
 				if (partial) {
-					/*
-					 * We skip over hard errors and
-					 * filtered sources.
-					 */
+					  
+                                    
+                         
+        
 					src->seq = state->ncs_seq;
 					src_count++;
 				}
@@ -4608,9 +4608,9 @@ nstat_control_handle_query_request(
 		}
 
 		if (gone) {
-			// send one last descriptor message so client may see last state
-			// If we can't send the notification now, it
-			// will be sent in the idle cleanup.
+			                                                                
+			                                            
+			                                    
 			result = nstat_control_send_description(state, src, 0, 0);
 			if (result != 0) {
 				nstat_stats.nstat_control_send_description_failures++;
@@ -4621,7 +4621,7 @@ nstat_control_handle_query_request(
 				break;
 			}
 
-			// pull src out of the list
+			                           
 			TAILQ_REMOVE(&state->ncs_src_queue, src, ns_control_link);
 			TAILQ_INSERT_TAIL(&dead_list, src, ns_control_link);
 		}
@@ -4644,11 +4644,11 @@ nstat_control_handle_query_request(
 
 	lck_mtx_unlock(&state->ncs_mtx);
 
-	/*
-	 * If an error occurred enqueueing data, then allow the error to
-	 * propagate to nstat_control_send. This way, the error is sent to
-	 * user-level.
-	 */
+	  
+                                                                 
+                                                                   
+               
+    
 	if (all_srcs && ENOMEM != result && ENOBUFS != result) {
 		nstat_enqueue_success(req.hdr.context, state, flags);
 		result = 0;
@@ -4680,10 +4680,10 @@ nstat_control_handle_get_src_description(
 	boolean_t partial = FALSE;
 	const boolean_t all_srcs = (req.srcref == NSTAT_SRC_REF_ALL);
 
-	/*
-	 * Error handling policy and sequence number generation is folded into
-	 * nstat_control_begin_query.
-	 */
+	  
+                                                                       
+                              
+    
 	partial = nstat_control_begin_query(state, &req.hdr);
 
 	TAILQ_FOREACH(src, &state->ncs_src_queue, ns_control_link)
@@ -4698,17 +4698,17 @@ nstat_control_handle_get_src_description(
 				}
 
 				if (ENOMEM == result || ENOBUFS == result) {
-					/*
-					 * If the description message failed to
-					 * enqueue then we give up for now.
-					 */
+					  
+                                            
+                                        
+        
 					break;
 				}
 				if (partial) {
-					/*
-					 * Note, we skip over hard errors and
-					 * filtered sources.
-					 */
+					  
+                                          
+                         
+        
 					src->seq = state->ncs_seq;
 					src_count++;
 					if (src_count >= QUERY_CONTINUATION_SRC_COUNT) {
@@ -4730,11 +4730,11 @@ nstat_control_handle_get_src_description(
 	}
 
 	lck_mtx_unlock(&state->ncs_mtx);
-	/*
-	 * If an error occurred enqueueing data, then allow the error to
-	 * propagate to nstat_control_send. This way, the error is sent to
-	 * user-level.
-	 */
+	  
+                                                                 
+                                                                   
+               
+    
 	if (all_srcs && ENOMEM != result && ENOBUFS != result) {
 		nstat_enqueue_success(req.hdr.context, state, flags);
 		result = 0;
@@ -4805,7 +4805,7 @@ nstat_control_begin_query(
 	boolean_t partial = FALSE;
 
 	if (hdrp->flags & NSTAT_MSG_HDR_FLAG_CONTINUATION) {
-		/* A partial query all has been requested. */
+		                                             
 		partial = TRUE;
 
 		if (state->ncs_context != hdrp->context) {
@@ -4813,7 +4813,7 @@ nstat_control_begin_query(
 				nstat_send_error(state, state->ncs_context, EAGAIN);
 			}
 
-			/* Initialize state for a partial query all. */
+			                                               
 			state->ncs_context = hdrp->context;
 			state->ncs_seq++;
 		}
@@ -4831,18 +4831,18 @@ nstat_control_end_query(
 	u_int16_t flags = 0;
 
 	if (last_src == NULL || !partial) {
-		/*
-		 * We iterated through the entire srcs list or exited early
-		 * from the loop when a partial update was not requested (an
-		 * error occurred), so clear context to indicate internally
-		 * that the query is finished.
-		 */
+		  
+                                                             
+                                                              
+                                                             
+                                
+     
 		state->ncs_context = 0;
 	} else {
-		/*
-		 * Indicate to userlevel to make another partial request as
-		 * there are still sources left to be reported.
-		 */
+		  
+                                                             
+                                                 
+     
 		flags |= NSTAT_MSG_HDR_FLAG_CONTINUATION;
 	}
 
@@ -4871,10 +4871,10 @@ nstat_control_handle_get_update(
 	boolean_t partial = FALSE;
 	TAILQ_INIT(&dead_list);
 
-	/*
-	 * Error handling policy and sequence number generation is folded into
-	 * nstat_control_begin_query.
-	 */
+	  
+                                                                       
+                              
+    
 	partial = nstat_control_begin_query(state, &req.hdr);
 
 	TAILQ_FOREACH_SAFE(src, &state->ncs_src_queue, ns_control_link, tmpsrc)
@@ -4883,24 +4883,24 @@ nstat_control_handle_get_update(
 
 		gone = 0;
 		if (nstat_control_reporting_allowed(state, src)) {
-			/* skip this source if it has the current state
-			 * sequence number as it's already been reported in
-			 * this query-all partial sequence. */
+			                                               
+                                                      
+                                         
 			if (req.srcref == NSTAT_SRC_REF_ALL
 			    && (FALSE == partial || src->seq != state->ncs_seq)) {
 				result = nstat_control_append_update(state, src, &gone);
 				if (ENOMEM == result || ENOBUFS == result) {
-					/*
-					 * If the update message failed to
-					 * enqueue then give up.
-					 */
+					  
+                                       
+                             
+        
 					break;
 				}
 				if (partial) {
-					/*
-					 * We skip over hard errors and
-					 * filtered sources.
-					 */
+					  
+                                    
+                         
+        
 					src->seq = state->ncs_seq;
 					src_count++;
 				}
@@ -4910,7 +4910,7 @@ nstat_control_handle_get_update(
 		}
 
 		if (gone) {
-			// pull src out of the list
+			                           
 			TAILQ_REMOVE(&state->ncs_src_queue, src, ns_control_link);
 			TAILQ_INSERT_TAIL(&dead_list, src, ns_control_link);
 		}
@@ -4932,11 +4932,11 @@ nstat_control_handle_get_update(
 	}
 
 	lck_mtx_unlock(&state->ncs_mtx);
-	/*
-	 * If an error occurred enqueueing data, then allow the error to
-	 * propagate to nstat_control_send. This way, the error is sent to
-	 * user-level.
-	 */
+	  
+                                                                 
+                                                                   
+               
+    
 	if (req.srcref == NSTAT_SRC_REF_ALL && ENOMEM != result && ENOBUFS != result) {
 		nstat_enqueue_success(req.hdr.context, state, flags);
 		result = 0;
@@ -4944,7 +4944,7 @@ nstat_control_handle_get_update(
 
 	while ((src = TAILQ_FIRST(&dead_list))) {
 		TAILQ_REMOVE(&dead_list, src, ns_control_link);
-		// release src and send notification
+		                                    
 		nstat_control_cleanup_source(state, src, FALSE);
 	}
 
@@ -4982,7 +4982,7 @@ nstat_control_send(
 	errno_t                                 result = 0;
 
 	if (mbuf_pkthdr_len(m) < sizeof(*hdr)) {
-		// Is this the right thing to do?
+		                                 
 		mbuf_freem(m);
 		return EINVAL;
 	}
@@ -4994,9 +4994,9 @@ nstat_control_send(
 		hdr = &storage;
 	}
 
-	// Legacy clients may not set the length
-	// Those clients are likely not setting the flags either
-	// Fix everything up so old clients continue to work
+	                                        
+	                                                        
+	                                                    
 	if (hdr->length != mbuf_pkthdr_len(m)) {
 		hdr->flags = 0;
 		assert(mbuf_pkthdr_len(m) <= MAX_NSTAT_MSG_HDR_LENGTH);
@@ -5063,7 +5063,7 @@ nstat_control_send(
 		}
 
 		if (result != 0) {
-			// Unable to prepend the error to the request - just send the error
+			                                                                   
 			err.hdr.length = sizeof(err);
 			result = ctl_enqueuedata(kctl, unit, &err, sizeof(err),
 			    CTL_DATA_EOR | CTL_DATA_CRIT);
@@ -5093,9 +5093,9 @@ tcp_progress_indicators_for_interface(unsigned int ifindex, uint64_t recentflow_
 	bzero(indicators, sizeof(*indicators));
 
 	lck_rw_lock_shared(tcbinfo.ipi_lock);
-	/*
-	 * For progress indicators we don't need to special case TCP to collect time wait connections
-	 */
+	  
+                                                                                              
+    
 	LIST_FOREACH(inp, tcbinfo.ipi_listhead, inp_list)
 	{
 		struct tcpcb  *tp = intotcpcb(inp);

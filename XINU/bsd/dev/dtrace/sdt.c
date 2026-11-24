@@ -34,7 +34,7 @@
 
 #if defined(__arm__) || defined(__arm64__)
 #include <arm/caches_internal.h>
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 #include <sys/dtrace.h>
 #include <sys/dtrace_impl.h>
@@ -46,8 +46,8 @@ extern int dtrace_kernel_symbol_mode;
 
 #include <ptrauth.h>
 
-/* #include <machine/trap.h */
-struct savearea_t; /* Used anonymously */
+                              
+struct savearea_t;                       
 
 #if defined(__arm__)
 typedef kern_return_t (*perfCallback)(int, struct savearea_t *, __unused int, __unused int);
@@ -71,7 +71,7 @@ extern kern_return_t fbt_perfCallback(int, struct savearea_t *, uintptr_t *, int
 #error Unknown architecture
 #endif
 
-#define SDT_PROBETAB_SIZE       0x1000          /* 4k entries -- 16K total */
+#define SDT_PROBETAB_SIZE       0x1000                                       
 
 #define DTRACE_PROBE_PREFIX "_dtrace_probe$"
 
@@ -80,7 +80,7 @@ sdt_probe_t             **sdt_probetab;
 int                     sdt_probetab_size;
 int                     sdt_probetab_mask;
 
-/*ARGSUSED*/
+            
 static void
 __sdt_provide_module(void *arg, struct modctl *ctl)
 {
@@ -91,10 +91,10 @@ __sdt_provide_module(void *arg, struct modctl *ctl)
 	sdt_probe_t *sdp, *old;
 	sdt_provider_t *prov;
 
-	/*
-	 * One for all, and all for one:  if we haven't yet registered all of
-	 * our providers, we'll refuse to provide anything.
-	 */
+	  
+                                                                      
+                                                    
+    
 	for (prov = sdt_providers; prov->sdtp_name != NULL; prov++) {
 		if (prov->sdtp_id == DTRACE_PROVNONE) {
 			return;
@@ -109,7 +109,7 @@ __sdt_provide_module(void *arg, struct modctl *ctl)
 		const char *func;
 		dtrace_id_t id;
 
-		/* Validate probe's provider name. Do not provide probes for unknown providers. */
+		                                                                                  
 		for (prov = sdt_providers; prov->sdtp_name != NULL; prov++) {
 			if (strcmp(prov->sdtp_prefix, sdpd->sdpd_prov) == 0) {
 				break;
@@ -131,9 +131,9 @@ __sdt_provide_module(void *arg, struct modctl *ctl)
 
 		func = (sdpd->sdpd_func != NULL) ? sdpd->sdpd_func : "<unknown>";
 
-		/*
-		 * We have our provider.  Now create the probe.
-		 */
+		  
+                                                 
+     
 		if ((id = dtrace_probe_lookup(prov->sdtp_id, modname,
 		    func, sdp->sdp_name)) != DTRACE_IDNONE) {
 			old = dtrace_probe_arg(prov->sdtp_id, id);
@@ -164,7 +164,7 @@ __sdt_provide_module(void *arg, struct modctl *ctl)
 	}
 }
 
-/*ARGSUSED*/
+            
 static void
 sdt_destroy(void *arg, dtrace_id_t id, void *parg)
 {
@@ -173,9 +173,9 @@ sdt_destroy(void *arg, dtrace_id_t id, void *parg)
 	int ndx;
 
 #if !defined(__APPLE__)
-	/*
-	 * APPLE NOTE:  sdt probes for kexts not yet implemented
-	 */
+	  
+                                                         
+    
 	struct modctl *ctl = sdp->sdp_ctl;
 
 	if (ctl != NULL && ctl->mod_loadcnt == sdp->sdp_loadcnt) {
@@ -184,14 +184,14 @@ sdt_destroy(void *arg, dtrace_id_t id, void *parg)
 			((struct module *)(ctl->mod_mp))->sdt_nprobes--;
 		}
 	}
-#endif /* __APPLE__ */
+#endif                
 
 	while (sdp != NULL) {
 		old = sdp;
 
-		/*
-		 * Now we need to remove this probe from the sdt_probetab.
-		 */
+		  
+                                                            
+     
 		ndx = SDT_ADDR2NDX(sdp->sdp_patchpoint);
 		last = NULL;
 		hash = sdt_probetab[ndx];
@@ -214,7 +214,7 @@ sdt_destroy(void *arg, dtrace_id_t id, void *parg)
 	}
 }
 
-/*ARGSUSED*/
+            
 static int
 sdt_enable(void *arg, dtrace_id_t id, void *parg)
 {
@@ -224,10 +224,10 @@ sdt_enable(void *arg, dtrace_id_t id, void *parg)
 
 	ctl->mod_nenabled++;
 
-	/*
-	 * If this module has disappeared since we discovered its probes,
-	 * refuse to enable it.
-	 */
+	  
+                                                                  
+                        
+    
 	if (!ctl->mod_loaded) {
 		if (sdt_verbose) {
 			cmn_err(CE_NOTE, "sdt is failing for probe %s "
@@ -237,11 +237,11 @@ sdt_enable(void *arg, dtrace_id_t id, void *parg)
 		goto err;
 	}
 
-	/*
-	 * Now check that our modctl has the expected load count.  If it
-	 * doesn't, this module must have been unloaded and reloaded -- and
-	 * we're not going to touch it.
-	 */
+	  
+                                                                 
+                                                                    
+                                
+    
 	if (ctl->mod_loadcnt != sdp->sdp_loadcnt) {
 		if (sdt_verbose) {
 			cmn_err(CE_NOTE, "sdt is failing for probe %s "
@@ -265,10 +265,10 @@ sdt_enable(void *arg, dtrace_id_t id, void *parg)
 		(void)ml_nofault_copy((vm_offset_t)&sdp->sdp_patchval, (vm_offset_t)sdp->sdp_patchpoint,
 		    (vm_size_t)sizeof(sdp->sdp_patchval));
 
-		/*
-		 * Make the patched instruction visible via a data + instruction
-		 * cache fush on platforms that need it
-		 */
+		  
+                                                                  
+                                         
+     
 		flush_dcache((vm_offset_t)sdp->sdp_patchpoint, (vm_size_t)sizeof(sdp->sdp_patchval), 0);
 		invalidate_icache((vm_offset_t)sdp->sdp_patchpoint, (vm_size_t)sizeof(sdp->sdp_patchval), 0);
 
@@ -279,7 +279,7 @@ err:
 	return 0;
 }
 
-/*ARGSUSED*/
+            
 static void
 sdt_disable(void *arg, dtrace_id_t id, void *parg)
 {
@@ -296,10 +296,10 @@ sdt_disable(void *arg, dtrace_id_t id, void *parg)
 	while (sdp != NULL) {
 		(void)ml_nofault_copy((vm_offset_t)&sdp->sdp_savedval, (vm_offset_t)sdp->sdp_patchpoint,
 		    (vm_size_t)sizeof(sdp->sdp_savedval));
-		/*
-		 * Make the patched instruction visible via a data + instruction
-		 * cache flush on platforms that need it
-		 */
+		  
+                                                                  
+                                          
+     
 		flush_dcache((vm_offset_t)sdp->sdp_patchpoint, (vm_size_t)sizeof(sdp->sdp_savedval), 0);
 		invalidate_icache((vm_offset_t)sdp->sdp_patchpoint, (vm_size_t)sizeof(sdp->sdp_savedval), 0);
 		sdp = sdp->sdp_next;
@@ -322,7 +322,7 @@ static dtrace_pops_t sdt_pops = {
 	.dtps_destroy =         sdt_destroy,
 };
 
-/*ARGSUSED*/
+            
 static int
 sdt_attach(dev_info_t *devi)
 {
@@ -356,11 +356,11 @@ sdt_attach(dev_info_t *devi)
 	return DDI_SUCCESS;
 }
 
-/*
- * APPLE NOTE:  sdt_detach not implemented
- */
+  
+                                          
+   
 #if !defined(__APPLE__)
-/*ARGSUSED*/
+            
 static int
 sdt_detach(dev_info_t *dip, ddi_detach_cmd_t cmd)
 {
@@ -392,7 +392,7 @@ sdt_detach(dev_info_t *dip, ddi_detach_cmd_t cmd)
 
 	return DDI_SUCCESS;
 }
-#endif /* __APPLE__ */
+#endif                
 
 d_open_t _sdt_open;
 
@@ -403,7 +403,7 @@ _sdt_open(dev_t dev, int flags, int devtype, struct proc *p)
 	return 0;
 }
 
-#define SDT_MAJOR  -24 /* let the kernel pick the device number */
+#define SDT_MAJOR  -24                                            
 
 static const struct cdevsw sdt_cdevsw =
 {
@@ -427,18 +427,18 @@ static struct module g_sdt_mach_module;
 #include <mach-o/nlist.h>
 #include <libkern/kernel_mach_header.h>
 
-/*
- * Represents single record in __DATA,__sdt section.
- */
+  
+                                                    
+   
 typedef struct dtrace_sdt_def {
-	uintptr_t      dsd_addr;    /* probe site location */
-	const char     *dsd_prov;   /* provider's name */
-	const char     *dsd_name;   /* probe's name */
+	uintptr_t      dsd_addr;                             
+	const char     *dsd_prov;                        
+	const char     *dsd_name;                     
 } __attribute__((__packed__))  dtrace_sdt_def_t;
 
-/*
- * Creates a copy of name and unescapes '-' characters.
- */
+  
+                                                       
+   
 static char *
 sdt_strdup_name(const char *name)
 {
@@ -505,7 +505,7 @@ sdt_early_init( void )
 				} else if (LIT_STRNEQL(orig_sg->segname, SEG_LINKEDIT)) {
 					orig_le = orig_sg;
 				} else if (LIT_STRNEQL(orig_sg->segname, "")) {
-					orig_ts = orig_sg; /* kexts have a single unnamed segment */
+					orig_ts = orig_sg;                                          
 				}
 			} else if (cmd->cmd == LC_SYMTAB) {
 				orig_st = (struct symtab_command *) cmd;
@@ -514,7 +514,7 @@ sdt_early_init( void )
 			cmd = (struct load_command *) ((uintptr_t) cmd + cmd->cmdsize);
 		}
 
-		/* Locate DTrace SDT section in the object. */
+		                                              
 		if ((orig_dt = getsectbyname("__DATA", "__sdt")) == NULL) {
 			printf("DTrace section not found.\n");
 			return;
@@ -527,9 +527,9 @@ sdt_early_init( void )
 		sym = (kernel_nlist_t *)(orig_le->vmaddr + orig_st->symoff - orig_le->fileoff);
 		strings = (char *)(orig_le->vmaddr + orig_st->stroff - orig_le->fileoff);
 
-		/*
-		 * Iterate over SDT section and establish all SDT probes.
-		 */
+		  
+                                                           
+     
 		dtrace_sdt_def_t *sdtdef = (dtrace_sdt_def_t *)(orig_dt->addr);
 		for (size_t k = 0; k < orig_dt->size / sizeof(dtrace_sdt_def_t); k++, sdtdef++) {
 			const char *funcname;
@@ -537,17 +537,17 @@ sdt_early_init( void )
 
 			sdt_probedesc_t *sdpd = kmem_alloc(sizeof(sdt_probedesc_t), KM_SLEEP);
 
-			/* Unescape probe name and keep a note of the size of original memory allocation. */
+			                                                                                    
 			sdpd->sdpd_name = sdt_strdup_name(sdtdef->dsd_name);
 			sdpd->sdpd_namelen = strlen(sdtdef->dsd_name) + 1;
 
-			/* Used only for provider structure lookup so there is no need to make dynamic copy. */
+			                                                                                       
 			sdpd->sdpd_prov = sdtdef->dsd_prov;
 
-			/*
-			 * Find the symbol immediately preceding the sdt probe site just discovered,
-			 * that symbol names the function containing the sdt probe.
-			 */
+			  
+                                                                               
+                                                              
+      
 			funcname = "<unknown>";
 			for (i = 0; i < orig_st->nsyms; i++) {
 				uint8_t jn_type = sym[i].n_type & N_TYPE;
@@ -557,7 +557,7 @@ sdt_early_init( void )
 					continue;
 				}
 
-				if (0 == sym[i].n_un.n_strx) { /* iff a null, "", name. */
+				if (0 == sym[i].n_un.n_strx) {                            
 					continue;
 				}
 
@@ -581,11 +581,11 @@ sdt_early_init( void )
 
 			sdpd->sdpd_offset = sdtdef->dsd_addr;
 #if defined(__arm__)
-			/* PR8353094 - mask off thumb-bit */
+			                                    
 			sdpd->sdpd_offset &= ~0x1U;
 #elif defined(__arm64__)
 			sdpd->sdpd_offset &= ~0x1LU;
-#endif  /* __arm__ */
+#endif               
 
 			sdpd->sdpd_next = g_sdt_mach_module.sdt_probes;
 			g_sdt_mach_module.sdt_probes = sdpd;
@@ -612,7 +612,7 @@ sdt_init( void )
 
 #undef SDT_MAJOR
 
-/*ARGSUSED*/
+            
 void
 sdt_provide_module(void *arg, struct modctl *ctl)
 {
@@ -638,11 +638,11 @@ sdt_provide_module(void *arg, struct modctl *ctl)
 		}
 		g_sdt_mach_module.sdt_probes = NULL;
 	} else {
-		/*
-		 * APPLE NOTE:  sdt probes for kexts not yet implemented
-		 */
+		  
+                                                          
+     
 	}
 
-	/* Need to mark this module as completed */
+	                                           
 	ctl->mod_flags |= MODCTL_SDT_PROBES_PROVIDED;
 }

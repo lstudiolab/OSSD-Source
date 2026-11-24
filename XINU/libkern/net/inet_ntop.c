@@ -17,7 +17,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char rcsid[] = "$Id: inet_ntop.c,v 1.3.18.2 2005/11/03 23:02:22 marka Exp $";
-#endif /* LIBC_SCCS and not lint */
+#endif                             
 
 #include <sys/param.h>
 #include <sys/socket.h>
@@ -25,22 +25,22 @@ static const char rcsid[] = "$Id: inet_ntop.c,v 1.3.18.2 2005/11/03 23:02:22 mar
 
 #include <netinet/in.h>
 
-/*%
- * WARNING: Don't even consider trying to compile this on a system where
- * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
- */
+   
+                                                                        
+                                                                        
+   
 
 static char     *inet_ntop4(const u_char *src, char *dst, socklen_t size);
 static char     *inet_ntop6(const u_char *src, char *dst, socklen_t size);
 
-/* char *
- * inet_ntop(af, src, dst, size)
- *	convert a network format address to presentation format.
- * return:
- *	pointer to presentation format address (`dst'), or NULL (see errno).
- * author:
- *	Paul Vixie, 1996.
- */
+         
+                                
+                                                           
+          
+                                                                       
+          
+                    
+   
 const char *
 inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
@@ -52,20 +52,20 @@ inet_ntop(int af, const void *src, char *dst, socklen_t size)
 	default:
 		return NULL;
 	}
-	/* NOTREACHED */
+	                
 }
 
-/* const char *
- * inet_ntop4(src, dst, size)
- *	format an IPv4 address
- * return:
- *	`dst' (as a const)
- * notes:
- *	(1) uses no statics
- *	(2) takes a u_char* not an in_addr as input
- * author:
- *	Paul Vixie, 1996.
- */
+               
+                             
+                         
+          
+                     
+         
+                      
+                                              
+          
+                    
+   
 static char *
 inet_ntop4(const u_char *src, char *dst, socklen_t size)
 {
@@ -81,22 +81,22 @@ inet_ntop4(const u_char *src, char *dst, socklen_t size)
 	return dst;
 }
 
-/* const char *
- * inet_ntop6(src, dst, size)
- *	convert IPv6 binary address into presentation (printable) format
- * author:
- *	Paul Vixie, 1996.
- */
+               
+                             
+                                                                   
+          
+                    
+   
 static char *
 inet_ntop6(const u_char *src, char *dst, socklen_t size)
 {
-	/*
-	 * Note that int32_t and int16_t need only be "at least" large enough
-	 * to contain a value of the specified size.  On some systems, like
-	 * Crays, there is no such thing as an integer variable with 16 bits.
-	 * Keep this in mind if you think this function should have been coded
-	 * to use pointer overlays.  All the world's not a VAX.
-	 */
+	  
+                                                                      
+                                                                    
+                                                                      
+                                                                       
+                                                        
+    
 	char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"], *tp;
 	struct { int base, len; } best, cur;
 #define NS_IN6ADDRSZ    16
@@ -104,11 +104,11 @@ inet_ntop6(const u_char *src, char *dst, socklen_t size)
 	u_int words[NS_IN6ADDRSZ / NS_INT16SZ];
 	int i;
 
-	/*
-	 * Preprocess:
-	 *	Copy the input (bytewise) array into a wordwise array.
-	 *	Find the longest run of 0x00's in src[] for :: shorthanding.
-	 */
+	  
+               
+                                                          
+                                                                
+    
 	memset(words, '\0', sizeof words);
 	for (i = 0; i < NS_IN6ADDRSZ; i++) {
 		words[i / 2] |= (src[i] << ((1 - (i % 2)) << 3));
@@ -143,12 +143,12 @@ inet_ntop6(const u_char *src, char *dst, socklen_t size)
 		best.base = -1;
 	}
 
-	/*
-	 * Format the result.
-	 */
+	  
+                      
+    
 	tp = tmp;
 	for (i = 0; i < (NS_IN6ADDRSZ / NS_INT16SZ); i++) {
-		/* Are we inside the best run of 0x00's? */
+		                                           
 		if (best.base != -1 && i >= best.base &&
 		    i < (best.base + best.len)) {
 			if (i == best.base) {
@@ -156,11 +156,11 @@ inet_ntop6(const u_char *src, char *dst, socklen_t size)
 			}
 			continue;
 		}
-		/* Are we following an initial run of 0x00s or any real hex? */
+		                                                               
 		if (i != 0) {
 			*tp++ = ':';
 		}
-		/* Is this address an encapsulated IPv4? */
+		                                           
 		if (i == 6 && best.base == 0 && (best.len == 6 ||
 		    (best.len == 7 && words[7] != 0x0001) ||
 		    (best.len == 5 && words[5] == 0xffff))) {
@@ -173,16 +173,16 @@ inet_ntop6(const u_char *src, char *dst, socklen_t size)
 		}
 		tp += scnprintf(tp, sizeof(tmp), "%x", words[i]);
 	}
-	/* Was it a trailing run of 0x00's? */
+	                                      
 	if (best.base != -1 && (best.base + best.len) ==
 	    (NS_IN6ADDRSZ / NS_INT16SZ)) {
 		*tp++ = ':';
 	}
 	*tp++ = '\0';
 
-	/*
-	 * Check for overflow, copy, and we're done.
-	 */
+	  
+                                             
+    
 	if ((socklen_t)(tp - tmp) > size) {
 		return NULL;
 	}
@@ -190,4 +190,4 @@ inet_ntop6(const u_char *src, char *dst, socklen_t size)
 	return dst;
 }
 
-/*! \file */
+            

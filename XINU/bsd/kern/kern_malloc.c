@@ -60,12 +60,12 @@
  *
  *	@(#)kern_malloc.c	8.4 (Berkeley) 5/20/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <kern/zalloc.h>
 #include <kern/kalloc.h>
@@ -110,17 +110,17 @@ __MALLOC_ext(
 		return NULL;
 	}
 
-	/*
-	 * We get here when the caller told us to block waiting for memory, but
-	 * kalloc said there's no memory left to get.  Generally, this means there's a
-	 * leak or the caller asked for an impossibly large amount of memory. If the caller
-	 * is expecting a NULL return code then it should explicitly set the flag M_NULL.
-	 * If the caller isn't expecting a NULL return code, we just panic. This is less
-	 * than ideal, but returning NULL when the caller isn't expecting it doesn't help
-	 * since the majority of callers don't check the return value and will just
-	 * dereference the pointer and trap anyway.  We may as well get a more
-	 * descriptive message out while we can.
-	 */
+	  
+                                                                        
+                                                                               
+                                                                                    
+                                                                                  
+                                                                                 
+                                                                                  
+                                                                            
+                                                                       
+                                         
+    
 	panic("_MALLOC: kalloc returned NULL (potential leak), size %llu", (uint64_t) size);
 }
 
@@ -169,10 +169,10 @@ _FREE_external(void *addr, int type);
 void
 _FREE_external(void *addr, int type __unused)
 {
-	/*
-	 * hashinit and other functions allocate on behalf of kexts and do not have
-	 * a matching hashdestroy, so we sadly have to allow this for now.
-	 */
+	  
+                                                                            
+                                                                   
+    
 	kheap_free_addr(KHEAP_ANY, addr);
 }
 
@@ -236,7 +236,7 @@ static int
 sysctl_run_zone_test SYSCTL_HANDLER_ARGS
 {
 #pragma unused(oidp, arg1, arg2)
-	/* require setting this sysctl to prevent sysctl -a from running this */
+	                                                                        
 	if (!req->newptr) {
 		return 0;
 	}
@@ -249,19 +249,19 @@ SYSCTL_PROC(_kern, OID_AUTO, run_zone_test,
     CTLTYPE_INT | CTLFLAG_WR | CTLFLAG_MASKED | CTLFLAG_LOCKED,
     0, 0, &sysctl_run_zone_test, "I", "Test zone allocator KPI");
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 #if CONFIG_ZLEAKS
 
 SYSCTL_DECL(_kern_zleak);
 SYSCTL_NODE(_kern, OID_AUTO, zleak, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "zleak");
 
-/*
- * kern.zleak.active
- *
- * Show the status of the zleak subsystem (0 = enabled, 1 = active,
- * and -1 = failed), and if enabled, allow it to be activated immediately.
- */
+  
+                    
+  
+                                                                   
+                                                                          
+   
 static int
 sysctl_zleak_active SYSCTL_HANDLER_ARGS
 {
@@ -273,10 +273,10 @@ sysctl_zleak_active SYSCTL_HANDLER_ARGS
 	if (error || !req->newptr) {
 		return error;
 	}
-	/*
-	 * Can only be activated if it's off (and not failed.)
-	 * Cannot be deactivated once it's on.
-	 */
+	  
+                                                       
+                                       
+    
 	if (val == 1 && oldval == 0) {
 		kern_return_t kr = zleak_activate();
 
@@ -296,13 +296,13 @@ SYSCTL_PROC(_kern_zleak, OID_AUTO, active,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED,
     0, 0, sysctl_zleak_active, "I", "zleak activity");
 
-/*
- * kern.zleak.max_zonemap_size
- *
- * Read the value of the maximum zonemap size in bytes; useful
- * as the maximum size that zleak.global_threshold and
- * zleak.zone_threshold should be set to.
- */
+  
+                              
+  
+                                                              
+                                                      
+                                         
+   
 static int
 sysctl_zleak_max_zonemap_size SYSCTL_HANDLER_ARGS
 {
@@ -338,36 +338,36 @@ sysctl_zleak_threshold SYSCTL_HANDLER_ARGS
 	return 0;
 }
 
-/*
- * kern.zleak.global_threshold
- *
- * Set the global zleak threshold size (in bytes).  If the zone map
- * grows larger than this value, zleaks are automatically activated.
- *
- * The default value is set in zleak_init().
- */
+  
+                              
+  
+                                                                   
+                                                                    
+  
+                                            
+   
 SYSCTL_PROC(_kern_zleak, OID_AUTO, global_threshold,
     CTLTYPE_QUAD | CTLFLAG_RW | CTLFLAG_LOCKED,
     &zleak_global_tracking_threshold, 0,
     sysctl_zleak_threshold, "Q", "zleak global threshold");
 
-/*
- * kern.zleak.zone_threshold
- *
- * Set the per-zone threshold size (in bytes) above which any
- * zone will automatically start zleak tracking.
- *
- * The default value is set in zleak_init().
- *
- * Setting this variable will have no effect until zleak tracking is
- * activated (See above.)
- */
+  
+                            
+  
+                                                             
+                                                
+  
+                                            
+  
+                                                                    
+                         
+   
 SYSCTL_PROC(_kern_zleak, OID_AUTO, zone_threshold,
     CTLTYPE_QUAD | CTLFLAG_RW | CTLFLAG_LOCKED,
     &zleak_per_zone_tracking_threshold, 0,
     sysctl_zleak_threshold, "Q", "zleak per-zone threshold");
 
-#endif  /* CONFIG_ZLEAKS */
+#endif                     
 
 extern uint64_t get_zones_collectable_bytes(void);
 
@@ -391,7 +391,7 @@ static int
 sysctl_zone_gc_replenish_test SYSCTL_HANDLER_ARGS
 {
 #pragma unused(oidp, arg1, arg2)
-	/* require setting this sysctl to prevent sysctl -a from running this */
+	                                                                        
 	if (!req->newptr) {
 		return 0;
 	}
@@ -405,7 +405,7 @@ static int
 sysctl_zone_alloc_replenish_test SYSCTL_HANDLER_ARGS
 {
 #pragma unused(oidp, arg1, arg2)
-	/* require setting this sysctl to prevent sysctl -a from running this */
+	                                                                        
 	if (!req->newptr) {
 		return 0;
 	}
@@ -422,4 +422,4 @@ SYSCTL_PROC(_kern, OID_AUTO, zone_alloc_replenish_test,
     CTLTYPE_INT | CTLFLAG_MASKED | CTLFLAG_LOCKED | CTLFLAG_WR,
     0, 0, &sysctl_zone_alloc_replenish_test, "I", "Test zone alloc replenish");
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           

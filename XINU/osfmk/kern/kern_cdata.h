@@ -35,12 +35,12 @@
 #include <libkern/zlib.h>
 #endif
 
-/*
- * Do not use these macros!
- *
- * Instead, you should use kcdata_iter_* functions defined in kcdata.h.  These
- * macoros have no idea where the kcdata buffer ends, so they are all unsafe.
- */
+  
+                           
+  
+                                                                              
+                                                                             
+   
 #define KCDATA_ITEM_HEADER_SIZE         (sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint64_t))
 #define KCDATA_ITEM_ITER(item)          kcdata_iter_unsafe((void*)(item))
 #define KCDATA_ITEM_TYPE(item)          kcdata_iter_type(KCDATA_ITEM_ITER(item))
@@ -56,7 +56,7 @@
 #define KCDATA_ITEM_FIND_TYPE(itemx, type) (kcdata_iter_find_type(KCDATA_ITEM_ITER(itemx), type).item)
 #define kcdata_get_container_type(buffer) kcdata_iter_container_type(KCDATA_ITEM_ITER(buffer))
 #define kcdata_get_data_with_desc(buf, desc, data) kcdata_iter_get_data_with_desc(KCDATA_ITEM_ITER(buf),desc,data,NULL)
-/* Do not use these macros! */
+                              
 
 __options_decl(kcd_compression_type_t, uint64_t, {
 	KCDCT_NONE = 0x00,
@@ -71,7 +71,7 @@ __options_decl(kcd_cd_flag_t, uint64_t, {
 	KCD_CD_FLAG_FINALIZE = 0x02,
 });
 
-/* Structure to save zstream and other compression metadata */
+                                                              
 struct kcdata_compress_descriptor {
 	z_stream kcd_cd_zs;
 	void *kcd_cd_base;
@@ -85,30 +85,30 @@ struct kcdata_compress_descriptor {
 	mach_vm_address_t kcd_cd_totalin_addr;
 };
 
-/*
- * Various, compression algorithm agnostic flags for controlling writes to the
- * output buffer.
- */
+  
+                                                                              
+                 
+   
 enum kcdata_compression_flush {
-	/*
-	 * Hint that no flush is needed because more data is expected. Doesn't
-	 * guarantee that no data will be written to the output buffer, since the
-	 * underlying algorithm may decide that it's running out of space and may
-	 * flush to the output buffer.
-	 */
+	  
+                                                                       
+                                                                          
+                                                                          
+                               
+    
 	KCDCF_NO_FLUSH,
-	/*
-	 * Hint to flush all internal buffers to the output buffers.
-	 */
+	  
+                                                             
+    
 	KCDCF_SYNC_FLUSH,
-	/*
-	 * Hint that this is going to be the last call to the compression function,
-	 * so flush all output buffers and mark state as finished.
-	 */
+	  
+                                                                            
+                                                           
+    
 	KCDCF_FINISH,
 };
 
-/* Structure to save information about kcdata */
+                                                
 struct kcdata_descriptor {
 	uint32_t            kcd_length;
 	uint16_t kcd_flags;
@@ -116,7 +116,7 @@ struct kcdata_descriptor {
 #define KCFLAG_USE_COPYOUT 0x1
 #define KCFLAG_NO_AUTO_ENDBUFFER 0x2
 #define KCFLAG_USE_COMPRESSION 0x4
-	uint16_t kcd_user_flags; /* reserved for subsystems using kcdata */
+	uint16_t kcd_user_flags;                                           
 	mach_vm_address_t kcd_addr_begin;
 	mach_vm_address_t kcd_addr_end;
 	struct kcdata_compress_descriptor kcd_comp_d;
@@ -152,11 +152,11 @@ void kcdata_compression_window_open(kcdata_descriptor_t data);
 kern_return_t kcdata_compression_window_close(kcdata_descriptor_t data);
 void kcd_finalize_compression(kcdata_descriptor_t data);
 
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 
 typedef void * kcdata_descriptor_t;
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 uint32_t kcdata_estimate_required_buffer_size(uint32_t num_items, uint32_t payload_size);
 uint64_t kcdata_memory_get_used_bytes(kcdata_descriptor_t kcd);
@@ -167,5 +167,5 @@ kern_return_t kcdata_get_memory_addr(kcdata_descriptor_t data, uint32_t type, ui
 kern_return_t kcdata_get_memory_addr_for_array(
 	kcdata_descriptor_t data, uint32_t type_of_element, uint32_t size_of_element, uint32_t count, mach_vm_address_t * user_addr);
 
-#endif /* KERNEL */
-#endif /* _KERN_CDATA_H_ */
+#endif             
+#endif                     

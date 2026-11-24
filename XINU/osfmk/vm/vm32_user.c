@@ -53,22 +53,22 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm32_user.c
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *
- *	User-exported virtual memory functions.
- */
+  
+   
+  
+                       
+                                                    
+  
+                                          
+   
 
 #include <debug.h>
 
 #include <mach/boolean.h>
 #include <mach/kern_return.h>
-#include <mach/mach_types.h>    /* to get vm_address_t */
+#include <mach/mach_types.h>                             
 #include <mach/memory_object.h>
-#include <mach/std_types.h>     /* to get pointer_t */
+#include <mach/std_types.h>                           
 #include <mach/vm_attributes.h>
 #include <mach/vm_param.h>
 #include <mach/vm_statistics.h>
@@ -91,16 +91,16 @@
 
 #ifdef VM32_SUPPORT
 
-/*
- * See vm_user.c for the real implementation of all of these functions.
- * We call through to the mach_ "wide" versions of the routines, and trust
- * that the VM system verifies the arguments and only returns address that
- * are appropriate for the task's address space size.
- *
- * New VM call implementations should not be added here, because they would
- * be available only to 32-bit userspace clients. Add them to vm_user.c
- * and the corresponding prototype to mach_vm.defs (subsystem 4800).
- */
+  
+                                                                       
+                                                                          
+                                                                          
+                                                     
+  
+                                                                           
+                                                                       
+                                                                    
+   
 
 kern_return_t
 vm32_allocate(
@@ -167,7 +167,7 @@ vm32_machine_attribute(
 	vm32_address_t  addr,
 	vm32_size_t     size,
 	vm_machine_attribute_t  attribute,
-	vm_machine_attribute_val_t* value)              /* IN/OUT */
+	vm_machine_attribute_val_t* value)                          
 {
 	if ((map == VM_MAP_NULL) || (addr + size < addr)) {
 		return KERN_INVALID_ARGUMENT;
@@ -348,12 +348,12 @@ vm32_behavior_set(
 kern_return_t
 vm32_region_64(
 	vm_map_t                 map,
-	vm32_offset_t           *address,               /* IN/OUT */
-	vm32_size_t             *size,                  /* OUT */
-	vm_region_flavor_t       flavor,                /* IN */
-	vm_region_info_t         info,                  /* OUT */
-	mach_msg_type_number_t  *count,                 /* IN/OUT */
-	mach_port_t             *object_name)           /* OUT */
+	vm32_offset_t           *address,                           
+	vm32_size_t             *size,                           
+	vm_region_flavor_t       flavor,                        
+	vm_region_info_t         info,                           
+	mach_msg_type_number_t  *count,                             
+	mach_port_t             *object_name)                    
 {
 	mach_vm_offset_t        maddress;
 	mach_vm_size_t          msize;
@@ -371,12 +371,12 @@ vm32_region_64(
 kern_return_t
 vm32_region(
 	vm_map_t                        map,
-	vm32_address_t                  *address,       /* IN/OUT */
-	vm32_size_t                     *size,          /* OUT */
-	vm_region_flavor_t              flavor, /* IN */
-	vm_region_info_t                info,           /* OUT */
-	mach_msg_type_number_t  *count, /* IN/OUT */
-	mach_port_t                     *object_name)   /* OUT */
+	vm32_address_t                  *address,                   
+	vm32_size_t                     *size,                   
+	vm_region_flavor_t              flavor,         
+	vm_region_info_t                info,                    
+	mach_msg_type_number_t  *count,             
+	mach_port_t                     *object_name)            
 {
 	vm_map_address_t        map_addr;
 	vm_map_size_t           map_size;
@@ -428,11 +428,11 @@ vm32_region_recurse_64(
 kern_return_t
 vm32_region_recurse(
 	vm_map_t                        map,
-	vm32_offset_t           *address,       /* IN/OUT */
-	vm32_size_t                     *size,          /* OUT */
-	natural_t                       *depth, /* IN/OUT */
-	vm_region_recurse_info_t        info32, /* IN/OUT */
-	mach_msg_type_number_t  *infoCnt)       /* IN/OUT */
+	vm32_offset_t           *address,                   
+	vm32_size_t                     *size,                   
+	natural_t                       *depth,             
+	vm_region_recurse_info_t        info32,             
+	mach_msg_type_number_t  *infoCnt)                   
 {
 	vm_region_submap_info_data_64_t info64;
 	vm_region_submap_info_t info;
@@ -456,7 +456,7 @@ vm32_region_recurse(
 	info->protection = info64.protection;
 	info->max_protection = info64.max_protection;
 	info->inheritance = info64.inheritance;
-	info->offset = (uint32_t)info64.offset; /* trouble-maker */
+	info->offset = (uint32_t)info64.offset;                    
 	info->user_tag = info64.user_tag;
 	info->pages_resident = info64.pages_resident;
 	info->pages_shared_now_private = info64.pages_shared_now_private;
@@ -525,7 +525,7 @@ vm32_make_memory_entry_64(
 	ipc_port_t              *object_handle,
 	ipc_port_t              parent_handle)
 {
-	// use the existing entrypoint
+	                              
 	return _mach_make_memory_entry(target_map, size, offset, permission, object_handle, parent_handle);
 }
 
@@ -581,4 +581,4 @@ vm32__map_exec_lockdown(
 }
 
 
-#endif /* VM32_SUPPORT */
+#endif                   

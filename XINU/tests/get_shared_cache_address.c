@@ -7,11 +7,11 @@
 #include <mach-o/dyld.h>
 #include <mach-o/dyld_priv.h>
 
-/*
- * Test helper to retrieve the address of the shared cache. The helper
- * also verifies that the process is correctly marked to have the shared
- * cache reslid when interrogated through proc_pid_rusage()
- */
+  
+                                                                      
+                                                                        
+                                                           
+   
 int
 main(int argc, char **argv)
 {

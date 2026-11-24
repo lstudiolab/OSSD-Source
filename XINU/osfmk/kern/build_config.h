@@ -39,4 +39,4 @@ bool kern_config_is_development(void) OS_CONST;
 
 __END_DECLS
 
-#endif /* _KERN_BUILD_CONFIG_H */
+#endif                           

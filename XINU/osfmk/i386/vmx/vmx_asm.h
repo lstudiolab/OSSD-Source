@@ -33,10 +33,10 @@
 #define VMX_FAIL_VALID		-2
 #define VMX_SUCCEED			0
 
-/*
- * VMX Capability Registers (VCR)
- *
- */
+  
+                                 
+  
+   
 #define VMX_VCR_VMCS_MEM_TYPE_BIT	50
 #define VMX_VCR_VMCS_MEM_TYPE_MASK	0xF
 
@@ -59,4 +59,4 @@
 #define VMX_VCR_MSEG_ID_BIT		32
 #define VMX_VCR_MSEG_ID_MASK		0xFFFFFFFF
 
-#endif	/* _I386_VMX_H_ */
+#endif	                  

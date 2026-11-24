@@ -22,7 +22,7 @@ T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true), T_META_NAMESPACE("xnu.ipc"));
 
 typedef struct {
 	mach_msg_header_t   header;
-	mach_msg_mac_trailer_t  trailer;            // subtract this when sending
+	mach_msg_mac_trailer_t  trailer;                                         
 } ipc_simple_message;
 
 static ipc_simple_message icm_request = {};
@@ -54,7 +54,7 @@ parse_args(struct args *args)
 	args->request_msg = &icm_request;
 }
 
-/* Create a mach IPC listener which will respond to the client's message */
+                                                                           
 void
 server_setup(struct args* args)
 {
@@ -79,11 +79,11 @@ server_setup(struct args* args)
 	    args->server_port_name);
 }
 
-/* Server process loop
- *
- * Listens for message.
- *
- */
+                      
+  
+                       
+  
+   
 void *
 server(void *thread_args)
 {
@@ -112,7 +112,7 @@ server(void *thread_args)
 
 	tlr = (mach_msg_trailer_t *)((unsigned char *)request +
 	    round_msg(request->msgh_size));
-	// The trailer should always be of format zero.
+	                                               
 	if (tlr->msgh_trailer_type == MACH_MSG_TRAILER_FORMAT_0) {
 		if (tlr->msgh_trailer_size >= sizeof(mach_msg_mac_trailer_t)) {
 			mac_tlr = (mach_msg_mac_trailer_t *)tlr;
@@ -136,16 +136,16 @@ T_HELPER_DECL(client_not_filtered, "Send a message to the server which shouldn't
 	parse_args(&args);
 	args.request_msg_size -= sizeof(mach_msg_mac_trailer_t);
 
-	//Find the bootstrap port
+	                         
 	kern_return_t ret = task_get_bootstrap_port(mach_task_self(), &bsport);
 	T_ASSERT_MACH_SUCCESS(ret, "client: task_get_bootstrap_port()");
 
-	//Look up the service port
+	                          
 	ret = bootstrap_look_up(bsport, (char *)args.server_port_name,
 	    &args.server_port);
 	T_ASSERT_MACH_SUCCESS(ret, "client: bootstrap_look_up()");
 
-	//Construct the message
+	                       
 	mach_msg_header_t *request = (mach_msg_header_t *)args.request_msg;
 	request->msgh_bits = MACH_MSGH_BITS_SET(MACH_MSG_TYPE_COPY_SEND, 0, 0, 0);
 	request->msgh_size = (mach_msg_size_t)args.request_msg_size;

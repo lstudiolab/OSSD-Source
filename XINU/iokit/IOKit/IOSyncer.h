@@ -37,7 +37,7 @@ class IOSyncer : public OSObject
 	OSDeclareDefaultStructors(IOSyncer);
 
 private:
-// The spin lock that is used to guard the 'threadMustStop' variable.
+                                                                     
 	IOSimpleLock *guardLock;
 	volatile bool threadMustStop;
 	IOReturn fResult;
@@ -60,4 +60,4 @@ public:
 	APPLE_KEXT_DEPRECATED;
 };
 
-#endif /* !_IOSYNCER */
+#endif                 

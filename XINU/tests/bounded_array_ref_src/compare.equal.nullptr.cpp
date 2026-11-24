@@ -1,17 +1,17 @@
-//
-// Tests for
-//  template <typename T, typename P>
-//  bool operator==(bounded_array_ref<T, P> const& x, std::nullptr_t);
-//
-//  template <typename T, typename P>
-//  bool operator!=(bounded_array_ref<T, P> const& x, std::nullptr_t);
-//
-//  template <typename T, typename P>
-//  bool operator==(std::nullptr_t, bounded_array_ref<T, P> const& x);
-//
-//  template <typename T, typename P>
-//  bool operator!=(std::nullptr_t, bounded_array_ref<T, P> const& x);
-//
+  
+            
+                                     
+                                                                      
+  
+                                     
+                                                                      
+  
+                                     
+                                                                      
+  
+                                     
+                                                                      
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"

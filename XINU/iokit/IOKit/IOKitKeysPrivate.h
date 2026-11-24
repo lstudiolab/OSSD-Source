@@ -31,55 +31,55 @@
 
 #include <IOKit/IOKitKeys.h>
 
-// properties found in the registry root
-#define kIOConsoleLockedKey                     "IOConsoleLocked"               /* value is OSBoolean */
-#define kIOConsoleUsersKey                      "IOConsoleUsers"                /* value is OSArray */
-#define kIOMaximumMappedIOByteCountKey          "IOMaximumMappedIOByteCount"    /* value is OSNumber */
+                                        
+#define kIOConsoleLockedKey                     "IOConsoleLocked"                                       
+#define kIOConsoleUsersKey                      "IOConsoleUsers"                                      
+#define kIOMaximumMappedIOByteCountKey          "IOMaximumMappedIOByteCount"                           
 
-// properties found in the console user dict
-#define kIOConsoleSessionAuditIDKey             "kCGSSessionAuditIDKey"        /* value is OSNumber */
+                                            
+#define kIOConsoleSessionAuditIDKey             "kCGSSessionAuditIDKey"                               
 
-#define kIOConsoleSessionUserNameKey            "kCGSSessionUserNameKey"       /* value is OSString */
-#define kIOConsoleSessionUIDKey                 "kCGSSessionUserIDKey"         /* value is OSNumber */
-#define kIOConsoleSessionConsoleSetKey          "kCGSSessionConsoleSetKey"     /* value is OSNumber */
-#define kIOConsoleSessionOnConsoleKey           "kCGSSessionOnConsoleKey"      /* value is OSBoolean */
-#define kIOConsoleSessionLoginDoneKey           "kCGSessionLoginDoneKey"       /* value is OSBoolean */
-#define kIOConsoleSessionSecureInputPIDKey      "kCGSSessionSecureInputPID"    /* value is OSNumber */
-#define kIOConsoleSessionScreenLockedTimeKey    "CGSSessionScreenLockedTime"   /* value is OSNumber, secs - 1970 */
-#define kIOConsoleSessionScreenIsLockedKey      "CGSSessionScreenIsLocked"     /* value is OSBoolean */
+#define kIOConsoleSessionUserNameKey            "kCGSSessionUserNameKey"                              
+#define kIOConsoleSessionUIDKey                 "kCGSSessionUserIDKey"                                
+#define kIOConsoleSessionConsoleSetKey          "kCGSSessionConsoleSetKey"                            
+#define kIOConsoleSessionOnConsoleKey           "kCGSSessionOnConsoleKey"                              
+#define kIOConsoleSessionLoginDoneKey           "kCGSessionLoginDoneKey"                               
+#define kIOConsoleSessionSecureInputPIDKey      "kCGSSessionSecureInputPID"                           
+#define kIOConsoleSessionScreenLockedTimeKey    "CGSSessionScreenLockedTime"                                       
+#define kIOConsoleSessionScreenIsLockedKey      "CGSSessionScreenIsLocked"                             
 
-// IOResources property
-#define kIOConsoleUsersSeedKey                  "IOConsoleUsersSeed"           /* value is OSNumber */
+                       
+#define kIOConsoleUsersSeedKey                  "IOConsoleUsersSeed"                                  
 
-// IODeviceTree:chosen properties
-#define kIOProgressBackbufferKey                "IOProgressBackbuffer"           /* value is OSData   */
-#define kIOProgressColorThemeKey                "IOProgressColorTheme"           /* value is OSNumber */
-#define kIOBridgeBootSessionUUIDKey             "bridge-boot-session-uuid"       /* value is OSData   */
+                                 
+#define kIOProgressBackbufferKey                "IOProgressBackbuffer"                                  
+#define kIOProgressColorThemeKey                "IOProgressColorTheme"                                  
+#define kIOBridgeBootSessionUUIDKey             "bridge-boot-session-uuid"                              
 
-// interest type
+                
 #define kIOConsoleSecurityInterest              "IOConsoleSecurityInterest"
 
 
-// private keys for clientHasPrivilege
+                                      
 #define kIOClientPrivilegeConsoleUser           "console"
 #define kIOClientPrivilegeSecureConsoleProcess  "secureprocess"
 #define kIOClientPrivilegeConsoleSession        "consolesession"
 
 
-// Embedded still throttles NVRAM commits via kIONVRAMSyncNowPropertyKey, but
-// some clients still need a stricter NVRAM commit contract. Please use this with
-// care.
+                                                                             
+                                                                                 
+        
 #define kIONVRAMForceSyncNowPropertyKey         "IONVRAM-FORCESYNCNOW-PROPERTY"
 
-// GUID to address variables for the system NVRAM region
+                                                        
 #define kIOKitSystemGUID                        "40A0DDD2-77F8-4392-B4A3-1E7304206516"
 #define kIOKitSystemGUIDPrefix                  (kIOKitSystemGUID ":")
-// Internal only key to give access to system region on internal builds
+                                                                       
 #define kIONVRAMSystemInternalAllowKey          "com.apple.private.iokit.system-nvram-internal-allow"
-// Internal only key to give access to hidden system region variables
+                                                                     
 #define kIONVRAMSystemHiddenAllowKey            "com.apple.private.iokit.system-nvram-hidden-allow"
 
-// clientHasPrivilege security token for kIOClientPrivilegeSecureConsoleProcess
+                                                                               
 typedef struct _IOUCProcessToken {
 	void *  token;
 	UInt32  pid;
@@ -87,12 +87,12 @@ typedef struct _IOUCProcessToken {
 
 #define kIOKernelHasSafeSleep        1
 
-#define kIOPlatformSleepActionKey                    "IOPlatformSleepAction"         /* value is OSNumber (priority) */
-#define kIOPlatformWakeActionKey                     "IOPlatformWakeAction"          /* value is OSNumber (priority) */
-#define kIOPlatformQuiesceActionKey                  "IOPlatformQuiesceAction"       /* value is OSNumber (priority) */
-#define kIOPlatformActiveActionKey                   "IOPlatformActiveAction"        /* value is OSNumber (priority) */
-#define kIOPlatformHaltRestartActionKey              "IOPlatformHaltRestartAction"   /* value is OSNumber (priority) */
-#define kIOPlatformPanicActionKey                    "IOPlatformPanicAction"         /* value is OSNumber (priority) */
+#define kIOPlatformSleepActionKey                    "IOPlatformSleepAction"                                           
+#define kIOPlatformWakeActionKey                     "IOPlatformWakeAction"                                            
+#define kIOPlatformQuiesceActionKey                  "IOPlatformQuiesceAction"                                         
+#define kIOPlatformActiveActionKey                   "IOPlatformActiveAction"                                          
+#define kIOPlatformHaltRestartActionKey              "IOPlatformHaltRestartAction"                                     
+#define kIOPlatformPanicActionKey                    "IOPlatformPanicAction"                                           
 
 #define kIOPlatformFunctionHandlerSet                "IOPlatformFunctionHandlerSet"
 
@@ -104,10 +104,10 @@ typedef struct _IOUCProcessToken {
 #define kIOPlatformFunctionHandlerMaxInterruptDelay  "IOPlatformFunctionHandlerMaxInterruptDelay"
 #define kIOPlatformMaxInterruptDelay                 "IOPlatformMaxInterruptDelay"
 
-#endif /* defined(__i386__) || defined(__x86_64__) */
+#endif                                               
 
 enum {
-	// these flags are valid for the prepare() method only
+	                                                      
 	kIODirectionPrepareNoZeroFill = 0x00000010,
 };
 
@@ -123,4 +123,4 @@ enum {
 
 #define kIOServiceLegacyMatchingRegistryIDKey "IOServiceLegacyMatchingRegistryID"
 
-#endif /* ! _IOKIT_IOKITKEYSPRIVATE_H */
+#endif                                  

@@ -22,21 +22,21 @@ T_GLOBAL_META(
 	T_META_CHECK_LEAKS(false)
 	);
 
-#define TIMEOUT_SECS                                    10 * 60 /* abort if test takes > 10 minutes */
+#define TIMEOUT_SECS                                    10 * 60                                       
 
 #if (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)
-#define ALLOCATION_SIZE_VM_REGION                       (16*1024)               /* 16 KB */
+#define ALLOCATION_SIZE_VM_REGION                       (16*1024)                          
 #define ALLOCATION_SIZE_VM_OBJECT                       ALLOCATION_SIZE_VM_REGION
 #else
-#define ALLOCATION_SIZE_VM_REGION                       (1024*1024*100) /* 100 MB */
-#define ALLOCATION_SIZE_VM_OBJECT                       (16*1024)               /* 16 KB */
+#define ALLOCATION_SIZE_VM_REGION                       (1024*1024*100)             
+#define ALLOCATION_SIZE_VM_OBJECT                       (16*1024)                          
 #endif
 #define MAX_CHILD_PROCS                                 100
 
 #define NUM_GIVE_BACK                                   5
 #define NUM_GIVE_BACK_PORTS                             20
 
-/* 60% is too high on bridgeOS to achieve without vm-pageshortage jetsams. Set it to 40%. */
+                                                                                            
 #if TARGET_OS_BRIDGE
 #define ZONEMAP_JETSAM_LIMIT_SYSCTL                     "kern.zone_map_jetsam_limit=40"
 #else
@@ -81,7 +81,7 @@ static mach_zone_info_array_t zone_info_array = NULL;
 static mach_zone_name_t largest_zone_name;
 static mach_zone_info_t largest_zone_info;
 
-static pthread_mutex_t test_mtx = PTHREAD_MUTEX_INITIALIZER;   /* protects the next 3 things */
+static pthread_mutex_t test_mtx = PTHREAD_MUTEX_INITIALIZER;                                   
 static bool test_ending = false;
 static int num_children = 0;
 static pid_t child_pids[MAX_CHILD_PROCS];
@@ -113,9 +113,9 @@ check_time(time_t start, int timeout)
 	return start + timeout < time(NULL);
 }
 
-/*
- * flag values for allocate_vm_stuff()
- */
+  
+                                      
+   
 #define REGIONS 1
 #define OBJECTS 2
 
@@ -140,17 +140,17 @@ allocate_vm_stuff(int flags)
 	for (i = 0;; i++) {
 		mach_vm_address_t addr = (mach_vm_address_t)NULL;
 
-		/* Alternate VM tags between consecutive regions to prevent coalescing */
+		                                                                         
 		int vmflags = VM_MAKE_TAG((i % 2)? VM_TAG1: VM_TAG2) | VM_FLAGS_ANYWHERE;
 
 		if ((mach_vm_allocate(mach_task_self(), &addr, (mach_vm_size_t)alloc_size, vmflags)) != KERN_SUCCESS) {
 			break;
 		}
 
-		/*
-		 * If interested in objects, touch the region so the VM object is created,
-		 * then free this page. Keeps us from holding a lot of dirty pages.
-		 */
+		  
+                                                                            
+                                                                     
+     
 		if (flags == OBJECTS) {
 			*((int *)addr) = 0;
 			madvise((void *)addr, (size_t)alloc_size, MADV_FREE);
@@ -166,19 +166,19 @@ allocate_vm_stuff(int flags)
 		}
 	}
 
-	/* return some of the resource to avoid O-O-M problems */
+	                                                         
 	for (uint64_t j = 0; j < NUM_GIVE_BACK && j < i; ++j) {
 		mach_vm_deallocate(mach_task_self(), give_back[j], (mach_vm_size_t)alloc_size);
 	}
 
 	printf("[%d] Number of allocations: %lld\n", getpid(), i);
 
-	/* Signal to the parent that we're done allocating */
+	                                                     
 	kill(getppid(), SIGUSR1);
 
 	while (1) {
 		sleep(2);
-		/* Exit if parent has exited. Ensures child processes don't linger around after the test exits */
+		                                                                                                 
 		if (getppid() == 1) {
 			exit(0);
 		}
@@ -216,7 +216,7 @@ allocate_from_generic_zone(void)
 		}
 	}
 
-	/* return some of the resource to avoid O-O-M problems */
+	                                                         
 	for (uint64_t j = 0; j < NUM_GIVE_BACK_PORTS && j < i; ++j) {
 		int ret;
 		ret = mach_port_mod_refs(mach_task_self(), give_back[j], MACH_PORT_RIGHT_RECEIVE, -1);
@@ -224,12 +224,12 @@ allocate_from_generic_zone(void)
 	}
 	printf("[%d] Number of allocations: %lld\n", getpid(), i);
 
-	/* Signal to the parent that we're done allocating */
+	                                                     
 	kill(getppid(), SIGUSR1);
 
 	while (1) {
 		sleep(2);
-		/* Exit if parent has exited. Ensures child processes don't linger around after the test exits */
+		                                                                                                 
 		if (getppid() == 1) {
 			exit(0);
 		}
@@ -272,7 +272,7 @@ query_zone_info(void)
 		return;
 	}
 
-	/* Print out size and element count for zones relevant to the test */
+	                                                                     
 	for (i = 0; i < current_test.num_zones; i++) {
 		print_zone_info(&(current_test.zone_names[i]), &(zone_info_array[i]));
 	}
@@ -309,9 +309,9 @@ verify_generic_jetsam_criteria(void)
 	T_LOG("Largest zone info");
 	print_zone_info(&largest_zone_name, &largest_zone_info);
 
-	/* If VM map entries is not the largest zone */
+	                                               
 	if (strcmp(largest_zone_name.mzn_name, VME_ZONE)) {
-		/* If vm objects is the largest zone and the VM map entries zone had comparable # of elements, return false */
+		                                                                                                              
 		if (!strcmp(largest_zone_name.mzn_name, VMOBJECTS_ZONE) && vme_zone_compares_to_vm_objects()) {
 			return false;
 		}
@@ -325,18 +325,18 @@ begin_test_teardown(void)
 {
 	int ret, old_limit = 95;
 
-	/*
-	 * Restore kern.zone_map_jetsam_limit to the default high value, to prevent further jetsams.
-	 * We should change the value of old_limit if ZONE_MAP_JETSAM_LIMIT_DEFAULT changes in the kernel.
-	 * We don't have a way to capture what the original value was before the test, because the
-	 * T_META_SYSCTL_INT macro will have changed the value before the test starts running.
-	 */
+	  
+                                                                                             
+                                                                                                   
+                                                                                           
+                                                                                       
+    
 	ret = sysctlbyname("kern.zone_map_jetsam_limit", NULL, NULL, &old_limit, sizeof(old_limit));
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "sysctl kern.zone_map_jetsam_limit failed");
 	T_LOG("kern.zone_map_jetsam_limit set to %d%%", old_limit);
 
 
-	/* End ktrace session */
+	                        
 	if (session != NULL) {
 		T_LOG("Ending ktrace session...");
 		ktrace_end(session, 1);
@@ -345,18 +345,18 @@ begin_test_teardown(void)
 	dispatch_sync(dq_spawn, ^{
 		T_LOG("Cancelling dispatch sources...");
 
-		/* Disable the timer that queries and prints zone info periodically */
+		                                                                      
 		if (ds_timer != NULL) {
 		        dispatch_source_cancel(ds_timer);
 		}
 
-		/* Disable signal handler that spawns child processes */
+		                                                        
 		if (ds_signal != NULL) {
-		        /*
-		         * No need for a dispatch_source_cancel_and_wait here.
-		         * We're queueing this on the spawn queue, so no further
-		         * processes will be spawned after the source is cancelled.
-		         */
+		          
+                                                                
+                                                                  
+                                                                     
+             
 		        dispatch_source_cancel(ds_signal);
 		}
 	});
@@ -367,10 +367,10 @@ cleanup_and_end_test(void)
 {
 	int i;
 
-	/*
-	 * The atend handler executes on a different dispatch queue.
-	 * We want to do the cleanup only once.
-	 */
+	  
+                                                             
+                                        
+    
 	pthread_mutex_lock(&test_mtx);
 	if (test_ending) {
 		pthread_mutex_unlock(&test_mtx);
@@ -380,18 +380,18 @@ cleanup_and_end_test(void)
 	pthread_mutex_unlock(&test_mtx);
 
 	dispatch_async(dq_spawn, ^{
-		/*
-		 * If the test succeeds, we will call dispatch_source_cancel twice, which is fine since
-		 * the operation is idempotent. Just make sure to not drop all references to the dispatch sources
-		 * (in this case we're not, we have globals holding references to them), or we can end up with
-		 * use-after-frees which would be a problem.
-		 */
-		/* Disable the timer that queries and prints zone info periodically */
+		  
+                                                                                         
+                                                                                                   
+                                                                                                
+                                              
+     
+		                                                                      
 		if (ds_timer != NULL) {
 		        dispatch_source_cancel(ds_timer);
 		}
 
-		/* Disable signal handler that spawns child processes */
+		                                                        
 		if (ds_signal != NULL) {
 		        dispatch_source_cancel(ds_signal);
 		}
@@ -401,15 +401,15 @@ cleanup_and_end_test(void)
 	T_LOG("Number of processes spawned: %d", num_children);
 	T_LOG("Killing child processes...");
 
-	/* Kill all the child processes that were spawned */
+	                                                    
 	for (i = 0; i < num_children; i++) {
 		pid_t pid = child_pids[i];
 		int status = 0;
 
-		/*
-		 * Kill and wait for each child to exit
-		 * Without this we were seeing hw_lock_bit timeouts in BATS.
-		 */
+		  
+                                         
+                                                              
+     
 		kill(pid, SIGKILL);
 		pthread_mutex_unlock(&test_mtx);
 		if (waitpid(pid, &status, 0) < 0) {
@@ -419,10 +419,10 @@ cleanup_and_end_test(void)
 	}
 	sleep(1);
 
-	/* Force zone_gc before starting test for another zone or exiting */
+	                                                                    
 	mach_zone_force_gc(mach_host_self());
 
-	/* End ktrace session */
+	                        
 	if (session != NULL) {
 		ktrace_end(session, 1);
 	}
@@ -455,34 +455,34 @@ setup_ktrace_session(void)
 		T_END;
 	});
 
-	/* Listen for memorystatus_do_kill trace events */
+	                                                  
 	ret = ktrace_events_single(session, (BSDDBG_CODE(DBG_BSD_MEMSTAT, BSD_MEMSTAT_DO_KILL)), ^(ktrace_event_t event) {
 		int i;
 		bool received_jetsam_event = false;
 
-		/*
-		 * libktrace does not support DBG_FUNC_START/END in the event filter. It simply ignores it.
-		 * So we need to explicitly check for the end event (a successful jetsam kill) here,
-		 * instead of passing in ((BSDDBG_CODE(DBG_BSD_MEMSTAT, BSD_MEMSTAT_DO_KILL)) | DBG_FUNC_START).
-		 */
+		  
+                                                                                             
+                                                                                      
+                                                                                                  
+     
 		if (!(event->debugid & DBG_FUNC_START)) {
 		        return;
 		}
 
-		/* Check for zone-map-exhaustion jetsam. */
+		                                           
 		if (event->arg2 == kMemorystatusKilledZoneMapExhaustion) {
 		        begin_test_teardown();
 		        T_LOG("[memorystatus_do_kill] jetsam reason: zone-map-exhaustion, pid: %d\n\n", (int)event->arg1);
 		        if (current_test.test_index == VME_ZONE_TEST || current_test.test_index == VM_OBJECTS_ZONE_TEST) {
-		                /*
-		                 * For the VM map entries zone we try to kill the leaking process.
-		                 * Verify that we jetsammed one of the processes we spawned.
-		                 *
-		                 * For the vm objects zone we pick the leaking process via the VM map entries
-		                 * zone, if the number of vm objects and VM map entries are comparable.
-		                 * The test simulates this scenario, we should see a targeted jetsam for the
-		                 * vm objects zone too.
-		                 */
+		                  
+                                                                                    
+                                                                              
+                    
+                                                                                               
+                                                                                         
+                                                                                              
+                                         
+                     
 		                pthread_mutex_lock(&test_mtx);
 		                for (i = 0; i < num_children; i++) {
 		                        if (child_pids[i] == (pid_t)event->arg1) {
@@ -492,10 +492,10 @@ setup_ktrace_session(void)
 					}
 				}
 		                pthread_mutex_unlock(&test_mtx);
-		                /*
-		                 * If we didn't see a targeted jetsam, verify that the largest zone actually
-		                 * fulfilled the criteria for generic jetsams.
-		                 */
+		                  
+                                                                                              
+                                                                
+                     
 		                if (!received_jetsam_event && verify_generic_jetsam_criteria()) {
 		                        received_jetsam_event = true;
 		                        T_LOG("Did not receive jetsam event for a child, but generic jetsam criteria holds");
@@ -507,17 +507,17 @@ setup_ktrace_session(void)
 
 		        T_QUIET; T_ASSERT_TRUE(received_jetsam_event, "Jetsam event not as expected");
 		} else {
-		        /*
-		         * The test relies on the children being able to send a signal to the parent, to continue spawning new processes
-		         * that leak more zone memory. If a child is jetsammed for some other reason, the parent can get stuck waiting for
-		         * a signal from the child, never being able to make progress (We spawn only a single process at a time to rate-limit
-		         * the zone memory bloat.). If this happens, the test eventually times out. So if a child is jetsammed for some
-		         * reason other than zone-map-exhaustion, end the test early.
-		         *
-		         * This typically happens when we end up triggering vm-pageshortage jetsams before zone-map-exhaustion jetsams.
-		         * Lowering the zone_map_jetsam_limit if the zone map size was initially low should help with this too.
-		         * See sysctlbyname("kern.zone_map_jetsam_limit"...) in run_test() below.
-		         */
+		          
+                                                                                                                          
+                                                                                                                            
+                                                                                                                               
+                                                                                                                         
+                                                                       
+            
+                                                                                                                         
+                                                                                                                 
+                                                                                   
+             
 		        pthread_mutex_lock(&test_mtx);
 		        for (i = 0; i < num_children; i++) {
 		                if (child_pids[i] == (pid_t)event->arg1) {
@@ -570,7 +570,7 @@ spawn_child_process(void)
 		if (num_children == MAX_CHILD_PROCS) {
 			pthread_mutex_unlock(&test_mtx);
 			T_ASSERT_FAIL("Spawned too many children. Aborting test");
-			/* not reached */
+			                 
 		}
 
 		strlcpy(helper_func, current_test.helper_func, sizeof(helper_func));
@@ -579,7 +579,7 @@ spawn_child_process(void)
 		launch_tool_args[2] = helper_func;
 		launch_tool_args[3] = NULL;
 
-		/* Spawn the child process */
+		                             
 		int rc = dt_launch_tool(&pid, launch_tool_args, false, NULL, NULL);
 		if (rc != 0) {
 			T_LOG("dt_launch tool returned %d with error code %d", rc, errno);
@@ -638,16 +638,16 @@ run_test(void)
 
 	initial_zone_occupancy = query_zone_map_size();
 
-	/* On large memory systems, set the zone maps jetsam limit lower so we can hit it without timing out. */
+	                                                                                                        
 	if (mem > (uint64_t)LARGE_MEM_GB * 1024 * 1024 * 1024) {
 		new_limit = LARGE_MEM_JETSAM_LIMIT;
 	}
 
-	/*
-	 * If we start out with the zone map < 5% full, aim for 10% as the limit, so we don't time out.
-	 * For anything else aim for 2x the initial size, capped by whatever value was set by T_META_SYSCTL_INT,
-	 * or LARGE_MEM_JETSAM_LIMIT for large memory systems.
-	 */
+	  
+                                                                                                
+                                                                                                         
+                                                       
+    
 	if (initial_zone_occupancy < 5) {
 		new_limit = JETSAM_LIMIT_LOWEST;
 	} else {
@@ -655,11 +655,11 @@ run_test(void)
 	}
 
 	if (new_limit > 0 && new_limit < old_limit) {
-		/*
-		 * We should be fine messing with the zone_map_jetsam_limit here, i.e. outside of T_META_SYSCTL_INT.
-		 * When the test ends, T_META_SYSCTL_INT will restore the zone_map_jetsam_limit to what it was
-		 * before the test anyway.
-		 */
+		  
+                                                                                                      
+                                                                                                
+                            
+     
 		ret = sysctlbyname("kern.zone_map_jetsam_limit", NULL, NULL, &new_limit, sizeof(new_limit));
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "sysctl kern.zone_map_jetsam_limit failed");
 		T_LOG("kern.zone_map_jetsam_limit set to %d%%", new_limit);
@@ -667,19 +667,19 @@ run_test(void)
 
 	zone_info_array = (mach_zone_info_array_t) calloc((unsigned long)current_test.num_zones, sizeof *zone_info_array);
 
-	/*
-	 * If the timeout specified by T_META_TIMEOUT is hit, the atend handler does not get called.
-	 * So we're queueing a dispatch block to fire after TIMEOUT_SECS seconds, so we can exit cleanly.
-	 */
+	  
+                                                                                             
+                                                                                                  
+    
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, TIMEOUT_SECS * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
 		T_ASSERT_FAIL("Timed out after %d seconds", TIMEOUT_SECS);
 	});
 
-	/*
-	 * Create a dispatch source for the signal SIGUSR1. When a child is done allocating zone memory, it
-	 * sends SIGUSR1 to the parent. Only then does the parent spawn another child. This prevents us from
-	 * spawning many children at once and creating a lot of memory pressure.
-	 */
+	  
+                                                                                                    
+                                                                                                     
+                                                                         
+    
 	signal(SIGUSR1, SIG_IGN);
 	dq_spawn = dispatch_queue_create("spawn_queue", DISPATCH_QUEUE_SERIAL);
 	ds_signal = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGUSR1, 0, dq_spawn);
@@ -688,13 +688,13 @@ run_test(void)
 	dispatch_source_set_event_handler(ds_signal, ^{
 		(void)query_zone_map_size();
 
-		/* Wait a few seconds before spawning another child. Keeps us from allocating too aggressively */
+		                                                                                                 
 		sleep(5);
 		spawn_child_process();
 	});
 	dispatch_activate(ds_signal);
 
-	/* Timer to query jetsam-relevant zone info every second. Print it every 5 seconds. */
+	                                                                                      
 	ds_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_queue_create("timer_queue", NULL));
 	T_QUIET; T_ASSERT_NOTNULL(ds_timer, "dispatch_source_create: timer");
 	dispatch_source_set_timer(ds_timer, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC), NSEC_PER_SEC, 0);
@@ -704,12 +704,12 @@ run_test(void)
 	});
 	dispatch_activate(ds_timer);
 
-	/* Set up a ktrace session to listen for jetsam events */
+	                                                         
 	setup_ktrace_session();
 
 	T_SETUPEND;
 
-	/* Spawn the first child process */
+	                                   
 	T_LOG("Spawning child processes to allocate zone memory...\n\n");
 	spawn_child_process();
 
@@ -721,13 +721,13 @@ move_to_idle_band(void)
 {
 	memorystatus_priority_properties_t props;
 
-	/*
-	 * We want to move the processes we spawn into the idle band, so that jetsam can target them first.
-	 * This prevents other important BATS tasks from getting killed, specially in LTE where we have very few
-	 * processes running.
-	 *
-	 * This is only needed for tests which (are likely to) lead us down the generic jetsam path.
-	 */
+	  
+                                                                                                    
+                                                                                                         
+                      
+   
+                                                                                             
+    
 	props.priority = JETSAM_PRIORITY_IDLE;
 	props.user_data = 0;
 
@@ -755,18 +755,18 @@ T_HELPER_DECL(allocate_from_generic_zone, "allocates from a generic zone")
 	allocate_from_generic_zone();
 }
 
-/*
- * T_META_SYSCTL_INT(ZONEMAP_JETSAM_LIMIT_SYSCTL) changes the zone_map_jetsam_limit to a
- * lower value, so that the test can complete faster.
- * The test allocates zone memory pretty aggressively which can cause the system to panic
- * if the jetsam limit is quite high; a lower value keeps us from panicking.
- */
+  
+                                                                                        
+                                                     
+                                                                                         
+                                                                            
+   
 T_DECL( memorystatus_vme_zone_test,
     "allocates elements from the VM map entries zone, verifies zone-map-exhaustion jetsams",
     T_META_ASROOT(true),
     T_META_TIMEOUT(1800),
-/*		T_META_LTEPHASE(LTE_POSTINIT),
- */
+                                  
+   
     T_META_SYSCTL_INT(ZONEMAP_JETSAM_LIMIT_SYSCTL))
 {
 	current_test = (test_config_struct) {
@@ -784,8 +784,8 @@ T_DECL( memorystatus_vm_objects_zone_test,
     "allocates elements from the VM objects and the VM map entries zones, verifies zone-map-exhaustion jetsams",
     T_META_ASROOT(true),
     T_META_TIMEOUT(1800),
-/*		T_META_LTEPHASE(LTE_POSTINIT),
- */
+                                  
+   
     T_META_SYSCTL_INT(ZONEMAP_JETSAM_LIMIT_SYSCTL))
 {
 	current_test = (test_config_struct) {
@@ -804,8 +804,8 @@ T_DECL( memorystatus_generic_zone_test,
     "allocates elements from a zone that doesn't have an optimized jetsam path, verifies zone-map-exhaustion jetsams",
     T_META_ASROOT(true),
     T_META_TIMEOUT(1800),
-/*		T_META_LTEPHASE(LTE_POSTINIT),
- */
+                                  
+   
     T_META_SYSCTL_INT(ZONEMAP_JETSAM_LIMIT_SYSCTL))
 {
 	current_test = (test_config_struct) {

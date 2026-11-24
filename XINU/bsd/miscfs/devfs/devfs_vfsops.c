@@ -53,18 +53,18 @@
  * devfs_vfsops.c
  *
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/*
- * HISTORY
- *  Dieter Siegmund (dieter@apple.com) Wed Jul 14 13:37:59 PDT 1999
- *  - modified devfs_statfs() to use devfs_stats to calculate the
- *    amount of memory used by devfs
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
+  
+          
+                                                                   
+                                                                 
+                                    
+   
 
 
 #include <sys/param.h>
@@ -88,7 +88,7 @@
 
 #if FDESC
 #include "fdesc.h"
-#endif /* FDESC */
+#endif            
 
 
 static int devfs_statfs( struct mount *mp, struct vfsstatfs *sbp, vfs_context_t ctx);
@@ -98,14 +98,14 @@ static int devfs_vfs_getattr(mount_t mp, struct vfs_attr *fsap, vfs_context_t ct
 extern boolean_t dev_kmem_enabled;
 #endif
 
-/*-
- * Called from the generic VFS startups.
- * This is the second stage of DEVFS initialisation.
- * The probed devices have already been loaded and the
- * basic structure of the DEVFS created.
- * We take the oportunity to mount the hidden DEVFS layer, so that
- * devices from devfs get sync'd.
- */
+   
+                                        
+                                                    
+                                                      
+                                        
+                                                                  
+                                 
+   
 static int
 devfs_init(__unused struct vfsconf *vfsp)
 {
@@ -118,7 +118,7 @@ devfs_init(__unused struct vfsconf *vfsp)
 	    UID_ROOT, GID_WHEEL, 0666, "tty");
 #if CONFIG_DEV_KMEM
 	if (dev_kmem_enabled) {
-		/* (3,0) reserved for /dev/mem physical memory */
+		                                                 
 		devfs_make_node(makedev(3, 1), DEVFS_CHAR,
 		    UID_ROOT, GID_KMEM, 0640, "kmem");
 	}
@@ -154,41 +154,41 @@ devfs_init(__unused struct vfsconf *vfsp)
 	return 0;
 }
 
-/*-
- *  mp	 - pointer to 'mount' structure
- *  path - addr in user space of mount point (ie /usr or whatever)
- *  data - addr in user space of mount params including the
- *         name of the block special file to treat as a filesystem.
- *         (NOT USED)
- *  ndp  - namei data pointer (NOT USED)
- *  p    - proc pointer
- * devfs is special in that it doesn't require any device to be mounted..
- * It makes up its data as it goes along.
- * it must be mounted during single user.. until it is, only std{in/out/err}
- * and the root filesystem are available.
- */
-/*proto*/
+   
+                                      
+                                                                  
+                                                           
+                                                                   
+                     
+                                        
+                       
+                                                                         
+                                         
+                                                                            
+                                         
+   
+         
 int
 devfs_mount(struct mount *mp, __unused vnode_t devvp, __unused user_addr_t data, vfs_context_t ctx)
 {
-	struct devfsmount *devfs_mp_p;  /* devfs specific mount info */
+	struct devfsmount *devfs_mp_p;                                 
 	int error;
 
-	/*-
-	 *  If they just want to update, we don't need to do anything.
-	 */
+	   
+                                                               
+    
 	if (mp->mnt_flag & MNT_UPDATE) {
 		return 0;
 	}
 
-	/* Advisory locking should be handled at the VFS layer */
+	                                                         
 	vfs_setlocklocal(mp);
 
-	/*-
-	 *  Well, it's not an update, it's a real mount request.
-	 *  Time to get dirty.
-	 * HERE we should check to see if we are already mounted here.
-	 */
+	   
+                                                         
+                       
+                                                               
+    
 
 	MALLOC(devfs_mp_p, struct devfsmount *, sizeof(struct devfsmount),
 	    M_DEVFSMNT, M_WAITOK);
@@ -198,9 +198,9 @@ devfs_mount(struct mount *mp, __unused vnode_t devvp, __unused user_addr_t data,
 	bzero(devfs_mp_p, sizeof(*devfs_mp_p));
 	devfs_mp_p->mount = mp;
 
-	/*-
-	 *  Fill out some fields
-	 */
+	   
+                         
+    
 	__IGNORE_WCASTALIGN(mp->mnt_data = (qaddr_t)devfs_mp_p);
 	mp->mnt_vfsstat.f_fsid.val[0] = (int32_t)VM_KERNEL_ADDRHASH(devfs_mp_p);
 	mp->mnt_vfsstat.f_fsid.val[1] = vfs_typenum(mp);
@@ -218,12 +218,12 @@ devfs_mount(struct mount *mp, __unused vnode_t devvp, __unused user_addr_t data,
 		DEVFS_INCR_MOUNTS();
 	}
 
-	/*-
-	 *  Copy in the name of the directory the filesystem
-	 *  is to be mounted on.
-	 *  And we clear the remainder of the character strings
-	 *  to be tidy.
-	 */
+	   
+                                                     
+                         
+                                                        
+                
+    
 
 	bzero(mp->mnt_vfsstat.f_mntfromname, MAXPATHLEN);
 	bcopy("devfs", mp->mnt_vfsstat.f_mntfromname, 5);
@@ -239,9 +239,9 @@ devfs_start(__unused struct mount *mp, __unused int flags, __unused vfs_context_
 	return 0;
 }
 
-/*-
- *  Unmount the filesystem described by mp.
- */
+   
+                                           
+   
 static int
 devfs_unmount( struct mount *mp, int mntflags, __unused vfs_context_t ctx)
 {
@@ -272,7 +272,7 @@ devfs_unmount( struct mount *mp, int mntflags, __unused vfs_context_t ctx)
 	return 0;
 }
 
-/* return the address of the root vnode  in *vpp */
+                                                   
 static int
 devfs_root(struct mount *mp, struct vnode **vpp, __unused vfs_context_t ctx)
 {
@@ -280,7 +280,7 @@ devfs_root(struct mount *mp, struct vnode **vpp, __unused vfs_context_t ctx)
 	int error;
 
 	DEVFS_LOCK();
-	/* last parameter to devfs_dntovn() is ignored */
+	                                                 
 	error = devfs_dntovn(devfs_mp_p->plane_root->de_dnp, vpp, NULL);
 	DEVFS_UNLOCK();
 
@@ -292,11 +292,11 @@ devfs_statfs( struct mount *mp, struct vfsstatfs *sbp, __unused vfs_context_t ct
 {
 	struct devfsmount *devfs_mp_p = (struct devfsmount *)mp->mnt_data;
 
-	/*-
-	 *  Fill in the stat block.
-	 */
-	//sbp->f_type   = mp->mnt_vfsstat.f_type;
-	sbp->f_flags  = 0;              /* XXX */
+	   
+                            
+    
+	                                         
+	sbp->f_flags  = 0;                       
 	sbp->f_bsize  = 512;
 	sbp->f_iosize = 512;
 	sbp->f_blocks = (devfs_stats.mounts * sizeof(struct devfsmount)
@@ -455,10 +455,10 @@ devfs_vget(__unused struct mount *mp, __unused ino64_t ino, __unused struct vnod
 	return ENOTSUP;
 }
 
-/*************************************************************
- * The concept of exporting a kernel generated devfs is stupid
- * So don't handle filehandles
- */
+                                                              
+                                                              
+                              
+   
 
 static int
 devfs_fhtovp(__unused struct mount *mp, __unused int fhlen, __unused unsigned char *fhp, __unused struct vnode **vpp, __unused vfs_context_t ctx)
@@ -483,11 +483,11 @@ devfs_sysctl(__unused int *name, __unused u_int namelen, __unused user_addr_t ol
 
 #include <sys/namei.h>
 
-/*
- * Function: devfs_kernel_mount
- * Purpose:
- *   Mount devfs at the given mount point from within the kernel.
- */
+  
+                               
+           
+                                                                 
+   
 int
 devfs_kernel_mount(char * mntname)
 {
@@ -516,5 +516,5 @@ const struct vfsops devfs_vfsops = {
 	.vfs_vptofh  = devfs_vptofh,
 	.vfs_init    = devfs_init,
 	.vfs_sysctl  = devfs_sysctl,
-	// There are other VFS ops that we do not support
+	                                                 
 };

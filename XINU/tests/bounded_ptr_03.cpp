@@ -1,6 +1,6 @@
-//
-// Make sure that the forward declaration header can be included in C++03.
-//
+  
+                                                                          
+  
 
 #include <libkern/c++/bounded_ptr_fwd.h>
 #include <darwintest.h>

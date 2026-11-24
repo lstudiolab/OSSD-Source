@@ -73,21 +73,21 @@
 
 #include <net/raw_cb.h>
 
-decl_lck_mtx_data(, raw_mtx_data);       /*### global raw cb mutex for now */
+decl_lck_mtx_data(, raw_mtx_data);                                           
 lck_mtx_t       *raw_mtx = &raw_mtx_data;
 lck_attr_t      *raw_mtx_attr;
 lck_grp_t       *raw_mtx_grp;
 lck_grp_attr_t  *raw_mtx_grp_attr;
-/*
- * Initialize raw connection block q.
- */
+  
+                                     
+   
 void
 raw_init(struct protosw *pp, struct domain *dp)
 {
 #pragma unused(pp, dp)
 	static int raw_initialized = 0;
 
-	/* This is called by key_init as well, so do it only once */
+	                                                            
 	if (!raw_initialized) {
 		raw_initialized = 1;
 
@@ -101,14 +101,14 @@ raw_init(struct protosw *pp, struct domain *dp)
 }
 
 
-/*
- * Raw protocol input routine.  Find the socket
- * associated with the packet(s) and move them over.  If
- * nothing exists for this packet, drop it.
- */
-/*
- * Raw protocol interface.
- */
+  
+                                               
+                                                        
+                                           
+   
+  
+                          
+   
 void
 raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
     struct sockaddr *dst)
@@ -119,10 +119,10 @@ raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
 	struct socket *last;
 	int error;
 
-//####LD raw_input is called from many places, input & output path. We have to assume the
-//####LD socket we'll find and need to append to is unlocked.
-//####LD calls from the output (locked) path need to make sure the socket is not locked when
-//####LD we call in raw_input
+                                                                                         
+                                                             
+                                                                                            
+                             
 	last = NULL;
 	lck_mtx_lock(raw_mtx);
 	LIST_FOREACH(rp, &rawcb_list, list) {
@@ -133,14 +133,14 @@ raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
 		    rp->rcb_proto.sp_protocol != proto->sp_protocol) {
 			continue;
 		}
-		/*
-		 * We assume the lower level routines have
-		 * placed the address in a canonical format
-		 * suitable for a structure comparison.
-		 *
-		 * Note that if the lengths are not the same
-		 * the comparison will fail at the first byte.
-		 */
+		  
+                                            
+                                             
+                                         
+    
+                                              
+                                                
+     
 #define equal(a1, a2) \
   (bcmp((caddr_t)(a1), (caddr_t)(a2), a1->sa_len) == 0)
 		if (rp->rcb_laddr && !equal(rp->rcb_laddr, dst)) {
@@ -178,7 +178,7 @@ raw_input(struct mbuf *m0, struct sockproto *proto, struct sockaddr *src,
 	lck_mtx_unlock(raw_mtx);
 }
 
-/*ARGSUSED*/
+            
 void
 raw_ctlinput(int cmd, __unused struct sockaddr *arg, __unused void *dummy,
     __unused struct ifnet *ifp)
@@ -186,7 +186,7 @@ raw_ctlinput(int cmd, __unused struct sockaddr *arg, __unused void *dummy,
 	if (cmd < 0 || cmd >= PRC_NCMDS) {
 		return;
 	}
-	/* INCOMPLETE */
+	                
 }
 
 static int
@@ -211,7 +211,7 @@ raw_uabort(struct socket *so)
 	return 0;
 }
 
-/* pru_accept is EOPNOTSUPP */
+                              
 
 static int
 raw_uattach(struct socket *so, int proto, __unused struct proc *p)
@@ -239,8 +239,8 @@ raw_uconnect(__unused struct socket *so, __unused struct sockaddr *nam, __unused
 	return EINVAL;
 }
 
-/* pru_connect2 is EOPNOTSUPP */
-/* pru_control is EOPNOTSUPP */
+                                
+                               
 
 static int
 raw_udetach(struct socket *so)
@@ -278,7 +278,7 @@ raw_udisconnect(struct socket *so)
 	return 0;
 }
 
-/* pru_listen is EOPNOTSUPP */
+                              
 
 static int
 raw_upeeraddr(struct socket *so, struct sockaddr **nam)
@@ -295,8 +295,8 @@ raw_upeeraddr(struct socket *so, struct sockaddr **nam)
 	return 0;
 }
 
-/* pru_rcvd is EOPNOTSUPP */
-/* pru_rcvoob is EOPNOTSUPP */
+                            
+                              
 
 static int
 raw_usend(struct socket *so, int flags, struct mbuf *m,
@@ -355,7 +355,7 @@ release:
 	return error;
 }
 
-/* pru_sense is null */
+                       
 
 static int
 raw_ushutdown(struct socket *so)

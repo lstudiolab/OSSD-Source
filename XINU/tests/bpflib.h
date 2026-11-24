@@ -36,4 +36,4 @@ int bpf_set_timeout(int fd, struct timeval * tv_p);
 int bpf_set_header_complete(int fd, u_int header_complete);
 int bpf_set_see_sent(int fd, u_int see_send);
 
-#endif /* _S_BPFLIB_H */
+#endif                  

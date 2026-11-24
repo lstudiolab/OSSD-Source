@@ -1,34 +1,34 @@
-#! /bin/sh -
-#	@(#)makesyscalls.sh	8.1 (Berkeley) 6/10/93
-# $FreeBSD: src/sys/kern/makesyscalls.sh,v 1.60 2003/04/01 01:12:24 jeff Exp $
-#
+
+
+
+
 # Copyright (c) 2004-2008 Apple Inc. All rights reserved.
-#
-# @APPLE_OSREFERENCE_LICENSE_HEADER_START@
-# 
-# This file contains Original Code and/or Modifications of Original Code
+
+
+
+
 # as defined in and that are subject to the Apple Public Source License
-# Version 2.0 (the 'License'). You may not use this file except in
-# compliance with the License. Please obtain a copy of the License at
-# http://www.opensource.apple.com/apsl/ and read it before using this
-# file.
-# 
-# The Original Code and all software distributed under the License are
-# distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
-# EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
-# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
-# Please see the License for the specific language governing rights and
-# limitations under the License.
-# 
-# @APPLE_OSREFERENCE_LICENSE_HEADER_END@
-#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 set -e
 
 input_file="" # first argument
 
-# output type:
+
 output_syscallnamesfile=0
 output_sysprotofile=0
 output_syshdrfile=0
@@ -39,7 +39,7 @@ output_systrace=0
 
 use_stdout=0
 
-# output files:
+
 syscallnamesfile="syscalls.c"
 sysprotofile="sysproto.h"
 sysproto_h=_SYS_SYSPROTO_H_
@@ -52,7 +52,7 @@ switchname="sysent"
 namesname="syscallnames"
 tracecodename="syscall.codes"
 systraceargsfile="systrace_args.c"
-# tmp files:
+
 syslegal="sysent.syslegal.$$"
 sysent="sysent.switch.$$"
 sysinc="sysinc.switch.$$"
@@ -336,7 +336,7 @@ s/\$//g
 		additional_comments = " "
 		obs_comments = "_"
 
-		# find start and end of call name and arguments
+
 		if ($current_field != "{")
 			parserr($current_field, "{")
 		args_start = current_field
@@ -354,7 +354,7 @@ s/\$//g
 			exit 1
 		}
 
-		# find start and end of optional comments
+
 		current_field++
 		if (current_field < NF && $current_field == "{") {
 			comments_start = current_field
@@ -379,7 +379,7 @@ s/\$//g
 			parserr($args_end, ";")
 		args_end--
 
-		# skip any NO_SYSCALL_STUB qualifier
+
 		if ($args_end == "NO_SYSCALL_STUB")
 			args_end--
 
@@ -387,7 +387,7 @@ s/\$//g
 			parserr($args_end, ")")
 		args_end--
 
-		# extract additional comments
+
 		if (comments_start != 0) {
 			current_field = comments_start + 1
 			while (current_field < comments_end) {
@@ -402,11 +402,11 @@ s/\$//g
 			obs_comments = ""
 		}
 
-		# get function return type
+
 		current_field = args_start + 1
 		returntype = $current_field
 
-		# get function name and set up to get arguments
+
 		current_field++
 		funcname = $current_field
 		argalias = funcname "_args"
@@ -425,7 +425,7 @@ s/\$//g
 			return
 		}
 
-		# extract argument types and names
+
 		while (current_field <= args_end) {
 			argc++
 			argtype[argc]=""
@@ -497,8 +497,8 @@ s/\$//g
 		
 		parseline()
 		
-		# output function argument structures to sysproto.h and build the
-		# name of the appropriate argument mungers
+
+
 		munge32 = "NULL"
 		size32 = 0
 
@@ -543,11 +543,11 @@ s/\$//g
 				}
 				munge32 = "munge_"
 				for (i = 1; i <= argc; i++) {
-					# Build name of argument munger.
-					# We account for all sys call argument types here.
-					# This is where you add any new types.  With LP64 support
-					# each argument consumes 64-bits.  
-					# see .../xnu/bsd/dev/munge.c for munge argument types.
+
+
+
+
+
 					if (argtype[i] == "long") {
 						ext_argtype[i] = "user_long_t";
 						munge32 = munge32 "s"
@@ -622,7 +622,7 @@ s/\$//g
 			}
 		}
 		
-		# output to init_sysent.c
+
 		tempname = funcname
 		if (add_sysent_entry == 0) {
 			argssize = "0"
@@ -633,7 +633,7 @@ s/\$//g
 			}
 		}
 		else {
-			# figure out which return value type to munge
+
 			if (returntype == "user_addr_t") {
 				munge_ret = "_SYSCALL_RET_ADDR_T"
 			}
@@ -682,7 +682,7 @@ s/\$//g
 				tempname, munge_ret, argssize, size32) > sysent
 		printf("#endif\n") > sysent
 		
-		# output to syscalls.c
+
 		if (add_sysnames_entry == 1) {
 			tempname = funcname
 			if (substr(tempname, 1, 4) == "sys_") {
@@ -705,7 +705,7 @@ s/\$//g
 			}
 		}
 
-		# output to syscalls.h
+
 		if (add_sysheader_entry == 1) {
 			tempname = funcname
 			if (substr(tempname, 1, 4) == "sys_") {
@@ -725,7 +725,7 @@ s/\$//g
 			}
 		}
 		
-		# output function prototypes to sysproto.h
+
 		if (add_sysproto_entry == 1) {
 			if (funcname =="exit") {
 				printf("void %s(struct proc *, struct %s *, int32_t *);\n", 
@@ -737,7 +737,7 @@ s/\$//g
 			}
 		}
 
-		# output to audit_kevents.c
+
 		printf("\t%s,\t\t", auditev) > audittempfile
 		printf("/* %d = %s%s*/\n", syscall_num, tempname, additional_comments) > audittempfile 
 

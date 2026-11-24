@@ -63,31 +63,31 @@
 
 #include <libkern/OSDebug.h>
 
-/*
- * Audit Session Entry.  This is treated as an object with public and private
- * data.   The se_auinfo field is the only information that is public and
- * needs to be the first entry.
- */
+  
+                                                                             
+                                                                         
+                               
+   
 struct au_sentry {
-	auditinfo_addr_t        se_auinfo;      /* Public audit session data. */
+	auditinfo_addr_t        se_auinfo;                                      
 #define se_asid         se_auinfo.ai_asid
 #define se_auid         se_auinfo.ai_auid
 #define se_mask         se_auinfo.ai_mask
 #define se_termid       se_auinfo.ai_termid
 #define se_flags        se_auinfo.ai_flags
 
-	long                    se_refcnt;      /* Reference count. */
-	long                    se_procnt;      /* Processes in session. */
-	ipc_port_t              se_port;        /* Session port. */
-	LIST_ENTRY(au_sentry)   se_link;        /* Hash bucket link list (1) */
+	long                    se_refcnt;                            
+	long                    se_procnt;                                 
+	ipc_port_t              se_port;                           
+	LIST_ENTRY(au_sentry)   se_link;                                       
 };
 typedef struct au_sentry au_sentry_t;
 
 #define AU_SENTRY_PTR(aia_p)    ((au_sentry_t *)(aia_p))
 
-/*
- * The default au_sentry/auditinfo_addr entry for ucred.
- */
+  
+                                                        
+   
 
 static au_sentry_t audit_default_se = {
 	.se_auinfo = {
@@ -101,7 +101,7 @@ static au_sentry_t audit_default_se = {
 
 struct auditinfo_addr * const audit_default_aia_p = &audit_default_se.se_auinfo;
 
-/* Copied from <ipc/ipc_object.h> */
+                                    
 #define IPC_OBJECT_COPYIN_FLAGS_ALLOW_IMMOVABLE_SEND 0x1
 kern_return_t ipc_object_copyin(ipc_space_t, mach_port_name_t,
     mach_msg_type_name_t, ipc_port_t *, mach_port_context_t, mach_msg_guard_flags_t *, uint32_t);
@@ -110,13 +110,13 @@ void ipc_port_release_send(ipc_port_t);
 #if CONFIG_AUDIT
 
 
-/*
- * Currently the hash table is a fixed size.
- */
+  
+                                            
+   
 #define HASH_TABLE_SIZE         97
 #define HASH_ASID(asid)         (audit_session_hash(asid) % HASH_TABLE_SIZE)
 
-static struct rwlock    se_entry_lck;           /* (1) lock for se_link above */
+static struct rwlock    se_entry_lck;                                           
 
 LIST_HEAD(au_sentry_head, au_sentry);
 static struct au_sentry_head *au_sentry_bucket = NULL;
@@ -182,33 +182,33 @@ static void     audit_unref_session(au_sentry_t *se);
 
 static void     audit_session_event(int event, auditinfo_addr_t *aia_p);
 
-/*
- * Audit session device.
- */
+  
+                        
+   
 
 static MALLOC_DEFINE(M_AUDIT_SDEV, "audit_sdev", "Audit sdevs");
 static MALLOC_DEFINE(M_AUDIT_SDEV_ENTRY, "audit_sdevent",
     "Audit sdev entries and buffers");
 
-/*
- * Default audit sdev buffer parameters.
- */
+  
+                                        
+   
 #define AUDIT_SDEV_QLIMIT_DEFAULT       128
 #define AUDIT_SDEV_QLIMIT_MIN           1
 #define AUDIT_SDEV_QLIMIT_MAX           1024
 
-/*
- * Entry structure.
- */
+  
+                   
+   
 struct  audit_sdev_entry {
 	void                            *ase_record;
 	u_int                            ase_record_len;
 	TAILQ_ENTRY(audit_sdev_entry)    ase_queue;
 };
 
-/*
- * Per audit sdev structure.
- */
+  
+                            
+   
 
 struct audit_sdev {
 	int             asdev_open;
@@ -225,54 +225,54 @@ struct audit_sdev {
 	au_id_t         asdev_auid;
 	au_asid_t       asdev_asid;
 
-	/* Per-sdev mutex for most fields in this struct. */
+	                                                    
 	struct mtx      asdev_mtx;
 
-	/*
-	 * Per-sdev sleep lock serializing user-generated reads and
-	 * flushes. uiomove() is called to copy out the current head
-	 * record's data whie the record remains in the queue, so we
-	 * prevent other threads from removing it using this lock.
-	 */
+	  
+                                                            
+                                                             
+                                                             
+                                                           
+    
 	struct slck     asdev_sx;
 
-	/*
-	 * Condition variable to signal when data has been delivered to
-	 * a sdev.
-	 */
+	  
+                                                                
+           
+    
 	struct cv       asdev_cv;
 
-	/* Count and bound of records in the queue. */
+	                                              
 	u_int           asdev_qlen;
 	u_int           asdev_qlimit;
 
-	/* The number of bytes of data across all records. */
+	                                                     
 	u_int           asdev_qbyteslen;
 
-	/*
-	 * The amount read so far of the first record in the queue.
-	 * (The number of bytes available for reading in the queue is
-	 * qbyteslen - qoffset.)
-	 */
+	  
+                                                            
+                                                              
+                         
+    
 	u_int           asdev_qoffset;
 
-	/*
-	 * Per-sdev operation statistics.
-	 */
-	u_int64_t       asdev_inserts;  /* Records added. */
-	u_int64_t       asdev_reads;    /* Records read. */
-	u_int64_t       asdev_drops;    /* Records dropped. */
+	  
+                                  
+    
+	u_int64_t       asdev_inserts;                      
+	u_int64_t       asdev_reads;                       
+	u_int64_t       asdev_drops;                          
 
-	/*
-	 * Current pending record list.  This is protected by a
-	 * combination of asdev_mtx and asdev_sx.  Note that both
-	 * locks are required to remove a record from the head of the
-	 * queue, as an in-progress read may sleep while copying and,
-	 * therefore, cannot hold asdev_mtx.
-	 */
+	  
+                                                        
+                                                          
+                                                              
+                                                              
+                                     
+    
 	TAILQ_HEAD(, audit_sdev_entry)  asdev_queue;
 
-	/* Global sdev list. */
+	                       
 	TAILQ_ENTRY(audit_sdev)         asdev_list;
 };
 
@@ -293,21 +293,21 @@ struct audit_sdev {
 #define AUDIT_SDEV_SX_XLOCK_SIG(asd)    slck_lock_sig(&(asd)->asdev_sx)
 #define AUDIT_SDEV_SX_XUNLOCK(asd)      slck_unlock(&(asd)->asdev_sx)
 
-/*
- * Cloning variables and constants.
- */
+  
+                                   
+   
 #define AUDIT_SDEV_NAME         "auditsessions"
 #define MAX_AUDIT_SDEVS         32
 
 static int audit_sdev_major;
 static void *devnode;
 
-/*
- * Global list of audit sdevs.  The list is protected by a rw lock.
- * Individaul record queues are protected by  per-sdev locks.  These
- * locks synchronize between threads walking the list to deliver to
- * individual sdevs and adds/removes of sdevs.
- */
+  
+                                                                   
+                                                                    
+                                                                   
+                                              
+   
 static TAILQ_HEAD(, audit_sdev) audit_sdev_list;
 static struct rwlock            audit_sdev_lock;
 
@@ -320,17 +320,17 @@ static struct rwlock            audit_sdev_lock;
 	                                    RA_WLOCKED)
 #define AUDIT_SDEV_LIST_WUNLOCK()       rw_wunlock(&audit_sdev_lock)
 
-/*
- * dev_t doesn't have a pointer for "softc" data so we have to keep track of
- * it with the following global array (indexed by the minor number).
- *
- * XXX We may want to dynamically grow this as need.
- */
+  
+                                                                            
+                                                                    
+  
+                                                    
+   
 static struct audit_sdev        *audit_sdev_dtab[MAX_AUDIT_SDEVS];
 
-/*
- * Special device methods and definition.
- */
+  
+                                         
+   
 static open_close_fcn_t         audit_sdev_open;
 static open_close_fcn_t         audit_sdev_close;
 static read_write_fcn_t         audit_sdev_read;
@@ -352,13 +352,13 @@ static const struct cdevsw audit_sdev_cdevsw = {
 	.d_type      =          0
 };
 
-/*
- * Global statistics on audit sdevs.
- */
-static int              audit_sdev_count;       /* Current number of sdevs. */
-static u_int64_t        audit_sdev_ever;        /* Sdevs ever allocated. */
-static u_int64_t        audit_sdev_records;     /* Total records seen. */
-static u_int64_t        audit_sdev_drops;       /* Global record drop count. */
+  
+                                    
+   
+static int              audit_sdev_count;                                     
+static u_int64_t        audit_sdev_ever;                                   
+static u_int64_t        audit_sdev_records;                              
+static u_int64_t        audit_sdev_drops;                                      
 
 static int audit_sdev_init(void);
 
@@ -370,7 +370,7 @@ static int audit_sdev_init(void);
 #define AUDIT_SENTRY_RUNLOCK()          rw_runlock(&se_entry_lck)
 #define AUDIT_SENTRY_WUNLOCK()          rw_wunlock(&se_entry_lck)
 
-/* Access control on the auditinfo_addr.ai_flags member. */
+                                                           
 static uint64_t audit_session_superuser_set_sflags_mask;
 static uint64_t audit_session_superuser_clear_sflags_mask;
 static uint64_t audit_session_member_set_sflags_mask;
@@ -394,24 +394,24 @@ extern int set_security_token_task_internal(proc_t p, void *task);
 
 #define AUDIT_SESSION_DEBUG     0
 #if     AUDIT_SESSION_DEBUG
-/*
- * The following is debugging code that can be used to get a snapshot of the
- * session state.  The audit session information is read out using sysctl:
- *
- * error = sysctlbyname("kern.audit_session_debug", buffer_ptr, &buffer_len,
- *              NULL, 0);
- */
+  
+                                                                            
+                                                                          
+  
+                                                                            
+                         
+   
 #include <kern/kalloc.h>
 
-/*
- * The per session record structure for the snapshot data.
- */
+  
+                                                          
+   
 struct au_sentry_debug {
 	auditinfo_addr_t        se_auinfo;
-	int64_t                 se_refcnt;      /* refereence count */
-	int64_t                 se_procnt;      /* process count */
-	int64_t                 se_ptcnt;       /* process count from
-	                                         *  proc table */
+	int64_t                 se_refcnt;                            
+	int64_t                 se_procnt;                         
+	int64_t                 se_ptcnt;                            
+                                                          
 };
 typedef struct au_sentry_debug au_sentry_debug_t;
 
@@ -422,12 +422,12 @@ SYSCTL_PROC(_kern, OID_AUTO, audit_session_debug, CTLFLAG_RD | CTLFLAG_LOCKED,
     NULL, 0, audit_sysctl_session_debug, "S,audit_session_debug",
     "Current session debug info for auditing.");
 
-/*
- * Callouts for proc_interate() which is used to reconcile the audit session
- * proc state information with the proc table.  We get everything we need
- * in the filterfn while the proc_lock() is held so we really don't need the
- * callout() function.
- */
+  
+                                                                            
+                                                                         
+                                                                            
+                      
+   
 static int
 audit_session_debug_callout(__unused proc_t p, __unused void *arg)
 {
@@ -449,7 +449,7 @@ audit_session_debug_filterfn(proc_t p, void *st)
 			if (aia_p->ai_asid == sdtp->se_asid) {
 				sdtp->se_ptcnt++;
 
-				/* Do some santy checks. */
+				                           
 				se = AU_SENTRY_PTR(aia_p);
 				if (se->se_refcnt != sdtp->se_refcnt) {
 					sdtp->se_refcnt =
@@ -464,17 +464,17 @@ audit_session_debug_filterfn(proc_t p, void *st)
 			sdtp++;
 		} while (sdtp->se_asid != 0 && sdtp->se_auid != 0);
 	} else {
-		/* add it to the default sesison */
+		                                   
 		sed_tab->se_ptcnt++;
 	}
 
 	return 0;
 }
 
-/*
- * Copy out the session debug info via the sysctl interface.
- *
- */
+  
+                                                            
+  
+   
 static int
 audit_sysctl_session_debug(__unused struct sysctl_oid *oidp,
     __unused void *arg1, __unused int arg2, struct sysctl_req *req)
@@ -485,16 +485,16 @@ audit_sysctl_session_debug(__unused struct sysctl_oid *oidp,
 	size_t sz;
 	int err = 0;
 
-	/*
-	 * This provides a read-only node.
-	 */
+	  
+                                   
+    
 	if (req->newptr != USER_ADDR_NULL) {
 		return EPERM;
 	}
 
-	/*
-	 * Walk the audit session hash table to determine the size.
-	 */
+	  
+                                                            
+    
 	AUDIT_SENTRY_RLOCK();
 	for (i = 0; i < HASH_TABLE_SIZE; i++) {
 		LIST_FOREACH(se, &au_sentry_bucket[i], se_link)
@@ -503,29 +503,29 @@ audit_sysctl_session_debug(__unused struct sysctl_oid *oidp,
 		}
 	}
 
-	entry_cnt++;  /* add one for the default entry */
-	/*
-	 * If just querying then return the space required.  There is an
-	 * obvious race condition here so we just fudge this by 3 in case
-	 * the audit session table grows.
-	 */
+	entry_cnt++;                                     
+	  
+                                                                 
+                                                                  
+                                  
+    
 	if (req->oldptr == USER_ADDR_NULL) {
 		req->oldidx = (entry_cnt + 3) * sizeof(au_sentry_debug_t);
 		AUDIT_SENTRY_RUNLOCK();
 		return 0;
 	}
 
-	/*
-	 * Alloc a temporary buffer.
-	 */
+	  
+                             
+    
 	if (req->oldlen < (entry_cnt * sizeof(au_sentry_debug_t))) {
 		AUDIT_SENTRY_RUNLOCK();
 		return ENOMEM;
 	}
-	/*
-	 * We hold the lock over the alloc since we don't want the table to
-	 * grow on us.   Therefore, use the non-blocking version of kalloc().
-	 */
+	  
+                                                                    
+                                                                      
+    
 	sed_tab = (au_sentry_debug_t *)kheap_alloc(KHEAP_TEMP,
 	    entry_cnt * sizeof(au_sentry_debug_t), Z_NOWAIT | Z_ZERO);
 	if (sed_tab == NULL) {
@@ -533,12 +533,12 @@ audit_sysctl_session_debug(__unused struct sysctl_oid *oidp,
 		return ENOMEM;
 	}
 
-	/*
-	 * Walk the audit session hash table and build the record array.
-	 */
+	  
+                                                                 
+    
 	sz = 0;
 	next_sed = sed_tab;
-	/* add the first entry for processes not tracked in sessions. */
+	                                                                
 	bcopy(audit_default_aia_p, &next_sed->se_auinfo, sizeof(au_sentry_t));
 	next_sed->se_refcnt = (int64_t)audit_default_se.se_refcnt;
 	next_sed->se_procnt = (int64_t)audit_default_se.se_procnt;
@@ -557,7 +557,7 @@ audit_sysctl_session_debug(__unused struct sysctl_oid *oidp,
 	}
 	AUDIT_SENTRY_RUNLOCK();
 
-	/* Reconcile with the process table. */
+	                                       
 	proc_iterate(PROC_ALLPROCLIST | PROC_ZOMBPROCLIST,
 	    audit_session_debug_callout, NULL,
 	    audit_session_debug_filterfn, (void *)&sed_tab[0]);
@@ -570,12 +570,12 @@ audit_sysctl_session_debug(__unused struct sysctl_oid *oidp,
 	return err;
 }
 
-#endif /* AUDIT_SESSION_DEBUG */
+#endif                          
 
-/*
- * Create and commit a session audit event. The proc and se arguments needs to
- * be that of the subject and not necessarily the current process.
- */
+  
+                                                                              
+                                                                  
+   
 static void
 audit_session_event(int event, auditinfo_addr_t *aia_p)
 {
@@ -589,27 +589,27 @@ audit_session_event(int event, auditinfo_addr_t *aia_p)
 		return;
 	}
 
-	/*
-	 * Create a new audit record.  The record will contain the subject
-	 * ruid, rgid, egid, pid, auid, asid, amask, and term_addr
-	 * (implicitly added by audit_new).
-	 */
-	ar = audit_new(event, PROC_NULL, /* Not used */ NULL);
+	  
+                                                                   
+                                                           
+                                    
+    
+	ar = audit_new(event, PROC_NULL,                NULL);
 	if (NULL == ar) {
 		return;
 	}
 
-	/*
-	 * Audit session events are always generated because they are used
-	 * by some userland consumers so just set the preselect flag.
-	 */
+	  
+                                                                   
+                                                              
+    
 	ar->k_ar_commit |= AR_PRESELECT_FILTER;
 
-	/*
-	 * Populate the subject information.  Note that the ruid, rgid,
-	 * egid, and pid values are incorrect. We only need the  auditinfo_addr
-	 * information.
-	 */
+	  
+                                                                
+                                                                        
+                
+    
 	ar->k_ar.ar_subj_ruid = 0;
 	ar->k_ar.ar_subj_rgid = 0;
 	ar->k_ar.ar_subj_egid = 0;
@@ -619,23 +619,23 @@ audit_session_event(int event, auditinfo_addr_t *aia_p)
 	bcopy(&aia_p->ai_termid, &ar->k_ar.ar_subj_term_addr,
 	    sizeof(struct au_tid_addr));
 
-	/* Add the audit masks to the record. */
+	                                        
 	ar->k_ar.ar_arg_amask.am_success = aia_p->ai_mask.am_success;
 	ar->k_ar.ar_arg_amask.am_failure = aia_p->ai_mask.am_failure;
 	ARG_SET_VALID(ar, ARG_AMASK);
 
-	/* Add the audit session flags to the record. */
+	                                                
 	ar->k_ar.ar_arg_value64 = aia_p->ai_flags;
 	ARG_SET_VALID(ar, ARG_VALUE64);
 
 
-	/* Commit the record to the queue. */
+	                                     
 	audit_commit(ar, 0, 0);
 }
 
-/*
- * Hash the audit session ID using a simple 32-bit mix.
- */
+  
+                                                       
+   
 static inline uint32_t
 audit_session_hash(au_asid_t asid)
 {
@@ -649,11 +649,11 @@ audit_session_hash(au_asid_t asid)
 	return a;
 }
 
-/*
- * Do an hash lookup and find the session entry for a given ASID.  Return NULL
- * if not found. If the session is found then audit_session_find takes a
- * reference.
- */
+  
+                                                                              
+                                                                        
+             
+   
 static au_sentry_t *
 audit_session_find(au_asid_t asid)
 {
@@ -673,9 +673,9 @@ audit_session_find(au_asid_t asid)
 	return NULL;
 }
 
-/*
- * Remove the given audit_session entry from the hash table.
- */
+  
+                                                            
+   
 static void
 audit_session_remove(au_sentry_t *se)
 {
@@ -690,9 +690,9 @@ audit_session_remove(au_sentry_t *se)
 	hkey = HASH_ASID(se->se_asid);
 
 	AUDIT_SENTRY_WLOCK();
-	/*
-	 * Check and see if someone got a reference before we got the lock.
-	 */
+	  
+                                                                    
+    
 	if (se->se_refcnt != 0) {
 		AUDIT_SENTRY_WUNLOCK();
 		return;
@@ -701,10 +701,10 @@ audit_session_remove(au_sentry_t *se)
 	audit_session_portdestroy(&se->se_port);
 	LIST_FOREACH_SAFE(found_se, &au_sentry_bucket[hkey], se_link, tmp_se) {
 		if (found_se == se) {
-			/*
-			 * Generate an audit event to notify userland of the
-			 * session close.
-			 */
+			  
+                                                       
+                    
+      
 			audit_session_event(AUE_SESSION_CLOSE,
 			    &found_se->se_auinfo);
 
@@ -718,9 +718,9 @@ audit_session_remove(au_sentry_t *se)
 	AUDIT_SENTRY_WUNLOCK();
 }
 
-/*
- * Reference the session by incrementing the sentry ref count.
- */
+  
+                                                              
+   
 static void
 audit_ref_session(au_sentry_t *se)
 {
@@ -737,9 +737,9 @@ audit_ref_session(au_sentry_t *se)
 	    ("audit_ref_session: Too many references on session."));
 }
 
-/*
- * Decrement the sentry ref count and remove the session entry if last one.
- */
+  
+                                                                           
+   
 static void
 audit_unref_session(au_sentry_t *se)
 {
@@ -759,9 +759,9 @@ audit_unref_session(au_sentry_t *se)
 	    ("audit_unref_session: Too few references on session."));
 }
 
-/*
- * Increment the process count in the session.
- */
+  
+                                              
+   
 static void
 audit_inc_procount(au_sentry_t *se)
 {
@@ -776,10 +776,10 @@ audit_inc_procount(au_sentry_t *se)
 	    ("audit_inc_procount: proc count > PID_MAX"));
 }
 
-/*
- * Decrement the process count and add a knote if it is the last process
- * to exit the session.
- */
+  
+                                                                        
+                       
+   
 static void
 audit_dec_procount(au_sentry_t *se)
 {
@@ -790,10 +790,10 @@ audit_dec_procount(au_sentry_t *se)
 	}
 
 	old_val = OSAddAtomicLong(-1, &se->se_procnt);
-	/*
-	 * If this was the last process generate an audit event to notify
-	 * userland of the session ending.
-	 */
+	  
+                                                                  
+                                   
+    
 	if (old_val == 1) {
 		audit_session_event(AUE_SESSION_END, &se->se_auinfo);
 	}
@@ -801,12 +801,12 @@ audit_dec_procount(au_sentry_t *se)
 	    ("audit_dec_procount: proc count < 0"));
 }
 
-/*
- * Update the session entry and check to see if anything was updated.
- * Returns:
- *    0    Nothing was updated (We don't care about process preselection masks)
- *    1    Something was updated.
- */
+  
+                                                                     
+           
+                                                                               
+                                 
+   
 static int
 audit_update_sentry(au_sentry_t *se, auditinfo_addr_t *new_aia)
 {
@@ -828,10 +828,10 @@ audit_update_sentry(au_sentry_t *se, auditinfo_addr_t *new_aia)
 	return update;
 }
 
-/*
- * Return the next session ID.  The range of kernel generated audit session IDs
- * is ASSIGNED_ASID_MIN to ASSIGNED_ASID_MAX.
- */
+  
+                                                                               
+                                             
+   
 static uint32_t
 audit_session_nextid(void)
 {
@@ -846,12 +846,12 @@ audit_session_nextid(void)
 	return next_asid++;
 }
 
-/*
- * Allocated a new audit_session entry and add it to the hash table.  If the
- * given ASID is set to AU_ASSIGN_ASID then audit_session_new() will pick an
- * audit session ID.  Otherwise, it attempts use the one given. It creates a
- * reference to the entry that must be unref'ed.
- */
+  
+                                                                            
+                                                                            
+                                                                            
+                                                
+   
 static auditinfo_addr_t *
 audit_session_new(auditinfo_addr_t *new_aia_p, auditinfo_addr_t *old_aia_p)
 {
@@ -864,24 +864,24 @@ audit_session_new(auditinfo_addr_t *new_aia_p, auditinfo_addr_t *old_aia_p)
 
 	new_asid = new_aia_p->ai_asid;
 
-	/*
-	 * Alloc a new session entry now so we don't wait holding the lock.
-	 */
+	  
+                                                                    
+    
 	se = malloc(sizeof(au_sentry_t), M_AU_SESSION, M_WAITOK | M_ZERO);
 
-	/*
-	 * Find an unique session ID, if desired.
-	 */
+	  
+                                          
+    
 	AUDIT_SENTRY_WLOCK();
 	if (new_asid == AU_ASSIGN_ASID) {
 		do {
 			new_asid = (au_asid_t)audit_session_nextid();
 			found_se = audit_session_find(new_asid);
 
-			/*
-			 * If the session ID is currently active then drop the
-			 * reference and try again.
-			 */
+			  
+                                                         
+                              
+      
 			if (found_se != NULL) {
 				audit_unref_session(found_se);
 			} else {
@@ -889,10 +889,10 @@ audit_session_new(auditinfo_addr_t *new_aia_p, auditinfo_addr_t *old_aia_p)
 			}
 		} while (1);
 	} else {
-		/*
-		 * Check to see if the requested ASID is already in the
-		 * hash table.  If so, update it with the new auditinfo.
-		 */
+		  
+                                                         
+                                                          
+     
 		if ((found_se = audit_session_find(new_asid)) != NULL) {
 			int updated;
 
@@ -901,15 +901,15 @@ audit_session_new(auditinfo_addr_t *new_aia_p, auditinfo_addr_t *old_aia_p)
 			AUDIT_SENTRY_WUNLOCK();
 			free(se, M_AU_SESSION);
 
-			/* If a different session then add this process in. */
+			                                                      
 			if (new_aia_p != old_aia_p) {
 				audit_inc_procount(found_se);
 			}
 
-			/*
-			 * If the session information was updated then
-			 * generate an audit event to notify userland.
-			 */
+			  
+                                                 
+                                                 
+      
 			if (updated) {
 				audit_session_event(AUE_SESSION_UPDATE,
 				    &found_se->se_auinfo);
@@ -919,16 +919,16 @@ audit_session_new(auditinfo_addr_t *new_aia_p, auditinfo_addr_t *old_aia_p)
 		}
 	}
 
-	/*
-	 * Start the reference and proc count at 1 to account for the process
-	 * that invoked this via setaudit_addr() (or friends).
-	 */
+	  
+                                                                      
+                                                       
+    
 	se->se_refcnt = se->se_procnt = 1;
 
-	/*
-	 * Populate the new session entry.  Note that process masks are stored
-	 * in kauth ucred so just zero them here.
-	 */
+	  
+                                                                       
+                                          
+    
 	se->se_port = IPC_PORT_NULL;
 	aia = &se->se_auinfo;
 	aia->ai_asid = new_asid;
@@ -937,24 +937,24 @@ audit_session_new(auditinfo_addr_t *new_aia_p, auditinfo_addr_t *old_aia_p)
 	bcopy(&new_aia_p->ai_termid, &aia->ai_termid, sizeof(aia->ai_termid));
 	aia->ai_flags = new_aia_p->ai_flags;
 
-	/*
-	 * Add it to the hash table.
-	 */
+	  
+                             
+    
 	LIST_INSERT_HEAD(&au_sentry_bucket[HASH_ASID(new_asid)], se, se_link);
 	AUDIT_SENTRY_WUNLOCK();
 
-	/*
-	 * Generate an audit event to notify userland of the new session.
-	 */
+	  
+                                                                  
+    
 	audit_session_event(AUE_SESSION_START, aia);
 	au_history_record(se, AU_HISTORY_EVENT_BIRTH);
 	return aia;
 }
 
-/*
- * Lookup an existing session.  A copy of the audit session info for a given
- * ASID is returned in ret_aia.  Returns 0 on success.
- */
+  
+                                                                            
+                                                      
+   
 int
 audit_session_lookup(au_asid_t asid, auditinfo_addr_t *ret_aia)
 {
@@ -968,7 +968,7 @@ audit_session_lookup(au_asid_t asid, auditinfo_addr_t *ret_aia)
 		AUDIT_SENTRY_RUNLOCK();
 		return 1;
 	}
-	/* We have a reference on the session so it is safe to drop the lock. */
+	                                                                        
 	AUDIT_SENTRY_RUNLOCK();
 	if (ret_aia != NULL) {
 		bcopy(&se->se_auinfo, ret_aia, sizeof(*ret_aia));
@@ -984,9 +984,9 @@ audit_session_aiaref(auditinfo_addr_t *aia_p)
 	audit_ref_session(AU_SENTRY_PTR(aia_p));
 }
 
-/*
- * Add a reference to the session entry.
- */
+  
+                                        
+   
 void
 audit_session_ref(kauth_cred_t cred)
 {
@@ -1005,9 +1005,9 @@ audit_session_aiaunref(auditinfo_addr_t *aia_p)
 	audit_unref_session(AU_SENTRY_PTR(aia_p));
 }
 
-/*
- * Remove a reference to the session entry.
- */
+  
+                                           
+   
 void
 audit_session_unref(kauth_cred_t cred)
 {
@@ -1020,10 +1020,10 @@ audit_session_unref(kauth_cred_t cred)
 	audit_session_aiaunref(aia_p);
 }
 
-/*
- * Increment the per audit session process count.  Assumes that the caller has
- * a reference on the process' cred.
- */
+  
+                                                                              
+                                    
+   
 void
 audit_session_procnew(proc_t p)
 {
@@ -1038,10 +1038,10 @@ audit_session_procnew(proc_t p)
 	audit_inc_procount(AU_SENTRY_PTR(aia_p));
 }
 
-/*
- * Decrement the per audit session process count.  Assumes that the caller has
- * a reference on the cred.
- */
+  
+                                                                              
+                           
+   
 void
 audit_session_procexit(proc_t p)
 {
@@ -1056,9 +1056,9 @@ audit_session_procexit(proc_t p)
 	audit_dec_procount(AU_SENTRY_PTR(aia_p));
 }
 
-/*
- * Init the audit session code.
- */
+  
+                               
+   
 void
 audit_session_init(void)
 {
@@ -1089,12 +1089,12 @@ audit_session_update_check(kauth_cred_t cred, auditinfo_addr_t *old,
 {
 	uint64_t n;
 
-	/* If the current audit ID is not the default then it is immutable. */
+	                                                                      
 	if (old->ai_auid != AU_DEFAUDITID && old->ai_auid != new->ai_auid) {
 		return EINVAL;
 	}
 
-	/* If the current termid is not the default then it is immutable. */
+	                                                                    
 	if ((old->ai_termid.at_type != AU_IPv4 ||
 	    old->ai_termid.at_port != 0 ||
 	    old->ai_termid.at_addr[0] != 0) &&
@@ -1105,9 +1105,9 @@ audit_session_update_check(kauth_cred_t cred, auditinfo_addr_t *old,
 		return EINVAL;
 	}
 
-	/* The flags may be set only according to the
-	 * audit_session_*_set_sflags_masks.
-	 */
+	                                             
+                                     
+    
 	n = ~old->ai_flags & new->ai_flags;
 	if (0 != n &&
 	    !((n == (audit_session_superuser_set_sflags_mask & n) &&
@@ -1117,9 +1117,9 @@ audit_session_update_check(kauth_cred_t cred, auditinfo_addr_t *old,
 		return EINVAL;
 	}
 
-	/* The flags may be cleared only according to the
-	 * audit_session_*_clear_sflags_masks.
-	 */
+	                                                 
+                                       
+    
 	n = ~new->ai_flags & old->ai_flags;
 	if (0 != n &&
 	    !((n == (audit_session_superuser_clear_sflags_mask & n) &&
@@ -1129,13 +1129,13 @@ audit_session_update_check(kauth_cred_t cred, auditinfo_addr_t *old,
 		return EINVAL;
 	}
 
-	/* The audit masks are mutable. */
+	                                  
 	return 0;
 }
 
-/*
- * Safely update kauth cred of the given process with new the given audit info.
- */
+  
+                                                                               
+   
 int
 audit_session_setaia(proc_t p, auditinfo_addr_t *new_aia_p)
 {
@@ -1145,10 +1145,10 @@ audit_session_setaia(proc_t p, auditinfo_addr_t *new_aia_p)
 	auditinfo_addr_t caia, *old_aia_p;
 	int ret;
 
-	/*
-	 * If this is going to modify an existing session then do some
-	 * immutable checks.
-	 */
+	  
+                                                               
+                     
+    
 	if (audit_session_lookup(new_aia_p->ai_asid, &caia) == 0) {
 		my_cred = kauth_cred_proc_ref(p);
 		ret = audit_session_update_check(my_cred, &caia, new_aia_p);
@@ -1161,84 +1161,84 @@ audit_session_setaia(proc_t p, auditinfo_addr_t *new_aia_p)
 	my_cred = kauth_cred_proc_ref(p);
 	bcopy(&new_aia_p->ai_mask, &as.as_mask, sizeof(as.as_mask));
 	old_aia_p = my_cred->cr_audit.as_aia_p;
-	/* audit_session_new() adds a reference on the session */
+	                                                         
 	as.as_aia_p = audit_session_new(new_aia_p, old_aia_p);
 
-	/* If the process left a session then update the process count. */
+	                                                                  
 	if (old_aia_p != new_aia_p) {
 		audit_dec_procount(AU_SENTRY_PTR(old_aia_p));
 	}
 
 
-	/*
-	 * We are modifying the audit info in a credential so we need a new
-	 * credential (or take another reference on an existing credential that
-	 * matches our new one).  We must do this because the audit info in the
-	 * credential is used as part of our hash key.	Get current credential
-	 * in the target process and take a reference while we muck with it.
-	 */
+	  
+                                                                    
+                                                                        
+                                                                        
+                                                                      
+                                                                     
+    
 	for (;;) {
-		/*
-		 * Set the credential with new info.  If there is no change,
-		 * we get back the same credential we passed in; if there is
-		 * a change, we drop the reference on the credential we
-		 * passed in.  The subsequent compare is safe, because it is
-		 * a pointer compare rather than a contents compare.
-		 */
+		  
+                                                              
+                                                              
+                                                         
+                                                              
+                                                      
+     
 		bcopy(&as, &tmp_as, sizeof(tmp_as));
 		my_new_cred = kauth_cred_setauditinfo(my_cred, &tmp_as);
 
 		if (my_cred != my_new_cred) {
 			proc_ucred_lock(p);
-			/* Need to protect for a race where another thread also
-			 * changed the credential after we took our reference.
-			 * If p_ucred has changed then we should restart this
-			 * again with the new cred.
-			 */
+			                                                       
+                                                         
+                                                        
+                              
+      
 			if (p->p_ucred != my_cred) {
 				proc_ucred_unlock(p);
 				audit_session_unref(my_new_cred);
 				kauth_cred_unref(&my_new_cred);
-				/* try again */
+				               
 				my_cred = kauth_cred_proc_ref(p);
 				continue;
 			}
 			p->p_ucred = my_new_cred;
-			/* update cred on proc */
+			                         
 			PROC_UPDATE_CREDS_ONPROC(p);
 			proc_ucred_unlock(p);
 		}
-		/*
-		 * Drop old proc reference or our extra reference.
-		 */
+		  
+                                                    
+     
 		kauth_cred_unref(&my_cred);
 		break;
 	}
 
-	/* Drop the reference taken by audit_session_new() above. */
+	                                                            
 	audit_unref_session(AU_SENTRY_PTR(as.as_aia_p));
 
-	/* Propagate the change from the process to the Mach task. */
+	                                                             
 	set_security_token(p);
 
 	return 0;
 }
 
-/*
- * audit_session_self  (system call)
- *
- * Description: Obtain a Mach send right for the current session.
- *
- * Parameters:	p		Process calling audit_session_self().
- *
- * Returns:	*ret_port	Named Mach send right, which may be
- *                              MACH_PORT_NULL in the failure case.
- *
- * Errno:	0		Success
- *              EINVAL		The calling process' session has not be set.
- *              ESRCH		Bad process, can't get valid cred for process.
- *              ENOMEM		Port allocation failed due to no free memory.
- */
+  
+                                    
+  
+                                                                 
+  
+                                                       
+  
+                                                         
+                                                                   
+  
+                    
+                                                                    
+                                                                     
+                                                                     
+   
 int
 audit_session_self(proc_t p, __unused struct audit_session_self_args *uap,
     mach_port_name_t *ret_port)
@@ -1257,26 +1257,26 @@ audit_session_self(proc_t p, __unused struct audit_session_self_args *uap,
 
 	aia_p = cred->cr_audit.as_aia_p;
 	if (!IS_VALID_SESSION(aia_p)) {
-		/* Can't join the default session. */
+		                                     
 		err = EINVAL;
 		goto done;
 	}
 
 	se = AU_SENTRY_PTR(aia_p);
 
-	/*
-	 * Processes that join using this mach port will inherit this process'
-	 * pre-selection masks.
-	 */
+	  
+                                                                       
+                        
+    
 	if (se->se_port == IPC_PORT_NULL) {
 		bcopy(&cred->cr_audit.as_mask, &se->se_mask,
 		    sizeof(se->se_mask));
 	}
 
-	/*
-	 * Get a send right to the session's Mach port and insert it in the
-	 * process' mach port namespace.
-	 */
+	  
+                                                                    
+                                 
+    
 	sendport = audit_session_mksend(aia_p, &se->se_port);
 	*ret_port = ipc_port_copyout_send(sendport, get_task_ipcspace(p->task));
 
@@ -1290,26 +1290,26 @@ done:
 	return err;
 }
 
-/*
- * audit_session_port  (system call)
- *
- * Description: Obtain a Mach send right for the given session ID.
- *
- * Parameters:	p		Process calling audit_session_port().
- *              uap->asid       The target audit session ID.  The special
- *                              value -1 can be used to target the process's
- *                              own session.
- *              uap->portnamep  User address at which to place port name.
- *
- * Returns:	0		Success
- *              EINVAL		The calling process' session has not be set.
- *              EINVAL		The given session ID could not be found.
- *              EINVAL		The Mach port right could not be copied out.
- *              ESRCH		Bad process, can't get valid cred for process.
- *              EPERM		Only the superuser can reference sessions other
- *                              than the process's own.
- *              ENOMEM		Port allocation failed due to no free memory.
- */
+  
+                                    
+  
+                                                                  
+  
+                                                       
+                                                                         
+                                                                            
+                                            
+                                                                         
+  
+                      
+                                                                    
+                                                                
+                                                                    
+                                                                     
+                                                                      
+                                                       
+                                                                     
+   
 int
 audit_session_port(proc_t p, struct audit_session_port_args *uap,
     __unused int *retval)
@@ -1321,9 +1321,9 @@ audit_session_port(proc_t p, struct audit_session_port_args *uap,
 	au_sentry_t *se = NULL;
 	int err = 0;
 
-	/* Note: Currently this test will never be true, because
-	 * ASSIGNED_ASID_MAX is effectively (uint32_t)-2.
-	 */
+	                                                        
+                                                  
+    
 	if (uap->asid != -1 && (uint32_t)uap->asid > ASSIGNED_ASID_MAX) {
 		err = EINVAL;
 		goto done;
@@ -1335,28 +1335,28 @@ audit_session_port(proc_t p, struct audit_session_port_args *uap,
 	}
 	aia_p = cred->cr_audit.as_aia_p;
 
-	/* Find the session corresponding to the requested audit
-	 * session ID.  If found, take a reference on it so that
-	 * the session is not dropped until the join is later done.
-	 */
+	                                                        
+                                                         
+                                                            
+    
 	if (uap->asid == (au_asid_t)-1 ||
 	    uap->asid == aia_p->ai_asid) {
 		if (!IS_VALID_SESSION(aia_p)) {
-			/* Can't join the default session. */
+			                                     
 			err = EINVAL;
 			goto done;
 		}
 
-		/* No privilege is required to obtain a port for our
-		 * own session.
-		 */
+		                                                    
+                 
+     
 		se = AU_SENTRY_PTR(aia_p);
 		audit_ref_session(se);
 	} else {
-		/*
-		 * Only privileged processes may obtain a port for
-		 * any existing session.
-		 */
+		  
+                                                    
+                          
+     
 		err = priv_check_cred(cred, PRIV_AUDIT_SESSION_PORT, 0);
 		if (err != 0) {
 			goto done;
@@ -1371,20 +1371,20 @@ audit_session_port(proc_t p, struct audit_session_port_args *uap,
 		aia_p = &se->se_auinfo;
 	}
 
-	/*
-	 * Processes that join using this mach port will inherit this process'
-	 * pre-selection masks.
-	 */
+	  
+                                                                       
+                        
+    
 	if (se->se_port == IPC_PORT_NULL) {
 		bcopy(&cred->cr_audit.as_mask, &se->se_mask,
 		    sizeof(se->se_mask));
 	}
 
-	/*
-	 * Use the session reference to create a mach port reference for the
-	 * session (at which point we are free to drop the session reference)
-	 * and then copy out the mach port to the process' mach port namespace.
-	 */
+	  
+                                                                     
+                                                                      
+                                                                        
+    
 	sendport = audit_session_mksend(aia_p, &se->se_port);
 	portname = ipc_port_copyout_send(sendport, get_task_ipcspace(p->task));
 	if (!MACH_PORT_VALID(portname)) {
@@ -1435,9 +1435,9 @@ audit_session_join_internal(proc_t p, task_t task, ipc_port_t port, au_asid_t *n
 	old_asid = old_aia_p->ai_asid;
 	*new_asid = new_aia_p->ai_asid;
 
-	/*
-	 * Add process in if not already in the session.
-	 */
+	  
+                                                 
+    
 	if (*new_asid != old_asid) {
 		kauth_cred_t my_new_cred;
 		struct au_session new_as;
@@ -1450,15 +1450,15 @@ audit_session_join_internal(proc_t p, task_t task, ipc_port_t port, au_asid_t *n
 		p->p_ucred = my_new_cred;
 		PROC_UPDATE_CREDS_ONPROC(p);
 
-		/* Increment the proc count of new session */
+		                                             
 		audit_inc_procount(AU_SENTRY_PTR(new_aia_p));
 
 		proc_ucred_unlock(p);
 
-		/* Propagate the change from the process to the Mach task. */
+		                                                             
 		set_security_token_task_internal(p, task);
 
-		/* Decrement the process count of the former session. */
+		                                                        
 		audit_dec_procount(AU_SENTRY_PTR(old_aia_p));
 	} else {
 		proc_ucred_unlock(p);
@@ -1473,15 +1473,15 @@ done:
 	return err;
 }
 
-/*
- * audit_session_spawnjoin
- *
- * Description: posix_spawn() interface to audit_session_join_internal().
- *
- * Returns:	0		Success
- *              EINVAL		Invalid Mach port name.
- *              ESRCH		Invalid calling process/cred.
- */
+  
+                          
+  
+                                                                         
+  
+                      
+                                               
+                                                    
+   
 int
 audit_session_spawnjoin(proc_t p, task_t task, ipc_port_t port)
 {
@@ -1490,23 +1490,23 @@ audit_session_spawnjoin(proc_t p, task_t task, ipc_port_t port)
 	return audit_session_join_internal(p, task, port, &new_asid);
 }
 
-/*
- * audit_session_join  (system call)
- *
- * Description:	Join the session for a given Mach port send right.
- *
- * Parameters:	p		Process calling session join.
- *              uap->port	A Mach send right.
- *
- * Returns:	*ret_asid	Audit session ID of new session.
- *				In the failure case the return value will be -1
- *				and 'errno' will be set to a non-zero value
- *				described below.
- *
- * Errno:	0		Success
- *              EINVAL		Invalid Mach port name.
- *              ESRCH		Invalid calling process/cred.
- */
+  
+                                    
+  
+                                                                  
+  
+                                               
+                                            
+  
+                                                      
+                                                     
+                                                 
+                      
+  
+                    
+                                               
+                                                    
+   
 int
 audit_session_join(proc_t p, struct audit_session_join_args *uap,
     au_asid_t *ret_asid)
@@ -1527,13 +1527,13 @@ audit_session_join(proc_t p, struct audit_session_join_args *uap,
 	return err;
 }
 
-/*
- * Audit session device.
- */
+  
+                        
+   
 
-/*
- * Free an audit sdev entry.
- */
+  
+                            
+   
 static void
 audit_sdev_entry_free(struct audit_sdev_entry *ase)
 {
@@ -1541,11 +1541,11 @@ audit_sdev_entry_free(struct audit_sdev_entry *ase)
 	free(ase, M_AUDIT_SDEV_ENTRY);
 }
 
-/*
- * Append individual record to a queue.  Allocate queue-local buffer and
- * add to the queue.  If the queue is full or we can't allocate memory,
- * drop the newest record.
- */
+  
+                                                                        
+                                                                       
+                          
+   
 static void
 audit_sdev_append(struct audit_sdev *asdev, void *record, u_int record_len)
 {
@@ -1589,19 +1589,19 @@ audit_sdev_append(struct audit_sdev *asdev, void *record, u_int record_len)
 	cv_broadcast(&asdev->asdev_cv);
 }
 
-/*
- * Submit an audit record to be queued in the audit session device.
- */
+  
+                                                                   
+   
 void
 audit_sdev_submit(__unused au_id_t auid, __unused au_asid_t asid, void *record,
     u_int record_len)
 {
 	struct audit_sdev *asdev;
 
-	/*
-	 * Lockless read to avoid lock overhead if sessio devices are not in
-	 * use.
-	 */
+	  
+                                                                     
+        
+    
 	if (NULL == TAILQ_FIRST(&audit_sdev_list)) {
 		return;
 	}
@@ -1610,12 +1610,12 @@ audit_sdev_submit(__unused au_id_t auid, __unused au_asid_t asid, void *record,
 	TAILQ_FOREACH(asdev, &audit_sdev_list, asdev_list) {
 		AUDIT_SDEV_LOCK(asdev);
 
-		/*
-		 * Only append to the sdev queue if the AUID and ASID match that
-		 * of the process that opened this session device or if the
-		 * ALLSESSIONS flag is set.
-		 */
-		if ((/* XXXss auid == asdev->asdev_auid && */
+		  
+                                                                  
+                                                             
+                             
+     
+		if ((                                        
 			    asid == asdev->asdev_asid) ||
 		    (asdev->asdev_flags & AUDIT_SDEV_ALLSESSIONS) != 0) {
 			audit_sdev_append(asdev, record, record_len);
@@ -1624,14 +1624,14 @@ audit_sdev_submit(__unused au_id_t auid, __unused au_asid_t asid, void *record,
 	}
 	AUDIT_SDEV_LIST_RUNLOCK();
 
-	/* Unlocked increment. */
+	                         
 	audit_sdev_records++;
 }
 
-/*
- * Allocate a new audit sdev.  Connects the sdev, on succes, to the global
- * list and updates statistics.
- */
+  
+                                                                          
+                               
+   
 static struct audit_sdev *
 audit_sdev_alloc(void)
 {
@@ -1650,9 +1650,9 @@ audit_sdev_alloc(void)
 	AUDIT_SDEV_SX_LOCK_INIT(asdev);
 	cv_init(&asdev->asdev_cv, "audit_sdev_cv");
 
-	/*
-	 * Add to global list and update global statistics.
-	 */
+	  
+                                                    
+    
 	TAILQ_INSERT_HEAD(&audit_sdev_list, asdev, asdev_list);
 	audit_sdev_count++;
 	audit_sdev_ever++;
@@ -1660,9 +1660,9 @@ audit_sdev_alloc(void)
 	return asdev;
 }
 
-/*
- * Flush all records currently present in an audit sdev.
- */
+  
+                                                        
+   
 static void
 audit_sdev_flush(struct audit_sdev *asdev)
 {
@@ -1683,16 +1683,16 @@ audit_sdev_flush(struct audit_sdev *asdev)
 	    ("audit_sdev_flush: asdev_qbyteslen"));
 }
 
-/*
- * Free an audit sdev.
- */
+  
+                      
+   
 static void
 audit_sdev_free(struct audit_sdev *asdev)
 {
 	AUDIT_SDEV_LIST_WLOCK_ASSERT();
 	AUDIT_SDEV_LOCK_ASSERT(asdev);
 
-	/* XXXss - preselect hook here */
+	                                 
 	audit_sdev_flush(asdev);
 	cv_destroy(&asdev->asdev_cv);
 	AUDIT_SDEV_SX_LOCK_DESTROY(asdev);
@@ -1704,10 +1704,10 @@ audit_sdev_free(struct audit_sdev *asdev)
 	audit_sdev_count--;
 }
 
-/*
- * Get the auditinfo_addr of the proc and check to see if suser.  Will return
- * non-zero if not suser.
- */
+  
+                                                                             
+                         
+   
 static int
 audit_sdev_get_aia(proc_t p, struct auditinfo_addr *aia_p)
 {
@@ -1725,9 +1725,9 @@ audit_sdev_get_aia(proc_t p, struct auditinfo_addr *aia_p)
 	return error;
 }
 
-/*
- * Audit session dev open method.
- */
+  
+                                 
+   
 static int
 audit_sdev_open(dev_t dev, __unused int flags, __unused int devtype, proc_t p)
 {
@@ -1766,9 +1766,9 @@ audit_sdev_open(dev_t dev, __unused int flags, __unused int devtype, proc_t p)
 	return 0;
 }
 
-/*
- * Audit session dev close method.
- */
+  
+                                  
+   
 static int
 audit_sdev_close(dev_t dev, __unused int flags, __unused int devtype,
     __unused proc_t p)
@@ -1785,16 +1785,16 @@ audit_sdev_close(dev_t dev, __unused int flags, __unused int devtype,
 	AUDIT_SDEV_LIST_WLOCK();
 	AUDIT_SDEV_LOCK(asdev);
 	asdev->asdev_open = 0;
-	audit_sdev_free(asdev);  /* sdev lock unlocked in audit_sdev_free() */
+	audit_sdev_free(asdev);                                               
 	audit_sdev_dtab[u] = NULL;
 	AUDIT_SDEV_LIST_WUNLOCK();
 
 	return 0;
 }
 
-/*
- * Audit session dev ioctl method.
- */
+  
+                                  
+   
 static int
 audit_sdev_ioctl(dev_t dev, u_long cmd, caddr_t data,
     __unused int flag, proc_t p)
@@ -1863,7 +1863,7 @@ audit_sdev_ioctl(dev_t dev, u_long cmd, caddr_t data,
 		*(u_int *)data = MAXAUDITDATA;
 		break;
 
-	/* XXXss these should be 64 bit, maybe. */
+	                                          
 	case AUDITSDEV_GET_INSERTS:
 		*(u_int *)data = asdev->asdev_inserts;
 		break;
@@ -1907,9 +1907,9 @@ audit_sdev_ioctl(dev_t dev, u_long cmd, caddr_t data,
 	return error;
 }
 
-/*
- * Audit session dev read method.
- */
+  
+                                 
+   
 static int
 audit_sdev_read(dev_t dev, struct uio *uio, __unused int flag)
 {
@@ -1921,10 +1921,10 @@ audit_sdev_read(dev_t dev, struct uio *uio, __unused int flag)
 	asdev = audit_sdev_dtab[minor(dev)];
 	KASSERT(NULL != asdev, ("audit_sdev_read: asdev == NULL"));
 
-	/*
-	 * We hold a sleep lock over read and flush because we rely on the
-	 * stability of a record in the queue during uiomove.
-	 */
+	  
+                                                                   
+                                                      
+    
 	if (0 != AUDIT_SDEV_SX_XLOCK_SIG(asdev)) {
 		return EINTR;
 	}
@@ -1943,13 +1943,13 @@ audit_sdev_read(dev_t dev, struct uio *uio, __unused int flag)
 		}
 	}
 
-	/*
-	 * Copy as many remaining bytes from the current record to userspace
-	 * as we can. Keep processing records until we run out of records in
-	 * the queue or until the user buffer runs out of space.
-	 *
-	 * We rely on the sleep lock to maintain ase's stability here.
-	 */
+	  
+                                                                     
+                                                                     
+                                                         
+   
+                                                               
+    
 	asdev->asdev_reads++;
 	while ((ase = TAILQ_FIRST(&asdev->asdev_queue)) != NULL &&
 	    uio_resid(uio) > 0) {
@@ -1967,10 +1967,10 @@ audit_sdev_read(dev_t dev, struct uio *uio, __unused int flag)
 			return error;
 		}
 
-		/*
-		 * If the copy succeeded then update book-keeping, and if no
-		 * bytes remain in the current record then free it.
-		 */
+		  
+                                                              
+                                                     
+     
 		AUDIT_SDEV_LOCK(asdev);
 		KASSERT(TAILQ_FIRST(&asdev->asdev_queue) == ase,
 		    ("audit_sdev_read: queue out of sync after uiomove"));
@@ -1990,9 +1990,9 @@ audit_sdev_read(dev_t dev, struct uio *uio, __unused int flag)
 	return 0;
 }
 
-/*
- * Audit session device poll method.
- */
+  
+                                    
+   
 static int
 audit_sdev_poll(dev_t dev, int events, void *wql, struct proc *p)
 {
@@ -2015,10 +2015,10 @@ audit_sdev_poll(dev_t dev, int events, void *wql, struct proc *p)
 	return revents;
 }
 
-/*
- * Audit sdev clone routine.  Provides a new minor number or returns -1.
- * This called with DEVFS_LOCK held.
- */
+  
+                                                                        
+                                    
+   
 static int
 audit_sdev_clone(__unused dev_t dev, int action)
 {
@@ -2031,11 +2031,11 @@ audit_sdev_clone(__unused dev_t dev, int action)
 			}
 		}
 
-		/*
-		 * This really should return -1 here but that seems to
-		 * hang things in devfs.  We instead return 0 and let
-		 * audit_sdev_open tell userland the bad news.
-		 */
+		  
+                                                        
+                                                       
+                                                
+     
 		return 0;
 	}
 
@@ -2066,17 +2066,17 @@ audit_sdev_init(void)
 	return KERN_SUCCESS;
 }
 
-/* XXXss
- *  static int
- *  audit_sdev_shutdown(void)
- *  {
- *
- *       devfs_remove(devnode);
- *       (void) cdevsw_remove(audit_sdev_major, &audit_sdev_cdevsw);
- *
- *       return (KERN_SUCCESS);
- *  }
- */
+        
+              
+                             
+     
+  
+                               
+                                                                    
+  
+                               
+     
+   
 
 #else
 
@@ -2106,4 +2106,4 @@ audit_session_port(proc_t p, struct audit_session_port_args *uap, int *retval)
 	return ENOSYS;
 }
 
-#endif /* CONFIG_AUDIT */
+#endif                   

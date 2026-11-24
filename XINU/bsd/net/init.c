@@ -51,7 +51,7 @@ net_init_add(
 		return EINVAL;
 	}
 
-	/* Check if we've already started */
+	                                    
 	if (list_head == LIST_RAN) {
 		return EALREADY;
 	}
@@ -69,7 +69,7 @@ net_init_add(
 		entry->next = list_head;
 
 		if (entry->next == LIST_RAN) {
-			/* List already ran, cleanup and call the function */
+			                                                     
 			kfree(entry, sizeof(*entry));
 			return EALREADY;
 		}
@@ -85,15 +85,15 @@ net_init_run(void)
 	struct init_list_entry  *forward_head = 0;
 	struct init_list_entry  *current = 0;
 
-	/*
-	 * Grab the list, replacing the head with 0xffffffff to indicate
-	 * that we've already run.
-	 */
+	  
+                                                                 
+                           
+    
 	do {
 		backward_head = list_head;
 	} while (!OSCompareAndSwapPtr(backward_head, LIST_RAN, &list_head));
 
-	/* Reverse the order of the list */
+	                                   
 	while (backward_head != 0) {
 		current = backward_head;
 		backward_head = current->next;
@@ -101,7 +101,7 @@ net_init_run(void)
 		forward_head = current;
 	}
 
-	/* Call each function pointer registered */
+	                                           
 	while (forward_head != 0) {
 		current = forward_head;
 		forward_head = current->next;

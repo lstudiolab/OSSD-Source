@@ -29,6 +29,6 @@
 
 #ifdef KERNEL_PRIVATE
 int bond_family_init(void);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* _NET_IF_BOND_INTERNAL_H_ */
+#endif                               

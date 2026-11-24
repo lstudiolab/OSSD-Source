@@ -53,12 +53,12 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- *	processor.c: processor and processor_set manipulation routines.
- */
+  
+                                                                  
+   
 
 #include <mach/boolean.h>
 #include <mach/policy.h>
@@ -79,7 +79,7 @@
 #include <kern/timer.h>
 #if KPERF
 #include <kperf/kperf.h>
-#endif /* KPERF */
+#endif            
 #include <ipc/ipc_port.h>
 
 #include <security/mac_mach_internal.h>
@@ -88,11 +88,11 @@
 
 #include <tests/xnupost.h>
 
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
-/*
- * Exported interface
- */
+  
+                     
+   
 #include <mach/mach_host_server.h>
 #include <mach/processor_set_server.h>
 
@@ -103,7 +103,7 @@ static SIMPLE_LOCK_DECLARE(pset_node_lock, 0);
 LCK_GRP_DECLARE(pset_lck_grp, "pset");
 
 queue_head_t            tasks;
-queue_head_t            terminated_tasks;       /* To be used ONLY for stackshot. */
+queue_head_t            terminated_tasks;                                           
 queue_head_t            corpse_tasks;
 int                     tasks_count;
 int                     terminated_tasks_count;
@@ -156,7 +156,7 @@ ipi_test()
 		arm64_ipi_test();
 	}
 
-	/* unbind thread from specific cpu */
+	                                     
 	thread_bind(PROCESSOR_NULL);
 	thread_block(THREAD_CONTINUE_NULL);
 
@@ -164,11 +164,11 @@ ipi_test()
 #else
 	T_PASS("Unsupported platform. Not running IPI tests");
 
-#endif /* __arm64__ */
+#endif                
 
 	return KERN_SUCCESS;
 }
-#endif /* defined(CONFIG_XNUPOST) */
+#endif                              
 
 int sched_enable_smt = 1;
 
@@ -187,11 +187,11 @@ processor_bootstrap(void)
 	processor_init(master_processor, master_cpu, &pset0);
 }
 
-/*
- *	Initialize the given processor for the cpu
- *	indicated by cpu_id, and assign to the
- *	specified processor set.
- */
+  
+                                             
+                                         
+                           
+   
 void
 processor_init(
 	processor_t            processor,
@@ -204,7 +204,7 @@ processor_init(
 	processor->cpu_id = cpu_id;
 
 	if (processor != master_processor) {
-		/* Scheduler state for master_processor initialized in sched_init() */
+		                                                                      
 		SCHED(processor_init)(processor);
 	}
 
@@ -217,7 +217,7 @@ processor_init(
 	processor->deadline = UINT64_MAX;
 	processor->first_timeslice = FALSE;
 	processor->processor_offlined = false;
-	processor->processor_primary = processor; /* no SMT relationship known at this point */
+	processor->processor_primary = processor;                                              
 	processor->processor_secondary = NULL;
 	processor->is_SMT = false;
 	processor->is_recommended = true;
@@ -270,18 +270,18 @@ processor_set_primary(
 	processor_t             primary)
 {
 	assert(processor->processor_primary == primary || processor->processor_primary == processor);
-	/* Re-adjust primary point for this (possibly) secondary processor */
+	                                                                     
 	processor->processor_primary = primary;
 
 	assert(primary->processor_secondary == NULL || primary->processor_secondary == processor);
 	if (primary != processor) {
-		/* Link primary to secondary, assumes a 2-way SMT model
-		 * We'll need to move to a queue if any future architecture
-		 * requires otherwise.
-		 */
+		                                                       
+                                                             
+                        
+     
 		assert(processor->processor_secondary == NULL);
 		primary->processor_secondary = processor;
-		/* Mark both processors as SMT siblings */
+		                                          
 		primary->is_SMT = TRUE;
 		processor->is_SMT = TRUE;
 
@@ -316,36 +316,36 @@ pset_type_for_id(uint32_t cluster_id)
 	return pset_array[cluster_id]->pset_type;
 }
 
-/*
- * Processor foreign threads
- *
- * With the Edge scheduler, each pset maintains a bitmap of processors running threads
- * which are foreign to the pset/cluster. A thread is defined as foreign for a cluster
- * if its of a different type than its preferred cluster type (E/P). The bitmap should
- * be updated every time a new thread is assigned to run on a processor.
- *
- * This bitmap allows the Edge scheduler to quickly find CPUs running foreign threads
- * for rebalancing.
- */
+  
+                            
+  
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                        
+  
+                                                                                     
+                   
+   
 static void
 processor_state_update_running_foreign(processor_t processor, thread_t thread)
 {
 	cluster_type_t current_processor_type = pset_type_for_id(processor->processor_set->pset_cluster_id);
 	cluster_type_t thread_type = pset_type_for_id(sched_edge_thread_preferred_cluster(thread));
 
-	/* Update the bitmap for the pset only for unbounded non-RT threads. */
+	                                                                       
 	if ((processor->current_pri < BASEPRI_RTQUEUES) && (thread->bound_processor == PROCESSOR_NULL) && (current_processor_type != thread_type)) {
 		bit_set(processor->processor_set->cpu_running_foreign, processor->cpu_id);
 	} else {
 		bit_clear(processor->processor_set->cpu_running_foreign, processor->cpu_id);
 	}
 }
-#else /* CONFIG_SCHED_EDGE */
+#else                        
 static void
 processor_state_update_running_foreign(__unused processor_t processor, __unused thread_t thread)
 {
 }
-#endif /* CONFIG_SCHED_EDGE */
+#endif                        
 
 void
 processor_state_update_idle(processor_t processor)
@@ -371,7 +371,7 @@ processor_state_update_from_thread(processor_t processor, thread_t thread)
 	processor->current_sfi_class = thread->sfi_class;
 	processor->current_recommended_pset_type = recommended_pset_type(thread);
 	processor_state_update_running_foreign(processor, thread);
-	/* Since idle and bound threads are not tracked by the edge scheduler, ignore when those threads go on-core */
+	                                                                                                              
 	sched_bucket_t bucket = ((thread->state & TH_IDLE) || (thread->bound_processor != PROCESSOR_NULL)) ? TH_BUCKET_SCHED_MAX : thread->th_sched_bucket;
 	os_atomic_store(&processor->processor_set->cpu_running_buckets[processor->cpu_id], bucket, relaxed);
 
@@ -407,7 +407,7 @@ processor_set_t
 pset_create(
 	pset_node_t                     node)
 {
-	/* some schedulers do not support multiple psets */
+	                                                   
 	if (SCHED(multiple_psets_enabled) == FALSE) {
 		return processor_pset(master_processor);
 	}
@@ -432,10 +432,10 @@ pset_create(
 	return pset;
 }
 
-/*
- *	Find processor set with specified cluster_id.
- *	Returns default_pset if not found.
- */
+  
+                                                
+                                     
+   
 processor_set_t
 pset_find(
 	uint32_t cluster_id,
@@ -463,11 +463,11 @@ pset_find(
 
 #if !defined(RC_HIDE_XNU_FIRESTORM) && (MAX_CPU_CLUSTERS > 2)
 
-/*
- * Find the first processor_set for the given pset_cluster_type.
- * Should be removed with rdar://57340304, as it's only
- * useful for the workaround described in rdar://57306691.
- */
+  
+                                                                
+                                                       
+                                                          
+   
 
 processor_set_t
 pset_find_first_by_cluster_type(
@@ -490,11 +490,11 @@ pset_find_first_by_cluster_type(
 	return pset;
 }
 
-#endif /* !defined(RC_HIDE_XNU_FIRESTORM) && (MAX_CPU_CLUSTERS > 2) */
+#endif                                                                
 
-/*
- *	Initialize the given processor_set structure.
- */
+  
+                                                
+   
 void
 pset_init(
 	processor_set_t         pset,
@@ -503,10 +503,10 @@ pset_init(
 	static uint32_t pset_count = 0;
 
 	if (pset != &pset0) {
-		/*
-		 * Scheduler runqueue initialization for non-boot psets.
-		 * This initialization for pset0 happens in sched_init().
-		 */
+		  
+                                                          
+                                                           
+     
 		SCHED(pset_init)(pset);
 		SCHED(rt_init)(pset);
 	}
@@ -516,7 +516,7 @@ pset_init(
 	bzero(&pset->pset_load_average, sizeof(pset->pset_load_average));
 #if CONFIG_SCHED_EDGE
 	bzero(&pset->pset_execution_time, sizeof(pset->pset_execution_time));
-#endif /* CONFIG_SCHED_EDGE */
+#endif                        
 	pset->cpu_set_low = pset->cpu_set_hi = 0;
 	pset->cpu_set_count = 0;
 	pset->last_chosen = -1;
@@ -541,15 +541,15 @@ pset_init(
 	pset->pset_list = PROCESSOR_SET_NULL;
 	pset->node = node;
 
-	/*
-	 * The pset_cluster_type & pset_cluster_id for all psets
-	 * on the platform are initialized as part of the SCHED(init).
-	 * That works well for small cluster platforms; for large cluster
-	 * count systems, it might be cleaner to do all the setup
-	 * dynamically in SCHED(pset_init).
-	 *
-	 * <Edge Multi-cluster Support Needed>
-	 */
+	  
+                                                         
+                                                               
+                                                                  
+                                                          
+                                    
+   
+                                       
+    
 	pset->is_SMT = false;
 
 	simple_lock(&pset_node_lock, LCK_GRP_NULL);
@@ -641,16 +641,16 @@ processor_info(
 		uint64_t        idle_time_snapshot1, idle_time_snapshot2;
 		uint64_t        idle_time_tstamp1, idle_time_tstamp2;
 
-		/*
-		 * We capture the accumulated idle time twice over
-		 * the course of this function, as well as the timestamps
-		 * when each were last updated. Since these are
-		 * all done using non-atomic racy mechanisms, the
-		 * most we can infer is whether values are stable.
-		 * timer_grab() is the only function that can be
-		 * used reliably on another processor's per-processor
-		 * data.
-		 */
+		  
+                                                    
+                                                           
+                                                 
+                                                   
+                                                    
+                                                  
+                                                       
+          
+     
 
 		if (*count < PROCESSOR_CPU_LOAD_INFO_COUNT) {
 			return KERN_FAILURE;
@@ -674,28 +674,28 @@ processor_info(
 		idle_time_snapshot1 = timer_grab(idle_state);
 		idle_time_tstamp1 = idle_state->tstamp;
 
-		/*
-		 * Idle processors are not continually updating their
-		 * per-processor idle timer, so it may be extremely
-		 * out of date, resulting in an over-representation
-		 * of non-idle time between two measurement
-		 * intervals by e.g. top(1). If we are non-idle, or
-		 * have evidence that the timer is being updated
-		 * concurrently, we consider its value up-to-date.
-		 */
+		  
+                                                       
+                                                     
+                                                     
+                                             
+                                                     
+                                                  
+                                                    
+     
 		if (processor->current_state != idle_state) {
 			cpu_load_info->cpu_ticks[CPU_STATE_IDLE] =
 			    (uint32_t)(idle_time_snapshot1 / hz_tick_interval);
 		} else if ((idle_time_snapshot1 != (idle_time_snapshot2 = timer_grab(idle_state))) ||
 		    (idle_time_tstamp1 != (idle_time_tstamp2 = idle_state->tstamp))) {
-			/* Idle timer is being updated concurrently, second stamp is good enough */
+			                                                                           
 			cpu_load_info->cpu_ticks[CPU_STATE_IDLE] =
 			    (uint32_t)(idle_time_snapshot2 / hz_tick_interval);
 		} else {
-			/*
-			 * Idle timer may be very stale. Fortunately we have established
-			 * that idle_time_snapshot1 and idle_time_tstamp1 are unchanging
-			 */
+			  
+                                                                   
+                                                                   
+      
 			idle_time_snapshot1 += mach_absolute_time() - idle_time_tstamp1;
 
 			cpu_load_info->cpu_ticks[CPU_STATE_IDLE] =
@@ -752,10 +752,10 @@ processor_start(
 		if (cpu_can_exit(processor->cpu_id)) {
 			return KERN_SUCCESS;
 		}
-		/*
-		 * This secondary SMT processor must start in order to service interrupts,
-		 * so instead it will be disabled at the scheduler level.
-		 */
+		  
+                                                                            
+                                                           
+     
 		scheduler_disable = true;
 	}
 
@@ -775,9 +775,9 @@ processor_start(
 	pset_unlock(pset);
 	splx(s);
 
-	/*
-	 *	Create the idle processor thread.
-	 */
+	  
+                                     
+    
 	if (processor->idle_thread == THREAD_NULL) {
 		result = idle_thread_create(processor);
 		if (result != KERN_SUCCESS) {
@@ -792,11 +792,11 @@ processor_start(
 		}
 	}
 
-	/*
-	 *	If there is no active thread, the processor
-	 *	has never been started.  Create a dedicated
-	 *	start up thread.
-	 */
+	  
+                                               
+                                               
+                    
+    
 	if (processor->active_thread == THREAD_NULL &&
 	    processor->startup_thread == THREAD_NULL) {
 		result = kernel_thread_create(processor_start_thread, NULL, MAXPRI_KERNEL, &thread);
@@ -906,7 +906,7 @@ kern_return_t
 enable_smt_processors(bool enable)
 {
 	if (machine_info.logical_cpu_max == machine_info.physical_cpu_max) {
-		/* Not an SMT system */
+		                       
 		return KERN_INVALID_ARGUMENT;
 	}
 
@@ -918,7 +918,7 @@ enable_smt_processors(bool enable)
 		if (processor->processor_primary != processor) {
 			if (enable) {
 				processor_start_from_user(processor);
-			} else { /* Disable */
+			} else {              
 				processor_exit_from_user(processor);
 			}
 		}
@@ -1122,11 +1122,11 @@ processor_set_info(
 	return KERN_INVALID_ARGUMENT;
 }
 
-/*
- *	processor_set_statistics
- *
- *	Returns scheduling statistics for a processor set.
- */
+  
+                           
+  
+                                                     
+   
 kern_return_t
 processor_set_statistics(
 	processor_set_t         pset,
@@ -1160,13 +1160,13 @@ processor_set_statistics(
 	return KERN_INVALID_ARGUMENT;
 }
 
-/*
- *	processor_set_max_priority:
- *
- *	Specify max priority permitted on processor set.  This affects
- *	newly created and assigned threads.  Optionally change existing
- *      ones.
- */
+  
+                              
+  
+                                                                 
+                                                                  
+             
+   
 kern_return_t
 processor_set_max_priority(
 	__unused processor_set_t        pset,
@@ -1176,11 +1176,11 @@ processor_set_max_priority(
 	return KERN_INVALID_ARGUMENT;
 }
 
-/*
- *	processor_set_policy_enable:
- *
- *	Allow indicated policy on processor set.
- */
+  
+                               
+  
+                                           
+   
 
 kern_return_t
 processor_set_policy_enable(
@@ -1190,12 +1190,12 @@ processor_set_policy_enable(
 	return KERN_INVALID_ARGUMENT;
 }
 
-/*
- *	processor_set_policy_disable:
- *
- *	Forbid indicated policy on processor set.  Time sharing cannot
- *	be forbidden.
- */
+  
+                                
+  
+                                                                 
+                
+   
 kern_return_t
 processor_set_policy_disable(
 	__unused processor_set_t        pset,
@@ -1205,11 +1205,11 @@ processor_set_policy_disable(
 	return KERN_INVALID_ARGUMENT;
 }
 
-/*
- *	processor_set_things:
- *
- *	Common internals for processor_set_{threads,tasks}
- */
+  
+                        
+  
+                                                     
+   
 static kern_return_t
 processor_set_things(
 	processor_set_t pset,
@@ -1250,7 +1250,7 @@ processor_set_things(
 	for (;;) {
 		lck_mtx_lock(&tasks_threads_lock);
 
-		/* do we have the memory we need? */
+		                                    
 		if (type == PSET_THING_THREAD) {
 			thread_size_needed = threads_count * sizeof(void *);
 		}
@@ -1264,10 +1264,10 @@ processor_set_things(
 			break;
 		}
 
-		/* unlock and allocate more memory */
+		                                     
 		lck_mtx_unlock(&tasks_threads_lock);
 
-		/* grow task array */
+		                     
 		if (task_size_needed > task_size) {
 			if (task_size != 0) {
 				kfree(task_list, task_size);
@@ -1285,7 +1285,7 @@ processor_set_things(
 			}
 		}
 
-		/* grow thread array */
+		                       
 		if (thread_size_needed > thread_size) {
 			if (thread_size != 0) {
 				kfree(thread_list, thread_size);
@@ -1304,9 +1304,9 @@ processor_set_things(
 		}
 	}
 
-	/* OK, have memory and the list locked */
+	                                         
 
-	/* If we need it, get the thread list */
+	                                        
 	if (type == PSET_THING_THREAD) {
 		for (thread = (thread_t)queue_first(&threads);
 		    !queue_end(&threads, (queue_entry_t)thread);
@@ -1324,7 +1324,7 @@ processor_set_things(
 #if !CONFIG_MACF
 	else {
 #endif
-	/* get a list of the tasks */
+	                             
 	for (task = (task_t)queue_first(&tasks);
 	    !queue_end(&tasks, (queue_entry_t)task);
 	    task = (task_t)queue_next(&task->tasks)) {
@@ -1346,7 +1346,7 @@ processor_set_things(
 #if CONFIG_MACF
 	unsigned int j, used;
 
-	/* for each task, make sure we are allowed to examine it */
+	                                                           
 	for (i = used = 0; i < actual_tasks; i++) {
 		if (mac_task_check_expose_task(task_list[i], flavor)) {
 			task_deallocate(task_list[i]);
@@ -1358,7 +1358,7 @@ processor_set_things(
 	task_size_needed = actual_tasks * sizeof(void *);
 
 	if (type == PSET_THING_THREAD) {
-		/* for each thread (if any), make sure it's task is in the allowed list */
+		                                                                          
 		for (i = used = 0; i < actual_threads; i++) {
 			boolean_t found_task = FALSE;
 
@@ -1378,7 +1378,7 @@ processor_set_things(
 		actual_threads = used;
 		thread_size_needed = actual_threads * sizeof(void *);
 
-		/* done with the task list */
+		                             
 		for (i = 0; i < actual_tasks; i++) {
 			task_deallocate(task_list[i]);
 		}
@@ -1391,7 +1391,7 @@ processor_set_things(
 
 	if (type == PSET_THING_THREAD) {
 		if (actual_threads == 0) {
-			/* no threads available to return */
+			                                    
 			assert(task_size == 0);
 			if (thread_size != 0) {
 				kfree(thread_list, thread_size);
@@ -1405,7 +1405,7 @@ processor_set_things(
 		addr = thread_list;
 	} else {
 		if (actual_tasks == 0) {
-			/* no tasks available to return */
+			                                  
 			assert(thread_size == 0);
 			if (task_size != 0) {
 				kfree(task_list, task_size);
@@ -1419,7 +1419,7 @@ processor_set_things(
 		addr = task_list;
 	}
 
-	/* if we allocated too much, must copy */
+	                                         
 	if (size_needed < size) {
 		newaddr = kalloc(size_needed);
 		if (newaddr == 0) {
@@ -1449,11 +1449,11 @@ processor_set_things(
 	return KERN_SUCCESS;
 }
 
-/*
- *	processor_set_tasks:
- *
- *	List all tasks in the processor set.
- */
+  
+                       
+  
+                                       
+   
 static kern_return_t
 processor_set_tasks_internal(
 	processor_set_t         pset,
@@ -1469,12 +1469,12 @@ processor_set_tasks_internal(
 		return ret;
 	}
 
-	/* do the conversion that Mig should handle */
+	                                              
 	switch (flavor) {
 	case TASK_FLAVOR_CONTROL:
 		for (i = 0; i < *count; i++) {
 			if ((*task_list)[i] == current_task()) {
-				/* if current_task(), return pinned port */
+				                                           
 				(*task_list)[i] = (task_t)convert_task_to_port_pinned((*task_list)[i]);
 			} else {
 				(*task_list)[i] = (task_t)convert_task_to_port((*task_list)[i]);
@@ -1512,11 +1512,11 @@ processor_set_tasks(
 	return processor_set_tasks_internal(pset, task_list, count, TASK_FLAVOR_CONTROL);
 }
 
-/*
- *	processor_set_tasks_with_flavor:
- *
- *	Based on flavor, return task/inspect/read port to all tasks in the processor set.
- */
+  
+                                   
+  
+                                                                                    
+   
 kern_return_t
 processor_set_tasks_with_flavor(
 	processor_set_t         pset,
@@ -1535,11 +1535,11 @@ processor_set_tasks_with_flavor(
 	}
 }
 
-/*
- *	processor_set_threads:
- *
- *	List all threads in the processor set.
- */
+  
+                         
+  
+                                         
+   
 #if defined(SECURE_KERNEL)
 kern_return_t
 processor_set_threads(
@@ -1573,7 +1573,7 @@ processor_set_threads(
 		return ret;
 	}
 
-	/* do the conversion that Mig should handle */
+	                                              
 	for (i = 0; i < *count; i++) {
 		(*thread_list)[i] = (thread_t)convert_thread_to_port((*thread_list)[i]);
 	}
@@ -1581,13 +1581,13 @@ processor_set_threads(
 }
 #endif
 
-/*
- *	processor_set_policy_control
- *
- *	Controls the scheduling attributes governing the processor set.
- *	Allows control of enabled policies, and per-policy base and limit
- *	priorities.
- */
+  
+                               
+  
+                                                                  
+                                                                    
+              
+   
 kern_return_t
 processor_set_policy_control(
 	__unused processor_set_t                pset,
@@ -1626,11 +1626,11 @@ thread_group_pset_recommendation(__unused struct thread_group *tg, __unused clus
 	switch (recommendation) {
 	case CLUSTER_TYPE_SMP:
 	default:
-		/*
-		 * In case of SMP recommendations, check if the thread
-		 * group has special flags which restrict it to the E
-		 * cluster.
-		 */
+		  
+                                                        
+                                                       
+             
+     
 		if (thread_group_smp_restricted(tg)) {
 			return PSET_AMP_E;
 		}
@@ -1640,9 +1640,9 @@ thread_group_pset_recommendation(__unused struct thread_group *tg, __unused clus
 	case CLUSTER_TYPE_P:
 		return PSET_AMP_P;
 	}
-#else /* __AMP__ */
+#else              
 	return PSET_SMP;
-#endif /* __AMP__ */
+#endif              
 }
 
 #endif
@@ -1726,10 +1726,10 @@ sched_perfcontrol_inherit_recommendation_from_tg(perfcontrol_class_t perfctl_cla
 
 #elif defined(__arm64__)
 
-/* Define a stub routine since this symbol is exported on all arm64 platforms */
+                                                                                
 void
 sched_perfcontrol_inherit_recommendation_from_tg(__unused perfcontrol_class_t perfctl_class, __unused boolean_t inherit)
 {
 }
 
-#endif /* defined(__arm64__) */
+#endif                         

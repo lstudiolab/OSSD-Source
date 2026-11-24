@@ -52,9 +52,9 @@ boolean_t       kdp_read_io = 0;
 
 pmap_paddr_t    kdp_vtophys(pmap_t pmap, vm_offset_t va);
 
-/*
- * kdp_vtophys
- */
+  
+              
+   
 pmap_paddr_t
 kdp_vtophys(
 	pmap_t pmap,
@@ -62,7 +62,7 @@ kdp_vtophys(
 {
 	pmap_paddr_t    pa;
 
-	/* Ensure that the provided va resides within the provided pmap range. */
+	                                                                         
 	if (!pmap || ((pmap != kernel_pmap) && ((va < pmap->min) || (va >= pmap->max)))) {
 #ifdef KDP_VTOPHYS_DEBUG
 		printf("kdp_vtophys(%08x, %016lx) not in range %08x .. %08x\n", (unsigned int) pmap,
@@ -70,21 +70,21 @@ kdp_vtophys(
 		    (unsigned int) (pmap ? pmap->min : 0),
 		    (unsigned int) (pmap ? pmap->max : 0));
 #endif
-		return 0;   /* Just return if no translation */
+		return 0;                                      
 	}
 
-	pa = pmap_find_pa(pmap, va);  /* Get the physical address */
+	pa = pmap_find_pa(pmap, va);                                
 	return pa;
 }
 
-/*
- * kdp_machine_vm_read
- *
- * Verify that src is valid, and physically copy len bytes from src to
- * dst, translating if necessary. If translation is enabled
- * (kdp_trans_off is 0), a non-zero kdp_pmap specifies the pmap to use
- * when translating src.
- */
+  
+                      
+  
+                                                                      
+                                                           
+                                                                      
+                        
+   
 
 mach_vm_size_t
 kdp_machine_vm_read( mach_vm_address_t src, caddr_t dst, mach_vm_size_t len)
@@ -107,21 +107,21 @@ kdp_machine_vm_read( mach_vm_address_t src, caddr_t dst, mach_vm_size_t len)
 
 		rq.address = src;
 		rq.nbytes = (uint32_t)len;
-		ret = kdp_machine_phys_read(&rq, dst, 0 /* unused */);
+		ret = kdp_machine_phys_read(&rq, dst, 0             );
 		return ret;
 	} else {
 		resid = len;
 
 		if (kdp_pmap) {
-			pmap = kdp_pmap;        /* If special pmap, use it */
+			pmap = kdp_pmap;                                     
 		} else {
-			pmap = kernel_pmap;     /* otherwise, use kernel's */
+			pmap = kernel_pmap;                                  
 		}
 		while (resid != 0) {
-			/*
-			 * Always translate the destination using the
-			 * kernel_pmap.
-			 */
+			  
+                                                
+                  
+      
 			if ((cur_phys_dst = kdp_vtophys(kernel_pmap, cur_virt_dst)) == 0) {
 				goto exit;
 			}
@@ -130,13 +130,13 @@ kdp_machine_vm_read( mach_vm_address_t src, caddr_t dst, mach_vm_size_t len)
 				goto exit;
 			}
 
-			/* Attempt to ensure that there are valid translations for src and dst. */
+			                                                                          
 			if (!kdp_read_io && ((!pmap_valid_address(cur_phys_dst)) || (!pmap_valid_address(cur_phys_src)))) {
 				goto exit;
 			}
 
-			cnt = ARM_PGBYTES - (cur_virt_src & PAGE_MASK); /* Get length left on
-			                                                 * page */
+			cnt = ARM_PGBYTES - (cur_virt_src & PAGE_MASK);                      
+                                                             
 			if (cnt > (ARM_PGBYTES - (cur_virt_dst & PAGE_MASK))) {
 				cnt = ARM_PGBYTES - (cur_virt_dst & PAGE_MASK);
 			}
@@ -186,7 +186,7 @@ kdp_machine_phys_read(kdp_readphysmem64_req_t *rq, caddr_t dst, uint16_t lcpu __
 			goto exit;
 		}
 
-		/* Get length left on page */
+		                             
 
 		cnt_src = ARM_PGBYTES - (cur_phys_src & PAGE_MASK);
 		cnt_dst = ARM_PGBYTES - (cur_phys_dst & PAGE_MASK);
@@ -199,7 +199,7 @@ kdp_machine_phys_read(kdp_readphysmem64_req_t *rq, caddr_t dst, uint16_t lcpu __
 			cnt = resid;
 		}
 
-		bcopy_phys(cur_phys_src, cur_phys_dst, cnt);    /* Copy stuff over */
+		bcopy_phys(cur_phys_src, cur_phys_dst, cnt);                         
 		cur_phys_src += cnt;
 		cur_virt_dst += cnt;
 		resid -= cnt;
@@ -209,9 +209,9 @@ exit:
 	return len - resid;
 }
 
-/*
- * kdp_vm_write
- */
+  
+               
+   
 mach_vm_size_t
 kdp_machine_vm_write( caddr_t src, mach_vm_address_t dst, mach_vm_size_t len)
 {
@@ -237,8 +237,8 @@ kdp_machine_vm_write( caddr_t src, mach_vm_address_t dst, mach_vm_size_t len)
 			goto exit;
 		}
 
-		/* Attempt to ensure that there are valid translations for src and dst. */
-		/* No support for enabling writes for an invalid translation at the moment. */
+		                                                                          
+		                                                                              
 		if ((!pmap_valid_address(cur_phys_dst)) || (!pmap_valid_address(cur_phys_src))) {
 			goto exit;
 		}
@@ -258,7 +258,7 @@ kdp_machine_vm_write( caddr_t src, mach_vm_address_t dst, mach_vm_size_t len)
 #ifdef KDP_VM_WRITE_DEBUG
 		printf("kdp_vm_write: cur_phys_src %x cur_phys_src %x len %x - %08X %08X\n", src, dst, cnt);
 #endif
-		bcopy_phys(cur_phys_src, cur_phys_dst, cnt);    /* Copy stuff over */
+		bcopy_phys(cur_phys_src, cur_phys_dst, cnt);                         
 		flush_dcache64(cur_phys_dst, (unsigned int)cnt, TRUE);
 		invalidate_icache64(cur_phys_dst, (unsigned int)cnt, TRUE);
 
@@ -274,7 +274,7 @@ mach_vm_size_t
 kdp_machine_phys_write(kdp_writephysmem64_req_t *rq __unused, caddr_t src __unused,
     uint16_t lcpu __unused)
 {
-	return 0; /* unimplemented */
+	return 0;                    
 }
 
 void
@@ -356,7 +356,7 @@ kern_collectth_state(thread_t thread __unused, void *buffer, uint64_t size, void
 		state->cpsr = saved_state->cpsr;
 	}
 
-#else /* __arm64__ */
+#else                
 	vm_offset_t kstackptr = (vm_offset_t) processor->active_thread->machine.kstackptr;
 	arm_saved_state_t *saved_state = (arm_saved_state_t *) kstackptr;
 
@@ -366,27 +366,27 @@ kern_collectth_state(thread_t thread __unused, void *buffer, uint64_t size, void
 	state->cpsr = saved_state->cpsr;
 	bcopy(&saved_state->r[0], &state->r[0], sizeof(state->r));
 
-#endif /* !__arm64__ */
+#endif                 
 }
 
-/*
- * kdp_core_start_addr
- *
- * return the address where the kernel core file starts
- *
- * The kernel start address is VM_MIN_KERNEL_AND_KEXT_ADDRESS
- * unless the physical aperture has been relocated below
- * VM_MIN_KERNEL_AND_KEXT_ADDRESS as in the case of
- * ARM_LARGE_MEMORY systems
- *
- */
+  
+                      
+  
+                                                       
+  
+                                                             
+                                                        
+                                                   
+                           
+  
+   
 vm_map_offset_t
 kdp_core_start_addr()
 {
 #if defined(__arm64__)
 	extern const vm_map_address_t physmap_base;
 	return MIN(physmap_base, VM_MIN_KERNEL_AND_KEXT_ADDRESS);
-#else /* !defined(__arm64__) */
+#else                          
 	return VM_MIN_KERNEL_AND_KEXT_ADDRESS;
-#endif /* !defined(__arm64__) */
+#endif                          
 }

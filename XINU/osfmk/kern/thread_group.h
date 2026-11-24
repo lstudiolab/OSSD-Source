@@ -26,15 +26,15 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Thread group support routines.
- */
+  
+                                 
+   
 #ifndef _KERN_THREAD_GROUP_H_
 #define _KERN_THREAD_GROUP_H_
 
 struct thread_group;
 
-#include <mach/thread_status.h> /* for proc_reg.h / CONFIG_THREAD_GROUPS */
+#include <mach/thread_status.h>                                            
 
 #ifndef CONFIG_THREAD_GROUPS
 #error "The platform must define CONFIG_THREAD_GROUPS to 0 or 1"
@@ -47,16 +47,16 @@ struct thread_group;
 #define THREAD_GROUP_MAX                (CONFIG_TASK_MAX + 10)
 #define THREAD_GROUP_MAXNAME            (16)
 
-#define THREAD_GROUP_SYSTEM          0       // kernel (-VM) + launchd
-#define THREAD_GROUP_BACKGROUND      1       // background daemons
-#define THREAD_GROUP_ADAPTIVE        2       // adaptive daemons
-#define THREAD_GROUP_VM              3       // kernel VM threads
-#define THREAD_GROUP_IO_STORAGE      4       // kernel io storage threads
-#define THREAD_GROUP_PERF_CONTROLLER 5       // kernel CLPC threads
+#define THREAD_GROUP_SYSTEM          0                                
+#define THREAD_GROUP_BACKGROUND      1                            
+#define THREAD_GROUP_ADAPTIVE        2                          
+#define THREAD_GROUP_VM              3                           
+#define THREAD_GROUP_IO_STORAGE      4                                   
+#define THREAD_GROUP_PERF_CONTROLLER 5                             
 
 #define THREAD_GROUP_INVALID    UINT64_MAX
 
-/* Thread group flags */
+                        
 #define THREAD_GROUP_FLAGS_EFFICIENT    0x1
 #define THREAD_GROUP_FLAGS_UI_APP       0x2
 #define THREAD_GROUP_FLAGS_SMP_RESTRICT 0x4
@@ -103,6 +103,6 @@ void            thread_group_vm_add(void);
 
 __END_DECLS
 
-#endif /* CONFIG_THREAD_GROUPS */
+#endif                           
 
-#endif // _KERN_THREAD_GROUP_H_
+#endif                         

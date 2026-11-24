@@ -11,10 +11,10 @@
 #include <mach/semaphore.h>
 #include <sys/select.h>
 
-/* Select parameters */
-#define TIMEOUT_CHANCE          17      /* one in this many times, timeout */
-#define TIMEOUT_POLLCHANCE      11      /* one in this many is a poll */
-#define TIMEOUT_SCALE           5       /* microseconds multiplier */
+                       
+#define TIMEOUT_CHANCE          17                                           
+#define TIMEOUT_POLLCHANCE      11                                      
+#define TIMEOUT_SCALE           5                                    
 
 static semaphore_t g_thread_sem;
 static semaphore_t g_sync_sem;
@@ -54,9 +54,9 @@ abs_to_ns(uint64_t abs)
 
 
 
-/*
- * Synchronize the startup / initialization of a set of threads
- */
+  
+                                                               
+   
 static void *
 thread_sync(void *ctx)
 {
@@ -88,19 +88,19 @@ setup_stress_event(struct endpoint *ep)
 	    (uintptr_t)pthread_self(), ep->fd[0], ep->fd[1], (void *)ep);
 }
 
-/*
- * Cause file descriptors to be reused/replaced.  We expect that it will at
- * least take the lowest fd as part of the descriptor list.  This may be
- * optimistic, but it shows replacing an fd out from under a select() if it
- * happens.
- *
- * We potentially delay the open for a random amount of time so that another
- * thread can come in and wake up the fd_set with a bad (closed) fd in the set.
- */
+  
+                                                                           
+                                                                        
+                                                                           
+           
+  
+                                                                            
+                                                                               
+   
 static void
 recycle_fds(struct endpoint *ep)
 {
-	/* close endpoint descriptors in random order */
+	                                                
 	if (random() % 1) {
 		close(ep->fd[0]);
 		close(ep->fd[1]);
@@ -109,23 +109,23 @@ recycle_fds(struct endpoint *ep)
 		close(ep->fd[0]);
 	}
 
-	/* randomize a delay */
+	                       
 	if ((random() % ep->fd[0]) == 0) {
 		usleep(((random() % ep->fd[1]) + 1) * ep->fd[1]);
 	}
 
-	/* reopen the FDs, hopefully in the middle of select() */
+	                                                         
 	T_QUIET;
 	T_WITH_ERRNO;
 	T_ASSERT_POSIX_SUCCESS(pipe(&ep->fd[0]), "pipe");
 }
 
 
-/*
- * Send a byte of data down the thread end of a pipe to wake up the select
- * on the other end of it.  Select will wake up normally because of this,
- * and read the byte out. Hopefully, another thread has closed/reopened its FDs.
- */
+  
+                                                                          
+                                                                         
+                                                                                
+   
 static void
 write_data(struct endpoint *ep)
 {
@@ -140,7 +140,7 @@ do_stress_events(struct endpoint *ep)
 {
 	unsigned write_freq = (unsigned)(((uintptr_t)pthread_self() & 0xff0000) >> 16);
 
-	/* some default */
+	                  
 	if (write_freq == 0) {
 		write_freq = 31;
 	}
@@ -148,7 +148,7 @@ do_stress_events(struct endpoint *ep)
 	T_LOG("th[0x%lx] write_freq:%d", (uintptr_t)pthread_self(), write_freq);
 
 	for (;;) {
-		/* randomized delay between events */
+		                                     
 		usleep(((random() % ep->fd[1]) + 1) * ep->fd[1]);
 
 		if ((random() % write_freq) == 0) {
@@ -169,10 +169,10 @@ struct selarg {
 	pthread_t pth;
 };
 
-/*
- * Put the actual call to select in its own thread so we can catch errors that
- * occur only the first time a thread calls select.
- */
+  
+                                                                              
+                                                   
+   
 static void *
 do_select(void *arg)
 {
@@ -186,34 +186,34 @@ do_select(void *arg)
 
 	FD_COPY(&sarg->def_readfds, &readfds);
 
-	/* Add a timeout probablistically */
+	                                    
 	if ((random() % TIMEOUT_CHANCE) == 0) {
 		timeout.tv_sec = random() % 1;
 		timeout.tv_usec = ((random() % TIMEOUT_POLLCHANCE) * TIMEOUT_SCALE);
 		tp = &timeout;
 	}
 
-	/* Do the select */
+	                   
 	nfd = select(sarg->max_fd + 1, &readfds, 0, 0, tp);
 	if (nfd < 0) {
-		/* EBADF: fd_set has changed */
+		                               
 		if (errno == EBADF) {
 			sarg->ret = EBADF;
 			return NULL;
 		}
 
-		/* Other errors are fatal */
+		                            
 		T_QUIET;
 		T_WITH_ERRNO;
 		T_ASSERT_POSIX_SUCCESS(nfd, "select:stress");
 	}
 
-	/* Fast: handle timeouts */
+	                           
 	if (nfd == 0) {
 		return NULL;
 	}
 
-	/* Slower: discard read input thrown at us from threads */
+	                                                          
 	for (int i = 0; i < sarg->nthreads; i++) {
 		struct endpoint *ep = &sarg->th[i].ep;
 
@@ -243,18 +243,18 @@ test_select_stress(int nthreads, uint64_t duration_seconds)
 		nthreads = 2;
 	}
 
-	/*
-	 * Allocate memory for endpoint data
-	 */
+	  
+                                     
+    
 	th = calloc(nthreads, sizeof(*th));
 	T_QUIET;
 	T_ASSERT_NOTNULL(th, "select_stress: No memory for thread endpoints");
 
 	T_LOG("Select stress test: %d threads, for %lld seconds", nthreads, duration_seconds);
 
-	/*
-	 * Startup all the threads
-	 */
+	  
+                           
+    
 	T_LOG("\tcreating threads...");
 	for (int i = 0; i < nthreads; i++) {
 		struct endpoint *e = &th[i].ep;
@@ -266,35 +266,35 @@ test_select_stress(int nthreads, uint64_t duration_seconds)
 		    "pthread_create:do_stress_events");
 	}
 
-	/*
-	 * Wait for all the threads to start up
-	 */
+	  
+                                        
+    
 	while (started_threads < nthreads) {
 		if (semaphore_wait(g_sync_sem) == KERN_SUCCESS) {
 			++started_threads;
 		}
 	}
 
-	/*
-	 * Kick everyone off
-	 */
+	  
+                     
+    
 	semaphore_signal_all(g_thread_sem);
 
-	/*
-	 * Calculate a stop time
-	 */
+	  
+                         
+    
 	deadline = mach_absolute_time() + ns_to_abs(duration_seconds * NSEC_PER_SEC);
 	seconds_remain = duration_seconds;
 	last_print_time = seconds_remain + 1;
 
-	/*
-	 * Perform the select and read any data that comes from the
-	 * constituent thread FDs.
-	 */
+	  
+                                                            
+                           
+    
 
 	T_LOG("\ttest running!");
 handle_ebadf:
-	/* (re) set up the select fd set */
+	                                   
 	sarg.max_fd = 0;
 	FD_ZERO(&sarg.def_readfds);
 	for (int i = 0; i < nthreads; i++) {
@@ -343,9 +343,9 @@ handle_ebadf:
 }
 
 
-/*
- * TEST: use select as sleep()
- */
+  
+                              
+   
 static void
 test_select_sleep(uint32_t niterations, unsigned long usecs)
 {

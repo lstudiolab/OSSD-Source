@@ -73,7 +73,7 @@
 #include <ddb/db_output.h>
 #include <ddb/db_sym.h>
 #include <ddb/db_print.h>
-#endif                          /* MACH_KDB */
+#endif                                        
 
 #include <sys/kdebug.h>
 #include <sys/munge.h>
@@ -83,7 +83,7 @@
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
 #include <arm64/amcc_rorgn.h>
-#endif // defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
+#endif                                                                    
 
 kern_return_t arm64_lock_test(void);
 kern_return_t arm64_munger_test(void);
@@ -103,7 +103,7 @@ kern_return_t arm64_spr_lock_test(void);
 extern void arm64_msr_lock_test(uint64_t);
 #endif
 
-// exception handler ignores this fault address during PAN test
+                                                               
 #if __ARM_PAN_AVAILABLE__
 const uint64_t pan_ro_value = 0xFEEDB0B0DEADBEEF;
 vm_offset_t pan_test_addr = 0;
@@ -210,35 +210,35 @@ lt_grab_rw_exclusive_with_try()
 	lck_rw_done(&lt_rwlock);
 }
 
-/* Disabled until lt_grab_rw_shared() is fixed (rdar://30685840)
- *  static void
- *  lt_grab_rw_shared()
- *  {
- *       lck_rw_lock_shared(&lt_rwlock);
- *       lt_counter++;
- *
- *       lt_note_another_blocking_lock_holder();
- *       lt_sleep_a_little_bit();
- *       lt_note_blocking_lock_release();
- *
- *       lck_rw_done(&lt_rwlock);
- *  }
- */
+                                                                
+               
+                       
+     
+                                        
+                      
+  
+                                                
+                                 
+                                         
+  
+                                 
+     
+   
 
-/* Disabled until lt_grab_rw_shared_with_try() is fixed (rdar://30685840)
- *  static void
- *  lt_grab_rw_shared_with_try()
- *  {
- *       while(0 == lck_rw_try_lock_shared(&lt_rwlock));
- *       lt_counter++;
- *
- *       lt_note_another_blocking_lock_holder();
- *       lt_sleep_a_little_bit();
- *       lt_note_blocking_lock_release();
- *
- *       lck_rw_done(&lt_rwlock);
- *  }
- */
+                                                                         
+               
+                                
+     
+                                                        
+                      
+  
+                                                
+                                 
+                                         
+  
+                                 
+     
+   
 
 static void
 lt_upgrade_downgrade_rw()
@@ -441,7 +441,7 @@ static void
 lt_wait_for_lock_test_threads()
 {
 	OSMemoryBarrier();
-	/* Spin to reduce dependencies */
+	                                 
 	while (lt_done_threads < lt_target_done_threads) {
 		lt_sleep_a_little_bit();
 		OSMemoryBarrier();
@@ -455,27 +455,27 @@ lt_test_trylocks()
 	boolean_t success;
 	extern unsigned int real_ncpus;
 
-	/*
-	 * First mtx try lock succeeds, second fails.
-	 */
+	  
+                                              
+    
 	success = lck_mtx_try_lock(&lt_mtx);
 	T_ASSERT_NOTNULL(success, "First mtx try lock");
 	success = lck_mtx_try_lock(&lt_mtx);
 	T_ASSERT_NULL(success, "Second mtx try lock for a locked mtx");
 	lck_mtx_unlock(&lt_mtx);
 
-	/*
-	 * After regular grab, can't try lock.
-	 */
+	  
+                                       
+    
 	lck_mtx_lock(&lt_mtx);
 	success = lck_mtx_try_lock(&lt_mtx);
 	T_ASSERT_NULL(success, "try lock should fail after regular lck_mtx_lock");
 	lck_mtx_unlock(&lt_mtx);
 
-	/*
-	 * Two shared try locks on a previously unheld rwlock suceed, and a
-	 * subsequent exclusive attempt fails.
-	 */
+	  
+                                                                    
+                                       
+    
 	success = lck_rw_try_lock_shared(&lt_rwlock);
 	T_ASSERT_NOTNULL(success, "Two shared try locks on a previously unheld rwlock should succeed");
 	success = lck_rw_try_lock_shared(&lt_rwlock);
@@ -485,10 +485,10 @@ lt_test_trylocks()
 	lck_rw_done(&lt_rwlock);
 	lck_rw_done(&lt_rwlock);
 
-	/*
-	 * After regular shared grab, can trylock
-	 * for shared but not for exclusive.
-	 */
+	  
+                                          
+                                     
+    
 	lck_rw_lock_shared(&lt_rwlock);
 	success = lck_rw_try_lock_shared(&lt_rwlock);
 	T_ASSERT_NOTNULL(success, "After regular shared grab another shared try lock should succeed.");
@@ -497,10 +497,10 @@ lt_test_trylocks()
 	lck_rw_done(&lt_rwlock);
 	lck_rw_done(&lt_rwlock);
 
-	/*
-	 * An exclusive try lock succeeds, subsequent shared and exclusive
-	 * attempts fail.
-	 */
+	  
+                                                                   
+                  
+    
 	success = lck_rw_try_lock_exclusive(&lt_rwlock);
 	T_ASSERT_NOTNULL(success, "An exclusive try lock should succeed");
 	success = lck_rw_try_lock_shared(&lt_rwlock);
@@ -509,9 +509,9 @@ lt_test_trylocks()
 	T_ASSERT_NULL(success, "try lock in exclusive mode attempt after an exclusive grab should fail");
 	lck_rw_done(&lt_rwlock);
 
-	/*
-	 * After regular exclusive grab, neither kind of trylock succeeds.
-	 */
+	  
+                                                                   
+    
 	lck_rw_lock_exclusive(&lt_rwlock);
 	success = lck_rw_try_lock_shared(&lt_rwlock);
 	T_ASSERT_NULL(success, "After regular exclusive grab, shared trylock should not succeed");
@@ -519,9 +519,9 @@ lt_test_trylocks()
 	T_ASSERT_NULL(success, "After regular exclusive grab, exclusive trylock should not succeed");
 	lck_rw_done(&lt_rwlock);
 
-	/*
-	 * First spin lock attempts succeed, second attempts fail.
-	 */
+	  
+                                                           
+    
 	success = hw_lock_try(&lt_hw_lock, LCK_GRP_NULL);
 	T_ASSERT_NOTNULL(success, "First spin lock attempts should succeed");
 	success = hw_lock_try(&lt_hw_lock, LCK_GRP_NULL);
@@ -542,13 +542,13 @@ lt_test_trylocks()
 	success = hw_lock_to(&lt_hw_lock, 100, LCK_GRP_NULL);
 	T_ASSERT_NOTNULL(success, "First spin lock with timeout should succeed");
 	if (real_ncpus == 1) {
-		mp_enable_preemption(); /* if we re-enable preemption, the other thread can timeout and exit */
+		mp_enable_preemption();                                                                        
 	}
 	OSIncrementAtomic((volatile SInt32*)&lt_thread_lock_grabbed);
 	lt_wait_for_lock_test_threads();
 	T_ASSERT_NULL(lt_thread_lock_success, "Second spin lock with timeout should fail and timeout");
 	if (real_ncpus == 1) {
-		mp_disable_preemption(); /* don't double-enable when we unlock */
+		mp_disable_preemption();                                         
 	}
 	hw_lock_unlock(&lt_hw_lock);
 
@@ -560,13 +560,13 @@ lt_test_trylocks()
 	lt_start_trylock_thread(lt_trylock_hw_lock_with_to);
 	hw_lock_lock(&lt_hw_lock, LCK_GRP_NULL);
 	if (real_ncpus == 1) {
-		mp_enable_preemption(); /* if we re-enable preemption, the other thread can timeout and exit */
+		mp_enable_preemption();                                                                        
 	}
 	OSIncrementAtomic((volatile SInt32*)&lt_thread_lock_grabbed);
 	lt_wait_for_lock_test_threads();
 	T_ASSERT_NULL(lt_thread_lock_success, "after taking a spin lock, lock attempt with timeout should fail");
 	if (real_ncpus == 1) {
-		mp_disable_preemption(); /* don't double-enable when we unlock */
+		mp_disable_preemption();                                         
 	}
 	hw_lock_unlock(&lt_hw_lock);
 
@@ -583,13 +583,13 @@ lt_test_trylocks()
 	lt_start_trylock_thread(lt_trylock_spin_try_lock);
 	lck_spin_lock(&lt_lck_spin_t);
 	if (real_ncpus == 1) {
-		mp_enable_preemption(); /* if we re-enable preemption, the other thread can timeout and exit */
+		mp_enable_preemption();                                                                        
 	}
 	OSIncrementAtomic((volatile SInt32*)&lt_thread_lock_grabbed);
 	lt_wait_for_lock_test_threads();
 	T_ASSERT_NULL(lt_thread_lock_success, "spin trylock attempt of previously held lock should fail");
 	if (real_ncpus == 1) {
-		mp_disable_preemption(); /* don't double-enable when we unlock */
+		mp_disable_preemption();                                         
 	}
 	lck_spin_unlock(&lt_lck_spin_t);
 
@@ -736,14 +736,14 @@ lt_test_locks()
 
 	T_LOG("Testing locks.");
 
-	/* Try locks (custom) */
+	                        
 	lt_reset();
 
 	T_LOG("Running try lock test.");
 	kr = lt_test_trylocks();
 	T_EXPECT_NULL(kr, "try lock test failed.");
 
-	/* Uncontended mutex */
+	                       
 	T_LOG("Running uncontended mutex test.");
 	lt_reset();
 	lt_target_done_threads = 1;
@@ -752,7 +752,7 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* Contended mutex:try locks*/
+	                              
 	T_LOG("Running contended mutex test.");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -763,7 +763,7 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* Contended mutex: try locks*/
+	                               
 	T_LOG("Running contended mutex trylock test.");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -774,7 +774,7 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* Uncontended exclusive rwlock */
+	                                  
 	T_LOG("Running uncontended exclusive rwlock test.");
 	lt_reset();
 	lt_target_done_threads = 1;
@@ -783,19 +783,19 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* Uncontended shared rwlock */
+	                               
 
-	/* Disabled until lt_grab_rw_shared() is fixed (rdar://30685840)
-	 *  T_LOG("Running uncontended shared rwlock test.");
-	 *  lt_reset();
-	 *  lt_target_done_threads = 1;
-	 *  lt_start_lock_thread(lt_grab_rw_shared);
-	 *  lt_wait_for_lock_test_threads();
-	 *  T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
-	 *  T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
-	 */
+	                                                                
+                                                      
+                
+                                
+                                             
+                                     
+                                                                                       
+                                               
+    
 
-	/* Contended exclusive rwlock */
+	                                
 	T_LOG("Running contended exclusive rwlock test.");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -806,33 +806,33 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* One shared, two exclusive */
-	/* Disabled until lt_grab_rw_shared() is fixed (rdar://30685840)
-	 *  T_LOG("Running test with one shared and two exclusive rw lock threads.");
-	 *  lt_reset();
-	 *  lt_target_done_threads = 3;
-	 *  lt_start_lock_thread(lt_grab_rw_shared);
-	 *  lt_start_lock_thread(lt_grab_rw_exclusive);
-	 *  lt_start_lock_thread(lt_grab_rw_exclusive);
-	 *  lt_wait_for_lock_test_threads();
-	 *  T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
-	 *  T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
-	 */
+	                               
+	                                                                
+                                                                              
+                
+                                
+                                             
+                                                
+                                                
+                                     
+                                                                                       
+                                               
+    
 
-	/* Four shared */
-	/* Disabled until lt_grab_rw_shared() is fixed (rdar://30685840)
-	 *  T_LOG("Running test with four shared holders.");
-	 *  lt_reset();
-	 *  lt_target_done_threads = 4;
-	 *  lt_start_lock_thread(lt_grab_rw_shared);
-	 *  lt_start_lock_thread(lt_grab_rw_shared);
-	 *  lt_start_lock_thread(lt_grab_rw_shared);
-	 *  lt_start_lock_thread(lt_grab_rw_shared);
-	 *  lt_wait_for_lock_test_threads();
-	 *  T_EXPECT_LE_UINT(lt_max_holders, 4, NULL);
-	 */
+	                 
+	                                                                
+                                                     
+                
+                                
+                                             
+                                             
+                                             
+                                             
+                                     
+                                               
+    
 
-	/* Three doing upgrades and downgrades */
+	                                         
 	T_LOG("Running test with threads upgrading and downgrading.");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -844,7 +844,7 @@ lt_test_locks()
 	T_EXPECT_LE_UINT(lt_max_holders, 3, NULL);
 	T_EXPECT_EQ_UINT(lt_max_upgrade_holders, 1, NULL);
 
-	/* Uncontended - exclusive trylocks */
+	                                      
 	T_LOG("Running test with single thread doing exclusive rwlock trylocks.");
 	lt_reset();
 	lt_target_done_threads = 1;
@@ -853,18 +853,18 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* Uncontended - shared trylocks */
-	/* Disabled until lt_grab_rw_shared_with_try() is fixed (rdar://30685840)
-	 *  T_LOG("Running test with single thread doing shared rwlock trylocks.");
-	 *  lt_reset();
-	 *  lt_target_done_threads = 1;
-	 *  lt_start_lock_thread(lt_grab_rw_shared_with_try);
-	 *  lt_wait_for_lock_test_threads();
-	 *  T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
-	 *  T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
-	 */
+	                                   
+	                                                                         
+                                                                            
+                
+                                
+                                                      
+                                     
+                                                                                       
+                                               
+    
 
-	/* Three doing exclusive trylocks */
+	                                    
 	T_LOG("Running test with threads doing exclusive rwlock trylocks.");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -875,34 +875,34 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 	T_EXPECT_EQ_UINT(lt_max_holders, 1, NULL);
 
-	/* Three doing shared trylocks */
-	/* Disabled until lt_grab_rw_shared_with_try() is fixed (rdar://30685840)
-	 *  T_LOG("Running test with threads doing shared rwlock trylocks.");
-	 *  lt_reset();
-	 *  lt_target_done_threads = 3;
-	 *  lt_start_lock_thread(lt_grab_rw_shared_with_try);
-	 *  lt_start_lock_thread(lt_grab_rw_shared_with_try);
-	 *  lt_start_lock_thread(lt_grab_rw_shared_with_try);
-	 *  lt_wait_for_lock_test_threads();
-	 *  T_EXPECT_LE_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
-	 *  T_EXPECT_LE_UINT(lt_max_holders, 3, NULL);
-	 */
+	                                 
+	                                                                         
+                                                                      
+                
+                                
+                                                      
+                                                      
+                                                      
+                                     
+                                                                                       
+                                               
+    
 
-	/* Three doing various trylocks */
-	/* Disabled until lt_grab_rw_shared_with_try() is fixed (rdar://30685840)
-	 *  T_LOG("Running test with threads doing mixed rwlock trylocks.");
-	 *  lt_reset();
-	 *  lt_target_done_threads = 4;
-	 *  lt_start_lock_thread(lt_grab_rw_shared_with_try);
-	 *  lt_start_lock_thread(lt_grab_rw_shared_with_try);
-	 *  lt_start_lock_thread(lt_grab_rw_exclusive_with_try);
-	 *  lt_start_lock_thread(lt_grab_rw_exclusive_with_try);
-	 *  lt_wait_for_lock_test_threads();
-	 *  T_EXPECT_LE_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
-	 *  T_EXPECT_LE_UINT(lt_max_holders, 2, NULL);
-	 */
+	                                  
+	                                                                         
+                                                                     
+                
+                                
+                                                      
+                                                      
+                                                         
+                                                         
+                                     
+                                                                                       
+                                               
+    
 
-	/* HW locks */
+	              
 	T_LOG("Running test with hw_lock_lock()");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -913,7 +913,7 @@ lt_test_locks()
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 
 #if __AMP__
-	/* Ticket locks stress test */
+	                              
 	T_LOG("Running Ticket locks stress test with lck_ticket_lock()");
 	extern unsigned int real_ncpus;
 	lck_grp_init(&lt_ticket_grp, "ticket lock stress", LCK_GRP_ATTR_NULL);
@@ -938,7 +938,7 @@ lt_test_locks()
 		T_PASS("Ticket locks stress test with lck_ticket_lock()");
 	}
 
-	/* AMP ticket locks stress test */
+	                                  
 	T_LOG("Running AMP Ticket locks stress test bound to clusters with lck_ticket_lock()");
 	lt_reset();
 	lt_target_done_threads = real_ncpus;
@@ -955,7 +955,7 @@ lt_test_locks()
 	lt_wait_for_lock_test_threads();
 #endif
 
-	/* HW locks: trylocks */
+	                        
 	T_LOG("Running test with hw_lock_try()");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -965,7 +965,7 @@ lt_test_locks()
 	lt_wait_for_lock_test_threads();
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 
-	/* HW locks: with timeout */
+	                            
 	T_LOG("Running test with hw_lock_to()");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -975,7 +975,7 @@ lt_test_locks()
 	lt_wait_for_lock_test_threads();
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 
-	/* Spin locks */
+	                
 	T_LOG("Running test with lck_spin_lock()");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -985,7 +985,7 @@ lt_test_locks()
 	lt_wait_for_lock_test_threads();
 	T_EXPECT_EQ_UINT(lt_counter, LOCK_TEST_ITERATIONS * lt_target_done_threads, NULL);
 
-	/* Spin locks: trylocks */
+	                          
 	T_LOG("Running test with lck_spin_try_lock()");
 	lt_reset();
 	lt_target_done_threads = 3;
@@ -1000,9 +1000,9 @@ lt_test_locks()
 
 #define MT_MAX_ARGS             8
 #define MT_INITIAL_VALUE        0xfeedbeef
-#define MT_W_VAL                (0x00000000feedbeefULL) /* Drop in zeros */
-#define MT_S_VAL                (0xfffffffffeedbeefULL) /* High bit is 1, so sign-extends as negative */
-#define MT_L_VAL                (((uint64_t)MT_INITIAL_VALUE) | (((uint64_t)MT_INITIAL_VALUE) << 32)) /* Two back-to-back */
+#define MT_W_VAL                (0x00000000feedbeefULL)                    
+#define MT_S_VAL                (0xfffffffffeedbeefULL)                                                 
+#define MT_L_VAL                (((uint64_t)MT_INITIAL_VALUE) | (((uint64_t)MT_INITIAL_VALUE) << 32))                       
 
 typedef void (*sy_munge_t)(void*);
 
@@ -1102,7 +1102,7 @@ mt_test_mungers()
 	}
 }
 
-/* Exception Callback Test */
+                             
 static ex_cb_action_t
 excb_test_action(
 	ex_cb_class_t           cb_class,
@@ -1177,13 +1177,13 @@ arm64_ropjop_test()
 {
 	T_LOG("Testing ROP/JOP");
 
-	/* how is ROP/JOP configured */
+	                               
 	boolean_t config_rop_enabled = TRUE;
 	boolean_t config_jop_enabled = TRUE;
 
 
 	if (config_jop_enabled) {
-		/* jop key */
+		             
 		uint64_t apiakey_hi = __builtin_arm_rsr64("APIAKEYHI_EL1");
 		uint64_t apiakey_lo = __builtin_arm_rsr64("APIAKEYLO_EL1");
 
@@ -1191,41 +1191,41 @@ arm64_ropjop_test()
 	}
 
 	if (config_rop_enabled) {
-		/* rop key */
+		             
 		uint64_t apibkey_hi = __builtin_arm_rsr64("APIBKEYHI_EL1");
 		uint64_t apibkey_lo = __builtin_arm_rsr64("APIBKEYLO_EL1");
 
 		T_EXPECT(apibkey_hi != 0 && apibkey_lo != 0, NULL);
 
-		/* sign a KVA (the address of this function) */
+		                                               
 		uint64_t kva_signed = (uint64_t) ptrauth_sign_unauthenticated((void *)&config_rop_enabled, ptrauth_key_asib, 0);
 
-		/* assert it was signed (changed) */
+		                                    
 		T_EXPECT(kva_signed != (uint64_t)&config_rop_enabled, NULL);
 
-		/* authenticate the newly signed KVA */
+		                                       
 		uint64_t kva_authed = (uint64_t) ml_auth_ptr_unchecked((void *)kva_signed, ptrauth_key_asib, 0);
 
-		/* assert the authed KVA is the original KVA */
+		                                               
 		T_EXPECT(kva_authed == (uint64_t)&config_rop_enabled, NULL);
 
-		/* corrupt a signed ptr, auth it, ensure auth failed */
+		                                                       
 		uint64_t kva_corrupted = kva_signed ^ 1;
 
-		/* authenticate the corrupted pointer */
+		                                        
 		kva_authed = (uint64_t) ml_auth_ptr_unchecked((void *)kva_corrupted, ptrauth_key_asib, 0);
 
-		/* when AuthIB fails, bits 63:62 will be set to 2'b10 */
+		                                                        
 		uint64_t auth_fail_mask = 3ULL << 61;
 		uint64_t authib_fail = 2ULL << 61;
 
-		/* assert the failed authIB of corrupted pointer is tagged */
+		                                                             
 		T_EXPECT((kva_authed & auth_fail_mask) == authib_fail, NULL);
 	}
 
 	return KERN_SUCCESS;
 }
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 #if __ARM_PAN_AVAILABLE__
 
@@ -1247,7 +1247,7 @@ arm64_pan_test_thread(void *arg, wait_result_t __unused wres)
 		arm64_pan_test();
 	}
 
-	/* unbind thread from specific cpu */
+	                                     
 	thread_bind(PROCESSOR_NULL);
 	thread_block(THREAD_CONTINUE_NULL);
 
@@ -1292,17 +1292,17 @@ arm64_pan_test_pan_enabled_fault_handler(arm_saved_state_t * state)
 	    (cpsr & PSR64_PAN) &&
 	    ((esr & ISS_DA_WNR) ? mmu_kvtop_wpreflight(far) : mmu_kvtop(far))) {
 		++pan_exception_level;
-		// read the user-accessible value to make sure
-		// pan is enabled and produces a 2nd fault from
-		// the exception handler
+		                                              
+		                                               
+		                        
 		if (pan_exception_level == 1) {
 			ml_expect_fault_begin(arm64_pan_test_pan_enabled_fault_handler, far);
 			pan_fault_value = *(volatile char *)far;
 			ml_expect_fault_end();
-			__builtin_arm_wsr("pan", 1); // turn PAN back on after the nested exception cleared it for this context
+			__builtin_arm_wsr("pan", 1);                                                                           
 		}
-		// this fault address is used for PAN test
-		// disable PAN and rerun
+		                                          
+		                        
 		mask_saved_state_cpsr(state, 0, PSR64_PAN);
 
 		retval = true;
@@ -1323,13 +1323,13 @@ arm64_pan_test_pan_disabled_fault_handler(arm_saved_state_t * state)
 	if ((class == ESR_EC_DABORT_EL1) && (fsc == FSC_PERMISSION_FAULT_L3) &&
 	    !(cpsr & PSR64_PAN)) {
 		++pan_exception_level;
-		// On an exception taken from a PAN-disabled context, verify
-		// that PAN is re-enabled for the exception handler and that
-		// accessing the test address produces a PAN fault.
+		                                                            
+		                                                            
+		                                                   
 		ml_expect_fault_begin(arm64_pan_test_pan_enabled_fault_handler, pan_test_addr);
 		pan_fault_value = *(volatile char *)pan_test_addr;
 		ml_expect_fault_end();
-		__builtin_arm_wsr("pan", 1); // turn PAN back on after the nested exception cleared it for this context
+		__builtin_arm_wsr("pan", 1);                                                                           
 		add_saved_state_pc(state, 4);
 
 		retval = true;
@@ -1353,18 +1353,18 @@ arm64_pan_test()
 
 	pan_exception_level = 0;
 	pan_fault_value = 0xDE;
-	// convert priv_addr to one that is accessible from user mode
+	                                                             
 	pan_test_addr = priv_addr + _COMM_HIGH_PAGE64_BASE_ADDRESS -
 	    _COMM_PAGE_START_ADDRESS;
 
-	// Context-switch with PAN disabled is prohibited; prevent test logging from
-	// triggering a voluntary context switch.
+	                                                                            
+	                                         
 	mp_disable_preemption();
 
-	// Below should trigger a PAN exception as pan_test_addr is accessible
-	// in user mode
-	// The exception handler, upon recognizing the fault address is pan_test_addr,
-	// will disable PAN and rerun this instruction successfully
+	                                                                      
+	               
+	                                                                              
+	                                                           
 	ml_expect_fault_begin(arm64_pan_test_pan_enabled_fault_handler, pan_test_addr);
 	values_match = (*(volatile char *)pan_test_addr == *(volatile char *)priv_addr);
 	ml_expect_fault_end();
@@ -1380,8 +1380,8 @@ arm64_pan_test()
 	pan_fault_value = 0xAD;
 	pan_ro_addr = (vm_offset_t) &pan_ro_value;
 
-	// Force a permission fault while PAN is disabled to make sure PAN is
-	// re-enabled during the exception handler.
+	                                                                     
+	                                           
 	ml_expect_fault_begin(arm64_pan_test_pan_disabled_fault_handler, pan_ro_addr);
 	*((volatile uint64_t*)pan_ro_addr) = 0xFEEDFACECAFECAFE;
 	ml_expect_fault_end();
@@ -1401,7 +1401,7 @@ arm64_pan_test()
 
 	return KERN_SUCCESS;
 }
-#endif /* __ARM_PAN_AVAILABLE__ */
+#endif                            
 
 
 kern_return_t
@@ -1419,7 +1419,7 @@ arm64_munger_test()
 
 #if defined(KERNEL_INTEGRITY_CTRR) && defined(CONFIG_XNUPOST)
 SECURITY_READ_ONLY_LATE(uint64_t) ctrr_ro_test;
-uint64_t ctrr_nx_test = 0xd65f03c0; /* RET */
+uint64_t ctrr_nx_test = 0xd65f03c0;          
 volatile uint64_t ctrr_exception_esr;
 vm_offset_t ctrr_test_va;
 vm_offset_t ctrr_test_page;
@@ -1436,7 +1436,7 @@ ctrr_test(void)
 	if (csr_unsafe_kernel_text) {
 		ctrr_disable = TRUE;
 	}
-#endif /* CONFIG_CSR_FROM_DT */
+#endif                         
 
 	if (ctrr_disable) {
 		T_LOG("Skipping CTRR test when -unsafe_kernel_text boot-arg present");
@@ -1452,7 +1452,7 @@ ctrr_test(void)
 		ctrr_test_cpu();
 	}
 
-	/* unbind thread from specific cpu */
+	                                     
 	thread_bind(PROCESSOR_NULL);
 	thread_block(THREAD_CONTINUE_NULL);
 
@@ -1486,7 +1486,7 @@ ctrr_test_nx_fault_handler(arm_saved_state_t * state)
 
 	if ((class == ESR_EC_IABORT_EL1) && (fsc == FSC_PERMISSION_FAULT_L3)) {
 		ctrr_exception_esr = esr;
-		/* return to the instruction immediately after the call to NX page */
+		                                                                     
 		set_saved_state_pc(state, get_saved_state_lr(state));
 		retval = true;
 	}
@@ -1494,8 +1494,8 @@ ctrr_test_nx_fault_handler(arm_saved_state_t * state)
 	return retval;
 }
 
-/* test CTRR on a cpu, caller to bind thread to desired cpu */
-/* ctrr_test_page was reserved during bootstrap process */
+                                                              
+                                                          
 kern_return_t
 ctrr_test_cpu(void)
 {
@@ -1506,7 +1506,7 @@ ctrr_test_cpu(void)
 	uint64_t prot = 0;
 	extern vm_offset_t virtual_space_start;
 
-	/* ctrr read only region = [rorgn_begin_va, rorgn_end_va) */
+	                                                            
 
 	vm_offset_t rorgn_begin_va = phystokv(ctrr_begin);
 	vm_offset_t rorgn_end_va = phystokv(ctrr_end) + 1;
@@ -1531,8 +1531,8 @@ ctrr_test_cpu(void)
 	    VM_PROT_READ | VM_PROT_WRITE, VM_PROT_NONE, VM_WIMG_USE_DEFAULT, FALSE);
 	T_EXPECT(kr == KERN_SUCCESS, "Expect pmap_enter of RW mapping to succeed");
 
-	// assert entire mmu prot path (Hierarchical protection model) is NOT RO
-	// fetch effective block level protections from table/block entries
+	                                                                        
+	                                                                   
 	prot = pmap_get_arm64_prot(kernel_pmap, ctrr_test_page);
 	T_EXPECT(ARM_PTE_EXTRACT_AP(prot) == AP_RWNA && (prot & ARM_PTE_PNX), "Mapping is EL1 RWNX");
 
@@ -1541,13 +1541,13 @@ ctrr_test_cpu(void)
 
 	T_LOG("Read only region test writing to %p to provoke data abort", ctrr_ro_test_ptr);
 
-	// should cause data abort
+	                          
 	ml_expect_fault_begin(ctrr_test_ro_fault_handler, ctrr_test_va);
 	*ctrr_ro_test_ptr = 1;
 	ml_expect_fault_end();
 
-	// ensure write permission fault at expected level
-	// data abort handler will set ctrr_exception_esr when ctrr_test_va takes a permission fault
+	                                                  
+	                                                                                            
 
 	T_EXPECT(ESR_EC(ctrr_exception_esr) == ESR_EC_DABORT_EL1, "Data Abort from EL1 expected");
 	T_EXPECT(ISS_DA_FSC(ESR_ISS(ctrr_exception_esr)) == FSC_PERMISSION_FAULT_L3, "Permission Fault Expected");
@@ -1563,7 +1563,7 @@ ctrr_test_cpu(void)
 	    VM_PROT_READ | VM_PROT_EXECUTE, VM_PROT_NONE, VM_WIMG_USE_DEFAULT, FALSE);
 	T_EXPECT(kr == KERN_SUCCESS, "Expect pmap_enter of RX mapping to succeed");
 
-	// assert entire mmu prot path (Hierarchical protection model) is NOT XN
+	                                                                        
 	prot = pmap_get_arm64_prot(kernel_pmap, ctrr_test_page);
 	T_EXPECT(ARM_PTE_EXTRACT_AP(prot) == AP_RONA && (~prot & ARM_PTE_PNX), "Mapping is EL1 ROX");
 
@@ -1576,12 +1576,12 @@ ctrr_test_cpu(void)
 
 	T_LOG("No execute test calling ctrr_nx_test_ptr(): %p to provoke instruction abort", ctrr_nx_test_ptr);
 
-	// should cause prefetch abort
+	                              
 	ml_expect_fault_begin(ctrr_test_nx_fault_handler, ctrr_test_va);
 	ctrr_nx_test_ptr();
 	ml_expect_fault_end();
 
-	// TODO: ensure execute permission fault at expected level
+	                                                          
 	T_EXPECT(ESR_EC(ctrr_exception_esr) == ESR_EC_IABORT_EL1, "Instruction abort from EL1 Expected");
 	T_EXPECT(ISS_DA_FSC(ESR_ISS(ctrr_exception_esr)) == FSC_PERMISSION_FAULT_L3, "Permission Fault Expected");
 
@@ -1593,12 +1593,12 @@ ctrr_test_cpu(void)
 	T_LOG("Expect no faults when reading CTRR region to verify correct programming of CTRR limits");
 	for (vm_offset_t addr = rorgn_begin_va; addr < rorgn_end_va; addr += 8) {
 		volatile uint64_t x = *(uint64_t *)addr;
-		(void) x; /* read for side effect only */
+		(void) x;                                
 	}
 
 	return KERN_SUCCESS;
 }
-#endif /* defined(KERNEL_INTEGRITY_CTRR) && defined(CONFIG_XNUPOST) */
+#endif                                                                
 
 #if HAS_TWO_STAGE_SPR_LOCK
 
@@ -1630,7 +1630,7 @@ arm64_spr_lock_test()
 		spr_lock_test_addr = 0;
 	}
 
-	/* unbind thread from specific cpu */
+	                                     
 	thread_bind(PROCESSOR_NULL);
 	thread_block(THREAD_CONTINUE_NULL);
 
@@ -1639,4 +1639,4 @@ arm64_spr_lock_test()
 	return KERN_SUCCESS;
 }
 
-#endif /* HAS_TWO_STAGE_SPR_LOCK */
+#endif                             

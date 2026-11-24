@@ -29,27 +29,27 @@
 #ifndef _I386_POSTCODE_H_
 #define _I386_POSTCODE_H_
 
-/*
- * Postcodes are no longer enabled by default in the DEBUG kernel
- * because platforms may not have builtin port 0x80 support.
- * To re-enable postcode outpout, uncomment the following define:
- */
-//#define DEBUG_POSTCODE 1
+  
+                                                                 
+                                                            
+                                                                 
+   
+                          
 
-/* Define this to delay about 1 sec after posting each code */
-//#define POSTCODE_DELAY 1
+                                                              
+                          
 
-/* The POSTCODE is port 0x80 */
+                               
 #define POSTPORT 0x80
 
 #define SPINCOUNT       300000000
 #define CPU_PAUSE()     rep; nop
 
 #if DEBUG_POSTCODE
-/*
- * Macro to output byte value to postcode, destoying register al.
- * Additionally, if POSTCODE_DELAY, spin for about a second.
- */
+  
+                                                                 
+                                                            
+   
 #if POSTCODE_DELAY
 #define POSTCODE_AL                     \
 	outb    %al,$(POSTPORT);        \
@@ -70,7 +70,7 @@
 	outb    %al,$(POSTPORT)
 #define POSTCODE_AX                     \
 	outw    %ax,$(POSTPORT)
-#endif /* POSTCODE_DELAY */
+#endif                     
 
 #define POSTCODE(XX)                    \
 	mov	$(XX), %al;             \
@@ -80,17 +80,17 @@
 	mov	$(XXXX), %ax;           \
 	POSTCODE_AX
 
-/* Output byte value to postcode, without destoying register eax */
+                                                                   
 #define POSTCODE_SAVE_EAX(XX)           \
 	push	%eax;                   \
 	POSTCODE(XX);                   \
 	pop	%eax
 
-/*
- * Display a 32-bit value to the post card - low byte to high byte
- * Entry: value in %ebx
- * Exit: %ebx preserved; %eax destroyed
- */
+  
+                                                                  
+                       
+                                       
+   
 #define POSTCODE32_EBX                  \
 	roll	$8, %ebx;               \
 	movl	%ebx, %eax;             \
@@ -108,18 +108,18 @@
 	movl	%ebx, %eax;             \
 	POSTCODE_AL
 
-#else   /* DEBUG_POSTCODE */
+#else                       
 #define POSTCODE_AL
 #define POSTCODE_AX
 #define POSTCODE(X)
 #define POSTCODE2(X)
 #define POSTCODE_SAVE_EAX(X)
 #define POSTCODE32_EBX
-#endif  /* DEBUG_POSTCODE */
+#endif                      
 
-/*
- * The following postcodes are defined for stages of early startup:
- */
+  
+                                                                   
+   
 
 #define PSTART_ENTRY                    0xFF
 #define PSTART_REBASE                   0xFE
@@ -142,12 +142,12 @@
 #define SLAVE_PSTART                    0xEE
 #define I386_INIT_SLAVE                 0xED
 
-#define PANIC_DOUBLE_FAULT              0xDF    /* Double Fault exception */
-#define PANIC_MACHINE_CHECK             0xDC    /* Machine-Check */
-#define MP_KDP_ENTER                    0xDB    /* Debugger Begin */
-#define MP_KDP_EXIT                     0xDE    /* Debugger End */
-#define PANIC_HLT                       0xD1    /* Die an early death */
-#define BOOT_TRAP_HLT                   0xD0    /* D'oh! even earlier */
+#define PANIC_DOUBLE_FAULT              0xDF                                
+#define PANIC_MACHINE_CHECK             0xDC                       
+#define MP_KDP_ENTER                    0xDB                        
+#define MP_KDP_EXIT                     0xDE                      
+#define PANIC_HLT                       0xD1                            
+#define BOOT_TRAP_HLT                   0xD0                            
 
 #define ACPI_WAKE_START_ENTRY           0xCF
 #define ACPI_WAKE_PROT_ENTRY            0xCE
@@ -205,4 +205,4 @@ postcode2(uint8_t       xxxx)
 #endif
 #endif
 
-#endif /* _I386_POSTCODE_H_ */
+#endif                        

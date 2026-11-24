@@ -63,13 +63,13 @@
 	dptr = t->t_data;                                               \
 } while (0)
 
-/*
- * token ID                1 byte
- * argument #              1 byte
- * argument value          4 bytes/8 bytes (32-bit/64-bit value)
- * text length             2 bytes
- * text                    N bytes + 1 terminating NULL byte
- */
+  
+                                 
+                                 
+                                                                
+                                  
+                                                            
+   
 token_t *
 au_to_arg32(char n, const char *text, u_int32_t v)
 {
@@ -121,15 +121,15 @@ au_to_arg(char n, const char *text, u_int32_t v)
 }
 
 #if defined(_KERNEL) || defined(KERNEL)
-/*
- * token ID                1 byte
- * file access mode        4 bytes
- * owner user ID           4 bytes
- * owner group ID          4 bytes
- * file system ID          4 bytes
- * node ID                 8 bytes
- * device                  4 bytes/8 bytes (32-bit/64-bit)
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                  
+                                  
+                                                          
+   
 token_t *
 au_to_attr32(struct vnode_au_info *vni)
 {
@@ -143,10 +143,10 @@ au_to_attr32(struct vnode_au_info *vni)
 
 	ADD_U_CHAR(dptr, AUT_ATTR32);
 
-	/*
-	 * Darwin defines the size for the file mode
-	 * as 2 bytes; BSM defines 4 so pad with 0
-	 */
+	  
+                                             
+                                           
+    
 	ADD_U_INT16(dptr, pad0_16);
 	ADD_U_INT16(dptr, vni->vn_mode);
 
@@ -154,12 +154,12 @@ au_to_attr32(struct vnode_au_info *vni)
 	ADD_U_INT32(dptr, vni->vn_gid);
 	ADD_U_INT32(dptr, vni->vn_fsid);
 
-	/*
-	 * Some systems use 32-bit file ID's, others use 64-bit file IDs.
-	 * Attempt to handle both, and let the compiler sort it out.  If we
-	 * could pick this out at compile-time, it would be better, so as to
-	 * avoid the else case below.
-	 */
+	  
+                                                                  
+                                                                    
+                                                                     
+                              
+    
 	if (sizeof(vni->vn_fileid) == sizeof(uint32_t)) {
 		ADD_U_INT32(dptr, pad0_32);
 		ADD_U_INT32(dptr, vni->vn_fileid);
@@ -187,10 +187,10 @@ au_to_attr64(struct vnode_au_info *vni)
 
 	ADD_U_CHAR(dptr, AUT_ATTR64);
 
-	/*
-	 * Darwin defines the size for the file mode
-	 * as 2 bytes; BSM defines 4 so pad with 0
-	 */
+	  
+                                             
+                                           
+    
 	ADD_U_INT16(dptr, pad0_16);
 	ADD_U_INT16(dptr, vni->vn_mode);
 
@@ -198,12 +198,12 @@ au_to_attr64(struct vnode_au_info *vni)
 	ADD_U_INT32(dptr, vni->vn_gid);
 	ADD_U_INT32(dptr, vni->vn_fsid);
 
-	/*
-	 * Some systems use 32-bit file ID's, other's use 64-bit file IDs.
-	 * Attempt to handle both, and let the compiler sort it out.  If we
-	 * could pick this out at compile-time, it would be better, so as to
-	 * avoid the else case below.
-	 */
+	  
+                                                                   
+                                                                    
+                                                                     
+                              
+    
 	if (sizeof(vni->vn_fileid) == sizeof(uint32_t)) {
 		ADD_U_INT32(dptr, pad0_32);
 		ADD_U_INT32(dptr, vni->vn_fileid);
@@ -223,15 +223,15 @@ au_to_attr(struct vnode_au_info *vni)
 {
 	return au_to_attr32(vni);
 }
-#endif /* defined(_KERNEL) || defined(KERNEL) */
+#endif                                          
 
-/*
- * token ID                1 byte
- * how to print            1 byte
- * basic unit              1 byte
- * unit count              1 byte
- * data items              (depends on basic unit)
- */
+  
+                                 
+                                 
+                                 
+                                 
+                                                  
+   
 token_t *
 au_to_data(char unit_print, char unit_type, char unit_count, const char *p)
 {
@@ -239,10 +239,10 @@ au_to_data(char unit_print, char unit_type, char unit_count, const char *p)
 	u_char *dptr = NULL;
 	size_t datasize, totdata;
 
-	/* Determine the size of the basic unit. */
+	                                           
 	switch (unit_type) {
 	case AUR_BYTE:
-		/* case AUR_CHAR: */
+		                    
 		datasize = AUR_BYTE_SIZE;
 		break;
 
@@ -251,7 +251,7 @@ au_to_data(char unit_print, char unit_type, char unit_count, const char *p)
 		break;
 
 	case AUR_INT32:
-		/* case AUR_INT: */
+		                   
 		datasize = AUR_INT32_SIZE;
 		break;
 
@@ -260,7 +260,7 @@ au_to_data(char unit_print, char unit_type, char unit_count, const char *p)
 		break;
 
 	default:
-		/* For unknown assume byte. */
+		                              
 		datasize = AUR_BYTE_SIZE;
 		break;
 	}
@@ -278,11 +278,11 @@ au_to_data(char unit_print, char unit_type, char unit_count, const char *p)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * status		   4 bytes
- * return value            4 bytes
- */
+  
+                                 
+                     
+                                  
+   
 token_t *
 au_to_exit(int retval, int err)
 {
@@ -298,19 +298,19 @@ au_to_exit(int retval, int err)
 	return t;
 }
 
-/*
- */
+  
+   
 token_t *
 au_to_groups(int *groups)
 {
 	return au_to_newgroups(AUDIT_MAX_GROUPS, (gid_t *)groups);
 }
 
-/*
- * token ID                1 byte
- * number groups           2 bytes
- * group list              count * 4 bytes
- */
+  
+                                 
+                                  
+                                          
+   
 token_t *
 au_to_newgroups(u_int16_t n, gid_t *groups)
 {
@@ -330,10 +330,10 @@ au_to_newgroups(u_int16_t n, gid_t *groups)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * internet address        4 bytes
- */
+  
+                                 
+                                  
+   
 token_t *
 au_to_in_addr(struct in_addr *internet_addr)
 {
@@ -348,11 +348,11 @@ au_to_in_addr(struct in_addr *internet_addr)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * address type/length     4 bytes
- * address                16 bytes
- */
+  
+                                 
+                                  
+                                  
+   
 token_t *
 au_to_in_addr_ex(struct in6_addr *internet_addr)
 {
@@ -369,12 +369,12 @@ au_to_in_addr_ex(struct in6_addr *internet_addr)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * ip header		   20 bytes
- *
- * The IP header should be submitted in network byte order.
- */
+  
+                                 
+                         
+  
+                                                           
+   
 token_t *
 au_to_ip(struct ip *ip)
 {
@@ -389,11 +389,11 @@ au_to_ip(struct ip *ip)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * object ID type          1 byte
- * object ID               4 bytes
- */
+  
+                                 
+                                 
+                                  
+   
 token_t *
 au_to_ipc(char type, int id)
 {
@@ -409,16 +409,16 @@ au_to_ipc(char type, int id)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * owner user ID           4 bytes
- * owner group ID          4 bytes
- * creator user ID         4 bytes
- * creator group ID        4 bytes
- * access mode             4 bytes
- * slot sequence #         4 bytes
- * key                     4 bytes
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+   
 token_t *
 au_to_ipc_perm(struct ipc_perm *perm)
 {
@@ -435,10 +435,10 @@ au_to_ipc_perm(struct ipc_perm *perm)
 
 	ADD_U_CHAR(dptr, AUT_IPC_PERM);
 
-	/*
-	 * Darwin defines the size for the file mode
-	 * as 2 bytes; BSM defines 4 so pad with 0
-	 */
+	  
+                                             
+                                           
+    
 	ADD_U_INT32(dptr, perm->uid);
 	ADD_U_INT32(dptr, perm->gid);
 	ADD_U_INT32(dptr, perm->cuid);
@@ -456,10 +456,10 @@ au_to_ipc_perm(struct ipc_perm *perm)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * port IP address         2 bytes
- */
+  
+                                 
+                                  
+   
 token_t *
 au_to_iport(u_int16_t iport)
 {
@@ -474,11 +474,11 @@ au_to_iport(u_int16_t iport)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * size                    2 bytes
- * data                    size bytes
- */
+  
+                                 
+                                  
+                                     
+   
 token_t *
 au_to_opaque(const char *data, uint16_t bytes)
 {
@@ -494,13 +494,13 @@ au_to_opaque(const char *data, uint16_t bytes)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * seconds of time         4 bytes
- * milliseconds of time    4 bytes
- * file name len           2 bytes
- * file pathname           N bytes + 1 terminating NULL byte
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                                            
+   
 token_t *
 au_to_file(const char *file, struct timeval tm)
 {
@@ -519,18 +519,18 @@ au_to_file(const char *file, struct timeval tm)
 
 	ADD_U_CHAR(dptr, AUT_OTHER_FILE32);
 	ADD_U_INT32(dptr, tm.tv_sec);
-	ADD_U_INT32(dptr, timems);      /* We need time in ms. */
+	ADD_U_INT32(dptr, timems);                               
 	ADD_U_INT16(dptr, filelen);
 	ADD_STRING(dptr, file, filelen);
 
 	return t;
 }
 
-/*
- * token ID                1 byte
- * text length             2 bytes
- * text                    N bytes + 1 terminating NULL byte
- */
+  
+                                 
+                                  
+                                                            
+   
 token_t *
 au_to_text(const char *text)
 {
@@ -550,11 +550,11 @@ au_to_text(const char *text)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * path length             2 bytes
- * path                    N bytes + 1 terminating NULL byte
- */
+  
+                                 
+                                  
+                                                            
+   
 token_t *
 au_to_path(const char *text)
 {
@@ -574,19 +574,19 @@ au_to_path(const char *text)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * audit ID                4 bytes
- * effective user ID       4 bytes
- * effective group ID      4 bytes
- * real user ID            4 bytes
- * real group ID           4 bytes
- * process ID              4 bytes
- * session ID              4 bytes
- * terminal ID
- *   port ID               4 bytes/8 bytes (32-bit/64-bit value)
- *   machine address       4 bytes
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+              
+                                                                
+                                  
+   
 token_t *
 au_to_process32(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid, gid_t rgid,
     pid_t pid, au_asid_t sid, au_tid_t *tid)
@@ -642,20 +642,20 @@ au_to_process(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid, gid_t rgid,
 	           tid);
 }
 
-/*
- * token ID                1 byte
- * audit ID                4 bytes
- * effective user ID       4 bytes
- * effective group ID      4 bytes
- * real user ID            4 bytes
- * real group ID           4 bytes
- * process ID              4 bytes
- * session ID              4 bytes
- * terminal ID
- *   port ID               4 bytes/8 bytes (32-bit/64-bit value)
- *   address type-len      4 bytes
- *   machine address    4/16 bytes
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+              
+                                                                
+                                  
+                                  
+   
 token_t *
 au_to_process32_ex(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid,
     gid_t rgid, pid_t pid, au_asid_t sid, au_tid_addr_t *tid)
@@ -740,11 +740,11 @@ au_to_process_ex(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid,
 	           tid);
 }
 
-/*
- * token ID                1 byte
- * error status            1 byte
- * return value            4 bytes/8 bytes (32-bit/64-bit value)
- */
+  
+                                 
+                                 
+                                                                
+   
 token_t *
 au_to_return32(char status, u_int32_t ret)
 {
@@ -781,10 +781,10 @@ au_to_return(char status, u_int32_t ret)
 	return au_to_return32(status, ret);
 }
 
-/*
- * token ID                1 byte
- * sequence number         4 bytes
- */
+  
+                                 
+                                  
+   
 token_t *
 au_to_seq(long audit_count)
 {
@@ -799,16 +799,16 @@ au_to_seq(long audit_count)
 	return t;
 }
 
-/*
- * token ID		1 byte
- * socket domain	2 bytes
- * socket type		2 bytes
- * address type		2 bytes
- * local port		2 bytes
- * local address	4 bytes/16 bytes (IPv4/IPv6 address)
- * remote port		2 bytes
- * remote address	4 bytes/16 bytes (IPv4/IPv6 address)
- */
+  
+                   
+                        
+                       
+                        
+                      
+                                                     
+                       
+                                                      
+   
 token_t *
 au_to_socket_ex(u_short so_domain, u_short so_type,
     struct sockaddr *sa_local, struct sockaddr *sa_remote)
@@ -839,7 +839,7 @@ au_to_socket_ex(u_short so_domain, u_short so_type,
 		sin = (struct sockaddr_in *)sa_remote;
 		ADD_MEM(dptr, &sin->sin_port, sizeof(uint16_t));
 		ADD_MEM(dptr, &sin->sin_addr.s_addr, sizeof(uint32_t));
-	} else { /* if (so_domain == AF_INET6) */
+	} else {                                 
 		ADD_U_INT16(dptr, AU_IPv6);
 		sin6 = (struct sockaddr_in6 *)sa_local;
 		ADD_MEM(dptr, &sin6->sin6_port, sizeof(uint16_t));
@@ -852,11 +852,11 @@ au_to_socket_ex(u_short so_domain, u_short so_type,
 	return t;
 }
 
-/*
- * token ID                1 byte
- * socket family           2 bytes
- * path                    (up to) 104 bytes + NULL
- */
+  
+                                 
+                                  
+                                                   
+   
 token_t *
 au_to_sock_unix(struct sockaddr_un *so)
 {
@@ -864,10 +864,10 @@ au_to_sock_unix(struct sockaddr_un *so)
 	u_char *dptr;
 	size_t slen;
 
-	/*
-	 * Please note that sun_len may not be correctly set and sun_path may
-	 * not be NULL terminated.
-	 */
+	  
+                                                                      
+                           
+    
 	if (so->sun_len >= offsetof(struct sockaddr_un, sun_path)) {
 		slen = min(so->sun_len - offsetof(struct sockaddr_un, sun_path),
 		    strnlen(so->sun_path, sizeof(so->sun_path)));
@@ -878,23 +878,23 @@ au_to_sock_unix(struct sockaddr_un *so)
 	GET_TOKEN_AREA(t, dptr, 3 * sizeof(u_char) + slen + 1);
 
 	ADD_U_CHAR(dptr, AUT_SOCKUNIX);
-	/* BSM token has two bytes for family */
+	                                        
 	ADD_U_CHAR(dptr, 0);
 	ADD_U_CHAR(dptr, so->sun_family);
 	if (slen) {
 		ADD_MEM(dptr, so->sun_path, slen);
 	}
-	ADD_U_CHAR(dptr, '\0'); /* make the path a null-terminated string */
+	ADD_U_CHAR(dptr, '\0');                                             
 
 	return t;
 }
 
-/*
- * token ID                1 byte
- * socket family           2 bytes
- * local port              2 bytes
- * socket address          4 bytes
- */
+  
+                                 
+                                  
+                                  
+                                  
+   
 token_t *
 au_to_sock_inet32(struct sockaddr_in *so)
 {
@@ -905,11 +905,11 @@ au_to_sock_inet32(struct sockaddr_in *so)
 	    sizeof(uint32_t));
 
 	ADD_U_CHAR(dptr, AUT_SOCKINET32);
-	/*
-	 * Convert sin_family to the BSM value.  Assume that both the port and
-	 * the address in the sockaddr_in are already in network byte order,
-	 * but family is in local byte order.
-	 */
+	  
+                                                                       
+                                                                     
+                                      
+    
 	ADD_U_INT16(dptr, au_domain_to_bsm(so->sin_family));
 	ADD_MEM(dptr, &so->sin_port, sizeof(uint16_t));
 	ADD_MEM(dptr, &so->sin_addr.s_addr, sizeof(uint32_t));
@@ -917,12 +917,12 @@ au_to_sock_inet32(struct sockaddr_in *so)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * socket family           2 bytes
- * local port              2 bytes
- * socket address          16 bytes
- */
+  
+                                 
+                                  
+                                  
+                                   
+   
 token_t *
 au_to_sock_inet128(struct sockaddr_in6 *so)
 {
@@ -947,19 +947,19 @@ au_to_sock_inet(struct sockaddr_in *so)
 	return au_to_sock_inet32(so);
 }
 
-/*
- * token ID                1 byte
- * audit ID                4 bytes
- * effective user ID       4 bytes
- * effective group ID      4 bytes
- * real user ID            4 bytes
- * real group ID           4 bytes
- * process ID              4 bytes
- * session ID              4 bytes
- * terminal ID
- *   port ID               4 bytes/8 bytes (32-bit/64-bit value)
- *   machine address       4 bytes
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+              
+                                                                
+                                  
+   
 token_t *
 au_to_subject32(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid, gid_t rgid,
     pid_t pid, au_asid_t sid, au_tid_t *tid)
@@ -1015,20 +1015,20 @@ au_to_subject(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid, gid_t rgid,
 	           tid);
 }
 
-/*
- * token ID                1 byte
- * audit ID                4 bytes
- * effective user ID       4 bytes
- * effective group ID      4 bytes
- * real user ID            4 bytes
- * real group ID           4 bytes
- * process ID              4 bytes
- * session ID              4 bytes
- * terminal ID
- *   port ID               4 bytes/8 bytes (32-bit/64-bit value)
- *   address type/length   4 bytes
- *   machine address    4/16 bytes
- */
+  
+                                 
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+              
+                                                                
+                                  
+                                  
+   
 token_t *
 au_to_subject32_ex(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid,
     gid_t rgid, pid_t pid, au_asid_t sid, au_tid_addr_t *tid)
@@ -1113,10 +1113,10 @@ au_to_subject_ex(au_id_t auid, uid_t euid, gid_t egid, uid_t ruid,
 }
 
 #if !defined(_KERNEL) && !defined(KERNEL) && defined(HAVE_AUDIT_SYSCALLS)
-/*
- * Collects audit information for the current process
- * and creates a subject token from it
- */
+  
+                                                     
+                                      
+   
 token_t *
 au_to_me(void)
 {
@@ -1156,55 +1156,55 @@ au_to_exec_strings(const char *strs, int count, u_char type)
 	return t;
 }
 
-/*
- * token ID         1 byte
- * count            4 bytes
- * text             count null-terminated strings
- */
+  
+                          
+                           
+                                                 
+   
 token_t *
 au_to_exec_args(char *args, int argc)
 {
 	return au_to_exec_strings(args, argc, AUT_EXEC_ARGS);
 }
 
-/*
- * token ID         1 byte
- * count            4 bytes
- * text             count null-terminated strings
- */
+  
+                          
+                           
+                                                 
+   
 token_t *
 au_to_exec_env(char *envs, int envc)
 {
 	return au_to_exec_strings(envs, envc, AUT_EXEC_ENV);
 }
 
-/*
- * token ID         1 byte
- * count            4 bytes
- * text             count null-terminated strings
- */
+  
+                          
+                           
+                                                 
+   
 token_t *
 au_to_certificate_hash(char *hashes, int hashc)
 {
 	return au_to_exec_strings(hashes, hashc, AUT_CERT_HASH);
 }
 
-/*
- * token ID         1 byte
- * count            4 bytes
- * text             count null-terminated strings
- */
+  
+                          
+                           
+                                                 
+   
 token_t *
 au_to_krb5_principal(char *principals, int princ)
 {
 	return au_to_exec_strings(principals, princ, AUT_KRB5_PRINCIPAL);
 }
 #else
-/*
- * token ID        1 byte
- * count           4 bytes
- * text            count null-terminated strings
- */
+  
+                         
+                          
+                                                
+   
 token_t *
 au_to_exec_args(char **argv)
 {
@@ -1225,7 +1225,7 @@ au_to_exec_args(char **argv)
 		nextarg = *(argv + count);
 	}
 
-	totlen += count * sizeof(char); /* nul terminations. */
+	totlen += count * sizeof(char);                        
 	GET_TOKEN_AREA(t, dptr, sizeof(u_char) + sizeof(u_int32_t) + totlen);
 
 	ADD_U_CHAR(dptr, AUT_EXEC_ARGS);
@@ -1239,11 +1239,11 @@ au_to_exec_args(char **argv)
 	return t;
 }
 
-/*
- * token ID                1 byte
- * zonename length         2 bytes
- * zonename                N bytes + 1 terminating NULL byte
- */
+  
+                                 
+                                  
+                                                            
+   
 token_t *
 au_to_zonename(char *zonename)
 {
@@ -1260,11 +1260,11 @@ au_to_zonename(char *zonename)
 	return t;
 }
 
-/*
- * token ID               1 byte
- * count                  4 bytes
- * text                   count null-terminated strings
- */
+  
+                                
+                                 
+                                                       
+   
 token_t *
 au_to_exec_env(char **envp)
 {
@@ -1297,20 +1297,20 @@ au_to_exec_env(char **envp)
 
 	return t;
 }
-#endif  /* !(defined(_KERNEL) || defined(KERNEL)) */
+#endif                                              
 
-/*
- * token ID             1 byte
- * signer type          4 bytes
- * signer id length     2 bytes
- * signer id            n bytes
- * signer id truncated  1 byte
- * team id length       2 bytes
- * team id              n bytes
- * team id truncated    1 byte
- * cdhash length        2 bytes
- * cdhash               n bytes
- */
+  
+                              
+                               
+                               
+                               
+                              
+                               
+                               
+                              
+                               
+                               
+   
 token_t*
 au_to_identity(uint32_t signer_type, const char* signing_id,
     u_char signing_id_trunc, const char* team_id, u_char team_id_trunc,
@@ -1331,48 +1331,48 @@ au_to_identity(uint32_t signer_type, const char* signing_id,
 	}
 
 	totlen =
-	    sizeof(u_char) +        // token id
-	    sizeof(uint32_t) +      // signer type
-	    sizeof(uint16_t) +      // singing id length
-	    signing_id_len +        // length of signing id to copy
-	    sizeof(u_char) +        // null terminator for signing id
-	    sizeof(u_char) +        // if signing id truncated
-	    sizeof(uint16_t) +      // team id length
-	    team_id_len +           // length of team id to copy
-	    sizeof(u_char) +        // null terminator for team id
-	    sizeof(u_char) +        // if team id truncated
-	    sizeof(uint16_t) +      // cdhash length
-	    cdhash_len;             // cdhash buffer
+	    sizeof(u_char) +                   
+	    sizeof(uint32_t) +                    
+	    sizeof(uint16_t) +                          
+	    signing_id_len +                                       
+	    sizeof(u_char) +                                         
+	    sizeof(u_char) +                                  
+	    sizeof(uint16_t) +                       
+	    team_id_len +                                       
+	    sizeof(u_char) +                                      
+	    sizeof(u_char) +                               
+	    sizeof(uint16_t) +                      
+	    cdhash_len;                             
 
 	GET_TOKEN_AREA(t, dptr, totlen);
 
-	ADD_U_CHAR(dptr, AUT_IDENTITY);                // token id
-	ADD_U_INT32(dptr, signer_type);                // signer type
-	ADD_U_INT16(dptr, signing_id_len + 1);         // signing id length+null
-	ADD_STRING(dptr, signing_id, signing_id_len);  // truncated signing id
-	ADD_U_CHAR(dptr, 0);                           // null terminator byte
-	ADD_U_CHAR(dptr, signing_id_trunc);            // if signing id is trunc
-	ADD_U_INT16(dptr, team_id_len + 1);            // team id length+null
-	ADD_STRING(dptr, team_id, team_id_len);        // truncated team id
-	ADD_U_CHAR(dptr, 0);                           // null terminator byte
-	ADD_U_CHAR(dptr, team_id_trunc);               // if team id is trunc
-	ADD_U_INT16(dptr, cdhash_len);                 // cdhash length
-	ADD_MEM(dptr, cdhash, cdhash_len);             // cdhash
+	ADD_U_CHAR(dptr, AUT_IDENTITY);                           
+	ADD_U_INT32(dptr, signer_type);                              
+	ADD_U_INT16(dptr, signing_id_len + 1);                                  
+	ADD_STRING(dptr, signing_id, signing_id_len);                         
+	ADD_U_CHAR(dptr, 0);                                                  
+	ADD_U_CHAR(dptr, signing_id_trunc);                                     
+	ADD_U_INT16(dptr, team_id_len + 1);                                  
+	ADD_STRING(dptr, team_id, team_id_len);                            
+	ADD_U_CHAR(dptr, 0);                                                  
+	ADD_U_CHAR(dptr, team_id_trunc);                                     
+	ADD_U_INT16(dptr, cdhash_len);                                 
+	ADD_MEM(dptr, cdhash, cdhash_len);                      
 
 	return t;
 }
 
-/*
- * token ID                1 byte
- * record byte count       4 bytes
- * version #               1 byte
- * event type              2 bytes
- * event modifier          2 bytes
- * address type/length     4 bytes
- * machine address         4 bytes/16 bytes (IPv4/IPv6 address)
- * seconds of time         4 bytes/8 bytes  (32/64-bits)
- * milliseconds of time    4 bytes/8 bytes  (32/64-bits)
- */
+  
+                                 
+                                  
+                                 
+                                  
+                                  
+                                  
+                                                               
+                                                        
+                                                        
+   
 token_t *
 au_to_header32_ex_tm(int rec_size, au_event_t e_type, au_emod_t e_mod,
     struct timeval tm, struct auditinfo_addr *aia)
@@ -1402,21 +1402,21 @@ au_to_header32_ex_tm(int rec_size, au_event_t e_type, au_emod_t e_mod,
 		ADD_MEM(dptr, &tid->at_addr[0], sizeof(u_int32_t));
 	}
 	timems = tm.tv_usec / 1000;
-	/* Add the timestamp */
+	                       
 	ADD_U_INT32(dptr, tm.tv_sec);
-	ADD_U_INT32(dptr, timems);      /* We need time in ms. */
+	ADD_U_INT32(dptr, timems);                               
 	return t;
 }
 
-/*
- * token ID                1 byte
- * record byte count       4 bytes
- * version #               1 byte    [2]
- * event type              2 bytes
- * event modifier          2 bytes
- * seconds of time         4 bytes/8 bytes (32-bit/64-bit value)
- * milliseconds of time    4 bytes/8 bytes (32-bit/64-bit value)
- */
+  
+                                 
+                                  
+                                        
+                                  
+                                  
+                                                                
+                                                                
+   
 token_t *
 au_to_header32_tm(int rec_size, au_event_t e_type, au_emod_t e_mod,
     struct timeval tm)
@@ -1435,9 +1435,9 @@ au_to_header32_tm(int rec_size, au_event_t e_type, au_emod_t e_mod,
 	ADD_U_INT16(dptr, e_mod);
 
 	timems = tm.tv_usec / 1000;
-	/* Add the timestamp */
+	                       
 	ADD_U_INT32(dptr, tm.tv_sec);
-	ADD_U_INT32(dptr, timems);      /* We need time in ms. */
+	ADD_U_INT32(dptr, timems);                               
 
 	return t;
 }
@@ -1460,18 +1460,18 @@ au_to_header64_tm(int rec_size, au_event_t e_type, au_emod_t e_mod,
 	ADD_U_INT16(dptr, e_mod);
 
 	timems = tm.tv_usec / 1000;
-	/* Add the timestamp */
+	                       
 	ADD_U_INT64(dptr, tm.tv_sec);
-	ADD_U_INT64(dptr, timems);      /* We need time in ms. */
+	ADD_U_INT64(dptr, timems);                               
 
 	return t;
 }
 
-/*
- * token ID                1 byte
- * trailer magic number    2 bytes
- * record byte count       4 bytes
- */
+  
+                                 
+                                  
+                                  
+   
 token_t *
 au_to_trailer(int rec_size)
 {
@@ -1488,4 +1488,4 @@ au_to_trailer(int rec_size)
 
 	return t;
 }
-#endif /* CONFIG_AUDIT */
+#endif                   

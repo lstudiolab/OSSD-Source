@@ -34,4 +34,4 @@
 #define ev_try_lock(l)   OSSpinLockTry(l)
 #endif
 
-#endif /* ! _IOKIT_IOSHAREDLOCK_H */
+#endif                              

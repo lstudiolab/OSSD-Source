@@ -1,13 +1,13 @@
-/*
- * Test to validate that we can schedule threads on all hw.ncpus cores according to _os_cpu_number
- *
- * <rdar://problem/29545645>
- * <rdar://problem/30445216>
- *
- *  xcrun -sdk macosx.internal clang -o cpucount cpucount.c -ldarwintest -g -Weverything
- *  xcrun -sdk iphoneos.internal clang -arch arm64 -o cpucount-ios cpucount.c -ldarwintest -g -Weverything
- *  xcrun -sdk macosx.internal clang -o cpucount cpucount.c -ldarwintest -arch arm64e -Weverything
- */
+  
+                                                                                                  
+  
+                            
+                            
+  
+                                                                                        
+                                                                                                          
+                                                                                                  
+   
 
 #include <darwintest.h>
 
@@ -22,7 +22,7 @@
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 
-#include <os/tsd.h> /* private header for _os_cpu_number */
+#include <os/tsd.h>                                        
 
 T_GLOBAL_META(
 	T_META_RUN_CONCURRENTLY(false),
@@ -58,8 +58,8 @@ get_csw_count()
 	return taskinfo.pti_csw;
 }
 
-// noinline hopefully keeps the optimizer from hoisting it out of the loop
-// until rdar://68253516 is fixed.
+                                                                          
+                                  
 __attribute__((noinline))
 static uint32_t
 fixed_os_cpu_number(void)
@@ -77,14 +77,14 @@ T_DECL(count_cpus, "Tests we can schedule bound threads on all hw.ncpus cores an
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 
-	/* Validate what kind of kernel we're on */
+	                                           
 	size_t kernel_version_size = sizeof(kernel_version);
 	rv = sysctlbyname("kern.version", kernel_version, &kernel_version_size, NULL, 0);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(rv, "kern.version");
 
 	T_LOG("kern.version: %s\n", kernel_version);
 
-	/* Double check that darwintest set the boot arg we requested */
+	                                                                
 	size_t kernel_bootargs_size = sizeof(kernel_bootargs);
 	rv = sysctlbyname("kern.bootargs", kernel_bootargs, &kernel_bootargs_size, NULL, 0);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(rv, "kern.bootargs");
@@ -176,7 +176,7 @@ T_DECL(count_cpus, "Tests we can schedule bound threads on all hw.ncpus cores an
 		    "should report same CPU number as was bound to");
 	}
 
-	int unbind = -1; /* pass -1 in order to unbind the thread */
+	int unbind = -1;                                            
 
 	rv = sysctlbyname("kern.sched_thread_bind_cpu", NULL, 0, &unbind, sizeof(unbind));
 

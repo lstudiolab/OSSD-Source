@@ -63,6 +63,6 @@ extern int              master_cpu;
 
 #include <machine/cpu_number.h>
 
-#endif  /* _KERN_CPU_NUMBER_H_ */
+#endif                           
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

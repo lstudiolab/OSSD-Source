@@ -31,12 +31,12 @@
 #include <stdint.h>
 #include "tsd.h"
 
-/*
- * cerror takes the return value of the syscall, being non-zero, and
- * stores it in errno. It needs to return -1 to indicate failure but
- * 64-bit platforms need to ensure that possible 128-bit wide return
- * values are also properly set.
- */
+  
+                                                                    
+                                                                    
+                                                                    
+                                
+   
 #ifdef __LP64__
 typedef unsigned __int128 cerror_return_t;
 #else

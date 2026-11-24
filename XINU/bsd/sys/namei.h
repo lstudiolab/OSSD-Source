@@ -67,20 +67,20 @@
 #include <sys/appleapiopts.h>
 
 #ifdef KERNEL
-#define LOCKLEAF        0x0004  /* lock inode on return */
-#define LOCKPARENT      0x0008  /* want parent vnode returned */
-#define WANTPARENT      0x0010  /* want parent vnode returned */
+#define LOCKLEAF        0x0004                            
+#define LOCKPARENT      0x0008                                  
+#define WANTPARENT      0x0010                                  
 
 #ifdef KERNEL_PRIVATE
-#define CN_SECLUDE_RENAME 0x10000000 /*rename iff ￢(hard-linked ∨ opened ∨ mmaped)*/
-#define CN_RAW_ENCRYPTED 0x80000000 /* Look-up is for RO raw encrypted access. */
+#define CN_SECLUDE_RENAME 0x10000000                                                
+#define CN_RAW_ENCRYPTED 0x80000000                                              
 #endif
 
-#endif // KERNEL
+#endif          
 
 #ifdef BSD_KERNEL_PRIVATE
 
-/* VFS Supports "/..namedfork/rsrc" access. */
+                                              
 #define NAMEDRSRCFORK           NAMEDSTREAMS
 
 
@@ -92,51 +92,51 @@
 
 #define PATHBUFLEN      256
 
-/*
- * Encapsulation of namei parameters.
- */
+  
+                                     
+   
 struct nameidata {
-	/*
-	 * Arguments to namei/lookup.
-	 */
-	user_addr_t ni_dirp;            /* pathname pointer */
-	enum    uio_seg ni_segflg;      /* location of pathname */
+	  
+                              
+    
+	user_addr_t ni_dirp;                                  
+	enum    uio_seg ni_segflg;                                
 #if CONFIG_TRIGGERS
-	enum    path_operation ni_op;   /* intended operation, see enum path_operation in vnode.h */
-#endif /* CONFIG_TRIGGERS */
-	/*
-	 * Arguments to lookup.
-	 */
-	struct  vnode *ni_startdir;     /* starting directory */
-	struct  vnode *ni_rootdir;      /* logical root directory */
-	struct  vnode *ni_usedvp;       /* directory passed in via USEDVP */
-	/*
-	 * Results: returned from/manipulated by lookup
-	 */
-	struct  vnode *ni_vp;           /* vnode of result */
-	struct  vnode *ni_dvp;          /* vnode of intermediate directory */
-	/*
-	 * Shared between namei and lookup/commit routines.
-	 */
-	u_int   ni_pathlen;             /* remaining chars in path */
-	char    *ni_next;               /* next location in pathname */
+	enum    path_operation ni_op;                                                               
+#endif                      
+	  
+                        
+    
+	struct  vnode *ni_startdir;                             
+	struct  vnode *ni_rootdir;                                  
+	struct  vnode *ni_usedvp;                                           
+	  
+                                                
+    
+	struct  vnode *ni_vp;                                
+	struct  vnode *ni_dvp;                                               
+	  
+                                                    
+    
+	u_int   ni_pathlen;                                          
+	char    *ni_next;                                              
 	char    ni_pathbuf[PATHBUFLEN];
-	u_long  ni_loopcnt;             /* count of symlinks encountered */
+	u_long  ni_loopcnt;                                                
 
 	struct componentname ni_cnd;
 	int32_t ni_flag;
-	int ni_ncgeneration;            /* For a batched vnop, grab generation beforehand */
+	int ni_ncgeneration;                                                                
 };
 
-#define NAMEI_CONTLOOKUP        0x002    /* Continue processing a lookup which was partially processed in a compound VNOP */
-#define NAMEI_TRAILINGSLASH     0x004    /* There was at least one trailing slash after last component */
-#define NAMEI_UNFINISHED        0x008    /* We broke off a lookup to do a compound op */
+#define NAMEI_CONTLOOKUP        0x002                                                                                       
+#define NAMEI_TRAILINGSLASH     0x004                                                                    
+#define NAMEI_UNFINISHED        0x008                                                   
 
-/*
- * XXX Hack: we need to encode the intended VNOP in order to
- * be able to include information about which operations a filesystem
- * supports in the decision to break off a lookup early.
- */
+  
+                                                            
+                                                                     
+                                                        
+   
 #define NAMEI_COMPOUNDOPEN      0x010
 #define NAMEI_COMPOUNDREMOVE    0x020
 #define NAMEI_COMPOUNDMKDIR     0x040
@@ -144,63 +144,63 @@ struct nameidata {
 #define NAMEI_COMPOUNDRENAME    0x100
 #define NAMEI_COMPOUND_OP_MASK (NAMEI_COMPOUNDOPEN | NAMEI_COMPOUNDREMOVE | NAMEI_COMPOUNDMKDIR | NAMEI_COMPOUNDRMDIR | NAMEI_COMPOUNDRENAME)
 
-#define NAMEI_NOFOLLOW_ANY      0x1000  /* no symlinks allowed in the path */
+#define NAMEI_NOFOLLOW_ANY      0x1000                                       
 
 #ifdef KERNEL
-/*
- * namei operational modifier flags, stored in ni_cnd.flags
- * Also includes LOCKLEAF, LOCKPARENT, and WANTPARENT flags, defined above.
- */
-#define NOCACHE         0x00000020 /* name must not be left in cache */
-#define NOFOLLOW        0x00000000 /* do not follow symbolic links (pseudo) */
-/* public FOLLOW	0x00000040    see vnode.h */
-#define SHAREDLEAF      0x00000080 /* OK to have shared leaf lock */
-#define MODMASK         0x100000fc /* mask of operational modifiers */
-/*
- * Namei parameter descriptors.
- *
- * SAVESTART is set only by the callers of namei. It implies SAVENAME
- * plus the addition of saving the parent directory that contains the
- * name in ni_startdir. It allows repeated calls to lookup for the
- * name being sought. The caller is responsible for releasing the
- * buffer and for vrele'ing ni_startdir.
- */
-#define SAVENAME        0          /* save pathanme buffer ***obsolete */
-#define NOCROSSMOUNT    0x00000100 /* do not cross mount points */
-#define RDONLY          0x00000200 /* lookup with read-only semantics */
-#define HASBUF          0x00000400 /* has allocated pathname buffer */
-#define DONOTAUTH       0x00000800 /* do not authorize during lookup */
-#define SAVESTART       0x00001000 /* save starting directory */
-/* public ISDOTDOT	0x00002000    see vnode.h */
-/* public MAKEENTRY	0x00004000    see vnode.h */
-/* public ISLASTCN	0x00008000    see vnode.h */
-#define ISSYMLINK       0x00010000 /* symlink needs interpretation */
-/* public ISWHITEOUT	0x00020000    see vnode.h */
-/* public DOWHITEOUT	0x00040000    see vnode.h */
-#define WILLBEDIR       0x00080000 /* new files will be dirs; allow trailing / */
-#define AUDITVNPATH1    0x00100000 /* audit the path/vnode info */
-#define AUDITVNPATH2    0x00200000 /* audit the path/vnode info */
-#define USEDVP          0x00400000 /* start the lookup at ndp.ni_dvp */
-#define CN_VOLFSPATH    0x00800000 /* user path was a volfs style path */
-#define CN_FIRMLINK_NOFOLLOW    0x01000000 /* Do not follow firm links */
-#define UNIONCREATED    0x02000000 /* union fs creation of vnode */
+  
+                                                           
+                                                                           
+   
+#define NOCACHE         0x00000020                                     
+#define NOFOLLOW        0x00000000                                            
+                                             
+#define SHAREDLEAF      0x00000080                                  
+#define MODMASK         0x100000fc                                    
+  
+                               
+  
+                                                                     
+                                                                     
+                                                                  
+                                                                 
+                                        
+   
+#define SAVENAME        0                                                
+#define NOCROSSMOUNT    0x00000100                                
+#define RDONLY          0x00000200                                      
+#define HASBUF          0x00000400                                    
+#define DONOTAUTH       0x00000800                                     
+#define SAVESTART       0x00001000                              
+                                               
+                                                
+                                               
+#define ISSYMLINK       0x00010000                                   
+                                                 
+                                                 
+#define WILLBEDIR       0x00080000                                               
+#define AUDITVNPATH1    0x00100000                                
+#define AUDITVNPATH2    0x00200000                                
+#define USEDVP          0x00400000                                     
+#define CN_VOLFSPATH    0x00800000                                       
+#define CN_FIRMLINK_NOFOLLOW    0x01000000                               
+#define UNIONCREATED    0x02000000                                 
 #if NAMEDRSRCFORK
 #define CN_WANTSRSRCFORK 0x04000000
 #define CN_ALLOWRSRCFORK 0x08000000
-#endif // NAMEDRSRCFORK
-// CN_SECLUDE_RENAME is defined above as 0x10000000 (SPI)
-#define CN_NBMOUNTLOOK  0x20000000 /* do not block for cross mount lookups */
+#endif                 
+                                                         
+#define CN_NBMOUNTLOOK  0x20000000                                           
 #ifdef BSD_KERNEL_PRIVATE
-#define CN_SKIPNAMECACHE        0x40000000      /* skip cache during lookup(), allow FS to handle all components */
+#define CN_SKIPNAMECACHE        0x40000000                                                                         
 #endif
-// CN_RAW_ENCRYPTED	is defined above as 0x80000000 (SPI)
+                                                        
 
-/*
- * Initialization of an nameidata structure.
- */
+  
+                                            
+   
 
 #if CONFIG_TRIGGERS
-/* Note: vnode triggers require more precise path operation (ni_op) */
+                                                                      
 
 #define NDINIT(ndp, op, pop, flags, segflg, namep, ctx) { \
 	(ndp)->ni_cnd.cn_nameiop = op; \
@@ -232,26 +232,26 @@ struct nameidata {
 	(ndp)->ni_flag = 0; \
 	(ndp)->ni_cnd.cn_ndp = (ndp); \
 }
-#endif /* CONFIG_TRIGGERS */
+#endif                      
 
-#endif /* KERNEL */
+#endif             
 
-/*
- * This structure describes the elements in the cache of recent
- * names looked up by namei.
- */
+  
+                                                               
+                            
+   
 struct  namecache {
-	TAILQ_ENTRY(namecache)  nc_entry;       /* chain of all entries */
-	TAILQ_ENTRY(namecache)  nc_child;       /* chain of ncp's that are children of a vp */
+	TAILQ_ENTRY(namecache)  nc_entry;                                 
+	TAILQ_ENTRY(namecache)  nc_child;                                                     
 	union {
-		LIST_ENTRY(namecache)  nc_link; /* chain of ncp's that 'name' a vp */
-		TAILQ_ENTRY(namecache) nc_negentry; /* chain of ncp's that 'name' a vp */
+		LIST_ENTRY(namecache)  nc_link;                                      
+		TAILQ_ENTRY(namecache) nc_negentry;                                      
 	} nc_un;
-	LIST_ENTRY(namecache)   nc_hash;        /* hash chain */
-	vnode_t                 nc_dvp;         /* vnode of parent of name */
-	vnode_t                 nc_vp;          /* vnode the name refers to */
-	unsigned int            nc_hashval;     /* hashval of stringname */
-	const char              *nc_name;       /* pointer to segment name in string cache */
+	LIST_ENTRY(namecache)   nc_hash;                        
+	vnode_t                 nc_dvp;                                      
+	vnode_t                 nc_vp;                                        
+	unsigned int            nc_hashval;                                
+	const char              *nc_name;                                                    
 };
 
 
@@ -266,9 +266,9 @@ int     lookup_traverse_union(vnode_t dvp, vnode_t *new_dvp, vfs_context_t ctx);
 void    lookup_compound_vnop_post_hook(int error, vnode_t dvp, vnode_t vp, struct nameidata *ndp, int did_create);
 void    kdebug_lookup(struct vnode *dp, struct componentname *cnp);
 
-/*
- * namecache function prototypes
- */
+  
+                                
+   
 void    cache_purgevfs(mount_t mp);
 int             cache_lookup_path(struct nameidata *ndp, struct componentname *cnp, vnode_t dp,
     vfs_context_t context, int *dp_authorized, vnode_t last_dp);
@@ -280,23 +280,23 @@ boolean_t       vnode_cache_is_authorized(vnode_t vp, vfs_context_t context, kau
 int             lookup_validate_creation_path(struct nameidata *ndp);
 int             namei_compound_available(vnode_t dp, struct nameidata *ndp);
 
-#endif /* KERNEL */
+#endif             
 
-/*
- * Stats on usefulness of namei caches.
- */
+  
+                                       
+   
 struct  nchstats {
-	long    ncs_goodhits;           /* hits that we can really use */
-	long    ncs_neghits;            /* negative hits that we can use */
-	long    ncs_badhits;            /* hits we must drop */
-	long    ncs_miss;               /* misses */
-	long    ncs_pass2;              /* names found with passes == 2 */
-	long    ncs_2passes;            /* number of times we attempt it */
+	long    ncs_goodhits;                                            
+	long    ncs_neghits;                                               
+	long    ncs_badhits;                                   
+	long    ncs_miss;                           
+	long    ncs_pass2;                                                
+	long    ncs_2passes;                                               
 	long    ncs_stolen;
 	long    ncs_enters;
 	long    ncs_deletes;
 	long    ncs_badvid;
 };
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* !_SYS_NAMEI_H_ */
+#endif                     

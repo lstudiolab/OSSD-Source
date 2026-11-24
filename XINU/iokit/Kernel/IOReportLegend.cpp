@@ -32,7 +32,7 @@
 #include <IOKit/IOKernelReporters.h>
 
 
-//#define IORDEBUG_LEGEND 1
+                           
 
 #ifdef IORDEBUG_LEGEND
     #define IORLEGENDLOG(fmt, args...)      \
@@ -67,7 +67,7 @@ IOReportLegend::with(OSArray *legend)
 	}
 }
 
-/* must clean up everything if it fails */
+                                          
 IOReturn
 IOReportLegend::initWith(OSArray *legend)
 {
@@ -106,22 +106,22 @@ IOReportLegend::addReporterLegend(IOService *reportingService,
 	OSSharedPtr<IOReportLegend> legend;
 	OSSharedPtr<OSObject> curLegend;
 
-	// No need to check groupName and subGroupName because optional params
+	                                                                      
 	if (!reportingService || !reporter) {
 		goto finish;
 	}
 
-	// It's fine if the legend doesn't exist (IOReportLegend::with(NULL)
-	// is how you make an empty legend).  If it's not an array, then
-	// we're just going to replace it.
+	                                                                    
+	                                                                
+	                                  
 	curLegend = reportingService->copyProperty(kIOReportLegendKey);
 	legend = IOReportLegend::with(OSDynamicCast(OSArray, curLegend.get()));
 	if (!legend) {
 		goto finish;
 	}
 
-	// Add the reporter's entries and update the service property.
-	// The overwrite triggers a release of the old legend array.
+	                                                              
+	                                                            
 	legend->addReporterLegend(reporter, groupName, subGroupName);
 	reportingService->setProperty(kIOReportLegendKey, legend->getLegend());
 	reportingService->setProperty(kIOReportLegendPublicKey, true);
@@ -154,7 +154,7 @@ IOReportLegend::addLegendEntry(IOReportLegendEntry *legendEntry,
 		tmpSubGroupName = OSSymbol::withCString(subGroupName);
 	}
 
-	// It is ok to call appendLegendWith() if tmpGroups are NULL
+	                                                            
 	res = organizeLegend(legendEntry, tmpGroupName.get(), tmpSubGroupName.get());
 
 	return res;
@@ -195,7 +195,7 @@ IOReportLegend::organizeLegend(IOReportLegendEntry *legendEntry,
 	}
 
 	IORLEGENDLOG("IOReportLegend::organizeLegend");
-	// Legend is empty, enter first node
+	                                    
 	if (_reportLegend == NULL) {
 		IORLEGENDLOG("IOReportLegend::new legend creation");
 		_reportLegend = OSArray::withCapacity(1);
@@ -215,7 +215,7 @@ IOReportLegend::organizeLegend(IOReportLegendEntry *legendEntry,
 
 	_reportLegend->setObject(legendEntry);
 
-	// callers can now safely release legendEntry (it is part of _reportLegend)
+	                                                                           
 
 	return kIOReturnSuccess;
 }

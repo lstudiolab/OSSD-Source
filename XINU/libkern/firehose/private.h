@@ -28,4 +28,4 @@
 #include "ioctl_private.h"
 #include "chunk_private.h"
 
-#endif // __FIREHOSE_FIREHOSE_PRIVATE__
+#endif                                 

@@ -29,13 +29,13 @@ OS_ASSUME_NONNULL_BEGIN
 
 __BEGIN_DECLS
 
-/*!
- * @enum firehose_activity_flags_t
- *
- * @discussion
- * The lower 8 bits are or-ed in the upper 8 bits of Activity ID and propagated
- * to children activities
- */
+   
+                                  
+  
+              
+                                                                               
+                         
+   
     OS_OPTIONS(firehose_activity_flags, unsigned long,
     firehose_activity_flags_default             = 0x0000,
 
@@ -46,15 +46,15 @@ __BEGIN_DECLS
     firehose_activity_flags_precise_timestamp   = 0x0080,
     );
 
-/*!
- * @typedef firehose_activity_id_t
- *
- * @abstract
- * Opaque activity identifier.
- *
- * @discussion
- * Scalar value type, not reference counted.
- */
+   
+                                  
+  
+            
+                              
+  
+              
+                                            
+   
 typedef uint64_t firehose_activity_id_t;
 #define FIREHOSE_ACTIVITY_ID_NULL    ((firehose_activity_id_t)0)
 #define FIREHOSE_ACTIVITY_ID_INVALID ((firehose_activity_id_t)~0ULL)
@@ -65,9 +65,9 @@ typedef uint64_t firehose_activity_id_t;
 	        ((firehose_activity_id_t)(aid)) | \
 	        ((firehose_activity_id_t)(flags) << FIREHOSE_ACTIVITY_ID_FLAGS_SHIFT))
 
-/*!
- * @enum firehose_stream_t
- */
+   
+                          
+   
 OS_ENUM(firehose_stream, uint8_t,
     firehose_stream_persist                     = 0,
     firehose_stream_special                     = 1,
@@ -81,12 +81,12 @@ OS_ENUM(firehose_stream, uint8_t,
     _firehose_stream_disabled = (uint8_t)-1,
     );
 
-/*!
- * @enum firehose_tracepoint_namespace_t
- *
- * @abstract
- * Namespaces of tracepoints.
- */
+   
+                                        
+  
+            
+                             
+   
 OS_ENUM(firehose_tracepoint_namespace, uint8_t,
     firehose_tracepoint_namespace_activity      = 0x02,
     firehose_tracepoint_namespace_trace         = 0x03,
@@ -96,12 +96,12 @@ OS_ENUM(firehose_tracepoint_namespace, uint8_t,
     firehose_tracepoint_namespace_loss          = 0x07,
     );
 
-/*!
- * @enum firehose_tracepoint_code_t
- *
- * @abstract
- * Codes of tracepoints.
- */
+   
+                                   
+  
+            
+                        
+   
 OS_ENUM(firehose_tracepoint_code, uint32_t,
     firehose_tracepoint_code_load               = 0x01,
     firehose_tracepoint_code_unload             = 0x02,
@@ -109,20 +109,20 @@ OS_ENUM(firehose_tracepoint_code, uint32_t,
     firehose_tracepoint_code_load_memory        = 0x08,
     );
 
-/*!
- * @typedef firehose_tracepoint_type_t
- *
- * @abstract
- * Type of tracepoints.
- */
+   
+                                      
+  
+            
+                       
+   
 typedef uint8_t firehose_tracepoint_type_t;
 
-/*!
- * @typedef firehose_tracepoint_flags_t
- *
- * @abstract
- * Flags for tracepoints.
- */
+   
+                                       
+  
+            
+                         
+   
 OS_OPTIONS(firehose_tracepoint_flags, uint16_t,
     _firehose_tracepoint_flags_base_has_current_aid         = 0x0001,
 #define _firehose_tracepoint_flags_pc_style_mask                 (0x0007 << 1)
@@ -138,62 +138,62 @@ OS_OPTIONS(firehose_tracepoint_flags, uint16_t,
         _firehose_tracepoint_flags_base_has_large_offset        = 0x0020,
     );
 
-/*
- * Same as _OS_TRACE_DYNAMIC_BIT defined in libtrace/tracepoint_internal.h.
- * This bit is used by logd to know how to evaluate the format
- * string.
- * If it is set, logd assumes that the format is "%s" and the content of the
- * whole string is passed with the firehose_tracepoint.
- * Otherwise it tries to find the unformatted string within the text
- * section of the executable and expects only the content of the variables
- * on the firehose_tracepoint.
- */
+  
+                                                                           
+                                                              
+          
+                                                                            
+                                                       
+                                                                    
+                                                                          
+                              
+   
 #define FIREHOSE_TRACEPOINT_PC_DYNAMIC_BIT 0x80000000
 
-/*
- * Same as KERNEL_MASK defined in logd/logd_main.c
- * It is used by logd to mask the pc before calling
- * OSKextCopyUUIDForAddress.
- */
+  
+                                                  
+                                                   
+                            
+   
 #define FIREHOSE_TRACEPOINT_PC_KERNEL_MASK 0xffff000000000000
 
-/*!
- * @typedef firehose_tracepoint_id_t
- *
- * @abstract
- * Opaque tracepoint identifier.
- */
+   
+                                    
+  
+            
+                                
+   
 typedef uint64_t firehose_tracepoint_id_t;
 
-/*!
- * @enum _firehose_tracepoint_type_activity_t
- *
- * @abstract
- * Types of Activity tracepoints (namespace activity).
- */
+   
+                                             
+  
+            
+                                                      
+   
 OS_ENUM(_firehose_tracepoint_type_activity, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_activity_create               = 0x01,
     _firehose_tracepoint_type_activity_swap                 = 0x02,
     _firehose_tracepoint_type_activity_useraction           = 0x03,
     );
 
-/*!
- * @enum firehose_tracepoint_flags_activity_t
- *
- * @abstract
- * Flags for Activity tracepoints (namespace activity).
- */
+   
+                                             
+  
+            
+                                                       
+   
 OS_OPTIONS(_firehose_tracepoint_flags_activity, uint16_t,
     _firehose_tracepoint_flags_activity_user_interface      = 0x0100,
     _firehose_tracepoint_flags_activity_has_other_aid       = 0x0200,
     );
 
-/*!
- * @enum firehose_tracepoint_type_trace_t
- *
- * @abstract
- * Types of trace tracepoints (namespace trace).
- */
+   
+                                         
+  
+            
+                                                
+   
 OS_ENUM(_firehose_tracepoint_type_trace, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_trace_default                 = 0x00,
     _firehose_tracepoint_type_trace_info                    = 0x01,
@@ -202,12 +202,12 @@ OS_ENUM(_firehose_tracepoint_type_trace, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_trace_fault                   = 0x11,
     );
 
-/*!
- * @enum firehose_tracepoint_type_log_t
- *
- * @abstract
- * Types of Log tracepoints (namespace log).
- */
+   
+                                       
+  
+            
+                                            
+   
 OS_ENUM(_firehose_tracepoint_type_log, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_log_default                   = 0x00,
     _firehose_tracepoint_type_log_info                      = 0x01,
@@ -216,12 +216,12 @@ OS_ENUM(_firehose_tracepoint_type_log, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_log_fault                     = 0x11,
     );
 
-/*!
- * @enum firehose_tracepoint_flags_log_t
- *
- * @abstract
- * Flags for Log tracepoints (namespace log).
- */
+   
+                                        
+  
+            
+                                             
+   
 OS_OPTIONS(_firehose_tracepoint_flags_log, uint16_t,
     _firehose_tracepoint_flags_log_has_private_data         = 0x0100,
     _firehose_tracepoint_flags_log_has_subsystem            = 0x0200,
@@ -230,12 +230,12 @@ OS_OPTIONS(_firehose_tracepoint_flags_log, uint16_t,
     _firehose_tracepoint_flags_log_has_context_data         = 0x1000,
     );
 
-/*!
- * @enum _firehose_tracepoint_type_metadata_t
- *
- * @abstract
- * Types for metadata tracepoints (namespace metadata).
- */
+   
+                                             
+  
+            
+                                                       
+   
 OS_ENUM(_firehose_tracepoint_type_metadata, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_metadata_dyld                 = 0x01,
     _firehose_tracepoint_type_metadata_subsystem            = 0x02,
@@ -243,12 +243,12 @@ OS_ENUM(_firehose_tracepoint_type_metadata, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_metadata_coprocessor          = 0x04,
     );
 
-/*!
- * @enum firehose_tracepoint_type_signpost_t
- *
- * @abstract
- * Types of Log tracepoints (namespace signpost).
- */
+   
+                                            
+  
+            
+                                                 
+   
 OS_ENUM(_firehose_tracepoint_type_signpost, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_signpost_event                = 0x00,
     _firehose_tracepoint_type_signpost_interval_begin       = 0x01,
@@ -260,27 +260,27 @@ OS_ENUM(_firehose_tracepoint_type_signpost, firehose_tracepoint_type_t,
     _firehose_tracepoint_type_signpost_scope_system         = 0xc0,
     );
 
-/*!
- * @enum firehose_tracepoint_flags_signpost_t
- *
- * @abstract
- * Flags for Log tracepoints (namespace signpost).
- *
- * When flags are shared with the log type, they should have the same values.
- */
+   
+                                             
+  
+            
+                                                  
+  
+                                                                             
+   
 OS_OPTIONS(_firehose_tracepoint_flags_signpost, uint16_t,
-    // shared with log
+                      
     _firehose_tracepoint_flags_signpost_has_private_data    = 0x0100,
     _firehose_tracepoint_flags_signpost_has_subsystem       = 0x0200,
     _firehose_tracepoint_flags_signpost_has_rules           = 0x0400,
     _firehose_tracepoint_flags_signpost_has_oversize        = 0x0800,
     _firehose_tracepoint_flags_signpost_has_context_data    = 0x1000,
 
-    // specific to signpost
+                           
     _firehose_tracepoint_flags_signpost_has_name            = 0x8000,
     );
 
-/* MIG firehose push reply structure */
+                                       
 typedef struct firehose_push_reply_s {
 	uint64_t fpr_mem_flushed_pos;
 	uint64_t fpr_io_flushed_pos;
@@ -299,4 +299,4 @@ __END_DECLS
 
     OS_ASSUME_NONNULL_END
 
-#endif // __FIREHOSE_TYPES_PRIVATE__
+#endif                              

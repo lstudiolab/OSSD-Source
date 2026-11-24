@@ -38,4 +38,4 @@
 #define BT_WAKE_SENTINEL_TS   (~2ULL)
 #define BT_RESET_SENTINEL_TS  (~3ULL)
 
-#endif /* MACHINE_REMOTE_TIME_H */
+#endif                            

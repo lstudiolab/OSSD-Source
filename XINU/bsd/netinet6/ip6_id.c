@@ -92,25 +92,25 @@
 
 #include <sys/cdefs.h>
 
-/*
- * seed = random (bits - 1) bit
- * n = prime, g0 = generator to n,
- * j = random so that gcd(j,n-1) == 1
- * g = g0^j mod n will be a generator again.
- *
- * X[0] = random seed.
- * X[n] = a*X[n-1]+b mod m is a Linear Congruential Generator
- * with a = 7^(even random) mod m,
- *      b = random with gcd(b,m) == 1
- *      m = constant and a maximal period of m-1.
- *
- * The transaction id is determined by:
- * id[n] = seed xor (g^X[n] mod n)
- *
- * Effectivly the id is restricted to the lower (bits - 1) bits, thus
- * yielding two different cycles by toggling the msb on and off.
- * This avoids reuse issues caused by reseeding.
- */
+  
+                               
+                                  
+                                     
+                                            
+  
+                      
+                                                             
+                                  
+                                     
+                                                 
+  
+                                       
+                                  
+  
+                                                                     
+                                                                
+                                                
+   
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -129,14 +129,14 @@
 #include <netinet6/ip6_var.h>
 
 struct randomtab {
-	const int       ru_bits; /* resulting bits */
-	const long      ru_out; /* Time after wich will be reseeded */
-	const u_int32_t ru_max; /* Uniq cycle, avoid blackjack prediction */
-	const u_int32_t ru_gen; /* Starting generator */
-	const u_int32_t ru_n;   /* ru_n: prime, ru_n - 1: product of pfacts[] */
-	const u_int32_t ru_agen; /* determine ru_a as ru_agen^(2*rand) */
-	const u_int32_t ru_m;   /* ru_m = 2^x*3^y */
-	const u_int32_t pfacts[4];      /* factors of ru_n */
+	const int       ru_bits;                     
+	const long      ru_out;                                       
+	const u_int32_t ru_max;                                             
+	const u_int32_t ru_gen;                         
+	const u_int32_t ru_n;                                                   
+	const u_int32_t ru_agen;                                         
+	const u_int32_t ru_m;                       
+	const u_int32_t pfacts[4];                           
 
 	u_int32_t ru_counter;
 	u_int32_t ru_msb;
@@ -149,14 +149,14 @@ struct randomtab {
 };
 
 static struct randomtab randomtab_32 = {
-	.ru_bits = 32,          /* resulting bits */
-	.ru_out = 180,          /* Time after wich will be reseeded */
-	.ru_max = 1000000000,   /* Uniq cycle, avoid blackjack prediction */
-	.ru_gen = 2,            /* Starting generator */
-	.ru_n = 2147483629,     /* RU_N-1 = 2^2*3^2*59652323 */
-	.ru_agen = 7,           /* determine ru_a as RU_AGEN^(2*rand) */
-	.ru_m = 1836660096,     /* RU_M = 2^7*3^15 - don't change */
-	.pfacts = { 2, 3, 59652323, 0 },        /* factors of ru_n */
+	.ru_bits = 32,                              
+	.ru_out = 180,                                                
+	.ru_max = 1000000000,                                               
+	.ru_gen = 2,                                    
+	.ru_n = 2147483629,                                    
+	.ru_agen = 7,                                                   
+	.ru_m = 1836660096,                                         
+	.pfacts = { 2, 3, 59652323, 0 },                             
 	.ru_counter = 0,
 	.ru_msb = 0,
 	.ru_x = 0,
@@ -172,10 +172,10 @@ static u_int32_t pmod(u_int32_t, u_int32_t, u_int32_t);
 static void initid(struct randomtab *);
 static u_int32_t randomid(struct randomtab *);
 
-/*
- * Do a fast modular exponation, returned value will be in the range
- * of 0 - (mod-1)
- */
+  
+                                                                    
+                 
+   
 static u_int32_t
 pmod(u_int32_t gen, u_int32_t expo, u_int32_t mod)
 {
@@ -195,14 +195,14 @@ pmod(u_int32_t gen, u_int32_t expo, u_int32_t mod)
 	return (u_int32_t)s;
 }
 
-/*
- * Initalizes the seed and chooses a suitable generator. Also toggles
- * the msb flag. The msb flag is used to generate two distinct
- * cycles of random numbers and thus avoiding reuse of ids.
- *
- * This function is called from id_randomid() when needed, an
- * application does not have to worry about it.
- */
+  
+                                                                     
+                                                              
+                                                           
+  
+                                                             
+                                               
+   
 static void
 initid(struct randomtab *p)
 {
@@ -212,11 +212,11 @@ initid(struct randomtab *p)
 
 	p->ru_x = RandomULong() % p->ru_m;
 
-	/* (bits - 1) bits of random seed */
+	                                    
 	p->ru_seed = RandomULong() & (~0U >> (32 - p->ru_bits + 1));
 	p->ru_seed2 = RandomULong() & (~0U >> (32 - p->ru_bits + 1));
 
-	/* Determine the LCG we use */
+	                              
 	p->ru_b = (RandomULong() & (~0U >> (32 - p->ru_bits))) | 1;
 	p->ru_a = pmod(p->ru_agen,
 	    (RandomULong() & (~0U >> (32 - p->ru_bits))) & (~1U), p->ru_m);
@@ -226,11 +226,11 @@ initid(struct randomtab *p)
 
 	j = RandomULong() % p->ru_n;
 
-	/*
-	 * Do a fast gcd(j, RU_N - 1), so we can find a j with
-	 * gcd(j, RU_N - 1) == 1, giving a new generator for
-	 * RU_GEN^j mod RU_N
-	 */
+	  
+                                                       
+                                                     
+                     
+    
 	while (noprime) {
 		for (i = 0; p->pfacts[i] > 0; i++) {
 			if (j % p->pfacts[i] == 0) {
@@ -265,14 +265,14 @@ randomid(struct randomtab *p)
 
 	tmp = RandomULong();
 
-	/* Skip a random number of ids */
+	                                 
 	n = tmp & 0x3; tmp = tmp >> 2;
 	if (p->ru_counter + n >= p->ru_max) {
 		initid(p);
 	}
 
 	for (i = 0; i <= n; i++) {
-		/* Linear Congruential Generator */
+		                                   
 		p->ru_x = ((u_int64_t)p->ru_a * p->ru_x + p->ru_b) % p->ru_m;
 	}
 

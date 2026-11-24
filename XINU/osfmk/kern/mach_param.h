@@ -53,16 +53,16 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	kern/mach_param.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1986
- *
- *	Mach system sizing parameters
- *
- */
+  
+   
+  
+                          
+                                                    
+             
+  
+                                
+  
+   
 
 #ifdef  XNU_KERNEL_PRIVATE
 
@@ -72,21 +72,21 @@
 extern int thread_max, task_threadmax, task_max;
 
 
-#define THREAD_CHUNK    64              /* Allocation chunk */
-#define TASK_CHUNK              64              /* Allocation chunk */
+#define THREAD_CHUNK    64                                    
+#define TASK_CHUNK              64                                    
 
-#define PORT_MAX        ((task_max * 3 + thread_max)    /* kernel */ \
-	                        + (thread_max * 2)      /* user */ \
-	                        + 40000)                /* slop for objects */
-/* Number of ports, system-wide */
+#define PORT_MAX        ((task_max * 3 + thread_max)                 \
+	                        + (thread_max * 2)                 \
+	                        + 40000)                                      
+                                  
 
 #define SET_MAX         (task_max + (thread_max * 2) + 200)
-/* Max number of port sets */
+                             
 
-#define SPACE_MAX       (task_max + 5)  /* Max number of IPC spaces */
+#define SPACE_MAX       (task_max + 5)                                
 
-#define SEMAPHORE_MAX   (PORT_MAX >> 1) /* Maximum number of semaphores */
+#define SEMAPHORE_MAX   (PORT_MAX >> 1)                                   
 
-#endif  /* _KERN_MACH_PARAM_H_ */
+#endif                           
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

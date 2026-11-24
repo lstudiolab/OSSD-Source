@@ -29,12 +29,12 @@
  * @OSF_COPYRIGHT@
  *
  */
-/*
- *	File:	kern/sync_lock.h
- *	Author:	Joseph CaraDonna
- *
- *	Contains RT distributed lock synchronization service definitions.
- */
+  
+                         
+                           
+  
+                                                                    
+   
 
 #ifndef _KERN_SYNC_LOCK_H_
 #define _KERN_SYNC_LOCK_H_
@@ -50,6 +50,6 @@
 extern  void            lock_set_reference(lock_set_t lock_set);
 extern  void            lock_set_dereference(lock_set_t lock_set);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
-#endif /* _KERN_SYNC_LOCK_H_ */
+#endif                         

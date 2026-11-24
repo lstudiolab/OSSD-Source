@@ -62,87 +62,87 @@
 #define DEVFS_CHAR      0
 #define DEVFS_BLOCK     1
 
-/*
- * Argument to clone callback after dev
- */
-#define DEVFS_CLONE_ALLOC       1       /* Allocate minor number slot */
-#define DEVFS_CLONE_FREE        0       /* Free minor number slot */
+  
+                                       
+   
+#define DEVFS_CLONE_ALLOC       1                                       
+#define DEVFS_CLONE_FREE        0                                   
 
 __BEGIN_DECLS
 
-/*
- * Function: devfs_make_node_clone
- *
- * Purpose
- *   Create a device node with the given pathname in the devfs namespace;
- *   before returning a dev_t value for an open instance, the dev_t has
- *   it's minor number updated by calling the supplied clone function on
- *   the supplied dev..
- *
- * Parameters:
- *   dev        - the dev_t value to associate
- *   chrblk	- block or character device (DEVFS_CHAR or DEVFS_BLOCK)
- *   uid, gid	- ownership
- *   perms	- permissions
- *   clone	- minor number cloning function
- *   fmt, ...	- print format string and args to format the path name
- * Returns:
- *   A handle to a device node if successful, NULL otherwise.
- */
+  
+                                  
+  
+          
+                                                                         
+                                                                       
+                                                                        
+                       
+  
+              
+                                              
+                                                                   
+                         
+                        
+                                          
+                                                                    
+           
+                                                             
+   
 void *  devfs_make_node_clone(dev_t dev, int chrblk, uid_t uid, gid_t gid,
     int perms, int (*clone)(dev_t dev, int action),
     const char *fmt, ...);
 
-/*
- * Function: devfs_make_node
- *
- * Purpose
- *   Create a device node with the given pathname in the devfs namespace.
- *
- * Parameters:
- *   dev        - the dev_t value to associate
- *   chrblk	- block or character device (DEVFS_CHAR or DEVFS_BLOCK)
- *   uid, gid	- ownership
- *   perms	- permissions
- *   fmt, ...	- print format string and args to format the path name
- * Returns:
- *   A handle to a device node if successful, NULL otherwise.
- */
+  
+                            
+  
+          
+                                                                         
+  
+              
+                                              
+                                                                   
+                         
+                        
+                                                                    
+           
+                                                             
+   
 void *  devfs_make_node(dev_t dev, int chrblk, uid_t uid, gid_t gid,
     int perms, const char *fmt, ...);
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * Function: devfs_make_link
- *
- * Purpose:
- *   Create a link to a previously created device node.
- *
- * Returns:
- *   0 if successful, -1 if failed
- */
+  
+                            
+  
+           
+                                                       
+  
+           
+                                  
+   
 int     devfs_make_link(void * handle, char *fmt, ...);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Function: devfs_remove
- *
- * Purpose:
- *   Remove the device node returned by devfs_make_node() along with
- *   any links created with devfs_make_link().
- */
+  
+                         
+  
+           
+                                                                    
+                                              
+   
 void    devfs_remove(void * handle);
 
 __END_DECLS
 
 #ifdef __APPLE_API_PRIVATE
-/* XXX */
+         
 #define UID_ROOT        0
 #define UID_BIN         3
 #define UID_UUCP        66
 #define UID_LOGD        272
 
-/* XXX */
+         
 #define GID_WHEEL       0
 #define GID_KMEM        2
 #define GID_TTY         4
@@ -152,6 +152,6 @@ __END_DECLS
 #define GID_DIALER      68
 #define GID_WINDOWSERVER 88
 #define GID_LOGD        272
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
-#endif /* !_MISCFS_DEVFS_DEVFS_H_ */
+#endif                              

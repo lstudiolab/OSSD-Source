@@ -33,9 +33,9 @@
 #include <arm/pmap.h>
 #include "pgtrace_decoder.h"
 
-//-------------------------------------------------------------------
-// Macros
-//
+                                                                     
+         
+  
 #define DBG     1
 #if DBG == 1
 #define INLINE  __attribute__((noinline))
@@ -67,9 +67,9 @@
 #define SIGN_EXTEND_64(val, width)  (((int64_t)(val) << (64 - (width)) >> (64 - (width))))
 #define ZERO_EXTEND_64(val, width)  (((uint64_t)(val) << (64 - (width))) >> (64 - (width)))
 
-//-------------------------------------------------------------------
-// Types
-//
+                                                                     
+        
+  
 typedef int (*run_t)(uint32_t inst, vm_offset_t pa, vm_offset_t va, arm_saved_state_t *ss, pgtrace_run_result_t *res);
 
 typedef struct {
@@ -86,9 +86,9 @@ typedef struct {
 	get_info_t get_info;
 } type_entry_t;
 
-//-------------------------------------------------------------------
-// Statics
-//
+                                                                     
+          
+  
 static int run_simd(uint32_t inst, vm_offset_t pa, vm_offset_t va, arm_saved_state_t *ss, pgtrace_run_result_t *res);
 static int run_c335(uint32_t inst, vm_offset_t pa, vm_offset_t va, arm_saved_state_t *ss, pgtrace_run_result_t *res);
 static int run_c336(uint32_t inst, vm_offset_t pa, vm_offset_t va, arm_saved_state_t *ss, pgtrace_run_result_t *res);
@@ -116,25 +116,25 @@ static bool get_info_c3314(uint32_t inst, arm_saved_state_t *ss, instruction_inf
 static bool get_info_c3315(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info);
 static bool get_info_c3316(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info);
 
-// Table from ARM DDI 0487A.a C3.3
+                                  
 static type_entry_t typetbl[] = {
-	{ 0x3f000000, 0x08000000, run_c336, get_info_c336 }, // Load/store exclusive
-	{ 0x3b000000, 0x18000000, run_c335, get_info_c335 }, // Load register (literal)
-	{ 0x3b800000, 0x28000000, run_c337, get_info_c337 }, // Load/store no-allocate pair (offset)
-	{ 0x3b800000, 0x28800000, run_c3315, get_info_c3315 }, // Load/store register pair (post-indexed)
-	{ 0x3b800000, 0x29000000, run_c3314, get_info_c3314 }, // Load/store register pair (offset)
-	{ 0x3b800000, 0x29800000, run_c3316, get_info_c3316 }, // Load/store register pair (pre-indexed)
-	{ 0x3b200c00, 0x38000000, run_c3312, get_info_c3312 }, // Load/store register (unscaled immediate)
-	{ 0x3b200c00, 0x38000400, run_c338, get_info_c338 }, // Load/store register (immediate post-indexed)
-	{ 0x3b200c00, 0x38000800, run_c3311, get_info_c3311 }, // Load/store register (unprivileged)
-	{ 0x3b200c00, 0x38000c00, run_c339, get_info_c339 }, // Load/store register (immediate pre-indexed)
-	{ 0x3b200c00, 0x38200800, run_c3310, get_info_c3310 }, // Load/store register (register offset)
-	{ 0x3b000000, 0x39000000, run_c3313, get_info_c3313 }, // Load/store register (unsigned immediate)
+	{ 0x3f000000, 0x08000000, run_c336, get_info_c336 },                        
+	{ 0x3b000000, 0x18000000, run_c335, get_info_c335 },                           
+	{ 0x3b800000, 0x28000000, run_c337, get_info_c337 },                                        
+	{ 0x3b800000, 0x28800000, run_c3315, get_info_c3315 },                                           
+	{ 0x3b800000, 0x29000000, run_c3314, get_info_c3314 },                                     
+	{ 0x3b800000, 0x29800000, run_c3316, get_info_c3316 },                                          
+	{ 0x3b200c00, 0x38000000, run_c3312, get_info_c3312 },                                            
+	{ 0x3b200c00, 0x38000400, run_c338, get_info_c338 },                                                
+	{ 0x3b200c00, 0x38000800, run_c3311, get_info_c3311 },                                      
+	{ 0x3b200c00, 0x38000c00, run_c339, get_info_c339 },                                               
+	{ 0x3b200c00, 0x38200800, run_c3310, get_info_c3310 },                                         
+	{ 0x3b000000, 0x39000000, run_c3313, get_info_c3313 },                                            
 
-	{ 0xbfbf0000, 0x0c000000, run_simd, get_info_simd }, // AdvSIMD load/store multiple structures
-	{ 0xbfa00000, 0x0c800000, run_simd, get_info_simd }, // AdvSIMD load/store multiple structures (post-indexed)
-	{ 0xbf980000, 0x0d000000, run_simd, get_info_simd }, // AdvSIMD load/store single structure
-	{ 0xbf800000, 0x0d800000, run_simd, get_info_simd } // AdvSIMD load/store single structure (post-indexed)
+	{ 0xbfbf0000, 0x0c000000, run_simd, get_info_simd },                                          
+	{ 0xbfa00000, 0x0c800000, run_simd, get_info_simd },                                                         
+	{ 0xbf980000, 0x0d000000, run_simd, get_info_simd },                                       
+	{ 0xbf800000, 0x0d800000, run_simd, get_info_simd }                                                      
 };
 
 static pgtrace_stats_t stats;
@@ -1339,7 +1339,7 @@ get_info_simd(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return false;
 }
 
-// load register (literal)
+                          
 static bool
 get_info_c335(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1378,7 +1378,7 @@ get_info_c335(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store exclusive
+                       
 static bool
 get_info_c336(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1414,7 +1414,7 @@ get_info_c336(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store no-allocate pair (offset)
+                                       
 bool
 get_info_c337(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1438,14 +1438,14 @@ get_info_c337(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 		scale = BITS(opc, 1, 1) + 2;
 	}
 
-	// double since it's pair
+	                         
 	info->bytes = 2 * (1 << scale);
 	info->addr = ss->ss_64.x[Rn] + (SIGN_EXTEND_64(imm7, 7) << scale);
 
 	return true;
 }
 
-// load/store reigster (immediate post-indexed)
+                                               
 static bool
 get_info_c338(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1472,13 +1472,13 @@ get_info_c338(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	}
 
 	info->bytes = 1 << scale;
-	// post-indexed
+	               
 	info->addr = ss->ss_64.x[Rn];
 
 	return true;
 }
 
-// load/store register (immediate pre-indexed)
+                                              
 static bool
 get_info_c339(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1511,7 +1511,7 @@ get_info_c339(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store register (register offset)
+                                        
 static bool
 get_info_c3310(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1560,7 +1560,7 @@ get_info_c3310(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store register (unprivileged)
+                                     
 static bool
 get_info_c3311(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1585,7 +1585,7 @@ get_info_c3311(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store register (unscaled immediate)
+                                           
 static bool
 get_info_c3312(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1618,7 +1618,7 @@ get_info_c3312(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store register (unsigned immediate)
+                                           
 bool
 get_info_c3313(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1651,7 +1651,7 @@ get_info_c3313(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store register pair (offset)
+                                    
 static bool
 get_info_c3314(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1681,7 +1681,7 @@ get_info_c3314(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	return true;
 }
 
-// load/store register pair (post-indexed)
+                                          
 static bool
 get_info_c3315(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1705,13 +1705,13 @@ get_info_c3315(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 	}
 
 	info->bytes = 2 * (1 << scale);
-	// post-indexed
+	               
 	info->addr = ss->ss_64.x[Rn];
 
 	return true;
 }
 
-// load/store register pair (pre-indexed)
+                                         
 static bool
 get_info_c3316(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 {
@@ -1742,9 +1742,9 @@ get_info_c3316(uint32_t inst, arm_saved_state_t *ss, instruction_info_t *info)
 }
 
 
-//-------------------------------------------------------------------
-// Globals
-//
+                                                                     
+          
+  
 int
 pgtrace_decode_and_run(uint32_t inst, vm_offset_t fva, vm_map_offset_t *cva_page, arm_saved_state_t *ss, pgtrace_run_result_t *res)
 {
@@ -1771,7 +1771,7 @@ pgtrace_decode_and_run(uint32_t inst, vm_offset_t fva, vm_map_offset_t *cva_page
 	if (info.addr == fva) {
 		cva = cva_cur_page + (fva & ARM_PGMASK);
 	} else {
-		// which means a front page is not a tracing page
+		                                                 
 		cva = cva_front_page + (fva & ARM_PGMASK);
 	}
 

@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	Kernel stack management routines.
- */
+  
+                                    
+   
 
 #include <mach/mach_host.h>
 #include <mach/mach_types.h>
@@ -49,12 +49,12 @@
 #include <mach_debug.h>
 #include <san/kasan.h>
 
-/*
- *	We allocate stacks from generic kernel VM.
- *
- *	The stack_free_list can only be accessed at splsched,
- *	because stack_alloc_try/thread_invoke operate at splsched.
- */
+  
+                                             
+  
+                                                        
+                                                             
+   
 
 decl_simple_lock_data(static, stack_lock_data);
 #define stack_lock()            simple_lock(&stack_lock_data, LCK_GRP_NULL)
@@ -64,15 +64,15 @@ decl_simple_lock_data(static, stack_lock_data);
 
 static vm_offset_t              stack_free_list;
 
-static unsigned int             stack_free_count, stack_free_hiwat;             /* free list count */
+static unsigned int             stack_free_count, stack_free_hiwat;                                  
 static unsigned int             stack_hiwat;
-unsigned int                    stack_total;                            /* current total count */
-unsigned long long              stack_allocs;                           /* total count of allocations */
+unsigned int                    stack_total;                                                     
+unsigned long long              stack_allocs;                                                           
 
 static unsigned int             stack_free_target;
 static int                      stack_free_delta;
 
-static unsigned int             stack_new_count;                                                /* total new stack allocations */
+static unsigned int             stack_new_count;                                                                                 
 
 static vm_offset_t              stack_addr_mask;
 
@@ -87,10 +87,10 @@ struct stack_cache {
 };
 static struct stack_cache PERCPU_DATA(stack_cache);
 
-/*
- *	The next field is at the base of the stack,
- *	so the low end is left unsullied.
- */
+  
+                                              
+                                    
+   
 #define stack_next(stack)       \
 	(*((vm_offset_t *)((stack) + kernel_stack_size) - 1))
 
@@ -140,12 +140,12 @@ stack_init(void)
 	kernel_stack_mask = ~stack_addr_mask;
 }
 
-/*
- *	stack_alloc:
- *
- *	Allocate a stack for a thread, may
- *	block.
- */
+  
+               
+  
+                                     
+         
+   
 
 static vm_offset_t
 stack_alloc_internal(void)
@@ -173,11 +173,11 @@ stack_alloc_internal(void)
 	splx(s);
 
 	if (stack == 0) {
-		/*
-		 * Request guard pages on either side of the stack.  Ask
-		 * kernel_memory_allocate() for two extra pages to account
-		 * for these.
-		 */
+		  
+                                                          
+                                                            
+               
+     
 
 		flags = KMA_GUARD_FIRST | KMA_GUARD_LAST | KMA_KSTACK | KMA_KOBJECT | KMA_ZERO;
 		kr = kernel_memory_allocate(kernel_map, &stack,
@@ -189,10 +189,10 @@ stack_alloc_internal(void)
 			panic("stack_alloc: kernel_memory_allocate(size:0x%llx, mask: 0x%llx, flags: 0x%x) failed with %d\n", (uint64_t)(kernel_stack_size + (2 * PAGE_SIZE)), (uint64_t)stack_addr_mask, flags, kr);
 		}
 
-		/*
-		 * The stack address that comes back is the address of the lower
-		 * guard page.  Skip past it to get the actual stack base address.
-		 */
+		  
+                                                                  
+                                                                    
+     
 
 		stack += PAGE_SIZE;
 	}
@@ -214,11 +214,11 @@ stack_handoff(thread_t from, thread_t to)
 	machine_stack_handoff(from, to);
 }
 
-/*
- *	stack_free:
- *
- *	Detach and free the stack for a thread.
- */
+  
+              
+  
+                                          
+   
 void
 stack_free(
 	thread_t        thread)
@@ -248,7 +248,7 @@ stack_free_stack(
 	spl_t                           s;
 
 #if KASAN_DEBUG
-	/* Sanity check - stack should be unpoisoned by now */
+	                                                      
 	assert(kasan_check_shadow(stack, kernel_stack_size, 0));
 #endif
 
@@ -271,16 +271,16 @@ stack_free_stack(
 	splx(s);
 }
 
-/*
- *	stack_alloc_try:
- *
- *	Non-blocking attempt to allocate a
- *	stack for a thread.
- *
- *	Returns TRUE on success.
- *
- *	Called at splsched.
- */
+  
+                   
+  
+                                     
+                      
+  
+                           
+  
+                      
+   
 boolean_t
 stack_alloc_try(
 	thread_t                thread)
@@ -316,12 +316,12 @@ stack_alloc_try(
 
 static unsigned int             stack_collect_tick, last_stack_tick;
 
-/*
- *	stack_collect:
- *
- *	Free excess kernel stacks, may
- *	block.
- */
+  
+                 
+  
+                                 
+         
+   
 void
 stack_collect(void)
 {
@@ -343,13 +343,13 @@ stack_collect(void)
 			stack_unlock();
 			splx(s);
 
-			/*
-			 * Get the stack base address, then decrement by one page
-			 * to account for the lower guard page.  Add two extra pages
-			 * to the size to account for the guard pages on both ends
-			 * that were originally requested when the stack was allocated
-			 * back in stack_alloc().
-			 */
+			  
+                                                            
+                                                               
+                                                             
+                                                                 
+                            
+      
 
 			stack = (vm_offset_t)vm_map_trunc_page(
 				stack,
@@ -379,15 +379,15 @@ stack_collect(void)
 	}
 }
 
-/*
- *	compute_stack_target:
- *
- *	Computes a new target free list count
- *	based on recent alloc / free activity.
- *
- *	Limits stack collection to once per
- *	computation period.
- */
+  
+                        
+  
+                                        
+                                         
+  
+                                      
+                      
+   
 void
 compute_stack_target(
 	__unused void           *arg)
@@ -412,7 +412,7 @@ compute_stack_target(
 	splx(s);
 }
 
-/* OBSOLETE */
+              
 void    stack_privilege(
 	thread_t        thread);
 
@@ -420,12 +420,12 @@ void
 stack_privilege(
 	__unused thread_t       thread)
 {
-	/* OBSOLETE */
+	              
 }
 
-/*
- * Return info on stack usage for threads in a specific processor set
- */
+  
+                                                                     
+   
 kern_return_t
 processor_set_stack_usage(
 	processor_set_t pset,
@@ -445,7 +445,7 @@ processor_set_stack_usage(
 	thread_t *thread_list;
 	thread_t thread;
 
-	unsigned int actual;    /* this many things */
+	unsigned int actual;                          
 	unsigned int i;
 
 	vm_size_t size, size_needed;
@@ -463,7 +463,7 @@ processor_set_stack_usage(
 
 		actual = threads_count;
 
-		/* do we have the memory we need? */
+		                                    
 
 		size_needed = actual * sizeof(thread_t);
 		if (size_needed <= size) {
@@ -485,7 +485,7 @@ processor_set_stack_usage(
 		}
 	}
 
-	/* OK, have memory and list is locked */
+	                                        
 	thread_list = (thread_t *) addr;
 	for (i = 0, thread = (thread_t)(void *) queue_first(&threads);
 	    !queue_end(&threads, (queue_entry_t) thread);
@@ -497,7 +497,7 @@ processor_set_stack_usage(
 
 	lck_mtx_unlock(&tasks_threads_lock);
 
-	/* calculate maxusage and free thread references */
+	                                                   
 
 	total = 0;
 	maxusage = 0;
@@ -522,7 +522,7 @@ processor_set_stack_usage(
 	*maxstackp = maxstack;
 	return KERN_SUCCESS;
 
-#endif  /* MACH_DEBUG */
+#endif                  
 }
 
 vm_offset_t

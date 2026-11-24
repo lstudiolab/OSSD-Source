@@ -32,10 +32,10 @@
 
 #if defined(__i386__)
 
-/*
- * i386 needs custom assembly to transform the return from syscalls
- * into a proper stack for a function call out to cerror{,_nocancel}.
- */
+  
+                                                                   
+                                                                     
+   
 
 LABEL(tramp_cerror)
 	mov		%esp, %edx
@@ -117,8 +117,8 @@ _i386_set_ldt:
 	ALIGN
 	.globl __thread_set_tsd_base
 __thread_set_tsd_base:
-	movl	$0, %esi	// 0 as the second argument
-	movl    $ SYSCALL_CONSTRUCT_MDEP(3), %eax	// Machine-dependent syscall number 3
+	movl	$0, %esi	                           
+	movl    $ SYSCALL_CONSTRUCT_MDEP(3), %eax	                                     
 	MACHDEP_SYSCALL_TRAP
 	ret
 

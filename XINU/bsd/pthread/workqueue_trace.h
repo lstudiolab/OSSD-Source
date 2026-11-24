@@ -29,11 +29,11 @@
 #ifndef _WORKQUEUE_TRACE_H_
 #define _WORKQUEUE_TRACE_H_
 
-// General workqueue tracepoints, mostly for debugging
+                                                      
 #define WQ_TRACE_WORKQUEUE_SUBCLASS 1
-// Workqueue request scheduling tracepoints
+                                           
 #define WQ_TRACE_REQUESTS_SUBCLASS 2
-// Generic pthread tracepoints
+                              
 #define WQ_TRACE_BSDTHREAD_SUBCLASS 16
 
 #define TRACE_wq_pthread_exit \
@@ -96,8 +96,8 @@
 
 #if (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
 #define __wq_trace_only
-#else // (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
+#else                                           
 #define __wq_trace_only __unused
-#endif // (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
+#endif                                           
 
-#endif // _WORKQUEUE_TRACE_H_
+#endif                       

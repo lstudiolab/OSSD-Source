@@ -58,9 +58,9 @@
 
 #include <mach_ldebug.h>
 
-/*
- * Pass field offsets to assembly code.
- */
+  
+                                       
+   
 #include <kern/ast.h>
 #include <kern/thread.h>
 #include <kern/task.h>
@@ -88,20 +88,20 @@
 #if HIBERNATION
 #include <IOKit/IOHibernatePrivate.h>
 #include <machine/pal_hibernate.h>
-#endif /* HIBERNATION */
+#endif                  
 
-/*
- * genassym.c is used to produce an
- * assembly file which, intermingled with unuseful assembly code,
- * has all the necessary definitions emitted. This assembly file is
- * then postprocessed with sed to extract only these definitions
- * and thus the final assyms.s is created.
- *
- * This convoluted means is necessary since the structure alignment
- * and packing may be different between the host machine and the
- * target so we are forced into using the cross compiler to generate
- * the values, but we cannot run anything on the target machine.
- */
+  
+                                   
+                                                                 
+                                                                   
+                                                                
+                                          
+  
+                                                                   
+                                                                
+                                                                    
+                                                                
+   
 
 #define DECLARE(SYM, VAL) \
 	__asm("DEFINITION__define__" SYM ":\t .ascii \"%0\"" : : "i"  ((u_long)(VAL)))
@@ -123,9 +123,9 @@ main(int     argc,
 	DECLARE("TH_ROP_PID", offsetof(struct thread, machine.rop_pid));
 	DECLARE("TH_JOP_PID", offsetof(struct thread, machine.jop_pid));
 	DECLARE("TH_DISABLE_USER_JOP", offsetof(struct thread, machine.disable_user_jop));
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
-	/* These fields are being added on demand */
+	                                            
 	DECLARE("ACT_CONTEXT", offsetof(struct thread, machine.contextData));
 	DECLARE("TH_CTH_SELF", offsetof(struct thread, machine.cthread_self));
 	DECLARE("ACT_PREEMPT_CNT", offsetof(struct thread, machine.preemption_count));
@@ -139,7 +139,7 @@ main(int     argc,
 #if defined(HAS_APPLE_PAC)
 	DECLARE("TASK_ROP_PID", offsetof(struct task, rop_pid));
 	DECLARE("TASK_JOP_PID", offsetof(struct task, jop_pid));
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 
 	DECLARE("ARM_CONTEXT_SIZE", sizeof(arm_context_t));
@@ -178,7 +178,7 @@ main(int     argc,
 	DECLARE("SS64_ESR", offsetof(arm_context_t, ss.ss_64.esr));
 #if defined(HAS_APPLE_PAC)
 	DECLARE("SS64_JOPHASH", offsetof(arm_context_t, ss.ss_64.jophash));
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 	DECLARE("NS_FLAVOR", offsetof(arm_context_t, ns.nsh.flavor));
 	DECLARE("NS_COUNT", offsetof(arm_context_t, ns.nsh.count));
@@ -234,7 +234,7 @@ main(int     argc,
 	DECLARE("SS64_KERNEL_CPSR", offsetof(arm_kernel_context_t, ss.cpsr));
 #if defined(HAS_APPLE_PAC)
 	DECLARE("SS64_KERNEL_JOPHASH", offsetof(arm_kernel_context_t, ss.jophash));
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 	DECLARE("NS64_KERNEL_D8", offsetof(arm_kernel_context_t, ns.d[0]));
 	DECLARE("NS64_KERNEL_D9", offsetof(arm_kernel_context_t, ns.d[1]));
@@ -266,7 +266,7 @@ main(int     argc,
 	DECLARE("CPU_EXCEPSTACK_TOP", offsetof(cpu_data_t, excepstack_top));
 #if __ARM_KERNEL_PROTECT__
 	DECLARE("CPU_EXC_VECTORS", offsetof(cpu_data_t, cpu_exc_vectors));
-#endif /* __ARM_KERNEL_PROTECT__ */
+#endif                             
 	DECLARE("CPU_NUMBER_GS", offsetof(cpu_data_t, cpu_number));
 	DECLARE("CPU_PENDING_AST", offsetof(cpu_data_t, cpu_pending_ast));
 	DECLARE("CPU_INT_STATE", offsetof(cpu_data_t, cpu_int_state));
@@ -281,7 +281,7 @@ main(int     argc,
 	DECLARE("rhdSize", sizeof(struct reset_handler_data));
 #if WITH_CLASSIC_S2R || !__arm64__
 	DECLARE("stSize", sizeof(SleepToken));
-#endif /* WITH_CLASSIC_S2R || !__arm64__ */
+#endif                                     
 
 	DECLARE("CPU_DATA_ENTRIES", offsetof(struct reset_handler_data, cpu_data_entries));
 
@@ -308,7 +308,7 @@ main(int     argc,
 	DECLARE("PMAP_CPU_DATA_KERN_SAVED_SP", offsetof(struct pmap_cpu_data, ppl_kern_saved_sp));
 	DECLARE("PMAP_CPU_DATA_SAVE_AREA", offsetof(struct pmap_cpu_data, save_area));
 	DECLARE("PMAP_COUNT", PMAP_COUNT);
-#endif /* XNU_MONITOR */
+#endif                  
 
 
 #if defined(HAS_APPLE_PAC)
@@ -318,13 +318,13 @@ main(int     argc,
 	DECLARE("THREAD_CONTINUE_T_DISC", __builtin_ptrauth_type_discriminator(thread_continue_t));
 #else
 	DECLARE("THREAD_CONTINUE_T_DISC", 0);
-#endif /* __has_feature(ptrauth_function_pointer_type_discrimination) */
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                                                                  
+#endif                             
 
 
 #if __ARM_ARCH_8_5__
 	DECLARE("CPU_SYNC_ON_CSWITCH", offsetof(cpu_data_t, sync_on_cswitch));
-#endif /* __ARM_ARCH_8_5__ */
+#endif                       
 
 #if HIBERNATION
 	DECLARE("HIBHDR_STACKOFFSET", offsetof(IOHibernateImageHeader, restore1StackOffset));
@@ -332,7 +332,7 @@ main(int     argc,
 	DECLARE("HIBTRAMP_TTBR1", offsetof(pal_hib_tramp_result_t, ttbr1));
 	DECLARE("HIBTRAMP_MEMSLIDE", offsetof(pal_hib_tramp_result_t, memSlide));
 	DECLARE("HIBGLOBALS_KERNELSLIDE", offsetof(pal_hib_globals_t, kernelSlide));
-#endif /* HIBERNATION */
+#endif                  
 
 	return 0;
 }

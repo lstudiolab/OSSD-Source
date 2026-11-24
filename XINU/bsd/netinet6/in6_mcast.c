@@ -54,10 +54,10 @@
  * SUCH DAMAGE.
  */
 
-/*
- * IPv6 multicast socket, group, and socket option processing module.
- * Normative references: RFC 2292, RFC 3492, RFC 3542, RFC 3678, RFC 3810.
- */
+  
+                                                                     
+                                                                          
+   
 
 #include <sys/cdefs.h>
 
@@ -121,7 +121,7 @@ static int      in6m_get_source(struct in6_multi *inm,
     const struct in6_addr *addr, const int noalloc,
     struct ip6_msource **pims);
 static int      in6m_is_ifp_detached(const struct in6_multi *);
-static int      in6m_merge(struct in6_multi *, /*const*/ struct in6_mfilter *);
+static int      in6m_merge(struct in6_multi *,           struct in6_mfilter *);
 static void     in6m_reap(struct in6_multi *);
 static struct ip6_moptions *
 in6p_findmoptions(struct inpcb *);
@@ -139,7 +139,7 @@ static int      sysctl_ip6_mcast_filters SYSCTL_HANDLER_ARGS;
 static __inline__ int ip6_msource_cmp(const struct ip6_msource *,
     const struct ip6_msource *);
 
-SYSCTL_DECL(_net_inet6_ip6);    /* XXX Not in any common header. */
+SYSCTL_DECL(_net_inet6_ip6);                                       
 
 SYSCTL_NODE(_net_inet6_ip6, OID_AUTO, mcast, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "IPv6 multicast");
 
@@ -163,37 +163,37 @@ SYSCTL_NODE(_net_inet6_ip6_mcast, OID_AUTO, filters,
 
 RB_GENERATE_PREV(ip6_msource_tree, ip6_msource, im6s_link, ip6_msource_cmp);
 
-#define IN6M_TRACE_HIST_SIZE    32      /* size of trace history */
+#define IN6M_TRACE_HIST_SIZE    32                                 
 
-/* For gdb */
+             
 __private_extern__ unsigned int in6m_trace_hist_size = IN6M_TRACE_HIST_SIZE;
 
 struct in6_multi_dbg {
-	struct in6_multi        in6m;                   /* in6_multi */
-	u_int16_t               in6m_refhold_cnt;       /* # of ref */
-	u_int16_t               in6m_refrele_cnt;       /* # of rele */
-	/*
-	 * Circular lists of in6m_addref and in6m_remref callers.
-	 */
+	struct in6_multi        in6m;                                  
+	u_int16_t               in6m_refhold_cnt;                     
+	u_int16_t               in6m_refrele_cnt;                      
+	  
+                                                          
+    
 	ctrace_t                in6m_refhold[IN6M_TRACE_HIST_SIZE];
 	ctrace_t                in6m_refrele[IN6M_TRACE_HIST_SIZE];
-	/*
-	 * Trash list linkage
-	 */
+	  
+                      
+    
 	TAILQ_ENTRY(in6_multi_dbg) in6m_trash_link;
 };
 
-/* List of trash in6_multi entries protected by in6m_trash_lock */
+                                                                  
 static TAILQ_HEAD(, in6_multi_dbg) in6m_trash_head;
 static decl_lck_mtx_data(, in6m_trash_lock);
 
 #if DEBUG
-static unsigned int in6m_debug = 1;             /* debugging (enabled) */
+static unsigned int in6m_debug = 1;                                      
 #else
-static unsigned int in6m_debug;                 /* debugging (disabled) */
-#endif /* !DEBUG */
-static struct zone *in6m_zone;                  /* zone for in6_multi */
-#define IN6M_ZONE_NAME          "in6_multi"     /* zone name */
+static unsigned int in6m_debug;                                           
+#endif             
+static struct zone *in6m_zone;                                          
+#define IN6M_ZONE_NAME          "in6_multi"                    
 
 static ZONE_DECLARE(imm_zone, "in6_multi_mship",
     sizeof(struct in6_multi_mship), ZC_ZFREE_CLEARMEM);
@@ -204,7 +204,7 @@ static ZONE_DECLARE(ip6ms_zone, "ip6_msource",
 static ZONE_DECLARE(in6ms_zone, "in6_msource",
     sizeof(struct in6_msource), ZC_ZFREE_CLEARMEM);
 
-/* Lock group and attribute for in6_multihead_lock lock */
+                                                          
 static lck_attr_t       *in6_multihead_lock_attr;
 static lck_grp_t        *in6_multihead_lock_grp;
 static lck_grp_attr_t   *in6_multihead_lock_grp_attr;
@@ -224,21 +224,21 @@ static void ip6ms_free(struct ip6_msource *);
 static struct in6_msource *in6ms_alloc(zalloc_flags_t);
 static void in6ms_free(struct in6_msource *);
 
-/*
- * IPv6 source tree comparison function.
- *
- * An ordered predicate is necessary; bcmp() is not documented to return
- * an indication of order, memcmp() is, and is an ISO C99 requirement.
- */
+  
+                                        
+  
+                                                                        
+                                                                      
+   
 static __inline int
 ip6_msource_cmp(const struct ip6_msource *a, const struct ip6_msource *b)
 {
 	return memcmp(&a->im6s_addr, &b->im6s_addr, sizeof(struct in6_addr));
 }
 
-/*
- * Inline function which wraps assertions for a valid ifp.
- */
+  
+                                                          
+   
 static __inline__ int
 in6m_is_ifp_detached(const struct in6_multi *inm)
 {
@@ -248,10 +248,10 @@ in6m_is_ifp_detached(const struct in6_multi *inm)
 	return !ifnet_is_attached(inm->in6m_ifp, 0);
 }
 
-/*
- * Initialize an in6_mfilter structure to a known state at t0, t1
- * with an empty source filter list.
- */
+  
+                                                                 
+                                    
+   
 static __inline__ void
 im6f_init(struct in6_mfilter *imf, const uint8_t st0, const  uint8_t st1)
 {
@@ -261,9 +261,9 @@ im6f_init(struct in6_mfilter *imf, const uint8_t st0, const  uint8_t st1)
 	imf->im6f_st[1] = st1;
 }
 
-/*
- * Resize the ip6_moptions vector to the next power-of-two minus 1.
- */
+  
+                                                                   
+   
 static int
 im6o_grow(struct ip6_moptions *imo)
 {
@@ -304,7 +304,7 @@ im6o_grow(struct ip6_moptions *imo)
 
 	imo->im6o_mfilters = nmfilters;
 
-	/* Initialize newly allocated source filter heads. */
+	                                                     
 	for (idx = oldmax; idx < newmax; idx++) {
 		im6f_init(&nmfilters[idx], MCAST_UNDEFINED, MCAST_EXCLUDE);
 	}
@@ -314,11 +314,11 @@ im6o_grow(struct ip6_moptions *imo)
 	return 0;
 }
 
-/*
- * Find an IPv6 multicast group entry for this ip6_moptions instance
- * which matches the specified group, and optionally an interface.
- * Return its index into the array, or -1 if not found.
- */
+  
+                                                                    
+                                                                  
+                                                       
+   
 static size_t
 im6o_match_group(const struct ip6_moptions *imo, const struct ifnet *ifp,
     const struct sockaddr_in6 *group)
@@ -332,7 +332,7 @@ im6o_match_group(const struct ip6_moptions *imo, const struct ifnet *ifp,
 
 	gsin6 = group;
 
-	/* The im6o_membership array may be lazy allocated. */
+	                                                      
 	if (imo->im6o_membership == NULL || imo->im6o_num_memberships == 0) {
 		return -1;
 	}
@@ -359,17 +359,17 @@ im6o_match_group(const struct ip6_moptions *imo, const struct ifnet *ifp,
 	return idx;
 }
 
-/*
- * Find an IPv6 multicast source entry for this imo which matches
- * the given group index for this socket, and source address.
- *
- * XXX TODO: The scope ID, if present in src, is stripped before
- * any comparison. We SHOULD enforce scope/zone checks where the source
- * filter entry has a link scope.
- *
- * NOTE: This does not check if the entry is in-mode, merely if
- * it exists, which may not be the desired behaviour.
- */
+  
+                                                                 
+                                                             
+  
+                                                                
+                                                                       
+                                 
+  
+                                                               
+                                                     
+   
 static struct in6_msource *
 im6o_match_source(const struct ip6_moptions *imo, const size_t gidx,
     const struct sockaddr_in6 *src)
@@ -384,7 +384,7 @@ im6o_match_source(const struct ip6_moptions *imo, const size_t gidx,
 	VERIFY(src->sin6_family == AF_INET6);
 	VERIFY(gidx != (size_t)-1 && gidx < imo->im6o_num_memberships);
 
-	/* The im6o_mfilters array may be lazy allocated. */
+	                                                    
 	if (imo->im6o_mfilters == NULL) {
 		return NULL;
 	}
@@ -392,18 +392,18 @@ im6o_match_source(const struct ip6_moptions *imo, const size_t gidx,
 
 	psa = src;
 	find.im6s_addr = psa->sin6_addr;
-	in6_clearscope(&find.im6s_addr);                /* XXX */
+	in6_clearscope(&find.im6s_addr);                         
 	ims = RB_FIND(ip6_msource_tree, &imf->im6f_sources, &find);
 
 	return (struct in6_msource *)ims;
 }
 
-/*
- * Perform filtering for multicast datagrams on a socket by group and source.
- *
- * Returns 0 if a datagram should be allowed through, or various error codes
- * if the socket was not a member of the group, or the source was muted, etc.
- */
+  
+                                                                             
+  
+                                                                            
+                                                                             
+   
 int
 im6o_mc_filter(const struct ip6_moptions *imo, const struct ifnet *ifp,
     const struct sockaddr_in6 *group, const struct sockaddr_in6 *src)
@@ -420,15 +420,15 @@ im6o_mc_filter(const struct ip6_moptions *imo, const struct ifnet *ifp,
 		return MCAST_NOTGMEMBER;
 	}
 
-	/*
-	 * Check if the source was included in an (S,G) join.
-	 * Allow reception on exclusive memberships by default,
-	 * reject reception on inclusive memberships by default.
-	 * Exclude source only if an in-mode exclude filter exists.
-	 * Include source only if an in-mode include filter exists.
-	 * NOTE: We are comparing group state here at MLD t1 (now)
-	 * with socket-layer t0 (since last downcall).
-	 */
+	  
+                                                      
+                                                        
+                                                         
+                                                            
+                                                            
+                                                           
+                                               
+    
 	mode = imo->im6o_mfilters[gidx].im6f_st[1];
 	ims = im6o_match_source(imo, gidx, src);
 
@@ -440,14 +440,14 @@ im6o_mc_filter(const struct ip6_moptions *imo, const struct ifnet *ifp,
 	return MCAST_PASS;
 }
 
-/*
- * Find and return a reference to an in6_multi record for (ifp, group),
- * and bump its reference count.
- * If one does not exist, try to allocate it, and update link-layer multicast
- * filters on ifp to listen for group.
- * Assumes the IN6_MULTI lock is held across the call.
- * Return 0 if successful, otherwise return an appropriate error code.
- */
+  
+                                                                       
+                                
+                                                                             
+                                      
+                                                      
+                                                                      
+   
 static int
 in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
     struct in6_multi **pinm)
@@ -469,10 +469,10 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 		*pinm = inm;
 		IN6M_UNLOCK(inm);
 		in6_multihead_lock_done();
-		/*
-		 * We already joined this group; return the in6m
-		 * with a refcount held (via lookup) for caller.
-		 */
+		  
+                                                  
+                                                  
+     
 		return 0;
 	}
 	in6_multihead_lock_done();
@@ -482,24 +482,24 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 	gsin6.sin6_len = sizeof(struct sockaddr_in6);
 	gsin6.sin6_addr = *group;
 
-	/*
-	 * Check if a link-layer group is already associated
-	 * with this network-layer group on the given ifnet.
-	 */
+	  
+                                                     
+                                                     
+    
 	error = if_addmulti(ifp, (struct sockaddr *)&gsin6, &ifma);
 	if (error != 0) {
 		return error;
 	}
 
-	/*
-	 * See comments in in6m_remref() for access to ifma_protospec.
-	 */
+	  
+                                                               
+    
 	in6_multihead_lock_exclusive();
 	IFMA_LOCK(ifma);
 	if ((inm = ifma->ifma_protospec) != NULL) {
 		VERIFY(ifma->ifma_addr != NULL);
 		VERIFY(ifma->ifma_addr->sa_family == AF_INET6);
-		IN6M_ADDREF(inm);       /* for caller */
+		IN6M_ADDREF(inm);                       
 		IFMA_UNLOCK(ifma);
 		IN6M_LOCK(inm);
 		VERIFY(inm->in6m_ifma == ifma);
@@ -513,20 +513,20 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 			IN6M_UNLOCK(inm);
 			in6_multihead_lock_done();
 			IFMA_REMREF(ifma);
-			/*
-			 * We lost the race with another thread doing
-			 * in6_mc_get(); since this group has already
-			 * been joined; return the inm with a refcount
-			 * held for caller.
-			 */
+			  
+                                                
+                                                
+                                                 
+                      
+      
 			return 0;
 		}
-		/*
-		 * We lost the race with another thread doing in6_delmulti();
-		 * the inm referring to the ifma has been detached, thus we
-		 * reattach it back to the in6_multihead list, and return the
-		 * inm with a refcount held for the caller.
-		 */
+		  
+                                                               
+                                                             
+                                                               
+                                             
+     
 		in6_multi_attach(inm);
 		VERIFY((inm->in6m_debug &
 		    (IFD_ATTACHED | IFD_TRASHED)) == IFD_ATTACHED);
@@ -538,14 +538,14 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 	}
 	IFMA_UNLOCK(ifma);
 
-	/*
-	 * A new in6_multi record is needed; allocate and initialize it.
-	 * We DO NOT perform an MLD join as the in6_ layer may need to
-	 * push an initial source list down to MLD to support SSM.
-	 *
-	 * The initial source filter state is INCLUDE, {} as per the RFC.
-	 * Pending state-changes per group are subject to a bounds check.
-	 */
+	  
+                                                                 
+                                                               
+                                                           
+   
+                                                                  
+                                                                  
+    
 	inm = in6_multi_alloc(Z_WAITOK);
 
 	IN6M_LOCK(inm);
@@ -554,11 +554,11 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 	inm->in6m_mli = MLD_IFINFO(ifp);
 	VERIFY(inm->in6m_mli != NULL);
 	MLI_ADDREF(inm->in6m_mli);
-	inm->in6m_ifma = ifma;          /* keep refcount from if_addmulti() */
+	inm->in6m_ifma = ifma;                                                
 	inm->in6m_state = MLD_NOT_MEMBER;
-	/*
-	 * Pending state-changes per group are subject to a bounds check.
-	 */
+	  
+                                                                  
+    
 	inm->in6m_scq.ifq_maxlen = MLD_MAX_STATE_CHANGES;
 	inm->in6m_st[0].iss_fmode = MCAST_UNDEFINED;
 	inm->in6m_st[1].iss_fmode = MCAST_UNDEFINED;
@@ -567,7 +567,7 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 	in6_multi_attach(inm);
 	VERIFY((inm->in6m_debug &
 	    (IFD_ATTACHED | IFD_TRASHED)) == IFD_ATTACHED);
-	IN6M_ADDREF_LOCKED(inm);        /* for caller */
+	IN6M_ADDREF_LOCKED(inm);                        
 	IN6M_UNLOCK(inm);
 
 	IFMA_LOCK(ifma);
@@ -579,11 +579,11 @@ in6_mc_get(struct ifnet *ifp, const struct in6_addr *group,
 	return 0;
 }
 
-/*
- * Clear recorded source entries for a group.
- * Used by the MLD code. Caller must hold the IN6_MULTI lock.
- * FIXME: Should reap.
- */
+  
+                                             
+                                                             
+                      
+   
 void
 in6m_clear_recorded(struct in6_multi *inm)
 {
@@ -600,28 +600,28 @@ in6m_clear_recorded(struct in6_multi *inm)
 	VERIFY(inm->in6m_st[1].iss_rec == 0);
 }
 
-/*
- * Record a source as pending for a Source-Group MLDv2 query.
- * This lives here as it modifies the shared tree.
- *
- * inm is the group descriptor.
- * naddr is the address of the source to record in network-byte order.
- *
- * If the net.inet6.mld.sgalloc sysctl is non-zero, we will
- * lazy-allocate a source node in response to an SG query.
- * Otherwise, no allocation is performed. This saves some memory
- * with the trade-off that the source will not be reported to the
- * router if joined in the window between the query response and
- * the group actually being joined on the local host.
- *
- * VIMAGE: XXX: Currently the mld_sgalloc feature has been removed.
- * This turns off the allocation of a recorded source entry if
- * the group has not been joined.
- *
- * Return 0 if the source didn't exist or was already marked as recorded.
- * Return 1 if the source was marked as recorded by this function.
- * Return <0 if any error occured (negated errno code).
- */
+  
+                                                             
+                                                  
+  
+                               
+                                                                      
+  
+                                                           
+                                                          
+                                                                
+                                                                 
+                                                                
+                                                     
+  
+                                                                   
+                                                              
+                                 
+  
+                                                                         
+                                                                  
+                                                       
+   
 int
 in6m_record_source(struct in6_multi *inm, const struct in6_addr *addr)
 {
@@ -646,27 +646,27 @@ in6m_record_source(struct in6_multi *inm, const struct in6_addr *addr)
 		ims = nims;
 	}
 
-	/*
-	 * Mark the source as recorded and update the recorded
-	 * source count.
-	 */
+	  
+                                                       
+                 
+    
 	++ims->im6s_stp;
 	++inm->in6m_st[1].iss_rec;
 
 	return 1;
 }
 
-/*
- * Return a pointer to an in6_msource owned by an in6_mfilter,
- * given its source address.
- * Lazy-allocate if needed. If this is a new entry its filter state is
- * undefined at t0.
- *
- * imf is the filter set being modified.
- * addr is the source address.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                              
+                            
+                                                                      
+                   
+  
+                                        
+                              
+  
+                                              
+   
 static int
 im6f_get_source(struct in6_mfilter *imf, const struct sockaddr_in6 *psin,
     struct in6_msource **plims)
@@ -700,16 +700,16 @@ im6f_get_source(struct in6_mfilter *imf, const struct sockaddr_in6 *psin,
 	return error;
 }
 
-/*
- * Graft a source entry into an existing socket-layer filter set,
- * maintaining any required invariants and checking allocations.
- *
- * The source is marked as being in the new filter mode at t1.
- *
- * Return the pointer to the new node, otherwise return NULL.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                                 
+                                                                
+  
+                                                              
+  
+                                                             
+  
+                                              
+   
 static struct in6_msource *
 im6f_graft(struct in6_mfilter *imf, const uint8_t st1,
     const struct sockaddr_in6 *psin)
@@ -727,16 +727,16 @@ im6f_graft(struct in6_mfilter *imf, const uint8_t st1,
 	return lims;
 }
 
-/*
- * Prune a source entry from an existing socket-layer filter set,
- * maintaining any required invariants and checking allocations.
- *
- * The source is marked as being left at t1, it is not freed.
- *
- * Return 0 if no error occurred, otherwise return an errno value.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                                 
+                                                                
+  
+                                                             
+  
+                                                                  
+  
+                                              
+   
 static int
 im6f_prune(struct in6_mfilter *imf, const struct sockaddr_in6 *psin)
 {
@@ -754,11 +754,11 @@ im6f_prune(struct in6_mfilter *imf, const struct sockaddr_in6 *psin)
 	return 0;
 }
 
-/*
- * Revert socket-layer filter set deltas at t1 to t0 state.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                           
+  
+                                              
+   
 static void
 im6f_rollback(struct in6_mfilter *imf)
 {
@@ -768,13 +768,13 @@ im6f_rollback(struct in6_mfilter *imf)
 	RB_FOREACH_SAFE(ims, ip6_msource_tree, &imf->im6f_sources, tims) {
 		lims = (struct in6_msource *)ims;
 		if (lims->im6sl_st[0] == lims->im6sl_st[1]) {
-			/* no change at t1 */
+			                     
 			continue;
 		} else if (lims->im6sl_st[0] != MCAST_UNDEFINED) {
-			/* revert change to existing source at t1 */
+			                                            
 			lims->im6sl_st[1] = lims->im6sl_st[0];
 		} else {
-			/* revert source added t1 */
+			                            
 			MLD_PRINTF(("%s: free in6ms 0x%llx\n", __func__,
 			    (uint64_t)VM_KERNEL_ADDRPERM(lims)));
 			RB_REMOVE(ip6_msource_tree, &imf->im6f_sources, ims);
@@ -785,11 +785,11 @@ im6f_rollback(struct in6_mfilter *imf)
 	imf->im6f_st[1] = imf->im6f_st[0];
 }
 
-/*
- * Mark socket-layer filter set as INCLUDE {} at t1.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                    
+  
+                                              
+   
 void
 im6f_leave(struct in6_mfilter *imf)
 {
@@ -803,11 +803,11 @@ im6f_leave(struct in6_mfilter *imf)
 	imf->im6f_st[1] = MCAST_INCLUDE;
 }
 
-/*
- * Mark socket-layer filter set deltas as committed.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                    
+  
+                                              
+   
 static void
 im6f_commit(struct in6_mfilter *imf)
 {
@@ -821,11 +821,11 @@ im6f_commit(struct in6_mfilter *imf)
 	imf->im6f_st[0] = imf->im6f_st[1];
 }
 
-/*
- * Reap unreferenced sources from socket-layer filter set.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                                          
+  
+                                              
+   
 static void
 im6f_reap(struct in6_mfilter *imf)
 {
@@ -845,11 +845,11 @@ im6f_reap(struct in6_mfilter *imf)
 	}
 }
 
-/*
- * Purge socket-layer filter set.
- *
- * Caller is expected to be holding im6o_lock.
- */
+  
+                                 
+  
+                                              
+   
 void
 im6f_purge(struct in6_mfilter *imf)
 {
@@ -868,16 +868,16 @@ im6f_purge(struct in6_mfilter *imf)
 	VERIFY(RB_EMPTY(&imf->im6f_sources));
 }
 
-/*
- * Look up a source filter entry for a multicast group.
- *
- * inm is the group descriptor to work with.
- * addr is the IPv6 address to look up.
- * noalloc may be non-zero to suppress allocation of sources.
- * *pims will be set to the address of the retrieved or allocated source.
- *
- * Return 0 if successful, otherwise return a non-zero error code.
- */
+  
+                                                       
+  
+                                            
+                                       
+                                                             
+                                                                         
+  
+                                                                  
+   
 static int
 in6m_get_source(struct in6_multi *inm, const struct in6_addr *addr,
     const int noalloc, struct ip6_msource **pims)
@@ -906,14 +906,14 @@ in6m_get_source(struct in6_multi *inm, const struct in6_addr *addr,
 	return 0;
 }
 
-/*
- * Helper function to derive the filter mode on a source entry
- * from its internal counters. Predicates are:
- *  A source is only excluded if all listeners exclude it.
- *  A source is only included if no listeners exclude it,
- *  and at least one listener includes it.
- * May be used by ifmcstat(8).
- */
+  
+                                                              
+                                              
+                                                          
+                                                         
+                                          
+                              
+   
 uint8_t
 im6s_get_mode(const struct in6_multi *inm, const struct ip6_msource *ims,
     uint8_t t)
@@ -930,10 +930,10 @@ im6s_get_mode(const struct in6_multi *inm, const struct ip6_msource *ims,
 	return MCAST_UNDEFINED;
 }
 
-/*
- * Merge socket-layer source into MLD-layer source.
- * If rollback is non-zero, perform the inverse of the merge.
- */
+  
+                                                   
+                                                             
+   
 static void
 im6s_merge(struct ip6_msource *ims, const struct in6_msource *lims,
     const int rollback)
@@ -961,22 +961,22 @@ im6s_merge(struct ip6_msource *ims, const struct in6_msource *lims,
 	}
 }
 
-/*
- * Atomically update the global in6_multi state, when a membership's
- * filter list is being updated in any way.
- *
- * imf is the per-inpcb-membership group filter pointer.
- * A fake imf may be passed for in-kernel consumers.
- *
- * XXX This is a candidate for a set-symmetric-difference style loop
- * which would eliminate the repeated lookup from root of ims nodes,
- * as they share the same key space.
- *
- * If any error occurred this function will back out of refcounts
- * and return a non-zero value.
- */
+  
+                                                                    
+                                           
+  
+                                                        
+                                                    
+  
+                                                                    
+                                                                    
+                                    
+  
+                                                                 
+                               
+   
 static int
-in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
+in6m_merge(struct in6_multi *inm,           struct in6_mfilter *imf)
 {
 	struct ip6_msource      *ims, *nims = NULL;
 	struct in6_msource      *lims;
@@ -989,13 +989,13 @@ in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 	error = 0;
 	nsrc1 = nsrc0 = 0;
 
-	/*
-	 * Update the source filters first, as this may fail.
-	 * Maintain count of in-mode filters at t0, t1. These are
-	 * used to work out if we transition into ASM mode or not.
-	 * Maintain a count of source filters whose state was
-	 * actually modified by this operation.
-	 */
+	  
+                                                      
+                                                          
+                                                           
+                                                      
+                                        
+    
 	RB_FOREACH(ims, ip6_msource_tree, &imf->im6f_sources) {
 		lims = (struct in6_msource *)ims;
 		if (lims->im6sl_st[0] == imf->im6f_st[0]) {
@@ -1034,7 +1034,7 @@ in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 	MLD_PRINTF(("%s: imf filters in-mode: %d at t0, %d at t1\n",
 	    __func__, nsrc0, nsrc1));
 
-	/* Handle transition between INCLUDE {n} and INCLUDE {} on socket. */
+	                                                                     
 	if (imf->im6f_st[0] == imf->im6f_st[1] &&
 	    imf->im6f_st[1] == MCAST_INCLUDE) {
 		if (nsrc1 == 0) {
@@ -1043,7 +1043,7 @@ in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 		}
 	}
 
-	/* Handle filter mode transition on socket. */
+	                                              
 	if (imf->im6f_st[0] != imf->im6f_st[1]) {
 		MLD_PRINTF(("%s: imf transition %d to %d\n",
 		    __func__, imf->im6f_st[0], imf->im6f_st[1]));
@@ -1065,14 +1065,14 @@ in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 		}
 	}
 
-	/*
-	 * Track inm filter state in terms of listener counts.
-	 * If there are any exclusive listeners, stack-wide
-	 * membership is exclusive.
-	 * Otherwise, if only inclusive listeners, stack-wide is inclusive.
-	 * If no listeners remain, state is undefined at t1,
-	 * and the MLD lifecycle for this group should finish.
-	 */
+	  
+                                                       
+                                                    
+                            
+                                                                    
+                                                     
+                                                       
+    
 	if (inm->in6m_st[1].iss_ex > 0) {
 		MLD_PRINTF(("%s: transition to EX\n", __func__));
 		inm->in6m_st[1].iss_fmode = MCAST_EXCLUDE;
@@ -1084,7 +1084,7 @@ in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 		inm->in6m_st[1].iss_fmode = MCAST_UNDEFINED;
 	}
 
-	/* Decrement ASM listener count on transition out of ASM mode. */
+	                                                                 
 	if (imf->im6f_st[0] == MCAST_EXCLUDE && nsrc0 == 0) {
 		if ((imf->im6f_st[1] != MCAST_EXCLUDE) ||
 		    (imf->im6f_st[1] == MCAST_EXCLUDE && nsrc1 > 0)) {
@@ -1093,7 +1093,7 @@ in6m_merge(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 		}
 	}
 
-	/* Increment ASM listener count on transition to ASM mode. */
+	                                                             
 	if (imf->im6f_st[1] == MCAST_EXCLUDE && nsrc1 == 0) {
 		MLD_PRINTF(("%s: asm++ on inm at t1\n", __func__));
 		inm->in6m_st[1].iss_asm++;
@@ -1112,10 +1112,10 @@ out_reap:
 	return error;
 }
 
-/*
- * Mark an in6_multi's filter set deltas as committed.
- * Called by MLD after a state change has been enqueued.
- */
+  
+                                                      
+                                                        
+   
 void
 in6m_commit(struct in6_multi *inm)
 {
@@ -1134,9 +1134,9 @@ in6m_commit(struct in6_multi *inm)
 	inm->in6m_st[0] = inm->in6m_st[1];
 }
 
-/*
- * Reap unreferenced nodes from an in6_multi's filter set.
- */
+  
+                                                          
+   
 static void
 in6m_reap(struct in6_multi *inm)
 {
@@ -1158,9 +1158,9 @@ in6m_reap(struct in6_multi *inm)
 	}
 }
 
-/*
- * Purge all source nodes from an in6_multi's filter set.
- */
+  
+                                                         
+   
 void
 in6m_purge(struct in6_multi *inm)
 {
@@ -1177,11 +1177,11 @@ in6m_purge(struct in6_multi *inm)
 	}
 }
 
-/*
- * Join a multicast address w/o sources.
- * KAME compatibility entry point.
- *
- */
+  
+                                        
+                                  
+  
+   
 struct in6_multi_mship *
 in6_joingroup(struct ifnet *ifp, struct in6_addr *mcaddr,
     int *errorp, int delay)
@@ -1203,10 +1203,10 @@ in6_joingroup(struct ifnet *ifp, struct in6_addr *mcaddr,
 	return imm;
 }
 
-/*
- * Leave a multicast address w/o sources.
- * KAME compatibility entry point.
- */
+  
+                                         
+                                  
+   
 int
 in6_leavegroup(struct in6_multi_mship *imm)
 {
@@ -1219,18 +1219,18 @@ in6_leavegroup(struct in6_multi_mship *imm)
 	return 0;
 }
 
-/*
- * Join a multicast group; real entry point.
- *
- * Only preserves atomicity at inm level.
- * NOTE: imf argument cannot be const due to sys/tree.h limitations.
- *
- * If the MLD downcall fails, the group is not joined, and an error
- * code is returned.
- */
+  
+                                            
+  
+                                         
+                                                                    
+  
+                                                                   
+                    
+   
 int
 in6_mc_join(struct ifnet *ifp, const struct in6_addr *mcaddr,
-    /*const*/ struct in6_mfilter *imf, struct in6_multi **pinm,
+              struct in6_mfilter *imf, struct in6_multi **pinm,
     const int delay)
 {
 	struct in6_mfilter       timf;
@@ -1238,10 +1238,10 @@ in6_mc_join(struct ifnet *ifp, const struct in6_addr *mcaddr,
 	int                      error = 0;
 	struct mld_tparams       mtp;
 
-	/*
-	 * Sanity: Check scope zone ID was set for ifp, if and
-	 * only if group is scoped to an interface.
-	 */
+	  
+                                                       
+                                            
+    
 	VERIFY(IN6_IS_ADDR_MULTICAST(mcaddr));
 	if (IN6_IS_ADDR_MC_LINKLOCAL(mcaddr) ||
 	    IN6_IS_ADDR_MC_INTFACELOCAL(mcaddr)) {
@@ -1255,10 +1255,10 @@ in6_mc_join(struct ifnet *ifp, const struct in6_addr *mcaddr,
 	bzero(&mtp, sizeof(mtp));
 	*pinm = NULL;
 
-	/*
-	 * If no imf was specified (i.e. kernel consumer),
-	 * fake one up and assume it is an ASM join.
-	 */
+	  
+                                                   
+                                             
+    
 	if (imf == NULL) {
 		im6f_init(&timf, MCAST_UNDEFINED, MCAST_EXCLUDE);
 		imf = &timf;
@@ -1295,30 +1295,30 @@ out_in6m_release:
 		IN6M_REMREF(inm);
 	} else {
 		IN6M_UNLOCK(inm);
-		*pinm = inm;    /* keep refcount from in6_mc_get() */
+		*pinm = inm;                                         
 	}
 
-	/* schedule timer now that we've dropped the lock(s) */
+	                                                       
 	mld_set_timeout(&mtp);
 
 	return error;
 }
 
-/*
- * Leave a multicast group; real entry point.
- * All source filters will be expunged.
- *
- * Only preserves atomicity at inm level.
- *
- * Holding the write lock for the INP which contains imf
- * is highly advisable. We can't assert for it as imf does not
- * contain a back-pointer to the owning inp.
- *
- * Note: This is not the same as in6m_release(*) as this function also
- * makes a state change downcall into MLD.
- */
+  
+                                             
+                                       
+  
+                                         
+  
+                                                        
+                                                              
+                                            
+  
+                                                                      
+                                          
+   
 int
-in6_mc_leave(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
+in6_mc_leave(struct in6_multi *inm,           struct in6_mfilter *imf)
 {
 	struct in6_mfilter       timf;
 	int                      error, lastref;
@@ -1337,22 +1337,22 @@ in6_mc_leave(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 	    (in6m_is_ifp_detached(inm) ? "null" : inm->in6m_ifp->if_name),
 	    inm->in6m_ifp->if_unit, (uint64_t)VM_KERNEL_ADDRPERM(imf)));
 
-	/*
-	 * If no imf was specified (i.e. kernel consumer),
-	 * fake one up and assume it is an ASM join.
-	 */
+	  
+                                                   
+                                             
+    
 	if (imf == NULL) {
 		im6f_init(&timf, MCAST_EXCLUDE, MCAST_UNDEFINED);
 		imf = &timf;
 	}
 
-	/*
-	 * Begin state merge transaction at MLD layer.
-	 *
-	 * As this particular invocation should not cause any memory
-	 * to be allocated, and there is no opportunity to roll back
-	 * the transaction, it MUST NOT fail.
-	 */
+	  
+                                               
+   
+                                                             
+                                                             
+                                      
+    
 	MLD_PRINTF(("%s: merge inm state\n", __func__));
 
 	error = in6m_merge(inm, imf);
@@ -1372,23 +1372,23 @@ in6_mc_leave(struct in6_multi *inm, /*const*/ struct in6_mfilter *imf)
 	in6_multihead_lock_done();
 
 	if (lastref) {
-		IN6M_REMREF(inm);       /* for in6_multihead list */
+		IN6M_REMREF(inm);                                   
 	}
-	/* schedule timer now that we've dropped the lock(s) */
+	                                                       
 	mld_set_timeout(&mtp);
 
 	return error;
 }
 
-/*
- * Block or unblock an ASM multicast source on an inpcb.
- * This implements the delta-based API described in RFC 3678.
- *
- * The delta-based API applies only to exclusive-mode memberships.
- * An MLD downcall will be performed.
- *
- * Return 0 if successful, otherwise return an appropriate error code.
- */
+  
+                                                        
+                                                             
+  
+                                                                  
+                                     
+  
+                                                                      
+   
 static int
 in6p_block_unblock_source(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -1464,9 +1464,9 @@ in6p_block_unblock_source(struct inpcb *inp, struct sockopt *sopt)
 
 	(void) in6_setscope(&gsa->sin6_addr, ifp, NULL);
 
-	/*
-	 * Check if we are actually a member of this group.
-	 */
+	  
+                                                    
+    
 	imo = in6p_findmoptions(inp);
 	if (imo == NULL) {
 		return ENOMEM;
@@ -1483,22 +1483,22 @@ in6p_block_unblock_source(struct inpcb *inp, struct sockopt *sopt)
 	imf = &imo->im6o_mfilters[idx];
 	inm = imo->im6o_membership[idx];
 
-	/*
-	 * Attempting to use the delta-based API on an
-	 * non exclusive-mode membership is an error.
-	 */
+	  
+                                               
+                                              
+    
 	fmode = imf->im6f_st[0];
 	if (fmode != MCAST_EXCLUDE) {
 		error = EINVAL;
 		goto out_imo_locked;
 	}
 
-	/*
-	 * Deal with error cases up-front:
-	 *  Asked to block, but already blocked; or
-	 *  Asked to unblock, but nothing to unblock.
-	 * If adding a new block entry, allocate it.
-	 */
+	  
+                                   
+                                            
+                                              
+                                             
+    
 	ims = im6o_match_source(imo, idx, ssa);
 	if ((ims != NULL && doblock) || (ims == NULL && !doblock)) {
 		MLD_PRINTF(("%s: source %s %spresent\n", __func__,
@@ -1508,9 +1508,9 @@ in6p_block_unblock_source(struct inpcb *inp, struct sockopt *sopt)
 		goto out_imo_locked;
 	}
 
-	/*
-	 * Begin state merge transaction at socket layer.
-	 */
+	  
+                                                  
+    
 	if (doblock) {
 		MLD_PRINTF(("%s: %s source\n", __func__, "block"));
 		ims = im6f_graft(imf, fmode, ssa);
@@ -1527,9 +1527,9 @@ in6p_block_unblock_source(struct inpcb *inp, struct sockopt *sopt)
 		goto out_im6f_rollback;
 	}
 
-	/*
-	 * Begin state merge transaction at MLD layer.
-	 */
+	  
+                                               
+    
 	IN6M_LOCK(inm);
 	MLD_PRINTF(("%s: merge inm state\n", __func__));
 	error = in6m_merge(inm, imf);
@@ -1559,19 +1559,19 @@ out_im6f_rollback:
 
 out_imo_locked:
 	IM6O_UNLOCK(imo);
-	IM6O_REMREF(imo);       /* from in6p_findmoptions() */
+	IM6O_REMREF(imo);                                     
 
-	/* schedule timer now that we've dropped the lock(s) */
+	                                                       
 	mld_set_timeout(&mtp);
 
 	return error;
 }
 
-/*
- * Given an inpcb, return its multicast options structure pointer.  Accepts
- * an unlocked inpcb pointer, but will return it locked.  May sleep.
- *
- */
+  
+                                                                           
+                                                                    
+  
+   
 static struct ip6_moptions *
 in6p_findmoptions(struct inpcb *inp)
 {
@@ -1581,7 +1581,7 @@ in6p_findmoptions(struct inpcb *inp)
 	size_t                    idx;
 
 	if ((imo = inp->in6p_moptions) != NULL) {
-		IM6O_ADDREF(imo);       /* for caller */
+		IM6O_ADDREF(imo);                       
 		return imo;
 	}
 
@@ -1612,22 +1612,22 @@ in6p_findmoptions(struct inpcb *inp)
 	imo->im6o_max_memberships = IPV6_MIN_MEMBERSHIPS;
 	imo->im6o_membership = immp;
 
-	/* Initialize per-group source filters. */
+	                                          
 	for (idx = 0; idx < IPV6_MIN_MEMBERSHIPS; idx++) {
 		im6f_init(&imfp[idx], MCAST_UNDEFINED, MCAST_EXCLUDE);
 	}
 
 	imo->im6o_mfilters = imfp;
-	inp->in6p_moptions = imo; /* keep reference from ip6_allocmoptions() */
-	IM6O_ADDREF(imo);       /* for caller */
+	inp->in6p_moptions = imo;                                              
+	IM6O_ADDREF(imo);                       
 
 	return imo;
 }
 
-/*
- * Atomically get source filters on a socket for an IPv6 multicast group.
- * Called with INP lock held; returns with lock released.
- */
+  
+                                                                         
+                                                         
+   
 static int
 in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -1656,7 +1656,7 @@ in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		if (error) {
 			return error;
 		}
-		/* we never use msfr.msfr_srcs; */
+		                                  
 		memcpy(&msfr, &msfr64, sizeof(msfr64));
 	} else {
 		error = sooptcopyin(sopt, &msfr32,
@@ -1665,7 +1665,7 @@ in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		if (error) {
 			return error;
 		}
-		/* we never use msfr.msfr_srcs; */
+		                                  
 		memcpy(&msfr, &msfr32, sizeof(msfr32));
 	}
 
@@ -1703,9 +1703,9 @@ in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 	(void)in6_setscope(&gsa->sin6_addr, ifp, NULL);
 
 	IM6O_LOCK(imo);
-	/*
-	 * Lookup group on the socket.
-	 */
+	  
+                               
+    
 	idx = im6o_match_group(imo, ifp, gsa);
 	if (idx == (size_t)-1 || imo->im6o_mfilters == NULL) {
 		IM6O_UNLOCK(imo);
@@ -1713,22 +1713,22 @@ in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 	}
 	imf = &imo->im6o_mfilters[idx];
 
-	/*
-	 * Ignore memberships which are in limbo.
-	 */
+	  
+                                          
+    
 	if (imf->im6f_st[1] == MCAST_UNDEFINED) {
 		IM6O_UNLOCK(imo);
 		return EAGAIN;
 	}
 	msfr.msfr_fmode = imf->im6f_st[1];
 
-	/*
-	 * If the user specified a buffer, copy out the source filter
-	 * entries to userland gracefully.
-	 * We only copy out the number of entries which userland
-	 * has asked for, but we always tell userland how big the
-	 * buffer really needs to be.
-	 */
+	  
+                                                              
+                                   
+                                                         
+                                                          
+                              
+    
 	tss = NULL;
 
 	if (IS_64BIT_PROCESS(current_proc())) {
@@ -1746,10 +1746,10 @@ in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		}
 	}
 
-	/*
-	 * Count number of sources in-mode at t0.
-	 * If buffer space exists and remains, copy out source entries.
-	 */
+	  
+                                          
+                                                                
+    
 	nsrcs = msfr.msfr_nsrcs;
 	ncsrcs = 0;
 	ptss = tss;
@@ -1803,9 +1803,9 @@ in6p_get_source_filters(struct inpcb *inp, struct sockopt *sopt)
 	return error;
 }
 
-/*
- * Return the IP multicast options in response to user getsockopt().
- */
+  
+                                                                    
+   
 int
 ip6_getmoptions(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -1814,10 +1814,10 @@ ip6_getmoptions(struct inpcb *inp, struct sockopt *sopt)
 	u_int                    optval;
 
 	im6o = inp->in6p_moptions;
-	/*
-	 * If socket is neither of type SOCK_RAW or SOCK_DGRAM,
-	 * or is a divert socket, reject it.
-	 */
+	  
+                                                        
+                                     
+    
 	if (SOCK_PROTO(inp->inp_socket) == IPPROTO_DIVERT ||
 	    (SOCK_TYPE(inp->inp_socket) != SOCK_RAW &&
 	    SOCK_TYPE(inp->inp_socket) != SOCK_DGRAM)) {
@@ -1854,7 +1854,7 @@ ip6_getmoptions(struct inpcb *inp, struct sockopt *sopt)
 
 	case IPV6_MULTICAST_LOOP:
 		if (im6o == NULL) {
-			optval = in6_mcast_loop; /* XXX VIMAGE */
+			optval = in6_mcast_loop;                 
 		} else {
 			IM6O_LOCK(im6o);
 			optval = im6o->im6o_multicast_loop;
@@ -1879,21 +1879,21 @@ ip6_getmoptions(struct inpcb *inp, struct sockopt *sopt)
 	return error;
 }
 
-/*
- * Look up the ifnet to use for a multicast group membership,
- * given the address of an IPv6 group.
- *
- * This routine exists to support legacy IPv6 multicast applications.
- *
- * If inp is non-NULL and is bound to an interface, use this socket's
- * inp_boundif for any required routing table lookup.
- *
- * If the route lookup fails, return NULL.
- *
- * FUTURE: Support multiple forwarding tables for IPv6.
- *
- * Returns NULL if no ifp could be found.
- */
+  
+                                                             
+                                      
+  
+                                                                     
+  
+                                                                     
+                                                     
+  
+                                          
+  
+                                                       
+  
+                                         
+   
 static struct ifnet *
 in6p_lookup_mcast_ifp(const struct inpcb *in6p,
     const struct sockaddr_in6 *gsin6)
@@ -1925,13 +1925,13 @@ in6p_lookup_mcast_ifp(const struct inpcb *in6p,
 	return ifp;
 }
 
-/*
- * Since ipv6_mreq contains an ifindex and ip_mreq contains an AF_INET
- * address, we need to lookup the AF_INET address when translating an
- * ipv6_mreq structure into an ipmreq structure.
- * This is used when userland performs multicast setsockopt() on AF_INET6
- * sockets with AF_INET multicast addresses (IPv6 v4 mapped addresses).
- */
+  
+                                                                      
+                                                                     
+                                                
+                                                                         
+                                                                       
+   
 static int
 in6p_lookup_v4addr(struct ipv6_mreq *mreq, struct ip_mreq *v4mreq)
 {
@@ -1961,12 +1961,12 @@ in6p_lookup_v4addr(struct ipv6_mreq *mreq, struct ip_mreq *v4mreq)
 	return 0;
 }
 
-/*
- * Join an IPv6 multicast group, possibly with a source.
- *
- * FIXME: The KAME use of the unspecified address (::)
- * to join *all* multicast groups is currently unsupported.
- */
+  
+                                                        
+  
+                                                      
+                                                           
+   
 static int
 in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -1992,12 +1992,12 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 	gsa = (struct sockaddr_in6 *)&gsr.gsr_group;
 	ssa = (struct sockaddr_in6 *)&gsr.gsr_source;
 
-	/*
-	 * Chew everything into struct group_source_req.
-	 * Overwrite the port field if present, as the sockaddr
-	 * being copied in may be matched with a binary comparison.
-	 * Ignore passed-in scope ID.
-	 */
+	  
+                                                 
+                                                        
+                                                            
+                              
+    
 	switch (sopt->sopt_name) {
 	case IPV6_JOIN_GROUP: {
 		struct ipv6_mreq mreq;
@@ -2034,7 +2034,7 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 		gsa->sin6_len = sizeof(struct sockaddr_in6);
 		gsa->sin6_addr = mreq.ipv6mr_multiaddr;
 
-		/* Only allow IPv6 multicast addresses */
+		                                         
 		if (IN6_IS_ADDR_MULTICAST(&gsa->sin6_addr) == 0) {
 			return EINVAL;
 		}
@@ -2084,11 +2084,11 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 			if (IN6_IS_ADDR_MULTICAST(&ssa->sin6_addr)) {
 				return EINVAL;
 			}
-			/*
-			 * TODO: Validate embedded scope ID in source
-			 * list entry against passed-in ifp, if and only
-			 * if source list filter entry is iface or node local.
-			 */
+			  
+                                                
+                                                   
+                                                         
+      
 			in6_clearscope(&ssa->sin6_addr);
 			ssa->sin6_port = 0;
 			ssa->sin6_scope_id = 0;
@@ -2119,9 +2119,9 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 	}
 
 	INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_mcast_join_total);
-	/*
-	 * TBD: revisit the criteria for non-OS initiated joins
-	 */
+	  
+                                                        
+    
 	if (inp->inp_lport == htons(5353)) {
 		INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_mcast_join_os_total);
 	}
@@ -2129,16 +2129,16 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 	gsa->sin6_port = 0;
 	gsa->sin6_scope_id = 0;
 
-	/*
-	 * Always set the scope zone ID on memberships created from userland.
-	 * Use the passed-in ifp to do this.
-	 */
+	  
+                                                                      
+                                     
+    
 	(void)in6_setscope(&gsa->sin6_addr, ifp, &scopeid);
-	/*
-	 * Some addresses are not valid without an embedded scopeid.
-	 * This check must be present because otherwise we will later hit
-	 * a VERIFY() in in6_mc_join().
-	 */
+	  
+                                                             
+                                                                  
+                                
+    
 	if ((IN6_IS_ADDR_MC_LINKLOCAL(&gsa->sin6_addr) ||
 	    IN6_IS_ADDR_MC_INTFACELOCAL(&gsa->sin6_addr)) &&
 	    (scopeid == 0 || gsa->sin6_addr.s6_addr16[1] == 0)) {
@@ -2158,54 +2158,54 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 		inm = imo->im6o_membership[idx];
 		imf = &imo->im6o_mfilters[idx];
 		if (ssa->sin6_family != AF_UNSPEC) {
-			/*
-			 * MCAST_JOIN_SOURCE_GROUP on an exclusive membership
-			 * is an error. On an existing inclusive membership,
-			 * it just adds the source to the filter list.
-			 */
+			  
+                                                        
+                                                       
+                                                 
+      
 			if (imf->im6f_st[1] != MCAST_INCLUDE) {
 				error = EINVAL;
 				goto out_imo_locked;
 			}
-			/*
-			 * Throw out duplicates.
-			 *
-			 * XXX FIXME: This makes a naive assumption that
-			 * even if entries exist for *ssa in this imf,
-			 * they will be rejected as dupes, even if they
-			 * are not valid in the current mode (in-mode).
-			 *
-			 * in6_msource is transactioned just as for anything
-			 * else in SSM -- but note naive use of in6m_graft()
-			 * below for allocating new filter entries.
-			 *
-			 * This is only an issue if someone mixes the
-			 * full-state SSM API with the delta-based API,
-			 * which is discouraged in the relevant RFCs.
-			 */
+			  
+                           
+     
+                                                   
+                                                 
+                                                  
+                                                  
+     
+                                                       
+                                                       
+                                              
+     
+                                                
+                                                  
+                                                
+      
 			lims = im6o_match_source(imo, idx, ssa);
-			if (lims != NULL /*&&
-			                  *  lims->im6sl_st[1] == MCAST_INCLUDE*/) {
+			if (lims != NULL     
+                                                            ) {
 				error = EADDRNOTAVAIL;
 				goto out_imo_locked;
 			}
 		} else {
-			/*
-			 * MCAST_JOIN_GROUP on an existing exclusive
-			 * membership is an error; return EADDRINUSE
-			 * to preserve 4.4BSD API idempotence, and
-			 * avoid tedious detour to code below.
-			 * NOTE: This is bending RFC 3678 a bit.
-			 *
-			 * On an existing inclusive membership, this is also
-			 * an error; if you want to change filter mode,
-			 * you must use the userland API setsourcefilter().
-			 * XXX We don't reject this for imf in UNDEFINED
-			 * state at t1, because allocation of a filter
-			 * is atomic with allocation of a membership.
-			 */
+			  
+                                               
+                                               
+                                             
+                                         
+                                           
+     
+                                                       
+                                                  
+                                                      
+                                                   
+                                                 
+                                                
+      
 			error = EINVAL;
-			/* See comments above for EADDRINUSE */
+			                                       
 			if (imf->im6f_st[1] == MCAST_EXCLUDE) {
 				error = EADDRINUSE;
 			}
@@ -2213,9 +2213,9 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 		}
 	}
 
-	/*
-	 * Begin state merge transaction at socket layer.
-	 */
+	  
+                                                  
+    
 
 	if (is_new) {
 		if (imo->im6o_num_memberships == imo->im6o_max_memberships) {
@@ -2224,11 +2224,11 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 				goto out_imo_locked;
 			}
 		}
-		/*
-		 * Allocate the new slot upfront so we can deal with
-		 * grafting the new source filter in same code path
-		 * as for join-source on existing membership.
-		 */
+		  
+                                                      
+                                                     
+                                               
+     
 		idx = imo->im6o_num_memberships;
 		imo->im6o_membership[idx] = NULL;
 		imo->im6o_num_memberships++;
@@ -2237,19 +2237,19 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 		VERIFY(RB_EMPTY(&imf->im6f_sources));
 	}
 
-	/*
-	 * Graft new source into filter list for this inpcb's
-	 * membership of the group. The in6_multi may not have
-	 * been allocated yet if this is a new membership, however,
-	 * the in_mfilter slot will be allocated and must be initialized.
-	 *
-	 * Note: Grafting of exclusive mode filters doesn't happen
-	 * in this path.
-	 * XXX: Should check for non-NULL lims (node exists but may
-	 * not be in-mode) for interop with full-state API.
-	 */
+	  
+                                                      
+                                                       
+                                                            
+                                                                  
+   
+                                                           
+                 
+                                                            
+                                                    
+    
 	if (ssa->sin6_family != AF_UNSPEC) {
-		/* Membership starts in IN mode */
+		                                  
 		if (is_new) {
 			MLD_PRINTF(("%s: new join w/source\n", __func__);
 			    im6f_init(imf, MCAST_UNDEFINED, MCAST_INCLUDE));
@@ -2264,21 +2264,21 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 			goto out_im6o_free;
 		}
 	} else {
-		/* No address specified; Membership starts in EX mode */
+		                                                        
 		if (is_new) {
 			MLD_PRINTF(("%s: new join w/o source", __func__));
 			im6f_init(imf, MCAST_UNDEFINED, MCAST_EXCLUDE);
 		}
 	}
 
-	/*
-	 * Begin state merge transaction at MLD layer.
-	 */
+	  
+                                               
+    
 
 	if (is_new) {
-		/*
-		 * See inp_join_group() for why we need to unlock
-		 */
+		  
+                                                   
+     
 		IM6O_ADDREF_LOCKED(imo);
 		IM6O_UNLOCK(imo);
 		socket_unlock(inp->inp_socket, 0);
@@ -2294,7 +2294,7 @@ in6p_join_group(struct inpcb *inp, struct sockopt *sopt)
 		if (error) {
 			goto out_im6o_free;
 		}
-		imo->im6o_membership[idx] = inm; /* from in6_mc_join() */
+		imo->im6o_membership[idx] = inm;                         
 	} else {
 		MLD_PRINTF(("%s: merge inm state\n", __func__));
 		IN6M_LOCK(inm);
@@ -2336,17 +2336,17 @@ out_im6o_free:
 
 out_imo_locked:
 	IM6O_UNLOCK(imo);
-	IM6O_REMREF(imo);       /* from in6p_findmoptions() */
+	IM6O_REMREF(imo);                                     
 
-	/* schedule timer now that we've dropped the lock(s) */
+	                                                       
 	mld_set_timeout(&mtp);
 
 	return error;
 }
 
-/*
- * Leave an IPv6 multicast group on an inpcb, possibly with a source.
- */
+  
+                                                                     
+   
 static int
 in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -2372,13 +2372,13 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 	gsa = (struct sockaddr_in6 *)&gsr.gsr_group;
 	ssa = (struct sockaddr_in6 *)&gsr.gsr_source;
 
-	/*
-	 * Chew everything passed in up into a struct group_source_req
-	 * as that is easier to process.
-	 * Note: Any embedded scope ID in the multicast group passed
-	 * in by userland is ignored, the interface index is the recommended
-	 * mechanism to specify an interface; see below.
-	 */
+	  
+                                                               
+                                 
+                                                             
+                                                                     
+                                                 
+    
 	switch (sopt->sopt_name) {
 	case IPV6_LEAVE_GROUP: {
 		error = sooptcopyin(sopt, &mreq, sizeof(struct ipv6_mreq),
@@ -2415,7 +2415,7 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 		gsa->sin6_port = 0;
 		gsa->sin6_scope_id = 0;
 		ifindex = mreq.ipv6mr_interface;
-		/* Only allow IPv6 multicast addresses */
+		                                         
 		if (IN6_IS_ADDR_MULTICAST(&gsa->sin6_addr) == 0) {
 			return EINVAL;
 		}
@@ -2449,11 +2449,11 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 			if (IN6_IS_ADDR_MULTICAST(&ssa->sin6_addr)) {
 				return EINVAL;
 			}
-			/*
-			 * TODO: Validate embedded scope ID in source
-			 * list entry against passed-in ifp, if and only
-			 * if source list filter entry is iface or node local.
-			 */
+			  
+                                                
+                                                   
+                                                         
+      
 			in6_clearscope(&ssa->sin6_addr);
 		}
 		gsa->sin6_port = 0;
@@ -2471,13 +2471,13 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 		return EINVAL;
 	}
 
-	/*
-	 * Validate interface index if provided. If no interface index
-	 * was provided separately, attempt to look the membership up
-	 * from the default scope as a last resort to disambiguate
-	 * the membership we are being asked to leave.
-	 * XXX SCOPE6 lock potentially taken here.
-	 */
+	  
+                                                               
+                                                              
+                                                           
+                                               
+                                           
+    
 	if (ifindex != 0) {
 		ifnet_head_lock_shared();
 		if ((u_int)if_index < ifindex) {
@@ -2495,16 +2495,16 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 		if (error) {
 			return EADDRNOTAVAIL;
 		}
-		/*
-		 * Some badly behaved applications don't pass an ifindex
-		 * or a scope ID, which is an API violation. In this case,
-		 * perform a lookup as per a v6 join.
-		 *
-		 * XXX For now, stomp on zone ID for the corner case.
-		 * This is not the 'KAME way', but we need to see the ifp
-		 * directly until such time as this implementation is
-		 * refactored, assuming the scope IDs are the way to go.
-		 */
+		  
+                                                          
+                                                            
+                                       
+    
+                                                       
+                                                           
+                                                       
+                                                          
+     
 		ifindex = ntohs(gsa->sin6_addr.s6_addr16[1]);
 		if (ifindex == 0) {
 			MLD_PRINTF(("%s: warning: no ifindex, looking up "
@@ -2528,9 +2528,9 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 	MLD_PRINTF(("%s: ifp = 0x%llx\n", __func__,
 	    (uint64_t)VM_KERNEL_ADDRPERM(ifp)));
 
-	/*
-	 * Find the membership in the membership array.
-	 */
+	  
+                                                
+    
 	imo = in6p_findmoptions(inp);
 	if (imo == NULL) {
 		return ENOMEM;
@@ -2549,14 +2549,14 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 		is_final = 0;
 	}
 
-	/*
-	 * Begin state merge transaction at socket layer.
-	 */
+	  
+                                                  
+    
 
-	/*
-	 * If we were instructed only to leave a given source, do so.
-	 * MCAST_LEAVE_SOURCE_GROUP is only valid for inclusive memberships.
-	 */
+	  
+                                                              
+                                                                     
+    
 	if (is_final) {
 		im6f_leave(imf);
 	} else {
@@ -2581,16 +2581,16 @@ in6p_leave_group(struct inpcb *inp, struct sockopt *sopt)
 		}
 	}
 
-	/*
-	 * Begin state merge transaction at MLD layer.
-	 */
+	  
+                                               
+    
 
 	if (is_final) {
-		/*
-		 * Give up the multicast address record to which
-		 * the membership points.  Reference held in im6o
-		 * will be released below.
-		 */
+		  
+                                                  
+                                                   
+                            
+     
 		(void) in6_mc_leave(inm, imf);
 	} else {
 		MLD_PRINTF(("%s: merge inm state\n", __func__));
@@ -2621,13 +2621,13 @@ out_im6f_rollback:
 	im6f_reap(imf);
 
 	if (is_final) {
-		/* Remove the gap in the membership array. */
+		                                             
 		VERIFY(inm == imo->im6o_membership[idx]);
 		imo->im6o_membership[idx] = NULL;
 
-		/*
-		 * See inp_join_group() for why we need to unlock
-		 */
+		  
+                                                   
+     
 		IM6O_ADDREF_LOCKED(imo);
 		IM6O_UNLOCK(imo);
 		socket_unlock(inp->inp_socket, 0);
@@ -2647,22 +2647,22 @@ out_im6f_rollback:
 
 out_locked:
 	IM6O_UNLOCK(imo);
-	IM6O_REMREF(imo);       /* from in6p_findmoptions() */
+	IM6O_REMREF(imo);                                     
 
-	/* schedule timer now that we've dropped the lock(s) */
+	                                                       
 	mld_set_timeout(&mtp);
 
 	return error;
 }
 
-/*
- * Select the interface for transmitting IPv6 multicast datagrams.
- *
- * Either an instance of struct in6_addr or an instance of struct ipv6_mreqn
- * may be passed to this socket option. An address of in6addr_any or an
- * interface index of 0 is used to remove a previous selection.
- * When no interface is selected, one is chosen for every send.
- */
+  
+                                                                  
+  
+                                                                            
+                                                                       
+                                                               
+                                                               
+   
 static int
 in6p_set_multicast_if(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -2700,15 +2700,15 @@ in6p_set_multicast_if(struct inpcb *inp, struct sockopt *sopt)
 	IM6O_LOCK(imo);
 	imo->im6o_multicast_ifp = ifp;
 	IM6O_UNLOCK(imo);
-	IM6O_REMREF(imo);       /* from in6p_findmoptions() */
+	IM6O_REMREF(imo);                                     
 
 	return 0;
 }
 
-/*
- * Atomically set source filters on a socket for an IPv6 multicast group.
- *
- */
+  
+                                                                         
+  
+   
 static int
 in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -2733,7 +2733,7 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		if (error) {
 			return error;
 		}
-		/* we never use msfr.msfr_srcs; */
+		                                  
 		memcpy(&msfr, &msfr64, sizeof(msfr64));
 	} else {
 		error = sooptcopyin(sopt, &msfr32,
@@ -2742,7 +2742,7 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		if (error) {
 			return error;
 		}
-		/* we never use msfr.msfr_srcs; */
+		                                  
 		memcpy(&msfr, &msfr32, sizeof(msfr32));
 	}
 
@@ -2770,7 +2770,7 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		return EINVAL;
 	}
 
-	gsa->sin6_port = 0;     /* ignore port */
+	gsa->sin6_port = 0;                      
 
 	ifnet_head_lock_shared();
 	if (msfr.msfr_ifindex == 0 || (u_int)if_index < msfr.msfr_ifindex) {
@@ -2785,10 +2785,10 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 
 	(void)in6_setscope(&gsa->sin6_addr, ifp, NULL);
 
-	/*
-	 * Take the INP write lock.
-	 * Check if this socket is a member of this group.
-	 */
+	  
+                            
+                                                   
+    
 	imo = in6p_findmoptions(inp);
 	if (imo == NULL) {
 		return ENOMEM;
@@ -2803,18 +2803,18 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 	inm = imo->im6o_membership[idx];
 	imf = &imo->im6o_mfilters[idx];
 
-	/*
-	 * Begin state merge transaction at socket layer.
-	 */
+	  
+                                                  
+    
 
 	imf->im6f_st[1] = (uint8_t)msfr.msfr_fmode;
 
-	/*
-	 * Apply any new source filters, if present.
-	 * Make a copy of the user-space source vector so
-	 * that we may copy them with a single copyin. This
-	 * allows us to deal with page faults up-front.
-	 */
+	  
+                                             
+                                                  
+                                                    
+                                                
+    
 	if (msfr.msfr_nsrcs > 0) {
 		struct in6_msource      *lims;
 		struct sockaddr_in6     *psin;
@@ -2843,25 +2843,25 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 			goto out_imo_locked;
 		}
 
-		/*
-		 * Mark all source filters as UNDEFINED at t1.
-		 * Restore new group filter mode, as im6f_leave()
-		 * will set it to INCLUDE.
-		 */
+		  
+                                                
+                                                   
+                            
+     
 		im6f_leave(imf);
 		imf->im6f_st[1] = (uint8_t)msfr.msfr_fmode;
 
-		/*
-		 * Update socket layer filters at t1, lazy-allocating
-		 * new entries. This saves a bunch of memory at the
-		 * cost of one RB_FIND() per source entry; duplicate
-		 * entries in the msfr_nsrcs vector are ignored.
-		 * If we encounter an error, rollback transaction.
-		 *
-		 * XXX This too could be replaced with a set-symmetric
-		 * difference like loop to avoid walking from root
-		 * every time, as the key space is common.
-		 */
+		  
+                                                       
+                                                     
+                                                      
+                                                  
+                                                    
+    
+                                                        
+                                                    
+                                            
+     
 		for (i = 0, pkss = kss; i < msfr.msfr_nsrcs; i++, pkss++) {
 			psin = (struct sockaddr_in6 *)pkss;
 			if (psin->sin6_family != AF_INET6) {
@@ -2876,11 +2876,11 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 				error = EINVAL;
 				break;
 			}
-			/*
-			 * TODO: Validate embedded scope ID in source
-			 * list entry against passed-in ifp, if and only
-			 * if source list filter entry is iface or node local.
-			 */
+			  
+                                                
+                                                   
+                                                         
+      
 			in6_clearscope(&psin->sin6_addr);
 			error = im6f_get_source(imf, psin, &lims);
 			if (error) {
@@ -2895,9 +2895,9 @@ in6p_set_source_filters(struct inpcb *inp, struct sockopt *sopt)
 		goto out_im6f_rollback;
 	}
 
-	/*
-	 * Begin state merge transaction at MLD layer.
-	 */
+	  
+                                               
+    
 	IN6M_LOCK(inm);
 	MLD_PRINTF(("%s: merge inm state\n", __func__));
 	error = in6m_merge(inm, imf);
@@ -2927,24 +2927,24 @@ out_im6f_rollback:
 
 out_imo_locked:
 	IM6O_UNLOCK(imo);
-	IM6O_REMREF(imo);       /* from in6p_findmoptions() */
+	IM6O_REMREF(imo);                                     
 
-	/* schedule timer now that we've dropped the lock(s) */
+	                                                       
 	mld_set_timeout(&mtp);
 
 	return error;
 }
 
-/*
- * Set the IP multicast options in response to user setsockopt().
- *
- * Many of the socket options handled in this function duplicate the
- * functionality of socket options in the regular unicast API. However,
- * it is not possible to merge the duplicate code, because the idempotence
- * of the IPv6 multicast part of the BSD Sockets API must be preserved;
- * the effects of these options must be treated as separate and distinct.
- *
- */
+  
+                                                                 
+  
+                                                                    
+                                                                       
+                                                                          
+                                                                       
+                                                                         
+  
+   
 int
 ip6_setmoptions(struct inpcb *inp, struct sockopt *sopt)
 {
@@ -2953,10 +2953,10 @@ ip6_setmoptions(struct inpcb *inp, struct sockopt *sopt)
 
 	error = 0;
 
-	/*
-	 * If socket is neither of type SOCK_RAW or SOCK_DGRAM,
-	 * or is a divert socket, reject it.
-	 */
+	  
+                                                        
+                                     
+    
 	if (SOCK_PROTO(inp->inp_socket) == IPPROTO_DIVERT ||
 	    (SOCK_TYPE(inp->inp_socket) != SOCK_RAW &&
 	    SOCK_TYPE(inp->inp_socket) != SOCK_DGRAM)) {
@@ -2993,17 +2993,17 @@ ip6_setmoptions(struct inpcb *inp, struct sockopt *sopt)
 		IM6O_LOCK(im6o);
 		im6o->im6o_multicast_hlim = (u_char)hlim;
 		IM6O_UNLOCK(im6o);
-		IM6O_REMREF(im6o);      /* from in6p_findmoptions() */
+		IM6O_REMREF(im6o);                                    
 		break;
 	}
 
 	case IPV6_MULTICAST_LOOP: {
 		u_int loop;
 
-		/*
-		 * Set the loopback flag for outgoing multicast packets.
-		 * Must be zero or one.
-		 */
+		  
+                                                          
+                         
+     
 		if (sopt->sopt_valsize != sizeof(u_int)) {
 			error = EINVAL;
 			break;
@@ -3024,7 +3024,7 @@ ip6_setmoptions(struct inpcb *inp, struct sockopt *sopt)
 		IM6O_LOCK(im6o);
 		im6o->im6o_multicast_loop = (u_char)loop;
 		IM6O_UNLOCK(im6o);
-		IM6O_REMREF(im6o);      /* from in6p_findmoptions() */
+		IM6O_REMREF(im6o);                                    
 		break;
 	}
 
@@ -3056,13 +3056,13 @@ ip6_setmoptions(struct inpcb *inp, struct sockopt *sopt)
 
 	return error;
 }
-/*
- * Expose MLD's multicast filter mode and source list(s) to userland,
- * keyed by (ifindex, group).
- * The filter mode is written out as a uint32_t, followed by
- * 0..n of struct in6_addr.
- * For use by ifmcstat(8).
- */
+  
+                                                                     
+                             
+                                                            
+                           
+                          
+   
 static int
 sysctl_ip6_mcast_filters SYSCTL_HANDLER_ARGS
 {
@@ -3086,7 +3086,7 @@ sysctl_ip6_mcast_filters SYSCTL_HANDLER_ARGS
 		return EPERM;
 	}
 
-	/* int: ifindex + 4 * 32 bits of IPv6 address */
+	                                                
 	if (namelen != 5) {
 		return EINVAL;
 	}
@@ -3114,9 +3114,9 @@ sysctl_ip6_mcast_filters SYSCTL_HANDLER_ARGS
 		MLD_PRINTF(("%s: no ifp for ifindex %u\n", __func__, ifindex));
 		return ENOENT;
 	}
-	/*
-	 * Internal MLD lookups require that scope/zone ID is set.
-	 */
+	  
+                                                           
+    
 	(void)in6_setscope(&mcaddr, ifp, NULL);
 
 	in6_multihead_lock_shared();
@@ -3135,23 +3135,23 @@ sysctl_ip6_mcast_filters SYSCTL_HANDLER_ARGS
 		retval = SYSCTL_OUT(req, &fmode, sizeof(uint32_t));
 		if (retval != 0) {
 			IN6M_UNLOCK(inm);
-			break;          /* abort */
+			break;                     
 		}
 		RB_FOREACH(ims, ip6_msource_tree, &inm->in6m_srcs) {
 			MLD_PRINTF(("%s: visit node 0x%llx\n", __func__,
 			    (uint64_t)VM_KERNEL_ADDRPERM(ims)));
-			/*
-			 * Only copy-out sources which are in-mode.
-			 */
+			  
+                                              
+      
 			if (fmode != im6s_get_mode(inm, ims, 1)) {
 				MLD_PRINTF(("%s: skip non-in-mode\n",
 				    __func__));
-				continue; /* process next source */
+				continue;                          
 			}
 			src = ims->im6s_addr;
 			retval = SYSCTL_OUT(req, &src, sizeof(struct in6_addr));
 			if (retval != 0) {
-				break;  /* process next inm */
+				break;                        
 			}
 		}
 next:
@@ -3168,7 +3168,7 @@ in6_multi_init(void)
 {
 	PE_parse_boot_argn("ifa_debug", &in6m_debug, sizeof(in6m_debug));
 
-	/* Setup lock group and attribute for in6_multihead */
+	                                                      
 	in6_multihead_lock_grp_attr = lck_grp_attr_alloc_init();
 	in6_multihead_lock_grp = lck_grp_alloc_init("in6_multihead",
 	    in6_multihead_lock_grp_attr);
@@ -3209,22 +3209,22 @@ in6_multi_free(struct in6_multi *in6m)
 	IN6M_LOCK(in6m);
 	if (in6m->in6m_debug & IFD_ATTACHED) {
 		panic("%s: attached in6m=%p is being freed", __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (in6m->in6m_ifma != NULL) {
 		panic("%s: ifma not NULL for in6m=%p", __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (!(in6m->in6m_debug & IFD_ALLOC)) {
 		panic("%s: in6m %p cannot be freed", __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (in6m->in6m_refcount != 0) {
 		panic("%s: non-zero refcount in6m=%p", __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (in6m->in6m_reqcnt != 0) {
 		panic("%s: non-zero reqcnt in6m=%p", __func__, in6m);
-		/* NOTREACHED */
+		                
 	}
 
-	/* Free any pending MLDv2 state-change records */
+	                                                 
 	IF_DRAIN(&in6m->in6m_scq);
 
 	in6m->in6m_debug &= ~IFD_ALLOC;
@@ -3251,20 +3251,20 @@ in6_multi_attach(struct in6_multi *in6m)
 	if (in6m->in6m_debug & IFD_ATTACHED) {
 		panic("%s: Attempt to attach an already attached in6m=%p",
 		    __func__, in6m);
-		/* NOTREACHED */
+		                
 	}
 
 	in6m->in6m_reqcnt++;
 	VERIFY(in6m->in6m_reqcnt == 1);
 	IN6M_ADDREF_LOCKED(in6m);
 	in6m->in6m_debug |= IFD_ATTACHED;
-	/*
-	 * Reattach case:  If debugging is enabled, take it
-	 * out of the trash list and clear IFD_TRASHED.
-	 */
+	  
+                                                    
+                                                
+    
 	if ((in6m->in6m_debug & (IFD_DEBUG | IFD_TRASHED)) ==
 	    (IFD_DEBUG | IFD_TRASHED)) {
-		/* Become a regular mutex, just in case */
+		                                          
 		IN6M_CONVERT_LOCK(in6m);
 		lck_mtx_lock(&in6m_trash_lock);
 		TAILQ_REMOVE(&in6m_trash_head, (struct in6_multi_dbg *)in6m,
@@ -3284,7 +3284,7 @@ in6_multi_detach(struct in6_multi *in6m)
 
 	if (in6m->in6m_reqcnt == 0) {
 		panic("%s: in6m=%p negative reqcnt", __func__, in6m);
-		/* NOTREACHED */
+		                
 	}
 
 	--in6m->in6m_reqcnt;
@@ -3295,20 +3295,20 @@ in6_multi_detach(struct in6_multi *in6m)
 	if (!(in6m->in6m_debug & IFD_ATTACHED)) {
 		panic("%s: Attempt to detach an unattached record in6m=%p",
 		    __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (in6m->in6m_debug & IFD_TRASHED) {
 		panic("%s: in6m %p is already in trash list", __func__, in6m);
-		/* NOTREACHED */
+		                
 	}
 
-	/*
-	 * NOTE: Caller calls IFMA_REMREF
-	 */
+	  
+                                  
+    
 	in6m->in6m_debug &= ~IFD_ATTACHED;
 	LIST_REMOVE(in6m, in6m_entry);
 
 	if (in6m->in6m_debug & IFD_DEBUG) {
-		/* Become a regular mutex, just in case */
+		                                          
 		IN6M_CONVERT_LOCK(in6m);
 		lck_mtx_lock(&in6m_trash_lock);
 		TAILQ_INSERT_TAIL(&in6m_trash_head,
@@ -3331,7 +3331,7 @@ in6m_addref(struct in6_multi *in6m, int locked)
 
 	if (++in6m->in6m_refcount == 0) {
 		panic("%s: in6m=%p wraparound refcnt", __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (in6m->in6m_trace != NULL) {
 		(*in6m->in6m_trace)(in6m, TRUE);
 	}
@@ -3354,7 +3354,7 @@ in6m_remref(struct in6_multi *in6m, int locked)
 
 	if (in6m->in6m_refcount == 0 || (in6m->in6m_refcount == 1 && locked)) {
 		panic("%s: in6m=%p negative refcnt", __func__, in6m);
-		/* NOTREACHED */
+		                
 	} else if (in6m->in6m_trace != NULL) {
 		(*in6m->in6m_trace)(in6m, FALSE);
 	}
@@ -3367,27 +3367,27 @@ in6m_remref(struct in6_multi *in6m, int locked)
 		return;
 	}
 
-	/*
-	 * Synchronization with in6_mc_get().  In the event the in6m has been
-	 * detached, the underlying ifma would still be in the if_multiaddrs
-	 * list, and thus can be looked up via if_addmulti().  At that point,
-	 * the only way to find this in6m is via ifma_protospec.  To avoid
-	 * race conditions between the last in6m_remref() of that in6m and its
-	 * use via ifma_protospec, in6_multihead lock is used for serialization.
-	 * In order to avoid violating the lock order, we must drop in6m_lock
-	 * before acquiring in6_multihead lock.  To prevent the in6m from being
-	 * freed prematurely, we hold an extra reference.
-	 */
+	  
+                                                                      
+                                                                     
+                                                                      
+                                                                   
+                                                                       
+                                                                         
+                                                                      
+                                                                        
+                                                  
+    
 	++in6m->in6m_refcount;
 	IN6M_UNLOCK(in6m);
 	in6_multihead_lock_shared();
 	IN6M_LOCK_SPIN(in6m);
 	--in6m->in6m_refcount;
 	if (in6m->in6m_refcount > 0) {
-		/* We've lost the race, so abort since in6m is still in use */
+		                                                              
 		IN6M_UNLOCK(in6m);
 		in6_multihead_lock_done();
-		/* If it was locked, return it as such */
+		                                         
 		if (locked) {
 			IN6M_LOCK(in6m);
 		}
@@ -3407,7 +3407,7 @@ in6m_remref(struct in6_multi *in6m, int locked)
 
 	in6_multi_free(in6m);
 	if_delmulti_ifma(ifma);
-	/* Release reference held to the underlying ifmultiaddr */
+	                                                          
 	IFMA_REMREF(ifma);
 
 	if (mli != NULL) {
@@ -3425,7 +3425,7 @@ in6m_trace(struct in6_multi *in6m, int refhold)
 
 	if (!(in6m->in6m_debug & IFD_DEBUG)) {
 		panic("%s: in6m %p has no debug structure", __func__, in6m);
-		/* NOTREACHED */
+		                
 	}
 	if (refhold) {
 		cnt = &in6m_dbg->in6m_refhold_cnt;
@@ -3450,7 +3450,7 @@ in6_multi_mship_free(struct in6_multi_mship *imm)
 {
 	if (imm->i6mm_maddr != NULL) {
 		panic("%s: i6mm_maddr not NULL for imm=%p", __func__, imm);
-		/* NOTREACHED */
+		                
 	}
 	zfree(imm_zone, imm);
 }
@@ -3541,9 +3541,9 @@ in6m_state_str(const int state)
 	return "??";
 }
 
-/*
- * Dump an in6_multi structure to the console.
- */
+  
+                                              
+   
 void
 in6m_print(const struct in6_multi *inm)
 {

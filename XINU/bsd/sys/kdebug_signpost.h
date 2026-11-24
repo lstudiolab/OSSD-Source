@@ -37,10 +37,10 @@ __BEGIN_DECLS
 
 #ifndef KERNEL
 
-/*
- * kdebug_signpost(2) is deprecated.  Use the os_signpost(3) family of tracing
- * functions, instead.
- */
+  
+                                                                              
+                      
+   
 
 int kdebug_signpost(uint32_t code, uintptr_t arg1, uintptr_t arg2,
     uintptr_t arg3, uintptr_t arg4)
@@ -57,8 +57,8 @@ int kdebug_signpost_end(uint32_t code, uintptr_t arg1, uintptr_t arg2,
 __API_DEPRECATED_WITH_REPLACEMENT("os_signpost_interval_end",
     macos(10.12, 10.15), ios(10.0, 13.0), watchos(3.0, 6.0), tvos(10.0, 13.0));
 
-#endif /* !KERNEL */
+#endif              
 
 __END_DECLS
 
-#endif /* !BSD_SYS_KDEBUG_SIGNPOST_H */
+#endif                                 

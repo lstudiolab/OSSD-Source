@@ -54,11 +54,11 @@
  * the rights to redistribute these changes.
  */
 
-/*
- *	File:	mach/host_info.h
- *
- *	Definitions for host_info call.
- */
+  
+                         
+  
+                                  
+   
 
 #ifndef _MACH_HOST_INFO_H_
 #define _MACH_HOST_INFO_H_
@@ -71,13 +71,13 @@
 
 #include <sys/cdefs.h>
 
-/*
- *	Generic information structure to allow for expansion.
- */
-typedef integer_t       *host_info_t;           /* varying array of int. */
-typedef integer_t       *host_info64_t;         /* varying array of int. */
+  
+                                                        
+   
+typedef integer_t       *host_info_t;                                      
+typedef integer_t       *host_info64_t;                                    
 
-#define HOST_INFO_MAX   (1024)          /* max array size */
+#define HOST_INFO_MAX   (1024)                              
 typedef integer_t       host_info_data_t[HOST_INFO_MAX];
 
 #define KERNEL_VERSION_MAX (512)
@@ -86,36 +86,36 @@ typedef char    kernel_version_t[KERNEL_VERSION_MAX];
 #define KERNEL_BOOT_INFO_MAX (4096)
 typedef char    kernel_boot_info_t[KERNEL_BOOT_INFO_MAX];
 
-/*
- *	Currently defined information.
- */
-/* host_info() */
+  
+                                 
+   
+                 
 typedef integer_t       host_flavor_t;
-#define HOST_BASIC_INFO         1       /* basic info */
-#define HOST_SCHED_INFO         3       /* scheduling info */
-#define HOST_RESOURCE_SIZES     4       /* kernel struct sizes */
-#define HOST_PRIORITY_INFO      5       /* priority information */
-#define HOST_SEMAPHORE_TRAPS    7       /* Has semaphore traps */
-#define HOST_MACH_MSG_TRAP      8       /* Has mach_msg_trap */
-#define HOST_VM_PURGABLE        9       /* purg'e'able memory info */
-#define HOST_DEBUG_INFO_INTERNAL 10     /* Used for kernel internal development tests only */
+#define HOST_BASIC_INFO         1                       
+#define HOST_SCHED_INFO         3                            
+#define HOST_RESOURCE_SIZES     4                                
+#define HOST_PRIORITY_INFO      5                                 
+#define HOST_SEMAPHORE_TRAPS    7                                
+#define HOST_MACH_MSG_TRAP      8                              
+#define HOST_VM_PURGABLE        9                                    
+#define HOST_DEBUG_INFO_INTERNAL 10                                                          
 #define HOST_CAN_HAS_DEBUGGER   11
-#define HOST_PREFERRED_USER_ARCH 12     /* Get the preferred user-space architecture */
+#define HOST_PREFERRED_USER_ARCH 12                                                    
 
 #ifdef MACH_KERNEL_PRIVATE
 struct host_basic_info_old {
-	integer_t       max_cpus;       /* max number of cpus possible */
-	uint32_t        avail_cpus;     /* number of cpus now available */
-	natural_t       memory_size;    /* size of memory in bytes */
-	cpu_type_t      cpu_type;       /* cpu type */
-	cpu_subtype_t   cpu_subtype;    /* cpu subtype */
+	integer_t       max_cpus;                                        
+	uint32_t        avail_cpus;                                       
+	natural_t       memory_size;                                 
+	cpu_type_t      cpu_type;                     
+	cpu_subtype_t   cpu_subtype;                     
 };
 
 typedef struct host_basic_info_old      host_basic_info_data_old_t;
 typedef struct host_basic_info_old      *host_basic_info_old_t;
 #define HOST_BASIC_INFO_OLD_COUNT ((mach_msg_type_number_t) \
 	        (sizeof(host_basic_info_data_old_t)/sizeof(integer_t)))
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 struct host_can_has_debugger_info {
 	boolean_t       can_has_debugger;
@@ -128,17 +128,17 @@ typedef struct host_can_has_debugger_info       *host_can_has_debugger_info_t;
 #pragma pack(push, 4)
 
 struct host_basic_info {
-	integer_t               max_cpus;               /* max number of CPUs possible */
-	integer_t               avail_cpus;             /* number of CPUs now available */
-	natural_t               memory_size;            /* size of memory in bytes, capped at 2 GB */
-	cpu_type_t              cpu_type;               /* cpu type */
-	cpu_subtype_t           cpu_subtype;            /* cpu subtype */
-	cpu_threadtype_t        cpu_threadtype;         /* cpu threadtype */
-	integer_t               physical_cpu;           /* number of physical CPUs now available */
-	integer_t               physical_cpu_max;       /* max number of physical CPUs possible */
-	integer_t               logical_cpu;            /* number of logical cpu now available */
-	integer_t               logical_cpu_max;        /* max number of physical CPUs possible */
-	uint64_t                max_mem;                /* actual size of physical memory */
+	integer_t               max_cpus;                                                
+	integer_t               avail_cpus;                                               
+	natural_t               memory_size;                                                         
+	cpu_type_t              cpu_type;                             
+	cpu_subtype_t           cpu_subtype;                             
+	cpu_threadtype_t        cpu_threadtype;                             
+	integer_t               physical_cpu;                                                      
+	integer_t               physical_cpu_max;                                                 
+	integer_t               logical_cpu;                                                     
+	integer_t               logical_cpu_max;                                                  
+	uint64_t                max_mem;                                                    
 };
 
 #pragma pack(pop)
@@ -149,8 +149,8 @@ typedef struct host_basic_info  *host_basic_info_t;
 	        (sizeof(host_basic_info_data_t)/sizeof(integer_t)))
 
 struct host_sched_info {
-	integer_t       min_timeout;    /* minimum timeout in milliseconds */
-	integer_t       min_quantum;    /* minimum quantum in milliseconds */
+	integer_t       min_timeout;                                         
+	integer_t       min_quantum;                                         
 };
 
 typedef struct host_sched_info  host_sched_info_data_t;
@@ -187,23 +187,23 @@ typedef struct host_priority_info       *host_priority_info_t;
 #define HOST_PRIORITY_INFO_COUNT ((mach_msg_type_number_t) \
 	        (sizeof(host_priority_info_data_t)/sizeof(integer_t)))
 
-/* host_statistics() */
-#define HOST_LOAD_INFO          1       /* System loading stats */
-#define HOST_VM_INFO            2       /* Virtual memory stats */
-#define HOST_CPU_LOAD_INFO      3       /* CPU load stats */
+                       
+#define HOST_LOAD_INFO          1                                 
+#define HOST_VM_INFO            2                                 
+#define HOST_CPU_LOAD_INFO      3                           
 
-/* host_statistics64() */
-#define HOST_VM_INFO64          4       /* 64-bit virtual memory stats */
-#define HOST_EXTMOD_INFO64      5       /* External modification stats */
-#define HOST_EXPIRED_TASK_INFO  6       /* Statistics for expired tasks */
+                         
+#define HOST_VM_INFO64          4                                        
+#define HOST_EXTMOD_INFO64      5                                        
+#define HOST_EXPIRED_TASK_INFO  6                                         
 
 #ifdef XNU_KERNEL_PRIVATE
 void host_statistics_init(void);
 #endif
 
 struct host_load_info {
-	integer_t       avenrun[3];     /* scaled by LOAD_SCALE */
-	integer_t       mach_factor[3]; /* scaled by LOAD_SCALE */
+	integer_t       avenrun[3];                               
+	integer_t       mach_factor[3];                           
 };
 
 typedef struct host_load_info   host_load_info_data_t;
@@ -216,44 +216,44 @@ typedef struct vm_purgeable_info        *host_purgable_info_t;
 #define HOST_VM_PURGABLE_COUNT ((mach_msg_type_number_t) \
 	        (sizeof(host_purgable_info_data_t)/sizeof(integer_t)))
 
-/* in <mach/vm_statistics.h> */
-/* vm_statistics64 */
+                               
+                     
 #define HOST_VM_INFO64_COUNT ((mach_msg_type_number_t) \
 	        (sizeof(vm_statistics64_data_t)/sizeof(integer_t)))
 
-/* size of the latest version of the structure */
+                                                 
 #define HOST_VM_INFO64_LATEST_COUNT HOST_VM_INFO64_COUNT
 #define HOST_VM_INFO64_REV1_COUNT HOST_VM_INFO64_LATEST_COUNT
-/* previous versions: adjust the size according to what was added each time */
-#define HOST_VM_INFO64_REV0_COUNT /* added compression and swapper info (14 ints) */ \
+                                                                              
+#define HOST_VM_INFO64_REV0_COUNT                                                    \
 	((mach_msg_type_number_t) \
 	 (HOST_VM_INFO64_REV1_COUNT - 14))
 
-/* in <mach/vm_statistics.h> */
-/* vm_extmod_statistics */
+                               
+                          
 #define HOST_EXTMOD_INFO64_COUNT ((mach_msg_type_number_t) \
 	    (sizeof(vm_extmod_statistics_data_t)/sizeof(integer_t)))
 
-/* size of the latest version of the structure */
+                                                 
 #define HOST_EXTMOD_INFO64_LATEST_COUNT HOST_EXTMOD_INFO64_COUNT
 
-/* vm_statistics */
+                   
 #define HOST_VM_INFO_COUNT ((mach_msg_type_number_t) \
 	        (sizeof(vm_statistics_data_t)/sizeof(integer_t)))
 
-/* size of the latest version of the structure */
+                                                 
 #define HOST_VM_INFO_LATEST_COUNT HOST_VM_INFO_COUNT
 #define HOST_VM_INFO_REV2_COUNT HOST_VM_INFO_LATEST_COUNT
-/* previous versions: adjust the size according to what was added each time */
-#define HOST_VM_INFO_REV1_COUNT /* added "speculative_count" (1 int) */ \
+                                                                              
+#define HOST_VM_INFO_REV1_COUNT                                         \
 	((mach_msg_type_number_t) \
 	 (HOST_VM_INFO_REV2_COUNT - 1))
-#define HOST_VM_INFO_REV0_COUNT /* added "purgable" info (2 ints) */    \
+#define HOST_VM_INFO_REV0_COUNT                                         \
 	((mach_msg_type_number_t) \
 	 (HOST_VM_INFO_REV1_COUNT - 2))
 
-struct host_cpu_load_info {             /* number of ticks while running... */
-	natural_t       cpu_ticks[CPU_STATE_MAX]; /* ... in the given mode */
+struct host_cpu_load_info {                                                   
+	natural_t       cpu_ticks[CPU_STATE_MAX];                            
 };
 
 typedef struct host_cpu_load_info       host_cpu_load_info_data_t;
@@ -262,8 +262,8 @@ typedef struct host_cpu_load_info       *host_cpu_load_info_t;
 	        (sizeof (host_cpu_load_info_data_t) / sizeof (integer_t)))
 
 struct host_preferred_user_arch {
-	cpu_type_t      cpu_type;       /* Preferred user-space cpu type */
-	cpu_subtype_t   cpu_subtype;    /* Preferred user-space cpu subtype */
+	cpu_type_t      cpu_type;                                          
+	cpu_subtype_t   cpu_subtype;                                          
 };
 
 typedef struct host_preferred_user_arch host_preferred_user_arch_data_t;
@@ -272,9 +272,9 @@ typedef struct host_preferred_user_arch *host_preferred_user_arch_t;
 	        (sizeof(host_preferred_user_arch_data_t)/sizeof(integer_t)))
 
 #ifdef PRIVATE
-/*
- * CPU Statistics information
- */
+  
+                             
+   
 struct _processor_statistics_np  {
 	int32_t                 ps_cpuid;
 
@@ -296,7 +296,7 @@ struct _processor_statistics_np  {
 };
 
 struct host_debug_info_internal {
-	uint64_t config_bank:1,   /* built configurations */
+	uint64_t config_bank:1,                             
 	    config_atm:1,
 	    config_csr:1,
 	    config_coalitions:1,
@@ -308,7 +308,7 @@ typedef struct host_debug_info_internal  host_debug_info_internal_data_t;
 #define HOST_DEBUG_INFO_INTERNAL_COUNT  ((mach_msg_type_number_t)\
 	(sizeof (host_debug_info_internal_data_t) / sizeof(integer_t)))
 
-#endif /* PRIVATE */
+#endif              
 
 #ifdef KERNEL_PRIVATE
 
@@ -318,7 +318,7 @@ extern kern_return_t    set_sched_stats_active(
 extern kern_return_t    get_sched_statistics(
 	struct _processor_statistics_np *out,
 	uint32_t *count);
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 
-#endif  /* _MACH_HOST_INFO_H_ */
+#endif                          

@@ -27,4 +27,4 @@
  */
 #ifndef FD_ZERO
 #define FD_ZERO(p)      __DARWIN_FD_ZERO(p)
-#endif /* FD_ZERO */
+#endif              

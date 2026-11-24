@@ -45,7 +45,7 @@
 #include <net/necp.h>
 #include <os/log.h>
 
-u_int32_t netagent_debug = LOG_NOTICE; // 0=None, 1=Basic
+u_int32_t netagent_debug = LOG_NOTICE;                   
 
 SYSCTL_NODE(_net, OID_AUTO, netagent, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "NetworkAgent");
 SYSCTL_INT(_net_netagent, OID_AUTO, debug, CTLFLAG_LOCKED | CTLFLAG_RW, &netagent_debug, 0, "");
@@ -99,7 +99,7 @@ struct netagent_wrapper {
 };
 
 struct netagent_session {
-	u_int32_t control_unit; // A control unit of 0 indicates an agent owned by the kernel
+	u_int32_t control_unit;                                                              
 	struct netagent_wrapper *wrapper;
 	netagent_event_f event_handler;
 	void *event_context;
@@ -112,7 +112,7 @@ typedef enum {
 
 static LIST_HEAD(_netagent_list, netagent_wrapper) master_netagent_list;
 
-// Protected by netagent_lock
+                             
 static u_int32_t g_next_generation = 1;
 
 static kern_ctl_ref     netagent_kctlref;
@@ -139,31 +139,31 @@ static int netagent_send_ctl_data(u_int32_t control_unit, u_int8_t *buffer, size
 static struct netagent_session *netagent_create_session(u_int32_t control_unit);
 static void netagent_delete_session(struct netagent_session *session);
 
-// Register
+           
 static void netagent_handle_register_message(struct netagent_session *session, u_int32_t message_id,
     size_t payload_length, mbuf_t packet, size_t offset);
 static errno_t netagent_handle_register_setopt(struct netagent_session *session, u_int8_t *payload,
     size_t payload_length);
 
-// Unregister
+             
 static void netagent_handle_unregister_message(struct netagent_session *session, u_int32_t message_id,
     size_t payload_length, mbuf_t packet, size_t offset);
 static errno_t netagent_handle_unregister_setopt(struct netagent_session *session, u_int8_t *payload,
     size_t payload_length);
 
-// Update
+         
 static void netagent_handle_update_message(struct netagent_session *session, u_int32_t message_id,
     size_t payload_length, mbuf_t packet, size_t offset);
 static errno_t netagent_handle_update_setopt(struct netagent_session *session, u_int8_t *payload,
     size_t payload_length);
 
-// Assign nexus
+               
 static void netagent_handle_assign_nexus_message(struct netagent_session *session, u_int32_t message_id,
     size_t payload_length, mbuf_t packet, size_t offset);
 static errno_t netagent_handle_assign_nexus_setopt(struct netagent_session *session, u_int8_t *payload,
     size_t payload_length);
 
-// Set/get assert count
+                       
 static errno_t netagent_handle_use_count_setopt(struct netagent_session *session, u_int8_t *payload, size_t payload_length);
 static errno_t netagent_handle_use_count_getopt(struct netagent_session *session, u_int8_t *buffer, size_t *buffer_length);
 
@@ -235,7 +235,7 @@ netagent_register_control(void)
 	struct kern_ctl_reg     kern_ctl;
 	errno_t                 result = 0;
 
-	// Find a unique value for our interface family
+	                                               
 	result = mbuf_tag_id_find(NETAGENT_CONTROL_NAME, &netagent_family);
 	if (result != 0) {
 		NETAGENTLOG(LOG_ERR, "mbuf_tag_id_find_internal failed: %d", result);
@@ -245,7 +245,7 @@ netagent_register_control(void)
 	bzero(&kern_ctl, sizeof(kern_ctl));
 	strlcpy(kern_ctl.ctl_name, NETAGENT_CONTROL_NAME, sizeof(kern_ctl.ctl_name));
 	kern_ctl.ctl_name[sizeof(kern_ctl.ctl_name) - 1] = 0;
-	kern_ctl.ctl_flags = CTL_FLAG_PRIVILEGED; // Require root
+	kern_ctl.ctl_flags = CTL_FLAG_PRIVILEGED;                
 	kern_ctl.ctl_sendsize = 64 * 1024;
 	kern_ctl.ctl_recvsize = 64 * 1024;
 	kern_ctl.ctl_connect = netagent_ctl_connect;
@@ -270,7 +270,7 @@ netagent_ctl_connect(kern_ctl_ref kctlref, struct sockaddr_ctl *sac, void **unit
 #pragma unused(kctlref)
 	*unitinfo = netagent_create_session(sac->sc_unit);
 	if (*unitinfo == NULL) {
-		// Could not allocate session
+		                             
 		return ENOBUFS;
 	}
 
@@ -289,7 +289,7 @@ netagent_ctl_disconnect(kern_ctl_ref kctlref, u_int32_t unit, void *unitinfo)
 	return 0;
 }
 
-// Kernel events
+                
 static void
 netagent_post_event(uuid_t agent_uuid, u_int32_t event_code, bool update_necp, bool should_update_immediately)
 {
@@ -314,7 +314,7 @@ netagent_post_event(uuid_t agent_uuid, u_int32_t event_code, bool update_necp, b
 	kev_post_msg(&ev_msg);
 }
 
-// Message handling
+                   
 static u_int8_t *
 netagent_buffer_write_message_header(u_int8_t *buffer, u_int8_t message_type, u_int8_t flags,
     u_int32_t message_id, u_int32_t error, size_t payload_length)
@@ -607,7 +607,7 @@ done:
 	return error;
 }
 
-// Session Management
+                     
 static struct netagent_session *
 netagent_create_session(u_int32_t control_unit)
 {
@@ -641,7 +641,7 @@ netagent_create(netagent_event_f event_handler, void *context)
 static void
 netagent_free_wrapper(struct netagent_wrapper *wrapper)
 {
-	// Free any pending client triggers
+	                                   
 	struct netagent_client *search_client = NULL;
 	struct netagent_client *temp_client = NULL;
 	LIST_FOREACH_SAFE(search_client, &wrapper->pending_triggers_list, client_chain, temp_client) {
@@ -649,7 +649,7 @@ netagent_free_wrapper(struct netagent_wrapper *wrapper)
 		FREE(search_client, M_NETAGENT);
 	}
 
-	// Free wrapper itself
+	                      
 	FREE(wrapper, M_NETAGENT);
 }
 
@@ -1057,9 +1057,9 @@ netagent_handle_update_inner(struct netagent_session *session, struct netagent_w
 	new_wrapper->netagent.netagent_flags |= NETAGENT_FLAG_REGISTERED;
 	if (session->wrapper->netagent.netagent_data_size == new_wrapper->netagent.netagent_data_size &&
 	    memcmp(&session->wrapper->netagent, &new_wrapper->netagent, sizeof(struct netagent) + data_size) == 0) {
-		// Agent is exactly identical, don't increment the generation count
+		                                                                   
 
-		// Make a copy of the list of pending clients, and clear the current list
+		                                                                         
 		struct netagent_client_list_s pending_triggers_list_copy;
 		LIST_INIT(&pending_triggers_list_copy);
 		struct netagent_client *search_client = NULL;
@@ -1070,7 +1070,7 @@ netagent_handle_update_inner(struct netagent_session *session, struct netagent_w
 		}
 		lck_rw_done(&netagent_lock);
 
-		// Update pending client triggers without holding a lock
+		                                                        
 		search_client = NULL;
 		temp_client = NULL;
 		LIST_FOREACH_SAFE(search_client, &pending_triggers_list_copy, client_chain, temp_client) {
@@ -1159,7 +1159,7 @@ netagent_update(netagent_session_t _session, struct netagent *agent)
 	if (error == 0) {
 		netagent_post_event(updated_uuid, KEV_NETAGENT_UPDATED, agent_changed, should_update_immediately);
 		if (agent_changed == FALSE) {
-			// The session wrapper does not need the "new_wrapper" as nothing changed
+			                                                                         
 			FREE(new_wrapper, M_NETAGENT);
 		}
 	} else {
@@ -1235,7 +1235,7 @@ netagent_handle_update_setopt(struct netagent_session *session, u_int8_t *payloa
 	if (response_error == 0) {
 		netagent_post_event(updated_uuid, KEV_NETAGENT_UPDATED, agent_changed, should_update_immediately);
 		if (agent_changed == FALSE) {
-			// The session wrapper does not need the "new_wrapper" as nothing changed
+			                                                                         
 			FREE(new_wrapper, M_NETAGENT);
 		}
 	} else {
@@ -1314,7 +1314,7 @@ netagent_handle_update_message(struct netagent_session *session, u_int32_t messa
 	netagent_post_event(updated_uuid, KEV_NETAGENT_UPDATED, agent_changed, should_update_immediately);
 
 	if (agent_changed == FALSE) {
-		// The session wrapper does not need the "new_wrapper" as nothing changed
+		                                                                         
 		FREE(new_wrapper, M_NETAGENT);
 	}
 
@@ -1392,10 +1392,10 @@ netagent_assign_nexus(netagent_session_t _session, uuid_t necp_client_uuid,
 	uuid_copy(netagent_uuid, session->wrapper->netagent.netagent_uuid);
 	lck_rw_done(&netagent_lock);
 
-	// Note that if the error is 0, NECP has taken over our malloc'ed buffer
+	                                                                        
 	int error = necp_assign_client_result(netagent_uuid, necp_client_uuid, assign_message, assigned_results_length);
 	if (error) {
-		// necp_assign_client_result returns POSIX errors; don't error for ENOENT
+		                                                                         
 		NETAGENTLOG((error == ENOENT ? LOG_DEBUG : LOG_ERR), "Client assignment failed: %d", error);
 		return error;
 	}
@@ -1485,10 +1485,10 @@ netagent_handle_assign_nexus_setopt(struct netagent_session *session, u_int8_t *
 		memcpy(assigned_results, assign_nexus_netagent->assign_necp_results, assigned_results_length);
 	}
 
-	// Note that if the error is 0, NECP has taken over our malloc'ed buffer
+	                                                                        
 	response_error = necp_assign_client_result(netagent_uuid, client_id, assigned_results, assigned_results_length);
 	if (response_error) {
-		// necp_assign_client_result returns POSIX errors
+		                                                 
 		if (assigned_results) {
 			FREE(assigned_results, M_NETAGENT);
 		}
@@ -1559,7 +1559,7 @@ netagent_handle_assign_nexus_message(struct netagent_session *session, u_int32_t
 		}
 	}
 
-	// Note that if the error is 0, NECP has taken over our malloc'ed buffer
+	                                                                        
 	error = necp_assign_client_result(netagent_uuid, client_id, assigned_results, assigned_results_length);
 	if (error) {
 		if (assigned_results) {
@@ -1699,7 +1699,7 @@ netagent_dump_get_data_size_locked()
 {
 	struct netagent_wrapper *search_netagent = NULL;
 	u_int32_t total_netagent_data_size = 0;
-	// Traverse the master list to know how much data the client needs to allocate to get the list of agent UUIDs
+	                                                                                                             
 	LIST_FOREACH(search_netagent, &master_netagent_list, master_chain) {
 		total_netagent_data_size += sizeof(search_netagent->netagent.netagent_uuid);
 	}
@@ -1713,7 +1713,7 @@ netagent_dump_copy_data_locked(u_int8_t *buffer, u_int32_t buffer_length)
 	u_int8_t *cursor = NULL;
 	struct netagent_wrapper *search_netagent = NULL;
 
-	response_size = buffer_length; // We already know that buffer_length is the same as total_netagent_data_size.
+	response_size = buffer_length;                                                                               
 	cursor = buffer;
 	LIST_FOREACH(search_netagent, &master_netagent_list, master_chain) {
 		memcpy(cursor, search_netagent->netagent.netagent_uuid, sizeof(search_netagent->netagent.netagent_uuid));
@@ -1729,7 +1729,7 @@ netagent_ioctl(u_long cmd, caddr_t data)
 	switch (cmd) {
 	case SIOCGIFAGENTLIST32:
 	case SIOCGIFAGENTLIST64: {
-		/* Check entitlement if the client requests agent dump */
+		                                                         
 		errno_t cred_result = priv_check_cred(kauth_cred_get(), PRIV_NET_PRIVILEGED_NECP_POLICIES, 0);
 		if (cred_result != 0) {
 			NETAGENTLOG0(LOG_ERR, "Client does not hold the necessary entitlement to get netagent information");
@@ -1756,11 +1756,11 @@ netagent_ioctl(u_long cmd, caddr_t data)
 		memcpy(ifsir32->netagent_desc, wrapper->netagent.netagent_desc, sizeof(ifsir32->netagent_desc));
 		ifsir32->netagent_flags = wrapper->netagent.netagent_flags;
 		if (ifsir32->netagent_data_size == 0) {
-			// First pass, client wants data size
+			                                     
 			ifsir32->netagent_data_size = wrapper->netagent.netagent_data_size;
 		} else if (ifsir32->netagent_data != USER_ADDR_NULL &&
 		    ifsir32->netagent_data_size == wrapper->netagent.netagent_data_size) {
-			// Second pass, client wants data buffer filled out
+			                                                   
 			error = copyout(wrapper->netagent.netagent_data, ifsir32->netagent_data, wrapper->netagent.netagent_data_size);
 		} else {
 			error = EINVAL;
@@ -1780,11 +1780,11 @@ netagent_ioctl(u_long cmd, caddr_t data)
 		memcpy(ifsir64->netagent_desc, wrapper->netagent.netagent_desc, sizeof(ifsir64->netagent_desc));
 		ifsir64->netagent_flags = wrapper->netagent.netagent_flags;
 		if (ifsir64->netagent_data_size == 0) {
-			// First pass, client wants data size
+			                                     
 			ifsir64->netagent_data_size = wrapper->netagent.netagent_data_size;
 		} else if (ifsir64->netagent_data != USER_ADDR_NULL &&
 		    ifsir64->netagent_data_size == wrapper->netagent.netagent_data_size) {
-			// Second pass, client wants data buffer filled out
+			                                                   
 			error = copyout(wrapper->netagent.netagent_data, ifsir64->netagent_data, wrapper->netagent.netagent_data_size);
 		} else {
 			error = EINVAL;
@@ -1794,12 +1794,12 @@ netagent_ioctl(u_long cmd, caddr_t data)
 	case SIOCGIFAGENTLIST32: {
 		struct netagentlist_req32 *ifsir32 = (struct netagentlist_req32 *)(void *)data;
 		if (ifsir32->data_size == 0) {
-			// First pass, client wants data size
+			                                     
 			ifsir32->data_size = netagent_dump_get_data_size_locked();
 		} else if (ifsir32->data != USER_ADDR_NULL &&
 		    ifsir32->data_size > 0 &&
 		    ifsir32->data_size == netagent_dump_get_data_size_locked()) {
-			// Second pass, client wants data buffer filled out
+			                                                   
 			u_int8_t *response = NULL;
 			MALLOC(response, u_int8_t *, ifsir32->data_size, M_NETAGENT, M_NOWAIT | M_ZERO);
 			if (response == NULL) {
@@ -1818,12 +1818,12 @@ netagent_ioctl(u_long cmd, caddr_t data)
 	case SIOCGIFAGENTLIST64: {
 		struct netagentlist_req64 *ifsir64 = (struct netagentlist_req64 *)(void *)data;
 		if (ifsir64->data_size == 0) {
-			// First pass, client wants data size
+			                                     
 			ifsir64->data_size = netagent_dump_get_data_size_locked();
 		} else if (ifsir64->data != USER_ADDR_NULL &&
 		    ifsir64->data_size > 0 &&
 		    ifsir64->data_size == netagent_dump_get_data_size_locked()) {
-			// Second pass, client wants data buffer filled out
+			                                                   
 			u_int8_t *response = NULL;
 			MALLOC(response, u_int8_t *, ifsir64->data_size, M_NETAGENT, M_NOWAIT | M_ZERO);
 			if (response == NULL) {
@@ -1936,13 +1936,13 @@ netagent_kernel_trigger(uuid_t uuid)
 
 	if ((wrapper->netagent.netagent_flags & NETAGENT_FLAG_KERNEL_ACTIVATED) == 0) {
 		NETAGENTLOG0(LOG_ERR, "Requested netagent for kernel trigger is not kernel activated");
-		// Agent does not accept kernel triggers
+		                                        
 		error = EINVAL;
 		goto done;
 	}
 
 	if ((wrapper->netagent.netagent_flags & NETAGENT_FLAG_ACTIVE)) {
-		// Agent already active
+		                       
 		NETAGENTLOG0(LOG_INFO, "Requested netagent for kernel trigger is already active");
 		error = 0;
 		goto done;
@@ -1988,8 +1988,8 @@ netagent_client_message_with_params(uuid_t agent_uuid,
 
 	if (message_type == NETAGENT_MESSAGE_TYPE_CLIENT_TRIGGER) {
 		if ((wrapper->netagent.netagent_flags & NETAGENT_FLAG_USER_ACTIVATED) == 0) {
-			// Agent does not accept user triggers
-			// Don't log, since this is a common case used to trigger events that cellular data is blocked, etc.
+			                                      
+			                                                                                                    
 			error = ENOTSUP;
 
 
@@ -2019,13 +2019,13 @@ netagent_client_message_with_params(uuid_t agent_uuid,
 		    NETAGENT_FLAG_INTERPOSE_NEXUS)) != 0);
 		if (!is_nexus_agent) {
 			NETAGENTLOG0(LOG_ERR, "Requested netagent for nexus instance is not a nexus provider");
-			// Agent is not a nexus provider
+			                                
 			error = EINVAL;
 			goto done;
 		}
 
 		if ((wrapper->netagent.netagent_flags & NETAGENT_FLAG_ACTIVE) == 0) {
-			// Agent not active
+			                   
 			NETAGENTLOG0(LOG_INFO, "Requested netagent for nexus instance is not active");
 			error = EINVAL;
 			goto done;
@@ -2034,12 +2034,12 @@ netagent_client_message_with_params(uuid_t agent_uuid,
 
 	if (wrapper->control_unit == 0) {
 		if (wrapper->event_handler == NULL) {
-			// No event handler registered for kernel agent
+			                                               
 			error = EINVAL;
 		} else {
-			// We hold the shared lock during the event handler callout, so it is expected
-			// that the event handler will not lead to any registrations or unregistrations
-			// of network agents.
+			                                                                              
+			                                                                               
+			                     
 			error = wrapper->event_handler(message_type, necp_client_uuid, pid, handle,
 			    wrapper->event_context, parameters,
 			    assigned_results, assigned_results_length);
@@ -2049,7 +2049,7 @@ netagent_client_message_with_params(uuid_t agent_uuid,
 			}
 		}
 	} else {
-		// ABORT_NEXUS is kernel-private, so translate it for userspace nexus
+		                                                                     
 		if (message_type == NETAGENT_MESSAGE_TYPE_ABORT_NEXUS) {
 			message_type = NETAGENT_MESSAGE_TYPE_CLOSE_NEXUS;
 		}
@@ -2057,7 +2057,7 @@ netagent_client_message_with_params(uuid_t agent_uuid,
 		error = netagent_send_client_message(wrapper, necp_client_uuid, message_type);
 		if (error == 0 && message_type == NETAGENT_MESSAGE_TYPE_CLIENT_TRIGGER) {
 			if (lck_rw_lock_shared_to_exclusive(&netagent_lock)) {
-				// Grab the lock exclusively to add a pending client to the list
+				                                                                
 				struct netagent_client *new_pending_client = NULL;
 				MALLOC(new_pending_client, struct netagent_client *, sizeof(*new_pending_client), M_NETAGENT, M_WAITOK);
 				if (new_pending_client == NULL) {
@@ -2077,7 +2077,7 @@ netagent_client_message_with_params(uuid_t agent_uuid,
 					LIST_INSERT_HEAD(&wrapper->pending_triggers_list, new_pending_client, client_chain);
 				}
 			} else {
-				// If lck_rw_lock_shared_to_exclusive fails, it unlocks automatically
+				                                                                     
 				should_unlock = FALSE;
 			}
 		}
@@ -2194,14 +2194,14 @@ netagent_trigger(struct proc *p, struct netagent_trigger_args *uap, int32_t *ret
 	}
 
 	if ((wrapper->netagent.netagent_flags & NETAGENT_FLAG_USER_ACTIVATED) == 0) {
-		// Agent does not accept triggers
+		                                 
 		NETAGENTLOG0(LOG_ERR, "Requested netagent UUID is not eligible for triggering");
 		error = ENOTSUP;
 		goto done;
 	}
 
 	if ((wrapper->netagent.netagent_flags & NETAGENT_FLAG_ACTIVE)) {
-		// Agent already active
+		                       
 		NETAGENTLOG0(LOG_INFO, "Requested netagent UUID is already active");
 		error = 0;
 		goto done;

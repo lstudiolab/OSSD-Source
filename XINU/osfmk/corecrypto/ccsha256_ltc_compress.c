@@ -32,19 +32,19 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Parts of this code adapted from LibTomCrypt
- *
- * LibTomCrypt, modular cryptographic library -- Tom St Denis
- *
- * LibTomCrypt is a library that provides various cryptographic
- * algorithms in a highly modular and flexible manner.
- *
- * The library is free for all purposes without any express
- * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
- */
+  
+                                              
+  
+                                                             
+  
+                                                               
+                                                      
+  
+                                                           
+                      
+  
+                                                        
+   
 
 #include <corecrypto/ccsha2.h>
 #include <corecrypto/cc_priv.h>
@@ -58,7 +58,7 @@
 #define K(i) ccsha256_K[i]
 #endif
 
-// Various logical functions
+                            
 #define Ch(x, y, z) (z ^ (x & (y ^ z)))
 #define Maj(x, y, z) (((x | y) & z) | (x & y))
 #define S(x, n) CC_RORc(x, n)
@@ -70,14 +70,14 @@
 
 #define set_W(i) CC_LOAD32_BE(W[i], buf + (4 * (i)))
 
-// the round function
+                     
 #define RND(a, b, c, d, e, f, g, h, i)              \
     t0 = h + Sigma1(e) + Ch(e, f, g) + K(i) + W[i]; \
     t1 = Sigma0(a) + Maj(a, b, c);                  \
     d += t0;                                        \
     h = t0 + t1;
 
-// compress 512-bits
+                    
 void
 ccsha256_ltc_compress(ccdigest_state_t state, size_t nblocks, const void *in)
 {
@@ -88,17 +88,17 @@ ccsha256_ltc_compress(ccdigest_state_t state, size_t nblocks, const void *in)
 	const unsigned char *buf = in;
 
 	while (nblocks--) {
-		// schedule W 0..15
+		                   
 		for (i = 0; i < 16; i += 1) {
 			set_W(i);
 		}
 
-		// schedule W 16..63
+		                    
 		for (; i < 64; i++) {
 			W[i] = Gamma1(W[i - 2]) + W[i - 7] + Gamma0(W[i - 15]) + W[i - 16];
 		}
 
-		// copy state into S
+		                    
 		S[0] = s[0];
 		S[1] = s[1];
 		S[2] = s[2];
@@ -108,7 +108,7 @@ ccsha256_ltc_compress(ccdigest_state_t state, size_t nblocks, const void *in)
 		S[6] = s[6];
 		S[7] = s[7];
 
-		// Compress
+		           
 #if CC_SMALL_CODE
 		for (i = 0; i < 64; i += 1) {
 			t0 = S[7] + Sigma1(S[4]) + Ch(S[4], S[5], S[6]) + K(i) + W[i];
@@ -135,7 +135,7 @@ ccsha256_ltc_compress(ccdigest_state_t state, size_t nblocks, const void *in)
 		}
 #endif
 
-		// feedback
+		           
 		s[0] += S[0];
 		s[1] += S[1];
 		s[2] += S[2];

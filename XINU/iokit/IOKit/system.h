@@ -44,7 +44,7 @@ __BEGIN_DECLS
 #include <stdint.h>
 #include <string.h>
 
-#include <IOKit/assert.h>  /* Must be before other includes of kern/assert.h */
+#include <IOKit/assert.h>                                                      
 
 #include <kern/kern_types.h>
 #include <kern/thread.h>
@@ -63,7 +63,7 @@ __BEGIN_DECLS
 #include <vm/pmap.h>
 #include <vm/vm_map.h>
 #include <vm/vm_kern.h>
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifndef _MISC_PROTOS_H_
 extern void     _doprnt( const char *format, va_list *arg,
@@ -72,4 +72,4 @@ extern void     _doprnt( const char *format, va_list *arg,
 
 __END_DECLS
 
-#endif /* !__IOKIT_SYSTEM_H */
+#endif                        

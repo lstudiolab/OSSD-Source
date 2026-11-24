@@ -65,10 +65,10 @@
  * $FreeBSD: src/sys/sys/mac.h,v 1.40 2003/04/18 19:57:37 rwatson Exp $
  *
  */
-/*
- * Kernel interface for Mandatory Access Control -- how kernel services
- * interact with the TrustedBSD MAC Framework.
- */
+  
+                                                                       
+                                              
+   
 
 #ifndef _SECURITY_MAC_FRAMEWORK_H_
 #define _SECURITY_MAC_FRAMEWORK_H_
@@ -136,12 +136,12 @@ typedef OSObject *io_object_t;
 struct OSObject;
 typedef struct OSObject *io_object_t;
 #endif
-#endif /* __IOKIT_PORTS_DEFINED__ */
+#endif                              
 
-/*@ macros */
+             
 #define VNODE_LABEL_CREATE      1
 
-/*@ === */
+          
 int     mac_audit_check_postselect(kauth_cred_t cred, unsigned short syscode,
     void *args, int error, int retval, int mac_forced) __result_use_check;
 int     mac_audit_check_preselect(kauth_cred_t cred, unsigned short syscode,
@@ -567,6 +567,6 @@ void    mac_vnode_notify_reclaim(vnode_t vp);
 void psem_label_associate(struct fileproc *fp, struct vnode *vp, struct vfs_context *ctx);
 void pshm_label_associate(struct fileproc *fp, struct vnode *vp, struct vfs_context *ctx);
 
-#endif  /* CONFIG_MACF */
+#endif                   
 
-#endif /* !_SECURITY_MAC_FRAMEWORK_H_ */
+#endif                                  

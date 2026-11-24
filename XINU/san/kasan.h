@@ -59,7 +59,7 @@ typedef uintptr_t uptr;
 #define KASAN_HEAP_FAKESTACK 2
 #define KASAN_HEAP_TYPES     3
 
-/* shadow map byte values */
+                            
 #define ASAN_VALID          0x00
 #define ASAN_PARTIAL1       0x01
 #define ASAN_PARTIAL2       0x02
@@ -81,9 +81,9 @@ typedef uintptr_t uptr;
 #define ASAN_HEAP_RIGHT_RZ  0xfb
 #define ASAN_HEAP_FREED     0xfd
 
-/*
- * KASAN internal interface
- */
+  
+                           
+   
 
 __BEGIN_DECLS
 void kasan_map_shadow(vm_offset_t address, vm_size_t size, bool is_zero);
@@ -105,12 +105,12 @@ void kasan_unpoison_curstack(bool whole_stack);
 bool kasan_check_shadow(vm_address_t base, vm_size_t sz, uint8_t shadow);
 void kasan_unpoison_cxx_array_cookie(void *ptr);
 
-void kasan_fakestack_drop(thread_t thread); /* mark all fakestack entries for thread as unused */
-void kasan_fakestack_gc(thread_t thread);   /* free and poison all unused fakestack objects for thread */
+void kasan_fakestack_drop(thread_t thread);                                                      
+void kasan_fakestack_gc(thread_t thread);                                                                
 void kasan_fakestack_suspend(void);
 void kasan_fakestack_resume(void);
 
-/* Initialization and check for uninitialized memory */
+                                                       
 void kasan_leak_init(vm_address_t addr, vm_size_t sz);
 void kasan_check_uninitialized(vm_address_t base, vm_size_t sz);
 
@@ -135,13 +135,13 @@ extern unsigned shadow_stolen_idx;
 #endif
 
 #if HIBERNATION
-// if we're building a kernel with hibernation support, hibernate_write_image depends on these symbols
+                                                                                                      
 extern vm_offset_t shadow_pnext, shadow_ptop;
-#endif /* HIBERNATION */
+#endif                  
 
-/*
- * Allocator hooks
- */
+  
+                  
+   
 
 vm_size_t kasan_alloc_resize(vm_size_t size);
 vm_size_t kasan_user_size(vm_offset_t addr);
@@ -154,14 +154,14 @@ void kasan_free(void **addr, vm_size_t *size, int type, zone_t *zone, vm_size_t 
 
 __END_DECLS
 
-/* thread interface */
+                      
 struct kasan_thread_data {
 	LIST_HEAD(fakestack_header_list, fakestack_header) fakestack_head;
 };
 struct kasan_thread_data *kasan_get_thread_data(thread_t);
 void kasan_init_thread(struct kasan_thread_data *);
 
-#endif /* KASAN */
+#endif            
 
 #if __has_feature(address_sanitizer)
 # define NOKASAN __attribute__ ((no_sanitize_address))
@@ -169,9 +169,9 @@ void kasan_init_thread(struct kasan_thread_data *);
 # define NOKASAN
 #endif
 
-/*
- * ASAN callbacks - inserted by the compiler
- */
+  
+                                            
+   
 
 extern int __asan_option_detect_stack_use_after_return;
 extern const uintptr_t __asan_shadow_memory_dynamic_address;
@@ -256,5 +256,5 @@ void __asan_unregister_image_globals(uptr);
 void __asan_register_image_globals(uptr);
 __END_DECLS
 
-#endif /* KERNEL_PRIVATE */
-#endif /* _KASAN_H_ */
+#endif                     
+#endif                

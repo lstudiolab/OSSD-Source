@@ -83,9 +83,9 @@ unsigned long cs_procs_invalidated = 0;
 int cs_force_kill = 0;
 int cs_force_hard = 0;
 int cs_debug = 0;
-// If set, AMFI will error out early on unsigned code, before evaluation the normal policy.
+                                                                                           
 int cs_debug_fail_on_unsigned_code = 0;
-// If the previous mode is enabled, we count the resulting failures here.
+                                                                         
 unsigned int cs_debug_unsigned_exec_failures = 0;
 unsigned int cs_debug_unsigned_mmap_failures = 0;
 
@@ -105,24 +105,24 @@ unsigned int cs_debug_unsigned_mmap_failures = 0;
 
 #if SECURE_KERNEL
 
-/*
- *  Here we split cs_enforcement_enable into cs_system_enforcement_enable and cs_process_enforcement_enable
- *
- *  cs_system_enforcement_enable governs whether or not system level code signing enforcement mechanisms
- *  are applied on the system. Today, the only such mechanism is code signing enforcement of the dyld shared
- *  cache.
- *
- *  cs_process_enforcement_enable governs whether code signing enforcement mechanisms are applied to all
- *  processes or only those that opt into such enforcement.
- *
- *  (On iOS and related, both of these are set by default. On macOS, only cs_system_enforcement_enable
- *  is set by default. Processes can then be opted into code signing enforcement on a case by case basis.)
- */
+  
+                                                                                                           
+  
+                                                                                                        
+                                                                                                            
+          
+  
+                                                                                                        
+                                                           
+  
+                                                                                                      
+                                                                                                          
+   
 SECURITY_READ_ONLY_EARLY(int) cs_system_enforcement_enable = DEFAULT_CS_SYSTEM_ENFORCEMENT_ENABLE;
 SECURITY_READ_ONLY_EARLY(int) cs_process_enforcement_enable = DEFAULT_CS_PROCESS_ENFORCEMENT_ENABLE;
 SECURITY_READ_ONLY_EARLY(int) cs_library_val_enable = DEFAULT_CS_LIBRARY_VA_ENABLE;
 
-#else /* !SECURE_KERNEL */
+#else                     
 int cs_enforcement_panic = 0;
 int cs_relax_platform_task_ports = 0;
 
@@ -131,7 +131,7 @@ SECURITY_READ_ONLY_LATE(int) cs_process_enforcement_enable = DEFAULT_CS_PROCESS_
 
 SECURITY_READ_ONLY_LATE(int) cs_library_val_enable = DEFAULT_CS_LIBRARY_VA_ENABLE;
 
-#endif /* !SECURE_KERNEL */
+#endif                     
 int cs_all_vnodes = 0;
 
 SYSCTL_INT(_vm, OID_AUTO, cs_force_kill, CTLFLAG_RW | CTLFLAG_LOCKED, &cs_force_kill, 0, "");
@@ -154,7 +154,7 @@ SYSCTL_INT(_vm, OID_AUTO, cs_enforcement_panic, CTLFLAG_RW | CTLFLAG_LOCKED, &cs
 #if !CONFIG_ENFORCE_LIBRARY_VALIDATION
 SYSCTL_INT(_vm, OID_AUTO, cs_library_validation, CTLFLAG_RD | CTLFLAG_LOCKED, &cs_library_val_enable, 0, "");
 #endif
-#endif /* !SECURE_KERNEL */
+#endif                     
 
 int panic_on_cs_killed = 0;
 
@@ -165,8 +165,8 @@ cs_init(void)
 #if MACH_ASSERT
 #if PLATFORM_WatchOS || __x86_64__
 	panic_on_cs_killed = 1;
-#endif /* watchos || x86_64 */
-#endif /* MACH_ASSERT */
+#endif                        
+#endif                  
 	PE_parse_boot_argn("panic_on_cs_killed", &panic_on_cs_killed,
 	    sizeof(panic_on_cs_killed));
 #if !SECURE_KERNEL
@@ -192,7 +192,7 @@ cs_init(void)
 	PE_parse_boot_argn("cs_library_val_enable", &cs_library_val_enable,
 	    sizeof(cs_library_val_enable));
 #endif
-#endif /* !SECURE_KERNEL */
+#endif                     
 }
 STARTUP(CODESIGNING, STARTUP_RANK_FIRST, cs_init);
 
@@ -203,11 +203,11 @@ cs_allow_invalid(struct proc *p)
 	lck_mtx_assert(&p->p_mlock, LCK_MTX_ASSERT_NOTOWNED);
 #endif
 #if CONFIG_MACF
-	/* There needs to be a MAC policy to implement this hook, or else the
-	 * kill bits will be cleared here every time. If we have
-	 * CONFIG_ENFORCE_SIGNED_CODE, we can assume there is a policy
-	 * implementing the hook.
-	 */
+	                                                                     
+                                                         
+                                                               
+                          
+    
 	if (0 != mac_proc_check_run_cs_invalid(p)) {
 		if (cs_debug) {
 			printf("CODE SIGNING: cs_allow_invalid() "
@@ -237,10 +237,10 @@ cs_allow_invalid(struct proc *p)
 			vm_map_deallocate(proc_map);
 		}
 	}
-#endif // MAP_CS
+#endif          
 	proc_unlock(p);
 
-	/* allow a debugged process to hide some (debug-only!) memory */
+	                                                                
 	task_set_memory_ownership_transfer(p->task, TRUE);
 
 	vm_map_switch_protect(get_task_map(p->task), FALSE);
@@ -264,7 +264,7 @@ cs_invalid_page(addr64_t vaddr, boolean_t *cs_killed)
 
 	proc_lock(p);
 
-	/* XXX for testing */
+	                     
 	if (cs_force_kill) {
 		p->p_csflags |= CS_KILL;
 	}
@@ -272,7 +272,7 @@ cs_invalid_page(addr64_t vaddr, boolean_t *cs_killed)
 		p->p_csflags |= CS_HARD;
 	}
 
-	/* CS_KILL triggers a kill signal, and no you can't have the page. Nothing else. */
+	                                                                                   
 	if (p->p_csflags & CS_KILL) {
 		p->p_csflags |= CS_KILLED;
 		cs_procs_killed++;
@@ -280,7 +280,7 @@ cs_invalid_page(addr64_t vaddr, boolean_t *cs_killed)
 		retval = 1;
 	}
 
-	/* CS_HARD means fail the mapping operation so the process stays valid. */
+	                                                                          
 	if (p->p_csflags & CS_HARD) {
 		retval = 1;
 	} else {
@@ -302,7 +302,7 @@ cs_invalid_page(addr64_t vaddr, boolean_t *cs_killed)
 	}
 
 	if (send_kill) {
-		/* We will set the exit reason for the thread later */
+		                                                      
 		threadsignal(current_thread(), SIGKILL, EXC_BAD_ACCESS, FALSE);
 		if (cs_killed) {
 			*cs_killed = TRUE;
@@ -314,15 +314,15 @@ cs_invalid_page(addr64_t vaddr, boolean_t *cs_killed)
 	return retval;
 }
 
-/*
- * Called after a process got its CS_VALID bit removed, either by
- * a previous call to cs_invalid_page, or through other means.
- * Called from fault handler with vm object lock held.
- * Called with proc lock held for current_proc or, if passed in, p,
- * to ensure MACF hook can suspend the task before other threads
- * can access the memory that is paged in after cs_invalid_page
- * returns 0 due to missing CS_HARD|CS_KILL.
- */
+  
+                                                                 
+                                                              
+                                                      
+                                                                   
+                                                                
+                                                               
+                                            
+   
 void
 cs_process_invalidated(struct proc * __unused p)
 {
@@ -334,9 +334,9 @@ cs_process_invalidated(struct proc * __unused p)
 #endif
 }
 
-/*
- * Assumes p (if passed in) is locked with proc_lock().
- */
+  
+                                                       
+   
 
 int
 cs_process_enforcement(struct proc *p)
@@ -375,9 +375,9 @@ cs_vm_supports_4k_translations(void)
 }
 
 
-/*
- * Returns whether a given process is still valid.
- */
+  
+                                                  
+   
 int
 cs_valid(struct proc *p)
 {
@@ -392,9 +392,9 @@ cs_valid(struct proc *p)
 	return 0;
 }
 
-/*
- * Library validation functions
- */
+  
+                               
+   
 int
 cs_require_lv(struct proc *p)
 {
@@ -425,22 +425,22 @@ csproc_forced_lv(struct proc* p)
 	return 0;
 }
 
-/*
- * <rdar://problem/24634089> added to allow system level library
- *  validation check at mac_cred_label_update_execve time
- */
+  
+                                                                
+                                                         
+   
 int
 cs_system_require_lv(void)
 {
 	return cs_library_val_enable ? 1 : 0;
 }
 
-/*
- * Function: csblob_get_base_offset
- *
- * Description: This function returns the base offset into the (possibly universal) binary
- *		for a given blob.
- */
+  
+                                   
+  
+                                                                                          
+                     
+   
 
 off_t
 csblob_get_base_offset(struct cs_blob *blob)
@@ -448,11 +448,11 @@ csblob_get_base_offset(struct cs_blob *blob)
 	return blob->csb_base_offset;
 }
 
-/*
- * Function: csblob_get_size
- *
- * Description: This function returns the size of a given blob.
- */
+  
+                            
+  
+                                                               
+   
 
 vm_size_t
 csblob_get_size(struct cs_blob *blob)
@@ -460,11 +460,11 @@ csblob_get_size(struct cs_blob *blob)
 	return blob->csb_mem_size;
 }
 
-/*
- * Function: csblob_get_addr
- *
- * Description: This function returns the address of a given blob.
- */
+  
+                            
+  
+                                                                  
+   
 
 vm_address_t
 csblob_get_addr(struct cs_blob *blob)
@@ -472,12 +472,12 @@ csblob_get_addr(struct cs_blob *blob)
 	return (vm_address_t)blob->csb_mem_kaddr;
 }
 
-/*
- * Function: csblob_get_platform_binary
- *
- * Description: This function returns true if the binary is
- *		in the trust cache.
- */
+  
+                                       
+  
+                                                           
+                       
+   
 
 int
 csblob_get_platform_binary(struct cs_blob *blob)
@@ -488,11 +488,11 @@ csblob_get_platform_binary(struct cs_blob *blob)
 	return 0;
 }
 
-/*
- * Function: csblob_get_flags
- *
- * Description: This function returns the flags for a given blob
- */
+  
+                             
+  
+                                                                
+   
 
 unsigned int
 csblob_get_flags(struct cs_blob *blob)
@@ -500,11 +500,11 @@ csblob_get_flags(struct cs_blob *blob)
 	return blob->csb_flags;
 }
 
-/*
- * Function: csblob_get_hashtype
- *
- * Description: This function returns the hash type for a given blob
- */
+  
+                                
+  
+                                                                    
+   
 
 uint8_t
 csblob_get_hashtype(struct cs_blob const * const blob)
@@ -512,12 +512,12 @@ csblob_get_hashtype(struct cs_blob const * const blob)
 	return blob->csb_hashtype != NULL ? cs_hash_type(blob->csb_hashtype) : 0;
 }
 
-/*
- * Function: csproc_get_blob
- *
- * Description: This function returns the cs_blob
- *		for the process p
- */
+  
+                            
+  
+                                                 
+                     
+   
 struct cs_blob *
 csproc_get_blob(struct proc *p)
 {
@@ -536,36 +536,36 @@ csproc_get_blob(struct proc *p)
 	return ubc_cs_blob_get(p->p_textvp, -1, -1, p->p_textoff);
 }
 
-/*
- * Function: csvnode_get_blob
- *
- * Description: This function returns the cs_blob
- *		for the vnode vp
- */
+  
+                             
+  
+                                                 
+                    
+   
 struct cs_blob *
 csvnode_get_blob(struct vnode *vp, off_t offset)
 {
 	return ubc_cs_blob_get(vp, -1, -1, offset);
 }
 
-/*
- * Function: csblob_get_teamid
- *
- * Description: This function returns a pointer to the
- *		team id of csblob
- */
+  
+                              
+  
+                                                      
+                     
+   
 const char *
 csblob_get_teamid(struct cs_blob *csblob)
 {
 	return csblob->csb_teamid;
 }
 
-/*
- * Function: csblob_get_identity
- *
- * Description: This function returns a pointer to the
- *		identity string
- */
+  
+                                
+  
+                                                      
+                   
+   
 const char *
 csblob_get_identity(struct cs_blob *csblob)
 {
@@ -583,12 +583,12 @@ csblob_get_identity(struct cs_blob *csblob)
 	return ((const char *)cd) + ntohl(cd->identOffset);
 }
 
-/*
- * Function: csblob_get_cdhash
- *
- * Description: This function returns a pointer to the
- *		cdhash of csblob (20 byte array)
- */
+  
+                              
+  
+                                                      
+                                    
+   
 const uint8_t *
 csblob_get_cdhash(struct cs_blob *csblob)
 {
@@ -600,12 +600,12 @@ csblob_get_cdhash(struct cs_blob *csblob)
 	return csblob->csb_cdhash;
 }
 
-/*
- * Function: csblob_get_signer_type
- *
- * Description: This function returns the signer type
- *		as an integer
- */
+  
+                                   
+  
+                                                     
+                 
+   
 unsigned int
 csblob_get_signer_type(struct cs_blob *csblob)
 {
@@ -632,12 +632,12 @@ csblob_entitlements_dictionary_set(struct cs_blob *csblob, void * entitlements)
 	csblob->csb_entitlements = entitlements;
 }
 
-/*
- * Function: csproc_get_teamid
- *
- * Description: This function returns a pointer to the
- *		team id of the process p
- */
+  
+                              
+  
+                                                      
+                            
+   
 const char *
 csproc_get_teamid(struct proc *p)
 {
@@ -664,12 +664,12 @@ csproc_get_identity(struct proc *p)
 	return csblob_get_identity(csblob);
 }
 
-/*
- * Function: csproc_get_signer_type
- *
- * Description: This function returns the signer type
- *		of the process p
- */
+  
+                                   
+  
+                                                     
+                    
+   
 unsigned int
 csproc_get_signer_type(struct proc *p)
 {
@@ -683,12 +683,12 @@ csproc_get_signer_type(struct proc *p)
 	return csblob_get_signer_type(csblob);
 }
 
-/*
- * Function: csvnode_get_teamid
- *
- * Description: This function returns a pointer to the
- *		team id of the binary at the given offset in vnode vp
- */
+  
+                               
+  
+                                                      
+                                                         
+   
 const char *
 csvnode_get_teamid(struct vnode *vp, off_t offset)
 {
@@ -706,12 +706,12 @@ csvnode_get_teamid(struct vnode *vp, off_t offset)
 	return csblob_get_teamid(csblob);
 }
 
-/*
- * Function: csproc_get_platform_binary
- *
- * Description: This function returns the value
- *		of the platform_binary field for proc p
- */
+  
+                                       
+  
+                                               
+                                           
+   
 int
 csproc_get_platform_binary(struct proc *p)
 {
@@ -719,8 +719,8 @@ csproc_get_platform_binary(struct proc *p)
 
 	csblob = csproc_get_blob(p);
 
-	/* If there is no csblob this returns 0 because
-	 *  it is true that it is not a platform binary */
+	                                               
+                                                   
 	return (csblob == NULL) ? 0 : csblob->csb_platform_binary;
 }
 
@@ -767,12 +767,12 @@ csproc_disable_enforcement(struct proc* __unused p)
 #endif
 }
 
-/* Function: csproc_mark_invalid_allowed
- *
- * Description: Mark the process as being allowed to go invalid. Called as part of
- *		task_for_pid and ptrace policy. Note CS_INVALID_ALLOWED only matters for
- *		processes that have been opted into CS_ENFORCEMENT.
- */
+                                        
+  
+                                                                                  
+                                                                            
+                                                       
+   
 void
 csproc_mark_invalid_allowed(struct proc* __unused p)
 {
@@ -785,12 +785,12 @@ csproc_mark_invalid_allowed(struct proc* __unused p)
 #endif
 }
 
-/*
- * Function: csproc_check_invalid_allowed
- *
- * Description: Returns 1 if the process has been marked as allowed to go invalid
- *		because it gave its task port to an allowed process.
- */
+  
+                                         
+  
+                                                                                 
+                                                        
+   
 int
 csproc_check_invalid_allowed(struct proc* __unused p)
 {
@@ -806,13 +806,13 @@ csproc_check_invalid_allowed(struct proc* __unused p)
 	return 0;
 }
 
-/*
- * Function: csproc_get_prod_signed
- *
- * Description: Returns 1 if process is not signed with a developer identity.
- *		Note the inverted meaning from the cs_flag to make the error case safer.
- *		Will go away with rdar://problem/28322552.
- */
+  
+                                   
+  
+                                                                             
+                                                                            
+                                              
+   
 int
 csproc_get_prod_signed(struct proc *p)
 {
@@ -820,13 +820,13 @@ csproc_get_prod_signed(struct proc *p)
 }
 
 
-/*
- * Function: csfg_get_platform_binary
- *
- * Description: This function returns the
- *		platform binary field for the
- *              fileglob fg
- */
+  
+                                     
+  
+                                         
+                                 
+                           
+   
 int
 csfg_get_platform_binary(struct fileglob *fg)
 {
@@ -857,8 +857,8 @@ csfg_get_platform_binary(struct fileglob *fg)
 		goto out;
 	}
 
-	/* It is OK to extract the teamid from the first blob
-	 *  because all blobs of a vnode must have the same teamid */
+	                                                     
+                                                              
 	platform_binary = uip->cs_blobs->csb_platform_binary;
 out:
 	vnode_unlock(vp);
@@ -903,8 +903,8 @@ out:
 
 	return platform_binary;
 #else
-	// Supplemental signatures are only allowed in CONFIG_SUPPLEMENTAL_SIGNATURES
-	// Return false if anyone asks about them
+	                                                                             
+	                                         
 	return 0;
 #endif
 }
@@ -969,8 +969,8 @@ csfg_get_supplement_cdhash(struct fileglob *fg __unused, uint64_t offset __unuse
 	    csblob->csb_cdhash_signature);
 	return csblob->csb_cdhash;
 #else
-	// Supplemental signatures are only available in CONFIG_SUPPLEMENTAL_SIGNATURES
-	// return NULL if anyone asks about them
+	                                                                               
+	                                        
 	return NULL;
 #endif
 }
@@ -1001,18 +1001,18 @@ csfg_get_supplement_linkage_cdhash(struct fileglob *fg __unused, uint64_t offset
 
 	return csblob->csb_linkage;
 #else
-	// Supplemental signatures are only available in CONFIG_SUPPLEMENTAL_SIGNATURES
-	// return NULL if anyone asks about them
+	                                                                               
+	                                        
 	return NULL;
 #endif
 }
 
-/*
- * Function: csfg_get_signer_type
- *
- * Description: This returns the signer type
- *              for the fileglob fg
- */
+  
+                                 
+  
+                                            
+                                   
+   
 unsigned int
 csfg_get_signer_type(struct fileglob *fg)
 {
@@ -1043,8 +1043,8 @@ csfg_get_signer_type(struct fileglob *fg)
 		goto out;
 	}
 
-	/* It is OK to extract the signer type from the first blob,
-	 *  because all blobs of a vnode must have the same signer type. */
+	                                                           
+                                                                    
 	signer_type = uip->cs_blobs->csb_signer_type;
 out:
 	vnode_unlock(vp);
@@ -1089,18 +1089,18 @@ out:
 
 	return signer_type;
 #else
-	// Supplemental signatures are only available in CONFIG_SUPPLEMENTAL_SIGNATURES
-	// Return unknown if anyone asks
+	                                                                               
+	                                
 	return CS_SIGNER_TYPE_UNKNOWN;
 #endif
 }
 
-/*
- * Function: csfg_get_teamid
- *
- * Description: This returns a pointer to
- *              the teamid for the fileglob fg
- */
+  
+                            
+  
+                                         
+                                              
+   
 const char *
 csfg_get_teamid(struct fileglob *fg)
 {
@@ -1131,8 +1131,8 @@ csfg_get_teamid(struct fileglob *fg)
 		goto out;
 	}
 
-	/* It is OK to extract the teamid from the first blob
-	 *  because all blobs of a vnode must have the same teamid */
+	                                                     
+                                                              
 	str = uip->cs_blobs->csb_teamid;
 out:
 	vnode_unlock(vp);
@@ -1177,19 +1177,19 @@ out:
 
 	return str;
 #else
-	// Supplemental Signatures are only available in CONFIG_SUPPLEMENTAL_SIGNATURES
-	// Return NULL if anyone asks
+	                                                                               
+	                             
 	return NULL;
 #endif
 }
 
-/*
- * Function: csfg_get_prod_signed
- *
- * Description: Returns 1 if code is not signed with a developer identity.
- *		Note the inverted meaning from the cs_flag to make the error case safer.
- *		Will go away with rdar://problem/28322552.
- */
+  
+                                 
+  
+                                                                          
+                                                                            
+                                              
+   
 int
 csfg_get_prod_signed(struct fileglob *fg)
 {
@@ -1220,8 +1220,8 @@ csfg_get_prod_signed(struct fileglob *fg)
 		goto out;
 	}
 
-	/* It is OK to extract the flag from the first blob
-	 *  because all blobs of a vnode must have the same cs_flags */
+	                                                   
+                                                                
 	prod_signed = (uip->cs_blobs->csb_flags & CS_DEV_CODE) == 0;
 out:
 	vnode_unlock(vp);
@@ -1260,26 +1260,26 @@ csfg_get_supplement_prod_signed(struct fileglob *fg __unused)
 		goto out;
 	}
 
-	/* It is OK to extract the flag from the first blob
-	 *  because all blobs of a vnode must have the same cs_flags */
+	                                                   
+                                                                
 	prod_signed = (uip->cs_blob_supplement->csb_flags & CS_DEV_CODE) == 0;
 out:
 	vnode_unlock(vp);
 
 	return prod_signed;
 #else
-	// Supplemental signatures are only available in CONFIG_SUPPLEMENTAL_SIGNATURES
-	// Indicate development signed if anyone tries to ask about one.
+	                                                                               
+	                                                                
 	return 0;
 #endif
 }
 
-/*
- * Function: csfg_get_identity
- *
- * Description: This function returns the codesign identity
- *		for the fileglob
- */
+  
+                              
+  
+                                                           
+                    
+   
 const char *
 csfg_get_identity(struct fileglob *fg, off_t offset)
 {
@@ -1303,13 +1303,13 @@ csfg_get_identity(struct fileglob *fg, off_t offset)
 	return csblob_get_identity(csblob);
 }
 
-/*
- * Function: csfg_get_platform_identifier
- *
- * Description: This function returns the codesign platform
- *		identifier for the fileglob.  Assumes the fileproc
- *		is being held busy to keep the fileglob consistent.
- */
+  
+                                         
+  
+                                                           
+                                                      
+                                                       
+   
 uint8_t
 csfg_get_platform_identifier(struct fileglob *fg, off_t offset)
 {
@@ -1327,13 +1327,13 @@ csfg_get_platform_identifier(struct fileglob *fg, off_t offset)
 	return csvnode_get_platform_identifier(vp, offset);
 }
 
-/*
- * Function: csvnode_get_platform_identifier
- *
- * Description: This function returns the codesign platform
- *		identifier for the vnode.  Assumes a vnode reference
- *		is held.
- */
+  
+                                            
+  
+                                                           
+                                                        
+            
+   
 uint8_t
 csvnode_get_platform_identifier(struct vnode *vp, off_t offset)
 {
@@ -1353,13 +1353,13 @@ csvnode_get_platform_identifier(struct vnode *vp, off_t offset)
 	return code_dir->platform;
 }
 
-/*
- * Function: csproc_get_platform_identifier
- *
- * Description: This function returns the codesign platform
- *		identifier for the proc.  Assumes proc will remain
- *		valid through call.
- */
+  
+                                           
+  
+                                                           
+                                                      
+                       
+   
 uint8_t
 csproc_get_platform_identifier(struct proc *p)
 {
@@ -1388,15 +1388,15 @@ csproc_hardened_runtime(struct proc* p)
 	return (p->p_csflags & CS_RUNTIME) ? 1 : 0;
 }
 
-/*
- * Function: csfg_get_path
- *
- * Description: This populates the buffer passed in
- *		with the path of the vnode
- *		When calling this, the fileglob
- *		cannot go away. The caller must have a
- *		a reference on the fileglob or fileproc
- */
+  
+                          
+  
+                                                   
+                              
+                                   
+                                          
+                                           
+   
 int
 csfg_get_path(struct fileglob *fg, char *path, int *len)
 {
@@ -1408,22 +1408,22 @@ csfg_get_path(struct fileglob *fg, char *path, int *len)
 
 	vp = (struct vnode *)fg->fg_data;
 
-	/* vn_getpath returns 0 for success,
-	 *  or an error code */
+	                                    
+                        
 	return vn_getpath(vp, path, len);
 }
 
-/*
- * Retrieve the entitlements blob for a vnode
- * Returns:
- *   EINVAL	no text vnode associated with the process
- *   EBADEXEC   invalid code signing data
- *   0		no error occurred
- *
- * On success, out_start and out_length will point to the
- * entitlements blob if found; or will be set to NULL/zero
- * if there were no entitlements.
- */
+  
+                                             
+           
+                                                     
+                                         
+                         
+  
+                                                         
+                                                          
+                                 
+   
 int
 cs_entitlements_blob_get_vnode(vnode_t vnode, off_t offset, void **out_start, size_t *out_length)
 {
@@ -1443,17 +1443,17 @@ cs_entitlements_blob_get_vnode(vnode_t vnode, off_t offset, void **out_start, si
 	return csblob_get_entitlements(csblob, out_start, out_length);
 }
 
-/*
- * Retrieve the entitlements blob for a process.
- * Returns:
- *   EINVAL	no text vnode associated with the process
- *   EBADEXEC   invalid code signing data
- *   0		no error occurred
- *
- * On success, out_start and out_length will point to the
- * entitlements blob if found; or will be set to NULL/zero
- * if there were no entitlements.
- */
+  
+                                                
+           
+                                                     
+                                         
+                         
+  
+                                                         
+                                                          
+                                 
+   
 int
 cs_entitlements_blob_get(proc_t p, void **out_start, size_t *out_length)
 {
@@ -1465,14 +1465,14 @@ cs_entitlements_blob_get(proc_t p, void **out_start, size_t *out_length)
 }
 
 
-/* Retrieve the cached entitlements for a process
- * Returns:
- *   EINVAL	no text vnode associated with the process
- *   EBADEXEC   invalid code signing data
- *   0		no error occurred
- *
- * Note: the entitlements may be NULL if there is nothing cached.
- */
+                                                 
+           
+                                                     
+                                         
+                         
+  
+                                                                 
+   
 
 int
 cs_entitlements_dictionary_copy(proc_t p, void **entitlements)
@@ -1497,11 +1497,11 @@ cs_entitlements_dictionary_copy(proc_t p, void **entitlements)
 	return 0;
 }
 
-/* Retrieve the codesign identity for a process.
- * Returns:
- *   NULL	an error occured
- *   string	the cs_identity
- */
+                                                
+           
+                          
+                           
+   
 
 const char *
 cs_identity_get(proc_t p)
@@ -1523,14 +1523,14 @@ cs_identity_get(proc_t p)
 	return csblob_get_identity(csblob);
 }
 
-/*
- * DO NOT USE THIS FUNCTION!
- * Use the properly guarded csproc_get_blob instead.
- *
- * This is currently here to allow detached signatures to work
- * properly. The only user of this function is also checking
- * for CS_VALID.
- */
+  
+                            
+                                                    
+  
+                                                              
+                                                            
+                
+   
 
 int
 cs_blob_get(proc_t p, void **out_start, size_t *out_length)
@@ -1554,9 +1554,9 @@ cs_blob_get(proc_t p, void **out_start, size_t *out_length)
 	return 0;
 }
 
-/*
- * return cshash of a process, cdhash is of size CS_CDHASH_LEN
- */
+  
+                                                              
+   
 
 uint8_t *
 cs_get_cdhash(struct proc *p)

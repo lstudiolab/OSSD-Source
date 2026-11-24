@@ -60,13 +60,13 @@
  */
 
 
-/*
- * Warning: This file is generated automatically.
- * (Modifications made here may easily be lost!)
- *
- * Created by the script:
- *	@(#)vnode_if.sh	8.7 (Berkeley) 5/11/95
- */
+  
+                                                 
+                                                
+  
+                         
+                                         
+   
 
 
 #include <sys/param.h>
@@ -1083,7 +1083,7 @@ int vnop_makenamedstream_vp_offsets[] = {
 struct vnodeop_desc vnop_makenamedstream_desc = {
 	0,
 	"vnop_makenamedstream",
-	0, /* flags */
+	0,            
 	vnop_makenamedstream_vp_offsets,
 	VOPARG_OFFSETOF(struct vnop_makenamedstream_args, a_svpp),
 	VDESC_NO_OFFSET,
@@ -1116,7 +1116,7 @@ int vnop_getnamedstream_vp_offsets[] = {
 struct vnodeop_desc vnop_getnamedstream_desc = {
 	0,
 	"vnop_getnamedstream",
-	VDESC_DISABLED, /* flags */
+	VDESC_DISABLED,            
 	vnop_getnamedstream_vp_offsets,
 	VDESC_NO_OFFSET,
 	VDESC_NO_OFFSET,
@@ -1132,7 +1132,7 @@ int vnop_makenamedstream_vp_offsets[] = {
 struct vnodeop_desc vnop_makenamedstream_desc = {
 	0,
 	"vnop_makenamedstream",
-	VDESC_DISABLED, /* flags */
+	VDESC_DISABLED,            
 	vnop_makenamedstream_vp_offsets,
 	VDESC_NO_OFFSET,
 	VDESC_NO_OFFSET,
@@ -1148,7 +1148,7 @@ int vnop_removenamedstream_vp_offsets[] = {
 struct vnodeop_desc vnop_removenamedstream_desc = {
 	0,
 	"vnop_removenamedstream",
-	VDESC_DISABLED, /* flags */
+	VDESC_DISABLED,            
 	vnop_removenamedstream_vp_offsets,
 	VDESC_NO_OFFSET,
 	VDESC_NO_OFFSET,
@@ -1159,7 +1159,7 @@ struct vnodeop_desc vnop_removenamedstream_desc = {
 };
 #endif
 
-/* Special cases: */
+                    
 
 int vnop_strategy_vp_offsets[] = {
 	VDESC_NO_OFFSET
@@ -1210,12 +1210,12 @@ struct vnodeop_desc vnop_verify_desc = {
 	.vdesc_transports = NULL
 };
 
-/* End of special cases. */
+                           
 
 struct vnodeop_desc *vfs_op_descs[] = {
-	&vnop_default_desc,     /* MUST BE FIRST */
-	&vnop_strategy_desc,    /* XXX: SPECIAL CASE */
-	&vnop_bwrite_desc,      /* XXX: SPECIAL CASE */
+	&vnop_default_desc,                        
+	&vnop_strategy_desc,                           
+	&vnop_bwrite_desc,                             
 
 	&vnop_lookup_desc,
 	&vnop_create_desc,
@@ -1274,13 +1274,13 @@ struct vnodeop_desc *vfs_op_descs[] = {
 	&vnop_blockmap_desc,
 	&vnop_monitor_desc,
 #if !defined(NAMEDSTREAMS)
-	/*
-	 * We define the named streams ops descriptors as we _always_ have to
-	 * have symbols with their names, and as such we really really need
-	 * those symbols to be valid operations descriptors. However if
-	 * named streams support is not enabled, we flag these descriptors
-	 * as ignored.
-	 */
+	  
+                                                                      
+                                                                    
+                                                                
+                                                                   
+               
+    
 #endif
 	&vnop_getnamedstream_desc,
 	&vnop_makenamedstream_desc,

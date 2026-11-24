@@ -109,7 +109,7 @@ T_DECL(send, "test for 30465592")
 		T_QUIET; T_ASSERT_EQ(recv_fd(pair[1], &fd), 0, "recv_fd");
 		T_QUIET; T_ASSERT_NE(fd, -1, "received a proper fd");
 		T_QUIET; T_EXPECT_POSIX_SUCCESS(close(fd), "close(fd)");
-		raise(SIGKILL); /* do not confuse the test system */
+		raise(SIGKILL);                                     
 	}
 }
 
@@ -135,7 +135,7 @@ T_DECL(send_kill, "test for 30465592")
 		T_QUIET; T_ASSERT_EQ(recv_fd(pair[1], &fd), 0, "recv_fd");
 		T_QUIET; T_ASSERT_NE(fd, -1, "received a proper fd");
 		T_QUIET; T_EXPECT_POSIX_SUCCESS(close(fd), "close(fd)");
-		raise(SIGKILL); /* do not confuse the test system */
+		raise(SIGKILL);                                     
 	}
 }
 
@@ -161,7 +161,7 @@ T_DECL(send_sock, "test for 30465592")
 		T_QUIET; T_ASSERT_EQ(recv_fd(pair[1], &fd), 0, "recv_fd");
 		T_QUIET; T_ASSERT_NE(fd, -1, "received a proper fd");
 		T_QUIET; T_EXPECT_POSIX_SUCCESS(close(fd), "close(fd)");
-		raise(SIGKILL); /* do not confuse the test system */
+		raise(SIGKILL);                                     
 	}
 }
 

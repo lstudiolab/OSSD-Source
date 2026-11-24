@@ -39,9 +39,9 @@
 
 extern kern_return_t sysdiagnose_notify_user(uint32_t);
 
-/*
- * If userland has registered a port for sysdiagnose notifications, send one now.
- */
+  
+                                                                                 
+   
 kern_return_t
 sysdiagnose_notify_user(uint32_t keycode)
 {

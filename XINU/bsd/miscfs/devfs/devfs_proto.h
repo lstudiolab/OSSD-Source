@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* THIS FILE HAS BEEN PRODUCED AUTOMATICALLY */
+                                               
 #ifndef __DEVFS_DEVFS_PROTO_H__
 #define __DEVFS_DEVFS_PROTO_H__
 
@@ -49,9 +49,9 @@ int     dev_add_entry(const char *name, devnode_t * parent, int type, devnode_ty
 int     devfs_mount(struct mount *mp, vnode_t devvp, user_addr_t data,
     vfs_context_t context);
 int     devfs_kernel_mount(char * mntname);
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 __END_DECLS
 
-#endif /* __DEVFS_DEVFS_PROTO_H__ */
-/* THIS FILE PRODUCED AUTOMATICALLY */
-/* DO NOT EDIT (see reproto.sh) */
+#endif                              
+                                      
+                                  

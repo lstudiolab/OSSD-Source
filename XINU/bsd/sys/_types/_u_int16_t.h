@@ -28,4 +28,4 @@
 #ifndef _U_INT16_T
 #define _U_INT16_T
 typedef unsigned short                  u_int16_t;
-#endif /* _U_INT16_T */
+#endif                 

@@ -86,7 +86,7 @@ proto_kpi_init(void)
 	lck_attr_t      *lck_attrib = NULL;
 	lck_grp_t       *lck_group = NULL;
 
-	/* Allocate a mtx lock */
+	                         
 	grp_attrib = lck_grp_attr_alloc_init();
 	lck_group = lck_grp_alloc_init("protocol kpi", grp_attrib);
 	lck_grp_attr_free(grp_attrib);
@@ -180,7 +180,7 @@ proto_delayed_attach(struct proto_input_entry *entry)
 			}
 		}
 
-		/* If the entry already exists, call detached and dispose */
+		                                                            
 		if (exist != NULL) {
 			if (entry->detached) {
 				entry->detached(entry->protocol);
@@ -212,10 +212,10 @@ proto_input_run(void)
 		proto_delayed_attach(entry);
 	}
 
-	/*
-	 * Move everything from the lock protected list to the thread
-	 * specific list.
-	 */
+	  
+                                                              
+                  
+    
 	for (i = 0; proto_total_waiting != 0 && i < PROTO_HASH_SLOTS; i++) {
 		for (entry = proto_hash[i];
 		    entry != NULL && proto_total_waiting; entry = entry->next) {
@@ -313,7 +313,7 @@ proto_inject(protocol_family_t protocol, mbuf_t packet_list)
 
 	for (last_packet = packet_list; mbuf_nextpkt(last_packet) != NULL;
 	    last_packet = mbuf_nextpkt(last_packet)) {
-		/* find the last packet */;
+		                          ;
 	}
 
 	for (entry = proto_hash[hash_slot]; entry != NULL;

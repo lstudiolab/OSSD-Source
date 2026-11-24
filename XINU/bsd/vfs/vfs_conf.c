@@ -60,12 +60,12 @@
  *
  *	@(#)vfs_conf.c	8.11 (Berkeley) 5/10/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -74,23 +74,23 @@
 
 #include <nfs/nfs_conf.h>
 
-/*
- * These define the root filesystem, device, and root filesystem type.
- */
+  
+                                                                      
+   
 struct mount *rootfs;
 struct vnode *rootvnode;
 
 #ifdef CONFIG_IMGSRC_ACCESS
-struct vnode *imgsrc_rootvnodes[MAX_IMAGEBOOT_NESTING]; /* [0] -> source volume, [1] -> first disk image */
-#endif /* CONFIG_IMGSRC_ACCESS */
+struct vnode *imgsrc_rootvnodes[MAX_IMAGEBOOT_NESTING];                                                    
+#endif                           
 
 int (*mountroot)(void) = NULL;
 
-/*
- * Set up the initial array of known filesystem types.
- */
+  
+                                                      
+   
 extern  struct vfsops mfs_vfsops;
-extern  int mfs_mountroot(mount_t, vnode_t, vfs_context_t);     /* dead */
+extern  int mfs_mountroot(mount_t, vnode_t, vfs_context_t);               
 extern  struct vfsops nfs_vfsops;
 extern  int nfs_mountroot(void);
 extern  struct vfsops afs_vfsops;
@@ -103,12 +103,12 @@ extern struct vfsops bindfs_vfsops;
 #if MOCKFS
 extern  struct vfsops mockfs_vfsops;
 extern  int mockfs_mountroot(mount_t, vnode_t, vfs_context_t);
-#endif /* MOCKFS */
+#endif             
 
-/*
- * For nfs_mountroot(void) cast.  nfs_mountroot ignores its parameters, if
- * invoked through this table.
- */
+  
+                                                                          
+                              
+   
 typedef int (*mountroot_t)(mount_t, vnode_t, vfs_context_t);
 
 enum fs_type_num {
@@ -121,11 +121,11 @@ enum fs_type_num {
 	FT_MOCKFS  = 0x6D6F636B
 };
 
-/*
- * Set up the filesystem operations for vnodes.
- */
+  
+                                               
+   
 static struct vfstable vfstbllist[] = {
-	/* Sun-compatible Network Filesystem */
+	                                       
 #if CONFIG_NFS_CLIENT
 	{
 		.vfc_vfsops = &nfs_vfsops,
@@ -142,9 +142,9 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        
 
-	/* Device Filesystem */
+	                       
 #if DEVFS
 #if CONFIG_MACF
 	{
@@ -162,7 +162,7 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#else /* !CONFIG_MAC */
+#else                  
 	{
 		.vfc_vfsops = &devfs_vfsops,
 		.vfc_name = "devfs",
@@ -178,11 +178,11 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#endif /* CONFIG_MAC */
-#endif /* DEVFS */
+#endif                 
+#endif            
 
 #ifndef __LP64__
-#endif /* __LP64__ */
+#endif               
 
 #if NULLFS
 	{
@@ -200,7 +200,7 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#endif /* NULLFS */
+#endif             
 
 #if BINDFS
 	{
@@ -218,10 +218,10 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#endif /* BINDFS */
+#endif             
 
 #if MOCKFS
-	/* If we are configured for it, mockfs should always be the last standard entry (and thus the last FS we attempt mountroot with) */
+	                                                                                                                                   
 	{
 		.vfc_vfsops = &mockfs_vfsops,
 		.vfc_name = "mockfs",
@@ -237,10 +237,10 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#endif /* MOCKFS */
+#endif             
 
 #if ROUTEFS
-	/* If we are configured for it, mockfs should always be the last standard entry (and thus the last FS we attempt mountroot with) */
+	                                                                                                                                   
 	{
 		.vfc_vfsops = &routefs_vfsops,
 		.vfc_name = "routefs",
@@ -256,7 +256,7 @@ static struct vfstable vfstbllist[] = {
 		.vfc_descsize = 0,
 		.vfc_sysctl = NULL
 	},
-#endif /* ROUTEFS */
+#endif              
 
 	{
 		.vfc_vfsops = NULL,
@@ -290,27 +290,27 @@ static struct vfstable vfstbllist[] = {
 	},
 };
 
-/*
- * vfs_init will set maxvfstypenum to the highest defined type number.
- */
+  
+                                                                      
+   
 const int maxvfsslots = sizeof(vfstbllist) / sizeof(struct vfstable);
 int numused_vfsslots = 0;
 int numregistered_fses = 0;
 int maxvfstypenum = VT_NON + 1;
 struct vfstable *vfsconf = vfstbllist;
 
-/*
- *
- * vfs_opv_descs enumerates the list of vnode classes, each with it's own
- * vnode operation vector.  It is consulted at system boot to build operation
- * vectors.  It is NULL terminated.
- *
- */
+  
+  
+                                                                         
+                                                                             
+                                   
+  
+   
 extern struct vnodeopv_desc mfs_vnodeop_opv_desc;
 extern const struct vnodeopv_desc dead_vnodeop_opv_desc;
 #if FIFO && SOCKETS
 extern const struct vnodeopv_desc fifo_vnodeop_opv_desc;
-#endif /* SOCKETS */
+#endif              
 extern const struct vnodeopv_desc spec_vnodeop_opv_desc;
 extern const struct vnodeopv_desc nfsv2_vnodeop_opv_desc;
 extern const struct vnodeopv_desc spec_nfsv2nodeop_opv_desc;
@@ -326,11 +326,11 @@ extern struct vnodeopv_desc devfs_spec_vnodeop_opv_desc;
 #if FDESC
 extern struct vnodeopv_desc devfs_devfd_vnodeop_opv_desc;
 extern const struct vnodeopv_desc devfs_fdesc_vnodeop_opv_desc;
-#endif /* FDESC */
+#endif            
 
 #if MOCKFS
 extern const struct vnodeopv_desc mockfs_vnodeop_opv_desc;
-#endif /* MOCKFS */
+#endif             
 
 extern const struct vnodeopv_desc nullfs_vnodeop_opv_desc;
 extern const struct vnodeopv_desc bindfs_vnodeop_opv_desc;
@@ -355,25 +355,25 @@ const struct vnodeopv_desc *vfs_opv_descs[] = {
 	&fifo_nfsv2nodeop_opv_desc,
 #if CONFIG_NFS4
 	&fifo_nfsv4nodeop_opv_desc,
-#endif /* CONFIG_NFS4 */
-#endif /* FIFO */
-#endif /* CONFIG_NFS_CLIENT */
+#endif                  
+#endif           
+#endif                        
 #if DEVFS
 	&devfs_vnodeop_opv_desc,
 	&devfs_spec_vnodeop_opv_desc,
 #if FDESC
 	&devfs_devfd_vnodeop_opv_desc,
 	&devfs_fdesc_vnodeop_opv_desc,
-#endif /* FDESC */
-#endif /* DEVFS */
+#endif            
+#endif            
 #if NULLFS
 	&nullfs_vnodeop_opv_desc,
-#endif /* NULLFS */
+#endif             
 #if BINDFS
 	&bindfs_vnodeop_opv_desc,
-#endif /* BINDFS */
+#endif             
 #if MOCKFS
 	&mockfs_vnodeop_opv_desc,
-#endif /* MOCKFS */
+#endif             
 	NULL
 };

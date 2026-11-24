@@ -70,12 +70,12 @@
 #include <netinet/ip.h>
 #include <netinet/ip_var.h>
 
-/*
- * Checksum routine for Internet Protocol family headers (Portable Version).
- *
- * This routine is very heavily used in the network
- * code and should be modified for each CPU to be as fast as possible.
- */
+  
+                                                                            
+  
+                                                   
+                                                                      
+   
 #define REDUCE16 {                                                        \
 	q_util.q = sum;                                                   \
 	l_util.l = q_util.s[0] + q_util.s[1] + q_util.s[2] + q_util.s[3]; \
@@ -96,9 +96,9 @@ union q_util {
 
 extern uint32_t os_cpu_in_cksum(const void *, uint32_t, uint32_t);
 
-/*
- * Perform 16-bit 1's complement sum on a contiguous span.
- */
+  
+                                                          
+   
 uint16_t
 b_sum16(const void *buf, int len)
 {
@@ -106,9 +106,9 @@ b_sum16(const void *buf, int len)
 }
 
 uint16_t inet_cksum_simple(struct mbuf *, int);
-/*
- * For the exported _in_cksum symbol in BSDKernel symbol set.
- */
+  
+                                                             
+   
 uint16_t
 inet_cksum_simple(struct mbuf *m, int len)
 {
@@ -148,20 +148,20 @@ in_pseudo64(uint64_t a, uint64_t b, uint64_t c)
 	return (uint16_t)sum;
 }
 
-/*
- * May be used on IP header with options.
- */
+  
+                                         
+   
 uint16_t
 in_cksum_hdr_opt(const struct ip *ip)
 {
 	return ~b_sum16(ip, (IP_VHL_HL(ip->ip_vhl) << 2)) & 0xffff;
 }
 
-/*
- * A wrapper around the simple in_cksum_hdr() and the more complicated
- * inet_cksum(); the former is chosen if the IP header is simple,
- * contiguous and 32-bit aligned.  Also does some stats accounting.
- */
+  
+                                                                      
+                                                                 
+                                                                   
+   
 uint16_t
 ip_cksum_hdr_dir(struct mbuf *m, uint32_t hlen, int out)
 {
@@ -205,12 +205,12 @@ ip_cksum_hdr_dir_buffer(const void *buffer, uint32_t hlen, uint32_t len,
 	return inet_cksum_buffer(buffer, 0, 0, hlen);
 }
 
-/*
- * m MUST contain at least an IP header, if nxt is specified;
- * nxt is the upper layer protocol number;
- * off is an offset where TCP/UDP/ICMP header starts;
- * len is a total length of a transport segment (e.g. TCP header + TCP payload)
- */
+  
+                                                             
+                                          
+                                                     
+                                                                               
+   
 uint16_t
 inet_cksum(struct mbuf *m, uint32_t nxt, uint32_t off, uint32_t len)
 {
@@ -218,30 +218,30 @@ inet_cksum(struct mbuf *m, uint32_t nxt, uint32_t off, uint32_t len)
 
 	sum = m_sum16(m, off, len);
 
-	/* include pseudo header checksum? */
+	                                     
 	if (nxt != 0) {
 		struct ip *ip;
 		unsigned char buf[sizeof((*ip))] __attribute__((aligned(8)));
 		uint32_t mlen;
 
-		/*
-		 * Sanity check
-		 *
-		 * Use m_length2() instead of m_length(), as we cannot rely on
-		 * the caller setting m_pkthdr.len correctly, if the mbuf is
-		 * a M_PKTHDR one.
-		 */
+		  
+                 
+    
+                                                                
+                                                              
+                    
+     
 		if ((mlen = m_length2(m, NULL)) < sizeof(*ip)) {
 			panic("%s: mbuf %p too short (%d) for IPv4 header",
 			    __func__, m, mlen);
-			/* NOTREACHED */
+			                
 		}
 
-		/*
-		 * In case the IP header is not contiguous, or not 32-bit
-		 * aligned, copy it to a local buffer.  Note here that we
-		 * expect the data pointer to point to the IP header.
-		 */
+		  
+                                                           
+                                                           
+                                                       
+     
 		if ((sizeof(*ip) > m->m_len) ||
 		    !IP_HDR_ALIGNED_P(mtod(m, caddr_t))) {
 			m_copydata(m, 0, sizeof(*ip), (caddr_t)buf);
@@ -250,23 +250,23 @@ inet_cksum(struct mbuf *m, uint32_t nxt, uint32_t off, uint32_t len)
 			ip = (struct ip *)(void *)(m->m_data);
 		}
 
-		/* add pseudo header checksum */
+		                                
 		sum += in_pseudo(ip->ip_src.s_addr, ip->ip_dst.s_addr,
 		    htonl(len + nxt));
 
-		/* fold in carry bits */
+		                        
 		ADDCARRY(sum);
 	}
 
 	return ~sum & 0xffff;
 }
 
-/*
- * buffer MUST contain at least an IP header, if nxt is specified;
- * nxt is the upper layer protocol number;
- * off is an offset where TCP/UDP/ICMP header starts;
- * len is a total length of a transport segment (e.g. TCP header + TCP payload)
- */
+  
+                                                                  
+                                          
+                                                     
+                                                                               
+   
 uint16_t
 inet_cksum_buffer(const void *buffer, uint32_t nxt, uint32_t off,
     uint32_t len)
@@ -279,16 +279,16 @@ inet_cksum_buffer(const void *buffer, uint32_t nxt, uint32_t off,
 
 	sum = b_sum16(&((const uint8_t *)buffer)[off], len);
 
-	/* include pseudo header checksum? */
+	                                     
 	if (nxt != 0) {
 		const struct ip *ip;
 		unsigned char buf[sizeof((*ip))] __attribute__((aligned(8)));
 
-		/*
-		 * In case the IP header is not contiguous, or not 32-bit
-		 * aligned, copy it to a local buffer.  Note here that we
-		 * expect the data pointer to point to the IP header.
-		 */
+		  
+                                                           
+                                                           
+                                                       
+     
 		if (!IP_HDR_ALIGNED_P(buffer)) {
 			memcpy(buf, buffer, sizeof(*ip));
 			ip = (const struct ip *)(const void *)buf;
@@ -296,11 +296,11 @@ inet_cksum_buffer(const void *buffer, uint32_t nxt, uint32_t off,
 			ip = (const struct ip *)buffer;
 		}
 
-		/* add pseudo header checksum */
+		                                
 		sum += in_pseudo(ip->ip_src.s_addr, ip->ip_dst.s_addr,
 		    htonl(len + nxt));
 
-		/* fold in carry bits */
+		                        
 		ADDCARRY(sum);
 	}
 
@@ -312,15 +312,15 @@ inet_cksum_buffer(const void *buffer, uint32_t nxt, uint32_t off,
 
 #define CKSUM_ERR kprintf
 
-/*
- * The following routines implement the portable, reference implementation
- * of os_cpu_in_cksum_mbuf().  This is currently used only for validating
- * the correctness of the platform-specific implementation, at boot time
- * in dlil_verify_sum16().  It returns the 32-bit accumulator without doing
- * a 1's complement on it.
- */
+  
+                                                                          
+                                                                         
+                                                                        
+                                                                           
+                          
+   
 #if !defined(__LP64__)
-/* 32-bit version */
+                    
 uint32_t
 in_cksum_mbuf_ref(struct mbuf *m, int len, int off, uint32_t initial_sum)
 {
@@ -373,13 +373,13 @@ post_initial_offset:
 
 		partial = 0;
 		if ((uintptr_t)data & 1) {
-			/* Align on word boundary */
+			                            
 			started_on_odd = !started_on_odd;
 #if BYTE_ORDER == LITTLE_ENDIAN
 			partial = *data << 8;
-#else /* BYTE_ORDER != LITTLE_ENDIAN */
+#else                                  
 			partial = *data;
-#endif /* BYTE_ORDER != LITTLE_ENDIAN */
+#endif                                  
 			++data;
 			--mlen;
 		}
@@ -426,10 +426,10 @@ post_initial_offset:
 			data += 16;
 			mlen -= 16;
 		}
-		/*
-		 * mlen is not updated below as the remaining tests
-		 * are using bit masks, which are not affected.
-		 */
+		  
+                                                     
+                                                 
+     
 		if (mlen & 8) {
 			partial += *(uint16_t *)(void *)data;
 			partial += *(uint16_t *)(void *)(data + 2);
@@ -449,9 +449,9 @@ post_initial_offset:
 		if (mlen & 1) {
 #if BYTE_ORDER == LITTLE_ENDIAN
 			partial += *data;
-#else /* BYTE_ORDER != LITTLE_ENDIAN */
+#else                                  
 			partial += *data << 8;
-#endif /* BYTE_ORDER != LITTLE_ENDIAN */
+#endif                                  
 			started_on_odd = !started_on_odd;
 		}
 
@@ -459,10 +459,10 @@ post_initial_offset:
 			partial = (partial << 8) + (partial >> 24);
 		}
 		sum += (partial >> 16) + (partial & 0xffff);
-		/*
-		 * Reduce sum to allow potential byte swap
-		 * in the next iteration without carry.
-		 */
+		  
+                                            
+                                         
+     
 		sum = (sum >> 16) + (sum & 0xffff);
 	}
 	final_acc = ((sum >> 16) & 0xffff) + (sum & 0xffff);
@@ -470,8 +470,8 @@ post_initial_offset:
 	return final_acc & 0xffff;
 }
 
-#else /* __LP64__ */
-/* 64-bit version */
+#else               
+                    
 uint32_t
 in_cksum_mbuf_ref(struct mbuf *m, int len, int off, uint32_t initial_sum)
 {
@@ -524,13 +524,13 @@ post_initial_offset:
 
 		partial = 0;
 		if ((uintptr_t)data & 1) {
-			/* Align on word boundary */
+			                            
 			started_on_odd = !started_on_odd;
 #if BYTE_ORDER == LITTLE_ENDIAN
 			partial = *data << 8;
-#else /* BYTE_ORDER != LITTLE_ENDIAN */
+#else                                  
 			partial = *data;
-#endif /* BYTE_ORDER != LITTLE_ENDIAN */
+#endif                                  
 			++data;
 			--mlen;
 		}
@@ -574,10 +574,10 @@ post_initial_offset:
 				partial = 0;
 			}
 		}
-		/*
-		 * mlen is not updated below as the remaining tests
-		 * are using bit masks, which are not affected.
-		 */
+		  
+                                                     
+                                                 
+     
 		if (mlen & 32) {
 			partial += *(uint32_t *)(void *)data;
 			partial += *(uint32_t *)(void *)(data + 4);
@@ -613,9 +613,9 @@ trailing_bytes:
 		if (mlen & 1) {
 #if BYTE_ORDER == LITTLE_ENDIAN
 			partial += *data;
-#else /* BYTE_ORDER != LITTLE_ENDIAN */
+#else                                  
 			partial += *data << 8;
-#endif /* BYTE_ORDER != LITTLE_ENDIAN */
+#endif                                  
 			started_on_odd = !started_on_odd;
 		}
 
@@ -623,10 +623,10 @@ trailing_bytes:
 			partial = (partial << 8) + (partial >> 56);
 		}
 		sum += (partial >> 32) + (partial & 0xffffffff);
-		/*
-		 * Reduce sum to allow potential byte swap
-		 * in the next iteration without carry.
-		 */
+		  
+                                            
+                                         
+     
 		sum = (sum >> 32) + (sum & 0xffffffff);
 	}
 	final_acc = (sum >> 48) + ((sum >> 32) & 0xffff) +
@@ -635,5 +635,5 @@ trailing_bytes:
 	final_acc = (final_acc >> 16) + (final_acc & 0xffff);
 	return final_acc & 0xffff;
 }
-#endif /* __LP64 */
-#endif /* DEBUG || DEVELOPMENT */
+#endif             
+#endif                           

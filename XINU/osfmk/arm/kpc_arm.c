@@ -36,7 +36,7 @@
 #include <kern/kpc.h>
 
 #ifdef ARMA7
-/* PMU v2 based implementation for A7 */
+                                        
 static uint32_t saved_PMXEVTYPER[MAX_CPUS][KPC_ARM_TOTAL_COUNT];
 static uint32_t saved_PMCNTENSET[MAX_CPUS];
 static uint64_t saved_counter[MAX_CPUS][KPC_ARM_TOTAL_COUNT];
@@ -51,7 +51,7 @@ static uint32_t kpc_enabled_counters = 0;
 
 static int first_time = 1;
 
-/* Private */
+             
 
 static uint64_t get_counter_config(uint32_t counter);
 
@@ -61,23 +61,23 @@ enable_counter(uint32_t counter)
 {
 	boolean_t enabled;
 	uint32_t PMCNTENSET;
-	/* Cycle counter is MSB; configurable counters reside in LSBs */
+	                                                                
 	uint32_t mask = (counter == 0) ? (1 << 31) : (1 << (counter - 1));
 
-	/* Enabled? */
+	              
 	__asm__ volatile ("mrc p15, 0, %0, c9, c12, 1;" : "=r" (PMCNTENSET));
 
 	enabled = (PMCNTENSET & mask);
 	if (!enabled) {
-		/* Counter interrupt enable (PMINTENSET) */
+		                                           
 		__asm__ volatile ("mcr p15, 0, %0, c9, c14, 1;" : : "r" (mask));
 
-		/* Individual counter enable set (PMCNTENSET) */
+		                                                
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 1;" : : "r" (mask));
 
 		kpc_enabled_counters++;
 
-		/* 1st enabled counter? Set the master enable bit in PMCR */
+		                                                            
 		if (kpc_enabled_counters == 1) {
 			uint32_t PMCR = 1;
 			__asm__ volatile ("mcr p15, 0, %0, c9, c12, 0;" : : "r" (PMCR));
@@ -92,23 +92,23 @@ disable_counter(uint32_t counter)
 {
 	boolean_t enabled;
 	uint32_t PMCNTENCLR;
-	/* Cycle counter is MSB; configurable counters reside in LSBs */
+	                                                                
 	uint32_t mask = (counter == 0) ? (1 << 31) : (1 << (counter - 1));
 
-	/* Enabled? */
+	              
 	__asm__ volatile ("mrc p15, 0, %0, c9, c12, 2;" : "=r" (PMCNTENCLR));
 
 	enabled = (PMCNTENCLR & mask);
 	if (enabled) {
-		/* Individual counter enable clear (PMCNTENCLR) */
+		                                                  
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 2;" : : "r" (mask));
 
-		/* Counter interrupt disable (PMINTENCLR) */
+		                                            
 		__asm__ volatile ("mcr p15, 0, %0, c9, c14, 2;" : : "r" (mask));
 
 		kpc_enabled_counters--;
 
-		/* Last enabled counter? Clear the master enable bit in PMCR */
+		                                                               
 		if (kpc_enabled_counters == 0) {
 			uint32_t PMCR = 0;
 			__asm__ volatile ("mcr p15, 0, %0, c9, c12, 0;" : : "r" (PMCR));
@@ -125,20 +125,20 @@ read_counter(uint32_t counter)
 
 	switch (counter) {
 	case 0:
-		/* Fixed counter */
+		                   
 		__asm__ volatile ("mrc p15, 0, %0, c9, c13, 0;" : "=r" (low));
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
-		/* Configurable. Set PMSELR... */
+		                                 
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (counter - 1));
-		/* ...then read PMXEVCNTR */
+		                            
 		__asm__ volatile ("mrc p15, 0, %0, c9, c13, 2;" : "=r" (low));
 		break;
 	default:
-		/* ??? */
+		         
 		break;
 	}
 
@@ -152,20 +152,20 @@ write_counter(uint32_t counter, uint64_t value)
 
 	switch (counter) {
 	case 0:
-		/* Fixed counter */
+		                   
 		__asm__ volatile ("mcr p15, 0, %0, c9, c13, 0;" : : "r" (low));
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
-		/* Configurable. Set PMSELR... */
+		                                 
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (counter - 1));
-		/* ...then write PMXEVCNTR */
+		                             
 		__asm__ volatile ("mcr p15, 0, %0, c9, c13, 2;" : : "r" (low));
 		break;
 	default:
-		/* ??? */
+		         
 		break;
 	}
 }
@@ -249,7 +249,7 @@ kpc_pmi_handler(cpu_id_t source)
 
 	enabled = ml_set_interrupts_enabled(FALSE);
 
-	/* The pmi must be delivered to the CPU that generated it */
+	                                                            
 	if (source != getCpuDatap()->interrupt_nub) {
 		panic("pmi from IOCPU %p delivered to IOCPU %p", source, getCpuDatap()->interrupt_nub);
 	}
@@ -260,21 +260,21 @@ kpc_pmi_handler(cpu_id_t source)
 		uint32_t PMOVSR;
 		uint32_t mask;
 
-		/* check the counter for overflow */
+		                                    
 		if (ctr == 0) {
 			mask = 1 << 31;
 		} else {
 			mask = 1 << (ctr - 1);
 		}
 
-		/* read PMOVSR */
+		                 
 		__asm__ volatile ("mrc p15, 0, %0, c9, c12, 3;" : "=r" (PMOVSR));
 
 		if (PMOVSR & mask) {
 			extra = kpc_reload_counter(ctr);
 
 			FIXED_SHADOW(ctr)
-			        += (kpc_fixed_max() - FIXED_RELOAD(ctr) + 1 /* wrap */) + extra;
+			        += (kpc_fixed_max() - FIXED_RELOAD(ctr) + 1           ) + extra;
 
 			if (FIXED_ACTIONID(ctr)) {
 				bool kernel = false;
@@ -283,7 +283,7 @@ kpc_pmi_handler(cpu_id_t source)
 				    FIXED_SHADOW(ctr), pc, kernel ? KPC_KERNEL_PC : 0);
 			}
 
-			/* clear PMOVSR bit */
+			                      
 			__asm__ volatile ("mcr p15, 0, %0, c9, c12, 3;" : : "r" (mask));
 		}
 	}
@@ -316,22 +316,22 @@ get_counter_config(uint32_t counter)
 
 	switch (counter) {
 	case 0:
-		/* Fixed counter accessed via top bit... */
+		                                           
 		counter = 31;
-		/* Write PMSELR.SEL */
+		                      
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (counter));
-		/* Read PMXEVTYPER */
+		                     
 		__asm__ volatile ("mcr p15, 0, %0, c9, c13, 1;" : "=r" (config));
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
-		/* Offset */
+		            
 		counter -= 1;
-		/* Write PMSELR.SEL to select the configurable counter */
+		                                                         
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (counter));
-		/* Read PMXEVTYPER to get the config */
+		                                       
 		__asm__ volatile ("mrc p15, 0, %0, c9, c13, 1;" : "=r" (config));
 		break;
 	default:
@@ -346,18 +346,18 @@ set_counter_config(uint32_t counter, uint64_t config)
 {
 	switch (counter) {
 	case 0:
-		/* Write PMSELR.SEL */
+		                      
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (31));
-		/* Write PMXEVTYPER */
+		                      
 		__asm__ volatile ("mcr p15, 0, %0, c9, c13, 1;" : : "r" (config & 0xFFFFFFFF));
 		break;
 	case 1:
 	case 2:
 	case 3:
 	case 4:
-		/* Write PMSELR.SEL */
+		                      
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (counter - 1));
-		/* Write PMXEVTYPER */
+		                      
 		__asm__ volatile ("mcr p15, 0, %0, c9, c13, 1;" : : "r" (config & 0xFFFFFFFF));
 		break;
 	default:
@@ -365,7 +365,7 @@ set_counter_config(uint32_t counter, uint64_t config)
 	}
 }
 
-/* Common */
+            
 
 void
 kpc_arch_init(void)
@@ -373,7 +373,7 @@ kpc_arch_init(void)
 	uint32_t PMCR;
 	uint32_t event_counters;
 
-	/* read PMOVSR and determine the number of event counters */
+	                                                            
 	__asm__ volatile ("mrc p15, 0, %0, c9, c12, 0;" : "=r" (PMCR));
 	event_counters = (PMCR >> 11) & 0x1F;
 
@@ -447,15 +447,15 @@ kpc_get_configurable_counters(uint64_t *counterv, uint64_t pmc_mask)
 		}
 		ctr = read_counter(i + offset);
 
-		/* check the counter for overflow */
+		                                    
 		mask = 1 << i;
 
-		/* read PMOVSR */
+		                 
 		__asm__ volatile ("mrc p15, 0, %0, c9, c12, 3;" : "=r" (PMOVSR));
 
 		if (PMOVSR & mask) {
 			ctr = CONFIGURABLE_SHADOW(i) +
-			    (kpc_configurable_max() - CONFIGURABLE_RELOAD(i) + 1 /* Wrap */) +
+			    (kpc_configurable_max() - CONFIGURABLE_RELOAD(i) + 1           ) +
 			    ctr;
 		} else {
 			ctr = CONFIGURABLE_SHADOW(i) +
@@ -475,17 +475,17 @@ kpc_get_fixed_counters(uint64_t *counterv)
 	uint32_t mask;
 	uint64_t ctr;
 
-	/* check the counter for overflow */
+	                                    
 	mask = 1 << 31;
 
-	/* read PMOVSR */
+	                 
 	__asm__ volatile ("mrc p15, 0, %0, c9, c12, 3;" : "=r" (PMOVSR));
 
 	ctr = read_counter(0);
 
 	if (PMOVSR & mask) {
 		ctr = FIXED_SHADOW(0) +
-		    (kpc_fixed_max() - FIXED_RELOAD(0) + 1 /* Wrap */) +
+		    (kpc_fixed_max() - FIXED_RELOAD(0) + 1           ) +
 		    (ctr & 0xFFFFFFFF);
 	} else {
 		ctr = FIXED_SHADOW(0) +
@@ -527,7 +527,7 @@ kpc_set_running_arch(struct kpc_running_remote *mp_config)
 		first_time = 0;
 	}
 
-	/* dispatch to all CPUs */
+	                          
 	cpu_broadcast_xcall(&kpc_xcall_sync, TRUE, kpc_set_running_xcall,
 	    mp_config);
 
@@ -547,29 +547,29 @@ save_regs(void)
 
 	__asm__ volatile ("dmb ish");
 
-	/* Clear master enable */
+	                         
 	__asm__ volatile ("mcr p15, 0, %0, c9, c12, 0;" : : "r" (PMCR));
 
-	/* Save individual enable state */
+	                                  
 	__asm__ volatile ("mrc p15, 0, %0, c9, c12, 1;" : "=r" (saved_PMCNTENSET[cpuid]));
 
-	/* Save PMOVSR */
+	                 
 	__asm__ volatile ("mrc p15, 0, %0, c9, c12, 3;" : "=r" (saved_PMOVSR[cpuid]));
 
-	/* Select fixed counter with PMSELR.SEL */
+	                                          
 	__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (31));
-	/* Read PMXEVTYPER */
+	                     
 	__asm__ volatile ("mrc p15, 0, %0, c9, c13, 1;" : "=r" (saved_PMXEVTYPER[cpuid][0]));
 
-	/* Save configurable event selections */
+	                                        
 	for (i = 0; i < 4; i++) {
-		/* Select counter with PMSELR.SEL */
+		                                    
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (i));
-		/* Read PMXEVTYPER */
+		                     
 		__asm__ volatile ("mrc p15, 0, %0, c9, c13, 1;" : "=r" (saved_PMXEVTYPER[cpuid][i + 1]));
 	}
 
-	/* Finally, save count for each counter */
+	                                          
 	for (i = 0; i < 5; i++) {
 		saved_counter[cpuid][i] = read_counter(i);
 	}
@@ -583,12 +583,12 @@ restore_regs(void)
 	uint64_t extra;
 	uint32_t PMCR = 1;
 
-	/* Restore counter values */
+	                            
 	for (i = 0; i < 5; i++) {
-		/* did we overflow? if so handle it now since we won't get a pmi */
+		                                                                   
 		uint32_t mask;
 
-		/* check the counter for overflow */
+		                                    
 		if (i == 0) {
 			mask = 1 << 31;
 		} else {
@@ -598,12 +598,12 @@ restore_regs(void)
 		if (saved_PMOVSR[cpuid] & mask) {
 			extra = kpc_reload_counter(i);
 
-			/*
-			 * CONFIGURABLE_* directly follows FIXED, so we can simply
-			 * increment the index here. Although it's ugly.
-			 */
+			  
+                                                             
+                                                   
+      
 			FIXED_SHADOW(i)
-			        += (kpc_fixed_max() - FIXED_RELOAD(i) + 1 /* Wrap */) + extra;
+			        += (kpc_fixed_max() - FIXED_RELOAD(i) + 1           ) + extra;
 
 			if (FIXED_ACTIONID(i)) {
 				bool kernel = false;
@@ -616,23 +616,23 @@ restore_regs(void)
 		}
 	}
 
-	/* Restore configuration - first, the fixed... */
+	                                                 
 	__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (31));
-	/* Write PMXEVTYPER */
+	                      
 	__asm__ volatile ("mcr p15, 0, %0, c9, c13, 1;" : : "r" (saved_PMXEVTYPER[cpuid][0]));
 
-	/* ...then the configurable */
+	                              
 	for (i = 0; i < 4; i++) {
-		/* Select counter with PMSELR.SEL */
+		                                    
 		__asm__ volatile ("mcr p15, 0, %0, c9, c12, 5;" : : "r" (i));
-		/* Write PMXEVTYPER */
+		                      
 		__asm__ volatile ("mcr p15, 0, %0, c9, c13, 1;" : : "r" (saved_PMXEVTYPER[cpuid][i + 1]));
 	}
 
-	/* Restore enable state */
+	                          
 	__asm__ volatile ("mcr p15, 0, %0, c9, c12, 1;" : : "r" (saved_PMCNTENSET[cpuid]));
 
-	/* Counter master re-enable */
+	                              
 	__asm__ volatile ("mcr p15, 0, %0, c9, c12, 0;" : : "r" (PMCR));
 }
 
@@ -652,37 +652,37 @@ kpc_set_reload_xcall(void *vmp_config)
 	enabled = ml_set_interrupts_enabled(FALSE);
 
 	if ((classes & KPC_CLASS_FIXED_MASK) && kpc_controls_fixed_counters()) {
-		/* update shadow counters */
+		                            
 		kpc_get_fixed_counters(&FIXED_SHADOW(0));
 
-		/* set the new period */
+		                        
 		count = kpc_fixed_count();
 		for (uint32_t i = 0; i < count; ++i) {
 			if (*new_period == 0) {
 				*new_period = kpc_fixed_max();
 			}
 			FIXED_RELOAD(i) = max - *new_period;
-			/* reload the counter if possible */
+			                                    
 			kpc_reload_counter(i);
-			/* next period value */
+			                       
 			new_period++;
 		}
 	}
 
 	if (classes & KPC_CLASS_CONFIGURABLE_MASK) {
-		/*
-		 * Update _all_ shadow counters, this cannot be done for only
-		 * selected PMCs. Otherwise, we would corrupt the configurable
-		 * shadow buffer since the PMCs are muxed according to the pmc
-		 * mask.
-		 */
+		  
+                                                               
+                                                                
+                                                                
+          
+     
 		uint64_t all_cfg_mask = (1ULL << kpc_configurable_count()) - 1;
 		kpc_get_configurable_counters(&CONFIGURABLE_SHADOW(0), all_cfg_mask);
 
-		/* set the new period */
+		                        
 		count = kpc_configurable_count();
 		for (uint32_t i = 0; i < count; ++i) {
-			/* ignore the counter */
+			                        
 			if (((1ULL << i) & mp_config->pmc_mask) == 0) {
 				continue;
 			}
@@ -690,9 +690,9 @@ kpc_set_reload_xcall(void *vmp_config)
 				*new_period = kpc_configurable_max();
 			}
 			CONFIGURABLE_RELOAD(i) = max - *new_period;
-			/* reload the counter */
+			                        
 			kpc_reload_counter(offset + i);
-			/* next period value */
+			                       
 			new_period++;
 		}
 	}
@@ -708,7 +708,7 @@ kpc_set_reload_xcall(void *vmp_config)
 int
 kpc_set_period_arch(struct kpc_config_remote *mp_config)
 {
-	/* dispatch to all CPUs */
+	                          
 	cpu_broadcast_xcall(&kpc_reload_sync, TRUE, kpc_set_reload_xcall, mp_config);
 
 	kpc_configured = 1;
@@ -782,7 +782,7 @@ kpc_set_config_xcall(void *vmp_config)
 int
 kpc_set_config_arch(struct kpc_config_remote *mp_config)
 {
-	/* dispatch to all CPUs */
+	                          
 	cpu_broadcast_xcall(&kpc_config_sync, TRUE, kpc_set_config_xcall, mp_config);
 
 	kpc_configured = 1;
@@ -819,7 +819,7 @@ kpc_get_curcpu_counters_xcall(void *args)
 	offset = cpu_number() * handler->buf_stride;
 	r = kpc_get_curcpu_counters(handler->classes, NULL, &handler->buf[offset]);
 
-	/* number of counters added by this CPU, needs to be atomic  */
+	                                                               
 	os_atomic_add(&(handler->nb_counters), r, relaxed);
 
 	if (os_atomic_dec(&kpc_xread_sync, relaxed) == 0) {
@@ -861,22 +861,22 @@ kpc_get_pmu_version(void)
 int
 kpc_set_sw_inc( uint32_t mask )
 {
-	/* Only works with the configurable counters set to count the increment event (0x0) */
+	                                                                                      
 
-	/* Write to PMSWINC */
+	                      
 	__asm__ volatile ("mcr p15, 0, %0, c9, c12, 4;" : : "r" (mask));
 
 	return 0;
 }
 
-#else /* !ARMA7 */
+#else             
 
-/* no kpc */
+            
 
 void
 kpc_arch_init(void)
 {
-	/* No-op */
+	           
 }
 
 uint32_t
@@ -978,13 +978,13 @@ kpc_set_config_arch(struct kpc_config_remote *mp_config __unused)
 void
 kpc_idle(void)
 {
-	// do nothing
+	             
 }
 
 void
 kpc_idle_exit(void)
 {
-	// do nothing
+	             
 }
 
 int
@@ -1011,9 +1011,9 @@ kpc_get_pmu_version(void)
 
 #endif
 
-/*
- * RAWPMU isn't implemented for any of the 32-bit ARMs.
- */
+  
+                                                       
+   
 
 uint32_t
 kpc_rawpmu_config_count(void)

@@ -29,7 +29,7 @@
 #ifndef _TESTS_KTEST_H
 #define _TESTS_KTEST_H
 
-/* Symbol name prefix */
+                        
 #define T_SYM(sym) ktest_ ## sym
 
 #include <stdarg.h>
@@ -87,25 +87,25 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_SUCCESS 1
 #define T_FAILURE 0
 
-/* Testcase modes */
+                    
 #define T_MAIN 0
 #define T_SETUP 1
 
-/* Testcase result states */
+                            
 #define T_RESULT_PASS 0
 #define T_RESULT_FAIL 1
 #define T_RESULT_UXPASS 2
 #define T_RESULT_XFAIL 3
 
-/* Test result states */
+                        
 #define T_STATE_UNRESOLVED 0
 #define T_STATE_PASS 1
 #define T_STATE_FAIL 2
 #define T_STATE_SETUPFAIL 3
 
-/*
- * Helpers
- */
+  
+          
+   
 
 #define T_TOSTRING_HELPER(x) #x
 #define T_TOSTRING(x) T_TOSTRING_HELPER(x)
@@ -117,7 +117,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 } while(0)
 
 #define T_SET_AUX_VARS do {\
-	/* Only used in userspace lib for now */ \
+	                                         \
 } while(0)
 
 #define T_ASSERTION_CHECK do {\
@@ -143,87 +143,87 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 	T_ASSERTION_CHECK;\
 } while(0)
 
-/*
- * Core functions
- */
+  
+                 
+   
 
-/* Denotes start of testing. All prior output is ignored. */
+                                                            
 #define T_START do {\
 	T_SAVEINFO;\
 	T_SYM(start)();\
 } while(0)
 
-/* Denotes end of testing. All subsequent output is ignored. */
+                                                               
 #define T_FINISH do {\
 	T_SAVEINFO;\
 	T_SYM(finish)();\
 } while(0)
 
-/* Denotes beginning of a test. */
+                                  
 #define T_BEGIN(name) do {\
 	T_SAVEINFO;\
 	T_SYM(testbegin)(name);\
 } while(0)
 
-/* Denotes end of current test. */
+                                  
 #define T_END do {\
 	T_SAVEINFO;\
 	T_SYM(testend)();\
 } while(0)
 
-/* Denotes beginning of a setup section of the current test. */
+                                                               
 #define T_SETUPBEGIN do {\
 	T_SYM(testcase_mode) = T_SETUP;\
 } while(0)
 
-/* Denotes end of the current setup section of the current test. */
+                                                                   
 #define T_SETUPEND do {\
 	T_SYM(testcase_mode) = T_MAIN;\
 } while(0)
 
-/* Denotes end of current test because test was skipped. */
+                                                           
 #define T_SKIP(msg, ...) do {\
 	T_SAVEINFO;\
 	T_SYM(testskip)(msg, ## __VA_ARGS__);\
 } while(0)
 
-/* Returns result of latest testrun. */
+                                       
 #define T_TESTRESULT (T_SYM(test_result))
 
-/* Return result of latest testcase. */
+                                       
 #define T_TESTCASERESULT (T_SYM(testcase_result))
 
-/* Flags the next testcase as expected failure. */
+                                                  
 #define T_EXPECTFAIL do {\
 	T_SYM(expectfail) = 1;\
 } while(0)
 
-/* Only emit output for next testcase if it is a FAIL or UXPASS. */
+                                                                   
 #define T_QUIET do {\
 	T_SYM(quiet) = 1;\
 } while(0)
 
-/* Logs a message. */
+                     
 #define T_LOG(msg, ...) do {\
 	T_SAVEINFO;\
 	T_SYM(log)(msg, ## __VA_ARGS__);\
 } while(0)
 
-/* Explicit pass. */
+                    
 #define T_PASS(msg, ...) do {\
 	T_SAVEINFO;\
 	T_SYM(set_current_msg)(msg, ## __VA_ARGS__);\
 	T_SYM(testcase)(T_SUCCESS);\
 } while(0)
 
-/* Explicit fail. */
+                    
 #define T_FAIL(msg, ...) do {\
 	T_SAVEINFO;\
 	T_SYM(set_current_msg)(msg, ## __VA_ARGS__);\
 	T_SYM(testcase)(T_FAILURE);\
 } while(0)
 
-/* Explicit assert fail. */
+                           
 #define T_ASSERT_FAIL(msg, ...) do {\
 	T_SAVEINFO;\
 	T_SET_AUX_VARS;\
@@ -232,7 +232,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 	T_SYM(assertion_fail)();\
 } while(0)
 
-/* Generic expect. */
+                     
 #define T_EXPECT(expr, msg, ...) do {\
 	T_SAVEINFO;\
 	T_SYM(temp1)._int = (int)(!!(expr));\
@@ -242,17 +242,17 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 	T_SYM(testcase)(T_SYM(temp1)._int);\
 } while(0)
 
-/* Generic assert. */
+                     
 #define T_ASSERT(expr, msg, ...) do {\
 	T_EXPECT(expr, msg, ## __VA_ARGS__);\
 	T_ASSERTION_CHECK;\
 } while(0)
 
-/*
- * Convenience functions
- */
+  
+                        
+   
 
-/* null */
+          
 
 #define T_EXPECT_NOTNULL(expr, msg, ...) do {\
 	T_SAVEINFO;\
@@ -288,9 +288,9 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 	T_ASSERTION_CHECK;\
 } while(0)
 
-/* string */
+            
 
-// TODO: check/truncate inputs
+                              
 #define T_EXPECT_EQ_STR(lhs, rhs, msg, ...) do {\
 	T_SAVEINFO;\
 	T_SYM(temp1)._ptr = (lhs);\
@@ -325,7 +325,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 	T_ASSERTION_CHECK;\
 } while(0)
 
-/* char */
+          
 
 #define T_EXPECT_EQ_CHAR(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_char, "%c", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -353,7 +353,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_CHAR(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_char, "%c", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* unsigned char */
+                   
 
 #define T_EXPECT_EQ_UCHAR(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_uchar, "%c", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -381,7 +381,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_UCHAR(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_uchar, "%c", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* short */
+           
 
 #define T_EXPECT_EQ_SHORT(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_short, "%hi", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -409,7 +409,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_SHORT(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_short, "%hi", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* unsigned short */
+                    
 
 #define T_EXPECT_EQ_USHORT(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_ushort, "%hu", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -437,7 +437,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_USHORT(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_ushort, "%hu", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* int */
+         
 
 #define T_EXPECT_EQ_INT(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_int, "%d", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -465,7 +465,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_INT(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_int, "%d", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* unsigned int */
+                  
 
 #define T_EXPECT_EQ_UINT(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_uint, "%u", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -493,7 +493,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_UINT(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_uint, "%u", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* long */
+          
 
 #define T_EXPECT_EQ_LONG(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_long, "%li", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -521,7 +521,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_LONG(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_long, "%li", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* unsigned long */
+                   
 
 #define T_EXPECT_EQ_ULONG(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_ulong, "%lu", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -549,7 +549,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_ULONG(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_ulong, "%lu", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* long long */
+               
 
 #define T_EXPECT_EQ_LLONG(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_llong, "%lli", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -577,7 +577,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_LLONG(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_llong, "%lli", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* unsigned long long */
+                        
 
 #define T_EXPECT_EQ_ULLONG(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_ullong, "%llu", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -605,7 +605,7 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_ULLONG(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_ullong, "%llu", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/* pointer */
+             
 
 #define T_EXPECT_EQ_PTR(lhs, rhs, msg, ...) \
 	T_EXPECT_BLOCK2(_ptr, "%p", ==, lhs, rhs, msg, ## __VA_ARGS__)
@@ -633,14 +633,14 @@ extern T_SYM(temp) T_SYM(temp1), T_SYM(temp2), T_SYM(temp3);
 #define T_ASSERT_GE_PTR(lhs, rhs, msg, ...) \
 	T_ASSERT_BLOCK2(_ptr, "%p", >=, lhs, rhs, msg, ## __VA_ARGS__)
 
-/*
- * Log a perfdata measurement. For example:
- * T_PERF("name_of_metric", 3234, "nsec", "time since first test run")
- */
+  
+                                           
+                                                                      
+   
 #define T_PERF(metric, value, unit, desc) \
 	do {                                              \
 	        T_SAVEINFO;                               \
 	        T_SYM(perf)(metric, unit, value, desc);   \
 	} while (0)
 
-#endif /* _TESTS_KTEST_H */
+#endif                     

@@ -17,11 +17,11 @@ T_DECL(settimeofday, "check setting and getting time of day",
 	T_ASSERT_POSIX_SUCCESS(ret, "get current time with gettimeofday(2)");
 
 #if TARGET_OS_BRIDGE
-	/*
-	 * bridgeOS is not allowed to set the time -- only the macOS side can.
-	 */
+	  
+                                                                       
+    
 	T_SKIP("bridgeOS is not allowed to call settimeofday(2)");
-#endif /* TARGET_OS_BRIDGE */
+#endif                       
 
 	struct timeval newtime = {};
 	newtime = origtime;
@@ -89,9 +89,9 @@ T_DECL(futimes, "check that futimes updates file times",
 	TIMESPEC_TO_TIMEVAL(&newamtimes[0], &stbuf.st_atimespec);
 	TIMESPEC_TO_TIMEVAL(&newamtimes[1], &stbuf.st_mtimespec);
 
-	/*
-	 * Reading the metadata shouldn't count as an access.
-	 */
+	  
+                                                      
+    
 	T_ASSERT_EQ(amtimes[0].tv_sec, newamtimes[0].tv_sec,
 	    "access time matches what was set");
 	T_ASSERT_EQ(amtimes[1].tv_sec, newamtimes[1].tv_sec,

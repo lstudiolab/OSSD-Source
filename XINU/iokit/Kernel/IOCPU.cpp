@@ -45,7 +45,7 @@ extern void kperf_kernel_configure(char *);
 #include <IOKit/IOCPU.h>
 #include "IOKitKernelInternal.h"
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #include <kern/queue.h>
 #include <kern/sched_prim.h>
@@ -55,14 +55,14 @@ extern "C" void console_resume();
 extern "C" void sched_override_recommended_cores_for_sleep(void);
 extern "C" void sched_restore_recommended_cores_after_sleep(void);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static IOLock *gIOCPUsLock;
 static OSSharedPtr<OSArray> gIOCPUs;
 static OSSharedPtr<const OSSymbol> gIOCPUStateKey;
 static OSSharedPtr<OSString> gIOCPUStateNames[kIOCPUStateCount];
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                       
 
 #if !USE_APPLEARMSMP
 
@@ -84,7 +84,7 @@ IOCPUInitialize(void)
 	    OSString::withCStringNoCopy("Running");
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 kern_return_t
 PE_cpu_start(cpu_id_t target,
@@ -147,7 +147,7 @@ PE_cpu_machine_init(cpu_id_t target, boolean_t bootb)
 	if (!bootb && (targetCPU->getCPUNumber() == (UInt32)master_cpu)) {
 		ml_set_is_quiescing(false);
 	}
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 }
 
 void
@@ -158,7 +158,7 @@ PE_cpu_machine_quiesce(cpu_id_t target)
 	if (targetCPU->getCPUNumber() == (UInt32)master_cpu) {
 		ml_set_is_quiescing(true);
 	}
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 	targetCPU->quiesceCPU();
 }
 
@@ -191,9 +191,9 @@ PE_cpu_perfmon_interrupt_enable(cpu_id_t target, boolean_t enable)
 }
 #endif
 
-#endif /* !USE_APPLEARMSMP */
+#endif                       
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #define super IOService
 
@@ -207,7 +207,7 @@ OSMetaClassDefineReservedUnused(IOCPU, 5);
 OSMetaClassDefineReservedUnused(IOCPU, 6);
 OSMetaClassDefineReservedUnused(IOCPU, 7);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #if !USE_APPLEARMSMP
 void
@@ -238,24 +238,24 @@ IOCPUSleepKernel(void)
 	integer_t old_pri;
 	thread_t self = current_thread();
 
-	/*
-	 * We need to boost this thread's priority to the maximum kernel priority to
-	 * ensure we can urgently preempt ANY thread currently executing on the
-	 * target CPU.  Note that realtime threads have their own mechanism to eventually
-	 * demote their priority below MAXPRI_KERNEL if they hog the CPU for too long.
-	 */
+	  
+                                                                             
+                                                                        
+                                                                                  
+                                                                               
+    
 	old_pri = thread_kern_get_pri(self);
 	thread_kern_set_pri(self, thread_kern_get_kernel_maxpri());
 
-	// Sleep the CPUs.
+	                  
 	ml_set_is_quiescing(true);
 	cnt = numCPUs;
 	while (cnt--) {
 		target = OSDynamicCast(IOCPU, gIOCPUs->getObject(cnt));
 
-		// We make certain that the bootCPU is the last to sleep
-		// We'll skip it for now, and halt it after finishing the
-		// non-boot CPU's.
+		                                                        
+		                                                         
+		                  
 		if (target->getCPUNumber() == (UInt32)master_cpu) {
 			bootCPU = target;
 		} else if (target->getCPUState() == kIOCPUStateRunning) {
@@ -274,18 +274,18 @@ IOCPUSleepKernel(void)
 	rootDomain->tracePoint( kIOPMTracePointSleepPlatformDriver );
 	rootDomain->stop_watchdog_timer();
 
-	/*
-	 * Now sleep the boot CPU, including calling the kQueueQuiesce actions.
-	 * The system sleeps here.
-	 */
+	  
+                                                                        
+                           
+    
 
 	bootCPU->haltCPU();
 	ml_set_is_quiescing(false);
 
-	/*
-	 * The system is now coming back from sleep on the boot CPU.
-	 * The kQueueActive actions have already been called.
-	 */
+	  
+                                                             
+                                                      
+    
 
 	rootDomain->start_watchdog_timer();
 	rootDomain->tracePoint( kIOPMTracePointWakePlatformActions );
@@ -295,11 +295,11 @@ IOCPUSleepKernel(void)
 	IOPlatformActionsPostResume();
 	rootDomain->tracePoint( kIOPMTracePointWakeCPUs );
 
-	// Wake the other CPUs.
+	                       
 	for (cnt = 0; cnt < numCPUs; cnt++) {
 		target = OSDynamicCast(IOCPU, gIOCPUs->getObject(cnt));
 
-		// Skip the already-woken boot CPU.
+		                                   
 		if (target->getCPUNumber() != (UInt32)master_cpu) {
 			if (target->getCPUState() == kIOCPUStateRunning) {
 				panic("Spurious wakeup of cpu %u", (unsigned int)(target->getCPUNumber()));
@@ -324,13 +324,13 @@ is_IOCPU_disabled(void)
 {
 	return false;
 }
-#else /* !USE_APPLEARMSMP */
+#else                       
 static bool
 is_IOCPU_disabled(void)
 {
 	return true;
 }
-#endif /* !USE_APPLEARMSMP */
+#endif                       
 
 bool
 IOCPU::start(IOService *provider)
@@ -350,7 +350,7 @@ IOCPU::start(IOService *provider)
 	gIOCPUs->setObject(this);
 	IOLockUnlock(gIOCPUsLock);
 
-	// Correct the bus, cpu and timebase frequencies in the device tree.
+	                                                                    
 	if (gPEClockFrequencyInfo.bus_frequency_hz < 0x100000000ULL) {
 		OSSharedPtr<OSData> busFrequency = OSData::withBytesNoCopy((void *)&gPEClockFrequencyInfo.bus_clock_rate_hz, 4);
 		provider->setProperty("bus-frequency", busFrequency.get());
@@ -458,28 +458,28 @@ IOCPU::setProperties(OSObject *properties)
 }
 
 void
-IOCPU::signalCPU(IOCPU */*target*/)
+IOCPU::signalCPU(IOCPU *          )
 {
 }
 
 void
 IOCPU::signalCPUDeferred(IOCPU *target)
 {
-	// Our CPU may not support deferred IPIs,
-	// so send a regular IPI by default
+	                                         
+	                                   
 	signalCPU(target);
 }
 
 void
-IOCPU::signalCPUCancel(IOCPU */*target*/)
+IOCPU::signalCPUCancel(IOCPU *          )
 {
-	// Meant to cancel signals sent by
-	// signalCPUDeferred; unsupported
-	// by default
+	                                  
+	                                 
+	             
 }
 
 void
-IOCPU::enableCPUTimeBase(bool /*enable*/)
+IOCPU::enableCPUTimeBase(bool           )
 {
 }
 
@@ -529,7 +529,7 @@ IOCPU::getMachProcessor(void)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #undef super
 #define super IOInterruptController
@@ -544,7 +544,7 @@ OSMetaClassDefineReservedUnused(IOCPUInterruptController, 5);
 
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOCPUInterruptController::initCPUInterruptController(int sources)
@@ -570,7 +570,7 @@ IOCPUInterruptController::initCPUInterruptController(int sources, int cpus)
 	}
 	bzero(vectors, numSources * sizeof(IOInterruptVector));
 
-	// Allocate a lock for each vector
+	                                  
 	for (cnt = 0; cnt < numSources; cnt++) {
 		vectors[cnt].interruptLock = IOLockAlloc();
 		if (vectors[cnt].interruptLock == NULL) {
@@ -610,7 +610,7 @@ IOCPUInterruptController::setCPUInterruptProperties(IOService *service)
 		return;
 	}
 
-	// Create the interrupt specifer array.
+	                                       
 	specifier = OSArray::withCapacity(numSources);
 	for (cnt = 0; cnt < numSources; cnt++) {
 		tmpLong = cnt;
@@ -618,13 +618,13 @@ IOCPUInterruptController::setCPUInterruptProperties(IOService *service)
 		specifier->setObject(tmpData.get());
 	}
 
-	// Create the interrupt controller array.
+	                                         
 	controller = OSArray::withCapacity(numSources);
 	for (cnt = 0; cnt < numSources; cnt++) {
 		controller->setObject(gPlatformInterruptControllerName);
 	}
 
-	// Put the two arrays into the property table.
+	                                              
 	service->setProperty(gIOInterruptControllersKey, controller.get());
 	service->setProperty(gIOInterruptSpecifiersKey, specifier.get());
 }
@@ -658,7 +658,7 @@ IOCPUInterruptController::registerInterrupt(IOService *nub,
 {
 	IOInterruptVector *vector;
 
-	// Interrupts must be enabled, as this can allocate memory.
+	                                                           
 	assert(ml_get_interrupts_enabled() == TRUE);
 
 	if (source >= numSources) {
@@ -667,23 +667,23 @@ IOCPUInterruptController::registerInterrupt(IOService *nub,
 
 	vector = &vectors[source];
 
-	// Get the lock for this vector.
+	                                
 	IOTakeLock(vector->interruptLock);
 
-	// Make sure the vector is not in use.
+	                                      
 	if (vector->interruptRegistered) {
 		IOUnlock(vector->interruptLock);
 		return kIOReturnNoResources;
 	}
 
-	// Fill in vector with the client's info.
+	                                         
 	vector->handler = handler;
 	vector->nub     = nub;
 	vector->source  = source;
 	vector->target  = target;
 	vector->refCon  = refCon;
 
-	// Get the vector ready.  It starts hard disabled.
+	                                                  
 	vector->interruptDisabledHard = 1;
 	vector->interruptDisabledSoft = 1;
 	vector->interruptRegistered   = 1;
@@ -703,8 +703,8 @@ IOCPUInterruptController::registerInterrupt(IOService *nub,
 }
 
 IOReturn
-IOCPUInterruptController::getInterruptType(IOService */*nub*/,
-    int /*source*/,
+IOCPUInterruptController::getInterruptType(IOService *       ,
+    int           ,
     int *interruptType)
 {
 	if (interruptType == NULL) {
@@ -717,32 +717,32 @@ IOCPUInterruptController::getInterruptType(IOService */*nub*/,
 }
 
 IOReturn
-IOCPUInterruptController::enableInterrupt(IOService */*nub*/,
-    int /*source*/)
+IOCPUInterruptController::enableInterrupt(IOService *       ,
+    int           )
 {
-//  ml_set_interrupts_enabled(true);
+                                    
 	return kIOReturnSuccess;
 }
 
 IOReturn
-IOCPUInterruptController::disableInterrupt(IOService */*nub*/,
-    int /*source*/)
+IOCPUInterruptController::disableInterrupt(IOService *       ,
+    int           )
 {
-//  ml_set_interrupts_enabled(false);
+                                     
 	return kIOReturnSuccess;
 }
 
 IOReturn
-IOCPUInterruptController::causeInterrupt(IOService */*nub*/,
-    int /*source*/)
+IOCPUInterruptController::causeInterrupt(IOService *       ,
+    int           )
 {
 	ml_cause_interrupt();
 	return kIOReturnSuccess;
 }
 
 IOReturn
-IOCPUInterruptController::handleInterrupt(void */*refCon*/,
-    IOService */*nub*/,
+IOCPUInterruptController::handleInterrupt(void *          ,
+    IOService *       ,
     int source)
 {
 	IOInterruptVector *vector;
@@ -759,4 +759,4 @@ IOCPUInterruptController::handleInterrupt(void */*refCon*/,
 	return kIOReturnSuccess;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           

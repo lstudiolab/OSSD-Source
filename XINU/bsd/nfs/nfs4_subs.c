@@ -29,9 +29,9 @@
 #include <nfs/nfs_conf.h>
 #if CONFIG_NFS_CLIENT
 
-/*
- * miscellaneous support functions for NFSv4
- */
+  
+                                            
+   
 #include <sys/param.h>
 #include <sys/proc.h>
 #include <sys/kauth.h>
@@ -73,43 +73,43 @@
 #include <net/kpi_interface.h>
 
 #if CONFIG_NFS4
-/*
- * NFS_MAX_WHO is the maximum length of a string representation used
- * in as an ace who, owner, or group. There is no explicit limit in the
- * protocol, however the kauth routines have a limit of MAPATHLEN for
- * strings including the trailing null character, so we impose that
- * limit. This should be changed if kauth routines change.
- *
- * We also want some reasonable maximum, as 32 bits worth of string length
- * is liable to cause problems. At the very least this limit must guarantee
- * that any express that contains the 32 bit length from off the wire used in
- * allocations does not overflow.
- */
+  
+                                                                    
+                                                                       
+                                                                     
+                                                                   
+                                                          
+  
+                                                                          
+                                                                           
+                                                                             
+                                 
+   
 #define NFS_MAX_WHO     MAXPATHLEN
 
-/*
- * Create the unique client ID to use for this mount.
- *
- * Format: unique ID + en0_address + server_address + mntfromname + mntonname
- *
- * We could possibly use one client ID for all mounts of the same server;
- * however, that would complicate some aspects of state management.
- *
- * Each mount socket connection sends a SETCLIENTID.  If the ID is the same but
- * the verifier (mounttime) changes, then all previous (mounts') state gets dropped.
- *
- * State is typically managed per-mount and in order to keep it that way
- * each mount needs to use a separate client ID.  However, we also need to
- * make sure that each mount uses the same client ID each time.
- *
- * In an attempt to differentiate mounts we include the mntfromname and mntonname
- * strings to the client ID (as long as they fit).  We also make sure that the
- * value does not conflict with any existing values in use (changing the unique ID).
- *
- * Note that info such as the server's address may change over the lifetime of the
- * mount.  But the client ID will not be updated because we don't want it changing
- * simply because we switched to a different server address.
- */
+  
+                                                     
+  
+                                                                             
+  
+                                                                         
+                                                                   
+  
+                                                                               
+                                                                                    
+  
+                                                                        
+                                                                          
+                                                               
+  
+                                                                                 
+                                                                              
+                                                                                    
+  
+                                                                                  
+                                                                                  
+                                                            
+   
 int
 nfs4_init_clientid(struct nfsmount *nmp)
 {
@@ -184,7 +184,7 @@ nfs4_init_clientid(struct nfsmount *nmp)
 		}
 	}
 
-	/* make sure the ID is unique, and add it to the sorted list */
+	                                                               
 	lck_mtx_lock(&nfs_global_mutex);
 	TAILQ_FOREACH(ncip2, &nfsclientids, nci_link) {
 		if (ncip->nci_idlen > ncip2->nci_idlen) {
@@ -225,9 +225,9 @@ nfs4_init_clientid(struct nfsmount *nmp)
 	return 0;
 }
 
-/*
- * NFSv4 SETCLIENTID
- */
+  
+                    
+   
 int
 nfs4_setclientid(struct nfsmount *nmp)
 {
@@ -255,18 +255,18 @@ nfs4_setclientid(struct nfsmount *nmp)
 		error = nfs4_init_clientid(nmp);
 	}
 
-	// SETCLIENTID
+	              
 	numops = 1;
 	nfsm_chain_build_alloc_init(error, &nmreq, 14 * NFSX_UNSIGNED + nmp->nm_longid->nci_idlen);
 	nfsm_chain_add_compound_header(error, &nmreq, "setclid", nmp->nm_minor_vers, numops);
 	numops--;
 	nfsm_chain_add_32(error, &nmreq, NFS_OP_SETCLIENTID);
-	/* nfs_client_id4  client; */
+	                             
 	nfsm_chain_add_64(error, &nmreq, nmp->nm_mounttime);
 	nfsm_chain_add_32(error, &nmreq, nmp->nm_longid->nci_idlen);
 	nfsm_chain_add_opaque(error, &nmreq, nmp->nm_longid->nci_id, nmp->nm_longid->nci_idlen);
 	nfsmout_if(error);
-	/* cb_client4      callback; */
+	                               
 	if (!NMFLAG(nmp, NOCALLBACK) && nmp->nm_cbid && nfs4_cb_port &&
 	    !sock_getsockname(nmp->nm_nso->nso_so, (struct sockaddr*)&ss, sizeof(ss))) {
 		if (ss.ss_family == AF_INET) {
@@ -280,32 +280,32 @@ nfs4_setclientid(struct nfsmount *nmp)
 			nfsmout_if(error);
 		}
 		if (sinaddr && port && (inet_ntop(ss.ss_family, sinaddr, raddr, sizeof(raddr)) == raddr)) {
-			/* assemble r_addr = universal address (nmp->nm_nso->nso_so source IP addr + port) */
+			                                                                                     
 			ualen = snprintf(uaddr, sizeof(uaddr), "%s.%d.%d", raddr,
 			    ((port >> 8) & 0xff),
 			    (port & 0xff));
-			/* make sure it fit, give up if it didn't */
+			                                            
 			if (ualen >= (int)sizeof(uaddr)) {
 				ualen = 0;
 			}
 		}
 	}
 	if (ualen > 0) {
-		/* add callback info */
-		nfsm_chain_add_32(error, &nmreq, NFS4_CALLBACK_PROG); /* callback program */
+		                       
+		nfsm_chain_add_32(error, &nmreq, NFS4_CALLBACK_PROG);                       
 		if (ss.ss_family == AF_INET) {
-			nfsm_chain_add_string(error, &nmreq, "tcp", 3); /* callback r_netid */
+			nfsm_chain_add_string(error, &nmreq, "tcp", 3);                       
 		} else if (ss.ss_family == AF_INET6) {
-			nfsm_chain_add_string(error, &nmreq, "tcp6", 4); /* callback r_netid */
+			nfsm_chain_add_string(error, &nmreq, "tcp6", 4);                       
 		}
-		nfsm_chain_add_string(error, &nmreq, uaddr, ualen); /* callback r_addr */
-		nfsm_chain_add_32(error, &nmreq, nmp->nm_cbid); /* callback_ident */
+		nfsm_chain_add_string(error, &nmreq, uaddr, ualen);                      
+		nfsm_chain_add_32(error, &nmreq, nmp->nm_cbid);                     
 	} else {
-		/* don't provide valid callback info */
-		nfsm_chain_add_32(error, &nmreq, 0); /* callback program */
-		nfsm_chain_add_string(error, &nmreq, "", 0); /* callback r_netid */
-		nfsm_chain_add_string(error, &nmreq, "", 0); /* callback r_addr */
-		nfsm_chain_add_32(error, &nmreq, 0); /* callback_ident */
+		                                       
+		nfsm_chain_add_32(error, &nmreq, 0);                       
+		nfsm_chain_add_string(error, &nmreq, "", 0);                       
+		nfsm_chain_add_string(error, &nmreq, "", 0);                      
+		nfsm_chain_add_32(error, &nmreq, 0);                     
 	}
 	nfsm_chain_build_done(error, &nmreq);
 	nfsm_assert(error, (numops == 0), EPROTO);
@@ -326,7 +326,7 @@ nfs4_setclientid(struct nfsmount *nmp)
 	nfsm_chain_cleanup(&nmreq);
 	nfsm_chain_cleanup(&nmrep);
 
-	// SETCLIENTID_CONFIRM
+	                      
 	numops = 1;
 	nfsm_chain_build_alloc_init(error, &nmreq, 15 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "setclid_conf", nmp->nm_minor_vers, numops);
@@ -352,8 +352,8 @@ nfs4_setclientid(struct nfsmount *nmp)
 
 	nfsmout_if(error || !nmp->nm_dnp);
 
-	/* take the opportunity to refresh fs attributes too */
-	// PUTFH, GETATTR(FS)
+	                                                       
+	                     
 	numops = 2;
 	nfsm_chain_build_alloc_init(error, &nmreq, 23 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "setclid_attr", nmp->nm_minor_vers, numops);
@@ -378,7 +378,7 @@ nfs4_setclientid(struct nfsmount *nmp)
 		error = nfs4_parsefattr(&nmrep, &nmp->nm_fsattr, NULL, NULL, NULL, NULL);
 	}
 	lck_mtx_unlock(&nmp->nm_lock);
-	if (error) { /* ignore any error from the getattr */
+	if (error) {                                        
 		error = 0;
 	}
 nfsmout:
@@ -391,9 +391,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * renew/check lease state on server
- */
+  
+                                    
+   
 int
 nfs4_renew(struct nfsmount *nmp, int rpcflag)
 {
@@ -408,7 +408,7 @@ nfs4_renew(struct nfsmount *nmp, int rpcflag)
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// RENEW
+	        
 	numops = 1;
 	nfsm_chain_build_alloc_init(error, &nmreq, 8 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "renew", nmp->nm_minor_vers, numops);
@@ -431,9 +431,9 @@ nfsmout:
 }
 
 
-/*
- * periodic timer to renew lease state on server
- */
+  
+                                                
+   
 void
 nfs4_renew_timer(void *param0, __unused void *param1)
 {
@@ -471,18 +471,18 @@ out:
 	lck_mtx_unlock(&nmp->nm_lock);
 }
 
-/*
- * get the list of supported security flavors
- *
- * How we get them depends on what args we are given:
- *
- * FH?   Name?  Action
- * ----- -----  ------
- * YES   YES    Use the fh and name provided
- * YES   NO     4.1-only just use the fh provided
- * NO    YES    Use the node's (or root) fh and the name provided
- * NO    NO     Use the node's parent and the node's name (4.1 will just use node's fh)
- */
+  
+                                             
+  
+                                                     
+  
+                      
+                      
+                                            
+                                                 
+                                                                 
+                                                                                       
+   
 int
 nfs4_secinfo_rpc(struct nfsmount *nmp, struct nfsreq_secinfo_args *siap, kauth_cred_t cred, uint32_t *sec, int *seccountp)
 {
@@ -513,7 +513,7 @@ nfs4_secinfo_rpc(struct nfsmount *nmp, struct nfsreq_secinfo_args *siap, kauth_c
 		namelen = strlen(name);
 	}
 	if (!fhp && name) {
-		if (!np) { /* use PUTROOTFH */
+		if (!np) {                    
 			goto gotargs;
 		}
 		fhp = np->n_fhp;
@@ -528,10 +528,10 @@ nfs4_secinfo_rpc(struct nfsmount *nmp, struct nfsreq_secinfo_args *siap, kauth_c
 	}
 	nfs_node_lock_force(np);
 	if ((vnode_vtype(NFSTOV(np)) != VDIR) && np->n_sillyrename) {
-		/*
-		 * The node's been sillyrenamed, so we need to use
-		 * the sillyrename directory/name to do the open.
-		 */
+		  
+                                                    
+                                                   
+     
 		struct nfs_sillyrename *nsp = np->n_sillyrename;
 		dnp = nsp->nsr_dnp;
 		dvp = NFSTOV(dnp);
@@ -545,12 +545,12 @@ nfs4_secinfo_rpc(struct nfsmount *nmp, struct nfsreq_secinfo_args *siap, kauth_c
 		name = nsp->nsr_name;
 		namelen = nsp->nsr_namlen;
 	} else {
-		/*
-		 * [sigh] We can't trust VFS to get the parent right for named
-		 * attribute nodes.  (It likes to reparent the nodes after we've
-		 * created them.)  Luckily we can probably get the right parent
-		 * from the n_parent we have stashed away.
-		 */
+		  
+                                                                
+                                                                  
+                                                                 
+                                            
+     
 		if ((np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR) &&
 		    (((dvp = np->n_parent)) && (error = vnode_get(dvp)))) {
 			dvp = NULL;
@@ -575,7 +575,7 @@ nfs4_secinfo_rpc(struct nfsmount *nmp, struct nfsreq_secinfo_args *siap, kauth_c
 	nfs_node_unlock(np);
 
 gotargs:
-	// PUT(ROOT)FH + SECINFO
+	                        
 	numops = 2;
 	nfsm_chain_build_alloc_init(error, &nmreq,
 	    4 * NFSX_UNSIGNED + NFSX_FH(nfsvers) + nfsm_rndup(namelen));
@@ -612,12 +612,12 @@ nfsmout:
 	}
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-/*
- * Parse an NFSv4 SECINFO array to an array of pseudo flavors.
- * (Note: also works for MOUNTv3 security arrays.)
- */
+  
+                                                              
+                                                  
+   
 int
 nfsm_chain_get_secinfo(struct nfsm_chain *nmc, uint32_t *sec, int *seccountp)
 {
@@ -644,27 +644,27 @@ nfsm_chain_get_secinfo(struct nfsm_chain *nmc, uint32_t *sec, int *seccountp)
 		case RPCAUTH_KRB5:
 		case RPCAUTH_KRB5I:
 		case RPCAUTH_KRB5P:
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 			sec[seccount++] = flavor;
 			break;
 #if CONFIG_NFS_GSS
 		case RPCSEC_GSS:
-			/* we only recognize KRB5, KRB5I, KRB5P */
-			nfsm_chain_get_32(error, nmc, val); /* OID length */
+			                                          
+			nfsm_chain_get_32(error, nmc, val);                 
 			nfsmout_if(error);
 			if (val != sizeof(krb5_mech_oid)) {
 				nfsm_chain_adv(error, nmc, val);
 				nfsm_chain_adv(error, nmc, 2 * NFSX_UNSIGNED);
 				break;
 			}
-			nfsm_chain_get_opaque(error, nmc, val, oid); /* OID bytes */
+			nfsm_chain_get_opaque(error, nmc, val, oid);                
 			nfsmout_if(error);
 			if (bcmp(oid, krb5_mech_oid, sizeof(krb5_mech_oid))) {
 				nfsm_chain_adv(error, nmc, 2 * NFSX_UNSIGNED);
 				break;
 			}
-			nfsm_chain_get_32(error, nmc, val); /* QOP */
-			nfsm_chain_get_32(error, nmc, val); /* SERVICE */
+			nfsm_chain_get_32(error, nmc, val);          
+			nfsm_chain_get_32(error, nmc, val);              
 			nfsmout_if(error);
 			switch (val) {
 			case RPCSEC_GSS_SVC_NONE:
@@ -678,7 +678,7 @@ nfsm_chain_get_secinfo(struct nfsm_chain *nmc, uint32_t *sec, int *seccountp)
 				break;
 			}
 			break;
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 		}
 		srvcount--;
 	}
@@ -690,9 +690,9 @@ nfsmout:
 }
 
 #if CONFIG_NFS4
-/*
- * Fetch the FS_LOCATIONS attribute for the node found at directory/name.
- */
+  
+                                                                         
+   
 int
 nfs4_get_fs_locations(
 	struct nfsmount *nmp,
@@ -759,10 +759,10 @@ nfsmout:
 	return error;
 }
 
-/*
- * Referral trigger nodes may not have many attributes provided by the
- * server, so put some default values in place.
- */
+  
+                                                                      
+                                               
+   
 void
 nfs4_default_attrs_for_referral_trigger(
 	nfsnode_t dnp,
@@ -831,7 +831,7 @@ nfs4_default_attrs_for_referral_trigger(
 		nvap->nva_fileid = 42;
 	}
 	if (!NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_FILEHANDLE) && dnp && name && fhp) {
-		/* Build a fake filehandle made up of parent node pointer and name */
+		                                                                     
 		NFS_BITMAP_SET(nvap->nva_bitmap, NFS_FATTR_FILEHANDLE);
 		bcopy(&dnp, &fhp->fh_data[0], sizeof(dnp));
 		len = sizeof(fhp->fh_data) - sizeof(dnp);
@@ -843,9 +843,9 @@ nfs4_default_attrs_for_referral_trigger(
 	}
 }
 
-/*
- * Set NFS bitmap according to what's set in vnode_attr (and supported by the server).
- */
+  
+                                                                                      
+   
 void
 nfs_vattr_set_bitmap(struct nfsmount *nmp, uint32_t *bitmap, struct vnode_attr *vap)
 {
@@ -862,7 +862,7 @@ nfs_vattr_set_bitmap(struct nfsmount *nmp, uint32_t *bitmap, struct vnode_attr *
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_ARCHIVE);
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_HIDDEN);
 	}
-	// NFS_BITMAP_SET(bitmap, NFS_FATTR_MIMETYPE)
+	                                             
 	if (VATTR_IS_ACTIVE(vap, va_mode) && !NMFLAG(nmp, ACLONLY)) {
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_MODE);
 	}
@@ -872,7 +872,7 @@ nfs_vattr_set_bitmap(struct nfsmount *nmp, uint32_t *bitmap, struct vnode_attr *
 	if (VATTR_IS_ACTIVE(vap, va_gid) || VATTR_IS_ACTIVE(vap, va_guuid)) {
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_OWNER_GROUP);
 	}
-	// NFS_BITMAP_SET(bitmap, NFS_FATTR_SYSTEM)
+	                                           
 	if (vap->va_vaflags & VA_UTIMES_NULL) {
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_TIME_ACCESS_SET);
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_TIME_MODIFY_SET);
@@ -890,15 +890,15 @@ nfs_vattr_set_bitmap(struct nfsmount *nmp, uint32_t *bitmap, struct vnode_attr *
 	if (VATTR_IS_ACTIVE(vap, va_create_time)) {
 		NFS_BITMAP_SET(bitmap, NFS_FATTR_TIME_CREATE);
 	}
-	/* and limit to what is supported by server */
+	                                              
 	for (i = 0; i < NFS_ATTR_BITMAP_LEN; i++) {
 		bitmap[i] &= nmp->nm_fsattr.nfsa_supp_attr[i];
 	}
 }
 
-/*
- * Convert between NFSv4 and VFS ACE types
- */
+  
+                                          
+   
 uint32_t
 nfs4_ace_nfstype_to_vfstype(uint32_t nfsacetype, int *errorp)
 {
@@ -933,9 +933,9 @@ nfs4_ace_vfstype_to_nfstype(uint32_t vfstype, int *errorp)
 	return 0;
 }
 
-/*
- * Convert between NFSv4 and VFS ACE flags
- */
+  
+                                          
+   
 uint32_t
 nfs4_ace_nfsflags_to_vfsflags(uint32_t nfsflags)
 {
@@ -996,9 +996,9 @@ nfs4_ace_vfsflags_to_nfsflags(uint32_t vfsflags)
 	return nfsflags;
 }
 
-/*
- * Convert between NFSv4 ACE access masks and VFS access rights
- */
+  
+                                                               
+   
 uint32_t
 nfs4_ace_nfsmask_to_vfsrights(uint32_t nfsmask)
 {
@@ -1140,11 +1140,11 @@ nfs4_ace_vfsrights_to_nfsmask(uint32_t vfsrights)
 	return nfsmask;
 }
 
-/*
- * nfs4_wkid2sidd::
- *	 mapid a wellknown identity to guid.
- * Return 0 on success ENOENT if id does not map and EINVAL if the id is not a well known name.
- */
+  
+                   
+                                       
+                                                                                               
+   
 static int
 nfs4_wkid2sid(const char *id, ntsid_t *sp)
 {
@@ -1158,47 +1158,47 @@ nfs4_wkid2sid(const char *id, ntsid_t *sp)
 	sp->sid_kind = 1;
 	sp->sid_authcount = 1;
 	if (!strcmp(id, "OWNER@")) {
-		// S-1-3-0
+		          
 		sp->sid_authority[5] = 3;
 		sp->sid_authorities[0] = 0;
 	} else if (!strcmp(id, "GROUP@")) {
-		// S-1-3-1
+		          
 		sp->sid_authority[5] = 3;
 		sp->sid_authorities[0] = 1;
 	} else if (!strcmp(id, "EVERYONE@")) {
-		// S-1-1-0
+		          
 		sp->sid_authority[5] = 1;
 		sp->sid_authorities[0] = 0;
 	} else if (!strcmp(id, "INTERACTIVE@")) {
-		// S-1-5-4
+		          
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 4;
 	} else if (!strcmp(id, "NETWORK@")) {
-		// S-1-5-2
+		          
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 2;
 	} else if (!strcmp(id, "DIALUP@")) {
-		// S-1-5-1
+		          
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 1;
 	} else if (!strcmp(id, "BATCH@")) {
-		// S-1-5-3
+		          
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 3;
 	} else if (!strcmp(id, "ANONYMOUS@")) {
-		// S-1-5-7
+		          
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 7;
 	} else if (!strcmp(id, "AUTHENTICATED@")) {
-		// S-1-5-11
+		           
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 11;
 	} else if (!strcmp(id, "SERVICE@")) {
-		// S-1-5-6
+		          
 		sp->sid_authority[5] = 5;
 		sp->sid_authorities[0] = 6;
 	} else {
-		// S-1-0-0 "NOBODY"
+		                   
 		sp->sid_authority[5] = 0;
 		sp->sid_authorities[0] = 0;
 	}
@@ -1209,8 +1209,8 @@ static int
 nfs4_fallback_name(const char *id, int have_at)
 {
 	if (have_at) {
-		/* must be user@domain */
-		/* try to identify some well-known IDs */
+		                         
+		                                         
 		if (!strncmp(id, "root@", 5)) {
 			return 0;
 		} else if (!strncmp(id, "wheel@", 6)) {
@@ -1263,28 +1263,28 @@ nfs4_map_domain(char *id, char **atp)
 	otw_id_2_at_len = at - id + 1;
 
 	dsnode = zalloc(ZV_NAMEI);
-	/* first try to map nfs4 domain to dsnode for scoped lookups */
+	                                                               
 	error = kauth_cred_nfs4domain2dsnode(otw_nfs4domain, dsnode);
 	if (!error) {
-		/* Success! Make new id be id@dsnode */
+		                                       
 		size_t dsnode_len = strnlen(dsnode, MAXPATHLEN);
 		size_t new_id_len = otw_id_2_at_len + dsnode_len + 1;
 		char tmp;
 
 		MALLOC(new_id, char*, new_id_len, M_TEMP, M_WAITOK);
 		tmp = *otw_nfs4domain;
-		*otw_nfs4domain = '\0';  /* Chop of the old domain */
+		*otw_nfs4domain = '\0';                              
 		strlcpy(new_id, id, MAXPATHLEN);
-		*otw_nfs4domain = tmp;  /* Be nice and preserve callers original id */
+		*otw_nfs4domain = tmp;                                                
 		strlcat(new_id, dsnode, MAXPATHLEN);
 		at = strchr(new_id, '@');
 	} else {
-		/* Bummer:-( See if default nfs4 set for unscoped lookup */
+		                                                           
 		size_t default_domain_len = strnlen(nfs4_default_domain, MAXPATHLEN);
 
 		if ((otw_domain_len == default_domain_len) &&
 		    (strncmp(otw_nfs4domain, nfs4_default_domain, otw_domain_len) == 0)) {
-			/* Woohoo! We have matching domains, do unscoped lookups */
+			                                                           
 			*at = '\0';
 		}
 	}
@@ -1298,13 +1298,13 @@ nfs4_map_domain(char *id, char **atp)
 	return new_id;
 }
 
-/*
- * Map an NFSv4 ID string to a VFS guid.
- *
- * Try to use the ID mapping service... but we may fallback to trying to do it ourselves.
- */
+  
+                                        
+  
+                                                                                         
+   
 int
-nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
+nfs4_id2guid(          char *id, guid_t *guidp, int isgroup)
 {
 	int  error = 0;
 	ntsid_t sid;
@@ -1313,11 +1313,11 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 
 	*guidp = kauth_null_guid;
 
-	/*
-	 * First check if it is just a simple numeric ID string or a special "XXX@" name.
-	 * If it's a number, there's no need trying to ask the IDMAP service to map it.
-	 * If it's a special "XXX@" name, we want to make sure to treat it as a group.
-	 */
+	  
+                                                                                  
+                                                                                
+                                                                               
+    
 	num = 1;
 	at = NULL;
 	p = id;
@@ -1332,7 +1332,7 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 	}
 
 	if (num) {
-		/* must be numeric ID (or empty) */
+		                                   
 		num = *id ? strtol(id, NULL, 10) : -2;
 		if (isgroup) {
 			error = kauth_cred_gid2guid((gid_t)num, guidp);
@@ -1343,7 +1343,7 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 		return error;
 	}
 
-	/* See if this is a well known NFSv4 name */
+	                                            
 	error = nfs4_wkid2sid(id, &sid);
 	if (!error) {
 		error = kauth_cred_ntsid2guid(&sid, guidp);
@@ -1351,7 +1351,7 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 		return error;
 	}
 
-	/* Handle nfs4 domain first */
+	                              
 	if (at && at[1]) {
 		new_id = nfs4_map_domain(id, &at);
 		if (new_id) {
@@ -1359,13 +1359,13 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 		}
 	}
 
-	/* Now try to do actual id mapping */
+	                                     
 	if (nfs_idmap_ctrl & NFS_IDMAP_CTRL_USE_IDMAP_SERVICE) {
-		/*
-		 * Ask the ID mapping service to map the ID string to a GUID.
-		 *
-		 * [sigh] this isn't a "pwnam/grnam" it's an NFS ID string!
-		 */
+		  
+                                                               
+    
+                                                             
+     
 		if (isgroup) {
 			error = kauth_cred_grnam2guid(id, guidp);
 		} else {
@@ -1377,9 +1377,9 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 	}
 
 	if (error) {
-		/*
-		 * fallback path... see if we can come up with an answer ourselves.
-		 */
+		  
+                                                                     
+     
 		num = nfs4_fallback_name(id, at != NULL);
 		if (isgroup) {
 			error = kauth_cred_gid2guid((gid_t)num, guidp);
@@ -1390,12 +1390,12 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 	}
 
 
-	/* restore @ symbol in case we clobered for unscoped lookup */
+	                                                              
 	if (at && *at == '\0') {
 		*at = '@';
 	}
 
-	/* free mapped domain id string */
+	                                  
 	if (new_id) {
 		FREE(new_id, M_TEMP);
 	}
@@ -1403,46 +1403,46 @@ nfs4_id2guid(/*const*/ char *id, guid_t *guidp, int isgroup)
 	return error;
 }
 
-/*
- * nfs4_sid2wkid:
- *	 mapid a wellknown identity to guid.
- * returns well known name for the sid or NULL if sid does not map.
- */
+  
+                 
+                                       
+                                                                   
+   
 #define MAXWELLKNOWNID 18
 
 static const char*
 nfs4_sid2wkid(ntsid_t *sp)
 {
 	if ((sp->sid_kind == 1) && (sp->sid_authcount == 1)) {
-		/* check if it's one of our well-known ACE WHO names */
+		                                                       
 		if (sp->sid_authority[5] == 0) {
-			if (sp->sid_authorities[0] == 0) { // S-1-0-0
+			if (sp->sid_authorities[0] == 0) {           
 				return "nobody@localdomain";
 			}
 		} else if (sp->sid_authority[5] == 1) {
-			if (sp->sid_authorities[0] == 0) { // S-1-1-0
+			if (sp->sid_authorities[0] == 0) {           
 				return "EVERYONE@";
 			}
 		} else if (sp->sid_authority[5] == 3) {
-			if (sp->sid_authorities[0] == 0) { // S-1-3-0
+			if (sp->sid_authorities[0] == 0) {           
 				return "OWNER@";
-			} else if (sp->sid_authorities[0] == 1) { // S-1-3-1
+			} else if (sp->sid_authorities[0] == 1) {           
 				return "GROUP@";
 			}
 		} else if (sp->sid_authority[5] == 5) {
-			if (sp->sid_authorities[0] == 1) { // S-1-5-1
+			if (sp->sid_authorities[0] == 1) {           
 				return "DIALUP@";
-			} else if (sp->sid_authorities[0] == 2) { // S-1-5-2
+			} else if (sp->sid_authorities[0] == 2) {           
 				return "NETWORK@";
-			} else if (sp->sid_authorities[0] == 3) { // S-1-5-3
+			} else if (sp->sid_authorities[0] == 3) {           
 				return "BATCH@";
-			} else if (sp->sid_authorities[0] == 4) { // S-1-5-4
+			} else if (sp->sid_authorities[0] == 4) {           
 				return "INTERACTIVE@";
-			} else if (sp->sid_authorities[0] == 6) { // S-1-5-6
+			} else if (sp->sid_authorities[0] == 6) {           
 				return "SERVICE@";
-			} else if (sp->sid_authorities[0] == 7) { // S-1-5-7
+			} else if (sp->sid_authorities[0] == 7) {           
 				return "ANONYMOUS@";
-			} else if (sp->sid_authorities[0] == 11) { // S-1-5-11
+			} else if (sp->sid_authorities[0] == 11) {            
 				return "AUTHENTICATED@";
 			}
 		}
@@ -1514,9 +1514,9 @@ nfs4_addv4domain(char *id, size_t *idlen)
 			mapped_domain = nfs4_default_domain;
 		}
 		if (domain_len) {
-			/* chop off id after the '@' */
+			                               
 			at[1] = '\0';
-			/* Add our mapped_domain */
+			                           
 			idsize = strlcat(id, mapped_domain, *idlen);
 			if (*idlen > idsize) {
 				*idlen = idsize;
@@ -1526,11 +1526,11 @@ nfs4_addv4domain(char *id, size_t *idlen)
 		}
 		NFS_ZFREE(ZV_NAMEI, nfs4domain);
 	} else if (at == NULL) {
-		/*
-		 * If we didn't find an 'at' then cp points to the end of id passed in.
-		 * and if we have a nfs4_default_domain set. Try to append the
-		 * default domain if we have root or set ENOSPC.
-		 */
+		  
+                                                                         
+                                                                
+                                                  
+     
 		size_t default_domain_len = strnlen(nfs4_default_domain, MAXPATHLEN);
 
 		if (default_domain_len) {
@@ -1542,7 +1542,7 @@ nfs4_addv4domain(char *id, size_t *idlen)
 				error = ENOSPC;
 			}
 		} else {
-			; /* Unscoped name otw */
+			;                        
 		}
 	}
 
@@ -1559,7 +1559,7 @@ nfs4_fallback_id(int numid, int isgrp, char *buf, size_t size)
 	const char *idp = NULL;
 
 	if (!(nfs_idmap_ctrl & NFS_IDMAP_CTRL_FALLBACK_NO_COMMON_IDS)) {
-		/* map well known uid's to strings */
+		                                     
 		if (numid == 0) {
 			idp = isgrp ? "wheel" : "root";
 		} else if (numid == -2) {
@@ -1567,7 +1567,7 @@ nfs4_fallback_id(int numid, int isgrp, char *buf, size_t size)
 		}
 	}
 	if (!idp) {
-		/* or just use a decimal number string. */
+		                                          
 		snprintf(buf, size - 1, "%d", numid);
 		buf[size - 1] = '\0';
 	} else {
@@ -1580,11 +1580,11 @@ nfs4_fallback_id(int numid, int isgrp, char *buf, size_t size)
 	return buf;
 }
 
-/*
- * Map a VFS guid to an NFSv4 ID string.
- *
- * Try to use the ID mapping service... but we may fallback to trying to do it ourselves.
- */
+  
+                                        
+  
+                                                                                         
+   
 int
 nfs4_guid2id(guid_t *guidp, char *id, size_t *idlen, int isgroup)
 {
@@ -1597,9 +1597,9 @@ nfs4_guid2id(guid_t *guidp, char *id, size_t *idlen, int isgroup)
 	id1buf = id1 = NULL;
 	id1len = 0;
 
-	/*
-	 * See if our guid maps to a well known NFSv4 name
-	 */
+	  
+                                                   
+    
 	error = kauth_cred_guid2ntsid(guidp, &sid);
 	if (!error) {
 		const char *wkid = nfs4_sid2wkid(&sid);
@@ -1616,17 +1616,17 @@ nfs4_guid2id(guid_t *guidp, char *id, size_t *idlen, int isgroup)
 	}
 
 	if (nfs_idmap_ctrl & NFS_IDMAP_CTRL_USE_IDMAP_SERVICE) {
-		/*
-		 * Ask the ID mapping service to map the GUID to an ID string.
-		 *
-		 * [sigh] this isn't a "pwnam" it's an NFS id string!
-		 */
+		  
+                                                                
+    
+                                                       
+     
 
-		/*
-		 * Stupid kauth_cred_guid2pwnam() function requires that the buffer
-		 * be at least MAXPATHLEN bytes long even though most if not all ID
-		 * strings will be much much shorter than that.
-		 */
+		  
+                                                                     
+                                                                     
+                                                 
+     
 
 		if (*idlen < MAXPATHLEN) {
 			id1buf = zalloc(ZV_NAMEI);
@@ -1650,12 +1650,12 @@ nfs4_guid2id(guid_t *guidp, char *id, size_t *idlen, int isgroup)
 	}
 
 	if (error) {
-		/*
-		 * fallback path... see if we can come up with an answer ourselves.
-		 */
+		  
+                                                                     
+     
 		uid_t uid;
 
-		/* OK, let's just try mapping it to a UID/GID */
+		                                                
 		if (isgroup) {
 			error = kauth_cred_guid2gid(guidp, (gid_t*)&uid);
 		} else {
@@ -1675,7 +1675,7 @@ nfs4_guid2id(guid_t *guidp, char *id, size_t *idlen, int isgroup)
 
 	if (!error) {
 		if (id1 != id) {
-			/* copy idmap result to output buffer */
+			                                        
 			len = strlcpy(id, id1, *idlen);
 			if (len >= *idlen) {
 				error = ENOSPC;
@@ -1693,16 +1693,16 @@ nfs4_guid2id(guid_t *guidp, char *id, size_t *idlen, int isgroup)
 	return error;
 }
 
-/*
- * Set a vnode attr's supported bits according to the given bitmap
- */
+  
+                                                                  
+   
 void
 nfs_vattr_set_supported(uint32_t *bitmap, struct vnode_attr *vap)
 {
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TYPE)) {
 		VATTR_SET_SUPPORTED(vap, va_type);
 	}
-	// if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_CHANGE))
+	                                                  
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_SIZE)) {
 		VATTR_SET_SUPPORTED(vap, va_data_size);
 	}
@@ -1721,7 +1721,7 @@ nfs_vattr_set_supported(uint32_t *bitmap, struct vnode_attr *vap)
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_HIDDEN)) {
 		VATTR_SET_SUPPORTED(vap, va_flags);
 	}
-	// if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_MIMETYPE))
+	                                                    
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_MODE)) {
 		VATTR_SET_SUPPORTED(vap, va_mode);
 	}
@@ -1742,7 +1742,7 @@ nfs_vattr_set_supported(uint32_t *bitmap, struct vnode_attr *vap)
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_SPACE_USED)) {
 		VATTR_SET_SUPPORTED(vap, va_total_alloc);
 	}
-	// if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_SYSTEM))
+	                                                  
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_ACCESS)) {
 		VATTR_SET_SUPPORTED(vap, va_access_time);
 	}
@@ -1760,10 +1760,10 @@ nfs_vattr_set_supported(uint32_t *bitmap, struct vnode_attr *vap)
 	}
 }
 
-/*
- * Parse the attributes that are in the mbuf list and store them in
- * the given structures.
- */
+  
+                                                                   
+                        
+   
 int
 nfs4_parsefattr(
 	struct nfsm_chain *nmc,
@@ -1786,7 +1786,7 @@ nfs4_parsefattr(
 	struct nfs_fs_locations nfsls_dummy;
 	struct sockaddr_storage ss;
 
-	/* if not interested in some values... throw 'em into a local dummy variable */
+	                                                                               
 	if (!nfsap) {
 		nfsap = &nfsa_dummy;
 	}
@@ -1809,7 +1809,7 @@ nfs4_parsefattr(
 
 	len = NFS_ATTR_BITMAP_LEN;
 	nfsm_chain_get_bitmap(error, nmc, bitmap, len);
-	/* add bits to object/fs attr bitmaps */
+	                                        
 	for (i = 0; i < NFS_ATTR_BITMAP_LEN; i++) {
 		nvap->nva_bitmap[i] |= bitmap[i] & nfs_object_attr_bitmap[i];
 		nfsap->nfsa_bitmap[i] |= bitmap[i] & nfs_fs_attr_bitmap[i];
@@ -1899,7 +1899,7 @@ nfs4_parsefattr(
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_RDATTR_ERROR)) {
 		nfsm_chain_get_32(error, nmc, rderror);
 		attrbytes -= NFSX_UNSIGNED;
-		if (!rderror) { /* no error */
+		if (!rderror) {               
 			NFS_BITMAP_CLR(bitmap, NFS_FATTR_RDATTR_ERROR);
 			NFS_BITMAP_CLR(nvap->nva_bitmap, NFS_FATTR_RDATTR_ERROR);
 		}
@@ -1907,7 +1907,7 @@ nfs4_parsefattr(
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_ACL)) {
 		error2 = 0;
 		ace_type = ace_flags = ace_mask = 0;
-		nfsm_chain_get_32(error, nmc, val); /* ACE count */
+		nfsm_chain_get_32(error, nmc, val);                
 		if (!error && (val > KAUTH_ACL_MAX_ENTRIES)) {
 			error = EOVERFLOW;
 		}
@@ -1937,7 +1937,7 @@ nfs4_parsefattr(
 					s = sbuf;
 					slen = sizeof(sbuf);
 				}
-				/* Let's add a bit more if we can to the allocation as to try and avoid future allocations */
+				                                                                                             
 				MALLOC(s, char*, (len + 16 < NFS_MAX_WHO) ? len + 16 : NFS_MAX_WHO, M_TEMP, M_WAITOK);
 				if (s) {
 					slen = (len + 16 < NFS_MAX_WHO) ? len + 16 : NFS_MAX_WHO;
@@ -1968,10 +1968,10 @@ nfs4_parsefattr(
 		}
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_ACLSUPPORT)) {
-		/*
-		 * Support ACLs if: the server supports DENY/ALLOC ACEs and
-		 * (just to be safe) FATTR_ACL is in the supported list too.
-		 */
+		  
+                                                             
+                                                              
+     
 		nfsm_chain_get_32(error, nmc, val);
 		if ((val & (NFS_ACL_SUPPORT_ALLOW_ACL | NFS_ACL_SUPPORT_DENY_ACL)) &&
 		    NFS_BITMAP_ISSET(nfsap->nfsa_supp_attr, NFS_FATTR_ACL)) {
@@ -1981,7 +1981,7 @@ nfs4_parsefattr(
 		}
 		attrbytes -= NFSX_UNSIGNED;
 	}
-	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_ARCHIVE)) { /* SF_ARCHIVED */
+	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_ARCHIVE)) {                  
 		nfsm_chain_get_32(error, nmc, val);
 		if (val) {
 			nvap->nva_flags |= NFS_FFLAG_ARCHIVED;
@@ -2062,11 +2062,11 @@ nfs4_parsefattr(
 		struct nfs_fs_server *fss;
 		struct nfs_fs_path *fsp;
 
-		/* get root pathname */
+		                       
 		fsp = &nfslsp->nl_root;
-		nfsm_chain_get_32(error, nmc, fsp->np_compcount); /* component count */
+		nfsm_chain_get_32(error, nmc, fsp->np_compcount);                      
 		attrbytes -= NFSX_UNSIGNED;
-		/* sanity check component count */
+		                                  
 		if (!error && (fsp->np_compcount > MAXPATHLEN)) {
 			error = EBADRPC;
 		}
@@ -2078,14 +2078,14 @@ nfs4_parsefattr(
 			}
 		}
 		for (comp = 0; comp < fsp->np_compcount; comp++) {
-			nfsm_chain_get_32(error, nmc, val); /* component length */
-			/* sanity check component length */
+			nfsm_chain_get_32(error, nmc, val);                       
+			                                   
 			if (!error && (val == 0)) {
-				/*
-				 * Apparently some people think a path with zero components should
-				 * be encoded with one zero-length component.  So, just ignore any
-				 * zero length components.
-				 */
+				  
+                                                                      
+                                                                      
+                              
+       
 				comp--;
 				fsp->np_compcount--;
 				if (fsp->np_compcount == 0) {
@@ -2104,12 +2104,12 @@ nfs4_parsefattr(
 				error = ENOMEM;
 			}
 			nfsmout_if(error);
-			nfsm_chain_get_opaque(error, nmc, val, fsp->np_components[comp]); /* component */
+			nfsm_chain_get_opaque(error, nmc, val, fsp->np_components[comp]);                
 			attrbytes -= NFSX_UNSIGNED + nfsm_rndup(val);
 		}
-		nfsm_chain_get_32(error, nmc, nfslsp->nl_numlocs); /* fs location count */
+		nfsm_chain_get_32(error, nmc, nfslsp->nl_numlocs);                        
 		attrbytes -= NFSX_UNSIGNED;
-		/* sanity check location count */
+		                                 
 		if (!error && (nfslsp->nl_numlocs > 256)) {
 			error = EBADRPC;
 		}
@@ -2128,9 +2128,9 @@ nfs4_parsefattr(
 				error = ENOMEM;
 			}
 			nfslsp->nl_locations[loc] = fsl;
-			nfsm_chain_get_32(error, nmc, fsl->nl_servcount); /* server count */
+			nfsm_chain_get_32(error, nmc, fsl->nl_servcount);                   
 			attrbytes -= NFSX_UNSIGNED;
-			/* sanity check server count */
+			                               
 			if (!error && ((fsl->nl_servcount < 1) || (fsl->nl_servcount > 256))) {
 				error = EBADRPC;
 			}
@@ -2146,8 +2146,8 @@ nfs4_parsefattr(
 					error = ENOMEM;
 				}
 				fsl->nl_servers[serv] = fss;
-				nfsm_chain_get_32(error, nmc, val); /* server name length */
-				/* sanity check server name length */
+				nfsm_chain_get_32(error, nmc, val);                         
+				                                     
 				if (!error && ((val < 1) || (val > MAXPATHLEN))) {
 					error = EINVAL;
 				}
@@ -2156,10 +2156,10 @@ nfs4_parsefattr(
 				if (!fss->ns_name) {
 					error = ENOMEM;
 				}
-				nfsm_chain_get_opaque(error, nmc, val, fss->ns_name); /* server name */
+				nfsm_chain_get_opaque(error, nmc, val, fss->ns_name);                  
 				attrbytes -= NFSX_UNSIGNED + nfsm_rndup(val);
 				nfsmout_if(error);
-				/* copy name to address if it converts to a sockaddr */
+				                                                       
 				if (nfs_uaddr2sockaddr(fss->ns_name, (struct sockaddr*)&ss)) {
 					fss->ns_addrcount = 1;
 					MALLOC(fss->ns_addresses, char **, sizeof(char *), M_TEMP, M_WAITOK | M_ZERO);
@@ -2175,11 +2175,11 @@ nfs4_parsefattr(
 					strlcpy(fss->ns_addresses[0], fss->ns_name, val + 1);
 				}
 			}
-			/* get pathname */
+			                  
 			fsp = &fsl->nl_path;
-			nfsm_chain_get_32(error, nmc, fsp->np_compcount); /* component count */
+			nfsm_chain_get_32(error, nmc, fsp->np_compcount);                      
 			attrbytes -= NFSX_UNSIGNED;
-			/* sanity check component count */
+			                                  
 			if (!error && (fsp->np_compcount > MAXPATHLEN)) {
 				error = EINVAL;
 			}
@@ -2191,14 +2191,14 @@ nfs4_parsefattr(
 				}
 			}
 			for (comp = 0; comp < fsp->np_compcount; comp++) {
-				nfsm_chain_get_32(error, nmc, val); /* component length */
-				/* sanity check component length */
+				nfsm_chain_get_32(error, nmc, val);                       
+				                                   
 				if (!error && (val == 0)) {
-					/*
-					 * Apparently some people think a path with zero components should
-					 * be encoded with one zero-length component.  So, just ignore any
-					 * zero length components.
-					 */
+					  
+                                                                       
+                                                                       
+                               
+        
 					comp--;
 					fsp->np_compcount--;
 					if (fsp->np_compcount == 0) {
@@ -2216,13 +2216,13 @@ nfs4_parsefattr(
 				if (!fsp->np_components[comp]) {
 					error = ENOMEM;
 				}
-				nfsm_chain_get_opaque(error, nmc, val, fsp->np_components[comp]); /* component */
+				nfsm_chain_get_opaque(error, nmc, val, fsp->np_components[comp]);                
 				attrbytes -= NFSX_UNSIGNED + nfsm_rndup(val);
 			}
 		}
 		nfsm_assert(error, (attrbytes >= 0), EBADRPC);
 	}
-	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_HIDDEN)) { /* UF_HIDDEN */
+	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_HIDDEN)) {                
 		nfsm_chain_get_32(error, nmc, val);
 		if (val) {
 			nvap->nva_flags |= NFS_FFLAG_HIDDEN;
@@ -2232,7 +2232,7 @@ nfs4_parsefattr(
 		attrbytes -= NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_HOMOGENEOUS)) {
-		/* XXX If NOT homogeneous, we may need to clear flags on the mount */
+		                                                                     
 		nfsm_chain_get_32(error, nmc, val);
 		if (val) {
 			nfsap->nfsa_flags |= NFS_FSFLAG_HOMOGENEOUS;
@@ -2306,7 +2306,7 @@ nfs4_parsefattr(
 				s = sbuf;
 				slen = sizeof(sbuf);
 			}
-			/* Let's add a bit more if we can to the allocation as to try and avoid future allocations */
+			                                                                                             
 			MALLOC(s, char*, (len + 16 < NFS_MAX_WHO) ? len + 16 : NFS_MAX_WHO, M_TEMP, M_WAITOK);
 			if (s) {
 				slen = (len + 16 < NFS_MAX_WHO) ? len + 16 : NFS_MAX_WHO;
@@ -2322,7 +2322,7 @@ nfs4_parsefattr(
 				error = kauth_cred_guid2uid(&nvap->nva_uuuid, &nvap->nva_uid);
 			}
 			if (error) {
-				/* unable to get either GUID or UID, set to default */
+				                                                      
 				nvap->nva_uid = (uid_t)(-2);
 				if (nfs_idmap_ctrl & NFS_IDMAP_CTRL_LOG_FAILED_MAPPINGS) {
 					printf("nfs4_parsefattr: owner %s is no one, no %s?, error %d\n", s,
@@ -2345,7 +2345,7 @@ nfs4_parsefattr(
 				s = sbuf;
 				slen = sizeof(sbuf);
 			}
-			/* Let's add a bit more if we can to the allocation as to try and avoid future allocations */
+			                                                                                             
 			MALLOC(s, char*, (len + 16 < NFS_MAX_WHO) ? len + 16 : NFS_MAX_WHO, M_TEMP, M_WAITOK);
 			if (s) {
 				slen = (len + 16 < NFS_MAX_WHO) ? len + 16 : NFS_MAX_WHO;
@@ -2361,7 +2361,7 @@ nfs4_parsefattr(
 				error = kauth_cred_guid2gid(&nvap->nva_guuid, &nvap->nva_gid);
 			}
 			if (error) {
-				/* unable to get either GUID or GID, set to default */
+				                                                      
 				nvap->nva_gid = (gid_t)(-2);
 				if (nfs_idmap_ctrl & NFS_IDMAP_CTRL_LOG_FAILED_MAPPINGS) {
 					printf("nfs4_parsefattr: group %s is no one, no %s?, error %d\n", s,
@@ -2407,7 +2407,7 @@ nfs4_parsefattr(
 		attrbytes -= 2 * NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_SYSTEM)) {
-		/* we'd support this if we had a flag to map it to... */
+		                                                        
 		nfsm_chain_adv(error, nmc, NFSX_UNSIGNED);
 		attrbytes -= NFSX_UNSIGNED;
 	}
@@ -2417,7 +2417,7 @@ nfs4_parsefattr(
 		attrbytes -= 3 * NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_ACCESS_SET)) {
-		nfsm_chain_adv(error, nmc, 4 * NFSX_UNSIGNED); /* just skip it */
+		nfsm_chain_adv(error, nmc, 4 * NFSX_UNSIGNED);                   
 		attrbytes -= 4 * NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_BACKUP)) {
@@ -2430,7 +2430,7 @@ nfs4_parsefattr(
 		nfsm_chain_get_32(error, nmc, nvap->nva_timensec[NFSTIME_CREATE]);
 		attrbytes -= 3 * NFSX_UNSIGNED;
 	}
-	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_DELTA)) { /* skip for now */
+	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_DELTA)) {                   
 		nfsm_chain_adv(error, nmc, 3 * NFSX_UNSIGNED);
 		attrbytes -= 3 * NFSX_UNSIGNED;
 	}
@@ -2445,19 +2445,19 @@ nfs4_parsefattr(
 		attrbytes -= 3 * NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_MODIFY_SET)) {
-		nfsm_chain_adv(error, nmc, 4 * NFSX_UNSIGNED); /* just skip it */
+		nfsm_chain_adv(error, nmc, 4 * NFSX_UNSIGNED);                   
 		attrbytes -= 4 * NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_MOUNTED_ON_FILEID)) {
 #if CONFIG_TRIGGERS
-		/* we prefer the mounted on file ID, so just replace the fileid */
+		                                                                  
 		nfsm_chain_get_64(error, nmc, nvap->nva_fileid);
 #else
 		nfsm_chain_adv(error, nmc, 2 * NFSX_UNSIGNED);
 #endif
 		attrbytes -= 2 * NFSX_UNSIGNED;
 	}
-	/* advance over any leftover attrbytes */
+	                                         
 	nfsm_assert(error, (attrbytes >= 0), EBADRPC);
 	nfsm_chain_adv(error, nmc, nfsm_rndup(attrbytes));
 nfsmout:
@@ -2467,7 +2467,7 @@ nfsmout:
 	if (!error && rderror) {
 		error = rderror;
 	}
-	/* free up temporary resources */
+	                                 
 	if (s && (s != sbuf)) {
 		FREE(s, M_TEMP);
 	}
@@ -2482,9 +2482,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * Add an NFSv4 "sattr" structure to an mbuf chain
- */
+  
+                                                  
+   
 int
 nfsm_chain_add_fattr4_f(struct nfsm_chain *nmc, struct vnode_attr *vap, struct nfsmount *nmp)
 {
@@ -2499,14 +2499,14 @@ nfsm_chain_add_fattr4_f(struct nfsm_chain *nmc, struct vnode_attr *vap, struct n
 	s = sbuf;
 	slen = sizeof(sbuf);
 
-	/* First calculate the bitmap... */
+	                                   
 	nfs_vattr_set_bitmap(nmp, bitmap, vap);
 
-	/*
-	 * Now pack it all together:
-	 *     BITMAP, #BYTES, ATTRS
-	 * Keep a pointer to the length so we can set it later.
-	 */
+	  
+                             
+                             
+                                                        
+    
 	nfsm_chain_add_bitmap(error, nmc, bitmap, NFS_ATTR_BITMAP_LEN);
 	attrbytes = 0;
 	nfsm_chain_add_32(error, nmc, attrbytes);
@@ -2563,14 +2563,14 @@ nfsm_chain_add_fattr4_f(struct nfsm_chain *nmc, struct vnode_attr *vap, struct n
 		nfsm_chain_add_32(error, nmc, (vap->va_flags & UF_HIDDEN) ? 1 : 0);
 		attrbytes += NFSX_UNSIGNED;
 	}
-	// NFS_BITMAP_ISSET(bitmap, NFS_FATTR_MIMETYPE)
+	                                               
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_MODE)) {
 		nfsm_chain_add_32(error, nmc, vap->va_mode);
 		attrbytes += NFSX_UNSIGNED;
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_OWNER)) {
 		nfsmout_if(error);
-		/* if we have va_uuuid use it, otherwise use uid */
+		                                                   
 		if (!VATTR_IS_ACTIVE(vap, va_uuuid)) {
 			error = kauth_cred_uid2guid(vap->va_uid, &vap->va_uuuid);
 			nfsmout_if(error);
@@ -2596,7 +2596,7 @@ nfsm_chain_add_fattr4_f(struct nfsm_chain *nmc, struct vnode_attr *vap, struct n
 	}
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_OWNER_GROUP)) {
 		nfsmout_if(error);
-		/* if we have va_guuid use it, otherwise use gid */
+		                                                   
 		if (!VATTR_IS_ACTIVE(vap, va_guuid)) {
 			error = kauth_cred_gid2guid(vap->va_gid, &vap->va_guuid);
 			nfsmout_if(error);
@@ -2620,7 +2620,7 @@ nfsm_chain_add_fattr4_f(struct nfsm_chain *nmc, struct vnode_attr *vap, struct n
 		nfsm_chain_add_name(error, nmc, s, len, nmp);
 		attrbytes += NFSX_UNSIGNED + nfsm_rndup(len);
 	}
-	// NFS_BITMAP_SET(bitmap, NFS_FATTR_SYSTEM)
+	                                           
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_TIME_ACCESS_SET)) {
 		if (vap->va_vaflags & VA_UTIMES_NULL) {
 			nfsm_chain_add_32(error, nmc, NFS4_TIME_SET_TO_SERVER);
@@ -2654,7 +2654,7 @@ nfsm_chain_add_fattr4_f(struct nfsm_chain *nmc, struct vnode_attr *vap, struct n
 		}
 	}
 	nfsmout_if(error);
-	/* Now, set the attribute data length */
+	                                        
 	*pattrbytes = txdr_unsigned(attrbytes);
 nfsmout:
 	if (s && (s != sbuf)) {
@@ -2662,12 +2662,12 @@ nfsmout:
 	}
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-/*
- * Got the given error and need to start recovery (if not already started).
- * Note: nmp must be locked!
- */
+  
+                                                                           
+                            
+   
 void
 nfs_need_recover(struct nfsmount *nmp, int error)
 {
@@ -2685,14 +2685,14 @@ nfs_need_recover(struct nfsmount *nmp, int error)
 }
 
 #if CONFIG_NFS4
-/*
- * After recovery due to state expiry, check each node and
- * drop any lingering delegation we thought we had.
- *
- * If a node has an open that is not lost and is not marked
- * for reopen, then we hold onto any delegation because it is
- * likely newly-granted.
- */
+  
+                                                          
+                                                   
+  
+                                                           
+                                                             
+                        
+   
 static void
 nfs4_expired_check_delegation(nfsnode_t np, vfs_context_t ctx)
 {
@@ -2716,8 +2716,8 @@ nfs4_expired_check_delegation(nfsnode_t np, vfs_context_t ctx)
 		if (nofp->nof_flags & NFS_OPEN_FILE_REOPEN) {
 			continue;
 		}
-		/* we have an open that is not lost and not marked for reopen */
-		// XXX print out what's keeping this node from dropping the delegation.
+		                                                                
+		                                                                       
 		NP(nofp->nof_np, "nfs4_expired_check_delegation: !drop: opencnt %d flags 0x%x access %d %d mmap %d %d",
 		    nofp->nof_opencnt, nofp->nof_flags,
 		    nofp->nof_access, nofp->nof_deny,
@@ -2727,9 +2727,9 @@ nfs4_expired_check_delegation(nfsnode_t np, vfs_context_t ctx)
 	}
 
 	if (drop) {
-		/* need to drop a delegation */
+		                               
 		if (np->n_dreturn.tqe_next != NFSNOLIST) {
-			/* remove this node from the delegation return list */
+			                                                      
 			lck_mtx_lock(&nmp->nm_lock);
 			if (np->n_dreturn.tqe_next != NFSNOLIST) {
 				TAILQ_REMOVE(&nmp->nm_dreturnq, np, n_dreturn);
@@ -2752,13 +2752,13 @@ nfs4_expired_check_delegation(nfsnode_t np, vfs_context_t ctx)
 
 	lck_mtx_unlock(&np->n_openlock);
 }
-#endif /* CONFIG_NFS4*/
+#endif                 
 
-/*
- * Recover state for an NFS mount.
- *
- * Iterates over all open files, reclaiming opens and lock state.
- */
+  
+                                  
+  
+                                                                 
+   
 void
 nfs_recover(struct nfsmount *nmp)
 {
@@ -2777,10 +2777,10 @@ nfs_recover(struct nfsmount *nmp)
 restart:
 	error = 0;
 	lck_mtx_lock(&nmp->nm_lock);
-	/*
-	 * First, wait for the state inuse count to go to zero so
-	 * we know there are no state operations in progress.
-	 */
+	  
+                                                          
+                                                      
+    
 	do {
 		if ((error = nfs_sigintr(nmp, NULL, NULL, 1))) {
 			break;
@@ -2825,15 +2825,15 @@ restart:
 	printf("nfs recovery started for %s, 0x%x\n", vfs_statfs(nmp->nm_mountp)->f_mntfromname, nmp->nm_stategenid);
 	lck_mtx_unlock(&nmp->nm_lock);
 
-	/* for each open owner... */
+	                            
 	TAILQ_FOREACH(noop, &nmp->nm_open_owners, noo_link) {
-		/* for each of its opens... */
+		                              
 		TAILQ_FOREACH(nofp, &noop->noo_opens, nof_oolink) {
 			if (!nofp->nof_access || (nofp->nof_flags & NFS_OPEN_FILE_LOST) || (nofp->nof_np->n_flag & NREVOKE)) {
 				continue;
 			}
 			lost = reopen = 0;
-			/* for NFSv2/v3, just skip straight to lock reclaim */
+			                                                      
 			if (nmp->nm_vers < NFS_VER4) {
 				goto reclaim_locks;
 			}
@@ -2856,9 +2856,9 @@ restart:
 			if (!error && nofp->nof_r_dw) {
 				error = nfs4_open_reclaim_rpc(nofp, NFS_OPEN_SHARE_ACCESS_READ, NFS_OPEN_SHARE_DENY_WRITE);
 			}
-			/*
-			 * deny-none opens with no locks can just be reopened (later) if reclaim fails.
-			 */
+			  
+                                                                                  
+      
 			if (!error && nofp->nof_rw) {
 				error = nfs4_open_reclaim_rpc(nofp, NFS_OPEN_SHARE_ACCESS_BOTH, NFS_OPEN_SHARE_DENY_NONE);
 				if ((error == NFSERR_ADMIN_REVOKED) || (error == NFSERR_EXPIRED) || (error == NFSERR_NO_GRACE)) {
@@ -2881,11 +2881,11 @@ restart:
 				}
 			}
 
-			/*
-			 * If we hold delegated state but we don't have any non-delegated opens,
-			 * then we should attempt to claim that state now (but don't return the
-			 * delegation unless asked to).
-			 */
+			  
+                                                                           
+                                                                          
+                                  
+      
 			if ((nofp->nof_d_rw_drw || nofp->nof_d_w_drw || nofp->nof_d_r_drw ||
 			    nofp->nof_d_rw_dw || nofp->nof_d_w_dw || nofp->nof_d_r_dw ||
 			    nofp->nof_d_rw || nofp->nof_d_w || nofp->nof_d_r) &&
@@ -2898,22 +2898,22 @@ restart:
 						reopen = EAGAIN;
 					}
 					nfs_open_state_clear_busy(nofp->nof_np);
-					/* if claim didn't go well, we may need to return delegation now */
+					                                                                   
 					if (nofp->nof_np->n_openflags & N_DELEG_RETURN) {
 						nfs4_delegation_return(nofp->nof_np, R_RECOVER, thd, noop->noo_cred);
 						if (!(nmp->nm_sockflags & NMSOCK_READY)) {
-							error = ETIMEDOUT;  /* looks like we need a reconnect */
+							error = ETIMEDOUT;                                      
 						}
 					}
 				}
 			}
 
-			/*
-			 * Handle any issue claiming open state.
-			 * Potential reopens need to first confirm that there are no locks.
-			 */
+			  
+                                           
+                                                                      
+      
 			if (error || reopen) {
-				/* restart recovery? */
+				                       
 				if ((error == ETIMEDOUT) || nfs_mount_state_error_should_restart(error)) {
 					if (error == ETIMEDOUT) {
 						nfs_need_reconnect(nmp);
@@ -2924,14 +2924,14 @@ restart:
 					goto restart;
 				}
 				if (reopen && (nfs_check_for_locks(noop, nofp) == 0)) {
-					/* just reopen the file on next access */
+					                                         
 					NP(nofp->nof_np, "nfs_recover: %d, need reopen for %d %p 0x%x", reopen,
 					    kauth_cred_getuid(noop->noo_cred), nofp->nof_np, nofp->nof_np->n_flag);
 					lck_mtx_lock(&nofp->nof_lock);
 					nofp->nof_flags |= NFS_OPEN_FILE_REOPEN;
 					lck_mtx_unlock(&nofp->nof_lock);
 				} else {
-					/* open file state lost */
+					                          
 					if (reopen) {
 						NP(nofp->nof_np, "nfs_recover: %d, can't reopen because of locks %d %p", reopen,
 						    kauth_cred_getuid(noop->noo_cred), nofp->nof_np);
@@ -2941,16 +2941,16 @@ restart:
 					reopen = 0;
 				}
 			} else {
-				/* no error, so make sure the reopen flag isn't set */
+				                                                      
 				lck_mtx_lock(&nofp->nof_lock);
 				nofp->nof_flags &= ~NFS_OPEN_FILE_REOPEN;
 				lck_mtx_unlock(&nofp->nof_lock);
 			}
-#endif /* CONFIG_NFS4 */
-			/*
-			 * Scan this node's lock owner list for entries with this open owner,
-			 * then walk the lock owner's held lock list recovering each lock.
-			 */
+#endif                  
+			  
+                                                                        
+                                                                     
+      
 reclaim_locks:
 			TAILQ_FOREACH(nlop, &nofp->nof_np->n_lock_owners, nlo_link) {
 				if (lost || reopen) {
@@ -2960,11 +2960,11 @@ reclaim_locks:
 					continue;
 				}
 				TAILQ_FOREACH_SAFE(nflp, &nlop->nlo_locks, nfl_lolink, nextnflp) {
-					/* skip dead & blocked lock requests (shouldn't be any in the held lock list) */
+					                                                                                
 					if (nflp->nfl_flags & (NFS_FILE_LOCK_DEAD | NFS_FILE_LOCK_BLOCKED)) {
 						continue;
 					}
-					/* skip delegated locks */
+					                          
 					if (nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED) {
 						continue;
 					}
@@ -2977,7 +2977,7 @@ reclaim_locks:
 					if (!error) {
 						continue;
 					}
-					/* restart recovery? */
+					                       
 					if ((error == ETIMEDOUT) || nfs_mount_state_error_should_restart(error)) {
 						if (error == ETIMEDOUT) {
 							nfs_need_reconnect(nmp);
@@ -2987,26 +2987,26 @@ reclaim_locks:
 						    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nmp->nm_stategenid, error);
 						goto restart;
 					}
-					/* lock state lost - attempt to close file */
+					                                             
 					lost = 1;
 					error = 0;
 					break;
 				}
 			}
 #if CONFIG_NFS4
-			/*
-			 * If we've determined that we need to reopen the file then we probably
-			 * didn't receive any delegation we think we hold.  We should attempt to
-			 * return that delegation (and claim any delegated state).
-			 *
-			 * If we hold a delegation that is marked for return, then we should
-			 * return it now.
-			 */
+			  
+                                                                          
+                                                                           
+                                                             
+     
+                                                                       
+                    
+      
 			if ((nofp->nof_np->n_openflags & N_DELEG_RETURN) ||
 			    (reopen && (nofp->nof_np->n_openflags & N_DELEG_MASK))) {
 				nfs4_delegation_return(nofp->nof_np, R_RECOVER, thd, noop->noo_cred);
 				if (!(nmp->nm_sockflags & NMSOCK_READY)) {
-					/* looks like we need a reconnect */
+					                                    
 					tsleep(nfs_recover, (PZERO - 1), "nfsrecoverrestart", hz);
 					printf("nfs recovery restarting for %s, 0x%x, error %d\n",
 					    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nmp->nm_stategenid, error);
@@ -3015,7 +3015,7 @@ reclaim_locks:
 			}
 #endif
 			if (lost) {
-				/* revoke open file state */
+				                            
 				NP(nofp->nof_np, "nfs_recover: state lost for %d %p 0x%x",
 				    kauth_cred_getuid(noop->noo_cred), nofp->nof_np, nofp->nof_np->n_flag);
 				nfs_revoke_open_state_for_node(nofp->nof_np);
@@ -3024,7 +3024,7 @@ reclaim_locks:
 	}
 
 	if (!error) {
-		/* If state expired, make sure we're not holding onto any stale delegations */
+		                                                                              
 		lck_mtx_lock(&nmp->nm_lock);
 #if CONFIG_NFS4
 		if ((nmp->nm_vers >= NFS_VER4) && (nmp->nm_state & NFSSTA_RECOVER_EXPIRED)) {
@@ -3050,4 +3050,4 @@ recheckdeleg:
 	}
 }
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        

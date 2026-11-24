@@ -64,7 +64,7 @@
 
 
 #include <sys/types.h>
-//#include <stdlib.h>
+                     
 #include <sys/kpi_private.h>
 
 __private_extern__
@@ -76,9 +76,9 @@ static inline void       swapfunc(char *, char *, long, int);
 
 #define min(a, b)       ((a) < (b) ? (a) : (b))
 
-/*
- * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
- */
+  
+                                                                        
+   
 #define swapcode(TYPE, parmi, parmj, n)                 \
 	long i = (n) / sizeof (TYPE);                   \
 	TYPE *pi = (TYPE *) (parmi);                    \
@@ -180,7 +180,7 @@ loop:   SWAPINIT(a, es);
 		pb += es;
 		pc -= es;
 	}
-	if (swap_cnt == 0) {  /* Switch to insertion sort */
+	if (swap_cnt == 0) {                                
 		for (pm = (char *)a + es; pm < (char *) a + n * es; pm += es) {
 			for (pl = pm; pl > (char *) a && cmp(pl - es, pl) > 0;
 			    pl -= es) {
@@ -199,15 +199,15 @@ loop:   SWAPINIT(a, es);
 		qsort(a, r / es, es, cmp);
 	}
 	if ((size_t)(r = pd - pc) > es) {
-		/* Iterate rather than recurse to save stack space */
+		                                                     
 		a = pn - r;
 		n = r / es;
 		goto loop;
 	}
-/*		qsort(pn - r, r / es, es, cmp);*/
+                                     
 }
 
-/* private KPI */
+                 
 void
 kx_qsort(void *array, size_t nm, size_t member_size, int (*cmpf)(const void *, const void *))
 {

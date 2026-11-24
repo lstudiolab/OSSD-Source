@@ -52,8 +52,8 @@
 #define MARK_AS_HIBERNATE_TEXT __attribute__((section("__HIB, __text, regular, pure_instructions")))
 #define MARK_AS_HIBERNATE_DATA __attribute__((section("__HIB, __data")))
 #define MARK_AS_HIBERNATE_DATA_CONST_LATE __attribute__((section("__HIB, __const")))
-#endif /* HIBERNATION */
-#endif /* __arm64__ || __x86_64__ */
+#endif                  
+#endif                              
 
 #ifndef __security_const_early
 #define __security_const_early const
@@ -78,4 +78,4 @@
 #define SECURITY_READ_ONLY_LATE(_t)  _t __security_const_late  __attribute__((used))
 #define SECURITY_READ_WRITE(_t)      _t __security_read_write  __attribute__((used))
 
-#endif /* _SECTION_KEYWORDS_H_ */
+#endif                           

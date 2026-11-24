@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* CMU_HIST */
+              
 
-/*
- *      kern/ast.h: Definitions for Asynchronous System Traps.
- */
+  
+                                                              
+   
 
 #ifndef _KERN_AST_H_
 #define _KERN_AST_H_
@@ -51,4 +51,4 @@ extern void act_set_ast_reset_pcs(thread_t thread);
 extern void ast_dtrace_on(void);
 #endif
 
-#endif  /* _KERN_AST_H_ */
+#endif                    

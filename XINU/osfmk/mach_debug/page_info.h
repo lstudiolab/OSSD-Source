@@ -53,12 +53,12 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 #ifndef MACH_DEBUG_PAGE_INFO_H
 #define MACH_DEBUG_PAGE_INFO_H
 
 #include <mach/machine/vm_types.h>
 
 typedef vm_offset_t     *page_address_array_t;
-#endif  /* MACH_DEBUG_PAGE_INFO_H */
+#endif                              

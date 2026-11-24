@@ -29,12 +29,12 @@
  *
  * @APPLE_BSD_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _BSM_AUDIT_KERNEL_H
 #define _BSM_AUDIT_KERNEL_H
@@ -43,4 +43,4 @@
 
 #include <security/audit/audit.h>
 
-#endif /* !_BSM_AUDIT_KERNEL_H */
+#endif                           

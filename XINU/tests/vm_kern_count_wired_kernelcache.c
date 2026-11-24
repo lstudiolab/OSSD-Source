@@ -7,9 +7,9 @@
 
 #include <darwintest.h>
 
-/*
- * Ensure that mach_memory_info includes a counter for the kernelcache size.
- */
+  
+                                                                            
+   
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.vm"));
 
@@ -46,13 +46,13 @@ T_DECL(vm_kern_count_wired_kernelcache,
 		}
 	}
 	T_QUIET; T_ASSERT_TRUE(found_kernelcache_counter, "mach_memory_info returned kernelcache counter.");
-	// Sanity check that the counter isn't 0.
+	                                         
 	T_QUIET; T_ASSERT_GT(static_kernelcache_size, 0ULL, "kernelcache counter > 0");
-	// Sanity check that the counter is less than the amount of wired memory
-	// at boot.
+	                                                                        
+	           
 	T_QUIET; T_ASSERT_LE(static_kernelcache_size, wired_memory_boot, "kernelcache counter <= VM_KERN_COUNT_WIRED_BOOT");
 
-	// Cleanup
+	          
 	if ((name != NULL) && (nameCnt != 0)) {
 		kr = vm_deallocate(mach_task_self(), (vm_address_t) name,
 		    (vm_size_t) (nameCnt * sizeof *name));

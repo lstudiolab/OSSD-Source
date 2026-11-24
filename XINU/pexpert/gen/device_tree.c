@@ -43,7 +43,7 @@
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
 extern addr64_t kvtophys(vm_offset_t va);
-#endif /* defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR) */
+#endif                                                                       
 
 #include <sys/types.h>
 
@@ -52,11 +52,11 @@ SECURITY_READ_ONLY_LATE(RealDTEntry) DTRootNode;
 SECURITY_READ_ONLY_LATE(static vm_size_t) DTSize;
 SECURITY_READ_ONLY_LATE(static vm_offset_t) DTEnd;
 
-/*
- *
- * Support Routines
- *
- */
+  
+  
+                   
+  
+   
 
 static inline void
 assert_in_dt_region(vm_offset_t const start, vm_offset_t const end, void const *p)
@@ -83,27 +83,27 @@ assert_prop_in_dt_region(vm_offset_t const start, vm_offset_t const end, DeviceT
 #define ASSERT_HEADER_IN_DT_REGION(start, end, p, size) assert_in_dt_region((start), (end), (uint8_t const *)(p) + (size))
 #define ASSERT_HEADER_IN_DT(p, size) ASSERT_IN_DT((uint8_t const *)(p) + (size))
 
-/*
- * Since there is no way to know the size of a device tree node
- * without fully walking it, we employ the following principle to make
- * sure that the accessed device tree is fully within its memory
- * region:
- *
- * Internally, we check anything we want to access just before we want
- * to access it (not after creating a pointer).
- *
- * Then, before returning a DTEntry to the caller, we check whether
- * the start address (only!) of the entry is still within the device
- * tree region.
- *
- * Before returning a property value the caller, we check whether the
- * property is fully within the region.
- *
- * "DTEntry"s are opaque to the caller, so only checking their
- * starting address is enough to satisfy existence within the device
- * tree region, while for property values we need to make sure that
- * they are fully within the region.
- */
+  
+                                                               
+                                                                      
+                                                                
+          
+  
+                                                                      
+                                               
+  
+                                                                   
+                                                                    
+               
+  
+                                                                     
+                                       
+  
+                                                              
+                                                                    
+                                                                   
+                                    
+   
 
 static inline DeviceTreeNodeProperty const *
 next_prop_region(vm_offset_t const start, vm_offset_t end, DeviceTreeNodeProperty const *prop)
@@ -228,9 +228,9 @@ FindChild(RealDTEntry cur, char *buf)
 	return NULL;
 }
 
-/*
- * External Routines
- */
+  
+                    
+   
 void
 SecureDTInit(void const *base, size_t size)
 {
@@ -247,15 +247,15 @@ bool
 SecureDTIsLockedDown(void)
 {
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
-	/*
-	 * We cannot check if the DT is in the CTRR region early on,
-	 * because knowledge of the CTRR region is set up later.  But the
-	 * DT is used in all kinds of early bootstrapping before that.
-	 *
-	 * Luckily, we know that the device tree must be in front of the
-	 * kernel if set up in EXTRADATA (which means it's covered by
-	 * CTRR), and after it otherwise.
-	 */
+	  
+                                                             
+                                                                  
+                                                               
+   
+                                                                 
+                                                              
+                                  
+    
 	addr64_t exec_header_phys = kvtophys((vm_offset_t)&_mh_execute_header);
 
 	if (kvtophys((vm_offset_t)DTRootNode) < exec_header_phys) {
@@ -270,11 +270,11 @@ SecureDTIsLockedDown(void)
 int
 SecureDTEntryIsEqual(const DTEntry ref1, const DTEntry ref2)
 {
-	/* equality of pointers */
+	                          
 	return ref1 == ref2;
 }
 
-static char const *startingP;         // needed for find_entry
+static char const *startingP;                                 
 int find_entry(const char *propName, const char *propValue, DTEntry *entryH);
 
 int
@@ -297,11 +297,11 @@ find_entry(const char *propName, const char *propValue, DTEntry *entryH)
 	ASSERT_HEADER_IN_DT(nodeP, sizeof(DeviceTreeNode));
 
 	if (nodeP->nProperties == 0) {
-		return kError;                        // End of the list of nodes
+		return kError;                                                   
 	}
 	startingP = (char const *) (nodeP + 1);
 
-	// Search current entry
+	                       
 	for (k = 0; k < nodeP->nProperties; ++k) {
 		DeviceTreeNodeProperty const *propP = (DeviceTreeNodeProperty const *) (void const *) startingP;
 		ASSERT_PROP_IN_DT(propP);
@@ -317,7 +317,7 @@ find_entry(const char *propName, const char *propValue, DTEntry *entryH)
 		}
 	}
 
-	// Search child nodes
+	                     
 	for (k = 0; k < nodeP->nChildren; ++k) {
 		if (find_entry(propName, propValue, entryH) == kSuccess) {
 			return kSuccess;
@@ -353,7 +353,7 @@ SecureDTLookupEntry(const DTEntry searchPoint, const char *pathName, DTEntry *fo
 	do {
 		cp = GetNextComponent(cp, buf);
 
-		/* Check for done */
+		                    
 		if (*buf == 0) {
 			if (*cp == 0) {
 				*foundEntry = cur;
@@ -454,9 +454,9 @@ int
 SecureDTRestartEntryIteration(DTEntryIterator iter)
 {
 #if 0
-	// This commented out code allows a second argument (outer)
-	// which (if true) causes restarting at the outer scope
-	// rather than the current scope.
+	                                                           
+	                                                       
+	                                 
 	DTSavedScopePtr scope;
 
 	if (outer) {

@@ -39,7 +39,7 @@
 #error architecture not supported
 #endif
 
-#else /* !KERNEL_PRIVATE -- System Framework header */
+#else                                                 
 #if defined (__i386__) || defined(__x86_64__)
 #include <System/i386/cpu_capabilities.h>
 #elif defined (__arm__) || defined(__arm64__)
@@ -47,7 +47,7 @@
 #else
 #error architecture not supported
 #endif
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* _MACHINE_CPU_CAPABILITIES_H */
-#endif /* PRIVATE */
+#endif                                  
+#endif              

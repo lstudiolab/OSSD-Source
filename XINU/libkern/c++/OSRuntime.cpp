@@ -39,9 +39,9 @@
 #if defined(HAS_APPLE_PAC)
 #include <ptrauth.h>
 #define PTRAUTH_STRIP_STRUCTOR(x)       ((uintptr_t) ptrauth_strip(ptrauth_nop_cast(void *, (x)), ptrauth_key_function_pointer))
-#else  /* defined(HAS_APPLE_PAC) */
+#else                              
 #define PTRAUTH_STRIP_STRUCTOR(x)       ((uintptr_t) (x))
-#endif /* !defined(HAS_APPLE_PAC) */
+#endif                              
 
 __BEGIN_DECLS
 
@@ -57,7 +57,7 @@ __BEGIN_DECLS
 
 #if PRAGMA_MARK
 #pragma mark Constants &c.
-#endif /* PRAGMA_MARK */
+#endif                  
 OSKextLogSpec kOSRuntimeLogSpec =
     kOSKextLogErrorLevel |
     kOSKextLogLoadFlag |
@@ -65,15 +65,15 @@ OSKextLogSpec kOSRuntimeLogSpec =
 
 #if PRAGMA_MARK
 #pragma mark Logging Bootstrap
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* kern_os Logging Bootstrap
-*
-* We can't call in to OSKext until the kernel's C++ environment is up
-* and running, so let's mask those references with a check variable.
-* We print unconditionally if C++ isn't up, but if that's the case
-* we've generally hit a serious error in kernel init!
-*********************************************************************/
+#endif                  
+                                                                      
+                           
+ 
+                                                                     
+                                                                    
+                                                                  
+                                                     
+                                                                      
 static bool gKernelCPPInitialized = false;
 
 #define OSRuntimeLog(kext, flags, format, args ...)            \
@@ -87,10 +87,10 @@ static bool gKernelCPPInitialized = false;
 
 #if PRAGMA_MARK
 #pragma mark Libkern Init
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* Libkern Init
-*********************************************************************/
+#endif                  
+                                                                      
+              
+                                                                      
 
 #if __GNUC__ >= 3
 void __dead2
@@ -129,12 +129,12 @@ static const char *
 void
 OSlibkernInit(void)
 {
-	// This must be called before calling OSRuntimeInitializeCPP.
+	                                                             
 	OSMetaClassBase::initialize();
 
 	g_kernel_kmod_info.address = (vm_address_t) &_mh_execute_header;
 	if (kOSReturnSuccess != OSRuntimeInitializeCPP(NULL)) {
-		// &g_kernel_kmod_info, gOSSectionNamesStandard, 0, 0)) {
+		                                                         
 		panic("OSRuntime: C++ runtime failed to initialize.");
 	}
 
@@ -147,10 +147,10 @@ __END_DECLS
 
 #if PRAGMA_MARK
 #pragma mark C++ Runtime Load/Unload
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* kern_os C++ Runtime Load/Unload
-*********************************************************************/
+#endif                  
+                                                                      
+                                 
+                                                                      
 
 typedef void (*structor_t)(void);
 
@@ -189,7 +189,7 @@ OSRuntimeCallStructorsInSection(
 		unsigned long firstIndex = 0;
 
 		if (textStart) {
-			// bsearch for any in range
+			                           
 			unsigned long baseIdx;
 			unsigned long lim;
 			firstIndex = num_structors;
@@ -201,7 +201,7 @@ OSRuntimeCallStructorsInSection(
 				value = PTRAUTH_STRIP_STRUCTOR(structor);
 				if ((value >= textStart) && (value < textEnd)) {
 					firstIndex = (baseIdx + (lim >> 1));
-					// scan back for the first in range
+					                                   
 					for (; firstIndex; firstIndex--) {
 						structor = structors[firstIndex - 1];
 						value = PTRAUTH_STRIP_STRUCTOR(structor);
@@ -212,11 +212,11 @@ OSRuntimeCallStructorsInSection(
 					break;
 				}
 				if (textStart > value) {
-					// move right
+					             
 					baseIdx += (lim >> 1) + 1;
 					lim--;
 				}
-				// else move left
+				                 
 			}
 			baseIdx = (baseIdx + (lim >> 1));
 		}
@@ -242,18 +242,18 @@ OSRuntimeCallStructorsInSection(
 			result = OSMetaClass::checkModLoad(metaHandle);
 		}
 		break;
-	} /* for (section...) */
+	}                       
 	return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 kern_return_t
 OSRuntimeFinalizeCPP(
 	OSKext                   * theKext)
 {
 	kern_return_t              result = KMOD_RETURN_FAILURE;
-	void                     * metaHandle = NULL;// do not free
+	void                     * metaHandle = NULL;              
 	kernel_mach_header_t     * header;
 	kernel_segment_command_t * segment;
 	kmod_info_t              * kmodInfo;
@@ -286,11 +286,11 @@ OSRuntimeFinalizeCPP(
 		header   = (kernel_mach_header_t *)kmodInfo->address;
 	}
 
-	/* OSKext checks for this condition now, but somebody might call
-	 * this function directly (the symbol is exported....).
-	 */
+	                                                                
+                                                        
+    
 	if (OSMetaClass::modHasInstance(kmodInfo->name)) {
-		// xxx - Don't log under errors? this is more of an info thing
+		                                                              
 		OSRuntimeLog(theKext, kOSRuntimeLogSpec,
 		    "Can't tear down kext %s C++; classes have instances:",
 		    kmodInfo->name);
@@ -299,11 +299,11 @@ OSRuntimeFinalizeCPP(
 		goto finish;
 	}
 
-	/* Tell the meta class system that we are starting to unload.
-	 * metaHandle isn't actually needed on the finalize path,
-	 * so we don't check it here, even though OSMetaClass::postModLoad() will
-	 * return a failure (it only does actual work on the init path anyhow).
-	 */
+	                                                             
+                                                          
+                                                                          
+                                                                        
+    
 	metaHandle = OSMetaClass::preModLoad(kmodInfo->name);
 
 	OSSymbol::checkForPageUnload((void *)kmodInfo->address,
@@ -331,10 +331,10 @@ finish:
 
 #if defined(HAS_APPLE_PAC)
 #if !KASAN
-/*
- * Place this function in __KLD,__text on non-kasan builds so it gets unmapped
- * after CTRR lockdown.
- */
+  
+                                                                              
+                       
+   
 __attribute__((noinline, section("__KLD,__text")))
 #endif
 static void
@@ -366,12 +366,12 @@ OSRuntimeSignStructorsInSegment(kernel_segment_command_t *segment)
 			structor = ptrauth_sign_unauthenticated(structor, ptrauth_key_function_pointer, ptrauth_function_pointer_type_discriminator(void (*)(void)));
 			structors[idx] = structor;
 		}
-	} /* for (section...) */
+	}                       
 }
 #endif
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSRuntimeSignStructors(
 	kernel_mach_header_t * header __unused)
@@ -384,12 +384,12 @@ OSRuntimeSignStructors(
 	    segment != NULL;
 	    segment = nextsegfromheader(header, segment)) {
 		OSRuntimeSignStructorsInSegment(segment);
-	} /* for (segment...) */
-#endif /* !defined(XXX) && defined(HAS_APPLE_PAC) */
+	}                       
+#endif                                              
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSRuntimeSignStructorsInFileset(
 	kernel_mach_header_t * fileset_header __unused)
@@ -408,31 +408,31 @@ OSRuntimeSignStructorsInFileset(
 			mh = (kernel_mach_header_t *)((uintptr_t)fse->vmaddr);
 			OSRuntimeSignStructors(mh);
 		} else if (lc->cmd == LC_SEGMENT_64) {
-			/*
-			 * Slide/adjust all LC_SEGMENT_64 commands in the fileset
-			 * (and any sections in those segments)
-			 */
+			  
+                                                            
+                                          
+      
 			kernel_segment_command_t *seg;
 			seg = (kernel_segment_command_t *)(uintptr_t)lc;
 			OSRuntimeSignStructorsInSegment(seg);
 		}
 	}
 
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 kern_return_t
 OSRuntimeInitializeCPP(
 	OSKext                   * theKext)
 {
 	kern_return_t              result          = KMOD_RETURN_FAILURE;
 	kernel_mach_header_t     * header          = NULL;
-	void                     * metaHandle      = NULL;// do not free
+	void                     * metaHandle      = NULL;              
 	bool                       load_success    = true;
-	kernel_segment_command_t * segment         = NULL;// do not free
-	kernel_segment_command_t * failure_segment = NULL; // do not free
+	kernel_segment_command_t * segment         = NULL;              
+	kernel_segment_command_t * failure_segment = NULL;               
 	kmod_info_t             *  kmodInfo;
 	const char              ** sectionNames;
 	uintptr_t                  textStart;
@@ -465,63 +465,63 @@ OSRuntimeInitializeCPP(
 		header   = (kernel_mach_header_t *)kmodInfo->address;
 	}
 
-	/* Tell the meta class system that we are starting the load
-	 */
+	                                                           
+    
 	metaHandle = OSMetaClass::preModLoad(kmodInfo->name);
 	assert(metaHandle);
 	if (!metaHandle) {
 		goto finish;
 	}
 
-	/* NO GOTO PAST HERE. */
+	                        
 
-	/* Scan the header for all constructor sections, in any
-	 * segment, and invoke the constructors within those sections.
-	 */
+	                                                       
+                                                               
+    
 	for (segment = firstsegfromheader(header);
 	    segment != NULL && load_success;
 	    segment = nextsegfromheader(header, segment)) {
-		/* Record the current segment in the event of a failure.
-		 */
+		                                                        
+     
 		failure_segment = segment;
 		load_success = OSRuntimeCallStructorsInSection(
 			theKext, kmodInfo, metaHandle, segment,
 			sectionNames[kOSSectionNameInitializer],
 			textStart, textEnd);
-	} /* for (segment...) */
+	}                       
 
-	/* We failed so call all of the destructors. We must do this before
-	 * calling OSMetaClass::postModLoad() as the OSMetaClass destructors
-	 * will alter state (in the metaHandle) used by that function.
-	 */
+	                                                                   
+                                                                     
+                                                               
+    
 	if (!load_success) {
-		/* Scan the header for all destructor sections, in any
-		 * segment, and invoke the constructors within those sections.
-		 */
+		                                                      
+                                                                
+     
 		for (segment = firstsegfromheader(header);
 		    segment != failure_segment && segment != NULL;
 		    segment = nextsegfromheader(header, segment)) {
 			OSRuntimeCallStructorsInSection(theKext, kmodInfo, NULL, segment,
 			    sectionNames[kOSSectionNameFinalizer], textStart, textEnd);
-		} /* for (segment...) */
+		}                       
 	}
 
-	/* Now, regardless of success so far, do the post-init registration
-	 * and cleanup. If we had to call the unloadCPP function, static
-	 * destructors have removed classes from the stalled list so no
-	 * metaclasses will actually be registered.
-	 */
+	                                                                   
+                                                                 
+                                                                
+                                            
+    
 	result = OSMetaClass::postModLoad(metaHandle);
 
-	/* If we've otherwise been fine up to now, but OSMetaClass::postModLoad()
-	 * fails (typically due to a duplicate class), tear down all the C++
-	 * stuff from the kext. This isn't necessary for libkern/OSMetaClass stuff,
-	 * but may be necessary for other C++ code. We ignore the return value
-	 * because it's only a fail when there are existing instances of libkern
-	 * classes, and there had better not be any created on the C++ init path.
-	 */
+	                                                                         
+                                                                     
+                                                                            
+                                                                       
+                                                                         
+                                                                          
+    
 	if (load_success && result != KMOD_RETURN_SUCCESS) {
-		(void)OSRuntimeFinalizeCPP(theKext); //kmodInfo, sectionNames, textStart, textEnd);
+		(void)OSRuntimeFinalizeCPP(theKext);                                               
 	}
 
 	if (theKext && load_success && result == KMOD_RETURN_SUCCESS) {
@@ -531,9 +531,9 @@ finish:
 	return result;
 }
 
-/*********************************************************************
-*   Unload a kernel segment.
-*********************************************************************/
+                                                                      
+                            
+                                                                      
 
 void
 OSRuntimeUnloadCPPForSegment(
@@ -545,10 +545,10 @@ OSRuntimeUnloadCPPForSegment(
 
 #if PRAGMA_MARK
 #pragma mark C++ Allocators & Deallocators
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* C++ Allocators & Deallocators
-*********************************************************************/
+#endif                  
+                                                                      
+                               
+                                                                      
 void *
 operator new(size_t size)
 {
@@ -582,10 +582,10 @@ noexcept
 {
 	if (ptr) {
 #if KASAN
-		/*
-		 * Unpoison the C++ array cookie inserted (but not removed) by the
-		 * compiler on new[].
-		 */
+		  
+                                                                    
+                       
+     
 		kasan_unpoison_cxx_array_cookie(ptr);
 #endif
 		kheap_free_addr(KERN_OS_MALLOC, ptr);
@@ -609,15 +609,15 @@ operator delete[](void * addr, size_t sz) noexcept
 	}
 }
 
-#endif /* __cplusplus >= 201103L */
+#endif                             
 
-/* PR-6481964 - The compiler is going to check for size overflows in calls to
- * new[], and if there is an overflow, it will call __throw_length_error.
- * This is an unrecoverable error by the C++ standard, so we must panic here.
- *
- * We have to put the function inside the std namespace because of how the
- * compiler expects the name to be mangled.
- */
+                                                                             
+                                                                         
+                                                                             
+  
+                                                                          
+                                           
+   
 namespace std {
 void __dead2
 __throw_length_error(const char *msg __unused)

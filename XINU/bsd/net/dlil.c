@@ -25,12 +25,12 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 #include <stddef.h>
 #include <ptrauth.h>
 
@@ -95,7 +95,7 @@
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #include <netinet/icmp_var.h>
-#endif /* INET */
+#endif           
 
 #include <net/nat464_utils.h>
 #include <netinet6/in6_var.h>
@@ -123,13 +123,13 @@
 
 #if PF
 #include <net/pfvar.h>
-#endif /* PF */
+#endif         
 #include <net/pktsched/pktsched.h>
 #include <net/pktsched/pktsched_netem.h>
 
 #if NECP
 #include <net/necp.h>
-#endif /* NECP */
+#endif           
 
 
 #include <os/log.h>
@@ -140,8 +140,8 @@
 #define DBG_FNC_DLIL_OUTPUT     DLILDBG_CODE(DBG_DLIL_STATIC, (2 << 8))
 #define DBG_FNC_DLIL_IFOUT      DLILDBG_CODE(DBG_DLIL_STATIC, (3 << 8))
 
-#define MAX_FRAME_TYPE_SIZE 4 /* LONGWORDS */
-#define MAX_LINKADDR        4 /* LONGWORDS */
+#define MAX_FRAME_TYPE_SIZE 4                
+#define MAX_LINKADDR        4                
 #define M_NKE M_IFADDR
 
 #if 1
@@ -161,12 +161,12 @@ enum {
 	kProtoKPI_v2    = 2
 };
 
-/*
- * List of if_proto structures in if_proto_hash[] is protected by
- * the ifnet lock.  The rest of the fields are initialized at protocol
- * attach time and never change, thus no lock required as long as
- * a reference to it is valid, via if_proto_ref().
- */
+  
+                                                                 
+                                                                      
+                                                                 
+                                                  
+   
 struct if_proto {
 	SLIST_ENTRY(if_proto)       next_hash;
 	u_int32_t                   refcount;
@@ -202,50 +202,50 @@ SLIST_HEAD(proto_hash_entry, if_proto);
 	(DLIL_SDLMAXLEN - offsetof(struct sockaddr_dl, sdl_data[0]))
 
 struct dlil_ifnet {
-	struct ifnet    dl_if;                  /* public ifnet */
-	/*
-	 * DLIL private fields, protected by dl_if_lock
-	 */
+	struct ifnet    dl_if;                                    
+	  
+                                                
+    
 	decl_lck_mtx_data(, dl_if_lock);
-	TAILQ_ENTRY(dlil_ifnet) dl_if_link;     /* dlil_ifnet link */
-	u_int32_t dl_if_flags;                  /* flags (below) */
-	u_int32_t dl_if_refcnt;                 /* refcnt */
-	void (*dl_if_trace)(struct dlil_ifnet *, int); /* ref trace callback */
-	void    *dl_if_uniqueid;                /* unique interface id */
-	size_t  dl_if_uniqueid_len;             /* length of the unique id */
-	char    dl_if_namestorage[IFNAMSIZ];    /* interface name storage */
-	char    dl_if_xnamestorage[IFXNAMSIZ];  /* external name storage */
+	TAILQ_ENTRY(dlil_ifnet) dl_if_link;                          
+	u_int32_t dl_if_flags;                                     
+	u_int32_t dl_if_refcnt;                             
+	void (*dl_if_trace)(struct dlil_ifnet *, int);                         
+	void    *dl_if_uniqueid;                                         
+	size_t  dl_if_uniqueid_len;                                          
+	char    dl_if_namestorage[IFNAMSIZ];                                
+	char    dl_if_xnamestorage[IFXNAMSIZ];                             
 	struct {
-		struct ifaddr   ifa;            /* lladdr ifa */
-		u_int8_t        asdl[DLIL_SDLMAXLEN]; /* addr storage */
-		u_int8_t        msdl[DLIL_SDLMAXLEN]; /* mask storage */
+		struct ifaddr   ifa;                            
+		u_int8_t        asdl[DLIL_SDLMAXLEN];                   
+		u_int8_t        msdl[DLIL_SDLMAXLEN];                   
 	} dl_if_lladdr;
-	u_int8_t dl_if_descstorage[IF_DESCSIZE]; /* desc storage */
-	u_int8_t dl_if_permanent_ether[ETHER_ADDR_LEN]; /* permanent address */
+	u_int8_t dl_if_descstorage[IF_DESCSIZE];                   
+	u_int8_t dl_if_permanent_ether[ETHER_ADDR_LEN];                        
 	u_int8_t dl_if_permanent_ether_is_set;
 	u_int8_t dl_if_unused;
-	struct dlil_threading_info dl_if_inpstorage; /* input thread storage */
-	ctrace_t        dl_if_attach;           /* attach PC stacktrace */
-	ctrace_t        dl_if_detach;           /* detach PC stacktrace */
+	struct dlil_threading_info dl_if_inpstorage;                           
+	ctrace_t        dl_if_attach;                                     
+	ctrace_t        dl_if_detach;                                     
 };
 
-/* Values for dl_if_flags (private to DLIL) */
-#define DLIF_INUSE      0x1     /* DLIL ifnet recycler, ifnet in use */
-#define DLIF_REUSE      0x2     /* DLIL ifnet recycles, ifnet is not new */
-#define DLIF_DEBUG      0x4     /* has debugging info */
+                                              
+#define DLIF_INUSE      0x1                                            
+#define DLIF_REUSE      0x2                                                
+#define DLIF_DEBUG      0x4                             
 
-#define IF_REF_TRACE_HIST_SIZE  8       /* size of ref trace history */
+#define IF_REF_TRACE_HIST_SIZE  8                                      
 
-/* For gdb */
+             
 __private_extern__ unsigned int if_ref_trace_hist_size = IF_REF_TRACE_HIST_SIZE;
 
 struct dlil_ifnet_dbg {
-	struct dlil_ifnet       dldbg_dlif;             /* dlil_ifnet */
-	u_int16_t               dldbg_if_refhold_cnt;   /* # ifnet references */
-	u_int16_t               dldbg_if_refrele_cnt;   /* # ifnet releases */
-	/*
-	 * Circular lists of ifnet_{reference,release} callers.
-	 */
+	struct dlil_ifnet       dldbg_dlif;                             
+	u_int16_t               dldbg_if_refhold_cnt;                           
+	u_int16_t               dldbg_if_refrele_cnt;                         
+	  
+                                                        
+    
 	ctrace_t                dldbg_if_refhold[IF_REF_TRACE_HIST_SIZE];
 	ctrace_t                dldbg_if_refrele[IF_REF_TRACE_HIST_SIZE];
 };
@@ -282,14 +282,14 @@ decl_lck_mtx_data(static, dlil_ifnet_lock);
 u_int32_t dlil_filter_disable_tso_count = 0;
 
 #if DEBUG
-static unsigned int ifnet_debug = 1;    /* debugging (enabled) */
+static unsigned int ifnet_debug = 1;                             
 #else
-static unsigned int ifnet_debug;        /* debugging (disabled) */
-#endif /* !DEBUG */
-static unsigned int dlif_size;          /* size of dlil_ifnet to allocate */
-static unsigned int dlif_bufsize;       /* size of dlif_size + headroom */
-static struct zone *dlif_zone;          /* zone for dlil_ifnet */
-#define DLIF_ZONE_NAME          "ifnet"         /* zone name */
+static unsigned int ifnet_debug;                                  
+#endif             
+static unsigned int dlif_size;                                              
+static unsigned int dlif_bufsize;                                         
+static struct zone *dlif_zone;                                   
+#define DLIF_ZONE_NAME          "ifnet"                        
 
 static ZONE_DECLARE(dlif_filt_zone, "ifnet_filter",
     sizeof(struct ifnet_filter), ZC_ZFREE_CLEARMEM);
@@ -300,15 +300,15 @@ static ZONE_DECLARE(dlif_phash_zone, "ifnet_proto_hash",
 static ZONE_DECLARE(dlif_proto_zone, "ifnet_proto",
     sizeof(struct if_proto), ZC_ZFREE_CLEARMEM);
 
-static unsigned int dlif_tcpstat_size;  /* size of tcpstat_local to allocate */
-static unsigned int dlif_tcpstat_bufsize; /* size of dlif_tcpstat_size + headroom */
-static struct zone *dlif_tcpstat_zone;          /* zone for tcpstat_local */
-#define DLIF_TCPSTAT_ZONE_NAME  "ifnet_tcpstat" /* zone name */
+static unsigned int dlif_tcpstat_size;                                         
+static unsigned int dlif_tcpstat_bufsize;                                           
+static struct zone *dlif_tcpstat_zone;                                      
+#define DLIF_TCPSTAT_ZONE_NAME  "ifnet_tcpstat"                
 
-static unsigned int dlif_udpstat_size;  /* size of udpstat_local to allocate */
-static unsigned int dlif_udpstat_bufsize;       /* size of dlif_udpstat_size + headroom */
-static struct zone *dlif_udpstat_zone;          /* zone for udpstat_local */
-#define DLIF_UDPSTAT_ZONE_NAME  "ifnet_udpstat" /* zone name */
+static unsigned int dlif_udpstat_size;                                         
+static unsigned int dlif_udpstat_bufsize;                                                 
+static struct zone *dlif_udpstat_zone;                                      
+#define DLIF_UDPSTAT_ZONE_NAME  "ifnet_udpstat"                
 
 static u_int32_t net_rtref;
 
@@ -369,10 +369,10 @@ static errno_t ifp_if_check_multi(struct ifnet *, const struct sockaddr *);
 static errno_t ifp_if_framer(struct ifnet *, struct mbuf **,
     const struct sockaddr *, const char *, const char *,
     u_int32_t *, u_int32_t *);
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 static errno_t ifp_if_framer(struct ifnet *, struct mbuf **,
     const struct sockaddr *, const char *, const char *);
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 static errno_t ifp_if_framer_extended(struct ifnet *, struct mbuf **,
     const struct sockaddr *, const char *, const char *,
     u_int32_t *, u_int32_t *);
@@ -414,7 +414,7 @@ static errno_t dlil_clat46(ifnet_t, protocol_family_t *, mbuf_t *);
 static errno_t dlil_clat64(ifnet_t, protocol_family_t *, mbuf_t *);
 #if DEBUG || DEVELOPMENT
 static void dlil_verify_sum16(void);
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 static void dlil_output_cksum_dbg(struct ifnet *, struct mbuf *, uint32_t,
     protocol_family_t);
 static void dlil_input_cksum_dbg(struct ifnet *, struct mbuf *, char *,
@@ -460,13 +460,13 @@ static int sysctl_tx_chain_len_stats SYSCTL_HANDLER_ARGS;
 
 #if TEST_INPUT_THREAD_TERMINATION
 static int sysctl_input_thread_termination_spin SYSCTL_HANDLER_ARGS;
-#endif /* TEST_INPUT_THREAD_TERMINATION */
+#endif                                    
 
-/* The following are protected by dlil_ifnet_lock */
+                                                    
 static TAILQ_HEAD(, ifnet) ifnet_detaching_head;
 static u_int32_t ifnet_detaching_cnt;
 static boolean_t ifnet_detaching_embryonic;
-static void *ifnet_delayed_run; /* wait channel for detaching thread */
+static void *ifnet_delayed_run;                                        
 
 decl_lck_mtx_data(static, ifnet_fc_lock);
 
@@ -484,7 +484,7 @@ struct ifnet_flowhash_key {
 	uint32_t        ifk_rand2;
 };
 
-/* Flow control entry per interface */
+                                      
 struct ifnet_fc_entry {
 	RB_ENTRY(ifnet_fc_entry) ifce_entry;
 	u_int32_t       ifce_flowhash;
@@ -498,7 +498,7 @@ static int ifnet_fc_add(struct ifnet *);
 static struct ifnet_fc_entry *ifnet_fc_get(u_int32_t);
 static void ifnet_fc_entry_free(struct ifnet_fc_entry *);
 
-/* protected by ifnet_fc_lock */
+                                
 RB_HEAD(ifnet_fc_tree, ifnet_fc_entry) ifnet_fc_tree;
 RB_PROTOTYPE(ifnet_fc_tree, ifnet_fc_entry, ifce_entry, ifce_cmp);
 RB_GENERATE(ifnet_fc_tree, ifnet_fc_entry, ifce_entry, ifce_cmp);
@@ -519,21 +519,21 @@ __private_extern__ void link_rtrequest(int, struct rtentry *, struct sockaddr *)
 #if CONFIG_MACF
 #if !XNU_TARGET_OS_OSX
 int dlil_lladdr_ckreq = 1;
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 int dlil_lladdr_ckreq = 0;
-#endif /* XNU_TARGET_OS_OSX */
-#endif /* CONFIG_MACF */
+#endif                        
+#endif                  
 
 #if DEBUG
 int dlil_verbose = 1;
 #else
 int dlil_verbose = 0;
-#endif /* DEBUG */
+#endif            
 #if IFNET_INPUT_SANITY_CHK
-/* sanity checking of input packet lists received */
+                                                    
 static u_int32_t dlil_input_sanity_check = 0;
-#endif /* IFNET_INPUT_SANITY_CHK */
-/* rate limit debug messages */
+#endif                             
+                               
 struct timespec dlil_dbgrate = { .tv_sec = 1, .tv_nsec = 0 };
 
 SYSCTL_DECL(_net_link_generic_system);
@@ -554,22 +554,22 @@ SYSCTL_PROC(_net_link_generic_system, OID_AUTO, rcvq_maxlen,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED, &if_rcvq_maxlen, IFQ_MAXLEN,
     sysctl_rcvq_maxlen, "I", "Default receive queue max length");
 
-#define IF_RXPOLL_DECAY         2       /* ilog2 of EWMA decay rate (4) */
+#define IF_RXPOLL_DECAY         2                                         
 u_int32_t if_rxpoll_decay = IF_RXPOLL_DECAY;
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, rxpoll_decay,
     CTLFLAG_RW | CTLFLAG_LOCKED, &if_rxpoll_decay, IF_RXPOLL_DECAY,
     "ilog2 of EWMA decay rate of avg inbound packets");
 
-#define IF_RXPOLL_MODE_HOLDTIME_MIN     (10ULL * 1000 * 1000)   /* 10 ms */
-#define IF_RXPOLL_MODE_HOLDTIME         (1000ULL * 1000 * 1000) /* 1 sec */
+#define IF_RXPOLL_MODE_HOLDTIME_MIN     (10ULL * 1000 * 1000)              
+#define IF_RXPOLL_MODE_HOLDTIME         (1000ULL * 1000 * 1000)            
 static u_int64_t if_rxpoll_mode_holdtime = IF_RXPOLL_MODE_HOLDTIME;
 SYSCTL_PROC(_net_link_generic_system, OID_AUTO, rxpoll_freeze_time,
     CTLTYPE_QUAD | CTLFLAG_RW | CTLFLAG_LOCKED, &if_rxpoll_mode_holdtime,
     IF_RXPOLL_MODE_HOLDTIME, sysctl_rxpoll_mode_holdtime,
     "Q", "input poll mode freeze time");
 
-#define IF_RXPOLL_SAMPLETIME_MIN        (1ULL * 1000 * 1000)    /* 1 ms */
-#define IF_RXPOLL_SAMPLETIME            (10ULL * 1000 * 1000)   /* 10 ms */
+#define IF_RXPOLL_SAMPLETIME_MIN        (1ULL * 1000 * 1000)              
+#define IF_RXPOLL_SAMPLETIME            (10ULL * 1000 * 1000)              
 static u_int64_t if_rxpoll_sample_holdtime = IF_RXPOLL_SAMPLETIME;
 SYSCTL_PROC(_net_link_generic_system, OID_AUTO, rxpoll_sample_time,
     CTLTYPE_QUAD | CTLFLAG_RW | CTLFLAG_LOCKED, &if_rxpoll_sample_holdtime,
@@ -582,7 +582,7 @@ SYSCTL_PROC(_net_link_generic_system, OID_AUTO, rxpoll_interval_time,
     IF_RXPOLL_INTERVALTIME, sysctl_rxpoll_interval_time,
     "Q", "input poll interval (time)");
 
-#define IF_RXPOLL_INTERVAL_PKTS 0       /* 0 (disabled) */
+#define IF_RXPOLL_INTERVAL_PKTS 0                         
 u_int32_t if_rxpoll_interval_pkts = IF_RXPOLL_INTERVAL_PKTS;
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, rxpoll_interval_pkts,
     CTLFLAG_RW | CTLFLAG_LOCKED, &if_rxpoll_interval_pkts,
@@ -602,7 +602,7 @@ SYSCTL_PROC(_net_link_generic_system, OID_AUTO, rxpoll_wakeups_hiwat,
     IF_RXPOLL_WHIWAT, sysctl_rxpoll_whiwat,
     "I", "input poll wakeup high watermark");
 
-static u_int32_t if_rxpoll_max = 0;                     /* 0 (automatic) */
+static u_int32_t if_rxpoll_max = 0;                                        
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, rxpoll_max,
     CTLFLAG_RW | CTLFLAG_LOCKED, &if_rxpoll_max, 0,
     "max packets per poll call");
@@ -619,7 +619,7 @@ SYSCTL_PROC(_net_link_generic_system, OID_AUTO, input_thread_termination_spin,
     &if_input_thread_termination_spin, 0,
     sysctl_input_thread_termination_spin,
     "I", "input thread termination spin limit");
-#endif /* TEST_INPUT_THREAD_TERMINATION */
+#endif                                    
 
 static u_int32_t cur_dlil_input_threads = 0;
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, dlil_input_threads,
@@ -630,7 +630,7 @@ SYSCTL_UINT(_net_link_generic_system, OID_AUTO, dlil_input_threads,
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, dlil_input_sanity_check,
     CTLFLAG_RW | CTLFLAG_LOCKED, &dlil_input_sanity_check, 0,
     "Turn on sanity checking in DLIL input");
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 
 static u_int32_t if_flowadv = 1;
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, flow_advisory,
@@ -668,9 +668,9 @@ ifnet_delay_start_disabled_increment(void)
 	OSIncrementAtomic(&ifnet_delay_start_disabled);
 }
 
-#define HWCKSUM_DBG_PARTIAL_FORCED      0x1     /* forced partial checksum */
-#define HWCKSUM_DBG_PARTIAL_RXOFF_ADJ   0x2     /* adjust start offset */
-#define HWCKSUM_DBG_FINALIZE_FORCED     0x10    /* forced finalize */
+#define HWCKSUM_DBG_PARTIAL_FORCED      0x1                                  
+#define HWCKSUM_DBG_PARTIAL_RXOFF_ADJ   0x2                              
+#define HWCKSUM_DBG_FINALIZE_FORCED     0x10                         
 #define HWCKSUM_DBG_MASK \
 	(HWCKSUM_DBG_PARTIAL_FORCED | HWCKSUM_DBG_PARTIAL_RXOFF_ADJ |   \
 	HWCKSUM_DBG_FINALIZE_FORCED)
@@ -751,11 +751,11 @@ uint32_t tx_chain_len_count = 0;
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, tx_chain_len_count,
     CTLFLAG_RW | CTLFLAG_LOCKED, &tx_chain_len_count, 0, "");
 
-static uint32_t threshold_notify = 1;           /* enable/disable */
+static uint32_t threshold_notify = 1;                               
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, threshold_notify,
     CTLFLAG_RW | CTLFLAG_LOCKED, &threshold_notify, 0, "");
 
-static uint32_t threshold_interval = 2;         /* in seconds */
+static uint32_t threshold_interval = 2;                         
 SYSCTL_UINT(_net_link_generic_system, OID_AUTO, threshold_interval,
     CTLFLAG_RW | CTLFLAG_LOCKED, &threshold_interval, 0, "");
 
@@ -763,7 +763,7 @@ SYSCTL_UINT(_net_link_generic_system, OID_AUTO, threshold_interval,
 static int sysctl_get_kao_frames SYSCTL_HANDLER_ARGS;
 SYSCTL_NODE(_net_link_generic_system, OID_AUTO, get_kao_frames,
     CTLFLAG_RD | CTLFLAG_LOCKED, sysctl_get_kao_frames, "");
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 struct net_api_stats net_api_stats;
 SYSCTL_STRUCT(_net, OID_AUTO, api_stats, CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -771,7 +771,7 @@ SYSCTL_STRUCT(_net, OID_AUTO, api_stats, CTLFLAG_RD | CTLFLAG_LOCKED,
 
 unsigned int net_rxpoll = 1;
 unsigned int net_affinity = 1;
-unsigned int net_async = 1;     /* 0: synchronous, 1: asynchronous */
+unsigned int net_async = 1;                                          
 
 static kern_return_t dlil_affinity_set(struct thread *, u_int32_t);
 
@@ -780,16 +780,16 @@ extern u_int32_t        inject_buckets;
 static  lck_grp_attr_t  *dlil_grp_attributes = NULL;
 static  lck_attr_t      *dlil_lck_attributes = NULL;
 
-/* DLIL data threshold thread call */
+                                     
 static void dlil_dt_tcall_fn(thread_call_param_t, thread_call_param_t);
 
 void
 ifnet_filter_update_tso(boolean_t filter_enable)
 {
-	/*
-	 * update filter count and route_generation ID to let TCP
-	 * know it should reevalute doing TSO or not
-	 */
+	  
+                                                          
+                                             
+    
 	OSAddAtomic(filter_enable ? 1 : -1, &dlil_filter_disable_tso_count);
 	routegenid_update();
 }
@@ -800,7 +800,7 @@ ifnet_filter_update_tso(boolean_t filter_enable)
 	if (_rcvif == NULL || (ifp != lo_ifp && _rcvif != ifp) ||       \
 	    !(mbuf_flags(m) & MBUF_PKTHDR)) {                           \
 	        panic_plain("%s: invalid mbuf %p\n", __func__, m);      \
-	/* NOTREACHED */                                        \
+	                                                        \
 	}                                                               \
 }
 
@@ -817,11 +817,11 @@ ifnet_filter_update_tso(boolean_t filter_enable)
 #define GBPS    (MBPS * 1000)
 
 struct rxpoll_time_tbl {
-	u_int64_t       speed;          /* downlink speed */
-	u_int32_t       plowat;         /* packets low watermark */
-	u_int32_t       phiwat;         /* packets high watermark */
-	u_int32_t       blowat;         /* bytes low watermark */
-	u_int32_t       bhiwat;         /* bytes high watermark */
+	u_int64_t       speed;                              
+	u_int32_t       plowat;                                    
+	u_int32_t       phiwat;                                     
+	u_int32_t       blowat;                                  
+	u_int32_t       bhiwat;                                   
 };
 
 static struct rxpoll_time_tbl rxpoll_tbl[] = {
@@ -861,11 +861,11 @@ dlil_decr_pending_thread_count(void)
 int
 proto_hash_value(u_int32_t protocol_family)
 {
-	/*
-	 * dlil_proto_unplumb_all() depends on the mapping between
-	 * the hash bucket index and the protocol family defined
-	 * here; future changes must be applied there as well.
-	 */
+	  
+                                                           
+                                                         
+                                                       
+    
 	switch (protocol_family) {
 	case PF_INET:
 		return 0;
@@ -881,9 +881,9 @@ proto_hash_value(u_int32_t protocol_family)
 	}
 }
 
-/*
- * Caller must already be holding ifnet lock.
- */
+  
+                                             
+   
 static struct if_proto *
 find_attached_proto(struct ifnet *ifp, u_int32_t protocol_family)
 {
@@ -939,21 +939,21 @@ if_proto_free(struct if_proto *proto)
 		}
 	}
 
-	/*
-	 * Cleanup routes that may still be in the routing table for that
-	 * interface/protocol pair.
-	 */
+	  
+                                                                  
+                            
+    
 	if_rtproto_del(ifp, proto_family);
 
 	ifnet_lock_shared(ifp);
 
-	/* No more reference on this, protocol must have been detached */
+	                                                                 
 	VERIFY(proto->detached);
 
-	/*
-	 * The reserved field carries the number of protocol still attached
-	 * (subject to change)
-	 */
+	  
+                                                                    
+                       
+    
 	ev_pr_data.proto_family = proto_family;
 	ev_pr_data.proto_remaining_count = dlil_ifp_protolist(ifp, NULL, 0);
 
@@ -964,11 +964,11 @@ if_proto_free(struct if_proto *proto)
 	    sizeof(struct kev_dl_proto_data));
 
 	if (ev_pr_data.proto_remaining_count == 0) {
-		/*
-		 * The protocol count has gone to zero, mark the interface down.
-		 * This used to be done by configd.KernelEventMonitor, but that
-		 * is inherently prone to races (rdar://problem/30810208).
-		 */
+		  
+                                                                  
+                                                                 
+                                                            
+     
 		(void) ifnet_set_flags(ifp, 0, IFF_UP);
 		(void) ifnet_ioctl(ifp, 0, SIOCSIFFLAGS, NULL);
 		dlil_post_sifflags_msg(ifp);
@@ -1000,13 +1000,13 @@ ifnet_lock_assert(struct ifnet *ifp, ifnet_lock_assert_t what)
 		break;
 
 	case IFNET_LCK_ASSERT_NOTOWNED:
-		/* nothing to do here for RW lock; bypass assert */
+		                                                   
 		ass = 0;
 		break;
 
 	default:
 		panic("bad ifnet assert type: %d", what);
-		/* NOTREACHED */
+		                
 	}
 	if (ass) {
 		LCK_RW_ASSERT(&ifp->if_lock, type);
@@ -1093,15 +1093,15 @@ ifnet_head_assert_exclusive(void)
 	LCK_RW_ASSERT(&ifnet_head_lock, LCK_RW_ASSERT_EXCLUSIVE);
 }
 
-/*
- * dlil_ifp_protolist
- * - get the list of protocols attached to the interface, or just the number
- *   of attached protocols
- * - if the number returned is greater than 'list_count', truncation occurred
- *
- * Note:
- * - caller must already be holding ifnet lock.
- */
+  
+                     
+                                                                            
+                          
+                                                                             
+  
+        
+                                               
+   
 static u_int32_t
 dlil_ifp_protolist(struct ifnet *ifp, protocol_family_t *list,
     u_int32_t list_count)
@@ -1153,11 +1153,11 @@ dlil_post_msg(struct ifnet *ifp, u_int32_t event_subclass,
 
 	bzero(&ev_msg, sizeof(ev_msg));
 	bzero(&ev_data, sizeof(ev_data));
-	/*
-	 * a net event always starts with a net_event_data structure
-	 * but the caller can generate a simple net event or
-	 * provide a longer event structure to post
-	 */
+	  
+                                                             
+                                                     
+                                            
+    
 	ev_msg.vendor_code      = KEV_VENDOR_APPLE;
 	ev_msg.kev_class        = KEV_NETWORK_CLASS;
 	ev_msg.kev_subclass     = event_subclass;
@@ -1178,7 +1178,7 @@ dlil_post_msg(struct ifnet *ifp, u_int32_t event_subclass,
 
 	bool update_generation = true;
 	if (event_subclass == KEV_DL_SUBCLASS) {
-		/* Don't update interface generation for frequent link quality and state changes  */
+		                                                                                    
 		switch (event_code) {
 		case KEV_DL_LINK_QUALITY_METRIC_CHANGED:
 		case KEV_DL_RRC_STATE_CHANGED:
@@ -1206,44 +1206,44 @@ dlil_alloc_local_stats(struct ifnet *ifp)
 	}
 
 	if (ifp->if_tcp_stat == NULL && ifp->if_udp_stat == NULL) {
-		/* allocate tcpstat_local structure */
+		                                      
 		buf = zalloc_flags(dlif_tcpstat_zone, Z_WAITOK | Z_ZERO);
 		if (buf == NULL) {
 			ret = ENOMEM;
 			goto end;
 		}
 
-		/* Get the 64-bit aligned base address for this object */
+		                                                         
 		base = (void *)P2ROUNDUP((intptr_t)buf + sizeof(u_int64_t),
 		    sizeof(u_int64_t));
 		VERIFY(((intptr_t)base + dlif_tcpstat_size) <=
 		    ((intptr_t)buf + dlif_tcpstat_bufsize));
 
-		/*
-		 * Wind back a pointer size from the aligned base and
-		 * save the original address so we can free it later.
-		 */
+		  
+                                                       
+                                                       
+     
 		pbuf = (void **)((intptr_t)base - sizeof(void *));
 		*pbuf = buf;
 		ifp->if_tcp_stat = base;
 
-		/* allocate udpstat_local structure */
+		                                      
 		buf = zalloc_flags(dlif_udpstat_zone, Z_WAITOK | Z_ZERO);
 		if (buf == NULL) {
 			ret = ENOMEM;
 			goto end;
 		}
 
-		/* Get the 64-bit aligned base address for this object */
+		                                                         
 		base = (void *)P2ROUNDUP((intptr_t)buf + sizeof(u_int64_t),
 		    sizeof(u_int64_t));
 		VERIFY(((intptr_t)base + dlif_udpstat_size) <=
 		    ((intptr_t)buf + dlif_udpstat_bufsize));
 
-		/*
-		 * Wind back a pointer size from the aligned base and
-		 * save the original address so we can free it later.
-		 */
+		  
+                                                       
+                                                       
+     
 		pbuf = (void **)((intptr_t)base - sizeof(void *));
 		*pbuf = buf;
 		ifp->if_udp_stat = base;
@@ -1329,39 +1329,39 @@ dlil_create_input_thread(ifnet_t ifp, struct dlil_threading_info *inp,
 	dlil_rxpoll_input = (ifp != NULL && net_rxpoll &&
 	    (ifp->if_eflags & IFEF_RXPOLL) && (ifp->if_xflags & IFXF_LEGACY));
 
-	/* default strategy utilizes the DLIL worker thread */
+	                                                      
 	inp->dlth_strategy = dlil_input_async;
 
-	/* NULL ifp indicates the main input thread, called at dlil_init time */
+	                                                                        
 	if (ifp == NULL) {
-		/*
-		 * Main input thread only.
-		 */
+		  
+                            
+     
 		func = dlil_main_input_thread_func;
 		VERIFY(inp == dlil_main_input_thread);
 		(void) strlcat(inp->dlth_name,
 		    "main_input", DLIL_THREADNAME_LEN);
 	} else if (dlil_rxpoll_input) {
-		/*
-		 * Legacy (non-netif) hybrid polling.
-		 */
+		  
+                                       
+     
 		func = dlil_rxpoll_input_thread_func;
 		VERIFY(inp != dlil_main_input_thread);
 		(void) snprintf(inp->dlth_name, DLIL_THREADNAME_LEN,
 		    "%s_input_poll", if_name(ifp));
 	} else if (net_async || (ifp->if_xflags & IFXF_LEGACY)) {
-		/*
-		 * Asynchronous strategy.
-		 */
+		  
+                           
+     
 		func = dlil_input_thread_func;
 		VERIFY(inp != dlil_main_input_thread);
 		(void) snprintf(inp->dlth_name, DLIL_THREADNAME_LEN,
 		    "%s_input", if_name(ifp));
 	} else {
-		/*
-		 * Synchronous strategy if there's a netif below and
-		 * the device isn't capable of hybrid polling.
-		 */
+		  
+                                                      
+                                                
+     
 		ASSERT(func == NULL);
 		ASSERT(!(ifp->if_xflags & IFXF_LEGACY));
 		VERIFY(inp != dlil_main_input_thread);
@@ -1370,7 +1370,7 @@ dlil_create_input_thread(ifnet_t ifp, struct dlil_threading_info *inp,
 	}
 	VERIFY(inp->dlth_thread == THREAD_NULL);
 
-	/* let caller know */
+	                     
 	if (thfunc != NULL) {
 		*thfunc = func;
 	}
@@ -1379,13 +1379,13 @@ dlil_create_input_thread(ifnet_t ifp, struct dlil_threading_info *inp,
 	    dlil_grp_attributes);
 	lck_mtx_init(&inp->dlth_lock, inp->dlth_lock_grp, dlil_lck_attributes);
 
-	inp->dlth_ifp = ifp; /* NULL for main input thread */
-	/*
-	 * For interfaces that support opportunistic polling, set the
-	 * low and high watermarks for outstanding inbound packets/bytes.
-	 * Also define freeze times for transitioning between modes
-	 * and updating the average.
-	 */
+	inp->dlth_ifp = ifp;                                 
+	  
+                                                              
+                                                                  
+                                                            
+                             
+    
 	if (ifp != NULL && net_rxpoll && (ifp->if_eflags & IFEF_RXPOLL)) {
 		limit = MAX(if_rcvq_maxlen, IF_RCVQ_MINLEN);
 		if (ifp->if_xflags & IFXF_LEGACY) {
@@ -1420,18 +1420,18 @@ dlil_create_input_thread(ifnet_t ifp, struct dlil_threading_info *inp,
 		    THREAD_PRECEDENCE_POLICY, (thread_policy_t)&info,
 		    THREAD_PRECEDENCE_POLICY_COUNT);
 		ASSERT(kret == KERN_SUCCESS);
-		/*
-		 * We create an affinity set so that the matching workloop
-		 * thread or the starter thread (for loopback) can be
-		 * scheduled on the same processor set as the input thread.
-		 */
+		  
+                                                            
+                                                       
+                                                             
+     
 		if (net_affinity) {
 			struct thread *tp = inp->dlth_thread;
 			u_int32_t tag;
-			/*
-			 * Randomize to reduce the probability
-			 * of affinity tag namespace collision.
-			 */
+			  
+                                         
+                                          
+      
 			read_frandom(&tag, sizeof(tag));
 			if (dlil_affinity_set(tp, tag) == KERN_SUCCESS) {
 				thread_reference(tp);
@@ -1441,11 +1441,11 @@ dlil_create_input_thread(ifnet_t ifp, struct dlil_threading_info *inp,
 		}
 	} else if (inp == dlil_main_input_thread) {
 		panic_plain("%s: couldn't create main input thread", __func__);
-		/* NOTREACHED */
+		                
 	} else {
 		panic_plain("%s: couldn't create %s input thread", __func__,
 		    if_name(ifp));
-		/* NOTREACHED */
+		                
 	}
 	OSAddAtomic(1, &cur_dlil_input_threads);
 
@@ -1475,7 +1475,7 @@ sysctl_input_thread_termination_spin SYSCTL_HANDLER_ARGS
 	if_input_thread_termination_spin = i;
 	return err;
 }
-#endif /* TEST_INPUT_THREAD_TERMINATION */
+#endif                                    
 
 static void
 dlil_clean_threading_info(struct dlil_threading_info *inp)
@@ -1500,7 +1500,7 @@ dlil_clean_threading_info(struct dlil_threading_info *inp)
 	VERIFY(inp->dlth_affinity_tag == 0);
 #if IFNET_INPUT_SANITY_CHK
 	inp->dlth_pkts_cnt = 0;
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 }
 
 static void
@@ -1515,7 +1515,7 @@ dlil_terminate_input_thread(struct dlil_threading_info *inp)
 	OSAddAtomic(-1, &cur_dlil_input_threads);
 
 #if TEST_INPUT_THREAD_TERMINATION
-	{ /* do something useless that won't get optimized away */
+	{                                                         
 		uint32_t        v = 1;
 		for (uint32_t i = 0;
 		    i < if_input_thread_termination_spin;
@@ -1524,7 +1524,7 @@ dlil_terminate_input_thread(struct dlil_threading_info *inp)
 		}
 		DLIL_PRINTF("the value is %d\n", v);
 	}
-#endif /* TEST_INPUT_THREAD_TERMINATION */
+#endif                                    
 
 	lck_mtx_lock_spin(&inp->dlth_lock);
 	_getq_all(&inp->dlth_pkts, &pkt, NULL, NULL, NULL);
@@ -1533,12 +1533,12 @@ dlil_terminate_input_thread(struct dlil_threading_info *inp)
 	wakeup_one((caddr_t)&inp->dlth_flags);
 	lck_mtx_unlock(&inp->dlth_lock);
 
-	/* free up pending packets */
+	                             
 	if (pkt.cp_mbuf != NULL) {
 		mbuf_freem_list(pkt.cp_mbuf);
 	}
 
-	/* for the extra refcnt from kernel_thread_start() */
+	                                                     
 	thread_deallocate(current_thread());
 
 	if (dlil_verbose) {
@@ -1546,9 +1546,9 @@ dlil_terminate_input_thread(struct dlil_threading_info *inp)
 		    if_name(ifp));
 	}
 
-	/* this is the end */
+	                     
 	thread_terminate(current_thread());
-	/* NOTREACHED */
+	                
 }
 
 static kern_return_t
@@ -1567,9 +1567,9 @@ dlil_init(void)
 {
 	thread_t thread = THREAD_NULL;
 
-	/*
-	 * The following fields must be 64-bit aligned for atomic operations.
-	 */
+	  
+                                                                      
+    
 	IF_DATA_REQUIRE_ALIGNED_64(ifi_ipackets);
 	IF_DATA_REQUIRE_ALIGNED_64(ifi_ierrors);
 	IF_DATA_REQUIRE_ALIGNED_64(ifi_opackets);
@@ -1602,9 +1602,9 @@ dlil_init(void)
 	IFNET_IF_DATA_REQUIRE_ALIGNED_64(ifi_fpackets);
 	IFNET_IF_DATA_REQUIRE_ALIGNED_64(ifi_fbytes);
 
-	/*
-	 * These IF_HWASSIST_ flags must be equal to their IFNET_* counterparts.
-	 */
+	  
+                                                                         
+    
 	_CASSERT(IF_HWASSIST_CSUM_IP == IFNET_CSUM_IP);
 	_CASSERT(IF_HWASSIST_CSUM_TCP == IFNET_CSUM_TCP);
 	_CASSERT(IF_HWASSIST_CSUM_UDP == IFNET_CSUM_UDP);
@@ -1620,9 +1620,9 @@ dlil_init(void)
 	_CASSERT(IF_HWASSIST_TSO_V4 == IFNET_TSO_IPV4);
 	_CASSERT(IF_HWASSIST_TSO_V6 == IFNET_TSO_IPV6);
 
-	/*
-	 * ... as well as the mbuf checksum flags counterparts.
-	 */
+	  
+                                                        
+    
 	_CASSERT(CSUM_IP == IF_HWASSIST_CSUM_IP);
 	_CASSERT(CSUM_TCP == IF_HWASSIST_CSUM_TCP);
 	_CASSERT(CSUM_UDP == IF_HWASSIST_CSUM_UDP);
@@ -1635,9 +1635,9 @@ dlil_init(void)
 	_CASSERT(CSUM_ZERO_INVERT == IF_HWASSIST_CSUM_ZERO_INVERT);
 	_CASSERT(CSUM_VLAN_TAG_VALID == IF_HWASSIST_VLAN_TAGGING);
 
-	/*
-	 * Make sure we have at least IF_LLREACH_MAXLEN in the llreach info.
-	 */
+	  
+                                                                     
+    
 	_CASSERT(IF_LLREACH_MAXLEN <= IF_LLREACHINFO_ADDRLEN);
 	_CASSERT(IFNET_LLREACHINFO_ADDRLEN == IF_LLREACHINFO_ADDRLEN);
 
@@ -1697,13 +1697,13 @@ dlil_init(void)
 	VERIFY(dlil_pending_thread_cnt == 0);
 	dlif_size = (ifnet_debug == 0) ? sizeof(struct dlil_ifnet) :
 	    sizeof(struct dlil_ifnet_dbg);
-	/* Enforce 64-bit alignment for dlil_ifnet structure */
+	                                                       
 	dlif_bufsize = dlif_size + sizeof(void *) + sizeof(u_int64_t);
 	dlif_bufsize = (uint32_t)P2ROUNDUP(dlif_bufsize, sizeof(u_int64_t));
 	dlif_zone = zone_create(DLIF_ZONE_NAME, dlif_bufsize, ZC_ZFREE_CLEARMEM);
 
 	dlif_tcpstat_size = sizeof(struct tcpstat_local);
-	/* Enforce 64-bit alignment for tcpstat_local structure */
+	                                                          
 	dlif_tcpstat_bufsize =
 	    dlif_tcpstat_size + sizeof(void *) + sizeof(u_int64_t);
 	dlif_tcpstat_bufsize = (uint32_t)
@@ -1712,7 +1712,7 @@ dlil_init(void)
 	    dlif_tcpstat_bufsize, ZC_ZFREE_CLEARMEM);
 
 	dlif_udpstat_size = sizeof(struct udpstat_local);
-	/* Enforce 64-bit alignment for udpstat_local structure */
+	                                                          
 	dlif_udpstat_bufsize =
 	    dlif_udpstat_size + sizeof(void *) + sizeof(u_int64_t);
 	dlif_udpstat_bufsize = (uint32_t)
@@ -1727,7 +1727,7 @@ dlil_init(void)
 	TAILQ_INIT(&ifnet_detaching_head);
 	TAILQ_INIT(&ifnet_ordered_head);
 
-	/* Setup the lock groups we will use */
+	                                       
 	dlil_grp_attributes = lck_grp_attr_alloc_init();
 
 	dlil_lock_group = lck_grp_alloc_init("DLIL internal locks",
@@ -1741,7 +1741,7 @@ dlil_init(void)
 	ifnet_snd_lock_group = lck_grp_alloc_init("ifnet snd locks",
 	    dlil_grp_attributes);
 
-	/* Setup the lock attributes we will use */
+	                                           
 	dlil_lck_attributes = lck_attr_alloc_init();
 
 	ifnet_lock_attr = lck_attr_alloc_init();
@@ -1751,72 +1751,72 @@ dlil_init(void)
 	lck_mtx_init(&dlil_ifnet_lock, dlil_lock_group, dlil_lck_attributes);
 	lck_mtx_init(&dlil_thread_sync_lock, dlil_lock_group, dlil_lck_attributes);
 
-	/* Setup interface flow control related items */
+	                                                
 	lck_mtx_init(&ifnet_fc_lock, dlil_lock_group, dlil_lck_attributes);
 
-	/* Initialize interface address subsystem */
+	                                            
 	ifa_init();
 
 #if PF
-	/* Initialize the packet filter */
+	                                  
 	pfinit();
-#endif /* PF */
+#endif         
 
-	/* Initialize queue algorithms */
+	                                 
 	classq_init();
 
-	/* Initialize packet schedulers */
+	                                  
 	pktsched_init();
 
-	/* Initialize flow advisory subsystem */
+	                                        
 	flowadv_init();
 
-	/* Initialize the pktap virtual interface */
+	                                            
 	pktap_init();
 
-	/* Initialize the service class to dscp map */
+	                                              
 	net_qos_map_init();
 
-	/* Initialize the interface port list */
+	                                        
 	if_ports_used_init();
 
-	/* Initialize the interface low power mode event handler */
+	                                                           
 	if_low_power_evhdlr_init();
 
 #if DEBUG || DEVELOPMENT
-	/* Run self-tests */
+	                    
 	dlil_verify_sum16();
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
-	/* Initialize link layer table */
+	                                 
 	lltable_glbl_init();
 
-	/*
-	 * Create and start up the main DLIL input thread and the interface
-	 * detacher threads once everything is initialized.
-	 */
+	  
+                                                                    
+                                                    
+    
 	dlil_incr_pending_thread_count();
 	(void) dlil_create_input_thread(NULL, dlil_main_input_thread, NULL);
 
-	/*
-	 * Create ifnet detacher thread.
-	 * When an interface gets detached, part of the detach processing
-	 * is delayed. The interface is added to delayed detach list
-	 * and this thread is woken up to call ifnet_detach_final
-	 * on these interfaces.
-	 */
+	  
+                                 
+                                                                  
+                                                             
+                                                          
+                        
+    
 	dlil_incr_pending_thread_count();
 	if (kernel_thread_start(ifnet_detacher_thread_func,
 	    NULL, &thread) != KERN_SUCCESS) {
 		panic_plain("%s: couldn't create detacher thread", __func__);
-		/* NOTREACHED */
+		                
 	}
 	thread_deallocate(thread);
 
-	/*
-	 * Wait for the created kernel threads for dlil to get
-	 * scheduled and run at least once before we proceed
-	 */
+	  
+                                                       
+                                                     
+    
 	lck_mtx_lock(&dlil_thread_sync_lock);
 	while (dlil_pending_thread_cnt != 0) {
 		DLIL_PRINTF("%s: Waiting for all the create dlil kernel "
@@ -1880,7 +1880,7 @@ dlil_attach_filter(struct ifnet *ifp, const struct iff_filter *if_filter,
 	struct ifnet_filter *filter = NULL;
 
 	ifnet_head_lock_shared();
-	/* Check that the interface is in the global list */
+	                                                    
 	if (!ifnet_lookup(ifp)) {
 		retval = ENXIO;
 		goto done;
@@ -1892,15 +1892,15 @@ dlil_attach_filter(struct ifnet *ifp, const struct iff_filter *if_filter,
 		goto done;
 	}
 
-	/* refcnt held above during lookup */
+	                                     
 	filter->filt_flags = flags;
 	filter->filt_ifp = ifp;
 	filter->filt_cookie = if_filter->iff_cookie;
 	filter->filt_name = if_filter->iff_name;
 	filter->filt_protocol = if_filter->iff_protocol;
-	/*
-	 * Do not install filter callbacks for internal coproc interface
-	 */
+	  
+                                                                 
+    
 	if (!IFNET_IS_INTCOPROC(ifp)) {
 		filter->filt_input = if_filter->iff_input;
 		filter->filt_output = if_filter->iff_output;
@@ -1920,10 +1920,10 @@ dlil_attach_filter(struct ifnet *ifp, const struct iff_filter *if_filter,
 
 	*filter_ref = filter;
 
-	/*
-	 * Bump filter count and route_generation ID to let TCP
-	 * know it shouldn't do TSO on this connection
-	 */
+	  
+                                                        
+                                               
+    
 	if ((filter->filt_flags & DLIL_IFF_TSO) == 0) {
 		ifnet_filter_update_tso(TRUE);
 	}
@@ -1966,14 +1966,14 @@ dlil_detach_filter_internal(interface_filter_t  filter, int detached)
 				if (entry != filter || entry->filt_skip) {
 					continue;
 				}
-				/*
-				 * We've found a match; since it's possible
-				 * that the thread gets blocked in the monitor,
-				 * we do the lock dance.  Interface should
-				 * not be detached since we still have a use
-				 * count held during filter attach.
-				 */
-				entry->filt_skip = 1;   /* skip input/output */
+				  
+                                               
+                                                   
+                                              
+                                                
+                                       
+       
+				entry->filt_skip = 1;                          
 				lck_mtx_unlock(&ifp->if_flt_lock);
 				ifnet_head_done();
 
@@ -1982,7 +1982,7 @@ dlil_detach_filter_internal(interface_filter_t  filter, int detached)
 				LCK_MTX_ASSERT(&ifp->if_flt_lock,
 				    LCK_MTX_ASSERT_OWNED);
 
-				/* Remove the filter from the list */
+				                                     
 				TAILQ_REMOVE(&ifp->if_flt_head, filter,
 				    filt_next);
 
@@ -1998,7 +1998,7 @@ dlil_detach_filter_internal(interface_filter_t  filter, int detached)
 		}
 		ifnet_head_done();
 
-		/* filter parameter is not a valid filter ref */
+		                                                
 		retval = EINVAL;
 		goto done;
 	}
@@ -2009,22 +2009,22 @@ dlil_detach_filter_internal(interface_filter_t  filter, int detached)
 
 destroy:
 
-	/* Call the detached function if there is one */
+	                                                
 	if (filter->filt_detached) {
 		filter->filt_detached(filter->filt_cookie, filter->filt_ifp);
 	}
 
-	/*
-	 * Decrease filter count and route_generation ID to let TCP
-	 * know it should reevalute doing TSO or not
-	 */
+	  
+                                                            
+                                             
+    
 	if ((filter->filt_flags & DLIL_IFF_TSO) == 0) {
 		ifnet_filter_update_tso(FALSE);
 	}
 
 	VERIFY(OSDecrementAtomic64(&net_api_stats.nas_iflt_attach_count) > 0);
 
-	/* Free the filter */
+	                     
 	zfree(dlif_filt_zone, filter);
 	filter = NULL;
 done:
@@ -2088,24 +2088,24 @@ dlil_main_input_thread_func(void *v, wait_result_t w)
 	VERIFY(!(inp->dlth_flags & (DLIL_INPUT_EMBRYONIC | DLIL_INPUT_RUNNING)));
 	(void) assert_wait(&inp->dlth_flags, THREAD_UNINT);
 	inp->dlth_flags |= DLIL_INPUT_EMBRYONIC;
-	/* wake up once to get out of embryonic state */
+	                                                
 	dlil_input_wakeup(inp);
 	lck_mtx_unlock(&inp->dlth_lock);
 	(void) thread_block_parameter(dlil_main_input_thread_cont, inp);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
-/*
- * Main input thread:
- *
- *   a) handles all inbound packets for lo0
- *   b) handles all inbound packets for interfaces with no dedicated
- *	input thread (e.g. anything but Ethernet/PDP or those that support
- *	opportunistic polling.)
- *   c) protocol registrations
- *   d) packet injections
- */
+  
+                     
+  
+                                           
+                                                                    
+                                                                     
+                          
+                              
+                         
+   
 __attribute__((noreturn))
 static void
 dlil_main_input_thread_cont(void *v, wait_result_t wres)
@@ -2113,7 +2113,7 @@ dlil_main_input_thread_cont(void *v, wait_result_t wres)
 	struct dlil_main_threading_info *inpm = v;
 	struct dlil_threading_info *inp = v;
 
-	/* main input thread is uninterruptible */
+	                                          
 	VERIFY(wres != THREAD_INTERRUPTED);
 	lck_mtx_lock_spin(&inp->dlth_lock);
 	VERIFY(!(inp->dlth_flags & (DLIL_INPUT_TERMINATE |
@@ -2137,12 +2137,12 @@ dlil_main_input_thread_cont(void *v, wait_result_t wres)
 		proto_req = (inp->dlth_flags &
 		    (DLIL_PROTO_WAITING | DLIL_PROTO_REGISTER));
 
-		/* Packets for non-dedicated interfaces other than lo0 */
+		                                                         
 		m_cnt = qlen(&inp->dlth_pkts);
 		_getq_all(&inp->dlth_pkts, &pkt, NULL, NULL, NULL);
 		m = pkt.cp_mbuf;
 
-		/* Packets exclusive to lo0 */
+		                              
 		m_cnt_loop = qlen(&inpm->lo_rcvq_pkts);
 		_getq_all(&inpm->lo_rcvq_pkts, &pkt, NULL, NULL, NULL);
 		m_loop = pkt.cp_mbuf;
@@ -2155,11 +2155,11 @@ dlil_main_input_thread_cont(void *v, wait_result_t wres)
 			dlil_decr_pending_thread_count();
 		}
 
-		/*
-		 * NOTE warning %%% attention !!!!
-		 * We should think about putting some thread starvation
-		 * safeguards if we deal with long chains of packets.
-		 */
+		  
+                                    
+                                                         
+                                                       
+     
 		if (__probable(m_loop != NULL)) {
 			dlil_input_packet_list_extended(lo_ifp, m_loop,
 			    m_cnt_loop, IFNET_MODEL_INPUT_POLL_OFF);
@@ -2176,7 +2176,7 @@ dlil_main_input_thread_cont(void *v, wait_result_t wres)
 
 		lck_mtx_lock_spin(&inp->dlth_lock);
 		VERIFY(inp->dlth_flags & DLIL_INPUT_RUNNING);
-		/* main input thread cannot be terminated */
+		                                            
 		VERIFY(!(inp->dlth_flags & DLIL_INPUT_TERMINATE));
 		if (!(inp->dlth_flags & ~DLIL_INPUT_RUNNING)) {
 			break;
@@ -2188,14 +2188,14 @@ dlil_main_input_thread_cont(void *v, wait_result_t wres)
 	lck_mtx_unlock(&inp->dlth_lock);
 	(void) thread_block_parameter(dlil_main_input_thread_cont, inp);
 
-	VERIFY(0);      /* we should never get here */
-	/* NOTREACHED */
+	VERIFY(0);                                    
+	                
 	__builtin_unreachable();
 }
 
-/*
- * Input thread for interfaces with legacy input model.
- */
+  
+                                                       
+   
 __attribute__((noreturn))
 static void
 dlil_input_thread_func(void *v, wait_result_t w)
@@ -2213,7 +2213,7 @@ dlil_input_thread_func(void *v, wait_result_t w)
 	    !(ifp->if_xflags & IFXF_LEGACY));
 	VERIFY(current_thread() == inp->dlth_thread);
 
-	/* construct the name for this thread, and then apply it */
+	                                                           
 	bzero(thread_name, sizeof(thread_name));
 	(void) snprintf(thread_name, sizeof(thread_name),
 	    "dlil_input_%s", ifp->if_xname);
@@ -2223,11 +2223,11 @@ dlil_input_thread_func(void *v, wait_result_t w)
 	VERIFY(!(inp->dlth_flags & (DLIL_INPUT_EMBRYONIC | DLIL_INPUT_RUNNING)));
 	(void) assert_wait(&inp->dlth_flags, THREAD_UNINT);
 	inp->dlth_flags |= DLIL_INPUT_EMBRYONIC;
-	/* wake up once to get out of embryonic state */
+	                                                
 	dlil_input_wakeup(inp);
 	lck_mtx_unlock(&inp->dlth_lock);
 	(void) thread_block_parameter(dlil_input_thread_cont, inp);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -2261,17 +2261,17 @@ dlil_input_thread_cont(void *v, wait_result_t wres)
 			inp->dlth_flags &= ~DLIL_INPUT_EMBRYONIC;
 		}
 
-		/*
-		 * Protocol registration and injection must always use
-		 * the main input thread; in theory the latter can utilize
-		 * the corresponding input thread where the packet arrived
-		 * on, but that requires our knowing the interface in advance
-		 * (and the benefits might not worth the trouble.)
-		 */
+		  
+                                                        
+                                                            
+                                                            
+                                                               
+                                                    
+     
 		VERIFY(!(inp->dlth_flags &
 		    (DLIL_PROTO_WAITING | DLIL_PROTO_REGISTER)));
 
-		/* Packets for this interface */
+		                                
 		m_cnt = qlen(&inp->dlth_pkts);
 		_getq_all(&inp->dlth_pkts, &pkt, NULL, NULL, NULL);
 		m = pkt.cp_mbuf;
@@ -2290,11 +2290,11 @@ dlil_input_thread_cont(void *v, wait_result_t wres)
 			ifnet_notify_data_threshold(ifp);
 		}
 
-		/*
-		 * NOTE warning %%% attention !!!!
-		 * We should think about putting some thread starvation
-		 * safeguards if we deal with long chains of packets.
-		 */
+		  
+                                    
+                                                         
+                                                       
+     
 		if (__probable(m != NULL)) {
 			dlil_input_packet_list_extended(NULL, m,
 			    m_cnt, ifp->if_poll_mode);
@@ -2314,22 +2314,22 @@ dlil_input_thread_cont(void *v, wait_result_t wres)
 terminate:
 		lck_mtx_unlock(&inp->dlth_lock);
 		dlil_terminate_input_thread(inp);
-		/* NOTREACHED */
+		                
 	} else {
 		(void) assert_wait(&inp->dlth_flags, THREAD_UNINT);
 		lck_mtx_unlock(&inp->dlth_lock);
 		(void) thread_block_parameter(dlil_input_thread_cont, inp);
-		/* NOTREACHED */
+		                
 	}
 
-	VERIFY(0);      /* we should never get here */
-	/* NOTREACHED */
+	VERIFY(0);                                    
+	                
 	__builtin_unreachable();
 }
 
-/*
- * Input thread for interfaces with opportunistic polling input model.
- */
+  
+                                                                      
+   
 __attribute__((noreturn))
 static void
 dlil_rxpoll_input_thread_func(void *v, wait_result_t w)
@@ -2344,7 +2344,7 @@ dlil_rxpoll_input_thread_func(void *v, wait_result_t w)
 	    (ifp->if_xflags & IFXF_LEGACY));
 	VERIFY(current_thread() == inp->dlth_thread);
 
-	/* construct the name for this thread, and then apply it */
+	                                                           
 	bzero(thread_name, sizeof(thread_name));
 	(void) snprintf(thread_name, sizeof(thread_name),
 	    "dlil_input_poll_%s", ifp->if_xname);
@@ -2354,11 +2354,11 @@ dlil_rxpoll_input_thread_func(void *v, wait_result_t w)
 	VERIFY(!(inp->dlth_flags & (DLIL_INPUT_EMBRYONIC | DLIL_INPUT_RUNNING)));
 	(void) assert_wait(&inp->dlth_flags, THREAD_UNINT);
 	inp->dlth_flags |= DLIL_INPUT_EMBRYONIC;
-	/* wake up once to get out of embryonic state */
+	                                                
 	dlil_input_wakeup(inp);
 	lck_mtx_unlock(&inp->dlth_lock);
 	(void) thread_block_parameter(dlil_rxpoll_input_thread_cont, inp);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -2402,32 +2402,32 @@ dlil_rxpoll_input_thread_cont(void *v, wait_result_t wres)
 			ival = IF_RXPOLL_INTERVALTIME_MIN;
 		}
 
-		/* Link parameters changed? */
+		                              
 		if (ifp->if_poll_update != 0) {
 			ifp->if_poll_update = 0;
 			(void) dlil_rxpoll_set_params(ifp, NULL, TRUE);
 		}
 
-		/* Current operating mode */
+		                            
 		mode = ifp->if_poll_mode;
 
-		/*
-		 * Protocol registration and injection must always use
-		 * the main input thread; in theory the latter can utilize
-		 * the corresponding input thread where the packet arrived
-		 * on, but that requires our knowing the interface in advance
-		 * (and the benefits might not worth the trouble.)
-		 */
+		  
+                                                        
+                                                            
+                                                            
+                                                               
+                                                    
+     
 		VERIFY(!(inp->dlth_flags &
 		    (DLIL_PROTO_WAITING | DLIL_PROTO_REGISTER)));
 
-		/* Total count of all packets */
+		                                
 		m_cnt = qlen(&inp->dlth_pkts);
 
-		/* Total bytes of all packets */
+		                                
 		m_size = qsize(&inp->dlth_pkts);
 
-		/* Packets for this interface */
+		                                
 		_getq_all(&inp->dlth_pkts, &pkt, NULL, NULL, NULL);
 		m = pkt.cp_mbuf;
 		VERIFY(m != NULL || m_cnt == 0);
@@ -2441,7 +2441,7 @@ dlil_rxpoll_input_thread_cont(void *v, wait_result_t wres)
 		if (if_rxpoll && net_timerisset(&ifp->if_poll_sample_holdtime)) {
 			u_int32_t ptot, btot;
 
-			/* Accumulate statistics for current sampling */
+			                                                
 			PKTCNTR_ADD(&ifp->if_poll_sstats, m_cnt, m_size);
 
 			if (net_timercmp(&delta, &ifp->if_poll_sample_holdtime, <)) {
@@ -2450,7 +2450,7 @@ dlil_rxpoll_input_thread_cont(void *v, wait_result_t wres)
 
 			*(&ifp->if_poll_sample_lasttime) = *(&now);
 
-			/* Calculate min/max of inbound bytes */
+			                                        
 			btot = (u_int32_t)ifp->if_poll_sstats.bytes;
 			if (ifp->if_rxpoll_bmin == 0 || ifp->if_rxpoll_bmin > btot) {
 				ifp->if_rxpoll_bmin = btot;
@@ -2459,10 +2459,10 @@ dlil_rxpoll_input_thread_cont(void *v, wait_result_t wres)
 				ifp->if_rxpoll_bmax = btot;
 			}
 
-			/* Calculate EWMA of inbound bytes */
+			                                     
 			DLIL_EWMA(ifp->if_rxpoll_bavg, btot, if_rxpoll_decay);
 
-			/* Calculate min/max of inbound packets */
+			                                          
 			ptot = (u_int32_t)ifp->if_poll_sstats.packets;
 			if (ifp->if_rxpoll_pmin == 0 || ifp->if_rxpoll_pmin > ptot) {
 				ifp->if_rxpoll_pmin = ptot;
@@ -2471,13 +2471,13 @@ dlil_rxpoll_input_thread_cont(void *v, wait_result_t wres)
 				ifp->if_rxpoll_pmax = ptot;
 			}
 
-			/* Calculate EWMA of inbound packets */
+			                                       
 			DLIL_EWMA(ifp->if_rxpoll_pavg, ptot, if_rxpoll_decay);
 
-			/* Reset sampling statistics */
+			                               
 			PKTCNTR_CLEAR(&ifp->if_poll_sstats);
 
-			/* Calculate EWMA of wakeup requests */
+			                                       
 			DLIL_EWMA(ifp->if_rxpoll_wavg, inp->dlth_wtot,
 			    if_rxpoll_decay);
 			inp->dlth_wtot = 0;
@@ -2508,7 +2508,7 @@ dlil_rxpoll_input_thread_cont(void *v, wait_result_t wres)
 				}
 			}
 
-			/* Perform mode transition, if necessary */
+			                                           
 			if (!net_timerisset(&ifp->if_poll_mode_lasttime)) {
 				*(&ifp->if_poll_mode_lasttime) = *(&now);
 			}
@@ -2548,12 +2548,12 @@ skip:
 			ifnet_notify_data_threshold(ifp);
 		}
 
-		/*
-		 * If there's a mode change and interface is still attached,
-		 * perform a downcall to the driver for the new mode.  Also
-		 * hold an IO refcnt on the interface to prevent it from
-		 * being detached (will be release below.)
-		 */
+		  
+                                                              
+                                                             
+                                                          
+                                            
+     
 		if (poll_req != 0 && ifnet_is_attached(ifp, 1)) {
 			struct ifnet_model_params p = {
 				.model = mode, .reserved = { 0 }
@@ -2604,18 +2604,18 @@ skip:
 
 			default:
 				VERIFY(0);
-				/* NOTREACHED */
+				                
 			}
 
-			/* Release the IO refcnt */
+			                           
 			ifnet_decr_iorefcnt(ifp);
 		}
 
-		/*
-		 * NOTE warning %%% attention !!!!
-		 * We should think about putting some thread starvation
-		 * safeguards if we deal with long chains of packets.
-		 */
+		  
+                                    
+                                                         
+                                                       
+     
 		if (__probable(m != NULL)) {
 			dlil_input_packet_list_extended(NULL, m, m_cnt, mode);
 		}
@@ -2634,17 +2634,17 @@ skip:
 terminate:
 		lck_mtx_unlock(&inp->dlth_lock);
 		dlil_terminate_input_thread(inp);
-		/* NOTREACHED */
+		                
 	} else {
 		(void) assert_wait(&inp->dlth_flags, THREAD_UNINT);
 		lck_mtx_unlock(&inp->dlth_lock);
 		(void) thread_block_parameter(dlil_rxpoll_input_thread_cont,
 		    inp);
-		/* NOTREACHED */
+		                
 	}
 
-	VERIFY(0);      /* we should never get here */
-	/* NOTREACHED */
+	VERIFY(0);                                    
+	                
 	__builtin_unreachable();
 }
 
@@ -2656,7 +2656,7 @@ dlil_rxpoll_validate_params(struct ifnet_poll_params *p)
 		    (p->packets_lowat != 0 && p->packets_hiwat == 0)) {
 			return EINVAL;
 		}
-		if (p->packets_lowat != 0 &&    /* hiwat must be non-zero */
+		if (p->packets_lowat != 0 &&                                
 		    p->packets_lowat >= p->packets_hiwat) {
 			return EINVAL;
 		}
@@ -2664,7 +2664,7 @@ dlil_rxpoll_validate_params(struct ifnet_poll_params *p)
 		    (p->bytes_lowat != 0 && p->bytes_hiwat == 0)) {
 			return EINVAL;
 		}
-		if (p->bytes_lowat != 0 &&      /* hiwat must be non-zero */
+		if (p->bytes_lowat != 0 &&                                  
 		    p->bytes_lowat >= p->bytes_hiwat) {
 			return EINVAL;
 		}
@@ -2682,7 +2682,7 @@ dlil_rxpoll_update_params(struct ifnet *ifp, struct ifnet_poll_params *p)
 	u_int64_t sample_holdtime, inbw;
 
 	if ((inbw = ifnet_input_linkrate(ifp)) == 0 && p == NULL) {
-		sample_holdtime = 0;    /* polling is disabled */
+		sample_holdtime = 0;                             
 		ifp->if_rxpoll_wlowat = ifp->if_rxpoll_plowat =
 		    ifp->if_rxpoll_blowat = 0;
 		ifp->if_rxpoll_whiwat = ifp->if_rxpoll_phiwat =
@@ -2700,7 +2700,7 @@ dlil_rxpoll_update_params(struct ifnet *ifp, struct ifnet_poll_params *p)
 			}
 			n = i;
 		}
-		/* auto-tune if caller didn't specify a value */
+		                                                
 		plowat = ((p == NULL || p->packets_lowat == 0) ?
 		    rxpoll_tbl[n].plowat : p->packets_lowat);
 		phiwat = ((p == NULL || p->packets_hiwat == 0) ?
@@ -2745,10 +2745,10 @@ dlil_rxpoll_update_params(struct ifnet *ifp, struct ifnet_poll_params *p)
 	}
 }
 
-/*
- * Must be called on an attached ifnet (caller is expected to check.)
- * Caller may pass NULL for poll parameters to indicate "auto-tuning."
- */
+  
+                                                                     
+                                                                      
+   
 errno_t
 dlil_rxpoll_set_params(struct ifnet *ifp, struct ifnet_poll_params *p,
     boolean_t locked)
@@ -2769,14 +2769,14 @@ dlil_rxpoll_set_params(struct ifnet *ifp, struct ifnet_poll_params *p,
 		lck_mtx_lock(&inp->dlth_lock);
 	}
 	LCK_MTX_ASSERT(&inp->dlth_lock, LCK_MTX_ASSERT_OWNED);
-	/*
-	 * Normally, we'd reset the parameters to the auto-tuned values
-	 * if the the input thread detects a change in link rate.  If the
-	 * driver provides its own parameters right after a link rate
-	 * changes, but before the input thread gets to run, we want to
-	 * make sure to keep the driver's values.  Clearing if_poll_update
-	 * will achieve that.
-	 */
+	  
+                                                                
+                                                                  
+                                                              
+                                                                
+                                                                   
+                      
+    
 	if (p != NULL && !locked && ifp->if_poll_update != 0) {
 		ifp->if_poll_update = 0;
 	}
@@ -2787,9 +2787,9 @@ dlil_rxpoll_set_params(struct ifnet *ifp, struct ifnet_poll_params *p,
 	return 0;
 }
 
-/*
- * Must be called on an attached ifnet (caller is expected to check.)
- */
+  
+                                                                     
+   
 errno_t
 dlil_rxpoll_get_params(struct ifnet *ifp, struct ifnet_poll_params *p)
 {
@@ -2857,11 +2857,11 @@ ifnet_input_common(struct ifnet *ifp, struct mbuf *m_head, struct mbuf *m_tail,
 	VERIFY(m_tail == NULL || ext);
 	VERIFY(s != NULL || !ext);
 
-	/*
-	 * Drop the packet(s) if the parameters are invalid, or if the
-	 * interface is no longer attached; else hold an IO refcnt to
-	 * prevent it from being detached (will be released below.)
-	 */
+	  
+                                                               
+                                                              
+                                                            
+    
 	if (ifp == NULL || (ifp != lo_ifp && !ifnet_datamov_begin(ifp))) {
 		if (m_head != NULL) {
 			mbuf_freem_list(m_head);
@@ -2879,7 +2879,7 @@ ifnet_input_common(struct ifnet *ifp, struct mbuf *m_head, struct mbuf *m_tail,
 			if (__improbable(dlil_input_sanity_check != 0)) {
 				DLIL_INPUT_CHECK(last, ifp);
 			}
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 			m_cnt++;
 			m_size += m_length(last);
 			if (mbuf_nextpkt(last) == NULL) {
@@ -2910,7 +2910,7 @@ ifnet_input_common(struct ifnet *ifp, struct mbuf *m_head, struct mbuf *m_tail,
 		m_cnt = s->packets_in;
 		m_size = s->bytes_in;
 		last = m_tail;
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 	}
 
 	if (last != m_tail) {
@@ -2919,13 +2919,13 @@ ifnet_input_common(struct ifnet *ifp, struct mbuf *m_head, struct mbuf *m_tail,
 		    m_tail, last);
 	}
 
-	/*
-	 * Assert packet count only for the extended variant, for backwards
-	 * compatibility, since this came directly from the device driver.
-	 * Relax this assertion for input bytes, as the driver may have
-	 * included the link-layer headers in the computation; hence
-	 * m_size is just an approximation.
-	 */
+	  
+                                                                    
+                                                                   
+                                                                
+                                                             
+                                    
+    
 	if (ext && s->packets_in != m_cnt) {
 		panic_plain("%s: input packet count mismatch for %s, "
 		    "%d instead of %d\n", __func__, if_name(ifp),
@@ -2944,7 +2944,7 @@ ifnet_input_common(struct ifnet *ifp, struct mbuf *m_head, struct mbuf *m_tail,
 	err = (*input_func)(ifp, m_head, m_tail, s, poll, current_thread());
 
 	if (ifp != lo_ifp) {
-		/* Release the IO refcnt */
+		                           
 		ifnet_datamov_end(ifp);
 	}
 
@@ -2982,11 +2982,11 @@ dlil_input_async(struct dlil_threading_info *inp,
 	u_int32_t m_size = s->bytes_in;
 	boolean_t notify = FALSE;
 
-	/*
-	 * If there is a matching DLIL input thread associated with an
-	 * affinity set, associate this thread with the same set.  We
-	 * will only do this once.
-	 */
+	  
+                                                               
+                                                              
+                           
+    
 	lck_mtx_lock_spin(&inp->dlth_lock);
 	if (inp != dlil_main_input_thread && inp->dlth_affinity && tp != NULL &&
 	    ((!poll && inp->dlth_driver_thread == THREAD_NULL) ||
@@ -3002,27 +3002,27 @@ dlil_input_async(struct dlil_threading_info *inp,
 		}
 		lck_mtx_unlock(&inp->dlth_lock);
 
-		/* Associate the current thread with the new affinity tag */
+		                                                            
 		(void) dlil_affinity_set(tp, tag);
 
-		/*
-		 * Take a reference on the current thread; during detach,
-		 * we will need to refer to it in order to tear down its
-		 * affinity.
-		 */
+		  
+                                                           
+                                                          
+              
+     
 		thread_reference(tp);
 		lck_mtx_lock_spin(&inp->dlth_lock);
 	}
 
 	VERIFY(m_head != NULL || (m_tail == NULL && m_cnt == 0));
 
-	/*
-	 * Because of loopbacked multicast we cannot stuff the ifp in
-	 * the rcvif of the packet header: loopback (lo0) packets use a
-	 * dedicated list so that we can later associate them with lo_ifp
-	 * on their way up the stack.  Packets for other interfaces without
-	 * dedicated input threads go to the regular list.
-	 */
+	  
+                                                              
+                                                                
+                                                                  
+                                                                    
+                                                   
+    
 	if (m_head != NULL) {
 		classq_pkt_t head, tail;
 		CLASSQ_PKT_INIT_MBUF(&head, m_head);
@@ -3051,26 +3051,26 @@ dlil_input_async(struct dlil_threading_info *inp,
 		if (count != m_cnt) {
 			panic_plain("%s: invalid total packet count %u "
 			    "(expected %u)\n", if_name(ifp), count, m_cnt);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		} else if (size != m_size) {
 			panic_plain("%s: invalid total packet size %u "
 			    "(expected %u)\n", if_name(ifp), size, m_size);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		}
 
 		inp->dlth_pkts_cnt += m_cnt;
 	}
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 
 	dlil_input_stats_add(s, inp, ifp, poll);
-	/*
-	 * If we're using the main input thread, synchronize the
-	 * stats now since we have the interface context.  All
-	 * other cases involving dedicated input threads will
-	 * have their stats synchronized there.
-	 */
+	  
+                                                         
+                                                       
+                                                      
+                                        
+    
 	if (inp == dlil_main_input_thread) {
 		notify = dlil_input_stats_sync(ifp, inp);
 	}
@@ -3099,7 +3099,7 @@ dlil_input_sync(struct dlil_threading_info *inp,
 
 	ASSERT(inp != dlil_main_input_thread);
 
-	/* XXX: should we just assert instead? */
+	                                         
 	if (__improbable(m_head == NULL)) {
 		return 0;
 	}
@@ -3123,18 +3123,18 @@ dlil_input_sync(struct dlil_threading_info *inp,
 		if (count != m_cnt) {
 			panic_plain("%s: invalid total packet count %u "
 			    "(expected %u)\n", if_name(ifp), count, m_cnt);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		} else if (size != m_size) {
 			panic_plain("%s: invalid total packet size %u "
 			    "(expected %u)\n", if_name(ifp), size, m_size);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		}
 
 		inp->dlth_pkts_cnt += m_cnt;
 	}
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 
 	dlil_input_stats_add(s, inp, ifp, poll);
 
@@ -3149,11 +3149,11 @@ dlil_input_sync(struct dlil_threading_info *inp,
 		ifnet_notify_data_threshold(ifp);
 	}
 
-	/*
-	 * NOTE warning %%% attention !!!!
-	 * We should think about putting some thread starvation
-	 * safeguards if we deal with long chains of packets.
-	 */
+	  
+                                   
+                                                        
+                                                      
+    
 	if (head.cp_mbuf != NULL) {
 		dlil_input_packet_list_extended(NULL, head.cp_mbuf,
 		    m_cnt, ifp->if_poll_mode);
@@ -3169,13 +3169,13 @@ ifnet_start_common(struct ifnet *ifp, boolean_t resetfc)
 	if (!(ifp->if_eflags & IFEF_TXSTART)) {
 		return;
 	}
-	/*
-	 * If the starter thread is inactive, signal it to do work,
-	 * unless the interface is being flow controlled from below,
-	 * e.g. a virtual interface being flow controlled by a real
-	 * network interface beneath it, or it's been disabled via
-	 * a call to ifnet_disable_output().
-	 */
+	  
+                                                            
+                                                             
+                                                            
+                                                           
+                                     
+    
 	lck_mtx_lock_spin(&ifp->if_start_lock);
 	if (resetfc) {
 		ifp->if_start_flags &= ~IFSF_FLOW_CONTROLLED;
@@ -3207,20 +3207,20 @@ ifnet_start_thread_func(void *v, wait_result_t w)
 	struct ifnet *ifp = v;
 	char thread_name[MAXTHREADNAMESIZE];
 
-	/* Construct the name for this thread, and then apply it. */
+	                                                            
 	bzero(thread_name, sizeof(thread_name));
 	(void) snprintf(thread_name, sizeof(thread_name),
 	    "ifnet_start_%s", ifp->if_xname);
 	ASSERT(ifp->if_start_thread == current_thread());
 	thread_set_thread_name(current_thread(), thread_name);
 
-	/*
-	 * Treat the dedicated starter thread for lo0 as equivalent to
-	 * the driver workloop thread; if net_affinity is enabled for
-	 * the main input thread, associate this starter thread to it
-	 * by binding them with the same affinity tag.  This is done
-	 * only once (as we only have one lo_ifp which never goes away.)
-	 */
+	  
+                                                               
+                                                              
+                                                              
+                                                             
+                                                                 
+    
 	if (ifp == lo_ifp) {
 		struct dlil_threading_info *inp = dlil_main_input_thread;
 		struct thread *tp = current_thread();
@@ -3234,7 +3234,7 @@ ifnet_start_thread_func(void *v, wait_result_t w)
 			inp->dlth_driver_thread = tp;
 			lck_mtx_unlock(&inp->dlth_lock);
 
-			/* Associate this thread with the affinity tag */
+			                                                 
 			(void) dlil_affinity_set(tp, tag);
 		} else {
 			lck_mtx_unlock(&inp->dlth_lock);
@@ -3245,12 +3245,12 @@ ifnet_start_thread_func(void *v, wait_result_t w)
 	VERIFY(!ifp->if_start_embryonic && !ifp->if_start_active);
 	(void) assert_wait(&ifp->if_start_thread, THREAD_UNINT);
 	ifp->if_start_embryonic = 1;
-	/* wake up once to get out of embryonic state */
+	                                                
 	ifp->if_start_req++;
 	(void) wakeup_one((caddr_t)&ifp->if_start_thread);
 	lck_mtx_unlock(&ifp->if_start_lock);
 	(void) thread_block_parameter(ifnet_start_thread_cont, ifp);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -3277,9 +3277,9 @@ ifnet_start_thread_cont(void *v, wait_result_t wres)
 
 	ifp->if_start_active = 1;
 
-	/*
-	 * Keep on servicing until no more request.
-	 */
+	  
+                                            
+    
 	for (;;) {
 		u_int32_t req = ifp->if_start_req;
 		if (!IFCQ_IS_EMPTY(ifq) &&
@@ -3295,31 +3295,31 @@ ifnet_start_thread_cont(void *v, wait_result_t wres)
 		}
 		lck_mtx_unlock(&ifp->if_start_lock);
 
-		/*
-		 * If no longer attached, don't call start because ifp
-		 * is being destroyed; else hold an IO refcnt to
-		 * prevent the interface from being detached (will be
-		 * released below.)
-		 */
+		  
+                                                        
+                                                  
+                                                       
+                     
+     
 		if (!ifnet_datamov_begin(ifp)) {
 			lck_mtx_lock_spin(&ifp->if_start_lock);
 			break;
 		}
 
-		/* invoke the driver's start routine */
+		                                       
 		((*ifp->if_start)(ifp));
 
-		/*
-		 * Release the io ref count taken above.
-		 */
+		  
+                                          
+     
 		ifnet_datamov_end(ifp);
 
 		lck_mtx_lock_spin(&ifp->if_start_lock);
 
-		/*
-		 * If there's no pending request or if the
-		 * interface has been disabled, we're done.
-		 */
+		  
+                                            
+                                             
+     
 		if (req == ifp->if_start_req ||
 		    (ifp->if_start_flags & IFSF_FLOW_CONTROLLED)) {
 			break;
@@ -3335,12 +3335,12 @@ skip:
 		struct timespec delay_start_ts;
 		struct timespec *ts;
 
-		/*
-		 * Wakeup N ns from now if rate-controlled by TBR, and if
-		 * there are still packets in the send queue which haven't
-		 * been dequeued so far; else sleep indefinitely (ts = NULL)
-		 * until ifnet_start() is called again.
-		 */
+		  
+                                                           
+                                                            
+                                                              
+                                         
+     
 		ts = ((IFCQ_TBR_IS_ENABLED(ifq) && !IFCQ_IS_EMPTY(ifq)) ?
 		    &ifp->if_start_cycle : NULL);
 
@@ -3363,10 +3363,10 @@ skip:
 		    THREAD_UNINT, deadline);
 		lck_mtx_unlock(&ifp->if_start_lock);
 		(void) thread_block_parameter(ifnet_start_thread_cont, ifp);
-		/* NOTREACHED */
+		                
 	} else {
 terminate:
-		/* interface is detached? */
+		                            
 		ifnet_set_start_cycle(ifp, NULL);
 		lck_mtx_unlock(&ifp->if_start_lock);
 		ifnet_purge(ifp);
@@ -3376,16 +3376,16 @@ terminate:
 			    if_name(ifp));
 		}
 
-		/* for the extra refcnt from kernel_thread_start() */
+		                                                     
 		thread_deallocate(current_thread());
-		/* this is the end */
+		                     
 		thread_terminate(current_thread());
-		/* NOTREACHED */
+		                
 	}
 
-	/* must never get here */
+	                         
 	VERIFY(0);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -3419,9 +3419,9 @@ ifnet_poll_wakeup(struct ifnet *ifp)
 void
 ifnet_poll(struct ifnet *ifp)
 {
-	/*
-	 * If the poller thread is inactive, signal it to do work.
-	 */
+	  
+                                                           
+    
 	lck_mtx_lock_spin(&ifp->if_poll_lock);
 	ifnet_poll_wakeup(ifp);
 	lck_mtx_unlock(&ifp->if_poll_lock);
@@ -3438,7 +3438,7 @@ ifnet_poll_thread_func(void *v, wait_result_t w)
 	VERIFY(ifp->if_eflags & IFEF_RXPOLL);
 	VERIFY(current_thread() == ifp->if_poll_thread);
 
-	/* construct the name for this thread, and then apply it */
+	                                                           
 	bzero(thread_name, sizeof(thread_name));
 	(void) snprintf(thread_name, sizeof(thread_name),
 	    "ifnet_poller_%s", ifp->if_xname);
@@ -3448,11 +3448,11 @@ ifnet_poll_thread_func(void *v, wait_result_t w)
 	VERIFY(!(ifp->if_poll_flags & (IF_POLLF_EMBRYONIC | IF_POLLF_RUNNING)));
 	(void) assert_wait(&ifp->if_poll_thread, THREAD_UNINT);
 	ifp->if_poll_flags |= IF_POLLF_EMBRYONIC;
-	/* wake up once to get out of embryonic state */
+	                                                
 	ifnet_poll_wakeup(ifp);
 	lck_mtx_unlock(&ifp->if_poll_lock);
 	(void) thread_block_parameter(ifnet_poll_thread_cont, ifp);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -3489,9 +3489,9 @@ ifnet_poll_thread_cont(void *v, wait_result_t wres)
 
 	ifp->if_poll_flags |= IF_POLLF_RUNNING;
 
-	/*
-	 * Keep on servicing until no more request.
-	 */
+	  
+                                            
+    
 	for (;;) {
 		struct mbuf *m_head, *m_tail;
 		u_int32_t m_lim, m_cnt, m_totlen;
@@ -3501,11 +3501,11 @@ ifnet_poll_thread_cont(void *v, wait_result_t wres)
 		    MAX((qlimit(&inp->dlth_pkts)), (ifp->if_rxpoll_phiwat << 2));
 		lck_mtx_unlock(&ifp->if_poll_lock);
 
-		/*
-		 * If no longer attached, there's nothing to do;
-		 * else hold an IO refcnt to prevent the interface
-		 * from being detached (will be released below.)
-		 */
+		  
+                                                  
+                                                    
+                                                  
+     
 		if (!ifnet_is_attached(ifp, 1)) {
 			lck_mtx_lock_spin(&ifp->if_poll_lock);
 			break;
@@ -3520,7 +3520,7 @@ ifnet_poll_thread_cont(void *v, wait_result_t wres)
 			    ifp->if_rxpoll_wavg, ifp->if_rxpoll_bavg);
 		}
 
-		/* invoke the driver's input poll routine */
+		                                            
 		((*ifp->if_input_poll)(ifp, 0, m_lim, &m_head, &m_tail,
 		&m_cnt, &m_totlen));
 
@@ -3536,7 +3536,7 @@ ifnet_poll_thread_cont(void *v, wait_result_t wres)
 				    ifp->if_rxpoll_wavg, ifp->if_rxpoll_bavg);
 			}
 
-			/* stats are required for extended variant */
+			                                             
 			s.packets_in = m_cnt;
 			s.bytes_in = m_totlen;
 
@@ -3556,12 +3556,12 @@ ifnet_poll_thread_cont(void *v, wait_result_t wres)
 			    NULL, FALSE, TRUE);
 		}
 
-		/* Release the io ref count */
+		                              
 		ifnet_decr_iorefcnt(ifp);
 
 		lck_mtx_lock_spin(&ifp->if_poll_lock);
 
-		/* if there's no pending request, we're done */
+		                                               
 		if (req == ifp->if_poll_req ||
 		    ifp->if_poll_thread == THREAD_NULL) {
 			break;
@@ -3575,10 +3575,10 @@ skip:
 		uint64_t deadline = TIMEOUT_WAIT_FOREVER;
 		struct timespec *ts;
 
-		/*
-		 * Wakeup N ns from now, else sleep indefinitely (ts = NULL)
-		 * until ifnet_poll() is called again.
-		 */
+		  
+                                                              
+                                        
+     
 		ts = &ifp->if_poll_cycle;
 		if (ts->tv_sec == 0 && ts->tv_nsec == 0) {
 			ts = NULL;
@@ -3593,10 +3593,10 @@ skip:
 		    THREAD_UNINT, deadline);
 		lck_mtx_unlock(&ifp->if_poll_lock);
 		(void) thread_block_parameter(ifnet_poll_thread_cont, ifp);
-		/* NOTREACHED */
+		                
 	} else {
 terminate:
-		/* interface is detached (maybe while asleep)? */
+		                                                 
 		ifnet_set_poll_cycle(ifp, NULL);
 		lck_mtx_unlock(&ifp->if_poll_lock);
 
@@ -3605,16 +3605,16 @@ terminate:
 			    if_name(ifp));
 		}
 
-		/* for the extra refcnt from kernel_thread_start() */
+		                                                     
 		thread_deallocate(current_thread());
-		/* this is the end */
+		                     
 		thread_terminate(current_thread());
-		/* NOTREACHED */
+		                
 	}
 
-	/* must never get here */
+	                         
 	VERIFY(0);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -3815,7 +3815,7 @@ ifnet_enqueue_multi_setup(struct ifnet *ifp, uint16_t delay_qlen,
 		if_set_eflags(ifp, IFEF_ENQUEUE_MULTI);
 		ifp->if_start_delay_qlen = MIN(100, delay_qlen);
 		ifp->if_start_delay_timeout = min(20000, delay_timeout);
-		/* convert timeout to nanoseconds */
+		                                    
 		ifp->if_start_delay_timeout *= 1000;
 		kprintf("%s: forced IFEF_ENQUEUE_MULTI qlen %u timeout %u\n",
 		    ifp->if_xname, (uint32_t)delay_qlen,
@@ -3825,11 +3825,11 @@ ifnet_enqueue_multi_setup(struct ifnet *ifp, uint16_t delay_qlen,
 	}
 }
 
-/*
- * This function clears the DSCP bits in the IPV4/V6 header pointed to by buf.
- * While it's ok for buf to be not 32 bit aligned, the caller must ensure that
- * buf holds the full header.
- */
+  
+                                                                              
+                                                                              
+                             
+   
 static __attribute__((noinline)) void
 ifnet_mcast_clear_dscp(uint8_t *buf, uint8_t ip_ver)
 {
@@ -3901,12 +3901,12 @@ ifnet_enqueue_ifclassq(struct ifnet *ifp, classq_pkt_t *p, boolean_t flush,
 
 	ASSERT(ifp->if_eflags & IFEF_TXSTART);
 
-	/*
-	 * If packet already carries a timestamp, either from dlil_output()
-	 * or from flowswitch, use it here.  Otherwise, record timestamp.
-	 * PKTF_TS_VALID is always cleared prior to entering classq, i.e.
-	 * the timestamp value is used internally there.
-	 */
+	  
+                                                                    
+                                                                  
+                                                                  
+                                                 
+    
 	switch (p->cp_ptype) {
 	case QP_MBUF:
 		ASSERT(p->cp_mbuf->m_flags & M_PKTHDR);
@@ -3919,11 +3919,11 @@ ifnet_enqueue_ifclassq(struct ifnet *ifp, classq_pkt_t *p, boolean_t flush,
 			p->cp_mbuf->m_pkthdr.pkt_timestamp = now_nsec;
 		}
 		p->cp_mbuf->m_pkthdr.pkt_flags &= ~PKTF_TS_VALID;
-		/*
-		 * If the packet service class is not background,
-		 * update the timestamp to indicate recent activity
-		 * on a foreground socket.
-		 */
+		  
+                                                   
+                                                     
+                            
+     
 		if ((p->cp_mbuf->m_pkthdr.pkt_flags & PKTF_FLOW_ID) &&
 		    p->cp_mbuf->m_pkthdr.pkt_flowsrc == FLOWSRC_INPCB) {
 			if (!(p->cp_mbuf->m_pkthdr.pkt_flags &
@@ -3942,12 +3942,12 @@ ifnet_enqueue_ifclassq(struct ifnet *ifp, classq_pkt_t *p, boolean_t flush,
 		}
 		pktlen = m_pktlen(p->cp_mbuf);
 
-		/*
-		 * Some Wi-Fi AP implementations do not correctly handle
-		 * multicast IP packets with DSCP bits set (radr://9331522).
-		 * As a workaround we clear the DSCP bits but keep service
-		 * class (rdar://51507725).
-		 */
+		  
+                                                          
+                                                              
+                                                            
+                             
+     
 		if ((p->cp_mbuf->m_flags & M_MCAST) != 0 &&
 		    IFNET_IS_WIFI_INFRA(ifp)) {
 			size_t len = mbuf_len(p->cp_mbuf), hlen;
@@ -3994,18 +3994,18 @@ ifnet_enqueue_ifclassq(struct ifnet *ifp, classq_pkt_t *p, boolean_t flush,
 					p->cp_mbuf);
 			}
 			mcast_buf = (uint8_t *)(eh + 1);
-			/*
-			 * ifnet_mcast_clear_dscp() will finish the work below.
-			 * Note that the pullups above ensure that mcast_buf
-			 * points to a full IP header.
-			 */
+			  
+                                                          
+                                                       
+                                 
+      
 		}
 		break;
 
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -4018,20 +4018,20 @@ ifnet_enqueue_ifclassq(struct ifnet *ifp, classq_pkt_t *p, boolean_t flush,
 			nanouptime(&now);
 			net_timernsec(&now, &now_nsec);
 		}
-		/*
-		 * If the driver chose to delay start callback for
-		 * coalescing multiple packets, Then use the following
-		 * heuristics to make sure that start callback will
-		 * be delayed only when bulk data transfer is detected.
-		 * 1. number of packets enqueued in (delay_win * 2) is
-		 * greater than or equal to the delay qlen.
-		 * 2. If delay_start is enabled it will stay enabled for
-		 * another 10 idle windows. This is to take into account
-		 * variable RTT and burst traffic.
-		 * 3. If the time elapsed since last enqueue is more
-		 * than 200ms we disable delaying start callback. This is
-		 * is to take idle time into account.
-		 */
+		  
+                                                    
+                                                        
+                                                     
+                                                         
+                                                        
+                                             
+                                                          
+                                                          
+                                    
+                                                      
+                                                           
+                                       
+     
 		u_int64_t dwin = (ifp->if_start_delay_timeout << 1);
 		if (ifp->if_start_delay_swin > 0) {
 			if ((ifp->if_start_delay_swin + dwin) > now_nsec) {
@@ -4072,14 +4072,14 @@ ifnet_enqueue_ifclassq(struct ifnet *ifp, classq_pkt_t *p, boolean_t flush,
 		if_clear_eflags(ifp, IFEF_DELAY_START);
 	}
 
-	/* enqueue the packet (caller consumes object) */
+	                                                 
 	error = ifclassq_enqueue(&ifp->if_snd, p, p, 1, pktlen, pdrop);
 
-	/*
-	 * Tell the driver to start dequeueing; do this even when the queue
-	 * for the packet is suspended (EQSUSPENDED), as the driver could still
-	 * be dequeueing from other unsuspended queues.
-	 */
+	  
+                                                                    
+                                                                        
+                                                
+    
 	if (!(ifp->if_eflags & IFEF_ENQUEUE_MULTI) &&
 	    ((error == 0 && flush) || error == EQFULL || error == EQSUSPENDED)) {
 		ifnet_start(ifp);
@@ -4095,14 +4095,14 @@ ifnet_enqueue_ifclassq_chain(struct ifnet *ifp, classq_pkt_t *head,
 {
 	int error;
 
-	/* enqueue the packet (caller consumes object) */
+	                                                 
 	error = ifclassq_enqueue(&ifp->if_snd, head, tail, cnt, bytes, pdrop);
 
-	/*
-	 * Tell the driver to start dequeueing; do this even when the queue
-	 * for the packet is suspended (EQSUSPENDED), as the driver could still
-	 * be dequeueing from other unsuspended queues.
-	 */
+	  
+                                                                    
+                                                                        
+                                                
+    
 	if ((error == 0 && flush) || error == EQFULL || error == EQSUSPENDED) {
 		ifnet_start(ifp);
 	}
@@ -4113,7 +4113,7 @@ int
 ifnet_enqueue_netem(void *handle, pktsched_pkt_t *pkts, uint32_t n_pkts)
 {
 	struct ifnet *ifp = handle;
-	boolean_t pdrop;        /* dummy */
+	boolean_t pdrop;                   
 	uint32_t i;
 
 	ASSERT(n_pkts >= 1);
@@ -4121,7 +4121,7 @@ ifnet_enqueue_netem(void *handle, pktsched_pkt_t *pkts, uint32_t n_pkts)
 		(void) ifnet_enqueue_ifclassq(ifp, &pkts[i].pktsched_pkt,
 		    FALSE, &pdrop);
 	}
-	/* flush with the last packet */
+	                                
 	(void) ifnet_enqueue_ifclassq(ifp, &pkts[i].pktsched_pkt, TRUE, &pdrop);
 
 	return 0;
@@ -4160,7 +4160,7 @@ ifnet_enqueue_mbuf(struct ifnet *ifp, struct mbuf *m, boolean_t flush,
 		return EINVAL;
 	} else if (!(ifp->if_eflags & IFEF_TXSTART) ||
 	    !IF_FULLY_ATTACHED(ifp)) {
-		/* flag tested without lock for performance */
+		                                              
 		m_freem(m);
 		*pdrop = TRUE;
 		return ENXIO;
@@ -4189,7 +4189,7 @@ ifnet_enqueue_mbuf_chain(struct ifnet *ifp, struct mbuf *m_head,
 	ASSERT((ifp->if_eflags & IFEF_TXSTART) != 0);
 
 	if (!IF_FULLY_ATTACHED(ifp)) {
-		/* flag tested without lock for performance */
+		                                              
 		m_freem_list(m_head);
 		*pdrop = TRUE;
 		return ENXIO;
@@ -4360,7 +4360,7 @@ ifnet_framer_stub(struct ifnet *ifp, struct mbuf **m,
 
 	return ifp->if_framer_legacy(ifp, m, dest, dest_linkaddr, frame_type);
 }
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 static boolean_t
 packet_has_vlan_tag(struct mbuf * m)
@@ -4370,7 +4370,7 @@ packet_has_vlan_tag(struct mbuf * m)
 	if ((m->m_pkthdr.csum_flags & CSUM_VLAN_TAG_VALID) != 0) {
 		tag = EVL_VLANOFTAG(m->m_pkthdr.vlan_tag);
 		if (tag == 0) {
-			/* the packet is just priority-tagged, clear the bit */
+			                                                       
 			m->m_pkthdr.csum_flags &= ~CSUM_VLAN_TAG_VALID;
 		}
 	}
@@ -4391,16 +4391,16 @@ dlil_interface_filters_input(struct ifnet *ifp, struct mbuf **m_p,
 		return 0;
 	}
 
-	/*
-	 * Pass the inbound packet to the interface filters
-	 */
+	  
+                                                    
+    
 	lck_mtx_lock_spin(&ifp->if_flt_lock);
-	/* prevent filter list from changing in case we drop the lock */
+	                                                                
 	if_flt_monitor_busy(ifp);
 	TAILQ_FOREACH(filter, &ifp->if_flt_head, filt_next) {
 		int result;
 
-		/* exclude VLAN packets from external filters PR-3586856 */
+		                                                           
 		if (is_vlan_packet &&
 		    (filter->filt_flags & DLIL_IFF_INTERNAL) == 0) {
 			continue;
@@ -4416,21 +4416,21 @@ dlil_interface_filters_input(struct ifnet *ifp, struct mbuf **m_p,
 
 			lck_mtx_lock_spin(&ifp->if_flt_lock);
 			if (result != 0) {
-				/* we're done with the filter list */
+				                                     
 				if_flt_monitor_unbusy(ifp);
 				lck_mtx_unlock(&ifp->if_flt_lock);
 				return result;
 			}
 		}
 	}
-	/* we're done with the filter list */
+	                                     
 	if_flt_monitor_unbusy(ifp);
 	lck_mtx_unlock(&ifp->if_flt_lock);
 
-	/*
-	 * Strip away M_PROTO1 bit prior to sending packet up the stack as
-	 * it is meant to be local to a subsystem -- if_bridge for M_PROTO1
-	 */
+	  
+                                                                   
+                                                                    
+    
 	if (*m_p != NULL) {
 		(*m_p)->m_flags &= ~M_PROTO1;
 	}
@@ -4448,16 +4448,16 @@ dlil_interface_filters_output(struct ifnet *ifp, struct mbuf **m_p,
 
 	is_vlan_packet = packet_has_vlan_tag(m);
 
-	/*
-	 * Pass the outbound packet to the interface filters
-	 */
+	  
+                                                     
+    
 	lck_mtx_lock_spin(&ifp->if_flt_lock);
-	/* prevent filter list from changing in case we drop the lock */
+	                                                                
 	if_flt_monitor_busy(ifp);
 	TAILQ_FOREACH(filter, &ifp->if_flt_head, filt_next) {
 		int result;
 
-		/* exclude VLAN packets from external filters PR-3586856 */
+		                                                           
 		if (is_vlan_packet &&
 		    (filter->filt_flags & DLIL_IFF_INTERNAL) == 0) {
 			continue;
@@ -4473,14 +4473,14 @@ dlil_interface_filters_output(struct ifnet *ifp, struct mbuf **m_p,
 
 			lck_mtx_lock_spin(&ifp->if_flt_lock);
 			if (result != 0) {
-				/* we're done with the filter list */
+				                                     
 				if_flt_monitor_unbusy(ifp);
 				lck_mtx_unlock(&ifp->if_flt_lock);
 				return result;
 			}
 		}
 	}
-	/* we're done with the filter list */
+	                                     
 	if_flt_monitor_unbusy(ifp);
 	lck_mtx_unlock(&ifp->if_flt_lock);
 
@@ -4493,7 +4493,7 @@ dlil_ifproto_input(struct if_proto * ifproto, mbuf_t m)
 	int error;
 
 	if (ifproto->proto_kpi == kProtoKPI_v1) {
-		/* Version 1 protocols get one packet at a time */
+		                                                  
 		while (m != NULL) {
 			char *  frame_header;
 			mbuf_t  next_packet;
@@ -4510,7 +4510,7 @@ dlil_ifproto_input(struct if_proto * ifproto, mbuf_t m)
 			m = next_packet;
 		}
 	} else if (ifproto->proto_kpi == kProtoKPI_v2) {
-		/* Version 2 protocols support packet lists */
+		                                              
 		error = (*ifproto->kpi.v2.input)(ifproto->ifp,
 		    ifproto->protocol_family, m);
 		if (error != 0 && error != EJUSTRETURN) {
@@ -4562,10 +4562,10 @@ dlil_input_stats_sync(struct ifnet *ifp, struct dlil_threading_info *inp)
 {
 	struct ifnet_stat_increment_param *s = &inp->dlth_stats;
 
-	/*
-	 * Use of atomic operations is unavoidable here because
-	 * these stats may also be incremented elsewhere via KPIs.
-	 */
+	  
+                                                        
+                                                           
+    
 	if (s->packets_in != 0) {
 		atomic_add_64(&ifp->if_data.ifi_ipackets, s->packets_in);
 		s->packets_in = 0;
@@ -4601,10 +4601,10 @@ dlil_input_stats_sync(struct ifnet *ifp, struct dlil_threading_info *inp)
 		s->dropped = 0;
 	}
 
-	/*
-	 * No need for atomic operations as they are modified here
-	 * only from within the DLIL input thread context.
-	 */
+	  
+                                                           
+                                                   
+    
 	if (ifp->if_poll_tstats.packets != 0) {
 		ifp->if_poll_pstats.ifi_poll_packets += ifp->if_poll_tstats.packets;
 		ifp->if_poll_tstats.packets = 0;
@@ -4655,7 +4655,7 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 
 	while (m != NULL) {
 		struct if_proto *ifproto = NULL;
-		uint32_t pktf_mask;     /* pkt flags to preserve */
+		uint32_t pktf_mask;                                
 
 		if (ifp_param == NULL) {
 			ifp = m->m_pkthdr.rcvif;
@@ -4667,7 +4667,7 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 			ifnet_poll(ifp);
 		}
 
-		/* Check if this mbuf looks valid */
+		                                    
 		MBUF_INPUT_CHECK(m, ifp);
 
 		next_packet = m->m_nextpkt;
@@ -4675,13 +4675,13 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 		frame_header = m->m_pkthdr.pkt_hdr;
 		m->m_pkthdr.pkt_hdr = NULL;
 
-		/*
-		 * Get an IO reference count if the interface is not
-		 * loopback (lo0) and it is attached; lo0 never goes
-		 * away, so optimize for that.
-		 */
+		  
+                                                      
+                                                      
+                                
+     
 		if (ifp != lo_ifp) {
-			/* iorefcnt is 0 if it hasn't been taken yet */
+			                                               
 			if (iorefcnt == 0) {
 				if (!ifnet_datamov_begin(ifp)) {
 					m_freem(m);
@@ -4689,25 +4689,25 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 				}
 			}
 			iorefcnt = 1;
-			/*
-			 * Preserve the time stamp and skip pktap flags.
-			 */
+			  
+                                                   
+      
 			pktf_mask = PKTF_TS_VALID | PKTF_SKIP_PKTAP;
 		} else {
-			/*
-			 * If this arrived on lo0, preserve interface addr
-			 * info to allow for connectivity between loopback
-			 * and local interface addresses.
-			 */
+			  
+                                                     
+                                                     
+                                    
+      
 			pktf_mask = (PKTF_LOOP | PKTF_IFAINFO);
 		}
 
-		/* make sure packet comes in clean */
+		                                     
 		m_classifier_init(m, pktf_mask);
 
 		ifp_inc_traffic_class_in(ifp, m);
 
-		/* find which protocol family this packet is for */
+		                                                   
 		ifnet_lock_shared(ifp);
 		error = (*ifp->if_demux)(ifp, m, frame_header,
 		    &protocol_family);
@@ -4721,14 +4721,14 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 
 		pktap_input(ifp, protocol_family, m, frame_header);
 
-		/* Drop v4 packets received on CLAT46 enabled interface */
+		                                                          
 		if (protocol_family == PF_INET && IS_INTF_CLAT46(ifp)) {
 			m_freem(m);
 			ip6stat.ip6s_clat464_in_v4_drop++;
 			goto next;
 		}
 
-		/* Translate the packet if it is received on CLAT interface */
+		                                                              
 		if (protocol_family == PF_INET6 && IS_INTF_CLAT46(ifp)
 		    && dlil_is_clat_needed(protocol_family, m)) {
 			char *data = NULL;
@@ -4737,12 +4737,12 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 
 			if (ifp->if_type == IFT_ETHER) {
 				ehp = (struct ether_header *)(void *)frame_header;
-				/* Skip RX Ethernet packets if they are not IPV6 */
+				                                                   
 				if (ntohs(ehp->ether_type) != ETHERTYPE_IPV6) {
 					goto skip_clat;
 				}
 
-				/* Keep a copy of frame_header for Ethernet packets */
+				                                                      
 				bcopy(frame_header, (caddr_t)&eh, ETHER_HDR_LEN);
 			}
 			error = dlil_clat64(ifp, &protocol_family, &m);
@@ -4752,31 +4752,31 @@ dlil_input_packet_list_common(struct ifnet *ifp_param, struct mbuf *m,
 				ip6stat.ip6s_clat464_in_drop++;
 				goto next;
 			}
-			/* Native v6 should be No-op */
+			                               
 			if (protocol_family != PF_INET) {
 				goto skip_clat;
 			}
 
-			/* Do this only for translated v4 packets. */
+			                                             
 			switch (ifp->if_type) {
 			case IFT_CELLULAR:
 				frame_header = data;
 				break;
 			case IFT_ETHER:
-				/*
-				 * Drop if the mbuf doesn't have enough
-				 * space for Ethernet header
-				 */
+				  
+                                           
+                                
+       
 				if (M_LEADINGSPACE(m) < ETHER_HDR_LEN) {
 					m_free(m);
 					ip6stat.ip6s_clat464_in_drop++;
 					goto next;
 				}
-				/*
-				 * Set the frame_header ETHER_HDR_LEN bytes
-				 * preceeding the data pointer. Change
-				 * the ether_type too.
-				 */
+				  
+                                               
+                                          
+                          
+       
 				frame_header = data - ETHER_HDR_LEN;
 				eh.ether_type = htons(ETHERTYPE_IP);
 				bcopy((caddr_t)&eh, frame_header, ETHER_HDR_LEN);
@@ -4789,20 +4789,20 @@ skip_clat:
 			dlil_input_cksum_dbg(ifp, m, frame_header,
 			    protocol_family);
 		}
-		/*
-		 * For partial checksum offload, we expect the driver to
-		 * set the start offset indicating the start of the span
-		 * that is covered by the hardware-computed checksum;
-		 * adjust this start offset accordingly because the data
-		 * pointer has been advanced beyond the link-layer header.
-		 *
-		 * Virtual lan types (bridge, vlan, bond) can call
-		 * dlil_input_packet_list() with the same packet with the
-		 * checksum flags set. Set a flag indicating that the
-		 * adjustment has already been done.
-		 */
+		  
+                                                          
+                                                          
+                                                       
+                                                          
+                                                            
+    
+                                                    
+                                                           
+                                                       
+                                      
+     
 		if ((m->m_pkthdr.csum_flags & CSUM_ADJUST_DONE) != 0) {
-			/* adjustment has already been done */
+			                                      
 		} else if ((m->m_pkthdr.csum_flags &
 		    (CSUM_DATA_VALID | CSUM_PARTIAL)) ==
 		    (CSUM_DATA_VALID | CSUM_PARTIAL)) {
@@ -4818,7 +4818,7 @@ skip_clat:
 			} else {
 				m->m_pkthdr.csum_rx_start -= adj;
 			}
-			/* make sure we don't adjust more than once */
+			                                              
 			m->m_pkthdr.csum_flags |= CSUM_ADJUST_DONE;
 		}
 		if (clat_debug) {
@@ -4829,7 +4829,7 @@ skip_clat:
 			atomic_add_64(&ifp->if_imcasts, 1);
 		}
 
-		/* run interface filters */
+		                           
 		error = dlil_interface_filters_input(ifp, &m,
 		    &frame_header, protocol_family);
 		if (error != 0) {
@@ -4838,24 +4838,24 @@ skip_clat:
 			}
 			goto next;
 		}
-		/*
-		 * A VLAN interface receives VLAN-tagged packets by attaching
-		 * its PF_VLAN protocol to a parent interface. When a VLAN
-		 * interface is a member of a bridge, the parent interface
-		 * receives VLAN-tagged M_PROMISC packets. A VLAN-tagged
-		 * M_PROMISC packet must be processed by the VLAN protocol
-		 * so that it can be sent up the stack via
-		 * dlil_input_packet_list(). That allows the bridge interface's
-		 * input filter, attached to the VLAN interface, to process
-		 * the packet.
-		 */
+		  
+                                                               
+                                                            
+                                                            
+                                                          
+                                                            
+                                            
+                                                                 
+                                                             
+                
+     
 		if (protocol_family != PF_VLAN &&
 		    (m->m_flags & M_PROMISC) != 0) {
 			m_freem(m);
 			goto next;
 		}
 
-		/* Lookup the protocol attachment to this interface */
+		                                                      
 		if (protocol_family == 0) {
 			ifproto = NULL;
 		} else if (last_ifproto != NULL && last_ifproto->ifp == ifp &&
@@ -4866,18 +4866,18 @@ skip_clat:
 		} else {
 			VERIFY(ifproto == NULL);
 			ifnet_lock_shared(ifp);
-			/* callee holds a proto refcnt upon success */
+			                                              
 			ifproto = find_attached_proto(ifp, protocol_family);
 			ifnet_lock_done(ifp);
 		}
 		if (ifproto == NULL) {
-			/* no protocol for this packet, discard */
+			                                          
 			m_freem(m);
 			goto next;
 		}
 		if (ifproto != last_ifproto) {
 			if (last_ifproto != NULL) {
-				/* pass up the list for the previous protocol */
+				                                                
 				dlil_ifproto_input(last_ifproto, pkt_first);
 				pkt_first = NULL;
 				if_proto_free(last_ifproto);
@@ -4885,7 +4885,7 @@ skip_clat:
 			last_ifproto = ifproto;
 			if_proto_ref(ifproto);
 		}
-		/* extend the list */
+		                     
 		m->m_pkthdr.pkt_hdr = frame_header;
 		if (pkt_first == NULL) {
 			pkt_first = m;
@@ -4896,7 +4896,7 @@ skip_clat:
 
 next:
 		if (next_packet == NULL && last_ifproto != NULL) {
-			/* pass up the last list of packets */
+			                                      
 			dlil_ifproto_input(last_ifproto, pkt_first);
 			if_proto_free(last_ifproto);
 			last_ifproto = NULL;
@@ -4908,12 +4908,12 @@ next:
 
 		m = next_packet;
 
-		/* update the driver's multicast filter, if needed */
+		                                                     
 		if (ifp->if_updatemcasts > 0 && if_mcasts_update(ifp) == 0) {
 			ifp->if_updatemcasts = 0;
 		}
 		if (iorefcnt == 1) {
-			/* If the next mbuf is on a different interface, unlock data-mov */
+			                                                                   
 			if (!m || (ifp != ifp_param && ifp != m->m_pkthdr.rcvif)) {
 				ifnet_datamov_end(ifp);
 				iorefcnt = 0;
@@ -4938,11 +4938,11 @@ if_mcasts_update(struct ifnet *ifp)
 	    (err == 0 ? "successfully restored" : "failed to restore"),
 	    ifp->if_updatemcasts, err);
 
-	/* just return success */
+	                         
 	return 0;
 }
 
-/* If ifp is set, we will increment the generation for the interface */
+                                                                       
 int
 dlil_post_complete_msg(struct ifnet *ifp, struct kev_msg *event)
 {
@@ -4952,7 +4952,7 @@ dlil_post_complete_msg(struct ifnet *ifp, struct kev_msg *event)
 
 #if NECP
 	necp_update_all_clients();
-#endif /* NECP */
+#endif           
 
 	return kev_post_msg(event);
 }
@@ -4990,11 +4990,11 @@ dlil_event_internal(struct ifnet *ifp, struct kev_msg *event, bool update_genera
 	int tmp_ifproto_arr_idx = 0;
 	bool tmp_malloc = false;
 
-	/*
-	 * Pass the event to the interface filters
-	 */
+	  
+                                           
+    
 	lck_mtx_lock_spin(&ifp->if_flt_lock);
-	/* prevent filter list from changing in case we drop the lock */
+	                                                                
 	if_flt_monitor_busy(ifp);
 	TAILQ_FOREACH(filter, &ifp->if_flt_head, filt_next) {
 		if (filter->filt_event != NULL) {
@@ -5006,20 +5006,20 @@ dlil_event_internal(struct ifnet *ifp, struct kev_msg *event, bool update_genera
 			lck_mtx_lock_spin(&ifp->if_flt_lock);
 		}
 	}
-	/* we're done with the filter list */
+	                                     
 	if_flt_monitor_unbusy(ifp);
 	lck_mtx_unlock(&ifp->if_flt_lock);
 
-	/* Get an io ref count if the interface is attached */
+	                                                      
 	if (!ifnet_is_attached(ifp, 1)) {
 		goto done;
 	}
 
-	/*
-	 * An embedded tmp_list_entry in if_proto may still get
-	 * over-written by another thread after giving up ifnet lock,
-	 * therefore we are avoiding embedded pointers here.
-	 */
+	  
+                                                        
+                                                              
+                                                     
+    
 	ifnet_lock_shared(ifp);
 	if_proto_count = dlil_ifp_protolist(ifp, NULL, 0);
 	if (if_proto_count) {
@@ -5071,12 +5071,12 @@ cleanup:
 		FREE(tmp_ifproto_arr, M_TEMP);
 	}
 
-	/* Pass the event to the interface */
+	                                     
 	if (ifp->if_event != NULL) {
 		ifp->if_event(ifp, event);
 	}
 
-	/* Release the io ref count */
+	                              
 	ifnet_decr_iorefcnt(ifp);
 done:
 	return dlil_post_complete_msg(update_generation ? ifp : NULL, event);
@@ -5138,23 +5138,23 @@ dlil_count_chain_len(mbuf_t m, struct chain_len_stats *cls)
 	}
 }
 
-/*
- * dlil_output
- *
- * Caller should have a lock on the protocol domain if the protocol
- * doesn't support finer grained locking. In most cases, the lock
- * will be held from the socket layer and won't be released until
- * we return back to the socket layer.
- *
- * This does mean that we must take a protocol lock before we take
- * an interface lock if we're going to take both. This makes sense
- * because a protocol is likely to interact with an ifp while it
- * is under the protocol lock.
- *
- * An advisory code will be returned if adv is not null. This
- * can be used to provide feedback about interface queues to the
- * application.
- */
+  
+              
+  
+                                                                   
+                                                                 
+                                                                 
+                                      
+  
+                                                                  
+                                                                  
+                                                                
+                              
+  
+                                                             
+                                                                
+               
+   
 errno_t
 dlil_output(ifnet_t ifp, protocol_family_t proto_family, mbuf_t packetlist,
     void *route, const struct sockaddr *dest, int raw, struct flowadv *adv)
@@ -5182,10 +5182,10 @@ dlil_output(ifnet_t ifp, protocol_family_t proto_family, mbuf_t packetlist,
 
 	KERNEL_DEBUG(DBG_FNC_DLIL_OUTPUT | DBG_FUNC_START, 0, 0, 0, 0, 0);
 
-	/*
-	 * Get an io refcnt if the interface is attached to prevent ifnet_detach
-	 * from happening while this operation is in progress
-	 */
+	  
+                                                                         
+                                                      
+    
 	if (!ifnet_datamov_begin(ifp)) {
 		retval = ENXIO;
 		goto cleanup;
@@ -5194,7 +5194,7 @@ dlil_output(ifnet_t ifp, protocol_family_t proto_family, mbuf_t packetlist,
 
 	VERIFY(ifp->if_output_dlil != NULL);
 
-	/* update the driver's multicast filter, if needed */
+	                                                     
 	if (ifp->if_updatemcasts > 0 && if_mcasts_update(ifp) == 0) {
 		ifp->if_updatemcasts = 0;
 	}
@@ -5204,7 +5204,7 @@ dlil_output(ifnet_t ifp, protocol_family_t proto_family, mbuf_t packetlist,
 
 	if (raw == 0) {
 		ifnet_lock_shared(ifp);
-		/* callee holds a proto refcnt upon success */
+		                                              
 		proto = find_attached_proto(ifp, proto_family);
 		if (proto == NULL) {
 			ifnet_lock_done(ifp);
@@ -5223,32 +5223,32 @@ preout_again:
 	packetlist = packetlist->m_nextpkt;
 	m->m_nextpkt = NULL;
 
-	/*
-	 * Perform address family translation for the first
-	 * packet outside the loop in order to perform address
-	 * lookup for the translated proto family.
-	 */
+	  
+                                                    
+                                                       
+                                           
+    
 	if (proto_family == PF_INET && IS_INTF_CLAT46(ifp) &&
 	    (ifp->if_type == IFT_CELLULAR ||
 	    dlil_is_clat_needed(proto_family, m))) {
 		retval = dlil_clat46(ifp, &proto_family, &m);
-		/*
-		 * Go to the next packet if translation fails
-		 */
+		  
+                                               
+     
 		if (retval != 0) {
 			m_freem(m);
 			m = NULL;
 			ip6stat.ip6s_clat464_out_drop++;
-			/* Make sure that the proto family is PF_INET */
+			                                                
 			ASSERT(proto_family == PF_INET);
 			goto preout_again;
 		}
-		/*
-		 * Free the old one and make it point to the IPv6 proto structure.
-		 *
-		 * Change proto for the first time we have successfully
-		 * performed address family translation.
-		 */
+		  
+                                                                    
+    
+                                                         
+                                          
+     
 		if (!did_clat46 && proto_family == PF_INET6) {
 			did_clat46 = TRUE;
 
@@ -5256,7 +5256,7 @@ preout_again:
 				if_proto_free(proto);
 			}
 			ifnet_lock_shared(ifp);
-			/* callee holds a proto refcnt upon success */
+			                                              
 			proto = find_attached_proto(ifp, proto_family);
 			if (proto == NULL) {
 				ifnet_lock_done(ifp);
@@ -5267,16 +5267,16 @@ preout_again:
 			}
 			ifnet_lock_done(ifp);
 			if (ifp->if_type == IFT_ETHER) {
-				/* Update the dest to translated v6 address */
+				                                              
 				dest6.sin6_len = sizeof(struct sockaddr_in6);
 				dest6.sin6_family = AF_INET6;
 				dest6.sin6_addr = (mtod(m, struct ip6_hdr *))->ip6_dst;
 				dest = (const struct sockaddr *)&dest6;
 
-				/*
-				 * Lookup route to the translated destination
-				 * Free this route ref during cleanup
-				 */
+				  
+                                                 
+                                         
+       
 				rt = rtalloc1_scoped((struct sockaddr *)&dest6,
 				    0, 0, ifp->if_index);
 
@@ -5285,23 +5285,23 @@ preout_again:
 		}
 	}
 
-	/*
-	 * This path gets packet chain going to the same destination.
-	 * The pre output routine is used to either trigger resolution of
-	 * the next hop or retreive the next hop's link layer addressing.
-	 * For ex: ether_inet(6)_pre_output routine.
-	 *
-	 * If the routine returns EJUSTRETURN, it implies that packet has
-	 * been queued, and therefore we have to call preout_again for the
-	 * following packet in the chain.
-	 *
-	 * For errors other than EJUSTRETURN, the current packet is freed
-	 * and the rest of the chain (pointed by packetlist is freed as
-	 * part of clean up.
-	 *
-	 * Else if there is no error the retrieved information is used for
-	 * all the packets in the chain.
-	 */
+	  
+                                                              
+                                                                  
+                                                                  
+                                             
+   
+                                                                  
+                                                                   
+                                  
+   
+                                                                  
+                                                                
+                     
+   
+                                                                   
+                                 
+    
 	if (raw == 0) {
 		proto_media_preout preoutp = (proto->proto_kpi == kProtoKPI_v1 ?
 		    proto->kpi.v1.pre_output : proto->kpi.v2.pre_output);
@@ -5322,12 +5322,12 @@ preout_again:
 	}
 
 	do {
-		/*
-		 * pkt_hdr is set here to point to m_data prior to
-		 * calling into the framer. This value of pkt_hdr is
-		 * used by the netif gso logic to retrieve the ip header
-		 * for the TCP packets, offloaded for TSO processing.
-		 */
+		  
+                                                    
+                                                      
+                                                          
+                                                       
+     
 		if ((raw != 0) && (ifp->if_family == IFNET_FAMILY_ETHERNET)) {
 			uint8_t vlan_encap_len = 0;
 
@@ -5339,22 +5339,22 @@ preout_again:
 			m->m_pkthdr.pkt_hdr = mtod(m, void *);
 		}
 
-		/*
-		 * Perform address family translation if needed.
-		 * For now we only support stateless 4 to 6 translation
-		 * on the out path.
-		 *
-		 * The routine below translates IP header, updates protocol
-		 * checksum and also translates ICMP.
-		 *
-		 * We skip the first packet as it is already translated and
-		 * the proto family is set to PF_INET6.
-		 */
+		  
+                                                  
+                                                         
+                     
+    
+                                                             
+                                       
+    
+                                                             
+                                         
+     
 		if (proto_family == PF_INET && IS_INTF_CLAT46(ifp) &&
 		    (ifp->if_type == IFT_CELLULAR ||
 		    dlil_is_clat_needed(proto_family, m))) {
 			retval = dlil_clat46(ifp, &proto_family, &m);
-			/* Goto the next packet if the translation fails */
+			                                                   
 			if (retval != 0) {
 				m_freem(m);
 				m = NULL;
@@ -5375,19 +5375,19 @@ preout_again:
 			    struct ip6_hdr *, ip6, struct ifnet *, ifp,
 			    struct ip *, NULL, struct ip6_hdr *, ip6);
 		}
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 		if (raw == 0 && ifp->if_framer != NULL) {
 			int rcvif_set = 0;
 
-			/*
-			 * If this is a broadcast packet that needs to be
-			 * looped back into the system, set the inbound ifp
-			 * to that of the outbound ifp.  This will allow
-			 * us to determine that it is a legitimate packet
-			 * for the system.  Only set the ifp if it's not
-			 * already set, just to be safe.
-			 */
+			  
+                                                    
+                                                      
+                                                   
+                                                    
+                                                   
+                                   
+      
 			if ((m->m_flags & (M_BCAST | M_LOOP)) &&
 			    m->m_pkthdr.rcvif == NULL) {
 				m->m_pkthdr.rcvif = ifp;
@@ -5403,10 +5403,10 @@ preout_again:
 				goto next;
 			}
 
-			/*
-			 * For partial checksum offload, adjust the start
-			 * and stuff offsets based on the prepended header.
-			 */
+			  
+                                                    
+                                                      
+      
 			if ((m->m_pkthdr.csum_flags &
 			    (CSUM_DATA_VALID | CSUM_PARTIAL)) ==
 			    (CSUM_DATA_VALID | CSUM_PARTIAL)) {
@@ -5419,23 +5419,23 @@ preout_again:
 				    proto_family);
 			}
 
-			/*
-			 * Clear the ifp if it was set above, and to be
-			 * safe, only if it is still the same as the
-			 * outbound ifp we have in context.  If it was
-			 * looped back, then a copy of it was sent to the
-			 * loopback interface with the rcvif set, and we
-			 * are clearing the one that will go down to the
-			 * layer below.
-			 */
+			  
+                                                  
+                                               
+                                                 
+                                                    
+                                                   
+                                                   
+                  
+      
 			if (rcvif_set && m->m_pkthdr.rcvif == ifp) {
 				m->m_pkthdr.rcvif = NULL;
 			}
 		}
 
-		/*
-		 * Let interface filters (if any) do their thing ...
-		 */
+		  
+                                                      
+     
 		retval = dlil_interface_filters_output(ifp, &m, proto_family);
 		if (retval != 0) {
 			if (retval != EJUSTRETURN) {
@@ -5443,30 +5443,30 @@ preout_again:
 			}
 			goto next;
 		}
-		/*
-		 * Strip away M_PROTO1 bit prior to sending packet
-		 * to the driver as this field may be used by the driver
-		 */
+		  
+                                                    
+                                                          
+     
 		m->m_flags &= ~M_PROTO1;
 
-		/*
-		 * If the underlying interface is not capable of handling a
-		 * packet whose data portion spans across physically disjoint
-		 * pages, we need to "normalize" the packet so that we pass
-		 * down a chain of mbufs where each mbuf points to a span that
-		 * resides in the system page boundary.  If the packet does
-		 * not cross page(s), the following is a no-op.
-		 */
+		  
+                                                             
+                                                               
+                                                             
+                                                                
+                                                             
+                                                 
+     
 		if (!(ifp->if_hwassist & IFNET_MULTIPAGES)) {
 			if ((m = m_normalize(m)) == NULL) {
 				goto next;
 			}
 		}
 
-		/*
-		 * If this is a TSO packet, make sure the interface still
-		 * advertise TSO capability.
-		 */
+		  
+                                                           
+                              
+     
 		if (TSO_IPV4_NOTOK(ifp, m) || TSO_IPV6_NOTOK(ifp, m)) {
 			retval = EMSGSIZE;
 			m_freem(m);
@@ -5477,29 +5477,29 @@ preout_again:
 
 		pktap_output(ifp, proto_family, m, pre, post);
 
-		/*
-		 * Count the number of elements in the mbuf chain
-		 */
+		  
+                                                   
+     
 		if (tx_chain_len_count) {
 			dlil_count_chain_len(m, &tx_chain_len_stats);
 		}
 
-		/*
-		 * Record timestamp; ifnet_enqueue() will use this info
-		 * rather than redoing the work.  An optimization could
-		 * involve doing this just once at the top, if there are
-		 * no interface filters attached, but that's probably
-		 * not a big deal.
-		 */
+		  
+                                                         
+                                                         
+                                                          
+                                                       
+                    
+     
 		nanouptime(&now);
 		net_timernsec(&now, &now_nsec);
 		(void) mbuf_set_timestamp(m, now_nsec, TRUE);
 
-		/*
-		 * Discard partial sum information if this packet originated
-		 * from another interface; the packet would already have the
-		 * final checksum and we shouldn't recompute it.
-		 */
+		  
+                                                              
+                                                              
+                                                  
+     
 		if ((m->m_pkthdr.pkt_flags & PKTF_FORWARDED) &&
 		    (m->m_pkthdr.csum_flags & (CSUM_DATA_VALID | CSUM_PARTIAL)) ==
 		    (CSUM_DATA_VALID | CSUM_PARTIAL)) {
@@ -5507,9 +5507,9 @@ preout_again:
 			m->m_pkthdr.csum_data = 0;
 		}
 
-		/*
-		 * Finally, call the driver.
-		 */
+		  
+                              
+     
 		if (ifp->if_eflags & (IFEF_SENDLIST | IFEF_ENQUEUE_MULTI)) {
 			if (m->m_pkthdr.pkt_flags & PKTF_FORWARDED) {
 				flen += (m_pktlen(m) - (pre + post));
@@ -5556,7 +5556,7 @@ next:
 			packetlist = packetlist->m_nextpkt;
 			m->m_nextpkt = NULL;
 		}
-		/* Reset the proto family to old proto family for CLAT */
+		                                                         
 		if (did_clat46) {
 			proto_family = old_proto_family;
 		}
@@ -5632,7 +5632,7 @@ cleanup:
 	if (proto != NULL) {
 		if_proto_free(proto);
 	}
-	if (packetlist) { /* if any packets are left, clean up */
+	if (packetlist) {                                        
 		mbuf_freem_list(packetlist);
 	}
 	if (retval == EJUSTRETURN) {
@@ -5649,10 +5649,10 @@ cleanup:
 	return retval;
 }
 
-/*
- * This routine checks if the destination address is not a loopback, link-local,
- * multicast or broadcast address.
- */
+  
+                                                                                
+                                  
+   
 static int
 dlil_is_clat_needed(protocol_family_t proto_family, mbuf_t m)
 {
@@ -5677,19 +5677,19 @@ dlil_is_clat_needed(protocol_family_t proto_family, mbuf_t m)
 
 	return ret;
 }
-/*
- * @brief This routine translates IPv4 packet to IPv6 packet,
- *     updates protocol checksum and also translates ICMP for code
- *     along with inner header translation.
- *
- * @param ifp Pointer to the interface
- * @param proto_family pointer to protocol family. It is updated if function
- *     performs the translation successfully.
- * @param m Pointer to the pointer pointing to the packet. Needed because this
- *     routine can end up changing the mbuf to a different one.
- *
- * @return 0 on success or else a negative value.
- */
+  
+                                                             
+                                                                  
+                                           
+  
+                                      
+                                                                            
+                                             
+                                                                              
+                                                               
+  
+                                                 
+   
 static errno_t
 dlil_clat46(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 {
@@ -5726,30 +5726,30 @@ dlil_clat46(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 
 	tot_len = ntohs(iph->ip_len);
 
-	/*
-	 * For packets that are not first frags
-	 * we only need to adjust CSUM.
-	 * For 4 to 6, Fragmentation header gets appended
-	 * after proto translation.
-	 */
+	  
+                                        
+                                
+                                                  
+                            
+    
 	if (ntohs(iph->ip_off) & ~(IP_DF | IP_RF)) {
 		is_frag = TRUE;
 
-		/* If the offset is not zero, it is not first frag */
+		                                                     
 		if (ip_frag_off != 0) {
 			is_first_frag = FALSE;
 		}
 
-		/* If IP_MF is set, then it is not last frag */
+		                                               
 		if (ntohs(iph->ip_off) & IP_MF) {
 			is_last_frag = FALSE;
 		}
 	}
 
-	/*
-	 * Retrive the local IPv6 CLAT46 address reserved for stateless
-	 * translation.
-	 */
+	  
+                                                                
+                
+    
 	ia6_clat_src = in6ifa_ifpwithflag(ifp, IN6_IFF_CLAT46);
 	if (ia6_clat_src == NULL) {
 		ip6stat.ip6s_clat464_out_nov6addr_drop++;
@@ -5759,30 +5759,30 @@ dlil_clat46(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 
 	src = &ia6_clat_src->ia_addr.sin6_addr;
 
-	/*
-	 * Translate IPv4 destination to IPv6 destination by using the
-	 * prefixes learned through prior PLAT discovery.
-	 */
+	  
+                                                               
+                                                  
+    
 	if ((error = nat464_synthesize_ipv6(ifp, &odst, &dst)) != 0) {
 		ip6stat.ip6s_clat464_out_v6synthfail_drop++;
 		goto cleanup;
 	}
 
-	/* Translate the IP header part first */
+	                                        
 	error = (nat464_translate_46(pbuf, off, iph->ip_tos, iph->ip_p,
 	    iph->ip_ttl, *src, dst, tot_len) == NT_NAT64) ? 0 : -1;
 
-	iph = NULL;     /* Invalidate iph as pbuf has been modified */
+	iph = NULL;                                                   
 
 	if (error != 0) {
 		ip6stat.ip6s_clat464_out_46transfail_drop++;
 		goto cleanup;
 	}
 
-	/*
-	 * Translate protocol header, update checksum, checksum flags
-	 * and related fields.
-	 */
+	  
+                                                              
+                       
+    
 	error = (nat464_translate_proto(pbuf, (struct nat464_addr *)&osrc, (struct nat464_addr *)&odst,
 	    proto, PF_INET, PF_INET6, NT_OUT, !is_first_frag) == NT_NAT64) ? 0 : -1;
 
@@ -5791,7 +5791,7 @@ dlil_clat46(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 		goto cleanup;
 	}
 
-	/* Now insert the IPv6 fragment header */
+	                                         
 	if (is_frag) {
 		error = nat464_insert_frag46(pbuf, ip_id_val, ip_frag_off, is_last_frag);
 
@@ -5823,13 +5823,13 @@ cleanup:
 	return error;
 }
 
-/*
- * @brief This routine translates incoming IPv6 to IPv4 packet,
- *     updates protocol checksum and also translates ICMPv6 outer
- *     and inner headers
- *
- * @return 0 on success or else a negative value.
- */
+  
+                                                               
+                                                                 
+                        
+  
+                                                 
+   
 static errno_t
 dlil_clat64(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 {
@@ -5849,7 +5849,7 @@ dlil_clat64(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 	uint8_t tos = 0;
 	boolean_t is_first_frag = TRUE;
 
-	/* Incoming mbuf does not contain valid IP6 header */
+	                                                     
 	if ((size_t)(*m)->m_pkthdr.len < sizeof(struct ip6_hdr) ||
 	    ((size_t)(*m)->m_len < sizeof(struct ip6_hdr) &&
 	    (*m = m_pullup(*m, sizeof(struct ip6_hdr))) == NULL)) {
@@ -5858,7 +5858,7 @@ dlil_clat64(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 	}
 
 	ip6h = mtod(*m, struct ip6_hdr *);
-	/* Validate that mbuf contains IP payload equal to ip6_plen  */
+	                                                               
 	if ((size_t)(*m)->m_pkthdr.len < ntohs(ip6h->ip6_plen) + sizeof(struct ip6_hdr)) {
 		ip6stat.ip6s_clat464_in_tooshort_drop++;
 		return -1;
@@ -5867,29 +5867,29 @@ dlil_clat64(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 	osrc = ip6h->ip6_src;
 	odst = ip6h->ip6_dst;
 
-	/*
-	 * Retrieve the local CLAT46 reserved IPv6 address.
-	 * Let the packet pass if we don't find one, as the flag
-	 * may get set before IPv6 configuration has taken place.
-	 */
+	  
+                                                    
+                                                         
+                                                          
+    
 	ia6_clat_dst = in6ifa_ifpwithflag(ifp, IN6_IFF_CLAT46);
 	if (ia6_clat_dst == NULL) {
 		goto done;
 	}
 
-	/*
-	 * Check if the original dest in the packet is same as the reserved
-	 * CLAT46 IPv6 address
-	 */
+	  
+                                                                    
+                       
+    
 	if (IN6_ARE_ADDR_EQUAL(&odst, &ia6_clat_dst->ia_addr.sin6_addr)) {
 		pbuf_t pbuf_store, *pbuf = NULL;
 		pbuf_init_mbuf(&pbuf_store, *m, ifp);
 		pbuf = &pbuf_store;
 
-		/*
-		 * Retrive the local CLAT46 IPv4 address reserved for stateless
-		 * translation.
-		 */
+		  
+                                                                 
+                 
+     
 		ia4_clat_dst = inifa_ifpclatv4(ifp);
 		if (ia4_clat_dst == NULL) {
 			IFA_REMREF(&ia6_clat_dst->ia_ifa);
@@ -5899,7 +5899,7 @@ dlil_clat64(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 		}
 		IFA_REMREF(&ia6_clat_dst->ia_ifa);
 
-		/* Translate IPv6 src to IPv4 src by removing the NAT64 prefix */
+		                                                                 
 		dst = &ia4_clat_dst->ia_addr.sin_addr;
 		if ((error = nat464_synthesize_ipv4(ifp, &osrc, &src)) != 0) {
 			ip6stat.ip6s_clat464_in_v4synthfail_drop++;
@@ -5913,25 +5913,25 @@ dlil_clat64(ifnet_t ifp, protocol_family_t *proto_family, mbuf_t *m)
 		tos = (ntohl(ip6h->ip6_flow) >> 20) & 0xff;
 		tot_len = ntohs(ip6h->ip6_plen) + sizeof(struct ip6_hdr);
 
-		/*
-		 * Translate the IP header and update the fragmentation
-		 * header if needed
-		 */
+		  
+                                                         
+                     
+     
 		error = (nat464_translate_64(pbuf, off, tos, &proto,
 		    ip6h->ip6_hlim, src, *dst, tot_len, &is_first_frag) == NT_NAT64) ?
 		    0 : -1;
 
-		ip6h = NULL; /* Invalidate ip6h as pbuf has been changed */
+		ip6h = NULL;                                               
 
 		if (error != 0) {
 			ip6stat.ip6s_clat464_in_64transfail_drop++;
 			goto cleanup;
 		}
 
-		/*
-		 * Translate protocol header, update checksum, checksum flags
-		 * and related fields.
-		 */
+		  
+                                                               
+                        
+     
 		error = (nat464_translate_proto(pbuf, (struct nat464_addr *)&osrc,
 		    (struct nat464_addr *)&odst, proto, PF_INET6, PF_INET,
 		    NT_IN, !is_first_frag) == NT_NAT64) ? 0 : -1;
@@ -5959,7 +5959,7 @@ cleanup:
 			*proto_family = PF_INET;
 			ip6stat.ip6s_clat464_in_success++;
 		}
-	} /* CLAT traffic */
+	}                   
 
 done:
 	return error;
@@ -5977,18 +5977,18 @@ ifnet_ioctl(ifnet_t ifp, protocol_family_t proto_fam, u_long ioctl_code,
 		return EINVAL;
 	}
 
-	/* Get an io ref count if the interface is attached */
+	                                                      
 	if (!ifnet_is_attached(ifp, 1)) {
 		return EOPNOTSUPP;
 	}
 
-	/*
-	 * Run the interface filters first.
-	 * We want to run all filters before calling the protocol,
-	 * interface family, or interface.
-	 */
+	  
+                                    
+                                                           
+                                   
+    
 	lck_mtx_lock_spin(&ifp->if_flt_lock);
-	/* prevent filter list from changing in case we drop the lock */
+	                                                                
 	if_flt_monitor_busy(ifp);
 	TAILQ_FOREACH(filter, &ifp->if_flt_head, filt_next) {
 		if (filter->filt_ioctl != NULL && (filter->filt_protocol == 0 ||
@@ -6000,14 +6000,14 @@ ifnet_ioctl(ifnet_t ifp, protocol_family_t proto_fam, u_long ioctl_code,
 
 			lck_mtx_lock_spin(&ifp->if_flt_lock);
 
-			/* Only update retval if no one has handled the ioctl */
+			                                                        
 			if (retval == EOPNOTSUPP || result == EJUSTRETURN) {
 				if (result == ENOTSUP) {
 					result = EOPNOTSUPP;
 				}
 				retval = result;
 				if (retval != 0 && retval != EOPNOTSUPP) {
-					/* we're done with the filter list */
+					                                     
 					if_flt_monitor_unbusy(ifp);
 					lck_mtx_unlock(&ifp->if_flt_lock);
 					goto cleanup;
@@ -6015,15 +6015,15 @@ ifnet_ioctl(ifnet_t ifp, protocol_family_t proto_fam, u_long ioctl_code,
 			}
 		}
 	}
-	/* we're done with the filter list */
+	                                     
 	if_flt_monitor_unbusy(ifp);
 	lck_mtx_unlock(&ifp->if_flt_lock);
 
-	/* Allow the protocol to handle the ioctl */
+	                                            
 	if (proto_fam != 0) {
 		struct if_proto *proto;
 
-		/* callee holds a proto refcnt upon success */
+		                                              
 		ifnet_lock_shared(ifp);
 		proto = find_attached_proto(ifp, proto_fam);
 		ifnet_lock_done(ifp);
@@ -6038,7 +6038,7 @@ ifnet_ioctl(ifnet_t ifp, protocol_family_t proto_fam, u_long ioctl_code,
 			}
 			if_proto_free(proto);
 
-			/* Only update retval if no one has handled the ioctl */
+			                                                        
 			if (retval == EOPNOTSUPP || result == EJUSTRETURN) {
 				if (result == ENOTSUP) {
 					result = EOPNOTSUPP;
@@ -6051,18 +6051,18 @@ ifnet_ioctl(ifnet_t ifp, protocol_family_t proto_fam, u_long ioctl_code,
 		}
 	}
 
-	/* retval is either 0 or EOPNOTSUPP */
+	                                      
 
-	/*
-	 * Let the interface handle this ioctl.
-	 * If it returns EOPNOTSUPP, ignore that, we may have
-	 * already handled this in the protocol or family.
-	 */
+	  
+                                        
+                                                      
+                                                   
+    
 	if (ifp->if_ioctl) {
 		result = (*ifp->if_ioctl)(ifp, ioctl_code, ioctl_arg);
 	}
 
-	/* Only update retval if no one has handled the ioctl */
+	                                                        
 	if (retval == EOPNOTSUPP || result == EJUSTRETURN) {
 		if (result == ENOTSUP) {
 			result = EOPNOTSUPP;
@@ -6090,7 +6090,7 @@ dlil_set_bpf_tap(ifnet_t ifp, bpf_tap_mode mode, bpf_packet_func callback)
 
 
 	if (ifp->if_set_bpf_tap) {
-		/* Get an io reference on the interface if it is attached */
+		                                                            
 		if (!ifnet_is_attached(ifp, 1)) {
 			return ENXIO;
 		}
@@ -6115,7 +6115,7 @@ dlil_resolve_multi(struct ifnet *ifp, const struct sockaddr *proto_addr,
 
 	bzero(ll_addr, ll_len);
 
-	/* Call the protocol first; callee holds a proto refcnt upon success */
+	                                                                       
 	ifnet_lock_shared(ifp);
 	proto = find_attached_proto(ifp, proto_addr->sa_family);
 	ifnet_lock_done(ifp);
@@ -6129,7 +6129,7 @@ dlil_resolve_multi(struct ifnet *ifp, const struct sockaddr *proto_addr,
 		if_proto_free(proto);
 	}
 
-	/* Let the interface verify the multicast address */
+	                                                    
 	if ((result == EOPNOTSUPP || result == 0) && ifp->if_check_multi) {
 		if (result == 0) {
 			verify = ll_addr;
@@ -6151,7 +6151,7 @@ dlil_send_arp_internal(ifnet_t ifp, u_short arpop,
 	struct if_proto *proto;
 	errno_t result = 0;
 
-	/* callee holds a proto refcnt upon success */
+	                                              
 	ifnet_lock_shared(ifp);
 	proto = find_attached_proto(ifp, target_proto->sa_family);
 	ifnet_lock_done(ifp);
@@ -6310,10 +6310,10 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 		return EINVAL;
 	}
 
-	/*
-	 * If the target is a (default) router, provide that
-	 * information to the send_arp callback routine.
-	 */
+	  
+                                                     
+                                                 
+    
 	if (rtflags & RTF_ROUTER) {
 		bcopy(target_proto, &target_proto_sinarp,
 		    sizeof(struct sockaddr_in));
@@ -6321,12 +6321,12 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 		target_proto = (struct sockaddr *)&target_proto_sinarp;
 	}
 
-	/*
-	 * If this is an ARP request and the target IP is IPv4LL,
-	 * send the request on all interfaces.  The exception is
-	 * an announcement, which must only appear on the specific
-	 * interface.
-	 */
+	  
+                                                          
+                                                         
+                                                           
+              
+    
 	sender_sin = (struct sockaddr_in *)(void *)(uintptr_t)sender_proto;
 	target_sin = (struct sockaddr_in *)(void *)(uintptr_t)target_proto;
 	if (target_proto->sa_family == AF_INET &&
@@ -6347,16 +6347,16 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 				struct sockaddr_in source_ip_copy;
 				struct ifnet *cur_ifp = ifp_list[ifp_on];
 
-				/*
-				 * Only arp on interfaces marked for IPv4LL
-				 * ARPing.  This may mean that we don't ARP on
-				 * the interface the subnet route points to.
-				 */
+				  
+                                               
+                                                  
+                                                
+       
 				if (!(cur_ifp->if_eflags & IFEF_ARPLL)) {
 					continue;
 				}
 
-				/* Find the source IP address */
+				                                
 				ifnet_lock_shared(cur_ifp);
 				source_hw = cur_ifp->if_lladdr;
 				TAILQ_FOREACH(source_ip, &cur_ifp->if_addrhead,
@@ -6365,7 +6365,7 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 					if (source_ip->ifa_addr != NULL &&
 					    source_ip->ifa_addr->sa_family ==
 					    AF_INET) {
-						/* Copy the source IP address */
+						                                
 						source_ip_copy =
 						    *(struct sockaddr_in *)
 						    (void *)source_ip->ifa_addr;
@@ -6375,7 +6375,7 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 					IFA_UNLOCK(source_ip);
 				}
 
-				/* No IP Source, don't arp */
+				                             
 				if (source_ip == NULL) {
 					ifnet_lock_done(cur_ifp);
 					continue;
@@ -6384,7 +6384,7 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 				IFA_ADDREF(source_hw);
 				ifnet_lock_done(cur_ifp);
 
-				/* Send the ARP */
+				                  
 				new_result = dlil_send_arp_internal(cur_ifp,
 				    arpop, (struct sockaddr_dl *)(void *)
 				    source_hw->ifa_addr,
@@ -6406,9 +6406,9 @@ dlil_send_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 	return result;
 }
 
-/*
- * Caller must hold ifnet head lock.
- */
+  
+                                    
+   
 static int
 ifnet_lookup(struct ifnet *ifp)
 {
@@ -6423,11 +6423,11 @@ ifnet_lookup(struct ifnet *ifp)
 	return _ifp != NULL;
 }
 
-/*
- * Caller has to pass a non-zero refio argument to get a
- * IO reference count. This will prevent ifnet_detach from
- * being called when there are outstanding io reference counts.
- */
+  
+                                                        
+                                                          
+                                                               
+   
 int
 ifnet_is_attached(struct ifnet *ifp, int refio)
 {
@@ -6464,11 +6464,11 @@ ifnet_decr_pending_thread_count(struct ifnet *ifp)
 	lck_mtx_unlock(&ifp->if_ref_lock);
 }
 
-/*
- * Caller must ensure the interface is attached; the assumption is that
- * there is at least an outstanding IO reference count held already.
- * Most callers would call ifnet_is_{attached,data_ready}() instead.
- */
+  
+                                                                       
+                                                                    
+                                                                    
+   
 void
 ifnet_incr_iorefcnt(struct ifnet *ifp)
 {
@@ -6491,10 +6491,10 @@ ifnet_decr_iorefcnt_locked(struct ifnet *ifp)
 	ifp->if_refio--;
 	VERIFY(ifp->if_refio != 0 || ifp->if_datamov == 0);
 
-	/*
-	 * if there are no more outstanding io references, wakeup the
-	 * ifnet_detach thread if detaching flag is set.
-	 */
+	  
+                                                              
+                                                 
+    
 	if (ifp->if_refio == 0 && (ifp->if_refflags & IFRF_DETACHING)) {
 		wakeup(&(ifp->if_refio));
 	}
@@ -6528,10 +6528,10 @@ ifnet_datamov_end(struct ifnet *ifp)
 {
 	lck_mtx_lock_spin(&ifp->if_ref_lock);
 	VERIFY(ifp->if_datamov > 0);
-	/*
-	 * if there's no more thread moving data, wakeup any
-	 * drainers that's blocked waiting for this.
-	 */
+	  
+                                                     
+                                             
+    
 	if (--ifp->if_datamov == 0 && ifp->if_drainers > 0) {
 		wakeup(&(ifp->if_datamov));
 	}
@@ -6557,7 +6557,7 @@ ifnet_datamov_drain(struct ifnet *ifp)
 {
 	lck_mtx_lock(&ifp->if_ref_lock);
 	VERIFY(ifp->if_refflags & (IFRF_ATTACHED | IFRF_DETACHING));
-	/* data movement must already be suspended */
+	                                             
 	VERIFY(ifp->if_suspend > 0);
 	VERIFY(!(ifp->if_refflags & IFRF_READY));
 	ifp->if_drainers++;
@@ -6570,7 +6570,7 @@ ifnet_datamov_drain(struct ifnet *ifp)
 	ifp->if_drainers--;
 	lck_mtx_unlock(&ifp->if_ref_lock);
 
-	/* purge the interface queues */
+	                                
 	if ((ifp->if_eflags & IFEF_TXSTART) != 0) {
 		if_qflush(ifp, 0);
 	}
@@ -6580,7 +6580,7 @@ void
 ifnet_datamov_resume(struct ifnet *ifp)
 {
 	lck_mtx_lock(&ifp->if_ref_lock);
-	/* data movement must already be suspended */
+	                                             
 	VERIFY(ifp->if_suspend > 0);
 	if (--ifp->if_suspend == 0) {
 		VERIFY(!(ifp->if_refflags & IFRF_READY));
@@ -6600,7 +6600,7 @@ dlil_if_trace(struct dlil_ifnet *dl_if, int refhold)
 
 	if (!(dl_if->dl_if_flags & DLIF_DEBUG)) {
 		panic("%s: dl_if %p has no debug structure", __func__, dl_if);
-		/* NOTREACHED */
+		                
 	}
 
 	if (refhold) {
@@ -6628,7 +6628,7 @@ dlil_if_ref(struct ifnet *ifp)
 	++dl_if->dl_if_refcnt;
 	if (dl_if->dl_if_refcnt == 0) {
 		panic("%s: wraparound refcnt for ifp=%p", __func__, ifp);
-		/* NOTREACHED */
+		                
 	}
 	if (dl_if->dl_if_trace != NULL) {
 		(*dl_if->dl_if_trace)(dl_if, TRUE);
@@ -6652,7 +6652,7 @@ dlil_if_free(struct ifnet *ifp)
 	switch (dl_if->dl_if_refcnt) {
 	case 0:
 		panic("%s: negative refcnt for ifp=%p", __func__, ifp);
-		/* NOTREACHED */
+		                
 		break;
 	case 1:
 		if ((ifp->if_refflags & IFRF_EMBRYONIC) != 0) {
@@ -6685,7 +6685,7 @@ dlil_attach_protocol_internal(struct if_proto *proto,
 	struct if_proto *prev_proto;
 	struct if_proto *_proto;
 
-	/* callee holds a proto refcnt upon success */
+	                                              
 	ifnet_lock_exclusive(ifp);
 	_proto = find_attached_proto(ifp, proto->protocol_family);
 	if (_proto != NULL) {
@@ -6694,10 +6694,10 @@ dlil_attach_protocol_internal(struct if_proto *proto,
 		return EEXIST;
 	}
 
-	/*
-	 * Call family module add_proto routine so it can refine the
-	 * demux descriptors as it wishes.
-	 */
+	  
+                                                             
+                                   
+    
 	retval = ifp->if_add_proto(ifp, proto->protocol_family, demux_list,
 	    demux_count);
 	if (retval) {
@@ -6705,9 +6705,9 @@ dlil_attach_protocol_internal(struct if_proto *proto,
 		return retval;
 	}
 
-	/*
-	 * Insert the protocol in the hash
-	 */
+	  
+                                   
+    
 	prev_proto = SLIST_FIRST(&ifp->if_proto_hash[hash_value]);
 	while (prev_proto != NULL && SLIST_NEXT(prev_proto, next_hash) != NULL) {
 		prev_proto = SLIST_NEXT(prev_proto, next_hash);
@@ -6719,13 +6719,13 @@ dlil_attach_protocol_internal(struct if_proto *proto,
 		    proto, next_hash);
 	}
 
-	/* hold a proto refcnt for attach */
+	                                    
 	if_proto_ref(proto);
 
-	/*
-	 * The reserved field carries the number of protocol still attached
-	 * (subject to change)
-	 */
+	  
+                                                                    
+                       
+    
 	ev_pr_data.proto_family = proto->protocol_family;
 	ev_pr_data.proto_remaining_count = dlil_ifp_protolist(ifp, NULL, 0);
 
@@ -6753,7 +6753,7 @@ ifnet_attach_protocol(ifnet_t ifp, protocol_family_t protocol,
 		retval = EINVAL;
 		goto end;
 	}
-	/* Check that the interface is in the global list */
+	                                                    
 	if (!ifnet_lookup(ifp)) {
 		retval = ENXIO;
 		goto end;
@@ -6765,7 +6765,7 @@ ifnet_attach_protocol(ifnet_t ifp, protocol_family_t protocol,
 		goto end;
 	}
 
-	/* refcnt held above during lookup */
+	                                     
 	ifproto->ifp = ifp;
 	ifproto->protocol_family = protocol;
 	ifproto->proto_kpi = kProtoKPI_v1;
@@ -6794,11 +6794,11 @@ end:
 	}
 	ifnet_head_done();
 	if (retval == 0) {
-		/*
-		 * A protocol has been attached, mark the interface up.
-		 * This used to be done by configd.KernelEventMonitor, but that
-		 * is inherently prone to races (rdar://problem/30810208).
-		 */
+		  
+                                                         
+                                                                 
+                                                            
+     
 		(void) ifnet_set_flags(ifp, IFF_UP, IFF_UP);
 		(void) ifnet_ioctl(ifp, 0, SIOCSIFFLAGS, NULL);
 		dlil_post_sifflags_msg(ifp);
@@ -6821,7 +6821,7 @@ ifnet_attach_protocol_v2(ifnet_t ifp, protocol_family_t protocol,
 		retval = EINVAL;
 		goto end;
 	}
-	/* Check that the interface is in the global list */
+	                                                    
 	if (!ifnet_lookup(ifp)) {
 		retval = ENXIO;
 		goto end;
@@ -6834,7 +6834,7 @@ ifnet_attach_protocol_v2(ifnet_t ifp, protocol_family_t protocol,
 	}
 	bzero(ifproto, sizeof(*ifproto));
 
-	/* refcnt held above during lookup */
+	                                     
 	ifproto->ifp = ifp;
 	ifproto->protocol_family = protocol;
 	ifproto->proto_kpi = kProtoKPI_v2;
@@ -6863,11 +6863,11 @@ end:
 	}
 	ifnet_head_done();
 	if (retval == 0) {
-		/*
-		 * A protocol has been attached, mark the interface up.
-		 * This used to be done by configd.KernelEventMonitor, but that
-		 * is inherently prone to races (rdar://problem/30810208).
-		 */
+		  
+                                                         
+                                                                 
+                                                            
+     
 		(void) ifnet_set_flags(ifp, IFF_UP, IFF_UP);
 		(void) ifnet_ioctl(ifp, 0, SIOCSIFFLAGS, NULL);
 		dlil_post_sifflags_msg(ifp);
@@ -6889,7 +6889,7 @@ ifnet_detach_protocol(ifnet_t ifp, protocol_family_t proto_family)
 	}
 
 	ifnet_lock_exclusive(ifp);
-	/* callee holds a proto refcnt upon success */
+	                                              
 	proto = find_attached_proto(ifp, proto_family);
 	if (proto == NULL) {
 		retval = ENXIO;
@@ -6897,7 +6897,7 @@ ifnet_detach_protocol(ifnet_t ifp, protocol_family_t proto_family)
 		goto end;
 	}
 
-	/* call family module del_proto */
+	                                  
 	if (ifp->if_del_proto) {
 		ifp->if_del_proto(ifp, proto->protocol_family);
 	}
@@ -6929,14 +6929,14 @@ ifnet_detach_protocol(ifnet_t ifp, protocol_family_t proto_family)
 		    "v1" : "v2", proto_family);
 	}
 
-	/* release proto refcnt held during protocol attach */
+	                                                      
 	if_proto_free(proto);
 
-	/*
-	 * Release proto refcnt held during lookup; the rest of
-	 * protocol detach steps will happen when the last proto
-	 * reference is released.
-	 */
+	  
+                                                        
+                                                         
+                          
+    
 	if_proto_free(proto);
 
 end:
@@ -7020,15 +7020,15 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		return EINVAL;
 	}
 
-	/*
-	 * Serialize ifnet attach using dlil_ifnet_lock, in order to
-	 * prevent the interface from being configured while it is
-	 * embryonic, as ifnet_head_lock is dropped and reacquired
-	 * below prior to marking the ifnet with IFRF_ATTACHED.
-	 */
+	  
+                                                             
+                                                           
+                                                           
+                                                        
+    
 	dlil_if_lock();
 	ifnet_head_lock_exclusive();
-	/* Verify we aren't already on the list */
+	                                          
 	TAILQ_FOREACH(tmp_if, &ifnet_head, if_link) {
 		if (tmp_if == ifp) {
 			ifnet_head_done();
@@ -7041,13 +7041,13 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	if (!(ifp->if_refflags & IFRF_EMBRYONIC)) {
 		panic_plain("%s: flags mismatch (embryonic not set) ifp=%p",
 		    __func__, ifp);
-		/* NOTREACHED */
+		                
 	}
 	lck_mtx_unlock(&ifp->if_ref_lock);
 
 	ifnet_lock_exclusive(ifp);
 
-	/* Sanity check */
+	                  
 	VERIFY(ifp->if_detaching_link.tqe_next == NULL);
 	VERIFY(ifp->if_detaching_link.tqe_prev == NULL);
 	VERIFY(ifp->if_threads_pending == 0);
@@ -7063,10 +7063,10 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		}
 	}
 
-	/*
-	 * Allow interfaces without protocol families to attach
-	 * only if they have the necessary fields filled out.
-	 */
+	  
+                                                        
+                                                      
+    
 	if (ifp->if_add_proto == NULL || ifp->if_del_proto == NULL) {
 		DLIL_PRINTF("%s: Attempt to attach interface without "
 		    "family module - %d\n", __func__, ifp->if_family);
@@ -7076,7 +7076,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		return ENODEV;
 	}
 
-	/* Allocate protocol hash table */
+	                                  
 	VERIFY(ifp->if_proto_hash == NULL);
 	ifp->if_proto_hash = zalloc_flags(dlif_phash_zone, Z_WAITOK | Z_ZERO);
 	if (ifp->if_proto_hash == NULL) {
@@ -7114,7 +7114,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		}
 		ifp->if_index = (uint16_t)idx;
 
-		/* the lladdr passed at attach time is the permanent address */
+		                                                               
 		if (ll_addr != NULL && ifp->if_type == IFT_ETHER &&
 		    ll_addr->sdl_alen == ETHER_ADDR_LEN) {
 			bcopy(CONST_LLADDR(ll_addr),
@@ -7123,10 +7123,10 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 			dl_if->dl_if_permanent_ether_is_set = 1;
 		}
 	}
-	/* There should not be anything occupying this slot */
+	                                                      
 	VERIFY(ifindex2ifnet[ifp->if_index] == NULL);
 
-	/* allocate (if needed) and initialize a link address */
+	                                                        
 	ifa = dlil_alloc_lladdr(ifp, ll_addr);
 	if (ifa == NULL) {
 		ifnet_lock_done(ifp);
@@ -7138,21 +7138,21 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	VERIFY(ifnet_addrs[ifp->if_index - 1] == NULL);
 	ifnet_addrs[ifp->if_index - 1] = ifa;
 
-	/* make this address the first on the list */
+	                                             
 	IFA_LOCK(ifa);
-	/* hold a reference for ifnet_addrs[] */
+	                                        
 	IFA_ADDREF_LOCKED(ifa);
-	/* if_attach_link_ifa() holds a reference for ifa_link */
+	                                                         
 	if_attach_link_ifa(ifp, ifa);
 	IFA_UNLOCK(ifa);
 
 	TAILQ_INSERT_TAIL(&ifnet_head, ifp, if_link);
 	ifindex2ifnet[ifp->if_index] = ifp;
 
-	/* Hold a reference to the underlying dlil_ifnet */
+	                                                   
 	ifnet_reference(ifp);
 
-	/* Clear stats (save and restore other fields that we care) */
+	                                                              
 	if_data_saved = ifp->if_data;
 	bzero(&ifp->if_data, sizeof(ifp->if_data));
 	ifp->if_data.ifi_type = if_data_saved.ifi_type;
@@ -7171,7 +7171,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	    ifp->if_output_sched_model == IFNET_SCHED_MODEL_DRIVER_MANAGED ||
 	    ifp->if_output_sched_model == IFNET_SCHED_MODEL_FQ_CODEL);
 
-	/* By default, use SFB and enable flow advisory */
+	                                                  
 	sflags = PKTSCHEDF_QALG_SFB;
 	if (if_flowadv) {
 		sflags |= PKTSCHEDF_QALG_FLOWCTL;
@@ -7186,15 +7186,15 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		sflags |= PKTSCHEDF_QALG_DRIVER_MANAGED;
 	}
 
-	/* Initialize transmit queue(s) */
+	                                  
 	err = ifclassq_setup(ifp, sflags, (dl_if->dl_if_flags & DLIF_REUSE));
 	if (err != 0) {
 		panic_plain("%s: ifp=%p couldn't initialize transmit queue; "
 		    "err=%d", __func__, ifp, err);
-		/* NOTREACHED */
+		                
 	}
 
-	/* Sanity checks on the input thread storage */
+	                                               
 	dl_inp = &dl_if->dl_if_inpstorage;
 	bzero(&dl_inp->dlth_stats, sizeof(dl_inp->dlth_stats));
 	VERIFY(dl_inp->dlth_flags == 0);
@@ -7212,13 +7212,13 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 
 #if IFNET_INPUT_SANITY_CHK
 	VERIFY(dl_inp->dlth_pkts_cnt == 0);
-#endif /* IFNET_INPUT_SANITY_CHK */
+#endif                             
 
 	VERIFY(ifp->if_poll_thread == THREAD_NULL);
 	dlil_reset_rxpoll_params(ifp);
-	/*
-	 * A specific DLIL input thread is created per non-loopback interface.
-	 */
+	  
+                                                                       
+    
 	if (ifp->if_family != IFNET_FAMILY_LOOPBACK) {
 		ifp->if_inp = dl_inp;
 		ifnet_incr_pending_thread_count(ifp);
@@ -7229,14 +7229,14 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		} else if (err != 0) {
 			panic_plain("%s: ifp=%p couldn't get an input thread; "
 			    "err=%d", __func__, ifp, err);
-			/* NOTREACHED */
+			                
 		}
 	}
-	/*
-	 * If the driver supports the new transmit model, calculate flow hash
-	 * and create a workloop starter thread to invoke the if_start callback
-	 * where the packets may be dequeued and transmitted.
-	 */
+	  
+                                                                      
+                                                                        
+                                                      
+    
 	if (ifp->if_eflags & IFEF_TXSTART) {
 		thread_precedence_policy_data_t info;
 		__unused kern_return_t kret;
@@ -7256,7 +7256,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 			panic_plain("%s: "
 			    "ifp=%p couldn't get a start thread; "
 			    "err=%d", __func__, ifp, err);
-			/* NOTREACHED */
+			                
 		}
 		bzero(&info, sizeof(info));
 		info.importance = 1;
@@ -7268,20 +7268,20 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		ifp->if_flowhash = 0;
 	}
 
-	/* Reset polling parameters */
+	                              
 	ifnet_set_poll_cycle(ifp, NULL);
 	ifp->if_poll_update = 0;
 	ifp->if_poll_flags = 0;
 	ifp->if_poll_req = 0;
 	VERIFY(ifp->if_poll_thread == THREAD_NULL);
 
-	/*
-	 * If the driver supports the new receive model, create a poller
-	 * thread to invoke if_input_poll callback where the packets may
-	 * be dequeued from the driver and processed for reception.
-	 * if the interface is netif compat then the poller thread is
-	 * managed by netif.
-	 */
+	  
+                                                                 
+                                                                 
+                                                            
+                                                              
+                     
+    
 	if (thfunc == dlil_rxpoll_input_thread_func) {
 		thread_precedence_policy_data_t info;
 		__unused kern_return_t kret;
@@ -7292,7 +7292,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		    &ifp->if_poll_thread)) != KERN_SUCCESS) {
 			panic_plain("%s: ifp=%p couldn't get a poll thread; "
 			    "err=%d", __func__, ifp, err);
-			/* NOTREACHED */
+			                
 		}
 		bzero(&info, sizeof(info));
 		info.importance = 1;
@@ -7306,7 +7306,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	VERIFY(ifp->if_desc.ifd_len == 0);
 	VERIFY(ifp->if_desc.ifd_desc != NULL);
 
-	/* Record attach PC stacktrace */
+	                                 
 	ctrace_record(&((struct dlil_ifnet *)ifp)->dl_if_attach);
 
 	ifp->if_updatemcasts = 0;
@@ -7326,10 +7326,10 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		    ifp->if_updatemcasts);
 	}
 
-	/* Clear logging parameters */
+	                              
 	bzero(&ifp->if_log, sizeof(ifp->if_log));
 
-	/* Clear foreground/realtime activity timestamps */
+	                                                   
 	ifp->if_fg_sendts = 0;
 	ifp->if_rt_sendts = 0;
 
@@ -7343,14 +7343,14 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	VERIFY(ifp->if_agentids == NULL);
 	VERIFY(ifp->if_agentcount == 0);
 
-	/* Reset interface state */
+	                           
 	bzero(&ifp->if_interface_state, sizeof(ifp->if_interface_state));
 	ifp->if_interface_state.valid_bitmask |=
 	    IF_INTERFACE_STATE_INTERFACE_AVAILABILITY_VALID;
 	ifp->if_interface_state.interface_availability =
 	    IF_INTERFACE_STATE_INTERFACE_AVAILABLE;
 
-	/* Initialize Link Quality Metric (loopback [lo0] is always good) */
+	                                                                    
 	if (ifp == lo_ifp) {
 		ifp->if_interface_state.lqm_state = IFNET_LQM_THRESH_GOOD;
 		ifp->if_interface_state.valid_bitmask |=
@@ -7359,18 +7359,18 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		ifp->if_interface_state.lqm_state = IFNET_LQM_THRESH_UNKNOWN;
 	}
 
-	/*
-	 * Enable ECN capability on this interface depending on the
-	 * value of ECN global setting
-	 */
+	  
+                                                            
+                               
+    
 	if (tcp_ecn_outbound == 2 && !IFNET_IS_CELLULAR(ifp)) {
 		if_set_eflags(ifp, IFEF_ECN_ENABLE);
 		if_clear_eflags(ifp, IFEF_ECN_DISABLE);
 	}
 
-	/*
-	 * Built-in Cyclops always on policy for WiFi infra
-	 */
+	  
+                                                    
+    
 	if (IFNET_IS_WIFI_INFRA(ifp) && net_qos_policy_wifi_enabled != 0) {
 		errno_t error;
 
@@ -7384,7 +7384,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 #if (DEVELOPMENT || DEBUG)
 			DLIL_PRINTF("%s fastlane enabled on %s\n",
 			    __func__, ifp->if_xname);
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 		}
 	}
 
@@ -7393,9 +7393,9 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 
 
 	lck_mtx_lock(&ifp->if_cached_route_lock);
-	/* Enable forwarding cached route */
+	                                    
 	ifp->if_fwd_cacheok = 1;
-	/* Clean up any existing cached routes */
+	                                         
 	ROUTE_RELEASE(&ifp->if_fwd_route);
 	bzero(&ifp->if_fwd_route, sizeof(ifp->if_fwd_route));
 	ROUTE_RELEASE(&ifp->if_src_route);
@@ -7406,15 +7406,15 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 
 	ifnet_llreach_ifattach(ifp, (dl_if->dl_if_flags & DLIF_REUSE));
 
-	/*
-	 * Allocate and attach IGMPv3/MLDv2 interface specific variables
-	 * and trees; do this before the ifnet is marked as attached.
-	 * The ifnet keeps the reference to the info structures even after
-	 * the ifnet is detached, since the network-layer records still
-	 * refer to the info structures even after that.  This also
-	 * makes it possible for them to still function after the ifnet
-	 * is recycled or reattached.
-	 */
+	  
+                                                                 
+                                                              
+                                                                   
+                                                                
+                                                            
+                                                                
+                              
+    
 #if INET
 	if (IGMP_IFINFO(ifp) == NULL) {
 		IGMP_IFINFO(ifp) = igmp_domifattach(ifp, Z_WAITOK);
@@ -7423,7 +7423,7 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 		VERIFY(IGMP_IFINFO(ifp)->igi_ifp == ifp);
 		igmp_domifreattach(IGMP_IFINFO(ifp));
 	}
-#endif /* INET */
+#endif           
 	if (MLD_IFINFO(ifp) == NULL) {
 		MLD_IFINFO(ifp) = mld_domifattach(ifp, Z_WAITOK);
 		VERIFY(MLD_IFINFO(ifp) != NULL);
@@ -7435,11 +7435,11 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	VERIFY(ifp->if_data_threshold == 0);
 	VERIFY(ifp->if_dt_tcall != NULL);
 
-	/*
-	 * Wait for the created kernel threads for I/O to get
-	 * scheduled and run at least once before we proceed
-	 * to mark interface as attached.
-	 */
+	  
+                                                      
+                                                     
+                                  
+    
 	lck_mtx_lock(&ifp->if_ref_lock);
 	while (ifp->if_threads_pending != 0) {
 		DLIL_PRINTF("%s: Waiting for all kernel threads created for "
@@ -7453,18 +7453,18 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	DLIL_PRINTF("%s: All kernel threads created for interface %s have been scheduled "
 	    "at least once. Proceeding.\n", __func__, ifp->if_xname);
 
-	/* Final mark this ifnet as attached. */
+	                                        
 	lck_mtx_lock(rnh_lock);
 	ifnet_lock_exclusive(ifp);
 	lck_mtx_lock_spin(&ifp->if_ref_lock);
-	ifp->if_refflags = (IFRF_ATTACHED | IFRF_READY); /* clears embryonic */
+	ifp->if_refflags = (IFRF_ATTACHED | IFRF_READY);                       
 	lck_mtx_unlock(&ifp->if_ref_lock);
 	if (net_rtref) {
-		/* boot-args override; enable idle notification */
+		                                                  
 		(void) ifnet_set_idle_flags_locked(ifp, IFRF_IDLE_NOTIFY,
 		    IFRF_IDLE_NOTIFY);
 	} else {
-		/* apply previous request(s) to set the idle flags, if any */
+		                                                             
 		(void) ifnet_set_idle_flags_locked(ifp, ifp->if_idle_new_flags,
 		    ifp->if_idle_new_flags_mask);
 	}
@@ -7473,11 +7473,11 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	dlil_if_unlock();
 
 #if PF
-	/*
-	 * Attach packet filter to this interface, if enabled.
-	 */
+	  
+                                                       
+    
 	pf_ifnet_hook(ifp, 1);
-#endif /* PF */
+#endif         
 
 	dlil_post_msg(ifp, KEV_DL_SUBCLASS, KEV_DL_IF_ATTACHED, NULL, 0);
 
@@ -7489,16 +7489,16 @@ ifnet_attach(ifnet_t ifp, const struct sockaddr_dl *ll_addr)
 	return 0;
 }
 
-/*
- * Prepare the storage for the first/permanent link address, which must
- * must have the same lifetime as the ifnet itself.  Although the link
- * address gets removed from if_addrhead and ifnet_addrs[] at detach time,
- * its location in memory must never change as it may still be referred
- * to by some parts of the system afterwards (unfortunate implementation
- * artifacts inherited from BSD.)
- *
- * Caller must hold ifnet lock as writer.
- */
+  
+                                                                       
+                                                                      
+                                                                          
+                                                                       
+                                                                        
+                                 
+  
+                                         
+   
 static struct ifaddr *
 dlil_alloc_lladdr(struct ifnet *ifp, const struct sockaddr_dl *ll_addr)
 {
@@ -7526,13 +7526,13 @@ dlil_alloc_lladdr(struct ifnet *ifp, const struct sockaddr_dl *ll_addr)
 	ifa = ifp->if_lladdr;
 	if (socksize > DLIL_SDLMAXLEN ||
 	    (ifa != NULL && ifa != &dl_if->dl_if_lladdr.ifa)) {
-		/*
-		 * Rare, but in the event that the link address requires
-		 * more storage space than DLIL_SDLMAXLEN, allocate the
-		 * largest possible storages for address and mask, such
-		 * that we can reuse the same space when if_addrlen grows.
-		 * This same space will be used when if_addrlen shrinks.
-		 */
+		  
+                                                          
+                                                         
+                                                         
+                                                            
+                                                          
+     
 		if (ifa == NULL || ifa == &dl_if->dl_if_lladdr.ifa) {
 			int ifasize = sizeof(*ifa) + 2 * SOCK_MAXADDRLEN;
 			ifa = _MALLOC(ifasize, M_IFADDR, M_WAITOK | M_ZERO);
@@ -7540,11 +7540,11 @@ dlil_alloc_lladdr(struct ifnet *ifp, const struct sockaddr_dl *ll_addr)
 				return NULL;
 			}
 			ifa_lock_init(ifa);
-			/* Don't set IFD_ALLOC, as this is permanent */
+			                                               
 			ifa->ifa_debug = IFD_LINK;
 		}
 		IFA_LOCK(ifa);
-		/* address and mask sockaddr_dl locations */
+		                                            
 		asdl = (struct sockaddr_dl *)(ifa + 1);
 		bzero(asdl, SOCK_MAXADDRLEN);
 		msdl = (struct sockaddr_dl *)(void *)
@@ -7552,25 +7552,25 @@ dlil_alloc_lladdr(struct ifnet *ifp, const struct sockaddr_dl *ll_addr)
 		bzero(msdl, SOCK_MAXADDRLEN);
 	} else {
 		VERIFY(ifa == NULL || ifa == &dl_if->dl_if_lladdr.ifa);
-		/*
-		 * Use the storage areas for address and mask within the
-		 * dlil_ifnet structure.  This is the most common case.
-		 */
+		  
+                                                          
+                                                         
+     
 		if (ifa == NULL) {
 			ifa = &dl_if->dl_if_lladdr.ifa;
 			ifa_lock_init(ifa);
-			/* Don't set IFD_ALLOC, as this is permanent */
+			                                               
 			ifa->ifa_debug = IFD_LINK;
 		}
 		IFA_LOCK(ifa);
-		/* address and mask sockaddr_dl locations */
+		                                            
 		asdl = (struct sockaddr_dl *)(void *)&dl_if->dl_if_lladdr.asdl;
 		bzero(asdl, sizeof(dl_if->dl_if_lladdr.asdl));
 		msdl = (struct sockaddr_dl *)(void *)&dl_if->dl_if_lladdr.msdl;
 		bzero(msdl, sizeof(dl_if->dl_if_lladdr.msdl));
 	}
 
-	/* hold a permanent reference for the ifnet itself */
+	                                                     
 	IFA_ADDREF_LOCKED(ifa);
 	oifa = ifp->if_lladdr;
 	ifp->if_lladdr = ifa;
@@ -7615,7 +7615,7 @@ if_purgeaddrs(struct ifnet *ifp)
 {
 #if INET
 	in_purgeaddrs(ifp);
-#endif /* INET */
+#endif           
 	in6_purgeaddrs(ifp);
 }
 
@@ -7643,12 +7643,12 @@ ifnet_detach(ifnet_t ifp)
 		ifp->if_output_netem = NULL;
 	}
 
-	/*
-	 * Check to see if this interface has previously triggered
-	 * aggressive protocol draining; if so, decrement the global
-	 * refcnt and clear PR_AGGDRAIN on the route domain if
-	 * there are no more of such an interface around.
-	 */
+	  
+                                                           
+                                                             
+                                                       
+                                                  
+    
 	(void) ifnet_set_idle_flags_locked(ifp, 0, ~0);
 
 	lck_mtx_lock_spin(&ifp->if_ref_lock);
@@ -7659,7 +7659,7 @@ ifnet_detach(ifnet_t ifp)
 		lck_mtx_unlock(rnh_lock);
 		return EINVAL;
 	} else if (ifp->if_refflags & IFRF_DETACHING) {
-		/* Interface has already been detached */
+		                                         
 		lck_mtx_unlock(&ifp->if_ref_lock);
 		ifnet_lock_done(ifp);
 		ifnet_head_done();
@@ -7667,7 +7667,7 @@ ifnet_detach(ifnet_t ifp)
 		return ENXIO;
 	}
 	VERIFY(!(ifp->if_refflags & IFRF_EMBRYONIC));
-	/* Indicate this interface is being detached */
+	                                               
 	ifp->if_refflags &= ~IFRF_ATTACHED;
 	ifp->if_refflags |= IFRF_DETACHING;
 	lck_mtx_unlock(&ifp->if_ref_lock);
@@ -7676,30 +7676,30 @@ ifnet_detach(ifnet_t ifp)
 		DLIL_PRINTF("%s: detaching\n", if_name(ifp));
 	}
 
-	/* clean up flow control entry object if there's any */
+	                                                       
 	if (ifp->if_eflags & IFEF_TXSTART) {
 		ifnet_flowadv(ifp->if_flowhash);
 	}
 
-	/* Reset ECN enable/disable flags */
-	/* Reset CLAT46 flag */
+	                                    
+	                       
 	if_clear_eflags(ifp, IFEF_ECN_ENABLE | IFEF_ECN_DISABLE | IFEF_CLAT46);
 
-	/*
-	 * We do not reset the TCP keep alive counters in case
-	 * a TCP connection stays connection after the interface
-	 * went down
-	 */
+	  
+                                                       
+                                                         
+             
+    
 	if (ifp->if_tcp_kao_cnt > 0) {
 		os_log(OS_LOG_DEFAULT, "%s %s tcp_kao_cnt %u not zero",
 		    __func__, if_name(ifp), ifp->if_tcp_kao_cnt);
 	}
 	ifp->if_tcp_kao_max = 0;
 
-	/*
-	 * Remove ifnet from the ifnet_head, ifindex2ifnet[]; it will
-	 * no longer be visible during lookups from this point.
-	 */
+	  
+                                                              
+                                                        
+    
 	VERIFY(ifindex2ifnet[ifp->if_index] == ifp);
 	TAILQ_REMOVE(&ifnet_head, ifp, if_link);
 	ifp->if_link.tqe_next = NULL;
@@ -7710,21 +7710,21 @@ ifnet_detach(ifnet_t ifp)
 	}
 	ifindex2ifnet[ifp->if_index] = NULL;
 
-	/* 18717626 - reset router mode */
+	                                  
 	if_clear_eflags(ifp, IFEF_IPV4_ROUTER);
 	ifp->if_ipv6_router_mode = IPV6_ROUTER_MODE_DISABLED;
 
-	/* Record detach PC stacktrace */
+	                                 
 	ctrace_record(&((struct dlil_ifnet *)ifp)->dl_if_detach);
 
-	/* Clear logging parameters */
+	                              
 	bzero(&ifp->if_log, sizeof(ifp->if_log));
 
-	/* Clear delegated interface info (reference released below) */
+	                                                               
 	delegated_ifp = ifp->if_delegated.ifp;
 	bzero(&ifp->if_delegated, sizeof(ifp->if_delegated));
 
-	/* Reset interface state */
+	                           
 	bzero(&ifp->if_interface_state, sizeof(ifp->if_interface_state));
 
 	ifnet_lock_done(ifp);
@@ -7732,43 +7732,43 @@ ifnet_detach(ifnet_t ifp)
 	lck_mtx_unlock(rnh_lock);
 
 
-	/* Release reference held on the delegated interface */
+	                                                       
 	if (delegated_ifp != NULL) {
 		ifnet_release(delegated_ifp);
 	}
 
-	/* Reset Link Quality Metric (unless loopback [lo0]) */
+	                                                       
 	if (ifp != lo_ifp) {
 		if_lqm_update(ifp, IFNET_LQM_THRESH_OFF, 0);
 	}
 
-	/* Reset TCP local statistics */
+	                                
 	if (ifp->if_tcp_stat != NULL) {
 		bzero(ifp->if_tcp_stat, sizeof(*ifp->if_tcp_stat));
 	}
 
-	/* Reset UDP local statistics */
+	                                
 	if (ifp->if_udp_stat != NULL) {
 		bzero(ifp->if_udp_stat, sizeof(*ifp->if_udp_stat));
 	}
 
-	/* Reset ifnet IPv4 stats */
+	                            
 	if (ifp->if_ipv4_stat != NULL) {
 		bzero(ifp->if_ipv4_stat, sizeof(*ifp->if_ipv4_stat));
 	}
 
-	/* Reset ifnet IPv6 stats */
+	                            
 	if (ifp->if_ipv6_stat != NULL) {
 		bzero(ifp->if_ipv6_stat, sizeof(*ifp->if_ipv6_stat));
 	}
 
-	/* Release memory held for interface link status report */
+	                                                          
 	if (ifp->if_link_status != NULL) {
 		FREE(ifp->if_link_status, M_TEMP);
 		ifp->if_link_status = NULL;
 	}
 
-	/* Clear agent IDs */
+	                     
 	if (ifp->if_agentids != NULL) {
 		FREE(ifp->if_agentids, M_NETAGENT);
 		ifp->if_agentids = NULL;
@@ -7776,35 +7776,35 @@ ifnet_detach(ifnet_t ifp)
 	ifp->if_agentcount = 0;
 
 
-	/* Let BPF know we're detaching */
+	                                  
 	bpfdetach(ifp);
 
-	/* Mark the interface as DOWN */
+	                                
 	if_down(ifp);
 
-	/* Disable forwarding cached route */
+	                                     
 	lck_mtx_lock(&ifp->if_cached_route_lock);
 	ifp->if_fwd_cacheok = 0;
 	lck_mtx_unlock(&ifp->if_cached_route_lock);
 
-	/* Disable data threshold and wait for any pending event posting */
+	                                                                   
 	ifp->if_data_threshold = 0;
 	VERIFY(ifp->if_dt_tcall != NULL);
 	(void) thread_call_cancel_wait(ifp->if_dt_tcall);
 
-	/*
-	 * Drain any deferred IGMPv3/MLDv2 query responses, but keep the
-	 * references to the info structures and leave them attached to
-	 * this ifnet.
-	 */
+	  
+                                                                 
+                                                                
+               
+    
 #if INET
 	igmp_domifdetach(ifp);
-#endif /* INET */
+#endif           
 	mld_domifdetach(ifp);
 
 	dlil_post_msg(ifp, KEV_DL_SUBCLASS, KEV_DL_IF_DETACHING, NULL, 0);
 
-	/* Let worker thread take care of the rest, to avoid reentrancy */
+	                                                                  
 	dlil_if_lock();
 	ifnet_detaching_enqueue(ifp);
 	dlil_if_unlock();
@@ -7852,7 +7852,7 @@ ifnet_detacher_thread_cont(void *v, wait_result_t wres)
 	dlil_if_lock();
 	if (__improbable(ifnet_detaching_embryonic)) {
 		ifnet_detaching_embryonic = FALSE;
-		/* there's no lock ordering constrain so OK to do this here */
+		                                                              
 		dlil_decr_pending_thread_count();
 	}
 
@@ -7867,7 +7867,7 @@ ifnet_detacher_thread_cont(void *v, wait_result_t wres)
 
 		VERIFY(TAILQ_FIRST(&ifnet_detaching_head) != NULL);
 
-		/* Take care of detaching ifnet */
+		                                  
 		ifp = ifnet_detaching_dequeue();
 		if (ifp != NULL) {
 			dlil_if_unlock();
@@ -7880,8 +7880,8 @@ ifnet_detacher_thread_cont(void *v, wait_result_t wres)
 	dlil_if_unlock();
 	(void) thread_block(ifnet_detacher_thread_cont);
 
-	VERIFY(0);      /* we should never get here */
-	/* NOTREACHED */
+	VERIFY(0);                                    
+	                
 	__builtin_unreachable();
 }
 
@@ -7893,12 +7893,12 @@ ifnet_detacher_thread_func(void *v, wait_result_t w)
 	dlil_if_lock();
 	(void) assert_wait(&ifnet_delayed_run, THREAD_UNINT);
 	ifnet_detaching_embryonic = TRUE;
-	/* wake up once to get out of embryonic state */
+	                                                
 	wakeup((caddr_t)&ifnet_delayed_run);
 	dlil_if_unlock();
 	(void) thread_block(ifnet_detacher_thread_cont);
 	VERIFY(0);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -7916,14 +7916,14 @@ ifnet_detach_final(struct ifnet *ifp)
 	if (!(ifp->if_refflags & IFRF_DETACHING)) {
 		panic("%s: flags mismatch (detaching not set) ifp=%p",
 		    __func__, ifp);
-		/* NOTREACHED */
+		                
 	}
 
-	/*
-	 * Wait until the existing IO references get released
-	 * before we proceed with ifnet_detach.  This is not a
-	 * common case, so block without using a continuation.
-	 */
+	  
+                                                      
+                                                       
+                                                       
+    
 	while (ifp->if_refio > 0) {
 		DLIL_PRINTF("%s: Waiting for IO references on %s interface "
 		    "to be released\n", __func__, if_name(ifp));
@@ -7937,10 +7937,10 @@ ifnet_detach_final(struct ifnet *ifp)
 	ifp->if_refflags &= ~IFRF_READY;
 	lck_mtx_unlock(&ifp->if_ref_lock);
 
-	/* Drain and destroy send queue */
+	                                  
 	ifclassq_teardown(ifp);
 
-	/* Detach interface filters */
+	                              
 	lck_mtx_lock(&ifp->if_flt_lock);
 	if_flt_monitor_enter(ifp);
 
@@ -7958,12 +7958,12 @@ ifnet_detach_final(struct ifnet *ifp)
 	if_flt_monitor_leave(ifp);
 	lck_mtx_unlock(&ifp->if_flt_lock);
 
-	/* Tell upper layers to drop their network addresses */
+	                                                       
 	if_purgeaddrs(ifp);
 
 	ifnet_lock_exclusive(ifp);
 
-	/* Unplumb all protocols */
+	                           
 	for (i = 0; i < PROTO_HASH_SLOTS; i++) {
 		struct if_proto *proto;
 
@@ -7975,24 +7975,24 @@ ifnet_detach_final(struct ifnet *ifp)
 			ifnet_lock_exclusive(ifp);
 			proto = SLIST_FIRST(&ifp->if_proto_hash[i]);
 		}
-		/* There should not be any protocols left */
+		                                            
 		VERIFY(SLIST_EMPTY(&ifp->if_proto_hash[i]));
 	}
 	zfree(dlif_phash_zone, ifp->if_proto_hash);
 	ifp->if_proto_hash = NULL;
 
-	/* Detach (permanent) link address from if_addrhead */
+	                                                      
 	ifa = TAILQ_FIRST(&ifp->if_addrhead);
 	VERIFY(ifnet_addrs[ifp->if_index - 1] == ifa);
 	IFA_LOCK(ifa);
 	if_detach_link_ifa(ifp, ifa);
 	IFA_UNLOCK(ifa);
 
-	/* Remove (permanent) link address from ifnet_addrs[] */
+	                                                        
 	IFA_REMREF(ifa);
 	ifnet_addrs[ifp->if_index - 1] = NULL;
 
-	/* This interface should not be on {ifnet_head,detaching} */
+	                                                            
 	VERIFY(ifp->if_link.tqe_next == NULL);
 	VERIFY(ifp->if_link.tqe_prev == NULL);
 	VERIFY(ifp->if_detaching_link.tqe_next == NULL);
@@ -8000,15 +8000,15 @@ ifnet_detach_final(struct ifnet *ifp)
 	VERIFY(ifp->if_ordered_link.tqe_next == NULL);
 	VERIFY(ifp->if_ordered_link.tqe_prev == NULL);
 
-	/* The slot should have been emptied */
+	                                       
 	VERIFY(ifindex2ifnet[ifp->if_index] == NULL);
 
-	/* There should not be any addresses left */
+	                                            
 	VERIFY(TAILQ_EMPTY(&ifp->if_addrhead));
 
-	/*
-	 * Signal the starter thread to terminate itself.
-	 */
+	  
+                                                  
+    
 	if (ifp->if_start_thread != THREAD_NULL) {
 		lck_mtx_lock_spin(&ifp->if_start_lock);
 		ifp->if_start_flags = 0;
@@ -8017,9 +8017,9 @@ ifnet_detach_final(struct ifnet *ifp)
 		lck_mtx_unlock(&ifp->if_start_lock);
 	}
 
-	/*
-	 * Signal the poller thread to terminate itself.
-	 */
+	  
+                                                 
+    
 	if (ifp->if_poll_thread != THREAD_NULL) {
 		lck_mtx_lock_spin(&ifp->if_poll_lock);
 		ifp->if_poll_thread = THREAD_NULL;
@@ -8027,12 +8027,12 @@ ifnet_detach_final(struct ifnet *ifp)
 		lck_mtx_unlock(&ifp->if_poll_lock);
 	}
 
-	/*
-	 * If thread affinity was set for the workloop thread, we will need
-	 * to tear down the affinity and release the extra reference count
-	 * taken at attach time.  Does not apply to lo0 or other interfaces
-	 * without dedicated input threads.
-	 */
+	  
+                                                                    
+                                                                   
+                                                                    
+                                    
+    
 	if ((inp = ifp->if_inp) != NULL) {
 		VERIFY(inp != dlil_main_input_thread);
 
@@ -8045,12 +8045,12 @@ ifnet_detach_final(struct ifnet *ifp)
 			ptp = inp->dlth_poller_thread;
 			inp->dlth_poller_thread = THREAD_NULL;
 			ASSERT(inp->dlth_thread != THREAD_NULL);
-			tp = inp->dlth_thread;    /* don't nullify now */
+			tp = inp->dlth_thread;                           
 			inp->dlth_affinity_tag = 0;
 			inp->dlth_affinity = FALSE;
 			lck_mtx_unlock(&inp->dlth_lock);
 
-			/* Tear down poll thread affinity */
+			                                    
 			if (ptp != NULL) {
 				VERIFY(ifp->if_eflags & IFEF_RXPOLL);
 				VERIFY(ifp->if_xflags & IFXF_LEGACY);
@@ -8059,22 +8059,22 @@ ifnet_detach_final(struct ifnet *ifp)
 				thread_deallocate(ptp);
 			}
 
-			/* Tear down workloop thread affinity */
+			                                        
 			if (wtp != NULL) {
 				(void) dlil_affinity_set(wtp,
 				    THREAD_AFFINITY_TAG_NULL);
 				thread_deallocate(wtp);
 			}
 
-			/* Tear down DLIL input thread affinity */
+			                                          
 			(void) dlil_affinity_set(tp, THREAD_AFFINITY_TAG_NULL);
 			thread_deallocate(tp);
 		}
 
-		/* disassociate ifp DLIL input thread */
+		                                        
 		ifp->if_inp = NULL;
 
-		/* if the worker thread was created, tell it to terminate */
+		                                                            
 		if (inp->dlth_thread != THREAD_NULL) {
 			lck_mtx_lock_spin(&inp->dlth_lock);
 			inp->dlth_flags |= DLIL_INPUT_TERMINATE;
@@ -8084,7 +8084,7 @@ ifnet_detach_final(struct ifnet *ifp)
 			lck_mtx_unlock(&inp->dlth_lock);
 			ifnet_lock_done(ifp);
 
-			/* wait for the input thread to terminate */
+			                                            
 			lck_mtx_lock_spin(&inp->dlth_lock);
 			while ((inp->dlth_flags & DLIL_INPUT_TERMINATE_COMPLETE)
 			    == 0) {
@@ -8095,14 +8095,14 @@ ifnet_detach_final(struct ifnet *ifp)
 			ifnet_lock_exclusive(ifp);
 		}
 
-		/* clean-up input thread state */
+		                                 
 		dlil_clean_threading_info(inp);
-		/* clean-up poll parameters */
+		                              
 		VERIFY(ifp->if_poll_thread == THREAD_NULL);
 		dlil_reset_rxpoll_params(ifp);
 	}
 
-	/* The driver might unload, so point these to ourselves */
+	                                                          
 	if_free = ifp->if_free;
 	ifp->if_output_dlil = ifp_if_output;
 	ifp->if_output = ifp_if_output;
@@ -8123,13 +8123,13 @@ ifnet_detach_final(struct ifnet *ifp)
 	ifp->if_del_proto = ifp_if_del_proto;
 	ifp->if_check_multi = ifp_if_check_multi;
 
-	/* wipe out interface description */
+	                                    
 	VERIFY(ifp->if_desc.ifd_maxlen == IF_DESCSIZE);
 	ifp->if_desc.ifd_len = 0;
 	VERIFY(ifp->if_desc.ifd_desc != NULL);
 	bzero(ifp->if_desc.ifd_desc, IF_DESCSIZE);
 
-	/* there shouldn't be any delegation by now */
+	                                              
 	VERIFY(ifp->if_delegated.ifp == NULL);
 	VERIFY(ifp->if_delegated.type == 0);
 	VERIFY(ifp->if_delegated.family == 0);
@@ -8137,7 +8137,7 @@ ifnet_detach_final(struct ifnet *ifp)
 	VERIFY(ifp->if_delegated.expensive == 0);
 	VERIFY(ifp->if_delegated.constrained == 0);
 
-	/* QoS marking get cleared */
+	                             
 	if_clear_eflags(ifp, IFEF_QOSMARKING_ENABLED);
 	if_set_qosmarking_mode(ifp, IFRTYPE_QOSMARKING_MODE_NONE);
 
@@ -8145,23 +8145,23 @@ ifnet_detach_final(struct ifnet *ifp)
 	ifnet_lock_done(ifp);
 
 #if PF
-	/*
-	 * Detach this interface from packet filter, if enabled.
-	 */
+	  
+                                                         
+    
 	pf_ifnet_hook(ifp, 0);
-#endif /* PF */
+#endif         
 
-	/* Filter list should be empty */
+	                                 
 	lck_mtx_lock_spin(&ifp->if_flt_lock);
 	VERIFY(TAILQ_EMPTY(&ifp->if_flt_head));
 	VERIFY(ifp->if_flt_busy == 0);
 	VERIFY(ifp->if_flt_waiters == 0);
 	lck_mtx_unlock(&ifp->if_flt_lock);
 
-	/* Last chance to drain send queue */
+	                                     
 	if_qflush(ifp, 0);
 
-	/* Last chance to cleanup any cached route */
+	                                             
 	lck_mtx_lock(&ifp->if_cached_route_lock);
 	VERIFY(!ifp->if_fwd_cacheok);
 	ROUTE_RELEASE(&ifp->if_fwd_route);
@@ -8180,14 +8180,14 @@ ifnet_detach_final(struct ifnet *ifp)
 
 	dlil_post_msg(ifp, KEV_DL_SUBCLASS, KEV_DL_IF_DETACHED, NULL, 0);
 
-	/*
-	 * Finally, mark this ifnet as detached.
-	 */
+	  
+                                         
+    
 	lck_mtx_lock_spin(&ifp->if_ref_lock);
 	if (!(ifp->if_refflags & IFRF_DETACHING)) {
 		panic("%s: flags mismatch (detaching not set) ifp=%p",
 		    __func__, ifp);
-		/* NOTREACHED */
+		                
 	}
 	ifp->if_refflags &= ~IFRF_DETACHING;
 	lck_mtx_unlock(&ifp->if_ref_lock);
@@ -8199,7 +8199,7 @@ ifnet_detach_final(struct ifnet *ifp)
 		DLIL_PRINTF("%s: detached\n", if_name(ifp));
 	}
 
-	/* Release reference held during ifnet attach */
+	                                                
 	ifnet_release(ifp);
 }
 
@@ -8288,18 +8288,18 @@ static errno_t
 ifp_if_framer(struct ifnet *ifp, struct mbuf **m,
     const struct sockaddr *sa, const char *ll, const char *t,
     u_int32_t *pre, u_int32_t *post)
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 static errno_t
 ifp_if_framer(struct ifnet *ifp, struct mbuf **m,
     const struct sockaddr *sa, const char *ll, const char *t)
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 {
 #pragma unused(ifp, m, sa, ll, t)
 #if !XNU_TARGET_OS_OSX
 	return ifp_if_framer_extended(ifp, m, sa, ll, t, pre, post);
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 	return ifp_if_framer_extended(ifp, m, sa, ll, t, NULL, NULL);
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 }
 
 static errno_t
@@ -8332,7 +8332,7 @@ static errno_t
 ifp_if_set_bpf_tap(struct ifnet *ifp, bpf_tap_mode tm, bpf_packet_func f)
 {
 #pragma unused(ifp, tm, f)
-	/* XXX not sure what to do here */
+	                                  
 	return 0;
 }
 
@@ -8360,11 +8360,11 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 
 	VERIFY(*ifp == NULL);
 	dlil_if_lock();
-	/*
-	 * We absolutely can't have an interface with the same name
-	 * in in-use state.
-	 * To make sure of that list has to be traversed completely
-	 */
+	  
+                                                            
+                    
+                                                            
+    
 	TAILQ_FOREACH(dlifp1, &dlil_ifnet_head, dl_if_link) {
 		ifp1 = (struct ifnet *)dlifp1;
 
@@ -8372,10 +8372,10 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 			continue;
 		}
 
-		/*
-		 * If interface is in use, return EBUSY if either unique id
-		 * or interface extended names are the same
-		 */
+		  
+                                                             
+                                             
+     
 		lck_mtx_lock(&dlifp1->dl_if_lock);
 		if (strncmp(ifxname, ifp1->if_xname, IFXNAMSIZ) == 0) {
 			if (dlifp1->dl_if_flags & DLIF_INUSE) {
@@ -8393,22 +8393,22 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 					ret = EBUSY;
 					goto end;
 				} else {
-					/* Cache the first interface that can be recycled */
+					                                                    
 					if (*ifp == NULL) {
 						*ifp = ifp1;
 						dlifp1_saved = dlifp1;
 					}
-					/*
-					 * XXX Do not break or jump to end as we have to traverse
-					 * the whole list to ensure there are no name collisions
-					 */
+					  
+                                                              
+                                                             
+        
 				}
 			}
 		}
 		lck_mtx_unlock(&dlifp1->dl_if_lock);
 	}
 
-	/* If there's an interface that can be recycled, use that */
+	                                                            
 	if (*ifp != NULL) {
 		if (dlifp1_saved != NULL) {
 			lck_mtx_lock(&dlifp1_saved->dl_if_lock);
@@ -8419,22 +8419,22 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 		goto end;
 	}
 
-	/* no interface found, allocate a new one */
+	                                            
 	buf = zalloc_flags(dlif_zone, Z_WAITOK | Z_ZERO);
 	if (buf == NULL) {
 		ret = ENOMEM;
 		goto end;
 	}
 
-	/* Get the 64-bit aligned base address for this object */
+	                                                         
 	base = (void *)P2ROUNDUP((intptr_t)buf + sizeof(u_int64_t),
 	    sizeof(u_int64_t));
 	VERIFY(((intptr_t)base + dlif_size) <= ((intptr_t)buf + dlif_bufsize));
 
-	/*
-	 * Wind back a pointer size from the aligned base and
-	 * save the original address so we can free it later.
-	 */
+	  
+                                                      
+                                                      
+    
 	pbuf = (void **)((intptr_t)base - sizeof(void *));
 	*pbuf = buf;
 	dlifp1 = base;
@@ -8460,7 +8460,7 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 	ifp1->if_name = dlifp1->dl_if_namestorage;
 	ifp1->if_xname = dlifp1->dl_if_xnamestorage;
 
-	/* initialize interface description */
+	                                      
 	ifp1->if_desc.ifd_maxlen = IF_DESCSIZE;
 	ifp1->if_desc.ifd_len = 0;
 	ifp1->if_desc.ifd_desc = dlifp1->dl_if_descstorage;
@@ -8469,7 +8469,7 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 	if ((ret = dlil_alloc_local_stats(ifp1)) != 0) {
 		DLIL_PRINTF("%s: failed to allocate if local stats, "
 		    "error: %d\n", __func__, ret);
-		/* This probably shouldn't be fatal */
+		                                      
 		ret = 0;
 	}
 
@@ -8492,7 +8492,7 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 	    ifnet_lock_attr);
 	ifp1->if_link_status = NULL;
 
-	/* for send data paths */
+	                         
 	lck_mtx_init(&ifp1->if_start_lock, ifnet_snd_lock_group,
 	    ifnet_lock_attr);
 	lck_mtx_init(&ifp1->if_cached_route_lock, ifnet_snd_lock_group,
@@ -8500,16 +8500,16 @@ dlil_if_acquire(u_int32_t family, const void *uniqueid,
 	lck_mtx_init(&ifp1->if_snd.ifcq_lock, ifnet_snd_lock_group,
 	    ifnet_lock_attr);
 
-	/* for receive data paths */
+	                            
 	lck_mtx_init(&ifp1->if_poll_lock, ifnet_rcv_lock_group,
 	    ifnet_lock_attr);
 
-	/* thread call allocation is done with sleeping zalloc */
+	                                                         
 	ifp1->if_dt_tcall = thread_call_allocate_with_options(dlil_dt_tcall_fn,
 	    ifp1, THREAD_CALL_PRIORITY_KERNEL, THREAD_CALL_OPTIONS_ONCE);
 	if (ifp1->if_dt_tcall == NULL) {
 		panic_plain("%s: couldn't create if_dt_tcall", __func__);
-		/* NOTREACHED */
+		                
 	}
 
 	TAILQ_INSERT_TAIL(&dlil_ifnet_head, dlifp1, dl_if_link);
@@ -8540,7 +8540,7 @@ dlil_if_release(ifnet_t ifp)
 	dlifp->dl_if_flags &= ~DLIF_INUSE;
 	strlcpy(dlifp->dl_if_namestorage, ifp->if_name, IFNAMSIZ);
 	ifp->if_name = dlifp->dl_if_namestorage;
-	/* Reset external name (name + unit) */
+	                                       
 	ifp->if_xname = dlifp->dl_if_xnamestorage;
 	snprintf(__DECONST(char *, ifp->if_xname), IFXNAMSIZ,
 	    "%s?", ifp->if_name);
@@ -8569,15 +8569,15 @@ dlil_if_lock_assert(void)
 __private_extern__ void
 dlil_proto_unplumb_all(struct ifnet *ifp)
 {
-	/*
-	 * if_proto_hash[0-2] are for PF_INET, PF_INET6 and PF_VLAN, where
-	 * each bucket contains exactly one entry; PF_VLAN does not need an
-	 * explicit unplumb.
-	 *
-	 * if_proto_hash[3] is for other protocols; we expect anything
-	 * in this bucket to respond to the DETACHING event (which would
-	 * have happened by now) and do the unplumb then.
-	 */
+	  
+                                                                   
+                                                                    
+                     
+   
+                                                               
+                                                                 
+                                                  
+    
 	(void) proto_unplumb(PF_INET, ifp);
 	(void) proto_unplumb(PF_INET6, ifp);
 }
@@ -8658,7 +8658,7 @@ ifnet_cached_rtlookup_inet(struct ifnet *ifp, struct in_addr src_ip)
 		    0, 0, ifp->if_index);
 
 		if (src_rt.ro_rt != NULL) {
-			/* retain a ref, copyin consumes one */
+			                                       
 			struct rtentry  *rte = src_rt.ro_rt;
 			RT_ADDREF(rte);
 			ifp_src_route_copyin(ifp, &src_rt);
@@ -8694,7 +8694,7 @@ ifnet_cached_rtlookup_inet6(struct ifnet *ifp, struct in6_addr *src_ip6)
 				ifp->if_index);
 
 			if (src_rt.ro_rt != NULL) {
-				/* retain a ref, copyin consumes one */
+				                                       
 				struct rtentry  *rte = src_rt.ro_rt;
 				RT_ADDREF(rte);
 				ifp_src_route6_copyin(ifp, &src_rt);
@@ -8713,7 +8713,7 @@ if_lqm_update(struct ifnet *ifp, int lqm, int locked)
 
 	VERIFY(lqm >= IFNET_LQM_MIN && lqm <= IFNET_LQM_MAX);
 
-	/* Normalize to edge */
+	                       
 	if (lqm >= 0 && lqm <= IFNET_LQM_THRESH_ABORT) {
 		lqm = IFNET_LQM_THRESH_ABORT;
 		atomic_bitset_32(&tcbinfo.ipi_flags,
@@ -8730,9 +8730,9 @@ if_lqm_update(struct ifnet *ifp, int lqm, int locked)
 		lqm = IFNET_LQM_THRESH_GOOD;
 	}
 
-	/*
-	 * Take the lock if needed
-	 */
+	  
+                           
+    
 	if (!locked) {
 		ifnet_lock_exclusive(ifp);
 	}
@@ -8740,21 +8740,21 @@ if_lqm_update(struct ifnet *ifp, int lqm, int locked)
 	if (lqm == ifp->if_interface_state.lqm_state &&
 	    (ifp->if_interface_state.valid_bitmask &
 	    IF_INTERFACE_STATE_LQM_STATE_VALID)) {
-		/*
-		 * Release the lock if was not held by the caller
-		 */
+		  
+                                                   
+     
 		if (!locked) {
 			ifnet_lock_done(ifp);
 		}
-		return;         /* nothing to update */
+		return;                                
 	}
 	ifp->if_interface_state.valid_bitmask |=
 	    IF_INTERFACE_STATE_LQM_STATE_VALID;
 	ifp->if_interface_state.lqm_state = (int8_t)lqm;
 
-	/*
-	 * Don't want to hold the lock when issuing kernel events
-	 */
+	  
+                                                          
+    
 	ifnet_lock_done(ifp);
 
 	bzero(&ev_lqm_data, sizeof(ev_lqm_data));
@@ -8763,9 +8763,9 @@ if_lqm_update(struct ifnet *ifp, int lqm, int locked)
 	dlil_post_msg(ifp, KEV_DL_SUBCLASS, KEV_DL_LINK_QUALITY_METRIC_CHANGED,
 	    (struct net_event_data *)&ev_lqm_data, sizeof(ev_lqm_data));
 
-	/*
-	 * Reacquire the lock for the caller
-	 */
+	  
+                                     
+    
 	if (locked) {
 		ifnet_lock_exclusive(ifp);
 	}
@@ -8787,9 +8787,9 @@ if_rrc_state_update(struct ifnet *ifp, unsigned int rrc_state)
 
 	ifp->if_interface_state.rrc_state = (uint8_t)rrc_state;
 
-	/*
-	 * Don't want to hold the lock when issuing kernel events
-	 */
+	  
+                                                          
+    
 	ifnet_lock_done(ifp);
 
 	bzero(&kev, sizeof(struct kev_dl_rrc_state));
@@ -8859,12 +8859,12 @@ if_state_update(struct ifnet *ifp,
 	}
 	ifnet_lock_done(ifp);
 
-	/*
-	 * Check if the TCP connections going on this interface should be
-	 * forced to send probe packets instead of waiting for TCP timers
-	 * to fire. This is done on an explicit notification such as
-	 * SIOCSIFINTERFACESTATE which marks the interface as available.
-	 */
+	  
+                                                                  
+                                                                  
+                                                             
+                                                                 
+    
 	if (if_index_available > 0) {
 		tcp_interface_send_probe(if_index_available);
 	}
@@ -8919,13 +8919,13 @@ if_probe_connectivity(struct ifnet *ifp, u_int32_t conn_probe)
 
 #if NECP
 	necp_update_all_clients();
-#endif /* NECP */
+#endif           
 
 	tcp_probe_connectivity(ifp, conn_probe);
 	return 0;
 }
 
-/* for uuid.c */
+                
 static int
 get_ether_index(int * ret_other_index)
 {
@@ -8937,14 +8937,14 @@ get_ether_index(int * ret_other_index)
 
 	*ret_other_index = 0;
 	TAILQ_FOREACH(ifp, &ifnet_head, if_link) {
-		/*
-		 * find en0, or if not en0, the lowest unit en*, and if not
-		 * that, any ethernet
-		 */
+		  
+                                                             
+                       
+     
 		ifnet_lock_shared(ifp);
 		if (strcmp(ifp->if_name, "en") == 0) {
 			if (ifp->if_unit == 0) {
-				/* found en0, we're done */
+				                           
 				en0_index = ifp->if_index;
 				ifnet_lock_done(ifp);
 				break;
@@ -8993,10 +8993,10 @@ uuid_get_ethernet(u_int8_t *node)
 		VERIFY(ifp != NULL);
 		dl_if = (struct dlil_ifnet *)ifp;
 		if (dl_if->dl_if_permanent_ether_is_set != 0) {
-			/*
-			 * Use the permanent ethernet address if it is
-			 * available because it will never change.
-			 */
+			  
+                                                 
+                                             
+      
 			memcpy(node, dl_if->dl_if_permanent_ether,
 			    ETHER_ADDR_LEN);
 		} else {
@@ -9236,18 +9236,18 @@ dlil_node_absent(struct ifnet *ifp, struct sockaddr *sa)
 	kev_sdl = &kev.sdl_node_address;
 
 	if (sa->sa_family == AF_INET6) {
-		/*
-		 * If IPv6 address is given, get the link layer
-		 * address from what was cached in the neighbor cache
-		 */
+		  
+                                                 
+                                                       
+     
 		VERIFY(sa->sa_len <= sizeof(*kev_sin6));
 		bcopy(sa, kev_sin6, sa->sa_len);
 		nd6_alt_node_absent(ifp, kev_sin6, kev_sdl);
 	} else {
-		/*
-		 * If passed address is AF_LINK type, derive the address
-		 * based on the link address.
-		 */
+		  
+                                                          
+                               
+     
 		nd6_alt_node_addr_decompose(ifp, sa, kev_sdl, kev_sin6);
 		nd6_alt_node_absent(ifp, kev_sin6, NULL);
 	}
@@ -9374,9 +9374,9 @@ ifnet_getset_opportunistic(ifnet_t ifp, u_long cmd, struct ifreq *ifr,
 	VERIFY(cmd == SIOCSIFOPPORTUNISTIC || cmd == SIOCGIFOPPORTUNISTIC);
 
 	if (cmd == SIOCSIFOPPORTUNISTIC) {
-		/*
-		 * XXX: Use priv_check_cred() instead of root check?
-		 */
+		  
+                                                      
+     
 		if ((result = proc_suser(p)) != 0) {
 			return result;
 		}
@@ -9401,10 +9401,10 @@ ifnet_getset_opportunistic(ifnet_t ifp, u_long cmd, struct ifreq *ifr,
 		}
 	}
 
-	/*
-	 * Return the count of current opportunistic connections
-	 * over the interface.
-	 */
+	  
+                                                         
+                       
+    
 	if (result == 0) {
 		uint32_t flags = 0;
 		flags |= (cmd == SIOCSIFOPPORTUNISTIC) ?
@@ -9437,7 +9437,7 @@ ifnet_get_throttle(struct ifnet *ifp, u_int32_t *level)
 
 	ifq = &ifp->if_snd;
 	IFCQ_LOCK(ifq);
-	/* Throttling works only for IFCQ, not ALTQ instances */
+	                                                        
 	if (IFCQ_IS_ENABLED(ifq)) {
 		cqrq_throttle_t req = { 0, IFNET_THROTTLE_OFF };
 
@@ -9482,7 +9482,7 @@ ifnet_set_throttle(struct ifnet *ifp, u_int32_t level)
 		    level);
 #if NECP
 		necp_update_all_clients();
-#endif /* NECP */
+#endif           
 		if (level == IFNET_THROTTLE_OFF) {
 			ifnet_start(ifp);
 		}
@@ -9548,10 +9548,10 @@ ifnet_set_log(struct ifnet *ifp, int32_t level, uint32_t flags,
 	VERIFY(level >= IFNET_LOG_MIN && level <= IFNET_LOG_MAX);
 	VERIFY(flags & IFNET_LOGF_MASK);
 
-	/*
-	 * The logging level applies to all facilities; make sure to
-	 * update them all with the most current level.
-	 */
+	  
+                                                             
+                                                
+    
 	flags |= ifp->if_log.flags;
 
 	if (ifp->if_output_ctl != NULL) {
@@ -9564,17 +9564,17 @@ ifnet_set_log(struct ifnet *ifp, int32_t level, uint32_t flags,
 		l.category = category;
 		l.subcategory = subcategory;
 
-		/* Send this request to lower layers */
+		                                       
 		if (l.flags != 0) {
 			err = ifp->if_output_ctl(ifp, IFNET_CTL_SET_LOG,
 			    sizeof(l), &l);
 		}
 	} else if ((flags & ~IFNET_LOGF_DLIL) && ifp->if_output_ctl == NULL) {
-		/*
-		 * If targeted to the lower layers without an output
-		 * control callback registered on the interface, just
-		 * silently ignore facilities other than ours.
-		 */
+		  
+                                                      
+                                                       
+                                                
+     
 		flags &= IFNET_LOGF_DLIL;
 		if (flags == 0 && (!(ifp->if_log.flags & IFNET_LOGF_DLIL))) {
 			level = 0;
@@ -9625,7 +9625,7 @@ ifnet_notify_address(struct ifnet *ifp, int af)
 
 #if PF
 	(void) pf_ifaddr_hook(ifp);
-#endif /* PF */
+#endif         
 
 	if (ifp->if_output_ctl == NULL) {
 		return EOPNOTSUPP;
@@ -9701,7 +9701,7 @@ ifnet_flowadv(uint32_t flowhash)
 	VERIFY(ifce->ifce_ifp != NULL);
 	ifp = ifce->ifce_ifp;
 
-	/* flow hash gets recalculated per attach, so check */
+	                                                      
 	if (ifnet_is_attached(ifp, 1)) {
 		if (ifp->if_flowhash == flowhash) {
 			(void) ifnet_enable_output(ifp);
@@ -9711,9 +9711,9 @@ ifnet_flowadv(uint32_t flowhash)
 	ifnet_fc_entry_free(ifce);
 }
 
-/*
- * Function to compare ifnet_fc_entries in ifnet flow control tree
- */
+  
+                                                                  
+   
 static inline int
 ifce_cmp(const struct ifnet_fc_entry *fc1, const struct ifnet_fc_entry *fc2)
 {
@@ -9736,23 +9736,23 @@ ifnet_fc_add(struct ifnet *ifp)
 	lck_mtx_lock_spin(&ifnet_fc_lock);
 	ifce = RB_FIND(ifnet_fc_tree, &ifnet_fc_tree, &keyfc);
 	if (ifce != NULL && ifce->ifce_ifp == ifp) {
-		/* Entry is already in ifnet_fc_tree, return */
+		                                               
 		lck_mtx_unlock(&ifnet_fc_lock);
 		return 0;
 	}
 
 	if (ifce != NULL) {
-		/*
-		 * There is a different fc entry with the same flow hash
-		 * but different ifp pointer.  There can be a collision
-		 * on flow hash but the probability is low.  Let's just
-		 * avoid adding a second one when there is a collision.
-		 */
+		  
+                                                          
+                                                         
+                                                         
+                                                         
+     
 		lck_mtx_unlock(&ifnet_fc_lock);
 		return EAGAIN;
 	}
 
-	/* become regular mutex */
+	                          
 	lck_mtx_convert_spin(&ifnet_fc_lock);
 
 	ifce = zalloc_flags(ifnet_fc_zone, Z_WAITOK | Z_ZERO);
@@ -9776,7 +9776,7 @@ ifnet_fc_get(uint32_t flowhash)
 	lck_mtx_lock_spin(&ifnet_fc_lock);
 	ifce = RB_FIND(ifnet_fc_tree, &ifnet_fc_tree, &keyfc);
 	if (ifce == NULL) {
-		/* Entry is not present in ifnet_fc_tree, return */
+		                                                   
 		lck_mtx_unlock(&ifnet_fc_lock);
 		return NULL;
 	}
@@ -9786,14 +9786,14 @@ ifnet_fc_get(uint32_t flowhash)
 	VERIFY(ifce->ifce_ifp != NULL);
 	ifp = ifce->ifce_ifp;
 
-	/* become regular mutex */
+	                          
 	lck_mtx_convert_spin(&ifnet_fc_lock);
 
 	if (!ifnet_is_attached(ifp, 0)) {
-		/*
-		 * This ifp is not attached or in the process of being
-		 * detached; just don't process it.
-		 */
+		  
+                                                        
+                                     
+     
 		ifnet_fc_entry_free(ifce);
 		ifce = NULL;
 	}
@@ -9833,7 +9833,7 @@ ifnet_calc_flowhash(struct ifnet *ifp)
 try_again:
 	flowhash = net_flowhash(&fh, sizeof(fh), ifnet_flowhash_seed);
 	if (flowhash == 0) {
-		/* try to get a non-zero flowhash */
+		                                    
 		ifnet_flowhash_seed = RandomULong();
 		goto try_again;
 	}
@@ -9853,7 +9853,7 @@ ifnet_set_netsignature(struct ifnet *ifp, uint8_t family, uint8_t len,
 		if_inetdata_lock_exclusive(ifp);
 		if (IN_IFEXTRA(ifp) != NULL) {
 			if (len == 0) {
-				/* Allow clearing the signature */
+				                                  
 				IN_IFEXTRA(ifp)->netsig_len = 0;
 				bzero(IN_IFEXTRA(ifp)->netsig,
 				    sizeof(IN_IFEXTRA(ifp)->netsig));
@@ -9876,7 +9876,7 @@ ifnet_set_netsignature(struct ifnet *ifp, uint8_t family, uint8_t len,
 		if_inet6data_lock_exclusive(ifp);
 		if (IN6_IFEXTRA(ifp) != NULL) {
 			if (len == 0) {
-				/* Allow clearing the signature */
+				                                  
 				IN6_IFEXTRA(ifp)->netsig_len = 0;
 				bzero(IN6_IFEXTRA(ifp)->netsig,
 				    sizeof(IN6_IFEXTRA(ifp)->netsig));
@@ -9986,7 +9986,7 @@ ifnet_set_nat64prefix(struct ifnet *ifp, struct ipv6_prefix *prefixes)
 			clat_log0((LOG_DEBUG,
 			    "NAT64 prefixes purged from Interface %s\n",
 			    if_name(ifp)));
-			/* Allow clearing the signature */
+			                                  
 			IN6_IFEXTRA(ifp)->nat64_prefixes[i].prefix_len = 0;
 			bzero(&IN6_IFEXTRA(ifp)->nat64_prefixes[i].ipv6_prefix,
 			    sizeof(struct in6_addr));
@@ -10091,13 +10091,13 @@ dlil_output_cksum_dbg(struct ifnet *ifp, struct mbuf *m, uint32_t hoff,
 		}
 		break;
 	case PF_INET6:
-		/*
-		 * Checksum offload should not have been enabled when
-		 * extension headers exist; that also means that we
-		 * cannot force-finalize packets with extension headers.
-		 * Indicate to the callee should it skip such case by
-		 * setting optlen to -1.
-		 */
+		  
+                                                       
+                                                     
+                                                          
+                                                       
+                          
+     
 		did_sw = in6_finalize_cksum(m, hoff, -1, -1,
 		    m->m_pkthdr.csum_flags);
 		if (did_sw & CSUM_DELAY_IPV6_DATA) {
@@ -10137,11 +10137,11 @@ dlil_input_cksum_dbg(struct ifnet *ifp, struct mbuf *m, char *frame_header,
 		return;
 	}
 
-	/*
-	 * Force partial checksum offload; useful to simulate cases
-	 * where the hardware does not support partial checksum offload,
-	 * in order to validate correctness throughout the layers above.
-	 */
+	  
+                                                            
+                                                                 
+                                                                 
+    
 	if (hwcksum_dbg_mode & HWCKSUM_DBG_PARTIAL_FORCED) {
 		uint32_t foff = hwcksum_dbg_partial_rxoff_forced;
 
@@ -10151,7 +10151,7 @@ dlil_input_cksum_dbg(struct ifnet *ifp, struct mbuf *m, char *frame_header,
 
 		m->m_pkthdr.csum_flags &= ~CSUM_RX_FLAGS;
 
-		/* Compute 16-bit 1's complement sum from forced offset */
+		                                                          
 		sum = m_sum16(m, foff, (m->m_pkthdr.len - foff));
 
 		m->m_pkthdr.csum_flags |= (CSUM_DATA_VALID | CSUM_PARTIAL);
@@ -10162,17 +10162,17 @@ dlil_input_cksum_dbg(struct ifnet *ifp, struct mbuf *m, char *frame_header,
 		hwcksum_dbg_partial_forced_bytes += m->m_pkthdr.len;
 	}
 
-	/*
-	 * Partial checksum offload verification (and adjustment);
-	 * useful to validate and test cases where the hardware
-	 * supports partial checksum offload.
-	 */
+	  
+                                                           
+                                                        
+                                      
+    
 	if ((m->m_pkthdr.csum_flags &
 	    (CSUM_DATA_VALID | CSUM_PARTIAL | CSUM_PSEUDO_HDR)) ==
 	    (CSUM_DATA_VALID | CSUM_PARTIAL)) {
 		uint32_t rxoff;
 
-		/* Start offset must begin after frame header */
+		                                                
 		rxoff = m->m_pkthdr.csum_rx_start;
 		if (hlen > rxoff) {
 			hwcksum_dbg_bad_rxoff++;
@@ -10187,14 +10187,14 @@ dlil_input_cksum_dbg(struct ifnet *ifp, struct mbuf *m, char *frame_header,
 		rxoff -= hlen;
 
 		if (!(hwcksum_dbg_mode & HWCKSUM_DBG_PARTIAL_FORCED)) {
-			/*
-			 * Compute the expected 16-bit 1's complement sum;
-			 * skip this if we've already computed it above
-			 * when partial checksum offload is forced.
-			 */
+			  
+                                                     
+                                                  
+                                              
+      
 			sum = m_sum16(m, rxoff, (m->m_pkthdr.len - rxoff));
 
-			/* Hardware or driver is buggy */
+			                                 
 			if (sum != m->m_pkthdr.csum_rx_val) {
 				hwcksum_dbg_bad_cksum++;
 				if (dlil_verbose) {
@@ -10211,11 +10211,11 @@ dlil_input_cksum_dbg(struct ifnet *ifp, struct mbuf *m, char *frame_header,
 		}
 		hwcksum_dbg_verified++;
 
-		/*
-		 * This code allows us to emulate various hardwares that
-		 * perform 16-bit 1's complement sum beginning at various
-		 * start offset values.
-		 */
+		  
+                                                          
+                                                           
+                         
+     
 		if (hwcksum_dbg_mode & HWCKSUM_DBG_PARTIAL_RXOFF_ADJ) {
 			uint32_t aoff = hwcksum_dbg_partial_rxoff_adj;
 
@@ -10326,7 +10326,7 @@ sysctl_tx_chain_len_stats SYSCTL_HANDLER_ARGS
 
 
 #if DEBUG || DEVELOPMENT
-/* Blob for sum16 verification */
+                                 
 static uint8_t sumdata[] = {
 	0x1f, 0x8b, 0x08, 0x08, 0x4c, 0xe5, 0x9a, 0x4f, 0x00, 0x03,
 	0x5f, 0x00, 0x5d, 0x91, 0x41, 0x4e, 0xc4, 0x30, 0x0c, 0x45,
@@ -10363,12 +10363,12 @@ static uint8_t sumdata[] = {
 	0xc8, 0x28, 0x02, 0x00, 0x00
 };
 
-/* Precomputed 16-bit 1's complement sums for various spans of the above data */
+                                                                                
 static struct {
 	boolean_t       init;
 	uint16_t        len;
-	uint16_t        sumr;   /* reference */
-	uint16_t        sumrp;  /* reference, precomputed */
+	uint16_t        sumr;                  
+	uint16_t        sumrp;                              
 } sumtbl[] = {
 	{ FALSE, 0, 0, 0x0000 },
 	{ FALSE, 1, 0, 0x001f },
@@ -10395,7 +10395,7 @@ dlil_verify_sum16(void)
 	uint8_t *buf;
 	int n;
 
-	/* Make sure test data plus extra room for alignment fits in cluster */
+	                                                                       
 	_CASSERT((sizeof(sumdata) + (sizeof(uint64_t) * 2)) <= MCLBYTES);
 
 	kprintf("DLIL: running SUM16 self-tests ... ");
@@ -10403,23 +10403,23 @@ dlil_verify_sum16(void)
 	m = m_getcl(M_WAITOK, MT_DATA, M_PKTHDR);
 	m_align(m, sizeof(sumdata) + (sizeof(uint64_t) * 2));
 
-	buf = mtod(m, uint8_t *);               /* base address */
+	buf = mtod(m, uint8_t *);                                 
 
 	for (n = 0; n < SUMTBL_MAX; n++) {
 		uint16_t len = sumtbl[n].len;
 		int i;
 
-		/* Verify for all possible alignments */
+		                                        
 		for (i = 0; i < (int)sizeof(uint64_t); i++) {
 			uint16_t sum, sumr;
 			uint8_t *c;
 
-			/* Copy over test data to mbuf */
+			                                 
 			VERIFY(len <= sizeof(sumdata));
 			c = buf + i;
 			bcopy(sumdata, c, len);
 
-			/* Zero-offset test (align by data pointer) */
+			                                              
 			m->m_data = (caddr_t)c;
 			m->m_len = len;
 			sum = m_sum16(m, 0, len);
@@ -10432,51 +10432,51 @@ dlil_verify_sum16(void)
 				sumr = sumtbl[n].sumr;
 			}
 
-			/* Something is horribly broken; stop now */
+			                                            
 			if (sumr != sumtbl[n].sumrp) {
 				panic_plain("\n%s: broken in_cksum_mbuf_ref() "
 				    "for len=%d align=%d sum=0x%04x "
 				    "[expected=0x%04x]\n", __func__,
 				    len, i, sum, sumr);
-				/* NOTREACHED */
+				                
 			} else if (sum != sumr) {
 				panic_plain("\n%s: broken m_sum16() for len=%d "
 				    "align=%d sum=0x%04x [expected=0x%04x]\n",
 				    __func__, len, i, sum, sumr);
-				/* NOTREACHED */
+				                
 			}
 
-			/* Alignment test by offset (fixed data pointer) */
+			                                                   
 			m->m_data = (caddr_t)buf;
 			m->m_len = i + len;
 			sum = m_sum16(m, i, len);
 
-			/* Something is horribly broken; stop now */
+			                                            
 			if (sum != sumr) {
 				panic_plain("\n%s: broken m_sum16() for len=%d "
 				    "offset=%d sum=0x%04x [expected=0x%04x]\n",
 				    __func__, len, i, sum, sumr);
-				/* NOTREACHED */
+				                
 			}
 #if INET
-			/* Simple sum16 contiguous buffer test by aligment */
+			                                                     
 			sum = b_sum16(c, len);
 
-			/* Something is horribly broken; stop now */
+			                                            
 			if (sum != sumr) {
 				panic_plain("\n%s: broken b_sum16() for len=%d "
 				    "align=%d sum=0x%04x [expected=0x%04x]\n",
 				    __func__, len, i, sum, sumr);
-				/* NOTREACHED */
+				                
 			}
-#endif /* INET */
+#endif           
 		}
 	}
 	m_freem(m);
 
 	kprintf("PASSED\n");
 }
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 #define CASE_STRINGIFY(x) case x: return #x
 
@@ -10535,10 +10535,10 @@ ifnet_notify_data_threshold(struct ifnet *ifp)
 
 	ASSERT(ifp->if_dt_tcall != NULL);
 
-	/*
-	 * If we went over the threshold, notify NetworkStatistics.
-	 * We rate-limit it based on the threshold interval value.
-	 */
+	  
+                                                            
+                                                           
+    
 	if (threshold_notify && (bytes - oldbytes) > ifp->if_data_threshold &&
 	    OSCompareAndSwap64(oldbytes, bytes, &ifp->if_dt_bytes) &&
 	    !thread_call_isactive(ifp->if_dt_tcall)) {
@@ -10558,14 +10558,14 @@ ifnet_notify_data_threshold(struct ifnet *ifp)
 }
 
 #if (DEVELOPMENT || DEBUG)
-/*
- * The sysctl variable name contains the input parameters of
- * ifnet_get_keepalive_offload_frames()
- *  ifp (interface index): name[0]
- *  frames_array_count:    name[1]
- *  frame_data_offset:     name[2]
- * The return length gives used_frames_count
- */
+  
+                                                            
+                                       
+                                  
+                                  
+                                  
+                                            
+   
 static int
 sysctl_get_kao_frames SYSCTL_HANDLER_ARGS
 {
@@ -10581,16 +10581,16 @@ sysctl_get_kao_frames SYSCTL_HANDLER_ARGS
 	int error = 0;
 	u_int32_t i;
 
-	/*
-	 * Only root can get look at other people TCP frames
-	 */
+	  
+                                                     
+    
 	error = proc_suser(current_proc());
 	if (error != 0) {
 		goto done;
 	}
-	/*
-	 * Validate the input parameters
-	 */
+	  
+                                 
+    
 	if (req->newptr != USER_ADDR_NULL) {
 		error = EPERM;
 		goto done;
@@ -10611,7 +10611,7 @@ sysctl_get_kao_frames SYSCTL_HANDLER_ARGS
 	frames_array_count = name[1];
 	frame_data_offset = name[2];
 
-	/* Make sure the passed buffer is large enough */
+	                                                 
 	if (frames_array_count * sizeof(struct ifnet_keepalive_offload_frame) >
 	    req->oldlen) {
 		error = ENOMEM;
@@ -10655,7 +10655,7 @@ done:
 	}
 	return error;
 }
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 void
 ifnet_update_stats_per_flow(struct ifnet_stats_per_flow *ifs,

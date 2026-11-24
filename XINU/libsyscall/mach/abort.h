@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-// Defined because we don't have Libc
+                                     
 #define __SIGABRT 6
 #define __STDERR_FILENO 2
 

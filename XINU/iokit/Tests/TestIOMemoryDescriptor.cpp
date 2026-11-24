@@ -39,7 +39,7 @@
 
 #ifndef __LP64__
 #include <IOKit/IOSubMemoryDescriptor.h>
-#endif /* !__LP64__ */
+#endif                
 #include <IOKit/IOSubMemoryDescriptor.h>
 #include <IOKit/IOMultiMemoryDescriptor.h>
 #include <IOKit/IOBufferMemoryDescriptor.h>
@@ -61,7 +61,7 @@ __BEGIN_DECLS
 __END_DECLS
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #if DEVELOPMENT || DEBUG
 
@@ -151,7 +151,7 @@ IOMultMemoryDescriptorTest(int newValue)
 
 
 
-// <rdar://problem/30102458>
+                            
 static int
 IODMACommandForceDoubleBufferTest(int newValue)
 {
@@ -235,7 +235,7 @@ IODMACommandForceDoubleBufferTest(int newValue)
 	return 0;
 }
 
-// <rdar://problem/34322778>
+                            
 static int __unused
 IODMACommandLocalMappedNonContig(int newValue)
 {
@@ -270,7 +270,7 @@ IODMACommandLocalMappedNonContig(int newValue)
 	kr = vm_allocate_kernel(kernel_map, &buffer, bufSize, VM_FLAGS_ANYWHERE, VM_KERN_MEMORY_IOKIT);
 	assert(KERN_SUCCESS == kr);
 
-	// fragment the vmentries
+	                         
 	kr = vm_inherit(kernel_map, buffer + ptoa(1), ptoa(1), VM_INHERIT_NONE);
 	assert(KERN_SUCCESS == kr);
 
@@ -320,7 +320,7 @@ IODMACommandLocalMappedNonContig(int newValue)
 	return 0;
 }
 
-// <rdar://problem/30102458>
+                            
 static int
 IOMemoryRemoteTest(int newValue)
 {
@@ -352,8 +352,8 @@ IOMemoryRemoteTest(int newValue)
 	md = IOMemoryDescriptor::withAddressRanges(&ranges[0], 2, kIODirectionOutIn | kIOMemoryRemote, TASK_NULL);
 	assert(md);
 
-//    md->map();
-//    md->readBytes(0, &idx, sizeof(idx));
+                
+                                          
 
 	ret = md->prepare(kIODirectionOutIn);
 	assert(kIOReturnSuccess == ret);
@@ -447,7 +447,7 @@ IOBMDOverflowTest(uint32_t options)
 	return kIOReturnSuccess;
 }
 
-// <rdar://problem/26375234>
+                            
 static IOReturn
 ZeroLengthTest(int newValue)
 {
@@ -462,7 +462,7 @@ ZeroLengthTest(int newValue)
 	return 0;
 }
 
-// <rdar://problem/27002624>
+                            
 static IOReturn
 BadFixedAllocTest(int newValue)
 {
@@ -479,7 +479,7 @@ BadFixedAllocTest(int newValue)
 	return 0;
 }
 
-// <rdar://problem/26466423>
+                            
 static IOReturn
 IODirectionPrepareNoZeroFillTest(int newValue)
 {
@@ -496,7 +496,7 @@ IODirectionPrepareNoZeroFillTest(int newValue)
 	return 0;
 }
 
-// <rdar://problem/28190483>
+                            
 static IOReturn
 IOMemoryMapTest(uint32_t options)
 {
@@ -823,8 +823,8 @@ IOMemoryDescriptorTest(int newValue)
 	}
 #endif
 
-//    result = IODMACommandLocalMappedNonContig(newValue);
-//    if (result) return (result);
+                                                          
+                                  
 
 	result = IODMACommandForceDoubleBufferTest(newValue);
 	if (result) {
@@ -940,7 +940,7 @@ IOMemoryDescriptorTest(int newValue)
 						mach_vm_address_t addr = 0;
 						uint32_t          data;
 
-//			IOLog("<mapRef [0x%lx @ 0x%lx]\n", (long) size, (long) mapoffset);
+                                                                       
 
 						map = md->createMappingInTask(kernel_task, 0, kIOMapAnywhere, mapoffset, size);
 						if (map) {
@@ -949,7 +949,7 @@ IOMemoryDescriptorTest(int newValue)
 							kr = kIOReturnError;
 						}
 
-//			IOLog(">mapRef 0x%x %llx\n", kr, addr);
+                                            
 
 						if (kIOReturnSuccess != kr) {
 							break;
@@ -983,7 +983,7 @@ IOMemoryDescriptorTest(int newValue)
 						}
 						md->complete();
 						map->release();
-//			IOLog("unmapRef %llx\n", addr);
+                                    
 					}
 					if (kIOReturnSuccess != kr) {
 						break;
@@ -1008,11 +1008,11 @@ IOMemoryDescriptorTest(int newValue)
 	assert(kr == kIOReturnSuccess);
 
 	vm_deallocate(kernel_map, data[0], bsize);
-//    vm_deallocate(kernel_map, data[1], size);
+                                               
 
 	IOLog("IOMemoryDescriptorTest/ %d\n", (int) gIOMemoryReferenceCount);
 
 	return 0;
 }
 
-#endif  /* DEVELOPMENT || DEBUG */
+#endif                            

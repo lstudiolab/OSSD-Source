@@ -49,9 +49,9 @@ struct mt_cpu {
 	uint64_t mtc_counts[MT_CORE_NFIXED];
 	uint64_t mtc_counts_last[MT_CORE_NFIXED];
 	uint64_t mtc_npmis;
-	/*
-	 * Whether this CPU should be using PMCs.
-	 */
+	  
+                                          
+    
 	bool mtc_active;
 };
 
@@ -82,4 +82,4 @@ extern void *mt_microstackshot_ctx;
 extern uint64_t mt_core_reset_values[MT_CORE_NFIXED];
 int mt_microstackshot_start_arch(uint64_t period);
 
-#endif /* !defined(MACHINE_MONOTONIC_H) */
+#endif                                    

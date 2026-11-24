@@ -9,9 +9,9 @@ class LazyTarget(object):
     """ A common object that lazy-evaluates and caches the lldb.SBTarget
         and lldb.SBProcess for the current interactive debugging session.
     """
-    _debugger = None # This holds an lldb.SBDebugger object for debugger state
-    _target   = None # This holds an lldb.SBTarget object for symbol lookup
-    _process  = None # This holds an lldb.SBProcess object for reading memory
+    _debugger = None                                                          
+    _target   = None                                                       
+    _process  = None                                                         
 
     @staticmethod
     def Initialize(debugger):

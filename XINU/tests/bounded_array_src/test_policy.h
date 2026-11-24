@@ -23,4 +23,4 @@ using test_bounded_ptr = libkern::bounded_ptr<T, test_policy>;
 
 #define CHECK(...) T_ASSERT_TRUE((__VA_ARGS__), # __VA_ARGS__)
 
-#endif // !TESTS_BOUNDED_ARRAY_SRC_TEST_POLICY_H
+#endif                                          

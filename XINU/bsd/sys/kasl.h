@@ -31,10 +31,10 @@
 
 #ifdef BSD_KERNEL_PRIVATE
 
-#define KASL_KEY_FACILITY       "Facility"      /* Facility generating messages */
-#define KASL_KEY_LEVEL          "Level"         /* Priority level */
+#define KASL_KEY_FACILITY       "Facility"                                        
+#define KASL_KEY_LEVEL          "Level"                             
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 extern int
 kern_asl_msg(int level, const char *facility, size_t num_pairs, ...);
@@ -42,4 +42,4 @@ kern_asl_msg(int level, const char *facility, size_t num_pairs, ...);
 extern int escape_str(char *str, size_t len, size_t buflen);
 extern void fpxlog(int, uint32_t, uint32_t, uint32_t);
 
-#endif /* !_SYS_KASL_H_ */
+#endif                    

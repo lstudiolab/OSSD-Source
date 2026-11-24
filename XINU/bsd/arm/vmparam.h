@@ -11,41 +11,41 @@
 #include <TargetConditionals.h>
 #endif
 
-#define USRSTACK        (0x27E00000)    /* ASLR slides stack down by up to 1MB */
+#define USRSTACK        (0x27E00000)                                             
 #define USRSTACK64      (0x000000016FE00000ULL)
 
-/*
- * Virtual memory related constants, all in bytes
- */
+  
+                                                 
+   
 #ifndef DFLDSIZ
-#define DFLDSIZ         (RLIM_INFINITY)         /* initial data size limit */
+#define DFLDSIZ         (RLIM_INFINITY)                                      
 #endif
 #ifndef MAXDSIZ
-#define MAXDSIZ         (RLIM_INFINITY)         /* max data size */
+#define MAXDSIZ         (RLIM_INFINITY)                            
 #endif
 #ifndef DFLSSIZ
-/* XXX stack size default is a platform property: use getrlimit(2) */
+                                                                     
 #if (defined(TARGET_OS_OSX) && (TARGET_OS_OSX != 0)) || \
         (defined(KERNEL) && XNU_TARGET_OS_OSX)
 #define DFLSSIZ         (8*1024*1024 - 16*1024)
 #else
-#define DFLSSIZ         (1024*1024 - 16*1024)   /* initial stack size limit */
-#endif /* TARGET_OS_OSX .. || XNU_KERNEL_PRIVATE .. */
-#endif /* DFLSSIZ */
+#define DFLSSIZ         (1024*1024 - 16*1024)                                 
+#endif                                                
+#endif              
 #ifndef MAXSSIZ
-/* XXX stack size limit is a platform property: use getrlimit(2) */
+                                                                   
 #if (defined(TARGET_OS_OSX) && (TARGET_OS_OSX != 0)) || \
         (defined(KERNEL) && XNU_TARGET_OS_OSX)
-#define MAXSSIZ         (64*1024*1024)          /* max stack size */
+#define MAXSSIZ         (64*1024*1024)                              
 #else
-#define MAXSSIZ         (1024*1024)             /* max stack size */
-#endif /* TARGET_OS_OSX .. || XNU_KERNEL_PRIVATE .. */
-#endif /* MAXSSIZ */
+#define MAXSSIZ         (1024*1024)                                 
+#endif                                                
+#endif              
 #ifndef DFLCSIZ
-#define DFLCSIZ         (0)                     /* initial core size limit */
+#define DFLCSIZ         (0)                                                  
 #endif
 #ifndef MAXCSIZ
-#define MAXCSIZ         (RLIM_INFINITY)         /* max core size */
-#endif  /* MAXCSIZ */
+#define MAXCSIZ         (RLIM_INFINITY)                            
+#endif               
 
-#endif  /* _BSD_ARM_VMPARAM_H_ */
+#endif                           

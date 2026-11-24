@@ -1,4 +1,4 @@
-/* test that the header doesn't implicitly depend on others */
+                                                              
 #include <sys/work_interval.h>
 
 #include <stdlib.h>
@@ -30,7 +30,7 @@ joining_thread_fn(__unused void *arg)
 	kr = mach_port_deallocate(mach_task_self(), port);
 	T_ASSERT_MACH_SUCCESS(kr, "mach_port_deallocate of port, another thread");
 
-	/* deliberately exit with joined work interval */
+	                                                 
 	return NULL;
 }
 
@@ -45,7 +45,7 @@ T_DECL(work_interval, "work interval interface")
 	T_ASSERT_EQ(errno, EINVAL, "create with null errno EINVAL");
 	T_ASSERT_EQ(ret, -1, "create with null returns -1");
 
-	/* Binary must be entitled for this to succeed */
+	                                                 
 	ret = work_interval_create(&handle, 0);
 	T_ASSERT_POSIX_SUCCESS(ret, "work_interval_create, no flags");
 
@@ -137,12 +137,12 @@ set_realtime(pthread_t thread)
 	mach_port_t target_thread = pthread_mach_thread_np(thread);
 	T_ASSERT_NOTNULL(target_thread, "pthread_mach_thread_np");
 
-	/* 1s 100ms 10ms */
+	                   
 	pol.period      = (uint32_t)nanos_to_abs(1000000000);
 	pol.constraint  = (uint32_t)nanos_to_abs(100000000);
 	pol.computation = (uint32_t)nanos_to_abs(10000000);
 
-	pol.preemptible = 0; /* Ignored by OS */
+	pol.preemptible = 0;                    
 	kr = thread_policy_set(target_thread, THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) &pol,
 	    THREAD_TIME_CONSTRAINT_POLICY_COUNT);
 	T_ASSERT_MACH_SUCCESS(kr, "thread_policy_set(THREAD_TIME_CONSTRAINT_POLICY)");
@@ -219,7 +219,7 @@ T_DECL(work_interval_get_flags, "querying a port for create flags")
 	mach_port_mod_refs(mach_task_self(), port, MACH_PORT_RIGHT_SEND, -1);
 	work_interval_destroy(handle);
 
-	// Negative test
+	                
 
 	mach_port_t fake_port = MACH_PORT_NULL;
 	ret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &fake_port);

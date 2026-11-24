@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* This module implements a hybrid/adaptive compression scheme, using WKdm where
- * profitable and, currently, an LZ4 variant elsewhere.
- * (Created 2016, Derek Kumar)
- */
+                                                                                
+                                                       
+                              
+   
 #include "lz4.h"
 #include "WKdm_new.h"
 #include <vm/vm_compressor_algorithms.h>
@@ -50,7 +50,7 @@
 
 typedef union {
 	uint8_t lz4state[lz4_encode_scratch_size]__attribute((aligned(LZ4_SCRATCH_ALIGN)));
-	uint8_t wkscratch[0] __attribute((aligned(WKC_SCRATCH_ALIGN))); // TODO
+	uint8_t wkscratch[0] __attribute((aligned(WKC_SCRATCH_ALIGN)));        
 } compressor_encode_scratch_t;
 
 typedef union {
@@ -126,7 +126,7 @@ boolean_t verbose = FALSE;
 	do {                                                            \
 	        (x);                                                    \
 	} while(0)
-//TODO make atomic where needed, decompression paths
+                                                    
 #define VM_DECOMPRESSOR_STAT(x...)                                      \
 	do {                                                            \
 	        (x);                                                    \
@@ -225,12 +225,12 @@ WKdm_hv(uint32_t *wkbuf)
 			panic("WKdm(%p): invalid header 0x%x 0x%x 0x%x\n", wkbuf, *inw, *(inw + 1), *(inw + 2));
 		}
 	}
-#else /* DEVELOPMENT || DEBUG */
+#else                           
 	(void) wkbuf;
 #endif
 }
 
-//todo fix clang diagnostic
+                           
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
 
@@ -256,7 +256,7 @@ WKdmD(WK_word* src_buf, WK_word* dest_buf, WK_word* scratch, unsigned int bytes,
 		VM_COMPRESSOR_STAT_DBG(compressor_stats.wks_dabstime += mach_absolute_time() - wdsstart);
 		VM_COMPRESSOR_STAT(compressor_stats.wks_decompressions++);
 	}
-#else /* !defined arm64 */
+#else                     
 	WKdm_decompress_new(src_buf, dest_buf, scratch, bytes);
 #endif
 	return true;
@@ -300,7 +300,7 @@ metacompressor(const uint8_t *in, uint8_t *cdst, int32_t outbufsz, uint16_t *cod
 	int dowk = FALSE, dolz4 = FALSE, skiplz4 = FALSE;
 	int insize = PAGE_SIZE;
 	compressor_encode_scratch_t *cscratch = cscratchin;
-	/* Not all paths lead to an inline population count. */
+	                                                       
 	uint32_t pop_count = C_SLOT_NO_POPCOUNT;
 
 	if (vm_compressor_current_codec == CMODE_WK) {
@@ -385,7 +385,7 @@ metadecompressor(const uint8_t *source, uint8_t *dest, uint32_t csize,
 	int dolz4 = (ccodec == CCLZ4);
 	int rval;
 	compressor_decode_scratch_t *compressor_dscratch = compressor_dscratchin;
-	/* Not all paths lead to an inline population count. */
+	                                                       
 	uint32_t pop_count = C_SLOT_NO_POPCOUNT;
 	bool success;
 
@@ -468,5 +468,5 @@ vm_compressor_algorithm_init(void)
 	}
 
 	vm_compressor_current_codec = new_codec;
-#endif /* arm/arm64 */
+#endif                
 }

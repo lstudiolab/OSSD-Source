@@ -40,16 +40,16 @@
 
 #include <pexpert/machine/protos.h>
 
-//------------------------------------------------------------------------
-// from ppc/misc_protos.h
+                                                                          
+                         
 extern void printf(const char *fmt, ...) __printflike(1, 2);
 
 extern void interrupt_enable(void);
 extern void interrupt_disable(void);
 #define bcopy_nc bcopy
 
-//------------------------------------------------------------------------
-//from kern/misc_protos.h
+                                                                          
+                         
 extern void
 _doprnt(
 	const char     *fmt,
@@ -66,33 +66,33 @@ _doprnt_log(
 
 #include <machine/io_map_entries.h>
 
-//------------------------------------------------------------------------
-// ??
-//typedef int kern_return_t;
+                                                                          
+     
+                            
 void Debugger(const char *message);
 
 #include <kern/cpu_number.h>
 #include <kern/cpu_data.h>
 
-//------------------------------------------------------------------------
-// from kgdb/kgdb_defs.h
+                                                                          
+                        
 #define kgdb_printf printf
 
 #include <mach/machine/vm_types.h>
 #include <device/device_types.h>
 #include <kern/kalloc.h>
 
-//------------------------------------------------------------------------
+                                                                          
 
-// from iokit/IOStartIOKit.cpp
+                              
 extern void InitIOKit(void *dtTop);
 extern void ConfigureIOKit(void);
 extern void StartIOKitMatching(void);
 
-// from iokit/Families/IOFramebuffer.cpp
+                                        
 extern unsigned char appleClut8[256 * 3];
 
 
-#endif /* PEXPERT_KERNEL_PRIVATE */
+#endif                             
 
-#endif /* _PEXPERT_PROTOS_H_ */
+#endif                         

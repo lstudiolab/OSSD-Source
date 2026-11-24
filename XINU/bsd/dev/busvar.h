@@ -38,13 +38,13 @@
 #ifndef _BUSVAR_
 #define _BUSVAR_
 
-/* pseudo device initialization routine support */
+                                                  
 struct pseudo_init {
 	int     ps_count;
 	int     (*ps_func)(int count);
 };
 extern struct pseudo_init pseudo_inits[];
 
-#endif /* _BUSVAR_ */
+#endif               
 
-#endif  /* DRIVER_PRIVATE */
+#endif                      

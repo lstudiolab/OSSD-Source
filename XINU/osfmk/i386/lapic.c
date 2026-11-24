@@ -45,7 +45,7 @@
 
 #include <sys/kdebug.h>
 
-/* Base vector for local APIC interrupt sources */
+                                                  
 int lapic_interrupt_base = LAPIC_DEFAULT_INTERRUPT_BASE;
 
 int             lapic_to_cpu[MAX_LAPICIDS];
@@ -73,20 +73,20 @@ lapic_cpu_map(int apic_id, int cpu)
 	lapic_to_cpu[apic_id] = cpu;
 }
 
-/*
- * Retrieve the local apic ID a cpu.
- *
- * Returns the local apic ID for the given processor.
- * If the processor does not exist or apic not configured, returns -1.
- */
+  
+                                    
+  
+                                                     
+                                                                      
+   
 
 uint32_t
 ml_get_apicid(uint32_t cpu)
 {
 	if (cpu >= (uint32_t)MAX_CPUS) {
-		return 0xFFFFFFFF;      /* Return -1 if cpu too big */
+		return 0xFFFFFFFF;                                    
 	}
-	/* Return the apic ID (or -1 if not configured) */
+	                                                  
 	return (uint32_t)cpu_to_lapic[cpu];
 }
 
@@ -94,8 +94,8 @@ uint32_t
 ml_get_cpuid(uint32_t lapic_index)
 {
 	if (lapic_index >= (uint32_t)MAX_LAPICIDS) {
-		return 0xFFFFFFFF;      /* Return -1 if cpu too big */
+		return 0xFFFFFFFF;                                    
 	}
-	/* Return the cpu ID (or -1 if not configured) */
+	                                                 
 	return (uint32_t)lapic_to_cpu[lapic_index];
 }

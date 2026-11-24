@@ -22,7 +22,7 @@ T_DECL(task_ident, "test task identity token")
 	T_ASSERT_MACH_SUCCESS(kr, "task_create_identity_token()");
 
 	port1 = mach_task_self();
-	kr = task_identity_token_get_task_port(token, TASK_FLAVOR_CONTROL, &port2); /* Immovable control port for self */
+	kr = task_identity_token_get_task_port(token, TASK_FLAVOR_CONTROL, &port2);                                      
 	T_ASSERT_MACH_SUCCESS(kr, "task_identity_token_get_task_port() - CONTROL");
 	T_EXPECT_EQ(port1, port2, "Control port does not match!");
 

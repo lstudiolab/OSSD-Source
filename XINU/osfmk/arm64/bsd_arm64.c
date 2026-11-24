@@ -90,13 +90,13 @@ arm_get_mach_syscall_args(struct arm_saved_state *state, struct mach_call_args *
 	uint32_t reg_count;
 
 	if (is_saved_state32(state)) {
-		/* The trap table entry defines the number of 32-bit words to be copied in from userspace. */
+		                                                                                             
 		reg_count = trapp->mach_trap_u32_words;
 
-		/*
-		 * We get 7 contiguous words; r0-r6, hop over r7
-		 * (frame pointer), optionally r8
-		 */
+		  
+                                                  
+                                   
+     
 		if (reg_count <= 7) {
 			bcopy((char*)saved_state32(state), (char*)dest, sizeof(uint32_t) * reg_count);
 		} else if (reg_count <= 9) {
@@ -120,18 +120,18 @@ arm_get_mach_syscall_args(struct arm_saved_state *state, struct mach_call_args *
 	return KERN_SUCCESS;
 }
 
-/**
- *  Marks or unmarks the given thread to be single stepped such
- *  that it executes exactly one instruction and then takes an exception to
- *  prevent further execution.
- *
- *  @param thread 64 bit thread to be single stepped
- *  @param on boolean value representing whether the thread should be
- *            single stepped (on is true) or not (on is false)
- *
- *  @returns KERN_SUCCESS if the status is successfully set or KERN_FAILURE if
- *           it fails for any reason.
- */
+   
+                                                               
+                                                                           
+                              
+  
+                                                    
+                                                                     
+                                                              
+  
+                                                                              
+                                     
+   
 kern_return_t
 thread_setsinglestep(thread_t thread, int on)
 {
@@ -162,10 +162,10 @@ dtrace_get_cpu_int_stack_top(void)
 {
 	return getCpuDatap()->intstack_top;
 }
-#endif /* CONFIG_DTRACE */
+#endif                    
 extern const char *const mach_syscall_name_table[];
 
-/* ARM64_TODO: remove this. still TODO?*/
+                                         
 extern struct proc* current_proc(void);
 extern int proc_pid(struct proc*);
 
@@ -192,7 +192,7 @@ mach_syscall(struct arm_saved_state *state)
 	struct uthread *ut = get_bsdthread_info(current_thread());
 	uthread_reset_proc_refcount(ut);
 
-	assert(call_number < 0); /* Otherwise it would be a Unix syscall */
+	assert(call_number < 0);                                           
 	call_number = -call_number;
 
 	if (call_number >= MACH_TRAP_TABLE_COUNT) {
@@ -233,12 +233,12 @@ mach_syscall(struct arm_saved_state *state)
 	    args.arg1, args.arg2, args.arg3, args.arg4, 0);
 
 #if CONFIG_MACF
-	/*
-	 * Check syscall filter mask, if exists.
-	 *
-	 * Not all mach traps are filtered. e.g., mach_absolute_time() and
-	 * mach_continuous_time(). See handle_svc().
-	 */
+	  
+                                         
+   
+                                                                   
+                                             
+    
 	task_t task = current_task();
 	uint8_t *filter_mask = task->mach_trap_filter_mask;
 
@@ -252,7 +252,7 @@ mach_syscall(struct arm_saved_state *state)
 			}
 		}
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 
 	retval = mach_call(&args);
 
@@ -275,7 +275,7 @@ skip_machcall:
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(current_thread())->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 #if PROC_REF_DEBUG
 	if (__improbable(uthread_get_proc_refcount(ut) != 0)) {
@@ -288,7 +288,7 @@ skip_machcall:
 bad:
 	exc_code = call_number;
 	exception_triage(EXC_SYSCALL, &exc_code, 1);
-	/* NOTREACHED */
+	                
 	panic("Returned from exception_triage()?\n");
 }
-#endif /* MACH_BSD */
+#endif               

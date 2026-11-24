@@ -68,37 +68,37 @@
 #include <sys/resource.h>
 #include <sys/_types/_caddr_t.h>
 
-/*
- * Kernel per-process accounting / statistics
- * (not necessarily resident except when running).
- */
+  
+                                             
+                                                  
+   
 struct pstats {
-	struct  rusage            p_ru;         /* stats for this proc */
-	struct  rusage            p_cru;        /* (PL) sum of stats for reaped children */
+	struct  rusage            p_ru;                                  
+	struct  rusage            p_cru;                                                   
 
-	struct uprof {                  /* profile arguments */
-		struct uprof *pr_next;  /* multiple prof buffers allowed */
-		caddr_t pr_base;        /* buffer base */
-		u_int32_t       pr_size;        /* buffer size */
-		u_int32_t       pr_off;         /* pc offset */
-		u_int32_t       pr_scale;       /* pc scaling */
-		u_int32_t       pr_addr;        /* temp storage for addr until AST */
-		u_int32_t       pr_ticks;       /* temp storage for ticks until AST */
+	struct uprof {                                         
+		struct uprof *pr_next;                                     
+		caddr_t pr_base;                         
+		u_int32_t       pr_size;                         
+		u_int32_t       pr_off;                        
+		u_int32_t       pr_scale;                       
+		u_int32_t       pr_addr;                                             
+		u_int32_t       pr_ticks;                                             
 	} p_prof;
 
-	uint64_t ps_start;              /* starting time ; compat only */
+	uint64_t ps_start;                                               
 #ifdef KERNEL
-	struct  rusage_info_child ri_child;     /* (PL) sum of additional stats for reaped children (proc_pid_rusage) */
-	struct user_uprof {                         /* profile arguments */
-		struct user_uprof *pr_next;  /* multiple prof buffers allowed */
-		user_addr_t         pr_base;    /* buffer base */
-		user_size_t         pr_size;    /* buffer size */
-		user_ulong_t    pr_off;         /* pc offset */
-		user_ulong_t    pr_scale;       /* pc scaling */
-		user_ulong_t    pr_addr;        /* temp storage for addr until AST */
-		user_ulong_t    pr_ticks;       /* temp storage for ticks until AST */
+	struct  rusage_info_child ri_child;                                                                             
+	struct user_uprof {                                                
+		struct user_uprof *pr_next;                                     
+		user_addr_t         pr_base;                     
+		user_size_t         pr_size;                     
+		user_ulong_t    pr_off;                        
+		user_ulong_t    pr_scale;                       
+		user_ulong_t    pr_addr;                                             
+		user_ulong_t    pr_ticks;                                             
 	} user_p_prof;
-#endif // KERNEL
+#endif          
 };
 
 #ifdef KERNEL
@@ -112,7 +112,7 @@ void proc_limitdrop(proc_t p);
 void proc_limitupdate(proc_t p, struct rlimit *newrlim, uint8_t which);
 void proc_limitblock(proc_t);
 void proc_limitunblock(proc_t);
-#endif /* KERNEL */
+#endif             
 
 
-#endif  /* !_SYS_RESOURCEVAR_H_ */
+#endif                            

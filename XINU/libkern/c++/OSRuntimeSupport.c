@@ -1,7 +1,7 @@
-// These functions have been moved inline but we need to continue
-// exporting the mangled functions for loadable drivers compiled on older
-// systems.
-// Note that I have had to manually mangle the symbols names.
+                                                                 
+                                                                         
+           
+                                                             
 void _ZN11OSMetaClassdlEPvm(void *mem, unsigned long size);
 void *_ZN11OSMetaClassnwEm(unsigned long size);
 

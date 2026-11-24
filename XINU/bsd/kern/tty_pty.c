@@ -60,11 +60,11 @@
  *	@(#)tty_pty.c	8.4 (Berkeley) 2/20/95
  */
 
-/*
- * Pseudo-teletype Driver
- * (Actually two drivers, requiring two entries in 'cdevsw')
- */
-#include "pty.h"                /* XXX */
+  
+                         
+                                                            
+   
+#include "pty.h"                         
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -88,14 +88,14 @@
 
 #if NPTY == 1
 #undef NPTY
-#define NPTY    32              /* crude XXX */
+#define NPTY    32                             
 #warning        You have only one pty defined, redefining to 32.
 #endif
 
-/*
- * pts == /dev/tty[pqrsPQRS][0-9a-v]
- * ptc == /dev/pty[pqrsPQRS][0-9a-v]
- */
+  
+                                    
+                                    
+   
 static struct ptmx_ioctl pt_ioctl[NPTY];
 
 int pty_init(int n_ptys);
@@ -106,7 +106,7 @@ pty_init(__unused int n_ptys)
 {
 	return 0;
 }
-#else // DEVFS
+#else         
 #include <miscfs/devfs/devfs.h>
 #define START_CHAR      'p'
 #define HEX_BASE        16
@@ -145,9 +145,9 @@ pty_init(int n_ptys)
 	int i;
 	int j;
 
-	n_ptys = min(n_ptys, NPTY); /* clamp to avoid pt_ioctl overflow */
+	n_ptys = min(n_ptys, NPTY);                                       
 
-	/* create the pseudo tty device nodes */
+	                                        
 	for (j = 0; j < 10; j++) {
 		for (i = 0; i < HEX_BASE; i++) {
 			int m = j * HEX_BASE + i;
@@ -179,4 +179,4 @@ done:
 	}
 	return 0;
 }
-#endif // DEVFS
+#endif         

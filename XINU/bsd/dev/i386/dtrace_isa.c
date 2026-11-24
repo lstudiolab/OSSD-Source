@@ -51,53 +51,53 @@ typedef x86_saved_state_t savearea_t;
 #include <i386/mp.h>
 #include <machine/trap.h>
 
-/*
- * APPLE NOTE:  The regmap is used to decode which 64bit uregs[] register
- * is being accessed when passed the 32bit uregs[] constant (based on
- * the reg.d translator file). The dtrace_getreg() is smart enough to handle
- * the register mappings.   The register set definitions are the same as
- * those used by the fasttrap_getreg code.
- */
+  
+                                                                         
+                                                                     
+                                                                            
+                                                                        
+                                          
+   
 #include "fasttrap_regset.h"
 static const uint8_t regmap[19] = {
-    REG_GS,		/* GS */
-    REG_FS,		/* FS */
-    REG_ES,		/* ES */
-    REG_DS,		/* DS */
-    REG_RDI,		/* EDI */
-    REG_RSI,		/* ESI */
-    REG_RBP,		/* EBP, REG_FP  */
-    REG_RSP,		/* ESP */
-    REG_RBX,		/* EBX */
-    REG_RDX,		/* EDX, REG_R1  */
-    REG_RCX,		/* ECX */
-    REG_RAX,		/* EAX, REG_R0  */
-    REG_TRAPNO,		/* TRAPNO */
-    REG_ERR,		/* ERR */
-    REG_RIP,		/* EIP, REG_PC  */
-    REG_CS,		/* CS */
-    REG_RFL,		/* EFL, REG_PS  */
-    REG_RSP,		/* UESP, REG_SP */
-    REG_SS		/* SS */
+    REG_GS,		        
+    REG_FS,		        
+    REG_ES,		        
+    REG_DS,		        
+    REG_RDI,		         
+    REG_RSI,		         
+    REG_RBP,		                  
+    REG_RSP,		         
+    REG_RBX,		         
+    REG_RDX,		                  
+    REG_RCX,		         
+    REG_RAX,		                  
+    REG_TRAPNO,		            
+    REG_ERR,		         
+    REG_RIP,		                  
+    REG_CS,		        
+    REG_RFL,		                  
+    REG_RSP,		                  
+    REG_SS		        
 };    
 
-extern dtrace_id_t      dtrace_probeid_error;   /* special ERROR probe */
+extern dtrace_id_t      dtrace_probeid_error;                            
 
 void
 dtrace_probe_error(dtrace_state_t *state, dtrace_epid_t epid, int which,
     int fltoffs, int fault, uint64_t illval)
 {
-    /*
-     * For the case of the error probe firing lets
-     * stash away "illval" here, and special-case retrieving it in DIF_VARIABLE_ARG.
-     */
+      
+                                                  
+                                                                                    
+       
     state->dts_arg_error_illval = illval;
     dtrace_probe( dtrace_probeid_error, (uint64_t)(uintptr_t)state, epid, which, fltoffs, fault );
 }
 
-/*
- * Atomicity and synchronization
- */
+  
+                                
+   
 void
 dtrace_membar_producer(void)
 {
@@ -110,24 +110,24 @@ dtrace_membar_consumer(void)
 	__asm__ volatile("lfence");
 }
 
-/*
- * Interrupt manipulation
- * XXX dtrace_getipl() can be called from probe context.
- */
+  
+                         
+                                                        
+   
 int
 dtrace_getipl(void)
 {
-	/*
-	 * XXX Drat, get_interrupt_level is MACH_KERNEL_PRIVATE
-	 * in osfmk/kern/cpu_data.h
-	 */
-	/* return get_interrupt_level(); */
+	  
+                                                        
+                            
+    
+	                                   
 	return (ml_at_interrupt_context() ? 1: 0);
 }
 
-/*
- * MP coordination
- */
+  
+                  
+   
 typedef struct xcArg {
 	processorid_t cpu;
 	dtrace_xcall_t f;
@@ -145,9 +145,9 @@ xcRemote( void *foo )
 }
 
 
-/*
- * dtrace_xcall() is not called from probe context.
- */
+  
+                                                   
+   
 void
 dtrace_xcall(processorid_t cpu, dtrace_xcall_t f, void *arg)
 {
@@ -165,9 +165,9 @@ dtrace_xcall(processorid_t cpu, dtrace_xcall_t f, void *arg)
 	}
 }
 
-/*
- * Runtime and ABI
- */
+  
+                  
+   
 uint64_t
 dtrace_getreg(struct regs *savearea, uint_t reg)
 {
@@ -242,8 +242,8 @@ dtrace_getreg(struct regs *savearea, uint_t reg)
 		return (0);
 	    }
 	
-	} else {   /* is 32bit user */
-		/* beyond register SS */
+	} else {                      
+		                        
 		if (reg > x86_SAVED_STATE32_COUNT - 1) {
 			DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 			return (0);
@@ -258,7 +258,7 @@ dtrace_getvmreg(uint_t ndx)
 	uint64_t reg = 0;
 	bool failed = false;
 
-	/* Any change in the vmread final opcode must be reflected in dtrace_handle_trap below. */
+	                                                                                          
 	__asm__ __volatile__(
 		"vmread %2, %0\n"
 		"ja 1f\n"
@@ -266,15 +266,15 @@ dtrace_getvmreg(uint_t ndx)
 		"1:\n"
 	: "=a" (reg), "+r" (failed) : "D" ((uint64_t)ndx));
 
-	/*
-	 * Check for fault in vmreg first. If DTrace has recovered the fault cause by
-	 * vmread above then the value in failed will be unreliable.
-	 */
+	  
+                                                                              
+                                                             
+    
 	if (DTRACE_CPUFLAG_ISSET(CPU_DTRACE_ILLOP)) {
 		return 0;
 	}
 
-	/* If vmread succeeded but failed because CF or ZS is 1 report fail. */
+	                                                                       
 	if (failed) {
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_BADADDR);
 		cpu_core[CPU->cpu_id].cpuc_dtrace_illval = ndx;
@@ -295,7 +295,7 @@ dtrace_getustack_common(uint64_t *pcstack, int pcstack_limit, user_addr_t pc,
 	    (volatile uint16_t *)&cpu_core[CPU->cpu_id].cpuc_dtrace_flags;
 
 #if 0
-	uintptr_t oldcontext = lwp->lwp_oldcontext; /* XXX signal stack crawl */
+	uintptr_t oldcontext = lwp->lwp_oldcontext;                             
 	size_t s1, s2;
 #endif
 	int ret = 0;
@@ -303,7 +303,7 @@ dtrace_getustack_common(uint64_t *pcstack, int pcstack_limit, user_addr_t pc,
 
 	ASSERT(pcstack == NULL || pcstack_limit > 0);
 	
-#if 0 /* XXX signal stack crawl */
+#if 0                             
 	if (p->p_model == DATAMODEL_NATIVE) {
 		s1 = sizeof (struct frame) + 2 * sizeof (long);
 		s2 = s1 + sizeof (siginfo_t);
@@ -325,7 +325,7 @@ dtrace_getustack_common(uint64_t *pcstack, int pcstack_limit, user_addr_t pc,
 		if (sp == 0)
 			break;
 
-#if 0 /* XXX signal stack crawl */
+#if 0                             
 		if (oldcontext == sp + s1 || oldcontext == sp + s2) {
 			if (p->p_model == DATAMODEL_NATIVE) {
 				ucontext_t *ucp = (ucontext_t *)oldcontext;
@@ -357,7 +357,7 @@ dtrace_getustack_common(uint64_t *pcstack, int pcstack_limit, user_addr_t pc,
 			}
 		}
 
-		/* Truncate ustack if the iterator causes fault. */
+		                                                   
 		if (*flags & CPU_DTRACE_FAULT) {
 			*flags &= ~CPU_DTRACE_FAULT;
 			break;
@@ -368,9 +368,9 @@ dtrace_getustack_common(uint64_t *pcstack, int pcstack_limit, user_addr_t pc,
 }
 
 
-/*
- * The return value indicates if we've modified the stack.
- */
+  
+                                                          
+   
 static int
 dtrace_adjust_stack(uint64_t **pcstack, int *pcstack_limit, user_addr_t *pc,
                     user_addr_t sp)
@@ -383,16 +383,16 @@ dtrace_adjust_stack(uint64_t **pcstack, int *pcstack_limit, user_addr_t *pc,
     ASSERT(pc != NULL);
 
     if (DTRACE_CPUFLAG_ISSET(CPU_DTRACE_ENTRY)) {
-        /*
-         * If we found ourselves in an entry probe, the frame pointer has not
-         * yet been pushed (that happens in the
-         * function prologue).  The best approach is to
-	 * add the current pc as a missing top of stack,
-         * and back the pc up to the caller, which is stored  at the
-         * current stack pointer address since the call
-         * instruction puts it there right before
-         * the branch.
-         */
+          
+                                                                             
+                                               
+                                                       
+                                                 
+                                                                    
+                                                       
+                                                 
+                      
+           
 
         missing_tos = *pc;
 
@@ -401,36 +401,36 @@ dtrace_adjust_stack(uint64_t **pcstack, int *pcstack_limit, user_addr_t *pc,
         else
             *pc = dtrace_fuword32(sp);
 
-	/* Truncate ustack if the iterator causes fault. */
+	                                                   
 	if (*flags & CPU_DTRACE_FAULT) {
 		*flags &= ~CPU_DTRACE_FAULT;
 	}
     } else {
-        /*
-         * We might have a top of stack override, in which case we just
-         * add that frame without question to the top.  This
-         * happens in return probes where you have a valid
-         * frame pointer, but it's for the callers frame
-         * and you'd like to add the pc of the return site
-         * to the frame.
-         */
+          
+                                                                       
+                                                            
+                                                          
+                                                        
+                                                          
+                        
+           
         missing_tos = cpu_core[CPU->cpu_id].cpuc_missing_tos;
     }
 
     if (missing_tos != 0) {
         if (pcstack != NULL && pcstack_limit != NULL) {
-            /*
-	     * If the missing top of stack has been filled out, then
-	     * we add it and adjust the size.
-             */
+              
+                                                             
+                                      
+               
 	    *(*pcstack)++ = missing_tos;
 	    (*pcstack_limit)--;
 	}
-        /*
-	 * return 1 because we would have changed the
-	 * stack whether or not it was passed in.  This
-	 * ensures the stack count is correct
-	 */
+          
+                                              
+                                                
+                                      
+    
          rc = 1;
     }
     return rc;
@@ -453,9 +453,9 @@ dtrace_getupcstack(uint64_t *pcstack, int pcstack_limit)
 	if (pcstack_limit <= 0)
 		return;
 
-	/*
-	 * If there's no user context we still need to zero the stack.
-	 */
+	  
+                                                               
+    
 	if (thread == NULL)
 		goto zero;
 
@@ -480,22 +480,22 @@ dtrace_getupcstack(uint64_t *pcstack, int pcstack_limit)
 		fp = regs->ss_32.ebp;
 	}
 
-        /*
-	 * The return value indicates if we've modified the stack.
-	 * Since there is nothing else to fix up in either case,
-	 * we can safely ignore it here.
-	 */
+          
+                                                           
+                                                         
+                                 
+    
 	(void)dtrace_adjust_stack(&pcstack, &pcstack_limit, &pc, sp);
 
 	if(pcstack_limit <= 0)
 	    return;
 
-	/*
-	 * Note that unlike ppc, the x86 code does not use
-	 * CPU_DTRACE_USTACK_FP. This is because x86 always
-	 * traces from the fp, even in syscall/profile/fbt
-	 * providers.
-	 */
+	  
+                                                   
+                                                    
+                                                   
+              
+    
 	n = dtrace_getustack_common(pcstack, pcstack_limit, pc, fp);
 	ASSERT(n >= 0);
 	ASSERT(n <= pcstack_limit);
@@ -539,22 +539,22 @@ dtrace_getustackdepth(void)
 	}
 
 	if (dtrace_adjust_stack(NULL, NULL, &pc, sp) == 1) {
-	    /*
-	     * we would have adjusted the stack if we had
-	     * supplied one (that is what rc == 1 means).
-	     * Also, as a side effect, the pc might have
-	     * been fixed up, which is good for calling
-	     * in to dtrace_getustack_common.
-	     */
+	      
+                                                  
+                                                  
+                                                 
+                                                
+                                      
+        
 	    n++;
 	}
 	
-	/*
-	 * Note that unlike ppc, the x86 code does not use
-	 * CPU_DTRACE_USTACK_FP. This is because x86 always
-	 * traces from the fp, even in syscall/profile/fbt
-	 * providers.
-	 */
+	  
+                                                   
+                                                    
+                                                   
+              
+    
 
 	n += dtrace_getustack_common(NULL, 0, pc, fp);
 
@@ -581,9 +581,9 @@ dtrace_getufpstack(uint64_t *pcstack, uint64_t *fpstack, int pcstack_limit)
 	if (pcstack_limit <= 0)
 		return;
 
-	/*
-	 * If there's no user context we still need to zero the stack.
-	 */
+	  
+                                                               
+    
 	if (thread == NULL)
 		goto zero;
 
@@ -600,7 +600,7 @@ dtrace_getufpstack(uint64_t *pcstack, uint64_t *fpstack, int pcstack_limit)
 	pc = regs->ss_32.eip;
 	sp = regs->ss_32.ebp;
 	
-#if 0 /* XXX signal stack crawl */
+#if 0                             
 	oldcontext = lwp->lwp_oldcontext;
 
 	if (p->p_model == DATAMODEL_NATIVE) {
@@ -613,9 +613,9 @@ dtrace_getufpstack(uint64_t *pcstack, uint64_t *fpstack, int pcstack_limit)
 #endif
 
 	if(dtrace_adjust_stack(&pcstack, &pcstack_limit, &pc, sp) == 1) {
-            /*
-	     * we made a change.
-	     */
+              
+                         
+        
 	    *fpstack++ = 0;
 	    if (pcstack_limit <= 0)
 		return;
@@ -631,7 +631,7 @@ dtrace_getufpstack(uint64_t *pcstack, uint64_t *fpstack, int pcstack_limit)
 		if (sp == 0)
 			break;
 
-#if 0 /* XXX signal stack crawl */
+#if 0                             
 		if (oldcontext == sp + s1 || oldcontext == sp + s2) {
 			if (p->p_model == DATAMODEL_NATIVE) {
 				ucontext_t *ucp = (ucontext_t *)oldcontext;
@@ -663,7 +663,7 @@ dtrace_getufpstack(uint64_t *pcstack, uint64_t *fpstack, int pcstack_limit)
 			}
 		}
 
-		/* Truncate ustack if the iterator causes fault. */
+		                                                   
 		if (*flags & CPU_DTRACE_FAULT) {
 			*flags &= ~CPU_DTRACE_FAULT;
 			break;
@@ -705,9 +705,9 @@ dtrace_getpcstack(pc_t *pcstack, int pcstack_limit, int aframes,
 
 		if (nextfp <= minfp || nextfp >= stacktop) {
 			if (on_intr) {
-				/*
-				 * Hop from interrupt stack to thread stack.
-				 */
+				  
+                                                
+       
 				vm_offset_t kstack_base = dtrace_get_kernel_stack(current_thread());
 
 				minfp = (struct frame *)kstack_base;
@@ -716,20 +716,20 @@ dtrace_getpcstack(pc_t *pcstack, int pcstack_limit, int aframes,
 				on_intr = 0;
 				continue;
 			}
-			/*
-			 * This is the last frame we can process; indicate
-			 * that we should return after processing this frame.
-			 */
+			  
+                                                     
+                                                        
+      
 			last = 1;
 		}
 
 		if (aframes > 0) {
 			if (--aframes == 0 && caller != 0) {
-				/*
-				 * We've just run out of artificial frames,
-				 * and we have a valid caller -- fill it in
-				 * now.
-				 */
+				  
+                                               
+                                               
+           
+       
 				ASSERT(depth < pcstack_limit);
 				pcstack[depth++] = (pc_t)caller;
 				caller = 0;
@@ -765,10 +765,10 @@ dtrace_getarg(int arg, int aframes, dtrace_mstate_t *mstate, dtrace_vstate_t *vs
 	int i;
 
 
-    /*
-     * A total of 6 arguments are passed via registers; any argument with
-     * index of 5 or lower is therefore in a register.
-     */
+      
+                                                                         
+                                                      
+       
     int inreg = 5;
 
 	for (i = 1; i <= aframes; i++) {
@@ -778,23 +778,23 @@ dtrace_getarg(int arg, int aframes, dtrace_mstate_t *mstate, dtrace_vstate_t *vs
 		if (dtrace_invop_callsite_pre != NULL
 			&& pc  >  (uintptr_t)dtrace_invop_callsite_pre
 			&& pc  <= (uintptr_t)dtrace_invop_callsite_post) {
-			/*
-			 * In the case of x86_64, we will use the pointer to the
-			 * save area structure that was pushed when we took the
-			 * trap.  To get this structure, we must increment
-			 * beyond the frame structure. If the
-			 * argument that we're seeking is passed on the stack,
-			 * we'll pull the true stack pointer out of the saved
-			 * registers and decrement our argument by the number
-			 * of arguments passed in registers; if the argument
-			 * we're seeking is passed in regsiters, we can just
-			 * load it directly.
-			 */
+			  
+                                                           
+                                                          
+                                                     
+                                        
+                                                         
+                                                        
+                                                        
+                                                       
+                                                       
+                       
+      
 
-			/* fp points to frame of dtrace_invop() activation. */
-			fp = fp->backchain; /* to fbt_perfcallback() activation. */
-			fp = fp->backchain; /* to kernel_trap() activation. */
-			fp = fp->backchain; /* to trap_from_kernel() activation. */
+			                                                      
+			fp = fp->backchain;                                        
+			fp = fp->backchain;                                   
+			fp = fp->backchain;                                        
 			
 			x86_saved_state_t   *tagged_regs = (x86_saved_state_t *)&fp[1];
 			x86_saved_state64_t *saved_state = saved_state64(tagged_regs);
@@ -803,64 +803,64 @@ dtrace_getarg(int arg, int aframes, dtrace_mstate_t *mstate, dtrace_vstate_t *vs
 				stack = (uintptr_t *)(void*)&saved_state->rdi;
 			} else {
 				fp = (struct frame *)(saved_state->isf.rsp);
-				stack = (uintptr_t *)&fp[1]; /* Find marshalled
-								arguments */
+				stack = (uintptr_t *)&fp[1];                   
+                    
 				arg -= inreg + 1;
 			}
 			goto load;
 		}
 	}
 
-	/*
-	 * We know that we did not come through a trap to get into
-	 * dtrace_probe() --  We arrive here when the provider has
-	 * called dtrace_probe() directly.
-	 * The probe ID is the first argument to dtrace_probe().
-	 * We must advance beyond that to get the argX.
-	 */
-	arg++; /* Advance past probeID */
+	  
+                                                           
+                                                           
+                                   
+                                                         
+                                                
+    
+	arg++;                           
 
 	if (arg <= inreg) {
-		/*
-		 * This shouldn't happen.  If the argument is passed in a
-		 * register then it should have been, well, passed in a
-		 * register...
-		 */
+		  
+                                                           
+                                                         
+                
+     
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 		return (0);
 	}
 
 	arg -= (inreg + 1);
-	stack = (uintptr_t *)&fp[1]; /* Find marshalled arguments */
+	stack = (uintptr_t *)&fp[1];                                
 
 load:
 	if (dtrace_canload((uint64_t)(stack + arg), sizeof(uint64_t),
 		mstate, vstate)) {
-		/* dtrace_probe arguments arg0 ... arg4 are 64bits wide */
+		                                                          
 		val = dtrace_load64((uint64_t)(stack + arg));
 	}
 
 	return (val);
 }
 
-/*
- * Load/Store Safety
- */
+  
+                    
+   
 void
 dtrace_toxic_ranges(void (*func)(uintptr_t base, uintptr_t limit))
 {
-	/*
-	 * "base" is the smallest toxic address in the range, "limit" is the first
-	 * VALID address greater than "base".
-	 */
+	  
+                                                                           
+                                      
+    
 	func(0x0, VM_MIN_KERNEL_AND_KEXT_ADDRESS);
 	if (VM_MAX_KERNEL_ADDRESS < ~(uintptr_t)0)
 			func(VM_MAX_KERNEL_ADDRESS + 1, ~(uintptr_t)0);
 }
 
-/*
- * Trap Safety
- */
+  
+              
+   
 extern boolean_t dtrace_handle_trap(int, x86_saved_state_t *);
 
 boolean_t
@@ -872,14 +872,14 @@ dtrace_handle_trap(int trapno, x86_saved_state_t *state)
 		return FALSE;
 	}
 
-	/*
-	 * General purpose solution would require pulling in disassembler. Right now there
-	 * is only one specific case to be handled so it is hardcoded here.
-	 */
+	  
+                                                                                   
+                                                                    
+    
 	if (trapno == T_INVALID_OPCODE) {
 		uint8_t *inst = (uint8_t *)saved_state->isf.rip;
 
-		/* vmread %rdi, %rax */
+		                       
 		if (inst[0] == 0x0f && inst[1] == 0x78 && inst[2] == 0xf8) {
 			DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 			saved_state->isf.rip += 3;

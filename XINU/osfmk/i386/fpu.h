@@ -57,10 +57,10 @@
 #ifndef _I386_FPU_H_
 #define _I386_FPU_H_
 
-/*
- * Macro definitions for routines to manipulate the
- * floating-point processor.
- */
+  
+                                                   
+                            
+   
 #include <kern/kern_types.h>
 #include <mach/i386/kern_return.h>
 #include <mach/i386/thread_status.h>
@@ -84,11 +84,11 @@ typedef enum {
 	FP,
 	AVX,
 	AVX512,
-	/*
-	 * The following states are never associated with a thread or task.
-	 * They are used for array declarations of data used during signal dispatch,
-	 * but these values are never assigned to threads' (or tasks') xstate members.
-	 */
+	  
+                                                                    
+                                                                             
+                                                                               
+    
 	UNDEFINED_FULL = UNDEFINED | STATE64_FULL,
 	FP_FULL = FP | STATE64_FULL,
 	AVX_FULL = AVX | STATE64_FULL,
@@ -149,5 +149,5 @@ extern uint32_t thread_fpsimd_hash(thread_t);
 extern void vzeroall(void);
 extern void xmmzeroall(void);
 extern void avx512_zero(void);
-#endif /* MKP */
-#endif  /* _I386_FPU_H_ */
+#endif          
+#endif                    

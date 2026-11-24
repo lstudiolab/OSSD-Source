@@ -34,11 +34,11 @@ DECL_SETUP {
 	long long i;
 	int pgsz = getpagesize();
 
-	/* Heuristic: use half the physical memory, hopefully this should work on all
-	 * devices. We use the amount of physical memory, rather than some softer
-	 * metric, like amount of free memory, so that the memory allocated is always
-	 * consistent for a given device.
-	 */
+	                                                                             
+                                                                          
+                                                                              
+                                  
+    
 	memsize = hw_memsize();
 	VERIFY(memsize > 0, "hw_memsize failed");
 	memsize = memsize / 2;
@@ -48,7 +48,7 @@ DECL_SETUP {
 
 	memblockfiller = memblock;
 
-	/* Do this manually, to make sure everything is paged in */
+	                                                           
 	for (i = 0; i < memsize; i += pgsz) {
 		memblockfiller[i] = 1;
 	}
@@ -56,8 +56,8 @@ DECL_SETUP {
 	return PERFINDEX_SUCCESS;
 }
 
-/* figures out what region of memory to copy, so it does interfere with other
- *  threads,  */
+                                                                             
+                
 DECL_TEST {
 	long long left = length;
 	long long region_len = memsize / num_threads / 2;

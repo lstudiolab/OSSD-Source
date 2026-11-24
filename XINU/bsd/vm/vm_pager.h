@@ -52,9 +52,9 @@ struct  pager_struct {
 typedef struct pager_struct     *vm_pager_t;
 #define vm_pager_null           ((vm_pager_t) 0)
 
-#define PAGER_SUCCESS           0  /* page read or written */
-#define PAGER_ABSENT            1  /* pager does not have page */
-#define PAGER_ERROR             2  /* pager unable to read or write page */
+#define PAGER_SUCCESS           0                            
+#define PAGER_ABSENT            1                                
+#define PAGER_ERROR             2                                          
 
 #if 0
 #ifdef  KERNEL
@@ -65,7 +65,7 @@ extern void                             vm_pager_deallocate(void);
 extern pager_return_t   vm_pager_get(void);
 extern pager_return_t   vm_pager_put(void);
 extern boolean_t                vm_pager_has_page(void);
-#endif  /* KERNEL */
+#endif              
 #endif
 
-#endif  /* _VM_PAGER_ */
+#endif                  

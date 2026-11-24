@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$NetBSD: shm.h,v 1.15 1994/06/29 06:45:17 cgd Exp $	*/
+                                                         
 
 /*
  * Copyright (c) 1994 Adam Glass
@@ -57,10 +57,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * As defined+described in "X/Open System Interfaces and Headers"
- *                         Issue 4, p. XXX
- */
+  
+                                                                 
+                                          
+   
 
 #ifndef _SYS_SHM_H_
 #define _SYS_SHM_H_
@@ -68,76 +68,76 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
-/*
- * [XSI]	All of the symbols from <sys/ipc.h> SHALL be defined
- *		when this header is included
- */
+  
+                                                             
+                                
+   
 #include <sys/ipc.h>
 
-/*
- * [XSI] The pid_t, time_t, key_t, and size_t types shall be defined as
- * described in <sys/types.h>.
- *
- * NOTE:	The definition of the key_t type is implicit from the
- *		inclusion of <sys/ipc.h>
- */
+  
+                                                                       
+                              
+  
+                                                              
+                            
+   
 #include <sys/_types/_pid_t.h>
 #include <sys/_types/_time_t.h>
 #include <sys/_types/_size_t.h>
 
-/*
- * [XSI] The unsigned integer type used for the number of current attaches
- * that MUST be able to store values at least as large as a type unsigned
- * short.
- */
+  
+                                                                          
+                                                                         
+         
+   
 typedef unsigned short  shmatt_t;
 
 
-/*
- * Possible flag values which may be OR'ed into the third argument to
- * shmat()
- */
-#define SHM_RDONLY      010000  /* [XSI] Attach read-only (else read-write) */
-#define SHM_RND         020000  /* [XSI] Round attach address to SHMLBA */
+  
+                                                                     
+          
+   
+#define SHM_RDONLY      010000                                                
+#define SHM_RND         020000                                            
 
-/*
- * This value is symbolic, and generally not expected to be sed by user
- * programs directly, although such ise is permitted by the standard.  Its
- * value in our implementation is equal to the number of bytes per page.
- *
- * NOTE:	We DO NOT obtain this value from the appropriate system
- *		headers at this time, to avoid the resulting namespace
- *		pollution, which is why we discourages its use.
- */
+  
+                                                                       
+                                                                          
+                                                                        
+  
+                                                                
+                                                          
+                                                   
+   
 #if __arm64__
-#define SHMLBA      (16*1024)   /* [XSI] Segment low boundary address multiple*/
-#else /* __arm64__ */
-#define SHMLBA      4096        /* [XSI] Segment low boundary address multiple*/
-#endif /* __arm64__ */
+#define SHMLBA      (16*1024)                                                   
+#else                
+#define SHMLBA      4096                                                        
+#endif                
 
-/* "official" access mode definitions; somewhat braindead since you have
- *  to specify (SHM_* >> 3) for group and (SHM_* >> 6) for world permissions */
+                                                                        
+                                                                               
 #define SHM_R       (IPC_R)
 #define SHM_W       (IPC_W)
 
 #pragma pack(4)
 
-/*
- * Technically, we should force all code references to the new structure
- * definition, not in just the standards conformance case, and leave the
- * legacy interface there for binary compatibility only.  Currently, we
- * are only forcing this for programs requesting standards conformance.
- */
+  
+                                                                        
+                                                                        
+                                                                       
+                                                                       
+   
 #if __DARWIN_UNIX03 || defined(KERNEL)
-/*
- * Structure used internally.
- *
- * This structure is exposed because standards dictate that it is used as
- * the third argment to shmctl().
- *
- * NOTE:	The field shm_internal is not meaningful in user space,
- *		and must not be used there.
- */
+  
+                             
+  
+                                                                         
+                                 
+  
+                                                                
+                               
+   
 #if (defined(_POSIX_C_SOURCE) && !defined(_DARWIN_C_SOURCE))
 struct shmid_ds
 #else
@@ -145,33 +145,33 @@ struct shmid_ds
 struct __shmid_ds_new
 #endif
 {
-	struct __ipc_perm_new shm_perm; /* [XSI] Operation permission value */
-	size_t          shm_segsz;      /* [XSI] Size of segment in bytes */
-	pid_t           shm_lpid;       /* [XSI] PID of last shared memory op */
-	pid_t           shm_cpid;       /* [XSI] PID of creator */
-	shmatt_t        shm_nattch;     /* [XSI] Number of current attaches */
-	time_t          shm_atime;      /* [XSI] Time of last shmat() */
-	time_t          shm_dtime;      /* [XSI] Time of last shmdt() */
-	time_t          shm_ctime;      /* [XSI] Time of last shmctl() change */
-	void            *shm_internal;  /* reserved for kernel use */
+	struct __ipc_perm_new shm_perm;                                       
+	size_t          shm_segsz;                                          
+	pid_t           shm_lpid;                                               
+	pid_t           shm_cpid;                                 
+	shmatt_t        shm_nattch;                                           
+	time_t          shm_atime;                                      
+	time_t          shm_dtime;                                      
+	time_t          shm_ctime;                                              
+	void            *shm_internal;                               
 };
-#else   /* !__DARWIN_UNIX03 */
+#else                         
 #define shmid_ds        __shmid_ds_old
-#endif  /* !__DARWIN_UNIX03 */
+#endif                        
 
 #if !__DARWIN_UNIX03
 struct __shmid_ds_old {
-	struct __ipc_perm_old shm_perm; /* [XSI] Operation permission value */
-	size_t          shm_segsz;      /* [XSI] Size of segment in bytes */
-	pid_t           shm_lpid;       /* [XSI] PID of last shared memory op */
-	pid_t           shm_cpid;       /* [XSI] PID of creator */
-	shmatt_t        shm_nattch;     /* [XSI] Number of current attaches */
-	time_t          shm_atime;      /* [XSI] Time of last shmat() */
-	time_t          shm_dtime;      /* [XSI] Time of last shmdt() */
-	time_t          shm_ctime;      /* [XSI] Time of last shmctl() change */
-	void            *shm_internal;  /* reserved for kernel use */
+	struct __ipc_perm_old shm_perm;                                       
+	size_t          shm_segsz;                                          
+	pid_t           shm_lpid;                                               
+	pid_t           shm_cpid;                                 
+	shmatt_t        shm_nattch;                                           
+	time_t          shm_atime;                                      
+	time_t          shm_dtime;                                      
+	time_t          shm_ctime;                                              
+	void            *shm_internal;                               
 };
-#endif  /* !__DARWIN_UNIX03 */
+#endif                        
 
 #pragma pack()
 
@@ -180,13 +180,13 @@ struct __shmid_ds_old {
 __BEGIN_DECLS
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 int     shmsys(int, ...);
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 void    *shmat(int, const void *, int);
 int     shmctl(int, int, struct shmid_ds *) __DARWIN_ALIAS(shmctl);
 int     shmdt(const void *);
 int     shmget(key_t, size_t, int);
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
-#endif /* !_SYS_SHM_H_ */
+#endif                   

@@ -1,5 +1,5 @@
-//
-//cc progress.m -framework AppKit -Wall; ./a.out >/tmp/xx.c; cc /tmp/xx.c -Wall; cat /tmp/xx.c 
+  
+                                                                                               
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>

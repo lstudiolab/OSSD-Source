@@ -73,19 +73,19 @@
 
 #ifdef __APPLE_API_PRIVATE
 
-/*
- * "flags" argument to prf().
- * NB: Used in integer flags field, private to bsd/kern/subr_prf.c
- */
-#define TOCONS          0x00000001      /* output to console */
-#define TOTTY           0x00000002      /* output to tty */
-#define TOLOG           0x00000004      /* output to log (log lock not held) */
-#define TOSTR           0x00000008      /* output to string */
-#define TOLOGLOCKED     0x00000010      /* output to log (log lock held) */
+  
+                             
+                                                                  
+   
+#define TOCONS          0x00000001                             
+#define TOTTY           0x00000002                         
+#define TOLOG           0x00000004                                             
+#define TOSTR           0x00000008                            
+#define TOLOGLOCKED     0x00000010                                         
 
 extern int prf(const char *fmt, va_list ap, int flags, struct tty *ttyp) __printflike(1, 0);
 
-#endif /* __APPLE_API_PRIVATE */
-#endif  /* KERNEL_PRIVATE */
+#endif                          
+#endif                      
 
-#endif /* ! _SYS_SUBRPRF_H_ */
+#endif                        

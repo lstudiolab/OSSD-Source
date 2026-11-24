@@ -1,11 +1,11 @@
-/*
- * io_catalog_send_data.m
- *
- * A regression test to build an IORegistry entry with mismatching
- * IOService and IOUserClientClass via IOCatalogueSendData, to verify
- * if exploit risk still exists in IOCatalogueSendData.
- *
- */
+  
+                         
+  
+                                                                  
+                                                                     
+                                                       
+  
+   
 #include <darwintest.h>
 
 #include <Foundation/Foundation.h>
@@ -124,7 +124,7 @@ T_DECL(io_catalog_send_data_test, "regression test to build an IORegistry entry"
 	kret = build_ioregistry_by_catalog_send_data("fooBar",
 	    "IOSurfaceRootUserClient", "IOReportHub");
 #if (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)
-	/* this trick to build an entry by io_catalog_send_data should fail */
+	                                                                      
 	T_EXPECT_EQ(kret, kIOReturnNotPrivileged, "build an entry with"
 	    " mismatch IOService and IOUserClientClass by IOCatalogueSendData "
 	    "should fail as kIOReturnNotPrivileged");

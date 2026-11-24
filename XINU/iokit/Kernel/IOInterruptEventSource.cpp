@@ -62,7 +62,7 @@ do { \
 #define IOStatisticsCheckForWork()
 #define IOStatisticsInterrupt()
 
-#endif // IOKITSTATS
+#endif              
 
 #define super IOEventSource
 
@@ -101,25 +101,25 @@ IOInterruptEventSource::init(OSObject *inOwner,
 	autoDisable = explicitDisable = false;
 	intIndex = ~inIntIndex;
 
-	// Assumes inOwner holds a reference(retain) on the provider
+	                                                            
 	if (inProvider) {
 		if (IA_ANY_STATISTICS_ENABLED) {
-			/*
-			 * We only treat this as an "interrupt" if it has a provider; if it does,
-			 * set up the objects necessary to track interrupt statistics.  Interrupt
-			 * event sources without providers are most likely being used as simple
-			 * event source in order to poke at workloops and kick off work.
-			 *
-			 * We also avoid try to avoid interrupt accounting overhead if none of
-			 * the statistics are enabled.
-			 */
+			  
+                                                                            
+                                                                            
+                                                                          
+                                                                   
+     
+                                                                         
+                                 
+      
 			reserved->statistics = IONew(IOInterruptAccountingData, 1);
 
 			if (!reserved->statistics) {
-				/*
-				 * We rely on the free() routine to clean up after us if init fails
-				 * midway.
-				 */
+				  
+                                                                       
+              
+       
 				return false;
 			}
 
@@ -164,35 +164,35 @@ IOInterruptEventSource::registerInterruptHandler(IOService *inProvider,
 
 	ret = provider->registerInterrupt(inIntIndex, this, intHandler);
 
-	/*
-	 * Add statistics to the provider.  The setWorkLoop convention should ensure
-	 * that we always go down the unregister path before we register (outside of
-	 * init()), so we don't have to worry that we will invoke addInterruptStatistics
-	 * erroneously.
-	 */
+	  
+                                                                             
+                                                                             
+                                                                                 
+                
+    
 	if ((ret == kIOReturnSuccess) && (reserved->statistics)) {
-		/*
-		 * Stash the normal index value, for the sake of debugging.
-		 */
+		  
+                                                             
+     
 		reserved->statistics->interruptIndex = inIntIndex;
 
-		/*
-		 * We need to hook the interrupt information up to the provider so that it
-		 * can find the statistics for this interrupt when desired.  The provider is
-		 * responsible for maintaining the reporter for a particular interrupt, and
-		 * needs a handle on the statistics so that it can request that the reporter
-		 * be updated as needed.  Errors are considered "soft" for the moment (it
-		 * will either panic, or fail in a way such that we can still service the
-		 * interrupt).
-		 */
+		  
+                                                                            
+                                                                              
+                                                                             
+                                                                              
+                                                                           
+                                                                           
+                
+     
 		provider->addInterruptStatistics(reserved->statistics, inIntIndex);
 
-		/*
-		 * Add the statistics object to the global list of statistics objects; this
-		 * is an aid to debugging (we can trivially find statistics for all eligible
-		 * interrupts, and dump them; potentially helpful if the system is wedged
-		 * due to interrupt activity).
-		 */
+		  
+                                                                             
+                                                                              
+                                                                           
+                                
+     
 		interruptAccountingDataAddToList(reserved->statistics);
 	}
 
@@ -290,10 +290,10 @@ IOInterruptEventSource::setWorkLoop(IOWorkLoop *inWorkLoop)
 	if (provider) {
 		if (!inWorkLoop) {
 			if (intIndex >= 0) {
-				/*
-				 * It isn't necessarily safe to wait until free() to unregister the interrupt;
-				 * our provider may disappear.
-				 */
+				  
+                                                                                  
+                                  
+       
 				unregisterInterruptHandler(provider, intIndex);
 				intIndex = ~intIndex;
 			}
@@ -365,7 +365,7 @@ IOInterruptEventSource::checkForWork()
 			}
 		}
 
-		// Call the handler
+		                   
 		if (kActionBlock & flags) {
 			(intActionBlock)(this, numInts);
 		} else {
@@ -417,7 +417,7 @@ IOInterruptEventSource::checkForWork()
 			}
 		}
 
-		// Call the handler
+		                   
 		if (kActionBlock & flags) {
 			(intActionBlock)(this, numInts);
 		} else {
@@ -458,7 +458,7 @@ IOInterruptEventSource::checkForWork()
 
 void
 IOInterruptEventSource::normalInterruptOccurred
-(void */*refcon*/, IOService */*prov*/, int /*source*/)
+(void *          , IOService *        , int           )
 {
 	bool trace = (gIOKitTrace & kIOTraceIntEventSource) ? true : false;
 
@@ -487,11 +487,11 @@ IOInterruptEventSource::normalInterruptOccurred
 
 void
 IOInterruptEventSource::disableInterruptOccurred
-(void */*refcon*/, IOService *prov, int source)
+(void *          , IOService *prov, int source)
 {
 	bool trace = (gIOKitTrace & kIOTraceIntEventSource) ? true : false;
 
-	prov->disableInterrupt(source); /* disable the interrupt */
+	prov->disableInterrupt(source);                            
 
 	IOStatisticsInterrupt();
 	producerCount++;

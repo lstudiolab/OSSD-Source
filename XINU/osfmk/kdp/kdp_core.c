@@ -52,7 +52,7 @@
 #include <i386/pmap_internal.h>
 #include <kdp/ml/i386/kdp_x86_common.h>
 #include <kern/debug.h>
-#endif /* defined(__x86_64__) */
+#endif                          
 
 #if defined(__arm__) || defined(__arm64__)
 #include <arm/cpuid.h>
@@ -66,7 +66,7 @@
 #if !defined(ROUNDDOWN)
 #define ROUNDDOWN(a, b) ((a) & ~((b) - 1))
 #endif
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 typedef int (*pmap_traverse_callback)(vm_map_offset_t start,
     vm_map_offset_t end,
@@ -130,12 +130,12 @@ struct xnu_hw_shmem_dbg_command_info *hwsd_info = NULL;
 #define KDP_CORE_HW_SHMEM_DBG_NUM_BUFFERS 2
 #define KDP_CORE_HW_SHMEM_DBG_TOTAL_BUF_SIZE 64 * 1024
 
-/*
- * Astris can read up to 4064 bytes at a time over
- * the probe, so we should try to make our buffer
- * size a multiple of this to make reads by astris
- * (the bottleneck) most efficient.
- */
+  
+                                                  
+                                                 
+                                                  
+                                   
+   
 #define OPTIMAL_ASTRIS_READSIZE 4064
 
 struct kdp_hw_shmem_dbg_buf_elm {
@@ -159,16 +159,16 @@ static uint64_t kdp_hw_shmem_dbg_contact_deadline = 0;
 static uint64_t kdp_hw_shmem_dbg_contact_deadline_interval = 0;
 
 #define KDP_HW_SHMEM_DBG_TIMEOUT_DEADLINE_SECS 30
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 static boolean_t kern_dump_successful = FALSE;
 
 struct mach_core_fileheader kdp_core_header = { };
 
-/*
- * These variables will be modified by the BSD layer if the root device is
- * a RAMDisk.
- */
+  
+                                                                          
+             
+   
 uint64_t kdp_core_ramdisk_addr = 0;
 uint64_t kdp_core_ramdisk_size = 0;
 
@@ -185,12 +185,12 @@ kdp_polled_corefile_error(void)
 }
 
 #if defined(__arm__) || defined(__arm64__)
-/*
- * Whenever we start a coredump, make sure the buffers
- * are all on the free queue and the state is as expected.
- * The buffers may have been left in a different state if
- * a previous coredump attempt failed.
- */
+  
+                                                      
+                                                          
+                                                         
+                                      
+   
 static void
 kern_dump_hw_shmem_dbg_reset(void)
 {
@@ -233,12 +233,12 @@ kern_dump_hw_shmem_dbg_reset(void)
 	kdp_hw_shmem_dbg_contact_deadline = mach_absolute_time() + kdp_hw_shmem_dbg_contact_deadline_interval;
 }
 
-/*
- * Tries to move buffers forward in 'progress'. If
- * the hardware debugger is done consuming the current buffer, we
- * can put the next one on it and move the current
- * buffer back to the free queue.
- */
+  
+                                                  
+                                                                 
+                                                  
+                                 
+   
 static int
 kern_dump_hw_shmem_dbg_process_buffers(void)
 {
@@ -293,12 +293,12 @@ kern_dump_hw_shmem_dbg_process_buffers(void)
 	return 0;
 }
 
-/*
- * Populates currently_filling_buf with a new buffer
- * once one becomes available. Returns 0 on success
- * or the value returned by kern_dump_hw_shmem_dbg_process_buffers()
- * if it is non-zero (an error).
- */
+  
+                                                    
+                                                   
+                                                                    
+                                
+   
 static int
 kern_dump_hw_shmem_dbg_get_buffer(void)
 {
@@ -320,11 +320,11 @@ kern_dump_hw_shmem_dbg_get_buffer(void)
 	return ret;
 }
 
-/*
- * Output procedure for hardware shared memory core dumps
- *
- * Tries to fill up the buffer completely before flushing
- */
+  
+                                                         
+  
+                                                         
+   
 static int
 kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename,
     uint64_t length, void * data)
@@ -338,10 +338,10 @@ kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename
 	if (request == KDP_EOF) {
 		assert(currently_filling_buf == NULL);
 
-		/*
-		 * Wait until we've flushed all the buffers
-		 * before setting the connection status to done.
-		 */
+		  
+                                             
+                                                  
+     
 		while (!STAILQ_EMPTY(&hw_shmem_dbg_bufs_to_flush) ||
 		    currently_flushing_buf != NULL) {
 			ret = kern_dump_hw_shmem_dbg_process_buffers();
@@ -350,11 +350,11 @@ kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename
 			}
 		}
 
-		/*
-		 * If the last status we saw indicates that the buffer was
-		 * empty and we didn't flush any new data since then, we expect
-		 * the sequence number to still match the last we saw.
-		 */
+		  
+                                                            
+                                                                 
+                                                        
+     
 		if (hwsd_info->xhsdci_seq_no < kdp_hw_shmem_dbg_seq_no) {
 			kern_coredump_log(NULL, "EOF Flush: Detected stale/invalid seq num. Expected: %d, received %d\n",
 			    kdp_hw_shmem_dbg_seq_no, hwsd_info->xhsdci_seq_no);
@@ -373,11 +373,11 @@ kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename
 
 	assert(request == KDP_DATA);
 
-	/*
-	 * The output procedure is called with length == 0 and data == NULL
-	 * to flush any remaining output at the end of the coredump before
-	 * we call it a final time to mark the dump as done.
-	 */
+	  
+                                                                    
+                                                                   
+                                                     
+    
 	if (length == 0) {
 		assert(data == NULL);
 
@@ -386,17 +386,17 @@ kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename
 			currently_filling_buf = NULL;
 		}
 
-		/*
-		 * Move the current buffer along if possible.
-		 */
+		  
+                                               
+     
 		ret = kern_dump_hw_shmem_dbg_process_buffers();
 		return ret;
 	}
 
 	while (bytes_remaining != 0) {
-		/*
-		 * Make sure we have a buffer to work with.
-		 */
+		  
+                                             
+     
 		while (currently_filling_buf == NULL) {
 			ret = kern_dump_hw_shmem_dbg_get_buffer();
 			if (ret) {
@@ -416,9 +416,9 @@ kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename
 			STAILQ_INSERT_TAIL(&hw_shmem_dbg_bufs_to_flush, currently_filling_buf, khsd_elms);
 			currently_filling_buf = NULL;
 
-			/*
-			 * Move it along if possible.
-			 */
+			  
+                                
+      
 			ret = kern_dump_hw_shmem_dbg_process_buffers();
 			if (ret) {
 				return ret;
@@ -431,7 +431,7 @@ kern_dump_hw_shmem_dbg_buffer_proc(unsigned int request, __unused char *corename
 
 	return ret;
 }
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 static IOReturn
 kern_dump_disk_proc(unsigned int request, __unused char *corename,
@@ -473,7 +473,7 @@ kern_dump_disk_proc(unsigned int request, __unused char *corename,
 		break;
 
 #if defined(__arm__) || defined(__arm64__)
-	/* Only supported on embedded by the underlying polled mode driver */
+	                                                                     
 	case KDP_FLUSH:
 		err = IOPolledFileFlush(gIOPolledCoreFileVars);
 		if (kIOReturnSuccess != err) {
@@ -481,7 +481,7 @@ kern_dump_disk_proc(unsigned int request, __unused char *corename,
 			break;
 		}
 		break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 	case KDP_EOF:
 		err = IOPolledFileWrite(gIOPolledCoreFileVars, 0, 0, NULL);
@@ -500,9 +500,9 @@ kern_dump_disk_proc(unsigned int request, __unused char *corename,
 	return err;
 }
 
-/*
- * flushes any data to the output proc immediately
- */
+  
+                                                  
+   
 static int
 kdp_core_zoutput(z_streamp strm, Bytef *buf, unsigned len)
 {
@@ -524,9 +524,9 @@ kdp_core_zoutput(z_streamp strm, Bytef *buf, unsigned len)
 	return len;
 }
 
-/*
- * tries to fill the buffer with data before flushing it via the output proc.
- */
+  
+                                                                             
+   
 static int
 kdp_core_zoutputbuf(z_streamp strm, Bytef *inbuf, unsigned inlen)
 {
@@ -635,7 +635,7 @@ kdp_core_stream_output_chunk(struct kdp_core_out_vars * vars, unsigned length, v
 				if (!length) {
 					break;
 				}
-				zs->next_in = data ? data : (Bytef *) zs /* zero marker */;
+				zs->next_in = data ? data : (Bytef *) zs                  ;
 				zs->avail_in = length;
 				length = 0;
 			}
@@ -701,13 +701,13 @@ kernel_pmap_present_mapping(uint64_t vaddr, uint64_t * pvincr, uintptr_t * pvphy
 
 	assert(!(vaddr & PAGE_MASK_64));
 
-	/* VA ranges to exclude */
+	                          
 	if (vaddr == c_buffers) {
-		/* compressor data */
+		                     
 		ppn = 0;
 		vincr = c_buffers_size;
 	} else if (vaddr == kdp_core_zmem) {
-		/* zlib working memory */
+		                         
 		ppn = 0;
 		vincr = kdp_core_zsize;
 	} else if ((kdp_core_ramdisk_addr != 0) && (vaddr == kdp_core_ramdisk_addr)) {
@@ -716,18 +716,18 @@ kernel_pmap_present_mapping(uint64_t vaddr, uint64_t * pvincr, uintptr_t * pvphy
 	} else
 #if defined(__arm64__) && defined(CONFIG_XNUPOST)
 	if (vaddr == _COMM_HIGH_PAGE64_BASE_ADDRESS) {
-		/* not readable */
+		                  
 		ppn = 0;
 		vincr = _COMM_PAGE_AREA_LENGTH;
 	} else
-#endif /* defined(__arm64__) */
+#endif                         
 #if defined(__arm__) || defined(__arm64__)
 	if (vaddr == phystokv(avail_start)) {
-		/* physical memory map */
+		                         
 		ppn = 0;
 		vincr = (avail_end - avail_start);
 	} else
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 	{
 		ppn = (pvphysaddr != NULL ?
 		    pmap_find_phys(kernel_pmap, vaddr) :
@@ -774,7 +774,7 @@ pmap_traverse_present_mappings(pmap_t __unused pmap,
 	assert(!is_ept_pmap(pmap));
 #endif
 
-	/* Assumes pmap is locked, or being called from the kernel debugger */
+	                                                                      
 
 	if (start > end) {
 		return KERN_INVALID_ARGUMENT;
@@ -786,8 +786,8 @@ pmap_traverse_present_mappings(pmap_t __unused pmap,
 		ppnum_t ppn = 0;
 
 #if defined(__arm__) || defined(__arm64__)
-		/* We're at the start of the physmap, so pull out the pagetable pages that
-		 * are accessed through that region.*/
+		                                                                          
+                                        
 		if (vcur == phystokv(avail_start) && vm_object_lock_try_shared(&pmap_object_store)) {
 			m = (vm_page_t)vm_page_queue_first(&pmap_object_store.memq);
 		}
@@ -796,7 +796,7 @@ pmap_traverse_present_mappings(pmap_t __unused pmap,
 			vm_map_offset_t vprev = vcur;
 			ppn = (ppnum_t)atop(avail_end);
 			while (!vm_page_queue_end(&pmap_object_store.memq, (vm_page_queue_entry_t)m)) {
-				/* Ignore pages that come from the static region and have already been dumped.*/
+				                                                                                
 				if (VM_PAGE_GET_PHYS_PAGE(m) >= atop(avail_start)) {
 					ppn = VM_PAGE_GET_PHYS_PAGE(m);
 					break;
@@ -807,8 +807,8 @@ pmap_traverse_present_mappings(pmap_t __unused pmap,
 			if (ppn == atop(avail_end)) {
 				vm_object_unlock(&pmap_object_store);
 				m = VM_PAGE_NULL;
-				// avail_end is not a valid physical address,
-				// so phystokv(avail_end) may not produce the expected result.
+				                                             
+				                                                              
 				vcur = phystokv(avail_start) + (avail_end - avail_start);
 			} else {
 				m = (vm_page_t)vm_page_queue_next(&m->vmp_listq);
@@ -822,54 +822,54 @@ pmap_traverse_present_mappings(pmap_t __unused pmap,
 		if (m == VM_PAGE_NULL) {
 			ppn = kernel_pmap_present_mapping(vcur, &vincr, NULL);
 		}
-#else /* defined(__arm__) || defined(__arm64__) */
+#else                                             
 		ppn = kernel_pmap_present_mapping(vcur, &vincr, NULL);
 #endif
 		if (ppn != 0) {
 			if (((vcur < debug_start) || (vcur >= debug_end))
 			    && !(pmap_valid_page(ppn) || bootloader_valid_page(ppn))
 #if defined(XNU_TARGET_OS_BRIDGE)
-			    // include the macOS panic region if it's mapped
+			                                                    
 			    && ((vcur < macos_panic_start) || (vcur >= macos_panic_end))
 #endif
 			    ) {
-				/* not something we want */
+				                           
 				ppn = 0;
 			}
 		}
 
 		if (ppn != 0) {
 			if (!lastvavalid) {
-				/* Start of a new virtual region */
+				                                   
 				vcurstart = vcur;
 				lastvavalid = TRUE;
 			}
 		} else {
 			if (lastvavalid) {
-				/* end of a virtual region */
+				                             
 				ret = callback(vcurstart, vcur, context);
 				lastvavalid = FALSE;
 			}
 
 #if defined(__x86_64__)
-			/* Try to skip by 2MB if possible */
+			                                    
 			if ((vcur & PDMASK) == 0) {
 				pd_entry_t *pde;
 				pde = pmap_pde(pmap, vcur);
 				if (0 == pde || ((*pde & INTEL_PTE_VALID) == 0)) {
-					/* Make sure we wouldn't overflow */
+					                                    
 					if (vcur < (end - NBPD)) {
 						vincr = NBPD;
 					}
 				}
 			}
-#endif /* defined(__x86_64__) */
+#endif                          
 		}
 		vcur += vincr;
 	}
 
 	if ((ret == KERN_SUCCESS) && lastvavalid) {
-		/* send previous run */
+		                       
 		ret = callback(vcurstart, vcur, context);
 	}
 
@@ -1037,7 +1037,7 @@ kdp_reset_output_vars(void *kdp_core_out_vars, uint64_t totalbytes)
 {
 	struct kdp_core_out_vars *outvars = (struct kdp_core_out_vars *)kdp_core_out_vars;
 
-	/* Re-initialize kdp_outvars */
+	                               
 	outvars->zipped = 0;
 	outvars->totalbytes = totalbytes;
 	outvars->lastpercent = 0;
@@ -1048,14 +1048,14 @@ kdp_reset_output_vars(void *kdp_core_out_vars, uint64_t totalbytes)
 	outvars->outbuf = NULL;
 
 	if (outvars->outproc == &kdp_send_crashdump_data) {
-		/* KERN_DUMP_NET */
+		                   
 		outvars->outbuf = (Bytef *) (kdp_core_zmem + kdp_core_zoffset);
 		outvars->outremain = outvars->outlen = kdp_crashdump_pkt_size;
 	}
 
 	kdp_core_total_size = totalbytes;
 
-	/* Re-initialize zstream variables */
+	                                     
 	kdp_core_zs.avail_in  = 0;
 	kdp_core_zs.next_in   = NULL;
 	kdp_core_zs.avail_out = 0;
@@ -1073,7 +1073,7 @@ kern_dump_update_header(struct kdp_core_out_vars *outvars)
 	uint64_t foffset;
 	int ret;
 
-	/* Write the file header -- first seek to the beginning of the file */
+	                                                                      
 	foffset = 0;
 	if ((ret = (outvars->outproc)(KDP_SEEK, NULL, sizeof(foffset), &foffset)) != kIOReturnSuccess) {
 		kern_coredump_log(NULL, "(kern_dump_update_header) outproc(KDP_SEEK, NULL, %lu, %p) foffset = 0x%llx returned 0x%x\n",
@@ -1097,7 +1097,7 @@ kern_dump_update_header(struct kdp_core_out_vars *outvars)
 		kern_coredump_log(NULL, "(kern_dump_update_header) outproc explicit flush returned 0x%x\n", ret);
 		return ret;
 	}
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 	return KERN_SUCCESS;
 }
@@ -1153,28 +1153,28 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 	int ret = 0;
 	boolean_t output_opened = FALSE, dump_succeeded = TRUE;
 
-	/*
-	 * Record the initial panic log buffer length so we can dump the coredump log
-	 * and panic log to disk
-	 */
+	  
+                                                                              
+                         
+    
 	coredump_log_start = debug_buf_ptr;
 #if defined(__arm__) || defined(__arm64__)
 	assert(panic_info->eph_other_log_offset != 0);
 	assert(panic_info->eph_panic_log_len != 0);
-	/* Include any data from before the panic log as well */
+	                                                        
 	prior_debug_logsize = (panic_info->eph_panic_log_offset - sizeof(struct embedded_panic_header)) +
 	    panic_info->eph_panic_log_len + panic_info->eph_other_log_len;
-#else /* defined(__arm__) || defined(__arm64__) */
+#else                                             
 	if (panic_info->mph_panic_log_offset != 0) {
 		prior_debug_logsize = (panic_info->mph_panic_log_offset - sizeof(struct macos_panic_header)) +
 		    panic_info->mph_panic_log_len + panic_info->mph_other_log_len;
 	}
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 	assert(prior_debug_logsize <= debug_buf_size);
 
 	if ((kd_variant == KERN_DUMP_DISK) || (kd_variant == KERN_DUMP_STACKSHOT_DISK)) {
-		/* Open the file for output */
+		                              
 		if ((ret = (*outproc)(KDP_WRQ, NULL, 0, NULL)) != kIOReturnSuccess) {
 			kern_coredump_log(NULL, "outproc(KDP_WRQ, NULL, 0, NULL) returned 0x%x\n", ret);
 			dump_succeeded = FALSE;
@@ -1183,19 +1183,19 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 	}
 	output_opened = true;
 
-	/* Initialize gzip, output context */
+	                                     
 	bzero(&outvars, sizeof(outvars));
 	outvars.outproc = outproc;
 
 	if ((kd_variant == KERN_DUMP_DISK) || (kd_variant == KERN_DUMP_STACKSHOT_DISK)) {
 		outvars.zoutput     = kdp_core_zoutput;
 		reserved_debug_logsize = prior_debug_logsize + KERN_COREDUMP_MAXDEBUGLOGSIZE;
-		/* Space for file header, panic log, core log */
+		                                                
 		foffset = ((KERN_COREDUMP_HEADERSIZE + reserved_debug_logsize + (KERN_COREDUMP_BEGIN_FILEBYTES_ALIGN - 1)) \
 		    & ~(KERN_COREDUMP_BEGIN_FILEBYTES_ALIGN - 1));
 		kdp_core_header.log_offset = KERN_COREDUMP_HEADERSIZE;
 
-		/* Seek the calculated offset (we'll scrollback later to flush the logs and header) */
+		                                                                                      
 		if ((ret = (*outproc)(KDP_SEEK, NULL, sizeof(foffset), &foffset)) != kIOReturnSuccess) {
 			kern_coredump_log(NULL, "(do_kern_dump seek begin) outproc(KDP_SEEK, NULL, %lu, %p) foffset = 0x%llx returned 0x%x\n",
 			    sizeof(foffset), &foffset, foffset, ret);
@@ -1206,7 +1206,7 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 		assert((kdp_core_zoffset + kdp_crashdump_pkt_size) <= kdp_core_zsize);
 		outvars.zoutput = kdp_core_zoutputbuf;
 #if defined(__arm__) || defined(__arm64__)
-	} else { /* KERN_DUMP_HW_SHMEM_DBG */
+	} else {                             
 		outvars.zoutput = kdp_core_zoutput;
 		kern_dump_hw_shmem_dbg_reset();
 #endif
@@ -1249,15 +1249,15 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 #endif
 
 	if (kd_variant == KERN_DUMP_DISK) {
-		/*
-		 * Dump co-processors as well, foffset will be overwritten with the
-		 * offset of the next location in the file to be written to.
-		 */
+		  
+                                                                     
+                                                              
+     
 		if (kern_do_coredump(&outvars, FALSE, foffset, &foffset) != 0) {
 			dump_succeeded = FALSE;
 		}
 	} else if (kd_variant != KERN_DUMP_STACKSHOT_DISK) {
-		/* Only the kernel */
+		                     
 		if (kern_do_coredump(&outvars, TRUE, foffset, &foffset) != 0) {
 			dump_succeeded = FALSE;
 		}
@@ -1267,7 +1267,7 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 		assert(reserved_debug_logsize != 0);
 		size_t remaining_debug_logspace = reserved_debug_logsize;
 
-		/* Write the debug log -- first seek to the end of the corefile header */
+		                                                                         
 		foffset = KERN_COREDUMP_HEADERSIZE;
 		if ((ret = (*outproc)(KDP_SEEK, NULL, sizeof(foffset), &foffset)) != kIOReturnSuccess) {
 			kern_coredump_log(NULL, "(do_kern_dump seek logfile) outproc(KDP_SEEK, NULL, %lu, %p) foffset = 0x%llx returned 0x%x\n",
@@ -1276,7 +1276,7 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 			goto exit;
 		}
 
-		/* First flush the data from just the paniclog */
+		                                                 
 		size_t initial_log_length = 0;
 #if defined(__arm__) || defined(__arm64__)
 		initial_log_length = (panic_info->eph_panic_log_offset - sizeof(struct embedded_panic_header)) +
@@ -1298,15 +1298,15 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 
 		remaining_debug_logspace -= initial_log_length;
 
-		/* Next include any log data from after the stackshot (the beginning of the 'other' log). */
+		                                                                                            
 #if defined(__arm__) || defined(__arm64__)
 		buf = (char *)(((char *)panic_info) + (uintptr_t) panic_info->eph_other_log_offset);
 #else
-		/*
-		 * There may be no paniclog if we're doing a coredump after a call to Debugger() on x86 if debugger_is_panic was
-		 * configured to FALSE based on the boot-args. In that case just start from where the debug buffer was when
-		 * we began taking a coredump.
-		 */
+		  
+                                                                                                                  
+                                                                                                             
+                                
+     
 		if (panic_info->mph_other_log_offset != 0) {
 			buf = (char *)(((char *)panic_info) + (uintptr_t) panic_info->mph_other_log_offset);
 		} else {
@@ -1320,7 +1320,7 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 			other_log_length = remaining_debug_logspace;
 		}
 
-		/* Write the coredump log */
+		                            
 		if ((ret = (*outproc)(KDP_DATA, NULL, other_log_length, buf)) != kIOReturnSuccess) {
 			kern_coredump_log(NULL, "(do_kern_dump coredump log) outproc(KDP_DATA, NULL, %lu, %p) returned 0x%x\n",
 			    other_log_length, buf, ret);
@@ -1333,13 +1333,13 @@ do_kern_dump(kern_dump_output_proc outproc, enum kern_dump_type kd_variant)
 	}
 
 exit:
-	/* close / last packet */
+	                         
 	if (output_opened && (ret = (*outproc)(KDP_EOF, NULL, 0, ((void *) 0))) != kIOReturnSuccess) {
 		kern_coredump_log(NULL, "(do_kern_dump close) outproc(KDP_EOF, NULL, 0, 0) returned 0x%x\n", ret);
 		dump_succeeded = FALSE;
 	}
 
-	/* If applicable, update the panic header and flush it so we update the CRC */
+	                                                                              
 #if defined(__arm__) || defined(__arm64__)
 	panic_info->eph_panic_flags |= (dump_succeeded ? EMBEDDED_PANIC_HEADER_FLAG_COREDUMP_COMPLETE :
 	    EMBEDDED_PANIC_HEADER_FLAG_COREDUMP_FAILED);
@@ -1442,7 +1442,7 @@ panic_spin_shmcon(void)
 		}
 	}
 }
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 static void *
 kdp_core_zalloc(void * __unused ref, u_int items, u_int size)
@@ -1450,7 +1450,7 @@ kdp_core_zalloc(void * __unused ref, u_int items, u_int size)
 	void * result;
 
 	result = (void *) (kdp_core_zmem + kdp_core_zoffset);
-	kdp_core_zoffset += ~31L & (31 + (items * size)); // 32b align for vector crc
+	kdp_core_zoffset += ~31L & (31 + (items * size));                            
 	assert(kdp_core_zoffset <= kdp_core_zsize);
 
 	return result;
@@ -1481,7 +1481,7 @@ kdp_core_init(void)
 	vm_offset_t kdp_core_hw_shmem_buf = 0;
 	struct kdp_hw_shmem_dbg_buf_elm *cur_elm = NULL;
 	cache_info_t   *cpuid_cache_info = NULL;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 	kern_coredump_callback_config core_config = { };
 
 	if (kdp_core_zs.zalloc) {
@@ -1497,15 +1497,15 @@ kdp_core_init(void)
 	kdp_core_zs.zfree  = kdp_core_zfree;
 
 	if (deflateInit2(&kdp_core_zs, LEVEL, Z_DEFLATED,
-	    wbits + 16 /*gzip mode*/, memlevel, Z_DEFAULT_STRATEGY)) {
-		/* Allocation failed */
+	    wbits + 16              , memlevel, Z_DEFAULT_STRATEGY)) {
+		                       
 		bzero(&kdp_core_zs, sizeof(kdp_core_zs));
 		kdp_core_zoffset = 0;
 	}
 
 	bzero(&kdp_core_header, sizeof(kdp_core_header));
 
-	core_config.kcc_coredump_init = NULL; /* TODO: consider doing mmu flush from an init function */
+	core_config.kcc_coredump_init = NULL;                                                           
 	core_config.kcc_coredump_get_summary = kern_dump_save_summary;
 	core_config.kcc_coredump_save_segment_descriptions = kern_dump_save_seg_descriptions;
 	core_config.kcc_coredump_save_thread_state = kern_dump_save_thread_state;
@@ -1525,20 +1525,20 @@ kdp_core_init(void)
 		return;
 	}
 
-	/*
-	 * We need to allocate physically contiguous memory since astris isn't capable
-	 * of doing address translations while the CPUs are running.
-	 */
+	  
+                                                                               
+                                                             
+    
 	kdp_hw_shmem_dbg_bufsize = KDP_CORE_HW_SHMEM_DBG_TOTAL_BUF_SIZE;
 	kr = kmem_alloc_contig(kernel_map, &kdp_core_hw_shmem_buf,
 	    kdp_hw_shmem_dbg_bufsize, VM_MAP_PAGE_MASK(kernel_map),
 	    0, 0, KMA_KOBJECT, VM_KERN_MEMORY_DIAG);
 	assert(KERN_SUCCESS == kr);
 
-	/*
-	 * Put the connection info structure at the beginning of this buffer and adjust
-	 * the buffer size accordingly.
-	 */
+	  
+                                                                                
+                                
+    
 	hwsd_info = (struct xnu_hw_shmem_dbg_command_info *) kdp_core_hw_shmem_buf;
 	hwsd_info->xhsdci_status = XHSDCI_STATUS_NONE;
 	hwsd_info->xhsdci_seq_no = 0;
@@ -1552,11 +1552,11 @@ kdp_core_init(void)
 	assert(cpuid_cache_info != NULL);
 
 	kdp_core_hw_shmem_buf += sizeof(*hwsd_info);
-	/* Leave the handshake structure on its own cache line so buffer writes don't cause flushes of old handshake data */
+	                                                                                                                    
 	kdp_core_hw_shmem_buf = ROUNDUP(kdp_core_hw_shmem_buf, (uint64_t) cpuid_cache_info->c_linesz);
 	kdp_hw_shmem_dbg_bufsize -= (uint32_t) (kdp_core_hw_shmem_buf - (vm_offset_t) hwsd_info);
 	kdp_hw_shmem_dbg_bufsize /= KDP_CORE_HW_SHMEM_DBG_NUM_BUFFERS;
-	/* The buffer size should be a cache-line length multiple */
+	                                                            
 	kdp_hw_shmem_dbg_bufsize -= (kdp_hw_shmem_dbg_bufsize % ROUNDDOWN(OPTIMAL_ASTRIS_READSIZE, cpuid_cache_info->c_linesz));
 
 	STAILQ_INIT(&free_hw_shmem_dbg_bufs);
@@ -1579,7 +1579,7 @@ kdp_core_init(void)
 
 	PE_consistent_debug_register(kDbgIdAstrisConnection, kvtophys((vm_offset_t) hwsd_info), sizeof(pmap_paddr_t));
 	PE_consistent_debug_register(kDbgIdAstrisConnectionVers, CUR_XNU_HWSDCI_STRUCT_VERS, sizeof(uint32_t));
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 }
 
-#endif /* CONFIG_KDP_INTERACTIVE_DEBUGGING */
+#endif                                       

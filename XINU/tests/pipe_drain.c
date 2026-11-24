@@ -65,7 +65,7 @@ T_DECL(pipe_drain,
 	char buf[10] = "Hello";
 	pthread_t thread;
 
-	/* Install the signal handler for SIGPIPE */
+	                                            
 
 	struct sigaction sa = {
 		.sa_sigaction = signal_handler,

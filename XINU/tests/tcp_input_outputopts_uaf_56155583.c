@@ -13,7 +13,7 @@
 
 #include <darwintest.h>
 
-/* sizeof(struct ip6_pktopts) */
+                                
 #define SIZEOF_STRUCT_IP6_PKTOPTS 192
 
 static int finished = 0;
@@ -31,10 +31,10 @@ setopt_thread(void *data)
 	while (!finished) {
 		T_ASSERT_POSIX_SUCCESS(setsockopt(s, IPPROTO_IPV6, IPV6_2292PKTOPTIONS, optbuf, sizeof(optbuf)), NULL);
 
-		/* force an error to free: */
+		                             
 		T_ASSERT_EQ(setsockopt(s, IPPROTO_IPV6, IPV6_2292PKTOPTIONS, optbuf, 1), -1, NULL);
 
-		/* realloc: */
+		              
 		T_ASSERT_EQ(ioctl(-1, _IOW('x', 0, spraybuf), spraybuf), -1, NULL);
 	}
 

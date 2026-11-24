@@ -66,10 +66,10 @@ bitmap_reserve_root(logmem_t *lm, size_t block)
 	const size_t top_block = BLOCK_LEVEL_BASE(lm->lm_cap_order - lm->lm_max_order);
 
 	for (ssize_t next = BLOCK_PARENT(block); next >= top_block; next = BLOCK_PARENT(next)) {
-		/*
-		 * If the rest of the root path is already marked as
-		 * allocated we are done.
-		 */
+		  
+                                                      
+                           
+     
 		if (bitmap_get(lm, next)) {
 			break;
 		}
@@ -86,10 +86,10 @@ bitmap_release_root(logmem_t *lm, size_t block)
 	while (block > top_block) {
 		buddy_allocated = bitmap_get(lm, BLOCK_BUDDY(block));
 		block = BLOCK_PARENT(block);
-		/*
-		 * If there is another allocation within the parent subtree
-		 * in place we cannot mark the rest of the root path as free.
-		 */
+		  
+                                                             
+                                                               
+     
 		if (buddy_allocated) {
 			break;
 		}

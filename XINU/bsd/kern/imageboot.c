@@ -117,18 +117,18 @@ imageboot_desired(void)
 
 	char *root_path = NULL;
 	root_path = zalloc(ZV_NAMEI);
-	/*
-	 * Check for first layer DMG rooting.
-	 *
-	 * Note that here we are principally concerned with whether or not we
-	 * SHOULD try to imageboot, not whether or not we are going to be able to.
-	 *
-	 * If NONE of the boot-args are present, then assume that image-rooting
-	 * is not requested.
-	 *
-	 * [!! Note parens guard the entire logically OR'd set of statements, below. It validates
-	 * that NONE of the below-mentioned boot-args is present...!!]
-	 */
+	  
+                                      
+   
+                                                                      
+                                                                           
+   
+                                                                        
+                     
+   
+                                                                                          
+                                                               
+    
 	if (!(PE_parse_boot_argn("rp0", root_path, MAXPATHLEN) ||
 #if CONFIG_IMAGEBOOT_IMG4
 	    PE_parse_boot_argn("arp0", root_path, MAXPATHLEN) ||
@@ -136,16 +136,16 @@ imageboot_desired(void)
 	    PE_parse_boot_argn("rp", root_path, MAXPATHLEN) ||
 	    PE_parse_boot_argn(IMAGEBOOT_ROOT_ARG, root_path, MAXPATHLEN) ||
 	    PE_parse_boot_argn(IMAGEBOOT_AUTHROOT_ARG, root_path, MAXPATHLEN))) {
-		/* explicitly set to false */
+		                             
 		do_imageboot = false;
 	} else {
-		/* now sanity check the file-path format */
+		                                           
 		if (imageboot_format_is_valid(root_path)) {
 			DBG_TRACE("%s: Found %s\n", __FUNCTION__, root_path);
-			/* root_path looks good and we have one of the aforementioned bootargs */
+			                                                                         
 			do_imageboot = true;
 		} else {
-			/* explicitly set to false */
+			                             
 			do_imageboot = false;
 		}
 	}
@@ -169,13 +169,13 @@ imageboot_needed(void)
 	root_path = zalloc(ZV_NAMEI);
 	result = IMAGEBOOT_DMG;
 
-	/* Check for second layer */
+	                            
 	if (!(PE_parse_boot_argn("rp1", root_path, MAXPATHLEN) ||
 	    PE_parse_boot_argn(IMAGEBOOT_CONTAINER_ARG, root_path, MAXPATHLEN))) {
 		goto out;
 	}
 
-	/* Sanity-check second layer */
+	                               
 	if (imageboot_format_is_valid(root_path)) {
 		DBG_TRACE("%s: Found %s\n", __FUNCTION__, root_path);
 	} else {
@@ -193,15 +193,15 @@ out:
 extern bool IOBaseSystemARVRootHashAvailable(void);
 
 
-/*
- * Mounts new filesystem based on image path, and pivots it to the root.
- * The image to be mounted is located at image_path.
- * It will be mounted at mount_path.
- * The vfs_switch_root operation will be performed.
- * After the pivot, the outgoing root filesystem (the filesystem at root when
- * this function begins) will be at outgoing_root_path.  If `skip_signature_check` is true,
- * then ignore the chunklisted or authAPFS checks on this image
- */
+  
+                                                                        
+                                                    
+                                    
+                                                   
+                                                                             
+                                                                                           
+                                                               
+   
 __private_extern__ int
 imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char *mount_path,
     const char *outgoing_root_path, const bool rooted_dmg, const bool skip_signature_check)
@@ -216,29 +216,29 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 		panic("not supported");
 	}
 
-	/*
-	 * Check that the image file actually exists.
-	 * We also need to find the mount it's on, to mark it as backing the
-	 * root.
-	 */
+	  
+                                              
+                                                                     
+         
+    
 	vnode_t imagevp = NULLVP;
 	error = vnode_lookup(image_path, 0, &imagevp, vfs_context_kernel());
 	if (error) {
 		printf("%s: image file not found or couldn't be read: %d\n", __FUNCTION__, error);
-		/*
-		 * bail out here to short-circuit out of panic logic below.
-		 * Failure to find the pivot-image should not be a fatal condition (ENOENT)
-		 * since it may result in natural consequences (ergo, cannot unlock filevault prompt).
-		 */
+		  
+                                                             
+                                                                             
+                                                                                        
+     
 		return error;
 	}
 
-	/*
-	 * load the disk image and obtain its device.
-	 * di_root_image's name and the names of its arguments suggest it has
-	 * to be mounted at the root, but that's not actually needed.
-	 * We just need to obtain the device info.
-	 */
+	  
+                                              
+                                                                      
+                                                              
+                                           
+    
 
 	dev_t dev;
 	char devname[DEVMAXNAMESIZE];
@@ -258,29 +258,29 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 			printf("authenticated root-dmg via chunklist...\n");
 			authenticated_dmg_chunklist = true;
 		} else {
-			/* root hash was not available, and image is NOT chunklisted? */
+			                                                                
 			printf("failed to chunklist-authenticate root-dmg @ %s\n", image_path);
 		}
 	}
 #endif
 
-	char fulldevname[DEVMAXNAMESIZE + 5]; // "/dev/"
+	char fulldevname[DEVMAXNAMESIZE + 5];           
 	strlcpy(fulldevname, "/dev/", sizeof(fulldevname));
 	strlcat(fulldevname, devname, sizeof(fulldevname));
 
-	/*
-	 * mount expects another layer of indirection (because it expects to
-	 * be getting a user_addr_t of a char *.
-	 * Make a pointer-to-pointer on our stack. It won't use this
-	 * address after it returns so this should be safe.
-	 */
+	  
+                                                                     
+                                         
+                                                             
+                                                    
+    
 	char *fulldevnamep = &(fulldevname[0]);
 	char **fulldevnamepp = &fulldevnamep;
 
 #define PIVOTMNT "/System/Volumes/BaseSystem"
 
 
-	/* Attempt to mount as HFS; if it fails, then try as APFS */
+	                                                            
 	printf("%s: attempting to mount as hfs...\n", __FUNCTION__);
 	error = kernel_mount("hfs", NULLVP, NULLVP, PIVOTMNT, fulldevnamepp, 0, (MNT_RDONLY | MNT_DONTBROWSE), (KERNEL_MOUNT_NOAUTH | KERNEL_MOUNT_BASESYSTEMROOT), vfs_context_kernel());
 	if (error) {
@@ -289,17 +289,17 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 		error = kernel_mount("apfs", NULLVP, NULLVP, PIVOTMNT, fulldevnamepp, 0, (MNT_RDONLY | MNT_DONTBROWSE), (KERNEL_MOUNT_NOAUTH | KERNEL_MOUNT_BASESYSTEMROOT), vfs_context_kernel());
 	}
 
-	/* If we didn't mount as either HFS or APFS, then bail out */
+	                                                             
 	if (error) {
-		/*
-		 * Note that for this particular failure case (failure to mount), the disk image
-		 * being attached may have failed to quiesce within the alloted time out (20-30 sec).
-		 * For example, it may be still probing, or APFS container enumeration may have not
-		 * completed. If so, then we may have fallen into this particular error case. However,
-		 * failure to complete matching should be an exceptional case as 30 sec. is quite a
-		 * long time to wait for matching to complete (which would have occurred in
-		 * di_root_image_ext).
-		 */
+		  
+                                                                                  
+                                                                                       
+                                                                                     
+                                                                                        
+                                                                                     
+                                                                             
+                        
+     
 #if defined(__arm64__) && XNU_TARGET_OS_OSX
 		panic("%s: failed to mount pivot image(%d)!", __FUNCTION__, error);
 #endif
@@ -307,7 +307,7 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 		goto done;
 	}
 
-	/* otherwise, if the mount succeeded, then assert that the DMG is authenticated (either chunklist or authapfs) */
+	                                                                                                                 
 	error = vnode_lookup(PIVOTMNT, 0, &mount_vp, vfs_context_kernel());
 	if (error) {
 #if defined(__arm64__) && XNU_TARGET_OS_OSX
@@ -317,15 +317,15 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 		goto done;
 	}
 
-	/* the 0x1 implies base system */
+	                                 
 	rootauth = VNOP_IOCTL(mount_vp, FSIOC_KERNEL_ROOTAUTH, (caddr_t)0x1, 0, vfs_context_kernel());
 	if (rootauth) {
 		printf("BS-DMG failed to authenticate intra-FS \n");
-		/*
-		 * If we are using a custom rooted DMG, or if we have already authenticated
-		 * the DMG via chunklist, then it is permissible to use.
-		 * Or, if CSR_ALLOW_ANY_RECOVERY_OS is set on Development or Debug build variant.
-		 */
+		  
+                                                                             
+                                                          
+                                                                                   
+     
 		if (rooted_dmg || authenticated_dmg_chunklist || skip_signature_check) {
 			rootauth = 0;
 		}
@@ -335,12 +335,12 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 	mount_vp = NULLVP;
 
 	if (error) {
-		/*
-		 * Failure here exclusively means that the mount failed to authenticate.
-		 * This means that the disk image either was not sealed (authapfs), or it was
-		 * not hosted on a chunklisted DMG.  Both scenarios may be fatal depending
-		 * on the platform.
-		 */
+		  
+                                                                          
+                                                                               
+                                                                            
+                     
+     
 #if defined(__arm64__) && XNU_TARGET_OS_OSX
 		panic("%s: could not authenticate the pivot image: %d. giving up.\n", __FUNCTION__, error);
 #endif
@@ -354,23 +354,23 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 			rootvp_is_ssd = true;
 		}
 	}
-	/*
-	 * pivot the incoming and outgoing filesystems
-	 */
+	  
+                                               
+    
 	error = vfs_switch_root(mount_path, outgoing_root_path, 0);
 	if (error) {
 		panic("%s: vfs_switch_root failed: %d\n", __FUNCTION__, error);
 	}
 
-	/*
-	 * Mark the filesystem containing the image as backing root, so it
-	 * won't be unmountable.
-	 *
-	 * vfs_switch_root() clears this flag, so we have to set it after
-	 * the pivot call.
-	 * If the system later pivots out of the image, vfs_switch_root
-	 * will clear it again, so the backing filesystem can be unmounted.
-	 */
+	  
+                                                                   
+                         
+   
+                                                                  
+                   
+                                                                
+                                                                    
+    
 	mount_t imagemp = imagevp->v_mount;
 	lck_rw_lock_exclusive(&imagemp->mnt_rwlock);
 	imagemp->mnt_kern_flag |= MNTK_BACKS_ROOT;
@@ -378,14 +378,14 @@ imageboot_pivot_image(const char *image_path, imageboot_type_t type, const char 
 
 	error = 0;
 
-	/*
-	 * Note that we do NOT change kern.bootuuid here -
-	 * imageboot_mount_image() does, but imageboot_pivot_image() doesn't.
-	 * imageboot_mount_image() is used when the root volume uuid was
-	 * "always supposed to be" the one inside the dmg. imageboot_pivot_
-	 * image() is used when the true root volume just needs to be
-	 * obscured for a moment by the dmg.
-	 */
+	  
+                                                   
+                                                                      
+                                                                 
+                                                                    
+                                                              
+                                     
+    
 
 done:
 	if (imagevp != NULLVP) {
@@ -394,7 +394,7 @@ done:
 	return error;
 }
 
-/* kern_sysctl.c */
+                   
 extern uuid_string_t fake_bootuuid;
 
 static void
@@ -415,25 +415,25 @@ set_fake_bootuuid(mount_t mp)
 	uuid_unparse(va.f_uuid, fake_bootuuid);
 }
 
-/*
- * Swaps in new root filesystem based on image path.
- * Current root filesystem is removed from mount list and
- * tagged MNTK_BACKS_ROOT, MNT_ROOTFS is cleared on it, and
- * "rootvnode" is reset.  Root vnode of currentroot filesystem
- * is returned with usecount (no iocount).
- * kern.bootuuid is arranged to return the UUID of the mounted image. (If
- * we did nothing here, it would be the UUID of the image source volume.)
- */
+  
+                                                    
+                                                         
+                                                           
+                                                              
+                                          
+                                                                         
+                                                                         
+   
 __private_extern__ int
 imageboot_mount_image(const char *root_path, int height, imageboot_type_t type)
 {
 	dev_t           dev;
 	int             error;
-	/*
-	 * Need to stash this here since we may do a kernel_mount() on /, which will
-	 * automatically update the rootvnode global. Note that vfs_mountroot() does
-	 * not update that global, which is a bit weird.
-	 */
+	  
+                                                                             
+                                                                             
+                                                 
+    
 	vnode_t         old_rootvnode = rootvnode;
 	vnode_t         newdp;
 	mount_t         new_rootfs;
@@ -474,7 +474,7 @@ imageboot_mount_image(const char *root_path, int height, imageboot_type_t type)
 		}
 		kheap_free(KHEAP_TEMP, mntargs, sizeof(*mntargs));
 
-		/* Clear the old mount association. */
+		                                      
 		old_rootvnode->v_mountedhere = NULL;
 		rootvnode->v_mount->mnt_vnodecovered = NULL;
 	}
@@ -483,17 +483,17 @@ imageboot_mount_image(const char *root_path, int height, imageboot_type_t type)
 		panic("invalid imageboot type: %d", type);
 	}
 
-	/*
-	 * Get the vnode for '/'.
-	 * Set fdp->fd_fd.fd_cdir to reference it.
-	 */
+	  
+                          
+                                           
+    
 	if (VFS_ROOT(TAILQ_LAST(&mountlist, mntlist), &newdp, vfs_context_kernel())) {
 		panic("%s: cannot find root vnode", __FUNCTION__);
 	}
 	DBG_TRACE("%s: old root fsname: %s\n", __FUNCTION__, old_rootvnode->v_mount->mnt_vtable->vfc_name);
 
 	if (old_rootvnode != NULL) {
-		/* remember the old rootvnode, but remove it from mountlist */
+		                                                              
 		mount_t old_rootfs = old_rootvnode->v_mount;
 
 		mount_list_remove(old_rootfs);
@@ -507,7 +507,7 @@ imageboot_mount_image(const char *root_path, int height, imageboot_type_t type)
 	vnode_put(newdp);
 
 	lck_rw_lock_exclusive(&rootvnode_rw_lock);
-	/* switch to the new rootvnode */
+	                                 
 	if (update_rootvnode) {
 		rootvnode = newdp;
 		set_fake_bootuuid(rootvnode->v_mount);
@@ -533,15 +533,15 @@ imageboot_mount_image(const char *root_path, int height, imageboot_type_t type)
 #else
 #pragma unused(height)
 		vnode_get_and_drop_always(old_rootvnode);
-#endif /* CONFIG_IMGSRC_ACCESS */
+#endif                           
 	}
 	return 0;
 }
 
-/*
- * Return a memory object for given file path.
- * Also returns a vnode reference for the given file path.
- */
+  
+                                              
+                                                          
+   
 void *
 ubc_getobject_from_filename(const char *filename, struct vnode **vpp, off_t *file_size)
 {
@@ -620,7 +620,7 @@ imageboot_read_file_from_offset(kalloc_heap_t kheap, const char *path, off_t off
 	}
 	doclose = true;
 
-	/* if bufsz is non-zero, cap the read at bufsz bytes */
+	                                                       
 	if (*bufszp && *bufszp < (size_t)fsize) {
 		fsize = *bufszp;
 	}
@@ -639,7 +639,7 @@ imageboot_read_file_from_offset(kalloc_heap_t kheap, const char *path, off_t off
 	}
 
 	if (resid) {
-		/* didnt get everything we wanted */
+		                                    
 		AUTHPRNT("Short read of %d bytes at offset %d from %s - %d", (int)fsize, (int)offset, path, resid);
 		err = EINVAL;
 		goto out;
@@ -705,7 +705,7 @@ imgboot_get_image_file(const char *path, off_t *fsize, int *errp)
 	}
 	return vp;
 }
-#endif /* CONFIG_IMAGEBOOT_CHUNKLIST || CONFIG_IMAGEBOOT_CHUNKLIST */
+#endif                                                               
 
 #if CONFIG_IMAGEBOOT_IMG4
 
@@ -774,7 +774,7 @@ authenticate_root_with_img4(const char *rootpath)
 
 	vp = imgboot_get_image_file(rootpath, NULL, &rv);
 	if (vp == NULL) {
-		/* Error message had been printed already */
+		                                            
 		rv = EIO;
 		goto out_with_ticket_bytes;
 	}
@@ -798,13 +798,13 @@ out_with_ticket_path:
 	img4_firmware_destroy(&fw);
 	return rv;
 }
-#endif /* CONFIG_IMAGEBOOT_IMG4 */
+#endif                            
 
 
-/*
- * Attach the image at 'path' as a ramdisk and mount it as our new rootfs.
- * All existing mounts are first umounted.
- */
+  
+                                                                          
+                                          
+   
 static int
 imageboot_mount_ramdisk(const char *path)
 {
@@ -816,7 +816,7 @@ imageboot_mount_ramdisk(const char *path)
 	vnode_t tvp;
 	mount_t new_rootfs;
 
-	/* Read our target image from disk */
+	                                     
 	err = imageboot_read_file(KHEAP_DATA_BUFFERS, path, &buf, &bufsz);
 	if (err) {
 		printf("%s: failed: imageboot_read_file() = %d\n", __func__, err);
@@ -825,7 +825,7 @@ imageboot_mount_ramdisk(const char *path)
 	DBG_TRACE("%s: read '%s' sz = %lu\n", __func__, path, bufsz);
 
 #if CONFIG_IMGSRC_ACCESS
-	/* Re-add all root mounts to the mount list in the correct order... */
+	                                                                      
 	mount_list_remove(rootvnode->v_mount);
 	for (int i = 0; i < MAX_IMAGEBOOT_NESTING; i++) {
 		struct vnode *vn = imgsrc_rootvnodes[i];
@@ -846,7 +846,7 @@ imageboot_mount_ramdisk(const char *path)
 	mount_list_add(rootvnode->v_mount);
 #endif
 
-	/* ... and unmount everything */
+	                                
 	vfs_unmountall(FALSE);
 
 	lck_rw_lock_exclusive(&rootvnode_rw_lock);
@@ -858,14 +858,14 @@ imageboot_mount_ramdisk(const char *path)
 	lck_rw_unlock_exclusive(&rootvnode_rw_lock);
 	vnode_get_and_drop_always(tvp);
 
-	/* Attach the ramfs image ... */
+	                                
 	err = di_root_ramfile_buf(buf, bufsz, rootdevice, DEVMAXNAMESIZE, &dev);
 	if (err) {
 		printf("%s: failed: di_root_ramfile_buf() = %d\n", __func__, err);
 		goto out;
 	}
 
-	/* ... and mount it */
+	                      
 	rootdev = dev;
 	mountroot = NULL;
 	err = vfs_mountroot();
@@ -874,7 +874,7 @@ imageboot_mount_ramdisk(const char *path)
 		goto out;
 	}
 
-	/* Switch to new root vnode */
+	                              
 	if (VFS_ROOT(TAILQ_LAST(&mountlist, mntlist), &newdp, vfs_context_kernel())) {
 		panic("%s: cannot find root vnode", __func__);
 	}
@@ -904,12 +904,12 @@ out:
 	return err;
 }
 
-/*
- * If the path is in <file://> URL format then we allocate memory and decode it,
- * otherwise return the same pointer.
- *
- * Caller is expected to check if the pointers are different.
- */
+  
+                                                                                
+                                     
+  
+                                                             
+   
 static char *
 url_to_path(char *url_path, size_t *sz)
 {
@@ -917,12 +917,12 @@ url_to_path(char *url_path, size_t *sz)
 	size_t len = strlen(kIBFilePrefix);
 
 	if (strncmp(kIBFilePrefix, url_path, len) == 0) {
-		/* its a URL - remove the file:// prefix and percent-decode */
+		                                                              
 		url_path += len;
 
 		len = strlen(url_path);
 		if (len) {
-			/* Make a copy of the path to URL-decode */
+			                                           
 			path = kheap_alloc(KHEAP_TEMP, len + 1, Z_WAITOK);
 			if (path == NULL) {
 				panic("imageboot path allocation failed - cannot allocate %d bytes\n", (int)len);
@@ -962,10 +962,10 @@ imageboot_setup_new(imageboot_type_t type)
 
 		DBG_TRACE("%s: root fsname: %s\n", __FUNCTION__, rootvnode->v_mount->mnt_vtable->vfc_name);
 
-		/*
-		 * The locker path is a path, not a URL, so just pass it directly to
-		 * imageboot_mount_image().
-		 */
+		  
+                                                                      
+                             
+     
 		error = imageboot_mount_image(root_path, 0, type);
 		if (error) {
 			panic("failed to mount system locker: %d", error);
@@ -974,7 +974,7 @@ imageboot_setup_new(imageboot_type_t type)
 		done = TRUE;
 		goto out;
 	}
-#endif /* CONFIG_LOCKERBOOT */
+#endif                        
 
 	unsigned imgboot_arg;
 	if (PE_parse_boot_argn("-rootdmg-ramdisk", &imgboot_arg, sizeof(imgboot_arg))) {
@@ -1001,18 +1001,18 @@ imageboot_setup_new(imageboot_type_t type)
 
 	printf("%s: root image URL is '%s'\n", __func__, root_path);
 
-	/* Make a copy of the path to URL-decode */
+	                                           
 	size_t pathsz;
 	char *path = url_to_path(root_path, &pathsz);
 	assert(path);
 
 #if CONFIG_IMAGEBOOT_CHUNKLIST
 	if (auth_root) {
-		/*
-		 * This updates auth_root to reflect whether chunklist was
-		 * actually enforced. In effect, this clears auth_root if
-		 * CSR_ALLOW_ANY_RECOVERY_OS allowed an invalid image.
-		 */
+		  
+                                                            
+                                                           
+                                                        
+     
 		AUTHDBG("authenticating root image at %s", path);
 		error = authenticate_root_with_chunklist(path, &auth_root);
 		if (error) {
@@ -1039,7 +1039,7 @@ imageboot_setup_new(imageboot_type_t type)
 
 #if CONFIG_IMAGEBOOT_CHUNKLIST
 	if (auth_root) {
-		/* check that the image version matches the running kernel */
+		                                                             
 		AUTHDBG("checking root image version");
 		error = authenticate_root_version_check();
 		if (error) {
@@ -1069,14 +1069,14 @@ imageboot_setup(imageboot_type_t type)
 		panic("imageboot_setup: rootvnode is NULL.");
 	}
 
-	/*
-	 * New boot-arg scheme:
-	 *      root-dmg : the dmg that will be the root filesystem, authenticated by default.
-	 *      auth-root-dmg : same as root-dmg.
-	 *      container-dmg : an optional dmg that contains the root-dmg.
-	 *  locker : the locker that will be the root filesystem -- mutually
-	 *           exclusive with any other boot-arg.
-	 */
+	  
+                        
+                                                                                       
+                                          
+                                                                    
+                                                                     
+                                                
+    
 	if (imageboot_setup_new(type)) {
 		return;
 	}
@@ -1084,13 +1084,13 @@ imageboot_setup(imageboot_type_t type)
 	root_path = zalloc(ZV_NAMEI);
 	assert(root_path != NULL);
 
-	/*
-	 * Look for outermost disk image to root from.  If we're doing a nested boot,
-	 * there's some sense in which the outer image never needs to be the root filesystem,
-	 * but it does need very similar treatment: it must not be unmounted, needs a fake
-	 * device vnode created for it, and should not show up in getfsstat() until exposed
-	 * with MNT_IMGSRC. We just make it the temporary root.
-	 */
+	  
+                                                                              
+                                                                                      
+                                                                                   
+                                                                                    
+                                                        
+    
 #if CONFIG_IMAGEBOOT_IMG4
 	if (PE_parse_boot_argn("arp0", root_path, MAXPATHLEN)) {
 		size_t pathsz;
@@ -1105,7 +1105,7 @@ imageboot_setup(imageboot_type_t type)
 			kheap_free_safe(KHEAP_TEMP, path, pathsz);
 		}
 	} else
-#endif /* CONFIG_IMAGEBOOT_IMG4 */
+#endif                            
 	if ((PE_parse_boot_argn("rp", root_path, MAXPATHLEN) == FALSE) &&
 	    (PE_parse_boot_argn("rp0", root_path, MAXPATHLEN) == FALSE)) {
 		panic("%s: no valid path to image.\n", __FUNCTION__);
@@ -1118,19 +1118,19 @@ imageboot_setup(imageboot_type_t type)
 		panic("Failed on first stage of imageboot.");
 	}
 
-	/*
-	 * See if we are rooting from a nested image
-	 */
+	  
+                                             
+    
 	if (PE_parse_boot_argn("rp1", root_path, MAXPATHLEN) == FALSE) {
 		goto done;
 	}
 
 	printf("%s: second level root image url is %s\n", __FUNCTION__, root_path);
 
-	/*
-	 * If we fail to set up second image, it's not a given that we
-	 * can safely root off the first.
-	 */
+	  
+                                                               
+                                  
+    
 	error = imageboot_mount_image(root_path, 1, type);
 	if (error) {
 		panic("Failed on second stage of imageboot.");

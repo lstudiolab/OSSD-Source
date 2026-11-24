@@ -36,7 +36,7 @@
 #ifndef _IOKIT_IOSERVICEPRIVATE_H
 #define _IOKIT_IOSERVICEPRIVATE_H
 
-// options for getExistingServices()
+                                    
 enum {
 	kIONotifyOnce             = 0x00000001,
 	kIOServiceExistingSet     = 0x00000002,
@@ -45,7 +45,7 @@ enum {
 	kIOServiceClassDone       = 0x00000010,
 };
 
-// masks for __state[1]
+                       
 enum {
 	kIOServiceBusyStateMask     = 0x000003ff,
 	kIOServiceBusyMax           = 1023,
@@ -68,7 +68,7 @@ enum {
 	kIOServiceFinalized         = 0x00010000,
 };
 
-// notify state
+               
 enum {
 	kIOServiceNotifyEnable      = 0x00000001,
 	kIOServiceNotifyWaiter      = 0x00000002,
@@ -245,4 +245,4 @@ extern const OSSymbol * gIOConsoleSessionSecureInputPIDKey;
 #define sizeofAllIOInterruptSource          \
     (sizeof(IOInterruptSourcePrivate) + sizeof(IOInterruptSource))
 
-#endif /* ! _IOKIT_IOSERVICEPRIVATE_H */
+#endif                                  

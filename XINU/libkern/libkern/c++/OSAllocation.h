@@ -32,7 +32,7 @@
 #include <libkern/c++/OSBoundedPtr.h>
 #include <libkern/c++/safe_allocation.h>
 #include <stddef.h>
-#include <IOKit/IOLib.h> // IOMalloc/IOFree
+#include <IOKit/IOLib.h>                   
 #include <kern/debug.h>
 
 namespace os_detail {
@@ -49,7 +49,7 @@ struct IOKit_allocator {
 		IOFree(p, bytes);
 	}
 };
-} // end namespace os_detail
+}                           
 
 template <typename T>
 using OSAllocation = libkern::safe_allocation<T, os_detail::IOKit_allocator, os_detail::panic_trapping_policy>;
@@ -57,4 +57,4 @@ using OSAllocation = libkern::safe_allocation<T, os_detail::IOKit_allocator, os_
 inline constexpr auto OSAllocateMemory = libkern::allocate_memory;
 inline constexpr auto OSAdoptMemory = libkern::adopt_memory;
 
-#endif /* !XNU_LIBKERN_LIBKERN_CXX_OS_ALLOCATION_H */
+#endif                                               

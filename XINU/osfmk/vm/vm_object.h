@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm_object.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Virtual memory object module definitions.
- */
+  
+   
+  
+                    
+                                                    
+             
+  
+                                            
+   
 
 #ifndef _VM_VM_OBJECT_H_
 #define _VM_VM_OBJECT_H_
@@ -101,16 +101,16 @@ extern btlog_t *vm_object_tracking_btlog;
 #define VM_OBJECT_TRACKING_OP_CREATED   1
 #define VM_OBJECT_TRACKING_OP_MODIFIED  2
 #define VM_OBJECT_TRACKING_OP_TRUESHARE 3
-#endif /* VM_OBJECT_TRACKING */
+#endif                         
 
 struct vm_page;
 
-/*
- *	Types defined:
- *
- *	vm_object_t		Virtual memory object.
- *	vm_object_fault_info_t	Used to determine cluster size.
- */
+  
+                 
+  
+                                      
+                                                         
+   
 
 struct vm_object_fault_info {
 	int             interruptible;
@@ -120,15 +120,15 @@ struct vm_object_fault_info {
 	vm_object_offset_t lo_offset;
 	vm_object_offset_t hi_offset;
 	unsigned int
-	/* boolean_t */ no_cache:1,
-	/* boolean_t */ stealth:1,
-	/* boolean_t */ io_sync:1,
-	/* boolean_t */ cs_bypass:1,
-	/* boolean_t */ pmap_cs_associated:1,
-	/* boolean_t */ mark_zf_absent:1,
-	/* boolean_t */ batch_pmap_op:1,
-	/* boolean_t */ resilient_media:1,
-	/* boolean_t */ no_copy_on_read:1,
+	                no_cache:1,
+	                stealth:1,
+	                io_sync:1,
+	                cs_bypass:1,
+	                pmap_cs_associated:1,
+	                mark_zf_absent:1,
+	                batch_pmap_op:1,
+	                resilient_media:1,
+	                no_copy_on_read:1,
 	    __vm_object_fault_info_unused_bits:23;
 	int             pmap_options;
 };
@@ -141,206 +141,206 @@ struct vm_object_fault_info {
 #define vo_owner                        vo_un2.vou_owner
 
 struct vm_object {
-	/*
-	 * on 64 bit systems we pack the pointers hung off the memq.
-	 * those pointers have to be able to point back to the memq.
-	 * the packed pointers are required to be on a 64 byte boundary
-	 * which means 2 things for the vm_object...  (1) the memq
-	 * struct has to be the first element of the structure so that
-	 * we can control it's alignment... (2) the vm_object must be
-	 * aligned on a 64 byte boundary... for static vm_object's
-	 * this is accomplished via the 'aligned' attribute... for
-	 * vm_object's in the zone pool, this is accomplished by
-	 * rounding the size of the vm_object element to the nearest
-	 * 64 byte size before creating the zone.
-	 */
-	vm_page_queue_head_t    memq;           /* Resident memory - must be first */
-	lck_rw_t                Lock;           /* Synchronization */
+	  
+                                                             
+                                                             
+                                                                
+                                                           
+                                                               
+                                                              
+                                                           
+                                                           
+                                                         
+                                                             
+                                          
+    
+	vm_page_queue_head_t    memq;                                                
+	lck_rw_t                Lock;                                
 
 #if DEVELOPMENT || DEBUG
 	thread_t                Lock_owner;
 #endif
 	union {
-		vm_object_size_t  vou_size;     /* Object size (only valid if internal) */
-		int               vou_cache_pages_to_scan;      /* pages yet to be visited in an
-		                                                 * external object in cache
-		                                                 */
+		vm_object_size_t  vou_size;                                               
+		int               vou_cache_pages_to_scan;                                      
+                                                                             
+                                                     
 	} vo_un1;
 
 	struct vm_page          *memq_hint;
-	int                     ref_count;      /* Number of references */
+	int                     ref_count;                                
 	unsigned int            resident_page_count;
-	/* number of resident pages */
-	unsigned int            wired_page_count; /* number of wired pages
-	                                           *  use VM_OBJECT_WIRED_PAGE_UPDATE macros to update */
+	                              
+	unsigned int            wired_page_count;                         
+                                                                                                  
 	unsigned int            reusable_page_count;
 
-	struct vm_object        *copy;          /* Object that should receive
-	                                         * a copy of my changed pages,
-	                                         * for copy_delay, or just the
-	                                         * temporary object that
-	                                         * shadows this object, for
-	                                         * copy_call.
-	                                         */
-	struct vm_object        *shadow;        /* My shadow */
-	memory_object_t         pager;          /* Where to get data */
+	struct vm_object        *copy;                                       
+                                                                       
+                                                                       
+                                                                 
+                                                                    
+                                                      
+                                            
+	struct vm_object        *shadow;                       
+	memory_object_t         pager;                                 
 
 	union {
-		vm_object_offset_t vou_shadow_offset;   /* Offset into shadow */
-		clock_sec_t     vou_cache_ts;   /* age of an external object
-		                                 * present in cache
-		                                 */
-		task_t          vou_owner;      /* If the object is purgeable
-		                                 * or has a "ledger_tag", this
-		                                 * is the task that owns it.
-		                                 */
+		vm_object_offset_t vou_shadow_offset;                           
+		clock_sec_t     vou_cache_ts;                               
+                                                     
+                                     
+		task_t          vou_owner;                                   
+                                                                
+                                                              
+                                     
 	} vo_un2;
 
-	vm_object_offset_t      paging_offset;  /* Offset into memory object */
-	memory_object_control_t pager_control;  /* Where data comes back */
+	vm_object_offset_t      paging_offset;                                 
+	memory_object_control_t pager_control;                             
 
 	memory_object_copy_strategy_t
-	    copy_strategy;                      /* How to handle data copy */
+	    copy_strategy;                                                   
 
 #if __LP64__
-	/*
-	 * Some user processes (mostly VirtualMachine software) take a large
-	 * number of UPLs (via IOMemoryDescriptors) to wire pages in large
-	 * VM objects and overflow the 16-bit "activity_in_progress" counter.
-	 * Since we never enforced any limit there, let's give them 32 bits
-	 * for backwards compatibility's sake.
-	 */
+	  
+                                                                     
+                                                                   
+                                                                      
+                                                                    
+                                       
+    
 	unsigned int            paging_in_progress:16,
 	    __object1_unused_bits:16;
 	unsigned int            activity_in_progress;
-#else /* __LP64__ */
-	/*
-	 * On 32-bit platforms, enlarging "activity_in_progress" would increase
-	 * the size of "struct vm_object".  Since we don't know of any actual
-	 * overflow of these counters on these platforms, let's keep the
-	 * counters as 16-bit integers.
-	 */
+#else               
+	  
+                                                                        
+                                                                      
+                                                                 
+                                
+    
 	unsigned short          paging_in_progress;
 	unsigned short          activity_in_progress;
-#endif /* __LP64__ */
-	/* The memory object ports are
-	 * being used (e.g., for pagein
-	 * or pageout) -- don't change
-	 * any of these fields (i.e.,
-	 * don't collapse, destroy or
-	 * terminate)
-	 */
+#endif               
+	                              
+                                
+                               
+                              
+                              
+              
+    
 
 	unsigned int
-	/* boolean_t array */ all_wanted:11,    /* Bit array of "want to be
-	                                         * awakened" notations.  See
-	                                         * VM_OBJECT_EVENT_* items
-	                                         * below */
-	/* boolean_t */ pager_created:1,        /* Has pager been created? */
-	/* boolean_t */ pager_initialized:1,    /* Are fields ready to use? */
-	/* boolean_t */ pager_ready:1,          /* Will pager take requests? */
+	                      all_wanted:11,                               
+                                                                     
+                                                                   
+                                                    
+	                pager_created:1,                                     
+	                pager_initialized:1,                                  
+	                pager_ready:1,                                         
 
-	/* boolean_t */ pager_trusted:1,        /* The pager for this object
-	                                         * is trusted. This is true for
-	                                         * all internal objects (backed
-	                                         * by the default pager)
-	                                         */
-	/* boolean_t */ can_persist:1,          /* The kernel may keep the data
-	                                         * for this object (and rights
-	                                         * to the memory object) after
-	                                         * all address map references
-	                                         * are deallocated?
-	                                         */
-	/* boolean_t */ internal:1,             /* Created by the kernel (and
-	                                         * therefore, managed by the
-	                                         * default memory manger)
-	                                         */
-	/* boolean_t */ private:1,              /* magic device_pager object,
-	                                        * holds private pages only */
-	/* boolean_t */ pageout:1,              /* pageout object. contains
-	                                         * private pages that refer to
-	                                         * a real memory object. */
-	/* boolean_t */ alive:1,                /* Not yet terminated */
+	                pager_trusted:1,                                    
+                                                                        
+                                                                        
+                                                                 
+                                            
+	                can_persist:1,                                         
+                                                                       
+                                                                       
+                                                                      
+                                                            
+                                            
+	                internal:1,                                          
+                                                                     
+                                                                  
+                                            
+	                private:1,                                           
+                                                                      
+	                pageout:1,                                         
+                                                                       
+                                                                    
+	                alive:1,                                        
 
-	/* boolean_t */ purgable:2,             /* Purgable state.  See
-	                                         * VM_PURGABLE_*
-	                                         */
-	/* boolean_t */ purgeable_only_by_kernel:1,
-	/* boolean_t */ purgeable_when_ripe:1,         /* Purgeable when a token
-	                                                * becomes ripe.
-	                                                */
-	/* boolean_t */ shadowed:1,             /* Shadow may exist */
-	/* boolean_t */ true_share:1,
-	/* This object is mapped
-	 * in more than one place
-	 * and hence cannot be
-	 * coalesced */
-	/* boolean_t */ terminating:1,
-	/* Allows vm_object_lookup
-	 * and vm_object_deallocate
-	 * to special case their
-	 * behavior when they are
-	 * called as a result of
-	 * page cleaning during
-	 * object termination
-	 */
-	/* boolean_t */ named:1,                /* An enforces an internal
-	                                         * naming convention, by
-	                                         * calling the right routines
-	                                         * for allocation and
-	                                         * destruction, UBC references
-	                                         * against the vm_object are
-	                                         * checked.
-	                                         */
-	/* boolean_t */ shadow_severed:1,
-	/* When a permanent object
-	 * backing a COW goes away
-	 * unexpectedly.  This bit
-	 * allows vm_fault to return
-	 * an error rather than a
-	 * zero filled page.
-	 */
-	/* boolean_t */ phys_contiguous:1,
-	/* Memory is wired and
-	 * guaranteed physically
-	 * contiguous.  However
-	 * it is not device memory
-	 * and obeys normal virtual
-	 * memory rules w.r.t pmap
-	 * access bits.
-	 */
-	/* boolean_t */ nophyscache:1,
-	/* When mapped at the
-	 * pmap level, don't allow
-	 * primary caching. (for
-	 * I/O)
-	 */
-	/* boolean_t */ _object5_unused_bits:1;
+	                purgable:2,                                    
+                                                         
+                                            
+	                purgeable_only_by_kernel:1,
+	                purgeable_when_ripe:1,                                  
+                                                                
+                                                   
+	                shadowed:1,                                   
+	                true_share:1,
+	                        
+                          
+                       
+                
+	                terminating:1,
+	                          
+                            
+                         
+                          
+                         
+                        
+                      
+    
+	                named:1,                                          
+                                                                 
+                                                                      
+                                                              
+                                                                       
+                                                                     
+                                                    
+                                            
+	                shadow_severed:1,
+	                          
+                           
+                           
+                             
+                          
+                     
+    
+	                phys_contiguous:1,
+	                      
+                         
+                        
+                           
+                            
+                           
+                
+    
+	                nophyscache:1,
+	                     
+                           
+                         
+        
+    
+	                _object5_unused_bits:1;
 
-	queue_chain_t           cached_list;    /* Attachment point for the
-	                                         * list of objects cached as a
-	                                         * result of their can_persist
-	                                         * value
-	                                         */
-	/*
-	 * the following fields are not protected by any locks
-	 * they are updated via atomic compare and swap
-	 */
-	vm_object_offset_t      last_alloc;     /* last allocation offset */
-	vm_offset_t             cow_hint;       /* last page present in     */
-	                                        /* shadow but not in object */
-	int                     sequential;     /* sequential access size */
+	queue_chain_t           cached_list;                               
+                                                                       
+                                                                       
+                                                 
+                                            
+	  
+                                                       
+                                                
+    
+	vm_object_offset_t      last_alloc;                                 
+	vm_offset_t             cow_hint;                                     
+	                                                                      
+	int                     sequential;                                 
 
 	uint32_t                pages_created;
 	uint32_t                pages_used;
-	/* hold object lock when altering */
+	                                    
 	unsigned        int
-	    wimg_bits:8,                /* cache WIMG bits         */
-	    code_signed:1,              /* pages are signed and should be
-	                                 *  validated; the signatures are stored
-	                                 *  with the pager */
-	    transposed:1,               /* object was transposed with another */
-	    mapping_in_progress:1,      /* pager being mapped/unmapped */
+	    wimg_bits:8,                                             
+	    code_signed:1,                                               
+                                                                         
+                                                      
+	    transposed:1,                                                       
+	    mapping_in_progress:1,                                       
 	    phantom_isssd:1,
 	    volatile_empty:1,
 	    volatile_fault:1,
@@ -351,25 +351,25 @@ struct vm_object {
 	    purgeable_queue_type:2,
 	    purgeable_queue_group:3,
 	    io_tracking:1,
-	    no_tag_update:1,            /*  */
+	    no_tag_update:1,                  
 #if CONFIG_SECLUDED_MEMORY
 	    eligible_for_secluded:1,
 	    can_grab_secluded:1,
-#else /* CONFIG_SECLUDED_MEMORY */
+#else                             
 	__object3_unused_bits:2,
-#endif /* CONFIG_SECLUDED_MEMORY */
+#endif                             
 #if VM_OBJECT_ACCESS_TRACKING
 	    access_tracking:1,
-#else /* VM_OBJECT_ACCESS_TRACKING */
+#else                                
 	__unused_access_tracking:1,
-#endif /* VM_OBJECT_ACCESS_TRACKING */
+#endif                                
 	vo_ledger_tag:3,
 	    vo_no_footprint:1;
 
 #if VM_OBJECT_ACCESS_TRACKING
 	uint32_t        access_tracking_reads;
 	uint32_t        access_tracking_writes;
-#endif /* VM_OBJECT_ACCESS_TRACKING */
+#endif                                
 
 	uint8_t                 scan_collisions;
 	uint8_t                 __object4_unused_bits[1];
@@ -379,33 +379,33 @@ struct vm_object {
 	uint32_t                phantom_object_id;
 #endif
 #if CONFIG_IOSCHED || UPL_DEBUG
-	queue_head_t            uplq;           /* List of outstanding upls */
+	queue_head_t            uplq;                                         
 #endif
 
 #ifdef  VM_PIP_DEBUG
-/*
- * Keep track of the stack traces for the first holders
- * of a "paging_in_progress" reference for this VM object.
- */
-#define VM_PIP_DEBUG_STACK_FRAMES       25      /* depth of each stack trace */
-#define VM_PIP_DEBUG_MAX_REFS           10      /* track that many references */
+  
+                                                       
+                                                          
+   
+#define VM_PIP_DEBUG_STACK_FRAMES       25                                     
+#define VM_PIP_DEBUG_MAX_REFS           10                                      
 	struct __pip_backtrace {
 		void *pip_retaddr[VM_PIP_DEBUG_STACK_FRAMES];
 	} pip_holders[VM_PIP_DEBUG_MAX_REFS];
-#endif  /* VM_PIP_DEBUG  */
+#endif                     
 
-	queue_chain_t           objq;      /* object queue - currently used for purgable queues */
-	queue_chain_t           task_objq; /* objects owned by task - protected by task lock */
+	queue_chain_t           objq;                                                             
+	queue_chain_t           task_objq;                                                     
 
 #if !VM_TAG_ACTIVE_UPDATE
 	queue_chain_t           wired_objq;
-#endif /* !VM_TAG_ACTIVE_UPDATE */
+#endif                            
 
 #if DEBUG
 	void *purgeable_owner_bt[16];
-	task_t vo_purgeable_volatilizer; /* who made it volatile? */
+	task_t vo_purgeable_volatilizer;                            
 	void *purgeable_volatilizer_bt[16];
-#endif /* DEBUG */
+#endif            
 };
 
 #define VM_OBJECT_PURGEABLE_FAULT_ERROR(object)                         \
@@ -420,20 +420,20 @@ extern void vm_object_access_tracking(vm_object_t object,
     int *access_tracking,
     uint32_t *access_tracking_reads,
     uint32_t *acess_tracking_writes);
-#endif /* VM_OBJECT_ACCESS_TRACKING */
+#endif                                
 
 extern
-vm_object_t     kernel_object;          /* the single kernel object */
+vm_object_t     kernel_object;                                        
 
 extern
-vm_object_t     compressor_object;      /* the single compressor object */
+vm_object_t     compressor_object;                                        
 
 extern
-vm_object_t     retired_pages_object;   /* holds VM pages which should never be used */
+vm_object_t     retired_pages_object;                                                  
 
 extern
-unsigned int    vm_object_absent_max;   /* maximum number of absent pages
-                                         *  at a time for each object */
+unsigned int    vm_object_absent_max;                                    
+                                                                        
 
 # define        VM_MSYNC_INITIALIZED                    0
 # define        VM_MSYNC_SYNCHRONIZING                  1
@@ -450,7 +450,7 @@ extern lck_attr_t               vm_map_lck_attr;
 #if VM_TAG_ACTIVE_UPDATE
 #define VM_OBJECT_WIRED_ENQUEUE(object) panic("VM_OBJECT_WIRED_ENQUEUE")
 #define VM_OBJECT_WIRED_DEQUEUE(object) panic("VM_OBJECT_WIRED_DEQUEUE")
-#else /* VM_TAG_ACTIVE_UPDATE */
+#else                           
 #define VM_OBJECT_WIRED_ENQUEUE(object)                                 \
 	MACRO_BEGIN                                                     \
 	lck_spin_lock_grp(&vm_objects_wired_lock, &vm_page_lck_grp_bucket);                          \
@@ -469,7 +469,7 @@ extern lck_attr_t               vm_map_lck_attr;
 	        lck_spin_unlock(&vm_objects_wired_lock);                \
 	}                                                               \
 	MACRO_END
-#endif /* VM_TAG_ACTIVE_UPDATE */
+#endif                           
 
 #define VM_OBJECT_WIRED(object, tag)                                    \
     MACRO_BEGIN                                                         \
@@ -492,7 +492,7 @@ extern lck_attr_t               vm_map_lck_attr;
     }                                                                                   \
     MACRO_END
 
-// These two macros start & end a C block
+                                         
 #define VM_OBJECT_WIRED_PAGE_UPDATE_START(object)                                       \
     MACRO_BEGIN                                                                         \
     {                                                                                   \
@@ -555,9 +555,9 @@ extern boolean_t        vm_object_lock_try_shared(vm_object_t);
 extern void             vm_object_unlock(vm_object_t);
 extern boolean_t        vm_object_lock_upgrade(vm_object_t);
 
-/*
- *	Object locking macros
- */
+  
+                        
+   
 
 #define vm_object_lock_init(object)                                     \
 	lck_rw_init(&(object)->Lock, &vm_object_lck_grp,                \
@@ -571,11 +571,11 @@ extern boolean_t        vm_object_lock_upgrade(vm_object_t);
 
 #define vm_object_lock_try_scan(object) _vm_object_lock_try(object)
 
-/*
- * CAUTION: the following vm_object_lock_assert_held*() macros merely
- * check if anyone is holding the lock, but the holder may not necessarily
- * be the caller...
- */
+  
+                                                                     
+                                                                          
+                   
+   
 #if MACH_ASSERT || DEBUG
 #define vm_object_lock_assert_held(object) \
 	lck_rw_assert(&(object)->Lock, LCK_RW_ASSERT_HELD)
@@ -585,17 +585,17 @@ extern boolean_t        vm_object_lock_upgrade(vm_object_t);
 	lck_rw_assert(&(object)->Lock, LCK_RW_ASSERT_EXCLUSIVE)
 #define vm_object_lock_assert_notheld(object) \
 	lck_rw_assert(&(object)->Lock, LCK_RW_ASSERT_NOTHELD)
-#else  /* MACH_ASSERT || DEBUG */
+#else                            
 #define vm_object_lock_assert_held(object)
 #define vm_object_lock_assert_shared(object)
 #define vm_object_lock_assert_exclusive(object)
 #define vm_object_lock_assert_notheld(object)
-#endif /* MACH_ASSERT || DEBUG */
+#endif                           
 
 
-/*
- *	Declare procedures that operate on VM objects.
- */
+  
+                                                 
+   
 
 __private_extern__ void         vm_object_bootstrap(void);
 
@@ -641,7 +641,7 @@ MACRO_BEGIN                                             \
 	}                                               \
 MACRO_END
 
-#endif  /* MACH_ASSERT */
+#endif                   
 
 __private_extern__ void         vm_object_deallocate(
 	vm_object_t     object);
@@ -681,7 +681,7 @@ __private_extern__ void         vm_object_deactivate_pages(
 	boolean_t               kill_page,
 	boolean_t               reusable_page,
 	struct pmap             *pmap,
-/* XXX TODO4K: need pmap_page_size here too? */
+                                               
 	vm_map_offset_t         pmap_offset);
 
 __private_extern__ void vm_object_reuse_pages(
@@ -876,7 +876,7 @@ __private_extern__ void
 vm_object_compressed_freezer_done(
 	void);
 
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 __private_extern__ void
 vm_object_pageout(
@@ -895,9 +895,9 @@ typedef struct io_reprioritize_req *io_reprioritize_req_t;
 extern void vm_io_reprioritize_init(void);
 #endif
 
-/*
- *	Event waiting handling
- */
+  
+                         
+   
 
 #define VM_OBJECT_EVENT_INITIALIZED             0
 #define VM_OBJECT_EVENT_PAGER_READY             1
@@ -910,7 +910,7 @@ extern void vm_io_reprioritize_init(void);
 #define VM_OBJECT_EVENT_UNBLOCKED               8
 #define VM_OBJECT_EVENT_PAGING_ONLY_IN_PROGRESS 9
 
-#define VM_OBJECT_EVENT_MAX 10 /* 11 bits in "all_wanted", so 0->10 */
+#define VM_OBJECT_EVENT_MAX 10                                        
 
 static __inline__ wait_result_t
 vm_object_assert_wait(
@@ -1021,9 +1021,9 @@ vm_object_wanted(
 	return object->all_wanted & (1 << event);
 }
 
-/*
- *	Routines implemented as macros
- */
+  
+                                 
+   
 #ifdef VM_PIP_DEBUG
 #include <libkern/OSDebug.h>
 #define VM_PIP_DEBUG_BEGIN(object)                                      \
@@ -1035,9 +1035,9 @@ vm_object_wanted(
 	                           VM_PIP_DEBUG_STACK_FRAMES);          \
 	}                                                               \
 	MACRO_END
-#else   /* VM_PIP_DEBUG */
+#else                     
 #define VM_PIP_DEBUG_BEGIN(object)
-#endif  /* VM_PIP_DEBUG */
+#endif                    
 
 #define         vm_object_activity_begin(object)                        \
 	MACRO_BEGIN                                                     \
@@ -1099,8 +1099,8 @@ vm_object_wanted(
 	                        VM_OBJECT_EVENT_PAGING_IN_PROGRESS,     \
 	                        (interruptible));                       \
                                                                         \
-	/*XXX if ((interruptible) && (_wr != THREAD_AWAKENED))*/ \
-	/*XXX break; */                                 \
+	                                                         \
+	                                                \
 	}                                                               \
 	MACRO_END
 
@@ -1114,8 +1114,8 @@ vm_object_wanted(
 	                        VM_OBJECT_EVENT_PAGING_ONLY_IN_PROGRESS,\
 	                        (interruptible));                       \
                                                                         \
-	/*XXX if ((interruptible) && (_wr != THREAD_AWAKENED))*/ \
-	/*XXX break; */                                 \
+	                                                         \
+	                                                \
 	}                                                               \
 	MACRO_END
 
@@ -1145,8 +1145,8 @@ vm_object_wanted(
 	        _wr = vm_object_sleep((object),                         \
 	                              VM_OBJECT_EVENT_MAPPING_IN_PROGRESS, \
 	                              (interruptible));                 \
-	/*XXX if ((interruptible) && (_wr != THREAD_AWAKENED))*/ \
-	/*XXX break; */                                 \
+	                                                         \
+	                                                \
 	}                                                               \
 	assert(!(object)->mapping_in_progress);                         \
 	MACRO_END
@@ -1165,10 +1165,10 @@ extern int      vm_object_cache_evict(int, int);
 	((((object)->purgable == VM_PURGABLE_DENY &&                    \
 	   (object)->vo_ledger_tag == 0) ||                             \
 	  (object)->vo_owner == TASK_NULL)                              \
-	 ? TASK_NULL    /* not owned */                                 \
+	 ? TASK_NULL                                                    \
 	 : (((object)->vo_owner == VM_OBJECT_OWNER_DISOWNED)            \
-	    ? kernel_task /* disowned -> kernel */                      \
-	    : (object)->vo_owner)) /* explicit owner */                 \
+	    ? kernel_task                                               \
+	    : (object)->vo_owner))                                      \
 
 extern void     vm_object_ledger_tag_ledgers(
 	vm_object_t object,
@@ -1184,9 +1184,9 @@ extern kern_return_t vm_object_ownership_change(
 	int new_ledger_flags,
 	boolean_t task_objq_locked);
 
-// LP64todo: all the current tools are 32bit, obviously never worked for 64b
-// so probably should be a real 32b ID vs. ptr.
-// Current users just check for equality
+                                                                            
+                                               
+                                        
 #define VM_OBJECT_ID(o) ((uint32_t)(uintptr_t)VM_KERNEL_ADDRPERM((o)))
 
-#endif  /* _VM_VM_OBJECT_H_ */
+#endif                        

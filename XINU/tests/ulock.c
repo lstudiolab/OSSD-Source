@@ -73,7 +73,7 @@ T_DECL(ulock_non_owner_wake, "ulock_wake respects non-owner wakes",
 
 	T_ASSERT_POSIX_ZERO(pthread_create(&waiter, NULL, test_waiter, NULL), "create waiter");
 
-	// wait for the waiter to reach the kernel
+	                                          
 	for (;;) {
 		int kernel_ulocks = __ulock_wake(UL_DEBUG_HASH_DUMP_PID, NULL, 0);
 		T_QUIET; T_ASSERT_NE(kernel_ulocks, -1, "UL_DEBUG_HASH_DUMP_PID");
@@ -87,6 +87,6 @@ T_DECL(ulock_non_owner_wake, "ulock_wake respects non-owner wakes",
 
 	T_ASSERT_POSIX_ZERO(pthread_create(&waker, NULL, test_waker, NULL), "create waker");
 
-	// won't ever actually join
+	                           
 	pthread_join(waiter, NULL);
 }

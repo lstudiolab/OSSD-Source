@@ -35,10 +35,10 @@
 
 #if CONFIG_CSR_FROM_DT
 
-/*
- * New style CSR for non-x86 platforms, using Per-OS Security Policy
- * (POSP)
- */
+  
+                                                                    
+         
+   
 
 #include <libkern/section_keywords.h>
 #include <pexpert/device_tree.h>
@@ -49,7 +49,7 @@
 
 static SECURITY_READ_ONLY_LATE(csr_config_t) csr_config = 0;
 
-// WARNING: Used extremely early during boot. See csr_bootstrap().
+                                                                  
 static bool
 _csr_get_dt_bool(DTEntry *entry, char const *name, bool *out)
 {
@@ -68,7 +68,7 @@ _csr_get_dt_bool(DTEntry *entry, char const *name, bool *out)
 	return true;
 }
 
-// WARNING: Used extremely early during boot. See csr_bootstrap().
+                                                                  
 static bool
 _csr_get_dt_uint64(DTEntry *entry, char const *name, uint64_t *out)
 {
@@ -87,7 +87,7 @@ _csr_get_dt_uint64(DTEntry *entry, char const *name, uint64_t *out)
 	return true;
 }
 
-// WARNING: Used extremely early during boot. See csr_bootstrap().
+                                                                  
 static bool
 _csr_dt_string_is_equal(DTEntry *entry, const char *name, const char *str)
 {
@@ -127,11 +127,11 @@ _csr_is_iuou_or_iuos_device(void)
 static bool
 _csr_should_allow_device_configuration(void)
 {
-	/*
-	 * Allow CSR_ALLOW_DEVICE_CONFIGURATION if the device is running in a
-	 * restore environment, or if the "csr-allow-device-configuration"
-	 * property is set in the device tree.
-	 */
+	  
+                                                                      
+                                                                   
+                                       
+    
 	DTEntry chosen;
 	bool    bool_value;
 
@@ -140,24 +140,24 @@ _csr_should_allow_device_configuration(void)
 		_csr_get_dt_bool(&chosen, "csr-allow-device-configuration", &bool_value) && bool_value);
 }
 
-/*
- * Initialize CSR from the Device Tree.
- *
- * WARNING: csr_bootstrap() is called extremely early in the kernel
- * startup process in kernel_startup_bootstrap(), which happens
- * before even the vm or pmap layer are initialized.
- *
- * It is marked as STARTUP_RANK_FIRST so that it is called before panic_init(),
- * which runs during STARTUP_RANK_MIDDLE. This is necessary because panic_init()
- * calls csr_check() to determine whether the device is configured to allow
- * kernel debugging.
- *
- * Only do things here that don't require any dynamic memory (other
- * than the stack). Parsing boot-args, walking the device tree and
- * setting global variables is fine, most other things are not. Defer
- * those other things with global variables, if necessary.
- *
- */
+  
+                                       
+  
+                                                                   
+                                                               
+                                                    
+  
+                                                                               
+                                                                                
+                                                                           
+                    
+  
+                                                                   
+                                                                  
+                                                                     
+                                                          
+  
+   
 __startup_func
 static void
 csr_bootstrap(void)
@@ -167,25 +167,25 @@ csr_bootstrap(void)
 	bool            config_active   = false;
 	bool            bool_value;
 
-	csr_config = 0;                // start out fully restrictive
+	csr_config = 0;                                              
 
 	if (SecureDTLookupEntry(0, "/chosen/asmb", &entry) == kSuccess &&
 	    _csr_get_dt_uint64(&entry, "lp-sip0", &uint64_value)) {
-		csr_config = (uint32_t)uint64_value;    // Currently only 32 bits used.
+		csr_config = (uint32_t)uint64_value;                                   
 		config_active = true;
 	}
 
-	/*
-	 * If the device is an Internal Use Only Unit (IUOU) or if it is running a
-	 * build that is signed with the Internal Use Only Software (IUOS) tag, then
-	 * allow the preservation of the CSR_ALLOW_APPLE_INTERNAL bit. Otherwise,
-	 * forcefully remove the bit on boot.
-	 */
+	  
+                                                                           
+                                                                             
+                                                                          
+                                      
+    
 	if (!_csr_is_iuou_or_iuos_device()) {
 		csr_config &= ~CSR_ALLOW_APPLE_INTERNAL;
 	} else if (!config_active) {
-		// If there is no custom configuration present, infer the AppleInternal
-		// bit on IUOU or IUOS devices.
+		                                                                       
+		                               
 		csr_config |= CSR_ALLOW_APPLE_INTERNAL;
 	}
 
@@ -193,8 +193,8 @@ csr_bootstrap(void)
 		csr_config |= CSR_ALLOW_DEVICE_CONFIGURATION;
 	}
 
-	// The CSR_ALLOW_UNAUTHENTICATED_ROOT flag must be synthesized from sip1
-	// in the local boot policy.
+	                                                                        
+	                            
 	if (_csr_get_dt_bool(&entry, "lp-sip1", &bool_value) && bool_value) {
 		csr_config |= CSR_ALLOW_UNAUTHENTICATED_ROOT;
 	} else {
@@ -202,9 +202,9 @@ csr_bootstrap(void)
 	}
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
-	// Check whether we have to disable CTRR.
-	// lp-sip2 in the local boot policy is the bit driving this,
-	// which csrutil also sets implicitly when e.g. requesting kernel debugging.
+	                                         
+	                                                            
+	                                                                            
 	csr_unsafe_kernel_text = _csr_get_dt_bool(&entry, "lp-sip2", &bool_value) && bool_value;
 #endif
 }
@@ -228,11 +228,11 @@ csr_check(csr_config_t mask)
 		return ret;
 	}
 
-	// CSR_ALLOW_KERNEL_DEBUGGER needs to be allowed when SIP is disabled
-	// to allow 3rd-party developers to debug their kexts.  Use
-	// CSR_ALLOW_UNTRUSTED_KEXTS as a proxy for "SIP is disabled" on the
-	// grounds that you can do the same damage with a kernel debugger as
-	// you can with an untrusted kext.
+	                                                                     
+	                                                           
+	                                                                    
+	                                                                    
+	                                  
 	if ((config & (CSR_ALLOW_UNTRUSTED_KEXTS | CSR_ALLOW_APPLE_INTERNAL)) != 0) {
 		config |= CSR_ALLOW_KERNEL_DEBUGGER;
 	}
@@ -242,28 +242,28 @@ csr_check(csr_config_t mask)
 
 #else
 
-/*
- * Old style CSR for x86 platforms, using NVRAM values
- */
+  
+                                                      
+   
 
 #include <libkern/section_keywords.h>
 
-/* enable enforcement by default */
+                                   
 static SECURITY_READ_ONLY_LATE(int) csr_allow_all = 0;
 
-/*
- * Initialize csr_allow_all from device boot state.
- *
- * Needs to be run before panic_init() since panic_init()
- * calls into csr_check() and runs during STARTUP_RANK_MIDDLE.
- */
+  
+                                                   
+  
+                                                         
+                                                              
+   
 __startup_func
 static void
 csr_bootstrap(void)
 {
 	boot_args *args = (boot_args *)PE_state.bootArgs;
 	if (args->flags & kBootArgsFlagCSRBoot) {
-		/* special booter; allow everything */
+		                                      
 		csr_allow_all = 1;
 	}
 }
@@ -297,18 +297,18 @@ csr_check(csr_config_t mask)
 		return ret;
 	}
 
-	// CSR_ALLOW_KERNEL_DEBUGGER needs to be allowed when SIP is disabled
-	// to allow 3rd-party developers to debug their kexts.  Use
-	// CSR_ALLOW_UNTRUSTED_KEXTS as a proxy for "SIP is disabled" on the
-	// grounds that you can do the same damage with a kernel debugger as
-	// you can with an untrusted kext.
+	                                                                     
+	                                                           
+	                                                                    
+	                                                                    
+	                                  
 	if ((config & (CSR_ALLOW_UNTRUSTED_KEXTS | CSR_ALLOW_APPLE_INTERNAL)) != 0) {
 		config |= CSR_ALLOW_KERNEL_DEBUGGER;
 	}
 
 	ret = ((config & mask) == mask) ? 0 : EPERM;
 	if (ret == EPERM) {
-		// Override the return value if booted from the BaseSystem and the mask does not contain any flag that should always be enforced.
+		                                                                                                                                 
 		if (csr_allow_all && (mask & CSR_ALWAYS_ENFORCED_FLAGS) == 0) {
 			ret = 0;
 		}
@@ -317,11 +317,11 @@ csr_check(csr_config_t mask)
 	return ret;
 }
 
-#endif /* CONFIG_CSR_FROM_DT */
+#endif                         
 
-/*
- * Syscall stubs
- */
+  
+                
+   
 
 int syscall_csr_check(struct csrctl_args *args);
 int syscall_csr_get_active_config(struct csrctl_args *args);
@@ -363,9 +363,9 @@ syscall_csr_get_active_config(struct csrctl_args *args)
 	return copyout(&config, args->useraddr, sizeof(config));
 }
 
-/*
- * Syscall entrypoint
- */
+  
+                     
+   
 
 int
 csrctl(__unused proc_t p, struct csrctl_args *args, __unused int32_t *retval)

@@ -54,11 +54,11 @@ counter_dec(scalable_counter_t *counter)
 	os_atomic_dec(zpercpu_get(*counter), relaxed);
 }
 
-/*
- * NB: On arm, the preemption disabled implementation is the same as
- * the normal implementation. Otherwise we would need to enforce that
- * callers never mix the interfaces for the same counter.
- */
+  
+                                                                    
+                                                                     
+                                                         
+   
 OS_OVERLOADABLE
 void
 counter_add_preemption_disabled(scalable_counter_t *counter, uint64_t amount)

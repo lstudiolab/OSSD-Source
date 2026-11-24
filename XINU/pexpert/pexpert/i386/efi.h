@@ -36,7 +36,7 @@ typedef uint16_t  EFI_UINT16;
 typedef uint32_t  EFI_UINT32;
 typedef uint64_t  EFI_UINT64;
 
-typedef uint32_t  EFI_UINTN; /* natural size for firmware, not kernel */
+typedef uint32_t  EFI_UINTN;                                            
 
 typedef int8_t    EFI_INT8;
 typedef int16_t   EFI_INT16;
@@ -71,9 +71,9 @@ typedef uint64_t  EFI_HANDLE64;
  */
 
 
-//
-// Modifiers for EFI Runtime and Boot Services
-//
+  
+                                              
+  
 #define EFI_RUNTIMESERVICE
 #define EFIAPI
 #define IN
@@ -82,9 +82,9 @@ typedef uint64_t  EFI_HANDLE64;
 
 #define EFI_MAX_BIT       0x80000000
 
-//
-// Set the upper bit to indicate EFI Error.
-//
+  
+                                           
+  
 #define EFIERR(a)                 (EFI_MAX_BIT | (a))
 
 #define EFIWARN(a)                (a)
@@ -124,9 +124,9 @@ typedef uint64_t  EFI_HANDLE64;
 #define EFI_WARN_WRITE_FAILURE    EFIWARN (3)
 #define EFI_WARN_BUFFER_TOO_SMALL EFIWARN (4)
 
-//
-// EFI Specification Revision information
-//
+  
+                                         
+  
 #define EFI_SPECIFICATION_MAJOR_REVISION  1
 #define EFI_SPECIFICATION_MINOR_REVISION  10
 
@@ -148,17 +148,17 @@ typedef union {
 	EFI_UINT8 Raw[16];
 } EFI_GUID_UNION;
 
-//
-// EFI Time Abstraction:
-//  Year:       2000 - 20XX
-//  Month:      1 - 12
-//  Day:        1 - 31
-//  Hour:       0 - 23
-//  Minute:     0 - 59
-//  Second:     0 - 59
-//  Nanosecond: 0 - 999,999,999
-//  TimeZone:   -1440 to 1440 or 2047
-//
+  
+                        
+                           
+                      
+                      
+                      
+                      
+                      
+                               
+                                     
+  
 typedef struct {
 	EFI_UINT16  Year;
 	EFI_UINT8   Month;
@@ -173,15 +173,15 @@ typedef struct {
 	EFI_UINT8   Pad2;
 } EFI_TIME;
 
-//
-// Bit definitions for EFI_TIME.Daylight
-//
+  
+                                        
+  
 #define EFI_TIME_ADJUST_DAYLIGHT  0x01
 #define EFI_TIME_IN_DAYLIGHT      0x02
 
-//
-// Value definition for EFI_TIME.TimeZone
-//
+  
+                                         
+  
 #define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
 typedef enum {
@@ -210,25 +210,25 @@ typedef struct {
 	EFI_UINT32  Reserved;
 } __attribute__((aligned(8))) EFI_TABLE_HEADER;
 
-//
-// possible caching types for the memory range
-//
+  
+                                              
+  
 #define EFI_MEMORY_UC   0x0000000000000001ULL
 #define EFI_MEMORY_WC   0x0000000000000002ULL
 #define EFI_MEMORY_WT   0x0000000000000004ULL
 #define EFI_MEMORY_WB   0x0000000000000008ULL
 #define EFI_MEMORY_UCE  0x0000000000000010ULL
 
-//
-// physical memory protection on range
-//
+  
+                                      
+  
 #define EFI_MEMORY_WP 0x0000000000001000ULL
 #define EFI_MEMORY_RP 0x0000000000002000ULL
 #define EFI_MEMORY_XP 0x0000000000004000ULL
 
-//
-// range requires a runtime mapping
-//
+  
+                                   
+  
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
 #define EFI_MEMORY_KERN_RESERVED (1ULL << 59)
 typedef EFI_UINT64  EFI_PHYSICAL_ADDRESS;
@@ -263,9 +263,9 @@ typedef
 	IN OUT VOID                 **Address
 	);
 
-//
-// Variable attributes
-//
+  
+                      
+  
 #define EFI_VARIABLE_NON_VOLATILE       0x00000001
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
@@ -302,9 +302,9 @@ typedef
 	IN VOID                     * Data
 	);
 
-//
-// EFI Time
-//
+  
+           
+  
 typedef struct {
 	EFI_UINT32  Resolution;
 	EFI_UINT32  Accuracy;
@@ -370,18 +370,18 @@ typedef
 	OUT EFI_UINT32                  * HighCount
 	);
 
-//
-// Definition of Status Code extended data header
-//
-//  HeaderSize    The size of the architecture. This is specified to enable
-//                the future expansion
-//
-//  Size          The size of the data in bytes. This does not include the size
-//                of the header structure.
-//
-//  Type          A GUID defining the type of the data
-//
-//
+  
+                                                 
+  
+                                                                           
+                                      
+  
+                                                                               
+                                          
+  
+                                                      
+  
+  
 #ifdef TIANO_EXTENSION_FLAG
 
 typedef
@@ -396,48 +396,48 @@ typedef
 	);
 
 #endif
-//
-// EFI Runtime Services Table
-//
+  
+                             
+  
 #define EFI_RUNTIME_SERVICES_SIGNATURE  0x56524553544e5552ULL
 #define EFI_RUNTIME_SERVICES_REVISION   ((EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION))
 
 typedef struct {
 	EFI_TABLE_HEADER              Hdr;
 
-	//
-	// Time services
-	//
+	  
+	                
+	  
 	EFI_PTR32                     GetTime;
 	EFI_PTR32                     SetTime;
 	EFI_PTR32                     GetWakeupTime;
 	EFI_PTR32                     SetWakeupTime;
 
-	//
-	// Virtual memory services
-	//
+	  
+	                          
+	  
 	EFI_PTR32                     SetVirtualAddressMap;
 	EFI_PTR32                     ConvertPointer;
 
-	//
-	// Variable services
-	//
+	  
+	                    
+	  
 	EFI_PTR32                     GetVariable;
 	EFI_PTR32                     GetNextVariableName;
 	EFI_PTR32                     SetVariable;
 
-	//
-	// Misc
-	//
+	  
+	       
+	  
 	EFI_PTR32                     GetNextHighMonotonicCount;
 	EFI_PTR32                     ResetSystem;
 
 #ifdef TIANO_EXTENSION_FLAG
-	//
-	// ////////////////////////////////////////////////////
-	// Extended EFI Services
-	//////////////////////////////////////////////////////
-	//
+	  
+	                                                       
+	                        
+	                                                      
+	  
 	EFI_PTR32                     ReportStatusCode;
 #endif
 } __attribute__((aligned(8))) EFI_RUNTIME_SERVICES_32;
@@ -445,46 +445,46 @@ typedef struct {
 typedef struct {
 	EFI_TABLE_HEADER              Hdr;
 
-	//
-	// Time services
-	//
+	  
+	                
+	  
 	EFI_PTR64                     GetTime;
 	EFI_PTR64                     SetTime;
 	EFI_PTR64                     GetWakeupTime;
 	EFI_PTR64                     SetWakeupTime;
 
-	//
-	// Virtual memory services
-	//
+	  
+	                          
+	  
 	EFI_PTR64                     SetVirtualAddressMap;
 	EFI_PTR64                     ConvertPointer;
 
-	//
-	// Variable services
-	//
+	  
+	                    
+	  
 	EFI_PTR64                     GetVariable;
 	EFI_PTR64                     GetNextVariableName;
 	EFI_PTR64                     SetVariable;
 
-	//
-	// Misc
-	//
+	  
+	       
+	  
 	EFI_PTR64                     GetNextHighMonotonicCount;
 	EFI_PTR64                     ResetSystem;
 
 #ifdef TIANO_EXTENSION_FLAG
-	//
-	// ////////////////////////////////////////////////////
-	// Extended EFI Services
-	//////////////////////////////////////////////////////
-	//
+	  
+	                                                       
+	                        
+	                                                      
+	  
 	EFI_PTR64                     ReportStatusCode;
 #endif
 } __attribute__((aligned(8))) EFI_RUNTIME_SERVICES_64;
 
-//
-// EFI Configuration Table
-//
+  
+                          
+  
 typedef struct {
 	EFI_GUID  VendorGuid;
 	EFI_PTR32 VendorTable;
@@ -495,9 +495,9 @@ typedef struct {
 	EFI_PTR64 VendorTable;
 } __attribute__((aligned(8))) EFI_CONFIGURATION_TABLE_64;
 
-//
-// EFI System Table
-//
+  
+                   
+  
 #define EFI_SYSTEM_TABLE_SIGNATURE      0x5453595320494249ULL
 #define EFI_SYSTEM_TABLE_REVISION       ((EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION))
 #define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | 00)
@@ -554,4 +554,4 @@ typedef struct EFI_SYSTEM_TABLE_64 {
 extern uint64_t efi_get_rsdp_physaddr(void);
 #endif
 
-#endif /* _PEXPERT_I386_EFI_H */
+#endif                          

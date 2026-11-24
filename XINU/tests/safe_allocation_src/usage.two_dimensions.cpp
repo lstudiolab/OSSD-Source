@@ -1,10 +1,10 @@
-//
-// Make sure `safe_allocation` can be used to create a two-dimensional array.
-//
-// Note that we don't really recommend using that representation for two
-// dimensional arrays because other representations are better, but it
-// should at least work.
-//
+  
+                                                                             
+  
+                                                                        
+                                                                      
+                        
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

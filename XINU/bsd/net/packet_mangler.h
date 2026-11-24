@@ -34,7 +34,7 @@
 #ifdef BSD_KERNEL_PRIVATE
 #include <sys/mbuf.h>
 #include <sys/socketvar.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 __BEGIN_DECLS
 
@@ -46,12 +46,12 @@ typedef enum {
 	OUT
 } Pkt_Mnglr_Flow;
 
-/*
- * Kernel control name for an instance of a packet mangler.
- * Use CTLIOCGINFO to find out the corresponding kernel control id
- * to be set in the sc_id field of sockaddr_ctl for connect(2)
- * Note: the sc_unit is ephemeral
- */
+  
+                                                           
+                                                                  
+                                                              
+                                 
+   
 #define PACKET_MANGLER_CONTROL_NAME "com.apple.packet-mangler"
 
 #define PKT_MNGLR_OPT_PROTO_ACT_MASK    1
@@ -64,15 +64,15 @@ typedef enum {
 #define PKT_MNGLR_OPT_PROTOCOL          8
 #define PKT_MNGLR_OPT_ACTIVATE          0xFFFFFFFF
 
-/* Packet mangler action masks */
-/* Packet Mangler TCP action mask */
+                                 
+                                    
 #define PKT_MNGLR_TCP_ACT_NOP_MPTCP     0x00000001
 #define PKT_MNGLR_TCP_ACT_SWAP_L_PORT   0x00000002
 #define PKT_MNGLR_TCP_ACT_SWAP_R_PORT   0x00000004
 #define PKT_MNGLR_TCP_ACT_DSS_DROP      0x00000008
 #define PKT_MNGLR_TCP_ACT_CHK_EXTENDED  0x80000000
 
-/* Packet Mangler IP action mask */
+                                   
 #define PKT_MNGLR_IP_ACT_FLT_L_IP       0x00000001
 #define PKT_MNGLR_IP_ACT_FLT_R_IP       0x00000002
 #define PKT_MNGLR_IP_ACT_SWAP_L_IP      0x00000004
@@ -80,14 +80,14 @@ typedef enum {
 #define PKT_MNGLR_IP_ACT_DROP_PACKET    0x00000010
 #define PKT_MNGLR_IP_ACT_CHK_EXTENDED   0x80000000
 
-/*
- * How many filter may be active simultaneously
- */
+  
+                                               
+   
 #define PKT_MNGLR_MAX_FILTER_COUNT      1
 
 #define PKT_MNGLR_VERSION_CURRENT 1
 
-#endif /* PRIVATE */
+#endif              
 
 #ifdef BSD_KERNEL_PRIVATE
 
@@ -105,6 +105,6 @@ extern void pkt_mnglr_init(void);
 
 __END_DECLS
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* __PACKET_MANGLER_H__ */
+#endif                           

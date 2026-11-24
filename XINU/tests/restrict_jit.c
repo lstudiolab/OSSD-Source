@@ -6,9 +6,9 @@
 #include <darwintest.h>
 
 
-/*
- * macOS only test. Try to map 2 different MAP_JIT regions. 2nd should fail.
- */
+  
+                                                                            
+   
 T_DECL(restrict_jit, "macOS restricted JIT entitlement test")
 {
 #if TARGET_OS_OSX

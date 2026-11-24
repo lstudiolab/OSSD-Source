@@ -23,98 +23,98 @@
  
 #ifndef __AVAILABILITY__
 #define __AVAILABILITY__
- /*     
-    These macros are for use in OS header files. They enable function prototypes
-    and Objective-C methods to be tagged with the OS version in which they
-    were first available; and, if applicable, the OS version in which they 
-    became deprecated.  
+        
+                                                                                
+                                                                          
+                                                                           
+                        
      
-    The desktop Mac OS X and iOS each have different version numbers.
-    The __OSX_AVAILABLE_STARTING() macro allows you to specify both the desktop
-    and iOS version numbers.  For instance:
-        __OSX_AVAILABLE_STARTING(__MAC_10_2,__IPHONE_2_0)
-    means the function/method was first available on Mac OS X 10.2 on the desktop
-    and first available in iOS 2.0 on the iPhone.
+                                                                     
+                                                                               
+                                           
+                                                         
+                                                                                 
+                                                 
     
-    If a function is available on one platform, but not the other a _NA (not
-    applicable) parameter is used.  For instance:
-            __OSX_AVAILABLE_STARTING(__MAC_10_3,__IPHONE_NA)
-    means that the function/method was first available on Mac OS X 10.3, and it
-    currently not implemented on the iPhone.
+                                                                            
+                                                 
+                                                            
+                                                                               
+                                            
 
-    At some point, a function/method may be deprecated.  That means Apple
-    recommends applications stop using the function, either because there is a 
-    better replacement or the functionality is being phased out.  Deprecated
-    functions/methods can be tagged with a __OSX_AVAILABLE_BUT_DEPRECATED()
-    macro which specifies the OS version where the function became available
-    as well as the OS version in which it became deprecated.  For instance:
-        __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0,__MAC_10_5,__IPHONE_NA,__IPHONE_NA)
-    means that the function/method was introduced in Mac OS X 10.0, then
-    became deprecated beginning in Mac OS X 10.5.  On iOS the function 
-    has never been available.  
+                                                                         
+                                                                               
+                                                                            
+                                                                           
+                                                                            
+                                                                           
+                                                                                     
+                                                                        
+                                                                       
+                               
     
-    For these macros to function properly, a program must specify the OS version range 
-    it is targeting.  The min OS version is specified as an option to the compiler:
-    -mmacosx-version-min=10.x when building for Mac OS X, and -miphoneos-version-min=y.z
-    when building for the iPhone.  The upper bound for the OS version is rarely needed,
-    but it can be set on the command line via: -D__MAC_OS_X_VERSION_MAX_ALLOWED=10x0 for
-    Mac OS X and __IPHONE_OS_VERSION_MAX_ALLOWED = y0z00 for iOS.  
+                                                                                       
+                                                                                   
+                                                                                        
+                                                                                       
+                                                                                        
+                                                                   
     
-    Examples:
+             
 
-        A function available in Mac OS X 10.5 and later, but not on the phone:
+                                                                              
         
-            extern void mymacfunc() __OSX_AVAILABLE_STARTING(__MAC_10_5,__IPHONE_NA);
+                                                                                     
 
 
-        An Objective-C method in Mac OS X 10.5 and later, but not on the phone:
+                                                                               
         
-            @interface MyClass : NSObject
-            -(void) mymacmethod __OSX_AVAILABLE_STARTING(__MAC_10_5,__IPHONE_NA);
-            @end
+                                         
+                                                                                 
+                
 
         
-        An enum available on the phone, but not available on Mac OS X:
+                                                                      
         
-            #if __IPHONE_OS_VERSION_MIN_REQUIRED
-                enum { myEnum = 1 };
-            #endif
-           Note: this works when targeting the Mac OS X platform because 
-           __IPHONE_OS_VERSION_MIN_REQUIRED is undefined which evaluates to zero. 
+                                                
+                                    
+                  
+                                                                         
+                                                                                  
         
 
-        An enum with values added in different iPhoneOS versions:
-		
-			enum {
-			    myX  = 1,	// Usable on iPhoneOS 2.1 and later
-			    myY  = 2,	// Usable on iPhoneOS 3.0 and later
-			    myZ  = 3,	// Usable on iPhoneOS 3.0 and later
-				...
-		      Note: you do not want to use #if with enumeration values
-			  when a client needs to see all values at compile time
-			  and use runtime logic to only use the viable values.
-			  
+                                                                 
+  
+         
+                                                    
+                                                    
+                                                    
+       
+                                                                
+                                                          
+                                                         
+     
 
-    It is also possible to use the *_VERSION_MIN_REQUIRED in source code to make one
-    source base that can be compiled to target a range of OS versions.  It is best
-    to not use the _MAC_* and __IPHONE_* macros for comparisons, but rather their values.
-    That is because you might get compiled on an old OS that does not define a later
-    OS version macro, and in the C preprocessor undefined values evaluate to zero
-    in expresssions, which could cause the #if expression to evaluate in an unexpected
-    way.
+                                                                                    
+                                                                                  
+                                                                                         
+                                                                                    
+                                                                                 
+                                                                                      
+        
     
-        #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-            // code only compiled when targeting Mac OS X and not iPhone
-            // note use of 1050 instead of __MAC_10_5
-            #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1050
-                // code in here might run on pre-Leopard OS
-            #else
-                // code here can assume Leopard or later
-            #endif
-        #endif
+                                              
+                                                                        
+                                                     
+                                                      
+                                                           
+                 
+                                                        
+                  
+              
 
 
-*/
+  
 
 #define __MAC_10_0            1000
 #define __MAC_10_1            1010
@@ -137,7 +137,7 @@
 #define __MAC_10_12_1       101201
 #define __MAC_10_12_2       101202
 #define __MAC_10_12_4       101204
-/* __MAC_NA is not defined to a value but is uses as a token by macros to indicate that the API is unavailable */
+                                                                                                                 
 
 #define __IPHONE_2_0      20000
 #define __IPHONE_2_1      20100
@@ -168,7 +168,7 @@
 #define __IPHONE_10_1    100100
 #define __IPHONE_10_2    100200
 #define __IPHONE_10_3    100300
-/* __IPHONE_NA is not defined to a value but is uses as a token by macros to indicate that the API is unavailable */
+                                                                                                                    
 
 #define __TVOS_9_0        90000
 #define __TVOS_9_1        90100
@@ -225,7 +225,7 @@
 #endif
 
 
-/* for use to document app extension usage */
+                                             
 #if defined(__has_feature)
   #if __has_feature(attribute_availability_app_extension)
     #define __OSX_EXTENSION_UNAVAILABLE(_msg)  __OS_AVAILABILITY_MSG(macosx_app_extension,unavailable,_msg)
@@ -243,7 +243,7 @@
 
 
 
-/* for use marking APIs available info for Mac OSX */
+                                                     
 #if defined(__has_attribute)
   #if __has_attribute(availability)
     #define __OSX_UNAVAILABLE                    __OS_AVAILABILITY(macosx,unavailable)
@@ -265,7 +265,7 @@
 #endif
 
 
-/* for use marking APIs available info for iOS */
+                                                 
 #if defined(__has_attribute)
   #if __has_attribute(availability)
     #define __IOS_UNAVAILABLE                    __OS_AVAILABILITY(ios,unavailable)
@@ -292,7 +292,7 @@
 #endif
 
 
-/* for use marking APIs available info for tvOS */
+                                                  
 #if defined(__has_feature)
   #if __has_feature(attribute_availability_tvos)
     #define __TVOS_UNAVAILABLE                    __OS_AVAILABILITY(tvos,unavailable)
@@ -319,7 +319,7 @@
 #endif
 
 
-/* for use marking APIs available info for Watch OS */
+                                                      
 #if defined(__has_feature)
   #if __has_feature(attribute_availability_watchos)
     #define __WATCHOS_UNAVAILABLE                    __OS_AVAILABILITY(watchos,unavailable)
@@ -346,7 +346,7 @@
 #endif
 
 
-/* for use marking APIs unavailable for swift */
+                                                
 #if defined(__has_feature)
   #if __has_feature(attribute_availability_swift)
     #define __SWIFT_UNAVAILABLE                   __OS_AVAILABILITY(swift,unavailable)
@@ -366,55 +366,55 @@
   #include <AvailabilityProhibitedInternal.h>
 #endif
 
-/*
- Macros for defining which versions/platform a given symbol can be used.
+  
+                                                                        
  
- @see http://clang.llvm.org/docs/AttributeReference.html#availability
- */
+                                                                     
+   
 
-/*
- * API Introductions
- *
- * Use to specify the release that a particular API became available.
- *
- * Platform names:
- *   macos, ios, tvos, watchos
- *
- * Examples:
- *    __API_AVAILABLE(macos(10.10))
- *    __API_AVAILABLE(macos(10.9), ios(10.0))
- *    __API_AVAILABLE(macos(10.4), ios(8.0), watchos(2.0), tvos(10.0))
- */
+  
+                    
+  
+                                                                     
+  
+                  
+                              
+  
+            
+                                   
+                                             
+                                                                      
+   
 #define __API_AVAILABLE(...) __API_AVAILABLE_GET_MACRO(__VA_ARGS__,__API_AVAILABLE4, __API_AVAILABLE3, __API_AVAILABLE2, __API_AVAILABLE1)(__VA_ARGS__)
 
 
-/*
- * API Deprecations
- *
- * Use to specify the release that a particular API became unavailable.
- *
- * Platform names:
- *   macos, ios, tvos, watchos
- *
- * Examples:
- *
- *    __API_DEPRECATED("No longer supported", macos(10.4, 10.8))
- *    __API_DEPRECATED("No longer supported", macos(10.4, 10.8), ios(2.0, 3.0), watchos(2.0, 3.0), tvos(9.0, 10.0))
- *
- *    __API_DEPRECATED_WITH_REPLACEMENT("-setName:", tvos(10.0, 10.4), ios(9.0, 10.0))
- *    __API_DEPRECATED_WITH_REPLACEMENT("SomeClassName", macos(10.4, 10.6), watchos(2.0, 3.0))
- */
+  
+                   
+  
+                                                                       
+  
+                  
+                              
+  
+            
+  
+                                                                
+                                                                                                                   
+  
+                                                                                      
+                                                                                              
+   
 #define __API_DEPRECATED(...) __API_DEPRECATED_MSG_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_MSG5,__API_DEPRECATED_MSG4,__API_DEPRECATED_MSG3,__API_DEPRECATED_MSG2,__API_DEPRECATED_MSG1)(__VA_ARGS__)
 #define __API_DEPRECATED_WITH_REPLACEMENT(...) __API_DEPRECATED_REP_GET_MACRO(__VA_ARGS__,__API_DEPRECATED_REP5,__API_DEPRECATED_REP4,__API_DEPRECATED_REP3,__API_DEPRECATED_REP2,__API_DEPRECATED_REP1)(__VA_ARGS__)
 
-/*
- * API Unavailability
- * Use to specify that an API is unavailable for a particular platform.
- *
- * Example:
- *    __API_UNAVAILABLE(macos)
- *    __API_UNAVAILABLE(watchos, tvos)
- */
+  
+                     
+                                                                       
+  
+           
+                              
+                                      
+   
 #define __API_UNAVAILABLE(...) __API_UNAVAILABLE_GET_MACRO(__VA_ARGS__,__API_UNAVAILABLE3,__API_UNAVAILABLE2,__API_UNAVAILABLE1)(__VA_ARGS__)
 
-#endif /* __AVAILABILITY__ */
+#endif                       

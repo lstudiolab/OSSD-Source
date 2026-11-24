@@ -24,25 +24,25 @@
 #endif
 
 
-/* extern references */
+                       
 extern void     pe_identify_machine(boot_args *bootArgs);
 
-/* static references */
+                       
 static void     pe_prepare_images(void);
 
-/* private globals */
+                     
 SECURITY_READ_ONLY_LATE(PE_state_t) PE_state;
 #define FW_VERS_LEN 128
 char            firmware_version[FW_VERS_LEN];
 
-/*
- * This variable is only modified once, when the BSP starts executing. We put it in __TEXT
- * as page protections on kernel text early in startup are read-write. The kernel is
- * locked down later in start-up, said mappings become RO and thus this
- * variable becomes immutable.
- *
- * See osfmk/arm/arm_vm_init.c for more information.
- */
+  
+                                                                                          
+                                                                                    
+                                                                       
+                              
+  
+                                                    
+   
 SECURITY_READ_ONLY_SPECIAL_SECTION(volatile uint32_t, "__TEXT,__const") debug_enabled = FALSE;
 
 uint8_t         gPlatformECID[8];
@@ -52,7 +52,7 @@ uint64_t    last_hwaccess_thread = 0;
 char     gTargetTypeBuffer[16];
 char     gModelTypeBuffer[32];
 
-/* Clock Frequency Info */
+                          
 clock_frequency_info_t gPEClockFrequencyInfo;
 
 vm_offset_t gPanicBase = 0;
@@ -60,20 +60,20 @@ unsigned int gPanicSize;
 struct embedded_panic_header *panic_info = NULL;
 
 #if (DEVELOPMENT || DEBUG) && defined(XNU_TARGET_OS_BRIDGE)
-/*
- * On DEVELOPMENT bridgeOS, we map the x86 panic region
- * so we can include this data in bridgeOS corefiles
- */
+  
+                                                       
+                                                    
+   
 uint64_t macos_panic_base = 0;
 unsigned int macos_panic_size = 0;
 
 struct macos_panic_header *mac_panic_header = NULL;
 #endif
 
-/* Maximum size of panic log excluding headers, in bytes */
+                                                           
 static unsigned int panic_text_len;
 
-/* Whether a console is standing by for panic logging */
+                                                        
 static boolean_t panic_console_available = FALSE;
 
 extern uint32_t crc32(uint32_t crc, const void *buf, size_t size);
@@ -93,22 +93,22 @@ check_for_panic_log(void)
 	uintptr_t const *reg_prop;
 	uint32_t const *panic_region_length;
 
-	/*
-	 * DT properties for the panic region are populated by UpdateDeviceTree() in iBoot:
-	 *
-	 * chosen {
-	 *   embedded-panic-log-size = <0x00080000>;
-	 *   [a bunch of other stuff]
-	 * };
-	 *
-	 * pram {
-	 *   reg = <0x00000008_fbc48000 0x00000000_000b4000>;
-	 * };
-	 *
-	 * reg[0] is the physical address
-	 * reg[1] is the size of iBoot's kMemoryRegion_Panic (not used)
-	 * embedded-panic-log-size is the maximum amount of data to store in the buffer
-	 */
+	  
+                                                                                    
+   
+            
+                                             
+                              
+      
+   
+          
+                                                      
+      
+   
+                                  
+                                                                
+                                                                                
+    
 	if (kSuccess != SecureDTLookupEntry(0, "pram", &entry)) {
 		return;
 	}
@@ -127,7 +127,7 @@ check_for_panic_log(void)
 
 	gPanicBase = ml_io_map_wcomb(reg_prop[0], panic_region_length[0]);
 
-	/* Deduct the size of the panic header from the panic region size */
+	                                                                    
 	panic_text_len = panic_region_length[0] - sizeof(struct embedded_panic_header);
 	gPanicSize = panic_region_length[0];
 
@@ -135,37 +135,37 @@ check_for_panic_log(void)
 	if (PE_consistent_debug_enabled()) {
 		uint64_t macos_panic_physbase = 0;
 		uint64_t macos_panic_physlen = 0;
-		/* Populate the macOS panic region data if it's present in consistent debug */
+		                                                                              
 		if (PE_consistent_debug_lookup_entry(kDbgIdMacOSPanicRegion, &macos_panic_physbase, &macos_panic_physlen)) {
 			macos_panic_base = ml_io_map_with_prot(macos_panic_physbase, macos_panic_physlen, VM_PROT_READ);
 			mac_panic_header = (struct macos_panic_header *) ((void *) macos_panic_base);
 			macos_panic_size = macos_panic_physlen;
 		}
 	}
-#endif /* DEVELOPMENT && defined(XNU_TARGET_OS_BRIDGE) */
+#endif                                                   
 
 #endif
 	panic_info = (struct embedded_panic_header *)gPanicBase;
 
-	/* Check if a shared memory console is running in the panic buffer */
+	                                                                     
 	if (panic_info->eph_magic == 'SHMC') {
 		panic_console_available = TRUE;
 		return;
 	}
 
-	/* Check if there's a boot profile in the panic buffer */
+	                                                         
 	if (panic_info->eph_magic == 'BTRC') {
 		return;
 	}
 
-	/*
-	 * Check to see if a panic (FUNK) is in VRAM from the last time
-	 */
+	  
+                                                                
+    
 	if (panic_info->eph_magic == EMBEDDED_PANIC_MAGIC) {
 		printf("iBoot didn't extract panic log from previous session crash, this is bad\n");
 	}
 
-	/* Clear panic region */
+	                        
 	bzero((void *)gPanicBase, gPanicSize);
 }
 
@@ -197,10 +197,10 @@ PE_initialize_console(PE_Video * info, int op)
 		break;
 
 	case kPEReleaseScreen:
-		/*
-		 * we don't show the progress indicator on boot, but want to
-		 * show it afterwards.
-		 */
+		  
+                                                              
+                        
+     
 		if (!vc_progress_initialized) {
 			default_progress.dx = 0;
 			default_progress.dy = 0;
@@ -274,9 +274,9 @@ PE_init_iokit(void)
 #else
 	show_progress = FALSE;
 	PE_parse_boot_argn("-progress", &show_progress, sizeof(show_progress));
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 	if (show_progress) {
-		/* Rotation: 0:normal, 1:right 90, 2:left 180, 3:left 90 */
+		                                                           
 		switch (PE_state.video.v_rotate) {
 		case 2:
 			flip = -1;
@@ -302,7 +302,7 @@ PE_init_iokit(void)
 		}
 		*delta *= flip;
 
-		/* Check for DT-defined progress y delta */
+		                                           
 		PE_get_default("progress-dy", &default_progress.dy, sizeof(default_progress.dy));
 
 		vc_progress_initialize(&default_progress,
@@ -314,7 +314,7 @@ PE_init_iokit(void)
 	}
 
 	if (kdebug_enable && kdebug_debugid_enabled(IOKDBG_CODE(DBG_BOOTER, 0))) {
-		/* Trace iBoot-provided timing information. */
+		                                              
 		if (kSuccess == SecureDTLookupEntry(0, "/chosen/iBoot", &entry)) {
 			uint32_t const * value_ptr;
 
@@ -353,18 +353,18 @@ PE_init_iokit(void)
 void
 PE_lockdown_iokit(void)
 {
-	/*
-	 * On arm/arm64 platforms, and especially those that employ KTRR/CTRR,
-	 * machine_lockdown() is treated as a hard security checkpoint, such that
-	 * code which executes prior to lockdown must be minimized and limited only to
-	 * trusted parts of the kernel and specially-entitled kexts.  We therefore
-	 * cannot start the general-purpose IOKit matching process until after lockdown,
-	 * as it may involve execution of untrusted/non-entitled kext code.
-	 * Furthermore, such kext code may process attacker controlled data (e.g.
-	 * network packets), which dramatically increases the potential attack surface
-	 * against a kernel which has not yet enabled the full set of available
-	 * hardware protections.
-	 */
+	  
+                                                                       
+                                                                          
+                                                                               
+                                                                           
+                                                                                 
+                                                                    
+                                                                          
+                                                                               
+                                                                        
+                         
+    
 	StartIOKitMatching();
 }
 
@@ -395,19 +395,19 @@ PE_init_platform(boolean_t vm_initialized, void *args)
 		PE_state.video.v_height = boot_args_ptr->Video.v_height;
 		PE_state.video.v_depth = (boot_args_ptr->Video.v_depth >> kBootVideoDepthDepthShift) & kBootVideoDepthMask;
 		PE_state.video.v_rotate = (
-			((boot_args_ptr->Video.v_depth >> kBootVideoDepthRotateShift) & kBootVideoDepthMask) +    // rotation
-			((boot_args_ptr->Video.v_depth >> kBootVideoDepthBootRotateShift)  & kBootVideoDepthMask) // add extra boot rotation
+			((boot_args_ptr->Video.v_depth >> kBootVideoDepthRotateShift) & kBootVideoDepthMask) +               
+			((boot_args_ptr->Video.v_depth >> kBootVideoDepthBootRotateShift)  & kBootVideoDepthMask)                           
 			) % 4;
 		PE_state.video.v_scale = ((boot_args_ptr->Video.v_depth >> kBootVideoDepthScaleShift) & kBootVideoDepthMask) + 1;
 		PE_state.video.v_display = boot_args_ptr->Video.v_display;
 		strlcpy(PE_state.video.v_pixelFormat, "BBBBBBBBGGGGGGGGRRRRRRRR", sizeof(PE_state.video.v_pixelFormat));
 	}
 	if (!vm_initialized) {
-		/*
-		 * Setup the Device Tree routines
-		 * so the console can be found and the right I/O space
-		 * can be used..
-		 */
+		  
+                                   
+                                                        
+                  
+     
 		SecureDTInit(PE_state.deviceTreeHead, PE_state.deviceTreeSize);
 		pe_identify_machine(boot_args_ptr);
 	} else {
@@ -439,12 +439,12 @@ PE_init_platform(boolean_t vm_initialized, void *args)
 		if (kSuccess == SecureDTLookupEntry(NULL, "/chosen", &entry)) {
 			if (kSuccess == SecureDTGetProperty(entry, "debug-enabled",
 			    (void const **) &prop, &size)) {
-				/*
-				 * We purposefully modify a constified variable as
-				 * it will get locked down by a trusted monitor or
-				 * via page table mappings. We don't want people easily
-				 * modifying this variable...
-				 */
+				  
+                                                      
+                                                      
+                                                           
+                                 
+       
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcast-qual"
 				boolean_t *modify_debug_enabled = (boolean_t *) &debug_enabled;
@@ -484,10 +484,10 @@ PE_init_platform(boolean_t vm_initialized, void *args)
 void
 PE_create_console(void)
 {
-	/*
-	 * Check the head of VRAM for a panic log saved on last panic.
-	 * Do this before the VRAM is trashed.
-	 */
+	  
+                                                               
+                                       
+    
 	check_for_panic_log();
 
 	if (PE_state.video.v_display) {
@@ -541,24 +541,24 @@ PE_call_timebase_callback(void)
 	}
 }
 
-/*
- * The default PE_poll_input handler.
- */
+  
+                                     
+   
 int
 PE_stub_poll_input(__unused unsigned int options, char *c)
 {
 	*c = (char)uart_getc();
-	return 0;               /* 0 for success, 1 for unsupported */
+	return 0;                                                     
 }
 
-/*
- * This routine will return 1 if you are running on a device with a variant
- * of iBoot that allows debugging. This is typically not the case on production
- * fused parts (even when running development variants of iBoot).
- *
- * The routine takes an optional argument of the flags passed to debug="" so
- * kexts don't have to parse the boot arg themselves.
- */
+  
+                                                                           
+                                                                               
+                                                                 
+  
+                                                                            
+                                                     
+   
 uint32_t
 PE_i_can_has_debugger(uint32_t *debug_flags)
 {
@@ -575,10 +575,10 @@ PE_i_can_has_debugger(uint32_t *debug_flags)
 	return debug_enabled;
 }
 
-/*
- * This routine returns TRUE if the device is configured
- * with panic debugging enabled.
- */
+  
+                                                        
+                                
+   
 boolean_t
 PE_panic_debugging_enabled()
 {
@@ -606,7 +606,7 @@ PE_save_buffer_to_vram(unsigned char *buf, unsigned int *size)
 		printf("Error!! Current Magic 0x%X, expected value 0x%x", panic_info->eph_magic, EMBEDDED_PANIC_MAGIC);
 	}
 
-	/* CRC everything after the CRC itself - starting with the panic header version */
+	                                                                                  
 	panic_info->eph_crc = crc32(0L, &panic_info->eph_version, (panic_text_len +
 	    sizeof(struct embedded_panic_header) - offsetof(struct embedded_panic_header, eph_version)));
 }
@@ -630,10 +630,10 @@ PE_init_panicheader()
 
 	bzero(panic_info, sizeof(struct embedded_panic_header));
 
-	/*
-	 * The panic log begins immediately after the panic header -- debugger synchronization and other functions
-	 * may log into this region before we've become the exclusive panicking CPU and initialize the header here.
-	 */
+	  
+                                                                                                           
+                                                                                                            
+    
 	panic_info->eph_panic_log_offset = debug_buf_base ? PE_get_offset_into_panic_region(debug_buf_base) : 0;
 
 	panic_info->eph_magic = EMBEDDED_PANIC_MAGIC;
@@ -642,12 +642,12 @@ PE_init_panicheader()
 	return;
 }
 
-/*
- * Tries to update the panic header to keep it consistent on nested panics.
- *
- * NOTE: The purpose of this function is NOT to detect/correct corruption in the panic region,
- *       it is to update the panic header to make it consistent when we nest panics.
- */
+  
+                                                                           
+  
+                                                                                              
+                                                                                    
+   
 void
 PE_update_panicheader_nestedpanic()
 {
@@ -655,9 +655,9 @@ PE_update_panicheader_nestedpanic()
 		return;
 	}
 
-	/*
-	 * If the panic log offset is not set, re-init the panic header
-	 */
+	  
+                                                                
+    
 	if (panic_info->eph_panic_log_offset == 0) {
 		PE_init_panicheader();
 		panic_info->eph_panic_flags |= EMBEDDED_PANIC_HEADER_FLAG_NESTED_PANIC;
@@ -666,29 +666,29 @@ PE_update_panicheader_nestedpanic()
 
 	panic_info->eph_panic_flags |= EMBEDDED_PANIC_HEADER_FLAG_NESTED_PANIC;
 
-	/*
-	 * If the panic log length is not set, set the end to
-	 * the current location of the debug_buf_ptr to close it.
-	 */
+	  
+                                                      
+                                                          
+    
 	if (panic_info->eph_panic_log_len == 0) {
 		panic_info->eph_panic_log_len = PE_get_offset_into_panic_region(debug_buf_ptr);
 
-		/* If this assert fires, it's indicative of corruption in the panic region */
+		                                                                             
 		assert(panic_info->eph_other_log_offset == panic_info->eph_other_log_len == 0);
 	}
 
-	/* If this assert fires, it's likely indicative of corruption in the panic region */
+	                                                                                    
 	assert(((panic_info->eph_stackshot_offset == 0) && (panic_info->eph_stackshot_len == 0)) ||
 	    ((panic_info->eph_stackshot_offset != 0) && (panic_info->eph_stackshot_len != 0)));
 
-	/*
-	 * If we haven't set up the other log yet, set the beginning of the other log
-	 * to the current location of the debug_buf_ptr
-	 */
+	  
+                                                                              
+                                                
+    
 	if (panic_info->eph_other_log_offset == 0) {
 		panic_info->eph_other_log_offset = PE_get_offset_into_panic_region(debug_buf_ptr);
 
-		/* If this assert fires, it's indicative of corruption in the panic region */
+		                                                                             
 		assert(panic_info->eph_other_log_len == 0);
 	}
 
@@ -702,7 +702,7 @@ PE_reboot_on_panic(void)
 
 	if (PE_i_can_has_debugger(&debug_flags)
 	    && (debug_flags & DB_NMI)) {
-		/* kernel debugging is active */
+		                                
 		return FALSE;
 	} else {
 		return TRUE;
@@ -712,15 +712,15 @@ PE_reboot_on_panic(void)
 void
 PE_sync_panic_buffers(void)
 {
-	/*
-	 * rdar://problem/26453070:
-	 * The iBoot panic region is write-combined on arm64.  We must flush dirty lines
-	 * from L1/L2 as late as possible before reset, with no further reads of the panic
-	 * region between the flush and the reset.  Some targets have an additional memcache (L3),
-	 * and a read may bring dirty lines out of L3 and back into L1/L2, causing the lines to
-	 * be discarded on reset.  If we can make sure the lines are flushed to L3/DRAM,
-	 * the platform reset handler will flush any L3.
-	 */
+	  
+                            
+                                                                                 
+                                                                                   
+                                                                                           
+                                                                                        
+                                                                                 
+                                                 
+    
 	if (gPanicBase) {
 		CleanPoC_DcacheRegion_Force(gPanicBase, gPanicSize);
 	}
@@ -730,10 +730,10 @@ static void
 pe_prepare_images(void)
 {
 	if ((1 & PE_state.video.v_rotate) != 0) {
-		// Only square square images with radial symmetry are supported
-		// No need to actually rotate the data
+		                                                               
+		                                      
 
-		// Swap the dx and dy offsets
+		                             
 		uint32_t tmp = default_progress.dx;
 		default_progress.dx = default_progress.dy;
 		default_progress.dy = tmp;
@@ -747,7 +747,7 @@ pe_prepare_images(void)
 	width  = default_progress.width;
 	height = default_progress.height * default_progress.count;
 
-	// Scale images if the UI is being scaled
+	                                         
 	if (PE_state.video.v_scale > 1) {
 		new_data = kalloc(width * height * scale * scale);
 		if (new_data != 0) {

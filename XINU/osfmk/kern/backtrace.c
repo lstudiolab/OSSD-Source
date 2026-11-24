@@ -58,15 +58,15 @@ backtrace(uintptr_t *bt, unsigned int max_frames, bool *was_truncated_out)
 	           was_truncated_out);
 }
 
-/*
- * This function captures a backtrace from the current stack and returns the
- * number of frames captured, limited by max_frames and starting at start_frame.
- * It's fast because it does no checking to make sure there isn't bad data.
- * Since it's only called from threads that we're going to keep executing,
- * if there's bad data we were going to die eventually.  If this function is
- * inlined, it doesn't record the frame of the function it's inside (because
- * there's no stack frame).
- */
+  
+                                                                            
+                                                                                
+                                                                           
+                                                                          
+                                                                            
+                                                                            
+                           
+   
 unsigned int __attribute__((noinline, not_tail_called))
 backtrace_frame(uintptr_t *bt, unsigned int max_frames, void *start_frame,
     bool *was_truncated_out)
@@ -91,7 +91,7 @@ backtrace_frame(uintptr_t *bt, unsigned int max_frames, void *start_frame,
 	in_valid_stack = IN_STK_BOUNDS(fp);
 #if XNU_MONITOR
 	in_valid_stack |= IN_PPLSTK_BOUNDS(fp);
-#endif /* XNU_MONITOR */
+#endif                  
 
 	if (!in_valid_stack) {
 		fp = NULL;
@@ -99,30 +99,30 @@ backtrace_frame(uintptr_t *bt, unsigned int max_frames, void *start_frame,
 
 	while (fp != NULL && frame_index < max_frames) {
 		uintptr_t *next_fp = (uintptr_t *)*fp;
-		uintptr_t ret_addr = *(fp + 1); /* return address is one word higher than frame pointer */
+		uintptr_t ret_addr = *(fp + 1);                                                           
 
-		/*
-		 * If the frame pointer is 0, backtracing has reached the top of
-		 * the stack and there is no return address.  Some stacks might not
-		 * have set this up, so bounds check, as well.
-		 */
+		  
+                                                                  
+                                                                     
+                                                
+     
 		in_valid_stack = IN_STK_BOUNDS(next_fp);
 #if XNU_MONITOR
 		in_valid_stack |= IN_PPLSTK_BOUNDS(next_fp);
-#endif /* XNU_MONITOR */
+#endif                  
 
 		if (next_fp == NULL || !in_valid_stack) {
 			break;
 		}
 
 #if defined(HAS_APPLE_PAC)
-		/* return addresses signed by arm64e ABI */
+		                                           
 		bt[frame_index++] = (uintptr_t) ptrauth_strip((void *)ret_addr, ptrauth_key_return_address);
-#else /* defined(HAS_APPLE_PAC) */
+#else                             
 		bt[frame_index++] = ret_addr;
-#endif /* !defined(HAS_APPLE_PAC) */
+#endif                              
 
-		/* stacks grow down; backtracing should be moving to higher addresses */
+		                                                                        
 		if (next_fp <= fp) {
 #if XNU_MONITOR
 			bool fp_in_pplstack = IN_PPLSTK_BOUNDS(fp);
@@ -130,24 +130,24 @@ backtrace_frame(uintptr_t *bt, unsigned int max_frames, void *start_frame,
 			bool next_fp_in_pplstack = IN_PPLSTK_BOUNDS(fp);
 			bool next_fp_in_kstack = IN_STK_BOUNDS(fp);
 
-			/*
-			 * This check is verbose; it is basically checking whether
-			 * we are switching between the kernel stack and the cpu
-			 * stack.  If so, we ignore the fact that fp has switched
-			 * directions (as it is a symptom of switching stacks).
-			 */
+			  
+                                                             
+                                                           
+                                                            
+                                                          
+      
 			if (((fp_in_pplstack) && (next_fp_in_kstack)) ||
 			    ((fp_in_kstack) && (next_fp_in_pplstack))) {
 				break;
 			}
-#else /* XNU_MONITOR */
+#else                  
 			break;
-#endif /* !XNU_MONITOR */
+#endif                   
 		}
 		fp = next_fp;
 	}
 
-	/* NULL-terminate the list, if space is available */
+	                                                    
 	if (frame_index != max_frames) {
 		bt[frame_index] = 0;
 	}
@@ -181,7 +181,7 @@ interrupted_kernel_pc_fp(uintptr_t *pc, uintptr_t *fp)
 	} else {
 		cs = saved_state32(state)->cs;
 	}
-	/* return early if interrupted a thread in user space */
+	                                                        
 	if ((cs & SEL_PL) == SEL_PL_U) {
 		return KERN_FAILURE;
 	}
@@ -210,7 +210,7 @@ interrupted_kernel_pc_fp(uintptr_t *pc, uintptr_t *fp)
 	}
 	state_64 = is_saved_state64(state);
 
-	/* return early if interrupted a thread in user space */
+	                                                        
 	if (PSR64_IS_USER(get_saved_state_cpsr(state))) {
 		return KERN_FAILURE;
 	}
@@ -232,7 +232,7 @@ interrupted_kernel_pc_fp(uintptr_t *pc, uintptr_t *fp)
 		return KERN_FAILURE;
 	}
 
-	/* return early if interrupted a thread in user space */
+	                                                        
 	if (PSR_IS_USER(get_saved_state_cpsr(state))) {
 		return KERN_FAILURE;
 	}
@@ -242,9 +242,9 @@ interrupted_kernel_pc_fp(uintptr_t *pc, uintptr_t *fp)
 	return KERN_SUCCESS;
 }
 
-#else /* defined(__arm__) */
+#else                       
 #error "interrupted_kernel_pc_fp: unsupported architecture"
-#endif /* !defined(__arm__) */
+#endif                        
 
 unsigned int
 backtrace_interrupted(uintptr_t *bt, unsigned int max_frames,
@@ -297,7 +297,7 @@ backtrace_thread_user(void *thread, uintptr_t *bt, unsigned int max_frames,
 
 #if defined(__x86_64__)
 
-	/* don't allow a malformed user stack to copyin arbitrary kernel data */
+	                                                                        
 #define INVALID_USER_FP(FP) ((FP) == 0 || !IS_USERADDR64_CANONICAL((FP)))
 
 	x86_saved_state_t *state = get_user_regs(thread);
@@ -326,14 +326,14 @@ backtrace_thread_user(void *thread, uintptr_t *bt, unsigned int max_frames,
 	fp = get_saved_state_fp(state);
 
 
-	/* ARM expects stack frames to be aligned to 16 bytes */
+	                                                        
 #define INVALID_USER_FP(FP) ((FP) == 0 || ((FP) & 0x3UL) != 0UL)
 
 
 
 #elif defined(__arm__)
 
-	/* ARM expects stack frames to be aligned to 16 bytes */
+	                                                        
 #define INVALID_USER_FP(FP) ((FP) == 0 || ((FP) & 0x3UL) != 0UL)
 
 	struct arm_saved_state *state = get_user_regs(thread);
@@ -345,9 +345,9 @@ backtrace_thread_user(void *thread, uintptr_t *bt, unsigned int max_frames,
 	pc = get_saved_state_pc(state);
 	fp = get_saved_state_fp(state);
 
-#else /* defined(__arm__) */
+#else                       
 #error "backtrace_thread_user: unsupported architecture"
-#endif /* !defined(__arm__) */
+#endif                        
 
 	bt[frame_index++] = pc;
 
@@ -377,7 +377,7 @@ backtrace_thread_user(void *thread, uintptr_t *bt, unsigned int max_frames,
 
 	frame_size = 2 * (user_64 ? 8 : 4);
 
-	/* switch to the correct map, for copyin */
+	                                           
 	if (thread != current_thread()) {
 		map = get_task_map_reference(get_threadtask(thread));
 		if (map == NULL) {
@@ -405,14 +405,14 @@ backtrace_thread_user(void *thread, uintptr_t *bt, unsigned int max_frames,
 
 		uintptr_t ret_addr = user_64 ? frame.u64.ret : frame.u32.ret;
 #if defined(HAS_APPLE_PAC)
-		/* return addresses signed by arm64e ABI */
+		                                           
 		bt[frame_index++] = (uintptr_t)ptrauth_strip((void *)ret_addr,
 		    ptrauth_key_return_address);
-#else /* defined(HAS_APPLE_PAC) */
+#else                             
 		bt[frame_index++] = ret_addr;
-#endif /* !defined(HAS_APPLE_PAC) */
+#endif                              
 
-		/* stacks grow down; backtracing should be moving to higher addresses */
+		                                                                        
 		if (next_fp <= fp) {
 			break;
 		}
@@ -425,7 +425,7 @@ out:
 		vm_map_deallocate(map);
 	}
 
-	/* NULL-terminate the list, if space is available */
+	                                                    
 	if (frame_index != max_frames) {
 		bt[frame_index] = 0;
 	}

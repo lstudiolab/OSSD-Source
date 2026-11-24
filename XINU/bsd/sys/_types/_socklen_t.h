@@ -27,6 +27,6 @@
  */
 #ifndef _SOCKLEN_T
 #define _SOCKLEN_T
-#include <machine/types.h> /* __darwin_socklen_t */
+#include <machine/types.h>                         
 typedef __darwin_socklen_t      socklen_t;
 #endif

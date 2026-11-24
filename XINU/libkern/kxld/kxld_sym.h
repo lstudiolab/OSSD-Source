@@ -42,41 +42,41 @@ typedef struct kxld_sym KXLDSym;
 typedef boolean_t (*KXLDSymPredicateTest)(const KXLDSym *sym);
 
 struct kxld_sym {
-	char *name;                   // The symbol's name
-	char *alias;                  // The indirect symbol's alias name
-	kxld_addr_t base_addr;        // The symbol's base address
-	kxld_addr_t link_addr;        // The relocated address
-	kxld_addr_t got_addr;         // The address of this symbol's GOT entry
+	char *name;                                       
+	char *alias;                                                     
+	kxld_addr_t base_addr;                                    
+	kxld_addr_t link_addr;                                
+	kxld_addr_t got_addr;                                                  
 	uint16_t desc;
 	uint8_t type;
-	uint8_t sectnum;              // The symbol's section number
+	uint8_t sectnum;                                            
 	uint8_t relocated_sectnum;
-	u_int is_absolute:1,          // Set for absolute symbols
-	    is_section:1,             // Set for section symbols
-	    is_undefined:1,           // Set for undefined symbols
-	    is_indirect:1,            // Set for indirect symbols
-	    is_common:1,              // Set for common symbols
-	    is_external:1,            // Set for external symbols
-	    is_stab:1,                // Set for stab symbols
-	    is_weak:1,                // Set for weak definition symbols
-	    is_resolved:1,            // For symbols that have been resolved
-	                              // externally and should not be exported
-	    is_obsolete:1,            // For symbols marked as obsolete
-	    is_replaced:1,            // Set for symbols replaced by patching
-	    is_got:1,                 // Has an entry in the GOT
-	    is_cxx:1,                 // Set for C++ symbols
-	    is_pure_virtual:1,        // Set for pure virtual symbols
-	    is_class_vtable:1,        // Set for vtable symbols of classes
-	    is_meta_vtable:1,         // Set for vtable symbols of MetaClasses
-	    is_padslot:1,             // Set for pad slot symbols
-	    is_metaclass:1,           // Set for metaclass symbols
-	    is_super_metaclass_pointer:1, // Set for super metaclass pointer syms
-	    is_thumb:1;               // Set for thumb symbols (ARM only)
+	u_int is_absolute:1,                                     
+	    is_section:1,                                       
+	    is_undefined:1,                                       
+	    is_indirect:1,                                       
+	    is_common:1,                                       
+	    is_external:1,                                       
+	    is_stab:1,                                       
+	    is_weak:1,                                                  
+	    is_resolved:1,                                                  
+	                                                                      
+	    is_obsolete:1,                                             
+	    is_replaced:1,                                                   
+	    is_got:1,                                           
+	    is_cxx:1,                                       
+	    is_pure_virtual:1,                                       
+	    is_class_vtable:1,                                            
+	    is_meta_vtable:1,                                                 
+	    is_padslot:1,                                        
+	    is_metaclass:1,                                       
+	    is_super_metaclass_pointer:1,                                        
+	    is_thumb:1;                                                  
 };
 
-/*******************************************************************************
-* Constructors and destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 #if KXLD_USER_OR_ILP32
 kern_return_t kxld_sym_init_from_macho32(KXLDSym *sym, char *strtab,
@@ -97,9 +97,9 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_sym_destroy(KXLDSym *sym)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 boolean_t kxld_sym_is_absolute(const KXLDSym *sym)
 __attribute__((pure, nonnull, visibility("hidden")));
@@ -128,9 +128,9 @@ __attribute__((pure, nonnull, visibility("hidden")));
 boolean_t kxld_sym_is_replaced(const KXLDSym *sym)
 __attribute__((pure, nonnull, visibility("hidden")));
 
-/* We don't wrap this in KXLD_USER_OR_COMMON because even though common symbols
- * aren't always supported, we always need to be able to detect them.
- */
+                                                                               
+                                                                     
+   
 boolean_t kxld_sym_is_common(const KXLDSym *sym)
 __attribute__((pure, nonnull, visibility("hidden")));
 
@@ -143,7 +143,7 @@ __attribute__((pure, nonnull, visibility("hidden")));
 #if KXLD_USER_OR_GOT
 boolean_t kxld_sym_is_got(const KXLDSym *sym)
 __attribute__((pure, nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
 boolean_t kxld_sym_is_stab(const KXLDSym *sym)
 __attribute__((pure, nonnull, visibility("hidden")));
@@ -191,7 +191,7 @@ __attribute__((pure, nonnull, visibility("hidden")));
 
 u_int kxld_sym_get_common_align(const KXLDSym *sym)
 __attribute__((pure, nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
 kern_return_t kxld_sym_get_class_name_from_metaclass(const KXLDSym *sym,
     char class_name[], u_long class_name_len)
@@ -237,9 +237,9 @@ kern_return_t kxld_sym_export_macho_64(const KXLDSym *sym, u_char *nl,
 __attribute__((nonnull, visibility("hidden")));
 #endif
 
-/*******************************************************************************
-* Mutators
-*******************************************************************************/
+                                                                                
+          
+                                                                                
 
 void kxld_sym_relocate(KXLDSym *sym, const struct kxld_sect *sect)
 __attribute__((nonnull, visibility("hidden")));
@@ -247,7 +247,7 @@ __attribute__((nonnull, visibility("hidden")));
 #if KXLD_USER_OR_GOT
 void kxld_sym_set_got(KXLDSym *sym)
 __attribute__((nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
 kern_return_t kxld_sym_resolve(KXLDSym *sym, const kxld_addr_t addr)
 __attribute__((nonnull, visibility("hidden")));
@@ -256,7 +256,7 @@ __attribute__((nonnull, visibility("hidden")));
 kern_return_t kxld_sym_resolve_common(KXLDSym *sym, u_int sectnum,
     kxld_addr_t base_addr)
 __attribute__((nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
 void kxld_sym_delete(KXLDSym *sym)
 __attribute__((nonnull, visibility("hidden")));
@@ -267,4 +267,4 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_sym_mark_private(KXLDSym *sym)
 __attribute__((nonnull, visibility("hidden")));
 
-#endif /* _KXLD_SYMBOL_H_ */
+#endif                      

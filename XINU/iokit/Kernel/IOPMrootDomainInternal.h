@@ -21,17 +21,17 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/* DO NOT MODIFY THIS FILE
- *
- * This file is a partial mirror of
- *    AppleIntelCPUPowerManagement/pmioctl.h
- * Changes may only be made to the original, pmioctl.h.
- * This file must be updated only when pmioctl.h changes.
- */
+                          
+  
+                                   
+                                            
+                                                       
+                                                         
+   
 
-/*
- * Defines the IOCTLs for dealing with the CPU power management KEXT.
- */
+  
+                                                                     
+   
 #ifndef _IOPMROOTDOMAINIOCTLS_H_
 #define _IOPMROOTDOMAINIOCTLS_H_
 
@@ -42,30 +42,30 @@
 #define PMIOCGETVARNAMEINFO     _IOW('P', 26, uint64_t)
 #define PMIOCSETVARINFO         _IOW('P', 27, uint64_t)
 
-/*
- * Data structures used by IOCTLs
- */
+  
+                                 
+   
 #pragma pack(4)
 
 #define PMVARNAMELEN    16
 
 typedef enum{
-	vUnknown            = 0,        /* Unknown type */
-	vBool               = 1,        /* Boolean value */
-	vInt                = 2,        /* signed integer value */
-	vUInt               = 3,        /* Unsigned integer value */
-	vChars              = 4,        /* 8 characters */
-	vInvalid            = -1        /* invalid type */
+	vUnknown            = 0,                          
+	vBool               = 1,                           
+	vInt                = 2,                                  
+	vUInt               = 3,                                    
+	vChars              = 4,                          
+	vInvalid            = -1                          
 } pmioctlVarType_t;
 
 typedef struct pmioctlVaribleInfo {
-	uint32_t            varID;      /* ID of variable */
+	uint32_t            varID;                          
 	uint8_t             varName[PMVARNAMELEN + 1];
-	pmioctlVarType_t    varType;    /* type of variable's value */
-	uint64_t            varInitValue;/* variable's initial value */
-	uint64_t            varCurValue;/* variable's current value */
+	pmioctlVarType_t    varType;                                  
+	uint64_t            varInitValue;                              
+	uint64_t            varCurValue;                              
 } pmioctlVariableInfo_t;
 
 #pragma pack()
 
-#endif /* _IOPMROOTDOMAINIOCTLS_H_ */
+#endif                               

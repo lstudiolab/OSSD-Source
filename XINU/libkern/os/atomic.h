@@ -29,27 +29,27 @@
 #ifndef __OS_ATOMIC_H__
 #define __OS_ATOMIC_H__
 
-/*!
- * @file <os/atomic.h>
- *
- * @brief
- * Small header that helps write code that works with both C11 and C++11,
- * or pre-C11 type declarations.
- *
- * @discussion
- * The macros below allow to write code like this, that can be put in a header
- * and will work with both C11 and C++11:
- *
- * <code>
- * struct old_type {
- *     int atomic_field;
- * } old_variable;
- *
- * os_atomic_std(atomic_fetch_add_explicit)(
- *     os_cast_to_atomic_pointer(&old_variable), 1,
- *     os_atomic_std(memory_order_relaxed));
- * </code>
- */
+   
+                      
+  
+         
+                                                                         
+                                
+  
+              
+                                                                              
+                                         
+  
+         
+                    
+                        
+                  
+  
+                                            
+                                                   
+                                            
+          
+   
 
 #include <os/base.h>
 
@@ -71,7 +71,7 @@
 #define os_cast_to_atomic_pointer(p)     os::cast_to_atomic_pointer(p)
 #define os_atomic_basetypeof(p)          decltype(os_cast_to_atomic_pointer(p)->load())
 #define os_cast_to_nonatomic_pointer(p)  os::cast_to_nonatomic_pointer(p)
-#else /* !OS_ATOMIC_USES_CXX */
+#else                          
 #include <stdatomic.h>
 #define OS_ATOMIC_STD
 #define os_atomic_std(op)                op
@@ -79,13 +79,13 @@
 #define os_cast_to_atomic_pointer(p)     (__typeof__(*(p)) volatile _Atomic *)(uintptr_t)(p)
 #define os_atomic_basetypeof(p)          __typeof__(atomic_load(os_cast_to_atomic_pointer(p)))
 #define os_cast_to_nonatomic_pointer(p)  (os_atomic_basetypeof(p) *)(uintptr_t)(p)
-#endif /* !OS_ATOMIC_USES_CXX */
+#endif                          
 
-/*!
- * @group Internal implementation details
- *
- * @discussion The functions below are not intended to be used directly.
- */
+   
+                                         
+  
+                                                                        
+   
 
 #if OS_ATOMIC_USES_CXX
 #include <type_traits>
@@ -130,6 +130,6 @@ cast_to_nonatomic_pointer(volatile std::atomic<T> *v)
 	return reinterpret_cast<remove_volatile_t<T> *>(_v);
 }
 };
-#endif /* OS_ATOMIC_USES_CXX */
+#endif                         
 
-#endif /* __OS_ATOMIC_H__ */
+#endif                      

@@ -28,4 +28,4 @@
 #ifndef _U_CHAR
 #define _U_CHAR
 typedef unsigned char   u_char;
-#endif /* _U_CHAR */
+#endif              

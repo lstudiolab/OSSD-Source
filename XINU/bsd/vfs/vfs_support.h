@@ -178,4 +178,4 @@ extern int nop_blockmap(struct vnop_blockmap_args *ap);
 extern int err_blockmap(struct vnop_blockmap_args *ap);
 __END_DECLS
 
-#endif  /* _VFS_VFS_SUPPORT_H_ */
+#endif                           

@@ -1,6 +1,6 @@
-/* This program tests that kThreadIdleWorker is being set properly, so
- * that idle and active threads can be appropriately identified.
- */
+                                                                      
+                                                                
+   
 
 #include <darwintest.h>
 #include <dispatch/dispatch.h>
@@ -18,9 +18,9 @@
 
 #include <Foundation/Foundation.h>
 
-#define NUMRETRIES  5  // number of times to retry a stackshot
-#define NUMENQUEUES 16 // number of blocking jobs to enqueue
-#define NUMTHREADS  (NUMENQUEUES + 2) // total number of threads (including numenqueues)
+#define NUMRETRIES  5                                         
+#define NUMENQUEUES 16                                      
+#define NUMTHREADS  (NUMENQUEUES + 2)                                                   
 
 volatile static int spin_threads = 1;
 
@@ -125,7 +125,7 @@ get_thread_statuses(void * stackshot, int * num_idles, int * num_nonidles)
 
 		parsed_threads = parsed_container[@"task_snapshots"][@"thread_snapshots"];
 		for (id th_key in parsed_threads) {
-			/* check to see that tid matches expected idle status */
+			                                                        
 			thread_snap_flags = [parsed_threads[th_key][@"thread_snapshot"][@"ths_ss_flags"] unsignedLongLongValue];
 			(thread_snap_flags & kThreadIdleWorker) ? (*num_idles)++ : (*num_nonidles)++;
 		}
@@ -134,8 +134,8 @@ get_thread_statuses(void * stackshot, int * num_idles, int * num_nonidles)
 
 }
 
-/* Dispatch NUMENQUEUES jobs to a concurrent queue that immediately wait on a
- * shared semaphore. This should spin up plenty of threads! */
+                                                                             
+                                                              
 static void
 warm_up_threadpool(dispatch_queue_t q)
 {
@@ -152,7 +152,7 @@ warm_up_threadpool(dispatch_queue_t q)
 		});
 	}
 
-	sleep(1); // give worker threads enough time to block
+	sleep(1);                                            
 
 	for (i = 0; i < NUMENQUEUES; i++) {
 		dispatch_semaphore_signal(thread_wait);
@@ -162,30 +162,30 @@ warm_up_threadpool(dispatch_queue_t q)
 	dispatch_release(thread_wait);
 	dispatch_release(main_wait);
 
-	// Give enough time for worker threads to go idle again
+	                                                       
 	sleep(1);
 }
 
-/* Dispatch NUMENQUEUES jobs to a concurrent queue that spin in a tight loop.
- * Isn't guaranteed to occupy every worker thread, but it's enough so
- * that a thread will go from idle to nonidle.
- */
+                                                                             
+                                                                     
+                                              
+   
 static void
 fill_threadpool_with_spinning(dispatch_queue_t q)
 {
 	int i;
 	for (i = 0; i < NUMENQUEUES; i++) {
 		dispatch_async(q, ^{
-			while(spin_threads); // should now appear as non-idle in delta shot
+			while(spin_threads);                                               
 		});
 	}
-	sleep(1); // wait for jobs to enqueue
+	sleep(1);                            
 }
 
-/* Take stackshot, count the number of idle and nonidle threads the stackshot records.
- * Where this is called, there should be NUMENQUEUES idle threads (thanks to warm_up_threadpool)
- * and 2 nonidle threads (the main thread, and the spinning pthread).
- */
+                                                                                      
+                                                                                                
+                                                                     
+   
 static void
 take_and_verify_initial_stackshot(uint64_t * since_time)
 {
@@ -205,12 +205,12 @@ take_and_verify_initial_stackshot(uint64_t * since_time)
 	stackshot_config_dealloc(stackshot);
 }
 
-/* Take a stackshot and a delta stackshot, measuring what changed since the previous
- * stackshot. Where this is called, the blocking jobs have been cleared from the work queue,
- * and the work queue has NUMENQUEUES tight-spinning jobs on it. Make sure that
- * no new idle threads appear in the delta, and make sure that the delta shot isn't
- * ignoring the worker threads that have become active.
- */
+                                                                                    
+                                                                                            
+                                                                               
+                                                                                   
+                                                       
+   
 static void
 take_and_verify_delta_stackshot(uint64_t since_time)
 {
@@ -220,7 +220,7 @@ take_and_verify_delta_stackshot(uint64_t since_time)
 	int num_delta_idles, num_delta_nonidles, num_curr_idles, num_curr_nonidles;
 
 	stackshot = take_stackshot(0, 0);
-	delta_stackshot = take_stackshot(0, since_time); /* Threads should appear in delta stackshot as non-idle */
+	delta_stackshot = take_stackshot(0, since_time);                                                           
 
 	get_thread_statuses(stackshot, &num_curr_idles, &num_curr_nonidles);
 	get_thread_statuses(delta_stackshot, &num_delta_idles, &num_delta_nonidles);
@@ -258,7 +258,7 @@ T_DECL(stackshot_idle_25570396, "Tests that stackshot can properly recognize idl
 	fill_threadpool_with_spinning(q);
 	take_and_verify_delta_stackshot(initial_stackshot_time);
 
-	spin_threads = 0; /* pthread-made thread should now exit */
+	spin_threads = 0;                                          
 	ret = pthread_join(spinning_thread, NULL);
 	T_ASSERT_POSIX_ZERO(ret, "Joining on non-work-queue thread");
 }

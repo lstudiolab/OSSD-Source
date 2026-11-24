@@ -25,14 +25,14 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$NetBSD: sem.h,v 1.5 1994/06/29 06:45:15 cgd Exp $	*/
+                                                        
 
-/*
- * SVID compatible sem.h file
- *
- * Author:  Daniel Boulet
- * John Bellardo modified the implementation for Darwin. 12/2000
- */
+  
+                             
+  
+                         
+                                                                
+   
 
 #ifndef _SYS_SEM_H_
 #define _SYS_SEM_H_
@@ -40,44 +40,44 @@
 
 #include <sys/cdefs.h>
 #include <sys/_types.h>
-#include <machine/types.h> /* __int32_t */
+#include <machine/types.h>                
 
-/*
- * [XSI]	All of the symbols from <sys/ipc.h> SHALL be defined
- *		when this header is included
- */
+  
+                                                             
+                                
+   
 #include <sys/ipc.h>
 
 
-/*
- * [XSI] The pid_t, time_t, key_t, and size_t types shall be defined as
- * described in <sys/types.h>.
- *
- * NOTE:	The definition of the key_t type is implicit from the
- *		inclusion of <sys/ipc.h>
- */
+  
+                                                                       
+                              
+  
+                                                              
+                            
+   
 #include <sys/_types/_pid_t.h>
 #include <sys/_types/_time_t.h>
 #include <sys/_types/_size_t.h>
 
-/*
- * Technically, we should force all code references to the new structure
- * definition, not in just the standards conformance case, and leave the
- * legacy interface there for binary compatibility only.  Currently, we
- * are only forcing this for programs requesting standards conformance.
- */
+  
+                                                                        
+                                                                        
+                                                                       
+                                                                       
+   
 #if __DARWIN_UNIX03 || defined(KERNEL)
 #pragma pack(4)
-/*
- * Structure used internally.
- *
- * This structure is exposed because standards dictate that it is used as
- * the semun union member 'buf' as the fourth argment to semctl() when the
- * third argument is IPC_STAT or IPC_SET.
- *
- * Note: only the fields sem_perm, sem_nsems, sem_otime, and sem_ctime
- * are meaningful in user space.
- */
+  
+                             
+  
+                                                                         
+                                                                          
+                                         
+  
+                                                                      
+                                
+   
 #if (defined(_POSIX_C_SOURCE) && !defined(_DARWIN_C_SOURCE))
 struct semid_ds
 #else
@@ -85,110 +85,110 @@ struct semid_ds
 struct __semid_ds_new
 #endif
 {
-	struct __ipc_perm_new sem_perm; /* [XSI] operation permission struct */
-	__int32_t       sem_base;       /* 32 bit base ptr for semaphore set */
-	unsigned short  sem_nsems;      /* [XSI] number of sems in set */
-	time_t          sem_otime;      /* [XSI] last operation time */
-	__int32_t       sem_pad1;       /* RESERVED: DO NOT USE! */
-	time_t          sem_ctime;      /* [XSI] last change time */
-	                                /* Times measured in secs since */
-	                                /* 00:00:00 GMT, Jan. 1, 1970 */
-	__int32_t       sem_pad2;       /* RESERVED: DO NOT USE! */
-	__int32_t       sem_pad3[4];    /* RESERVED: DO NOT USE! */
+	struct __ipc_perm_new sem_perm;                                        
+	__int32_t       sem_base;                                              
+	unsigned short  sem_nsems;                                       
+	time_t          sem_otime;                                     
+	__int32_t       sem_pad1;                                  
+	time_t          sem_ctime;                                  
+	                                                                  
+	                                                                
+	__int32_t       sem_pad2;                                  
+	__int32_t       sem_pad3[4];                               
 };
 #pragma pack()
-#else   /* !__DARWIN_UNIX03 */
+#else                         
 #define semid_ds        __semid_ds_old
-#endif  /* __DARWIN_UNIX03 */
+#endif                       
 
 #if !__DARWIN_UNIX03
 struct __semid_ds_old {
-	struct __ipc_perm_old sem_perm; /* [XSI] operation permission struct */
-	__int32_t       sem_base;       /* 32 bit base ptr for semaphore set */
-	unsigned short  sem_nsems;      /* [XSI] number of sems in set */
-	time_t          sem_otime;      /* [XSI] last operation time */
-	__int32_t       sem_pad1;       /* RESERVED: DO NOT USE! */
-	time_t          sem_ctime;      /* [XSI] last change time */
-	                                /* Times measured in secs since */
-	                                /* 00:00:00 GMT, Jan. 1, 1970 */
-	__int32_t       sem_pad2;       /* RESERVED: DO NOT USE! */
-	__int32_t       sem_pad3[4];    /* RESERVED: DO NOT USE! */
+	struct __ipc_perm_old sem_perm;                                        
+	__int32_t       sem_base;                                              
+	unsigned short  sem_nsems;                                       
+	time_t          sem_otime;                                     
+	__int32_t       sem_pad1;                                  
+	time_t          sem_ctime;                                  
+	                                                                  
+	                                                                
+	__int32_t       sem_pad2;                                  
+	__int32_t       sem_pad3[4];                               
 };
-#endif  /* !__DARWIN_UNIX03 */
+#endif                        
 
-/*
- * Possible values for the third argument to semctl()
- */
-#define GETNCNT 3       /* [XSI] Return the value of semncnt {READ} */
-#define GETPID  4       /* [XSI] Return the value of sempid {READ} */
-#define GETVAL  5       /* [XSI] Return the value of semval {READ} */
-#define GETALL  6       /* [XSI] Return semvals into arg.array {READ} */
-#define GETZCNT 7       /* [XSI] Return the value of semzcnt {READ} */
-#define SETVAL  8       /* [XSI] Set the value of semval to arg.val {ALTER} */
-#define SETALL  9       /* [XSI] Set semvals from arg.array {ALTER} */
+  
+                                                     
+   
+#define GETNCNT 3                                                     
+#define GETPID  4                                                    
+#define GETVAL  5                                                    
+#define GETALL  6                                                       
+#define GETZCNT 7                                                     
+#define SETVAL  8                                                             
+#define SETALL  9                                                     
 
 
-/* A semaphore; this is an anonymous structure, not for external use */
+                                                                       
 struct sem {
-	unsigned short  semval;         /* semaphore value */
-	pid_t           sempid;         /* pid of last operation */
-	unsigned short  semncnt;        /* # awaiting semval > cval */
-	unsigned short  semzcnt;        /* # awaiting semval == 0 */
+	unsigned short  semval;                              
+	pid_t           sempid;                                    
+	unsigned short  semncnt;                                      
+	unsigned short  semzcnt;                                    
 };
 
 
-/*
- * Structure of array element for second argument to semop()
- */
+  
+                                                            
+   
 struct sembuf {
-	unsigned short  sem_num;        /* [XSI] semaphore # */
-	short           sem_op;         /* [XSI] semaphore operation */
-	short           sem_flg;        /* [XSI] operation flags */
+	unsigned short  sem_num;                               
+	short           sem_op;                                        
+	short           sem_flg;                                   
 };
 
-/*
- * Possible flag values for sem_flg
- */
-#define SEM_UNDO        010000          /* [XSI] Set up adjust on exit entry */
+  
+                                   
+   
+#define SEM_UNDO        010000                                                 
 
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 
-/*
- * Union used as the fourth argment to semctl() in all cases.  Specific
- * member values are used for different values of the third parameter:
- *
- * Command					Member
- * -------------------------------------------	------
- * GETALL, SETALL				array
- * SETVAL					val
- * IPC_STAT, IPC_SET				buf
- *
- * The union definition is intended to be defined by the user application
- * in conforming applications; it is provided here for two reasons:
- *
- * 1)	Historical source compatability for non-conforming applications
- *	expecting this header to declare the union type on their behalf
- *
- * 2)	Documentation; specifically, 64 bit applications that do not pass
- *	this structure for 'val', or, alternately, a 64 bit type, will
- *	not function correctly
- */
+  
+                                                                       
+                                                                      
+  
+                     
+                                                     
+                          
+                 
+                           
+  
+                                                                         
+                                                                   
+  
+                                                                     
+                                                                  
+  
+                                                                       
+                                                                 
+                         
+   
 union semun {
-	int             val;            /* value for SETVAL */
-	struct semid_ds *buf;           /* buffer for IPC_STAT & IPC_SET */
-	unsigned short  *array;         /* array for GETALL & SETALL */
+	int             val;                                  
+	struct semid_ds *buf;                                              
+	unsigned short  *array;                                        
 };
 typedef union semun semun_t;
 
 
-/*
- * Permissions
- */
-#define SEM_A           0200    /* alter permission */
-#define SEM_R           0400    /* read permission */
+  
+              
+   
+#define SEM_A           0200                          
+#define SEM_R           0400                         
 
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
 
 
@@ -197,12 +197,12 @@ typedef union semun semun_t;
 __BEGIN_DECLS
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 int     semsys(int, ...);
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 int     semctl(int, int, int, ...) __DARWIN_ALIAS(semctl);
 int     semget(key_t, int, int);
 int     semop(int, struct sembuf *, size_t);
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
-#endif /* !_SEM_H_ */
+#endif               

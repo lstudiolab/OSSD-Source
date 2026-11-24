@@ -33,7 +33,7 @@ getiopolicy_np(int iotype, int scope)
 	int policy, error;
 	struct _iopol_param_t iop_param;
 
-	/* Do not sanity check iotype and scope, leave it to kernel. */
+	                                                               
 
 	iop_param.iop_scope = scope;
 	iop_param.iop_iotype = iotype;
@@ -53,7 +53,7 @@ exit:
 int
 setiopolicy_np(int iotype, int scope, int policy)
 {
-	/* kernel validates the indiv values, no need to repeat it */
+	                                                             
 	struct _iopol_param_t iop_param;
 
 	iop_param.iop_scope = scope;
@@ -62,7 +62,7 @@ setiopolicy_np(int iotype, int scope, int policy)
 
 	int rv = __iopolicysys(IOPOL_CMD_SET, &iop_param);
 	if (rv == -2) {
-		/* not an actual error but indication that __iopolicysys removed the thread QoS */
+		                                                                                  
 		_pthread_clear_qos_tsd(MACH_PORT_NULL);
 		rv = 0;
 	}

@@ -45,28 +45,28 @@
 #include <os/hash.h>
 #include <os/refcnt.h>
 
-/**
- * @file osfmk/kern/restartable.c
- *
- * @brief
- * This module implements restartable userspace functions.
- *
- * @discussion
- * task_restartable_ranges_register() allows task to configure
- * the restartable ranges, only once per task,
- * before it has made its second thread.
- *
- * task_restartable_ranges_synchronize() can later be used to trigger
- * restarts for threads with a PC in a restartable region.
- *
- * It is implemented with an AST (AST_RESET_PCS) that will cause threads
- * as they return to userspace to reset PCs in a restartable region
- * to the recovery offset of this region.
- *
- * Because signal delivery would mask the proper saved PC for threads,
- * sigreturn also forcefully sets the AST and will go through the logic
- * every single time.
- */
+   
+                                 
+  
+         
+                                                          
+  
+              
+                                                              
+                                              
+                                        
+  
+                                                                     
+                                                          
+  
+                                                                        
+                                                                   
+                                         
+  
+                                                                      
+                                                                       
+                     
+   
 
 typedef int (*cmpfunc_t)(const void *a, const void *b);
 extern void qsort(void *a, size_t n, size_t es, cmpfunc_t cmp);
@@ -82,7 +82,7 @@ struct restartable_ranges {
 #if DEBUG || DEVELOPMENT
 #define RR_HASH_SIZE   256
 #else
-// Release kernel userspace should have shared caches and a single registration
+                                                                               
 #define RR_HASH_SIZE    16
 #endif
 
@@ -95,12 +95,12 @@ LCK_SPIN_DECLARE(rr_spinlock, &rr_lock_grp);
 
 #pragma mark internals
 
-/**
- * @function _ranges_cmp
- *
- * @brief
- * Compares two ranges together.
- */
+   
+                        
+  
+         
+                                
+   
 static int
 _ranges_cmp(const void *_r1, const void *_r2)
 {
@@ -116,23 +116,23 @@ _ranges_cmp(const void *_r1, const void *_r2)
 	return r1->length < r2->length ? -1 : 1;
 }
 
-/**
- * @function _ranges_validate
- *
- * @brief
- * Validates an array of PC ranges for wraps and intersections.
- *
- * @discussion
- * This sorts and modifies the input.
- *
- * The ranges must:
- * - not wrap around,
- * - have a length/recovery offset within a page of the range start
- *
- * @returns
- * - KERN_SUCCESS:          ranges are valid
- * - KERN_INVALID_ARGUMENT: ranges are invalid
- */
+   
+                             
+  
+         
+                                                               
+  
+              
+                                     
+  
+                   
+                     
+                                                                   
+  
+           
+                                            
+                                              
+   
 static kern_return_t
 _ranges_validate(task_t task, task_restartable_range_t *ranges, uint32_t count)
 {
@@ -169,16 +169,16 @@ _ranges_validate(task_t task, task_restartable_range_t *ranges, uint32_t count)
 	return KERN_SUCCESS;
 }
 
-/**
- * @function _ranges_lookup
- *
- * @brief
- * Lookup the left side of a range for a given PC within a set of ranges.
- *
- * @returns
- * - 0: no PC range found
- * - the left-side of the range.
- */
+   
+                           
+  
+         
+                                                                         
+  
+           
+                         
+                                
+   
 __attribute__((always_inline))
 static mach_vm_address_t
 _ranges_lookup(struct restartable_ranges *rr, mach_vm_address_t pc)
@@ -198,13 +198,13 @@ _ranges_lookup(struct restartable_ranges *rr, mach_vm_address_t pc)
 		mach_vm_address_t location = ranges[i].location;
 
 		if (pc <= location) {
-			/* if the PC is exactly at pc_start, no reset is needed */
+			                                                          
 			r = i;
 		} else if (location + ranges[i].length <= pc) {
-			/* if the PC is exactly at the end, it's out of the function */
+			                                                               
 			l = i + 1;
 		} else {
-			/* else it's strictly in the range, return the recovery pc */
+			                                                             
 			return location + ranges[i].recovery_offs;
 		}
 	}
@@ -212,12 +212,12 @@ _ranges_lookup(struct restartable_ranges *rr, mach_vm_address_t pc)
 	return 0;
 }
 
-/**
- * @function _restartable_ranges_dispose
- *
- * @brief
- * Helper to dispose of a range that has reached a 0 refcount.
- */
+   
+                                        
+  
+         
+                                                              
+   
 __attribute__((noinline))
 static void
 _restartable_ranges_dispose(struct restartable_ranges *rr, bool hash_remove)
@@ -230,12 +230,12 @@ _restartable_ranges_dispose(struct restartable_ranges *rr, bool hash_remove)
 	kfree(rr, sizeof(*rr) + rr->rr_count * sizeof(task_restartable_range_t));
 }
 
-/**
- * @function _restartable_ranges_equals
- *
- * @brief
- * Helper to compare two restartable ranges.
- */
+   
+                                       
+  
+         
+                                            
+   
 static bool
 _restartable_ranges_equals(
 	const struct restartable_ranges *rr1,
@@ -247,17 +247,17 @@ _restartable_ranges_equals(
 	       memcmp(rr1->rr_ranges, rr2->rr_ranges, rr1_size) == 0;
 }
 
-/**
- * @function _restartable_ranges_create
- *
- * @brief
- * Helper to create a uniqued restartable range.
- *
- * @returns
- * - KERN_SUCCESS
- * - KERN_INVALID_ARGUMENT: the validation of the new ranges failed.
- * - KERN_RESOURCE_SHORTAGE: too many ranges, out of memory
- */
+   
+                                       
+  
+         
+                                                
+  
+           
+                 
+                                                                    
+                                                           
+   
 static kern_return_t
 _restartable_ranges_create(task_t task, task_restartable_range_t *ranges,
     uint32_t count, struct restartable_ranges **rr_storage)
@@ -349,13 +349,13 @@ thread_reset_pcs_ast(thread_t thread)
 	struct restartable_ranges *rr;
 	mach_vm_address_t pc;
 
-	/*
-	 * Because restartable_ranges are set while the task only has on thread
-	 * and can't be mutated outside of this, no lock is required to read this.
-	 */
+	  
+                                                                        
+                                                                           
+    
 	rr = task->restartable_ranges;
 	if (rr) {
-		/* pairs with the barrier in task_restartable_ranges_synchronize() */
+		                                                                     
 		os_atomic_thread_fence(acquire);
 
 		pc = _ranges_lookup(rr, machine_thread_pc(thread));
@@ -402,13 +402,13 @@ task_restartable_ranges_register(
 			}
 		}
 #if !DEBUG && !DEVELOPMENT
-		/*
-		 * For security reasons, on release kernels, only allow for this to be
-		 * configured once.
-		 *
-		 * But to be able to test the feature we need to relax this for
-		 * dev kernels.
-		 */
+		  
+                                                                        
+                     
+    
+                                                                 
+                 
+     
 		if (task->restartable_ranges) {
 			kr = KERN_NOT_SUPPORTED;
 		}
@@ -432,7 +432,7 @@ task_restartable_ranges_synchronize(task_t task)
 		return KERN_FAILURE;
 	}
 
-	/* pairs with the barrier in thread_reset_pcs_ast() */
+	                                                      
 	os_atomic_thread_fence(release);
 
 	task_lock(task);

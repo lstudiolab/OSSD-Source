@@ -204,10 +204,10 @@ iptap_clone_create(struct if_clone *ifc, u_int32_t unit, void *params)
 	}
 	iptap->iptap_unit = unit;
 
-	/*
-	 * We do not use a set_bpf_tap() function as we rather rely on the more
-	 * accurate callback passed to bpf_attach()
-	 */
+	  
+                                                                        
+                                            
+    
 	bzero(&if_init, sizeof(if_init));
 	if_init.ver = IFNET_INIT_CURRENT_VERSION;
 	if_init.len = sizeof(if_init);
@@ -239,16 +239,16 @@ iptap_clone_create(struct if_clone *ifc, u_int32_t unit, void *params)
 		goto done;
 	}
 
-	/*
-	 * Attach by default as DLT_PKTAP for packet metadata
-	 * Provide DLT_RAW for legacy
-	 */
+	  
+                                                      
+                              
+    
 	bpf_attach(iptap->iptap_ifp, DLT_PKTAP, sizeof(struct pktap_header), NULL,
 	    iptap_tap_callback);
 	bpf_attach(iptap->iptap_ifp, DLT_RAW, 0, NULL,
 	    iptap_tap_callback);
 
-	/* Take a reference and add to the global list */
+	                                                 
 	ifnet_reference(iptap->iptap_ifp);
 
 	iptap_lock_exclusive();
@@ -277,12 +277,12 @@ iptap_clone_destroy(struct ifnet *ifp)
 	return error;
 }
 
-/*
- * This function is called whenever a DLT is set on the interface:
- * - When interface is attached to a BPF device via BIOCSETIF for the default DLT
- * - Whenever a new DLT is selected via BIOCSDLT
- * - When the interface is detached from a BPF device (direction is zero)
- */
+  
+                                                                  
+                                                                                 
+                                                
+                                                                         
+   
 __private_extern__ errno_t
 iptap_tap_callback(ifnet_t ifp, u_int32_t dlt, bpf_tap_mode direction)
 {
@@ -319,10 +319,10 @@ iptap_tap_callback(ifnet_t ifp, u_int32_t dlt, bpf_tap_mode direction)
 		break;
 	}
 done:
-	/*
-	 * Attachements count must be positive and we're in trouble
-	 * if we have more that 2**31 attachements
-	 */
+	  
+                                                            
+                                           
+    
 	VERIFY(iptap_total_tap_count >= 0);
 
 	return 0;
@@ -467,11 +467,11 @@ iptap_detach(ifnet_t ifp)
 
 	iptap_lock_done();
 
-	/* Drop reference as it's no more on the global list */
+	                                                       
 	ifnet_release(ifp);
 	if_clone_softc_deallocate(&iptap_cloner, iptap);
 
-	/* This is for the reference taken by ifnet_attach() */
+	                                                       
 	(void) ifnet_release(ifp);
 }
 
@@ -599,9 +599,9 @@ iptap_bpf_tap(struct mbuf *m, u_int32_t proto, int outgoing)
 
 	if (proto == AF_INET6) {
 		struct ip6_hdr *ip6 = mtod(m, struct ip6_hdr *);
-		/*
-		 * Clear the embedded scope ID
-		 */
+		  
+                                
+     
 		if (IN6_IS_SCOPE_EMBED(&ip6->ip6_src)) {
 			src_scope_id = ip6->ip6_src.s6_addr16[1];
 			ip6->ip6_src.s6_addr16[1] = 0;
@@ -628,7 +628,7 @@ iptap_bpf_tap(struct mbuf *m, u_int32_t proto, int outgoing)
 			size_t hdr_size = sizeof(hdr_buffer);
 			struct ifnet *ifp = outgoing ? NULL : m->m_pkthdr.rcvif;
 
-			/* Verify the structure is packed */
+			                                    
 			_CASSERT(sizeof(hdr_buffer) == sizeof(struct pktap_header) + sizeof(u_int32_t));
 
 			bzero(hdr, sizeof(hdr_buffer));
@@ -660,9 +660,9 @@ iptap_bpf_tap(struct mbuf *m, u_int32_t proto, int outgoing)
 	if (proto == AF_INET6) {
 		struct ip6_hdr *ip6 = mtod(m, struct ip6_hdr *);
 
-		/*
-		 * Restore the embedded scope ID
-		 */
+		  
+                                  
+     
 		if (IN6_IS_SCOPE_EMBED(&ip6->ip6_src)) {
 			ip6->ip6_src.s6_addr16[1] = src_scope_id;
 		}

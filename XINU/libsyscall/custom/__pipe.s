@@ -49,7 +49,7 @@ PSEUDO(___pipe, pipe, 0, cerror_nocancel)
 #elif defined(__arm__)
 
 MI_ENTRY_POINT(___pipe)
-	mov		r3,r0              // save fildes across syscall
+	mov		r3,r0                                           
 	SYSCALL_NONAME(pipe, 0, cerror_nocancel)
 	str     r0, [r3, #0]
 	str     r1, [r3, #4]
@@ -59,11 +59,11 @@ MI_ENTRY_POINT(___pipe)
 #elif defined(__arm64__)
 
 MI_ENTRY_POINT(___pipe)
-	mov		x9, x0				// Stash FD array
+	mov		x9, x0				                 
 	SYSCALL_NONAME(pipe, 0, cerror_nocancel)
-	stp		w0, w1, [x9]		// Save results
-	mov		x0, #0				// Success
-	ret							// Done
+	stp		w0, w1, [x9]		               
+	mov		x0, #0				          
+	ret							       
 
 #else
 #error Unsupported architecture

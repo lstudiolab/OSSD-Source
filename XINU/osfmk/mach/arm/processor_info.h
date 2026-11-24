@@ -29,10 +29,10 @@
 #ifndef _MACH_ARM_PROCESSOR_INFO_H_
 #define _MACH_ARM_PROCESSOR_INFO_H_
 
-#define PROCESSOR_CPU_STAT   0x10000003 /* Low-level CPU statistics */
-#define PROCESSOR_CPU_STAT64 0x10000004 /* Low-level CPU statistics, in full 64-bit */
+#define PROCESSOR_CPU_STAT   0x10000003                               
+#define PROCESSOR_CPU_STAT64 0x10000004                                               
 
-#include <stdint.h> /* uint32_t, uint64_t */
+#include <stdint.h>                         
 
 struct processor_cpu_stat {
 	uint32_t irq_ex_cnt;
@@ -69,4 +69,4 @@ typedef struct processor_cpu_stat64 *processor_cpu_stat64_t;
 #define PROCESSOR_CPU_STAT64_COUNT ((mach_msg_type_number_t) \
 	        (sizeof(processor_cpu_stat64_data_t) / sizeof(integer_t)))
 
-#endif /* _MACH_ARM_PROCESSOR_INFO_H_ */
+#endif                                  

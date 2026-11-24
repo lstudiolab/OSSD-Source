@@ -29,12 +29,12 @@
  * @OSF_COPYRIGHT@
  */
 
-/*
- * Define Basic IPC types available to callers.
- * These are not intended to be used directly, but
- * are used to define other types available through
- * port.h and mach_types.h for in-kernel entities.
- */
+  
+                                               
+                                                  
+                                                   
+                                                  
+   
 
 #ifndef _IPC_IPC_TYPES_H_
 #define _IPC_IPC_TYPES_H_
@@ -45,14 +45,14 @@
 
 #ifdef  MACH_KERNEL_PRIVATE
 
-typedef natural_t ipc_table_index_t;    /* index into tables */
-typedef natural_t ipc_table_elems_t;    /* size of tables */
+typedef natural_t ipc_table_index_t;                           
+typedef natural_t ipc_table_elems_t;                        
 typedef natural_t ipc_entry_bits_t;
-typedef ipc_table_elems_t ipc_entry_num_t;      /* number of entries */
+typedef ipc_table_elems_t ipc_entry_num_t;                             
 typedef ipc_table_index_t ipc_port_request_index_t;
 
-typedef mach_port_name_t mach_port_index_t;             /* index values */
-typedef mach_port_name_t mach_port_gen_t;               /* generation numbers */
+typedef mach_port_name_t mach_port_index_t;                               
+typedef mach_port_name_t mach_port_gen_t;                                       
 
 typedef struct ipc_entry *ipc_entry_t;
 
@@ -84,7 +84,7 @@ typedef struct ipc_kobject_label *ipc_kobject_label_t;
 #define IPS_NULL        ((ipc_pset_t) 0)
 #define IKM_NULL        ((ipc_kmsg_t) 0)
 
-typedef void (*mach_msg_continue_t)(mach_msg_return_t); /* after wakeup */
+typedef void (*mach_msg_continue_t)(mach_msg_return_t);                   
 #define MACH_MSG_CONTINUE_NULL  ((mach_msg_continue_t) 0)
 
 typedef struct ipc_importance_elem *ipc_importance_elem_t;
@@ -97,11 +97,11 @@ typedef struct ipc_importance_inherit *ipc_importance_inherit_t;
 #define III_NULL        ((ipc_importance_inherit_t)0)
 
 
-#else   /* MACH_KERNEL_PRIVATE */
+#else                            
 
 struct ipc_object;
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 typedef struct ipc_object       *ipc_object_t;
 
@@ -110,4 +110,4 @@ typedef struct ipc_object       *ipc_object_t;
 #define IPC_OBJECT_VALID(io)    (((io) != IPC_OBJECT_NULL) && \
 	                         ((io) != IPC_OBJECT_DEAD))
 
-#endif  /* _IPC_IPC_TYPES_H_ */
+#endif                         

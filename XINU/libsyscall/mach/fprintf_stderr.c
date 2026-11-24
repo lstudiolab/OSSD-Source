@@ -40,13 +40,13 @@ int (*vprintf_stderr_func)(const char *format, va_list ap);
 #define __STDERR_FILENO 2
 int write(int fd, const char* cbuf, int nbyte);
 
-/* This function allows the writing of a mach error message to an
- * application-controllable output method, the default being to
- * use printf if no other method is specified by the application.
- *
- * To override, set the global function pointer vprintf_stderr to
- * a function which takes the same parameters as vprintf.
- */
+                                                                 
+                                                               
+                                                                 
+  
+                                                                 
+                                                         
+   
 
 __private_extern__ int
 fprintf_stderr(const char *format, ...)

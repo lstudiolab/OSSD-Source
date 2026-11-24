@@ -53,7 +53,7 @@ def WaitqTableIdxFromId(id):
     if hasattr(kern.globals, 'g_lt_idx_max'):
         idx = id & unsigned(kern.globals.g_lt_idx_max)
     else:
-        # best guess
+                    
         idx = id & 0x000000000003ffff
     return int(idx)
 
@@ -61,7 +61,7 @@ def WaitqTableGenFromId(id):
     if hasattr(kern.globals, 'g_lt_idx_max'):
         msk = ~unsigned(kern.globals.g_lt_idx_max)
     else:
-        # best guess
+                    
         msk = ~0x000000000003ffff
     shift = 0
     while (msk & 0x1) == 0:
@@ -113,7 +113,7 @@ def GetWaitqPrepost(id):
 def GetWaitqSetidString(setid):
     idx = WaitqTableIdxFromId(setid)
     gen = WaitqTableGenFromId(setid)
-    # This must match the format used in WaitqSetsFromLink
+                                                          
     str = "{:>7d}/{:<#14x}".format(unsigned(idx), unsigned(gen))
     return str
 
@@ -123,8 +123,8 @@ def WaitqSetsFromLink(link, sets, depth):
         sets.append("{: <22s}".format("<link:NULL>"))
         return
     if WaitqTableElemType(link) == "ELEM":
-        #sets.append("{: <#18x}".format(unsigned(link.wql_wqs.wql_set)))
-        #sets.append("{:>7d}/{:<#14x}".format(unsigned(id.idx),unsigned(id.generation)))
+                                                                        
+                                                                                        
         sets.append(GetWaitqSetidString(link.wqte.lt_id.id))
         return
     if depth >= 950:
@@ -274,7 +274,7 @@ def PrintWaitqSetidLinkTree(link, verbose, sets, indent=87):
         PrintWaitqSetidLinkTree(right, verbose, sets, indent + len(lstr) + 6)
     return
 
-# Macro: showsetidlink
+                      
 @lldb_command('showsetidlink', "S:FT")
 def ShowSetidLink(cmd_args=None, cmd_options={}):
     """ Print waitq_link structure summary
@@ -344,7 +344,7 @@ def ShowSetidLink(cmd_args=None, cmd_options={}):
                 else:
                     nps = "s"
                 print "\tWQS:{:<#x} ({:d} prepost{:s})".format(unsigned(wq),npreposts,nps)
-# EndMacro: showsetidlink
+                         
 @lldb_command('showwaitqlink', "S:FT")
 def ShowWaitqLink(cmd_args=None, cmd_options={}):
     """ Print waitq_link structure summary
@@ -352,7 +352,7 @@ def ShowWaitqLink(cmd_args=None, cmd_options={}):
     ShowSetidLink(cmd_args, cmd_options)
 
 
-# Macro: showallsetidlinks
+                          
 @lldb_command('showallsetidlinks', 'V:T:S:F:XQ')
 def ShowAllSetidLinks(cmd_args=None, cmd_options={}):
     """ Dump / summarize all waitq set linktable elements
@@ -459,7 +459,7 @@ def ShowAllSetidLinks(cmd_args=None, cmd_options={}):
     id = 0
     while id < nelem:
         if id == 0:
-            # Set a generation count to differentiate from an invalid ID
+                                                                        
             first_entry = Cast(kern.globals.g_wqlinktable.table[0], 'lt_elem *')
             link = GetWaitqLink(first_entry.lt_id.id)[0]
         else:
@@ -489,8 +489,8 @@ def ShowAllSetidLinks(cmd_args=None, cmd_options={}):
                     if rValid or lValid:
                         do_print = False
                 elif opt_subtype_filter == "iLRI" and hasattr(link, 'sl_alloc_task'):
-                    # only print this if both left and right are invalid
-                    # and the allocating task is unknown/dead
+                                                                        
+                                                             
                     do_print = False
                     is_dead = 0
                     pid = -1
@@ -509,8 +509,8 @@ def ShowAllSetidLinks(cmd_args=None, cmd_options={}):
                         do_print = True
 
             if do_print and opt_type_filt == "" and opt_subtype_filter == "iP" and hasattr(link, 'sl_alloc_task'):
-                # Only print non-free table objects that were allocated by
-                # dead processes
+                                                                          
+                                
                 do_print = False
                 is_dead = 0
                 pid = -1
@@ -552,8 +552,8 @@ def ShowAllSetidLinks(cmd_args=None, cmd_options={}):
                     print GetWaitqSetidLinkSummary(link, verbose)
                 if inconsistent:
                     ninconsistent += 1
-                    # print out warnings about inconsistent state as we parse
-                    # the list - even if the caller wants a summary
+                                                                             
+                                                                   
                     print "[WARNING] inconsistent state in idx: {:d} ({:s} element)".format(link.wqte.lt_id.idx, lt)
             if opt_cross_check == 1 and lt == "ELEM":
                 wq = unsigned(addressof(link.wql_wqs.wql_set.wqset_q))
@@ -589,10 +589,10 @@ def ShowAllSetidLinks(cmd_args=None, cmd_options={}):
             l = len(wq_ptr[wq])
             if l > 1:
                 print "\tWQS:{:#x} ({:d} {:s}".format(wq, l, str(wq_ptr[wq]))
-# EndMacro: showallsetidlinks
+                             
 
 
-# Macro: showallpreposts
+                        
 @lldb_command('showallpreposts', 'VQT:F:Y:')
 def ShowAllPreposts(cmd_args=None, cmd_options={}):
     """ Dump / summarize all waitq prepost linkage elements
@@ -671,9 +671,9 @@ def ShowAllPreposts(cmd_args=None, cmd_options={}):
             if isvalid and opt_post_type > -1 and lt == "LINK":
                 post_wqp = GetWaitqPrepost(wqp.wqp_post.wqp_wq_id)[0]
                 post_valid = WaitqTableElemValid(post_wqp)
-                if opt_post_type == 0 and post_valid: # only count _invalid_ POST objects
+                if opt_post_type == 0 and post_valid:                                    
                     should_count = 0
-                elif opt_post_type == 1 and not post_valid: # only count _valid_ POST objects
+                elif opt_post_type == 1 and not post_valid:                                  
                     should_count = 0
             if should_count and (opt_type_filt == "" or opt_type_filt == lt) and ((opt_valid_only == 0 or isvalid)):
                 if lt == "ELEM":
@@ -708,7 +708,7 @@ def ShowAllPreposts(cmd_args=None, cmd_options={}):
         print "Link allocation BT (frame={:d})".format(opt_bt_idx)
     for k,v in bt_summary.iteritems():
         print "\t[{:d}] from: {:s}".format(v, GetSourceInformationForAddress(unsigned(k)))
-# EndMacro: showallpreposts
+                           
 
 
 @lldb_type_summary(['wq_prepost', 'wq_prepost *'])
@@ -742,7 +742,7 @@ def GetWaitqPrepostSummary(wqp):
     return out_str
 
 
-# Macro: showprepost
+                    
 @lldb_command('showprepost', "P:")
 def ShowPrepost(cmd_args=None, cmd_options={}):
     """ Print prepost structure summary
@@ -770,7 +770,7 @@ def ShowPrepost(cmd_args=None, cmd_options={}):
 
     print GetWaitqPrepostSummary.header
     print GetWaitqPrepostSummary(wqp)
-# EndMacro: showprepost
+                       
 
 
 def WaitqPrepostFromObj(wqp, head_id, inv_ok, prepost_str, pp_arr = 0, depth = 0):
@@ -783,13 +783,13 @@ def WaitqPrepostFromObj(wqp, head_id, inv_ok, prepost_str, pp_arr = 0, depth = 0
             id = wqp.wqte.lt_id.id
         prepost_str.append("{0: <#18x}:{1: <18s}".format(id, "<invalid>"))
         return
-    if etype == "ELEM": # WQP_WQ
+    if etype == "ELEM":         
         prepost_str.append("{0: <#18x}:{1: <#18x}".format(wqp.wqte.lt_id.id, unsigned(wqp.wqp_wq.wqp_wq_ptr)))
         return
 
     post_wq = 0
 
-    if etype == "LINK": # WQP_POST
+    if etype == "LINK":           
         next_id = wqp.wqp_post.wqp_next_id
         post_wq = GetWaitqPrepost(wqp.wqp_post.wqp_wq_id)[0]
         if WaitqTableElemValid(post_wq):
@@ -802,7 +802,7 @@ def WaitqPrepostFromObj(wqp, head_id, inv_ok, prepost_str, pp_arr = 0, depth = 0
                 prepost_str.append("{: <37s}".format("!recursion limit!"))
                 return
             WaitqPrepostFromObj(GetWaitqPrepost(next_id)[0], head_id, inv_ok, prepost_str, pp_arr, depth + 1)
-    else: #  "RSVD" or "FREE":
+    else:                     
         prepost_str.append("{0: <#18x} -> {1: <15d}".format(wqp.wqte.lt_id.id, wqp.wqte.lt_next_idx))
         next_id = wqp.wqte.lt_next_idx
         max_elem = int(kern.globals.g_prepost_table.nelem)
@@ -833,13 +833,13 @@ def GetWaitqPreposts(waitq):
     if wqset.wqset_prepost_id == 0:
         return []
     if not wqset.wqset_q.waitq_prepost:
-        # If the "prepost_id" is non-zero, but the 'waitq_prepost' bit is
-        # *not* set, then this waitq actually has a prepost hook!
+                                                                         
+                                                                 
         return [ "{0: <#18x}:{1: <18s}".format(wqset.wqset_prepost_id, "<hook>") ]
     return GetPrepostChain(wqset.wqset_prepost_id)
 
 
-# Macro: showprepostchain
+                         
 @lldb_command('showprepostchain', "P:")
 def ShowPrepostChain(cmd_args=None, cmd_options={}):
     """ Follow a chain of preposts, printing each one.
@@ -889,7 +889,7 @@ def ShowPrepostChain(cmd_args=None, cmd_options={}):
         idx += 1
     print "%s" % '-'*86
     print "Total: {:d} ({:d} valid, {:d} invalid)".format(len(pp_arr), nvalid, ninvalid)
-# EndMacro: showprepostchain
+                            
 
 
 @lldb_type_summary(['waitq', 'waitq *'])
@@ -936,7 +936,7 @@ def GetWaitqSummary(waitq):
     out_str += last_str
     return out_str
 
-# Macro: showwaitq
+                  
 @lldb_command('showwaitq', "P:S:")
 def ShowWaitq(cmd_args=None, cmd_options={}):
     """ Print waitq structure summary.
@@ -982,10 +982,10 @@ def ShowWaitq(cmd_args=None, cmd_options={}):
         raise ("Unknown arguments: %r %r" % (cmd_args, cmd_options))
     print GetWaitqSummary.header
     print GetWaitqSummary(waitq)
-# EndMacro: showwaitq
+                     
 
 
-# Macro: showglobalwaitqs
+                         
 @lldb_command('showglobalwaitqs')
 def ShowGlobalWaitqs(cmd_args=None):
     """ Summarize global waitq usage
@@ -999,10 +999,10 @@ def ShowGlobalWaitqs(cmd_args=None):
     while q < kern.globals.g_num_waitqs:
         print GetWaitqSummary(addressof(kern.globals.global_waitqs[q]))
         q = q + 1
-# EndMacro: showglobalwaitqs
+                            
 
 
-# Macro: showglobalqstats
+                         
 @lldb_command('showglobalqstats', "OF")
 def ShowGlobalQStats(cmd_args=None, cmd_options={}):
     """ Summarize global waitq statistics
@@ -1070,4 +1070,4 @@ def ShowGlobalQStats(cmd_args=None, cmd_options={}):
 
         print fmt_str.format(q=addressof(waitq), stats=stats, diff=diff, bt_str=bt_str)
         q = q + 1
-# EndMacro: showglobalqstats
+                            

@@ -42,7 +42,7 @@ def GetExecutablePathForPid(pid):
 
 """
 
-#Private Routines and objects
+                             
 
 from configuration import *
 
@@ -80,7 +80,7 @@ def _GetCurrentSessionID():
     return session_id;
 
 
-#Public APIs
+            
 
 def ClearAllCache():
     """ remove all cached data.

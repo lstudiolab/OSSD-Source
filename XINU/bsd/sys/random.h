@@ -38,14 +38,14 @@ __BEGIN_DECLS
 int getentropy(void* buffer, size_t size);
 __END_DECLS
 
-#else /* KERNEL */
+#else             
 #ifdef __APPLE_API_UNSTABLE
 __BEGIN_DECLS
 void read_random(void* buffer, u_int numBytes);
 void read_frandom(void* buffer, u_int numBytes);
 int  write_random(void* buffer, u_int numBytes);
 __END_DECLS
-#endif /* __APPLE_API_UNSTABLE */
+#endif                           
 
-#endif /* KERNEL */
-#endif /* __SYS_RANDOM_H__ */
+#endif             
+#endif                       

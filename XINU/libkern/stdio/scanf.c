@@ -76,41 +76,41 @@ isspace(char c)
 	return c == ' ' || c == '\t' || c == '\n' || c == '\12';
 }
 
-#define BUF             32      /* Maximum length of numeric string. */
+#define BUF             32                                             
 
-/*
- * Flags used during conversion.
- */
-#define LONG            0x01    /* l: long or double */
-#define SHORT           0x04    /* h: short */
-#define SUPPRESS        0x08    /* *: suppress assignment */
-#define POINTER         0x10    /* p: void * (as hex) */
-#define NOSKIP          0x20    /* [ or c: do not skip blanks */
-#define LONGLONG        0x400   /* ll: long long (+ deprecated q: quad) */
-#define SHORTSHORT      0x4000  /* hh: char */
-#define UNSIGNED        0x8000  /* %[oupxX] conversions */
+  
+                                
+   
+#define LONG            0x01                           
+#define SHORT           0x04                  
+#define SUPPRESS        0x08                                
+#define POINTER         0x10                            
+#define NOSKIP          0x20                                    
+#define LONGLONG        0x400                                             
+#define SHORTSHORT      0x4000                
+#define UNSIGNED        0x8000                            
 
-/*
- * The following are used in numeric conversions only:
- * SIGNOK, NDIGITS, DPTOK, and EXPOK are for floating point;
- * SIGNOK, NDIGITS, PFXOK, and NZDIGITS are for integral.
- */
-#define SIGNOK          0x40    /* +/- is (still) legal */
-#define NDIGITS         0x80    /* no digits detected */
+  
+                                                      
+                                                            
+                                                         
+   
+#define SIGNOK          0x40                              
+#define NDIGITS         0x80                            
 
-#define DPTOK           0x100   /* (float) decimal point is still legal */
-#define EXPOK           0x200   /* (float) exponent (e+3, etc) still legal */
+#define DPTOK           0x100                                             
+#define EXPOK           0x200                                                
 
-#define PFXOK           0x100   /* 0x prefix is (still) legal */
-#define NZDIGITS        0x200   /* no zero digits detected */
+#define PFXOK           0x100                                   
+#define NZDIGITS        0x200                                
 
-/*
- * Conversion types.
- */
-#define CT_CHAR         0       /* %c conversion */
-#define CT_CCL          1       /* %[...] conversion */
-#define CT_STRING       2       /* %s conversion */
-#define CT_INT          3       /* %[dioupxX] conversion */
+  
+                    
+   
+#define CT_CHAR         0                          
+#define CT_CCL          1                              
+#define CT_STRING       2                          
+#define CT_INT          3                                  
 
 static const u_char *__sccl(char *, const u_char *);
 
@@ -134,25 +134,25 @@ vsscanf(const char *inp, char const *fmt0, va_list ap)
 {
 	ssize_t inr;
 	const u_char *fmt = (const u_char *)fmt0;
-	ssize_t width;           /* field width, or 0 */
-	char *p;                /* points into all kinds of strings */
-	int flags;              /* flags as defined above */
-	char *p0;               /* saves original value of p when necessary */
-	int nassigned = 0;          /* number of fields assigned */
-	int nconversions = 0;       /* number of conversions */
-	int nread = 0;              /* number of characters consumed from fp */
-	int base = 0;               /* base argument to conversion function */
-	char ccltab[256];       /* character class table for %[...] */
-	char buf[BUF];          /* buffer for numeric conversions */
+	ssize_t width;                                  
+	char *p;                                                      
+	int flags;                                          
+	char *p0;                                                             
+	int nassigned = 0;                                         
+	int nconversions = 0;                                  
+	int nread = 0;                                                         
+	int base = 0;                                                         
+	char ccltab[256];                                             
+	char buf[BUF];                                              
 
-	/* `basefix' is used to avoid `if' tests in the integer scanner */
+	                                                                  
 	static short basefix[17] =
 	{ 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
 	inr = (ssize_t)strlen(inp);
 
 	for (;;) {
-		char c = (char)*fmt++; /* character from format, or conversion */
+		char c = (char)*fmt++;                                           
 		if (c == 0) {
 			return nassigned;
 		}
@@ -169,10 +169,10 @@ vsscanf(const char *inp, char const *fmt0, va_list ap)
 		}
 		width = 0;
 		flags = 0;
-		/*
-		 * switch on the format.  continue if done;
-		 * break once format type is derived.
-		 */
+		  
+                                             
+                                       
+     
 again:
 		c = (char)*fmt++;
 		switch (c) {
@@ -201,7 +201,7 @@ literal:
 			}
 			goto again;
 		case 'q':
-			flags |= LONGLONG;      /* not quite */
+			flags |= LONGLONG;                     
 			goto again;
 		case 'h':
 			if (flags & SHORT) {
@@ -217,9 +217,9 @@ literal:
 			width = width * 10 + c - '0';
 			goto again;
 
-		/*
-		 * Conversions.
-		 */
+		  
+                 
+     
 		case 'd':
 			c = CT_INT;
 			base = 10;
@@ -244,7 +244,7 @@ literal:
 
 		case 'X':
 		case 'x':
-			flags |= PFXOK; /* enable 0x prefixing */
+			flags |= PFXOK;                          
 			c = CT_INT;
 			flags |= UNSIGNED;
 			base = 16;
@@ -265,7 +265,7 @@ literal:
 			c = CT_CHAR;
 			break;
 
-		case 'p':       /* pointer format is like hex */
+		case 'p':                                       
 			flags |= POINTER | PFXOK;
 			c = CT_INT;
 			flags |= UNSIGNED;
@@ -274,7 +274,7 @@ literal:
 
 		case 'n':
 			nconversions++;
-			if (flags & SUPPRESS) { /* ??? */
+			if (flags & SUPPRESS) {          
 				continue;
 			}
 			if (flags & SHORTSHORT) {
@@ -291,17 +291,17 @@ literal:
 			continue;
 		}
 
-		/*
-		 * We have a conversion that requires input.
-		 */
+		  
+                                              
+     
 		if (inr <= 0) {
 			goto input_failure;
 		}
 
-		/*
-		 * Consume leading white space, except for formats
-		 * that suppress this.
-		 */
+		  
+                                                    
+                        
+     
 		if ((flags & NOSKIP) == 0) {
 			while (isspace(*inp)) {
 				nread++;
@@ -311,19 +311,19 @@ literal:
 					goto input_failure;
 				}
 			}
-			/*
-			 * Note that there is at least one character in
-			 * the buffer, so conversions that do not set NOSKIP
-			 * can no longer result in an input failure.
-			 */
+			  
+                                                  
+                                                       
+                                               
+      
 		}
 
-		/*
-		 * Do the conversion.
-		 */
+		  
+                       
+     
 		switch (c) {
 		case CT_CHAR:
-			/* scan arbitrary characters (sets NOSKIP) */
+			                                             
 			if (width == 0) {
 				width = 1;
 			}
@@ -358,11 +358,11 @@ literal:
 			break;
 
 		case CT_CCL: {
-			/* scan a (nonempty) character class (sets NOSKIP) */
+			                                                     
 			if (width == 0) {
-				width = SSIZE_MAX;     /* `infinity' */
+				width = SSIZE_MAX;                     
 			}
-			/* take only those things in the class */
+			                                         
 			ptrdiff_t n;
 			if (flags & SUPPRESS) {
 				n = 0;
@@ -411,7 +411,7 @@ literal:
 		}
 
 		case CT_STRING:
-			/* like CCL, but zero-length string OK, & no NOSKIP */
+			                                                      
 			if (width == 0) {
 				width = SSIZE_MAX;
 			}
@@ -449,30 +449,30 @@ literal:
 			continue;
 
 		case CT_INT:
-			/* scan an integer as if by the conversion function */
+			                                                      
 			if (width <= 0 || width > (ssize_t)(sizeof(buf) - 1)) {
 				width = sizeof(buf) - 1;
 			}
 			flags |= SIGNOK | NDIGITS | NZDIGITS;
 			for (p = buf; width; width--) {
 				c = *inp;
-				/*
-				 * Switch on the character; `goto ok'
-				 * if we accept it as a part of number.
-				 */
+				  
+                                         
+                                           
+       
 				switch (c) {
-				/*
-				 * The digit 0 is always legal, but is
-				 * special.  For %i conversions, if no
-				 * digits (zero or nonzero) have been
-				 * scanned (only signs), we will have
-				 * base==0.  In that case, we should set
-				 * it to 8 and enable 0x prefixing.
-				 * Also, if we have not scanned zero digits
-				 * before this, do not turn off prefixing
-				 * (someone else will turn it off if we
-				 * have scanned any nonzero digits).
-				 */
+				  
+                                          
+                                          
+                                         
+                                         
+                                            
+                                       
+                                               
+                                             
+                                           
+                                        
+       
 				case '0':
 					if (base == 0) {
 						base = 8;
@@ -485,35 +485,35 @@ literal:
 					}
 					goto ok;
 
-				/* 1 through 7 always legal */
+				                              
 				case '1': case '2': case '3':
 				case '4': case '5': case '6': case '7':
 					base = basefix[base];
 					flags &= ~(SIGNOK | PFXOK | NDIGITS);
 					goto ok;
 
-				/* digits 8 and 9 ok iff decimal or hex */
+				                                          
 				case '8': case '9':
 					base = basefix[base];
 					if (base <= 8) {
-						break;  /* not legal here */
+						break;                      
 					}
 					flags &= ~(SIGNOK | PFXOK | NDIGITS);
 					goto ok;
 
-				/* letters ok iff hex */
+				                        
 				case 'A': case 'B': case 'C':
 				case 'D': case 'E': case 'F':
 				case 'a': case 'b': case 'c':
 				case 'd': case 'e': case 'f':
-					/* no need to fix base here */
+					                              
 					if (base <= 10) {
-						break;  /* not legal here */
+						break;                      
 					}
 					flags &= ~(SIGNOK | PFXOK | NDIGITS);
 					goto ok;
 
-				/* sign ok only as first character */
+				                                     
 				case '+': case '-':
 					if (flags & SIGNOK) {
 						flags &= ~SIGNOK;
@@ -521,38 +521,38 @@ literal:
 					}
 					break;
 
-				/* x ok iff flag still set & 2nd char */
+				                                        
 				case 'x': case 'X':
 					if (flags & PFXOK && p == buf + 1) {
-						base = 16;      /* if %i */
+						base = 16;                 
 						flags &= ~PFXOK;
 						goto ok;
 					}
 					break;
 				}
 
-				/*
-				 * If we got here, c is not a legal character
-				 * for a number.  Stop accumulating digits.
-				 */
+				  
+                                                 
+                                               
+       
 				break;
 ok:
-				/*
-				 * c is legal: store it and look at the next.
-				 */
+				  
+                                                 
+       
 				*p++ = c;
 				if (--inr > 0) {
 					inp++;
 				} else {
-					break;          /* end of input */
+					break;                            
 				}
 			}
-			/*
-			 * If we had only a sign, it is no good; push
-			 * back the sign.  If the number ends in `x',
-			 * it was [sign] '0' 'x', so push back the x
-			 * and treat it as [sign] '0'.
-			 */
+			  
+                                                
+                                                
+                                               
+                                 
+      
 			if (flags & NDIGITS) {
 				if (p > buf) {
 					inp--;
@@ -602,92 +602,92 @@ match_failure:
 	return nassigned;
 }
 
-/*
- * Fill in the given table from the scanset at the given format
- * (just after `[').  Return a pointer to the character past the
- * closing `]'.  The table has a 1 wherever characters should be
- * considered part of the scanset.
- */
+  
+                                                               
+                                                                
+                                                                
+                                  
+   
 static const u_char *
 __sccl(char *tab, const u_char *fmt)
 {
 	char v;
 
-	/* first `clear' the whole table */
-	int c = *fmt++;             /* first char hat => negated scanset */
+	                                   
+	int c = *fmt++;                                                    
 	if (c == '^') {
-		v = 1;          /* default => accept */
-		c = *fmt++;     /* get new first char */
+		v = 1;                                 
+		c = *fmt++;                             
 	} else {
-		v = 0;          /* default => reject */
+		v = 0;                                 
 	}
-	/* XXX: Will not work if sizeof(tab*) > sizeof(char) */
+	                                                       
 	(void) memset(tab, v, 256);
 
 	if (c == 0) {
-		return fmt - 1;/* format ended before closing ] */
+		return fmt - 1;                                   
 	}
-	/*
-	 * Now set the entries corresponding to the actual scanset
-	 * to the opposite of the above.
-	 *
-	 * The first character may be ']' (or '-') without being special;
-	 * the last character may be '-'.
-	 */
+	  
+                                                           
+                                 
+   
+                                                                  
+                                  
+    
 	v = 1 - v;
 	for (;;) {
 		int n;
-		tab[c] = v;             /* take character c */
+		tab[c] = v;                                   
 doswitch:
 		n = *fmt++;
 		switch (n) {
-		case 0:                 /* format ended too soon */
+		case 0:                                            
 			return fmt - 1;
 
 		case '-':
-			/*
-			 * A scanset of the form
-			 *	[01+-]
-			 * is defined as `the digit 0, the digit 1,
-			 * the character +, the character -', but
-			 * the effect of a scanset such as
-			 *	[a-zA-Z0-9]
-			 * is implementation defined.  The V7 Unix
-			 * scanf treats `a-z' as `the letters a through
-			 * z', but treats `a-a' as `the letter a, the
-			 * character -, and the letter a'.
-			 *
-			 * For compatibility, the `-' is not considerd
-			 * to define a range if the character following
-			 * it is either a close bracket (required by ANSI)
-			 * or is not numerically greater than the character
-			 * we just stored in the table (c).
-			 */
+			  
+                           
+            
+                                              
+                                            
+                                     
+                 
+                                             
+                                                  
+                                                
+                                     
+     
+                                                 
+                                                  
+                                                     
+                                                      
+                                      
+      
 			n = *fmt;
 			if (n == ']' || n < c) {
 				c = '-';
-				break;  /* resume the for(;;) */
+				break;                          
 			}
 			fmt++;
-			/* fill in the range */
+			                       
 			do {
 				tab[++c] = v;
 			} while (c < n);
 			c = n;
-			/*
-			 * Alas, the V7 Unix scanf also treats formats
-			 * such as [a-c-e] as `the letters a through e'.
-			 * This too is permitted by the standard....
-			 */
+			  
+                                                 
+                                                   
+                                               
+      
 			goto doswitch;
 
-		case ']':               /* end of scanset */
+		case ']':                                   
 			return fmt;
 
-		default:                /* just another character */
+		default:                                            
 			c = n;
 			break;
 		}
 	}
-	/* NOTREACHED */
+	                
 }

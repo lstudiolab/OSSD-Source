@@ -32,23 +32,23 @@
 #define MAX_KCALLSTACK_FRAMES (128)
 #define MAX_UCALLSTACK_FRAMES (256)
 
-/* the callstack contains valid data */
+                                       
 #define CALLSTACK_VALID        (1U << 0)
-/* the callstack has been deferred */
+                                     
 #define CALLSTACK_DEFERRED     (1U << 1)
-/* the callstack is 64-bit */
+                             
 #define CALLSTACK_64BIT        (1U << 2)
-/* the callstack is from the kernel */
+                                      
 #define CALLSTACK_KERNEL       (1U << 3)
-/* the callstack was cut off */
+                               
 #define CALLSTACK_TRUNCATED    (1U << 4)
-/* the callstack is only holding a continuation "frame" */
+                                                          
 #define CALLSTACK_CONTINUATION (1U << 5)
-/* the frames field is filled with uintptr_t, not uint64_t */
+                                                             
 #define CALLSTACK_KERNEL_WORDS (1U << 6)
-/* the frames come from a translated task */
+                                            
 #define CALLSTACK_TRANSLATED   (1U << 7)
-/* the last frame could be the real PC */
+                                         
 #define CALLSTACK_FIXUP_PC     (1U << 8)
 
 struct kp_ucallstack {
@@ -78,4 +78,4 @@ int kperf_ucallstack_pend(struct kperf_context *, uint32_t depth,
     unsigned int actionid);
 void kperf_ucallstack_log(struct kp_ucallstack *cs);
 
-#endif /* !defined(KPERF_CALLSTACK_H) */
+#endif                                  

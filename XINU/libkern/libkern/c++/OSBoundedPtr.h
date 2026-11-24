@@ -42,6 +42,6 @@ struct panic_trapping_policy {
 };
 }
 
-// OSBoundedPtr alias is defined in the fwd decl header
+                                                       
 
-#endif /* !XNU_LIBKERN_LIBKERN_CXX_OS_BOUNDED_PTR_H */
+#endif                                                

@@ -3,4 +3,4 @@
 
 void drop_priv(void);
 
-#endif /* __DROP_PRIV_H */
+#endif                    

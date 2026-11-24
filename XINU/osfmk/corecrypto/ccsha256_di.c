@@ -49,7 +49,7 @@ ccsha256_di(void)
 		return &ccsha256_vng_intel_SupplementalSSE3_di;
 	} else
 #if CC_ACCELERATECRYPTO
-	{ return &ccsha256_vng_intel_di; // use AccelerateCrypto
+	{ return &ccsha256_vng_intel_di;                        
 	}
 #else
 	{ return CC_HAS_AVX2() ? &ccsha256_vng_intel_AVX2_di :

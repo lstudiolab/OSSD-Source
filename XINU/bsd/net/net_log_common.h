@@ -36,4 +36,4 @@
 #define NET_LOG_SUBSYSTEM_MPTCP         NET_LOG_SUBSYSTEM_PREFIX ".mptcp"
 #define NET_LOG_SUBSYSTEM_TCP           NET_LOG_SUBSYSTEM_PREFIX ".tcp"
 
-#endif /* _NET_LOG_COMMON_H_ */
+#endif                         

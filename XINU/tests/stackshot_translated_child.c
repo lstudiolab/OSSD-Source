@@ -5,7 +5,7 @@
 int
 main()
 {
-	// Always signal parent to unblock them
+	                                       
 	kill(getppid(), SIGUSR1);
 
 #if !defined(__x86_64__)

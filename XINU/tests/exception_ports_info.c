@@ -38,7 +38,7 @@ T_DECL(exception_ports_info, "Test {task, thread}_get_exception_ports_info")
 	ipc_info_tree_name_array_t tree;
 	mach_msg_type_number_t tblcnt = 0, treecnt = 0;
 
-	/* Create the mach port the exception messages will be sent to. */
+	                                                                  
 	kr = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &exc_port1);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "Allocated mach exception port");
 	kr = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &exc_port2);
@@ -46,10 +46,10 @@ T_DECL(exception_ports_info, "Test {task, thread}_get_exception_ports_info")
 	kr = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &exc_port3);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "Allocated mach exception port");
 
-	/*
-	 * Insert a send right into the exception port that the kernel will use to
-	 * send the exception thread the exception messages.
-	 */
+	  
+                                                                           
+                                                     
+    
 	kr = mach_port_insert_right(mach_task_self(), exc_port1, exc_port1, MACH_MSG_TYPE_MAKE_SEND);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "Inserted a SEND right into the exception port");
 	kr = mach_port_insert_right(mach_task_self(), exc_port2, exc_port2, MACH_MSG_TYPE_MAKE_SEND);
@@ -61,7 +61,7 @@ T_DECL(exception_ports_info, "Test {task, thread}_get_exception_ports_info")
 	T_LOG("exc_port2: 0x%x", exc_port2);
 	T_LOG("exc_port3: 0x%x", exc_port3);
 
-	/* Tell the kernel what port to send exceptions to. */
+	                                                      
 	kr = task_set_exception_ports(
 		mach_task_self(),
 		EXC_MASK_GUARD,
@@ -72,7 +72,7 @@ T_DECL(exception_ports_info, "Test {task, thread}_get_exception_ports_info")
 
 	kr = task_set_exception_ports(
 		mach_task_self(),
-		EXC_MASK_RPC_ALERT,  /* why can't be EXC_CRASH or EXC_MASK_CORPSE_NOTIFY ? */
+		EXC_MASK_RPC_ALERT,                                                          
 		exc_port2,
 		(exception_behavior_t)(EXCEPTION_STATE_IDENTITY | MACH_EXCEPTION_CODES),
 		THREAD_STATE_NONE);
@@ -86,7 +86,7 @@ T_DECL(exception_ports_info, "Test {task, thread}_get_exception_ports_info")
 		THREAD_STATE_NONE);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "Set the exception port to my custom handler");
 
-	/* now, get exception ports info */
+	                                   
 	kr = thread_get_exception_ports(mach_thread_self(), EXC_MASK_ALL, masks2, &count2, ports, behaviors2, flavors2);
 	T_EXPECT_MACH_SUCCESS(kr, "thread_get_exception_ports(): 0x%x", kr);
 	T_EXPECT_EQ(count2, 0, "should have 0 exception ports");
@@ -100,9 +100,9 @@ T_DECL(exception_ports_info, "Test {task, thread}_get_exception_ports_info")
 
 	kr = task_get_exception_ports_info(mach_task_self(), EXC_MASK_ALL, masks, &count, ports_info, behaviors, flavors);
 	T_EXPECT_MACH_SUCCESS(kr, "task_get_exception_ports_info(): 0x%x", kr);
-	T_EXPECT_EQ(count, 4, "should have 4 masks"); /* Returns 3 if one exc_port registers for EXC_CRASH */
+	T_EXPECT_EQ(count, 4, "should have 4 masks");                                                        
 
-	/* get exception ports */
+	                         
 	kr = task_get_exception_ports(mach_task_self(), EXC_MASK_ALL, masks2, &count2, ports, behaviors2, flavors2);
 	T_EXPECT_MACH_SUCCESS(kr, "task_get_exception_ports(): 0x%x", kr);
 

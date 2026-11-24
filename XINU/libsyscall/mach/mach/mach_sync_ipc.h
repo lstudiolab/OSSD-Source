@@ -58,61 +58,61 @@
 
 __BEGIN_DECLS
 
-/*!
- * @function mach_sync_ipc_link_monitoring_start
- *
- * @abstract
- * Starts monitoring the sync IPC priority inversion avoidance
- * facility of the current thread.
- * A subsequent call to mach_sync_ipc_link_monitoring_stop() will
- * validate that the facility took effect for all synchronous IPC
- * performed from this thread between the calls to start and stop.
- *
- * @discussion
- * In case of success, a port right is returned, which has to be
- * deallocated by passing it to mach_sync_ipc_link_monitoring_stop().
- *
- * @param port
- * Pointer to a mach_port_t that will be populated in case of success.
- *
- * @result
- * KERN_SUCCESS in case of success, specific error otherwise.
- * If the call is not supported, KERN_NOT_SUPPORTED is returned.
- */
+   
+                                                
+  
+            
+                                                              
+                                  
+                                                                 
+                                                                 
+                                                                  
+  
+              
+                                                                
+                                                                     
+  
+              
+                                                                      
+  
+          
+                                                             
+                                                                
+   
 extern kern_return_t mach_sync_ipc_link_monitoring_start(mach_port_t* port);
 
-/*!
- * @function mach_sync_ipc_link_monitoring_stop
- *
- * @abstract
- * Stops monitoring the sync IPC priority inversion avoidance facility
- * of the current thread started by a call to mach_sync_ipc_link_monitoring_start().
- *
- * Returns whether the facility took effect for all synchronous IPC performed
- * from this thread between the calls to start and stop.
- *
- * Reasons for this function to return false include:
- * -remote message event handler did not reply to the message itself
- * -remote message was not received by a workloop (xpc connection or dispatch mach channel)
- *
- * @discussion
- * To be called after mach_sync_ipc_link_monitoring_start(). If
- * mach_sync_ipc_link_monitoring_start() didn't return an error this
- * function must be called to deallocate the port right that was returned.
- *
- * @param port
- * mach_port_t returned by mach_sync_ipc_link_monitoring_start().
- *
- * @param in_effect
- * Pointer to boolean_t value that will be populated in the case of success.
- * Indicates whether the sync IPC priority inversion avoidance facility took
- * effect for all synchronous IPC performed from this thread between the calls
- * to start and stop.
- *
- * @result
- * KERN_SUCCESS in case of no errors, specific error otherwise.
- * If the call is not supported, KERN_NOT_SUPPORTED is returned.
- */
+   
+                                               
+  
+            
+                                                                      
+                                                                                    
+  
+                                                                             
+                                                        
+  
+                                                     
+                                                                    
+                                                                                           
+  
+              
+                                                               
+                                                                    
+                                                                          
+  
+              
+                                                                 
+  
+                   
+                                                                            
+                                                                            
+                                                                              
+                     
+  
+          
+                                                               
+                                                                
+   
 extern kern_return_t mach_sync_ipc_link_monitoring_stop(mach_port_t port, boolean_t* in_effect);
 
 typedef enum thread_destruct_special_reply_port_rights {
@@ -130,4 +130,4 @@ extern void mig_dealloc_special_reply_port(mach_port_t migport);
 
 __END_DECLS
 
-#endif  /* _MACH_SYNC_IPC_H_ */
+#endif                         

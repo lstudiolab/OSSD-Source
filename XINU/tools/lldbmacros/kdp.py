@@ -20,7 +20,7 @@ def GetKDPPacketHeaderInt(request=0, is_reply=False, seq=0, length=0, key=0):
         retval = 1<<7 |retval
     retval = (seq << 8) | retval
     retval = (length << 16) | retval
-    #retval = (retval << 32) | key
+                                  
     retval = (key << 32) | retval
     return retval
 
@@ -51,14 +51,14 @@ def KDPDumpInfo(subcmd, file_name="", dest_ip="", router_ip="", port=0):
         router_ip = router_ip[:15]
 
     header_value =GetKDPPacketHeaderInt(request=GetEnumValue('kdp_req_t::KDP_DUMPINFO'), length=kdp_pkt_size)
-    # 0x1f is same as KDP_DUMPINFO
+                                  
     if ( WriteInt64ToMemoryAddress((header_value), int(addressof(pkt.hdr))) and
          WriteInt32ToMemoryAddress(subcmd, int(addressof(pkt.type))) and
          WriteStringToMemoryAddress(file_name, int(addressof(pkt.name))) and
          WriteStringToMemoryAddress(dest_ip, int(addressof(pkt.destip))) and
          WriteStringToMemoryAddress(router_ip, int(addressof(pkt.routerip)))
          ):
-         #We have saved important data successfully
+                                                   
         if port > 0:
             if not WriteInt32ToMemoryAddress(port, int(addressof(pkt.port))):
                 return False
@@ -223,7 +223,7 @@ def KDPGetDumpInfo(cmd_args=None):
             fname = str(dumpinfo.name)
         print "Filename: " + fname
         print "Network Info: {:s} [{:d}] , Router: {:s}".format(dumpinfo.destip, dumpinfo.port, dumpinfo.routerip)
-    # end of get dump info
+                          
 
 
 @lldb_command('kdp-reenter')

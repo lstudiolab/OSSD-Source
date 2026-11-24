@@ -69,37 +69,37 @@
 #include <sys/appleapiopts.h>
 #include <sys/cdefs.h>
 
-/* XXX: this will go away */
-#define PR_SLOWHZ       2               /* 2 slow timeouts per second */
+                            
+#define PR_SLOWHZ       2                                               
 
-/*
- * The arguments to the ctlinput routine are
- *      (*protosw[].pr_ctlinput)(cmd, sa, arg);
- * where cmd is one of the commands below, sa is a pointer to a sockaddr,
- * and arg is a `void *' argument used within a protocol family.
- */
-#define PRC_IFDOWN              0       /* interface transition */
-#define PRC_ROUTEDEAD           1       /* select new route if possible ??? */
-#define PRC_IFUP                2       /* interface has come back up */
-#define PRC_QUENCH2             3       /* DEC congestion bit says slow down */
-#define PRC_QUENCH              4       /* some one said to slow down */
-#define PRC_MSGSIZE             5       /* message size forced drop */
-#define PRC_HOSTDEAD            6       /* host appears to be down */
-#define PRC_HOSTUNREACH         7       /* deprecated (use PRC_UNREACH_HOST) */
-#define PRC_UNREACH_NET         8       /* no route to network */
-#define PRC_UNREACH_HOST        9       /* no route to host */
-#define PRC_UNREACH_PROTOCOL    10      /* dst says bad protocol */
-#define PRC_UNREACH_PORT        11      /* bad port # */
-/* was PRC_UNREACH_NEEDFRAG	12         (use PRC_MSGSIZE) */
-#define PRC_UNREACH_SRCFAIL     13      /* source route failed */
-#define PRC_REDIRECT_NET        14      /* net routing redirect */
-#define PRC_REDIRECT_HOST       15      /* host routing redirect */
-#define PRC_REDIRECT_TOSNET     16      /* redirect for type of service & net */
-#define PRC_REDIRECT_TOSHOST    17      /* redirect for tos & host */
-#define PRC_TIMXCEED_INTRANS    18      /* packet lifetime expired in transit */
-#define PRC_TIMXCEED_REASS      19      /* lifetime expired on reass q */
-#define PRC_PARAMPROB           20      /* header incorrect */
-#define PRC_UNREACH_ADMIN_PROHIB        21     /* packet administrativly prohibited */
+  
+                                            
+                                               
+                                                                         
+                                                                
+   
+#define PRC_IFDOWN              0                                 
+#define PRC_ROUTEDEAD           1                                             
+#define PRC_IFUP                2                                       
+#define PRC_QUENCH2             3                                              
+#define PRC_QUENCH              4                                       
+#define PRC_MSGSIZE             5                                     
+#define PRC_HOSTDEAD            6                                    
+#define PRC_HOSTUNREACH         7                                              
+#define PRC_UNREACH_NET         8                                
+#define PRC_UNREACH_HOST        9                             
+#define PRC_UNREACH_PROTOCOL    10                                 
+#define PRC_UNREACH_PORT        11                      
+                                                           
+#define PRC_UNREACH_SRCFAIL     13                               
+#define PRC_REDIRECT_NET        14                                
+#define PRC_REDIRECT_HOST       15                                 
+#define PRC_REDIRECT_TOSNET     16                                              
+#define PRC_REDIRECT_TOSHOST    17                                   
+#define PRC_TIMXCEED_INTRANS    18                                              
+#define PRC_TIMXCEED_REASS      19                                       
+#define PRC_PARAMPROB           20                            
+#define PRC_UNREACH_ADMIN_PROHIB        21                                            
 
 #define PRC_NCMDS               22
 
@@ -116,7 +116,7 @@
 #include <sys/queue.h>
 #include <kern/locks.h>
 
-/* Forward declare these structures referenced from prototypes below. */
+                                                                        
 struct mbuf;
 struct proc;
 struct sockaddr;
@@ -128,196 +128,196 @@ struct ifnet;
 #ifdef XNU_KERNEL_PRIVATE
 struct domain_old;
 struct proc;
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #pragma pack(4)
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * Legacy protocol switch table.
- *
- * NOTE: Do not modify this structure, as there are modules outside of xnu
- * which rely on the size and layout for binary compatibility.  This structure
- * is simply used by the exported net_{add,del}_proto_old, pffindproto_old
- * routines, and by the domain_old structure.  Internally, protocol switch
- * tables are stored in the private variant of protosw defined down below.
- */
+  
+                                
+  
+                                                                          
+                                                                              
+                                                                          
+                                                                          
+                                                                          
+   
 struct protosw_old {
 #else
 struct protosw {
-#endif /* !XNU_KERNEL_PRIVATE */
-	short   pr_type;                /* socket type used for */
-	struct  domain *pr_domain;      /* domain protocol a member of */
-	short   pr_protocol;            /* protocol number */
-	unsigned int pr_flags;          /* see below */
-	/*
-	 * protocol-protocol hooks
-	 */
-	void    (*pr_input)             /* input to protocol (from below) */
+#endif                          
+	short   pr_type;                                          
+	struct  domain *pr_domain;                                       
+	short   pr_protocol;                                 
+	unsigned int pr_flags;                         
+	  
+                           
+    
+	void    (*pr_input)                                                 
 	(struct mbuf *, int len);
-	int     (*pr_output)            /* output to protocol (from above) */
+	int     (*pr_output)                                                 
 	(struct mbuf *m, struct socket *so);
-	void    (*pr_ctlinput)          /* control input (from below) */
+	void    (*pr_ctlinput)                                          
 	(int, struct sockaddr *, void *, struct ifnet *);
-	int     (*pr_ctloutput)         /* control output (from above) */
+	int     (*pr_ctloutput)                                          
 	(struct socket *, struct sockopt *);
-	/*
-	 * user-protocol hook
-	 */
+	  
+                      
+    
 	void    *pr_ousrreq;
-	/*
-	 * utility hooks
-	 */
-	void    (*pr_init)(void);       /* initialization hook */
-	void    (*pr_unused)(void);     /* placeholder - fasttimo is removed */
-	void    (*pr_unused2)(void);    /* placeholder - slowtimo is removed */
-	void    (*pr_drain)(void);      /* flush any excess space possible */
-	int     (*pr_sysctl)            /* sysctl for protocol */
+	  
+                 
+    
+	void    (*pr_init)(void);                                
+	void    (*pr_unused)(void);                                            
+	void    (*pr_unused2)(void);                                           
+	void    (*pr_drain)(void);                                           
+	int     (*pr_sysctl)                                     
 	(int *, u_int, void *, size_t *, void *, size_t);
 #ifdef XNU_KERNEL_PRIVATE
-	struct  pr_usrreqs_old *pr_usrreqs; /* supersedes pr_usrreq() */
+	struct  pr_usrreqs_old *pr_usrreqs;                             
 #else
-	struct  pr_usrreqs *pr_usrreqs; /* supersedes pr_usrreq() */
-#endif /* !XNU_KERNEL_PRIVATE */
-	int     (*pr_lock)              /* lock function for protocol */
+	struct  pr_usrreqs *pr_usrreqs;                             
+#endif                          
+	int     (*pr_lock)                                              
 	(struct socket *so, int refcnt, void *debug);
-	int     (*pr_unlock)            /* unlock for protocol */
+	int     (*pr_unlock)                                     
 	(struct socket *so, int refcnt, void *debug);
-	lck_mtx_t *(*pr_getlock)        /* retrieve protocol lock */
+	lck_mtx_t *(*pr_getlock)                                    
 	(struct socket *so, int flags);
-	/*
-	 * Implant hooks
-	 */
+	  
+                 
+    
 	TAILQ_HEAD(, socket_filter) pr_filter_head;
 #ifdef XNU_KERNEL_PRIVATE
-	struct protosw_old *pr_next;    /* chain for domain */
+	struct protosw_old *pr_next;                          
 #else
-	struct protosw *pr_next;        /* chain for domain */
-#endif /* !XNU_KERNEL_PRIVATE */
-	u_int32_t       reserved[1];    /* padding for future use */
+	struct protosw *pr_next;                              
+#endif                          
+	u_int32_t       reserved[1];                                
 };
 
 #pragma pack()
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * Protocol switch table.
- *
- * Each protocol has a handle initializing one of these structures,
- * which is used for protocol-protocol and system-protocol communication.
- *
- * A protocol is called through the pr_init entry before any other.
- * The system will call the pr_drain entry if it is low on space and this
- * should throw away any non-critical data.
- *
- * Protocols pass data between themselves as chains of mbufs using
- * the pr_input and pr_output hooks.  Pr_input passes data up (towards
- * the users) and pr_output passes it down (towards the interfaces); control
- * information passes up and down on pr_ctlinput and pr_ctloutput.
- * The protocol is responsible for the space occupied by any the
- * arguments to these entries and must dispose it.
- *
- * The userreq routine interfaces protocols to the system and is
- * described below.
- *
- * After a protocol is attached, its pr_domain will be set to the domain
- * which the protocol belongs to, and its pr_protosw will be set to the
- * address of the protosw instance.  The latter is useful for finding
- * the real/original protosw instance, in the event so_proto is altered
- * to point to an alternative/derivative protosw.  E.g. the list of
- * socket filters is only applicable on the original protosw instance.
- *
- * Internal, private and extendable representation of protosw.
- */
+  
+                         
+  
+                                                                   
+                                                                         
+  
+                                                                   
+                                                                         
+                                           
+  
+                                                                  
+                                                                      
+                                                                            
+                                                                  
+                                                                
+                                                  
+  
+                                                                
+                   
+  
+                                                                        
+                                                                       
+                                                                     
+                                                                       
+                                                                   
+                                                                      
+  
+                                                              
+   
 struct protosw {
-	TAILQ_ENTRY(protosw) pr_entry; /* chain for domain */
-	struct  domain *pr_domain;      /* domain protocol a member of */
-	struct protosw *pr_protosw;     /* pointer to self */
-	u_int16_t pr_type;              /* socket type used for */
-	u_int16_t pr_protocol;          /* protocol number */
-	u_int32_t pr_flags;             /* see below */
-	/*
-	 * protocol-protocol hooks
-	 */
-	void    (*pr_input)             /* input to protocol (from below) */
+	TAILQ_ENTRY(protosw) pr_entry;                       
+	struct  domain *pr_domain;                                       
+	struct protosw *pr_protosw;                          
+	u_int16_t pr_type;                                        
+	u_int16_t pr_protocol;                               
+	u_int32_t pr_flags;                            
+	  
+                           
+    
+	void    (*pr_input)                                                 
 	(struct mbuf *, int len);
-	int     (*pr_output)            /* output to protocol (from above) */
+	int     (*pr_output)                                                 
 	(struct mbuf *m, struct socket *so);
-	void    (*pr_ctlinput)          /* control input (from below) */
+	void    (*pr_ctlinput)                                          
 	(int, struct sockaddr *, void *, struct ifnet *);
-	int     (*pr_ctloutput)         /* control output (from above) */
+	int     (*pr_ctloutput)                                          
 	(struct socket *, struct sockopt *);
-	/*
-	 * user-protocol hook
-	 */
-	struct  pr_usrreqs *pr_usrreqs; /* user request; see list below */
-	/*
-	 * utility hooks
-	 */
-	void    (*pr_init)              /* initialization hook */
+	  
+                      
+    
+	struct  pr_usrreqs *pr_usrreqs;                                   
+	  
+                 
+    
+	void    (*pr_init)                                       
 	(struct protosw *, struct domain *);
-	void    (*pr_drain)(void);      /* flush any excess space possible */
-	int     (*pr_sysctl)            /* sysctl for protocol */
+	void    (*pr_drain)(void);                                           
+	int     (*pr_sysctl)                                     
 	(int *, u_int, void *, size_t *, void *, size_t);
-	int     (*pr_lock)              /* lock function for protocol */
+	int     (*pr_lock)                                              
 	(struct socket *so, int refcnt, void *debug);
-	int     (*pr_unlock)            /* unlock for protocol */
+	int     (*pr_unlock)                                     
 	(struct socket *so, int refcnt, void *debug);
-	lck_mtx_t *(*pr_getlock)        /* retrieve protocol lock */
+	lck_mtx_t *(*pr_getlock)                                    
 	(struct socket *so, int flags);
-	/*
-	 * misc
-	 */
+	  
+        
+    
 	TAILQ_HEAD(, socket_filter) pr_filter_head;
 	struct protosw_old *pr_old;
 
-	void    (*pr_update_last_owner) /* update last socket owner */
+	void    (*pr_update_last_owner)                               
 	(struct socket *so, struct proc *p, struct proc *ep);
 
-	void    (*pr_copy_last_owner) /* copy last socket from listener */
+	void    (*pr_copy_last_owner)                                     
 	(struct socket *so, struct socket *head);
 };
 
-/*
- * Values for the flags argument of pr_getlock
- */
-#define PR_F_WILLUNLOCK 0x01    /* Will unlock (e.g., msleep) after the pr_getlock call */
+  
+                                              
+   
+#define PR_F_WILLUNLOCK 0x01                                                              
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Values for pr_flags.
- * PR_ADDR requires PR_ATOMIC;
- * PR_ADDR and PR_CONNREQUIRED are mutually exclusive.
- * PR_IMPLOPCL means that the protocol allows sendto without prior connect,
- *	and the protocol understands the MSG_EOF flag.  The first property is
- *	is only relevant if PR_CONNREQUIRED is set (otherwise sendto is allowed
- *	anyhow).
- */
-#define PR_ATOMIC       0x01    /* exchange atomic messages only */
-#define PR_ADDR         0x02    /* addresses given with messages */
-#define PR_CONNREQUIRED 0x04    /* connection required by protocol */
-#define PR_WANTRCVD     0x08    /* want PRU_RCVD calls */
-#define PR_RIGHTS       0x10    /* passes capabilities */
-#define PR_IMPLOPCL     0x20    /* implied open/close */
-#define PR_LASTHDR      0x40    /* enforce ipsec policy; last header */
-#define PR_PROTOLOCK    0x80    /* protocol takes care of it's own locking */
-#define PR_PCBLOCK      0x100   /* protocol supports per pcb locking */
-#define PR_DISPOSE      0x200   /* protocol requires late lists disposal */
+  
+                       
+                              
+                                                      
+                                                                           
+                                                                        
+                                                                          
+           
+   
+#define PR_ATOMIC       0x01                                       
+#define PR_ADDR         0x02                                       
+#define PR_CONNREQUIRED 0x04                                         
+#define PR_WANTRCVD     0x08                             
+#define PR_RIGHTS       0x10                             
+#define PR_IMPLOPCL     0x20                            
+#define PR_LASTHDR      0x40                                           
+#define PR_PROTOLOCK    0x80                                                 
+#define PR_PCBLOCK      0x100                                          
+#define PR_DISPOSE      0x200                                              
 #ifdef BSD_KERNEL_PRIVATE
-#define PR_INITIALIZED  0x400   /* protocol has been initialized */
-#define PR_ATTACHED     0x800   /* protocol is attached to a domain */
-#define PR_MULTICONN    0x1000  /* supports multiple connect calls */
-#define PR_EVCONNINFO   0x2000  /* protocol generates conninfo event */
-#define PR_PRECONN_WRITE        0x4000  /* protocol supports preconnect write */
-#define PR_DATA_IDEMPOTENT      0x8000  /* protocol supports idempotent data at connectx-time */
-#define PR_OLD          0x10000000 /* added via net_add_proto */
+#define PR_INITIALIZED  0x400                                      
+#define PR_ATTACHED     0x800                                         
+#define PR_MULTICONN    0x1000                                       
+#define PR_EVCONNINFO   0x2000                                         
+#define PR_PRECONN_WRITE        0x4000                                          
+#define PR_DATA_IDEMPOTENT      0x8000                                                          
+#define PR_OLD          0x10000000                              
 
-/* pseudo-public domain flags */
+                                
 #define PRF_USERFLAGS                                                   \
 	(PR_ATOMIC|PR_ADDR|PR_CONNREQUIRED|PR_WANTRCVD|PR_RIGHTS|       \
 	PR_IMPLOPCL|PR_LASTHDR|PR_PROTOLOCK|PR_PCBLOCK|PR_DISPOSE)
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef BSD_KERNEL_PRIVATE
 #ifdef PRCREQUESTS
@@ -329,21 +329,21 @@ char    *prcrequests[] = {
 	"TOSNET-REDIRECT", "TOSHOST-REDIRECT", "TX-INTRANS", "TX-REASS",
 	"PARAMPROB", "ADMIN-UNREACH"
 };
-#endif /* PRCREQUESTS */
+#endif                  
 
-/*
- * The arguments to ctloutput are:
- *	(*protosw[].pr_ctloutput)(req, so, level, optname, optval, p);
- * req is one of the actions listed below, so is a (struct socket *),
- * level is an indication of which protocol layer the option is intended.
- * optname is a protocol dependent socket option request,
- * optval is a pointer to a mbuf-chain pointer, for value-return results.
- * The protocol is responsible for disposal of the mbuf chain *optval
- * if supplied,
- * the caller is responsible for any space held by *optval, when returned.
- * A non-zero return from usrreq gives an
- * UNIX error number which should be passed to higher level software.
- */
+  
+                                  
+                                                                 
+                                                                     
+                                                                         
+                                                         
+                                                                         
+                                                                     
+               
+                                                                          
+                                         
+                                                                     
+   
 #define PRCO_GETOPT     0
 #define PRCO_SETOPT     1
 
@@ -353,40 +353,40 @@ char    *prcrequests[] = {
 char    *prcorequests[] = {
 	"GETOPT", "SETOPT",
 };
-#endif /* PRCOREQUESTS */
+#endif                   
 
-/*
- * In earlier BSD network stacks, a single pr_usrreq() function pointer was
- * invoked with an operation number indicating what operation was desired.
- * We now provide individual function pointers which protocols can implement,
- * which offers a number of benefits (such as type checking for arguments).
- * These older constants are still present in order to support TCP debugging.
- */
-#define PRU_ATTACH              0       /* attach protocol to up */
-#define PRU_DETACH              1       /* detach protocol from up */
-#define PRU_BIND                2       /* bind socket to address */
-#define PRU_LISTEN              3       /* listen for connection */
-#define PRU_CONNECT             4       /* establish connection to peer */
-#define PRU_ACCEPT              5       /* accept connection from peer */
-#define PRU_DISCONNECT          6       /* disconnect from peer */
-#define PRU_SHUTDOWN            7       /* won't send any more data */
-#define PRU_RCVD                8       /* have taken data; more room now */
-#define PRU_SEND                9       /* send this data */
-#define PRU_ABORT               10      /* abort (fast DISCONNECT, DETATCH) */
-#define PRU_CONTROL             11      /* control operations on protocol */
-#define PRU_SENSE               12      /* return status into m */
-#define PRU_RCVOOB              13      /* retrieve out of band data */
-#define PRU_SENDOOB             14      /* send out of band data */
-#define PRU_SOCKADDR            15      /* fetch socket's address */
-#define PRU_PEERADDR            16      /* fetch peer's address */
-#define PRU_CONNECT2            17      /* connect two sockets */
-/* begin for protocols internal use */
-#define PRU_FASTTIMO            18      /* 200ms timeout */
-#define PRU_SLOWTIMO            19      /* 500ms timeout */
-#define PRU_PROTORCV            20      /* receive from below */
-#define PRU_PROTOSEND           21      /* send to below */
-/* end for protocol's internal use */
-#define PRU_SEND_EOF            22      /* send and close */
+  
+                                                                           
+                                                                          
+                                                                             
+                                                                           
+                                                                             
+   
+#define PRU_ATTACH              0                                  
+#define PRU_DETACH              1                                    
+#define PRU_BIND                2                                   
+#define PRU_LISTEN              3                                  
+#define PRU_CONNECT             4                                         
+#define PRU_ACCEPT              5                                        
+#define PRU_DISCONNECT          6                                 
+#define PRU_SHUTDOWN            7                                     
+#define PRU_RCVD                8                                           
+#define PRU_SEND                9                           
+#define PRU_ABORT               10                                            
+#define PRU_CONTROL             11                                          
+#define PRU_SENSE               12                                
+#define PRU_RCVOOB              13                                     
+#define PRU_SENDOOB             14                                 
+#define PRU_SOCKADDR            15                                  
+#define PRU_PEERADDR            16                                
+#define PRU_CONNECT2            17                               
+                                      
+#define PRU_FASTTIMO            18                         
+#define PRU_SLOWTIMO            19                         
+#define PRU_PROTORCV            20                              
+#define PRU_PROTOSEND           21                         
+                                     
+#define PRU_SEND_EOF            22                          
 #define PRU_NREQ                22
 
 #ifdef PRUREQUESTS
@@ -398,8 +398,8 @@ char *prurequests[] = {
 	"PEERADDR", "CONNECT2", "FASTTIMO", "SLOWTIMO",
 	"PROTORCV", "PROTOSEND", "SEND_EOF",
 };
-#endif /* PRUREQUESTS */
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                  
+#endif                         
 
 struct stat;
 struct ucred;
@@ -407,18 +407,18 @@ struct uio;
 struct recv_msg_elem;
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * Legacy user-protocol hooks.
- *
- * NOTE: Do not modify this structure, as there are modules outside of xnu
- * which rely on the size and layout for binary compatibility.  This structure
- * is simply used by the protosw_old structure.  Internally, user-protocol
- * hooks use the private variant of pr_usrreqs defined down below.
- */
+  
+                              
+  
+                                                                          
+                                                                              
+                                                                          
+                                                                  
+   
 struct pr_usrreqs_old {
 #else
 struct pr_usrreqs {
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 	int     (*pru_abort)(struct socket *so);
 	int     (*pru_accept)(struct socket *so, struct sockaddr **nam);
 	int     (*pru_attach)(struct socket *so, int proto, struct proc *p);
@@ -452,16 +452,16 @@ struct pr_usrreqs {
 };
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * If the ordering here looks odd, that's because it's alphabetical.  These
- * should eventually be merged back into struct protosw.
- *
- * Internal, private and extendable representation of pr_usrreqs.
- *
- * NOTE: When adding new ones, also add default callbacks in pru_sanitize().
- */
+  
+                                                                           
+                                                        
+  
+                                                                 
+  
+                                                                            
+   
 struct pr_usrreqs {
-	uint32_t pru_flags;     /* see PRUF flags below */
+	uint32_t pru_flags;                               
 	int     (*pru_abort)(struct socket *);
 	int     (*pru_accept)(struct socket *, struct sockaddr **);
 	int     (*pru_attach)(struct socket *, int proto, struct proc *);
@@ -505,16 +505,16 @@ struct pr_usrreqs {
 	int     (*pru_preconnect)(struct socket *so);
 };
 
-/* Values for pru_flags  */
-#define PRUF_OLD        0x10000000      /* added via net_add_proto */
+                           
+#define PRUF_OLD        0x10000000                                   
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * For faster access than net_uptime(), bypassing the initialization.
- */
+  
+                                                                     
+   
 extern u_int64_t _net_uptime;
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
+#endif                         
 
 __BEGIN_DECLS
 extern int pru_abort_notsupp(struct socket *so);
@@ -532,7 +532,7 @@ extern int pru_connectx_notsupp(struct socket *, struct sockaddr *,
 extern int pru_disconnectx_notsupp(struct socket *, sae_associd_t,
     sae_connid_t);
 extern int pru_socheckopt_null(struct socket *, struct sockopt *);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 extern int pru_control_notsupp(struct socket *so, u_long cmd, caddr_t data,
     struct ifnet *ifp, struct proc *p);
 extern int pru_detach_notsupp(struct socket *so);
@@ -587,7 +587,7 @@ __XNU_INTERNAL(pffindproto);
 extern int net_add_proto(struct protosw *, struct domain *);
 extern int net_del_proto(int, int, struct domain *);
 extern struct protosw *pffindproto(int family, int protocol, int type);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 __END_DECLS
-#endif /* KERNEL_PRIVATE */
-#endif  /* !_SYS_PROTOSW_H_ */
+#endif                     
+#endif                        

@@ -30,7 +30,7 @@ T_DECL(thread_call_race_71455282,
 	pthread_t t;
 	size_t n;
 
-	/* we will violate mach rules so ignore crashes here */
+	                                                       
 	T_ASSERT_MACH_SUCCESS(task_set_exc_guard_behavior(mach_task_self(), 0),
 	    "task_set_exc_guard_behavior");
 

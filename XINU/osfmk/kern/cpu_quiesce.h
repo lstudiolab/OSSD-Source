@@ -33,15 +33,15 @@
 
 #include <sys/cdefs.h>
 
-/* State field kept on each CPU to track participation */
+                                                         
 typedef enum {
-	/* Processor that never participated */
+	                                       
 	CPU_QUIESCE_COUNTER_NONE = 0,
-	/* Processor ready to participate, waiting for return to user */
+	                                                                
 	CPU_QUIESCE_COUNTER_PENDING_JOIN = 1,
-	/* Processor currently participating in counter */
+	                                                  
 	CPU_QUIESCE_COUNTER_JOINED = 2,
-	/* Processor currently not participating in counter */
+	                                                      
 	CPU_QUIESCE_COUNTER_LEFT = 3,
 } cpu_quiescent_state_t;
 
@@ -53,13 +53,13 @@ extern void cpu_quiescent_counter_checkin(uint64_t ctime);
 extern void cpu_quiescent_counter_ast(void);
 extern void cpu_quiescent_counter_init(void);
 
-/* use of these is guarded by the config */
+                                           
 extern void cpu_quiescent_counter_set_min_interval_us(uint32_t new_value);
 extern uint32_t cpu_quiescent_counter_get_min_interval_us(void);
 
-#else /* CONFIG_QUIESCE_COUNTER */
+#else                             
 
-/* stub routines for platforms without the counter */
+                                                     
 
 static inline void
 cpu_quiescent_counter_join(__unused uint64_t ctime)
@@ -82,7 +82,7 @@ cpu_quiescent_counter_init(void)
 {
 }
 
-#endif /* CONFIG_QUIESCE_COUNTER */
+#endif                             
 
 #if MACH_ASSERT && CONFIG_QUIESCE_COUNTER
 extern void cpu_quiescent_counter_assert_ast(void);
@@ -93,6 +93,6 @@ cpu_quiescent_counter_assert_ast(void)
 }
 #endif
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _KERN_CPU_QUIESCE_H_ */
+#endif                           

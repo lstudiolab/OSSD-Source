@@ -35,8 +35,8 @@
 #include "kxld_util.h"
 #include "kxld_splitinfolc.h"
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_splitinfolc_init_from_macho(KXLDsplitinfolc *splitinfolc, struct linkedit_data_command *src)
 {
@@ -49,24 +49,24 @@ kxld_splitinfolc_init_from_macho(KXLDsplitinfolc *splitinfolc, struct linkedit_d
 	splitinfolc->has_splitinfolc = TRUE;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_splitinfolc_clear(KXLDsplitinfolc *splitinfolc)
 {
 	bzero(splitinfolc, sizeof(*splitinfolc));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_splitinfolc_get_macho_header_size(void)
 {
 	return sizeof(struct linkedit_data_command);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_splitinfolc_export_macho(const KXLDsplitinfolc *splitinfolc,
     splitKextLinkInfo *linked_object,
@@ -104,15 +104,15 @@ kxld_splitinfolc_export_macho(const KXLDsplitinfolc *splitinfolc,
 		goto finish;
 	}
 
-	// copy in the split info reloc data from kextExecutable. For example dataoff
-	// in LC_SEGMENT_SPLIT_INFO load command points to the reloc data in the
-	// __LINKEDIT segment.  In this case 65768 into the kextExecutable file is
-	// the split seg reloc info (for 920 bytes)
-//    Load command 9
-//    cmd LC_SEGMENT_SPLIT_INFO
-//    cmdsize 16
-//    dataoff 65768
-//    datasize 920
+	                                                                             
+	                                                                        
+	                                                                          
+	                                           
+                    
+                               
+                
+                   
+                  
 
 
 	memcpy(buf + *data_offset, linked_object->kextExecutable + splitinfolc->dataoff, splitinfolc->datasize);
@@ -147,7 +147,7 @@ kxld_splitinfolc_export_macho(const KXLDsplitinfolc *splitinfolc,
 	}
 #endif
 
-	// update the load command header
+	                                 
 	splitinfolc_hdr->cmd = LC_SEGMENT_SPLIT_INFO;
 	splitinfolc_hdr->cmdsize = (uint32_t) sizeof(*splitinfolc_hdr);
 	splitinfolc_hdr->dataoff = (uint32_t)(*data_offset);

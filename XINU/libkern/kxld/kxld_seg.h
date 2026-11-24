@@ -56,19 +56,19 @@ struct kxld_seg {
 	vm_prot_t initprot;
 };
 
-/*******************************************************************************
-* Constructors and Destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 #if KXLD_USER_OR_ILP32
 kern_return_t kxld_seg_init_from_macho_32(KXLDSeg *seg, struct segment_command *src)
 __attribute__((nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
 kern_return_t kxld_seg_init_from_macho_64(KXLDSeg *seg, struct segment_command_64 *src)
 __attribute__((nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
 #if KXLD_USER_OR_OBJECT
 kern_return_t kxld_seg_create_seg_from_sections(KXLDArray *segarray,
@@ -81,7 +81,7 @@ __attribute__((nonnull, visibility("hidden")));
 
 kern_return_t kxld_seg_init_linkedit(KXLDArray *segs)
 __attribute__((nonnull, visibility("hidden")));
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
 void kxld_seg_clear(KXLDSeg *seg)
 __attribute__((nonnull, visibility("hidden")));
@@ -90,9 +90,9 @@ void kxld_seg_deinit(KXLDSeg *seg)
 __attribute__((nonnull, visibility("hidden")));
 
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 kxld_size_t kxld_seg_get_vmsize(const KXLDSeg *seg)
 __attribute__((pure, nonnull, visibility("hidden")));
@@ -101,7 +101,7 @@ u_long kxld_seg_get_macho_header_size(const KXLDSeg *seg, boolean_t is_32_bit)
 __attribute__((pure, nonnull, visibility("hidden")));
 
 #if 0
-/* This is no longer used, but may be useful some day... */
+                                                           
 u_long kxld_seg_get_macho_data_size(const KXLDSeg *seg)
 __attribute__((pure, nonnull, visibility("hidden")));
 #endif
@@ -123,14 +123,14 @@ kxld_seg_export_macho_to_vm(const KXLDSeg *seg,
     boolean_t is_32_bit)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Modifiers
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 kern_return_t kxld_seg_add_section(KXLDSeg *seg, struct kxld_sect *sect)
 __attribute__((nonnull, visibility("hidden")));
 
-/* To be called after all sections are added */
+                                               
 kern_return_t kxld_seg_finish_init(KXLDSeg *seg)
 __attribute__((nonnull, visibility("hidden")));
 
@@ -146,7 +146,7 @@ void kxld_seg_populate_linkedit(KXLDSeg *seg, const struct kxld_symtab *symtab,
     , const struct kxld_array *locrelocs
     , const struct kxld_array *extrelocs
     , boolean_t target_supports_slideable_kexts
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
     , uint32_t splitinfolc_size
     )
 __attribute__((nonnull, visibility("hidden")));
@@ -172,4 +172,4 @@ __attribute__((pure, nonnull, visibility("hidden")));
 boolean_t kxld_seg_is_llvm_cov_seg(const KXLDSeg *seg)
 __attribute__((pure, nonnull, visibility("hidden")));
 
-#endif /* _KXLD_SEG_H_ */
+#endif                   

@@ -46,6 +46,6 @@ void OSPrintMemory(void);
 
 __END_DECLS
 
-#endif /* OSCPP_DEBUG */
+#endif                  
 
-#endif    /* _OSCPPDEBUG_H */
+#endif                       

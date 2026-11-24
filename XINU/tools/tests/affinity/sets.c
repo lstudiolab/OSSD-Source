@@ -13,39 +13,39 @@
 #include <errno.h>
 #include <sys/sysctl.h>
 
-/*
- * Sets is a multithreaded test/benchmarking program to evaluate
- * affinity set placement in Leopard.
- *
- * The picture here, for each set, is:
- *
- *       free                   work
- *    -> queue --> producer --> queue --> consumer --
- *   |                                               |
- *    -----------------------------------------------
- *
- *       <------ "stage" -----> <------ "stage" ----->
- *
- * We spin off sets of production line threads (2 sets by default).
- * All threads of each line sets the same affinity tag (unless disabled).
- * By default there are 2 stage (worker) threads per production line.
- * A worker thread removes a buffer from an input queue, processses it and
- * queues it on an output queue.  By default the initial stage (producer)
- * writes every byte in a buffer and the other (consumer) stages read every
- * byte. By default the buffers are 1MB (256 pages) in size but this can be
- * overidden.  By default there are 2 buffers per set (again overridable).
- * Worker threads process (iterate over) 10000 buffers by default.
- *
- * With affinity enabled, each producer and consumer thread sets its affinity
- * to the set number, 1 .. N. So the threads of each set share an L2 cache.
- *
- * Buffer management uses pthread mutex/condition variables. A thread blocks
- * when no buffer is available on a queue and it is signaled when a buffer
- * is placed on an empty queue. Queues are tailq'a a la <sys/queue.h>.
- * The queue management is centralized in a single routine: what queues to
- * use as input and output and what function to call for processing is
- * data-driven.
- */
+  
+                                                                
+                                     
+  
+                                      
+  
+                                    
+                                                     
+                                                      
+                                                     
+  
+                                                      
+  
+                                                                   
+                                                                         
+                                                                     
+                                                                          
+                                                                         
+                                                                           
+                                                                           
+                                                                          
+                                                                  
+  
+                                                                             
+                                                                           
+  
+                                                                            
+                                                                          
+                                                                      
+                                                                          
+                                                                      
+               
+   
 
 pthread_mutex_t funnel;
 pthread_cond_t  barrier;
@@ -65,9 +65,9 @@ typedef struct work {
 	int                     *data;
 } work_t;
 
-/*
- * A work queue, complete with pthread objects for its management
- */
+  
+                                                                 
+   
 typedef struct work_queue {
 	pthread_mutex_t         mtx;
 	pthread_cond_t          cnd;
@@ -75,10 +75,10 @@ typedef struct work_queue {
 	boolean_t               waiters;
 } work_queue_t;
 
-/* Worker functions take a integer array and size */
+                                                    
 typedef void (worker_fn_t)(int *, int);
 
-/* This struct controls the function of a thread */
+                                                   
 typedef struct {
 	int                     stagenum;
 	char                    *name;
@@ -90,7 +90,7 @@ typedef struct {
 	work_queue_t            bufq;
 } stage_info_t;
 
-/* This defines a thread set */
+                               
 #define WORKERS_MAX 10
 typedef struct line_info {
 	int                     setnum;
@@ -134,7 +134,7 @@ usage()
 	exit(1);
 }
 
-/* Trivial producer: write to each byte */
+                                          
 void
 writer_fn(int *data, int isize)
 {
@@ -145,7 +145,7 @@ writer_fn(int *data, int isize)
 	}
 }
 
-/* Trivial consumer: read each byte */
+                                      
 void
 reader_fn(int *data, int isize)
 {
@@ -157,7 +157,7 @@ reader_fn(int *data, int isize)
 	}
 }
 
-/* Consumer reading and writing the buffer */
+                                             
 void
 reader_writer_fn(int *data, int isize)
 {
@@ -168,10 +168,10 @@ reader_writer_fn(int *data, int isize)
 	}
 }
 
-/*
- * This is the central function for every thread.
- * For each invocation, its role is ets by (a pointer to) a stage_info_t.
- */
+  
+                                                 
+                                                                         
+   
 void *
 manager_fn(void *arg)
 {
@@ -180,10 +180,10 @@ manager_fn(void *arg)
 	kern_return_t                   ret;
 	long                            iteration = 0;
 
-	/*
-	 * If we're using affinity sets (we are by default)
-	 * set our tag to by our thread set number.
-	 */
+	  
+                                                    
+                                            
+    
 	thread_extended_policy_data_t   epolicy;
 	thread_affinity_policy_data_t   policy;
 
@@ -209,10 +209,10 @@ manager_fn(void *arg)
 
 	DBG("Starting %s set: %d stage: %d\n", sp->name, lp->setnum, sp->stagenum);
 
-	/*
-	 * Start barrier.
-	 * The tets thread to get here releases everyone and starts the timer.
-	 */
+	  
+                  
+                                                                       
+    
 	pthread_mutex_lock(&funnel);
 	threads_ready++;
 	if (threads_ready == threads) {
@@ -234,10 +234,10 @@ manager_fn(void *arg)
 		int             i;
 		work_t          *workp;
 
-		/*
-		 * Get a buffer from the input queue.
-		 * Block if none.
-		 */
+		  
+                                       
+                   
+     
 		pthread_mutex_lock(&sp->input->mtx);
 		while (1) {
 			workp = TAILQ_FIRST(&(sp->input->queue));
@@ -256,13 +256,13 @@ manager_fn(void *arg)
 		DBG("  %s[%d,%d] iteration %d work %p data %p\n",
 		    sp->name, lp->setnum, sp->stagenum, iteration, workp, workp->data);
 
-		/* Do our stuff with the buffer */
+		                                  
 		(void) sp->fn(workp->data, lp->isize);
 
-		/*
-		 * Place the buffer on the input queue.
-		 * Signal  waiters if required.
-		 */
+		  
+                                         
+                                 
+     
 		pthread_mutex_lock(&sp->output->mtx);
 		TAILQ_INSERT_TAIL(&(sp->output->queue), workp, link);
 		if (sp->output->waiters) {
@@ -303,27 +303,27 @@ auto_config(int npages, int *nbufs, int *nsets)
 		exit(1);
 	}
 
-	/*
-	 * Find LLC
-	 */
+	  
+            
+    
 	for (llc = MAX_CACHE_DEPTH - 1; llc > 0; llc--) {
 		if (cacheconfig[llc] != 0) {
 			break;
 		}
 	}
 
-	/*
-	 * Calculate number of buffers of size pages*4096 bytes
-	 * fit into 90% of an L2 cache.
-	 */
+	  
+                                                        
+                                
+    
 	*nbufs = cachesize[llc] * 9 / (npages * 4096 * 10);
 	mutter("  L%d (LLC) cache %qd bytes: "
 	    "using %d buffers of size %d bytes\n",
 	    llc, cachesize[llc], *nbufs, (npages * 4096));
 
-	/*
-	 * Calcalute how many sets:
-	 */
+	  
+                            
+    
 	*nsets = cacheconfig[0] / cacheconfig[llc];
 	mutter("  %qd cpus; %qd cpus per L%d cache: using %d sets\n",
 	    cacheconfig[0], cacheconfig[llc], llc, *nsets);
@@ -337,7 +337,7 @@ main(int argc, char *argv[])
 {
 	int                     i;
 	int                     j;
-	int                     pages = 256; /* 1MB */
+	int                     pages = 256;          
 	int                     buffers = 2;
 	int                     sets = 2;
 	int                     stages = 2;
@@ -349,7 +349,7 @@ main(int argc, char *argv[])
 	kern_return_t           ret;
 	int                     c;
 
-	/* Do switch parsing: */
+	                        
 	while ((c = getopt(argc, argv, "ab:chi:p:s:twv:")) != -1) {
 		switch (c) {
 		case 'a':
@@ -400,9 +400,9 @@ main(int argc, char *argv[])
 	pthread_mutex_init(&funnel, NULL);
 	pthread_cond_init(&barrier, NULL);
 
-	/*
-	 * Fire up the worker threads.
-	 */
+	  
+                               
+    
 	threads = sets * stages;
 	mutter("Launching %d set%s of %d threads with %saffinity, "
 	    "consumer reads%s data\n",
@@ -433,7 +433,7 @@ main(int argc, char *argv[])
 		lp->isize = pages * 4096 / sizeof(int);
 		lp->data = (int *) malloc(buffers * pages * 4096);
 
-		/* Set up the queue for the workers of this thread set: */
+		                                                          
 		for (j = 0; j < stages; j++) {
 			sp = &stage_info[(i * stages) + j];
 			sp->stagenum = j;
@@ -445,10 +445,10 @@ main(int argc, char *argv[])
 			sp->bufq.waiters = FALSE;
 		}
 
-		/*
-		 * Take a second pass through the stages
-		 * to define what the workers are and to interconnect their input/outputs
-		 */
+		  
+                                          
+                                                                           
+     
 		for (j = 0; j < stages; j++) {
 			sp = lp->stage[j];
 			if (j == 0) {
@@ -462,7 +462,7 @@ main(int argc, char *argv[])
 			sp->output = &lp->stage[(j + 1) % stages]->bufq;
 		}
 
-		/* Set up the buffers on the first worker of the set. */
+		                                                        
 		work_array = (work_t *)  malloc(buffers * sizeof(work_t));
 		for (j = 0; j < buffers; j++) {
 			work_array[j].data = lp->data + (lp->isize * j);
@@ -471,7 +471,7 @@ main(int argc, char *argv[])
 			    &work_array[j], i, work_array[j].data);
 		}
 
-		/* Create this set of threads */
+		                                
 		for (j = 0; j < stages; j++) {
 			if (ret = pthread_create(&lp->stage[j]->thread, NULL,
 			    &manager_fn,
@@ -481,9 +481,9 @@ main(int argc, char *argv[])
 		}
 	}
 
-	/*
-	 * We sit back anf wait for the slave to finish.
-	 */
+	  
+                                                 
+    
 	for (i = 0; i < sets; i++) {
 		lp = &line_info[i];
 		for (j = 0; j < stages; j++) {
@@ -494,9 +494,9 @@ main(int argc, char *argv[])
 		}
 	}
 
-	/*
-	 * See how long the work took.
-	 */
+	  
+                               
+    
 	timer = mach_absolute_time() - timer;
 	timer = timer / 1000000ULL;
 	printf("%d.%03d seconds elapsed.\n",

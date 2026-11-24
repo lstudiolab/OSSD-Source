@@ -101,8 +101,8 @@ T_DECL(kdebug_signpost_syscall,
 	__block int single_seen = 0;
 	__block int paired_seen = 0;
 
-	/* make sure to get enough events for the KDBUFWAIT to trigger */
-	// ktrace_events_class(s, DBG_MACH, ^(__unused struct trace_point *tp){});
+	                                                                 
+	                                                                          
 	ktrace_events_single(s,
 	    APPSDBG_CODE(DBG_APP_SIGNPOST, SIGNPOST_SINGLE_CODE),
 	    ^(struct trace_point *tp) {
@@ -207,10 +207,10 @@ T_DECL(syscall_tracing,
 	int error = ktrace_start(s, dispatch_get_main_queue());
 	T_ASSERT_POSIX_ZERO(error, "started tracing");
 
-	/*
-	 * telemetry(2) has a 64-bit argument that will definitely be traced, and
-	 * is unlikely to be used elsewhere by this process.
-	 */
+	  
+                                                                          
+                                                     
+    
 	extern int __telemetry(uint64_t cmd, uint64_t deadline, uint64_t interval,
 			uint64_t leeway, uint64_t arg4, uint64_t arg5);
 	(void)__telemetry(arg1, 0, 0, 0, 0, 0);
@@ -240,7 +240,7 @@ T_DECL(wrapping,
 
 	start_controlling_ktrace();
 
-	/* use sysctls manually to bypass libktrace assumptions */
+	                                                          
 
 	int mib[4] = { CTL_KERN, KERN_KDEBUG };
 	mib[2] = KERN_KDSETBUF; mib[3] = WRAPPING_EVENTS_COUNT;
@@ -254,9 +254,9 @@ T_DECL(wrapping,
 	mib[2] = KERN_KDENABLE; mib[3] = 1;
 	T_ASSERT_POSIX_SUCCESS(sysctl(mib, 4, NULL, 0, NULL, 0), "KERN_KDENABLE");
 
-	/* wrapping is on by default */
+	                               
 
-	/* wait until wrapped */
+	                        
 	T_LOG("waiting for trace to wrap");
 	mib[2] = KERN_KDGETBUF;
 	needed = sizeof(buf_info);
@@ -340,9 +340,9 @@ T_DECL(reject_old_events,
 	event_horizon_ts = mach_absolute_time();
 
 	T_ASSERT_POSIX_ZERO(ktrace_start(s, dispatch_get_main_queue()), NULL);
-	/* first, try an old event at the beginning of trace */
+	                                                       
 	assert_kdebug_test(KDBG_TEST_OLD_TIMES);
-	/* after a good event has been traced, old events should be rejected */
+	                                                                       
 	assert_kdebug_test(KDBG_TEST_OLD_TIMES);
 	ktrace_end(s, 0);
 
@@ -385,7 +385,7 @@ T_DECL(ascending_time_order,
 	T_ASSERT_POSIX_ZERO(ktrace_start(s, dispatch_get_main_queue()),
 	    "started tracing");
 
-	/* try to inject old timestamps into trace */
+	                                             
 	assert_kdebug_test(KDBG_TEST_OLD_TIMES);
 
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ORDERING_TIMEOUT_SEC * NSEC_PER_SEC),
@@ -455,7 +455,7 @@ expect_dyld_image_info(struct trace_point *tp, const uint64_t *exp_uuid,
 	} else {
 		T_ASSERT_FAIL("unrecognized order of events %d", order);
 	}
-#else /* defined(__LP64__) */
+#else                        
 	if (order == 0) {
 		uint32_t uuid[4];
 
@@ -492,7 +492,7 @@ expect_dyld_image_info(struct trace_point *tp, const uint64_t *exp_uuid,
 	} else {
 		T_ASSERT_FAIL("unrecognized order of events %d", order);
 	}
-#endif /* defined(__LP64__) */
+#endif                        
 }
 
 #if defined(__LP64__) || defined(__arm64__)
@@ -524,11 +524,11 @@ T_DECL(dyld_events, "test that dyld registering libraries emits events")
 {
 	dyld_kernel_image_info_t info;
 
-	/*
-	 * Use pointers instead of __block variables in order to use these variables
-	 * in the completion block below _and_ pass pointers to them to the
-	 * expect_dyld_events function.
-	 */
+	  
+                                                                             
+                                                                    
+                                
+    
 	uint8_t saw_events[3] = { 0 };
 	uint8_t *saw_mapping = &(saw_events[0]);
 	uint8_t *saw_unmapping = &(saw_events[1]);
@@ -728,10 +728,10 @@ T_DECL(kernel_events, "ensure kernel macros work")
 	expect_kdbg_test_events(s, false,
 	    ^(unsigned int dev_seen, unsigned int rel_seen,
 	    unsigned int filt_seen, unsigned int noprocfilt_seen) {
-		/*
-		 * Development-only events are only filtered if running on an embedded
-		 * OS.
-		 */
+		  
+                                                                        
+        
+     
 		unsigned int dev_exp;
 #if (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)
 		dev_exp = is_development_kernel() ? EXP_KERNEL_EVENTS : 0U;
@@ -771,7 +771,7 @@ T_DECL(kernel_events_filtered, "ensure that the filtered kernel macros work")
 #else
 		T_EXPECT_EQ(dev_seen, EXP_KERNEL_EVENTS,
 		"development-only events seen");
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		T_EXPECT_EQ(filt_seen, 0U, "no filter-only events seen");
 		T_EXPECT_EQ(noprocfilt_seen, EXP_KERNEL_EVENTS,
 		"process filter-agnostic events seen");
@@ -788,9 +788,9 @@ T_DECL(kernel_events_noprocfilt,
 	ktrace_session_t s = ktrace_session_create();
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(s, "created session");
 
-	/*
-	 * Only allow launchd events through.
-	 */
+	  
+                                      
+    
 	T_ASSERT_POSIX_ZERO(ktrace_filter_pid(s, 1), "filtered events to launchd");
 	for (size_t i = 0; i < sizeof(noprocfilt_evts) / sizeof(noprocfilt_evts[0]); i++) {
 		T_QUIET;
@@ -818,9 +818,9 @@ static volatile bool continue_abuse = true;
 #define STRESS_DEBUGID (0xfeedfac0)
 #define ABUSE_SECS (2)
 #define TIMER_NS (100 * NSEC_PER_USEC)
-/*
- * Use the quantum as the gap threshold.
- */
+  
+                                        
+   
 #define GAP_THRESHOLD_NS (10 * NSEC_PER_MSEC)
 
 static void *
@@ -845,10 +845,10 @@ T_DECL(stress, "emit events on all but one CPU with a small buffer",
 	ktrace_session_t s = ktrace_session_create();
 	T_WITH_ERRNO; T_QUIET; T_ASSERT_NOTNULL(s, "ktrace_session_create");
 
-	/* Let's not waste any time with pleasantries. */
+	                                                 
 	ktrace_set_uuid_map_enabled(s, KTRACE_FEATURE_DISABLED);
 
-	/* Ouch. */
+	           
 	ktrace_events_all(s, ^(__unused struct trace_point *tp) {});
 	ktrace_set_vnode_paths_enabled(s, KTRACE_FEATURE_ENABLED);
 	(void)atexit_b(^{ kperf_reset(); });
@@ -866,9 +866,9 @@ T_DECL(stress, "emit events on all but one CPU with a small buffer",
 	    KPERF_SAMPLER_TK_SNAPSHOT | KPERF_SAMPLER_SYS_MEM |
 	    KPERF_SAMPLER_TH_INSTRS_CYCLES);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(kperror, "kperf_action_samplers_set");
-	/* You monster... */
+	                    
 
-	/* The coup-de-grace. */
+	                        
 	ktrace_set_buffer_size(s, 10);
 
 	char filepath_arr[MAXPATHLEN] = "";
@@ -929,10 +929,10 @@ T_DECL(stress, "emit events on all but one CPU with a small buffer",
 			                tp->timestamp, tp->cpuid, tp->debugid);
 				}
 
-			        /*
-			         * These gaps are ok -- they appear after CPUs are brought back
-			         * up.
-			         */
+			          
+                                                                          
+                 
+              
 #define INTERRUPT (0x1050000)
 #define PERF_CPU_IDLE (0x27001000)
 #define INTC_HANDLER (0x5000004)
@@ -991,7 +991,7 @@ T_DECL(stress, "emit events on all but one CPU with a small buffer",
 		T_SETUPEND;
 	});
 
-/* Just kidding... for now. */
+                              
 #if 0
 	kperror = kperf_sample_set(1);
 	T_ASSERT_POSIX_SUCCESS(kperror,
@@ -1032,19 +1032,19 @@ T_DECL(stress, "emit events on all but one CPU with a small buffer",
 #define ROUND_TRIPS_TIMEOUT_SECS (2 * 60)
 #define COLLECTION_INTERVAL_MS 100
 
-/*
- * Test a sustained tracing session, involving multiple round-trips to the
- * kernel.
- *
- * Trace all events, and every `ROUND_TRIP_PERIOD` events, emit an event that's
- * unlikely to be emitted elsewhere.  Look for this event, too, and make sure we
- * see as many of them as we emitted.
- *
- * After seeing `ROUND_TRIPS_THRESHOLD` of the unlikely events, end tracing.
- * In the failure mode, we won't see any of these, so set a timeout of
- * `ROUND_TRIPS_TIMEOUT_SECS` to prevent hanging, waiting for events that we'll
- * never see.
- */
+  
+                                                                          
+          
+  
+                                                                               
+                                                                                
+                                     
+  
+                                                                            
+                                                                      
+                                                                               
+             
+   
 T_DECL(round_trips,
     "test sustained tracing with multiple round-trips through the kernel")
 {
@@ -1053,10 +1053,10 @@ T_DECL(round_trips,
 	ktrace_session_t s = ktrace_session_create();
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(s, "created session");
 
-	/*
-	 * Set a small buffer and collection interval to increase the number of
-	 * round-trips.
-	 */
+	  
+                                                                        
+                
+    
 	ktrace_set_buffer_size(s, 50);
 	ktrace_set_collection_interval(s, COLLECTION_INTERVAL_MS);
 
@@ -1107,10 +1107,10 @@ T_DECL(round_trips,
 #define HEARTBEAT_INTERVAL_SECS 2
 #define HEARTBEAT_COUNT 20
 
-/*
- * Ensure we see events periodically, checking for recent events on a
- * heart-beat.
- */
+  
+                                                                     
+              
+   
 T_DECL(event_coverage, "ensure events appear up to the end of tracing")
 {
 	start_controlling_ktrace();
@@ -1215,10 +1215,10 @@ T_DECL(set_buffer_size, "ensure large buffer sizes can be set")
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(sysctlbyname("hw.memsize", &memsize,
 	    &(size_t){ sizeof(memsize) }, NULL, 0), "get memory size");
 
-	/*
-	 * Try to allocate up to one-eighth of available memory towards
-	 * tracing.
-	 */
+	  
+                                                                
+            
+    
 	uint64_t maxevents_u64 = memsize / 8 / sizeof(kd_buf);
 	if (maxevents_u64 > UINT32_MAX) {
 		maxevents_u64 = UINT32_MAX;
@@ -1261,10 +1261,10 @@ T_DECL(long_names, "ensure long command names are reported")
 
 	ktrace_session_t ktsess = ktrace_session_create();
 
-	/*
-	 * 32-bit kernels can only trace 16 bytes of the string in their event
-	 * arguments.
-	 */
+	  
+                                                                       
+              
+    
 	if (!ktrace_is_kernel_64_bit(ktsess)) {
 		longname[16] = '\0';
 	}
@@ -1492,7 +1492,7 @@ T_DECL(lookup_long_paths,
 static const char *expected_subsystems[] = {
 	"tunables", "locks_early", "kprintf", "pmap_steal", "vm_kernel",
 	"kmem", "kmem_alloc", "zalloc",
-	/* "percpu", only has a startup phase on Intel */
+	                                                 
 	"locks", "codesigning", "oslog", "early_boot",
 };
 #define EXPECTED_SUBSYSTEMS_LEN \
@@ -1511,9 +1511,9 @@ T_DECL(early_boot_tracing, "ensure early boot strings are present",
 
 #if defined(__x86_64__)
 #define FIRST_EVENT_STRING "i386_init"
-#else /* defined(__x86_64__) */
+#else                          
 #define FIRST_EVENT_STRING "kernel_startup_bootstrap"
-#endif /* !defined(__x86_64__) */
+#endif                           
 
 	__block bool seen_event = false;
 	__block unsigned int cur_subsystem = 0;
@@ -1531,7 +1531,7 @@ T_DECL(early_boot_tracing, "ensure early boot strings are present",
 			    tp->arg1, tp->arg2, tp->arg3, tp->arg4);
 			char expect_str[33] = FIRST_EVENT_STRING;
 			if (!ktrace_is_kernel_64_bit(s)) {
-				// Only the first 16 bytes of the string will be traced.
+				                                                        
 				expect_str[16] = '\0';
 			}
 
@@ -1588,7 +1588,7 @@ T_DECL(typefilter_boot_arg, "ensure typefilter is set up correctly at boot",
 	T_ASSERT_NOTNULL(typefilt, "typefilter is active");
 	T_EXPECT_TRUE(typefilt[0x0c00 / 8],
 			"specified subclass is set in typefilter");
-	T_MAYFAIL; // rdar://63625062 (UTD converts commas in boot-args to spaces)
+	T_MAYFAIL;                                                                
 	T_EXPECT_TRUE(typefilt[0xfeed / 8],
 			"specified class is set in typefilter");
 
@@ -1644,7 +1644,7 @@ T_DECL(instrs_and_cycles_on_proc_exit,
 	});
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_POSIX_ZERO(error, "trace single event");
 	ktrace_set_completion_handler(s, ^{
-		// TODO Check for equality once rdar://61948669 is fixed.
+		                                                         
 		T_ASSERT_GE(proc_instrs, rusage->ri_instructions,
 				"trace event instrs are >= to rusage instrs");
 		T_ASSERT_GE(proc_cycles, rusage->ri_cycles,
@@ -1682,7 +1682,7 @@ T_DECL(instrs_and_cycles_on_proc_exit,
 #define NO_OF_THREADS 2
 
 struct thread_counters_info {
-	uint64_t counts[2]; //cycles and/or instrs
+	uint64_t counts[2];                       
 	uint64_t cpu_time;
 	uint64_t thread_id;
 };
@@ -1696,7 +1696,7 @@ get_thread_counters(void* ptr)
 	extern uint64_t __thread_selfid(void);
 	tc_info_t tc_info = (tc_info_t) ptr;
 	tc_info->thread_id = __thread_selfid();
-	// Just to increase the instr, cycle count
+	                                          
 	T_LOG("printing %llu\n", tc_info->thread_id);
 	tc_info->cpu_time = __thread_selfusage();
 	thread_selfcounts(1, tc_info->counts, sizeof(tc_info->counts));
@@ -1731,11 +1731,11 @@ T_DECL(instrs_and_cycles_on_thread_exit,
 			if (tp->threadid == tc_infos[i].thread_id) {
 				nevents++;
 				uint64_t cpu_time = tp->arg3 + tp->arg4;
-				/*
-				 * as we are getting counts before thread exit,
-				 * the counts at thread exit should be greater than
-				 * thread_selfcounts
-				 */
+				  
+                                                   
+                                                       
+                        
+       
 				T_ASSERT_GE(tp->arg1, tc_infos[i].counts[0],
 					"trace event instrs are >= to thread's instrs");
 				T_ASSERT_GE(tp->arg2, tc_infos[i].counts[1],

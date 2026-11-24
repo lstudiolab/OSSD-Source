@@ -28,9 +28,9 @@
 
 #include <sys/cdefs.h>
 
-/*
- * Ethernet debugger header file
- */
+  
+                                
+   
 
 __BEGIN_DECLS
 typedef void (*kdp_send_t)(void * pkt, unsigned int pkt_len);

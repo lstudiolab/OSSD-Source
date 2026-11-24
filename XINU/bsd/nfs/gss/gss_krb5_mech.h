@@ -33,9 +33,9 @@
 #include <corecrypto/ccaes.h>
 #include <corecrypto/ccpad.h>
 
-/*
- * GSS-API things from gssapi.h
- */
+  
+                               
+   
 /*
  * Copyright 1993 by OpenVision Technologies, Inc.
  *
@@ -62,10 +62,10 @@ typedef uint32_t OM_uint32;
 
 #define GSS_S_COMPLETE                  0
 
-/*
- * Some "helper" definitions to make the status code macros obvious.
- * From gssapi.h:
- */
+  
+                                                                    
+                 
+   
 #define GSS_C_CALLING_ERROR_OFFSET 24
 #define GSS_C_ROUTINE_ERROR_OFFSET 16
 #define GSS_C_SUPPLEMENTARY_OFFSET 0
@@ -73,11 +73,11 @@ typedef uint32_t OM_uint32;
 #define GSS_C_ROUTINE_ERROR_MASK ((OM_uint32) 0377ul)
 #define GSS_C_SUPPLEMENTARY_MASK ((OM_uint32) 0177777ul)
 
-/*
- * The macros that test status codes for error conditions.  Note that the
- * GSS_ERROR() macro has changed slightly from the V1 GSSAPI so that it now
- * evaluates its argument only once.
- */
+  
+                                                                         
+                                                                           
+                                    
+   
 #define GSS_CALLING_ERROR(x) \
 	((x) & (GSS_C_CALLING_ERROR_MASK << GSS_C_CALLING_ERROR_OFFSET))
 #define GSS_ROUTINE_ERROR(x) \
@@ -88,9 +88,9 @@ typedef uint32_t OM_uint32;
 	((x) & ((GSS_C_CALLING_ERROR_MASK << GSS_C_CALLING_ERROR_OFFSET) | \
 	        (GSS_C_ROUTINE_ERROR_MASK << GSS_C_ROUTINE_ERROR_OFFSET)))
 
-/*
- * Calling errors:
- */
+  
+                  
+   
 #define GSS_S_CALL_INACCESSIBLE_READ \
 	                     (((OM_uint32) 1ul) << GSS_C_CALLING_ERROR_OFFSET)
 #define GSS_S_CALL_INACCESSIBLE_WRITE \
@@ -98,9 +98,9 @@ typedef uint32_t OM_uint32;
 #define GSS_S_CALL_BAD_STRUCTURE \
 	                     (((OM_uint32) 3ul) << GSS_C_CALLING_ERROR_OFFSET)
 
-/*
- * Routine errors:
- */
+  
+                  
+   
 #define GSS_S_BAD_MECH (((OM_uint32) 1ul) << GSS_C_ROUTINE_ERROR_OFFSET)
 #define GSS_S_BAD_NAME (((OM_uint32) 2ul) << GSS_C_ROUTINE_ERROR_OFFSET)
 #define GSS_S_BAD_NAMETYPE (((OM_uint32) 3ul) << GSS_C_ROUTINE_ERROR_OFFSET)
@@ -125,9 +125,9 @@ typedef uint32_t OM_uint32;
 #define GSS_S_NAME_NOT_MN \
      (((OM_uint32) 18ul) << GSS_C_ROUTINE_ERROR_OFFSET)
 
-/*
- * Supplementary info bits:
- */
+  
+                           
+   
 #define GSS_S_CONTINUE_NEEDED (1 << (GSS_C_SUPPLEMENTARY_OFFSET + 0))
 #define GSS_S_DUPLICATE_TOKEN (1 << (GSS_C_SUPPLEMENTARY_OFFSET + 1))
 #define GSS_S_OLD_TOKEN (1 << (GSS_C_SUPPLEMENTARY_OFFSET + 2))
@@ -136,13 +136,13 @@ typedef uint32_t OM_uint32;
 
 #define GSS_C_QOP_DEFAULT 0
 
-/* end of gssapi.h */
+                     
 
-/*
- * The following data structures are genenrated from lucid.x in the gssd project
- * and must be kept in sync with that project. This is a more memory efficient
- * representation of the gss_kerb5_lucid_context_v1_t defined in gssapi_krb5.h
- */
+  
+                                                                                
+                                                                              
+                                                                              
+   
 struct lucid_key {
 	uint32_t etype;
 	struct {
@@ -183,16 +183,16 @@ struct lucid_context {
 };
 typedef struct lucid_context lucid_context;
 
-/* end of lucid.x generated data structures */
+                                              
 
 typedef struct lucid_context *lucid_context_t;
-/*
- * Mask for determining the returned structure version.
- * See example below for usage.
- */
+  
+                                                       
+                               
+   
 typedef struct lucid_context_version {
 	uint32_t        version;
-	/* Structure version number */
+	                              
 } *lucid_context_version_t;
 
 typedef enum etypes {
@@ -209,43 +209,43 @@ typedef enum etypes {
 
 #define GSS_SND 0
 #define GSS_RCV 1
-#define GSS_C_QOP_REVERSE 0x80000000    /* Pseudo QOP value to use as input to gss_krb5_unwrap to allow Sender to unwrap */
+#define GSS_C_QOP_REVERSE 0x80000000                                                                                       
 
-/*
- * Key schedule is the cbc state for encryption and decryption.
- * For DES3 we always use the session key from the lucid context,
- * and in that case Ekey and Ikey will point to the session key.
- */
+  
+                                                               
+                                                                 
+                                                                
+   
 struct key_schedule {
 	cccbc_ctx *enc;
 	cccbc_ctx *dec;
-	void *ikey[2];          /* Drived integrity key (same length context key); */
+	void *ikey[2];                                                               
 };
 
-/*
- * Crypto context that supports AES and DES3 etypes
- * All supported encryption types use hmac with SHA1
- * All are CBC encryption types
- * des3-cbc-sha1            --  7
- * des3-dbc-sha1-kd         -- 16 ???
- * aes128-cts-hmac-sha1-96  -- 17
- * aes256-cts-hmac-sha1-96  -- 18
- */
+  
+                                                   
+                                                    
+                               
+                                 
+                                     
+                                 
+                                 
+   
 
 typedef struct crypto_ctx {
 	uint32_t etype;
 	uint32_t flags;
-	size_t mpad;             /* Message padding */
+	size_t mpad;                                  
 	lck_mtx_t lock;
-	lucid_context_t gss_ctx;  /* Back pointer to lucid context */
-	void *key;   /* Points to session key from lucid context */
+	lucid_context_t gss_ctx;                                     
+	void *key;                                                 
 	const struct ccdigest_info *di;
 	const struct ccmode_cbc *enc_mode;
 	const struct ccmode_cbc *dec_mode;
 	struct key_schedule ks;
 	uint32_t digest_size;
 	uint32_t keylen;
-	void *ckey[2];  /* Derived checksum key. Same as key for DES3 */
+	void *ckey[2];                                                  
 } *crypto_ctx_t;
 
 #define CRYPTO_KS_ALLOCED       0x00001
@@ -262,69 +262,69 @@ typedef struct gss_buffer_desc_struct {
 } gss_buffer_desc, *gss_buffer_t;
 
 uint32_t
-    gss_release_buffer(uint32_t *,    /* minor_status */
+    gss_release_buffer(uint32_t *,                      
     gss_buffer_t);
 
 
-/* Per message interfaces for kerberos gss mech in the kernel */
+                                                                
 
 typedef uint32_t gss_qop_t;
 
 uint32_t
-    gss_krb5_get_mic_mbuf(uint32_t *,   /* minor_status */
-    gss_ctx_id_t,                       /* context_handle */
-    gss_qop_t,                          /* qop_req */
-    mbuf_t,                             /* message mbuf */
-    size_t,                             /* offest */
-    size_t,                             /* length */
-    gss_buffer_t                        /* message_token */
+    gss_krb5_get_mic_mbuf(uint32_t *,                     
+    gss_ctx_id_t,                                           
+    gss_qop_t,                                       
+    mbuf_t,                                               
+    size_t,                                         
+    size_t,                                         
+    gss_buffer_t                                           
     );
 
 uint32_t
-    gss_krb5_get_mic(uint32_t *, /* minor_status */
-    gss_ctx_id_t,               /* context_handle */
-    gss_qop_t,                  /* qop_req */
-    gss_buffer_t,               /* message buffer */
-    gss_buffer_t                /* message_token */
+    gss_krb5_get_mic(uint32_t *,                   
+    gss_ctx_id_t,                                   
+    gss_qop_t,                               
+    gss_buffer_t,                                   
+    gss_buffer_t                                   
     );
 
 uint32_t
-    gss_krb5_verify_mic(uint32_t *,     /* minor_status */
-    gss_ctx_id_t,                       /* context_handle */
-    gss_buffer_t,                       /* message_buffer */
-    gss_buffer_t,                       /* message_token */
-    gss_qop_t *                         /* qop_state */
+    gss_krb5_verify_mic(uint32_t *,                       
+    gss_ctx_id_t,                                           
+    gss_buffer_t,                                           
+    gss_buffer_t,                                          
+    gss_qop_t *                                        
     );
 
 uint32_t
-    gss_krb5_verify_mic_mbuf(uint32_t *,        /* minor_status */
-    gss_ctx_id_t,                               /* context_handle */
-    mbuf_t,                                     /* message_buffer */
-    size_t,                                     /* offset */
-    size_t,                                     /* length */
-    gss_buffer_t,                               /* message_token */
-    gss_qop_t *                                 /* qop_state */
+    gss_krb5_verify_mic_mbuf(uint32_t *,                          
+    gss_ctx_id_t,                                                   
+    mbuf_t,                                                         
+    size_t,                                                 
+    size_t,                                                 
+    gss_buffer_t,                                                  
+    gss_qop_t *                                                
     );
 
 uint32_t
-    gss_krb5_wrap_mbuf(uint32_t *,      /* minor_status */
-    gss_ctx_id_t,                       /* context_handle */
-    int,                                /* conf_req_flag */
-    gss_qop_t,                          /* qop_req */
-    mbuf_t *,                           /* input/output message_buffer */
-    size_t,                             /* offset */
-    size_t,                             /* length */
-    int *                               /* conf_state */
+    gss_krb5_wrap_mbuf(uint32_t *,                        
+    gss_ctx_id_t,                                           
+    int,                                                   
+    gss_qop_t,                                       
+    mbuf_t *,                                                            
+    size_t,                                         
+    size_t,                                         
+    int *                                               
     );
 
 uint32_t
-    gss_krb5_unwrap_mbuf(uint32_t *,    /* minor_status */
-    gss_ctx_id_t,                       /* context_handle */
-    mbuf_t *,                           /* input/output message_buffer */
-    size_t,                             /* offset */
-    size_t,                             /* length */
-    int *,                              /* conf_state */
-    gss_qop_t *                         /* qop state */
+    gss_krb5_unwrap_mbuf(uint32_t *,                      
+    gss_ctx_id_t,                                           
+    mbuf_t *,                                                            
+    size_t,                                         
+    size_t,                                         
+    int *,                                              
+    gss_qop_t *                                        
     );
 
 void gss_krb5_destroy_context(gss_ctx_id_t);

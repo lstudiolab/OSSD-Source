@@ -118,9 +118,9 @@ SYSCTL_ULONG(_net_inet_mptcp, OID_AUTO, expected_progress_headstart, CTLFLAG_RW 
     &mptcp_expected_progress_headstart, "Headstart to give MPTCP before meeting the progress deadline");
 
 
-/*
- * Attaches an MPTCP control block to a socket.
- */
+  
+                                               
+   
 static int
 mptcp_usr_attach(struct socket *mp_so, int proto, struct proc *p)
 {
@@ -141,9 +141,9 @@ out:
 	return error;
 }
 
-/*
- * Detaches an MPTCP control block from a socket.
- */
+  
+                                                 
+   
 static int
 mptcp_usr_detach(struct socket *mp_so)
 {
@@ -157,12 +157,12 @@ mptcp_usr_detach(struct socket *mp_so)
 		return EINVAL;
 	}
 
-	/*
-	 * We are done with this MPTCP socket (it has been closed);
-	 * trigger all subflows to be disconnected, if not already,
-	 * by initiating the PCB detach sequence (SOF_PCBCLEARING
-	 * will be set.)
-	 */
+	  
+                                                            
+                                                            
+                                                          
+                 
+    
 	mp_pcbdetach(mp_so);
 
 	mptcp_disconnect(mpte);
@@ -170,10 +170,10 @@ mptcp_usr_detach(struct socket *mp_so)
 	return 0;
 }
 
-/*
- * Attach MPTCP protocol to socket, allocating MP control block,
- * MPTCP session, control block, buffer space, etc.
- */
+  
+                                                                
+                                                   
+   
 static int
 mptcp_attach(struct socket *mp_so, struct proc *p)
 {
@@ -201,11 +201,11 @@ mptcp_attach(struct socket *mp_so, struct proc *p)
 		mp_so->so_snd.sb_flags |= SB_AUTOSIZE;
 	}
 
-	/*
-	 * MPTCP send-socket buffers cannot be compressed, due to the
-	 * fact that each mbuf chained via m_next is a M_PKTHDR
-	 * which carries some MPTCP metadata.
-	 */
+	  
+                                                              
+                                                        
+                                      
+    
 	mp_so->so_snd.sb_flags |= SB_NOCOMPRESS;
 
 	if ((error = mp_pcballoc(mp_so, &mtcbinfo)) != 0) {
@@ -230,23 +230,23 @@ mptcp_entitlement_check(struct socket *mp_so, uint8_t svctype)
 		return 0;
 	}
 
-	/* First, check for mptcp_extended without delegation */
+	                                                        
 	if (soopt_cred_check(mp_so, PRIV_NET_RESTRICTED_MULTIPATH_EXTENDED, TRUE, FALSE) == 0) {
-		/*
-		 * This means the app has the extended entitlement. Thus,
-		 * it's a first party app and can run without restrictions.
-		 */
+		  
+                                                           
+                                                             
+     
 		mpte->mpte_flags |= MPTE_FIRSTPARTY;
 		return 0;
 	}
 
-	/* Now with delegation */
+	                         
 	if (mp_so->so_flags & SOF_DELEGATED &&
 	    soopt_cred_check(mp_so, PRIV_NET_RESTRICTED_MULTIPATH_EXTENDED, TRUE, TRUE) == 0) {
-		/*
-		 * This means the app has the extended entitlement. Thus,
-		 * it's a first party app and can run without restrictions.
-		 */
+		  
+                                                           
+                                                             
+     
 		mpte->mpte_flags |= MPTE_FIRSTPARTY;
 		return 0;
 	}
@@ -264,12 +264,12 @@ mptcp_entitlement_check(struct socket *mp_so, uint8_t svctype)
 	return 0;
 }
 
-/*
- * Common subroutine to open a MPTCP connection to one of the remote hosts
- * specified by dst_sl.  This includes allocating and establishing a
- * subflow TCP connection, either initially to establish MPTCP connection,
- * or to join an existing one.  Returns a connection handle upon success.
- */
+  
+                                                                          
+                                                                    
+                                                                          
+                                                                         
+   
 static int
 mptcp_connectx(struct mptses *mpte, struct sockaddr *src,
     struct sockaddr *dst, uint32_t ifscope, sae_connid_t *pcid)
@@ -284,9 +284,9 @@ mptcp_connectx(struct mptses *mpte, struct sockaddr *src,
 	return error;
 }
 
-/*
- * User-protocol pru_connectx callback.
- */
+  
+                                       
+   
 static int
 mptcp_usr_connectx(struct socket *mp_so, struct sockaddr *src,
     struct sockaddr *dst, struct proc *p, uint32_t ifscope,
@@ -386,7 +386,7 @@ mptcp_usr_connectx(struct socket *mp_so, struct sockaddr *src,
 
 	error = mptcp_connectx(mpte, src, dst, ifscope, pcid);
 
-	/* If there is data, copy it */
+	                               
 	if (auio != NULL) {
 		datalen = uio_resid(auio);
 		socket_unlock(mp_so, 0);
@@ -408,16 +408,16 @@ out:
 	return error;
 }
 
-/*
- * Handle SIOCGASSOCIDS ioctl for PF_MULTIPATH domain.
- */
+  
+                                                      
+   
 static int
 mptcp_getassocids(struct mptses *mpte, uint32_t *cnt, user_addr_t aidp)
 {
-	/* MPTCP has at most 1 association */
+	                                     
 	*cnt = (mpte->mpte_associd != SAE_ASSOCID_ANY) ? 1 : 0;
 
-	/* just asking how many there are? */
+	                                     
 	if (aidp == USER_ADDR_NULL) {
 		return 0;
 	}
@@ -426,9 +426,9 @@ mptcp_getassocids(struct mptses *mpte, uint32_t *cnt, user_addr_t aidp)
 	           sizeof(mpte->mpte_associd));
 }
 
-/*
- * Handle SIOCGCONNIDS ioctl for PF_MULTIPATH domain.
- */
+  
+                                                     
+   
 static int
 mptcp_getconnids(struct mptses *mpte, sae_associd_t aid, uint32_t *cnt,
     user_addr_t cidp)
@@ -443,7 +443,7 @@ mptcp_getconnids(struct mptses *mpte, sae_associd_t aid, uint32_t *cnt,
 
 	*cnt = mpte->mpte_numflows;
 
-	/* just asking how many there are? */
+	                                     
 	if (cidp == USER_ADDR_NULL) {
 		return 0;
 	}
@@ -460,9 +460,9 @@ mptcp_getconnids(struct mptses *mpte, sae_associd_t aid, uint32_t *cnt,
 	return error;
 }
 
-/*
- * Handle SIOCGCONNINFO ioctl for PF_MULTIPATH domain.
- */
+  
+                                                      
+   
 static int
 mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
     uint32_t *ifindex, int32_t *soerror, user_addr_t src, socklen_t *src_len,
@@ -474,7 +474,7 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 	*ifindex = 0;
 	*soerror = 0;
 
-	/* MPTCP-level global stats */
+	                              
 	if (*cid == SAE_CONNID_ALL) {
 		struct socket *mp_so = mptetoso(mpte);
 		struct mptcb *mp_tp = mpte->mpte_mptcb;
@@ -563,7 +563,7 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 		return 0;
 	}
 
-	/* Any stats of any subflow */
+	                              
 	if (*cid == SAE_CONNID_ANY) {
 		const struct mptsub *mpts;
 		struct socket *so;
@@ -609,7 +609,7 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 
 		return 0;
 	} else {
-		/* Per-interface stats */
+		                         
 		const struct mptsub *mpts, *orig_mpts = NULL;
 		struct conninfo_tcp tcp_ci;
 		const struct inpcb *inp;
@@ -617,14 +617,14 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 		int error = 0;
 		int index;
 
-		/* cid is thus an ifindex - range-check first! */
+		                                                 
 		if (*cid > USHRT_MAX) {
 			return EINVAL;
 		}
 
 		bzero(&tcp_ci, sizeof(tcp_ci));
 
-		/* First, get a subflow to fill in the "regular" info. */
+		                                                         
 		TAILQ_FOREACH(mpts, &mpte->mpte_subflows, mpts_entry) {
 			const struct ifnet *ifp = sotoinpcb(mpts->mpts_socket)->inp_last_outifp;
 
@@ -634,14 +634,14 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 		}
 
 		if (mpts == NULL) {
-			/* No subflow there - well, let's just get the basic itf-info */
+			                                                                
 			goto interface_info;
 		}
 
 		so = mpts->mpts_socket;
 		inp = sotoinpcb(so);
 
-		/* Give it USER_ADDR_NULL, because we are doing this on our own */
+		                                                                  
 		if (inp->inp_vflag & INP_IPV4) {
 			error = in_getconninfo(so, SAE_CONNID_ANY, flags, ifindex,
 			    soerror, src, src_len, dst, dst_len,
@@ -658,7 +658,7 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 			return error;
 		}
 
-		/* ToDo: Nobody is reading these flags on subflows. Why bother ? */
+		                                                                   
 		if (mpts->mpts_flags & MPTSF_MP_CAPABLE) {
 			*flags |= CIF_MP_CAPABLE;
 		}
@@ -672,14 +672,14 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 			*flags |= CIF_MP_ACTIVE;
 		}
 
-		/*
-		 * Now, we gather the metrics (aka., tcp_info) and roll them in
-		 * across all subflows of this interface to build an aggregated
-		 * view.
-		 *
-		 * We take the TCP_INFO from the first subflow as the "master",
-		 * feeding into those fields that we do not roll.
-		 */
+		  
+                                                                 
+                                                                 
+          
+    
+                                                                 
+                                                   
+     
 		if (aux_data != USER_ADDR_NULL) {
 			tcp_getconninfo(so, &tcp_ci);
 
@@ -694,7 +694,7 @@ mptcp_getconninfo(struct mptses *mpte, sae_connid_t *cid, uint32_t *flags,
 					continue;
 				}
 
-				/* Roll the itf-stats into the tcp_info */
+				                                          
 				tcp_ci.tcpci_tcp_info.tcpi_txbytes +=
 				    mptsinp->inp_stat->txbytes;
 				tcp_ci.tcpci_tcp_info.tcpi_rxbytes +=
@@ -724,19 +724,19 @@ interface_info:
 		} else if (aux_data != USER_ADDR_NULL) {
 			boolean_t create;
 
-			/*
-			 * Finally, old subflows might have been closed - we
-			 * want this data as well, so grab it from the interface
-			 * stats.
-			 */
+			  
+                                                       
+                                                           
+            
+      
 			create = orig_mpts != NULL;
 
-			/*
-			 * When we found a subflow, we are willing to create a stats-index
-			 * because we have some data to return. If there isn't a subflow,
-			 * nor anything in the stats, return EINVAL. Because the
-			 * ifindex belongs to something that doesn't exist.
-			 */
+			  
+                                                                     
+                                                                    
+                                                           
+                                                      
+      
 			index = mptcpstats_get_index_by_ifindex(mpte->mpte_itfstats, (u_short)(*cid), false);
 			if (index == -1) {
 				os_log_error(mptcp_log_handle,
@@ -753,7 +753,7 @@ interface_info:
 
 				stats = &mpte->mpte_itfstats[index];
 
-				/* Roll the itf-stats into the tcp_info */
+				                                          
 				tcp_ci.tcpci_tcp_info.tcpi_last_outif = *cid;
 				tcp_ci.tcpci_tcp_info.tcpi_txbytes +=
 				    stats->mpis_txbytes;
@@ -787,9 +787,9 @@ interface_info:
 	return 0;
 }
 
-/*
- * User-protocol pru_control callback.
- */
+  
+                                      
+   
 static int
 mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
     struct ifnet *ifp, struct proc *p)
@@ -806,7 +806,7 @@ mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
 	mpte = mptompte(mpp);
 
 	switch (cmd) {
-	case SIOCGASSOCIDS32: {         /* struct so_aidreq32 */
+	case SIOCGASSOCIDS32: {                                 
 		struct so_aidreq32 aidr;
 		bcopy(data, &aidr, sizeof(aidr));
 		error = mptcp_getassocids(mpte, &aidr.sar_cnt,
@@ -817,7 +817,7 @@ mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
 		break;
 	}
 
-	case SIOCGASSOCIDS64: {         /* struct so_aidreq64 */
+	case SIOCGASSOCIDS64: {                                 
 		struct so_aidreq64 aidr;
 		bcopy(data, &aidr, sizeof(aidr));
 		error = mptcp_getassocids(mpte, &aidr.sar_cnt,
@@ -828,7 +828,7 @@ mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
 		break;
 	}
 
-	case SIOCGCONNIDS32: {          /* struct so_cidreq32 */
+	case SIOCGCONNIDS32: {                                  
 		struct so_cidreq32 cidr;
 		bcopy(data, &cidr, sizeof(cidr));
 		error = mptcp_getconnids(mpte, cidr.scr_aid, &cidr.scr_cnt,
@@ -839,7 +839,7 @@ mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
 		break;
 	}
 
-	case SIOCGCONNIDS64: {          /* struct so_cidreq64 */
+	case SIOCGCONNIDS64: {                                  
 		struct so_cidreq64 cidr;
 		bcopy(data, &cidr, sizeof(cidr));
 		error = mptcp_getconnids(mpte, cidr.scr_aid, &cidr.scr_cnt,
@@ -850,7 +850,7 @@ mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
 		break;
 	}
 
-	case SIOCGCONNINFO32: {         /* struct so_cinforeq32 */
+	case SIOCGCONNINFO32: {                                   
 		struct so_cinforeq32 cifr;
 		bcopy(data, &cifr, sizeof(cifr));
 		error = mptcp_getconninfo(mpte, &cifr.scir_cid,
@@ -864,7 +864,7 @@ mptcp_usr_control(struct socket *mp_so, u_long cmd, caddr_t data,
 		break;
 	}
 
-	case SIOCGCONNINFO64: {         /* struct so_cinforeq64 */
+	case SIOCGCONNINFO64: {                                   
 		struct so_cinforeq64 cifr;
 		bcopy(data, &cifr, sizeof(cifr));
 		error = mptcp_getconninfo(mpte, &cifr.scir_cid,
@@ -900,7 +900,7 @@ mptcp_disconnect(struct mptses *mpte)
 	DTRACE_MPTCP3(disconnectx, struct mptses *, mpte,
 	    struct socket *, mp_so, struct mptcb *, mp_tp);
 
-	/* if we're not detached, go thru socket state checks */
+	                                                        
 	if (!(mp_so->so_flags & SOF_PCBCLEARING) && !(mp_so->so_flags & SOF_DEFUNCT)) {
 		if (!(mp_so->so_state & (SS_ISCONNECTED |
 		    SS_ISCONNECTING))) {
@@ -935,18 +935,18 @@ out:
 	return error;
 }
 
-/*
- * Wrapper function to support disconnect on socket
- */
+  
+                                                   
+   
 static int
 mptcp_usr_disconnect(struct socket *mp_so)
 {
 	return mptcp_disconnect(mpsotompte(mp_so));
 }
 
-/*
- * User-protocol pru_disconnectx callback.
- */
+  
+                                          
+   
 static int
 mptcp_usr_disconnectx(struct socket *mp_so, sae_associd_t aid, sae_connid_t cid)
 {
@@ -985,9 +985,9 @@ mptcp_finish_usrclosed(struct mptses *mpte)
 	}
 }
 
-/*
- * User issued close, and wish to trail thru shutdown states.
- */
+  
+                                                             
+   
 static struct mptses *
 mptcp_usrclosed(struct mptses *mpte)
 {
@@ -995,7 +995,7 @@ mptcp_usrclosed(struct mptses *mpte)
 
 	mptcp_close_fsm(mp_tp, MPCE_CLOSE);
 
-	/* Not everything has been acknowledged - don't close the subflows! */
+	                                                                      
 	if (mp_tp->mpt_state != MPTCPS_TERMINATE &&
 	    mp_tp->mpt_sndnxt + 1 != mp_tp->mpt_sndmax) {
 		return mpte;
@@ -1006,9 +1006,9 @@ mptcp_usrclosed(struct mptses *mpte)
 	return mpte;
 }
 
-/*
- * After a receive, possible send some update to peer.
- */
+  
+                                                      
+   
 static int
 mptcp_usr_rcvd(struct socket *mp_so, int flags)
 {
@@ -1038,9 +1038,9 @@ out:
 	return error;
 }
 
-/*
- * Do a send by putting data in the output queue.
- */
+  
+                                                 
+   
 static int
 mptcp_usr_send(struct socket *mp_so, int prus_flags, struct mbuf *m,
     struct sockaddr *nam, struct mbuf *control, struct proc *p)
@@ -1108,9 +1108,9 @@ out:
 	return error;
 }
 
-/*
- * Mark the MPTCP connection as being incapable of further output.
- */
+  
+                                                                  
+   
 static int
 mptcp_usr_shutdown(struct socket *mp_so)
 {
@@ -1135,9 +1135,9 @@ out:
 	return error;
 }
 
-/*
- * Copy the contents of uio into a properly sized mbuf chain.
- */
+  
+                                                             
+   
 static int
 mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 {
@@ -1147,10 +1147,10 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 
 	VERIFY(top != NULL && *top == NULL);
 
-	/*
-	 * space can be zero or an arbitrary large value bound by
-	 * the total data supplied by the uio.
-	 */
+	  
+                                                          
+                                       
+    
 	resid = uio_resid(uio);
 	if (space > 0) {
 		tot = MIN(resid, space);
@@ -1167,7 +1167,7 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 		len = 1;
 	}
 
-	/* Loop and append maximum sized mbufs to the chain tail. */
+	                                                            
 	while (len > 0) {
 		uint32_t m_needed = 1;
 
@@ -1184,7 +1184,7 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 			mb = m_gethdr(how, MT_DATA);
 		}
 
-		/* Fail the whole operation if one mbuf can't be allocated. */
+		                                                              
 		if (mb == NULL) {
 			if (nm != NULL) {
 				m_freem(nm);
@@ -1192,7 +1192,7 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 			return ENOBUFS;
 		}
 
-		/* Book keeping. */
+		                   
 		VERIFY(mb->m_flags & M_PKTHDR);
 		len -= ((mb->m_flags & M_EXT) ? mb->m_ext.ext_size : MHLEN);
 		if (mtail != NULL) {
@@ -1206,9 +1206,9 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 	m = nm;
 
 	progress = 0;
-	/* Fill all mbufs with uio data and update header information. */
+	                                                                 
 	for (mb = m; mb != NULL; mb = mb->m_next) {
-		/* tot >= 0 && tot <= INT_MAX (see above) */
+		                                            
 		len = MIN((int)M_TRAILINGSPACE(mb), (int)(tot - progress));
 
 		error = uiomove(mtod(mb, char *), len, uio);
@@ -1217,7 +1217,7 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 			return error;
 		}
 
-		/* each mbuf is M_PKTHDR chained via m_next */
+		                                              
 		mb->m_len = len;
 		mb->m_pkthdr.len = len;
 
@@ -1228,9 +1228,9 @@ mptcp_uiotombuf(struct uio *uio, int how, user_ssize_t space, struct mbuf **top)
 	return 0;
 }
 
-/*
- * MPTCP socket protocol-user socket send routine, derived from sosend().
- */
+  
+                                                                         
+   
 static int
 mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
     struct mbuf *top, struct mbuf *control, int flags)
@@ -1241,7 +1241,7 @@ mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
 	struct proc *p = current_proc();
 	int sblocked = 0;
 
-	/* UIO is required for now, due to per-mbuf M_PKTHDR constrains */
+	                                                                  
 	if (uio == NULL || top != NULL) {
 		error = EINVAL;
 		goto out;
@@ -1261,13 +1261,13 @@ mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
 		goto out;
 	}
 
-	/*
-	 * In theory resid should be unsigned.  However, space must be
-	 * signed, as it might be less than 0 if we over-committed, and we
-	 * must use a signed comparison of space and resid.  On the other
-	 * hand, a negative resid causes us to loop sending 0-length
-	 * segments to the protocol.
-	 */
+	  
+                                                               
+                                                                   
+                                                                  
+                                                             
+                             
+    
 	if (resid < 0 || resid > INT_MAX ||
 	    (flags & MSG_EOR) || control != NULL) {
 		error = EINVAL;
@@ -1287,9 +1287,9 @@ mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
 		space = sbspace(&mp_so->so_snd);
 		do {
 			socket_unlock(mp_so, 0);
-			/*
-			 * Copy the data from userland into an mbuf chain.
-			 */
+			  
+                                                     
+      
 			error = mptcp_uiotombuf(uio, M_WAITOK, space, &top);
 			if (error != 0) {
 				socket_lock(mp_so, 0);
@@ -1300,22 +1300,22 @@ mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
 			resid = uio_resid(uio);
 			socket_lock(mp_so, 0);
 
-			/*
-			 * Compute flags here, for pru_send and NKEs.
-			 */
+			  
+                                                
+      
 			sendflags = (resid > 0 && space > 0) ?
 			    PRUS_MORETOCOME : 0;
 
-			/*
-			 * Socket filter processing
-			 */
+			  
+                              
+      
 			VERIFY(control == NULL);
 			error = sflt_data_out(mp_so, NULL, &top, &control, 0);
 			if (error != 0) {
 				if (error == EJUSTRETURN) {
 					error = 0;
 					top = NULL;
-					/* always free control if any */
+					                                
 				}
 				goto release;
 			}
@@ -1324,9 +1324,9 @@ mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
 				control = NULL;
 			}
 
-			/*
-			 * Pass data to protocol.
-			 */
+			  
+                            
+      
 			error = (*mp_so->so_proto->pr_usrreqs->pru_send)
 			    (mp_so, sendflags, top, NULL, NULL, p);
 
@@ -1339,7 +1339,7 @@ mptcp_usr_sosend(struct socket *mp_so, struct sockaddr *addr, struct uio *uio,
 
 release:
 	if (sblocked) {
-		sbunlock(&mp_so->so_snd, FALSE); /* will unlock socket */
+		sbunlock(&mp_so->so_snd, FALSE);                         
 	} else {
 		socket_unlock(mp_so, 1);
 	}
@@ -1356,12 +1356,12 @@ out:
 	return error;
 }
 
-/*
- * Called to filter SOPT_{SET,GET} for SOL_SOCKET level socket options.
- * This routine simply indicates to the caller whether or not to proceed
- * further with the given socket option.  This is invoked by sosetoptlock()
- * and sogetoptlock().
- */
+  
+                                                                       
+                                                                        
+                                                                           
+                      
+   
 static int
 mptcp_usr_socheckopt(struct socket *mp_so, struct sockopt *sopt)
 {
@@ -1370,83 +1370,83 @@ mptcp_usr_socheckopt(struct socket *mp_so, struct sockopt *sopt)
 
 	VERIFY(sopt->sopt_level == SOL_SOCKET);
 
-	/*
-	 * We could check for sopt_dir (set/get) here, but we'll just
-	 * let the caller deal with it as appropriate; therefore the
-	 * following is a superset of the socket options which we
-	 * allow for set/get.
-	 *
-	 * XXX: adi@apple.com
-	 *
-	 * Need to consider the following cases:
-	 *
-	 *   a.	Certain socket options don't have a clear definition
-	 *	on the expected behavior post connect(2).  At the time
-	 *	those options are issued on the MP socket, there may
-	 *	be existing subflow sockets that are already connected.
-	 */
+	  
+                                                              
+                                                             
+                                                          
+                      
+   
+                      
+   
+                                         
+   
+                                                             
+                                                          
+                                                        
+                                                           
+    
 	switch (sopt->sopt_name) {
-	case SO_LINGER:                         /* MP */
-	case SO_LINGER_SEC:                     /* MP */
-	case SO_TYPE:                           /* MP */
-	case SO_NREAD:                          /* MP */
-	case SO_NWRITE:                         /* MP */
-	case SO_ERROR:                          /* MP */
-	case SO_SNDBUF:                         /* MP */
-	case SO_RCVBUF:                         /* MP */
-	case SO_SNDLOWAT:                       /* MP */
-	case SO_RCVLOWAT:                       /* MP */
-	case SO_SNDTIMEO:                       /* MP */
-	case SO_RCVTIMEO:                       /* MP */
-	case SO_NKE:                            /* MP */
-	case SO_NOSIGPIPE:                      /* MP */
-	case SO_NOADDRERR:                      /* MP */
-	case SO_LABEL:                          /* MP */
-	case SO_PEERLABEL:                      /* MP */
-	case SO_DEFUNCTIT:                      /* MP */
-	case SO_DEFUNCTOK:                      /* MP */
-	case SO_ISDEFUNCT:                      /* MP */
-	case SO_TRAFFIC_CLASS_DBG:              /* MP */
-	case SO_DELEGATED:                      /* MP */
-	case SO_DELEGATED_UUID:                 /* MP */
+	case SO_LINGER:                                 
+	case SO_LINGER_SEC:                             
+	case SO_TYPE:                                   
+	case SO_NREAD:                                  
+	case SO_NWRITE:                                 
+	case SO_ERROR:                                  
+	case SO_SNDBUF:                                 
+	case SO_RCVBUF:                                 
+	case SO_SNDLOWAT:                               
+	case SO_RCVLOWAT:                               
+	case SO_SNDTIMEO:                               
+	case SO_RCVTIMEO:                               
+	case SO_NKE:                                    
+	case SO_NOSIGPIPE:                              
+	case SO_NOADDRERR:                              
+	case SO_LABEL:                                  
+	case SO_PEERLABEL:                              
+	case SO_DEFUNCTIT:                              
+	case SO_DEFUNCTOK:                              
+	case SO_ISDEFUNCT:                              
+	case SO_TRAFFIC_CLASS_DBG:                      
+	case SO_DELEGATED:                              
+	case SO_DELEGATED_UUID:                         
 #if NECP
 	case SO_NECP_ATTRIBUTES:
 	case SO_NECP_CLIENTUUID:
-#endif /* NECP */
+#endif           
 	case SO_MPKL_SEND_INFO:
-		/*
-		 * Tell the caller that these options are to be processed.
-		 */
+		  
+                                                            
+     
 		break;
 
-	case SO_DEBUG:                          /* MP + subflow */
-	case SO_KEEPALIVE:                      /* MP + subflow */
-	case SO_USELOOPBACK:                    /* MP + subflow */
-	case SO_RANDOMPORT:                     /* MP + subflow */
-	case SO_TRAFFIC_CLASS:                  /* MP + subflow */
-	case SO_RECV_TRAFFIC_CLASS:             /* MP + subflow */
-	case SO_PRIVILEGED_TRAFFIC_CLASS:       /* MP + subflow */
-	case SO_RECV_ANYIF:                     /* MP + subflow */
-	case SO_RESTRICTIONS:                   /* MP + subflow */
-	case SO_FLUSH:                          /* MP + subflow */
+	case SO_DEBUG:                                            
+	case SO_KEEPALIVE:                                        
+	case SO_USELOOPBACK:                                      
+	case SO_RANDOMPORT:                                       
+	case SO_TRAFFIC_CLASS:                                    
+	case SO_RECV_TRAFFIC_CLASS:                               
+	case SO_PRIVILEGED_TRAFFIC_CLASS:                         
+	case SO_RECV_ANYIF:                                       
+	case SO_RESTRICTIONS:                                     
+	case SO_FLUSH:                                            
 	case SO_NOWAKEFROMSLEEP:
 	case SO_NOAPNFALLBK:
 	case SO_MARK_CELLFALLBACK:
-		/*
-		 * Tell the caller that these options are to be processed;
-		 * these will also be recorded later by mptcp_setopt().
-		 *
-		 * NOTE: Only support integer option value for now.
-		 */
+		  
+                                                            
+                                                         
+    
+                                                     
+     
 		if (sopt->sopt_valsize != sizeof(int)) {
 			error = EINVAL;
 		}
 		break;
 
 	default:
-		/*
-		 * Tell the caller to stop immediately and return an error.
-		 */
+		  
+                                                             
+     
 		error = ENOPROTOOPT;
 		break;
 	}
@@ -1454,9 +1454,9 @@ mptcp_usr_socheckopt(struct socket *mp_so, struct sockopt *sopt)
 	return error;
 }
 
-/*
- * Issue SOPT_SET for all MPTCP subflows (for integer option values.)
- */
+  
+                                                                     
+   
 static int
 mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 {
@@ -1465,17 +1465,17 @@ mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 	struct mptopt smpo;
 	int error = 0;
 
-	/* just bail now if this isn't applicable to subflow sockets */
+	                                                               
 	if (!(mpo->mpo_flags & MPOF_SUBFLOW_OK)) {
 		error = ENOPROTOOPT;
 		goto out;
 	}
 
-	/*
-	 * Skip those that are handled internally; these options
-	 * should not have been recorded and marked with the
-	 * MPOF_SUBFLOW_OK by mptcp_setopt(), but just in case.
-	 */
+	  
+                                                         
+                                                     
+                                                        
+    
 	if (mpo->mpo_level == SOL_SOCKET &&
 	    (mpo->mpo_name == SO_NOSIGPIPE || mpo->mpo_name == SO_NOADDRERR)) {
 		error = ENOPROTOOPT;
@@ -1484,16 +1484,16 @@ mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 
 	mp_so = mptetoso(mpte);
 
-	/*
-	 * Don't bother going further if there's no subflow; mark the option
-	 * with MPOF_INTERIM so that we know whether or not to remove this
-	 * option upon encountering an error while issuing it during subflow
-	 * socket creation.
-	 */
+	  
+                                                                     
+                                                                   
+                                                                     
+                    
+    
 	if (mpte->mpte_numflows == 0) {
 		VERIFY(TAILQ_EMPTY(&mpte->mpte_subflows));
 		mpo->mpo_flags |= MPOF_INTERIM;
-		/* return success */
+		                    
 		goto out;
 	}
 
@@ -1502,7 +1502,7 @@ mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 	smpo.mpo_level = mpo->mpo_level;
 	smpo.mpo_name = mpo->mpo_name;
 
-	/* grab exisiting values in case we need to rollback */
+	                                                       
 	TAILQ_FOREACH(mpts, &mpte->mpte_subflows, mpts_entry) {
 		struct socket *so;
 
@@ -1517,7 +1517,7 @@ mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 		}
 	}
 
-	/* apply socket option */
+	                         
 	TAILQ_FOREACH(mpts, &mpte->mpte_subflows, mpts_entry) {
 		struct socket *so;
 
@@ -1530,12 +1530,12 @@ mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 		}
 	}
 
-	/* cleanup, and rollback if needed */
+	                                     
 	TAILQ_FOREACH(mpts, &mpte->mpte_subflows, mpts_entry) {
 		struct socket *so;
 
 		if (!(mpts->mpts_flags & MPTSF_SOPT_INPROG)) {
-			/* clear in case it's set */
+			                            
 			mpts->mpts_flags &= ~MPTSF_SOPT_OLDVAL;
 			mpts->mpts_oldintval = 0;
 			continue;
@@ -1545,7 +1545,7 @@ mptcp_setopt_apply(struct mptses *mpte, struct mptopt *mpo)
 			VERIFY(mpts->mpts_oldintval == 0);
 			continue;
 		}
-		/* error during sosetopt, so roll it back */
+		                                            
 		if (error != 0) {
 			VERIFY(mpts->mpts_socket != NULL);
 			so = mpts->mpts_socket;
@@ -1560,9 +1560,9 @@ out:
 	return error;
 }
 
-/*
- * Handle SOPT_SET for socket options issued on MP socket.
- */
+  
+                                                          
+   
 static int
 mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 {
@@ -1575,11 +1575,11 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 
 	mp_so = mptetoso(mpte);
 
-	/*
-	 * Record socket options which are applicable to subflow sockets so
-	 * that we can replay them for new ones; see mptcp_usr_socheckopt()
-	 * for the list of eligible socket-level options.
-	 */
+	  
+                                                                    
+                                                                    
+                                                  
+    
 	if (level == SOL_SOCKET) {
 		switch (optname) {
 		case SO_DEBUG:
@@ -1594,14 +1594,14 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 		case SO_NOWAKEFROMSLEEP:
 		case SO_NOAPNFALLBK:
 		case SO_MARK_CELLFALLBACK:
-			/* record it */
+			               
 			break;
 		case SO_FLUSH:
-			/* don't record it */
+			                     
 			rec = 0;
 			break;
 
-		/* Next ones, record at MPTCP-level */
+		                                      
 		case SO_DELEGATED:
 			error = sooptcopyin(sopt, &mpte->mpte_epid,
 			    sizeof(int), sizeof(int));
@@ -1646,9 +1646,9 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 
 			goto out;
 		case SO_NECP_ATTRIBUTES:
-#endif /* NECP */
+#endif           
 		default:
-			/* nothing to do; just return */
+			                                
 			goto out;
 		}
 	} else {
@@ -1664,10 +1664,10 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 		case TCP_ADAPTIVE_READ_TIMEOUT:
 		case TCP_ADAPTIVE_WRITE_TIMEOUT:
 		case TCP_FASTOPEN_FORCE_ENABLE:
-			/* eligible; record it */
+			                         
 			break;
 		case TCP_NOTSENT_LOWAT:
-			/* record at MPTCP level */
+			                           
 			error = sooptcopyin(sopt, &optval, sizeof(optval),
 			    sizeof(optval));
 			if (error) {
@@ -1692,7 +1692,7 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 			}
 			goto out;
 		case MPTCP_SERVICE_TYPE:
-			/* record at MPTCP level */
+			                           
 			error = sooptcopyin(sopt, &optval, sizeof(optval),
 			    sizeof(optval));
 			if (error) {
@@ -1713,7 +1713,7 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 
 			goto out;
 		case MPTCP_ALTERNATE_PORT:
-			/* record at MPTCP level */
+			                           
 			error = sooptcopyin(sopt, &optval, sizeof(optval),
 			    sizeof(optval));
 			if (error) {
@@ -1729,7 +1729,7 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 
 			goto out;
 		case MPTCP_FORCE_ENABLE:
-			/* record at MPTCP level */
+			                           
 			error = sooptcopyin(sopt, &optval, sizeof(optval),
 			    sizeof(optval));
 			if (error) {
@@ -1784,10 +1784,10 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 				absolutetime_to_nanoseconds(time_now, &time_now_nanoseconds);
 
 				nanoseconds_to_absolutetime(nanoseconds, &mach_time_target);
-				/* If the timer is already running and it would
-				 * fire in less than mptcp_expected_progress_headstart
-				 * seconds, then it's not worth canceling it.
-				 */
+				                                               
+                                                          
+                                                 
+       
 				if (mpte->mpte_time_target &&
 				    mpte->mpte_time_target < time_now &&
 				    time_now_nanoseconds > nanoseconds - (mptcp_expected_progress_headstart * NSEC_PER_MSEC)) {
@@ -1806,7 +1806,7 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 			goto out;
 		}
 		default:
-			/* not eligible */
+			                  
 			error = ENOPROTOOPT;
 			goto err_out;
 		}
@@ -1818,7 +1818,7 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 	}
 
 	if (rec) {
-		/* search for an existing one; if not found, allocate */
+		                                                        
 		if ((mpo = mptcp_sopt_find(mpte, sopt)) == NULL) {
 			mpo = mptcp_sopt_alloc(Z_WAITOK);
 		}
@@ -1827,14 +1827,14 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 			error = ENOBUFS;
 			goto err_out;
 		} else {
-			/* initialize or update, as needed */
+			                                     
 			mpo->mpo_intval = optval;
 			if (!(mpo->mpo_flags & MPOF_ATTACHED)) {
 				mpo->mpo_level = level;
 				mpo->mpo_name = optname;
 				mptcp_sopt_insert(mpte, mpo);
 			}
-			/* this can be issued on the subflow socket */
+			                                              
 			mpo->mpo_flags |= MPOF_SUBFLOW_OK;
 		}
 	} else {
@@ -1846,7 +1846,7 @@ mptcp_setopt(struct mptses *mpte, struct sockopt *sopt)
 		mpo->mpo_intval = optval;
 	}
 
-	/* issue this socket option on existing subflows */
+	                                                   
 	error = mptcp_setopt_apply(mpte, mpo);
 	if (error != 0 && (mpo->mpo_flags & MPOF_ATTACHED)) {
 		VERIFY(mpo != &smpo);
@@ -1926,25 +1926,25 @@ mptcp_fill_info(struct mptses *mpte, struct tcp_info *ti)
 	bzero(ti, sizeof(*ti));
 
 	ti->tcpi_state = (uint8_t)mp_tp->mpt_state;
-	/* tcpi_options */
-	/* tcpi_snd_wscale */
-	/* tcpi_rcv_wscale */
-	/* tcpi_flags */
+	                  
+	                     
+	                     
+	                
 	if (acttp) {
 		ti->tcpi_rto = acttp->t_timer[TCPT_REXMT] ? acttp->t_rxtcur : 0;
 	}
 
-	/* tcpi_snd_mss */
-	/* tcpi_rcv_mss */
+	                  
+	                  
 	if (acttp) {
 		ti->tcpi_rttcur = acttp->t_rttcur;
 		ti->tcpi_srtt = acttp->t_srtt >> TCP_RTT_SHIFT;
 		ti->tcpi_rttvar = acttp->t_rttvar >> TCP_RTTVAR_SHIFT;
 		ti->tcpi_rttbest = acttp->t_rttbest >> TCP_RTT_SHIFT;
 	}
-	/* tcpi_snd_ssthresh */
-	/* tcpi_snd_cwnd */
-	/* tcpi_rcv_space */
+	                       
+	                   
+	                    
 	ti->tcpi_snd_wnd = mp_tp->mpt_sndwnd;
 	ti->tcpi_snd_nxt = (uint32_t)mp_tp->mpt_sndnxt;
 	ti->tcpi_rcv_nxt = (uint32_t)mp_tp->mpt_rcvnxt;
@@ -1954,60 +1954,60 @@ mptcp_fill_info(struct mptses *mpte, struct tcp_info *ti)
 	}
 
 	mptcp_fill_info_bytestats(ti, mpte);
-	/* tcpi_txpackets */
+	                    
 
-	/* tcpi_txretransmitbytes */
-	/* tcpi_txunacked */
-	/* tcpi_rxpackets */
+	                            
+	                    
+	                    
 
-	/* tcpi_rxduplicatebytes */
-	/* tcpi_rxoutoforderbytes */
-	/* tcpi_snd_bw */
-	/* tcpi_synrexmits */
-	/* tcpi_unused1 */
-	/* tcpi_unused2 */
-	/* tcpi_cell_rxpackets */
+	                           
+	                            
+	                 
+	                     
+	                  
+	                  
+	                         
 
-	/* tcpi_cell_txpackets */
+	                         
 
-	/* tcpi_wifi_rxpackets */
+	                         
 
-	/* tcpi_wifi_txpackets */
+	                         
 
-	/* tcpi_wired_rxpackets */
-	/* tcpi_wired_txpackets */
-	/* tcpi_connstatus */
-	/* TFO-stuff */
-	/* ECN stuff */
-	/* tcpi_ecn_recv_ce */
-	/* tcpi_ecn_recv_cwr */
+	                          
+	                          
+	                     
+	               
+	               
+	                      
+	                       
 	if (acttp) {
 		ti->tcpi_rcvoopack = acttp->t_rcvoopack;
 	}
-	/* tcpi_pawsdrop */
-	/* tcpi_sack_recovery_episode */
-	/* tcpi_reordered_pkts */
-	/* tcpi_dsack_sent */
-	/* tcpi_dsack_recvd */
-	/* tcpi_flowhash */
+	                   
+	                                
+	                         
+	                     
+	                      
+	                   
 	if (acttp) {
 		ti->tcpi_txretransmitpackets = acttp->t_stat.rxmitpkts;
 	}
 }
 
-/*
- * Handle SOPT_GET for socket options issued on MP socket.
- */
+  
+                                                          
+   
 static int
 mptcp_getopt(struct mptses *mpte, struct sockopt *sopt)
 {
 	int error = 0, optval = 0;
 
-	/*
-	 * We only handle SOPT_GET for TCP level socket options; we should
-	 * not get here for socket level options since they are already
-	 * handled at the socket layer.
-	 */
+	  
+                                                                   
+                                                                
+                                
+    
 	if (sopt->sopt_level != IPPROTO_TCP) {
 		error = ENOPROTOOPT;
 		goto out;
@@ -2015,7 +2015,7 @@ mptcp_getopt(struct mptses *mpte, struct sockopt *sopt)
 
 	switch (sopt->sopt_name) {
 	case PERSIST_TIMEOUT:
-		/* Only case for which we have a non-zero default */
+		                                                    
 		optval = tcp_max_persist_timeout;
 		OS_FALLTHROUGH;
 	case TCP_NODELAY:
@@ -2037,7 +2037,7 @@ mptcp_getopt(struct mptses *mpte, struct sockopt *sopt)
 		break;
 	}
 
-	/* The next ones are stored at the MPTCP-level */
+	                                                 
 	case TCP_NOTSENT_LOWAT:
 		if (mptetoso(mpte)->so_flags & SOF_NOTSENT_LOWAT) {
 			optval = mptcp_get_notsent_lowat(mpte);
@@ -2068,7 +2068,7 @@ mptcp_getopt(struct mptses *mpte, struct sockopt *sopt)
 
 		goto out;
 	default:
-		/* not eligible */
+		                  
 		error = ENOPROTOOPT;
 		break;
 	}
@@ -2081,11 +2081,11 @@ out:
 	return error;
 }
 
-/*
- * MPTCP SOPT_{SET,GET} socket option handler, for options issued on the MP
- * socket, at SOL_SOCKET and IPPROTO_TCP levels.  The former is restricted
- * to those that are allowed by mptcp_usr_socheckopt().
- */
+  
+                                                                           
+                                                                          
+                                                       
+   
 int
 mptcp_ctloutput(struct socket *mp_so, struct sockopt *sopt)
 {
@@ -2100,7 +2100,7 @@ mptcp_ctloutput(struct socket *mp_so, struct sockopt *sopt)
 	mpte = mptompte(mpp);
 	socket_lock_assert_owned(mp_so);
 
-	/* we only handle socket and TCP-level socket options for MPTCP */
+	                                                                  
 	if (sopt->sopt_level != SOL_SOCKET && sopt->sopt_level != IPPROTO_TCP) {
 		error = EINVAL;
 		goto out;
@@ -2204,7 +2204,7 @@ mptcp_sopt2str(int level, int optname)
 			return "SO_NECP_ATTRIBUTES";
 		case SO_NECP_CLIENTUUID:
 			return "SO_NECP_CLIENTUUID";
-#endif /* NECP */
+#endif           
 		}
 
 		break;

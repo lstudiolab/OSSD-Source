@@ -67,18 +67,18 @@
 
 #include "bindfs.h"
 
-/*
- * Null layer cache:
- * Each cache entry holds a reference to the lower vnode
- * along with a pointer to the alias vnode.  When an
- * entry is added the lower vnode is VREF'd.  When the
- * alias is removed the lower vnode is vrele'd.
- */
+  
+                    
+                                                        
+                                                    
+                                                      
+                                               
+   
 
 #define BIND_HASH_SIZE (desiredvnodes / 10)
 
-/* xnu doesn't really have the functionality freebsd uses here..gonna try this
- * hacked hash...*/
+                                                                              
+                   
 #define BIND_NHASH(vp) (&bind_node_hashtbl[((((uintptr_t)vp) >> vnsz2log) + (uintptr_t)vnode_mount(vp)) & bind_hash_mask])
 
 static LIST_HEAD(bind_node_hashhead, bind_node) * bind_node_hashtbl;
@@ -86,15 +86,15 @@ static LCK_GRP_DECLARE(bind_hashlck_grp, "com.apple.filesystems.bindfs");
 static LCK_MTX_DECLARE(bind_hashmtx, &bind_hashlck_grp);
 static u_long bind_hash_mask;
 
-/*  xnu doesn't have hashes built into vnodes. This mimics what freebsd does
- *  9 is an eyeball of the log 2 size of vnode */
+                                                                            
+                                                 
 static int vnsz2log = 9;
 
 static int bind_hashins(struct mount *, struct bind_node *, struct vnode **);
 
-/*
- * Initialise cache headers
- */
+  
+                           
+   
 int
 bindfs_init(__unused struct vfsconf * vfsp)
 {
@@ -115,16 +115,16 @@ error:
 int
 bindfs_destroy(void)
 {
-	/* This gets called when the fs is uninstalled, there wasn't an exact
-	 * equivalent in vfsops */
+	                                                                     
+                           
 	hashdestroy(bind_node_hashtbl, M_TEMP, bind_hash_mask);
 	return 0;
 }
 
-/*
- * Find the bindfs vnode mapped to lowervp. Return it in *vpp with an iocount if found.
- * Return 0 on success. On failure *vpp will be NULL and a non-zero error code will be returned.
- */
+  
+                                                                                       
+                                                                                                
+   
 int
 bind_hashget(struct mount * mp, struct vnode * lowervp, struct vnode ** vpp)
 {
@@ -134,12 +134,12 @@ bind_hashget(struct mount * mp, struct vnode * lowervp, struct vnode ** vpp)
 	uint32_t vp_vid = 0;
 	int error = ENOENT;
 
-	/*
-	 * Find hash base, and then search the (two-way) linked
-	 * list looking for a bind_node structure which is referencing
-	 * the lower vnode. We only give up our reference at reclaim so
-	 * just check whether the lowervp has gotten pulled from under us
-	 */
+	  
+                                                        
+                                                               
+                                                                
+                                                                  
+    
 	hd = BIND_NHASH(lowervp);
 	lck_mtx_lock(&bind_hashmtx);
 	LIST_FOREACH(a, hd, bind_hash)
@@ -147,7 +147,7 @@ bind_hashget(struct mount * mp, struct vnode * lowervp, struct vnode ** vpp)
 		if (a->bind_lowervp == lowervp && vnode_mount(BINDTOV(a)) == mp) {
 			vp = BINDTOV(a);
 			if (a->bind_lowervid != vnode_vid(lowervp)) {
-				/*lowervp has reved */
+				                      
 				error = EIO;
 				vp = NULL;
 			} else {
@@ -167,14 +167,14 @@ bind_hashget(struct mount * mp, struct vnode * lowervp, struct vnode ** vpp)
 	return error;
 }
 
-/*
- * Act like bind_hashget, but add passed bind_node to hash if no existing
- * node found.
- * If we find a vnode in the hash table it is returned via vpp. If we don't
- * find a hit in the table, then vpp is NULL on return and xp is added to the table.
- * 0 is returned if a hash table hit occurs or if we insert the bind_node.
- * EIO is returned if we found a hash table hit but the lower vnode was recycled.
- */
+  
+                                                                         
+              
+                                                                           
+                                                                                    
+                                                                          
+                                                                                 
+   
 static int
 bind_hashins(struct mount * mp, struct bind_node * xp, struct vnode ** vpp)
 {
@@ -191,11 +191,11 @@ bind_hashins(struct mount * mp, struct bind_node * xp, struct vnode ** vpp)
 		if (oxp->bind_lowervp == xp->bind_lowervp && vnode_mount(BINDTOV(oxp)) == mp) {
 			ovp = BINDTOV(oxp);
 			if (oxp->bind_lowervid != vnode_vid(oxp->bind_lowervp)) {
-				/*	vp doesn't exist so return null (not sure we are actually gonna catch
-				 *  recycle right now
-				 *  This is an exceptional case right now, it suggests the vnode we are
-				 *  trying to add has been recycled
-				 *  don't add it.*/
+				                                                                        
+                         
+                                                                           
+                                       
+                       
 				error = EIO;
 				ovp = NULL;
 			} else {
@@ -204,14 +204,14 @@ bind_hashins(struct mount * mp, struct bind_node * xp, struct vnode ** vpp)
 			goto end;
 		}
 	}
-	/* if it wasn't in the hash map then the vnode pointed to by xp already has a
-	 * iocount so don't get another. */
+	                                                                             
+                                    
 	LIST_INSERT_HEAD(hd, xp, bind_hash);
 	xp->bind_flags |= BIND_FLAG_HASHED;
 end:
 	lck_mtx_unlock(&bind_hashmtx);
 	if (ovp != NULL) {
-		/* if we found something in the hash map then grab an iocount */
+		                                                                
 		error = vnode_getwithvid(ovp, oxp_vid);
 		if (error == 0) {
 			*vpp = ovp;
@@ -220,9 +220,9 @@ end:
 	return error;
 }
 
-/*
- * Remove node from hash.
- */
+  
+                         
+   
 void
 bind_hashrem(struct bind_node * xp)
 {
@@ -248,7 +248,7 @@ bind_nodecreate(struct vnode * lowervp)
 	return xp;
 }
 
-/* assumption is that vnode has iocount on it after vnode create */
+                                                                   
 int
 bind_getnewvnode(
 	struct mount * mp, struct vnode * lowervp, struct vnode * dvp, struct vnode ** vpp, struct componentname * cnp, int root)
@@ -275,7 +275,7 @@ bind_getnewvnode(
 	vnfs_param.vnfs_markroot   = root;
 	vnfs_param.vnfs_marksystem = 0;
 	vnfs_param.vnfs_rdev       = 0;
-	vnfs_param.vnfs_filesize   = 0; // set this to 0 since we should only be shadowing non-regular files
+	vnfs_param.vnfs_filesize   = 0;                                                                     
 	vnfs_param.vnfs_cnp        = cnp;
 	vnfs_param.vnfs_flags      = VNFS_ADDFSREF;
 
@@ -290,12 +290,12 @@ bind_getnewvnode(
 	return error;
 }
 
-/*
- * Make a new or get existing bindfs node.
- * Vp is the alias vnode, lowervp is the lower vnode.
- *
- * lowervp is assumed to have an iocount on it from the caller
- */
+  
+                                          
+                                                     
+  
+                                                              
+   
 int
 bind_nodeget(
 	struct mount * mp, struct vnode * lowervp, struct vnode * dvp, struct vnode ** vpp, struct componentname * cnp, int root)
@@ -303,25 +303,25 @@ bind_nodeget(
 	struct vnode * vp;
 	int error;
 
-	/* Lookup the hash firstly. */
+	                              
 	error = bind_hashget(mp, lowervp, vpp);
-	/* ENOENT means it wasn't found, EIO is a failure we should bail from, 0 is it
-	 * was found */
+	                                                                              
+                
 	if (error != ENOENT) {
-		/* bind_hashget checked the vid, so if we got something here its legit to
-		 * the best of our knowledge*/
-		/* if we found something then there is an iocount on vpp,
-		 *  if we didn't find something then vpp shouldn't be used by the caller */
+		                                                                         
+                                
+		                                                         
+                                                                             
 		return error;
 	}
 
-	/*
-	 * We do not serialize vnode creation, instead we will check for
-	 * duplicates later, when adding new vnode to hash.
-	 */
-	error = vnode_ref(lowervp); // take a ref on lowervp so we let the system know we care about it
+	  
+                                                                 
+                                                    
+    
+	error = vnode_ref(lowervp);                                                                    
 	if (error) {
-		// Failed to get a reference on the lower vp so bail. Lowervp may be gone already.
+		                                                                                  
 		return error;
 	}
 
@@ -332,20 +332,20 @@ bind_nodeget(
 		return error;
 	}
 
-	/*
-	 * Atomically insert our new node into the hash or vget existing
-	 * if someone else has beaten us to it.
-	 */
+	  
+                                                                 
+                                        
+    
 	error = bind_hashins(mp, VTOBIND(vp), vpp);
 	if (error || *vpp != NULL) {
-		/* recycle will call reclaim which will get rid of the internals */
+		                                                                   
 		vnode_recycle(vp);
 		vnode_put(vp);
-		/* if we found vpp, then bind_hashins put an iocount on it */
+		                                                             
 		return error;
 	}
 
-	/* vp has an iocount from bind_getnewvnode */
+	                                             
 	*vpp = vp;
 
 	return 0;

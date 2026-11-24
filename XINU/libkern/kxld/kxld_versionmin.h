@@ -51,9 +51,9 @@ struct kxld_versionmin {
 	boolean_t has_versionmin;
 };
 
-/*******************************************************************************
-* Constructors and destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 void kxld_versionmin_init_from_macho(KXLDversionmin *versionmin, struct version_min_command *src)
 __attribute__((nonnull, visibility("hidden")));
@@ -64,9 +64,9 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_versionmin_clear(KXLDversionmin *versionmin)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 u_long kxld_versionmin_get_macho_header_size(const KXLDversionmin *versionmin)
 __attribute__((pure, visibility("hidden")));
@@ -76,4 +76,4 @@ kxld_versionmin_export_macho(const KXLDversionmin *versionmin, u_char *buf,
     u_long *header_offset, u_long header_size)
 __attribute__((pure, nonnull, visibility("hidden")));
 
-#endif /* _KXLD_VERSIONMIN_H_ */
+#endif                          

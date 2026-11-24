@@ -47,7 +47,7 @@ int fakestack_enabled = 0;
 #define FAKESTACK_HEADER_SZ 64
 #define FAKESTACK_NUM_SZCLASS 7
 
-#define FAKESTACK_UNUSED    0 /* waiting to be collected at next gc - forced by clang */
+#define FAKESTACK_UNUSED    0                                                           
 #define FAKESTACK_ALLOCATED 1
 #define FAKESTACK_FREED     2
 
@@ -55,7 +55,7 @@ int fakestack_enabled = 0;
 
 struct fakestack_header {
 	LIST_ENTRY(fakestack_header) list;
-	void *site; /* allocation site */
+	void *site;                      
 	struct {
 		uint8_t flag;
 		vm_size_t realsz : 52;
@@ -70,16 +70,16 @@ static char fakestack_names[FAKESTACK_NUM_SZCLASS][16];
 static const unsigned long fakestack_min = 1 << 6;
 static const unsigned long __unused fakestack_max = 1 << 16;
 
-/*
- * Enter a fakestack critical section in a reentrant-safe fashion. Returns true on
- * success with the kasan lock held.
- */
+  
+                                                                                  
+                                    
+   
 static bool
 thread_enter_fakestack(boolean_t *flags)
 {
 	thread_t cur = current_thread();
 	if (cur && kasan_lock_held(cur)) {
-		/* current thread is already in kasan - fail */
+		                                               
 		return false;
 	}
 	kasan_lock(flags);
@@ -120,7 +120,7 @@ ptr_is_on_stack(uptr ptr)
 	}
 }
 
-/* free all unused fakestack entries */
+                                       
 void
 kasan_fakestack_gc(thread_t thread)
 {
@@ -132,7 +132,7 @@ kasan_fakestack_gc(thread_t thread)
 		panic("expected success entering fakestack\n");
 	}
 
-	/* move the unused objects off the per-thread list... */
+	                                                        
 	struct fakestack_header_list *head = &kasan_get_thread_data(thread)->fakestack_head;
 	LIST_FOREACH_SAFE(cur, head, list, tmp) {
 		if (cur->flag == FAKESTACK_UNUSED) {
@@ -144,7 +144,7 @@ kasan_fakestack_gc(thread_t thread)
 
 	kasan_unlock(flags);
 
-	/* ... then actually free them */
+	                                 
 	LIST_FOREACH_SAFE(cur, &tofree, list, tmp) {
 		LIST_REMOVE(cur, list);
 
@@ -193,8 +193,8 @@ kasan_fakestack_alloc(int sz_class, size_t realsz)
 
 	if (ret) {
 		size_t leftrz = 32 + FAKESTACK_HEADER_SZ;
-		size_t validsz = realsz - 32 - 16; /* remove redzones */
-		size_t rightrz = sz - validsz - 32; /* 16 bytes, plus whatever is left over */
+		size_t validsz = realsz - 32 - 16;                      
+		size_t rightrz = sz - validsz - 32;                                           
 		struct fakestack_header *hdr = (struct fakestack_header *)ret;
 
 		kasan_poison(ret, validsz, leftrz, rightrz, ASAN_STACK_RZ);
@@ -205,7 +205,7 @@ kasan_fakestack_alloc(int sz_class, size_t realsz)
 		hdr->flag = FAKESTACK_ALLOCATED;
 		ret += FAKESTACK_HEADER_SZ;
 
-		*fakestack_flag_ptr(ret, sz) = &hdr->flag; /* back ptr to the slot */
+		*fakestack_flag_ptr(ret, sz) = &hdr->flag;                           
 		struct fakestack_header_list *head = &kasan_get_thread_data(current_thread())->fakestack_head;
 		LIST_INSERT_HEAD(head, hdr, list);
 	}
@@ -227,7 +227,7 @@ kasan_fakestack_free(int sz_class, uptr dst, size_t realsz)
 	zone_t zone = fakestack_zones[sz_class];
 	assert(zone);
 
-	/* TODO: check the magic? */
+	                            
 
 	dst -= FAKESTACK_HEADER_SZ;
 	sz += FAKESTACK_HEADER_SZ;
@@ -270,13 +270,13 @@ kasan_fakestack_drop(thread_t thread)
 void NOINLINE
 kasan_init_fakestack(void)
 {
-	/* allocate the fakestack zones */
+	                                  
 	for (int i = 0; i < FAKESTACK_NUM_SZCLASS; i++) {
 		unsigned long sz = (fakestack_min << i) + FAKESTACK_HEADER_SZ;
 		size_t maxsz = 256UL * 1024;
 
 		if (i <= 3) {
-			/* size classes 0..3 are much more common */
+			                                            
 			maxsz *= 4;
 		}
 
@@ -290,13 +290,13 @@ kasan_init_fakestack(void)
 		zone_fill_initially(fakestack_zones[i], maxsz / sz);
 	}
 
-	/* globally enable */
+	                     
 	if (fakestack_enabled) {
 		__asan_option_detect_stack_use_after_return = 1;
 	}
 }
 
-#else /* FAKESTACK */
+#else                
 
 void
 kasan_init_fakestack(void)

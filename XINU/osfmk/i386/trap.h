@@ -53,43 +53,43 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _I386_TRAP_H_
 #define _I386_TRAP_H_
 
-/*
- * Hardware trap vectors for i386.
- */
+  
+                                  
+   
 #define T_DIVIDE_ERROR          0
 #define T_DEBUG                 1
-#define T_NMI                   2               /* non-maskable interrupt */
-#define T_INT3                  3               /* int 3 instruction */
-#define T_OVERFLOW              4               /* overflow test */
-#define T_OUT_OF_BOUNDS         5               /* bounds check */
-#define T_INVALID_OPCODE        6               /* invalid op code */
-#define T_NO_FPU                7               /* no floating point */
-#define T_DOUBLE_FAULT          8               /* double fault */
+#define T_NMI                   2                                           
+#define T_INT3                  3                                      
+#define T_OVERFLOW              4                                  
+#define T_OUT_OF_BOUNDS         5                                 
+#define T_INVALID_OPCODE        6                                    
+#define T_NO_FPU                7                                      
+#define T_DOUBLE_FAULT          8                                 
 #define T_FPU_FAULT             9
 #define T_INVALID_TSS           10
 #define T_SEGMENT_NOT_PRESENT   11
 #define T_STACK_FAULT           12
 #define T_GENERAL_PROTECTION    13
 #define T_PAGE_FAULT            14
-/*				15 */
+           
 #define T_FLOATING_POINT_ERROR  16
 #define T_WATCHPOINT            17
 #define T_MACHINE_CHECK         18
 #define T_SSE_FLOAT_ERROR       19
-/*                          20-126 */
+                                     
 #define T_DTRACE_RET            127
 
-/* The SYSENTER and SYSCALL trap numbers are software constructs.
- * These exceptions are dispatched directly to the system call handlers.
- * See also the "software interrupt codes" section of
- * osfmk/mach/i386/syscall_sw.h
- */
+                                                                 
+                                                                        
+                                                     
+                               
+   
 #define T_SYSENTER              0x84
 #define T_SYSCALL               0x85
 
@@ -102,15 +102,15 @@
 	           "general protection", "page fault", "(reserved)", \
 	           "coprocessor error", "watchpoint", "machine check", "SSE floating point"
 
-/*
- * Page-fault trap codes.
- */
-#define T_PF_PROT               0x1             /* protection violation */
-#define T_PF_WRITE              0x2             /* write access */
-#define T_PF_USER               0x4             /* from user state */
+  
+                         
+   
+#define T_PF_PROT               0x1                                       
+#define T_PF_WRITE              0x2                               
+#define T_PF_USER               0x4                                  
 
-#define T_PF_RSVD               0x8             /* reserved bit set to 1 */
-#define T_PF_EXECUTE            0x10            /* instruction fetch when NX */
+#define T_PF_RSVD               0x8                                        
+#define T_PF_EXECUTE            0x10                                           
 
 #if defined(MACH_KERNEL_PRIVATE)
 
@@ -164,9 +164,9 @@ extern boolean_t        kdp_i386_trap(
 	x86_saved_state64_t *,
 	kern_return_t,
 	vm_offset_t);
-#endif /* MACH_KDP */
-#endif  /* !ASSEMBLER && MACH_KERNEL */
+#endif               
+#endif                                 
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* _I386_TRAP_H_ */
+#endif                     

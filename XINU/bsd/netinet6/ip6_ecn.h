@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/ip6_ecn.h,v 1.2.2.2 2001/07/03 11:01:53 ume Exp $	*/
-/*	$KAME: ip_ecn.h,v 1.5 2000/03/27 04:58:38 sumikawa Exp $	*/
+                                                                                  
+                                                              
 
 /*
  * Copyright (C) 1999 WIDE Project.
@@ -58,10 +58,10 @@
  * SUCH DAMAGE.
  *
  */
-/*
- * ECN consideration on tunnel ingress/egress operation.
- * http://www.aciri.org/floyd/papers/draft-ipsec-ecn-00.txt
- */
+  
+                                                        
+                                                           
+   
 #include <sys/appleapiopts.h>
 
 #ifdef BSD_KERNEL_PRIVATE
@@ -71,4 +71,4 @@ extern void ip46_ecn_ingress(int, u_int32_t *, const u_int8_t *);
 extern int ip46_ecn_egress(int, const u_int32_t *, u_int8_t *);
 extern void ip64_ecn_ingress(int, u_int8_t *, const u_int32_t *);
 extern int ip64_ecn_egress(int, const u_int8_t *, u_int32_t *);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         

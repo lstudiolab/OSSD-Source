@@ -1,17 +1,17 @@
-//
-// Tests for
-//  template <typename T, typename Policy>
-//  bool operator==(std::nullptr_t, bounded_ptr<T, Policy> const& p);
-//
-//  template <typename T, typename Policy>
-//  bool operator!=(std::nullptr_t, bounded_ptr<T, Policy> const& p);
-//
-//  template <typename T, typename Policy>
-//  bool operator==(bounded_ptr<T, Policy> const& p, std::nullptr_t);
-//
-//  template <typename T, typename Policy>
-//  bool operator!=(bounded_ptr<T, Policy> const& p, std::nullptr_t);
-//
+  
+            
+                                          
+                                                                     
+  
+                                          
+                                                                     
+  
+                                          
+                                                                     
+  
+                                          
+                                                                     
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <darwintest.h>
@@ -50,7 +50,7 @@ tests()
 		_assert(!(nullptr != ptr));
 	}
 
-	// Test with a custom policy
+	                            
 	{
 		libkern::bounded_ptr<QualT, non_default_policy> const ptr = nullptr;
 		_assert(ptr == nullptr);

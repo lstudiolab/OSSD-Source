@@ -53,16 +53,16 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_table.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Definitions for tables, used for IPC capabilities (ipc_entry_t)
- *	and dead-name requests (ipc_port_request_t).
- */
+  
+   
+  
+                        
+                      
+             
+  
+                                                                  
+                                               
+   
 
 #ifndef _IPC_IPC_TABLE_H_
 #define _IPC_IPC_TABLE_H_
@@ -73,52 +73,52 @@
 
 #include <ipc/ipc_types.h>
 
-/*
- *	The is_table_next field of an ipc_space_t points to
- *	an ipc_table_size structure.  These structures must
- *	be elements of an array, ipc_table_entries.
- *
- *	The array must end with two elements with the same its_size value.
- *	Except for the terminating element, the its_size values must
- *	be strictly increasing.  The largest (last) its_size value
- *	must be less than or equal to MACH_PORT_INDEX(MACH_PORT_DEAD).
- *	This ensures that
- *		1) MACH_PORT_INDEX(MACH_PORT_DEAD) isn't a valid index
- *		in the table, so ipc_entry_get won't allocate it.
- *		2) MACH_PORT_MAKE(index+1, 0) and MAKE_PORT_MAKE(size, 0)
- *		won't ever overflow.
- *
- *
- *	The ipr_size field of the first element in a table of
- *	dead-name requests (ipc_port_request_t) points to the
- *	ipc_table_size structure.  The structures must be elements
- *	of ipc_table_dnrequests.  ipc_table_dnrequests must end
- *	with an element with zero its_size, and except for this last
- *	element, the its_size values must be strictly increasing.
- *
- *	The is_table_next field points to the ipc_table_size structure
- *	for the next larger size of table, not the one currently in use.
- *	The ipr_size field points to the currently used ipc_table_size.
- */
+  
+                                                      
+                                                      
+                                              
+  
+                                                                     
+                                                               
+                                                             
+                                                                 
+                    
+                                                          
+                                                     
+                                                             
+                        
+  
+  
+                                                        
+                                                        
+                                                             
+                                                          
+                                                               
+                                                            
+  
+                                                                 
+                                                                   
+                                                                  
+   
 
 struct ipc_table_size {
-	ipc_table_elems_t its_size;     /* number of elements in table */
+	ipc_table_elems_t its_size;                                      
 };
 
 extern struct ipc_table_size ipc_table_entries[];
 extern struct ipc_table_size ipc_table_requests[];
 
-/*
- *	Note that ipc_table_alloc and ipc_table_free
- *	potentially use the VM system.  Hence simple locks can't
- *	be held across them.
- */
+  
+                                               
+                                                           
+                       
+   
 
-/* Allocate a table */
+                      
 extern void * ipc_table_alloc(
 	vm_size_t       size);
 
-/* Free a table */
+                  
 extern void ipc_table_free(
 	vm_size_t       size,
 	void *          table);
@@ -145,4 +145,4 @@ extern void ipc_table_free(
 extern unsigned int ipc_table_max_entries(void);
 extern unsigned int ipc_table_max_requests(void);
 
-#endif  /* _IPC_IPC_TABLE_H_ */
+#endif                         

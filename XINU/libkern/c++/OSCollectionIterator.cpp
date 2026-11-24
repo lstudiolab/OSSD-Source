@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOArray.h created by rsulack on Thu 11-Sep-1997 */
+                                                     
 
 #define IOKIT_ENABLE_SHARED_PTR
 

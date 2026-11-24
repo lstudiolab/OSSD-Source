@@ -28,16 +28,16 @@
 #ifndef _IOBSD_H
 #define _IOBSD_H
 
-/*
- * bsd-related registry properties
- */
+  
+                                  
+   
 
-#define kIOBSDKey      "IOBSD"     // (BSD subsystem resource)
-#define kIOBSDNameKey  "BSD Name"  // (an OSString)
-#define kIOBSDNamesKey "BSD Names" // (an OSDictionary of OSString's, for links)
-#define kIOBSDMajorKey "BSD Major" // (an OSNumber)
-#define kIOBSDMinorKey "BSD Minor" // (an OSNumber)
-#define kIOBSDUnitKey  "BSD Unit"  // (an OSNumber)
+#define kIOBSDKey      "IOBSD"                                
+#define kIOBSDNameKey  "BSD Name"                  
+#define kIOBSDNamesKey "BSD Names"                                              
+#define kIOBSDMajorKey "BSD Major"                 
+#define kIOBSDMinorKey "BSD Minor"                 
+#define kIOBSDUnitKey  "BSD Unit"                  
 
 
 #ifdef KERNEL_PRIVATE
@@ -79,6 +79,6 @@ extern IOPolledCoreFileMode_t gIOPolledCoreFileMode;
 }
 #endif
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* !_IOBSD_H */
+#endif                

@@ -37,4 +37,4 @@ void *vmx_pcalloc(void);
 addr64_t vmx_paddr(void *);
 void vmx_pfree(void *);
 
-#endif  /* _I386_VMX_SHIMS_H_ */
+#endif                          

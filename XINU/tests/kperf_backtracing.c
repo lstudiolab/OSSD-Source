@@ -48,16 +48,16 @@ expect_frame(const char **bt, unsigned int bt_len, CSSymbolRef symbol,
 	    frame_idx, name, bt[frame_idx]);
 }
 
-/*
- * Expect to see either user or kernel stacks on thread with ID `tid` with a
- * signature of `bt` of length `bt_len`.  Updates `stacks_seen` when stack
- * is found.
- *
- * Can also allow stacks to be larger than the signature -- additional frames
- * near the current PC will be ignored.  This allows stacks to potentially be
- * in the middle of a signalling system call (which signals that it is safe to
- * start sampling).
- */
+  
+                                                                            
+                                                                          
+            
+  
+                                                                             
+                                                                             
+                                                                              
+                   
+   
 static void
 expect_backtrace(ktrace_session_t s, uint64_t tid, unsigned int *stacks_seen,
     bool kern, const char **bt, unsigned int bt_len, unsigned int allow_larger_by)
@@ -114,7 +114,7 @@ expect_backtrace(ktrace_session_t s, uint64_t tid, unsigned int *stacks_seen,
 		}
 
 		hdr_frames = (unsigned int)tp->arg2;
-		/* ignore extra link register or value pointed to by stack pointer */
+		                                                                     
 		hdr_frames -= 1;
 
 		T_QUIET; T_EXPECT_GE(hdr_frames, bt_len,
@@ -138,7 +138,7 @@ expect_backtrace(ktrace_session_t s, uint64_t tid, unsigned int *stacks_seen,
 		int i = 0;
 
 		if (frames == 0 && hdr_frames > bt_len) {
-		        /* skip frames near the PC */
+		                                     
 		        i = (int)allow_larger;
 		        allow_larger -= 4;
 		}
@@ -151,7 +151,7 @@ expect_backtrace(ktrace_session_t s, uint64_t tid, unsigned int *stacks_seen,
 		        expect_frame(bt, bt_len, symbol, addr, frames, hdr_frames);
 		}
 
-		/* saw the end of the user stack */
+		                                   
 		if (hdr_frames == frames) {
 		        *stacks_seen += 1;
 		        if (!kern) {
@@ -165,11 +165,11 @@ expect_backtrace(ktrace_session_t s, uint64_t tid, unsigned int *stacks_seen,
 
 #define TRIGGERING_DEBUGID (0xfeff0f00)
 
-/*
- * These functions must return an int to avoid the function prologue being
- * hoisted out of the path to the spin (breaking being able to get a good
- * backtrace).
- */
+  
+                                                                          
+                                                                         
+              
+   
 static int __attribute__((noinline, not_tail_called))
 recurse_a(dispatch_semaphore_t spinning, unsigned int frames);
 static int __attribute__((noinline, not_tail_called))
@@ -217,29 +217,29 @@ recurse_b(dispatch_semaphore_t spinning, unsigned int frames)
 
 #define RECURSE_START_OFFSET (3)
 
-#else /* defined(__x86_64__) */
+#else                          
 
 #define RECURSE_START_OFFSET (2)
 
-#endif /* !defined(__x86_64__) */
+#endif                           
 
 static const char *user_bt[USER_FRAMES] = {
 #if defined(__x86_64__)
-	/*
-	 * x86_64 has an extra "thread_start" frame here.
-	 */
+	  
+                                                  
+    
 	NULL,
-#endif /* defined(__x86_64__) */
+#endif                          
 	NULL,
 	"backtrace_thread",
 	"recurse_a", "recurse_b", "recurse_a", "recurse_b",
 	"recurse_a", "recurse_b", "recurse_a", "recurse_b",
 #if !defined(__x86_64__)
-	/*
-	 * Pick up the slack to make the number of frames constant.
-	 */
+	  
+                                                            
+    
 	"recurse_a",
-#endif /* !defined(__x86_64__) */
+#endif                           
 	NULL,
 };
 
@@ -266,19 +266,19 @@ static const char *kernel_bt[KERNEL_FRAMES] = {
 
 #else
 #error "architecture unsupported"
-#endif /* defined(__arm__) */
+#endif                       
 
 static dispatch_once_t backtrace_once;
 static dispatch_semaphore_t backtrace_started;
 static dispatch_semaphore_t backtrace_go;
 
-/*
- * Another thread to run with a known backtrace.
- *
- * Take a semaphore that will be signalled when the thread is spinning at the
- * correct frame.  If the semaphore is NULL, don't spin and instead make a
- * kdebug_trace system call, which can trigger a deterministic backtrace itself.
- */
+  
+                                                
+  
+                                                                             
+                                                                          
+                                                                                
+   
 static void *
 backtrace_thread(void *arg)
 {
@@ -292,16 +292,16 @@ backtrace_thread(void *arg)
 		dispatch_semaphore_wait(backtrace_go, DISPATCH_TIME_FOREVER);
 	}
 
-	/*
-	 * backtrace_thread, recurse_a, recurse_b, ...[, __kdebug_trace64]
-	 *
-	 * Always make one less call for this frame (backtrace_thread).
-	 */
-	calls = USER_FRAMES - RECURSE_START_OFFSET - 1 /* backtrace_thread */;
+	  
+                                                                   
+   
+                                                                
+    
+	calls = USER_FRAMES - RECURSE_START_OFFSET - 1                       ;
 	if (notify_spinning) {
-		/*
-		 * Spinning doesn't end up calling __kdebug_trace64.
-		 */
+		  
+                                                      
+     
 		calls -= 1;
 	}
 
@@ -352,9 +352,9 @@ start_backtrace_thread(void)
 
 #if TARGET_OS_WATCH
 #define TEST_TIMEOUT_NS (30 * NSEC_PER_SEC)
-#else /* TARGET_OS_WATCH */
+#else                      
 #define TEST_TIMEOUT_NS (5 * NSEC_PER_SEC)
-#endif /* !TARGET_OS_WATCH */
+#endif                       
 
 T_DECL(kperf_stacks_kdebug_trig,
     "test that backtraces from kdebug trigger are correct",
@@ -378,10 +378,10 @@ T_DECL(kperf_stacks_kdebug_trig,
 	expect_backtrace(s, tid, &stacks_seen, false, user_bt, USER_FRAMES, 0);
 	expect_backtrace(s, tid, &stacks_seen, true, kernel_bt, KERNEL_FRAMES, 0);
 
-	/*
-	 * The triggering event must be traced (and thus registered with libktrace)
-	 * to get backtraces.
-	 */
+	  
+                                                                            
+                      
+    
 	ktrace_events_single(s, TRIGGERING_DEBUGID,
 	    ^(__unused struct trace_point *tp){ });
 
@@ -441,7 +441,7 @@ T_DECL(kperf_ustack_timer,
 	configure_kperf_stacks_timer(getpid(), 10, false);
 
 	tid = create_backtrace_thread(backtrace_thread, wait_for_spinning);
-	/* potentially calling dispatch function and system call */
+	                                                           
 	expect_backtrace(s, tid, &stacks_seen, false, user_bt, USER_FRAMES - 1, 2);
 
 	ktrace_set_completion_handler(s, ^(void) {
@@ -453,7 +453,7 @@ T_DECL(kperf_ustack_timer,
 
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(kperf_sample_set(1), NULL);
 
-	/* wait until the thread that will be backtraced is spinning */
+	                                                               
 	dispatch_semaphore_wait(wait_for_spinning, DISPATCH_TIME_FOREVER);
 
 	T_ASSERT_POSIX_ZERO(ktrace_start(s, dispatch_get_main_queue()), NULL);
@@ -607,5 +607,5 @@ T_DECL(kperf_ustack_maxlen, "ensure stacks up to 256 frames can be captured")
 	dispatch_main();
 }
 
-/* TODO test kernel stacks in all modes */
-/* TODO legacy PET mode backtracing */
+                                          
+                                      

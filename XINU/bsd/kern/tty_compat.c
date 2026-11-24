@@ -61,17 +61,17 @@
  *      @(#)tty_compat.c        8.1 (Berkeley) 6/10/93
  */
 
-/*
- * Compatibility routines for BSD 4.3 tty ioctl() commands
- *
- * The only function externalized from this file is ttcompat() and it is
- * externalized as private extern to prevent exporting of the symbol when
- * KEXTs link against the kernel.
- *
- * Locks:	All functions in this file assume that the tty_lock()
- *		is held on the tty structure before these functions are
- *		called.
- */
+  
+                                                          
+  
+                                                                        
+                                                                         
+                                 
+  
+                                                               
+                                                           
+           
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -90,13 +90,13 @@ static void ttcompatsetflags(struct tty *tp, struct termios *t);
 static void ttcompatsetlflags(struct tty *tp, struct termios *t);
 static unsigned int ttcompatspeedtab(speed_t speed, struct speedtab *table);
 
-/*
- * These two tables encode baud rate to speed code and speed code to
- * baud rate information.  They are a mapping between the <sys/termios.h>
- * baud rate constants and the <sys/ttydev.h> baud rate constants.  We
- * cannot use those constants directly here because they occupy the same
- * name space.
- */
+  
+                                                                    
+                                                                         
+                                                                      
+                                                                        
+              
+   
 static struct speedtab compatspeeds[] = {
 #define MAX_SPEED 17
 	{ .sp_speed = 115200, .sp_code = 17 },
@@ -124,108 +124,108 @@ static int compatspcodes[] = {
 	1800, 2400, 4800, 9600, 19200, 38400, 57600, 115200,
 };
 
-/*
- * ttcompatspeedtab
- *
- * Description:	Given a baud rate value as a speed_t, and a speed table,
- *		convert the baud rate to a speed code integer, according to the
- *		contents of the table.  This effectively changes termios.h
- *		baud rate values into ttydev.h baud rate codes.
- *
- * Parameters:	speed_t speed  Baud rate
- *		struct speedtab *table Baud rate table to speed code table
- *
- * Returns:	1              B50 speed code; returned if we can
- *                         not find an answer in the table.
- *          0              If a 0 was requested in order to
- *                         trigger a hangup (250ms of line
- *                         silence, per Bell 103C standard).
- *          [2, MAX_SPEED] A speed code matching the requested
- *                         baud rate (potentially rounded down,
- *                         if there is no exact match).
- *
- * Notes:	This function is used for TIOCGETP, TIOCSETP, and TIOCSETN.
- */
+  
+                   
+  
+                                                                        
+                                                                   
+                                                              
+                                                   
+  
+                                       
+                                                              
+  
+                                                             
+                                                           
+                                                           
+                                                          
+                                                            
+                                                              
+                                                               
+                                                       
+  
+                                                                     
+   
 static unsigned int
 ttcompatspeedtab(speed_t speed, struct speedtab *table)
 {
 	if (speed == 0) {
-		return 0; /* hangup */
+		return 0;             
 	}
 	for (; table->sp_speed > 0; table++) {
-		if (table->sp_speed <= speed) { /* nearest one, rounded down */
+		if (table->sp_speed <= speed) {                                
 			return (unsigned int)table->sp_code;
 		}
 	}
-	return 1; /* 50, min and not hangup */
+	return 1;                             
 }
 
 
-/*
- * ttsetcompat
- *
- * Description:	Convert backward compatability set command arguments as
- *		follows:
- *
- *		TIOCSETP	->	TIOSETAF
- *		TIOCSETN	->	TIOCSETA
- *		TIOCSETC	->	TIOCSETA
- *		TIOCSLTC	->	TIOCSETA
- *		TIOCLBIS	->	TIOCSETA
- *		TIOCLBIC	->	TIOCSETA
- *		TIOCLSET	->	TIOCSETA
- *
- *	The converted command argument and potentially modified 'term'
- *	argument are returned to ttcompat(), which will then call
- *	ttioctl_locked(), if this function returns successfully.
- *
- * Parameters	struct tty *tp		The tty on which the operation is
- *					being performed.
- *		u_long *com		A pointer to the terminal input/output
- *					command being requested; its contents
- *					will be modified per the table above,
- *					on a non-error return.
- *		caddr_t data		Command specific parameter data; this
- *					data is read but not modified.
- *		struct termios *term	A local stack termios structure from
- *					ttcompat(), whose contents are to be
- *					modified based on *com and *data.
- *
- * Returns:	EINVAL			An input speed or output speed is
- *					outside the allowable range for a
- *					TIOCSETP or TIOCSETN command.
- *		0			All other cases return 0.
- *
- * Notes:	This function may modify the contents of the tp->t_flags
- *		field in a successful call to TIOCSETP, TIOCSETN, TIOCLBIS,
- *		TIOCLBIC, or TIOCLSET.
- *
- *		All other tp fields will remain unmodifed, since the struct
- *		termios is a local stack copy from ttcompat(), and not the
- *		real thing.  A subsequent call to ttioctl_locked() in
- *		ttcompat(), however, may result in subsequent changes.
- *
- * WARNING:	This compatibility code is not 64/32 clean; it will only
- *		work for 32 bit processes on 32 bit kernels or 64 bit
- *		processes on 64 bit kernels.  We are not addressing this
- *		due to <rdar://6904053>.
- */
+  
+              
+  
+                                                                       
+            
+  
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+  
+                                                                 
+                                                            
+                                                           
+  
+                                                               
+                       
+                                                       
+                                            
+                                            
+                             
+                                                       
+                                     
+                                                             
+                                           
+                                        
+  
+                                                      
+                                        
+                                    
+                                 
+  
+                                                                  
+                                                               
+                          
+  
+                                                               
+                                                              
+                                                         
+                                                          
+  
+                                                                    
+                                                         
+                                                            
+                            
+   
 static int
 ttsetcompat(struct tty *tp, u_long *com, caddr_t data, struct termios *term)
 {
 	switch (*com) {
 	case TIOCSETP:
-	/*
-	 * Wait for all characters queued for output to drain, then
-	 * Discard all characters queued for input, and then set
-	 * the input and output speeds and device flags, per the
-	 * contents of the struct sgttyb that 'data' points to.
-	 */
+	  
+                                                            
+                                                         
+                                                         
+                                                        
+    
 	case TIOCSETN:
-		/*
-		 * Same as TIOCSETP, but the output is not drained, and any
-		 * pending input is not discarded.
-		 */
+		  
+                                                             
+                                    
+     
 	{
 		__IGNORE_WCASTALIGN(struct sgttyb *sg = (struct sgttyb *)data);
 		if (sg->sg_ispeed < 0) {
@@ -241,15 +241,15 @@ ttsetcompat(struct tty *tp, u_long *com, caddr_t data, struct termios *term)
 			term->c_ispeed = tp->t_ispeed;
 		}
 
-		/*
-		 * Can't error out at the beginning due to potential for
-		 * backwards-incompatibility.  For instance:
-		 *
-		 * struct sgttyb sg; // uninitialized
-		 * sg.sg_ispeed = SOME_VALID_VALUE;
-		 *
-		 * Should still set the input speed.
-		 */
+		  
+                                                          
+                                              
+    
+                                       
+                                     
+    
+                                      
+     
 		if (sg->sg_ospeed < 0) {
 			return EINVAL;
 		}
@@ -271,10 +271,10 @@ ttsetcompat(struct tty *tp, u_long *com, caddr_t data, struct termios *term)
 		break;
 	}
 	case TIOCSETC:
-		/*
-		 * Set the terminal control characters per the contents of
-		 * the struct tchars that 'data' points to.
-		 */
+		  
+                                                            
+                                             
+     
 	{
 		__IGNORE_WCASTALIGN(struct tchars *tc = (struct tchars *)data);
 		cc_t *cc;
@@ -293,10 +293,10 @@ ttsetcompat(struct tty *tp, u_long *com, caddr_t data, struct termios *term)
 		break;
 	}
 	case TIOCSLTC:
-		/*
-		 * Set the terminal control characters per the contents of
-		 * the struct ltchars that 'data' points to.
-		 */
+		  
+                                                            
+                                              
+     
 	{
 		__IGNORE_WCASTALIGN(struct ltchars *ltc = (struct ltchars *)data);
 		cc_t *cc;
@@ -312,23 +312,23 @@ ttsetcompat(struct tty *tp, u_long *com, caddr_t data, struct termios *term)
 		break;
 	}
 	case TIOCLBIS:
-	/*
-	 * Set the bits in the terminal state local flags word
-	 * (16 bits) for the terminal to the current bits OR
-	 * those in the 16 bit value pointed to by 'data'.
-	 */
+	  
+                                                       
+                                                     
+                                                   
+    
 	case TIOCLBIC:
-	/*
-	 * Clear the bits in the terminal state local flags word
-	 * for the terminal to the current bits AND those bits NOT
-	 * in the 16 bit value pointed to by 'data'.
-	 */
+	  
+                                                         
+                                                           
+                                             
+    
 	case TIOCLSET:
-		/*
-		 * Set the terminal state local flags word to exactly those
-		 * bits that correspond to the 16 bit value pointed to by
-		 * 'data'.
-		 */
+		  
+                                                             
+                                                           
+            
+     
 	{
 		__IGNORE_WCASTALIGN(int set = *(int *)data);
 		if (*com == TIOCLSET) {
@@ -350,42 +350,42 @@ ttsetcompat(struct tty *tp, u_long *com, caddr_t data, struct termios *term)
 	return 0;
 }
 
-/*
- * ttcompat
- *
- * Description:	For 'set' commands, convert the command and arguments as
- *		necessary, and call ttioctl_locked(), returning the result
- *		as our result; for 'get' commands, obtain the requested data
- *		from the appropriate source, and return it in the expected
- *		format.  If the command is not recognized, return EINVAL.
- *
- * Parameters	struct tty *tp		The tty on which the operation is
- *					being performed.
- *		u_long com		The terminal input/output command
- *					being requested.
- *		caddr_t	data		The pointer to the user data argument
- *					provided with the command.
- *		int flag		The file open flags (e.g. FREAD).
- *		struct proc *p		The current process pointer for the
- *					operation.
- *
- * Returns:	0			Most 'get' operations can't fail, and
- *					therefore return this.
- *		ENOTTY			TIOCGSID may return this when you
- *					attempt to get the session ID for a
- *					terminal with no associated session,
- *					or for which there is a session, but
- *					no session leader.
- *		ENOTTY			If the command cannot be handled at
- *					this layer, this will be returned.
- *		*			Any value returned by ttioctl_locked(),
- *					if a set command is requested.
- *
- * Notes:	The process pointer may be a proxy on whose behalf we are
- *		operating, so it is not safe to simply use current_process()
- *		instead.
- */
-/*ARGSUSED*/
+  
+           
+  
+                                                                        
+                                                              
+                                                                
+                                                              
+                                                             
+  
+                                                               
+                       
+                                                 
+                       
+                                                       
+                                 
+                                               
+                                                       
+                 
+  
+                                                     
+                             
+                                              
+                                          
+                                           
+                                           
+                         
+                                                
+                                         
+                                               
+                                     
+  
+                                                                   
+                                                                
+            
+   
+            
 __private_extern__ int
 ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 {
@@ -397,10 +397,10 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 	case TIOCLBIS:
 	case TIOCLBIC:
 	case TIOCLSET:
-		/*
-		 * See ttsetcompat() for a full description of these command
-		 * values and their meanings.
-		 */
+		  
+                                                              
+                               
+     
 	{
 		struct termios term;
 		int error;
@@ -412,10 +412,10 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 		return ttioctl_locked(tp, com, (caddr_t) &term, flag, p);
 	}
 	case TIOCGETP:
-		/*
-		 * Get the current input and output speeds, and device
-		 * flags, into the structure pointed to by 'data'.
-		 */
+		  
+                                                        
+                                                    
+     
 	{
 		__IGNORE_WCASTALIGN(struct sgttyb *sg = (struct sgttyb *)data);
 		cc_t *cc = tp->t_cc;
@@ -434,10 +434,10 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 		break;
 	}
 	case TIOCGETC:
-		/*
-		 * Get the terminal control characters into the struct
-		 * tchars that 'data' points to.
-		 */
+		  
+                                                        
+                                  
+     
 	{
 		struct tchars *tc = (struct tchars *)data;
 		cc_t *cc = tp->t_cc;
@@ -451,10 +451,10 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 		break;
 	}
 	case TIOCGLTC:
-		/*
-		 * Get the terminal control characters into the struct
-		 * ltchars that 'data' points to.
-		 */
+		  
+                                                        
+                                   
+     
 	{
 		struct ltchars *ltc = (struct ltchars *)data;
 		cc_t *cc = tp->t_cc;
@@ -468,10 +468,10 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 		break;
 	}
 	case TIOCLGET:
-		/*
-		 * Get the terminal state local flags word into the 16 bit
-		 * value pointed to by 'data'.
-		 */
+		  
+                                                            
+                                
+     
 		tp->t_flags =
 		    (ttcompatgetflags(tp) & 0xffff0000UL)
 		    | (tp->t_flags & 0xffff);
@@ -479,18 +479,18 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 		break;
 
 	case OTIOCGETD:
-		/*
-		 * Get the current line discipline into the int pointed to
-		 * by 'data'.
-		 */
+		  
+                                                            
+               
+     
 		*(int *)data = tp->t_line ? tp->t_line : 2;
 		break;
 
 	case OTIOCSETD:
-		/*
-		 * Set the current line discipline based on the value of the
-		 * int pointed to by 'data'.
-		 */
+		  
+                                                              
+                              
+     
 	{
 		int ldisczero = 0;
 
@@ -499,16 +499,16 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 	}
 
 	case OTIOCCONS:
-		/*
-		 * Become the console device.
-		 */
+		  
+                               
+     
 		*(int *)data = 1;
 		return ttioctl_locked(tp, TIOCCONS, data, flag, p);
 
 	case TIOCGSID:
-		/*
-		 * Get the current session ID (controlling process' PID).
-		 */
+		  
+                                                           
+     
 		if (tp->t_session == NULL) {
 			return ENOTTY;
 		}
@@ -521,34 +521,34 @@ ttcompat(struct tty *tp, u_long com, caddr_t data, int flag, struct proc *p)
 		break;
 
 	default:
-		/*
-		 * This ioctl is not handled at this layer.
-		 */
+		  
+                                             
+     
 		return ENOTTY;
 	}
 
-	/*
-	 * Successful 'get' operation.
-	 */
+	  
+                               
+    
 	return 0;
 }
 
-/*
- * ttcompatgetflags
- *
- * Description:	Get the terminal state local flags, device flags, and current
- *		speed code for the device (all 32 bits are returned).
- *
- * Parameters	struct tty *tp		The tty on which the operation is
- *					being performed.
- *
- * Returns:	*			Integer value corresponding to the
- *					current terminal state local flags
- *					word.
- *
- * Notes:	Caller is responsible for breaking these bits back out into
- *		separate 16 bit filelds, if that's what was actually desired.
- */
+  
+                   
+  
+                                                                             
+                                                         
+  
+                                                               
+                       
+  
+                                                  
+                                         
+            
+  
+                                                                     
+                                                                 
+   
 static int
 ttcompatgetflags(struct tty *tp)
 {
@@ -582,7 +582,7 @@ ttcompatgetflags(struct tty *tp)
 	}
 
 	if ((lflag & ICANON) == 0) {
-		/* fudge */
+		           
 		if (iflag & (INPCK | ISTRIP | IXON) || lflag & (IEXTEN | ISIG)
 		    || (cflag & (CSIZE | PARENB)) != CS8) {
 			flags |= CBREAK;
@@ -621,20 +621,20 @@ ttcompatgetflags(struct tty *tp)
 	return flags;
 }
 
-/*
- * ttcompatsetflags
- *
- * Description:	Given a set of compatability flags, convert the compatability
- *		flags in the terminal flags fields into canonical flags in the
- *		provided termios struct.
- *
- * Parameters:	struct tty *tp		The tty on which the operation is
- *					being performed.
- *		struct termios *t	The termios structure into which to
- *					return the converted flags.
- *
- * Returns:	void			(implicit: *t, modified)
- */
+  
+                   
+  
+                                                                             
+                                                                  
+                            
+  
+                                                                
+                       
+                                                         
+                                  
+  
+                                           
+   
 static void
 ttcompatsetflags(struct tty *tp, struct termios *t)
 {
@@ -650,7 +650,7 @@ ttcompatsetflags(struct tty *tp, struct termios *t)
 	} else {
 		iflag &= ~(PARMRK | IGNPAR | IGNCR | INLCR);
 		iflag |= BRKINT | IXON | IMAXBEL;
-		lflag |= ISIG | IEXTEN | ECHOCTL;   /* XXX was echoctl on ? */
+		lflag |= ISIG | IEXTEN | ECHOCTL;                             
 		if (flags & XTABS) {
 			oflag |= OXTABS;
 		} else {
@@ -694,7 +694,7 @@ ttcompatsetflags(struct tty *tp, struct termios *t)
 		iflag |= ISTRIP;
 		oflag |= OPOST;
 	}
-	/* XXX don't set INPCK if RAW or PASS8? */
+	                                          
 	if ((flags & (EVENP | ODDP)) == EVENP) {
 		iflag |= INPCK;
 		cflag &= ~PARODD;
@@ -720,20 +720,20 @@ ttcompatsetflags(struct tty *tp, struct termios *t)
 	t->c_cflag = cflag;
 }
 
-/*
- * ttcompatsetlflags
- *
- * Description:	Given a set of compatability terminal state local flags,
- *		convert the compatability flags in the terminal flags
- *		fields into canonical flags in the provided termios struct.
- *
- * Parameters:	struct tty *tp		The tty on which the operation is
- *					being performed.
- *		struct termios *t	The termios structure into which to
- *					return the converted local flags.
- *
- * Returns:	void			(implicit: *t, modified)
- */
+  
+                    
+  
+                                                                        
+                                                         
+                                                               
+  
+                                                                
+                       
+                                                         
+                                        
+  
+                                           
+   
 static void
 ttcompatsetlflags(struct tty *tp, struct termios *t)
 {
@@ -787,14 +787,14 @@ ttcompatsetlflags(struct tty *tp, struct termios *t)
 	lflag &= ~(TOSTOP | FLUSHO | PENDIN | NOFLSH);
 	lflag |= flags & (TOSTOP | FLUSHO | PENDIN | NOFLSH);
 
-	/*
-	 * The next if-else statement is copied from above so don't bother
-	 * checking it separately.  We could avoid fiddlling with the
-	 * character size if the mode is already RAW or if neither the
-	 * LITOUT bit or the PASS8 bit is being changed, but the delta of
-	 * the change is not available here and skipping the RAW case would
-	 * make the code different from above.
-	 */
+	  
+                                                                   
+                                                              
+                                                               
+                                                                  
+                                                                    
+                                       
+    
 	cflag &= ~(CSIZE | PARENB);
 	if (flags & (RAW | LITOUT | PASS8)) {
 		cflag |= CS8;

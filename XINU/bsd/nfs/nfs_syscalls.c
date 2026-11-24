@@ -67,12 +67,12 @@
 
 #include <nfs/nfs_conf.h>
 
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -82,7 +82,7 @@
 #include <sys/stat.h>
 #include <sys/vnode_internal.h>
 #include <sys/mount_internal.h>
-#include <sys/proc_internal.h> /* for fdflags */
+#include <sys/proc_internal.h>                  
 #include <sys/kauth.h>
 #include <sys/sysctl.h>
 #include <sys/ubc.h>
@@ -122,7 +122,7 @@
 #include <security/mac_framework.h>
 #endif
 
-kern_return_t   thread_terminate(thread_t); /* XXX */
+kern_return_t   thread_terminate(thread_t);          
 
 #if CONFIG_NFS_SERVER
 
@@ -135,7 +135,7 @@ static int nfsrv_require_resv_port = 0;
 static time_t  nfsrv_idlesock_timer_on = 0;
 static int nfsrv_sock_tcp_cnt = 0;
 #define NFSD_MIN_IDLE_TIMEOUT 30
-static int nfsrv_sock_idle_timeout = 3600; /* One hour */
+static int nfsrv_sock_idle_timeout = 3600;               
 
 int     nfssvc_export(user_addr_t argp);
 int     nfssvc_nfsd(void);
@@ -144,15 +144,15 @@ void    nfsrv_zapsock(struct nfsrv_sock *);
 void    nfsrv_slpderef(struct nfsrv_sock *);
 void    nfsrv_slpfree(struct nfsrv_sock *);
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
 #if CONFIG_NFS
-/*
- * sysctl stuff
- */
+  
+               
+   
 SYSCTL_DECL(_vfs_generic);
 SYSCTL_NODE(_vfs_generic, OID_AUTO, nfs, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "nfs hinge");
-#endif /* CONFIG_NFS */
+#endif                 
 
 #if CONFIG_NFS_CLIENT
 SYSCTL_NODE(_vfs_generic_nfs, OID_AUTO, client, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "nfs client hinge");
@@ -182,7 +182,7 @@ SYSCTL_INT(_vfs_generic_nfs_client, OID_AUTO, root_steals_gss_context, CTLFLAG_R
 #if CONFIG_NFS4
 SYSCTL_STRING(_vfs_generic_nfs_client, OID_AUTO, default_nfs4domain, CTLFLAG_RW | CTLFLAG_LOCKED, nfs4_default_domain, sizeof(nfs4_default_domain), "");
 #endif
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        
 
 #if CONFIG_NFS_SERVER
 SYSCTL_NODE(_vfs_generic_nfs, OID_AUTO, server, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "nfs server hinge");
@@ -208,7 +208,7 @@ SYSCTL_INT(_vfs_generic_nfs_server, OID_AUTO, upcall_queue_limit, CTLFLAG_RW | C
 SYSCTL_INT(_vfs_generic_nfs_server, OID_AUTO, upcall_queue_max_seen, CTLFLAG_RW | CTLFLAG_LOCKED, &nfsrv_uc_queue_max_seen, 0, "");
 SYSCTL_INT(_vfs_generic_nfs_server, OID_AUTO, upcall_queue_count, CTLFLAG_RD | CTLFLAG_LOCKED, __DECONST(int *, &nfsrv_uc_queue_count), 0, "");
 #endif
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
 #if CONFIG_NFS_CLIENT && CONFIG_NFS4
 static int
@@ -257,7 +257,7 @@ nfsclnt_testidmap(proc_t p, user_addr_t argp)
 	int error, coerror;
 	size_t len = sizeof(mapid.ntm_name);
 
-	/* Let root make this call. */
+	                              
 	error = proc_suser(p);
 	if (error) {
 		return error;
@@ -290,12 +290,12 @@ nfsclnt_testidmap(proc_t p, user_addr_t argp)
 
 	return error ? error : coerror;
 }
-#endif /* CONFIG_NFS_CLIENT && CONFIG_NFS4 */
+#endif                                       
 
 #if !CONFIG_NFS_CLIENT
 #define __no_nfs_client_unused      __unused
 #else
-#define __no_nfs_client_unused      /* nothing */
+#define __no_nfs_client_unused                   
 #endif
 
 int
@@ -329,31 +329,31 @@ nfsclnt(
 	return error;
 #else
 	return ENOSYS;
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        
 }
 
 #if CONFIG_NFS_CLIENT
 
-/*
- * Asynchronous I/O threads for client NFS.
- * They do read-ahead and write-behind operations on the block I/O cache.
- *
- * The pool of up to nfsiod_thread_max threads is launched on demand and exit
- * when unused for a while.  There are as many nfsiod structs as there are
- * nfsiod threads; however there's no strict tie between a thread and a struct.
- * Each thread puts an nfsiod on the free list and sleeps on it.  When it wakes
- * up, it removes the next struct nfsiod from the queue and services it.  Then
- * it will put the struct at the head of free list and sleep on it.
- * Async requests will pull the next struct nfsiod from the head of the free list,
- * put it on the work queue, and wake whatever thread is waiting on that struct.
- */
+  
+                                           
+                                                                         
+  
+                                                                             
+                                                                          
+                                                                               
+                                                                               
+                                                                              
+                                                                   
+                                                                                  
+                                                                                
+   
 
-/*
- * nfsiod thread exit routine
- *
- * Must be called with nfsiod_mutex held so that the
- * decision to terminate is atomic with the termination.
- */
+  
+                             
+  
+                                                    
+                                                        
+   
 void
 nfsiod_terminate(struct nfsiod *niod)
 {
@@ -365,10 +365,10 @@ nfsiod_terminate(struct nfsiod *niod)
 		printf("nfsiod: terminating without niod\n");
 	}
 	thread_terminate(current_thread());
-	/*NOTREACHED*/
+	              
 }
 
-/* nfsiod thread startup routine */
+                                   
 void
 nfsiod_thread(void)
 {
@@ -382,27 +382,27 @@ nfsiod_thread(void)
 		wakeup(current_thread());
 		lck_mtx_unlock(&nfsiod_mutex);
 		thread_terminate(current_thread());
-		/*NOTREACHED*/
+		              
 	}
 	bzero(niod, sizeof(*niod));
 	lck_mtx_lock(&nfsiod_mutex);
 	TAILQ_INSERT_HEAD(&nfsiodfree, niod, niod_link);
 	wakeup(current_thread());
 	error = msleep0(niod, &nfsiod_mutex, PWAIT | PDROP, "nfsiod", NFS_ASYNCTHREADMAXIDLE * hz, nfsiod_continue);
-	/* shouldn't return... so we have an error */
-	/* remove an old nfsiod struct and terminate */
+	                                             
+	                                               
 	lck_mtx_lock(&nfsiod_mutex);
 	if ((niod = TAILQ_LAST(&nfsiodfree, nfsiodlist))) {
 		TAILQ_REMOVE(&nfsiodfree, niod, niod_link);
 	}
 	nfsiod_terminate(niod);
-	/*NOTREACHED*/
+	              
 }
 
-/*
- * Start up another nfsiod thread.
- * (unless we're already maxed out and there are nfsiods running)
- */
+  
+                                  
+                                                                 
+   
 int
 nfsiod_start(void)
 {
@@ -418,17 +418,17 @@ nfsiod_start(void)
 		lck_mtx_unlock(&nfsiod_mutex);
 		return EBUSY;
 	}
-	/* wait for the thread to complete startup */
+	                                             
 	msleep(thd, &nfsiod_mutex, PWAIT | PDROP, "nfsiodw", NULL);
 	thread_deallocate(thd);
 	return 0;
 }
 
-/*
- * Continuation for Asynchronous I/O threads for NFS client.
- *
- * Grab an nfsiod struct to work on, do some work, then drop it
- */
+  
+                                                            
+  
+                                                               
+   
 int
 nfsiod_continue(int error)
 {
@@ -441,13 +441,13 @@ nfsiod_continue(int error)
 	lck_mtx_lock(&nfsiod_mutex);
 	niod = TAILQ_FIRST(&nfsiodwork);
 	if (!niod) {
-		/* there's no work queued up */
-		/* remove an old nfsiod struct and terminate */
+		                               
+		                                               
 		if ((niod = TAILQ_LAST(&nfsiodfree, nfsiodlist))) {
 			TAILQ_REMOVE(&nfsiodfree, niod, niod_link);
 		}
 		nfsiod_terminate(niod);
-		/*NOTREACHED*/
+		              
 	}
 	TAILQ_REMOVE(&nfsiodwork, niod, niod_link);
 
@@ -458,20 +458,20 @@ worktodo:
 			break;
 		}
 
-		/*
-		 * Service this mount's async I/O queue.
-		 *
-		 * In order to ensure some level of fairness between mounts,
-		 * we grab all the work up front before processing it so any
-		 * new work that arrives will be serviced on a subsequent
-		 * iteration - and we have a chance to see if other work needs
-		 * to be done (e.g. the delayed write queue needs to be pushed
-		 * or other mounts are waiting for an nfsiod).
-		 */
-		/* grab the current contents of the queue */
+		  
+                                          
+    
+                                                              
+                                                              
+                                                           
+                                                                
+                                                                
+                                                
+     
+		                                            
 		TAILQ_INIT(&iodq);
 		TAILQ_CONCAT(&iodq, &nmp->nm_iodq, r_achain);
-		/* Mark each iod request as being managed by an iod */
+		                                                      
 		TAILQ_FOREACH(req, &iodq, r_achain) {
 			lck_mtx_lock(&req->r_mtx);
 			assert(!(req->r_flags & R_IOD));
@@ -480,21 +480,21 @@ worktodo:
 		}
 		lck_mtx_unlock(&nfsiod_mutex);
 
-		/* process the queue */
+		                       
 		TAILQ_FOREACH_SAFE(req, &iodq, r_achain, treq) {
 			TAILQ_REMOVE(&iodq, req, r_achain);
 			req->r_achain.tqe_next = NFSREQNOLIST;
 			req->r_callback.rcb_func(req);
 		}
 
-		/* now check if there's more/other work to be done */
+		                                                     
 		lck_mtx_lock(&nfsiod_mutex);
 		morework = !TAILQ_EMPTY(&nmp->nm_iodq);
 		if (!morework || !TAILQ_EMPTY(&nfsiodmounts)) {
-			/*
-			 * we're going to stop working on this mount but if the
-			 * mount still needs more work so queue it up
-			 */
+			  
+                                                          
+                                                
+      
 			if (morework && nmp->nm_iodlink.tqe_next == NFSNOLIST) {
 				TAILQ_INSERT_TAIL(&nfsiodmounts, nmp, nm_iodlink);
 			}
@@ -503,7 +503,7 @@ worktodo:
 		}
 	}
 
-	/* loop if there's still a mount to work on */
+	                                              
 	if (!niod->niod_nmp && !TAILQ_EMPTY(&nfsiodmounts)) {
 		niod->niod_nmp = TAILQ_FIRST(&nfsiodmounts);
 		TAILQ_REMOVE(&nfsiodmounts, niod->niod_nmp, nm_iodlink);
@@ -513,34 +513,34 @@ worktodo:
 		goto worktodo;
 	}
 
-	/* queue ourselves back up - if there aren't too many threads running */
+	                                                                        
 	if (nfsiod_thread_count <= NFSIOD_MAX) {
 		TAILQ_INSERT_HEAD(&nfsiodfree, niod, niod_link);
 		error = msleep0(niod, &nfsiod_mutex, PWAIT | PDROP, "nfsiod", NFS_ASYNCTHREADMAXIDLE * hz, nfsiod_continue);
-		/* shouldn't return... so we have an error */
-		/* remove an old nfsiod struct and terminate */
+		                                             
+		                                               
 		lck_mtx_lock(&nfsiod_mutex);
 		if ((niod = TAILQ_LAST(&nfsiodfree, nfsiodlist))) {
 			TAILQ_REMOVE(&nfsiodfree, niod, niod_link);
 		}
 	}
 	nfsiod_terminate(niod);
-	/*NOTREACHED*/
+	              
 	return 0;
 }
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        
 
 #if !CONFIG_NFS_SERVER
 #define __no_nfs_server_unused      __unused
 #else
-#define __no_nfs_server_unused      /* nothing */
+#define __no_nfs_server_unused                   
 #endif
 
-/*
- * NFS server system calls
- * getfh() lives here too, but maybe should move to kern/vfs_syscalls.c
- */
+  
+                          
+                                                                       
+   
 
 #if CONFIG_NFS_SERVER
 static struct nfs_exportfs *
@@ -560,9 +560,9 @@ nfsrv_find_exportfs(const char *ptr)
 	return nxfs;
 }
 
-/*
- * Get file handle system call
- */
+  
+                              
+   
 int
 getfh(
 	proc_t p __no_nfs_server_unused,
@@ -578,9 +578,9 @@ getfh(
 	struct nfs_exportfs *nxfs;
 	struct nfs_export *nx;
 
-	/*
-	 * Must be super user
-	 */
+	  
+                      
+    
 	error = proc_suser(p);
 	if (error) {
 		return error;
@@ -593,7 +593,7 @@ getfh(
 	if (error) {
 		return error;
 	}
-	/* limit fh size to length specified (or v3 size by default) */
+	                                                               
 	if ((fhlen != NFSV2_MAX_FH_SIZE) && (fhlen != NFSV3_MAX_FH_SIZE)) {
 		fhlen = NFSV3_MAX_FH_SIZE;
 	}
@@ -613,14 +613,14 @@ getfh(
 
 	vp = nd.ni_vp;
 
-	// find exportfs that matches f_mntonname
+	                                         
 	lck_rw_lock_shared(&nfsrv_export_rwlock);
 	ptr = vnode_mount(vp)->mnt_vfsstat.f_mntonname;
 	if ((nxfs = nfsrv_find_exportfs(ptr)) == NULL) {
-		/*
-		 * The f_mntonname might be a firmlink path.  Resolve
-		 * it into a physical path and try again.
-		 */
+		  
+                                                       
+                                           
+     
 		int pathbuflen = MAXPATHLEN;
 		vnode_t rvp;
 
@@ -641,14 +641,14 @@ getfh(
 		error = EINVAL;
 		goto out;
 	}
-	// find export that best matches remainder of path
+	                                                  
 	ptr = path + strlen(nxfs->nxfs_path);
 	while (*ptr && (*ptr == '/')) {
 		ptr++;
 	}
 	LIST_FOREACH(nx, &nxfs->nxfs_exports, nx_next) {
 		size_t len = strlen(nx->nx_path);
-		if (len == 0) { // we've hit the export entry for the root directory
+		if (len == 0) {                                                     
 			break;
 		}
 		if (!strncmp(nx->nx_path, ptr, len)) {
@@ -681,26 +681,26 @@ out:
 	if (error) {
 		return error;
 	}
-	/*
-	 * At first blush, this may appear to leak a kernel stack
-	 * address, but the copyout() never reaches &nfh.nfh_fhp
-	 * (sizeof(fhandle_t) < sizeof(nfh)).
-	 */
+	  
+                                                          
+                                                         
+                                      
+    
 	error = copyout((caddr_t)&nfh, uap->fhp, sizeof(fhandle_t));
 	return error;
 }
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
 #if CONFIG_NFS_SERVER
 extern const struct fileops vnops;
 
-/*
- * syscall for the rpc.lockd to use to translate a NFS file handle into
- * an open descriptor.
- *
- * warning: do not remove the suser() call or this becomes one giant
- * security hole.
- */
+  
+                                                                       
+                      
+  
+                                                                    
+                 
+   
 int
 fhopen(proc_t p __no_nfs_server_unused,
     struct fhopen_args *uap __no_nfs_server_unused,
@@ -717,9 +717,9 @@ fhopen(proc_t p __no_nfs_server_unused,
 	vfs_context_t ctx = vfs_context_current();
 	kauth_action_t action;
 
-	/*
-	 * Must be super user
-	 */
+	  
+                      
+    
 	error = suser(vfs_context_ucred(ctx), 0);
 	if (error) {
 		return error;
@@ -730,7 +730,7 @@ fhopen(proc_t p __no_nfs_server_unused,
 	}
 
 	fmode = FFLAGS(uap->flags);
-	/* why not allow a non-read/write open for our lockd? */
+	                                                        
 	if (((fmode & (FREAD | FWRITE)) == 0) || (fmode & O_CREAT)) {
 		return EINVAL;
 	}
@@ -750,32 +750,32 @@ fhopen(proc_t p __no_nfs_server_unused,
 	nfh.nfh_fhp = (u_char*)&nfh.nfh_xh;
 
 	lck_rw_lock_shared(&nfsrv_export_rwlock);
-	/* now give me my vnode, it gets returned to me with a reference */
+	                                                                   
 	error = nfsrv_fhtovp(&nfh, NULL, &vp, &nx, &nxo);
 	lck_rw_done(&nfsrv_export_rwlock);
 	if (error) {
 		if (error == NFSERR_TRYLATER) {
-			error = EAGAIN; // XXX EBUSY? Or just leave as TRYLATER?
+			error = EAGAIN;                                         
 		}
 		return error;
 	}
 
-	/*
-	 * From now on we have to make sure not
-	 * to forget about the vnode.
-	 * Any error that causes an abort must vnode_put(vp).
-	 * Just set error = err and 'goto bad;'.
-	 */
+	  
+                                        
+                              
+                                                      
+                                         
+    
 
-	/*
-	 * from vn_open
-	 */
+	  
+                
+    
 	if (vnode_vtype(vp) == VSOCK) {
 		error = EOPNOTSUPP;
 		goto bad;
 	}
 
-	/* disallow write operations on directories */
+	                                              
 	if (vnode_isdir(vp) && (fmode & (FWRITE | O_TRUNC))) {
 		error = EISDIR;
 		goto bad;
@@ -787,7 +787,7 @@ fhopen(proc_t p __no_nfs_server_unused,
 	}
 #endif
 
-	/* compute action to be authorized */
+	                                     
 	action = 0;
 	if (fmode & FREAD) {
 		action |= KAUTH_VNODE_READ_DATA;
@@ -806,11 +806,11 @@ fhopen(proc_t p __no_nfs_server_unused,
 		goto bad;
 	}
 
-	/*
-	 * end of vn_open code
-	 */
+	  
+                       
+    
 
-	// starting here... error paths should call vn_close/vnode_put
+	                                                              
 	if ((error = falloc(p, &nfp, &indx, ctx)) != 0) {
 		vn_close(vp, fmode & FMASK, ctx);
 		goto bad;
@@ -821,7 +821,7 @@ fhopen(proc_t p __no_nfs_server_unused,
 	fp->fp_glob->fg_ops = &vnops;
 	fp->fp_glob->fg_data = (caddr_t)vp;
 
-	// XXX do we really need to support this with fhopen()?
+	                                                       
 	if (fmode & (O_EXLOCK | O_SHLOCK)) {
 		lf.l_whence = SEEK_SET;
 		lf.l_start = 0;
@@ -837,7 +837,7 @@ fhopen(proc_t p __no_nfs_server_unused,
 		}
 		if ((error = VNOP_ADVLOCK(vp, (caddr_t)fp->fp_glob, F_SETLK, &lf, type, ctx, NULL))) {
 			struct vfs_context context = *vfs_context_current();
-			/* Modify local copy (to not damage thread copy) */
+			                                                   
 			context.vc_ucred = fp->fp_glob->fg_cred;
 
 			vn_close(vp, fp->fp_glob->fg_flag, &context);
@@ -861,12 +861,12 @@ bad:
 	vnode_put(vp);
 	return error;
 }
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
 #if CONFIG_NFS_SERVER
-/*
- * NFS server pseudo system call
- */
+  
+                                
+   
 int
 nfssvc(proc_t p __no_nfs_server_unused,
     struct nfssvc_args *uap __no_nfs_server_unused,
@@ -879,9 +879,9 @@ nfssvc(proc_t p __no_nfs_server_unused,
 
 	AUDIT_ARG(cmd, uap->flag);
 
-	/*
-	 * Must be super user for most operations (export ops checked later).
-	 */
+	  
+                                                                      
+    
 	if ((uap->flag != NFSSVC_EXPORT) && ((error = proc_suser(p)))) {
 		return error;
 	}
@@ -892,7 +892,7 @@ nfssvc(proc_t p __no_nfs_server_unused,
 	}
 #endif
 
-	/* make sure NFS server data structures have been initialized */
+	                                                                
 	nfsrv_init();
 
 	if (uap->flag & NFSSVC_ADDSOCK) {
@@ -910,29 +910,29 @@ nfssvc(proc_t p __no_nfs_server_unused,
 		if (error) {
 			return error;
 		}
-		/* get the socket */
+		                    
 		error = file_socket(user_nfsdarg.sock, &so);
 		if (error) {
 			return error;
 		}
-		/* Get the client address for connected sockets. */
+		                                                   
 		if (user_nfsdarg.name == USER_ADDR_NULL || user_nfsdarg.namelen == 0) {
 			nam = NULL;
 		} else {
 			error = sockargs(&nam, user_nfsdarg.name, user_nfsdarg.namelen, MBUF_TYPE_SONAME);
 			if (error) {
-				/* drop the iocount file_socket() grabbed on the file descriptor */
+				                                                                   
 				file_drop(user_nfsdarg.sock);
 				return error;
 			}
 		}
-		/*
-		 * nfssvc_addsock() will grab a retain count on the socket
-		 * to keep the socket from being closed when nfsd closes its
-		 * file descriptor for it.
-		 */
+		  
+                                                            
+                                                              
+                            
+     
 		error = nfssvc_addsock(so, nam);
-		/* drop the iocount file_socket() grabbed on the file descriptor */
+		                                                                   
 		file_drop(user_nfsdarg.sock);
 	} else if (uap->flag & NFSSVC_NFSD) {
 		error = nfssvc_nfsd();
@@ -946,13 +946,13 @@ nfssvc(proc_t p __no_nfs_server_unused,
 	}
 	return error;
 }
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
 #if CONFIG_NFS_SERVER
 
-/*
- * Adds a socket to the list for servicing by nfsds.
- */
+  
+                                                    
+   
 int
 nfssvc_addsock(socket_t so, mbuf_t mynam)
 {
@@ -962,14 +962,14 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 	struct timeval timeo;
 	u_quad_t sbmaxsize;
 
-	/* make sure mbuf constants are set up */
+	                                         
 	if (!nfs_mbuf_mhlen) {
 		nfs_mbuf_init();
 	}
 
 	sock_gettype(so, &sodomain, &sotype, &soprotocol);
 
-	/* There should be only one UDP socket for each of IPv4 and IPv6 */
+	                                                                   
 	if ((sodomain == AF_INET) && (soprotocol == IPPROTO_UDP) && nfsrv_udpsock) {
 		mbuf_freem(mynam);
 		return EEXIST;
@@ -979,7 +979,7 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 		return EEXIST;
 	}
 
-	/* Set protocol options and reserve some space (for UDP). */
+	                                                            
 	if (sotype == SOCK_STREAM) {
 		error = nfsrv_check_exports_allow_address(mynam);
 		if (error) {
@@ -993,10 +993,10 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 		sock_setsockopt(so, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 	}
 
-	/* Calculate maximum supported socket buffers sizes */
+	                                                      
 	sbmaxsize = (u_quad_t)sb_max * MCLBYTES / (MSIZE + MCLBYTES);
 
-	/* Set socket buffer sizes for UDP/TCP */
+	                                         
 	sobufsize = min(sbmaxsize, (sotype == SOCK_DGRAM) ? NFS_UDPSOCKBUF : NFSRV_TCPSOCKBUF);
 	error |= sock_setsockopt(so, SOL_SOCKET, SO_SNDBUF, &sobufsize, sizeof(sobufsize));
 	error |= sock_setsockopt(so, SOL_SOCKET, SO_RCVBUF, &sobufsize, sizeof(sobufsize));
@@ -1007,11 +1007,11 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 	}
 	sock_nointerrupt(so, 0);
 
-	/*
-	 * Set socket send/receive timeouts.
-	 * Receive timeout shouldn't matter, but setting the send timeout
-	 * will make sure that an unresponsive client can't hang the server.
-	 */
+	  
+                                     
+                                                                  
+                                                                     
+    
 	timeo.tv_usec = 0;
 	timeo.tv_sec = 1;
 	error |= sock_setsockopt(so, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
@@ -1035,7 +1035,7 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 
 	if (soprotocol == IPPROTO_UDP) {
 		if (sodomain == AF_INET) {
-			/* There should be only one UDP/IPv4 socket */
+			                                              
 			if (nfsrv_udpsock) {
 				lck_mtx_unlock(&nfsd_mutex);
 				nfsrv_slpfree(slp);
@@ -1045,7 +1045,7 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 			nfsrv_udpsock = slp;
 		}
 		if (sodomain == AF_INET6) {
-			/* There should be only one UDP/IPv6 socket */
+			                                              
 			if (nfsrv_udp6sock) {
 				lck_mtx_unlock(&nfsd_mutex);
 				nfsrv_slpfree(slp);
@@ -1056,7 +1056,7 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 		}
 	}
 
-	/* add the socket to the list */
+	                                
 	first = TAILQ_EMPTY(&nfsrv_socklist);
 	TAILQ_INSERT_TAIL(&nfsrv_socklist, slp, ns_chain);
 	if (sotype == SOCK_STREAM) {
@@ -1067,12 +1067,12 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 		if (nfsrv_sock_idle_timeout && (nfsrv_sock_idle_timeout < NFSD_MIN_IDLE_TIMEOUT)) {
 			nfsrv_sock_idle_timeout = NFSD_MIN_IDLE_TIMEOUT;
 		}
-		/*
-		 * Possibly start or stop the idle timer. We only start the idle timer when
-		 * we have more than 2 * nfsd_thread_max connections. If the idle timer is
-		 * on then we may need to turn it off based on the nvsrv_sock_idle_timeout or
-		 * the number of connections.
-		 */
+		  
+                                                                             
+                                                                            
+                                                                               
+                               
+     
 		if ((nfsrv_sock_tcp_cnt > 2 * nfsd_thread_max) || nfsrv_idlesock_timer_on) {
 			if (nfsrv_sock_idle_timeout == 0 || nfsrv_sock_tcp_cnt <= 2 * nfsd_thread_max) {
 				if (nfsrv_idlesock_timer_on) {
@@ -1083,11 +1083,11 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 				struct nfsrv_sock *old_slp;
 				struct timeval now;
 				time_t time_to_wait = nfsrv_sock_idle_timeout;
-				/*
-				 * Get the oldest tcp socket and calculate the
-				 * earliest time for the next idle timer to fire
-				 * based on the possibly updated nfsrv_sock_idle_timeout
-				 */
+				  
+                                                  
+                                                    
+                                                            
+       
 				TAILQ_FOREACH(old_slp, &nfsrv_socklist, ns_chain) {
 					if (old_slp->ns_sotype == SOCK_STREAM) {
 						microuptime(&now);
@@ -1098,15 +1098,15 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 						break;
 					}
 				}
-				/*
-				 * If we have a timer scheduled, but if its going to fire too late,
-				 * turn it off.
-				 */
+				  
+                                                                       
+                   
+       
 				if (nfsrv_idlesock_timer_on > now.tv_sec + time_to_wait) {
 					thread_call_cancel(nfsrv_idlesock_timer_call);
 					nfsrv_idlesock_timer_on = 0;
 				}
-				/* Schedule the idle thread if it isn't already */
+				                                                  
 				if (!nfsrv_idlesock_timer_on) {
 					nfs_interval_timer_start(nfsrv_idlesock_timer_call, time_to_wait * 1000);
 					nfsrv_idlesock_timer_on = now.tv_sec + time_to_wait;
@@ -1115,16 +1115,16 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 		}
 	}
 
-	sock_retain(so); /* grab a retain count on the socket */
+	sock_retain(so);                                        
 	slp->ns_so = so;
 	slp->ns_sotype = sotype;
 	slp->ns_nam = mynam;
 	slp->ns_sobufsize = sobufsize;
 
-	/* set up the socket up-call */
+	                               
 	nfsrv_uc_addsock(slp, first);
 
-	/* mark that the socket is not in the nfsrv_sockwg list */
+	                                                          
 	slp->ns_wgq.tqe_next = SLPNOLIST;
 
 	slp->ns_flag = SLP_VALID | SLP_NEEDQ;
@@ -1135,41 +1135,41 @@ nfssvc_addsock(socket_t so, mbuf_t mynam)
 	return 0;
 }
 
-/*
- * nfssvc_nfsd()
- *
- * nfsd theory of operation:
- *
- * The first nfsd thread stays in user mode accepting new TCP connections
- * which are then added via the "addsock" call.  The rest of the nfsd threads
- * simply call into the kernel and remain there in a loop handling NFS
- * requests until killed by a signal.
- *
- * There's a list of nfsd threads (nfsd_head).
- * There's an nfsd queue that contains only those nfsds that are
- *   waiting for work to do (nfsd_queue).
- *
- * There's a list of all NFS sockets (nfsrv_socklist) and two queues for
- *   managing the work on the sockets:
- *   nfsrv_sockwait - sockets w/new data waiting to be worked on
- *   nfsrv_sockwork - sockets being worked on which may have more work to do
- *   nfsrv_sockwg -- sockets which have pending write gather data
- * When a socket receives data, if it is not currently queued, it
- *   will be placed at the end of the "wait" queue.
- * Whenever a socket needs servicing we make sure it is queued and
- *   wake up a waiting nfsd (if there is one).
- *
- * nfsds will service at most 8 requests from the same socket before
- *   defecting to work on another socket.
- * nfsds will defect immediately if there are any sockets in the "wait" queue
- * nfsds looking for a socket to work on check the "wait" queue first and
- *   then check the "work" queue.
- * When an nfsd starts working on a socket, it removes it from the head of
- *   the queue it's currently on and moves it to the end of the "work" queue.
- * When nfsds are checking the queues for work, any sockets found not to
- *   have any work are simply dropped from the queue.
- *
- */
+  
+                
+  
+                            
+  
+                                                                         
+                                                                             
+                                                                      
+                                     
+  
+                                              
+                                                                
+                                         
+  
+                                                                        
+                                      
+                                                                
+                                                                            
+                                                                 
+                                                                 
+                                                   
+                                                                  
+                                              
+  
+                                                                    
+                                         
+                                                                             
+                                                                         
+                                 
+                                                                          
+                                                                             
+                                                                        
+                                                     
+  
+   
 int
 nfssvc_nfsd(void)
 {
@@ -1196,39 +1196,39 @@ nfssvc_nfsd(void)
 	bzero(nfsd, sizeof(struct nfsd));
 	lck_mtx_lock(&nfsd_mutex);
 	if (nfsd_thread_count++ == 0) {
-		nfsrv_initcache();              /* Init the server request cache */
+		nfsrv_initcache();                                                 
 	}
 	TAILQ_INSERT_TAIL(&nfsd_head, nfsd, nfsd_chain);
 	lck_mtx_unlock(&nfsd_mutex);
 
 	context.vc_thread = current_thread();
 
-	/* Set time out so that nfsd threads can wake up a see if they are still needed. */
+	                                                                                   
 	to.tv_sec = 5;
 	to.tv_nsec = 0;
 
-	/*
-	 * Loop getting rpc requests until SIGKILL.
-	 */
+	  
+                                            
+    
 	for (;;) {
 		if (nfsd_thread_max <= 0) {
-			/* NFS server shutting down, get out ASAP */
+			                                            
 			error = EINTR;
 			slp = nfsd->nfsd_slp;
 		} else if (nfsd->nfsd_flag & NFSD_REQINPROG) {
-			/* already have some work to do */
+			                                  
 			error = 0;
 			slp = nfsd->nfsd_slp;
 		} else {
-			/* need to find work to do */
+			                             
 			error = 0;
 			lck_mtx_lock(&nfsd_mutex);
 			while (!nfsd->nfsd_slp && TAILQ_EMPTY(&nfsrv_sockwait) && TAILQ_EMPTY(&nfsrv_sockwork)) {
 				if (nfsd_thread_count > nfsd_thread_max) {
-					/*
-					 * If we have no socket and there are more
-					 * nfsd threads than configured, let's exit.
-					 */
+					  
+                                               
+                                                 
+        
 					error = 0;
 					goto done;
 				}
@@ -1248,44 +1248,44 @@ nfssvc_nfsd(void)
 			}
 			slp = nfsd->nfsd_slp;
 			if (!slp && !TAILQ_EMPTY(&nfsrv_sockwait)) {
-				/* look for a socket to work on in the wait queue */
+				                                                    
 				while ((slp = TAILQ_FIRST(&nfsrv_sockwait))) {
 					lck_rw_lock_exclusive(&slp->ns_rwlock);
-					/* remove from the head of the queue */
+					                                       
 					TAILQ_REMOVE(&nfsrv_sockwait, slp, ns_svcq);
 					slp->ns_flag &= ~SLP_WAITQ;
 					if ((slp->ns_flag & SLP_VALID) && (slp->ns_flag & SLP_WORKTODO)) {
 						break;
 					}
-					/* nothing to do, so skip this socket */
+					                                        
 					lck_rw_done(&slp->ns_rwlock);
 				}
 			}
 			if (!slp && !TAILQ_EMPTY(&nfsrv_sockwork)) {
-				/* look for a socket to work on in the work queue */
+				                                                    
 				while ((slp = TAILQ_FIRST(&nfsrv_sockwork))) {
 					lck_rw_lock_exclusive(&slp->ns_rwlock);
-					/* remove from the head of the queue */
+					                                       
 					TAILQ_REMOVE(&nfsrv_sockwork, slp, ns_svcq);
 					slp->ns_flag &= ~SLP_WORKQ;
 					if ((slp->ns_flag & SLP_VALID) && (slp->ns_flag & SLP_WORKTODO)) {
 						break;
 					}
-					/* nothing to do, so skip this socket */
+					                                        
 					lck_rw_done(&slp->ns_rwlock);
 				}
 			}
 			if (!nfsd->nfsd_slp && slp) {
-				/* we found a socket to work on, grab a reference */
+				                                                    
 				slp->ns_sref++;
 				microuptime(&now);
 				slp->ns_timestamp = now.tv_sec;
-				/* We keep the socket list in least recently used order for reaping idle sockets */
+				                                                                                   
 				TAILQ_REMOVE(&nfsrv_socklist, slp, ns_chain);
 				TAILQ_INSERT_TAIL(&nfsrv_socklist, slp, ns_chain);
 				nfsd->nfsd_slp = slp;
 				opcnt = 0;
-				/* and put it at the back of the work queue */
+				                                              
 				TAILQ_INSERT_TAIL(&nfsrv_sockwork, slp, ns_svcq);
 				slp->ns_flag |= SLP_WORKQ;
 				lck_rw_done(&slp->ns_rwlock);
@@ -1304,9 +1304,9 @@ nfssvc_nfsd(void)
 					nfsrv_zapsock(slp);
 				}
 				error = nfsrv_dorec(slp, nfsd, &nd);
-				if (error == EINVAL) {  // RPCSEC_GSS drop
+				if (error == EINVAL) {                    
 					if (slp->ns_sotype == SOCK_STREAM) {
-						nfsrv_zapsock(slp); // drop connection
+						nfsrv_zapsock(slp);                   
 					}
 				}
 				writes_todo = 0;
@@ -1359,7 +1359,7 @@ nfssvc_nfsd(void)
 			cacherep = nfsrv_getcache(nd, slp, &mrep);
 
 			if (nfsrv_require_resv_port) {
-				/* Check if source port is a reserved port */
+				                                             
 				in_port_t port = 0;
 				struct sockaddr *saddr = mbuf_data(nd->nd_nam);
 
@@ -1376,10 +1376,10 @@ nfssvc_nfsd(void)
 			}
 		}
 
-		/*
-		 * Loop to get all the write RPC replies that have been
-		 * gathered together.
-		 */
+		  
+                                                         
+                       
+     
 		do {
 			switch (cacherep) {
 			case RC_DOIT:
@@ -1397,11 +1397,11 @@ nfssvc_nfsd(void)
 				}
 				lck_rw_done(&nfsrv_export_rwlock);
 				if (mrep == NULL) {
-					/*
-					 * If this is a stream socket and we are not going
-					 * to send a reply we better close the connection
-					 * so the client doesn't hang.
-					 */
+					  
+                                                       
+                                                      
+                                   
+        
 					if (error && slp->ns_sotype == SOCK_STREAM) {
 						lck_rw_lock_exclusive(&slp->ns_rwlock);
 						nfsrv_zapsock(slp);
@@ -1425,10 +1425,10 @@ nfssvc_nfsd(void)
 				OS_FALLTHROUGH;
 
 			case RC_REPLY:
-				if (nd->nd_gss_mb != NULL) { // It's RPCSEC_GSS
-					/*
-					 * Need to checksum or encrypt the reply
-					 */
+				if (nd->nd_gss_mb != NULL) {                   
+					  
+                                             
+        
 					error = nfs_gss_svc_protect_reply(nd, mrep);
 					if (error) {
 						mbuf_freem(mrep);
@@ -1436,9 +1436,9 @@ nfssvc_nfsd(void)
 					}
 				}
 
-				/*
-				 * Get the total size of the reply
-				 */
+				  
+                                      
+       
 				m = mrep;
 				siz = 0;
 				while (m) {
@@ -1455,10 +1455,10 @@ nfssvc_nfsd(void)
 				if (error) {
 					panic("nfsd setrcvif failed: %d", error);
 				}
-				/*
-				 * For stream protocols, prepend a Sun RPC
-				 * Record Mark.
-				 */
+				  
+                                              
+                   
+       
 				if (slp->ns_sotype == SOCK_STREAM) {
 					error = mbuf_prepend(&m, NFSX_UNSIGNED, MBUF_WAITOK);
 					if (!error) {
@@ -1520,10 +1520,10 @@ nfssvc_nfsd(void)
 				NFS_ZFREE(nfsrv_descript_zone, nd);
 			}
 
-			/*
-			 * Check to see if there are outstanding writes that
-			 * need to be serviced.
-			 */
+			  
+                                                       
+                          
+      
 			writes_todo = 0;
 			if (slp->ns_wgtime) {
 				microuptime(&now);
@@ -1539,15 +1539,15 @@ nfssvc_nfsd(void)
 		if (TAILQ_EMPTY(&nfsrv_sockwait) && (opcnt < 8)) {
 			lck_rw_lock_exclusive(&slp->ns_rwlock);
 			error = nfsrv_dorec(slp, nfsd, &nd);
-			if (error == EINVAL) {  // RPCSEC_GSS drop
+			if (error == EINVAL) {                    
 				if (slp->ns_sotype == SOCK_STREAM) {
-					nfsrv_zapsock(slp); // drop connection
+					nfsrv_zapsock(slp);                   
 				}
 			}
 			lck_rw_done(&slp->ns_rwlock);
 		}
 		if (!nd) {
-			/* drop our reference on the socket */
+			                                      
 			nfsd->nfsd_flag &= ~NFSD_REQINPROG;
 			nfsd->nfsd_slp = NULL;
 			nfsrv_slpderef(slp);
@@ -1573,14 +1573,14 @@ nfssvc_export(user_addr_t argp)
 
 	is_64bit = IS_64BIT_PROCESS(vfs_context_proc(ctx));
 
-	/* copy in pointers to path and export args */
+	                                              
 	if (is_64bit) {
 		error = copyin(argp, (caddr_t)&unxa, sizeof(unxa));
 	} else {
 		struct nfs_export_args tnxa;
 		error = copyin(argp, (caddr_t)&tnxa, sizeof(tnxa));
 		if (error == 0) {
-			/* munge into LP64 version of nfs_export_args structure */
+			                                                          
 			unxa.nxa_fsid = tnxa.nxa_fsid;
 			unxa.nxa_expid = tnxa.nxa_expid;
 			unxa.nxa_fspath = CAST_USER_ADDR_T(tnxa.nxa_fspath);
@@ -1599,13 +1599,13 @@ nfssvc_export(user_addr_t argp)
 	return error;
 }
 
-/*
- * Shut down a socket associated with an nfsrv_sock structure.
- * Should be called with the send lock set, if required.
- * The trick here is to increment the sref at the start, so that the nfsds
- * will stop using it and clear ns_flag at the end so that it will not be
- * reassigned during cleanup.
- */
+  
+                                                              
+                                                        
+                                                                          
+                                                                         
+                             
+   
 void
 nfsrv_zapsock(struct nfsrv_sock *slp)
 {
@@ -1624,15 +1624,15 @@ nfsrv_zapsock(struct nfsrv_sock *slp)
 	sock_setupcall(so, NULL, NULL);
 	sock_shutdown(so, SHUT_RDWR);
 
-	/*
-	 * Remove from the up-call queue
-	 */
+	  
+                                 
+    
 	nfsrv_uc_dequeue(slp);
 }
 
-/*
- * cleanup and release a server socket structure.
- */
+  
+                                                 
+   
 void
 nfsrv_slpfree(struct nfsrv_sock *slp)
 {
@@ -1682,10 +1682,10 @@ nfsrv_slpfree(struct nfsrv_sock *slp)
 	FREE(slp, M_NFSSVC);
 }
 
-/*
- * Derefence a server socket structure. If it has no more references and
- * is no longer valid, you can throw it away.
- */
+  
+                                                                        
+                                             
+   
 static void
 nfsrv_slpderef_locked(struct nfsrv_sock *slp)
 {
@@ -1694,7 +1694,7 @@ nfsrv_slpderef_locked(struct nfsrv_sock *slp)
 
 	if (slp->ns_sref || (slp->ns_flag & SLP_VALID)) {
 		if ((slp->ns_flag & SLP_QUEUED) && !(slp->ns_flag & SLP_WORKTODO)) {
-			/* remove socket from queue since there's no work */
+			                                                    
 			if (slp->ns_flag & SLP_WAITQ) {
 				TAILQ_REMOVE(&nfsrv_sockwait, slp, ns_svcq);
 			} else {
@@ -1706,7 +1706,7 @@ nfsrv_slpderef_locked(struct nfsrv_sock *slp)
 		return;
 	}
 
-	/* This socket is no longer valid, so we'll get rid of it */
+	                                                            
 
 	if (slp->ns_flag & SLP_QUEUED) {
 		if (slp->ns_flag & SLP_WAITQ) {
@@ -1723,7 +1723,7 @@ nfsrv_slpderef_locked(struct nfsrv_sock *slp)
 		nfsrv_sock_tcp_cnt--;
 	}
 
-	/* now remove from the write gather socket list */
+	                                                  
 	if (slp->ns_wgq.tqe_next != SLPNOLIST) {
 		TAILQ_REMOVE(&nfsrv_sockwg, slp, ns_wgq);
 		slp->ns_wgq.tqe_next = SLPNOLIST;
@@ -1739,10 +1739,10 @@ nfsrv_slpderef(struct nfsrv_sock *slp)
 	lck_mtx_unlock(&nfsd_mutex);
 }
 
-/*
- * Check periodically for idle sockest if needed and
- * zap them.
- */
+  
+                                                    
+            
+   
 void
 nfsrv_idlesock_timer(__unused void *param0, __unused void *param1)
 {
@@ -1753,7 +1753,7 @@ nfsrv_idlesock_timer(__unused void *param0, __unused void *param1)
 	microuptime(&now);
 	lck_mtx_lock(&nfsd_mutex);
 
-	/* Turn off the timer if we're suppose to and get out */
+	                                                        
 	if (nfsrv_sock_idle_timeout < NFSD_MIN_IDLE_TIMEOUT) {
 		nfsrv_sock_idle_timeout = 0;
 	}
@@ -1765,18 +1765,18 @@ nfsrv_idlesock_timer(__unused void *param0, __unused void *param1)
 
 	TAILQ_FOREACH_SAFE(slp, &nfsrv_socklist, ns_chain, tslp) {
 		lck_rw_lock_exclusive(&slp->ns_rwlock);
-		/* Skip udp and referenced sockets */
+		                                     
 		if (slp->ns_sotype == SOCK_DGRAM || slp->ns_sref) {
 			lck_rw_done(&slp->ns_rwlock);
 			continue;
 		}
-		/*
-		 * If this is the first non-referenced socket that hasn't idle out,
-		 * use its time stamp to calculate the earlist time in the future
-		 * to start the next invocation of the timer. Since the nfsrv_socklist
-		 * is sorted oldest access to newest. Once we find the first one,
-		 * we're done and break out of the loop.
-		 */
+		  
+                                                                     
+                                                                   
+                                                                        
+                                                                   
+                                          
+     
 		if (((slp->ns_timestamp + nfsrv_sock_idle_timeout) > now.tv_sec) ||
 		    nfsrv_sock_tcp_cnt <= 2 * nfsd_thread_max) {
 			time_to_wait -= now.tv_sec - slp->ns_timestamp;
@@ -1786,26 +1786,26 @@ nfsrv_idlesock_timer(__unused void *param0, __unused void *param1)
 			lck_rw_done(&slp->ns_rwlock);
 			break;
 		}
-		/*
-		 * Bump the ref count. nfsrv_slpderef below will destroy
-		 * the socket, since nfsrv_zapsock has closed it.
-		 */
+		  
+                                                          
+                                                   
+     
 		slp->ns_sref++;
 		nfsrv_zapsock(slp);
 		lck_rw_done(&slp->ns_rwlock);
 		nfsrv_slpderef_locked(slp);
 	}
 
-	/* Start ourself back up */
+	                           
 	nfs_interval_timer_start(nfsrv_idlesock_timer_call, time_to_wait * 1000);
-	/* Remember when the next timer will fire for nfssvc_addsock. */
+	                                                                
 	nfsrv_idlesock_timer_on = now.tv_sec + time_to_wait;
 	lck_mtx_unlock(&nfsd_mutex);
 }
 
-/*
- * Clean up the data structures for the server.
- */
+  
+                                               
+   
 void
 nfsrv_cleanup(void)
 {
@@ -1829,16 +1829,16 @@ nfsrv_cleanup(void)
 	}
 #
 #if CONFIG_FSE
-	/*
-	 * Flush pending file write fsevents
-	 */
+	  
+                                     
+    
 	lck_mtx_lock(&nfsrv_fmod_mutex);
 	for (i = 0; i < NFSRVFMODHASHSZ; i++) {
 		for (fp = LIST_FIRST(&nfsrv_fmod_hashtbl[i]); fp; fp = nfp) {
-			/*
-			 * Fire off the content modified fsevent for each
-			 * entry, remove it from the list, and free it.
-			 */
+			  
+                                                    
+                                                  
+      
 			if (nfsrv_fsevents_enabled) {
 				fp->fm_context.vc_thread = current_thread();
 				add_fsevent(FSE_CONTENT_MODIFIED, &fp->fm_context,
@@ -1856,14 +1856,14 @@ nfsrv_cleanup(void)
 	lck_mtx_unlock(&nfsrv_fmod_mutex);
 #endif
 
-	nfsrv_uc_cleanup();     /* Stop nfs socket up-call threads */
+	nfsrv_uc_cleanup();                                          
 
-	nfs_gss_svc_cleanup();  /* Remove any RPCSEC_GSS contexts */
+	nfs_gss_svc_cleanup();                                      
 
-	nfsrv_cleancache();     /* And clear out server cache */
+	nfsrv_cleancache();                                     
 
 	nfsrv_udpsock = NULL;
 	nfsrv_udp6sock = NULL;
 }
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        

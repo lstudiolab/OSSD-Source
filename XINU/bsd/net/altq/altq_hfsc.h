@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_hfsc.h,v 1.8 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_hfsc.h,v 1.12 2003/12/05 05:40:46 kjc Exp $	*/
+                                                                
+                                                             
 
 /*
  * Copyright (c) 1997-1999 Carnegie Mellon University. All Rights Reserved.
@@ -65,4 +65,4 @@
 #include <net/altq/altq.h>
 #include <net/pktsched/pktsched_hfsc.h>
 
-#endif /* _NET_ALTQ_ALTQ_HFSC_H_ */
+#endif                             

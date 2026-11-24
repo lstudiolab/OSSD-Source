@@ -26,25 +26,25 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* Structure used in sigaltstack call. */
+                                         
 #ifndef _STRUCT_SIGALTSTACK
 
-#include <sys/cdefs.h> /* __DARWIN_UNIX03 */
+#include <sys/cdefs.h>                      
 
 #if __DARWIN_UNIX03
 #define _STRUCT_SIGALTSTACK     struct __darwin_sigaltstack
-#else /* !__DARWIN_UNIX03 */
+#else                       
 #define _STRUCT_SIGALTSTACK     struct sigaltstack
-#endif /* __DARWIN_UNIX03 */
+#endif                      
 
-#include <machine/types.h> /* __darwin_size_t */
+#include <machine/types.h>                      
 
 _STRUCT_SIGALTSTACK
 {
-	void            *ss_sp;         /* signal stack base */
-	__darwin_size_t ss_size;        /* signal stack length */
-	int             ss_flags;       /* SA_DISABLE and/or SA_ONSTACK */
+	void            *ss_sp;                                
+	__darwin_size_t ss_size;                                 
+	int             ss_flags;                                         
 };
-typedef _STRUCT_SIGALTSTACK     stack_t; /* [???] signal stack */
+typedef _STRUCT_SIGALTSTACK     stack_t;                         
 
-#endif /* _STRUCT_SIGALTSTACK */
+#endif                          

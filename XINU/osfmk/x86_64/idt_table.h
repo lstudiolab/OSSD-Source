@@ -159,7 +159,7 @@ INTERRUPT(0x7b)
 INTERRUPT(0x7c)
 INTERRUPT(0x7d)
 INTERRUPT(0x7e)
-USER_TRAP(0x7f, idt64_dtrace_ret) /* Required by dtrace "fasttrap" */
+USER_TRAP(0x7f, idt64_dtrace_ret)                                    
 
 USER_TRAP_SPC(0x80, idt64_unix_scall)
 USER_TRAP_SPC(0x81, idt64_mach_scall)
@@ -247,7 +247,7 @@ INTERRUPT(0xcd)
 INTERRUPT(0xce)
 INTERRUPT(0xcf)
 
-/* Local APIC interrupt vectors */
+                                  
 INTERRUPT(0xd0)
 INTERRUPT(0xd1)
 INTERRUPT(0xd2)

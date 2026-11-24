@@ -1,10 +1,10 @@
-//
-// Tests for
-//  bounded_ptr& operator++();
-//  bounded_ptr operator++(int);
-//  bounded_ptr& operator--();
-//  bounded_ptr operator--(int);
-//
+  
+            
+                              
+                                
+                              
+                                
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -25,7 +25,7 @@ tests()
 	std::array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
 	{
-		// Test pre-increment and pre-decrement
+		                                       
 		test_bounded_ptr<QualT> ptr(array.begin(), array.begin(), array.end());
 		_assert(&*ptr == &array[0]);
 
@@ -53,7 +53,7 @@ tests()
 		{
 			auto& ref = ++ptr;
 			_assert(&ref == &ptr);
-			// ptr is now one-past-last
+			                           
 		}
 		{
 			auto& ref = --ptr;
@@ -82,7 +82,7 @@ tests()
 		}
 	}
 	{
-		// Test post-increment and post-decrement
+		                                         
 		test_bounded_ptr<QualT> ptr(array.begin(), array.begin(), array.end());
 		_assert(&*ptr == &array[0]);
 

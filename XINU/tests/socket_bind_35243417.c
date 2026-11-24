@@ -1,4 +1,4 @@
-/* -*- Mode: c; tab-width: 8; indent-tabs-mode: 1; c-basic-offset: 8; -*- */
+                                                                            
 
 #include <darwintest.h>
 #include <poll.h>
@@ -57,7 +57,7 @@ alloc_and_bind_ports(in_port_t port_start, in_port_t port_end,
 		s6 = sockv6_open();
 		sockv6_set_v6only(s6);
 		if (sockv6_bind(s6, i) != 0) {
-			/* find the next available port */
+			                                  
 			goto loop_done;
 		}
 		s6_other = sockv6_open();
@@ -65,11 +65,11 @@ alloc_and_bind_ports(in_port_t port_start, in_port_t port_end,
 		T_WITH_ERRNO;
 		T_QUIET;
 		T_ASSERT_TRUE(ret != 0, "socket %d bind %d", s6_other, i);
-		/*
-		 * After bind fails, try binding to a different port.
-		 * For non-root user, this will panic without the fix for
-		 * <rdar://problem/35243417>.
-		 */
+		  
+                                                       
+                                                           
+                               
+     
 		if (sockv6_bind(s6_other, i + 1) == 0) {
 			bound_count++;
 			if (bound_count >= bind_attempts) {

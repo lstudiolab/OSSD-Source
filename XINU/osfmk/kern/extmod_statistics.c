@@ -36,36 +36,36 @@
 
 #include <uuid/uuid.h>
 
-/*
- * This code module adds statistics to track when
- * a userspace task is modified by another userspace
- * task. This can facilitate triage of crashes
- * and abberant behavior, which are not expected
- * to occur when the program is running in its
- * qualified environment.
- *
- * We assume the target task has a lifecycle lock
- * that will prevent it from exiting
- * (task_reference/task_reference_internal), which
- * should be called either explicitly, or implicitly
- * via MIG glue code (convert_port_to_task).
- *
- * Host-wide statistics don't asssume any locks are
- * held, and use atomic operations.
- *
- * If we can detect that the kernel proper is
- * performing these operations, don't count
- * it as an external modification. Some of the
- * external modification routines are called
- * by the kernel during thread setup, in which
- * case we rename the userspace entrypoint called
- * by the MIG demuxer to have a "_from_user" suffix.
- */
+  
+                                                 
+                                                    
+                                              
+                                                
+                                              
+                         
+  
+                                                 
+                                    
+                                                  
+                                                    
+                                            
+  
+                                                   
+                                   
+  
+                                             
+                                           
+                                              
+                                            
+                                              
+                                                 
+                                                    
+   
 
-/* externs for BSD kernel */
+                            
 extern void fslog_extmod_msgtracer(void *, void *);
 
-/* local routines */
+                    
 static void
 extmod_statistics_log(task_t current_task, task_t target);
 

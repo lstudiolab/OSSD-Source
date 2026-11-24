@@ -21,74 +21,74 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/*
-     File:       AvailabilityMacros.h
+  
+                                     
  
-     More Info:  See the SDK Compatibility Guide
+                                                
 
-     Contains:   Autoconfiguration of AVAILABLE_ macros for Mac OS X
+                                                                    
 
-                 This header enables a developer to specify build time
-                 constraints on what Mac OS X versions the resulting
-                 application will be run.  There are two bounds a developer
-                 can specify:
+                                                                      
+                                                                    
+                                                                           
+                             
                  
-                      MAC_OS_X_VERSION_MIN_REQUIRED
-                      MAC_OS_X_VERSION_MAX_ALLOWED
+                                                   
+                                                  
                       
-                The lower bound controls which calls to OS functions will 
-                be weak-importing (allowed to be unresolved at launch time).
-                The upper bound controls which OS functionality, if used,
-                will result in a compiler error because that functionality is
-                not available on on any OS is the specifed range.
+                                                                          
+                                                                            
+                                                                         
+                                                                             
+                                                                 
                 
-                For example, suppose an application is compiled with:
+                                                                     
                 
-                      MAC_OS_X_VERSION_MIN_REQUIRED = MAC_OS_X_VERSION_10_2
-                      MAC_OS_X_VERSION_MAX_ALLOWED  = MAC_OS_X_VERSION_10_3
+                                                                           
+                                                                           
                      
-                and an OS header contains:
+                                          
                 
-                     extern void funcA(void) AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER;
-                     extern void funcB(void) AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2;
-                     extern void funcC(void) AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3;
-                     extern void funcD(void) AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER;
-                     extern void funcE(void) AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER;
-                     extern void funcF(void) AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER;
-                     extern void funcG(void) AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER;
+                                                                                       
+                                                                                                                               
+                                                                                                                               
+                                                                                       
+                                                                                       
+                                                                                       
+                                                                                       
                      
-                     typedef long TypeA DEPRECATED_IN_MAC_OS_X_VERSION_10_0_AND_LATER;
-                     typedef long TypeB DEPRECATED_IN_MAC_OS_X_VERSION_10_1_AND_LATER;
-                     typedef long TypeC DEPRECATED_IN_MAC_OS_X_VERSION_10_2_AND_LATER;
-                     typedef long TypeD DEPRECATED_IN_MAC_OS_X_VERSION_10_3_AND_LATER;
-                     typedef long TypeE DEPRECATED_IN_MAC_OS_X_VERSION_10_4_AND_LATER;
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
 
-                Any application code which uses these declarations will get the following:
+                                                                                          
                 
-                                compile         link          run 
-                                -------         ------        -------
-                     funcA:     normal          normal        normal
-                     funcB:     warning         normal        normal
-                     funcC:     normal          normal        normal
-                     funcD:     normal          normal        normal
-                     funcE:     normal          normal        normal
-                     funcF:     normal          weak          on 10.3 normal, on 10.2 (&funcF == NULL)
-                     funcG:     error           error         n/a
-                     typeA:     warning
-                     typeB:     warning
-                     typeC:     warning
-                     typeD:     normal
-                     typeE:     normal
+                                                                  
+                                                                     
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                                                      
+                                                                 
+                                       
+                                       
+                                       
+                                      
+                                      
                   
   
-*/
+  
 #ifndef __AVAILABILITYMACROS__
 #define __AVAILABILITYMACROS__
 
 
-/*
- * Set up standard Mac OS X versions
- */
+  
+                                    
+   
 #define MAC_OS_X_VERSION_10_0         1000
 #define MAC_OS_X_VERSION_10_1         1010
 #define MAC_OS_X_VERSION_10_2         1020
@@ -111,10 +111,10 @@
 #define MAC_OS_X_VERSION_10_12_2    101202
 #define MAC_OS_X_VERSION_10_12_4    101204
 
-/* 
- * If min OS not specified, assume 10.4 for intel
- * Note: compiler driver may set _ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED_ based on MACOSX_DEPLOYMENT_TARGET environment variable
- */
+   
+                                                 
+                                                                                                                                   
+   
 #ifndef MAC_OS_X_VERSION_MIN_REQUIRED
     #ifdef __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
         #if (__i386__ || __x86_64__) && (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < MAC_OS_X_VERSION_10_4)
@@ -132,9 +132,9 @@
      #endif
 #endif
 
-/*
- * if max OS not specified, assume larger of (10.12.4, min)
- */
+  
+                                                           
+   
 #ifndef MAC_OS_X_VERSION_MAX_ALLOWED
     #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_12_4
         #define MAC_OS_X_VERSION_MAX_ALLOWED MAC_OS_X_VERSION_MIN_REQUIRED
@@ -143,9 +143,9 @@
     #endif
 #endif
 
-/*
- * Error on bad values
- */
+  
+                      
+   
 #if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_MIN_REQUIRED
     #error MAC_OS_X_VERSION_MAX_ALLOWED must be >= MAC_OS_X_VERSION_MIN_REQUIRED
 #endif
@@ -153,9 +153,9 @@
     #error MAC_OS_X_VERSION_MIN_REQUIRED must be >= MAC_OS_X_VERSION_10_0
 #endif
 
-/*
- * only certain compilers support __attribute__((weak_import))
- */
+  
+                                                              
+   
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1))) && (MAC_OS_X_VERSION_MIN_REQUIRED >= 1020)
     #define WEAK_IMPORT_ATTRIBUTE __attribute__((weak_import))
 #elif defined(__MWERKS__) && (__MWERKS__ >= 0x3205) && (MAC_OS_X_VERSION_MIN_REQUIRED >= 1020) && !defined(__INTEL__)
@@ -164,9 +164,9 @@
     #define WEAK_IMPORT_ATTRIBUTE
 #endif
 
-/*
- * only certain compilers support __attribute__((deprecated))
- */
+  
+                                                             
+   
 #if defined(__has_feature) && defined(__has_attribute)
     #if __has_attribute(deprecated)
         #define DEPRECATED_ATTRIBUTE        __attribute__((deprecated))
@@ -191,9 +191,9 @@
     #define DEPRECATED_MSG_ATTRIBUTE(s)
 #endif
 
-/*
- * only certain compilers support __attribute__((unavailable))
- */
+  
+                                                              
+   
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
     #define UNAVAILABLE_ATTRIBUTE __attribute__((unavailable))
 #else
@@ -201,26 +201,26 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
- * 
- * Used on functions introduced in Mac OS X 10.0 
- */
+  
+                                            
+   
+                                                 
+   
 #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED
- * 
- * Used on functions introduced in Mac OS X 10.0, 
- * and deprecated in Mac OS X 10.0
- */
+  
+                                                           
+   
+                                                  
+                                  
+   
 #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED    DEPRECATED_ATTRIBUTE
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_0_AND_LATER
- * 
- * Used on types deprecated in Mac OS X 10.0 
- */
+  
+                                                
+   
+                                             
+   
 #define DEPRECATED_IN_MAC_OS_X_VERSION_10_0_AND_LATER     DEPRECATED_ATTRIBUTE
 
 #ifndef __AVAILABILITY_MACROS_USES_AVAILABILITY
@@ -232,11 +232,11 @@
 	#endif
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.1 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_1, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_1
@@ -247,12 +247,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * and deprecated in Mac OS X 10.1
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_1
@@ -261,12 +261,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_1
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.1
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_1
@@ -275,11 +275,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_1    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_1_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.1
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_1_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_1
@@ -289,11 +289,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.2 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_2, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_2
@@ -304,12 +304,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * and deprecated in Mac OS X 10.2
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
@@ -318,12 +318,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.2
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
@@ -332,12 +332,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.2
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
@@ -346,11 +346,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_2    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_2_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.2
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_2_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
@@ -360,11 +360,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.3 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_3, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_3
@@ -375,12 +375,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * and deprecated in Mac OS X 10.3
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3
@@ -389,12 +389,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.3
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3
@@ -403,12 +403,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.3
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3
@@ -417,12 +417,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.3
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3
@@ -431,11 +431,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_3    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_3_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.3
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_3_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3
@@ -445,11 +445,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.4 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_4, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_4
@@ -460,12 +460,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * and deprecated in Mac OS X 10.4
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
@@ -474,12 +474,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.4
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
@@ -488,12 +488,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.4
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
@@ -502,12 +502,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.4
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
@@ -516,12 +516,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.4
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
@@ -530,11 +530,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_4    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_4_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.4
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_4_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
@@ -544,11 +544,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.5 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_5, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
@@ -559,12 +559,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * and deprecated in Mac OS X 10.5
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -573,12 +573,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.5
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -587,12 +587,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.5
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -601,12 +601,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.5
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -615,12 +615,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.5
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -629,12 +629,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.5
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -643,11 +643,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_5    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_5_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.5
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_5_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_5, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_5
@@ -657,11 +657,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.6 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_6
@@ -672,12 +672,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * and deprecated in Mac OS X 10.6
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -686,12 +686,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.6
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -700,12 +700,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.6
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -714,12 +714,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.6
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -728,12 +728,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.6
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -742,12 +742,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.6
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -756,12 +756,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.6
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -770,11 +770,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_6    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_6_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.6
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_6_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_6, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
@@ -784,11 +784,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.7 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_7
@@ -799,12 +799,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * and deprecated in Mac OS X 10.7
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -813,12 +813,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -827,12 +827,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -841,12 +841,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -855,12 +855,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -869,12 +869,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -883,12 +883,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -897,12 +897,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.7
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -911,11 +911,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_7    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.7
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_7, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
@@ -925,11 +925,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.8 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_8, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_8
@@ -940,12 +940,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * and deprecated in Mac OS X 10.8
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -954,12 +954,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -968,12 +968,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -982,12 +982,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -996,12 +996,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -1010,12 +1010,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -1024,12 +1024,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -1038,12 +1038,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -1052,12 +1052,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.8
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -1066,11 +1066,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_8    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_8_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.8
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_8_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_8, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
@@ -1080,11 +1080,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.9 
- */
+  
+                                            
+   
+                                                    
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_9
@@ -1095,12 +1095,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * and deprecated in Mac OS X 10.9
- */
+  
+                                                           
+  
+                                                    
+                                  
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1109,12 +1109,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1123,12 +1123,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1137,12 +1137,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1151,12 +1151,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1165,12 +1165,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1179,12 +1179,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1193,12 +1193,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1207,12 +1207,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1221,12 +1221,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.9
- */
+  
+                                                                                    
+  
+                                                    
+                                        
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1235,11 +1235,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_9    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_9_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.9
- */
+  
+                                                
+  
+                                            
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_9_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_9, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
@@ -1249,11 +1249,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.10 
- */
+  
+                                             
+   
+                                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_10, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10
@@ -1264,12 +1264,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * and deprecated in Mac OS X 10.10
- */
+  
+                                                            
+  
+                                                     
+                                   
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1278,12 +1278,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1292,12 +1292,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1306,12 +1306,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1320,12 +1320,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1334,12 +1334,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1348,12 +1348,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1362,12 +1362,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1376,12 +1376,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1390,12 +1390,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1404,12 +1404,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.10
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1418,11 +1418,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_10_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.10
- */
+  
+                                                 
+  
+                                             
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_10_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_10, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10
@@ -1432,11 +1432,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.10.2 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_10_2, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10_2
@@ -1447,12 +1447,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * and deprecated in Mac OS X 10.10.2
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1461,12 +1461,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1475,12 +1475,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1489,12 +1489,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1503,12 +1503,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1517,12 +1517,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1531,12 +1531,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1545,12 +1545,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1559,12 +1559,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1573,12 +1573,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1587,12 +1587,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1601,12 +1601,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.10.2
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1615,11 +1615,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.10.2
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_10_2_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_10_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_2
@@ -1629,11 +1629,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.10.3 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_10_3, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10_3
@@ -1644,12 +1644,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * and deprecated in Mac OS X 10.10.3
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1658,12 +1658,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1672,12 +1672,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1686,12 +1686,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1700,12 +1700,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1714,12 +1714,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1728,12 +1728,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1742,12 +1742,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1756,12 +1756,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1770,12 +1770,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1784,12 +1784,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1798,12 +1798,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1812,12 +1812,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.10.3
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1826,11 +1826,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.10.3
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_10_3_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_10_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_10_3
@@ -1840,11 +1840,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.11 
- */
+  
+                                             
+   
+                                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_11, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11
@@ -1855,12 +1855,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * and deprecated in Mac OS X 10.11
- */
+  
+                                                            
+  
+                                                     
+                                   
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1869,12 +1869,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1883,12 +1883,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1897,12 +1897,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1911,12 +1911,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1925,12 +1925,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1939,12 +1939,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1953,12 +1953,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1967,12 +1967,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1981,12 +1981,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -1995,12 +1995,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -2009,12 +2009,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                      
+  
+                                                     
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -2023,12 +2023,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -2037,12 +2037,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.11
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -2051,11 +2051,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_11_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.11
- */
+  
+                                                 
+  
+                                             
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_11_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11
@@ -2065,11 +2065,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.11.2 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_11_2, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11_2
@@ -2080,12 +2080,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * and deprecated in Mac OS X 10.11.2
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2094,12 +2094,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2108,12 +2108,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2122,12 +2122,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2136,12 +2136,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2150,12 +2150,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2164,12 +2164,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2178,12 +2178,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2192,12 +2192,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2206,12 +2206,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2220,12 +2220,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2234,12 +2234,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2248,12 +2248,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2262,12 +2262,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2276,12 +2276,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.11.2
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2290,11 +2290,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.11.2
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_11_2_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_2
@@ -2304,11 +2304,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.11.3 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_11_3, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11_3
@@ -2319,12 +2319,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.11.3,
- * and deprecated in Mac OS X 10.11.3
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_3, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2333,12 +2333,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2347,12 +2347,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2361,12 +2361,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2375,12 +2375,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2389,12 +2389,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2403,12 +2403,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2417,12 +2417,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2431,12 +2431,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2445,12 +2445,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2459,12 +2459,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2473,12 +2473,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2487,12 +2487,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2501,12 +2501,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2515,12 +2515,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2529,12 +2529,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * but later deprecated in Mac OS X 10.11.3
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2543,11 +2543,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.11.3
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_11_3_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11_3, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_3
@@ -2557,11 +2557,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.11.4 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_11_4, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11_4
@@ -2572,12 +2572,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.11.4,
- * and deprecated in Mac OS X 10.11.4
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_4, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2586,12 +2586,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2600,12 +2600,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2614,12 +2614,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2628,12 +2628,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2642,12 +2642,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2656,12 +2656,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2670,12 +2670,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2684,12 +2684,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2698,12 +2698,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2712,12 +2712,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2726,12 +2726,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2740,12 +2740,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2754,12 +2754,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2768,12 +2768,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2782,12 +2782,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2796,12 +2796,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4
- *
- * Used on declarations introduced in Mac OS X 10.11.3,
- * but later deprecated in Mac OS X 10.11.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_3, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2810,11 +2810,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4    AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.11.4
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_11_4_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_11_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_11_4
@@ -2824,11 +2824,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.12 
- */
+  
+                                             
+   
+                                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_12, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
@@ -2839,12 +2839,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.12,
- * and deprecated in Mac OS X 10.12
- */
+  
+                                                            
+  
+                                                     
+                                   
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2853,12 +2853,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2867,12 +2867,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2881,12 +2881,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2895,12 +2895,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2909,12 +2909,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2923,12 +2923,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2937,12 +2937,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2951,12 +2951,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2965,12 +2965,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2979,12 +2979,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                     
+  
+                                                    
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -2993,12 +2993,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                      
+  
+                                                     
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3007,12 +3007,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3021,12 +3021,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3035,12 +3035,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                      
+  
+                                                     
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3049,12 +3049,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3063,12 +3063,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.11.3,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_3, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3077,12 +3077,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12
- *
- * Used on declarations introduced in Mac OS X 10.11.4,
- * but later deprecated in Mac OS X 10.12
- */
+  
+                                                                                        
+  
+                                                       
+                                         
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_4, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3091,11 +3091,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12    AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_12_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.12
- */
+  
+                                                 
+  
+                                             
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_12_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
@@ -3105,11 +3105,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.12.1 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_12_1, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12_1
@@ -3120,12 +3120,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.12.1,
- * and deprecated in Mac OS X 10.12.1
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12_1, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3134,12 +3134,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3148,12 +3148,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3162,12 +3162,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3176,12 +3176,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3190,12 +3190,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3204,12 +3204,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3218,12 +3218,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3232,12 +3232,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3246,12 +3246,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3260,12 +3260,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3274,12 +3274,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3288,12 +3288,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3302,12 +3302,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3316,12 +3316,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3330,12 +3330,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3344,12 +3344,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.11.3,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_3, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3358,12 +3358,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.11.4,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_4, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3372,12 +3372,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1
- *
- * Used on declarations introduced in Mac OS X 10.12,
- * but later deprecated in Mac OS X 10.12.1
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3386,11 +3386,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1    AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.12.1
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_12_1_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12_1, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_1
@@ -3400,11 +3400,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.12.2 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_12_2, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12_2
@@ -3415,12 +3415,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.12.2,
- * and deprecated in Mac OS X 10.12.2
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12_2, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3429,12 +3429,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3443,12 +3443,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3457,12 +3457,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3471,12 +3471,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3485,12 +3485,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3499,12 +3499,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3513,12 +3513,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3527,12 +3527,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3541,12 +3541,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3555,12 +3555,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3569,12 +3569,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3583,12 +3583,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3597,12 +3597,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3611,12 +3611,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3625,12 +3625,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3639,12 +3639,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.11.3,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_3, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3653,12 +3653,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.11.4,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_4, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3667,12 +3667,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.12,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3681,12 +3681,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2
- *
- * Used on declarations introduced in Mac OS X 10.12.1,
- * but later deprecated in Mac OS X 10.12.2
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12_1, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3695,11 +3695,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2    AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.12.2
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_12_2_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12_2, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_2
@@ -3709,11 +3709,11 @@
 #endif
 
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER
- * 
- * Used on declarations introduced in Mac OS X 10.12.4 
- */
+  
+                                               
+   
+                                                       
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER     __OSX_AVAILABLE_STARTING(__MAC_10_12_4, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12_4
@@ -3724,12 +3724,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER_BUT_DEPRECATED
- *
- * Used on declarations introduced in Mac OS X 10.12.4,
- * and deprecated in Mac OS X 10.12.4
- */
+  
+                                                              
+  
+                                                       
+                                     
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER_BUT_DEPRECATED     __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12_4, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3738,12 +3738,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER_BUT_DEPRECATED    AVAILABLE_MAC_OS_X_VERSION_10_12_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.0,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3752,12 +3752,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_0_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.1,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_1, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3766,12 +3766,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.2,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_2, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3780,12 +3780,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.3,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_3, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3794,12 +3794,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.4,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_4, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3808,12 +3808,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.5,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_5, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3822,12 +3822,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.6,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_6, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3836,12 +3836,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.7,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_7, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3850,12 +3850,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_7_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.8,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_8, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3864,12 +3864,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_8_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.9,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                       
+  
+                                                    
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_9, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3878,12 +3878,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_9_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.10,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3892,12 +3892,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.10.2,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_2, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3906,12 +3906,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_10_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.10.3,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_10_3, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3920,12 +3920,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_10_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.11,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3934,12 +3934,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.11.2,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_2, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3948,12 +3948,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_11_2_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.11.3,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_3, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3962,12 +3962,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_11_3_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.11.4,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_11_4, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3976,12 +3976,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_11_4_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.12,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                        
+  
+                                                     
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -3990,12 +3990,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_12_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.12.1,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12_1, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -4004,12 +4004,12 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_12_1_AND_LATER
 #endif
 
-/*
- * AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4
- *
- * Used on declarations introduced in Mac OS X 10.12.2,
- * but later deprecated in Mac OS X 10.12.4
- */
+  
+                                                                                          
+  
+                                                       
+                                           
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_12_2, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -4018,11 +4018,11 @@
     #define AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4    AVAILABLE_MAC_OS_X_VERSION_10_12_2_AND_LATER
 #endif
 
-/*
- * DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4_AND_LATER
- *
- * Used on types deprecated in Mac OS X 10.12.4
- */
+  
+                                                   
+  
+                                               
+   
 #if __AVAILABILITY_MACROS_USES_AVAILABILITY
     #define DEPRECATED_IN_MAC_OS_X_VERSION_10_12_4_AND_LATER    __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_12_4, __IPHONE_4_0, __IPHONE_4_0)
 #elif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12_4
@@ -4034,6 +4034,6 @@
 
 
 
-#endif  /* __AVAILABILITYMACROS__ */
+#endif                              
 
 

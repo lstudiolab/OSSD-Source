@@ -20,7 +20,7 @@ static uint64_t time_for_read(int fd, const char *expected);
 static void perf_setup(char **path, int *fd);
 
 #define READSIZE 1024L
-#endif /* !TEST_UNENTITLED */
+#endif                       
 
 T_GLOBAL_META(
 	T_META_NAMESPACE("xnu.vfs.dmc"),
@@ -104,8 +104,8 @@ verify_mount_fallback_values(const char *mount_path, disk_conditioner_info *info
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_GET) after SET");
 
-	// without querying the drive for the expected values, the best we can do is
-	// assert that they are not zero (impossible) or less than UINT32_MAX (unlikely)
+	                                                                            
+	                                                                                
 	T_ASSERT_GT(newinfo.ioqueue_depth, 0u, "ioqueue_depth is the value from the mount");
 	T_ASSERT_GT(newinfo.maxreadcnt, 0u, "maxreadcnt is value from the mount");
 	T_ASSERT_GT(newinfo.maxwritecnt, 0u, "maxwritecnt is value from the mount");
@@ -128,7 +128,7 @@ T_DECL(fsctl_set_zero,
 	mount_path = mktempmount();
 
 	info.enabled = 1;
-	/* everything else is 0 */
+	                          
 
 	T_SETUPEND;
 
@@ -149,7 +149,7 @@ T_DECL(fsctl_set_out_of_bounds,
 	info.access_time_usec = 0;
 	info.read_throughput_mbps = 0;
 	info.write_throughput_mbps = 0;
-	/* everything else is UINT32_MAX */
+	                                   
 
 	T_SETUPEND;
 
@@ -168,13 +168,13 @@ T_DECL(fsctl_restore_mount_fields,
 	mount_path = mktempmount();
 	T_SETUPEND;
 
-	/* first set out-of-bounds values to retrieve the original mount_t fields */
+	                                                                            
 	memset(&info, UINT32_MAX, sizeof(info));
 	info.enabled = 1;
 	info.access_time_usec = 0;
 	info.read_throughput_mbps = 0;
 	info.write_throughput_mbps = 0;
-	/* everything else is UINT32_MAX */
+	                                   
 	err = fsctl(mount_path, DISK_CONDITIONER_IOC_SET, &info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_SET)");
@@ -183,20 +183,20 @@ T_DECL(fsctl_restore_mount_fields,
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_GET)");
 
-	/* now turn off the disk conditioner which should restore fields on the mount_t */
+	                                                                                  
 	memset(&info, 1, sizeof(info));
 	info.enabled = 0;
 	err = fsctl(mount_path, DISK_CONDITIONER_IOC_SET, &info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_SET)");
 
-	/* and finally set out-of-bounds values again to retrieve the new mount_t fields which should not have changed */
+	                                                                                                                 
 	memset(&info, UINT32_MAX, sizeof(info));
 	info.enabled = 0;
 	info.access_time_usec = 0;
 	info.read_throughput_mbps = 0;
 	info.write_throughput_mbps = 0;
-	/* everything else is UINT32_MAX */
+	                                   
 	err = fsctl(mount_path, DISK_CONDITIONER_IOC_SET, &info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_SET)");
@@ -221,7 +221,7 @@ T_DECL(fsctl_get_nonroot,
 	disk_conditioner_info info;
 
 	T_SETUPBEGIN;
-	// make sure we're not root
+	                           
 	if (0 == geteuid()) {
 		seteuid(5000);
 	}
@@ -244,7 +244,7 @@ T_DECL(fsctl_set_nonroot,
 	disk_conditioner_info expected_info = {0};
 
 	T_SETUPBEGIN;
-	// make sure we're not root
+	                           
 	if (0 == geteuid()) {
 		seteuid(5000);
 	}
@@ -252,7 +252,7 @@ T_DECL(fsctl_set_nonroot,
 	mount_path = mktempmount();
 	T_SETUPEND;
 
-	// save original info
+	                     
 	err = fsctl(mount_path, DISK_CONDITIONER_IOC_GET, &expected_info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "Get original DMC info");
@@ -291,16 +291,16 @@ T_DECL(fsctl_delays,
 
 	expected_nsec = NSEC_PER_SEC / 2;
 
-	// measure delay before setting parameters (should be none)
+	                                                           
 	elapsed_nsec = time_for_read(fd, buf);
 	T_ASSERT_LT_ULLONG(elapsed_nsec, expected_nsec, "DMC disabled read(%ld) from %s is reasonably fast", READSIZE, path);
 
-	// measure delay after setting parameters
+	                                         
 	info.enabled = 1;
 	info.access_time_usec = expected_nsec / NSEC_PER_USEC;
 	info.read_throughput_mbps = 40;
 	info.write_throughput_mbps = 40;
-	info.is_ssd = 1; // is_ssd will ensure we get constant access_time delays rather than scaled
+	info.is_ssd = 1;                                                                            
 	err = fsctl(path, DISK_CONDITIONER_IOC_SET, &info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_SET) delay");
@@ -309,18 +309,18 @@ T_DECL(fsctl_delays,
 	T_ASSERT_GT_ULLONG(elapsed_nsec, expected_nsec, "DMC enabled read(%ld) from %s is at least the expected delay", READSIZE, path);
 	T_ASSERT_LT_ULLONG(elapsed_nsec, 2 * expected_nsec, "DMC enabled read(%ld) from %s is no more than twice the expected delay", READSIZE, path);
 
-	// measure delay after resetting parameters (should be none)
+	                                                            
 	info.enabled = 0;
 	err = fsctl(path, DISK_CONDITIONER_IOC_SET, &info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "fsctl(DISK_CONDITIONER_IOC_SET) reset delay");
 
-	usleep(USEC_PER_SEC / 2); // might still be other I/O inflight
+	usleep(USEC_PER_SEC / 2);                                     
 	elapsed_nsec = time_for_read(fd, buf);
 	T_ASSERT_LT_ULLONG(elapsed_nsec, expected_nsec, "After disabling DMC read(%ld) from %s is reasonably fast", READSIZE, path);
 }
 
-#else /* TEST_UNENTITLED */
+#else                      
 
 #pragma mark Unentitled Tests
 
@@ -352,7 +352,7 @@ T_DECL(fsctl_set_unentitled,
 	mount_path = mktempmount();
 	T_SETUPEND;
 
-	// save original info
+	                     
 	err = fsctl(mount_path, DISK_CONDITIONER_IOC_GET, &expected_info, 0);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ_INT(0, err, "Get original DMC info");
@@ -371,7 +371,7 @@ T_DECL(fsctl_set_unentitled,
 	T_ASSERT_EQ_INT(0, err, "fsctl.set should not change info without entitlement");
 }
 
-#endif /* TEST_UNENTITLED */
+#endif                      
 
 #pragma mark Helpers
 
@@ -382,7 +382,7 @@ mktempdir(void)
 	strcpy(path, "/tmp/dmc.XXXXXXXX");
 	atexit_b(^{ free(path); });
 
-	// create a temporary mount to run the fsctl on
+	                                               
 	T_WITH_ERRNO;
 	T_ASSERT_NOTNULL(mkdtemp(path), "Create temporary directory");
 	atexit_b(^{ remove(path); });
@@ -390,14 +390,14 @@ mktempdir(void)
 	return path;
 }
 
-/*
- * Return the path to a temporary mount
- * with no usable filesystem but still
- * can be configured by the disk conditioner
- *
- * Faster than creating a ram disk to test with
- * when access to the filesystem is not necessary
- */
+  
+                                       
+                                      
+                                            
+  
+                                               
+                                                 
+   
 static char *
 mktempmount(void)
 {
@@ -412,10 +412,10 @@ mktempmount(void)
 
 #ifndef TEST_UNENTITLED
 
-/*
- * Wrapper around dt_launch_tool/dt_waitpid
- * that works like libc:system()
- */
+  
+                                           
+                                
+   
 static int
 system_legal(const char *command)
 {
@@ -442,11 +442,11 @@ system_legal(const char *command)
 	return exit_status;
 }
 
-/*
- * Return the path to a temporary mount
- * that contains a usable HFS+ filesystem
- * mounted via a ram disk
- */
+  
+                                       
+                                         
+                         
+   
 static char *
 mkramdisk(void)
 {
@@ -460,7 +460,7 @@ mkramdisk(void)
 	T_ASSERT_NOTNULL(mktemp(dev_disk_file), "Create temporary file to store dev disk for ramdisk");
 	atexit_b(^{ remove(dev_disk_file); });
 
-	// create the RAM disk device
+	                             
 	snprintf(cmd, sizeof(cmd), "hdik -nomount ram://10000 > %s", dev_disk_file);
 	T_ASSERT_EQ_INT(0, system_legal(cmd), "Create ramdisk");
 
@@ -472,11 +472,11 @@ mkramdisk(void)
 		remove(dev_disk_file);
 	});
 
-	// initialize as an HFS volume
+	                              
 	snprintf(cmd, sizeof(cmd), "newfs_hfs `cat %s`", dev_disk_file);
 	T_ASSERT_EQ_INT(0, system_legal(cmd), "Initialize ramdisk as HFS");
 
-	// mount it
+	           
 	snprintf(cmd, sizeof(cmd), "mount -t hfs `cat %s` %s", dev_disk_file, mount_path);
 	T_ASSERT_EQ_INT(0, system_legal(cmd), "Mount ramdisk");
 
@@ -526,4 +526,4 @@ perf_setup(char **path, int *fd)
 	atexit_b(^{ close(temp_fd); });
 	fcntl(temp_fd, F_NOCACHE, 1);
 }
-#endif /* !TEST_UNENTITLED */
+#endif                       

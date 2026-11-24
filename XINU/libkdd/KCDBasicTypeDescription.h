@@ -34,10 +34,10 @@
 
 - (id)initWithKCTypeDesc:(kcdata_subtype_descriptor_t)sub_type_desc;
 
-/*
- * Restricted. Only for internal use
- * the following interface creates a basic type_0x33 = [ array of uint8_t ] kind
- */
+  
+                                    
+                                                                                
+   
 - (id)createDefaultForType:(uint32_t)typeID;
 
 - (BOOL) shouldMergeData;

@@ -30,17 +30,17 @@
 #define _NET_IF_6LOWPAN_VAR_H_  1
 
 #define IEEE802154_ADDR_LEN     8
-#define IEEE802154_ENCAP_LEN    25 /* len of 802.15.4 Frame header */
+#define IEEE802154_ENCAP_LEN    25                                   
 #define IEEE802154_FRAME_LEN    127
 
-/*
- * Configuration structure for SIOCSET6LOWPAN and SIOCGET6LOWPAN ioctls.
- */
+  
+                                                                        
+   
 struct sixlowpanreq {
 	char parent[IFNAMSIZ];
 };
 
 #ifdef KERNEL_PRIVATE
 int sixlowpan_family_init(void);
-#endif /* KERNEL_PRIVATE */
-#endif /* _NET_IF_6LOWPAN_VAR_H_ */
+#endif                     
+#endif                             

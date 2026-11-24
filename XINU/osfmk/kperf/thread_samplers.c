@@ -26,12 +26,12 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*  Sample thread data */
+                         
 
-#include <kern/debug.h> /* panic */
-#include <kern/thread.h> /* thread_* */
-#include <kern/timer.h> /* timer_data_t */
-#include <kern/policy_internal.h> /* TASK_POLICY_* */
+#include <kern/debug.h>            
+#include <kern/thread.h>               
+#include <kern/timer.h>                   
+#include <kern/policy_internal.h>                    
 #include <mach/mach_types.h>
 
 #include <kperf/kperf.h>
@@ -43,16 +43,16 @@
 #if MONOTONIC
 #include <kern/monotonic.h>
 #include <machine/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 extern boolean_t stackshot_thread_is_idle_worker_unsafe(thread_t thread);
 
-/*
- * XXX Deprecated, use thread scheduling sampler instead.
- *
- * Taken from AppleProfileGetRunModeOfThread and CHUD.  Still here for
- * backwards compatibility.
- */
+  
+                                                         
+  
+                                                                      
+                           
+   
 
 #define KPERF_TI_RUNNING   (1U << 0)
 #define KPERF_TI_RUNNABLE  (1U << 1)
@@ -92,13 +92,13 @@ kperf_thread_info_runmode_legacy(thread_t thread)
 	}
 
 #if defined(XNU_TARGET_OS_OSX)
-	/* on desktop, if state is blank, leave not idle set */
+	                                                       
 	if (kperf_state == 0) {
 		return TH_IDLE << 16;
 	}
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 
 
-	/* high two bytes are inverted mask, low two bytes are normal */
+	                                                                
 	return ((~kperf_state & 0xffff) << 16) | (kperf_state & 0xffff);
 }
 
@@ -120,14 +120,14 @@ kperf_thread_info_sample(struct kperf_thread_info *ti, struct kperf_context *con
 void
 kperf_thread_info_log(struct kperf_thread_info *ti)
 {
-	BUF_DATA(PERF_TI_DATA, ti->kpthi_pid, ti->kpthi_tid /* K64-only */,
+	BUF_DATA(PERF_TI_DATA, ti->kpthi_pid, ti->kpthi_tid               ,
 	    ti->kpthi_dq_addr, ti->kpthi_runmode);
 }
 
-/*
- * Scheduling information reports inputs and outputs of the scheduler state for
- * a thread.
- */
+  
+                                                                               
+            
+   
 
 void
 kperf_thread_scheduling_sample(struct kperf_thread_scheduling *thsc,
@@ -205,19 +205,19 @@ kperf_thread_scheduling_log(struct kperf_thread_scheduling *thsc)
 	    );
 	BUF_DATA(PERF_TI_SCHEDDATA3_32, UPPER_32(thsc->kpthsc_runnable_time),
 	    LOWER_32(thsc->kpthsc_runnable_time));
-#endif /* defined(__LP64__) */
+#endif                        
 }
 
-/*
- * Snapshot information maintains parity with stackshot information for other,
- * miscellaneous information about threads.
- */
+  
+                                                                              
+                                           
+   
 
 #define KPERF_THREAD_SNAPSHOT_DARWIN_BG  (1U << 0);
 #define KPERF_THREAD_SNAPSHOT_PASSIVE_IO (1U << 1);
 #define KPERF_THREAD_SNAPSHOT_GFI        (1U << 2);
 #define KPERF_THREAD_SNAPSHOT_IDLE_WQ    (1U << 3);
-/* max is 1U << 7 */
+                    
 
 void
 kperf_thread_snapshot_sample(struct kperf_thread_snapshot *thsn,
@@ -247,9 +247,9 @@ kperf_thread_snapshot_sample(struct kperf_thread_snapshot *thsn,
 	}
 
 	thsn->kpthsn_suspend_count = thread->suspend_count;
-	/*
-	 * Only have room for 8-bits in the trace event, so truncate here.
-	 */
+	  
+                                                                   
+    
 	thsn->kpthsn_io_tier = (uint8_t)proc_get_effective_thread_policy(thread, TASK_POLICY_IO);
 
 	BUF_VERB(PERF_TI_SNAPSAMPLE | DBG_FUNC_END);
@@ -268,15 +268,15 @@ kperf_thread_snapshot_log(struct kperf_thread_snapshot *thsn)
 	    | (thsn->kpthsn_io_tier << 24),
 	    UPPER_32(thsn->kpthsn_last_made_runnable_time),
 	    LOWER_32(thsn->kpthsn_last_made_runnable_time));
-#endif /* defined(__LP64__) */
+#endif                        
 }
 
-/*
- * Dispatch information only contains the dispatch queue serial number from
- * libdispatch.
- *
- * It's a separate sampler because queue data must be copied in from user space.
- */
+  
+                                                                           
+               
+  
+                                                                                
+   
 
 void
 kperf_thread_dispatch_sample(struct kperf_thread_dispatch *thdi,
@@ -340,13 +340,13 @@ kperf_thread_dispatch_log(struct kperf_thread_dispatch *thdi)
 #else
 	BUF_DATA(PERF_TI_DISPDATA_32, UPPER_32(thdi->kpthdi_dq_serialno),
 	    LOWER_32(thdi->kpthdi_dq_serialno));
-#endif /* defined(__LP64__) */
+#endif                        
 }
 
-/*
- * A bit different from other samplers -- since logging disables interrupts,
- * it's a fine place to sample the thread counters.
- */
+  
+                                                                            
+                                                   
+   
 void
 kperf_thread_inscyc_log(struct kperf_context *context)
 {
@@ -354,7 +354,7 @@ kperf_thread_inscyc_log(struct kperf_context *context)
 	thread_t cur_thread = current_thread();
 
 	if (context->cur_thread != cur_thread) {
-		/* can't safely access another thread's counters */
+		                                                   
 		return;
 	}
 
@@ -363,13 +363,13 @@ kperf_thread_inscyc_log(struct kperf_context *context)
 
 #if defined(__LP64__)
 	BUF_DATA(PERF_TI_INSCYCDATA, counts[MT_CORE_INSTRS], counts[MT_CORE_CYCLES]);
-#else /* defined(__LP64__) */
-	/* 32-bit platforms don't count instructions */
+#else                        
+	                                               
 	BUF_DATA(PERF_TI_INSCYCDATA_32, 0, 0, UPPER_32(counts[MT_CORE_CYCLES]),
 	    LOWER_32(counts[MT_CORE_CYCLES]));
-#endif /* !defined(__LP64__) */
+#endif                         
 
 #else
 #pragma unused(context)
-#endif /* MONOTONIC */
+#endif                
 }

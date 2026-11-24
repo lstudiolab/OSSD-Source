@@ -25,13 +25,13 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	sys/aio_kern.h
- *	Author:	Jerry Cottingham [jerryc@apple.com]
- *
- *	Header file for kernel only portion of POSIX Asynchronous IO APIs
- *
- */
+  
+                       
+                                              
+  
+                                                                    
+  
+   
 
 #include <sys/aio.h>
 
@@ -42,9 +42,9 @@
 
 typedef struct aio_workq_entry aio_workq_entry;
 
-/*
- * Prototypes
- */
+  
+             
+   
 
 __private_extern__ void
 _aio_close(struct proc *p, int fd);
@@ -64,6 +64,6 @@ aio_init(void);
 task_t
 get_aiotask(void);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* _SYS_AIO_KERN_H_ */
+#endif                       

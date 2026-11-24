@@ -48,20 +48,20 @@ kern_return_t copyio_test(void);
 static const char copyio_test_string[] = {'T', 'e', 's', 't', ' ', 'S', 't', 'r', 'i', 'n', 'g', '!', '\0', 'A', 'B', 'C'};
 
 struct copyio_test_data {
-	/* VM map of the current userspace process. */
+	                                              
 	vm_map_t user_map;
-	/* The start of a `copyio_test_buf_size'-sized region mapped into userspace. */
+	                                                                               
 	user_addr_t user_addr;
-	/* The start of a page-sized region that guaranteed to be unmapped in userspace. */
+	                                                                                   
 	user_addr_t unmapped_addr;
-	/* The start of a page-sized region mapped at the largest possible userspace address. */
+	                                                                                        
 	user_addr_t user_lastpage_addr;
-	/* Kernel mapping of the physical pages mapped at `user_addr'. */
+	                                                                 
 	void *kern_addr;
 
-	/* Scratch buffers of size `copyio_test_buf_size'. */
+	                                                     
 	char *buf1, *buf2;
-	/* Scratch data to pass to helper threads */
+	                                            
 	union {
 		void *thread_ptr;
 		uint64_t thread_data;
@@ -270,7 +270,7 @@ copyinstr_test(struct copyio_test_data *data)
 	T_EXPECT_EQ_INT(err, EFAULT, "copyinstr() from write-only address should return EFAULT");
 	copyio_test_protect(data, VM_PROT_READ | VM_PROT_WRITE);
 
-	/* Place an unterminated string at the end of the mapped region */
+	                                                                  
 	const size_t unterminated_size = 16;
 	char *kern_unterminated_addr = (char *)data->kern_addr + copyio_test_buf_size - unterminated_size;
 	memset(kern_unterminated_addr, 'A', unterminated_size);
@@ -365,12 +365,12 @@ copyout_atomic64_to_kernel(struct copyio_test_data *data)
 	return copyout_atomic64(data->thread_data, (user_addr_t)data->kern_addr);
 }
 
-/**
- * Note: we can't test atomic copyio calls which go past the end of the
- * userspace address space, since there's no way to provide a range
- * that straddles the userspace address boundary while being suitably
- * aligned for the copy.
- */
+   
+                                                                       
+                                                                   
+                                                                     
+                        
+   
 #define copyin_atomic_test(data, word_t, copyin_fn, copyin_from_kernel_fn)                                              \
 	do {                                                                                                            \
 	        const word_t word_out = (word_t)0x123456789ABCDEF0UL;                                                   \
@@ -503,13 +503,13 @@ copyio_test(void)
 		goto err_kalloc;
 	}
 
-	/**
-	 * This test needs to manipulate the current userspace process's
-	 * address space.  This is okay to do at the specific point in time
-	 * when bsd_do_post() runs: current_proc() points to the init process,
-	 * which has been set up to the point of having a valid vm_map, but
-	 * not to the point of actually execing yet.
-	 */
+	   
+                                                                 
+                                                                    
+                                                                       
+                                                                    
+                                             
+    
 	proc_t proc = current_proc();
 	assert(proc->p_pid == 1);
 	data.user_map = get_task_map_reference(proc->task);

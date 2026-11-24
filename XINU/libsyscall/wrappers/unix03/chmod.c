@@ -31,12 +31,12 @@
 
 extern int __chmod(const char *path, mode_t mode);
 
-/*
- * chmod stub, ignore S_ISUID and/or S_ISGID on EPERM,
- * mandated for conformance.
- *
- * This is for UNIX03 only.
- */
+  
+                                                      
+                            
+  
+                           
+   
 int
 chmod(const char *path, mode_t mode)
 {
@@ -63,4 +63,4 @@ chmod(const char *path, mode_t mode)
 	return res;
 }
 
-#endif /* __DARWIN_UNIX03 */
+#endif                      

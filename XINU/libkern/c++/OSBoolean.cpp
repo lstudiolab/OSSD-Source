@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* OSBoolean.cpp created by rsulack on Tue Oct 12 1999 */
+                                                         
 
 #include <libkern/c++/OSBoolean.h>
 #include <libkern/c++/OSString.h>
@@ -77,12 +77,12 @@ OSBoolean::initialize()
 void
 OSBoolean::free()
 {
-	/*
-	 * An OSBoolean should never have free() called on it, since it is a shared
-	 * object, with two non-mutable instances: kOSBooleanTrue, kOSBooleanFalse.
-	 * There will be cases where an incorrect number of releases will cause the
-	 * free() method to be called, however, which we must catch and ignore here.
-	 */
+	  
+                                                                            
+                                                                            
+                                                                            
+                                                                             
+    
 	assert(false);
 }
 

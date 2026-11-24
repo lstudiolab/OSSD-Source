@@ -89,21 +89,21 @@
 #include <netinet6/in6_ifattach.h>
 #include <netinet6/ip6_var.h>
 
-/* #include "vlan.h" */
+                       
 #if NVLAN > 0
 #include <net/if_vlan_var.h>
-#endif /* NVLAN > 0 */
+#endif                
 
 #include <net/ether_if_module.h>
 
 static const u_char etherip6allnodes[ETHER_ADDR_LEN] =
 { 0x33, 0x33, 0, 0, 0, 1 };
 
-/*
- * Process a received Ethernet packet;
- * the packet is in the mbuf chain m without
- * the ether header, which is provided separately.
- */
+  
+                                      
+                                            
+                                                  
+   
 static errno_t
 ether_inet6_input(ifnet_t ifp, protocol_family_t protocol,
     mbuf_t packet, char *header)
@@ -116,23 +116,23 @@ ether_inet6_input(ifnet_t ifp, protocol_family_t protocol,
 
 	if (ether_type == htons(ETHERTYPE_IPV6)) {
 		struct ifnet *mifp;
-		/*
-		 * Trust the ifp in the mbuf, rather than ifproto's
-		 * since the packet could have been injected via
-		 * a dlil_input_packet_list() using an ifp that is
-		 * different than the one where the packet really
-		 * came from.
-		 */
+		  
+                                                     
+                                                  
+                                                    
+                                                   
+               
+     
 		mifp = mbuf_pkthdr_rcvif(packet);
 
-		/* Update L2 reachability record, if present (and not bcast) */
+		                                                               
 		if (bcmp(eh->ether_shost, etherbroadcastaddr,
 		    ETHER_ADDR_LEN) != 0) {
 			nd6_llreach_set_reachable(mifp, eh->ether_shost,
 			    ETHER_ADDR_LEN);
 		}
 
-		/* Save the Ethernet source address for all-nodes multicasts */
+		                                                               
 		if (!bcmp(eh->ether_dhost, etherip6allnodes, ETHER_ADDR_LEN)) {
 			struct ip6aux *ip6a;
 
@@ -164,9 +164,9 @@ ether_inet6_pre_output(ifnet_t ifp, protocol_family_t protocol_family,
 	struct sockaddr_dl sdl = {};
 	struct mbuf *m = *m0;
 
-	/*
-	 * Tell ether_frameout it's ok to loop packet if necessary
-	 */
+	  
+                                                           
+    
 	m->m_flags |= M_LOOP;
 
 	result = nd6_lookup_ipv6(ifp, (const struct sockaddr_in6 *)
@@ -224,19 +224,19 @@ ether_inet6_prmod_ioctl(ifnet_t ifp, protocol_family_t protocol_family,
 	int error = 0;
 
 	switch (command) {
-	case SIOCSIFADDR:               /* struct ifaddr pointer */
-		/*
-		 * Note: caller of ifnet_ioctl() passes in pointer to
-		 * struct ifaddr as parameter to SIOCSIFADDR, for legacy
-		 * reasons.
-		 */
+	case SIOCSIFADDR:                                          
+		  
+                                                       
+                                                          
+             
+     
 		if ((ifp->if_flags & IFF_RUNNING) == 0) {
 			ifnet_set_flags(ifp, IFF_UP, IFF_UP);
 			ifnet_ioctl(ifp, 0, SIOCSIFFLAGS, NULL);
 		}
 		break;
 
-	case SIOCGIFADDR: {             /* struct ifreq */
+	case SIOCGIFADDR: {                               
 		struct ifreq *ifr = (struct ifreq *)(void *)data;
 		(void) ifnet_guarded_lladdr_copy_bytes(ifp,
 		    ifr->ifr_addr.sa_data, ETHER_ADDR_LEN);

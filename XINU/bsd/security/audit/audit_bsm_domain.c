@@ -499,4 +499,4 @@ au_bsm_to_domain(u_short bsm_domain, int *local_domainp)
 	*local_domainp = bstp->bd_local_domain;
 	return 0;
 }
-#endif /* CONFIG_AUDIT */
+#endif                   

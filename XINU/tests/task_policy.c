@@ -307,7 +307,7 @@ T_DECL(task_policy_get_foreign_task_name, "task_policy_get for foreign task name
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "killing sleep");
 }
 
-#else /* ENTITLED */
+#else               
 
 T_DECL(task_policy_set_task_name_entitled, "task_policy_set with task name (entitled)", T_META_ASROOT(true), T_META_ASROOT(true))
 {
@@ -597,4 +597,4 @@ T_DECL(task_policy_get_foreign_task_name_entitled, "task_policy_get for foreign 
 	T_QUIET; T_ASSERT_POSIX_ZERO(ret, "killing sleep");
 }
 
-#endif /* UNENTITLED */
+#endif                 

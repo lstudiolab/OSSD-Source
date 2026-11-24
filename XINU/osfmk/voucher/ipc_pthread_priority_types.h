@@ -39,4 +39,4 @@ typedef uint32_t ipc_pthread_priority_value_t;
 
 #define MACH_VOUCHER_PTHPRIORITY_CONTENT_SIZE (sizeof(ipc_pthread_priority_value_t))
 
-#endif /* _VOUCHER_IPC_PTHREAD_PRIORITY_TYPES_H_ */
+#endif                                             

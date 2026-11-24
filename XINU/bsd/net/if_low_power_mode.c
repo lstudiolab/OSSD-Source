@@ -84,7 +84,7 @@ SYSCTL_INT(_net_link_generic_system_low_power, OID_AUTO, verbose,
 SYSCTL_INT(_net_link_generic_system_low_power, OID_AUTO, restricted,
     CTLFLAG_RW | CTLFLAG_LOCKED,
     &if_low_power_restricted, 0, "");
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 
 static void

@@ -62,7 +62,7 @@ struct turnstile;
 struct waitq;
 typedef struct stackshot_thread_waitinfo thread_waitinfo_t;
 
-/* Used for stackshot_thread_waitinfo_unsafe */
+                                               
 extern void kdp_lck_mtx_find_owner(struct waitq * waitq, event64_t event, thread_waitinfo_t *waitinfo);
 extern void kdp_sema_find_owner(struct waitq * waitq, event64_t event, thread_waitinfo_t *waitinfo);
 extern void kdp_mqueue_send_find_owner(struct waitq * waitq, event64_t event, thread_waitinfo_t *waitinfo);
@@ -77,6 +77,6 @@ extern void kdp_sleep_with_inheritor_find_owner(struct waitq * waitq, __unused e
 extern void kdp_turnstile_fill_tsinfo(struct turnstile *ts, thread_turnstileinfo_t *tsinfo);
 void kdp_eventlink_find_owner(struct waitq *waitq, event64_t event, thread_waitinfo_t *waitinfo);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* !_KERN_BLOCK_HINT_H_ */
+#endif                           

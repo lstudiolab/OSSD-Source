@@ -39,21 +39,21 @@ extern "C" {
 typedef struct sha1_ctxt {
 	union {
 		u_int8_t        b8[20];
-		u_int32_t       b32[5]; /* state (ABCDE) */
+		u_int32_t       b32[5];                    
 	} h;
 	union {
 		u_int8_t        b8[8];
 		u_int32_t       b32[2];
-		u_int64_t       b64[1]; /* # of bits, modulo 2^64 (msb first) */
+		u_int64_t       b64[1];                                         
 	} c;
 	union {
 		u_int8_t        b8[64];
-		u_int32_t       b32[16]; /* input buffer */
+		u_int32_t       b32[16];                   
 	} m;
-	u_int8_t        count;          /* unused; for compatibility only */
+	u_int8_t        count;                                              
 } SHA1_CTX;
 
-/* For compatibility with the other SHA-1 implementation. */
+                                                            
 #define sha1_init(c)            SHA1Init(c)
 #define sha1_loop(c, b, l)      SHA1Update(c, b, l)
 #define sha1_result(c, b)       SHA1Final(b, c)
@@ -69,4 +69,4 @@ extern void SHA1Final(void *, SHA1_CTX *);
 }
 #endif
 
-#endif /*_CRYPTO_SHA1_H_*/
+#endif                    

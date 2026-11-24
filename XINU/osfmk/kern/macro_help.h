@@ -53,14 +53,14 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	kern/macro_help.h
- *
- *	Provide help in making lint-free macro routines
- *
- */
+  
+   
+  
+                          
+  
+                                                  
+  
+   
 
 #ifndef _KERN_MACRO_HELP_H_
 #define _KERN_MACRO_HELP_H_
@@ -70,14 +70,14 @@
 #ifdef  lint
 boolean_t       NEVER;
 boolean_t       ALWAYS;
-#else   /* lint */
+#else             
 #define         NEVER           FALSE
 #define         ALWAYS          TRUE
-#endif  /* lint */
+#endif            
 
 #define         MACRO_BEGIN     do {
 #define         MACRO_END       } while (NEVER)
 
 #define         MACRO_RETURN    if (ALWAYS) return
 
-#endif  /* _KERN_MACRO_HELP_H_ */
+#endif                           

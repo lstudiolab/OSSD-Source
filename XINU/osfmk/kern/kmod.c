@@ -25,12 +25,12 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
 /*
  * Copyright (c) 1999 Apple Inc.  All rights reserved.
  *
@@ -52,21 +52,21 @@
 
 #include <libkern/kernel_mach_header.h>
 
-/*********************************************************************
- **********************************************************************
- ***           KMOD INTERFACE DEPRECATED AS OF SNOWLEOPARD          ***
- **********************************************************************
- **********************************************************************
- * Except for kmod_get_info(), which continues to work for K32 with
- * 32-bit clients, all remaining functions in this module remain
- * for symbol linkage or MIG support only,
- * and return KERN_NOT_SUPPORTED.
- *
- * Some kernel-internal portions have been moved to
- * libkern/OSKextLib.cpp and libkern/c++/OSKext.cpp.
- **********************************************************************/
+                                                                      
+                                                                       
+                                                                       
+                                                                       
+                                                                       
+                                                                   
+                                                                
+                                          
+                                 
+  
+                                                   
+                                                    
+                                                                        
 
-// bsd/sys/proc.h
+                 
 extern void proc_selfname(char * buf, int size);
 
 #define NOT_SUPPORTED_USER64()    \
@@ -88,13 +88,13 @@ extern void proc_selfname(char * buf, int size);
 #define KMOD_MIG_UNUSED __unused
 
 
-/*********************************************************************
- * Old MIG routines that are no longer supported.
- **********************************************************************
- * We have to keep these around for ppc, i386, and x86_64. A 32-bit
- * user-space client might call into the 64-bit kernel. Only
- * kmod_get_info() retains a functional implementation (ppc/i386).
- **********************************************************************/
+                                                                      
+                                                 
+                                                                       
+                                                                   
+                                                            
+                                                                  
+                                                                        
 kern_return_t
 kmod_create(
 	host_priv_t   host_priv __unused,
@@ -105,7 +105,7 @@ kmod_create(
 	return KERN_NOT_SUPPORTED;
 }
 
-/********************************************************************/
+                                                                      
 kern_return_t
 kmod_destroy(
 	host_priv_t host_priv __unused,
@@ -115,7 +115,7 @@ kmod_destroy(
 	return KERN_NOT_SUPPORTED;
 }
 
-/********************************************************************/
+                                                                      
 kern_return_t
 kmod_control(
 	host_priv_t              host_priv __unused,
@@ -128,7 +128,7 @@ kmod_control(
 	return KERN_NOT_SUPPORTED;
 }
 
-/********************************************************************/
+                                                                      
 kern_return_t
 kmod_get_info(
 	host_t host __unused,

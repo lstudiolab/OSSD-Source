@@ -53,20 +53,20 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/*
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
+  
+   
 
-/*
- * File:	ipc_tt.c
- * Purpose:
- *	Task and thread related IPC functions.
- */
+  
+                 
+           
+                                         
+   
 
 #include <mach/mach_types.h>
 #include <mach/boolean.h>
@@ -109,7 +109,7 @@ extern int cs_relax_platform_task_ports;
 
 extern boolean_t IOTaskHasEntitlement(task_t, const char *);
 
-/* forward declarations */
+                          
 static kern_return_t port_allowed_with_task_flavor(int which, mach_task_flavor_t flavor);
 static kern_return_t port_allowed_with_thread_flavor(int which, mach_thread_flavor_t flavor);
 static void ipc_port_bind_special_reply_port_locked(ipc_port_t port);
@@ -123,16 +123,16 @@ static task_read_t convert_port_to_task_read_no_eval(ipc_port_t port);
 static thread_read_t convert_port_to_thread_read_no_eval(ipc_port_t port);
 static ipc_space_read_t convert_port_to_space_read_no_eval(ipc_port_t port);
 
-/*
- *	Routine:	ipc_task_init
- *	Purpose:
- *		Initialize a task's IPC state.
- *
- *		If non-null, some state will be inherited from the parent.
- *		The parent must be appropriately initialized.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                         
+           
+                                  
+  
+                                                              
+                                                 
+              
+                   
+   
 
 void
 ipc_task_init(
@@ -184,18 +184,18 @@ ipc_task_init(
 	task->itk_task_ports[TASK_FLAVOR_CONTROL] = kport;
 	task->itk_task_ports[TASK_FLAVOR_NAME] = nport;
 
-	/* Lazily allocated on-demand */
+	                                
 	task->itk_task_ports[TASK_FLAVOR_INSPECT] = IP_NULL;
 	task->itk_task_ports[TASK_FLAVOR_READ] = IP_NULL;
 	task->itk_dyld_notify = NULL;
 
 	task->itk_self = pport;
-	task->itk_resume = IP_NULL; /* Lazily allocated on-demand */
+	task->itk_resume = IP_NULL;                                 
 	if (task_is_a_corpse_fork(task)) {
-		/*
-		 * No sender's notification for corpse would not
-		 * work with a naked send right in kernel.
-		 */
+		  
+                                                  
+                                            
+     
 		task->itk_settable_self = IP_NULL;
 	} else {
 		task->itk_settable_self = ipc_port_make_send(kport);
@@ -210,7 +210,7 @@ ipc_task_init(
 	}
 #endif
 
-	/* always zero-out the first (unused) array element */
+	                                                      
 	bzero(&task->exc_actions[0], sizeof(task->exc_actions[0]));
 
 	if (parent == TASK_NULL) {
@@ -220,7 +220,7 @@ ipc_task_init(
 			task->exc_actions[i].flavor = 0;
 			task->exc_actions[i].behavior = 0;
 			task->exc_actions[i].privileged = FALSE;
-		}/* for */
+		}         
 
 		kr = host_get_host_port(host_priv_self(), &port);
 		assert(kr == KERN_SUCCESS);
@@ -238,14 +238,14 @@ ipc_task_init(
 		itk_lock(parent);
 		assert(parent->itk_task_ports[TASK_FLAVOR_CONTROL] != IP_NULL);
 
-		/* inherit registered ports */
+		                              
 
 		for (i = 0; i < TASK_PORT_REGISTER_MAX; i++) {
 			task->itk_registered[i] =
 			    ipc_port_copy_send(parent->itk_registered[i]);
 		}
 
-		/* inherit exception and bootstrap ports */
+		                                           
 
 		for (i = FIRST_EXCEPTION; i < EXC_TYPES_COUNT; i++) {
 			task->exc_actions[i].port =
@@ -259,7 +259,7 @@ ipc_task_init(
 #if CONFIG_MACF
 			mac_exc_inherit_action_label(parent->exc_actions + i, task->exc_actions + i);
 #endif
-		}/* for */
+		}         
 		task->itk_host =
 		    ipc_port_copy_send(parent->itk_host);
 
@@ -279,13 +279,13 @@ ipc_task_init(
 	}
 }
 
-/*
- *	Routine:	ipc_task_enable
- *	Purpose:
- *		Enable a task for IPC access.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                           
+           
+                                 
+              
+                   
+   
 
 void
 ipc_task_enable(
@@ -326,13 +326,13 @@ ipc_task_enable(
 	itk_unlock(task);
 }
 
-/*
- *	Routine:	ipc_task_disable
- *	Purpose:
- *		Disable IPC access to a task.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                            
+           
+                                 
+              
+                   
+   
 
 void
 ipc_task_disable(
@@ -347,14 +347,14 @@ ipc_task_disable(
 
 	itk_lock(task);
 
-	/*
-	 * This innocuous looking line is load bearing.
-	 *
-	 * It is used to disable the creation of lazy made ports.
-	 * We must do so before we drop the last reference on the task,
-	 * as task ports do not own a reference on the task, and
-	 * convert_port_to_task* will crash trying to resurect a task.
-	 */
+	  
+                                                
+   
+                                                          
+                                                                
+                                                         
+                                                               
+    
 	task->ipc_active = false;
 
 	kport = task->itk_task_ports[TASK_FLAVOR_CONTROL];
@@ -385,31 +385,31 @@ ipc_task_disable(
 
 	rport = task->itk_resume;
 	if (rport != IP_NULL) {
-		/*
-		 * From this point onwards this task is no longer accepting
-		 * resumptions.
-		 *
-		 * There are still outstanding suspensions on this task,
-		 * even as it is being torn down. Disconnect the task
-		 * from the rport, thereby "orphaning" the rport. The rport
-		 * itself will go away only when the last suspension holder
-		 * destroys his SO right to it -- when he either
-		 * exits, or tries to actually use that last SO right to
-		 * resume this (now non-existent) task.
-		 */
+		  
+                                                             
+                 
+    
+                                                          
+                                                       
+                                                             
+                                                             
+                                                  
+                                                          
+                                         
+     
 		ipc_kobject_set(rport, IKO_NULL, IKOT_NONE);
 	}
 	itk_unlock(task);
 }
 
-/*
- *	Routine:	ipc_task_terminate
- *	Purpose:
- *		Clean up and destroy a task's IPC state.
- *	Conditions:
- *		Nothing locked.  The task must be suspended.
- *		(Or the current thread must be in the task.)
- */
+  
+                              
+           
+                                            
+              
+                                                
+                                                
+   
 
 void
 ipc_task_terminate(
@@ -426,19 +426,19 @@ ipc_task_terminate(
 
 	itk_lock(task);
 
-	/*
-	 * If we ever failed to clear ipc_active before the last reference
-	 * was dropped, lazy ports might be made and used after the last
-	 * reference is dropped and cause use after free (see comment in
-	 * ipc_task_disable()).
-	 */
+	  
+                                                                   
+                                                                 
+                                                                 
+                        
+    
 	assert(!task->ipc_active);
 
 	kport = task->itk_task_ports[TASK_FLAVOR_CONTROL];
 	sself = task->itk_settable_self;
 
 	if (kport == IP_NULL) {
-		/* the task is already terminated (can this happen?) */
+		                                                       
 		itk_unlock(task);
 		return;
 	}
@@ -471,7 +471,7 @@ ipc_task_terminate(
 
 	itk_unlock(task);
 
-	/* release the naked send rights */
+	                                   
 	if (IP_VALID(sself)) {
 		ipc_port_release_send(sself);
 	}
@@ -524,14 +524,14 @@ ipc_task_terminate(
 		}
 	}
 
-	/* destroy the kernel ports */
+	                              
 	if (immovable_control_port_enabled) {
 		ip_lock(kport);
 		kport->ip_alt_port = IP_NULL;
 		ipc_kobject_set_atomically(kport, IKO_NULL, IKOT_NONE);
 		ip_unlock(kport);
 
-		/* pport == kport if immovability is off */
+		                                           
 		ipc_port_dealloc_kernel(pport);
 	}
 	ipc_port_dealloc_kernel(kport);
@@ -549,17 +549,17 @@ ipc_task_terminate(
 	itk_lock_destroy(task);
 }
 
-/*
- *	Routine:	ipc_task_reset
- *	Purpose:
- *		Reset a task's IPC state to protect it when
- *		it enters an elevated security context. The
- *		task name port can remain the same - since it
- *              represents no specific privilege.
- *	Conditions:
- *		Nothing locked.  The task must be suspended.
- *		(Or the current thread must be in the task.)
- */
+  
+                          
+           
+                                               
+                                               
+                                                 
+                                                 
+              
+                                                
+                                                
+   
 
 void
 ipc_task_reset(
@@ -573,7 +573,7 @@ ipc_task_reset(
 	ipc_port_t *notifiers_ptr = NULL;
 
 #if CONFIG_MACF
-	/* Fresh label to unset credentials in existing labels. */
+	                                                          
 	struct label *unset_label = mac_exc_create_label();
 #endif
 
@@ -606,7 +606,7 @@ ipc_task_reset(
 	old_pport = task->itk_self;
 
 	if (old_pport == IP_NULL) {
-		/* the task is already terminated (can this happen?) */
+		                                                       
 		itk_unlock(task);
 		ipc_port_dealloc_kernel(new_kport);
 		if (immovable_control_port_enabled) {
@@ -624,14 +624,14 @@ ipc_task_reset(
 
 	task->itk_settable_self = ipc_port_make_send(new_kport);
 
-	/* Set the old kport to IKOT_NONE and update the exec token while under the port lock */
+	                                                                                        
 	ip_lock(old_kport);
 	old_kport->ip_alt_port = IP_NULL;
 	ipc_kobject_set_atomically(old_kport, IKO_NULL, IKOT_NONE);
 	task->exec_token += 1;
 	ip_unlock(old_kport);
 
-	/* Reset the read and inspect flavors of task port */
+	                                                     
 	task->itk_task_ports[TASK_FLAVOR_READ] = IP_NULL;
 	task->itk_task_ports[TASK_FLAVOR_INSPECT] = IP_NULL;
 
@@ -656,7 +656,7 @@ ipc_task_reset(
 			old_exc_actions[i] = task->exc_actions[i].port;
 			task->exc_actions[i].port = IP_NULL;
 		}
-	}/* for */
+	}         
 
 	if (IP_VALID(task->itk_debug_control)) {
 		ipc_port_release_send(task->itk_debug_control);
@@ -674,7 +674,7 @@ ipc_task_reset(
 	mac_exc_free_label(unset_label);
 #endif
 
-	/* release the naked send rights */
+	                                   
 
 	if (IP_VALID(old_sself)) {
 		ipc_port_release_send(old_sself);
@@ -693,9 +693,9 @@ ipc_task_reset(
 		if (IP_VALID(old_exc_actions[i])) {
 			ipc_port_release_send(old_exc_actions[i]);
 		}
-	}/* for */
+	}         
 
-	/* destroy all task port flavors */
+	                                   
 	ipc_port_dealloc_kernel(old_kport);
 	if (immovable_control_port_enabled) {
 		ipc_port_dealloc_kernel(old_pport);
@@ -708,13 +708,13 @@ ipc_task_reset(
 	}
 }
 
-/*
- *	Routine:	ipc_thread_init
- *	Purpose:
- *		Initialize a thread's IPC state.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                           
+           
+                                    
+              
+                   
+   
 
 void
 ipc_thread_init(
@@ -725,13 +725,13 @@ ipc_thread_init(
 	ipc_port_t      pport;
 	ipc_kobject_alloc_options_t alloc_options = IPC_KOBJECT_ALLOC_NONE;
 
-	/*
-	 * Having immovable_control_port_enabled boot-arg set does not guarantee
-	 * thread control port should be made immovable/pinned, also check options.
-	 *
-	 * raw mach threads created via thread_create() have neither of INIT_PINNED
-	 * or INIT_IMMOVABLE set.
-	 */
+	  
+                                                                         
+                                                                            
+   
+                                                                            
+                          
+    
 	if (immovable_control_port_enabled && (options & IPC_THREAD_INIT_IMMOVABLE)) {
 		alloc_options |= IPC_KOBJECT_ALLOC_IMMOVABLE_SEND;
 
@@ -804,13 +804,13 @@ ipc_thread_destroy_exc_actions(
 	}
 }
 
-/*
- *	Routine:	ipc_thread_disable
- *	Purpose:
- *		Clean up and destroy a thread's IPC state.
- *	Conditions:
- *		Thread locked.
- */
+  
+                              
+           
+                                              
+              
+                  
+   
 void
 ipc_thread_disable(
 	thread_t        thread)
@@ -820,14 +820,14 @@ ipc_thread_disable(
 	ipc_port_t      rdport = thread->ith_thread_ports[THREAD_FLAVOR_READ];
 	ipc_port_t      pport = thread->ith_self;
 
-	/*
-	 * This innocuous looking line is load bearing.
-	 *
-	 * It is used to disable the creation of lazy made ports.
-	 * We must do so before we drop the last reference on the thread,
-	 * as thread ports do not own a reference on the thread, and
-	 * convert_port_to_thread* will crash trying to resurect a thread.
-	 */
+	  
+                                                
+   
+                                                          
+                                                                  
+                                                             
+                                                                   
+    
 	thread->ipc_active = false;
 
 	if (kport != IP_NULL) {
@@ -851,19 +851,19 @@ ipc_thread_disable(
 		ipc_kobject_set(pport, IKO_NULL, IKOT_NONE);
 	}
 
-	/* unbind the thread special reply port */
+	                                          
 	if (IP_VALID(thread->ith_special_reply_port)) {
 		ipc_port_unbind_special_reply_port(thread, TRUE);
 	}
 }
 
-/*
- *	Routine:	ipc_thread_terminate
- *	Purpose:
- *		Clean up and destroy a thread's IPC state.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                
+           
+                                              
+              
+                   
+   
 
 void
 ipc_thread_terminate(
@@ -877,12 +877,12 @@ ipc_thread_terminate(
 
 	thread_mtx_lock(thread);
 
-	/*
-	 * If we ever failed to clear ipc_active before the last reference
-	 * was dropped, lazy ports might be made and used after the last
-	 * reference is dropped and cause use after free (see comment in
-	 * ipc_thread_disable()).
-	 */
+	  
+                                                                   
+                                                                 
+                                                                 
+                          
+    
 	assert(!thread->ipc_active);
 
 	kport = thread->ith_thread_ports[THREAD_FLAVOR_CONTROL];
@@ -922,7 +922,7 @@ ipc_thread_terminate(
 	thread_mtx_unlock(thread);
 
 	if (pport != kport && pport != IP_NULL) {
-		/* this thread has immovable contorl port */
+		                                            
 		ip_lock(kport);
 		kport->ip_alt_port = IP_NULL;
 		ipc_kobject_set_atomically(kport, IKO_NULL, IKOT_NONE);
@@ -943,18 +943,18 @@ ipc_thread_terminate(
 	}
 }
 
-/*
- *	Routine:	ipc_thread_reset
- *	Purpose:
- *		Reset the IPC state for a given Mach thread when
- *		its task enters an elevated security context.
- *		All flavors of thread port and its exception ports have
- *		to be reset.  Its RPC reply port cannot have any
- *		rights outstanding, so it should be fine. The thread
- *		inspect and read port are set to NULL.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                            
+           
+                                                    
+                                                 
+                                                           
+                                                    
+                                                        
+                                          
+              
+                   
+   
 
 void
 ipc_thread_reset(
@@ -1010,7 +1010,7 @@ ipc_thread_reset(
 	old_pport = thread->ith_self;
 
 	if (old_kport == IP_NULL && thread->inspection == FALSE) {
-		/* thread is already terminated (can this happen?) */
+		                                                     
 		thread_mtx_unlock(thread);
 		ipc_port_dealloc_kernel(new_kport);
 		if (thread_is_immovable) {
@@ -1045,10 +1045,10 @@ ipc_thread_reset(
 		ipc_kobject_set(old_pport, IKO_NULL, IKOT_NONE);
 	}
 
-	/*
-	 * Only ports that were set by root-owned processes
-	 * (privileged ports) should survive
-	 */
+	  
+                                                    
+                                     
+    
 	if (thread->exc_actions != NULL) {
 		has_old_exc_actions = TRUE;
 		for (i = FIRST_EXCEPTION; i < EXC_TYPES_COUNT; i++) {
@@ -1070,7 +1070,7 @@ ipc_thread_reset(
 	mac_exc_free_label(new_label);
 #endif
 
-	/* release the naked send rights */
+	                                   
 
 	if (IP_VALID(old_sself)) {
 		ipc_port_release_send(old_sself);
@@ -1082,7 +1082,7 @@ ipc_thread_reset(
 		}
 	}
 
-	/* destroy the kernel port */
+	                             
 	if (old_kport != IP_NULL) {
 		ipc_port_dealloc_kernel(old_kport);
 	}
@@ -1097,23 +1097,23 @@ ipc_thread_reset(
 		ipc_port_dealloc_kernel(old_pport);
 	}
 
-	/* unbind the thread special reply port */
+	                                          
 	if (IP_VALID(thread->ith_special_reply_port)) {
 		ipc_port_unbind_special_reply_port(thread, TRUE);
 	}
 }
 
-/*
- *	Routine:	retrieve_task_self_fast
- *	Purpose:
- *		Optimized version of retrieve_task_self,
- *		that only works for the current task.
- *
- *		Return a send right (possibly null/dead)
- *		for the task's user-visible self port.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                   
+           
+                                            
+                                         
+  
+                                            
+                                          
+              
+                   
+   
 
 ipc_port_t
 retrieve_task_self_fast(
@@ -1127,12 +1127,12 @@ retrieve_task_self_fast(
 	assert(task->itk_self != IP_NULL);
 
 	if (task->itk_settable_self == task->itk_task_ports[TASK_FLAVOR_CONTROL]) {
-		/* no interposing, return the IMMOVABLE port */
+		                                               
 		port = ipc_port_make_send(task->itk_self);
 		if (immovable_control_port_enabled) {
 			assert(port->ip_immovable_send == 1);
 			if (pinned_control_port_enabled) {
-				/* pinned port is also immovable */
+				                                   
 				assert(port->ip_pinned == 1);
 			}
 		}
@@ -1144,12 +1144,12 @@ retrieve_task_self_fast(
 	return port;
 }
 
-/*
- *	Routine:	mach_task_is_self
- *	Purpose:
- *      [MIG call] Checks if the task (control/read/inspect/name/movable)
- *      port is pointing to current_task.
- */
+  
+                             
+           
+                                                                         
+                                         
+   
 kern_return_t
 mach_task_is_self(
 	task_t         task,
@@ -1164,17 +1164,17 @@ mach_task_is_self(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	retrieve_thread_self_fast
- *	Purpose:
- *		Return a send right (possibly null/dead)
- *		for the thread's user-visible self port.
- *
- *		Only works for the current thread.
- *
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                     
+           
+                                            
+                                            
+  
+                                      
+  
+              
+                   
+   
 
 ipc_port_t
 retrieve_thread_self_fast(
@@ -1189,7 +1189,7 @@ retrieve_thread_self_fast(
 	assert(thread->ith_self != IP_NULL);
 
 	if (thread->ith_settable_self == thread->ith_thread_ports[THREAD_FLAVOR_CONTROL]) {
-		/* no interposing, return IMMOVABLE_PORT */
+		                                           
 		port = ipc_port_make_send(thread->ith_self);
 	} else {
 		port = ipc_port_copy_send(thread->ith_settable_self);
@@ -1200,16 +1200,16 @@ retrieve_thread_self_fast(
 	return port;
 }
 
-/*
- *	Routine:	task_self_trap [mach trap]
- *	Purpose:
- *		Give the caller send rights for his own task port.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		MACH_PORT_NULL if there are any resource failures
- *		or other errors.
- */
+  
+                                      
+           
+                                                      
+              
+                   
+           
+                                                     
+                    
+   
 
 mach_port_name_t
 task_self_trap(
@@ -1224,16 +1224,16 @@ task_self_trap(
 	return name;
 }
 
-/*
- *	Routine:	thread_self_trap [mach trap]
- *	Purpose:
- *		Give the caller send rights for his own thread port.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		MACH_PORT_NULL if there are any resource failures
- *		or other errors.
- */
+  
+                                        
+           
+                                                        
+              
+                   
+           
+                                                     
+                    
+   
 
 mach_port_name_t
 thread_self_trap(
@@ -1249,16 +1249,16 @@ thread_self_trap(
 	return name;
 }
 
-/*
- *	Routine:	mach_reply_port [mach trap]
- *	Purpose:
- *		Allocate a port for the caller.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		MACH_PORT_NULL if there are any resource failures
- *		or other errors.
- */
+  
+                                       
+           
+                                   
+              
+                   
+           
+                                                     
+                    
+   
 
 mach_port_name_t
 mach_reply_port(
@@ -1278,17 +1278,17 @@ mach_reply_port(
 	return name;
 }
 
-/*
- *	Routine:	thread_get_special_reply_port [mach trap]
- *	Purpose:
- *		Allocate a special reply port for the calling thread.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		mach_port_name_t: send right & receive right for special reply port.
- *		MACH_PORT_NULL if there are any resource failures
- *		or other errors.
- */
+  
+                                                     
+           
+                                                         
+              
+                   
+           
+                                                                        
+                                                     
+                    
+   
 
 mach_port_name_t
 thread_get_special_reply_port(
@@ -1301,7 +1301,7 @@ thread_get_special_reply_port(
 	ipc_port_init_flags_t flags = IPC_PORT_INIT_MESSAGE_QUEUE |
 	    IPC_PORT_INIT_MAKE_SEND_RIGHT | IPC_PORT_INIT_SPECIAL_REPLY;
 
-	/* unbind the thread special reply port */
+	                                          
 	if (IP_VALID(thread->ith_special_reply_port)) {
 		kr = ipc_port_unbind_special_reply_port(thread, TRUE);
 		if (kr != KERN_SUCCESS) {
@@ -1319,15 +1319,15 @@ thread_get_special_reply_port(
 	return name;
 }
 
-/*
- *	Routine:	ipc_port_bind_special_reply_port_locked
- *	Purpose:
- *		Bind the given port to current thread as a special reply port.
- *	Conditions:
- *		Port locked.
- *	Returns:
- *		None.
- */
+  
+                                                   
+           
+                                                                  
+              
+                
+           
+         
+   
 
 static void
 ipc_port_bind_special_reply_port_locked(
@@ -1345,17 +1345,17 @@ ipc_port_bind_special_reply_port_locked(
 	ipc_special_reply_port_bits_reset(port);
 }
 
-/*
- *	Routine:	ipc_port_unbind_special_reply_port
- *	Purpose:
- *		Unbind the thread's special reply port.
- *		If the special port has threads waiting on turnstile,
- *		update it's inheritor.
- *	Condition:
- *		Nothing locked.
- *	Returns:
- *		None.
- */
+  
+                                              
+           
+                                           
+                                                         
+                          
+             
+                   
+           
+         
+   
 static kern_return_t
 ipc_port_unbind_special_reply_port(
 	thread_t thread,
@@ -1365,7 +1365,7 @@ ipc_port_unbind_special_reply_port(
 
 	ip_lock(special_reply_port);
 
-	/* Return error if port active and unbind_active_port set to FALSE */
+	                                                                     
 	if (unbind_active_port == FALSE && ip_active(special_reply_port)) {
 		ip_unlock(special_reply_port);
 		return KERN_FAILURE;
@@ -1374,25 +1374,25 @@ ipc_port_unbind_special_reply_port(
 	thread->ith_special_reply_port = NULL;
 	ipc_port_adjust_special_reply_port_locked(special_reply_port, NULL,
 	    IPC_PORT_ADJUST_UNLINK_THREAD, FALSE);
-	/* port unlocked */
+	                   
 
 	ip_release(special_reply_port);
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	thread_get_special_port [kernel call]
- *	Purpose:
- *		Clones a send right for one of the thread's
- *		special ports.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Extracted a send right.
- *		KERN_INVALID_ARGUMENT	The thread is null.
- *		KERN_FAILURE		The thread is dead.
- *		KERN_INVALID_ARGUMENT	Invalid special port.
- */
+  
+                                                 
+           
+                                               
+                  
+              
+                   
+           
+                                         
+                                             
+                                     
+                                               
+   
 
 kern_return_t
 thread_get_special_port(
@@ -1435,7 +1435,7 @@ thread_get_special_port_internal(
 		thread_mtx_unlock(thread);
 		mach_thread_flavor_t current_flavor = (which == THREAD_READ_PORT) ?
 		    THREAD_FLAVOR_READ : THREAD_FLAVOR_INSPECT;
-		/* convert_thread_to_port_with_flavor consumes a thread reference */
+		                                                                    
 		thread_reference(thread);
 		port = convert_thread_to_port_with_flavor(thread, current_flavor);
 		break;
@@ -1471,7 +1471,7 @@ thread_get_non_substituted_self(thread_t thread)
 	thread_mtx_unlock(thread);
 
 	if (IP_VALID(port)) {
-		/* consumes the port reference */
+		                                 
 		return ipc_kobject_alloc_subst_once(port);
 	}
 
@@ -1497,10 +1497,10 @@ thread_get_special_port_from_user(
 
 	if (which == THREAD_KERNEL_PORT && thread->task == current_task()) {
 #if CONFIG_MACF
-		/*
-		 * only check for threads belong to current_task,
-		 * because foreign thread ports are always movable
-		 */
+		  
+                                                   
+                                                    
+     
 		if (mac_task_check_get_movable_control_port()) {
 			kr = KERN_DENIED;
 			goto out;
@@ -1565,22 +1565,22 @@ port_allowed_with_thread_flavor(
 	}
 }
 
-/*
- *	Routine:	thread_set_special_port [kernel call]
- *	Purpose:
- *		Changes one of the thread's special ports,
- *		setting it to the supplied send right.
- *	Conditions:
- *		Nothing locked.  If successful, consumes
- *		the supplied send right.
- *	Returns:
- *		KERN_SUCCESS            Changed the special port.
- *		KERN_INVALID_ARGUMENT   The thread is null.
- *      KERN_INVALID_RIGHT      Port is marked as immovable.
- *		KERN_FAILURE            The thread is dead.
- *		KERN_INVALID_ARGUMENT   Invalid special port.
- *		KERN_NO_ACCESS          Restricted access to set port.
- */
+  
+                                                 
+           
+                                              
+                                          
+              
+                                            
+                            
+           
+                                                     
+                                               
+                                                            
+                                               
+                                                 
+                                                          
+   
 
 kern_return_t
 thread_set_special_port(
@@ -1603,11 +1603,11 @@ thread_set_special_port(
 	case THREAD_KERNEL_PORT:
 #if CONFIG_CSR
 		if (csr_check(CSR_ALLOW_KERNEL_DEBUGGER) != 0) {
-			/*
-			 * Only allow setting of thread-self
-			 * special port from user-space when SIP is
-			 * disabled (for Mach-on-Mach emulation).
-			 */
+			  
+                                       
+                                              
+                                            
+      
 			return KERN_NO_ACCESS;
 		}
 #endif
@@ -1636,19 +1636,19 @@ thread_set_special_port(
 	return result;
 }
 
-/*
- *	Routine:	task_get_special_port [kernel call]
- *	Purpose:
- *		Clones a send right for one of the task's
- *		special ports.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		    Extracted a send right.
- *		KERN_INVALID_ARGUMENT	The task is null.
- *		KERN_FAILURE		    The task/space is dead.
- *		KERN_INVALID_ARGUMENT	Invalid special port.
- */
+  
+                                               
+           
+                                             
+                  
+              
+                   
+           
+                                             
+                                           
+                                             
+                                               
+   
 
 kern_return_t
 task_get_special_port(
@@ -1691,7 +1691,7 @@ task_get_special_port_internal(
 		itk_unlock(task);
 		mach_task_flavor_t current_flavor = (which == TASK_READ_PORT) ?
 		    TASK_FLAVOR_READ : TASK_FLAVOR_INSPECT;
-		/* convert_task_to_port_with_flavor consumes a task reference */
+		                                                                
 		task_reference(task);
 		port = convert_task_to_port_with_flavor(task, current_flavor);
 		break;
@@ -1757,7 +1757,7 @@ task_get_non_substituted_self(task_t task)
 	itk_unlock(task);
 
 	if (IP_VALID(port)) {
-		/* consumes the port reference */
+		                                 
 		return ipc_kobject_alloc_subst_once(port);
 	}
 
@@ -1782,10 +1782,10 @@ task_get_special_port_from_user(
 
 	if (which == TASK_KERNEL_PORT && task == current_task()) {
 #if CONFIG_MACF
-		/*
-		 * only check for current_task,
-		 * because foreign task ports are always movable
-		 */
+		  
+                                 
+                                                  
+     
 		if (mac_task_check_get_movable_control_port()) {
 			kr = KERN_DENIED;
 			goto out;
@@ -1852,22 +1852,22 @@ port_allowed_with_task_flavor(
 	}
 }
 
-/*
- *	Routine:	task_set_special_port [kernel call]
- *	Purpose:
- *		Changes one of the task's special ports,
- *		setting it to the supplied send right.
- *	Conditions:
- *		Nothing locked.  If successful, consumes
- *		the supplied send right.
- *	Returns:
- *		KERN_SUCCESS		    Changed the special port.
- *		KERN_INVALID_ARGUMENT	The task is null.
- *      KERN_INVALID_RIGHT      Port is marked as immovable.
- *		KERN_FAILURE		    The task/space is dead.
- *		KERN_INVALID_ARGUMENT	Invalid special port.
- *      KERN_NO_ACCESS		    Restricted access to set port.
- */
+  
+                                               
+           
+                                            
+                                          
+              
+                                            
+                            
+           
+                                               
+                                           
+                                                            
+                                             
+                                               
+                                                          
+   
 
 kern_return_t
 task_set_special_port(
@@ -1892,11 +1892,11 @@ task_set_special_port(
 	case TASK_HOST_PORT:
 #if CONFIG_CSR
 		if (csr_check(CSR_ALLOW_KERNEL_DEBUGGER) == 0) {
-			/*
-			 * Only allow setting of task-self / task-host
-			 * special ports from user-space when SIP is
-			 * disabled (for Mach-on-Mach emulation).
-			 */
+			  
+                                                 
+                                               
+                                            
+      
 			break;
 		}
 #endif
@@ -1908,21 +1908,21 @@ task_set_special_port(
 	return task_set_special_port_internal(task, which, port);
 }
 
-/*
- *	Routine:	task_set_special_port_internal
- *	Purpose:
- *		Changes one of the task's special ports,
- *		setting it to the supplied send right.
- *	Conditions:
- *		Nothing locked.  If successful, consumes
- *		the supplied send right.
- *	Returns:
- *		KERN_SUCCESS		Changed the special port.
- *		KERN_INVALID_ARGUMENT	The task is null.
- *		KERN_FAILURE		The task/space is dead.
- *		KERN_INVALID_ARGUMENT	Invalid special port.
- *      KERN_NO_ACCESS		Restricted access to overwrite port.
- */
+  
+                                          
+           
+                                            
+                                          
+              
+                                            
+                            
+           
+                                           
+                                           
+                                         
+                                               
+                                                            
+   
 
 kern_return_t
 task_set_special_port_internal(
@@ -1959,7 +1959,7 @@ task_set_special_port_internal(
 		task->itk_bootstrap = port;
 		break;
 
-	/* Never allow overwrite of seatbelt port */
+	                                            
 	case TASK_SEATBELT_PORT:
 		if (IP_VALID(task->itk_seatbelt)) {
 			rc = KERN_NO_ACCESS;
@@ -1968,7 +1968,7 @@ task_set_special_port_internal(
 		task->itk_seatbelt = port;
 		break;
 
-	/* Never allow overwrite of the task access port */
+	                                                   
 	case TASK_ACCESS_PORT:
 		if (IP_VALID(task->itk_task_access)) {
 			rc = KERN_NO_ACCESS;
@@ -1985,7 +1985,7 @@ task_set_special_port_internal(
 	default:
 		rc = KERN_INVALID_ARGUMENT;
 		goto out_unlock;
-	}/* switch */
+	}            
 
 	rc = KERN_SUCCESS;
 
@@ -1998,26 +1998,26 @@ out_unlock:
 out:
 	return rc;
 }
-/*
- *	Routine:	mach_ports_register [kernel call]
- *	Purpose:
- *		Stash a handful of port send rights in the task.
- *		Child tasks will inherit these rights, but they
- *		must use mach_ports_lookup to acquire them.
- *
- *		The rights are supplied in a (wired) kalloc'd segment.
- *		Rights which aren't supplied are assumed to be null.
- *	Conditions:
- *		Nothing locked.  If successful, consumes
- *		the supplied rights and memory.
- *	Returns:
- *		KERN_SUCCESS		    Stashed the port rights.
- *      KERN_INVALID_RIGHT      Port in array is marked immovable.
- *		KERN_INVALID_ARGUMENT	The task is null.
- *		KERN_INVALID_ARGUMENT	The task is dead.
- *		KERN_INVALID_ARGUMENT	The memory param is null.
- *		KERN_INVALID_ARGUMENT	Too many port rights supplied.
- */
+  
+                                             
+           
+                                                    
+                                                   
+                                               
+  
+                                                          
+                                                        
+              
+                                            
+                                   
+           
+                                              
+                                                                  
+                                           
+                                           
+                                                   
+                                                        
+   
 
 kern_return_t
 mach_ports_register(
@@ -2034,9 +2034,9 @@ mach_ports_register(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 *	Pad the port rights with nulls.
-	 */
+	  
+                                   
+    
 
 	for (i = 0; i < portsCnt; i++) {
 		ports[i] = memory[i];
@@ -2054,10 +2054,10 @@ mach_ports_register(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 *	Replace the old send rights with the new.
-	 *	Release the old rights after unlocking.
-	 */
+	  
+                                             
+                                           
+    
 
 	for (i = 0; i < TASK_PORT_REGISTER_MAX; i++) {
 		ipc_port_t old;
@@ -2075,10 +2075,10 @@ mach_ports_register(
 		}
 	}
 
-	/*
-	 *	Now that the operation is known to be successful,
-	 *	we can free the memory.
-	 */
+	  
+                                                     
+                           
+    
 
 	if (portsCnt != 0) {
 		kfree(memory,
@@ -2088,19 +2088,19 @@ mach_ports_register(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	mach_ports_lookup [kernel call]
- *	Purpose:
- *		Retrieves (clones) the stashed port send rights.
- *	Conditions:
- *		Nothing locked.  If successful, the caller gets
- *		rights and memory.
- *	Returns:
- *		KERN_SUCCESS		Retrieved the send rights.
- *		KERN_INVALID_ARGUMENT	The task is null.
- *		KERN_INVALID_ARGUMENT	The task is dead.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                                           
+           
+                                                    
+              
+                                                   
+                      
+           
+                                            
+                                           
+                                           
+                                                    
+   
 
 kern_return_t
 mach_ports_lookup(
@@ -2134,10 +2134,10 @@ mach_ports_lookup(
 
 	ports = (ipc_port_t *) memory;
 
-	/*
-	 *	Clone port rights.  Because kalloc'd memory
-	 *	is wired, we won't fault while holding the task lock.
-	 */
+	  
+                                               
+                                                         
+    
 
 	for (i = 0; i < TASK_PORT_REGISTER_MAX; i++) {
 		ports[i] = ipc_port_copy_send(task->itk_registered[i]);
@@ -2153,10 +2153,10 @@ mach_ports_lookup(
 kern_return_t
 task_conversion_eval(task_t caller, task_t victim)
 {
-	/*
-	 * Tasks are allowed to resolve their own task ports, and the kernel is
-	 * allowed to resolve anyone's task port.
-	 */
+	  
+                                                                        
+                                          
+    
 	if (caller == kernel_task) {
 		return KERN_SUCCESS;
 	}
@@ -2165,10 +2165,10 @@ task_conversion_eval(task_t caller, task_t victim)
 		return KERN_SUCCESS;
 	}
 
-	/*
-	 * Only the kernel can can resolve the kernel's task port. We've established
-	 * by this point that the caller is not kernel_task.
-	 */
+	  
+                                                                             
+                                                     
+    
 	if (victim == TASK_NULL || victim == kernel_task) {
 		return KERN_INVALID_SECURITY;
 	}
@@ -2176,10 +2176,10 @@ task_conversion_eval(task_t caller, task_t victim)
 	task_require(victim);
 
 #if !defined(XNU_TARGET_OS_OSX)
-	/*
-	 * On platforms other than macOS, only a platform binary can resolve the task port
-	 * of another platform binary.
-	 */
+	  
+                                                                                   
+                               
+    
 	if ((victim->t_flags & TF_PLATFORM) && !(caller->t_flags & TF_PLATFORM)) {
 #if SECURE_KERNEL
 		return KERN_INVALID_SECURITY;
@@ -2189,22 +2189,22 @@ task_conversion_eval(task_t caller, task_t victim)
 		} else {
 			return KERN_INVALID_SECURITY;
 		}
-#endif /* SECURE_KERNEL */
+#endif                    
 	}
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine: convert_port_to_locked_task
- *	Purpose:
- *		Internal helper routine to convert from a port to a locked
- *		task.  Used by several routines that try to convert from a
- *		task port to a reference on some task related object.
- *	Conditions:
- *		Nothing locked, blocking OK.
- */
+  
+                                       
+           
+                                                              
+                                                              
+                                                         
+              
+                                
+   
 static task_t
 convert_port_to_locked_task(ipc_port_t port, boolean_t eval)
 {
@@ -2227,10 +2227,10 @@ convert_port_to_locked_task(ipc_port_t port, boolean_t eval)
 			return TASK_NULL;
 		}
 
-		/*
-		 * Normal lock ordering puts task_lock() before ip_lock().
-		 * Attempt out-of-order locking here.
-		 */
+		  
+                                                            
+                                       
+     
 		if (task_lock_try(task)) {
 			ip_unlock(port);
 			return task;
@@ -2243,15 +2243,15 @@ convert_port_to_locked_task(ipc_port_t port, boolean_t eval)
 	return TASK_NULL;
 }
 
-/*
- *	Routine: convert_port_to_locked_task_inspect
- *	Purpose:
- *		Internal helper routine to convert from a port to a locked
- *		task inspect right. Used by internal routines that try to convert from a
- *		task inspect port to a reference on some task related object.
- *	Conditions:
- *		Nothing locked, blocking OK.
- */
+  
+                                               
+           
+                                                              
+                                                                            
+                                                                 
+              
+                                
+   
 static task_inspect_t
 convert_port_to_locked_task_inspect(ipc_port_t port)
 {
@@ -2269,10 +2269,10 @@ convert_port_to_locked_task_inspect(ipc_port_t port)
 		}
 		task = (task_inspect_t) ip_get_kobject(port);
 		assert(task != TASK_INSPECT_NULL);
-		/*
-		 * Normal lock ordering puts task_lock() before ip_lock().
-		 * Attempt out-of-order locking here.
-		 */
+		  
+                                                            
+                                       
+     
 		if (task_lock_try((task_t)task)) {
 			ip_unlock(port);
 			return task;
@@ -2285,15 +2285,15 @@ convert_port_to_locked_task_inspect(ipc_port_t port)
 	return TASK_INSPECT_NULL;
 }
 
-/*
- *	Routine: convert_port_to_locked_task_read
- *	Purpose:
- *		Internal helper routine to convert from a port to a locked
- *		task read right. Used by internal routines that try to convert from a
- *		task read port to a reference on some task related object.
- *	Conditions:
- *		Nothing locked, blocking OK.
- */
+  
+                                            
+           
+                                                              
+                                                                         
+                                                              
+              
+                                
+   
 static task_read_t
 convert_port_to_locked_task_read(
 	ipc_port_t port,
@@ -2319,10 +2319,10 @@ convert_port_to_locked_task_read(
 			return TASK_READ_NULL;
 		}
 
-		/*
-		 * Normal lock ordering puts task_lock() before ip_lock().
-		 * Attempt out-of-order locking here.
-		 */
+		  
+                                                            
+                                       
+     
 		if (task_lock_try((task_t)task)) {
 			ip_unlock(port);
 			return task;
@@ -2364,16 +2364,16 @@ convert_port_to_task_locked(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_task_with_exec_token
- *	Purpose:
- *		Convert from a port to a task and return
- *		the exec token stored in the task.
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                                
+           
+                                            
+                                      
+                                                      
+                      
+              
+                   
+   
 task_t
 convert_port_to_task_with_exec_token(
 	ipc_port_t              port,
@@ -2393,15 +2393,15 @@ convert_port_to_task_with_exec_token(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_task
- *	Purpose:
- *		Convert from a port to a task.
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                
+           
+                                  
+                                                      
+                      
+              
+                   
+   
 task_t
 convert_port_to_task(
 	ipc_port_t              port)
@@ -2409,15 +2409,15 @@ convert_port_to_task(
 	return convert_port_to_task_with_exec_token(port, NULL, TRUE);
 }
 
-/*
- *	Routine:	convert_port_to_task_no_eval
- *	Purpose:
- *		Convert from a port to a task, skips task_conversion_eval.
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                        
+           
+                                                              
+                                                      
+                      
+              
+                   
+   
 static task_t
 convert_port_to_task_no_eval(
 	ipc_port_t              port)
@@ -2425,15 +2425,15 @@ convert_port_to_task_no_eval(
 	return convert_port_to_task_with_exec_token(port, NULL, FALSE);
 }
 
-/*
- *	Routine:	convert_port_to_task_name
- *	Purpose:
- *		Convert from a port to a task name.
- *		Doesn't consume the port ref; produces a task name ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                     
+           
+                                       
+                                                           
+                      
+              
+                   
+   
 
 static task_name_t
 convert_port_to_task_name_locked(
@@ -2474,19 +2474,19 @@ convert_port_to_task_name(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_task_policy
- *	Purpose:
- *		Convert from a port to a task.
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *		If the port is being used with task_port_set(), any task port
- *		type other than TASK_CONTROL requires an entitlement. If the
- *		port is being used with task_port_get(), TASK_NAME requires an
- *		entitlement.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                       
+           
+                                  
+                                                      
+                      
+                                                                 
+                                                                
+                                                                  
+                
+              
+                   
+   
 static task_t
 convert_port_to_task_policy(ipc_port_t port, boolean_t set)
 {
@@ -2574,26 +2574,26 @@ convert_port_to_task_read_locked(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_task_check_type
- *	Purpose:
- *		Convert from a port to a task based on port's type.
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *  Arguments:
- *		port:       The port that we do conversion on
- *      kotype:     Returns the IKOT_TYPE of the port, if translation succeeded
- *      at_most:    The lowest capability flavor allowed. In mach_task_flavor_t,
- *                  the higher the flavor number, the lesser the capability, hence the name.
- *      eval_check: Whether to run task_conversion_eval check during the conversion.
- *                  For backward compatibility, some interfaces does not run conversion
- *                  eval on IKOT_TASK_CONTROL.
- *	Conditions:
- *		Nothing locked.
- *  Returns:
- *      task_t and port's type, if translation succeeded;
- *      TASK_NULL and IKOT_NONE, if translation failed
- */
+  
+                                           
+           
+                                                       
+                                                      
+                      
+              
+                                                 
+                                                                               
+                                                                                
+                                                                                            
+                                                                                    
+                                                                                       
+                                              
+              
+                   
+            
+                                                         
+                                                      
+   
 task_t
 convert_port_to_task_check_type(
 	ipc_port_t              port,
@@ -2650,28 +2650,28 @@ out:
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_thread_check_type
- *	Purpose:
- *		Convert from a port to a thread based on port's type.
- *		Doesn't consume the port ref; produces a thread ref,
- *		which may be null.
- *      This conversion routine is _ONLY_ supposed to be used
- *      by thread_get_special_port.
- *  Arguments:
- *		port:       The port that we do conversion on
- *      kotype:     Returns the IKOT_TYPE of the port, if translation succeeded
- *      at_most:    The lowest capability flavor allowed. In mach_thread_flavor_t,
- *                  the higher the flavor number, the lesser the capability, hence the name.
- *      eval_check: Whether to run task_conversion_eval check during the conversion.
- *                  For backward compatibility, some interfaces do not run
- *                  conversion eval on IKOT_THREAD_CONTROL.
- *	Conditions:
- *		Nothing locked.
- *  Returns:
- *      thread_t and port's type, if translation succeeded;
- *      THREAD_NULL and IKOT_NONE, if translation failed
- */
+  
+                                             
+           
+                                                         
+                                                        
+                      
+                                                             
+                                   
+              
+                                                 
+                                                                               
+                                                                                  
+                                                                                            
+                                                                                    
+                                                                          
+                                                           
+              
+                   
+            
+                                                           
+                                                        
+   
 thread_t
 convert_port_to_thread_check_type(
 	ipc_port_t              port,
@@ -2720,26 +2720,26 @@ out:
 	return thread;
 }
 
-/*
- *	Routine:	convert_port_to_space_check_type
- *	Purpose:
- *		Convert from a port to a space based on port's type.
- *		Doesn't consume the port ref; produces a space ref,
- *		which may be null.
- *  Arguments:
- *      port:       The port that we do conversion on
- *      kotype:     Returns the IKOT_TYPE of the port, if translation succeeded
- *      at_most:    The lowest capability flavor allowed. In mach_task_flavor_t,
- *                  the higher the flavor number, the lesser the capability, hence the name.
- *      eval_check: Whether to run task_conversion_eval check during the conversion.
- *                  For backward compatibility, some interfaces do not run
- *                  conversion eval on IKOT_TASK_CONTROL.
- *	Conditions:
- *		Nothing locked.
- *  Returns:
- *      ipc_space_t and port's type, if translation succeeded;
- *      IPC_SPACE_NULL and IKOT_NONE, if translation failed
- */
+  
+                                            
+           
+                                                        
+                                                       
+                      
+              
+                                                     
+                                                                               
+                                                                                
+                                                                                            
+                                                                                    
+                                                                          
+                                                         
+              
+                   
+            
+                                                              
+                                                           
+   
 ipc_space_t
 convert_port_to_space_check_type(
 	ipc_port_t              port,
@@ -2788,15 +2788,15 @@ out:
 	return space;
 }
 
-/*
- *	Routine:	convert_port_to_task_inspect
- *	Purpose:
- *		Convert from a port to a task inspection right
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                        
+           
+                                                  
+                                                      
+                      
+              
+                   
+   
 task_inspect_t
 convert_port_to_task_inspect(
 	ipc_port_t              port)
@@ -2814,15 +2814,15 @@ convert_port_to_task_inspect(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_task_read
- *	Purpose:
- *		Convert from a port to a task read right
- *		Doesn't consume the port ref; produces a task ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                     
+           
+                                            
+                                                      
+                      
+              
+                   
+   
 task_read_t
 convert_port_to_task_read(
 	ipc_port_t              port)
@@ -2857,15 +2857,15 @@ convert_port_to_task_read_no_eval(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_task_suspension_token
- *	Purpose:
- *		Convert from a port to a task suspension token.
- *		Doesn't consume the port ref; produces a suspension token ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                                 
+           
+                                                   
+                                                                  
+                      
+              
+                   
+   
 task_suspension_token_t
 convert_port_to_task_suspension_token(
 	ipc_port_t              port)
@@ -2889,15 +2889,15 @@ convert_port_to_task_suspension_token(
 	return task;
 }
 
-/*
- *	Routine:	convert_port_to_space_with_flavor
- *	Purpose:
- *		Convert from a port to a space.
- *		Doesn't consume the port ref; produces a space ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                             
+           
+                                   
+                                                       
+                      
+              
+                   
+   
 static ipc_space_t
 convert_port_to_space_with_flavor(
 	ipc_port_t         port,
@@ -2972,15 +2972,15 @@ convert_port_to_space_inspect(
 	return convert_port_to_space_with_flavor(port, TASK_FLAVOR_INSPECT, TRUE);
 }
 
-/*
- *	Routine:	convert_port_to_map_with_flavor
- *	Purpose:
- *		Convert from a port to a map.
- *		Doesn't consume the port ref; produces a map ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                           
+           
+                                 
+                                                     
+                      
+              
+                   
+   
 
 static vm_map_t
 convert_port_to_map_with_flavor(
@@ -2992,13 +2992,13 @@ convert_port_to_map_with_flavor(
 
 	switch (flavor) {
 	case TASK_FLAVOR_CONTROL:
-		task = convert_port_to_locked_task(port, TRUE); /* always eval */
+		task = convert_port_to_locked_task(port, TRUE);                  
 		break;
 	case TASK_FLAVOR_READ:
-		task = convert_port_to_locked_task_read(port, TRUE); /* always eval */
+		task = convert_port_to_locked_task_read(port, TRUE);                  
 		break;
 	case TASK_FLAVOR_INSPECT:
-		task = convert_port_to_locked_task_inspect(port); /* always no eval */
+		task = convert_port_to_locked_task_inspect(port);                     
 		break;
 	default:
 		task = TASK_NULL;
@@ -3055,15 +3055,15 @@ convert_port_to_map_inspect(
 }
 
 
-/*
- *	Routine:	convert_port_to_thread
- *	Purpose:
- *		Convert from a port to a thread.
- *		Doesn't consume the port ref; produces an thread ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                  
+           
+                                    
+                                                         
+                      
+              
+                   
+   
 
 static thread_t
 convert_port_to_thread_locked(
@@ -3091,7 +3091,7 @@ convert_port_to_thread_locked(
 				return THREAD_NULL;
 			}
 		} else {
-			/* Use task conversion rules for thread control conversions */
+			                                                              
 			if (eval && task_conversion_eval(current_task(), thread->task) != KERN_SUCCESS) {
 				return THREAD_NULL;
 			}
@@ -3137,15 +3137,15 @@ convert_port_to_thread_no_eval(
 	return thread;
 }
 
-/*
- *	Routine:	convert_port_to_thread_inspect
- *	Purpose:
- *		Convert from a port to a thread inspect right
- *		Doesn't consume the port ref; produces a thread ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                          
+           
+                                                 
+                                                        
+                      
+              
+                   
+   
 static thread_inspect_t
 convert_port_to_thread_inspect_locked(
 	ipc_port_t              port)
@@ -3183,15 +3183,15 @@ convert_port_to_thread_inspect(
 	return thread;
 }
 
-/*
- *	Routine:	convert_port_to_thread_read
- *	Purpose:
- *		Convert from a port to a thread read right
- *		Doesn't consume the port ref; produces a thread ref,
- *		which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                       
+           
+                                              
+                                                        
+                      
+              
+                   
+   
 static thread_read_t
 convert_port_to_thread_read_locked(
 	ipc_port_t port,
@@ -3207,7 +3207,7 @@ convert_port_to_thread_read_locked(
 		thread = (thread_read_t) ip_get_kobject(port);
 		assert(thread != THREAD_READ_NULL);
 
-		/* Use task conversion rules for thread control conversions */
+		                                                              
 		if (eval && task_conversion_eval(current_task(), thread->task) != KERN_SUCCESS) {
 			return THREAD_READ_NULL;
 		}
@@ -3253,15 +3253,15 @@ convert_port_to_thread_read_no_eval(
 }
 
 
-/*
- *	Routine:	convert_thread_to_port_with_flavor
- *	Purpose:
- *		Convert from a thread to a port of given flavor.
- *		Consumes a thread ref; produces a naked send right
- *		which may be invalid.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                              
+           
+                                                    
+                                                      
+                         
+              
+                   
+   
 static ipc_port_t
 convert_thread_to_port_with_flavor(
 	thread_t              thread,
@@ -3279,15 +3279,15 @@ convert_thread_to_port_with_flavor(
 		port = ipc_port_make_send(thread->ith_thread_ports[flavor]);
 	} else {
 		ipc_kobject_type_t kotype = (flavor == THREAD_FLAVOR_READ) ? IKOT_THREAD_READ : IKOT_THREAD_INSPECT;
-		/*
-		 * Claim a send right on the thread read/inspect port, and request a no-senders
-		 * notification on that port (if none outstanding). A thread reference is not
-		 * donated here even though the ports are created lazily because it doesn't own the
-		 * kobject that it points to. Threads manage their lifetime explicitly and
-		 * have to synchronize with each other, between the task/thread terminating and the
-		 * send-once notification firing, and this is done under the thread mutex
-		 * rather than with atomics.
-		 */
+		  
+                                                                                 
+                                                                               
+                                                                                     
+                                                                            
+                                                                                     
+                                                                           
+                              
+     
 		(void)ipc_kobject_make_send_lazy_alloc_port(&thread->ith_thread_ports[flavor], (ipc_kobject_t)thread,
 		    kotype, IPC_KOBJECT_ALLOC_IMMOVABLE_SEND, false, 0);
 		port = thread->ith_thread_ports[flavor];
@@ -3319,14 +3319,14 @@ convert_thread_inspect_to_port(thread_inspect_t thread)
 }
 
 
-/*
- *	Routine:	port_name_to_thread
- *	Purpose:
- *		Convert from a port name to a thread reference
- *		A name of MACH_PORT_NULL is valid for the null thread.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                               
+           
+                                                  
+                                                          
+              
+                   
+   
 thread_t
 port_name_to_thread(
 	mach_port_name_t         name,
@@ -3347,14 +3347,14 @@ port_name_to_thread(
 	return thread;
 }
 
-/*
- *	Routine:	port_name_to_task
- *	Purpose:
- *		Convert from a port name to a task reference
- *		A name of MACH_PORT_NULL is valid for the null task.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                             
+           
+                                                
+                                                        
+              
+                   
+   
 task_t
 port_name_to_task(
 	mach_port_name_t name)
@@ -3373,14 +3373,14 @@ port_name_to_task(
 	return task;
 }
 
-/*
- *	Routine:	port_name_to_task_read
- *	Purpose:
- *		Convert from a port name to a task reference
- *		A name of MACH_PORT_NULL is valid for the null task.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                  
+           
+                                                
+                                                        
+              
+                   
+   
 task_read_t
 port_name_to_task_read(
 	mach_port_name_t name)
@@ -3399,15 +3399,15 @@ port_name_to_task_read(
 	return tr;
 }
 
-/*
- *	Routine:	port_name_to_task_read_no_eval
- *	Purpose:
- *		Convert from a port name to a task reference
- *		A name of MACH_PORT_NULL is valid for the null task.
- *		Skips task_conversion_eval() during conversion.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                          
+           
+                                                
+                                                        
+                                                   
+              
+                   
+   
 task_read_t
 port_name_to_task_read_no_eval(
 	mach_port_name_t name)
@@ -3426,14 +3426,14 @@ port_name_to_task_read_no_eval(
 	return tr;
 }
 
-/*
- *	Routine:	port_name_to_task_name
- *	Purpose:
- *		Convert from a port name to a task reference
- *		A name of MACH_PORT_NULL is valid for the null task.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                  
+           
+                                                
+                                                        
+              
+                   
+   
 task_name_t
 port_name_to_task_name(
 	mach_port_name_t name)
@@ -3452,14 +3452,14 @@ port_name_to_task_name(
 	return tn;
 }
 
-/*
- *	Routine:	port_name_to_host
- *	Purpose:
- *		Convert from a port name to a host pointer.
- *		NOTE: This does _not_ return a +1 reference to the host_t
- *	Conditions:
- *		Nothing locked.
- */
+  
+                             
+           
+                                               
+                                                             
+              
+                   
+   
 host_t
 port_name_to_host(
 	mach_port_name_t name)
@@ -3478,15 +3478,15 @@ port_name_to_host(
 	return host;
 }
 
-/*
- *	Routine:	convert_task_to_port_with_flavor
- *	Purpose:
- *		Convert from a task to a port of given flavor.
- *		Consumes a task ref; produces a naked send right
- *		which may be invalid.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                            
+           
+                                                  
+                                                    
+                         
+              
+                   
+   
 static ipc_port_t
 convert_task_to_port_with_flavor(
 	task_t              task,
@@ -3506,14 +3506,14 @@ convert_task_to_port_with_flavor(
 	case TASK_FLAVOR_NAME:
 		port = ipc_port_make_send(task->itk_task_ports[flavor]);
 		break;
-	/*
-	 * Claim a send right on the task read/inspect port, and request a no-senders
-	 * notification on that port (if none outstanding). A task reference is
-	 * deliberately not donated here because ipc_kobject_make_send_lazy_alloc_port
-	 * is used only for convenience and these ports don't control the lifecycle of
-	 * the task kobject. Instead, the task's itk_lock is used to synchronize the
-	 * handling of the no-senders notification with the task termination.
-	 */
+	  
+                                                                              
+                                                                        
+                                                                               
+                                                                               
+                                                                             
+                                                                      
+    
 	case TASK_FLAVOR_READ:
 	case TASK_FLAVOR_INSPECT:
 		kotype = (flavor == TASK_FLAVOR_READ) ? IKOT_TASK_READ : IKOT_TASK_INSPECT;
@@ -3575,15 +3575,15 @@ convert_task_to_port_pinned(
 	task_deallocate(task);
 	return port;
 }
-/*
- *	Routine:	convert_task_suspend_token_to_port
- *	Purpose:
- *		Convert from a task suspension token to a port.
- *		Consumes a task suspension token ref; produces a naked send-once right
- *		which may be invalid.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                              
+           
+                                                   
+                                                                          
+                         
+              
+                   
+   
 ipc_port_t
 convert_task_suspension_token_to_port(
 	task_suspension_token_t         task)
@@ -3597,11 +3597,11 @@ convert_task_suspension_token_to_port(
 			    IKOT_TASK_RESUME, IPC_KOBJECT_ALLOC_NONE);
 		}
 
-		/*
-		 * Create a send-once right for each instance of a direct user-called
-		 * task_suspend2 call. Each time one of these send-once rights is abandoned,
-		 * the notification handler will resume the target task.
-		 */
+		  
+                                                                       
+                                                                              
+                                                          
+     
 		port = ipc_port_make_sonce(task->itk_resume);
 		assert(IP_VALID(port));
 	} else {
@@ -3630,13 +3630,13 @@ convert_thread_to_port_pinned(
 	thread_deallocate(thread);
 	return port;
 }
-/*
- *	Routine:	space_deallocate
- *	Purpose:
- *		Deallocate a space ref produced by convert_port_to_space.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                            
+           
+                                                             
+              
+                   
+   
 
 void
 space_deallocate(
@@ -3647,13 +3647,13 @@ space_deallocate(
 	}
 }
 
-/*
- *	Routine:	space_read_deallocate
- *	Purpose:
- *		Deallocate a space read ref produced by convert_port_to_space_read.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                 
+           
+                                                                       
+              
+                   
+   
 
 void
 space_read_deallocate(
@@ -3664,13 +3664,13 @@ space_read_deallocate(
 	}
 }
 
-/*
- *	Routine:	space_inspect_deallocate
- *	Purpose:
- *		Deallocate a space inspect ref produced by convert_port_to_space_inspect.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                    
+           
+                                                                             
+              
+                   
+   
 
 void
 space_inspect_deallocate(
@@ -3682,23 +3682,23 @@ space_inspect_deallocate(
 }
 
 
-/*
- *	Routine:	thread/task_set_exception_ports [kernel call]
- *	Purpose:
- *			Sets the thread/task exception port, flavor and
- *			behavior for the exception types specified by the mask.
- *			There will be one send right per exception per valid
- *			port.
- *	Conditions:
- *		Nothing locked.  If successful, consumes
- *		the supplied send right.
- *	Returns:
- *		KERN_SUCCESS		Changed the special port.
- *		KERN_INVALID_ARGUMENT	The thread is null,
- *					Illegal mask bit set.
- *					Illegal exception behavior
- *		KERN_FAILURE		The thread is dead.
- */
+  
+                                                         
+           
+                                                    
+                                                            
+                                                         
+          
+              
+                                            
+                            
+           
+                                           
+                                             
+                            
+                                 
+                                     
+   
 
 kern_return_t
 thread_set_exception_ports(
@@ -3737,11 +3737,11 @@ thread_set_exception_ports(
 	}
 
 
-	/*
-	 * Check the validity of the thread_state_flavor by calling the
-	 * VALID_THREAD_STATE_FLAVOR architecture dependent macro defined in
-	 * osfmk/mach/ARCHITECTURE/thread_status.h
-	 */
+	  
+                                                                
+                                                                     
+                                           
+    
 	if (new_flavor != 0 && !VALID_THREAD_STATE_FLAVOR(new_flavor)) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -3789,7 +3789,7 @@ thread_set_exception_ports(
 		}
 	}
 
-	if (IP_VALID(new_port)) {         /* consume send right */
+	if (IP_VALID(new_port)) {                                 
 		ipc_port_release_send(new_port);
 	}
 
@@ -3833,11 +3833,11 @@ task_set_exception_ports(
 	}
 
 
-	/*
-	 * Check the validity of the thread_state_flavor by calling the
-	 * VALID_THREAD_STATE_FLAVOR architecture dependent macro defined in
-	 * osfmk/mach/ARCHITECTURE/thread_status.h
-	 */
+	  
+                                                                
+                                                                     
+                                           
+    
 	if (new_flavor != 0 && !VALID_THREAD_STATE_FLAVOR(new_flavor)) {
 		return KERN_INVALID_ARGUMENT;
 	}
@@ -3882,39 +3882,39 @@ task_set_exception_ports(
 		}
 	}
 
-	if (IP_VALID(new_port)) {         /* consume send right */
+	if (IP_VALID(new_port)) {                                 
 		ipc_port_release_send(new_port);
 	}
 
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	thread/task_swap_exception_ports [kernel call]
- *	Purpose:
- *			Sets the thread/task exception port, flavor and
- *			behavior for the exception types specified by the
- *			mask.
- *
- *			The old ports, behavior and flavors are returned
- *			Count specifies the array sizes on input and
- *			the number of returned ports etc. on output.  The
- *			arrays must be large enough to hold all the returned
- *			data, MIG returnes an error otherwise.  The masks
- *			array specifies the corresponding exception type(s).
- *
- *	Conditions:
- *		Nothing locked.  If successful, consumes
- *		the supplied send right.
- *
- *		Returns upto [in} CountCnt elements.
- *	Returns:
- *		KERN_SUCCESS		Changed the special port.
- *		KERN_INVALID_ARGUMENT	The thread is null,
- *					Illegal mask bit set.
- *					Illegal exception behavior
- *		KERN_FAILURE		The thread is dead.
- */
+  
+                                                          
+           
+                                                    
+                                                      
+          
+  
+                                                     
+                                                 
+                                                      
+                                                         
+                                                      
+                                                         
+  
+              
+                                            
+                            
+  
+                                        
+           
+                                           
+                                             
+                            
+                                 
+                                     
+   
 
 kern_return_t
 thread_swap_exception_ports(
@@ -3988,10 +3988,10 @@ thread_swap_exception_ports(
 #endif
 		    ) {
 			for (j = 0; j < count; ++j) {
-				/*
-				 * search for an identical entry, if found
-				 * set corresponding mask for this exception.
-				 */
+				  
+                                              
+                                                 
+       
 				if (thread->exc_actions[i].port == ports[j] &&
 				    thread->exc_actions[i].behavior == behaviors[j] &&
 				    thread->exc_actions[i].flavor == flavors[j]) {
@@ -4031,7 +4031,7 @@ thread_swap_exception_ports(
 		}
 	}
 
-	if (IP_VALID(new_port)) {         /* consume send right */
+	if (IP_VALID(new_port)) {                                 
 		ipc_port_release_send(new_port);
 	}
 
@@ -4108,10 +4108,10 @@ task_swap_exception_ports(
 #endif
 		    ) {
 			for (j = 0; j < count; j++) {
-				/*
-				 * search for an identical entry, if found
-				 * set corresponding mask for this exception.
-				 */
+				  
+                                              
+                                                 
+       
 				if (task->exc_actions[i].port == ports[j] &&
 				    task->exc_actions[i].behavior == behaviors[j] &&
 				    task->exc_actions[i].flavor == flavors[j]) {
@@ -4151,7 +4151,7 @@ task_swap_exception_ports(
 		}
 	}
 
-	if (IP_VALID(new_port)) {         /* consume send right */
+	if (IP_VALID(new_port)) {                                 
 		ipc_port_release_send(new_port);
 	}
 
@@ -4160,24 +4160,24 @@ task_swap_exception_ports(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	thread/task_get_exception_ports [kernel call]
- *	Purpose:
- *		Clones a send right for each of the thread/task's exception
- *		ports specified in the mask and returns the behaviour
- *		and flavor of said port.
- *
- *		Returns upto [in} CountCnt elements.
- *
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Extracted a send right.
- *		KERN_INVALID_ARGUMENT	The thread is null,
- *					Invalid special port,
- *					Illegal mask bit set.
- *		KERN_FAILURE		The thread is dead.
- */
+  
+                                                         
+           
+                                                               
+                                                         
+                            
+  
+                                        
+  
+              
+                   
+           
+                                         
+                                             
+                            
+                            
+                                     
+   
 static kern_return_t
 thread_get_exception_ports_internal(
 	thread_t                        thread,
@@ -4192,7 +4192,7 @@ thread_get_exception_ports_internal(
 	unsigned int count;
 	boolean_t info_only = (ports_info != NULL);
 	boolean_t dbg_ok = TRUE;
-	ipc_port_t port_ptrs[EXC_TYPES_COUNT]; /* pointers only, does not hold right */
+	ipc_port_t port_ptrs[EXC_TYPES_COUNT];                                         
 
 	if (thread == THREAD_NULL) {
 		return KERN_INVALID_ARGUMENT;
@@ -4235,10 +4235,10 @@ thread_get_exception_ports_internal(
 			thread_state_flavor_t exc_flavor = thread->exc_actions[i].flavor;
 
 			for (j = 0; j < count; ++j) {
-				/*
-				 * search for an identical entry, if found
-				 * set corresponding mask for this exception.
-				 */
+				  
+                                              
+                                                 
+       
 				if (exc_port == port_ptrs[j] &&
 				    exc_behavior == behaviors[j] &&
 				    exc_flavor == flavors[j]) {
@@ -4253,7 +4253,7 @@ thread_get_exception_ports_internal(
 
 				if (info_only) {
 					if (!dbg_ok || !IP_VALID(exc_port)) {
-						/* avoid taking port lock if !dbg_ok */
+						                                       
 						ports_info[j] = (ipc_info_port_t){ .iip_port_object = 0, .iip_receiver_object = 0 };
 					} else {
 						uintptr_t receiver;
@@ -4356,7 +4356,7 @@ task_get_exception_ports_internal(
 	unsigned int count;
 	boolean_t info_only = (ports_info != NULL);
 	boolean_t dbg_ok = TRUE;
-	ipc_port_t port_ptrs[EXC_TYPES_COUNT]; /* pointers only, does not hold right */
+	ipc_port_t port_ptrs[EXC_TYPES_COUNT];                                         
 
 	if (task == TASK_NULL) {
 		return KERN_INVALID_ARGUMENT;
@@ -4394,10 +4394,10 @@ task_get_exception_ports_internal(
 			thread_state_flavor_t exc_flavor = task->exc_actions[i].flavor;
 
 			for (j = 0; j < count; ++j) {
-				/*
-				 * search for an identical entry, if found
-				 * set corresponding mask for this exception.
-				 */
+				  
+                                              
+                                                 
+       
 				if (exc_port == port_ptrs[j] &&
 				    exc_behavior == behaviors[j] &&
 				    exc_flavor == flavors[j]) {
@@ -4412,7 +4412,7 @@ task_get_exception_ports_internal(
 
 				if (info_only) {
 					if (!dbg_ok || !IP_VALID(exc_port)) {
-						/* avoid taking port lock if !dbg_ok */
+						                                       
 						ports_info[j] = (ipc_info_port_t){ .iip_port_object = 0, .iip_receiver_object = 0 };
 					} else {
 						uintptr_t receiver;
@@ -4500,17 +4500,17 @@ task_get_exception_ports_from_user(
 	return kr;
 }
 
-/*
- *	Routine:	ipc_thread_port_unpin
- *	Purpose:
- *		Called on the thread port when the thread is
- *		terminating so that the last ref can be deallocated
- *		without a guard exception.
- *	Conditions:
- *		Thread mutex lock is held.
- *		check_bit should be set to true only when port is expected
- *		to have ip_pinned bit set.
- */
+  
+                                 
+           
+                                                
+                                                       
+                              
+              
+                              
+                                                              
+                              
+   
 void
 ipc_thread_port_unpin(
 	ipc_port_t port,
@@ -4523,7 +4523,7 @@ ipc_thread_port_unpin(
 	imq_lock(&port->ip_messages);
 #if DEVELOPMENT || DEBUG
 	if (pinned_control_port_enabled && check_bit) {
-		assert(ip_is_control(port)); /*remove once we get rid of boot-arg */
+		assert(ip_is_control(port));                                        
 		assert(port->ip_pinned == 1);
 	}
 #endif

@@ -46,4 +46,4 @@ sysctl_run_ctrr_test(__unused struct sysctl_oid *oidp, __unused void *arg1, __un
 SYSCTL_PROC(_kern, OID_AUTO, run_ctrr_test,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED,
     0, 0, sysctl_run_ctrr_test, "I", "");
-#endif /* defined(KERNEL_INTEGRITY_CTRR) && defined(CONFIG_XNUPOST) */
+#endif                                                                

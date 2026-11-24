@@ -28,7 +28,7 @@
 
 #include "strings.h"
 
-/* syscall entry point */
+                         
 int __persona(uint32_t operation, uint32_t flags, struct kpersona_info *info, uid_t *id, size_t *idlen, char *path);
 
 int

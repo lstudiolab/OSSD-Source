@@ -29,9 +29,9 @@
 #include <nfs/nfs_conf.h>
 #if CONFIG_NFS_CLIENT
 
-/*
- * vnode op calls for NFS version 4
- */
+  
+                                   
+   
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <sys/systm.h>
@@ -104,7 +104,7 @@ nfs4_access_rpc(nfsnode_t np, u_int32_t *access, int rpcflags, vfs_context_t ctx
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, ACCESS, GETATTR
+	                         
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 17 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "access", nmp->nm_minor_vers, numops);
@@ -135,30 +135,30 @@ nfs4_access_rpc(nfsnode_t np, u_int32_t *access, int rpcflags, vfs_context_t ctx
 	nfsm_chain_get_32(error, &nmrep, access_result);
 	nfsmout_if(error);
 	if ((missing = (*access & ~supported))) {
-		/* missing support for something(s) we wanted */
+		                                                
 		if (missing & NFS_ACCESS_DELETE) {
-			/*
-			 * If the server doesn't report DELETE (possible
-			 * on UNIX systems), we'll assume that it is OK
-			 * and just let any subsequent delete action fail
-			 * if it really isn't deletable.
-			 */
+			  
+                                                   
+                                                  
+                                                    
+                                   
+      
 			access_result |= NFS_ACCESS_DELETE;
 		}
 	}
-	/* ".zfs" subdirectories may erroneously give a denied answer for modify/delete */
+	                                                                                  
 	if (nfs_access_dotzfs) {
 		vnode_t dvp = NULLVP;
-		if (np->n_flag & NISDOTZFSCHILD) { /* may be able to create/delete snapshot dirs */
+		if (np->n_flag & NISDOTZFSCHILD) {                                                 
 			access_result |= (NFS_ACCESS_MODIFY | NFS_ACCESS_EXTEND | NFS_ACCESS_DELETE);
 		} else if (((dvp = vnode_getparent(NFSTOV(np))) != NULLVP) && (VTONFS(dvp)->n_flag & NISDOTZFSCHILD)) {
-			access_result |= NFS_ACCESS_DELETE; /* may be able to delete snapshot dirs */
+			access_result |= NFS_ACCESS_DELETE;                                          
 		}
 		if (dvp != NULLVP) {
 			vnode_put(dvp);
 		}
 	}
-	/* Some servers report DELETE support but erroneously give a denied answer. */
+	                                                                              
 	if (nfs_access_delete && (*access & NFS_ACCESS_DELETE) && !(access_result & NFS_ACCESS_DELETE)) {
 		access_result |= NFS_ACCESS_DELETE;
 	}
@@ -182,7 +182,7 @@ nfs4_access_rpc(nfsnode_t np, u_int32_t *access, int rpcflags, vfs_context_t ctx
 	np->n_accessstamp[slot] = now.tv_sec;
 	np->n_access[slot] = access_result;
 
-	/* pass back the access returned with this request */
+	                                                     
 	*access = np->n_access[slot];
 nfsmout:
 	if (!lockerror) {
@@ -221,11 +221,11 @@ nfs4_getattr_rpc(
 		return 0;
 	}
 
-	if (flags & NGA_MONITOR) { /* vnode monitor requests should be soft */
+	if (flags & NGA_MONITOR) {                                            
 		rpcflags = R_RECOVER;
 	}
 
-	if (flags & NGA_SOFT) { /* Return ETIMEDOUT if server not responding */
+	if (flags & NGA_SOFT) {                                                
 		rpcflags |= R_SOFT;
 	}
 
@@ -233,7 +233,7 @@ nfs4_getattr_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, GETATTR
+	                 
 	numops = 2;
 	nfsm_chain_build_alloc_init(error, &nmreq, 15 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "getattr", nmp->nm_minor_vers, numops);
@@ -262,7 +262,7 @@ nfs4_getattr_rpc(
 	error = nfs4_parsefattr(&nmrep, NULL, nvap, NULL, NULL, NULL);
 	nfsmout_if(error);
 	if ((flags & NGA_ACL) && acls && !NFS_BITMAP_ISSET(nvap->nva_bitmap, NFS_FATTR_ACL)) {
-		/* we asked for the ACL but didn't get one... assume there isn't one */
+		                                                                       
 		NFS_BITMAP_SET(nvap->nva_bitmap, NFS_FATTR_ACL);
 		nvap->nva_acl = NULL;
 	}
@@ -293,7 +293,7 @@ nfs4_readlink_rpc(nfsnode_t np, char *buf, size_t *buflenp, vfs_context_t ctx)
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, GETATTR, READLINK
+	                           
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 16 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "readlink", nmp->nm_minor_vers, numops);
@@ -369,7 +369,7 @@ nfs4_read_rpc_async(
 	NFSREQ_SECINFO_SET(&si, np, NULL, 0, NULL, 0);
 	nfsm_chain_null(&nmreq);
 
-	// PUTFH, READ
+	              
 	numops = 2;
 	nfsm_chain_build_alloc_init(error, &nmreq, 22 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "read", nmp->nm_minor_vers, numops);
@@ -415,7 +415,7 @@ nfs4_read_rpc_async_finish(
 	nfsm_chain_null(&nmrep);
 
 	error = nfs_request_async_finish(req, &nmrep, &xid, &status);
-	if (error == EINPROGRESS) { /* async request restarted */
+	if (error == EINPROGRESS) {                              
 		return error;
 	}
 
@@ -475,7 +475,7 @@ nfs4_write_rpc_async(
 		return EINVAL;
 	}
 
-	/* for async mounts, don't bother sending sync write requests */
+	                                                                
 	if ((iomode != NFS_WRITE_UNSTABLE) && nfs_allow_async &&
 	    ((mp = NFSTOMP(np))) && (vfs_flags(mp) & MNT_ASYNC)) {
 		iomode = NFS_WRITE_UNSTABLE;
@@ -484,7 +484,7 @@ nfs4_write_rpc_async(
 	NFSREQ_SECINFO_SET(&si, np, NULL, 0, NULL, 0);
 	nfsm_chain_null(&nmreq);
 
-	// PUTFH, WRITE, GETATTR
+	                        
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 25 * NFSX_UNSIGNED + len);
 	nfsm_chain_add_compound_header(error, &nmreq, "write", nmp->nm_minor_vers, numops);
@@ -540,7 +540,7 @@ nfs4_write_rpc_async_finish(
 	nfsm_chain_null(&nmrep);
 
 	error = nfs_request_async_finish(req, &nmrep, &xid, &status);
-	if (error == EINPROGRESS) { /* async request restarted */
+	if (error == EINPROGRESS) {                              
 		return error;
 	}
 	nmp = NFSTONMP(np);
@@ -576,10 +576,10 @@ nfs4_write_rpc_async_finish(
 	lck_mtx_unlock(&nmp->nm_lock);
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 
-	/*
-	 * NFSv4 WRITE RPCs contain partial GETATTR requests - only type, change, size, metadatatime and modifytime are requested.
-	 * In such cases,  we do not update the time stamp - but the requested attributes.
-	 */
+	  
+                                                                                                                           
+                                                                                   
+    
 	np->n_vattr.nva_flags |= NFS_FFLAG_PARTIAL_WRITE;
 	nfsm_chain_loadattr(error, &nmrep, np, nfsvers, &xid);
 	np->n_vattr.nva_flags &= ~NFS_FFLAG_PARTIAL_WRITE;
@@ -628,7 +628,7 @@ restart:
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, REMOVE, GETATTR
+	                         
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 17 * NFSX_UNSIGNED + namelen);
 	nfsm_chain_add_compound_header(error, &nmreq, "remove", nmp->nm_minor_vers, numops);
@@ -709,7 +709,7 @@ nfs4_rename_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH(FROM), SAVEFH, PUTFH(TO), RENAME, GETATTR(TO), RESTOREFH, GETATTR(FROM)
+	                                                                                
 	numops = 7;
 	nfsm_chain_build_alloc_init(error, &nmreq, 30 * NFSX_UNSIGNED + fnamelen + tnamelen);
 	nfsm_chain_add_compound_header(error, &nmreq, "rename", nmp->nm_minor_vers, numops);
@@ -750,7 +750,7 @@ nfs4_rename_rpc(
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_RENAME);
 	nfsm_chain_check_change_info(error, &nmrep, fdnp);
 	nfsm_chain_check_change_info(error, &nmrep, tdnp);
-	/* directory attributes: if we don't get them, make sure to invalidate */
+	                                                                         
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 	savedxid = xid;
 	nfsm_chain_loadattr(error, &nmrep, tdnp, nfsvers, &xid);
@@ -775,9 +775,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS V4 readdir RPC.
- */
+  
+                      
+   
 int
 nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 {
@@ -814,11 +814,11 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 	}
 	NFSREQ_SECINFO_SET(&si, dnp, NULL, 0, NULL, 0);
 
-	/*
-	 * Set up attribute request for entries.
-	 * For READDIRPLUS functionality, get everything.
-	 * Otherwise, just get what we need for struct direntry.
-	 */
+	  
+                                         
+                                                  
+                                                         
+    
 	if (rdirplus) {
 		tag = "readdirplus";
 		NFS_COPY_ATTRIBUTES(nfs_getattr_bitmap, entry_attrs);
@@ -832,7 +832,7 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 	}
 	NFS_BITMAP_SET(entry_attrs, NFS_FATTR_RDATTR_ERROR);
 
-	/* lock to protect access to cookie verifier */
+	                                               
 	if ((lockerror = nfs_node_lock(dnp))) {
 		return lockerror;
 	}
@@ -840,7 +840,7 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 	fh = zalloc(nfs_fhandle_zone);
 	MALLOC(nvattr, struct nfs_vattr *, sizeof(*nvattr), M_TEMP, M_WAITOK);
 
-	/* determine cookie to use, and move dp to the right offset */
+	                                                              
 	ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 	dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
 	if (ndbhp->ndbh_count) {
@@ -851,22 +851,22 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 		dp = NFS_DIRENTRY_NEXT(dp);
 	} else {
 		cookie = bp->nb_lblkno;
-		/* increment with every buffer read */
+		                                      
 		OSAddAtomic64(1, &nfsstats.readdir_bios);
 	}
 	lastcookie = cookie;
 
-	/*
-	 * The NFS client is responsible for the "." and ".." entries in the
-	 * directory.  So, we put them at the start of the first buffer.
-	 * Don't bother for attribute directories.
-	 */
+	  
+                                                                     
+                                                                 
+                                           
+    
 	if (((bp->nb_lblkno == 0) && (ndbhp->ndbh_count == 0)) &&
 	    !(dnp->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR)) {
 		fh->fh_len = 0;
 		fhlen = rdirplus ? fh->fh_len + 1 : 0;
 		xlen = rdirplus ? (fhlen + sizeof(time_t)) : 0;
-		/* "." */
+		         
 		namlen = 1;
 		reclen = NFS_DIRENTRY_LEN_16(namlen + xlen);
 		if (xlen) {
@@ -884,11 +884,11 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 		if (padlen > 0) {
 			bzero(padstart, padlen);
 		}
-		if (rdirplus) { /* zero out attributes */
+		if (rdirplus) {                          
 			bzero(NFS_DIR_BUF_NVATTR(bp, 0), sizeof(struct nfs_vattr));
 		}
 
-		/* ".." */
+		          
 		namlen = 2;
 		reclen = NFS_DIRENTRY_LEN_16(namlen + xlen);
 		if (xlen) {
@@ -910,7 +910,7 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 		if (padlen > 0) {
 			bzero(padstart, padlen);
 		}
-		if (rdirplus) { /* zero out attributes */
+		if (rdirplus) {                          
 			bzero(NFS_DIR_BUF_NVATTR(bp, 1), sizeof(struct nfs_vattr));
 		}
 
@@ -918,15 +918,15 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 		ndbhp->ndbh_count = 2;
 	}
 
-	/*
-	 * Loop around doing readdir(plus) RPCs of size nm_readdirsize until
-	 * the buffer is full (or we hit EOF).  Then put the remainder of the
-	 * results in the next buffer(s).
-	 */
+	  
+                                                                     
+                                                                      
+                                  
+    
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 	while (nfs_dir_buf_freespace(bp, rdirplus) && !(ndbhp->ndbh_flags & NDB_FULL)) {
-		// PUTFH, GETATTR, READDIR
+		                          
 		numops = 3;
 		nfsm_chain_build_alloc_init(error, &nmreq, 26 * NFSX_UNSIGNED);
 		nfsm_chain_add_compound_header(error, &nmreq, tag, nmp->nm_minor_vers, numops);
@@ -977,9 +977,9 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 			}
 		}
 
-		/* loop through the entries packing them into the buffer */
+		                                                           
 		while (more_entries) {
-			/* Entry: COOKIE, NAME, FATTR */
+			                                
 			nfsm_chain_get_64(error, &nmrep, cookie);
 			nfsm_chain_get_32(error, &nmrep, namlen32);
 			if (namlen32 > UINT16_MAX) {
@@ -989,13 +989,13 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 			namlen = (uint16_t)namlen32;
 			nfsmout_if(error);
 			if (!bigcookies && (cookie >> 32) && (nmp == NFSTONMP(dnp))) {
-				/* we've got a big cookie, make sure flag is set */
+				                                                   
 				lck_mtx_lock(&nmp->nm_lock);
 				nmp->nm_state |= NFSSTA_BIGCOOKIES;
 				lck_mtx_unlock(&nmp->nm_lock);
 				bigcookies = 1;
 			}
-			/* just truncate names that don't fit in direntry.d_name */
+			                                                           
 			if (namlen <= 0) {
 				error = EBADRPC;
 				goto nfsmout;
@@ -1006,7 +1006,7 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 			} else {
 				skiplen = 0;
 			}
-			/* guess that fh size will be same as parent */
+			                                               
 			fhlen = rdirplus ? (1 + dnp->n_fhsize) : 0;
 			xlen = rdirplus ? (fhlen + sizeof(time_t)) : 0;
 			attrlen = rdirplus ? sizeof(struct nfs_vattr) : 0;
@@ -1014,13 +1014,13 @@ nfs4_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 			space_needed = reclen + attrlen;
 			space_free = nfs_dir_buf_freespace(bp, rdirplus);
 			if (space_needed > space_free) {
-				/*
-				 * We still have entries to pack, but we've
-				 * run out of room in the current buffer.
-				 * So we need to move to the next buffer.
-				 * The block# for the next buffer is the
-				 * last cookie in the current buffer.
-				 */
+				  
+                                               
+                                             
+                                             
+                                            
+                                         
+       
 nextbuffer:
 				ndbhp->ndbh_flags |= NDB_FULL;
 				nfs_buf_release(bp, 0);
@@ -1028,7 +1028,7 @@ nextbuffer:
 				bp = NULL;
 				error = nfs_buf_get(dnp, lastcookie, NFS_DIRBLKSIZ, vfs_context_thread(ctx), NBLK_READ, &bp);
 				nfsmout_if(error);
-				/* initialize buffer */
+				                       
 				ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 				ndbhp->ndbh_flags = 0;
 				ndbhp->ndbh_count = 0;
@@ -1036,11 +1036,11 @@ nextbuffer:
 				ndbhp->ndbh_ncgen = dnp->n_ncgen;
 				space_free = nfs_dir_buf_freespace(bp, rdirplus);
 				dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
-				/* increment with every buffer read */
+				                                      
 				OSAddAtomic64(1, &nfsstats.readdir_bios);
 			}
 			nmrepsave = nmrep;
-			dp->d_fileno = cookie; /* placeholder */
+			dp->d_fileno = cookie;                  
 			dp->d_seekoff = cookie;
 			dp->d_namlen = namlen;
 			dp->d_reclen = reclen;
@@ -1056,7 +1056,7 @@ nextbuffer:
 			nvattrp = rdirplus ? NFS_DIR_BUF_NVATTR(bp, ndbhp->ndbh_count) : nvattr;
 			error = nfs4_parsefattr(&nmrep, NULL, nvattrp, fh, NULL, NULL);
 			if (!error && NFS_BITMAP_ISSET(nvattrp->nva_bitmap, NFS_FATTR_ACL)) {
-				/* we do NOT want ACLs returned to us here */
+				                                             
 				NFS_BITMAP_CLR(nvattrp->nva_bitmap, NFS_FATTR_ACL);
 				if (nvattrp->nva_acl) {
 					kauth_acl_free(nvattrp->nva_acl);
@@ -1064,19 +1064,19 @@ nextbuffer:
 				}
 			}
 			if (error && NFS_BITMAP_ISSET(nvattrp->nva_bitmap, NFS_FATTR_RDATTR_ERROR)) {
-				/* OK, we may not have gotten all of the attributes but we will use what we can. */
+				                                                                                   
 				if ((error == NFSERR_MOVED) || (error == NFSERR_INVAL)) {
-					/* set this up to look like a referral trigger */
+					                                                 
 					nfs4_default_attrs_for_referral_trigger(dnp, dp->d_name, namlen, nvattrp, fh);
 				}
 				error = 0;
 			}
-			/* check for more entries after this one */
+			                                           
 			nfsm_chain_get_32(error, &nmrep, more_entries);
 			nfsmout_if(error);
 
-			/* Skip any "." and ".." entries returned from server. */
-			/* Also skip any bothersome named attribute entries. */
+			                                                         
+			                                                       
 			if (((dp->d_name[0] == '.') && ((namlen == 1) || ((namlen == 2) && (dp->d_name[1] == '.')))) ||
 			    (namedattr && (namlen == 11) && (!strcmp(dp->d_name, "SUNWattr_ro") || !strcmp(dp->d_name, "SUNWattr_rw")))) {
 				lastcookie = cookie;
@@ -1090,7 +1090,7 @@ nextbuffer:
 				dp->d_fileno = nvattrp->nva_fileid;
 			}
 			if (rdirplus) {
-				/* fileid is already in d_fileno, so stash xid in attrs */
+				                                                          
 				nvattrp->nva_fileid = savedxid;
 				nvattrp->nva_flags |= NFS_FFLAG_FILEID_CONTAINS_XID;
 				if (NFS_BITMAP_ISSET(nvattrp->nva_bitmap, NFS_FATTR_FILEHANDLE)) {
@@ -1099,15 +1099,15 @@ nextbuffer:
 					reclen = NFS_DIRENTRY_LEN_16(namlen + xlen);
 					space_needed = reclen + attrlen;
 					if (space_needed > space_free) {
-						/* didn't actually have the room... move on to next buffer */
+						                                                             
 						nmrep = nmrepsave;
 						goto nextbuffer;
 					}
-					/* pack the file handle into the record */
-					dp->d_name[dp->d_namlen + 1] = (unsigned char)fh->fh_len; /* No truncation because fh_len's value is checked during nfs4_parsefattr() */
+					                                          
+					dp->d_name[dp->d_namlen + 1] = (unsigned char)fh->fh_len;                                                                               
 					bcopy(fh->fh_data, &dp->d_name[dp->d_namlen + 2], fh->fh_len);
 				} else {
-					/* mark the file handle invalid */
+					                                  
 					fh->fh_len = 0;
 					fhlen = fh->fh_len + 1;
 					xlen = fhlen + sizeof(time_t);
@@ -1122,16 +1122,16 @@ nextbuffer:
 			ndbhp->ndbh_count++;
 			lastcookie = cookie;
 
-			/* advance to next direntry in buffer */
+			                                        
 			dp = NFS_DIRENTRY_NEXT(dp);
 			ndbhp->ndbh_entry_end = (char*)dp - bp->nb_data;
-			/* zero out the pad bytes */
+			                            
 			padlen = (char*)dp - padstart;
 			if (padlen > 0) {
 				bzero(padstart, padlen);
 			}
 		}
-		/* Finally, get the eof boolean */
+		                                  
 		nfsm_chain_get_32(error, &nmrep, eof);
 		nfsmout_if(error);
 		if (eof) {
@@ -1203,7 +1203,7 @@ nfs4_lookup_rpc_async(
 
 	nfsm_chain_null(&nmreq);
 
-	// PUTFH, GETATTR, LOOKUP(P), GETFH, GETATTR (FH)
+	                                                 
 	numops = 5;
 	nfsm_chain_build_alloc_init(error, &nmreq, 20 * NFSX_UNSIGNED + namelen);
 	nfsm_chain_add_compound_header(error, &nmreq, "lookup", nmp->nm_minor_vers, numops);
@@ -1225,7 +1225,7 @@ nfs4_lookup_rpc_async(
 	numops--;
 	nfsm_chain_add_32(error, &nmreq, NFS_OP_GETATTR);
 	NFS_COPY_ATTRIBUTES(nfs_getattr_bitmap, bitmap);
-	/* some ".zfs" directories can't handle being asked for some attributes */
+	                                                                          
 	if ((dnp->n_flag & NISDOTZFS) && !isdotdot) {
 		NFS_BITMAP_CLR(bitmap, NFS_FATTR_NAMED_ATTR);
 	}
@@ -1300,7 +1300,7 @@ nfs4_lookup_rpc_async_finish(
 	nfsm_chain_get_opaque(error, &nmrep, fhp->fh_len, fhp->fh_data);
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 	if ((error == NFSERR_MOVED) || (error == NFSERR_INVAL)) {
-		/* set this up to look like a referral trigger */
+		                                                 
 		nfs4_default_attrs_for_referral_trigger(dnp, name, namelen, nvap, fhp);
 		error = 0;
 	} else {
@@ -1313,18 +1313,18 @@ nfsmout:
 	}
 	nfsm_chain_cleanup(&nmrep);
 	if (!error && (op == NFS_OP_LOOKUP) && (nmp->nm_state & NFSSTA_NEEDSECINFO)) {
-		/* We still need to get SECINFO to set default for mount. */
-		/* Do so for the first LOOKUP that returns successfully. */
+		                                                            
+		                                                           
 		struct nfs_sec sec;
 
 		sec.count = NX_MAX_SEC_FLAVORS;
 		error = nfs4_secinfo_rpc(nmp, &req->r_secinfo, vfs_context_ucred(ctx), sec.flavors, &sec.count);
-		/* [sigh] some implementations return "illegal" error for unsupported ops */
+		                                                                            
 		if (error == NFSERR_OP_ILLEGAL) {
 			error = 0;
 		}
 		if (!error) {
-			/* set our default security flavor to the first in the list */
+			                                                              
 			lck_mtx_lock(&nmp->nm_lock);
 			if (sec.count) {
 				nmp->nm_auth = sec.flavors[0];
@@ -1369,7 +1369,7 @@ nfs4_commit_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, COMMIT, GETATTR
+	                         
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 19 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "commit", nmp->nm_minor_vers, numops);
@@ -1445,8 +1445,8 @@ nfs4_pathconf_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	/* NFSv4: fetch "pathconf" info for this node */
-	// PUTFH, GETATTR
+	                                                
+	                 
 	numops = 2;
 	nfsm_chain_build_alloc_init(error, &nmreq, 16 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "pathconf", nmp->nm_minor_vers, numops);
@@ -1494,12 +1494,12 @@ nfsmout:
 
 int
 nfs4_vnop_getattr(
-	struct vnop_getattr_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  struct vnode_attr *a_vap;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_getattr_args     
+                                                                 
+                                                  
+                                                              
+                                                             
+                                         *ap)
 {
 	struct vnode_attr *vap = ap->a_vap;
 	struct nfsmount *nmp;
@@ -1522,7 +1522,7 @@ nfs4_vnop_getattr(
 		goto out;
 	}
 
-	/* copy what we have in nva to *a_vap */
+	                                        
 	if (VATTR_IS_ACTIVE(vap, va_rdev) && NFS_BITMAP_ISSET(nva->nva_bitmap, NFS_FATTR_RAWDEV)) {
 		dev_t rdev = makedev(nva->nva_rawdev.specdata1, nva->nva_rawdev.specdata2);
 		VATTR_RETURN(vap, va_rdev, rdev);
@@ -1533,8 +1533,8 @@ nfs4_vnop_getattr(
 	if (VATTR_IS_ACTIVE(vap, va_data_size) && NFS_BITMAP_ISSET(nva->nva_bitmap, NFS_FATTR_SIZE)) {
 		VATTR_RETURN(vap, va_data_size, nva->nva_size);
 	}
-	// VATTR_RETURN(vap, va_data_alloc, ???);
-	// VATTR_RETURN(vap, va_total_size, ???);
+	                                         
+	                                         
 	if (VATTR_IS_ACTIVE(vap, va_total_alloc) && NFS_BITMAP_ISSET(nva->nva_bitmap, NFS_FATTR_SPACE_USED)) {
 		VATTR_RETURN(vap, va_total_alloc, nva->nva_bytes);
 	}
@@ -1612,8 +1612,8 @@ nfs4_vnop_getattr(
 		nva->nva_acl = NULL;
 	}
 
-	// other attrs we might support someday:
-	// VATTR_RETURN(vap, va_encoding, ??? /* potentially unnormalized UTF-8? */);
+	                                        
+	                                                                             
 
 	NVATTR_CLEANUP(nva);
 out:
@@ -1646,15 +1646,15 @@ nfs4_setattr_rpc(
 	}
 
 	if (VATTR_IS_ACTIVE(vap, va_flags) && (vap->va_flags & ~(SF_ARCHIVED | UF_HIDDEN))) {
-		/* we don't support setting unsupported flags (duh!) */
+		                                                       
 		if (vap->va_active & ~VNODE_ATTR_va_flags) {
-			return EINVAL;        /* return EINVAL if other attributes also set */
+			return EINVAL;                                                        
 		} else {
-			return ENOTSUP;       /* return ENOTSUP for chflags(2) */
+			return ENOTSUP;                                          
 		}
 	}
 
-	/* don't bother requesting some changes if they don't look like they are changing */
+	                                                                                    
 	if (VATTR_IS_ACTIVE(vap, va_uid) && (vap->va_uid == np->n_vattr.nva_uid)) {
 		VATTR_CLEAR_ACTIVE(vap, va_uid);
 	}
@@ -1669,7 +1669,7 @@ nfs4_setattr_rpc(
 	}
 
 tryagain:
-	/* do nothing if no attributes will be sent */
+	                                              
 	nfs_vattr_set_bitmap(nmp, bitmap, vap);
 	if (!bitmap[0] && !bitmap[1]) {
 		return 0;
@@ -1679,11 +1679,11 @@ tryagain:
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	/*
-	 * Prepare GETATTR bitmap: if we are setting the ACL or mode, we
-	 * need to invalidate any cached ACL.  And if we had an ACL cached,
-	 * we might as well also fetch the new value.
-	 */
+	  
+                                                                 
+                                                                    
+                                              
+    
 	NFS_COPY_ATTRIBUTES(nfs_getattr_bitmap, getbitmap);
 	if (NFS_BITMAP_ISSET(bitmap, NFS_FATTR_ACL) ||
 	    NFS_BITMAP_ISSET(bitmap, NFS_FATTR_MODE)) {
@@ -1693,7 +1693,7 @@ tryagain:
 		NACLINVALIDATE(np);
 	}
 
-	// PUTFH, SETATTR, GETATTR
+	                          
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 40 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "setattr", nmp->nm_minor_vers, numops);
@@ -1742,15 +1742,15 @@ tryagain:
 	if (error) {
 		NATTRINVALIDATE(np);
 	}
-	/*
-	 * We just changed the attributes and we want to make sure that we
-	 * see the latest attributes.  Get the next XID.  If it's not the
-	 * next XID after the SETATTR XID, then it's possible that another
-	 * RPC was in flight at the same time and it might put stale attributes
-	 * in the cache.  In that case, we invalidate the attributes and set
-	 * the attribute cache XID to guarantee that newer attributes will
-	 * get loaded next.
-	 */
+	  
+                                                                   
+                                                                  
+                                                                   
+                                                                        
+                                                                     
+                                                                   
+                    
+    
 	nextxid = 0;
 	nfs_get_xid(&nextxid);
 	if (nextxid != (xid + 1)) {
@@ -1764,12 +1764,12 @@ nfsmout:
 	nfsm_chain_cleanup(&nmreq);
 	nfsm_chain_cleanup(&nmrep);
 	if ((setattr_error == EINVAL) && VATTR_IS_ACTIVE(vap, va_acl) && VATTR_IS_ACTIVE(vap, va_mode) && !NMFLAG(nmp, ACLONLY)) {
-		/*
-		 * Some server's may not like ACL/mode combos that get sent.
-		 * If it looks like that's what the server choked on, try setting
-		 * just the ACL and not the mode (unless it looks like everything
-		 * but mode was already successfully set).
-		 */
+		  
+                                                              
+                                                                   
+                                                                   
+                                            
+     
 		if (((bitmap[0] & setbitmap[0]) != bitmap[0]) ||
 		    ((bitmap[1] & (setbitmap[1] | NFS_FATTR_MODE)) != bitmap[1])) {
 			VATTR_CLEAR_ACTIVE(vap, va_mode);
@@ -1779,11 +1779,11 @@ nfsmout:
 	}
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-/*
- * Wait for any pending recovery to complete.
- */
+  
+                                             
+   
 int
 nfs_mount_state_wait_for_recovery(struct nfsmount *nmp)
 {
@@ -1804,12 +1804,12 @@ nfs_mount_state_wait_for_recovery(struct nfsmount *nmp)
 	return error;
 }
 
-/*
- * We're about to use/manipulate NFS mount's open/lock state.
- * Wait for any pending state recovery to complete, then
- * mark the state as being in use (which will hold off
- * the recovery thread until we're done).
- */
+  
+                                                             
+                                                        
+                                                      
+                                         
+   
 int
 nfs_mount_state_in_use_start(struct nfsmount *nmp, thread_t thd)
 {
@@ -1840,11 +1840,11 @@ nfs_mount_state_in_use_start(struct nfsmount *nmp, thread_t thd)
 	return error;
 }
 
-/*
- * We're done using/manipulating the NFS mount's open/lock
- * state.  If the given error indicates that recovery should
- * be performed, we'll initiate recovery.
- */
+  
+                                                          
+                                                            
+                                         
+   
 int
 nfs_mount_state_in_use_end(struct nfsmount *nmp, int error)
 {
@@ -1875,9 +1875,9 @@ nfs_mount_state_in_use_end(struct nfsmount *nmp, int error)
 	return restart;
 }
 
-/*
- * Does the error mean we should restart/redo a state-related operation?
- */
+  
+                                                                        
+   
 int
 nfs_mount_state_error_should_restart(int error)
 {
@@ -1894,20 +1894,20 @@ nfs_mount_state_error_should_restart(int error)
 	return 0;
 }
 
-/*
- * In some cases we may want to limit how many times we restart a
- * state-related operation - e.g. we're repeatedly getting NFSERR_GRACE.
- * Base the limit on the lease (as long as it's not too short).
- */
+  
+                                                                 
+                                                                        
+                                                               
+   
 uint
 nfs_mount_state_max_restarts(struct nfsmount *nmp)
 {
 	return MAX(nmp->nm_fsattr.nfsa_lease, 60);
 }
 
-/*
- * Does the error mean we probably lost a delegation?
- */
+  
+                                                     
+   
 int
 nfs_mount_state_error_delegation_lost(int error)
 {
@@ -1917,16 +1917,16 @@ nfs_mount_state_error_delegation_lost(int error)
 	case NFSERR_EXPIRED:
 	case NFSERR_OLD_STATEID:
 	case NFSERR_BAD_STATEID:
-	case NFSERR_GRACE: /* ugh! (stupid) RFC 3530 specifically disallows CLAIM_DELEGATE_CUR during grace period? */
+	case NFSERR_GRACE:                                                                                            
 		return 1;
 	}
 	return 0;
 }
 
 
-/*
- * Mark an NFS node's open state as busy.
- */
+  
+                                         
+   
 int
 nfs_open_state_set_busy(nfsnode_t np, thread_t thd)
 {
@@ -1957,10 +1957,10 @@ nfs_open_state_set_busy(nfsnode_t np, thread_t thd)
 	return error;
 }
 
-/*
- * Clear an NFS node's open state busy flag and wake up
- * anyone wanting it.
- */
+  
+                                                       
+                     
+   
 void
 nfs_open_state_clear_busy(nfsnode_t np)
 {
@@ -1978,10 +1978,10 @@ nfs_open_state_clear_busy(nfsnode_t np)
 	}
 }
 
-/*
- * Search a mount's open owner list for the owner for this credential.
- * If not found and "alloc" is set, then allocate a new one.
- */
+  
+                                                                      
+                                                            
+   
 struct nfs_open_owner *
 nfs_open_owner_find(struct nfsmount *nmp, kauth_cred_t cred, int alloc)
 {
@@ -2030,9 +2030,9 @@ tryagain:
 	return noop;
 }
 
-/*
- * destroy an open owner that's no longer needed
- */
+  
+                                                
+   
 void
 nfs_open_owner_destroy(struct nfs_open_owner *noop)
 {
@@ -2043,9 +2043,9 @@ nfs_open_owner_destroy(struct nfs_open_owner *noop)
 	FREE(noop, M_TEMP);
 }
 
-/*
- * acquire a reference count on an open owner
- */
+  
+                                             
+   
 void
 nfs_open_owner_ref(struct nfs_open_owner *noop)
 {
@@ -2054,10 +2054,10 @@ nfs_open_owner_ref(struct nfs_open_owner *noop)
 	lck_mtx_unlock(&noop->noo_lock);
 }
 
-/*
- * drop a reference count on an open owner and destroy it if
- * it is no longer referenced and no longer on the mount's list.
- */
+  
+                                                            
+                                                                
+   
 void
 nfs_open_owner_rele(struct nfs_open_owner *noop)
 {
@@ -2071,20 +2071,20 @@ nfs_open_owner_rele(struct nfs_open_owner *noop)
 	if (!newcount && (noop->noo_flags & NFS_OPEN_OWNER_BUSY)) {
 		panic("nfs_open_owner_rele: busy");
 	}
-	/* XXX we may potentially want to clean up idle/unused open owner structures */
+	                                                                               
 	if (newcount || (noop->noo_flags & NFS_OPEN_OWNER_LINK)) {
 		lck_mtx_unlock(&noop->noo_lock);
 		return;
 	}
-	/* owner is no longer referenced or linked to mount, so destroy it */
+	                                                                     
 	lck_mtx_unlock(&noop->noo_lock);
 	nfs_open_owner_destroy(noop);
 }
 
-/*
- * Mark an open owner as busy because we are about to
- * start an operation that uses and updates open owner state.
- */
+  
+                                                     
+                                                             
+   
 int
 nfs_open_owner_set_busy(struct nfs_open_owner *noop, thread_t thd)
 {
@@ -2115,10 +2115,10 @@ nfs_open_owner_set_busy(struct nfs_open_owner *noop, thread_t thd)
 	return error;
 }
 
-/*
- * Clear the busy flag on an open owner and wake up anyone waiting
- * to mark it busy.
- */
+  
+                                                                  
+                   
+   
 void
 nfs_open_owner_clear_busy(struct nfs_open_owner *noop)
 {
@@ -2136,10 +2136,10 @@ nfs_open_owner_clear_busy(struct nfs_open_owner *noop)
 	}
 }
 
-/*
- * Given an open/lock owner and an error code, increment the
- * sequence ID if appropriate.
- */
+  
+                                                            
+                              
+   
 void
 nfs_owner_seqid_increment(struct nfs_open_owner *noop, struct nfs_lock_owner *nlop, int error)
 {
@@ -2152,7 +2152,7 @@ nfs_owner_seqid_increment(struct nfs_open_owner *noop, struct nfs_lock_owner *nl
 	case NFSERR_BADXDR:
 	case NFSERR_RESOURCE:
 	case NFSERR_NOFILEHANDLE:
-		/* do not increment the open seqid on these errors */
+		                                                     
 		return;
 	}
 	if (noop) {
@@ -2163,11 +2163,11 @@ nfs_owner_seqid_increment(struct nfs_open_owner *noop, struct nfs_lock_owner *nl
 	}
 }
 
-/*
- * Search a node's open file list for any conflicts with this request.
- * Also find this open owner's open file structure.
- * If not found and "alloc" is set, then allocate one.
- */
+  
+                                                                      
+                                                   
+                                                      
+   
 int
 nfs_open_file_find(
 	nfsnode_t np,
@@ -2181,11 +2181,11 @@ nfs_open_file_find(
 	return nfs_open_file_find_internal(np, noop, nofpp, accessMode, denyMode, alloc);
 }
 
-/*
- * Internally, allow using a provisional nodeless nofp (passed in via *nofpp)
- * if an existing one is not found.  This is used in "create" scenarios to
- * officially add the provisional nofp to the node once the node is created.
- */
+  
+                                                                             
+                                                                          
+                                                                            
+   
 int
 nfs_open_file_find_internal(
 	nfsnode_t np,
@@ -2210,16 +2210,16 @@ tryagain:
 			}
 		}
 		if ((accessMode & nofp2->nof_deny) || (denyMode & nofp2->nof_access)) {
-			/* This request conflicts with an existing open on this client. */
+			                                                                  
 			lck_mtx_unlock(&np->n_openlock);
 			return EACCES;
 		}
 	}
 
-	/*
-	 * If this open owner doesn't have an open
-	 * file structure yet, we create one for it.
-	 */
+	  
+                                           
+                                             
+    
 	if (!nofp && !*nofpp && !newnofp && alloc) {
 		lck_mtx_unlock(&np->n_openlock);
 alloc:
@@ -2262,9 +2262,9 @@ alloc:
 	return nofp ? 0 : ESRCH;
 }
 
-/*
- * Destroy an open file structure.
- */
+  
+                                  
+   
 void
 nfs_open_file_destroy(struct nfs_open_file *nofp)
 {
@@ -2276,10 +2276,10 @@ nfs_open_file_destroy(struct nfs_open_file *nofp)
 	FREE(nofp, M_TEMP);
 }
 
-/*
- * Mark an open file as busy because we are about to
- * start an operation that uses and updates open file state.
- */
+  
+                                                    
+                                                            
+   
 int
 nfs_open_file_set_busy(struct nfs_open_file *nofp, thread_t thd)
 {
@@ -2310,10 +2310,10 @@ nfs_open_file_set_busy(struct nfs_open_file *nofp, thread_t thd)
 	return error;
 }
 
-/*
- * Clear the busy flag on an open file and wake up anyone waiting
- * to mark it busy.
- */
+  
+                                                                 
+                   
+   
 void
 nfs_open_file_clear_busy(struct nfs_open_file *nofp)
 {
@@ -2331,9 +2331,9 @@ nfs_open_file_clear_busy(struct nfs_open_file *nofp)
 	}
 }
 
-/*
- * Add the open state for the given access/deny modes to this open file.
- */
+  
+                                                                        
+   
 void
 nfs_open_file_add_open(struct nfs_open_file *nofp, uint32_t accessMode, uint32_t denyMode, int delegated)
 {
@@ -2358,7 +2358,7 @@ nfs_open_file_add_open(struct nfs_open_file *nofp, uint32_t accessMode, uint32_t
 			} else if (accessMode == NFS_OPEN_SHARE_ACCESS_BOTH) {
 				nofp->nof_d_rw_dw++;
 			}
-		} else { /* NFS_OPEN_SHARE_DENY_BOTH */
+		} else {                               
 			if (accessMode == NFS_OPEN_SHARE_ACCESS_READ) {
 				nofp->nof_d_r_drw++;
 			} else if (accessMode == NFS_OPEN_SHARE_ACCESS_WRITE) {
@@ -2384,7 +2384,7 @@ nfs_open_file_add_open(struct nfs_open_file *nofp, uint32_t accessMode, uint32_t
 			} else if (accessMode == NFS_OPEN_SHARE_ACCESS_BOTH) {
 				nofp->nof_rw_dw++;
 			}
-		} else { /* NFS_OPEN_SHARE_DENY_BOTH */
+		} else {                               
 			if (accessMode == NFS_OPEN_SHARE_ACCESS_READ) {
 				nofp->nof_r_drw++;
 			} else if (accessMode == NFS_OPEN_SHARE_ACCESS_WRITE) {
@@ -2399,10 +2399,10 @@ nfs_open_file_add_open(struct nfs_open_file *nofp, uint32_t accessMode, uint32_t
 	lck_mtx_unlock(&nofp->nof_lock);
 }
 
-/*
- * Find which particular open combo will be closed and report what
- * the new modes will be and whether the open was delegated.
- */
+  
+                                                                  
+                                                            
+   
 void
 nfs_open_file_remove_open_find(
 	struct nfs_open_file *nofp,
@@ -2412,10 +2412,10 @@ nfs_open_file_remove_open_find(
 	uint8_t *newDenyMode,
 	int *delegated)
 {
-	/*
-	 * Calculate new modes: a mode bit gets removed when there's only
-	 * one count in all the corresponding counts
-	 */
+	  
+                                                                  
+                                             
+    
 	*newAccessMode = nofp->nof_access;
 	*newDenyMode = nofp->nof_deny;
 
@@ -2457,7 +2457,7 @@ nfs_open_file_remove_open_find(
 		*newDenyMode &= ~NFS_OPEN_SHARE_DENY_WRITE;
 	}
 
-	/* Find the corresponding open access/deny mode counter. */
+	                                                           
 	if (denyMode == NFS_OPEN_SHARE_DENY_NONE) {
 		if (accessMode == NFS_OPEN_SHARE_ACCESS_READ) {
 			*delegated = (nofp->nof_d_r != 0);
@@ -2478,7 +2478,7 @@ nfs_open_file_remove_open_find(
 		} else {
 			*delegated = 0;
 		}
-	} else { /* NFS_OPEN_SHARE_DENY_BOTH */
+	} else {                               
 		if (accessMode == NFS_OPEN_SHARE_ACCESS_READ) {
 			*delegated = (nofp->nof_d_r_drw != 0);
 		} else if (accessMode == NFS_OPEN_SHARE_ACCESS_WRITE) {
@@ -2491,9 +2491,9 @@ nfs_open_file_remove_open_find(
 	}
 }
 
-/*
- * Remove the open state for the given access/deny modes to this open file.
- */
+  
+                                                                           
+   
 void
 nfs_open_file_remove_open(struct nfs_open_file *nofp, uint32_t accessMode, uint32_t denyMode)
 {
@@ -2503,7 +2503,7 @@ nfs_open_file_remove_open(struct nfs_open_file *nofp, uint32_t accessMode, uint3
 	lck_mtx_lock(&nofp->nof_lock);
 	nfs_open_file_remove_open_find(nofp, accessMode, denyMode, &newAccessMode, &newDenyMode, &delegated);
 
-	/* Decrement the corresponding open access/deny mode counter. */
+	                                                                
 	if (denyMode == NFS_OPEN_SHARE_DENY_NONE) {
 		if (accessMode == NFS_OPEN_SHARE_ACCESS_READ) {
 			if (delegated) {
@@ -2592,7 +2592,7 @@ nfs_open_file_remove_open(struct nfs_open_file *nofp, uint32_t accessMode, uint3
 				}
 			}
 		}
-	} else { /* NFS_OPEN_SHARE_DENY_BOTH */
+	} else {                               
 		if (accessMode == NFS_OPEN_SHARE_ACCESS_READ) {
 			if (delegated) {
 				if (nofp->nof_d_r_drw == 0) {
@@ -2638,7 +2638,7 @@ nfs_open_file_remove_open(struct nfs_open_file *nofp, uint32_t accessMode, uint3
 		}
 	}
 
-	/* update the modes */
+	                      
 	nofp->nof_access = newAccessMode;
 	nofp->nof_deny = newDenyMode;
 	nofp->nof_opencnt--;
@@ -2646,18 +2646,18 @@ nfs_open_file_remove_open(struct nfs_open_file *nofp, uint32_t accessMode, uint3
 }
 
 #if CONFIG_NFS4
-/*
- * Get the current (delegation, lock, open, default) stateid for this node.
- * If node has a delegation, use that stateid.
- * If pid has a lock, use the lockowner's stateid.
- * Or use the open file's stateid.
- * If no open file, use a default stateid of all ones.
- */
+  
+                                                                           
+                                              
+                                                  
+                                  
+                                                      
+   
 void
 nfs_get_stateid(nfsnode_t np, thread_t thd, kauth_cred_t cred, nfs_stateid *sid)
 {
 	struct nfsmount *nmp = NFSTONMP(np);
-	proc_t p = thd ? get_bsdthreadtask_info(thd) : current_proc();  // XXX async I/O requests don't have a thread
+	proc_t p = thd ? get_bsdthreadtask_info(thd) : current_proc();                                               
 	struct nfs_open_owner *noop = NULL;
 	struct nfs_open_file *nofp = NULL;
 	struct nfs_lock_owner *nlop = NULL;
@@ -2670,13 +2670,13 @@ nfs_get_stateid(nfsnode_t np, thread_t thd, kauth_cred_t cred, nfs_stateid *sid)
 			nlop = nfs_lock_owner_find(np, p, 0);
 		}
 		if (nlop && !TAILQ_EMPTY(&nlop->nlo_locks)) {
-			/* we hold locks, use lock stateid */
+			                                     
 			s = &nlop->nlo_stateid;
 		} else if (((noop = nfs_open_owner_find(nmp, cred, 0))) &&
 		    (nfs_open_file_find(np, noop, &nofp, 0, 0, 0) == 0) &&
 		    !(nofp->nof_flags & NFS_OPEN_FILE_LOST) &&
 		    nofp->nof_access) {
-			/* we (should) have the file open, use open stateid */
+			                                                      
 			if (nofp->nof_flags & NFS_OPEN_FILE_REOPEN) {
 				nfs4_reopen(nofp, thd);
 			}
@@ -2692,7 +2692,7 @@ nfs_get_stateid(nfsnode_t np, thread_t thd, kauth_cred_t cred, nfs_stateid *sid)
 		sid->other[1] = s->other[1];
 		sid->other[2] = s->other[2];
 	} else {
-		/* named attributes may not have a stateid for reads, so don't complain for them */
+		                                                                                   
 		if (!(np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR)) {
 			NP(np, "nfs_get_stateid: no stateid");
 		}
@@ -2707,10 +2707,10 @@ nfs_get_stateid(nfsnode_t np, thread_t thd, kauth_cred_t cred, nfs_stateid *sid)
 }
 
 
-/*
- * When we have a delegation, we may be able to perform the OPEN locally.
- * Perform the OPEN by checking the delegation ACE and/or checking via ACCESS.
- */
+  
+                                                                         
+                                                                              
+   
 int
 nfs4_open_delegated(
 	nfsnode_t np,
@@ -2725,10 +2725,10 @@ nfs4_open_delegated(
 	kauth_cred_t cred = vfs_context_ucred(ctx);
 
 	if (!(accessMode & NFS_OPEN_SHARE_ACCESS_READ)) {
-		/*
-		 * Try to open it for read access too,
-		 * so the buffer cache can read data.
-		 */
+		  
+                                        
+                                       
+     
 		readtoo = 1;
 		accessMode |= NFS_OPEN_SHARE_ACCESS_READ;
 	}
@@ -2742,7 +2742,7 @@ tryagain:
 		action |= KAUTH_VNODE_WRITE_DATA;
 	}
 
-	/* evaluate ACE (if we have one) */
+	                                   
 	if (np->n_dace.ace_flags) {
 		eval.ae_requested = action;
 		eval.ae_acl = &np->n_dace;
@@ -2769,7 +2769,7 @@ tryagain:
 	}
 
 	if (!authorized) {
-		/* need to ask the server via ACCESS */
+		                                       
 		struct vnop_access_args naa;
 		naa.a_desc = &vnop_access_desc;
 		naa.a_vp = NFSTOV(np);
@@ -2782,7 +2782,7 @@ tryagain:
 
 	if (!authorized) {
 		if (readtoo) {
-			/* try again without the extra read access */
+			                                             
 			accessMode &= ~NFS_OPEN_SHARE_ACCESS_READ;
 			readtoo = 0;
 			goto tryagain;
@@ -2796,16 +2796,16 @@ tryagain:
 }
 
 
-/*
- * Open a file with the given access/deny modes.
- *
- * If we have a delegation, we may be able to handle the open locally.
- * Otherwise, we will always send the open RPC even if this open's mode is
- * a subset of all the existing opens.  This makes sure that we will always
- * be able to do a downgrade to any of the open modes.
- *
- * Note: local conflicts should have already been checked in nfs_open_file_find().
- */
+  
+                                                
+  
+                                                                      
+                                                                          
+                                                                           
+                                                      
+  
+                                                                                  
+   
 int
 nfs4_open(
 	nfsnode_t np,
@@ -2823,12 +2823,12 @@ nfs4_open(
 	char *filename = NULL;
 	int error = 0, readtoo = 0;
 
-	/*
-	 * We can handle the OPEN ourselves if we have a delegation,
-	 * unless it's a read delegation and the open is asking for
-	 * either write access or deny read.  We also don't bother to
-	 * use the delegation if it's being returned.
-	 */
+	  
+                                                             
+                                                            
+                                                              
+                                              
+    
 	if (np->n_openflags & N_DELEG_MASK) {
 		if ((error = nfs_open_state_set_busy(np, vfs_context_thread(ctx)))) {
 			return error;
@@ -2843,12 +2843,12 @@ nfs4_open(
 		nfs_open_state_clear_busy(np);
 	}
 
-	/*
-	 * [sigh] We can't trust VFS to get the parent right for named
-	 * attribute nodes.  (It likes to reparent the nodes after we've
-	 * created them.)  Luckily we can probably get the right parent
-	 * from the n_parent we have stashed away.
-	 */
+	  
+                                                               
+                                                                 
+                                                                
+                                           
+    
 	if ((np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR) &&
 	    (((dvp = np->n_parent)) && (error = vnode_get(dvp)))) {
 		dvp = NULL;
@@ -2878,10 +2878,10 @@ nfs4_open(
 	cn.cn_namelen = namelen;
 
 	if (!(accessMode & NFS_OPEN_SHARE_ACCESS_READ)) {
-		/*
-		 * Try to open it for read access too,
-		 * so the buffer cache can read data.
-		 */
+		  
+                                        
+                                       
+     
 		readtoo = 1;
 		accessMode |= NFS_OPEN_SHARE_ACCESS_READ;
 	}
@@ -2890,7 +2890,7 @@ tryagain:
 	if (error) {
 		if (!nfs_mount_state_error_should_restart(error) &&
 		    (error != EINTR) && (error != ERESTART) && readtoo) {
-			/* try again without the extra read access */
+			                                             
 			accessMode &= ~NFS_OPEN_SHARE_ACCESS_READ;
 			readtoo = 0;
 			goto tryagain;
@@ -2910,16 +2910,16 @@ out:
 	}
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
 int
 nfs_vnop_mmap(
-	struct vnop_mmap_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  int a_fflags;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_mmap_args     
+                                                              
+                                               
+                                               
+                                                          
+                                      *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -2942,11 +2942,11 @@ nfs_vnop_mmap(
 		return EIO;
 	}
 
-	/*
-	 * fflags contains some combination of: PROT_READ, PROT_WRITE
-	 * Since it's not possible to mmap() without having the file open for reading,
-	 * read access is always there (regardless if PROT_READ is not set).
-	 */
+	  
+                                                              
+                                                                               
+                                                                     
+    
 	accessMode = NFS_OPEN_SHARE_ACCESS_READ;
 	if (ap->a_fflags & PROT_WRITE) {
 		accessMode |= NFS_OPEN_SHARE_ACCESS_WRITE;
@@ -2994,38 +2994,38 @@ restart:
 		goto out;
 	}
 
-	/*
-	 * The open reference for mmap must mirror an existing open because
-	 * we may need to reclaim it after the file is closed.
-	 * So grab another open count matching the accessMode passed in.
-	 * If we already had an mmap open, prefer read/write without deny mode.
-	 * This means we may have to drop the current mmap open first.
-	 *
-	 * N.B. We should have an open for the mmap, because, mmap was
-	 * called on an open descriptor, or we've created an open for read
-	 * from reading the first page for execve. However, if we piggy
-	 * backed on an existing NFS_OPEN_SHARE_ACCESS_READ/NFS_OPEN_SHARE_DENY_NONE
-	 * that open may have closed.
-	 */
+	  
+                                                                    
+                                                       
+                                                                 
+                                                                        
+                                                               
+   
+                                                               
+                                                                   
+                                                                
+                                                                             
+                              
+    
 
 	if (!(nofp->nof_access & NFS_OPEN_SHARE_ACCESS_READ)) {
 		if (nofp->nof_flags & NFS_OPEN_FILE_NEEDCLOSE) {
-			/* We shouldn't get here. We've already open the file for execve */
+			                                                                   
 			NP(np, "nfs_vnop_mmap: File already needs close access: 0x%x, cred: %d thread: %lld",
 			    nofp->nof_access, kauth_cred_getuid(nofp->nof_owner->noo_cred), thread_tid(vfs_context_thread(ctx)));
 		}
-		/*
-		 * mmapings for execve are just for read. Get out with EPERM if the accessMode is not ACCESS_READ
-		 * or the access would be denied. Other accesses should have an open descriptor for the mapping.
-		 */
+		  
+                                                                                                   
+                                                                                                  
+     
 		if (accessMode != NFS_OPEN_SHARE_ACCESS_READ || (accessMode & nofp->nof_deny)) {
-			/* not asking for just read access -> fail */
+			                                             
 			error = EPERM;
 			goto out;
 		}
-		/* we don't have the file open, so open it for read access */
+		                                                             
 		if (nmp->nm_vers < NFS_VER4) {
-			/* NFS v2/v3 opens are always allowed - so just add it. */
+			                                                          
 			nfs_open_file_add_open(nofp, NFS_OPEN_SHARE_ACCESS_READ, NFS_OPEN_SHARE_DENY_NONE, 0);
 			error = 0;
 		}
@@ -3042,7 +3042,7 @@ restart:
 		}
 	}
 
-	/* determine deny mode for open */
+	                                  
 	if (accessMode == NFS_OPEN_SHARE_ACCESS_BOTH) {
 		if (nofp->nof_d_rw || nofp->nof_d_rw_dw || nofp->nof_d_rw_drw) {
 			delegated = 1;
@@ -3065,7 +3065,7 @@ restart:
 		} else {
 			error = EPERM;
 		}
-	} else { /* NFS_OPEN_SHARE_ACCESS_READ */
+	} else {                                 
 		if (nofp->nof_d_r || nofp->nof_d_r_dw || nofp->nof_d_r_drw) {
 			delegated = 1;
 			if (nofp->nof_d_r) {
@@ -3085,11 +3085,11 @@ restart:
 				denyMode = NFS_OPEN_SHARE_DENY_BOTH;
 			}
 		} else if (nofp->nof_d_rw || nofp->nof_d_rw_dw || nofp->nof_d_rw_drw) {
-			/*
-			 * This clause and the one below is to co-opt a read write access
-			 * for a read only mmaping. We probably got here in that an
-			 * existing rw open for an executable file already exists.
-			 */
+			  
+                                                                    
+                                                              
+                                                             
+      
 			delegated = 1;
 			accessMode = NFS_OPEN_SHARE_ACCESS_BOTH;
 			if (nofp->nof_d_rw) {
@@ -3113,21 +3113,21 @@ restart:
 			error = EPERM;
 		}
 	}
-	if (error) { /* mmap mode without proper open mode */
+	if (error) {                                         
 		goto out;
 	}
 
-	/*
-	 * If the existing mmap access is more than the new access OR the
-	 * existing access is the same and the existing deny mode is less,
-	 * then we'll stick with the existing mmap open mode.
-	 */
+	  
+                                                                  
+                                                                   
+                                                      
+    
 	if ((nofp->nof_mmap_access > accessMode) ||
 	    ((nofp->nof_mmap_access == accessMode) && (nofp->nof_mmap_deny <= denyMode))) {
 		goto out;
 	}
 
-	/* update mmap open mode */
+	                           
 	if (nofp->nof_mmap_access) {
 		error = nfs_close(np, nofp, nofp->nof_mmap_access, nofp->nof_mmap_deny, ctx);
 		if (error) {
@@ -3181,12 +3181,12 @@ out:
 
 int
 nfs_vnop_mmap_check(
-	struct vnop_mmap_check_args /* {
-                                     *  struct vnodeop_desc *a_desc;
-                                     *  vnode_t a_vp;
-                                     *  int a_flags;
-                                     *  vfs_context_t a_context;
-                                     *  } */*ap)
+	struct vnop_mmap_check_args     
+                                                                    
+                                                     
+                                                    
+                                                                
+                                            *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -3199,17 +3199,17 @@ nfs_vnop_mmap_check(
 	}
 
 	if (vnode_isreg(vp)) {
-		/*
-		 * We only need to ensure that a page-in will be
-		 * possible with these credentials.  Everything
-		 * else has been checked at other layers.
-		 */
+		  
+                                                  
+                                                 
+                                           
+     
 		naa.a_desc = &vnop_access_desc;
 		naa.a_vp = vp;
 		naa.a_action = KAUTH_VNODE_READ_DATA;
 		naa.a_context = ctx;
 
-		/* compute actual success/failure based on accessibility */
+		                                                           
 		error = nfs_vnop_access(&naa);
 	}
 
@@ -3218,11 +3218,11 @@ nfs_vnop_mmap_check(
 
 int
 nfs_vnop_mnomap(
-	struct vnop_mnomap_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_vp;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_mnomap_args     
+                                                                
+                                                 
+                                                            
+                                        *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -3254,13 +3254,13 @@ nfs_vnop_mnomap(
 		lck_mtx_unlock(&nmp->nm_lock);
 	}
 
-	/* flush buffers/ubc before we drop the open (in case it's our last open) */
+	                                                                            
 	nfs_flush(np, MNT_WAIT, vfs_context_thread(ctx), V_IGNORE_WRITEERR);
 	if (UBCINFOEXISTS(vp) && (size = ubc_getsize(vp))) {
 		ubc_msync(vp, 0, size, NULL, UBC_PUSHALL | UBC_SYNC);
 	}
 
-	/* walk all open files and close all mmap opens */
+	                                                  
 loop:
 	error = nfs_mount_state_in_use_start(nmp, NULL);
 	if (error) {
@@ -3291,7 +3291,7 @@ loop:
 		if (nofp->nof_mmap_access) {
 			error = nfs_close(np, nofp, nofp->nof_mmap_access, nofp->nof_mmap_deny, ctx);
 			if (!nfs_mount_state_error_should_restart(error)) {
-				if (error) { /* not a state-operation-restarting error, so just clear the access */
+				if (error) {                                                                       
 					NP(np, "nfs_vnop_mnomap: close of mmap mode failed: %d, %d", error, kauth_cred_getuid(nofp->nof_owner->noo_cred));
 				}
 				nofp->nof_mmap_access = nofp->nof_mmap_deny = 0;
@@ -3309,10 +3309,10 @@ loop:
 	return error;
 }
 
-/*
- * Search a node's lock owner list for the owner for this process.
- * If not found and "alloc" is set, then allocate a new one.
- */
+  
+                                                                  
+                                                            
+   
 struct nfs_lock_owner *
 nfs_lock_owner_find(nfsnode_t np, proc_t p, int alloc)
 {
@@ -3330,7 +3330,7 @@ tryagain:
 		if (timevalcmp(&nlop->nlo_pid_start, &p->p_start, ==)) {
 			break;
 		}
-		/* stale lock owner... reuse it if we can */
+		                                            
 		if (os_ref_get_count(&nlop->nlo_refcnt)) {
 			TAILQ_REMOVE(&np->n_lock_owners, nlop, nlo_link);
 			nlop->nlo_flags &= ~NFS_LOCK_OWNER_LINK;
@@ -3377,9 +3377,9 @@ tryagain:
 	return nlop;
 }
 
-/*
- * destroy a lock owner that's no longer needed
- */
+  
+                                               
+   
 void
 nfs_lock_owner_destroy(struct nfs_lock_owner *nlop)
 {
@@ -3391,9 +3391,9 @@ nfs_lock_owner_destroy(struct nfs_lock_owner *nlop)
 	FREE(nlop, M_TEMP);
 }
 
-/*
- * acquire a reference count on a lock owner
- */
+  
+                                            
+   
 void
 nfs_lock_owner_ref(struct nfs_lock_owner *nlop)
 {
@@ -3402,10 +3402,10 @@ nfs_lock_owner_ref(struct nfs_lock_owner *nlop)
 	lck_mtx_unlock(&nlop->nlo_lock);
 }
 
-/*
- * drop a reference count on a lock owner and destroy it if
- * it is no longer referenced and no longer on the mount's list.
- */
+  
+                                                           
+                                                                
+   
 void
 nfs_lock_owner_rele(struct nfs_lock_owner *nlop)
 {
@@ -3419,20 +3419,20 @@ nfs_lock_owner_rele(struct nfs_lock_owner *nlop)
 	if (!newcount && (nlop->nlo_flags & NFS_LOCK_OWNER_BUSY)) {
 		panic("nfs_lock_owner_rele: busy");
 	}
-	/* XXX we may potentially want to clean up idle/unused lock owner structures */
+	                                                                               
 	if (newcount || (nlop->nlo_flags & NFS_LOCK_OWNER_LINK)) {
 		lck_mtx_unlock(&nlop->nlo_lock);
 		return;
 	}
-	/* owner is no longer referenced or linked to mount, so destroy it */
+	                                                                     
 	lck_mtx_unlock(&nlop->nlo_lock);
 	nfs_lock_owner_destroy(nlop);
 }
 
-/*
- * Mark a lock owner as busy because we are about to
- * start an operation that uses and updates lock owner state.
- */
+  
+                                                    
+                                                             
+   
 int
 nfs_lock_owner_set_busy(struct nfs_lock_owner *nlop, thread_t thd)
 {
@@ -3463,10 +3463,10 @@ nfs_lock_owner_set_busy(struct nfs_lock_owner *nlop, thread_t thd)
 	return error;
 }
 
-/*
- * Clear the busy flag on a lock owner and wake up anyone waiting
- * to mark it busy.
- */
+  
+                                                                 
+                   
+   
 void
 nfs_lock_owner_clear_busy(struct nfs_lock_owner *nlop)
 {
@@ -3484,16 +3484,16 @@ nfs_lock_owner_clear_busy(struct nfs_lock_owner *nlop)
 	}
 }
 
-/*
- * Insert a held lock into a lock owner's sorted list.
- * (flock locks are always inserted at the head the list)
- */
+  
+                                                      
+                                                         
+   
 void
 nfs_lock_owner_insert_held_lock(struct nfs_lock_owner *nlop, struct nfs_file_lock *newnflp)
 {
 	struct nfs_file_lock *nflp;
 
-	/* insert new lock in lock owner's held lock list */
+	                                                    
 	lck_mtx_lock(&nlop->nlo_lock);
 	if ((newnflp->nfl_flags & NFS_FILE_LOCK_STYLE_MASK) == NFS_FILE_LOCK_STYLE_FLOCK) {
 		TAILQ_INSERT_HEAD(&nlop->nlo_locks, newnflp, nfl_lolink);
@@ -3512,9 +3512,9 @@ nfs_lock_owner_insert_held_lock(struct nfs_lock_owner *nlop, struct nfs_file_loc
 	lck_mtx_unlock(&nlop->nlo_lock);
 }
 
-/*
- * Get a file lock structure for this lock owner.
- */
+  
+                                                 
+   
 struct nfs_file_lock *
 nfs_file_lock_alloc(struct nfs_lock_owner *nlop)
 {
@@ -3539,9 +3539,9 @@ nfs_file_lock_alloc(struct nfs_lock_owner *nlop)
 	return nflp;
 }
 
-/*
- * destroy the given NFS file lock structure
- */
+  
+                                            
+   
 void
 nfs_file_lock_destroy(struct nfs_file_lock *nflp)
 {
@@ -3558,18 +3558,18 @@ nfs_file_lock_destroy(struct nfs_file_lock *nflp)
 	nfs_lock_owner_rele(nlop);
 }
 
-/*
- * Check if one file lock conflicts with another.
- * (nflp1 is the new lock.  nflp2 is the existing lock.)
- */
+  
+                                                 
+                                                        
+   
 int
 nfs_file_lock_conflict(struct nfs_file_lock *nflp1, struct nfs_file_lock *nflp2, int *willsplit)
 {
-	/* no conflict if lock is dead */
+	                                 
 	if ((nflp1->nfl_flags & NFS_FILE_LOCK_DEAD) || (nflp2->nfl_flags & NFS_FILE_LOCK_DEAD)) {
 		return 0;
 	}
-	/* no conflict if it's ours - unless the lock style doesn't match */
+	                                                                    
 	if ((nflp1->nfl_owner == nflp2->nfl_owner) &&
 	    ((nflp1->nfl_flags & NFS_FILE_LOCK_STYLE_MASK) == (nflp2->nfl_flags & NFS_FILE_LOCK_STYLE_MASK))) {
 		if (willsplit && (nflp1->nfl_type != nflp2->nfl_type) &&
@@ -3579,22 +3579,22 @@ nfs_file_lock_conflict(struct nfs_file_lock *nflp1, struct nfs_file_lock *nflp2,
 		}
 		return 0;
 	}
-	/* no conflict if ranges don't overlap */
+	                                         
 	if ((nflp1->nfl_start > nflp2->nfl_end) || (nflp1->nfl_end < nflp2->nfl_start)) {
 		return 0;
 	}
-	/* no conflict if neither lock is exclusive */
+	                                              
 	if ((nflp1->nfl_type != F_WRLCK) && (nflp2->nfl_type != F_WRLCK)) {
 		return 0;
 	}
-	/* conflict */
+	              
 	return 1;
 }
 
 #if CONFIG_NFS4
-/*
- * Send an NFSv4 LOCK RPC to the server.
- */
+  
+                                        
+   
 int
 nfs4_setlock_rpc(
 	nfsnode_t np,
@@ -3657,7 +3657,7 @@ nfs4_setlock_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, GETATTR, LOCK
+	                       
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 33 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "lock", nmp->nm_minor_vers, numops);
@@ -3703,8 +3703,8 @@ nfs4_setlock_rpc(
 	nfs_owner_seqid_increment(newlocker ? nofp->nof_owner : NULL, nlop, error);
 	nfsm_chain_get_stateid(error, &nmrep, &nlop->nlo_stateid);
 
-	/* Update the lock owner's stategenid once it appears the server has state for it. */
-	/* We determine this by noting the request was successful (we got a stateid). */
+	                                                                                     
+	                                                                                
 	if (newlocker && !error) {
 		nlop->nlo_stategenid = nmp->nm_stategenid;
 	}
@@ -3722,9 +3722,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * Send an NFSv4 LOCKU RPC to the server.
- */
+  
+                                         
+   
 int
 nfs4_unlock_rpc(
 	nfsnode_t np,
@@ -3759,7 +3759,7 @@ nfs4_unlock_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, GETATTR, LOCKU
+	                        
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 26 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "unlock", nmp->nm_minor_vers, numops);
@@ -3805,9 +3805,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * Send an NFSv4 LOCKT RPC to the server.
- */
+  
+                                         
+   
 int
 nfs4_getlock_rpc(
 	nfsnode_t np,
@@ -3837,7 +3837,7 @@ nfs4_getlock_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, GETATTR, LOCKT
+	                        
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 26 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "locktest", nmp->nm_minor_vers, numops);
@@ -3890,15 +3890,15 @@ nfsmout:
 	nfsm_chain_cleanup(&nmrep);
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-/*
- * Check for any conflicts with the given lock.
- *
- * Checking for a lock doesn't require the file to be opened.
- * So we skip all the open owner, open file, lock owner work
- * and just check for a conflicting lock.
- */
+  
+                                               
+  
+                                                             
+                                                            
+                                         
+   
 int
 nfs_advlock_getlock(
 	nfsnode_t np,
@@ -3923,7 +3923,7 @@ restart:
 	}
 
 	lck_mtx_lock(&np->n_openlock);
-	/* scan currently held locks for conflict */
+	                                            
 	TAILQ_FOREACH(nflp, &np->n_locks, nfl_link) {
 		if (nflp->nfl_flags & (NFS_FILE_LOCK_BLOCKED | NFS_FILE_LOCK_DEAD)) {
 			continue;
@@ -3934,7 +3934,7 @@ restart:
 		}
 	}
 	if (nflp) {
-		/* found a conflicting lock */
+		                              
 		fl->l_type = nflp->nfl_type;
 		fl->l_pid = (nflp->nfl_flags & NFS_FILE_LOCK_STYLE_FLOCK) ? -1 : nflp->nfl_owner->nlo_pid;
 		fl->l_start = nflp->nfl_start;
@@ -3942,10 +3942,10 @@ restart:
 		fl->l_whence = SEEK_SET;
 		answered = 1;
 	} else if ((np->n_openflags & N_DELEG_WRITE) && !(np->n_openflags & N_DELEG_RETURN)) {
-		/*
-		 * If we have a write delegation, we know there can't be other
-		 * locks on the server.  So the answer is no conflicting lock found.
-		 */
+		  
+                                                                
+                                                                      
+     
 		fl->l_type = F_UNLCK;
 		answered = 1;
 	}
@@ -3955,7 +3955,7 @@ restart:
 		return 0;
 	}
 
-	/* no conflict found locally, so ask the server */
+	                                                  
 	error = nmp->nm_funcs->nf_getlock_rpc(np, nlop, fl, start, end, ctx);
 
 	if (nfs_mount_state_in_use_end(nmp, error)) {
@@ -3964,17 +3964,17 @@ restart:
 	return error;
 }
 
-/*
- * Acquire a file lock for the given range.
- *
- * Add the lock (request) to the lock queue.
- * Scan the lock queue for any conflicting locks.
- * If a conflict is found, block or return an error.
- * Once end of queue is reached, send request to the server.
- * If the server grants the lock, scan the lock queue and
- * update any existing locks.  Then (optionally) scan the
- * queue again to coalesce any locks adjacent to the new one.
- */
+  
+                                           
+  
+                                            
+                                                 
+                                                    
+                                                            
+                                                         
+                                                         
+                                                             
+   
 int
 nfs_advlock_setlock(
 	nfsnode_t np,
@@ -4003,7 +4003,7 @@ nfs_advlock_setlock(
 		return EINVAL;
 	}
 
-	/* allocate a new lock */
+	                         
 	newnflp = nfs_file_lock_alloc(nlop);
 	if (!newnflp) {
 		return ENOLCK;
@@ -4018,12 +4018,12 @@ nfs_advlock_setlock(
 	newnflp->nfl_flags |= NFS_FILE_LOCK_BLOCKED;
 
 	if ((style == NFS_FILE_LOCK_STYLE_FLOCK) && (type == F_WRLCK)) {
-		/*
-		 * For exclusive flock-style locks, if we block waiting for the
-		 * lock, we need to first release any currently held shared
-		 * flock-style lock.  So, the first thing we do is check if we
-		 * have a shared flock-style lock.
-		 */
+		  
+                                                                 
+                                                             
+                                                                
+                                    
+     
 		nflp = TAILQ_FIRST(&nlop->nlo_locks);
 		if (nflp && ((nflp->nfl_flags & NFS_FILE_LOCK_STYLE_MASK) != NFS_FILE_LOCK_STYLE_FLOCK)) {
 			nflp = NULL;
@@ -4061,23 +4061,23 @@ restart:
 
 	lck_mtx_lock(&np->n_openlock);
 	if (!inqueue) {
-		/* insert new lock at beginning of list */
+		                                          
 		TAILQ_INSERT_HEAD(&np->n_locks, newnflp, nfl_link);
 		inqueue = 1;
 	}
 
-	/* scan current list of locks (held and pending) for conflicts */
+	                                                                 
 	for (nflp = TAILQ_NEXT(newnflp, nfl_link); nflp; nflp = nextnflp) {
 		nextnflp = TAILQ_NEXT(nflp, nfl_link);
 		if (!nfs_file_lock_conflict(newnflp, nflp, &willsplit)) {
 			continue;
 		}
-		/* Conflict */
+		              
 		if (!(newnflp->nfl_flags & NFS_FILE_LOCK_WAIT)) {
 			error = EAGAIN;
 			break;
 		}
-		/* Block until this lock is no longer held. */
+		                                              
 		if (nflp->nfl_blockcnt == UINT_MAX) {
 			error = ENOLCK;
 			break;
@@ -4085,7 +4085,7 @@ restart:
 		nflp->nfl_blockcnt++;
 		do {
 			if (flocknflp) {
-				/* release any currently held shared lock before sleeping */
+				                                                            
 				lck_mtx_unlock(&np->n_openlock);
 				nfs_mount_state_in_use_end(nmp, 0);
 				inuse = 0;
@@ -4100,7 +4100,7 @@ restart:
 				}
 				inuse = 1;
 				lck_mtx_lock(&np->n_openlock);
-				/* no need to block/sleep if the conflict is gone */
+				                                                    
 				if (!nfs_file_lock_conflict(newnflp, nflp, NULL)) {
 					break;
 				}
@@ -4109,7 +4109,7 @@ restart:
 			slpflag = 0;
 			error = nfs_sigintr(NFSTONMP(np), NULL, vfs_context_thread(ctx), 0);
 			if (!error && (nmp->nm_state & NFSSTA_RECOVER)) {
-				/* looks like we have a recover pending... restart */
+				                                                     
 				restart = 1;
 				lck_mtx_unlock(&np->n_openlock);
 				nfs_mount_state_in_use_end(nmp, 0);
@@ -4129,8 +4129,8 @@ restart:
 		if (error || restart) {
 			break;
 		}
-		/* We have released n_openlock and we can't trust that nextnflp is still valid. */
-		/* So, start this lock-scanning loop over from where it started. */
+		                                                                                  
+		                                                                   
 		nextnflp = TAILQ_NEXT(newnflp, nfl_link);
 	}
 	lck_mtx_unlock(&np->n_openlock);
@@ -4142,11 +4142,11 @@ restart:
 	}
 
 	if (willsplit) {
-		/*
-		 * It looks like this operation is splitting a lock.
-		 * We allocate a new lock now so we don't have to worry
-		 * about the allocation failing after we've updated some state.
-		 */
+		  
+                                                      
+                                                         
+                                                                 
+     
 		nflp2 = nfs_file_lock_alloc(nlop);
 		if (!nflp2) {
 			error = ENOLCK;
@@ -4154,7 +4154,7 @@ restart:
 		}
 	}
 
-	/* once scan for local conflicts is clear, send request to server */
+	                                                                    
 	if ((error = nfs_open_state_set_busy(np, vfs_context_thread(ctx)))) {
 		goto error_out;
 	}
@@ -4162,25 +4162,25 @@ restart:
 	delay = 0;
 	do {
 #if CONFIG_NFS4
-		/* do we have a delegation? (that we're not returning?) */
+		                                                          
 		if ((np->n_openflags & N_DELEG_MASK) && !(np->n_openflags & N_DELEG_RETURN)) {
 			if (np->n_openflags & N_DELEG_WRITE) {
-				/* with a write delegation, just take the lock delegated */
+				                                                           
 				newnflp->nfl_flags |= NFS_FILE_LOCK_DELEGATED;
 				error = 0;
-				/* make sure the lock owner knows its open owner */
+				                                                   
 				if (!nlop->nlo_open_owner) {
 					nfs_open_owner_ref(nofp->nof_owner);
 					nlop->nlo_open_owner = nofp->nof_owner;
 				}
 				break;
 			} else {
-				/*
-				 * If we don't have any non-delegated opens but we do have
-				 * delegated opens, then we need to first claim the delegated
-				 * opens so that the lock request on the server can be associated
-				 * with an open it knows about.
-				 */
+				  
+                                                              
+                                                                 
+                                                                     
+                                   
+       
 				if ((!nofp->nof_rw_drw && !nofp->nof_w_drw && !nofp->nof_r_drw &&
 				    !nofp->nof_rw_dw && !nofp->nof_w_dw && !nofp->nof_r_dw &&
 				    !nofp->nof_rw && !nofp->nof_w && !nofp->nof_r) &&
@@ -4211,13 +4211,13 @@ restart:
 		if (!error || ((error != NFSERR_DENIED) && (error != NFSERR_GRACE))) {
 			break;
 		}
-		/* request was denied due to either conflict or grace period */
+		                                                               
 		if ((error == NFSERR_DENIED) && !(newnflp->nfl_flags & NFS_FILE_LOCK_WAIT)) {
 			error = EAGAIN;
 			break;
 		}
 		if (flocknflp) {
-			/* release any currently held shared lock before sleeping */
+			                                                            
 			nfs_open_state_clear_busy(np);
 			busy = 0;
 			if (inuse) {
@@ -4239,10 +4239,10 @@ restart:
 			}
 			busy = 1;
 		}
-		/*
-		 * Wait a little bit and send the request again.
-		 * Except for retries of blocked v2/v3 request where we've already waited a bit.
-		 */
+		  
+                                                  
+                                                                                  
+     
 		if ((nmp->nm_vers >= NFS_VER4) || (error == NFSERR_GRACE)) {
 			if (error == NFSERR_GRACE) {
 				delay = 4;
@@ -4255,7 +4255,7 @@ restart:
 		}
 		error = nfs_sigintr(NFSTONMP(np), NULL, vfs_context_thread(ctx), 0);
 		if (!error && (nmp->nm_state & NFSSTA_RECOVER)) {
-			/* looks like we have a recover pending... restart */
+			                                                     
 			nfs_open_state_clear_busy(np);
 			busy = 0;
 			if (inuse) {
@@ -4271,7 +4271,7 @@ restart:
 
 error_out:
 	if (nfs_mount_state_error_should_restart(error)) {
-		/* looks like we need to restart this operation */
+		                                                  
 		if (busy) {
 			nfs_open_state_clear_busy(np);
 			busy = 0;
@@ -4287,10 +4287,10 @@ error_out:
 	if (error) {
 		newnflp->nfl_flags |= NFS_FILE_LOCK_DEAD;
 		if (newnflp->nfl_blockcnt) {
-			/* wake up anyone blocked on this lock */
+			                                         
 			wakeup(newnflp);
 		} else {
-			/* remove newnflp from lock list and destroy */
+			                                               
 			if (inqueue) {
 				TAILQ_REMOVE(&np->n_locks, newnflp, nfl_link);
 			}
@@ -4309,15 +4309,15 @@ error_out:
 		return error;
 	}
 
-	/* server granted the lock */
+	                             
 
-	/*
-	 * Scan for locks to update.
-	 *
-	 * Locks completely covered are killed.
-	 * At most two locks may need to be clipped.
-	 * It's possible that a single lock may need to be split.
-	 */
+	  
+                             
+   
+                                        
+                                             
+                                                          
+    
 	TAILQ_FOREACH_SAFE(nflp, &np->n_locks, nfl_link, nextnflp) {
 		if (nflp == newnflp) {
 			continue;
@@ -4334,18 +4334,18 @@ error_out:
 		if ((newnflp->nfl_start > nflp->nfl_end) || (newnflp->nfl_end < nflp->nfl_start)) {
 			continue;
 		}
-		/* here's one to update */
+		                          
 		if ((newnflp->nfl_start <= nflp->nfl_start) && (newnflp->nfl_end >= nflp->nfl_end)) {
-			/* The entire lock is being replaced. */
+			                                        
 			nflp->nfl_flags |= NFS_FILE_LOCK_DEAD;
 			lck_mtx_lock(&nlop->nlo_lock);
 			TAILQ_REMOVE(&nlop->nlo_locks, nflp, nfl_lolink);
 			lck_mtx_unlock(&nlop->nlo_lock);
-			/* lock will be destroyed below, if no waiters */
+			                                                 
 		} else if ((newnflp->nfl_start > nflp->nfl_start) && (newnflp->nfl_end < nflp->nfl_end)) {
-			/* We're replacing a range in the middle of a lock. */
-			/* The current lock will be split into two locks. */
-			/* Update locks and insert new lock after current lock. */
+			                                                      
+			                                                    
+			                                                          
 			nflp2->nfl_flags |= (nflp->nfl_flags & (NFS_FILE_LOCK_STYLE_MASK | NFS_FILE_LOCK_DELEGATED));
 			nflp2->nfl_type = nflp->nfl_type;
 			nflp2->nfl_start = newnflp->nfl_end + 1;
@@ -4356,17 +4356,17 @@ error_out:
 			nextnflp = nflp2;
 			nflp2 = NULL;
 		} else if (newnflp->nfl_start > nflp->nfl_start) {
-			/* We're replacing the end of a lock. */
+			                                        
 			nflp->nfl_end = newnflp->nfl_start - 1;
 		} else if (newnflp->nfl_end < nflp->nfl_end) {
-			/* We're replacing the start of a lock. */
+			                                          
 			nflp->nfl_start = newnflp->nfl_end + 1;
 		}
 		if (nflp->nfl_blockcnt) {
-			/* wake up anyone blocked on this lock */
+			                                         
 			wakeup(nflp);
 		} else if (nflp->nfl_flags & NFS_FILE_LOCK_DEAD) {
-			/* remove nflp from lock list and destroy */
+			                                            
 			TAILQ_REMOVE(&np->n_locks, nflp, nfl_link);
 			nfs_file_lock_destroy(nflp);
 		}
@@ -4374,20 +4374,20 @@ error_out:
 
 	nfs_lock_owner_insert_held_lock(nlop, newnflp);
 
-	/*
-	 * POSIX locks should be coalesced when possible.
-	 */
+	  
+                                                  
+    
 	if ((style == NFS_FILE_LOCK_STYLE_POSIX) && (nofp->nof_flags & NFS_OPEN_FILE_POSIXLOCK)) {
-		/*
-		 * Walk through the lock queue and check each of our held locks with
-		 * the previous and next locks in the lock owner's "held lock list".
-		 * If the two locks can be coalesced, we merge the current lock into
-		 * the other (previous or next) lock.  Merging this way makes sure that
-		 * lock ranges are always merged forward in the lock queue.  This is
-		 * important because anyone blocked on the lock being "merged away"
-		 * will still need to block on that range and it will simply continue
-		 * checking locks that are further down the list.
-		 */
+		  
+                                                                      
+                                                                      
+                                                                      
+                                                                         
+                                                                      
+                                                                     
+                                                                       
+                                                   
+     
 		TAILQ_FOREACH_SAFE(nflp, &np->n_locks, nfl_link, nextnflp) {
 			if (nflp->nfl_flags & (NFS_FILE_LOCK_BLOCKED | NFS_FILE_LOCK_DEAD)) {
 				continue;
@@ -4421,10 +4421,10 @@ error_out:
 				continue;
 			}
 			if (nflp->nfl_blockcnt) {
-				/* wake up anyone blocked on this lock */
+				                                         
 				wakeup(nflp);
 			} else {
-				/* remove nflp from lock list and destroy */
+				                                            
 				TAILQ_REMOVE(&np->n_locks, nflp, nfl_link);
 				nfs_file_lock_destroy(nflp);
 			}
@@ -4443,9 +4443,9 @@ error_out:
 	return error;
 }
 
-/*
- * Release all (same style) locks within the given range.
- */
+  
+                                                         
+   
 int
 nfs_advlock_unlock(
 	nfsnode_t np,
@@ -4490,11 +4490,11 @@ restart:
 
 	lck_mtx_lock(&np->n_openlock);
 	if ((start > 0) && (end < UINT64_MAX) && !willsplit) {
-		/*
-		 * We may need to allocate a new lock if an existing lock gets split.
-		 * So, we first scan the list to check for a split, and if there's
-		 * going to be one, we'll allocate one now.
-		 */
+		  
+                                                                       
+                                                                    
+                                             
+     
 		TAILQ_FOREACH_SAFE(nflp, &np->n_locks, nfl_link, nextnflp) {
 			if (nflp->nfl_flags & (NFS_FILE_LOCK_BLOCKED | NFS_FILE_LOCK_DEAD)) {
 				continue;
@@ -4525,22 +4525,22 @@ restart:
 		}
 	}
 
-	/*
-	 * Free all of our locks in the given range.
-	 *
-	 * Note that this process requires sending requests to the server.
-	 * Because of this, we will release the n_openlock while performing
-	 * the unlock RPCs.  The N_OPENBUSY state keeps the state of *held*
-	 * locks from changing underneath us.  However, other entries in the
-	 * list may be removed.  So we need to be careful walking the list.
-	 */
+	  
+                                             
+   
+                                                                   
+                                                                    
+                                                                    
+                                                                     
+                                                                    
+    
 
-	/*
-	 * Don't unlock ranges that are held by other-style locks.
-	 * If style is posix, don't send any unlock rpcs if flock is held.
-	 * If we unlock an flock, don't send unlock rpcs for any posix-style
-	 * ranges held - instead send unlocks for the ranges not held.
-	 */
+	  
+                                                           
+                                                                   
+                                                                     
+                                                               
+    
 	if ((style == NFS_FILE_LOCK_STYLE_POSIX) &&
 	    ((nflp = TAILQ_FIRST(&nlop->nlo_locks))) &&
 	    ((nflp->nfl_flags & NFS_FILE_LOCK_STYLE_MASK) == NFS_FILE_LOCK_STYLE_FLOCK)) {
@@ -4556,7 +4556,7 @@ restart:
 		int delegated = (TAILQ_FIRST(&nlop->nlo_locks)->nfl_flags & NFS_FILE_LOCK_DELEGATED);
 		while (!delegated && nflp) {
 			if ((nflp->nfl_flags & NFS_FILE_LOCK_STYLE_MASK) == NFS_FILE_LOCK_STYLE_POSIX) {
-				/* unlock the range preceding this lock */
+				                                          
 				lck_mtx_unlock(&np->n_openlock);
 				error = nmp->nm_funcs->nf_unlock_rpc(np, nlop, type, s, nflp->nfl_start - 1, 0,
 				    vfs_context_thread(ctx), vfs_context_ucred(ctx));
@@ -4603,9 +4603,9 @@ restart:
 		if ((start > nflp->nfl_end) || (end < nflp->nfl_start)) {
 			continue;
 		}
-		/* here's one to unlock */
+		                          
 		if ((start <= nflp->nfl_start) && (end >= nflp->nfl_end)) {
-			/* The entire lock is being unlocked. */
+			                                        
 			if (send_unlock_rpcs && !(nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED)) {
 				lck_mtx_unlock(&np->n_openlock);
 				error = nmp->nm_funcs->nf_unlock_rpc(np, nlop, nflp->nfl_type, nflp->nfl_start, nflp->nfl_end, 0,
@@ -4625,10 +4625,10 @@ restart:
 			lck_mtx_lock(&nlop->nlo_lock);
 			TAILQ_REMOVE(&nlop->nlo_locks, nflp, nfl_lolink);
 			lck_mtx_unlock(&nlop->nlo_lock);
-			/* lock will be destroyed below, if no waiters */
+			                                                 
 		} else if ((start > nflp->nfl_start) && (end < nflp->nfl_end)) {
-			/* We're unlocking a range in the middle of a lock. */
-			/* The current lock will be split into two locks. */
+			                                                      
+			                                                    
 			if (send_unlock_rpcs && !(nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED)) {
 				lck_mtx_unlock(&np->n_openlock);
 				error = nmp->nm_funcs->nf_unlock_rpc(np, nlop, nflp->nfl_type, start, end, 0,
@@ -4643,7 +4643,7 @@ restart:
 			if (error) {
 				break;
 			}
-			/* update locks and insert new lock after current lock */
+			                                                         
 			newnflp->nfl_flags |= (nflp->nfl_flags & (NFS_FILE_LOCK_STYLE_MASK | NFS_FILE_LOCK_DELEGATED));
 			newnflp->nfl_type = nflp->nfl_type;
 			newnflp->nfl_start = end + 1;
@@ -4654,7 +4654,7 @@ restart:
 			nextnflp = newnflp;
 			newnflp = NULL;
 		} else if (start > nflp->nfl_start) {
-			/* We're unlocking the end of a lock. */
+			                                        
 			if (send_unlock_rpcs && !(nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED)) {
 				lck_mtx_unlock(&np->n_openlock);
 				error = nmp->nm_funcs->nf_unlock_rpc(np, nlop, nflp->nfl_type, start, nflp->nfl_end, 0,
@@ -4672,7 +4672,7 @@ restart:
 			}
 			nflp->nfl_end = start - 1;
 		} else if (end < nflp->nfl_end) {
-			/* We're unlocking the start of a lock. */
+			                                          
 			if (send_unlock_rpcs && !(nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED)) {
 				lck_mtx_unlock(&np->n_openlock);
 				error = nmp->nm_funcs->nf_unlock_rpc(np, nlop, nflp->nfl_type, nflp->nfl_start, end, 0,
@@ -4691,10 +4691,10 @@ restart:
 			nflp->nfl_start = end + 1;
 		}
 		if (nflp->nfl_blockcnt) {
-			/* wake up anyone blocked on this lock */
+			                                         
 			wakeup(nflp);
 		} else if (nflp->nfl_flags & NFS_FILE_LOCK_DEAD) {
-			/* remove nflp from lock list and destroy */
+			                                            
 			TAILQ_REMOVE(&np->n_locks, nflp, nfl_link);
 			nfs_file_lock_destroy(nflp);
 		}
@@ -4710,20 +4710,20 @@ out:
 	return error;
 }
 
-/*
- * NFSv4 advisory file locking
- */
+  
+                              
+   
 int
 nfs_vnop_advlock(
-	struct vnop_advlock_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  caddr_t a_id;
-                                  *  int a_op;
-                                  *  struct flock *a_fl;
-                                  *  int a_flags;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_advlock_args     
+                                                                 
+                                                  
+                                                  
+                                              
+                                                        
+                                                 
+                                                             
+                                         *ap)
 {
 	vnode_t vp = ap->a_vp;
 	nfsnode_t np = VTONFS(ap->a_vp);
@@ -4756,26 +4756,26 @@ nfs_vnop_advlock(
 		return EIO;
 	}
 	vtype = vnode_vtype(ap->a_vp);
-	if (vtype == VDIR) { /* ignore lock requests on directories */
+	if (vtype == VDIR) {                                          
 		return 0;
 	}
-	if (vtype != VREG) { /* anything other than regular files is invalid */
+	if (vtype != VREG) {                                                   
 		return EINVAL;
 	}
 
-	/* Convert the flock structure into a start and end. */
+	                                                       
 	switch (fl->l_whence) {
 	case SEEK_SET:
 	case SEEK_CUR:
-		/*
-		 * Caller is responsible for adding any necessary offset
-		 * to fl->l_start when SEEK_CUR is used.
-		 */
+		  
+                                                          
+                                          
+     
 		lstart = fl->l_start;
 		break;
 	case SEEK_END:
-		/* need to flush, and refetch attributes to make */
-		/* sure we have the correct end of file offset   */
+		                                                   
+		                                                   
 		if ((error = nfs_node_lock(np))) {
 			return error;
 		}
@@ -4812,7 +4812,7 @@ nfs_vnop_advlock(
 			return EOVERFLOW;
 		}
 		end = start - 1 + fl->l_len;
-	} else { /* l_len is negative */
+	} else {                        
 		if ((lstart + fl->l_len) < 0) {
 			return EINVAL;
 		}
@@ -4828,7 +4828,7 @@ nfs_vnop_advlock(
 		return EINVAL;
 	}
 
-	/* find the lock owner, alloc if not unlock */
+	                                              
 	nlop = nfs_lock_owner_find(np, vfs_context_proc(ctx), (op != F_UNLCK));
 	if (!nlop) {
 		error = (op == F_UNLCK) ? 0 : ENOMEM;
@@ -4841,14 +4841,14 @@ nfs_vnop_advlock(
 	if (op == F_GETLK) {
 		error = nfs_advlock_getlock(np, nlop, fl, start, end, ctx);
 	} else {
-		/* find the open owner */
+		                         
 		noop = nfs_open_owner_find(nmp, vfs_context_ucred(ctx), 0);
 		if (!noop) {
 			NP(np, "nfs_vnop_advlock: no open owner %d", kauth_cred_getuid(vfs_context_ucred(ctx)));
 			error = EPERM;
 			goto out;
 		}
-		/* find the open file */
+		                        
 #if CONFIG_NFS4
 restart:
 #endif
@@ -4881,7 +4881,7 @@ restart:
 			}
 			error = nfs_advlock_setlock(np, nofp, nlop, op, start, end, style, fl->l_type, ctx);
 		} else {
-			/* not getlk, unlock or lock? */
+			                                
 			error = EINVAL;
 		}
 	}
@@ -4896,9 +4896,9 @@ out:
 	return error;
 }
 
-/*
- * Check if an open owner holds any locks on a file.
- */
+  
+                                                    
+   
 int
 nfs_check_for_locks(struct nfs_open_owner *noop, struct nfs_open_file *nofp)
 {
@@ -4916,9 +4916,9 @@ nfs_check_for_locks(struct nfs_open_owner *noop, struct nfs_open_file *nofp)
 }
 
 #if CONFIG_NFS4
-/*
- * Reopen simple (no deny, no locks) open state that was lost.
- */
+  
+                                                              
+   
 int
 nfs4_reopen(struct nfs_open_file *nofp, thread_t thd)
 {
@@ -4953,10 +4953,10 @@ nfs4_reopen(struct nfs_open_file *nofp, thread_t thd)
 
 	nfs_node_lock_force(np);
 	if ((vnode_vtype(vp) != VDIR) && np->n_sillyrename) {
-		/*
-		 * The node's been sillyrenamed, so we need to use
-		 * the sillyrename directory/name to do the open.
-		 */
+		  
+                                                    
+                                                   
+     
 		struct nfs_sillyrename *nsp = np->n_sillyrename;
 		dvp = NFSTOV(nsp->nsr_dnp);
 		if ((error = vnode_get(dvp))) {
@@ -4966,12 +4966,12 @@ nfs4_reopen(struct nfs_open_file *nofp, thread_t thd)
 		}
 		name = nsp->nsr_name;
 	} else {
-		/*
-		 * [sigh] We can't trust VFS to get the parent right for named
-		 * attribute nodes.  (It likes to reparent the nodes after we've
-		 * created them.)  Luckily we can probably get the right parent
-		 * from the n_parent we have stashed away.
-		 */
+		  
+                                                                
+                                                                  
+                                                                 
+                                            
+     
 		if ((np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR) &&
 		    (((dvp = np->n_parent)) && (error = vnode_get(dvp)))) {
 			dvp = NULL;
@@ -5055,9 +5055,9 @@ out:
 	return error;
 }
 
-/*
- * Send a normal OPEN RPC to open/create a file.
- */
+  
+                                                
+   
 int
 nfs4_open_rpc(
 	struct nfs_open_file *nofp,
@@ -5074,9 +5074,9 @@ nfs4_open_rpc(
 	           cnp, vap, dvp, vpp, create, share_access, share_deny);
 }
 
-/*
- * Send an OPEN RPC to reopen a file.
- */
+  
+                                     
+   
 int
 nfs4_open_reopen_rpc(
 	struct nfs_open_file *nofp,
@@ -5091,9 +5091,9 @@ nfs4_open_reopen_rpc(
 	return nfs4_open_rpc_internal(nofp, NULL, thd, cred, cnp, NULL, dvp, vpp, NFS_OPEN_NOCREATE, share_access, share_deny);
 }
 
-/*
- * Send an OPEN_CONFIRM RPC to confirm an OPEN.
- */
+  
+                                               
+   
 int
 nfs4_open_confirm_rpc(
 	struct nfsmount *nmp,
@@ -5115,7 +5115,7 @@ nfs4_open_confirm_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, OPEN_CONFIRM, GETATTR
+	                               
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 23 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "open_confirm", nmp->nm_minor_vers, numops);
@@ -5150,12 +5150,12 @@ nfsmout:
 	return error;
 }
 
-/*
- * common OPEN RPC code
- *
- * If create is set, ctx must be passed in.
- * Returns a node on success if no node passed in.
- */
+  
+                       
+  
+                                           
+                                                  
+   
 int
 nfs4_open_rpc_internal(
 	struct nfs_open_file *nofp,
@@ -5245,7 +5245,7 @@ again:
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, SAVEFH, OPEN(CREATE?), GETATTR(FH), RESTOREFH, GETATTR
+	                                                                
 	numops = 6;
 	nfsm_chain_build_alloc_init(error, &nmreq, 53 * NFSX_UNSIGNED + cnp->cn_namelen);
 	nfsm_chain_add_compound_header(error, &nmreq, create ? "create" : "open", nmp->nm_minor_vers, numops);
@@ -5265,10 +5265,10 @@ again:
 	nfsm_chain_add_32(error, &nmreq, create);
 	if (create) {
 		if (exclusive) {
-			static uint32_t create_verf; // XXX need a better verifier
+			static uint32_t create_verf;                              
 			create_verf++;
 			nfsm_chain_add_32(error, &nmreq, NFS_CREATE_EXCLUSIVE);
-			/* insert 64 bit verifier */
+			                            
 			nfsm_chain_add_32(error, &nmreq, create_verf);
 			nfsm_chain_add_32(error, &nmreq, create_verf);
 		} else {
@@ -5336,10 +5336,10 @@ again:
 		case NFS_OPEN_DELEGATE_WRITE:
 			nfsm_chain_get_stateid(error, &nmrep, &dstateid);
 			nfsm_chain_get_32(error, &nmrep, recall);
-			if (delegation == NFS_OPEN_DELEGATE_WRITE) { // space (skip) XXX
+			if (delegation == NFS_OPEN_DELEGATE_WRITE) {                    
 				nfsm_chain_adv(error, &nmrep, 3 * NFSX_UNSIGNED);
 			}
-			/* if we have any trouble accepting the ACE, just invalidate it */
+			                                                                  
 			ace_type = ace_flags = ace_mask = len = 0;
 			nfsm_chain_get_32(error, &nmrep, ace_type);
 			nfsm_chain_get_32(error, &nmrep, ace_flags);
@@ -5379,7 +5379,7 @@ again:
 			break;
 		}
 	}
-	/* At this point if we have no error, the object was created/opened. */
+	                                                                       
 	open_error = error;
 	nfsmout_if(error);
 	if (create && vap && !exclusive) {
@@ -5395,13 +5395,13 @@ again:
 		goto nfsmout;
 	}
 	if (!create && np && !NFS_CMPFH(np, fh->fh_data, fh->fh_len)) {
-		// XXX for the open case, what if fh doesn't match the vnode we think we're opening?
-		// Solaris Named Attributes may do this due to a bug.... so don't warn for named attributes.
+		                                                                                    
+		                                                                                            
 		if (!(np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR)) {
 			NP(np, "nfs4_open_rpc: warning: file handle mismatch");
 		}
 	}
-	/* directory attributes: if we don't get them, make sure to invalidate */
+	                                                                         
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_RESTOREFH);
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 	nfsm_chain_loadattr(error, &nmrep, dnp, nfsvers, &xid);
@@ -5444,7 +5444,7 @@ nfsmout:
 		nfs_node_unlock(dnp);
 	}
 	if (!error && !np && fh->fh_len) {
-		/* create the vnode with the filehandle and attributes */
+		                                                         
 		xid = savedxid;
 		error = nfs_nget(NFSTOMP(dnp), dnp, cnp, fh->fh_data, fh->fh_len, nvattr, &xid, req->r_auth, NG_MAKEENTRY, &newnp);
 		if (!error) {
@@ -5460,7 +5460,7 @@ nfsmout:
 			np = newnp;
 		}
 		if (!error && np && !recall) {
-			/* stuff the delegation state in the node */
+			                                            
 			lck_mtx_lock(&np->n_openlock);
 			np->n_openflags &= ~N_DELEG_MASK;
 			np->n_openflags |= ((delegation == NFS_OPEN_DELEGATE_READ) ? N_DELEG_READ : N_DELEG_WRITE);
@@ -5475,10 +5475,10 @@ nfsmout:
 			}
 			lck_mtx_unlock(&np->n_openlock);
 		} else {
-			/* give the delegation back */
+			                              
 			if (np) {
 				if (NFS_CMPFH(np, fh->fh_data, fh->fh_len)) {
-					/* update delegation state and return it */
+					                                           
 					lck_mtx_lock(&np->n_openlock);
 					np->n_openflags &= ~N_DELEG_MASK;
 					np->n_openflags |= ((delegation == NFS_OPEN_DELEGATE_READ) ? N_DELEG_READ : N_DELEG_WRITE);
@@ -5492,13 +5492,13 @@ nfsmout:
 						lck_mtx_unlock(&nmp->nm_lock);
 					}
 					lck_mtx_unlock(&np->n_openlock);
-					/* don't need to send a separate delegreturn for fh */
+					                                                      
 					fh->fh_len = 0;
 				}
-				/* return np's current delegation */
+				                                    
 				nfs4_delegation_return(np, 0, thd, cred);
 			}
-			if (fh->fh_len) { /* return fh's delegation if it wasn't for np */
+			if (fh->fh_len) {                                                 
 				nfs4_delegreturn_rpc(nmp, fh->fh_data, fh->fh_len, &dstateid, 0, thd, cred);
 			}
 		}
@@ -5517,8 +5517,8 @@ nfsmout:
 		if (exclusive) {
 			error = nfs4_setattr_rpc(newnp, vap, ctx);
 			if (error && (gotuid || gotgid)) {
-				/* it's possible the server didn't like our attempt to set IDs. */
-				/* so, let's try it again without those */
+				                                                                  
+				                                          
 				VATTR_CLEAR_ACTIVE(vap, va_uid);
 				VATTR_CLEAR_ACTIVE(vap, va_gid);
 				error = nfs4_setattr_rpc(newnp, vap, ctx);
@@ -5539,9 +5539,9 @@ nfsmout:
 }
 
 
-/*
- * Send an OPEN RPC to claim a delegated open for a file
- */
+  
+                                                        
+   
 int
 nfs4_claim_delegated_open_rpc(
 	struct nfs_open_file *nofp,
@@ -5582,10 +5582,10 @@ nfs4_claim_delegated_open_rpc(
 
 	nfs_node_lock_force(np);
 	if ((vnode_vtype(NFSTOV(np)) != VDIR) && np->n_sillyrename) {
-		/*
-		 * The node's been sillyrenamed, so we need to use
-		 * the sillyrename directory/name to do the open.
-		 */
+		  
+                                                    
+                                                   
+     
 		struct nfs_sillyrename *nsp = np->n_sillyrename;
 		dvp = NFSTOV(nsp->nsr_dnp);
 		if ((error = vnode_get(dvp))) {
@@ -5595,12 +5595,12 @@ nfs4_claim_delegated_open_rpc(
 		}
 		name = nsp->nsr_name;
 	} else {
-		/*
-		 * [sigh] We can't trust VFS to get the parent right for named
-		 * attribute nodes.  (It likes to reparent the nodes after we've
-		 * created them.)  Luckily we can probably get the right parent
-		 * from the n_parent we have stashed away.
-		 */
+		  
+                                                                
+                                                                  
+                                                                 
+                                            
+     
 		if ((np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR) &&
 		    (((dvp = np->n_parent)) && (error = vnode_get(dvp)))) {
 			dvp = NULL;
@@ -5642,7 +5642,7 @@ nfs4_claim_delegated_open_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, OPEN, GETATTR(FH)
+	                           
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 48 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "open_claim_d", nmp->nm_minor_vers, numops);
@@ -5654,13 +5654,13 @@ nfs4_claim_delegated_open_rpc(
 	nfsm_chain_add_32(error, &nmreq, noop->noo_seqid);
 	nfsm_chain_add_32(error, &nmreq, share_access);
 	nfsm_chain_add_32(error, &nmreq, share_deny);
-	// open owner: clientid + uid
-	nfsm_chain_add_64(error, &nmreq, nmp->nm_clientid); // open_owner4.clientid
+	                             
+	nfsm_chain_add_64(error, &nmreq, nmp->nm_clientid);                        
 	nfsm_chain_add_32(error, &nmreq, NFSX_UNSIGNED);
-	nfsm_chain_add_32(error, &nmreq, kauth_cred_getuid(noop->noo_cred)); // open_owner4.owner
-	// openflag4
+	nfsm_chain_add_32(error, &nmreq, kauth_cred_getuid(noop->noo_cred));                     
+	            
 	nfsm_chain_add_32(error, &nmreq, NFS_OPEN_NOCREATE);
-	// open_claim4
+	              
 	nfsm_chain_add_32(error, &nmreq, NFS_CLAIM_DELEGATE_CUR);
 	nfsm_chain_add_stateid(error, &nmreq, &np->n_dstateid);
 	nfsm_chain_add_name(error, &nmreq, filename, namelen, nmp);
@@ -5694,8 +5694,8 @@ nfs4_claim_delegated_open_rpc(
 	if (!error) {
 		switch (delegation) {
 		case NFS_OPEN_DELEGATE_NONE:
-			// if (!(np->n_openflags & N_DELEG_RETURN)) /* don't warn if delegation is being returned */
-			//      printf("nfs: open delegated claim didn't return a delegation %s\n", filename ? filename : "???");
+			                                                                                            
+			                                                                                                         
 			break;
 		case NFS_OPEN_DELEGATE_READ:
 		case NFS_OPEN_DELEGATE_WRITE:
@@ -5709,10 +5709,10 @@ nfs4_claim_delegated_open_rpc(
 			}
 			nfsm_chain_get_stateid(error, &nmrep, &dstateid);
 			nfsm_chain_get_32(error, &nmrep, recall);
-			if (delegation == NFS_OPEN_DELEGATE_WRITE) { // space (skip) XXX
+			if (delegation == NFS_OPEN_DELEGATE_WRITE) {                    
 				nfsm_chain_adv(error, &nmrep, 3 * NFSX_UNSIGNED);
 			}
-			/* if we have any trouble accepting the ACE, just invalidate it */
+			                                                                  
 			ace_type = ace_flags = ace_mask = len = 0;
 			nfsm_chain_get_32(error, &nmrep, ace_type);
 			nfsm_chain_get_32(error, &nmrep, ace_flags);
@@ -5747,7 +5747,7 @@ nfs4_claim_delegated_open_rpc(
 				FREE(s, M_TEMP);
 			}
 			if (!error) {
-				/* stuff the latest delegation state in the node */
+				                                                   
 				lck_mtx_lock(&np->n_openlock);
 				np->n_openflags &= ~N_DELEG_MASK;
 				np->n_openflags |= ((delegation == NFS_OPEN_DELEGATE_READ) ? N_DELEG_READ : N_DELEG_WRITE);
@@ -5778,8 +5778,8 @@ nfs4_claim_delegated_open_rpc(
 		goto nfsmout;
 	}
 	if (!NFS_CMPFH(np, fh->fh_data, fh->fh_len)) {
-		// XXX what if fh doesn't match the vnode we think we're re-opening?
-		// Solaris Named Attributes may do this due to a bug.... so don't warn for named attributes.
+		                                                                    
+		                                                                                            
 		if (!(np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR)) {
 			printf("nfs4_claim_delegated_open_rpc: warning: file handle mismatch %s\n", filename ? filename : "???");
 		}
@@ -5801,17 +5801,17 @@ nfsmout:
 	nfs_open_owner_clear_busy(noop);
 	if ((delegation == NFS_OPEN_DELEGATE_READ) || (delegation == NFS_OPEN_DELEGATE_WRITE)) {
 		if (recall) {
-			/*
-			 * We're making a delegated claim.
-			 * Don't return the delegation here in case we have more to claim.
-			 * Just make sure it's queued up to be returned.
-			 */
+			  
+                                     
+                                                                     
+                                                   
+      
 			nfs4_delegation_return_enqueue(np);
 		}
 	}
 out:
-	// if (!error)
-	//      printf("nfs: open claim delegated (%d, %d) succeeded for %s\n", share_access, share_deny, filename ? filename : "???");
+	              
+	                                                                                                                               
 	if (filename && (filename != &smallname[0])) {
 		FREE(filename, M_TEMP);
 	}
@@ -5824,9 +5824,9 @@ out:
 	return error;
 }
 
-/*
- * Send an OPEN RPC to reclaim an open file.
- */
+  
+                                            
+   
 int
 nfs4_open_reclaim_rpc(
 	struct nfs_open_file *nofp,
@@ -5870,7 +5870,7 @@ nfs4_open_reclaim_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, OPEN, GETATTR(FH)
+	                           
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 48 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "open_reclaim", nmp->nm_minor_vers, numops);
@@ -5882,13 +5882,13 @@ nfs4_open_reclaim_rpc(
 	nfsm_chain_add_32(error, &nmreq, noop->noo_seqid);
 	nfsm_chain_add_32(error, &nmreq, share_access);
 	nfsm_chain_add_32(error, &nmreq, share_deny);
-	// open owner: clientid + uid
-	nfsm_chain_add_64(error, &nmreq, nmp->nm_clientid); // open_owner4.clientid
+	                             
+	nfsm_chain_add_64(error, &nmreq, nmp->nm_clientid);                        
 	nfsm_chain_add_32(error, &nmreq, NFSX_UNSIGNED);
-	nfsm_chain_add_32(error, &nmreq, kauth_cred_getuid(noop->noo_cred)); // open_owner4.owner
-	// openflag4
+	nfsm_chain_add_32(error, &nmreq, kauth_cred_getuid(noop->noo_cred));                     
+	            
 	nfsm_chain_add_32(error, &nmreq, NFS_OPEN_NOCREATE);
-	// open_claim4
+	              
 	nfsm_chain_add_32(error, &nmreq, NFS_CLAIM_PREVIOUS);
 	delegation = (np->n_openflags & N_DELEG_READ) ? NFS_OPEN_DELEGATE_READ :
 	    (np->n_openflags & N_DELEG_WRITE) ? NFS_OPEN_DELEGATE_WRITE :
@@ -5926,13 +5926,13 @@ nfs4_open_reclaim_rpc(
 		switch (delegation) {
 		case NFS_OPEN_DELEGATE_NONE:
 			if (np->n_openflags & N_DELEG_MASK) {
-				/*
-				 * Hey!  We were supposed to get our delegation back even
-				 * if it was getting immediately recalled.  Bad server!
-				 *
-				 * Just try to return the existing delegation.
-				 */
-				// NP(np, "nfs: open reclaim didn't return delegation?");
+				  
+                                                             
+                                                           
+      
+                                                  
+       
+				                                                         
 				delegation = (np->n_openflags & N_DELEG_WRITE) ? NFS_OPEN_DELEGATE_WRITE : NFS_OPEN_DELEGATE_READ;
 				recall = 1;
 			}
@@ -5941,10 +5941,10 @@ nfs4_open_reclaim_rpc(
 		case NFS_OPEN_DELEGATE_WRITE:
 			nfsm_chain_get_stateid(error, &nmrep, &dstateid);
 			nfsm_chain_get_32(error, &nmrep, recall);
-			if (delegation == NFS_OPEN_DELEGATE_WRITE) { // space (skip) XXX
+			if (delegation == NFS_OPEN_DELEGATE_WRITE) {                    
 				nfsm_chain_adv(error, &nmrep, 3 * NFSX_UNSIGNED);
 			}
-			/* if we have any trouble accepting the ACE, just invalidate it */
+			                                                                  
 			ace_type = ace_flags = ace_mask = len = 0;
 			nfsm_chain_get_32(error, &nmrep, ace_type);
 			nfsm_chain_get_32(error, &nmrep, ace_flags);
@@ -5979,7 +5979,7 @@ nfs4_open_reclaim_rpc(
 				FREE(s, M_TEMP);
 			}
 			if (!error) {
-				/* stuff the delegation state in the node */
+				                                            
 				lck_mtx_lock(&np->n_openlock);
 				np->n_openflags &= ~N_DELEG_MASK;
 				np->n_openflags |= ((delegation == NFS_OPEN_DELEGATE_READ) ? N_DELEG_READ : N_DELEG_WRITE);
@@ -6010,10 +6010,10 @@ nfs4_open_reclaim_rpc(
 		goto nfsmout;
 	}
 	if (!NFS_CMPFH(np, fh->fh_data, fh->fh_len)) {
-		// XXX what if fh doesn't match the vnode we think we're re-opening?
-		// That should be pretty hard in this case, given that we are doing
-		// the open reclaim using the file handle (and not a dir/name pair).
-		// Solaris Named Attributes may do this due to a bug.... so don't warn for named attributes.
+		                                                                    
+		                                                                   
+		                                                                    
+		                                                                                            
 		if (!(np->n_vattr.nva_flags & NFS_FFLAG_IS_ATTR)) {
 			NP(np, "nfs4_open_reclaim_rpc: warning: file handle mismatch");
 		}
@@ -6024,8 +6024,8 @@ nfs4_open_reclaim_rpc(
 		nofp->nof_flags |= NFS_OPEN_FILE_POSIXLOCK;
 	}
 nfsmout:
-	// if (!error)
-	//      NP(np, "nfs: open reclaim (%d, %d) succeeded", share_access, share_deny);
+	              
+	                                                                                 
 	NVATTR_CLEANUP(nvattr);
 	FREE(nvattr, M_TEMP);
 	NFS_ZFREE(nfs_fhandle_zone, fh);
@@ -6070,7 +6070,7 @@ nfs4_open_downgrade_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, OPEN_DOWNGRADE, GETATTR
+	                                 
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 23 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "open_downgrd", nmp->nm_minor_vers, numops);
@@ -6144,7 +6144,7 @@ nfs4_close_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, CLOSE, GETATTR
+	                        
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 23 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "close", nmp->nm_minor_vers, numops);
@@ -6186,9 +6186,9 @@ nfsmout:
 }
 
 
-/*
- * Claim the delegated open combinations this open file holds.
- */
+  
+                                                              
+   
 int
 nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 {
@@ -6252,10 +6252,10 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 			lck_mtx_unlock(&nofp->nof_lock);
 		}
 	}
-	/* non-deny-mode opens may be reopened if no locks are held */
+	                                                              
 	if (!error && nofp->nof_d_rw) {
 		error = nfs4_claim_delegated_open_rpc(nofp, NFS_OPEN_SHARE_ACCESS_BOTH, NFS_OPEN_SHARE_DENY_NONE, flags);
-		/* for some errors, we should just try reopening the file */
+		                                                            
 		if (nfs_mount_state_error_delegation_lost(error)) {
 			reopen = error;
 		}
@@ -6266,11 +6266,11 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 			lck_mtx_unlock(&nofp->nof_lock);
 		}
 	}
-	/* if we've already set reopen, we should move these other two opens from delegated to not delegated */
+	                                                                                                       
 	if ((!error || reopen) && nofp->nof_d_w) {
 		if (!error) {
 			error = nfs4_claim_delegated_open_rpc(nofp, NFS_OPEN_SHARE_ACCESS_WRITE, NFS_OPEN_SHARE_DENY_NONE, flags);
-			/* for some errors, we should just try reopening the file */
+			                                                            
 			if (nfs_mount_state_error_delegation_lost(error)) {
 				reopen = error;
 			}
@@ -6285,7 +6285,7 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 	if ((!error || reopen) && nofp->nof_d_r) {
 		if (!error) {
 			error = nfs4_claim_delegated_open_rpc(nofp, NFS_OPEN_SHARE_ACCESS_READ, NFS_OPEN_SHARE_DENY_NONE, flags);
-			/* for some errors, we should just try reopening the file */
+			                                                            
 			if (nfs_mount_state_error_delegation_lost(error)) {
 				reopen = error;
 			}
@@ -6299,10 +6299,10 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 	}
 
 	if (reopen) {
-		/*
-		 * Any problems with the delegation probably indicates that we
-		 * should review/return all of our current delegation state.
-		 */
+		  
+                                                                
+                                                              
+     
 		if ((nmp = NFSTONMP(nofp->nof_np))) {
 			nfs4_delegation_return_enqueue(nofp->nof_np);
 			lck_mtx_lock(&nmp->nm_lock);
@@ -6310,7 +6310,7 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 			lck_mtx_unlock(&nmp->nm_lock);
 		}
 		if (reopen && (nfs_check_for_locks(noop, nofp) == 0)) {
-			/* just reopen the file on next access */
+			                                         
 			NP(nofp->nof_np, "nfs4_claim_delegated_state_for_open_file: %d, need reopen, %d",
 			    reopen, kauth_cred_getuid(nofp->nof_owner->noo_cred));
 			lck_mtx_lock(&nofp->nof_lock);
@@ -6325,17 +6325,17 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 	}
 
 	if (!error && ((nmp = NFSTONMP(nofp->nof_np)))) {
-		/* claim delegated locks */
+		                           
 		TAILQ_FOREACH(nlop, &nofp->nof_np->n_lock_owners, nlo_link) {
 			if (nlop->nlo_open_owner != noop) {
 				continue;
 			}
 			TAILQ_FOREACH_SAFE(nflp, &nlop->nlo_locks, nfl_lolink, nextnflp) {
-				/* skip dead & blocked lock requests (shouldn't be any in the held lock list) */
+				                                                                                
 				if (nflp->nfl_flags & (NFS_FILE_LOCK_DEAD | NFS_FILE_LOCK_BLOCKED)) {
 					continue;
 				}
-				/* skip non-delegated locks */
+				                              
 				if (!(nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED)) {
 					continue;
 				}
@@ -6345,10 +6345,10 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 					    nflp->nfl_start, nflp->nfl_end, error, kauth_cred_getuid(nofp->nof_owner->noo_cred));
 					break;
 				}
-				// else {
-				//      NP(nofp->nof_np, "nfs: delegated lock claim (0x%llx, 0x%llx) succeeded, %d",
-				//              nflp->nfl_start, nflp->nfl_end, kauth_cred_getuid(nofp->nof_owner->noo_cred));
-				// }
+				         
+				                                                                                    
+				                                                                                              
+				    
 			}
 			if (error) {
 				break;
@@ -6356,11 +6356,11 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 		}
 	}
 
-	if (!error) { /* all state claimed successfully! */
+	if (!error) {                                      
 		return 0;
 	}
 
-	/* restart if it looks like a problem more than just losing the delegation */
+	                                                                             
 	if (!nfs_mount_state_error_delegation_lost(error) &&
 	    ((error == ETIMEDOUT) || nfs_mount_state_error_should_restart(error))) {
 		NP(nofp->nof_np, "nfs delegated lock claim error %d, %d", error, kauth_cred_getuid(nofp->nof_owner->noo_cred));
@@ -6370,13 +6370,13 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 		return error;
 	}
 
-	/* delegated state lost (once held but now not claimable) */
+	                                                            
 	NP(nofp->nof_np, "nfs delegated state claim error %d, state lost, %d", error, kauth_cred_getuid(nofp->nof_owner->noo_cred));
 
-	/*
-	 * Any problems with the delegation probably indicates that we
-	 * should review/return all of our current delegation state.
-	 */
+	  
+                                                               
+                                                             
+    
 	if ((nmp = NFSTONMP(nofp->nof_np))) {
 		nfs4_delegation_return_enqueue(nofp->nof_np);
 		lck_mtx_lock(&nmp->nm_lock);
@@ -6384,16 +6384,16 @@ nfs4_claim_delegated_state_for_open_file(struct nfs_open_file *nofp, int flags)
 		lck_mtx_unlock(&nmp->nm_lock);
 	}
 
-	/* revoke all open file state */
+	                                
 	nfs_revoke_open_state_for_node(nofp->nof_np);
 
 	return error;
 }
-#endif /* CONFIG_NFS4*/
+#endif                 
 
-/*
- * Release all open state for the given node.
- */
+  
+                                             
+   
 void
 nfs_release_open_state_for_node(nfsnode_t np, int force)
 {
@@ -6401,28 +6401,28 @@ nfs_release_open_state_for_node(nfsnode_t np, int force)
 	struct nfs_open_file *nofp;
 	struct nfs_file_lock *nflp, *nextnflp;
 
-	/* drop held locks */
+	                     
 	TAILQ_FOREACH_SAFE(nflp, &np->n_locks, nfl_link, nextnflp) {
-		/* skip dead & blocked lock requests */
+		                                       
 		if (nflp->nfl_flags & (NFS_FILE_LOCK_DEAD | NFS_FILE_LOCK_BLOCKED)) {
 			continue;
 		}
-		/* send an unlock if not a delegated lock */
+		                                            
 		if (!force && nmp && !(nflp->nfl_flags & NFS_FILE_LOCK_DELEGATED)) {
 			nmp->nm_funcs->nf_unlock_rpc(np, nflp->nfl_owner, F_WRLCK, nflp->nfl_start, nflp->nfl_end, R_RECOVER,
 			    NULL, nflp->nfl_owner->nlo_open_owner->noo_cred);
 		}
-		/* kill/remove the lock */
+		                          
 		lck_mtx_lock(&np->n_openlock);
 		nflp->nfl_flags |= NFS_FILE_LOCK_DEAD;
 		lck_mtx_lock(&nflp->nfl_owner->nlo_lock);
 		TAILQ_REMOVE(&nflp->nfl_owner->nlo_locks, nflp, nfl_lolink);
 		lck_mtx_unlock(&nflp->nfl_owner->nlo_lock);
 		if (nflp->nfl_blockcnt) {
-			/* wake up anyone blocked on this lock */
+			                                         
 			wakeup(nflp);
 		} else {
-			/* remove nflp from lock list and destroy */
+			                                            
 			TAILQ_REMOVE(&np->n_locks, nflp, nfl_link);
 			nfs_file_lock_destroy(nflp);
 		}
@@ -6431,12 +6431,12 @@ nfs_release_open_state_for_node(nfsnode_t np, int force)
 
 	lck_mtx_lock(&np->n_openlock);
 
-	/* drop all opens */
+	                    
 	TAILQ_FOREACH(nofp, &np->n_opens, nof_link) {
 		if (nofp->nof_flags & NFS_OPEN_FILE_LOST) {
 			continue;
 		}
-		/* mark open state as lost */
+		                             
 		lck_mtx_lock(&nofp->nof_lock);
 		nofp->nof_flags &= ~NFS_OPEN_FILE_REOPEN;
 		nofp->nof_flags |= NFS_OPEN_FILE_LOST;
@@ -6452,19 +6452,19 @@ nfs_release_open_state_for_node(nfsnode_t np, int force)
 	lck_mtx_unlock(&np->n_openlock);
 }
 
-/*
- * State for a node has been lost, drop it, and revoke the node.
- * Attempt to return any state if possible in case the server
- * might somehow think we hold it.
- */
+  
+                                                                
+                                                             
+                                  
+   
 void
 nfs_revoke_open_state_for_node(nfsnode_t np)
 {
 	struct nfsmount *nmp;
 
-	/* mark node as needing to be revoked */
+	                                        
 	nfs_node_lock_force(np);
-	if (np->n_flag & NREVOKE) { /* already revoked? */
+	if (np->n_flag & NREVOKE) {                       
 		NP(np, "nfs_revoke_open_state_for_node(): already revoked");
 		nfs_node_unlock(np);
 		return;
@@ -6475,7 +6475,7 @@ nfs_revoke_open_state_for_node(nfsnode_t np)
 	nfs_release_open_state_for_node(np, 0);
 	NP(np, "nfs: state lost for %p 0x%x", np, np->n_flag);
 
-	/* mark mount as needing a revoke scan and have the socket thread do it. */
+	                                                                           
 	if ((nmp = NFSTONMP(np))) {
 		lck_mtx_lock(&nmp->nm_lock);
 		nmp->nm_state |= NFSSTA_REVOKE;
@@ -6485,9 +6485,9 @@ nfs_revoke_open_state_for_node(nfsnode_t np)
 }
 
 #if CONFIG_NFS4
-/*
- * Claim the delegated open combinations that each of this node's open files hold.
- */
+  
+                                                                                  
+   
 int
 nfs4_claim_delegated_state_for_node(nfsnode_t np, int flags)
 {
@@ -6496,7 +6496,7 @@ nfs4_claim_delegated_state_for_node(nfsnode_t np, int flags)
 
 	lck_mtx_lock(&np->n_openlock);
 
-	/* walk the open file list looking for opens with delegated state to claim */
+	                                                                             
 restart:
 	TAILQ_FOREACH(nofp, &np->n_opens, nof_link) {
 		if (!nofp->nof_d_rw_drw && !nofp->nof_d_w_drw && !nofp->nof_d_r_drw &&
@@ -6518,11 +6518,11 @@ restart:
 	return error;
 }
 
-/*
- * Mark a node as needed to have its delegation returned.
- * Queue it up on the delegation return queue.
- * Make sure the thread is running.
- */
+  
+                                                         
+                                              
+                                   
+   
 void
 nfs4_delegation_return_enqueue(nfsnode_t np)
 {
@@ -6545,9 +6545,9 @@ nfs4_delegation_return_enqueue(nfsnode_t np)
 	lck_mtx_unlock(&nmp->nm_lock);
 }
 
-/*
- * return any delegation we may have for the given node
- */
+  
+                                                       
+   
 int
 nfs4_delegation_return(nfsnode_t np, int flags, thread_t thd, kauth_cred_t cred)
 {
@@ -6563,29 +6563,29 @@ nfs4_delegation_return(nfsnode_t np, int flags, thread_t thd, kauth_cred_t cred)
 
 	fh = zalloc(nfs_fhandle_zone);
 
-	/* first, make sure the node's marked for delegation return */
+	                                                              
 	lck_mtx_lock(&np->n_openlock);
 	np->n_openflags |= (N_DELEG_RETURN | N_DELEG_RETURNING);
 	lck_mtx_unlock(&np->n_openlock);
 
-	/* make sure nobody else is using the delegation state */
+	                                                         
 	if ((error = nfs_open_state_set_busy(np, NULL))) {
 		goto out;
 	}
 
-	/* claim any delegated state */
+	                               
 	if ((error = nfs4_claim_delegated_state_for_node(np, flags))) {
 		goto out;
 	}
 
-	/* return the delegation */
+	                           
 	lck_mtx_lock(&np->n_openlock);
 	dstateid = np->n_dstateid;
 	fh->fh_len = np->n_fhsize;
 	bcopy(np->n_fhp, fh->fh_data, fh->fh_len);
 	lck_mtx_unlock(&np->n_openlock);
 	error = nfs4_delegreturn_rpc(NFSTONMP(np), fh->fh_data, fh->fh_len, &dstateid, flags, thd, cred);
-	/* assume delegation is gone for all errors except ETIMEDOUT, NFSERR_*MOVED */
+	                                                                              
 	if ((error != ETIMEDOUT) && (error != NFSERR_MOVED) && (error != NFSERR_LEASE_MOVED)) {
 		lck_mtx_lock(&np->n_openlock);
 		np->n_openflags &= ~N_DELEG_MASK;
@@ -6599,7 +6599,7 @@ nfs4_delegation_return(nfsnode_t np, int flags, thread_t thd, kauth_cred_t cred)
 	}
 
 out:
-	/* make sure it's no longer on the return queue and clear the return flags */
+	                                                                             
 	lck_mtx_lock(&nmp->nm_lock);
 	if (np->n_dreturn.tqe_next != NFSNOLIST) {
 		TAILQ_REMOVE(&nmp->nm_dreturnq, np, n_dreturn);
@@ -6616,7 +6616,7 @@ out:
 			nfs_need_reconnect(nmp);
 		}
 		if (nfs_mount_state_error_should_restart(error)) {
-			/* make sure recovery happens */
+			                                
 			lck_mtx_lock(&nmp->nm_lock);
 			nfs_need_recover(nmp, nfs_mount_state_error_delegation_lost(error) ? NFSERR_EXPIRED : 0);
 			lck_mtx_unlock(&nmp->nm_lock);
@@ -6628,9 +6628,9 @@ out:
 	return error;
 }
 
-/*
- * RPC to return a delegation for a file handle
- */
+  
+                                               
+   
 int
 nfs4_delegreturn_rpc(struct nfsmount *nmp, u_char *fhp, int fhlen, struct nfs_stateid *sid, int flags, thread_t thd, kauth_cred_t cred)
 {
@@ -6643,7 +6643,7 @@ nfs4_delegreturn_rpc(struct nfsmount *nmp, u_char *fhp, int fhlen, struct nfs_st
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, DELEGRETURN
+	                     
 	numops = 2;
 	nfsm_chain_build_alloc_init(error, &nmreq, 16 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "delegreturn", nmp->nm_minor_vers, numops);
@@ -6666,24 +6666,24 @@ nfsmout:
 	nfsm_chain_cleanup(&nmrep);
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-/*
- * NFS read call.
- * Just call nfs_bioread() to do the work.
- *
- * Note: the exec code paths have a tendency to call VNOP_READ (and VNOP_MMAP)
- * without first calling VNOP_OPEN, so we make sure the file is open here.
- */
+  
+                 
+                                          
+  
+                                                                              
+                                                                          
+   
 int
 nfs_vnop_read(
-	struct vnop_read_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  struct uio *a_uio;
-                               *  int a_ioflag;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_read_args     
+                                                              
+                                               
+                                                    
+                                               
+                                                          
+                                      *ap)
 {
 	vnode_t vp = ap->a_vp;
 	vfs_context_t ctx = ap->a_context;
@@ -6729,17 +6729,17 @@ restart:
 		nfs_open_owner_rele(noop);
 		return error;
 	}
-	/*
-	 * Since the read path is a hot path, if we already have
-	 * read access, lets go and try and do the read, without
-	 * busying the mount and open file node for this open owner.
-	 *
-	 * N.B. This is inherently racy w.r.t. an execve using
-	 * an already open file, in that the read at the end of
-	 * this routine will be racing with a potential close.
-	 * The code below ultimately has the same problem. In practice
-	 * this does not seem to be an issue.
-	 */
+	  
+                                                         
+                                                         
+                                                             
+   
+                                                       
+                                                        
+                                                       
+                                                               
+                                      
+    
 	if (nofp->nof_access & NFS_OPEN_SHARE_ACCESS_READ) {
 		nfs_open_owner_rele(noop);
 		goto do_read;
@@ -6749,12 +6749,12 @@ restart:
 		nfs_open_owner_rele(noop);
 		return error;
 	}
-	/*
-	 * If we don't have a file already open with the access we need (read) then
-	 * we need to open one. Otherwise we just co-opt an open. We might not already
-	 * have access because we're trying to read the first page of the
-	 * file for execve.
-	 */
+	  
+                                                                            
+                                                                               
+                                                                  
+                    
+    
 	error = nfs_open_file_set_busy(nofp, vfs_context_thread(ctx));
 	if (error) {
 		nfs_mount_state_in_use_end(nmp, 0);
@@ -6762,7 +6762,7 @@ restart:
 		return error;
 	}
 	if (!(nofp->nof_access & NFS_OPEN_SHARE_ACCESS_READ)) {
-		/* we don't have the file open, so open it for read access if we're not denied */
+		                                                                                 
 		if (nofp->nof_flags & NFS_OPEN_FILE_NEEDCLOSE) {
 			NP(np, "nfs_vnop_read: File already needs close access: 0x%x, cred: %d thread: %lld",
 			    nofp->nof_access, kauth_cred_getuid(nofp->nof_owner->noo_cred), thread_tid(vfs_context_thread(ctx)));
@@ -6781,7 +6781,7 @@ restart:
 			return error;
 		}
 		if (nmp->nm_vers < NFS_VER4) {
-			/* NFS v2/v3 opens are always allowed - so just add it. */
+			                                                          
 			nfs_open_file_add_open(nofp, NFS_OPEN_SHARE_ACCESS_READ, NFS_OPEN_SHARE_DENY_NONE, 0);
 		}
 #if CONFIG_NFS4
@@ -6809,21 +6809,21 @@ do_read:
 }
 
 #if CONFIG_NFS4
-/*
- * Note: the NFSv4 CREATE RPC is for everything EXCEPT regular files.
- * Files are created using the NFSv4 OPEN RPC.  So we must open the
- * file to create it and then close it.
- */
+  
+                                                                     
+                                                                   
+                                       
+   
 int
 nfs4_vnop_create(
-	struct vnop_create_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_dvp;
-                                 *  vnode_t *a_vpp;
-                                 *  struct componentname *a_cnp;
-                                 *  struct vnode_attr *a_vap;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_create_args     
+                                                                
+                                                  
+                                                   
+                                                                
+                                                             
+                                                            
+                                        *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	struct componentname *cnp = ap->a_cnp;
@@ -6857,14 +6857,14 @@ restart:
 		return error;
 	}
 
-	/* grab a provisional, nodeless open file */
+	                                            
 	error = nfs_open_file_find(NULL, noop, &newnofp, 0, 0, 1);
 	if (!error && (newnofp->nof_flags & NFS_OPEN_FILE_LOST)) {
 		printf("nfs_vnop_create: LOST\n");
 		error = EIO;
 	}
 	if (!error && (newnofp->nof_flags & NFS_OPEN_FILE_REOPEN)) {
-		/* This shouldn't happen given that this is a new, nodeless nofp */
+		                                                                   
 		error = nfs4_reopen(newnofp, vfs_context_thread(ctx));
 		nfs_open_file_destroy(newnofp);
 		newnofp = NULL;
@@ -6884,29 +6884,29 @@ restart:
 		goto out;
 	}
 
-	/*
-	 * We're just trying to create the file.
-	 * We'll create/open it RW, and set NFS_OPEN_FILE_CREATE.
-	 */
+	  
+                                         
+                                                          
+    
 	accessMode = NFS_OPEN_SHARE_ACCESS_BOTH;
 	denyMode = NFS_OPEN_SHARE_DENY_NONE;
 
-	/* Do the open/create */
+	                        
 	error = nfs4_open_rpc(newnofp, ctx, cnp, vap, dvp, vpp, NFS_OPEN_CREATE, accessMode, denyMode);
 	if ((error == EACCES) && vap && !(vap->va_vaflags & VA_EXCLUSIVE) &&
 	    VATTR_IS_ACTIVE(vap, va_mode) && !(vap->va_mode & S_IWUSR)) {
-		/*
-		 * Hmm... it looks like we may have a situation where the request was
-		 * retransmitted because we didn't get the first response which successfully
-		 * created/opened the file and then the second time we were denied the open
-		 * because the mode the file was created with doesn't allow write access.
-		 *
-		 * We'll try to work around this by temporarily updating the mode and
-		 * retrying the open.
-		 */
+		  
+                                                                       
+                                                                              
+                                                                             
+                                                                           
+    
+                                                                       
+                       
+     
 		struct vnode_attr vattr;
 
-		/* first make sure it's there */
+		                                
 		int error2 = nfs_lookitup(VTONFS(dvp), cnp->cn_nameptr, cnp->cn_namelen, ctx, &np);
 		if (!error2 && np) {
 			nfs_node_unlock(np);
@@ -6932,33 +6932,33 @@ restart:
 	}
 	if (!error && !*vpp) {
 		printf("nfs4_open_rpc returned without a node?\n");
-		/* Hmmm... with no node, we have no filehandle and can't close it */
+		                                                                    
 		error = EIO;
 	}
 	if (error) {
-		/* need to cleanup our temporary nofp */
+		                                        
 		nfs_open_file_clear_busy(newnofp);
 		nfs_open_file_destroy(newnofp);
 		newnofp = NULL;
 		goto out;
 	}
-	/* After we have a node, add our open file struct to the node */
+	                                                                
 	np = VTONFS(*vpp);
 	nfs_open_file_add_open(newnofp, accessMode, denyMode, 0);
 	nofp = newnofp;
 	error = nfs_open_file_find_internal(np, noop, &nofp, 0, 0, 0);
 	if (error) {
-		/* This shouldn't happen, because we passed in a new nofp to use. */
+		                                                                    
 		printf("nfs_open_file_find_internal failed! %d\n", error);
 		goto out;
 	} else if (nofp != newnofp) {
-		/*
-		 * Hmm... an open file struct already exists.
-		 * Mark the existing one busy and merge our open into it.
-		 * Then destroy the one we created.
-		 * Note: there's no chance of an open confict because the
-		 * open has already been granted.
-		 */
+		  
+                                               
+                                                           
+                                     
+                                                           
+                                   
+     
 		busyerror = nfs_open_file_set_busy(nofp, NULL);
 		nfs_open_file_add_open(nofp, accessMode, denyMode, 0);
 		nofp->nof_stateid = newnofp->nof_stateid;
@@ -6969,7 +6969,7 @@ restart:
 		nfs_open_file_destroy(newnofp);
 	}
 	newnofp = NULL;
-	/* mark the node as holding a create-initiated open */
+	                                                      
 	nofp->nof_flags |= NFS_OPEN_FILE_CREATE;
 	nofp->nof_creator = current_thread();
 out:
@@ -6987,9 +6987,9 @@ out:
 	return error;
 }
 
-/*
- * Note: the NFSv4 CREATE RPC is for everything EXCEPT regular files.
- */
+  
+                                                                     
+   
 int
 nfs4_create_rpc(
 	vfs_context_t ctx,
@@ -7068,7 +7068,7 @@ nfs4_create_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH, SAVEFH, CREATE, GETATTR(FH), RESTOREFH, GETATTR
+	                                                         
 	numops = 6;
 	nfsm_chain_build_alloc_init(error, &nmreq, 66 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, tag, nmp->nm_minor_vers, numops);
@@ -7123,8 +7123,8 @@ nfs4_create_rpc(
 	nfsm_chain_check_change_info(error, &nmrep, dnp);
 	bmlen = NFS_ATTR_BITMAP_LEN;
 	nfsm_chain_get_bitmap(error, &nmrep, bitmap, bmlen);
-	/* At this point if we have no error, the object was created. */
-	/* if we don't get attributes, then we should lookitup. */
+	                                                                
+	                                                          
 	create_error = error;
 	nfsmout_if(error);
 	nfs_vattr_set_supported(bitmap, vap);
@@ -7137,7 +7137,7 @@ nfs4_create_rpc(
 		error = EBADRPC;
 		goto nfsmout;
 	}
-	/* directory attributes: if we don't get them, make sure to invalidate */
+	                                                                         
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_RESTOREFH);
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 	savedxid = xid;
@@ -7157,12 +7157,12 @@ nfsmout:
 		}
 		dnp->n_flag |= NMODIFIED;
 		nfs_node_unlock(dnp);
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		nfs_getattr(dnp, NULL, ctx, NGA_CACHED);
 	}
 
 	if (!error && fh->fh_len) {
-		/* create the vnode with the filehandle and attributes */
+		                                                         
 		xid = savedxid;
 		error = nfs_nget(NFSTOMP(dnp), dnp, cnp, fh->fh_data, fh->fh_len, nvattr, &xid, req->r_auth, NG_MAKEENTRY, &np);
 		if (!error) {
@@ -7180,10 +7180,10 @@ nfsmout:
 	FREE(dul, M_TEMP);
 	FREE(nvattr, M_TEMP);
 
-	/*
-	 * Kludge: Map EEXIST => 0 assuming that you have a reply to a retry
-	 * if we can succeed in looking up the object.
-	 */
+	  
+                                                                     
+                                               
+    
 	if ((create_error == EEXIST) || (!create_error && !newvp)) {
 		error = nfs_lookitup(dnp, cnp->cn_nameptr, cnp->cn_namelen, ctx, &np);
 		if (!error) {
@@ -7210,14 +7210,14 @@ nfsmout:
 
 int
 nfs4_vnop_mknod(
-	struct vnop_mknod_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_dvp;
-                                *  vnode_t *a_vpp;
-                                *  struct componentname *a_cnp;
-                                *  struct vnode_attr *a_vap;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_mknod_args     
+                                                               
+                                                 
+                                                  
+                                                               
+                                                            
+                                                           
+                                       *ap)
 {
 	nfsnode_t np = NULL;
 	struct nfsmount *nmp;
@@ -7251,14 +7251,14 @@ nfs4_vnop_mknod(
 
 int
 nfs4_vnop_mkdir(
-	struct vnop_mkdir_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_dvp;
-                                *  vnode_t *a_vpp;
-                                *  struct componentname *a_cnp;
-                                *  struct vnode_attr *a_vap;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_mkdir_args     
+                                                               
+                                                 
+                                                  
+                                                               
+                                                            
+                                                           
+                                       *ap)
 {
 	nfsnode_t np = NULL;
 	int error;
@@ -7273,15 +7273,15 @@ nfs4_vnop_mkdir(
 
 int
 nfs4_vnop_symlink(
-	struct vnop_symlink_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_dvp;
-                                  *  vnode_t *a_vpp;
-                                  *  struct componentname *a_cnp;
-                                  *  struct vnode_attr *a_vap;
-                                  *  char *a_target;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_symlink_args     
+                                                                 
+                                                   
+                                                    
+                                                                 
+                                                              
+                                                    
+                                                             
+                                         *ap)
 {
 	nfsnode_t np = NULL;
 	int error;
@@ -7296,13 +7296,13 @@ nfs4_vnop_symlink(
 
 int
 nfs4_vnop_link(
-	struct vnop_link_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  vnode_t a_tdvp;
-                               *  struct componentname *a_cnp;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_link_args     
+                                                              
+                                               
+                                                 
+                                                              
+                                                          
+                                      *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -7333,11 +7333,11 @@ nfs4_vnop_link(
 		return EINVAL;
 	}
 
-	/*
-	 * Push all writes to the server, so that the attribute cache
-	 * doesn't get "out of sync" with the server.
-	 * XXX There should be a better way!
-	 */
+	  
+                                                              
+                                              
+                                     
+    
 	nfs_flush(np, MNT_WAIT, vfs_context_thread(ctx), V_IGNORE_WRITEERR);
 
 	if ((error = nfs_node_set_busy2(tdnp, np, vfs_context_thread(ctx)))) {
@@ -7348,7 +7348,7 @@ nfs4_vnop_link(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	// PUTFH(SOURCE), SAVEFH, PUTFH(DIR), LINK, GETATTR(DIR), RESTOREFH, GETATTR
+	                                                                            
 	numops = 7;
 	nfsm_chain_build_alloc_init(error, &nmreq, 29 * NFSX_UNSIGNED + cnp->cn_namelen);
 	nfsm_chain_add_compound_header(error, &nmreq, "link", nmp->nm_minor_vers, numops);
@@ -7387,14 +7387,14 @@ nfs4_vnop_link(
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_PUTFH);
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_LINK);
 	nfsm_chain_check_change_info(error, &nmrep, tdnp);
-	/* directory attributes: if we don't get them, make sure to invalidate */
+	                                                                         
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 	savedxid = xid;
 	nfsm_chain_loadattr(error, &nmrep, tdnp, nfsvers, &xid);
 	if (error) {
 		NATTRINVALIDATE(tdnp);
 	}
-	/* link attributes: if we don't get them, make sure to invalidate */
+	                                                                    
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_RESTOREFH);
 	nfsm_chain_op_check(error, &nmrep, NFS_OP_GETATTR);
 	xid = savedxid;
@@ -7408,7 +7408,7 @@ nfsmout:
 	if (!lockerror) {
 		tdnp->n_flag |= NMODIFIED;
 	}
-	/* Kludge: Map EEXIST => 0 assuming that it is a reply to a retry. */
+	                                                                     
 	if (error == EEXIST) {
 		error = 0;
 	}
@@ -7425,13 +7425,13 @@ nfsmout:
 
 int
 nfs4_vnop_rmdir(
-	struct vnop_rmdir_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_dvp;
-                                *  vnode_t a_vp;
-                                *  struct componentname *a_cnp;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_rmdir_args     
+                                                               
+                                                 
+                                                
+                                                               
+                                                           
+                                       *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -7467,25 +7467,25 @@ nfs4_vnop_rmdir(
 	    vfs_context_thread(ctx), vfs_context_ucred(ctx));
 
 	nfs_name_cache_purge(dnp, np, cnp, ctx);
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	nfs_getattr(dnp, NULL, ctx, NGA_CACHED);
 	if (!namedattrs) {
 		nfs_dulookup_finish(dul, dnp, ctx);
 	}
 	nfs_node_clear_busy2(dnp, np);
 
-	/*
-	 * Kludge: Map ENOENT => 0 assuming that you have a reply to a retry.
-	 */
+	  
+                                                                      
+    
 	if (error == ENOENT) {
 		error = 0;
 	}
 	if (!error) {
-		/*
-		 * remove nfsnode from hash now so we can't accidentally find it
-		 * again if another object gets created with the same filehandle
-		 * before this vnode gets reclaimed
-		 */
+		  
+                                                                  
+                                                                  
+                                     
+     
 		lck_mtx_lock(&nfs_node_hash_mutex);
 		if (np->n_hflag & NHHASHED) {
 			LIST_REMOVE(np, n_hash);
@@ -7498,30 +7498,30 @@ nfs4_vnop_rmdir(
 	return error;
 }
 
-/*
- * NFSv4 Named Attributes
- *
- * Both the extended attributes interface and the named streams interface
- * are backed by NFSv4 named attributes.  The implementations for both use
- * a common set of routines in an attempt to reduce code duplication, to
- * increase efficiency, to increase caching of both names and data, and to
- * confine the complexity.
- *
- * Each NFS node caches its named attribute directory's file handle.
- * The directory nodes for the named attribute directories are handled
- * exactly like regular directories (with a couple minor exceptions).
- * Named attribute nodes are also treated as much like regular files as
- * possible.
- *
- * Most of the heavy lifting is done by nfs4_named_attr_get().
- */
+  
+                         
+  
+                                                                         
+                                                                          
+                                                                        
+                                                                          
+                          
+  
+                                                                    
+                                                                      
+                                                                     
+                                                                       
+            
+  
+                                                              
+   
 
-/*
- * Get the given node's attribute directory node.
- * If !fetch, then only return a cached node.
- * Otherwise, we will attempt to fetch the node from the server.
- * (Note: the node should be marked busy.)
- */
+  
+                                                 
+                                             
+                                                                
+                                          
+   
 nfsnode_t
 nfs4_named_attr_dir_get(nfsnode_t np, int fetch, vfs_context_t ctx)
 {
@@ -7554,12 +7554,12 @@ nfs4_named_attr_dir_get(nfsnode_t np, int fetch, vfs_context_t ctx)
 	nfsm_chain_null(&nmrep);
 
 	bzero(&cn, sizeof(cn));
-	cn.cn_nameptr = __CAST_AWAY_QUALIFIER(_PATH_FORKSPECIFIER, const, char *); /* "/..namedfork/" */
+	cn.cn_nameptr = __CAST_AWAY_QUALIFIER(_PATH_FORKSPECIFIER, const, char *);                      
 	cn.cn_namelen = NFS_STRLEN_INT(_PATH_FORKSPECIFIER);
 	cn.cn_nameiop = LOOKUP;
 
 	if (np->n_attrdirfh) {
-		// XXX can't set parent correctly (to np) yet
+		                                             
 		error = nfs_nget(nmp->nm_mountp, NULL, &cn, np->n_attrdirfh + 1, *np->n_attrdirfh,
 		    NULL, NULL, RPCAUTH_UNKNOWN, NG_NOCREATE, &adnp);
 		if (adnp) {
@@ -7571,7 +7571,7 @@ nfs4_named_attr_dir_get(nfsnode_t np, int fetch, vfs_context_t ctx)
 		goto nfsmout;
 	}
 
-	// PUTFH, OPENATTR, GETATTR
+	                           
 	numops = 3;
 	nfsm_chain_build_alloc_init(error, &nmreq, 22 * NFSX_UNSIGNED);
 	nfsm_chain_add_compound_header(error, &nmreq, "openattr", nmp->nm_minor_vers, numops);
@@ -7609,7 +7609,7 @@ nfs4_named_attr_dir_get(nfsnode_t np, int fetch, vfs_context_t ctx)
 		goto nfsmout;
 	}
 	if (!np->n_attrdirfh || (*np->n_attrdirfh != fh->fh_len)) {
-		/* (re)allocate attrdir fh buffer */
+		                                    
 		if (np->n_attrdirfh) {
 			FREE(np->n_attrdirfh, M_TEMP);
 		}
@@ -7619,11 +7619,11 @@ nfs4_named_attr_dir_get(nfsnode_t np, int fetch, vfs_context_t ctx)
 		error = ENOMEM;
 		goto nfsmout;
 	}
-	/* cache the attrdir fh in the node */
-	*np->n_attrdirfh = (unsigned char)fh->fh_len; /* No truncation because fh_len's value is checked during nfs4_parsefattr() */
+	                                      
+	*np->n_attrdirfh = (unsigned char)fh->fh_len;                                                                               
 	bcopy(fh->fh_data, np->n_attrdirfh + 1, fh->fh_len);
-	/* create node for attrdir */
-	// XXX can't set parent correctly (to np) yet
+	                             
+	                                             
 	error = nfs_nget(NFSTOMP(np), NULL, &cn, fh->fh_data, fh->fh_len, nvattr, &xid, req->r_auth, 0, &adnp);
 nfsmout:
 	NVATTR_CLEANUP(nvattr);
@@ -7634,7 +7634,7 @@ nfsmout:
 	nfsm_chain_cleanup(&nmrep);
 
 	if (adnp) {
-		/* sanity check that this node is an attribute directory */
+		                                                           
 		if (adnp->n_vattr.nva_type != VDIR) {
 			error = EINVAL;
 		}
@@ -7649,26 +7649,26 @@ nfsmout:
 	return error ? NULL : adnp;
 }
 
-/*
- * Get the given node's named attribute node for the name given.
- *
- * In an effort to increase the performance of named attribute access, we try
- * to reduce server requests by doing the following:
- *
- * - cache the node's named attribute directory file handle in the node
- * - maintain a directory vnode for the attribute directory
- * - use name cache entries (positive and negative) to speed up lookups
- * - optionally open the named attribute (with the given accessMode) in the same RPC
- * - combine attribute directory retrieval with the lookup/open RPC
- * - optionally prefetch the named attribute's first block of data in the same RPC
- *
- * Also, in an attempt to reduce the number of copies/variations of this code,
- * parts of the RPC building/processing code are conditionalized on what is
- * needed for any particular request (openattr, lookup vs. open, read).
- *
- * Note that because we may not have the attribute directory node when we start
- * the lookup/open, we lock both the node and the attribute directory node.
- */
+  
+                                                                
+  
+                                                                             
+                                                    
+  
+                                                                       
+                                                           
+                                                                       
+                                                                                    
+                                                                   
+                                                                                  
+  
+                                                                              
+                                                                           
+                                                                       
+  
+                                                                               
+                                                                           
+   
 
 #define NFS_GET_NAMED_ATTR_CREATE               0x1
 #define NFS_GET_NAMED_ATTR_CREATE_GUARDED       0x2
@@ -7747,20 +7747,20 @@ nfs4_named_attr_get(
 			goto out_free;
 		}
 	} else if (accessMode == NFS_OPEN_SHARE_ACCESS_NONE) {
-		/* shouldn't happen... but just be safe */
+		                                          
 		printf("nfs4_named_attr_get: create with no access %s\n", cnp->cn_nameptr);
 		accessMode = NFS_OPEN_SHARE_ACCESS_READ;
 	}
 	open = (accessMode != NFS_OPEN_SHARE_ACCESS_NONE);
 	if (open) {
-		/*
-		 * We're trying to open the file.
-		 * We'll create/open it with the given access mode,
-		 * and set NFS_OPEN_FILE_CREATE.
-		 */
+		  
+                                   
+                                                     
+                                  
+     
 		denyMode = NFS_OPEN_SHARE_DENY_NONE;
 		if (prefetch && guarded) {
-			prefetch = 0;  /* no sense prefetching data that can't be there */
+			prefetch = 0;                                                     
 		}
 		noop = nfs_open_owner_find(nmp, vfs_context_ucred(ctx), 1);
 		if (!noop) {
@@ -7777,7 +7777,7 @@ nfs4_named_attr_get(
 	hadattrdir = (adnp != NULL);
 	if (prefetch) {
 		microuptime(&now);
-		/* use the special state ID because we don't have a real one to send */
+		                                                                       
 		stateid.seqid = stateid.other[0] = stateid.other[1] = stateid.other[2] = 0;
 		rlen = MIN(nmp->nm_rsize, nmp->nm_biosize);
 	}
@@ -7789,29 +7789,29 @@ nfs4_named_attr_get(
 		if ((error = adbusyerror = nfs_node_set_busy(adnp, vfs_context_thread(ctx)))) {
 			goto nfsmout;
 		}
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		error = nfs_getattr(adnp, NULL, ctx, NGA_CACHED);
 		nfsmout_if(error);
 		error = cache_lookup(NFSTOV(adnp), &avp, cnp);
 		switch (error) {
 		case ENOENT:
-			/* negative cache entry */
+			                          
 			goto nfsmout;
 		case 0:
-			/* cache miss */
-			/* try dir buf cache lookup */
+			                
+			                              
 			error = nfs_dir_buf_cache_lookup(adnp, &anp, cnp, ctx, 0, NULL);
 			if (!error && anp) {
-				/* dir buf cache hit */
+				                       
 				*anpp = anp;
 				error = -1;
 			}
-			if (error != -1) { /* cache miss */
+			if (error != -1) {                 
 				break;
 			}
 			OS_FALLTHROUGH;
 		case -1:
-			/* cache hit, not really an error */
+			                                    
 			OSAddAtomic64(1, &nfsstats.lookupcache_hits);
 			if (!anp && avp) {
 				*anpp = anp = VTONFS(avp);
@@ -7820,28 +7820,28 @@ nfs4_named_attr_get(
 			nfs_node_clear_busy(adnp);
 			adbusyerror = ENOENT;
 
-			/* check for directory access */
+			                                
 			naa.a_desc = &vnop_access_desc;
 			naa.a_vp = NFSTOV(adnp);
 			naa.a_action = KAUTH_VNODE_SEARCH;
 			naa.a_context = ctx;
 
-			/* compute actual success/failure based on accessibility */
+			                                                           
 			error = nfs_vnop_access(&naa);
 			OS_FALLTHROUGH;
 		default:
-			/* we either found it, or hit an error */
+			                                         
 			if (!error && guarded) {
-				/* found cached entry but told not to use it */
+				                                               
 				error = EEXIST;
 				vnode_put(NFSTOV(anp));
 				*anpp = anp = NULL;
 			}
-			/* we're done if error or we don't need to open */
+			                                                  
 			if (error || !open) {
 				goto nfsmout;
 			}
-			/* no error and we need to open... */
+			                                     
 		}
 	}
 
@@ -7855,7 +7855,7 @@ restart:
 		}
 		inuse = 1;
 
-		/* grab an open file - possibly provisional/nodeless if cache_lookup() failed */
+		                                                                                
 		error = nfs_open_file_find(anp, noop, &newnofp, 0, 0, 1);
 		if (!error && (newnofp->nof_flags & NFS_OPEN_FILE_LOST)) {
 			printf("nfs4_named_attr_get: LOST %d %s\n", kauth_cred_getuid(noop->noo_cred), cnp->cn_nameptr);
@@ -7882,13 +7882,13 @@ restart:
 			goto nfsmout;
 		}
 		if (anp) {
-			/*
-			 * We already have the node.  So we just need to open
-			 * it - which we may be able to do with a delegation.
-			 */
+			  
+                                                        
+                                                        
+      
 			open_error = error = nfs4_open(anp, newnofp, accessMode, denyMode, ctx);
 			if (!error) {
-				/* open succeeded, so our open file is no longer temporary */
+				                                                             
 				nofp = newnofp;
 				nofpbusyerror = 0;
 				newnofp = NULL;
@@ -7900,39 +7900,39 @@ restart:
 		}
 	}
 
-	/*
-	 * We either don't have the attrdir or we didn't find the attribute
-	 * in the name cache, so we need to talk to the server.
-	 *
-	 * If we don't have the attrdir, we'll need to ask the server for that too.
-	 * If the caller is requesting that the attribute be created, we need to
-	 * make sure the attrdir is created.
-	 * The caller may also request that the first block of an existing attribute
-	 * be retrieved at the same time.
-	 */
+	  
+                                                                    
+                                                        
+   
+                                                                            
+                                                                         
+                                     
+                                                                             
+                                  
+    
 
 	if (open) {
-		/* need to mark the open owner busy during the RPC */
+		                                                     
 		if ((error = nfs_open_owner_set_busy(noop, thd))) {
 			goto nfsmout;
 		}
 		noopbusy = 1;
 	}
 
-	/*
-	 * We'd like to get updated post-open/lookup attributes for the
-	 * directory and we may also want to prefetch some data via READ.
-	 * We'd like the READ results to be last so that we can leave the
-	 * data in the mbufs until the end.
-	 *
-	 * At a minimum we're sending: PUTFH, LOOKUP/OPEN, GETATTR, PUTFH, GETATTR
-	 */
+	  
+                                                                
+                                                                  
+                                                                  
+                                    
+   
+                                                                           
+    
 	numops = 5;
 	if (!hadattrdir) {
-		numops += 3;    // also sending: OPENATTR, GETATTR, OPENATTR
+		numops += 3;                                                
 	}
 	if (prefetch) {
-		numops += 4;    // also sending: SAVEFH, RESTOREFH, NVERIFY, READ
+		numops += 4;                                                     
 	}
 	nfsm_chain_build_alloc_init(error, &nmreq, 64 * NFSX_UNSIGNED + cnp->cn_namelen);
 	nfsm_chain_add_compound_header(error, &nmreq, "getnamedattr", nmp->nm_minor_vers, numops);
@@ -8043,31 +8043,31 @@ restart:
 		nfsmout_if(error);
 		if (NFS_BITMAP_ISSET(nvattr->nva_bitmap, NFS_FATTR_FILEHANDLE) && fh->fh_len) {
 			if (!np->n_attrdirfh || (*np->n_attrdirfh != fh->fh_len)) {
-				/* (re)allocate attrdir fh buffer */
+				                                    
 				if (np->n_attrdirfh) {
 					FREE(np->n_attrdirfh, M_TEMP);
 				}
 				MALLOC(np->n_attrdirfh, u_char*, fh->fh_len + 1, M_TEMP, M_WAITOK);
 			}
 			if (np->n_attrdirfh) {
-				/* remember the attrdir fh in the node */
-				*np->n_attrdirfh = (unsigned char)fh->fh_len;  /* No truncation because fh_len's value is checked during nfs4_parsefattr() */
+				                                         
+				*np->n_attrdirfh = (unsigned char)fh->fh_len;                                                                                
 				bcopy(fh->fh_data, np->n_attrdirfh + 1, fh->fh_len);
-				/* create busied node for attrdir */
+				                                    
 				struct componentname cn;
 				bzero(&cn, sizeof(cn));
-				cn.cn_nameptr = __CAST_AWAY_QUALIFIER(_PATH_FORKSPECIFIER, const, char *); /* "/..namedfork/" */
+				cn.cn_nameptr = __CAST_AWAY_QUALIFIER(_PATH_FORKSPECIFIER, const, char *);                      
 				cn.cn_namelen = NFS_STRLEN_INT(_PATH_FORKSPECIFIER);
 				cn.cn_nameiop = LOOKUP;
-				// XXX can't set parent correctly (to np) yet
+				                                             
 				error = nfs_nget(NFSTOMP(np), NULL, &cn, fh->fh_data, fh->fh_len, nvattr, &xid, req->r_auth, 0, &adnp);
 				if (!error) {
 					adlockerror = 0;
-					/* set the node busy */
+					                       
 					SET(adnp->n_flag, NBUSY);
 					adbusyerror = 0;
 				}
-				/* if no adnp, oh well... */
+				                            
 				error = 0;
 			}
 		}
@@ -8091,10 +8091,10 @@ restart:
 			case NFS_OPEN_DELEGATE_WRITE:
 				nfsm_chain_get_stateid(error, &nmrep, &dstateid);
 				nfsm_chain_get_32(error, &nmrep, recall);
-				if (delegation == NFS_OPEN_DELEGATE_WRITE) { // space (skip) XXX
+				if (delegation == NFS_OPEN_DELEGATE_WRITE) {                    
 					nfsm_chain_adv(error, &nmrep, 3 * NFSX_UNSIGNED);
 				}
-				/* if we have any trouble accepting the ACE, just invalidate it */
+				                                                                  
 				ace_type = ace_flags = ace_mask = len = 0;
 				nfsm_chain_get_32(error, &nmrep, ace_type);
 				nfsm_chain_get_32(error, &nmrep, ace_flags);
@@ -8134,7 +8134,7 @@ restart:
 				break;
 			}
 		}
-		/* At this point if we have no error, the object was created/opened. */
+		                                                                       
 		open_error = error;
 	} else {
 		nfsm_chain_op_check(error, &nmrep, NFS_OP_LOOKUP);
@@ -8192,7 +8192,7 @@ nfsmout:
 	}
 	if (adnp && !adlockerror && (error == ENOENT) &&
 	    (cnp->cn_flags & MAKEENTRY) && (cnp->cn_nameiop != CREATE) && negnamecache) {
-		/* add a negative entry in the name cache */
+		                                            
 		cache_enter(NFSTOV(adnp), NULL, cnp);
 		adnp->n_flag |= NNEGNCENTRIES;
 	}
@@ -8201,7 +8201,7 @@ nfsmout:
 		adlockerror = ENOENT;
 	}
 	if (!error && !anp && fh->fh_len) {
-		/* create the vnode with the filehandle and attributes */
+		                                                         
 		xid = savedxid;
 		error = nfs_nget(NFSTOMP(np), adnp, cnp, fh->fh_data, fh->fh_len, nvattr, &xid, req->r_auth, NG_MAKEENTRY, &anp);
 		if (!error) {
@@ -8210,21 +8210,21 @@ nfsmout:
 		}
 		if (!error && open) {
 			nfs_open_file_add_open(newnofp, accessMode, denyMode, 0);
-			/* After we have a node, add our open file struct to the node */
+			                                                                
 			nofp = newnofp;
 			error = nfs_open_file_find_internal(anp, noop, &nofp, 0, 0, 0);
 			if (error) {
-				/* This shouldn't happen, because we passed in a new nofp to use. */
+				                                                                    
 				printf("nfs_open_file_find_internal failed! %d\n", error);
 				nofp = NULL;
 			} else if (nofp != newnofp) {
-				/*
-				 * Hmm... an open file struct already exists.
-				 * Mark the existing one busy and merge our open into it.
-				 * Then destroy the one we created.
-				 * Note: there's no chance of an open confict because the
-				 * open has already been granted.
-				 */
+				  
+                                                 
+                                                             
+                                       
+                                                             
+                                     
+       
 				nofpbusyerror = nfs_open_file_set_busy(nofp, NULL);
 				nfs_open_file_add_open(nofp, accessMode, denyMode, 0);
 				nofp->nof_stateid = newnofp->nof_stateid;
@@ -8238,7 +8238,7 @@ nfsmout:
 			if (!error) {
 				newnofp = NULL;
 				nofpbusyerror = 0;
-				/* mark the node as holding a create-initiated open */
+				                                                      
 				nofp->nof_flags |= NFS_OPEN_FILE_CREATE;
 				nofp->nof_creator = current_thread();
 				if (nofpp) {
@@ -8250,7 +8250,7 @@ nfsmout:
 	NVATTR_CLEANUP(nvattr);
 	if (open && ((delegation == NFS_OPEN_DELEGATE_READ) || (delegation == NFS_OPEN_DELEGATE_WRITE))) {
 		if (!error && anp && !recall) {
-			/* stuff the delegation state in the node */
+			                                            
 			lck_mtx_lock(&anp->n_openlock);
 			anp->n_openflags &= ~N_DELEG_MASK;
 			anp->n_openflags |= ((delegation == NFS_OPEN_DELEGATE_READ) ? N_DELEG_READ : N_DELEG_WRITE);
@@ -8265,10 +8265,10 @@ nfsmout:
 			}
 			lck_mtx_unlock(&anp->n_openlock);
 		} else {
-			/* give the delegation back */
+			                              
 			if (anp) {
 				if (NFS_CMPFH(anp, fh->fh_data, fh->fh_len)) {
-					/* update delegation state and return it */
+					                                           
 					lck_mtx_lock(&anp->n_openlock);
 					anp->n_openflags &= ~N_DELEG_MASK;
 					anp->n_openflags |= ((delegation == NFS_OPEN_DELEGATE_READ) ? N_DELEG_READ : N_DELEG_WRITE);
@@ -8282,20 +8282,20 @@ nfsmout:
 						lck_mtx_unlock(&nmp->nm_lock);
 					}
 					lck_mtx_unlock(&anp->n_openlock);
-					/* don't need to send a separate delegreturn for fh */
+					                                                      
 					fh->fh_len = 0;
 				}
-				/* return anp's current delegation */
+				                                     
 				nfs4_delegation_return(anp, 0, thd, cred);
 			}
-			if (fh->fh_len) { /* return fh's delegation if it wasn't for anp */
+			if (fh->fh_len) {                                                  
 				nfs4_delegreturn_rpc(nmp, fh->fh_data, fh->fh_len, &dstateid, 0, thd, cred);
 			}
 		}
 	}
 	if (open) {
 		if (newnofp) {
-			/* need to cleanup our temporary nofp */
+			                                        
 			nfs_open_file_clear_busy(newnofp);
 			nfs_open_file_destroy(newnofp);
 			newnofp = NULL;
@@ -8339,27 +8339,27 @@ nfsmout:
 		nfsm_chain_get_32(error, &nmrep, eof);
 		nfsm_chain_get_32(error, &nmrep, retlen);
 		if (!error && anp) {
-			/*
-			 * There can be one problem with doing the prefetch.
-			 * Because we don't have the node before we start the RPC, we
-			 * can't have the buffer busy while the READ is performed.
-			 * So there is a chance that other I/O occured on the same
-			 * range of data while we were performing this RPC.  If that
-			 * happens, then it's possible the data we have in the READ
-			 * response is no longer up to date.
-			 * Once we have the node and the buffer, we need to make sure
-			 * that there's no chance we could be putting stale data in
-			 * the buffer.
-			 * So, we check if the range read is dirty or if any I/O may
-			 * have occured on it while we were performing our RPC.
-			 */
+			  
+                                                       
+                                                                
+                                                             
+                                                             
+                                                               
+                                                              
+                                       
+                                                                
+                                                              
+                 
+                                                               
+                                                          
+      
 			struct nfsbuf *bp = NULL;
 			int lastpg;
 			nfsbufpgs pagemask, pagemaskand;
 
 			retlen = MIN(retlen, rlen);
 
-			/* check if node needs size update or invalidation */
+			                                                     
 			if (ISSET(anp->n_flag, NUPDATESIZE)) {
 				nfs_data_update_size(anp, 0);
 			}
@@ -8368,7 +8368,7 @@ nfsmout:
 					anp->n_flag &= ~NNEEDINVALIDATE;
 					nfs_node_unlock(anp);
 					error = nfs_vinvalbuf(NFSTOV(anp), V_SAVE | V_IGNORE_WRITEERR, ctx, 1);
-					if (!error) { /* lets play it safe and just drop the data */
+					if (!error) {                                               
 						error = EIO;
 					}
 				} else {
@@ -8376,14 +8376,14 @@ nfsmout:
 				}
 			}
 
-			/* calculate page mask for the range of data read */
+			                                                    
 			lastpg = (retlen - 1) / PAGE_SIZE;
 			nfs_buf_pgs_get_page_mask(&pagemask, lastpg + 1);
 
 			if (!error) {
 				error = nfs_buf_get(anp, 0, nmp->nm_biosize, thd, NBLK_READ | NBLK_NOWAIT, &bp);
 			}
-			/* don't save the data if dirty or potential I/O conflict */
+			                                                            
 			nfs_buf_pgs_bit_and(&bp->nb_dirty, &pagemask, &pagemaskand);
 			if (!error && bp && !bp->nb_dirtyoff && !nfs_buf_pgs_is_set(&pagemaskand) &&
 			    timevalcmp(&anp->n_lastio, &now, <)) {
@@ -8402,7 +8402,7 @@ nfsmout:
 						bp->nb_endio = retlen;
 					}
 					if (eof || (retlen == 0)) {
-						/* zero out the remaining data (up to EOF) */
+						                                             
 						off_t rpcrem, eofrem, rem;
 						rpcrem = (rlen - retlen);
 						eofrem = anp->n_size - (NBOFF(bp) + retlen);
@@ -8411,7 +8411,7 @@ nfsmout:
 							bzero(bp->nb_data + retlen, rem);
 						}
 					} else if ((retlen < rlen) && !ISSET(bp->nb_flags, NB_ERROR)) {
-						/* ugh... short read ... just invalidate for now... */
+						                                                      
 						SET(bp->nb_flags, NB_INVAL);
 					}
 				}
@@ -8422,7 +8422,7 @@ nfsmout:
 				nfs_buf_release(bp, 1);
 			}
 		}
-		error = 0; /* ignore any transient error in processing the prefetch */
+		error = 0;                                                            
 	}
 	if (adnp && !adbusyerror) {
 		nfs_node_clear_busy(adnp);
@@ -8451,9 +8451,9 @@ out_free:
 	return error;
 }
 
-/*
- * Remove a named attribute.
- */
+  
+                            
+   
 int
 nfs4_named_attr_remove(nfsnode_t np, nfsnode_t anp, const char *name, vfs_context_t ctx)
 {
@@ -8519,15 +8519,15 @@ out:
 
 int
 nfs4_vnop_getxattr(
-	struct vnop_getxattr_args /* {
-                                   *  struct vnodeop_desc *a_desc;
-                                   *  vnode_t a_vp;
-                                   *  const char * a_name;
-                                   *  uio_t a_uio;
-                                   *  size_t *a_size;
-                                   *  int a_options;
-                                   *  vfs_context_t a_context;
-                                   *  } */*ap)
+	struct vnop_getxattr_args     
+                                                                  
+                                                   
+                                                          
+                                                  
+                                                     
+                                                    
+                                                              
+                                          *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	struct nfsmount *nmp;
@@ -8562,7 +8562,7 @@ nfs4_vnop_getxattr(
 	cn.cn_nameiop = LOOKUP;
 	cn.cn_flags = MAKEENTRY;
 
-	/* we'll normally try to prefetch data for xattrs... the resource fork is really a stream */
+	                                                                                            
 	isrsrcfork = (bcmp(ap->a_name, XATTR_RESOURCEFORK_NAME, sizeof(XATTR_RESOURCEFORK_NAME)) == 0);
 
 	error = nfs4_named_attr_get(VTONFS(ap->a_vp), &cn, NFS_OPEN_SHARE_ACCESS_NONE,
@@ -8587,14 +8587,14 @@ out:
 
 int
 nfs4_vnop_setxattr(
-	struct vnop_setxattr_args /* {
-                                   *  struct vnodeop_desc *a_desc;
-                                   *  vnode_t a_vp;
-                                   *  const char * a_name;
-                                   *  uio_t a_uio;
-                                   *  int a_options;
-                                   *  vfs_context_t a_context;
-                                   *  } */*ap)
+	struct vnop_setxattr_args     
+                                                                  
+                                                   
+                                                          
+                                                  
+                                                    
+                                                              
+                                          *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	int options = ap->a_options;
@@ -8625,7 +8625,7 @@ nfs4_vnop_setxattr(
 		return EINVAL;
 	}
 
-	/* XXX limitation based on need to back up uio on short write */
+	                                                                
 	if (uio_iovcnt(uio) > 1) {
 		printf("nfs4_vnop_setxattr: iovcnt > 1\n");
 		return EINVAL;
@@ -8650,7 +8650,7 @@ nfs4_vnop_setxattr(
 		if (error) {
 			return error;
 		}
-		/* setting a FinderInfo of all zeroes means remove the FinderInfo */
+		                                                                    
 		empty = 1;
 		for (i = 0, finfop = (uint32_t*)&finfo; i < (int)(sizeof(finfo) / sizeof(uint32_t)); i++) {
 			if (finfop[i]) {
@@ -8665,17 +8665,17 @@ nfs4_vnop_setxattr(
 			}
 			return error;
 		}
-		/* first, let's see if we get a create/replace error */
+		                                                       
 	}
 
-	/*
-	 * create/open the xattr
-	 *
-	 * We need to make sure not to create it if XATTR_REPLACE.
-	 * For all xattrs except the resource fork, we also want to
-	 * truncate the xattr to remove any current data.  We'll do
-	 * that by setting the size to 0 on create/open.
-	 */
+	  
+                         
+   
+                                                           
+                                                            
+                                                            
+                                                 
+    
 	flags = 0;
 	if (!(options & XATTR_REPLACE)) {
 		flags |= NFS_GET_NAMED_ATTR_CREATE;
@@ -8695,23 +8695,23 @@ nfs4_vnop_setxattr(
 	if (error) {
 		goto out;
 	}
-	/* grab the open state from the get/create/open */
+	                                                  
 	if (nofp && !(error = nfs_open_file_set_busy(nofp, NULL))) {
 		nofp->nof_flags &= ~NFS_OPEN_FILE_CREATE;
 		nofp->nof_creator = NULL;
 		nfs_open_file_clear_busy(nofp);
 	}
 
-	/* Setting an empty FinderInfo really means remove it, skip to the close/remove */
+	                                                                                  
 	if (isfinderinfo && empty) {
 		goto doclose;
 	}
 
-	/*
-	 * Write the data out and flush.
-	 *
-	 * For FinderInfo, we've already copied the data to finfo, so do I/O from there.
-	 */
+	  
+                                 
+   
+                                                                                 
+    
 	vwa.a_desc = &vnop_write_desc;
 	vwa.a_vp = NFSTOV(anp);
 	vwa.a_uio = NULL;
@@ -8731,7 +8731,7 @@ nfs4_vnop_setxattr(
 		}
 	}
 doclose:
-	/* Close the xattr. */
+	                      
 	if (nofp) {
 		int busyerror = nfs_open_file_set_busy(nofp, NULL);
 		closeerror = nfs_close(anp, nofp, NFS_OPEN_SHARE_ACCESS_BOTH, NFS_OPEN_SHARE_DENY_NONE, ctx);
@@ -8739,7 +8739,7 @@ doclose:
 			nfs_open_file_clear_busy(nofp);
 		}
 	}
-	if (!error && isfinderinfo && empty) { /* Setting an empty FinderInfo really means remove it */
+	if (!error && isfinderinfo && empty) {                                                         
 		error = nfs4_named_attr_remove(VTONFS(ap->a_vp), anp, name, ctx);
 		if (error == ENOENT) {
 			error = 0;
@@ -8760,13 +8760,13 @@ out:
 
 int
 nfs4_vnop_removexattr(
-	struct vnop_removexattr_args /* {
-                                      *  struct vnodeop_desc *a_desc;
-                                      *  vnode_t a_vp;
-                                      *  const char * a_name;
-                                      *  int a_options;
-                                      *  vfs_context_t a_context;
-                                      *  } */*ap)
+	struct vnop_removexattr_args     
+                                                                     
+                                                      
+                                                             
+                                                       
+                                                                 
+                                             *ap)
 {
 	struct nfsmount *nmp = VTONMP(ap->a_vp);
 	int error;
@@ -8787,14 +8787,14 @@ nfs4_vnop_removexattr(
 
 int
 nfs4_vnop_listxattr(
-	struct vnop_listxattr_args /* {
-                                    *  struct vnodeop_desc *a_desc;
-                                    *  vnode_t a_vp;
-                                    *  uio_t a_uio;
-                                    *  size_t *a_size;
-                                    *  int a_options;
-                                    *  vfs_context_t a_context;
-                                    *  } */*ap)
+	struct vnop_listxattr_args     
+                                                                   
+                                                    
+                                                   
+                                                      
+                                                     
+                                                               
+                                           *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	nfsnode_t np = VTONFS(ap->a_vp);
@@ -8854,9 +8854,9 @@ nfs4_vnop_listxattr(
 		}
 	}
 
-	/*
-	 * check for need to invalidate when (re)starting at beginning
-	 */
+	  
+                                                               
+    
 	if (adnp->n_flag & NMODIFIED) {
 		nfs_invaldir(adnp);
 		nfs_node_unlock(adnp);
@@ -8866,7 +8866,7 @@ nfs4_vnop_listxattr(
 	} else {
 		nfs_node_unlock(adnp);
 	}
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	if ((error = nfs_getattr(adnp, nvattr, ctx, NGA_UNCACHED))) {
 		goto out;
 	}
@@ -8888,7 +8888,7 @@ getbuffer:
 		}
 		ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 		if (!ISSET(bp->nb_flags, NB_CACHE) || !ISSET(ndbhp->ndbh_flags, NDB_FULL)) {
-			if (!ISSET(bp->nb_flags, NB_CACHE)) { /* initialize the buffer */
+			if (!ISSET(bp->nb_flags, NB_CACHE)) {                            
 				ndbhp->ndbh_flags = 0;
 				ndbhp->ndbh_count = 0;
 				ndbhp->ndbh_entry_end = sizeof(*ndbhp);
@@ -8916,7 +8916,7 @@ getbuffer:
 			}
 		}
 
-		/* go through all the entries copying/counting */
+		                                                 
 		dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
 		for (i = 0; i < ndbhp->ndbh_count; i++) {
 			if (!xattr_protected(dp->d_name)) {
@@ -8936,9 +8936,9 @@ getbuffer:
 		}
 
 		if (i == ndbhp->ndbh_count) {
-			/* hit end of buffer, move to next buffer */
+			                                            
 			lbn = nextcookie;
-			/* if we also hit EOF, we're done */
+			                                    
 			if (ISSET(ndbhp->ndbh_flags, NDB_EOF)) {
 				done = 1;
 			}
@@ -8961,15 +8961,15 @@ out_free:
 #if NAMEDSTREAMS
 int
 nfs4_vnop_getnamedstream(
-	struct vnop_getnamedstream_args /* {
-                                         *  struct vnodeop_desc *a_desc;
-                                         *  vnode_t a_vp;
-                                         *  vnode_t *a_svpp;
-                                         *  const char *a_name;
-                                         *  enum nsoperation a_operation;
-                                         *  int a_flags;
-                                         *  vfs_context_t a_context;
-                                         *  } */*ap)
+	struct vnop_getnamedstream_args     
+                                                                        
+                                                         
+                                                            
+                                                               
+                                                                         
+                                                        
+                                                                    
+                                                *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	struct nfsmount *nmp;
@@ -9021,14 +9021,14 @@ out:
 
 int
 nfs4_vnop_makenamedstream(
-	struct vnop_makenamedstream_args /* {
-                                          *  struct vnodeop_desc *a_desc;
-                                          *  vnode_t *a_svpp;
-                                          *  vnode_t a_vp;
-                                          *  const char *a_name;
-                                          *  int a_flags;
-                                          *  vfs_context_t a_context;
-                                          *  } */*ap)
+	struct vnop_makenamedstream_args     
+                                                                         
+                                                             
+                                                          
+                                                                
+                                                         
+                                                                     
+                                                 *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	struct nfsmount *nmp;
@@ -9066,14 +9066,14 @@ nfs4_vnop_makenamedstream(
 
 int
 nfs4_vnop_removenamedstream(
-	struct vnop_removenamedstream_args /* {
-                                            *  struct vnodeop_desc *a_desc;
-                                            *  vnode_t a_vp;
-                                            *  vnode_t a_svp;
-                                            *  const char *a_name;
-                                            *  int a_flags;
-                                            *  vfs_context_t a_context;
-                                            *  } */*ap)
+	struct vnop_removenamedstream_args     
+                                                                           
+                                                            
+                                                             
+                                                                  
+                                                           
+                                                                       
+                                                   *ap)
 {
 	struct nfsmount *nmp = VTONMP(ap->a_vp);
 	nfsnode_t np = ap->a_vp ? VTONFS(ap->a_vp) : NULL;
@@ -9083,10 +9083,10 @@ nfs4_vnop_removenamedstream(
 		return ENXIO;
 	}
 
-	/*
-	 * Given that a_svp is a named stream, checking for
-	 * named attribute support is kinda pointless.
-	 */
+	  
+                                                    
+                                               
+    
 	if (!(nmp->nm_fsattr.nfsa_flags & NFS_FSFLAG_NAMED_ATTR)) {
 		return ENOTSUP;
 	}
@@ -9095,6 +9095,6 @@ nfs4_vnop_removenamedstream(
 }
 
 #endif
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        

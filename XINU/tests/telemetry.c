@@ -27,10 +27,10 @@ T_GLOBAL_META(T_META_NAMESPACE("xnu.debugging.telemetry"),
 extern int __telemetry(uint64_t cmd, uint64_t deadline, uint64_t interval,
     uint64_t leeway, uint64_t arg4, uint64_t arg5);
 
-/*
- * Microstackshots based on PMI are only supported on devices with monotonic
- * support.
- */
+  
+                                                                            
+           
+   
 
 static void
 skip_if_pmi_unsupported(void)
@@ -47,10 +47,10 @@ skip_if_pmi_unsupported(void)
 	}
 }
 
-/*
- * Data Analytics (da) also has a microstackshot configuration -- set a PMI
- * cycle interval of 0 to force it to disable microstackshot on PMI.
- */
+  
+                                                                           
+                                                                    
+   
 
 static void
 set_da_microstackshot_period(CFNumberRef num)
@@ -59,9 +59,9 @@ set_da_microstackshot_period(CFNumberRef num)
 	    CFSTR("com.apple.da"),
 #if TARGET_OS_IPHONE
 	    CFSTR("mobile"),
-#else // TARGET_OS_IPHONE
+#else                    
 	    CFSTR("root"),
-#endif // !TARGET_OS_IPHONE
+#endif                     
 	    kCFPreferencesCurrentHost);
 
 	notify_post("com.apple.da.tasking_changed");
@@ -76,23 +76,23 @@ disable_da_microstackshots(void)
 	T_LOG("notified da of tasking change, sleeping");
 #if TARGET_OS_WATCH
 	sleep(8);
-#else /* TARGET_OS_WATCH */
+#else                      
 	sleep(3);
-#endif /* !TARGET_OS_WATCH */
+#endif                       
 }
 
-/*
- * Unset the preference to allow da to reset its configuration.
- */
+  
+                                                               
+   
 static void
 reenable_da_microstackshots(void)
 {
 	set_da_microstackshot_period(NULL);
 }
 
-/*
- * Clean up the test's configuration and allow da to activate again.
- */
+  
+                                                                    
+   
 static void
 telemetry_cleanup(void)
 {
@@ -100,10 +100,10 @@ telemetry_cleanup(void)
 	reenable_da_microstackshots();
 }
 
-/*
- * Make sure da hasn't configured the microstackshots -- otherwise the PMI
- * setup command will return EBUSY.
- */
+  
+                                                                          
+                                   
+   
 static void
 telemetry_init(void)
 {
@@ -127,9 +127,9 @@ thread_spin(__unused void *arg)
 	        MICROSTACKSHOT_RECORD)
 #if defined(__arm64__) || defined(__arm__)
 #define INSTRS_PERIOD (100ULL * 1000 * 1000)
-#else /* defined(__arm64__) || defined(__arm__) */
+#else                                             
 #define INSTRS_PERIOD (1ULL * 1000 * 1000 * 1000)
-#endif /* !defined(__arm64__) && !defined(__arm__) */
+#endif                                               
 #define SLEEP_SECS 10
 
 T_DECL(microstackshot_pmi, "attempt to configure microstackshots on PMI")
@@ -169,10 +169,10 @@ T_DECL(microstackshot_pmi, "attempt to configure microstackshots on PMI")
 		}
 
 		if (start->arg2 == end->arg2) {
-			/*
-			 * The buffer didn't grow for this record -- there was
-			 * an error.
-			 */
+			  
+                                                         
+               
+      
 			empty_records++;
 		}
 
@@ -225,9 +225,9 @@ T_DECL(microstackshot_pmi, "attempt to configure microstackshots on PMI")
 
 	telemetry_init();
 
-	/*
-	 * Start sampling via telemetry on the instructions PMI.
-	 */
+	  
+                                                         
+    
 	int ret = __telemetry(TELEMETRY_CMD_PMI_SETUP, TELEMETRY_PMI_INSTRS,
 	    INSTRS_PERIOD, 0, 0, 0);
 	T_ASSERT_POSIX_SUCCESS(ret,

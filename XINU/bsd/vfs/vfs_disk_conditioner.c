@@ -43,30 +43,30 @@
 
 #define DISK_CONDITIONER_SET_ENTITLEMENT "com.apple.private.dmc.set"
 
-// number of total blocks for a mount
+                                     
 #define BLK_MAX(mp) ((mp->mnt_vfsstat.f_blocks * mp->mnt_vfsstat.f_bsize) / (mp->mnt_devblocksize))
 
-// approx. time to spin up an idle HDD
+                                      
 #define DISK_SPINUP_SEC (8)
 
-// idle period until assumed disk spin down
+                                           
 #define DISK_IDLE_SEC (10 * 60)
 
 struct saved_mount_fields {
-	uint32_t        mnt_maxreadcnt;         /* Max. byte count for read */
-	uint32_t        mnt_maxwritecnt;        /* Max. byte count for write */
-	uint32_t        mnt_segreadcnt;         /* Max. segment count for read */
-	uint32_t        mnt_segwritecnt;        /* Max. segment count for write */
-	uint32_t        mnt_ioqueue_depth;      /* the maxiumum number of commands a device can accept */
-	uint32_t        mnt_ioscale;            /* scale the various throttles/limits imposed on the amount of I/O in flight */
+	uint32_t        mnt_maxreadcnt;                                       
+	uint32_t        mnt_maxwritecnt;                                       
+	uint32_t        mnt_segreadcnt;                                          
+	uint32_t        mnt_segwritecnt;                                          
+	uint32_t        mnt_ioqueue_depth;                                                               
+	uint32_t        mnt_ioscale;                                                                                           
 };
 
 struct _disk_conditioner_info_t {
-	disk_conditioner_info dcinfo; // all the original data from fsctl
-	struct saved_mount_fields mnt_fields; // fields to restore in mount_t when conditioner is disabled
+	disk_conditioner_info dcinfo;                                    
+	struct saved_mount_fields mnt_fields;                                                             
 
-	daddr64_t last_blkno; // approx. last transfered block for simulating seek times
-	struct timeval last_io_timestamp; // the last time an I/O completed
+	daddr64_t last_blkno;                                                           
+	struct timeval last_io_timestamp;                                  
 };
 
 void disk_conditioner_delay(buf_t, int, int, uint64_t);
@@ -77,9 +77,9 @@ extern void throttle_info_mount_reset_period(mount_t, int isssd);
 static double
 weighted_scale_factor(double scale)
 {
-	// 0 to 1 increasing quickly from 0. This weights smaller blkdiffs higher to add a type of minimum latency
-	// I would like to use log(10) / 2.0 + 1, but using different approximation due to no math library
-	// y = (x-1)^3 + 1
+	                                                                                                          
+	                                                                                                  
+	                  
 	double x_m1 = scale - 1;
 	return x_m1 * x_m1 * x_m1 + 1;
 }
@@ -115,7 +115,7 @@ disk_conditioner_delay(buf_t bp, int extents, int total_size, uint64_t already_e
 	info = &(internal_info->dcinfo);
 
 	if (!info->is_ssd) {
-		// calculate approximate seek time based on difference in block number
+		                                                                      
 		last_blkno = internal_info->last_blkno;
 		blkdiff = bp->b_blkno > last_blkno ? bp->b_blkno - last_blkno : last_blkno - bp->b_blkno;
 		internal_info->last_blkno = bp->b_blkno + bp->b_bcount;
@@ -123,16 +123,16 @@ disk_conditioner_delay(buf_t bp, int extents, int total_size, uint64_t already_e
 		blkdiff = BLK_MAX(mp);
 	}
 
-	// scale access time by (distance in blocks from previous I/O / maximum blocks)
+	                                                                               
 	access_time_scale = weighted_scale_factor((double)blkdiff / (double)BLK_MAX(mp));
 	if (__builtin_isnan(access_time_scale)) {
 		return;
 	}
-	// most cases should pass in extents==1 for optimal delay calculation, otherwise just multiply delay by extents
+	                                                                                                               
 	double temp = (((double)extents * (double)info->access_time_usec) * access_time_scale);
 	if (temp <= 0) {
 		delay_usec = 0;
-	} else if (temp >= (double)(18446744073709549568ULL)) { /* highest 64-bit unsigned integer representable as a double */
+	} else if (temp >= (double)(18446744073709549568ULL)) {                                                                
 		delay_usec = UINT64_MAX;
 	} else {
 		delay_usec = (uint64_t)temp;
@@ -144,11 +144,11 @@ disk_conditioner_delay(buf_t bp, int extents, int total_size, uint64_t already_e
 		delay_usec += (uint64_t)(total_size / ((double)(info->write_throughput_mbps * 1024 * 1024 / 8) / USEC_PER_SEC));
 	}
 
-	// try simulating disk spinup based on time since last I/O
+	                                                          
 	if (!info->is_ssd) {
 		microuptime(&elapsed);
 		timevalsub(&elapsed, &internal_info->last_io_timestamp);
-		// avoid this delay right after boot (assuming last_io_timestamp is 0 and disk is already spinning)
+		                                                                                                   
 		if (elapsed.tv_sec > DISK_IDLE_SEC && internal_info->last_io_timestamp.tv_sec != 0) {
 			delay_usec += DISK_SPINUP_SEC * USEC_PER_SEC;
 		}
@@ -235,7 +235,7 @@ disk_conditioner_set_info(mount_t mp, disk_conditioner_info *uinfo)
 		mp->mnt_disk_conditioner_info = internal_info;
 		mnt_fields = &(internal_info->mnt_fields);
 
-		/* save mount_t fields for restoration later */
+		                                               
 		mnt_fields->mnt_maxreadcnt = mp->mnt_maxreadcnt;
 		mnt_fields->mnt_maxwritecnt = mp->mnt_maxwritecnt;
 		mnt_fields->mnt_segreadcnt = mp->mnt_segreadcnt;
@@ -248,13 +248,13 @@ disk_conditioner_set_info(mount_t mp, disk_conditioner_info *uinfo)
 	mnt_fields = &(internal_info->mnt_fields);
 
 	if (!uinfo->enabled && info->enabled) {
-		/* disk conditioner is being disabled when already enabled */
+		                                                             
 		disk_conditioner_restore_mount_fields(mp, mnt_fields);
 	}
 
 	memcpy(info, uinfo, sizeof(disk_conditioner_info));
 
-	/* scale back based on hardware advertised limits */
+	                                                    
 	if (uinfo->ioqueue_depth == 0 || uinfo->ioqueue_depth > mnt_fields->mnt_ioqueue_depth) {
 		info->ioqueue_depth = mnt_fields->mnt_ioqueue_depth;
 	}
@@ -284,7 +284,7 @@ disk_conditioner_set_info(mount_t mp, disk_conditioner_info *uinfo)
 
 	microuptime(&internal_info->last_io_timestamp);
 
-	// make sure throttling picks up the new periods
+	                                                
 	throttle_info_mount_reset_period(mp, info->is_ssd);
 
 	return 0;

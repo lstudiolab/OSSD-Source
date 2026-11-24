@@ -28,4 +28,4 @@
 #ifndef _INT64_T
 #define _INT64_T
 typedef long long               int64_t;
-#endif /* _INT64_T */
+#endif               

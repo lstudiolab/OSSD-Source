@@ -26,10 +26,10 @@
 #define _NONSTD_SOURCE
 #include <sys/cdefs.h>
 
-/*
- * We need conformance on so that EOPNOTSUPP=102.  But the routine symbol
- * will still be the legacy (undecorated) one.
- */
+  
+                                                                         
+                                              
+   
 #undef __DARWIN_UNIX03
 #define __DARWIN_UNIX03 1
 
@@ -38,15 +38,15 @@
 
 int __lchown(const char *, uid_t, gid_t);
 
-/*
- * lchown stub, legacy version
- */
+  
+                              
+   
 int
 lchown(const char *path, uid_t owner, gid_t group)
 {
 	int ret = __lchown(path, owner, group);
 
-	/* use ENOTSUP for legacy behavior */
+	                                     
 	if (ret < 0 && errno == EOPNOTSUPP) {
 		errno = ENOTSUP;
 	}

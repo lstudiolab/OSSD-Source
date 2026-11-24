@@ -74,7 +74,7 @@
 #include <libkern/libkern.h>
 
 
-u_int32_t classq_verbose = 0;   /* more noise if greater than 1 */
+u_int32_t classq_verbose = 0;                                     
 
 SYSCTL_NODE(_net, OID_AUTO, classq, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "classq");
 
@@ -92,7 +92,7 @@ _qinit(class_queue_t *q, int type, int lim, classq_pkt_type_t ptype)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 	}
 
 	qlimit(q) = lim;
@@ -103,7 +103,7 @@ _qinit(class_queue_t *q, int type, int lim, classq_pkt_type_t ptype)
 	qstate(q) = QS_RUNNING;
 }
 
-/* add a packet at the tail of the queue */
+                                           
 void
 _addq(class_queue_t *q, classq_pkt_t *pkt)
 {
@@ -122,7 +122,7 @@ _addq(class_queue_t *q, classq_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -131,7 +131,7 @@ _addq(class_queue_t *q, classq_pkt_t *pkt)
 	qsize(q) += size;
 }
 
-/* add one or more packets at the tail of the queue */
+                                                      
 void
 _addq_multi(class_queue_t *q, classq_pkt_t *pkt_head, classq_pkt_t *pkt_tail,
     u_int32_t cnt, u_int64_t size)
@@ -149,7 +149,7 @@ _addq_multi(class_queue_t *q, classq_pkt_t *pkt_head, classq_pkt_t *pkt_tail,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -157,7 +157,7 @@ _addq_multi(class_queue_t *q, classq_pkt_t *pkt_head, classq_pkt_t *pkt_tail,
 	qsize(q) += size;
 }
 
-/* get a packet at the head of the queue */
+                                           
 void
 _getq(class_queue_t *q, classq_pkt_t *pkt)
 {
@@ -176,7 +176,7 @@ _getq(class_queue_t *q, classq_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -190,7 +190,7 @@ _getq(class_queue_t *q, classq_pkt_t *pkt)
 	VERIFY(qlen(q) > 0);
 	qlen(q)--;
 
-	/* qsize is an approximation, so adjust if necessary */
+	                                                       
 	if (((int)qsize(q) - pkt_len) > 0) {
 		qsize(q) -= pkt_len;
 	} else if (qsize(q) != 0) {
@@ -214,7 +214,7 @@ _getq_flow_or_scidx(class_queue_t *q, classq_pkt_t *pkt, u_int32_t val,
 			    m->m_pkthdr.pkt_flowid == val))) ||
 			    (!isflowid &&
 			    MBUF_SCIDX(mbuf_get_service_class(m)) < val)) {
-				/* remove it from the class queue */
+				                                    
 				MBUFQ_REMOVE(&qmbufq(q), m);
 				MBUFQ_NEXT(m) = NULL;
 				break;
@@ -230,7 +230,7 @@ _getq_flow_or_scidx(class_queue_t *q, classq_pkt_t *pkt, u_int32_t val,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -238,7 +238,7 @@ _getq_flow_or_scidx(class_queue_t *q, classq_pkt_t *pkt, u_int32_t val,
 		VERIFY(qlen(q) > 0);
 		qlen(q)--;
 
-		/* qsize is an approximation, so adjust if necessary */
+		                                                       
 		if (((int)qsize(q) - pkt_len) > 0) {
 			qsize(q) -= pkt_len;
 		} else if (qsize(q) != 0) {
@@ -247,21 +247,21 @@ _getq_flow_or_scidx(class_queue_t *q, classq_pkt_t *pkt, u_int32_t val,
 	}
 }
 
-/* get a packet of a specific flow beginning from the head of the queue */
+                                                                          
 void
 _getq_flow(class_queue_t *q, classq_pkt_t *pkt, u_int32_t flow)
 {
 	return _getq_flow_or_scidx(q, pkt, flow, TRUE);
 }
 
-/* Get a packet whose MBUF_SCIDX() < scidx from head of queue */
+                                                                
 void
 _getq_scidx_lt(class_queue_t *q, classq_pkt_t *pkt, u_int32_t scidx)
 {
 	return _getq_flow_or_scidx(q, pkt, scidx, FALSE);
 }
 
-/* get all packets (chained) starting from the head of the queue */
+                                                                   
 void
 _getq_all(class_queue_t *q, classq_pkt_t *first, classq_pkt_t *last,
     u_int32_t *qlenp, u_int64_t *qsizep)
@@ -284,7 +284,7 @@ _getq_all(class_queue_t *q, classq_pkt_t *first, classq_pkt_t *last,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -321,7 +321,7 @@ _getq_tail_mbuf(class_queue_t *q)
 		VERIFY(qlen(q) > 0);
 		--qlen(q);
 
-		/* qsize is an approximation, so adjust if necessary */
+		                                                       
 		if (((int)qsize(q) - m_length(m)) > 0) {
 			qsize(q) -= m_length(m);
 		} else if (qsize(q) != 0) {
@@ -339,7 +339,7 @@ _getq_tail_mbuf(class_queue_t *q)
 	return m;
 }
 
-/* drop a packet at the tail of the queue */
+                                            
 void
 _getq_tail(class_queue_t *q, classq_pkt_t *pkt)
 {
@@ -353,7 +353,7 @@ _getq_tail(class_queue_t *q, classq_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -366,7 +366,7 @@ _getq_random_mbuf(class_queue_t *q)
 	unsigned int n;
 	u_int32_t rnd;
 
-	/* XXX: Add support for Kernel packet when needed */
+	                                                    
 	VERIFY((qptype(q) == QP_MBUF));
 
 	n = qlen(q);
@@ -407,7 +407,7 @@ _getq_random_mbuf(class_queue_t *q)
 	VERIFY(qlen(q) > 0);
 	--qlen(q);
 
-	/* qsize is an approximation, so adjust if necessary */
+	                                                       
 	if (((int)qsize(q) - m_length(m)) > 0) {
 		qsize(q) -= m_length(m);
 	} else if (qsize(q) != 0) {
@@ -419,7 +419,7 @@ _getq_random_mbuf(class_queue_t *q)
 	return m;
 }
 
-/* randomly select a packet in the queue */
+                                           
 void
 _getq_random(class_queue_t *q, classq_pkt_t *pkt)
 {
@@ -433,7 +433,7 @@ _getq_random(class_queue_t *q, classq_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -470,7 +470,7 @@ _removeq_mbuf(class_queue_t *q, struct mbuf *m)
 	VERIFY(qlen(q) > 0);
 	--qlen(q);
 
-	/* qsize is an approximation, so adjust if necessary */
+	                                                       
 	if (((int)qsize(q) - m_length(m)) > 0) {
 		qsize(q) -= m_length(m);
 	} else if (qsize(q) != 0) {
@@ -480,7 +480,7 @@ _removeq_mbuf(class_queue_t *q, struct mbuf *m)
 	MBUFQ_NEXT(m) = NULL;
 }
 
-/* remove a packet from the queue */
+                                    
 void
 _removeq(class_queue_t *q, classq_pkt_t *pkt)
 {
@@ -492,7 +492,7 @@ _removeq(class_queue_t *q, classq_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -516,11 +516,11 @@ _flushq_flow_mbuf(class_queue_t *q, u_int32_t flow, u_int32_t *cnt,
 	MBUFQ_FOREACH_SAFE(m, &qmbufq(q), m_tmp) {
 		if (flow == 0 || ((m->m_flags & M_PKTHDR) &&
 		    m->m_pkthdr.pkt_flowid == flow)) {
-			/* remove it from the class queue */
+			                                    
 			MBUFQ_REMOVE(&qmbufq(q), m);
 			MBUFQ_NEXT(m) = NULL;
 
-			/* and add it to the free queue */
+			                                  
 			MBUFQ_ENQUEUE(&freeq, m);
 
 			l += m_length(m);
@@ -533,7 +533,7 @@ _flushq_flow_mbuf(class_queue_t *q, u_int32_t flow, u_int32_t *cnt,
 		VERIFY(qlen(q) >= c);
 		qlen(q) -= c;
 
-		/* qsize is an approximation, so adjust if necessary */
+		                                                       
 		if (((int)qsize(q) - l) > 0) {
 			qsize(q) -= l;
 		} else if (qsize(q) != 0) {
@@ -564,7 +564,7 @@ _flushq_flow(class_queue_t *q, u_int32_t flow, u_int32_t *cnt, u_int32_t *len)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }

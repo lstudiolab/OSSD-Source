@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: tree.h,v 1.13 2006/08/27 22:32:38 christos Exp $	*/
-/*	$OpenBSD: tree.h,v 1.7 2002/10/17 21:51:54 art Exp $	*/
+                                                               
+                                                          
 /*
  * Copyright 2002 Niels Provos <provos@citi.umich.edu>
  * All rights reserved.
@@ -56,36 +56,36 @@
 #ifndef _LIBKERN_TREE_H_
 #define _LIBKERN_TREE_H_
 
-/*
- * This file defines data structures for different types of trees:
- * splay trees and red-black trees.
- *
- * A splay tree is a self-organizing data structure.  Every operation
- * on the tree causes a splay to happen.  The splay moves the requested
- * node to the root of the tree and partly rebalances it.
- *
- * This has the benefit that request locality causes faster lookups as
- * the requested nodes move to the top of the tree.  On the other hand,
- * every lookup causes memory writes.
- *
- * The Balance Theorem bounds the total access time for m operations
- * and n inserts on an initially empty tree as O((m + n)lg n).  The
- * amortized cost for a sequence of m accesses to a splay tree is O(lg n);
- *
- * A red-black tree is a binary search tree with the node color as an
- * extra attribute.  It fulfills a set of conditions:
- *	- every search path from the root to a leaf consists of the
- *	  same number of black nodes,
- *	- each red node (except for the root) has a black parent,
- *	- each leaf node is black.
- *
- * Every operation on a red-black tree is bounded as O(lg n).
- * The maximum height of a red-black tree is 2lg (n+1).
- */
+  
+                                                                  
+                                   
+  
+                                                                     
+                                                                       
+                                                         
+  
+                                                                      
+                                                                       
+                                     
+  
+                                                                    
+                                                                   
+                                                                          
+  
+                                                                     
+                                                     
+                                                              
+                                
+                                                            
+                             
+  
+                                                             
+                                                       
+   
 
 #define SPLAY_HEAD(name, type)                                          \
 struct name {                                                           \
-	struct type *sph_root; /* root of the tree */                   \
+	struct type *sph_root;                                          \
 }
 
 #define SPLAY_INITIALIZER(root)                                         \
@@ -93,12 +93,12 @@ struct name {                                                           \
 
 #define SPLAY_INIT(root) do {                                           \
 	(root)->sph_root = NULL;                                        \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define SPLAY_ENTRY(type)                                               \
 struct {                                                                \
-	struct type *spe_left; /* left element */                       \
-	struct type *spe_right; /* right element */                     \
+	struct type *spe_left;                                          \
+	struct type *spe_right;                                         \
 }
 
 #define SPLAY_LEFT(elm, field)          (elm)->field.spe_left
@@ -106,39 +106,39 @@ struct {                                                                \
 #define SPLAY_ROOT(head)                (head)->sph_root
 #define SPLAY_EMPTY(head)               (SPLAY_ROOT(head) == NULL)
 
-/* SPLAY_ROTATE_{LEFT,RIGHT} expect that tmp hold SPLAY_{RIGHT,LEFT} */
+                                                                       
 #define SPLAY_ROTATE_RIGHT(head, tmp, field) do {                       \
 	SPLAY_LEFT((head)->sph_root, field) = SPLAY_RIGHT(tmp, field);  \
 	SPLAY_RIGHT(tmp, field) = (head)->sph_root;                     \
 	(head)->sph_root = tmp;                                         \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define SPLAY_ROTATE_LEFT(head, tmp, field) do {                        \
 	SPLAY_RIGHT((head)->sph_root, field) = SPLAY_LEFT(tmp, field);  \
 	SPLAY_LEFT(tmp, field) = (head)->sph_root;                      \
 	(head)->sph_root = tmp;                                         \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define SPLAY_LINKLEFT(head, tmp, field) do {                           \
 	SPLAY_LEFT(tmp, field) = (head)->sph_root;                      \
 	tmp = (head)->sph_root;                                         \
 	(head)->sph_root = SPLAY_LEFT((head)->sph_root, field);         \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define SPLAY_LINKRIGHT(head, tmp, field) do {                          \
 	SPLAY_RIGHT(tmp, field) = (head)->sph_root;                     \
 	tmp = (head)->sph_root;                                         \
 	(head)->sph_root = SPLAY_RIGHT((head)->sph_root, field);        \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define SPLAY_ASSEMBLE(head, node, left, right, field) do {             \
 	SPLAY_RIGHT(left, field) = SPLAY_LEFT((head)->sph_root, field); \
 	SPLAY_LEFT(right, field) = SPLAY_RIGHT((head)->sph_root, field);\
 	SPLAY_LEFT((head)->sph_root, field) = SPLAY_RIGHT(node, field); \
 	SPLAY_RIGHT((head)->sph_root, field) = SPLAY_LEFT(node, field); \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
-/* Generates prototypes and inline functions */
+                                               
 
 #define SPLAY_PROTOTYPE(name, type, field, cmp)                         \
 void name##_SPLAY(struct name *, struct type *);                        \
@@ -146,7 +146,7 @@ void name##_SPLAY_MINMAX(struct name *, int);                           \
 struct type *name##_SPLAY_INSERT(struct name *, struct type *);         \
 struct type *name##_SPLAY_REMOVE(struct name *, struct type *);         \
                                                                         \
-/* Finds the node with the same key as elm */                           \
+                                                                        \
 static __inline struct type *                                           \
 name##_SPLAY_FIND(struct name *head, struct type *elm)                  \
 {                                                                       \
@@ -179,9 +179,9 @@ name##_SPLAY_MIN_MAX(struct name *head, int val)                        \
 	return (SPLAY_ROOT(head));                                      \
 }
 
-/* Main splay operation.
- * Moves node close to the key of elm to top
- */
+                        
+                                            
+   
 #define SPLAY_GENERATE(name, type, field, cmp)                          \
 struct type *                                                           \
 name##_SPLAY_INSERT(struct name *head, struct type *elm)                \
@@ -263,7 +263,7 @@ name##_SPLAY(struct name *head, struct type *elm)                       \
 	SPLAY_ASSEMBLE(head, &__node, __left, __right, field);          \
 }                                                                       \
                                                                         \
-/* Searches for a matching entry without splaying */                    \
+                                                                        \
 static __inline struct type *                                           \
 name##_SPLAY_SEARCH(struct name *head, struct type *elm)                \
 {                                                                       \
@@ -283,9 +283,9 @@ name##_SPLAY_SEARCH(struct name *head, struct type *elm)                \
 	return (NULL);                                                  \
 }                                                                       \
                                                                         \
-/* Splay with either the minimum or the maximum element \
- * Used to find minimum or maximum element in tree. \
- */                                                                     \
+                                                         
+                                                     
+                                                                        \
 void name##_SPLAY_MINMAX(struct name *head, int __comp) \
 {                                                                       \
 	struct type __node, *__left, *__right, *__tmp;                  \
@@ -337,10 +337,10 @@ void name##_SPLAY_MINMAX(struct name *head, int __comp) \
 	     (x) != NULL;                                               \
 	     (x) = SPLAY_NEXT(name, head, x))
 
-/* Macros that define a red-black tree */
+                                         
 #define RB_HEAD(name, type)                                             \
 struct name {                                                           \
-	struct type *rbh_root; /* root of the tree */                   \
+	struct type *rbh_root;                                          \
 }
 
 #define RB_INITIALIZER(root)                                            \
@@ -348,16 +348,16 @@ struct name {                                                           \
 
 #define RB_INIT(root) do {                                              \
 	(root)->rbh_root = NULL;                                        \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define RB_BLACK        0
 #define RB_RED          1
 #define RB_PLACEHOLDER  NULL
 #define RB_ENTRY(type)                                                  \
 struct {                                                                \
-	struct type *rbe_left;          /* left element */              \
-	struct type *rbe_right;         /* right element */             \
-	struct type *rbe_parent;        /* parent element */            \
+	struct type *rbe_left;                                          \
+	struct type *rbe_right;                                         \
+	struct type *rbe_parent;                                        \
 }
 
 #define RB_COLOR_MASK                   (uintptr_t)0x1
@@ -371,12 +371,12 @@ struct {                                                                \
 	name##_RB_SETPARENT(elm, parent);                                       \
 	RB_LEFT(elm, field) = RB_RIGHT(elm, field) = NULL;              \
 	name##_RB_SETCOLOR(elm, RB_RED);                                \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define RB_SET_BLACKRED(name, black, red, field) do {                           \
 	name##_RB_SETCOLOR(black,  RB_BLACK);                           \
 	name##_RB_SETCOLOR(red, RB_RED);                                        \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #ifndef RB_AUGMENT
 #define RB_AUGMENT(x) (void)(x)
@@ -400,7 +400,7 @@ struct {                                                                \
 	RB_AUGMENT(tmp);                                                \
 	if ((name##_RB_GETPARENT(tmp)))                                 \
 	        RB_AUGMENT(name##_RB_GETPARENT(tmp));                   \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define RB_ROTATE_RIGHT(name, head, elm, tmp, field) do {                       \
 	(tmp) = RB_LEFT(elm, field);                                    \
@@ -420,9 +420,9 @@ struct {                                                                \
 	RB_AUGMENT(tmp);                                                \
 	if ((name##_RB_GETPARENT(tmp)))                                 \
 	        RB_AUGMENT(name##_RB_GETPARENT(tmp));                   \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
-/* Generates prototypes and inline functions */
+                                               
 #define RB_PROTOTYPE(name, type, field, cmp)                            \
 void name##_RB_INSERT_COLOR(struct name *, struct type *);      \
 void name##_RB_REMOVE_COLOR(struct name *, struct type *, struct type *);\
@@ -437,7 +437,7 @@ struct type *name##_RB_SETPARENT(struct type*, struct type*);           \
 int name##_RB_GETCOLOR(struct type*);                                   \
 void name##_RB_SETCOLOR(struct type*,int);
 
-/* Generates prototypes (with storage class) and inline functions */
+                                                                    
 #define RB_PROTOTYPE_SC(_sc_, name, type, field, cmp)                   \
 _sc_ void name##_RB_INSERT_COLOR(struct name *, struct type *);         \
 _sc_ void name##_RB_REMOVE_COLOR(struct name *, struct type *, struct type *); \
@@ -453,9 +453,9 @@ _sc_ int name##_RB_GETCOLOR(struct type*);                      \
 _sc_ void name##_RB_SETCOLOR(struct type*,int)
 
 
-/* Main rb operation.
- * Moves node close to the key of elm to top
- */
+                     
+                                            
+   
 #define RB_GENERATE(name, type, field, cmp)                             \
 struct type *name##_RB_GETPARENT(struct type *elm) {                            \
 	struct type *parent = _RB_PARENT(elm, field);                   \
@@ -672,7 +672,7 @@ color:                                                                  \
 	return (old);                                                   \
 }                                                                       \
                                                                         \
-/* Inserts a node into the RB tree */                                   \
+                                                                        \
 struct type *                                                           \
 name##_RB_INSERT(struct name *head, struct type *elm)                   \
 {                                                                       \
@@ -703,7 +703,7 @@ name##_RB_INSERT(struct name *head, struct type *elm)                   \
 	return (NULL);                                                  \
 }                                                                       \
                                                                         \
-/* Finds the node with the same key as elm */                           \
+                                                                        \
 struct type *                                                           \
 name##_RB_FIND(struct name *head, struct type *elm)                     \
 {                                                                       \
@@ -721,7 +721,7 @@ name##_RB_FIND(struct name *head, struct type *elm)                     \
 	return (NULL);                                                  \
 }                                                                       \
                                                                         \
-/* Finds the first node greater than or equal to the search key */      \
+                                                                        \
 __attribute__((unused))                                                 \
 struct type *                                                           \
 name##_RB_NFIND(struct name *head, struct type *elm)                    \
@@ -743,7 +743,7 @@ name##_RB_NFIND(struct name *head, struct type *elm)                    \
 	return (res);                                                   \
 }                                                                       \
                                                                         \
-/* ARGSUSED */                                                          \
+                                                                        \
 struct type *                                                           \
 name##_RB_NEXT(struct type *elm)                                        \
 {                                                                       \
@@ -845,4 +845,4 @@ name##_RB_PREV(struct type *elm)                                        \
 	    ((x) != NULL) && ((y) = name##_RB_NEXT(x), (x) != NULL);    \
 	     (x) = (y))
 
-#endif  /* _LIBKERN_TREE_H_ */
+#endif                        

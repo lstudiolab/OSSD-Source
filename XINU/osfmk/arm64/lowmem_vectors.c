@@ -32,10 +32,10 @@
 #include <vm/vm_object.h>
 #include <vm/vm_page.h>
 
-/*
- * On arm64, the low globals get mapped low via machine_init() during kernel
- * bootstrap.
- */
+  
+                                                                            
+             
+   
 
 extern vm_offset_t vm_kernel_stext;
 extern void     *version;
@@ -44,19 +44,19 @@ extern void     *kdp_trans_off;
 extern void     *osversion;
 extern void     *flag_kdp_trigger_reboot;
 extern void     *manual_pkt;
-extern struct vm_object pmap_object_store;      /* store pt pages */
+extern struct vm_object pmap_object_store;                          
 
 lowglo lowGlo __attribute__ ((aligned(PAGE_MAX_SIZE))) = {
-	// Increment the major version for changes that break the current Astris
-	// usage of lowGlo values
-	// Increment the minor version for changes that provide additonal info/function
-	// but does not break current usage
+	                                                                        
+	                         
+	                                                                               
+	                                   
 	.lgLayoutMajorVersion = 3,
 	.lgLayoutMinorVersion = 2,
 	.lgLayoutMagic = LOWGLO_LAYOUT_MAGIC,
 	.lgVerCode = { 'K', 'r', 'a', 'k', 'e', 'n', ' ', ' ' },
 	.lgZero = 0,
-	.lgStext = 0, // To be filled in below
+	.lgStext = 0,                         
 	.lgVersion = (uint64_t) &version,
 	.lgOSVersion = (uint64_t) &osversion,
 	.lgKmodptr = (uint64_t) &kmod,
@@ -96,10 +96,10 @@ patch_low_glo_static_region(uint64_t address, uint64_t size)
 	lowGlo.lgStaticAddr = address;
 	lowGlo.lgStaticSize = size;
 
-	/**
-	 * These values are set in pmap_bootstrap() and represent the range of
-	 * kernel managed memory.
-	 */
+	   
+                                                                       
+                          
+    
 	extern const pmap_paddr_t vm_first_phys;
 	extern const pmap_paddr_t vm_last_phys;
 	assertf((vm_first_phys != 0) && (vm_last_phys != 0),
@@ -107,25 +107,25 @@ patch_low_glo_static_region(uint64_t address, uint64_t size)
 	lowGlo.lgVmFirstPhys = vm_first_phys;
 	lowGlo.lgVmLastPhys = vm_last_phys;
 
-	/**
-	 * These values are set in pmap_bootstrap() and represent an array of all
-	 * kernel-managed I/O regions (pmap-io-ranges in the device tree). Some of
-	 * these regions may include DRAM carved out for usage by other agents on
-	 * the system.
-	 *
-	 * Need to forward-declare pmap_io_range_t since that only exists in the
-	 * PMAP code.
-	 */
+	   
+                                                                          
+                                                                           
+                                                                          
+               
+   
+                                                                         
+              
+    
 	typedef struct pmap_io_range pmap_io_range_t;
 	extern const pmap_io_range_t* io_attr_table;
 	extern const unsigned int num_io_rgns;
 	lowGlo.lgPmapIoRangePtr = (uint64_t)io_attr_table;
 	lowGlo.lgNumPmapIoRanges = (uint64_t)num_io_rgns;
 
-	/**
-	 * These values are set in arm_vm_init() and represent the virtual address
-	 * space used by the physical aperture.
-	 */
+	   
+                                                                           
+                                        
+    
 	extern const vm_map_address_t physmap_base;
 	extern const vm_map_address_t physmap_end;
 	assertf((physmap_base != 0) && (physmap_end != 0),

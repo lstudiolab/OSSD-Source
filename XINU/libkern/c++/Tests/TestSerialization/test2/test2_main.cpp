@@ -41,9 +41,9 @@ __END_DECLS
 
 const char *testBuffer =
     " <?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
-    " <!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\"> \n"
+    " <!DOCTYPE plist SYSTEM \"file:                                                       
     " <plist version=\"1.0\"> \n"
-    " <!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"> \n"
+    " <!DOCTYPE plist PUBLIC \"-                                                                                             
     " <plist version=\"0.9\"> \n"
     " <!-- this is a comment --> \n"
     " <!-- this is a comment with embedded XML statements \n"
@@ -109,18 +109,18 @@ const char *testBuffer =
     " </plist> \n"
 ;
 
-/*
- *  this causes the parser to return an empty string? it doesn't look like yyerror gets called
- *  char *testBuffer = "<array ID=1><array IDREF=\"1\"/></array>"
- *
- */
+  
+                                                                                              
+                                                                 
+  
+   
 
 kern_return_t
 test2_start(struct kmod_info *ki, void *data)
 {
 	IOLog("test buffer start:\n%s\n:test buffer end.\n", testBuffer);
 
-	// test unserialize
+	                   
 	OSString *errmsg = 0;
 	OSObject *d = OSUnserializeXML(testBuffer, &errmsg);
 	if (!d) {
@@ -133,7 +133,7 @@ test2_start(struct kmod_info *ki, void *data)
 		return KMOD_RETURN_SUCCESS;
 	}
 
-	// test serialize
+	                 
 	OSSerialize *s = OSSerialize::withCapacity(5);
 	if (!d->serialize(s)) {
 		IOLog("serialization failed\n");
@@ -143,7 +143,7 @@ test2_start(struct kmod_info *ki, void *data)
 	IOLog("serialized object's length = %d, capacity = %d\n", s->getLength(), s->getCapacity());
 	IOLog("object unformatted = %s\n", s->text());
 
-	// try second time
+	                  
 	OSObject *d2 = OSUnserializeXML(s->text(), &errmsg);
 	if (!d2) {
 		IOLog("%s\n", errmsg->getCStringNoCopy());

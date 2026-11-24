@@ -111,7 +111,7 @@ vfp_state_test_thread_routine(void *args, __unused wait_result_t wr)
 
 	vfp_state_test_args->result = -1;
 
-	/* Allocate memory to store expected and actual VFP register values */
+	                                                                      
 	vfp_regs = kalloc(sizeof(vfp_state_test_regs));
 	if (vfp_regs == NULL) {
 		goto vfp_state_thread_kalloc1_failure;
@@ -122,7 +122,7 @@ vfp_state_test_thread_routine(void *args, __unused wait_result_t wr)
 		goto vfp_state_thread_kalloc2_failure;
 	}
 
-	/* Preload VFP registers with unique, per-thread patterns */
+	                                                            
 	bcopy(vfp_state_test_regs, vfp_regs_expected, sizeof(vfp_state_test_regs));
 	for (int i = 0; i < VFP_STATE_TEST_N_REGS; i++) {
 		vfp_regs_expected[i] ^= vfp_state_test_args->vfp_reg_rand;
@@ -136,12 +136,12 @@ vfp_state_test_thread_routine(void *args, __unused wait_result_t wr)
                                    : : "r"(vfp_regs_expected) : \
                                    "memory", "d8", "d9", "d10", "d11", "d12", "d13", "d14", "d15");
 
-	/*
-	 * Set FPSCR to a known value, so we can validate the save/restore path.
-	 * Only touch NZCV flags, since 1) writing them does not have visible side-effects
-	 * and 2) they're only set by the CPU as a result of executing an FP comparison,
-	 * which do not exist in this function.
-	 */
+	  
+                                                                         
+                                                                                   
+                                                                                 
+                                        
+    
 	asm volatile ("fmrx	%0, fpscr" : "=r"(fp_control_expected));
 	fp_control_expected |= vfp_state_test_args->fp_control_mask;
 	asm volatile ("fmxr	fpscr, %0" : : "r"(fp_control_expected));
@@ -158,11 +158,11 @@ vfp_state_test_thread_routine(void *args, __unused wait_result_t wr)
 	asm volatile ("msr	fpcr, %0" : : "r"(fp_control_expected));
 #endif
 
-	/* Make sure all threads start at roughly the same time */
+	                                                          
 	wake_threads(vfp_state_test_args->start_barrier);
 	wait_threads(vfp_state_test_args->start_barrier, VFP_STATE_TEST_N_THREADS);
 
-	/* Check VFP registers against expected values, and go to sleep */
+	                                                                  
 	for (int i = 0; i < VFP_STATE_TEST_N_ITER; i++) {
 		bzero(vfp_regs, sizeof(vfp_state_test_regs));
 
@@ -198,16 +198,16 @@ vfp_state_thread_kalloc2_failure:
 	kfree(vfp_regs, sizeof(vfp_state_test_regs));
 vfp_state_thread_kalloc1_failure:
 
-	/* Signal that the thread has finished, and terminate */
+	                                                        
 	wake_threads(vfp_state_test_args->end_barrier);
 	thread_terminate_self();
 }
 
-/*
- * This test spawns N threads that preload unique values into
- * callee-saved VFP registers and then repeatedly check them
- * for correctness after waking up from delay()
- */
+  
+                                                             
+                                                            
+                                               
+   
 kern_return_t
 vfp_state_test(void)
 {
@@ -216,7 +216,7 @@ vfp_state_test(void)
 	kern_return_t retval;
 	int start_barrier = 0, end_barrier = 0;
 
-	/* Spawn threads */
+	                   
 	for (int i = 0; i < VFP_STATE_TEST_N_THREADS; i++) {
 		vfp_state_test_args[i].start_barrier = &start_barrier;
 		vfp_state_test_args[i].end_barrier = &end_barrier;
@@ -234,14 +234,14 @@ vfp_state_test(void)
 		T_EXPECT((retval == KERN_SUCCESS), "thread %d started", i);
 	}
 
-	/* Wait for all threads to finish */
+	                                    
 	wait_threads(&end_barrier, VFP_STATE_TEST_N_THREADS);
 
-	/* Check if all threads completed successfully */
+	                                                 
 	for (int i = 0; i < VFP_STATE_TEST_N_THREADS; i++) {
 		T_EXPECT((vfp_state_test_args[i].result == 0), "thread %d finished", i);
 	}
 
 	return KERN_SUCCESS;
 }
-#endif /* __ARM_VFP__ */
+#endif                  

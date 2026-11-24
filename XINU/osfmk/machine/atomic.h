@@ -39,4 +39,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_ATOMIC_H */
+#endif                        

@@ -70,7 +70,7 @@
 #include <sys/domain.h>
 #if XNU_TARGET_OS_OSX
 #include <sys/kasl.h>
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 #include <sys/priv.h>
 #include <sys/socket.h>
 #include <sys/socketvar.h>
@@ -105,15 +105,15 @@
 #endif
 #if MPTCP
 #include <netinet/mptcp_var.h>
-#endif /* MPTCP */
+#endif            
 
 #if IPSEC
 #include <netinet6/ipsec.h>
-#endif /*IPSEC*/
+#endif          
 
 #if FLOW_DIVERT
 #include <netinet/flow_divert.h>
-#endif /* FLOW_DIVERT */
+#endif                  
 
 errno_t tcp_fill_info_for_info_tuple(struct info_tuple *, struct tcp_info *);
 
@@ -122,9 +122,9 @@ static void tcp_connection_fill_info(struct tcpcb *tp,
     struct tcp_connection_info *tci);
 static int tcp_get_mpkl_send_info(struct mbuf *, struct so_mpkl_send_info *);
 
-/*
- * TCP protocol interface to socket abstraction.
- */
+  
+                                                
+   
 static int      tcp_attach(struct socket *, struct proc *);
 static int      tcp_connect(struct tcpcb *, struct sockaddr *, struct proc *);
 static int      tcp6_connect(struct tcpcb *, struct sockaddr *, struct proc *);
@@ -149,16 +149,16 @@ SYSCTL_PROC(_net_inet_tcp, OID_AUTO, info,
     CTLFLAG_RW | CTLFLAG_LOCKED | CTLFLAG_ANYBODY | CTLFLAG_KERN,
     0, 0, tcp_sysctl_info, "S", "TCP info per tuple");
 
-/*
- * TCP attaches to socket via pru_attach(), reserving space,
- * and an internet control block.
- *
- * Returns:	0			Success
- *		EISCONN
- *	tcp_attach:ENOBUFS
- *	tcp_attach:ENOMEM
- *	tcp_attach:???			[IPSEC specific]
- */
+  
+                                                            
+                                 
+  
+                       
+           
+                     
+                    
+                                    
+   
 static int
 tcp_usr_attach(struct socket *so, __unused int proto, struct proc *p)
 {
@@ -187,13 +187,13 @@ out:
 	return error;
 }
 
-/*
- * pru_detach() detaches the TCP protocol from the socket.
- * If the protocol state is non-embryonic, then can't
- * do this directly: have to initiate a pru_disconnect(),
- * which may finish later; embryonic TCB's can just
- * be discarded here.
- */
+  
+                                                          
+                                                     
+                                                         
+                                                   
+                     
+   
 static int
 tcp_usr_detach(struct socket *so)
 {
@@ -203,11 +203,11 @@ tcp_usr_detach(struct socket *so)
 	TCPDEBUG0;
 
 	if (inp == 0 || (inp->inp_state == INPCB_STATE_DEAD)) {
-		return EINVAL;  /* XXX */
+		return EINVAL;           
 	}
 	socket_lock_assert_owned(so);
 	tp = intotcpcb(inp);
-	/* In case we got disconnected from the peer */
+	                                               
 	if (tp == NULL) {
 		goto out;
 	}
@@ -232,7 +232,7 @@ do {                                                                    \
 	TCPDEBUG1();                                                    \
 	calculate_tcp_clock();                                          \
 } while (0)
-#else /* NECP */
+#else           
 #define COMMON_START_ALLOW_FLOW_DIVERT(allow)  TCPDEBUG0;               \
 do {                                                                    \
 	if (inp == NULL || inp->inp_state == INPCB_STATE_DEAD)          \
@@ -241,26 +241,26 @@ do {                                                                    \
 	TCPDEBUG1();                                                    \
 	calculate_tcp_clock();                                          \
 } while (0)
-#endif /* !NECP */
+#endif            
 
 #define COMMON_START() COMMON_START_ALLOW_FLOW_DIVERT(false)
 #define COMMON_END(req) out: TCPDEBUG2(req); return error; goto out
 
 
-/*
- * Give the socket an address.
- *
- * Returns:	0			Success
- *		EINVAL			Invalid argument [COMMON_START]
- *		EAFNOSUPPORT		Address family not supported
- *	in_pcbbind:EADDRNOTAVAIL	Address not available.
- *	in_pcbbind:EINVAL		Invalid argument
- *	in_pcbbind:EAFNOSUPPORT		Address family not supported [notdef]
- *	in_pcbbind:EACCES		Permission denied
- *	in_pcbbind:EADDRINUSE		Address in use
- *	in_pcbbind:EAGAIN		Resource unavailable, try again
- *	in_pcbbind:EPERM		Operation not permitted
- */
+  
+                              
+  
+                       
+                                            
+                                              
+                                                  
+                                      
+                                                                 
+                                       
+                                        
+                                                     
+                                            
+   
 static int
 tcp_usr_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 {
@@ -276,10 +276,10 @@ tcp_usr_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 		goto out;
 	}
 
-	/*
-	 * Must check for multicast addresses and disallow binding
-	 * to them.
-	 */
+	  
+                                                           
+            
+    
 	sinp = (struct sockaddr_in *)(void *)nam;
 	if (sinp->sin_family == AF_INET &&
 	    IN_MULTICAST(ntohl(sinp->sin_addr.s_addr))) {
@@ -292,14 +292,14 @@ tcp_usr_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 	}
 
 #if NECP
-	/* Update NECP client with bind result if not in middle of connect */
+	                                                                     
 	if ((inp->inp_flags2 & INP2_CONNECT_IN_PROGRESS) &&
 	    !uuid_is_null(inp->necp_client_uuid)) {
 		socket_unlock(so, 0);
 		necp_client_assign_from_socket(so->last_pid, inp->necp_client_uuid, inp);
 		socket_lock(so, 0);
 	}
-#endif /* NECP */
+#endif           
 
 	COMMON_END(PRU_BIND);
 }
@@ -319,10 +319,10 @@ tcp6_usr_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 		goto out;
 	}
 
-	/*
-	 * Must check for multicast addresses and disallow binding
-	 * to them.
-	 */
+	  
+                                                           
+            
+    
 	sin6p = (struct sockaddr_in6 *)(void *)nam;
 	if (sin6p->sin6_family == AF_INET6 &&
 	    IN6_IS_ADDR_MULTICAST(&sin6p->sin6_addr)) {
@@ -351,19 +351,19 @@ tcp6_usr_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 	COMMON_END(PRU_BIND);
 }
 
-/*
- * Prepare to accept connections.
- *
- * Returns:	0			Success
- *		EINVAL [COMMON_START]
- *	in_pcbbind:EADDRNOTAVAIL	Address not available.
- *	in_pcbbind:EINVAL		Invalid argument
- *	in_pcbbind:EAFNOSUPPORT		Address family not supported [notdef]
- *	in_pcbbind:EACCES		Permission denied
- *	in_pcbbind:EADDRINUSE		Address in use
- *	in_pcbbind:EAGAIN		Resource unavailable, try again
- *	in_pcbbind:EPERM		Operation not permitted
- */
+  
+                                 
+  
+                       
+                         
+                                                  
+                                      
+                                                                 
+                                       
+                                        
+                                                     
+                                            
+   
 static int
 tcp_usr_listen(struct socket *so, struct proc *p)
 {
@@ -411,14 +411,14 @@ tcp_connect_complete(struct socket *so)
 	struct inpcb *inp = sotoinpcb(so);
 	int error = 0;
 
-	/* TFO delays the tcp_output until later, when the app calls write() */
+	                                                                       
 	if (so->so_flags1 & SOF1_PRECONNECT_DATA) {
 		if (!necp_socket_is_allowed_to_send_recv(sotoinpcb(so), NULL, 0, NULL, NULL, NULL, NULL)) {
 			TCP_LOG_DROP_NECP(NULL, NULL, tp, true);
 			return EHOSTUNREACH;
 		}
 
-		/* Initialize enough state so that we can actually send data */
+		                                                               
 		tcp_mss(tp, -1, IFSCOPE_NONE);
 		tp->snd_wnd = tp->t_maxseg;
 		tp->max_sndwnd = tp->snd_wnd;
@@ -427,24 +427,24 @@ tcp_connect_complete(struct socket *so)
 	}
 
 #if NECP
-	/* Update NECP client with connected five-tuple */
+	                                                  
 	if (error == 0 && !uuid_is_null(inp->necp_client_uuid)) {
 		socket_unlock(so, 0);
 		necp_client_assign_from_socket(so->last_pid, inp->necp_client_uuid, inp);
 		socket_lock(so, 0);
 	}
-#endif /* NECP */
+#endif           
 
 	return error;
 }
 
-/*
- * Initiate connection to peer.
- * Create a template for use in transmissions on this connection.
- * Enter SYN_SENT state, and mark socket as connecting.
- * Start keep-alive timer, and seed output sequence space.
- * Send initial segment on connection.
- */
+  
+                               
+                                                                 
+                                                       
+                                                          
+                                      
+   
 static int
 tcp_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 {
@@ -471,7 +471,7 @@ tcp_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 	if (error != 0) {
 		return error;
 	}
-#endif /* CONTENT_FILTER */
+#endif                     
 #if FLOW_DIVERT
 	if (necp_socket_should_use_flow_divert(inp)) {
 		error = flow_divert_pcb_init(so);
@@ -480,8 +480,8 @@ tcp_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		}
 		return error;
 	}
-#endif /* FLOW_DIVERT */
-#endif /* NECP */
+#endif                  
+#endif           
 	tp = intotcpcb(inp);
 	TCPDEBUG1();
 
@@ -491,9 +491,9 @@ tcp_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		error = EAFNOSUPPORT;
 		goto out;
 	}
-	/*
-	 * Must disallow TCP ``connections'' to multicast addresses.
-	 */
+	  
+                                                             
+    
 	sinp = (struct sockaddr_in *)(void *)nam;
 	if (sinp->sin_family == AF_INET
 	    && IN_MULTICAST(ntohl(sinp->sin_addr.s_addr))) {
@@ -536,22 +536,22 @@ tcp_usr_connectx_common(struct socket *so, int af,
 
 #if NECP
 	inp_update_necp_policy(inp, src, dst, ifscope);
-#endif /* NECP */
+#endif           
 
 	if ((so->so_flags1 & SOF1_DATA_IDEMPOTENT) &&
 	    (tcp_fastopen & TCP_FASTOPEN_CLIENT)) {
 		sototcpcb(so)->t_flagsext |= TF_FASTOPEN;
 	}
 
-	/* bind socket to the specified interface, if requested */
+	                                                          
 	if (ifscope != IFSCOPE_NONE &&
 	    (error = inp_bindif(inp, ifscope, NULL)) != 0) {
 		goto done;
 	}
 
-	/* if source address and/or port is specified, bind to it */
+	                                                            
 	if (src != NULL) {
-		error = sobindlock(so, src, 0); /* already locked */
+		error = sobindlock(so, src, 0);                     
 		if (error != 0) {
 			goto done;
 		}
@@ -566,14 +566,14 @@ tcp_usr_connectx_common(struct socket *so, int af,
 		break;
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 	}
 
 	if (error != 0) {
 		goto done;
 	}
 
-	/* if there is data, copy it */
+	                               
 	if (auio != NULL) {
 		socket_unlock(so, 0);
 
@@ -588,21 +588,21 @@ tcp_usr_connectx_common(struct socket *so, int af,
 			*bytes_written = datalen - uio_resid(auio);
 		}
 
-		/*
-		 * sosend returns EWOULDBLOCK if it's a non-blocking
-		 * socket or a timeout occured (this allows to return
-		 * the amount of queued data through sendit()).
-		 *
-		 * However, connectx() returns EINPROGRESS in case of a
-		 * blocking socket. So we change the return value here.
-		 */
+		  
+                                                      
+                                                       
+                                                 
+    
+                                                         
+                                                         
+     
 		if (error == EWOULDBLOCK) {
 			error = EINPROGRESS;
 		}
 	}
 
 	if (error == 0 && pcid != NULL) {
-		*pcid = 1; /* there is only one connection in regular TCP */
+		*pcid = 1;                                                  
 	}
 done:
 	if (error && error != EINPROGRESS) {
@@ -649,7 +649,7 @@ tcp6_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 	if (error != 0) {
 		return error;
 	}
-#endif /* CONTENT_FILTER */
+#endif                     
 #if FLOW_DIVERT
 	if (necp_socket_should_use_flow_divert(inp)) {
 		error = flow_divert_pcb_init(so);
@@ -658,8 +658,8 @@ tcp6_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		}
 		return error;
 	}
-#endif /* FLOW_DIVERT */
-#endif /* NECP */
+#endif                  
+#endif           
 
 	tp = intotcpcb(inp);
 	TCPDEBUG1();
@@ -671,9 +671,9 @@ tcp6_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		goto out;
 	}
 
-	/*
-	 * Must disallow TCP ``connections'' to multicast addresses.
-	 */
+	  
+                                                             
+    
 	sin6p = (struct sockaddr_in6 *)(void *)nam;
 	if (sin6p->sin6_family == AF_INET6
 	    && IN6_IS_ADDR_MULTICAST(&sin6p->sin6_addr)) {
@@ -690,9 +690,9 @@ tcp6_usr_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		}
 
 		in6_sin6_2_sin(&sin, sin6p);
-		/*
-		 * Must disallow TCP ``connections'' to multicast addresses.
-		 */
+		  
+                                                              
+     
 		if (IN_MULTICAST(ntohl(sin.sin_addr.s_addr))) {
 			error = EAFNOSUPPORT;
 			goto out;
@@ -731,17 +731,17 @@ tcp6_usr_connectx(struct socket *so, struct sockaddr*src,
 	           pcid, flags, arg, arglen, uio, bytes_written);
 }
 
-/*
- * Initiate disconnect from peer.
- * If connection never passed embryonic stage, just drop;
- * else if don't need to let data drain, then can just drop anyways,
- * else have to begin TCP shutdown process: mark socket disconnecting,
- * drain unread data, state switch to reflect user close, and
- * send segment (e.g. FIN) to peer.  Socket will be really disconnected
- * when peer sends FIN and acks ours.
- *
- * SHOULD IMPLEMENT LATER PRU_CONNECT VIA REALLOC TCPCB.
- */
+  
+                                 
+                                                         
+                                                                    
+                                                                      
+                                                             
+                                                                       
+                                     
+  
+                                                        
+   
 static int
 tcp_usr_disconnect(struct socket *so)
 {
@@ -751,7 +751,7 @@ tcp_usr_disconnect(struct socket *so)
 
 	socket_lock_assert_owned(so);
 	COMMON_START();
-	/* In case we got disconnected from the peer */
+	                                               
 	if (tp == NULL) {
 		goto out;
 	}
@@ -759,9 +759,9 @@ tcp_usr_disconnect(struct socket *so)
 	COMMON_END(PRU_DISCONNECT);
 }
 
-/*
- * User-protocol pru_disconnectx callback.
- */
+  
+                                          
+   
 static int
 tcp_usr_disconnectx(struct socket *so, sae_associd_t aid, sae_connid_t cid)
 {
@@ -773,11 +773,11 @@ tcp_usr_disconnectx(struct socket *so, sae_associd_t aid, sae_connid_t cid)
 	return tcp_usr_disconnect(so);
 }
 
-/*
- * Accept a connection.  Essentially all the work is
- * done at higher levels; just return the address
- * of the peer, storing through addr.
- */
+  
+                                                    
+                                                 
+                                     
+   
 static int
 tcp_usr_accept(struct socket *so, struct sockaddr **nam)
 {
@@ -800,7 +800,7 @@ tcp_usr_accept(struct socket *so, struct sockaddr **nam)
 		return EPROTOTYPE;
 	}
 
-#endif /* NECP */
+#endif           
 
 	tp = intotcpcb(inp);
 	TCPDEBUG1();
@@ -832,7 +832,7 @@ tcp6_usr_accept(struct socket *so, struct sockaddr **nam)
 		return EPROTOTYPE;
 	}
 
-#endif /* NECP */
+#endif           
 
 	tp = intotcpcb(inp);
 	TCPDEBUG1();
@@ -845,23 +845,23 @@ tcp6_usr_accept(struct socket *so, struct sockaddr **nam)
 	COMMON_END(PRU_ACCEPT);
 }
 
-/*
- * Mark the connection as being incapable of further output.
- *
- * Returns:	0			Success
- *		EINVAL [COMMON_START]
- *	tcp_output:EADDRNOTAVAIL
- *	tcp_output:ENOBUFS
- *	tcp_output:EMSGSIZE
- *	tcp_output:EHOSTUNREACH
- *	tcp_output:ENETUNREACH
- *	tcp_output:ENETDOWN
- *	tcp_output:ENOMEM
- *	tcp_output:EACCES
- *	tcp_output:EMSGSIZE
- *	tcp_output:ENOBUFS
- *	tcp_output:???			[ignorable: mostly IPSEC/firewall/DLIL]
- */
+  
+                                                            
+  
+                       
+                         
+                           
+                     
+                      
+                          
+                         
+                      
+                    
+                    
+                      
+                     
+                                                           
+   
 static int
 tcp_usr_shutdown(struct socket *so)
 {
@@ -876,17 +876,17 @@ tcp_usr_shutdown(struct socket *so)
 
 	socantsendmore(so);
 
-	/*
-	 * In case we got disconnected from the peer, or if this is
-	 * a socket that is to be flow-diverted (but not yet).
-	 */
+	  
+                                                            
+                                                       
+    
 	tp = intotcpcb(inp);
 	TCPDEBUG1();
 
 	if (tp == NULL
 #if NECP
 	    || (necp_socket_should_use_flow_divert(inp))
-#endif /* NECP */
+#endif           
 	    ) {
 		if (tp != NULL) {
 			error = EPROTOTYPE;
@@ -898,28 +898,28 @@ tcp_usr_shutdown(struct socket *so)
 
 	tp = tcp_usrclosed(tp);
 #if MPTCP
-	/* A reset has been sent but socket exists, do not send FIN */
+	                                                              
 	if ((so->so_flags & SOF_MP_SUBFLOW) &&
 	    (tp) && (tp->t_mpflags & TMPF_RESET)) {
 		goto out;
 	}
 #endif
 #if CONTENT_FILTER
-	/* Don't send a FIN yet */
+	                          
 	if (tp && !(so->so_state & SS_ISDISCONNECTED) &&
 	    cfil_sock_data_pending(&so->so_snd)) {
 		goto out;
 	}
-#endif /* CONTENT_FILTER */
+#endif                     
 	if (tp) {
 		error = tcp_output(tp);
 	}
 	COMMON_END(PRU_SHUTDOWN);
 }
 
-/*
- * After a receive, possibly send window update to peer.
- */
+  
+                                                        
+   
 static int
 tcp_usr_rcvd(struct socket *so, int flags)
 {
@@ -928,7 +928,7 @@ tcp_usr_rcvd(struct socket *so, int flags)
 	struct tcpcb *tp;
 
 	COMMON_START();
-	/* In case we got disconnected from the peer */
+	                                               
 	if (tp == NULL) {
 		goto out;
 	}
@@ -938,53 +938,53 @@ tcp_usr_rcvd(struct socket *so, int flags)
 		tp->t_flags |= TF_ACKNOW;
 	}
 
-	/*
-	 * This tcp_output is solely there to trigger window-updates.
-	 * However, we really do not want these window-updates while we
-	 * are still in SYN_SENT or SYN_RECEIVED.
-	 */
+	  
+                                                              
+                                                                
+                                          
+    
 	if (TCPS_HAVEESTABLISHED(tp->t_state)) {
 		tcp_output(tp);
 	}
 
 #if CONTENT_FILTER
 	cfil_sock_buf_update(&so->so_rcv);
-#endif /* CONTENT_FILTER */
+#endif                     
 
 	COMMON_END(PRU_RCVD);
 }
 
-/*
- * Do a send by putting data in output queue and updating urgent
- * marker if URG set.  Possibly send more data.  Unlike the other
- * pru_*() routines, the mbuf chains are our responsibility.  We
- * must either enqueue them or free them.  The other pru_* routines
- * generally are caller-frees.
- *
- * Returns:	0			Success
- *		ECONNRESET
- *		EINVAL
- *		ENOBUFS
- *	tcp_connect:EADDRINUSE		Address in use
- *	tcp_connect:EADDRNOTAVAIL	Address not available.
- *	tcp_connect:EINVAL		Invalid argument
- *	tcp_connect:EAFNOSUPPORT	Address family not supported [notdef]
- *	tcp_connect:EACCES		Permission denied
- *	tcp_connect:EAGAIN		Resource unavailable, try again
- *	tcp_connect:EPERM		Operation not permitted
- *	tcp_output:EADDRNOTAVAIL
- *	tcp_output:ENOBUFS
- *	tcp_output:EMSGSIZE
- *	tcp_output:EHOSTUNREACH
- *	tcp_output:ENETUNREACH
- *	tcp_output:ENETDOWN
- *	tcp_output:ENOMEM
- *	tcp_output:EACCES
- *	tcp_output:EMSGSIZE
- *	tcp_output:ENOBUFS
- *	tcp_output:???			[ignorable: mostly IPSEC/firewall/DLIL]
- *	tcp6_connect:???		[IPV6 only]
- */
+  
+                                                                
+                                                                 
+                                                                
+                                                                   
+                              
+  
+                       
+              
+          
+           
+                                         
+                                                   
+                                       
+                                                                 
+                                        
+                                                      
+                                             
+                           
+                     
+                      
+                          
+                         
+                      
+                    
+                    
+                      
+                     
+                                                           
+                                
+   
 static int
 tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
     struct sockaddr *nam, struct mbuf *control, struct proc *p)
@@ -992,8 +992,8 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 	int error = 0;
 	struct inpcb *inp = sotoinpcb(so);
 	struct tcpcb *tp;
-	uint32_t mpkl_len = 0; /* length of mbuf chain */
-	uint32_t mpkl_seq; /* sequence number where new data is added */
+	uint32_t mpkl_len = 0;                           
+	uint32_t mpkl_seq;                                              
 	struct so_mpkl_send_info mpkl_send_info = {};
 
 	int isipv6;
@@ -1002,13 +1002,13 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 	if (inp == NULL || inp->inp_state == INPCB_STATE_DEAD
 #if NECP
 	    || (necp_socket_should_use_flow_divert(inp))
-#endif /* NECP */
+#endif           
 	    ) {
-		/*
-		 * OOPS! we lost a race, the TCP session got reset after
-		 * we checked SS_CANTSENDMORE, eg: while doing uiomove or a
-		 * network interrupt in the non-splnet() section of sosend().
-		 */
+		  
+                                                          
+                                                             
+                                                               
+     
 		if (m != NULL) {
 			m_freem(m);
 		}
@@ -1018,7 +1018,7 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 		}
 
 		if (inp == NULL) {
-			error = ECONNRESET;     /* XXX EPIPE? */
+			error = ECONNRESET;                     
 		} else {
 			error = EPROTOTYPE;
 		}
@@ -1046,12 +1046,12 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 	if (control != NULL) {
 		if (control->m_len > 0 && net_mpklog_enabled) {
 			error = tcp_get_mpkl_send_info(control, &mpkl_send_info);
-			/*
-			 * Intepretation of the returned code:
-			 *  0: client wants us to use value passed in SCM_MPKL_SEND_INFO
-			 *  1: SCM_MPKL_SEND_INFO was not present
-			 *  other: failure
-			 */
+			  
+                                         
+                                                                   
+                                            
+                     
+      
 			if (error != 0 && error != ENOMSG) {
 				m_freem(control);
 				if (m != NULL) {
@@ -1062,14 +1062,14 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 				goto out;
 			}
 		}
-		/*
-		 * Silently drop unsupported ancillary data messages
-		 */
+		  
+                                                      
+     
 		m_freem(control);
 		control = NULL;
 	}
 
-	/* MPTCP sublow socket buffers must not be compressed */
+	                                                        
 	VERIFY(!(so->so_flags & SOF_MP_SUBFLOW) ||
 	    (so->so_snd.sb_flags & SB_NOCOMPRESS));
 
@@ -1077,12 +1077,12 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 		sbappendstream(&so->so_snd, m);
 
 		if (nam && tp->t_state < TCPS_SYN_SENT) {
-			/*
-			 * Do implied connect if not yet connected,
-			 * initialize window to default value, and
-			 * initialize maxseg/maxopd using peer's cached
-			 * MSS.
-			 */
+			  
+                                              
+                                             
+                                                  
+          
+      
 			if (isipv6) {
 				error = tcp6_connect(tp, nam, p);
 			} else {
@@ -1098,15 +1098,15 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 
 			TCP_LOG_CONNECT(tp, true, error);
 
-			/* The sequence number of the data is past the SYN */
+			                                                     
 			mpkl_seq = tp->iss + 1;
 		}
 
 		if (flags & PRUS_EOF) {
-			/*
-			 * Close the send side of the connection after
-			 * the data is sent.
-			 */
+			  
+                                                 
+                       
+      
 			socantsendmore(so);
 			tp = tcp_usrclosed(tp);
 		}
@@ -1121,28 +1121,28 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 		}
 	} else {
 		if (sbspace(&so->so_snd) == 0) {
-			/* if no space is left in sockbuf,
-			 * do not try to squeeze in OOB traffic */
+			                                  
+                                             
 			m_freem(m);
 			error = ENOBUFS;
 			goto out;
 		}
-		/*
-		 * According to RFC961 (Assigned Protocols),
-		 * the urgent pointer points to the last octet
-		 * of urgent data.  We continue, however,
-		 * to consider it to indicate the first octet
-		 * of data past the urgent section.
-		 * Otherwise, snd_up should be one lower.
-		 */
+		  
+                                              
+                                                
+                                           
+                                               
+                                     
+                                           
+     
 		sbappendstream(&so->so_snd, m);
 		if (nam && tp->t_state < TCPS_SYN_SENT) {
-			/*
-			 * Do implied connect if not yet connected,
-			 * initialize window to default value, and
-			 * initialize maxseg/maxopd using peer's cached
-			 * MSS.
-			 */
+			  
+                                              
+                                             
+                                                  
+          
+      
 			if (isipv6) {
 				error = tcp6_connect(tp, nam, p);
 			} else {
@@ -1176,10 +1176,10 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 		    so->last_pid, so->so_log_seqn++);
 	}
 
-	/*
-	 * We wait for the socket to successfully connect before returning.
-	 * This allows us to signal a timeout to the application.
-	 */
+	  
+                                                                    
+                                                          
+    
 	if (so->so_state & SS_ISCONNECTING) {
 		if (so->so_state & SS_NBIO) {
 			error = EWOULDBLOCK;
@@ -1192,9 +1192,9 @@ tcp_usr_send(struct socket *so, int flags, struct mbuf *m,
 	    ((flags & PRUS_EOF) ? PRU_SEND_EOF : PRU_SEND));
 }
 
-/*
- * Abort the TCP.
- */
+  
+                 
+   
 static int
 tcp_usr_abort(struct socket *so)
 {
@@ -1203,7 +1203,7 @@ tcp_usr_abort(struct socket *so)
 	struct tcpcb *tp;
 
 	COMMON_START();
-	/* In case we got disconnected from the peer */
+	                                               
 	if (tp == NULL) {
 		goto out;
 	}
@@ -1213,14 +1213,14 @@ tcp_usr_abort(struct socket *so)
 	COMMON_END(PRU_ABORT);
 }
 
-/*
- * Receive out-of-band data.
- *
- * Returns:	0			Success
- *		EINVAL [COMMON_START]
- *		EINVAL
- *		EWOULDBLOCK
- */
+  
+                            
+  
+                       
+                         
+          
+               
+   
 static int
 tcp_usr_rcvoob(struct socket *so, struct mbuf *m, int flags)
 {
@@ -1257,13 +1257,13 @@ tcp_usr_preconnect(struct socket *so)
 
 #if NECP
 	if (necp_socket_should_use_flow_divert(inp)) {
-		/* May happen, if in tcp_usr_connect we did not had a chance
-		 * to set the usrreqs (due to some error). So, let's get out
-		 * of here.
-		 */
+		                                                            
+                                                              
+             
+     
 		goto out;
 	}
-#endif /* NECP */
+#endif           
 
 	error = tcp_output(sototcpcb(so));
 
@@ -1272,7 +1272,7 @@ tcp_usr_preconnect(struct socket *so)
 	COMMON_END(PRU_PRECONNECT);
 }
 
-/* xxx - should be const */
+                           
 struct pr_usrreqs tcp_usrreqs = {
 	.pru_abort =            tcp_usr_abort,
 	.pru_accept =           tcp_usr_accept,
@@ -1319,30 +1319,30 @@ struct pr_usrreqs tcp6_usrreqs = {
 	.pru_preconnect =       tcp_usr_preconnect,
 };
 
-/*
- * Common subroutine to open a TCP connection to remote host specified
- * by struct sockaddr_in in mbuf *nam.  Call in_pcbbind to assign a local
- * port number if needed.  Call in_pcbladdr to do the routing and to choose
- * a local host address (interface).  If there is an existing incarnation
- * of the same connection in TIME-WAIT state and if the remote host was
- * sending CC options and if the connection duration was < MSL, then
- * truncate the previous TIME-WAIT state and proceed.
- * Initialize connection parameters and enter SYN-SENT state.
- *
- * Returns:	0			Success
- *		EADDRINUSE
- *		EINVAL
- *	in_pcbbind:EADDRNOTAVAIL	Address not available.
- *	in_pcbbind:EINVAL		Invalid argument
- *	in_pcbbind:EAFNOSUPPORT		Address family not supported [notdef]
- *	in_pcbbind:EACCES		Permission denied
- *	in_pcbbind:EADDRINUSE		Address in use
- *	in_pcbbind:EAGAIN		Resource unavailable, try again
- *	in_pcbbind:EPERM		Operation not permitted
- *	in_pcbladdr:EINVAL		Invalid argument
- *	in_pcbladdr:EAFNOSUPPORT	Address family not supported
- *	in_pcbladdr:EADDRNOTAVAIL	Address not available
- */
+  
+                                                                      
+                                                                         
+                                                                           
+                                                                         
+                                                                       
+                                                                    
+                                                     
+                                                             
+  
+                       
+              
+          
+                                                  
+                                      
+                                                                 
+                                       
+                                        
+                                                     
+                                            
+                                       
+                                                        
+                                                  
+   
 static int
 tcp_connect(struct tcpcb *tp, struct sockaddr *nam, struct proc *p)
 {
@@ -1361,11 +1361,11 @@ tcp_connect(struct tcpcb *tp, struct sockaddr *nam, struct proc *p)
 		}
 	}
 
-	/*
-	 * Cannot simply call in_pcbconnect, because there might be an
-	 * earlier incarnation of this same connection still in
-	 * TIME_WAIT state, creating an ADDRINUSE error.
-	 */
+	  
+                                                               
+                                                        
+                                                 
+    
 	error = in_pcbladdr(inp, nam, &laddr, IFSCOPE_NONE, &outif, 0);
 	if (error) {
 		goto done;
@@ -1379,7 +1379,7 @@ tcp_connect(struct tcpcb *tp, struct sockaddr *nam, struct proc *p)
 
 	socket_lock(inp->inp_socket, 0);
 	if (oinp) {
-		if (oinp != inp) { /* 4143933: avoid deadlock if inp == oinp */
+		if (oinp != inp) {                                             
 			socket_lock(oinp->inp_socket, 1);
 		}
 		if (in_pcb_checkstate(oinp, WNT_RELEASE, 1) == WNT_STOPUSING) {
@@ -1415,14 +1415,14 @@ skip_oinp:
 		goto done;
 	}
 	if (!lck_rw_try_lock_exclusive(inp->inp_pcbinfo->ipi_lock)) {
-		/*lock inversion issue, mostly with udp multicast packets */
+		                                                            
 		socket_unlock(inp->inp_socket, 0);
 		lck_rw_lock_exclusive(inp->inp_pcbinfo->ipi_lock);
 		socket_lock(inp->inp_socket, 0);
 	}
 	if (inp->inp_laddr.s_addr == INADDR_ANY) {
 		inp->inp_laddr = laddr;
-		/* no reference needed */
+		                         
 		inp->inp_last_outifp = outif;
 
 		inp->inp_flags |= INP_INADDR_ANY;
@@ -1477,15 +1477,15 @@ tcp6_connect(struct tcpcb *tp, struct sockaddr *nam, struct proc *p)
 		}
 	}
 
-	/*
-	 * Cannot simply call in_pcbconnect, because there might be an
-	 * earlier incarnation of this same connection still in
-	 * TIME_WAIT state, creating an ADDRINUSE error.
-	 *
-	 * in6_pcbladdr() might return an ifp with its reference held
-	 * even in the error case, so make sure that it's released
-	 * whenever it's non-NULL.
-	 */
+	  
+                                                               
+                                                        
+                                                 
+   
+                                                              
+                                                           
+                           
+    
 	error = in6_pcbladdr(inp, nam, &addr6, &outif);
 	if (error) {
 		goto done;
@@ -1510,14 +1510,14 @@ tcp6_connect(struct tcpcb *tp, struct sockaddr *nam, struct proc *p)
 		}
 	}
 	if (!lck_rw_try_lock_exclusive(inp->inp_pcbinfo->ipi_lock)) {
-		/*lock inversion issue, mostly with udp multicast packets */
+		                                                            
 		socket_unlock(inp->inp_socket, 0);
 		lck_rw_lock_exclusive(inp->inp_pcbinfo->ipi_lock);
 		socket_lock(inp->inp_socket, 0);
 	}
 	if (IN6_IS_ADDR_UNSPECIFIED(&inp->in6p_laddr)) {
 		inp->in6p_laddr = addr6;
-		inp->in6p_last_outifp = outif;  /* no reference needed */
+		inp->in6p_last_outifp = outif;                           
 		inp->in6p_flags |= INP_IN6ADDR_ANY;
 	}
 	inp->in6p_faddr = sin6->sin6_addr;
@@ -1531,7 +1531,7 @@ tcp6_connect(struct tcpcb *tp, struct sockaddr *nam, struct proc *p)
 	if (inp->inp_flowhash == 0) {
 		inp->inp_flowhash = inp_calc_flowhash(inp);
 	}
-	/* update flowinfo - RFC 6437 */
+	                                
 	if (inp->inp_flow == 0 && inp->in6p_flags & IN6P_AUTOFLOWLABEL) {
 		inp->inp_flow &= ~IPV6_FLOWLABEL_MASK;
 		inp->inp_flow |=
@@ -1562,9 +1562,9 @@ done:
 	return error;
 }
 
-/*
- * Export TCP internal state information via a struct tcp_info
- */
+  
+                                                              
+   
 void
 tcp_fill_info(struct tcpcb *tp, struct tcp_info *ti)
 {
@@ -1591,7 +1591,7 @@ tcp_fill_info(struct tcpcb *tp, struct tcp_info *ti)
 			ti->tcpi_options |= TCPI_OPT_ECN;
 		}
 
-		/* Are we in retranmission episode */
+		                                     
 		if (IN_FASTRECOVERY(tp) || tp->t_rxtshift > 0) {
 			ti->tcpi_flags |= TCPI_FLAG_LOSSRECOVERY;
 		}
@@ -1619,7 +1619,7 @@ tcp_fill_info(struct tcpcb *tp, struct tcp_info *ti)
 		ti->tcpi_snd_nxt = tp->snd_nxt;
 		ti->tcpi_rcv_nxt = tp->rcv_nxt;
 
-		/* convert bytes/msec to bits/sec */
+		                                    
 		if ((tp->t_flagsext & TF_MEASURESNDBW) != 0 &&
 		    tp->t_bwmeas != NULL) {
 			ti->tcpi_snd_bw = (tp->t_bwmeas->bw_sndbw * 8000);
@@ -1628,14 +1628,14 @@ tcp_fill_info(struct tcpcb *tp, struct tcp_info *ti)
 		ti->tcpi_last_outif = (tp->t_inpcb->inp_last_outifp == NULL) ? 0 :
 		    tp->t_inpcb->inp_last_outifp->if_index;
 
-		//atomic_get_64(ti->tcpi_txbytes, &inp->inp_stat->txbytes);
+		                                                           
 		ti->tcpi_txpackets = inp->inp_stat->txpackets;
 		ti->tcpi_txbytes = inp->inp_stat->txbytes;
 		ti->tcpi_txretransmitbytes = tp->t_stat.txretransmitbytes;
 		ti->tcpi_txretransmitpackets = tp->t_stat.rxmitpkts;
 		ti->tcpi_txunacked = tp->snd_max - tp->snd_una;
 
-		//atomic_get_64(ti->tcpi_rxbytes, &inp->inp_stat->rxbytes);
+		                                                           
 		ti->tcpi_rxpackets = inp->inp_stat->rxpackets;
 		ti->tcpi_rxbytes = inp->inp_stat->rxbytes;
 		ti->tcpi_rxduplicatebytes = tp->t_stat.rxduplicatebytes;
@@ -2014,13 +2014,13 @@ tcp_set_keep_alive_offload(struct socket *so, struct proc *proc)
 	return error;
 }
 
-/*
- * The new sockopt interface makes it possible for us to block in the
- * copyin/out step (if we take a page fault).  Taking a page fault at
- * splnet() is probably a Bad Thing.  (Since sockets and pcbs both now
- * use TSM, there probably isn't any need for this function to run at
- * splnet() any more.  This needs more examination.)
- */
+  
+                                                                     
+                                                                     
+                                                                      
+                                                                     
+                                                    
+   
 int
 tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 {
@@ -2032,7 +2032,7 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 	if (inp == NULL) {
 		return ECONNRESET;
 	}
-	/* Allow <SOL_SOCKET,SO_FLUSH/SO_TRAFFIC_MGT_BACKGROUND> at this level */
+	                                                                         
 	if (sopt->sopt_level != IPPROTO_TCP &&
 	    !(sopt->sopt_level == SOL_SOCKET && (sopt->sopt_name == SO_FLUSH ||
 	    sopt->sopt_name == SO_TRAFFIC_MGT_BACKGROUND))) {
@@ -2073,7 +2073,7 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 				opt = TF_NOPUSH;
 				break;
 			default:
-				opt = 0; /* dead code to fool gcc */
+				opt = 0;                            
 				break;
 			}
 
@@ -2125,7 +2125,7 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 				tp->t_flagsext |= opt;
 			} else {
 				tp->t_flagsext &= ~opt;
-				/* Reset snd bw measurement state */
+				                                    
 				tp->t_flagsext &= ~(TF_BWMEAS_INPROGRESS);
 				if (tp->t_bwmeas != NULL) {
 					tcp_bwmeas_free(tp);
@@ -2186,7 +2186,7 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 				error = EINVAL;
 			} else {
 				tp->t_keepidle = optval * TCP_RETRANSHZ;
-				/* reset the timer to new value */
+				                                  
 				tp->t_timer[TCPT_KEEP] = OFFSET_FROM_START(tp,
 				    TCP_CONN_KEEPIDLE(tp));
 				tcp_check_timer_state(tp);
@@ -2481,10 +2481,10 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 				break;
 			}
 
-			/*
-			 * validate that the given marker id is not
-			 * a duplicate to avoid ambiguity
-			 */
+			  
+                                              
+                                    
+      
 			if ((error = tcp_notify_ack_id_valid(tp, so,
 			    optval)) != 0) {
 				break;
@@ -2529,7 +2529,7 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 			} else {
 				tp->t_rxt_minimum_timeout = min(optval,
 				    TCP_RXT_MINIMUM_TIMEOUT_LIMIT);
-				/* convert to milliseconds */
+				                             
 				tp->t_rxt_minimum_timeout *= TCP_RETRANSHZ;
 			}
 			break;
@@ -2627,7 +2627,7 @@ tcp_ctloutput(struct socket *so, struct sockopt *sopt)
 			tcp_fill_info(tp, &ti);
 			error = sooptcopyout(sopt, &ti, sizeof(struct tcp_info));
 			goto done;
-			/* NOT REACHED */
+			                 
 		}
 		case TCP_CONNECTION_INFO: {
 			struct tcp_connection_info tci;
@@ -2719,19 +2719,19 @@ done:
 	return error;
 }
 
-/*
- * tcp_sendspace and tcp_recvspace are the default send and receive window
- * sizes, respectively.  These are obsolescent (this information should
- * be set by the route).
- */
+  
+                                                                          
+                                                                       
+                        
+   
 u_int32_t       tcp_sendspace = 1448 * 256;
 u_int32_t       tcp_recvspace = 1448 * 384;
 
-/* During attach, the size of socket buffer allocated is limited to
- * sb_max in sbreserve. Disallow setting the tcp send and recv space
- * to be more than sb_max because that will cause tcp_attach to fail
- * (see radar 5713060)
- */
+                                                                   
+                                                                    
+                                                                    
+                      
+   
 static int
 sysctl_tcp_sospace(struct sysctl_oid *oidp, __unused void *arg1,
     int arg2, struct sysctl_req *req)
@@ -2773,24 +2773,24 @@ SYSCTL_PROC(_net_inet_tcp, TCPCTL_RECVSPACE, recvspace,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED, &tcp_recvspace,
     offsetof(skmem_sysctl, tcp.recvspace), sysctl_tcp_sospace,
     "IU", "Maximum incoming TCP datagram size");
-#else /* SYSCTL_SKMEM */
+#else                   
 SYSCTL_PROC(_net_inet_tcp, TCPCTL_SENDSPACE, sendspace, CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED,
     &tcp_sendspace, 0, &sysctl_tcp_sospace, "IU", "Maximum outgoing TCP datagram size");
 SYSCTL_PROC(_net_inet_tcp, TCPCTL_RECVSPACE, recvspace, CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED,
     &tcp_recvspace, 0, &sysctl_tcp_sospace, "IU", "Maximum incoming TCP datagram size");
-#endif /* SYSCTL_SKMEM */
+#endif                   
 
-/*
- * Attach TCP protocol to socket, allocating
- * internet protocol control block, tcp control block,
- * bufer space, and entering LISTEN state if to accept connections.
- *
- * Returns:	0			Success
- *	in_pcballoc:ENOBUFS
- *	in_pcballoc:ENOMEM
- *	in_pcballoc:???			[IPSEC specific]
- *	soreserve:ENOBUFS
- */
+  
+                                            
+                                                      
+                                                                   
+  
+                       
+                      
+                     
+                                     
+                    
+   
 static int
 tcp_attach(struct socket *so, struct proc *p)
 {
@@ -2826,15 +2826,15 @@ tcp_attach(struct socket *so, struct proc *p)
 
 	if (isipv6) {
 		inp->inp_vflag |= INP_IPV6;
-		inp->in6p_hops = -1;    /* use kernel default */
+		inp->in6p_hops = -1;                            
 	} else {
 		inp->inp_vflag |= INP_IPV4;
 	}
 	tp = tcp_newtcpcb(inp);
 	if (tp == NULL) {
-		int nofd = so->so_state & SS_NOFDREF;   /* XXX */
+		int nofd = so->so_state & SS_NOFDREF;            
 
-		so->so_state &= ~SS_NOFDREF;    /* don't free the socket yet */
+		so->so_state &= ~SS_NOFDREF;                                   
 		if (isipv6) {
 			in6_pcbdetach(inp);
 		} else {
@@ -2850,14 +2850,14 @@ tcp_attach(struct socket *so, struct proc *p)
 	return 0;
 }
 
-/*
- * Initiate (or continue) disconnect.
- * If embryonic state, just send reset (once).
- * If in ``let data drain'' option and linger null, just drop.
- * Otherwise (hard), mark socket disconnecting and drop
- * current input data; switch states based on user close, and
- * send segment to peer (with FIN).
- */
+  
+                                     
+                                              
+                                                              
+                                                       
+                                                             
+                                   
+   
 static struct tcpcb *
 tcp_disconnect(struct tcpcb *tp)
 {
@@ -2876,7 +2876,7 @@ tcp_disconnect(struct tcpcb *tp)
 		sbflush(&so->so_rcv);
 		tp = tcp_usrclosed(tp);
 #if MPTCP
-		/* A reset has been sent but socket exists, do not send FIN */
+		                                                              
 		if ((so->so_flags & SOF_MP_SUBFLOW) &&
 		    (tp) && (tp->t_mpflags & TMPF_RESET)) {
 			return tp;
@@ -2889,16 +2889,16 @@ tcp_disconnect(struct tcpcb *tp)
 	return tp;
 }
 
-/*
- * User issued close, and wish to trail through shutdown states:
- * if never received SYN, just forget it.  If got a SYN from peer,
- * but haven't sent FIN, then go to FIN_WAIT_1 state to send peer a FIN.
- * If already got a FIN from peer, then almost done; go to LAST_ACK
- * state.  In all other cases, have already sent FIN to peer (e.g.
- * after PRU_SHUTDOWN), and just have to play tedious game waiting
- * for peer to send FIN or not respond to keep-alives, etc.
- * We can let the user exit from the close as soon as the FIN is acked.
- */
+  
+                                                                
+                                                                  
+                                                                        
+                                                                   
+                                                                  
+                                                                  
+                                                           
+                                                                       
+   
 static struct tcpcb *
 tcp_usrclosed(struct tcpcb *tp)
 {
@@ -2933,7 +2933,7 @@ tcp_usrclosed(struct tcpcb *tp)
 	}
 	if (tp && tp->t_state >= TCPS_FIN_WAIT_2) {
 		soisdisconnected(tp->t_inpcb->inp_socket);
-		/* To prevent the connection hanging in FIN_WAIT_2 forever. */
+		                                                              
 		if (tp->t_state == TCPS_FIN_WAIT_2) {
 			tp->t_timer[TCPT_2MSL] = OFFSET_FROM_START(tp,
 			    TCP_CONN_MAXIDLE(tp));

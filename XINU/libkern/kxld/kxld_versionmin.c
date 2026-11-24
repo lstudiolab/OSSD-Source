@@ -35,8 +35,8 @@
 #include "kxld_util.h"
 #include "kxld_versionmin.h"
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_versionmin_init_from_macho(KXLDversionmin *versionmin, struct version_min_command *src)
 {
@@ -88,25 +88,25 @@ kxld_versionmin_init_from_build_cmd(KXLDversionmin *versionmin, struct build_ver
 	versionmin->has_versionmin = TRUE;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_versionmin_clear(KXLDversionmin *versionmin)
 {
 	bzero(versionmin, sizeof(*versionmin));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_versionmin_get_macho_header_size(__unused const KXLDversionmin *versionmin)
 {
-	/* TODO: eventually we can just use struct build_version_command */
+	                                                                   
 	return sizeof(struct version_min_command);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_versionmin_export_macho(const KXLDversionmin *versionmin, u_char *buf,
     u_long *header_offset, u_long header_size)

@@ -54,8 +54,8 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
 #ifndef _I386_IOPB_H_
 #define _I386_IOPB_H_
@@ -63,31 +63,31 @@
 #include <i386/tss.h>
 #include <kern/queue.h>
 
-/*
- * IO permission bitmap.
- *
- * Allows only IO ports 0 .. 0xffff: for ISA machines.
- */
+  
+                        
+  
+                                                      
+   
 
 #define iopb_howmany(a, b)       (((a)+(b)-1)/(b))
 
-#define IOPB_MAX        0xffff          /* x86 allows ports 0..ffff */
+#define IOPB_MAX        0xffff                                        
 #define IOPB_BYTES      (iopb_howmany(IOPB_MAX+1,8))
 
 typedef unsigned char   isa_iopb[IOPB_BYTES];
 
-/*
- * An IO permission map is a task segment with an IO permission bitmap.
- */
+  
+                                                                       
+   
 
 struct iopb_tss {
-	struct i386_tss tss;            /* task state segment */
-	isa_iopb        bitmap;         /* bitmap of mapped IO ports */
-	unsigned int    barrier;        /* bitmap barrier for CPU slop */
-	queue_head_t    io_port_list;   /* list of mapped IO ports */
-	int             iopb_desc[2];   /* descriptor for this TSS */
+	struct i386_tss tss;                                    
+	isa_iopb        bitmap;                                        
+	unsigned int    barrier;                                         
+	queue_head_t    io_port_list;                                
+	int             iopb_desc[2];                                
 };
 
 typedef struct iopb_tss *iopb_tss_t;
 
-#endif  /* _I386_IOPB_H_ */
+#endif                     

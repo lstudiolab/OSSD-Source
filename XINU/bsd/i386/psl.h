@@ -51,6 +51,6 @@
 #define PSL_ALLCC       EFL_ALLCC
 #define PSL_T           EFL_TF
 
-#endif  /* _BSD_I386_PSL_H_ */
+#endif                        
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

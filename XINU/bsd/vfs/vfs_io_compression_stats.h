@@ -46,7 +46,7 @@ void io_compression_stats(buf_t bp);
 #define io_compression_stats_dbg(fmt, ...)
 #endif
 
-/* iocs_store_buffer: Buffer that captures the stats of vnode being reclaimed */
+                                                                                
 struct iocs_store_buffer {
 	void*                   buffer;
 	uint32_t                current_position;
@@ -56,10 +56,10 @@ struct iocs_store_buffer {
 #define IOCS_STORE_BUFFER_NUM_SLOTS 10000
 #define IOCS_STORE_BUFFER_SIZE (IOCS_STORE_BUFFER_NUM_SLOTS * (sizeof(struct iocs_store_buffer_entry)))
 
-/* Notify user when the buffer is 80% full */
+                                             
 #define IOCS_STORE_BUFFER_NOTIFY_AT ((IOCS_STORE_BUFFER_SIZE * 8) / 10)
 
-/* Wait for the buffer to be 10% more full before notifying again */
+                                                                    
 #define IOCS_STORE_BUFFER_NOTIFICATION_INTERVAL (IOCS_STORE_BUFFER_SIZE / 10)
 
 #endif

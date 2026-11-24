@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _BSD_MACHINE_FASTTRAP_ISA_H_ */
+#endif                                   

@@ -148,7 +148,7 @@ vm_map_store_copy_reset_rb( vm_map_copy_t copy, vm_map_entry_t entry, int nentri
 	}
 }
 
-extern zone_t   vm_map_holes_zone;      /* zone for vm map holes (vm_map_links) structures */
+extern zone_t   vm_map_holes_zone;                                                           
 
 void
 vm_map_combine_hole(vm_map_t map, vm_map_entry_t hole_entry);
@@ -212,9 +212,9 @@ vm_map_delete_hole(vm_map_t map, vm_map_entry_t hole_entry)
 }
 
 
-/*
- * For Debugging.
- */
+  
+                 
+   
 
 #if DEBUG
 extern int vm_check_map_sanity;
@@ -276,9 +276,9 @@ check_map_sanity(vm_map_t map, vm_map_entry_t old_hole_entry)
 	}
 }
 
-/*
- * For debugging.
- */
+  
+                 
+   
 static void
 copy_hole_info(vm_map_entry_t hole_entry, vm_map_entry_t old_hole_entry)
 {
@@ -287,46 +287,46 @@ copy_hole_info(vm_map_entry_t hole_entry, vm_map_entry_t old_hole_entry)
 	old_hole_entry->vme_start = hole_entry->vme_start;
 	old_hole_entry->vme_end = hole_entry->vme_end;
 }
-#endif /* DEBUG */
+#endif            
 
 void
 update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry);
 void
 update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry)
 {
-	/*
-	 * Dealing with the deletion of an older entry.
-	 */
+	  
+                                                
+    
 
 	vm_map_entry_t          hole_entry, next_hole_entry;
 #if DEBUG
 	struct vm_map_entry     old_hole_entry;
-#endif /* DEBUG */
+#endif            
 	boolean_t               create_new_hole = TRUE;
 
 	hole_entry = CAST_TO_VM_MAP_ENTRY(map->hole_hint);
 
 	if (hole_entry) {
 		if (hole_entry->vme_end == old_entry->vme_start) {
-			/*
-			 * Found a hole right after above our entry.
-			 * Hit.
-			 */
+			  
+                                               
+          
+      
 		} else if (hole_entry->vme_start == old_entry->vme_end) {
 			if (hole_entry != CAST_TO_VM_MAP_ENTRY(map->holes_list)) {
-				/*
-				 * Found a hole right after below our entry but
-				 * make sure we don't erroneously extend backwards.
-				 *
-				 * Hit.
-				 */
+				  
+                                                   
+                                                       
+      
+           
+       
 
 				hole_entry = hole_entry->vme_prev;
 			}
 		} else if (hole_entry->vme_start > old_entry->vme_end) {
-			/*
-			 * Useless hint. Start from the top.
-			 */
+			  
+                                       
+      
 
 			hole_entry = CAST_TO_VM_MAP_ENTRY(map->holes_list);
 		}
@@ -351,18 +351,18 @@ update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry)
 		while (1) {
 			next_hole_entry = hole_entry->vme_next;
 
-			/*
-			 * Hole is right above the entry.
-			 */
+			  
+                                    
+      
 			if (hole_entry->vme_end == old_entry->vme_start) {
 #if DEBUG
 				copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
-				/*
-				 * Is there another hole right below the entry?
-				 * Can we combine holes?
-				 */
+				  
+                                                   
+                            
+       
 
 				if (old_entry->vme_end == hole_entry->vme_next->vme_start) {
 					vm_map_combine_hole(map, hole_entry);
@@ -374,17 +374,17 @@ update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry)
 				if (vm_check_map_sanity) {
 					check_map_sanity(map, &old_hole_entry);
 				}
-#endif /* DEBUG */
+#endif            
 				break;
 			}
 
-			/*
-			 * Hole is right below the entry.
-			 */
+			  
+                                    
+      
 			if (hole_entry->vme_start == old_entry->vme_end) {
 #if DEBUG
 				copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
 				hole_entry->vme_start = old_entry->vme_start;
 				create_new_hole = FALSE;
@@ -393,19 +393,19 @@ update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry)
 				if (vm_check_map_sanity) {
 					check_map_sanity(map, &old_hole_entry);
 				}
-#endif /* DEBUG */
+#endif            
 				break;
 			}
 
-			/*
-			 * Hole is beyond our entry. Let's go back to the last hole
-			 * before our entry so we have the right place to link up the
-			 * new hole that will be needed.
-			 */
+			  
+                                                              
+                                                                
+                                   
+      
 			if (hole_entry->vme_start > old_entry->vme_end) {
 #if DEBUG
 				copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
 				if (hole_entry != CAST_TO_VM_MAP_ENTRY(map->holes_list)) {
 					assert(hole_entry->vme_start != old_entry->vme_start);
@@ -429,11 +429,11 @@ update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry)
 
 		new_hole_entry = zalloc(vm_map_holes_zone);
 
-		/*
-		 * First hole in the map?
-		 * OR
-		 * A hole that is located above the current first hole in the map?
-		 */
+		  
+                           
+       
+                                                                    
+     
 		if (map->holes_list == NULL || (hole_entry == CAST_TO_VM_MAP_ENTRY(map->holes_list) && hole_entry->vme_start > old_entry->vme_start)) {
 			if (map->holes_list == NULL) {
 				map->holes_list = new_hole_entry;
@@ -470,7 +470,7 @@ update_holes_on_entry_deletion(vm_map_t map, vm_map_entry_t old_entry)
 	if (vm_check_map_sanity) {
 		check_map_sanity(map, &old_hole_entry);
 	}
-#endif /* DEBUG */
+#endif            
 
 	SAVE_HINT_HOLE_WRITE(map, (struct vm_map_links*) hole_entry);
 	return;
@@ -487,18 +487,18 @@ update_holes_on_entry_creation(vm_map_t map, vm_map_entry_t new_entry)
 	struct vm_map_entry             old_hole_entry;
 	vm_map_entry_t                  tmp_entry;
 	boolean_t                               check_map_with_hole_sanity = TRUE;
-#endif /* DEBUG */
+#endif            
 
-	/*
-	 * Case A: The entry is aligned exactly with the start and end of the hole.
-	 *	   This will delete the hole.
-	 *
-	 * Case B: The entry is completely within a hole but NOT aligned with the start/end of the hole.
-	 *	   This  will split a hole.
-	 *
-	 * Case C: The entry overlaps with the hole. The entry could be extending upwards (C1) or downwards (C2).
-	 *	   This will reduce the size of the hole or delete the hole completely if it is smaller than the entry.
-	 */
+	  
+                                                                            
+                                 
+   
+                                                                                                 
+                               
+   
+                                                                                                          
+                                                                                                           
+    
 
 	hole_entry = CAST_TO_VM_MAP_ENTRY(map->holes_list);
 	assert(hole_entry);
@@ -506,39 +506,39 @@ update_holes_on_entry_creation(vm_map_t map, vm_map_entry_t new_entry)
 
 	while (1) {
 #if DEBUG
-		/*
-		 * If the entry doesn't exist in the RB tree, we are likely dealing with copy maps where
-		 * the entries belonging to the copy map are linked into the list of entries silently and
-		 * then added to the RB-tree later on.
-		 * So sanity checks are useless in that case.
-		 */
+		  
+                                                                                          
+                                                                                           
+                                        
+                                               
+     
 		check_map_with_hole_sanity = vm_map_lookup_entry(map, new_entry->vme_start, &tmp_entry);
-#endif /* DEBUG */
+#endif            
 
 		if (hole_entry->vme_start == new_entry->vme_start &&
 		    hole_entry->vme_end == new_entry->vme_end) {
-			/* Case A */
+			            
 #if DEBUG
 			copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
-			/*
-			 * This check makes sense only for regular maps, not copy maps.
-			 * With a regular map, the VM entry is first linked and then
-			 * the hole is deleted. So the check below, which makes sure that
-			 * the map's bounds are being respected, is valid.
-			 * But for copy maps, the hole is deleted before the VM entry is
-			 * linked (vm_map_store_copy_insert) and so this check is invalid.
-			 *
-			 *  if (hole_entry == (vm_map_entry_t) map->holes_list) {
-			 *
-			 *       if (hole_entry->vme_next == (vm_map_entry_t) map->holes_list) {
-			 *
-			 *               next_hole_entry = vm_map_last_entry(map);
-			 *               assert(next_hole_entry->vme_end >= map->max_offset);
-			 *       }
-			 *  }
-			 */
+			  
+                                                                  
+                                                               
+                                                                    
+                                                     
+                                                                   
+                                                                     
+     
+                                                            
+     
+                                                                           
+     
+                                                             
+                                                                        
+             
+        
+      
 
 			vm_map_delete_hole(map, hole_entry);
 
@@ -546,18 +546,18 @@ update_holes_on_entry_creation(vm_map_t map, vm_map_entry_t new_entry)
 			if (vm_check_map_sanity && check_map_with_hole_sanity) {
 				check_map_sanity(map, &old_hole_entry);
 			}
-#endif /* DEBUG */
+#endif            
 			return;
 		} else if (hole_entry->vme_start < new_entry->vme_start &&
 		    hole_entry->vme_end > new_entry->vme_end) {
-			/* Case B */
+			            
 			struct vm_map_links *new_hole_entry = NULL;
 
 			new_hole_entry = zalloc(vm_map_holes_zone);
 
 #if DEBUG
 			copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
 			new_hole_entry->prev = hole_entry;
 			new_hole_entry->next = hole_entry->vme_next;
@@ -575,18 +575,18 @@ update_holes_on_entry_creation(vm_map_t map, vm_map_entry_t new_entry)
 			if (vm_check_map_sanity && check_map_with_hole_sanity) {
 				check_map_sanity(map, &old_hole_entry);
 			}
-#endif /* DEBUG */
+#endif            
 
 			SAVE_HINT_HOLE_WRITE(map, (struct vm_map_links*) hole_entry);
 			return;
 		} else if ((new_entry->vme_start <= hole_entry->vme_start) && (hole_entry->vme_start < new_entry->vme_end)) {
-			/*
-			 * Case C1: Entry moving upwards and a part/full hole lies within the bounds of the entry.
-			 */
+			  
+                                                                                             
+      
 
 #if DEBUG
 			copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
 			if (hole_entry->vme_end <= new_entry->vme_end) {
 				vm_map_delete_hole(map, hole_entry);
@@ -599,17 +599,17 @@ update_holes_on_entry_creation(vm_map_t map, vm_map_entry_t new_entry)
 			if (vm_check_map_sanity && check_map_with_hole_sanity) {
 				check_map_sanity(map, &old_hole_entry);
 			}
-#endif /* DEBUG */
+#endif            
 
 			return;
 		} else if ((new_entry->vme_start < hole_entry->vme_end) && (hole_entry->vme_end <= new_entry->vme_end)) {
-			/*
-			 * Case C2: Entry moving downwards and a part/full hole lies within the bounds of the entry.
-			 */
+			  
+                                                                                               
+      
 
 #if DEBUG
 			copy_hole_info(hole_entry, &old_hole_entry);
-#endif /* DEBUG */
+#endif            
 
 			if (hole_entry->vme_start >= new_entry->vme_start) {
 				vm_map_delete_hole(map, hole_entry);
@@ -622,7 +622,7 @@ update_holes_on_entry_creation(vm_map_t map, vm_map_entry_t new_entry)
 			if (vm_check_map_sanity && check_map_with_hole_sanity) {
 				check_map_sanity(map, &old_hole_entry);
 			}
-#endif /* DEBUG */
+#endif            
 
 			return;
 		}
@@ -651,38 +651,38 @@ void
 update_first_free_rb(vm_map_t map, vm_map_entry_t entry, boolean_t new_entry_creation)
 {
 	if (map->holelistenabled) {
-		/*
-		 * Holes can be used to track ranges all the way up to MACH_VM_MAX_ADDRESS or more (e.g. kernel map).
-		 */
+		  
+                                                                                                       
+     
 		vm_map_offset_t max_valid_offset = (map->max_offset > MACH_VM_MAX_ADDRESS) ? map->max_offset : MACH_VM_MAX_ADDRESS;
 
-		/*
-		 * Clipping an entry will not result in the creation/deletion/modification of
-		 * a hole. Those calls pass NULL for their target entry.
-		 */
+		  
+                                                                               
+                                                          
+     
 		if (entry == NULL) {
 			return;
 		}
 
-		/*
-		 * Commpage is pinned beyond the map's max offset. That shouldn't affect the
-		 * holes within the bounds of the map.
-		 */
+		  
+                                                                              
+                                        
+     
 		if (vm_map_trunc_page(entry->vme_start, VM_MAP_PAGE_MASK(map)) >= max_valid_offset) {
 			return;
 		}
 
-		/*
-		 *
-		 * Note:
-		 *
-		 * - A new entry has already been added to the map
-		 * OR
-		 * - An older entry has already been deleted from the map
-		 *
-		 * We are updating the hole list after the fact (except in one special case involving copy maps).
-		 *
-		 */
+		  
+    
+          
+    
+                                                    
+       
+                                                           
+    
+                                                                                                   
+    
+     
 
 		if (new_entry_creation) {
 			update_holes_on_entry_creation(map, entry);

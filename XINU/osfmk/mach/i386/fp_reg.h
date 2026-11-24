@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _I386_FP_SAVE_H_
 #define _I386_FP_SAVE_H_
@@ -63,33 +63,33 @@
 
 
 struct  x86_fx_thread_state {
-	unsigned short  fx_control;     /* control */
-	unsigned short  fx_status;      /* status */
-	unsigned char   fx_tag;         /* register tags */
-	unsigned char   fx_bbz1;        /* better be zero when calling fxrtstor */
+	unsigned short  fx_control;                  
+	unsigned short  fx_status;                  
+	unsigned char   fx_tag;                            
+	unsigned char   fx_bbz1;                                                  
 	unsigned short  fx_opcode;
 	union {
-		struct {                /* 32-bit layout: */
-			unsigned int    fx_eip; /* eip  instruction */
-			unsigned short  fx_cs;  /* cs instruction */
-			unsigned short  fx_bbz2;/* better be zero when calling fxrtstor */
-			unsigned int    fx_dp;  /* data address */
-			unsigned short  fx_ds;  /* data segment */
-			unsigned short  fx_bbz3;/* better be zero when calling fxrtstor */
+		struct {                                    
+			unsigned int    fx_eip;                       
+			unsigned short  fx_cs;                      
+			unsigned short  fx_bbz2;                                          
+			unsigned int    fx_dp;                    
+			unsigned short  fx_ds;                    
+			unsigned short  fx_bbz3;                                          
 		};
-		struct {                /* 64-bit layout: */
-			uint64_t        fx_rip; /* instruction pointer */
-			uint64_t        fx_rdp; /* data pointer */
+		struct {                                    
+			uint64_t        fx_rip;                          
+			uint64_t        fx_rdp;                   
 		};
 	};
 	unsigned int    fx_MXCSR;
 	unsigned int    fx_MXCSR_MASK;
-	unsigned short  fx_reg_word[8][8];      /* STx/MMx registers */
-	unsigned short  fx_XMM_reg[8][16];      /* XMM0-XMM15 on 64 bit processors */
-	                                        /* XMM0-XMM7  on 32 bit processors... unused storage reserved */
+	unsigned short  fx_reg_word[8][8];                             
+	unsigned short  fx_XMM_reg[8][16];                                           
+	                                                                                                        
 
-	unsigned char   fx_reserved[16 * 5];      /* reserved by intel for future
-	                                           * expansion */
+	unsigned char   fx_reserved[16 * 5];                                     
+                                                          
 	unsigned int    fp_valid;
 	unsigned int    fp_save_layout;
 	unsigned char   fx_pad[8];
@@ -107,24 +107,24 @@ typedef struct { reg256_t lo256, hi256; }__attribute__ ((packed)) reg512_t;
 
 struct x86_avx_thread_state {
 	struct x86_fx_thread_state      fp;
-	struct xsave_header             _xh;                    /* Offset 512, xsave header */
-	reg128_t                        x_YMM_Hi128[16];        /* Offset 576, high YMMs `*/
-	                                                        /* Offset 832, end */
+	struct xsave_header             _xh;                                                  
+	reg128_t                        x_YMM_Hi128[16];                                    
+	                                                                             
 }__attribute__ ((packed));
 
 struct x86_avx512_thread_state {
 	struct x86_fx_thread_state      fp;
-	struct xsave_header             _xh;                    /* Offset 512, xsave header */
-	reg128_t                        x_YMM_Hi128[16];        /* Offset 576, high YMMs */
+	struct xsave_header             _xh;                                                  
+	reg128_t                        x_YMM_Hi128[16];                                   
 
-	uint64_t                        x_pad[16];              /* Offset 832, unused AMD LWP */
-	uint64_t                        x_BNDREGS[8];           /* Offset 960, unused MPX */
-	uint64_t                        x_BNDCTL[8];            /* Offset 1024, unused MPX */
+	uint64_t                        x_pad[16];                                              
+	uint64_t                        x_BNDREGS[8];                                       
+	uint64_t                        x_BNDCTL[8];                                         
 
-	uint64_t                        x_Opmask[8];            /* Offset 1088, K0-K7 */
-	reg256_t                        x_ZMM_Hi256[16];        /* Offset 1152, ZMM0..15[511:256] */
-	reg512_t                        x_Hi16_ZMM[16];         /* Offset 1664, ZMM16..31[511:0] */
-	                                                        /* Offset 2688, end */
+	uint64_t                        x_Opmask[8];                                    
+	reg256_t                        x_ZMM_Hi256[16];                                            
+	reg512_t                        x_Hi16_ZMM[16];                                            
+	                                                                              
 }__attribute__ ((packed));
 
 typedef union {
@@ -133,65 +133,65 @@ typedef union {
 	struct x86_avx512_thread_state  avx512;
 } x86_ext_thread_state_t;
 
-#define EVEX_PREFIX     0x62            /* AVX512's EVEX vector operation prefix */
-#define VEX2_PREFIX     0xC5            /* VEX 2-byte prefix for Opmask instructions */
-#define VEX3_PREFIX     0xC4            /* VEX 3-byte prefix for Opmask instructions */
+#define EVEX_PREFIX     0x62                                                       
+#define VEX2_PREFIX     0xC5                                                           
+#define VEX3_PREFIX     0xC4                                                           
 
-#endif /* MACH_KERNEL_PRIVATE */
-/*
- * Control register
- */
-#define FPC_IE          0x0001          /* enable invalid operation
-	                                 *  exception */
+#endif                          
+  
+                   
+   
+#define FPC_IE          0x0001                                     
+                                                 
 #define FPC_IM          FPC_IE
-#define FPC_DE          0x0002          /* enable denormalized operation
-	                                 *  exception */
+#define FPC_DE          0x0002                                          
+                                                 
 #define FPC_DM          FPC_DE
-#define FPC_ZE          0x0004          /* enable zero-divide exception */
+#define FPC_ZE          0x0004                                            
 #define FPC_ZM          FPC_ZE
-#define FPC_OE          0x0008          /* enable overflow exception */
+#define FPC_OE          0x0008                                         
 #define FPC_OM          FPC_OE
-#define FPC_UE          0x0010          /* enable underflow exception */
-#define FPC_PE          0x0020          /* enable precision exception */
-#define FPC_PC          0x0300          /* precision control: */
-#define FPC_PC_24       0x0000                  /* 24 bits */
-#define FPC_PC_53       0x0200                  /* 53 bits */
-#define FPC_PC_64       0x0300                  /* 64 bits */
-#define FPC_RC          0x0c00          /* rounding control: */
-#define FPC_RC_RN       0x0000                  /* round to nearest or even */
-#define FPC_RC_RD       0x0400                  /* round down */
-#define FPC_RC_RU       0x0800                  /* round up */
-#define FPC_RC_CHOP     0x0c00                  /* chop */
-#define FPC_IC          0x1000          /* infinity control (obsolete) */
-#define FPC_IC_PROJ     0x0000                  /* projective infinity */
-#define FPC_IC_AFF      0x1000                  /* affine infinity (std) */
+#define FPC_UE          0x0010                                          
+#define FPC_PE          0x0020                                          
+#define FPC_PC          0x0300                                  
+#define FPC_PC_24       0x0000                               
+#define FPC_PC_53       0x0200                               
+#define FPC_PC_64       0x0300                               
+#define FPC_RC          0x0c00                                 
+#define FPC_RC_RN       0x0000                                                
+#define FPC_RC_RD       0x0400                                  
+#define FPC_RC_RU       0x0800                                
+#define FPC_RC_CHOP     0x0c00                            
+#define FPC_IC          0x1000                                           
+#define FPC_IC_PROJ     0x0000                                           
+#define FPC_IC_AFF      0x1000                                             
 
-/*
- * Status register
- */
-#define FPS_IE          0x0001          /* invalid operation */
-#define FPS_DE          0x0002          /* denormalized operand */
-#define FPS_ZE          0x0004          /* divide by zero */
-#define FPS_OE          0x0008          /* overflow */
-#define FPS_UE          0x0010          /* underflow */
-#define FPS_PE          0x0020          /* precision */
-#define FPS_SF          0x0040          /* stack flag */
-#define FPS_ES          0x0080          /* error summary */
-#define FPS_C0          0x0100          /* condition code bit 0 */
-#define FPS_C1          0x0200          /* condition code bit 1 */
-#define FPS_C2          0x0400          /* condition code bit 2 */
-#define FPS_TOS         0x3800          /* top-of-stack pointer */
+  
+                  
+   
+#define FPS_IE          0x0001                                 
+#define FPS_DE          0x0002                                    
+#define FPS_ZE          0x0004                              
+#define FPS_OE          0x0008                        
+#define FPS_UE          0x0010                         
+#define FPS_PE          0x0020                         
+#define FPS_SF          0x0040                          
+#define FPS_ES          0x0080                             
+#define FPS_C0          0x0100                                    
+#define FPS_C1          0x0200                                    
+#define FPS_C2          0x0400                                    
+#define FPS_TOS         0x3800                                    
 #define FPS_TOS_SHIFT   11
-#define FPS_C3          0x4000          /* condition code bit 3 */
-#define FPS_BUSY        0x8000          /* FPU busy */
+#define FPS_C3          0x4000                                    
+#define FPS_BUSY        0x8000                        
 
-/*
- * Kind of floating-point support provided by kernel.
- */
-#define FP_NO           0               /* no floating point */
-#define FP_SOFT         1               /* software FP emulator */
-#define FP_287          2               /* 80287 */
-#define FP_387          3               /* 80387 or 80486 */
-#define FP_FXSR         4               /* Fast save/restore SIMD Extension */
+  
+                                                     
+   
+#define FP_NO           0                                      
+#define FP_SOFT         1                                         
+#define FP_287          2                          
+#define FP_387          3                                   
+#define FP_FXSR         4                                                     
 
-#endif  /* _I386_FP_SAVE_H_ */
+#endif                        

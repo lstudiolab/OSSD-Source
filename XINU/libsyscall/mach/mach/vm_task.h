@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
-** This file contains compatibilty wrapper header for things that are
-** generated from mach/vm_map.defs into mach/vm_map.h.
-**
-** This file will go away eventually - please switch.
-*/
+  
+                                                                     
+                                                      
+  
+                                                     
+  
 #include <mach/vm_map.h>

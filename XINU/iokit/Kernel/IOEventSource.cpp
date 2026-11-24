@@ -60,7 +60,7 @@ IOEventSource::checkForWork()
 	return false;
 }
 
-/* inline function implementations */
+                                     
 
 #if IOKITSTATS
 
@@ -92,7 +92,7 @@ do { \
 #define IOStatisticsOpenGate()
 #define IOStatisticsCloseGate()
 
-#endif /* IOKITSTATS */
+#endif                 
 
 void
 IOEventSource::signalWorkAvailable()

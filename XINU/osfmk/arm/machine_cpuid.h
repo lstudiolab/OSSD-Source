@@ -28,7 +28,7 @@
 #ifndef _ARM_MACHINE_CPUID_H_
 #define _ARM_MACHINE_CPUID_H_
 
-/* CPU feature identification */
+                                
 
 typedef struct {
 	uint32_t        arm_32bit_isa   : 4,
@@ -43,7 +43,7 @@ typedef union {
 	uint32_t                        value;
 } arm_feature0_reg_t;
 
-// Register 0, subtype 21: Instruction Set Features #1
+                                                      
 typedef struct{
 	uint32_t endianness_support     : 4;
 	uint32_t exception_1_support    : 4;
@@ -63,9 +63,9 @@ typedef union {
 
 arm_isa_feat1_reg machine_read_isa_feat1(void);
 
-/* Debug identification */
+                          
 
-/* ID_DFR0 */
+             
 typedef union {
 	struct {
 		uint32_t    coprocessor_core_debug      : 4,
@@ -78,7 +78,7 @@ typedef union {
 	uint32_t value;
 } arm_cpuid_id_dfr0;
 
-/* DBGDIDR */
+             
 typedef union {
 	struct {
 		uint32_t    revision                    : 4,
@@ -103,4 +103,4 @@ typedef struct {
 	uint32_t                num_breakpoint_pairs;
 } arm_debug_info_t;
 
-#endif /* _ARM_MACHINE_CPUID_H_ */
+#endif                            

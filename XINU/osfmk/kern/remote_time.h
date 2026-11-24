@@ -34,28 +34,28 @@
 #include <os/overflow.h>
 
 __BEGIN_DECLS
-/* bt_params is an ABI for tracing tools */
+                                           
 struct bt_params {
 	double rate;
 	uint64_t base_local_ts;
 	uint64_t base_remote_ts;
 };
 
-/* local_ts_ns should be in nanoseconds */
+                                          
 static inline uint64_t
 mach_bridge_compute_timestamp(uint64_t local_ts_ns, struct bt_params *params)
 {
 	if (!params || params->rate == 0.0) {
 		return 0;
 	}
-	/*
-	 * Formula to compute remote_timestamp
-	 * remote_timestamp = (bt_params.rate * (local_ts_ns - bt_params.base_local_ts))
-	 *	 +  bt_params.base_remote_ts
-	 */
+	  
+                                       
+                                                                                 
+                                
+    
 	int64_t remote_ts = 0;
 	int64_t rate_prod = 0;
-	/* To avoid precision loss due to typecasting from int64_t to double */
+	                                                                       
 	if (params->rate != 1.0) {
 		rate_prod = (int64_t)(params->rate * (double)((int64_t)local_ts_ns - (int64_t)params->base_local_ts));
 	} else {
@@ -79,4 +79,4 @@ extern lck_spin_t bt_ts_conversion_lock;
 
 __END_DECLS
 
-#endif /* REMOTE_TIME_H */
+#endif                    

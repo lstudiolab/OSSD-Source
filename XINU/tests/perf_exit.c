@@ -22,7 +22,7 @@ T_GLOBAL_META(
 #else
 #define TEST_TIMEOUT 1800 * (NSEC_PER_SEC)
 #endif
-// From bsd/sys/proc_internal.h
+                               
 #define PID_MAX 99999
 
 #define EXIT_BINARY "perf_exit_proc"
@@ -107,7 +107,7 @@ T_DECL(exit, "exit(2) time from syscall start to end", T_META_TIMEOUT(TEST_TIMEO
 	ktrace_set_signal_handler(session);
 	ktrace_set_execnames_enabled(session, KTRACE_FEATURE_ENABLED);
 
-	// We are only interested in the processes we launched and ourselves
+	                                                                    
 	ktrace_filter_process(session, EXIT_BINARY);
 	ktrace_filter_process(session, "perf_exit");
 
@@ -149,7 +149,7 @@ T_DECL(exit, "exit(2) time from syscall start to end", T_META_TIMEOUT(TEST_TIMEO
 	T_ASSERT_POSIX_ZERO(ret, "starting trace");
 	tracing_on = true;
 
-	// Spawn processes continuously until the test is over
+	                                                      
 
 	__block void (^spawn_process)(void) = Block_copy(^(void) {
 		char nthreads_buf[32], mem_buf[32];
@@ -175,7 +175,7 @@ T_DECL(exit, "exit(2) time from syscall start to end", T_META_TIMEOUT(TEST_TIMEO
 		        T_ASSERT_FAIL("child process failed to run");
 		}
 
-		// Avoid saturating the CPU with new processes
+		                                              
 		usleep(1000);
 
 		dispatch_async(spawn_queue, spawn_process);

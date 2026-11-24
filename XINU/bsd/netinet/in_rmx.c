@@ -55,18 +55,18 @@
  *
  */
 
-/*
- * This code does two things necessary for the enhanced TCP metrics to
- * function in a useful manner:
- *  1) It marks all non-host routes as `cloning', thus ensuring that
- *     every actual reference to such a route actually gets turned
- *     into a reference to a host route to the specific destination
- *     requested.
- *  2) When such routes lose all their references, it arranges for them
- *     to be deleted in some random collection of circumstances, so that
- *     a large quantity of stale routing data is not kept in kernel memory
- *     indefinitely.  See in_rtqtimo() below for the exact mechanism.
- */
+  
+                                                                      
+                               
+                                                                    
+                                                                  
+                                                                   
+                 
+                                                                       
+                                                                        
+                                                                          
+                                                                     
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -90,7 +90,7 @@
 
 extern int tvtohz(struct timeval *);
 
-static int in_rtqtimo_run;              /* in_rtqtimo is scheduled to run */
+static int in_rtqtimo_run;                                                  
 static void in_rtqtimo(void *);
 static void in_sched_rtqtimo(struct timeval *);
 
@@ -106,9 +106,9 @@ static int in_rtqkill(struct radix_node *, void *);
 
 static int in_ifadownkill(struct radix_node *, void *);
 
-/*
- * Do what we need to do when inserting a route.
- */
+  
+                                                
+   
 static struct radix_node *
 in_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
     struct radix_node *treenodes)
@@ -127,9 +127,9 @@ in_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
 		rt_str(rt, dbuf, sizeof(dbuf), gbuf, sizeof(gbuf));
 	}
 
-	/*
-	 * For IP, all unicast non-host routes are automatically cloning.
-	 */
+	  
+                                                                  
+    
 	if (IN_MULTICAST(ntohl(sin->sin_addr.s_addr))) {
 		rt->rt_flags |= RTF_MULTICAST;
 	}
@@ -138,27 +138,27 @@ in_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
 		rt->rt_flags |= RTF_PRCLONING;
 	}
 
-	/*
-	 * A little bit of help for both IP output and input:
-	 *   For host routes, we make sure that RTF_BROADCAST
-	 *   is set for anything that looks like a broadcast address.
-	 *   This way, we can avoid an expensive call to in_broadcast()
-	 *   in ip_output() most of the time (because the route passed
-	 *   to ip_output() is almost always a host route).
-	 *
-	 *   We also do the same for local addresses, with the thought
-	 *   that this might one day be used to speed up ip_input().
-	 *
-	 * We also mark routes to multicast addresses as such, because
-	 * it's easy to do and might be useful (but this is much more
-	 * dubious since it's so easy to inspect the address).  (This
-	 * is done above.)
-	 */
+	  
+                                                      
+                                                      
+                                                              
+                                                                
+                                                               
+                                                    
+   
+                                                               
+                                                             
+   
+                                                               
+                                                              
+                                                              
+                   
+    
 	if (rt->rt_flags & RTF_HOST) {
 		if (in_broadcast(sin->sin_addr, rt->rt_ifp)) {
 			rt->rt_flags |= RTF_BROADCAST;
 		} else {
-			/* Become a regular mutex */
+			                            
 			RT_CONVERT_LOCK(rt);
 			IFA_LOCK_SPIN(rt->rt_ifa);
 			if (satosin(rt->rt_ifa->ifa_addr)->sin_addr.s_addr ==
@@ -174,7 +174,7 @@ in_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
 		rt->rt_rmx.rmx_mtu = rt->rt_ifp->if_mtu;
 		if (INTF_ADJUST_MTU_FOR_CLAT46(rt->rt_ifp)) {
 			rt->rt_rmx.rmx_mtu = IN6_LINKMTU(rt->rt_ifp);
-			/* Further adjust the size for CLAT46 expansion */
+			                                                  
 			rt->rt_rmx.rmx_mtu -= CLAT46_HDR_EXPANSION_OVERHD;
 		}
 	}
@@ -182,11 +182,11 @@ in_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
 	ret = rn_addroute(v_arg, n_arg, head, treenodes);
 	if (ret == NULL && (rt->rt_flags & RTF_HOST)) {
 		struct rtentry *rt2;
-		/*
-		 * We are trying to add a host route, but can't.
-		 * Find out if it is because of an
-		 * ARP entry and delete it if so.
-		 */
+		  
+                                                  
+                                    
+                                   
+     
 		rt2 = rtalloc1_scoped_locked(rt_key(rt), 0,
 		    RTF_CLONING | RTF_PRCLONING, sin_get_ifscope(rt_key(rt)));
 		if (rt2 != NULL) {
@@ -214,12 +214,12 @@ in_addroute(void *v_arg, void *n_arg, struct radix_node_head *head,
 					    rt2->rt_ifp->if_xname : "",
 					    rt2->rt_flags, RTF_BITS);
 				}
-				/*
-				 * Safe to drop rt_lock and use rt_key,
-				 * rt_gateway, since holding rnh_lock here
-				 * prevents another thread from calling
-				 * rt_setgate() on this route.
-				 */
+				  
+                                           
+                                              
+                                           
+                                  
+       
 				RT_UNLOCK(rt2);
 				(void) rtrequest_locked(RTM_DELETE, rt_key(rt2),
 				    rt2->rt_gateway, rt_mask(rt2),
@@ -282,9 +282,9 @@ in_deleteroute(void *v_arg, void *netmask_arg, struct radix_node_head *head)
 	return rn;
 }
 
-/*
- * Validate (unexpire) an expiring AF_INET route.
- */
+  
+                                                 
+   
 struct radix_node *
 in_validate(struct radix_node *rn)
 {
@@ -292,7 +292,7 @@ in_validate(struct radix_node *rn)
 
 	RT_LOCK_ASSERT_HELD(rt);
 
-	/* This is first reference? */
+	                              
 	if (rt->rt_refcnt == 0) {
 		if (rt_verbose > 2) {
 			char dbuf[MAX_IPv4_STR_LEN], gbuf[MAX_IPv4_STR_LEN];
@@ -304,11 +304,11 @@ in_validate(struct radix_node *rn)
 			    rt->rt_flags, RTF_BITS);
 		}
 
-		/*
-		 * It's one of ours; unexpire it.  If the timer is already
-		 * scheduled, let it run later as it won't re-arm itself
-		 * if there's nothing to do.
-		 */
+		  
+                                                            
+                                                          
+                              
+     
 		if (rt->rt_flags & RTPRF_OURS) {
 			rt->rt_flags &= ~RTPRF_OURS;
 			rt_setexpire(rt, 0);
@@ -317,20 +317,20 @@ in_validate(struct radix_node *rn)
 	return rn;
 }
 
-/*
- * Similar to in_matroute_args except without the leaf-matching parameters.
- */
+  
+                                                                           
+   
 static struct radix_node *
 in_matroute(void *v_arg, struct radix_node_head *head)
 {
 	return in_matroute_args(v_arg, head, NULL, NULL);
 }
 
-/*
- * This code is the inverse of in_clsroute: on first reference, if we
- * were managing the route, stop doing so and set the expiration timer
- * back off again.
- */
+  
+                                                                     
+                                                                      
+                  
+   
 static struct radix_node *
 in_matroute_args(void *v_arg, struct radix_node_head *head,
     rn_matchf_t *f, void *w)
@@ -345,28 +345,28 @@ in_matroute_args(void *v_arg, struct radix_node_head *head,
 	return rn;
 }
 
-/* one hour is ``really old'' */
+                                
 static uint32_t rtq_reallyold = 60 * 60;
 SYSCTL_UINT(_net_inet_ip, IPCTL_RTEXPIRE, rtexpire,
     CTLFLAG_RW | CTLFLAG_LOCKED, &rtq_reallyold, 0,
     "Default expiration time on dynamically learned routes");
 
-/* never automatically crank down to less */
+                                            
 static uint32_t rtq_minreallyold = 10;
 SYSCTL_UINT(_net_inet_ip, IPCTL_RTMINEXPIRE, rtminexpire,
     CTLFLAG_RW | CTLFLAG_LOCKED, &rtq_minreallyold, 0,
     "Minimum time to attempt to hold onto dynamically learned routes");
 
-/* 128 cached routes is ``too many'' */
+                                       
 static uint32_t rtq_toomany = 128;
 SYSCTL_UINT(_net_inet_ip, IPCTL_RTMAXCACHE, rtmaxcache,
     CTLFLAG_RW | CTLFLAG_LOCKED, &rtq_toomany, 0,
     "Upper limit on dynamically learned routes");
 
-/*
- * On last reference drop, mark the route as belong to us so that it can be
- * timed out.
- */
+  
+                                                                           
+             
+   
 static void
 in_clsroute(struct radix_node *rn, struct radix_node_head *head)
 {
@@ -379,7 +379,7 @@ in_clsroute(struct radix_node *rn, struct radix_node_head *head)
 	RT_LOCK_ASSERT_HELD(rt);
 
 	if (!(rt->rt_flags & RTF_UP)) {
-		return;         /* prophylactic measures */
+		return;                                    
 	}
 	if ((rt->rt_flags & (RTF_LLINFO | RTF_HOST)) != RTF_HOST) {
 		return;
@@ -397,11 +397,11 @@ in_clsroute(struct radix_node *rn, struct radix_node_head *head)
 		rt_str(rt, dbuf, sizeof(dbuf), gbuf, sizeof(gbuf));
 	}
 
-	/*
-	 * Delete the route immediately if RTF_DELCLONE is set or
-	 * if route caching is disabled (rtq_reallyold set to 0).
-	 * Otherwise, let it expire and be deleted by in_rtqkill().
-	 */
+	  
+                                                          
+                                                          
+                                                            
+    
 	if ((rt->rt_flags & RTF_DELCLONE) || rtq_reallyold == 0) {
 		int err;
 
@@ -411,20 +411,20 @@ in_clsroute(struct radix_node *rn, struct radix_node_head *head)
 			    (rt->rt_ifp != NULL) ? rt->rt_ifp->if_xname : "",
 			    rt->rt_flags, RTF_BITS);
 		}
-		/*
-		 * Delete the route from the radix tree but since we are
-		 * called when the route's reference count is 0, don't
-		 * deallocate it until we return from this routine by
-		 * telling rtrequest that we're interested in it.
-		 * Safe to drop rt_lock and use rt_key, rt_gateway since
-		 * holding rnh_lock here prevents another thread from
-		 * calling rt_setgate() on this route.
-		 */
+		  
+                                                          
+                                                        
+                                                       
+                                                   
+                                                          
+                                                       
+                                        
+     
 		RT_UNLOCK(rt);
 		err = rtrequest_locked(RTM_DELETE, rt_key(rt),
 		    rt->rt_gateway, rt_mask(rt), rt->rt_flags, &rt);
 		if (err == 0) {
-			/* Now let the caller free it */
+			                                
 			RT_LOCK(rt);
 			RT_REMREF_LOCKED(rt);
 		} else {
@@ -453,7 +453,7 @@ in_clsroute(struct radix_node *rn, struct radix_node_head *head)
 			    rt->rt_flags, RTF_BITS, rt->rt_expire - timenow);
 		}
 
-		/* We have at least one entry; arm the timer if not already */
+		                                                              
 		in_sched_rtqtimo(NULL);
 	}
 }
@@ -467,11 +467,11 @@ struct rtqk_arg {
 	uint64_t nextstop;
 };
 
-/*
- * Get rid of old routes.  When draining, this deletes everything, even when
- * the timeout is not expired yet.  When updating, this makes sure that
- * nothing has a timeout longer than the current value of rtq_reallyold.
- */
+  
+                                                                            
+                                                                       
+                                                                        
+   
 static int
 in_rtqkill(struct radix_node *rn, void *rock)
 {
@@ -500,7 +500,7 @@ in_rtqkill(struct radix_node *rn, void *rock)
 				panic("%s: route %p marked with RTPRF_OURS "
 				    "with non-zero refcnt (%u)", __func__,
 				    rt, rt->rt_refcnt);
-				/* NOTREACHED */
+				                
 			}
 
 			if (verbose) {
@@ -510,16 +510,16 @@ in_rtqkill(struct radix_node *rn, void *rock)
 				    rt->rt_ifp->if_xname : "", rt->rt_flags,
 				    RTF_BITS, ap->draining);
 			}
-			RT_ADDREF_LOCKED(rt);   /* for us to free below */
-			/*
-			 * Delete this route since we're done with it;
-			 * the route may be freed afterwards, so we
-			 * can no longer refer to 'rt' upon returning
-			 * from rtrequest().  Safe to drop rt_lock and
-			 * use rt_key, rt_gateway since holding rnh_lock
-			 * here prevents another thread from calling
-			 * rt_setgate() on this route.
-			 */
+			RT_ADDREF_LOCKED(rt);                             
+			  
+                                                 
+                                              
+                                                
+                                                 
+                                                   
+                                               
+                                 
+      
 			RT_UNLOCK(rt);
 			err = rtrequest_locked(RTM_DELETE, rt_key(rt),
 			    rt->rt_gateway, rt_mask(rt), rt->rt_flags, NULL);
@@ -565,7 +565,7 @@ in_rtqkill(struct radix_node *rn, void *rock)
 	return 0;
 }
 
-#define RTQ_TIMEOUT     60*10   /* run no less than once every ten minutes */
+#define RTQ_TIMEOUT     60*10                                                
 static int rtq_timeout = RTQ_TIMEOUT;
 
 static void
@@ -584,7 +584,7 @@ in_rtqtimo(void *targ)
 	rnh = rt_tables[AF_INET];
 	VERIFY(rnh != NULL);
 
-	/* Get the timestamp after we acquire the lock for better accuracy */
+	                                                                     
 	timenow = net_uptime();
 	if (verbose) {
 		log(LOG_DEBUG, "%s: initial nextstop is T+%u seconds\n",
@@ -598,14 +598,14 @@ in_rtqtimo(void *targ)
 		log(LOG_DEBUG, "%s: found %u, killed %u\n", __func__,
 		    arg.found, arg.killed);
 	}
-	/*
-	 * Attempt to be somewhat dynamic about this:
-	 * If there are ``too many'' routes sitting around taking up space,
-	 * then crank down the timeout, and see if we can't make some more
-	 * go away.  However, we make sure that we will never adjust more
-	 * than once in rtq_timeout seconds, to keep from cranking down too
-	 * hard.
-	 */
+	  
+                                              
+                                                                    
+                                                                   
+                                                                  
+                                                                    
+         
+    
 	ours = (arg.found - arg.killed);
 	if (ours > rtq_toomany &&
 	    ((timenow - last_adjusted_timeout) >= (uint64_t)rtq_timeout) &&
@@ -627,7 +627,7 @@ in_rtqtimo(void *targ)
 
 	atv.tv_usec = 0;
 	atv.tv_sec = arg.nextstop - timenow;
-	/* re-arm the timer only if there's work to do */
+	                                                 
 	in_rtqtimo_run = 0;
 	if (ours > 0) {
 		in_sched_rtqtimo(&atv);
@@ -680,29 +680,29 @@ in_rtqdrain(void)
 	lck_mtx_unlock(rnh_lock);
 }
 
-/*
- * Initialize our routing tree.
- */
+  
+                               
+   
 int
 in_inithead(void **head, int off)
 {
 	struct radix_node_head *rnh;
 
-	/* If called from route_init(), make sure it is exactly once */
+	                                                               
 	VERIFY(head != (void **)&rt_tables[AF_INET] || *head == NULL);
 
 	if (!rn_inithead(head, off)) {
 		return 0;
 	}
 
-	/*
-	 * We can get here from nfs_subs.c as well, in which case this
-	 * won't be for the real routing table and thus we're done;
-	 * this also takes care of the case when we're called more than
-	 * once from anywhere but route_init().
-	 */
+	  
+                                                               
+                                                            
+                                                                
+                                        
+    
 	if (head != (void **)&rt_tables[AF_INET]) {
-		return 1;     /* only do this for the real routing table */
+		return 1;                                                  
 	}
 	rnh = *head;
 	rnh->rnh_addaddr = in_addroute;
@@ -713,15 +713,15 @@ in_inithead(void **head, int off)
 	return 1;
 }
 
-/*
- * This zaps old routes when the interface goes down or interface
- * address is deleted.  In the latter case, it deletes static routes
- * that point to this address.  If we don't do this, we may end up
- * using the old address in the future.  The ones we always want to
- * get rid of are things like ARP entries, since the user might down
- * the interface, walk over to a completely different network, and
- * plug back in.
- */
+  
+                                                                 
+                                                                    
+                                                                  
+                                                                   
+                                                                    
+                                                                  
+                
+   
 struct in_ifadown_arg {
 	struct radix_node_head *rnh;
 	struct ifaddr *ifa;
@@ -749,18 +749,18 @@ in_ifadownkill(struct radix_node *rn, void *xap)
 			    (rt->rt_ifp != NULL) ? rt->rt_ifp->if_xname : "",
 			    rt->rt_flags, RTF_BITS);
 		}
-		RT_ADDREF_LOCKED(rt);   /* for us to free below */
-		/*
-		 * We need to disable the automatic prune that happens
-		 * in this case in rtrequest() because it will blow
-		 * away the pointers that rn_walktree() needs in order
-		 * continue our descent.  We will end up deleting all
-		 * the routes that rtrequest() would have in any case,
-		 * so that behavior is not needed there.  Safe to drop
-		 * rt_lock and use rt_key, rt_gateway, since holding
-		 * rnh_lock here prevents another thread from calling
-		 * rt_setgate() on this route.
-		 */
+		RT_ADDREF_LOCKED(rt);                             
+		  
+                                                        
+                                                     
+                                                        
+                                                       
+                                                        
+                                                        
+                                                      
+                                                       
+                                
+     
 		rt->rt_flags &= ~(RTF_CLONING | RTF_PRCLONING);
 		RT_UNLOCK(rt);
 		err = rtrequest_locked(RTM_DELETE, rt_key(rt),
@@ -793,16 +793,16 @@ in_ifadown(struct ifaddr *ifa, int delete)
 
 	LCK_MTX_ASSERT(rnh_lock, LCK_MTX_ASSERT_OWNED);
 
-	/*
-	 * Holding rnh_lock here prevents the possibility of
-	 * ifa from changing (e.g. in_ifinit), so it is safe
-	 * to access its ifa_addr without locking.
-	 */
+	  
+                                                     
+                                                     
+                                           
+    
 	if (ifa->ifa_addr->sa_family != AF_INET) {
 		return 1;
 	}
 
-	/* trigger route cache reevaluation */
+	                                      
 	routegenid_inet_update();
 
 	arg.rnh = rnh = rt_tables[AF_INET];

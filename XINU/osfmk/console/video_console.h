@@ -63,7 +63,7 @@ enum {
 
 struct vc_progress_user_options {
 	uint32_t options;
-	// fractional position of middle of spinner 0 (0.0) - 0xFFFFFFFF (1.0)
+	                                                                      
 	uint32_t x_pos;
 	uint32_t y_pos;
 	uint32_t resv[8];
@@ -84,22 +84,22 @@ void video_scroll_up(   void    *start,
     void    *end,
     void    *dest );
 
-void video_scroll_down( void    *start,  /* HIGH addr */
-    void    *end,                        /* LOW addr */
-    void    *dest );                     /* HIGH addr */
+void video_scroll_down( void    *start,                 
+    void    *end,                                      
+    void    *dest );                                    
 
 struct vc_info {
-	unsigned int    v_height;       /* pixels */
-	unsigned int    v_width;        /* pixels */
+	unsigned int    v_height;                   
+	unsigned int    v_width;                    
 	unsigned int    v_depth;
 	unsigned int    v_rowbytes;
 	unsigned long   v_baseaddr;
 	unsigned int    v_type;
 	char            v_name[32];
 	uint64_t        v_physaddr;
-	unsigned int    v_rows;         /* characters */
-	unsigned int    v_columns;      /* characters */
-	unsigned int    v_rowscanbytes; /* Actualy number of bytes used for display per row*/
+	unsigned int    v_rows;                         
+	unsigned int    v_columns;                      
+	unsigned int    v_rowscanbytes;                                                      
 	unsigned int    v_scale;
 	unsigned int    v_rotate;
 	unsigned int    v_reserved[3];
@@ -146,12 +146,12 @@ extern int vc_progressmeter_enable;
 extern int vc_progressmeter_value;
 extern void vc_progress_setdiskspeed(uint32_t speed);
 
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _VIDEO_CONSOLE_H_ */
+#endif                        

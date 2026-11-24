@@ -69,7 +69,7 @@
 #include <vm/pmap.h>
 #include <vm/vm_shared_region.h>
 #include <mach/time_value.h>
-#include <machine/machparam.h>  /* for btop */
+#include <machine/machparam.h>                
 
 #include <console/video_console.h>
 #include <console/serial_protos.h>
@@ -97,10 +97,10 @@ extern int              kdp_stack_snapshot_bytes_uncompressed(void);
 extern boolean_t interrupt_masked_debug;
 #endif
 
-/*
- * Increment the PANICLOG_VERSION if you change the format of the panic
- * log in any way.
- */
+  
+                                                                       
+                  
+   
 #define PANICLOG_VERSION 13
 static struct kcdata_descriptor kc_panic_data;
 
@@ -111,17 +111,17 @@ extern unsigned int         not_in_kdp;
 extern int                              copyinframe(vm_address_t fp, uint32_t * frame);
 extern void                             kdp_callouts(kdp_event_t event);
 
-/* #include <sys/proc.h> */
+                           
 #define MAXCOMLEN 16
 struct proc;
 extern int                              proc_pid(struct proc *p);
 extern void                     proc_name_kdp(task_t, char *, int);
 
-/*
- * Make sure there's enough space to include the relevant bits in the format required
- * within the space allocated for the panic version string in the panic header.
- * The format required by OSAnalytics/DumpPanic is 'Product Version (OS Version)'.
- */
+  
+                                                                                     
+                                                                               
+                                                                                  
+   
 #define PANIC_HEADER_VERSION_FMT_STR "%.14s (%.14s)"
 
 extern const char version[];
@@ -139,8 +139,8 @@ extern uint32_t         gPlatformMemoryID;
 
 extern uint64_t         last_hwaccess_thread;
 
-/*Choosing the size for gTargetTypeBuffer as 16 and size for gModelTypeBuffer as 32
- *  since the target name and model name typically  doesn't exceed this size */
+                                                                                   
+                                                                               
 extern char  gTargetTypeBuffer[16];
 extern char  gModelTypeBuffer[32];
 
@@ -153,13 +153,13 @@ extern uuid_t kernelcache_uuid;
 
 extern void stackshot_memcpy(void *dst, const void *src, size_t len);
 
-/* Definitions for frame pointers */
+                                    
 #define FP_ALIGNMENT_MASK      ((uint32_t)(0x3))
 #define FP_LR_OFFSET           ((uint32_t)4)
 #define FP_LR_OFFSET64         ((uint32_t)8)
 #define FP_MAX_NUM_TO_EVALUATE (50)
 
-/* Timeout (in nanoseconds) for all processors responding to debug crosscall */
+                                                                               
 #if APPLEVIRTUALPLATFORM
 uint64_t debug_ack_timeout = 10000000;
 #define DEBUG_ACK_TIMEOUT (debug_ack_timeout)
@@ -167,19 +167,19 @@ uint64_t debug_ack_timeout = 10000000;
 #define DEBUG_ACK_TIMEOUT ((uint64_t) 10000000)
 #endif
 
-/* Forward functions definitions */
+                                   
 void panic_display_times(void);
 void panic_print_symbol_name(vm_address_t search);
 
 
-/* Global variables */
+                      
 static uint32_t       panic_bt_depth;
 boolean_t             PanicInfoSaved = FALSE;
 boolean_t             force_immediate_debug_halt = FALSE;
 unsigned int          debug_ack_timeout_count = 0;
 volatile unsigned int debugger_sync = 0;
-volatile unsigned int mp_kdp_trap = 0; /* CPUs signalled by the debug CPU will spin on this */
-volatile unsigned int debug_cpus_spinning = 0; /* Number of signalled CPUs still spinning on mp_kdp_trap (in DebuggerXCall). */
+volatile unsigned int mp_kdp_trap = 0;                                                        
+volatile unsigned int debug_cpus_spinning = 0;                                                                                 
 unsigned int          DebugContextCount = 0;
 
 #if defined(__arm64__)
@@ -192,8 +192,8 @@ uint32_t PE_pcie_stashed_link_state = UINT32_MAX;
 #endif
 
 
-// Convenient macros to easily validate one or more pointers if
-// they have defined types
+                                                               
+                          
 #define VALIDATE_PTR(ptr) \
 	validate_ptr((vm_offset_t)(ptr), sizeof(*(ptr)), #ptr)
 
@@ -210,10 +210,10 @@ uint32_t PE_pcie_stashed_link_state = UINT32_MAX;
 
 #define VALIDATE_PTR_LIST(...) GET_MACRO(__VA_ARGS__, VALIDATE_PTR_4, VALIDATE_PTR_3, VALIDATE_PTR_2, VALIDATE_PTR)(__VA_ARGS__)
 
-/*
- * Evaluate if a pointer is valid
- * Print a message if pointer is invalid
- */
+  
+                                 
+                                        
+   
 static boolean_t
 validate_ptr(
 	vm_offset_t ptr, vm_size_t size, const char * ptr_name)
@@ -232,9 +232,9 @@ validate_ptr(
 	}
 }
 
-/*
- * Backtrace a single frame.
- */
+  
+                            
+   
 static void
 print_one_backtrace(pmap_t pmap, vm_offset_t topfp, const char *cur_marker,
     boolean_t is_64_bit, boolean_t print_kexts_in_backtrace)
@@ -268,11 +268,11 @@ print_one_backtrace(pmap_t pmap, vm_offset_t topfp, const char *cur_marker,
 			break;
 		}
 
-		/*
-		 * Check to see if current address will result in a different
-		 * ppn than previously computed (to avoid recomputation) via
-		 * (addr) ^ fp_for_ppn) >> PAGE_SHIFT)
-		 */
+		  
+                                                               
+                                                              
+                                        
+     
 		if ((((fp + FP_LR_OFFSET) ^ fp_for_ppn) >> PAGE_SHIFT) != 0x0U) {
 			ppn = pmap_find_phys(pmap, fp + FP_LR_OFFSET);
 			fp_for_ppn = fp + (is_64_bit ? FP_LR_OFFSET64 : FP_LR_OFFSET);
@@ -281,7 +281,7 @@ print_one_backtrace(pmap_t pmap, vm_offset_t topfp, const char *cur_marker,
 			if (is_64_bit) {
 				lr = ml_phys_read_double_64(((((vm_offset_t)ppn) << PAGE_SHIFT)) | ((fp + FP_LR_OFFSET64) & PAGE_MASK));
 #if defined(HAS_APPLE_PAC)
-				/* return addresses on stack will be signed by arm64e ABI */
+				                                                            
 				lr = (addr64_t) ptrauth_strip((void *)lr, ptrauth_key_return_address);
 #endif
 			} else {
@@ -341,10 +341,10 @@ panic_display_hung_cpus_help(void)
 #if defined(__arm64__)
 	const uint32_t pcsr_offset = 0x90;
 
-	/*
-	 * Print some info that might help in cases where nothing
-	 * else does
-	 */
+	  
+                                                          
+             
+    
 	const ml_topology_info_t *info = ml_get_topology_info();
 	if (info) {
 		unsigned i, retry;
@@ -355,14 +355,14 @@ panic_display_hung_cpus_help(void)
 				volatile uint32_t *pcsrTrigger = (volatile uint32_t*)pcsr;
 				uint64_t pc = 0;
 
-				// a number of retries are needed till this works
+				                                                 
 				for (retry = 1024; retry && !pc; retry--) {
-					//a 32-bit read is required to make a PC sample be produced, else we'll only get a zero
+					                                                                                       
 					(void)*pcsrTrigger;
 					pc = *pcsr;
 				}
 
-				//postprocessing (same as astris does)
+				                                      
 				if (pc >> 48) {
 					pc |= 0xffff000000000000ull;
 				}
@@ -370,7 +370,7 @@ panic_display_hung_cpus_help(void)
 			}
 		}
 	}
-#endif //defined(__arm64__)
+#endif                     
 }
 
 static void
@@ -383,7 +383,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 	int             print_vnodes = 0;
 	const char *nohilite_thread_marker = "\t";
 
-	/* end_marker_bytes set to 200 for printing END marker + stackshot summary info always */
+	                                                                                         
 	int bytes_traced = 0, bytes_remaining = 0, end_marker_bytes = 200;
 	int bytes_uncompressed = 0;
 	uint64_t bytes_used = 0ULL;
@@ -408,7 +408,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 	assert(result == true);
 	filesetKC = kc_format == KCFormatFileset;
 
-	/* Truncate panic string to 1200 bytes */
+	                                         
 	paniclog_append_noflush("Debugger message: %.1200s\n", message);
 	if (debug_enabled) {
 		paniclog_append_noflush("Device: %s\n",
@@ -503,10 +503,10 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 	panic_display_hung_cpus_help();
 #if CONFIG_ZLEAKS
 	panic_display_ztrace();
-#endif /* CONFIG_ZLEAKS */
+#endif                    
 #if CONFIG_ECC_LOGGING
 	panic_display_ecc_errors();
-#endif /* CONFIG_ECC_LOGGING */
+#endif                         
 
 #if DEVELOPMENT || DEBUG
 	if (cs_debug_unsigned_exec_failures != 0 || cs_debug_unsigned_mmap_failures != 0) {
@@ -515,7 +515,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 	}
 #endif
 
-	// Highlight threads that used high amounts of CPU in the panic log if requested (historically requested for watchdog panics)
+	                                                                                                                             
 	if (panic_options & DEBUGGER_OPTION_PRINT_CPU_USAGE_PANICLOG) {
 		thread_t        top_runnable[5] = {0};
 		thread_t        thread;
@@ -529,7 +529,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 		    thread = (thread_t)queue_next(&thread->threads)) {
 			total_cpu_usage += thread->cpu_usage;
 
-			// Look for the 5 runnable threads with highest priority
+			                                                        
 			if (thread->state & TH_RUN) {
 				int                     k;
 				thread_t        comparison_thread = thread;
@@ -542,12 +542,12 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 						thread_t temp = top_runnable[k];
 						top_runnable[k] = comparison_thread;
 						comparison_thread = temp;
-					} // if comparison thread has higher priority than previously saved thread
-				} // loop through highest priority runnable threads
-			} // Check if thread is runnable
-		} // Loop through all threads
+					}                                                                         
+				}                                                  
+			}                               
+		}                            
 
-		// Print the relevant info for each thread identified
+		                                                     
 		paniclog_append_noflush("Total cpu_usage: %d\n", total_cpu_usage);
 		paniclog_append_noflush("Thread task pri cpu_usage\n");
 
@@ -559,11 +559,11 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 				paniclog_append_noflush("%p %s %d %d\n",
 				    top_runnable[i], name, top_runnable[i]->sched_pri, top_runnable[i]->cpu_usage);
 			}
-		} // Loop through highest priority runnable threads
+		}                                                  
 		paniclog_append_noflush("\n");
 	}
 
-	// print current task info
+	                          
 	if (VALIDATE_PTR_LIST(cur_thread, cur_thread->task)) {
 		task = cur_thread->task;
 
@@ -606,7 +606,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 		paniclog_append_noflush("\n");
 	}
 	panic_info->eph_panic_log_len = PE_get_offset_into_panic_region(debug_buf_ptr) - panic_info->eph_panic_log_offset;
-	/* set the os version data in the panic header in the format 'Product Version (OS Version)' (only if they have been set) */
+	                                                                                                                           
 	if ((osversion[0] != '\0') && (osproductversion[0] != '\0')) {
 		snprintf((char *)&panic_info->eph_os_version, sizeof(panic_info->eph_os_version), PANIC_HEADER_VERSION_FMT_STR,
 		    osproductversion, osversion);
@@ -627,7 +627,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 		panic_info->eph_other_log_offset = PE_get_offset_into_panic_region(debug_buf_ptr);
 		paniclog_append_noflush("!! panicked during stackshot, skipping panic stackshot !!\n");
 	} else {
-		/* Align the stackshot buffer to an 8-byte address (especially important for armv7k devices) */
+		                                                                                               
 		debug_buf_ptr += (8 - ((uintptr_t)debug_buf_ptr % 8));
 		stackshot_begin_loc = debug_buf_ptr;
 
@@ -671,7 +671,7 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 			} else {
 				bytes_used = kcdata_memory_get_used_bytes(&kc_panic_data);
 				if (bytes_used > 0) {
-					/* Zero out the stackshot data */
+					                                 
 					bzero(stackshot_begin_loc, bytes_used);
 					panic_info->eph_panic_flags |= EMBEDDED_PANIC_HEADER_FLAG_STACKSHOT_FAILED_INCOMPLETE;
 
@@ -701,9 +701,9 @@ do_print_all_backtraces(const char *message, uint64_t panic_options)
 	panic_bt_depth--;
 }
 
-/*
- * Entry to print_all_backtraces is serialized by the debugger lock
- */
+  
+                                                                   
+   
 static void
 print_all_backtraces(const char *message, uint64_t panic_options)
 {
@@ -714,11 +714,11 @@ print_all_backtraces(const char *message, uint64_t panic_options)
 	assert(cpu_data_ptr->PAB_active == FALSE);
 	cpu_data_ptr->PAB_active = TRUE;
 
-	/*
-	 * Because print all backtraces uses the pmap routines, it needs to
-	 * avoid taking pmap locks.  Right now, this is conditionalized on
-	 * not_in_kdp.
-	 */
+	  
+                                                                    
+                                                                   
+               
+    
 	not_in_kdp = 0;
 	do_print_all_backtraces(message, panic_options);
 
@@ -757,7 +757,7 @@ void
 panic_print_symbol_name(vm_address_t search)
 {
 #pragma unused(search)
-	// empty stub. Really only used on x86_64.
+	                                          
 	return;
 }
 
@@ -765,15 +765,15 @@ void
 SavePanicInfo(
 	const char *message, __unused void *panic_data, uint64_t panic_options)
 {
-	/*
-	 * This should be initialized by the time we get here, but
-	 * if it is not, asserting about it will be of no use (it will
-	 * come right back to here), so just loop right here and now.
-	 * This prevents early-boot panics from becoming recursive and
-	 * thus makes them easier to debug. If you attached to a device
-	 * and see your PC here, look down a few frames to see your
-	 * early-boot panic there.
-	 */
+	  
+                                                           
+                                                               
+                                                              
+                                                               
+                                                                
+                                                            
+                           
+    
 	while (!panic_info || panic_info->eph_panic_log_offset == 0) {
 		;
 	}
@@ -792,15 +792,15 @@ SavePanicInfo(
 	panic_info->eph_x86_system_state = PE_smc_stashed_x86_system_state;
 #endif
 
-	/*
-	 * On newer targets, panic data is stored directly into the iBoot panic region.
-	 * If we re-enter SavePanicInfo (e.g. on a double panic) on such a target, update the
-	 * panic CRC so that iBoot can hopefully find *something* useful in the panic region.
-	 */
+	  
+                                                                                
+                                                                                      
+                                                                                      
+    
 	if (PanicInfoSaved && (debug_buf_base >= (char*)gPanicBase) && (debug_buf_base < (char*)gPanicBase + gPanicSize)) {
 		unsigned int pi_size = (unsigned int)(debug_buf_ptr - gPanicBase);
 		PE_save_buffer_to_vram((unsigned char*)gPanicBase, &pi_size);
-		PE_sync_panic_buffers(); // extra precaution; panic path likely isn't reliable if we're here
+		PE_sync_panic_buffers();                                                                    
 	}
 
 	if (PanicInfoSaved || (debug_buf_size == 0)) {
@@ -816,11 +816,11 @@ SavePanicInfo(
 
 	PEHaltRestart(kPEPanicSync);
 
-	/*
-	 * Notifies registered IOPlatformPanicAction callbacks
-	 * (which includes one to disable the memcache) and flushes
-	 * the buffer contents from the cache
-	 */
+	  
+                                                       
+                                                            
+                                      
+    
 	paniclog_flush();
 }
 
@@ -834,56 +834,56 @@ paniclog_flush()
 		return;
 	}
 
-	/*
-	 * Updates the log length of the last part of the panic log.
-	 */
+	  
+                                                             
+    
 	panic_info->eph_other_log_len = PE_get_offset_into_panic_region(debug_buf_ptr) - panic_info->eph_other_log_offset;
 
-	/*
-	 * Updates the metadata at the beginning of the panic buffer,
-	 * updates the CRC.
-	 */
+	  
+                                                              
+                    
+    
 	PE_save_buffer_to_vram((unsigned char *)gPanicBase, &panicbuf_length);
 
-	/*
-	 * This is currently unused by platform KEXTs on embedded but is
-	 * kept for compatibility with the published IOKit interfaces.
-	 */
+	  
+                                                                 
+                                                               
+    
 	PESavePanicInfo((unsigned char *)gPanicBase, panicbuf_length);
 
 	PE_sync_panic_buffers();
 }
 
-/*
- * @function _was_in_userspace
- *
- * @abstract Unused function used to indicate that a CPU was in userspace
- * before it was IPI'd to enter the Debugger context.
- *
- * @discussion This function should never actually be called.
- */
+  
+                              
+  
+                                                                         
+                                                     
+  
+                                                             
+   
 static void __attribute__((__noreturn__))
 _was_in_userspace(void)
 {
 	panic("%s: should not have been invoked.", __FUNCTION__);
 }
 
-/*
- * @function DebuggerXCallEnter
- *
- * @abstract IPI other cores so this core can run in a single-threaded context.
- *
- * @discussion This function should be called with the debugger lock held.  It
- * signals the other cores to go into a busy loop so this core can run in a
- * single-threaded context and inspect kernel memory.
- *
- * @param proceed_on_sync_failure If true, then go ahead and try to debug even
- * if we can't synch with the other cores.  This is inherently unsafe and should
- * only be used if the kernel is going down in flames anyway.
- *
- * @result returns KERN_OPERATION_TIMED_OUT if synchronization times out and
- * proceed_on_sync_failure is false.
- */
+  
+                               
+  
+                                                                               
+  
+                                                                              
+                                                                           
+                                                     
+  
+                                                                              
+                                                                                
+                                                             
+  
+                                                                            
+                                    
+   
 kern_return_t
 DebuggerXCallEnter(
 	boolean_t proceed_on_sync_failure)
@@ -894,34 +894,34 @@ DebuggerXCallEnter(
 	cpu_data_t      *target_cpu_datap;
 	cpu_data_t      *cpu_data_ptr = getCpuDatap();
 
-	/* Check for nested debugger entry. */
+	                                      
 	cpu_data_ptr->debugger_active++;
 	if (cpu_data_ptr->debugger_active != 1) {
 		return KERN_SUCCESS;
 	}
 
-	/*
-	 * If debugger_sync is not 0, someone responded excessively late to the last
-	 * debug request (we zero the sync variable in the return function).  Zero it
-	 * again here.  This should prevent us from getting out of sync (heh) and
-	 * timing out on every entry to the debugger if we timeout once.
-	 */
+	  
+                                                                             
+                                                                              
+                                                                          
+                                                                 
+    
 
 	debugger_sync = 0;
 	mp_kdp_trap = 1;
 	debug_cpus_spinning = 0;
 
-	/*
-	 * We need a barrier here to ensure CPUs see mp_kdp_trap and spin when responding
-	 * to the signal.
-	 */
+	  
+                                                                                  
+                  
+    
 	__builtin_arm_dmb(DMB_ISH);
 
-	/*
-	 * Try to signal all CPUs (except ourselves, of course).  Use debugger_sync to
-	 * synchronize with every CPU that we appeared to signal successfully (cpu_signal
-	 * is not synchronous).
-	 */
+	  
+                                                                               
+                                                                                  
+                        
+    
 	bool cpu_signal_failed = false;
 	max_cpu = ml_get_max_cpu_number();
 
@@ -952,13 +952,13 @@ DebuggerXCallEnter(
 		max_mabs_time += current_mabs_time;
 		assert(max_mabs_time > current_mabs_time);
 
-		/*
-		 * Wait for DEBUG_ACK_TIMEOUT ns for a response from everyone we IPI'd.  If we
-		 * timeout, that is simply too bad; we don't have a true NMI, and one CPU may be
-		 * uninterruptibly spinning on someone else.  The best we can hope for is that
-		 * all other CPUs have either responded or are spinning in a context that is
-		 * debugger safe.
-		 */
+		  
+                                                                                
+                                                                                  
+                                                                                
+                                                                              
+                   
+     
 		while ((debugger_sync != 0) && (current_mabs_time < max_mabs_time)) {
 			current_mabs_time = mach_absolute_time();
 		}
@@ -968,10 +968,10 @@ DebuggerXCallEnter(
 		DebuggerXCallReturn();
 		return KERN_FAILURE;
 	} else if (immediate_halt || (current_mabs_time >= max_mabs_time)) {
-		/*
-		 * For the moment, we're aiming for a timeout that the user shouldn't notice,
-		 * but will be sufficient to let the other core respond.
-		 */
+		  
+                                                                               
+                                                          
+     
 		__builtin_arm_dmb(DMB_ISH);
 		for (cpu = 0; cpu <= max_cpu; cpu++) {
 			target_cpu_datap = (cpu_data_t *)CpuDataEntries[cpu].cpu_data_vaddr;
@@ -1030,13 +1030,13 @@ DebuggerXCallEnter(
 	}
 }
 
-/*
- * @function DebuggerXCallReturn
- *
- * @abstract Resume normal multicore operation after DebuggerXCallEnter()
- *
- * @discussion This function should be called with debugger lock held.
- */
+  
+                                
+  
+                                                                         
+  
+                                                                      
+   
 void
 DebuggerXCallReturn(
 	void)
@@ -1057,21 +1057,21 @@ DebuggerXCallReturn(
 	max_mabs_time += current_mabs_time;
 	assert(max_mabs_time > current_mabs_time);
 
-	/*
-	 * Wait for other CPUs to stop spinning on mp_kdp_trap (see DebuggerXCall).
-	 * It's possible for one or more CPUs to not decrement debug_cpus_spinning,
-	 * since they may be stuck somewhere else with interrupts disabled.
-	 * Wait for DEBUG_ACK_TIMEOUT ns for a response and move on if we don't get it.
-	 *
-	 * Note that the same is done in DebuggerXCallEnter, when we wait for other
-	 * CPUS to update debugger_sync. If we time out, let's hope for all CPUs to be
-	 * spinning in a debugger-safe context
-	 */
+	  
+                                                                            
+                                                                            
+                                                                    
+                                                                                
+   
+                                                                            
+                                                                               
+                                       
+    
 	while ((debug_cpus_spinning != 0) && (current_mabs_time < max_mabs_time)) {
 		current_mabs_time = mach_absolute_time();
 	}
 
-	/* Do we need a barrier here? */
+	                                
 	__builtin_arm_dmb(DMB_ISH);
 }
 
@@ -1097,10 +1097,10 @@ DebuggerXCall(
 	arm_kernel_saved_state_t *state = (arm_kernel_saved_state_t *)kstackptr;
 
 	if (save_context) {
-		/* Save the interrupted context before acknowledging the signal */
+		                                                                  
 		current_thread()->machine.kpcb = regs;
 	} else if (regs) {
-		/* zero old state so machine_trace_thread knows not to backtrace it */
+		                                                                      
 		register_t pc = (register_t)ptrauth_strip((void *)&_was_in_userspace, ptrauth_key_function_pointer);
 		state->fp = 0;
 		state->pc = pc;
@@ -1111,10 +1111,10 @@ DebuggerXCall(
 	arm_saved_state_t *state = (arm_saved_state_t *)kstackptr;
 
 	if (save_context) {
-		/* Save the interrupted context before acknowledging the signal */
+		                                                                  
 		copy_signed_thread_state(state, regs);
 	} else if (regs) {
-		/* zero old state so machine_trace_thread knows not to backtrace it */
+		                                                                      
 		register_t pc = (register_t)ptrauth_strip((void *)&_was_in_userspace, ptrauth_key_function_pointer);
 		set_saved_state_fp(state, 0);
 		set_saved_state_pc(state, pc);
@@ -1123,15 +1123,15 @@ DebuggerXCall(
 	}
 #endif
 
-	/*
-	 * When running in serial mode, the core capturing the dump may hold interrupts disabled
-	 * for a time longer than the timeout. That path includes logic to reset the timestamp
-	 * so that we do not eventually trigger the interrupt timeout assert().
-	 *
-	 * Here we check whether other cores have already gone over the timeout at this point
-	 * before spinning, so we at least cover the IPI reception path. After spinning, however,
-	 * we reset the timestamp so as to avoid hitting the interrupt timeout assert().
-	 */
+	  
+                                                                                         
+                                                                                       
+                                                                        
+   
+                                                                                      
+                                                                                          
+                                                                                 
+    
 	if ((serialmode & SERIALMODE_OUTPUT) || stackshot_active()) {
 		INTERRUPT_MASKED_DEBUG_END();
 	}
@@ -1142,11 +1142,11 @@ DebuggerXCall(
 		;
 	}
 
-	/**
-	 * Alert the triggering CPU that this CPU is done spinning. The CPU that
-	 * signalled all of the other CPUs will wait (in DebuggerXCallReturn) for
-	 * all of the CPUs to exit the above loop before continuing.
-	 */
+	   
+                                                                         
+                                                                          
+                                                             
+    
 	os_atomic_dec(&debug_cpus_spinning, relaxed);
 
 	if ((serialmode & SERIALMODE_OUTPUT) || stackshot_active()) {
@@ -1155,9 +1155,9 @@ DebuggerXCall(
 
 #if defined(__arm64__)
 	current_thread()->machine.kpcb = NULL;
-#endif /* defined(__arm64__) */
+#endif                         
 
-	/* Any cleanup for our pushed context should go here */
+	                                                       
 }
 
 void
@@ -1167,7 +1167,7 @@ DebuggerCall(
 {
 #if     !MACH_KDP
 #pragma unused(reason,ctx)
-#endif /* !MACH_KDP */
+#endif                
 
 #if ALTERNATE_DEBUGGER
 	alternate_debugger_enter();
@@ -1176,7 +1176,7 @@ DebuggerCall(
 #if     MACH_KDP
 	kdp_trap(reason, (struct arm_saved_state *)ctx);
 #else
-	/* TODO: decide what to do if no debugger config */
+	                                                   
 #endif
 }
 

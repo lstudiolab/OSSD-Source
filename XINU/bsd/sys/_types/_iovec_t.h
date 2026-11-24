@@ -27,9 +27,9 @@
  */
 #ifndef _STRUCT_IOVEC
 #define _STRUCT_IOVEC
-#include <sys/_types/_size_t.h> /* size_t */
+#include <sys/_types/_size_t.h>             
 struct iovec {
-	void *   iov_base;      /* [XSI] Base address of I/O memory region */
-	size_t   iov_len;       /* [XSI] Size of region iov_base points to */
+	void *   iov_base;                                                   
+	size_t   iov_len;                                                    
 };
-#endif /* _STRUCT_IOVEC */
+#endif                    

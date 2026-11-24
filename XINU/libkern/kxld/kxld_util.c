@@ -52,7 +52,7 @@ static void unswap_macho_32(u_char *file, enum NXByteOrder host_order,
     enum NXByteOrder target_order);
 static void unswap_macho_64(u_char *file, enum NXByteOrder host_order,
     enum NXByteOrder target_order);
-#endif /* !KERNEL */
+#endif              
 
 #if DEBUG
 static unsigned long num_allocations = 0;
@@ -67,32 +67,32 @@ static void *s_callback_data = NULL;
 
 #if !KERNEL
 static boolean_t s_cross_link_enabled  = FALSE;
-/* Can't use PAGE_SIZE here because it is not a compile-time constant.
- * However from inspection below, s_cross_link_page_size is not used
- * unless s_cross_link_enabled is TRUE, and s_cross_link_enabled is
- * only set to TRUE when a client specifies the value. So the
- * default should never be used in practice,
- */
+                                                                      
+                                                                    
+                                                                   
+                                                             
+                                            
+   
 static kxld_size_t s_cross_link_page_size;
 #endif
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_set_logging_callback(KXLDLoggingCallback logging_callback)
 {
 	s_logging_callback = logging_callback;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_set_logging_callback_data(const char *name, void *user_data)
 {
 	if (name) {
 		(void)strlcpy(s_callback_name, name, sizeof(s_callback_name));
-		/* disallow format strings in the kxld logging callback name */
+		                                                               
 		for (size_t i = 0; i < sizeof(s_callback_name); i++) {
 			if (s_callback_name[i] == '%') {
 				s_callback_name[i] = '.';
@@ -105,8 +105,8 @@ kxld_set_logging_callback_data(const char *name, void *user_data)
 	s_callback_data = user_data;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_log(KXLDLogSubsystem subsystem, KXLDLogLevel level,
     const char *in_format, ...)
@@ -143,13 +143,13 @@ kxld_log(KXLDLogSubsystem subsystem, KXLDLogLevel level,
 	}
 }
 
-/* We'll use kalloc for any page-based allocations under this threshold, and
- * kmem_alloc otherwise.
- */
+                                                                            
+                        
+   
 #define KALLOC_MAX 16 * 1024
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_calloc(size_t size)
 {
@@ -195,8 +195,8 @@ kxld_alloc(size_t size)
 	return ptr;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_page_alloc_untracked(size_t size)
 {
@@ -204,7 +204,7 @@ kxld_page_alloc_untracked(size_t size)
 #if KERNEL
 	kern_return_t rval = 0;
 	vm_offset_t addr = 0;
-#endif /* KERNEL */
+#endif             
 
 	size = round_page(size);
 
@@ -220,15 +220,15 @@ kxld_page_alloc_untracked(size_t size)
 	if (ptr) {
 		bzero(ptr, size);
 	}
-#else /* !KERNEL */
+#else              
 	ptr = calloc(1, size);
-#endif /* KERNEL */
+#endif             
 
 	return ptr;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_page_alloc(size_t size)
 {
@@ -240,13 +240,13 @@ kxld_page_alloc(size_t size)
 		++num_allocations;
 		bytes_allocated += round_page(size);
 	}
-#endif /* DEBUG */
+#endif            
 
 	return ptr;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void *
 kxld_alloc_pageable(size_t size)
 {
@@ -267,8 +267,8 @@ kxld_alloc_pageable(size_t size)
 #endif
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_free(void *ptr, size_t size __unused)
 {
@@ -284,8 +284,8 @@ kxld_free(void *ptr, size_t size __unused)
 #endif
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_page_free_untracked(void *ptr, size_t size __unused)
 {
@@ -297,31 +297,31 @@ kxld_page_free_untracked(void *ptr, size_t size __unused)
 	} else {
 		kmem_free(kernel_map, (vm_offset_t) ptr, size);
 	}
-#else /* !KERNEL */
+#else              
 	free(ptr);
-#endif /* KERNEL */
+#endif             
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_page_free(void *ptr, size_t size)
 {
 #if DEBUG
 	++num_frees;
 	bytes_freed += round_page(size);
-#endif /* DEBUG */
+#endif            
 	kxld_page_free_untracked(ptr, size);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 validate_and_swap_macho_32(u_char *file, u_long size
 #if !KERNEL
     , enum NXByteOrder host_order
-#endif /* !KERNEL */
+#endif              
     )
 {
 	kern_return_t rval = KERN_FAILURE;
@@ -339,45 +339,45 @@ validate_and_swap_macho_32(u_char *file, u_long size
 	u_int j = 0;
 #if !KERNEL
 	boolean_t swap = FALSE;
-#endif /* !KERNEL */
+#endif              
 
 	check(file);
 	check(size);
 
-	/* Verify that the file is big enough for the mach header */
+	                                                            
 	require_action(size >= sizeof(*mach_hdr), finish,
 	    rval = KERN_FAILURE;
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 	offset = sizeof(*mach_hdr);
 
 #if !KERNEL
-	/* Swap the mach header if necessary */
+	                                       
 	if (mach_hdr->magic == MH_CIGAM) {
 		swap = TRUE;
 		(void) swap_mach_header(mach_hdr, host_order);
 	}
-#endif /* !KERNEL */
+#endif              
 
-	/* Validate the mach_header's magic number */
+	                                             
 	require_action(mach_hdr->magic == MH_MAGIC, finish,
 	    rval = KERN_FAILURE;
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
 	    "Invalid magic number: 0x%x.", mach_hdr->magic));
 
-	/* If in the running kernel, and asked to validate the kernel
-	 * (which is the only file of type MH_EXECUTE we should ever see),
-	 * then just assume it's ok or we wouldn't be running to begin with.
-	 */
+	                                                             
+                                                                   
+                                                                     
+    
 #if KERNEL
 	if (mach_hdr->filetype == MH_EXECUTE) {
 		rval = KERN_SUCCESS;
 		goto finish;
 	}
-#endif /* KERNEL */
+#endif             
 
-	/* Validate and potentially swap the load commands */
+	                                                     
 	for (i = 0; i < mach_hdr->ncmds; ++i, offset += cmdsize) {
-		/* Get the load command and size */
+		                                   
 		load_hdr = (struct load_command *) ((void *) (file + offset));
 		cmd = load_hdr->cmd;
 		cmdsize = load_hdr->cmdsize;
@@ -387,105 +387,105 @@ validate_and_swap_macho_32(u_char *file, u_long size
 			cmd = OSSwapInt32(load_hdr->cmd);
 			cmdsize = OSSwapInt32(load_hdr->cmdsize);
 		}
-#endif /* !KERNEL */
+#endif              
 
-		/* Verify that the file is big enough to contain the load command */
+		                                                                    
 		require_action(size >= offset + cmdsize, finish,
 		    rval = KERN_FAILURE;
 		    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
 		switch (cmd) {
 		case LC_SEGMENT:
-			/* Get and swap the segment header */
+			                                     
 			seg_hdr = (struct segment_command *) load_hdr;
 #if !KERNEL
 			if (swap) {
 				swap_segment_command(seg_hdr, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
-			/* Get and swap the section headers */
+			                                      
 			sects = (struct section *) &seg_hdr[1];
 #if !KERNEL
 			if (swap) {
 				swap_section(sects, seg_hdr->nsects, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
 
-			/* Verify that the file is big enough for the segment data. */
+			                                                              
 			require_action(size >= seg_hdr->fileoff + seg_hdr->filesize, finish,
 			    rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
 			for (j = 0; j < seg_hdr->nsects; ++j) {
-				/* Verify that, if the section is not to be zero filled on
-				 * demand, that file is big enough for the section's data.
-				 */
+				                                                          
+                                                              
+       
 				require_action((sects[j].flags & S_ZEROFILL) ||
 				    (size >= sects[j].offset + sects[j].size), finish,
 				    rval = KERN_FAILURE;
 				    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-				/* Verify that the file is big enough for the section's
-				 * relocation entries.
-				 */
+				                                                       
+                          
+       
 				require_action(size >=
 				    sects[j].reloff + sects[j].nreloc * sizeof(*relocs), finish,
 				    rval = KERN_FAILURE;
 				    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-				/* Swap the relocation entries */
+				                                 
 				relocs = (struct relocation_info *) ((void *) (file + sects[j].reloff));
 #if !KERNEL
 				if (swap) {
 					swap_relocation_info(relocs, sects[j].nreloc,
 					    host_order);
 				}
-#endif /* !KERNEL */
+#endif              
 			}
 
 			break;
 		case LC_SYMTAB:
-			/* Get and swap the symtab header */
+			                                    
 			symtab_hdr = (struct symtab_command *) load_hdr;
 #if !KERNEL
 			if (swap) {
 				swap_symtab_command(symtab_hdr, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
-			/* Verify that the file is big enough for the symbol table */
+			                                                             
 			require_action(size >=
 			    symtab_hdr->symoff + symtab_hdr->nsyms * sizeof(*symtab), finish,
 			    rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-			/* Verify that the file is big enough for the string table */
+			                                                             
 			require_action(size >= symtab_hdr->stroff + symtab_hdr->strsize, finish,
 			    rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
 #if !KERNEL
-			/* Swap the symbol table entries */
+			                                   
 			symtab = (struct nlist *) ((void *) (file + symtab_hdr->symoff));
 			if (swap) {
 				swap_nlist(symtab, symtab_hdr->nsyms, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
 			break;
 		default:
 #if !KERNEL
-			/* Swap the load command */
+			                           
 			if (swap) {
 				swap_load_command(load_hdr, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 			break;
 		}
 	}
@@ -496,13 +496,13 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 validate_and_swap_macho_64(u_char *file, u_long size
 #if !KERNEL
     , enum NXByteOrder host_order
-#endif /* !KERNEL */
+#endif              
     )
 {
 	kern_return_t rval = KERN_FAILURE;
@@ -520,45 +520,45 @@ validate_and_swap_macho_64(u_char *file, u_long size
 	u_int j = 0;
 #if !KERNEL
 	boolean_t swap = FALSE;
-#endif /* !KERNEL */
+#endif              
 
 	check(file);
 	check(size);
 
-	/* Verify that the file is big enough for the mach header */
+	                                                            
 	require_action(size >= sizeof(*mach_hdr), finish,
 	    rval = KERN_FAILURE;
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 	offset = sizeof(*mach_hdr);
 
 #if !KERNEL
-	/* Swap the mach header if necessary */
+	                                       
 	if (mach_hdr->magic == MH_CIGAM_64) {
 		swap = TRUE;
 		(void) swap_mach_header_64(mach_hdr, host_order);
 	}
-#endif /* !KERNEL */
+#endif              
 
-	/* Validate the mach_header's magic number */
+	                                             
 	require_action(mach_hdr->magic == MH_MAGIC_64, finish,
 	    rval = KERN_FAILURE;
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
 	    "Invalid magic number: 0x%x.", mach_hdr->magic));
 
-	/* If in the running kernel, and asked to validate the kernel
-	 * (which is the only file of type MH_EXECUTE we should ever see),
-	 * then just assume it's ok or we wouldn't be running to begin with.
-	 */
+	                                                             
+                                                                   
+                                                                     
+    
 #if KERNEL
 	if (mach_hdr->filetype == MH_EXECUTE) {
 		rval = KERN_SUCCESS;
 		goto finish;
 	}
-#endif /* KERNEL */
+#endif             
 
-	/* Validate and potentially swap the load commands */
+	                                                     
 	for (i = 0; i < mach_hdr->ncmds; ++i, offset += cmdsize) {
-		/* Get the load command and size */
+		                                   
 		load_hdr = (struct load_command *) ((void *) (file + offset));
 		cmd = load_hdr->cmd;
 		cmdsize = load_hdr->cmdsize;
@@ -568,104 +568,104 @@ validate_and_swap_macho_64(u_char *file, u_long size
 			cmd = OSSwapInt32(load_hdr->cmd);
 			cmdsize = OSSwapInt32(load_hdr->cmdsize);
 		}
-#endif /* !KERNEL */
+#endif              
 
-		/* Verify that the file is big enough to contain the load command */
+		                                                                    
 		require_action(size >= offset + cmdsize, finish,
 		    rval = KERN_FAILURE;
 		    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 		switch (cmd) {
 		case LC_SEGMENT_64:
-			/* Get and swap the segment header */
+			                                     
 			seg_hdr = (struct segment_command_64 *) ((void *) load_hdr);
 #if !KERNEL
 			if (swap) {
 				swap_segment_command_64(seg_hdr, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
-			/* Get and swap the section headers */
+			                                      
 			sects = (struct section_64 *) &seg_hdr[1];
 #if !KERNEL
 			if (swap) {
 				swap_section_64(sects, seg_hdr->nsects, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
-			/* If the segment has no vm footprint, skip it */
+			                                                 
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
 
-			/* Verify that the file is big enough for the segment data. */
+			                                                              
 			require_action(size >= seg_hdr->fileoff + seg_hdr->filesize, finish,
 			    rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
 			for (j = 0; j < seg_hdr->nsects; ++j) {
-				/* Verify that, if the section is not to be zero filled on
-				 * demand, that file is big enough for the section's data.
-				 */
+				                                                          
+                                                              
+       
 				require_action((sects[j].flags & S_ZEROFILL) ||
 				    (size >= sects[j].offset + sects[j].size), finish,
 				    rval = KERN_FAILURE;
 				    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-				/* Verify that the file is big enough for the section's
-				 * relocation entries.
-				 */
+				                                                       
+                          
+       
 				require_action(size >=
 				    sects[j].reloff + sects[j].nreloc * sizeof(*relocs), finish,
 				    rval = KERN_FAILURE;
 				    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-				/* Swap the relocation entries */
+				                                 
 				relocs = (struct relocation_info *) ((void *) (file + sects[j].reloff));
 #if !KERNEL
 				if (swap) {
 					swap_relocation_info(relocs, sects[j].nreloc,
 					    host_order);
 				}
-#endif /* !KERNEL */
+#endif              
 			}
 
 			break;
 		case LC_SYMTAB:
-			/* Get and swap the symtab header */
+			                                    
 			symtab_hdr = (struct symtab_command *) load_hdr;
 #if !KERNEL
 			if (swap) {
 				swap_symtab_command(symtab_hdr, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
-			/* Verify that the file is big enough for the symbol table */
+			                                                             
 			require_action(size >=
 			    symtab_hdr->symoff + symtab_hdr->nsyms * sizeof(*symtab), finish,
 			    rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-			/* Verify that the file is big enough for the string table */
+			                                                             
 			require_action(size >= symtab_hdr->stroff + symtab_hdr->strsize, finish,
 			    rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
 #if !KERNEL
-			/* Swap the symbol table entries */
+			                                   
 			symtab = (struct nlist_64 *) ((void *) (file + symtab_hdr->symoff));
 			if (swap) {
 				swap_nlist_64(symtab, symtab_hdr->nsyms, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 
 			break;
 		default:
 #if !KERNEL
-			/* Swap the load command */
+			                           
 			if (swap) {
 				swap_load_command(load_hdr, host_order);
 			}
-#endif /* !KERNEL */
+#endif              
 			break;
 		}
 	}
@@ -677,8 +677,8 @@ finish:
 }
 
 #if !KERNEL
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 unswap_macho(u_char *file, enum NXByteOrder host_order,
     enum NXByteOrder target_order)
@@ -696,8 +696,8 @@ unswap_macho(u_char *file, enum NXByteOrder host_order,
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 unswap_macho_32(u_char *file, enum NXByteOrder host_order,
     enum NXByteOrder target_order)
@@ -730,9 +730,9 @@ unswap_macho_32(u_char *file, enum NXByteOrder host_order,
 			seg_hdr = (struct segment_command *) load_hdr;
 			sects = (struct section *) &seg_hdr[1];
 
-			/* We don't need to unswap relocations because this function is
-			 * called when linking is completed (so there are no relocations).
-			 */
+			                                                               
+                                                                     
+      
 
 			swap_section(sects, seg_hdr->nsects, target_order);
 			swap_segment_command(seg_hdr, target_order);
@@ -754,8 +754,8 @@ unswap_macho_32(u_char *file, enum NXByteOrder host_order,
 	(void) swap_mach_header(mach_hdr, target_order);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 unswap_macho_64(u_char *file, enum NXByteOrder host_order,
     enum NXByteOrder target_order)
@@ -788,9 +788,9 @@ unswap_macho_64(u_char *file, enum NXByteOrder host_order,
 			seg_hdr = (struct segment_command_64 *) ((void *) load_hdr);
 			sects = (struct section_64 *) &seg_hdr[1];
 
-			/* We don't need to unswap relocations because this function is
-			 * called when linking is completed (so there are no relocations).
-			 */
+			                                                               
+                                                                     
+      
 
 			swap_section_64(sects, seg_hdr->nsects, target_order);
 			swap_segment_command_64(seg_hdr, target_order);
@@ -811,10 +811,10 @@ unswap_macho_64(u_char *file, enum NXByteOrder host_order,
 
 	(void) swap_mach_header_64(mach_hdr, target_order);
 }
-#endif /* !KERNEL */
+#endif              
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kxld_addr_t
 kxld_align_address(kxld_addr_t address, u_int align)
 {
@@ -833,16 +833,16 @@ kxld_align_address(kxld_addr_t address, u_int align)
 	return address;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_is_32_bit(cpu_type_t cputype)
 {
 	return !(cputype & CPU_ARCH_ABI64);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_print_memory_report(void)
 {
@@ -859,13 +859,13 @@ kxld_print_memory_report(void)
 #endif
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 #if !KERNEL
 boolean_t
 kxld_set_cross_link_page_size(kxld_size_t target_page_size)
 {
-	// verify radix 2
+	                 
 	if ((target_page_size != 0) &&
 	    ((target_page_size & (target_page_size - 1)) == 0)) {
 		s_cross_link_enabled = TRUE;
@@ -876,10 +876,10 @@ kxld_set_cross_link_page_size(kxld_size_t target_page_size)
 		return FALSE;
 	}
 }
-#endif /* !KERNEL */
+#endif              
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 kxld_size_t
 kxld_get_effective_page_size(void)
 {
@@ -891,25 +891,25 @@ kxld_get_effective_page_size(void)
 	} else {
 		return PAGE_SIZE;
 	}
-#endif /* KERNEL */
+#endif             
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 kxld_addr_t
 kxld_round_page_cross_safe(kxld_addr_t offset)
 {
 #if KERNEL
 	return round_page(offset);
 #else
-	// assume s_cross_link_page_size is power of 2
+	                                              
 	if (s_cross_link_enabled) {
 		return (offset + (s_cross_link_page_size - 1)) &
 		       (~(s_cross_link_page_size - 1));
 	} else {
 		return round_page(offset);
 	}
-#endif /* KERNEL */
+#endif             
 }
 
 #if SPLIT_KEXTS_DEBUG

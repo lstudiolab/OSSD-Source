@@ -111,14 +111,14 @@ panic_check_hook(void)
 	}
 }
 
-/*
- * addr should be page aligned and len should be multiple of page
- * size.  This will currently only work if each page can be compressed
- * to no more than 4095 bytes.
- *
- * Remember the debug buffer isn't very big so don't try and dump too
- * much.
- */
+  
+                                                                 
+                                                                      
+                              
+  
+                                                                     
+        
+   
 void
 panic_dump_mem(const void *addr, int len)
 {
@@ -129,20 +129,20 @@ panic_dump_mem(const void *addr, int len)
 			continue;
 		}
 
-		// 4095 is multiple of 3 -- see below
+		                                     
 		int n = WKdm_compress_new((const WK_word *)addr, (WK_word *)(void *)panic_dump_buf,
 		    scratch, 4095);
 
 		if (n == -1) {
-			return; // Give up
+			return;           
 		}
 		kdb_log("%p: ", addr);
 
-		// Dump out base64
+		                  
 		static char base64_table[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		    "abcdefghijklmnopqrstuvwxyz0123456789+/";
 
-		// Pad to multiple of 3
+		                       
 		switch (n % 3) {
 		case 1:
 			panic_dump_buf[n++] = 0;
@@ -191,7 +191,7 @@ panic_phys_range_before(const void *addr, uint64_t *pphys,
 	const uint32_t size = args->MemoryMapDescriptorSize;
 	const uint32_t count = args->MemoryMapSize / size;
 
-	if (count > 1024) {     // Sanity check
+	if (count > 1024) {                    
 		return FALSE;
 	}
 

@@ -37,16 +37,16 @@
 #include <i386/machine_check.h>
 #include <i386/proc_reg.h>
 
-/*
- * At the time of the machine-check exception, all hardware-threads panic.
- * Each thread saves the state of its MCA registers to its per-cpu data area.
- *
- * State reporting is serialized so one thread dumps all valid state for all
- * threads to the panic log. This may entail spinning waiting for other
- * threads to complete saving state to memory. A timeout applies to this wait
- * -- in particular, a 3-strikes timeout may prevent a thread from taking
- * part is the affair.
- */
+  
+                                                                          
+                                                                             
+  
+                                                                            
+                                                                       
+                                                                             
+                                                                         
+                      
+   
 
 #define IF(bool, str)    ((bool) ? (str) : "")
 
@@ -69,7 +69,7 @@ typedef struct {
 
 typedef struct mca_state {
 	boolean_t               mca_is_saved;
-	boolean_t               mca_is_valid;   /* some state is valid */
+	boolean_t               mca_is_valid;                            
 	ia32_mcg_ctl_t          mca_mcg_ctl;
 	ia32_mcg_status_t       mca_mcg_status;
 	mca_mci_bank_t          mca_error_bank[0];
@@ -100,9 +100,9 @@ mca_get_availability(void)
 	mca_MCA_present = (features & CPUID_FEATURE_MCA) != 0;
 	mca_family = family;
 
-	/*
-	 * If MCA, the number of banks etc is reported by the IA32_MCG_CAP MSR.
-	 */
+	  
+                                                                        
+    
 	if (mca_MCA_present) {
 		ia32_mcg_cap.u64 = rdmsr64(IA32_MCG_CAP);
 		mca_error_bank_count = ia32_mcg_cap.bits.count;
@@ -116,10 +116,10 @@ mca_cpu_init(void)
 {
 	unsigned int    i;
 
-	/*
-	 * The first (boot) processor is responsible for discovering the
-	 * machine check architecture present on this machine.
-	 */
+	  
+                                                                 
+                                                       
+    
 	if (!mca_initialized) {
 		mca_get_availability();
 		mca_initialized = TRUE;
@@ -127,30 +127,30 @@ mca_cpu_init(void)
 	}
 
 	if (mca_MCA_present) {
-		/* Enable all MCA features */
+		                             
 		if (mca_control_MSR_present) {
 			wrmsr64(IA32_MCG_CTL, IA32_MCG_CTL_ENABLE);
 		}
 
 		switch (mca_family) {
 		case 0x06:
-			/* Enable all but mc0 */
+			                        
 			for (i = 1; i < mca_error_bank_count; i++) {
 				wrmsr64(IA32_MCi_CTL(i), 0xFFFFFFFFFFFFFFFFULL);
 			}
 
-			/* Clear all errors */
+			                      
 			for (i = 0; i < mca_error_bank_count; i++) {
 				wrmsr64(IA32_MCi_STATUS(i), 0ULL);
 			}
 			break;
 		case 0x0F:
-			/* Enable all banks */
+			                      
 			for (i = 0; i < mca_error_bank_count; i++) {
 				wrmsr64(IA32_MCi_CTL(i), 0xFFFFFFFFFFFFFFFFULL);
 			}
 
-			/* Clear all errors */
+			                      
 			for (i = 0; i < mca_error_bank_count; i++) {
 				wrmsr64(IA32_MCi_STATUS(i), 0ULL);
 			}
@@ -158,7 +158,7 @@ mca_cpu_init(void)
 		}
 	}
 
-	/* Enable machine check exception handling if available */
+	                                                          
 	if (mca_MCE_present) {
 		set_cr4(get_cr4() | CR4_MCE);
 	}
@@ -178,9 +178,9 @@ mca_cpu_alloc(cpu_data_t        *cdp)
 {
 	vm_size_t       mca_state_size;
 
-	/*
-	 * Allocate space for an array of error banks.
-	 */
+	  
+                                               
+    
 	mca_state_size = sizeof(mca_state_t) +
 	    sizeof(mca_mci_bank_t) * mca_error_bank_count;
 	cdp->cpu_mca_state = zalloc_permanent(mca_state_size, ZALIGN_PTR);
@@ -189,10 +189,10 @@ mca_cpu_alloc(cpu_data_t        *cdp)
 		return;
 	}
 
-	/*
-	 * If the boot processor is yet have its allocation made,
-	 * do this now.
-	 */
+	  
+                                                          
+                
+    
 	if (cpu_datap(master_cpu)->cpu_mca_state == NULL) {
 		mca_cpu_alloc(cpu_datap(master_cpu));
 	}
@@ -228,10 +228,10 @@ mca_save_state(mca_state_t *mca_state)
 		mca_state->mca_is_valid = TRUE;
 	}
 
-	/*
-	 * If we're the first thread with MCA state, point our package to it
-	 * and don't care about races
-	 */
+	  
+                                                                     
+                              
+    
 	if (x86_package()->mca_state == NULL) {
 		x86_package()->mca_state = mca_state;
 	}
@@ -310,15 +310,15 @@ mca_dump(void)
 	uint64_t        deadline;
 	unsigned int    i = 0;
 
-	/*
-	 * Capture local MCA registers to per-cpu data.
-	 */
+	  
+                                                
+    
 	mca_save_state(mca_state);
 
-	/*
-	 * Serialize: the first caller controls dumping MCA registers,
-	 * other threads spin meantime.
-	 */
+	  
+                                                               
+                                
+    
 	simple_lock(&mca_lock, LCK_GRP_NULL);
 	if (mca_dump_state > CLEAR) {
 		simple_unlock(&mca_lock);
@@ -330,10 +330,10 @@ mca_dump(void)
 	mca_dump_state = DUMPING;
 	simple_unlock(&mca_lock);
 
-	/*
-	 * Wait for all other hardware threads to save their state.
-	 * Or timeout.
-	 */
+	  
+                                                            
+               
+    
 	deadline = mach_absolute_time() + LockTimeOut;
 	while (mach_absolute_time() < deadline && i < real_ncpus) {
 		if (!cpu_datap(i)->cpu_mca_state->mca_is_saved) {
@@ -343,18 +343,18 @@ mca_dump(void)
 		i += 1;
 	}
 
-	/*
-	 * Report machine-check capabilities:
-	 */
+	  
+                                      
+    
 	paniclog_append_noflush("Machine-check capabilities: 0x%016qx\n", ia32_mcg_cap.u64);
 
 	mca_report_cpu_info();
 
 	paniclog_append_noflush(" %d error-reporting banks\n", mca_error_bank_count);
 
-	/*
-	 * Dump all processor state:
-	 */
+	  
+                             
+    
 	for (i = 0; i < real_ncpus; i++) {
 		mca_state_t             *mcsp = cpu_datap(i)->cpu_mca_state;
 		ia32_mcg_status_t       status;
@@ -371,7 +371,7 @@ mca_dump(void)
 		mca_cpu_dump_error_banks(mcsp);
 	}
 
-	/* Update state to release any other threads. */
+	                                                
 	mca_dump_state = DUMPED;
 }
 

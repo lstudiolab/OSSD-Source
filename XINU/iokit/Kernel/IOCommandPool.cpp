@@ -53,9 +53,9 @@ OSMetaClassDefineReservedUnused(IOCommandPool, 5);
 OSMetaClassDefineReservedUnused(IOCommandPool, 6);
 OSMetaClassDefineReservedUnused(IOCommandPool, 7);
 
-//--------------------------------------------------------------------------
-//	withWorkLoop -	primary initializer and factory method
-//--------------------------------------------------------------------------
+                                                                            
+                                                        
+                                                                            
 
 OSSharedPtr<IOCommandPool>
 IOCommandPool::
@@ -96,9 +96,9 @@ initWithWorkLoop(IOWorkLoop *inWorkLoop)
 	return true;
 }
 
-//--------------------------------------------------------------------------
-//	commandPool & init -	obsolete initializer and factory method
-//--------------------------------------------------------------------------
+                                                                            
+                                                               
+                                                                            
 
 OSSharedPtr<IOCommandPool>
 IOCommandPool::
@@ -115,21 +115,21 @@ commandPool(IOService * inOwner, IOWorkLoop *inWorkLoop, UInt32 inSize)
 
 bool
 IOCommandPool::
-init(IOService */* inOwner */, IOWorkLoop *inWorkLoop, UInt32 /* inSize */)
+init(IOService *             , IOWorkLoop *inWorkLoop, UInt32             )
 {
 	return initWithWorkLoop(inWorkLoop);
 }
 
 
-//--------------------------------------------------------------------------
-//	free -	free all allocated resources
-//--------------------------------------------------------------------------
+                                                                            
+                                      
+                                                                            
 
 void
 IOCommandPool::free(void)
 {
 	if (fSerializer) {
-		// remove our event source from owner's workloop
+		                                                
 		IOWorkLoop *wl = fSerializer->getWorkLoop();
 		if (wl) {
 			wl->removeEventSource(fSerializer.get());
@@ -138,16 +138,16 @@ IOCommandPool::free(void)
 		fSerializer.reset();
 	}
 
-	// Tell our superclass to cleanup too
+	                                     
 	super::free();
 }
 
 
-//--------------------------------------------------------------------------
-//	getCommand -	Gets a command from the pool. Pass true in
-//			blockForCommand if you want your thread to sleep
-//			waiting for resources
-//--------------------------------------------------------------------------
+                                                                            
+                                                          
+                                                     
+                          
+                                                                            
 
 OSSharedPtr<IOCommand>
 IOCommandPool::getCommand(bool blockForCommand)
@@ -167,10 +167,10 @@ IOCommandPool::getCommand(bool blockForCommand)
 }
 
 
-//--------------------------------------------------------------------------
-//	gatedGetCommand -	Static callthrough function
-//				(on safe side of command gate)
-//--------------------------------------------------------------------------
+                                                                            
+                                                
+                                    
+                                                                            
 
 IOReturn
 IOCommandPool::
@@ -191,9 +191,9 @@ gatedGetCommand(IOCommand **command, bool blockForCommand)
 }
 
 
-//--------------------------------------------------------------------------
-//	returnCommand -		Returns command to the pool.
-//--------------------------------------------------------------------------
+                                                                            
+                                                
+                                                                            
 
 void
 IOCommandPool::
@@ -205,10 +205,10 @@ returnCommand(IOCommand *command)
 }
 
 
-//--------------------------------------------------------------------------
-//	gatedReturnCommand -	Callthrough function
-//                              (on safe side of command gate)
-//--------------------------------------------------------------------------
+                                                                            
+                                            
+                                                              
+                                                                            
 
 IOReturn
 IOCommandPool::
@@ -216,7 +216,7 @@ gatedReturnCommand(IOCommand *command)
 {
 	queue_enter_first(&fQueueHead, command, IOCommand *, fCommandChain);
 	if (fSleepers) {
-		fSerializer->commandWakeup(&fSleepers, /* oneThread */ true);
+		fSerializer->commandWakeup(&fSleepers,                 true);
 		fSleepers--;
 	}
 	return kIOReturnSuccess;

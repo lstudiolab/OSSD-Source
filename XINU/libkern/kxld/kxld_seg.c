@@ -34,7 +34,7 @@
     #include <mach/vm_param.h>
 #else
     #include <mach/mach_init.h>
-#endif /* KERNEL */
+#endif             
 
 #define DEBUG_ASSERT_COMPONENT_NAME_STRING "kxld"
 #include <AssertMacros.h>
@@ -57,7 +57,7 @@ extern boolean_t isOldInterface;
 static kern_return_t reorder_sections(KXLDSeg *seg, KXLDArray *section_order);
 static void reorder_section(KXLDArray *sects, u_int *sect_reorder_index,
     KXLDSect **reorder_buffer, u_int reorder_buffer_index);
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
 #if 0
 static KXLDSeg * get_segment_by_name(KXLDArray *segarray, const char *name);
@@ -75,8 +75,8 @@ static kern_return_t seg_export_macho_header_64(const KXLDSeg *seg, u_char *buf,
 static KXLDSect * get_sect_by_index(const KXLDSeg *seg, u_int idx);
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_init_from_macho_32(KXLDSeg *seg, struct segment_command *src)
 {
@@ -101,11 +101,11 @@ kxld_seg_init_from_macho_32(KXLDSeg *seg, struct segment_command *src)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_init_from_macho_64(KXLDSeg *seg, struct segment_command_64 *src)
 {
@@ -131,11 +131,11 @@ kxld_seg_init_from_macho_64(KXLDSeg *seg, struct segment_command_64 *src)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
 #if KXLD_USER_OR_OBJECT
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_create_seg_from_sections(KXLDArray *segarray, KXLDArray *sectarray)
 {
@@ -145,19 +145,19 @@ kxld_seg_create_seg_from_sections(KXLDArray *segarray, KXLDArray *sectarray)
 	KXLDSect **sectp = NULL;
 	u_int i = 0;
 
-	/* Initialize the segment array to one segment */
+	                                                 
 
 	rval = kxld_array_init(segarray, sizeof(KXLDSeg), 1);
 	require_noerr(rval, finish);
 
-	/* Initialize the segment */
+	                            
 
 	seg = kxld_array_get_item(segarray, 0);
 	seg->initprot = VM_PROT_ALL;
 	seg->maxprot = VM_PROT_ALL;
 	seg->link_addr = 0;
 
-	/* Add the sections to the segment */
+	                                     
 
 	rval = kxld_array_init(&seg->sects, sizeof(KXLDSect *), sectarray->nitems);
 	require_noerr(rval, finish);
@@ -174,8 +174,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_finalize_object_segment(KXLDArray *segarray, KXLDArray *section_order,
     u_long hdrsize)
@@ -192,16 +192,16 @@ kxld_seg_finalize_object_segment(KXLDArray *segarray, KXLDArray *section_order,
 
 	seg = kxld_array_get_item(segarray, 0);
 
-	/* Reorder the sections */
+	                          
 
 	rval = reorder_sections(seg, section_order);
 	require_noerr(rval, finish);
 
-	/* Set the initial link address at the end of the header pages */
+	                                                                 
 
 	seg->link_addr = kxld_round_page_cross_safe(hdrsize);
 
-	/* Fix up all of the section addresses */
+	                                         
 
 	sect_offset = (u_long) seg->link_addr;
 	for (i = 0; i < seg->sects.nitems; ++i) {
@@ -211,7 +211,7 @@ kxld_seg_finalize_object_segment(KXLDArray *segarray, KXLDArray *section_order,
 		sect_offset = (u_long) (sect->link_addr + sect->size);
 	}
 
-	/* Finish initializing the segment */
+	                                     
 
 	seg->vmsize = kxld_round_page_cross_safe(sect_offset) - seg->link_addr;
 
@@ -220,51 +220,51 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* The legacy section ordering used by kld was based of the order of sections
-* in the kernel file.  To achieve the same layout, we save the kernel's
-* section ordering as an array of section names when the kernel file itself
-* is linked.  Then, when kexts are linked with the KXLD_LEGACY_LAYOUT flag,
-* we refer to the kernel's section layout to order the kext's sections.
-*
-* The algorithm below is as follows.  We iterate through all of the kernel's
-* sections grouped by segment name, so that we are processing all of the __TEXT
-* sections, then all of the __DATA sections, etc.  We then iterate through the
-* kext's sections with a similar grouping, looking for sections that match
-* the current kernel's section.  In this way, we order all of the matching
-* kext sections in the order in which they appear in the kernel, and then place
-* all remaining kext sections at the end of the current segment grouping in
-* the order in which they originally appeared.  Sections that only appear in
-* the kernel are not created.  segments that only appear in the kext are
-* left in their original ordering.
-*
-* An example:
-*
-* Kernel sections:
-* __TEXT,__text
-* __TEXT,__const
-* __DATA,__data
-*
-* Kext sections:
-* __TEXT,__const
-* __TEXT,__literal4
-* __TEXT,__text
-* __DATA,__const
-* __DATA,__data
-*
-* Reordered kext sections:
-* __TEXT,__text
-* __TEXT,__const
-* __TEXT,__literal4
-* __DATA,__data
-* __DATA,__const
-*
-* In the implementation below, we use a reorder buffer to hold pointers to the
-* sections of the current working segment.  We scan this buffer looking for
-* matching sections, placing them in the segment's section index as we find them.
-* If this function must exit early, the segment's section index is left in an
-* unusable state.
-*******************************************************************************/
+                                                                                
+                                                                            
+                                                                       
+                                                                           
+                                                                           
+                                                                       
+ 
+                                                                            
+                                                                               
+                                                                              
+                                                                          
+                                                                          
+                                                                               
+                                                                           
+                                                                            
+                                                                        
+                                  
+ 
+             
+ 
+                  
+               
+                
+               
+ 
+                
+                
+                   
+               
+                
+               
+ 
+                          
+               
+                
+                   
+               
+                
+ 
+                                                                              
+                                                                           
+                                                                                 
+                                                                             
+                 
+                                                                                
 static kern_return_t
 reorder_sections(KXLDSeg *seg, KXLDArray *section_order)
 {
@@ -281,18 +281,18 @@ reorder_sections(KXLDSeg *seg, KXLDArray *section_order)
 	check(seg);
 	check(section_order);
 
-	/* Allocate the reorder buffer with enough space to hold all of the
-	 * sections.
-	 */
+	                                                                   
+             
+    
 
 	reorder_buffer = kxld_alloc(
 		seg->sects.nitems * sizeof(*reorder_buffer));
 	require_action(reorder_buffer, finish, rval = KERN_RESOURCE_SHORTAGE);
 
 	while (legacy_index < section_order->nitems) {
-		/* Find the next group of sections with a common segment in the
-		 * section_order array.
-		 */
+		                                                               
+                         
+     
 
 		legacy_start = legacy_index++;
 		legacy_end = legacy_index;
@@ -310,9 +310,9 @@ reorder_sections(KXLDSeg *seg, KXLDArray *section_order)
 			++legacy_end;
 		}
 
-		/* Find a group of sections in the kext that match the current
-		 * section_order segment.
-		 */
+		                                                              
+                           
+     
 
 		sect_start = sect_index;
 		sect_end = sect_index;
@@ -332,17 +332,17 @@ reorder_sections(KXLDSeg *seg, KXLDArray *section_order)
 			continue;
 		}
 
-		/* Populate the reorder buffer with the current group of kext sections */
+		                                                                         
 
 		for (i = sect_start; i < sect_end; ++i) {
 			reorder_buffer[i - sect_start] =
 			    *(KXLDSect **) kxld_array_get_item(&seg->sects, i);
 		}
 
-		/* For each section_order section, scan the reorder buffer for a matching
-		 * kext section.  If one is found, copy it into the next slot in the
-		 * segment's section index.
-		 */
+		                                                                         
+                                                                      
+                             
+     
 
 		sect_reorder_index = sect_start;
 		for (i = legacy_start; i < legacy_end; ++i) {
@@ -369,10 +369,10 @@ reorder_sections(KXLDSeg *seg, KXLDArray *section_order)
 			}
 		}
 
-		/* If any sections remain in the reorder buffer, they are not specified
-		 * in the section_order array, so append them to the section index in
-		 * in the order they are found.
-		 */
+		                                                                       
+                                                                       
+                                 
+     
 
 		for (i = 0; i < nsects; ++i) {
 			if (!reorder_buffer[i]) {
@@ -394,8 +394,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 reorder_section(KXLDArray *sects, u_int *sect_reorder_index,
     KXLDSect **reorder_buffer, u_int reorder_buffer_index)
@@ -411,8 +411,8 @@ reorder_section(KXLDArray *sects, u_int *sect_reorder_index,
 	++(*sect_reorder_index);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_init_linkedit(KXLDArray *segs)
 {
@@ -436,10 +436,10 @@ kxld_seg_init_linkedit(KXLDArray *segs)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_seg_clear(KXLDSeg *seg)
 {
@@ -453,14 +453,14 @@ kxld_seg_clear(KXLDSeg *seg)
 	seg->maxprot = 0;
 	seg->initprot = 0;
 
-	/* Don't clear the individual sections here because kxld_kext.c will take
-	 * care of that.
-	 */
+	                                                                         
+                 
+    
 	kxld_array_clear(&seg->sects);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_seg_deinit(KXLDSeg *seg)
 {
@@ -470,8 +470,8 @@ kxld_seg_deinit(KXLDSeg *seg)
 	bzero(seg, sizeof(*seg));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kxld_size_t
 kxld_seg_get_vmsize(const KXLDSeg *seg)
 {
@@ -480,8 +480,8 @@ kxld_seg_get_vmsize(const KXLDSeg *seg)
 	return seg->vmsize;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_seg_get_macho_header_size(const KXLDSeg *seg, boolean_t is_32_bit)
 {
@@ -499,9 +499,9 @@ kxld_seg_get_macho_header_size(const KXLDSeg *seg, boolean_t is_32_bit)
 	return size;
 }
 
-/*******************************************************************************
-*******************************************************************************/
-/* This is no longer used, but may be useful some day... */
+                                                                                
+                                                                                
+                                                           
 #if 0
 u_long
 kxld_seg_get_macho_data_size(const KXLDSeg *seg)
@@ -522,8 +522,8 @@ kxld_seg_get_macho_data_size(const KXLDSeg *seg)
 }
 #endif
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static KXLDSect *
 get_sect_by_index(const KXLDSeg *seg, u_int idx)
 {
@@ -532,8 +532,8 @@ get_sect_by_index(const KXLDSeg *seg, u_int idx)
 	return *(KXLDSect **) kxld_array_get_item(&seg->sects, idx);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_export_macho_to_file_buffer(const KXLDSeg *seg, u_char *buf,
     u_long *header_offset, u_long header_size,
@@ -554,14 +554,14 @@ kxld_seg_export_macho_to_file_buffer(const KXLDSeg *seg, u_char *buf,
 	check(header_offset);
 	check(data_offset);
 
-	/* Write out the header */
+	                          
 
 	KXLD_3264_FUNC(is_32_bit, rval,
 	    seg_export_macho_header_32, seg_export_macho_header_64,
 	    seg, buf, header_offset, header_size, *data_offset);
 	require_noerr(rval, finish);
 
-	/* Write out each section */
+	                            
 
 	for (i = 0; i < seg->sects.nitems; ++i) {
 		sect = get_sect_by_index(seg, i);
@@ -571,7 +571,7 @@ kxld_seg_export_macho_to_file_buffer(const KXLDSeg *seg, u_char *buf,
 		require_noerr(rval, finish);
 	}
 
-	/* Update the filesize */
+	                         
 
 	if (is_32_bit) {
 		hdr32->filesize = (uint32_t) (*data_offset - base_data_offset);
@@ -588,8 +588,8 @@ finish:
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_export_macho_to_vm(const KXLDSeg *seg,
     u_char *buf,
@@ -602,7 +602,7 @@ kxld_seg_export_macho_to_vm(const KXLDSeg *seg,
 	kern_return_t   rval = KERN_FAILURE;
 	KXLDSect *      sect = NULL;
 
-	// data_offset is used to set fileoff field in segment header
+	                                                             
 	u_long          data_offset;
 	u_int           i = 0;
 
@@ -612,7 +612,7 @@ kxld_seg_export_macho_to_vm(const KXLDSeg *seg,
 
 	data_offset = (u_long) (seg->link_addr - file_link_addr);
 
-	/* Write out the header */
+	                          
 
 	KXLD_3264_FUNC(is_32_bit, rval,
 	    seg_export_macho_header_32, seg_export_macho_header_64,
@@ -621,7 +621,7 @@ kxld_seg_export_macho_to_vm(const KXLDSeg *seg,
 	    header_offset, header_size, data_offset);
 	require_noerr(rval, finish);
 
-	/* Write out each section */
+	                            
 
 	for (i = 0; i < seg->sects.nitems; ++i) {
 		sect = get_sect_by_index(seg, i);
@@ -638,8 +638,8 @@ finish:
 }
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 seg_export_macho_header_32(const KXLDSeg *seg, u_char *buf,
     u_long *header_offset, u_long header_size, u_long data_offset)
@@ -690,11 +690,11 @@ seg_export_macho_header_32(const KXLDSeg *seg, u_char *buf,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 seg_export_macho_header_64(const KXLDSeg *seg, u_char *buf,
     u_long *header_offset, u_long header_size, u_long data_offset)
@@ -773,10 +773,10 @@ seg_export_macho_header_64(const KXLDSeg *seg, u_char *buf,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_add_section(KXLDSeg *seg, KXLDSect *sect)
 {
@@ -789,7 +789,7 @@ kxld_seg_add_section(KXLDSeg *seg, KXLDSect *sect)
 	require_action(streq_safe(seg->segname, sect->segname, sizeof(seg->segname)),
 	    finish, rval = KERN_FAILURE);
 
-	/* Add the section into the section index */
+	                                            
 
 	for (i = 0; i < seg->sects.nitems; ++i) {
 		sectp = kxld_array_get_item(&seg->sects, i);
@@ -807,8 +807,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_seg_finish_init(KXLDSeg *seg)
 {
@@ -818,13 +818,13 @@ kxld_seg_finish_init(KXLDSeg *seg)
 	kxld_addr_t maxaddr = 0;
 	kxld_size_t maxsize = 0;
 
-	/* If we already have a size for this segment (e.g. from the mach-o load
-	 * command) then don't recalculate the segment size. This is safer since
-	 * when we recalculate we are making assumptions about page alignment and
-	 * padding that the kext mach-o file was built with. Better to trust the
-	 * macho-o info, if we have it. If we don't (i.e. vmsize == 0) then add up
-	 * the section sizes and take a best guess at page padding.
-	 */
+	                                                                        
+                                                                         
+                                                                          
+                                                                         
+                                                                           
+                                                            
+    
 	if ((seg->vmsize == 0) && (seg->sects.nitems)) {
 		for (i = 0; i < seg->sects.nitems; ++i) {
 			sect = get_sect_by_index(seg, i);
@@ -844,8 +844,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_seg_set_vm_protections(KXLDSeg *seg, boolean_t strict_protections)
 {
@@ -863,8 +863,8 @@ kxld_seg_set_vm_protections(KXLDSeg *seg, boolean_t strict_protections)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_seg_relocate(KXLDSeg *seg, kxld_addr_t link_addr)
 {
@@ -877,45 +877,45 @@ kxld_seg_relocate(KXLDSeg *seg, kxld_addr_t link_addr)
 		seg->link_addr += link_addr;
 	} else {
 		if (isSplitKext) {
-			// we have a split kext
+			                       
 			if (kxld_seg_is_text_seg(seg)) {
-				// assumes this is the beginning of the kext
+				                                            
 				my_link_addr = link_info->vmaddr_TEXT;
 				seg->link_addr = my_link_addr;
 			} else if (kxld_seg_is_text_exec_seg(seg)) {
 				my_link_addr = link_info->vmaddr_TEXT_EXEC;
 				seg->link_addr = my_link_addr;
-				// vmaddr_TEXT_EXEC is the actual vmaddr for this segment so we need
-				// to adjust for kxld_sect_relocate assuming the link addr is
-				// the address of the kext (macho header in __TEXT)
+				                                                                    
+				                                                             
+				                                                   
 				my_link_addr -= seg->base_addr;
 			} else if (kxld_seg_is_data_seg(seg)) {
 				my_link_addr = link_info->vmaddr_DATA;
 				seg->link_addr = my_link_addr;
-				// vmaddr_DATA is the actual vmaddr for this segment so we need
-				// to adjust for kxld_sect_relocate assuming the link addr is
-				// the address of the kext (macho header in __TEXT)
+				                                                               
+				                                                             
+				                                                   
 				my_link_addr -= seg->base_addr;
 			} else if (kxld_seg_is_data_const_seg(seg)) {
 				my_link_addr = link_info->vmaddr_DATA_CONST;
 				seg->link_addr = my_link_addr;
-				// vmaddr_DATA_CONST is the actual vmaddr for this segment so we need
-				// to adjust for kxld_sect_relocate assuming the link addr is
-				// the address of the kext (macho header in __TEXT)
+				                                                                     
+				                                                             
+				                                                   
 				my_link_addr -= seg->base_addr;
 			} else if (kxld_seg_is_llvm_cov_seg(seg)) {
 				my_link_addr = link_info->vmaddr_LLVM_COV;
 				seg->link_addr = my_link_addr;
-				// vmaddr_LLVM_COV is the actual vmaddr for this segment so we need
-				// to adjust for kxld_sect_relocate assuming the link addr is
-				// the address of the kext (macho header in __TEXT)
+				                                                                   
+				                                                             
+				                                                   
 				my_link_addr -= seg->base_addr;
 			} else if (kxld_seg_is_linkedit_seg(seg)) {
 				my_link_addr = link_info->vmaddr_LINKEDIT;
 				seg->link_addr = my_link_addr;
-				// vmaddr_DATA is the actual vmaddr for this segment so we need
-				// to adjust for kxld_sect_relocate assuming the link addr is
-				// the address of the kext (macho header in __TEXT)
+				                                                               
+				                                                             
+				                                                   
 				my_link_addr -= seg->base_addr;
 			} else {
 				kxld_log(kKxldLogLinking, kKxldLogErr,
@@ -957,15 +957,15 @@ kxld_seg_relocate(KXLDSeg *seg, kxld_addr_t link_addr)
 	}
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_seg_populate_linkedit(KXLDSeg *seg, const KXLDSymtab *symtab, boolean_t is_32_bit
 #if KXLD_PIC_KEXTS
     , const KXLDArray *locrelocs
     , const KXLDArray *extrelocs
     , boolean_t target_supports_slideable_kexts
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
     , uint32_t splitinfolc_size
     )
 {
@@ -977,16 +977,16 @@ kxld_seg_populate_linkedit(KXLDSeg *seg, const KXLDSymtab *symtab, boolean_t is_
 	if (target_supports_slideable_kexts) {
 		size += kxld_reloc_get_macho_data_size(locrelocs, extrelocs);
 	}
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
 
-	// 0 unless this is a split kext
+	                                
 	size += splitinfolc_size;
 
 	seg->vmsize = kxld_round_page_cross_safe(size);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_seg_is_split_seg(const KXLDSeg *seg)
 {

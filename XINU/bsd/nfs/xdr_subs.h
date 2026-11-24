@@ -71,16 +71,16 @@
 #include <sys/appleapiopts.h>
 
 #ifdef __APPLE_API_PRIVATE
-/*
- * Macros used for conversion to/from xdr representation by nfs...
- * These use the MACHINE DEPENDENT routines ntohl, htonl
- * As defined by "XDR: External Data Representation Standard" RFC1014
- *
- * To simplify the implementation, we use ntohl/htonl even on big-endian
- * machines, and count on them being `#define'd away.  Some of these
- * might be slightly more efficient as quad_t copies on a big-endian,
- * but we cannot count on their alignment anyway.
- */
+  
+                                                                  
+                                                        
+                                                                     
+  
+                                                                        
+                                                                    
+                                                                     
+                                                 
+   
 
 #define fxdr_unsigned(t, v)     ((t)ntohl((uint32_t)(v)))
 #define txdr_unsigned(v)        (htonl((uint32_t)(v)))
@@ -95,11 +95,11 @@
 }
 
 
-/*
- * xdrbuf
- *
- * generalized functionality for managing the building/dissecting of XDR data
- */
+  
+         
+  
+                                                                             
+   
 typedef enum xdrbuf_type {
 	XDRBUF_NONE   = 0,
 	XDRBUF_BUFFER = 1,
@@ -108,23 +108,23 @@ typedef enum xdrbuf_type {
 struct xdrbuf {
 	union {
 		struct {
-			char *                  xbb_base;       /* base address of buffer */
-			size_t                  xbb_size;       /* size of buffer */
-			size_t                  xbb_len;        /* length of data in buffer */
+			char *                  xbb_base;                                   
+			size_t                  xbb_size;                           
+			size_t                  xbb_len;                                      
 		} xb_buffer;
 	} xb_u;
-	char *          xb_ptr;         /* pointer to current position */
-	size_t          xb_left;        /* bytes remaining in current buffer */
-	size_t          xb_growsize;    /* bytes to allocate when growing */
-	xdrbuf_type     xb_type;        /* type of xdr buffer */
-	uint32_t        xb_flags;       /* XB_* (see below) */
+	char *          xb_ptr;                                          
+	size_t          xb_left;                                               
+	size_t          xb_growsize;                                        
+	xdrbuf_type     xb_type;                                
+	uint32_t        xb_flags;                             
 };
 
-#define XB_CLEANUP      0x0001  /* needs cleanup */
+#define XB_CLEANUP      0x0001                     
 
-#define XDRWORD         4       /* the basic XDR building block is a 4 byte (32 bit) word */
-#define xdr_rndup(a)    (((a)+3)&(~0x3))        /* round up to XDRWORD size */
-#define xdr_pad(a)      (xdr_rndup(a) - (a))    /* calculate round up padding */
+#define XDRWORD         4                                                                   
+#define xdr_rndup(a)    (((a)+3)&(~0x3))                                      
+#define xdr_pad(a)      (xdr_rndup(a) - (a))                                    
 
 void xb_init(struct xdrbuf *, xdrbuf_type);
 void xb_init_buffer(struct xdrbuf *, char *, size_t);
@@ -142,9 +142,9 @@ int xb_get_bytes(struct xdrbuf *, char *, uint32_t, int);
 
 #ifdef _NFS_XDR_SUBS_FUNCS_
 
-/*
- * basic initialization of xdrbuf structure
- */
+  
+                                           
+   
 void
 xb_init(struct xdrbuf *xbp, xdrbuf_type type)
 {
@@ -153,9 +153,9 @@ xb_init(struct xdrbuf *xbp, xdrbuf_type type)
 	xbp->xb_flags |= XB_CLEANUP;
 }
 
-/*
- * initialize a single-buffer xdrbuf
- */
+  
+                                    
+   
 void
 xb_init_buffer(struct xdrbuf *xbp, char *buf, size_t buflen)
 {
@@ -166,23 +166,23 @@ xb_init_buffer(struct xdrbuf *xbp, char *buf, size_t buflen)
 	xbp->xb_growsize = 512;
 	xbp->xb_ptr = buf;
 	xbp->xb_left = buflen;
-	if (buf) { /* when using an existing buffer, xb code should skip cleanup */
+	if (buf) {                                                                 
 		xbp->xb_flags &= ~XB_CLEANUP;
 	}
 }
 
-/*
- * get the pointer to the single-buffer xdrbuf's buffer
- */
+  
+                                                       
+   
 char *
 xb_buffer_base(struct xdrbuf *xbp)
 {
 	return xbp->xb_u.xb_buffer.xbb_base;
 }
 
-/*
- * clean up any resources held by an xdrbuf
- */
+  
+                                           
+   
 void
 xb_cleanup(struct xdrbuf *xbp)
 {
@@ -201,10 +201,10 @@ xb_cleanup(struct xdrbuf *xbp)
 	xbp->xb_flags &= ~XB_CLEANUP;
 }
 
-/*
- * set the length of valid data in the current buffer to
- * be up to the current location within the buffer
- */
+  
+                                                        
+                                                  
+   
 void
 xb_set_cur_buf_len(struct xdrbuf *xbp)
 {
@@ -217,9 +217,9 @@ xb_set_cur_buf_len(struct xdrbuf *xbp)
 	}
 }
 
-/*
- * advance forward through existing data in xdrbuf
- */
+  
+                                                  
+   
 int
 xb_advance(struct xdrbuf *xbp, size_t len)
 {
@@ -239,9 +239,9 @@ xb_advance(struct xdrbuf *xbp, size_t len)
 	return 0;
 }
 
-/*
- * Calculate the current offset in the XDR buffer.
- */
+  
+                                                  
+   
 size_t
 xb_offset(struct xdrbuf *xbp)
 {
@@ -258,9 +258,9 @@ xb_offset(struct xdrbuf *xbp)
 	return offset;
 }
 
-/*
- * Seek to the given offset in the existing data in the XDR buffer.
- */
+  
+                                                                   
+   
 int
 xb_seek(struct xdrbuf *xbp, size_t offset)
 {
@@ -276,9 +276,9 @@ xb_seek(struct xdrbuf *xbp, size_t offset)
 	return 0;
 }
 
-/*
- * allocate memory
- */
+  
+                  
+   
 void *
 xb_malloc(size_t size)
 {
@@ -291,9 +291,9 @@ xb_malloc(size_t size)
 #endif
 	return buf;
 }
-/*
- * free a chunk of memory allocated with xb_malloc()
- */
+  
+                                                    
+   
 void
 xb_free(void *buf)
 {
@@ -304,9 +304,9 @@ xb_free(void *buf)
 #endif
 }
 
-/*
- * Increase space available for new data in XDR buffer.
- */
+  
+                                                       
+   
 int
 xb_grow(struct xdrbuf *xbp)
 {
@@ -341,11 +341,11 @@ xb_grow(struct xdrbuf *xbp)
 	return 0;
 }
 
-/*
- * xb_add_bytes()
- *
- * Add "count" bytes of opaque data pointed to by "buf" to the given XDR buffer.
- */
+  
+                 
+  
+                                                                                
+   
 int
 xb_add_bytes(struct xdrbuf *xbp, const char *buf, size_t count, int nopad)
 {
@@ -354,10 +354,10 @@ xb_add_bytes(struct xdrbuf *xbp, const char *buf, size_t count, int nopad)
 
 	len = nopad ? count : xdr_rndup(count);
 
-	/* copy in "count" bytes and zero out any pad bytes */
+	                                                      
 	while (len) {
 		if (xbp->xb_left <= 0) {
-			/* need more space */
+			                     
 			if ((error = xb_grow(xbp))) {
 				return error;
 			}
@@ -387,11 +387,11 @@ xb_add_bytes(struct xdrbuf *xbp, const char *buf, size_t count, int nopad)
 	return 0;
 }
 
-/*
- * xb_get_bytes()
- *
- * Get "count" bytes of opaque data from the given XDR buffer.
- */
+  
+                 
+  
+                                                              
+   
 int
 xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 {
@@ -399,7 +399,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 
 	len = nopad ? count : xdr_rndup(count);
 
-	/* copy in "count" bytes and zero out any pad bytes */
+	                                                      
 	while (len) {
 		if (xbp->xb_left <= 0) {
 			return ENOMEM;
@@ -424,21 +424,21 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	return 0;
 }
 
-#endif /* _NFS_XDR_SUBS_FUNCS_ */
+#endif                           
 
 
-/*
- * macros for building XDR data
- */
+  
+                               
+   
 
-/* finalize the data that has been added to the buffer */
+                                                         
 #define xb_build_done(E, XB) \
 	do { \
 	        if (E) break; \
 	        xb_set_cur_buf_len(XB); \
 	} while (0)
 
-/* add a 32-bit value */
+                        
 #define xb_add_32(E, XB, VAL) \
 	do { \
 	        uint32_t __tmp; \
@@ -447,7 +447,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	        (E) = xb_add_bytes((XB), (void*)&__tmp, XDRWORD, 0); \
 	} while (0)
 
-/* add a 64-bit value */
+                        
 #define xb_add_64(E, XB, VAL) \
 	do { \
 	        uint64_t __tmp1, __tmp2; \
@@ -457,7 +457,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	        (E) = xb_add_bytes((XB), (char*)&__tmp2, 2 * XDRWORD, 0); \
 	} while (0)
 
-/* add an array of XDR words */
+                               
 #define xb_add_word_array(E, XB, A, LEN) \
 	do { \
 	        uint32_t __i; \
@@ -467,7 +467,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	} while (0)
 #define xb_add_bitmap(E, XB, B, LEN)    xb_add_word_array((E), (XB), (B), (LEN))
 
-/* add a file handle */
+                       
 #define xb_add_fh(E, XB, FHP, FHLEN) \
 	do { \
 	        xb_add_32((E), (XB), (FHLEN)); \
@@ -475,7 +475,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	        (E) = xb_add_bytes((XB), (char*)(FHP), (FHLEN), 0); \
 	} while (0)
 
-/* add a string */
+                  
 #define xb_add_string(E, XB, S, LEN) \
 	do { \
 	        xb_add_32((E), (XB), (LEN)); \
@@ -484,18 +484,18 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	} while (0)
 
 
-/*
- * macros for decoding XDR data
- */
+  
+                               
+   
 
-/* skip past data in the buffer */
+                                  
 #define xb_skip(E, XB, LEN) \
 	do { \
 	        if (E) break; \
 	        (E) = xb_advance((XB), (LEN)); \
 	} while (0)
 
-/* get a 32-bit value */
+                        
 #define xb_get_32(E, XB, LVAL) \
 	do { \
 	        uint32_t __tmp; \
@@ -506,7 +506,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	        (LVAL) = fxdr_unsigned(uint32_t, __tmp); \
 	} while (0)
 
-/* get a 64-bit value */
+                        
 #define xb_get_64(E, XB, LVAL) \
 	do { \
 	        uint64_t __tmp; \
@@ -517,7 +517,7 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	        fxdr_hyper(&__tmp, &(LVAL)); \
 	} while (0)
 
-/* get an array of XDR words (of a given expected/maximum length) */
+                                                                    
 #define xb_get_word_array(E, XB, A, LEN) \
 	do { \
 	        uint32_t __len = 0, __i; \
@@ -534,5 +534,5 @@ xb_get_bytes(struct xdrbuf *xbp, char *buf, uint32_t count, int nopad)
 	} while (0)
 #define xb_get_bitmap(E, XB, B, LEN)    xb_get_word_array((E), (XB), (B), (LEN))
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* _NFS_XDR_SUBS_H_ */
+#endif                          
+#endif                       

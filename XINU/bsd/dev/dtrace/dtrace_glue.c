@@ -48,13 +48,13 @@
 #include <mach/vm_param.h>
 #include <mach/mach_vm.h>
 #include <mach/task.h>
-#include <vm/vm_map.h> /* All the bits we care about are guarded by MACH_KERNEL_PRIVATE :-( */
+#include <vm/vm_map.h>                                                                        
 
-/*
- * pid/proc
- */
-/* Solaris proc_t is the struct. Darwin's proc_t is a pointer to it. */
-#define proc_t struct proc /* Steer clear of the Darwin typedef for proc_t */
+  
+           
+   
+                                                                       
+#define proc_t struct proc                                                   
 
 KALLOC_HEAP_DEFINE(KHEAP_DTRACE, "dtrace", KHEAP_ID_DEFAULT);
 
@@ -70,7 +70,7 @@ dtrace_sprunlock(proc_t *p)
 	lck_mtx_unlock(&p->p_dtrace_sprlock);
 }
 
-/* Not called from probe context */
+                                   
 proc_t *
 sprlock(pid_t pid)
 {
@@ -87,7 +87,7 @@ sprlock(pid_t pid)
 	return p;
 }
 
-/* Not called from probe context */
+                                   
 void
 sprunlock(proc_t *p)
 {
@@ -100,15 +100,15 @@ sprunlock(proc_t *p)
 	}
 }
 
-/*
- * uread/uwrite
- */
+  
+               
+   
 
-// These are not exported from vm_map.h.
+                                        
 extern kern_return_t vm_map_read_user(vm_map_t map, vm_map_address_t src_addr, void *dst_p, vm_size_t size);
 extern kern_return_t vm_map_write_user(vm_map_t map, void *src_p, vm_map_address_t dst_addr, vm_size_t size);
 
-/* Not called from probe context */
+                                   
 int
 uread(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 {
@@ -119,14 +119,14 @@ uread(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 
 	task_t task = p->task;
 
-	/*
-	 * Grab a reference to the task vm_map_t to make sure
-	 * the map isn't pulled out from under us.
-	 *
-	 * Because the proc_lock is not held at all times on all code
-	 * paths leading here, it is possible for the proc to have
-	 * exited. If the map is null, fail.
-	 */
+	  
+                                                      
+                                           
+   
+                                                              
+                                                           
+                                     
+    
 	vm_map_t map = get_task_map_reference(task);
 	if (map) {
 		ret = vm_map_read_user( map, (vm_map_address_t)a, buf, (vm_size_t)len);
@@ -139,7 +139,7 @@ uread(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 }
 
 
-/* Not called from probe context */
+                                   
 int
 uwrite(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 {
@@ -150,17 +150,17 @@ uwrite(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 
 	task_t task = p->task;
 
-	/*
-	 * Grab a reference to the task vm_map_t to make sure
-	 * the map isn't pulled out from under us.
-	 *
-	 * Because the proc_lock is not held at all times on all code
-	 * paths leading here, it is possible for the proc to have
-	 * exited. If the map is null, fail.
-	 */
+	  
+                                                      
+                                           
+   
+                                                              
+                                                           
+                                     
+    
 	vm_map_t map = get_task_map_reference(task);
 	if (map) {
-		/* Find the memory permissions. */
+		                                  
 		uint32_t nestingDepth = 999999;
 		vm_region_submap_short_info_data_64_t info;
 		mach_msg_type_number_t count = VM_REGION_SUBMAP_SHORT_INFO_COUNT_64;
@@ -175,18 +175,18 @@ uwrite(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 		vm_prot_t reprotect;
 
 		if (!(info.protection & VM_PROT_WRITE)) {
-			/* Save the original protection values for restoration later */
+			                                                               
 			reprotect = info.protection;
 
 			if (info.max_protection & VM_PROT_WRITE) {
-				/* The memory is not currently writable, but can be made writable. */
+				                                                                     
 				ret = mach_vm_protect(map, (mach_vm_offset_t)a, (mach_vm_size_t)len, 0, (reprotect & ~VM_PROT_EXECUTE) | VM_PROT_WRITE);
 			} else {
-				/*
-				 * The memory is not currently writable, and cannot be made writable. We need to COW this memory.
-				 *
-				 * Strange, we can't just say "reprotect | VM_PROT_COPY", that fails.
-				 */
+				  
+                                                                                                     
+      
+                                                                         
+       
 				ret = mach_vm_protect(map, (mach_vm_offset_t)a, (mach_vm_size_t)len, 0, VM_PROT_COPY | VM_PROT_READ | VM_PROT_WRITE);
 			}
 
@@ -194,7 +194,7 @@ uwrite(proc_t *p, void *buf, user_size_t len, user_addr_t a)
 				goto done;
 			}
 		} else {
-			/* The memory was already writable. */
+			                                      
 			reprotect = VM_PROT_NONE;
 		}
 
@@ -223,24 +223,24 @@ done:
 	return (int)ret;
 }
 
-/*
- * cpuvar
- */
+  
+         
+   
 LCK_MTX_DECLARE_ATTR(cpu_lock, &dtrace_lck_grp, &dtrace_lck_attr);
 LCK_MTX_DECLARE_ATTR(cyc_lock, &dtrace_lck_grp, &dtrace_lck_attr);
 LCK_MTX_DECLARE_ATTR(mod_lock, &dtrace_lck_grp, &dtrace_lck_attr);
 
 dtrace_cpu_t *cpu_list;
-cpu_core_t *cpu_core; /* XXX TLB lockdown? */
+cpu_core_t *cpu_core;                        
 
-/*
- * cred_t
- */
+  
+         
+   
 
-/*
- * dtrace_CRED() can be called from probe context. We cannot simply call kauth_cred_get() since
- * that function may try to resolve a lazy credential binding, which entails taking the proc_lock.
- */
+  
+                                                                                               
+                                                                                                  
+   
 cred_t *
 dtrace_CRED(void)
 {
@@ -249,7 +249,7 @@ dtrace_CRED(void)
 	if (uthread == NULL) {
 		return NULL;
 	} else {
-		return uthread->uu_ucred; /* May return NOCRED which is defined to be 0 */
+		return uthread->uu_ucred;                                                 
 	}
 }
 
@@ -257,14 +257,14 @@ int
 PRIV_POLICY_CHOICE(void* cred, int priv, int all)
 {
 #pragma unused(priv, all)
-	return kauth_cred_issuser(cred); /* XXX TODO: How is this different from PRIV_POLICY_ONLY? */
+	return kauth_cred_issuser(cred);                                                             
 }
 
 int
 PRIV_POLICY_ONLY(void *cr, int priv, int boolean)
 {
 #pragma unused(priv, boolean)
-	return kauth_cred_issuser(cr); /* XXX TODO: HAS_PRIVILEGE(cr, priv); */
+	return kauth_cred_issuser(cr);                                         
 }
 
 uid_t
@@ -273,12 +273,12 @@ crgetuid(const cred_t *cr)
 	cred_t copy_cr = *cr; return kauth_cred_getuid(&copy_cr);
 }
 
-/*
- * "cyclic"
- */
+  
+           
+   
 
 typedef struct wrap_timer_call {
-	/* node attributes */
+	                     
 	cyc_handler_t           hdlr;
 	cyc_time_t              when;
 	uint64_t                deadline;
@@ -286,7 +286,7 @@ typedef struct wrap_timer_call {
 	boolean_t               suspended;
 	struct timer_call       call;
 
-	/* next item in the linked list */
+	                                  
 	LIST_ENTRY(wrap_timer_call) entries;
 } wrap_timer_call_t;
 
@@ -303,7 +303,7 @@ typedef struct cyc_list {
 } cyc_list_t;
 #endif
 
-/* CPU going online/offline notifications */
+                                            
 void (*dtrace_cpu_state_changed_hook)(int, boolean_t) = NULL;
 void dtrace_cpu_state_changed(int, boolean_t);
 
@@ -321,7 +321,7 @@ dtrace_cpu_state_changed(int cpuid, boolean_t is_running)
 	boolean_t               suspend = (is_running ? FALSE : TRUE);
 	dtrace_icookie_t        s;
 
-	/* Ensure that we're not going to leave the CPU */
+	                                                  
 	s = dtrace_interrupt_disable();
 	assert(cpuid == cpu_number());
 
@@ -329,13 +329,13 @@ dtrace_cpu_state_changed(int cpuid, boolean_t is_running)
 		assert(wrapTC->cpuid == cpu_number());
 		if (suspend) {
 			assert(!wrapTC->suspended);
-			/* If this fails, we'll panic anyway, so let's do this now. */
+			                                                              
 			if (!timer_call_cancel(&wrapTC->call)) {
 				panic("timer_call_set_suspend() failed to cancel a timer call");
 			}
 			wrapTC->suspended = TRUE;
 		} else {
-			/* Rearm the timer, but ensure it was suspended first. */
+			                                                         
 			assert(wrapTC->suspended);
 			clock_deadline_for_periodic_event(wrapTC->when.cyt_interval, mach_absolute_time(),
 			    &wrapTC->deadline);
@@ -345,7 +345,7 @@ dtrace_cpu_state_changed(int cpuid, boolean_t is_running)
 		}
 	}
 
-	/* Restore the previous interrupt state. */
+	                                           
 	dtrace_interrupt_enable(s);
 }
 
@@ -378,7 +378,7 @@ timer_call_add_cyclic(wrap_timer_call_t *wrapTC, cyc_handler_t *handler, cyc_tim
 
 	clock_deadline_for_periodic_event( wrapTC->when.cyt_interval, now, &(wrapTC->deadline));
 
-	/* Insert the timer to the list of the running timers on this CPU, and start it. */
+	                                                                                   
 	s = dtrace_interrupt_disable();
 	wrapTC->cpuid = cpu_number();
 	LIST_INSERT_HEAD(&cpu_list[wrapTC->cpuid].cpu_cyc_list, wrapTC, entries);
@@ -390,9 +390,9 @@ timer_call_add_cyclic(wrap_timer_call_t *wrapTC, cyc_handler_t *handler, cyc_tim
 	return (cyclic_id_t)wrapTC;
 }
 
-/*
- * Executed on the CPU the timer is running on.
- */
+  
+                                               
+   
 static void
 timer_call_remove_cyclic(wrap_timer_call_t *wrapTC)
 {
@@ -428,7 +428,7 @@ cyclic_timer_remove(cyclic_id_t cyclic)
 {
 	ASSERT( cyclic != CYCLIC_NONE );
 
-	/* Removing a timer call must be done on the CPU the timer is running on. */
+	                                                                            
 	wrap_timer_call_t *wrapTC = (wrap_timer_call_t *) cyclic;
 	dtrace_xcall(wrapTC->cpuid, (dtrace_xcall_t) timer_call_remove_cyclic, (void*) cyclic);
 
@@ -472,10 +472,10 @@ _cyclic_remove_omni(cyc_list_t *cyc_list)
 	void *oarg;
 	wrap_timer_call_t *wrapTC;
 
-	/*
-	 * If the processor was offline when dtrace started, we did not allocate
-	 * a cyclic timer for this CPU.
-	 */
+	  
+                                                                         
+                                
+    
 	if ((wrapTC = &cyc_list->cyl_wrap_by_cpus[cpu_number()]) != NULL) {
 		oarg = timer_call_get_cyclic_arg(wrapTC);
 		timer_call_remove_cyclic(wrapTC);
@@ -499,10 +499,10 @@ typedef struct wrap_thread_call {
 	uint64_t deadline;
 } wrap_thread_call_t;
 
-/*
- * _cyclic_apply will run on some thread under kernel_task. That's OK for the
- * cleaner and the deadman, but too distant in time and place for the profile provider.
- */
+  
+                                                                             
+                                                                                       
+   
 static void
 _cyclic_apply( void *ignore, void *vTChdl )
 {
@@ -514,7 +514,7 @@ _cyclic_apply( void *ignore, void *vTChdl )
 	clock_deadline_for_periodic_event( wrapTC->when.cyt_interval, mach_absolute_time(), &(wrapTC->deadline));
 	(void)thread_call_enter1_delayed( wrapTC->TChdl, (void *)wrapTC, wrapTC->deadline );
 
-	/* Did cyclic_remove request a wakeup call when this thread call was re-armed? */
+	                                                                                 
 	if (wrapTC->when.cyt_interval == WAKEUP_REAPER) {
 		thread_wakeup((event_t)wrapTC);
 	}
@@ -574,7 +574,7 @@ cyclic_remove(cyclic_id_t cyclic)
 	if (thread_call_free(wrapTC->TChdl)) {
 		_FREE(wrapTC, M_TEMP);
 	} else {
-		/* Gut this cyclic and move on ... */
+		                                     
 		wrapTC->hdlr.cyh_func = noop_cyh_func;
 		wrapTC->when.cyt_interval = NEARLY_FOREVER;
 	}
@@ -604,7 +604,7 @@ void
 ddi_remove_minor_node(dev_info_t *dip, char *name)
 {
 #pragma unused(dip,name)
-/* XXX called from dtrace_detach, so NOTREACHED for now. */
+                                                           
 }
 
 major_t
@@ -627,19 +627,19 @@ debug_enter(char *c)
 	Debugger(c);
 }
 
-/*
- * kmem
- */
+  
+       
+   
 
 void *
 dt_kmem_alloc_site(size_t size, int kmflag, vm_allocation_site_t *site)
 {
 #pragma unused(kmflag)
 
-/*
- * We ignore the M_NOWAIT bit in kmflag (all of kmflag, in fact).
- * Requests larger than 8K with M_NOWAIT fail in kalloc_ext.
- */
+  
+                                                                 
+                                                            
+   
 	return kalloc_ext(KHEAP_DTRACE, size, Z_WAITOK, site).addr;
 }
 
@@ -648,10 +648,10 @@ dt_kmem_zalloc_site(size_t size, int kmflag, vm_allocation_site_t *site)
 {
 #pragma unused(kmflag)
 
-/*
- * We ignore the M_NOWAIT bit in kmflag (all of kmflag, in fact).
- * Requests larger than 8K with M_NOWAIT fail in kalloc_ext.
- */
+  
+                                                                 
+                                                            
+   
 	return kalloc_ext(KHEAP_DTRACE, size, Z_WAITOK | Z_ZERO, site).addr;
 }
 
@@ -663,10 +663,10 @@ dt_kmem_free(void *buf, size_t size)
 
 
 
-/*
- * aligned dt_kmem allocator
- * align should be a power of two
- */
+  
+                            
+                                 
+   
 
 void*
 dt_kmem_alloc_aligned_site(size_t size, size_t align, int kmflag, vm_allocation_site_t *site)
@@ -675,14 +675,14 @@ dt_kmem_alloc_aligned_site(size_t size, size_t align, int kmflag, vm_allocation_
 	intptr_t mem_aligned;
 	size_t *size_to_free, hdr_size;
 
-	/* Must be a power of two. */
+	                             
 	assert(align != 0);
 	assert((align & (align - 1)) == 0);
 
-	/*
-	 * We are going to add a header to the allocation. It contains
-	 * the address to free and the total size of the buffer.
-	 */
+	  
+                                                               
+                                                         
+    
 	hdr_size = sizeof(size_t) + sizeof(void*);
 	mem = dt_kmem_alloc_site(size + align + hdr_size, kmflag, site);
 	if (mem == NULL) {
@@ -691,11 +691,11 @@ dt_kmem_alloc_aligned_site(size_t size, size_t align, int kmflag, vm_allocation_
 
 	mem_aligned = (intptr_t) (((intptr_t) mem + align + hdr_size) & ~(align - 1));
 
-	/* Write the address to free in the header. */
+	                                              
 	addr_to_free = (void**) (mem_aligned - sizeof(void*));
 	*addr_to_free = mem;
 
-	/* Write the size to free in the header. */
+	                                           
 	size_to_free = (size_t*) (mem_aligned - hdr_size);
 	*size_to_free = size + align + hdr_size;
 
@@ -733,26 +733,26 @@ dt_kmem_free_aligned(void* buf, size_t size)
 	dt_kmem_free(*addr_to_free, *size_to_free);
 }
 
-/*
- * dtrace wants to manage just a single block: dtrace_state_percpu_t * NCPU, and
- * doesn't specify constructor, destructor, or reclaim methods.
- * At present, it always zeroes the block it obtains from kmem_cache_alloc().
- * We'll manage this constricted use of kmem_cache with ordinary _MALLOC and _FREE.
- */
+  
+                                                                                
+                                                               
+                                                                             
+                                                                                   
+   
 kmem_cache_t *
 kmem_cache_create(
-	const char *name,       /* descriptive name for this cache */
-	size_t bufsize,         /* size of the objects it manages */
-	size_t align,           /* required object alignment */
-	int (*constructor)(void *, void *, int), /* object constructor */
-	void (*destructor)(void *, void *), /* object destructor */
-	void (*reclaim)(void *), /* memory reclaim callback */
-	void *private,          /* pass-thru arg for constr/destr/reclaim */
-	vmem_t *vmp,            /* vmem source for slab allocation */
-	int cflags)     /* cache creation flags */
+	const char *name,                                            
+	size_t bufsize,                                             
+	size_t align,                                          
+	int (*constructor)(void *, void *, int),                         
+	void (*destructor)(void *, void *),                        
+	void (*reclaim)(void *),                              
+	void *private,                                                      
+	vmem_t *vmp,                                                 
+	int cflags)                               
 {
 #pragma unused(name,align,constructor,destructor,reclaim,private,vmp,cflags)
-	return (kmem_cache_t *)bufsize; /* A cookie that tracks the single object size. */
+	return (kmem_cache_t *)bufsize;                                                   
 }
 
 void *
@@ -776,13 +776,13 @@ kmem_cache_destroy(kmem_cache_t *cp)
 #pragma unused(cp)
 }
 
-/*
- * vmem (Solaris "slab" allocator) used by DTrace solely to hand out resource ids
- */
+  
+                                                                                 
+   
 typedef unsigned int u_daddr_t;
 #include "blist.h"
 
-/* By passing around blist *handles*, the underlying blist can be resized as needed. */
+                                                                                       
 struct blist_hdl {
 	blist_t blist;
 };
@@ -803,12 +803,12 @@ vmem_create(const char *name, void *base, size_t size, size_t quantum, void *ign
 	ASSERT(size <= INT32_MAX);
 	ASSERT(vmflag & VMC_IDENTIFIER);
 
-	size = MIN(128, size); /* Clamp to 128 initially, since the underlying data structure is pre-allocated */
+	size = MIN(128, size);                                                                                   
 
 	p->blist = bl = blist_create((daddr_t)size);
 	blist_free(bl, 0, (daddr_t)size);
 	if (base) {
-		blist_alloc( bl, (daddr_t)(uintptr_t)base );   /* Chomp off initial ID(s) */
+		blist_alloc( bl, (daddr_t)(uintptr_t)base );                                
 	}
 	return (vmem_t *)p;
 }
@@ -852,14 +852,14 @@ vmem_destroy(vmem_t *vmp)
 	_FREE( p, sizeof(struct blist_hdl));
 }
 
-/*
- * Timing
- */
+  
+         
+   
 
-/*
- * dtrace_gethrestime() provides the "walltimestamp", a value that is anchored at
- * January 1, 1970. Because it can be called from probe context, it must take no locks.
- */
+  
+                                                                                 
+                                                                                       
+   
 
 hrtime_t
 dtrace_gethrestime(void)
@@ -876,52 +876,52 @@ dtrace_gethrestime(void)
 	return ns64;
 }
 
-/*
- * dtrace_gethrtime() provides high-resolution timestamps with machine-dependent origin.
- * Hence its primary use is to specify intervals.
- */
+  
+                                                                                        
+                                                 
+   
 
 hrtime_t
 dtrace_abs_to_nano(uint64_t elapsed)
 {
 	static mach_timebase_info_data_t    sTimebaseInfo = { 0, 0 };
 
-	/*
-	 * If this is the first time we've run, get the timebase.
-	 * We can use denom == 0 to indicate that sTimebaseInfo is
-	 * uninitialised because it makes no sense to have a zero
-	 * denominator in a fraction.
-	 */
+	  
+                                                          
+                                                           
+                                                          
+                              
+    
 
 	if (sTimebaseInfo.denom == 0) {
 		(void) clock_timebase_info(&sTimebaseInfo);
 	}
 
-	/*
-	 * Convert to nanoseconds.
-	 * return (elapsed * (uint64_t)sTimebaseInfo.numer)/(uint64_t)sTimebaseInfo.denom;
-	 *
-	 * Provided the final result is representable in 64 bits the following maneuver will
-	 * deliver that result without intermediate overflow.
-	 */
+	  
+                           
+                                                                                   
+   
+                                                                                     
+                                                      
+    
 	if (sTimebaseInfo.denom == sTimebaseInfo.numer) {
 		return elapsed;
 	} else if (sTimebaseInfo.denom == 1) {
 		return elapsed * (uint64_t)sTimebaseInfo.numer;
 	} else {
-		/* Decompose elapsed = eta32 * 2^32 + eps32: */
+		                                               
 		uint64_t eta32 = elapsed >> 32;
 		uint64_t eps32 = elapsed & 0x00000000ffffffffLL;
 
 		uint32_t numer = sTimebaseInfo.numer, denom = sTimebaseInfo.denom;
 
-		/* Form product of elapsed64 (decomposed) and numer: */
+		                                                       
 		uint64_t mu64 = numer * eta32;
 		uint64_t lambda64 = numer * eps32;
 
-		/* Divide the constituents by denom: */
+		                                       
 		uint64_t q32 = mu64 / denom;
-		uint64_t r32 = mu64 - (q32 * denom); /* mu64 % denom */
+		uint64_t r32 = mu64 - (q32 * denom);                   
 
 		return (q32 << 32) + ((r32 << 32) + lambda64) / denom;
 	}
@@ -939,16 +939,16 @@ dtrace_gethrtime(void)
 	return dtrace_abs_to_nano(mach_absolute_time() - start);
 }
 
-/*
- * Atomicity and synchronization
- */
+  
+                                
+   
 uint32_t
 dtrace_cas32(uint32_t *target, uint32_t cmp, uint32_t new)
 {
 	if (OSCompareAndSwap((UInt32)cmp, (UInt32)new, (volatile UInt32 *)target )) {
 		return cmp;
 	} else {
-		return ~cmp; /* Must return something *other* than cmp */
+		return ~cmp;                                             
 	}
 }
 
@@ -958,13 +958,13 @@ dtrace_casptr(void *target, void *cmp, void *new)
 	if (OSCompareAndSwapPtr( cmp, new, (void**)target )) {
 		return cmp;
 	} else {
-		return (void *)(~(uintptr_t)cmp); /* Must return something *other* than cmp */
+		return (void *)(~(uintptr_t)cmp);                                             
 	}
 }
 
-/*
- * Interrupt manipulation
- */
+  
+                         
+   
 dtrace_icookie_t
 dtrace_interrupt_disable(void)
 {
@@ -977,26 +977,26 @@ dtrace_interrupt_enable(dtrace_icookie_t reenable)
 	(void)ml_set_interrupts_enabled((boolean_t)reenable);
 }
 
-/*
- * MP coordination
- */
+  
+                  
+   
 static void
 dtrace_sync_func(void)
 {
 }
 
-/*
- * dtrace_sync() is not called from probe context.
- */
+  
+                                                  
+   
 void
 dtrace_sync(void)
 {
 	dtrace_xcall(DTRACE_CPUALL, (dtrace_xcall_t)dtrace_sync_func, NULL);
 }
 
-/*
- * The dtrace_copyin/out/instr and dtrace_fuword* routines can be called from probe context.
- */
+  
+                                                                                            
+   
 
 extern kern_return_t dtrace_copyio_preflight(addr64_t);
 extern kern_return_t dtrace_copyio_postflight(addr64_t);
@@ -1006,13 +1006,13 @@ dtrace_copycheck(user_addr_t uaddr, uintptr_t kaddr, size_t size)
 {
 #pragma unused(kaddr)
 
-	vm_offset_t recover = dtrace_set_thread_recover( current_thread(), 0 ); /* Snare any extant recovery point. */
-	dtrace_set_thread_recover( current_thread(), recover ); /* Put it back. We *must not* re-enter and overwrite. */
+	vm_offset_t recover = dtrace_set_thread_recover( current_thread(), 0 );                                       
+	dtrace_set_thread_recover( current_thread(), recover );                                                         
 
 	ASSERT(kaddr + size >= kaddr);
 
-	if (uaddr + size < uaddr ||             /* Avoid address wrap. */
-	    KERN_FAILURE == dtrace_copyio_preflight(uaddr)) {   /* Machine specific setup/constraints. */
+	if (uaddr + size < uaddr ||                                      
+	    KERN_FAILURE == dtrace_copyio_preflight(uaddr)) {                                            
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_BADADDR);
 		cpu_core[CPU->cpu_id].cpuc_dtrace_illval = uaddr;
 		return 0;
@@ -1042,15 +1042,15 @@ dtrace_copyinstr(user_addr_t src, uintptr_t dst, size_t len, volatile uint16_t *
 	size_t actual;
 
 	if (dtrace_copycheck( src, dst, len )) {
-		/*  copyin as many as 'len' bytes. */
+		                                     
 		int error = copyinstr((const user_addr_t)src, (char *)dst, (vm_size_t)len, &actual);
 
-		/*
-		 * ENAMETOOLONG is returned when 'len' bytes have been copied in but the NUL terminator was
-		 * not encountered. That does not require raising CPU_DTRACE_BADADDR, and we press on.
-		 * Note that we do *not* stuff a NUL terminator when returning ENAMETOOLONG, that's left
-		 * to the caller.
-		 */
+		  
+                                                                                             
+                                                                                        
+                                                                                          
+                   
+     
 		if (error && error != ENAMETOOLONG) {
 			DTRACE_CPUFLAG_SET(CPU_DTRACE_BADADDR);
 			cpu_core[CPU->cpu_id].cpuc_dtrace_illval = src;
@@ -1081,12 +1081,12 @@ dtrace_copyoutstr(uintptr_t src, user_addr_t dst, size_t len, volatile uint16_t 
 	size_t actual;
 
 	if (dtrace_copycheck( dst, src, len )) {
-		/*
-		 * ENAMETOOLONG is returned when 'len' bytes have been copied out but the NUL terminator was
-		 * not encountered. We raise CPU_DTRACE_BADADDR in that case.
-		 * Note that we do *not* stuff a NUL terminator when returning ENAMETOOLONG, that's left
-		 * to the caller.
-		 */
+		  
+                                                                                              
+                                                               
+                                                                                          
+                   
+     
 		if (copyoutstr((const void *)src, dst, (size_t)len, &actual)) {
 			DTRACE_CPUFLAG_SET(CPU_DTRACE_BADADDR);
 			cpu_core[CPU->cpu_id].cpuc_dtrace_illval = dst;
@@ -1108,9 +1108,9 @@ int
 dtrace_buffer_copyout(const void *kaddr, user_addr_t uaddr, vm_size_t nbytes)
 {
 	int maxsize = dtrace_copy_maxsize();
-	/*
-	 * Partition the copyout in copysize_limit_panic-sized chunks
-	 */
+	  
+                                                              
+    
 	while (nbytes >= (vm_size_t)maxsize) {
 		if (copyout(kaddr, uaddr, maxsize) != 0) {
 			return EFAULT;
@@ -1201,10 +1201,10 @@ dtrace_fuword64(user_addr_t uaddr)
 	return ret;
 }
 
-/*
- * Emulation of Solaris fuword / suword
- * Called from the fasttrap provider, so the use of copyin/out requires fewer safegaurds.
- */
+  
+                                       
+                                                                                         
+   
 
 int
 fuword8(user_addr_t uaddr, uint8_t *value)
@@ -1282,9 +1282,9 @@ suword32(user_addr_t addr, uint32_t value)
 	return 0;
 }
 
-/*
- * Miscellaneous
- */
+  
+                
+   
 extern boolean_t dtrace_tally_fault(user_addr_t);
 
 boolean_t
@@ -1296,7 +1296,7 @@ dtrace_tally_fault(user_addr_t uaddr)
 }
 
 #define TOTTY   0x02
-extern int prf(const char *, va_list, int, struct tty *); /* bsd/kern/subr_prf.h */
+extern int prf(const char *, va_list, int, struct tty *);                          
 
 int
 vuprintf(const char *format, va_list ap)
@@ -1304,7 +1304,7 @@ vuprintf(const char *format, va_list ap)
 	return prf(format, ap, TOTTY, NULL);
 }
 
-/* Not called from probe context */
+                                   
 void
 cmn_err( int level, const char *format, ... )
 {
@@ -1330,22 +1330,22 @@ bsearch(const void *key, const void *base0, size_t nmemb, size_t size, int (*com
 		if (cmp == 0) {
 			return p;
 		}
-		if (cmp > 0) {  /* key > p: move right */
+		if (cmp > 0) {                           
 			base = (const char *)p + size;
 			lim--;
-		}               /* else move left */
+		}                                   
 	}
 	return NULL;
 }
 
-/*
- * Runtime and ABI
- */
+  
+                  
+   
 uintptr_t
 dtrace_caller(int ignore)
 {
 #pragma unused(ignore)
-	return -1; /* Just as in Solaris dtrace_asm.s */
+	return -1;                                      
 }
 
 int
@@ -1373,9 +1373,9 @@ dtrace_getstackdepth(int aframes)
 
 		if (nextfp <= minfp || nextfp >= stacktop) {
 			if (on_intr) {
-				/*
-				 * Hop from interrupt stack to thread stack.
-				 */
+				  
+                                                
+       
 				vm_offset_t kstack_base = dtrace_get_kernel_stack(current_thread());
 
 				minfp = (struct frame *)kstack_base;
@@ -1404,9 +1404,9 @@ dtrace_addr_in_module(void* addr, struct modctl *ctl)
 	return OSKextKextForAddress(addr) == (void*)ctl->mod_address;
 }
 
-/*
- * Unconsidered
- */
+  
+               
+   
 void
 dtrace_vtime_enable(void)
 {

@@ -57,24 +57,24 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)strsep.c	8.1 (Berkeley) 6/4/93";
-#endif /* LIBC_SCCS and not lint */
+#endif                             
 #include <sys/cdefs.h>
-/* __FBSDID("$FreeBSD: src/sys/libkern/strsep.c,v 1.7 2004/04/07 20:46:10 imp Exp $"); */
+                                                                                         
 
 #include <sys/param.h>
 #include <libkern/libkern.h>
 
-/*
- * Get next token from string *stringp, where tokens are possibly-empty
- * strings separated by characters from delim.
- *
- * Writes NULs into the string at *stringp to end tokens.
- * delim need not remain constant from call to call.
- * On return, *stringp points past the last NUL written (if there might
- * be further tokens), or is NULL (if there are definitely no more tokens).
- *
- * If *stringp is NULL, strsep returns NULL.
- */
+  
+                                                                       
+                                              
+  
+                                                         
+                                                    
+                                                                       
+                                                                           
+  
+                                            
+   
 char *
 strsep(char **stringp, const char *delim)
 {
@@ -101,5 +101,5 @@ strsep(char **stringp, const char *delim)
 			}
 		} while (sc != 0);
 	}
-	/* NOTREACHED */
+	                
 }

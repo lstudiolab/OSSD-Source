@@ -47,4 +47,4 @@ enum{
 #define kOSSerializeBinarySignature        "\323\0\0"
 #define kOSSerializeIndexedBinarySignature 0x000000D4
 
-#endif /* _OS_OSSERIALIZEBINARY_H */
+#endif                              

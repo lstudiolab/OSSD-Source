@@ -39,4 +39,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _BSD_MACHINE_PARAM_H_ */
+#endif                            

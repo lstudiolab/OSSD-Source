@@ -1,17 +1,17 @@
-//
-// Tests for
-//  template <typename T, typename Alloc, typename TrappingPolicy>
-//  bool operator==(std::nullptr_t, safe_allocation<T, Alloc, TrappingPolicy> const& x);
-//
-//  template <typename T, typename Alloc, typename TrappingPolicy>
-//  bool operator!=(std::nullptr_t, safe_allocation<T, Alloc, TrappingPolicy> const& x);
-//
-//  template <typename T, typename Alloc, typename TrappingPolicy>
-//  bool operator==(safe_allocation<T, Alloc, TrappingPolicy> const& x, std::nullptr_t);
-//
-//  template <typename T, typename Alloc, typename TrappingPolicy>
-//  bool operator!=(safe_allocation<T, Alloc, TrappingPolicy> const& x, std::nullptr_t);
-//
+  
+            
+                                                                  
+                                                                                        
+  
+                                                                  
+                                                                                        
+  
+                                                                  
+                                                                                        
+  
+                                                                  
+                                                                                        
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

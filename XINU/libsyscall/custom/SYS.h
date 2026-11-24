@@ -53,11 +53,11 @@
 #include <architecture/i386/asm_help.h>
 #include <mach/i386/syscall_sw.h>
 
-/*
- * We have two entry points. int's is used for syscalls which need to preserve
- * %ecx across the call, or return a 64-bit value in %eax:%edx. sysenter is used
- * for the majority of syscalls which just return a value in %eax.
- */
+  
+                                                                              
+                                                                                
+                                                                  
+   
 
 #define UNIX_SYSCALL_SYSENTER		call __sysenter_trap
 #define UNIX_SYSCALL(name, nargs)			\
@@ -85,7 +85,7 @@ LEAF(_##name, 0)					;\
 	jnb	2f						;\
 	BRANCH_EXTERN(tramp_##cerror)				;\
 2:
-#else /* __SYSCALL_32BIT_ARG_BYTES < 4 || > 20 */
+#else                                            
 #define UNIX_SYSCALL_NONAME(name, nargs, cerror)	\
 	movl	$ SYS_##name, %eax			;\
 	UNIX_SYSCALL_SYSENTER				;\
@@ -167,22 +167,22 @@ LEAF(pseudo, 0)					;\
 #include <architecture/arm/asm_help.h>
 #include <mach/arm/syscall_sw.h>
 
-/*
- * ARM system call interface:
- *
- * swi 0x80
- * args: r0-r6
- * return code: r0
- * on error, carry bit is set in the psr, otherwise carry bit is cleared.
- */
+  
+                             
+  
+           
+              
+                  
+                                                                         
+   
 
-/*
- * Macros.
- */
+  
+          
+   
 
-/*
- * until we update the architecture project, these live here
- */
+  
+                                                            
+   
 
 #if defined(__DYNAMIC__)
 #define MI_GET_ADDRESS(reg,var)  \
@@ -233,56 +233,56 @@ LEAF(pseudo, 0)					;\
 	.globl  name							;\
 name:
 
-/* load the syscall number into r12 and trap */
+                                               
 #define DO_SYSCALL(num)		\
 	.if (((num) & 0xff) == (num)) 	       				;\
 	mov		r12, #(num)		       			;\
 	.elseif (((num) & 0x3fc) == (num))				;\
 	mov		r12, #(num)					;\
 	.else								;\
-	mov		r12, #((num) & 0xffffff00)	/* top half of the syscall number */ ;\
-	orr		r12, r12, #((num) & 0xff)	/* bottom half */ ;\
+	mov		r12, #((num) & 0xffffff00)	                                     ;\
+	orr		r12, r12, #((num) & 0xff)	                  ;\
 	.endif								;\
 	swi		#SWI_SYSCALL
 
-/* simple syscalls (0 to 4 args) */
+                                   
 #define	SYSCALL_0to4(name, cerror)			\
 	MI_ENTRY_POINT(_##name)					;\
 	DO_SYSCALL(SYS_##name)					;\
-	bxcc	lr								/* return if carry is clear (no error) */ ; \
+	bxcc	lr								                                          ; \
 1:	MI_BRANCH_EXTERNAL(_##cerror)
 
-/* syscalls with 5 args is different, because of the single arg register load */
+                                                                                
 #define	SYSCALL_5(name, cerror)				\
 	MI_ENTRY_POINT(_##name)					;\
-	mov		ip, sp							/* save a pointer to the args */ ; \
-	stmfd	sp!, { r4-r5 }					/* save r4-r5 */ ;\
-	ldr		r4, [ip]						/* load 5th arg */ ; \
+	mov		ip, sp							                                 ; \
+	stmfd	sp!, { r4-r5 }					                 ;\
+	ldr		r4, [ip]						                   ; \
 	DO_SYSCALL(SYS_##name)					;\
-	ldmfd	sp!, { r4-r5 }					/* restore r4-r5 */ ; \
-	bxcc	lr								/* return if carry is clear (no error) */ ; \
+	ldmfd	sp!, { r4-r5 }					                    ; \
+	bxcc	lr								                                          ; \
 1:	MI_BRANCH_EXTERNAL(_##cerror)
 
-/* syscalls with 6 to 12 args. kernel may have to read from stack */
+                                                                    
 #define SYSCALL_6to12(name, save_regs, arg_regs, cerror) \
 	MI_ENTRY_POINT(_##name)					;\
-	mov		ip, sp							/* save a pointer to the args */ ; \
-	stmfd	sp!, { save_regs }				/* callee saved regs */ ;\
-	ldmia	ip, { arg_regs }				/* load arg regs */ ; \
+	mov		ip, sp							                                 ; \
+	stmfd	sp!, { save_regs }				                        ;\
+	ldmia	ip, { arg_regs }				                    ; \
 	DO_SYSCALL(SYS_##name)					;\
-	ldmfd	sp!, { save_regs }				/* restore callee saved regs */ ; \
-	bxcc	lr								/* return if carry is clear (no error) */ ; \
+	ldmfd	sp!, { save_regs }				                                ; \
+	bxcc	lr								                                          ; \
 1:	MI_BRANCH_EXTERNAL(_##cerror)
 
 #define COMMA ,
 
 #if __BIGGEST_ALIGNMENT__ > 4
 
-/* For the armv7k ABI, the alignment requirements may add padding. So we
- * let the kernel figure it out and push extra on the stack to avoid un-needed
- * copy-ins */
+                                                                        
+                                                                              
+              
 
- /* We'll also use r8 for moving arguments */
+                                             
 
 #define SYSCALL_0(name)						SYSCALL_0to4(name)
 #define SYSCALL_1(name)						SYSCALL_0to4(name)
@@ -296,22 +296,22 @@ name:
 #define SYSCALL_8(name)						SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6 COMMA r8)
 #define SYSCALL_12(name)					SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6 COMMA r8)
 
-#else // !(__BIGGEST_ALIGNMENT__ > 4) (the normal arm32 ABI case)
+#else                                                            
 
 #define SYSCALL_0(name)						SYSCALL_0to4(name)
 #define SYSCALL_1(name)						SYSCALL_0to4(name)
 #define SYSCALL_2(name)						SYSCALL_0to4(name)
 #define SYSCALL_3(name)						SYSCALL_0to4(name)
 #define SYSCALL_4(name)						SYSCALL_0to4(name)
-/* SYSCALL_5 declared above */
+                              
 #define SYSCALL_6(name)						SYSCALL_6to12(name, r4-r5, r4-r5)
 #define SYSCALL_7(name)						SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6)
-#define SYSCALL_8(name)						SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6) /* 8th on stack */
-#define SYSCALL_12(name)					SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6) /* 8th-12th on stack */
+#define SYSCALL_8(name)						SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6)                   
+#define SYSCALL_12(name)					SYSCALL_6to12(name, r4-r6 COMMA r8, r4-r6)                        
 
-#endif // __BIGGEST_ALIGNMENT__ > 4
+#endif                             
 
-/* select the appropriate syscall code, based on the number of arguments */
+                                                                           
 #ifndef __SYSCALL_32BIT_ARG_BYTES
 #define SYSCALL(name, nargs, cerror)		SYSCALL_##nargs(name, cerror)
 #define SYSCALL_NONAME(name, nargs, cerror)	SYSCALL_NONAME_##nargs(name, cerror)
@@ -348,37 +348,37 @@ name:
 
 #define	SYSCALL_NONAME_0to4(name, cerror)	\
 	DO_SYSCALL(SYS_##name)					;\
-	bcc		1f								/* branch if carry bit is clear (no error) */ ; \
-	MI_BRANCH_EXTERNAL(_##cerror)			/* call cerror */ ; \
+	bcc		1f								                                              ; \
+	MI_BRANCH_EXTERNAL(_##cerror)			                  ; \
 1:
 
 #define	SYSCALL_NONAME_5(name, cerror)		\
-	mov		ip, sp 							/* save a pointer to the args */ ; \
-	stmfd	sp!, { r4-r5 }					/* save r4-r5 */ ;\
-	ldr		r4, [ip]						/* load 5th arg */ ; \
+	mov		ip, sp 							                                 ; \
+	stmfd	sp!, { r4-r5 }					                 ;\
+	ldr		r4, [ip]						                   ; \
 	DO_SYSCALL(SYS_##name)					;\
-	ldmfd	sp!, { r4-r5 }					/* restore r4-r7 */ ; \
-	bcc		1f								/* branch if carry bit is clear (no error) */ ; \
-	MI_BRANCH_EXTERNAL(_##cerror)			/* call cerror */ ; \
+	ldmfd	sp!, { r4-r5 }					                    ; \
+	bcc		1f								                                              ; \
+	MI_BRANCH_EXTERNAL(_##cerror)			                  ; \
 1:
 
 #define	SYSCALL_NONAME_6to12(name, save_regs, arg_regs, cerror)	\
-	mov		ip, sp 							/* save a pointer to the args */ ; \
-	stmfd	sp!, { save_regs }				/* callee save regs */ ;\
-	ldmia	ip, { arg_regs }				/* load arguments */ ; \
+	mov		ip, sp 							                                 ; \
+	stmfd	sp!, { save_regs }				                       ;\
+	ldmia	ip, { arg_regs }				                     ; \
 	DO_SYSCALL(SYS_##name)					;\
-	ldmfd	sp!, { save_regs }				/* restore callee saved regs */ ; \
-	bcc		1f								/* branch if carry bit is clear (no error) */ ; \
-	MI_BRANCH_EXTERNAL(_##cerror)			/* call cerror */ ; \
+	ldmfd	sp!, { save_regs }				                                ; \
+	bcc		1f								                                              ; \
+	MI_BRANCH_EXTERNAL(_##cerror)			                  ; \
 1:
 
 
 #if __BIGGEST_ALIGNMENT__ > 4
 
-/* For the armv7k ABI, the alignment requirements may add padding. So we
- * let the kernel figure it out and push extra on the stack to avoid un-needed
- * copy-ins. We are relying on arguments that aren't in registers starting
- * 32 bytes from sp. We also use r8 like in the mach case. */
+                                                                        
+                                                                              
+                                                                          
+                                                             
 
 #define SYSCALL_NONAME_0(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
 #define SYSCALL_NONAME_1(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
@@ -392,20 +392,20 @@ name:
 #define SYSCALL_NONAME_8(name, cerror)				SYSCALL_NONAME_6to12(name, r4-r6 COMMA r8, r4-r6 COMMA r8, cerror)
 #define SYSCALL_NONAME_12(name, cerror)				SYSCALL_NONAME_6to12(name, r4-r6 COMMA r8, r4-r6 COMMA r8, cerror)
 
-#else // !(__BIGGEST_ALIGNMENT__ > 4) (the normal arm32 ABI case)
+#else                                                            
 
 #define SYSCALL_NONAME_0(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
 #define SYSCALL_NONAME_1(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
 #define SYSCALL_NONAME_2(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
 #define SYSCALL_NONAME_3(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
 #define SYSCALL_NONAME_4(name, cerror)				SYSCALL_NONAME_0to4(name, cerror)
-/* SYSCALL_NONAME_5 declared above */
+                                     
 #define SYSCALL_NONAME_6(name, cerror)				SYSCALL_NONAME_6to12(name, r4-r5, r4-r5, cerror)
 #define SYSCALL_NONAME_7(name, cerror)				SYSCALL_NONAME_6to12(name, r4-r6 COMMA r8, r4-r6, cerror)
 #define SYSCALL_NONAME_8(name, cerror)				SYSCALL_NONAME_6to12(name, r4-r6 COMMA r8, r4-r6, cerror)
 #define SYSCALL_NONAME_12(name, cerror)				SYSCALL_NONAME_6to12(name, r4-r6 COMMA r8, r4-r6, cerror)
 
-#endif // __BIGGEST_ALIGNMENT__ > 4
+#endif                             
 
 #define	PSEUDO(pseudo, name, nargs, cerror)			\
 	.globl pseudo						;\
@@ -440,11 +440,11 @@ pseudo:									;\
 #define SIGN_EXTEND(argnum)
 #endif
 
-/*
- * ARM64 system call interface:
- *
- * TBD
- */
+  
+                               
+  
+      
+   
 
 #define DO_SYSCALL(num, cerror)                 \
 	mov   x16, #(num)                     %%\

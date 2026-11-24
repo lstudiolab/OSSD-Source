@@ -64,12 +64,12 @@
  *
  * $FreeBSD: src/sys/sys/mac.h,v 1.40 2003/04/18 19:57:37 rwatson Exp $
  */
-/*
- * Userland interface for Mandatory Access Control.
- *
- * The POSIX.1e implementation page may be reached at:
- * http://www.trustedbsd.org/
- */
+  
+                                                   
+  
+                                                      
+                             
+   
 
 #ifndef _SECURITY_MAC_H_
 #define _SECURITY_MAC_H_
@@ -80,9 +80,9 @@
 
 #include <sys/types.h>
 
-/*
- * MAC framework-related constants and limits.
- */
+  
+                                              
+   
 #define MAC_MAX_POLICY_NAME             32
 #define MAC_MAX_LABEL_ELEMENT_NAME      32
 #define MAC_MAX_LABEL_ELEMENT_DATA      4096
@@ -124,11 +124,11 @@ struct user64_mac {
 	uint64_t        m_buflen;
 	uint64_t        m_string;
 };
-#endif /* KERNEL */
+#endif             
 
-/*
- * Flags for mac_proc_check_suspend_resume()
- */
+  
+                                            
+   
 #define MAC_PROC_CHECK_SUSPEND                  0
 #define MAC_PROC_CHECK_RESUME                   1
 #define MAC_PROC_CHECK_HIBERNATE                2
@@ -136,17 +136,17 @@ struct user64_mac {
 #define MAC_PROC_CHECK_PIDBIND                  4
 
 #ifndef KERNEL
-/*
- * Location of the userland MAC framework configuration file.  mac.conf
- * binds policy names to shared libraries that understand those policies,
- * as well as setting defaults for MAC-aware applications.
- */
+  
+                                                                       
+                                                                         
+                                                          
+   
 #define MAC_CONFFILE    "/etc/mac.conf"
 
-/*
- * Extended non-POSIX.1e interfaces that offer additional services
- * available from the userland and kernel MAC frameworks.
- */
+  
+                                                                  
+                                                         
+   
 #ifdef __APPLE_API_PRIVATE
 __BEGIN_DECLS
 int      __mac_execve(char *fname, char **argv, char **envv, mac_t _label);
@@ -164,8 +164,8 @@ int      __mac_get_mount(const char *path, struct mac *label);
 int      __mac_set_proc(const mac_t _label);
 int      __mac_syscall(const char *_policyname, int _call, void *_arg);
 __END_DECLS
-#endif /*__APPLE_API_PRIVATE*/
+#endif                        
 
 #endif
 
-#endif /* !_SECURITY_MAC_H_ */
+#endif                        

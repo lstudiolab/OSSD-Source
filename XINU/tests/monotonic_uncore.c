@@ -1,23 +1,23 @@
-/*
- * Must come before including darwintest.h
- */
+  
+                                          
+   
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
-#endif /* defined(T_NAMESPACE) */
+#endif                           
 
 #include <darwintest.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #ifndef PRIVATE
-/*
- * Need new CPU families.
- */
+  
+                         
+   
 #define PRIVATE
 #include <mach/machine.h>
 #undef PRIVATE
-#else /* !defined(PRIVATE) */
+#else                        
 #include <mach/machine.h>
-#endif /* defined(PRIVATE) */
+#endif                       
 #include <stdint.h>
 #include <System/sys/guarded.h>
 #include <System/sys/monotonic.h>
@@ -39,9 +39,9 @@ device_supports_uncore(void)
 	unsigned int family;
 	size_t size = sizeof(type);
 
-	/*
-	 * Only arm64 Monsoon devices support uncore counters.
-	 */
+	  
+                                                       
+    
 
 	r = sysctlbyname("hw.cputype", &type, &size, NULL, 0);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(r, "sysctlbyname(\"hw.cputype\")");
@@ -274,13 +274,13 @@ T_DECL(uncore_accuracy,
 
 	fd = open_uncore_error(NULL);
 
-	/*
-	 * The reference timebase event counts the same as mach_continuous_time
-	 * (on hardware supporting uncore counters).  Make sure that the counter
-	 * is close to the values returned from the trap.
-	 *
-	 * Fill all the counters with this event.
-	 */
+	  
+                                                                        
+                                                                         
+                                                  
+   
+                                          
+    
 	nctrs = uncore_add_all(fd, REF_TIMEBASE_EVENT, &nmonitors);
 	ctr_mask = (UINT64_C(1) << nctrs) - 1;
 
@@ -288,10 +288,10 @@ T_DECL(uncore_accuracy,
 
 	uncore_enable(fd);
 
-	/*
-	 * First, make sure there's an upper bound on the counter -- take the
-	 * time around getting the counter values.
-	 */
+	  
+                                                                      
+                                           
+    
 
 	times[0] = mach_absolute_time();
 	uncore_counts(fd, ctr_mask, counts[0]);
@@ -311,10 +311,10 @@ T_DECL(uncore_accuracy,
 		    "from mach_absolute_time", i);
 	}
 
-	/*
-	 * Next, the lower bound -- put mach_absolute_time inside getting the
-	 * counter values.
-	 */
+	  
+                                                                      
+                   
+    
 
 	uncore_counts(fd, ctr_mask, counts[0]);
 	times[0] = mach_absolute_time();

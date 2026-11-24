@@ -29,9 +29,9 @@
 #include <kern/spl.h>
 #include <machine/machine_routines.h>
 
-/*
- *  spl routines
- */
+  
+                
+   
 
 __private_extern__ spl_t
 splhigh(

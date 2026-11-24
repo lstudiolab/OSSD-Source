@@ -54,13 +54,13 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- * User LDT management.
- * Each task may have its own LDT.
- */
+  
+                       
+                                  
+   
 
 #include <kern/kalloc.h>
 #include <kern/thread.h>
@@ -85,22 +85,22 @@ static int i386_set_ldt_impl(uint32_t *retval, uint64_t start_sel, uint64_t desc
 static int i386_get_ldt_impl(uint32_t *retval, uint64_t start_sel, uint64_t descs,
     uint64_t num_sels);
 
-/*
- * Add the descriptors to the LDT, starting with
- * the descriptor for 'first_selector'.
- */
+  
+                                                
+                                       
+   
 
 static int
 i386_set_ldt_impl(
 	uint32_t                *retval,
 	uint64_t                start_sel,
-	uint64_t                descs,  /* out */
+	uint64_t                descs,           
 	uint64_t                num_sels)
 {
 	user_ldt_t      new_ldt, old_ldt;
 	struct real_descriptor *dp;
 	unsigned int    i;
-	unsigned int    min_selector = LDTSZ_MIN;       /* do not allow the system selectors to be changed */
+	unsigned int    min_selector = LDTSZ_MIN;                                                            
 	task_t          task = current_task();
 	unsigned int    ldt_count;
 	kern_return_t err;
@@ -125,33 +125,33 @@ i386_set_ldt_impl(
 
 			bzero(&null_ldt, sizeof(null_ldt));
 
-			/*
-			 * Look for null selectors among the already-allocated
-			 * entries.
-			 */
+			  
+                                                         
+              
+      
 			null_count = 0;
 			i = 0;
 			while (i < old_ldt->count) {
 				if (!memcmp(&old_ldt->ldt[i++], &null_ldt, sizeof(null_ldt))) {
 					null_count++;
 					if (null_count == num_sels) {
-						break; /* break out of while loop */
+						break;                              
 					}
 				} else {
 					null_count = 0;
 				}
 			}
 
-			/*
-			 * If we broke out of the while loop, i points to the selector
-			 * after num_sels null selectors.  Otherwise it points to the end
-			 * of the old LDTs, and null_count is the number of null selectors
-			 * at the end.
-			 *
-			 * Either way, there are null_count null selectors just prior to
-			 * the i-indexed selector, and either null_count >= num_sels,
-			 * or we're at the end, so we can extend.
-			 */
+			  
+                                                                 
+                                                                    
+                                                                     
+                 
+     
+                                                                   
+                                                                
+                                            
+      
 			start_sel = old_ldt->start + i - null_count;
 		} else {
 			start_sel = LDTSZ_MIN;
@@ -166,9 +166,9 @@ i386_set_ldt_impl(
 	if (start_sel == 0 && num_sels == 0) {
 		new_ldt = NULL;
 	} else {
-		/*
-		 * Allocate new LDT
-		 */
+		  
+                     
+     
 
 		unsigned int    begin_sel = (unsigned int)start_sel;
 		unsigned int    end_sel = (unsigned int)begin_sel +
@@ -184,7 +184,7 @@ i386_set_ldt_impl(
 		}
 
 		ldt_count = end_sel - begin_sel;
-		/* XXX allocation under task lock */
+		                                    
 		new_ldt = (user_ldt_t)kalloc(sizeof(struct user_ldt) + (ldt_count * sizeof(struct real_descriptor)));
 		if (new_ldt == NULL) {
 			task_unlock(task);
@@ -194,19 +194,19 @@ i386_set_ldt_impl(
 		new_ldt->start = begin_sel;
 		new_ldt->count = ldt_count;
 
-		/*
-		 * Have new LDT.  If there was a an old ldt, copy descriptors
-		 * from old to new.
-		 */
+		  
+                                                               
+                     
+     
 		if (old_ldt) {
 			bcopy(&old_ldt->ldt[0],
 			    &new_ldt->ldt[old_ldt->start - begin_sel],
 			    old_ldt->count * sizeof(struct real_descriptor));
 
-			/*
-			 * If the old and new LDTs are non-overlapping, fill the
-			 * center in with null selectors.
-			 */
+			  
+                                                           
+                                    
+      
 
 			if (old_ldt->start + old_ldt->count < start_sel) {
 				bzero(&new_ldt->ldt[old_ldt->count],
@@ -217,11 +217,11 @@ i386_set_ldt_impl(
 			}
 		}
 
-		/*
-		 * Install new descriptors.
-		 */
+		  
+                             
+     
 		if (descs != 0) {
-			/* XXX copyin under task lock */
+			                                
 			err = copyin(descs, (char *)&new_ldt->ldt[start_sel - begin_sel],
 			    num_sels * sizeof(struct real_descriptor));
 			if (err != 0) {
@@ -232,17 +232,17 @@ i386_set_ldt_impl(
 		} else {
 			bzero(&new_ldt->ldt[start_sel - begin_sel], num_sels * sizeof(struct real_descriptor));
 		}
-		/*
-		 * Validate descriptors.
-		 * Only allow descriptors with user privileges.
-		 */
+		  
+                          
+                                                 
+     
 		for (i = 0, dp = (struct real_descriptor *) &new_ldt->ldt[start_sel - begin_sel];
 		    i < num_sels;
 		    i++, dp++) {
 			switch (dp->access & ~ACC_A) {
 			case 0:
 			case ACC_P:
-				/* valid empty descriptor, clear Present preemptively */
+				                                                        
 				dp->access &= (~ACC_P & 0xff);
 				break;
 			case ACC_P | ACC_PL_U | ACC_DATA:
@@ -259,11 +259,11 @@ i386_set_ldt_impl(
 				user_ldt_free(new_ldt);
 				return EACCES;
 			}
-			/* Reject attempts to create segments with 64-bit granules */
-			/* Note this restriction is still correct, even when
-			 * executing as a 64-bit process (we want to maintain a single
-			 * 64-bit selector (located in the GDT)).
-			 */
+			                                                             
+			                                                    
+                                                                 
+                                            
+      
 			if (dp->granularity & SZ_64) {
 				task_unlock(task);
 				user_ldt_free(new_ldt);
@@ -272,22 +272,22 @@ i386_set_ldt_impl(
 		}
 	}
 
-	task->i386_ldt = new_ldt; /* new LDT for task */
+	task->i386_ldt = new_ldt;                       
 
-	/*
-	 * Switch to new LDT.  We need to do this on all CPUs, since
-	 * another thread in this same task may be currently running,
-	 * and we need to make sure the new LDT is in place
-	 * throughout the task before returning to the user.
-	 */
+	  
+                                                             
+                                                              
+                                                    
+                                                     
+    
 	mp_broadcast(user_ldt_set_action, task);
 
 	task_unlock(task);
 
-	/* free old LDT.  We can't do this until after we've
-	 * rendezvoused with all CPUs, in case another thread
-	 * in this task was in the process of context switching.
-	 */
+	                                                    
+                                                      
+                                                         
+    
 	if (old_ldt) {
 		user_ldt_free(old_ldt);
 	}
@@ -301,7 +301,7 @@ static int
 i386_get_ldt_impl(
 	uint32_t                *retval,
 	uint64_t                start_sel,
-	uint64_t                descs,  /* out */
+	uint64_t                descs,           
 	uint64_t                num_sels)
 {
 	user_ldt_t      user_ldt;
@@ -324,9 +324,9 @@ i386_get_ldt_impl(
 	user_ldt = task->i386_ldt;
 	err = 0;
 
-	/*
-	 * copy out the descriptors
-	 */
+	  
+                            
+    
 
 	if (user_ldt != 0) {
 		ldt_count = user_ldt->start + user_ldt->count;
@@ -387,10 +387,10 @@ user_ldt_set_action(
 	}
 }
 
-/*
- * Set the LDT for the given thread on the current CPU.  Should be invoked
- * with interrupts disabled.
- */
+  
+                                                                          
+                            
+   
 void
 user_ldt_set(
 	thread_t thread)
@@ -419,47 +419,47 @@ user_ldt_set(
 	}
 }
 
-/* For 32-bit processes, called via machdep_syscall() */
+                                                        
 int
 i386_set_ldt(
 	uint32_t                *retval,
 	uint32_t                start_sel,
-	uint32_t                descs,  /* out */
+	uint32_t                descs,           
 	uint32_t                num_sels)
 {
 	return i386_set_ldt_impl(retval, (uint64_t)start_sel, (uint64_t)descs,
 	           (uint64_t)num_sels);
 }
 
-/* For 64-bit processes, called via machdep_syscall64() */
+                                                          
 int
 i386_set_ldt64(
 	uint32_t                *retval,
 	uint64_t                start_sel,
-	uint64_t                descs,  /* out */
+	uint64_t                descs,           
 	uint64_t                num_sels)
 {
 	return i386_set_ldt_impl(retval, start_sel, descs, num_sels);
 }
 
-/* For 32-bit processes, called via machdep_syscall() */
+                                                        
 int
 i386_get_ldt(
 	uint32_t                *retval,
 	uint32_t                start_sel,
-	uint32_t                descs,  /* out */
+	uint32_t                descs,           
 	uint32_t                num_sels)
 {
 	return i386_get_ldt_impl(retval, (uint64_t)start_sel, (uint64_t)descs,
 	           (uint64_t)num_sels);
 }
 
-/* For 64-bit processes, called via machdep_syscall64() */
+                                                          
 int
 i386_get_ldt64(
 	uint32_t                *retval,
 	uint64_t                start_sel,
-	uint64_t                descs,  /* out */
+	uint64_t                descs,           
 	uint64_t                num_sels)
 {
 	return i386_get_ldt_impl(retval, start_sel, descs, num_sels);

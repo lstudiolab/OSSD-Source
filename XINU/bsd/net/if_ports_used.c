@@ -99,7 +99,7 @@ SYSCTL_PROC(_net_link_generic_system_port_used, OID_AUTO, test_wakeuuid_str,
 SYSCTL_OPAQUE(_net_link_generic_system_port_used, OID_AUTO, test_wakeuuid,
     CTLFLAG_RD | CTLFLAG_LOCKED,
     test_wakeuuid, sizeof(uuid_t), "S,uuid_t", "");
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 static int sysctl_get_ports_used SYSCTL_HANDLER_ARGS;
 SYSCTL_NODE(_net_link_generic_system, OID_AUTO, get_ports_used,
@@ -229,10 +229,10 @@ get_test_wake_uuid(uuid_string_t wakeuuid_str, size_t len)
 static bool
 is_wakeuuid_set(void)
 {
-	/*
-	 * IOPMCopySleepWakeUUIDKey() tells if SleepWakeUUID is currently set
-	 * That means we are currently in a sleep/wake cycle
-	 */
+	  
+                                                                      
+                                                     
+    
 	return get_test_wake_uuid(NULL, 0) || IOPMCopySleepWakeUUIDKey(NULL, 0);
 }
 
@@ -285,9 +285,9 @@ if_ports_used_update_wakeuuid(struct ifnet *ifp)
 		uuid_copy(current_wakeuuid, wakeuuid);
 		updated = true;
 	}
-	/*
-	 * Record the time last checked
-	 */
+	  
+                                
+    
 	microuptime(&wakeuiid_last_check);
 	lck_mtx_unlock(&net_port_entry_head_lock);
 
@@ -481,7 +481,7 @@ sysctl_test_wakeuuid_str SYSCTL_HANDLER_ARGS
 	return error;
 }
 
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 int
 sysctl_wakeuuid_not_set_last_time SYSCTL_HANDLER_ARGS
@@ -527,7 +527,7 @@ sysctl_net_port_info_list SYSCTL_HANDLER_ARGS
 	lck_mtx_lock(&net_port_entry_head_lock);
 
 	if (req->oldptr == USER_ADDR_NULL) {
-		/* Add a 25 % cushion */
+		                        
 		uint32_t cnt = net_port_entry_count;
 		cnt += cnt >> 4;
 		req->oldidx = sizeof(struct xnpigen) +
@@ -563,12 +563,12 @@ done:
 	return error;
 }
 
-/*
- * Mirror the arguments of ifnet_get_local_ports_extended()
- *  ifindex
- *  protocol
- *  flags
- */
+  
+                                                           
+           
+            
+         
+   
 static int
 sysctl_get_ports_used SYSCTL_HANDLER_ARGS
 {
@@ -586,9 +586,9 @@ sysctl_get_ports_used SYSCTL_HANDLER_ARGS
 		error = EPERM;
 		goto done;
 	}
-	/*
-	 * 3 is the required number of parameters: ifindex, protocol and flags
-	 */
+	  
+                                                                       
+    
 	if (namelen != 3) {
 		error = ENOENT;
 		goto done;
@@ -644,7 +644,7 @@ if_ports_used_add_inpcb(const uint32_t ifindex, const struct inpcb *inp)
 
 	bzero(&npi, sizeof(struct net_port_info));
 
-	/* This is unlikely to happen but better be safe than sorry */
+	                                                              
 	if (ifindex > UINT16_MAX) {
 		os_log(OS_LOG_DEFAULT, "%s: ifindex %u too big\n", __func__, ifindex);
 		return;
@@ -675,9 +675,9 @@ if_ports_used_add_inpcb(const uint32_t ifindex, const struct inpcb *inp)
 	npi.npi_local_port = inp->inp_lport;
 	npi.npi_foreign_port = inp->inp_fport;
 
-	/*
-	 * Take in account IPv4 addresses mapped on IPv6
-	 */
+	  
+                                                 
+    
 	if ((inp->inp_vflag & INP_IPV6) != 0 && (inp->inp_flags & IN6P_IPV6_V6ONLY) == 0 &&
 	    (inp->inp_vflag & (INP_IPV6 | INP_IPV4)) == (INP_IPV6 | INP_IPV4)) {
 		npi.npi_flags |= NPIF_IPV6 | NPIF_IPV4;
@@ -694,7 +694,7 @@ if_ports_used_add_inpcb(const uint32_t ifindex, const struct inpcb *inp)
 		memcpy(&npi.npi_foreign_addr_in6,
 		    &inp->in6p_faddr, sizeof(struct in6_addr));
 
-		/* Clear the embedded scope ID */
+		                                 
 		if (IN6_IS_ADDR_LINKLOCAL(&npi.npi_local_addr_in6)) {
 			npi.npi_local_addr_in6.s6_addr16[1] = 0;
 		}

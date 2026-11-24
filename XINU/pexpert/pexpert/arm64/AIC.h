@@ -26,8 +26,8 @@ _aic_write32(uintptr_t addr, uint32_t data)
 
 #endif
 
-// AIC timebase registers (timer base address in DT node is setup as AIC_BASE + 0x1000)
+                                                                                       
 #define kAICMainTimLo                           (0x20)
 #define kAICMainTimHi                           (0x28)
 
-#endif /* ! _PEXPERT_ARM_AIC_H */
+#endif                           

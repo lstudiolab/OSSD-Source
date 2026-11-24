@@ -52,7 +52,7 @@ do { \
 } while (0)
 #else
 #define IOStatisticsAlloc(type, size)
-#endif /* IOKITSTATS */
+#endif                 
 
 
 __BEGIN_DECLS
@@ -61,7 +61,7 @@ void ipc_port_release_send(ipc_port_t port);
 
 __END_DECLS
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 enum{
 	kInternalFlagPhysical      = 0x00000001,
@@ -70,13 +70,13 @@ enum{
 	kInternalFlagInit          = 0x00000008
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #define super IOGeneralMemoryDescriptor
 OSDefineMetaClassAndStructorsWithZone(IOBufferMemoryDescriptor,
     IOGeneralMemoryDescriptor, ZC_ZFREE_CLEARMEM);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static uintptr_t
 IOBMDPageProc(iopa_t * a)
@@ -96,7 +96,7 @@ IOBMDPageProc(iopa_t * a)
 	return (uintptr_t) vmaddr;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #ifndef __LP64__
 bool
@@ -109,7 +109,7 @@ IOBufferMemoryDescriptor::initWithOptions(
 	mach_vm_address_t physicalMask = 0;
 	return initWithPhysicalMask(inTask, options, capacity, alignment, physicalMask);
 }
-#endif /* !__LP64__ */
+#endif                
 
 OSSharedPtr<IOBufferMemoryDescriptor>
 IOBufferMemoryDescriptor::withCopy(
@@ -137,7 +137,7 @@ IOBufferMemoryDescriptor::withCopy(
 		}
 
 		err = vm_map_copyin(sourceMap, source, size,
-		    false /* src_destroy */, &copy);
+		    false                  , &copy);
 		if (KERN_SUCCESS != err) {
 			break;
 		}
@@ -215,10 +215,10 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 		_buffer = (void *) _ranges.v64->address;
 		withCopy = true;
 	}
-	//  make sure super::free doesn't dealloc _ranges before super::init
+	                                                                    
 	_flags = kIOMemoryAsReference;
 
-	// Grab IOMD bits from the Buffer MD options
+	                                            
 	iomdOptions  |= (options & kIOBufferDescriptorMemoryFlags);
 
 	if (!(kIOMemoryMapperNone & options)) {
@@ -271,7 +271,7 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 		highestMask = 0;
 	}
 
-	// set memory entry cache mode, pageable, purgeable
+	                                                   
 	iomdOptions |= ((options & kIOMapCacheMask) >> kIOMapCacheShift) << kIOMemoryBufferCacheShift;
 	if (options & kIOMemoryPageable) {
 		iomdOptions |= kIOMemoryBufferPageable;
@@ -281,11 +281,11 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 	} else {
 		vmmap = kernel_map;
 
-		// Buffer shouldn't auto prepare they should be prepared explicitly
-		// But it never was enforced so what are you going to do?
+		                                                                   
+		                                                         
 		iomdOptions |= kIOMemoryAutoPrepare;
 
-		/* Allocate a wired-down buffer inside kernel space. */
+		                                                       
 
 		bool contig = (0 != (options & kIOMemoryHostPhysicallyContiguous));
 
@@ -293,7 +293,7 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 			contig |= (!mapped);
 			contig |= (0 != (kIOMemoryMapperNone & options));
 #if 0
-			// treat kIOMemoryPhysicallyContiguous as kIOMemoryHostPhysicallyContiguous for now
+			                                                                                   
 			contig |= true;
 #endif
 		}
@@ -333,7 +333,7 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 	if ((options & (kIOMemoryPageable | kIOMapCacheMask))) {
 		vm_size_t       size = round_page(capacity);
 
-		// initWithOptions will create memory entry
+		                                           
 		if (!withCopy) {
 			iomdOptions |= kIOMemoryPersistent;
 		}
@@ -349,7 +349,7 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 				inTask = kernel_task;
 			}
 		} else if (options & kIOMapCacheMask) {
-			// Prefetch each page to put entries into the pmap
+			                                                  
 			volatile UInt8 *    startAddr = (UInt8 *)_buffer;
 			volatile UInt8 *    endAddr   = (UInt8 *)_buffer + capacity;
 
@@ -365,7 +365,7 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 	_ranges.v64->length  = _capacity;
 
 	if (!super::initWithOptions(_ranges.v64, 1, 0,
-	    inTask, iomdOptions, /* System mapper */ NULL)) {
+	    inTask, iomdOptions,                     NULL)) {
 		return false;
 	}
 
@@ -374,9 +374,9 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 	if (!(options & kIOMemoryPageable)) {
 		trackingAccumSize(capacity);
 	}
-#endif /* IOTRACKING */
+#endif                 
 
-	// give any system mapper the allocation params
+	                                               
 	if (kIOReturnSuccess != dmaCommandOperation(kIOMDAddDMAMapSpec,
 	    &mapSpec, sizeof(mapSpec))) {
 		return false;
@@ -395,7 +395,7 @@ IOBufferMemoryDescriptor::initWithPhysicalMask(
 			_buffer = NULL;
 			return false;
 		}
-		release();  // map took a retain on this
+		release();                              
 		reserved->map->retain();
 		removeMapping(reserved->map);
 		mach_vm_address_t buffer = reserved->map->getAddress();
@@ -470,7 +470,7 @@ IOBufferMemoryDescriptor::initWithOptions(
 {
 	return initWithPhysicalMask(kernel_task, options, capacity, alignment, (mach_vm_address_t)0);
 }
-#endif /* !__LP64__ */
+#endif                
 
 OSSharedPtr<IOBufferMemoryDescriptor>
 IOBufferMemoryDescriptor::withOptions(
@@ -487,12 +487,12 @@ IOBufferMemoryDescriptor::withOptions(
 }
 
 
-/*
- * withCapacity:
- *
- * Returns a new IOBufferMemoryDescriptor with a buffer large enough to
- * hold capacity bytes.  The descriptor's length is initially set to the capacity.
- */
+  
+                
+  
+                                                                       
+                                                                                  
+   
 OSSharedPtr<IOBufferMemoryDescriptor>
 IOBufferMemoryDescriptor::withCapacity(vm_size_t   inCapacity,
     IODirection inDirection,
@@ -505,12 +505,12 @@ IOBufferMemoryDescriptor::withCapacity(vm_size_t   inCapacity,
 }
 
 #ifndef __LP64__
-/*
- * initWithBytes:
- *
- * Initialize a new IOBufferMemoryDescriptor preloaded with bytes (copied).
- * The descriptor's length and capacity are set to the input buffer's size.
- */
+  
+                 
+  
+                                                                           
+                                                                           
+   
 bool
 IOBufferMemoryDescriptor::initWithBytes(const void * inBytes,
     vm_size_t    inLength,
@@ -523,7 +523,7 @@ IOBufferMemoryDescriptor::initWithBytes(const void * inBytes,
 		return false;
 	}
 
-	// start out with no data
+	                         
 	setLength(0);
 
 	if (!appendBytes(inBytes, inLength)) {
@@ -532,14 +532,14 @@ IOBufferMemoryDescriptor::initWithBytes(const void * inBytes,
 
 	return true;
 }
-#endif /* !__LP64__ */
+#endif                
 
-/*
- * withBytes:
- *
- * Returns a new IOBufferMemoryDescriptor preloaded with bytes (copied).
- * The descriptor's length and capacity are set to the input buffer's size.
- */
+  
+             
+  
+                                                                        
+                                                                           
+   
 OSSharedPtr<IOBufferMemoryDescriptor>
 IOBufferMemoryDescriptor::withBytes(const void * inBytes,
     vm_size_t    inLength,
@@ -556,7 +556,7 @@ IOBufferMemoryDescriptor::withBytes(const void * inBytes,
 	}
 
 	if (me) {
-		// start out with no data
+		                         
 		me->setLength(0);
 
 		if (!me->appendBytes(inBytes, inLength)) {
@@ -566,16 +566,16 @@ IOBufferMemoryDescriptor::withBytes(const void * inBytes,
 	return me;
 }
 
-/*
- * free:
- *
- * Free resources
- */
+  
+        
+  
+                 
+   
 void
 IOBufferMemoryDescriptor::free()
 {
-	// Cache all of the relevant information on the stack for use
-	// after we call super::free()!
+	                                                             
+	                               
 	IOOptionBits     flags         = _flags;
 	IOOptionBits     internalFlags = _internalFlags;
 	IOOptionBits     options   = _options;
@@ -608,9 +608,9 @@ IOBufferMemoryDescriptor::free()
 	    && (kInternalFlagInit & _internalFlags)) {
 		trackingAccumSize(-size);
 	}
-#endif /* IOTRACKING */
+#endif                 
 
-	/* super::free may unwire - deallocate buffer afterwards */
+	                                                           
 	super::free();
 
 	if (options & kIOMemoryPageable) {
@@ -641,27 +641,27 @@ IOBufferMemoryDescriptor::free()
 	}
 }
 
-/*
- * getCapacity:
- *
- * Get the buffer capacity
- */
+  
+               
+  
+                          
+   
 vm_size_t
 IOBufferMemoryDescriptor::getCapacity() const
 {
 	return _capacity;
 }
 
-/*
- * setLength:
- *
- * Change the buffer length of the memory descriptor.  When a new buffer
- * is created, the initial length of the buffer is set to be the same as
- * the capacity.  The length can be adjusted via setLength for a shorter
- * transfer (there is no need to create more buffer descriptors when you
- * can reuse an existing one, even for different transfer sizes).   Note
- * that the specified length must not exceed the capacity of the buffer.
- */
+  
+             
+  
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+                                                                        
+   
 void
 IOBufferMemoryDescriptor::setLength(vm_size_t length)
 {
@@ -674,29 +674,29 @@ IOBufferMemoryDescriptor::setLength(vm_size_t length)
 	_ranges.v64->length = length;
 }
 
-/*
- * setDirection:
- *
- * Change the direction of the transfer.  This method allows one to redirect
- * the descriptor's transfer direction.  This eliminates the need to destroy
- * and create new buffers when different transfer directions are needed.
- */
+  
+                
+  
+                                                                            
+                                                                            
+                                                                        
+   
 void
 IOBufferMemoryDescriptor::setDirection(IODirection direction)
 {
 	_flags = (_flags & ~kIOMemoryDirectionMask) | direction;
 #ifndef __LP64__
 	_direction = (IODirection) (_flags & kIOMemoryDirectionMask);
-#endif /* !__LP64__ */
+#endif                
 }
 
-/*
- * appendBytes:
- *
- * Add some data to the end of the buffer.  This method automatically
- * maintains the memory descriptor buffer length.  Note that appendBytes
- * will not copy past the end of the memory descriptor's current capacity.
- */
+  
+               
+  
+                                                                     
+                                                                        
+                                                                          
+   
 bool
 IOBufferMemoryDescriptor::appendBytes(const void * bytes, vm_size_t withLength)
 {
@@ -710,7 +710,7 @@ IOBufferMemoryDescriptor::appendBytes(const void * bytes, vm_size_t withLength)
 	_ranges.v64->length += actualBytesToCopy;
 
 	if (_task == kernel_task) {
-		bcopy(/* from */ bytes, (void *)(_ranges.v64->address + offset),
+		bcopy(           bytes, (void *)(_ranges.v64->address + offset),
 		    actualBytesToCopy);
 	} else {
 		writeBytes(offset, bytes, actualBytesToCopy);
@@ -719,11 +719,11 @@ IOBufferMemoryDescriptor::appendBytes(const void * bytes, vm_size_t withLength)
 	return true;
 }
 
-/*
- * getBytesNoCopy:
- *
- * Return the virtual address of the beginning of the buffer
- */
+  
+                  
+  
+                                                            
+   
 void *
 IOBufferMemoryDescriptor::getBytesNoCopy()
 {
@@ -735,11 +735,11 @@ IOBufferMemoryDescriptor::getBytesNoCopy()
 }
 
 
-/*
- * getBytesNoCopy:
- *
- * Return the virtual address of an offset from the beginning of the buffer
- */
+  
+                  
+  
+                                                                           
+   
 void *
 IOBufferMemoryDescriptor::getBytesNoCopy(vm_size_t start, vm_size_t withLength)
 {
@@ -774,15 +774,15 @@ IOBufferMemoryDescriptor::getVirtualSegment(IOByteCount offset,
 
 	return bytes;
 }
-#endif /* !__LP64__ */
+#endif                
 
 #ifdef __LP64__
 OSMetaClassDefineReservedUnused(IOBufferMemoryDescriptor, 0);
 OSMetaClassDefineReservedUnused(IOBufferMemoryDescriptor, 1);
-#else /* !__LP64__ */
+#else                
 OSMetaClassDefineReservedUsedX86(IOBufferMemoryDescriptor, 0);
 OSMetaClassDefineReservedUsedX86(IOBufferMemoryDescriptor, 1);
-#endif /* !__LP64__ */
+#endif                
 OSMetaClassDefineReservedUnused(IOBufferMemoryDescriptor, 2);
 OSMetaClassDefineReservedUnused(IOBufferMemoryDescriptor, 3);
 OSMetaClassDefineReservedUnused(IOBufferMemoryDescriptor, 4);

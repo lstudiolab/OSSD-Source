@@ -28,12 +28,12 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _MISC_PROTOS_H_
 #define _MISC_PROTOS_H_
@@ -50,22 +50,22 @@
 
 #ifndef MIN
 #define MIN(a, b) (((a)<(b))?(a):(b))
-#endif /* MIN */
+#endif          
 #ifndef MAX
 #define MAX(a, b) (((a)>(b))?(a):(b))
-#endif  /* MAX */
+#endif           
 
-/* Set a bit in a bit array */
+                              
 extern void setbit(
 	int             which,
 	int             *bitmap);
 
-/* Clear a bit in a bit array */
+                                
 extern void clrbit(
 	int             which,
 	int             *bitmap);
 
-/* Find the first set bit in a bit array */
+                                           
 extern int ffsbit(
 	int             *bitmap);
 extern int ffs(
@@ -73,23 +73,23 @@ extern int ffs(
 extern int ffsll(
 	unsigned long long mask);
 
-/* Find the last set bit in a bit array */
+                                          
 extern int fls(
 	unsigned int    mask);
 extern int flsll(
 	unsigned long long mask);
 
-/*
- * Test if indicated bit is set in bit string.
- */
+  
+                                              
+   
 extern int testbit(
 	int             which,
 	int             *bitmap);
 
-/*
- * Move an aligned 32 or 64-bit word from user space to kernel space
- * using a single read instruction
- */
+  
+                                                                    
+                                  
+   
 extern int copyin_atomic32(
 	const user_addr_t   user_addr,
 	uint32_t            *kernel_addr);
@@ -98,25 +98,25 @@ extern int copyin_atomic64(
 	const user_addr_t   user_addr,
 	uint64_t            *kernel_addr);
 
-/*
- * Does an atomic copyin at the specified user_address and compares
- * it to the passed in value, and if it matches, waits.
- *
- * This is used to implement adaptive spinning for userspace synchronization
- *
- * Returns:
- * 0:       the value mached, and it paused efficiently for the platform
- * ESTALE:  the value didn't match, and it returned immediately
- * other:   the copyin failed (EFAULT, EINVAL, ...)
- */
+  
+                                                                   
+                                                       
+  
+                                                                            
+  
+           
+                                                                        
+                                                               
+                                                   
+   
 extern int copyin_atomic32_wait_if_equals(
 	const user_addr_t   user_addr,
 	uint32_t            value);
 
-/*
- * Move a 32 or 64-bit word from kernel space to user space
- * using a single write instruction
- */
+  
+                                                           
+                                   
+   
 extern int copyout_atomic32(
 	uint32_t            u32,
 	user_addr_t         user_addr);
@@ -125,20 +125,20 @@ extern int copyout_atomic64(
 	uint64_t            u64,
 	user_addr_t         user_addr);
 
-/* Move a NUL-terminated string from a user space to kernel space */
+                                                                    
 extern int copyinstr(
 	const user_addr_t   user_addr,
 	char                *kernel_addr,
 	vm_size_t           max,
 	vm_size_t           *actual);
 
-/* Move arbitrarily-aligned data from a user space to kernel space */
+                                                                     
 extern int copyinmsg(
 	const user_addr_t   user_addr,
 	char                *kernel_addr,
 	mach_msg_size_t     nbytes);
 
-/* Move arbitrarily-aligned data from a kernel space to user space */
+                                                                     
 extern int copyoutmsg(
 	const char      *kernel_addr,
 	user_addr_t     user_addr,
@@ -146,7 +146,7 @@ extern int copyoutmsg(
 
 extern int sscanf(const char *input, const char *fmt, ...) __scanflike(2, 3);
 
-/* sprintf() is being deprecated. Please use snprintf() instead. */
+                                                                   
 extern integer_t sprintf(char *buf, const char *fmt, ...) __printflike(2, 3) __deprecated;
 
 extern int printf(const char *format, ...) __printflike(1, 2);
@@ -244,7 +244,7 @@ extern void bootstrap_create(void);
 #if     DIPC
 extern boolean_t        no_bootstrap_task(void);
 extern ipc_port_t       get_root_master_device_port(void);
-#endif  /* DIPC */
+#endif            
 
 extern kern_return_t    kernel_set_special_port(
 	host_priv_t     host_priv,
@@ -258,11 +258,11 @@ extern kern_return_t    kernel_get_special_port(
 
 user_addr_t get_useraddr(void);
 
-/* symbol lookup */
+                   
 #ifndef __cplusplus
 struct kmod_info_t;
 #endif
 
 extern uint64_t early_random(void);
 
-#endif  /* _MISC_PROTOS_H_ */
+#endif                       

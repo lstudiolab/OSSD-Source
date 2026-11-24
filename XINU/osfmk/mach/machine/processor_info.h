@@ -37,4 +37,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACH_MACHINE_PROCESSOR_INFO_H_ */
+#endif                                      

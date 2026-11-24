@@ -43,7 +43,7 @@ gethostuuid(uuid_t uuid, const struct timespec *timeout)
 		if (_gethostuuid_callback) {
 			result = _gethostuuid_callback(uuid);
 		} else {
-			/* no fallback, return -1/EPERM */
+			                                  
 			memset(uuid, 0x00, sizeof(*uuid));
 		}
 	}
@@ -51,7 +51,7 @@ gethostuuid(uuid_t uuid, const struct timespec *timeout)
 	return result;
 }
 
-/* SPI to call gethostuuid syscall directly, without fallback, need an entitlement */
+                                                                                     
 int
 _getprivatesystemidentifier(uuid_t uuid, const struct timespec *timeout)
 {

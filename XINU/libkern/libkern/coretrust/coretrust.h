@@ -34,17 +34,17 @@
 #include <sys/types.h>
 
 #if XNU_KERNEL_PRIVATE
-/*
- * Only include this when building for XNU. CoreTrust will include its
- * local copy of the header.
- */
+  
+                                                                      
+                            
+   
 #include <coretrust/CTEvaluate.h>
 #endif
 
-/*
- * We add more definitions as the need for them arises. Please refer
- * to <coretrust/CTEvaluate.h> for more information.
- */
+  
+                                                                    
+                                                    
+   
 
 typedef int (*coretrust_CTEvaluateAMFICodeSignatureCMS_t)(
 	const uint8_t *cms_data,
@@ -67,27 +67,27 @@ typedef struct _coretrust {
 
 __BEGIN_DECLS
 
-/*!
- * @const coretrust
- * The CoreTrust interface that was registered.
- */
+   
+                   
+                                               
+   
 extern const coretrust_t *coretrust;
 
-/*!
- * @function coretrust_interface_register
- * Registers the CoreTrust kext interface for use within the kernel proper.
- *
- * @param ct
- * The interface to register.
- *
- * @discussion
- * This routine may only be called once and must be called before late-const has
- * been applied to kernel memory.
- */
+   
+                                         
+                                                                           
+  
+            
+                             
+  
+              
+                                                                                
+                                 
+   
 OS_EXPORT OS_NONNULL1
 void
 coretrust_interface_register(const coretrust_t *ct);
 
 __END_DECLS
 
-#endif // __CORETRUST_H
+#endif                 

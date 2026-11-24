@@ -60,15 +60,15 @@
  * Version 2.0.
  * Copyright (c) 2005-2006 SPARTA, Inc.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_object.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Functions to manipulate IPC objects.
- */
+  
+   
+  
+                         
+                      
+             
+  
+                                       
+   
 
 #include <mach/mach_types.h>
 #include <mach/boolean.h>
@@ -105,11 +105,11 @@ ZONE_INIT(&ipc_object_zones[IOT_PORT_SET], "ipc port sets",
     ZC_NOENCRYPT | ZC_ZFREE_CLEARMEM | ZC_NOSEQUESTER,
     ZONE_ID_IPC_PORT_SET, NULL);
 
-/*
- *	Routine:	ipc_object_reference
- *	Purpose:
- *		Take a reference to an object.
- */
+  
+                                
+           
+                                  
+   
 
 void
 ipc_object_reference(
@@ -118,11 +118,11 @@ ipc_object_reference(
 	io_reference(object);
 }
 
-/*
- *	Routine:	ipc_object_release
- *	Purpose:
- *		Release a reference to an object.
- */
+  
+                              
+           
+                                     
+   
 
 void
 ipc_object_release(
@@ -131,19 +131,19 @@ ipc_object_release(
 	io_release(object);
 }
 
-/*
- *	Routine:	ipc_object_translate
- *	Purpose:
- *		Look up an object in a space.
- *	Conditions:
- *		Nothing locked before.  If successful, the object
- *		is returned active and locked.  The caller doesn't get a ref.
- *	Returns:
- *		KERN_SUCCESS		Object returned locked.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	The name doesn't denote a right
- *		KERN_INVALID_RIGHT	Name doesn't denote the correct right
- */
+  
+                                
+           
+                                 
+              
+                                                     
+                                                                 
+           
+                                         
+                                        
+                                                     
+                                                            
+   
 kern_return_t
 ipc_object_translate(
 	ipc_space_t             space,
@@ -163,7 +163,7 @@ ipc_object_translate(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is read-locked and active */
+	                                     
 
 	if ((entry->ie_bits & MACH_PORT_TYPE(right)) == MACH_PORT_TYPE_NONE) {
 		is_read_unlock(space);
@@ -185,19 +185,19 @@ ipc_object_translate(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_object_translate_two
- *	Purpose:
- *		Look up two objects in a space.
- *	Conditions:
- *		Nothing locked before.  If successful, the objects
- *		are returned locked.  The caller doesn't get a ref.
- *	Returns:
- *		KERN_SUCCESS		Objects returned locked.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	A name doesn't denote a right.
- *		KERN_INVALID_RIGHT	A name doesn't denote the correct right.
- */
+  
+                                    
+           
+                                   
+              
+                                                      
+                                                       
+           
+                                          
+                                        
+                                                    
+                                                               
+   
 
 kern_return_t
 ipc_object_translate_two(
@@ -219,10 +219,10 @@ ipc_object_translate_two(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is read-locked and active */
+	                                     
 
 	if ((entry1->ie_bits & MACH_PORT_TYPE(right1)) == MACH_PORT_TYPE_NONE) {
-		/* If looking for receive, and the entry used to hold one, give a pass on EXC_GUARD */
+		                                                                                      
 		if ((right1 & MACH_PORT_RIGHT_RECEIVE) == MACH_PORT_RIGHT_RECEIVE &&
 		    (entry1->ie_bits & MACH_PORT_TYPE_EX_RECEIVE) == MACH_PORT_TYPE_EX_RECEIVE) {
 			doguard = FALSE;
@@ -235,7 +235,7 @@ ipc_object_translate_two(
 	}
 
 	if ((entry2->ie_bits & MACH_PORT_TYPE(right2)) == MACH_PORT_TYPE_NONE) {
-		/* If looking for receive, and the entry used to hold one, give a pass on EXC_GUARD */
+		                                                                                      
 		if ((right2 & MACH_PORT_RIGHT_RECEIVE) == MACH_PORT_RIGHT_RECEIVE &&
 		    (entry2->ie_bits & MACH_PORT_TYPE_EX_RECEIVE) == MACH_PORT_TYPE_EX_RECEIVE) {
 			doguard = FALSE;
@@ -273,18 +273,18 @@ ipc_object_translate_two(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_object_alloc_dead
- *	Purpose:
- *		Allocate a dead-name entry.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		The dead name is allocated.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_NO_SPACE		No room for an entry in the space.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                                 
+           
+                               
+              
+                   
+           
+                                             
+                                        
+                                                     
+                                                    
+   
 
 kern_return_t
 ipc_object_alloc_dead(
@@ -298,9 +298,9 @@ ipc_object_alloc_dead(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is write-locked */
+	                           
 
-	/* null object, MACH_PORT_TYPE_DEAD_NAME, 1 uref */
+	                                                   
 
 	assert(entry->ie_object == IO_NULL);
 	entry->ie_bits |= MACH_PORT_TYPE_DEAD_NAME | 1;
@@ -309,18 +309,18 @@ ipc_object_alloc_dead(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_object_alloc_dead_name
- *	Purpose:
- *		Allocate a dead-name entry, with a specific name.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		The dead name is allocated.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_NAME_EXISTS	The name already denotes a right.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                                      
+           
+                                                     
+              
+                   
+           
+                                             
+                                        
+                                                      
+                                                    
+   
 
 kern_return_t
 ipc_object_alloc_dead_name(
@@ -334,14 +334,14 @@ ipc_object_alloc_dead_name(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is write-locked */
+	                           
 
 	if (ipc_right_inuse(entry)) {
 		is_write_unlock(space);
 		return KERN_NAME_EXISTS;
 	}
 
-	/* null object, MACH_PORT_TYPE_DEAD_NAME, 1 uref */
+	                                                   
 
 	assert(entry->ie_object == IO_NULL);
 	entry->ie_bits |= MACH_PORT_TYPE_DEAD_NAME | 1;
@@ -350,20 +350,20 @@ ipc_object_alloc_dead_name(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_object_alloc
- *	Purpose:
- *		Allocate an object.
- *	Conditions:
- *		Nothing locked.  If successful, the object is returned locked.
- *		The space is write locked on successful return.
- *		The caller doesn't get a reference for the object.
- *	Returns:
- *		KERN_SUCCESS		The object is allocated.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_NO_SPACE		No room for an entry in the space.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                            
+           
+                       
+              
+                                                                  
+                                                   
+                                                      
+           
+                                          
+                                        
+                                                     
+                                                    
+   
 
 kern_return_t
 ipc_object_alloc(
@@ -395,7 +395,7 @@ ipc_object_alloc(
 		io_free(otype, object);
 		return kr;
 	}
-	/* space is write-locked */
+	                           
 
 	entry->ie_bits |= type | urefs;
 	entry->ie_object = object;
@@ -404,25 +404,25 @@ ipc_object_alloc(
 	object->io_bits = io_makebits(TRUE, otype, 0);
 	io_lock(object);
 
-	object->io_references = 1; /* for entry, not caller */
+	object->io_references = 1;                            
 
 	*objectp = object;
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_object_alloc_name
- *	Purpose:
- *		Allocate an object, with a specific name.
- *	Conditions:
- *		Nothing locked.  If successful, the object is returned locked.
- *		The caller doesn't get a reference for the object.
- *	Returns:
- *		KERN_SUCCESS		The object is allocated.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_NAME_EXISTS	The name already denotes a right.
- *		KERN_RESOURCE_SHORTAGE	Couldn't allocate memory.
- */
+  
+                                 
+           
+                                             
+              
+                                                                  
+                                                      
+           
+                                          
+                                        
+                                                      
+                                                    
+   
 
 kern_return_t
 ipc_object_alloc_name(
@@ -453,7 +453,7 @@ ipc_object_alloc_name(
 		io_free(otype, object);
 		return kr;
 	}
-	/* space is write-locked */
+	                           
 
 	if (ipc_right_inuse(entry)) {
 		is_write_unlock(space);
@@ -470,17 +470,17 @@ ipc_object_alloc_name(
 	io_lock(object);
 	is_write_unlock(space);
 
-	object->io_references = 1; /* for entry, not caller */
+	object->io_references = 1;                            
 
 	*objectp = object;
 	return KERN_SUCCESS;
 }
 
-/*	Routine:	ipc_object_validate
- *	Purpose:
- *		Validates an ipc port or port set as belonging to the correct
- *		zone.
- */
+                               
+           
+                                                                 
+         
+   
 
 void
 ipc_object_validate(
@@ -495,11 +495,11 @@ ipc_object_validate(
 	}
 }
 
-/*
- *	Routine:	ipc_object_copyin_type
- *	Purpose:
- *		Convert a send type name to a received type name.
- */
+  
+                                  
+           
+                                                     
+   
 
 mach_msg_type_name_t
 ipc_object_copyin_type(
@@ -521,26 +521,26 @@ ipc_object_copyin_type(
 	case MACH_MSG_TYPE_DISPOSE_RECEIVE:
 	case MACH_MSG_TYPE_DISPOSE_SEND:
 	case MACH_MSG_TYPE_DISPOSE_SEND_ONCE:
-	/* fall thru */
+	               
 	default:
 		return MACH_MSG_TYPE_PORT_NONE;
 	}
 }
 
-/*
- *	Routine:	ipc_object_copyin
- *	Purpose:
- *		Copyin a capability from a space.
- *		If successful, the caller gets a ref
- *		for the resulting object, unless it is IO_DEAD.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Acquired an object, possibly IO_DEAD.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	Name doesn't exist in space.
- *		KERN_INVALID_RIGHT	Name doesn't denote correct right.
- */
+  
+                             
+           
+                                     
+                                        
+                                                   
+              
+                   
+           
+                                                       
+                                        
+                                                  
+                                                         
+   
 
 kern_return_t
 ipc_object_copyin(
@@ -561,17 +561,17 @@ ipc_object_copyin(
 	ipc_object_copyin_flags_t irc_flags = IPC_OBJECT_COPYIN_FLAGS_ALLOW_IMMOVABLE_SEND |
 	    IPC_OBJECT_COPYIN_FLAGS_SOFT_FAIL_IMMOVABLE_SEND;
 	irc_flags = (copyin_flags & irc_flags) | IPC_OBJECT_COPYIN_FLAGS_DEADOK;
-	/*
-	 *	Could first try a read lock when doing
-	 *	MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND,
-	 *	and MACH_MSG_TYPE_MAKE_SEND_ONCE.
-	 */
+	  
+                                          
+                                                     
+                                     
+    
 
 	kr = ipc_right_lookup_write(space, name, &entry);
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is write-locked and active */
+	                                      
 
 	release_port = IP_NULL;
 	kr = ipc_right_copyin(space, name, entry,
@@ -590,7 +590,7 @@ ipc_object_copyin(
 	if (0 < assertcnt && ipc_importance_task_is_any_receiver_type(current_task()->task_imp_base)) {
 		ipc_importance_task_drop_internal_assertion(current_task()->task_imp_base, assertcnt);
 	}
-#endif /* IMPORTANCE_INHERITANCE */
+#endif                             
 
 	if (release_port != IP_NULL) {
 		ip_release(release_port);
@@ -603,33 +603,33 @@ ipc_object_copyin(
 	return kr;
 }
 
-/*
- *	Routine:	ipc_object_copyin_from_kernel
- *	Purpose:
- *		Copyin a naked capability from the kernel.
- *
- *		MACH_MSG_TYPE_MOVE_RECEIVE
- *			The receiver must be ipc_space_kernel
- *			or the receive right must already be in limbo.
- *			Consumes the naked receive right.
- *		MACH_MSG_TYPE_COPY_SEND
- *			A naked send right must be supplied.
- *			The port gains a reference, and a send right
- *			if the port is still active.
- *		MACH_MSG_TYPE_MAKE_SEND
- *			The receiver must be ipc_space_kernel.
- *			The port gains a reference and a send right.
- *		MACH_MSG_TYPE_MOVE_SEND
- *			Consumes a naked send right.
- *		MACH_MSG_TYPE_MAKE_SEND_ONCE
- *			The port gains a reference and a send-once right.
- *			Receiver also be the caller of device subsystem,
- *			so no assertion.
- *		MACH_MSG_TYPE_MOVE_SEND_ONCE
- *			Consumes a naked send-once right.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                         
+           
+                                              
+  
+                              
+                                          
+                                                   
+                                      
+                           
+                                         
+                                                 
+                                 
+                           
+                                           
+                                                 
+                           
+                                 
+                                
+                                                      
+                                                     
+                     
+                                
+                                      
+              
+                   
+   
 
 void
 ipc_object_copyin_from_kernel(
@@ -649,7 +649,7 @@ ipc_object_copyin_from_kernel(
 			assert(port->ip_receiver == ipc_space_kernel);
 			assert(port->ip_immovable_receive == 0);
 
-			/* relevant part of ipc_port_clear_receiver */
+			                                              
 			port->ip_mscount = 0;
 			port->ip_receiver_name = MACH_PORT_NULL;
 			port->ip_destination = IP_NULL;
@@ -690,7 +690,7 @@ ipc_object_copyin_from_kernel(
 	}
 
 	case MACH_MSG_TYPE_MOVE_SEND: {
-		/* move naked send right into the message */
+		                                            
 		assert(ip_object_to_port(object)->ip_srights);
 		break;
 	}
@@ -708,7 +708,7 @@ ipc_object_copyin_from_kernel(
 	}
 
 	case MACH_MSG_TYPE_MOVE_SEND_ONCE: {
-		/* move naked send-once right into the message */
+		                                                 
 		assert(ip_object_to_port(object)->ip_sorights);
 		break;
 	}
@@ -718,16 +718,16 @@ ipc_object_copyin_from_kernel(
 	}
 }
 
-/*
- *	Routine:	ipc_object_destroy
- *	Purpose:
- *		Destroys a naked capability.
- *		Consumes a ref for the object.
- *
- *		A receive right should be in limbo or in transit.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                              
+           
+                                
+                                  
+  
+                                                     
+              
+                   
+   
 
 void
 ipc_object_destroy(
@@ -755,15 +755,15 @@ ipc_object_destroy(
 	}
 }
 
-/*
- *	Routine:	ipc_object_destroy_dest
- *	Purpose:
- *		Destroys a naked capability for the destination of
- *		of a message. Consumes a ref for the object.
- *
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                   
+           
+                                                      
+                                                
+  
+              
+                   
+   
 
 void
 ipc_object_destroy_dest(
@@ -792,30 +792,30 @@ ipc_object_destroy_dest(
 	}
 }
 
-/*
- *	Routine:	ipc_object_insert_send_right
- *	Purpose:
- *		Insert a send right into an object already in the space.
- *		The specified name must already point to a valid object.
- *
- *		Note: This really is a combined copyin()/copyout(),
- *		that avoids most of the overhead of being implemented that way.
- *
- *		This is the fastpath for mach_port_insert_right.
- *
- *	Conditions:
- *		Nothing locked.
- *
- *		msgt_name must be MACH_MSG_TYPE_MAKE_SEND_ONCE or
- *		MACH_MSG_TYPE_MOVE_SEND_ONCE.
- *
- *	Returns:
- *		KERN_SUCCESS		Copied out object, consumed ref.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_NAME	Name doesn't exist in space.
- *		KERN_INVALID_CAPABILITY	The object is dead.
- *		KERN_RIGHT_EXISTS	Space has rights under another name.
- */
+  
+                                        
+           
+                                                            
+                                                            
+  
+                                                       
+                                                                   
+  
+                                                    
+  
+              
+                   
+  
+                                                     
+                                 
+  
+           
+                                                  
+                                        
+                                                  
+                                               
+                                                          
+   
 kern_return_t
 ipc_object_insert_send_right(
 	ipc_space_t             space,
@@ -834,7 +834,7 @@ ipc_object_insert_send_right(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is write-locked and active */
+	                                      
 
 	if (!IO_VALID(entry->ie_object)) {
 		is_write_unlock(space);
@@ -855,9 +855,9 @@ ipc_object_insert_send_right(
 				port->ip_srights++;
 				bits |= MACH_PORT_TYPE_SEND;
 			}
-			/* leave urefs pegged to maximum if it overflowed */
+			                                                    
 			if (IE_BITS_UREFS(bits) < MACH_PORT_UREFS_MAX) {
-				bits += 1; /* increment urefs */
+				bits += 1;                      
 			}
 			entry->ie_bits = bits;
 			ipc_entry_modified(space, name, entry);
@@ -865,11 +865,11 @@ ipc_object_insert_send_right(
 		} else {
 			kr = KERN_INVALID_RIGHT;
 		}
-	} else { // MACH_MSG_TYPE_COPY_SEND
+	} else {                           
 		if (bits & MACH_PORT_TYPE_SEND) {
-			/* leave urefs pegged to maximum if it overflowed */
+			                                                    
 			if (IE_BITS_UREFS(bits) < MACH_PORT_UREFS_MAX) {
-				entry->ie_bits = bits + 1; /* increment urefs */
+				entry->ie_bits = bits + 1;                      
 			}
 			ipc_entry_modified(space, name, entry);
 			kr = KERN_SUCCESS;
@@ -884,22 +884,22 @@ ipc_object_insert_send_right(
 	return kr;
 }
 
-/*
- *	Routine:	ipc_object_copyout
- *	Purpose:
- *		Copyout a capability, placing it into a space.
- *		Always consumes a ref for the object.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Copied out object, consumed ref.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_CAPABILITY	The object is dead.
- *		KERN_NO_SPACE		No room in space for another right.
- *		KERN_RESOURCE_SHORTAGE	No memory available.
- *		KERN_UREFS_OVERFLOW	Urefs limit exceeded
- *			and overflow wasn't specified.
- */
+  
+                              
+           
+                                                  
+                                         
+              
+                   
+           
+                                                  
+                                        
+                                               
+                                                      
+                                               
+                                            
+                                   
+   
 
 kern_return_t
 ipc_object_copyout(
@@ -937,11 +937,11 @@ ipc_object_copyout(
 
 		kr = ipc_entries_hold(space, 1);
 		if (kr != KERN_SUCCESS) {
-			/* unlocks/locks space, so must start again */
+			                                              
 
 			kr = ipc_entry_grow_table(space, ITS_SIZE_NONE);
 			if (kr != KERN_SUCCESS) {
-				/* space is unlocked */
+				                       
 				goto out;
 			}
 			continue;
@@ -955,7 +955,7 @@ ipc_object_copyout(
 			goto out;
 		}
 
-		/* Don't actually copyout rights we aren't allowed to */
+		                                                        
 		if (!ip_label_check(space, port, msgt_name, &flags, &port_subst)) {
 			io_unlock(object);
 			is_write_unlock(space);
@@ -964,12 +964,12 @@ ipc_object_copyout(
 			goto out;
 		}
 
-		/* is the kolabel requesting a substitution */
+		                                              
 		if (port_subst != IP_NULL) {
-			/*
-			 * port is unlocked, its right consumed
-			 * space is unlocked
-			 */
+			  
+                                          
+                       
+      
 			assert(msgt_name == MACH_MSG_TYPE_PORT_SEND);
 			port = port_subst;
 			if (!IP_VALID(port)) {
@@ -986,7 +986,7 @@ ipc_object_copyout(
 		break;
 	}
 
-	/* space is write-locked and active, object is locked and active */
+	                                                                   
 
 	if ((msgt_name != MACH_MSG_TYPE_PORT_SEND_ONCE) &&
 	    ipc_right_reverse(space, object, &name, &entry)) {
@@ -1003,7 +1003,7 @@ ipc_object_copyout(
 	kr = ipc_right_copyout(space, name, entry,
 	    msgt_name, flags, context, guard_flags, object);
 
-	/* object is unlocked */
+	                        
 	is_write_unlock(space);
 
 out:
@@ -1016,24 +1016,24 @@ out:
 	return kr;
 }
 
-/*
- *	Routine:	ipc_object_copyout_name
- *	Purpose:
- *		Copyout a capability, placing it into a space.
- *		The specified name is used for the capability.
- *		If successful, consumes a ref for the object.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		KERN_SUCCESS		Copied out object, consumed ref.
- *		KERN_INVALID_TASK	The space is dead.
- *		KERN_INVALID_CAPABILITY	The object is dead.
- *		KERN_RESOURCE_SHORTAGE	No memory available.
- *		KERN_UREFS_OVERFLOW	Urefs limit exceeded
- *			and overflow wasn't specified.
- *		KERN_RIGHT_EXISTS	Space has rights under another name.
- *		KERN_NAME_EXISTS	Name is already used.
- */
+  
+                                   
+           
+                                                  
+                                                  
+                                                 
+              
+                   
+           
+                                                  
+                                        
+                                               
+                                               
+                                            
+                                   
+                                                          
+                                          
+   
 
 kern_return_t
 ipc_object_copyout_name(
@@ -1051,7 +1051,7 @@ ipc_object_copyout_name(
 #if IMPORTANCE_INHERITANCE
 	int assertcnt = 0;
 	ipc_importance_task_t task_imp = IIT_NULL;
-#endif /* IMPORTANCE_INHERITANCE */
+#endif                             
 
 	assert(IO_VALID(object));
 	assert(io_otype(object) == IOT_PORT);
@@ -1060,16 +1060,16 @@ ipc_object_copyout_name(
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
-	/* space is write-locked and active */
+	                                      
 
 	io_lock(object);
 
-	/*
-	 * Don't actually copyout rights we aren't allowed to
-	 *
-	 * In particular, kolabel-ed objects do not allow callers
-	 * to pick the name they end up with.
-	 */
+	  
+                                                      
+   
+                                                          
+                                      
+    
 	if (!io_active(object) || ip_is_kolabeled(port)) {
 		io_unlock(object);
 		if (!ipc_right_inuse(entry)) {
@@ -1079,7 +1079,7 @@ ipc_object_copyout_name(
 		return KERN_INVALID_CAPABILITY;
 	}
 
-	/* space is write-locked and active, object is locked and active */
+	                                                                   
 
 	if ((msgt_name != MACH_MSG_TYPE_PORT_SEND_ONCE) &&
 	    ipc_right_reverse(space, object, &oname, &oentry)) {
@@ -1105,12 +1105,12 @@ ipc_object_copyout_name(
 	}
 
 #if IMPORTANCE_INHERITANCE
-	/*
-	 * We are slamming a receive right into the space, without
-	 * first having been enqueued on a port destined there.  So,
-	 * we have to arrange to boost the task appropriately if this
-	 * port has assertions (and the task wants them).
-	 */
+	  
+                                                           
+                                                             
+                                                              
+                                                  
+    
 	if (msgt_name == MACH_MSG_TYPE_PORT_RECEIVE) {
 		if (space->is_task != TASK_NULL) {
 			task_imp = space->is_task->task_imp_base;
@@ -1122,44 +1122,44 @@ ipc_object_copyout_name(
 			}
 		}
 
-		/* take port out of limbo */
+		                            
 		assert(port->ip_tempowner != 0);
 		port->ip_tempowner = 0;
 	}
 
-#endif /* IMPORTANCE_INHERITANCE */
+#endif                             
 
 	kr = ipc_right_copyout(space, name, entry,
 	    msgt_name, IPC_OBJECT_COPYOUT_FLAGS_NONE, NULL, NULL, object);
 
-	/* object is unlocked */
+	                        
 	is_write_unlock(space);
 
 #if IMPORTANCE_INHERITANCE
-	/*
-	 * Add the assertions to the task that we captured before
-	 */
+	  
+                                                          
+    
 	if (task_imp != IIT_NULL) {
 		ipc_importance_task_hold_internal_assertion(task_imp, assertcnt);
 		ipc_importance_task_release(task_imp);
 	}
-#endif /* IMPORTANCE_INHERITANCE */
+#endif                             
 
 	return kr;
 }
 
-/*
- *	Routine:	ipc_object_copyout_dest
- *	Purpose:
- *		Translates/consumes the destination right of a message.
- *		This is unlike normal copyout because the right is consumed
- *		in a funny way instead of being given to the receiving space.
- *		The receiver gets his name for the port, if he has receive
- *		rights, otherwise MACH_PORT_NULL.
- *	Conditions:
- *		The object is locked and active.  Nothing else locked.
- *		The object is unlocked and loses a reference.
- */
+  
+                                   
+           
+                                                           
+                                                               
+                                                                 
+                                                              
+                                     
+              
+                                                          
+                                                 
+   
 
 void
 ipc_object_copyout_dest(
@@ -1173,12 +1173,12 @@ ipc_object_copyout_dest(
 	assert(IO_VALID(object));
 	assert(io_active(object));
 
-	/*
-	 *	If the space is the receiver/owner of the object,
-	 *	then we quietly consume the right and return
-	 *	the space's name for the object.  Otherwise
-	 *	we destroy the right and return MACH_PORT_NULL.
-	 */
+	  
+                                                     
+                                                
+                                               
+                                                   
+    
 
 	switch (msgt_name) {
 	case MACH_MSG_TYPE_PORT_SEND: {
@@ -1199,11 +1199,11 @@ ipc_object_copyout_dest(
 			port->ip_nsrequest = IP_NULL;
 			mscount = port->ip_mscount;
 			ipc_port_clear_sync_rcv_thread_boost_locked(port);
-			/* port unlocked */
+			                   
 			ipc_notify_no_senders(nsrequest, mscount);
 		} else {
 			ipc_port_clear_sync_rcv_thread_boost_locked(port);
-			/* port unlocked */
+			                   
 		}
 
 		ip_release(port);
@@ -1216,22 +1216,22 @@ ipc_object_copyout_dest(
 		assert(port->ip_sorights > 0);
 
 		if (port->ip_receiver == space) {
-			/* quietly consume the send-once right */
+			                                         
 
 			port->ip_sorights--;
 			name = port->ip_receiver_name;
 			ipc_port_clear_sync_rcv_thread_boost_locked(port);
-			/* port unlocked */
+			                   
 			ip_release(port);
 		} else {
-			/*
-			 *	A very bizarre case.  The message
-			 *	was received, but before this copyout
-			 *	happened the space lost receive rights.
-			 *	We can't quietly consume the soright
-			 *	out from underneath some other task,
-			 *	so generate a send-once notification.
-			 */
+			  
+                                       
+                                           
+                                             
+                                          
+                                          
+                                           
+      
 
 			ip_unlock(port);
 
@@ -1250,11 +1250,11 @@ ipc_object_copyout_dest(
 	*namep = name;
 }
 
-/*
- *	Routine:        io_lock
- *	Purpose:
- *		Validate, then acquire a lock on an ipc object
- */
+  
+                          
+           
+                                                  
+   
 
 void
 io_lock(ipc_object_t io)
@@ -1263,12 +1263,12 @@ io_lock(ipc_object_t io)
 	lck_spin_lock_grp(&(io)->io_lock_data, &ipc_lck_grp);
 }
 
-/*
- *	Routine:	io_lock_try
- *	Purpose:
- *		Validate, then try to acquire a lock on an object,
- *		fail if there is an existing busy lock
- */
+  
+                       
+           
+                                                      
+                                          
+   
 
 boolean_t
 io_lock_try(ipc_object_t io)
@@ -1277,10 +1277,10 @@ io_lock_try(ipc_object_t io)
 	return lck_spin_try_lock_grp(&(io)->io_lock_data, &ipc_lck_grp);
 }
 
-/*
- *	Check whether the object is a port if so, free it.  But
- *	keep track of that fact.
- */
+  
+                                                          
+                           
+   
 void
 io_free(
 	unsigned int    otype,

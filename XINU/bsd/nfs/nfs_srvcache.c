@@ -68,11 +68,11 @@
 #include <nfs/nfs_conf.h>
 #if CONFIG_NFS_SERVER
 
-/*
- * Reference: Chet Juszczak, "Improving the Performance and Correctness
- *		of an NFS Server", in Proc. Winter 1989 USENIX Conference,
- *		pages 53-63. San Diego, February 1989.
- */
+  
+                                                                       
+                                                              
+                                          
+   
 #include <sys/param.h>
 #include <sys/vnode.h>
 #include <sys/mount_internal.h>
@@ -103,9 +103,9 @@ u_long nfsrv_reqcache_hash;
 static LCK_GRP_DECLARE(nfsrv_reqcache_lck_grp, "nfsrv_reqcache");
 LCK_MTX_DECLARE(nfsrv_reqcache_mutex, &nfsrv_reqcache_lck_grp);
 
-/*
- * Static array that defines which nfs rpc's are nonidempotent
- */
+  
+                                                              
+   
 static int nonidempotent[NFS_NPROCS] = {
 	FALSE,
 	FALSE,
@@ -132,7 +132,7 @@ static int nonidempotent[NFS_NPROCS] = {
 	FALSE,
 };
 
-/* True iff the rpc reply is an nfs status ONLY! */
+                                                   
 static int nfsv2_repstat[NFS_NPROCS] = {
 	FALSE,
 	FALSE,
@@ -154,9 +154,9 @@ static int nfsv2_repstat[NFS_NPROCS] = {
 	FALSE,
 };
 
-/*
- * Initialize the server request cache list
- */
+  
+                                           
+   
 void
 nfsrv_initcache(void)
 {
@@ -165,20 +165,20 @@ nfsrv_initcache(void)
 	}
 
 	lck_mtx_lock(&nfsrv_reqcache_mutex);
-	/* init nfs server request cache hash table */
+	                                              
 	nfsrv_reqcache_hashtbl = hashinit(nfsrv_reqcache_size, M_NFSD, &nfsrv_reqcache_hash);
 	TAILQ_INIT(&nfsrv_reqcache_lruhead);
 	lck_mtx_unlock(&nfsrv_reqcache_mutex);
 }
 
-/*
- * This function compares two net addresses by family and returns TRUE
- * if they are the same host.
- * If there is any doubt, return FALSE.
- * The AF_INET family is handled as a special case so that address mbufs
- * don't need to be saved to store "struct in_addr", which is only 4 bytes.
- * Ditto for AF_INET6 which is only 16 bytes.
- */
+  
+                                                                      
+                             
+                                       
+                                                                        
+                                                                           
+                                             
+   
 static int
 netaddr_match(
 	int family,
@@ -207,20 +207,20 @@ netaddr_match(
 	return 0;
 }
 
-/*
- * Look for the request in the cache
- * If found then
- *    return action and optionally reply
- * else
- *    insert it in the cache
- *
- * The rules are as follows:
- * - if in progress, return DROP request
- * - if completed within DELAY of the current time, return DROP it
- * - if completed a longer time ago return REPLY if the reply was cached or
- *   return DOIT
- * Update/add new request at end of lru list
- */
+  
+                                    
+                
+                                        
+       
+                            
+  
+                            
+                                        
+                                                                  
+                                                                           
+                
+                                            
+   
 int
 nfsrv_getcache(
 	struct nfsrv_descript *nd,
@@ -232,10 +232,10 @@ nfsrv_getcache(
 	struct sockaddr *saddr;
 	int ret, error;
 
-	/*
-	 * Don't cache recent requests for reliable transport protocols.
-	 * (Maybe we should for the case of a reconnect, but..)
-	 */
+	  
+                                                                 
+                                                        
+    
 	if (!nd->nd_nam2) {
 		return RC_DOIT;
 	}
@@ -251,7 +251,7 @@ loop:
 				goto loop;
 			}
 			rp->rc_flag |= RC_LOCKED;
-			/* If not at end of LRU chain, move it there */
+			                                               
 			if (rp->rc_lru.tqe_next) {
 				TAILQ_REMOVE(&nfsrv_reqcache_lruhead, rp, rc_lru);
 				TAILQ_INSERT_TAIL(&nfsrv_reqcache_lruhead, rp, rc_lru);
@@ -299,7 +299,7 @@ loop:
 	}
 	OSAddAtomic64(1, &nfsstats.srvcache_misses);
 	if (nfsrv_reqcache_count < nfsrv_reqcache_size) {
-		/* try to allocate a new entry */
+		                                 
 		MALLOC(rp, struct nfsrvcache *, sizeof *rp, M_NFSD, M_WAITOK);
 		if (rp) {
 			bzero((char *)rp, sizeof *rp);
@@ -310,11 +310,11 @@ loop:
 		rp = NULL;
 	}
 	if (!rp) {
-		/* try to reuse the least recently used entry */
+		                                                
 		rp = nfsrv_reqcache_lruhead.tqh_first;
 		if (!rp) {
-			/* no entry to reuse? */
-			/* OK, we just won't be able to cache this request */
+			                        
+			                                                     
 			lck_mtx_unlock(&nfsrv_reqcache_mutex);
 			return RC_DOIT;
 		}
@@ -369,9 +369,9 @@ loop:
 	return RC_DOIT;
 }
 
-/*
- * Update a request cache entry after the rpc has been done
- */
+  
+                                                           
+   
 void
 nfsrv_updatecache(
 	struct nfsrv_descript *nd,
@@ -397,22 +397,22 @@ loop:
 			}
 			rp->rc_flag |= RC_LOCKED;
 			if (rp->rc_state == RC_DONE) {
-				/*
-				 * This can occur if the cache is too small.
-				 * Retransmits of the same request aren't
-				 * dropped so we may see the operation
-				 * complete more then once.
-				 */
+				  
+                                                
+                                             
+                                          
+                               
+       
 				if (rp->rc_flag & RC_REPMBUF) {
 					mbuf_freem(rp->rc_reply);
 					rp->rc_flag &= ~RC_REPMBUF;
 				}
 			}
 			rp->rc_state = RC_DONE;
-			/*
-			 * If we have a valid reply update status and save
-			 * the reply for non-idempotent rpc's.
-			 */
+			  
+                                                     
+                                         
+      
 			if (repvalid && nonidempotent[nd->nd_procnum]) {
 				if ((nd->nd_vers == NFS_VER2) &&
 				    nfsv2_repstat[nfsv2_procid[nd->nd_procnum]]) {
@@ -437,9 +437,9 @@ loop:
 	lck_mtx_unlock(&nfsrv_reqcache_mutex);
 }
 
-/*
- * Clean out the cache. Called when the last nfsd terminates.
- */
+  
+                                                             
+   
 void
 nfsrv_cleancache(void)
 {
@@ -457,4 +457,4 @@ nfsrv_cleancache(void)
 	lck_mtx_unlock(&nfsrv_reqcache_mutex);
 }
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        

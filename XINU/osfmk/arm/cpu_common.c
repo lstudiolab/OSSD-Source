@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	arm/cpu_common.c
- *
- *	cpu routines common to all supported arm variants
- */
+  
+                         
+  
+                                                    
+   
 
 #include <kern/machine.h>
 #include <kern/cpu_number.h>
@@ -73,7 +73,7 @@ extern uint64_t xcall_ack_timeout_abstime;
 
 #if defined(HAS_IPI)
 extern unsigned int gFastIPI;
-#endif /* defined(HAS_IPI) */
+#endif                       
 
 cpu_data_t *
 cpu_datap(int cpu)
@@ -158,7 +158,7 @@ cpu_info(processor_flavor_t flavor, int slot_num, processor_info_t info,
 		cpu_stat->instr_ex_cnt = cpu_data_ptr->cpu_stat.instr_ex_cnt;
 #if MONOTONIC
 		cpu_stat->pmi_cnt = cpu_data_ptr->cpu_monotonic.mtc_npmis;
-#endif /* MONOTONIC */
+#endif                
 
 		*count = PROCESSOR_CPU_STAT64_COUNT;
 
@@ -170,10 +170,10 @@ cpu_info(processor_flavor_t flavor, int slot_num, processor_info_t info,
 	}
 }
 
-/*
- *	Routine:	cpu_doshutdown
- *	Function:
- */
+  
+                          
+            
+   
 void
 cpu_doshutdown(void (*doshutdown)(processor_t),
     processor_t processor)
@@ -181,10 +181,10 @@ cpu_doshutdown(void (*doshutdown)(processor_t),
 	doshutdown(processor);
 }
 
-/*
- *	Routine:	cpu_idle_tickle
- *
- */
+  
+                           
+  
+   
 void
 cpu_idle_tickle(void)
 {
@@ -198,10 +198,10 @@ cpu_idle_tickle(void)
 	if (cpu_data_ptr->idle_timer_notify != NULL) {
 		cpu_data_ptr->idle_timer_notify(cpu_data_ptr->idle_timer_refcon, &new_idle_timeout_ticks);
 		if (new_idle_timeout_ticks != 0x0ULL) {
-			/* if a new idle timeout was requested set the new idle timer deadline */
+			                                                                         
 			clock_absolutetime_interval_to_deadline(new_idle_timeout_ticks, &cpu_data_ptr->idle_timer_deadline);
 		} else {
-			/* turn off the idle timer */
+			                             
 			cpu_data_ptr->idle_timer_deadline = 0x0ULL;
 		}
 		timer_resync_deadlines();
@@ -216,8 +216,8 @@ cpu_handle_xcall(cpu_data_t *cpu_data_ptr)
 	void            *xparam;
 
 	os_atomic_thread_fence(acquire);
-	/* Come back around if cpu_signal_internal is running on another CPU and has just
-	* added SIGPxcall to the pending mask, but hasn't yet assigned the call params.*/
+	                                                                                 
+                                                                                  
 	if (cpu_data_ptr->cpu_xcall_p0 != NULL && cpu_data_ptr->cpu_xcall_p1 != NULL) {
 		xfunc = cpu_data_ptr->cpu_xcall_p0;
 		INTERRUPT_MASKED_DEBUG_START(xfunc, DBG_INTR_TYPE_IPI);
@@ -256,7 +256,7 @@ cpu_broadcast_xcall_internal(unsigned int signal,
 	int             cpu;
 	int             max_cpu = ml_get_max_cpu_number() + 1;
 
-	//yes, param ALSO cannot be NULL
+	                                
 	assert(func);
 	assert(parm);
 
@@ -417,7 +417,7 @@ cpu_signal_internal(cpu_data_t *target_proc,
 	boolean_t       interruptible = ml_set_interrupts_enabled(FALSE);
 	cpu_data_t      *current_proc = getCpuDatap();
 
-	/* We'll mandate that only IPIs meant to kick a core out of idle may ever be deferred. */
+	                                                                                         
 	if (defer) {
 		assert(signal == SIGPnop);
 	}
@@ -448,19 +448,19 @@ cpu_signal_internal(cpu_data_t *target_proc,
 				return KERN_ALREADY_WAITING;
 			}
 
-			/* Drain pending xcalls on this cpu; the CPU we're trying to xcall may in turn
-			 * be trying to xcall us.  Since we have interrupts disabled that can deadlock,
-			 * so break the deadlock by draining pending xcalls. */
+			                                                                              
+                                                                                  
+                                                          
 			if (!swap_success && (current_proc->cpu_signal & signal)) {
 				cpu_handle_xcall(current_proc);
 			}
 		} while (!swap_success && ((current_mabs_time = mach_absolute_time()) < max_mabs_time));
 
-		/*
-		 * If we time out while waiting for the target CPU to respond, it's possible that no
-		 * other CPU is available to handle the watchdog interrupt that would eventually trigger
-		 * a panic. To prevent this from happening, we just panic here to flag this condition.
-		 */
+		  
+                                                                                      
+                                                                                          
+                                                                                        
+     
 		if (__improbable(current_mabs_time >= max_mabs_time)) {
 			uint64_t end_time_ns, xcall_ack_timeout_ns;
 			absolutetime_to_nanoseconds(current_mabs_time - start_mabs_time, &end_time_ns);
@@ -489,12 +489,12 @@ cpu_signal_internal(cpu_data_t *target_proc,
 		} while (!swap_success);
 	}
 
-	/*
-	 * Issue DSB here to guarantee: 1) prior stores to pending signal mask and xcall params
-	 * will be visible to other cores when the IPI is dispatched, and 2) subsequent
-	 * instructions to signal the other cores will not execute until after the barrier.
-	 * DMB would be sufficient to guarantee 1) but not 2).
-	 */
+	  
+                                                                                        
+                                                                                
+                                                                                    
+                                                       
+    
 	__builtin_arm_dsb(DSB_ISH);
 
 	if (!(target_proc->cpu_signal & SIGPdisabled)) {
@@ -507,7 +507,7 @@ cpu_signal_internal(cpu_data_t *target_proc,
 			}
 #else
 			PE_cpu_signal_deferred(getCpuDatap()->cpu_id, target_proc->cpu_id);
-#endif /* defined(HAS_IPI) */
+#endif                       
 		} else {
 #if defined(HAS_IPI)
 			if (gFastIPI) {
@@ -517,7 +517,7 @@ cpu_signal_internal(cpu_data_t *target_proc,
 			}
 #else
 			PE_cpu_signal(getCpuDatap()->cpu_id, target_proc->cpu_id);
-#endif /* defined(HAS_IPI) */
+#endif                       
 		}
 	}
 
@@ -543,7 +543,7 @@ cpu_signal_deferred(cpu_data_t *target_proc)
 void
 cpu_signal_cancel(cpu_data_t *target_proc)
 {
-	/* TODO: Should we care about the state of a core as far as squashing deferred IPIs goes? */
+	                                                                                            
 	if (!(target_proc->cpu_signal & SIGPdisabled)) {
 #if defined(HAS_IPI)
 		if (gFastIPI) {
@@ -553,7 +553,7 @@ cpu_signal_cancel(cpu_data_t *target_proc)
 		}
 #else
 		PE_cpu_signal_cancel(getCpuDatap()->cpu_id, target_proc->cpu_id);
-#endif /* defined(HAS_IPI) */
+#endif                       
 	}
 }
 
@@ -596,7 +596,7 @@ cpu_signal_handler_internal(boolean_t disable_signal)
 			kperf_signal_handler();
 			INTERRUPT_MASKED_DEBUG_END();
 		}
-#endif /* KPERF */
+#endif            
 		if (cpu_signal & (SIGPxcall | SIGPxcallImm)) {
 			cpu_handle_xcall(cpu_data_ptr);
 		}
@@ -636,21 +636,21 @@ cpu_exit_wait(int cpu_id)
 {
 #if USE_APPLEARMSMP
 	if (!ml_is_quiescing()) {
-		// For runtime disable (non S2R) the CPU will shut down immediately.
+		                                                                    
 		ml_topology_cpu_t *cpu = &ml_get_topology_info()->cpus[cpu_id];
 		assert(cpu && cpu->cpu_IMPL_regs);
 		volatile uint64_t *cpu_sts = (void *)(cpu->cpu_IMPL_regs + CPU_PIO_CPU_STS_OFFSET);
 
-		// Poll the "CPU running state" field until it is 0 (off)
+		                                                         
 		while ((*cpu_sts & CPU_PIO_CPU_STS_cpuRunSt_mask) != 0x00) {
 			__builtin_arm_dsb(DSB_ISH);
 		}
 		return;
 	}
-#endif /* USE_APPLEARMSMP */
+#endif                      
 
 	if (cpu_id != master_cpu) {
-		// For S2R, ml_arm_sleep() will do some extra polling after setting ARM_CPU_ON_SLEEP_PATH.
+		                                                                                          
 		cpu_data_t      *cpu_data_ptr;
 
 		cpu_data_ptr = CpuDataEntries[cpu_id].cpu_data_vaddr;
@@ -678,7 +678,7 @@ cpu_machine_init(void)
 		platform_cache_init();
 	}
 
-	/* Note: this calls IOCPURunPlatformActiveActions when resuming on boot cpu */
+	                                                                              
 	PE_cpu_machine_init(cpu_data_ptr->cpu_id, !started);
 
 	cpu_data_ptr->cpu_flags |= StartedState;
@@ -723,15 +723,15 @@ cpu_data_startup_init(void)
 		return;
 	}
 
-	/*
-	 * The memory needs to be physically contiguous because it contains
-	 * cpu_data_t structures sometimes accessed during reset
-	 * with the MMU off.
-	 *
-	 * kmem_alloc_contig() can't be used early, at the time STARTUP_SUB_PERCPU
-	 * normally runs, so we instead steal the memory for the PERCPU subsystem
-	 * even earlier.
-	 */
+	  
+                                                                    
+                                                         
+                     
+   
+                                                                           
+                                                                          
+                 
+    
 	percpu_base.start  = (vm_offset_t)pmap_steal_memory(round_page(size));
 	bzero((void *)percpu_base.start, round_page(size));
 
@@ -829,15 +829,15 @@ ml_cpu_signal_is_enabled(void)
 bool
 ml_cpu_can_exit(__unused int cpu_id)
 {
-	/* processor_exit() is always allowed on the S2R path */
+	                                                        
 	if (ml_is_quiescing()) {
 		return true;
 	}
 #if HAS_CLUSTER && USE_APPLEARMSMP
-	/*
-	 * Cyprus and newer chips can disable individual non-boot CPUs. The
-	 * implementation polls cpuX_IMPL_CPU_STS, which differs on older chips.
-	 */
+	  
+                                                                    
+                                                                         
+    
 	if (CpuDataEntries[cpu_id].cpu_data_vaddr != &BootCpuData) {
 		return true;
 	}
@@ -875,7 +875,7 @@ ml_cpu_end_loop(void)
 	lck_rw_unlock_shared(&cpu_state_lock);
 }
 
-#else /* USE_APPLEARMSMP */
+#else                      
 
 void
 ml_cpu_begin_state_transition(__unused int cpu_id)
@@ -897,4 +897,4 @@ ml_cpu_end_loop(void)
 {
 }
 
-#endif /* USE_APPLEARMSMP */
+#endif                      

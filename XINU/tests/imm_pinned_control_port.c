@@ -23,32 +23,32 @@ static exception_type_t exception_taken = 0;
 
 #define IKOT_TASK_CONTROL               2
 
-/*
- * This test verifies behaviors of immovable/pinned task/thread ports.
- *
- * 1. Compare and verifies port names of mach_{task, thread}_self(),
- * {TASK, THREAD}_KERNEL_PORT, and ports returned from task_threads()
- * and processor_set_tasks().
- * 2. Make sure correct exceptions are raised resulting from moving immovable
- * task/thread control, read and inspect ports.
- * 3. Make sure correct exceptions are raised resulting from deallocating pinned
- * task/thread control ports.
- * 4. Make sure immovable ports cannot be stashed:
- * rdar://70585367 (Disallow immovable port stashing with *_set_special_port() and mach_port_register())
- */
+  
+                                                                      
+  
+                                                                    
+                                                                     
+                             
+                                                                             
+                                               
+                                                                                
+                             
+                                                  
+                                                                                                        
+   
 T_GLOBAL_META(
 	T_META_NAMESPACE("xnu.ipc"),
 	T_META_RUN_CONCURRENTLY(TRUE));
 
 static uint64_t test_exception_code[] = {
-	/* Pinning tests. Currently delivered as soft crash */
-	EXC_GUARD, // Soft crash delivered as EXC_CORPSE_NOTIFY
+	                                                      
+	EXC_GUARD,                                             
 	EXC_GUARD,
 	EXC_GUARD,
 	EXC_GUARD,
 	EXC_GUARD,
 
-	/* Immovable tests. Currently delivered as hard crash */
+	                                                        
 	(GUARD_TYPE_MACH_PORT << EXC_GUARD_TYPE_SHIFT) | kGUARD_EXC_IMMOVABLE,
 	(GUARD_TYPE_MACH_PORT << EXC_GUARD_TYPE_SHIFT) | kGUARD_EXC_IMMOVABLE,
 	(GUARD_TYPE_MACH_PORT << EXC_GUARD_TYPE_SHIFT) | kGUARD_EXC_IMMOVABLE,
@@ -128,7 +128,7 @@ exception_server_thread(void *arg)
 	kern_return_t kr;
 	mach_port_t exc_port = *(mach_port_t *)arg;
 
-	/* Handle exceptions on exc_port */
+	                                   
 	kr = mach_msg_server_once(mach_exc_server, 4096, exc_port, 0);
 	T_QUIET; T_EXPECT_MACH_SUCCESS(kr, "mach_msg_server_once");
 
@@ -190,7 +190,7 @@ test_task_thread_port_values(void)
 	mach_msg_type_number_t pcnt = 0, tcnt = 0;
 	mach_port_t host = mach_host_self();
 
-	/* Compare with task/thread_get_special_port() */
+	                                                 
 	kr = task_get_special_port(mach_task_self(), TASK_KERNEL_PORT, &port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "task_get_special_port() - TASK_KERNEL_PORT");
 	T_EXPECT_NE(port, mach_task_self(), "TASK_KERNEL_PORT should not match mach_task_self()");
@@ -207,13 +207,13 @@ test_task_thread_port_values(void)
 	T_EXPECT_NE(port, th_self, "THREAD_KERNEL_PORT should not match mach_thread_self()");
 	mach_port_deallocate(mach_task_self(), port);
 
-	/* Make sure task_threads() return immovable thread ports */
+	                                                            
 	kr = task_threads(mach_task_self(), &threadList, &threadCount);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "task_threads()");
 	T_QUIET; T_ASSERT_GE(threadCount, 1, "should have at least 1 thread");
 
 	for (size_t i = 0; i < threadCount; i++) {
-		if (th_self == threadList[i]) { /* th_self is immovable */
+		if (th_self == threadList[i]) {                           
 			found_self = true;
 			break;
 		}
@@ -233,7 +233,7 @@ test_task_thread_port_values(void)
 
 	mach_port_deallocate(mach_task_self(), th_self);
 
-	/* Make sure processor_set_tasks() return immovable task self */
+	                                                                
 	kr = host_processor_sets(host, &psets, &pcnt);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "host_processor_sets");
 	T_QUIET; T_ASSERT_GE(pcnt, 1, "should have at least 1 processor set");
@@ -303,23 +303,23 @@ T_DECL(imm_pinned_control_port, "Test pinned & immovable task and thread control
 		T_SKIP("immovable control port isn't enabled");
 	}
 
-	/* first, try out comparing various task/thread ports */
+	                                                        
 	test_task_thread_port_values();
 
-	/* try stashing immovable ports: rdar://70585367 */
+	                                                   
 	test_immovable_port_stashing();
 
-	/* spawn a child and see if EXC_GUARD are correctly generated */
+	                                                                
 	for (int i = 0; i < MAX_TEST_NUM; i++) {
-		/* Create the exception port for the child */
+		                                             
 		exc_port = alloc_exception_port();
 		T_QUIET; T_ASSERT_NE(exc_port, MACH_PORT_NULL, "Create a new exception port");
 
-		/* Create exception serving thread */
+		                                     
 		ret = pthread_create(&s_exc_thread, NULL, exception_server_thread, &exc_port);
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "pthread_create exception_server_thread");
 
-		/* Initialize posix_spawn attributes */
+		                                       
 		posix_spawnattr_init(&attrs);
 
 		int err = posix_spawnattr_setexceptionports_np(&attrs, EXC_MASK_GUARD | EXC_MASK_CORPSE_NOTIFY, exc_port,
@@ -336,13 +336,13 @@ T_DECL(imm_pinned_control_port, "Test pinned & immovable task and thread control
 		err = posix_spawn(&client_pid, child_args[0], NULL, &attrs, &child_args[0], environ);
 		T_ASSERT_POSIX_SUCCESS(err, "posix_spawn control_port_options_client = %d test_num = %d", client_pid, i);
 
-		/* try extracting child task port: rdar://71744817
-		 * Moved to tests/extract_right_soft_fail.c
-		 */
-		// test_extract_immovable_task_port(client_pid);
+		                                                  
+                                             
+     
+		                                                
 
 		int child_status;
-		/* Wait for child and check for exception */
+		                                            
 		if (-1 == waitpid(-1, &child_status, 0)) {
 			T_FAIL("waitpid: child mia");
 		}

@@ -57,4 +57,4 @@
 #define         IOA_R_R_TM_LEVEL        0x08000
 #define         IOA_R_R_MASKED          0x10000
 
-#endif /* _I386_APIC_H_ */
+#endif                    

@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_blue.h,v 1.5 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_blue.h,v 1.7 2002/11/29 04:36:22 kjc Exp $	*/
+                                                                
+                                                            
 
 /*
  * Copyright (C) 1997-2002
@@ -61,7 +61,7 @@
 #ifdef PRIVATE
 #ifdef BSD_KERNEL_PRIVATE
 #include <net/classq/if_classq.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,5 +78,5 @@ struct blue_stats {
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_CLASSQ_BLUE_H_ */
+#endif              
+#endif                                 

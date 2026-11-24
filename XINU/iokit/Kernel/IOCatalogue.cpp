@@ -31,12 +31,12 @@
  * HISTORY
  *
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -65,8 +65,8 @@ extern "C" {
 #if PRAGMA_MARK
 #pragma mark Internal Declarations
 #endif
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
 OSSharedPtr<IOCatalogue> gIOCatalogue;
 OSSharedPtr<const OSSymbol> gIOClassKey;
@@ -83,8 +83,8 @@ IORWLock       * gIOCatalogLock;
 #if PRAGMA_MARK
 #pragma mark IOCatalogue class implementation
 #endif
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
 #define super OSObject
 OSDefineMetaClassAndStructors(IOCatalogue, OSObject)
@@ -93,8 +93,8 @@ static bool isModuleLoadedNoOSKextLock(OSDictionary *theKexts,
     OSDictionary *theModuleDict);
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 IOCatalogue::initialize(void)
 {
@@ -126,9 +126,9 @@ IOCatalogue::initialize(void)
 	assert(rc);
 }
 
-/*********************************************************************
-* Initialize the IOCatalog object.
-*********************************************************************/
+                                                                      
+                                  
+                                                                      
 OSArray *
 IOCatalogue::arrayForPersonality(OSDictionary * dict)
 {
@@ -161,9 +161,9 @@ IOCatalogue::addPersonality(OSDictionary * dict)
 	}
 }
 
-/*********************************************************************
-* Initialize the IOCatalog object.
-*********************************************************************/
+                                                                      
+                                  
+                                                                      
 bool
 IOCatalogue::init(OSArray * initArray)
 {
@@ -199,18 +199,18 @@ IOCatalogue::init(OSArray * initArray)
 	return true;
 }
 
-/*********************************************************************
-* Release all resources used by IOCatalogue and deallocate.
-* This will probably never be called.
-*********************************************************************/
+                                                                      
+                                                           
+                                     
+                                                                      
 void
 IOCatalogue::free( void )
 {
 	panic("");
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSPtr<OSOrderedSet>
 IOCatalogue::findDrivers(
 	IOService * service,
@@ -251,9 +251,9 @@ IOCatalogue::findDrivers(
 	return set;
 }
 
-/*********************************************************************
-* Is personality already in the catalog?
-*********************************************************************/
+                                                                      
+                                        
+                                                                      
 OSPtr<OSOrderedSet>
 IOCatalogue::findDrivers(
 	OSDictionary * matching,
@@ -283,9 +283,9 @@ IOCatalogue::findDrivers(
 		array = (OSArray *) personalities->getObject(key);
 		if (array) {
 			for (idx = 0; (dict = (OSDictionary *) array->getObject(idx)); idx++) {
-				/* This comparison must be done with only the keys in the
-				 * "matching" dict to enable general searches.
-				 */
+				                                                         
+                                                  
+       
 				if (dict->isEqualTo(matching, matching)) {
 					set->setObject(dict);
 				}
@@ -298,17 +298,17 @@ IOCatalogue::findDrivers(
 	return set;
 }
 
-/*********************************************************************
-* Add driver config tables to catalog and start matching process.
-*
-* Important that existing personalities are kept (not replaced)
-* if duplicates found. Personalities can come from OSKext objects
-* or from userland kext library. We want to minimize distinct
-* copies between OSKext & IOCatalogue.
-*
-* xxx - userlib used to refuse to send personalities with IOKitDebug
-* xxx - during safe boot. That would be better implemented here.
-*********************************************************************/
+                                                                      
+                                                                 
+ 
+                                                               
+                                                                 
+                                                             
+                                      
+ 
+                                                                    
+                                                                
+                                                                      
 
 bool
 IOCatalogue::addDrivers(
@@ -318,8 +318,8 @@ IOCatalogue::addDrivers(
 	bool                   result = false;
 	OSSharedPtr<OSOrderedSet> set;
 	OSSharedPtr<OSCollectionIterator> iter;
-	OSObject             * object = NULL;   // do not release
-	OSArray              * persons = NULL;// do not release
+	OSObject             * object = NULL;                    
+	OSArray              * persons = NULL;                 
 
 	persons = OSDynamicCast(OSArray, drivers);
 	if (!persons) {
@@ -337,13 +337,13 @@ IOCatalogue::addDrivers(
 		goto finish;
 	}
 
-	/* Start with success; clear it on an error.
-	 */
+	                                            
+    
 	result = true;
 
 	IORWLockWrite(lock);
 	while ((object = iter->getNextObject())) {
-		// xxx Deleted OSBundleModuleDemand check; will handle in other ways for SL
+		                                                                           
 
 		OSDictionary * personality = OSDynamicCast(OSDictionary, object);
 
@@ -357,7 +357,7 @@ IOCatalogue::addDrivers(
 
 		OSKext::uniquePersonalityProperties(personality);
 
-		// Add driver personality to catalogue.
+		                                       
 
 		OSArray * array = arrayForPersonality(personality);
 		if (!array) {
@@ -367,21 +367,21 @@ IOCatalogue::addDrivers(
 			while (count--) {
 				OSDictionary * driver;
 
-				// Be sure not to double up on personalities.
+				                                             
 				driver = (OSDictionary *)array->getObject(count);
 
-				/* Unlike in other functions, this comparison must be exact!
-				 * The catalogue must be able to contain personalities that
-				 * are proper supersets of others.
-				 * Do not compare just the properties present in one driver
-				 * personality or the other.
-				 */
+				                                                            
+                                                               
+                                      
+                                                               
+                                
+       
 				if (personality->isEqualTo(driver)) {
 					break;
 				}
 			}
 			if (count >= 0) {
-				// its a dup
+				            
 				continue;
 			}
 			result = array->setObject(personality);
@@ -392,7 +392,7 @@ IOCatalogue::addDrivers(
 
 		set->setObject(personality);
 	}
-	// Start device matching.
+	                         
 	if (result && doNubMatching && (set->getCount() > 0)) {
 		IOService::catalogNewDrivers(set.get());
 		generation++;
@@ -437,7 +437,7 @@ IOCatalogue::removeDrivers(bool doNubMatching, bool (^shouldRemove)(OSDictionary
 				}
 			}
 		}
-		// Start device matching.
+		                         
 		if (doNubMatching && (set->getCount() > 0)) {
 			IOService::catalogNewDrivers(set.get());
 			generation++;
@@ -448,10 +448,10 @@ IOCatalogue::removeDrivers(bool doNubMatching, bool (^shouldRemove)(OSDictionary
 	return true;
 }
 
-/*********************************************************************
-* Remove drivers from the catalog which match the
-* properties in the matching dictionary.
-*********************************************************************/
+                                                                      
+                                                 
+                                        
+                                                                      
 bool
 IOCatalogue::removeDrivers(
 	OSDictionary * matching,
@@ -461,21 +461,21 @@ IOCatalogue::removeDrivers(
 		return false;
 	}
 	return removeDrivers(doNubMatching, ^(OSDictionary *dict) {
-		/* This comparison must be done with only the keys in the
-		 * "matching" dict to enable general searches.
-		 */
+		                                                         
+                                                
+     
 		return dict->isEqualTo(matching, matching);
 	});
 }
 
-// Return the generation count.
+                               
 SInt32
 IOCatalogue::getGenerationCount(void) const
 {
 	return generation;
 }
 
-// Check to see if kernel module has been loaded already, and request its load.
+                                                                               
 bool
 IOCatalogue::isModuleLoaded(OSDictionary * driver, OSObject ** kextRef) const
 {
@@ -490,12 +490,12 @@ IOCatalogue::isModuleLoaded(OSDictionary * driver, OSObject ** kextRef) const
 		return false;
 	}
 
-	/* The personalities of codeless kexts often contain the bundle ID of the
-	 * kext they reference, and not the bundle ID of the codeless kext itself.
-	 * The prelinked kernel needs to know the bundle ID of the codeless kext
-	 * so it can include these personalities, so OSKext stores that bundle ID
-	 * in the IOPersonalityPublisher key, and we record it as requested here.
-	 */
+	                                                                         
+                                                                           
+                                                                         
+                                                                          
+                                                                          
+    
 	publisherName = OSDynamicCast(OSString,
 	    driver->getObject(kIOPersonalityPublisherKey));
 	OSKext::recordIdentifierRequest(publisherName);
@@ -504,8 +504,8 @@ IOCatalogue::isModuleLoaded(OSDictionary * driver, OSObject ** kextRef) const
 	if (moduleName) {
 		ret = OSKext::loadKextWithIdentifier(moduleName, kextRef);
 		if (kOSKextReturnDeferred == ret) {
-			// a request has been queued but the module isn't necessarily
-			// loaded yet, so stall.
+			                                                             
+			                        
 			return false;
 		}
 		OSString *moduleDextName = OSDynamicCast(OSString, driver->getObject(gIOModuleIdentifierKey.get()));
@@ -513,13 +513,13 @@ IOCatalogue::isModuleLoaded(OSDictionary * driver, OSObject ** kextRef) const
 			OSSharedPtr<OSObject> dextRef;
 			ret = OSKext::loadKextWithIdentifier(moduleDextName, dextRef);
 		}
-		// module is present or never will be
+		                                     
 		return true;
 	}
 
-	/* If a personality doesn't hold the "CFBundleIdentifier" or "CFBundleIdentifierKernel" key
-	 * it is assumed to be an "in-kernel" driver.
-	 */
+	                                                                                           
+                                              
+    
 	return true;
 }
 
@@ -532,10 +532,10 @@ IOCatalogue::isModuleLoaded(OSDictionary * driver, OSSharedPtr<OSObject>& kextRe
 	return result;
 }
 
-/* This function is called after a module has been loaded.
- * Is invoked from user client call, ultimately from IOKitLib's
- * IOCatalogueModuleLoaded(). Sent from kextd.
- */
+                                                          
+                                                               
+                                              
+   
 void
 IOCatalogue::moduleHasLoaded(const OSSymbol * moduleName)
 {
@@ -554,7 +554,7 @@ IOCatalogue::moduleHasLoaded(const char * moduleName)
 	moduleHasLoaded(name.get());
 }
 
-// xxx - return is really OSReturn/kern_return_t
+                                                
 IOReturn
 IOCatalogue::unloadModule(OSString * moduleName) const
 {
@@ -581,7 +581,7 @@ IOCatalogue::terminateDrivers(OSDictionary * matching, io_name_t className)
 		OSKext::uniquePersonalityProperties( matching, false );
 	}
 
-	// terminate instances.
+	                       
 	do {
 		iter->reset();
 		while ((service = (IOService *)iter->getNextObject())) {
@@ -589,10 +589,10 @@ IOCatalogue::terminateDrivers(OSDictionary * matching, io_name_t className)
 				continue;
 			}
 			if (matching) {
-				/* Terminate only for personalities that match the matching dictionary.
-				 * This comparison must be done with only the keys in the
-				 * "matching" dict to enable general matching.
-				 */
+				                                                                       
+                                                             
+                                                  
+       
 				dict = service->getPropertyTable();
 				if (!dict) {
 					continue;
@@ -643,7 +643,7 @@ IOCatalogue::terminateDrivers(OSDictionary * matching, io_name_t className)
 			if (!okToTerminate) {
 #if DEVELOPMENT || DEBUG
 				okToTerminate = true;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 				IOLog("%sallowing kextunload terminate for bundleID %s\n",
 				    okToTerminate ? "" : "dis", bundleIDStr ? bundleIDStr : "?");
 				if (!okToTerminate) {
@@ -675,7 +675,7 @@ IOCatalogue::_removeDrivers(OSDictionary * matching)
 	const OSSymbol       * key;
 	unsigned int           idx;
 
-	// remove configs from catalog.
+	                               
 
 	iter = OSCollectionIterator::withCollection(personalities.get());
 	if (!iter) {
@@ -686,11 +686,11 @@ IOCatalogue::_removeDrivers(OSDictionary * matching)
 		array = (OSArray *) personalities->getObject(key);
 		if (array) {
 			for (idx = 0; (dict = (OSDictionary *) array->getObject(idx)); idx++) {
-				/* Remove from the catalogue's array any personalities
-				 * that match the matching dictionary.
-				 * This comparison must be done with only the keys in the
-				 * "matching" dict to enable general matching.
-				 */
+				                                                      
+                                          
+                                                             
+                                                  
+       
 				if (dict->isEqualTo(matching, matching)) {
 					array->removeObject(idx);
 					idx--;
@@ -795,7 +795,7 @@ IOCatalogue::resetAfterUserspaceReboot(void)
 		}
 	} while (!service && !iter->isValid());
 
-	/* Remove all dext personalities */
+	                                   
 	removeDrivers(false, ^(OSDictionary *dict) {
 		return dict->getObject(gIOUserServerNameKey) != NULL;
 	});
@@ -814,21 +814,21 @@ IOCatalogue::terminateDriversForModule(
 	bool isLoaded = false;
 	bool isDext = false;
 
-	/* Check first if the kext currently has any linkage dependents;
-	 * in such a case the unload would fail so let's not terminate any
-	 * IOServices (since doing so typically results in a panic when there
-	 * are loaded dependencies). Note that we aren't locking the kext here
-	 * so it might lose or gain dependents by the time we call unloadModule();
-	 * I think that's ok, our unload can fail if a kext comes in on top of
-	 * this one even after we've torn down IOService objects. Conversely,
-	 * if we fail the unload here and then lose a library, the autounload
-	 * thread will get us in short order.
-	 */
+	                                                                
+                                                                   
+                                                                      
+                                                                       
+                                                                           
+                                                                       
+                                                                      
+                                                                      
+                                      
+    
 	if (OSKext::isKextWithIdentifierLoaded(moduleName->getCStringNoCopy())) {
 		isLoaded = true;
 
 		if (!OSKext::canUnloadKextWithIdentifier(moduleName,
-		    /* checkClasses */ false)) {
+		                       false)) {
 			ret = kOSKextReturnInUse;
 			goto finish;
 		}
@@ -849,18 +849,18 @@ IOCatalogue::terminateDriversForModule(
 	ret = terminateDrivers(dict.get(), NULL);
 
 	if (isDext) {
-		/* Force rematching after removing personalities. Dexts are never considered to be "loaded" (from OSKext),
-		 * so we can't call unloadModule() to remove personalities and start rematching. */
+		                                                                                                          
+                                                                                     
 		removeDrivers(dict.get(), true);
 	} else {
-		/* No goto between IOLock calls!
-		 */
+		                                
+     
 		IORWLockWrite(lock);
 		if (kIOReturnSuccess == ret) {
 			ret = _removeDrivers(dict.get());
 		}
 
-		// Unload the module itself.
+		                            
 		if (unload && isLoaded && ret == kIOReturnSuccess) {
 			ret = unloadModule(moduleName);
 		}
@@ -914,9 +914,9 @@ IOCatalogue::startMatching( OSDictionary * matching )
 
 		array = (OSArray *) value;
 		for (idx = 0; (dict = (OSDictionary *) array->getObject(idx)); idx++) {
-		        /* This comparison must be done with only the keys in the
-		         * "matching" dict to enable general matching.
-		         */
+		                                                                 
+                                                        
+             
 		        if (dict->isEqualTo(matching, matching)) {
 		                set->setObject(dict);
 			}
@@ -924,7 +924,7 @@ IOCatalogue::startMatching( OSDictionary * matching )
 		return false;
 	});
 
-	// Start device matching.
+	                         
 	if (set->getCount() > 0) {
 		IOService::catalogNewDrivers(set.get());
 		generation++;
@@ -934,7 +934,7 @@ IOCatalogue::startMatching( OSDictionary * matching )
 
 	return true;
 }
-#endif /* defined(__i386__) || defined(__x86_64__) */
+#endif                                               
 
 bool
 IOCatalogue::startMatching( const OSSymbol * moduleName )
@@ -957,12 +957,12 @@ IOCatalogue::startMatching( const OSSymbol * moduleName )
 
 	kext = OSKext::lookupKextWithIdentifier(moduleName->getCStringNoCopy());
 	if (kext && kext->isDriverKit()) {
-		/* We're here because kernelmanagerd called IOCatalogueModuleLoaded after launching a dext.
-		 * Determine what providers the dext would match against. If there's something already attached
-		 * to the provider, terminate it.
-		 *
-		 * This is only safe to do for HID dexts.
-		 */
+		                                                                                           
+                                                                                                 
+                                   
+    
+                                           
+     
 		OSSharedPtr<OSArray> dextPersonalities = kext->copyPersonalitiesArray();
 
 		if (!dextPersonalities) {
@@ -1037,7 +1037,7 @@ IOCatalogue::startMatching( const OSSymbol * moduleName )
 		});
 	}
 
-	// Start device matching.
+	                         
 	if (set->getCount() > 0) {
 		IOService::catalogNewDrivers(set.get());
 		generation++;
@@ -1051,8 +1051,8 @@ IOCatalogue::startMatching( const OSSymbol * moduleName )
 void
 IOCatalogue::reset(void)
 {
-	IOCatalogue::resetAndAddDrivers(/* no drivers; true reset */ NULL,
-	    /* doMatching */ false);
+	IOCatalogue::resetAndAddDrivers(                             NULL,
+	                     false);
 	return;
 }
 
@@ -1060,11 +1060,11 @@ bool
 IOCatalogue::resetAndAddDrivers(OSArray * drivers, bool doNubMatching)
 {
 	bool                   result              = false;
-	OSArray              * newPersonalities    = NULL;// do not release
+	OSArray              * newPersonalities    = NULL;                 
 	const OSSymbol       * key;
 	OSArray              * array;
-	OSDictionary         * thisNewPersonality   = NULL;// do not release
-	OSDictionary         * thisOldPersonality   = NULL;// do not release
+	OSDictionary         * thisNewPersonality   = NULL;                 
+	OSDictionary         * thisOldPersonality   = NULL;                 
 	OSSharedPtr<OSDictionary> myKexts;
 	OSSharedPtr<OSCollectionIterator> iter;
 	OSSharedPtr<OSOrderedSet> matchSet;
@@ -1086,18 +1086,18 @@ IOCatalogue::resetAndAddDrivers(OSArray * drivers, bool doNubMatching)
 		goto finish;
 	}
 
-	/* need copy of loaded kexts so we can check if for loaded modules without
-	 * taking the OSKext lock.  There is a potential of deadlocking if we get
-	 * an OSKext via the normal path.  See 14672140.
-	 */
+	                                                                          
+                                                                          
+                                                 
+    
 	myKexts = OSKext::copyKexts();
 
 	result = true;
 
 	IOLog("Resetting IOCatalogue.\n");
 
-	/* No goto finish from here to unlock.
-	 */
+	                                      
+    
 	IORWLockWrite(lock);
 
 	while ((key = (const OSSymbol *) iter->getNextObject())) {
@@ -1118,14 +1118,14 @@ IOCatalogue::resetAndAddDrivers(OSArray * drivers, bool doNubMatching)
 				for (newIdx = 0;
 				    (thisNewPersonality = (OSDictionary *) newPersonalities->getObject(newIdx));
 				    newIdx++) {
-					/* Unlike in other functions, this comparison must be exact!
-					 * The catalogue must be able to contain personalities that
-					 * are proper supersets of others.
-					 * Do not compare just the properties present in one driver
-					 * personality or the other.
-					 */
+					                                                            
+                                                                
+                                       
+                                                                
+                                 
+        
 					if (OSDynamicCast(OSDictionary, thisNewPersonality) == NULL) {
-						/* skip thisNewPersonality if it is not an OSDictionary */
+						                                                          
 						continue;
 					}
 					if (thisNewPersonality->isEqualTo(thisOldPersonality)) {
@@ -1134,11 +1134,11 @@ IOCatalogue::resetAndAddDrivers(OSArray * drivers, bool doNubMatching)
 				}
 			}
 			if (thisNewPersonality) {
-				// dup, ignore
+				              
 				newPersonalities->removeObject(newIdx);
 			} else {
-				// not in new set - remove
-				// only remove dictionary if this module in not loaded - 9953845
+				                          
+				                                                                
 				if (isModuleLoadedNoOSKextLock(myKexts.get(), thisOldPersonality) == false) {
 					if (matchSet) {
 						matchSet->setObject(thisOldPersonality);
@@ -1147,16 +1147,16 @@ IOCatalogue::resetAndAddDrivers(OSArray * drivers, bool doNubMatching)
 					idx--;
 				}
 			}
-		} // for...
-	} // while...
+		}          
+	}            
 
-	// add new
+	          
 	if (newPersonalities) {
 		for (newIdx = 0;
 		    (thisNewPersonality = (OSDictionary *) newPersonalities->getObject(newIdx));
 		    newIdx++) {
 			if (OSDynamicCast(OSDictionary, thisNewPersonality) == NULL) {
-				/* skip thisNewPersonality if it is not an OSDictionary */
+				                                                          
 				continue;
 			}
 
@@ -1166,8 +1166,8 @@ IOCatalogue::resetAndAddDrivers(OSArray * drivers, bool doNubMatching)
 		}
 	}
 
-	/* Finally, start device matching on all new & removed personalities.
-	 */
+	                                                                     
+    
 	if (result && doNubMatching && (matchSet->getCount() > 0)) {
 		IOService::catalogNewDrivers(matchSet.get());
 		generation++;
@@ -1220,28 +1220,28 @@ IOCatalogue::serializeData(IOOptionBits kind, OSSerialize * s) const
 	return kr;
 }
 
-/* isModuleLoadedNoOSKextLock - used to check to see if a kext is loaded
- * without taking the OSKext lock.  We use this to avoid the problem
- * where taking the IOCatalog lock then the OSKext lock will dealock when
- * a kext load or unload is happening at the same time as IOCatalog changing.
- *
- * theKexts - is a dictionary of current kexts (from OSKext::copyKexts) with
- *      key set to the kext bundle ID and value set to an OSKext object
- * theModuleDict - is an IOKit personality dictionary for a given module (kext)
- */
+                                                                        
+                                                                    
+                                                                         
+                                                                             
+  
+                                                                            
+                                                                       
+                                                                               
+   
 static bool
 isModuleLoadedNoOSKextLock(OSDictionary *theKexts,
     OSDictionary *theModuleDict)
 {
 	bool                    myResult = false;
-	const OSString *        myBundleID = NULL;// do not release
-	OSKext *                myKext = NULL;  // do not release
+	const OSString *        myBundleID = NULL;                 
+	OSKext *                myKext = NULL;                   
 
 	if (theKexts == NULL || theModuleDict == NULL) {
 		return myResult;
 	}
 
-	// gIOModuleIdentifierKey is "CFBundleIdentifier"
+	                                                 
 	myBundleID = OSDynamicCast(OSString,
 	    theModuleDict->getObject(gIOModuleIdentifierKey.get()));
 	if (myBundleID == NULL) {
@@ -1260,11 +1260,11 @@ isModuleLoadedNoOSKextLock(OSDictionary *theKexts,
 #if PRAGMA_MARK
 #pragma mark Obsolete Kext Loading Stuff
 #endif
-/*********************************************************************
- **********************************************************************
- ***                  BINARY COMPATIBILITY SECTION                  ***
- **********************************************************************
- **********************************************************************
- * These functions are no longer used are necessary for C++ binary
- * compatibility on i386.
- **********************************************************************/
+                                                                      
+                                                                       
+                                                                       
+                                                                       
+                                                                       
+                                                                  
+                         
+                                                                        

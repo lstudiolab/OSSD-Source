@@ -25,13 +25,13 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * HISTORY
- *
- * 17-Apr-91   Portions from libIO.m, Doug Mitchell at NeXT.
- * 17-Nov-98   cpp
- *
- */
+  
+          
+  
+                                                            
+                  
+  
+   
 
 #include <IOKit/system.h>
 #include <mach/sync_policy.h>
@@ -73,7 +73,7 @@ do { \
 
 #define IOStatisticsAlloc(type, size)
 
-#endif /* IOKITSTATS */
+#endif                 
 
 
 #define TRACK_ALLOC     (IOTRACKING && (kIOTracking & gIOKitDebug))
@@ -99,15 +99,15 @@ extern bool bsd_log_lock(bool);
 extern void bsd_log_unlock(void);
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 lck_grp_t       *IOLockGroup;
 
-/*
- * Global variables for use by iLogger
- * These symbols are for use only by Apple diagnostic code.
- * Binary compatibility is not guaranteed for kexts that reference these symbols.
- */
+  
+                                      
+                                                           
+                                                                                 
+   
 
 void *_giDebugLogInternal       = NULL;
 void *_giDebugLogDataInternal   = NULL;
@@ -116,9 +116,9 @@ void *_giDebugReserved2         = NULL;
 
 iopa_t gIOBMDPageAllocator;
 
-/*
- * Static variables for this module.
- */
+  
+                                    
+   
 
 static queue_head_t gIOMallocContiguousEntries;
 static lck_mtx_t *  gIOMallocContiguousEntriesLock;
@@ -154,9 +154,9 @@ uint32_t  gIOPageAllocChunkBytes;
 IOTrackingQueue * gIOMallocTracking;
 IOTrackingQueue * gIOWireTracking;
 IOTrackingQueue * gIOMapTracking;
-#endif /* IOTRACKING */
+#endif                 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 void
 IOLibInit(void)
@@ -216,7 +216,7 @@ IOLibInit(void)
 	libInitialized = true;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static vm_size_t
 log2up(vm_size_t size)
@@ -233,7 +233,7 @@ log2up(vm_size_t size)
 	return size;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOThread
 IOCreateThread(IOThreadFunc fcn, void *arg)
@@ -278,7 +278,7 @@ IOMallocZero_external(
 	return IOMallocZero_internal(KHEAP_KEXT, size);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 void *
 IOMallocZero_internal(struct kalloc_heap *kalloc_heap_cfg, vm_size_t size)
@@ -291,7 +291,7 @@ IOMallocZero_internal(struct kalloc_heap *kalloc_heap_cfg, vm_size_t size)
 	return result;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #if IOTRACKING
 struct IOLibMallocHeader {
@@ -305,7 +305,7 @@ struct IOLibMallocHeader {
 #define sizeofIOLibMallocHeader (0)
 #endif
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 void *
 IOMalloc_internal(struct kalloc_heap *kheap, vm_size_t size)
@@ -316,7 +316,7 @@ IOMalloc_internal(struct kalloc_heap *kheap, vm_size_t size)
 	allocSize = size + sizeofIOLibMallocHeader;
 #if IOTRACKING
 	if (sizeofIOLibMallocHeader && (allocSize <= size)) {
-		return NULL;                                          // overflow
+		return NULL;                                                     
 	}
 #endif
 	address = kheap_alloc_tag_bt(kheap, allocSize, Z_WAITOK, VM_KERN_MEMORY_IOKIT);
@@ -357,8 +357,8 @@ IOFree(void * inAddress, vm_size_t size)
 			struct ptr_reference { void * ptr; };
 			volatile struct ptr_reference ptr;
 
-			// we're about to block in IOTrackingRemove(), make sure the original pointer
-			// exists in memory or a register for leak scanning to find
+			                                                                             
+			                                                           
 			ptr.ptr = inAddress;
 
 			hdr = (typeof(hdr))address;
@@ -379,7 +379,7 @@ IOFree(void * inAddress, vm_size_t size)
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 vm_tag_t
 IOMemoryTag(vm_map_t map)
@@ -398,7 +398,7 @@ IOMemoryTag(vm_map_t map)
 	return tag;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 struct IOLibPageMallocHeader {
 	mach_vm_size_t    allocationSize;
@@ -414,7 +414,7 @@ struct IOLibPageMallocHeader {
 #define sizeofIOLibPageMallocHeader     (sizeof(IOLibPageMallocHeader))
 #endif
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 void *
 IOMallocAligned_external(
 	vm_size_t size, vm_size_t alignment);
@@ -448,7 +448,7 @@ IOMallocAligned_internal(struct kalloc_heap *kheap, vm_size_t size,
 	adjustedSize = size + sizeofIOLibPageMallocHeader;
 
 	if (size > adjustedSize) {
-		address = 0; /* overflow detected */
+		address = 0;                        
 	} else if (adjustedSize >= page_size) {
 		kr = kernel_memory_allocate(kernel_map, &address,
 		    size, alignMask, KMA_NONE, IOMemoryTag(kernel_map));
@@ -555,7 +555,7 @@ IOFreeAligned(void * address, vm_size_t size)
 	IOStatisticsAlloc(kIOStatisticsFreeAligned, size);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 void
 IOKernelFreePhysical(mach_vm_address_t address, mach_vm_size_t size)
@@ -709,7 +709,7 @@ IOKernelAllocateWithPhysicalRestrict(mach_vm_size_t size, mach_vm_address_t maxP
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 struct _IOMallocContiguousEntry {
 	mach_vm_address_t          virtualAddr;
@@ -731,9 +731,9 @@ IOMallocContiguous(vm_size_t size, vm_size_t alignment,
 		alignment = 1;
 	}
 
-	/* Do we want a physical address? */
+	                                    
 	if (!physicalAddress) {
-		address = IOKernelAllocateWithPhysicalRestrict(size, 0 /*maxPhys*/, alignment, true);
+		address = IOKernelAllocateWithPhysicalRestrict(size, 0            , alignment, true);
 	} else {
 		do {
 			IOBufferMemoryDescriptor * bmd;
@@ -805,7 +805,7 @@ IOFreeContiguous(void * _address, vm_size_t size)
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 kern_return_t
 IOIteratePageableMaps(vm_size_t size,
@@ -969,7 +969,7 @@ IOMallocPageableInternal(vm_size_t size, vm_size_t alignment, bool zeroed)
 	if (size >= (page_size - 4 * gIOPageAllocChunkBytes) ||
 	    alignment > page_size) {
 		addr = IOMallocPageablePages(size, alignment, IOMemoryTag(kernel_map));
-		/* Memory allocated this way will already be zeroed. */
+		                                                       
 	} else {
 		addr = ((void *) iopa_alloc(&gIOPageablePageAllocator, &IOMallocOnePageablePage, size, (uint32_t) alignment));
 		if (zeroed) {
@@ -990,13 +990,13 @@ IOMallocPageableInternal(vm_size_t size, vm_size_t alignment, bool zeroed)
 void *
 IOMallocPageable(vm_size_t size, vm_size_t alignment)
 {
-	return IOMallocPageableInternal(size, alignment, /*zeroed*/ false);
+	return IOMallocPageableInternal(size, alignment,            false);
 }
 
 void *
 IOMallocPageableZero(vm_size_t size, vm_size_t alignment)
 {
-	return IOMallocPageableInternal(size, alignment, /*zeroed*/ true);
+	return IOMallocPageableInternal(size, alignment,            true);
 }
 
 void
@@ -1016,7 +1016,7 @@ IOFreePageable(void * address, vm_size_t size)
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 extern "C" void
 iopa_init(iopa_t * a)
@@ -1034,12 +1034,12 @@ iopa_allocinpage(iopa_page_t * pa, uint32_t count, uint64_t align)
 
 	assert(avail);
 
-	// find strings of count 1 bits in avail
+	                                        
 	for (n = count; n > 1; n -= s) {
 		s = n >> 1;
 		avail = avail & (avail << s);
 	}
-	// and aligned
+	              
 	avail &= align;
 
 	if (avail) {
@@ -1157,7 +1157,7 @@ iopa_free(iopa_t * a, uintptr_t addr, vm_size_t bytes)
 		pa->link.next = NULL;
 		pa->signature = 0;
 		a->pagecount--;
-		// page to free
+		               
 		pa = (typeof(pa))trunc_page(pa);
 	}
 	a->bytecount -= bytes;
@@ -1166,7 +1166,7 @@ iopa_free(iopa_t * a, uintptr_t addr, vm_size_t bytes)
 	return (uintptr_t) pa;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOSetProcessorCacheMode( task_t task, IOVirtualAddress address,
@@ -1179,17 +1179,17 @@ IOSetProcessorCacheMode( task_t task, IOVirtualAddress address,
 		return kIOReturnUnsupported;
 	}
 	if ((address | length) & PAGE_MASK) {
-//	OSReportWithBacktrace("IOSetProcessorCacheMode(0x%x, 0x%x, 0x%x) fails\n", address, length, cacheMode);
+                                                                                                          
 		return kIOReturnUnsupported;
 	}
 	length = round_page(address + length) - trunc_page( address );
 	address = trunc_page( address );
 
-	// make map mode
+	                
 	cacheMode = (cacheMode << kIOMapCacheShift) & kIOMapCacheMask;
 
 	while ((kIOReturnSuccess == ret) && (length > 0)) {
-		// Get the physical page number
+		                               
 		pagenum = pmap_find_phys(kernel_pmap, (addr64_t)address);
 		if (pagenum) {
 			ret = IOUnmapPages( get_task_map(task), address, page_size );
@@ -1219,7 +1219,7 @@ IOFlushProcessorCache( task_t task, IOVirtualAddress address,
 	return kIOReturnSuccess;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 vm_offset_t
 OSKernelStackRemaining( void )
@@ -1227,46 +1227,46 @@ OSKernelStackRemaining( void )
 	return ml_stack_remaining();
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/*
- * Spin for indicated number of milliseconds.
- */
+  
+                                             
+   
 void
 IOSleep(unsigned milliseconds)
 {
 	delay_for_interval(milliseconds, kMillisecondScale);
 }
 
-/*
- * Spin for indicated number of milliseconds, and potentially an
- * additional number of milliseconds up to the leeway values.
- */
+  
+                                                                
+                                                             
+   
 void
 IOSleepWithLeeway(unsigned intervalMilliseconds, unsigned leewayMilliseconds)
 {
 	delay_for_interval_with_leeway(intervalMilliseconds, leewayMilliseconds, kMillisecondScale);
 }
 
-/*
- * Spin for indicated number of microseconds.
- */
+  
+                                             
+   
 void
 IODelay(unsigned microseconds)
 {
 	delay_for_interval(microseconds, kMicrosecondScale);
 }
 
-/*
- * Spin for indicated number of nanoseconds.
- */
+  
+                                            
+   
 void
 IOPause(unsigned nanoseconds)
 {
 	delay_for_interval(nanoseconds, kNanosecondScale);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static void _IOLogv(const char *format, va_list ap, void *caller) __printflike(1, 0);
 
@@ -1316,7 +1316,7 @@ IOPanic(const char *reason)
 }
 #endif
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 void
 IOKitKernelLogBuffer(const char * title, const void * buffer, size_t size,
@@ -1348,12 +1348,12 @@ IOKitKernelLogBuffer(const char * title, const void * buffer, size_t size,
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/*
- * Convert a integer constant (typically a #define or enum) to a string.
- */
-static char noValue[80];        // that's pretty
+  
+                                                                        
+   
+static char noValue[80];                        
 
 const char *
 IOFindNameForValue(int value, const IONamedValue *regValueArray)
@@ -1392,7 +1392,7 @@ IOCopyLogNameForPID(int pid)
 	return OSString::withCString(buf);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOAlignment
 IOSizeToAlignment(unsigned int size)
@@ -1419,4 +1419,4 @@ IOAlignmentToSize(IOAlignment align)
 	}
 	return size;
 }
-} /* extern "C" */
+}                 

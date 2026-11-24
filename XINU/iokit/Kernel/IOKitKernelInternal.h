@@ -40,7 +40,7 @@ __BEGIN_DECLS
 #include <IOKit/IODMACommand.h>
 #include <IOKit/IOKitServer.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 typedef kern_return_t (*IOIteratePageableMapsCallback)(vm_map_t map, void * ref);
 
@@ -72,7 +72,7 @@ IOKernelFreePhysical(mach_vm_address_t address, mach_vm_size_t size);
 IOReturn
 IOMemoryMapTracking(IOTrackingUser * tracking, task_t * task,
     mach_vm_address_t * address, mach_vm_size_t * size);
-#endif /* IOTRACKING */
+#endif                 
 
 extern vm_size_t debug_iomallocpageable_size;
 
@@ -81,7 +81,7 @@ extern ppnum_t gIOLastPage;
 extern IOSimpleLock * gIOPageAllocLock;
 extern queue_head_t   gIOPageAllocList;
 
-/* Physical to physical copy (ints must be disabled) */
+                                                       
 extern void bcopy_phys(addr64_t from, addr64_t to, vm_size_t size);
 
 __END_DECLS
@@ -91,9 +91,9 @@ __END_DECLS
        (type)(uintptr_t)(expr_); })
 
 struct IODMACommandMapSegment {
-	uint64_t fDMAOffset;       // The offset of this segment in DMA
-	uint64_t fMapOffset;       // Offset of segment in mapping
-	uint64_t fPageOffset;      // Offset within first page of segment
+	uint64_t fDMAOffset;                                           
+	uint64_t fMapOffset;                                      
+	uint64_t fPageOffset;                                            
 };
 
 struct IODMACommandInternal {
@@ -130,12 +130,12 @@ struct IODMACommandInternal {
 
 	IOService * fDevice;
 
-	// IODMAEventSource use
+	                       
 	IOReturn fStatus;
 	UInt64   fActualByteCount;
 	AbsoluteTime    fTimeStamp;
 
-	// Multisegment vars
+	                    
 	IODMACommandMapSegment * fMapSegments;
 	uint32_t                 fMapSegmentsCount;
 	uint64_t fLocalMapperAllocBase;
@@ -155,7 +155,7 @@ struct IOMemoryDescriptorReserved {
 	IOMemoryDescriptorDevicePager dp;
 	uint64_t                      descriptorID;
 	uint64_t                      preparationID;
-	// for kernel IOMD subclasses... they have no expansion
+	                                                       
 	uint64_t                      kernReserved[4];
 	vm_tag_t                      kernelTag;
 	vm_tag_t                      userTag;
@@ -229,4 +229,4 @@ IOReturn IORemoveServicePlatformActions(IOService * service);
 void     IOCPUSleepKernel(void);
 void     IOPlatformActionsInitialize(void);
 
-#endif /* ! _IOKIT_KERNELINTERNAL_H */
+#endif                                

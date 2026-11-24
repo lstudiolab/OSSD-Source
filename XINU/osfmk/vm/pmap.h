@@ -53,16 +53,16 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/pmap.h
- *	Author:	Avadis Tevanian, Jr.
- *	Date:	1985
- *
- *	Machine address mapping definitions -- machine-independent
- *	section.  [For machine-dependent section, see "machine/pmap.h".]
- */
+  
+   
+  
+                  
+                               
+             
+  
+                                                             
+                                                                   
+   
 
 #ifndef _VM_PMAP_H_
 #define _VM_PMAP_H_
@@ -79,20 +79,20 @@
 
 #ifdef  KERNEL_PRIVATE
 
-/*
- *	The following is a description of the interface to the
- *	machine-dependent "physical map" data structure.  The module
- *	must provide a "pmap_t" data type that represents the
- *	set of valid virtual-to-physical addresses for one user
- *	address space.  [The kernel address space is represented
- *	by a distinguished "pmap_t".]  The routines described manage
- *	this type, install and update virtual-to-physical mappings,
- *	and perform operations on physical addresses common to
- *	many address spaces.
- */
+  
+                                                         
+                                                               
+                                                        
+                                                          
+                                                           
+                                                               
+                                                              
+                                                         
+                       
+   
 
-/* Copy between a physical page and a virtual address */
-/* LP64todo - switch to vm_map_offset_t when it grows */
+                                                        
+                                                        
 extern kern_return_t    copypv(
 	addr64_t source,
 	addr64_t sink,
@@ -110,7 +110,7 @@ extern kern_return_t    copypv(
 #define cppvNoModSnkb  27
 #define cppvNoRefSrc   32
 #define cppvNoRefSrcb  26
-#define cppvKmap       64       /* Use the kernel's vm_map */
+#define cppvKmap       64                                    
 #define cppvKmapb      25
 
 extern boolean_t pmap_has_managed_page(ppnum_t first, ppnum_t last);
@@ -122,54 +122,54 @@ extern boolean_t pmap_has_managed_page(ppnum_t first, ppnum_t last);
 #include <machine/pmap.h>
 #include <vm/memory_types.h>
 
-/*
- *	Routines used for initialization.
- *	There is traditionally also a pmap_bootstrap,
- *	used very early by machine-dependent code,
- *	but it is not part of the interface.
- *
- *	LP64todo -
- *	These interfaces are tied to the size of the
- *	kernel pmap - and therefore use the "local"
- *	vm_offset_t, etc... types.
- */
+  
+                                    
+                                                
+                                             
+                                       
+  
+             
+                                               
+                                              
+                             
+   
 
-extern void *pmap_steal_memory(vm_size_t size); /* Early memory allocation */
-extern void *pmap_steal_freeable_memory(vm_size_t size); /* Early memory allocation */
+extern void *pmap_steal_memory(vm_size_t size);                              
+extern void *pmap_steal_freeable_memory(vm_size_t size);                              
 
-extern uint_t pmap_free_pages(void); /* report remaining unused physical pages */
+extern uint_t pmap_free_pages(void);                                             
 #if defined(__arm__) || defined(__arm64__)
-extern uint_t pmap_free_pages_span(void); /* report phys address range of unused physical pages */
-#endif /* defined(__arm__) || defined(__arm64__) */
+extern uint_t pmap_free_pages_span(void);                                                         
+#endif                                             
 
-extern void pmap_startup(vm_offset_t *startp, vm_offset_t *endp); /* allocate vm_page structs */
+extern void pmap_startup(vm_offset_t *startp, vm_offset_t *endp);                               
 
-extern void pmap_init(void); /* Initialization, once we have kernel virtual memory.  */
+extern void pmap_init(void);                                                           
 
-extern void mapping_adjust(void); /* Adjust free mapping count */
+extern void mapping_adjust(void);                                
 
-extern void mapping_free_prime(void); /* Primes the mapping block release list */
+extern void mapping_free_prime(void);                                            
 
 #ifndef MACHINE_PAGES
-/*
- *	If machine/pmap.h defines MACHINE_PAGES, it must implement
- *	the above functions.  The pmap module has complete control.
- *	Otherwise, it must implement the following functions:
- *		pmap_free_pages
- *		pmap_virtual_space
- *		pmap_next_page
- *		pmap_init
- *	and vm/vm_resident.c implements pmap_steal_memory and pmap_startup
- *	using pmap_free_pages, pmap_next_page, pmap_virtual_space,
- *	and pmap_enter.  pmap_free_pages may over-estimate the number
- *	of unused physical pages, and pmap_next_page may return FALSE
- *	to indicate that there are no more unused pages to return.
- *	However, for best performance pmap_free_pages should be accurate.
- */
+  
+                                                             
+                                                              
+                                                        
+                   
+                      
+                  
+             
+                                                                     
+                                                             
+                                                                
+                                                                
+                                                             
+                                                                    
+   
 
-/*
- * Routines to return the next unused physical page.
- */
+  
+                                                    
+   
 extern boolean_t pmap_next_page(ppnum_t *pnum);
 extern boolean_t pmap_next_page_hi(ppnum_t *pnum, boolean_t might_free);
 #ifdef __x86_64__
@@ -177,25 +177,25 @@ extern kern_return_t pmap_next_page_large(ppnum_t *pnum);
 extern void pmap_hi_pages_done(void);
 #endif
 
-/*
- * Report virtual space available for the kernel.
- */
+  
+                                                 
+   
 extern void pmap_virtual_space(
 	vm_offset_t     *virtual_start,
 	vm_offset_t     *virtual_end);
-#endif  /* MACHINE_PAGES */
+#endif                     
 
-/*
- * Routines to manage the physical map data structure.
- */
-extern pmap_t           pmap_create_options(    /* Create a pmap_t. */
+  
+                                                      
+   
+extern pmap_t           pmap_create_options(                          
 	ledger_t        ledger,
 	vm_map_size_t   size,
 	unsigned int    flags);
 
-extern pmap_t(pmap_kernel)(void);               /* Return the kernel's pmap */
-extern void             pmap_reference(pmap_t pmap);    /* Gain a reference. */
-extern void             pmap_destroy(pmap_t pmap); /* Release a reference. */
+extern pmap_t(pmap_kernel)(void);                                             
+extern void             pmap_reference(pmap_t pmap);                           
+extern void             pmap_destroy(pmap_t pmap);                           
 extern void             pmap_switch(pmap_t);
 extern void             pmap_require(pmap_t pmap);
 
@@ -203,9 +203,9 @@ extern void             pmap_require(pmap_t pmap);
 extern void pmap_set_process(pmap_t pmap,
     int pid,
     char *procname);
-#endif /* MACH_ASSERT */
+#endif                  
 
-extern kern_return_t    pmap_enter(     /* Enter a mapping */
+extern kern_return_t    pmap_enter(                          
 	pmap_t          pmap,
 	vm_map_offset_t v,
 	ppnum_t         pn,
@@ -246,15 +246,15 @@ extern void             pmap_unlock_phys_page(
 	ppnum_t         pn);
 
 
-/*
- *	Routines that operate on physical addresses.
- */
+  
+                                               
+   
 
-extern void             pmap_page_protect(      /* Restrict access to page. */
+extern void             pmap_page_protect(                                    
 	ppnum_t phys,
 	vm_prot_t       prot);
 
-extern void             pmap_page_protect_options(      /* Restrict access to page. */
+extern void             pmap_page_protect_options(                                    
 	ppnum_t phys,
 	vm_prot_t       prot,
 	unsigned int    options,
@@ -291,17 +291,17 @@ extern void(pmap_copy_part_rpage)(
 	vm_offset_t     dst,
 	vm_size_t       len);
 
-extern unsigned int(pmap_disconnect)(   /* disconnect mappings and return reference and change */
+extern unsigned int(pmap_disconnect)(                                                            
 	ppnum_t         phys);
 
-extern unsigned int(pmap_disconnect_options)(   /* disconnect mappings and return reference and change */
+extern unsigned int(pmap_disconnect_options)(                                                            
 	ppnum_t         phys,
 	unsigned int    options,
 	void            *arg);
 
-extern kern_return_t(pmap_attribute_cache_sync)(      /* Flush appropriate
-                                                       * cache based on
-                                                       * page number sent */
+extern kern_return_t(pmap_attribute_cache_sync)(                          
+                                                                       
+                                                                            
 	ppnum_t         pn,
 	vm_size_t       size,
 	vm_machine_attribute_t attribute,
@@ -310,9 +310,9 @@ extern kern_return_t(pmap_attribute_cache_sync)(      /* Flush appropriate
 extern unsigned int(pmap_cache_attributes)(
 	ppnum_t         pn);
 
-/*
- * Set (override) cache attributes for the specified physical page
- */
+  
+                                                                  
+   
 extern  void            pmap_set_cache_attributes(
 	ppnum_t,
 	unsigned int);
@@ -325,7 +325,7 @@ extern void             pmap_unmap_compressor_page(
 	void*);
 
 #if defined(__arm__) || defined(__arm64__)
-/* ARM64_TODO */
+                
 extern  boolean_t       pmap_batch_set_cache_attributes(
 	ppnum_t,
 	unsigned int,
@@ -337,56 +337,56 @@ extern  boolean_t       pmap_batch_set_cache_attributes(
 extern void pmap_sync_page_data_phys(ppnum_t pa);
 extern void pmap_sync_page_attributes_phys(ppnum_t pa);
 
-/*
- * debug/assertions. pmap_verify_free returns true iff
- * the given physical page is mapped into no pmap.
- * pmap_assert_free() will panic() if pn is not free.
- */
+  
+                                                      
+                                                  
+                                                     
+   
 extern boolean_t        pmap_verify_free(ppnum_t pn);
 #if MACH_ASSERT
 extern void pmap_assert_free(ppnum_t pn);
 #endif
 
-/*
- *	Statistics routines
- */
+  
+                      
+   
 extern int(pmap_compressed)(pmap_t pmap);
 extern int(pmap_resident_count)(pmap_t pmap);
 extern int(pmap_resident_max)(pmap_t pmap);
 
-/*
- *	Sundry required (internal) routines
- */
+  
+                                      
+   
 #ifdef CURRENTLY_UNUSED_AND_UNTESTED
-extern void             pmap_collect(pmap_t pmap);/* Perform garbage
-                                                   * collection, if any */
+extern void             pmap_collect(pmap_t pmap);                  
+                                                                          
 #endif
-/*
- *	Optional routines
- */
-extern void(pmap_copy)(                         /* Copy range of mappings,
-                                                 * if desired. */
+  
+                    
+   
+extern void(pmap_copy)(                                                   
+                                                                 
 	pmap_t          dest,
 	pmap_t          source,
 	vm_map_offset_t dest_va,
 	vm_map_size_t   size,
 	vm_map_offset_t source_va);
 
-extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
-                                                 * attributes */
+extern kern_return_t(pmap_attribute)(                                    
+                                                                
 	pmap_t          pmap,
 	vm_map_offset_t va,
 	vm_map_size_t   size,
 	vm_machine_attribute_t  attribute,
 	vm_machine_attribute_val_t* value);
 
-/*
- * Routines defined as macros.
- */
+  
+                              
+   
 #ifndef PMAP_ACTIVATE_USER
 #ifndef PMAP_ACTIVATE
 #define PMAP_ACTIVATE_USER(thr, cpu)
-#else   /* PMAP_ACTIVATE */
+#else                      
 #define PMAP_ACTIVATE_USER(thr, cpu) {                  \
 	pmap_t  pmap;                                           \
                                                                 \
@@ -394,13 +394,13 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	if (pmap != pmap_kernel())                              \
 	        PMAP_ACTIVATE(pmap, (thr), (cpu));              \
 }
-#endif  /* PMAP_ACTIVATE */
-#endif  /* PMAP_ACTIVATE_USER */
+#endif                     
+#endif                          
 
 #ifndef PMAP_DEACTIVATE_USER
 #ifndef PMAP_DEACTIVATE
 #define PMAP_DEACTIVATE_USER(thr, cpu)
-#else   /* PMAP_DEACTIVATE */
+#else                        
 #define PMAP_DEACTIVATE_USER(thr, cpu) {                        \
 	pmap_t  pmap;                                           \
                                                                 \
@@ -408,31 +408,31 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	if ((pmap) != pmap_kernel())                    \
 	        PMAP_DEACTIVATE(pmap, (thr), (cpu));    \
 }
-#endif  /* PMAP_DEACTIVATE */
-#endif  /* PMAP_DEACTIVATE_USER */
+#endif                       
+#endif                            
 
 #ifndef PMAP_ACTIVATE_KERNEL
 #ifndef PMAP_ACTIVATE
 #define PMAP_ACTIVATE_KERNEL(cpu)
-#else   /* PMAP_ACTIVATE */
+#else                      
 #define PMAP_ACTIVATE_KERNEL(cpu)                       \
 	        PMAP_ACTIVATE(pmap_kernel(), THREAD_NULL, cpu)
-#endif  /* PMAP_ACTIVATE */
-#endif  /* PMAP_ACTIVATE_KERNEL */
+#endif                     
+#endif                            
 
 #ifndef PMAP_DEACTIVATE_KERNEL
 #ifndef PMAP_DEACTIVATE
 #define PMAP_DEACTIVATE_KERNEL(cpu)
-#else   /* PMAP_DEACTIVATE */
+#else                        
 #define PMAP_DEACTIVATE_KERNEL(cpu)                     \
 	        PMAP_DEACTIVATE(pmap_kernel(), THREAD_NULL, cpu)
-#endif  /* PMAP_DEACTIVATE */
-#endif  /* PMAP_DEACTIVATE_KERNEL */
+#endif                       
+#endif                              
 
 #ifndef PMAP_ENTER
-/*
- *	Macro to be used in place of pmap_enter()
- */
+  
+                                            
+   
 #define PMAP_ENTER(pmap, virtual_address, page, protection, fault_type, \
 	    flags, wired, result)                                \
 	MACRO_BEGIN                                                     \
@@ -459,7 +459,7 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	                            __options,                          \
 	                            NULL);                              \
 	MACRO_END
-#endif  /* !PMAP_ENTER */
+#endif                   
 
 #ifndef PMAP_ENTER_OPTIONS
 #define PMAP_ENTER_OPTIONS(pmap, virtual_address, fault_phys_offset,   \
@@ -492,7 +492,7 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	                            (options) | __extra_options,        \
 	                            NULL);                              \
 	MACRO_END
-#endif  /* !PMAP_ENTER_OPTIONS */
+#endif                           
 
 #ifndef PMAP_SET_CACHE_ATTR
 #define PMAP_SET_CACHE_ATTR(mem, object, cache_attr, batch_pmap_op)             \
@@ -502,7 +502,7 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	                object->set_cache_attr = TRUE;                          \
 	        }                                                               \
 	MACRO_END
-#endif  /* PMAP_SET_CACHE_ATTR */
+#endif                           
 
 #ifndef PMAP_BATCH_SET_CACHE_ATTR
 #if     defined(__arm__) || defined(__arm64__)
@@ -562,7 +562,7 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	        }                                                               \
 	MACRO_END
 #endif
-#endif  /* PMAP_BATCH_SET_CACHE_ATTR */
+#endif                                 
 
 #define PMAP_ENTER_CHECK(pmap, page)                                    \
 {                                                                       \
@@ -572,11 +572,11 @@ extern kern_return_t(pmap_attribute)(           /* Get/Set special memory
 	}                                                               \
 }
 
-/*
- *	Routines to manage reference/modify bits based on
- *	physical addresses, simulating them if not provided
- *	by the hardware.
- */
+  
+                                                    
+                                                      
+                   
+   
 struct pfc {
 	long    pfc_cpus;
 	long    pfc_invalid_global;
@@ -584,32 +584,32 @@ struct pfc {
 
 typedef struct pfc      pmap_flush_context;
 
-/* Clear reference bit */
+                         
 extern void             pmap_clear_reference(ppnum_t     pn);
-/* Return reference bit */
+                          
 extern boolean_t(pmap_is_referenced)(ppnum_t     pn);
-/* Set modify bit */
+                    
 extern void             pmap_set_modify(ppnum_t  pn);
-/* Clear modify bit */
+                      
 extern void             pmap_clear_modify(ppnum_t pn);
-/* Return modify bit */
+                       
 extern boolean_t        pmap_is_modified(ppnum_t pn);
-/* Return modified and referenced bits */
+                                         
 extern unsigned int pmap_get_refmod(ppnum_t pn);
-/* Clear modified and referenced bits */
+                                        
 extern void                     pmap_clear_refmod(ppnum_t pn, unsigned int mask);
-#define VM_MEM_MODIFIED         0x01    /* Modified bit */
-#define VM_MEM_REFERENCED       0x02    /* Referenced bit */
+#define VM_MEM_MODIFIED         0x01                      
+#define VM_MEM_REFERENCED       0x02                        
 extern void                     pmap_clear_refmod_options(ppnum_t pn, unsigned int mask, unsigned int options, void *);
 
-/*
- * Clears the reference and/or modified bits on a range of virtually
- * contiguous pages.
- * It returns true if the operation succeeded. If it returns false,
- * nothing has been modified.
- * This operation is only supported on some platforms, so callers MUST
- * handle the case where it returns false.
- */
+  
+                                                                    
+                    
+                                                                   
+                             
+                                                                      
+                                          
+   
 extern bool
 pmap_clear_refmod_range_options(
 	pmap_t pmap,
@@ -622,16 +622,16 @@ pmap_clear_refmod_range_options(
 extern void pmap_flush_context_init(pmap_flush_context *);
 extern void pmap_flush(pmap_flush_context *);
 
-/*
- *	Routines that operate on ranges of virtual addresses.
- */
-extern void             pmap_protect(   /* Change protections. */
+  
+                                                        
+   
+extern void             pmap_protect(                            
 	pmap_t          map,
 	vm_map_offset_t s,
 	vm_map_offset_t e,
 	vm_prot_t       prot);
 
-extern void             pmap_protect_options(   /* Change protections. */
+extern void             pmap_protect_options(                            
 	pmap_t          map,
 	vm_map_offset_t s,
 	vm_map_offset_t e,
@@ -647,7 +647,7 @@ extern void(pmap_pageable)(
 
 extern uint64_t pmap_shared_region_size_min(pmap_t map);
 
-/* TODO: <rdar://problem/65247502> Completely remove pmap_nesting_size_max() */
+                                                                               
 extern uint64_t pmap_nesting_size_max(pmap_t map);
 
 extern kern_return_t pmap_nest(pmap_t,
@@ -666,27 +666,27 @@ extern kern_return_t pmap_unnest_options(pmap_t,
     unsigned int);
 extern boolean_t pmap_adjust_unnest_parameters(pmap_t, vm_map_offset_t *, vm_map_offset_t *);
 extern void             pmap_advise_pagezero_range(pmap_t, uint64_t);
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 extern boolean_t        pmap_is_noencrypt(ppnum_t);
 extern void             pmap_set_noencrypt(ppnum_t pn);
 extern void             pmap_clear_noencrypt(ppnum_t pn);
 
-/*
- * JMM - This portion is exported to other kernel components right now,
- * but will be pulled back in the future when the needed functionality
- * is provided in a cleaner manner.
- */
+  
+                                                                       
+                                                                      
+                                   
+   
 
-extern pmap_t   kernel_pmap;                    /* The kernel's map */
+extern pmap_t   kernel_pmap;                                          
 #define         pmap_kernel()   (kernel_pmap)
 
-#define VM_MEM_SUPERPAGE        0x100           /* map a superpage instead of a base page */
+#define VM_MEM_SUPERPAGE        0x100                                                       
 #define VM_MEM_STACK            0x200
 
-/* N.B. These use the same numerical space as the PMAP_EXPAND_OPTIONS
- * definitions in i386/pmap_internal.h
- */
+                                                                     
+                                      
+   
 #define PMAP_CREATE_64BIT          0x1
 
 #if __x86_64__
@@ -706,40 +706,40 @@ extern pmap_t   kernel_pmap;                    /* The kernel's map */
 #define PMAP_CREATE_FORCE_4K_PAGES 0x8
 #else
 #define PMAP_CREATE_FORCE_4K_PAGES 0
-#endif /* __ARM_MIXED_PAGE_SIZE__ */
+#endif                              
 #if __arm64__
 #define PMAP_CREATE_X86_64         0
 #else
 #define PMAP_CREATE_X86_64         0
 #endif
 
-/* Define PMAP_CREATE_KNOWN_FLAGS in terms of optional flags */
+                                                               
 #define PMAP_CREATE_KNOWN_FLAGS (PMAP_CREATE_64BIT | PMAP_CREATE_STAGE2 | PMAP_CREATE_DISABLE_JOP | PMAP_CREATE_FORCE_4K_PAGES | PMAP_CREATE_X86_64)
 
-#endif /* __x86_64__ */
+#endif                 
 
-#define PMAP_OPTIONS_NOWAIT     0x1             /* don't block, return
-	                                         * KERN_RESOURCE_SHORTAGE
-	                                         * instead */
-#define PMAP_OPTIONS_NOENTER    0x2             /* expand pmap if needed
-	                                         * but don't enter mapping
-	                                         */
-#define PMAP_OPTIONS_COMPRESSOR 0x4             /* credit the compressor for
-	                                         * this operation */
-#define PMAP_OPTIONS_INTERNAL   0x8             /* page from internal object */
-#define PMAP_OPTIONS_REUSABLE   0x10            /* page is "reusable" */
-#define PMAP_OPTIONS_NOFLUSH    0x20            /* delay flushing of pmap */
-#define PMAP_OPTIONS_NOREFMOD   0x40            /* don't need ref/mod on disconnect */
-#define PMAP_OPTIONS_ALT_ACCT   0x80            /* use alternate accounting scheme for page */
-#define PMAP_OPTIONS_REMOVE     0x100           /* removing a mapping */
-#define PMAP_OPTIONS_SET_REUSABLE   0x200       /* page is now "reusable" */
-#define PMAP_OPTIONS_CLEAR_REUSABLE 0x400       /* page no longer "reusable" */
-#define PMAP_OPTIONS_COMPRESSOR_IFF_MODIFIED 0x800 /* credit the compressor
-	                                            * iff page was modified */
-#define PMAP_OPTIONS_PROTECT_IMMEDIATE 0x1000   /* allow protections to be
-	                                         * be upgraded */
+#define PMAP_OPTIONS_NOWAIT     0x1                                   
+                                                                  
+                                                      
+#define PMAP_OPTIONS_NOENTER    0x2                                     
+                                                                   
+                                            
+#define PMAP_OPTIONS_COMPRESSOR 0x4                                         
+                                                             
+#define PMAP_OPTIONS_INTERNAL   0x8                                            
+#define PMAP_OPTIONS_REUSABLE   0x10                                    
+#define PMAP_OPTIONS_NOFLUSH    0x20                                        
+#define PMAP_OPTIONS_NOREFMOD   0x40                                                  
+#define PMAP_OPTIONS_ALT_ACCT   0x80                                                          
+#define PMAP_OPTIONS_REMOVE     0x100                                   
+#define PMAP_OPTIONS_SET_REUSABLE   0x200                                   
+#define PMAP_OPTIONS_CLEAR_REUSABLE 0x400                                      
+#define PMAP_OPTIONS_COMPRESSOR_IFF_MODIFIED 0x800                         
+                                                                       
+#define PMAP_OPTIONS_PROTECT_IMMEDIATE 0x1000                             
+                                                          
 #define PMAP_OPTIONS_CLEAR_WRITE 0x2000
-#define PMAP_OPTIONS_TRANSLATED_ALLOW_EXECUTE 0x4000 /* Honor execute for translated processes */
+#define PMAP_OPTIONS_TRANSLATED_ALLOW_EXECUTE 0x4000                                             
 #if defined(__arm__) || defined(__arm64__)
 #define PMAP_OPTIONS_FF_LOCKED  0x8000
 #define PMAP_OPTIONS_FF_WIRED   0x10000
@@ -749,18 +749,18 @@ extern pmap_t   kernel_pmap;                    /* The kernel's map */
 extern vm_offset_t      pmap_extract(pmap_t pmap,
     vm_map_offset_t va);
 #endif
-extern void             pmap_change_wiring(     /* Specify pageability */
+extern void             pmap_change_wiring(                              
 	pmap_t          pmap,
 	vm_map_offset_t va,
 	boolean_t       wired);
 
-/* LP64todo - switch to vm_map_offset_t when it grows */
-extern void             pmap_remove(    /* Remove mappings. */
+                                                        
+extern void             pmap_remove(                          
 	pmap_t          map,
 	vm_map_offset_t s,
 	vm_map_offset_t e);
 
-extern void             pmap_remove_options(    /* Remove mappings. */
+extern void             pmap_remove_options(                          
 	pmap_t          map,
 	vm_map_offset_t s,
 	vm_map_offset_t e,
@@ -782,37 +782,37 @@ mach_vm_size_t pmap_query_resident(pmap_t pmap,
 extern void pmap_set_vm_map_cs_enforced(pmap_t pmap, bool new_value);
 extern bool pmap_get_vm_map_cs_enforced(pmap_t pmap);
 
-/* Inform the pmap layer that there is a JIT entry in this map. */
+                                                                  
 extern void pmap_set_jit_entitled(pmap_t pmap);
 
-/* Ask the pmap layer if there is a JIT entry in this map. */
+                                                             
 extern bool pmap_get_jit_entitled(pmap_t pmap);
 
-/*
- * Tell the pmap layer what range within the nested region the VM intends to
- * use.
- */
+  
+                                                                            
+       
+   
 extern void pmap_trim(pmap_t grand, pmap_t subord, addr64_t vstart, uint64_t size);
 
-/*
- * Dump page table contents into the specified buffer.  Returns KERN_INSUFFICIENT_BUFFER_SIZE
- * if insufficient space, KERN_NOT_SUPPORTED if unsupported in the current configuration.
- * This is expected to only be called from kernel debugger context,
- * so synchronization is not required.
- */
+  
+                                                                                             
+                                                                                         
+                                                                   
+                                      
+   
 
 extern kern_return_t pmap_dump_page_tables(pmap_t pmap, void *bufp, void *buf_end, unsigned int level_mask, size_t *bytes_copied);
 
-/*
- * Indicates if any special policy is applied to this protection by the pmap
- * layer.
- */
+  
+                                                                            
+         
+   
 bool pmap_has_prot_policy(pmap_t pmap, bool translated_allow_execute, vm_prot_t prot);
 
-/*
- * Causes the pmap to return any available pages that it can return cheaply to
- * the VM.
- */
+  
+                                                                              
+          
+   
 uint64_t pmap_release_pages_fast(void);
 
 #define PMAP_QUERY_PAGE_PRESENT                 0x01
@@ -858,13 +858,13 @@ typedef enum {
 
 #define PMAP_IMAGE4_TRUST_CACHE_HAS_TYPE 1
 struct pmap_image4_trust_cache {
-	// Filled by pmap layer.
-	struct pmap_image4_trust_cache const *next;             // linked list linkage
-	struct trust_cache_module1 const *module;                       // pointer into module (within data below)
+	                        
+	struct pmap_image4_trust_cache const *next;                                   
+	struct trust_cache_module1 const *module;                                                                 
 
-	// Filled by caller.
-	// data is either an image4,
-	// or just the trust cache payload itself if the image4 manifest is external.
+	                    
+	                            
+	                                                                             
 	pmap_tc_type_t type;
 	size_t bnch_len;
 	uint8_t const bnch[48];
@@ -923,10 +923,10 @@ extern kern_return_t pmap_cs_allow_invalid(pmap_t pmap);
 
 #if __arm64__
 extern bool pmap_is_exotic(pmap_t pmap);
-#else /* __arm64__ */
+#else                
 #define pmap_is_exotic(pmap) false
-#endif /* __arm64__ */
+#endif                
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
-#endif  /* _VM_PMAP_H_ */
+#endif                   

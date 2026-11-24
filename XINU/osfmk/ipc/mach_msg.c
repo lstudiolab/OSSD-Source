@@ -60,15 +60,15 @@
  * Version 2.0.
  * Copyright (c) 2005 SPARTA, Inc.
  */
-/*
- */
-/*
- *	File:	ipc/mach_msg.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Exported message traps.  See mach/message.h.
- */
+  
+   
+  
+                       
+                      
+             
+  
+                                               
+   
 
 #include <mach/mach_types.h>
 #include <mach/kern_return.h>
@@ -114,11 +114,11 @@
 
 #ifndef offsetof
 #define offsetof(type, member)  ((size_t)(&((type *)0)->member))
-#endif /* offsetof */
+#endif               
 
-/*
- * Forward declarations - kernel internal routines
- */
+  
+                                                  
+   
 
 mach_msg_return_t mach_msg_send(
 	mach_msg_header_t       *msg,
@@ -164,31 +164,31 @@ const mach_msg_max_trailer_t trailer_template = {
 	.msgh_audit = KERNEL_AUDIT_TOKEN_VALUE
 };
 
-/*
- *	Routine:	mach_msg_send [Kernel Internal]
- *	Purpose:
- *		Routine for kernel-task threads to send a message.
- *
- *		Unlike mach_msg_send_from_kernel(), this routine
- *		looks port names up in the kernel's port namespace
- *		and copies in the kernel virtual memory (instead
- *		of taking a vm_map_copy_t pointer for OOL descriptors).
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		MACH_MSG_SUCCESS	Sent the message.
- *		MACH_SEND_MSG_TOO_SMALL	Message smaller than a header.
- *		MACH_SEND_NO_BUFFER	Couldn't allocate buffer.
- *		MACH_SEND_INVALID_DATA	Couldn't copy message data.
- *		MACH_SEND_INVALID_HEADER
- *			Illegal value in the message header bits.
- *		MACH_SEND_INVALID_DEST	The space is dead.
- *		MACH_SEND_INVALID_NOTIFY	Bad notify port.
- *		MACH_SEND_INVALID_DEST	Can't copyin destination port.
- *		MACH_SEND_INVALID_REPLY	Can't copyin reply port.
- *		MACH_SEND_TIMED_OUT	Timeout expired without delivery.
- *		MACH_SEND_INTERRUPTED	Delivery interrupted.
- */
+  
+                                           
+           
+                                                      
+  
+                                                    
+                                                      
+                                                    
+                                                           
+              
+                   
+           
+                                      
+                                                          
+                                                 
+                                                      
+                            
+                                              
+                                             
+                                             
+                                                         
+                                                    
+                                                         
+                                               
+   
 
 mach_msg_return_t
 mach_msg_send(
@@ -229,7 +229,7 @@ mach_msg_send(
 	}
 
 	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_IPC, MACH_IPC_KMSG_LINK) | DBG_FUNC_NONE,
-	    (uintptr_t)0,                   /* this should only be called from the kernel! */
+	    (uintptr_t)0,                                                                    
 	    VM_KERNEL_ADDRPERM((uintptr_t)kmsg),
 	    0, 0,
 	    0);
@@ -237,12 +237,12 @@ mach_msg_send(
 
 	kmsg->ikm_header->msgh_size = send_size;
 
-	/*
-	 * reserve for the trailer the largest space (MAX_TRAILER_SIZE)
-	 * However, the internal size field of the trailer (msgh_trailer_size)
-	 * is initialized to the minimum (sizeof(mach_msg_trailer_t)), to optimize
-	 * the cases where no implicit data is requested.
-	 */
+	  
+                                                                
+                                                                       
+                                                                           
+                                                  
+    
 	trailer = (mach_msg_max_trailer_t *) ((vm_offset_t)kmsg->ikm_header + send_size);
 	bzero(trailer, sizeof(*trailer));
 	trailer->msgh_sender = current_thread()->task->sec_token;
@@ -271,10 +271,10 @@ mach_msg_send(
 	return mr;
 }
 
-/*
- * message header as seen at user-space
- * (for MACH_RCV_LARGE/IDENTITY updating)
- */
+  
+                                       
+                                         
+   
 typedef struct{
 	mach_msg_bits_t       msgh_bits;
 	mach_msg_size_t       msgh_size;
@@ -284,26 +284,26 @@ typedef struct{
 	mach_msg_id_t         msgh_id;
 } mach_msg_user_header_t;
 
-/*
- *	Routine:	mach_msg_receive_results
- *	Purpose:
- *		Receive a message.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		MACH_MSG_SUCCESS	Received a message.
- *		MACH_RCV_INVALID_NAME	The name doesn't denote a right,
- *			or the denoted right is not receive or port set.
- *		MACH_RCV_IN_SET		Receive right is a member of a set.
- *		MACH_RCV_TOO_LARGE	Message wouldn't fit into buffer.
- *		MACH_RCV_TIMED_OUT	Timeout expired without a message.
- *		MACH_RCV_INTERRUPTED	Reception interrupted.
- *		MACH_RCV_PORT_DIED	Port/set died while receiving.
- *		MACH_RCV_PORT_CHANGED	Port moved into set while receiving.
- *		MACH_RCV_INVALID_DATA	Couldn't copy to user buffer.
- *		MACH_RCV_INVALID_NOTIFY	Bad notify port.
- *		MACH_RCV_HEADER_ERROR
- */
+  
+                                    
+           
+                      
+              
+                   
+           
+                                        
+                                                          
+                                                     
+                                                        
+                                                        
+                                                         
+                                               
+                                                     
+                                                              
+                                                       
+                                            
+                         
+   
 
 mach_msg_return_t
 mach_msg_receive_results(
@@ -325,31 +325,31 @@ mach_msg_receive_results(
 	mach_vm_address_t context;
 	mach_msg_size_t   size = 0;
 
-	/*
-	 * unlink the special_reply_port before releasing reference to object.
-	 * get the thread's turnstile, if the thread donated it's turnstile to the port
-	 */
+	  
+                                                                       
+                                                                                
+    
 	mach_msg_receive_results_complete(object);
 	io_release(object);
 
 	if (mr != MACH_MSG_SUCCESS) {
 		if (mr == MACH_RCV_TOO_LARGE) {
-			/*
-			 * If the receive operation occurs with MACH_RCV_LARGE set
-			 * then no message was extracted from the queue, and the size
-			 * and (optionally) receiver names were the only thing captured.
-			 * Just copyout the size (and optional port name) in a fake
-			 * header.
-			 */
+			  
+                                                             
+                                                                
+                                                                   
+                                                              
+             
+      
 			if (option & MACH_RCV_LARGE) {
 				if ((option & MACH_RCV_STACK) == 0 &&
 				    rcv_size >= offsetof(mach_msg_user_header_t, msgh_reserved)) {
-					/*
-					 * We need to inform the user-level code that it needs more
-					 * space.  The value for how much space was returned in the
-					 * msize save area instead of the message (which was left on
-					 * the queue).
-					 */
+					  
+                                                                
+                                                                
+                                                                 
+                   
+        
 					if (option & MACH_RCV_LARGE_IDENTITY) {
 						if (copyout((char *) &self->ith_receiver_name,
 						    rcv_addr + offsetof(mach_msg_user_header_t, msgh_local_port),
@@ -364,7 +364,7 @@ mach_msg_receive_results(
 					}
 				}
 			} else {
-				/* discard importance in message */
+				                                   
 				ipc_importance_clean(kmsg);
 
 				if (msg_receive_error(kmsg, option, rcv_addr, rcv_size, seqno, space, &size)
@@ -380,19 +380,19 @@ mach_msg_receive_results(
 		return mr;
 	}
 
-	/* MACH_MSG_SUCCESS */
+	                      
 
 #if IMPORTANCE_INHERITANCE
 
-	/* adopt/transform any importance attributes carried in the message */
+	                                                                      
 	ipc_importance_receive(kmsg, option);
 
-#endif  /* IMPORTANCE_INHERITANCE */
+#endif                              
 
-	/* auto redeem the voucher in the message */
+	                                            
 	ipc_voucher_receive_postprocessing(kmsg, option);
 
-	/* Save destination port context for the trailer before copyout */
+	                                                                  
 	context = kmsg->ikm_header->msgh_remote_port->ip_context;
 
 	mr = ipc_kmsg_copyout(kmsg, space, map, MACH_MSG_BODY_NULL, option);
@@ -400,10 +400,10 @@ mach_msg_receive_results(
 	trailer_size = ipc_kmsg_trailer_size(option, self);
 
 	if (mr != MACH_MSG_SUCCESS) {
-		/* already received importance, so have to undo that here */
+		                                                            
 		ipc_importance_unreceive(kmsg, option);
 
-		/* if we had a body error copyout what we have, otherwise a simple header/trailer */
+		                                                                                    
 		if ((mr & ~MACH_MSG_MASK) == MACH_RCV_BODY_ERROR) {
 			ipc_kmsg_add_trailer(kmsg, space, option, self, seqno, FALSE, context);
 			if (ipc_kmsg_put(kmsg, option, rcv_addr, rcv_size, trailer_size, &size) == MACH_RCV_INVALID_DATA) {
@@ -416,7 +416,7 @@ mach_msg_receive_results(
 			}
 		}
 	} else {
-		/* capture ksmg QoS values to the thread continuation state */
+		                                                              
 		self->ith_ppriority = kmsg->ikm_ppriority;
 		self->ith_qos_override = kmsg->ikm_qos_override;
 		ipc_kmsg_add_trailer(kmsg, space, option, self, seqno, FALSE, context);
@@ -429,23 +429,23 @@ mach_msg_receive_results(
 	return mr;
 }
 
-/*
- *	Routine:	mach_msg_receive [Kernel Internal]
- *	Purpose:
- *		Routine for kernel-task threads to actively receive a message.
- *
- *		Unlike being dispatched to by ipc_kobject_server() or the
- *		reply part of mach_msg_rpc_from_kernel(), this routine
- *		looks up the receive port name in the kernel's port
- *		namespace and copies out received port rights to that namespace
- *		as well.  Out-of-line memory is copied out the kernel's
- *		address space (rather than just providing the vm_map_copy_t).
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		MACH_MSG_SUCCESS	Received a message.
- *		See <mach/message.h> for list of MACH_RCV_XXX errors.
- */
+  
+                                              
+           
+                                                                  
+  
+                                                             
+                                                          
+                                                       
+                                                                   
+                                                           
+                                                                 
+              
+                   
+           
+                                        
+                                                         
+   
 mach_msg_return_t
 mach_msg_receive(
 	mach_msg_header_t       *msg,
@@ -466,7 +466,7 @@ mach_msg_receive(
 	if (mr != MACH_MSG_SUCCESS) {
 		return mr;
 	}
-	/* hold ref for object */
+	                         
 
 	self->ith_msg_addr = CAST_DOWN(mach_vm_address_t, msg);
 	self->ith_object = object;
@@ -499,15 +499,15 @@ mach_msg_receive_continue(void)
 }
 
 
-/*
- *	Routine:	mach_msg_overwrite_trap [mach trap]
- *	Purpose:
- *		Possibly send a message; possibly receive a message.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		All of mach_msg_send and mach_msg_receive error codes.
- */
+  
+                                               
+           
+                                                        
+              
+                   
+           
+                                                          
+   
 
 mach_msg_return_t
 mach_msg_overwrite_trap(
@@ -526,7 +526,7 @@ mach_msg_overwrite_trap(
 	mach_msg_return_t  mr = MACH_MSG_SUCCESS;
 	vm_map_t map = current_map();
 
-	/* Only accept options allowed by the user */
+	                                             
 	option &= MACH_MSG_OPTION_USER;
 
 	if (option & MACH_SEND_MSG) {
@@ -576,12 +576,12 @@ mach_msg_overwrite_trap(
 		if (mr != MACH_MSG_SUCCESS) {
 			goto end;
 		}
-		/* hold ref for object */
+		                         
 
 		if ((option & MACH_RCV_SYNC_WAIT) && !(option & MACH_SEND_SYNC_OVERRIDE)) {
 			ipc_port_t special_reply_port;
 			special_reply_port = ip_object_to_port(object);
-			/* link the special reply port to the destination */
+			                                                    
 			mr = mach_msg_rcv_link_special_reply_port(special_reply_port,
 			    (mach_port_name_t)priority);
 			if (mr != MACH_MSG_SUCCESS) {
@@ -616,16 +616,16 @@ end:
 	return mr;
 }
 
-/*
- *	Routine:	mach_msg_rcv_link_special_reply_port
- *	Purpose:
- *		Link the special reply port(rcv right) to the
- *		other end of the sync ipc channel.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		None.
- */
+  
+                                                
+           
+                                                 
+                                      
+              
+                   
+           
+         
+   
 static mach_msg_return_t
 mach_msg_rcv_link_special_reply_port(
 	ipc_port_t special_reply_port,
@@ -638,7 +638,7 @@ mach_msg_rcv_link_special_reply_port(
 		return MACH_RCV_INVALID_NOTIFY;
 	}
 
-	/* Copyin the destination port */
+	                                 
 	if (!MACH_PORT_VALID(dest_name_port)) {
 		return MACH_RCV_INVALID_NOTIFY;
 	}
@@ -648,10 +648,10 @@ mach_msg_rcv_link_special_reply_port(
 		ip_reference(dest_port);
 		ip_unlock(dest_port);
 
-		/*
-		 * The receive right of dest port might have gone away,
-		 * do not fail the receive in that case.
-		 */
+		  
+                                                         
+                                          
+     
 		ipc_port_link_special_reply_port(special_reply_port,
 		    dest_port, FALSE);
 
@@ -660,17 +660,17 @@ mach_msg_rcv_link_special_reply_port(
 	return MACH_MSG_SUCCESS;
 }
 
-/*
- *	Routine:	mach_msg_receive_results_complete
- *	Purpose:
- *		Get thread's turnstile back from the object and
- *              if object is a special reply port then reset its
- *		linkage.
- *	Condition:
- *		Nothing locked.
- *	Returns:
- *		None.
- */
+  
+                                             
+           
+                                                   
+                                                                
+            
+             
+                   
+           
+         
+   
 void
 mach_msg_receive_results_complete(ipc_object_t object)
 {
@@ -687,10 +687,10 @@ mach_msg_receive_results_complete(ipc_object_t object)
 
 	uint8_t flags = IPC_PORT_ADJUST_SR_ALLOW_SYNC_LINKAGE;
 
-	/*
-	 * Don't clear the ip_srp_msg_sent bit if...
-	 */
-	if (!((self->ith_state == MACH_RCV_TOO_LARGE && self->ith_option & MACH_RCV_LARGE) || //msg was too large and the next receive will get it
+	  
+                                             
+    
+	if (!((self->ith_state == MACH_RCV_TOO_LARGE && self->ith_option & MACH_RCV_LARGE) ||                                                     
 	    self->ith_state == MACH_RCV_INTERRUPTED ||
 	    self->ith_state == MACH_RCV_TIMED_OUT ||
 	    self->ith_state == MACH_RCV_PORT_CHANGED ||
@@ -704,18 +704,18 @@ mach_msg_receive_results_complete(ipc_object_t object)
 		    flags, get_turnstile);
 	}
 	assert(self->turnstile != TURNSTILE_NULL);
-	/* thread now has a turnstile */
+	                                
 }
 
-/*
- *	Routine:	mach_msg_trap [mach trap]
- *	Purpose:
- *		Possibly send a message; possibly receive a message.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		All of mach_msg_send and mach_msg_receive error codes.
- */
+  
+                                     
+           
+                                                        
+              
+                   
+           
+                                                          
+   
 
 mach_msg_return_t
 mach_msg_trap(
@@ -729,20 +729,20 @@ mach_msg_trap(
 }
 
 
-/*
- *	Routine:	msg_receive_error	[internal]
- *	Purpose:
- *		Builds a minimal header/trailer and copies it to
- *		the user message buffer.  Invoked when in the case of a
- *		MACH_RCV_TOO_LARGE or MACH_RCV_BODY_ERROR error.
- *	Conditions:
- *		Nothing locked.
- *		size - maximum buffer size on input,
- *		       actual copied-out size on output
- *	Returns:
- *		MACH_MSG_SUCCESS	minimal header/trailer copied
- *		MACH_RCV_INVALID_DATA	copyout to user buffer failed
- */
+  
+                                        
+           
+                                                    
+                                                           
+                                                    
+              
+                   
+                                        
+                                           
+           
+                                                  
+                                                       
+   
 
 mach_msg_return_t
 msg_receive_error(
@@ -761,15 +761,15 @@ msg_receive_error(
 
 	context = kmsg->ikm_header->msgh_remote_port->ip_context;
 
-	/*
-	 * Copy out the destination port in the message.
-	 * Destroy all other rights and memory in the message.
-	 */
+	  
+                                                 
+                                                       
+    
 	ipc_kmsg_copyout_dest(kmsg, space);
 
-	/*
-	 * Build a minimal message with the requested trailer.
-	 */
+	  
+                                                       
+    
 	trailer = (mach_msg_max_trailer_t *)
 	    ((vm_offset_t)kmsg->ikm_header +
 	    mach_round_msg(sizeof(mach_msg_header_t)));
@@ -782,11 +782,11 @@ msg_receive_error(
 	ipc_kmsg_add_trailer(kmsg, space, option, self,
 	    seqno, TRUE, context);
 
-	/*
-	 * Copy the message to user space and return the size
-	 * (note that ipc_kmsg_put may also adjust the actual
-	 * size copied out to user-space).
-	 */
+	  
+                                                      
+                                                      
+                                   
+    
 	if (ipc_kmsg_put(kmsg, option, rcv_addr, rcv_size, trailer_size, sizep) == MACH_RCV_INVALID_DATA) {
 		return MACH_RCV_INVALID_DATA;
 	} else {
@@ -814,7 +814,7 @@ mach_msg_filter_register_callback(
 	return KERN_SUCCESS;
 }
 
-/* This function should only be called if the task and port allow message filtering */
+                                                                                      
 boolean_t
 mach_msg_fetch_filter_policy(
 	void *port_label,

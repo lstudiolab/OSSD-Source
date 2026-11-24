@@ -28,7 +28,7 @@
 
 #if !defined(KERNEL)
 #include <MacTypes.h>
-#endif  /* !KERNEL */
+#endif               
 
 #ifndef _OS_OSTYPES_H
 #define _OS_OSTYPES_H
@@ -81,28 +81,28 @@ typedef UInt64          AbsoluteTime;
 typedef UInt32                          OptionBits __attribute__((deprecated));
 
 #if defined(__LP64__)
-/*
- * Use intrinsic boolean types for the LP64 kernel, otherwise maintain
- * source and binary backward compatibility.  This attempts to resolve
- * the "(x == true)" vs. "(x)" conditional issue.
- */
+  
+                                                                      
+                                                                      
+                                                 
+   
 #ifdef __cplusplus
 typedef bool Boolean;
-#else   /* !__cplusplus */
+#else                     
 #if defined(__STDC_VERSION__) && ((__STDC_VERSION__ - 199901L) > 0L)
-/* only use this if we are sure we are using a c99 compiler */
+                                                              
 typedef _Bool Boolean;
-#else   /* !c99 */
-/* Fall back to previous definition unless c99 */
+#else             
+                                                 
 typedef unsigned char Boolean;
-#endif  /* !c99 */
-#endif  /* !__cplusplus */
-#else   /* !__LP64__ */
+#endif            
+#endif                    
+#else                  
 typedef unsigned char Boolean;
-#endif  /* !__LP64__ */
+#endif                 
 
-#endif  /* KERNEL */
+#endif              
 
 #include <sys/_types/_os_inline.h>
 
-#endif /* _OS_OSTYPES_H */
+#endif                    

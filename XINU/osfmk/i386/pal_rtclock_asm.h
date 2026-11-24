@@ -30,4 +30,4 @@
 
 #include <i386/rtclock_asm_native.h>
 
-#endif /* _I386_PAL_RTCLOCK_ASM_H */
+#endif                              

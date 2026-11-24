@@ -34,9 +34,9 @@
  * the terms and conditions for use and redistribution.
  */
 
-/*
- * Definitions for the logstat module.
- */
+  
+                                      
+   
 
 
 #ifndef _LS_DEFS_
@@ -44,9 +44,9 @@
 
 #include <sys/types.h>
 
-/*
- * Definition for a log record.
- */
+  
+                               
+   
 typedef struct  {
 	long    code;
 	long    thread;
@@ -60,9 +60,9 @@ typedef struct  {
 
 typedef log_rec_t       *log_ptr_t;
 
-/*
- * Statistics record.
- */
+  
+                     
+   
 typedef struct {
 	int     datagram_pkts_sent;
 	int     datagram_pkts_rcvd;
@@ -142,9 +142,9 @@ typedef struct {
 typedef stat_t  *stat_ptr_t;
 
 
-/*
- * Debugging flags record.
- */
+  
+                          
+   
 typedef struct {
 	int     print_level;
 	int     ipc_in;
@@ -160,9 +160,9 @@ typedef struct {
 typedef debug_t *debug_ptr_t;
 
 
-/*
- * Parameters record.
- */
+  
+                     
+   
 typedef struct {
 	int     srr_max_tries;
 	int     srr_retry_sec;
@@ -188,9 +188,9 @@ typedef struct {
 typedef param_t *param_ptr_t;
 
 
-/*
- * Port statistics record.
- */
+  
+                          
+   
 typedef struct {
 	u_int   port_id;
 	u_int   alive;
@@ -217,22 +217,22 @@ extern port_stat_ptr_t  port_stat_end;
 extern struct mutex     port_stat_lock;
 
 
-/*
- * Types for the mem_list operation.
- *
- * XXX These must be faked, because we cannot include mem.h here
- * (mutual includes).
- */
+  
+                                    
+  
+                                                                
+                     
+   
 typedef char                    *mem_class_ptr_t;
 typedef char                    *mem_nam_ptr_t;
 typedef int                     *mem_bucket_ptr_t;
 
 
-/*
- * Definitions for print_level.
- */
+  
+                               
+   
 #define LS_PRINT_NEVER          5
 #define LS_PRINT_LOG            3
 #define LS_PRINT_ALWAYS         0
 
-#endif  /* _LS_DEFS_ */
+#endif                 

@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-//
-//cc scalegear.c -framework Accelerate -g -Wall */
+  
+                                                  
 
 #include <stdio.h>
 #include <stdlib.h>

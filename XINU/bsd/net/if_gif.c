@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* $FreeBSD: src/sys/net/if_gif.c,v 1.4.2.6 2001/07/24 19:10:18 brooks Exp $ */
-/* $KAME: if_gif.c,v 1.47 2001/05/01 05:28:42 itojun Exp $ */
+                                                                               
+                                                             
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -56,12 +56,12 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2006 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -92,7 +92,7 @@
 #include <netinet/in_var.h>
 #include <netinet/in_gif.h>
 #include <netinet/ip_var.h>
-#endif  /* INET */
+#endif            
 
 #include <netinet6/in6_var.h>
 #include <netinet/ip6.h>
@@ -112,7 +112,7 @@
 #define GIF_MAXUNIT     IF_MAXUNIT
 #define GIF_ZONE_MAX_ELEM       MIN(IFNETS_MAX, GIF_MAXUNIT)
 
-/* gif lock variables */
+                        
 static lck_grp_t        *gif_mtx_grp;
 static lck_grp_attr_t   *gif_mtx_grp_attr;
 static lck_attr_t       *gif_mtx_attr;
@@ -127,13 +127,13 @@ static errno_t gif_input(ifnet_t ifp, protocol_family_t protocol_family,
     mbuf_t m, char *frame_header);
 static errno_t gif_ioctl(ifnet_t ifp, u_long cmd, void *data);
 
-static int ngif = 0;            /* number of interfaces */
+static int ngif = 0;                                      
 
 #if INET
 static struct protosw in_gif_protosw =
 {
 	.pr_type =              SOCK_RAW,
-	.pr_protocol =          0, /* IPPROTO_IPV[46] */
+	.pr_protocol =          0,                      
 	.pr_flags =             PR_ATOMIC | PR_ADDR,
 	.pr_input =             in_gif_input,
 	.pr_usrreqs =           &rip_usrreqs,
@@ -143,7 +143,7 @@ static struct protosw in_gif_protosw =
 static struct ip6protosw in6_gif_protosw =
 {
 	.pr_type =              SOCK_RAW,
-	.pr_protocol =          0, /* IPPROTO_IPV[46] */
+	.pr_protocol =          0,                      
 	.pr_flags =             PR_ATOMIC | PR_ADDR,
 	.pr_input =             in6_gif_input,
 	.pr_usrreqs =           &rip6_usrreqs,
@@ -159,17 +159,17 @@ static void gif_detach(struct ifnet *);
 static struct if_clone gif_cloner =
     IF_CLONE_INITIALIZER(GIFNAME, gif_clone_create, gif_clone_destroy,
     0, GIF_MAXUNIT, GIF_ZONE_MAX_ELEM, sizeof(struct gif_softc));
-/*
- * Theory of operation: initially, one gif interface is created.
- * Any time a gif interface is configured, if there are no other
- * unconfigured gif interfaces, a new gif interface is created.
- * BSD uses the clone mechanism to dynamically create more
- * gif interfaces.
- *
- * We have some extra glue to support DLIL.
- */
+  
+                                                                
+                                                                
+                                                               
+                                                          
+                  
+  
+                                           
+   
 
-/* GIF interface module support */
+                                  
 static int
 gif_demux(
 	ifnet_t ifp,
@@ -180,7 +180,7 @@ gif_demux(
 	struct gif_softc *sc = ifnet_softc(ifp);
 
 	GIF_LOCK(sc);
-	/* Only one protocol may be attached to a gif interface. */
+	                                                           
 	*protocol_family = sc->gif_proto;
 	GIF_UNLOCK(sc);
 
@@ -194,7 +194,7 @@ gif_add_proto(
 	__unused const struct ifnet_demux_desc *demux_array,
 	__unused u_int32_t demux_count)
 {
-	/* Only one protocol may be attached at a time */
+	                                                 
 	struct gif_softc *sc = ifnet_softc(ifp);
 
 	GIF_LOCK(sc);
@@ -225,7 +225,7 @@ gif_del_proto(
 	return 0;
 }
 
-/* Glue code to attach inet to a gif interface through DLIL */
+                                                              
 static errno_t
 gif_attach_proto_family(
 	ifnet_t ifp,
@@ -246,22 +246,22 @@ gif_attach_proto_family(
 	return stat;
 }
 
-/* Function to setup the first gif interface */
+                                               
 void
 gif_init(void)
 {
 	errno_t result;
 
-	/* Initialize the list of interfaces */
+	                                       
 	TAILQ_INIT(&gifs);
 
-	/* Initialize the gif global lock */
+	                                    
 	gif_mtx_grp_attr = lck_grp_attr_alloc_init();
 	gif_mtx_grp = lck_grp_alloc_init("gif", gif_mtx_grp_attr);
 	gif_mtx_attr = lck_attr_alloc_init();
 	lck_mtx_init(gif_mtx, gif_mtx_grp, gif_mtx_attr);
 
-	/* Register protocol registration functions */
+	                                              
 	result = proto_register_plumber(PF_INET, APPLE_IF_FAM_GIF,
 	    gif_attach_proto_family, NULL);
 	if (result != 0) {
@@ -319,7 +319,7 @@ gif_clone_create(struct if_clone *ifc, uint32_t unit, __unused void *params)
 
 	lck_mtx_lock(gif_mtx);
 
-	/* Can't create more than GIF_MAXUNIT */
+	                                        
 	if (ngif >= GIF_MAXUNIT) {
 		error = ENXIO;
 		goto done;
@@ -333,7 +333,7 @@ gif_clone_create(struct if_clone *ifc, uint32_t unit, __unused void *params)
 		goto done;
 	}
 
-	/* use the interface name as the unique id for ifp recycle */
+	                                                             
 	snprintf(sc->gif_ifname, sizeof(sc->gif_ifname), "%s%d",
 	    ifc->ifc_name, unit);
 
@@ -517,7 +517,7 @@ gif_encapcheck(
 		goto done;
 	}
 
-	/* no physical address */
+	                         
 	if (!sc->gif_psrc || !sc->gif_pdst) {
 		goto done;
 	}
@@ -575,16 +575,16 @@ gif_output(
 	gif_pdst = sc->gif_pdst;
 	GIF_UNLOCK(sc);
 
-	/*
-	 * max_gif_nesting check used to live here. It doesn't anymore
-	 * because there is no guaruntee that we won't be called
-	 * concurrently from more than one thread.
-	 */
+	  
+                                                               
+                                                         
+                                           
+    
 	m->m_flags &= ~(M_BCAST | M_MCAST);
 	if (!(ifnet_flags(ifp) & IFF_UP) ||
 	    gif_psrc == NULL || gif_pdst == NULL) {
 		ifnet_touch_lastchange(ifp);
-		m_freem(m);     /* free it here not in dlil_output */
+		m_freem(m);                                          
 		error = ENETDOWN;
 		goto end;
 	}
@@ -593,17 +593,17 @@ gif_output(
 
 	GIF_LOCK(sc);
 
-	/* inner AF-specific encapsulation */
+	                                     
 
-	/* XXX should we check if our outer source is legal? */
+	                                                       
 
-	/*
-	 * Save the length as m may be free by the output functions
-	 * as they call m_pullup
-	 */
+	  
+                                                            
+                         
+    
 	u_int32_t bytes_out = m->m_pkthdr.len;
 
-	/* dispatch to output logic based on outer AF */
+	                                                
 	switch (sc->gif_psrc->sa_family) {
 #if INET
 	case AF_INET:
@@ -621,20 +621,20 @@ gif_output(
 	GIF_UNLOCK(sc);
 end:
 	if (error) {
-		/* the mbuf was freed either by in_gif_output or in here */
+		                                                           
 		ifnet_stat_increment_out(ifp, 0, 0, 1);
 	} else {
 		ifnet_stat_increment_out(ifp, 1, bytes_out, 0);
 	}
 	if (error == 0) {
-		error = EJUSTRETURN; /* if no error, packet got sent already */
+		error = EJUSTRETURN;                                           
 	}
 	return error;
 }
 
-/*
- * gif_input is the input handler for IP and IPv6 attached to gif
- */
+  
+                                                                 
+   
 static errno_t
 gif_input(
 	ifnet_t ifp,
@@ -646,18 +646,18 @@ gif_input(
 
 	bpf_tap_in(ifp, 0, m, &sc->gif_proto, sizeof(sc->gif_proto));
 
-	/*
-	 * Put the packet to the network layer input queue according to the
-	 * specified address family.
-	 * Note: older versions of gif_input directly called network layer
-	 * input functions, e.g. ip6_input, here. We changed the policy to
-	 * prevent too many recursive calls of such input functions, which
-	 * might cause kernel panic. But the change may introduce another
-	 * problem; if the input queue is full, packets are discarded.
-	 * We believed it rarely occurs and changed the policy. If we find
-	 * it occurs more times than we thought, we may change the policy
-	 * again.
-	 */
+	  
+                                                                    
+                             
+                                                                   
+                                                                   
+                                                                   
+                                                                  
+                                                               
+                                                                   
+                                                                  
+          
+    
 	int32_t pktlen = m->m_pkthdr.len;
 	if (proto_input(protocol_family, m) != 0) {
 		ifnet_stat_increment_in(ifp, 0, 0, 1);
@@ -669,7 +669,7 @@ gif_input(
 	return 0;
 }
 
-/* XXX how should we handle IPv6 scope on SIOC[GS]IFPHYADDR? */
+                                                               
 static errno_t
 gif_ioctl(
 	ifnet_t                 ifp,
@@ -695,7 +695,7 @@ gif_ioctl(
 	case SIOCDELMULTI:
 		break;
 
-#ifdef  SIOCSIFMTU /* xxx */
+#ifdef  SIOCSIFMTU          
 	case SIOCGIFMTU:
 		break;
 
@@ -709,7 +709,7 @@ gif_ioctl(
 		ifnet_set_mtu(ifp, mtu);
 	}
 	break;
-#endif /* SIOCSIFMTU */
+#endif                 
 
 	case SIOCSIFPHYADDR:
 	case SIOCSIFPHYADDR_IN6_32:
@@ -742,12 +742,12 @@ gif_ioctl(
 		}
 		}
 
-		/* sa_family must be equal */
+		                             
 		if (src->sa_family != dst->sa_family) {
 			return EINVAL;
 		}
 
-		/* validate sa_len */
+		                     
 		switch (src->sa_family) {
 #if INET
 		case AF_INET:
@@ -781,7 +781,7 @@ gif_ioctl(
 			return EAFNOSUPPORT;
 		}
 
-		/* check sa_family looks sane for the cmd */
+		                                            
 		switch (cmd) {
 		case SIOCSIFPHYADDR:
 			if (src->sa_family == AF_INET) {
@@ -823,7 +823,7 @@ gif_ioctl(
 			if (sc2 == sc) {
 				continue;
 			}
-			/* lock sc and sc2 in increasing order of ifnet index */
+			                                                        
 			GIF_ORDERED_LOCK(sc, sc2);
 			if (!sc2->gif_pdst || !sc2->gif_psrc) {
 				GIF_ORDERED_UNLOCK(sc, sc2);
@@ -837,7 +837,7 @@ gif_ioctl(
 				continue;
 			}
 #ifndef XBONEHACK
-			/* can't configure same pair of address onto two gifs */
+			                                                        
 			if (bcmp(sc2->gif_pdst, dst, dst->sa_len) == 0 &&
 			    bcmp(sc2->gif_psrc, src, src->sa_len) == 0) {
 				GIF_ORDERED_UNLOCK(sc, sc2);
@@ -847,7 +847,7 @@ gif_ioctl(
 			}
 #endif
 
-			/* can't configure multiple multi-dest interfaces */
+			                                                    
 #define multidest(x) \
 	(((struct sockaddr_in *)(void *)(x))->sin_addr.s_addr == INADDR_ANY)
 #define multidest6(x) \
@@ -915,7 +915,7 @@ gif_ioctl(
 			sc->gif_pdst = NULL;
 		}
 		GIF_UNLOCK(sc);
-		/* change the IFF_{UP, RUNNING} flag as well? */
+		                                                
 		break;
 #endif
 
@@ -934,7 +934,7 @@ gif_ioctl(
 			dst = &ifr->ifr_addr;
 			size = sizeof(ifr->ifr_addr);
 			break;
-#endif /* INET */
+#endif           
 		case SIOCGIFPSRCADDR_IN6:
 			dst = (struct sockaddr *)
 			    &(((struct in6_ifreq *)data)->ifr_addr);
@@ -968,7 +968,7 @@ gif_ioctl(
 			dst = &ifr->ifr_addr;
 			size = sizeof(ifr->ifr_addr);
 			break;
-#endif /* INET */
+#endif           
 		case SIOCGIFPDSTADDR_IN6:
 			dst = (struct sockaddr *)
 			    &(((struct in6_ifreq *)data)->ifr_addr);
@@ -988,7 +988,7 @@ gif_ioctl(
 		break;
 
 	case SIOCSIFFLAGS:
-		/* if_ioctl() takes care of it */
+		                                 
 		break;
 
 	default:
@@ -1012,5 +1012,5 @@ gif_delete_tunnel(struct gif_softc *sc)
 		sc->gif_pdst = NULL;
 	}
 	ROUTE_RELEASE(&sc->gif_ro);
-	/* change the IFF_UP flag as well? */
+	                                     
 }

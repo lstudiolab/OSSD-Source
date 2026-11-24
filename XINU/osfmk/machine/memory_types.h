@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_MEMORY_TYPES_H */
+#endif                              

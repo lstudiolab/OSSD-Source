@@ -31,9 +31,9 @@
 #include <sys/munge.h>
 #include <stdint.h>
 
-/*
- * Refer to comments in bsd/sys/munge.h
- */
+  
+                                       
+   
 
 static inline __attribute__((always_inline)) void
 munge_32_to_64_unsigned(volatile uint64_t *dest, volatile uint32_t *src, int count);
@@ -500,7 +500,7 @@ munge_wsw(void *args)
 	volatile uint32_t *in_args = (volatile uint32_t*)args;
 
 	out_args[2] = in_args[2];
-	out_args[1] = (int64_t)(int)in_args[1]; /* Sign-extend */
+	out_args[1] = (int64_t)(int)in_args[1];                  
 	out_args[0] = in_args[0];
 }
 
@@ -510,7 +510,7 @@ munge_wws(void *args)
 	volatile uint64_t *out_args = (volatile uint64_t*)args;
 	volatile uint32_t *in_args = (volatile uint32_t*)args;
 
-	out_args[2] = (int64_t)(int)in_args[2]; /* Sign-extend */
+	out_args[2] = (int64_t)(int)in_args[2];                  
 	out_args[1] = in_args[1];
 	out_args[0] = in_args[0];
 }
@@ -521,7 +521,7 @@ munge_wwws(void *args)
 	volatile uint64_t *out_args = (volatile uint64_t*)args;
 	volatile uint32_t *in_args = (volatile uint32_t*)args;
 
-	out_args[3] = (int64_t)(int)in_args[3]; /* Sign-extend */
+	out_args[3] = (int64_t)(int)in_args[3];                  
 	out_args[2] = in_args[2];
 	out_args[1] = in_args[1];
 	out_args[0] = in_args[0];
@@ -535,7 +535,7 @@ munge_wwwsw(void *args)
 	volatile uint32_t *in_args = (volatile uint32_t*)args;
 
 	out_args[4] = in_args[4];
-	out_args[3] = (int64_t)(int)in_args[3]; /* Sign-extend */
+	out_args[3] = (int64_t)(int)in_args[3];                  
 	out_args[2] = in_args[2];
 	out_args[1] = in_args[1];
 	out_args[0] = in_args[0];
@@ -544,25 +544,25 @@ munge_wwwsw(void *args)
 void
 munge_llllll(void *args __unused)
 {
-	/* Nothing to do, already all 64-bit */
+	                                       
 }
 
 void
 munge_llll(void *args __unused)
 {
-	/* Nothing to do, already all 64-bit */
+	                                       
 }
 
 void
 munge_ll(void *args __unused)
 {
-	/* Nothing to do, already all 64-bit */
+	                                       
 }
 
 void
 munge_l(void *args __unused)
 {
-	/* Nothing to do, already all 64-bit */
+	                                       
 }
 
 void
@@ -659,11 +659,11 @@ munge_wwlwwwl(void *args)
 	out_args[0] = in_args[0];
 }
 
-/*
- * Munge array of 32-bit values into an array of 64-bit values,
- * without sign extension.  Note, src and dest can be the same
- * (copies from end of array)
- */
+  
+                                                               
+                                                              
+                             
+   
 static inline __attribute__((always_inline)) void
 munge_32_to_64_unsigned(volatile uint64_t *dest, volatile uint32_t *src, int count)
 {

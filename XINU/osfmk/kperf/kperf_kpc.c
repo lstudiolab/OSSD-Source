@@ -26,16 +26,16 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Sample KPC data into kperf and manage shared context-switch and AST handlers
- */
+  
+                                                                               
+   
 
 #include <kperf/kperf.h>
 #include <kperf/buffer.h>
 #include <kperf/context.h>
 #include <kperf/pet.h>
 #include <kperf/kperf_kpc.h>
-#include <kern/kpc.h> /* kpc_cswitch_context, kpc_threads_counting */
+#include <kern/kpc.h>                                                
 
 void
 kperf_kpc_thread_ast(thread_t thread)
@@ -51,15 +51,15 @@ kperf_kpc_thread_sample(struct kpcdata *kpcd, int sample_config)
 	BUF_INFO(PERF_KPC_THREAD_SAMPLE | DBG_FUNC_START, sample_config);
 
 	kpcd->running = kpc_get_running();
-	/* let kpc_get_curthread_counters set the correct count */
+	                                                          
 	kpcd->counterc = KPC_MAX_COUNTERS;
 	if (kpc_get_curthread_counters(&kpcd->counterc,
 	    kpcd->counterv)) {
-		/* if thread counters aren't ready, default to 0 */
+		                                                   
 		memset(kpcd->counterv, 0,
 		    sizeof(uint64_t) * kpcd->counterc);
 	}
-	/* help out Instruments by sampling KPC's config */
+	                                                   
 	if (!sample_config) {
 		kpcd->configc = 0;
 	} else {
@@ -106,7 +106,7 @@ kperf_kpc_config_log(const struct kpcdata *kpcd)
 		    kpcd->configv[0 + i * 4], kpcd->configv[1 + i * 4],
 		    kpcd->configv[2 + i * 4], kpcd->configv[3 + i * 4]);
 	}
-#else /* __LP64__ */
+#else               
 	unsigned int max = (kpcd->configc + 1) / 2;
 	for (unsigned int i = 0; i < max; i++) {
 		uint32_t flag = (i == 0) ? DBG_FUNC_START : ((i == (max - 1)) ? DBG_FUNC_END : DBG_FUNC_NONE);
@@ -116,7 +116,7 @@ kperf_kpc_config_log(const struct kpcdata *kpcd)
 		    kpcd->configv[i * 2 + 1] >> 32ULL,
 		    kpcd->configv[i * 2 + 1] & 0xffffffffULL);
 	}
-#endif /* !__LP64__ */
+#endif                
 }
 
 static void
@@ -125,7 +125,7 @@ kperf_kpc_log(uint32_t code, uint32_t code32, const struct kpcdata *kpcd)
 #if __LP64__
 #pragma unused(code32)
 	unsigned int max = (kpcd->counterc + 3) / 4;
-	/* and the actual counts with one 64-bit argument each */
+	                                                         
 	for (unsigned int i = 0; i < max; i++) {
 		uint32_t flag = (i == 0) ? DBG_FUNC_START : ((i == (max - 1)) ? DBG_FUNC_END : DBG_FUNC_NONE);
 		BUF_DATA(code | flag,
@@ -134,10 +134,10 @@ kperf_kpc_log(uint32_t code, uint32_t code32, const struct kpcdata *kpcd)
 		    kpcd->counterv[2 + i * 4],
 		    kpcd->counterv[3 + i * 4]);
 	}
-#else /* __LP64__ */
+#else               
 #pragma unused(code)
 	unsigned int max = (kpcd->counterc + 1) / 2;
-	/* and the actual counts with two 32-bit trace arguments each */
+	                                                                
 	for (unsigned int i = 0; i < max; i++) {
 		uint32_t flag = (i == 0) ? DBG_FUNC_START : ((i == (max - 1)) ? DBG_FUNC_END : DBG_FUNC_NONE);
 		BUF_DATA(code32 | flag,
@@ -146,7 +146,7 @@ kperf_kpc_log(uint32_t code, uint32_t code32, const struct kpcdata *kpcd)
 		    (kpcd->counterv[1 + i * 2] >> 32ULL),
 		    kpcd->counterv[1 + i * 2] & 0xffffffffULL);
 	}
-#endif /* !__LP64__ */
+#endif                
 }
 
 void

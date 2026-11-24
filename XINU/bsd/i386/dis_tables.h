@@ -30,17 +30,17 @@
 #ifndef _DIS_TABLES_H
 #define _DIS_TABLES_H
 
-/*
- * Constants and prototypes for the IA32 disassembler backend.  See dis_tables.c
- * for usage information and documentation.
- */
+  
+                                                                                
+                                           
+   
 
-/*
- * APPLE NOTE: There is a copy of this file for userspace in
- * dtrace:sys_dis_tables.h
- *
- * It needs to be in sync with this file.
- */
+  
+                                                            
+                          
+  
+                                         
+   
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,44 +50,44 @@ extern "C" {
 #include <stdint.h>
 #include <sys/param.h>
 
-/*
- * values for cpu mode
- */
+  
+                      
+   
 #define SIZE16  1
 #define SIZE32  2
 #define SIZE64  3
 
 #define OPLEN   256
 #define PFIXLEN   8
-#define NCPS    20      /* number of chars per symbol	*/
+#define NCPS    20                                      
 
-/*
- * data structures that must be provided to dtrace_dis86()
- */
+  
+                                                          
+   
 typedef struct d86opnd {
-	char            d86_opnd[OPLEN];        /* symbolic rep of operand */
-	char            d86_prefix[PFIXLEN];    /* any prefix string or "" */
-	uint_t          d86_mode;               /* mode for immediate */
-	uint_t          d86_value_size;         /* size in bytes of d86_value */
-	uint64_t        d86_value;              /* immediate value of opnd */
+	char            d86_opnd[OPLEN];                                     
+	char            d86_prefix[PFIXLEN];                                 
+	uint_t          d86_mode;                                       
+	uint_t          d86_value_size;                                         
+	uint64_t        d86_value;                                           
 } d86opnd_t;
 
 typedef struct dis86 {
 	uint_t          d86_mode;
 	uint_t          d86_error;
-	uint_t          d86_len;                /* instruction length */
-	int             d86_rmindex;            /* index of modrm byte or -1 */
-	uint_t          d86_memsize;            /* size of memory referenced */
-	char            d86_bytes[16];          /* bytes of instruction */
+	uint_t          d86_len;                                        
+	int             d86_rmindex;                                           
+	uint_t          d86_memsize;                                           
+	char            d86_bytes[16];                                    
 	char            d86_mnem[OPLEN];
 	uint_t          d86_numopnds;
-	uint_t          d86_rex_prefix;         /* value of REX prefix if !0 */
-	char            *d86_seg_prefix;        /* segment prefix, if any */
+	uint_t          d86_rex_prefix;                                        
+	char            *d86_seg_prefix;                                    
 	uint_t          d86_opnd_size;
 	uint_t          d86_addr_size;
 	uint_t          d86_got_modrm;
-	uint_t          d86_vsib;               /* Has a VSIB */
-	struct d86opnd  d86_opnd[4];            /* up to 4 operands */
+	uint_t          d86_vsib;                               
+	struct d86opnd  d86_opnd[4];                                  
 	int             (*d86_check_func)(void *);
 	int             (*d86_get_byte)(void *);
 #ifdef DIS_TEXT
@@ -101,8 +101,8 @@ typedef struct dis86 {
 
 extern int dtrace_disx86(dis86_t *x, uint_t cpu_mode);
 
-#define DIS_F_OCTAL     0x1     /* Print all numbers in octal */
-#define DIS_F_NOIMMSYM  0x2     /* Don't print symbols for immediates (.o) */
+#define DIS_F_OCTAL     0x1                                     
+#define DIS_F_NOIMMSYM  0x2                                                  
 
 #ifdef DIS_TEXT
 extern void dtrace_disx86_str(dis86_t *x, uint_t cpu_mode, uint64_t pc,
@@ -113,4 +113,4 @@ extern void dtrace_disx86_str(dis86_t *x, uint_t cpu_mode, uint64_t pc,
 }
 #endif
 
-#endif /* _DIS_TABLES_H */
+#endif                    

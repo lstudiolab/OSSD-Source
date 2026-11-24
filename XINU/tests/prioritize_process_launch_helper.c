@@ -1,6 +1,6 @@
-/*
- * prioritize process launch: Tests prioritized process launch across posix spawn and exec.
- */
+  
+                                                                                           
+   
 
 #include <dispatch/dispatch.h>
 #include <pthread.h>
@@ -168,7 +168,7 @@ main(int argc __attribute__((unused)), char *argv[])
 	int priority;
 	set_thread_name(__FUNCTION__);
 
-	/* Check for priority */
+	                        
 	priority = get_pri(mach_thread_self());
 	printf("The priority of child is %d\n", priority);
 
@@ -179,7 +179,7 @@ main(int argc __attribute__((unused)), char *argv[])
 		int ret;
 
 		printf("Helper process execing\n");
-		/* exec the same binary with EXIT arg */
+		                                        
 		char *binary = "prioritize_process_launch_helper";
 		char *new_argv[] = {binary, "EXIT", NULL};
 		ret = execve(binary, new_argv, NULL);
@@ -201,7 +201,7 @@ main(int argc __attribute__((unused)), char *argv[])
 		}
 
 		printf("Helper process doing posix_spawn set_exec\n");
-		/* set exec the same binary with EXIT arg */
+		                                            
 		char *binary = "prioritize_process_launch_helper";
 		char *new_argv[] = {binary, "EXIT", NULL};
 
@@ -244,7 +244,7 @@ main(int argc __attribute__((unused)), char *argv[])
 		}
 
 		printf("Helper process doing posix_spawn set_exec\n");
-		/* set exec the same binary with EXIT arg */
+		                                            
 		char *binary = "prioritize_process_launch_helper";
 		char *new_argv[] = {binary, "EXIT", NULL};
 
@@ -284,7 +284,7 @@ main(int argc __attribute__((unused)), char *argv[])
 			ret_val = 0;
 		}
 
-		/* Get the stashed send right using mach_ports_lookup */
+		                                                        
 		kr = mach_ports_lookup(mach_task_self(), &port_array, &portCnt);
 		if (kr != KERN_SUCCESS) {
 			printf("mach_ports_lookup failed with return value %d and port count %d\n", kr, portCnt);
@@ -298,31 +298,31 @@ main(int argc __attribute__((unused)), char *argv[])
 			exit(0);
 		}
 
-		/* Perform a Sync bootstrap checkin */
+		                                      
 		send(send_port, special_reply_port, MACH_PORT_NULL, MACH_SEND_SYNC_BOOTSTRAP_CHECKIN, MACH_MSG_TYPE_COPY_SEND);
 		sleep(2);
 
-		/* Make sure we are still boosted */
+		                                    
 		priority = get_pri(mach_thread_self());
 		printf("The priority of spawned binary is  to %d\n", priority);
 		if (priority != 47) {
 			ret_val = 0;
 		}
 
-		/* Receive the service port */
+		                              
 		service_port = receive(special_reply_port, send_port);
 
-		/* Make sure we are still boosted */
+		                                    
 		priority = get_pri(mach_thread_self());
 		printf("The priority of spawned binary is  to %d\n", priority);
 		if (priority != 47) {
 			ret_val = 0;
 		}
 
-		/* Try to receive on service port */
+		                                    
 		receive(service_port, MACH_PORT_NULL);
 
-		/* Make sure we are no longer boosted */
+		                                        
 		priority = get_pri(mach_thread_self());
 		printf("The priority of spawned binary is  to %d\n", priority);
 		if (priority != 31) {

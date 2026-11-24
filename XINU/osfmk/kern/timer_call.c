@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * Timer interrupt callout module.
- */
+  
+                                  
+   
 
 #include <mach/mach_types.h>
 
@@ -50,8 +50,8 @@
 #define TIMER_ASSERT    1
 #endif
 
-//#define TIMER_ASSERT	1
-//#define TIMER_DBG	1
+                        
+                     
 
 #if TIMER_DBG
 #define DBG(x...) kprintf("DBG: " x);
@@ -68,66 +68,66 @@
 LCK_GRP_DECLARE(timer_call_lck_grp, "timer_call");
 LCK_GRP_DECLARE(timer_longterm_lck_grp, "timer_longterm");
 
-/* Timer queue lock must be acquired with interrupts disabled (under splclock()) */
+                                                                                   
 #define timer_queue_lock_spin(queue)                                    \
 	lck_mtx_lock_spin_always(&queue->lock_data)
 
 #define timer_queue_unlock(queue)               \
 	lck_mtx_unlock_always(&queue->lock_data)
 
-/*
- * The longterm timer object is a global structure holding all timers
- * beyond the short-term, local timer queue threshold. The boot processor
- * is responsible for moving each timer to its local timer queue
- * if and when that timer becomes due within the threshold.
- */
+  
+                                                                     
+                                                                         
+                                                                
+                                                           
+   
 
-/* Sentinel for "no time set": */
+                                 
 #define TIMER_LONGTERM_NONE             EndOfAllTime
-/* The default threadhold is the delta above which a timer is "long-term" */
+                                                                            
 #if defined(__x86_64__)
-#define TIMER_LONGTERM_THRESHOLD        (1ULL * NSEC_PER_SEC)   /* 1 sec */
+#define TIMER_LONGTERM_THRESHOLD        (1ULL * NSEC_PER_SEC)              
 #else
-#define TIMER_LONGTERM_THRESHOLD        TIMER_LONGTERM_NONE     /* disabled */
+#define TIMER_LONGTERM_THRESHOLD        TIMER_LONGTERM_NONE                   
 #endif
 
-/*
- * The scan_limit throttles processing of the longterm queue.
- * If the scan time exceeds this limit, we terminate, unlock
- * and defer for scan_interval. This prevents unbounded holding of
- * timer queue locks with interrupts masked.
- */
-#define TIMER_LONGTERM_SCAN_LIMIT       (100ULL * NSEC_PER_USEC)        /* 100 us */
-#define TIMER_LONGTERM_SCAN_INTERVAL    (100ULL * NSEC_PER_USEC)        /* 100 us */
-/* Sentinel for "scan limit exceeded": */
+  
+                                                             
+                                                            
+                                                                  
+                                            
+   
+#define TIMER_LONGTERM_SCAN_LIMIT       (100ULL * NSEC_PER_USEC)                    
+#define TIMER_LONGTERM_SCAN_INTERVAL    (100ULL * NSEC_PER_USEC)                    
+                                         
 #define TIMER_LONGTERM_SCAN_AGAIN       0
 
 typedef struct {
-	uint64_t        interval;       /* longterm timer interval */
-	uint64_t        margin;         /* fudge factor (10% of interval */
-	uint64_t        deadline;       /* first/soonest longterm deadline */
-	uint64_t        preempted;      /* sooner timer has pre-empted */
-	timer_call_t    call;           /* first/soonest longterm timer call */
-	uint64_t        deadline_set;   /* next timer set */
-	timer_call_data_t timer;        /* timer used by threshold management */
-	                                /* Stats: */
-	uint64_t        scans;          /*   num threshold timer scans */
-	uint64_t        preempts;       /*   num threshold reductions */
-	uint64_t        latency;        /*   average threshold latency */
-	uint64_t        latency_min;    /*   minimum threshold latency */
-	uint64_t        latency_max;    /*   maximum threshold latency */
+	uint64_t        interval;                                    
+	uint64_t        margin;                                            
+	uint64_t        deadline;                                            
+	uint64_t        preempted;                                       
+	timer_call_t    call;                                                  
+	uint64_t        deadline_set;                       
+	timer_call_data_t timer;                                                
+	                                            
+	uint64_t        scans;                                           
+	uint64_t        preempts;                                       
+	uint64_t        latency;                                         
+	uint64_t        latency_min;                                     
+	uint64_t        latency_max;                                     
 } threshold_t;
 
 typedef struct {
-	mpqueue_head_t  queue;          /* longterm timer list */
-	uint64_t        enqueues;       /* num timers queued */
-	uint64_t        dequeues;       /* num timers dequeued */
-	uint64_t        escalates;      /* num timers becoming shortterm */
-	uint64_t        scan_time;      /* last time the list was scanned */
-	threshold_t     threshold;      /* longterm timer threshold */
-	uint64_t        scan_limit;     /* maximum scan time */
-	uint64_t        scan_interval;  /* interval between LT "escalation" scans */
-	uint64_t        scan_pauses;    /* num scans exceeding time limit */
+	mpqueue_head_t  queue;                                   
+	uint64_t        enqueues;                              
+	uint64_t        dequeues;                                
+	uint64_t        escalates;                                         
+	uint64_t        scan_time;                                          
+	threshold_t     threshold;                                    
+	uint64_t        scan_limit;                            
+	uint64_t        scan_interval;                                              
+	uint64_t        scan_pauses;                                        
 } timer_longterm_t;
 
 timer_longterm_t                timer_longterm = {
@@ -268,7 +268,7 @@ static mpqueue_head_t*
 mpqueue_for_timer_call(timer_call_t entry)
 {
 	queue_t queue_entry_is_on = entry->tc_queue;
-	/* 'cast' the queue back to the orignal mpqueue */
+	                                                  
 	return __container_of(queue_entry_is_on, struct mpqueue_head, head);
 }
 
@@ -279,7 +279,7 @@ timer_call_entry_dequeue(
 {
 	mpqueue_head_t  *old_mpqueue = mpqueue_for_timer_call(entry);
 
-	/* The entry was always on a queue */
+	                                     
 	assert(old_mpqueue != NULL);
 
 #if TIMER_ASSERT
@@ -288,16 +288,16 @@ timer_call_entry_dequeue(
 		    "entry %p is not locked\n", entry);
 	}
 
-	/*
-	 * XXX The queue lock is actually a mutex in spin mode
-	 *     but there's no way to test for it being held
-	 *     so we pretend it's a spinlock!
-	 */
+	  
+                                                       
+                                                    
+                                      
+    
 	if (!hw_lock_held((hw_lock_t)&old_mpqueue->lock_data)) {
 		panic("_call_entry_dequeue() "
 		    "queue %p is not locked\n", old_mpqueue);
 	}
-#endif /* TIMER_ASSERT */
+#endif                   
 
 	if (old_mpqueue != timer_longterm_queue) {
 		priority_queue_remove(&old_mpqueue->mpq_pqhead,
@@ -327,7 +327,7 @@ timer_call_entry_enqueue_deadline(
 		    "entry %p is not locked\n", entry);
 	}
 
-	/* XXX More lock pretense:  */
+	                              
 	if (!hw_lock_held((hw_lock_t)&new_mpqueue->lock_data)) {
 		panic("_call_entry_enqueue_deadline() "
 		    "queue %p is not locked\n", new_mpqueue);
@@ -337,14 +337,14 @@ timer_call_entry_enqueue_deadline(
 		panic("_call_entry_enqueue_deadline() "
 		    "old_mpqueue %p != new_mpqueue", old_mpqueue);
 	}
-#endif /* TIMER_ASSERT */
+#endif                   
 
-	/* no longterm queue involved */
+	                                
 	assert(new_mpqueue != timer_longterm_queue);
 	assert(old_mpqueue != timer_longterm_queue);
 
 	if (old_mpqueue == new_mpqueue) {
-		/* optimize the same-queue case to avoid a full re-insert */
+		                                                            
 		uint64_t old_deadline = entry->tc_pqlink.deadline;
 		entry->tc_pqlink.deadline = deadline;
 
@@ -372,9 +372,9 @@ timer_call_entry_enqueue_deadline(
 	}
 
 
-	/* For efficiency, track the earliest soft deadline on the queue,
-	 * so that fuzzy decisions can be made without lock acquisitions.
-	 */
+	                                                                 
+                                                                  
+    
 
 	timer_call_t thead = priority_queue_min(&new_mpqueue->mpq_pqhead, struct timer_call, tc_pqlink);
 
@@ -393,13 +393,13 @@ timer_call_entry_enqueue_tail(
 	timer_call_t                    entry,
 	mpqueue_head_t                  *queue)
 {
-	/* entry is always dequeued before this call */
+	                                               
 	assert(entry->tc_queue == NULL);
 
-	/*
-	 * this is only used for timer_longterm_queue, which is unordered
-	 * and thus needs no priority queueing
-	 */
+	  
+                                                                  
+                                       
+    
 	assert(queue == timer_longterm_queue);
 
 	enqueue_tail(&queue->head, &entry->tc_qlink);
@@ -410,10 +410,10 @@ timer_call_entry_enqueue_tail(
 	return;
 }
 
-/*
- * Remove timer entry from its queue but don't change the queue pointer
- * and set the async_dequeue flag. This is locking case 2b.
- */
+  
+                                                                       
+                                                           
+   
 static __inline__ void
 timer_call_entry_dequeue_async(
 	timer_call_t            entry)
@@ -437,9 +437,9 @@ timer_call_entry_dequeue_async(
 unsigned timer_call_enqueue_deadline_unlocked_async1;
 unsigned timer_call_enqueue_deadline_unlocked_async2;
 #endif
-/*
- * Assumes call_entry and queues unlocked, interrupts disabled.
- */
+  
+                                                               
+   
 __inline__ mpqueue_head_t *
 timer_call_enqueue_deadline_unlocked(
 	timer_call_t                    call,
@@ -459,7 +459,7 @@ timer_call_enqueue_deadline_unlocked(
 	if (old_queue != NULL) {
 		timer_queue_lock_spin(old_queue);
 		if (call->tc_async_dequeue) {
-			/* collision (1c): timer already dequeued, clear flag */
+			                                                        
 #if TIMER_ASSERT
 			TIMER_KDEBUG_TRACE(KDEBUG_TRACE,
 			    DECR_TIMER_ASYNC_DEQ | DBG_FUNC_NONE,
@@ -525,7 +525,7 @@ timer_call_dequeue_unlocked(
 	if (old_queue != NULL) {
 		timer_queue_lock_spin(old_queue);
 		if (call->tc_async_dequeue) {
-			/* collision (1c): timer already dequeued, clear flag */
+			                                                        
 #if TIMER_ASSERT
 			TIMER_KDEBUG_TRACE(KDEBUG_TRACE,
 			    DECR_TIMER_ASYNC_DEQ | DBG_FUNC_NONE,
@@ -566,43 +566,43 @@ timer_call_past_deadline_timer_handle(uint64_t deadline, uint64_t ctime)
 	return ctime + past_deadline_timer_adjustment;
 }
 
-/*
- * Timer call entry locking model
- * ==============================
- *
- * Timer call entries are linked on per-cpu timer queues which are protected
- * by the queue lock and the call entry lock. The locking protocol is:
- *
- *  0) The canonical locking order is timer call entry followed by queue.
- *
- *  1) With only the entry lock held, entry.queue is valid:
- *    1a) NULL: the entry is not queued, or
- *    1b) non-NULL: this queue must be locked before the entry is modified.
- *        After locking the queue, the call.async_dequeue flag must be checked:
- *    1c) TRUE: the entry was removed from the queue by another thread
- *	        and we must NULL the entry.queue and reset this flag, or
- *    1d) FALSE: (ie. queued), the entry can be manipulated.
- *
- *  2) If a queue lock is obtained first, the queue is stable:
- *    2a) If a try-lock of a queued entry succeeds, the call can be operated on
- *	  and dequeued.
- *    2b) If a try-lock fails, it indicates that another thread is attempting
- *        to change the entry and move it to a different position in this queue
- *        or to different queue. The entry can be dequeued but it should not be
- *        operated upon since it is being changed. Furthermore, we don't null
- *	  the entry.queue pointer (protected by the entry lock we don't own).
- *	  Instead, we set the async_dequeue flag -- see (1c).
- *    2c) Same as 2b but occurring when a longterm timer is matured.
- *  3) A callout's parameters (deadline, flags, parameters, soft deadline &c.)
- *     should be manipulated with the appropriate timer queue lock held,
- *     to prevent queue traversal observations from observing inconsistent
- *     updates to an in-flight callout.
- */
+  
+                                 
+                                 
+  
+                                                                            
+                                                                      
+  
+                                                                         
+  
+                                                           
+                                           
+                                                                           
+                                                                               
+                                                                      
+                                                                   
+                                                            
+  
+                                                              
+                                                                               
+                  
+                                                                             
+                                                                               
+                                                                               
+                                                                             
+                                                                        
+                                                        
+                                                                    
+                                                                              
+                                                                        
+                                                                          
+                                       
+   
 
-/*
- * In the debug case, we assert that the timer call locking protocol
- * is being obeyed.
- */
+  
+                                                                    
+                   
+   
 
 static boolean_t
 timer_call_enter_internal(
@@ -665,10 +665,10 @@ timer_call_enter_internal(
 	    (ttd >> 32), (unsigned) (ttd & 0xFFFFFFFF), call);
 #endif
 
-	/* Program timer callout parameters under the appropriate per-CPU or
-	 * longterm queue lock. The callout may have been previously enqueued
-	 * and in-flight on this or another timer queue.
-	 */
+	                                                                    
+                                                                      
+                                                 
+    
 	if (!ratelimited && !slop_ratelimited) {
 		queue = timer_longterm_enqueue_unlocked(call, ctime, deadline, &old_queue, sdeadline, ttd, param1, flags);
 	}
@@ -692,10 +692,10 @@ timer_call_enter_internal(
 	return old_queue != NULL;
 }
 
-/*
- * timer_call_*()
- *	return boolean indicating whether the call was previously queued.
- */
+  
+                 
+                                                                    
+   
 boolean_t
 timer_call_enter(
 	timer_call_t            call,
@@ -770,7 +770,7 @@ timer_call_cancel(
 	DTRACE_TMR6(callout__cancel, timer_call_func_t, call->tc_func,
 	    timer_call_param_t, call->tc_param0, uint32_t, call->tc_flags, 0,
 	    (call->tc_ttd >> 32), (unsigned) (call->tc_ttd & 0xFFFFFFFF));
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 	return old_queue != NULL;
 }
@@ -801,11 +801,11 @@ timer_queue_shutdown(
 		}
 
 		if (!simple_lock_try(&call->tc_lock, LCK_GRP_NULL)) {
-			/*
-			 * case (2b) lock order inversion, dequeue and skip
-			 * Don't change the call_entry queue back-pointer
-			 * but set the async_dequeue field.
-			 */
+			  
+                                                      
+                                                    
+                                      
+      
 			timer_queue_shutdown_lock_skips++;
 			timer_call_entry_dequeue_async(call);
 #if TIMER_ASSERT
@@ -822,12 +822,12 @@ timer_queue_shutdown(
 
 		boolean_t call_local = ((call->tc_flags & TIMER_CALL_LOCAL) != 0);
 
-		/* remove entry from old queue */
+		                                 
 		timer_call_entry_dequeue(call);
 		timer_queue_unlock(queue);
 
 		if (call_local == FALSE) {
-			/* and queue it on new, discarding LOCAL timers */
+			                                                  
 			new_queue = timer_queue_assign(call->tc_pqlink.deadline);
 			timer_queue_lock_spin(new_queue);
 			timer_call_entry_enqueue_deadline(
@@ -857,21 +857,21 @@ timer_queue_expire_with_options(
 	uint32_t tc_iterations = 0;
 	DBG("timer_queue_expire(%p,)\n", queue);
 
-	/* 'rescan' means look at every timer in the list, instead of
-	 * early-exiting when the head of the list expires in the future.
-	 * when 'rescan' is true, iterate by linked list instead of priority queue.
-	 *
-	 * TODO: if we keep a deadline ordered and soft-deadline ordered
-	 * priority queue, then it's no longer necessary to do that
-	 */
+	                                                             
+                                                                  
+                                                                            
+   
+                                                                 
+                                                            
+    
 
 	uint64_t cur_deadline = deadline;
 	timer_queue_lock_spin(queue);
 
 	while (!queue_empty(&queue->head)) {
-		/* Upon processing one or more timer calls, refresh the
-		 * deadline to account for time elapsed in the callout
-		 */
+		                                                       
+                                                        
+     
 		if (++tc_iterations > 1) {
 			cur_deadline = mach_absolute_time();
 		}
@@ -904,7 +904,7 @@ timer_queue_expire_with_options(
 			}
 
 			if (!simple_lock_try(&call->tc_lock, LCK_GRP_NULL)) {
-				/* case (2b) lock inversion, dequeue and skip */
+				                                                
 				timer_queue_expire_lock_skips++;
 				timer_call_entry_dequeue_async(call);
 				call = NULL;
@@ -933,9 +933,9 @@ timer_queue_expire_with_options(
 			    0, (call->tc_ttd >> 32),
 			    (unsigned) (call->tc_ttd & 0xFFFFFFFF), call);
 #endif
-			/* Maintain time-to-deadline in per-processor data
-			 * structure for thread wakeup deadline statistics.
-			 */
+			                                                  
+                                                      
+      
 			uint64_t *ttdp = &current_processor()->timer_call_ttd;
 			*ttdp = call->tc_ttd;
 			(*func)(param0, param1);
@@ -960,19 +960,19 @@ timer_queue_expire_with_options(
 				int64_t skew = call->tc_pqlink.deadline - call->tc_soft_deadline;
 				assert(call->tc_pqlink.deadline >= call->tc_soft_deadline);
 
-				/* DRK: On a latency quality-of-service level change,
-				 * re-sort potentially rate-limited timers. The platform
-				 * layer determines which timers require
-				 * this. In the absence of the per-callout
-				 * synchronization requirement, a global resort could
-				 * be more efficient. The re-sort effectively
-				 * annuls all timer adjustments, i.e. the "soft
-				 * deadline" is the sort key.
-				 */
+				                                                     
+                                                            
+                                            
+                                              
+                                                         
+                                                 
+                                                   
+                                 
+       
 
 				if (timer_resort_threshold(skew)) {
 					if (__probable(simple_lock_try(&call->tc_lock, LCK_GRP_NULL))) {
-						/* TODO: don't need to dequeue before enqueue */
+						                                                
 						timer_call_entry_dequeue(call);
 						timer_call_entry_enqueue_deadline(call, queue, call->tc_soft_deadline);
 						simple_unlock(&call->tc_lock);
@@ -1014,11 +1014,11 @@ timer_queue_expire(
 
 extern int serverperfmode;
 static uint32_t timer_queue_migrate_lock_skips;
-/*
- * timer_queue_migrate() is called by timer_queue_migrate_cpu()
- * to move timer requests from the local processor (queue_from)
- * to a target processor's (queue_to).
- */
+  
+                                                               
+                                                               
+                                      
+   
 int
 timer_queue_migrate(mpqueue_head_t *queue_from, mpqueue_head_t *queue_to)
 {
@@ -1032,26 +1032,26 @@ timer_queue_migrate(mpqueue_head_t *queue_from, mpqueue_head_t *queue_to)
 	assert(queue_from != queue_to);
 
 	if (serverperfmode) {
-		/*
-		 * if we're running a high end server
-		 * avoid migrations... they add latency
-		 * and don't save us power under typical
-		 * server workloads
-		 */
+		  
+                                       
+                                         
+                                          
+                     
+     
 		return -4;
 	}
 
-	/*
-	 * Take both local (from) and target (to) timer queue locks while
-	 * moving the timers from the local queue to the target processor.
-	 * We assume that the target is always the boot processor.
-	 * But only move if all of the following is true:
-	 *  - the target queue is non-empty
-	 *  - the local queue is non-empty
-	 *  - the local queue's first deadline is later than the target's
-	 *  - the local queue contains no non-migrateable "local" call
-	 * so that we need not have the target resync.
-	 */
+	  
+                                                                  
+                                                                   
+                                                           
+                                                  
+                                    
+                                   
+                                                                  
+                                                               
+                                               
+    
 
 	timer_queue_lock_spin(queue_to);
 
@@ -1076,7 +1076,7 @@ timer_queue_migrate(mpqueue_head_t *queue_from, mpqueue_head_t *queue_to)
 		goto abort2;
 	}
 
-	/* perform scan for non-migratable timers */
+	                                            
 	qe_foreach_element(call, &queue_from->head, tc_qlink) {
 		if (call->tc_flags & TIMER_CALL_LOCAL) {
 			timers_migrated = -3;
@@ -1084,10 +1084,10 @@ timer_queue_migrate(mpqueue_head_t *queue_from, mpqueue_head_t *queue_to)
 		}
 	}
 
-	/* migration loop itself -- both queues are locked */
+	                                                     
 	qe_foreach_element_safe(call, &queue_from->head, tc_qlink) {
 		if (!simple_lock_try(&call->tc_lock, LCK_GRP_NULL)) {
-			/* case (2b) lock order inversion, dequeue only */
+			                                                  
 #ifdef TIMER_ASSERT
 			TIMER_KDEBUG_TRACE(KDEBUG_TRACE,
 			    DECR_TIMER_ASYNC_DEQ | DBG_FUNC_NONE,
@@ -1171,10 +1171,10 @@ timer_longterm_dequeued_locked(timer_call_t call)
 	}
 }
 
-/*
- * Place a timer call in the longterm list
- * and adjust the next timer callout deadline if the new timer is first.
- */
+  
+                                          
+                                                                        
+   
 mpqueue_head_t *
 timer_longterm_enqueue_unlocked(timer_call_t    call,
     uint64_t        now,
@@ -1191,27 +1191,27 @@ timer_longterm_enqueue_unlocked(timer_call_t    call,
 
 	longterm_threshold = now + tlp->threshold.interval;
 
-	/*
-	 * Return NULL without doing anything if:
-	 *  - this timer is local, or
-	 *  - the longterm mechanism is disabled, or
-	 *  - this deadline is too short.
-	 */
+	  
+                                          
+                              
+                                             
+                                  
+    
 	if ((callout_flags & TIMER_CALL_LOCAL) != 0 ||
 	    (tlp->threshold.interval == TIMER_LONGTERM_NONE) ||
 	    (deadline <= longterm_threshold)) {
 		return NULL;
 	}
 
-	/*
-	 * Remove timer from its current queue, if any.
-	 */
+	  
+                                                
+    
 	*old_queue = timer_call_dequeue_unlocked(call);
 
-	/*
-	 * Lock the longterm queue, queue timer and determine
-	 * whether an update is necessary.
-	 */
+	  
+                                                      
+                                   
+    
 	assert(!ml_get_interrupts_enabled());
 	simple_lock(&call->tc_lock, LCK_GRP_NULL);
 	timer_queue_lock_spin(timer_longterm_queue);
@@ -1224,10 +1224,10 @@ timer_longterm_enqueue_unlocked(timer_call_t    call,
 
 	tlp->enqueues++;
 
-	/*
-	 * We'll need to update the currently set threshold timer
-	 * if the new deadline is sooner and no sooner update is in flight.
-	 */
+	  
+                                                          
+                                                                    
+    
 	if (deadline < tlp->threshold.deadline &&
 	    deadline < tlp->threshold.preempted) {
 		tlp->threshold.preempted = deadline;
@@ -1238,10 +1238,10 @@ timer_longterm_enqueue_unlocked(timer_call_t    call,
 	simple_unlock(&call->tc_lock);
 
 	if (update_required) {
-		/*
-		 * Note: this call expects that calling the master cpu
-		 * alone does not involve locking the topo lock.
-		 */
+		  
+                                                        
+                                                  
+     
 		timer_call_nosync_cpu(
 			master_cpu,
 			(void (*)(void *))timer_longterm_update,
@@ -1251,21 +1251,21 @@ timer_longterm_enqueue_unlocked(timer_call_t    call,
 	return timer_longterm_queue;
 }
 
-/*
- * Scan for timers below the longterm threshold.
- * Move these to the local timer queue (of the boot processor on which the
- * calling thread is running).
- * Both the local (boot) queue and the longterm queue are locked.
- * The scan is similar to the timer migrate sequence but is performed by
- * successively examining each timer on the longterm queue:
- *  - if within the short-term threshold
- *    - enter on the local queue (unless being deleted),
- *  - otherwise:
- *    - if sooner, deadline becomes the next threshold deadline.
- * The total scan time is limited to TIMER_LONGTERM_SCAN_LIMIT. Should this be
- * exceeded, we abort and reschedule again so that we don't shut others from
- * the timer queues. Longterm timers firing late is not critical.
- */
+  
+                                                
+                                                                          
+                              
+                                                                 
+                                                                        
+                                                           
+                                        
+                                                        
+                
+                                                                
+                                                                              
+                                                                            
+                                                                 
+   
 void
 timer_longterm_scan(timer_longterm_t    *tlp,
     uint64_t            time_start)
@@ -1296,7 +1296,7 @@ timer_longterm_scan(timer_longterm_t    *tlp,
 	qe_foreach_element_safe(call, &timer_longterm_queue->head, tc_qlink) {
 		deadline = call->tc_soft_deadline;
 		if (!simple_lock_try(&call->tc_lock, LCK_GRP_NULL)) {
-			/* case (2c) lock order inversion, dequeue only */
+			                                                  
 #ifdef TIMER_ASSERT
 			TIMER_KDEBUG_TRACE(KDEBUG_TRACE,
 			    DECR_TIMER_ASYNC_DEQ | DBG_FUNC_NONE,
@@ -1309,10 +1309,10 @@ timer_longterm_scan(timer_longterm_t    *tlp,
 			continue;
 		}
 		if (deadline < threshold) {
-			/*
-			 * This timer needs moving (escalating)
-			 * to the local (boot) processor's queue.
-			 */
+			  
+                                          
+                                            
+      
 #ifdef TIMER_ASSERT
 			if (deadline < time_start) {
 				TIMER_KDEBUG_TRACE(KDEBUG_TRACE,
@@ -1335,10 +1335,10 @@ timer_longterm_scan(timer_longterm_t    *tlp,
 			timer_call_entry_dequeue(call);
 			timer_call_entry_enqueue_deadline(
 				call, timer_master_queue, call->tc_pqlink.deadline);
-			/*
-			 * A side-effect of the following call is to update
-			 * the actual hardware deadline if required.
-			 */
+			  
+                                                      
+                                               
+      
 			(void) timer_queue_assign(deadline);
 		} else {
 			if (deadline < tlp->threshold.deadline) {
@@ -1348,7 +1348,7 @@ timer_longterm_scan(timer_longterm_t    *tlp,
 		}
 		simple_unlock(&call->tc_lock);
 
-		/* Abort scan if we're taking too long. */
+		                                          
 		if (mach_absolute_time() > time_limit) {
 			tlp->threshold.deadline = TIMER_LONGTERM_SCAN_AGAIN;
 			tlp->scan_pauses++;
@@ -1386,18 +1386,18 @@ timer_longterm_update_locked(timer_longterm_t *tlp)
 		tlp->threshold.preempts++;
 		tlp->threshold.deadline = tlp->threshold.preempted;
 		tlp->threshold.preempted = TIMER_LONGTERM_NONE;
-		/*
-		 * Note: in the unlikely event that a pre-empted timer has
-		 * itself been cancelled, we'll simply re-scan later at the
-		 * time of the preempted/cancelled timer.
-		 */
+		  
+                                                            
+                                                             
+                                           
+     
 	} else {
 		tlp->threshold.scans++;
 
-		/*
-		 * Maintain a moving average of our wakeup latency.
-		 * Clamp latency to 0 and ignore above threshold interval.
-		 */
+		  
+                                                     
+                                                            
+     
 		if (tlp->scan_time > tlp->threshold.deadline_set) {
 			latency = tlp->scan_time - tlp->threshold.deadline_set;
 		} else {
@@ -1416,14 +1416,14 @@ timer_longterm_update_locked(timer_longterm_t *tlp)
 	}
 
 	tlp->threshold.deadline_set = tlp->threshold.deadline;
-	/* The next deadline timer to be set is adjusted */
+	                                                   
 	if (tlp->threshold.deadline != TIMER_LONGTERM_NONE &&
 	    tlp->threshold.deadline != TIMER_LONGTERM_SCAN_AGAIN) {
 		tlp->threshold.deadline_set -= tlp->threshold.margin;
 		tlp->threshold.deadline_set -= tlp->threshold.latency;
 	}
 
-	/* Throttle next scan time */
+	                             
 	uint64_t scan_clamp = mach_absolute_time() + tlp->scan_interval;
 	if (tlp->threshold.deadline_set < scan_clamp) {
 		tlp->threshold.deadline_set = scan_clamp;
@@ -1469,11 +1469,11 @@ timer_longterm_init(void)
 
 	DBG("timer_longterm_init() tlp: %p, queue: %p\n", tlp, &tlp->queue);
 
-	/*
-	 * Set the longterm timer threshold. Defaults to TIMER_LONGTERM_THRESHOLD
-	 * or TIMER_LONGTERM_NONE (disabled) for server;
-	 * overridden longterm boot-arg
-	 */
+	  
+                                                                          
+                                                 
+                                
+    
 	tlp->threshold.interval = serverperfmode ? TIMER_LONGTERM_NONE
 	    : TIMER_LONGTERM_THRESHOLD;
 	if (PE_parse_boot_argn("longterm", &longterm, sizeof(longterm))) {
@@ -1547,10 +1547,10 @@ timer_sysctl_get(int oid)
 	}
 }
 
-/*
- * timer_master_scan() is the inverse of timer_longterm_scan()
- * since it un-escalates timers to the longterm queue.
- */
+  
+                                                              
+                                                      
+   
 static void
 timer_master_scan(timer_longterm_t      *tlp,
     uint64_t              now)
@@ -1575,12 +1575,12 @@ timer_master_scan(timer_longterm_t      *tlp,
 			continue;
 		}
 		if (!simple_lock_try(&call->tc_lock, LCK_GRP_NULL)) {
-			/* case (2c) lock order inversion, dequeue only */
+			                                                  
 			timer_call_entry_dequeue_async(call);
 			continue;
 		}
 		if (deadline > threshold) {
-			/* move from master to longterm */
+			                                  
 			timer_call_entry_dequeue(call);
 			timer_call_entry_enqueue_tail(call, timer_longterm_queue);
 			if (deadline < tlp->threshold.deadline) {
@@ -1604,9 +1604,9 @@ timer_sysctl_set_threshold(uint64_t value)
 
 	timer_call_cancel(&tlp->threshold.timer);
 
-	/*
-	 * Set the new threshold and note whther it's increasing.
-	 */
+	  
+                                                          
+    
 	if (value == 0) {
 		tlp->threshold.interval = TIMER_LONGTERM_NONE;
 		threshold_increase = TRUE;
@@ -1624,20 +1624,20 @@ timer_sysctl_set_threshold(uint64_t value)
 		}
 	}
 
-	if (threshold_increase /* or removal */) {
-		/* Escalate timers from the longterm queue */
+	if (threshold_increase                 ) {
+		                                             
 		timer_longterm_scan(tlp, mach_absolute_time());
-	} else { /* decrease or addition  */
-		/*
-		 * We scan the local/master queue for timers now longterm.
-		 * To be strictly correct, we should scan all processor queues
-		 * but timer migration results in most timers gravitating to the
-		 * master processor in any case.
-		 */
+	} else {                            
+		  
+                                                            
+                                                                
+                                                                  
+                                  
+     
 		timer_master_scan(tlp, mach_absolute_time());
 	}
 
-	/* Set new timer accordingly */
+	                               
 	tlp->threshold.deadline_set = tlp->threshold.deadline;
 	if (tlp->threshold.deadline != TIMER_LONGTERM_NONE) {
 		tlp->threshold.deadline_set -= tlp->threshold.margin;
@@ -1648,7 +1648,7 @@ timer_sysctl_set_threshold(uint64_t value)
 			TIMER_CALL_LOCAL | TIMER_CALL_SYS_CRITICAL);
 	}
 
-	/* Reset stats */
+	                 
 	tlp->enqueues = 0;
 	tlp->dequeues = 0;
 	tlp->escalates = 0;
@@ -1685,7 +1685,7 @@ timer_sysctl_set(int oid, uint64_t value)
 }
 
 
-/* Select timer coalescing window based on per-task quality-of-service hints */
+                                                                               
 static boolean_t
 tcoal_qos_adjust(thread_t t, int32_t *tshift, uint64_t *tmax_abstime, boolean_t *pratelimited)
 {
@@ -1709,13 +1709,13 @@ tcoal_qos_adjust(thread_t t, int32_t *tshift, uint64_t *tmax_abstime, boolean_t 
 }
 
 
-/* Adjust timer deadlines based on priority of the thread and the
- * urgency value provided at timeout establishment. With this mechanism,
- * timers are no longer necessarily sorted in order of soft deadline
- * on a given timer queue, i.e. they may be differentially skewed.
- * In the current scheme, this could lead to fewer pending timers
- * processed than is technically possible when the HW deadline arrives.
- */
+                                                                 
+                                                                        
+                                                                    
+                                                                  
+                                                                 
+                                                                       
+   
 static void
 timer_compute_leeway(thread_t cthread, int32_t urgency, int32_t *tshift, uint64_t *tmax_abstime, boolean_t *pratelimited)
 {
@@ -1728,7 +1728,7 @@ timer_compute_leeway(thread_t cthread, int32_t urgency, int32_t *tshift, uint64_
 			TCOAL_PRIO_STAT(rt_tcl);
 		} else if (proc_get_effective_thread_policy(cthread, TASK_POLICY_DARWIN_BG) ||
 		    (urgency == TIMER_CALL_USER_BACKGROUND)) {
-			/* Determine if timer should be subjected to a lower QoS */
+			                                                           
 			if (tcoal_qos_adjust(cthread, tshift, tmax_abstime, pratelimited)) {
 				if (*tmax_abstime > tcoal_prio_params.timer_coalesce_bg_abstime_max) {
 					return;
@@ -1787,7 +1787,7 @@ timer_call_slop(uint64_t deadline, uint64_t now, uint32_t flags, thread_t cthrea
 		} else {
 			adjval =  MIN((deadline - now) << (-tcs_shift), tcs_max_abstime);
 		}
-		/* Apply adjustments derived from "user idle level" heuristic */
+		                                                                
 		adjval += (adjval * timer_user_idle_level) >> 7;
 		return adjval;
 	} else {
@@ -1828,10 +1828,10 @@ timer_set_user_idle_level(int ilevel)
 #define RUNNING_TIMER_FAKE_FLAGS (TIMER_CALL_SYS_CRITICAL | \
     TIMER_CALL_LOCAL)
 
-/*
- * timer_call_trace_* functions mimic the tracing behavior from the normal
- * timer_call subsystem, so tools continue to function.
- */
+  
+                                                                          
+                                                       
+   
 
 static void
 timer_call_trace_enter_before(struct timer_call *call, uint64_t deadline,
@@ -1846,7 +1846,7 @@ timer_call_trace_enter_before(struct timer_call *call, uint64_t deadline,
 	DTRACE_TMR7(callout__create, timer_call_func_t, call->tc_func,
 	    timer_call_param_t, call->tc_param0, uint32_t, flags, 0,
 	    (ttd >> 32), (unsigned int)(ttd & 0xFFFFFFFF), NULL);
-#endif /* CONFIG_DTRACE */
+#endif                    
 	TIMER_KDEBUG_TRACE(KDEBUG_TRACE, DECR_TIMER_ENTER | DBG_FUNC_END,
 	    VM_KERNEL_UNSLIDE_OR_PERM(call), 0, deadline, 0, 0);
 }
@@ -1875,11 +1875,11 @@ timer_call_trace_cancel(struct timer_call *call)
 	uint64_t ttd = deadline - call->tc_entry_time;
 #else
 	uint64_t ttd = UINT64_MAX;
-#endif /* TIMER_TRACE */
+#endif                  
 	DTRACE_TMR6(callout__cancel, timer_call_func_t, call->tc_func,
 	    timer_call_param_t, call->tc_param0, uint32_t, call->tc_flags, 0,
 	    (ttd >> 32), (unsigned int)(ttd & 0xFFFFFFFF));
-#endif /* CONFIG_DTRACE */
+#endif                    
 }
 
 static void
@@ -1894,13 +1894,13 @@ timer_call_trace_expire_entry(struct timer_call *call)
 #if CONFIG_DTRACE
 #if TIMER_TRACE
 	uint64_t ttd = call->tc_pqlink.deadline - call->tc_entry_time;
-#else /* TIMER_TRACE */
+#else                  
 	uint64_t ttd = UINT64_MAX;
-#endif /* TIMER_TRACE */
+#endif                  
 	DTRACE_TMR7(callout__start, timer_call_func_t, call->tc_func,
 	    timer_call_param_t, call->tc_param0, unsigned, call->tc_flags,
 	    0, (ttd >> 32), (unsigned int)(ttd & 0xFFFFFFFF), NULL);
-#endif /* CONFIG_DTRACE */
+#endif                    
 }
 
 static void
@@ -1910,7 +1910,7 @@ timer_call_trace_expire_return(struct timer_call *call)
 #if CONFIG_DTRACE
 	DTRACE_TMR4(callout__end, timer_call_func_t, call->tc_func,
 	    call->tc_param0, call->tc_param1, NULL);
-#endif /* CONFIG_DTRACE */
+#endif                    
 	TIMER_KDEBUG_TRACE(KDEBUG_TRACE, DECR_TIMER_CALLOUT | DBG_FUNC_END,
 	    VM_KERNEL_UNSLIDE_OR_PERM(call),
 	    VM_KERNEL_UNSLIDE(call->tc_func),
@@ -1919,9 +1919,9 @@ timer_call_trace_expire_return(struct timer_call *call)
 	    0);
 }
 
-/*
- * Set a new deadline for a running timer on this processor.
- */
+  
+                                                            
+   
 void
 running_timer_setup(processor_t processor, enum running_timer timer,
     void *param, uint64_t deadline, uint64_t now)
@@ -1941,7 +1941,7 @@ running_timer_setup(processor_t processor, enum running_timer timer,
 	call->tc_pqlink.deadline = deadline;
 #if TIMER_TRACE
 	call->tc_entry_time = now;
-#endif /* TIMER_TRACE */
+#endif                  
 	call->tc_param1 = param;
 
 	timer_call_trace_enter_after(call, deadline);
@@ -1961,10 +1961,10 @@ running_timer_enter(processor_t processor, unsigned int timer,
 	running_timers_sync();
 }
 
-/*
- * Call the callback for any running timers that fired for this processor.
- * Returns true if any timers were past their deadline.
- */
+  
+                                                                          
+                                                       
+   
 bool
 running_timers_expire(processor_t processor, uint64_t now)
 {
@@ -2003,7 +2003,7 @@ running_timer_clear(processor_t processor, enum running_timer timer)
 	call->tc_pqlink.deadline = EndOfAllTime;
 #if TIMER_TRACE
 	call->tc_entry_time = 0;
-#endif /* TIMER_TRACE */
+#endif                  
 	timer_call_trace_cancel(call);
 }
 

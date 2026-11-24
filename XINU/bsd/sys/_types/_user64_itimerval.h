@@ -30,8 +30,8 @@
 #define _STRUCT_USER64_ITIMERVAL                struct user64_itimerval
 _STRUCT_USER64_ITIMERVAL
 {
-	_STRUCT_USER64_TIMEVAL  it_interval;    /* timer interval */
-	_STRUCT_USER64_TIMEVAL  it_value;       /* current value */
+	_STRUCT_USER64_TIMEVAL  it_interval;                        
+	_STRUCT_USER64_TIMEVAL  it_value;                          
 };
-#endif /* _STRUCT_USER64_ITIMERVAL */
-#endif /* KERNEL */
+#endif                               
+#endif             

@@ -68,9 +68,9 @@
 #include <nfs/nfs_conf.h>
 #if CONFIG_NFS
 
-/*
- * Socket operations for use by nfs
- */
+  
+                                   
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -118,9 +118,9 @@
 #ifndef SUN_LEN
 #define SUN_LEN(su) \
 	(sizeof(*(su)) - sizeof((su)->sun_path) + strnlen((su)->sun_path, sizeof((su)->sun_path)))
-#endif /* SUN_LEN */
+#endif              
 
-/* XXX */
+         
 boolean_t       current_thread_aborted(void);
 kern_return_t   thread_terminate(thread_t);
 
@@ -131,16 +131,16 @@ ZONE_DECLARE(nfsrv_descript_zone, "NFSV3 srvdesc",
 
 
 #if CONFIG_NFS_SERVER
-int nfsrv_sock_max_rec_queue_length = 128; /* max # RPC records queued on (UDP) socket */
+int nfsrv_sock_max_rec_queue_length = 128;                                               
 
 int nfsrv_getstream(struct nfsrv_sock *, int);
 int nfsrv_getreq(struct nfsrv_descript *);
 extern int nfsv3_procid[NFS_NPROCS];
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
-/*
- * compare two sockaddr structures
- */
+  
+                                  
+   
 int
 nfs_sockaddr_cmp(struct sockaddr *sa1, struct sockaddr *sa2)
 {
@@ -191,18 +191,18 @@ int     nfs_can_squish(struct nfsmount *);
 int     nfs_is_squishy(struct nfsmount *);
 int     nfs_is_dead(int, struct nfsmount *);
 
-/*
- * Estimate rto for an nfs rpc sent via. an unreliable datagram.
- * Use the mean and mean deviation of rtt for the appropriate type of rpc
- * for the frequent rpcs and a default for the others.
- * The justification for doing "other" this way is that these rpcs
- * happen so infrequently that timer est. would probably be stale.
- * Also, since many of these rpcs are
- * non-idempotent, a conservative timeout is desired.
- * getattr, lookup - A+2D
- * read, write     - A+4D
- * other	   - nm_timeo
- */
+  
+                                                                
+                                                                         
+                                                      
+                                                                  
+                                                                  
+                                     
+                                                     
+                         
+                         
+                      
+   
 #define NFS_RTO(n, t) \
 	((t) == 0 ? (n)->nm_timeo : \
 	 ((t) < 3 ? \
@@ -211,14 +211,14 @@ int     nfs_is_dead(int, struct nfsmount *);
 #define NFS_SRTT(r)     (r)->r_nmp->nm_srtt[proct[(r)->r_procnum] - 1]
 #define NFS_SDRTT(r)    (r)->r_nmp->nm_sdrtt[proct[(r)->r_procnum] - 1]
 
-/*
- * Defines which timer to use for the procnum.
- * 0 - default
- * 1 - getattr
- * 2 - lookup
- * 3 - read
- * 4 - write
- */
+  
+                                              
+              
+              
+             
+           
+            
+   
 static const int proct[] = {
 	[NFSPROC_NULL]                  =       0,
 	[NFSPROC_GETATTR]               =       1,
@@ -245,26 +245,26 @@ static const int proct[] = {
 	[NFSPROC_NOOP]                  =       0,
 };
 
-/*
- * There is a congestion window for outstanding rpcs maintained per mount
- * point. The cwnd size is adjusted in roughly the way that:
- * Van Jacobson, Congestion avoidance and Control, In "Proceedings of
- * SIGCOMM '88". ACM, August 1988.
- * describes for TCP. The cwnd size is chopped in half on a retransmit timeout
- * and incremented by 1/cwnd when each rpc reply is received and a full cwnd
- * of rpcs is in progress.
- * (The sent count and cwnd are scaled for integer arith.)
- * Variants of "slow start" were tried and were found to be too much of a
- * performance hit (ave. rtt 3 times larger),
- * I suspect due to the large rtt that nfs rpcs have.
- */
+  
+                                                                         
+                                                            
+                                                                     
+                                  
+                                                                              
+                                                                            
+                          
+                                                          
+                                                                         
+                                             
+                                                     
+   
 #define NFS_CWNDSCALE   256
 #define NFS_MAXCWND     (NFS_CWNDSCALE * 32)
 static int nfs_backoff[8] = { 2, 4, 8, 16, 32, 64, 128, 256, };
 
-/*
- * Increment location index to next address/server/location.
- */
+  
+                                                            
+   
 void
 nfs_location_next(struct nfs_fs_locations *nlp, struct nfs_location_index *nlip)
 {
@@ -272,29 +272,29 @@ nfs_location_next(struct nfs_fs_locations *nlp, struct nfs_location_index *nlip)
 	uint8_t serv = nlip->nli_serv;
 	uint8_t addr = nlip->nli_addr;
 
-	/* move to next address */
+	                          
 	addr++;
 	if (addr >= nlp->nl_locations[loc]->nl_servers[serv]->ns_addrcount) {
-		/* no more addresses on current server, go to first address of next server */
+		                                                                             
 next_server:
 		addr = 0;
 		serv++;
 		if (serv >= nlp->nl_locations[loc]->nl_servcount) {
-			/* no more servers on current location, go to first server of next location */
+			                                                                              
 			serv = 0;
 			loc++;
 			if (loc >= nlp->nl_numlocs) {
-				loc = 0; /* after last location, wrap back around to first location */
+				loc = 0;                                                              
 			}
 		}
 	}
-	/*
-	 * It's possible for this next server to not have any addresses.
-	 * Check for that here and go to the next server.
-	 * But bail out if we've managed to come back around to the original
-	 * location that was passed in. (That would mean no servers had any
-	 * addresses.  And we don't want to spin here forever.)
-	 */
+	  
+                                                                 
+                                                  
+                                                                     
+                                                                    
+                                                        
+    
 	if ((loc == nlip->nli_loc) && (serv == nlip->nli_serv) && (addr == nlip->nli_addr)) {
 		return;
 	}
@@ -307,9 +307,9 @@ next_server:
 	nlip->nli_addr = addr;
 }
 
-/*
- * Compare two location indices.
- */
+  
+                                
+   
 int
 nfs_location_index_cmp(struct nfs_location_index *nlip1, struct nfs_location_index *nlip2)
 {
@@ -322,9 +322,9 @@ nfs_location_index_cmp(struct nfs_location_index *nlip1, struct nfs_location_ind
 	return nlip1->nli_addr - nlip2->nli_addr;
 }
 
-/*
- * Get the mntfromname (or path portion only) for a given location.
- */
+  
+                                                                   
+   
 void
 nfs_location_mntfromname(struct nfs_fs_locations *locs, struct nfs_location_index idx, char *s, size_t size, int pathonly)
 {
@@ -350,14 +350,14 @@ nfs_location_mntfromname(struct nfs_fs_locations *locs, struct nfs_location_inde
 		size -= cnt;
 	}
 	if (fsl->nl_path.np_compcount == 0) {
-		/* mounting root export on server */
+		                                    
 		if (size > 0) {
 			*p++ = '/';
 			*p++ = '\0';
 		}
 		return;
 	}
-	/* append each server path component */
+	                                       
 	for (i = 0; (size > 0) && (i < (int)fsl->nl_path.np_compcount); i++) {
 		cnt = scnprintf(p, size, "/%s", fsl->nl_path.np_components[i]);
 		p += cnt;
@@ -365,10 +365,10 @@ nfs_location_mntfromname(struct nfs_fs_locations *locs, struct nfs_location_inde
 	}
 }
 
-/*
- * NFS client connect socket upcall.
- * (Used only during socket connect/search.)
- */
+  
+                                    
+                                            
+   
 void
 nfs_connect_upcall(socket_t so, void *arg, __unused int waitflag)
 {
@@ -392,9 +392,9 @@ nfs_connect_upcall(socket_t so, void *arg, __unused int waitflag)
 	NFS_SOCK_DBG("nfs connect - socket %p upcall %8.8x\n", nso, nso->nso_flags);
 	nso->nso_flags |= NSO_UPCALL;
 
-	/* loop while we make error-free progress */
+	                                            
 	while (!error && recv) {
-		/* make sure we're still interested in this socket */
+		                                                     
 		if (nso->nso_flags & (NSO_DISCONNECTING | NSO_DEAD)) {
 			break;
 		}
@@ -410,7 +410,7 @@ nfs_connect_upcall(socket_t so, void *arg, __unused int waitflag)
 		}
 		lck_mtx_lock(&nso->nso_lock);
 		if (m) {
-			/* match response with request */
+			                                 
 			struct nfsm_chain nmrep;
 			uint32_t reply = 0, rxid = 0, verf_type, verf_len;
 			uint32_t reply_status, rejected_status, accepted_status;
@@ -429,8 +429,8 @@ nfs_connect_upcall(socket_t so, void *arg, __unused int waitflag)
 					error = (rejected_status == RPC_MISMATCH) ? ERPCMISMATCH : EACCES;
 				}
 			}
-			nfsm_chain_get_32(error, &nmrep, verf_type); /* verifier flavor */
-			nfsm_chain_get_32(error, &nmrep, verf_len); /* verifier length */
+			nfsm_chain_get_32(error, &nmrep, verf_type);                      
+			nfsm_chain_get_32(error, &nmrep, verf_len);                      
 			nfsmout_if(error);
 			if (verf_len) {
 				nfsm_chain_adv(error, &nmrep, nfsm_rndup(verf_len));
@@ -459,16 +459,16 @@ nfs_connect_upcall(socket_t so, void *arg, __unused int waitflag)
 				} else if (nso->nso_protocol == NFS_PROG) {
 					int vers;
 
-					/*
-					 * N.B. Both portmapper and rpcbind V3 are happy to return
-					 * addresses for other versions than the one you ask (getport or
-					 * getaddr) and thus we may have fallen to this code path. So if
-					 * we get a version that we support, use highest supported
-					 * version.  This assumes that the server supports all versions
-					 * between minvers and maxvers.  Note for IPv6 we will try and
-					 * use rpcbind V4 which has getversaddr and we should not get
-					 * here if that was successful.
-					 */
+					  
+                                                               
+                                                                     
+                                                                     
+                                                               
+                                                                    
+                                                                   
+                                                                  
+                                    
+        
 					for (vers = nso->nso_nfs_max_vers; vers >= (int)nso->nso_nfs_min_vers; vers--) {
 						if (vers >= (int)minvers && vers <= (int)maxvers) {
 							break;
@@ -514,7 +514,7 @@ nfsmout:
 				nso->nso_flags |= NSO_VERIFIED;
 			}
 			mbuf_freem(m);
-			/* wake up search thread */
+			                           
 			wakeup(nso->nso_wake);
 			break;
 		}
@@ -522,7 +522,7 @@ nfsmout:
 
 	nso->nso_flags &= ~NSO_UPCALL;
 	if ((error != EWOULDBLOCK) && (error || !recv)) {
-		/* problems with the socket... */
+		                                 
 		NFS_SOCK_DBG("connect upcall failed %d\n", error);
 		nso->nso_error = error ? error : EPIPE;
 		nso->nso_flags |= NSO_DEAD;
@@ -534,9 +534,9 @@ nfsmout:
 	lck_mtx_unlock(&nso->nso_lock);
 }
 
-/*
- * Create/initialize an nfs_socket structure.
- */
+  
+                                             
+   
 int
 nfs_socket_create(
 	struct nfsmount *nmp,
@@ -591,7 +591,7 @@ nfs_socket_create(
 
 	*nsop = NULL;
 
-	/* Create the socket. */
+	                        
 	MALLOC(nso, struct nfs_socket *, sizeof(struct nfs_socket), M_TEMP, M_WAITOK | M_ZERO);
 	if (nso) {
 		MALLOC(nso->nso_saddr, struct sockaddr *, sa->sa_len, M_SONAME, M_WAITOK | M_ZERO);
@@ -629,7 +629,7 @@ nfs_socket_create(
 
 	error = sock_socket(sa->sa_family, nso->nso_sotype, 0, NULL, NULL, &nso->nso_so);
 
-	/* Some servers require that the client port be a reserved port number. */
+	                                                                          
 	if (!error && resvport && ((sa->sa_family == AF_INET) || (sa->sa_family == AF_INET6))) {
 		struct sockaddr_storage ss;
 		int level = (sa->sa_family == AF_INET) ? IPPROTO_IP : IPPROTO_IPV6;
@@ -637,7 +637,7 @@ nfs_socket_create(
 		int portrange = IP_PORTRANGE_LOW;
 
 		error = sock_setsockopt(nso->nso_so, level, optname, &portrange, sizeof(portrange));
-		if (!error) {   /* bind now to check for failure */
+		if (!error) {                                      
 			ss.ss_len = sa->sa_len;
 			ss.ss_family = sa->sa_family;
 			if (ss.ss_family == AF_INET) {
@@ -669,9 +669,9 @@ nfs_socket_create(
 	return error;
 }
 
-/*
- * Destroy an nfs_socket structure.
- */
+  
+                                   
+   
 void
 nfs_socket_destroy(struct nfs_socket *nso)
 {
@@ -680,7 +680,7 @@ nfs_socket_destroy(struct nfs_socket *nso)
 	NFS_SOCK_DBG("Destoring socket %p flags = %8.8x error = %d\n", nso, nso->nso_flags, nso->nso_error);
 	lck_mtx_lock(&nso->nso_lock);
 	nso->nso_flags |= NSO_DISCONNECTING;
-	if (nso->nso_flags & NSO_UPCALL) { /* give upcall a chance to complete */
+	if (nso->nso_flags & NSO_UPCALL) {                                       
 		msleep(&nso->nso_flags, &nso->nso_lock, PZERO - 1, "nfswaitupcall", &ts);
 	}
 	lck_mtx_unlock(&nso->nso_lock);
@@ -700,19 +700,19 @@ nfs_socket_destroy(struct nfs_socket *nso)
 	FREE(nso, M_TEMP);
 }
 
-/*
- * Set common socket options on an nfs_socket.
- */
+  
+                                              
+   
 void
 nfs_socket_options(struct nfsmount *nmp, struct nfs_socket *nso)
 {
-	/*
-	 * Set socket send/receive timeouts
-	 * - Receive timeout shouldn't matter because most receives are performed
-	 *   in the socket upcall non-blocking.
-	 * - Send timeout should allow us to react to a blocked socket.
-	 *   Soft mounts will want to abort sooner.
-	 */
+	  
+                                    
+                                                                          
+                                        
+                                                                
+                                            
+    
 	struct timeval timeo;
 	int on = 1, proto, reserve, error;
 
@@ -721,16 +721,16 @@ nfs_socket_options(struct nfsmount *nmp, struct nfs_socket *nso)
 	sock_setsockopt(nso->nso_so, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
 	sock_setsockopt(nso->nso_so, SOL_SOCKET, SO_SNDTIMEO, &timeo, sizeof(timeo));
 	if (nso->nso_sotype == SOCK_STREAM) {
-		/* Assume that SOCK_STREAM always requires a connection */
+		                                                          
 		sock_setsockopt(nso->nso_so, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof(on));
-		/* set nodelay for TCP */
+		                         
 		sock_gettype(nso->nso_so, NULL, NULL, &proto);
 		if (proto == IPPROTO_TCP) {
 			sock_setsockopt(nso->nso_so, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 		}
 	}
 
-	/* set socket buffer sizes for UDP/TCP */
+	                                         
 	reserve = (nso->nso_sotype == SOCK_DGRAM) ? NFS_UDPSOCKBUF : MAX(nfs_tcp_sockbuf, nmp->nm_wsize * 2);
 	{
 		error = sock_setsockopt(nso->nso_so, SOL_SOCKET, SO_SNDBUF, &reserve, sizeof(reserve));
@@ -746,19 +746,19 @@ nfs_socket_options(struct nfsmount *nmp, struct nfs_socket *nso)
 		log(LOG_INFO, "nfs_socket_options: error %d setting SO_RCVBUF to %u\n", error, reserve);
 	}
 
-	/* set SO_NOADDRERR to detect network changes ASAP */
+	                                                     
 	sock_setsockopt(nso->nso_so, SOL_SOCKET, SO_NOADDRERR, &on, sizeof(on));
-	/* just playin' it safe with upcalls */
+	                                       
 	sock_setsockopt(nso->nso_so, SOL_SOCKET, SO_UPCALLCLOSEWAIT, &on, sizeof(on));
-	/* socket should be interruptible if the mount is */
+	                                                    
 	if (!NMFLAG(nmp, INTR)) {
 		sock_nointerrupt(nso->nso_so, 1);
 	}
 }
 
-/*
- * Release resources held in an nfs_socket_search.
- */
+  
+                                                  
+   
 void
 nfs_socket_search_cleanup(struct nfs_socket_search *nss)
 {
@@ -775,10 +775,10 @@ nfs_socket_search_cleanup(struct nfs_socket_search *nss)
 	}
 }
 
-/*
- * Prefer returning certain errors over others.
- * This function returns a ranking of the given error.
- */
+  
+                                               
+                                                      
+   
 int
 nfs_connect_error_class(int error)
 {
@@ -814,9 +814,9 @@ nfs_connect_error_class(int error)
 	}
 }
 
-/*
- * Make sure a socket search returns the best error.
- */
+  
+                                                    
+   
 void
 nfs_socket_search_update_error(struct nfs_socket_search *nss, int error)
 {
@@ -825,13 +825,13 @@ nfs_socket_search_update_error(struct nfs_socket_search *nss, int error)
 	}
 }
 
-/* nfs_connect_search_new_socket:
- *      Given a socket search structure for an nfs mount try to find a new socket from the set of addresses specified
- *	by nss.
- *
- *	nss_last is set to -1 at initialization to indicate the first time. Its set to -2 if address was found but
- *	could not be used or if a socket timed out.
- */
+                                 
+                                                                                                                     
+          
+  
+                                                                                                             
+                                              
+   
 int
 nfs_connect_search_new_socket(struct nfsmount *nmp, struct nfs_socket_search *nss, struct timeval *now)
 {
@@ -846,28 +846,28 @@ nfs_connect_search_new_socket(struct nfsmount *nmp, struct nfs_socket_search *ns
 	NFS_SOCK_DBG("nfs connect %s nss_addrcnt = %d\n",
 	    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nss->nss_addrcnt);
 
-	/*
-	 * while there are addresses and:
-	 *	we have no sockets or
-	 *	the last address failed and did not produce a socket (nss_last < 0) or
-	 *	Its been a while (2 seconds) and we have less than the max number of concurrent sockets to search (4)
-	 *	then attempt to create a socket with the current address.
-	 */
+	  
+                                  
+                         
+                                                                          
+                                                                                                         
+                                                             
+    
 	while (nss->nss_addrcnt > 0 && ((nss->nss_last < 0) || (nss->nss_sockcnt == 0) ||
 	    ((nss->nss_sockcnt < 4) && (now->tv_sec >= (nss->nss_last + 2))))) {
 		if (nmp->nm_sockflags & NMSOCK_UNMOUNT) {
 			return EINTR;
 		}
-		/* Can we convert the address to a sockaddr? */
+		                                               
 		fsl = nmp->nm_locations.nl_locations[nss->nss_nextloc.nli_loc];
 		fss = fsl->nl_servers[nss->nss_nextloc.nli_serv];
 		addrstr = fss->ns_addresses[nss->nss_nextloc.nli_addr];
 		NFS_SOCK_DBG("Trying address %s for program %d on port %d\n", addrstr, nss->nss_protocol, nss->nss_port);
 		if (*addrstr == '\0') {
-			/*
-			 * We have an unspecified local domain address. We use the program to translate to
-			 * a well known local transport address. We only support PMAPROG and NFS for this.
-			 */
+			  
+                                                                                     
+                                                                                     
+      
 			if (nss->nss_protocol == PMAPPROG) {
 				addrstr = (nss->nss_sotype == SOCK_DGRAM) ? RPCB_TICLTS_PATH : RPCB_TICOTSORD_PATH;
 			} else if (nss->nss_protocol == NFS_PROG) {
@@ -885,7 +885,7 @@ nfs_connect_search_new_socket(struct nfsmount *nmp, struct nfs_socket_search *ns
 			nss->nss_last = -2;
 			continue;
 		}
-		/* Check that socket family is acceptable. */
+		                                             
 		if (nmp->nm_sofamily && (ss.ss_family != nmp->nm_sofamily)) {
 			NFS_SOCK_DBG("Skipping socket family %d, want mount family %d\n", ss.ss_family, nmp->nm_sofamily);
 			nfs_location_next(&nmp->nm_locations, &nss->nss_nextloc);
@@ -894,7 +894,7 @@ nfs_connect_search_new_socket(struct nfsmount *nmp, struct nfs_socket_search *ns
 			continue;
 		}
 
-		/* Create the socket. */
+		                        
 		error = nfs_socket_create(nmp, (struct sockaddr*)&ss, nss->nss_sotype,
 		    nss->nss_port, nss->nss_protocol, nss->nss_version,
 		    ((nss->nss_protocol == NFS_PROG) && NMFLAG(nmp, RESVPORT)), &nso);
@@ -928,26 +928,26 @@ nfs_connect_search_new_socket(struct nfsmount *nmp, struct nfs_socket_search *ns
 	return error;
 }
 
-/*
- * nfs_connect_search_socket_connect:	Connect an nfs socket nso for nfsmount nmp.
- *					If successful set the socket options for the socket as require from the mount.
- *
- * Assumes:				nso->nso_lock is held on entry and return.
- */
+  
+                                                                                 
+                                                                                     
+  
+                                                         
+   
 int
 nfs_connect_search_socket_connect(struct nfsmount *nmp, struct nfs_socket *nso, int verbose)
 {
 	int error;
 
 	if ((nso->nso_sotype != SOCK_STREAM) && NMFLAG(nmp, NOCONNECT)) {
-		/* no connection needed, just say it's already connected */
+		                                                           
 		NFS_SOCK_DBG("nfs connect %s UDP socket %p noconnect\n",
 		    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso);
 		nso->nso_flags |= NSO_CONNECTED;
 		nfs_socket_options(nmp, nso);
-		return 1;   /* Socket is connected and setup */
+		return 1;                                      
 	} else if (!(nso->nso_flags & NSO_CONNECTING)) {
-		/* initiate the connection */
+		                             
 		nso->nso_flags |= NSO_CONNECTING;
 		lck_mtx_unlock(&nso->nso_lock);
 		NFS_SOCK_DBG("nfs connect %s connecting socket %p %s\n",
@@ -966,19 +966,19 @@ nfs_connect_search_socket_connect(struct nfsmount *nmp, struct nfs_socket *nso, 
 		}
 	}
 	if (nso->nso_flags & NSO_CONNECTING) {
-		/* check the connection */
+		                          
 		if (sock_isconnected(nso->nso_so)) {
 			NFS_SOCK_DBG("nfs connect %s socket %p is connected\n",
 			    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso);
 			nso->nso_flags &= ~NSO_CONNECTING;
 			nso->nso_flags |= NSO_CONNECTED;
 			nfs_socket_options(nmp, nso);
-			return 1;   /* Socket is connected and setup */
+			return 1;                                      
 		} else {
 			int optlen = sizeof(error);
 			error = 0;
 			sock_getsockopt(nso->nso_so, SOL_SOCKET, SO_ERROR, &error, &optlen);
-			if (error) { /* we got an error on the socket */
+			if (error) {                                    
 				NFS_SOCK_DBG("nfs connect %s socket %p connection error %d\n",
 				    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso, error);
 				if (verbose) {
@@ -992,16 +992,16 @@ nfs_connect_search_socket_connect(struct nfsmount *nmp, struct nfs_socket *nso, 
 		}
 	}
 
-	return 0;  /* Waiting to be connected */
+	return 0;                               
 }
 
-/*
- * nfs_connect_search_ping:	Send a null proc on the nso socket.
- */
+  
+                                                               
+   
 int
 nfs_connect_search_ping(struct nfsmount *nmp, struct nfs_socket *nso, struct timeval *now)
 {
-	/* initiate a NULL RPC request */
+	                                 
 	uint64_t xid = nso->nso_pingxid;
 	mbuf_t m, mreq = NULL;
 	struct msghdr msg;
@@ -1052,17 +1052,17 @@ nfs_connect_search_ping(struct nfsmount *nmp, struct nfs_socket *nso, struct tim
 	return 1;
 }
 
-/*
- * nfs_connect_search_socket_found:	Take the found socket of the socket search list and assign it to the searched socket.
- *					Set the nfs socket protocol and version if needed.
- */
+  
+                                                                                                                         
+                                                         
+   
 void
 nfs_connect_search_socket_found(struct nfsmount *nmp, struct nfs_socket_search *nss, struct nfs_socket *nso)
 {
 	NFS_SOCK_DBG("nfs connect %s socket %p verified\n",
 	    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso);
 	if (!nso->nso_version) {
-		/* If the version isn't set, the default must have worked. */
+		                                                             
 		if (nso->nso_protocol == PMAPPROG) {
 			nso->nso_version = (nso->nso_saddr->sa_family == AF_INET) ? PMAPVERS : RPCBVERS4;
 		}
@@ -1075,10 +1075,10 @@ nfs_connect_search_socket_found(struct nfsmount *nmp, struct nfs_socket_search *
 	nss->nss_sock = nso;
 }
 
-/*
- * nfs_connect_search_socket_reap:	For each socket in the search list mark any timed out socket as dead and remove from
- *					the list. Dead socket are then destroyed.
- */
+  
+                                                                                                                       
+                                                
+   
 void
 nfs_connect_search_socket_reap(struct nfsmount *nmp __unused, struct nfs_socket_search *nss, struct timeval *now)
 {
@@ -1087,7 +1087,7 @@ nfs_connect_search_socket_reap(struct nfsmount *nmp __unused, struct nfs_socket_
 	TAILQ_FOREACH_SAFE(nso, &nss->nss_socklist, nso_link, nsonext) {
 		lck_mtx_lock(&nso->nso_lock);
 		if (now->tv_sec >= (nso->nso_timestamp + nss->nss_timeo)) {
-			/* took too long */
+			                   
 			NFS_SOCK_DBG("nfs connect %s socket %p timed out\n",
 			    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso);
 			nso->nso_error = ETIMEDOUT;
@@ -1104,22 +1104,22 @@ nfs_connect_search_socket_reap(struct nfsmount *nmp __unused, struct nfs_socket_
 		TAILQ_REMOVE(&nss->nss_socklist, nso, nso_link);
 		nss->nss_sockcnt--;
 		nfs_socket_destroy(nso);
-		/* If there are more sockets to try, force the starting of another socket */
+		                                                                            
 		if (nss->nss_addrcnt > 0) {
 			nss->nss_last = -2;
 		}
 	}
 }
 
-/*
- * nfs_connect_search_check:	Check on the status of search and wait for replies if needed.
- */
+  
+                                                                                          
+   
 int
 nfs_connect_search_check(struct nfsmount *nmp, struct nfs_socket_search *nss, struct timeval *now)
 {
 	int error;
 
-	/* log a warning if connect is taking a while */
+	                                                
 	if (((now->tv_sec - nss->nss_timestamp) >= 8) && ((nss->nss_flags & (NSS_VERBOSE | NSS_WARNED)) == NSS_VERBOSE)) {
 		printf("nfs_connect: socket connect taking a while for %s\n", vfs_statfs(nmp->nm_mountp)->f_mntfromname);
 		nss->nss_flags |= NSS_WARNED;
@@ -1131,7 +1131,7 @@ nfs_connect_search_check(struct nfsmount *nmp, struct nfs_socket_search *nss, st
 		return error;
 	}
 
-	/* If we were succesfull at sending a ping, wait up to a second for a reply  */
+	                                                                               
 	if (nss->nss_last >= 0) {
 		tsleep(nss, PSOCK, "nfs_connect_search_wait", hz);
 	}
@@ -1140,9 +1140,9 @@ nfs_connect_search_check(struct nfsmount *nmp, struct nfs_socket_search *nss, st
 }
 
 
-/*
- * Continue the socket search until we have something to report.
- */
+  
+                                                                
+   
 int
 nfs_connect_search_loop(struct nfsmount *nmp, struct nfs_socket_search *nss)
 {
@@ -1155,18 +1155,18 @@ loop:
 	microuptime(&now);
 	NFS_SOCK_DBG("nfs connect %s search %ld\n", vfs_statfs(nmp->nm_mountp)->f_mntfromname, now.tv_sec);
 
-	/* add a new socket to the socket list if needed and available */
+	                                                                 
 	error = nfs_connect_search_new_socket(nmp, nss, &now);
 	if (error) {
 		NFS_SOCK_DBG("nfs connect returned %d\n", error);
 		return error;
 	}
 
-	/* check each active socket on the list and try to push it along */
+	                                                                   
 	TAILQ_FOREACH(nso, &nss->nss_socklist, nso_link) {
 		lck_mtx_lock(&nso->nso_lock);
 
-		/* If not connected connect it */
+		                                 
 		if (!(nso->nso_flags & NSO_CONNECTED)) {
 			if (!nfs_connect_search_socket_connect(nmp, nso, verbose)) {
 				lck_mtx_unlock(&nso->nso_lock);
@@ -1174,7 +1174,7 @@ loop:
 			}
 		}
 
-		/* If the socket hasn't been verified or in a ping, ping it. We also handle UDP retransmits */
+		                                                                                              
 		if (!(nso->nso_flags & (NSO_PINGING | NSO_VERIFIED)) ||
 		    ((nso->nso_sotype == SOCK_DGRAM) && (now.tv_sec >= nso->nso_reqtimestamp + 2))) {
 			if (!nfs_connect_search_ping(nmp, nso, &now)) {
@@ -1183,9 +1183,9 @@ loop:
 			}
 		}
 
-		/* Has the socket been verified by the up call routine? */
+		                                                          
 		if (nso->nso_flags & NSO_VERIFIED) {
-			/* WOOHOO!! This socket looks good! */
+			                                      
 			nfs_connect_search_socket_found(nmp, nss, nso);
 			lck_mtx_unlock(&nso->nso_lock);
 			break;
@@ -1193,13 +1193,13 @@ loop:
 		lck_mtx_unlock(&nso->nso_lock);
 	}
 
-	/* Check for timed out sockets and mark as dead and then remove all dead sockets. */
+	                                                                                    
 	nfs_connect_search_socket_reap(nmp, nss, &now);
 
-	/*
-	 * Keep looping if we haven't found a socket yet and we have more
-	 * sockets to (continue to) try.
-	 */
+	  
+                                                                  
+                                 
+    
 	error = 0;
 	if (!nss->nss_sock && (!TAILQ_EMPTY(&nss->nss_socklist) || nss->nss_addrcnt)) {
 		error = nfs_connect_search_check(nmp, nss, &now);
@@ -1212,21 +1212,21 @@ loop:
 	return error;
 }
 
-/*
- * Initialize a new NFS connection.
- *
- * Search for a location to connect a socket to and initialize the connection.
- *
- * An NFS mount may have multiple locations/servers/addresses available.
- * We attempt to connect to each one asynchronously and will start
- * several sockets in parallel if other locations are slow to answer.
- * We'll use the first NFS socket we can successfully set up.
- *
- * The search may involve contacting the portmapper service first.
- *
- * A mount's initial connection may require negotiating some parameters such
- * as socket type and NFS version.
- */
+  
+                                   
+  
+                                                                              
+  
+                                                                        
+                                                                  
+                                                                     
+                                                             
+  
+                                                                  
+  
+                                                                            
+                                  
+   
 
 int
 nfs_connect(struct nfsmount *nmp, int verbose, int timeo)
@@ -1248,7 +1248,7 @@ nfs_connect(struct nfsmount *nmp, int verbose, int timeo)
 	in_port_t port = 0;
 	int addrtotal = 0;
 
-	/* paranoia... check that we have at least one address in the locations */
+	                                                                          
 	uint32_t loc, serv;
 	for (loc = 0; loc < nmp->nm_locations.nl_numlocs; loc++) {
 		for (serv = 0; serv < nmp->nm_locations.nl_locations[loc]->nl_servcount; serv++) {
@@ -1278,7 +1278,7 @@ nfs_connect(struct nfsmount *nmp, int verbose, int timeo)
 	savederror = error = 0;
 
 tryagain:
-	/* initialize socket search state */
+	                                    
 	bzero(&nss, sizeof(nss));
 	nss.nss_addrcnt = addrtotal;
 	nss.nss_error = savederror;
@@ -1291,13 +1291,13 @@ tryagain:
 		nss.nss_flags |= NSS_VERBOSE;
 	}
 
-	/* First time connecting, we may need to negotiate some things */
+	                                                                 
 	if (!(nmp->nm_sockflags & NMSOCK_HASCONNECTED)) {
 		NFS_SOCK_DBG("so_family = %d\n", nmp->nm_sofamily);
 		NFS_SOCK_DBG("nfs port = %d local: <%s>\n", nmp->nm_nfsport, nmp->nm_nfs_localport ? nmp->nm_nfs_localport : "");
 		NFS_SOCK_DBG("mount port = %d local: <%s>\n", nmp->nm_mountport, nmp->nm_mount_localport ? nmp->nm_mount_localport : "");
 		if (!nmp->nm_vers) {
-			/* No NFS version specified... */
+			                                 
 			if (!nmp->nm_nfsport || (!NM_OMATTR_GIVEN(nmp, FH) && !nmp->nm_mountport)) {
 #if CONFIG_NFS4
 				if (PVER2MAJOR(nmp->nm_max_vers) >= NFS_VER4 && tryv4) {
@@ -1307,7 +1307,7 @@ tryagain:
 					nss.nss_flags |= NSS_FALLBACK2PMAP;
 				} else {
 #endif
-				/* ...connect to portmapper first if we (may) need any ports. */
+				                                                                
 				nss.nss_port = PMAPPORT;
 				nss.nss_protocol = PMAPPROG;
 				nss.nss_version = 0;
@@ -1315,7 +1315,7 @@ tryagain:
 			}
 #endif
 			} else {
-				/* ...connect to NFS port first. */
+				                                   
 				nss.nss_port = nmp->nm_nfsport;
 				nss.nss_protocol = NFS_PROG;
 				nss.nss_version = 0;
@@ -1323,15 +1323,15 @@ tryagain:
 #if CONFIG_NFS4
 		} else if (nmp->nm_vers >= NFS_VER4) {
 			if (tryv4) {
-				/* For NFSv4, we use the given (or default) port. */
+				                                                    
 				nss.nss_port = nmp->nm_nfsport ? nmp->nm_nfsport : NFS_PORT;
 				nss.nss_protocol = NFS_PROG;
 				nss.nss_version = 4;
-				/*
-				 * set NSS_FALLBACK2PMAP here to pick up any non standard port
-				 * if no port is specified on the mount;
-				 * Note nm_vers is set so we will only try NFS_VER4.
-				 */
+				  
+                                                                  
+                                            
+                                                        
+       
 				if (!nmp->nm_nfsport) {
 					nss.nss_flags |= NSS_FALLBACK2PMAP;
 				}
@@ -1342,14 +1342,14 @@ tryagain:
 			}
 #endif
 		} else {
-			/* For NFSv3/v2... */
+			                     
 			if (!nmp->nm_nfsport || (!NM_OMATTR_GIVEN(nmp, FH) && !nmp->nm_mountport)) {
-				/* ...connect to portmapper first if we need any ports. */
+				                                                          
 				nss.nss_port = PMAPPORT;
 				nss.nss_protocol = PMAPPROG;
 				nss.nss_version = 0;
 			} else {
-				/* ...connect to NFS port first. */
+				                                   
 				nss.nss_port = nmp->nm_nfsport;
 				nss.nss_protocol = NFS_PROG;
 				nss.nss_version = nmp->nm_vers;
@@ -1359,9 +1359,9 @@ tryagain:
 		    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nss.nss_sotype, nss.nss_port,
 		    nss.nss_protocol, nss.nss_version);
 	} else {
-		/* we've connected before, just connect to NFS port */
+		                                                      
 		if (!nmp->nm_nfsport) {
-			/* need to ask portmapper which port that would be */
+			                                                     
 			nss.nss_port = PMAPPORT;
 			nss.nss_protocol = PMAPPROG;
 			nss.nss_version = 0;
@@ -1375,8 +1375,8 @@ tryagain:
 		    nss.nss_protocol, nss.nss_version);
 	}
 
-	/* Set next location to first valid location. */
-	/* If start location is invalid, find next location. */
+	                                                
+	                                                       
 	nss.nss_nextloc = nss.nss_startloc;
 	if ((nss.nss_nextloc.nli_serv >= nmp->nm_locations.nl_locations[nss.nss_nextloc.nli_loc]->nl_servcount) ||
 	    (nss.nss_nextloc.nli_addr >= nmp->nm_locations.nl_locations[nss.nss_nextloc.nli_loc]->nl_servers[nss.nss_nextloc.nli_serv]->ns_addrcount)) {
@@ -1393,7 +1393,7 @@ keepsearching:
 
 	error = nfs_connect_search_loop(nmp, &nss);
 	if (error || !nss.nss_sock) {
-		/* search failed */
+		                   
 		nfs_socket_search_cleanup(&nss);
 		if (nss.nss_flags & NSS_FALLBACK2PMAP) {
 			tryv4 = 0;
@@ -1403,7 +1403,7 @@ keepsearching:
 		}
 
 		if (!error && (nss.nss_sotype == SOCK_STREAM) && !nmp->nm_sotype && (nmp->nm_vers < NFS_VER4)) {
-			/* Try using UDP */
+			                   
 			sotype = SOCK_DGRAM;
 			savederror = nss.nss_error;
 			NFS_SOCK_DBG("nfs connect %s TCP failed %d %d, trying UDP\n",
@@ -1432,11 +1432,11 @@ keepsearching:
 		return error;
 	}
 
-	/* try to use nss_sock */
+	                         
 	nso = nss.nss_sock;
 	nss.nss_sock = NULL;
 
-	/* We may be speaking to portmap first... to determine port(s). */
+	                                                                  
 	if (nso->nso_saddr->sa_family == AF_INET) {
 		port = ntohs(((struct sockaddr_in*)nso->nso_saddr)->sin_port);
 	} else if (nso->nso_saddr->sa_family == AF_INET6) {
@@ -1448,17 +1448,17 @@ keepsearching:
 	}
 
 	if (port == PMAPPORT) {
-		/* Use this portmapper port to get the port #s we need. */
+		                                                          
 		NFS_SOCK_DBG("nfs connect %s got portmapper socket %p\n",
 		    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso);
 
-		/* remove the connect upcall so nfs_portmap_lookup() can use this socket */
+		                                                                           
 		sock_setupcall(nso->nso_so, NULL, NULL);
 
-		/* Set up socket address and port for NFS socket. */
+		                                                    
 		bcopy(nso->nso_saddr, &ss, nso->nso_saddr->sa_len);
 
-		/* If NFS version not set, try nm_max_vers down to nm_min_vers */
+		                                                                 
 		nfsvers = nmp->nm_vers ? nmp->nm_vers : PVER2MAJOR(nmp->nm_max_vers);
 		if (!(port = nmp->nm_nfsport)) {
 			if (ss.ss_family == AF_INET) {
@@ -1472,11 +1472,11 @@ keepsearching:
 			}
 			for (; nfsvers >= (int)PVER2MAJOR(nmp->nm_min_vers); nfsvers--) {
 				if (nmp->nm_vers && nmp->nm_vers != nfsvers) {
-					continue; /* Wrong version */
+					continue;                    
 				}
 #if CONFIG_NFS4
 				if (nfsvers == NFS_VER4 && nso->nso_sotype == SOCK_DGRAM) {
-					continue; /* NFSv4 does not do UDP */
+					continue;                            
 				}
 #endif
 				if (ss.ss_family == AF_LOCAL && nmp->nm_nfs_localport) {
@@ -1502,7 +1502,7 @@ keepsearching:
 					}
 #if CONFIG_NFS4
 					if (port == NFS_PORT && nfsvers == NFS_VER4 && tryv4 == 0) {
-						continue; /* We already tried this */
+						continue;                            
 					}
 #endif
 				}
@@ -1524,8 +1524,8 @@ keepsearching:
 			NFS_SOCK_DBG("Using supplied nfs_local_port %s for NFS_PROG\n", nmp->nm_nfs_localport);
 		}
 
-		/* Create NFS protocol socket and add it to the list of sockets. */
-		/* N.B. If nfsvers is NFS_VER4 at this point then we're on a non standard port */
+		                                                                   
+		                                                                                 
 		if (ss.ss_family == AF_LOCAL) {
 			NFS_SOCK_DBG("Creating NFS socket for %s port = %d\n", ((struct sockaddr_un*)&ss)->sun_path, port);
 		}
@@ -1550,7 +1550,7 @@ keepsearching:
 		TAILQ_INSERT_TAIL(&nss.nss_socklist, nsonfs, nso_link);
 		nss.nss_sockcnt++;
 		if ((nfsvers < NFS_VER4) && !(nmp->nm_sockflags & NMSOCK_HASCONNECTED) && !NM_OMATTR_GIVEN(nmp, FH)) {
-			/* Set up socket address and port for MOUNT socket. */
+			                                                      
 			error = 0;
 			bcopy(nso->nso_saddr, &ss, nso->nso_saddr->sa_len);
 			port = nmp->nm_mountport;
@@ -1564,8 +1564,8 @@ keepsearching:
 				strlcpy(((struct sockaddr_un*)&ss)->sun_path, nmp->nm_mount_localport, sizeof(((struct sockaddr_un*)&ss)->sun_path));
 			}
 			if (!port) {
-				/* Get port/sockaddr for MOUNT version corresponding to NFS version. */
-				/* If NFS version is unknown, optimistically choose for NFSv3. */
+				                                                                       
+				                                                                 
 				int mntvers = (nfsvers == NFS_VER2) ? RPCMNT_VER1 : RPCMNT_VER3;
 				int mntproto = (NM_OMFLAG(nmp, MNTUDP) || (nso->nso_sotype == SOCK_DGRAM)) ? IPPROTO_UDP : IPPROTO_TCP;
 				NFS_SOCK_DBG("Looking up mount port with socket %p\n", nso->nso_so);
@@ -1584,7 +1584,7 @@ keepsearching:
 					error = EPROGUNAVAIL;
 				}
 			}
-			/* create sockaddr for MOUNT */
+			                               
 			if (!error) {
 				MALLOC(nsonfs->nso_saddr2, struct sockaddr *, ss.ss_len, M_SONAME, M_WAITOK | M_ZERO);
 			}
@@ -1607,18 +1607,18 @@ keepsearching:
 		goto keepsearching;
 	}
 
-	/* nso is an NFS socket */
+	                          
 	NFS_SOCK_DBG("nfs connect %s got NFS socket %p\n", vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso);
 
-	/* If NFS version wasn't specified, it was determined during the connect. */
+	                                                                            
 	nfsvers = nmp->nm_vers ? nmp->nm_vers : (int)nso->nso_version;
 
-	/* Perform MOUNT call for initial NFSv2/v3 connection/mount. */
+	                                                               
 	if ((nfsvers < NFS_VER4) && !(nmp->nm_sockflags & NMSOCK_HASCONNECTED) && !NM_OMATTR_GIVEN(nmp, FH)) {
 		error = 0;
 		saddr = nso->nso_saddr2;
 		if (!saddr) {
-			/* Need sockaddr for MOUNT port */
+			                                  
 			NFS_SOCK_DBG("Getting mount address mountport = %d, mount_localport = %s\n", nmp->nm_mountport, nmp->nm_mount_localport);
 			bcopy(nso->nso_saddr, &ss, nso->nso_saddr->sa_len);
 			port = nmp->nm_mountport;
@@ -1631,7 +1631,7 @@ keepsearching:
 				strlcpy(((struct sockaddr_un*)&ss)->sun_path, nmp->nm_mount_localport, sizeof(((struct sockaddr_un*)&ss)->sun_path));
 			}
 			if (!port) {
-				/* Get port/sockaddr for MOUNT version corresponding to NFS version. */
+				                                                                       
 				int mntvers = (nfsvers == NFS_VER2) ? RPCMNT_VER1 : RPCMNT_VER3;
 				int so_type = NM_OMFLAG(nmp, MNTUDP) ? SOCK_DGRAM : nso->nso_sotype;
 				error = nfs_portmap_lookup(nmp, vfs_context_current(), (struct sockaddr*)&ss,
@@ -1684,19 +1684,19 @@ keepsearching:
 		NFS_SOCK_DBG("nfs connect %s socket %p mount %d\n",
 		    vfs_statfs(nmp->nm_mountp)->f_mntfromname, nso, error);
 		if (!error) {
-			/* Make sure we can agree on a security flavor. */
-			int o, s;  /* indices into mount option and server security flavor lists */
+			                                                  
+			int o, s;                                                                  
 			int found = 0;
 
 			if ((nfsvers == NFS_VER3) && !nmp->nm_servsec.count) {
-				/* Some servers return an empty list to indicate RPCAUTH_SYS? */
+				                                                                
 				nmp->nm_servsec.count = 1;
 				nmp->nm_servsec.flavors[0] = RPCAUTH_SYS;
 			}
 			if (nmp->nm_sec.count) {
-				/* Choose the first flavor in our list that the server supports. */
+				                                                                   
 				if (!nmp->nm_servsec.count) {
-					/* we don't know what the server supports, just use our first choice */
+					                                                                       
 					nmp->nm_auth = nmp->nm_sec.flavors[0];
 					found = 1;
 				}
@@ -1709,7 +1709,7 @@ keepsearching:
 					}
 				}
 			} else {
-				/* Choose the first one we support from the server's list. */
+				                                                             
 				if (!nmp->nm_servsec.count) {
 					nmp->nm_auth = RPCAUTH_SYS;
 					found = 1;
@@ -1717,7 +1717,7 @@ keepsearching:
 				for (s = 0; s < nmp->nm_servsec.count; s++) {
 					switch (nmp->nm_servsec.flavors[s]) {
 					case RPCAUTH_SYS:
-						/* prefer RPCAUTH_SYS to RPCAUTH_NONE */
+						                                        
 						if (found && (nmp->nm_auth == RPCAUTH_NONE)) {
 							found = 0;
 						}
@@ -1751,7 +1751,7 @@ keepsearching:
 		NFS_BITMAP_SET(nmp->nm_flags, NFS_MFLAG_CALLUMNT);
 	}
 
-	/* put the real upcall in place */
+	                                  
 	upcall = (nso->nso_sotype == SOCK_STREAM) ? nfs_tcp_rcv : nfs_udp_rcv;
 	error = sock_setupcall(nso->nso_so, upcall, nmp);
 	if (error) {
@@ -1761,20 +1761,20 @@ keepsearching:
 	}
 
 	if (!(nmp->nm_sockflags & NMSOCK_HASCONNECTED)) {
-		/* set mntfromname to this location */
+		                                      
 		if (!NM_OMATTR_GIVEN(nmp, MNTFROM)) {
 			nfs_location_mntfromname(&nmp->nm_locations, nso->nso_location,
 			    vfs_statfs(nmp->nm_mountp)->f_mntfromname,
 			    sizeof(vfs_statfs(nmp->nm_mountp)->f_mntfromname), 0);
 		}
-		/* some negotiated values need to remain unchanged for the life of the mount */
+		                                                                               
 		if (!nmp->nm_sotype) {
 			nmp->nm_sotype = nso->nso_sotype;
 		}
 		if (!nmp->nm_vers) {
 			nmp->nm_vers = nfsvers;
 #if CONFIG_NFS4
-			/* If we negotiated NFSv4, set nm_nfsport if we ended up on the standard NFS port */
+			                                                                                    
 			if ((nfsvers >= NFS_VER4) && !NFS_BITMAP_ISSET(nmp->nm_mattrs, NFS_MATTR_NFS_PORT)) {
 				if (nso->nso_saddr->sa_family == AF_INET) {
 					port = ((struct sockaddr_in*)nso->nso_saddr)->sin_port = htons(port);
@@ -1790,7 +1790,7 @@ keepsearching:
 #endif
 		}
 #if CONFIG_NFS4
-		/* do some version-specific pre-mount set up */
+		                                               
 		if (nmp->nm_vers >= NFS_VER4) {
 			microtime(&now);
 			nmp->nm_mounttime = ((uint64_t)now.tv_sec << 32) | now.tv_usec;
@@ -1801,21 +1801,21 @@ keepsearching:
 #endif
 	}
 
-	/* Initialize NFS socket state variables */
+	                                           
 	lck_mtx_lock(&nmp->nm_lock);
 	nmp->nm_srtt[0] = nmp->nm_srtt[1] = nmp->nm_srtt[2] =
 	    nmp->nm_srtt[3] = (NFS_TIMEO << 3);
 	nmp->nm_sdrtt[0] = nmp->nm_sdrtt[1] = nmp->nm_sdrtt[2] =
 	    nmp->nm_sdrtt[3] = 0;
 	if (nso->nso_sotype == SOCK_DGRAM) {
-		nmp->nm_cwnd = NFS_MAXCWND / 2;     /* Initial send window */
+		nmp->nm_cwnd = NFS_MAXCWND / 2;                              
 		nmp->nm_sent = 0;
 	} else if (nso->nso_sotype == SOCK_STREAM) {
 		nmp->nm_timeouts = 0;
 	}
 	nmp->nm_sockflags &= ~NMSOCK_CONNECTING;
 	nmp->nm_sockflags |= NMSOCK_SETUP;
-	/* move the socket to the mount structure */
+	                                            
 	nmp->nm_nso = nso;
 	oldsaddr = nmp->nm_saddr;
 	nmp->nm_saddr = nso->nso_saddr;
@@ -1833,7 +1833,7 @@ keepsearching:
 		nfs_socket_search_update_error(&nss, error);
 		nmp->nm_saddr = oldsaddr;
 		if (!(nmp->nm_sockflags & NMSOCK_HASCONNECTED)) {
-			/* undo settings made prior to setup */
+			                                       
 			if (!NFS_BITMAP_ISSET(nmp->nm_mattrs, NFS_MATTR_SOCKET_TYPE)) {
 				nmp->nm_sotype = 0;
 			}
@@ -1859,17 +1859,17 @@ keepsearching:
 		goto keepsearching;
 	}
 
-	/* update current location */
+	                             
 	if ((nmp->nm_locations.nl_current.nli_flags & NLI_VALID) &&
 	    (nmp->nm_locations.nl_current.nli_serv != nso->nso_location.nli_serv)) {
-		/* server has changed, we should initiate failover/recovery */
-		// XXX
+		                                                              
+		      
 	}
 	nmp->nm_locations.nl_current = nso->nso_location;
 	nmp->nm_locations.nl_current.nli_flags |= NLI_VALID;
 
 	if (!(nmp->nm_sockflags & NMSOCK_HASCONNECTED)) {
-		/* We have now successfully connected... make a note of it. */
+		                                                              
 		nmp->nm_sockflags |= NMSOCK_HASCONNECTED;
 	}
 
@@ -1896,7 +1896,7 @@ keepsearching:
 }
 
 
-/* setup & confirm socket connection is functional */
+                                                     
 int
 nfs_connect_setup(
 #if !CONFIG_NFS4
@@ -1908,7 +1908,7 @@ nfs_connect_setup(
 #if CONFIG_NFS4
 	if (nmp->nm_vers >= NFS_VER4) {
 		if (nmp->nm_state & NFSSTA_CLIENTID) {
-			/* first, try to renew our current state */
+			                                           
 			error = nfs4_renew(nmp, R_SETUP);
 			if ((error == NFSERR_ADMIN_REVOKED) ||
 			    (error == NFSERR_CB_PATH_DOWN) ||
@@ -1926,14 +1926,14 @@ nfs_connect_setup(
 	return error;
 }
 
-/*
- * NFS socket reconnect routine:
- * Called when a connection is broken.
- * - disconnect the old socket
- * - nfs_connect() again
- * - set R_MUSTRESEND for all outstanding requests on mount point
- * If this fails the mount point is DEAD!
- */
+  
+                                
+                                      
+                              
+                        
+                                                                 
+                                         
+   
 int
 nfs_reconnect(struct nfsmount *nmp)
 {
@@ -1971,8 +1971,8 @@ nfs_reconnect(struct nfsmount *nmp)
 		}
 		lck_mtx_lock(&nmp->nm_lock);
 		if (!(nmp->nm_state & NFSSTA_MOUNTED)) {
-			/* we're not yet completely mounted and */
-			/* we can't reconnect, so we fail */
+			                                          
+			                                    
 			lck_mtx_unlock(&nmp->nm_lock);
 			NFS_SOCK_DBG("Not mounted returning %d\n", error);
 			return error;
@@ -1999,11 +1999,11 @@ nfs_reconnect(struct nfsmount *nmp)
 		nfs_up(nmp, thd, NFSSTA_TIMEO, "connected");
 	}
 
-	/*
-	 * Loop through outstanding request list and mark all requests
-	 * as needing a resend.  (Though nfs_need_reconnect() probably
-	 * marked them all already.)
-	 */
+	  
+                                                               
+                                                               
+                             
+    
 	lck_mtx_lock(&nfs_request_mutex);
 	TAILQ_FOREACH(rq, &nfs_reqq, r_chain) {
 		if (rq->r_nmp == nmp) {
@@ -2023,9 +2023,9 @@ nfs_reconnect(struct nfsmount *nmp)
 	return 0;
 }
 
-/*
- * NFS disconnect. Clean up and unlink.
- */
+  
+                                       
+   
 void
 nfs_disconnect(struct nfsmount *nmp)
 {
@@ -2035,12 +2035,12 @@ nfs_disconnect(struct nfsmount *nmp)
 tryagain:
 	if (nmp->nm_nso) {
 		struct timespec ts = { .tv_sec = 1, .tv_nsec = 0 };
-		if (nmp->nm_state & NFSSTA_SENDING) { /* wait for sending to complete */
+		if (nmp->nm_state & NFSSTA_SENDING) {                                   
 			nmp->nm_state |= NFSSTA_WANTSND;
 			msleep(&nmp->nm_state, &nmp->nm_lock, PZERO - 1, "nfswaitsending", &ts);
 			goto tryagain;
 		}
-		if (nmp->nm_sockflags & NMSOCK_POKE) { /* wait for poking to complete */
+		if (nmp->nm_sockflags & NMSOCK_POKE) {                                  
 			msleep(&nmp->nm_sockflags, &nmp->nm_lock, PZERO - 1, "nfswaitpoke", &ts);
 			goto tryagain;
 		}
@@ -2061,9 +2061,9 @@ tryagain:
 	}
 }
 
-/*
- * mark an NFS mount as needing a reconnect/resends.
- */
+  
+                                                    
+   
 void
 nfs_need_reconnect(struct nfsmount *nmp)
 {
@@ -2073,10 +2073,10 @@ nfs_need_reconnect(struct nfsmount *nmp)
 	nmp->nm_sockflags &= ~(NMSOCK_READY | NMSOCK_SETUP);
 	lck_mtx_unlock(&nmp->nm_lock);
 
-	/*
-	 * Loop through outstanding request list and
-	 * mark all requests as needing a resend.
-	 */
+	  
+                                             
+                                          
+    
 	lck_mtx_lock(&nfs_request_mutex);
 	TAILQ_FOREACH(rq, &nfs_reqq, r_chain) {
 		if (rq->r_nmp == nmp) {
@@ -2096,9 +2096,9 @@ nfs_need_reconnect(struct nfsmount *nmp)
 }
 
 
-/*
- * thread to handle miscellaneous async NFS socket work (reconnects/resends)
- */
+  
+                                                                            
+   
 void
 nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 {
@@ -2121,7 +2121,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 		if (nmp->nm_sockflags & NMSOCK_UNMOUNT) {
 			break;
 		}
-		/* do reconnect, if necessary */
+		                                
 		if (!(nmp->nm_sockflags & NMSOCK_READY) && !(nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD))) {
 			if (nmp->nm_reconnect_start <= 0) {
 				microuptime(&now);
@@ -2129,11 +2129,11 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 			}
 			lck_mtx_unlock(&nmp->nm_lock);
 			NFS_SOCK_DBG("nfs reconnect %s\n", vfs_statfs(nmp->nm_mountp)->f_mntfromname);
-			/*
-			 * XXX We don't want to call reconnect again right away if returned errors
-			 * before that may not have blocked. This has caused spamming null procs
-			 * from machines in the pass.
-			 */
+			  
+                                                                             
+                                                                           
+                                
+      
 			if (do_reconnect_sleep) {
 				tsleep(nfs_mount_sock_thread, PSOCK, "nfs_reconnect_sock_thread_delay", hz);
 			}
@@ -2155,13 +2155,13 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 		    (nmp->nm_state & NFSSTA_RECOVER) &&
 		    !(nmp->nm_sockflags & NMSOCK_UNMOUNT) &&
 		    !(nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD))) {
-			/* perform state recovery */
+			                            
 			lck_mtx_unlock(&nmp->nm_lock);
 			nfs_recover(nmp);
 			lck_mtx_lock(&nmp->nm_lock);
 		}
 #if CONFIG_NFS4
-		/* handle NFSv4 delegation returns */
+		                                     
 		while ((nmp->nm_vers >= NFS_VER4) && !(nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD)) &&
 		    (nmp->nm_sockflags & NMSOCK_READY) && !(nmp->nm_state & NFSSTA_RECOVER) &&
 		    ((np = TAILQ_FIRST(&nmp->nm_dreturnq)))) {
@@ -2170,7 +2170,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 			lck_mtx_lock(&nmp->nm_lock);
 		}
 #endif
-		/* do resends, if necessary/possible */
+		                                       
 		while ((((nmp->nm_sockflags & NMSOCK_READY) && !(nmp->nm_state & NFSSTA_RECOVER)) ||
 		    (nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD))) &&
 		    ((req = TAILQ_FIRST(&nmp->nm_resendq)))) {
@@ -2183,7 +2183,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 			if (!req) {
 				break;
 			}
-			/* acquire both locks in the right order: first req->r_mtx and then nmp->nm_lock */
+			                                                                                   
 			lck_mtx_unlock(&nmp->nm_lock);
 			lck_mtx_lock(&req->r_mtx);
 			lck_mtx_lock(&nmp->nm_lock);
@@ -2195,7 +2195,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 			req->r_flags &= ~R_RESENDQ;
 			req->r_rchain.tqe_next = NFSREQNOLIST;
 			lck_mtx_unlock(&nmp->nm_lock);
-			/* Note that we have a reference on the request that was taken nfs_asyncio_resend */
+			                                                                                    
 			if (req->r_error || req->r_nmrep.nmc_mhead) {
 				dofinish = req->r_callback.rcb_func && !(req->r_flags & R_WAITSENT);
 				wakeup(req);
@@ -2211,7 +2211,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 				req->r_flags &= ~R_RESTART;
 				req->r_resendtime = 0;
 				lck_mtx_unlock(&req->r_mtx);
-				/* async RPCs on GSS mounts need to be rebuilt and resent. */
+				                                                             
 				nfs_reqdequeue(req);
 #if CONFIG_NFS_GSS
 				if (nfs_request_using_gss(req)) {
@@ -2221,7 +2221,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 						req->r_xid = 0;
 					}
 				}
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 				NFS_SOCK_DBG("nfs async%s restart: p %d x 0x%llx f 0x%x rtt %d\n",
 				    nfs_request_using_gss(req) ? " gss" : "", req->r_procnum, req->r_xid,
 				    req->r_flags, req->r_rtt);
@@ -2281,7 +2281,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 		if (nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD)) {
 			break;
 		}
-		/* check monitored nodes, if necessary/possible */
+		                                                  
 		if (!LIST_EMPTY(&nmp->nm_monlist)) {
 			nmp->nm_state |= NFSSTA_MONITOR_SCAN;
 			LIST_FOREACH(np, &nmp->nm_monlist, n_monlink) {
@@ -2292,7 +2292,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 				np->n_mflag |= NMMONSCANINPROG;
 				lck_mtx_unlock(&nmp->nm_lock);
 				error = nfs_getattr(np, NULL, vfs_context_kernel(), (NGA_UNCACHED | NGA_MONITOR));
-				if (!error && ISSET(np->n_flag, NUPDATESIZE)) { /* update quickly to avoid multiple events */
+				if (!error && ISSET(np->n_flag, NUPDATESIZE)) {                                              
 					nfs_data_update_size(np, 0);
 				}
 				lck_mtx_lock(&nmp->nm_lock);
@@ -2308,7 +2308,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 			}
 			nmp->nm_state &= ~NFSSTA_MONITOR_SCAN;
 			if (nmp->nm_state & NFSSTA_UNMOUNTING) {
-				wakeup(&nmp->nm_state); /* let unmounting thread know scan is done */
+				wakeup(&nmp->nm_state);                                              
 			}
 		}
 		if ((nmp->nm_sockflags & NMSOCK_READY) || (nmp->nm_state & (NFSSTA_RECOVER | NFSSTA_UNMOUNTING))) {
@@ -2322,7 +2322,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 		}
 	}
 
-	/* If we're unmounting, send the unmount RPC, if requested/appropriate. */
+	                                                                          
 	if ((nmp->nm_sockflags & NMSOCK_UNMOUNT) &&
 	    (nmp->nm_state & NFSSTA_MOUNTED) && NMFLAG(nmp, CALLUMNT) &&
 	    (nmp->nm_vers < NFS_VER4) && !(nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD))) {
@@ -2340,7 +2340,7 @@ nfs_mount_sock_thread(void *arg, __unused wait_result_t wr)
 	thread_terminate(thd);
 }
 
-/* start or wake a mount's socket thread */
+                                           
 void
 nfs_mount_sock_thread_wake(struct nfsmount *nmp)
 {
@@ -2351,11 +2351,11 @@ nfs_mount_sock_thread_wake(struct nfsmount *nmp)
 	}
 }
 
-/*
- * Check if we should mark the mount dead because the
- * unresponsive mount has reached the dead timeout.
- * (must be called with nmp locked)
- */
+  
+                                                     
+                                                   
+                                   
+   
 int
 nfs_mount_check_dead_timeout(struct nfsmount *nmp)
 {
@@ -2378,12 +2378,12 @@ nfs_mount_check_dead_timeout(struct nfsmount *nmp)
 	return 1;
 }
 
-/*
- * Call nfs_mount_zombie to remove most of the
- * nfs state for the mount, and then ask to be forcibly unmounted.
- *
- * Assumes the nfs mount structure lock nm_lock is held.
- */
+  
+                                              
+                                                                  
+  
+                                                        
+   
 
 void
 nfs_mount_make_zombie(struct nfsmount *nmp)
@@ -2408,31 +2408,31 @@ nfs_mount_make_zombie(struct nfsmount *nmp)
 }
 
 
-/*
- * NFS callback channel socket state
- */
+  
+                                    
+   
 struct nfs_callback_socket {
 	TAILQ_ENTRY(nfs_callback_socket) ncbs_link;
-	socket_t                        ncbs_so;        /* the socket */
-	struct sockaddr_storage         ncbs_saddr;     /* socket address */
-	struct nfs_rpc_record_state     ncbs_rrs;       /* RPC record parsing state */
-	time_t                          ncbs_stamp;     /* last accessed at */
-	uint32_t                        ncbs_flags;     /* see below */
+	socket_t                        ncbs_so;                        
+	struct sockaddr_storage         ncbs_saddr;                         
+	struct nfs_rpc_record_state     ncbs_rrs;                                     
+	time_t                          ncbs_stamp;                           
+	uint32_t                        ncbs_flags;                    
 };
 #define NCBSOCK_UPCALL          0x0001
 #define NCBSOCK_UPCALLWANT      0x0002
 #define NCBSOCK_DEAD            0x0004
 
 #if CONFIG_NFS4
-/*
- * NFS callback channel state
- *
- * One listening socket for accepting socket connections from servers and
- * a list of connected sockets to handle callback requests on.
- * Mounts registered with the callback channel are assigned IDs and
- * put on a list so that the callback request handling code can match
- * the requests up with mounts.
- */
+  
+                             
+  
+                                                                         
+                                                              
+                                                                   
+                                                                     
+                               
+   
 socket_t nfs4_cb_so = NULL;
 socket_t nfs4_cb_so6 = NULL;
 in_port_t nfs4_cb_port = 0;
@@ -2444,12 +2444,12 @@ TAILQ_HEAD(nfs4_cb_mount_list, nfsmount) nfs4_cb_mounts;
 
 int nfs4_cb_handler(struct nfs_callback_socket *, mbuf_t);
 
-/*
- * Set up the callback channel for the NFS mount.
- *
- * Initializes the callback channel socket state and
- * assigns a callback ID to the mount.
- */
+  
+                                                 
+  
+                                                    
+                                      
+   
 void
 nfs4_mount_callback_setup(struct nfsmount *nmp)
 {
@@ -2479,7 +2479,7 @@ nfs4_mount_callback_setup(struct nfsmount *nmp)
 		return;
 	}
 
-	/* IPv4 */
+	          
 	error = sock_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nfs4_cb_accept, NULL, &nfs4_cb_so);
 	if (error) {
 		log(LOG_INFO, "nfs callback setup: error %d creating listening IPv4 socket\n", error);
@@ -2497,7 +2497,7 @@ nfs4_mount_callback_setup(struct nfsmount *nmp)
 	sin.sin_len = sizeof(struct sockaddr_in);
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
-	sin.sin_port = htons((in_port_t)nfs_callback_port); /* try to use specified port */
+	sin.sin_port = htons((in_port_t)nfs_callback_port);                                
 	error = sock_bind(so, (struct sockaddr *)&sin);
 	if (error) {
 		log(LOG_INFO, "nfs callback setup: error %d binding listening IPv4 socket\n", error);
@@ -2516,7 +2516,7 @@ nfs4_mount_callback_setup(struct nfsmount *nmp)
 		goto fail;
 	}
 
-	/* receive timeout shouldn't matter.  If timeout on send, we'll want to drop the socket */
+	                                                                                          
 	timeo.tv_usec = 0;
 	timeo.tv_sec = 60;
 	error = sock_setsockopt(so, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
@@ -2532,7 +2532,7 @@ nfs4_mount_callback_setup(struct nfsmount *nmp)
 	sock_setsockopt(so, SOL_SOCKET, SO_UPCALLCLOSEWAIT, &on, sizeof(on));
 	error = 0;
 
-	/* IPv6 */
+	          
 	error = sock_socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP, nfs4_cb_accept, NULL, &nfs4_cb_so6);
 	if (error) {
 		log(LOG_INFO, "nfs callback setup: error %d creating listening IPv6 socket\n", error);
@@ -2542,7 +2542,7 @@ nfs4_mount_callback_setup(struct nfsmount *nmp)
 
 	sock_setsockopt(so6, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	sock_setsockopt(so6, IPPROTO_IPV6, IPV6_V6ONLY, &on, sizeof(on));
-	/* try to use specified port or same port as IPv4 */
+	                                                    
 	port = nfs_callback_port ? (in_port_t)nfs_callback_port : nfs4_cb_port;
 ipv6_bind_again:
 	sin6.sin6_len = sizeof(struct sockaddr_in6);
@@ -2552,7 +2552,7 @@ ipv6_bind_again:
 	error = sock_bind(so6, (struct sockaddr *)&sin6);
 	if (error) {
 		if (port != nfs_callback_port) {
-			/* if we simply tried to match the IPv4 port, then try any port */
+			                                                                  
 			port = 0;
 			goto ipv6_bind_again;
 		}
@@ -2572,7 +2572,7 @@ ipv6_bind_again:
 		goto fail;
 	}
 
-	/* receive timeout shouldn't matter.  If timeout on send, we'll want to drop the socket */
+	                                                                                          
 	timeo.tv_usec = 0;
 	timeo.tv_sec = 60;
 	error = sock_setsockopt(so6, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
@@ -2605,13 +2605,13 @@ fail:
 	}
 }
 
-/*
- * Shut down the callback channel for the NFS mount.
- *
- * Clears the mount's callback ID and releases the mounts
- * reference on the callback socket.  Last reference dropped
- * will also shut down the callback socket(s).
- */
+  
+                                                    
+  
+                                                         
+                                                            
+                                              
+   
 void
 nfs4_mount_callback_shutdown(struct nfsmount *nmp)
 {
@@ -2626,7 +2626,7 @@ nfs4_mount_callback_shutdown(struct nfsmount *nmp)
 		return;
 	}
 	TAILQ_REMOVE(&nfs4_cb_mounts, nmp, nm_cblink);
-	/* wait for any callbacks in progress to complete */
+	                                                    
 	while (nmp->nm_cbrefs) {
 		msleep(&nmp->nm_cbrefs, &nfs_global_mutex, PSOCK, "cbshutwait", &ts);
 	}
@@ -2658,9 +2658,9 @@ nfs4_mount_callback_shutdown(struct nfsmount *nmp)
 	}
 }
 
-/*
- * Check periodically for stale/unused nfs callback sockets
- */
+  
+                                                           
+   
 #define NFS4_CB_TIMER_PERIOD    30
 #define NFS4_CB_IDLE_MAX        300
 void
@@ -2696,9 +2696,9 @@ loop:
 	lck_mtx_unlock(&nfs_global_mutex);
 }
 
-/*
- * Accept a new callback socket.
- */
+  
+                                
+   
 void
 nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 {
@@ -2716,7 +2716,7 @@ nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 		return;
 	}
 
-	/* allocate/initialize a new nfs_callback_socket */
+	                                                   
 	MALLOC(ncbsp, struct nfs_callback_socket *, sizeof(struct nfs_callback_socket), M_TEMP, M_WAITOK);
 	if (!ncbsp) {
 		log(LOG_ERR, "nfs callback accept: no memory for new socket\n");
@@ -2726,7 +2726,7 @@ nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 	ncbsp->ncbs_saddr.ss_len = (ip == 4) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
 	nfs_rpc_record_state_init(&ncbsp->ncbs_rrs);
 
-	/* accept a new socket */
+	                         
 	error = sock_accept(so, (struct sockaddr*)&ncbsp->ncbs_saddr,
 	    ncbsp->ncbs_saddr.ss_len, MSG_DONTWAIT,
 	    nfs4_cb_rcv, ncbsp, &newso);
@@ -2736,8 +2736,8 @@ nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 		return;
 	}
 
-	/* set up the new socket */
-	/* receive timeout shouldn't matter.  If timeout on send, we'll want to drop the socket */
+	                           
+	                                                                                          
 	timeo.tv_usec = 0;
 	timeo.tv_sec = 60;
 	error = sock_setsockopt(newso, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
@@ -2759,12 +2759,12 @@ nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 
 	lck_mtx_lock(&nfs_global_mutex);
 
-	/* add it to the list */
+	                        
 	TAILQ_INSERT_HEAD(&nfs4_cb_socks, ncbsp, ncbs_link);
 
-	/* verify it's from a host we have mounted */
+	                                             
 	TAILQ_FOREACH(nmp, &nfs4_cb_mounts, nm_cblink) {
-		/* check if socket's source address matches this mount's server address */
+		                                                                          
 		if (!nmp->nm_saddr) {
 			continue;
 		}
@@ -2772,12 +2772,12 @@ nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 			break;
 		}
 	}
-	if (!nmp) { /* we don't want this socket, mark it dead */
+	if (!nmp) {                                              
 		ncbsp->ncbs_flags |= NCBSOCK_DEAD;
 	}
 
-	/* make sure the callback socket cleanup timer is running */
-	/* (shorten the timer if we've got a socket we don't want) */
+	                                                            
+	                                                             
 	if (!nfs4_callback_timer_on) {
 		nfs4_callback_timer_on = 1;
 		nfs_interval_timer_start(nfs4_callback_timer_call,
@@ -2791,10 +2791,10 @@ nfs4_cb_accept(socket_t so, __unused void *arg, __unused int waitflag)
 	lck_mtx_unlock(&nfs_global_mutex);
 }
 
-/*
- * Receive mbufs from callback sockets into RPC records and process each record.
- * Detect connection has been closed and shut down.
- */
+  
+                                                                                
+                                                   
+   
 void
 nfs4_cb_rcv(socket_t so, void *arg, __unused int waitflag)
 {
@@ -2806,28 +2806,28 @@ nfs4_cb_rcv(socket_t so, void *arg, __unused int waitflag)
 
 	lck_mtx_lock(&nfs_global_mutex);
 	while (ncbsp->ncbs_flags & NCBSOCK_UPCALL) {
-		/* wait if upcall is already in progress */
+		                                           
 		ncbsp->ncbs_flags |= NCBSOCK_UPCALLWANT;
 		msleep(ncbsp, &nfs_global_mutex, PSOCK, "cbupcall", &ts);
 	}
 	ncbsp->ncbs_flags |= NCBSOCK_UPCALL;
 	lck_mtx_unlock(&nfs_global_mutex);
 
-	/* loop while we make error-free progress */
+	                                            
 	while (!error && recv) {
 		error = nfs_rpc_record_read(so, &ncbsp->ncbs_rrs, MSG_DONTWAIT, &recv, &m);
-		if (m) { /* handle the request */
+		if (m) {                         
 			error = nfs4_cb_handler(ncbsp, m);
 		}
 	}
 
-	/* note: no error and no data indicates server closed its end */
+	                                                                
 	if ((error != EWOULDBLOCK) && (error || !recv)) {
-		/*
-		 * Socket is either being closed or should be.
-		 * We can't close the socket in the context of the upcall.
-		 * So we mark it as dead and leave it for the cleanup timer to reap.
-		 */
+		  
+                                                
+                                                            
+                                                                      
+     
 		ncbsp->ncbs_stamp = 0;
 		ncbsp->ncbs_flags |= NCBSOCK_DEAD;
 	} else {
@@ -2841,9 +2841,9 @@ nfs4_cb_rcv(socket_t so, void *arg, __unused int waitflag)
 	wakeup(ncbsp);
 }
 
-/*
- * Handle an NFS callback channel request.
- */
+  
+                                          
+   
 int
 nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 {
@@ -2866,28 +2866,28 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 	fh = zalloc(nfs_fhandle_zone);
 
 	nfsm_chain_dissect_init(error, &nmreq, mreq);
-	nfsm_chain_get_32(error, &nmreq, xid);          // RPC XID
-	nfsm_chain_get_32(error, &nmreq, val);          // RPC Call
+	nfsm_chain_get_32(error, &nmreq, xid);                    
+	nfsm_chain_get_32(error, &nmreq, val);                     
 	nfsm_assert(error, (val == RPC_CALL), EBADRPC);
-	nfsm_chain_get_32(error, &nmreq, val);          // RPC Version
+	nfsm_chain_get_32(error, &nmreq, val);                        
 	nfsm_assert(error, (val == RPC_VER2), ERPCMISMATCH);
-	nfsm_chain_get_32(error, &nmreq, val);          // RPC Program Number
+	nfsm_chain_get_32(error, &nmreq, val);                               
 	nfsm_assert(error, (val == NFS4_CALLBACK_PROG), EPROGUNAVAIL);
-	nfsm_chain_get_32(error, &nmreq, val);          // NFS Callback Program Version Number
+	nfsm_chain_get_32(error, &nmreq, val);                                                
 	nfsm_assert(error, (val == NFS4_CALLBACK_PROG_VERSION), EPROGMISMATCH);
-	nfsm_chain_get_32(error, &nmreq, procnum);      // NFS Callback Procedure Number
+	nfsm_chain_get_32(error, &nmreq, procnum);                                      
 	nfsm_assert(error, (procnum <= NFSPROC4_CB_COMPOUND), EPROCUNAVAIL);
 
-	/* Handle authentication */
-	/* XXX just ignore auth for now - handling kerberos may be tricky */
-	nfsm_chain_get_32(error, &nmreq, auth_type);    // RPC Auth Flavor
-	nfsm_chain_get_32(error, &nmreq, auth_len);     // RPC Auth Length
+	                           
+	                                                                    
+	nfsm_chain_get_32(error, &nmreq, auth_type);                      
+	nfsm_chain_get_32(error, &nmreq, auth_len);                       
 	nfsm_assert(error, (auth_len <= RPCAUTH_MAXSIZ), EBADRPC);
 	if (!error && (auth_len > 0)) {
 		nfsm_chain_adv(error, &nmreq, nfsm_rndup(auth_len));
 	}
-	nfsm_chain_adv(error, &nmreq, NFSX_UNSIGNED);   // verifier flavor (should be AUTH_NONE)
-	nfsm_chain_get_32(error, &nmreq, auth_len);     // verifier length
+	nfsm_chain_adv(error, &nmreq, NFSX_UNSIGNED);                                           
+	nfsm_chain_get_32(error, &nmreq, auth_len);                       
 	nfsm_assert(error, (auth_len <= RPCAUTH_MAXSIZ), EBADRPC);
 	if (!error && (auth_len > 0)) {
 		nfsm_chain_adv(error, &nmreq, nfsm_rndup(auth_len));
@@ -2903,30 +2903,30 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 		status = NFSERR_RETVOID;
 		break;
 	case NFSPROC4_CB_COMPOUND:
-		/* tag, minorversion, cb ident, numops, op array */
-		nfsm_chain_get_32(error, &nmreq, taglen);       /* tag length */
+		                                                   
+		nfsm_chain_get_32(error, &nmreq, taglen);                       
 		nfsm_assert(error, (val <= NFS4_OPAQUE_LIMIT), EBADRPC);
 
-		/* start building the body of the response */
+		                                             
 		nfsm_mbuf_get(error, &mrest, nfsm_rndup(taglen) + 5 * NFSX_UNSIGNED);
 		nfsm_chain_init(&nmrep, mrest);
 
-		/* copy tag from request to response */
-		nfsm_chain_add_32(error, &nmrep, taglen);       /* tag length */
+		                                       
+		nfsm_chain_add_32(error, &nmrep, taglen);                       
 		for (len = (int)taglen; !error && (len > 0); len -= NFSX_UNSIGNED) {
 			nfsm_chain_get_32(error, &nmreq, val);
 			nfsm_chain_add_32(error, &nmrep, val);
 		}
 
-		/* insert number of results placeholder */
+		                                          
 		numres = 0;
 		nfsm_chain_add_32(error, &nmrep, numres);
 		pnumres = (uint32_t*)(nmrep.nmc_ptr - NFSX_UNSIGNED);
 
-		nfsm_chain_get_32(error, &nmreq, val);          /* minorversion */
+		nfsm_chain_get_32(error, &nmreq, val);                            
 		nfsm_assert(error, (val == 0), NFSERR_MINOR_VERS_MISMATCH);
-		nfsm_chain_get_32(error, &nmreq, cbid);         /* callback ID */
-		nfsm_chain_get_32(error, &nmreq, numops);       /* number of operations */
+		nfsm_chain_get_32(error, &nmreq, cbid);                          
+		nfsm_chain_get_32(error, &nmreq, numops);                                 
 		if (error) {
 			if ((error == EBADRPC) || (error == NFSERR_MINOR_VERS_MISMATCH)) {
 				status = error;
@@ -2939,13 +2939,13 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 			nfsm_chain_null(&nmrep);
 			goto nfsmout;
 		}
-		/* match the callback ID to a registered mount */
+		                                                 
 		lck_mtx_lock(&nfs_global_mutex);
 		TAILQ_FOREACH(nmp, &nfs4_cb_mounts, nm_cblink) {
 			if (nmp->nm_cbid != cbid) {
 				continue;
 			}
-			/* verify socket's source address matches this mount's server address */
+			                                                                        
 			if (!nmp->nm_saddr) {
 				continue;
 			}
@@ -2953,19 +2953,19 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 				break;
 			}
 		}
-		/* mark the NFS mount as busy */
+		                                
 		if (nmp) {
 			nmp->nm_cbrefs++;
 		}
 		lck_mtx_unlock(&nfs_global_mutex);
 		if (!nmp) {
-			/* if no mount match, just drop socket. */
+			                                          
 			error = EPERM;
 			nfsm_chain_null(&nmrep);
 			goto out;
 		}
 
-		/* process ops, adding results to mrest */
+		                                          
 		while (numops > 0) {
 			numops--;
 			nfsm_chain_get_32(error, &nmreq, op);
@@ -2974,7 +2974,7 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 			}
 			switch (op) {
 			case NFS_OP_CB_GETATTR:
-				// (FH, BITMAP) -> (STATUS, BITMAP, ATTRS)
+				                                          
 				np = NULL;
 				nfsm_chain_get_fh(error, &nmreq, NFS_VER4, fh);
 				bmlen = NFS_ATTR_BITMAP_LEN;
@@ -2982,15 +2982,15 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 				if (error) {
 					status = error;
 					error = 0;
-					numops = 0; /* don't process any more ops */
+					numops = 0;                                 
 				} else {
-					/* find the node for the file handle */
+					                                       
 					error = nfs_nget(nmp->nm_mountp, NULL, NULL, fh->fh_data, fh->fh_len, NULL, NULL, RPCAUTH_UNKNOWN, NG_NOCREATE, &np);
 					if (error || !np) {
 						status = NFSERR_BADHANDLE;
 						error = 0;
 						np = NULL;
-						numops = 0; /* don't process any more ops */
+						numops = 0;                                 
 					}
 				}
 				nfsm_chain_add_32(error, &nmrep, op);
@@ -2999,7 +2999,7 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 					error = status;
 				}
 				if (np) {
-					/* only allow returning size, change, and mtime attrs */
+					                                                        
 					NFS_CLEAR_ATTRIBUTES(&rbitmap);
 					attrbytes = 0;
 					if (NFS_BITMAP_ISSET(&bitmap, NFS_FATTR_CHANGE)) {
@@ -3031,14 +3031,14 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 					vnode_put(NFSTOV(np));
 					np = NULL;
 				}
-				/*
-				 * If we hit an error building the reply, we can't easily back up.
-				 * So we'll just update the status and hope the server ignores the
-				 * extra garbage.
-				 */
+				  
+                                                                      
+                                                                      
+                     
+       
 				break;
 			case NFS_OP_CB_RECALL:
-				// (STATEID, TRUNCATE, FH) -> (STATUS)
+				                                      
 				np = NULL;
 				nfsm_chain_get_stateid(error, &nmreq, &stateid);
 				nfsm_chain_get_32(error, &nmreq, truncate);
@@ -3046,22 +3046,22 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 				if (error) {
 					status = error;
 					error = 0;
-					numops = 0; /* don't process any more ops */
+					numops = 0;                                 
 				} else {
-					/* find the node for the file handle */
+					                                       
 					error = nfs_nget(nmp->nm_mountp, NULL, NULL, fh->fh_data, fh->fh_len, NULL, NULL, RPCAUTH_UNKNOWN, NG_NOCREATE, &np);
 					if (error || !np) {
 						status = NFSERR_BADHANDLE;
 						error = 0;
 						np = NULL;
-						numops = 0; /* don't process any more ops */
+						numops = 0;                                 
 					} else if (!(np->n_openflags & N_DELEG_MASK) ||
 					    bcmp(&np->n_dstateid, &stateid, sizeof(stateid))) {
-						/* delegation stateid state doesn't match */
+						                                            
 						status = NFSERR_BAD_STATEID;
-						numops = 0; /* don't process any more ops */
+						numops = 0;                                 
 					}
-					if (!status) { /* add node to recall queue, and wake socket thread */
+					if (!status) {                                                       
 						nfs4_delegation_return_enqueue(np);
 					}
 					if (np) {
@@ -3080,7 +3080,7 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 				nfsm_chain_add_32(error, &nmrep, NFS_OP_CB_ILLEGAL);
 				status = NFSERR_OP_ILLEGAL;
 				nfsm_chain_add_32(error, &nmrep, status);
-				numops = 0; /* don't process any more ops */
+				numops = 0;                                 
 				break;
 			}
 			numres++;
@@ -3097,12 +3097,12 @@ nfs4_cb_handler(struct nfs_callback_socket *ncbsp, mbuf_t mreq)
 			error = 0;
 		}
 
-		/* Now, set the numres field */
+		                               
 		*pnumres = txdr_unsigned(numres);
 		nfsm_chain_build_done(error, &nmrep);
 		nfsm_chain_null(&nmrep);
 
-		/* drop the callback reference on the mount */
+		                                              
 		lck_mtx_lock(&nfs_global_mutex);
 		nmp->nm_cbrefs--;
 		if (!nmp->nm_cbid) {
@@ -3117,10 +3117,10 @@ nfsmout:
 		OSAddAtomic64(1, &nfsstats.rpcinvalid);
 	}
 
-	/* build reply header */
+	                        
 	error = mbuf_gethdr(MBUF_WAITOK, MBUF_TYPE_DATA, &mhead);
 	nfsm_chain_init(&nmrep, mhead);
-	nfsm_chain_add_32(error, &nmrep, 0); /* insert space for an RPC record mark */
+	nfsm_chain_add_32(error, &nmrep, 0);                                          
 	nfsm_chain_add_32(error, &nmrep, xid);
 	nfsm_chain_add_32(error, &nmrep, RPC_REPLY);
 	if ((status == ERPCMISMATCH) || (status & NFSERR_AUTHERR)) {
@@ -3134,12 +3134,12 @@ nfsmout:
 			nfsm_chain_add_32(error, &nmrep, RPC_VER2);
 		}
 	} else {
-		/* reply status */
+		                  
 		nfsm_chain_add_32(error, &nmrep, RPC_MSGACCEPTED);
-		/* XXX RPCAUTH_NULL verifier */
+		                               
 		nfsm_chain_add_32(error, &nmrep, RPCAUTH_NULL);
 		nfsm_chain_add_32(error, &nmrep, 0);
-		/* accepted status */
+		                     
 		switch (status) {
 		case EPROGUNAVAIL:
 			nfsm_chain_add_32(error, &nmrep, RPC_PROGUNAVAIL);
@@ -3174,7 +3174,7 @@ nfsmout:
 		goto out;
 	}
 	mrest = NULL;
-	/* Calculate the size of the reply */
+	                                     
 	replen = 0;
 	for (m = nmrep.nmc_mhead; m; m = mbuf_next(m)) {
 		replen += mbuf_len(m);
@@ -3184,14 +3184,14 @@ nfsmout:
 	nfsm_chain_set_recmark(error, &nmrep, (replen - NFSX_UNSIGNED) | 0x80000000);
 	nfsm_chain_null(&nmrep);
 
-	/* send the reply */
+	                    
 	bzero(&msg, sizeof(msg));
 	error = sock_sendmbuf(so, &msg, mhead, 0, &sentlen);
 	mhead = NULL;
 	if (!error && ((int)sentlen != replen)) {
 		error = EWOULDBLOCK;
 	}
-	if (error == EWOULDBLOCK) { /* inability to send response is considered fatal */
+	if (error == EWOULDBLOCK) {                                                     
 		error = ETIMEDOUT;
 	}
 out:
@@ -3210,11 +3210,11 @@ out:
 	NFS_ZFREE(nfs_fhandle_zone, fh);
 	return error;
 }
-#endif /* CONFIG_NFS4 */
+#endif                  
 
-/*
- * Initialize an nfs_rpc_record_state structure.
- */
+  
+                                                
+   
 void
 nfs_rpc_record_state_init(struct nfs_rpc_record_state *nrrsp)
 {
@@ -3222,9 +3222,9 @@ nfs_rpc_record_state_init(struct nfs_rpc_record_state *nrrsp)
 	nrrsp->nrrs_markerleft = sizeof(nrrsp->nrrs_fragleft);
 }
 
-/*
- * Clean up an nfs_rpc_record_state structure.
- */
+  
+                                              
+   
 void
 nfs_rpc_record_state_cleanup(struct nfs_rpc_record_state *nrrsp)
 {
@@ -3234,12 +3234,12 @@ nfs_rpc_record_state_cleanup(struct nfs_rpc_record_state *nrrsp)
 	}
 }
 
-/*
- * Read the next (marked) RPC record from the socket.
- *
- * *recvp returns if any data was received.
- * *mp returns the next complete RPC record
- */
+  
+                                                     
+  
+                                           
+                                           
+   
 int
 nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, int *recvp, mbuf_t *mp)
 {
@@ -3252,7 +3252,7 @@ nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, 
 	*recvp = 0;
 	*mp = NULL;
 
-	/* read the TCP RPC record marker */
+	                                    
 	while (!error && nrrsp->nrrs_markerleft) {
 		aio.iov_base = ((char*)&nrrsp->nrrs_fragleft +
 		    sizeof(nrrsp->nrrs_fragleft) - nrrsp->nrrs_markerleft);
@@ -3269,7 +3269,7 @@ nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, 
 		if (nrrsp->nrrs_markerleft) {
 			continue;
 		}
-		/* record marker complete */
+		                            
 		nrrsp->nrrs_fragleft = ntohl(nrrsp->nrrs_fragleft);
 		if (nrrsp->nrrs_fragleft & 0x80000000) {
 			nrrsp->nrrs_lastfrag = 1;
@@ -3277,13 +3277,13 @@ nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, 
 		}
 		nrrsp->nrrs_reclen += nrrsp->nrrs_fragleft;
 		if (nrrsp->nrrs_reclen > NFS_MAXPACKET) {
-			/* This is SERIOUS! We are out of sync with the sender. */
+			                                                          
 			log(LOG_ERR, "impossible RPC record length (%d) on callback", nrrsp->nrrs_reclen);
 			error = EFBIG;
 		}
 	}
 
-	/* read the TCP RPC record fragment */
+	                                      
 	while (!error && !nrrsp->nrrs_markerleft && nrrsp->nrrs_fragleft) {
 		m = NULL;
 		rcvlen = nrrsp->nrrs_fragleft;
@@ -3292,7 +3292,7 @@ nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, 
 			break;
 		}
 		*recvp = 1;
-		/* append mbufs to list */
+		                          
 		nrrsp->nrrs_fragleft -= rcvlen;
 		if (!nrrsp->nrrs_m) {
 			nrrsp->nrrs_m = m;
@@ -3310,14 +3310,14 @@ nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, 
 		nrrsp->nrrs_mlast = m;
 	}
 
-	/* done reading fragment? */
+	                            
 	if (!error && !nrrsp->nrrs_markerleft && !nrrsp->nrrs_fragleft) {
-		/* reset socket fragment parsing state */
+		                                         
 		nrrsp->nrrs_markerleft = sizeof(nrrsp->nrrs_fragleft);
 		if (nrrsp->nrrs_lastfrag) {
-			/* RPC record complete */
+			                         
 			*mp = nrrsp->nrrs_m;
-			/* reset socket record parsing state */
+			                                       
 			nrrsp->nrrs_reclen = 0;
 			nrrsp->nrrs_m = nrrsp->nrrs_mlast = NULL;
 			nrrsp->nrrs_lastfrag = 0;
@@ -3329,31 +3329,31 @@ nfs_rpc_record_read(socket_t so, struct nfs_rpc_record_state *nrrsp, int flags, 
 
 
 
-/*
- * The NFS client send routine.
- *
- * Send the given NFS request out the mount's socket.
- * Holds nfs_sndlock() for the duration of this call.
- *
- * - check for request termination (sigintr)
- * - wait for reconnect, if necessary
- * - UDP: check the congestion window
- * - make a copy of the request to send
- * - UDP: update the congestion window
- * - send the request
- *
- * If sent successfully, R_MUSTRESEND and R_RESENDERR are cleared.
- * rexmit count is also updated if this isn't the first send.
- *
- * If the send is not successful, make sure R_MUSTRESEND is set.
- * If this wasn't the first transmit, set R_RESENDERR.
- * Also, undo any UDP congestion window changes made.
- *
- * If the error appears to indicate that the socket should
- * be reconnected, mark the socket for reconnection.
- *
- * Only return errors when the request should be aborted.
- */
+  
+                               
+  
+                                                     
+                                                     
+  
+                                            
+                                     
+                                     
+                                       
+                                      
+                     
+  
+                                                                  
+                                                             
+  
+                                                                
+                                                      
+                                                     
+  
+                                                          
+                                                    
+  
+                                                         
+   
 int
 nfs_send(struct nfsreq *req, int wait)
 {
@@ -3388,10 +3388,10 @@ again:
 	nmp = req->r_nmp;
 	sotype = nmp->nm_sotype;
 
-	/*
-	 * If it's a setup RPC but we're not in SETUP... must need reconnect.
-	 * If it's a recovery RPC but the socket's not ready... must need reconnect.
-	 */
+	  
+                                                                      
+                                                                             
+    
 	if (((req->r_flags & R_SETUP) && !(nmp->nm_sockflags & NMSOCK_SETUP)) ||
 	    ((req->r_flags & R_RECOVER) && !(nmp->nm_sockflags & NMSOCK_READY))) {
 		error = ETIMEDOUT;
@@ -3403,8 +3403,8 @@ again:
 		return error;
 	}
 
-	/* If the socket needs reconnection, do that now. */
-	/* wait until socket is ready - unless this request is part of setup */
+	                                                    
+	                                                                       
 	lck_mtx_lock(&nmp->nm_lock);
 	if (!(nmp->nm_sockflags & NMSOCK_READY) &&
 	    !((nmp->nm_sockflags & NMSOCK_SETUP) && (req->r_flags & R_SETUP))) {
@@ -3428,7 +3428,7 @@ again:
 		lck_mtx_unlock(&req->r_mtx);
 		lck_mtx_lock(&nmp->nm_lock);
 		while (!(nmp->nm_sockflags & NMSOCK_READY)) {
-			/* don't bother waiting if the socket thread won't be reconnecting it */
+			                                                                        
 			if (nmp->nm_state & (NFSSTA_FORCE | NFSSTA_DEAD)) {
 				error = EIO;
 				break;
@@ -3437,14 +3437,14 @@ again:
 				struct timeval now;
 				microuptime(&now);
 				if ((now.tv_sec - nmp->nm_reconnect_start) >= 8) {
-					/* soft mount in reconnect for a while... terminate ASAP */
+					                                                           
 					OSAddAtomic64(1, &nfsstats.rpctimeouts);
 					req->r_flags |= R_SOFTTERM;
 					req->r_error = error = ETIMEDOUT;
 					break;
 				}
 			}
-			/* make sure socket thread is running, then wait */
+			                                                   
 			nfs_mount_sock_thread_wake(nmp);
 			if ((error = nfs_sigintr(req->r_nmp, req, req->r_thread, 1))) {
 				break;
@@ -3463,8 +3463,8 @@ again:
 		goto again;
 	}
 	nso = nmp->nm_nso;
-	/* note that we're using the mount's socket to do the send */
-	nmp->nm_state |= NFSSTA_SENDING;  /* will be cleared by nfs_sndunlock() */
+	                                                             
+	nmp->nm_state |= NFSSTA_SENDING;                                          
 	lck_mtx_unlock(&nmp->nm_lock);
 	if (!nso) {
 		nfs_sndunlock(req);
@@ -3482,7 +3482,7 @@ again:
 	if (sotype == SOCK_DGRAM) {
 		lck_mtx_lock(&nmp->nm_lock);
 		if (!(req->r_flags & R_CWND) && (nmp->nm_sent >= nmp->nm_cwnd)) {
-			/* if we can't send this out yet, wait on the cwnd queue */
+			                                                           
 			slpflag = (NMFLAG(nmp, INTR) && req->r_thread) ? PCATCH : 0;
 			lck_mtx_unlock(&nmp->nm_lock);
 			nfs_sndunlock(req);
@@ -3509,19 +3509,19 @@ again:
 			lck_mtx_unlock(&nmp->nm_lock);
 			goto again;
 		}
-		/*
-		 * We update these *before* the send to avoid racing
-		 * against others who may be looking to send requests.
-		 */
+		  
+                                                      
+                                                        
+     
 		if (!rexmit) {
-			/* first transmit */
+			                    
 			req->r_flags |= R_CWND;
 			nmp->nm_sent += NFS_CWNDSCALE;
 		} else {
-			/*
-			 * When retransmitting, turn timing off
-			 * and divide congestion window by 2.
-			 */
+			  
+                                          
+                                        
+      
 			req->r_flags &= ~R_TIMING;
 			nmp->nm_cwnd >>= 1;
 			if (nmp->nm_cwnd < NFS_CWNDSCALE) {
@@ -3574,7 +3574,7 @@ again:
 	}
 
 	if (!error) {
-		/* SUCCESS */
+		             
 		req->r_flags &= ~R_RESENDERR;
 		if (rexmit) {
 			OSAddAtomic64(1, &nfsstats.rpcretries);
@@ -3589,7 +3589,7 @@ again:
 		return 0;
 	}
 
-	/* send failed */
+	                 
 	req->r_flags |= R_MUSTRESEND;
 	if (rexmit) {
 		req->r_flags |= R_RESENDERR;
@@ -3600,15 +3600,15 @@ again:
 	lck_mtx_unlock(&req->r_mtx);
 
 	if (sotype == SOCK_DGRAM) {
-		/*
-		 * Note: even though a first send may fail, we consider
-		 * the request sent for congestion window purposes.
-		 * So we don't need to undo any of the changes made above.
-		 */
-		/*
-		 * Socket errors ignored for connectionless sockets??
-		 * For now, ignore them all
-		 */
+		  
+                                                         
+                                                     
+                                                            
+     
+		  
+                                                       
+                             
+     
 		if ((error != EINTR) && (error != ERESTART) &&
 		    (error != EWOULDBLOCK) && (error != EIO) && (nso == nmp->nm_nso)) {
 			int clearerror = 0, optlen = sizeof(clearerror);
@@ -3622,10 +3622,10 @@ again:
 		}
 	}
 
-	/* check if it appears we should reconnect the socket */
+	                                                        
 	switch (error) {
 	case EWOULDBLOCK:
-		/* if send timed out, reconnect if on TCP */
+		                                            
 		if (sotype != SOCK_STREAM) {
 			break;
 		}
@@ -3642,11 +3642,11 @@ again:
 	case ECONNREFUSED:
 	case EHOSTDOWN:
 	case EHOSTUNREACH:
-		/* case ECANCELED??? */
+		                       
 		needrecon = 1;
 		break;
 	}
-	if (needrecon && (nso == nmp->nm_nso)) { /* mark socket as needing reconnect */
+	if (needrecon && (nso == nmp->nm_nso)) {                                       
 		NFS_SOCK_DBG("nfs_send: 0x%llx need reconnect %d\n", req->r_xid, error);
 		nfs_need_reconnect(nmp);
 	}
@@ -3657,12 +3657,12 @@ again:
 		error = EIO;
 	}
 
-	/*
-	 * Don't log some errors:
-	 * EPIPE errors may be common with servers that drop idle connections.
-	 * EADDRNOTAVAIL may occur on network transitions.
-	 * ENOTCONN may occur under some network conditions.
-	 */
+	  
+                          
+                                                                       
+                                                   
+                                                     
+    
 	if ((error == EPIPE) || (error == EADDRNOTAVAIL) || (error == ENOTCONN)) {
 		error = 0;
 	}
@@ -3672,42 +3672,42 @@ again:
 		    vfs_statfs(req->r_nmp->nm_mountp)->f_mntfromname);
 	}
 
-	/* prefer request termination error over other errors */
+	                                                        
 	error2 = nfs_sigintr(req->r_nmp, req, req->r_thread, 0);
 	if (error2) {
 		error = error2;
 	}
 
-	/* only allow the following errors to be returned */
+	                                                    
 	if ((error != EINTR) && (error != ERESTART) && (error != EIO) &&
 	    (error != ENXIO) && (error != ETIMEDOUT)) {
-		/*
-		 * We got some error we don't know what do do with,
-		 * i.e., we're not reconnecting, we map it to
-		 * EIO. Presumably our send failed and we better tell
-		 * the caller so they don't wait for a reply that is
-		 * never going to come.  If we are reconnecting we
-		 * return 0 and the request will be resent.
-		 */
+		  
+                                                     
+                                               
+                                                       
+                                                      
+                                                    
+                                             
+     
 		error = needrecon ? 0 : EIO;
 	}
 	return error;
 }
 
-/*
- * NFS client socket upcalls
- *
- * Pull RPC replies out of an NFS mount's socket and match them
- * up with the pending request.
- *
- * The datagram code is simple because we always get whole
- * messages out of the socket.
- *
- * The stream code is more involved because we have to parse
- * the RPC records out of the stream.
- */
+  
+                            
+  
+                                                               
+                               
+  
+                                                          
+                              
+  
+                                                            
+                                     
+   
 
-/* NFS client UDP socket upcall */
+                                  
 void
 nfs_udp_rcv(socket_t so, void *arg, __unused int waitflag)
 {
@@ -3722,7 +3722,7 @@ nfs_udp_rcv(socket_t so, void *arg, __unused int waitflag)
 	}
 
 	do {
-		/* make sure we're on the current socket */
+		                                           
 		if (!nso || (nso->nso_so != so)) {
 			return;
 		}
@@ -3736,13 +3736,13 @@ nfs_udp_rcv(socket_t so, void *arg, __unused int waitflag)
 	} while (m && !error);
 
 	if (error && (error != EWOULDBLOCK)) {
-		/* problems with the socket... mark for reconnection */
+		                                                       
 		NFS_SOCK_DBG("nfs_udp_rcv: need reconnect %d\n", error);
 		nfs_need_reconnect(nmp);
 	}
 }
 
-/* NFS client TCP socket upcall */
+                                  
 void
 nfs_tcp_rcv(socket_t so, void *arg, __unused int waitflag)
 {
@@ -3758,7 +3758,7 @@ nfs_tcp_rcv(socket_t so, void *arg, __unused int waitflag)
 		return;
 	}
 
-	/* make sure we're on the current socket */
+	                                           
 	lck_mtx_lock(&nmp->nm_lock);
 	nso = nmp->nm_nso;
 	if (!nso || (nso->nso_so != so) || (nmp->nm_sockflags & (NMSOCK_DISCONNECTING))) {
@@ -3767,7 +3767,7 @@ nfs_tcp_rcv(socket_t so, void *arg, __unused int waitflag)
 	}
 	lck_mtx_unlock(&nmp->nm_lock);
 
-	/* make sure this upcall should be trying to do work */
+	                                                       
 	lck_mtx_lock(&nso->nso_lock);
 	if (nso->nso_flags & (NSO_UPCALL | NSO_DISCONNECTING | NSO_DEAD)) {
 		lck_mtx_unlock(&nso->nso_lock);
@@ -3777,15 +3777,15 @@ nfs_tcp_rcv(socket_t so, void *arg, __unused int waitflag)
 	nrrs = nso->nso_rrs;
 	lck_mtx_unlock(&nso->nso_lock);
 
-	/* loop while we make error-free progress */
+	                                            
 	while (!error && recv) {
 		error = nfs_rpc_record_read(so, &nrrs, MSG_DONTWAIT, &recv, &m);
-		if (m) { /* match completed response with request */
+		if (m) {                                            
 			nfs_request_match_reply(nmp, m);
 		}
 	}
 
-	/* Update the sockets's rpc parsing state */
+	                                            
 	lck_mtx_lock(&nso->nso_lock);
 	nso->nso_rrs = nrrs;
 	if (nso->nso_flags & NSO_DISCONNECTING) {
@@ -3802,17 +3802,17 @@ nfs_tcp_rcv(socket_t so, void *arg, __unused int waitflag)
 		NFS_SOCK_DBG("nfs_tcp_rcv: got nothing, error %d, got FIN?\n", error);
 	}
 #endif
-	/* note: no error and no data indicates server closed its end */
+	                                                                
 	if ((error != EWOULDBLOCK) && (error || !recv)) {
-		/* problems with the socket... mark for reconnection */
+		                                                       
 		NFS_SOCK_DBG("nfs_tcp_rcv: need reconnect %d\n", error);
 		nfs_need_reconnect(nmp);
 	}
 }
 
-/*
- * "poke" a socket to try to provoke any pending errors
- */
+  
+                                                       
+   
 void
 nfs_sock_poke(struct nfsmount *nmp)
 {
@@ -3825,7 +3825,7 @@ nfs_sock_poke(struct nfsmount *nmp)
 	lck_mtx_lock(&nmp->nm_lock);
 	if ((nmp->nm_sockflags & NMSOCK_UNMOUNT) ||
 	    !(nmp->nm_sockflags & NMSOCK_READY) || !nmp->nm_nso || !nmp->nm_nso->nso_so) {
-		/* Nothing to poke */
+		                     
 		nmp->nm_sockflags &= ~NMSOCK_POKE;
 		wakeup(&nmp->nm_sockflags);
 		lck_mtx_unlock(&nmp->nm_lock);
@@ -3847,9 +3847,9 @@ nfs_sock_poke(struct nfsmount *nmp)
 	nfs_is_dead(error, nmp);
 }
 
-/*
- * Match an RPC reply with the corresponding request
- */
+  
+                                                    
+   
 void
 nfs_request_match_reply(struct nfsmount *nmp, mbuf_t mrep)
 {
@@ -3859,7 +3859,7 @@ nfs_request_match_reply(struct nfsmount *nmp, mbuf_t mrep)
 	int error = 0, asyncioq, t1;
 
 	bzero(&nmrep, sizeof(nmrep));
-	/* Get the xid and check that it is an rpc reply */
+	                                                   
 	nfsm_chain_dissect_init(error, &nmrep, mrep);
 	nfsm_chain_get_32(error, &nmrep, rxid);
 	nfsm_chain_get_32(error, &nmrep, reply);
@@ -3869,29 +3869,29 @@ nfs_request_match_reply(struct nfsmount *nmp, mbuf_t mrep)
 		return;
 	}
 
-	/*
-	 * Loop through the request list to match up the reply
-	 * Iff no match, just drop it.
-	 */
+	  
+                                                       
+                               
+    
 	lck_mtx_lock(&nfs_request_mutex);
 	TAILQ_FOREACH(req, &nfs_reqq, r_chain) {
 		if (req->r_nmrep.nmc_mhead || (rxid != R_XID32(req->r_xid))) {
 			continue;
 		}
-		/* looks like we have it, grab lock and double check */
+		                                                       
 		lck_mtx_lock(&req->r_mtx);
 		if (req->r_nmrep.nmc_mhead || (rxid != R_XID32(req->r_xid))) {
 			lck_mtx_unlock(&req->r_mtx);
 			continue;
 		}
-		/* Found it.. */
+		                
 		req->r_nmrep = nmrep;
 		lck_mtx_lock(&nmp->nm_lock);
 		if (nmp->nm_sotype == SOCK_DGRAM) {
-			/*
-			 * Update congestion window.
-			 * Do the additive increase of one rpc/rtt.
-			 */
+			  
+                               
+                                              
+      
 			FSDBG(530, R_XID32(req->r_xid), req, nmp->nm_sent, nmp->nm_cwnd);
 			if (nmp->nm_cwnd <= nmp->nm_sent) {
 				nmp->nm_cwnd +=
@@ -3906,26 +3906,26 @@ nfs_request_match_reply(struct nfsmount *nmp, mbuf_t mrep)
 				req->r_flags &= ~R_CWND;
 			}
 			if ((nmp->nm_sent < nmp->nm_cwnd) && !TAILQ_EMPTY(&nmp->nm_cwndq)) {
-				/* congestion window is open, poke the cwnd queue */
+				                                                    
 				struct nfsreq *req2 = TAILQ_FIRST(&nmp->nm_cwndq);
 				TAILQ_REMOVE(&nmp->nm_cwndq, req2, r_cchain);
 				req2->r_cchain.tqe_next = NFSREQNOLIST;
 				wakeup(req2);
 			}
 		}
-		/*
-		 * Update rtt using a gain of 0.125 on the mean
-		 * and a gain of 0.25 on the deviation.
-		 */
+		  
+                                                 
+                                         
+     
 		if (req->r_flags & R_TIMING) {
-			/*
-			 * Since the timer resolution of
-			 * NFS_HZ is so course, it can often
-			 * result in r_rtt == 0. Since
-			 * r_rtt == N means that the actual
-			 * rtt is between N+dt and N+2-dt ticks,
-			 * add 1.
-			 */
+			  
+                                   
+                                       
+                                 
+                                      
+                                           
+            
+      
 			if (proct[req->r_procnum] == 0) {
 				panic("nfs_request_match_reply: proct[%d] is zero", req->r_procnum);
 			}
@@ -3940,17 +3940,17 @@ nfs_request_match_reply(struct nfsmount *nmp, mbuf_t mrep)
 		}
 		nmp->nm_timeouts = 0;
 		lck_mtx_unlock(&nmp->nm_lock);
-		/* signal anyone waiting on this request */
+		                                           
 		wakeup(req);
 		asyncioq = (req->r_callback.rcb_func != NULL);
 #if CONFIG_NFS_GSS
 		if (nfs_request_using_gss(req)) {
 			nfs_gss_clnt_rpcdone(req);
 		}
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 		lck_mtx_unlock(&req->r_mtx);
 		lck_mtx_unlock(&nfs_request_mutex);
-		/* if it's an async RPC with a callback, queue it up */
+		                                                       
 		if (asyncioq) {
 			nfs_asyncio_finish(req);
 		}
@@ -3958,17 +3958,17 @@ nfs_request_match_reply(struct nfsmount *nmp, mbuf_t mrep)
 	}
 
 	if (!req) {
-		/* not matched to a request, so drop it. */
+		                                           
 		lck_mtx_unlock(&nfs_request_mutex);
 		OSAddAtomic64(1, &nfsstats.rpcunexpected);
 		mbuf_freem(mrep);
 	}
 }
 
-/*
- * Wait for the reply for a given request...
- * ...potentially resending the request if necessary.
- */
+  
+                                            
+                                                     
+   
 int
 nfs_wait_reply(struct nfsreq *req)
 {
@@ -3989,19 +3989,19 @@ nfs_wait_reply(struct nfsreq *req)
 		if (((error = req->r_error)) || req->r_nmrep.nmc_mhead) {
 			break;
 		}
-		/* check if we need to resend */
+		                                
 		if (req->r_flags & R_MUSTRESEND) {
 			NFS_SOCK_DBG("nfs wait resend: p %d x 0x%llx f 0x%x rtt %d\n",
 			    req->r_procnum, req->r_xid, req->r_flags, req->r_rtt);
 			req->r_flags |= R_SENDING;
 			lck_mtx_unlock(&req->r_mtx);
 			if (nfs_request_using_gss(req)) {
-				/*
-				 * It's an RPCSEC_GSS request.
-				 * Can't just resend the original request
-				 * without bumping the cred sequence number.
-				 * Go back and re-build the request.
-				 */
+				  
+                                  
+                                             
+                                                
+                                        
+       
 				lck_mtx_lock(&req->r_mtx);
 				req->r_flags &= ~R_SENDING;
 				lck_mtx_unlock(&req->r_mtx);
@@ -4018,7 +4018,7 @@ nfs_wait_reply(struct nfsreq *req)
 				break;
 			}
 		}
-		/* need to poll if we're P_NOREMOTEHANG */
+		                                          
 		if (nfs_noremotehang(req->r_thread)) {
 			ts.tv_sec = 1;
 		}
@@ -4030,35 +4030,35 @@ nfs_wait_reply(struct nfsreq *req)
 	return error;
 }
 
-/*
- * An NFS request goes something like this:
- * (nb: always frees up mreq mbuf list)
- * nfs_request_create()
- *	- allocates a request struct if one is not provided
- *	- initial fill-in of the request struct
- * nfs_request_add_header()
- *	- add the RPC header
- * nfs_request_send()
- *	- link it into list
- *	- call nfs_send() for first transmit
- * nfs_request_wait()
- *	- call nfs_wait_reply() to wait for the reply
- * nfs_request_finish()
- *	- break down rpc header and return with error or nfs reply
- *	  pointed to by nmrep.
- * nfs_request_rele()
- * nfs_request_destroy()
- *      - clean up the request struct
- *      - free the request struct if it was allocated by nfs_request_create()
- */
+  
+                                           
+                                       
+                       
+                                                      
+                                          
+                           
+                       
+                     
+                      
+                                       
+                     
+                                                
+                       
+                                                             
+                         
+                     
+                        
+                                     
+                                                                             
+   
 
-/*
- * Set up an NFS request struct (allocating if no request passed in).
- */
+  
+                                                                     
+   
 int
 nfs_request_create(
 	nfsnode_t np,
-	mount_t mp,     /* used only if !np */
+	mount_t mp,                           
 	struct nfsm_chain *nmrest,
 	int procnum,
 	thread_t thd,
@@ -4070,7 +4070,7 @@ nfs_request_create(
 
 	req = *reqp;
 	if (!req) {
-		/* allocate a new NFS request structure */
+		                                          
 		req = newreq = zalloc_flags(nfs_req_zone, Z_WAITOK | Z_ZERO);
 	} else {
 		bzero(req, sizeof(*req));
@@ -4127,7 +4127,7 @@ nfs_request_create(
 	req->r_rchain.tqe_next = NFSREQNOLIST;
 	req->r_cchain.tqe_next = NFSREQNOLIST;
 
-	/* set auth flavor to use for request */
+	                                        
 	if (!req->r_cred) {
 		req->r_auth = RPCAUTH_NONE;
 	} else if (req->r_np && (req->r_np->n_auth != RPCAUTH_INVALID)) {
@@ -4138,7 +4138,7 @@ nfs_request_create(
 
 	lck_mtx_unlock(&nmp->nm_lock);
 
-	/* move the request mbuf chain to the nfsreq */
+	                                               
 	req->r_mrest = nmrest->nmc_mhead;
 	nmrest->nmc_mhead = NULL;
 
@@ -4150,9 +4150,9 @@ nfs_request_create(
 	return 0;
 }
 
-/*
- * Clean up and free an NFS request structure.
- */
+  
+                                              
+   
 void
 nfs_request_destroy(struct nfsreq *req)
 {
@@ -4173,10 +4173,10 @@ nfs_request_destroy(struct nfsreq *req)
 	}
 
 	if (req->r_achain.tqe_next != NFSREQNOLIST) {
-		/*
-		 * Still on an async I/O queue?
-		 * %%% But which one, we may be on a local iod.
-		 */
+		  
+                                 
+                                                 
+     
 		lck_mtx_lock(&nfsiod_mutex);
 		if (nmp && req->r_achain.tqe_next != NFSREQNOLIST) {
 			TAILQ_REMOVE(&nmp->nm_iodq, req, r_achain);
@@ -4189,18 +4189,18 @@ nfs_request_destroy(struct nfsreq *req)
 	if (nmp) {
 		lck_mtx_lock(&nmp->nm_lock);
 		if (req->r_flags & R_CWND) {
-			/* Decrement the outstanding request count.  */
+			                                               
 			req->r_flags &= ~R_CWND;
 			nmp->nm_sent -= NFS_CWNDSCALE;
 			if ((nmp->nm_sent < nmp->nm_cwnd) && !TAILQ_EMPTY(&nmp->nm_cwndq)) {
-				/* congestion window is open, poke the cwnd queue */
+				                                                    
 				struct nfsreq *req2 = TAILQ_FIRST(&nmp->nm_cwndq);
 				TAILQ_REMOVE(&nmp->nm_cwndq, req2, r_cchain);
 				req2->r_cchain.tqe_next = NFSREQNOLIST;
 				wakeup(req2);
 			}
 		}
-		/* XXX should we just remove this conditional, we should have a reference if we're resending */
+		                                                                                               
 		if ((req->r_flags & R_RESENDQ) && req->r_rchain.tqe_next != NFSREQNOLIST) {
 			TAILQ_REMOVE(&nmp->nm_resendq, req, r_rchain);
 			req->r_flags &= ~R_RESENDQ;
@@ -4242,7 +4242,7 @@ nfs_request_destroy(struct nfsreq *req)
 	if (req->r_gss_ctx) {
 		nfs_gss_clnt_ctx_unref(req);
 	}
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	if (req->r_wrongsec) {
 		FREE(req->r_wrongsec, M_TEMP);
 	}
@@ -4288,9 +4288,9 @@ nfs_request_rele(struct nfsreq *req)
 }
 
 
-/*
- * Add an (updated) RPC header with authorization to an NFS request.
- */
+  
+                                                                    
+   
 int
 nfs_request_add_header(struct nfsreq *req)
 {
@@ -4298,7 +4298,7 @@ nfs_request_add_header(struct nfsreq *req)
 	int error = 0;
 	mbuf_t m;
 
-	/* free up any previous header */
+	                                 
 	if ((m = req->r_mhead)) {
 		while (m && (m != req->r_mrest)) {
 			m = mbuf_free(m);
@@ -4325,7 +4325,7 @@ nfs_request_add_header(struct nfsreq *req)
 	if (NMFLAG(nmp, SOFT) || (req->r_flags & R_SOFT)) {
 		req->r_retry = nmp->nm_retry;
 	} else {
-		req->r_retry = NFS_MAXREXMIT + 1;       /* past clip limit */
+		req->r_retry = NFS_MAXREXMIT + 1;                            
 	}
 	lck_mtx_unlock(&nmp->nm_lock);
 
@@ -4333,9 +4333,9 @@ nfs_request_add_header(struct nfsreq *req)
 }
 
 
-/*
- * Queue an NFS request up and send it out.
- */
+  
+                                           
+   
 int
 nfs_request_send(struct nfsreq *req, int wait)
 {
@@ -4363,24 +4363,24 @@ nfs_request_send(struct nfsreq *req, int wait)
 
 	OSAddAtomic64(1, &nfsstats.rpcrequests);
 
-	/*
-	 * Make sure the request is not in the queue.
-	 */
+	  
+                                              
+    
 	if (req->r_lflags & RL_QUEUED) {
 #if DEVELOPMENT
 		panic("nfs_request_send: req %p is already in global requests queue", req);
 #else
 		TAILQ_REMOVE(&nfs_reqq, req, r_chain);
 		req->r_lflags &= ~RL_QUEUED;
-#endif /* DEVELOPMENT */
+#endif                  
 	}
 
-	/*
-	 * Chain request into list of outstanding requests. Be sure
-	 * to put it LAST so timer finds oldest requests first.
-	 * Make sure that the request queue timer is running
-	 * to check for possible request timeout.
-	 */
+	  
+                                                            
+                                                        
+                                                     
+                                          
+    
 	TAILQ_INSERT_TAIL(&nfs_reqq, req, r_chain);
 	req->r_lflags |= RL_QUEUED;
 	if (!nfs_request_timer_on) {
@@ -4390,23 +4390,23 @@ nfs_request_send(struct nfsreq *req, int wait)
 	}
 	lck_mtx_unlock(&nfs_request_mutex);
 
-	/* Send the request... */
+	                         
 	return nfs_send(req, wait);
 }
 
-/*
- * Call nfs_wait_reply() to wait for the reply.
- */
+  
+                                               
+   
 void
 nfs_request_wait(struct nfsreq *req)
 {
 	req->r_error = nfs_wait_reply(req);
 }
 
-/*
- * Finish up an NFS request by dequeueing it and
- * doing the initial NFS request reply processing.
- */
+  
+                                                
+                                                  
+   
 int
 nfs_request_finish(
 	struct nfsreq *req,
@@ -4430,7 +4430,7 @@ nfs_request_finish(
 		nmrepp->nmc_mhead = NULL;
 	}
 
-	/* RPC done, unlink the request. */
+	                                   
 	nfs_reqdequeue(req);
 
 	mrep = req->r_nmrep.nmc_mhead;
@@ -4438,15 +4438,15 @@ nfs_request_finish(
 	nmp = req->r_nmp;
 
 	if ((req->r_flags & R_CWND) && nmp) {
-		/*
-		 * Decrement the outstanding request count.
-		 */
+		  
+                                             
+     
 		req->r_flags &= ~R_CWND;
 		lck_mtx_lock(&nmp->nm_lock);
 		FSDBG(273, R_XID32(req->r_xid), req, nmp->nm_sent, nmp->nm_cwnd);
 		nmp->nm_sent -= NFS_CWNDSCALE;
 		if ((nmp->nm_sent < nmp->nm_cwnd) && !TAILQ_EMPTY(&nmp->nm_cwndq)) {
-			/* congestion window is open, poke the cwnd queue */
+			                                                    
 			struct nfsreq *req2 = TAILQ_FIRST(&nmp->nm_cwndq);
 			TAILQ_REMOVE(&nmp->nm_cwndq, req2, r_cchain);
 			req2->r_cchain.tqe_next = NFSREQNOLIST;
@@ -4457,40 +4457,40 @@ nfs_request_finish(
 
 #if CONFIG_NFS_GSS
 	if (nfs_request_using_gss(req)) {
-		/*
-		 * If the request used an RPCSEC_GSS credential
-		 * then reset its sequence number bit in the
-		 * request window.
-		 */
+		  
+                                                 
+                                              
+                    
+     
 		nfs_gss_clnt_rpcdone(req);
 
-		/*
-		 * If we need to re-send, go back and re-build the
-		 * request based on a new sequence number.
-		 * Note that we're using the original XID.
-		 */
+		  
+                                                    
+                                            
+                                            
+     
 		if (error == EAGAIN) {
 			req->r_error = 0;
 			if (mrep) {
 				mbuf_freem(mrep);
 			}
-			error = nfs_gss_clnt_args_restore(req); // remove any trailer mbufs
+			error = nfs_gss_clnt_args_restore(req);                            
 			req->r_nmrep.nmc_mhead = NULL;
 			req->r_flags |= R_RESTART;
 			if (error == ENEEDAUTH) {
-				req->r_xid = 0;         // get a new XID
+				req->r_xid = 0;                         
 				error = 0;
 			}
 			goto nfsmout;
 		}
 	}
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 
-	/*
-	 * If there was a successful reply, make sure to mark the mount as up.
-	 * If a tprintf message was given (or if this is a timed-out soft mount)
-	 * then post a tprintf message indicating the server is alive again.
-	 */
+	  
+                                                                       
+                                                                         
+                                                                     
+    
 	if (!error) {
 		if ((req->r_flags & R_TPRINTFMSG) ||
 		    (nmp && (NMFLAG(nmp, SOFT) || (req->r_flags & R_SOFT)) &&
@@ -4505,9 +4505,9 @@ nfs_request_finish(
 	}
 	nfsmout_if(error);
 
-	/*
-	 * break down the RPC header and check if ok
-	 */
+	  
+                                             
+    
 	nmrep = req->r_nmrep;
 	nfsm_chain_get_32(error, &nmrep, reply_status);
 	nfsmout_if(error);
@@ -4524,12 +4524,12 @@ nfs_request_finish(
 #if CONFIG_NFS_GSS
 		case RPCSEC_GSS_CREDPROBLEM:
 		case RPCSEC_GSS_CTXPROBLEM:
-			/*
-			 * An RPCSEC_GSS cred or context problem.
-			 * We can't use it anymore.
-			 * Restore the args, renew the context
-			 * and set up for a resend.
-			 */
+			  
+                                            
+                              
+                                         
+                              
+      
 			error = nfs_gss_clnt_args_restore(req);
 			if (error && error != ENEEDAUTH) {
 				break;
@@ -4543,10 +4543,10 @@ nfs_request_finish(
 			}
 			mbuf_freem(mrep);
 			req->r_nmrep.nmc_mhead = NULL;
-			req->r_xid = 0;         // get a new XID
+			req->r_xid = 0;                         
 			req->r_flags |= R_RESTART;
 			goto nfsmout;
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 		default:
 			error = EACCES;
 			break;
@@ -4554,15 +4554,15 @@ nfs_request_finish(
 		goto nfsmout;
 	}
 
-	/* Now check the verifier */
-	nfsm_chain_get_32(error, &nmrep, verf_type); // verifier flavor
-	nfsm_chain_get_32(error, &nmrep, verf_len);  // verifier length
+	                            
+	nfsm_chain_get_32(error, &nmrep, verf_type);                   
+	nfsm_chain_get_32(error, &nmrep, verf_len);                    
 	nfsmout_if(error);
 
 	switch (req->r_auth) {
 	case RPCAUTH_NONE:
 	case RPCAUTH_SYS:
-		/* Any AUTH_SYS verifier is ignored */
+		                                      
 		if (verf_len > 0) {
 			nfsm_chain_adv(error, &nmrep, nfsm_rndup(verf_len));
 		}
@@ -4575,17 +4575,17 @@ nfs_request_finish(
 		error = nfs_gss_clnt_verf_get(req, &nmrep,
 		    verf_type, verf_len, &accepted_status);
 		break;
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	}
 	nfsmout_if(error);
 
 	switch (accepted_status) {
 	case RPC_SUCCESS:
 		if (req->r_procnum == NFSPROC_NULL) {
-			/*
-			 * The NFS null procedure is unique,
-			 * in not returning an NFS status.
-			 */
+			  
+                                       
+                                     
+      
 			*status = NFS_OK;
 		} else {
 			nfsm_chain_get_32(error, &nmrep, *status);
@@ -4593,16 +4593,16 @@ nfs_request_finish(
 		}
 
 		if ((nmp->nm_vers != NFS_VER2) && (*status == NFSERR_TRYLATER)) {
-			/*
-			 * It's a JUKEBOX error - delay and try again
-			 */
+			  
+                                                
+      
 			int delay, slpflag = (NMFLAG(nmp, INTR) && !(req->r_flags & R_NOINTR)) ? PCATCH : 0;
 
 			mbuf_freem(mrep);
 			req->r_nmrep.nmc_mhead = NULL;
 			if ((req->r_delay >= 30) && !(nmp->nm_state & NFSSTA_MOUNTED)) {
-				/* we're not yet completely mounted and */
-				/* we can't complete an RPC, so we fail */
+				                                          
+				                                          
 				OSAddAtomic64(1, &nfsstats.rpctimeouts);
 				nfs_softterm(req);
 				error = req->r_error;
@@ -4624,7 +4624,7 @@ nfs_request_finish(
 			}
 			if ((NMFLAG(nmp, SOFT) || (req->r_flags & R_SOFT)) && (req->r_delay == 30) &&
 			    !(req->r_flags & R_NOINTR)) {
-				/* for soft mounts, just give up after a short while */
+				                                                       
 				OSAddAtomic64(1, &nfsstats.rpctimeouts);
 				nfs_softterm(req);
 				error = req->r_error;
@@ -4644,7 +4644,7 @@ nfs_request_finish(
 					slpflag = 0;
 				} while (--delay > 0);
 			}
-			req->r_xid = 0;                 // get a new XID
+			req->r_xid = 0;                                 
 			req->r_flags |= R_RESTART;
 			req->r_start = 0;
 			FSDBG(273, R_XID32(req->r_xid), nmp, req, NFSERR_TRYLATER);
@@ -4662,115 +4662,115 @@ nfs_request_finish(
 
 #if CONFIG_NFS4
 		if ((nmp->nm_vers >= NFS_VER4) && (*status == NFSERR_WRONGSEC)) {
-			/*
-			 * Hmmm... we need to try a different security flavor.
-			 * The first time a request hits this, we will allocate an array
-			 * to track flavors to try.  We fill the array with the mount's
-			 * preferred flavors or the server's preferred flavors or just the
-			 * flavors we support.
-			 */
+			  
+                                                         
+                                                                   
+                                                                  
+                                                                     
+                         
+      
 			uint32_t srvflavors[NX_MAX_SEC_FLAVORS];
 			int srvcount, i, j;
 
-			/* Call SECINFO to try to get list of flavors from server. */
+			                                                             
 			srvcount = NX_MAX_SEC_FLAVORS;
 			nfs4_secinfo_rpc(nmp, &req->r_secinfo, req->r_cred, srvflavors, &srvcount);
 
 			if (!req->r_wrongsec) {
-				/* first time... set up flavor array */
+				                                       
 				MALLOC(req->r_wrongsec, uint32_t*, NX_MAX_SEC_FLAVORS * sizeof(uint32_t), M_TEMP, M_WAITOK);
 				if (!req->r_wrongsec) {
 					error = EACCES;
 					goto nfsmout;
 				}
 				i = 0;
-				if (nmp->nm_sec.count) { /* use the mount's preferred list of flavors */
+				if (nmp->nm_sec.count) {                                                
 					for (; i < nmp->nm_sec.count; i++) {
 						req->r_wrongsec[i] = nmp->nm_sec.flavors[i];
 					}
-				} else if (srvcount) { /* otherwise use the server's list of flavors */
+				} else if (srvcount) {                                                 
 					for (; i < srvcount; i++) {
 						req->r_wrongsec[i] = srvflavors[i];
 					}
-				} else { /* otherwise, just try the flavors we support. */
+				} else {                                                  
 					req->r_wrongsec[i++] = RPCAUTH_KRB5P;
 					req->r_wrongsec[i++] = RPCAUTH_KRB5I;
 					req->r_wrongsec[i++] = RPCAUTH_KRB5;
 					req->r_wrongsec[i++] = RPCAUTH_SYS;
 					req->r_wrongsec[i++] = RPCAUTH_NONE;
 				}
-				for (; i < NX_MAX_SEC_FLAVORS; i++) { /* invalidate any remaining slots */
+				for (; i < NX_MAX_SEC_FLAVORS; i++) {                                     
 					req->r_wrongsec[i] = RPCAUTH_INVALID;
 				}
 			}
 
-			/* clear the current flavor from the list */
+			                                            
 			for (i = 0; i < NX_MAX_SEC_FLAVORS; i++) {
 				if (req->r_wrongsec[i] == req->r_auth) {
 					req->r_wrongsec[i] = RPCAUTH_INVALID;
 				}
 			}
 
-			/* find the next flavor to try */
+			                                 
 			for (i = 0; i < NX_MAX_SEC_FLAVORS; i++) {
 				if (req->r_wrongsec[i] != RPCAUTH_INVALID) {
-					if (!srvcount) { /* no server list, just try it */
+					if (!srvcount) {                                  
 						break;
 					}
-					/* check that it's in the server's list */
+					                                          
 					for (j = 0; j < srvcount; j++) {
 						if (req->r_wrongsec[i] == srvflavors[j]) {
 							break;
 						}
 					}
-					if (j < srvcount) { /* found */
+					if (j < srvcount) {            
 						break;
 					}
-					/* not found in server list */
+					                              
 					req->r_wrongsec[i] = RPCAUTH_INVALID;
 				}
 			}
 			if (i == NX_MAX_SEC_FLAVORS) {
-				/* nothing left to try! */
+				                          
 				error = EACCES;
 				goto nfsmout;
 			}
 
-			/* retry with the next auth flavor */
+			                                     
 			req->r_auth = req->r_wrongsec[i];
-			req->r_xid = 0;                 // get a new XID
+			req->r_xid = 0;                                 
 			req->r_flags |= R_RESTART;
 			req->r_start = 0;
 			FSDBG(273, R_XID32(req->r_xid), nmp, req, NFSERR_WRONGSEC);
 			return 0;
 		}
 		if ((nmp->nm_vers >= NFS_VER4) && req->r_wrongsec) {
-			/*
-			 * We renegotiated security for this request; so update the
-			 * default security flavor for the associated node.
-			 */
+			  
+                                                              
+                                                      
+      
 			if (req->r_np) {
 				req->r_np->n_auth = req->r_auth;
 			}
 		}
-#endif /* CONFIG_NFS4 */
+#endif                  
 		if (*status == NFS_OK) {
-			/*
-			 * Successful NFS request
-			 */
+			  
+                            
+      
 			*nmrepp = nmrep;
 			req->r_nmrep.nmc_mhead = NULL;
 			break;
 		}
-		/* Got an NFS error of some kind */
+		                                   
 
-		/*
-		 * If the File Handle was stale, invalidate the
-		 * lookup cache, just in case.
-		 */
+		  
+                                                 
+                                
+     
 		if ((*status == ESTALE) && req->r_np) {
 			cache_purge(NFSTOV(req->r_np));
-			/* if monitored, also send delete event */
+			                                          
 			if (vnode_ismonitored(NFSTOV(req->r_np))) {
 				nfs_vnode_notify(req->r_np, (VNODE_EVENT_ATTRIB | VNODE_EVENT_DELETE));
 			}
@@ -4816,9 +4816,9 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS request using a GSS/Kerberos security flavor?
- */
+  
+                                                    
+   
 int
 nfs_request_using_gss(struct nfsreq *req)
 {
@@ -4834,14 +4834,14 @@ nfs_request_using_gss(struct nfsreq *req)
 	return 0;
 }
 
-/*
- * Perform an NFS request synchronously.
- */
+  
+                                        
+   
 
 int
 nfs_request(
 	nfsnode_t np,
-	mount_t mp,     /* used only if !np */
+	mount_t mp,                           
 	struct nfsm_chain *nmrest,
 	int procnum,
 	vfs_context_t ctx,
@@ -4858,7 +4858,7 @@ nfs_request(
 int
 nfs_request2(
 	nfsnode_t np,
-	mount_t mp,     /* used only if !np */
+	mount_t mp,                           
 	struct nfsm_chain *nmrest,
 	int procnum,
 	thread_t thd,
@@ -4909,11 +4909,11 @@ out_free:
 
 
 #if CONFIG_NFS_GSS
-/*
- * Set up a new null proc request to exchange GSS context tokens with the
- * server. Associate the context that we are setting up with the request that we
- * are sending.
- */
+  
+                                                                         
+                                                                                
+               
+   
 
 int
 nfs_request_gss(
@@ -4922,7 +4922,7 @@ nfs_request_gss(
 	thread_t thd,
 	kauth_cred_t cred,
 	int flags,
-	struct nfs_gss_clnt_ctx *cp,           /* Set to gss context to renew or setup */
+	struct nfs_gss_clnt_ctx *cp,                                                     
 	struct nfsm_chain *nmrepp,
 	int *status)
 {
@@ -4943,10 +4943,10 @@ nfs_request_gss(
 	}
 	nfs_gss_clnt_ctx_ref(req, cp);
 
-	/*
-	 * Don't wait for a reply to a context destroy advisory
-	 * to avoid hanging on a dead server.
-	 */
+	  
+                                                        
+                                      
+    
 	if (cp->gss_clnt_proc == RPCSEC_GSS_DESTROY) {
 		wait = 0;
 	}
@@ -4980,15 +4980,15 @@ out_free:
 	NFS_ZFREE(nfs_req_zone, req);
 	return error;
 }
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 
-/*
- * Create and start an asynchronous NFS request.
- */
+  
+                                                
+   
 int
 nfs_request_async(
 	nfsnode_t np,
-	mount_t mp,     /* used only if !np */
+	mount_t mp,                           
 	struct nfsm_chain *nmrest,
 	int procnum,
 	thread_t thd,
@@ -5025,7 +5025,7 @@ nfs_request_async(
 		error = nfs_request_send(req, 1);
 		lck_mtx_lock(&req->r_mtx);
 		if (!error && !(req->r_flags & R_SENT) && req->r_callback.rcb_func) {
-			/* make sure to wait until this async I/O request gets sent */
+			                                                              
 			int slpflag = (req->r_nmp && NMFLAG(req->r_nmp, INTR) && req->r_thread && !(req->r_flags & R_NOINTR)) ? PCATCH : 0;
 			struct timespec ts = { .tv_sec = 2, .tv_nsec = 0 };
 			while (!(req->r_flags & R_SENT)) {
@@ -5033,11 +5033,11 @@ nfs_request_async(
 				if ((req->r_flags & R_RESENDQ) && !nfs_mount_gone(nmp)) {
 					lck_mtx_lock(&nmp->nm_lock);
 					if ((req->r_flags & R_RESENDQ) && (nmp->nm_state & NFSSTA_RECOVER) && (req->r_rchain.tqe_next != NFSREQNOLIST)) {
-						/*
-						 * It's not going to get off the resend queue if we're in recovery.
-						 * So, just take it off ourselves.  We could be holding mount state
-						 * busy and thus holding up the start of recovery.
-						 */
+						  
+                                                                         
+                                                                         
+                                                        
+         
 						TAILQ_REMOVE(&nmp->nm_resendq, req, r_rchain);
 						req->r_flags &= ~R_RESENDQ;
 						req->r_rchain.tqe_next = NFSREQNOLIST;
@@ -5045,7 +5045,7 @@ nfs_request_async(
 						req->r_flags |= R_SENDING;
 						lck_mtx_unlock(&req->r_mtx);
 						error = nfs_send(req, 1);
-						/* Remove the R_RESENDQ reference */
+						                                    
 						nfs_request_rele(req);
 						lck_mtx_lock(&req->r_mtx);
 						if (error) {
@@ -5076,9 +5076,9 @@ nfs_request_async(
 	return error;
 }
 
-/*
- * Wait for and finish an asynchronous NFS request.
- */
+  
+                                                   
+   
 int
 nfs_request_async_finish(
 	struct nfsreq *req,
@@ -5093,21 +5093,21 @@ nfs_request_async_finish(
 	if (!asyncio) {
 		req->r_flags |= R_ASYNCWAIT;
 	}
-	while (req->r_flags & R_RESENDQ) {  /* wait until the request is off the resend queue */
+	while (req->r_flags & R_RESENDQ) {                                                      
 		struct timespec ts = { .tv_sec = 2, .tv_nsec = 0 };
 
 		if ((nmp = req->r_nmp)) {
 			lck_mtx_lock(&nmp->nm_lock);
 			if ((req->r_flags & R_RESENDQ) && (nmp->nm_state & NFSSTA_RECOVER) && (req->r_rchain.tqe_next != NFSREQNOLIST)) {
-				/*
-				 * It's not going to get off the resend queue if we're in recovery.
-				 * So, just take it off ourselves.  We could be holding mount state
-				 * busy and thus holding up the start of recovery.
-				 */
+				  
+                                                                       
+                                                                       
+                                                      
+       
 				TAILQ_REMOVE(&nmp->nm_resendq, req, r_rchain);
 				req->r_flags &= ~R_RESENDQ;
 				req->r_rchain.tqe_next = NFSREQNOLIST;
-				/* Remove the R_RESENDQ reference */
+				                                    
 				assert(req->r_refs > 0);
 				req->r_refs--;
 				lck_mtx_unlock(&nmp->nm_lock);
@@ -5132,7 +5132,7 @@ nfs_request_async_finish(
 			assert(req->r_achain.tqe_next == NFSREQNOLIST);
 			lck_mtx_lock(&req->r_mtx);
 			req->r_flags &= ~R_IOD;
-			if (req->r_resendtime) {  /* send later */
+			if (req->r_resendtime) {                  
 				nfs_asyncio_resend(req);
 				lck_mtx_unlock(&req->r_mtx);
 				return EINPROGRESS;
@@ -5164,9 +5164,9 @@ nfs_request_async_finish(
 	return error;
 }
 
-/*
- * Cancel a pending asynchronous NFS request.
- */
+  
+                                             
+   
 void
 nfs_request_async_cancel(struct nfsreq *req)
 {
@@ -5174,9 +5174,9 @@ nfs_request_async_cancel(struct nfsreq *req)
 	nfs_request_rele(req);
 }
 
-/*
- * Flag a request as being terminated.
- */
+  
+                                      
+   
 void
 nfs_softterm(struct nfsreq *req)
 {
@@ -5186,13 +5186,13 @@ nfs_softterm(struct nfsreq *req)
 	if (!(req->r_flags & R_CWND) || nfs_mount_gone(nmp)) {
 		return;
 	}
-	/* update congestion window */
+	                              
 	req->r_flags &= ~R_CWND;
 	lck_mtx_lock(&nmp->nm_lock);
 	FSDBG(532, R_XID32(req->r_xid), req, nmp->nm_sent, nmp->nm_cwnd);
 	nmp->nm_sent -= NFS_CWNDSCALE;
 	if ((nmp->nm_sent < nmp->nm_cwnd) && !TAILQ_EMPTY(&nmp->nm_cwndq)) {
-		/* congestion window is open, poke the cwnd queue */
+		                                                    
 		struct nfsreq *req2 = TAILQ_FIRST(&nmp->nm_cwndq);
 		TAILQ_REMOVE(&nmp->nm_cwndq, req2, r_cchain);
 		req2->r_cchain.tqe_next = NFSREQNOLIST;
@@ -5201,9 +5201,9 @@ nfs_softterm(struct nfsreq *req)
 	lck_mtx_unlock(&nmp->nm_lock);
 }
 
-/*
- * Ensure req isn't in use by the timer, then dequeue it.
- */
+  
+                                                         
+   
 void
 nfs_reqdequeue(struct nfsreq *req)
 {
@@ -5219,10 +5219,10 @@ nfs_reqdequeue(struct nfsreq *req)
 	lck_mtx_unlock(&nfs_request_mutex);
 }
 
-/*
- * Busy (lock) a nfsreq, used by the nfs timer to make sure it's not
- * free()'d out from under it.
- */
+  
+                                                                    
+                              
+   
 void
 nfs_reqbusy(struct nfsreq *req)
 {
@@ -5232,9 +5232,9 @@ nfs_reqbusy(struct nfsreq *req)
 	req->r_lflags |= RL_BUSY;
 }
 
-/*
- * Unbusy the nfsreq passed in, return the next nfsreq in the chain busied.
- */
+  
+                                                                           
+   
 struct nfsreq *
 nfs_reqnext(struct nfsreq *req)
 {
@@ -5243,16 +5243,16 @@ nfs_reqnext(struct nfsreq *req)
 	if (req == NULL) {
 		return NULL;
 	}
-	/*
-	 * We need to get and busy the next req before signalling the
-	 * current one, otherwise wakeup() may block us and we'll race to
-	 * grab the next req.
-	 */
+	  
+                                                              
+                                                                  
+                      
+    
 	nextreq = TAILQ_NEXT(req, r_chain);
 	if (nextreq != NULL) {
 		nfs_reqbusy(nextreq);
 	}
-	/* unbusy and signal. */
+	                        
 	req->r_lflags &= ~RL_BUSY;
 	if (req->r_lflags & RL_WAITING) {
 		req->r_lflags &= ~RL_WAITING;
@@ -5261,15 +5261,15 @@ nfs_reqnext(struct nfsreq *req)
 	return nextreq;
 }
 
-/*
- * NFS request queue timer routine
- *
- * Scan the NFS request queue for any requests that have timed out.
- *
- * Alert the system of unresponsive servers.
- * Mark expired requests on soft mounts as terminated.
- * For UDP, mark/signal requests for retransmission.
- */
+  
+                                  
+  
+                                                                   
+  
+                                            
+                                                      
+                                                    
+   
 void
 nfs_request_timer(__unused void *param0, __unused void *param1)
 {
@@ -5283,7 +5283,7 @@ nfs_request_timer(__unused void *param0, __unused void *param1)
 restart:
 	lck_mtx_lock(&nfs_request_mutex);
 	req = TAILQ_FIRST(&nfs_reqq);
-	if (req == NULL) {      /* no requests - turn timer off */
+	if (req == NULL) {                                        
 		nfs_request_timer_on = 0;
 		lck_mtx_unlock(&nfs_request_mutex);
 		return;
@@ -5303,7 +5303,7 @@ restart:
 		}
 		if ((error = nfs_sigintr(nmp, req, req->r_thread, 0))) {
 			if (req->r_callback.rcb_func != NULL) {
-				/* async I/O RPC needs to be finished */
+				                                        
 				lck_mtx_lock(&req->r_mtx);
 				req->r_error = error;
 				finish_asyncio = !(req->r_flags & R_WAITSENT);
@@ -5328,8 +5328,8 @@ restart:
 			lck_mtx_lock(&nmp->nm_lock);
 			if (!(nmp->nm_state & NFSSTA_MOUNTED)) {
 				lck_mtx_unlock(&nmp->nm_lock);
-				/* we're not yet completely mounted and */
-				/* we can't complete an RPC, so we fail */
+				                                          
+				                                          
 				OSAddAtomic64(1, &nfsstats.rpctimeouts);
 				nfs_softterm(req);
 				finish_asyncio = ((req->r_callback.rcb_func != NULL) && !(req->r_flags & R_WAITSENT));
@@ -5343,10 +5343,10 @@ restart:
 			lck_mtx_unlock(&nmp->nm_lock);
 		}
 
-		/*
-		 * Put a reasonable limit on the maximum timeout,
-		 * and reduce that limit when soft mounts get timeouts or are in reconnect.
-		 */
+		  
+                                                   
+                                                                             
+     
 		if (!(NMFLAG(nmp, SOFT) || (req->r_flags & R_SOFT)) && !nfs_can_squish(nmp)) {
 			maxtime = NFS_MAXTIMEO;
 		} else if ((req->r_flags & (R_SETUP | R_RECOVER)) ||
@@ -5356,25 +5356,25 @@ restart:
 			maxtime = NFS_MINTIMEO / 4;
 		}
 
-		/*
-		 * Check for request timeout.
-		 */
+		  
+                               
+     
 		if (req->r_rtt >= 0) {
 			req->r_rtt++;
 			lck_mtx_lock(&nmp->nm_lock);
 			if (req->r_flags & R_RESENDERR) {
-				/* with resend errors, retry every few seconds */
+				                                                 
 				timeo = 4 * hz;
 			} else {
 				if (req->r_procnum == NFSPROC_NULL && req->r_gss_ctx != NULL) {
-					timeo = NFS_MINIDEMTIMEO; // gss context setup
+					timeo = NFS_MINIDEMTIMEO;                     
 				} else if (NMFLAG(nmp, DUMBTIMER)) {
 					timeo = nmp->nm_timeo;
 				} else {
 					timeo = NFS_RTO(nmp, proct[req->r_procnum]);
 				}
 
-				/* ensure 62.5 ms floor */
+				                          
 				while (16 * timeo < hz) {
 					timeo *= 2;
 				}
@@ -5382,7 +5382,7 @@ restart:
 					timeo *= nfs_backoff[nmp->nm_timeouts - 1];
 				}
 			}
-			/* limit timeout to max */
+			                          
 			if (timeo > maxtime) {
 				timeo = maxtime;
 			}
@@ -5392,7 +5392,7 @@ restart:
 				lck_mtx_unlock(&req->r_mtx);
 				continue;
 			}
-			/* The request has timed out */
+			                               
 			NFS_SOCK_DBG("nfs timeout: proc %d %d xid %llx rtt %d to %d # %d, t %ld/%d\n",
 			    req->r_procnum, proct[req->r_procnum],
 			    req->r_xid, req->r_rtt, timeo, nmp->nm_timeouts,
@@ -5401,7 +5401,7 @@ restart:
 				nmp->nm_timeouts++;
 			}
 			if (nfs_mount_check_dead_timeout(nmp)) {
-				/* Unbusy this request */
+				                         
 				req->r_lflags &= ~RL_BUSY;
 				if (req->r_lflags & RL_WAITING) {
 					req->r_lflags &= ~RL_WAITING;
@@ -5409,67 +5409,67 @@ restart:
 				}
 				lck_mtx_unlock(&req->r_mtx);
 
-				/* No need to poke this mount */
+				                                
 				if (nmp->nm_sockflags & NMSOCK_POKE) {
 					nmp->nm_sockflags &= ~NMSOCK_POKE;
 					TAILQ_REMOVE(&nfs_mount_poke_queue, nmp, nm_pokeq);
 				}
-				/* Release our lock state, so we can become a zombie */
+				                                                       
 				lck_mtx_unlock(&nfs_request_mutex);
 
-				/*
-				 * Note nfs_mount_make zombie(nmp) must be
-				 * called with nm_lock held. After doing some
-				 * work we release nm_lock in
-				 * nfs_make_mount_zombie with out acquiring any
-				 * other locks. (Later, in nfs_mount_zombie we
-				 * will acquire &nfs_request_mutex, r_mtx,
-				 * nm_lock in that order). So we should not be
-				 * introducing deadlock here. We take a reference
-				 * on the mount so that its still there when we
-				 * release the lock.
-				 */
+				  
+                                              
+                                                 
+                                 
+                                                   
+                                                  
+                                              
+                                                  
+                                                     
+                                                   
+                        
+       
 				nmp->nm_ref++;
 				nfs_mount_make_zombie(nmp);
 				lck_mtx_unlock(&nmp->nm_lock);
 				nfs_mount_rele(nmp);
 
-				/*
-				 * All the request for this mount have now been
-				 * removed from the request queue. Restart to
-				 * process the remaining mounts
-				 */
+				  
+                                                   
+                                                 
+                                   
+       
 				goto restart;
 			}
 
-			/* if it's been a few seconds, try poking the socket */
+			                                                       
 			if ((nmp->nm_sotype == SOCK_STREAM) &&
 			    ((now.tv_sec - req->r_start) >= 3) &&
 			    !(nmp->nm_sockflags & (NMSOCK_POKE | NMSOCK_UNMOUNT)) &&
 			    (nmp->nm_sockflags & NMSOCK_READY)) {
 				nmp->nm_sockflags |= NMSOCK_POKE;
-				/*
-				 * We take a ref on the mount so that we know the mount will still be there
-				 * when we process the nfs_mount_poke_queue. An unmount request will block
-				 * in nfs_mount_drain_and_cleanup until after the poke is finished. We release
-				 * the reference after calling nfs_sock_poke below;
-				 */
+				  
+                                                                               
+                                                                              
+                                                                                  
+                                                       
+       
 				nmp->nm_ref++;
 				TAILQ_INSERT_TAIL(&nfs_mount_poke_queue, nmp, nm_pokeq);
 			}
 			lck_mtx_unlock(&nmp->nm_lock);
 		}
 
-		/* For soft mounts (& SETUPs/RECOVERs), check for too many retransmits/timeout. */
+		                                                                                  
 		if ((NMFLAG(nmp, SOFT) || (req->r_flags & (R_SETUP | R_RECOVER | R_SOFT))) &&
-		    ((req->r_rexmit >= req->r_retry) || /* too many */
-		    ((now.tv_sec - req->r_start) * NFS_HZ > maxtime))) { /* too long */
+		    ((req->r_rexmit >= req->r_retry) ||               
+		    ((now.tv_sec - req->r_start) * NFS_HZ > maxtime))) {               
 			OSAddAtomic64(1, &nfsstats.rpctimeouts);
 			lck_mtx_lock(&nmp->nm_lock);
 			if (!(nmp->nm_state & NFSSTA_TIMEO)) {
 				lck_mtx_unlock(&nmp->nm_lock);
-				/* make sure we note the unresponsive server */
-				/* (maxtime may be less than tprintf delay) */
+				                                               
+				                                              
 				nfs_down(req->r_nmp, req->r_thread, 0, NFSSTA_TIMEO,
 				    "not responding", 1);
 				req->r_lastmsg = now.tv_sec;
@@ -5478,7 +5478,7 @@ restart:
 				lck_mtx_unlock(&nmp->nm_lock);
 			}
 			if (req->r_flags & R_NOINTR) {
-				/* don't terminate nointr requests on timeout */
+				                                                
 				lck_mtx_unlock(&req->r_mtx);
 				continue;
 			}
@@ -5495,7 +5495,7 @@ restart:
 			continue;
 		}
 
-		/* for TCP, only resend if explicitly requested */
+		                                                  
 		if ((nmp->nm_sotype == SOCK_STREAM) && !(req->r_flags & R_MUSTRESEND)) {
 			if (++req->r_rexmit > NFS_MAXREXMIT) {
 				req->r_rexmit = NFS_MAXREXMIT;
@@ -5505,10 +5505,10 @@ restart:
 			continue;
 		}
 
-		/*
-		 * The request needs to be (re)sent.  Kick the requester to resend it.
-		 * (unless it's already marked as needing a resend)
-		 */
+		  
+                                                                        
+                                                     
+     
 		if ((req->r_flags & R_MUSTRESEND) && (req->r_rtt == -1)) {
 			lck_mtx_unlock(&req->r_mtx);
 			continue;
@@ -5526,7 +5526,7 @@ restart:
 
 	lck_mtx_unlock(&nfs_request_mutex);
 
-	/* poke any sockets */
+	                      
 	while ((nmp = TAILQ_FIRST(&nfs_mount_poke_queue))) {
 		TAILQ_REMOVE(&nfs_mount_poke_queue, nmp, nm_pokeq);
 		nfs_sock_poke(nmp);
@@ -5536,9 +5536,9 @@ restart:
 	nfs_interval_timer_start(nfs_request_timer_call, NFS_REQUESTDELAY);
 }
 
-/*
- * check a thread's proc for the "noremotehang" flag.
- */
+  
+                                                     
+   
 int
 nfs_noremotehang(thread_t thd)
 {
@@ -5546,15 +5546,15 @@ nfs_noremotehang(thread_t thd)
 	return p && proc_noremotehang(p);
 }
 
-/*
- * Test for a termination condition pending on the process.
- * This is used to determine if we need to bail on a mount.
- * ETIMEDOUT is returned if there has been a soft timeout.
- * EINTR is returned if there is a signal pending that is not being ignored
- * ESHUTDOWN is return if the system is in shutdown.
- * and the mount is interruptable, or if we are a thread that is in the process
- * of cancellation (also SIGKILL posted).
- */
+  
+                                                           
+                                                           
+                                                          
+                                                                           
+                                                    
+                                                                               
+                                         
+   
 extern int sigprop[NSIG + 1];
 int
 nfs_sigintr(struct nfsmount *nmp, struct nfsreq *req, thread_t thd, int nmplocked)
@@ -5572,32 +5572,32 @@ nfs_sigintr(struct nfsmount *nmp, struct nfsreq *req, thread_t thd, int nmplocke
 	}
 
 	if (req && (req->r_flags & R_SOFTTERM)) {
-		return ETIMEDOUT; /* request has been terminated. */
+		return ETIMEDOUT;                                   
 	}
 	if (req && (req->r_flags & R_NOINTR)) {
-		thd = NULL; /* don't check for signal on R_NOINTR */
+		thd = NULL;                                         
 	}
 	if (!nmplocked) {
 		lck_mtx_lock(&nmp->nm_lock);
 	}
 	if (nmp->nm_state & NFSSTA_FORCE) {
-		/* If a force unmount is in progress then fail. */
+		                                                  
 		error = EIO;
 	} else if (vfs_isforce(nmp->nm_mountp)) {
-		/* Someone is unmounting us, go soft and mark it. */
+		                                                    
 		NFS_BITMAP_SET(nmp->nm_flags, NFS_MFLAG_SOFT);
 		nmp->nm_state |= NFSSTA_FORCE;
 	}
 
-	/* Check if the mount is marked dead. */
+	                                        
 	if (!error && (nmp->nm_state & NFSSTA_DEAD)) {
 		error = ENXIO;
 	}
 
-	/*
-	 * If the mount is hung and we've requested not to hang
-	 * on remote filesystems, then bail now.
-	 */
+	  
+                                                        
+                                         
+    
 	if (current_proc() != kernproc &&
 	    !error && (nmp->nm_state & NFSSTA_TIMEO) && nfs_noremotehang(thd)) {
 		error = EIO;
@@ -5610,16 +5610,16 @@ nfs_sigintr(struct nfsmount *nmp, struct nfsreq *req, thread_t thd, int nmplocke
 		return error;
 	}
 
-	/* may not have a thread for async I/O */
+	                                         
 	if (thd == NULL || current_proc() == kernproc) {
 		return 0;
 	}
 
-	/*
-	 * Check if the process is aborted, but don't interrupt if we
-	 * were killed by a signal and this is the exiting thread which
-	 * is attempting to dump core.
-	 */
+	  
+                                                              
+                                                                
+                               
+    
 	if (((p = current_proc()) != kernproc) && current_thread_aborted() &&
 	    (!(p->p_acflag & AXSIG) || (p->exit_thread != current_thread()) ||
 	    (p->p_sigacts == NULL) ||
@@ -5628,7 +5628,7 @@ nfs_sigintr(struct nfsmount *nmp, struct nfsreq *req, thread_t thd, int nmplocke
 		return EINTR;
 	}
 
-	/* mask off thread and process blocked signals. */
+	                                                  
 	if (NMFLAG(nmp, INTR) && ((p = get_bsdthreadtask_info(thd))) &&
 	    proc_pendingsignals(p, NFSINT_SIGMASK)) {
 		return EINTR;
@@ -5636,12 +5636,12 @@ nfs_sigintr(struct nfsmount *nmp, struct nfsreq *req, thread_t thd, int nmplocke
 	return 0;
 }
 
-/*
- * Lock a socket against others.
- * Necessary for STREAM sockets to ensure you get an entire rpc request/reply
- * and also to avoid race conditions between the processes with nfs requests
- * in progress when a reconnect is necessary.
- */
+  
+                                
+                                                                             
+                                                                            
+                                             
+   
 int
 nfs_sndlock(struct nfsreq *req)
 {
@@ -5681,9 +5681,9 @@ nfs_sndlock(struct nfsreq *req)
 	return error;
 }
 
-/*
- * Unlock the stream socket for others.
- */
+  
+                                       
+   
 void
 nfs_sndunlock(struct nfsreq *req)
 {
@@ -5734,7 +5734,7 @@ nfs_aux_request(
 	struct nfs_rpc_record_state nrrs;
 
 	if (!so) {
-		/* create socket and set options */
+		                                   
 		if (saddr->sa_family == AF_LOCAL) {
 			soproto = 0;
 		} else {
@@ -5768,7 +5768,7 @@ nfs_aux_request(
 		}
 
 		if (sotype == SOCK_STREAM) {
-#                       define NFS_AUX_CONNECTION_TIMEOUT 4   /* 4 second timeout for connections */
+#                       define NFS_AUX_CONNECTION_TIMEOUT 4                                         
 			int count = 0;
 
 			error = sock_connect(newso, saddr, MSG_DONTWAIT);
@@ -5778,7 +5778,7 @@ nfs_aux_request(
 			nfsmout_if(error);
 
 			while ((error = sock_connectwait(newso, &tv)) == EINPROGRESS) {
-				/* After NFS_AUX_CONNECTION_TIMEOUT bail */
+				                                           
 				if (++count >= NFS_AUX_CONNECTION_TIMEOUT) {
 					error = ETIMEDOUT;
 					break;
@@ -5793,7 +5793,7 @@ nfs_aux_request(
 		}
 		so = newso;
 	} else {
-		/* make sure socket is using a one second timeout in this function */
+		                                                                     
 		optlen = sizeof(orig_rcvto);
 		error = sock_getsockopt(so, SOL_SOCKET, SO_RCVTIMEO, &orig_rcvto, &optlen);
 		if (!error) {
@@ -5808,7 +5808,7 @@ nfs_aux_request(
 	}
 
 	if (sotype == SOCK_STREAM) {
-		sendat = 0; /* we only resend the request for UDP */
+		sendat = 0;                                         
 		nfs_rpc_record_state_init(&nrrs);
 	}
 
@@ -5817,7 +5817,7 @@ nfs_aux_request(
 			break;
 		}
 		if (!try || (try == sendat)) {
-			/* send the request (resending periodically for UDP) */
+			                                                       
 			if ((error = mbuf_copym(mreq, 0, MBUF_COPYALL, MBUF_WAITOK, &m))) {
 				goto nfsmout;
 			}
@@ -5834,11 +5834,11 @@ nfs_aux_request(
 				sendat = 30;
 			}
 		}
-		/* wait for the response */
+		                           
 		if (sotype == SOCK_STREAM) {
-			/* try to read (more of) record */
+			                                  
 			error = nfs_rpc_record_read(so, &nrrs, 0, &recv, &mrep);
-			/* if we don't have the whole record yet, we'll keep trying */
+			                                                              
 		} else {
 			readlen = 1 << 18;
 			bzero(&msg, sizeof(msg));
@@ -5848,7 +5848,7 @@ nfs_aux_request(
 			continue;
 		}
 		nfsmout_if(error);
-		/* parse the response */
+		                        
 		nfsm_chain_dissect_init(error, nmrep, mrep);
 		nfsm_chain_get_32(error, nmrep, rxid);
 		nfsm_chain_get_32(error, nmrep, reply);
@@ -5864,8 +5864,8 @@ nfs_aux_request(
 			error = (rejected_status == RPC_MISMATCH) ? ERPCMISMATCH : EACCES;
 			goto nfsmout;
 		}
-		nfsm_chain_get_32(error, nmrep, verf_type); /* verifier flavor */
-		nfsm_chain_get_32(error, nmrep, verf_len); /* verifier length */
+		nfsm_chain_get_32(error, nmrep, verf_type);                      
+		nfsm_chain_get_32(error, nmrep, verf_len);                      
 		nfsmout_if(error);
 		if (verf_len) {
 			nfsm_chain_adv(error, nmrep, nfsm_rndup(verf_len));
@@ -5965,7 +5965,7 @@ nfs_portmap_lookup(
 	nfsm_chain_null(&nmrep);
 
 tryagain:
-	/* send portmapper request to get port/uaddr */
+	                                               
 	if (ip == 4) {
 		((struct sockaddr_in*)saddr)->sin_port = htons(PMAPPORT);
 	} else if (ip == 6) {
@@ -5991,8 +5991,8 @@ tryagain:
 				nfsm_chain_add_string(error, &nmreq, "ticlts", 6);
 			}
 		}
-		nfsm_chain_add_string(error, &nmreq, "", 0); /* uaddr */
-		nfsm_chain_add_string(error, &nmreq, "", 0); /* owner */
+		nfsm_chain_add_string(error, &nmreq, "", 0);            
+		nfsm_chain_add_string(error, &nmreq, "", 0);            
 	}
 	nfsm_chain_build_done(error, &nmreq);
 	nfsmout_if(error);
@@ -6009,7 +6009,7 @@ tryagain:
 	    (saddr->sa_family == AF_LOCAL) ? ((struct sockaddr_un *)saddr)->sun_path :
 	    (saddr->sa_family == AF_INET6) ? "INET6 socket" : "INET socket");
 
-	/* grab port from portmap response */
+	                                     
 	if (ip == 4) {
 		nfsm_chain_get_32(error, &nmrep, port32);
 		if (!error) {
@@ -6020,14 +6020,14 @@ tryagain:
 			}
 		}
 	} else {
-		/* get uaddr string and convert to sockaddr */
+		                                              
 		nfsm_chain_get_32(error, &nmrep, ualen);
 		if (!error) {
 			if (ualen > (sizeof(uaddr) - 1)) {
 				error = EIO;
 			}
 			if (ualen < 1) {
-				/* program is not available, just return a zero port */
+				                                                       
 				bcopy(sa, saddr, min(sizeof(ss), sa->sa_len));
 				if (ip == 6) {
 					((struct sockaddr_in6*)saddr)->sin6_port = htons(0);
@@ -6054,9 +6054,9 @@ tryagain:
 			}
 		}
 		if ((error == EPROGMISMATCH) || (error == EPROCUNAVAIL) || (error == EIO) || (error == EBADRPC)) {
-			/* remote doesn't support rpcbind version or proc (or we couldn't parse uaddr) */
+			                                                                                 
 			if (pmvers == RPCBVERS4) {
-				/* fall back to v3 and GETADDR */
+				                                 
 				pmvers = RPCBVERS3;
 				pmproc = RPCBPROC_GETADDR;
 				nfsm_chain_cleanup(&nmreq);
@@ -6102,22 +6102,22 @@ nfs_msg(thread_t thd,
 	return 0;
 }
 
-#define NFS_SQUISH_MOBILE_ONLY          0x0001          /* Squish mounts only on mobile machines */
-#define NFS_SQUISH_AUTOMOUNTED_ONLY     0x0002          /* Squish mounts only if the are automounted */
-#define NFS_SQUISH_SOFT                 0x0004          /* Treat all soft mounts as though they were on a mobile machine */
-#define NFS_SQUISH_QUICK                0x0008          /* Try to squish mounts more quickly. */
-#define NFS_SQUISH_SHUTDOWN             0x1000          /* Squish all mounts on shutdown. Currently not implemented */
+#define NFS_SQUISH_MOBILE_ONLY          0x0001                                                     
+#define NFS_SQUISH_AUTOMOUNTED_ONLY     0x0002                                                         
+#define NFS_SQUISH_SOFT                 0x0004                                                                             
+#define NFS_SQUISH_QUICK                0x0008                                                  
+#define NFS_SQUISH_SHUTDOWN             0x1000                                                                        
 
 uint32_t nfs_squishy_flags = NFS_SQUISH_MOBILE_ONLY | NFS_SQUISH_AUTOMOUNTED_ONLY | NFS_SQUISH_QUICK;
-uint32_t nfs_tcp_sockbuf = 128 * 1024;          /* Default value of tcp_sendspace and tcp_recvspace */
+uint32_t nfs_tcp_sockbuf = 128 * 1024;                                                                
 int32_t nfs_is_mobile;
 
-#define NFS_SQUISHY_DEADTIMEOUT         8       /* Dead time out for squishy mounts */
-#define NFS_SQUISHY_QUICKTIMEOUT        4       /* Quicker dead time out when nfs_squish_flags NFS_SQUISH_QUICK bit is set*/
+#define NFS_SQUISHY_DEADTIMEOUT         8                                             
+#define NFS_SQUISHY_QUICKTIMEOUT        4                                                                                   
 
-/*
- * Could this mount be squished?
- */
+  
+                                
+   
 int
 nfs_can_squish(struct nfsmount *nmp)
 {
@@ -6135,36 +6135,36 @@ nfs_can_squish(struct nfsmount *nmp)
 	return 1;
 }
 
-/*
- * NFS mounts default to "rw,hard" - but frequently on mobile clients
- * the mount may become "not responding".  It's desirable to be able
- * to unmount these dead mounts, but only if there is no risk of
- * losing data or crashing applications.  A "squishy" NFS mount is one
- * that can be force unmounted with little risk of harm.
- *
- * nfs_is_squishy checks if a mount is in a squishy state.  A mount is
- * in a squishy state iff it is allowed to be squishy and there are no
- * dirty pages and there are no mmapped files and there are no files
- * open for write. Mounts are allowed to be squishy is controlled by
- * the settings of the nfs_squishy_flags and its mobility state. These
- * flags can be set by sysctls.
- *
- * If nfs_is_squishy determines that we are in a squishy state we will
- * update the current dead timeout to at least NFS_SQUISHY_DEADTIMEOUT
- * (or NFS_SQUISHY_QUICKTIMEOUT if NFS_SQUISH_QUICK is set) (see
- * above) or 1/8th of the mount's nm_deadtimeout value, otherwise we just
- * update the current dead timeout with the mount's nm_deadtimeout
- * value set at mount time.
- *
- * Assumes that nm_lock is held.
- *
- * Note this routine is racey, but its effects on setting the
- * dead timeout only have effects when we're in trouble and are likely
- * to stay that way. Since by default its only for automounted
- * volumes on mobile machines; this is a reasonable trade off between
- * data integrity and user experience. It can be disabled or set via
- * nfs.conf file.
- */
+  
+                                                                     
+                                                                    
+                                                                
+                                                                      
+                                                        
+  
+                                                                      
+                                                                      
+                                                                    
+                                                                    
+                                                                      
+                               
+  
+                                                                      
+                                                                      
+                                                                
+                                                                         
+                                                                  
+                           
+  
+                                
+  
+                                                             
+                                                                      
+                                                              
+                                                                     
+                                                                    
+                 
+   
 
 int
 nfs_is_squishy(struct nfsmount *nmp)
@@ -6187,11 +6187,11 @@ nfs_is_squishy(struct nfsmount *nmp)
 		uint64_t flags = mp ? vfs_flags(mp) : 0;
 		squishy = 1;
 
-		/*
-		 * Walk the nfs nodes and check for dirty buffers it we're not
-		 * RDONLY and we've not already been declared as squishy since
-		 * this can be a bit expensive.
-		 */
+		  
+                                                                
+                                                                
+                                 
+     
 		if (!(flags & MNT_RDONLY) && !(nmp->nm_state & NFSSTA_SQUISHY)) {
 			squishy = !nfs_mount_is_dirty(mp);
 		}
@@ -6211,11 +6211,11 @@ out:
 	return squishy;
 }
 
-/*
- * On a send operation, if we can't reach the server and we've got only one server to talk to
- * and NFS_SQUISH_QUICK flag is set and we are in a squishy state then mark the mount as dead
- * and ask to be forcibly unmounted. Return 1 if we're dead and 0 otherwise.
- */
+  
+                                                                                             
+                                                                                             
+                                                                            
+   
 int
 nfs_is_dead(int error, struct nfsmount *nmp)
 {
@@ -6245,40 +6245,40 @@ nfs_is_dead(int error, struct nfsmount *nmp)
 	return 0;
 }
 
-/*
- * If we've experienced timeouts and we're not really a
- * classic hard mount, then just return cached data to
- * the caller instead of likely hanging on an RPC.
- */
+  
+                                                       
+                                                      
+                                                  
+   
 int
 nfs_use_cache(struct nfsmount *nmp)
 {
-	/*
-	 *%%% We always let mobile users goto the cache,
-	 * perhaps we should not even require them to have
-	 * a timeout?
-	 */
+	  
+                                                 
+                                                   
+              
+    
 	int cache_ok = (nfs_is_mobile || NMFLAG(nmp, SOFT) ||
 	    nfs_can_squish(nmp) || nmp->nm_deadtimeout);
 
 	int timeoutmask = NFSSTA_TIMEO | NFSSTA_LOCKTIMEO | NFSSTA_JUKEBOXTIMEO;
 
-	/*
-	 * So if we have a timeout and we're not really a hard hard-mount,
-	 * return 1 to not get things out of the cache.
-	 */
+	  
+                                                                   
+                                                
+    
 
 	return (nmp->nm_state & timeoutmask) && cache_ok;
 }
 
-/*
- * Log a message that nfs or lockd server is unresponsive. Check if we
- * can be squished and if we can, or that our dead timeout has
- * expired, and we're not holding state, set our mount as dead, remove
- * our mount state and ask to be unmounted. If we are holding state
- * we're being called from the nfs_request_timer and will soon detect
- * that we need to unmount.
- */
+  
+                                                                      
+                                                              
+                                                                      
+                                                                   
+                                                                     
+                           
+   
 void
 nfs_down(struct nfsmount *nmp, thread_t thd, int error, int flags, const char *msg, int holding_state)
 {
@@ -6293,12 +6293,12 @@ nfs_down(struct nfsmount *nmp, thread_t thd, int error, int flags, const char *m
 	lck_mtx_lock(&nmp->nm_lock);
 
 	timeoutmask = NFSSTA_TIMEO | NFSSTA_LOCKTIMEO | NFSSTA_JUKEBOXTIMEO;
-	if (NMFLAG(nmp, MUTEJUKEBOX)) { /* jukebox timeouts don't count as unresponsive if muted */
+	if (NMFLAG(nmp, MUTEJUKEBOX)) {                                                            
 		timeoutmask &= ~NFSSTA_JUKEBOXTIMEO;
 	}
 	wasunresponsive = (nmp->nm_state & timeoutmask);
 
-	/* XXX don't allow users to know about/disconnect unresponsive, soft, nobrowse mounts */
+	                                                                                        
 	softnobrowse = (NMFLAG(nmp, SOFT) && (vfs_flags(nmp->nm_mountp) & MNT_DONTBROWSE));
 
 	if ((flags & NFSSTA_TIMEO) && !(nmp->nm_state & NFSSTA_TIMEO)) {
@@ -6361,12 +6361,12 @@ nfs_up(struct nfsmount *nmp, thread_t thd, int flags, const char *msg)
 	lck_mtx_lock(&nmp->nm_lock);
 
 	timeoutmask = NFSSTA_TIMEO | NFSSTA_LOCKTIMEO | NFSSTA_JUKEBOXTIMEO;
-	if (NMFLAG(nmp, MUTEJUKEBOX)) { /* jukebox timeouts don't count as unresponsive if muted */
+	if (NMFLAG(nmp, MUTEJUKEBOX)) {                                                            
 		timeoutmask &= ~NFSSTA_JUKEBOXTIMEO;
 	}
 	wasunresponsive = (nmp->nm_state & timeoutmask);
 
-	/* XXX don't allow users to know about/disconnect unresponsive, soft, nobrowse mounts */
+	                                                                                        
 	softnobrowse = (NMFLAG(nmp, SOFT) && (vfs_flags(nmp->nm_mountp) & MNT_DONTBROWSE));
 
 	if ((flags & NFSSTA_TIMEO) && (nmp->nm_state & NFSSTA_TIMEO)) {
@@ -6397,14 +6397,14 @@ nfs_up(struct nfsmount *nmp, thread_t thd, int flags, const char *msg)
 }
 
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        
 
 #if CONFIG_NFS_SERVER
 
-/*
- * Generate the rpc reply header
- * siz arg. is used to decide if adding a cluster is worthwhile
- */
+  
+                                
+                                                               
+   
 int
 nfsrv_rephead(
 	struct nfsrv_descript *nd,
@@ -6422,10 +6422,10 @@ nfsrv_rephead(
 		siz = 0;
 	}
 
-	/*
-	 * If this is a big reply, use a cluster else
-	 * try and leave leading space for the lower level headers.
-	 */
+	  
+                                              
+                                                            
+    
 	siz += RPC_REPLYSIZ;
 	if (siz >= nfs_mbuf_minclsize) {
 		error = mbuf_getpacket(MBUF_WAITOK, &mrep);
@@ -6433,14 +6433,14 @@ nfsrv_rephead(
 		error = mbuf_gethdr(MBUF_WAITOK, MBUF_TYPE_DATA, &mrep);
 	}
 	if (error) {
-		/* unable to allocate packet */
-		/* XXX should we keep statistics for these errors? */
+		                               
+		                                                     
 		return error;
 	}
 	if (siz < nfs_mbuf_minclsize) {
-		/* leave space for lower level headers */
+		                                         
 		tl = mbuf_data(mrep);
-		tl += 80 / sizeof(*tl);  /* XXX max_hdr? XXX */
+		tl += 80 / sizeof(*tl);                        
 		mbuf_setdata(mrep, tl, 6 * NFSX_UNSIGNED);
 	}
 	nfsm_chain_init(&nmrep, mrep);
@@ -6457,28 +6457,28 @@ nfsrv_rephead(
 			nfsm_chain_add_32(error, &nmrep, RPC_VER2);
 		}
 	} else {
-		/* reply status */
+		                  
 		nfsm_chain_add_32(error, &nmrep, RPC_MSGACCEPTED);
 		if (nd->nd_gss_context != NULL) {
-			/* RPCSEC_GSS verifier */
+			                         
 			error = nfs_gss_svc_verf_put(nd, &nmrep);
 			if (error) {
 				nfsm_chain_add_32(error, &nmrep, RPC_SYSTEM_ERR);
 				goto done;
 			}
 		} else {
-			/* RPCAUTH_NULL verifier */
+			                           
 			nfsm_chain_add_32(error, &nmrep, RPCAUTH_NULL);
 			nfsm_chain_add_32(error, &nmrep, 0);
 		}
-		/* accepted status */
+		                     
 		switch (err) {
 		case EPROGUNAVAIL:
 			nfsm_chain_add_32(error, &nmrep, RPC_PROGUNAVAIL);
 			break;
 		case EPROGMISMATCH:
 			nfsm_chain_add_32(error, &nmrep, RPC_PROGMISMATCH);
-			/* XXX hard coded versions? */
+			                              
 			nfsm_chain_add_32(error, &nmrep, NFS_VER2);
 			nfsm_chain_add_32(error, &nmrep, NFS_VER3);
 			break;
@@ -6504,8 +6504,8 @@ nfsrv_rephead(
 done:
 	nfsm_chain_build_done(error, &nmrep);
 	if (error) {
-		/* error composing reply header */
-		/* XXX should we keep statistics for these errors? */
+		                                  
+		                                                     
 		mbuf_freem(mrep);
 		return error;
 	}
@@ -6517,13 +6517,13 @@ done:
 	return 0;
 }
 
-/*
- * The nfs server send routine.
- *
- * - return EINTR or ERESTART if interrupted by a signal
- * - return EPIPE if a connection is lost for connection based sockets (TCP...)
- * - do any cleanup required by recoverable socket errors (???)
- */
+  
+                               
+  
+                                                        
+                                                                               
+                                                               
+   
 int
 nfsrv_send(struct nfsrv_sock *slp, mbuf_t nam, mbuf_t top)
 {
@@ -6549,9 +6549,9 @@ nfsrv_send(struct nfsrv_sock *slp, mbuf_t nam, mbuf_t top)
 	log(LOG_INFO, "nfsd send error %d\n", error);
 
 	if ((error == EWOULDBLOCK) && (slp->ns_sotype == SOCK_STREAM)) {
-		error = EPIPE;  /* zap TCP sockets if they time out on send */
+		error = EPIPE;                                                
 	}
-	/* Handle any recoverable (soft) socket errors here. (???) */
+	                                                             
 	if (error != EINTR && error != ERESTART && error != EIO &&
 	    error != EWOULDBLOCK && error != EPIPE) {
 		error = 0;
@@ -6560,12 +6560,12 @@ nfsrv_send(struct nfsrv_sock *slp, mbuf_t nam, mbuf_t top)
 	return error;
 }
 
-/*
- * Socket upcall routine for the nfsd sockets.
- * The caddr_t arg is a pointer to the "struct nfsrv_sock".
- * Essentially do as much as possible non-blocking, else punt and it will
- * be called with MBUF_WAITOK from an nfsd.
- */
+  
+                                              
+                                                           
+                                                                         
+                                           
+   
 void
 nfsrv_rcv(socket_t so, void *arg, int waitflag)
 {
@@ -6577,7 +6577,7 @@ nfsrv_rcv(socket_t so, void *arg, int waitflag)
 
 	lck_rw_lock_exclusive(&slp->ns_rwlock);
 	nfsrv_rcv_locked(so, slp, waitflag);
-	/* Note: ns_rwlock gets dropped when called with MBUF_DONTWAIT */
+	                                                                 
 }
 void
 nfsrv_rcv_locked(socket_t so, struct nfsrv_sock *slp, int waitflag)
@@ -6595,28 +6595,28 @@ nfsrv_rcv_locked(socket_t so, struct nfsrv_sock *slp, int waitflag)
 	}
 
 #ifdef notdef
-	/*
-	 * Define this to test for nfsds handling this under heavy load.
-	 */
+	  
+                                                                 
+    
 	if (waitflag == MBUF_DONTWAIT) {
 		ns_flag = SLP_NEEDQ;
 		goto dorecs;
 	}
 #endif
 	if (slp->ns_sotype == SOCK_STREAM) {
-		/*
-		 * If there are already records on the queue, defer soreceive()
-		 * to an(other) nfsd so that there is feedback to the TCP layer that
-		 * the nfs servers are heavily loaded.
-		 */
+		  
+                                                                 
+                                                                      
+                                        
+     
 		if (slp->ns_rec) {
 			ns_flag = SLP_NEEDQ;
 			goto dorecs;
 		}
 
-		/*
-		 * Do soreceive().
-		 */
+		  
+                    
+     
 		bytes_read = 1000000000;
 		error = sock_receivembuf(so, NULL, &mp, MSG_DONTWAIT, &bytes_read);
 		if (error || mp == NULL) {
@@ -6642,9 +6642,9 @@ nfsrv_rcv_locked(socket_t so, struct nfsrv_sock *slp, int waitflag)
 		}
 		slp->ns_rawend = m;
 
-		/*
-		 * Now try and parse record(s) out of the raw stream data.
-		 */
+		  
+                                                            
+     
 		error = nfsrv_getstream(slp, waitflag);
 		if (error) {
 			if (error == EPERM) {
@@ -6657,7 +6657,7 @@ nfsrv_rcv_locked(socket_t so, struct nfsrv_sock *slp, int waitflag)
 		struct sockaddr_storage nam;
 
 		if (slp->ns_reccnt >= nfsrv_sock_max_rec_queue_length) {
-			/* already have max # RPC records queued on this socket */
+			                                                          
 			ns_flag = SLP_NEEDQ;
 			goto dorecs;
 		}
@@ -6675,7 +6675,7 @@ nfsrv_rcv_locked(socket_t so, struct nfsrv_sock *slp, int waitflag)
 					bcopy(&nam, mbuf_data(mhck), nam.ss_len);
 					m = mhck;
 					if (mbuf_setnext(m, mp)) {
-						/* trouble... just drop it */
+						                             
 						printf("nfsrv_rcv: mbuf_setnext failed\n");
 						mbuf_free(mhck);
 						m = mp;
@@ -6696,9 +6696,9 @@ nfsrv_rcv_locked(socket_t so, struct nfsrv_sock *slp, int waitflag)
 		} while (mp);
 	}
 
-	/*
-	 * Now try and process the request records, non-blocking.
-	 */
+	  
+                                                          
+    
 dorecs:
 	if (ns_flag) {
 		slp->ns_flag |= ns_flag;
@@ -6714,11 +6714,11 @@ dorecs:
 	}
 }
 
-/*
- * Try and extract an RPC request from the mbuf data list received on a
- * stream socket. The "waitflag" argument indicates whether or not it
- * can sleep.
- */
+  
+                                                                       
+                                                                     
+             
+   
 int
 nfsrv_getstream(struct nfsrv_sock *slp, int waitflag)
 {
@@ -6775,12 +6775,12 @@ nfsrv_getstream(struct nfsrv_sock *slp, int waitflag)
 			}
 		}
 
-		/*
-		 * Now get the record part.
-		 *
-		 * Note that slp->ns_reclen may be 0.  Linux sometimes
-		 * generates 0-length RPCs
-		 */
+		  
+                             
+    
+                                                        
+                            
+     
 		recm = NULL;
 		if (slp->ns_cc == slp->ns_reclen) {
 			recm = slp->ns_raw;
@@ -6800,7 +6800,7 @@ nfsrv_getstream(struct nfsrv_sock *slp, int waitflag)
 					}
 					if (om) {
 						if (mbuf_setnext(om, m2)) {
-							/* trouble... just drop it */
+							                             
 							printf("nfsrv_getstream: mbuf_setnext failed\n");
 							mbuf_freem(m2);
 							slp->ns_flag &= ~SLP_GETSTREAM;
@@ -6842,9 +6842,9 @@ nfsrv_getstream(struct nfsrv_sock *slp, int waitflag)
 			return 0;
 		}
 
-		/*
-		 * Accumulate the fragments into a record.
-		 */
+		  
+                                            
+     
 		if (slp->ns_frag == NULL) {
 			slp->ns_frag = recm;
 		} else {
@@ -6869,9 +6869,9 @@ nfsrv_getstream(struct nfsrv_sock *slp, int waitflag)
 	}
 }
 
-/*
- * Parse an RPC header.
- */
+  
+                       
+   
 int
 nfsrv_dorec(
 	struct nfsrv_sock *slp,
@@ -6927,11 +6927,11 @@ nfsrv_dorec(
 	return 0;
 }
 
-/*
- * Parse an RPC request
- * - verify it
- * - fill in the cred struct.
- */
+  
+                       
+              
+                             
+   
 int
 nfsrv_getreq(struct nfsrv_descript *nd)
 {
@@ -6953,28 +6953,28 @@ nfsrv_getreq(struct nfsrv_descript *nd)
 	val = auth_type = len = 0;
 
 	nmreq = &nd->nd_nmreq;
-	nfsm_chain_get_32(error, nmreq, nd->nd_retxid); // XID
-	nfsm_chain_get_32(error, nmreq, val);           // RPC Call
+	nfsm_chain_get_32(error, nmreq, nd->nd_retxid);       
+	nfsm_chain_get_32(error, nmreq, val);                      
 	if (!error && (val != RPC_CALL)) {
 		error = EBADRPC;
 	}
 	nfsmout_if(error);
 	nd->nd_repstat = 0;
-	nfsm_chain_get_32(error, nmreq, val);   // RPC Version
+	nfsm_chain_get_32(error, nmreq, val);                 
 	nfsmout_if(error);
 	if (val != RPC_VER2) {
 		nd->nd_repstat = ERPCMISMATCH;
 		nd->nd_procnum = NFSPROC_NOOP;
 		return 0;
 	}
-	nfsm_chain_get_32(error, nmreq, val);   // RPC Program Number
+	nfsm_chain_get_32(error, nmreq, val);                        
 	nfsmout_if(error);
 	if (val != NFS_PROG) {
 		nd->nd_repstat = EPROGUNAVAIL;
 		nd->nd_procnum = NFSPROC_NOOP;
 		return 0;
 	}
-	nfsm_chain_get_32(error, nmreq, nfsvers);// NFS Version Number
+	nfsm_chain_get_32(error, nmreq, nfsvers);                     
 	nfsmout_if(error);
 	if ((nfsvers < NFS_VER2) || (nfsvers > NFS_VER3)) {
 		nd->nd_repstat = EPROGMISMATCH;
@@ -6982,7 +6982,7 @@ nfsrv_getreq(struct nfsrv_descript *nd)
 		return 0;
 	}
 	nd->nd_vers = nfsvers;
-	nfsm_chain_get_32(error, nmreq, nd->nd_procnum);// NFS Procedure Number
+	nfsm_chain_get_32(error, nmreq, nd->nd_procnum);                       
 	nfsmout_if(error);
 	if ((nd->nd_procnum >= NFS_NPROCS) ||
 	    ((nd->nd_vers == NFS_VER2) && (nd->nd_procnum > NFSV2PROC_STATFS))) {
@@ -6993,34 +6993,34 @@ nfsrv_getreq(struct nfsrv_descript *nd)
 	if (nfsvers != NFS_VER3) {
 		nd->nd_procnum = nfsv3_procid[nd->nd_procnum];
 	}
-	nfsm_chain_get_32(error, nmreq, auth_type);     // Auth Flavor
-	nfsm_chain_get_32(error, nmreq, len);           // Auth Length
+	nfsm_chain_get_32(error, nmreq, auth_type);                   
+	nfsm_chain_get_32(error, nmreq, len);                         
 	if (!error && (len < 0 || len > RPCAUTH_MAXSIZ)) {
 		error = EBADRPC;
 	}
 	nfsmout_if(error);
 
-	/* Handle authentication */
+	                           
 	if (auth_type == RPCAUTH_SYS) {
 		struct posix_cred temp_pcred;
 		if (nd->nd_procnum == NFSPROC_NULL) {
 			return 0;
 		}
 		nd->nd_sec = RPCAUTH_SYS;
-		nfsm_chain_adv(error, nmreq, NFSX_UNSIGNED);    // skip stamp
-		nfsm_chain_get_32(error, nmreq, len);           // hostname length
+		nfsm_chain_adv(error, nmreq, NFSX_UNSIGNED);                 
+		nfsm_chain_get_32(error, nmreq, len);                             
 		if (len < 0 || len > NFS_MAXNAMLEN) {
 			error = EBADRPC;
 		}
-		nfsm_chain_adv(error, nmreq, nfsm_rndup(len));  // skip hostname
+		nfsm_chain_adv(error, nmreq, nfsm_rndup(len));                  
 		nfsmout_if(error);
 
-		/* create a temporary credential using the bits from the wire */
+		                                                                
 		bzero(&temp_pcred, sizeof(temp_pcred));
 		nfsm_chain_get_32(error, nmreq, user_id);
 		nfsm_chain_get_32(error, nmreq, group_id);
 		temp_pcred.cr_groups[0] = group_id;
-		nfsm_chain_get_32(error, nmreq, len);           // extra GID count
+		nfsm_chain_get_32(error, nmreq, len);                             
 		if ((len < 0) || (len > RPCAUTH_UNIXGIDS)) {
 			error = EBADRPC;
 		}
@@ -7037,8 +7037,8 @@ nfsrv_getreq(struct nfsrv_descript *nd)
 		if (ngroups > 1) {
 			nfsrv_group_sort(&temp_pcred.cr_groups[0], ngroups);
 		}
-		nfsm_chain_adv(error, nmreq, NFSX_UNSIGNED);    // verifier flavor (should be AUTH_NONE)
-		nfsm_chain_get_32(error, nmreq, len);           // verifier length
+		nfsm_chain_adv(error, nmreq, NFSX_UNSIGNED);                                            
+		nfsm_chain_get_32(error, nmreq, len);                             
 		if (len < 0 || len > RPCAUTH_MAXSIZ) {
 			error = EBADRPC;
 		}
@@ -7046,7 +7046,7 @@ nfsrv_getreq(struct nfsrv_descript *nd)
 			nfsm_chain_adv(error, nmreq, nfsm_rndup(len));
 		}
 
-		/* request creation of a real credential */
+		                                           
 		temp_pcred.cr_uid = user_id;
 		temp_pcred.cr_ngroups = ngroups;
 		nd->nd_cr = posix_cred_create(&temp_pcred);
@@ -7059,14 +7059,14 @@ nfsrv_getreq(struct nfsrv_descript *nd)
 		error = nfs_gss_svc_cred_get(nd, nmreq);
 		if (error) {
 			if (error == EINVAL) {
-				goto nfsmout;   // drop the request
+				goto nfsmout;                      
 			}
 			nd->nd_repstat = error;
 			nd->nd_procnum = NFSPROC_NOOP;
 			return 0;
 		}
 	} else {
-		if (nd->nd_procnum == NFSPROC_NULL) {   // assume it's AUTH_NONE
+		if (nd->nd_procnum == NFSPROC_NULL) {                           
 			return 0;
 		}
 		nd->nd_repstat = (NFSERR_AUTHERR | AUTH_REJECTCRED);
@@ -7082,12 +7082,12 @@ nfsmout:
 	return error;
 }
 
-/*
- * Search for a sleeping nfsd and wake it up.
- * SIDE EFFECT: If none found, make sure the socket is queued up so that one
- * of the running nfsds will go look for the work in the nfsrv_sockwait list.
- * Note: Must be called with nfsd_mutex held.
- */
+  
+                                             
+                                                                            
+                                                                             
+                                             
+   
 void
 nfsrv_wakenfsd(struct nfsrv_sock *slp)
 {
@@ -7098,14 +7098,14 @@ nfsrv_wakenfsd(struct nfsrv_sock *slp)
 	}
 
 	lck_rw_lock_exclusive(&slp->ns_rwlock);
-	/* if there's work to do on this socket, make sure it's queued up */
+	                                                                    
 	if ((slp->ns_flag & SLP_WORKTODO) && !(slp->ns_flag & SLP_QUEUED)) {
 		TAILQ_INSERT_TAIL(&nfsrv_sockwait, slp, ns_svcq);
 		slp->ns_flag |= SLP_WAITQ;
 	}
 	lck_rw_done(&slp->ns_rwlock);
 
-	/* wake up a waiting nfsd, if possible */
+	                                         
 	nd = TAILQ_FIRST(&nfsd_queue);
 	if (!nd) {
 		return;
@@ -7116,6 +7116,6 @@ nfsrv_wakenfsd(struct nfsrv_sock *slp)
 	wakeup(nd);
 }
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
-#endif /* CONFIG_NFS */
+#endif                 

@@ -1,5 +1,5 @@
-/*	$FreeBSD: src/sys/netinet6/ipsec6.h,v 1.3.2.2 2001/07/03 11:01:54 ume Exp $	*/
-/*	$KAME: ipsec.h,v 1.44 2001/03/23 08:08:47 itojun Exp $	*/
+                                                                                 
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -30,9 +30,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * IPsec controller part.
- */
+  
+                         
+   
 
 #ifndef _NETINET6_IPSEC6_H_
 #define _NETINET6_IPSEC6_H_
@@ -82,5 +82,5 @@ extern int ipsec6_output_tunnel(struct ipsec_output_state *,
     struct secpolicy *, int);
 extern int ipsec6_tunnel_validate(struct mbuf *, int, u_int,
     struct secasvar *, sa_family_t *);
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET6_IPSEC6_H_ */
+#endif                         
+#endif                          

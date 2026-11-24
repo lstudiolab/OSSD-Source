@@ -26,14 +26,14 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * For arm32 ABI where 64-bit types are aligned to even registers and
- * 64-bits on stack, we need to unpack registers differently. So
- * we use the mungers for that. Currently this is just ARMv7k.
- *
- * Since arm32 has no need for munging otherwise, we don't include
- * any of this for other arm32 ABIs
- */
+  
+                                                                     
+                                                                
+                                                              
+  
+                                                                  
+                                   
+   
 #if __arm__ && (__BIGGEST_ALIGNMENT__ > 4)
 
 #include <sys/munge.h>
@@ -43,12 +43,12 @@
 #include <stdint.h>
 
 
-/*
- * Userspace args are in r0-r6, then r8, then stack unless this is an
- * indirect call in which case the syscall number is in r0 then args
- * are in registers r1-r6, then r8, then stack. This is for mach and
- * BSD style syscalls.
- */
+  
+                                                                     
+                                                                    
+                                                                    
+                      
+   
 
 
 #define SS_TO_STYLE(ss)                            ((ss->r[12] != 0) ? kDirect : kIndirect)
@@ -62,23 +62,23 @@ typedef enum {
 #define DECLARE_AND_CAST(regs, args, ss, uu_args)  const arm_saved_state_t *ss = (const arm_saved_state_t *)regs; \
 	                                           uint32_t *uu_args = (uint32_t *)args;
 
-/*
- * We start 32 bytes after sp since 4 registers are pushed onto the stack
- * in the userspace syscall handler, and the first 4 stack arguments are moved
- * into registers already
- */
+  
+                                                                         
+                                                                              
+                         
+   
 #define ARG_SP_BYTE_OFFSET                         32
 
 
-/*
- * Marshal in arguments from userspace where no padding exists
- */
+  
+                                                              
+   
 
 static int
 marshal_no_pad(const arm_saved_state_t *ss, uint32_t *args, const uint32_t word_count)
 {
 	int error = 0;
-	/* init assuming kDirect style */
+	                                 
 	uint32_t copy_count, contiguous_reg_count = 7, contiguous_reg_start = 0;
 	style_t style = SS_TO_STYLE(ss);
 
@@ -87,18 +87,18 @@ marshal_no_pad(const arm_saved_state_t *ss, uint32_t *args, const uint32_t word_
 		contiguous_reg_start++;
 	}
 
-	/* r0 through r6 */
+	                   
 	copy_count = MIN(word_count, contiguous_reg_count);
 	memcpy(args, &(ss->r[contiguous_reg_start]), copy_count * sizeof(uint32_t));
 	args += copy_count;
 
 	if (word_count > copy_count) {
-		/* r8 */
+		        
 		*args = ss->r[8];
 		args++;
 		copy_count++;
 
-		/* stack */
+		           
 		if (word_count > copy_count) {
 			error = copyin(ss->sp + ARG_SP_BYTE_OFFSET,
 			    args, (word_count - copy_count) * sizeof(uint32_t));
@@ -110,9 +110,9 @@ marshal_no_pad(const arm_saved_state_t *ss, uint32_t *args, const uint32_t word_
 	return error;
 }
 
-/*
- * Define mungers to marshal userspace data into argument structs
- */
+  
+                                                                 
+   
 
 int
 munge_w(const void *regs, void *args)
@@ -170,10 +170,10 @@ munge_wwl(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[4]; // l (longs are aligned to even registers for armv7k, so skip r3)
-		uu_args[3] = ss->r[5]; //
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[4];                                                                  
+		uu_args[3] = ss->r[5];   
 		return 0;
 	}
 }
@@ -186,8 +186,8 @@ munge_wwlw(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		int error = munge_wwl(regs, args); // wwl
-		uu_args[4] = ss->r[6]; // w
+		int error = munge_wwl(regs, args);       
+		uu_args[4] = ss->r[6];     
 		return error;
 	}
 }
@@ -196,14 +196,14 @@ int
 munge_wwlww(const void *regs, void *args)
 {
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		// the long-long here is aligned on an even register
-		// so there shouldn't be any padding
+		                                                    
+		                                    
 		return marshal_no_pad(regs, args, 6);
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		int error = munge_wwlw(regs, args); // wwlw
-		uu_args[5] = ss->r[8]; // w
+		int error = munge_wwlw(regs, args);        
+		uu_args[5] = ss->r[8];     
 		return error;
 	}
 }
@@ -216,13 +216,13 @@ munge_wwlll(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		int error = munge_wwl(regs, args);  // wwl
+		int error = munge_wwl(regs, args);        
 		if (error) {
 			return error;
 		}
-		uu_args[4] = ss->r[6];              // l
-		uu_args[5] = ss->r[8];              //
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // l
+		uu_args[4] = ss->r[6];                  
+		uu_args[5] = ss->r[8];                
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,     
 		           &(uu_args[6]), 2 * sizeof(uint32_t));
 	}
 }
@@ -241,9 +241,9 @@ munge_wl(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[2] = ss->r[2]; // l
-		uu_args[3] = ss->r[3]; //
+		uu_args[0] = ss->r[1];     
+		uu_args[2] = ss->r[2];     
+		uu_args[3] = ss->r[3];   
 	}
 	return 0;
 }
@@ -256,10 +256,10 @@ munge_wlw(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[2] = ss->r[2]; // l
-		uu_args[3] = ss->r[3]; //
-		uu_args[4] = ss->r[4]; // w
+		uu_args[0] = ss->r[1];     
+		uu_args[2] = ss->r[2];     
+		uu_args[3] = ss->r[3];   
+		uu_args[4] = ss->r[4];     
 	}
 	return 0;
 }
@@ -272,11 +272,11 @@ munge_wlww(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[2] = ss->r[2]; // l
-		uu_args[3] = ss->r[3]; //
-		uu_args[4] = ss->r[4]; // w
-		uu_args[5] = ss->r[5]; // w
+		uu_args[0] = ss->r[1];     
+		uu_args[2] = ss->r[2];     
+		uu_args[3] = ss->r[3];   
+		uu_args[4] = ss->r[4];     
+		uu_args[5] = ss->r[5];     
 	}
 	return 0;
 }
@@ -287,17 +287,17 @@ munge_wlwwwll(const void *regs, void *args)
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		memcpy(args, regs, 7 * sizeof(uint32_t)); // wlwww
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       // ll
+		memcpy(args, regs, 7 * sizeof(uint32_t));         
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,            
 		           uu_args + 8, 4 * sizeof(uint32_t));
 	} else {
-		uu_args[0] = ss->r[1];                    // w
-		uu_args[2] = ss->r[2];                    // l
-		uu_args[3] = ss->r[3];                    //
-		uu_args[4] = ss->r[4];                    // w
-		uu_args[5] = ss->r[5];                    // w
-		uu_args[6] = ss->r[6];                    // w
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       // ll
+		uu_args[0] = ss->r[1];                        
+		uu_args[2] = ss->r[2];                        
+		uu_args[3] = ss->r[3];                      
+		uu_args[4] = ss->r[4];                        
+		uu_args[5] = ss->r[5];                        
+		uu_args[6] = ss->r[6];                        
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,            
 		           uu_args + 8, 4 * sizeof(uint32_t));
 	}
 }
@@ -308,17 +308,17 @@ munge_wlwwwllw(const void *regs, void *args)
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		memcpy(args, regs, 7 * sizeof(uint32_t)); // wlwww
+		memcpy(args, regs, 7 * sizeof(uint32_t));         
 		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,
-		           uu_args + 8, 5 * sizeof(uint32_t)); // ll
+		           uu_args + 8, 5 * sizeof(uint32_t));      
 	} else {
-		uu_args[0] = ss->r[1];                    // w
-		uu_args[2] = ss->r[2];                    // l
-		uu_args[3] = ss->r[3];                    //
-		uu_args[4] = ss->r[4];                    // w
-		uu_args[5] = ss->r[5];                    // w
-		uu_args[6] = ss->r[6];                    // w
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       // llw
+		uu_args[0] = ss->r[1];                        
+		uu_args[2] = ss->r[2];                        
+		uu_args[3] = ss->r[3];                      
+		uu_args[4] = ss->r[4];                        
+		uu_args[5] = ss->r[5];                        
+		uu_args[6] = ss->r[6];                        
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,             
 		           uu_args + 8, 5 * sizeof(uint32_t));
 	}
 }
@@ -329,17 +329,17 @@ munge_wlwwlwlw(const void *regs, void *args)
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		uu_args[0] = ss->r[0];      // w
+		uu_args[0] = ss->r[0];          
 	} else {
-		uu_args[0] = ss->r[1];      // w
+		uu_args[0] = ss->r[1];          
 	}
-	uu_args[2] = ss->r[2];              // l
-	uu_args[3] = ss->r[3];              //
-	uu_args[4] = ss->r[4];              // w
-	uu_args[5] = ss->r[5];              // w
-	uu_args[6] = ss->r[6];              // l
-	uu_args[7] = ss->r[8];              //
-	return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // wlw
+	uu_args[2] = ss->r[2];                  
+	uu_args[3] = ss->r[3];                
+	uu_args[4] = ss->r[4];                  
+	uu_args[5] = ss->r[5];                  
+	uu_args[6] = ss->r[6];                  
+	uu_args[7] = ss->r[8];                
+	return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       
 	           uu_args + 8, 5 * sizeof(uint32_t));
 }
 
@@ -351,11 +351,11 @@ munge_wll(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[2] = ss->r[2]; // l
-		uu_args[3] = ss->r[3]; //
-		uu_args[4] = ss->r[4]; // l
-		uu_args[5] = ss->r[5]; //
+		uu_args[0] = ss->r[1];     
+		uu_args[2] = ss->r[2];     
+		uu_args[3] = ss->r[3];   
+		uu_args[4] = ss->r[4];     
+		uu_args[5] = ss->r[5];   
 	}
 	return 0;
 }
@@ -365,9 +365,9 @@ munge_wlll(const void *regs, void *args)
 {
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-	int error = munge_wll(regs, args); // wll
-	uu_args[6] = ss->r[6]; // l
-	uu_args[7] = ss->r[8]; //
+	int error = munge_wll(regs, args);       
+	uu_args[6] = ss->r[6];     
+	uu_args[7] = ss->r[8];   
 	return error;
 }
 
@@ -382,8 +382,8 @@ munge_wllll(const void *regs, void *args)
 {
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-	munge_wlll(regs, args);             // wlll
-	return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // l
+	munge_wlll(regs, args);                    
+	return copyin(ss->sp + ARG_SP_BYTE_OFFSET,     
 	           uu_args + 8, 2 * sizeof(uint32_t));
 }
 
@@ -398,11 +398,11 @@ munge_wllwwll(const void *regs, void *args)
 {
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-	int error = munge_wlll(regs, args); // wllww
+	int error = munge_wlll(regs, args);         
 	if (error) {
 		return error;
 	}
-	return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // ll
+	return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 	           uu_args + 8, 4 * sizeof(uint32_t));
 }
 
@@ -414,12 +414,12 @@ munge_wwwlw(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[3]; // w
-		uu_args[4] = ss->r[4]; // l
-		uu_args[5] = ss->r[5]; //
-		uu_args[6] = ss->r[6]; // w
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[3];     
+		uu_args[4] = ss->r[4];     
+		uu_args[5] = ss->r[5];   
+		uu_args[6] = ss->r[6];     
 	}
 	return 0;
 }
@@ -432,13 +432,13 @@ munge_wwwlww(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[3]; // w
-		uu_args[4] = ss->r[4]; // l
-		uu_args[5] = ss->r[5]; //
-		uu_args[6] = ss->r[6]; // w
-		uu_args[7] = ss->r[8]; // w
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[3];     
+		uu_args[4] = ss->r[4];     
+		uu_args[5] = ss->r[5];   
+		uu_args[6] = ss->r[6];     
+		uu_args[7] = ss->r[8];     
 		return 0;
 	}
 }
@@ -451,14 +451,14 @@ munge_wwwlwww(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[3]; // w
-		uu_args[4] = ss->r[4]; // l
-		uu_args[5] = ss->r[5]; //
-		uu_args[6] = ss->r[6]; // w
-		uu_args[7] = ss->r[7]; // w
-		uu_args[8] = ss->r[8]; // w
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[3];     
+		uu_args[4] = ss->r[4];     
+		uu_args[5] = ss->r[5];   
+		uu_args[6] = ss->r[6];     
+		uu_args[7] = ss->r[7];     
+		uu_args[8] = ss->r[8];     
 	}
 	return 0;
 }
@@ -471,11 +471,11 @@ munge_wwwl(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[3]; // w
-		uu_args[4] = ss->r[4]; // l
-		uu_args[5] = ss->r[5]; //
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[3];     
+		uu_args[4] = ss->r[4];     
+		uu_args[5] = ss->r[5];   
 		return 0;
 	}
 }
@@ -488,12 +488,12 @@ munge_wwwwl(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[3]; // w
-		uu_args[3] = ss->r[4]; // w
-		uu_args[4] = ss->r[6]; // l
-		uu_args[5] = ss->r[8]; //
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[3];     
+		uu_args[3] = ss->r[4];     
+		uu_args[4] = ss->r[6];     
+		uu_args[5] = ss->r[8];   
 		return 0;
 	}
 }
@@ -506,11 +506,11 @@ munge_wwwwlw(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		int error = munge_wwwwl(regs, args); // wwwwl
+		int error = munge_wwwwl(regs, args);         
 		if (error) {
 			return error;
 		}
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // w
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,     
 		           uu_args + 6, sizeof(uint32_t));
 	}
 }
@@ -522,11 +522,11 @@ munge_wwwwllww(const void *regs, void *args)
 		return marshal_no_pad(regs, args, 10);
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
-		int error = munge_wwwwl(regs, args); // wwwwl
+		int error = munge_wwwwl(regs, args);         
 		if (error) {
 			return error;
 		}
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // lww
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       
 		           uu_args + 6, 4 * sizeof(uint32_t));
 	}
 }
@@ -539,13 +539,13 @@ munge_wwwwwl(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0] = ss->r[1]; // w
-		uu_args[1] = ss->r[2]; // w
-		uu_args[2] = ss->r[3]; // w
-		uu_args[3] = ss->r[4]; // w
-		uu_args[4] = ss->r[5]; // w
-		uu_args[6] = ss->r[6]; // l
-		uu_args[7] = ss->r[8]; //
+		uu_args[0] = ss->r[1];     
+		uu_args[1] = ss->r[2];     
+		uu_args[2] = ss->r[3];     
+		uu_args[3] = ss->r[4];     
+		uu_args[4] = ss->r[5];     
+		uu_args[6] = ss->r[6];     
+		uu_args[7] = ss->r[8];   
 		return 0;
 	}
 }
@@ -558,11 +558,11 @@ munge_wwwwwlww(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		int error = munge_wwwwwl(regs, args); // wwwwwl
+		int error = munge_wwwwwl(regs, args);          
 		if (error) {
 			return error;
 		}
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // ww
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 		           uu_args + 8, 2 * sizeof(uint32_t));
 	}
 }
@@ -572,11 +572,11 @@ munge_wwwwwllw(const void *regs, void *args)
 {
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-	int error = munge_wwwwwl(regs, args); // wwwwwl
+	int error = munge_wwwwwl(regs, args);          
 	if (error) {
 		return error;
 	}
-	return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // lw
+	return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 	           uu_args + 8, 3 * sizeof(uint32_t));
 }
 
@@ -587,18 +587,18 @@ munge_wwwwwlll(const void *regs, void *args)
 	int error;
 
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		error = munge_wlll(regs, args);     // wlll
+		error = munge_wlll(regs, args);            
 		if (error) {
 			return error;
 		}
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // ll
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 		           uu_args + 8, 4 * sizeof(uint32_t));
 	} else {
-		error = munge_wwwwwl(regs, args);   // wwwwwl
+		error = munge_wwwwwl(regs, args);            
 		if (error) {
 			return error;
 		}
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // ll
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 		           uu_args + 8, 4 * sizeof(uint32_t));
 	}
 }
@@ -613,8 +613,8 @@ munge_wwwwwwl(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		memcpy(args, &(ss->r[1]), 6 * sizeof(uint32_t)); // wwwwww
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       // l
+		memcpy(args, &(ss->r[1]), 6 * sizeof(uint32_t));          
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,           
 		           &(uu_args[6]), 2 * sizeof(uint32_t));
 	}
 }
@@ -627,8 +627,8 @@ munge_wwwwwwlw(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		memcpy(args, &(ss->r[1]), 6 * sizeof(uint32_t)); // wwwwww
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       // lw
+		memcpy(args, &(ss->r[1]), 6 * sizeof(uint32_t));          
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,            
 		           &(uu_args[6]), 3 * sizeof(uint32_t));
 	}
 }
@@ -641,8 +641,8 @@ munge_wwwwwwll(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		memcpy(args, &(ss->r[1]), 6 * sizeof(uint32_t)); // wwwwww
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       // ll
+		memcpy(args, &(ss->r[1]), 6 * sizeof(uint32_t));          
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,            
 		           &(uu_args[6]), 4 * sizeof(uint32_t));
 	}
 }
@@ -679,13 +679,13 @@ munge_llllll(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0]  = ss->r[2];             // l
-		uu_args[1]  = ss->r[3];             //
-		uu_args[2]  = ss->r[4];             // l
-		uu_args[3]  = ss->r[5];             //
-		uu_args[4]  = ss->r[6];             // l
-		uu_args[5]  = ss->r[8];             //
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // lll
+		uu_args[0]  = ss->r[2];                 
+		uu_args[1]  = ss->r[3];               
+		uu_args[2]  = ss->r[4];                 
+		uu_args[3]  = ss->r[5];               
+		uu_args[4]  = ss->r[6];                 
+		uu_args[5]  = ss->r[8];               
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       
 		           uu_args + 6, 6 * sizeof(uint32_t));
 	}
 }
@@ -742,13 +742,13 @@ munge_lwwwwwww(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0]  = ss->r[2];             // l
-		uu_args[1]  = ss->r[3];             //
-		uu_args[2]  = ss->r[4];             // w
-		uu_args[3]  = ss->r[5];             // w
-		uu_args[4]  = ss->r[6];             // w
-		uu_args[5]  = ss->r[8];             // w
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // www
+		uu_args[0]  = ss->r[2];                 
+		uu_args[1]  = ss->r[3];               
+		uu_args[2]  = ss->r[4];                 
+		uu_args[3]  = ss->r[5];                 
+		uu_args[4]  = ss->r[6];                 
+		uu_args[5]  = ss->r[8];                 
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,       
 		           uu_args + 6, 3 * sizeof(uint32_t));
 	}
 }
@@ -761,13 +761,13 @@ munge_wwlwww(const void *regs, void *args)
 	} else {
 		DECLARE_AND_CAST(regs, args, ss, uu_args);
 
-		uu_args[0]  = ss->r[1];             // w
-		uu_args[1]  = ss->r[2];             // w
-		uu_args[2]  = ss->r[4];             // l
-		uu_args[3]  = ss->r[5];             //
-		uu_args[4]  = ss->r[6];             // w
-		uu_args[5]  = ss->r[8];             // w
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // w
+		uu_args[0]  = ss->r[1];                 
+		uu_args[1]  = ss->r[2];                 
+		uu_args[2]  = ss->r[4];                 
+		uu_args[3]  = ss->r[5];               
+		uu_args[4]  = ss->r[6];                 
+		uu_args[5]  = ss->r[8];                 
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,     
 		           uu_args + 6, sizeof(uint32_t));
 	}
 }
@@ -778,17 +778,17 @@ munge_wlwwwl(const void *regs, void *args)
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		memcpy(args, regs, 7 * sizeof(uint32_t));  // wlwww
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, //  l
+		memcpy(args, regs, 7 * sizeof(uint32_t));          
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 		           uu_args + 8, 2 * sizeof(uint32_t));
 	} else {
-		uu_args[0]  = ss->r[1];             // w
-		uu_args[2]  = ss->r[2];             // l
-		uu_args[3]  = ss->r[3];             //
-		uu_args[4]  = ss->r[4];             // w
-		uu_args[5]  = ss->r[5];             // w
-		uu_args[6]  = ss->r[6];             // w
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // l
+		uu_args[0]  = ss->r[1];                 
+		uu_args[2]  = ss->r[2];                 
+		uu_args[3]  = ss->r[3];               
+		uu_args[4]  = ss->r[4];                 
+		uu_args[5]  = ss->r[5];                 
+		uu_args[6]  = ss->r[6];                 
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,     
 		           uu_args + 8, 2 * sizeof(uint32_t));
 	}
 }
@@ -799,19 +799,19 @@ munge_wwlwwwl(const void *regs, void *args)
 	DECLARE_AND_CAST(regs, args, ss, uu_args);
 
 	if (REGS_TO_STYLE(regs) == kDirect) {
-		memcpy(args, regs, 7 * sizeof(uint32_t));  // wwlwww
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, //  l
+		memcpy(args, regs, 7 * sizeof(uint32_t));           
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 		           uu_args + 8, 2 * sizeof(uint32_t));
 	} else {
-		uu_args[0]  = ss->r[1];             // w
-		uu_args[1]  = ss->r[2];             // w
-		uu_args[2]  = ss->r[4];             // l
-		uu_args[3]  = ss->r[5];             //
-		uu_args[4]  = ss->r[6];             // w
-		uu_args[5]  = ss->r[8];             // w
-		return copyin(ss->sp + ARG_SP_BYTE_OFFSET, // wl
+		uu_args[0]  = ss->r[1];                 
+		uu_args[1]  = ss->r[2];                 
+		uu_args[2]  = ss->r[4];                 
+		uu_args[3]  = ss->r[5];               
+		uu_args[4]  = ss->r[6];                 
+		uu_args[5]  = ss->r[8];                 
+		return copyin(ss->sp + ARG_SP_BYTE_OFFSET,      
 		           uu_args + 6, 4 * sizeof(uint32_t));
 	}
 }
 
-#endif // __arm__ && (__BIGGEST_ALIGNMENT__ > 4)
+#endif                                          

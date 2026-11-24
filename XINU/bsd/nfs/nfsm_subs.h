@@ -108,9 +108,9 @@ int nfsm_chain_add_wcc_data_f(struct nfsrv_descript *, struct nfsm_chain *, int,
 int nfsm_chain_get_path_namei(struct nfsm_chain *, uint32_t, struct nameidata *);
 int nfsm_chain_get_sattr(struct nfsrv_descript *, struct nfsm_chain *, struct vnode_attr *);
 int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
-#endif /* CONFIG_NFS_SERVER */
+#endif                        
 
-/* check name length */
+                       
 #define nfsm_name_len_check(E, ND, LEN) \
 	do { \
 	        if (E) break; \
@@ -127,7 +127,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (E) = (ERR); \
 	} while (0)
 
-/* Initialize a vnode_attr to retrieve attributes for the NFS server. */
+                                                                        
 #define nfsm_srv_vattr_init(VAP, VERS) \
 	do { \
 	        VATTR_INIT(VAP); \
@@ -150,7 +150,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                VATTR_WANTED((VAP), va_filerev); \
 	} while (0)
 
-/* Initialize a vnode_attr to retrieve pre-operation attributes for the NFS server. */
+                                                                                      
 #define nfsm_srv_pre_vattr_init(VAP) \
 	do { \
 	        VATTR_INIT(VAP); \
@@ -159,23 +159,23 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        VATTR_WANTED((VAP), va_change_time); \
 	} while (0)
 
-/* round up to a multiple of 4 */
+                                 
 #define nfsm_rndup(a)   (((a)+3)&(~0x3))
 
 #define nfsm_pad(a)     (nfsm_rndup(a) - (a))
 
-/*
- * control flow macros:
- * go to the appropriate label on condition
- */
+  
+                       
+                                           
+   
 #define nfsmout_if(E)   do { if (E) goto nfsmout; } while (0)
 #define nfsmerr_if(E)   do { if (E) goto nfsmerr; } while (0)
 
-/*
- * For NFS v2 errors and EBADRPC, the reply contains only the error.
- * This macro is used to skip any reply building code and go straight
- * to nfsmout instead.
- */
+  
+                                                                    
+                                                                     
+                      
+   
 #define nfsmout_on_status(ND, E) \
 	do { \
 	        if (((ND)->nd_repstat == EBADRPC) || \
@@ -185,14 +185,14 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-/* initialize an mbuf chain */
+                              
 #define nfsm_chain_null(NMC) \
 	do { \
 	        (NMC)->nmc_mhead = (NMC)->nmc_mcur = NULL; \
 	        (NMC)->nmc_ptr = NULL; \
 	} while (0)
 
-/* cleanup an mbuf chain */
+                           
 #define nfsm_chain_cleanup(NMC) \
 	do { \
 	        if (!(NMC)->nmc_mhead) break; \
@@ -200,7 +200,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        nfsm_chain_null(NMC); \
 	} while (0)
 
-/* get an mbuf given a size hint */
+                                   
 #define nfsm_mbuf_get(E, MBP, SIZEHINT) \
 	do { \
 	        *(MBP) = NULL; \
@@ -210,11 +210,11 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (E) = mbuf_get(MBUF_WAITOK, MBUF_TYPE_DATA, (MBP)); \
 	} while (0)
 
-/*
- * get an mbuf with size of M16KCLBYTES given a size hint
- * According to mbuf_getcluster() documentation, clusters greater than 4096 bytes might
- * not be available in all configurations; the caller must additionally check for ENOTSUP.
- * */
+  
+                                                         
+                                                                                       
+                                                                                          
+     
 #define nfsm_mbuf_getcluster(E, MBP, SIZEHINT) \
 	do { \
 	        *(MBP) = NULL; \
@@ -234,11 +234,11 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	} while (0)
 
 
-/*
- * macros for building NFS mbuf chains
- */
+  
+                                      
+   
 
-/* prepare an mbuf chain for building starting with the given mbuf */
+                                                                     
 #define nfsm_chain_init(NMC, MB) \
 	do { \
 	        (NMC)->nmc_mhead = (MB); \
@@ -248,7 +248,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_flags = 0; \
 	} while (0)
 
-/* prepare an mbuf chain for building starting with a newly allocated mbuf */
+                                                                             
 #define nfsm_chain_build_alloc_init(E, NMC, SIZEHINT) \
 	do { \
 	        mbuf_t ncbimb; \
@@ -257,19 +257,19 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        nfsm_chain_init((NMC), ncbimb); \
 	} while (0)
 
-/* done building an mbuf chain */
+                                 
 #define nfsm_chain_build_done(E, NMC) \
 	do { \
 	        if ((E) || !(NMC)->nmc_mcur) break; \
-	/* cap off current mbuf */ \
+	                           \
 	        mbuf_setlen((NMC)->nmc_mcur, \
 	                (NMC)->nmc_ptr - (caddr_t)mbuf_data((NMC)->nmc_mcur)); \
 	} while (0)
 
-/*
- *  set the TCP record mark at the head of an mbuf chain -
- *  assumes 4 bytes are already allocated in the head mbuf
- */
+  
+                                                          
+                                                          
+   
 #define nfsm_chain_set_recmark(E, NMC, VAL) \
 	do { \
 	        if (E) break; \
@@ -277,7 +277,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                = txdr_unsigned(VAL); \
 	} while (0)
 
-/* make sure there's room for size bytes in current mbuf */
+                                                           
 #define nfsm_chain_check_size(E, NMC, SIZE) \
 	do { \
 	        if (E) break; \
@@ -288,7 +288,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-/* add a 32bit value to an mbuf chain extending if necessary */
+                                                               
 #define nfsm_chain_add_32(E, NMC, VAL) \
 	do { \
 	        nfsm_chain_check_size((E), (NMC), NFSX_UNSIGNED); \
@@ -298,7 +298,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_left -= NFSX_UNSIGNED; \
 	} while (0)
 
-/* add a 64bit value to an mbuf chain */
+                                        
 #define nfsm_chain_add_64(E, NMC, VAL) \
 	do { \
 	        uint64_t __tmp64; \
@@ -310,15 +310,15 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_left -= 2 * NFSX_UNSIGNED; \
 	} while (0)
 
-/* zero the last 4 bytes for a range of opaque */
-/* data to make sure any pad bytes will be zero. */
+                                                 
+                                                   
 #define nfsm_chain_zero_opaque_pad(BUF, LEN) \
 	do { \
 	        if ((LEN) > 0) \
 	                *(((uint32_t*)(BUF))+((nfsm_rndup(LEN)>>2)-1)) = 0; \
 	} while (0)
 
-/* add buffer of opaque data to an mbuf chain */
+                                                
 #define nfsm_chain_add_opaque(E, NMC, BUF, LEN) \
 	do { \
 	        size_t rndlen = nfsm_rndup(LEN); \
@@ -333,7 +333,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_left -= rndlen; \
 	} while (0)
 
-/* add buffer of opaque data to an mbuf chain without padding */
+                                                                
 #define nfsm_chain_add_opaque_nopad(E, NMC, BUF, LEN) \
 	do { \
 	        if (E) break; \
@@ -346,7 +346,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_left -= (LEN); \
 	} while (0)
 
-/* finish an mbuf in a chain to allow subsequent insertion */
+                                                             
 #define nfsm_chain_finish_mbuf(E, NMC) \
 	do { \
 	        if (E) break; \
@@ -355,7 +355,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_left = 0; \
 	} while (0)
 
-/* add a file handle to an mbuf chain */
+                                        
 #define nfsm_chain_add_fh(E, NMC, VERS, FHP, FHLEN) \
 	do { \
 	        if (E) break; \
@@ -364,14 +364,14 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        nfsm_chain_add_opaque((E), (NMC), (FHP), (FHLEN)); \
 	} while (0)
 
-/* add a string to an mbuf chain */
+                                   
 #define nfsm_chain_add_string(E, NMC, STR, LEN) \
 	do { \
 	        nfsm_chain_add_32((E), (NMC), (LEN)); \
 	        nfsm_chain_add_opaque((E), (NMC), (STR), (LEN)); \
 	} while (0)
 
-/* add a name to an mbuf chain */
+                                 
 #define nfsm_chain_add_name(E, NMC, STR, LEN, NMP) \
 	do { \
 	        if (E) break; \
@@ -381,7 +381,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                nfsm_chain_add_string((E), (NMC), (STR), (LEN)); \
 	} while (0)
 
-/* add an NFSv2 time to an mbuf chain */
+                                        
 #define nfsm_chain_add_v2time(E, NMC, TVP) \
 	do { \
 	        if (TVP) { \
@@ -389,20 +389,20 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                nfsm_chain_add_32((E), (NMC), ((TVP)->tv_nsec != -1) ? \
 	                        ((uint32_t)(TVP)->tv_nsec / 1000) : 0xffffffff); \
 	        } else { \
-	/* no time... use -1 */ \
+	                        \
 	                nfsm_chain_add_32((E), (NMC), -1); \
 	                nfsm_chain_add_32((E), (NMC), -1); \
 	        } \
 	} while (0)
 
-/* add an NFSv3 time to an mbuf chain */
+                                        
 #define nfsm_chain_add_v3time(E, NMC, TVP) \
 	do { \
 	        nfsm_chain_add_32((E), (NMC), (TVP)->tv_sec); \
 	        nfsm_chain_add_32((E), (NMC), (TVP)->tv_nsec); \
 	} while (0)
 
-/* add an NFS v2 or v3 time to an mbuf chain */
+                                               
 #define nfsm_chain_add_time(E, NMC, VERS, TVP) \
 	do { \
 	        if ((VERS) == NFS_VER2) { \
@@ -412,14 +412,14 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-/* add an NFSv3 postop file handle to an mbuf chain */
+                                                      
 #define nfsm_chain_add_postop_fh(E, NMC, FHP, FHLEN) \
 	do { \
 	        nfsm_chain_add_32((E), (NMC), TRUE); \
 	        nfsm_chain_add_fh((E), (NMC), NFS_VER3, (FHP), (FHLEN)); \
 	} while (0)
 
-/* add NFSv3 postop attributes to an mbuf chain */
+                                                  
 #define nfsm_chain_add_postop_attr(E, ND, NMC, ATTRERR, VAP) \
 	do { \
 	        if (E) break; \
@@ -432,28 +432,28 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (E) = nfsm_chain_add_fattr((ND), (NMC), (VAP)); \
 	} while (0)
 
-/* Add an NFSv2 "sattr" structure to an mbuf chain */
+                                                     
 #define nfsm_chain_add_v2sattr(E, NMC, VAP, SZRDEV) \
 	do { \
 	        if (E) break; \
 	        (E) = nfsm_chain_add_v2sattr_f((NMC), (VAP), (SZRDEV)); \
 	} while (0)
 
-/* Add an NFSv3 "sattr" structure to an mbuf chain */
+                                                     
 #define nfsm_chain_add_v3sattr(NMP, E, NMC, VAP) \
 	do { \
 	        if (E) break; \
 	        (E) = nfsm_chain_add_v3sattr_f((NMP), (NMC), (VAP)); \
 	} while (0)
 
-/* Add an NFSv4 "fattr" structure to an mbuf chain */
+                                                     
 #define nfsm_chain_add_fattr4(E, NMC, VAP, NMP) \
 	do { \
 	        if (E) break; \
 	        (E) = nfsm_chain_add_fattr4_f((NMC), (VAP), (NMP)); \
 	} while (0)
 
-/* add NFSv3 WCC data to an mbuf chain */
+                                         
 #define nfsm_chain_add_wcc_data(E, ND, NMC, PREERR, PREVAP, POSTERR, POSTVAP) \
 	do { \
 	        if (E) break; \
@@ -461,12 +461,12 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (PREERR), (PREVAP), (POSTERR), (POSTVAP)); \
 	} while (0)
 
-/* add NFSv4 COMPOUND header */
+                               
 #define NFS4_TAG_LENGTH 12
 #define nfsm_chain_add_compound_header(E, NMC, TAG, MINOR, NUMOPS) \
 	do { \
 	        if ((TAG) && strlen(TAG)) { \
-	/* put tags into a fixed-length space-padded field */ \
+	                                                      \
 	                char __nfstag[NFS4_TAG_LENGTH+1]; \
 	                snprintf(__nfstag, sizeof(__nfstag), "%-*s", NFS4_TAG_LENGTH, (TAG)); \
 	                nfsm_chain_add_32((E), (NMC), NFS4_TAG_LENGTH); \
@@ -474,11 +474,11 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } else { \
 	                nfsm_chain_add_32((E), (NMC), 0); \
 	        } \
-	        nfsm_chain_add_32((E), (NMC), (MINOR)); /*minorversion*/ \
+	        nfsm_chain_add_32((E), (NMC), (MINOR));                  \
 	        nfsm_chain_add_32((E), (NMC), (NUMOPS)); \
 	} while (0)
 
-/* add NFSv4 attr bitmap */
+                           
 #define nfsm_chain_add_bitmap(E, NMC, B, LEN) \
 	do { \
 	        int __i; \
@@ -487,7 +487,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                nfsm_chain_add_32((E), (NMC), (B)[__i]); \
 	} while (0)
 
-/* add NFSv4 attr bitmap masked with the given mask */
+                                                      
 #define nfsm_chain_add_bitmap_masked(E, NMC, B, LEN, MASK) \
 	do { \
 	        int __i; \
@@ -496,7 +496,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                nfsm_chain_add_32((E), (NMC), ((B)[__i] & (MASK)[__i])); \
 	} while (0)
 
-/* add NFSv4 attr bitmap masked with the supported attributes for this mount/node */
+                                                                                    
 #define nfsm_chain_add_bitmap_supported(E, NMC, B, NMP, NP) \
 	do { \
 	        uint32_t __bitmap[NFS_ATTR_BITMAP_LEN], *__bmp = (B); \
@@ -509,8 +509,8 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        if (NMFLAG((NMP), ACLONLY)) \
 	                __nomode = 1; \
 	        if (__nonamedattr || __noacl || __nomode) { \
-	/* don't ask for attrs we're not supporting */ \
-	/* some ".zfs" directories can't handle being asked for some attributes */ \
+	                                               \
+	                                                                           \
 	                int __ii; \
 	                NFS_CLEAR_ATTRIBUTES(__bitmap); \
 	                for (__ii=0; __ii < NFS_ATTR_BITMAP_LEN; __ii++) \
@@ -526,7 +526,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        nfsm_chain_add_bitmap_masked((E), (NMC), __bmp, NFS_ATTR_BITMAP_LEN, (NMP)->nm_fsattr.nfsa_supp_attr); \
 	} while (0)
 
-/* Add an NFSv4 "stateid" structure to an mbuf chain */
+                                                       
 #define nfsm_chain_add_stateid(E, NMC, SID) \
 	do { \
 	        nfsm_chain_add_32((E), (NMC), (SID)->seqid); \
@@ -535,7 +535,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        nfsm_chain_add_32((E), (NMC), (SID)->other[2]); \
 	} while (0)
 
-/* add an NFSv4 lock owner structure to an mbuf chain */
+                                                        
 #define nfsm_chain_add_lock_owner4(E, NMC, NMP, NLOP) \
 	do { \
 	        nfsm_chain_add_64((E), (NMC), (NMP)->nm_clientid); \
@@ -546,11 +546,11 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        nfsm_chain_add_32((E), (NMC), (NLOP)->nlo_pid_start.tv_usec); \
 	} while (0)
 
-/*
- * macros for dissecting NFS mbuf chains
- */
+  
+                                        
+   
 
-/* prepare an mbuf chain for dissection starting with the given mbuf */
+                                                                       
 #define nfsm_chain_dissect_init(E, NMC, H) \
 	do { \
 	        if (!(H)) { \
@@ -562,7 +562,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (NMC)->nmc_left = mbuf_len(H); \
 	} while (0)
 
-/* skip a number of bytes in an mbuf chain */
+                                             
 #define nfsm_chain_adv(E, NMC, LEN) \
 	do { \
 	        if (E) break; \
@@ -574,7 +574,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-/* get a 32bit value from an mbuf chain */
+                                          
 #define nfsm_chain_get_32(E, NMC, LVAL) \
 	do { \
 	        uint32_t __tmp32, *__tmpptr; \
@@ -592,7 +592,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (LVAL) = fxdr_unsigned(uint32_t, *__tmpptr); \
 	} while (0)
 
-/* get a 64bit value from an mbuf chain */
+                                          
 #define nfsm_chain_get_64(E, NMC, LVAL) \
 	do { \
 	        uint64_t __tmp64, *__tmpptr; \
@@ -610,7 +610,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        fxdr_hyper(__tmpptr, &(LVAL)); \
 	} while (0)
 
-/* get a pointer to the next consecutive bytes in an mbuf chain */
+                                                                  
 #define nfsm_chain_get_opaque_pointer(E, NMC, LEN, PTR) \
 	do { \
 	        uint32_t rndlen; \
@@ -629,7 +629,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-/* copy the next consecutive bytes of opaque data from an mbuf chain */
+                                                                       
 #define nfsm_chain_get_opaque(E, NMC, LEN, PTR) \
 	do { \
 	        size_t rndlen; \
@@ -649,7 +649,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-/* get the size of and a pointer to a file handle in an mbuf chain */
+                                                                     
 #define nfsm_chain_get_fh_ptr(E, NMC, VERS, FHP, FHSIZE) \
 	do { \
 	        if ((VERS) != NFS_VER2) { \
@@ -663,7 +663,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                nfsm_chain_get_opaque_pointer((E), (NMC), (FHSIZE), (FHP));\
 	} while (0)
 
-/* get the size of and data for a file handle in an mbuf chain */
+                                                                 
 #define nfsm_chain_get_fh(E, NMC, VERS, FHP) \
 	do { \
 	        if ((VERS) != NFS_VER2) { \
@@ -678,7 +678,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (FHP)->fh_len = 0;\
 	} while (0)
 
-/* get an NFS v2 or v3 time from an mbuf chain */
+                                                 
 #define nfsm_chain_get_time(E, NMC, VERS, TSEC, TNSEC) \
 	do { \
 	        nfsm_chain_get_32((E), (NMC), (TSEC)); \
@@ -690,7 +690,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (TNSEC) *= 1000; \
 	} while (0)
 
-/* get postop attributes from an mbuf chain */
+                                              
 #define nfsm_chain_postop_attr_get(NMP, E, NMC, F, VAP) \
 	do { \
 	        (F) = 0; \
@@ -701,8 +701,8 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (F) = 0; \
 	} while (0)
 
-/* update a node's attribute cache with postop attributes from an mbuf chain */
-/* (F returns whether the attributes were updated or not) */
+                                                                               
+                                                            
 #define nfsm_chain_postop_attr_update_flag(E, NMC, NP, F, X) \
 	do { \
 	        struct nfs_vattr ttvattr; \
@@ -716,14 +716,14 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	                (F) = 0; \
 	} while (0)
 
-/* update a node's attribute cache with postop attributes from an mbuf chain */
+                                                                               
 #define nfsm_chain_postop_attr_update(E, NMC, NP, X) \
 	do { \
 	        int __dummy_flag = 0; \
 	        nfsm_chain_postop_attr_update_flag((E), (NMC), (NP), __dummy_flag, (X)); \
 	} while (0)
 
-/* get and process NFSv3 WCC data from an mbuf chain */
+                                                       
 #define nfsm_chain_get_wcc_data(E, NMC, NP, PREMTIME, NEWPOSTATTR, X) \
 	do { \
 	        if (E) break; \
@@ -731,7 +731,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	} while (0)
 
 #if CONFIG_NFS4
-/* separate v4 variant for loading attrs that only runs when NFSv4 is set */
+                                                                            
 #define __nfsm_chain_loadattr_v4(E, NMC, VERS, X, VATTR) \
 	do { \
 	        (E) = nfs4_parsefattr((NMC), NULL, (VATTR), NULL, NULL, NULL); \
@@ -743,7 +743,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	} while (0)
 #endif
 
-/* update a node's attribute cache with attributes from an mbuf chain */
+                                                                        
 #define nfsm_chain_loadattr(E, NMC, NP, VERS, X) \
 	do { \
 	        struct nfs_vattr ttvattr; \
@@ -758,7 +758,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        NVATTR_CLEANUP(&ttvattr); \
 	} while (0)
 
-/* get NFSv4 attr bitmap */
+                           
 #define nfsm_chain_get_bitmap(E, NMC, B, LEN) \
 	do { \
 	        uint32_t __len = 0, __i; \
@@ -774,7 +774,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        (LEN) = __len; \
 	} while (0)
 
-/* get an NFSv4 "stateid" structure from an mbuf chain */
+                                                         
 #define nfsm_chain_get_stateid(E, NMC, SID) \
 	do { \
 	        nfsm_chain_get_32((E), (NMC), (SID)->seqid); \
@@ -794,7 +794,7 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	do { \
 	        uint32_t __val = 0; \
 	        nfsm_chain_get_32((E), (NMC), __val); \
-	/* [sigh] some implementations return the "illegal" op for unsupported ops */ \
+	                                                                              \
 	        nfsm_assert((E), ((__val == (OP)) || (__val == NFS_OP_ILLEGAL)), EBADRPC); \
 	        nfsm_chain_get_32((E), (NMC), __val); \
 	        nfsm_assert((E), (__val == NFS_OK), __val); \
@@ -816,5 +816,5 @@ int nfsm_chain_trim_data(struct nfsm_chain *, int, int *);
 	        } \
 	} while (0)
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* _NFS_NFSM_SUBS_H_ */
+#endif                          
+#endif                        

@@ -67,21 +67,21 @@ __options_decl(ipc_eventlink_type_t, uint8_t, {
 struct ipc_eventlink_base;
 
 struct ipc_eventlink {
-	ipc_port_t                  el_port;             /* Port for eventlink object */
-	thread_t                    el_thread;           /* Thread associated with eventlink object */
-	struct ipc_eventlink_base   *el_base;            /* eventlink base struct */
-	uint64_t                    el_sync_counter;     /* Sync counter for wait/ signal */
-	uint64_t                    el_wait_counter;     /* Counter passed in eventlink wait */
+	ipc_port_t                  el_port;                                            
+	thread_t                    el_thread;                                                        
+	struct ipc_eventlink_base   *el_base;                                       
+	uint64_t                    el_sync_counter;                                        
+	uint64_t                    el_wait_counter;                                           
 };
 
 struct ipc_eventlink_base {
-	struct ipc_eventlink          elb_eventlink[2];  /* Eventlink pair */
-	struct waitq                  elb_waitq;         /* waitq */
-	os_refcnt_t                   elb_ref_count;     /* ref count for eventlink */
+	struct ipc_eventlink          elb_eventlink[2];                      
+	struct waitq                  elb_waitq;                    
+	os_refcnt_t                   elb_ref_count;                                  
 	uint32_t                      elb_active:1,
 	    elb_type:8;
 #if DEVELOPMENT || DEBUG
-	queue_chain_t                 elb_global_elm;    /* Global list of eventlinks */
+	queue_chain_t                 elb_global_elm;                                   
 #endif
 };
 
@@ -96,7 +96,7 @@ struct ipc_eventlink_base {
 
 void ipc_eventlink_init(void);
 
-/* Function declarations */
+                           
 void
 ipc_eventlink_init(void);
 
@@ -138,5 +138,5 @@ uint64_t
 	kern_clock_id_t                     clock_id,
 	uint64_t                            deadline);
 
-#endif /* MACH_KERNEL_PRIVATE */
-#endif /* _IPC_IPC_EVENTLINK_H_ */
+#endif                          
+#endif                            

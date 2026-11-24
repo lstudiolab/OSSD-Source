@@ -38,22 +38,22 @@
 #include <kern/kern_types.h>
 #include <security/_label.h>
 
-/*
- * Common storage for exception actions.
- * There are arrays of these maintained at the activation, task, and host.
- */
+  
+                                        
+                                                                          
+   
 struct exception_action {
-	struct ipc_port         * XNU_PTRAUTH_SIGNED_PTR("exception_action.port") port; /* exception port */
-	thread_state_flavor_t   flavor;         /* state flavor to send */
-	exception_behavior_t    behavior;       /* exception type to raise */
-	boolean_t               privileged;     /* survives ipc_task_reset */
-	struct label            * XNU_PTRAUTH_SIGNED_PTR("exception_action.label") label; /* MAC label associated with action */
+	struct ipc_port         * XNU_PTRAUTH_SIGNED_PTR("exception_action.port") port;                     
+	thread_state_flavor_t   flavor;                                   
+	exception_behavior_t    behavior;                                    
+	boolean_t               privileged;                                  
+	struct label            * XNU_PTRAUTH_SIGNED_PTR("exception_action.label") label;                                       
 };
 
-/* Initialize global state needed for exceptions. */
+                                                    
 extern void exception_init(void);
 
-/* Make an up-call to a thread's exception server */
+                                                    
 extern kern_return_t exception_triage(
 	exception_type_t        exception,
 	mach_exception_data_t   code,
@@ -65,11 +65,11 @@ extern kern_return_t exception_triage_thread(
 	mach_msg_type_number_t  codeCnt,
 	thread_t                thread);
 
-/* Notify system performance monitor */
+                                       
 extern kern_return_t sys_perf_notify(thread_t thread, int pid);
 
-/* Notify crash reporter */
+                           
 extern kern_return_t task_exception_notify(exception_type_t exception,
     mach_exception_data_type_t code, mach_exception_data_type_t subcode);
 
-#endif  /* _KERN_EXCEPTION_H_ */
+#endif                          

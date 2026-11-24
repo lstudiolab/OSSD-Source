@@ -35,8 +35,8 @@
 #include "kxld_util.h"
 #include "kxld_srcversion.h"
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_srcversion_init_from_macho(KXLDsrcversion *srcversion, struct source_version_command *src)
 {
@@ -47,24 +47,24 @@ kxld_srcversion_init_from_macho(KXLDsrcversion *srcversion, struct source_versio
 	srcversion->has_srcversion = TRUE;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_srcversion_clear(KXLDsrcversion *srcversion)
 {
 	bzero(srcversion, sizeof(*srcversion));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_srcversion_get_macho_header_size(void)
 {
 	return sizeof(struct source_version_command);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_srcversion_export_macho(const KXLDsrcversion *srcversion, u_char *buf,
     u_long *header_offset, u_long header_size)

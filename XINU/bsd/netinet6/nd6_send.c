@@ -47,7 +47,7 @@
 #include <security/mac_framework.h>
 #endif
 
-SYSCTL_DECL(_net_inet6);        /* Note: Not in any common header. */
+SYSCTL_DECL(_net_inet6);                                             
 
 SYSCTL_NODE(_net_inet6, OID_AUTO, send, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "IPv6 Secure Neighbor Discovery");
@@ -66,12 +66,12 @@ SYSCTL_PROC(_net_inet6_send, OID_AUTO, cga_parameters,
     CTLTYPE_OPAQUE | CTLFLAG_RW | CTLFLAG_LOCKED, 0, 0,
     sysctl_cga_parameters, "S,nd6_send_nodecfg", "");
 
-/*
- * The size of the buffer is sufficient to contain a public key, its size in
- * machine binary type for the kernel, and the CGA precalc for the global
- * scope. This interface is not a public API, so we don't anticipate that the
- * userland and the kernel will be mismatched between ILP32 and LP64.
- */
+  
+                                                                            
+                                                                         
+                                                                             
+                                                                     
+   
 #define SYSCTL_CGA_PARAMETERS_BUFFER_SIZE \
 	(2 * (sizeof (u_int16_t) + IN6_CGA_KEY_MAXSIZE) + \
 	sizeof (struct in6_cga_prepare))
@@ -250,4 +250,4 @@ done:
 	return error;
 }
 
-/* End of file */
+                 

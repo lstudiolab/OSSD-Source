@@ -53,11 +53,11 @@ _Atomic uint32_t bt_init_flag = 0;
 void mach_bridge_timer_maintenance(void);
 uint32_t mach_bridge_timer_enable(uint32_t new_value, int change);
 
-/*
- * When CONFIG_MACH_BRIDGE_SEND_TIME is defined, it is expected
- * that a machine-specific timestamp sending routine such as
- * void mach_bridge_send_timestamp(uint64_t); has also been defined.
- */
+  
+                                                               
+                                                            
+                                                                    
+   
 extern void mach_bridge_send_timestamp(uint64_t);
 
 void
@@ -77,11 +77,11 @@ done:
 	lck_spin_unlock(&bt_maintenance_lock);
 }
 
-/*
- * If change = 0, return the current value of bridge_timer_enable
- * If change = 1, update bridge_timer_enable and return the updated
- * value
- */
+  
+                                                                 
+                                                                   
+        
+   
 uint32_t
 mach_bridge_timer_enable(uint32_t new_value, int change)
 {
@@ -96,34 +96,34 @@ mach_bridge_timer_enable(uint32_t new_value, int change)
 	return current_value;
 }
 
-#endif /* CONFIG_MACH_BRIDGE_SEND_TIME */
+#endif                                   
 
 #if CONFIG_MACH_BRIDGE_RECV_TIME
 #include <machine/machine_remote_time.h>
 
-/*
- * functions used by machine-specific code
- * that implements CONFIG_MACH_BRIDGE_RECV_TIME
- */
+  
+                                          
+                                               
+   
 void mach_bridge_add_timestamp(uint64_t remote_timestamp, uint64_t local_timestamp);
 void bt_calibration_thread_start(void);
 void bt_params_add(struct bt_params *params);
 
-/* function called by sysctl */
+                               
 struct bt_params bt_params_get_latest(void);
 
-/*
- * Platform specific bridge time receiving interface.
- * These variables should be exported by the platform specific time receiving code.
- */
+  
+                                                     
+                                                                                   
+   
 extern _Atomic uint32_t bt_init_flag;
 
 static uint64_t received_local_timestamp = 0;
 static uint64_t received_remote_timestamp = 0;
-/*
- * Buffer the previous timestamp pairs and rate
- * It is protected by the bt_ts_conversion_lock
- */
+  
+                                               
+                                               
+   
 #define BT_PARAMS_COUNT 10
 static struct bt_params bt_params_hist[BT_PARAMS_COUNT] = {};
 static int bt_params_idx = -1;
@@ -158,7 +158,7 @@ bt_params_find(uint64_t local_ts)
 
 	return NULL;
 }
-#endif /* defined(XNU_TARGET_OS_BRIDGE) */
+#endif                                    
 
 static inline struct bt_params
 bt_params_get_latest_locked(void)
@@ -178,7 +178,7 @@ bt_params_get_latest(void)
 {
 	struct bt_params latest_params = {};
 
-	/* Check if ts_converison_lock has been initialized */
+	                                                      
 	if (os_atomic_load(&bt_init_flag, acquire)) {
 		lck_spin_lock(&bt_ts_conversion_lock);
 		latest_params = bt_params_get_latest_locked();
@@ -187,15 +187,15 @@ bt_params_get_latest(void)
 	return latest_params;
 }
 
-/*
- * Conditions: bt_spin_lock held and called from primary interrupt context
- */
+  
+                                                                          
+   
 void
 mach_bridge_add_timestamp(uint64_t remote_timestamp, uint64_t local_timestamp)
 {
 	lck_spin_assert(&bt_spin_lock, LCK_ASSERT_OWNED);
 
-	/* sleep/wake might return the same mach_absolute_time as the previous timestamp pair */
+	                                                                                        
 	if ((received_local_timestamp == local_timestamp) ||
 	    (received_remote_timestamp == remote_timestamp)) {
 		return;
@@ -223,9 +223,9 @@ mach_bridge_compute_rate(uint64_t new_local_ts, uint64_t new_remote_ts,
 #define MIN_INITIAL_SAMPLE_COUNT 10
 #define MAX_INITIAL_SAMPLE_COUNT 50
 #define MAX_SKIP_RESET_COUNT 2
-#define MIN_LOCAL_TS_DISTANCE_NS 100000000 /* 100 ms */
-#define MAX_LOCAL_TS_DISTANCE_NS 350000000 /* 350 ms */
-#define TS_PAIR_MISMATCH_THRESHOLD_NS 50000000 /* 50 ms */
+#define MIN_LOCAL_TS_DISTANCE_NS 100000000             
+#define MAX_LOCAL_TS_DISTANCE_NS 350000000             
+#define TS_PAIR_MISMATCH_THRESHOLD_NS 50000000            
 #define MAX_TS_PAIR_MISMATCHES 5
 #define MAX_TS_PAIR_MISMATCH_RESET_COUNT 3
 #define MIN_OBSERVED_RATE 0.8
@@ -255,27 +255,27 @@ bt_calibration_thread(void)
 				max_initial_sample_count = MIN_INITIAL_SAMPLE_COUNT;
 			}
 		}
-		/* Nothing to do the first time */
+		                                  
 		goto block;
 	}
-	/*
-	 * The values in bt_params are recalculated every time a new timestamp
-	 * pair is received. Firstly, both timestamps are converted to nanoseconds.
-	 * The current and previous timestamp pairs are used to compute the
-	 * observed_rate of the two clocks w.r.t each other. For the first
-	 * MIN_INITIAL_SAMPLE_COUNT number of pairs, the cumulative_rate is a simple
-	 * average of the observed_rate. For the later pairs, the cumulative_rate
-	 * is updated using exponential moving average of the observed_rate.
-	 * The current and bt_params' base timestamp pairs are used to compute
-	 * the rate_from_base. This value ensures that the bt_params base
-	 * timestamp pair curve doesn't stay parallel to the observed timestamp
-	 * pair curve, rather moves in the direction of the observed timestamp curve.
-	 * The bt_params.rate is computed as a weighted average of the cumulative_rate
-	 * and the rate_from_base. For each current local timestamp, the remote_time
-	 * is predicted using the previous values of bt_params. After computing the new
-	 * bt_params.rate, bt_params.base_remote_time is set to this predicted value
-	 * and bt_params.base_local_time is set to the current local timestamp.
-	 */
+	  
+                                                                       
+                                                                            
+                                                                    
+                                                                   
+                                                                             
+                                                                          
+                                                                     
+                                                                       
+                                                                  
+                                                                        
+                                                                              
+                                                                               
+                                                                             
+                                                                                
+                                                                             
+                                                                        
+    
 recalculate:
 	assertf(recalculate_count <= MAX_RECALCULATE_COUNT, "bt_caliberation_thread: recalculate \
 					invocation exceeds MAX_RECALCULATE_COUNT");
@@ -289,12 +289,12 @@ recalculate:
 	} else if (received_remote_timestamp == BT_SLEEP_SENTINEL_TS) {
 		sleep = true;
 	} else if (!received_local_timestamp) {
-		/* If the local timestamp isn't accurately captured, the received value will be ignored */
+		                                                                                          
 		skip_rcv_ts = true;
 		goto block;
 	}
 
-	/* Keep a copy of the prev timestamps to compute distance */
+	                                                            
 	prev_received_local_ts = curr_local_ts;
 	prev_received_remote_ts = curr_remote_ts;
 
@@ -302,17 +302,17 @@ recalculate:
 	absolutetime_to_nanoseconds(curr_local_abs, &curr_local_ts);
 	curr_remote_ts = received_remote_timestamp;
 
-	/* Prevent unusual rate changes caused by delayed timestamps */
+	                                                               
 	uint64_t local_diff = curr_local_ts - prev_received_local_ts;
 	if (!(reset || sleep) && ((local_diff < MIN_LOCAL_TS_DISTANCE_NS) ||
 	    (!skip_rcv_ts && (local_diff > MAX_LOCAL_TS_DISTANCE_NS)))) {
-		/* Skip the current timestamp */
+		                                
 		KDBG(MACHDBG_CODE(DBG_MACH_CLOCK, MACH_BRIDGE_SKIP_TS), curr_local_ts, curr_remote_ts,
 		    prev_received_local_ts);
 		goto block;
 	} else {
 		skip_rcv_ts = false;
-		/* Use the prev copy of timestamps only if the distance is acceptable */
+		                                                                        
 		prev_local_ts = prev_received_local_ts;
 		prev_remote_ts = prev_received_remote_ts;
 	}
@@ -350,14 +350,14 @@ recalculate:
 		}
 		lck_spin_unlock(&bt_ts_conversion_lock);
 		if (bt_params_snapshot.rate == 0.0) {
-			/*
-			 * The rate should never be 0 because we always expect a reset/wake
-			 * sentinel after sleep, followed by valid timestamp pair data that
-			 * will be handled by the reset clause (above). However, we should
-			 * not rely on a paired version of the remote OS - we could actually
-			 * be running a completely different OS! Treat a timestamp after
-			 * a sleep as a reset condition.
-			 */
+			  
+                                                                      
+                                                                      
+                                                                     
+                                                                       
+                                                                   
+                                   
+      
 			reset = true;
 			skip_reset_count = MAX_SKIP_RESET_COUNT;
 			ts_pair_mismatch_reset_count = 0;
@@ -367,7 +367,7 @@ recalculate:
 			goto block;
 		}
 
-		/* Check if the predicted remote timestamp is within the expected current remote timestamp range */
+		                                                                                                   
 		uint64_t pred_remote_ts = mach_bridge_compute_timestamp(curr_local_ts, &bt_params_snapshot);
 		uint64_t diff = 0;
 		if (initial_sample_count >= max_initial_sample_count) {
@@ -388,7 +388,7 @@ recalculate:
 				if (ts_pair_mismatch_reset_count == MAX_TS_PAIR_MISMATCH_RESET_COUNT) {
 					panic("remote_time: timestamp pair mismatch exceeded limit");
 				}
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 				reset = true;
 				ts_pair_mismatch_reset_count++;
 				KDBG(MACHDBG_CODE(DBG_MACH_CLOCK, MACH_BRIDGE_RESET_TS), curr_local_ts, curr_remote_ts, 4);
@@ -399,7 +399,7 @@ recalculate:
 		}
 		double observed_rate, rate_from_base, new_rate;
 		observed_rate = mach_bridge_compute_rate(curr_local_ts, curr_remote_ts, prev_local_ts, prev_remote_ts);
-		/* Log bad observed rates and skip the timestamp pair */
+		                                                        
 		if ((observed_rate < MIN_OBSERVED_RATE) || (observed_rate > MAX_OBSERVED_RATE)) {
 			KDBG(MACHDBG_CODE(DBG_MACH_CLOCK, MACH_BRIDGE_OBSV_RATE), *(uint64_t *)((void *)&observed_rate));
 			ts_pair_mismatch = ts_pair_mismatch > 0 ? (ts_pair_mismatch - 1) : 0;
@@ -419,12 +419,12 @@ recalculate:
 		rate_from_base = mach_bridge_compute_rate(curr_local_ts, curr_remote_ts, bt_params_snapshot.base_local_ts,
 		    bt_params_snapshot.base_remote_ts);
 		new_rate = CUMULATIVE_RATE_WEIGHT * cumulative_rate + (1 - CUMULATIVE_RATE_WEIGHT) * rate_from_base;
-		/*
-		 * Acquire the lock first to ensure that bt_params.base_local_ts is always
-		 * greater than the last value of now captured by mach_bridge_remote_time.
-		 * This ensures that we always use the same parameters to compute remote
-		 * timestamp for a given local timestamp.
-		 */
+		  
+                                                                            
+                                                                            
+                                                                          
+                                           
+     
 		lck_spin_lock(&bt_ts_conversion_lock);
 		absolutetime_to_nanoseconds(mach_absolute_time(), &bt_params.base_local_ts);
 		bt_params.base_remote_ts = mach_bridge_compute_timestamp(bt_params.base_local_ts, &bt_params_snapshot);
@@ -440,7 +440,7 @@ skip_reset:
 
 	s = splsched();
 	lck_spin_lock(&bt_spin_lock);
-	/* Check if a new timestamp pair was received */
+	                                                
 	if (received_local_timestamp != curr_local_abs) {
 		recalculate_count++;
 		goto recalculate;
@@ -464,42 +464,42 @@ bt_calibration_thread_start(void)
 	thread_deallocate(thread);
 }
 
-#endif /* CONFIG_MACH_BRIDGE_RECV_TIME */
+#endif                                   
 
-/**
- * mach_bridge_remote_time
- *
- * This function is used to predict the remote CPU's clock time, given
- * the local time.
- *
- * If local_timestamp = 0, then the remote_timestamp is calculated
- * corresponding to the current mach_absolute_time.
- *
- * If XNU_TARGET_OS_BRIDGE is defined, then monotonicity of
- * predicted time is guaranteed only for recent local_timestamp values
- * lesser than the current mach_absolute_time upto 1 second.
- *
- * If CONFIG_MACH_BRIDGE_SEND_TIME is true, then the function is compiled
- * for the remote CPU. If CONFIG_MACH_BRIDGE_RECV_TIME is true, then the
- * the function is compiled for the local CPU. Both config options cannot
- * be true simultaneously.
- */
+   
+                          
+  
+                                                                      
+                  
+  
+                                                                  
+                                                   
+  
+                                                           
+                                                                      
+                                                            
+  
+                                                                         
+                                                                        
+                                                                         
+                          
+   
 uint64_t
 mach_bridge_remote_time(uint64_t local_timestamp)
 {
 #if defined(CONFIG_MACH_BRIDGE_SEND_TIME)
 #if !defined(CONFIG_MACH_BRIDGE_RECV_TIME)
-	/* only send side of the bridge is defined: no translation needed */
+	                                                                    
 	if (!local_timestamp) {
 		return mach_absolute_time();
 	}
 	return 0;
 #else
 #error "You cannot define both sides of the bridge!"
-#endif /* !defined(CONFIG_MACH_BRIDGE_RECV_TIME) */
+#endif                                             
 #else
 #if !defined(CONFIG_MACH_BRIDGE_RECV_TIME)
-	/* neither the send or receive side of the bridge is defined: echo the input */
+	                                                                               
 	return local_timestamp;
 #else
 	if (!os_atomic_load(&bt_init_flag, acquire)) {
@@ -523,11 +523,11 @@ mach_bridge_remote_time(uint64_t local_timestamp)
 #else
 	struct bt_params params = bt_params_get_latest_locked();
 	remote_timestamp = mach_bridge_compute_timestamp(local_timestamp, &params);
-#endif /* defined(XNU_TARGET_OS_BRIDGE) */
+#endif                                    
 	lck_spin_unlock(&bt_ts_conversion_lock);
 	KDBG(MACHDBG_CODE(DBG_MACH_CLOCK, MACH_BRIDGE_REMOTE_TIME), local_timestamp, remote_timestamp, now);
 
 	return remote_timestamp;
-#endif /* !defined(CONFIG_MACH_BRIDGE_RECV_TIME) */
-#endif /* defined(CONFIG_MACH_BRIDGE_SEND_TIME) */
+#endif                                             
+#endif                                            
 }

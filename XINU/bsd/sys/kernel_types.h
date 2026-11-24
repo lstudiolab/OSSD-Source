@@ -34,7 +34,7 @@
 #include <stdint.h>
 
 #ifdef BSD_BUILD
-/* Macros(?) to clear/set/test flags. */
+                                        
 #define SET(t, f)       (t) |= (f)
 #define CLR(t, f)       (t) &= ~(f)
 #define ISSET(t, f)     ((t) & (f))
@@ -55,7 +55,7 @@ struct ucred;
 typedef struct ucred * ucred_t;
 #endif
 
-#if defined(KERNEL) || !defined(_SYS_MOUNT_H_) /* also defined in mount.h */
+#if defined(KERNEL) || !defined(_SYS_MOUNT_H_)                              
 struct mount;
 typedef struct mount * mount_t;
 
@@ -102,14 +102,14 @@ typedef struct __rtentry*               route_t;
 typedef struct __if_clone*              if_clone_t;
 typedef struct __bufattr*               bufattr_t;
 
-#else /* BSD_BUILD */
+#else                
 
 typedef struct buf * buf_t;
 typedef struct file * file_t;
 #ifndef __LP64__
 typedef struct ucred * ucred_t;
 #endif
-#if defined(KERNEL) || !defined(_SYS_MOUNT_H_) /* also defined in mount.h */
+#if defined(KERNEL) || !defined(_SYS_MOUNT_H_)                              
 typedef struct mount * mount_t;
 typedef struct vnode * vnode_t;
 #endif
@@ -133,9 +133,9 @@ typedef struct ifnet_filter*    interface_filter_t;
 typedef struct rtentry*         route_t;
 typedef struct if_clone*        if_clone_t;
 typedef struct bufattr*         bufattr_t;
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* !BSD_BUILD */
+#endif                 
 
 #include <sys/_types/_guid_t.h>
 
@@ -160,4 +160,4 @@ typedef struct kauth_filesec * kauth_filesec_t;
 typedef int kauth_action_t;
 #endif
 
-#endif /* !_KERN_SYS_KERNELTYPES_H_ */
+#endif                                

@@ -1,6 +1,6 @@
-/*
- * kevent_qos: Tests Synchronous IPC QOS override.
- */
+  
+                                                  
+   
 
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
@@ -114,10 +114,10 @@ get_user_promotion_basepri(void)
 	        } \
 	} while (0)
 
-/*
- * Basic WL handler callback, it sleeps for n seconds and then checks the
- * effective Qos of the servicer thread.
- */
+  
+                                                                         
+                                        
+   
 static void
 workloop_cb_test_intransit(uint64_t *workloop_id __unused, void **eventslist, int *events)
 {
@@ -127,15 +127,15 @@ workloop_cb_test_intransit(uint64_t *workloop_id __unused, void **eventslist, in
 
 	EXPECT_TEST_MSG(*eventslist);
 
-	/* Wait for the client to send the high priority message to override the qos */
+	                                                                               
 	sleep(2 * RECV_TIMEOUT_SECS);
 
-	/* Skip the test if we can't check Qos */
+	                                         
 	if (geteuid() != 0) {
 		T_SKIP("kevent_qos test requires root privileges to run.");
 	}
 
-	/* The effective Qos should be the one expected after override */
+	                                                                 
 	EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 	    "dispatch_source event handler QoS should be %s", g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
 
@@ -143,9 +143,9 @@ workloop_cb_test_intransit(uint64_t *workloop_id __unused, void **eventslist, in
 	T_END;
 }
 
-/*
- * WL handler which checks if the servicer thread has correct Qos.
- */
+  
+                                                                  
+   
 static void
 workloop_cb_test_sync_send(uint64_t *workloop_id __unused, void **eventslist, int *events)
 {
@@ -157,7 +157,7 @@ workloop_cb_test_sync_send(uint64_t *workloop_id __unused, void **eventslist, in
 		T_SKIP("kevent_qos test requires root privileges to run.");
 	}
 
-	/* The effective Qos should be the one expected after override */
+	                                                                 
 	EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 	    "dispatch_source event handler QoS should be %s", g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
 
@@ -165,10 +165,10 @@ workloop_cb_test_sync_send(uint64_t *workloop_id __unused, void **eventslist, in
 	T_END;
 }
 
-/*
- * WL handler which checks the overridden Qos and then enables the knote and checks
- * for the Qos again if that dropped the sync ipc override.
- */
+  
+                                                                                   
+                                                           
+   
 static void
 workloop_cb_test_sync_send_and_enable(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
 {
@@ -183,21 +183,21 @@ workloop_cb_test_sync_send_and_enable(uint64_t *workloop_id, struct kevent_qos_s
 		T_SKIP("kevent_qos test requires root privileges to run.");
 	}
 
-	/* The effective Qos should be the one expected after override */
+	                                                                 
 	EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 	    "dispatch_source event handler QoS should be %s", g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
 
-	/* Snapshot the current override priority */
+	                                            
 	override_priority = get_user_promotion_basepri();
 
-	/* Enable the knote */
+	                      
 	struct kevent_qos_s *kev = *eventslist;
 	enable_kevent(workloop_id, kev->ident);
 
-	/*
-	 * Check if the override has been dropped, check for priority instead of qos since
-	 * there will be async qos push.
-	 */
+	  
+                                                                                   
+                                 
+    
 	reenable_priority = get_user_promotion_basepri();
 	T_EXPECT_LT(reenable_priority, override_priority,
 	    "thread's current override priority %d should be less than override priority prior to enabling knote %d",
@@ -207,10 +207,10 @@ workloop_cb_test_sync_send_and_enable(uint64_t *workloop_id, struct kevent_qos_s
 	T_END;
 }
 
-/*
- * WL handler which checks the overridden Qos and then handoffs the IPC,
- * enables the knote and checks for the Qos again that it hasn't dropped the sync ipc override.
- */
+  
+                                                                        
+                                                                                               
+   
 static void
 workloop_cb_test_sync_send_and_enable_handoff(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
 {
@@ -225,18 +225,18 @@ workloop_cb_test_sync_send_and_enable_handoff(uint64_t *workloop_id, struct keve
 		T_SKIP("kevent_qos test requires root privileges to run.");
 	}
 
-	/* The effective Qos should be the one expected after override */
+	                                                                 
 	EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 	    "dispatch_source event handler QoS should be %s",
 	    g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
 
-	/* Snapshot the current override priority */
+	                                            
 	override_priority = get_user_promotion_basepri();
 
 	struct kevent_qos_s *kev = *eventslist;
 	mach_msg_header_t *hdr = (mach_msg_header_t *)kev->ext[0];
 
-	/* handoff the IPC */
+	                     
 	struct kevent_qos_s handoff_kev = {
 		.filter = EVFILT_WORKLOOP,
 		.ident = hdr->msgh_remote_port,
@@ -249,12 +249,12 @@ workloop_cb_test_sync_send_and_enable_handoff(uint64_t *workloop_id, struct keve
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(error, "kevent_id");
 	T_ASSERT_EQ(0, error, "Handed off the sync IPC");
 
-	/* Enable the knote */
+	                      
 	enable_kevent(workloop_id, kev->ident);
 
-	/*
-	 * Check if the override has not been dropped.
-	 */
+	  
+                                               
+    
 	EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 	    "dispatch_source event handler QoS should still be %s",
 	    g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
@@ -263,10 +263,10 @@ workloop_cb_test_sync_send_and_enable_handoff(uint64_t *workloop_id, struct keve
 	T_END;
 }
 
-/*
- * WL handler receives the first message and checks sync ipc override, then enables the knote
- * and receives 2nd message and checks it sync ipc override.
- */
+  
+                                                                                             
+                                                            
+   
 static int send_two_sync_handler_called = 0;
 static void
 workloop_cb_test_send_two_sync(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
@@ -282,11 +282,11 @@ workloop_cb_test_send_two_sync(uint64_t *workloop_id __unused, struct kevent_qos
 	T_LOG("Number of events received is %d\n", *events);
 
 	if (send_two_sync_handler_called == 0) {
-		/* The effective Qos should be the one expected after override */
+		                                                                 
 		EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 		    "dispatch_source event handler QoS should be %s", g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
 
-		/* Enable the knote to get 2nd message */
+		                                         
 		struct kevent_qos_s *kev = *eventslist;
 		uint64_t port = kev->ident;
 		populate_kevent(kev, port);
@@ -300,10 +300,10 @@ workloop_cb_test_send_two_sync(uint64_t *workloop_id __unused, struct kevent_qos
 	send_two_sync_handler_called++;
 }
 
-/*
- * Checks the sync ipc override and then waits for client to destroy the
- * special reply port and checks if that removes the sync ipc override.
- */
+  
+                                                                        
+                                                                       
+   
 static boolean_t two_send_and_destroy_test_passed = FALSE;
 static int two_send_and_destroy_handler = 0;
 static void
@@ -318,16 +318,16 @@ workloop_cb_test_two_send_and_destroy(uint64_t *workloop_id __unused, struct kev
 	}
 
 	if (two_send_and_destroy_handler == 0) {
-		/* Sleep to make sure the mqueue gets full */
+		                                             
 		sleep(RECV_TIMEOUT_SECS);
 
-		/* The effective Qos should be the one expected after override */
+		                                                                 
 		EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_AFTER_OVERRIDE],
 		    "dispatch_source event handler QoS should be %s", g_expected_qos_name[ENV_QOS_AFTER_OVERRIDE]);
 
 		sleep(SEND_TIMEOUT_SECS);
 
-		/* Special reply port should have been destroyed, check Qos again */
+		                                                                    
 		EXPECT_QOS_EQ(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE],
 		    "dispatch_source event handler QoS should be %s", g_expected_qos_name[ENV_QOS_BEFORE_OVERRIDE]);
 
@@ -338,7 +338,7 @@ workloop_cb_test_two_send_and_destroy(uint64_t *workloop_id __unused, struct kev
 		}
 	}
 
-	/* Enable the knote to get next message */
+	                                          
 	struct kevent_qos_s *kev = *eventslist;
 	uint64_t port = kev->ident;
 	populate_kevent(kev, port);
@@ -422,9 +422,9 @@ enable_kevent(uint64_t *workloop_id, unsigned long long port)
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(error, "kevent_id");
 }
 
-/*
- * WL handler which sends a msg to the client from handler.
- */
+  
+                                                           
+   
 static void
 workloop_cb_test_sync_send_reply(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
 {
@@ -437,15 +437,15 @@ workloop_cb_test_sync_send_reply(uint64_t *workloop_id __unused, struct kevent_q
 	T_QUIET; T_ASSERT_EQ_INT(*events, 1, "events received");
 	T_QUIET; T_ASSERT_EQ_INT((*eventslist)->filter, EVFILT_MACHPORT, "received EVFILT_MACHPORT");
 
-	/* send reply */
+	                
 	send_reply(get_reply_port(*eventslist));
 
 	*events = 0;
 }
 
-/*
- * WL handler which deallocates reply port.
- */
+  
+                                           
+   
 static void
 workloop_cb_test_sync_send_deallocate(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
 {
@@ -463,7 +463,7 @@ workloop_cb_test_sync_send_deallocate(uint64_t *workloop_id __unused, struct kev
 
 	reply_port = get_reply_port(*eventslist);
 
-	/* deallocate port */
+	                     
 	kr = mach_port_deallocate(mach_task_self(), reply_port);
 
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_deallocate");
@@ -474,9 +474,9 @@ workloop_cb_test_sync_send_deallocate(uint64_t *workloop_id __unused, struct kev
 }
 
 
-/*
- * WL handler which sends a msg to the client before enabling the event from handler.
- */
+  
+                                                                                     
+   
 static void
 workloop_cb_test_sync_send_reply_kevent(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
 {
@@ -491,10 +491,10 @@ workloop_cb_test_sync_send_reply_kevent(uint64_t *workloop_id, struct kevent_qos
 
 	struct kevent_qos_s *kev = *eventslist;
 
-	/* send reply */
+	                
 	send_reply(get_reply_port(kev));
 
-	/* Enable the knote */
+	                      
 	enable_kevent(workloop_id, kev->ident);
 
 	*events = 0;
@@ -502,9 +502,9 @@ workloop_cb_test_sync_send_reply_kevent(uint64_t *workloop_id, struct kevent_qos
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler which sends a msg to the client before enabling the event from pthread.
- */
+  
+                                                                                     
+   
 static void
 workloop_cb_test_sync_send_reply_kevent_pthread(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
 {
@@ -519,7 +519,7 @@ workloop_cb_test_sync_send_reply_kevent_pthread(uint64_t *workloop_id __unused, 
 
 	struct kevent_qos_s *kev = *eventslist;
 
-	/* send reply */
+	                
 	send_reply(get_reply_port(kev));
 
 	populate_kevent(kev, kev->ident);
@@ -529,9 +529,9 @@ workloop_cb_test_sync_send_reply_kevent_pthread(uint64_t *workloop_id __unused, 
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler which sends a msg to the client after reenabling the event.
- */
+  
+                                                                         
+   
 static void
 workloop_cb_test_sync_send_kevent_reply(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
 {
@@ -547,10 +547,10 @@ workloop_cb_test_sync_send_kevent_reply(uint64_t *workloop_id, struct kevent_qos
 	struct kevent_qos_s *kev = *eventslist;
 	mach_port_t reply_port = get_reply_port(*eventslist);
 
-	/* Enable the knote */
+	                      
 	enable_kevent(workloop_id, kev->ident);
 
-	/* send reply */
+	                
 	send_reply(reply_port);
 
 	*events = 0;
@@ -558,9 +558,9 @@ workloop_cb_test_sync_send_kevent_reply(uint64_t *workloop_id, struct kevent_qos
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler that does nothing.
- */
+  
+                                
+   
 static void
 workloop_cb_test_sync_send_do_nothing(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
 {
@@ -573,16 +573,16 @@ workloop_cb_test_sync_send_do_nothing(uint64_t *workloop_id __unused, struct kev
 	T_QUIET; T_ASSERT_EQ_INT(*events, 1, "events received");
 	T_QUIET; T_ASSERT_EQ_INT((*eventslist)->filter, EVFILT_MACHPORT, "received EVFILT_MACHPORT");
 
-	/* do nothing */
+	                
 
 	*events = 0;
 
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler that returns the event to reenable.
- */
+  
+                                                 
+   
 static void
 workloop_cb_test_sync_send_do_nothing_kevent_pthread(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
 {
@@ -603,9 +603,9 @@ workloop_cb_test_sync_send_do_nothing_kevent_pthread(uint64_t *workloop_id __unu
 	T_LOG("handler returning \n");
 }
 
-/*
- * WL handler that exits.
- */
+  
+                         
+   
 static void
 workloop_cb_test_sync_send_do_nothing_exit(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, __unused int *events)
 {
@@ -618,15 +618,15 @@ workloop_cb_test_sync_send_do_nothing_exit(uint64_t *workloop_id __unused, struc
 	T_QUIET; T_ASSERT_EQ_INT(*events, 1, "events received");
 	T_QUIET; T_ASSERT_EQ_INT((*eventslist)->filter, EVFILT_MACHPORT, "received EVFILT_MACHPORT");
 
-	/* call exit */
+	               
 	exit(0);
 }
 
-/*
- * WL handler which:
- * first sync sends a msg to the client and reenables kevent after
- * second sync sends a msg and reenables kevent after.
- */
+  
+                    
+                                                                  
+                                                      
+   
 static void
 workloop_cb_test_sync_send_reply_kevent_reply_kevent(uint64_t *workloop_id __unused, struct kevent_qos_s **eventslist, int *events)
 {
@@ -641,7 +641,7 @@ workloop_cb_test_sync_send_reply_kevent_reply_kevent(uint64_t *workloop_id __unu
 
 	struct kevent_qos_s *kev = *eventslist;
 
-	/* send reply */
+	                
 	send_reply(get_reply_port(kev));
 
 	populate_kevent(kev, kev->ident);
@@ -651,11 +651,11 @@ workloop_cb_test_sync_send_reply_kevent_reply_kevent(uint64_t *workloop_id __unu
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler which:
- * first sync reenables kevent and after sends a msg
- * second sync sends a msg and reenables kevent after.
- */
+  
+                    
+                                                    
+                                                      
+   
 static int workloop_cb_test_sync_send_kevent_reply_reply_kevent_handler_called = 0;
 static void
 workloop_cb_test_sync_send_kevent_reply_reply_kevent(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
@@ -675,18 +675,18 @@ workloop_cb_test_sync_send_kevent_reply_reply_kevent(uint64_t *workloop_id, stru
 	if (workloop_cb_test_sync_send_kevent_reply_reply_kevent_handler_called == 0) {
 		workloop_cb_test_sync_send_kevent_reply_reply_kevent_handler_called = 1;
 
-		/* Enable the knote */
+		                      
 		enable_kevent(workloop_id, kev->ident);
 
-		/* send reply */
+		                
 		send_reply(reply_port);
 
 		*events = 0;
 	} else {
-		/* send reply */
+		                
 		send_reply(reply_port);
 
-		/* Enable the knote */
+		                      
 		enable_kevent(workloop_id, kev->ident);
 
 		*events = 0;
@@ -695,11 +695,11 @@ workloop_cb_test_sync_send_kevent_reply_reply_kevent(uint64_t *workloop_id, stru
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler which:
- * first sync reenables kevent and after sends a msg
- * second sync reenables kevent and after sends a msg
- */
+  
+                    
+                                                    
+                                                     
+   
 static void
 workloop_cb_test_sync_send_kevent_reply_kevent_reply(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
 {
@@ -715,21 +715,21 @@ workloop_cb_test_sync_send_kevent_reply_kevent_reply(uint64_t *workloop_id, stru
 	struct kevent_qos_s *kev = *eventslist;
 	mach_port_t reply_port = get_reply_port(kev);
 
-	/* Enable the knote */
+	                      
 	enable_kevent(workloop_id, kev->ident);
 
-	/* send reply */
+	                
 	send_reply(reply_port);
 
 	*events = 0;
 	T_LOG("Handler returning \n");
 }
 
-/*
- * WL handler which:
- * first sync ends a msg and reenables kevent after
- * second sync reenables kevent and sends a msg after
- */
+  
+                    
+                                                   
+                                                     
+   
 static int workloop_cb_test_sync_send_reply_kevent_kevent_reply_handler_called = 0;
 static void
 workloop_cb_test_sync_send_reply_kevent_kevent_reply(uint64_t *workloop_id, struct kevent_qos_s **eventslist, int *events)
@@ -749,16 +749,16 @@ workloop_cb_test_sync_send_reply_kevent_kevent_reply(uint64_t *workloop_id, stru
 	if (workloop_cb_test_sync_send_reply_kevent_kevent_reply_handler_called == 0) {
 		workloop_cb_test_sync_send_reply_kevent_kevent_reply_handler_called = 1;
 
-		/* send reply */
+		                
 		send_reply(reply_port);
 
 		populate_kevent(kev, kev->ident);
 
 		*events = 1;
 	} else {
-		/* Enable the knote */
+		                      
 		enable_kevent(workloop_id, kev->ident);
-		/* send reply */
+		                
 		send_reply(reply_port);
 
 		*events = 0;
@@ -980,7 +980,7 @@ qos_client_send_to_intransit(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* Create a rcv right to send in a msg */
+	                                         
 	kr = mach_port_allocate(mach_task_self(),
 	    MACH_PORT_RIGHT_RECEIVE,
 	    &msg_port);
@@ -994,25 +994,25 @@ qos_client_send_to_intransit(void *arg __unused)
 
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "client mach_port_insert_right");
 
-	/* Send an empty msg on the port to fire the WL thread */
+	                                                         
 	send(qos_send_port, MACH_PORT_NULL, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE], 0, 0), 0);
 
-	/* Sleep 3 seconds for the server to start */
+	                                             
 	sleep(3);
 
-	/* Send the message with msg port as in-transit port, this msg will not be dequeued */
+	                                                                                      
 	send(qos_send_port, MACH_PORT_NULL, msg_port,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE], 0, 0), 0);
 
-	/* Send 5 messages to msg port to make sure the port is full */
+	                                                               
 	for (int i = 0; i < 5; i++) {
 		send(msg_port, MACH_PORT_NULL, MACH_PORT_NULL,
 		    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE], 0, 0), 0);
 	}
 
 	T_LOG("Sent 5 msgs, now trying to send sync ipc message, which will block with a timeout\n");
-	/* Send the message to the in-transit port, it should block and override the rcv's workloop */
+	                                                                                              
 	send(msg_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0, 0), 0);
 	T_LOG("Client done sending messages, now waiting for server to end the test");
@@ -1068,7 +1068,7 @@ qos_send_and_sync_rcv(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* enqueue two messages to make sure that mqueue is not empty */
+	                                                                
 	send(qos_send_port, MACH_PORT_NULL, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_QUEUE_OVERRIDE], 0, 0), 0);
 
@@ -1077,7 +1077,7 @@ qos_send_and_sync_rcv(void *arg __unused)
 
 	sleep(SEND_TIMEOUT_SECS);
 
-	/* sync wait on msg port */
+	                           
 	receive(special_reply_port, qos_send_port);
 
 	T_LOG("Client done doing sync rcv, now waiting for server to end the test");
@@ -1102,13 +1102,13 @@ qos_sync_rcv(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* enqueue two messages to make sure that mqueue is not empty */
+	                                                                
 	send(qos_send_port, MACH_PORT_NULL, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_QUEUE_OVERRIDE], 0, 0), 0);
 
 	sleep(RECV_TIMEOUT_SECS);
 
-	/* sync wait on msg port */
+	                           
 	receive(special_reply_port, qos_send_port);
 
 	T_LOG("Client done doing sync rcv, now waiting for server to end the test");
@@ -1156,10 +1156,10 @@ T_HELPER_DECL(qos_client_sync_rcv_qos_change,
 	T_LOG("Waiting for %d seconds before changing qos of rcv thread", SEND_TIMEOUT_SECS);
 	sleep(SEND_TIMEOUT_SECS);
 
-	/* Wait for the thread to block */
+	                                  
 	thread_wait_to_block(pthread_mach_thread_np(rcv_thread));
 
-	/* Update the rcv thread's qos */
+	                                 
 	pthread_override_qos_class_start_np(rcv_thread, g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0);
 
 	sleep(HELPER_TIMEOUT_SECS);
@@ -1178,22 +1178,22 @@ qos_client_send_sync_msg_and_test_link(void *arg)
 	    KEVENT_QOS_SERVICE_NAME, &qos_send_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "client bootstrap_look_up");
 
-	/* start monitoring sync ipc link */
+	                                    
 	kr = mach_sync_ipc_link_monitoring_start(&special_reply_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_sync_ipc_link_monitoring_start");
 
-	/* Send the message to msg port */
+	                                  
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0, 0), 0);
 
-	/*
-	 * wait for the reply
-	 * some tests do not send a msg back so the receive
-	 * might fail
-	 */
+	  
+                      
+                                                    
+              
+    
 	receive(special_reply_port, qos_send_port);
 
-	/* stop monitoring link */
+	                          
 	kr = mach_sync_ipc_link_monitoring_stop(special_reply_port, &in_effect);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_sync_ipc_link_monitoring_stop");
 
@@ -1224,27 +1224,27 @@ qos_client_send_2sync_msg_and_test_link(void *arg)
 	    KEVENT_QOS_SERVICE_NAME, &qos_send_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "client bootstrap_look_up");
 
-	/* start monitoring sync ipc link */
+	                                    
 	kr = mach_sync_ipc_link_monitoring_start(&special_reply_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_sync_ipc_link_monitoring_start");
 
-	/* Send the first message to msg port */
+	                                        
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0, 0), 0);
 
-	/* wait for the reply */
+	                        
 	kr = receive(special_reply_port, qos_send_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "receive");
 
-	/* Send the second message to msg port */
+	                                         
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0, 0), 0);
 
-	/* wait for the reply */
+	                        
 	kr = receive(special_reply_port, qos_send_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "receive");
 
-	/* stop monitoring link */
+	                          
 	kr = mach_sync_ipc_link_monitoring_stop(special_reply_port, &in_effect);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_sync_ipc_link_monitoring_stop");
 
@@ -1326,11 +1326,11 @@ qos_client_send_sync_msg(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* Send the message to msg port */
+	                                  
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0, 0), 0);
 
-	/* wait for the reply */
+	                        
 	receive(special_reply_port, qos_send_port);
 
 	T_LOG("Client done sending messages, now waiting for server to end the test");
@@ -1360,11 +1360,11 @@ qos_client_send_two_sync_msg_high_qos(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* Send the message to msg port */
+	                                  
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], 0, 0), 0);
 
-	/* wait for the reply */
+	                        
 	receive(special_reply_port, qos_send_port);
 
 	T_LOG("Client done sending messages, now waiting for server to end the test");
@@ -1387,11 +1387,11 @@ qos_client_send_two_sync_msg_low_qos(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* Send the message to msg port */
+	                                  
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE], 0, 0), 0);
 
-	/* wait for the reply */
+	                        
 	receive(special_reply_port, qos_send_port);
 
 	T_LOG("Client done sending messages, now waiting for server to end the test");
@@ -1442,18 +1442,18 @@ qos_client_create_sepcial_reply_and_spawn_thread(void *arg __unused)
 
 	other_thread_reply_port = special_reply_port;
 
-	/* Send an async message */
+	                           
 	send(qos_send_port, MACH_PORT_NULL, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE], 0, 0), 0);
 
-	/* Send the sync ipc message */
+	                               
 	send(qos_send_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(g_expected_qos[ENV_QOS_BEFORE_OVERRIDE], 0, 0), 0);
 
-	/* Create a new thread to send the sync message on our special reply port */
+	                                                                            
 	thread_create_at_qos(g_expected_qos[ENV_QOS_AFTER_OVERRIDE], qos_client_destroy_other_threads_port);
 
-	/* Client starting to receive message */
+	                                        
 	receive(special_reply_port, qos_send_port);
 
 	sleep(3 * SEND_TIMEOUT_SECS);
@@ -1565,7 +1565,7 @@ expect_kevent_id_recv(mach_port_t port, qos_class_t qos[], const char *qos_name[
 {
 	int r;
 
-	/* Qos expected by workloop thread */
+	                                     
 	for (int i = 0; i < ENV_VAR_QOS; i++) {
 		g_expected_qos[i] = qos[i];
 		g_expected_qos_name[i] = qos_name[i];
@@ -1660,7 +1660,7 @@ expect_kevent_id_recv(mach_port_t port, qos_class_t qos[], const char *qos_name[
 
 	struct kevent_qos_s kev_err[] = {{ 0 }};
 
-	/* Setup workloop for mach msg rcv */
+	                                     
 	r = kevent_id(25, kev, 1, kev_err, 1, NULL,
 	    NULL, KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_ERROR_EVENTS);
 
@@ -1703,7 +1703,7 @@ special_reply_port_thread(void *ctxt)
 
 	*(mach_port_t *)ctxt = MACH_PORT_NULL;
 
-	sleep(1); // give some time to pthread_exit
+	sleep(1);                                  
 
 	ret = mach_msg(&rcv_msg.header, MACH_RCV_MSG | MACH_RCV_TIMEOUT, 0,
 	    rcv_msg.header.msgh_size, rcv_port, 1000, MACH_PORT_NULL);
@@ -1737,160 +1737,160 @@ T_DECL(special_reply_port, "basic special reply port robustness checks",
 	        const char *qos_name_array[ENV_VAR_QOS] = {qos_bo_name, qos_qo_name, qos_ao_name}; \
 	        run_client_server(server_name, client_name, qos_array, qos_name_array, wl_function_name); \
 	}
-/*
- * Test 1: Test special reply port SPI
- *
- * Create thread special reply port and check any subsequent calls to
- * the same should return MACH_PORT_NULL, unless the reply port is destroyed.
- */
+  
+                                      
+  
+                                                                     
+                                                                             
+   
 TEST_QOS("server_kevent_id", "qos_get_special_reply_port", special_reply_port, "workloop_cb_test_intransit",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_DEFAULT, "default")
 
-/*
- * Test 2: Test sync ipc send to an in-transit port
- *
- * Send a sync ipc message (at IN qos) to an in-transit port enqueued in a port
- * attached to a workloop. Test that the servicer of the workloop gets
- * sync ipc override.
- */
+  
+                                                   
+  
+                                                                               
+                                                                      
+                     
+   
 TEST_QOS("server_kevent_id", "qos_client_send_to_intransit_with_thr_pri", transit_IN, "workloop_cb_test_intransit",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INITIATED, "user initiated")
 
-/*
- * Test 3: Test sync ipc send to an in-transit port
- *
- * Send a sync ipc message (at UI qos) to an in-transit port enqueued in a port
- * attached to a workloop. Test that the servicer of the workloop gets
- * sync ipc override.
- */
+  
+                                                   
+  
+                                                                               
+                                                                      
+                     
+   
 TEST_QOS("server_kevent_id", "qos_client_send_to_intransit_with_thr_pri", transit_UI, "workloop_cb_test_intransit",
     QOS_CLASS_USER_INITIATED, "user initiated",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 4: Test starting a sync rcv overrides the servicer
- *
- * Send an async message to a port and then start waiting on
- * the port in mach msg rcv (at IN qos) with sync wait and test if the
- * servicer of the workloop gets sync ipc override.
- */
+  
+                                                          
+  
+                                                            
+                                                                      
+                                                   
+   
 TEST_QOS("server_kevent_id", "qos_client_send_sync_and_sync_rcv", rcv_IN, "workloop_cb_test_intransit",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INITIATED, "user initiated")
 
-/*
- * Test 5: Test starting a sync rcv overrides the servicer
- *
- * Send an async message to a port and then start waiting on
- * the port in mach msg rcv (at UI qos) with sync wait and test if the
- * servicer of the workloop gets sync ipc override.
- */
+  
+                                                          
+  
+                                                            
+                                                                      
+                                                   
+   
 TEST_QOS("server_kevent_id", "qos_client_send_sync_and_sync_rcv", rcv_UI, "workloop_cb_test_intransit",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INTERACTIVE, "user interactive with 47 basepri promotion")
 
-/*
- * Test 6: test sending sync ipc message (at IN qos) to port will override the servicer
- *
- * Send a message with sync ipc override to a port and check if the servicer
- * of the workloop on other side gets sync ipc override.
- */
+  
+                                                                                       
+  
+                                                                            
+                                                        
+   
 TEST_QOS("server_kevent_id", "qos_client_send_sync_msg_with_pri", send_sync_IN, "workloop_cb_test_sync_send",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INITIATED, "user initiated")
 
-/*
- * Test 7: test sending sync ipc message (at UI qos) to port will override the servicer
- *
- * Send a message with sync ipc override to a port and check if the servicer
- * of the workloop on other side gets sync ipc override.
- */
+  
+                                                                                       
+  
+                                                                            
+                                                        
+   
 TEST_QOS("server_kevent_id", "qos_client_send_sync_msg_with_pri", send_sync_UI, "workloop_cb_test_sync_send",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 8: test enabling a knote in workloop handler will drop the sync ipc override of delivered message
- *
- * Send a sync ipc message to port and check the servicer of the workloop
- * on other side gets sync ipc override and once the handler enables the knote,
- * that sync ipc override is dropped.
- */
+  
+                                                                                                         
+  
+                                                                         
+                                                                               
+                                     
+   
 TEST_QOS("server_kevent_id", "qos_client_send_sync_msg_with_pri", send_sync_UI_and_enable, "workloop_cb_test_sync_send_and_enable",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 9: test returning to begin processing drops sync ipc override of delivered message
- *
- * Send a sync ipc message and check if enabling the knote clears the override of
- * the delivered message, but should still have the override of an enqueued message.
- */
+  
+                                                                                          
+  
+                                                                                 
+                                                                                    
+   
 TEST_QOS("server_kevent_id", "qos_client_send_two_sync_msg_with_thr_pri", send_two_sync_UI, "workloop_cb_test_send_two_sync",
     QOS_CLASS_BACKGROUND, "background",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 10: test destroying the special reply port drops the override
- *
- * Send an async messages and a sync ipc message, the workloop handler
- * should get a sync ipc override, now test if destroying the special
- * reply port drops the sync ipc override on the servicer.
- */
+  
+                                                                     
+  
+                                                                      
+                                                                     
+                                                          
+   
 TEST_QOS("server_kevent_id", "qos_client_send_two_msg_and_destroy", send_two_UI_and_destroy, "workloop_cb_test_two_send_and_destroy",
     QOS_CLASS_BACKGROUND, "background",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 11: test sending two ports with chaining
- *
- * Send a sync IPC to a connection port, which itself is embedded in a message
- * sent as a sync IPC to a service port.
- */
+  
+                                                
+  
+                                                                              
+                                        
+   
 TEST_QOS("server_kevent_id", "qos_client_send_complex_msg_with_pri", send_complex_sync_UI_and_enable, "workloop_cb_test_sync_send_and_enable",
     QOS_CLASS_USER_INITIATED, "user initiated",
     QOS_CLASS_USER_INITIATED, "user initiated",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 12: test sending two ports with chaining
- *
- * Send a sync IPC to a connection port, which itself is embedded in a message
- * sent as a sync IPC to a service port.
- */
+  
+                                                
+  
+                                                                              
+                                        
+   
 TEST_QOS("server_kevent_id", "qos_client_send_complex_msg_with_pri", send_complex_sync_UI_and_enable_and_handoff, "workloop_cb_test_sync_send_and_enable_handoff",
     QOS_CLASS_USER_INITIATED, "user initiated",
     QOS_CLASS_USER_INITIATED, "user initiated",
     QOS_CLASS_USER_INTERACTIVE, "user initiated with 47 basepri promotion")
 
-/*
- * Test 13: test changing qos of a thread to trigger turnstile push
- *
- * Send a sync IPC to a service port and change the qos of the blocked thread
- * to verify that changing qos triggers a turnstile push.
- */
+  
+                                                                   
+  
+                                                                             
+                                                         
+   
 TEST_QOS("server_kevent_id", "qos_client_sync_rcv_qos_change", qos_change_to_IN, "workloop_cb_test_intransit",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_MAINTENANCE, "maintenance",
     QOS_CLASS_USER_INITIATED, "user initiated")
 
-/*
- * Test 14 - 21
- *
- * Test single sync ipc link with server that breaks/preserves the link in different ways.
- */
+  
+               
+  
+                                                                                          
+   
 TEST_QOS("server_kevent_id", "qos_client_send_sync_msg_with_link_check_correct_server", send_sync_link_correct_server_s, "workloop_cb_test_sync_send_reply",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_DEFAULT, "default",
@@ -1931,11 +1931,11 @@ TEST_QOS("server_kevent_id", "qos_client_send_sync_msg_with_link_check_correct_s
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_DEFAULT, "default")
 
-/*
- * Test 22 - 25
- *
- * Test sequential sync ipc link with server that breaks/preserves the link.
- */
+  
+               
+  
+                                                                            
+   
 TEST_QOS("server_kevent_id", "qos_client_send_2sync_msg_with_link_check_correct_server", send_2sync_link_correct_server_sksk, "workloop_cb_test_sync_send_reply_kevent_reply_kevent",
     QOS_CLASS_DEFAULT, "default",
     QOS_CLASS_DEFAULT, "default",

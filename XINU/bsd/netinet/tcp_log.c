@@ -36,7 +36,7 @@
 
 #if !TCPDEBUG
 #define TCPSTATES
-#endif /* TCPDEBUG */
+#endif               
 #include <netinet/tcp_fsm.h>
 
 #include <netinet/tcp_log.h>
@@ -50,53 +50,53 @@ SYSCTL_INT(_net_inet_tcp_log, OID_AUTO, level_info,
 
 #if (DEVELOPMENT || DEBUG)
 #if defined(XNU_TARGET_OS_OSX)
-/*
- * Log less on macOS as sockets are more prevalent than channels
- */
+  
+                                                                
+   
 #define TCP_LOG_ENABLE_DEFAULT \
     (TLEF_CONNECTION | TLEF_DST_LOCAL | TLEF_DST_GW | \
     TLEF_DROP_NECP)
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 #define TCP_LOG_ENABLE_DEFAULT \
     (TLEF_CONNECTION | TLEF_DST_LOCAL | TLEF_DST_GW | \
     TLEF_DROP_NECP | TLEF_DROP_PCB | TLEF_DROP_PKT | TLEF_THF_SYN)
-#endif /* XNU_TARGET_OS_OSX */
-#else /* (DEVELOPMENT || DEBUG) */
+#endif                        
+#else                             
 #define TCP_LOG_ENABLE_DEFAULT 0
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 uint32_t tcp_log_enable_flags = TCP_LOG_ENABLE_DEFAULT;
 SYSCTL_UINT(_net_inet_tcp_log, OID_AUTO, enable,
     CTLFLAG_RW | CTLFLAG_LOCKED, &tcp_log_enable_flags, 0, "");
 
-/*
- * The following is a help to describe the values of the flags
- */
+  
+                                                              
+   
 #define X(name, value, description, ...) #description ":" #value " "
 SYSCTL_STRING(_net_inet_tcp_log, OID_AUTO, enable_usage, CTLFLAG_RD | CTLFLAG_LOCKED,
     TCP_ENABLE_FLAG_LIST, 0, "");
 #undef X
 
-/*
- * Values for tcp_log_port when TLEF_RTT is enabled:
- *  0: log all TCP connections regardless of the port numbers
- *  1 to 65535: log TCP connections with this local or foreign port
- *  other: do not log (same effect as as tcp_log_rtt == 0)
- */
+  
+                                                    
+                                                             
+                                                                   
+                                                          
+   
 uint32_t tcp_log_port = 0;
 SYSCTL_UINT(_net_inet_tcp_log, OID_AUTO, rtt_port, CTLFLAG_RW | CTLFLAG_LOCKED,
     &tcp_log_port, 0, "");
 
-/*
- * Values for tcp_log_thflags_if_family when TLEF_THF_XXX is enabled:
- *  0: all interfaces
- *  other: only for interfaces with the corresponding interface functional type
- */
+  
+                                                                     
+                     
+                                                                               
+   
 #if (DEVELOPMENT || DEBUG)
 #define TCP_LOG_THFLAGS_IF_FAMILY_DEFAULT IFNET_FAMILY_IPSEC
-#else /* (DEVELOPMENT || DEBUG) */
+#else                             
 #define TCP_LOG_THFLAGS_IF_FAMILY_DEFAULT 0
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 static uint32_t tcp_log_thflags_if_family = TCP_LOG_THFLAGS_IF_FAMILY_DEFAULT;
 SYSCTL_UINT(_net_inet_tcp_log, OID_AUTO, thflags_if_family,
@@ -106,7 +106,7 @@ SYSCTL_UINT(_net_inet_tcp_log, OID_AUTO, thflags_if_family,
 #define TCP_LOG_PRIVACY_DEFAULT 0
 #else
 #define TCP_LOG_PRIVACY_DEFAULT 1
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 int tcp_log_privacy = TCP_LOG_PRIVACY_DEFAULT;
 SYSCTL_INT(_net_inet_tcp_log, OID_AUTO, privacy,
@@ -117,7 +117,7 @@ static unsigned int tcp_log_rate_limit = TCP_LOG_RATE_LIMIT;
 SYSCTL_UINT(_net_inet_tcp_log, OID_AUTO, rate_limit,
     CTLFLAG_RW | CTLFLAG_LOCKED, &tcp_log_rate_limit, 0, "");
 
-/* 1 minute by default */
+                         
 #define TCP_LOG_RATE_DURATION 60
 static unsigned int tcp_log_rate_duration = TCP_LOG_RATE_DURATION;
 SYSCTL_UINT(_net_inet_tcp_log, OID_AUTO, rate_duration,
@@ -161,15 +161,15 @@ static uint64_t tcp_log_current_period = 0;
 	tcpstates[tp->t_state], \
 	inp->inp_last_proc_name, so->last_pid
 
-/*
- * Returns true when above the rate limit
- */
+  
+                                         
+   
 static bool
 tcp_log_is_rate_limited(void)
 {
 	uint64_t current_net_period = net_uptime();
 
-	/* When set to zero it means to reset to default */
+	                                                   
 	if (tcp_log_rate_duration == 0) {
 		tcp_log_rate_duration = TCP_LOG_RATE_DURATION;
 	}
@@ -199,9 +199,9 @@ tcp_log_is_rate_limited(void)
 static void
 tcp_log_inp_addresses(struct inpcb *inp, char *lbuf, socklen_t lbuflen, char *fbuf, socklen_t fbuflen)
 {
-	/*
-	 * Ugly but %{private} does not work in the kernel version of os_log()
-	 */
+	  
+                                                                       
+    
 	if (tcp_log_privacy != 0) {
 		if (inp->inp_vflag & INP_IPV6) {
 			strlcpy(lbuf, "<IPv6-redacted>", lbuflen);
@@ -230,7 +230,7 @@ tcp_log_rtt_info(const char *func_name, int line_no, struct tcpcb *tp)
 	in_port_t local_port = inp->inp_lport;
 	in_port_t foreign_port = inp->inp_fport;
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -263,7 +263,7 @@ tcp_log_rt_rtt(const char *func_name, int line_no, struct tcpcb *tp,
 	in_port_t local_port = inp->inp_lport;
 	in_port_t foreign_port = inp->inp_fport;
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -273,9 +273,9 @@ tcp_log_rt_rtt(const char *func_name, int line_no, struct tcpcb *tp,
 
 	tcp_log_inp_addresses(inp, laddr_buf, sizeof(laddr_buf), faddr_buf, sizeof(faddr_buf));
 
-	/*
-	 * Log RTT values in milliseconds
-	 */
+	  
+                                  
+    
 	os_log(OS_LOG_DEFAULT,
 	    "tcp_rt_rtt (%s:%d) "
 	    TCP_LOG_COMMON_PCB_FMT
@@ -306,7 +306,7 @@ tcp_log_rtt_change(const char *func_name, int line_no, struct tcpcb *tp,
 		in_port_t local_port = inp->inp_lport;
 		in_port_t foreign_port = inp->inp_fport;
 
-		/* Do not log too much */
+		                         
 		if (tcp_log_is_rate_limited()) {
 			return;
 		}
@@ -342,7 +342,7 @@ tcp_log_keepalive(const char *func_name, int line_no, struct tcpcb *tp,
 	in_port_t local_port = inp->inp_lport;
 	in_port_t foreign_port = inp->inp_fport;
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -385,7 +385,7 @@ tcp_log_connection(struct tcpcb *tp, const char *event, int error)
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -466,7 +466,7 @@ tcp_log_listen(struct tcpcb *tp, int error)
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -524,7 +524,7 @@ tcp_log_connection_summary(struct tcpcb *tp)
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -534,18 +534,18 @@ tcp_log_connection_summary(struct tcpcb *tp)
 	local_port = inp->inp_lport;
 	foreign_port = inp->inp_fport;
 
-	/* Make sure the summary is logged once */
+	                                          
 	if (tp->t_flagsext & TF_LOGGED_CONN_SUMMARY) {
 		return;
 	}
 	tp->t_flagsext |= TF_LOGGED_CONN_SUMMARY;
 
-	/*
-	 * t_connect_time is the time when the connection started on
-	 * the first SYN.
-	 *
-	 * t_starttime is when the three way handshake was completed.
-	 */
+	  
+                                                             
+                  
+   
+                                                              
+    
 	if (tp->t_connect_time > 0) {
 		duration = tcp_now - tp->t_connect_time;
 
@@ -653,9 +653,9 @@ tcp_log_pkt_addresses(void *hdr, struct tcphdr *th, bool outgoing,
 	return true;
 }
 
-/*
- * Note: currently only used in the input path
- */
+  
+                                              
+   
 void
 tcp_log_drop_pcb(void *hdr, struct tcphdr *th, struct tcpcb *tp, bool outgoing, const char *reason)
 {
@@ -671,12 +671,12 @@ tcp_log_drop_pcb(void *hdr, struct tcphdr *th, struct tcpcb *tp, bool outgoing, 
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
 
-	/* Use the packet addresses when in the data path */
+	                                                    
 	if (hdr != NULL && th != NULL) {
 		if (outgoing) {
 			local_port = th->th_sport;
@@ -773,14 +773,14 @@ tcp_log_th_flags(void *hdr, struct tcphdr *th, struct tcpcb *tp, bool outgoing, 
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
 
-	/*
-	 * When no PCB or socket just log the packet
-	 */
+	  
+                                             
+    
 	if (tp == NULL || so == NULL) {
 		if (tcp_log_level_info == 0) {
 			os_log(OS_LOG_DEFAULT, TCP_LOG_TH_FLAGS_COMMON_FMT " no pcb",
@@ -829,7 +829,7 @@ tcp_log_drop_pkt(void *hdr, struct tcphdr *th, struct ifnet *ifp, const char *re
 	in_port_t local_port;
 	in_port_t foreign_port;
 	uint8_t thflags;
-	bool outgoing = false;  /* This is only for incoming packets */
+	bool outgoing = false;                                         
 
 	if (hdr == NULL || th == NULL) {
 		return;
@@ -853,7 +853,7 @@ tcp_log_drop_pkt(void *hdr, struct tcphdr *th, struct ifnet *ifp, const char *re
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}
@@ -894,7 +894,7 @@ tcp_log_message(const char *func_name, int line_no, struct tcpcb *tp, const char
 		return;
 	}
 
-	/* Do not log too much */
+	                         
 	if (tcp_log_is_rate_limited()) {
 		return;
 	}

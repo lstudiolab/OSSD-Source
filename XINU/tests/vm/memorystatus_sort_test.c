@@ -7,7 +7,7 @@
 #include <dispatch/dispatch.h>
 #include <mach-o/dyld.h>
 
-/* internal */
+              
 #include <spawn_private.h>
 #include <sys/coalition.h>
 #include <sys/kern_memorystatus.h>
@@ -17,83 +17,83 @@
 
 #define kNumProcsInCoalition 4
 typedef struct {
-	pid_t pids[kNumProcsInCoalition]; // An array of pids in this coalition. Owned by this struct.
-	pid_t expected_order[kNumProcsInCoalition]; // An array of pids in this coalition in proper sorted order.
+	pid_t pids[kNumProcsInCoalition];                                                             
+	pid_t expected_order[kNumProcsInCoalition];                                                              
 	uint64_t ids[COALITION_NUM_TYPES];
 } coalition_info_t;
 
-/*
- * Children pids spawned by this test that need to be cleaned up.
- * Has to be a global because the T_ATEND API doesn't take any arguments.
- */
+  
+                                                                 
+                                                                         
+   
 #define kMaxChildrenProcs 16
 static pid_t children_pids[kMaxChildrenProcs];
 static size_t num_children = 0;
 
-/*
- * Sets up a new coalition.
- */
+  
+                           
+   
 static void init_coalition(coalition_info_t*);
 
-/*
- * Places all procs in the coalition in the given band.
- */
+  
+                                                       
+   
 static void place_coalition_in_band(const coalition_info_t *, int band);
 
-/*
- * Place the given proc in the given band.
- */
+  
+                                          
+   
 static void place_proc_in_band(pid_t pid, int band);
 
-/*
- * Cleans up any children processes.
- */
+  
+                                    
+   
 static void cleanup_children(void);
 
-/*
- * Check if we're on a kernel where we can test coalitions.
- */
+  
+                                                           
+   
 static bool has_unrestrict_coalitions(void);
 
-/*
- * Unrestrict coalition syscalls.
- */
+  
+                                 
+   
 static void unrestrict_coalitions(void);
 
-/*
- * Restrict coalition syscalls
- */
+  
+                              
+   
 static void restrict_coalitions(void);
 
-/*
- * Allocate the requested number of pages and fault them in.
- * Used to achieve a desired footprint.
- */
+  
+                                                            
+                                       
+   
 static void *allocate_pages(int);
 
-/*
- * Get the vm page size.
- */
+  
+                        
+   
 static int get_vmpage_size(void);
 
-/*
- * Launch a proc with a role in a coalition.
- * If coalition_ids is NULL, skip adding the proc to the coalition.
- */
+  
+                                            
+                                                                   
+   
 static pid_t
 launch_proc_in_coalition(uint64_t *coalition_ids, int role, int num_pages);
 
-/*
- * Background process that will munch some memory, signal its parent, and
- * then sit in a loop.
- */
+  
+                                                                         
+                      
+   
 T_HELPER_DECL(coalition_member, "Mock coalition member") {
 	int num_pages = 0;
 	if (argc == 1) {
 		num_pages = atoi(argv[0]);
 	}
 	allocate_pages(num_pages);
-	// Signal to the parent that we've touched all of our pages.
+	                                                            
 	if (kill(getppid(), SIGUSR1) != 0) {
 		T_LOG("Unable to signal to parent process!");
 		exit(1);
@@ -103,12 +103,12 @@ T_HELPER_DECL(coalition_member, "Mock coalition member") {
 	}
 }
 
-/*
- * Test that sorting the fg bucket in coalition order works properly.
- * Spawns children in the same coalition in the fg band. Each child
- * has a different coalition role. Verifies that the coalition
- * is sorted properly by role.
- */
+  
+                                                                     
+                                                                   
+                                                              
+                              
+   
 T_DECL(memorystatus_sort_coalition, "Coalition sort order",
     T_META_ASROOT(true)) {
 	int ret;
@@ -121,14 +121,14 @@ T_DECL(memorystatus_sort_coalition, "Coalition sort order",
 	T_WITH_ERRNO; T_ASSERT_NE(res, SIG_ERR, "SIG_IGN SIGUSR1");
 	unrestrict_coalitions();
 
-	// Set up a new coalition with various members.
+	                                               
 	init_coalition(&coalition);
 	T_ATEND(cleanup_children);
 	T_ATEND(restrict_coalitions);
-	// Place all procs in the coalition in the foreground band
+	                                                          
 	place_coalition_in_band(&coalition, JETSAM_PRIORITY_FOREGROUND);
-	// Have the kernel sort the foreground bucket and verify that it's
-	// sorted correctly.
+	                                                                  
+	                    
 	ret = memorystatus_control(MEMORYSTATUS_CMD_TEST_JETSAM_SORT, JETSAM_PRIORITY_FOREGROUND, 0,
 	    coalition.expected_order, kNumProcsInCoalition * sizeof(pid_t));
 	T_QUIET; T_ASSERT_EQ(ret, 0, "Error while sorting or validating sorted order.\n"
@@ -136,21 +136,21 @@ T_DECL(memorystatus_sort_coalition, "Coalition sort order",
 	    "Look for memorystatus_verify_sort_order.");
 }
 
-/*
- * Test that sorting the idle bucket in footprint order works properly.
- *
- * Spawns some children with very different footprints in the idle band,
- * and then ensures that they get sorted properly.
- */
+  
+                                                                       
+  
+                                                                        
+                                                  
+   
 T_DECL(memorystatus_sort_footprint, "Footprint sort order",
     T_META_ASROOT(true)) {
 #define kNumChildren 3
 	static const int kChildrenFootprints[kNumChildren] = {500, 0, 2500};
-	/*
-	 * The expected sort order of the children in the order that they were launched.
-	 * Used to construct the expected_order pid array.
-	 * Note that procs should be sorted in descending footprint order.
-	 */
+	  
+                                                                                 
+                                                   
+                                                                   
+    
 	static const int kExpectedOrder[kNumChildren] = {2, 0, 1};
 	static const int kJetsamBand = JETSAM_PRIORITY_IDLE;
 	__block pid_t pid;
@@ -158,7 +158,7 @@ T_DECL(memorystatus_sort_footprint, "Footprint sort order",
 	dispatch_source_t ds_allocated;
 	T_ATEND(cleanup_children);
 
-	// After we spawn the children, they'll signal that they've touched their pages.
+	                                                                                
 	res = signal(SIGUSR1, SIG_IGN);
 	T_WITH_ERRNO; T_ASSERT_NE(res, SIG_ERR, "SIG_IGN SIGUSR1");
 	ds_allocated = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGUSR1, 0, dispatch_get_main_queue());
@@ -174,7 +174,7 @@ T_DECL(memorystatus_sort_footprint, "Footprint sort order",
 			for (int i = 0; i < kNumChildren; i++) {
 				expected_order[i] = children_pids[kExpectedOrder[i]];
 			}
-			// Verify the sort order
+			                        
 			ret = memorystatus_control(MEMORYSTATUS_CMD_TEST_JETSAM_SORT, kJetsamBand, 0,
 			expected_order, sizeof(expected_order));
 			T_QUIET; T_ASSERT_EQ(ret, 0, "Error while sorting or validating sorted order.\n"
@@ -238,10 +238,10 @@ init_coalition(coalition_info_t *coalition)
 		T_QUIET; T_ASSERT_POSIX_ZERO(ret, "coalition_create");
 	}
 
-	/*
-	 * Spawn procs for each coalition role, and construct the expected
-	 * sorted order.
-	 */
+	  
+                                                                   
+                 
+    
 	for (size_t i = 0; i < kNumProcsInCoalition; i++) {
 		int role;
 		if (i == 0) {
@@ -255,12 +255,12 @@ init_coalition(coalition_info_t *coalition)
 		}
 		pid_t pid = launch_proc_in_coalition(coalition->ids, role, 0);
 		coalition->pids[i] = pid;
-		/*
-		 * Determine the expected sorted order.
-		 * After a bucket has been coalition sorted, coalition members should
-		 * be in the following kill order:
-		 * undefined coalition members, extensions, xpc services, leader
-		 */
+		  
+                                         
+                                                                       
+                                    
+                                                                  
+     
 		if (role == COALITION_TASKROLE_LEADER) {
 			coalition->expected_order[3] = pid;
 		} else if (role == COALITION_TASKROLE_XPC) {

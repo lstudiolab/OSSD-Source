@@ -78,14 +78,14 @@
 #include <libkern/OSByteOrder.h>
 
 
-/* vars for quota file lock */
+                              
 static LCK_GRP_DECLARE(qf_lck_grp, "quota file");
 
-/* vars for quota list lock */
+                              
 static LCK_GRP_DECLARE(quota_list_lck_grp, "quuota list");
 static LCK_MTX_DECLARE(quota_list_mtx_lock, &quota_list_lck_grp);
 
-/* Routines to lock and unlock the quota global data */
+                                                       
 static int dq_list_lock(void);
 static void dq_list_unlock(void);
 
@@ -95,24 +95,24 @@ static void dq_unlock_internal(struct dquot *dq);
 static u_int32_t quotamagic[MAXQUOTAS] = INITQMAGICS;
 
 
-/*
- * Code pertaining to management of the in-core dquot data structures.
- */
+  
+                                                                      
+   
 #define DQHASH(dqvp, id) \
 	(&dqhashtbl[((((intptr_t)(dqvp)) >> 8) + id) & dqhash])
 LIST_HEAD(dqhash, dquot) * dqhashtbl;
 u_long dqhash;
 
-#define DQUOTINC        5       /* minimum free dquots desired */
+#define DQUOTINC        5                                        
 long numdquot, desireddquot = DQUOTINC;
 
-/*
- * Dquot free list.
- */
+  
+                   
+   
 TAILQ_HEAD(dqfreelist, dquot) dqfreelist;
-/*
- * Dquot dirty orphans list
- */
+  
+                           
+   
 TAILQ_HEAD(dqdirtylist, dquot) dqdirtylist;
 
 ZONE_VIEW_DEFINE(ZV_DQUOT, "FS quota entries", KHEAP_ID_DEFAULT,
@@ -127,18 +127,18 @@ static int  qf_ref(struct quotafile *);
 static void qf_rele(struct quotafile *);
 
 
-/*
- * Report whether dqhashinit has been run.
- */
+  
+                                          
+   
 int
 dqisinitialized(void)
 {
 	return dqhashtbl != NULL;
 }
 
-/*
- * Initialize hash table for dquot structures.
- */
+  
+                                              
+   
 void
 dqhashinit(void)
 {
@@ -183,9 +183,9 @@ dq_list_unlock(void)
 }
 
 
-/*
- * must be called with the quota_list_lock held
- */
+  
+                                               
+   
 void
 dq_lock_internal(struct dquot *dq)
 {
@@ -196,9 +196,9 @@ dq_lock_internal(struct dquot *dq)
 	dq->dq_lflags |= DQ_LLOCK;
 }
 
-/*
- * must be called with the quota_list_lock held
- */
+  
+                                               
+   
 void
 dq_unlock_internal(struct dquot *dq)
 {
@@ -314,20 +314,20 @@ qf_unlock(struct quotafile *qfp)
 }
 
 
-/*
- * take a reference on the quota file while we're
- * in dqget... this will prevent a quota_off from
- * occurring while we're potentially playing with
- * the quota file... the quota_off will stall until
- * all the current references 'die'... once we start
- * into quoto_off, all new references will be rejected
- * we also don't want any dqgets being processed while
- * we're in the middle of the quota_on... once we've
- * actually got the quota file open and the associated
- * struct quotafile inited, we can let them come through
- *
- * quota list lock must be held on entry
- */
+  
+                                                 
+                                                 
+                                                 
+                                                   
+                                                    
+                                                      
+                                                      
+                                                    
+                                                      
+                                                        
+  
+                                        
+   
 static int
 qf_ref(struct quotafile *qfp)
 {
@@ -342,12 +342,12 @@ qf_ref(struct quotafile *qfp)
 	return error;
 }
 
-/*
- * drop our reference and wakeup any waiters if
- * we were the last one holding a ref
- *
- * quota list lock must be held on entry
- */
+  
+                                               
+                                     
+  
+                                        
+   
 static void
 qf_rele(struct quotafile *qfp)
 {
@@ -370,11 +370,11 @@ dqfileinit(struct quotafile *qfp)
 }
 
 
-/*
- * Initialize a quota file
- *
- * must be called with the quota file lock held
- */
+  
+                          
+  
+                                               
+   
 int
 dqfileopen(struct quotafile *qfp, int type)
 {
@@ -388,12 +388,12 @@ dqfileopen(struct quotafile *qfp, int type)
 	context.vc_thread = current_thread();
 	context.vc_ucred = qfp->qf_cred;
 
-	/* Obtain the file size */
+	                          
 	if ((error = vnode_size(qfp->qf_vp, &file_size, &context)) != 0) {
 		goto out;
 	}
 
-	/* Read the file header */
+	                          
 	auio = uio_createwithbuffer(1, 0, UIO_SYSSPACE, UIO_READ,
 	    &uio_buf[0], sizeof(uio_buf));
 	uio_addiov(auio, CAST_USER_ADDR_T(&header), sizeof(header));
@@ -404,7 +404,7 @@ dqfileopen(struct quotafile *qfp, int type)
 		error = EINVAL;
 		goto out;
 	}
-	/* Sanity check the quota file header. */
+	                                         
 	if ((OSSwapBigToHostInt32(header.dqh_magic) != quotamagic[type]) ||
 	    (OSSwapBigToHostInt32(header.dqh_version) > QF_VERSION) ||
 	    (!powerof2(OSSwapBigToHostInt32(header.dqh_maxentries))) ||
@@ -412,7 +412,7 @@ dqfileopen(struct quotafile *qfp, int type)
 		error = EINVAL;
 		goto out;
 	}
-	/* Set up the time limits for this quota. */
+	                                            
 	if (header.dqh_btime != 0) {
 		qfp->qf_btime = OSSwapBigToHostInt32(header.dqh_btime);
 	} else {
@@ -424,7 +424,7 @@ dqfileopen(struct quotafile *qfp, int type)
 		qfp->qf_itime = MAX_IQ_TIME;
 	}
 
-	/* Calculate the hash table constants. */
+	                                         
 	qfp->qf_maxentries = OSSwapBigToHostInt32(header.dqh_maxentries);
 	qfp->qf_entrycnt = OSSwapBigToHostInt32(header.dqh_entrycnt);
 	qfp->qf_shift = dqhashshift(qfp->qf_maxentries);
@@ -432,9 +432,9 @@ out:
 	return error;
 }
 
-/*
- * Close down a quota file
- */
+  
+                          
+   
 void
 dqfileclose(struct quotafile *qfp, __unused int type)
 {
@@ -459,10 +459,10 @@ dqfileclose(struct quotafile *qfp, __unused int type)
 }
 
 
-/*
- * Obtain a dquot structure for the specified identifier and quota file
- * reading the information from the file if necessary.
- */
+  
+                                                                       
+                                                      
+   
 int
 dqget(u_int32_t id, struct quotafile *qfp, int type, struct dquot **dqp)
 {
@@ -503,9 +503,9 @@ dqget(u_int32_t id, struct quotafile *qfp, int type, struct dquot **dqp)
 relookup:
 	listlockval = dq_list_lock_val();
 
-	/*
-	 * Check the cache first.
-	 */
+	  
+                          
+    
 	for (dq = dqh->lh_first; dq; dq = dq->dq_hash.le_next) {
 		if (dq->dq_id != id ||
 		    dq->dq_qfile->qf_vp != dqvp) {
@@ -518,19 +518,19 @@ relookup:
 			goto relookup;
 		}
 
-		/*
-		 * dq_lock_internal may drop the quota_list_lock to msleep, so
-		 * we need to re-evaluate the identity of this dq
-		 */
+		  
+                                                                
+                                                   
+     
 		if (dq->dq_id != id || dq->dq_qfile == NULL ||
 		    dq->dq_qfile->qf_vp != dqvp) {
 			dq_unlock_internal(dq);
 			goto relookup;
 		}
-		/*
-		 * Cache hit with no references.  Take
-		 * the structure off the free list.
-		 */
+		  
+                                        
+                                     
+     
 		if (dq->dq_cnt++ == 0) {
 			if (dq->dq_flags & DQ_MOD) {
 				TAILQ_REMOVE(&dqdirtylist, dq, dq_freelist);
@@ -541,68 +541,68 @@ relookup:
 		dq_unlock_internal(dq);
 
 		if (fdq != NULL) {
-			/*
-			 * we grabbed this from the free list in the first pass
-			 * but we found the dq we were looking for in
-			 * the cache the 2nd time through
-			 * so stick it back on the free list and return the cached entry
-			 */
+			  
+                                                          
+                                                
+                                    
+                                                                   
+      
 			TAILQ_INSERT_HEAD(&dqfreelist, fdq, dq_freelist);
 		}
 		qf_rele(qfp);
 		dq_list_unlock();
 
 		if (ndq != NULL) {
-			/*
-			 * we allocated this in the first pass
-			 * but we found the dq we were looking for in
-			 * the cache the 2nd time through so free it
-			 */
+			  
+                                         
+                                                
+                                               
+      
 			zfree(ZV_DQUOT, ndq);
 		}
 		*dqp = dq;
 
 		return 0;
 	}
-	/*
-	 * Not in cache, allocate a new one.
-	 */
+	  
+                                     
+    
 	if (TAILQ_EMPTY(&dqfreelist) &&
 	    numdquot < MAXQUOTAS * desiredvnodes) {
 		desireddquot += DQUOTINC;
 	}
 
 	if (fdq != NULL) {
-		/*
-		 * we captured this from the free list
-		 * in the first pass through, so go
-		 * ahead and use it
-		 */
+		  
+                                        
+                                     
+                     
+     
 		dq = fdq;
 		fdq = NULL;
 	} else if (numdquot < desireddquot) {
 		if (ndq == NULL) {
-			/*
-			 * drop the quota list lock since zalloc may block
-			 */
+			  
+                                                     
+      
 			dq_list_unlock();
 
 			ndq = (struct dquot *)zalloc_flags(ZV_DQUOT,
 			    Z_WAITOK | Z_ZERO);
 
 			listlockval = dq_list_lock();
-			/*
-			 * need to look for the entry again in the cache
-			 * since we dropped the quota list lock and
-			 * someone else may have beaten us to creating it
-			 */
+			  
+                                                   
+                                              
+                                                    
+      
 			goto relookup;
 		} else {
-			/*
-			 * we allocated this in the first pass through
-			 * and we're still under out target, so go
-			 * ahead and use it
-			 */
+			  
+                                                 
+                                             
+                      
+      
 			dq = ndq;
 			ndq = NULL;
 			numdquot++;
@@ -613,11 +613,11 @@ relookup:
 			dq_list_unlock();
 
 			if (ndq) {
-				/*
-				 * we allocated this in the first pass through
-				 * but we're now at the limit of our cache size
-				 * so free it
-				 */
+				  
+                                                  
+                                                   
+                 
+       
 				zfree(ZV_DQUOT, ndq);
 			}
 			tablefull("dquot");
@@ -629,19 +629,19 @@ relookup:
 		dq_lock_internal(dq);
 
 		if (dq_list_lock_changed(listlockval) || dq->dq_cnt || (dq->dq_flags & DQ_MOD)) {
-			/*
-			 * we lost the race while we weren't holding
-			 * the quota list lock... dq_lock_internal
-			 * will drop it to msleep... this dq has been
-			 * reclaimed... go find another
-			 */
+			  
+                                               
+                                             
+                                                
+                                  
+      
 			dq_unlock_internal(dq);
 
-			/*
-			 * need to look for the entry again in the cache
-			 * since we dropped the quota list lock and
-			 * someone else may have beaten us to creating it
-			 */
+			  
+                                                   
+                                              
+                                                    
+      
 			goto relookup;
 		}
 		TAILQ_REMOVE(&dqfreelist, dq, dq_freelist);
@@ -653,63 +653,63 @@ relookup:
 		}
 		dq_unlock_internal(dq);
 
-		/*
-		 * because we may have dropped the quota list lock
-		 * in the call to dq_lock_internal, we need to
-		 * relookup in the hash in case someone else
-		 * caused a dq with this identity to be created...
-		 * if we don't find it, we'll use this one
-		 */
+		  
+                                                    
+                                                
+                                              
+                                                    
+                                            
+     
 		fdq = dq;
 		goto relookup;
 	}
-	/*
-	 * we've either freshly allocated a dq
-	 * or we've atomically pulled it out of
-	 * the hash and freelists... no one else
-	 * can have a reference, which means no
-	 * one else can be trying to use this dq
-	 */
+	  
+                                       
+                                        
+                                         
+                                        
+                                         
+    
 	dq_lock_internal(dq);
 	if (dq_list_lock_changed(listlockval)) {
 		dq_unlock_internal(dq);
 		goto relookup;
 	}
 
-	/*
-	 * Initialize the contents of the dquot structure.
-	 */
+	  
+                                                   
+    
 	dq->dq_cnt = 1;
 	dq->dq_flags = 0;
 	dq->dq_id = id;
 	dq->dq_qfile = qfp;
 	dq->dq_type = type;
-	/*
-	 * once we insert it in the hash and
-	 * drop the quota_list_lock, it can be
-	 * 'found'... however, we're still holding
-	 * the dq_lock which will keep us from doing
-	 * anything with it until we've finished
-	 * initializing it...
-	 */
+	  
+                                     
+                                       
+                                           
+                                             
+                                         
+                      
+    
 	LIST_INSERT_HEAD(dqh, dq, dq_hash);
 	dq_list_unlock();
 
 	if (ndq) {
-		/*
-		 * we allocated this in the first pass through
-		 * but we didn't need it, so free it after
-		 * we've droped the quota list lock
-		 */
+		  
+                                                
+                                            
+                                     
+     
 		zfree(ZV_DQUOT, ndq);
 	}
 
 	error = dqlookup(qfp, id, &dq->dq_dqb, &dq->dq_index);
 
-	/*
-	 * I/O error in reading quota file, release
-	 * quota structure and reflect problem to caller.
-	 */
+	  
+                                            
+                                                  
+    
 	if (error) {
 		dq_list_lock();
 
@@ -726,10 +726,10 @@ relookup:
 		*dqp = NODQUOT;
 		return error;
 	}
-	/*
-	 * Check for no limit to enforce.
-	 * Initialize time values if necessary.
-	 */
+	  
+                                  
+                                        
+    
 	if (dq->dq_isoftlimit == 0 && dq->dq_bsoftlimit == 0 &&
 	    dq->dq_ihardlimit == 0 && dq->dq_bhardlimit == 0) {
 		dq->dq_flags |= DQ_FAKE;
@@ -754,11 +754,11 @@ relookup:
 	return 0;
 }
 
-/*
- * Lookup a dqblk structure for the specified identifier and
- * quota file.  If there is no entry for this identifier then
- * one is inserted.  The actual hash table index is returned.
- */
+  
+                                                            
+                                                             
+                                                             
+   
 static int
 dqlookup(struct quotafile *qfp, u_int32_t id, struct dqblk *dqb, uint32_t *index)
 {
@@ -797,17 +797,17 @@ dqlookup(struct quotafile *qfp, u_int32_t id, struct dqblk *dqb, uint32_t *index
 			printf("dqlookup: error looking up id %u at index %d\n", id, i);
 			break;
 		}
-		/*
-		 * An empty entry means there is no entry
-		 * with that id.  In this case a new dqb
-		 * record will be inserted.
-		 */
+		  
+                                           
+                                          
+                             
+     
 		if (dqb->dqb_id == 0) {
 			bzero(dqb, sizeof(struct dqblk));
 			dqb->dqb_id = OSSwapHostToBigInt32(id);
-			/*
-			 * Write back to reserve entry for this id
-			 */
+			  
+                                             
+      
 			uio_reset(auio, dqoffset(i), UIO_SYSSPACE, UIO_WRITE);
 			uio_addiov(auio, CAST_USER_ADDR_T(dqb), sizeof(struct dqblk));
 			error = VNOP_WRITE(dqvp, auio, 0, &context);
@@ -820,7 +820,7 @@ dqlookup(struct quotafile *qfp, u_int32_t id, struct dqblk *dqb, uint32_t *index
 			dqb->dqb_id = id;
 			break;
 		}
-		/* An id match means an entry was found. */
+		                                           
 		if (OSSwapBigToHostInt32(dqb->dqb_id) == id) {
 			dqb->dqb_bhardlimit = OSSwapBigToHostInt64(dqb->dqb_bhardlimit);
 			dqb->dqb_bsoftlimit = OSSwapBigToHostInt64(dqb->dqb_bsoftlimit);
@@ -836,15 +836,15 @@ dqlookup(struct quotafile *qfp, u_int32_t id, struct dqblk *dqb, uint32_t *index
 	}
 	qf_unlock(qfp);
 
-	*index = i;  /* remember index so we don't have to recompute it later */
+	*index = i;                                                             
 
 	return error;
 }
 
 
-/*
- * Release a reference to a dquot.
- */
+  
+                                  
+   
 void
 dqrele(struct dquot *dq)
 {
@@ -870,9 +870,9 @@ dqrele(struct dquot *dq)
 	dq_list_unlock();
 }
 
-/*
- * Release a reference to a dquot but don't do any I/O.
- */
+  
+                                                       
+   
 void
 dqreclaim(struct dquot *dq)
 {
@@ -898,9 +898,9 @@ dqreclaim(struct dquot *dq)
 	dq_list_unlock();
 }
 
-/*
- * Update a quota file's orphaned disk quotas.
- */
+  
+                                              
+   
 void
 dqsync_orphans(struct quotafile *qfp)
 {
@@ -916,20 +916,20 @@ loop:
 		dq_lock_internal(dq);
 
 		if (dq->dq_qfile != qfp) {
-			/*
-			 * the identity of this dq changed while
-			 * the quota_list_lock was dropped
-			 * dq_lock_internal can drop it to msleep
-			 */
+			  
+                                           
+                                     
+                                            
+      
 			dq_unlock_internal(dq);
 			goto loop;
 		}
 		if ((dq->dq_flags & DQ_MOD) == 0) {
-			/*
-			 * someone cleaned and removed this from
-			 * the dq from the dirty list while the
-			 * quota_list_lock was dropped
-			 */
+			  
+                                           
+                                          
+                                 
+      
 			dq_unlock_internal(dq);
 			goto loop;
 		}
@@ -940,12 +940,12 @@ loop:
 		TAILQ_REMOVE(&dqdirtylist, dq, dq_freelist);
 
 		dq_list_unlock();
-		/*
-		 * we're still holding the dqlock at this point
-		 * with the reference count == 0
-		 * we shouldn't be able
-		 * to pick up another one since we hold dqlock
-		 */
+		  
+                                                 
+                                  
+                         
+                                                
+     
 		(void) dqsync_locked(dq);
 
 		dq_list_lock();
@@ -976,9 +976,9 @@ dqsync(struct dquot *dq)
 }
 
 
-/*
- * Update the disk quota in the quota file.
- */
+  
+                                           
+   
 int
 dqsync_locked(struct dquot *dq)
 {
@@ -1004,7 +1004,7 @@ dqsync_locked(struct dquot *dq)
 	    UIO_WRITE, &uio_buf[0], sizeof(uio_buf));
 	uio_addiov(auio, CAST_USER_ADDR_T(&dqb), sizeof(struct dqblk));
 
-	context.vc_thread = current_thread();   /* XXX */
+	context.vc_thread = current_thread();            
 	context.vc_ucred = dq->dq_qfile->qf_cred;
 
 	dqblkp = &dq->dq_dqb;
@@ -1031,9 +1031,9 @@ dqsync_locked(struct dquot *dq)
 	return error;
 }
 
-/*
- * Flush all entries from the cache for a particular vnode.
- */
+  
+                                                           
+   
 void
 dqflush(struct vnode *vp)
 {
@@ -1044,11 +1044,11 @@ dqflush(struct vnode *vp)
 		return;
 	}
 
-	/*
-	 * Move all dquot's that used to refer to this quota
-	 * file off their hash chains (they will eventually
-	 * fall off the head of the free list and be re-used).
-	 */
+	  
+                                                     
+                                                    
+                                                       
+    
 	dq_list_lock();
 
 	for (dqh = &dqhashtbl[dqhash]; dqh >= dqhashtbl; dqh--) {
@@ -1067,25 +1067,25 @@ dqflush(struct vnode *vp)
 	dq_list_unlock();
 }
 
-/*
- * LP64 support for munging dqblk structure.
- * XXX conversion of user_time_t to time_t loses precision; not an issue for
- * XXX us now, since we are only ever setting 32 bits worth of time into it.
- */
+  
+                                            
+                                                                            
+                                                                            
+   
 __private_extern__ void
 munge_dqblk(struct dqblk *dqblkp, struct user_dqblk *user_dqblkp, boolean_t to64)
 {
 	if (to64) {
-		/* munge kernel (32 bit) dqblk into user (64 bit) dqblk */
+		                                                          
 		bcopy((caddr_t)dqblkp, (caddr_t)user_dqblkp, offsetof(struct dqblk, dqb_btime));
 		user_dqblkp->dqb_id = dqblkp->dqb_id;
 		user_dqblkp->dqb_itime = dqblkp->dqb_itime;
 		user_dqblkp->dqb_btime = dqblkp->dqb_btime;
 	} else {
-		/* munge user (64 bit) dqblk into kernel (32 bit) dqblk */
+		                                                          
 		bcopy((caddr_t)user_dqblkp, (caddr_t)dqblkp, offsetof(struct dqblk, dqb_btime));
 		dqblkp->dqb_id = user_dqblkp->dqb_id;
-		dqblkp->dqb_itime = user_dqblkp->dqb_itime;     /* XXX - lose precision */
-		dqblkp->dqb_btime = user_dqblkp->dqb_btime;     /* XXX - lose precision */
+		dqblkp->dqb_itime = user_dqblkp->dqb_itime;                               
+		dqblkp->dqb_btime = user_dqblkp->dqb_btime;                               
 	}
 }

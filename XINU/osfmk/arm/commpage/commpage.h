@@ -32,7 +32,7 @@
 #ifndef __ASSEMBLER__
 #include <stdint.h>
 #include <mach/vm_types.h>
-#endif /* __ASSEMBLER__ */
+#endif                    
 
 extern void     commpage_set_timestamp(uint64_t tbr, uint64_t secs, uint64_t frac, uint64_t scale, uint64_t tick_per_sec);
 #define commpage_disable_timestamp() commpage_set_timestamp( 0, 0, 0, 0, 0 );
@@ -53,4 +53,4 @@ extern  void    commpage_update_dof(boolean_t enabled);
 extern  void    commpage_update_dyld_flags(uint64_t value);
 extern uint32_t commpage_is_in_pfz64(addr64_t addr);
 
-#endif /* _ARM_COMMPAGE_H */
+#endif                      

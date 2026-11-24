@@ -76,9 +76,9 @@
 #define	FBT_RET					0xc3
 #define	FBT_RET_IMM16			0xc2
 #define	FBT_LEAVE				0xc9
-#define	FBT_JMP_SHORT_REL		0xeb /* Jump short, relative, displacement relative to next instr. */
-#define	FBT_JMP_NEAR_REL		0xe9 /* Jump near, relative, displacement relative to next instr. */
-#define	FBT_JMP_FAR_ABS			0xea /* Jump far, absolute, address given in operand */
+#define	FBT_JMP_SHORT_REL		0xeb                                                                 
+#define	FBT_JMP_NEAR_REL		0xe9                                                                
+#define	FBT_JMP_FAR_ABS			0xea                                                   
 #define FBT_RET_LEN				1
 #define FBT_RET_IMM16_LEN		3
 #define	FBT_JMP_SHORT_REL_LEN	2
@@ -110,8 +110,8 @@ fbt_invop(uintptr_t addr, uintptr_t *state, uintptr_t rval)
 			if (fbt->fbtp_roffset == 0) {
 				x86_saved_state64_t *regs = (x86_saved_state64_t *)state;
 
-				CPU->cpu_dtrace_caller = *(uintptr_t *)(((uintptr_t)(regs->isf.rsp))+sizeof(uint64_t)); // 8(%rsp)
-				/* 64-bit ABI, arguments passed in registers. */
+				CPU->cpu_dtrace_caller = *(uintptr_t *)(((uintptr_t)(regs->isf.rsp))+sizeof(uint64_t));           
+				                                                
 				dtrace_probe(fbt->fbtp_id, regs->rdi, regs->rsi, regs->rdx, regs->rcx, regs->r8);
 				CPU->cpu_dtrace_caller = 0;
 			} else {
@@ -150,8 +150,8 @@ fbt_perfCallback(
 
 		oldlevel = ml_set_interrupts_enabled(FALSE);
 
-		/* Calculate where the stack pointer was when the probe instruction "fired." */
-		rsp_probe = saved_state->isf.rsp; /* Easy, x86_64 establishes this value in idt64.s */
+		                                                                               
+		rsp_probe = saved_state->isf.rsp;                                                     
 
 		__asm__ volatile(
 			"Ldtrace_invop_callsite_pre_label:\n"
@@ -175,55 +175,55 @@ fbt_perfCallback(
 
 		switch (emul) {
 		case DTRACE_INVOP_NOP:
-			saved_state->isf.rip += DTRACE_INVOP_NOP_SKIP;	/* Skip over the patched NOP (planted by sdt). */
+			saved_state->isf.rip += DTRACE_INVOP_NOP_SKIP;	                                                 
 			retval = KERN_SUCCESS;
 			break;
 
 		case DTRACE_INVOP_MOV_RSP_RBP:
-			saved_state->rbp = rsp_probe;							/* Emulate patched mov %rsp,%rbp */
-			saved_state->isf.rip += DTRACE_INVOP_MOV_RSP_RBP_SKIP;	/* Skip over the bytes of the patched mov %rsp,%rbp */
+			saved_state->rbp = rsp_probe;							                                   
+			saved_state->isf.rip += DTRACE_INVOP_MOV_RSP_RBP_SKIP;	                                                      
 			retval = KERN_SUCCESS;
 			break;
 
 		case DTRACE_INVOP_POP_RBP:
 		case DTRACE_INVOP_LEAVE:
-/*
- * Emulate first micro-op of patched leave: mov %rbp,%rsp
- * fp points just below the return address slot for target's ret
- * and at the slot holding the frame pointer saved by the target's prologue.
- */
+  
+                                                         
+                                                                
+                                                                            
+   
 			fp = saved_state->rbp;
-/* Emulate second micro-op of patched leave: patched pop %rbp
- * savearea rbp is set for the frame of the caller to target
- * The *live* %rsp will be adjusted below for pop increment(s)
- */
+                                                             
+                                                            
+                                                              
+   
 			saved_state->rbp = *(uint64_t *)fp;
-/* Skip over the patched leave */
+                                 
 			saved_state->isf.rip += DTRACE_INVOP_LEAVE_SKIP;
-/*
- * Lift the stack to account for the emulated leave
- * Account for words local in this frame
- * (in "case DTRACE_INVOP_POPL_EBP:" this is zero.)
- */
-			delta = ((uint32_t *)fp) - ((uint32_t *)rsp_probe); /* delta is a *word* increment */
-/* Account for popping off the rbp (just accomplished by the emulation
- * above...)
- */
+  
+                                                   
+                                        
+                                                   
+   
+			delta = ((uint32_t *)fp) - ((uint32_t *)rsp_probe);                                  
+                                                                      
+            
+   
 			delta += 2;
 			saved_state->isf.rsp += (delta << 2);
-/* Obtain the stack pointer recorded by the trampolines */
+                                                          
 			old_sp = *lo_spp;
-/* Shift contents of stack */
+                             
 			for (pDst = (uint32_t *)fp;
 			     pDst > (((uint32_t *)old_sp));
 				 pDst--)
 				*pDst = pDst[-delta];
 
 #if KASAN
-			/*
-			 * The above has moved stack objects so they are no longer in sync
-			 * with the shadow.
-			 */
+			  
+                                                                     
+                      
+      
 			uintptr_t base = (uintptr_t)((uint32_t *)old_sp - delta);
 			uintptr_t size = (uintptr_t)fp - base;
 			if (base >= VM_MIN_KERNEL_AND_KEXT_ADDRESS) {
@@ -231,9 +231,9 @@ fbt_perfCallback(
 			}
 #endif
 
-/* Track the stack lift in "saved_state". */
+                                            
 			saved_state = (x86_saved_state64_t *) (((uintptr_t)saved_state) + (delta << 2));
-/* Adjust the stack pointer utilized by the trampolines */
+                                                          
 			*lo_spp = old_sp + (delta << 2);
 
 			retval = KERN_SUCCESS;
@@ -244,7 +244,7 @@ fbt_perfCallback(
 			break;
 		}
 
-		/* Trick trap_from_kernel into not attempting to handle pending AST_URGENT */
+		                                                                             
 		saved_state->isf.trapno = T_PREEMPT;
 
 		ml_set_interrupts_enabled(oldlevel);
@@ -264,9 +264,9 @@ fbt_provide_probe(struct modctl *ctl, const char *modname, const char* symbolNam
 	machine_inst_t *instr, *limit, theInstr, i1, i2, i3;
 	int size;
 
-	/*
-	 * Guard against null symbols
-	 */
+	  
+                              
+    
 	if (!symbolStart || !instrHigh || instrHigh < symbolStart) {
 		kprintf("dtrace: %s has an invalid address\n", symbolName);
 		return;
@@ -294,26 +294,26 @@ fbt_provide_probe(struct modctl *ctl, const char *modname, const char* symbolNam
 	limit = (machine_inst_t *)instrHigh;
 
 	if (i1 == FBT_REX_RSP_RBP && i2 == FBT_MOV_RSP_RBP0 && i3 == FBT_MOV_RSP_RBP1) {
-		instr += 1; /* Advance to the mov %rsp,%rbp */
+		instr += 1;                                   
 		theInstr = i1;
 	} else {
 		return;
 	}
 #if 0
 	else {
-		/*
-		 * Sometimes, the compiler will schedule an intervening instruction
-		 * in the function prologue. Example:
-		 *
-		 * _mach_vm_read:
-		 * 000006d8        pushl   %ebp
-		 * 000006d9        movl    $0x00000004,%edx
-		 * 000006de        movl    %esp,%ebp
-		 *
-		 * Try the next instruction, to see if it is a movl %esp,%ebp
-		 */
+		  
+                                                                     
+                                       
+    
+                   
+                                 
+                                             
+                                      
+    
+                                                               
+     
 
-		instr += 1; /* Advance past the pushl %ebp */
+		instr += 1;                                  
 		if ((size = dtrace_instr_size(instr)) <= 0)
 			return;
 
@@ -329,7 +329,7 @@ fbt_provide_probe(struct modctl *ctl, const char *modname, const char* symbolNam
 		    !(i1 == FBT_MOVL_ESP_EBP0_V1 && i2 == FBT_MOVL_ESP_EBP1_V1))
 			return;
 
-		/* instr already points at the movl %esp,%ebp */
+		                                                
 		theInstr = i1;
 	}
 #endif
@@ -338,13 +338,13 @@ fbt_provide_probe(struct modctl *ctl, const char *modname, const char* symbolNam
 	strlcpy( (char *)&(newfbt->fbtp_name), symbolName, MAX_FBTP_NAME_CHARS );
 
 	if (thisid != 0) {
-		/*
-		 * The dtrace_probe previously existed, so we have to hook
-		 * the newfbt entry onto the end of the existing fbt's chain.
-		 * If we find an fbt entry that was previously patched to
-		 * fire, (as indicated by the current patched value), then
-		 * we want to enable this newfbt on the spot.
-		 */
+		  
+                                                            
+                                                               
+                                                           
+                                                            
+                                               
+     
 		entryfbt = dtrace_probe_arg (fbt_id, thisid);
 		ASSERT (entryfbt != NULL);
 		for(; entryfbt != NULL; entryfbt = entryfbt->fbtp_next) {
@@ -359,11 +359,11 @@ fbt_provide_probe(struct modctl *ctl, const char *modname, const char* symbolNam
 		}
 	}
 	else {
-		/*
-		 * The dtrace_probe did not previously exist, so we
-		 * create it and hook in the newfbt.  Since the probe is
-		 * new, we obviously do not need to enable it on the spot.
-		 */
+		  
+                                                     
+                                                          
+                                                            
+     
 		newfbt->fbtp_id = dtrace_probe_create(fbt_id, modname, symbolName, FBT_ENTRY, FBT_AFRAMES_ENTRY, newfbt);
 		doenable = 0;
 	}
@@ -381,22 +381,22 @@ fbt_provide_probe(struct modctl *ctl, const char *modname, const char* symbolNam
 	if (doenable)
 		fbt_enable(NULL, newfbt->fbtp_id, newfbt);
 
-	/*
-	 * The fbt entry chain is in place, one entry point per symbol.
-	 * The fbt return chain can have multiple return points per symbol.
-	 * Here we find the end of the fbt return chain.
-	 */
+	  
+                                                                
+                                                                    
+                                                 
+    
 
 	doenable=0;
 
 	thisid = dtrace_probe_lookup(fbt_id, modname, symbolName, FBT_RETURN);
 	if (thisid != 0) {
-		/* The dtrace_probe previously existed, so we have to
-		 * find the end of the existing fbt chain.  If we find
-		 * an fbt return that was previously patched to fire,
-		 * (as indicated by the currrent patched value), then
-		 * we want to enable any new fbts on the spot.
-		 */
+		                                                     
+                                                        
+                                                       
+                                                       
+                                                
+     
 		retfbt = dtrace_probe_arg (fbt_id, thisid);
 		ASSERT(retfbt != NULL);
 		for (;  retfbt != NULL; retfbt =  retfbt->fbtp_next) {
@@ -415,25 +415,25 @@ again:
 	if (instr >= limit)
 		return;
 
-	/*
-	 * If this disassembly fails, then we've likely walked off into
-	 * a jump table or some other unsuitable area.  Bail out of the
-	 * disassembly now.
-	 */
+	  
+                                                                
+                                                                
+                    
+    
 	if ((size = dtrace_instr_size(instr)) <= 0)
 		return;
 
-	/*
-	 * We (desperately) want to avoid erroneously instrumenting a
-	 * jump table, especially given that our markers are pretty
-	 * short:  two bytes on x86, and just one byte on amd64.  To
-	 * determine if we're looking at a true instruction sequence
-	 * or an inline jump table that happens to contain the same
-	 * byte sequences, we resort to some heuristic sleeze:  we
-	 * treat this instruction as being contained within a pointer,
-	 * and see if that pointer points to within the body of the
-	 * function.  If it does, we refuse to instrument it.
-	 */
+	  
+                                                              
+                                                            
+                                                             
+                                                             
+                                                            
+                                                           
+                                                               
+                                                            
+                                                      
+    
 	for (j = 0; j < sizeof (uintptr_t); j++) {
 		uintptr_t check = (uintptr_t)instr - j;
 		uint8_t *ptr;
@@ -452,12 +452,12 @@ again:
 		}
 	}
 
-	/*
-	 * OK, it's an instruction.
-	 */
+	  
+                            
+    
 	theInstr = instr[0];
 
-	/* Walked onto the start of the next routine? If so, bail out of this function. */
+	                                                                                  
 	if (theInstr == FBT_PUSH_RBP)
 		return;
 
@@ -466,20 +466,20 @@ again:
 		goto again;
 	}
 
-	/*
-	 * Found the pop %rbp; or leave.
-	 */
+	  
+                                 
+    
 	machine_inst_t *patch_instr = instr;
 
-	/*
-	 * Scan forward for a "ret", or "jmp".
-	 */
+	  
+                                       
+    
 	instr += size;
 	if (instr >= limit)
 		return;
 
 	size = dtrace_instr_size(instr);
-	if (size <= 0) /* Failed instruction decode? */
+	if (size <= 0)                                 
 		return;
 
 	theInstr = instr[0];
@@ -491,9 +491,9 @@ again:
 	    !(size == FBT_JMP_FAR_ABS_LEN && (theInstr == FBT_JMP_FAR_ABS)))
 		return;
 
-	/*
-	 * pop %rbp; ret; or leave; ret; or leave; jmp tailCalledFun; -- We have a winner!
-	 */
+	  
+                                                                                   
+    
 	newfbt = kmem_zalloc(sizeof (fbt_probe_t), KM_SLEEP);
 	strlcpy( (char *)&(newfbt->fbtp_name), symbolName, MAX_FBTP_NAME_CHARS );
 

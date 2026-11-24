@@ -44,7 +44,7 @@ static bool dsHaveCRC;
 static void
 kdp_serial_out(unsigned char byte, void (*outFunc)(char))
 {
-	//need to escape '\n' because the kernel serial output turns it into a cr/lf
+	                                                                            
 	if (byte == SKDP_START_CHAR || byte == SKDP_END_CHAR || byte == SKDP_ESC_CHAR || byte == '\n') {
 		outFunc(SKDP_ESC_CHAR);
 		byte = ~byte;
@@ -59,7 +59,7 @@ kdp_serialize_packet(unsigned char *packet, unsigned int len, void (*outFunc)(ch
 	unsigned char byte;
 	uint32_t      crc;
 
-	// insert the CRC between back to back STARTs which is compatible with old clients
+	                                                                                  
 	crc = (uint32_t) z_crc32(0, packet, len);
 	outFunc(SKDP_START_CHAR);
 	kdp_serial_out((unsigned char)(crc >> 0), outFunc);
@@ -83,7 +83,7 @@ kdp_unserialize_packet(unsigned char byte, unsigned int *len)
 	switch (dsState) {
 	case DS_WAITSTART:
 		if (byte == SKDP_START_CHAR) {
-//				printf("got start char\n");
+                                 
 			dsState = DS_READING;
 			dsPos = 0;
 			*len = SERIALIZE_READING;
@@ -103,7 +103,7 @@ kdp_unserialize_packet(unsigned char byte, unsigned int *len)
 				dsHaveCRC = true;
 				dsCRC = dsBuffer[0] | (dsBuffer[1] << 8) | (dsBuffer[2] << 16) | (dsBuffer[3] << 24);
 			}
-			//else				printf("unexpected start char, resetting\n");
+			                                                       
 			dsPos = 0;
 			*len = SERIALIZE_READING;
 			return 0;
@@ -113,7 +113,7 @@ kdp_unserialize_packet(unsigned char byte, unsigned int *len)
 			if (dsHaveCRC) {
 				crc = (uint32_t) z_crc32(0, &dsBuffer[0], dsPos);
 				if (crc != dsCRC) {
-//						printf("bad packet crc 0x%x != 0x%x\n", crc, dsCRC);
+                                                            
 					dsPos = 0;
 					*len = SERIALIZE_WAIT_START;
 					return 0;
@@ -126,13 +126,13 @@ kdp_unserialize_packet(unsigned char byte, unsigned int *len)
 		dsBuffer[dsPos++] = byte;
 		break;
 	case DS_ESCAPED:
-//			printf("unescaping %02x to %02x\n", byte, ~byte);
+                                                      
 		dsBuffer[dsPos++] = ~byte;
 		dsState = DS_READING;
 		*len = SERIALIZE_READING;
 		break;
 	}
-	if (dsPos == sizeof(dsBuffer)) { //too much data...forget this packet
+	if (dsPos == sizeof(dsBuffer)) {                                     
 		dsState = DS_WAITSTART;
 		dsPos = 0;
 		*len = SERIALIZE_WAIT_START;

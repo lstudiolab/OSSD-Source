@@ -46,10 +46,10 @@ typedef union {
 } fasttrap_instr_t;
 
 typedef struct fasttrap_machtp {
-	fasttrap_instr_t        ftmt_instr;     /* original instruction */
+	fasttrap_instr_t        ftmt_instr;                               
 
-	uint8_t                 ftmt_fntype;    /* One of the FASTTRAP_FN* constants defined below */
-	/* Once the tracepoint is initialized, fntype will be FN_DONE_INIT and thumb will be 0 for ARM, 1 for Thumb */
+	uint8_t                 ftmt_fntype;                                                         
+	                                                                                                              
 	uint8_t                 ftmt_thumb;
 
 	uint8_t                 ftmt_type;
@@ -82,7 +82,7 @@ typedef struct fasttrap_machtp {
 #define FASTTRAP_T_VLDR_PC_IMMED                14
 #define FASTTRAP_T_CB_N_Z                       15
 #if defined(__arm64__)
-#define FASTTRAP_T_ARM64_STANDARD_FUNCTION_ENTRY 16     /* stp fp, lr, [sp, #-16]! */
+#define FASTTRAP_T_ARM64_STANDARD_FUNCTION_ENTRY 16                                  
 #define FASTTRAP_T_ARM64_LDR_S_PC_REL           17
 #define FASTTRAP_T_ARM64_LDR_W_PC_REL           18
 #define FASTTRAP_T_ARM64_LDR_D_PC_REL           19
@@ -155,80 +155,80 @@ typedef struct fasttrap_machtp {
 #define FASTTRAP_OFFSET_AFRAMES         5
 
 #if defined(__arm64__)
-#define FASTTRAP_ARM64_OP_VALUE_FUNC_ENTRY      0xa9bf7bfd /* stp fp, lr, [sp, #-16]! */
+#define FASTTRAP_ARM64_OP_VALUE_FUNC_ENTRY      0xa9bf7bfd                              
 
-#define FASTTRAP_ARM64_OP_MASK_LDR_S_PC_REL     0xff000000 /* Bits to check for ldr St, label */
-#define FASTTRAP_ARM64_OP_VALUE_LDR_S_PC_REL    0x1c000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_LDR_S_PC_REL     0xff000000                                      
+#define FASTTRAP_ARM64_OP_VALUE_LDR_S_PC_REL    0x1c000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_LDR_W_PC_REL     0xff000000 /* Bits to check for ldr Wt, label */
-#define FASTTRAP_ARM64_OP_VALUE_LDR_W_PC_REL    0x18000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_LDR_W_PC_REL     0xff000000                                      
+#define FASTTRAP_ARM64_OP_VALUE_LDR_W_PC_REL    0x18000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_LDR_D_PC_REL     0xff000000 /* Bits to check for ldr Dt, label */
-#define FASTTRAP_ARM64_OP_VALUE_LDR_D_PC_REL    0x5c000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_LDR_D_PC_REL     0xff000000                                      
+#define FASTTRAP_ARM64_OP_VALUE_LDR_D_PC_REL    0x5c000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_LDR_X_PC_REL     0xff000000 /* Bits to check for ldr Xt, label */
-#define FASTTRAP_ARM64_OP_VALUE_LDR_X_PC_REL    0x58000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_LDR_X_PC_REL     0xff000000                                      
+#define FASTTRAP_ARM64_OP_VALUE_LDR_X_PC_REL    0x58000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_LDR_Q_PC_REL     0xff000000 /* Bits to check for ldr Qt, label */
-#define FASTTRAP_ARM64_OP_VALUE_LDR_Q_PC_REL    0x9c000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_LDR_Q_PC_REL     0xff000000                                      
+#define FASTTRAP_ARM64_OP_VALUE_LDR_Q_PC_REL    0x9c000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_LRDSW_PC_REL     0xff000000 /* Bits to check for ldrsw <reg>, label */
-#define FASTTRAP_ARM64_OP_VALUE_LRDSW_PC_REL    0x98000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_LRDSW_PC_REL     0xff000000                                           
+#define FASTTRAP_ARM64_OP_VALUE_LRDSW_PC_REL    0x98000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_B_COND_PC_REL    0xff000010 /* Bits to check for b.cond label */
-#define FASTTRAP_ARM64_OP_VALUE_B_COND_PC_REL   0x54000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_B_COND_PC_REL    0xff000010                                     
+#define FASTTRAP_ARM64_OP_VALUE_B_COND_PC_REL   0x54000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_CBNZ_W_PC_REL    0xff000000 /* Bits to check for cbnz Wt, _label */
-#define FASTTRAP_ARM64_OP_VALUE_CBNZ_W_PC_REL   0x35000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_CBNZ_W_PC_REL    0xff000000                                        
+#define FASTTRAP_ARM64_OP_VALUE_CBNZ_W_PC_REL   0x35000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_CBNZ_X_PC_REL    0xff000000 /* Bits to check for cbnz Xt, _label */
-#define FASTTRAP_ARM64_OP_VALUE_CBNZ_X_PC_REL   0xb5000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_CBNZ_X_PC_REL    0xff000000                                        
+#define FASTTRAP_ARM64_OP_VALUE_CBNZ_X_PC_REL   0xb5000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_CBZ_W_PC_REL     0xff000000 /* Bits to check for cbz Wt, _label */
-#define FASTTRAP_ARM64_OP_VALUE_CBZ_W_PC_REL    0x34000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_CBZ_W_PC_REL     0xff000000                                       
+#define FASTTRAP_ARM64_OP_VALUE_CBZ_W_PC_REL    0x34000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_CBZ_X_PC_REL     0xff000000 /* Bits to check for cbz Xt, _label */
-#define FASTTRAP_ARM64_OP_VALUE_CBZ_X_PC_REL    0xb4000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_CBZ_X_PC_REL     0xff000000                                       
+#define FASTTRAP_ARM64_OP_VALUE_CBZ_X_PC_REL    0xb4000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_TBNZ_PC_REL      0x7f000000 /* Bits to check for tbnz Xt, _label */
-#define FASTTRAP_ARM64_OP_VALUE_TBNZ_PC_REL     0x37000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_TBNZ_PC_REL      0x7f000000                                        
+#define FASTTRAP_ARM64_OP_VALUE_TBNZ_PC_REL     0x37000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_TBZ_PC_REL       0x7f000000 /* Bits to check for tbz Xt, _label */
-#define FASTTRAP_ARM64_OP_VALUE_TBZ_PC_REL      0x36000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_TBZ_PC_REL       0x7f000000                                       
+#define FASTTRAP_ARM64_OP_VALUE_TBZ_PC_REL      0x36000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_B_PC_REL         0xfc000000 /* Bits to check for b _label */
-#define FASTTRAP_ARM64_OP_VALUE_B_PC_REL        0x14000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_B_PC_REL         0xfc000000                                 
+#define FASTTRAP_ARM64_OP_VALUE_B_PC_REL        0x14000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_BL_PC_REL        0xfc000000 /* Bits to check for bl _label */
-#define FASTTRAP_ARM64_OP_VALUE_BL_PC_REL       0x94000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_BL_PC_REL        0xfc000000                                  
+#define FASTTRAP_ARM64_OP_VALUE_BL_PC_REL       0x94000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_BLR              0xfffffe1f /* Bits to check for blr Xt */
-#define FASTTRAP_ARM64_OP_VALUE_BLR             0xd63f0000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_BLR              0xfffffe1f                               
+#define FASTTRAP_ARM64_OP_VALUE_BLR             0xd63f0000                    
 
-#define FASTTRAP_ARM64_OP_MASK_BR               0xfffffe1f /* Bits to check for br Xt */
-#define FASTTRAP_ARM64_OP_VALUE_BR              0xd61f0000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_BR               0xfffffe1f                              
+#define FASTTRAP_ARM64_OP_VALUE_BR              0xd61f0000                    
 
-#define FASTTRAP_ARM64_OP_MASK_RET              0xfffffc1f /* Bits to check for ret Rt */
-#define FASTTRAP_ARM64_OP_VALUE_RET             0xd65f0000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_RET              0xfffffc1f                               
+#define FASTTRAP_ARM64_OP_VALUE_RET             0xd65f0000                    
 
-#define FASTTRAP_ARM64_OP_MASK_ADRP             0x9f000000 /* Bits to check for adrp Xt, label*/
-#define FASTTRAP_ARM64_OP_VALUE_ADRP            0x90000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_ADRP             0x9f000000                                      
+#define FASTTRAP_ARM64_OP_VALUE_ADRP            0x90000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_ADR              0x9f000000 /* Bits to check for adr Xt, label*/
-#define FASTTRAP_ARM64_OP_VALUE_ADR             0x10000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_ADR              0x9f000000                                     
+#define FASTTRAP_ARM64_OP_VALUE_ADR             0x10000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_PRFM             0xff000000 /* Bits to check for adr Xt, label*/
-#define FASTTRAP_ARM64_OP_VALUE_PRFM            0xd8000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_PRFM             0xff000000                                     
+#define FASTTRAP_ARM64_OP_VALUE_PRFM            0xd8000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_EXCL_MEM         0x3f000000 /* Bits  to check for exclusive memory operation */
-#define FASTTRAP_ARM64_OP_VALUE_EXCL_MEM        0x08000000 /* Value to find */
+#define FASTTRAP_ARM64_OP_MASK_EXCL_MEM         0x3f000000                                                    
+#define FASTTRAP_ARM64_OP_VALUE_EXCL_MEM        0x08000000                    
 
-#define FASTTRAP_ARM64_OP_MASK_RETAB            0xfffffc1f /* Bits to check for retab Rt */
-#define FASTTRAP_ARM64_OP_VALUE_RETAB           0xd65f0c1f /* Value to find */
-#endif /* defined(__arm64__) */
+#define FASTTRAP_ARM64_OP_MASK_RETAB            0xfffffc1f                                 
+#define FASTTRAP_ARM64_OP_VALUE_RETAB           0xd65f0c1f                    
+#endif                         
 
 #ifdef  __cplusplus
 }
 #endif
 
-#endif  /* _FASTTRAP_ISA_H */
+#endif                       

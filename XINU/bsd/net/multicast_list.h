@@ -35,11 +35,11 @@
 #include <net/if.h>
 #include <net/kpi_interface.h>
 
-/*
- * multicast_util.h:
- * - keep track of multicast addresses on one device for programming on
- *   another (VLAN, BOND)
- */
+  
+                    
+                                                                       
+                         
+   
 struct multicast_entry {
 	SLIST_ENTRY(multicast_entry)    mc_entries;
 	ifmultiaddr_t                   mc_ifma;
@@ -56,4 +56,4 @@ multicast_list_program(struct multicast_list * mc_list,
 int
 multicast_list_remove(struct multicast_list * mc_list);
 
-#endif /* _NET_MULTICAST_LIST_H */
+#endif                            

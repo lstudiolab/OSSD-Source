@@ -42,15 +42,15 @@ __BEGIN_DECLS
 #define _FILEPORT_T
 typedef __darwin_mach_port_t fileport_t;
 #define FILEPORT_NULL   ((fileport_t)0)
-#endif /* _FILEPORT_T */
+#endif                  
 
 int     fileport_makeport(int, fileport_t *);
 int     fileport_makefd(fileport_t);
 
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
-#endif  /* !_SYS_FILEPORT_H_ */
+#endif                         

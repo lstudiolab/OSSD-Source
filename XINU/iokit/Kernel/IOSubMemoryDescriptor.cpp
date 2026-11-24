@@ -40,7 +40,7 @@ IOSubMemoryDescriptor::redirect( task_t safeTask, bool doRedirect )
 {
 #ifdef __LP64__
 	super::redirect( safeTask, doRedirect );
-#endif /* __LP64__ */
+#endif               
 	return _parent->redirect( safeTask, doRedirect );
 }
 
@@ -68,21 +68,21 @@ IOSubMemoryDescriptor::initSubRange( IOMemoryDescriptor * parent,
 		return false;
 	}
 
-	/*
-	 * We can check the _parent instance variable before having ever set it
-	 * to an initial value because I/O Kit guarantees that all our instance
-	 * variables are zeroed on an object's allocation.
-	 */
+	  
+                                                                        
+                                                                        
+                                                   
+    
 
 	if (!_parent) {
 		if (!super::init()) {
 			return false;
 		}
 	} else {
-		/*
-		 * An existing memory descriptor is being retargeted to
-		 * point to somewhere else.  Clean up our present state.
-		 */
+		  
+                                                         
+                                                          
+     
 
 		_parent->release();
 	}
@@ -101,7 +101,7 @@ IOSubMemoryDescriptor::initSubRange( IOMemoryDescriptor * parent,
 
 #ifndef __LP64__
 	_direction  = (IODirection) (_flags & kIOMemoryDirectionMask);
-#endif /* !__LP64__ */
+#endif                
 
 	return true;
 }
@@ -205,7 +205,7 @@ IOSubMemoryDescriptor::makeMapping(
 	if (!(kIOMap64Bit & options)) {
 		panic("IOSubMemoryDescriptor::makeMapping !64bit");
 	}
-#endif /* !__LP64__ */
+#endif                
 
 	mapping = (IOMemoryMap *) _parent->makeMapping(
 		owner,

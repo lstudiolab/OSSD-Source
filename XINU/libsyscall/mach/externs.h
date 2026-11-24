@@ -39,4 +39,4 @@ extern void mig_init(void *);
 extern void mach_init_ports(void);
 __END_DECLS
 
-#endif /* _MACH_EXTERNS_H_ */
+#endif                       

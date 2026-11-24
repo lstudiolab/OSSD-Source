@@ -57,11 +57,11 @@ typedef enum {
 } coprocessor_type_t;
 
 
-/*
- * PEGetMachineName() and PEGetModelName() are inconsistent across
- * architectures, and considered deprecated.
- * PEGetTargetName() and PEGetProductName() instead.
- */
+  
+                                                                  
+                                            
+                                                    
+   
 extern boolean_t PEGetMachineName( char * name, int maxLength );
 extern boolean_t PEGetModelName( char * name, int maxLength );
 
@@ -83,7 +83,7 @@ enum {
 	kPEPanicDiagnosticsDone,
 };
 
-/* Bitmask of details related to panic callouts */
+                                                  
 #define kPanicDetailsForcePowerOff 0x1
 
 extern int (*PE_halt_restart)(unsigned int type);
@@ -101,21 +101,21 @@ enum {
 extern void IOSystemShutdownNotification(int stage);
 
 extern uint32_t gEnforceQuiesceSafety;
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef KERNEL_PRIVATE
 extern boolean_t IOPMRootDomainGetWillShutdown(void);
 extern void PEInitiatePanic(void);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-// Save the Panic Info.  Returns the number of bytes saved.
+                                                           
 extern UInt32 PESavePanicInfo(UInt8 *buffer, UInt32 length);
 extern void PESavePanicInfoAction(void *buffer, UInt32 offset, UInt32 length);
 
-/*
- * SMC requires that all data is flushed in multiples of 16 bytes at 16 byte
- * boundaries.
- */
+  
+                                                                            
+              
+   
 #define PANIC_FLUSH_BOUNDARY 16
 
 extern long PEGetGMTTimeOfDay( void );
@@ -123,7 +123,7 @@ extern void PESetGMTTimeOfDay( long secs );
 extern void PEGetUTCTimeOfDay( clock_sec_t * secs, clock_usec_t * usecs );
 extern void PESetUTCTimeOfDay( clock_sec_t secs, clock_usec_t usecs );
 
-/* unless it's a "well-known" property, these will read/write out the value as raw data */
+                                                                                          
 
 extern boolean_t PEWriteNVRAMBooleanProperty(const char *symbol, boolean_t value);
 extern boolean_t PEWriteNVRAMProperty(const char *symbol, const void *value, const unsigned int len);
@@ -136,7 +136,7 @@ extern boolean_t PERemoveNVRAMProperty(const char *symbol);
 extern coprocessor_type_t PEGetCoprocessorVersion( void );
 
 #ifdef __cplusplus
-} /* extern "C" */
+}                 
 
 #define kIOPlatformMapperPresentKey "IOPlatformMapperPresent"
 
@@ -145,69 +145,69 @@ extern coprocessor_type_t PEGetCoprocessorVersion( void );
 
 extern OSSymbol *               gPlatformInterruptControllerName;
 
-/*
- * IOPlatformSleepAction
- *
- * Sleep is called after power management has finished all of the power plane
- * driver power management notifications and state transitions and has
- * committed to sleep, but before the other CPUs are powered off.
- * The scheduler is still active.
- */
+  
+                        
+  
+                                                                             
+                                                                      
+                                                                 
+                                 
+   
 extern const OSSymbol *gIOPlatformSleepActionKey;
 
-/*
- * IOPlatformWakeAction
- *
- * Wake is called with the scheduler enabled, but before
- * powering on other CPUs, so try to minimize work done in this path to speed
- * up wake time.
- */
+  
+                       
+  
+                                                        
+                                                                             
+                
+   
 extern const OSSymbol *gIOPlatformWakeActionKey;
 
-/*
- * IOPlatformQuiesceAction
- *
- * Quiesce is called after all CPUs are off, scheduling is disabled,
- * and the boot CPU is about to pull the plug.
- * Mutexes and blocking are disallowed in this context and will panic.
- * Do not pass this action to super() (incl. IOService, IOPlatformExpert)
- */
+  
+                          
+  
+                                                                    
+                                              
+                                                                      
+                                                                         
+   
 extern const OSSymbol *gIOPlatformQuiesceActionKey;
 
-/*
- * IOPlatformActiveAction
- *
- * Active is called very early in the wake path before enabling the scheduler
- * on the boot CPU.
- * Mutexes and blocking are disallowed in this context and will panic.
- * Do not pass this action to super() (incl. IOService, IOPlatformExpert)
- */
+  
+                         
+  
+                                                                             
+                   
+                                                                      
+                                                                         
+   
 extern const OSSymbol *gIOPlatformActiveActionKey;
 
-/*
- * IOPlatformHaltRestartAction
- *
- * Halt/Restart is called after the kernel finishes shutting down the
- * system and is ready to power off or reboot.
- *
- * It is not guaranteed to be called in non-graceful shutdown scenarios.
- */
+  
+                              
+  
+                                                                     
+                                              
+  
+                                                                        
+   
 extern const OSSymbol *gIOPlatformHaltRestartActionKey;
 
-/*
- * IOPlatformPanicAction
- *
- * Panic is called when the system is panicking before it records a core file
- * (if it is configured to do so)
- *
- * It can be called at any time, in any context, in any state.  Don't depend
- * on anything being powered on in a useful state.
- *
- * Mutexes and blocking are disallowed in this context and will fail.
- *
- * If you hang or panic again in this callout, the panic log may not be recorded,
- * leading to the loss of field reports about customer issues.
- */
+  
+                        
+  
+                                                                             
+                                 
+  
+                                                                            
+                                                  
+  
+                                                                     
+  
+                                                                                 
+                                                              
+   
 extern const OSSymbol *gIOPlatformPanicActionKey;
 
 class IORangeAllocator;
@@ -262,10 +262,10 @@ public:
 	virtual long getChipSetType(void);
 	virtual long getMachineType(void);
 
-	/*
-	 * getModelName() and getMachineName() are deprecated for direct
-	 * use. Use getTargetName() and getProductName() instead.
-	 */
+	  
+                                                                 
+                                                          
+    
 	virtual bool getModelName( char * name, int maxLength );
 	virtual bool getMachineName( char * name, int maxLength );
 
@@ -332,7 +332,7 @@ public:
 	OSMetaClassDeclareReservedUnused(IOPlatformExpert, 11);
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 class IODTNVRAM;
 
@@ -362,10 +362,10 @@ public:
 
 	virtual IOReturn getNubResources( IOService * nub ) APPLE_KEXT_OVERRIDE;
 
-	/*
-	 * getModelName() and getMachineName() are deprecated. Use
-	 * getTargetName() and getProductName() instead.
-	 */
+	  
+                                                           
+                                                 
+    
 	virtual bool getModelName( char * name, int maxLength ) APPLE_KEXT_OVERRIDE;
 	virtual bool getMachineName( char * name, int maxLength ) APPLE_KEXT_OVERRIDE;
 
@@ -376,10 +376,10 @@ public:
 
 	virtual int haltRestart(unsigned int type) APPLE_KEXT_OVERRIDE;
 
-/* virtual */ IOReturn readXPRAM(IOByteCount offset, UInt8 * buffer,
+              IOReturn readXPRAM(IOByteCount offset, UInt8 * buffer,
 	    IOByteCount length);
 
-/* virtual */ IOReturn writeXPRAM(IOByteCount offset, UInt8 * buffer,
+              IOReturn writeXPRAM(IOByteCount offset, UInt8 * buffer,
 	    IOByteCount length);
 
 	virtual IOReturn readNVRAMProperty(
@@ -394,16 +394,16 @@ public:
 		IORegistryEntry * entry,
 		const OSSymbol * name, OSData * value );
 
-// This returns a dictionary describing all the NVRAM partitions.
-// The keys will be the partitionIDs of the form "0x52,nvram".
-// The values will be OSNumbers of the partition's byte count.
-/* virtual */ OSDictionary *getNVRAMPartitions(void);
+                                                                 
+                                                              
+                                                              
+              OSDictionary *getNVRAMPartitions(void);
 
-/* virtual */ IOReturn readNVRAMPartition(const OSSymbol * partitionID,
+              IOReturn readNVRAMPartition(const OSSymbol * partitionID,
 	    IOByteCount offset, UInt8 * buffer,
 	    IOByteCount length);
 
-/* virtual */ IOReturn writeNVRAMPartition(const OSSymbol * partitionID,
+              IOReturn writeNVRAMPartition(const OSSymbol * partitionID,
 	    IOByteCount offset, UInt8 * buffer,
 	    IOByteCount length);
 
@@ -420,9 +420,9 @@ public:
 	OSMetaClassDeclareReservedUnused(IODTPlatformExpert, 7);
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/* generic root nub of service tree */
+                                      
 
 class IOPlatformExpertDevice : public IOService
 {
@@ -458,9 +458,9 @@ public:
 	OSMetaClassDeclareReservedUnused(IOPlatformExpertDevice, 3);
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/* generic nub for motherboard devices */
+                                         
 
 class IOPlatformDevice : public IOService
 {
@@ -480,6 +480,6 @@ public:
 	OSMetaClassDeclareReservedUnused(IOPlatformDevice, 3);
 };
 
-#endif /* __cplusplus */
+#endif                  
 
-#endif /* ! _IOKIT_IOPLATFORMEXPERT_H */
+#endif                                  

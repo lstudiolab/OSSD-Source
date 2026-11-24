@@ -28,15 +28,15 @@
 #ifndef _MACHINE_X86_64_KPC_H
 #define _MACHINE_X86_64_KPC_H
 
-/* x86 config registers are 64-bit */
+                                     
 typedef uint64_t kpc_config_t;
 
-/* Size to the maximum number of counters we could read from every
- * class in one go
- */
+                                                                  
+                  
+   
 #define KPC_MAX_COUNTERS (32)
 
-/* number of fixed config registers on x86_64 */
+                                                
 #define KPC_X86_64_FIXED_CONFIGS (1)
 
-#endif /* _MACHINE_X86_64_KPC_H */
+#endif                            

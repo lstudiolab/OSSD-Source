@@ -49,18 +49,18 @@ def IterateKernChannelRings(kc, kind):
     else :
         rings = kc.ch_na.na_free_rings
 
-    # note that ch_last is actually one greater than the last
-    # as per the comment in ch_connect
+                                                             
+                                      
     for i in xrange(kc.ch_first[kind], kc.ch_last[kind]):
         yield addressof(rings[i])
 
-# Note this is broken if you have type summaries enabled
-# because we are summarizing the pointer to the structure
-# and not the structure itself.  Unfortunately, that's
-# the pattern used elsewhere.
-# Trying to actually use the type summary will blow up
-# because it has a linked list pointer to itself
-#
+                                                        
+                                                         
+                                                      
+                             
+                                                      
+                                                
+ 
 @lldb_type_summary(['kern_channel_t', 'kern_channel *'])
 @header('{:<20s} {:<36s}'.format('kern_channel', 'uuid'))
 def GetKernChannelSummary(kc):
@@ -425,10 +425,10 @@ def GetNsTokenSummary(nt):
     elif ((nt.nt_flags & 0x7) == 0x01):
         owner = "SKYWALK"
         parent = "(struct flow_entry *)" + hex(nt.nt_parent_skywalk)
-    elif ((nt.nt_flags & 0x7) == 0x02): # XXX xnudefines?
+    elif ((nt.nt_flags & 0x7) == 0x02):                  
         owner = "BSD"
         parent = "(struct inpcb *)" + hex(nt.nt_parent_bsd)
-    elif ((nt.nt_flags & 0x7) == 0x03): # XXX xnudefines?
+    elif ((nt.nt_flags & 0x7) == 0x03):                  
         owner = "PF"
         parent = "(void *)" + hex(nt.nt_parent)
 
@@ -479,7 +479,7 @@ def IterateSTAILQ_HEAD(headval, element_name):
     while unsigned(iter_val) != 0 :
         yield iter_val
         iter_val = iter_val.__getattr__(element_name).stqe_next
-    #end of yield loop
+                      
 
 @lldb_command("shownexuschannels")
 def ShowNexusChannels(cmd_args=None):

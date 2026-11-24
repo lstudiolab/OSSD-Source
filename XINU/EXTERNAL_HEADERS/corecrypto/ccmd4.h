@@ -20,7 +20,7 @@
 
 extern const struct ccdigest_info ccmd4_ltc_di;
 
-/* default is libtomcrypt */
+                            
 #define ccmd4_di ccmd4_ltc_di
 
-#endif /* _CORECRYPTO_CCMD4_H_ */
+#endif                           

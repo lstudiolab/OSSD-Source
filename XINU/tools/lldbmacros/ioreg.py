@@ -6,14 +6,14 @@ import sys
 import lldb
 from collections import deque
 
-######################################
-# Globals
-######################################
+                                      
+         
+                                      
 plane = None
 
-#####################################
-# Utility functions.
-#####################################
+                                     
+                    
+                                     
 def CastIOKitClass(obj, target_type):
     """ Type cast an object to another IOKIT CPP class.
         params:
@@ -25,9 +25,9 @@ def CastIOKitClass(obj, target_type):
     v.GetSBValue().SetPreferDynamicValue(lldb.eNoDynamicValues)
     return v
 
-#####################################
-# Classes.
-#####################################
+                                     
+          
+                                     
 class PreoslogHeader(object):
     """
     Represents preoslog buffer header. There's no symbol in the kernel for it.
@@ -41,9 +41,9 @@ class PreoslogHeader(object):
         self.wrapped = 0
         self.data = None
 
-######################################
-# Type Summaries
-######################################
+                                      
+                
+                                      
 @lldb_type_summary(['OSObject *'])
 @header("")
 def GetObjectSummary(obj):
@@ -116,7 +116,7 @@ def GetObjectTypeStr(obj):
     if len(vtype):
         return vtype[0].GetName()
 
-    # See if the value is in a kext with no symbols
+                                                   
     for kval in IterateLinkedList(kern.globals.kmod, 'next'):
         if vt >= unsigned(kval.address) and vt <= (unsigned(kval.address) + unsigned(kval.size)):
             return "kmod:{:s}+{:#0x}".format(kval.name, vt - unsigned(kval.address))
@@ -147,7 +147,7 @@ def GetRegistryEntrySummary(entry):
     else:
         out_string += "+-o ??  "
     
-    # I'm using uintptr_t for now to work around <rdar://problem/12749733> FindFirstType & Co. should allow you to make pointer types directly
+                                                                                                                                              
     vtableAddr = dereference(Cast(entry, 'uintptr_t *')) - 2 * sizeof('uintptr_t *')
     vtableAddr = kern.StripKernelPAC(vtableAddr)
     vtype = kern.SymbolicateFromAddress(vtableAddr)
@@ -161,15 +161,15 @@ def GetRegistryEntrySummary(entry):
     if vtableAddr != ztvAddr:
         out_string += ", "
         state = CastIOKitClass(entry, 'IOService *').__state[0]
-        # kIOServiceRegisteredState
+                                   
         if 0 == state & 2:
             out_string += "!"
         out_string += "registered, "
-        # kIOServiceMatchedState
+                                
         if 0 == state & 4:
             out_string += "!"
         out_string += "matched, "
-        #kIOServiceInactiveState
+                                
         if 0 != state & 1:
             out_string += "in"
         busyCount = (CastIOKitClass(entry, 'IOService *').__state[1] & 0xff)
@@ -177,9 +177,9 @@ def GetRegistryEntrySummary(entry):
         out_string += "active, busy {0}, retain count {1}>".format(busyCount, retCount)
     return out_string
 
-######################################
-# Commands
-######################################
+                                      
+          
+                                      
 @lldb_command('showallclasses')
 def ShowAllClasses(cmd_args=None):
     """ Show the instance counts and ivar size of all OSObject subclasses.
@@ -204,7 +204,7 @@ def ShowObject(cmd_args=None):
     obj = kern.GetValueFromAddress(cmd_args[0], 'OSObject *')
     print GetObjectSummary(obj)
 
-#Macro: dumpobject
+                  
 @lldb_command('dumpobject')
 def DumpObject(cmd_args=None):
     """ Dumps object information if it is a valid object confirmed by showobject
@@ -241,7 +241,7 @@ def DumpObject(cmd_args=None):
     print "******** Object Dump for value \'{:s}\' with type \"{:s}\" ********".format(cmd_args[0], object_type)
     print lldb_run_command("p/x *({:s}*){:s}".format(object_type, cmd_args[0]))
 
-#EndMacro: dumpobject
+                     
 
 @lldb_command('setregistryplane')
 def SetRegistryPlane(cmd_args=None):
@@ -475,7 +475,7 @@ def ShowIOServicePM(cmd_args=None):
     iopmpriv = kern.GetValueFromAddress(cmd_args[0], 'IOServicePM *')
     out_string = "MachineState {0: <6d} (".format(iopmpriv.MachineState)
     
-    # Power state map
+                     
     pstate_map = {
             0:  'kIOPM_Finished',
             1:  'kIOPM_OurChangeTellClientsPowerDown',
@@ -606,7 +606,7 @@ def ShowInterruptVectorInfo(cmd_args=None):
     Shows interrupt vectors.
     """
 
-    # Constants
+               
     kInterruptTriggerModeMask  = 0x01
     kInterruptTriggerModeEdge  = 0x00
     kInterruptTriggerModeLevel = kInterruptTriggerModeMask
@@ -618,7 +618,7 @@ def ShowInterruptVectorInfo(cmd_args=None):
     kInterruptIsShareable      = kInterruptShareableMask
     kIOInterruptTypePCIMessaged = 0x00010000
 
-    # Get all interrupt controllers
+                                   
     interrupt_controllers = list(SearchInterruptControllerDrivers())
 
     print("Interrupt controllers: ")
@@ -626,43 +626,43 @@ def ShowInterruptVectorInfo(cmd_args=None):
         print("  {}".format(ic))
     print("")
 
-    # Iterate over all entries in the registry
+                                              
     for entry in GetMatchingEntries(lambda _: True):
-        # Get the name of the entry
+                                   
         entry_name = GetRegistryEntryName(entry)
 
-        # Get the location of the entry
+                                       
         entry_location = GetRegistryEntryLocationInPlane(entry, kern.globals.gIOServicePlane)
         if entry_location is None:
             entry_location = ""
         else:
             entry_location = "@" + entry_location
 
-        # Get the interrupt properties
+                                      
         (msi_mode, vectorDataList, vectorContList) = GetRegistryEntryInterruptProperties(entry)
         should_print = False
         out_str = ""
         for (vector_data, vector_cont) in zip(vectorDataList, vectorContList):
-            # vector_cont is the name of the interrupt controller. Find the matching controller from
-            # the list of controllers obtained earlier
+                                                                                                    
+                                                      
             matching_ics = filter(lambda ic: ic.name == vector_cont, interrupt_controllers)
 
             if len(matching_ics) > 0:
                 should_print = True
-                # Take the first match
+                                      
                 matchingIC = matching_ics[0]
 
-                # Use the vector_data to determine the vector and any flags
+                                                                           
                 data_ptr = vector_data.data
                 data_length = vector_data.length
 
-                # Dereference vector_data as a uint32_t * and add the base vector number
+                                                                                        
                 gsi = unsigned(dereference(Cast(data_ptr, 'uint32_t *')))
                 gsi += matchingIC.base_vector_number
 
-                # If data_length is >= 8 then vector_data contains interrupt flags
+                                                                                  
                 if data_length >= 8:
-                    # Add sizeof(uint32_t) to data_ptr to get the flags pointer
+                                                                               
                     flags_ptr = kern.GetValueFromAddress(unsigned(data_ptr) + sizeof("uint32_t"))
                     flags = unsigned(dereference(Cast(flags_ptr, 'uint32_t *')))
                     out_str += "  +----- [Interrupt Controller {ic}] vector {gsi}, {trigger_level}, {active}, {shareable}{messaged}\n" \
@@ -696,7 +696,7 @@ def ShowIOKitClassHierarchy(cmd_args=None):
         return
     metaclass = metaclasses[class_name]
 
-    # loop over superclasses
+                            
     hierarchy = []
     current_metaclass = metaclass
     while current_metaclass is not None:
@@ -708,26 +708,26 @@ def ShowIOKitClassHierarchy(cmd_args=None):
         print("{}[ {} ] {}".format(indent, str(mc.className()), str(mc.data())))
 
 
-######################################
-#  Helper routines
-######################################
+                                      
+                  
+                                      
 def ShowRegistryEntryRecurse(entry, prefix, printProps):
     """ prints registry entry summary and recurses through all its children.
     """
-    # Setup
+           
     global plane
     out_string = ""
     plen = (len(prefix)//2)
     registryTable = entry.fRegistryTable
     propertyTable = entry.fPropertyTable
     
-    # Print entry details
+                         
     print "{0:s}{1:s}".format(prefix, GetRegistryEntrySummary(entry))
-    # Printing large property tables make it look like lldb is 'stuck'
+                                                                      
     if printProps:
         print GetRegDictionary(propertyTable, prefix + "  | ")
     
-    # Recurse
+             
     if plane is None:
         childKey = kern.globals.gIOServicePlane.keys[1]
     else:
@@ -749,12 +749,12 @@ def FindRegistryEntryRecurse(entry, search_name, stopAfterFirst):
         If yes, it prints the entry's summary and then recurses through its children
         If no, it does nothing and recurses through its children
     """
-    # Setup
+           
     global plane
     registryTable = entry.fRegistryTable
     propertyTable = entry.fPropertyTable
     
-    # Compare
+             
     name = None
     name = LookupKeyInOSDict(registryTable, kern.globals.gIOServicePlane.nameKey)
     if name is None:
@@ -774,7 +774,7 @@ def FindRegistryEntryRecurse(entry, search_name, stopAfterFirst):
             if stopAfterFirst is True:
                 return True
     
-    # Recurse
+             
     if plane is None:
         childKey = kern.globals.gIOServicePlane.keys[1]
     else:
@@ -796,12 +796,12 @@ def FindRegistryObjectRecurse(entry, search_name):
         If no, it does nothing and recurses through its children
         Implicitly stops after finding the first entry
     """
-    # Setup
+           
     global plane
     registryTable = entry.fRegistryTable
     propertyTable = entry.fPropertyTable
 
-    # Compare
+             
     name = None
     name = LookupKeyInOSDict(registryTable, kern.globals.gIOServicePlane.nameKey)
     if name is None:
@@ -817,7 +817,7 @@ def FindRegistryObjectRecurse(entry, search_name):
         if str(name) == search_name:
             return entry
     
-    # Recurse
+             
     if plane is None:
         childKey = kern.globals.gIOServicePlane.keys[1]
     else:
@@ -933,18 +933,18 @@ def GetRegistryEntryClassName(entry):
         str: The class name of the entry or None if a class name could not be
             found.
     """
-    # Check using IOClass key
+                             
     result = LookupKeyInOSDict(entry.fPropertyTable, kern.globals.gIOClassKey)
     if result is not None:
         return GetString(result).replace("\"", "")
     else:
-        # Use the vtable of the entry to determine the concrete type
+                                                                    
         vt = dereference(Cast(entry, 'uintptr_t *')) - 2 * sizeof('uintptr_t')
         vt = kern.StripKernelPAC(vt)
         vtype = kern.SymbolicateFromAddress(vt)
         if len(vtype) > 0:
             vtableName = vtype[0].GetName()
-            return vtableName[11:] # strip off "vtable for "
+            return vtableName[11:]                          
         else:
             return None
 
@@ -962,24 +962,24 @@ def GetRegistryEntryName(entry):
     """
     name = None
 
-    # First check the IOService plane nameKey
+                                             
     result = LookupKeyInOSDict(entry.fRegistryTable, kern.globals.gIOServicePlane.nameKey)
     if result is not None:
         name = GetString(result)
 
-    # Check the global IOName key
+                                 
     if name is None:
         result = LookupKeyInOSDict(entry.fRegistryTable, kern.globals.gIONameKey)
         if result is not None:
             name = GetString(result)
 
-    # Check the IOClass key
+                           
     if name is None:
         result = LookupKeyInOSDict(entry.fPropertyTable, kern.globals.gIOClassKey)
         if result is not None:
             name = GetString(result)
 
-    # Remove extra quotes        
+                                 
     if name is not None:
         return name.replace("\"", "")
     else:
@@ -999,10 +999,10 @@ def GetRegistryEntryLocationInPlane(entry, plane):
         str: The location of the entry or None if a location could not be
             found.
     """
-    # Check the plane's pathLocationKey
+                                       
     sym = LookupKeyInOSDict(entry.fRegistryTable, plane.pathLocationKey)
 
-    # Check the global IOLocation key
+                                     
     if sym is None:
         sym = LookupKeyInOSDict(entry.fRegistryTable, kern.globals.gIOLocationKey)
     if sym is not None:
@@ -1022,53 +1022,53 @@ def GetMetaClasses():
     METACLASS_CACHE_KEY = "iokit_metaclasses"
     cached_data = caching.GetDynamicCacheData(METACLASS_CACHE_KEY)
 
-    # If we have cached data, return immediately
+                                                
     if cached_data is not None:
         return cached_data
 
-    # This method takes a while, so it prints a progress indicator
+                                                                  
     print("Enumerating IOKit metaclasses: ")
     
-    # Iterate over all classes present in sAllClassesDict
+                                                         
     idx = 0
     count = unsigned(kern.globals.sAllClassesDict.count)
     metaclasses_by_address = {}
     while idx < count:
-        # Print progress after every 10 items
+                                             
         if idx % 10 == 0:
             print("  {} metaclass structures parsed...".format(idx))
         
-        # Address of metaclass
+                              
         address = kern.globals.sAllClassesDict.dictionary[idx].value
 
-        # Create IOKitMetaClass and store in dict
+                                                 
         metaclasses_by_address[int(address)] = IOKitMetaClass(CastIOKitClass(kern.globals.sAllClassesDict.dictionary[idx].value, 'OSMetaClass *'))
         idx += 1
     
     print("  Enumerated {} metaclasses.".format(count))
 
-    # At this point, each metaclass is independent of each other. We don't have superclass links set up yet.
+                                                                                                            
 
     for (address, metaclass) in metaclasses_by_address.items():
-        # Get the address of the superclass using the superClassLink in IOMetaClass
+                                                                                   
         superclass_address = int(metaclass.data().superClassLink)
 
-        # Skip null superclass
+                              
         if superclass_address == 0:
             continue
 
-        # Find the superclass object in the dict
+                                                
         if superclass_address in metaclasses_by_address:
             metaclass.setSuperclass(metaclasses_by_address[superclass_address])
         else:
             print("warning: could not find superclass for {}".format(str(metaclass.data())))
     
-    # This method returns a dictionary mapping each class name to the associated metaclass object
+                                                                                                 
     metaclasses_by_name = {}
     for (_, metaclass) in metaclasses_by_address.items():
         metaclasses_by_name[str(metaclass.className())] = metaclass
 
-    # Save the result in the cache
+                                  
     caching.SaveDynamicCacheData(METACLASS_CACHE_KEY, metaclasses_by_name)
 
     return metaclasses_by_name
@@ -1088,18 +1088,18 @@ def GetMatchingEntries(matcher):
             each registry entry found.
     """
 
-    # Perform a BFS over the IOKit registry tree
+                                                
     bfs_queue = deque()
     bfs_queue.append(kern.globals.gRegistryRoot)
     while len(bfs_queue) > 0:
-        # Dequeue an entry
+                          
         entry = bfs_queue.popleft()
 
-        # Check if entry matches
+                                
         if matcher(entry):
             yield entry
 
-        # Find children of this entry and enqueue them
+                                                      
         child_array = LookupKeyInOSDict(entry.fRegistryTable, kern.globals.gIOServicePlane.keys[1])
         if child_array is not None:
             idx = 0
@@ -1126,15 +1126,15 @@ def FindMatchingServices(matching_name):
             each registry entry found.
     """
 
-    # Check if the argument is valid
+                                    
     metaclasses = GetMetaClasses()
     if matching_name not in metaclasses:
         return
     matching_metaclass = metaclasses[matching_name]
 
-    # An entry matches if it inherits from matching_metaclass
+                                                             
     def matcher(entry):
-        # Get the class name of the entry and the associated metaclass
+                                                                      
         entry_name = GetRegistryEntryClassName(entry)
         if entry_name in metaclasses:
             entry_metaclass = metaclasses[entry_name]
@@ -1142,7 +1142,7 @@ def FindMatchingServices(matching_name):
         else:
             return False
     
-    # Search for entries
+                        
     for entry in GetMatchingEntries(matcher):
         yield entry
 
@@ -1203,17 +1203,17 @@ def GetRegistryEntryInterruptProperties(entry):
     INTERRUPT_CONTROLLERS_PROPERTY = "IOInterruptControllers"
     MSI_MODE_PROPERTY = "IOPCIMSIMode"
 
-    # Check IOInterruptSpecifiers
+                                 
     interrupt_specifiers = LookupKeyInPropTable(entry.fPropertyTable, INTERRUPT_SPECIFIERS_PROPERTY)
     if interrupt_specifiers is not None:
         interrupt_specifiers = CastIOKitClass(interrupt_specifiers, 'OSArray *')
     
-    # Check IOInterruptControllers
+                                  
     interrupt_controllers = LookupKeyInPropTable(entry.fPropertyTable, INTERRUPT_CONTROLLERS_PROPERTY)
     if interrupt_controllers is not None:
         interrupt_controllers = CastIOKitClass(interrupt_controllers, 'OSArray *')
 
-    # Check MSI mode
+                    
     msi_mode = LookupKeyInPropTable(entry.fPropertyTable, MSI_MODE_PROPERTY)
 
     result_vector_data = []
@@ -1221,14 +1221,14 @@ def GetRegistryEntryInterruptProperties(entry):
     if interrupt_specifiers is not None and interrupt_controllers is not None:
         interrupt_specifiers_array_count = unsigned(interrupt_specifiers.count)
         interrupt_controllers_array_count = unsigned(interrupt_controllers.count)
-        # The array lengths should be the same
+                                              
         if interrupt_specifiers_array_count == interrupt_controllers_array_count and interrupt_specifiers_array_count > 0:
             idx = 0
             while idx < interrupt_specifiers_array_count:
-                # IOInterruptSpecifiers is an array of OSData *
+                                                               
                 vector_data = CastIOKitClass(interrupt_specifiers.array[idx], "OSData *")
 
-                # IOInterruptControllers is an array of OSString *
+                                                                  
                 vector_cont = GetString(interrupt_controllers.array[idx])
 
                 result_vector_data.append(vector_data)
@@ -1292,15 +1292,15 @@ class InterruptControllerDevice(object):
             device_name = LookupKeyInPropTable(driver.fPropertyTable, INTERRUPT_CONTROLLER_NAME_PROPERTY)
 
         if device_name is not None:
-            # Some interrupt controllers do not have a base vector number. Assume it is 0.
+                                                                                          
             base_vector_number = 0
             if base_vector is not None:
                 base_vector_number = unsigned(GetNumber(base_vector))
             device_name = GetString(device_name)
-            # Construct object and return
+                                         
             return InterruptControllerDevice(device, driver, base_vector_number, device_name)
         else:
-            # error case
+                        
             return None
 
 
@@ -1313,13 +1313,13 @@ def SearchInterruptControllerDrivers():
         inherits from IOInterruptController.
     """
     for entry in FindMatchingServices("IOInterruptController"):
-        # Get parent
+                    
         parent = GetRegistryEntryParent(entry)
 
-        # Make the interrupt controller object
+                                              
         ic = InterruptControllerDevice.makeInterruptControllerDevice(parent, entry)
 
-        # Yield object
+                      
         if ic is not None:
             yield ic
 
@@ -1335,8 +1335,8 @@ def LookupKeyInOSDict(osdict, key, comparer = None):
     idx = 0
 
     if not comparer:
-        # When comparer is specified, "key" argument can be of any type as "comparer" knows how to compare "key" to a key from "osdict".
-        # When comparer is not specified, key is of cpp_obj type.
+                                                                                                                                        
+                                                                 
         key = getOSPtr(key)
     while idx < count and result is None:
         if comparer is not None:
@@ -1451,7 +1451,7 @@ def ReadIOPortInt(addr, numbytes, lcpu):
         print "Target is not connected over kdp. Nothing to do here."
         return
     
-    # Set up the manual KDP packet
+                                  
     input_address = unsigned(addressof(kern.globals.manual_pkt.input))
     len_address = unsigned(addressof(kern.globals.manual_pkt.len))
     data_address = unsigned(addressof(kern.globals.manual_pkt.data))
@@ -1494,7 +1494,7 @@ def WriteIOPortInt(addr, numbytes, value, lcpu):
         print "Target is not connected over kdp. Nothing to do here."
         return
     
-    # Set up the manual KDP packet
+                                  
     input_address = unsigned(addressof(kern.globals.manual_pkt.input))
     len_address = unsigned(addressof(kern.globals.manual_pkt.len))
     data_address = unsigned(addressof(kern.globals.manual_pkt.data))
@@ -1534,7 +1534,7 @@ def WriteIOPortInt(addr, numbytes, value, lcpu):
 
         result_pkt = Cast(addressof(kern.globals.manual_pkt.data), 'kdp_writeioport_reply_t *')
         
-        # Done with the write
+                             
         if(result_pkt.error == 0):
             print "Writing {0: #x} to port {1: <#6x} was successful".format(value, addr)
     else:
@@ -1557,8 +1557,8 @@ def showinterruptcounts(cmd_args=None):
         nub = CastIOKitClass(owner.provider, 'IORegistryEntry *') 
         name = None
 
-        # To uniquely identify an interrupt, we need the nub name and the index.  The index
-        # is stored with the stats object, but we need to retrieve the name.
+                                                                                           
+                                                                            
 
         registryTable = nub.fRegistryTable
         propertyTable = nub.fPropertyTable
@@ -1574,7 +1574,7 @@ def showinterruptcounts(cmd_args=None):
         else:
             nub_name = GetString(CastIOKitClass(name, 'OSString *'))
 
-        # We now have everything we need; spew the requested data.
+                                                                  
 
         interrupt_index = i.interruptIndex
         first_level_count = i.interruptStatistics[0]
@@ -1607,8 +1607,8 @@ def showinterruptstats(cmd_args=None):
         nub = CastIOKitClass(owner.provider, 'IORegistryEntry *') 
         name = None
 
-        # To uniquely identify an interrupt, we need the nub name and the index.  The index
-        # is stored with the stats object, but we need to retrieve the name.
+                                                                                           
+                                                                            
 
         registryTable = nub.fRegistryTable
         propertyTable = nub.fPropertyTable
@@ -1624,7 +1624,7 @@ def showinterruptstats(cmd_args=None):
         else:
             nub_name = GetString(CastIOKitClass(name, 'OSString *'))
 
-        # We now have everything we need; spew the requested data.
+                                                                  
 
         interrupt_index = i.interruptIndex
         first_level_count = i.interruptStatistics[0]
@@ -1670,7 +1670,7 @@ def GetPreoslogHeader():
         print "Couldn't obtain a pointer to IODeviceTree"
         return None
 
-    # Registry API functions operate on "plane" global variable
+                                                               
     global plane
     prev_plane = plane
     plane = edt_plane
@@ -1702,7 +1702,7 @@ def GetPreoslogHeader():
 
     preoslog_header = PreoslogHeader()
 
-    # This structure defnition doesn't exist in xnu
+                                                   
     """
     typedef struct  __attribute__((packed)) {
         char magic[4];

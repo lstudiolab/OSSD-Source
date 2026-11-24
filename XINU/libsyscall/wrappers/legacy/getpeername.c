@@ -26,10 +26,10 @@
 #define _NONSTD_SOURCE
 #include <sys/cdefs.h>
 
-/*
- * We need conformance on so that EOPNOTSUPP=102.  But the routine symbol
- * will still be the legacy (undecorated) one.
- */
+  
+                                                                         
+                                              
+   
 #undef __DARWIN_UNIX03
 #define __DARWIN_UNIX03 1
 
@@ -38,20 +38,20 @@
 
 extern int __getpeername(int, struct sockaddr * __restrict, socklen_t * __restrict);
 
-/*
- * getpeername stub, legacy version
- */
+  
+                                   
+   
 int
 getpeername(int socket, struct sockaddr * __restrict address,
     socklen_t * __restrict address_len)
 {
 	int ret = __getpeername(socket, address, address_len);
 
-	/* use ENOTSUP for legacy behavior */
+	                                     
 	if (ret < 0 && errno == EOPNOTSUPP) {
 		errno = ENOTSUP;
 	}
 	return ret;
 }
 
-#endif /* __DARWIN_ONLY_UNIX_CONFORMANCE */
+#endif                                     

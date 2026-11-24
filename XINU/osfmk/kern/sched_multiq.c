@@ -47,128 +47,128 @@
 
 #include <sys/kdebug.h>
 
-/*
- * Theory Statement
- *
- * How does the task scheduler work?
- *
- * It schedules threads across a few levels.
- *
- * RT threads are dealt with above us
- * Bound threads go into the per-processor runq
- * Non-bound threads are linked on their task's sched_group's runq
- * sched_groups' sched_entries are linked on the pset's runq
- *
- * TODO: make this explicit - bound threads should have a different enqueue fxn
- *
- * When we choose a new thread, we will decide whether to look at the bound runqueue, the global runqueue
- * or the current group's runqueue, then dequeue the next thread in that runqueue.
- *
- * We then manipulate the sched_entries to reflect the invariant that:
- * Each non-empty priority level in a group's runq is represented by one sched_entry enqueued in the global
- * runqueue.
- *
- * A sched_entry represents a chance at running - for each priority in each task, there is one chance of getting
- * to run.  This reduces the excess contention bonus given to processes which have work spread among many threads
- * as compared to processes which do the same amount of work under fewer threads.
- *
- * NOTE: Currently, the multiq scheduler only supports one pset.
- *
- * NOTE ABOUT thread->sched_pri:
- *
- * It can change after enqueue - it's changed without pset lock but with thread lock if thread->runq is 0.
- * Therefore we can only depend on it not changing during the enqueue and remove path, not the dequeue.
- *
- * TODO: Future features:
- *
- * Decouple the task priority from the sched_entry priority, allowing for:
- *      fast task priority change without having to iterate and re-dispatch all threads in the task.
- *              i.e. task-wide priority, task-wide boosting
- *      fancier group decay features
- *
- * Group (or task) decay:
- *      Decay is used for a few different things:
- *              Prioritizing latency-needing threads over throughput-needing threads for time-to-running
- *              Balancing work between threads in a process
- *              Balancing work done at the same priority between different processes
- *              Recovering from priority inversions between two threads in the same process
- *              Recovering from priority inversions between two threads in different processes
- *              Simulating a proportional share scheduler by allowing lower priority threads
- *                to run for a certain percentage of the time
- *
- *      Task decay lets us separately address the 'same process' and 'different process' needs,
- *      which will allow us to make smarter tradeoffs in different cases.
- *      For example, we could resolve priority inversion in the same process by reordering threads without dropping the
- *      process below low priority threads in other processes.
- *
- * One lock to rule them all (or at least all the runqueues) instead of the pset locks
- *
- * Shrink sched_entry size to the size of a queue_chain_t by inferring priority, group, and perhaps runq field.
- * The entries array is 5K currently so it'd be really great to reduce.
- * One way to get sched_group below 4K without a new runq structure would be to remove the extra queues above realtime.
- *
- * When preempting a processor, store a flag saying if the preemption
- * was from a thread in the same group or different group,
- * and tell choose_thread about it.
- *
- * When choosing a processor, bias towards those running in the same
- * group as I am running (at the same priority, or within a certain band?).
- *
- * Decide if we need to support psets.
- * Decide how to support psets - do we need duplicate entries for each pset,
- * or can we get away with putting the entry in either one or the other pset?
- *
- * Consider the right way to handle runq count - I don't want to iterate groups.
- * Perhaps keep a global counter.
- * Alternate option - remove it from choose_processor. It doesn't add much value
- * now that we have global runq.
- *
- * Need a better way of finding group to target instead of looking at current_task.
- * Perhaps choose_thread could pass in the current thread?
- *
- * Consider unifying runq copy-pastes.
- *
- * Thoughts on having a group central quantum bucket:
- *
- * I see two algorithms to decide quanta:
- * A) Hand off only when switching thread to thread in the same group
- * B) Allocate and return quanta to the group's pool
- *
- * Issues:
- * If a task blocks completely, should it come back with the leftover quanta
- * or brand new quanta?
- *
- * Should I put a flag saying zero out a quanta you grab when youre dispatched'?
- *
- * Resolution:
- * Handing off quanta between threads will help with jumping around in the current task
- * but will not help when a thread from a different task is involved.
- * Need an algorithm that works with round robin-ing between threads in different tasks
- *
- * But wait - round robining can only be triggered by quantum expire or blocking.
- * We need something that works with preemption or yielding - that's the more interesting idea.
- *
- * Existing algorithm - preemption doesn't re-set quantum, puts thread on head of runq.
- * Blocking or quantum expiration does re-set quantum, puts thread on tail of runq.
- *
- * New algorithm -
- * Hand off quanta when hopping between threads with same sched_group
- * Even if thread was blocked it uses last thread remaining quanta when it starts.
- *
- * If we use the only cycle entry at quantum algorithm, then the quantum pool starts getting
- * interesting.
- *
- * A thought - perhaps the handoff approach doesn't work so well in the presence of
- * non-handoff wakeups i.e. wake other thread then wait then block - doesn't mean that
- * woken thread will be what I switch to - other processor may have stolen it.
- * What do we do there?
- *
- * Conclusions:
- * We currently don't know of a scenario where quantum buckets on the task is beneficial.
- * We will instead handoff quantum between threads in the task, and keep quantum
- * on the preempted thread if it's preempted by something outside the task.
- *
- */
+  
+                   
+  
+                                    
+  
+                                            
+  
+                                     
+                                               
+                                                                  
+                                                            
+  
+                                                                               
+  
+                                                                                                         
+                                                                                  
+  
+                                                                      
+                                                                                                           
+            
+  
+                                                                                                                
+                                                                                                                 
+                                                                                 
+  
+                                                                
+  
+                                
+  
+                                                                                                          
+                                                                                                       
+  
+                         
+  
+                                                                          
+                                                                                                    
+                                                           
+                                    
+  
+                         
+                                                 
+                                                                                                        
+                                                           
+                                                                                    
+                                                                                           
+                                                                                              
+                                                                                            
+                                                             
+  
+                                                                                               
+                                                                         
+                                                                                                                       
+                                                              
+  
+                                                                                      
+  
+                                                                                                               
+                                                                       
+                                                                                                                       
+  
+                                                                     
+                                                          
+                                   
+  
+                                                                    
+                                                                           
+  
+                                      
+                                                                            
+                                                                             
+  
+                                                                                
+                                 
+                                                                                
+                                
+  
+                                                                                   
+                                                          
+  
+                                      
+  
+                                                     
+  
+                                         
+                                                                     
+                                                    
+  
+          
+                                                                            
+                       
+  
+                                                                                
+  
+              
+                                                                                       
+                                                                     
+                                                                                       
+  
+                                                                                 
+                                                                                               
+  
+                                                                                       
+                                                                                   
+  
+                  
+                                                                     
+                                                                                  
+  
+                                                                                            
+               
+  
+                                                                                   
+                                                                                      
+                                                                              
+                       
+  
+               
+                                                                                         
+                                                                                
+                                                                           
+  
+   
 
 #if DEBUG || DEVELOPMENT
 #define MULTIQ_SANITY_CHECK
@@ -176,51 +176,51 @@
 
 typedef struct sched_entry {
 	queue_chain_t           entry_links;
-	int16_t                 sched_pri;      /* scheduled (current) priority */
+	int16_t                 sched_pri;                                        
 	int16_t                 runq;
 	int32_t                 pad;
 } *sched_entry_t;
 
-typedef run_queue_t entry_queue_t;                      /* A run queue that holds sched_entries instead of threads */
-typedef run_queue_t group_runq_t;                       /* A run queue that is part of a sched_group */
+typedef run_queue_t entry_queue_t;                                                                                   
+typedef run_queue_t group_runq_t;                                                                      
 
 #define SCHED_ENTRY_NULL        ((sched_entry_t) 0)
-#define MULTIQ_ERUNQ            (-4)                    /* Indicates entry is on the main runq */
+#define MULTIQ_ERUNQ            (-4)                                                             
 
-/* Each level in the run queue corresponds to one entry in the entries array */
+                                                                               
 struct sched_group {
 	struct sched_entry      entries[NRQS];
 	struct run_queue        runq;
 	queue_chain_t           sched_groups;
 };
 
-/*
- * Keep entry on the head of the runqueue while dequeueing threads.
- * Only cycle it to the end of the runqueue when a thread in the task
- * hits its quantum.
- */
+  
+                                                                   
+                                                                     
+                    
+   
 static boolean_t        deep_drain = FALSE;
 
-/* Verify the consistency of the runq before touching it */
+                                                           
 static boolean_t        multiq_sanity_check = FALSE;
 
-/*
- * Draining threads from the current task is preferred
- * when they're less than X steps below the current
- * global highest priority
- */
+  
+                                                      
+                                                   
+                          
+   
 #define DEFAULT_DRAIN_BAND_LIMIT MAXPRI
 static integer_t        drain_band_limit;
 
-/*
- * Don't go below this priority level if there is something above it in another task
- */
+  
+                                                                                    
+   
 #define DEFAULT_DRAIN_DEPTH_LIMIT MAXPRI_THROTTLE
 static integer_t        drain_depth_limit;
 
-/*
- * Don't favor the task when there's something above this priority in another task.
- */
+  
+                                                                                   
+   
 #define DEFAULT_DRAIN_CEILING BASEPRI_FOREGROUND
 static integer_t        drain_ceiling;
 
@@ -476,7 +476,7 @@ group_for_entry(sched_entry_t entry)
 	return group;
 }
 
-/* Peek at the head of the runqueue */
+                                      
 static sched_entry_t
 entry_queue_first_entry(entry_queue_t rq)
 {
@@ -506,7 +506,7 @@ queue_chain_linked(queue_chain_t* chain)
 		return FALSE;
 	}
 }
-#endif /* MACH_ASSERT */
+#endif                  
 
 static thread_t
 group_first_thread(sched_group_t group)
@@ -524,13 +524,13 @@ group_first_thread(sched_group_t group)
 
 	assert(thread->sched_group == group);
 
-	/* TODO: May not be safe */
+	                           
 	assert(thread->sched_pri == rq->highq);
 
 	return thread;
 }
 
-/* Asserts if entry is not in entry runq at pri */
+                                                  
 static void
 entry_queue_check_entry(entry_queue_t runq, sched_entry_t entry, int expected_pri)
 {
@@ -551,7 +551,7 @@ entry_queue_check_entry(entry_queue_t runq, sched_entry_t entry, int expected_pr
 	panic("runq %p doesn't contain entry %p at pri %d", runq, entry, expected_pri);
 }
 
-/* Asserts if thread is not in group at its priority */
+                                                       
 static void
 sched_group_check_thread(sched_group_t group, thread_t thread)
 {
@@ -614,11 +614,11 @@ group_check_run_queue(entry_queue_t main_entryq, sched_group_t group)
 	assert(sched_entry->runq == MULTIQ_ERUNQ);
 }
 
-#endif /* defined(MULTIQ_SANITY_CHECK) */
+#endif                                   
 
-/*
- * The run queue must not be empty.
- */
+  
+                                   
+   
 static sched_entry_t
 entry_queue_dequeue_entry(entry_queue_t rq)
 {
@@ -645,9 +645,9 @@ entry_queue_dequeue_entry(entry_queue_t rq)
 	return sched_entry;
 }
 
-/*
- * The run queue must not be empty.
- */
+  
+                                   
+   
 static boolean_t
 entry_queue_enqueue_entry(
 	entry_queue_t rq,
@@ -686,9 +686,9 @@ entry_queue_enqueue_entry(
 	return result;
 }
 
-/*
- * The entry must be in this runqueue.
- */
+  
+                                      
+   
 static void
 entry_queue_remove_entry(
 	entry_queue_t  rq,
@@ -711,7 +711,7 @@ entry_queue_remove_entry(
 	}
 
 	if (circle_queue_empty(&rq->queues[sched_pri])) {
-		/* update run queue status */
+		                             
 		rq_bitmap_clear(rq->bitmap, sched_pri);
 		rq->highq = bitmap_first(rq->bitmap, NRQS);
 	}
@@ -741,11 +741,11 @@ entry_queue_change_entry(
 		circle_enqueue_head(queue, &entry->entry_links);
 	}
 }
-/*
- * The run queue must not be empty.
- *
- * sets queue_empty to TRUE if queue is now empty at thread_pri
- */
+  
+                                   
+  
+                                                               
+   
 static thread_t
 group_run_queue_dequeue_thread(
 	group_runq_t   rq,
@@ -779,10 +779,10 @@ group_run_queue_dequeue_thread(
 	return thread;
 }
 
-/*
- * The run queue must not be empty.
- * returns TRUE if queue was empty at thread_pri
- */
+  
+                                   
+                                                
+   
 static boolean_t
 group_run_queue_enqueue_thread(
 	group_runq_t   rq,
@@ -820,10 +820,10 @@ group_run_queue_enqueue_thread(
 	return result;
 }
 
-/*
- * The thread must be in this runqueue.
- * returns TRUE if queue is now empty at thread_pri
- */
+  
+                                       
+                                                   
+   
 static boolean_t
 group_run_queue_remove_thread(
 	group_runq_t    rq,
@@ -845,7 +845,7 @@ group_run_queue_remove_thread(
 	}
 
 	if (circle_queue_empty(queue)) {
-		/* update run queue status */
+		                             
 		rq_bitmap_clear(rq->bitmap, thread_pri);
 		rq->highq = bitmap_first(rq->bitmap, NRQS);
 		result = TRUE;
@@ -856,11 +856,11 @@ group_run_queue_remove_thread(
 	return result;
 }
 
-/*
- * A thread's sched pri may change out from under us because
- * we're clearing thread->runq here without the thread locked.
- * Do not rely on it to be the same as when we enqueued.
- */
+  
+                                                            
+                                                              
+                                                        
+   
 static thread_t
 sched_global_dequeue_thread(entry_queue_t main_entryq)
 {
@@ -889,7 +889,7 @@ sched_global_dequeue_thread(entry_queue_t main_entryq)
 	return thread;
 }
 
-/* Dequeue a thread from the global runq without moving the entry */
+                                                                    
 static thread_t
 sched_global_deep_drain_dequeue_thread(entry_queue_t main_entryq)
 {
@@ -992,30 +992,30 @@ sched_group_enqueue_thread(
 	boolean_t pri_level_was_empty = group_run_queue_enqueue_thread(&group->runq, thread, sched_pri, options);
 
 	if (pri_level_was_empty) {
-		/*
-		 * TODO: Need to figure out if passing options here is a good idea or not
-		 * What effects would it have?
-		 */
+		  
+                                                                           
+                                
+     
 		entry_queue_enqueue_entry(main_entryq, &group->entries[sched_pri], options);
 	} else if (options & SCHED_HEADQ) {
-		/* The thread should be at the head of the line - move its entry to the front */
+		                                                                                
 		entry_queue_change_entry(main_entryq, &group->entries[sched_pri], options);
 	}
 }
 
-/*
- *  Locate a thread to execute from the run queue and return it.
- *  Only choose a thread with greater or equal priority.
- *
- *  pset is locked, thread is not locked.
- *
- *  Returns THREAD_NULL if it cannot find a valid thread.
- *
- *  Note: we cannot rely on the value of thread->sched_pri in this path because
- *  we don't have the thread locked.
- *
- *  TODO: Remove tracepoints
- */
+  
+                                                                
+                                                        
+  
+                                         
+  
+                                                         
+  
+                                                                               
+                                    
+  
+                            
+   
 static thread_t
 sched_multiq_choose_thread(
 	processor_t      processor,
@@ -1036,12 +1036,12 @@ sched_multiq_choose_thread(
 		if (bound_runq->highq >= main_entryq->highq) {
 			choose_bound_runq = TRUE;
 		} else {
-			/* Use main runq */
+			                   
 		}
 	} else if (bound_runq->count) {
 		choose_bound_runq = TRUE;
 	} else if (main_entryq->count) {
-		/* Use main runq */
+		                   
 	} else {
 		return THREAD_NULL;
 	}
@@ -1063,52 +1063,52 @@ sched_multiq_choose_thread(
 	}
 #endif
 
-	/*
-	 * Determine if we should look at the group or the global queue
-	 *
-	 * TODO:
-	 * Perhaps pass reason as a 'should look inside' argument to choose_thread
-	 * Should YIELD AST override drain limit?
-	 */
+	  
+                                                                
+   
+         
+                                                                           
+                                          
+    
 	if (group->runq.count != 0 && (reason & AST_PREEMPTION) == 0) {
 		boolean_t favor_group = TRUE;
 
 		integer_t global_pri = main_entryq->highq;
 		integer_t group_pri  = group->runq.highq;
 
-		/*
-		 * Favor the current group if the group is still the globally highest.
-		 *
-		 * Otherwise, consider choosing a thread from the current group
-		 * even if it's lower priority than the global highest priority.
-		 */
+		  
+                                                                        
+    
+                                                                 
+                                                                  
+     
 		if (global_pri > group_pri) {
-			/*
-			 * If there's something elsewhere above the depth limit,
-			 * don't pick a thread below the limit.
-			 */
+			  
+                                                           
+                                          
+      
 			if (global_pri > drain_depth_limit && group_pri <= drain_depth_limit) {
 				favor_group = FALSE;
 			}
 
-			/*
-			 * If there's something at or above the ceiling,
-			 * don't favor the group.
-			 */
+			  
+                                                   
+                            
+      
 			if (global_pri >= drain_ceiling) {
 				favor_group = FALSE;
 			}
 
-			/*
-			 * Don't go more than X steps below the global highest
-			 */
+			  
+                                                         
+      
 			if ((global_pri - group_pri) >= drain_band_limit) {
 				favor_group = FALSE;
 			}
 		}
 
 		if (favor_group) {
-			/* Pull from local runq */
+			                          
 			KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,
 			    MACHDBG_CODE(DBG_MACH_SCHED, MACH_MULTIQ_DEQUEUE) | DBG_FUNC_NONE,
 			    MACH_MULTIQ_GROUP, global_pri, group_pri, 0, 0);
@@ -1121,7 +1121,7 @@ sched_multiq_choose_thread(
 	    MACHDBG_CODE(DBG_MACH_SCHED, MACH_MULTIQ_DEQUEUE) | DBG_FUNC_NONE,
 	    MACH_MULTIQ_GLOBAL, main_entryq->highq, group->runq.highq, 0, 0);
 
-	/* Couldn't pull from local runq, pull from global runq instead */
+	                                                                  
 	if (deep_drain) {
 		return sched_global_deep_drain_dequeue_thread(main_entryq);
 	} else {
@@ -1130,10 +1130,10 @@ sched_multiq_choose_thread(
 }
 
 
-/*
- * Thread must be locked, and not already be on a run queue.
- * pset is locked.
- */
+  
+                                                            
+                  
+   
 static boolean_t
 sched_multiq_processor_enqueue(
 	processor_t      processor,
@@ -1162,19 +1162,19 @@ sched_multiq_processor_enqueue(
 	return FALSE;
 }
 
-/*
- * Called in the context of thread with thread and pset unlocked,
- * after updating thread priority but before propagating that priority
- * to the processor
- */
+  
+                                                                 
+                                                                      
+                   
+   
 void
 sched_multiq_quantum_expire(thread_t thread)
 {
 	if (deep_drain) {
-		/*
-		 * Move the entry at this priority to the end of the queue,
-		 * to allow the next task a shot at running.
-		 */
+		  
+                                                             
+                                              
+     
 
 		processor_t processor = thread->last_processor;
 		processor_set_t pset = processor->processor_set;
@@ -1258,25 +1258,25 @@ sched_multiq_processor_queue_has_priority(
 static int
 sched_multiq_runq_count(processor_t processor)
 {
-	/*
-	 *  TODO: Decide whether to keep a count of runnable threads in the pset
-	 *  or just return something less than the true count.
-	 *
-	 *  This needs to be fast, so no iterating the whole runq.
-	 *
-	 *  Another possible decision is to remove this - with global runq
-	 *  it doesn't make much sense.
-	 */
+	  
+                                                                         
+                                                       
+   
+                                                           
+   
+                                                                   
+                                
+    
 	return multiq_main_entryq(processor)->count + multiq_bound_runq(processor)->count;
 }
 
 static uint64_t
 sched_multiq_runq_stats_count_sum(processor_t processor)
 {
-	/*
-	 * TODO: This one does need to go through all the runqueues, but it's only needed for
-	 * the sched stats tool
-	 */
+	  
+                                                                                      
+                        
+    
 
 	uint64_t bound_sum = multiq_bound_runq(processor)->runq_stats.count_sum;
 
@@ -1301,7 +1301,7 @@ sched_multiq_processor_queue_shutdown(processor_t processor)
 	thread_t        thread;
 	queue_head_t    tqueue;
 
-	/* We only need to migrate threads if this is the last active processor in the pset */
+	                                                                                      
 	if (pset->online_processor_count > 0) {
 		pset_unlock(pset);
 		return;
@@ -1309,7 +1309,7 @@ sched_multiq_processor_queue_shutdown(processor_t processor)
 
 	queue_init(&tqueue);
 
-	/* Note that we do not remove bound threads from the queues here */
+	                                                                   
 
 	while (main_entryq->count > 0) {
 		thread = sched_global_dequeue_thread(main_entryq);
@@ -1329,12 +1329,12 @@ sched_multiq_processor_queue_shutdown(processor_t processor)
 	}
 }
 
-/*
- * Thread is locked
- *
- * This is why we can never read sched_pri unless we have the thread locked.
- * Which we do in the enqueue and remove cases, but not the dequeue case.
- */
+  
+                   
+  
+                                                                            
+                                                                         
+   
 static boolean_t
 sched_multiq_processor_queue_remove(
 	processor_t processor,
@@ -1346,10 +1346,10 @@ sched_multiq_processor_queue_remove(
 	pset_lock(pset);
 
 	if (thread->runq != PROCESSOR_NULL) {
-		/*
-		 * Thread is on a run queue and we have a lock on
-		 * that run queue.
-		 */
+		  
+                                                   
+                    
+     
 
 		assert(thread->runq == processor);
 
@@ -1371,7 +1371,7 @@ sched_multiq_processor_queue_remove(
 	return removed;
 }
 
-/* pset is locked, returned unlocked */
+                                       
 static thread_t
 sched_multiq_steal_thread(processor_set_t pset)
 {
@@ -1379,15 +1379,15 @@ sched_multiq_steal_thread(processor_set_t pset)
 	return THREAD_NULL;
 }
 
-/*
- * Scan the global queue for candidate groups, and scan those groups for
- * candidate threads.
- *
- * TODO: This iterates every group runq in its entirety for each entry it has in the runq, which is O(N^2)
- *       Instead, iterate only the queue in the group runq matching the priority of the entry.
- *
- * Returns TRUE if retry is needed.
- */
+  
+                                                                        
+                     
+  
+                                                                                                          
+                                                                                              
+  
+                                   
+   
 static boolean_t
 group_scan(entry_queue_t runq, sched_update_scan_context_t scan_context)
 {
@@ -1430,10 +1430,10 @@ sched_multiq_thread_update_scan(sched_update_scan_context_t scan_context)
 	thread_t                thread;
 	spl_t                   s;
 
-	/*
-	 *  We update the threads associated with each processor (bound and idle threads)
-	 *  and then update the threads in each pset runqueue.
-	 */
+	  
+                                                                                  
+                                                       
+    
 
 	do {
 		do {
@@ -1460,7 +1460,7 @@ sched_multiq_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while ((processor = processor->processor_list) != NULL);
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 
@@ -1481,22 +1481,22 @@ sched_multiq_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while ((pset = pset->pset_list) != NULL);
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 }
 
 extern int sched_allow_rt_smt;
 
-/* Return true if this thread should not continue running on this processor */
+                                                                              
 static bool
 sched_multiq_thread_avoid_processor(processor_t processor, thread_t thread)
 {
 	if (processor->processor_primary != processor) {
-		/*
-		 * This is a secondary SMT processor.  If the primary is running
-		 * a realtime thread, only allow realtime threads on the secondary.
-		 */
+		  
+                                                                  
+                                                                     
+     
 		if ((processor->processor_primary->current_pri >= BASEPRI_RTQUEUES) && ((thread->sched_pri < BASEPRI_RTQUEUES) || !sched_allow_rt_smt)) {
 			return true;
 		}

@@ -1,6 +1,6 @@
-/*
- * turnstiles_test: Tests turnstile kernel primitive.
- */
+  
+                                                     
+   
 
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
@@ -117,13 +117,13 @@ chain_locking(void* args)
 	int ret;
 	struct sched_param param;
 
-	/* Change our priority to pri_to_set */
+	                                       
 	ret = pthread_getschedparam(pthread_self(), &policy, &param);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "pthread_getschedparam");
 
 	param.sched_priority = data->pri_to_set;
 
-	/* this sets both sched and base pri */
+	                                       
 	ret = pthread_setschedparam(pthread_self(), policy, &param);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "pthread_setschedparam");
 
@@ -131,12 +131,12 @@ chain_locking(void* args)
 
 	T_ASSERT_EQ(pri, data->pri_to_set, "Priority before holding locks");
 
-	/* take lock1 */
+	                
 	if (data->lock1) {
 		turnstile_prim_lock(data->lock1);
 	}
 
-	/* take lock2 */
+	                
 	if (data->lock2) {
 		turnstile_prim_lock(data->lock2);
 	}
@@ -183,7 +183,7 @@ take_lock_check_priority(void * arg)
 
 	T_ASSERT_EQ(old_pri, 37, "thread(%llu) priority before acquiring the lock is %d\n", tid, old_pri);
 
-	/* Take the test lock */
+	                        
 	turnstile_prim_lock(type);
 
 	unboosted_pri = get_base_pri(mach_thread_self());
@@ -191,14 +191,14 @@ take_lock_check_priority(void * arg)
 
 	sleep(8);
 
-	/* Check for elevated priority */
+	                                 
 	boosted_pri =  get_base_pri(mach_thread_self());
 	T_ASSERT_EQ(boosted_pri, 47, "thread(%llu) priority after contention by 47 thread is %d\n", tid, boosted_pri);
 
-	/* Drop the lock */
+	                   
 	turnstile_prim_unlock(type);
 
-	/* Check for regular priority */
+	                                
 	after_unlock_pri =  get_base_pri(mach_thread_self());
 	T_ASSERT_EQ(after_unlock_pri, 37, "thread(%llu) priority after dropping lock is %d\n", tid, after_unlock_pri);
 
@@ -217,7 +217,7 @@ try_to_take_lock_and_unlock(void *arg)
 	int old_pri = get_base_pri(mach_thread_self());
 	T_ASSERT_EQ(old_pri, 47, "thread(%llu) priority before acquiring the lock is %d\n", tid, old_pri);
 
-	/* Try taking the test lock */
+	                              
 	turnstile_prim_lock(type);
 	sleep(2);
 	turnstile_prim_unlock(type);
@@ -237,7 +237,7 @@ take_lock_and_exit(void * arg)
 
 	T_ASSERT_EQ(old_pri, 37, "thread(%llu) priority before acquiring the lock is %d\n", tid, old_pri);
 
-	/* Take the test lock */
+	                        
 	turnstile_prim_lock(type);
 
 	unboosted_pri =  get_base_pri(mach_thread_self());
@@ -245,11 +245,11 @@ take_lock_and_exit(void * arg)
 
 	sleep(8);
 
-	/* Check for elevated priority */
+	                                 
 	boosted_pri =  get_base_pri(mach_thread_self());
 	T_ASSERT_EQ(boosted_pri, 47, "thread(%llu) priority after contention by 47 thread is %d\n", tid, boosted_pri);
 
-	/* return without unlocking the lock */
+	                                       
 	return NULL;
 }
 
@@ -265,74 +265,74 @@ unlock_an_owner_exited_lock(void *arg)
 	int old_pri = get_base_pri(mach_thread_self());
 	T_ASSERT_EQ(old_pri, 47, "thread(%llu) priority before acquiring the lock is %d\n", tid, old_pri);
 
-	/* Unlock the test lock causing the turnstile code to call thread_deallocate_safe */
+	                                                                                    
 	turnstile_prim_unlock(type);
 	return NULL;
 }
 
-/*
- * Test 1: test if lock contended by a UI thread boosts the owner to UI qos.
- */
+  
+                                                                            
+   
 static void
 test1(int type)
 {
 	T_LOG("Test 1: test if lock contended by a UI thread boosts the owner to UI qos");
 
-	/* Create a thread at IN and take lock */
+	                                         
 	thread_create_at_qos(QOS_CLASS_USER_INITIATED, &take_lock_check_priority, type);
 
-	/* Create a thread at UI and try to take lock */
+	                                                
 	thread_create_at_qos(QOS_CLASS_USER_INTERACTIVE, &try_to_take_lock_and_unlock, type);
 
 	sleep(12);
 	return;
 }
 
-/*
- * Test 2: test if lock contended by a 2 UI thread boosts the owner to UI qos.
- */
+  
+                                                                              
+   
 static void
 test2(int type)
 {
 	T_LOG("Test 2: test if lock contended by a 2 UI thread boosts the owner to UI qos");
 
-	/* Create a thread at IN and take lock */
+	                                         
 	thread_create_at_qos(QOS_CLASS_USER_INITIATED, &take_lock_check_priority, type);
 
-	/* Create a thread at UI and try to take lock */
+	                                                
 	thread_create_at_qos(QOS_CLASS_USER_INTERACTIVE, &try_to_take_lock_and_unlock, type);
 
-	/* Create a thread at UI and try to take lock */
+	                                                
 	thread_create_at_qos(QOS_CLASS_USER_INTERACTIVE, &try_to_take_lock_and_unlock, type);
 
 	sleep(16);
 	return;
 }
 
-/*
- * Test 3: test if lock owner thread exiting without unlocking allows turnstile to work correctly.
- */
+  
+                                                                                                  
+   
 static void
 test3(int type)
 {
 	T_LOG("Test 3: test if lock owner thread exiting without unlocking allows turnstile to work correctly");
 
-	/* Create a thread at IN and take lock */
+	                                         
 	thread_create_at_qos(QOS_CLASS_USER_INITIATED, &take_lock_and_exit, type);
 
-	/* Create a thread at UI and try to take lock */
+	                                                
 	thread_create_at_qos(QOS_CLASS_USER_INTERACTIVE, &try_to_take_lock_and_unlock, type);
 
-	/* Create a thread at UI and try to take lock */
+	                                                
 	thread_create_at_qos(QOS_CLASS_USER_INTERACTIVE, &unlock_an_owner_exited_lock, type);
 
 	sleep(16);
 	return;
 }
 
-/*
- * Test 4: test if a chain of user-space turnstile primitives followed by kernel primitives works correctly.
- */
+  
+                                                                                                            
+   
 static void
 test4(void)
 {
@@ -341,61 +341,61 @@ test4(void)
 
 	T_LOG("Test 4: test if a chain of user-space turnstile primitives followed by kernel primitives works correctly");
 
-	/*
-	 * Chain: t4->ud->t3->uh->t2->kh->t1->kd->t0
-	 * ud and uh (user space turnstiles) will push base pri and sched pri
-	 * kd and kh (kernel space turnstiles) will push sched pri
-	 * sched pri should be propagated up to the end
-	 * kh is the breaking point of the chain for sched pri
-	 */
+	  
+                                             
+                                                                      
+                                                           
+                                                
+                                                       
+    
 
 
-	/* Create a thread at priority 4 and take SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT lock */
+	                                                                                      
 	data[0].pri_to_set = 4;
-	data[0].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT; /* this should be not locked */
+	data[0].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT;                                
 	data[0].lock2 = NULL;
-	data[0].sleep = 10; /* long sleep, nothing is blocking this thread */
+	data[0].sleep = 10;                                                  
 	data[0].sched_pri_to_check = 60;
 	data[0].base_pri_to_check = 4;
 	pthread_create(&threads[0], NULL, chain_locking, (void *)&data[0]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 31 and take SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE lock followed by SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT */
+	                                                                                                                                          
 	data[1].pri_to_set = 31;
-	data[1].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE; /* this should be not locked */
-	data[1].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT; /* this should be locked */
-	data[1].sleep = 0; /* no need to sleep, everything should be pushing by the time it acquires the lock */
+	data[1].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE;                                
+	data[1].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT;                            
+	data[1].sleep = 0;                                                                                      
 	data[1].sched_pri_to_check = 60;
 	data[1].base_pri_to_check = 31;
 	pthread_create(&threads[1], NULL, chain_locking, (void *)&data[1]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 40 and take SYSCTL_TURNSTILE_TEST_USER_HASHTABLE lock followed by SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE */
+	                                                                                                                                          
 	data[2].pri_to_set = 40;
-	data[2].lock1 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE; /* this should be not locked */
-	data[2].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE; /* this should be locked */
-	data[2].sleep = 0; /* no need to sleep, everything should be pushing by the time it acquires the lock */
+	data[2].lock1 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE;                                
+	data[2].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE;                            
+	data[2].sleep = 0;                                                                                      
 	data[2].sched_pri_to_check = 60;
 	data[2].base_pri_to_check = 60;
 	pthread_create(&threads[2], NULL, chain_locking, (void *)&data[2]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 47 and take SYSCTL_TURNSTILE_TEST_USER_DEFAULT lock followed by SYSCTL_TURNSTILE_TEST_USER_HASHTABLE */
+	                                                                                                                                      
 	data[3].pri_to_set = 47;
-	data[3].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT; /* this should be not locked */
-	data[3].lock2 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE; /* this should be locked */
-	data[3].sleep = 0; /* no need to sleep, everything should be pushing by the time it acquires the lock */
+	data[3].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT;                                
+	data[3].lock2 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE;                            
+	data[3].sleep = 0;                                                                                      
 	data[3].sched_pri_to_check = 60;
 	data[3].base_pri_to_check = 60;
 	pthread_create(&threads[3], NULL, chain_locking, (void *)&data[3]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 60 and take SYSCTL_TURNSTILE_TEST_USER_DEFAULT */
+	                                                                                
 	data[4].pri_to_set = 60;
-	data[4].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT; /* this should be locked */
+	data[4].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT;                            
 	data[4].lock2 = NULL;
-	data[4].sleep = 0; /* no need to sleep, nothing should be pushing by the time it acquires the lock */
-	data[4].sched_pri_to_check = 60; /* this is its own priority */
+	data[4].sleep = 0;                                                                                   
+	data[4].sched_pri_to_check = 60;                               
 	data[4].base_pri_to_check = 60;
 	pthread_create(&threads[4], NULL, chain_locking, (void *)&data[4]);
 
@@ -403,9 +403,9 @@ test4(void)
 	return;
 }
 
-/*
- * Test 5: test if a chain of user-space turnstile primitives interleaved by kernel primitives works correctly.
- */
+  
+                                                                                                               
+   
 static void
 test5(void)
 {
@@ -414,59 +414,59 @@ test5(void)
 
 	T_LOG("Test 5: test if a chain of user-space turnstile primitives interleaved by kernel primitives works correctly");
 
-	/*
-	 * Chain: t4->ud->t3->kh->t2->uh->t1->kd->t0
-	 * ud and uh (user space turnstiles) will push base pri and sched pri
-	 * kd and kh (kernel space turnstiles) will push sched pri
-	 * uh is the breaking point of the chain for sched pri
-	 */
+	  
+                                             
+                                                                      
+                                                           
+                                                       
+    
 
-	/* Create a thread at priority 4 and take SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT lock */
+	                                                                                      
 	data[0].pri_to_set = 4;
-	data[0].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT; /* this should be not locked */
+	data[0].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT;                                
 	data[0].lock2 = NULL;
-	data[0].sleep = 10; /* long sleep, nothing is blocking this thread */
+	data[0].sleep = 10;                                                  
 	data[0].sched_pri_to_check = 41;
 	data[0].base_pri_to_check = 4;
 	pthread_create(&threads[0], NULL, chain_locking, (void *)&data[0]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 31 and take SYSCTL_TURNSTILE_TEST_USER_HASHTABLE lock followed by SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT */
+	                                                                                                                                        
 	data[1].pri_to_set = 31;
-	data[1].lock1 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE; /* this should be not locked */
-	data[1].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT; /* this should be locked */
-	data[1].sleep = 0; /* no need to sleep, everything should be pushing by the time it acquires the lock */
+	data[1].lock1 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE;                                
+	data[1].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_DEFAULT;                            
+	data[1].sleep = 0;                                                                                      
 	data[1].sched_pri_to_check = 41;
 	data[1].base_pri_to_check = 41;
 	pthread_create(&threads[1], NULL, chain_locking, (void *)&data[1]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 41 and take SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE lock followed by SYSCTL_TURNSTILE_TEST_USER_HASHTABLE */
+	                                                                                                                                          
 	data[2].pri_to_set = 41;
-	data[2].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE; /* this should be not locked */
-	data[2].lock2 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE; /* this should be locked */
-	data[2].sleep = 0; /* no need to sleep, everything should be pushing by the time it acquires the lock */
+	data[2].lock1 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE;                                
+	data[2].lock2 = SYSCTL_TURNSTILE_TEST_USER_HASHTABLE;                            
+	data[2].sleep = 0;                                                                                      
 	data[2].sched_pri_to_check = 60;
 	data[2].base_pri_to_check = 41;
 	pthread_create(&threads[2], NULL, chain_locking, (void *)&data[2]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 47 and take SYSCTL_TURNSTILE_TEST_USER_DEFAULT lock followed by SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE */
+	                                                                                                                                        
 	data[3].pri_to_set = 47;
-	data[3].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT; /* this should be not locked */
-	data[3].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE; /* this should be locked */
-	data[3].sleep = 0; /* no need to sleep, everything should be pushing by the time it acquires the lock */
+	data[3].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT;                                
+	data[3].lock2 = SYSCTL_TURNSTILE_TEST_KERNEL_HASHTABLE;                            
+	data[3].sleep = 0;                                                                                      
 	data[3].sched_pri_to_check = 60;
 	data[3].base_pri_to_check = 60;
 	pthread_create(&threads[3], NULL, chain_locking, (void *)&data[3]);
-	sleep(2); /* give the thread time to acquire the lock */
+	sleep(2);                                               
 
-	/* Create a thread at priority 60 and take SYSCTL_TURNSTILE_TEST_USER_DEFAULT */
+	                                                                                
 	data[4].pri_to_set = 60;
-	data[4].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT; /* this should be locked */
+	data[4].lock1 = SYSCTL_TURNSTILE_TEST_USER_DEFAULT;                            
 	data[4].lock2 = NULL;
-	data[4].sleep = 0; /* no need to sleep, nothing should be pushing by the time it acquires the lock */
-	data[4].sched_pri_to_check = 60; /* this is its own priority */
+	data[4].sleep = 0;                                                                                   
+	data[4].sched_pri_to_check = 60;                               
 	data[4].base_pri_to_check = 60;
 	pthread_create(&threads[4], NULL, chain_locking, (void *)&data[4]);
 
@@ -484,12 +484,12 @@ T_DECL(turnstile_test, "Turnstile test", T_META_ASROOT(YES))
 	test2(SYSCTL_TURNSTILE_TEST_USER_HASHTABLE);
 	test3(SYSCTL_TURNSTILE_TEST_USER_HASHTABLE);
 
-	/*
-	 * rdar://problem/46302128
-	 * These tests are using a sysctl to lock a dummy kernel resource that uses turnstile.
-	 * However a thread holding a kernel push from turnstile should never return in
-	 * userspace, and rdar://problem/24194397 adds an assert for it.
-	 */
-	//test4();
-	//test5();
+	  
+                           
+                                                                                       
+                                                                                
+                                                                 
+    
+	          
+	          
 }

@@ -99,9 +99,9 @@ pthread_current_stack_contains_np(const void *addr, size_t len)
 	return 0;
 }
 
-/*
- * Upcalls to optimized libplatform string functions
- */
+  
+                                                    
+   
 
 static const struct _libkernel_string_functions
     _libkernel_generic_string_functions = {
@@ -257,9 +257,9 @@ strstr(const char *s, const char *find)
 	return _libkernel_string_functions->strstr(s, find);
 }
 
-/*
- * mach/mach.h voucher_mach_msg API
- */
+  
+                                   
+   
 
 static const struct _libkernel_voucher_functions
     _libkernel_voucher_functions_empty;

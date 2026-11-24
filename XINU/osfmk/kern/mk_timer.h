@@ -42,6 +42,6 @@
 
 void mk_timer_port_destroy(ipc_port_t port);
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif /* _KERN_MK_TIMER_H_ */
+#endif                        

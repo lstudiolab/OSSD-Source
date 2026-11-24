@@ -26,39 +26,39 @@
 
 __BEGIN_DECLS
 
-/*!
- * @function __firehose_buffer_push_to_logd
- *
- * @abstract
- * Called by the dispatch firehose apis to notify logd that a chunk is available
- */
+   
+                                           
+  
+            
+                                                                                
+   
     __WATCHOS_AVAILABLE(3.0) __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0)
 void __firehose_buffer_push_to_logd(firehose_buffer_t fb, bool for_io);
 
-/*!
- * @function __firehose_allocate
- *
- * @abstract
- * Wrapper to allocate kernel memory
- */
+   
+                                
+  
+            
+                                    
+   
 __WATCHOS_AVAILABLE(3.0) __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0)
 void __firehose_allocate(vm_offset_t *addr, vm_size_t size);
 
-/*!
- * @function __firehose_critical_region_enter
- *
- * @abstract
- * Function that disables preemption
- */
+   
+                                             
+  
+            
+                                    
+   
 __WATCHOS_AVAILABLE(3.0) __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0)
 extern void __firehose_critical_region_enter(void);
 
-/*!
- * @function __firehose_critical_region_leave
- *
- * @abstract
- * Function that enables preemption
- */
+   
+                                             
+  
+            
+                                   
+   
 __WATCHOS_AVAILABLE(3.0) __OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0) __TVOS_AVAILABLE(10.0)
 extern void __firehose_critical_region_leave(void);
 
@@ -66,4 +66,4 @@ extern void oslogwakeup(void);
 
 __END_DECLS
 
-#endif /* __firehose_h */
+#endif                   

@@ -48,9 +48,9 @@
 #include <mach/vm_param.h>
 #include <mach/machine/vm_param.h>
 
-#include <sys/stat.h> /* dev_t */
-#include <miscfs/devfs/devfs.h> /* must come after sys/stat.h */
-#include <sys/conf.h> /* must come after sys/stat.h */
+#include <sys/stat.h>            
+#include <miscfs/devfs/devfs.h>                                 
+#include <sys/conf.h>                                 
 
 #include <libkern/libkern.h>
 #include <os/atomic_private.h>
@@ -58,7 +58,7 @@
 
 #include <san/ksancov.h>
 
-/* header mess... */
+                    
 struct uthread;
 typedef struct uthread * uthread_t;
 
@@ -68,7 +68,7 @@ typedef struct uthread * uthread_t;
 
 #define USE_PC_TABLE 0
 #define KSANCOV_MAX_DEV 64
-#define KSANCOV_MAX_PCS (1024U * 64)  /* default to 256k buffer => 64k pcs */
+#define KSANCOV_MAX_PCS (1024U * 64)                                         
 
 enum {
 	KS_MODE_NONE,
@@ -84,7 +84,7 @@ struct ksancov_dev {
 		struct ksancov_trace *trace;
 		struct ksancov_counters *counters;
 	};
-	size_t sz;     /* size of allocated trace/counters buffer */
+	size_t sz;                                                  
 
 	size_t maxpcs;
 
@@ -108,7 +108,7 @@ static _Atomic unsigned active_devs;
 static LCK_GRP_DECLARE(ksancov_lck_grp, "ksancov_lck_grp");
 static LCK_RW_DECLARE(ksancov_devs_lck, &ksancov_lck_grp);
 
-/* array of devices indexed by devnode minor */
+                                               
 static ksancov_dev_t ksancov_devs[KSANCOV_MAX_DEV];
 static struct ksancov_edgemap *ksancov_edgemap;
 
@@ -156,7 +156,7 @@ __sanitizer_cov_trace_pc_indirect(void * __unused callee)
 static inline void __attribute__((always_inline))
 trace_pc_guard(uint32_t *guardp, void *caller)
 {
-	/* record the pc for this guard */
+	                                  
 	if (guardp) {
 		uint32_t gd = *guardp;
 		if (__improbable(gd && !(gd & GUARD_SEEN) && ksancov_edgemap)) {
@@ -169,7 +169,7 @@ trace_pc_guard(uint32_t *guardp, void *caller)
 	}
 
 	if (__probable(os_atomic_load(&active_devs, relaxed) == 0)) {
-		/* early exit when nothing is active */
+		                                       
 		return;
 	}
 
@@ -196,7 +196,7 @@ trace_pc_guard(uint32_t *guardp, void *caller)
 		}
 
 		if (os_atomic_load(&trace->head, relaxed) >= dev->maxpcs) {
-			return; /* overflow */
+			return;               
 		}
 
 		uint32_t idx = os_atomic_inc_orig(&trace->head, relaxed);
@@ -213,7 +213,7 @@ trace_pc_guard(uint32_t *guardp, void *caller)
 			return;
 		}
 
-		/* saturating 8bit add */
+		                         
 		if (counters->hits[idx] < KSANCOV_MAX_HITS) {
 			counters->hits[idx]++;
 		}
@@ -235,7 +235,7 @@ __sanitizer_cov_trace_pc_guard(uint32_t *guardp)
 void
 __sanitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop)
 {
-	/* assign a unique number to each guard */
+	                                          
 	for (; start != stop; start++) {
 		if (*start == 0) {
 			if (nedges < KSANCOV_MAX_EDGES) {
@@ -255,10 +255,10 @@ __sanitizer_cov_pcs_init(uintptr_t *start, uintptr_t *stop)
 		uintptr_t pc = start[0];
 		uintptr_t flags = start[1];
 
-		/*
-		 * This function gets called multiple times on the same range, so mark the
-		 * ones we've seen using unused bits in the flags field.
-		 */
+		  
+                                                                            
+                                                          
+     
 		if (flags & pc_table_seen_flag) {
 			continue;
 		}
@@ -305,11 +305,11 @@ ksancov_do_map(uintptr_t base, size_t sz, vm_prot_t prot)
 	    prot,
 	    VM_INHERIT_SHARE);
 
-	/*
-	 * At this point, either vm_map() has taken a reference on the memory entry
-	 * and we can release our local reference, or the map failed and the entry
-	 * needs to be freed.
-	 */
+	  
+                                                                            
+                                                                           
+                      
+    
 	mach_memory_entry_port_release(mem_entry);
 
 	if (kr != KERN_SUCCESS) {
@@ -319,9 +319,9 @@ ksancov_do_map(uintptr_t base, size_t sz, vm_prot_t prot)
 	return (void *)user_addr;
 }
 
-/*
- * map the sancov buffer into the current process
- */
+  
+                                                 
+   
 static int
 ksancov_map(ksancov_dev_t d, uintptr_t *bufp, size_t *sizep)
 {
@@ -339,7 +339,7 @@ ksancov_map(ksancov_dev_t d, uintptr_t *bufp, size_t *sizep)
 		}
 		addr = (uintptr_t)d->counters;
 	} else {
-		return EINVAL; /* not configured */
+		return EINVAL;                     
 	}
 
 	void *buf = ksancov_do_map(addr, size, VM_PROT_READ | VM_PROT_WRITE);
@@ -353,9 +353,9 @@ ksancov_map(ksancov_dev_t d, uintptr_t *bufp, size_t *sizep)
 	return 0;
 }
 
-/*
- * map the edge -> pc mapping as read-only
- */
+  
+                                          
+   
 static int
 ksancov_map_edgemap(uintptr_t *bufp, size_t *sizep)
 {
@@ -372,9 +372,9 @@ ksancov_map_edgemap(uintptr_t *bufp, size_t *sizep)
 	return 0;
 }
 
-/*
- * Device node management
- */
+  
+                         
+   
 
 static int
 ksancov_open(dev_t dev, int flags, int devtype, proc_t p)
@@ -409,7 +409,7 @@ static int
 ksancov_trace_alloc(ksancov_dev_t d, size_t maxpcs)
 {
 	if (d->mode != KS_MODE_NONE) {
-		return EBUSY; /* trace/counters already created */
+		return EBUSY;                                     
 	}
 	assert(d->trace == NULL);
 
@@ -419,7 +419,7 @@ ksancov_trace_alloc(ksancov_dev_t d, size_t maxpcs)
 		return EINVAL;
 	}
 
-	/* allocate the shared memory buffer */
+	                                       
 	kern_return_t kr = kmem_alloc_flags(kernel_map, &buf, sz, VM_KERN_MEMORY_DIAG, KMA_ZERO);
 	if (kr != KERN_SUCCESS) {
 		return ENOMEM;
@@ -444,14 +444,14 @@ static int
 ksancov_counters_alloc(ksancov_dev_t d)
 {
 	if (d->mode != KS_MODE_NONE) {
-		return EBUSY; /* trace/counters already created */
+		return EBUSY;                                     
 	}
 	assert(d->counters == NULL);
 
 	uintptr_t buf;
 	size_t sz = sizeof(struct ksancov_counters) + ksancov_edgemap->nedges * sizeof(uint8_t);
 
-	/* allocate the shared memory buffer */
+	                                       
 	kern_return_t kr = kmem_alloc_flags(kernel_map, &buf, sz, VM_KERN_MEMORY_DIAG, KMA_ZERO);
 	if (kr != KERN_SUCCESS) {
 		return ENOMEM;
@@ -469,24 +469,24 @@ ksancov_counters_alloc(ksancov_dev_t d)
 	return 0;
 }
 
-/*
- * attach a thread to a ksancov dev instance
- */
+  
+                                            
+   
 static int
 ksancov_attach(ksancov_dev_t d, thread_t th)
 {
 	if (d->mode == KS_MODE_NONE) {
-		return EINVAL; /* not configured */
+		return EINVAL;                     
 	}
 
 	if (th != current_thread()) {
-		/* can only attach to self presently */
+		                                       
 		return EINVAL;
 	}
 
 	ksancov_dev_t *devp = (void *)__sanitizer_get_thread_data(th);
 	if (*devp) {
-		return EBUSY; /* one dev per thread */
+		return EBUSY;                         
 	}
 
 	if (d->thread != THREAD_NULL) {
@@ -508,18 +508,18 @@ thread_wait(
 	boolean_t       until_not_runnable);
 
 
-/*
- * disconnect thread from ksancov dev
- */
+  
+                                     
+   
 static void
 ksancov_detach(ksancov_dev_t d)
 {
 	if (d->thread == THREAD_NULL) {
-		/* no thread attached */
+		                        
 		return;
 	}
 
-	/* disconnect dev from thread */
+	                                
 	ksancov_dev_t *devp = (void *)__sanitizer_get_thread_data(d->thread);
 	if (*devp != NULL) {
 		assert(*devp == d);
@@ -527,14 +527,14 @@ ksancov_detach(ksancov_dev_t d)
 	}
 
 	if (d->thread != current_thread()) {
-		/* wait until it's safe to yank */
+		                                  
 		thread_wait(d->thread, TRUE);
 	}
 
 	assert(active_devs >= 1);
 	os_atomic_sub(&active_devs, 1, relaxed);
 
-	/* drop our thread reference */
+	                               
 	thread_deallocate(d->thread);
 	d->thread = THREAD_NULL;
 }
@@ -547,23 +547,23 @@ ksancov_close(dev_t dev, int flags, int devtype, proc_t p)
 
 	lck_rw_lock_exclusive(&ksancov_devs_lck);
 	ksancov_dev_t d = ksancov_devs[minor_num];
-	ksancov_devs[minor_num] = NULL; /* dev no longer discoverable */
+	ksancov_devs[minor_num] = NULL;                                 
 	lck_rw_unlock_exclusive(&ksancov_devs_lck);
 
-	/*
-	 * No need to lock d here as there is and will be no one having its
-	 * reference except for this thread and the one which is going to
-	 * be detached below.
-	 */
+	  
+                                                                    
+                                                                  
+                      
+    
 
 	if (!d) {
 		return ENXIO;
 	}
 
 	if (d->mode == KS_MODE_TRACE && d->trace) {
-		os_atomic_store(&d->trace->enabled, 0, relaxed); /* stop tracing */
+		os_atomic_store(&d->trace->enabled, 0, relaxed);                   
 	} else if (d->mode == KS_MODE_COUNTERS && d->counters) {
-		os_atomic_store(&d->counters->enabled, 0, relaxed);         /* stop tracing */
+		os_atomic_store(&d->counters->enabled, 0, relaxed);                           
 	}
 
 	ksancov_detach(d);
@@ -625,7 +625,7 @@ ksancov_ioctl(dev_t dev, unsigned long cmd, caddr_t _data, int fflag, proc_t p)
 	ksancov_dev_t d = ksancov_devs[minor(dev)];
 	if (!d) {
 		lck_rw_unlock_shared(&ksancov_devs_lck);
-		return EINVAL;         /* dev not open */
+		return EINVAL;                           
 	}
 
 	int ret = 0;
@@ -722,7 +722,7 @@ ksancov_init_dev(void)
 		return -1;
 	}
 
-	/* This could be moved to the first use of /dev/ksancov to save memory */
+	                                                                         
 	uintptr_t buf;
 	size_t sz = sizeof(struct ksancov_edgemap) + KSANCOV_MAX_EDGES * sizeof(uint32_t);
 

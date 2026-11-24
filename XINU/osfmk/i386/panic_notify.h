@@ -34,4 +34,4 @@
 extern void panic_notify_init(void);
 extern void panic_notify(void);
 
-#endif /* _I386_PANIC_NOTIFY_H */
+#endif                           

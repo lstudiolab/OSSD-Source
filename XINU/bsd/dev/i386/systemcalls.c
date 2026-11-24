@@ -70,20 +70,20 @@ extern void unix_syscall(x86_saved_state_t *);
 extern void unix_syscall64(x86_saved_state_t *);
 extern void *find_user_regs(thread_t);
 
-/* dynamically generated at build time based on syscalls.master */
+                                                                  
 extern const char *syscallnames[];
 
 #define code_is_kdebug_trace(code) (((code) == SYS_kdebug_trace) ||   \
 	                            ((code) == SYS_kdebug_trace64) || \
 	                            ((code) == SYS_kdebug_trace_string))
 
-/*
- * Function:	unix_syscall
- *
- * Inputs:	regs	- pointer to i386 save area
- *
- * Outputs:	none
- */
+  
+                         
+  
+                                           
+  
+                
+   
 __attribute__((noreturn))
 void
 unix_syscall(x86_saved_state_t *state)
@@ -113,7 +113,7 @@ unix_syscall(x86_saved_state_t *state)
 
 	uthread_reset_proc_refcount(uthread);
 
-	/* Get the approriate proc; may be different from task's for vfork() */
+	                                                                       
 	is_vfork = uthread->uu_flag & UT_VFORK;
 	if (__improbable(is_vfork != 0)) {
 		p = current_proc();
@@ -155,7 +155,7 @@ unix_syscall(x86_saved_state_t *state)
 			regs->eax = error;
 			regs->efl |= EFL_CF;
 			thread_exception_return();
-			/* NOTREACHED */
+			                
 		}
 
 		if (__probable(!code_is_kdebug_trace(code))) {
@@ -175,10 +175,10 @@ unix_syscall(x86_saved_state_t *state)
 		KDBG_RELEASE(BSDDBG_CODE(DBG_BSD_EXCP_SC, code) | DBG_FUNC_START);
 	}
 
-	/*
-	 * Delayed binding of thread credential to process credential, if we
-	 * are not running with an explicitly set thread credential.
-	 */
+	  
+                                                                     
+                                                             
+    
 	kauth_cred_uthread_update(uthread, p);
 
 	uthread->uu_rval[0] = 0;
@@ -199,7 +199,7 @@ unix_syscall(x86_saved_state_t *state)
 			goto skip_syscall;
 		}
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 
 	AUDIT_SYSCALL_ENTER(code, p, uthread);
 	error = (*(callp->sy_call))((void *) p, (void *) vt, &(uthread->uu_rval[0]));
@@ -207,7 +207,7 @@ unix_syscall(x86_saved_state_t *state)
 
 #if CONFIG_MACF
 skip_syscall:
-#endif /* CONFIG_MACF */
+#endif                  
 
 #ifdef JOE_DEBUG
 	if (uthread->uu_iocount) {
@@ -216,27 +216,27 @@ skip_syscall:
 #endif
 #if CONFIG_DTRACE
 	uthread->t_dtrace_errno = error;
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 	if (__improbable(error == ERESTART)) {
-		/*
-		 * Move the user's pc back to repeat the syscall:
-		 * 5 bytes for a sysenter, or 2 for an int 8x.
-		 * The SYSENTER_TF_CS covers single-stepping over a sysenter
-		 * - see debug trap handler in idt.s/idt64.s
-		 */
+		  
+                                                   
+                                                
+                                                              
+                                              
+     
 
 		pal_syscall_restart(thread, state);
 	} else if (error != EJUSTRETURN) {
 		if (__improbable(error)) {
 			regs->eax = error;
-			regs->efl |= EFL_CF;    /* carry bit */
-		} else { /* (not error) */
-			 /*
-			  * We split retval across two registers, in case the
-			  * syscall had a 64-bit return value, in which case
-			  * eax/edx matches the function call ABI.
-			  */
+			regs->efl |= EFL_CF;                   
+		} else {                  
+			   
+                                                        
+                                                       
+                                             
+       
 			regs->eax = uthread->uu_rval[0];
 			regs->edx = uthread->uu_rval[1];
 		}
@@ -253,16 +253,16 @@ skip_syscall:
 	kern_allocation_name_t
 	prior __assert_only = thread_set_allocation_name(NULL);
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	if (__improbable(uthread->uu_lowpri_window)) {
-		/*
-		 * task is marked as a low priority I/O type
-		 * and the I/O we issued while in this system call
-		 * collided with normal I/O operations... we'll
-		 * delay in order to mitigate the impact of this
-		 * task on the normal operation of the system
-		 */
+		  
+                                              
+                                                    
+                                                 
+                                                  
+                                               
+     
 		throttle_lowpri_io(1);
 	}
 	if (__probable(!code_is_kdebug_trace(code))) {
@@ -281,7 +281,7 @@ skip_syscall:
 #endif
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }
 
 __attribute__((noreturn))
@@ -312,20 +312,20 @@ unix_syscall64(x86_saved_state_t *state)
 
 	uthread_reset_proc_refcount(uthread);
 
-	/* Get the approriate proc; may be different from task's for vfork() */
+	                                                                       
 	if (__probable(!(uthread->uu_flag & UT_VFORK))) {
 		p = (struct proc *)get_bsdtask_info(current_task());
 	} else {
 		p = current_proc();
 	}
 
-	/* Verify that we are not being called from a task without a proc */
+	                                                                    
 	if (__improbable(p == NULL)) {
 		regs->rax = EPERM;
 		regs->isf.rflags |= EFL_CF;
 		task_terminate_internal(current_task());
 		thread_exception_return();
-		/* NOTREACHED */
+		                
 	}
 
 	code    = regs->rax & SYSCALL_NUMBER_MASK;
@@ -338,10 +338,10 @@ unix_syscall64(x86_saved_state_t *state)
 	vt = (void *)uthread->uu_arg;
 
 	if (__improbable(callp == sysent)) {
-		/*
-		 * indirect system call... system call number
-		 * passed as 'arg0'
-		 */
+		  
+                                               
+                     
+     
 		code    = regs->rdi;
 		syscode = (code < nsysent) ? code : SYS_invalid;
 		callp   = &sysent[syscode];
@@ -353,7 +353,7 @@ unix_syscall64(x86_saved_state_t *state)
 	}
 
 	if (callp->sy_narg != 0) {
-		assert(callp->sy_narg <= 8); /* size of uu_arg */
+		assert(callp->sy_narg <= 8);                     
 
 		args_in_regs = MIN(args_in_regs, callp->sy_narg);
 		memcpy(vt, args_start_at_rdi ? &regs->rdi : &regs->rsi, args_in_regs * sizeof(syscall_arg_t));
@@ -375,17 +375,17 @@ unix_syscall64(x86_saved_state_t *state)
 				regs->rax = error;
 				regs->isf.rflags |= EFL_CF;
 				thread_exception_return();
-				/* NOTREACHED */
+				                
 			}
 		}
 	} else {
 		KDBG_RELEASE(BSDDBG_CODE(DBG_BSD_EXCP_SC, code) | DBG_FUNC_START);
 	}
 
-	/*
-	 * Delayed binding of thread credential to process credential, if we
-	 * are not running with an explicitly set thread credential.
-	 */
+	  
+                                                                     
+                                                             
+    
 	kauth_cred_uthread_update(uthread, p);
 
 	uthread->uu_rval[0] = 0;
@@ -406,7 +406,7 @@ unix_syscall64(x86_saved_state_t *state)
 			goto skip_syscall;
 		}
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 
 	AUDIT_SYSCALL_ENTER(code, p, uthread);
 	error = (*(callp->sy_call))((void *) p, vt, &(uthread->uu_rval[0]));
@@ -414,7 +414,7 @@ unix_syscall64(x86_saved_state_t *state)
 
 #if CONFIG_MACF
 skip_syscall:
-#endif /* CONFIG_MACF */
+#endif                  
 
 #ifdef JOE_DEBUG
 	if (uthread->uu_iocount) {
@@ -424,20 +424,20 @@ skip_syscall:
 
 #if CONFIG_DTRACE
 	uthread->t_dtrace_errno = error;
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 	if (__improbable(error == ERESTART)) {
-		/*
-		 * all system calls come through via the syscall instruction
-		 * in 64 bit mode... its 2 bytes in length
-		 * move the user's pc back to repeat the syscall:
-		 */
+		  
+                                                              
+                                            
+                                                   
+     
 		pal_syscall_restart( thread, state );
 	} else if (error != EJUSTRETURN) {
 		if (__improbable(error)) {
 			regs->rax = error;
-			regs->isf.rflags |= EFL_CF;     /* carry bit */
-		} else { /* (not error) */
+			regs->isf.rflags |= EFL_CF;                    
+		} else {                  
 			switch (callp->sy_return_type) {
 			case _SYSCALL_RET_INT_T:
 				regs->rax = uthread->uu_rval[0];
@@ -476,16 +476,16 @@ skip_syscall:
 	kern_allocation_name_t
 	prior __assert_only = thread_set_allocation_name(NULL);
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	if (__improbable(uthread->uu_lowpri_window)) {
-		/*
-		 * task is marked as a low priority I/O type
-		 * and the I/O we issued while in this system call
-		 * collided with normal I/O operations... we'll
-		 * delay in order to mitigate the impact of this
-		 * task on the normal operation of the system
-		 */
+		  
+                                              
+                                                    
+                                                 
+                                                  
+                                               
+     
 		throttle_lowpri_io(1);
 	}
 	if (__probable(!code_is_kdebug_trace(code))) {
@@ -500,7 +500,7 @@ skip_syscall:
 #endif
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }
 
 
@@ -532,19 +532,19 @@ unix_syscall_return(int error)
 		if (callp->sy_call == dtrace_systrace_syscall) {
 			dtrace_systrace_syscall_return( code, error, uthread->uu_rval );
 		}
-#endif /* CONFIG_DTRACE */
+#endif                    
 		AUDIT_SYSCALL_EXIT(code, p, uthread, error);
 
 		if (error == ERESTART) {
-			/*
-			 * repeat the syscall
-			 */
+			  
+                        
+      
 			pal_syscall_restart( thread, find_user_regs(thread));
 		} else if (error != EJUSTRETURN) {
 			if (error) {
 				regs->rax = error;
-				regs->isf.rflags |= EFL_CF;     /* carry bit */
-			} else { /* (not error) */
+				regs->isf.rflags |= EFL_CF;                    
+			} else {                  
 				switch (callp->sy_return_type) {
 				case _SYSCALL_RET_INT_T:
 					regs->rax = uthread->uu_rval[0];
@@ -588,7 +588,7 @@ unix_syscall_return(int error)
 		if (callp->sy_call == dtrace_systrace_syscall) {
 			dtrace_systrace_syscall_return( code, error, uthread->uu_rval );
 		}
-#endif /* CONFIG_DTRACE */
+#endif                    
 		AUDIT_SYSCALL_EXIT(code, p, uthread, error);
 
 		if (error == ERESTART) {
@@ -596,8 +596,8 @@ unix_syscall_return(int error)
 		} else if (error != EJUSTRETURN) {
 			if (error) {
 				regs->eax = error;
-				regs->efl |= EFL_CF;    /* carry bit */
-			} else { /* (not error) */
+				regs->efl |= EFL_CF;                   
+			} else {                  
 				regs->eax = uthread->uu_rval[0];
 				regs->edx = uthread->uu_rval[1];
 			}
@@ -614,16 +614,16 @@ unix_syscall_return(int error)
 	kern_allocation_name_t
 	prior __assert_only = thread_set_allocation_name(NULL);
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	if (uthread->uu_lowpri_window) {
-		/*
-		 * task is marked as a low priority I/O type
-		 * and the I/O we issued while in this system call
-		 * collided with normal I/O operations... we'll
-		 * delay in order to mitigate the impact of this
-		 * task on the normal operation of the system
-		 */
+		  
+                                              
+                                                    
+                                                 
+                                                  
+                                               
+     
 		throttle_lowpri_io(1);
 	}
 	if (!code_is_kdebug_trace(code)) {
@@ -632,5 +632,5 @@ unix_syscall_return(int error)
 	}
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }

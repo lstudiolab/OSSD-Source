@@ -1,10 +1,10 @@
-//
-// Tests for
-//  template <typename U>
-//  intrusive_shared_ptr(intrusive_shared_ptr<U, RefcountPolicy> const& other);
-//
-//  intrusive_shared_ptr(intrusive_shared_ptr const& other);
-//
+  
+            
+                         
+                                                                               
+  
+                                                            
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <darwintest.h>
@@ -31,30 +31,30 @@ tests()
 {
 	Stored obj{3};
 
-	// Test with non-null pointers
+	                              
 	{
 		test_policy::retain_count = 0;
 		libkern::intrusive_shared_ptr<From, test_policy> const from(&obj, libkern::retain);
-		libkern::intrusive_shared_ptr<To, test_policy> to(from); // explicit
+		libkern::intrusive_shared_ptr<To, test_policy> to(from);            
 		CHECK(test_policy::retain_count == 2);
 		CHECK(to.get() == &obj);
 	}
 	{
 		test_policy::retain_count = 0;
 		libkern::intrusive_shared_ptr<From, test_policy> const from(&obj, libkern::retain);
-		libkern::intrusive_shared_ptr<To, test_policy> to{from}; // explicit
+		libkern::intrusive_shared_ptr<To, test_policy> to{from};            
 		CHECK(test_policy::retain_count == 2);
 		CHECK(to.get() == &obj);
 	}
 	{
 		test_policy::retain_count = 0;
 		libkern::intrusive_shared_ptr<From, test_policy> const from(&obj, libkern::retain);
-		libkern::intrusive_shared_ptr<To, test_policy> to = from; // implicit
+		libkern::intrusive_shared_ptr<To, test_policy> to = from;            
 		CHECK(test_policy::retain_count == 2);
 		CHECK(to.get() == &obj);
 	}
 
-	// Test with a null pointer
+	                           
 	{
 		test_policy::retain_count = 0;
 		libkern::intrusive_shared_ptr<From, test_policy> const from = nullptr;
@@ -65,37 +65,37 @@ tests()
 }
 
 T_DECL(ctor_copy, "intrusive_shared_ptr.ctor.copy") {
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Derived>();
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Derived const>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ Derived const>();
+	tests<           Derived,          Derived,        Derived>();
+	tests<           Derived,          Derived,        Derived const>();
+	tests<           Derived,          Derived const,        Derived const>();
 
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Base>();
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Base const>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ Base const>();
+	tests<           Derived,          Derived,        Base>();
+	tests<           Derived,          Derived,        Base const>();
+	tests<           Derived,          Derived const,        Base const>();
 
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple, /*to*/ Base1>();
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple const, /*to*/ Base1 const>();
+	tests<           DerivedMultiple,          DerivedMultiple,        Base1>();
+	tests<           DerivedMultiple,          DerivedMultiple const,        Base1 const>();
 
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple, /*to*/ Base2>();
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple const, /*to*/ Base2 const>();
+	tests<           DerivedMultiple,          DerivedMultiple,        Base2>();
+	tests<           DerivedMultiple,          DerivedMultiple const,        Base2 const>();
 
-	// Make sure basic trait querying works
+	                                       
 	static_assert(std::is_copy_constructible_v<test_shared_ptr<Derived> >);
 
-	// Make sure downcasts are disabled
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<Derived>, /*from*/ test_shared_ptr<Base> const&>);
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<DerivedMultiple>, /*from*/ test_shared_ptr<Base1> const&>);
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<DerivedMultiple>, /*from*/ test_shared_ptr<Base2> const&>);
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<Base2>, /*from*/ test_shared_ptr<Base1> const&>);
+	                                   
+	static_assert(!std::is_constructible_v<       test_shared_ptr<Derived>,          test_shared_ptr<Base> const&>);
+	static_assert(!std::is_constructible_v<       test_shared_ptr<DerivedMultiple>,          test_shared_ptr<Base1> const&>);
+	static_assert(!std::is_constructible_v<       test_shared_ptr<DerivedMultiple>,          test_shared_ptr<Base2> const&>);
+	static_assert(!std::is_constructible_v<       test_shared_ptr<Base2>,          test_shared_ptr<Base1> const&>);
 
-	// Make sure const-casting away doesn't work
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<Derived>, /*from*/ test_shared_ptr<Derived const> const&>);
+	                                            
+	static_assert(!std::is_constructible_v<       test_shared_ptr<Derived>,          test_shared_ptr<Derived const> const&>);
 
-	// Make sure casting to unrelated types doesn't work
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<char>, /*from*/ test_shared_ptr<Derived> const&>);
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<Unrelated>, /*from*/ test_shared_ptr<Derived> const&>);
-	static_assert(!std::is_constructible_v</*to*/ test_shared_ptr<Base2>, /*from*/ test_shared_ptr<Base1> const&>);
+	                                                    
+	static_assert(!std::is_constructible_v<       test_shared_ptr<char>,          test_shared_ptr<Derived> const&>);
+	static_assert(!std::is_constructible_v<       test_shared_ptr<Unrelated>,          test_shared_ptr<Derived> const&>);
+	static_assert(!std::is_constructible_v<       test_shared_ptr<Base2>,          test_shared_ptr<Base1> const&>);
 
-	// Make sure constructing with different policies doesn't work
-	static_assert(!std::is_constructible_v</*to*/ libkern::intrusive_shared_ptr<Derived, dummy_policy<2> >, /*from*/ libkern::intrusive_shared_ptr<Derived, dummy_policy<1> > const &>);
+	                                                              
+	static_assert(!std::is_constructible_v<       libkern::intrusive_shared_ptr<Derived, dummy_policy<2> >,          libkern::intrusive_shared_ptr<Derived, dummy_policy<1> > const &>);
 }

@@ -38,17 +38,17 @@
 
 extern void fileport_releasefg(struct fileglob *);
 
-/*
- * fileport_alloc
- *
- * Description: Obtain a send right for the given fileglob, which must be
- *		referenced.
- *
- * Parameters:  fg		A fileglob.
- *
- * Returns:     Port of type IKOT_FILEPORT with fileglob set as its kobject.
- *              Port is returned with a send right.
- */
+  
+                 
+  
+                                                                         
+               
+  
+                               
+  
+                                                                            
+                                                   
+   
 ipc_port_t
 fileport_alloc(struct fileglob *fg)
 {
@@ -57,20 +57,20 @@ fileport_alloc(struct fileglob *fg)
 }
 
 
-/*
- * fileport_get_fileglob
- *
- * Description: Obtain the fileglob associated with a given port.
- *
- * Parameters: port		A Mach port of type IKOT_FILEPORT.
- *
- * Returns:    NULL		The given Mach port did not reference a
- *				fileglob.
- *	       !NULL		The fileglob that is associated with the
- *				Mach port.
- *
- * Notes: The caller must have a reference on the fileport.
- */
+  
+                        
+  
+                                                                 
+  
+                                                       
+  
+                                                            
+               
+                                                         
+                
+  
+                                                           
+   
 struct fileglob *
 fileport_port_to_fileglob(ipc_port_t port)
 {
@@ -90,15 +90,15 @@ fileport_port_to_fileglob(ipc_port_t port)
 }
 
 
-/*
- * fileport_notify
- *
- * Description: Handle a no-senders notification for a fileport.  Unless
- *              the message is spoofed, destroys the port and releases
- *              its reference on the fileglob.
- *
- * Parameters: msg		A Mach no-senders notification message.
- */
+  
+                  
+  
+                                                                        
+                                                                      
+                                              
+  
+                                                           
+   
 void
 fileport_notify(mach_msg_header_t *msg)
 {
@@ -134,17 +134,17 @@ fileport_notify(mach_msg_header_t *msg)
 	}
 }
 
-/*
- * fileport_invoke
- *
- * Description: Invoke a function with the fileglob underlying the fileport.
- *		Returns the error code related to the fileglob lookup.
- *
- * Parameters:	task		The target task
- *		action		The function to invoke with the fileglob
- *		arg		Anonymous pointer to caller state
- *		rval		The value returned from calling 'action'
- */
+  
+                  
+  
+                                                                            
+                                                          
+  
+                                    
+                                                    
+                                          
+                                                  
+   
 kern_return_t
 fileport_invoke(task_t task, mach_port_name_t name,
     int (*action)(mach_port_name_t, struct fileglob *, void *),
@@ -170,21 +170,21 @@ fileport_invoke(task_t task, mach_port_name_t name,
 	return kr;
 }
 
-/*
- * fileport_walk
- *
- * Description: Invoke the action function on every fileport in the task.
- *
- *		This could be more efficient if we refactored mach_port_names()
- *		so that (a) it didn't compute the type information unless asked
- *		and (b) it could be asked to -not- unwire/copyout the memory
- *		and (c) if we could ask for port names by kobject type. Not
- *		clear that it's worth all that complexity, though.
- *
- * Parameters:  task		The target task
- *		action		The function to invoke on each fileport
- *		arg		Anonymous pointer to caller state.
- */
+  
+                
+  
+                                                                         
+  
+                                                                   
+                                                                   
+                                                                
+                                                               
+                                                      
+  
+                                     
+                                                   
+                                           
+   
 kern_return_t
 fileport_walk(task_t task,
     int (*action)(mach_port_name_t, struct fileglob *, void *arg),
@@ -198,11 +198,11 @@ fileport_walk(task_t task,
 	uint_t i;
 	int rval;
 
-	/*
-	 * mach_port_names returns the 'name' and 'types' in copied-in
-	 * form.  Discard 'types' immediately, then copyout 'names'
-	 * back into the kernel before walking the array.
-	 */
+	  
+                                                               
+                                                            
+                                                  
+    
 
 	kr = mach_port_names(task->itk_space,
 	    (mach_port_name_t **)&map_copy_names, &ncnt,
@@ -223,7 +223,7 @@ fileport_walk(task_t task,
 	for (rval = 0, i = 0; i < ncnt; i++) {
 		if (fileport_invoke(task, names[i], action, arg,
 		    &rval) == KERN_SUCCESS && -1 == rval) {
-			break;          /* early termination clause */
+			break;                                        
 		}
 	}
 	vm_deallocate(ipc_kernel_map,

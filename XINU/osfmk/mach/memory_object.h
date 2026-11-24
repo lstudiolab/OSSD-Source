@@ -53,99 +53,99 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	memory_object.h
- *	Author:	Michael Wayne Young
- *
- *	External memory management interface definition.
- */
+  
+   
+  
+                        
+                              
+  
+                                                   
+   
 
 #ifndef _MACH_MEMORY_OBJECT_H_
 #define _MACH_MEMORY_OBJECT_H_
 
-/*
- *	User-visible types used in the external memory
- *	management interface:
- */
+  
+                                                 
+                        
+   
 
 #include <mach/port.h>
 #include <mach/message.h>
 #include <mach/machine/vm_types.h>
 
 typedef mach_port_t     memory_object_t;
-/* A memory object ... */
-/*  Used by the kernel to retrieve */
-/*  or store data */
+                         
+                                     
+                    
 
 typedef mach_port_t     memory_object_control_t;
-/* Provided to a memory manager; ... */
-/*  used to control a memory object */
+                                       
+                                      
 
 typedef mach_port_t     memory_object_name_t;
-/* Used to describe the memory ... */
-/*  object in vm_regions() calls */
+                                     
+                                   
 
 typedef mach_port_t     memory_object_rep_t;
-/* Per-client handle for mem object */
-/*  Used by user programs to specify */
-/*  the object to map */
+                                      
+                                       
+                        
 
 typedef int             memory_object_copy_strategy_t;
-/* How memory manager handles copy: */
+                                      
 #define         MEMORY_OBJECT_COPY_NONE         0
-/* ... No special support */
+                            
 #define         MEMORY_OBJECT_COPY_CALL         1
-/* ... Make call on memory manager */
+                                     
 #define         MEMORY_OBJECT_COPY_DELAY        2
-/* ... Memory manager doesn't
- *     change data externally.
- */
+                             
+                              
+   
 #define         MEMORY_OBJECT_COPY_TEMPORARY    3
-/* ... Memory manager doesn't
- *     change data externally, and
- *     doesn't need to see changes.
- */
+                             
+                                  
+                                   
+   
 #define         MEMORY_OBJECT_COPY_SYMMETRIC    4
-/* ... Memory manager doesn't
- *     change data externally,
- *     doesn't need to see changes,
- *     and object will not be
- *     multiply mapped.
- *
- *     XXX
- *     Not yet safe for non-kernel use.
- */
+                             
+                              
+                                   
+                             
+                       
+  
+          
+                                       
+   
 
 #define         MEMORY_OBJECT_COPY_INVALID      5
-/* ...	An invalid copy strategy,
- *	for external objects which
- *	have not been initialized.
- *	Allows copy_strategy to be
- *	examined without also
- *	examining pager_ready and
- *	internal.
- */
+                                
+                             
+                             
+                             
+                        
+                            
+            
+   
 
 typedef int             memory_object_return_t;
-/* Which pages to return to manager
- *  this time (lock_request) */
+                                   
+                               
 #define         MEMORY_OBJECT_RETURN_NONE       0
-/* ... don't return any. */
+                           
 #define         MEMORY_OBJECT_RETURN_DIRTY      1
-/* ... only dirty pages. */
+                           
 #define         MEMORY_OBJECT_RETURN_ALL        2
-/* ... dirty and precious pages. */
+                                   
 #define         MEMORY_OBJECT_RETURN_ANYTHING   3
-/* ... any resident page. */
+                            
 
 #define         MEMORY_OBJECT_NULL      MACH_PORT_NULL
 
 
-/*
- *	Types for the memory object flavor interfaces
- */
+  
+                                                
+   
 
 #define MEMORY_OBJECT_INFO_MAX      (1024)
 typedef int     *memory_object_info_t;
@@ -171,7 +171,7 @@ struct memory_object_perf_info {
 	boolean_t                                               may_cache;
 };
 
-struct old_memory_object_attr_info {                    /* old attr list */
+struct old_memory_object_attr_info {                                       
 	boolean_t                       object_ready;
 	boolean_t                       may_cache;
 	memory_object_copy_strategy_t   copy_strategy;
@@ -225,4 +225,4 @@ typedef struct memory_object_attr_info  memory_object_attr_info_data_t;
 	 f != MEMORY_OBJECT_BEHAVIOR_INFO &&                            \
 	 f != OLD_MEMORY_OBJECT_ATTRIBUTE_INFO)
 
-#endif  /* _MACH_MEMORY_OBJECT_H_ */
+#endif                              

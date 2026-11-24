@@ -256,7 +256,7 @@ cpu_ucode_update SYSCTL_HANDLER_ARGS
 	uint64_t addr;
 	int error;
 
-	/* Can't update microcode from within a VM. */
+	                                              
 
 	if (cpuid_features() & CPUID_FEATURE_VMM) {
 		return ENODEV;
@@ -297,10 +297,10 @@ panic_set_restart_timeout(__unused struct sysctl_oid *oidp, __unused void *arg1,
 	return error;
 }
 
-/*
- * Populates the {CPU, vector, latency} triple for the maximum observed primary
- * interrupt latency
- */
+  
+                                                                               
+                    
+   
 static int
 misc_interrupt_latency_max(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
 {
@@ -320,15 +320,15 @@ misc_interrupt_latency_max(__unused struct sysctl_oid *oidp, __unused void *arg1
 }
 
 #if DEVELOPMENT || DEBUG
-/*
- * Populates a string with each CPU's tsc synch delta.
- */
+  
+                                                      
+   
 static int
 x86_cpu_tsc_deltas(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
 {
 	int err;
 	uint32_t ncpus = ml_wait_max_cpus();
-	uint32_t buflen = (2 /* hex digits */ * sizeof(uint64_t) + 3 /* for "0x" + " " */) * ncpus + 1;
+	uint32_t buflen = (2                  * sizeof(uint64_t) + 3                     ) * ncpus + 1;
 	char *buf = kalloc(buflen);
 
 	cpu_data_tsc_sync_deltas_string(buf, buflen, 0, ncpus - 1);
@@ -340,9 +340,9 @@ x86_cpu_tsc_deltas(__unused struct sysctl_oid *oidp, __unused void *arg1, __unus
 	return err;
 }
 
-/*
- * Triggers a machine-check exception - for a suitably configured kernel only.
- */
+  
+                                                                              
+   
 extern void mca_exception_panic(void);
 static int
 misc_machine_check_panic(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
@@ -359,9 +359,9 @@ misc_machine_check_panic(__unused struct sysctl_oid *oidp, __unused void *arg1, 
 	return error;
 }
 
-/*
- * Triggers a non-responsive processor timeout panic - for a suitably configured kernel only.
- */
+  
+                                                                                             
+   
 static uint64_t kernel_timeout_spin = 0;
 static int
 misc_kernel_timeout_spin(__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
@@ -381,7 +381,7 @@ misc_kernel_timeout_spin(__unused struct sysctl_oid *oidp, __unused void *arg1, 
 	}
 	return error;
 }
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 
 SYSCTL_NODE(_machdep, OID_AUTO, cpu, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
@@ -806,7 +806,7 @@ uint32_t pmap_pv_hashlist_max;
 uint32_t pmap_kernel_text_ps = PAGE_SIZE;
 extern uint32_t pv_hashed_kern_low_water_mark;
 
-/*extern struct sysctl_oid_list sysctl__machdep_pmap_children;*/
+                                                                
 
 SYSCTL_NODE(_machdep, OID_AUTO, pmap, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "PMAP info");
@@ -946,17 +946,17 @@ SYSCTL_QUAD(_machdep, OID_AUTO, sim_stretched_io_ns,
 
 extern int pmap_pagezero_mitigation;
 extern int pmap_asserts_enabled, pmap_asserts_traced;
-/* On DEV/DEBUG kernels, clear this to disable the SMAP emulation
- * (address space disconnect) for pagezero-less processes.
- */
+                                                                 
+                                                          
+   
 SYSCTL_INT(_machdep, OID_AUTO, pmap_pagezero_mitigation,
     CTLFLAG_KERN | CTLFLAG_RW | CTLFLAG_LOCKED,
     &pmap_pagezero_mitigation, 0, "");
-/* Toggle pmap assertions */
+                            
 SYSCTL_INT(_machdep, OID_AUTO, pmap_asserts,
     CTLFLAG_KERN | CTLFLAG_RW | CTLFLAG_LOCKED,
     &pmap_asserts_enabled, 0, "");
-/* Transform pmap assertions into kernel trace terminations */
+                                                              
 SYSCTL_INT(_machdep, OID_AUTO, pmap_asserts_traced,
     CTLFLAG_KERN | CTLFLAG_RW | CTLFLAG_LOCKED,
     &pmap_asserts_traced, 0, "");
@@ -980,7 +980,7 @@ SYSCTL_PROC(_machdep_misc, OID_AUTO, misc_svisor_read,
     0, 0,
     misc_svisor_read, "I", "supervisor mode read");
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 extern void timer_queue_trace_cpu(int);
 static int
@@ -1025,23 +1025,23 @@ SYSCTL_PROC(_machdep_misc, OID_AUTO, nmis,
     0, 0,
     misc_nmis, "I", "Report/increment NMI count");
 
-/* Parameters related to timer coalescing tuning, to be replaced
- * with a dedicated systemcall in the future.
- */
-/* Enable processing pending timers in the context of any other interrupt */
+                                                                
+                                             
+   
+                                                                            
 SYSCTL_INT(_kern, OID_AUTO, interrupt_timer_coalescing_enabled,
     CTLFLAG_KERN | CTLFLAG_RW | CTLFLAG_LOCKED,
     &interrupt_timer_coalescing_enabled, 0, "");
-/* Upon entering idle, process pending timers with HW deadlines
- * this far in the future.
- */
+                                                               
+                          
+   
 SYSCTL_INT(_kern, OID_AUTO, timer_coalesce_idle_entry_hard_deadline_max,
     CTLFLAG_KERN | CTLFLAG_RW | CTLFLAG_LOCKED,
     &idle_entry_timer_processing_hdeadline_threshold, 0, "");
 
-/* Track potentially expensive eager timer evaluations on QoS tier
- * switches.
- */
+                                                                  
+            
+   
 extern uint32_t ml_timer_eager_evaluations;
 
 SYSCTL_INT(_machdep, OID_AUTO, eager_timer_evaluations,
@@ -1089,7 +1089,7 @@ SYSCTL_INT(_machdep, OID_AUTO, pltrace,
     CTLFLAG_KERN | CTLFLAG_RW | CTLFLAG_LOCKED,
     &plctrace_enabled, 0, "");
 
-/* Intentionally not declared as volatile here: */
+                                                  
 extern int mmiotrace_enabled;
 
 SYSCTL_INT(_machdep, OID_AUTO, MMIOtrace,
@@ -1132,21 +1132,21 @@ SYSCTL_INT(_machdep_misc, OID_AUTO, traptrace_enabled,
     &traptrace_enabled, 0, "Enabled/disable trap trace");
 
 
-/*
- * Trigger a guest kernel core dump (internal only)
- * Usage: sysctl kern.trigger_kernel_coredump = 1
- * (option selector must be 1, other values reserved)
- */
+  
+                                                   
+                                                 
+                                                     
+   
 
 static int
 sysctl_trigger_kernel_coredump(struct sysctl_oid *oidp __unused, void *arg1, int arg2, struct sysctl_req *req)
 {
 	int error = 0;
 	hvg_hcall_return_t hv_ret;
-	char buf[2]; // 1 digit for dump option + 1 '\0'
+	char buf[2];                                    
 
 	if (req->newptr) {
-		// Write request
+		                
 		if (req->newlen > 1) {
 			return EINVAL;
 		}
@@ -1156,10 +1156,10 @@ sysctl_trigger_kernel_coredump(struct sysctl_oid *oidp __unused, void *arg1, int
 			if (strcmp(buf, "1") != 0) {
 				return EINVAL;
 			}
-			/* Issue hypercall to trigger a dump */
+			                                       
 			hv_ret = hvg_hcall_trigger_dump(arg1, HVG_HCALL_DUMP_OPTION_REGULAR);
 
-			/* Translate hypercall error code to syscall error code */
+			                                                          
 			switch (hv_ret) {
 			case HVG_HCALL_SUCCESS:
 				error = SYSCTL_OUT(req, arg1, 41);
@@ -1183,7 +1183,7 @@ sysctl_trigger_kernel_coredump(struct sysctl_oid *oidp __unused, void *arg1, int
 			}
 		}
 	} else {
-		// Read request
+		               
 		error = SYSCTL_OUT(req, arg1, arg2);
 	}
 	return error;
@@ -1200,7 +1200,7 @@ hvg_bsd_init(void)
 	}
 
 	if ((cpuid_vmm_get_applepv_features() & CPUID_LEAF_FEATURE_COREDUMP) != 0) {
-		/* Register an OID in the sysctl MIB tree for kern.trigger_kernel_coredump */
+		                                                                             
 		struct sysctl_oid *hcall_trigger_dump_oid = zalloc_permanent(sizeof(struct sysctl_oid), ZALIGN(struct sysctl_oid));
 		struct sysctl_oid oid = SYSCTL_STRUCT_INIT(_kern,
 		    OID_AUTO,
@@ -1214,4 +1214,4 @@ hvg_bsd_init(void)
 	}
 }
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           

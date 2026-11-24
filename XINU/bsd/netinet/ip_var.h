@@ -59,79 +59,79 @@
  *
  *	@(#)ip_var.h	8.2 (Berkeley) 1/9/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2007 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _NETINET_IP_VAR_H_
 #define _NETINET_IP_VAR_H_
 #include <sys/appleapiopts.h>
 
-/*
- * Overlay for ip header used by other protocols (tcp, udp).
- */
+  
+                                                            
+   
 struct ipovly {
-	u_char  ih_x1[9];               /* (unused) */
-	u_char  ih_pr;                  /* protocol */
-	u_short ih_len;                 /* protocol length */
-	struct  in_addr ih_src;         /* source internet address */
-	struct  in_addr ih_dst;         /* destination internet address */
+	u_char  ih_x1[9];                             
+	u_char  ih_pr;                                
+	u_short ih_len;                                      
+	struct  in_addr ih_src;                                      
+	struct  in_addr ih_dst;                                           
 };
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * Ip reassembly queue structure.  Each fragment
- * being reassembled is attached to one of these structures.
- * They are timed out after ipq_ttl drops to 0, and may also
- * be reclaimed if memory becomes tight.
- */
+  
+                                                
+                                                            
+                                                            
+                                        
+   
 struct ipq {
-	TAILQ_ENTRY(ipq) ipq_list;      /* to other reass headers */
-	struct mbuf *ipq_frags;         /* to ip headers of fragments */
-	u_char  ipq_ttl;                /* time for reass q to live */
-	u_char  ipq_p;                  /* protocol of this fragment */
-	u_short ipq_id;                 /* sequence id for reassembly */
+	TAILQ_ENTRY(ipq) ipq_list;                                  
+	struct mbuf *ipq_frags;                                         
+	u_char  ipq_ttl;                                              
+	u_char  ipq_p;                                                 
+	u_short ipq_id;                                                 
 	struct  in_addr ipq_src, ipq_dst;
-	u_int32_t       ipq_nfrags;     /* # frags in this packet */
-	uint32_t ipq_csum_flags;        /* checksum flags */
-	uint32_t ipq_csum;              /* partial checksum value */
+	u_int32_t       ipq_nfrags;                                 
+	uint32_t ipq_csum_flags;                            
+	uint32_t ipq_csum;                                          
 };
 
-/*
- * Structure stored in mbuf in inpcb.ip_options
- * and passed to ip_output when ip options are in use.
- * The actual length of the options (including ipopt_dst)
- * is in m_len.
- */
-#endif /* BSD_KERNEL_PRIVATE */
+  
+                                               
+                                                      
+                                                         
+               
+   
+#endif                         
 #define MAX_IPOPTLEN    40
 #ifdef BSD_KERNEL_PRIVATE
 struct ipoption {
-	struct  in_addr ipopt_dst;      /* first-hop dst if source routed */
-	char    ipopt_list[MAX_IPOPTLEN];       /* options proper */
+	struct  in_addr ipopt_dst;                                          
+	char    ipopt_list[MAX_IPOPTLEN];                           
 };
 
-/*
- * Structure attached to inpcb.ip_moptions and
- * passed to ip_output when IP multicast options are in use.
- */
+  
+                                              
+                                                            
+   
 struct ip_moptions {
 	decl_lck_mtx_data(, imo_lock);
-	uint32_t imo_refcnt;            /* ref count */
-	uint32_t imo_debug;             /* see ifa_debug flags */
-	struct  ifnet *imo_multicast_ifp; /* ifp for outgoing multicasts */
-	u_char  imo_multicast_ttl;      /* TTL for outgoing multicasts */
-	u_char  imo_multicast_loop;     /* 1 => hear sends if a member */
-	u_short imo_num_memberships;    /* no. memberships this socket */
-	u_short imo_max_memberships;    /* max memberships this socket */
-	struct  in_multi **imo_membership;      /* group memberships */
-	struct  in_mfilter *imo_mfilters;       /* source filters */
-	u_int32_t imo_multicast_vif;    /* vif num outgoing multicasts */
-	struct  in_addr imo_multicast_addr; /* ifindex/addr on MULTICAST_IF */
-	void (*imo_trace)               /* callback fn for tracing refs */
+	uint32_t imo_refcnt;                           
+	uint32_t imo_debug;                                      
+	struct  ifnet *imo_multicast_ifp;                                  
+	u_char  imo_multicast_ttl;                                       
+	u_char  imo_multicast_loop;                                      
+	u_short imo_num_memberships;                                     
+	u_short imo_max_memberships;                                     
+	struct  in_multi **imo_membership;                             
+	struct  in_mfilter *imo_mfilters;                           
+	u_int32_t imo_multicast_vif;                                     
+	struct  in_addr imo_multicast_addr;                                   
+	void (*imo_trace)                                                 
 	(struct ip_moptions *, int);
 };
 
@@ -164,59 +164,59 @@ struct ip_moptions {
 #define IMO_REMREF(_imo)                                                \
 	imo_remref(_imo)
 
-/* mbuf tag for ip_forwarding info */
+                                     
 struct ip_fwd_tag {
-	struct sockaddr_in *next_hop;   /* next_hop */
+	struct sockaddr_in *next_hop;                 
 };
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 struct  ipstat {
-	u_int32_t ips_total;            /* total packets received */
-	u_int32_t ips_badsum;           /* checksum bad */
-	u_int32_t ips_tooshort;         /* packet too short */
-	u_int32_t ips_toosmall;         /* not enough data */
-	u_int32_t ips_badhlen;          /* ip header length < data size */
-	u_int32_t ips_badlen;           /* ip length < ip header length */
-	u_int32_t ips_fragments;        /* fragments received */
-	u_int32_t ips_fragdropped;      /* frags dropped (dups, out of space) */
-	u_int32_t ips_fragtimeout;      /* fragments timed out */
-	u_int32_t ips_forward;          /* packets forwarded */
-	u_int32_t ips_fastforward;      /* packets fast forwarded */
-	u_int32_t ips_cantforward;      /* packets rcvd for unreachable dest */
-	u_int32_t ips_redirectsent;     /* packets forwarded on same net */
-	u_int32_t ips_noproto;          /* unknown or unsupported protocol */
-	u_int32_t ips_delivered;        /* datagrams delivered to upper level */
-	u_int32_t ips_localout;         /* total ip packets generated here */
-	u_int32_t ips_odropped;         /* lost packets due to nobufs, etc. */
-	u_int32_t ips_reassembled;      /* total packets reassembled ok */
-	u_int32_t ips_fragmented;       /* datagrams successfully fragmented */
-	u_int32_t ips_ofragments;       /* output fragments created */
-	u_int32_t ips_cantfrag;         /* don't fragment flag was set, etc. */
-	u_int32_t ips_badoptions;       /* error in option processing */
-	u_int32_t ips_noroute;          /* packets discarded due to no route */
-	u_int32_t ips_badvers;          /* ip version != 4 */
-	u_int32_t ips_rawout;           /* total raw ip packets generated */
-	u_int32_t ips_toolong;          /* ip length > max ip packet size */
-	u_int32_t ips_notmember;        /* multicasts for unregistered grps */
-	u_int32_t ips_nogif;            /* no match gif found */
-	u_int32_t ips_badaddr;          /* invalid address on header */
-	u_int32_t ips_pktdropcntrl;     /* pkt dropped, no mbufs for ctl data */
-	u_int32_t ips_rcv_swcsum;       /* ip hdr swcksum (inbound), packets */
-	u_int32_t ips_rcv_swcsum_bytes; /* ip hdr swcksum (inbound), bytes */
-	u_int32_t ips_snd_swcsum;       /* ip hdr swcksum (outbound), packets */
-	u_int32_t ips_snd_swcsum_bytes; /* ip hdr swcksum (outbound), bytes */
-	u_int32_t ips_adj;              /* total packets trimmed/adjusted */
-	u_int32_t ips_adj_hwcsum_clr;   /* hwcksum discarded during adj */
-	u_int32_t ips_rxc_collisions;   /* rx chaining collisions */
-	u_int32_t ips_rxc_chained;      /* rx chains */
-	u_int32_t ips_rxc_notchain;     /* rx bypassed chaining */
-	u_int32_t ips_rxc_chainsz_gt2;  /* rx chain size greater than 2 */
-	u_int32_t ips_rxc_chainsz_gt4;  /* rx chain size greater than 4 */
-	u_int32_t ips_rxc_notlist;      /* count of pkts through ip_input */
-	u_int32_t ips_raw_sappend_fail; /* sock append failed */
-	u_int32_t ips_necp_policy_drop; /* NECP policy related drop */
-	u_int32_t ips_rcv_if_weak_match; /* packets whose receive interface that passed the Weak ES address check */
-	u_int32_t ips_rcv_if_no_match;  /* packets whose receive interface did not pass the address check */
+	u_int32_t ips_total;                                        
+	u_int32_t ips_badsum;                             
+	u_int32_t ips_tooshort;                               
+	u_int32_t ips_toosmall;                              
+	u_int32_t ips_badhlen;                                            
+	u_int32_t ips_badlen;                                             
+	u_int32_t ips_fragments;                                
+	u_int32_t ips_fragdropped;                                              
+	u_int32_t ips_fragtimeout;                               
+	u_int32_t ips_forward;                                 
+	u_int32_t ips_fastforward;                                  
+	u_int32_t ips_cantforward;                                             
+	u_int32_t ips_redirectsent;                                        
+	u_int32_t ips_noproto;                                               
+	u_int32_t ips_delivered;                                                
+	u_int32_t ips_localout;                                              
+	u_int32_t ips_odropped;                                               
+	u_int32_t ips_reassembled;                                        
+	u_int32_t ips_fragmented;                                              
+	u_int32_t ips_ofragments;                                     
+	u_int32_t ips_cantfrag;                                                
+	u_int32_t ips_badoptions;                                       
+	u_int32_t ips_noroute;                                                 
+	u_int32_t ips_badvers;                               
+	u_int32_t ips_rawout;                                               
+	u_int32_t ips_toolong;                                              
+	u_int32_t ips_notmember;                                              
+	u_int32_t ips_nogif;                                    
+	u_int32_t ips_badaddr;                                         
+	u_int32_t ips_pktdropcntrl;                                             
+	u_int32_t ips_rcv_swcsum;                                              
+	u_int32_t ips_rcv_swcsum_bytes;                                      
+	u_int32_t ips_snd_swcsum;                                               
+	u_int32_t ips_snd_swcsum_bytes;                                       
+	u_int32_t ips_adj;                                                  
+	u_int32_t ips_adj_hwcsum_clr;                                     
+	u_int32_t ips_rxc_collisions;                               
+	u_int32_t ips_rxc_chained;                     
+	u_int32_t ips_rxc_notchain;                               
+	u_int32_t ips_rxc_chainsz_gt2;                                    
+	u_int32_t ips_rxc_chainsz_gt4;                                    
+	u_int32_t ips_rxc_notlist;                                          
+	u_int32_t ips_raw_sappend_fail;                         
+	u_int32_t ips_necp_policy_drop;                               
+	u_int32_t ips_rcv_if_weak_match;                                                                            
+	u_int32_t ips_rcv_if_no_match;                                                                      
 };
 
 struct ip_linklocal_stat {
@@ -227,38 +227,38 @@ struct ip_linklocal_stat {
 };
 
 #ifdef KERNEL_PRIVATE
-/* forward declarations for ip_output() */
+                                          
 struct ip_out_args;
 struct ip_moptions;
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef BSD_KERNEL_PRIVATE
-/* flags passed to ip_output as last parameter */
-#define IP_FORWARDING   0x1             /* most of ip header exists */
-#define IP_RAWOUTPUT    0x2             /* raw ip header exists */
-#define IP_NOIPSEC      0x4             /* No IPsec processing */
-#define IP_ROUTETOIF    SO_DONTROUTE    /* bypass routing tables (0x0010) */
-#define IP_ALLOWBROADCAST SO_BROADCAST  /* can send broadcast pkts (0x0020) */
-#define IP_OUTARGS      0x100           /* has ancillary output info */
+                                                 
+#define IP_FORWARDING   0x1                                           
+#define IP_RAWOUTPUT    0x2                                       
+#define IP_NOIPSEC      0x4                                      
+#define IP_ROUTETOIF    SO_DONTROUTE                                        
+#define IP_ALLOWBROADCAST SO_BROADCAST                                        
+#define IP_OUTARGS      0x100                                          
 
 #define IP_HDR_ALIGNED_P(_ip)   ((((uintptr_t)(_ip)) & ((uintptr_t)3)) == 0)
 #define IP_OFF_IS_ATOMIC(_ip_off) ((_ip_off & (IP_DF | IP_MF | IP_OFFMASK)) == IP_DF)
 
-/*
- * On platforms which require strict alignment (currently for anything but
- * i386 or x86_64), this macro checks whether the pointer to the IP header
- * is 32-bit aligned, and assert otherwise.
- */
+  
+                                                                          
+                                                                          
+                                           
+   
 #if defined(__i386__) || defined(__x86_64__)
 #define IP_HDR_STRICT_ALIGNMENT_CHECK(_ip) do { } while (0)
-#else /* !__i386__ && !__x86_64__ */
+#else                               
 #define IP_HDR_STRICT_ALIGNMENT_CHECK(_ip) do {                         \
 	if (!IP_HDR_ALIGNED_P(_ip)) {                                   \
 	        panic_plain("\n%s: Unaligned IP header %p\n",           \
 	            __func__, _ip);                                     \
 	}                                                               \
 } while (0)
-#endif /* !__i386__ && !__x86_64__ */
+#endif                               
 
 struct ip;
 struct inpcb;
@@ -268,38 +268,38 @@ struct sockopt;
 #include <kern/zalloc.h>
 #include <net/flowadv.h>
 
-/*
- * Extra information passed to ip_output when IP_OUTARGS is set.
- *
- * Upon returning an error to the caller, ip_output may indicate through
- * ipoa_retflags any additional information regarding the error.
- */
+  
+                                                                
+  
+                                                                        
+                                                                
+   
 struct ip_out_args {
-	unsigned int    ipoa_boundif;   /* boundif interface index */
-	struct flowadv  ipoa_flowadv;   /* flow advisory code */
-	u_int32_t       ipoa_flags;     /* IPOAF output flags (see below) */
-#define IPOAF_SELECT_SRCIF      0x00000001      /* src interface selection */
-#define IPOAF_BOUND_IF          0x00000002      /* boundif value is valid */
-#define IPOAF_BOUND_SRCADDR     0x00000004      /* bound to src address */
-#define IPOAF_NO_CELLULAR       0x00000010      /* skip IFT_CELLULAR */
-#define IPOAF_NO_EXPENSIVE      0x00000020      /* skip IFT_EXPENSIVE */
-#define IPOAF_AWDL_UNRESTRICTED 0x00000040      /* can send over
-	                                         *  AWDL_RESTRICTED */
-#define IPOAF_QOSMARKING_ALLOWED        0x00000080      /* policy allows Fastlane DSCP marking */
-#define IPOAF_NO_CONSTRAINED    0x00000100      /* skip IFXF_CONSTRAINED */
-#define IPOAF_REDO_QOSMARKING_POLICY    0x00000200      /* Re-evaluate QOS marking policy */
-	u_int32_t       ipoa_retflags;  /* IPOARF return flags (see below) */
-#define IPOARF_IFDENIED 0x00000001      /* denied access to interface */
-	int             ipoa_sotc;      /* traffic class for Fastlane DSCP mapping */
-	int             ipoa_netsvctype; /* network service type */
+	unsigned int    ipoa_boundif;                                
+	struct flowadv  ipoa_flowadv;                           
+	u_int32_t       ipoa_flags;                                         
+#define IPOAF_SELECT_SRCIF      0x00000001                                   
+#define IPOAF_BOUND_IF          0x00000002                                  
+#define IPOAF_BOUND_SRCADDR     0x00000004                                
+#define IPOAF_NO_CELLULAR       0x00000010                             
+#define IPOAF_NO_EXPENSIVE      0x00000020                              
+#define IPOAF_AWDL_UNRESTRICTED 0x00000040                      
+                                                               
+#define IPOAF_QOSMARKING_ALLOWED        0x00000080                                               
+#define IPOAF_NO_CONSTRAINED    0x00000100                                 
+#define IPOAF_REDO_QOSMARKING_POLICY    0x00000200                                          
+	u_int32_t       ipoa_retflags;                                       
+#define IPOARF_IFDENIED 0x00000001                                      
+	int             ipoa_sotc;                                                   
+	int             ipoa_netsvctype;                           
 	int32_t         qos_marking_gencount;
 };
 
 extern struct ipstat ipstat;
 extern int ip_use_randomid;
-extern u_short ip_id;                   /* ip packet ctr, for ids */
-extern int ip_defttl;                   /* default IP ttl */
-extern int ipforwarding;                /* ip forwarding */
+extern u_short ip_id;                                               
+extern int ip_defttl;                                       
+extern int ipforwarding;                                   
 extern int rfc6864;
 extern struct protosw *ip_protox[];
 extern struct pr_usrreqs rip_usrreqs;
@@ -358,11 +358,11 @@ extern void tcp_out6_cksum_stats(u_int32_t);
 
 extern void udp_in6_cksum_stats(u_int32_t);
 extern void udp_out6_cksum_stats(u_int32_t);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 #ifdef KERNEL_PRIVATE
-/* for PPP/PPTP */
+                  
 extern int ip_gre_output(struct mbuf *);
 typedef struct mbuf *(*gre_input_func_t)(struct mbuf *, int, int);
 extern int ip_gre_register_input(gre_input_func_t);
-#endif /* KERNEL_PRIVATE */
-#endif /* !_NETINET_IP_VAR_H_ */
+#endif                     
+#endif                          

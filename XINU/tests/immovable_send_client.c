@@ -12,7 +12,7 @@ typedef struct {
 	mach_msg_header_t   header;
 	mach_msg_body_t     body;
 	mach_msg_port_descriptor_t port_descriptor;
-	mach_msg_trailer_t  trailer;            // subtract this when sending
+	mach_msg_trailer_t  trailer;                                         
 } ipc_complex_message;
 
 static ipc_complex_message icm_request = {};
@@ -46,7 +46,7 @@ parse_args(struct args *args)
 	args->voucher_port = MACH_PORT_NULL;
 	args->num_msgs = 1;
 	args->request_msg_size = sizeof(ipc_complex_message) - sizeof(mach_msg_trailer_t);
-	//args->reply_msg_size = sizeof(ipc_complex_message2) - sizeof(mach_msg_trailer_t);
+	                                                                                   
 	args->request_msg = &icm_request;
 	args->reply_msg = NULL;
 	args->client_pid = getpid();
@@ -58,7 +58,7 @@ main()
 	struct args client_args = {};
 	parse_args(&client_args);
 
-	/* Find the bootstrap port */
+	                             
 	mach_port_t bsport;
 	kern_return_t ret = task_get_bootstrap_port(mach_task_self(), &bsport);
 	if (ret) {
@@ -92,7 +92,7 @@ main()
 
 	printf("client: Found the matching io_connect port = %d\n", connect);
 
-	/* Construct the message */
+	                           
 	mach_msg_header_t *request = (mach_msg_header_t *)client_args.request_msg;
 	request->msgh_bits = MACH_MSGH_BITS_SET(MACH_MSG_TYPE_COPY_SEND, 0,
 	    0, 0) | MACH_MSGH_BITS_COMPLEX;

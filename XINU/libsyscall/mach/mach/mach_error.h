@@ -51,13 +51,13 @@
  * rights to redistribute these changes.
  */
 
-/*
- *	File:	mach_error.h
- *	Author:	Douglas Orr, Carnegie Mellon University
- *	Date:	Mar. 1988
- *
- *	Definitions of routines in mach_error.c
- */
+  
+                     
+                                                  
+                  
+  
+                                          
+   
 
 #ifndef _MACH_ERROR_
 #define _MACH_ERROR_    1
@@ -68,26 +68,26 @@
 
 __BEGIN_DECLS
 char            *mach_error_string(
-/*
- *	Returns a string appropriate to the error argument given
- */
+  
+                                                           
+   
 	mach_error_t error_value
 	);
 
 void            mach_error(
-/*
- *	Prints an appropriate message on the standard error stream
- */
+  
+                                                             
+   
 	const char      *str,
 	mach_error_t    error_value
 	);
 
 char            *mach_error_type(
-/*
- *	Returns a string with the error system, subsystem and code
- */
+  
+                                                             
+   
 	mach_error_t    error_value
 	);
 __END_DECLS
 
-#endif  /* _MACH_ERROR_ */
+#endif                    

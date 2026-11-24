@@ -1,4 +1,4 @@
-#!/bin/sh
+
 
 EXECUTABLES="exit.nodyld \
         exit.nopie.dyld-but-no-Libsystem exit.pie.dyld-but-no-Libsystem \
@@ -9,7 +9,7 @@ RUN=run
 PRODUCT=`sw_vers -productName`
 COUNT=
 
-# params are: record_perf_data(metric, unit, value, description)
+
 function record_perf_data() {
     local METRIC=$1
     local UNIT=$2

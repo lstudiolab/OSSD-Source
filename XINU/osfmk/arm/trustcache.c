@@ -42,17 +42,17 @@
 
 #include <sys/cdefs.h>
 
-// All the external+engineering trust caches (accepting only one on RELEASE).
+                                                                             
 SECURITY_READ_ONLY_LATE(static struct serialized_trust_caches *)pmap_serialized_trust_caches = NULL;
 
-// Shortcut to the first (= non-engineering, and therefore "static") trust cache.
+                                                                                 
 SECURITY_READ_ONLY_LATE(static struct trust_cache_module1 *)pmap_static_trust_cache = NULL;
 
 #if CONFIG_SECOND_STATIC_TRUST_CACHE
 SECURITY_READ_ONLY_LATE(static struct trust_cache_module1 *)pmap_secondary_static_trust_cache = NULL;
 #endif
 
-// The EXTRADATA segment is where we find the external trust cache.
+                                                                   
 extern vm_offset_t   segEXTRADATA;
 extern unsigned long segSizeEXTRADATA;
 
@@ -63,7 +63,7 @@ trust_cache_init(void)
 	size_t const len = segSizeEXTRADATA - locked_down_dt_size;
 
 	if (len == 0) {
-		// We allow no trust cache at all.
+		                                  
 		printf("No external trust cache found (region len is 0).");
 		return;
 	}
@@ -73,13 +73,13 @@ trust_cache_init(void)
 
 	uint8_t const *region_end = (uint8_t*)pmap_serialized_trust_caches + len;
 
-	/* Validate the trust cache region for consistency.
-	 *
-	 * Technically, this shouldn't be necessary because any problem
-	 * here would indicate that iBoot is either broken or compromised,
-	 * but we do it anyway to assist in development, and for defense
-	 * in depth.
-	 */
+	                                                   
+   
+                                                                
+                                                                   
+                                                                 
+             
+    
 
 	if (len < sizeof(struct serialized_trust_caches)) {
 		panic("short serialized trust cache region: %zu", len);
@@ -133,8 +133,8 @@ trust_cache_init(void)
 }
 
 
-// Lookup cdhash in a trust cache module.
-// Suitable for all kinds of trust caches (but loadable ones are currently different).
+                                         
+                                                                                      
 bool
 lookup_in_trust_cache_module(
 	struct trust_cache_module1 const * const module,
@@ -149,7 +149,7 @@ lookup_in_trust_cache_module(
 
 	bool found = false;
 
-	/* Initialization already (redundantly) verified the size of the module for us. */
+	                                                                                  
 	for (lim = module->num_entries; lim != 0; lim >>= 1) {
 		entry = base + (lim >> 1);
 		int cmp = memcmp(cdhash, entry->cdhash, CS_CDHASH_LEN);
@@ -157,10 +157,10 @@ lookup_in_trust_cache_module(
 			found = true;
 			break;
 		}
-		if (cmp > 0) {  /* key > p: move right */
+		if (cmp > 0) {                           
 			base = entry + 1;
 			lim--;
-		}               /* else move left */
+		}                                   
 	}
 
 	if (found) {
@@ -175,13 +175,13 @@ lookup_in_trust_cache_module(
 MARK_AS_PMAP_TEXT uint32_t
 lookup_in_static_trust_cache(const uint8_t cdhash[CS_CDHASH_LEN])
 {
-	/* We will cram those into a single return value, because output parameters require
-	 * some contortion. */
+	                                                                                   
+                       
 	uint8_t hash_type = 0, flags = 0;
 	uint32_t engineering_trust_cache_index = 1;
 
 	if (pmap_static_trust_cache != NULL) {
-		// The one real new static trust cache.
+		                                       
 		if (lookup_in_trust_cache_module(pmap_static_trust_cache, cdhash, &hash_type, &flags)) {
 			return (hash_type << TC_LOOKUP_HASH_TYPE_SHIFT) |
 			       (flags << TC_LOOKUP_FLAGS_SHIFT) |
@@ -197,7 +197,7 @@ lookup_in_static_trust_cache(const uint8_t cdhash[CS_CDHASH_LEN])
 		engineering_trust_cache_index = (pmap_secondary_static_trust_cache != NULL) ? 2 : 1;
 #endif
 
-		// Engineering Trust Caches.
+		                            
 		if (pmap_serialized_trust_caches->num_caches > engineering_trust_cache_index) {
 			for (uint32_t i = engineering_trust_cache_index; i < pmap_serialized_trust_caches->num_caches; i++) {
 				struct trust_cache_module1 const *module =

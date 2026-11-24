@@ -11,5 +11,5 @@ T_DECL(ptrauth_data_tests, "invoke the PAC unit tests", T_META_ASROOT(true))
 	T_ASSERT_POSIX_SUCCESS(ret, "run ptrauth data tests");
 #else
 	T_SKIP("Running on non-ptrauth system. Skipping...");
-#endif //__has_feature(ptrauth_calls)
+#endif                               
 }

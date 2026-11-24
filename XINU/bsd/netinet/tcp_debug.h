@@ -72,16 +72,16 @@ struct  tcp_debug {
 	short   td_ostate;
 	caddr_t td_tcb;
 	int     td_family;
-	/*
-	 * Co-existense of td_ti and td_ti6 below is ugly, but it is necessary
-	 * to achieve backword compatibility to some extent.
-	 */
+	  
+                                                                       
+                                                     
+    
 	struct  tcpiphdr td_ti;
 	struct {
 #if !defined(KERNEL)
 		struct  ip6_hdr ip6;
 #else
-		u_char  ip6buf[40]; /* sizeof(struct ip6_hdr) */
+		u_char  ip6buf[40];                             
 #endif
 		struct  tcphdr th;
 	} td_ti6;
@@ -103,6 +103,6 @@ static char     *tanames[] =
 
 #define TCP_NDEBUG 100
 
-#endif /* PRIVATE */
+#endif              
 
-#endif /* !_NETINET_TCP_DEBUG_H_ */
+#endif                             

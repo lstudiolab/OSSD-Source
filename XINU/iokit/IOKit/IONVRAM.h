@@ -36,7 +36,7 @@
 #include <IOKit/IOService.h>
 #include <IOKit/IODeviceTreeSupport.h>
 #include <IOKit/nvram/IONVRAMController.h>
-#endif /* __cplusplus */
+#endif                  
 #include <uuid/uuid.h>
 
 #define kIODTNVRAMOFPartitionName       "common"
@@ -45,7 +45,7 @@
 #define kIODTNVRAMFreePartitionName     "wwwwwwwwwwww"
 #define kIODTNVRAMSystemPartitionName   "secure"
 
-#define MIN_SYNC_NOW_INTERVAL 15*60 /* Minimum 15 Minutes interval mandated */
+#define MIN_SYNC_NOW_INTERVAL 15*60                                           
 
 enum IONVRAMVariableType {
 	kOFVariableTypeBoolean = 1,
@@ -63,7 +63,7 @@ enum IONVRAMOperation {
 };
 
 enum {
-	// Deprecated but still used in AppleEFIRuntime for now
+	                                                       
 	kOFVariablePermRootOnly = 0,
 	kOFVariablePermUserRead,
 	kOFVariablePermUserWrite,
@@ -203,6 +203,6 @@ public:
 	void syncInternal(bool rateLimit);
 };
 
-#endif /* __cplusplus */
+#endif                  
 
-#endif /* !_IOKIT_IONVRAM_H */
+#endif                        

@@ -40,9 +40,9 @@
 
 errno_t netagent_init(void);
 #endif
-/*
- * Name registered by the Network Agent kernel control
- */
+  
+                                                      
+   
 #define NETAGENT_CONTROL_NAME "com.apple.net.netagent"
 
 struct netagent_message_header {
@@ -68,30 +68,30 @@ struct netagent_assign_nexus_message {
 	u_int8_t                assign_necp_results[0];
 };
 
-#define NETAGENT_MESSAGE_TYPE_REGISTER                  1       // Pass netagent to set, no return value
-#define NETAGENT_MESSAGE_TYPE_UNREGISTER                2       // No value, no return value
-#define NETAGENT_MESSAGE_TYPE_UPDATE                    3       // Pass netagent to update, no return value
-#define NETAGENT_MESSAGE_TYPE_GET                               4       // No value, return netagent
-#define NETAGENT_MESSAGE_TYPE_TRIGGER                   5       // Kernel initiated, no reply expected
-#define NETAGENT_MESSAGE_TYPE_ASSERT                    6       // Deprecated
-#define NETAGENT_MESSAGE_TYPE_UNASSERT                  7       // Deprecated
-#define NETAGENT_MESSAGE_TYPE_TRIGGER_ASSERT    8       // Kernel initiated, no reply expected
-#define NETAGENT_MESSAGE_TYPE_TRIGGER_UNASSERT  9       // Kernel initiated, no reply expected
-#define NETAGENT_MESSAGE_TYPE_REQUEST_NEXUS             10      // Kernel initiated, struct netagent_client_message
-#define NETAGENT_MESSAGE_TYPE_ASSIGN_NEXUS              11      // Pass struct netagent_assign_nexus_message
-#define NETAGENT_MESSAGE_TYPE_CLOSE_NEXUS               12      // Kernel initiated, struct netagent_client_message
-#define NETAGENT_MESSAGE_TYPE_CLIENT_TRIGGER    13      // Kernel initiated, struct netagent_client_message
-#define NETAGENT_MESSAGE_TYPE_CLIENT_ASSERT             14      // Kernel initiated, struct netagent_client_message
-#define NETAGENT_MESSAGE_TYPE_CLIENT_UNASSERT   15      // Kernel initiated, struct netagent_client_message
+#define NETAGENT_MESSAGE_TYPE_REGISTER                  1                                               
+#define NETAGENT_MESSAGE_TYPE_UNREGISTER                2                                   
+#define NETAGENT_MESSAGE_TYPE_UPDATE                    3                                                  
+#define NETAGENT_MESSAGE_TYPE_GET                               4                                   
+#define NETAGENT_MESSAGE_TYPE_TRIGGER                   5                                             
+#define NETAGENT_MESSAGE_TYPE_ASSERT                    6                    
+#define NETAGENT_MESSAGE_TYPE_UNASSERT                  7                    
+#define NETAGENT_MESSAGE_TYPE_TRIGGER_ASSERT    8                                             
+#define NETAGENT_MESSAGE_TYPE_TRIGGER_UNASSERT  9                                             
+#define NETAGENT_MESSAGE_TYPE_REQUEST_NEXUS             10                                                         
+#define NETAGENT_MESSAGE_TYPE_ASSIGN_NEXUS              11                                                  
+#define NETAGENT_MESSAGE_TYPE_CLOSE_NEXUS               12                                                         
+#define NETAGENT_MESSAGE_TYPE_CLIENT_TRIGGER    13                                                         
+#define NETAGENT_MESSAGE_TYPE_CLIENT_ASSERT             14                                                         
+#define NETAGENT_MESSAGE_TYPE_CLIENT_UNASSERT   15                                                         
 
-#define NETAGENT_OPTION_TYPE_REGISTER                   NETAGENT_MESSAGE_TYPE_REGISTER          // Pass netagent to set, no return value
-#define NETAGENT_OPTION_TYPE_UNREGISTER                 NETAGENT_MESSAGE_TYPE_UNREGISTER        // No value, no return value
-#define NETAGENT_OPTION_TYPE_UPDATE                             NETAGENT_MESSAGE_TYPE_UPDATE            // Pass netagent to update, no return value
-#define NETAGENT_OPTION_TYPE_ASSIGN_NEXUS               NETAGENT_MESSAGE_TYPE_ASSIGN_NEXUS      // Pass struct netagent_assign_nexus_message
-#define NETAGENT_OPTION_TYPE_USE_COUNT                  16                                                                      // Pass use count to set, get current use count
-#define NETAGENT_MESSAGE_TYPE_ABORT_NEXUS               17      // Kernel private
+#define NETAGENT_OPTION_TYPE_REGISTER                   NETAGENT_MESSAGE_TYPE_REGISTER                                                  
+#define NETAGENT_OPTION_TYPE_UNREGISTER                 NETAGENT_MESSAGE_TYPE_UNREGISTER                                    
+#define NETAGENT_OPTION_TYPE_UPDATE                             NETAGENT_MESSAGE_TYPE_UPDATE                                                       
+#define NETAGENT_OPTION_TYPE_ASSIGN_NEXUS               NETAGENT_MESSAGE_TYPE_ASSIGN_NEXUS                                                  
+#define NETAGENT_OPTION_TYPE_USE_COUNT                  16                                                                                                                     
+#define NETAGENT_MESSAGE_TYPE_ABORT_NEXUS               17                       
 
-#define NETAGENT_MESSAGE_FLAGS_RESPONSE                 0x01    // Used for acks, errors, and query responses
+#define NETAGENT_MESSAGE_FLAGS_RESPONSE                 0x01                                                 
 
 #define NETAGENT_MESSAGE_ERROR_NONE                     0
 #define NETAGENT_MESSAGE_ERROR_INTERNAL                 1
@@ -108,22 +108,22 @@ struct netagent_assign_nexus_message {
 
 #define NETAGENT_MAX_DATA_SIZE  4096
 
-#define NETAGENT_FLAG_REGISTERED                0x0001 // Agent is registered
-#define NETAGENT_FLAG_ACTIVE                    0x0002 // Agent is active
-#define NETAGENT_FLAG_KERNEL_ACTIVATED          0x0004 // Agent can be activated by kernel activity
-#define NETAGENT_FLAG_USER_ACTIVATED            0x0008 // Agent can be activated by system call (netagent_trigger)
-#define NETAGENT_FLAG_VOLUNTARY                 0x0010 // Use of agent is optional
-#define NETAGENT_FLAG_SPECIFIC_USE_ONLY         0x0020 // Agent should only be used and activated when specifically required
-#define NETAGENT_FLAG_NETWORK_PROVIDER          0x0040 // Agent provides network access
-#define NETAGENT_FLAG_NEXUS_PROVIDER            0x0080 // Agent provides a skywalk nexus
-#define NETAGENT_FLAG_SUPPORTS_BROWSE           0x0100 // Assertions will cause agent to fill in browse endpoints
-#define NETAGENT_FLAG_REQUIRES_ASSERT           0x0200 // Assertions are expected to be taken against this agent
-#define NETAGENT_FLAG_NEXUS_LISTENER            0x0400 // Nexus supports listeners
-#define NETAGENT_FLAG_UPDATE_IMMEDIATELY        0x0800 // Updates the clients without waiting for a leeway
-#define NETAGENT_FLAG_CUSTOM_ETHER_NEXUS        0x2000 // Agent provides a custom ethertype nexus
-#define NETAGENT_FLAG_CUSTOM_IP_NEXUS           0x4000 // Agent provides a custom IP nexus
-#define NETAGENT_FLAG_INTERPOSE_NEXUS           0x8000 // Agent provides an interpose nexus
-#define NETAGENT_FLAG_SUPPORTS_RESOLVE          0x10000 // Assertions will cause agent to fill in resolved endpoints
+#define NETAGENT_FLAG_REGISTERED                0x0001                       
+#define NETAGENT_FLAG_ACTIVE                    0x0002                   
+#define NETAGENT_FLAG_KERNEL_ACTIVATED          0x0004                                             
+#define NETAGENT_FLAG_USER_ACTIVATED            0x0008                                                            
+#define NETAGENT_FLAG_VOLUNTARY                 0x0010                            
+#define NETAGENT_FLAG_SPECIFIC_USE_ONLY         0x0020                                                                      
+#define NETAGENT_FLAG_NETWORK_PROVIDER          0x0040                                 
+#define NETAGENT_FLAG_NEXUS_PROVIDER            0x0080                                  
+#define NETAGENT_FLAG_SUPPORTS_BROWSE           0x0100                                                           
+#define NETAGENT_FLAG_REQUIRES_ASSERT           0x0200                                                          
+#define NETAGENT_FLAG_NEXUS_LISTENER            0x0400                            
+#define NETAGENT_FLAG_UPDATE_IMMEDIATELY        0x0800                                                    
+#define NETAGENT_FLAG_CUSTOM_ETHER_NEXUS        0x2000                                           
+#define NETAGENT_FLAG_CUSTOM_IP_NEXUS           0x4000                                    
+#define NETAGENT_FLAG_INTERPOSE_NEXUS           0x8000                                     
+#define NETAGENT_FLAG_SUPPORTS_RESOLVE          0x10000                                                             
 
 #define NETAGENT_NEXUS_MAX_REQUEST_TYPES                        16
 #define NETAGENT_NEXUS_MAX_RESOLUTION_TYPE_PAIRS        16
@@ -140,8 +140,8 @@ struct netagent_assign_nexus_message {
 #define NETAGENT_NEXUS_ENDPOINT_TYPE_SRV        5
 
 #define NETAGENT_NEXUS_FLAG_SUPPORTS_USER_PACKET_POOL   0x1
-#define NETAGENT_NEXUS_FLAG_ASSERT_UNSUPPORTED                  0x2 // No calls to assert the agent are required
-#define NETAGENT_NEXUS_FLAG_SHOULD_USE_EVENT_RING       0x4 // indicates that nexus agent should use event rings
+#define NETAGENT_NEXUS_FLAG_ASSERT_UNSUPPORTED                  0x2                                             
+#define NETAGENT_NEXUS_FLAG_SHOULD_USE_EVENT_RING       0x4                                                     
 
 struct netagent_nexus {
 	u_int32_t       frame_type;
@@ -151,14 +151,14 @@ struct netagent_nexus {
 	u_int32_t       nexus_flags;
 };
 
-#define NETAGENT_TRIGGER_FLAG_USER              0x0001  // Userspace triggered agent
-#define NETAGENT_TRIGGER_FLAG_KERNEL            0x0002  // Kernel triggered agent
+#define NETAGENT_TRIGGER_FLAG_USER              0x0001                              
+#define NETAGENT_TRIGGER_FLAG_KERNEL            0x0002                           
 
 struct kev_netagent_data {
 	uuid_t          netagent_uuid;
 };
 
-// To be used with kernel control socket
+                                        
 struct netagent {
 	uuid_t          netagent_uuid;
 	char            netagent_domain[NETAGENT_DOMAINSIZE];
@@ -169,7 +169,7 @@ struct netagent {
 	u_int8_t        netagent_data[0];
 };
 
-// To be used with SIOCGAGENTDATA
+                                 
 struct netagent_req {
 	uuid_t          netagent_uuid;
 	char            netagent_domain[NETAGENT_DOMAINSIZE];
@@ -180,7 +180,7 @@ struct netagent_req {
 	u_int8_t        *netagent_data;
 };
 
-// To be used with SIOCGAGENTLIST
+                                 
 struct netagentlist_req {
 	u_int32_t       data_size;
 	u_int8_t        *data;
@@ -217,8 +217,8 @@ struct netagentlist_req64 {
 
 struct necp_client_agent_parameters;
 
-// Kernel accessors
-extern void netagent_post_updated_interfaces(uuid_t uuid); // To be called from interface ioctls
+                   
+extern void netagent_post_updated_interfaces(uuid_t uuid);                                      
 
 extern u_int32_t netagent_get_flags(uuid_t uuid);
 
@@ -244,7 +244,7 @@ extern int netagent_client_message_with_params(uuid_t agent_uuid,
 extern int netagent_copyout(uuid_t uuid, user_addr_t user_addr, u_int32_t user_size);
 
 
-// Kernel agent management
+                          
 
 typedef void * netagent_session_t;
 
@@ -275,7 +275,7 @@ extern errno_t netagent_unregister(netagent_session_t session);
 extern errno_t netagent_assign_nexus(netagent_session_t _session,
     uuid_t necp_client_uuid,
     void *assign_message,
-    size_t assigned_results_length);                                                                      // Length of assigned_results_length
+    size_t assigned_results_length);                                                                                                          
 
 extern errno_t netagent_update_flow_protoctl_event(netagent_session_t _session,
     uuid_t client_id,
@@ -285,12 +285,12 @@ extern errno_t netagent_update_flow_protoctl_event(netagent_session_t _session,
 
 extern int netagent_use(uuid_t agent_uuid, uint64_t *out_use_count);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifndef KERNEL
 extern int netagent_trigger(uuid_t agent_uuid, size_t agent_uuidlen);
-#endif /* !KERNEL */
+#endif              
 
-#endif /* PRIVATE */
+#endif              
 
-#endif /* _NETAGENT_H_ */
+#endif                   

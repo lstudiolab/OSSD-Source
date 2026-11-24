@@ -94,17 +94,17 @@ T_DECL(dirtiness_tracking,
 	struct kev_request    kev_req;
 	int                   enable_sysctl = 1;
 
-	// First try enabling the dirtystatus_tracking sysctl if available
+	                                                                  
 	if (sysctlbyname("kern.dirtystatus_tracking_enabled", NULL, NULL, &enable_sysctl, sizeof(enable_sysctl)) != 0) {
 		T_SKIP("The kern.dirtystatus_tracking_enabled sysctl is not available, skipping...");
 	}
-	/* Open an event socket */
+	                          
 	so = socket(PF_SYSTEM, SOCK_RAW, SYSPROTO_EVENT);
 	if (so != -1) {
-		/* establish filter to return all events */
+		                                           
 		kev_req.vendor_code  = KEV_VENDOR_APPLE;
-		kev_req.kev_class    = KEV_SYSTEM_CLASS;/* Not used if vendor_code is 0 */
-		kev_req.kev_subclass = KEV_DIRTYSTATUS_SUBCLASS; /* Not used if either kev_class OR vendor_code are 0 */
+		kev_req.kev_class    = KEV_SYSTEM_CLASS;                                  
+		kev_req.kev_subclass = KEV_DIRTYSTATUS_SUBCLASS;                                                        
 		status = ioctl(so, SIOCSKEVFILT, &kev_req);
 		if (status) {
 			so = -1;

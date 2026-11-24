@@ -16,7 +16,7 @@ def ReadPhysInt(phys_addr, bitsize = 64, cpuval = None):
     if "kdp" == GetConnectionProtocol():
         return KDPReadPhysMEM(phys_addr, bitsize)
 
-    #NO KDP. Attempt to use physical memory
+                                           
     paddr_in_kva = kern.PhysToKernelVirt(long(phys_addr))
     if paddr_in_kva :
         if bitsize == 64 :
@@ -67,7 +67,7 @@ def KDPReadPhysMEM(address, bits):
         return retval
 
     if "hwprobe" == KDPMode():
-        # Send the proper KDP command and payload to the bare metal debug tool via a KDP server
+                                                                                               
         addr_for_kdp = struct.unpack("<Q", struct.pack(">Q", address))[0]
         byte_count = struct.unpack("<I", struct.pack(">I", bits/8))[0]
         packet = "{0:016x}{1:08x}{2:04x}".format(addr_for_kdp, byte_count, 0x0)
@@ -118,7 +118,7 @@ def KDPReadPhysMEM(address, bits):
              ):
 
             if WriteInt32ToMemoryAddress(1, input_address):
-                # now read data from the kdp packet
+                                                   
                 data_address = unsigned(addressof(kern.GetValueFromAddress(int(addressof(kern.globals.manual_pkt.data)), 'kdp_readphysmem64_reply_t *').data))
                 if bits == 64 :
                     retval =  kern.GetValueFromAddress(data_address, 'uint64_t *').GetSBValue().Dereference().GetValueAsUnsigned()
@@ -146,7 +146,7 @@ def KDPWritePhysMEM(address, intval, bits):
         return False
     
     if "hwprobe" == KDPMode():
-        # Send the proper KDP command and payload to the bare metal debug tool via a KDP server
+                                                                                               
         addr_for_kdp = struct.unpack("<Q", struct.pack(">Q", address))[0]
         byte_count = struct.unpack("<I", struct.pack(">I", bits/8))[0]
 
@@ -229,7 +229,7 @@ def WritePhysInt(phys_addr, int_val, bitsize = 64):
             print "Failed to write via KDP."
             return False
         return True
-    #We are not connected via KDP. So do manual math and savings.
+                                                                 
     print "Failed: Write to physical memory is not supported for %s connection." % GetConnectionProtocol()
     return False
 
@@ -307,7 +307,7 @@ def _PT_Step(paddr, index, verbose_level = vSCRIPT):
             pt_valid = False
             if entry & (0x1 << 62):
                 out_string += " compressed"
-            #Stop decoding other bits
+                                     
             entry = 0
         if entry & (0x1 << 1):
             out_string += " writable"
@@ -396,7 +396,7 @@ def _PT_StepEPT(paddr, index, verbose_level = vSCRIPT):
             pt_valid = False
             if entry & (0x1 << 62):
                 out_string += " compressed"
-            #Stop decoding other bits
+                                     
             entry = 0
         if entry & 0x1:
             out_string += " readable"
@@ -451,7 +451,7 @@ def _PmapL4Walk(pmap_addr_val,vaddr, ept_pmap, verbose_level = vSCRIPT):
     pt_large = 0
     pframe_offset = 0
     if pt_valid:
-        # Lookup bits 47:39 of linear address in PML4T
+                                                      
         pt_index = (vaddr >> 39) & 0x1ff
         pframe_offset = vaddr & 0x7fffffffff
         if verbose_level > vHUMAN :
@@ -461,7 +461,7 @@ def _PmapL4Walk(pmap_addr_val,vaddr, ept_pmap, verbose_level = vSCRIPT):
         else:
             (pt_paddr, pt_valid, pt_large) = _PT_StepEPT(pt_paddr, pt_index, verbose_level)
     if pt_valid:
-        # Lookup bits 38:30 of the linear address in PDPT
+                                                         
         pt_index = (vaddr >> 30) & 0x1ff
         pframe_offset = vaddr & 0x3fffffff
         if verbose_level > vHUMAN:
@@ -471,7 +471,7 @@ def _PmapL4Walk(pmap_addr_val,vaddr, ept_pmap, verbose_level = vSCRIPT):
         else:
             (pt_paddr, pt_valid, pt_large) = _PT_StepEPT(pt_paddr, pt_index, verbose_level)
     if pt_valid and not pt_large:
-        #Lookup bits 29:21 of the linear address in PDPT
+                                                        
         pt_index = (vaddr >> 21) & 0x1ff
         pframe_offset = vaddr & 0x1fffff
         if verbose_level > vHUMAN:
@@ -481,7 +481,7 @@ def _PmapL4Walk(pmap_addr_val,vaddr, ept_pmap, verbose_level = vSCRIPT):
         else:
             (pt_paddr, pt_valid, pt_large) = _PT_StepEPT(pt_paddr, pt_index, verbose_level)
     if pt_valid and not pt_large:
-        #Lookup bits 20:21 of linear address in PT
+                                                  
         pt_index = (vaddr >> 12) & 0x1ff
         pframe_offset = vaddr & 0xfff
         if verbose_level > vHUMAN:
@@ -517,28 +517,28 @@ def PmapDecodeTTEARM(tte, level, verbose_level):
         if verbose_level < vSCRIPT:
             return
 
-        #bit [1:0] evaluated in PmapWalkARM
-        # B bit 2
+                                           
+                 
         b_bit = (tte & 0x4) >> 2
-        # C bit 3
+                 
         c_bit = (tte & 0x8) >> 3
-        #XN bit 4
+                 
         if (tte & 0x10) :
             out_string += "no-execute"
         else:
             out_string += "execute"
-        #Domain bit [8:5] if not supersection
+                                             
         if (tte & 0x40000) == 0x0:
             out_string += " domain ({:d})".format(((tte & 0x1e0) >> 5) )
-        #IMP bit 9
+                  
         out_string += " imp({:d})".format( ((tte & 0x200) >> 9) )
-        # AP bit 15 and [11:10] merged to a single 3 bit value
+                                                              
         access = ( (tte & 0xc00) >> 10 ) | ((tte & 0x8000) >> 13)
         out_string += xnudefines.arm_level2_access_strings[access]
 
-        #TEX bit [14:12]
+                        
         tex_bits = ((tte & 0x7000) >> 12)
-        #Print TEX, C , B all together
+                                      
         out_string += " TEX:C:B({:d}{:d}{:d}:{:d}:{:d})".format(
                                                                     1 if (tex_bits & 0x4) else 0,
                                                                     1 if (tex_bits & 0x2) else 0,
@@ -546,22 +546,22 @@ def PmapDecodeTTEARM(tte, level, verbose_level):
                                                                     c_bit,
                                                                     b_bit
                                                                     )
-        # S bit 16
+                  
         if tte & 0x10000:
             out_string += " shareable"
         else:
             out_string += " not-shareable"
-        # nG bit 17
+                   
         if tte & 0x20000 :
             out_string += " not-global"
         else:
             out_string += " global"
-        # Supersection bit 18
+                             
         if tte & 0x40000:
             out_string += " supersection"
         else:
             out_string += " section"
-        #NS bit 19
+                  
         if tte & 0x80000 :
             out_string += " no-secure"
         else:
@@ -570,15 +570,15 @@ def PmapDecodeTTEARM(tte, level, verbose_level):
     elif level == 1 and (tte & 0x3) == 0x1:
 
         if verbose_level >= vSCRIPT:
-            # bit [1:0] evaluated in PmapWalkARM
-            # NS bit 3
+                                                
+                      
             if tte & 0x8:
                 out_string += ' no-secure'
             else:
                 out_string += ' secure'
-            #Domain bit [8:5]
+                             
             out_string += " domain({:d})".format(((tte & 0x1e0) >> 5))
-            # IMP bit 9
+                       
             out_string += " imp({:d})".format( ((tte & 0x200) >> 9))
             out_string += "\n"
 
@@ -590,31 +590,31 @@ def PmapDecodeTTEARM(tte, level, verbose_level):
             else:
                 if (pte & 0x3) == 0x1:
                     out_string += " large"
-                    # XN bit 15
+                               
                     if pte & 0x8000 == 0x8000:
                         out_string+= " no-execute"
                     else:
                         out_string += " execute"
                 else:
                     out_string += " small"
-                    # XN bit 0
+                              
                     if (pte & 0x1) == 0x01:
                         out_string += " no-execute"
                     else:
                         out_string += " execute"
-                # B bit 2
+                         
                 b_bit = (pte & 0x4) >> 2
                 c_bit = (pte & 0x8) >> 3
-                # AP bit 9 and [5:4], merged to a single 3-bit value
+                                                                    
                 access = (pte & 0x30) >> 4 | (pte & 0x200) >> 7
                 out_string += xnudefines.arm_level2_access_strings[access]
 
-                #TEX bit [14:12] for large, [8:6] for small
+                                                           
                 tex_bits = ((pte & 0x1c0) >> 6)
                 if (pte & 0x3) == 0x1:
                     tex_bits = ((pte & 0x7000) >> 12)
 
-                # Print TEX, C , B alltogether
+                                              
                 out_string += " TEX:C:B({:d}{:d}{:d}:{:d}:{:d})".format(
                                                                         1 if (tex_bits & 0x4) else 0,
                                                                         1 if (tex_bits & 0x2) else 0,
@@ -622,13 +622,13 @@ def PmapDecodeTTEARM(tte, level, verbose_level):
                                                                         c_bit,
                                                                         b_bit
                                                                         )
-                # S bit 10
+                          
                 if pte & 0x400 :
                     out_string += " shareable"
                 else:
                     out_string += " not-shareable"
 
-                # nG bit 11
+                           
                 if pte & 0x800:
                     out_string += " not-global"
                 else:
@@ -639,7 +639,7 @@ def PmapDecodeTTEARM(tte, level, verbose_level):
 
 def _PmapWalkARMLevel1Section(tte, vaddr, verbose_level = vSCRIPT):
     paddr = 0
-    #Supersection or just section?
+                                  
     if (tte & 0x40000) == 0x40000:
         paddr = ( (tte & 0xFF000000) | (vaddr & 0x00FFFFFF) )
     else:
@@ -687,7 +687,7 @@ def _PmapWalkARMLevel2(tte, vaddr, verbose_level = vSCRIPT):
     PmapDecodeTTEARM(pte, 2, verbose_level)
 
     return paddr
-    #end of level 2 walking of arm
+                                  
 
 
 def PmapWalkARM(pmap, vaddr, verbose_level = vHUMAN):
@@ -697,10 +697,10 @@ def PmapWalkARM(pmap, vaddr, verbose_level = vHUMAN):
           vaddr:  int     - integer representing virtual address to walk
     """
     paddr = 0
-    # shift by TTESHIFT (20) to get tte index
-    # Assume all L1 indexing starts at VA 0...for our purposes it does,
-    # as that's where all user pmaps start, and the kernel pmap contains
-    # 4 L1 pages (the lower 2 of which are unused after bootstrap)
+                                             
+                                                                       
+                                                                        
+                                                                  
     tte_index = vaddr >> 20
     tte = pmap.tte[tte_index]
     if verbose_level >= vSCRIPT:
@@ -826,15 +826,15 @@ def PmapWalkARM64(pmap_pt_attr, root_tte, vaddr, verbose_level = vHUMAN):
     assert_64bit(vaddr)
     assert_64bit(root_tte)
 
-    # Obtain pmap attributes
+                            
     page_size = pmap_pt_attr.pta_page_size
     page_offset_mask = (page_size - 1)
     page_base_mask = ((1 << ARM64_VMADDR_BITS) - 1) & (~page_offset_mask)
     tt_index = PmapTTnIndexARM64(vaddr, pmap_pt_attr)
     stage2 = bool(pmap_pt_attr.stage2 if hasattr(pmap_pt_attr, 'stage2') else False)
 
-    # The pmap starts at a page table level that is defined by register
-    # values; the root level can be obtained from the attributes structure
+                                                                       
+                                                                          
     level = unsigned(pmap_pt_attr.pta_root_level)
 
     root_tt_index = tt_index[level]
@@ -842,7 +842,7 @@ def PmapWalkARM64(pmap_pt_attr, root_tte, vaddr, verbose_level = vHUMAN):
         unsigned(pmap_pt_attr.pta_level_info[level].shift)) + 1
     tte = long(unsigned(root_tte[root_tt_index]))
 
-    # Walk the page tables
+                          
     paddr = -1
     max_level = unsigned(pmap_pt_attr.pta_max_level)
 
@@ -857,7 +857,7 @@ def PmapWalkARM64(pmap_pt_attr, root_tte, vaddr, verbose_level = vHUMAN):
                 print "L{} entry invalid: {:#x}\n".format(level, tte)
             break
 
-        # Handle leaf entry
+                           
         if tte & 0x2 == 0x0 or level == max_level:
             base_mask = page_base_mask if level == max_level else PmapBlockBaseMaskARM64(page_size, level)
             offset_mask = page_offset_mask if level == max_level else PmapBlockOffsetMaskARM64(page_size, level)
@@ -869,7 +869,7 @@ def PmapWalkARM64(pmap_pt_attr, root_tte, vaddr, verbose_level = vHUMAN):
 
             break
         else:
-        # Handle page table entry
+                                 
             next_phys = (tte & page_base_mask) + (ARM64_TTE_SIZE * tt_index[level + 1])
             assert(type(next_phys) == long)
 
@@ -883,7 +883,7 @@ def PmapWalkARM64(pmap_pt_attr, root_tte, vaddr, verbose_level = vHUMAN):
             tte = long(unsigned(dereference(ttep)))
             assert(type(tte) == long)
 
-        # We've parsed one level, so go to the next level
+                                                         
         assert(level <= 3)
         level = level + 1
 
@@ -901,7 +901,7 @@ def PmapWalk(pmap, vaddr, verbose_level = vHUMAN):
     elif kern.arch == 'arm':
         return PmapWalkARM(pmap, vaddr, verbose_level)
     elif kern.arch.startswith('arm64'):
-        # Obtain pmap attributes from pmap structure
+                                                    
         pmap_pt_attr = pmap.pmap_pt_attr if hasattr(pmap, 'pmap_pt_attr') else kern.globals.native_pt_attr
         return PmapWalkARM64(pmap_pt_attr, pmap.tte, vaddr, verbose_level)
     else:
@@ -1201,7 +1201,7 @@ def FindMappingAtLevelARM64(pmap, tt, nttes, level, va, action):
         level: translation table level, 1 2 or 3
         action: callback for each valid TTE
     """
-    # Obtain pmap attributes
+                            
     pmap_pt_attr = pmap.pmap_pt_attr if hasattr(pmap, 'pmap_pt_attr') else kern.globals.native_pt_attr
     page_size = pmap_pt_attr.pta_page_size
     page_offset_mask = (page_size - 1)
@@ -1217,12 +1217,12 @@ def FindMappingAtLevelARM64(pmap, tt, nttes, level, va, action):
             tt_next = None
             paddr = unsigned(tte) & unsigned(page_base_mask)
 
-            # Handle leaf entry
+                               
             if tte & 0x2 == 0x0 or level == max_level:
                 type = 'block' if level < max_level else 'entry'
                 granule = PmapBlockOffsetMaskARM64(page_size, level) + 1
             else:
-            # Handle page table entry
+                                     
                 type = 'table'
                 granule = page_size
                 tt_next = kern.GetValueFromAddress(kern.PhysToKernelVirt(paddr), 'tt_entry_t *')
@@ -1243,7 +1243,7 @@ def ScanPageTables(action, targetPmap=None):
     print "Scanning all available translation tables.  This may take a long time..."
     def ScanPmap(pmap, action):
         if kern.arch.startswith('arm64'):
-            # Obtain pmap attributes
+                                    
             pmap_pt_attr = pmap.pmap_pt_attr if hasattr(pmap, 'pmap_pt_attr') else kern.globals.native_pt_attr
             granule = pmap_pt_attr.pta_page_size
             level = unsigned(pmap_pt_attr.pta_root_level)

@@ -41,7 +41,7 @@
 #include <pexpert/pexpert.h>
 #include <kperf/kperf.h>
 
-/* Various sysctl requests */
+                             
 #define REQ_CLASSES              (1)
 #define REQ_COUNTING             (2)
 #define REQ_THREAD_COUNTING      (3)
@@ -56,7 +56,7 @@
 #define REQ_SW_INC              (14)
 #define REQ_PMU_VERSION         (15)
 
-/* Type-munging casts */
+                        
 typedef int (*getint_t)(void);
 typedef int (*setint_t)(int);
 
@@ -65,9 +65,9 @@ static int kpc_initted = 0;
 static LCK_GRP_DECLARE(sysctl_lckgrp, "kpc");
 static LCK_MTX_DECLARE(sysctl_lock, &sysctl_lckgrp);
 
-/*
- * Another element is needed to hold the CPU number when getting counter values.
- */
+  
+                                                                                
+   
 #define KPC_MAX_BUF_LEN (KPC_MAX_COUNTERS_COPIED + 1)
 
 typedef int (*setget_func_t)(int);
@@ -94,24 +94,24 @@ kpc_get_bigarray(uint32_t *size_out)
 		return bigarray;
 	}
 
-	/*
-	 * Another element is needed to hold the CPU number when getting counter
-	 * values.
-	 */
+	  
+                                                                         
+           
+    
 	bigarray = kheap_alloc_tag(KHEAP_DATA_BUFFERS, size,
 	    Z_WAITOK, VM_KERN_MEMORY_DIAG);
 	assert(bigarray != NULL);
 	return bigarray;
 }
 
-/* abstract sysctl handlers */
+                              
 static int
 sysctl_get_int( struct sysctl_oid *oidp, struct sysctl_req *req,
     uint32_t value )
 {
 	int error = 0;
 
-	/* copy out the old value */
+	                            
 	error = sysctl_handle_int(oidp, &value, 0, req);
 
 	return error;
@@ -140,16 +140,16 @@ sysctl_getset_int( struct sysctl_oid *oidp, struct sysctl_req *req,
 	int error = 0;
 	uint32_t value = 0;
 
-	/* get the old value and process it */
+	                                      
 	value = get_func();
 
-	/* copy out the old value, get the new value */
+	                                               
 	error = sysctl_handle_int(oidp, &value, 0, req);
 	if (error || !req->newptr) {
 		return error;
 	}
 
-	/* if that worked, and we're writing... */
+	                                          
 	error = set_func( value );
 
 	return error;
@@ -248,7 +248,7 @@ sysctl_kpc_get_config(uint32_t classes, void* buf)
 static int
 sysctl_kpc_set_config(uint32_t classes, void* buf)
 {
-	/* userspace cannot reconfigure the power class */
+	                                                  
 	if (classes & KPC_CLASS_POWER_MASK) {
 		return EPERM;
 	}
@@ -264,7 +264,7 @@ sysctl_kpc_get_period(uint32_t classes, void* buf)
 static int
 sysctl_kpc_set_period(uint32_t classes, void* buf)
 {
-	/* userspace cannot reconfigure the power class */
+	                                                  
 	if (classes & KPC_CLASS_POWER_MASK) {
 		return EPERM;
 	}
@@ -292,7 +292,7 @@ sysctl_get_bigarray(struct sysctl_req *req,
 	uint64_t *buf = kpc_get_bigarray(&bufsize);
 	uint32_t arg = 0;
 
-	/* get the argument */
+	                      
 	int error = SYSCTL_IN(req, &arg, sizeof(arg));
 	if (error) {
 		return error;
@@ -306,7 +306,7 @@ sysctl_get_bigarray(struct sysctl_req *req,
 	return error;
 }
 
-/* given a config word, how many bytes does it take? */
+                                                       
 static int
 sysctl_config_size( uint32_t config )
 {
@@ -335,24 +335,24 @@ sysctl_getset_bigarray(struct sysctl_req *req, int (*size_fn)(uint32_t arg),
 	uint32_t bufsize = 0;
 	uint64_t *buf = kpc_get_bigarray(&bufsize);
 
-	/* get the config word */
+	                         
 	error = SYSCTL_IN(req, &arg, sizeof(arg));
 	if (error) {
 		return error;
 	}
 
-	/* Determine the size of registers to modify. */
+	                                                
 	uint32_t regsize = size_fn((uint32_t)arg);
 	if (regsize == 0 || regsize > bufsize) {
 		return EINVAL;
 	}
 
-	/* if writing */
+	                
 	if (req->newptr) {
-		/* copy the rest -- SYSCTL_IN knows the copyin should be shifted */
+		                                                                   
 		error = SYSCTL_IN(req, buf, regsize);
 
-		/* SYSCTL_IN failure means only need to read */
+		                                               
 		if (!error) {
 			error = set_fn((uint32_t)arg, buf);
 			if (error) {
@@ -361,7 +361,7 @@ sysctl_getset_bigarray(struct sysctl_req *req, int (*size_fn)(uint32_t arg),
 		}
 	}
 
-	/* if reading */
+	                
 	if (req->oldptr) {
 		error = get_fn((uint32_t)arg, buf);
 		if (error) {
@@ -379,7 +379,7 @@ kpc_sysctl SYSCTL_HANDLER_ARGS
 {
 	int ret;
 
-	// __unused struct sysctl_oid *unused_oidp = oidp;
+	                                                  
 	(void)arg2;
 
 	if (!kpc_initted) {
@@ -392,17 +392,17 @@ kpc_sysctl SYSCTL_HANDLER_ARGS
 
 	ktrace_lock();
 
-	// Most sysctls require an access check, but a few are public.
+	                                                              
 	switch ((uintptr_t) arg1) {
 	case REQ_CLASSES:
 	case REQ_CONFIG_COUNT:
 	case REQ_COUNTER_COUNT:
-		// These read-only sysctls are public.
+		                                      
 		break;
 
 	default:
-		// Require kperf access to read or write anything else.
-		// This is either root or the blessed pid.
+		                                                       
+		                                          
 		if ((ret = ktrace_read_check())) {
 			ktrace_unlock();
 			return ret;
@@ -414,7 +414,7 @@ kpc_sysctl SYSCTL_HANDLER_ARGS
 
 	lck_mtx_lock(&sysctl_lock);
 
-	/* which request */
+	                   
 	switch ((uintptr_t) arg1) {
 	case REQ_CLASSES:
 		ret = sysctl_get_int( oidp, req,
@@ -495,13 +495,13 @@ kpc_sysctl SYSCTL_HANDLER_ARGS
 }
 
 
-/***  sysctl definitions  ***/
+                              
 
-/* root kperf node */
+                     
 SYSCTL_NODE(, OID_AUTO, kpc, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "kpc");
 
-/* values */
+            
 SYSCTL_PROC(_kpc, OID_AUTO, classes,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_ANYBODY | CTLFLAG_MASKED | CTLFLAG_LOCKED,
     (void*)REQ_CLASSES,
@@ -522,7 +522,7 @@ SYSCTL_PROC(_kpc, OID_AUTO, pmu_version,
     (void *)REQ_PMU_VERSION,
     sizeof(int), kpc_sysctl, "I", "PMU version for hardware");
 
-/* faux values */
+                 
 SYSCTL_PROC(_kpc, OID_AUTO, config_count,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_ANYBODY | CTLFLAG_MASKED | CTLFLAG_LOCKED,
     (void*)REQ_CONFIG_COUNT,
@@ -538,7 +538,7 @@ SYSCTL_PROC(_kpc, OID_AUTO, sw_inc,
     (void*)REQ_SW_INC,
     sizeof(int), kpc_sysctl, "S", "Software increment");
 
-/* arrays */
+            
 SYSCTL_PROC(_kpc, OID_AUTO, thread_counters,
     CTLFLAG_RD | CTLFLAG_WR | CTLFLAG_ANYBODY | CTLFLAG_MASKED | CTLFLAG_LOCKED,
     (void*)REQ_THREAD_COUNTERS,

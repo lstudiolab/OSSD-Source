@@ -55,4 +55,4 @@ typedef enum {
 
 void machine_write_csselr(csselr_cache_level level, csselr_cache_type type);
 
-#endif /* _ARM_CPUID_INTERNAL_H_ */
+#endif                             

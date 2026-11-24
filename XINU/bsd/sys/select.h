@@ -67,36 +67,36 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
-/*
- * [XSI] The <sys/select.h> header shall define the fd_set type as a structure.
- * The timespec structure shall be defined as described in <time.h>
- * The <sys/select.h> header shall define the timeval structure.
- */
+  
+                                                                               
+                                                                   
+                                                                
+   
 #include <sys/_types/_fd_def.h>
 #include <sys/_types/_timespec.h>
 #include <sys/_types/_timeval.h>
 
-/*
- * The time_t and suseconds_t types shall be defined as described in
- * <sys/types.h>
- * The sigset_t type shall be defined as described in <signal.h>
- */
+  
+                                                                    
+                
+                                                                
+   
 #include <sys/_types/_time_t.h>
 #include <sys/_types/_suseconds_t.h>
 #include <sys/_types/_sigset_t.h>
 
-/*
- * [XSI] FD_CLR, FD_ISSET, FD_SET, FD_ZERO may be declared as a function, or
- *	 defined as a macro, or both
- * [XSI] FD_SETSIZE shall be defined as a macro
- */
+  
+                                                                            
+                               
+                                               
+   
 
-/*
- * Select uses bit masks of file descriptors in longs.  These macros
- * manipulate such bit fields (the filesystem macros use chars).  The
- * extra protection here is to permit application redefinition above
- * the default size.
- */
+  
+                                                                    
+                                                                     
+                                                                    
+                    
+   
 #include <sys/_types/_fd_setsize.h>
 #include <sys/_types/_fd_set.h>
 #include <sys/_types/_fd_clr.h>
@@ -105,29 +105,29 @@
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 #include <sys/_types/_fd_copy.h>
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
 #ifdef KERNEL
 #include <sys/kernel_types.h>
 #include <kern/waitq.h>
 #include <sys/event.h>
 
-/*
- * Used to maintain information about processes that wish to be
- * notified when I/O becomes possible.
- */
+  
+                                                               
+                                      
+   
 #ifdef KERNEL_PRIVATE
 struct selinfo {
-	struct  waitq si_waitq;         /* waitq for wait/wakeup */
-	struct  klist si_note;          /* JMM - temporary separation */
-	u_int   si_flags;               /* see below */
+	struct  waitq si_waitq;                                    
+	struct  klist si_note;                                          
+	u_int   si_flags;                              
 };
 
-#define SI_COLL         0x0001          /* collision occurred */
-#define SI_RECORDED     0x0004          /* select has been recorded */
-#define SI_INITED       0x0008          /* selinfo has been inited */
-#define SI_CLEAR        0x0010          /* selinfo has been cleared */
-#define SI_KNPOSTING    0x0020          /* posting to knotes */
+#define SI_COLL         0x0001                                  
+#define SI_RECORDED     0x0004                                        
+#define SI_INITED       0x0008                                       
+#define SI_CLEAR        0x0010                                        
+#define SI_KNPOSTING    0x0020                                 
 
 #else
 struct selinfo;
@@ -146,7 +146,7 @@ void    select_cleanup_uthread(struct _select *);
 
 __END_DECLS
 
-#else /* !KERNEL */
+#else              
 
 __BEGIN_DECLS
 
@@ -156,20 +156,20 @@ int      pselect(int, fd_set * __restrict, fd_set * __restrict,
     const sigset_t * __restrict)
 #if defined(_DARWIN_C_SOURCE) || defined(_DARWIN_UNLIMITED_SELECT)
 __DARWIN_EXTSN_C(pselect)
-#else /* !_DARWIN_C_SOURCE && !_DARWIN_UNLIMITED_SELECT */
+#else                                                     
 #  if defined(__LP64__) && !__DARWIN_NON_CANCELABLE
 __DARWIN_1050(pselect)
-#  else /* !__LP64__ || __DARWIN_NON_CANCELABLE */
+#  else                                           
 __DARWIN_ALIAS_C(pselect)
-#  endif /* __LP64__ && !__DARWIN_NON_CANCELABLE */
-#endif /* _DARWIN_C_SOURCE || _DARWIN_UNLIMITED_SELECT */
+#  endif                                           
+#endif                                                   
 ;
-#endif /* __MWERKS__ */
+#endif                 
 
-#include <sys/_select.h>        /* select() prototype */
+#include <sys/_select.h>                                
 
 __END_DECLS
 
-#endif /* ! KERNEL */
+#endif               
 
-#endif /* !_SYS_SELECT_H_ */
+#endif                      

@@ -27,18 +27,18 @@
 #ifndef _MACH_I386_SDT_ISA_H
 #define _MACH_I386_SDT_ISA_H
 
-/*
- * Only define when testing.  This makes the calls into actual calls to
- * test functions.
- */
-/* #define DTRACE_CALL_TEST */
+  
+                                                                       
+                  
+   
+                              
 
 #define DTRACE_STRINGIFY(s) #s
 #define DTRACE_TOSTRING(s) DTRACE_STRINGIFY(s)
 #if defined(KERNEL)
-/*
- * For the kernel, set an explicit global label so the symbol can be located
- */
+  
+                                                                            
+   
 #ifdef __x86_64__
 
 #define DTRACE_LABEL(p, n)                                                              \
@@ -70,10 +70,10 @@
 	".popsection" "\n\t"                                                            \
 	"4:"
 #endif
-#else   /* !KERNEL */
+#else                
 #define DTRACE_LABEL(p, n)                                                                      \
 	"__dtrace_probe$" DTRACE_TOSTRING(%=__LINE__) DTRACE_STRINGIFY(_##p##___##n) ":"	"\n\t"
-#endif  /* !KERNEL */
+#endif               
 
 #ifdef DTRACE_CALL_TEST
 
@@ -216,7 +216,7 @@
 	              : "memory", "rdi", "rsi", "rdx", "rcx", "r8", "r9", "rax"                 \
 	);
 
-#endif // __x86_64__
+#endif              
 
 #ifdef __i386__
 
@@ -238,24 +238,24 @@
 #define ARGS9_EXTENT    12
 #define ARGS10_EXTENT   12
 
-/*
- * Because this code is used in the kernel, we must not touch any floating point
- * or specialized registers. This leaves the following registers:
- *
- * eax ; volatile, safe to use
- * ebx ; PIC register, gcc error when used
- * ecx ; volatile, safe to use
- * edx ; volatile, safe to use
- * esi ; non-volatile, otherwise safe to use
- * edi ; non-volatile, otherwise safe to use
- *
- * Using any of the non volatile register causes a spill to stack which is almost
- * certainly a net performance loss. Also, note that the array ref (__dtrace_args)
- * consumes one free register. If all three of the volatile regs are used for load/store,
- * the compiler will spill a register to hold the array ref.
- *
- * The end result is that we only pipeline two loads/stores at a time. Blech.
- */
+  
+                                                                                
+                                                                 
+  
+                              
+                                          
+                              
+                              
+                                            
+                                            
+  
+                                                                                 
+                                                                                  
+                                                                                         
+                                                            
+  
+                                                                             
+   
 
 #define DTRACE_CALL0ARGS(provider, name)                                                        \
 	asm volatile (                                                                          \
@@ -465,6 +465,6 @@
 	              : "memory", "eax", "edx"                                                  \
 	);
 
-#endif // __i386__
+#endif            
 
-#endif  /* _MACH_I386_SDT_ISA_H */
+#endif                            

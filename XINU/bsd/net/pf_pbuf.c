@@ -241,7 +241,7 @@ pbuf_resize_segment(pbuf_t *pbuf, int off, int olen, int nlen)
 		m = pbuf->pb_mbuf;
 
 		if (off > 0) {
-			/* Split the mbuf chain at the specified boundary */
+			                                                    
 			if ((n = m_split(m, off, M_DONTWAIT)) == NULL) {
 				return NULL;
 			}
@@ -249,12 +249,12 @@ pbuf_resize_segment(pbuf_t *pbuf, int off, int olen, int nlen)
 			n = m;
 		}
 
-		/* Trim old length */
+		                     
 		m_adj(n, olen);
 
-		/* Prepend new length */
+		                        
 		if (M_PREPEND(n, nlen, M_DONTWAIT, 0) == NULL) {
-			/* mbuf is freed by M_PREPEND in this case */
+			                                             
 			pbuf->pb_mbuf = NULL;
 			pbuf_destroy(pbuf);
 			return NULL;
@@ -263,14 +263,14 @@ pbuf_resize_segment(pbuf_t *pbuf, int off, int olen, int nlen)
 		rv = mtod(n, void *);
 
 		if (off > 0) {
-			/* Merge the two chains */
+			                          
 			int mlen;
 
 			mlen = n->m_pkthdr.len;
 			m_cat(m, n);
 			m->m_pkthdr.len += mlen;
 		} else {
-			/* The new mbuf becomes the packet header */
+			                                            
 			pbuf->pb_mbuf = n;
 		}
 
@@ -312,19 +312,19 @@ pbuf_contig_segment(pbuf_t *pbuf, int off, int len)
 	VERIFY(len >= 0);
 	VERIFY((u_int)(off + len) <= pbuf->pb_packet_len);
 
-	/*
-	 * Note: If this fails, then the pbuf is destroyed. This is a
-	 * side-effect of m_pulldown().
-	 *
-	 * PF expects this behaviour so it's not a real problem.
-	 */
+	  
+                                                              
+                                
+   
+                                                         
+    
 	if (pbuf->pb_type == PBUF_TYPE_MBUF) {
 		struct mbuf *n;
 		int moff;
 
 		n = m_pulldown(pbuf->pb_mbuf, off, len, &moff);
 		if (n == NULL) {
-			/* mbuf is freed by m_pulldown() in this case */
+			                                                
 			pbuf->pb_mbuf = NULL;
 			pbuf_destroy(pbuf);
 			return NULL;
@@ -334,9 +334,9 @@ pbuf_contig_segment(pbuf_t *pbuf, int off, int len)
 
 		rv = (void *)(mtod(n, uint8_t *) + moff);
 	} else if (pbuf->pb_type == PBUF_TYPE_MEMORY) {
-		/*
-		 * This always succeeds since memory pbufs are fully contig.
-		 */
+		  
+                                                              
+     
 		rv = (void *)(uintptr_t)(((uint8_t *)pbuf->pb_data)[off]);
 	} else {
 		panic("%s: bad pb_type: %d", __func__, pbuf->pb_type);

@@ -68,7 +68,7 @@ def GetIfConfiguration(ifname):
             return ifnet
     return None
 
-# Macro: net_get_always_on_pktap
+                                
 @lldb_command('net_get_always_on_pktap')
 def NetGetAlwaysOnPktap(cmd_args=None):
     """ Dump the always-on packet capture to /tmp/dump.pktap
@@ -111,9 +111,9 @@ def NetGetAlwaysOnPktap(cmd_args=None):
 
     print f.name
     f.close()
-# EndMacro: net_get_always_on_pktap
+                                   
 
-# Macro: ifconfig
+                 
 @lldb_command('ifconfig')
 def ShowIfconfig(cmd_args=None) :
     """ Display ifconfig-like output, and print the (struct ifnet *) pointers for further inspection
@@ -128,9 +128,9 @@ def ShowIfconfig(cmd_args=None) :
         ShowIfConfiguration(ifnet)
         if (showall == 1):
             print GetIfaddrs(ifnet)
-# EndMacro: ifconfig
+                    
 
-#Macro: ifconfig_dlil
+                     
 @lldb_command('ifconfig_dlil')
 def ShowIfconfigDlil(cmd_args=None) :
     """ Display ifconfig-like output for DLIL interface list, print (struct ifnet *) pointer and dlil info for further inspection
@@ -139,7 +139,7 @@ def ShowIfconfigDlil(cmd_args=None) :
     for dlil_ifnet in IterateTAILQ_HEAD(dlil_ifnets, "dl_if_link"):
         ShowIfConfiguration(dlil_ifnet)
         print GetIfaddrs(Cast(dlil_ifnet, 'ifnet *'))
-# EndMacro: ifconfig_dlil
+                         
 
 def GetAddressAsStringColonHex(addr, count):
     out_string = ""
@@ -237,7 +237,7 @@ def GetSocketAddrAsString(sockaddr):
         out_string += GetAddressAsStringColonHex(sockaddr.sa_data, sockaddr.sa_len)
     return out_string
 
-# Macro: showifaddrs
+                    
 @lldb_command('showifaddrs')
 def ShowIfaddrs(cmd_args=None):
     """ Show the (struct ifnet).if_addrhead list of addresses for the given ifp
@@ -254,7 +254,7 @@ def ShowIfaddrs(cmd_args=None):
             i += 1
     else :
         print "Missing argument 0 in user function."
-# EndMacro: showifaddrs
+                       
 
 def GetIfaddrs(ifp):
     out_string = ""
@@ -327,7 +327,7 @@ def ShowDlilIfnetConfiguration(dlil_ifnet, show_all) :
         out_string += "\n"
     print out_string
 
-# Macro: showifnets
+                   
 @lldb_command('showifnets')
 def ShowIfnets(cmd_args=None) :
     """ Display ifconfig-like output for all attached and detached interfaces
@@ -338,9 +338,9 @@ def ShowIfnets(cmd_args=None) :
     dlil_ifnets = kern.globals.dlil_ifnet_head
     for dlil_ifnet in IterateTAILQ_HEAD(dlil_ifnets, "dl_if_link"):
         ShowDlilIfnetConfiguration(dlil_ifnet, showall)
-# EndMacro: showifnets
+                      
 
-# Macro: showifmultiaddrs
+                         
 @lldb_command('showifmultiaddrs')
 def ShowIfMultiAddrs(cmd_args=None) :
     """ Show the list of multicast addresses for the given ifp
@@ -374,9 +374,9 @@ def ShowIfMultiAddrs(cmd_args=None) :
         print out_string
     else :
         print "Missing argument 0 in user function."
-# EndMacro: showifmultiaddrs
+                            
 
-# Macro: showinmultiaddrs
+                         
 @lldb_command('showinmultiaddrs')
 def ShowInMultiAddrs(cmd_args=None) :
     """ Show the contents of IPv4 multicast address records
@@ -395,9 +395,9 @@ def ShowInMultiAddrs(cmd_args=None) :
         inmulti = cast(inmulti.inm_link.le_next, 'in_multi *')
         i += 1
     print out_string
-# EndMacro: showinmultiaddrs
+                            
 
-# Macro: showin6multiaddrs
+                          
 @lldb_command('showin6multiaddrs')
 def ShowIn6MultiAddrs(cmd_args=None) :
     """ Show the contents of IPv6 multicast address records
@@ -416,7 +416,7 @@ def ShowIn6MultiAddrs(cmd_args=None) :
         in6multi = cast(in6multi.in6m_entry.le_next, 'in6_multi *')
         i += 1
     print out_string
-# EndMacro: showin6multiaddrs
+                             
 
 def GetTcpState(tcpcb):
     out_string = ""
@@ -560,10 +560,10 @@ def GetSocket(socket) :
     else:
         out_string += "(null)"
     return out_string
-# EndMacro: showsocket
+                      
 
 
-# Macro: showsocket
+                   
 @lldb_command('showsocket')
 def ShowSocket(cmd_args=None) :
     """ Show the contents of a socket
@@ -591,7 +591,7 @@ def ShowSocket(cmd_args=None) :
     else:
         print "Unknown value passed as argument."
         return
-# EndMacro: showsocket
+                      
 
 def GetProcSockets(proc, total_snd_cc, total_rcv_cc):
     """ Given a proc_t pointer, display information about its sockets
@@ -638,7 +638,7 @@ def GetProcSockets(proc, total_snd_cc, total_rcv_cc):
     return out_string
 
 
-# Macro: showprocsockets
+                        
 @lldb_command('showprocsockets')
 def ShowProcSockets(cmd_args=None):
     """ Given a proc_t pointer, display information about its sockets
@@ -657,9 +657,9 @@ def ShowProcSockets(cmd_args=None):
             print GetProcSockets(proc, total_snd_cc, total_rcv_cc)
     else:
         print "Missing argument 0 in user function."
-# EndMacro: showprocsockets
+                           
 
-# Macro: showallprocsockets
+                           
 @lldb_command('showallprocsockets')
 def ShowAllProcSockets(cmd_args=None):
     """Display information about the sockets of all the processes
@@ -671,7 +671,7 @@ def ShowAllProcSockets(cmd_args=None):
         print GetProcInfo(proc)
         print GetProcSockets(proc, total_snd_cc, total_rcv_cc)
     print ("total_snd_cc: " + str(int(total_snd_cc[0])) + " total_rcv_cc: " + str(int(total_rcv_cc[0])) + "\n")
-# EndMacro: showallprocsockets
+                              
 
 
 def GetRtEntryPrDetailsAsString(rte):
@@ -845,23 +845,23 @@ def GetRtInet6AsString():
         print rt_table_header_format_string.format("-" * 8, "-" * 16, "-" * 18, "-" * 8, "-" * 8, "-" * 8, "-" * 8)
         print GetRtTableAsString(rt_tables)
 
-# Macro: show_rt_inet
+                     
 @lldb_command('show_rt_inet')
 def ShowRtInet(cmd_args=None):
     """ Display the IPv4 routing table
     """
     print GetRtInetAsString()
-# EndMacro: show_rt_inet
+                        
 
-# Macro: show_rt_inet6
+                      
 @lldb_command('show_rt_inet6')
 def ShowRtInet6(cmd_args=None):
     """ Display the IPv6 routing table
     """
     print GetRtInet6AsString()
-# EndMacro: show_rt_inet6
+                         
 
-# Macro: rtentry_showdbg
+                        
 @lldb_command('rtentry_showdbg')
 def ShowRtEntryDebug(cmd_args=None):
     """ Print the debug information of a route entry
@@ -957,9 +957,9 @@ def ShowRtEntryDebug(cmd_args=None):
         cnt += 1
 
     print out_string
-# EndMacro: rtentry_showdbg
+                           
 
-# Macro: inifa_showdbg
+                      
 @lldb_command('inifa_showdbg')
 def InIfaShowDebug(cmd_args=None):
     """ Print the debug information of an IPv4 interface address
@@ -1023,9 +1023,9 @@ def InIfaShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: inifa_showdbg
+                         
 
-# Macro: in6ifa_showdbg
+                       
 @lldb_command('in6ifa_showdbg')
 def In6IfaShowDebug(cmd_args=None):
     """ Print the debug information of an IPv6 interface address
@@ -1089,9 +1089,9 @@ def In6IfaShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: in6ifa_showdbg
+                          
 
-# Macro: inm_showdbg
+                    
 @lldb_command('inm_showdbg')
 def InmShowDebug(cmd_args=None):
     """ Print the debug information of an IPv4 multicast address
@@ -1132,9 +1132,9 @@ def InmShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: inm_showdbg
+                       
 
-# Macro: ifma_showdbg
+                     
 @lldb_command('ifma_showdbg')
 def IfmaShowDebug(cmd_args=None):
     """ Print the debug information of a link multicast address
@@ -1175,9 +1175,9 @@ def IfmaShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: ifma_showdbg
+                        
 
-# Macro: ifpref_showdbg
+                       
 @lldb_command('ifpref_showdbg')
 def IfpRefShowDebug(cmd_args=None):
     """ Print the debug information of an interface ref count
@@ -1218,9 +1218,9 @@ def IfpRefShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: ifpref_showdbg
+                          
 
-# Macro: ndpr_showdbg
+                     
 @lldb_command('ndpr_showdbg')
 def ndprShowDebug(cmd_args=None):
     """ Print the debug information of a nd_prefix structure
@@ -1261,9 +1261,9 @@ def ndprShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: ndpr_showdbg
+                        
 
-# Macro: nddr_showdbg
+                     
 @lldb_command('nddr_showdbg')
 def nddrShowDebug(cmd_args=None):
     """ Print the debug information of a nd_defrouter structure
@@ -1304,9 +1304,9 @@ def nddrShowDebug(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: nddr_showdbg
+                        
 
-# Macro: imo_showdbg
+                    
 @lldb_command('imo_showdbg')
 def IpmOptions(cmd_args=None):
     """ Print the debug information of a ip_moptions structure
@@ -1347,9 +1347,9 @@ def IpmOptions(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: imo_showdbg
+                       
 
-# Macro: im6o_showdbg
+                     
 @lldb_command('im6o_showdbg')
 def IpmOptions(cmd_args=None):
     """ Print the debug information of a ip6_moptions structure
@@ -1390,9 +1390,9 @@ def IpmOptions(cmd_args=None):
             ix += 1
         cnt += 1
     print out_string
-# EndMacro: im6o_showdbg
+                        
 
-# Macro: rtentry_trash
+                      
 @lldb_command('rtentry_trash')
 def RtEntryTrash(cmd_args=None):
     """ Walk the list of trash route entries
@@ -1415,9 +1415,9 @@ def RtEntryTrash(cmd_args=None):
         rtd = rtd.rtd_trash_link.tqe_next
         cnt += 1
     print out_string
-# EndMacro: rtentry_trash
+                         
 
-# Macro: show_rtentry
+                     
 @lldb_command('show_rtentry')
 def ShRtEntry(cmd_args=None):
     """ Print rtentry.
@@ -1426,9 +1426,9 @@ def ShRtEntry(cmd_args=None):
     rt = kern.GetValueFromAddress(cmd_args[0], 'rtentry *')
     out_string += GetRtEntryPrDetailsAsString(rt) + "\n"
     print out_string
-# EndMacro: show_rtentry
+                        
 
-# Macro: inifa_trash
+                    
 @lldb_command('inifa_trash')
 def InIfaTrash(cmd_args=None):
     """ Walk the list of trash in_ifaddr entries
@@ -1451,9 +1451,9 @@ def InIfaTrash(cmd_args=None):
         ifa = ifa.inifa_trash_link.tqe_next
         cnt += 1
     print out_string
-# EndMacro: inifa_trash
+                       
 
-# Macro: in6ifa_trash
+                     
 @lldb_command('in6ifa_trash')
 def In6IfaTrash(cmd_args=None):
     """ Walk the list of trash in6_ifaddr entries
@@ -1476,9 +1476,9 @@ def In6IfaTrash(cmd_args=None):
         ifa = ifa.in6ifa_trash_link.tqe_next
         cnt += 1
     print out_string
-# EndMacro: in6ifa_trash
+                        
 
-# Macro: inm_trash
+                  
 @lldb_command('inm_trash')
 def InmTrash(cmd_args=None):
     """ Walk the list of trash in_multi entries
@@ -1501,9 +1501,9 @@ def InmTrash(cmd_args=None):
         inm = inm.inm_trash_link.tqe_next
         cnt += 1
     print out_string
-# EndMacro: inm_trash
+                     
 
-# Macro: in6m_trash
+                   
 @lldb_command('in6m_trash')
 def In6mTrash(cmd_args=None):
     """ Walk the list of trash in6_multi entries
@@ -1526,9 +1526,9 @@ def In6mTrash(cmd_args=None):
         in6m = in6m.in6m_trash_link.tqe_next
         cnt += 1
     print out_string
-# EndMacro: in6m_trash
+                      
 
-# Macro: ifma_trash
+                   
 @lldb_command('ifma_trash')
 def IfmaTrash(cmd_args=None):
     """ Walk the list of trash ifmultiaddr entries
@@ -1552,7 +1552,7 @@ def IfmaTrash(cmd_args=None):
         ifma = ifma.ifma_trash_link.tqe_next
         cnt += 1
     print out_string
-# EndMacro: ifma_trash
+                      
 
 def GetInPcb(pcb, proto):
     out_string = ""
@@ -1815,13 +1815,13 @@ def GetInPcbPort(ppcb):
 
 def Getntohs(port):
     out_string = ""
-    #p = unsigned(int(port) & 0x0000ffff)
+                                         
     p = ((port & 0x0000ff00) >> 8)
     p |= ((port & 0x000000ff) << 8)
     return str(p)
 
 
-# Macro: mbuf_list_usage_summary
+                                
 @lldb_command('mbuf_list_usage_summary')
 def ShowMbufListUsageSummary(cmd_args=None):
     """ Print mbuf list usage summary
@@ -1843,7 +1843,7 @@ def ShowMbufListUsageSummary(cmd_args=None):
     out_string += "Total mbuf cluster count " + str(int(mbuf_cluster_cnt[0])) + "\n"
     print out_string
 
-# Macro: show_kern_event_pcbinfo
+                                
 def GetKernEventPcbInfo(kev_pcb_head):
     out_string = ""
     pcb = Cast(kev_pcb_head.lh_first, 'kern_event_pcb *')
@@ -1866,9 +1866,9 @@ def ShowKernEventPcbInfo(cmd_args=None):
     """ Display the list of Kernel Event protocol control block information
     """
     print GetKernEventPcbInfo(addressof(kern.globals.kern_event_head))
-# EndMacro:  show_kern_event_pcbinfo
+                                    
 
-# Macro: show_kern_control_pcbinfo
+                                  
 def GetKernControlPcbInfo(ctl_head):
     out_string = ""
     kctl = Cast(ctl_head.tqh_first, 'kctl *')
@@ -1902,33 +1902,33 @@ def ShowKernControlPcbInfo(cmd_args=None):
     """ Display the list of Kernel Control protocol control block information
     """
     print GetKernControlPcbInfo(addressof(kern.globals.ctl_head))
-# EndMacro:  show_kern_control_pcbinfo
+                                      
 
-# Macro: show_tcp_pcbinfo
+                         
 @lldb_command('show_tcp_pcbinfo')
 def ShowTcpPcbInfo(cmd_args=None):
     """ Display the list of TCP protocol control block information
     """
     print GetPcbInfo(addressof(kern.globals.tcbinfo), IPPROTO_TCP)
-# EndMacro:  show_tcp_pcbinfo
+                             
 
-# Macro: show_udp_pcbinfo
+                         
 @lldb_command('show_udp_pcbinfo')
 def ShowUdpPcbInfo(cmd_args=None):
     """ Display the list of UDP protocol control block information
     """
     print GetPcbInfo(addressof(kern.globals.udbinfo), IPPROTO_UDP)
-# EndMacro:  show_udp_pcbinfo
+                             
 
-# Macro: show_rip_pcbinfo
+                         
 @lldb_command('show_rip_pcbinfo')
 def ShowRipPcbInfo(cmd_args=None):
     """ Display the list of Raw IP protocol control block information
     """
     print GetPcbInfo(addressof(kern.globals.ripcbinfo), IPPROTO_RAW)
-# EndMacro:  show_rip_pcbinfo
+                             
 
-# Macro: show_tcp_timewaitslots
+                               
 @lldb_command('show_tcp_timewaitslots')
 def ShowTcpTimeWaitSlots(cmd_args=None):
     """ Display the list of the TCP protocol control blocks in TIMEWAIT
@@ -1967,9 +1967,9 @@ def ShowTcpTimeWaitSlots(cmd_args=None):
 
         i += 1
     print out_string
-# EndMacro: show_tcp_timewaitslots
+                                  
 
-# Macro: show_domains
+                     
 @lldb_command('show_domains')
 def ShowDomains(cmd_args=None):
     """ Display the list of the domains
@@ -2087,4 +2087,4 @@ def ShowDomains(cmd_args=None):
         dp = dp.dom_entry.tqe_next
 
         print out_string
-# EndMacro: show_domains
+                        

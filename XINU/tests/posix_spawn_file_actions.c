@@ -18,7 +18,7 @@
 
 T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
-/* TEST_PATH needs to be something that exists, but is not the cwd */
+                                                                     
 #define TEST_PATH "/System/Library/Caches"
 
 T_DECL(posix_spawn_file_actions_addchdir_np, "Check posix_spawn_file_actions_addchdir_np",

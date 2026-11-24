@@ -83,7 +83,7 @@ struct ucred;
 typedef struct ucred *kauth_cred_t;
 struct posix_cred;
 typedef struct posix_cred *posix_cred_t;
-#endif  /* !_KAUTH_CRED_T */
+#endif                      
 
 __BEGIN_DECLS
 #ifdef KERNEL
@@ -92,7 +92,7 @@ int file_vnode(int, vnode_t *);
 int file_vnode_withvid(int, vnode_t *, uint32_t *);
 int file_flags(int, int *);
 int file_drop(int);
-#endif /* KERNEL */
+#endif             
 
 #ifdef KERNEL_PRIVATE
 int fd_rdwr(int fd, enum uio_rw, uint64_t base, int64_t len, enum uio_seg,
@@ -103,6 +103,6 @@ struct vnode;
 int fp_getfvp(struct proc *p, int fd, struct fileproc **resultfp, struct vnode  **resultvp);
 int fp_get_pipe_id(proc_t p, int fd, uint64_t *result_pipe_id);
 struct vnode *fg_get_vnode(struct fileglob *fg);
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 __END_DECLS
-#endif /* !_SYS_FILE_H_ */
+#endif                    

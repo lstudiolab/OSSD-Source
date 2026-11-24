@@ -77,6 +77,6 @@ void    tprintf_close(tpr_t);
 void    tprintf(tpr_t, const char *fmt, ...) __printflike(2, 3);
 __END_DECLS
 
-#endif /* __APPLE_API_UNSTABLE */
+#endif                           
 
-#endif /* !_SYS_TPRINTF_H_ */
+#endif                       

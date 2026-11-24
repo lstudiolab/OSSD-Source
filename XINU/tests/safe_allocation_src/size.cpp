@@ -1,7 +1,7 @@
-//
-// Tests for
-//      size_t size() const;
-//
+  
+            
+                            
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

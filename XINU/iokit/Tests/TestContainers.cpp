@@ -126,7 +126,7 @@ testData()
 	bool res = true;
 	unsigned short testData[DATA_SIZE_4 / sizeof(short)], *cp;
 
-	// very first test initialises the OSMetaClass cache.
+	                                                     
 	test1 = OSData::withCapacity(DATA_SIZE_1);
 	TEST_ASSERT('d', "0a", test1);
 	if (test1) {
@@ -137,7 +137,7 @@ testData()
 		testData[i] = (unsigned short) i;
 	}
 
-	// Check empty data allocation
+	                              
 	spaceCheck = checkPointSpace();
 	test1 = OSData::withCapacity(DATA_SIZE_1);
 	TEST_ASSERT('d', "1a", test1);
@@ -154,7 +154,7 @@ testData()
 	}
 	res = res && checkSpace("(d)1", spaceCheck, 0);
 
-	// Check appending to empty data allocation
+	                                           
 	spaceCheck = checkPointSpace();
 	test1 = OSData::withCapacity(DATA_SIZE_1);
 	TEST_ASSERT('d', "2a", test1);
@@ -184,7 +184,7 @@ testData()
 	}
 	res = res && checkSpace("(d)2", spaceCheck, 0);
 
-	// Check data allocation from some constant data
+	                                                
 	spaceCheck = checkPointSpace();
 	test1 = OSData::withBytes(testData, sizeof(testData));
 	TEST_ASSERT('d', "3a", test1);
@@ -203,7 +203,7 @@ testData()
 	}
 	res = res && checkSpace("(d)3", spaceCheck, 0);
 
-	// Check and continious addition of more data
+	                                             
 	spaceCheck = checkPointSpace();
 	test1 = OSData::withCapacity(DATA_SIZE_4);
 	test2 = OSData::withBytesNoCopy(testData, DATA_SIZE_3);
@@ -259,14 +259,14 @@ testString()
 	char c;
 	bool res = true;
 
-	// very first test initialises the OSMetaClass cache.
+	                                                     
 	test1 = OSString::withCStringNoCopy(testC00);
 	TEST_ASSERT('s', "0a", test1);
 	if (test1) {
 		test1->release();
 	}
 
-	// Check c string allocation
+	                            
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCString(testC00);
 	TEST_ASSERT('s', "1a", test1);
@@ -280,7 +280,7 @@ testString()
 	}
 	res = res && checkSpace("(s)1", spaceCheck, 0);
 
-	// Check c string no allocation
+	                               
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCStringNoCopy(testC00);
 	TEST_ASSERT('s', "2a", test1);
@@ -290,7 +290,7 @@ testString()
 	}
 	res = res && checkSpace("(s)2", spaceCheck, 0);
 
-	// Check string from other string generation
+	                                            
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCStringNoCopy(testC00);
 	TEST_ASSERT('s', "3a", test1);
@@ -306,7 +306,7 @@ testString()
 	}
 	res = res && checkSpace("(s)3", spaceCheck, 0);
 
-	// Check string comparison functionality no copy
+	                                                
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCStringNoCopy(testC00);
 	test2 = OSString::withCStringNoCopy(testC01);
@@ -322,7 +322,7 @@ testString()
 	}
 	res = res && checkSpace("(s)4", spaceCheck, 0);
 
-	// Check string comparison functionality with copy
+	                                                  
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCString(testC00);
 	test2 = OSString::withCString(testC01);
@@ -338,7 +338,7 @@ testString()
 	}
 	res = res && checkSpace("(s)5", spaceCheck, 0);
 
-	// Check string inplace modifications
+	                                     
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCString(testC00);
 	TEST_ASSERT('s', "6a", test1);
@@ -359,7 +359,7 @@ testString()
 	}
 	res = res && checkSpace("(s)6", spaceCheck, 0);
 
-	// Check const string fail inplace modifications
+	                                                
 	spaceCheck = checkPointSpace();
 	test1 = OSString::withCStringNoCopy(testC00);
 	TEST_ASSERT('s', "7a", test1);
@@ -395,7 +395,7 @@ testSymbol()
 	const OSSymbol *cache[numStrCache];
 	void *spaceCheck;
 
-	// very first test initialises the OSMetaClass cache.
+	                                                     
 	cache[0] = IOSymbol::withCStringNoCopy(testC00);
 	TEST_ASSERT('u', "0a", cache[0]);
 	if (cache[0]) {
@@ -404,9 +404,9 @@ testSymbol()
 
 	spaceCheck = checkPointSpace();
 
-	// Setup the symbol cache, make sure it grows the symbol unique'ing
-	// hash table.  Also determine that the symbol is created ok and that
-	// it is indeed equal to the creating cString by strcmp.
+	                                                                   
+	                                                                     
+	                                                        
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = OSSymbol::withCStringNoCopy(strCache[i]);
 		if (!cache[i]) {
@@ -416,9 +416,9 @@ testSymbol()
 		}
 	}
 
-	// The strCache does have some duplicates in it, mostly 'the'.  Make
-	// sure that we wind them and that different cache entries really are
-	// different by strcmp.  Fundamental to OSSymbol semantics.
+	                                                                    
+	                                                                     
+	                                                           
 	countDups = 0;
 	for (i = 0; i < numStrCache; i++) {
 		for (j = i + 1; j < numStrCache; j++) {
@@ -436,18 +436,18 @@ testSymbol()
 	}
 	TEST_ASSERT('u', "2c", countDups);
 
-	// Clear out the cache and check that the unique'ing hashtable has grown
+	                                                                        
 	for (i = 0; i < numStrCache; i++) {
 		if (cache[i]) {
 			cache[i]->release();
 			cache[i] = 0;
 		}
 	}
-	// As of 1998-11-17 the hash growth is 364.
+	                                           
 	res = res && checkSpace("(u)3", spaceCheck, 972);
 	logSpace();
 
-	// Check for leaks by repeating the cacheing and freeing
+	                                                        
 	spaceCheck = checkPointSpace();
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = OSSymbol::withCString(strCache[i]);
@@ -460,9 +460,9 @@ testSymbol()
 	}
 	res = res && checkSpace("(u)4", spaceCheck, 0);
 
-	// Check that the OSString based symbol constructors work
-	// and that they don't leak, and finally double check that while
-	// the cache is active the symbol semantics still work.
+	                                                         
+	                                                                
+	                                                       
 	spaceCheck = checkPointSpace();
 	for (i = 0; i < numStrCache; i++) {
 		OSString *tmpStr;
@@ -506,4 +506,4 @@ testSymbol()
 	}
 }
 
-#endif /* DEBUG */
+#endif            

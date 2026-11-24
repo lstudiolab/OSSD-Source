@@ -73,7 +73,7 @@
 #include <kern/machine.h>
 #include <kperf/kperf_kpc.h>
 #include <mach/policy.h>
-#include <security/mac_mach_internal.h> // for MACF AST hook
+#include <security/mac_mach_internal.h>                     
 #include <stdatomic.h>
 
 #if CONFIG_ARCADE
@@ -83,18 +83,18 @@
 static void __attribute__((noinline, noreturn, disable_tail_calls))
 thread_preempted(__unused void* parameter, __unused wait_result_t result)
 {
-	/*
-	 * We've been scheduled again after a userspace preemption,
-	 * try again to return to userspace.
-	 */
+	  
+                                                            
+                                     
+    
 	thread_exception_return();
 }
 
-/*
- * AST_URGENT was detected while in kernel mode
- * Called with interrupts disabled, returns the same way
- * Must return to caller
- */
+  
+                                               
+                                                        
+                        
+   
 void
 ast_taken_kernel(void)
 {
@@ -102,31 +102,31 @@ ast_taken_kernel(void)
 
 	thread_t thread = current_thread();
 
-	/* Idle threads handle preemption themselves */
+	                                               
 	if ((thread->state & TH_IDLE)) {
 		ast_off(AST_PREEMPTION);
 		return;
 	}
 
-	/*
-	 * It's possible for this to be called after AST_URGENT
-	 * has already been handled, due to races in enable_preemption
-	 */
+	  
+                                                        
+                                                               
+    
 	if (ast_peek(AST_URGENT) != AST_URGENT) {
 		return;
 	}
 
-	/*
-	 * Don't preempt if the thread is already preparing to block.
-	 * TODO: the thread can cheese this with clear_wait()
-	 */
+	  
+                                                              
+                                                      
+    
 	if (waitq_wait_possible(thread) == FALSE) {
-		/* Consume AST_URGENT or the interrupt will call us again */
+		                                                            
 		ast_consume(AST_URGENT);
 		return;
 	}
 
-	/* TODO: Should we csw_check again to notice if conditions have changed? */
+	                                                                           
 
 	ast_t urgent_reason = ast_consume(AST_PREEMPTION);
 
@@ -137,11 +137,11 @@ ast_taken_kernel(void)
 	assert(ml_get_interrupts_enabled() == FALSE);
 }
 
-/*
- * An AST flag was set while returning to user mode
- * Called with interrupts disabled, returns with interrupts enabled
- * May call continuation instead of returning
- */
+  
+                                                   
+                                                                   
+                                             
+   
 void
 ast_taken_user(void)
 {
@@ -149,53 +149,53 @@ ast_taken_user(void)
 
 	thread_t thread = current_thread();
 
-	/* We are about to return to userspace, there must not be a pending wait */
+	                                                                           
 	assert(waitq_wait_possible(thread));
 	assert((thread->state & TH_IDLE) == 0);
 
-	/* TODO: Add more 'return to userspace' assertions here */
+	                                                          
 
-	/*
-	 * If this thread was urgently preempted in userspace,
-	 * take the preemption before processing the ASTs.
-	 * The trap handler will call us again if we have more ASTs, so it's
-	 * safe to block in a continuation here.
-	 */
+	  
+                                                       
+                                                   
+                                                                     
+                                         
+    
 	if (ast_peek(AST_URGENT) == AST_URGENT) {
 		ast_t urgent_reason = ast_consume(AST_PREEMPTION);
 
 		assert(urgent_reason & AST_PREEMPT);
 
-		/* TODO: Should we csw_check again to notice if conditions have changed? */
+		                                                                           
 
 		thread_block_reason(thread_preempted, NULL, urgent_reason);
-		/* NOTREACHED */
+		                
 	}
 
-	/*
-	 * AST_KEVENT does not send an IPI when setting the ast for a thread running in parallel
-	 * on a different processor. Only the ast bit on the thread will be set.
-	 *
-	 * Force a propagate for concurrent updates without an IPI.
-	 */
+	  
+                                                                                         
+                                                                         
+   
+                                                            
+    
 	ast_propagate(thread);
 
-	/*
-	 * Consume all non-preemption processor ASTs matching reasons
-	 * because we're handling them here.
-	 *
-	 * If one of the AST handlers blocks in a continuation,
-	 * we'll reinstate the unserviced thread-level AST flags
-	 * from the thread to the processor on context switch.
-	 * If one of the AST handlers sets another AST,
-	 * the trap handler will call ast_taken_user again.
-	 *
-	 * We expect the AST handlers not to thread_exception_return
-	 * without an ast_propagate or context switch to reinstate
-	 * the per-processor ASTs.
-	 *
-	 * TODO: Why are AST_DTRACE and AST_KPERF not per-thread ASTs?
-	 */
+	  
+                                                              
+                                     
+   
+                                                        
+                                                         
+                                                       
+                                                
+                                                    
+   
+                                                             
+                                                           
+                           
+   
+                                                               
+    
 	ast_t reasons = ast_consume(AST_PER_THREAD | AST_KPERF | AST_DTRACE);
 
 	ml_set_interrupts_enabled(TRUE);
@@ -271,47 +271,47 @@ ast_taken_user(void)
 	spl_t s = splsched();
 
 #if CONFIG_SCHED_SFI
-	/*
-	 * SFI is currently a per-processor AST, not a per-thread AST
-	 *      TODO: SFI should be a per-thread AST
-	 */
+	  
+                                                              
+                                             
+    
 	if (ast_consume(AST_SFI) == AST_SFI) {
 		sfi_ast(thread);
 	}
 #endif
 
-	/* We are about to return to userspace, there must not be a pending wait */
+	                                                                           
 	assert(waitq_wait_possible(thread));
 
-	/*
-	 * We've handled all per-thread ASTs, time to handle non-urgent preemption.
-	 *
-	 * We delay reading the preemption bits until now in case the thread
-	 * blocks while handling per-thread ASTs.
-	 *
-	 * If one of the AST handlers had managed to set a new AST bit,
-	 * thread_exception_return will call ast_taken again.
-	 */
+	  
+                                                                            
+   
+                                                                     
+                                          
+   
+                                                                
+                                                      
+    
 	ast_t preemption_reasons = ast_consume(AST_PREEMPTION);
 
 	if (preemption_reasons & AST_PREEMPT) {
-		/* Conditions may have changed from when the AST_PREEMPT was originally set, so re-check. */
+		                                                                                            
 
 		thread_lock(thread);
 		preemption_reasons = csw_check(thread, current_processor(), (preemption_reasons & AST_QUANTUM));
 		thread_unlock(thread);
 
 #if CONFIG_SCHED_SFI
-		/* csw_check might tell us that SFI is needed */
+		                                                
 		if (preemption_reasons & AST_SFI) {
 			sfi_ast(thread);
 		}
 #endif
 
 		if (preemption_reasons & AST_PREEMPT) {
-			/* switching to a continuation implicitly re-enables interrupts */
+			                                                                  
 			thread_block_reason(thread_preempted, NULL, preemption_reasons);
-			/* NOTREACHED */
+			                
 		}
 	}
 
@@ -323,10 +323,10 @@ ast_taken_user(void)
 
 	splx(s);
 
-	/*
-	 * Here's a good place to put assertions of things which must be true
-	 * upon return to userspace.
-	 */
+	  
+                                                                      
+                             
+    
 	assert((thread->sched_flags & TH_SFLAG_WAITQ_PROMOTED) == 0);
 	assert((thread->sched_flags & TH_SFLAG_RW_PROMOTED) == 0);
 	assert((thread->sched_flags & TH_SFLAG_EXEC_PROMOTED) == 0);
@@ -338,10 +338,10 @@ ast_taken_user(void)
 	assert(thread->rwlock_count == 0);
 }
 
-/*
- * Set AST flags on current processor
- * Called at splsched
- */
+  
+                                     
+                     
+   
 void
 ast_on(ast_t reasons)
 {
@@ -350,10 +350,10 @@ ast_on(ast_t reasons)
 	*pending_ast |= reasons;
 }
 
-/*
- * Clear AST flags on current processor
- * Called at splsched
- */
+  
+                                       
+                     
+   
 void
 ast_off(ast_t reasons)
 {
@@ -362,11 +362,11 @@ ast_off(ast_t reasons)
 	*pending_ast &= ~reasons;
 }
 
-/*
- * Consume the requested subset of the AST flags set on the processor
- * Return the bits that were set
- * Called at splsched
- */
+  
+                                                                     
+                                
+                     
+   
 ast_t
 ast_consume(ast_t reasons)
 {
@@ -378,11 +378,11 @@ ast_consume(ast_t reasons)
 	return reasons;
 }
 
-/*
- * Read the requested subset of the AST flags set on the processor
- * Return the bits that were set, don't modify the processor
- * Called at splsched
- */
+  
+                                                                  
+                                                            
+                     
+   
 ast_t
 ast_peek(ast_t reasons)
 {
@@ -393,10 +393,10 @@ ast_peek(ast_t reasons)
 	return reasons;
 }
 
-/*
- * Re-set current processor's per-thread AST flags to those set on thread
- * Called at splsched
- */
+  
+                                                                         
+                     
+   
 void
 ast_context(thread_t thread)
 {
@@ -405,10 +405,10 @@ ast_context(thread_t thread)
 	*pending_ast = ((*pending_ast & ~AST_PER_THREAD) | thread->ast);
 }
 
-/*
- * Propagate ASTs set on a thread to the current processor
- * Called at splsched
- */
+  
+                                                          
+                     
+   
 void
 ast_propagate(thread_t thread)
 {

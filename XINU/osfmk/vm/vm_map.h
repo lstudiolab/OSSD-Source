@@ -53,19 +53,19 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- *	File:	vm/vm_map.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Virtual memory map module definitions.
- *
- * Contributors:
- *	avie, dlb, mwyoung
- */
+  
+                    
+                                                    
+             
+  
+                                         
+  
+                
+                     
+   
 
 #ifndef _VM_VM_MAP_H_
 #define _VM_VM_MAP_H_
@@ -88,14 +88,14 @@
 
 #ifdef XNU_KERNEL_PRIVATE
 #include <vm/vm_protos.h>
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 __BEGIN_DECLS
 
 extern void     vm_map_reference(vm_map_t       map);
 extern vm_map_t current_map(void);
 
-/* Setup reserved areas in a new VM map */
+                                          
 extern kern_return_t    vm_map_exec(
 	vm_map_t                new_map,
 	task_t                  task,
@@ -126,29 +126,29 @@ __END_DECLS
 #include <vm/vm_map_store.h>
 
 
-/*
- *	Types defined:
- *
- *	vm_map_t		the high-level address map data structure.
- *	vm_map_entry_t		an entry in an address map.
- *	vm_map_version_t	a timestamp of a map, for use with vm_map_lookup
- *	vm_map_copy_t		represents memory copied from an address map,
- *				 used for inter-map copy operations
- */
+  
+                 
+  
+                                                       
+                                              
+                                                                    
+                                                               
+                                         
+   
 typedef struct vm_map_entry     *vm_map_entry_t;
 #define VM_MAP_ENTRY_NULL       ((vm_map_entry_t) NULL)
 
 
-/*
- *	Type:		vm_map_object_t [internal use only]
- *
- *	Description:
- *		The target of an address mapping, either a virtual
- *		memory object or a sub map (of the kernel map).
- */
+  
+                                             
+  
+               
+                                                      
+                                                   
+   
 typedef union vm_map_object {
-	vm_object_t             vmo_object;     /* object object */
-	vm_map_t                vmo_submap;     /* belongs to another map */
+	vm_object_t             vmo_object;                        
+	vm_map_t                vmo_submap;                                 
 } vm_map_object_t;
 
 #define named_entry_lock_init(object)   lck_mtx_init(&(object)->Lock, &vm_object_lck_grp, &vm_object_lck_attr)
@@ -157,156 +157,156 @@ typedef union vm_map_object {
 #define named_entry_unlock(object)              lck_mtx_unlock(&(object)->Lock)
 #if VM_NAMED_ENTRY_LIST
 extern queue_head_t vm_named_entry_list;
-#endif /* VM_NAMED_ENTRY_LIST */
+#endif                          
 
-/*
- *	Type:		vm_named_entry_t [internal use only]
- *
- *	Description:
- *		Description of a mapping to a memory cache object.
- *
- *	Implementation:
- *		While the handle to this object is used as a means to map
- *              and pass around the right to map regions backed by pagers
- *		of all sorts, the named_entry itself is only manipulated
- *		by the kernel.  Named entries hold information on the
- *		right to map a region of a cached object.  Namely,
- *		the target cache object, the beginning and ending of the
- *		region to be mapped, and the permissions, (read, write)
- *		with which it can be mapped.
- *
- */
+  
+                                              
+  
+               
+                                                      
+  
+                  
+                                                             
+                                                                         
+                                                            
+                                                         
+                                                      
+                                                            
+                                                           
+                                
+  
+   
 
 struct vm_named_entry {
-	decl_lck_mtx_data(, Lock);              /* Synchronization */
+	decl_lck_mtx_data(, Lock);                                   
 	union {
-		vm_map_t        map;            /* map backing submap */
-		vm_map_copy_t   copy;           /* a VM map copy */
+		vm_map_t        map;                                    
+		vm_map_copy_t   copy;                              
 	} backing;
-	vm_object_offset_t      offset;         /* offset into object */
-	vm_object_size_t        size;           /* size of region */
-	vm_object_offset_t      data_offset;    /* offset to first byte of data */
-	vm_prot_t               protection;     /* access permissions */
-	int                     ref_count;      /* Number of references */
-	unsigned int                            /* Is backing.xxx : */
-	/* boolean_t */ is_object:1,            /* ... a VM object (wrapped in a VM map copy) */
-	/* boolean_t */ internal:1,              /* ... an internal object */
-	/* boolean_t */ is_sub_map:1,           /* ... a submap? */
-	/* boolean_t */ is_copy:1;              /* ... a VM map copy */
+	vm_object_offset_t      offset;                                 
+	vm_object_size_t        size;                               
+	vm_object_offset_t      data_offset;                                      
+	vm_prot_t               protection;                             
+	int                     ref_count;                                
+	unsigned int                                                  
+	                is_object:1,                                                            
+	                internal:1,                                          
+	                is_sub_map:1,                              
+	                is_copy:1;                                     
 #if VM_NAMED_ENTRY_LIST
 	queue_chain_t           named_entry_list;
 	int                     named_entry_alias;
 	mach_port_t             named_entry_port;
 #define NAMED_ENTRY_BT_DEPTH 16
 	void                    *named_entry_bt[NAMED_ENTRY_BT_DEPTH];
-#endif /* VM_NAMED_ENTRY_LIST */
+#endif                          
 };
 
-/*
- *	Type:		vm_map_entry_t [internal use only]
- *
- *	Description:
- *		A single mapping within an address map.
- *
- *	Implementation:
- *		Address map entries consist of start and end addresses,
- *		a VM object (or sub map) and offset into that object,
- *		and user-exported inheritance and protection information.
- *		Control information for virtual copy operations is also
- *		stored in the address map entry.
- */
+  
+                                            
+  
+               
+                                           
+  
+                  
+                                                           
+                                                         
+                                                             
+                                                           
+                                    
+   
 
 struct vm_map_links {
-	struct vm_map_entry     *prev;          /* previous entry */
-	struct vm_map_entry     *next;          /* next entry */
-	vm_map_offset_t         start;          /* start address */
-	vm_map_offset_t         end;            /* end address */
+	struct vm_map_entry     *prev;                              
+	struct vm_map_entry     *next;                          
+	vm_map_offset_t         start;                             
+	vm_map_offset_t         end;                             
 };
 
-/*
- * FOOTPRINT ACCOUNTING:
- * The "memory footprint" is better described in the pmap layer.
- *
- * At the VM level, these 2 vm_map_entry_t fields are relevant:
- * iokit_mapped:
- *	For an "iokit_mapped" entry, we add the size of the entry to the
- *	footprint when the entry is entered into the map and we subtract that
- *	size when the entry is removed.  No other accounting should take place.
- *	"use_pmap" should be FALSE but is not taken into account.
- * use_pmap: (only when is_sub_map is FALSE)
- *	This indicates if we should ask the pmap layer to account for pages
- *	in this mapping.  If FALSE, we expect that another form of accounting
- *	is being used (e.g. "iokit_mapped" or the explicit accounting of
- *	non-volatile purgable memory).
- *
- * So the logic is mostly:
- * if entry->is_sub_map == TRUE
- *	anything in a submap does not count for the footprint
- * else if entry->iokit_mapped == TRUE
- *	footprint includes the entire virtual size of this entry
- * else if entry->use_pmap == FALSE
- *	tell pmap NOT to account for pages being pmap_enter()'d from this
- *	mapping (i.e. use "alternate accounting")
- * else
- *	pmap will account for pages being pmap_enter()'d from this mapping
- *	as it sees fit (only if anonymous, etc...)
- */
+  
+                        
+                                                                
+  
+                                                               
+                
+                                                                   
+                                                                        
+                                                                          
+                                                            
+                                            
+                                                                      
+                                                                        
+                                                                   
+                                 
+  
+                          
+                               
+                                                        
+                                      
+                                                           
+                                   
+                                                                    
+                                            
+       
+                                                                     
+                                             
+   
 
 struct vm_map_entry {
-	struct vm_map_links     links;          /* links to other entries */
+	struct vm_map_links     links;                                      
 #define vme_prev                links.prev
 #define vme_next                links.next
 #define vme_start               links.start
 #define vme_end                 links.end
 
 	struct vm_map_store     store;
-	union vm_map_object     vme_object;     /* object I point to */
-	vm_object_offset_t      vme_offset;     /* offset into object */
+	union vm_map_object     vme_object;                            
+	vm_object_offset_t      vme_offset;                             
 
 	unsigned int
-	/* boolean_t */ is_shared:1,    /* region is shared */
-	/* boolean_t */ is_sub_map:1,   /* Is "object" a submap? */
-	/* boolean_t */ in_transition:1, /* Entry being changed */
-	/* boolean_t */ needs_wakeup:1, /* Waiters on in_transition */
-	/* vm_behavior_t */ behavior:2, /* user paging behavior hint */
-	/* behavior is not defined for submap type */
-	/* boolean_t */ needs_copy:1,   /* object need to be copied? */
+	                is_shared:1,                          
+	                is_sub_map:1,                              
+	                in_transition:1,                          
+	                needs_wakeup:1,                               
+	                    behavior:2,                                
+	                                             
+	                needs_copy:1,                                  
 
-	/* Only in task maps: */
-	/* vm_prot_t */ protection:3,   /* protection code */
-	/* vm_prot_t */ max_protection:3, /* maximum protection */
-	/* vm_inherit_t */ inheritance:2, /* inheritance */
-	/* boolean_t */ use_pmap:1,     /*
-	                                 * use_pmap is overloaded:
-	                                 * if "is_sub_map":
-	                                 *      use a nested pmap?
-	                                 * else (i.e. if object):
-	                                 *      use pmap accounting
-	                                 *      for footprint?
-	                                 */
-	/* boolean_t */ no_cache:1,     /* should new pages be cached? */
-	/* boolean_t */ permanent:1,    /* mapping can not be removed */
-	/* boolean_t */ superpage_size:1, /* use superpages of a certain size */
-	/* boolean_t */ map_aligned:1,  /* align to map's page size */
-	/* boolean_t */ zero_wired_pages:1, /* zero out the wired pages of
-	                                     * this entry it is being deleted
-	                                     * without unwiring them */
-	/* boolean_t */ used_for_jit:1,
-	/* boolean_t */ pmap_cs_associated:1, /* pmap_cs will validate */
-	/* boolean_t */ from_reserved_zone:1, /* Allocated from
-	                                       * kernel reserved zone	 */
+	                        
+	                protection:3,                        
+	                max_protection:3,                         
+	                   inheritance:2,                  
+	                use_pmap:1,       
+                                                           
+                                                    
+                                                           
+                                                          
+                                                            
+                                                       
+                                    
+	                no_cache:1,                                      
+	                permanent:1,                                    
+	                superpage_size:1,                                       
+	                map_aligned:1,                                
+	                zero_wired_pages:1,                               
+                                                                      
+                                                                
+	                used_for_jit:1,
+	                pmap_cs_associated:1,                            
+	                from_reserved_zone:1,                  
+                                                                  
 
-	/* iokit accounting: use the virtual size rather than resident size: */
-	/* boolean_t */ iokit_acct:1,
-	/* boolean_t */ vme_resilient_codesign:1,
-	/* boolean_t */ vme_resilient_media:1,
-	/* boolean_t */ vme_atomic:1, /* entry cannot be split/coalesced */
-	/* boolean_t */ vme_no_copy_on_read:1,
-	/* boolean_t */ translated_allow_execute:1, /* execute in translated processes */
+	                                                                       
+	                iokit_acct:1,
+	                vme_resilient_codesign:1,
+	                vme_resilient_media:1,
+	                vme_atomic:1,                                      
+	                vme_no_copy_on_read:1,
+	                translated_allow_execute:1,                                      
 	__unused:2;
 
-	unsigned short          wired_count;    /* can be paged if = 0 */
-	unsigned short          user_wired_count; /* for vm_wire */
+	unsigned short          wired_count;                             
+	unsigned short          user_wired_count;                  
 #if     DEBUG
 #define MAP_ENTRY_CREATION_DEBUG (1)
 #define MAP_ENTRY_INSERTION_DEBUG (1)
@@ -365,12 +365,12 @@ VME_OFFSET_SET(
 	assert((offset & FOURK_PAGE_MASK) == 0);
 	entry->vme_offset = offset | alias;
 }
-/*
- * IMPORTANT:
- * The "alias" field can be updated while holding the VM map lock
- * "shared".  It's OK as along as it's the only field that can be
- * updated without the VM map "exclusive" lock.
- */
+  
+             
+                                                                 
+                                                                 
+                                               
+   
 static inline void
 VME_ALIAS_SET(
 	vm_map_entry_t entry,
@@ -402,130 +402,130 @@ VME_OBJECT_SHADOW(
 }
 
 
-/*
- * Convenience macros for dealing with superpages
- * SUPERPAGE_NBASEPAGES is architecture dependent and defined in pmap.h
- */
+  
+                                                 
+                                                                       
+   
 #define SUPERPAGE_SIZE (PAGE_SIZE*SUPERPAGE_NBASEPAGES)
 #define SUPERPAGE_MASK (-SUPERPAGE_SIZE)
 #define SUPERPAGE_ROUND_DOWN(a) (a & SUPERPAGE_MASK)
 #define SUPERPAGE_ROUND_UP(a) ((a + SUPERPAGE_SIZE-1) & SUPERPAGE_MASK)
 
-/*
- * wired_counts are unsigned short.  This value is used to safeguard
- * against any mishaps due to runaway user programs.
- */
+  
+                                                                    
+                                                    
+   
 #define MAX_WIRE_COUNT          65535
 
 
 
-/*
- *	Type:		struct vm_map_header
- *
- *	Description:
- *		Header for a vm_map and a vm_map_copy.
- */
+  
+                              
+  
+               
+                                          
+   
 
 
 struct vm_map_header {
-	struct vm_map_links     links;          /* first, last, min, max */
-	int                     nentries;       /* Number of entries */
+	struct vm_map_links     links;                                     
+	int                     nentries;                              
 	boolean_t               entries_pageable;
-	/* are map entries pageable? */
+	                               
 #ifdef VM_MAP_STORE_USE_RB
 	struct rb_head  rb_head_store;
 #endif
-	int                     page_shift;     /* page shift */
+	int                     page_shift;                     
 };
 
 #define VM_MAP_HDR_PAGE_SHIFT(hdr) ((hdr)->page_shift)
 #define VM_MAP_HDR_PAGE_SIZE(hdr) (1 << VM_MAP_HDR_PAGE_SHIFT((hdr)))
 #define VM_MAP_HDR_PAGE_MASK(hdr) (VM_MAP_HDR_PAGE_SIZE((hdr)) - 1)
 
-/*
- *	Type:		vm_map_t [exported; contents invisible]
- *
- *	Description:
- *		An address map -- a directory relating valid
- *		regions of a task's address space to the corresponding
- *		virtual memory objects.
- *
- *	Implementation:
- *		Maps are doubly-linked lists of map entries, sorted
- *		by address.  One hint is used to start
- *		searches again from the last successful search,
- *		insertion, or removal.  Another hint is used to
- *		quickly find free space.
- */
+  
+                                                 
+  
+               
+                                                
+                                                          
+                           
+  
+                  
+                                                       
+                                          
+                                                   
+                                                   
+                            
+   
 struct _vm_map {
-	lck_rw_t                lock;           /* map lock */
-	struct vm_map_header    hdr;            /* Map entry header */
-#define min_offset              hdr.links.start /* start of range */
-#define max_offset              hdr.links.end   /* end of range */
-	pmap_t                  XNU_PTRAUTH_SIGNED_PTR("_vm_map.pmap") pmap;           /* Physical map */
-	vm_map_size_t           size;           /* virtual size */
-	vm_map_size_t           user_wire_limit;/* rlimit on user locked memory */
-	vm_map_size_t           user_wire_size; /* current size of user locked memory in this map */
+	lck_rw_t                lock;                         
+	struct vm_map_header    hdr;                                  
+#define min_offset              hdr.links.start                     
+#define max_offset              hdr.links.end                     
+	pmap_t                  XNU_PTRAUTH_SIGNED_PTR("_vm_map.pmap") pmap;                             
+	vm_map_size_t           size;                             
+	vm_map_size_t           user_wire_limit;                                  
+	vm_map_size_t           user_wire_size;                                                     
 #if XNU_TARGET_OS_OSX
 	vm_map_offset_t         vmmap_high_start;
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 	union {
-		/*
-		 * If map->disable_vmentry_reuse == TRUE:
-		 * the end address of the highest allocated vm_map_entry_t.
-		 */
+		  
+                                           
+                                                             
+     
 		vm_map_offset_t         vmu1_highest_entry_end;
-		/*
-		 * For a nested VM map:
-		 * the lowest address in this nested VM map that we would
-		 * expect to be unnested under normal operation (i.e. for
-		 * regular copy-on-write on DATA section).
-		 */
+		  
+                         
+                                                           
+                                                           
+                                            
+     
 		vm_map_offset_t         vmu1_lowest_unnestable_start;
 	} vmu1;
 #define highest_entry_end       vmu1.vmu1_highest_entry_end
 #define lowest_unnestable_start vmu1.vmu1_lowest_unnestable_start
-	decl_lck_mtx_data(, s_lock);                    /* Lock ref, res fields */
+	decl_lck_mtx_data(, s_lock);                                              
 	lck_mtx_ext_t           s_lock_ext;
-	vm_map_entry_t          hint;           /* hint for quick lookups */
+	vm_map_entry_t          hint;                                       
 	union {
-		struct vm_map_links* vmmap_hole_hint;   /* hint for quick hole lookups */
+		struct vm_map_links* vmmap_hole_hint;                                    
 		struct vm_map_corpse_footprint_header *vmmap_corpse_footprint;
 	} vmmap_u_1;
 #define hole_hint vmmap_u_1.vmmap_hole_hint
 #define vmmap_corpse_footprint vmmap_u_1.vmmap_corpse_footprint
 	union {
-		vm_map_entry_t          _first_free;    /* First free space hint */
-		struct vm_map_links*    _holes;         /* links all holes between entries */
-	} f_s;                                          /* Union for free space data structures being used */
+		vm_map_entry_t          _first_free;                               
+		struct vm_map_links*    _holes;                                              
+	} f_s;                                                                                               
 
 #define first_free              f_s._first_free
 #define holes_list              f_s._holes
 
-	struct os_refcnt        map_refcnt;       /* Reference count */
+	struct os_refcnt        map_refcnt;                            
 
 	unsigned int
-	/* boolean_t */ wait_for_space:1,         /* Should callers wait for space? */
-	/* boolean_t */ wiring_required:1,        /* All memory wired? */
-	/* boolean_t */ no_zero_fill:1,           /* No zero fill absent pages */
-	/* boolean_t */ mapped_in_other_pmaps:1,  /* has this submap been mapped in maps that use a different pmap */
-	/* boolean_t */ switch_protect:1,         /* Protect map from write faults while switched */
-	/* boolean_t */ disable_vmentry_reuse:1,  /* All vm entries should keep using newer and higher addresses in the map */
-	/* boolean_t */ map_disallow_data_exec:1, /* Disallow execution from data pages on exec-permissive architectures */
-	/* boolean_t */ holelistenabled:1,
-	/* boolean_t */ is_nested_map:1,
-	/* boolean_t */ map_disallow_new_exec:1, /* Disallow new executable code */
-	/* boolean_t */ jit_entry_exists:1,
-	/* boolean_t */ has_corpse_footprint:1,
-	/* boolean_t */ terminated:1,
-	/* boolean_t */ is_alien:1,              /* for platform simulation, i.e. PLATFORM_IOS on OSX */
-	/* boolean_t */ cs_enforcement:1,        /* code-signing enforcement */
-	/* boolean_t */ cs_debugged:1,           /* code-signed but debugged */
-	/* boolean_t */ reserved_regions:1,      /* has reserved regions. The map size that userspace sees should ignore these. */
-	/* boolean_t */ single_jit:1,        /* only allow one JIT mapping */
-	/* reserved */ pad:14;
-	unsigned int            timestamp;      /* Version number */
+	                wait_for_space:1,                                             
+	                wiring_required:1,                               
+	                no_zero_fill:1,                                          
+	                mapped_in_other_pmaps:1,                                                                     
+	                switch_protect:1,                                                           
+	                disable_vmentry_reuse:1,                                                                              
+	                map_disallow_data_exec:1,                                                                          
+	                holelistenabled:1,
+	                is_nested_map:1,
+	                map_disallow_new_exec:1,                                   
+	                jit_entry_exists:1,
+	                has_corpse_footprint:1,
+	                terminated:1,
+	                is_alien:1,                                                                     
+	                cs_enforcement:1,                                      
+	                cs_debugged:1,                                         
+	                reserved_regions:1,                                                                                       
+	                single_jit:1,                                        
+	               pad:14;
+	unsigned int            timestamp;                          
 };
 
 #define CAST_TO_VM_MAP_ENTRY(x) ((struct vm_map_entry *)(uintptr_t)(x))
@@ -533,58 +533,58 @@ struct _vm_map {
 #define vm_map_first_entry(map) ((map)->hdr.links.next)
 #define vm_map_last_entry(map)  ((map)->hdr.links.prev)
 
-/*
- *	Type:		vm_map_version_t [exported; contents invisible]
- *
- *	Description:
- *		Map versions may be used to quickly validate a previous
- *		lookup operation.
- *
- *	Usage note:
- *		Because they are bulky objects, map versions are usually
- *		passed by reference.
- *
- *	Implementation:
- *		Just a timestamp for the main map.
- */
+  
+                                                         
+  
+               
+                                                           
+                     
+  
+              
+                                                            
+                        
+  
+                  
+                                      
+   
 typedef struct vm_map_version {
 	unsigned int    main_timestamp;
 } vm_map_version_t;
 
-/*
- *	Type:		vm_map_copy_t [exported; contents invisible]
- *
- *	Description:
- *		A map copy object represents a region of virtual memory
- *		that has been copied from an address map but is still
- *		in transit.
- *
- *		A map copy object may only be used by a single thread
- *		at a time.
- *
- *	Implementation:
- *              There are three formats for map copy objects.
- *		The first is very similar to the main
- *		address map in structure, and as a result, some
- *		of the internal maintenance functions/macros can
- *		be used with either address maps or map copy objects.
- *
- *		The map copy object contains a header links
- *		entry onto which the other entries that represent
- *		the region are chained.
- *
- *		The second format is a single vm object.  This was used
- *		primarily in the pageout path - but is not currently used
- *		except for placeholder copy objects (see vm_map_copy_copy()).
- *
- *		The third format is a kernel buffer copy object - for data
- *              small enough that physical copies were the most efficient
- *		method. This method uses a zero-sized array unioned with
- *		other format-specific data in the 'c_u' member. This unsized
- *		array overlaps the other elements and allows us to use this
- *		extra structure space for physical memory copies. On 64-bit
- *		systems this saves ~64 bytes per vm_map_copy.
- */
+  
+                                                      
+  
+               
+                                                           
+                                                         
+               
+  
+                                                         
+              
+  
+                  
+                                                             
+                                         
+                                                   
+                                                    
+                                                         
+  
+                                               
+                                                     
+                           
+  
+                                                           
+                                                             
+                                                                 
+  
+                                                              
+                                                                         
+                                                            
+                                                                
+                                                               
+                                                               
+                                                 
+   
 
 struct vm_map_copy {
 	int                     type;
@@ -594,9 +594,9 @@ struct vm_map_copy {
 	vm_object_offset_t      offset;
 	vm_map_size_t           size;
 	union {
-		struct vm_map_header                  hdr;    /* ENTRY_LIST */
-		vm_object_t                           object; /* OBJECT */
-		void *XNU_PTRAUTH_SIGNED_PTR("vm_map_copy.kdata") kdata;  /* KERNEL_BUFFER */
+		struct vm_map_header                  hdr;                    
+		vm_object_t                           object;             
+		void *XNU_PTRAUTH_SIGNED_PTR("vm_map_copy.kdata") kdata;                     
 	} c_u;
 };
 
@@ -610,9 +610,9 @@ struct vm_map_copy {
 #define VM_MAP_COPY_PAGE_SIZE(copy) (1 << VM_MAP_COPY_PAGE_SHIFT((copy)))
 #define VM_MAP_COPY_PAGE_MASK(copy) (VM_MAP_COPY_PAGE_SIZE((copy)) - 1)
 
-/*
- *	Useful macros for entry list copy objects
- */
+  
+                                            
+   
 
 #define vm_map_copy_to_entry(copy) CAST_TO_VM_MAP_ENTRY(&(copy)->cpy_hdr.links)
 #define vm_map_copy_first_entry(copy)           \
@@ -632,13 +632,13 @@ vm_map_copy_adjust_to_target(
 	vm_map_offset_t         *overmap_end_p,
 	vm_map_offset_t         *trimmed_start_p);
 
-/*
- *	Macros:		vm_map_lock, etc. [internal use only]
- *	Description:
- *		Perform locking on the data portion of a map.
- *	When multiple maps are to be locked, order by map address.
- *	(See vm_map.c::vm_remap())
- */
+  
+                                                 
+               
+                                                 
+                                                             
+                             
+   
 
 #define vm_map_lock_init(map)                                           \
 	((map)->timestamp = 0 ,                                         \
@@ -697,35 +697,35 @@ int vm_self_region_page_shift_safely(vm_map_t target_map);
 	lck_rw_assert(&(map)->lock, LCK_RW_ASSERT_EXCLUSIVE)
 #define vm_map_lock_assert_notheld(map) \
 	lck_rw_assert(&(map)->lock, LCK_RW_ASSERT_NOTHELD)
-#else  /* MACH_ASSERT || DEBUG */
+#else                            
 #define vm_map_lock_assert_held(map)
 #define vm_map_lock_assert_shared(map)
 #define vm_map_lock_assert_exclusive(map)
 #define vm_map_lock_assert_notheld(map)
-#endif /* MACH_ASSERT || DEBUG */
+#endif                           
 
-/*
- *	Exported procedures that operate on vm_map_t.
- */
+  
+                                                
+   
 
-/* Initialize the module */
+                           
 extern void             vm_map_init(void);
 
 extern void             vm_kernel_reserved_entry_init(void);
 
-/* Allocate a range in the specified virtual address map and
- * return the entry allocated for that range. */
+                                                            
+                                                
 extern kern_return_t vm_map_find_space(
 	vm_map_t                map,
-	vm_map_address_t        *address,                               /* OUT */
+	vm_map_address_t        *address,                                        
 	vm_map_size_t           size,
 	vm_map_offset_t         mask,
 	int                     flags,
 	vm_map_kernel_flags_t   vmk_flags,
 	vm_tag_t                tag,
-	vm_map_entry_t          *o_entry);                              /* OUT */
+	vm_map_entry_t          *o_entry);                                       
 
-/* flags for vm_map_find_space */
+                                 
 #define VM_MAP_FIND_LAST_FREE              0x01
 
 extern void vm_map_clip_start(
@@ -739,11 +739,11 @@ extern void vm_map_clip_end(
 extern boolean_t vm_map_entry_should_cow_for_true_share(
 	vm_map_entry_t  entry);
 
-/* Lookup map entry containing or the specified address in the given map */
+                                                                           
 extern boolean_t        vm_map_lookup_entry(
 	vm_map_t                map,
 	vm_map_address_t        address,
-	vm_map_entry_t          *entry);                                /* OUT */
+	vm_map_entry_t          *entry);                                         
 
 extern void             vm_map_copy_remap(
 	vm_map_t                map,
@@ -754,26 +754,26 @@ extern void             vm_map_copy_remap(
 	vm_prot_t               max_prot,
 	vm_inherit_t            inheritance);
 
-/* Find the VM object, offset, and protection for a given virtual address
- * in the specified map, assuming a page fault of the	type specified. */
+                                                                         
+                                                                        
 extern kern_return_t    vm_map_lookup_locked(
-	vm_map_t                *var_map,                               /* IN/OUT */
+	vm_map_t                *var_map,                                           
 	vm_map_address_t        vaddr,
 	vm_prot_t               fault_type,
 	int                     object_lock_type,
-	vm_map_version_t        *out_version,                           /* OUT */
-	vm_object_t             *object,                                /* OUT */
-	vm_object_offset_t      *offset,                                /* OUT */
-	vm_prot_t               *out_prot,                              /* OUT */
-	boolean_t               *wired,                                 /* OUT */
-	vm_object_fault_info_t  fault_info,                             /* OUT */
-	vm_map_t                *real_map,                              /* OUT */
-	bool                    *contended);                            /* OUT */
+	vm_map_version_t        *out_version,                                    
+	vm_object_t             *object,                                         
+	vm_object_offset_t      *offset,                                         
+	vm_prot_t               *out_prot,                                       
+	boolean_t               *wired,                                          
+	vm_object_fault_info_t  fault_info,                                      
+	vm_map_t                *real_map,                                       
+	bool                    *contended);                                     
 
-/* Verifies that the map has not changed since the given version. */
+                                                                    
 extern boolean_t        vm_map_verify(
 	vm_map_t                map,
-	vm_map_version_t        *version);                              /* REF */
+	vm_map_version_t        *version);                                       
 
 extern vm_map_entry_t   vm_map_entry_insert(
 	vm_map_t                map,
@@ -802,33 +802,33 @@ extern vm_map_entry_t   vm_map_entry_insert(
 	boolean_t               translated_allow_execute);
 
 
-/*
- *	Functions implemented as macros
- */
+  
+                                  
+   
 #define         vm_map_min(map) ((map)->min_offset)
-/* Lowest valid address in
- * a map */
+                          
+           
 
 #define         vm_map_max(map) ((map)->max_offset)
-/* Highest valid address */
+                           
 
 #define         vm_map_pmap(map)        ((map)->pmap)
-/* Physical map associated
-* with this address map */
+                          
+                          
 
-/* Gain a reference to an existing map */
+                                         
 extern void             vm_map_reference(
 	vm_map_t        map);
 
-/*
- *	Submap object.  Must be used to create memory to be put
- *	in a submap by vm_map_submap.
- */
+  
+                                                          
+                                
+   
 extern vm_object_t      vm_submap_object;
 
-/*
- *	Wait and wakeup macros for in_transition map entries.
- */
+  
+                                                        
+   
 #define vm_map_entry_wait(map, interruptible)           \
 	((map)->timestamp++ ,                           \
 	 lck_rw_sleep(&(map)->lock, LCK_SLEEP_EXCLUSIVE|LCK_SLEEP_PROMOTED_PRI, \
@@ -839,7 +839,7 @@ extern vm_object_t      vm_submap_object;
 	thread_wakeup((event_t)(&(map)->hdr))
 
 
-/* simplify map entries */
+                          
 extern void             vm_map_simplify_entry(
 	vm_map_t        map,
 	vm_map_entry_t  this_entry);
@@ -847,23 +847,23 @@ extern void             vm_map_simplify(
 	vm_map_t                map,
 	vm_map_offset_t         start);
 
-/* Move the information in a map copy object to a new map copy object */
+                                                                        
 extern vm_map_copy_t    vm_map_copy_copy(
 	vm_map_copy_t           copy);
 
-/* Create a copy object from an object. */
+                                          
 extern kern_return_t    vm_map_copyin_object(
 	vm_object_t             object,
 	vm_object_offset_t      offset,
 	vm_object_size_t        size,
-	vm_map_copy_t           *copy_result);                         /* OUT */
+	vm_map_copy_t           *copy_result);                                  
 
 extern kern_return_t    vm_map_random_address_for_size(
 	vm_map_t        map,
 	vm_map_offset_t *address,
 	vm_map_size_t   size);
 
-/* Enter a mapping */
+                     
 extern kern_return_t    vm_map_enter(
 	vm_map_t                map,
 	vm_map_offset_t         *address,
@@ -894,9 +894,9 @@ extern kern_return_t    vm_map_enter_fourk(
 	vm_prot_t               cur_protection,
 	vm_prot_t               max_protection,
 	vm_inherit_t            inheritance);
-#endif /* __arm64__ */
+#endif                
 
-/* XXX should go away - replaced with regular enter of contig object */
+                                                                       
 extern  kern_return_t   vm_map_enter_cpm(
 	vm_map_t                map,
 	vm_map_address_t        *addr,
@@ -919,9 +919,9 @@ extern kern_return_t vm_map_remap(
 	vm_inherit_t            inheritance);
 
 
-/*
- * Read and write from a kernel buffer to a specified map.
- */
+  
+                                                          
+   
 extern  kern_return_t   vm_map_write_user(
 	vm_map_t                map,
 	void                    *src_p,
@@ -934,7 +934,7 @@ extern  kern_return_t   vm_map_read_user(
 	void                    *dst_p,
 	vm_size_t               size);
 
-/* Create a new task map using an existing task map as a template. */
+                                                                     
 extern vm_map_t         vm_map_fork(
 	ledger_t                ledger,
 	vm_map_t                old_map,
@@ -943,20 +943,20 @@ extern vm_map_t         vm_map_fork(
 #define VM_MAP_FORK_PRESERVE_PURGEABLE          0x00000002
 #define VM_MAP_FORK_CORPSE_FOOTPRINT            0x00000004
 
-/* Change inheritance */
+                        
 extern kern_return_t    vm_map_inherit(
 	vm_map_t                map,
 	vm_map_offset_t         start,
 	vm_map_offset_t         end,
 	vm_inherit_t            new_inheritance);
 
-/* Add or remove machine-dependent attributes from map regions */
+                                                                 
 extern kern_return_t    vm_map_machine_attribute(
 	vm_map_t                map,
 	vm_map_offset_t         start,
 	vm_map_offset_t         end,
 	vm_machine_attribute_t  attribute,
-	vm_machine_attribute_val_t* value);                         /* IN/OUT */
+	vm_machine_attribute_val_t* value);                                     
 
 extern kern_return_t    vm_map_msync(
 	vm_map_t                map,
@@ -964,7 +964,7 @@ extern kern_return_t    vm_map_msync(
 	vm_map_size_t           size,
 	vm_sync_t               sync_flags);
 
-/* Set paging behavior */
+                         
 extern kern_return_t    vm_map_behavior_set(
 	vm_map_t                map,
 	vm_map_offset_t         start,
@@ -1017,11 +1017,11 @@ extern void vm_map_submap_pmap_clean(
 	vm_map_t        sub_map,
 	vm_map_offset_t offset);
 
-/* Convert from a map entry port to a map */
+                                            
 extern vm_map_t convert_port_entry_to_map(
 	ipc_port_t      port);
 
-/* Convert from a port to a vm_object */
+                                        
 extern vm_object_t convert_port_entry_to_object(
 	ipc_port_t      port);
 
@@ -1031,7 +1031,7 @@ extern kern_return_t vm_map_set_cache_attr(
 	vm_map_offset_t va);
 
 
-/* definitions related to overriding the NX behavior */
+                                                       
 
 #define VM_ABI_32       0x1
 #define VM_ABI_64       0x2
@@ -1062,30 +1062,30 @@ extern void vm_map_copy_ledger(
 	task_t  new_task,
 	int     ledger_entry);
 
-/**
- * Represents a single region of virtual address space that should be reserved
- * (pre-mapped) in a user address space.
- */
+   
+                                                                              
+                                        
+   
 struct vm_reserved_region {
 	char            *vmrr_name;
 	vm_map_offset_t vmrr_addr;
 	vm_map_size_t   vmrr_size;
 };
 
-/**
- * Return back a machine-dependent array of address space regions that should be
- * reserved by the VM. This function is defined in the machine-dependent
- * machine_routines.c files.
- */
+   
+                                                                                
+                                                                        
+                            
+   
 extern size_t ml_get_vm_reserved_regions(
 	bool vm_is64bit,
 	struct vm_reserved_region **regions);
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 __BEGIN_DECLS
 
-/* Create an empty map */
+                         
 extern vm_map_t         vm_map_create(
 	pmap_t                  pmap,
 	vm_map_offset_t         min_off,
@@ -1105,27 +1105,27 @@ extern vm_map_size_t    vm_map_adjusted_size(vm_map_t map);
 
 extern void             vm_map_disable_hole_optimization(vm_map_t map);
 
-/* Get rid of a map */
+                      
 extern void             vm_map_destroy(
 	vm_map_t                map,
 	int                     flags);
 
-/* Lose a reference */
+                      
 extern void             vm_map_deallocate(
 	vm_map_t                map);
 
-/* Lose a reference */
+                      
 extern void             vm_map_inspect_deallocate(
 	vm_map_inspect_t        map);
 
-/* Lose a reference */
+                      
 extern void             vm_map_read_deallocate(
 	vm_map_read_t        map);
 
 extern vm_map_t         vm_map_switch(
 	vm_map_t                map);
 
-/* Change protection */
+                       
 extern kern_return_t    vm_map_protect(
 	vm_map_t                map,
 	vm_map_offset_t         start,
@@ -1133,7 +1133,7 @@ extern kern_return_t    vm_map_protect(
 	vm_prot_t               new_prot,
 	boolean_t               set_max);
 
-/* Check protection */
+                      
 extern boolean_t vm_map_check_protection(
 	vm_map_t                map,
 	vm_map_offset_t         start,
@@ -1152,7 +1152,7 @@ extern void vm_map_cs_debugged_set(
 
 extern kern_return_t vm_map_cs_wx_enable(vm_map_t map);
 
-/* wire down a region */
+                        
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -1172,7 +1172,7 @@ extern kern_return_t    vm_map_wire_and_extract_kernel(
 	boolean_t               user_wire,
 	ppnum_t                 *physpage_p);
 
-/* kext exported versions */
+                            
 
 extern kern_return_t    vm_map_wire_external(
 	vm_map_t                map,
@@ -1188,7 +1188,7 @@ extern kern_return_t    vm_map_wire_and_extract_external(
 	boolean_t               user_wire,
 	ppnum_t                 *physpage_p);
 
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 
 extern kern_return_t    vm_map_wire(
 	vm_map_t                map,
@@ -1204,9 +1204,9 @@ extern kern_return_t    vm_map_wire_and_extract(
 	boolean_t               user_wire,
 	ppnum_t                 *physpage_p);
 
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 
-/* unwire a region */
+                     
 extern kern_return_t    vm_map_unwire(
 	vm_map_t                map,
 	vm_map_offset_t         start,
@@ -1215,7 +1215,7 @@ extern kern_return_t    vm_map_unwire(
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/* Enter a mapping of a memory object */
+                                        
 extern kern_return_t    vm_map_enter_mem_object(
 	vm_map_t                map,
 	vm_map_offset_t         *address,
@@ -1231,7 +1231,7 @@ extern kern_return_t    vm_map_enter_mem_object(
 	vm_prot_t               max_protection,
 	vm_inherit_t            inheritance);
 
-/* Enter a mapping of a memory object */
+                                        
 extern kern_return_t    vm_map_enter_mem_object_prefault(
 	vm_map_t                map,
 	vm_map_offset_t         *address,
@@ -1247,7 +1247,7 @@ extern kern_return_t    vm_map_enter_mem_object_prefault(
 	upl_page_list_ptr_t     page_list,
 	unsigned int            page_list_count);
 
-/* Enter a mapping of a memory object */
+                                        
 extern kern_return_t    vm_map_enter_mem_object_control(
 	vm_map_t                map,
 	vm_map_offset_t         *address,
@@ -1269,27 +1269,27 @@ extern kern_return_t    vm_map_terminate(
 extern void             vm_map_require(
 	vm_map_t                map);
 
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 
-/* Deallocate a region */
+                         
 extern kern_return_t    vm_map_remove(
 	vm_map_t                map,
 	vm_map_offset_t         start,
 	vm_map_offset_t         end,
 	boolean_t               flags);
 
-/* Deallocate a region when the map is already locked */
+                                                        
 extern kern_return_t    vm_map_remove_locked(
 	vm_map_t        map,
 	vm_map_offset_t     start,
 	vm_map_offset_t     end,
 	boolean_t       flags);
 
-/* Discard a copy without using it */
+                                     
 extern void             vm_map_copy_discard(
 	vm_map_copy_t           copy);
 
-/* Overwrite existing memory with a copy */
+                                           
 extern kern_return_t    vm_map_copy_overwrite(
 	vm_map_t                dst_map,
 	vm_map_address_t        dst_addr,
@@ -1300,27 +1300,27 @@ extern kern_return_t    vm_map_copy_overwrite(
 #define VM_MAP_COPY_OVERWRITE_OPTIMIZATION_THRESHOLD_PAGES      (3)
 
 
-/* returns TRUE if size of vm_map_copy == size parameter FALSE otherwise */
+                                                                           
 extern boolean_t        vm_map_copy_validate_size(
 	vm_map_t                dst_map,
 	vm_map_copy_t           copy,
 	vm_map_size_t           *size);
 
-/* Place a copy into a map */
+                             
 extern kern_return_t    vm_map_copyout(
 	vm_map_t                dst_map,
-	vm_map_address_t        *dst_addr,                              /* OUT */
+	vm_map_address_t        *dst_addr,                                       
 	vm_map_copy_t           copy);
 
 extern kern_return_t vm_map_copyout_size(
 	vm_map_t                dst_map,
-	vm_map_address_t        *dst_addr,                              /* OUT */
+	vm_map_address_t        *dst_addr,                                       
 	vm_map_copy_t           copy,
 	vm_map_size_t           copy_size);
 
 extern kern_return_t    vm_map_copyout_internal(
 	vm_map_t                dst_map,
-	vm_map_address_t        *dst_addr,      /* OUT */
+	vm_map_address_t        *dst_addr,               
 	vm_map_copy_t           copy,
 	vm_map_size_t           copy_size,
 	boolean_t               consume_on_success,
@@ -1333,7 +1333,7 @@ extern kern_return_t    vm_map_copyin(
 	vm_map_address_t        src_addr,
 	vm_map_size_t           len,
 	boolean_t                       src_destroy,
-	vm_map_copy_t           *copy_result);                          /* OUT */
+	vm_map_copy_t           *copy_result);                                   
 
 extern kern_return_t    vm_map_copyin_common(
 	vm_map_t                src_map,
@@ -1341,7 +1341,7 @@ extern kern_return_t    vm_map_copyin_common(
 	vm_map_size_t           len,
 	boolean_t               src_destroy,
 	boolean_t               src_volatile,
-	vm_map_copy_t           *copy_result,                           /* OUT */
+	vm_map_copy_t           *copy_result,                                    
 	boolean_t               use_maxprot);
 
 #define VM_MAP_COPYIN_SRC_DESTROY       0x00000001
@@ -1354,16 +1354,16 @@ extern kern_return_t    vm_map_copyin_internal(
 	vm_map_address_t        src_addr,
 	vm_map_size_t           len,
 	int                     flags,
-	vm_map_copy_t           *copy_result);                         /* OUT */
+	vm_map_copy_t           *copy_result);                                  
 
 extern kern_return_t    vm_map_copy_extract(
 	vm_map_t                src_map,
 	vm_map_address_t        src_addr,
 	vm_map_size_t           len,
 	boolean_t               copy,
-	vm_map_copy_t           *copy_result,   /* OUT */
-	vm_prot_t               *cur_prot,      /* OUT */
-	vm_prot_t               *max_prot,      /* OUT */
+	vm_map_copy_t           *copy_result,            
+	vm_prot_t               *cur_prot,               
+	vm_prot_t               *max_prot,               
 	vm_inherit_t            inheritance,
 	vm_map_kernel_flags_t   vmk_flags);
 
@@ -1417,7 +1417,7 @@ extern kern_return_t    vm_map_raise_min_offset(
 extern void vm_map_set_high_start(
 	vm_map_t        map,
 	vm_map_offset_t high_start);
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 extern vm_map_offset_t  vm_compute_max_offset(
 	boolean_t               is64);
@@ -1492,7 +1492,7 @@ mach_vm_range_overflows(mach_vm_offset_t addr, mach_vm_size_t size)
 #if XNU_TARGET_OS_OSX
 extern void vm_map_mark_alien(vm_map_t map);
 extern void vm_map_single_jit(vm_map_t map);
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 extern kern_return_t vm_map_page_info(
 	vm_map_t                map,
@@ -1508,20 +1508,20 @@ extern kern_return_t vm_map_page_range_info_internal(
 	vm_page_info_flavor_t   flavor,
 	vm_page_info_t          info,
 	mach_msg_type_number_t  *count);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 
 #ifdef  MACH_KERNEL_PRIVATE
 
-/*
- *	Macros to invoke vm_map_copyin_common.  vm_map_copyin is the
- *	usual form; it handles a copyin based on the current protection
- *	(current protection == VM_PROT_NONE) is a failure.
- *	vm_map_copyin_maxprot handles a copyin based on maximum possible
- *	access.  The difference is that a region with no current access
- *	BUT possible maximum access is rejected by vm_map_copyin(), but
- *	returned by vm_map_copyin_maxprot.
- */
+  
+                                                               
+                                                                  
+                                                     
+                                                                   
+                                                                  
+                                                                  
+                                     
+   
 #define vm_map_copyin(src_map, src_addr, len, src_destroy, copy_result) \
 	        vm_map_copyin_common(src_map, src_addr, len, src_destroy, \
 	                                FALSE, copy_result, FALSE)
@@ -1532,15 +1532,15 @@ extern kern_return_t vm_map_page_range_info_internal(
 	                                FALSE, copy_result, TRUE)
 
 
-/*
- * Internal macros for rounding and truncation of vm_map offsets and sizes
- */
+  
+                                                                          
+   
 #define VM_MAP_ROUND_PAGE(x, pgmask) (((vm_map_offset_t)(x) + (pgmask)) & ~((signed)(pgmask)))
 #define VM_MAP_TRUNC_PAGE(x, pgmask) ((vm_map_offset_t)(x) & ~((signed)(pgmask)))
 
-/*
- * Macros for rounding and truncation of vm_map offsets and sizes
- */
+  
+                                                                 
+   
 #define VM_MAP_PAGE_SHIFT(map) ((map) ? (map)->hdr.page_shift : PAGE_SHIFT)
 #define VM_MAP_PAGE_SIZE(map) (1 << VM_MAP_PAGE_SHIFT((map)))
 #define VM_MAP_PAGE_MASK(map) (VM_MAP_PAGE_SIZE((map)) - 1)
@@ -1555,7 +1555,7 @@ VM_MAP_IS_EXOTIC(
 	    pmap_is_exotic(map->pmap)) {
 		return true;
 	}
-#endif /* __arm64__ */
+#endif                
 	return false;
 }
 
@@ -1563,18 +1563,18 @@ static inline bool
 VM_MAP_IS_ALIEN(
 	vm_map_t map __unused)
 {
-	/*
-	 * An "alien" process/task/map/pmap should mostly behave
-	 * as it currently would on iOS.
-	 */
+	  
+                                                         
+                                 
+    
 #if XNU_TARGET_OS_OSX
 	if (map->is_alien) {
 		return true;
 	}
 	return false;
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 	return true;
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 }
 
 static inline bool
@@ -1650,12 +1650,12 @@ VM_MAP_POLICY_WRITABLE_SHARED_REGION(
 {
 #if __x86_64__
 	return true;
-#else /* __x86_64__ */
+#else                 
 	if (VM_MAP_IS_EXOTIC(map)) {
 		return true;
 	}
 	return false;
-#endif /* __x86_64__ */
+#endif                 
 }
 
 static inline void
@@ -1676,20 +1676,20 @@ vm_prot_to_wimg(unsigned int prot, unsigned int *wimg)
 	}
 }
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 #ifdef XNU_KERNEL_PRIVATE
 extern kern_return_t vm_map_set_page_shift(vm_map_t map, int pageshift);
 extern bool vm_map_is_exotic(vm_map_t map);
 extern bool vm_map_is_alien(vm_map_t map);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #define vm_map_round_page(x, pgmask) (((vm_map_offset_t)(x) + (pgmask)) & ~((signed)(pgmask)))
 #define vm_map_trunc_page(x, pgmask) ((vm_map_offset_t)(x) & ~((signed)(pgmask)))
 
-/*
- * Flags for vm_map_remove() and vm_map_delete()
- */
+  
+                                                
+   
 #define VM_MAP_REMOVE_NO_FLAGS          0x0
 #define VM_MAP_REMOVE_KUNWIRE           0x1
 #define VM_MAP_REMOVE_INTERRUPTIBLE     0x2
@@ -1701,7 +1701,7 @@ extern bool vm_map_is_alien(vm_map_t map);
 #define VM_MAP_REMOVE_IMMUTABLE         0x80
 #define VM_MAP_REMOVE_GAPS_OK           0x100
 
-/* Support for UPLs from vm_maps */
+                                   
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -1716,7 +1716,7 @@ extern kern_return_t vm_map_get_upl(
 	vm_tag_t                tag,
 	int                     force_data_sync);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 extern void
 vm_map_sizes(vm_map_t map,
@@ -1770,14 +1770,14 @@ extern kern_return_t vm_map_freeze(
 
 __END_DECLS
 
-/*
- * In some cases, we don't have a real VM object but still want to return a
- * unique ID (to avoid a memory region looking like shared memory), so build
- * a fake pointer based on the map's ledger and the index of the ledger being
- * reported.
- */
+  
+                                                                           
+                                                                            
+                                                                             
+            
+   
 #define VM_OBJECT_ID_FAKE(map, ledger_id) ((uint32_t)(uintptr_t)VM_KERNEL_ADDRPERM((int*)((map)->pmap->ledger)+(ledger_id)))
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
-#endif  /* _VM_VM_MAP_H_ */
+#endif                     

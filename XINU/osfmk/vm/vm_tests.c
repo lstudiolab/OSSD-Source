@@ -55,7 +55,7 @@ vm_map_copy_adjust_to_target(
 #define VM_TEST_PAGE_WIRE_OVERFLOW_PANIC        0
 #if __arm64__
 #define VM_TEST_KERNEL_OBJECT_FAULT             0
-#endif /* __arm64__ */
+#endif                
 #define VM_TEST_DEVICE_PAGER_TRANSPOSE          (DEVELOPMENT || DEBUG)
 
 #if VM_TEST_COLLAPSE_COMPRESSOR
@@ -72,13 +72,13 @@ vm_test_collapse_compressor(void)
 
 	printf("VM_TEST_COLLAPSE_COMPRESSOR:\n");
 
-	/* create backing object */
+	                           
 	backing_size = 15 * PAGE_SIZE;
 	backing_object = vm_object_allocate(backing_size);
 	assert(backing_object != VM_OBJECT_NULL);
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: created backing object %p\n",
 	    backing_object);
-	/* map backing object */
+	                        
 	backing_offset = 0;
 	kr = vm_map_enter(kernel_map, &backing_offset, backing_size, 0,
 	    VM_FLAGS_ANYWHERE, VM_MAP_KERNEL_FLAGS_NONE,
@@ -89,7 +89,7 @@ vm_test_collapse_compressor(void)
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: "
 	    "mapped backing object %p at 0x%llx\n",
 	    backing_object, (uint64_t) backing_offset);
-	/* populate with pages to be compressed in backing object */
+	                                                            
 	backing_address[0x1 * PAGE_SIZE] = 0xB1;
 	backing_address[0x4 * PAGE_SIZE] = 0xB4;
 	backing_address[0x7 * PAGE_SIZE] = 0xB7;
@@ -98,17 +98,17 @@ vm_test_collapse_compressor(void)
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: "
 	    "populated pages to be compressed in "
 	    "backing_object %p\n", backing_object);
-	/* compress backing object */
+	                             
 	vm_object_pageout(backing_object);
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: compressing backing_object %p\n",
 	    backing_object);
-	/* wait for all the pages to be gone */
+	                                       
 	while (*(volatile int *)&backing_object->resident_page_count != 0) {
 		IODelay(10);
 	}
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: backing_object %p compressed\n",
 	    backing_object);
-	/* populate with pages to be resident in backing object */
+	                                                          
 	backing_address[0x0 * PAGE_SIZE] = 0xB0;
 	backing_address[0x3 * PAGE_SIZE] = 0xB3;
 	backing_address[0x6 * PAGE_SIZE] = 0xB6;
@@ -117,18 +117,18 @@ vm_test_collapse_compressor(void)
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: "
 	    "populated pages to be resident in "
 	    "backing_object %p\n", backing_object);
-	/* leave the other pages absent */
-	/* mess with the paging_offset of the backing_object */
+	                                  
+	                                                       
 	assert(backing_object->paging_offset == 0);
 	backing_object->paging_offset = 3 * PAGE_SIZE;
 
-	/* create top object */
+	                       
 	top_size = 9 * PAGE_SIZE;
 	top_object = vm_object_allocate(top_size);
 	assert(top_object != VM_OBJECT_NULL);
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: created top object %p\n",
 	    top_object);
-	/* map top object */
+	                    
 	top_offset = 0;
 	kr = vm_map_enter(kernel_map, &top_offset, top_size, 0,
 	    VM_FLAGS_ANYWHERE, VM_MAP_KERNEL_FLAGS_NONE,
@@ -139,40 +139,40 @@ vm_test_collapse_compressor(void)
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: "
 	    "mapped top object %p at 0x%llx\n",
 	    top_object, (uint64_t) top_offset);
-	/* populate with pages to be compressed in top object */
+	                                                        
 	top_address[0x3 * PAGE_SIZE] = 0xA3;
 	top_address[0x4 * PAGE_SIZE] = 0xA4;
 	top_address[0x5 * PAGE_SIZE] = 0xA5;
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: "
 	    "populated pages to be compressed in "
 	    "top_object %p\n", top_object);
-	/* compress top object */
+	                         
 	vm_object_pageout(top_object);
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: compressing top_object %p\n",
 	    top_object);
-	/* wait for all the pages to be gone */
+	                                       
 	while (top_object->resident_page_count != 0) {
 		IODelay(10);
 	}
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: top_object %p compressed\n",
 	    top_object);
-	/* populate with pages to be resident in top object */
+	                                                      
 	top_address[0x0 * PAGE_SIZE] = 0xA0;
 	top_address[0x1 * PAGE_SIZE] = 0xA1;
 	top_address[0x2 * PAGE_SIZE] = 0xA2;
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: "
 	    "populated pages to be resident in "
 	    "top_object %p\n", top_object);
-	/* leave the other pages absent */
+	                                  
 
-	/* link the 2 objects */
+	                        
 	vm_object_reference(backing_object);
 	top_object->shadow = backing_object;
 	top_object->vo_shadow_offset = 3 * PAGE_SIZE;
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: linked %p and %p\n",
 	    top_object, backing_object);
 
-	/* unmap backing object */
+	                          
 	vm_map_remove(kernel_map,
 	    backing_offset,
 	    backing_offset + backing_size,
@@ -183,14 +183,14 @@ vm_test_collapse_compressor(void)
 	    (uint64_t) backing_offset,
 	    (uint64_t) (backing_offset + backing_size));
 
-	/* collapse */
+	              
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: collapsing %p\n", top_object);
 	vm_object_lock(top_object);
 	vm_object_collapse(top_object, 0, FALSE);
 	vm_object_unlock(top_object);
 	printf("VM_TEST_COLLAPSE_COMPRESSOR: collapsed %p\n", top_object);
 
-	/* did it work? */
+	                  
 	if (top_object->shadow != VM_OBJECT_NULL) {
 		printf("VM_TEST_COLLAPSE_COMPRESSOR: not collapsed\n");
 		printf("VM_TEST_COLLAPSE_COMPRESSOR: FAIL\n");
@@ -198,13 +198,13 @@ vm_test_collapse_compressor(void)
 			panic("VM_TEST_COLLAPSE_COMPRESSOR: FAIL\n");
 		}
 	} else {
-		/* check the contents of the mapping */
+		                                       
 		unsigned char expect[9] =
-		{ 0xA0, 0xA1, 0xA2,             /* resident in top */
-		  0xA3, 0xA4, 0xA5,             /* compressed in top */
-		  0xB9,         /* resident in backing + shadow_offset */
-		  0xBD,         /* compressed in backing + shadow_offset + paging_offset */
-		  0x00 };                       /* absent in both */
+		{ 0xA0, 0xA1, 0xA2,                                  
+		  0xA3, 0xA4, 0xA5,                                    
+		  0xB9,                                                  
+		  0xBD,                                                                    
+		  0x00 };                                           
 		unsigned char actual[9];
 		unsigned int i, errors;
 
@@ -233,9 +233,9 @@ vm_test_collapse_compressor(void)
 		}
 	}
 }
-#else /* VM_TEST_COLLAPSE_COMPRESSOR */
+#else                                  
 #define vm_test_collapse_compressor()
-#endif /* VM_TEST_COLLAPSE_COMPRESSOR */
+#endif                                  
 
 #if VM_TEST_WIRE_AND_EXTRACT
 extern ledger_template_t        task_ledger_template;
@@ -327,9 +327,9 @@ vm_test_wire_and_extract(void)
 
 	printf("VM_TEST_WIRE_AND_EXTRACT: PASS\n");
 }
-#else /* VM_TEST_WIRE_AND_EXTRACT */
+#else                               
 #define vm_test_wire_and_extract()
-#endif /* VM_TEST_WIRE_AND_EXTRACT */
+#endif                               
 
 #if VM_TEST_PAGE_WIRE_OVERFLOW_PANIC
 static void
@@ -352,9 +352,9 @@ vm_test_page_wire_overflow_panic(void)
 	panic("FBDP(%p,%p): wire_count overflow not detected\n",
 	    object, page);
 }
-#else /* VM_TEST_PAGE_WIRE_OVERFLOW_PANIC */
+#else                                       
 #define vm_test_page_wire_overflow_panic()
-#endif /* VM_TEST_PAGE_WIRE_OVERFLOW_PANIC */
+#endif                                       
 
 #if __arm64__ && VM_TEST_KERNEL_OBJECT_FAULT
 extern int copyinframe(vm_address_t fp, char *frame, boolean_t is64bit);
@@ -387,9 +387,9 @@ vm_test_kernel_object_fault(void)
 	    VM_MAP_REMOVE_KUNWIRE);
 	stack = 0;
 }
-#else /* __arm64__ && VM_TEST_KERNEL_OBJECT_FAULT */
+#else                                               
 #define vm_test_kernel_object_fault()
-#endif /* __arm64__ && VM_TEST_KERNEL_OBJECT_FAULT */
+#endif                                               
 
 #if VM_TEST_DEVICE_PAGER_TRANSPOSE
 static void
@@ -409,11 +409,11 @@ vm_test_device_pager_transpose(void)
 	device_object = memory_object_to_vm_object(device_pager);
 	assert(device_object != VM_OBJECT_NULL);
 #if 0
-	/*
-	 * Can't actually map this, since another thread might do a
-	 * vm_map_enter() that gets coalesced into this object, which
-	 * would cause the test to fail.
-	 */
+	  
+                                                            
+                                                              
+                                 
+    
 	vm_map_offset_t anon_mapping = 0;
 	kr = vm_map_enter(kernel_map, &anon_mapping, size, 0,
 	    VM_FLAGS_ANYWHERE, VM_MAP_KERNEL_FLAGS_NONE, VM_KERN_MEMORY_NONE,
@@ -471,9 +471,9 @@ vm_test_device_pager_transpose(void)
 
 	printf("VM_TEST_DEVICE_PAGER_TRANSPOSE: PASS\n");
 }
-#else /* VM_TEST_DEVICE_PAGER_TRANSPOSE */
+#else                                     
 #define vm_test_device_pager_transpose()
-#endif /* VM_TEST_DEVICE_PAGER_TRANSPOSE */
+#endif                                     
 
 #if PMAP_CREATE_FORCE_4K_PAGES && MACH_ASSERT
 extern kern_return_t vm_allocate_external(vm_map_t        map,
@@ -655,11 +655,11 @@ vm_test_4k(void)
 	kr = vm_remap_external(test_map,
 	    &remap_dst_addr,
 	    remap_src_size,
-	    0,                    /* mask */
+	    0,                              
 	    VM_FLAGS_ANYWHERE,
 	    test_map,
 	    remap_src_addr,
-	    FALSE,                    /* copy */
+	    FALSE,                              
 	    &cur_prot,
 	    &max_prot,
 	    VM_INHERIT_DEFAULT);
@@ -692,11 +692,11 @@ vm_test_4k(void)
 	kr = vm_remap_external(kernel_map,
 	    &remap_dst_addr,
 	    remap_src_size,
-	    0,                    /* mask */
+	    0,                              
 	    VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR,
 	    test_map,
 	    remap_src_addr,
-	    FALSE,                    /* copy */
+	    FALSE,                              
 	    &cur_prot,
 	    &max_prot,
 	    VM_INHERIT_DEFAULT);
@@ -711,11 +711,11 @@ vm_test_4k(void)
 	kr = vm_remap_external(kernel_map,
 	    &remap_dst_addr,
 	    remap_src_size,
-	    0,                    /* mask */
+	    0,                              
 	    VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR,
 	    test_map,
 	    remap_src_addr,
-	    TRUE,                    /* copy */
+	    TRUE,                              
 	    &cur_prot,
 	    &max_prot,
 	    VM_INHERIT_DEFAULT);
@@ -732,11 +732,11 @@ vm_test_4k(void)
 	kr = vm_remap_external(kernel_map,
 	    &remap_dst_addr,
 	    remap_src_size,
-	    0,                    /* mask */
+	    0,                              
 	    VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR,
 	    test_map,
 	    remap_src_addr,
-	    FALSE,                    /* copy */
+	    FALSE,                              
 	    &cur_prot,
 	    &max_prot,
 	    VM_INHERIT_DEFAULT);
@@ -752,21 +752,21 @@ vm_test_4k(void)
 	kr = vm_remap_external(kernel_map,
 	    &remap_dst_addr,
 	    remap_src_size,
-	    0,                    /* mask */
+	    0,                              
 	    VM_FLAGS_ANYWHERE | VM_FLAGS_RETURN_DATA_ADDR,
 	    test_map,
 	    remap_src_addr,
-	    TRUE,                    /* copy */
+	    TRUE,                              
 	    &cur_prot,
 	    &max_prot,
 	    VM_INHERIT_DEFAULT);
 #if 000
 	assertf(kr != KERN_SUCCESS, "kr = 0x%x", kr);
 	printf("VM_TEST_4K: -> remap (COPY) in map %p at addr 0x%lx kr=0x%x\n", kernel_map, remap_dst_addr, kr);
-#else /* 000 */
+#else          
 	assertf(kr == KERN_SUCCESS, "kr = 0x%x", kr);
 	printf("VM_TEST_4K: -> remap (COPY) in map %p at addr 0x%lx kr=0x%x\n", kernel_map, remap_dst_addr, kr);
-#endif /* 000 */
+#endif          
 
 
 #if 00
@@ -780,7 +780,7 @@ vm_test_4k(void)
 
 	printf("VM_TEST_4K: PASS\n\n\n\n");
 }
-#endif /* PMAP_CREATE_FORCE_4K_PAGES && MACH_ASSERT */
+#endif                                                
 
 #if MACH_ASSERT
 static void
@@ -793,7 +793,7 @@ vm_test_map_copy_adjust_to_target_one(
 	vm_map_offset_t overmap_start, overmap_end, trimmed_start;
 
 	target_copy = VM_MAP_COPY_NULL;
-	/* size is 2 (4k) pages but range covers 3 pages */
+	                                                   
 	kr = vm_map_copy_adjust_to_target(copy_map,
 	    0x0 + 0xfff,
 	    0x1002,
@@ -812,19 +812,19 @@ vm_test_map_copy_adjust_to_target_one(
 	    target_copy, (uint64_t)target_copy->size);
 	vm_map_copy_discard(target_copy);
 
-	/* 1. adjust_to_target() for bad offset -> error */
-	/* 2. adjust_to_target() for bad size -> error */
-	/* 3. adjust_to_target() for the whole thing -> unchanged */
-	/* 4. adjust_to_target() to trim start by less than 1 page */
-	/* 5. adjust_to_target() to trim end by less than 1 page */
-	/* 6. adjust_to_target() to trim start and end by less than 1 page */
-	/* 7. adjust_to_target() to trim start by more than 1 page */
-	/* 8. adjust_to_target() to trim end by more than 1 page */
-	/* 9. adjust_to_target() to trim start and end by more than 1 page */
-	/* 10. adjust_to_target() to trim start by more than 1 entry */
-	/* 11. adjust_to_target() to trim start by more than 1 entry */
-	/* 12. adjust_to_target() to trim start and end by more than 1 entry */
-	/* 13. adjust_to_target() to trim start and end down to 1 entry */
+	                                                   
+	                                                 
+	                                                            
+	                                                             
+	                                                           
+	                                                                     
+	                                                             
+	                                                           
+	                                                                     
+	                                                               
+	                                                               
+	                                                                       
+	                                                                  
 }
 
 static void
@@ -838,21 +838,21 @@ vm_test_map_copy_adjust_to_target(void)
 	vm_map_copy_t copy4k, copy16k;
 	vm_prot_t curprot, maxprot;
 
-	/* create a 4k map */
+	                     
 	map4k = vm_map_create(PMAP_NULL, 0, (uint32_t)-1, TRUE);
 	vm_map_set_page_shift(map4k, 12);
 
-	/* create a 16k map */
+	                      
 	map16k = vm_map_create(PMAP_NULL, 0, (uint32_t)-1, TRUE);
 	vm_map_set_page_shift(map16k, 14);
 
-	/* create 4 VM objects */
+	                         
 	obj1 = vm_object_allocate(0x100000);
 	obj2 = vm_object_allocate(0x100000);
 	obj3 = vm_object_allocate(0x100000);
 	obj4 = vm_object_allocate(0x100000);
 
-	/* map objects in 4k map */
+	                           
 	vm_object_reference(obj1);
 	addr4k = 0x1000;
 	size4k = 0x3000;
@@ -863,7 +863,7 @@ vm_test_map_copy_adjust_to_target(void)
 	assert(kr == KERN_SUCCESS);
 	assert(addr4k == 0x1000);
 
-	/* map objects in 16k map */
+	                            
 	vm_object_reference(obj1);
 	addr16k = 0x4000;
 	size16k = 0x8000;
@@ -874,7 +874,7 @@ vm_test_map_copy_adjust_to_target(void)
 	assert(kr == KERN_SUCCESS);
 	assert(addr16k == 0x4000);
 
-	/* test for <rdar://60959809> */
+	                                
 	ipc_port_t mem_entry;
 	memory_object_size_t mem_entry_size;
 	mach_vm_size_t map_size;
@@ -891,7 +891,7 @@ vm_test_map_copy_adjust_to_target(void)
 	assertf(map_size == 0x3000, "mem_entry %p map_size 0x%llx\n", mem_entry, (uint64_t)map_size);
 	mach_memory_entry_port_release(mem_entry);
 
-	/* create 4k copy map */
+	                        
 	curprot = VM_PROT_NONE;
 	maxprot = VM_PROT_NONE;
 	kr = vm_map_copy_extract(map4k, addr4k, 0x3000,
@@ -900,7 +900,7 @@ vm_test_map_copy_adjust_to_target(void)
 	assert(kr == KERN_SUCCESS);
 	assert(copy4k->size == 0x3000);
 
-	/* create 16k copy map */
+	                         
 	curprot = VM_PROT_NONE;
 	maxprot = VM_PROT_NONE;
 	kr = vm_map_copy_extract(map16k, addr16k, 0x4000,
@@ -909,35 +909,35 @@ vm_test_map_copy_adjust_to_target(void)
 	assert(kr == KERN_SUCCESS);
 	assert(copy16k->size == 0x4000);
 
-	/* test each combination */
-//	vm_test_map_copy_adjust_to_target_one(copy4k, map4k);
-//	vm_test_map_copy_adjust_to_target_one(copy16k, map16k);
-//	vm_test_map_copy_adjust_to_target_one(copy4k, map16k);
+	                           
+                                                        
+                                                          
+                                                         
 	vm_test_map_copy_adjust_to_target_one(copy16k, map4k);
 
-	/* assert 1 ref on 4k map */
+	                            
 	assert(os_ref_get_count(&map4k->map_refcnt) == 1);
-	/* release 4k map */
+	                    
 	vm_map_deallocate(map4k);
-	/* assert 1 ref on 16k map */
+	                             
 	assert(os_ref_get_count(&map16k->map_refcnt) == 1);
-	/* release 16k map */
+	                     
 	vm_map_deallocate(map16k);
-	/* deallocate copy maps */
+	                          
 	vm_map_copy_discard(copy4k);
 	vm_map_copy_discard(copy16k);
-	/* assert 1 ref on all VM objects */
+	                                    
 	assert(obj1->ref_count == 1);
 	assert(obj2->ref_count == 1);
 	assert(obj3->ref_count == 1);
 	assert(obj4->ref_count == 1);
-	/* release all VM objects */
+	                            
 	vm_object_deallocate(obj1);
 	vm_object_deallocate(obj2);
 	vm_object_deallocate(obj3);
 	vm_object_deallocate(obj4);
 }
-#endif /* MACH_ASSERT */
+#endif                  
 
 boolean_t vm_tests_in_progress = FALSE;
 
@@ -953,10 +953,10 @@ vm_tests(void)
 	vm_test_device_pager_transpose();
 #if MACH_ASSERT
 	vm_test_map_copy_adjust_to_target();
-#endif /* MACH_ASSERT */
+#endif                  
 #if PMAP_CREATE_FORCE_4K_PAGES && MACH_ASSERT
 	vm_test_4k();
-#endif /* PMAP_CREATE_FORCE_4K_PAGES && MACH_ASSERT */
+#endif                                                
 
 	vm_tests_in_progress = FALSE;
 

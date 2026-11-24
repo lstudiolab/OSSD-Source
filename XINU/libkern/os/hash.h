@@ -58,53 +58,53 @@ os_hash_jenkins_finish(uint32_t hash)
 	return hash;
 }
 
-/*!
- * @function os_hash_jenkins
- *
- * @brief
- * The original Jenkins "one at a time" hash.
- *
- * @discussion
- * TBD: There may be some value to unrolling here,
- * depending on the architecture.
- *
- * @param data
- * The address of the data to hash.
- *
- * @param length
- * The length of the data to hash
- *
- * @returns
- * The jenkins hash for this data.
- */
+   
+                            
+  
+         
+                                             
+  
+              
+                                                  
+                                 
+  
+              
+                                   
+  
+                
+                                 
+  
+           
+                                  
+   
 static inline uint32_t
 os_hash_jenkins(const void *data, size_t length)
 {
 	return os_hash_jenkins_finish(os_hash_jenkins_update(data, length, 0));
 }
 
-/*!
- * @function os_hash_kernel_pointer
- *
- * @brief
- * Hashes a pointer from a zone.
- *
- * @discussion
- * This is a really cheap and fast hash that will behave well for pointers
- * allocated by the kernel.
- *
- * This should be not used for untrusted pointer values from userspace,
- * or cases when the pointer is somehow under the control of userspace.
- *
- * This hash function utilizes knowledge about the span of the kernel
- * address space and inherent alignment of zalloc/kalloc.
- *
- * @param pointer
- * The pointer to hash.
- *
- * @returns
- * The hash for this pointer.
- */
+   
+                                   
+  
+         
+                                
+  
+              
+                                                                          
+                           
+  
+                                                                       
+                                                                       
+  
+                                                                     
+                                                         
+  
+                 
+                       
+  
+           
+                             
+   
 static inline uint32_t
 os_hash_kernel_pointer(const void *pointer)
 {
@@ -115,5 +115,5 @@ os_hash_kernel_pointer(const void *pointer)
 
 __END_DECLS
 
-#endif // PRIVATE
-#endif // _OS_HASH_H_
+#endif           
+#endif               

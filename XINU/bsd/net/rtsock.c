@@ -99,9 +99,9 @@ static struct sockaddr route_src = { .sa_len = 2, .sa_family = PF_ROUTE, .sa_dat
 static struct sockaddr sa_zero   = { .sa_len = sizeof(sa_zero), .sa_family = AF_INET, .sa_data = { 0, } };
 
 struct route_cb {
-	u_int32_t       ip_count;       /* attached w/ AF_INET */
-	u_int32_t       ip6_count;      /* attached w/ AF_INET6 */
-	u_int32_t       any_count;      /* total attached */
+	u_int32_t       ip_count;                                
+	u_int32_t       ip6_count;                                
+	u_int32_t       any_count;                          
 };
 
 static struct route_cb route_cb;
@@ -148,7 +148,7 @@ SYSCTL_NODE(_net, PF_ROUTE, routetable, CTLFLAG_RD | CTLFLAG_LOCKED,
 
 SYSCTL_NODE(_net, OID_AUTO, route, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "routing");
 
-/* Align x to 1024 (only power of 2) assuming x is positive */
+                                                              
 #define ALIGN_BYTES(x) do {                                             \
 	x = (uint32_t)P2ALIGN(x, 1024);                         \
 } while(0)
@@ -163,17 +163,17 @@ SYSCTL_NODE(_net, OID_AUTO, route, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "routing");
 #define RT_HAS_IFADDR(rt)                                               \
 	((rt)->rt_ifa != NULL && (rt)->rt_ifa->ifa_addr != NULL)
 
-/*
- * It really doesn't make any sense at all for this code to share much
- * with raw_usrreq.c, since its functionality is so restricted.  XXX
- */
+  
+                                                                      
+                                                                    
+   
 static int
 rts_abort(struct socket *so)
 {
 	return raw_usrreqs.pru_abort(so);
 }
 
-/* pru_accept is EOPNOTSUPP */
+                              
 
 static int
 rts_attach(struct socket *so, int proto, struct proc *p)
@@ -190,7 +190,7 @@ rts_attach(struct socket *so, int proto, struct proc *p)
 	}
 
 	so->so_pcb = (caddr_t)rp;
-	/* don't use raw_usrreqs.pru_attach, it checks for SS_PRIV */
+	                                                             
 	error = raw_attach(so, proto);
 	rp = sotorawcb(so);
 	if (error) {
@@ -210,7 +210,7 @@ rts_attach(struct socket *so, int proto, struct proc *p)
 	}
 	rp->rcb_faddr = &route_src;
 	atomic_add_32(&route_cb.any_count, 1);
-	/* the socket is already locked when we enter rts_attach */
+	                                                           
 	soisconnected(so);
 	so->so_options |= SO_USELOOPBACK;
 	return 0;
@@ -219,17 +219,17 @@ rts_attach(struct socket *so, int proto, struct proc *p)
 static int
 rts_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 {
-	return raw_usrreqs.pru_bind(so, nam, p); /* xxx just EINVAL */
+	return raw_usrreqs.pru_bind(so, nam, p);                      
 }
 
 static int
 rts_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 {
-	return raw_usrreqs.pru_connect(so, nam, p); /* XXX just EINVAL */
+	return raw_usrreqs.pru_connect(so, nam, p);                      
 }
 
-/* pru_connect2 is EOPNOTSUPP */
-/* pru_control is EOPNOTSUPP */
+                                
+                               
 
 static int
 rts_detach(struct socket *so)
@@ -256,7 +256,7 @@ rts_disconnect(struct socket *so)
 	return raw_usrreqs.pru_disconnect(so);
 }
 
-/* pru_listen is EOPNOTSUPP */
+                              
 
 static int
 rts_peeraddr(struct socket *so, struct sockaddr **nam)
@@ -264,8 +264,8 @@ rts_peeraddr(struct socket *so, struct sockaddr **nam)
 	return raw_usrreqs.pru_peeraddr(so, nam);
 }
 
-/* pru_rcvd is EOPNOTSUPP */
-/* pru_rcvoob is EOPNOTSUPP */
+                            
+                              
 
 static int
 rts_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam,
@@ -274,7 +274,7 @@ rts_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam,
 	return raw_usrreqs.pru_send(so, flags, m, nam, control, p);
 }
 
-/* pru_sense is null */
+                       
 
 static int
 rts_shutdown(struct socket *so)
@@ -303,7 +303,7 @@ static struct pr_usrreqs route_usrreqs = {
 	.pru_soreceive =        soreceive,
 };
 
-/*ARGSUSED*/
+            
 static int
 route_output(struct mbuf *m, struct socket *so)
 {
@@ -327,10 +327,10 @@ route_output(struct mbuf *m, struct socket *so)
 	}
 	VERIFY(m->m_flags & M_PKTHDR);
 
-	/*
-	 * Unlock the socket (but keep a reference) it won't be
-	 * accessed until raw_input appends to it.
-	 */
+	  
+                                                        
+                                           
+    
 	socket_unlock(so, 0);
 	lck_mtx_lock(rnh_lock);
 
@@ -351,10 +351,10 @@ route_output(struct mbuf *m, struct socket *so)
 		senderr(EPROTONOSUPPORT);
 	}
 
-	/*
-	 * Silent version of RTM_GET for Reachabiltiy APIs. We may change
-	 * all RTM_GETs to be silent in the future, so this is private for now.
-	 */
+	  
+                                                                  
+                                                                        
+    
 	if (rtm->rtm_type == RTM_GET_SILENT) {
 		if (!(so->so_options & SO_USELOOPBACK)) {
 			senderr(EINVAL);
@@ -363,10 +363,10 @@ route_output(struct mbuf *m, struct socket *so)
 		rtm->rtm_type = RTM_GET;
 	}
 
-	/*
-	 * Perform permission checking, only privileged sockets
-	 * may perform operations other than RTM_GET
-	 */
+	  
+                                                        
+                                             
+    
 	if (rtm->rtm_type != RTM_GET && !(so->so_state & SS_PRIV)) {
 		info.rti_info[RTAX_DST] = NULL;
 		senderr(EPERM);
@@ -387,7 +387,7 @@ route_output(struct mbuf *m, struct socket *so)
 
 	if (info.rti_info[RTAX_DST]->sa_family == AF_INET &&
 	    info.rti_info[RTAX_DST]->sa_len != sizeof(struct sockaddr_in)) {
-		/* At minimum, we need up to sin_addr */
+		                                        
 		if (info.rti_info[RTAX_DST]->sa_len <
 		    offsetof(struct sockaddr_in, sin_zero)) {
 			senderr(EINVAL);
@@ -407,7 +407,7 @@ route_output(struct mbuf *m, struct socket *so)
 	if (info.rti_info[RTAX_GATEWAY] != NULL) {
 		if (info.rti_info[RTAX_GATEWAY]->sa_family == AF_INET &&
 		    info.rti_info[RTAX_GATEWAY]->sa_len != sizeof(struct sockaddr_in)) {
-			/* At minimum, we need up to sin_addr */
+			                                        
 			if (info.rti_info[RTAX_GATEWAY]->sa_len <
 			    offsetof(struct sockaddr_in, sin_zero)) {
 				senderr(EINVAL);
@@ -436,9 +436,9 @@ route_output(struct mbuf *m, struct socket *so)
 		}
 	}
 
-	/*
-	 * If RTF_IFSCOPE flag is set, then rtm_index specifies the scope.
-	 */
+	  
+                                                                   
+    
 	if (rtm->rtm_flags & RTF_IFSCOPE) {
 		if (info.rti_info[RTAX_DST]->sa_family != AF_INET &&
 		    info.rti_info[RTAX_DST]->sa_family != AF_INET6) {
@@ -446,9 +446,9 @@ route_output(struct mbuf *m, struct socket *so)
 		}
 		ifscope = rtm->rtm_index;
 	}
-	/*
-	 * Block changes on INTCOPROC interfaces.
-	 */
+	  
+                                          
+    
 	if (ifscope) {
 		unsigned int intcoproc_scope = 0;
 		ifnet_head_lock_shared();
@@ -464,20 +464,20 @@ route_output(struct mbuf *m, struct socket *so)
 		}
 	}
 
-	/*
-	 * RTF_PROXY can only be set internally from within the kernel.
-	 */
+	  
+                                                                
+    
 	if (rtm->rtm_flags & RTF_PROXY) {
 		senderr(EINVAL);
 	}
 
-	/*
-	 * For AF_INET, always zero out the embedded scope ID.  If this is
-	 * a scoped request, it must be done explicitly by setting RTF_IFSCOPE
-	 * flag and the corresponding rtm_index value.  This is to prevent
-	 * false interpretation of the scope ID because it's using the sin_zero
-	 * field, which might not be properly cleared by the requestor.
-	 */
+	  
+                                                                   
+                                                                       
+                                                                   
+                                                                        
+                                                                
+    
 	if (info.rti_info[RTAX_DST]->sa_family == AF_INET) {
 		sin_set_ifscope(info.rti_info[RTAX_DST], IFSCOPE_NONE);
 	}
@@ -497,33 +497,33 @@ route_output(struct mbuf *m, struct socket *so)
 		    ifscope);
 		if (error == 0 && saved_nrt != NULL) {
 			RT_LOCK(saved_nrt);
-			/*
-			 * If the route request specified an interface with
-			 * IFA and/or IFP, we set the requested interface on
-			 * the route with rt_setif.  It would be much better
-			 * to do this inside rtrequest, but that would
-			 * require passing the desired interface, in some
-			 * form, to rtrequest.  Since rtrequest is called in
-			 * so many places (roughly 40 in our source), adding
-			 * a parameter is to much for us to swallow; this is
-			 * something for the FreeBSD developers to tackle.
-			 * Instead, we let rtrequest compute whatever
-			 * interface it wants, then come in behind it and
-			 * stick in the interface that we really want.  This
-			 * works reasonably well except when rtrequest can't
-			 * figure out what interface to use (with
-			 * ifa_withroute) and returns ENETUNREACH.  Ideally
-			 * it shouldn't matter if rtrequest can't figure out
-			 * the interface if we're going to explicitly set it
-			 * ourselves anyway.  But practically we can't
-			 * recover here because rtrequest will not do any of
-			 * the work necessary to add the route if it can't
-			 * find an interface.  As long as there is a default
-			 * route that leads to some interface, rtrequest will
-			 * find an interface, so this problem should be
-			 * rarely encountered.
-			 * dwiggins@bbn.com
-			 */
+			  
+                                                      
+                                                       
+                                                       
+                                                 
+                                                    
+                                                       
+                                                       
+                                                       
+                                                     
+                                                
+                                                    
+                                                       
+                                                       
+                                            
+                                                      
+                                                       
+                                                       
+                                                 
+                                                       
+                                                     
+                                                       
+                                                        
+                                                  
+                         
+                      
+      
 			rt_setif(saved_nrt,
 			    info.rti_info[RTAX_IFP], info.rti_info[RTAX_IFA],
 			    info.rti_info[RTAX_GATEWAY], ifscope);
@@ -556,10 +556,10 @@ route_output(struct mbuf *m, struct socket *so)
 		if (rnh == NULL) {
 			senderr(EAFNOSUPPORT);
 		}
-		/*
-		 * Lookup the best match based on the key-mask pair;
-		 * callee adds a reference and checks for root node.
-		 */
+		  
+                                                      
+                                                      
+     
 		rt = rt_lookup(TRUE, info.rti_info[RTAX_DST],
 		    info.rti_info[RTAX_NETMASK], rnh, ifscope);
 		if (rt == NULL) {
@@ -567,11 +567,11 @@ route_output(struct mbuf *m, struct socket *so)
 		}
 		RT_LOCK(rt);
 
-		/*
-		 * Holding rnh_lock here prevents the possibility of
-		 * ifa from changing (e.g. in_ifinit), so it is safe
-		 * to access its ifa_addr (down below) without locking.
-		 */
+		  
+                                                      
+                                                      
+                                                         
+     
 		switch (rtm->rtm_type) {
 		case RTM_GET: {
 			kauth_cred_t cred;
@@ -655,23 +655,23 @@ report:
 				RT_UNLOCK(rt);
 				senderr(tmp);
 			}
-			/*
-			 * If they tried to change things but didn't specify
-			 * the required gateway, then just use the old one.
-			 * This can happen if the user tries to change the
-			 * flags on the default route without changing the
-			 * default gateway. Changing flags still doesn't work.
-			 */
+			  
+                                                       
+                                                      
+                                                     
+                                                     
+                                                         
+      
 			if ((rt->rt_flags & RTF_GATEWAY) &&
 			    info.rti_info[RTAX_GATEWAY] == NULL) {
 				info.rti_info[RTAX_GATEWAY] = rt->rt_gateway;
 			}
 
-			/*
-			 * On Darwin, we call rt_setif which contains the
-			 * equivalent to the code found at this very spot
-			 * in BSD.
-			 */
+			  
+                                                    
+                                                    
+             
+      
 			rt_setif(rt,
 			    info.rti_info[RTAX_IFP], info.rti_info[RTAX_IFA],
 			    info.rti_info[RTAX_GATEWAY], ifscope);
@@ -686,16 +686,16 @@ report:
 				rt->rt_genmask = info.rti_info[RTAX_GENMASK];
 			}
 
-			/*
-			 * Enqueue work item to invoke callback for this route entry
-			 * This may not be needed always, but for now issue it anytime
-			 * RTM_CHANGE gets called.
-			 */
+			  
+                                                               
+                                                                 
+                             
+      
 			route_event_enqueue_nwk_wq_entry(rt, NULL, ROUTE_ENTRY_REFRESH, NULL, TRUE);
-			/*
-			 * If the route is for a router, walk the tree to send refresh
-			 * event to protocol cloned entries
-			 */
+			  
+                                                                 
+                                      
+      
 			if (is_router) {
 				struct route_event rt_ev;
 				route_event_init(&rt_ev, rt, NULL, ROUTE_ENTRY_REFRESH);
@@ -729,11 +729,11 @@ flush:
 	}
 	lck_mtx_unlock(rnh_lock);
 
-	/* relock the socket now */
+	                           
 	socket_lock(so, 0);
-	/*
-	 * Check to see if we don't want our own messages.
-	 */
+	  
+                                                   
+    
 	if (!(so->so_options & SO_USELOOPBACK)) {
 		if (route_cb.any_count <= 1) {
 			if (rtm != NULL) {
@@ -742,7 +742,7 @@ flush:
 			m_freem(m);
 			return error;
 		}
-		/* There is another listener, so construct message */
+		                                                     
 		rp = sotorawcb(so);
 	}
 	if (rtm != NULL) {
@@ -767,7 +767,7 @@ flush:
 	} else {
 		struct sockproto route_proto = { .sp_family = PF_ROUTE, .sp_protocol = 0 };
 		if (rp != NULL) {
-			rp->rcb_proto.sp_family = 0; /* Avoid us */
+			rp->rcb_proto.sp_family = 0;               
 		}
 		if (dst_sa_family != 0) {
 			route_proto.sp_protocol = dst_sa_family;
@@ -787,7 +787,7 @@ flush:
 void
 rt_setexpire(struct rtentry *rt, uint64_t expiry)
 {
-	/* set both rt_expire and rmx_expire */
+	                                       
 	rt->rt_expire = expiry;
 	if (expiry) {
 		rt->rt_rmx.rmx_expire =
@@ -815,7 +815,7 @@ rt_setmetrics(u_int32_t which, struct rt_metrics *in, struct rtentry *out)
 		metric(RTV_EXPIRE, rmx_expire);
 #undef metric
 		if (out->rt_rmx.rmx_expire > 0) {
-			/* account for system time change */
+			                                    
 			getmicrotime(&caltime);
 			out->base_calendartime +=
 			    NET_CALCULATE_CLOCKSKEW(caltime,
@@ -832,7 +832,7 @@ rt_setmetrics(u_int32_t which, struct rt_metrics *in, struct rtentry *out)
 		VERIFY(out->rt_expire == 0 || out->rt_rmx.rmx_expire != 0);
 		VERIFY(out->rt_expire != 0 || out->rt_rmx.rmx_expire == 0);
 	} else {
-		/* Only RTV_REFRESH_HOST must be set */
+		                                       
 		if ((which & ~RTV_REFRESH_HOST) ||
 		    (out->rt_flags & RTF_STATIC) ||
 		    !(out->rt_flags & RTF_LLINFO)) {
@@ -859,7 +859,7 @@ rt_getmetrics(struct rtentry *in, struct rt_metrics *out)
 	*out = in->rt_rmx;
 
 	if (in->rt_expire != 0) {
-		/* account for system time change */
+		                                    
 		getmicrotime(&caltime);
 
 		in->base_calendartime +=
@@ -873,10 +873,10 @@ rt_getmetrics(struct rtentry *in, struct rt_metrics *out)
 	}
 }
 
-/*
- * Set route's interface given info.rti_info[RTAX_IFP],
- * info.rti_info[RTAX_IFA], and gateway.
- */
+  
+                                                       
+                                        
+   
 static void
 rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
     struct sockaddr *Gate, unsigned int ifscope)
@@ -889,22 +889,22 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 
 	RT_LOCK_ASSERT_HELD(rt);
 
-	/* Don't update a defunct route */
+	                                  
 	if (rt->rt_flags & RTF_CONDEMNED) {
 		return;
 	}
 
-	/* Add an extra ref for ourselves */
+	                                    
 	RT_ADDREF_LOCKED(rt);
 
-	/* Become a regular mutex, just in case */
+	                                          
 	RT_CONVERT_LOCK(rt);
 
-	/*
-	 * New gateway could require new ifaddr, ifp; flags may also
-	 * be different; ifp may be specified by ll sockaddr when
-	 * protocol address is ambiguous.
-	 */
+	  
+                                                             
+                                                          
+                                  
+    
 	if (Ifpaddr && (ifa = ifa_ifwithnet_scoped(Ifpaddr, ifscope)) &&
 	    (ifp = ifa->ifa_ifp) && (Ifaaddr || Gate)) {
 		IFA_REMREF(ifa);
@@ -929,32 +929,32 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 		    (ifa = ifa_ifwithaddr_scoped(Ifaaddr, ifscope))) {
 			ifp = ifa->ifa_ifp;
 		} else if (Gate != NULL) {
-			/*
-			 * Safe to drop rt_lock and use rt_key, since holding
-			 * rnh_lock here prevents another thread from calling
-			 * rt_setgate() on this route.  We cannot hold the
-			 * lock across ifa_ifwithroute since the lookup done
-			 * by that routine may point to the same route.
-			 */
+			  
+                                                        
+                                                        
+                                                     
+                                                       
+                                                  
+      
 			RT_UNLOCK(rt);
 			if ((ifa = ifa_ifwithroute_scoped_locked(rt->rt_flags,
 			    rt_key(rt), Gate, ifscope)) != NULL) {
 				ifp = ifa->ifa_ifp;
 			}
 			RT_LOCK(rt);
-			/* Don't update a defunct route */
+			                                  
 			if (rt->rt_flags & RTF_CONDEMNED) {
 				if (ifa != NULL) {
 					IFA_REMREF(ifa);
 				}
-				/* Release extra ref */
+				                       
 				RT_REMREF_LOCKED(rt);
 				return;
 			}
 		}
 	}
 
-	/* trigger route cache reevaluation */
+	                                      
 	if (rt_key(rt)->sa_family == AF_INET) {
 		routegenid_inet_update();
 	} else if (rt_key(rt)->sa_family == AF_INET6) {
@@ -975,40 +975,40 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 			rtsetifa(rt, ifa);
 
 			if (rt->rt_ifp != ifp) {
-				/*
-				 * Purge any link-layer info caching.
-				 */
+				  
+                                         
+       
 				if (rt->rt_llinfo_purge != NULL) {
 					rt->rt_llinfo_purge(rt);
 				}
 
-				/*
-				 * Adjust route ref count for the interfaces.
-				 */
+				  
+                                                 
+       
 				if (rt->rt_if_ref_fn != NULL) {
 					rt->rt_if_ref_fn(ifp, 1);
 					rt->rt_if_ref_fn(rt->rt_ifp, -1);
 				}
 			}
 			rt->rt_ifp = ifp;
-			/*
-			 * If this is the (non-scoped) default route, record
-			 * the interface index used for the primary ifscope.
-			 */
+			  
+                                                       
+                                                       
+      
 			if (rt_primary_default(rt, rt_key(rt))) {
 				set_primary_ifscope(rt_key(rt)->sa_family,
 				    rt->rt_ifp->if_index);
 			}
-			/*
-			 * If rmx_mtu is not locked, update it
-			 * to the MTU used by the new interface.
-			 */
+			  
+                                         
+                                           
+      
 			if (!(rt->rt_rmx.rmx_locks & RTV_MTU)) {
 				rt->rt_rmx.rmx_mtu = rt->rt_ifp->if_mtu;
 				if (rt_key(rt)->sa_family == AF_INET &&
 				    INTF_ADJUST_MTU_FOR_CLAT46(ifp)) {
 					rt->rt_rmx.rmx_mtu = IN6_LINKMTU(rt->rt_ifp);
-					/* Further adjust the size for CLAT46 expansion */
+					                                                  
 					rt->rt_rmx.rmx_mtu -= CLAT46_HDR_EXPANSION_OVERHD;
 				}
 			}
@@ -1022,7 +1022,7 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 				}
 			}
 			IFA_REMREF(ifa);
-			/* Release extra ref */
+			                       
 			RT_REMREF_LOCKED(rt);
 			return;
 		}
@@ -1030,7 +1030,7 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 		ifa = NULL;
 	}
 
-	/* XXX: to reset gateway to correct value, at RTM_CHANGE */
+	                                                           
 	if (rt->rt_ifa != NULL) {
 		IFA_LOCK_SPIN(rt->rt_ifa);
 		ifa_rtrequest = rt->rt_ifa->ifa_rtrequest;
@@ -1040,10 +1040,10 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 		}
 	}
 
-	/*
-	 * Workaround for local address routes pointing to the loopback
-	 * interface added by configd, until <rdar://problem/12970142>.
-	 */
+	  
+                                                                
+                                                                
+    
 	if ((rt->rt_ifp->if_flags & IFF_LOOPBACK) &&
 	    (rt->rt_flags & RTF_HOST) && rt->rt_ifa->ifa_ifp == rt->rt_ifp) {
 		ifa = ifa_ifwithaddr(rt_key(rt));
@@ -1055,15 +1055,15 @@ rt_setif(struct rtentry *rt, struct sockaddr *Ifpaddr, struct sockaddr *Ifaaddr,
 		}
 	}
 
-	/* Release extra ref */
+	                       
 	RT_REMREF_LOCKED(rt);
 }
 
-/*
- * Extract the addresses of the passed sockaddrs.
- * Do a little sanity checking so as to avoid bad memory references.
- * This data is derived straight from userland.
- */
+  
+                                                 
+                                                                    
+                                               
+   
 static int
 rt_xaddrs(caddr_t cp, caddr_t cplim, struct rt_addrinfo *rtinfo)
 {
@@ -1076,30 +1076,30 @@ rt_xaddrs(caddr_t cp, caddr_t cplim, struct rt_addrinfo *rtinfo)
 			continue;
 		}
 		sa = (struct sockaddr *)cp;
-		/*
-		 * It won't fit.
-		 */
+		  
+                  
+     
 		if ((cp + sa->sa_len) > cplim) {
 			return EINVAL;
 		}
 		if (sa->sa_len > sizeof(struct sockaddr_storage)) {
 			return EINVAL;
 		}
-		/*
-		 * there are no more.. quit now
-		 * If there are more bits, they are in error.
-		 * I've seen this. route(1) can evidently generate these.
-		 * This causes kernel to core dump.
-		 * for compatibility, If we see this, point to a safe address.
-		 */
+		  
+                                 
+                                               
+                                                           
+                                     
+                                                                
+     
 		if (sa->sa_len == 0) {
 			rtinfo->rti_info[i] = &sa_zero;
-			return 0; /* should be EINVAL but for compat */
+			return 0;                                      
 		}
 		if (sa->sa_len < offsetof(struct sockaddr, sa_data)) {
 			return EINVAL;
 		}
-		/* accept it */
+		               
 		rtinfo->rti_info[i] = sa;
 		ADVANCE32(cp, sa);
 	}
@@ -1152,9 +1152,9 @@ rt_msg1(u_char type, struct rt_addrinfo *rtinfo)
 		struct sockaddr *sa, *hint;
 		uint8_t ssbuf[SOCK_MAXADDRLEN + 1];
 
-		/*
-		 * Make sure to accomodate the largest possible size of sa_len.
-		 */
+		  
+                                                                 
+     
 		_CASSERT(sizeof(ssbuf) == (SOCK_MAXADDRLEN + 1));
 
 		if ((sa = rtinfo->rti_info[i]) == NULL) {
@@ -1168,7 +1168,7 @@ rt_msg1(u_char type, struct rt_addrinfo *rtinfo)
 				hint = rtinfo->rti_info[RTAX_IFA];
 			}
 
-			/* Scrub away any trace of embedded interface scope */
+			                                                      
 			sa = rtm_scrub(type, i, hint, sa, &ssbuf,
 			    sizeof(ssbuf), NULL);
 			break;
@@ -1245,9 +1245,9 @@ again:
 		struct sockaddr *sa, *hint;
 		uint8_t ssbuf[SOCK_MAXADDRLEN + 1];
 
-		/*
-		 * Make sure to accomodate the largest possible size of sa_len.
-		 */
+		  
+                                                                 
+     
 		_CASSERT(sizeof(ssbuf) == (SOCK_MAXADDRLEN + 1));
 
 		if ((sa = rtinfo->rti_info[i]) == NULL) {
@@ -1261,7 +1261,7 @@ again:
 				hint = rtinfo->rti_info[RTAX_IFA];
 			}
 
-			/* Scrub away any trace of embedded interface scope */
+			                                                      
 			sa = rtm_scrub(type, i, hint, sa, &ssbuf,
 			    sizeof(ssbuf), NULL);
 			break;
@@ -1317,12 +1317,12 @@ again:
 	return len;
 }
 
-/*
- * This routine is called to generate a message from the routing
- * socket indicating that a redirect has occurred, a routing lookup
- * has failed, or that a protocol has detected timeouts to a particular
- * destination.
- */
+  
+                                                                
+                                                                   
+                                                                       
+               
+   
 void
 rt_missmsg(u_char type, struct rt_addrinfo *rtinfo, int flags, int error)
 {
@@ -1346,10 +1346,10 @@ rt_missmsg(u_char type, struct rt_addrinfo *rtinfo, int flags, int error)
 	raw_input(m, &route_proto, &route_src, &route_dst);
 }
 
-/*
- * This routine is called to generate a message from the routing
- * socket indicating that the status of a network interface has changed.
- */
+  
+                                                                
+                                                                        
+   
 void
 rt_ifmsg(struct ifnet *ifp)
 {
@@ -1374,17 +1374,17 @@ rt_ifmsg(struct ifnet *ifp)
 	raw_input(m, &route_proto, &route_src, &route_dst);
 }
 
-/*
- * This is called to generate messages from the routing socket
- * indicating a network interface has had addresses associated with it.
- * if we ever reverse the logic and replace messages TO the routing
- * socket indicate a request to configure interfaces, then it will
- * be unnecessary as the routing socket will automatically generate
- * copies of it.
- *
- * Since this is coming from the interface, it is expected that the
- * interface will be locked.  Caller must hold rnh_lock and rt_lock.
- */
+  
+                                                              
+                                                                       
+                                                                   
+                                                                  
+                                                                   
+                
+  
+                                                                   
+                                                                    
+   
 void
 rt_newaddrmsg(u_char cmd, struct ifaddr *ifa, int error, struct rtentry *rt)
 {
@@ -1402,7 +1402,7 @@ rt_newaddrmsg(u_char cmd, struct ifaddr *ifa, int error, struct rtentry *rt)
 		return;
 	}
 
-	/* Become a regular mutex, just in case */
+	                                          
 	RT_CONVERT_LOCK(rt);
 	for (pass = 1; pass < 3; pass++) {
 		bzero((caddr_t)&info, sizeof(info));
@@ -1411,16 +1411,16 @@ rt_newaddrmsg(u_char cmd, struct ifaddr *ifa, int error, struct rtentry *rt)
 			struct ifa_msghdr *ifam;
 			u_char ncmd = cmd == RTM_ADD ? RTM_NEWADDR : RTM_DELADDR;
 
-			/* Lock ifp for if_lladdr */
+			                            
 			ifnet_lock_shared(ifp);
 			IFA_LOCK(ifa);
 			info.rti_info[RTAX_IFA] = sa = ifa->ifa_addr;
-			/*
-			 * Holding ifnet lock here prevents the link address
-			 * from changing contents, so no need to hold its
-			 * lock.  The link address is always present; it's
-			 * never freed.
-			 */
+			  
+                                                       
+                                                    
+                                                     
+                  
+      
 			info.rti_info[RTAX_IFP] = ifp->if_lladdr->ifa_addr;
 			info.rti_info[RTAX_NETMASK] = ifa->ifa_netmask;
 			info.rti_info[RTAX_BRD] = ifa->ifa_dstaddr;
@@ -1463,11 +1463,11 @@ rt_newaddrmsg(u_char cmd, struct ifaddr *ifa, int error, struct rtentry *rt)
 	}
 }
 
-/*
- * This is the analogue to the rt_newaddrmsg which performs the same
- * function but for multicast group memberhips.  This is easier since
- * there is no route state to worry about.
- */
+  
+                                                                    
+                                                                     
+                                          
+   
 void
 rt_newmaddrmsg(u_char cmd, struct ifmultiaddr *ifma)
 {
@@ -1481,18 +1481,18 @@ rt_newmaddrmsg(u_char cmd, struct ifmultiaddr *ifma)
 		return;
 	}
 
-	/* Lock ifp for if_lladdr */
+	                            
 	ifnet_lock_shared(ifp);
 	bzero((caddr_t)&info, sizeof(info));
 	IFMA_LOCK(ifma);
 	info.rti_info[RTAX_IFA] = ifma->ifma_addr;
-	/* lladdr doesn't need lock */
+	                              
 	info.rti_info[RTAX_IFP] = ifp->if_lladdr->ifa_addr;
 
-	/*
-	 * If a link-layer address is present, present it as a ``gateway''
-	 * (similarly to how ARP entries, e.g., are presented).
-	 */
+	  
+                                                                   
+                                                        
+    
 	info.rti_info[RTAX_GATEWAY] = (ifma->ifma_ll != NULL) ?
 	    ifma->ifma_ll->ifma_addr : NULL;
 	if ((m = rt_msg1(cmd, &info)) == NULL) {
@@ -1583,9 +1583,9 @@ rtm2str(int cmd)
 	return c;
 }
 
-/*
- * This is used in dumping the kernel table via sysctl().
- */
+  
+                                                         
+   
 static int
 sysctl_dumpentry(struct radix_node *rn, void *vw)
 {
@@ -1605,11 +1605,11 @@ sysctl_dumpentry(struct radix_node *rn, void *vw)
 		goto done;
 	}
 
-	/*
-	 * If the matching route has RTF_LLINFO set, then we can skip scrubbing the MAC
-	 * only if the outgoing interface is not loopback and the process has entitlement
-	 * for neighbor cache read.
-	 */
+	  
+                                                                                
+                                                                                  
+                            
+    
 	if (w->w_op == NET_RT_FLAGS_PRIV && (rt->rt_flags & RTF_LLINFO)) {
 		if (rt->rt_ifp != lo_ifp &&
 		    (route_op_entitlement_check(NULL, cred, ROUTE_OP_READ, TRUE) == 0)) {
@@ -1670,9 +1670,9 @@ done:
 	return error;
 }
 
-/*
- * This is used for dumping extended information from route entries.
- */
+  
+                                                                    
+   
 static int
 sysctl_dumpentry_ext(struct radix_node *rn, void *vw)
 {
@@ -1724,19 +1724,19 @@ done:
 	return error;
 }
 
-/*
- * rdar://9307819
- * To avoid to call copyout() while holding locks and to cause problems
- * in the paging path, sysctl_iflist() and sysctl_iflist2() contstruct
- * the list in two passes. In the first pass we compute the total
- * length of the data we are going to copyout, then we release
- * all locks to allocate a temporary buffer that gets filled
- * in the second pass.
- *
- * Note that we are verifying the assumption that _MALLOC returns a buffer
- * that is at least 32 bits aligned and that the messages and addresses are
- * 32 bits aligned.
- */
+  
+                 
+                                                                       
+                                                                      
+                                                                 
+                                                              
+                                                            
+                      
+  
+                                                                          
+                                                                           
+                   
+   
 static int
 sysctl_iflist(int af, struct walkarg *w)
 {
@@ -1764,12 +1764,12 @@ sysctl_iflist(int af, struct walkarg *w)
 				continue;
 			}
 			ifnet_lock_shared(ifp);
-			/*
-			 * Holding ifnet lock here prevents the link address
-			 * from changing contents, so no need to hold the ifa
-			 * lock.  The link address is always present; it's
-			 * never freed.
-			 */
+			  
+                                                       
+                                                        
+                                                     
+                  
+      
 			ifa = ifp->if_lladdr;
 			info.rti_info[RTAX_IFP] = ifa->ifa_addr;
 			len = rt_msg2(RTM_IFINFO, &info, NULL, NULL, &cred);
@@ -1794,10 +1794,10 @@ sysctl_iflist(int af, struct walkarg *w)
 				if_data_internal_to_if_data(ifp, &ifp->if_data,
 				    &ifm->ifm_data);
 				ifm->ifm_addrs = info.rti_addrs;
-				/*
-				 * <rdar://problem/32940901>
-				 * Round bytes only for non-platform
-				 */
+				  
+                                
+                                        
+       
 				if (!csproc_get_platform_binary(w->w_req->p)) {
 					ALIGN_BYTES(ifm->ifm_data.ifi_ibytes);
 					ALIGN_BYTES(ifm->ifm_data.ifi_obytes);
@@ -1868,7 +1868,7 @@ sysctl_iflist(int af, struct walkarg *w)
 		}
 
 		if (pass == 0) {
-			/* Better to return zero length buffer than ENOBUFS */
+			                                                      
 			if (total_len == 0) {
 				total_len = 1;
 			}
@@ -1928,12 +1928,12 @@ sysctl_iflist2(int af, struct walkarg *w)
 				continue;
 			}
 			ifnet_lock_shared(ifp);
-			/*
-			 * Holding ifnet lock here prevents the link address
-			 * from changing contents, so no need to hold the ifa
-			 * lock.  The link address is always present; it's
-			 * never freed.
-			 */
+			  
+                                                       
+                                                        
+                                                     
+                  
+      
 			ifa = ifp->if_lladdr;
 			info.rti_info[RTAX_IFP] = ifa->ifa_addr;
 			len = rt_msg2(RTM_IFINFO2, &info, NULL, NULL, &cred);
@@ -1963,10 +1963,10 @@ sysctl_iflist2(int af, struct walkarg *w)
 				ifm->ifm_timer = ifp->if_timer;
 				if_data_internal_to_if_data64(ifp,
 				    &ifp->if_data, &ifm->ifm_data);
-				/*
-				 * <rdar://problem/32940901>
-				 * Round bytes only for non-platform
-				 */
+				  
+                                
+                                        
+       
 				if (!csproc_get_platform_binary(w->w_req->p)) {
 					ALIGN_BYTES(ifm->ifm_data.ifi_ibytes);
 					ALIGN_BYTES(ifm->ifm_data.ifi_obytes);
@@ -2037,12 +2037,12 @@ sysctl_iflist2(int af, struct walkarg *w)
 				}
 				bzero((caddr_t)&info, sizeof(info));
 				info.rti_info[RTAX_IFA] = ifma->ifma_addr;
-				/*
-				 * Holding ifnet lock here prevents the link
-				 * address from changing contents, so no need
-				 * to hold the ifa0 lock.  The link address is
-				 * always present; it's never freed.
-				 */
+				  
+                                                
+                                                 
+                                                  
+                                        
+       
 				ifa0 = ifp->if_lladdr;
 				info.rti_info[RTAX_IFP] = ifa0->ifa_addr;
 				if (ifma->ifma_ll != NULL) {
@@ -2096,7 +2096,7 @@ sysctl_iflist2(int af, struct walkarg *w)
 		}
 
 		if (pass == 0) {
-			/* Better to return zero length buffer than ENOBUFS */
+			                                                      
 			if (total_len == 0) {
 				total_len = 1;
 			}
@@ -2211,9 +2211,9 @@ sysctl_rtsock SYSCTL_HANDLER_ARGS
 	return error;
 }
 
-/*
- * Definitions of protocols supported in the ROUTE domain.
- */
+  
+                                                          
+   
 static struct protosw routesw[] = {
 	{
 		.pr_type =              SOCK_RAW,

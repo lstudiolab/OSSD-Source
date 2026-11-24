@@ -75,12 +75,12 @@ SYSCTL_PROC(_machdep, OID_AUTO, deferred_ipi_timeout,
     0, 0,
     cpu_signal_deferred_timer, "I", "Deferred IPI timeout (nanoseconds)");
 
-#endif /* defined(HAS_IPI) */
+#endif                       
 
-/*
- * For source compatibility, here's some machdep.cpu mibs that
- * use host_info() to simulate reasonable answers.
- */
+  
+                                                              
+                                                  
+   
 
 SYSCTL_NODE(_machdep, OID_AUTO, cpu, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "CPU info");
@@ -108,12 +108,12 @@ arm_host_info SYSCTL_HANDLER_ARGS
 	return SYSCTL_OUT(req, &datum, sizeof(datum));
 }
 
-/*
- * machdep.cpu.cores_per_package
- *
- * x86: derived from CPUID data.
- * ARM: how many physical cores we have in the AP; aka hw.physicalcpu_max
- */
+  
+                                
+  
+                                
+                                                                         
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, cores_per_package,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -121,12 +121,12 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, cores_per_package,
     sizeof(integer_t),
     arm_host_info, "I", "CPU cores per package");
 
-/*
- * machdep.cpu.core_count
- *
- * x86: derived from CPUID data.
- * ARM: # active physical cores in the AP; aka hw.physicalcpu
- */
+  
+                         
+  
+                                
+                                                             
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, core_count,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -134,13 +134,13 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, core_count,
     sizeof(integer_t),
     arm_host_info, "I", "Number of enabled cores per package");
 
-/*
- * machdep.cpu.logical_per_package
- *
- * x86: derived from CPUID data. Returns ENOENT if HTT bit not set, but
- *      most x64 CPUs have that, so assume it's available.
- * ARM: total # logical cores in the AP; aka hw.logicalcpu_max
- */
+  
+                                  
+  
+                                                                       
+                                                          
+                                                              
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, logical_per_package,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -148,12 +148,12 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, logical_per_package,
     sizeof(integer_t),
     arm_host_info, "I", "CPU logical cpus per package");
 
-/*
- * machdep.cpu.thread_count
- *
- * x86: derived from CPUID data.
- * ARM: # active logical cores in the AP; aka hw.logicalcpu
- */
+  
+                           
+  
+                                
+                                                           
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, thread_count,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -164,10 +164,10 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, thread_count,
 static SECURITY_READ_ONLY_LATE(char*) brand_string = NULL;
 static SECURITY_READ_ONLY_LATE(size_t) brand_string_len = 0;
 
-/*
- * SecureDTLookupEntry() is only guaranteed to work before PE_init_iokit(),
- * so we load the brand string (if available) in a startup handler.
- */
+  
+                                                                           
+                                                                   
+   
 __startup_func
 static void
 sysctl_load_brand_string(void)
@@ -198,14 +198,14 @@ sysctl_load_brand_string(void)
 }
 STARTUP(SYSCTL, STARTUP_RANK_MIDDLE, sysctl_load_brand_string);
 
-/*
- * machdep.cpu.brand_string
- *
- * x86: derived from CPUID data.
- * ARM: Grab the product string from the device tree, if it exists.
- *      Otherwise, cons something up from the CPUID register.
- *      the value is already exported via the commpage. So keep it simple.
- */
+  
+                           
+  
+                                
+                                                                   
+                                                             
+                                                                          
+   
 static int
 make_brand_string SYSCTL_HANDLER_ARGS
 {
@@ -268,10 +268,10 @@ SYSCTL_QUAD(_machdep, OID_AUTO, tlto,
     CTLFLAG_RW | CTLFLAG_LOCKED, &TLockTimeOut,
     "Ticket spinlock timeout (MATUs): use with care");
 
-/*
- * macro to generate a sysctl machdep.cpu.sysreg_* for a given system register
- * using __builtin_arm_rsr64.
- */
+  
+                                                                              
+                             
+   
 #define SYSCTL_PROC_MACHDEP_CPU_SYSREG(name)                            \
 static int                                                              \
 sysctl_sysreg_##name SYSCTL_HANDLER_ARGS                                \
@@ -286,21 +286,21 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, sysreg_##name,                      \
     #name " register on the current CPU");
 
 
-// CPU system registers
-// ARM64: AArch64 Vector Base Address Register
+                       
+                                              
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(VBAR_EL1);
-// ARM64: AArch64 Memory Attribute Indirection Register
+                                                       
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(MAIR_EL1);
-// ARM64: AArch64 Translation table base register 1
+                                                   
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(TTBR1_EL1);
-// ARM64: AArch64 System Control Register
+                                         
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(SCTLR_EL1);
-// ARM64: AArch64 Translation Control Register
+                                              
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(TCR_EL1);
-// ARM64: AArch64 Memory Model Feature Register 0
+                                                 
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(ID_AA64MMFR0_EL1);
-// ARM64: AArch64 Instruction Set Attribute Register 1
+                                                      
 SYSCTL_PROC_MACHDEP_CPU_SYSREG(ID_AA64ISAR1_EL1);
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 

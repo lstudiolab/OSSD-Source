@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* TCP-cache to store and retrieve TCP-related information */
+                                                             
 
 #ifndef _NETINET_TCP_CACHE_H
 #define _NETINET_TCP_CACHE_H
@@ -34,8 +34,8 @@
 #include <netinet/tcp_var.h>
 #include <netinet/in.h>
 
-#define ECN_MIN_CE_PROBES       10 /* Probes are basically the number of incoming packets */
-#define ECN_MAX_CE_RATIO        7 /* Ratio is the maximum number of CE-packets we accept per incoming "probe" */
+#define ECN_MIN_CE_PROBES       10                                                          
+#define ECN_MAX_CE_RATIO        7                                                                               
 
 extern void tcp_cache_set_cookie(struct tcpcb *tp, u_char *cookie, u_int8_t len);
 extern int tcp_cache_get_cookie(struct tcpcb *tp, u_char *cookie, u_int8_t *len);
@@ -70,4 +70,4 @@ extern void tcp_heuristics_tfo_update(struct necp_tcp_tfo_cache *necp_buffer,
 
 extern void tcp_cache_init(void);
 
-#endif /* _NETINET_TCP_CACHE_H */
+#endif                           

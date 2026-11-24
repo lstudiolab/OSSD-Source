@@ -26,26 +26,26 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *	mach_port_t - a named port right
- *
- *	In user-space, "rights" are represented by the name of the
- *	right in the Mach port namespace.  Even so, this type is
- *	presented as a unique one to more clearly denote the presence
- *	of a right coming along with the name.
- *
- *	Often, various rights for a port held in a single name space
- *	will coalesce and are, therefore, be identified by a single name
- *	[this is the case for send and receive rights].  But not
- *	always [send-once rights currently get a unique name for
- *	each right].
- *
- *	This definition of mach_port_t is only for user-space.
- *
- */
+  
+                                   
+  
+                                                             
+                                                           
+                                                                
+                                         
+  
+                                                               
+                                                                   
+                                                           
+                                                           
+               
+  
+                                                         
+  
+   
 
 #ifndef _MACH_PORT_T
 #define _MACH_PORT_T
-#include <sys/_types.h> /* __darwin_mach_port_t */
+#include <sys/_types.h>                           
 typedef __darwin_mach_port_t mach_port_t;
-#endif /* _MACH_PORT_T */
+#endif                   

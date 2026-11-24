@@ -64,29 +64,29 @@ extern "C" {
 #include <sys/sysctl.h>
 }
 
-#define kShutdownTimeout    30 //in secs
+#define kShutdownTimeout    30          
 
 #if defined(XNU_TARGET_OS_OSX)
 
 boolean_t coprocessor_cross_panic_enabled = TRUE;
 #define APPLE_VENDOR_VARIABLE_GUID "4d1ede05-38c7-4a6a-9cc6-4bcca8b38c14"
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 
 
 void printDictionaryKeys(OSDictionary * inDictionary, char * inMsg);
 static void getCStringForObject(OSObject *inObj, char *outStr, size_t outStrLen);
 
-/*
- * There are drivers which take mutexes in the quiesce callout or pass
- * the quiesce/active action to super.  Even though it sometimes panics,
- * because it doesn't *always* panic, they get away with it.
- * We need a chicken bit to diagnose and fix them all before this
- * can be enabled by default.
- *
- * <rdar://problem/33831837> tracks turning this on by default.
- */
+  
+                                                                      
+                                                                        
+                                                            
+                                                                 
+                             
+  
+                                                               
+   
 uint32_t gEnforceQuiesceSafety = 0;
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #define super IOService
 
@@ -113,7 +113,7 @@ static IODTNVRAM *gIOOptionsEntry;
 
 OSSymbol * gPlatformInterruptControllerName;
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 bool
 IOPlatformExpert::attach( IOService * provider )
@@ -137,10 +137,10 @@ IOPlatformExpert::start( IOService * provider )
 		return false;
 	}
 
-	// Override the mapper present flag is requested by boot arguments, if SIP disabled.
+	                                                                                    
 #if CONFIG_CSR
 	if (csr_check(CSR_ALLOW_UNRESTRICTED_FS) == 0)
-#endif /* CONFIG_CSR */
+#endif                 
 	{
 		if (PE_parse_boot_argn("dart", &debugFlags, sizeof(debugFlags)) && (debugFlags == 0)) {
 			removeProperty(kIOPlatformMapperPresentKey);
@@ -149,17 +149,17 @@ IOPlatformExpert::start( IOService * provider )
 		if (PE_parse_boot_argn("-x", &debugFlags, sizeof(debugFlags))) {
 			removeProperty(kIOPlatformMapperPresentKey);
 		}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	}
 
-	// Register the presence or lack thereof a system
-	// PCI address mapper with the IOMapper class
+	                                                 
+	                                             
 	IOMapper::setMapperRequired(NULL != getProperty(kIOPlatformMapperPresentKey));
 
 	gIOInterruptControllers = OSDictionary::withCapacity(1);
 	gIOInterruptControllersLock = IOLockAlloc();
 
-	// Correct the bus frequency in the device tree.
+	                                                
 	busFrequency = OSData::withBytesNoCopy((void *)&gPEClockFrequencyInfo.bus_clock_rate_hz, 4);
 	provider->setProperty("clock-frequency", busFrequency);
 	busFrequency->release();
@@ -178,7 +178,7 @@ IOPlatformExpert::start( IOService * provider )
 
 #if !defined(__x86_64__)
 	publishPlatformUUIDAndSerial();
-#endif /* !defined(__x86_64__) */
+#endif                           
 
 #if defined (__x86_64__)
 	if (PEGetCoprocessorVersion() >= kCoprocessorVersion2) {
@@ -295,25 +295,25 @@ IOPlatformExpert::setMachineType(long peMachineType)
 }
 
 bool
-IOPlatformExpert::getMachineName( char * /*name*/, int /*maxLength*/)
+IOPlatformExpert::getMachineName( char *         , int              )
 {
 	return false;
 }
 
 bool
-IOPlatformExpert::getModelName( char * /*name*/, int /*maxLength*/)
+IOPlatformExpert::getModelName( char *         , int              )
 {
 	return false;
 }
 
 bool
-IOPlatformExpert::getTargetName( char * /*name*/, int /*maxLength*/)
+IOPlatformExpert::getTargetName( char *         , int              )
 {
 	return false;
 }
 
 bool
-IOPlatformExpert::getProductName( char * /*name*/, int /*maxLength*/)
+IOPlatformExpert::getProductName( char *         , int              )
 {
 	return false;
 }
@@ -346,12 +346,12 @@ IOPlatformExpert::haltRestart(unsigned int type)
 	}
 
 	if (type == kPEUPSDelayHaltCPU) {
-		// RestartOnPowerLoss feature was turned on, proceed with shutdown.
+		                                                                   
 		type = kPEHaltCPU;
 	}
 
 #if defined (__x86_64__)
-	// On ARM kPEPanicRestartCPU is supported in the drivers
+	                                                        
 	if (type == kPEPanicRestartCPU) {
 		type = kPERestartCPU;
 	}
@@ -379,11 +379,11 @@ IOPlatformExpert::sleepKernel(void)
 
 	ml_set_interrupts_enabled(intState);
 #else
-//  PE_initialize_console(0, kPEDisableScreen);
+                                               
 
 	IOCPUSleepKernel();
 
-//  PE_initialize_console(0, kPEEnableScreen);
+                                              
 #endif
 }
 
@@ -420,7 +420,7 @@ IOPlatformExpert::registerInterruptController(OSSymbol *name, IOInterruptControl
 	gIOInterruptControllers->setObject(name, interruptController);
 
 	IOLockWakeup(gIOInterruptControllersLock,
-	    gIOInterruptControllers, /* one-thread */ false);
+	    gIOInterruptControllers,                  false);
 
 	IOLockUnlock(gIOInterruptControllersLock);
 
@@ -482,7 +482,7 @@ IOPlatformExpert::atInterruptLevel(void)
 }
 
 bool
-IOPlatformExpert::platformAdjustService(IOService */*service*/)
+IOPlatformExpert::platformAdjustService(IOService *           )
 {
 	return true;
 }
@@ -501,10 +501,10 @@ IOPlatformExpert::setUTCTimeOfDay(clock_sec_t secs, __unused clock_nsec_t nsecs)
 }
 
 
-//*********************************************************************************
-// PMLog
-//
-//*********************************************************************************
+                                                                                   
+        
+  
+                                                                                   
 
 void
 IOPlatformExpert::
@@ -517,19 +517,19 @@ PMLog(const char *who, unsigned long event,
 	nowus += (nows % 1000) * 1000000;
 
 	kprintf("pm%u %p %.30s %d %lx %lx\n",
-	    nowus, OBFUSCATE(current_thread()), who,            // Identity
-	    (int) event, (long)OBFUSCATE(param1), (long)OBFUSCATE(param2));                     // Args
+	    nowus, OBFUSCATE(current_thread()), who,                       
+	    (int) event, (long)OBFUSCATE(param1), (long)OBFUSCATE(param2));                            
 }
 
 
-//*********************************************************************************
-// PMInstantiatePowerDomains
-//
-// In this vanilla implementation, a Root Power Domain is instantiated.
-// All other objects which register will be children of this Root.
-// Where this is inappropriate, PMInstantiatePowerDomains is overridden
-// in a platform-specific subclass.
-//*********************************************************************************
+                                                                                   
+                            
+  
+                                                                       
+                                                                  
+                                                                       
+                                   
+                                                                                   
 
 void
 IOPlatformExpert::PMInstantiatePowerDomains( void )
@@ -541,12 +541,12 @@ IOPlatformExpert::PMInstantiatePowerDomains( void )
 }
 
 
-//*********************************************************************************
-// PMRegisterDevice
-//
-// In this vanilla implementation, all callers are made children of the root power domain.
-// Where this is inappropriate, PMRegisterDevice is overridden in a platform-specific subclass.
-//*********************************************************************************
+                                                                                   
+                   
+  
+                                                                                          
+                                                                                               
+                                                                                   
 
 void
 IOPlatformExpert::PMRegisterDevice(IOService * theNub, IOService * theDevice)
@@ -554,10 +554,10 @@ IOPlatformExpert::PMRegisterDevice(IOService * theNub, IOService * theDevice)
 	root->addPowerChild( theDevice );
 }
 
-//*********************************************************************************
-// hasPMFeature
-//
-//*********************************************************************************
+                                                                                   
+               
+  
+                                                                                   
 
 bool
 IOPlatformExpert::hasPMFeature(unsigned long featureMask)
@@ -565,10 +565,10 @@ IOPlatformExpert::hasPMFeature(unsigned long featureMask)
 	return (_pePMFeatures & featureMask) != 0;
 }
 
-//*********************************************************************************
-// hasPrivPMFeature
-//
-//*********************************************************************************
+                                                                                   
+                   
+  
+                                                                                   
 
 bool
 IOPlatformExpert::hasPrivPMFeature(unsigned long privFeatureMask)
@@ -576,10 +576,10 @@ IOPlatformExpert::hasPrivPMFeature(unsigned long privFeatureMask)
 	return (_pePrivPMFeatures & privFeatureMask) != 0;
 }
 
-//*********************************************************************************
-// numBatteriesSupported
-//
-//*********************************************************************************
+                                                                                   
+                        
+  
+                                                                                   
 
 int
 IOPlatformExpert::numBatteriesSupported(void)
@@ -587,16 +587,16 @@ IOPlatformExpert::numBatteriesSupported(void)
 	return _peNumBatteriesSupported;
 }
 
-//*********************************************************************************
-// CheckSubTree
-//
-// This method is called by the instantiated sublass of the platform expert to
-// determine how a device should be inserted into the Power Domain. The subclass
-// provides an XML power tree description against which a device is matched based
-// on class and provider. If a match is found this routine returns true in addition
-// to flagging the description tree at the appropriate node that a device has been
-// registered for the given service.
-//*********************************************************************************
+                                                                                   
+               
+  
+                                                                              
+                                                                                
+                                                                                 
+                                                                                   
+                                                                                  
+                                    
+                                                                                   
 
 bool
 IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOService * theDevice, OSDictionary * theParent)
@@ -621,7 +621,7 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 
 	numPowerTreeNodes = inSubTree->getCount();
 
-	// iterate through the power tree to find a home for this device
+	                                                                
 
 	for (i = 0; i < numPowerTreeNodes; i++) {
 		entry =  (OSDictionary *) inSubTree->getObject(i);
@@ -629,7 +629,7 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 		matchingDictionary = (OSDictionary *) entry->getObject("device");
 		providerDictionary = (OSDictionary *) entry->getObject("provider");
 
-		deviceMatch = true; // if no matching dictionary, this is not a criteria and so must match
+		deviceMatch = true;                                                                       
 		if (matchingDictionary) {
 			deviceMatch = false;
 			if (NULL != (deviceDictionary = theDevice->dictionaryWithProperties())) {
@@ -638,7 +638,7 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 			}
 		}
 
-		providerMatch = true; // we indicate a match if there is no nub or provider
+		providerMatch = true;                                                      
 		if (theNub && providerDictionary) {
 			providerMatch = false;
 			if (NULL != (nubDictionary = theNub->dictionaryWithProperties())) {
@@ -647,7 +647,7 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 			}
 		}
 
-		multiParentMatch = true; // again we indicate a match if there is no multi-parent node
+		multiParentMatch = true;                                                              
 		if (deviceMatch && providerMatch) {
 			if (NULL != multipleParentKeyValue) {
 				OSNumber * aNumber = (OSNumber *) entry->getObject("multiple-parent");
@@ -657,14 +657,14 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 
 		nodeFound = (deviceMatch && providerMatch && multiParentMatch);
 
-		// if the power tree specifies a provider dictionary but theNub is
-		// NULL then we cannot match with this entry.
+		                                                                  
+		                                             
 
 		if (theNub == NULL && providerDictionary != NULL) {
 			nodeFound = false;
 		}
 
-		// if this node is THE ONE...then register the device
+		                                                     
 
 		if (nodeFound) {
 			if (RegisterServiceInTree(theDevice, entry, theParent, theNub)) {
@@ -674,7 +674,7 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 
 				numInstancesRegistered++;
 
-				// determine if we need to search for additional nodes for this item
+				                                                                    
 				multipleParentKeyValue = (OSNumber *) entry->getObject("multiple-parent");
 			} else {
 				nodeFound = false;
@@ -696,11 +696,11 @@ IOPlatformExpert::CheckSubTree(OSArray * inSubTree, IOService * theNub, IOServic
 	return nodeFound;
 }
 
-//*********************************************************************************
-// RegisterServiceInTree
-//
-// Register a device at the specified node of our power tree.
-//*********************************************************************************
+                                                                                   
+                        
+  
+                                                             
+                                                                                   
 
 bool
 IOPlatformExpert::RegisterServiceInTree(IOService * theService, OSDictionary * theTreeNode, OSDictionary * theTreeParentNode, IOService * theProvider)
@@ -711,14 +711,14 @@ IOPlatformExpert::RegisterServiceInTree(IOService * theService, OSDictionary * t
 	unsigned int   numChildren;
 	OSDictionary * child;
 
-	// make sure someone is not already registered here
+	                                                   
 
 	if (NULL == theTreeNode->getObject("service")) {
 		if (theTreeNode->setObject("service", OSDynamicCast( OSObject, theService))) {
-			// 1. CHILDREN ------------------
+			                                 
 
-			// we registered the node in the tree...now if the node has children
-			// registered we must tell this service to add them.
+			                                                                    
+			                                                    
 
 			if (NULL != (children = (OSArray *) theTreeNode->getObject("children"))) {
 				numChildren = children->getCount();
@@ -731,10 +731,10 @@ IOPlatformExpert::RegisterServiceInTree(IOService * theService, OSDictionary * t
 				}
 			}
 
-			// 2. PARENT --------------------
+			                                 
 
-			// also we must notify the parent of this node (if a registered service
-			// exists there) of a new child.
+			                                                                       
+			                                
 
 			if (theTreeParentNode) {
 				if (NULL != (aService = (IOService *) theTreeParentNode->getObject("service"))) {
@@ -751,11 +751,11 @@ IOPlatformExpert::RegisterServiceInTree(IOService * theService, OSDictionary * t
 	return registered;
 }
 
-//*********************************************************************************
-// printDictionaryKeys
-//
-// Print the keys for the given dictionary and selected contents.
-//*********************************************************************************
+                                                                                   
+                      
+  
+                                                                 
+                                                                                   
 void
 printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 {
@@ -769,9 +769,9 @@ printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 	mkey = OSDynamicCast(OSSymbol, mcoll->getNextObject());
 
 	while (mkey) {
-		// kprintf ("dictionary key #%d: %s\n", i, mkey->getCStringNoCopy () );
+		                                                                       
 
-		// if this is the IOClass key, print it's contents
+		                                                  
 
 		if (mkey->isEqualTo("IOClass")) {
 			ioClass = (OSString *) inDictionary->getObject("IOClass");
@@ -780,7 +780,7 @@ printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 			}
 		}
 
-		// if this is an IOProviderClass key print it
+		                                             
 
 		if (mkey->isEqualTo("IOProviderClass")) {
 			ioClass = (OSString *) inDictionary->getObject("IOProviderClass");
@@ -789,7 +789,7 @@ printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 			}
 		}
 
-		// also print IONameMatch keys
+		                              
 		if (mkey->isEqualTo("IONameMatch")) {
 			ioClass = (OSString *) inDictionary->getObject("IONameMatch");
 			if (ioClass) {
@@ -797,7 +797,7 @@ printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 			}
 		}
 
-		// also print IONameMatched keys
+		                                
 
 		if (mkey->isEqualTo("IONameMatched")) {
 			ioClass = (OSString *) inDictionary->getObject("IONameMatched");
@@ -807,7 +807,7 @@ printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 		}
 
 #if 0
-		// print clock-id
+		                 
 
 		if (mkey->isEqualTo("AAPL,clock-id")) {
 			char * cstr;
@@ -818,7 +818,7 @@ printDictionaryKeys(OSDictionary * inDictionary, char * inMsg)
 		}
 #endif
 
-		// print name
+		             
 
 		if (mkey->isEqualTo("name")) {
 			char nameStr[64];
@@ -865,9 +865,9 @@ getCStringForObject(OSObject *inObj, char *outStr, size_t outStrLen)
 	}
 }
 
-/* IOShutdownNotificationsTimedOut
- * - Called from a timer installed by PEHaltRestart
- */
+                                  
+                                                   
+   
 #if !defined(__x86_64)
 __abortlike
 #endif
@@ -877,10 +877,10 @@ IOShutdownNotificationsTimedOut(
 	thread_call_param_t p1)
 {
 #if !defined(__x86_64__)
-	/* 30 seconds has elapsed - panic */
+	                                    
 	panic("Halt/Restart Timed Out");
 
-#else /* !defined(__x86_64__) */
+#else                           
 	int type = (int)(long)p0;
 	uint32_t timeout = (uint32_t)(uintptr_t)p1;
 
@@ -891,24 +891,24 @@ IOShutdownNotificationsTimedOut(
 		}
 	}
 
-	/* 30 seconds has elapsed - resume shutdown */
+	                                              
 	if (gIOPlatform) {
 		gIOPlatform->haltRestart(type);
 	}
-#endif /* defined(__x86_64__) */
+#endif                          
 }
 
 
 extern "C" {
-/*
- * Callouts from BSD for machine name & model
- */
+  
+                                             
+   
 
-/*
- * PEGetMachineName() and PEGetModelName() are inconsistent across
- * architectures, and considered deprecated. Use PEGetTargetName() and
- * PEGetProductName() instead.
- */
+  
+                                                                  
+                                                                      
+                              
+   
 boolean_t
 PEGetMachineName( char * name, int maxLength )
 {
@@ -919,11 +919,11 @@ PEGetMachineName( char * name, int maxLength )
 	}
 }
 
-/*
- * PEGetMachineName() and PEGetModelName() are inconsistent across
- * architectures, and considered deprecated. Use PEGetTargetName() and
- * PEGetProductName() instead.
- */
+  
+                                                                  
+                                                                      
+                              
+   
 boolean_t
 PEGetModelName( char * name, int maxLength )
 {
@@ -964,15 +964,15 @@ PEGetPlatformEpoch(void)
 	}
 }
 
-/* Handle necessary platform specific actions prior to panic */
+                                                               
 void
 PEInitiatePanic(void)
 {
 #if defined(__arm64__)
-	/*
-	 * Trigger a TLB flush so any hard hangs exercise the SoC diagnostic
-	 * collection flow rather than hanging late in panic (see rdar://58062030)
-	 */
+	  
+                                                                     
+                                                                           
+    
 	flush_mmu_tlb_entry(0);
 #endif
 }
@@ -989,24 +989,24 @@ PEHaltRestartInternal(unsigned int type, uint32_t details)
 	static boolean_t  panic_begin_called = FALSE;
 
 	if (type == kPEHaltCPU || type == kPERestartCPU || type == kPEUPSDelayHaltCPU) {
-		/* If we're in the panic path, the locks and memory allocations required below
-		 *  could fail. So just try to reboot instead of risking a nested panic.
-		 */
+		                                                                              
+                                                                          
+     
 		if (panic_begin_called) {
 			goto skip_to_haltRestart;
 		}
 
 		pmRootDomain = IOService::getPMRootDomain();
-		/* Notify IOKit PM clients of shutdown/restart
-		 *  Clients subscribe to this message with a call to
-		 *  IOService::registerInterest()
-		 */
+		                                              
+                                                      
+                                   
+     
 
-		/* Spawn a thread that will panic in 30 seconds.
-		 *  If all goes well the machine will be off by the time
-		 *  the timer expires. If the device wants a different
-		 *  timeout, use that value instead of 30 seconds.
-		 */
+		                                                
+                                                          
+                                                        
+                                                    
+     
 #if  defined(__arm__) || defined(__arm64__)
 #define RESTART_NODE_PATH    "/defaults"
 #else
@@ -1021,7 +1021,7 @@ PEHaltRestartInternal(unsigned int type, uint32_t details)
 		}
 
 #if (DEVELOPMENT || DEBUG)
-		/* Override the default timeout via a boot-arg */
+		                                                 
 		uint32_t boot_arg_val;
 		if (PE_parse_boot_argn("halt_restart_timeout", &boot_arg_val, sizeof(boot_arg_val))) {
 			timeout = boot_arg_val;
@@ -1036,33 +1036,33 @@ PEHaltRestartInternal(unsigned int type, uint32_t details)
 		}
 
 		pmRootDomain->handlePlatformHaltRestart(type);
-		/* This notification should have few clients who all do
-		 *  their work synchronously.
-		 *
-		 *  In this "shutdown notification" context we don't give
-		 *  drivers the option of working asynchronously and responding
-		 *  later. PM internals make it very hard to wait for asynchronous
-		 *  replies.
-		 */
+		                                                       
+                               
+    
+                                                           
+                                                                 
+                                                                    
+              
+     
 	} else if (type == kPEPanicRestartCPU || type == kPEPanicSync || type == kPEPanicRestartCPUNoCallouts) {
 		if (type == kPEPanicRestartCPU) {
-			// Notify any listeners that we're done collecting
-			// panic data before we call through to do the restart
+			                                                  
+			                                                      
 #if defined(__x86_64__)
 			if (coprocessor_cross_panic_enabled)
 #endif
 			IOCPURunPlatformPanicActions(kPEPanicEnd, details);
 		} else if (type == kPEPanicRestartCPUNoCallouts) {
-			// We skipped the callouts so now set the type to
-			// the variant that the platform uses for panic restarts.
+			                                                 
+			                                                         
 			type = kPEPanicRestartCPU;
 		}
 
 
-		// Do an initial sync to flush as much panic data as possible,
-		// in case we have a problem in one of the platorm panic handlers.
-		// After running the platform handlers, do a final sync w/
-		// platform hardware quiesced for the panic.
+		                                                              
+		                                                                  
+		                                                          
+		                                            
 		PE_sync_panic_buffers();
 		IOCPURunPlatformPanicActions(type, details);
 		PE_sync_panic_buffers();
@@ -1076,7 +1076,7 @@ PEHaltRestartInternal(unsigned int type, uint32_t details)
 		if (coprocessor_cross_panic_enabled)
 #endif
 		{
-			// Only call the kPEPanicBegin callout once
+			                                           
 			if (!panic_begin_called) {
 				panic_begin_called = TRUE;
 				IOCPURunPlatformPanicActions(type, details);
@@ -1118,12 +1118,12 @@ PESavePanicInfoAction(void *buffer, UInt32 offset, UInt32 length)
 }
 
 
-/*
- * Depending on the platform, the /options node may not be created
- * until after IOKit matching has started, by an externally-supplied
- * platform expert subclass.  Therefore, we must check for its presence
- * here and update gIOOptionsEntry for the platform code as necessary.
- */
+  
+                                                                  
+                                                                    
+                                                                       
+                                                                      
+   
 inline static int
 init_gIOOptionsEntry(void)
 {
@@ -1159,7 +1159,7 @@ release:
 	return ret;
 }
 
-/* pass in a NULL value if you just want to figure out the len */
+                                                                 
 boolean_t
 PEReadNVRAMProperty(const char *symbol, void *value,
     unsigned int *len)
@@ -1184,7 +1184,7 @@ PEReadNVRAMProperty(const char *symbol, void *value,
 		goto err;
 	}
 
-	/* convert to data */
+	                     
 	data = OSDynamicCast(OSData, obj);
 	if (!data) {
 		goto err;
@@ -1226,7 +1226,7 @@ PEWriteNVRAMBooleanProperty(const char *symbol, boolean_t value)
 
 	sym->release();
 
-	/* success, force the NVRAM to flush writes */
+	                                              
 	if (ret == true) {
 		gIOOptionsEntry->sync();
 	}
@@ -1382,7 +1382,7 @@ PEGetCoprocessorVersion( void )
 #endif
 	return coprocessor_version;
 }
-} /* extern "C" */
+}                 
 
 bool gIOPlatformUUIDAndSerialDone = false;
 
@@ -1390,7 +1390,7 @@ void
 IOPlatformExpert::publishPlatformUUIDAndSerial( void )
 {
 	if (!gIOPlatformUUIDAndSerialDone) {
-		// Parse the serial-number data and publish a user-readable string
+		                                                                  
 		if (NULL == getProvider()->getProperty(kIOPlatformSerialNumberKey)) {
 			OSData* mydata = (OSData*) (getProvider()->getProperty("serial-number"));
 			if (mydata != NULL) {
@@ -1431,11 +1431,11 @@ IOPlatformExpert::registerNVRAMController(IONVRAMController * caller)
 	OSData *          data;
 	IORegistryEntry * entry;
 
-	/*
-	 * If we have panic debugging enabled and a prod-fused coprocessor,
-	 * disable cross panics so that the co-processor doesn't cause the system
-	 * to reset when we enter the debugger or hit a panic on the x86 side.
-	 */
+	  
+                                                                    
+                                                                          
+                                                                       
+    
 	if (panicDebugging) {
 		entry = IORegistryEntry::fromPath( "/options", gIODTPlane );
 		if (entry) {
@@ -1468,10 +1468,10 @@ IOPlatformExpert::registerNVRAMController(IONVRAMController * caller)
 	}
 	sysctl_unblock_osenvironment();
 #endif
-	/* on intel the UUID must be published after nvram is available */
+	                                                                  
 	publishPlatformUUIDAndSerial();
 
-#endif /* defined(__x86_64__) */
+#endif                          
 
 	publishResource("IONVRAM");
 }
@@ -1486,10 +1486,10 @@ IOPlatformExpert::callPlatformFunction(const OSSymbol *functionName,
 
 	if (functionName == gIOPlatformQuiesceActionKey ||
 	    functionName == gIOPlatformActiveActionKey) {
-		/*
-		 * Services which register for IOPlatformQuiesceAction / IOPlatformActiveAction
-		 * must consume that event themselves, without passing it up to super/IOPlatformExpert.
-		 */
+		  
+                                                                                 
+                                                                                         
+     
 		if (gEnforceQuiesceSafety) {
 			panic("Class %s passed the quiesce/active action to IOPlatformExpert",
 			    getMetaClass()->getClassName());
@@ -1520,7 +1520,7 @@ IOPlatformExpert::savePanicInfo(UInt8 *buffer, IOByteCount length)
 	return 0;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #undef super
 #define super IOPlatformExpert
@@ -1536,7 +1536,7 @@ OSMetaClassDefineReservedUnused(IODTPlatformExpert, 5);
 OSMetaClassDefineReservedUnused(IODTPlatformExpert, 6);
 OSMetaClassDefineReservedUnused(IODTPlatformExpert, 7);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOService *
 IODTPlatformExpert::probe( IOService * provider,
@@ -1546,7 +1546,7 @@ IODTPlatformExpert::probe( IOService * provider,
 		return NULL;
 	}
 
-	// check machine types
+	                      
 	if (!provider->compareNames( getProperty( gIONameMatchKey ))) {
 		return NULL;
 	}
@@ -1616,14 +1616,14 @@ IODTPlatformExpert::createNubs( IOService * parent, OSIterator * iter )
 			int logical_cpu_id = ml_get_cpu_number(phys_id);
 			int logical_cluster_id = ml_get_cluster_number(phys_id);
 
-			/*
-			 * If the following condition triggers, it means that a CPU that was present in the DT
-			 * was ignored by XNU at topology parsing time. This can happen currently when using the
-			 * cpus=N boot-arg; for example, cpus=1 will cause XNU to parse and enable a single CPU.
-			 *
-			 * Note that this condition will not trigger for harvested cores because these do not show up
-			 * in the DT/IORegistry in the first place.
-			 */
+			  
+                                                                                         
+                                                                                           
+                                                                                           
+     
+                                                                                                
+                                              
+      
 			if (logical_cpu_id < 0) {
 				nub->registerService();
 				continue;
@@ -1649,7 +1649,7 @@ IODTPlatformExpert::processTopLevel( IORegistryEntry * rootEntry )
 	IORegistryEntry *   next;
 	IORegistryEntry *   cpus;
 
-	// infanticide
+	              
 	kids = IODTFindMatchingEntries( rootEntry, 0, deleteList());
 	if (kids) {
 		while ((next = (IORegistryEntry *)kids->getNextObject())) {
@@ -1659,17 +1659,17 @@ IODTPlatformExpert::processTopLevel( IORegistryEntry * rootEntry )
 	}
 
 	publishNVRAM();
-	assert(gIOOptionsEntry != NULL); // subclasses that do their own NVRAM initialization shouldn't be calling this
+	assert(gIOOptionsEntry != NULL);                                                                               
 	dtNVRAM = gIOOptionsEntry;
 
-	// Publish the cpus.
+	                    
 	cpus = rootEntry->childFromPath( "cpus", gIODTPlane);
 	if (cpus) {
 		createNubs( this, IODTFindMatchingEntries( cpus, kIODTExclusive, NULL));
 		cpus->release();
 	}
 
-	// publish top level, minus excludeList
+	                                       
 	createNubs( this, IODTFindMatchingEntries( rootEntry, kIODTExclusive, excludeList()));
 }
 
@@ -1694,18 +1694,18 @@ IODTPlatformExpert::compareNubName( const IOService * nub,
 }
 
 
-/*
- * Do not use this method directly, it returns inconsistent results
- * across architectures and is considered deprecated.
- *
- * Use getTargetName and getProductName respectively.  For example:
- *
- * targetName: J137AP
- * productName: iMacPro1,1
- *
- * targetName: D331pAP
- * productName: iPhone11,6
- */
+  
+                                                                   
+                                                     
+  
+                                                                   
+  
+                     
+                          
+  
+                      
+                          
+   
 
 bool
 IODTPlatformExpert::getModelName( char * name, int maxLength )
@@ -1744,18 +1744,18 @@ IODTPlatformExpert::getModelName( char * name, int maxLength )
 	return ok;
 }
 
-/*
- * Do not use this method directly, it returns inconsistent results
- * across architectures and is considered deprecated.
- *
- * Use getTargetName and getProductName respectively.  For example:
- *
- * targetName: J137AP
- * productName: iMacPro1,1
- *
- * targetName: D331pAP
- * productName: iPhone11,6
- */
+  
+                                                                   
+                                                     
+  
+                                                                   
+  
+                     
+                          
+  
+                      
+                          
+   
 
 bool
 IODTPlatformExpert::getMachineName( char * name, int maxLength )
@@ -1774,7 +1774,7 @@ IODTPlatformExpert::getMachineName( char * name, int maxLength )
 	return ok;
 }
 
-/* Examples: J137AP, D331pAP... */
+                                  
 
 bool
 IODTPlatformExpert::getTargetName( char * name, int maxLength )
@@ -1788,7 +1788,7 @@ IODTPlatformExpert::getTargetName( char * name, int maxLength )
 	prop = (OSData *) getProvider()->getProperty( key );
 
 	if (prop == NULL) {
-		// This happens if there is no bridge.
+		                                      
 		char const * const  unknown = "";
 
 		strlcpy( name, unknown, maxLength );
@@ -1802,7 +1802,7 @@ IODTPlatformExpert::getTargetName( char * name, int maxLength )
 #endif
 }
 
-/* Examples: iMacPro1,1, iPhone11,6... */
+                                         
 
 bool
 IODTPlatformExpert::getProductName( char * name, int maxLength )
@@ -1814,7 +1814,7 @@ IODTPlatformExpert::getProductName( char * name, int maxLength )
 #endif
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 void
 IODTPlatformExpert::registerNVRAMController( IONVRAMController * nvram )
@@ -1964,18 +1964,18 @@ IODTPlatformExpert::createSystemSerialNumberString(OSData* myProperty)
 		serialNumber = (UInt8*)(myProperty->getBytesNoCopy());
 		temp = (char*)serialNumber;
 		if (serialNumberSize > 0) {
-			// check to see if this is a CTO serial number...
+			                                                 
 			while (pos < serialNumberSize && temp[pos] != '-') {
 				pos++;
 			}
 
-			if (pos < serialNumberSize) { // there was a hyphen, so it's a CTO serial number
+			if (pos < serialNumberSize) {                                                   
 				memcpy(SerialNo, serialNumber + 12, 8);
 				memcpy(&SerialNo[8], serialNumber, 3);
 				SerialNo[11] = '-';
 				memcpy(&SerialNo[12], serialNumber + 3, 8);
 				SerialNo[20] = 0;
-			} else { // just a normal serial number
+			} else {                               
 				memcpy(SerialNo, serialNumber + 13, 8);
 				memcpy(&SerialNo[8], serialNumber, 3);
 				SerialNo[11] = 0;
@@ -1987,7 +1987,7 @@ IODTPlatformExpert::createSystemSerialNumberString(OSData* myProperty)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #undef super
 #define super IOService
@@ -1999,7 +1999,7 @@ OSMetaClassDefineReservedUnused(IOPlatformExpertDevice, 1);
 OSMetaClassDefineReservedUnused(IOPlatformExpertDevice, 2);
 OSMetaClassDefineReservedUnused(IOPlatformExpertDevice, 3);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 bool
 IOPlatformExpertDevice::compareName( OSString * name,
@@ -2105,7 +2105,7 @@ void
 IOPlatformExpertDevice::configureDefaults( void )
 {
 	createNVRAM();
-	// Parse the serial-number data and publish a user-readable string
+	                                                                  
 	OSData* mydata = (OSData*) (getProperty("serial-number"));
 	if (mydata != NULL) {
 		OSString *serNoString = OSString::withCString((const char *)mydata->getBytesNoCopy());
@@ -2120,15 +2120,15 @@ IOPlatformExpertDevice::configureDefaults( void )
 void
 IOPlatformExpertDevice::createNVRAM( void )
 {
-	/*
-	 * Publish an IODTNVRAM class on /options, if present.
-	 * DT-based platforms may need NVRAM access prior to the start
-	 * of IOKit matching, to support security-related operations
-	 * that must happen before machine_lockdown().
-	 */
+	  
+                                                       
+                                                               
+                                                             
+                                               
+    
 	IORegistryEntry *options = IORegistryEntry::fromPath("/options", gIODTPlane);
 	if (options == NULL) {
-		return; // /options may not be present
+		return;                               
 	}
 
 	assert(gIOOptionsEntry == NULL);
@@ -2180,7 +2180,7 @@ IOPlatformExpertDevice::generatePlatformUUID( void )
 
 		entry->release();
 	}
-#else /* !defined(__x86_64__) */
+#else                           
 	OSData * data;
 
 	entry = IORegistryEntry::fromPath( "/efi/platform", gIODTPlane );
@@ -2206,7 +2206,7 @@ IOPlatformExpertDevice::generatePlatformUUID( void )
 		entry->release();
 	}
 	if (!string) {
-		/* vmware still runs this path */
+		                                 
 		entry = IORegistryEntry::fromPath( "/options", gIODTPlane );
 		if (entry) {
 			data = OSDynamicCast( OSData, entry->getProperty( "platform-uuid" ));
@@ -2217,7 +2217,7 @@ IOPlatformExpertDevice::generatePlatformUUID( void )
 			entry->release();
 		}
 	}
-#endif /* defined(__x86_64__) */
+#endif                          
 
 	if (string) {
 		setProperty( kIOPlatformUUIDKey, string );
@@ -2226,7 +2226,7 @@ IOPlatformExpertDevice::generatePlatformUUID( void )
 		string->release();
 	}
 }
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #undef super
 #define super IOService
@@ -2238,7 +2238,7 @@ OSMetaClassDefineReservedUnused(IOPlatformDevice, 1);
 OSMetaClassDefineReservedUnused(IOPlatformDevice, 2);
 OSMetaClassDefineReservedUnused(IOPlatformDevice, 3);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 bool
 IOPlatformDevice::compareName( OSString * name,
@@ -2249,7 +2249,7 @@ IOPlatformDevice::compareName( OSString * name,
 }
 
 IOService *
-IOPlatformDevice::matchLocation( IOService * /* client */ )
+IOPlatformDevice::matchLocation( IOService *              )
 {
 	return this;
 }
@@ -2260,14 +2260,14 @@ IOPlatformDevice::getResources( void )
 	return ((IOPlatformExpert *)getProvider())->getNubResources( this );
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/*********************************************************************
-* IOPanicPlatform class
-*
-* If no legitimate IOPlatformDevice matches, this one does and panics
-* the kernel with a suitable message.
-*********************************************************************/
+                                                                      
+                       
+ 
+                                                                     
+                                     
+                                                                      
 
 class IOPanicPlatform : IOPlatformExpert {
 	OSDeclareDefaultStructors(IOPanicPlatform);

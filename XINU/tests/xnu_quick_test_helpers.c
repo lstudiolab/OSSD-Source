@@ -30,7 +30,7 @@ create_target_directory( const char * the_targetp )
 		    "target path - \"%s\" test directory name - \"%s\"",
 		    the_targetp, &my_name[0] );
 
-		/* append generated directory name onto our path */
+		                                                   
 		g_target_path[0] = 0x00;
 		strcat( &g_target_path[0], the_targetp );
 		if (g_target_path[(strlen(the_targetp) - 1)] != '/') {
@@ -38,7 +38,7 @@ create_target_directory( const char * the_targetp )
 		}
 		strcat( &g_target_path[0], &my_name[0] );
 
-		/* try to create the test directory */
+		                                      
 		err = mkdir( &g_target_path[0], (S_IRWXU | S_IRWXG | S_IROTH));
 		if (err == 0) {
 			break;
@@ -50,16 +50,16 @@ create_target_directory( const char * the_targetp )
 			    &g_target_path[0], errno, strerror( err));
 		}
 	}
-} /* create_target_directory */
+}                              
 
-/*
- * create_random_name - creates a file with a random / unique name in the given directory.
- * when do_open is true we create a file else we generaate a name that does not exist in the
- * given directory (we do not create anything when do_open is 0).
- * WARNING - caller provides enough space in path buffer for longest possible name.
- * WARNING - assumes caller has appended a trailing '/' on the path passed to us.
- * RAND_MAX is currently 2147483647 (ten characters plus one for a slash)
- */
+  
+                                                                                          
+                                                                                            
+                                                                 
+                                                                                   
+                                                                                 
+                                                                         
+   
 int
 create_random_name( char *the_pathp, int do_open )
 {
@@ -76,12 +76,12 @@ create_random_name( char *the_pathp, int do_open )
 		T_ASSERT_LT_ULONG((strlen( &my_name[0] ) + strlen( the_pathp ) + 2), (unsigned long)PATH_MAX,
 		    "check if path to test file is less than PATH_MAX");
 
-		// append generated file name onto our path
+		                                           
 		myp = strrchr( the_pathp, '/' );
 		*(myp + 1) = 0x00;
 		strcat( the_pathp, &my_name[0] );
 		if (do_open) {
-			/* create a file with this name */
+			                                  
 			my_fd = open( the_pathp, (O_RDWR | O_CREAT | O_EXCL),
 			    (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH));
 			T_EXPECT_TRUE((my_fd != -1 || errno == EEXIST), "open file with name %s", the_pathp);
@@ -90,7 +90,7 @@ create_random_name( char *the_pathp, int do_open )
 				continue;
 			}
 		} else {
-			/* make sure the name is unique */
+			                                  
 			struct stat     my_sb;
 			my_err = stat( the_pathp, &my_sb );
 			T_EXPECT_TRUE((my_err == 0 || errno == ENOENT), "make sure the name is unique");
@@ -98,7 +98,7 @@ create_random_name( char *the_pathp, int do_open )
 			if (errno == ENOENT) {
 				break;
 			}
-			/* name already exists, try another */
+			                                      
 			i--;
 			continue;
 		}
@@ -113,7 +113,7 @@ create_random_name( char *the_pathp, int do_open )
 	}
 
 	return 0;
-} /* create_random_name */
+}                         
 
 void
 remove_target_directory()

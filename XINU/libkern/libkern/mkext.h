@@ -34,46 +34,46 @@
 
 #include <mach/machine.h>
 
-/*********************************************************************
-* Mkext File Format
-*
-* ALL BINARY VALUES ARE BIG-ENDIAN.
-*********************************************************************/
+                                                                      
+                   
+ 
+                                   
+                                                                      
 #if PRAGMA_MARK
 #pragma mark Constants
 #endif
 
-#define MKEXT_MAGIC 0x4D4B5854 /* 'MKXT' */
-#define MKEXT_SIGN  0x4D4F5358 /* 'MOSX' */
+#define MKEXT_MAGIC 0x4D4B5854             
+#define MKEXT_SIGN  0x4D4F5358             
 
 #define MKEXT_EXTN  ".mkext"
 
 #define MKEXT_VERS_1  (0x01008000)
 
-// Used during development/bringup: v 2.0d1
+                                           
 #define MKEXT_VERS_2  (0x02002001)
-// xxx - Will use this when format is final
-// #define MKEXT_VERS_2  (0x02008000)
+                                           
+                                     
 
 #if PRAGMA_MARK
 #pragma mark Core Header
 #endif
-/*********************************************************************
-* Core Header
-*
-* All versions of mkext files have this basic header:
-*
-* - magic & signature - always 'MKXT' and 'MOSX' as defined above.
-* - length - the length of the whole file
-* - adler32 - checksum from &version to end of file
-* - version - a 'vers' style value
-* - numkexts - how many kexts are in the archive (only needed in v.1)
-* - cputype & cpusubtype - in version 1 could be CPU_TYPE_ANY
-*     and CPU_SUBTYPE_MULTIPLE if the archive contained fat kexts;
-*     version 2 does not allow this and all kexts must be of a single
-*     arch. For either version, mkexts of specific arches can be
-*     embedded in a fat Mach-O file to combine them.
-*********************************************************************/
+                                                                      
+             
+ 
+                                                     
+ 
+                                                                  
+                                         
+                                                   
+                                  
+                                                                     
+                                                             
+                                                                  
+                                                                     
+                                                                
+                                                    
+                                                                      
 
 #define MKEXT_HEADER_CORE      \
     uint32_t      magic;       \
@@ -105,47 +105,47 @@ typedef struct mkext_basic_header {
 #if PRAGMA_MARK
 #pragma mark Mkext Version 2 Format Definitions
 #endif
-/*********************************************************************
-* Mkext Version 2 Format Definitions
-*
-* The version field here will be some variant of 0x0200....; that is
-* the  major version byte will be 0x02.
-*
-* Version 2 uses zlib for compression, not the lzss compressor used
-* by version 1.
-*
-* In version 2, all executable & resource files are stored in sequence
-* followed by the combined info dictionaries of all kexts at the end.
-* This XML plist should be nul-terminated and stored at a page-aligned
-* offset in the file so that kernel code can unmap it as soon as it's
-* parsed.
-*
-* The info dict for each kext will have inserted into it these
-* additional properties:
-*
-* - _MKEXTBundlePath (string) - full path to the original bundle,
-*   relative to volume.
-* - _MKEXTExecutable (integer) - offset to the executable entry.
-* - _MKEXTResources (dict) - keyed by filename, values integer offsets
-*   to file entries.
-*
-* Mkext2 buffers are used to send load requests to the kernel. When
-* this is done, the plist will contain an _MKEXTLoadRequest dictionary
-* whose keys are the bundle IDs to load, and whose values are
-* dictionaries of flags:
-*
-* - "Load Kext" - boolean, whether to load the kext or not (default true).
-*   May be used to send just personalities for already-loaded kexts,
-*   but we do have a mechanism to do that from userland already.
-* - "Start Kext" - boolean, whether to start the kext or not
-*   (used when debugging). Defaults to true.
-* - "Add Personalities" - boolean, whether to send personalities to
-*   the IOCatalogue (used when debugging). Defaults to true.
-* - "Disable Autounload" - boolean, whether to prevent the reaper
-*   thread from unloading the kext, so the dev. has time to set up
-*   the debug session. (Predefined window, or maybe this will be a
-*   number of seconds to wait.) Defaults to false.
-*********************************************************************/
+                                                                      
+                                    
+ 
+                                                                    
+                                       
+ 
+                                                                   
+               
+ 
+                                                                      
+                                                                     
+                                                                      
+                                                                     
+         
+ 
+                                                              
+                        
+ 
+                                                                 
+                       
+                                                                
+                                                                      
+                    
+ 
+                                                                   
+                                                                      
+                                                             
+                        
+ 
+                                                                          
+                                                                    
+                                                                
+                                                            
+                                            
+                                                                   
+                                                            
+                                                                 
+                                                                  
+                                                                  
+                                                  
+                                                                      
 #define kMKEXTInfoDictionariesKey             "_MKEXTInfoDictionaries"
 
 #define kMKEXTBundlePathKey                   "_MKEXTBundlePath"
@@ -159,9 +159,9 @@ typedef struct mkext_basic_header {
 #define kMKEXTLoadRequestDisableAutounloadKey "Disable Autounload"
 
 typedef struct mkext2_file_entry {
-	uint32_t  compressed_size;// if zero, file is not compressed
-	uint32_t  full_size;    // full size of data w/o this struct
-	uint8_t   data[0];      // data is inline to this struct
+	uint32_t  compressed_size;                                  
+	uint32_t  full_size;                                        
+	uint8_t   data[0];                                      
 } mkext2_file_entry;
 
 typedef struct mkext2_header {
@@ -183,35 +183,35 @@ typedef struct mkext2_header {
 #if PRAGMA_MARK
 #pragma mark Mkext Version 1 Format Definitions
 #endif
-/*********************************************************************
-* Mkext Version 1 Format Definitions
-*
-* The original mkext format has version 0x01008000 ("1.0").
-*
-* In version 1, plists were not nul-terminated, so it's up to the
-* reader to add that '\0' on the end if it's needed.
-*
-* Original bad names preserved for source compatibility.
-*********************************************************************/
+                                                                      
+                                    
+ 
+                                                           
+ 
+                                                                 
+                                                    
+ 
+                                                        
+                                                                      
 
-// If all fields are 0 then this file slot is empty
-// If compsize is zero then the file isn't compressed.
+                                                   
+                                                      
 typedef struct mkext_file {
-	uint32_t offset;     // 4 bytes
-	uint32_t compsize;   // 4 bytes
-	uint32_t realsize;   // 4 bytes
-	uint32_t modifiedsecs; // 4 bytes; cast to time_t to use
+	uint32_t offset;               
+	uint32_t compsize;             
+	uint32_t realsize;             
+	uint32_t modifiedsecs;                                  
 } mkext_file;
 
-// The plist file entry is mandatory, but module may be empty
+                                                             
 typedef struct mkext_kext {
-	mkext_file plist;    // 16 bytes
-	mkext_file module;   // 16 bytes
+	mkext_file plist;               
+	mkext_file module;              
 } mkext_kext;
 
 typedef struct mkext_header {
 	MKEXT_HEADER_CORE
-	mkext_kext kext[1]; // 32 bytes/entry
+	mkext_kext kext[1];                  
 } mkext_header;
 
 typedef mkext_header mkext1_header;
@@ -232,8 +232,8 @@ typedef mkext_header mkext1_header;
 
 #define MKEXT1_HDR_CAST(hdr)             ((mkext1_header *)(hdr))
 
-/* These functions are only used for version 1 mkexts.
- */
+                                                      
+   
 __BEGIN_DECLS
 u_int8_t *
 compress_lzss(u_int8_t * dst, u_int32_t dstlen,
@@ -247,4 +247,4 @@ u_int32_t
 mkext_adler32(u_int8_t * src, int32_t length);
 __END_DECLS
 
-#endif /* _MKEXT_H_ */
+#endif                

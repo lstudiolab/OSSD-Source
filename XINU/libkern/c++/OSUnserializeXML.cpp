@@ -26,29 +26,29 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * HISTORY
- *
- * OSUnserializeXML.y created by rsulack on Tue Oct 12 1999
- */
+  
+          
+  
+                                                           
+   
 
-// parser for unserializing OSContainer objects serialized to XML
-//
-// to build :
-//	bison -p OSUnserializeXML OSUnserializeXML.y
-//	head -50 OSUnserializeXML.y > OSUnserializeXML.cpp
-//	sed -e "s/#include <stdio.h>//" < OSUnserializeXML.tab.c >> OSUnserializeXML.cpp
-//
-//	when changing code check in both OSUnserializeXML.y and OSUnserializeXML.cpp
-//
-//
-//
-//
-//
-//		 DO NOT EDIT OSUnserializeXML.cpp!
-//
-//			this means you!
-/* A Bison parser, made by GNU Bison 2.3.  */
+                                                                 
+  
+             
+                                               
+                                                     
+                                                                                   
+  
+                                                                               
+  
+  
+  
+  
+  
+                                      
+  
+                    
+                                             
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
  *
@@ -83,32 +83,32 @@
  *  This special exception was added by the Free Software Foundation in
  *  version 2.2 of Bison.  */
 
-/* C LALR(1) parser skeleton written by Richard Stallman, by
-*  simplifying the original so-called "semantic" parser.  */
+                                                            
+                                                            
 
-/* All symbols defined below should begin with yy or YY, to avoid
- *  infringing on user name space.  This should be done even for local
- *  variables, as they might otherwise be expanded by user macros.
- *  There are some unavoidable exceptions within include files to
- *  define necessary library symbols; they are noted "INFRINGES ON
- *  USER NAME SPACE" below.  */
+                                                                 
+                                                                      
+                                                                  
+                                                                 
+                                                                  
+                               
 
-/* Identify Bison output.  */
+                             
 #define YYBISON 1
 
-/* Bison version.  */
+                     
 #define YYBISON_VERSION "2.3"
 
-/* Skeleton name.  */
+                     
 #define YYSKELETON_NAME "yacc.c"
 
-/* Pure parsers.  */
+                    
 #define YYPURE 1
 
-/* Using locations.  */
+                       
 #define YYLSP_NEEDED 0
 
-/* Substitute the variable and function names.  */
+                                                  
 #define yyparse OSUnserializeXMLparse
 #define yylex   OSUnserializeXMLlex
 #define yyerror OSUnserializeXMLerror
@@ -118,11 +118,11 @@
 #define yynerrs OSUnserializeXMLnerrs
 
 
-/* Tokens.  */
+              
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-/* Put the tokens into the symbol table, so that GDB and other debuggers
- *  know about them.  */
+                                                                        
+                        
 enum yytokentype {
 	ARRAY = 258,
 	BOOLEAN = 259,
@@ -136,7 +136,7 @@ enum yytokentype {
 	SYNTAX_ERROR = 267
 };
 #endif
-/* Tokens.  */
+              
 #define ARRAY 258
 #define BOOLEAN 259
 #define DATA 260
@@ -151,7 +151,7 @@ enum yytokentype {
 
 
 
-/* Copy the first part of user declarations.  */
+                                                
 #line 61 "OSUnserializeXML.y"
 
 #include <string.h>
@@ -166,33 +166,33 @@ enum yytokentype {
 #define YYPARSE_PARAM   state
 #define YYLEX_PARAM     (parser_state_t *)state
 
-// this is the internal struct used to hold objects on parser stack
-// it represents objects both before and after they have been created
+                                                                   
+                                                                     
 typedef struct object {
 	struct object   *next;
 	struct object   *free;
 	struct object   *elements;
 	OSObject        *object;
-	OSSymbol        *key;                   // for dictionary
+	OSSymbol        *key;                                    
 	int             size;
-	void            *data;                  // for data
-	char            *string;                // for string & symbol
+	void            *data;                             
+	char            *string;                                      
 	int             string_alloc_length;
-	long long       number;                 // for number
+	long long       number;                              
 	int             idref;
 } object_t;
 
-// this code is reentrant, this structure contains all
-// state information for the parsing of a single buffer
+                                                      
+                                                       
 typedef struct parser_state {
-	const char      *parseBuffer;           // start of text to be parsed
-	int             parseBufferIndex;       // current index into text
-	int             lineNumber;             // current line number
-	object_t        *objects;               // internal objects in use
-	object_t        *freeObjects;           // internal objects that are free
-	OSDictionary    *tags;                  // used to remember "ID" tags
-	OSString        **errorString;          // parse error with line
-	OSObject        *parsedObject;          // resultant object of parsed text
+	const char      *parseBuffer;                                        
+	int             parseBufferIndex;                                 
+	int             lineNumber;                                   
+	object_t        *objects;                                         
+	object_t        *freeObjects;                                            
+	OSDictionary    *tags;                                               
+	OSString        **errorString;                                  
+	OSObject        *parsedObject;                                            
 	int             parsedObjectCount;
 	int             retrievedObjectCount;
 } parser_state_t;
@@ -274,12 +274,12 @@ realloc_impl(void *addr, size_t osize, size_t nsize)
 
 
 
-/* Enabling traces.  */
+                       
 #ifndef YYDEBUG
 # define YYDEBUG 0
 #endif
 
-/* Enabling verbose error messages.  */
+                                       
 #ifdef YYERROR_VERBOSE
 # undef YYERROR_VERBOSE
 # define YYERROR_VERBOSE 1
@@ -287,24 +287,24 @@ realloc_impl(void *addr, size_t osize, size_t nsize)
 # define YYERROR_VERBOSE 0
 #endif
 
-/* Enabling the token table.  */
+                                
 #ifndef YYTOKEN_TABLE
 # define YYTOKEN_TABLE 0
 #endif
 
 #if !defined YYSTYPE && !defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
+# define yystype YYSTYPE                                     
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 
 
-/* Copy the second part of user declarations.  */
+                                                 
 
 
-/* Line 216 of yacc.c.  */
+                          
 #line 258 "OSUnserializeXML.tab.c"
 
 #ifdef short
@@ -345,7 +345,7 @@ typedef short int yytype_int16;
 #  define YYSIZE_T size_t
 # elif !defined YYSIZE_T && (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
-#  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#  include <stddef.h>                                   
 #  define YYSIZE_T size_t
 # else
 #  define YYSIZE_T unsigned int
@@ -357,7 +357,7 @@ typedef short int yytype_int16;
 #ifndef YY_
 # if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
-#   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
+#   include <libintl.h>                                   
 #   define YY_(msgid) dgettext ("bison-runtime", msgid)
 #  endif
 # endif
@@ -366,14 +366,14 @@ typedef short int yytype_int16;
 # endif
 #endif
 
-/* Suppress unused-variable warnings by "using" E.  */
+                                                      
 #if !defined lint || defined __GNUC__
 # define YYUSE(e) ((void) (e))
 #else
-# define YYUSE(e) /* empty */
+# define YYUSE(e)            
 #endif
 
-/* Identity function, used to suppress warnings about constant conditions.  */
+                                                                              
 #ifndef lint
 # define YYID(n) (n)
 #else
@@ -393,24 +393,24 @@ int i;
 
 #if !defined yyoverflow || YYERROR_VERBOSE
 
-/* The parser invokes alloca or malloc; define the necessary symbols.  */
+                                                                         
 
 # ifdef YYSTACK_USE_ALLOCA
 #  if YYSTACK_USE_ALLOCA
 #   ifdef __GNUC__
 #    define YYSTACK_ALLOC __builtin_alloca
 #   elif defined __BUILTIN_VA_ARG_INCR
-#    include <alloca.h> /* INFRINGES ON USER NAME SPACE */
+#    include <alloca.h>                                   
 #   elif defined _AIX
 #    define YYSTACK_ALLOC __alloca
 #   elif defined _MSC_VER
-#    include <malloc.h> /* INFRINGES ON USER NAME SPACE */
+#    include <malloc.h>                                   
 #    define alloca _alloca
 #   else
 #    define YYSTACK_ALLOC alloca
 #    if !defined _ALLOCA_H && !defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
-#     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
+#     include <stdlib.h>                                   
 #     ifndef _STDLIB_H
 #      define _STDLIB_H 1
 #     endif
@@ -420,14 +420,14 @@ int i;
 # endif
 
 # ifdef YYSTACK_ALLOC
-/* Pacify GCC's `empty if-body' warning.  */
-#  define YYSTACK_FREE(Ptr) do { /* empty */ ; } while (YYID (0))
+                                            
+#  define YYSTACK_FREE(Ptr) do {             ; } while (YYID (0))
 #  ifndef YYSTACK_ALLOC_MAXIMUM
-/* The OS might guarantee only one guard page at the bottom of the stack,
- *  and a page size can be as small as 4096 bytes.  So we cannot safely
- *  invoke alloca (N) if N exceeds 4096.  Use a slightly smaller number
- *  to allow for a few compiler-allocated temporary stack slots.  */
-#   define YYSTACK_ALLOC_MAXIMUM 4032 /* reasonable circa 2006 */
+                                                                         
+                                                                       
+                                                                       
+                                                                    
+#   define YYSTACK_ALLOC_MAXIMUM 4032                            
 #  endif
 # else
 #  define YYSTACK_ALLOC YYMALLOC
@@ -438,7 +438,7 @@ int i;
 #  if (defined __cplusplus && !defined _STDLIB_H \
         && !((defined YYMALLOC || defined malloc) \
         && (defined YYFREE || defined free)))
-#   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
+#   include <stdlib.h>                                   
 #   ifndef _STDLIB_H
 #    define _STDLIB_H 1
 #   endif
@@ -447,41 +447,41 @@ int i;
 #   define YYMALLOC malloc
 #   if !defined malloc && !defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
-void *malloc(YYSIZE_T);  /* INFRINGES ON USER NAME SPACE */
+void *malloc(YYSIZE_T);                                    
 #   endif
 #  endif
 #  ifndef YYFREE
 #   define YYFREE free
 #   if !defined free && !defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
-void free(void *);  /* INFRINGES ON USER NAME SPACE */
+void free(void *);                                    
 #   endif
 #  endif
 # endif
-#endif /* ! defined yyoverflow || YYERROR_VERBOSE */
+#endif                                              
 
 
 #if (!defined yyoverflow \
         && (!defined __cplusplus \
         || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
-/* A type that is properly aligned for any stack member.  */
+                                                            
 union yyalloc {
 	yytype_int16 yyss;
 	YYSTYPE yyvs;
 };
 
-/* The size of the maximum gap between one aligned stack and the next.  */
+                                                                          
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
 
-/* The size of an array large to enough to hold all stacks, each with
- *  N elements.  */
+                                                                     
+                   
 # define YYSTACK_BYTES(N) \
      ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
       + YYSTACK_GAP_MAXIMUM)
 
-/* Copy COUNT objects from FROM to TO.  The source and destination do
- *  not overlap.  */
+                                                                     
+                    
 # ifndef YYCOPY
 #  if defined __GNUC__ && 1 < __GNUC__
 #   define YYCOPY(To, From, Count) \
@@ -498,11 +498,11 @@ union yyalloc {
 #  endif
 # endif
 
-/* Relocate STACK from its old location to the new one.  The
- *  local variables YYSIZE and YYSTACKSIZE give the old and new number of
- *  elements in the stack, and YYPTR gives the new location of the
- *  stack.  Advance YYPTR to a properly aligned location for the next
- *  stack.  */
+                                                            
+                                                                         
+                                                                  
+                                                                     
+              
 # define YYSTACK_RELOCATE(Stack)                                        \
     do                                                                  \
       {                                                                 \
@@ -516,28 +516,28 @@ union yyalloc {
 
 #endif
 
-/* YYFINAL -- State number of the termination state.  */
+                                                        
 #define YYFINAL  33
-/* YYLAST -- Last index in YYTABLE.  */
+                                       
 #define YYLAST   108
 
-/* YYNTOKENS -- Number of terminals.  */
+                                        
 #define YYNTOKENS  19
-/* YYNNTS -- Number of nonterminals.  */
+                                        
 #define YYNNTS  15
-/* YYNRULES -- Number of rules.  */
+                                   
 #define YYNRULES  32
-/* YYNRULES -- Number of states.  */
+                                    
 #define YYNSTATES  40
 
-/* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
+                                                                        
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   267
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
-/* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
+                                                                        
 static const yytype_uint8 yytranslate[] =
 {
 	0, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -570,8 +570,8 @@ static const yytype_uint8 yytranslate[] =
 };
 
 #if YYDEBUG
-/* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
- *  YYRHS.  */
+                                                                     
+              
 static const yytype_uint8 yyprhs[] =
 {
 	0, 0, 3, 4, 6, 8, 10, 12, 14, 16,
@@ -580,7 +580,7 @@ static const yytype_uint8 yyprhs[] =
 	70, 72, 74
 };
 
-/* YYRHS -- A `-1'-separated list of the rules' RHS.  */
+                                                        
 static const yytype_int8 yyrhs[] =
 {
 	20, 0, -1, -1, 21, -1, 12, -1, 22, -1,
@@ -593,7 +593,7 @@ static const yytype_int8 yyrhs[] =
 	7, -1, 9, -1, 11, -1
 };
 
-/* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
+                                                                     
 static const yytype_uint16 yyrline[] =
 {
 	0, 192, 192, 195, 200, 205, 217, 229, 241, 253,
@@ -604,8 +604,8 @@ static const yytype_uint16 yyrline[] =
 #endif
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
-/* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
- *  First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
+                                                               
+                                                                        
 static const char *const yytname[] =
 {
 	"$end", "error", "$undefined", "ARRAY", "BOOLEAN", "DATA", "DICTIONARY",
@@ -617,8 +617,8 @@ static const char *const yytname[] =
 #endif
 
 # ifdef YYPRINT
-/* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
- *  token YYLEX-NUM.  */
+                                                                
+                        
 static const yytype_uint16 yytoknum[] =
 {
 	0, 256, 257, 258, 259, 260, 261, 262, 263, 264,
@@ -626,7 +626,7 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-/* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
+                                                                  
 static const yytype_uint8 yyr1[] =
 {
 	0, 19, 20, 20, 20, 21, 21, 21, 21, 21,
@@ -635,7 +635,7 @@ static const yytype_uint8 yyr1[] =
 	31, 32, 33
 };
 
-/* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
+                                                                            
 static const yytype_uint8 yyr2[] =
 {
 	0, 2, 0, 1, 1, 1, 1, 1, 1, 1,
@@ -644,9 +644,9 @@ static const yytype_uint8 yyr2[] =
 	1, 1, 1
 };
 
-/* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
- *  STATE-NUM when YYTABLE doesn't specify something else to do.  Zero
- *  means the default is an error.  */
+                                                               
+                                                                      
+                                      
 static const yytype_uint8 yydefact[] =
 {
 	2, 22, 28, 29, 15, 30, 31, 25, 32, 4,
@@ -655,15 +655,15 @@ static const yytype_uint8 yydefact[] =
 	0, 23, 0, 1, 14, 17, 18, 21, 27, 24
 };
 
-/* YYDEFGOTO[NTERM-NUM].  */
+                            
 static const yytype_int8 yydefgoto[] =
 {
 	-1, 13, 29, 15, 25, 26, 27, 16, 17, 30,
 	18, 19, 20, 21, 22
 };
 
-/* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
- *  STATE-NUM.  */
+                                                                  
+                  
 #define YYPACT_NINF -20
 static const yytype_int8 yypact[] =
 {
@@ -673,17 +673,17 @@ static const yytype_int8 yypact[] =
 	76, -20, 30, -20, -20, -20, -20, -20, -20, -20
 };
 
-/* YYPGOTO[NTERM-NUM].  */
+                          
 static const yytype_int8 yypgoto[] =
 {
 	-20, -20, 0, -20, -20, -19, -20, -20, -20, 5,
 	-20, -20, -20, -20, -20
 };
 
-/* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
- *  positive, shift that token.  If negative, reduce the rule which
- *  number is the opposite.  If zero, do what YYDEFACT says.
- *  If YYTABLE_NINF, syntax error.  */
+                                                                  
+                                                                   
+                                                            
+                                      
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
@@ -715,8 +715,8 @@ static const yytype_int8 yycheck[] =
 	9, 10, 11, -1, 13, -1, 15, -1, 17
 };
 
-/* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
- *  symbol of state STATE-NUM.  */
+                                                              
+                                  
 static const yytype_uint8 yystos[] =
 {
 	0, 3, 4, 5, 6, 7, 9, 10, 11, 12,
@@ -735,9 +735,9 @@ static const yytype_uint8 yystos[] =
 #define YYERROR         goto yyerrorlab
 
 
-/* Like YYERROR except do call yyerror.  This remains here temporarily
- *  to ease the transition to the new meaning of YYERROR, for GCC.
- *  Once GCC version 2 has supplanted version 1, this can go.  */
+                                                                      
+                                                                  
+                                                                 
 
 #define YYFAIL          goto yyerrlab
 
@@ -765,9 +765,9 @@ while (YYID (0))
 #define YYERRCODE       256
 
 
-/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
- *  If N is 0, then set CURRENT to the empty location which ends
- *  the previous symbol: RHS[0] (always defined).  */
+                                                               
+                                                                
+                                                     
 
 #define YYRHSLOC(Rhs, K) ((Rhs)[K])
 #ifndef YYLLOC_DEFAULT
@@ -791,9 +791,9 @@ while (YYID (0))
 #endif
 
 
-/* YY_LOCATION_PRINT -- Print the location on the stream.
- *  This macro was not mandated originally: define only if we know
- *  we won't break user code: when these are the locations we know.  */
+                                                         
+                                                                  
+                                                                       
 
 #ifndef YY_LOCATION_PRINT
 # if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
@@ -807,7 +807,7 @@ while (YYID (0))
 #endif
 
 
-/* YYLEX -- calling `yylex' with the right arguments.  */
+                                                         
 
 #ifdef YYLEX_PARAM
 # define YYLEX yylex (&yylval, YYLEX_PARAM)
@@ -815,11 +815,11 @@ while (YYID (0))
 # define YYLEX yylex (&yylval)
 #endif
 
-/* Enable debugging if requested.  */
+                                     
 #if YYDEBUG
 
 # ifndef YYFPRINTF
-#  include <stdio.h> /* INFRINGES ON USER NAME SPACE */
+#  include <stdio.h>                                   
 #  define YYFPRINTF fprintf
 # endif
 
@@ -841,11 +841,11 @@ do {                                                                      \
 } while (YYID (0))
 
 
-/*--------------------------------.
- | Print this symbol on YYOUTPUT.  |
- |   `--------------------------------*/
+                                   
+                                    
+                                        
 
-/*ARGSUSED*/
+            
 #if (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
 static void
@@ -875,9 +875,9 @@ YYSTYPE const * const yyvaluep;
 }
 
 
-/*--------------------------------.
- | Print this symbol on YYOUTPUT.  |
- |   `--------------------------------*/
+                                   
+                                    
+                                        
 
 #if (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
@@ -901,10 +901,10 @@ YYSTYPE const * const yyvaluep;
 	YYFPRINTF(yyoutput, ")");
 }
 
-/*------------------------------------------------------------------.
- | yy_stack_print -- Print the state stack from its BOTTOM up to its |
- | TOP (included).                                                   |
- |   `------------------------------------------------------------------*/
+                                                                     
+                                                                      
+                                                                      
+                                                                          
 
 #if (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
@@ -931,9 +931,9 @@ do {                                                            \
 } while (YYID (0))
 
 
-/*------------------------------------------------.
- | Report that the YYRULE is going to be reduced.  |
- |   `------------------------------------------------*/
+                                                   
+                                                    
+                                                        
 
 #if (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
@@ -951,7 +951,7 @@ int yyrule;
 	unsigned long int yylno = yyrline[yyrule];
 	YYFPRINTF(stderr, "Reducing stack by rule %d (line %lu):\n",
 	    yyrule - 1, yylno);
-	/* The symbols being reduced.  */
+	                                 
 	for (yyi = 0; yyi < yynrhs; yyi++) {
 		fprintf(stderr, "   $%d = ", yyi + 1);
 		yy_symbol_print(stderr, yyrhs[yyprhs[yyrule] + yyi],
@@ -967,28 +967,28 @@ do {                                    \
     yy_reduce_print (yyvsp, Rule); \
 } while (YYID (0))
 
-/* Nonzero means print parse trace.  It is left uninitialized so that
- *  multiple parsers can coexist.  */
+                                                                     
+                                     
 int yydebug;
-#else /* !YYDEBUG */
+#else               
 # define YYDPRINTF(Args)
 # define YY_SYMBOL_PRINT(Title, Type, Value, Location)
 # define YY_STACK_PRINT(Bottom, Top)
 # define YY_REDUCE_PRINT(Rule)
-#endif /* !YYDEBUG */
+#endif               
 
 
-/* YYINITDEPTH -- initial size of the parser's stacks.  */
+                                                          
 #ifndef YYINITDEPTH
 # define YYINITDEPTH 200
 #endif
 
-/* YYMAXDEPTH -- maximum size the stacks can grow to (effective only
- *  if the built-in stack extension method is used).
- *
- *  Do not make this value too large; the results are undefined if
- *  YYSTACK_ALLOC_MAXIMUM < YYSTACK_BYTES (YYMAXDEPTH)
- *  evaluated with infinite-precision integer arithmetic.  */
+                                                                    
+                                                    
+  
+                                                                  
+                                                      
+                                                             
 
 #ifndef YYMAXDEPTH
 # define YYMAXDEPTH 10000
@@ -1002,7 +1002,7 @@ int yydebug;
 #  if defined __GLIBC__ && defined _STRING_H
 #   define yystrlen strlen
 #  else
-/* Return the length of YYSTR.  */
+                                  
 #if (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
 static YYSIZE_T
@@ -1026,8 +1026,8 @@ const char *yystr;
 #  if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
 #   define yystpcpy stpcpy
 #  else
-/* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
- *  YYDEST.  */
+                                                                         
+               
 #if (defined __STDC__ || defined __C99__FUNC__ \
         || defined __cplusplus || defined _MSC_VER)
 static char *
@@ -1052,13 +1052,13 @@ const char *yysrc;
 # endif
 
 # ifndef yytnamerr
-/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
- *  quotes and backslashes, so that it's suitable for yyerror.  The
- *  heuristic is that double-quoting is unnecessary unless the string
- *  contains an apostrophe, a comma, or backslash (other than
- *  backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
- *  null, do not copy; instead, return the length of what the result
- *  would have been.  */
+                                                                       
+                                                                   
+                                                                     
+                                                             
+                                                                    
+                                                                    
+                        
 static YYSIZE_T
 yytnamerr(char *yyres, const char *yystr)
 {
@@ -2540,8 +2540,8 @@ top:
 	for (i = 0; i < attributeCount; i++) {
 		if (attributes[i][0] == 'I' && attributes[i][1] == 'D') {
 			// check for idref's, note: we ignore the tag, for
-			// this to work correctly, all idrefs must be unique
-			// across the whole serialization
+			                                                    
+			                                 
 			if (attributes[i][2] == 'R' && attributes[i][3] == 'E' &&
 			    attributes[i][4] == 'F' && !attributes[i][5]) {
 				if (tagType != TAG_EMPTY) {
@@ -2550,7 +2550,7 @@ top:
 				object->idref = strtol(values[i], NULL, 0);
 				return IDREF;
 			}
-			// check for id's
+			                 
 			if (!attributes[i][2]) {
 				object->idref = strtol(values[i], NULL, 0);
 			} else {
@@ -2592,7 +2592,7 @@ top:
 					break;
 				}
 			}
-			// CF encoded is the default form
+			                                 
 			if (isHexFormat) {
 				object->data = getHexData(STATE, &size);
 			} else {
@@ -2615,7 +2615,7 @@ top:
 		break;
 	case 'i':
 		if (!strcmp(tag, "integer")) {
-			object->size = 64;      // default
+			object->size = 64;                
 			for (i = 0; i < attributeCount; i++) {
 				if (!strcmp(attributes[i], "size")) {
 					object->size = strtoul(values[i], NULL, 0);
@@ -2699,15 +2699,15 @@ top:
 	return SYNTAX_ERROR;
 }
 
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
+                                                                 
+                                                                 
+                                                                 
 
-// "java" like allocation, if this code hits a syntax error in the
-// the middle of the parsed string we just bail with pointers hanging
-// all over place, this code helps keeps it all together
+                                                                  
+                                                                     
+                                                        
 
-//static int object_count = 0;
+                              
 
 object_t *
 newObject(parser_state_t *state)
@@ -2719,7 +2719,7 @@ newObject(parser_state_t *state)
 		state->freeObjects = state->freeObjects->next;
 	} else {
 		o = (object_t *)malloc(sizeof(object_t));
-//		object_count++;
+                   
 		o->free = state->objects;
 		state->objects = o;
 	}
@@ -2741,33 +2741,33 @@ cleanupObjects(parser_state_t *state)
 
 	while (o) {
 		if (o->object) {
-//			printf("OSUnserializeXML: releasing object o=%x object=%x\n", (int)o, (int)o->object);
+                                                                                           
 			o->object->release();
 		}
 		if (o->data) {
-//			printf("OSUnserializeXML: freeing   object o=%x data=%x\n", (int)o, (int)o->data);
+                                                                                       
 			free(o->data);
 		}
 		if (o->key) {
-//			printf("OSUnserializeXML: releasing object o=%x key=%x\n", (int)o, (int)o->key);
+                                                                                     
 			o->key->release();
 		}
 		if (o->string) {
-//			printf("OSUnserializeXML: freeing   object o=%x string=%x\n", (int)o, (int)o->string);
+                                                                                           
 			free(o->string);
 		}
 
 		t = o;
 		o = o->free;
 		safe_free(t, sizeof(object_t));
-//		object_count--;
+                   
 	}
-//	printf("object_count = %d\n", object_count);
+                                               
 }
 
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
+                                                                 
+                                                                 
+                                                                 
 
 static void
 rememberObject(parser_state_t *state, int tag, OSObject *o)
@@ -2775,7 +2775,7 @@ rememberObject(parser_state_t *state, int tag, OSObject *o)
 	char key[16];
 	snprintf(key, 16, "%u", tag);
 
-//	printf("remember key %s\n", key);
+                                    
 
 	state->tags->setObject(key, o);
 }
@@ -2788,7 +2788,7 @@ retrieveObject(parser_state_t *state, int tag)
 	char key[16];
 	snprintf(key, 16, "%u", tag);
 
-//	printf("retrieve key '%s'\n", key);
+                                      
 
 	ref = state->tags->getObject(key);
 	if (!ref) {
@@ -2800,9 +2800,9 @@ retrieveObject(parser_state_t *state, int tag)
 	return o;
 }
 
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
-// !@$&)(^Q$&*^!$(*!@$_(^%_(*Q#$(_*&!$_(*&!$_(*&!#$(*!@&^!@#%!_!#
+                                                                 
+                                                                 
+                                                                 
 
 object_t *
 buildDictionary(parser_state_t *state, object_t * header)
@@ -2811,7 +2811,7 @@ buildDictionary(parser_state_t *state, object_t * header)
 	int count = 0;
 	OSDictionary *dict;
 
-	// get count and reverse order
+	                              
 	o = header->elements;
 	header->elements = 0;
 	while (o) {
@@ -2853,7 +2853,7 @@ buildArray(parser_state_t *state, object_t * header)
 	int count = 0;
 	OSArray *array;
 
-	// get count and reverse order
+	                              
 	o = header->elements;
 	header->elements = 0;
 	while (o) {
@@ -2894,7 +2894,7 @@ buildSet(parser_state_t *state, object_t *header)
 	OSArray *array = (OSArray *)o->object;
 	OSSet *set = OSSet::withArray(array, array->getCapacity());
 
-	// write over the reference created in buildArray
+	                                                 
 	if (header->idref >= 0) {
 		rememberObject(state, header->idref, set);
 	}
@@ -2994,7 +2994,7 @@ OSUnserializeXML(const char *buffer, OSString **errorString)
 		return 0;
 	}
 
-	// just in case
+	               
 	if (errorString) {
 		*errorString = NULL;
 	}
@@ -3038,7 +3038,7 @@ OSUnserializeXML(const char *buffer, size_t bufferSize, OSString **errorString)
 		return OSUnserializeBinary(buffer, bufferSize, errorString);
 	}
 
-	// XML must be null terminated
+	                              
 	if (buffer[bufferSize - 1]) {
 		return 0;
 	}
@@ -3047,16 +3047,16 @@ OSUnserializeXML(const char *buffer, size_t bufferSize, OSString **errorString)
 }
 
 
-//
-//
-//
-//
-//
-//		 DO NOT EDIT OSUnserializeXML.cpp!
-//
-//			this means you!
-//
-//
-//
-//
-//
+  
+  
+  
+  
+  
+                                      
+  
+                    
+  
+  
+  
+  
+  

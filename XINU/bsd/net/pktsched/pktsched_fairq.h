@@ -78,24 +78,24 @@
 extern "C" {
 #endif
 
-#define FAIRQ_MAX_BUCKETS       2048    /* maximum number of sorting buckets */
+#define FAIRQ_MAX_BUCKETS       2048                                           
 #define FAIRQ_MAXPRI            RM_MAXPRIO
 #define FAIRQ_BITMAP_WIDTH      (sizeof (fairq_bitmap_t) * 8)
 #define FAIRQ_BITMAP_MASK       (FAIRQ_BITMAP_WIDTH - 1)
 
-/* fairq class flags */
-#define FARF_RED                0x0001  /* use RED */
-#define FARF_ECN                0x0002  /* use ECN with RED/BLUE/SFB */
-#define FARF_RIO                0x0004  /* use RIO */
-#define FARF_CLEARDSCP          0x0010  /* clear diffserv codepoint */
-#define FARF_BLUE               0x0100  /* use BLUE */
-#define FARF_SFB                0x0200  /* use SFB */
-#define FARF_FLOWCTL            0x0400  /* enable flow control advisories */
-#define FARF_DEFAULTCLASS       0x1000  /* default class */
+                       
+#define FARF_RED                0x0001               
+#define FARF_ECN                0x0002                                 
+#define FARF_RIO                0x0004               
+#define FARF_CLEARDSCP          0x0010                                
+#define FARF_BLUE               0x0100                
+#define FARF_SFB                0x0200               
+#define FARF_FLOWCTL            0x0400                                      
+#define FARF_DEFAULTCLASS       0x1000                     
 #ifdef BSD_KERNEL_PRIVATE
-#define FARF_HAS_PACKETS        0x2000  /* might have queued packets */
-#define FARF_LAZY               0x10000000 /* on-demand resource allocation */
-#endif /* BSD_KERNEL_PRIVATE */
+#define FARF_HAS_PACKETS        0x2000                                 
+#define FARF_LAZY               0x10000000                                    
+#endif                         
 
 #define FARF_USERFLAGS                                                  \
 	(FARF_RED | FARF_ECN | FARF_RIO | FARF_CLEARDSCP |              \
@@ -109,7 +109,7 @@ extern "C" {
 #define FARF_BITS \
 	"\020\1RED\2ECN\3RIO\5CLEARDSCP\11BLUE\12SFB\13FLOWCTL\15DEFAULT" \
 	"\16HASPKTS"
-#endif /* !BSD_KERNEL_PRIVATE */
+#endif                          
 
 typedef u_int32_t       fairq_bitmap_t;
 
@@ -119,13 +119,13 @@ struct fairq_classstats {
 
 	u_int32_t               qlength;
 	u_int32_t               qlimit;
-	struct pktcntr          xmit_cnt;  /* transmitted packet counter */
-	struct pktcntr          drop_cnt;  /* dropped packet counter */
+	struct pktcntr          xmit_cnt;                                  
+	struct pktcntr          drop_cnt;                              
 
-	/* RED, RIO, BLUE, SFB related info */
+	                                      
 	classq_type_t           qtype;
 	union {
-		/* RIO has 3 red stats */
+		                         
 		struct red_stats        red[RIO_NDROPPREC];
 		struct blue_stats       blue;
 		struct sfb_stats        sfb;
@@ -136,5 +136,5 @@ struct fairq_classstats {
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_PKTSCHED_PKTSCHED_FAIRQ_H_ */
+#endif              
+#endif                                      

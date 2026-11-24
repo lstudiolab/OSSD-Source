@@ -53,20 +53,20 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/memory_object.c
- *	Author:	Michael Wayne Young
- *
- *	External memory management interface control functions.
- */
+  
+   
+  
+                           
+                              
+  
+                                                          
+   
 
-/*
- *	Interface dependencies:
- */
+  
+                          
+   
 
-#include <mach/std_types.h>     /* For pointer_t */
+#include <mach/std_types.h>                        
 #include <mach/mach_types.h>
 
 #include <mach/mig.h>
@@ -79,13 +79,13 @@
 #include <mach/vm_prot.h>
 #include <mach/message.h>
 
-/*
- *	Implementation dependencies:
- */
-#include <string.h>             /* For memcpy() */
+  
+                               
+   
+#include <string.h>                               
 
 #include <kern/host.h>
-#include <kern/thread.h>        /* For current_thread() */
+#include <kern/thread.h>                                  
 #include <kern/ipc_mig.h>
 #include <kern/misc_protos.h>
 
@@ -94,10 +94,10 @@
 #include <vm/memory_object.h>
 #include <vm/vm_page.h>
 #include <vm/vm_pageout.h>
-#include <vm/pmap.h>            /* For pmap_clear_modify */
-#include <vm/vm_kern.h>         /* For kernel_map, vm_move */
-#include <vm/vm_map.h>          /* For vm_map_pageable */
-#include <vm/vm_purgeable_internal.h>   /* Needed by some vm_page.h macros */
+#include <vm/pmap.h>                                       
+#include <vm/vm_kern.h>                                      
+#include <vm/vm_map.h>                                   
+#include <vm/vm_purgeable_internal.h>                                        
 #include <vm/vm_shared_region.h>
 
 #include <vm/vm_external.h>
@@ -108,23 +108,23 @@ memory_object_default_t memory_manager_default = MEMORY_OBJECT_DEFAULT_NULL;
 LCK_MTX_EARLY_DECLARE(memory_manager_default_lock, &vm_object_lck_grp);
 
 
-/*
- *	Routine:	memory_object_should_return_page
- *
- *	Description:
- *		Determine whether the given page should be returned,
- *		based on the page's state and on the given return policy.
- *
- *		We should return the page if one of the following is true:
- *
- *		1. Page is dirty and should_return is not RETURN_NONE.
- *		2. Page is precious and should_return is RETURN_ALL.
- *		3. Should_return is RETURN_ANYTHING.
- *
- *		As a side effect, m->vmp_dirty will be made consistent
- *		with pmap_is_modified(m), if should_return is not
- *		MEMORY_OBJECT_RETURN_NONE.
- */
+  
+                                            
+  
+               
+                                                        
+                                                             
+  
+                                                              
+  
+                                                          
+                                                        
+                                        
+  
+                                                          
+                                                     
+                              
+   
 
 #define memory_object_should_return_page(m, should_return) \
     (should_return != MEMORY_OBJECT_RETURN_NONE && \
@@ -145,19 +145,19 @@ memory_object_lock_result_t memory_object_lock_page(
 	boolean_t               should_flush,
 	vm_prot_t               prot);
 
-/*
- *	Routine:	memory_object_lock_page
- *
- *	Description:
- *		Perform the appropriate lock operations on the
- *		given page.  See the description of
- *		"memory_object_lock_request" for the meanings
- *		of the arguments.
- *
- *		Returns an indication that the operation
- *		completed, blocked, or that the page must
- *		be cleaned.
- */
+  
+                                   
+  
+               
+                                                  
+                                       
+                                                 
+                     
+  
+                                            
+                                             
+               
+   
 memory_object_lock_result_t
 memory_object_lock_page(
 	vm_page_t               m,
@@ -173,17 +173,17 @@ memory_object_lock_page(
 		vm_pageout_steal_laundry(m, FALSE);
 	}
 
-	/*
-	 *	Don't worry about pages for which the kernel
-	 *	does not have any data.
-	 */
+	  
+                                                
+                           
+    
 	if (m->vmp_absent || m->vmp_error || m->vmp_restart) {
 		if (m->vmp_error && should_flush && !VM_PAGE_WIRED(m)) {
-			/*
-			 * dump the page, pager wants us to
-			 * clean it up and there is no
-			 * relevant data to return
-			 */
+			  
+                                      
+                                 
+                             
+      
 			return MEMORY_OBJECT_LOCK_RESULT_MUST_FREE;
 		}
 		return MEMORY_OBJECT_LOCK_RESULT_DONE;
@@ -191,10 +191,10 @@ memory_object_lock_page(
 	assert(!m->vmp_fictitious);
 
 	if (VM_PAGE_WIRED(m)) {
-		/*
-		 * The page is wired... just clean or return the page if needed.
-		 * Wired pages don't get flushed or disconnected from the pmap.
-		 */
+		  
+                                                                  
+                                                                 
+     
 		if (memory_object_should_return_page(m, should_return)) {
 			return MEMORY_OBJECT_LOCK_RESULT_MUST_RETURN;
 		}
@@ -203,96 +203,96 @@ memory_object_lock_page(
 	}
 
 	if (should_flush) {
-		/*
-		 * must do the pmap_disconnect before determining the
-		 * need to return the page... otherwise it's possible
-		 * for the page to go from the clean to the dirty state
-		 * after we've made our decision
-		 */
+		  
+                                                       
+                                                       
+                                                         
+                                  
+     
 		if (pmap_disconnect(VM_PAGE_GET_PHYS_PAGE(m)) & VM_MEM_MODIFIED) {
 			SET_PAGE_DIRTY(m, FALSE);
 		}
 	} else {
-		/*
-		 * If we are decreasing permission, do it now;
-		 * let the fault handler take care of increases
-		 * (pmap_page_protect may not increase protection).
-		 */
+		  
+                                                
+                                                 
+                                                     
+     
 		if (prot != VM_PROT_NO_CHANGE) {
 			pmap_page_protect(VM_PAGE_GET_PHYS_PAGE(m), VM_PROT_ALL & ~prot);
 		}
 	}
-	/*
-	 *	Handle returning dirty or precious pages
-	 */
+	  
+                                            
+    
 	if (memory_object_should_return_page(m, should_return)) {
-		/*
-		 * we use to do a pmap_disconnect here in support
-		 * of memory_object_lock_request, but that routine
-		 * no longer requires this...  in any event, in
-		 * our world, it would turn into a big noop since
-		 * we don't lock the page in any way and as soon
-		 * as we drop the object lock, the page can be
-		 * faulted back into an address space
-		 *
-		 *	if (!should_flush)
-		 *		pmap_disconnect(VM_PAGE_GET_PHYS_PAGE(m));
-		 */
+		  
+                                                   
+                                                    
+                                                 
+                                                   
+                                                  
+                                                
+                                       
+    
+                       
+                                                
+     
 		return MEMORY_OBJECT_LOCK_RESULT_MUST_RETURN;
 	}
 
-	/*
-	 *	Handle flushing clean pages
-	 */
+	  
+                               
+    
 	if (should_flush) {
 		return MEMORY_OBJECT_LOCK_RESULT_MUST_FREE;
 	}
 
-	/*
-	 * we use to deactivate clean pages at this point,
-	 * but we do not believe that an msync should change
-	 * the 'age' of a page in the cache... here is the
-	 * original comment and code concerning this...
-	 *
-	 *	XXX Make clean but not flush a paging hint,
-	 *	and deactivate the pages.  This is a hack
-	 *	because it overloads flush/clean with
-	 *	implementation-dependent meaning.  This only
-	 *	happens to pages that are already clean.
-	 *
-	 *   if (vm_page_deactivate_hint && (should_return != MEMORY_OBJECT_RETURN_NONE))
-	 *	return (MEMORY_OBJECT_LOCK_RESULT_MUST_DEACTIVATE);
-	 */
+	  
+                                                   
+                                                     
+                                                   
+                                                
+   
+                                               
+                                             
+                                         
+                                                
+                                            
+   
+                                                                                  
+                                                       
+    
 
 	return MEMORY_OBJECT_LOCK_RESULT_DONE;
 }
 
 
 
-/*
- *	Routine:	memory_object_lock_request [user interface]
- *
- *	Description:
- *		Control use of the data associated with the given
- *		memory object.  For each page in the given range,
- *		perform the following operations, in order:
- *			1)  restrict access to the page (disallow
- *			    forms specified by "prot");
- *			2)  return data to the manager (if "should_return"
- *			    is RETURN_DIRTY and the page is dirty, or
- *                          "should_return" is RETURN_ALL and the page
- *			    is either dirty or precious); and,
- *			3)  flush the cached copy (if "should_flush"
- *			    is asserted).
- *		The set of pages is defined by a starting offset
- *		("offset") and size ("size").  Only pages with the
- *		same page alignment as the starting offset are
- *		considered.
- *
- *		A single acknowledgement is sent (to the "reply_to"
- *		port) when these actions are complete.  If successful,
- *		the naked send right for reply_to is consumed.
- */
+  
+                                                       
+  
+               
+                                                     
+                                                     
+                                               
+                                              
+                                    
+                                                       
+                                                  
+                                                                      
+                                           
+                                                 
+                      
+                                                    
+                                                      
+                                                  
+               
+  
+                                                       
+                                                          
+                                                  
+   
 
 kern_return_t
 memory_object_lock_request(
@@ -307,9 +307,9 @@ memory_object_lock_request(
 {
 	vm_object_t     object;
 
-	/*
-	 *	Check for bogus arguments.
-	 */
+	  
+                              
+    
 	object = memory_object_control_to_vm_object(control);
 	if (object == VM_OBJECT_NULL) {
 		return KERN_INVALID_ARGUMENT;
@@ -321,10 +321,10 @@ memory_object_lock_request(
 
 	size = round_page_64(size);
 
-	/*
-	 *	Lock the object, and acquire a paging reference to
-	 *	prevent the memory_object reference from being released.
-	 */
+	  
+                                                      
+                                                            
+    
 	vm_object_lock(object);
 	vm_object_paging_begin(object);
 
@@ -349,22 +349,22 @@ memory_object_lock_request(
 	return KERN_SUCCESS;
 }
 
-/*
- *	memory_object_release_name:  [interface]
- *
- *	Enforces name semantic on memory_object reference count decrement
- *	This routine should not be called unless the caller holds a name
- *	reference gained through the memory_object_named_create or the
- *	memory_object_rename call.
- *	If the TERMINATE_IDLE flag is set, the call will return if the
- *	reference count is not 1. i.e. idle with the only remaining reference
- *	being the name.
- *	If the decision is made to proceed the name field flag is set to
- *	false and the reference count is decremented.  If the RESPECT_CACHE
- *	flag is set and the reference count has gone to zero, the
- *	memory_object is checked to see if it is cacheable otherwise when
- *	the reference count is zero, it is simply terminated.
- */
+  
+                                           
+  
+                                                                    
+                                                                   
+                                                                 
+                             
+                                                                 
+                                                                        
+                  
+                                                                   
+                                                                      
+                                                            
+                                                                    
+                                                        
+   
 
 kern_return_t
 memory_object_release_name(
@@ -383,13 +383,13 @@ memory_object_release_name(
 
 
 
-/*
- *	Routine:	memory_object_destroy [user interface]
- *	Purpose:
- *		Shut down a memory object, despite the
- *		presence of address map (or other) references
- *		to the vm_object.
- */
+  
+                                                  
+           
+                                          
+                                                 
+                     
+   
 kern_return_t
 memory_object_destroy(
 	memory_object_control_t control,
@@ -405,29 +405,29 @@ memory_object_destroy(
 	return vm_object_destroy(object, reason);
 }
 
-/*
- *	Routine:	vm_object_sync
- *
- *	Kernel internal function to synch out pages in a given
- *	range within an object to its memory manager.  Much the
- *	same as memory_object_lock_request but page protection
- *	is not changed.
- *
- *	If the should_flush and should_return flags are true pages
- *	are flushed, that is dirty & precious pages are written to
- *	the memory manager and then discarded.  If should_return
- *	is false, only precious pages are returned to the memory
- *	manager.
- *
- *	If should flush is false and should_return true, the memory
- *	manager's copy of the pages is updated.  If should_return
- *	is also false, only the precious pages are updated.  This
- *	last option is of limited utility.
- *
- *	Returns:
- *	FALSE		if no pages were returned to the pager
- *	TRUE		otherwise.
- */
+  
+                          
+  
+                                                         
+                                                          
+                                                         
+                  
+  
+                                                             
+                                                             
+                                                           
+                                                           
+           
+  
+                                                              
+                                                            
+                                                            
+                                     
+  
+           
+                                                
+                   
+   
 
 boolean_t
 vm_object_sync(
@@ -441,23 +441,23 @@ vm_object_sync(
 	boolean_t       rv;
 	int             flags;
 
-	/*
-	 * Lock the object, and acquire a paging reference to
-	 * prevent the memory_object and control ports from
-	 * being destroyed.
-	 */
+	  
+                                                      
+                                                    
+                    
+    
 	vm_object_lock(object);
 	vm_object_paging_begin(object);
 
 	if (should_flush) {
 		flags = MEMORY_OBJECT_DATA_FLUSH;
-		/*
-		 * This flush is from an msync(), not a truncate(), so the
-		 * contents of the file are not affected.
-		 * MEMORY_OBECT_DATA_NO_CHANGE lets vm_object_update() know
-		 * that the data is not changed and that there's no need to
-		 * push the old contents to a copy object.
-		 */
+		  
+                                                            
+                                           
+                                                             
+                                                             
+                                            
+     
 		flags |= MEMORY_OBJECT_DATA_NO_CHANGE;
 	} else {
 		flags = 0;
@@ -555,10 +555,10 @@ vm_object_update_extent(
 	for (;
 	    offset < offset_end && object->resident_page_count;
 	    offset += PAGE_SIZE_64) {
-		/*
-		 * Limit the number of pages to be cleaned at once to a contiguous
-		 * run, or at most MAX_UPL_TRANSFER_BYTES
-		 */
+		  
+                                                                    
+                                           
+     
 		if (data_cnt) {
 			if ((data_cnt >= MAX_UPL_TRANSFER_BYTES) || (next_offset != offset)) {
 				if (dw_count) {
@@ -577,9 +577,9 @@ vm_object_update_extent(
 			page_lock_result = memory_object_lock_page(m, should_return, should_flush, prot);
 
 			if (data_cnt && page_lock_result != MEMORY_OBJECT_LOCK_RESULT_MUST_RETURN) {
-				/*
-				 *	End of a run of dirty/precious pages.
-				 */
+				  
+                                            
+       
 				if (dw_count) {
 					vm_page_do_delayed_work(object, VM_KERN_MEMORY_NONE, dwp_start, dw_count);
 					dwp = dwp_start;
@@ -587,11 +587,11 @@ vm_object_update_extent(
 				}
 				LIST_REQ_PAGEOUT_PAGES(object, data_cnt,
 				    paging_offset, offset_resid, io_errno, should_iosync);
-				/*
-				 * LIST_REQ_PAGEOUT_PAGES will drop the object lock which will
-				 * allow the state of page 'm' to change... we need to re-lookup
-				 * the current offset
-				 */
+				  
+                                                                  
+                                                                    
+                         
+       
 				data_cnt = 0;
 				continue;
 			}
@@ -619,26 +619,26 @@ vm_object_update_extent(
 				data_cnt += PAGE_SIZE;
 				next_offset = offset + PAGE_SIZE_64;
 
-				/*
-				 * wired pages shouldn't be flushed and
-				 * since they aren't on any queue,
-				 * no need to remove them
-				 */
+				  
+                                           
+                                      
+                             
+       
 				if (!VM_PAGE_WIRED(m)) {
 					if (should_flush) {
-						/*
-						 * add additional state for the flush
-						 */
+						  
+                                           
+         
 						m->vmp_free_when_done = TRUE;
 					}
-					/*
-					 * we use to remove the page from the queues at this
-					 * point, but we do not believe that an msync
-					 * should cause the 'age' of a page to be changed
-					 *
-					 *    else
-					 *	dwp->dw_mask |= DW_VM_PAGE_QUEUES_REMOVE;
-					 */
+					  
+                                                         
+                                                  
+                                                      
+       
+               
+                                                 
+        
 				}
 				retval = 1;
 				break;
@@ -659,10 +659,10 @@ vm_object_update_extent(
 	if (object->pager) {
 		task_update_logical_writes(current_task(), (dirty_count * PAGE_SIZE), TASK_WRITE_INVALIDATED, vnode_pager_lookup_vnode(object->pager));
 	}
-	/*
-	 *	We have completed the scan for applicable pages.
-	 *	Clean any pages that have been saved.
-	 */
+	  
+                                                    
+                                         
+    
 	if (dw_count) {
 		vm_page_do_delayed_work(object, VM_KERN_MEMORY_NONE, dwp_start, dw_count);
 	}
@@ -682,13 +682,13 @@ vm_object_update_extent(
 
 
 
-/*
- *	Routine:	vm_object_update
- *	Description:
- *		Work function for m_o_lock_request(), vm_o_sync().
- *
- *		Called with object locked and paging ref taken.
- */
+  
+                            
+               
+                                                      
+  
+                                                   
+   
 kern_return_t
 vm_object_update(
 	vm_object_t             object,
@@ -717,22 +717,22 @@ vm_object_update(
 		vm_object_offset_t e_max;
 	} extents[MAX_EXTENTS];
 
-	/*
-	 *	To avoid blocking while scanning for pages, save
-	 *	dirty pages to be cleaned all at once.
-	 *
-	 *	XXXO A similar strategy could be used to limit the
-	 *	number of times that a scan must be restarted for
-	 *	other reasons.  Those pages that would require blocking
-	 *	could be temporarily collected in another list, or
-	 *	their offsets could be recorded in a small array.
-	 */
+	  
+                                                    
+                                          
+   
+                                                      
+                                                     
+                                                           
+                                                      
+                                                     
+    
 
-	/*
-	 * XXX	NOTE: May want to consider converting this to a page list
-	 * XXX	vm_map_copy interface.  Need to understand object
-	 * XXX	coalescing implications before doing so.
-	 */
+	  
+                                                                 
+                                                         
+                                                
+    
 
 	update_cow = ((flags & MEMORY_OBJECT_DATA_FLUSH)
 	    && (!(flags & MEMORY_OBJECT_DATA_NO_CHANGE) &&
@@ -743,22 +743,22 @@ vm_object_update(
 		int collisions = 0;
 
 		while ((copy_object = object->copy) != VM_OBJECT_NULL) {
-			/*
-			 * need to do a try here since we're swimming upstream
-			 * against the normal lock ordering... however, we need
-			 * to hold the object stable until we gain control of the
-			 * copy object so we have to be careful how we approach this
-			 */
+			  
+                                                         
+                                                          
+                                                            
+                                                               
+      
 			if (vm_object_lock_try(copy_object)) {
-				/*
-				 * we 'won' the lock on the copy object...
-				 * no need to hold the object lock any longer...
-				 * take a real reference on the copy object because
-				 * we're going to call vm_fault_page on it which may
-				 * under certain conditions drop the lock and the paging
-				 * reference we're about to take... the reference
-				 * will keep the copy object from going away if that happens
-				 */
+				  
+                                              
+                                                    
+                                                       
+                                                        
+                                                            
+                                                     
+                                                                
+       
 				vm_object_unlock(object);
 				vm_object_reference_locked(copy_object);
 				break;
@@ -782,9 +782,9 @@ vm_object_update(
 		struct vm_object_fault_info fault_info = {};
 
 		if (copy_object != VM_OBJECT_NULL) {
-			/*
-			 * translate offset with respect to shadow's offset
-			 */
+			  
+                                                      
+      
 			copy_offset = (offset >= copy_object->vo_shadow_offset) ?
 			    (offset - copy_object->vo_shadow_offset) : 0;
 
@@ -792,9 +792,9 @@ vm_object_update(
 				copy_offset = copy_object->vo_size;
 			}
 
-			/*
-			 * clip size with respect to shadow offset
-			 */
+			  
+                                             
+      
 			if (offset >= copy_object->vo_shadow_offset) {
 				copy_size = size;
 			} else if (size >= copy_object->vo_shadow_offset - offset) {
@@ -837,7 +837,7 @@ RETRY_COW_OF_LOCK_REQUEST:
 			result = vm_fault_page(copy_object, i,
 			    VM_PROT_WRITE | VM_PROT_READ,
 			    FALSE,
-			    FALSE,                    /* page not looked up */
+			    FALSE,                                            
 			    &prot,
 			    &page,
 			    &top_page,
@@ -881,7 +881,7 @@ RETRY_COW_OF_LOCK_REQUEST:
 				vm_object_paging_begin(copy_object);
 				goto RETRY_COW_OF_LOCK_REQUEST;
 			case VM_FAULT_SUCCESS_NO_VM_PAGE:
-				/* success but no VM page: fail */
+				                                  
 				vm_object_paging_end(copy_object);
 				vm_object_unlock(copy_object);
 				OS_FALLTHROUGH;
@@ -912,9 +912,9 @@ RETRY_COW_OF_LOCK_REQUEST:
 			copy_object->shadow_severed = TRUE;
 			copy_object->shadowed = FALSE;
 			copy_object->shadow = NULL;
-			/*
-			 * delete the ref the COW was holding on the target object
-			 */
+			  
+                                                             
+      
 			vm_object_deallocate(object);
 		}
 		vm_object_unlock(copy_object);
@@ -923,29 +923,29 @@ RETRY_COW_OF_LOCK_REQUEST:
 	}
 BYPASS_COW_COPYIN:
 
-	/*
-	 * when we have a really large range to check relative
-	 * to the number of actual resident pages, we'd like
-	 * to use the resident page list to drive our checks
-	 * however, the object lock will get dropped while processing
-	 * the page which means the resident queue can change which
-	 * means we can't walk the queue as we process the pages
-	 * we also want to do the processing in offset order to allow
-	 * 'runs' of pages to be collected if we're being told to
-	 * flush to disk... the resident page queue is NOT ordered.
-	 *
-	 * a temporary solution (until we figure out how to deal with
-	 * large address spaces more generically) is to pre-flight
-	 * the resident page queue (if it's small enough) and develop
-	 * a collection of extents (that encompass actual resident pages)
-	 * to visit.  This will at least allow us to deal with some of the
-	 * more pathological cases in a more efficient manner.  The current
-	 * worst case (a single resident page at the end of an extremely large
-	 * range) can take minutes to complete for ranges in the terrabyte
-	 * category... since this routine is called when truncating a file,
-	 * and we currently support files up to 16 Tbytes in size, this
-	 * is not a theoretical problem
-	 */
+	  
+                                                       
+                                                     
+                                                     
+                                                              
+                                                            
+                                                         
+                                                              
+                                                          
+                                                            
+   
+                                                              
+                                                           
+                                                              
+                                                                  
+                                                                   
+                                                                    
+                                                                       
+                                                                   
+                                                                    
+                                                                
+                                
+    
 
 	if ((object->resident_page_count < RESIDENT_LIMIT) &&
 	    (atop_64(size) > (unsigned)(object->resident_page_count / (8 * MAX_EXTENTS)))) {
@@ -966,17 +966,17 @@ BYPASS_COW_COPYIN:
 			next = (vm_page_t) vm_page_queue_next(&m->vmp_listq);
 
 			if ((m->vmp_offset >= start) && (m->vmp_offset < end)) {
-				/*
-				 * this is a page we're interested in
-				 * try to fit it into a current extent
-				 */
+				  
+                                         
+                                          
+       
 				for (n = 0; n < num_of_extents; n++) {
 					if ((m->vmp_offset & e_mask) == extents[n].e_base) {
-						/*
-						 * use (PAGE_SIZE - 1) to determine the
-						 * max offset so that we don't wrap if
-						 * we're at the last page of the space
-						 */
+						  
+                                             
+                                            
+                                            
+         
 						if (m->vmp_offset < extents[n].e_min) {
 							extents[n].e_min = m->vmp_offset;
 						} else if ((m->vmp_offset + (PAGE_SIZE - 1)) > extents[n].e_max) {
@@ -986,30 +986,30 @@ BYPASS_COW_COPYIN:
 					}
 				}
 				if (n == num_of_extents) {
-					/*
-					 * didn't find a current extent that can encompass
-					 * this page
-					 */
+					  
+                                                       
+                 
+        
 					if (n < MAX_EXTENTS) {
-						/*
-						 * if we still have room,
-						 * create a new extent
-						 */
+						  
+                               
+                            
+         
 						extents[n].e_base = m->vmp_offset & e_mask;
 						extents[n].e_min  = m->vmp_offset;
 						extents[n].e_max  = m->vmp_offset + (PAGE_SIZE - 1);
 
 						num_of_extents++;
 					} else {
-						/*
-						 * no room to create a new extent...
-						 * fall back to a single extent based
-						 * on the min and max page offsets
-						 * we find in the range we're interested in...
-						 * first, look through the extent list and
-						 * develop the overall min and max for the
-						 * pages we've looked at up to this point
-						 */
+						  
+                                          
+                                           
+                                        
+                                                    
+                                                
+                                                
+                                               
+         
 						for (n = 1; n < num_of_extents; n++) {
 							if (extents[n].e_min < extents[0].e_min) {
 								extents[0].e_min = extents[n].e_min;
@@ -1018,20 +1018,20 @@ BYPASS_COW_COPYIN:
 								extents[0].e_max = extents[n].e_max;
 							}
 						}
-						/*
-						 * now setup to run through the remaining pages
-						 * to determine the overall min and max
-						 * offset for the specified range
-						 */
+						  
+                                                     
+                                             
+                                       
+         
 						extents[0].e_base = 0;
 						e_mask = 0;
 						num_of_extents = 1;
 
-						/*
-						 * by continuing, we'll reprocess the
-						 * page that forced us to abandon trying
-						 * to develop multiple extents
-						 */
+						  
+                                           
+                                              
+                                    
+         
 						continue;
 					}
 				}
@@ -1066,9 +1066,9 @@ vm_object_set_attributes_common(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 *	Verify the attributes of importance
-	 */
+	  
+                                       
+    
 
 	switch (copy_strategy) {
 	case MEMORY_OBJECT_COPY_NONE:
@@ -1084,18 +1084,18 @@ vm_object_set_attributes_common(
 
 	vm_object_lock(object);
 
-	/*
-	 *	Copy the attributes
-	 */
+	  
+                       
+    
 	assert(!object->internal);
 	object_became_ready = !object->pager_ready;
 	object->copy_strategy = copy_strategy;
 	object->can_persist = may_cache;
 
-	/*
-	 *	Wake up anyone waiting for the ready attribute
-	 *	to become asserted.
-	 */
+	  
+                                                  
+                       
+    
 
 	if (object_became_ready) {
 		object->pager_ready = TRUE;
@@ -1119,14 +1119,14 @@ memory_object_synchronize_completed(
 }
 
 
-/*
- *	Set the memory object attribute as provided.
- *
- *	XXX This routine cannot be completed until the vm_msync, clean
- *	     in place, and cluster work is completed. See ifdef notyet
- *	     below and note that vm_object_set_attributes_common()
- *	     may have to be expanded.
- */
+  
+                                               
+  
+                                                                 
+                                                                 
+                                                             
+                                
+   
 kern_return_t
 memory_object_change_attributes(
 	memory_object_control_t         control,
@@ -1251,10 +1251,10 @@ memory_object_change_attributes(
 		copy_strategy = MEMORY_OBJECT_COPY_DELAY;
 	}
 
-	/*
-	 * XXX	may_cache may become a tri-valued variable to handle
-	 * XXX	uncache if not in use.
-	 */
+	  
+                                                            
+                              
+    
 	return vm_object_set_attributes_common(object,
 	           may_cache,
 	           copy_strategy);
@@ -1264,8 +1264,8 @@ kern_return_t
 memory_object_get_attributes(
 	memory_object_control_t control,
 	memory_object_flavor_t  flavor,
-	memory_object_info_t    attributes,     /* pointer to OUT array */
-	mach_msg_type_number_t  *count)         /* IN/OUT */
+	memory_object_info_t    attributes,                               
+	mach_msg_type_number_t  *count)                     
 {
 	kern_return_t           ret = KERN_SUCCESS;
 	vm_object_t             object;
@@ -1290,7 +1290,7 @@ memory_object_get_attributes(
 		behave = (old_memory_object_behave_info_t) attributes;
 		behave->copy_strategy = object->copy_strategy;
 		behave->temporary = FALSE;
-#if notyet      /* remove when vm_msync complies and clean in place fini */
+#if notyet                                                                 
 		behave->invalidate = object->invalidate;
 #else
 		behave->invalidate = FALSE;
@@ -1312,7 +1312,7 @@ memory_object_get_attributes(
 		behave = (memory_object_behave_info_t) attributes;
 		behave->copy_strategy = object->copy_strategy;
 		behave->temporary = FALSE;
-#if notyet      /* remove when vm_msync complies and clean in place fini */
+#if notyet                                                                 
 		behave->invalidate = object->invalidate;
 #else
 		behave->invalidate = FALSE;
@@ -1405,10 +1405,10 @@ memory_object_iopl_request(
 	caller_flags = *flags;
 
 	if (caller_flags & ~UPL_VALID_FLAGS) {
-		/*
-		 * For forward compatibility's sake,
-		 * reject any unknown flag.
-		 */
+		  
+                                      
+                             
+     
 		return KERN_INVALID_VALUE;
 	}
 
@@ -1416,7 +1416,7 @@ memory_object_iopl_request(
 		vm_named_entry_t        named_entry;
 
 		named_entry = (vm_named_entry_t) ip_get_kobject(port);
-		/* a few checks to make sure user is obeying rules */
+		                                                     
 		if (*upl_size == 0) {
 			if (offset >= named_entry->size) {
 				return KERN_INVALID_RIGHT;
@@ -1442,8 +1442,8 @@ memory_object_iopl_request(
 			return KERN_INVALID_ARGUMENT;
 		}
 
-		/* the callers parameter offset is defined to be the */
-		/* offset from beginning of named entry offset in object */
+		                                                       
+		                                                           
 		offset = offset + named_entry->offset;
 		offset += named_entry->data_offset;
 
@@ -1492,14 +1492,14 @@ memory_object_iopl_request(
 	return ret;
 }
 
-/*
- *	Routine:	memory_object_upl_request [interface]
- *	Purpose:
- *		Cause the population of a portion of a vm_object.
- *		Depending on the nature of the request, the pages
- *		returned may be contain valid data or be uninitialized.
- *
- */
+  
+                                                 
+           
+                                                     
+                                                     
+                                                           
+  
+   
 
 kern_return_t
 memory_object_upl_request(
@@ -1531,16 +1531,16 @@ memory_object_upl_request(
 	           vmtag);
 }
 
-/*
- *	Routine:	memory_object_super_upl_request [interface]
- *	Purpose:
- *		Cause the population of a portion of a vm_object
- *		in much the same way as memory_object_upl_request.
- *		Depending on the nature of the request, the pages
- *		returned may be contain valid data or be uninitialized.
- *		However, the region may be expanded up to the super
- *		cluster size provided.
- */
+  
+                                                       
+           
+                                                    
+                                                      
+                                                     
+                                                           
+                                                       
+                          
+   
 
 kern_return_t
 memory_object_super_upl_request(
@@ -1606,14 +1606,14 @@ memory_object_cluster_size(
 }
 
 
-/*
- *	Routine:	host_default_memory_manager [interface]
- *	Purpose:
- *		set/get the default memory manager port and default cluster
- *		size.
- *
- *		If successful, consumes the supplied naked send right.
- */
+  
+                                                   
+           
+                                                               
+         
+  
+                                                          
+   
 kern_return_t
 host_default_memory_manager(
 	host_priv_t             host_priv,
@@ -1635,25 +1635,25 @@ host_default_memory_manager(
 	returned_manager = MEMORY_OBJECT_DEFAULT_NULL;
 
 	if (new_manager == MEMORY_OBJECT_DEFAULT_NULL) {
-		/*
-		 *	Retrieve the current value.
-		 */
+		  
+                                
+     
 		returned_manager = current_manager;
 		memory_object_default_reference(returned_manager);
 	} else {
-		/*
-		 *	Only allow the kernel to change the value.
-		 */
+		  
+                                               
+     
 		extern task_t kernel_task;
 		if (current_task() != kernel_task) {
 			result = KERN_NO_ACCESS;
 			goto out;
 		}
 
-		/*
-		 *	If this is the first non-null manager, start
-		 *	up the internal pager support.
-		 */
+		  
+                                                 
+                                   
+     
 		if (current_manager == MEMORY_OBJECT_DEFAULT_NULL) {
 			result = vm_pageout_internal_start();
 			if (result != KERN_SUCCESS) {
@@ -1661,29 +1661,29 @@ host_default_memory_manager(
 			}
 		}
 
-		/*
-		 *	Retrieve the current value,
-		 *	and replace it with the supplied value.
-		 *	We return the old reference to the caller
-		 *	but we have to take a reference on the new
-		 *	one.
-		 */
+		  
+                                
+                                            
+                                              
+                                               
+         
+     
 		returned_manager = current_manager;
 		memory_manager_default = new_manager;
 		memory_object_default_reference(new_manager);
 
-		/*
-		 *	In case anyone's been waiting for a memory
-		 *	manager to be established, wake them up.
-		 */
+		  
+                                               
+                                             
+     
 
 		thread_wakeup((event_t) &memory_manager_default);
 
-		/*
-		 * Now that we have a default pager for anonymous memory,
-		 * reactivate all the throttled pages (i.e. dirty pages with
-		 * no pager).
-		 */
+		  
+                                                           
+                                                              
+               
+     
 		if (current_manager == MEMORY_OBJECT_DEFAULT_NULL) {
 			vm_page_reactivate_all_throttled();
 		}
@@ -1695,13 +1695,13 @@ out:
 	return result;
 }
 
-/*
- *	Routine:	memory_manager_default_reference
- *	Purpose:
- *		Returns a naked send right for the default
- *		memory manager.  The returned right is always
- *		valid (not IP_NULL or IP_DEAD).
- */
+  
+                                            
+           
+                                              
+                                                 
+                                   
+   
 
 __private_extern__ memory_object_default_t
 memory_manager_default_reference(void)
@@ -1726,18 +1726,18 @@ memory_manager_default_reference(void)
 	return current_manager;
 }
 
-/*
- *	Routine:	memory_manager_default_check
- *
- *	Purpose:
- *		Check whether a default memory manager has been set
- *		up yet, or not. Returns KERN_SUCCESS if dmm exists,
- *		and KERN_FAILURE if dmm does not exist.
- *
- *		If there is no default memory manager, log an error,
- *		but only the first time.
- *
- */
+  
+                                        
+  
+           
+                                                       
+                                                       
+                                           
+  
+                                                        
+                            
+  
+   
 __private_extern__ kern_return_t
 memory_manager_default_check(void)
 {
@@ -1746,7 +1746,7 @@ memory_manager_default_check(void)
 	lck_mtx_lock(&memory_manager_default_lock);
 	current = memory_manager_default;
 	if (current == MEMORY_OBJECT_DEFAULT_NULL) {
-		static boolean_t logged;        /* initialized to 0 */
+		static boolean_t logged;                              
 		boolean_t       complain = !logged;
 		logged = TRUE;
 		lck_mtx_unlock(&memory_manager_default_lock);
@@ -1760,8 +1760,8 @@ memory_manager_default_check(void)
 	}
 }
 
-/* Allow manipulation of individual page state.  This is actually part of */
-/* the UPL regimen but takes place on the object rather than on a UPL */
+                                                                            
+                                                                        
 
 kern_return_t
 memory_object_page_op(
@@ -1781,15 +1781,15 @@ memory_object_page_op(
 	return vm_object_page_op(object, offset, ops, phys_entry, flags);
 }
 
-/*
- * memory_object_range_op offers performance enhancement over
- * memory_object_page_op for page_op functions which do not require page
- * level state to be returned from the call.  Page_op was created to provide
- * a low-cost alternative to page manipulation via UPLs when only a single
- * page was involved.  The range_op call establishes the ability in the _op
- * family of functions to work on multiple pages where the lack of page level
- * state handling allows the caller to avoid the overhead of the upl structures.
- */
+  
+                                                             
+                                                                        
+                                                                            
+                                                                          
+                                                                           
+                                                                             
+                                                                                
+   
 
 kern_return_t
 memory_object_range_op(
@@ -1905,7 +1905,7 @@ memory_object_mark_eligible_for_secluded(
 
 	vm_object_lock(object);
 	if (eligible_for_secluded &&
-	    secluded_for_filecache && /* global boot-arg */
+	    secluded_for_filecache &&                      
 	    !object->eligible_for_secluded) {
 		object->eligible_for_secluded = TRUE;
 		vm_page_secluded.eligible_for_secluded += object->resident_page_count;
@@ -1914,13 +1914,13 @@ memory_object_mark_eligible_for_secluded(
 		object->eligible_for_secluded = FALSE;
 		vm_page_secluded.eligible_for_secluded -= object->resident_page_count;
 		if (object->resident_page_count) {
-			/* XXX FBDP TODO: flush pages from secluded queue? */
-			// printf("FBDP TODO: flush %d pages from %p from secluded queue\n", object->resident_page_count, object);
+			                                                     
+			                                                                                                          
 		}
 	}
 	vm_object_unlock(object);
 }
-#endif /* CONFIG_SECLUDED_MEMORY */
+#endif                             
 
 kern_return_t
 memory_object_pages_resident(
@@ -2055,11 +2055,11 @@ memory_object_control_reference(
 	return;
 }
 
-/*
- * We only every issue one of these references, so kill it
- * when that gets released (should switch the real reference
- * counting in true port-less EMMI).
- */
+  
+                                                          
+                                                            
+                                    
+   
 void
 memory_object_control_deallocate(
 	__unused memory_object_control_t control)
@@ -2104,7 +2104,7 @@ convert_memory_object_to_port(
 }
 
 
-/* Routine memory_object_reference */
+                                     
 void
 memory_object_reference(
 	memory_object_t memory_object)
@@ -2113,7 +2113,7 @@ memory_object_reference(
 		memory_object);
 }
 
-/* Routine memory_object_deallocate */
+                                      
 void
 memory_object_deallocate(
 	memory_object_t memory_object)
@@ -2123,7 +2123,7 @@ memory_object_deallocate(
 }
 
 
-/* Routine memory_object_init */
+                                
 kern_return_t
 memory_object_init
 (
@@ -2138,7 +2138,7 @@ memory_object_init
 		memory_object_page_size);
 }
 
-/* Routine memory_object_terminate */
+                                     
 kern_return_t
 memory_object_terminate
 (
@@ -2149,7 +2149,7 @@ memory_object_terminate
 		memory_object);
 }
 
-/* Routine memory_object_data_request */
+                                        
 kern_return_t
 memory_object_data_request
 (
@@ -2168,7 +2168,7 @@ memory_object_data_request
 		fault_info);
 }
 
-/* Routine memory_object_data_return */
+                                       
 kern_return_t
 memory_object_data_return
 (
@@ -2193,7 +2193,7 @@ memory_object_data_return
 		upl_flags);
 }
 
-/* Routine memory_object_data_initialize */
+                                           
 kern_return_t
 memory_object_data_initialize
 (
@@ -2208,7 +2208,7 @@ memory_object_data_initialize
 		size);
 }
 
-/* Routine memory_object_data_unlock */
+                                       
 kern_return_t
 memory_object_data_unlock
 (
@@ -2225,7 +2225,7 @@ memory_object_data_unlock
 		desired_access);
 }
 
-/* Routine memory_object_synchronize */
+                                       
 kern_return_t
 memory_object_synchronize
 (
@@ -2245,25 +2245,25 @@ memory_object_synchronize
 }
 
 
-/*
- * memory_object_map() is called by VM (in vm_map_enter() and its variants)
- * each time a "named" VM object gets mapped directly or indirectly
- * (copy-on-write mapping).  A "named" VM object has an extra reference held
- * by the pager to keep it alive until the pager decides that the
- * memory object (and its VM object) can be reclaimed.
- * VM calls memory_object_last_unmap() (in vm_object_deallocate()) when all
- * the mappings of that memory object have been removed.
- *
- * For a given VM object, calls to memory_object_map() and memory_object_unmap()
- * are serialized (through object->mapping_in_progress), to ensure that the
- * pager gets a consistent view of the mapping status of the memory object.
- *
- * This allows the pager to keep track of how many times a memory object
- * has been mapped and with which protections, to decide when it can be
- * reclaimed.
- */
+  
+                                                                           
+                                                                   
+                                                                            
+                                                                 
+                                                      
+                                                                           
+                                                        
+  
+                                                                                
+                                                                           
+                                                                           
+  
+                                                                        
+                                                                       
+             
+   
 
-/* Routine memory_object_map */
+                               
 kern_return_t
 memory_object_map
 (
@@ -2276,7 +2276,7 @@ memory_object_map
 		prot);
 }
 
-/* Routine memory_object_last_unmap */
+                                      
 kern_return_t
 memory_object_last_unmap
 (
@@ -2287,7 +2287,7 @@ memory_object_last_unmap
 		memory_object);
 }
 
-/* Routine memory_object_data_reclaim */
+                                        
 kern_return_t
 memory_object_data_reclaim
 (

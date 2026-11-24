@@ -28,24 +28,24 @@
 #ifndef _KDP_SERIAL_H_
 #define _KDP_SERIAL_H_
 
-/*
- * APIs for escaping a KDP UDP packet into a byte stream suitable
- * for a standard serial console
- */
+  
+                                                                 
+                                
+   
 
 enum {SERIALIZE_WAIT_START, SERIALIZE_READING};
 
-/*
- * Take a buffer of specified length and output it with the given
- * function. Escapes special characters as needed
- */
+  
+                                                                 
+                                                 
+   
 void kdp_serialize_packet(unsigned char *, unsigned int, void (*func)(char));
 
-/*
- * Add a new character to an internal buffer, and return that
- * buffer when a fully constructed packet has been identified.
- * Will track intermediate state using magic enums above
- */
+  
+                                                             
+                                                              
+                                                        
+   
 unsigned char *kdp_unserialize_packet(unsigned char, unsigned int *);
 
 #endif

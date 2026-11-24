@@ -67,11 +67,11 @@
 
 #define TRACE_SYSCALL 0
 
-/*
- * Copied to low physical memory in arm_init,
- * so the kernel must be linked virtually at
- * 0xc0001000 or higher to leave space for it.
- */
+  
+                                             
+                                            
+                                              
+   
 	.syntax unified
 	.text
 	.align 12
@@ -79,16 +79,16 @@
 
 LEXT(ExceptionLowVectorsBase)	
 	adr	pc, Lreset_low_vector
-	b	.	// Undef
-	b	.	// SWI
-	b	.	// Prefetch Abort
-	b	.	// Data Abort
-	b	.	// Address Exception
-	b	.	// IRQ
-	b	.	// FIQ/DEC
+	b	.	        
+	b	.	      
+	b	.	                 
+	b	.	             
+	b	.	                    
+	b	.	      
+	b	.	          
 LEXT(ResetPrivateData)
-	.space  (480),0		// (filled with 0s)
-	// ExceptionLowVectorsBase + 0x200
+	.space  (480),0		                   
+	                                  
 Lreset_low_vector:
 	adr		r4, EXT(ResetHandlerData)
 	ldr		r0, [r4, ASSIST_RESET_HANDLER]
@@ -104,26 +104,26 @@ Lreset_low_vector:
 	ldr		r0, [r4, BOOT_ARGS]
 	ldr		r1, [r4, CPU_DATA_ENTRIES]
 #if	defined(ARMA7)
-	// physical cpu number is stored in MPIDR Affinity level 0
-	mrc		p15, 0, r6, c0, c0, 5				// Read MPIDR
-	and		r6, r6, #0xFF						// Extract Affinity level 0
+	                                                          
+	mrc		p15, 0, r6, c0, c0, 5				             
+	and		r6, r6, #0xFF						                           
 #else
 #error missing Who Am I implementation
 #endif
-	// physical cpu number matches cpu number
-//#if cdeSize != 16
-//#error cpu_data_entry is not 16bytes in size
-//#endif
-	lsl		r6, r6, #4							// Get CpuDataEntry offset
-	add		r1, r1, r6							// Get  cpu_data_entry pointer
+	                                         
+                   
+                                              
+        
+	lsl		r6, r6, #4							                          
+	add		r1, r1, r6							                              
 	ldr		r1, [r1, CPU_DATA_PADDR]
 	ldr		r5, [r1, CPU_RESET_HANDLER]
 	movs	r5, r5
-	blxne	r5									// Branch to cpu reset handler
-	b		.									// Unexpected reset
+	blxne	r5									                              
+	b		.									                   
 	.globl  EXT(ResetHandlerData)
 LEXT(ResetHandlerData)
-	.space  (rhdSize_NUM),0		// (filled with 0s)
+	.space  (rhdSize_NUM),0		                   
 
 
         .globl EXT(ExceptionLowVectorsEnd)
@@ -144,9 +144,9 @@ LEXT(ExceptionVectorsBase)
 	adr	pc, Lexc_irq_vector
 #if __ARM_TIME__
 	adr	pc, Lexc_decirq_vector
-#else /* ! __ARM_TIME__ */
+#else                     
 	mov	pc, r9
-#endif /* __ARM_TIME__ */
+#endif                   
 
 Lexc_reset_vector:
 	b	.
@@ -154,58 +154,58 @@ Lexc_reset_vector:
 	.long	0x0
 	.long	0x0
 Lexc_undefined_inst_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #4]						// Branch to exception handler
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #4]						                              
 Lexc_swi_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #8]						// Branch to exception handler
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #8]						                              
 Lexc_prefetch_abort_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #0xC]						// Branch to exception handler
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #0xC]						                              
 Lexc_data_abort_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #0x10]						// Branch to exception handler
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #0x10]						                              
 Lexc_address_exception_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #0x14]						// Branch to exception handler
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #0x14]						                              
 Lexc_irq_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #0x18]						// Branch to exception handler
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #0x18]						                              
 #if __ARM_TIME__
 Lexc_decirq_vector:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu data
-	ldr		sp, [sp, CPU_EXC_VECTORS]			// Get exception vector table
-	ldr		pc, [sp, #0x1C]						// Branch to exception handler
-#else /* ! __ARM_TIME__ */
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                       
+	ldr		sp, [sp, CPU_EXC_VECTORS]			                             
+	ldr		pc, [sp, #0x1C]						                              
+#else                     
 	.long	0x0
 	.long	0x0
 	.long	0x0
 	.long	0x0
-#endif /* __ARM_TIME__ */
+#endif                   
 
-	.fill   984, 4, 0						// Push to the 4KB page boundary
+	.fill   984, 4, 0						                                
 
     .globl EXT(ExceptionVectorsEnd)
 LEXT(ExceptionVectorsEnd)	
 
 
-/*
- * Targets for the exception vectors; we patch these during boot (to allow
- * for position independent code without complicating the vectors; see start.s).
- */
+  
+                                                                          
+                                                                                
+   
 	.globl EXT(ExceptionVectorsTable)
 LEXT(ExceptionVectorsTable)	
 Lreset_vector:
@@ -226,72 +226,72 @@ Ldecirq_vector:
 	.long	0x0
 
 
-/*
- *	First Level Exception Handlers
- */
+  
+                                 
+   
 	.text
 	.align 2
 	.globl EXT(fleh_reset)
 LEXT(fleh_reset)
-	b		.									// Never return
+	b		.									               
 
-/*
- *	First Level Exception Handler for Undefined Instruction.
- */
+  
+                                                           
+   
 	.text
 	.align 2
 	.globl EXT(fleh_undef)
 
-/*
- *	Ensures the stack is safely aligned, usually in preparation for an external branch
- *	arg0: temp register for storing the stack offset
- *	arg1: temp register for storing the previous stack pointer
- */
+  
+                                                                                     
+                                                   
+                                                             
+   
 .macro ALIGN_STACK
-/*
- * For armv7k ABI, the stack needs to be 16-byte aligned
- */
+  
+                                                        
+   
 #if __BIGGEST_ALIGNMENT__ > 4
-	and		$0, sp, #0x0F						// sp mod 16-bytes
-	cmp		$0, #4							// need space for the sp on the stack
-	addlt		$0, $0, #0x10						// make room if needed, but keep stack aligned
-	mov		$1, sp							// get current sp
-	sub		sp, sp, $0						// align stack
-	str		$1, [sp]						// store previous sp on stack
+	and		$0, sp, #0x0F						                  
+	cmp		$0, #4							                                     
+	addlt		$0, $0, #0x10						                                              
+	mov		$1, sp							                 
+	sub		sp, sp, $0						              
+	str		$1, [sp]						                             
 #endif
 .endmacro
 
-/*
- *	Restores the stack pointer to its previous value following an ALIGN_STACK call
- */
+  
+                                                                                 
+   
 .macro UNALIGN_STACK
 #if __BIGGEST_ALIGNMENT__ > 4
 	ldr		sp, [sp]
 #endif
 .endmacro
 
-/*
- *	Checks that cpu is currently in the expected mode, panics if not.
- *	arg0: the expected mode, should be one of the PSR_*_MODE defines
- */
+  
+                                                                    
+                                                                   
+   
 .macro VERIFY_EXCEPTION_MODE
-	mrs		sp, cpsr 							// Read cpsr
-	and		sp, sp, #PSR_MODE_MASK					// Extract current mode
-	cmp		sp, $0							// Check specified mode
+	mrs		sp, cpsr 							            
+	and		sp, sp, #PSR_MODE_MASK					                       
+	cmp		sp, $0							                       
 	movne		r0, sp
 	bne		EXT(ExceptionVectorPanic)
 .endmacro
 
-/*
- *	Checks previous processor mode.  If usermode, will execute the code
- *	following the macro to handle the userspace exception.  Otherwise,
- *	will branch to a ELSE_IF_KERNELMODE_EXCEPTION call with the same
- *	argument.
- *	arg0: arbitrary string indicating the exception class, e.g. 'dataabt'
- */ 
+  
+                                                                      
+                                                                     
+                                                                   
+            
+                                                                        
+    
 .macro IF_USERMODE_EXCEPTION
 	mrs		sp, spsr
-	and		sp, sp, #PSR_MODE_MASK						// Is it from user?
+	and		sp, sp, #PSR_MODE_MASK						                   
 	cmp		sp, #PSR_USER_MODE
 	beq		$0_from_user
 	cmp		sp, #PSR_IRQ_MODE
@@ -302,13 +302,13 @@ LEXT(fleh_reset)
 $0_from_user:
 .endmacro
 
-/*
- *	Handles an exception taken from kernelmode (IRQ/FIQ/SVC/etc).
- *	Places the processor into the correct mode and executes the
- *	code following the macro to handle the kernel exception.
- *	Intended to be paired with a prior call to IF_USERMODE_EXCEPTION.
- *	arg0: arbitrary string indicating the exception class, e.g. 'dataabt'
- */
+  
+                                                                
+                                                              
+                                                           
+                                                                    
+                                                                        
+   
 .macro ELSE_IF_KERNELMODE_EXCEPTION
 $0_from_irq:
 	cpsid		i, #PSR_IRQ_MODE
@@ -323,253 +323,253 @@ $0_from_kernel:
 
 LEXT(fleh_undef)
 VERIFY_EXCEPTION_MODE PSR_UND_MODE
-	mrs		sp, spsr							// For check the previous mode
-	tst		sp, #PSR_TF							// Is it Thumb?
+	mrs		sp, spsr							                              
+	tst		sp, #PSR_TF							               
 	subeq		lr, lr, #4
 	subne		lr, lr, #2
 IF_USERMODE_EXCEPTION undef
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA				// Get current thread PCB pointer
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA				                                 
 
-	stmia	sp, {r0-r12, sp, lr}^				// Save user context on PCB
-	mov		r7, #0								// Zero the frame pointer
+	stmia	sp, {r0-r12, sp, lr}^				                           
+	mov		r7, #0								                         
 	nop
 
-	mov		r0, sp								// Store arm_saved_state pointer 
-												//  for argument
+	mov		r0, sp								                                 
+												                
 
-	str		lr, [sp, SS_PC]						// Save user mode pc register
+	str		lr, [sp, SS_PC]						                             
 
 	mrs		r4, spsr
-	str		r4, [sp, SS_CPSR]					// Save user mode cpsr
+	str		r4, [sp, SS_CPSR]					                      
 
 	cpsid i, #PSR_SVC_MODE
-	mrs		r3, cpsr 							// Read cpsr
-	msr		spsr_cxsf, r3                       // Set spsr(svc mode cpsr)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [r9, TH_KSTACKPTR]				// Load kernel stack
+	mrs		r3, cpsr 							            
+	msr		spsr_cxsf, r3                                                 
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		sp, [r9, TH_KSTACKPTR]				                    
 #if __ARM_USER_PROTECT__
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 
 	mvn		r0, #0
-	str		r0, [r9, TH_IOTIER_OVERRIDE]			// Reset IO tier override to -1 before handling abort from userspace
+	str		r0, [r9, TH_IOTIER_OVERRIDE]			                                                                    
 
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_user_to_kernel)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #endif
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r3, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r3					// And shove it into FPSCR
-	add		r1, r9, ACT_UVFP				// Reload the pointer to the save state
-	add		r0, r9, ACT_PCBDATA				// Reload the VFP save state argument
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r3, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r3					                          
+	add		r1, r9, ACT_UVFP				                                       
+	add		r0, r9, ACT_PCBDATA				                                     
 #else
-	mov		r1, #0                              		// Clear the VFP save state argument
-	add		r0, r9, ACT_PCBDATA					// Reload arm_saved_state pointer
+	mov		r1, #0                              		                                    
+	add		r0, r9, ACT_PCBDATA					                                 
 #endif
 
-	bl		EXT(sleh_undef)						// Call second level handler
-												//   sleh will enable interrupt
+	bl		EXT(sleh_undef)						                            
+												                               
 	b		load_and_go_user
 
 ELSE_IF_KERNELMODE_EXCEPTION undef
-	/*
-	 * We have a kernel stack already, and I will use it to save contexts
-	 * IRQ is disabled
-	 */
+	  
+                                                                      
+                   
+    
 #if CONFIG_DTRACE
-	// We need a frame for backtracing. The LR here is the LR of supervisor mode, not the location where the exception
-	// took place. We'll store that later after we switch to undef mode and pull out the LR from there.
+	                                                                                                                  
+	                                                                                                   
 
-	// This frame is consumed by fbt_invop. Any changes with the size or location of this frame will probably require
-	// changes in fbt_invop also.
+	                                                                                                                 
+	                             
 	stmfd sp!, { r7, lr }
 #endif
 
-	sub		sp, sp, EXC_CTX_SIZE						// Reserve for arm_saved_state
+	sub		sp, sp, EXC_CTX_SIZE						                              
 
-	stmia	sp, {r0-r12}						// Save on supervisor mode stack
+	stmia	sp, {r0-r12}						                                
 	str		lr, [sp, SS_LR]
 	
 #if CONFIG_DTRACE
-	add		r7, sp, EXC_CTX_SIZE						// Save frame pointer
+	add		r7, sp, EXC_CTX_SIZE						                     
 #endif
 
 	mrs		r4, lr_und
-	str		r4, [sp, SS_PC]						// Save complete
+	str		r4, [sp, SS_PC]						                
 	mrs		r4, spsr_und
 	str		r4, [sp, SS_CPSR]	
 
 	mov		ip, sp
 
-/*
-   sp - stack pointer
-   ip - stack pointer
-   r7 - frame pointer state
- */
+  
+                     
+                     
+                           
+   
 
 
 #if CONFIG_DTRACE
-	ldr		r0, [ip, SS_PC]						// Get the exception pc to store later
+	ldr		r0, [ip, SS_PC]						                                      
 #endif
 
-	add		ip, ip, EXC_CTX_SIZE						// Send stack pointer to debugger
+	add		ip, ip, EXC_CTX_SIZE						                                 
 #if CONFIG_DTRACE
 	str		r0, [ip, #4]
 	add		ip, ip, #8
 #endif
-	str		ip, [sp, SS_SP]						// for accessing local variable
+	str		ip, [sp, SS_SP]						                               
 #if CONFIG_DTRACE
 	sub		ip, ip, #8
 #endif
 	sub		ip, ip, EXC_CTX_SIZE
 
 #if __ARM_VFP__
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	mov		r5, r0						// Stash the save area in another register
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack
-	mov		r1, r5						// Load the VFP save area argument 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	mrc		p15, 0, r9, c13, c0, 4				                
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	mov		r5, r0						                                          
+	bl		EXT(vfp_save)					                                          
+	mov		r1, r5						                                   
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #else
-	mov     r1, #0                              // Clear the facility context argument
+	mov     r1, #0                                                                    
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
 	cmp		r3, r10
 	beq		1f
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
+	mcr		p15, 0, r3, c2, c0, 0				            
 1:
-	mrc		p15, 0, r11, c13, c0, 1				// Save CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r11, c13, c0, 1				                  
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	mov		r0, sp								// Argument
+	mov		r0, sp								           
 
 	ALIGN_STACK r2, r3
-	bl		EXT(sleh_undef)						// Call second level handler
+	bl		EXT(sleh_undef)						                            
 	UNALIGN_STACK
 
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r9, c13, c0, 4              // Read TPIDRPRW
-	ldr		r0, [r9, ACT_KPTW_TTB]              // Load kernel ttb
+	mrc		p15, 0, r9, c13, c0, 4                              
+	ldr		r0, [r9, ACT_KPTW_TTB]                                
 	cmp		r10, r0
 	beq		1f
-	ldr		r10, [r9, ACT_UPTW_TTB]             // Load thread ttb
+	ldr		r10, [r9, ACT_UPTW_TTB]                               
 	cmp		r10, r0
 	beq		1f
-	mcr		p15, 0, r10, c2, c0, 0              // Set TTBR0
-	ldr		r11, [r9, ACT_ASID]                 // Load thread asid
+	mcr		p15, 0, r10, c2, c0, 0                          
+	ldr		r11, [r9, ACT_ASID]                                    
 1:
-	mcr		p15, 0, r11, c13, c0, 1             // set CONTEXTIDR
+	mcr		p15, 0, r11, c13, c0, 1                              
 	isb
 #endif
 	b		load_and_go_sys
 
 
-/*
- * First Level Exception Handler for Software Interrupt
- *
- *	We assert that only user level can use the "SWI" instruction for a system
- *	call on development kernels, and assume it's true on release.
- *
- *	System call number is stored in r12.
- *	System call arguments are stored in r0 to r6 and r8 (we skip r7)
- *
- */
+  
+                                                       
+  
+                                                                            
+                                                                
+  
+                                       
+                                                                   
+  
+   
 	.text
 	.align 5
 	.globl EXT(fleh_swi)
 
 LEXT(fleh_swi)
 	cpsid	i, #PSR_ABT_MODE
-	mov		sp, ip								// Save ip
+	mov		sp, ip								          
 	cpsid	i, #PSR_SVC_MODE
-	mrs		ip, spsr							// Check the previous mode
+	mrs		ip, spsr							                          
 	tst		ip, #0x0f
 	cpsid	i, #PSR_ABT_MODE
-	mov		ip, sp								// Restore ip
+	mov		ip, sp								             
 	cpsid	i, #PSR_SVC_MODE
 	beq		swi_from_user
 
-/* Only user mode can use SWI. Panic if the kernel tries. */
+                                                            
 swi_from_kernel:
 	sub     sp, sp, EXC_CTX_SIZE
 	stmia	sp, {r0-r12}
 	add		r0, sp, EXC_CTX_SIZE
 
-	str		r0, [sp, SS_SP]						// Save supervisor mode sp
-	str		lr, [sp, SS_LR]                     // Save supervisor mode lr
+	str		r0, [sp, SS_SP]						                          
+	str		lr, [sp, SS_LR]                                               
 
 	ALIGN_STACK r0, r1
-	adr		r0, L_kernel_swi_panic_str			// Load panic messages and panic()
+	adr		r0, L_kernel_swi_panic_str			                                  
 	blx		EXT(panic)
 	b		.
 
 swi_from_user:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA					// Get User PCB
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA					               
 
 
-	/* Check for special mach_absolute_time trap value.
-	 * This is intended to be a super-lightweight call to ml_get_timebase(), which
-	 * is handrolled assembly and does not use the stack, thus not requiring us to setup a kernel stack. */
+	                                                   
+                                                                               
+                                                                                                        
 	cmp		r12, #MACH_ARM_TRAP_ABSTIME
 	beq		fleh_swi_trap_tb
-	stmia	sp, {r0-r12, sp, lr}^				// Save user context on PCB
-	mov		r7, #0								// Zero the frame pointer
+	stmia	sp, {r0-r12, sp, lr}^				                           
+	mov		r7, #0								                         
 	nop
-	mov		r8, sp								// Store arm_saved_state pointer
+	mov		r8, sp								                                
 	add		sp, sp, SS_PC
 	srsia sp, 	#PSR_SVC_MODE
-	mrs		r3, cpsr 							// Read cpsr
-	msr		spsr_cxsf, r3                       // Set spsr(svc mode cpsr)
+	mrs		r3, cpsr 							            
+	msr		spsr_cxsf, r3                                                 
 	sub		r9, sp, ACT_PCBDATA_PC
 
-	ldr		sp, [r9, TH_KSTACKPTR]				// Load kernel stack
-	mov		r11, r12							// save the syscall vector in a nontrashed register
+	ldr		sp, [r9, TH_KSTACKPTR]				                    
+	mov		r11, r12							                                                   
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 
 	mvn		r0, #0
-	str		r0, [r9, TH_IOTIER_OVERRIDE]			// Reset IO tier override to -1 before handling SWI from userspace
+	str		r0, [r9, TH_IOTIER_OVERRIDE]			                                                                  
 
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_user_to_kernel)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	add		r8, r9, ACT_PCBDATA				// Reload arm_saved_state pointer
+	mrc		p15, 0, r9, c13, c0, 4				                
+	add		r8, r9, ACT_PCBDATA				                                 
 #endif
-	ldr		r10, [r9, ACT_TASK]				// Load the current task
+	ldr		r10, [r9, ACT_TASK]				                        
 
-	/* enable interrupts */
-	cpsie	i							// Enable IRQ
+	                       
+	cpsie	i							             
 
-	cmp		r11, #MACH_ARM_TRAP_CONTTIME			// Special value for mach_continuous_time
+	cmp		r11, #MACH_ARM_TRAP_CONTTIME			                                         
 	beq		fleh_swi_trap_mct
 
 	cmp		r11, #0x80000000
@@ -577,33 +577,33 @@ swi_from_user:
 fleh_swi_trap_ret:
 
 #if TRACE_SYSCALL
-	/* trace the syscall */
+	                       
 	mov		r0, r8
 	bl		EXT(syscall_trace)
 #endif
 
 	bl		EXT(mach_kauth_cred_uthread_update)
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	/* unix syscall? */
-	rsbs	r5, r11, #0							// make the syscall positive (if negative)
-	ble		fleh_swi_unix						// positive syscalls are unix (note reverse logic here)
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	                   
+	rsbs	r5, r11, #0							                                          
+	ble		fleh_swi_unix						                                                       
 
 fleh_swi_mach:
-	/* note that mach_syscall_trace can modify r9, so increment the thread
-	 * syscall count before the call : */
+	                                                                      
+                                      
 	ldr		r2, [r9, TH_MACH_SYSCALLS]
 	add		r2, r2, #1
 	str		r2, [r9, TH_MACH_SYSCALLS]
 
-	LOAD_ADDR(r1, mach_trap_table)				// load mach_trap_table
+	LOAD_ADDR(r1, mach_trap_table)				                       
 #if MACH_TRAP_TABLE_ENTRY_SIZE_NUM == 12
-	add		r11, r5, r5, lsl #1					// syscall * 3
-	add		r6, r1, r11, lsl #2					// trap_table + syscall * 12
+	add		r11, r5, r5, lsl #1					              
+	add		r6, r1, r11, lsl #2					                            
 #elif MACH_TRAP_TABLE_ENTRY_SIZE_NUM == 16
-	add		r6, r1, r5, lsl #4					// trap_table + syscall * 16
+	add		r6, r1, r5, lsl #4					                            
 #elif MACH_TRAP_TABLE_ENTRY_SIZE_NUM == 20
-	add		r11, r5, r5, lsl #2					// syscall * 5
-	add		r6, r1, r11, lsl #2					// trap_table + syscall * 20
+	add		r11, r5, r5, lsl #2					              
+	add		r6, r1, r11, lsl #2					                            
 #else
 #error mach_trap_t size unhandled (see MACH_TRAP_TABLE_ENTRY_SIZE)!
 #endif
@@ -612,52 +612,52 @@ fleh_swi_mach:
 	LOAD_ADDR(r4, kdebug_enable)
 	ldr		r4, [r4]
 	movs	r4, r4
-	movne	r0, r8								// ready the reg state pointer as an arg to the call
-	movne	r1, r5								// syscall number as 2nd arg
+	movne	r0, r8								                                                    
+	movne	r1, r5								                            
 	COND_EXTERN_BLNE(mach_syscall_trace)
 #endif
-	adr		lr,	fleh_swi_exit					// any calls from here on out will return to our exit path
-	cmp		r5, MACH_TRAP_TABLE_COUNT			// check syscall number range
+	adr		lr,	fleh_swi_exit					                                                          
+	cmp		r5, MACH_TRAP_TABLE_COUNT			                             
 	bge		fleh_swi_mach_error
 
-/* 
- * For arm32 ABI where 64-bit types are aligned to even registers and
- * 64-bits on stack, we need to unpack registers differently. So
- * we use the mungers for marshalling in arguments from user space.
- * Currently this is just ARMv7k.
- */
+   
+                                                                     
+                                                                
+                                                                   
+                                 
+   
 #if __BIGGEST_ALIGNMENT__ > 4
-	sub		sp, #0x40						// allocate buffer and keep stack 128-bit aligned
-	                                            				//     it should be big enough for all syscall arguments
-	ldr		r11, [r6, #8]						// get mach_trap_table[call_number].mach_trap_arg_munge32
-	teq		r11, #0							// check if we have a munger
+	sub		sp, #0x40						                                                 
+	                                            				                                                        
+	ldr		r11, [r6, #8]						                                                         
+	teq		r11, #0							                            
 	moveq		r0, #0
-	movne		r0, r8							// ready the reg state pointer as an arg to the call
-	movne		r1, sp							// stack will hold arguments buffer
-	blxne		r11							// call munger to get arguments from userspace
-	adr		lr,	fleh_swi_exit					// any calls from here on out will return to our exit path
+	movne		r0, r8							                                                    
+	movne		r1, sp							                                   
+	blxne		r11							                                              
+	adr		lr,	fleh_swi_exit					                                                          
 	teq		r0, #0
-	bne		fleh_swi_mach_error					// exit if the munger returned non-zero status
+	bne		fleh_swi_mach_error					                                              
 #endif
 
-	ldr		r1, [r6, #4]						// load the syscall vector
+	ldr		r1, [r6, #4]						                          
 
-	LOAD_ADDR(r2, kern_invalid)					// test to make sure the trap is not kern_invalid
+	LOAD_ADDR(r2, kern_invalid)					                                                 
 	teq		r1, r2
 	beq		fleh_swi_mach_error
 
 #if __BIGGEST_ALIGNMENT__ > 4
-	mov		r0, sp								// argument buffer on stack
-	bx		r1									// call the syscall handler
+	mov		r0, sp								                           
+	bx		r1									                           
 #else
-	mov		r0, r8								// ready the reg state pointer as an arg to the call
-	bx		r1									// call the syscall handler
+	mov		r0, r8								                                                    
+	bx		r1									                           
 #endif
 
 fleh_swi_exit64:
-	str		r1, [r8, #4]						// top of 64-bit return
+	str		r1, [r8, #4]						                       
 fleh_swi_exit:
-	str		r0, [r8]							// save the return value
+	str		r0, [r8]							                        
 #ifndef	NO_KDEBUG
 	movs	r4, r4
 	movne	r1, r5
@@ -668,7 +668,7 @@ fleh_swi_exit:
 #endif
 
 	mov		r0, #1
-	bl		EXT(throttle_lowpri_io)				// throttle_lowpri_io(1);
+	bl		EXT(throttle_lowpri_io)				                         
 
 	bl		EXT(thread_exception_return)
 	b		.
@@ -683,12 +683,12 @@ fleh_swi_mach_error:
 	.align	5
 fleh_swi_unix:
 	ldr		r1, [r9, TH_UNIX_SYSCALLS]
-	mov		r0, r8								// reg state structure is arg
+	mov		r0, r8								                             
 	add		r1, r1, #1
 	str		r1, [r9, TH_UNIX_SYSCALLS]
-	mov		r1, r9								// current thread in arg1
-	ldr		r2, [r9, TH_UTHREAD]				// current uthread in arg2
-	ldr		r3, [r10, TASK_BSD_INFO]			// current proc in arg3
+	mov		r1, r9								                         
+	ldr		r2, [r9, TH_UTHREAD]				                          
+	ldr		r3, [r10, TASK_BSD_INFO]			                       
 	bl		EXT(unix_syscall)
 	b		.
 
@@ -708,23 +708,23 @@ icache_invalidate_trap:
 	subhi	r3, r3, #1<<MMU_CLINE
 	bhi		cache_trap_error
 	adr		r11, cache_trap_jmp	
-	ldr		r6,  [r9, TH_RECOVER]				// Save existing recovery routine
+	ldr		r6,  [r9, TH_RECOVER]				                                 
 	str		r11, [r9, TH_RECOVER] 
 #if __ARM_USER_PROTECT__
-	ldr     r5, [r9, ACT_UPTW_TTB]				// Load thread ttb
-	mcr		p15, 0, r5, c2, c0, 0				// Set TTBR0
-	ldr     r5, [r9, ACT_ASID]					// Load thread asid
-	mcr		p15, 0, r5, c13, c0, 1				// Set CONTEXTIDR
+	ldr     r5, [r9, ACT_UPTW_TTB]				                  
+	mcr		p15, 0, r5, c2, c0, 0				            
+	ldr     r5, [r9, ACT_ASID]					                   
+	mcr		p15, 0, r5, c13, c0, 1				                 
 	dsb		ish
 	isb
 #endif
 	bl		EXT(InvalidatePoU_IcacheRegion)
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                          
 #if __ARM_USER_PROTECT__
-	ldr		r4, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r4, c2, c0, 0				// Set TTBR0
-	mov		r4, #0								// Load kernel asid
-	mcr		p15, 0, r4, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r4, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r4, c2, c0, 0				            
+	mov		r4, #0								                   
+	mcr		p15, 0, r4, c13, c0, 1				                 
 	isb
 #endif
 	str		r6, [r9, TH_RECOVER]
@@ -737,22 +737,22 @@ dcache_flush_trap:
 	subhi	r3, r3, #1<<MMU_CLINE
 	bhi		cache_trap_error
 	adr		r11, cache_trap_jmp	
-	ldr		r4,  [r9, TH_RECOVER]				// Save existing recovery routine
+	ldr		r4,  [r9, TH_RECOVER]				                                 
 	str		r11, [r9, TH_RECOVER] 
 #if __ARM_USER_PROTECT__
-	ldr     r6, [r9, ACT_UPTW_TTB]              // Load thread ttb
-	mcr		p15, 0, r6, c2, c0, 0				// Set TTBR0
-	ldr     r5, [r9, ACT_ASID]					// Load thread asid
-	mcr		p15, 0, r5, c13, c0, 1				// Set CONTEXTIDR
+	ldr     r6, [r9, ACT_UPTW_TTB]                                
+	mcr		p15, 0, r6, c2, c0, 0				            
+	ldr     r5, [r9, ACT_ASID]					                   
+	mcr		p15, 0, r5, c13, c0, 1				                 
 	isb
 #endif
 	bl		EXT(flush_dcache_syscall)
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                          
 #if __ARM_USER_PROTECT__
-	ldr		r5, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r5, c2, c0, 0				// Set TTBR0
-	mov		r5, #0								// Load kernel asid
-	mcr		p15, 0, r5, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r5, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r5, c2, c0, 0				            
+	mov		r5, #0								                   
+	mcr		p15, 0, r5, c13, c0, 1				                 
 	isb
 #endif
 	str		r4, [r9, TH_RECOVER]
@@ -766,29 +766,29 @@ thread_set_cthread_trap:
 
 thread_get_cthread_trap:
 	bl		EXT(thread_get_cthread_self)
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	add		r1, r9, ACT_PCBDATA					// Get User PCB
-	str		r0, [r1, SS_R0]						// set return value
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	add		r1, r9, ACT_PCBDATA					               
+	str		r0, [r1, SS_R0]						                   
 	bl		EXT(thread_exception_return)
 	b		.
 
 cache_trap_jmp:
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	ldr		r5, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r5, c2, c0, 0				// Set TTBR0
-	mov		r5, #0								// Load kernel asid
-	mcr		p15, 0, r5, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	ldr		r5, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r5, c2, c0, 0				            
+	mov		r5, #0								                   
+	mcr		p15, 0, r5, c13, c0, 1				                 
 	isb
 #endif
-	mrc		p15, 0, r3, c6, c0 					// Read Fault Address
+	mrc		p15, 0, r3, c6, c0 					                     
 cache_trap_error:
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	add		r0, r9, ACT_PCBDATA					// Get User PCB
-	ldr		r1, [r0, SS_PC]						// Save user mode pc register as pc
-	sub		r1, r1, #4							// Backtrack current pc
-	str		r1, [r0, SS_PC]						// pc at cache assist swi
-	str		r3, [r0, SS_VADDR]					// Fault Address
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	add		r0, r9, ACT_PCBDATA					               
+	ldr		r1, [r0, SS_PC]						                                   
+	sub		r1, r1, #4							                       
+	str		r1, [r0, SS_PC]						                         
+	str		r3, [r0, SS_VADDR]					                
 	mov		r0, #EXC_BAD_ACCESS
 	mov		r2, KERN_INVALID_ADDRESS
 	sub		sp, sp, #8
@@ -802,27 +802,27 @@ cache_trap_error:
 
 fleh_swi_trap_mct:
 	bl 		EXT(mach_continuous_time)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	add		r9, r9, ACT_PCBDATA_R0				// Get User register state
-	stmia		r9, {r0, r1}					// set 64-bit return value
+	mrc		p15, 0, r9, c13, c0, 4				                
+	add		r9, r9, ACT_PCBDATA_R0				                          
+	stmia		r9, {r0, r1}					                          
 	bl		EXT(thread_exception_return)
 	b		.
 
 fleh_swi_trap_tb:
 	str		lr, [sp, SS_PC]
-	bl		EXT(ml_get_timebase)				// ml_get_timebase() (64-bit return)
+	bl		EXT(ml_get_timebase)				                                    
 	ldr		lr, [sp, SS_PC]
 	nop
-	movs	pc, lr								// Return to user
+	movs	pc, lr								                 
 
 	.align  2
 L_kernel_swi_panic_str:
 	.asciz  "fleh_swi: took SWI from kernel mode\n"
 	.align	2
 
-/*
- * First Level Exception Handler for Prefetching Abort.
- */
+  
+                                                       
+   
 	.text
 	.align 2
 	.globl EXT(fleh_prefabt)
@@ -832,135 +832,135 @@ VERIFY_EXCEPTION_MODE PSR_ABT_MODE
 	sub		lr, lr, #4
 
 IF_USERMODE_EXCEPTION prefabt
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA					// Get User PCB
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA					               
 
-	stmia   sp, {r0-r12, sp, lr}^				// Save user context on PCB
-	mov		r7, #0								// Zero the frame pointer
+	stmia   sp, {r0-r12, sp, lr}^				                           
+	mov		r7, #0								                         
 	nop
-	mov     r0, sp								// Store arm_saved_state pointer 
-												// For argument
-	str		lr, [sp, SS_PC]						// Save user mode pc register as pc
-	mrc		p15, 0, r1, c6, c0, 2 				// Read IFAR
-	str		r1, [sp, SS_VADDR]					// and fault address of pcb
+	mov     r0, sp								                                 
+												               
+	str		lr, [sp, SS_PC]						                                   
+	mrc		p15, 0, r1, c6, c0, 2 				            
+	str		r1, [sp, SS_VADDR]					                           
 
-	mrc		p15, 0, r5, c5, c0, 1 				// Read Fault Status
-	str		r5, [sp, SS_STATUS]					// Save fault status register to pcb
+	mrc		p15, 0, r5, c5, c0, 1 				                    
+	str		r5, [sp, SS_STATUS]					                                    
 
 	mrs     r4, spsr
-	str     r4, [sp, SS_CPSR]					// Save user mode cpsr
+	str     r4, [sp, SS_CPSR]					                      
 
 	cpsid	i, #PSR_SVC_MODE
-	mrs		r3, cpsr 							// Read cpsr
-	msr		spsr_cxsf, r3                       // Set spsr(svc mode cpsr)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [r9, TH_KSTACKPTR]				// Load kernel stack
+	mrs		r3, cpsr 							            
+	msr		spsr_cxsf, r3                                                 
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		sp, [r9, TH_KSTACKPTR]				                    
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r3, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r3					// And shove it into FPSCR
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r3, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r3					                          
 #endif
 #if __ARM_USER_PROTECT__
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 
 	mvn		r0, #0
-	str		r0, [r9, TH_IOTIER_OVERRIDE]			// Reset IO tier override to -1 before handling abort from userspace
+	str		r0, [r9, TH_IOTIER_OVERRIDE]			                                                                    
 
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_user_to_kernel)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #endif
 
-	add		r0, r9, ACT_PCBDATA					// Reload arm_saved_state pointer
-	mov		r1, T_PREFETCH_ABT					// Pass abort type
-	bl		EXT(sleh_abort)						// Call second level handler
-												// Sleh will enable interrupt
+	add		r0, r9, ACT_PCBDATA					                                 
+	mov		r1, T_PREFETCH_ABT					                  
+	bl		EXT(sleh_abort)						                            
+												                             
 	b		load_and_go_user
 
 ELSE_IF_KERNELMODE_EXCEPTION prefabt
 	
 UNWIND_PROLOGUE
 	
-	/*
-	 * We have a kernel stack already, and I will use it to save contexts:
-	 *     ------------------
-	 *    | VFP saved state  |
-	 *    |------------------|
-	 *    | ARM saved state  |
-	 * SP  ------------------
-	 *
-	 * IRQ is disabled
-	 */
+	  
+                                                                       
+                          
+                           
+                           
+                           
+                          
+   
+                   
+    
 	sub     sp, sp, EXC_CTX_SIZE
 	stmia	sp, {r0-r12}
 	add		r0, sp, EXC_CTX_SIZE
 
-	str		r0, [sp, SS_SP]						// Save supervisor mode sp
-	str		lr, [sp, SS_LR]                     // Save supervisor mode lr
+	str		r0, [sp, SS_SP]						                          
+	str		lr, [sp, SS_LR]                                               
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_save)					                                           
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
 	cmp		r3, r10
 	beq		1f
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
+	mcr		p15, 0, r3, c2, c0, 0				            
 1:
-	mrc		p15, 0, r11, c13, c0, 1				// Save CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r11, c13, c0, 1				                  
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 
 	mrs		r4, lr_abt
-	str		r4, [sp, SS_PC]					// Save pc
+	str		r4, [sp, SS_PC]					          
 
-	mrc		p15, 0, r5, c6, c0, 2 				// Read IFAR
-	str		r5, [sp, SS_VADDR]					// and fault address of pcb
-	mrc		p15, 0, r5, c5, c0, 1 				// Read (instruction) Fault Status
-	str		r5, [sp, SS_STATUS]					// Save fault status register to pcb
+	mrc		p15, 0, r5, c6, c0, 2 				            
+	str		r5, [sp, SS_VADDR]					                           
+	mrc		p15, 0, r5, c5, c0, 1 				                                  
+	str		r5, [sp, SS_STATUS]					                                    
 
 	mrs		r4, spsr_abt
 	str		r4, [sp, SS_CPSR]	
 
 	mov		r0, sp
 	ALIGN_STACK r1, r2
-	mov		r1, T_PREFETCH_ABT					// Pass abort type
+	mov		r1, T_PREFETCH_ABT					                  
 
 
 UNWIND_DIRECTIVES	
 	
-	bl		EXT(sleh_abort) 					// Call second level handler
+	bl		EXT(sleh_abort) 					                            
 	UNALIGN_STACK
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #if __ARM_USER_PROTECT__
-	ldr		r0, [r9, ACT_KPTW_TTB]              // Load kernel ttb
+	ldr		r0, [r9, ACT_KPTW_TTB]                                
 	cmp		r10, r0
 	beq		1f
-	ldr		r10, [r9, ACT_UPTW_TTB]             // Load thread ttb
+	ldr		r10, [r9, ACT_UPTW_TTB]                               
 	cmp		r10, r0
 	beq		1f
-	mcr		p15, 0, r10, c2, c0, 0              // Set TTBR0
-	ldr		r11, [r9, ACT_ASID]                 // Load thread asid
+	mcr		p15, 0, r10, c2, c0, 0                          
+	ldr		r11, [r9, ACT_ASID]                                    
 1:
-	mcr		p15, 0, r11, c13, c0, 1             // set CONTEXTIDR
+	mcr		p15, 0, r11, c13, c0, 1                              
 	isb
 #endif
 
@@ -968,9 +968,9 @@ UNWIND_DIRECTIVES
 
 UNWIND_EPILOGUE
 
-/*
- * First Level Exception Handler for Data Abort
- */
+  
+                                               
+   
 	.text
 	.align 2
 	.globl EXT(fleh_dataabt)
@@ -979,90 +979,90 @@ LEXT(fleh_dataabt)
 VERIFY_EXCEPTION_MODE PSR_ABT_MODE
 	sub		lr, lr, #8
 IF_USERMODE_EXCEPTION dataabt
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA					// Get User PCB
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA					               
 
-	stmia	sp, {r0-r12, sp, lr}^				// Save user context on PCB
-	mov		r7, #0								// Zero the frame pointer
+	stmia	sp, {r0-r12, sp, lr}^				                           
+	mov		r7, #0								                         
 	nop
 		
-	mov		r0, sp								// Store arm_saved_state pointer 
-												// For argument
+	mov		r0, sp								                                 
+												               
 
-	str		lr, [sp, SS_PC]						// Save user mode pc register
+	str		lr, [sp, SS_PC]						                             
 
 	mrs		r4, spsr
-	str		r4, [sp, SS_CPSR]					// Save user mode cpsr
+	str		r4, [sp, SS_CPSR]					                      
 
-	mrc		p15, 0, r5, c5, c0 					// Read Fault Status
-	mrc		p15, 0, r6, c6, c0 					// Read Fault Address
-	str		r5, [sp, SS_STATUS]					// Save fault status register to pcb
-	str		r6, [sp, SS_VADDR]					// Save fault address to pcb
+	mrc		p15, 0, r5, c5, c0 					                    
+	mrc		p15, 0, r6, c6, c0 					                     
+	str		r5, [sp, SS_STATUS]					                                    
+	str		r6, [sp, SS_VADDR]					                            
 
 	cpsid	i, #PSR_SVC_MODE
-	mrs		r3, cpsr 							// Read cpsr
-	msr		spsr_cxsf, r3                       // Set spsr(svc mode cpsr)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [r9, TH_KSTACKPTR]				// Load kernel stack
+	mrs		r3, cpsr 							            
+	msr		spsr_cxsf, r3                                                 
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		sp, [r9, TH_KSTACKPTR]				                    
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r3, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r3					// And shove it into FPSCR
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r3, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r3					                          
 #endif
 #if __ARM_USER_PROTECT__
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 
 	mvn		r0, #0
-	str		r0, [r9, TH_IOTIER_OVERRIDE]			// Reset IO tier override to -1 before handling abort from userspace
+	str		r0, [r9, TH_IOTIER_OVERRIDE]			                                                                    
 
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_user_to_kernel)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #endif
 
-	add		r0, r9, ACT_PCBDATA					// Reload arm_saved_state pointer
-	mov     r1, T_DATA_ABT						// Pass abort type
-	bl		EXT(sleh_abort)						// Call second level handler
-												// Sleh will enable irq
+	add		r0, r9, ACT_PCBDATA					                                 
+	mov     r1, T_DATA_ABT						                  
+	bl		EXT(sleh_abort)						                            
+												                       
 	b		load_and_go_user
 
 ELSE_IF_KERNELMODE_EXCEPTION dataabt
 
 UNWIND_PROLOGUE	
 	
-	/*
-	 * We have a kernel stack already, and I will use it to save contexts:
-	 *     ------------------
-	 *    | VFP saved state  |
-	 *    |------------------|
-	 *    | ARM saved state  |
-	 * SP  ------------------
-	 *
-	 * IRQ is disabled
-	 */
+	  
+                                                                       
+                          
+                           
+                           
+                           
+                          
+   
+                   
+    
 	sub     sp, sp, EXC_CTX_SIZE
 	stmia	sp, {r0-r12}
 	add		r0, sp, EXC_CTX_SIZE
 
-	str		r0, [sp, SS_SP]						// Save supervisor mode sp
-	str		lr, [sp, SS_LR]                     // Save supervisor mode lr
+	str		r0, [sp, SS_SP]						                          
+	str		lr, [sp, SS_LR]                                               
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_save)					                                           
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 
 	mrs		r4, lr_abt
@@ -1071,133 +1071,133 @@ UNWIND_PROLOGUE
 	str		r4, [sp, SS_CPSR]	
 
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
 	cmp		r3, r10
 	beq		1f
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
+	mcr		p15, 0, r3, c2, c0, 0				            
 1:
-	mrc		p15, 0, r11, c13, c0, 1				// Save CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r11, c13, c0, 1				                  
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	mrc		p15, 0, r5, c5, c0					// Read Fault Status
-	mrc		p15, 0, r6, c6, c0					// Read Fault Address
-	str		r5, [sp, SS_STATUS]					// Save fault status register to pcb
-	str		r6, [sp, SS_VADDR]					// Save fault address to pcb
+	mrc		p15, 0, r5, c5, c0					                    
+	mrc		p15, 0, r6, c6, c0					                     
+	str		r5, [sp, SS_STATUS]					                                    
+	str		r6, [sp, SS_VADDR]					                            
 
-	mov		r0, sp								// Argument
+	mov		r0, sp								           
 	ALIGN_STACK r1, r2
-	mov		r1, T_DATA_ABT						// Pass abort type
+	mov		r1, T_DATA_ABT						                  
 
 UNWIND_DIRECTIVES
 	
-	bl		EXT(sleh_abort)						// Call second level handler
+	bl		EXT(sleh_abort)						                            
 	UNALIGN_STACK
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #if __ARM_USER_PROTECT__
-	ldr		r0, [r9, ACT_KPTW_TTB]              // Load kernel ttb
+	ldr		r0, [r9, ACT_KPTW_TTB]                                
 	cmp		r10, r0
 	beq		1f
-	ldr		r10, [r9, ACT_UPTW_TTB]             // Load thread ttb
+	ldr		r10, [r9, ACT_UPTW_TTB]                               
 	cmp		r10, r0
 	beq		1f
-	mcr		p15, 0, r10, c2, c0, 0              // Set TTBR0
-	ldr		r11, [r9, ACT_ASID]                 // Load thread asid
+	mcr		p15, 0, r10, c2, c0, 0                          
+	ldr		r11, [r9, ACT_ASID]                                    
 1:
-	mcr		p15, 0, r11, c13, c0, 1             // set CONTEXTIDR
+	mcr		p15, 0, r11, c13, c0, 1                              
 	isb
 #endif
 
 load_and_go_sys:	
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
-	ldr		r4, [sp, SS_CPSR]					// Load saved cpsr
-	tst		r4, #PSR_IRQF						// Test IRQ set
-	bne		lags1								// Branch if IRQ disabled
+	ldr		r4, [sp, SS_CPSR]					                  
+	tst		r4, #PSR_IRQF						               
+	bne		lags1								                         
 
-	cpsid	i									// Disable IRQ
-	ldr		r2, [r9, ACT_PREEMPT_CNT]           // Load preemption count
-	movs	r2, r2								// Test if null
-	ldr		r8, [r9, ACT_CPUDATAP]				// Get current cpu
-	bne		lags1								// Branch if count not null
-	ldr		r5, [r8, CPU_PENDING_AST]			// Get ASTs
-	ands	r5, r5, AST_URGENT					// Get the requests we do honor
-	beq		lags1								// Branch if no ASTs
+	cpsid	i									              
+	ldr		r2, [r9, ACT_PREEMPT_CNT]                                   
+	movs	r2, r2								               
+	ldr		r8, [r9, ACT_CPUDATAP]				                  
+	bne		lags1								                           
+	ldr		r5, [r8, CPU_PENDING_AST]			           
+	ands	r5, r5, AST_URGENT					                               
+	beq		lags1								                    
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
 	cmp		r3, r10
 	beq		1f
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
+	mcr		p15, 0, r3, c2, c0, 0				            
 1:
-	mrc		p15, 0, r11, c13, c0, 1				// Save CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r11, c13, c0, 1				                  
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	ldr		lr, [sp, SS_LR]							// Restore the link register
-	stmfd		sp!, {r7, lr}							// Push a fake frame
+	ldr		lr, [sp, SS_LR]							                            
+	stmfd		sp!, {r7, lr}							                    
 
 	ALIGN_STACK r2, r3
-	bl		EXT(ast_taken_kernel)				// Handle AST_URGENT
+	bl		EXT(ast_taken_kernel)				                    
 	UNALIGN_STACK
 
-	ldmfd		sp!, {r7, lr}							// Pop the fake frame
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	ldr		r8, [r9, ACT_CPUDATAP]				// Get current cpu
+	ldmfd		sp!, {r7, lr}							                     
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	ldr		r8, [r9, ACT_CPUDATAP]				                  
 #if __ARM_USER_PROTECT__
-	ldr		r0, [r9, ACT_KPTW_TTB]              // Load kernel ttb
+	ldr		r0, [r9, ACT_KPTW_TTB]                                
 	cmp		r10, r0
 	beq		1f
-	ldr		r10, [r9, ACT_UPTW_TTB]             // Load thread ttb
+	ldr		r10, [r9, ACT_UPTW_TTB]                               
 	cmp		r10, r0
 	beq		1f
-	mcr		p15, 0, r10, c2, c0, 0              // Set TTBR0
-	ldr		r11, [r9, ACT_ASID]                 // Load thread asid
+	mcr		p15, 0, r10, c2, c0, 0                          
+	ldr		r11, [r9, ACT_ASID]                                    
 1:
-	mcr		p15, 0, r11, c13, c0, 1             // set CONTEXTIDR
+	mcr		p15, 0, r11, c13, c0, 1                              
 	isb
 #endif
 lags1:
 	ldr		lr, [sp, SS_LR]
 
-	mov		ip, sp                              // Save pointer to contexts for abort mode
-	ldr		sp, [ip, SS_SP]                     // Restore stack pointer
+	mov		ip, sp                                                                        
+	ldr		sp, [ip, SS_SP]                                             
 
 	cpsid	if, #PSR_ABT_MODE
 
 	mov		sp, ip
 
 	ldr		r4, [sp, SS_CPSR]
-	msr		spsr_cxsf, r4						// Restore spsr
+	msr		spsr_cxsf, r4						               
 
-	clrex										// clear exclusive memory tag
+	clrex										                             
 #if	__ARM_ENABLE_WFE_
 	sev
 #endif
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_load)					// Load the desired VFP state from the stack 
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_load)					                                             
 #endif
 
-	ldr		lr, [sp, SS_PC]						// Restore lr
+	ldr		lr, [sp, SS_PC]						             
 
-	ldmia	sp, {r0-r12}						// Restore other registers
+	ldmia	sp, {r0-r12}						                          
 
-	movs	pc, lr								// Return to sys (svc, irq, fiq)
+	movs	pc, lr								                                
 	
 UNWIND_EPILOGUE
 	
-/*
- * First Level Exception Handler for address exception
- * Not supported
- */
+  
+                                                      
+                
+   
 	.text
 	.align 2
 	.globl EXT(fleh_addrexc)
@@ -1206,15 +1206,15 @@ LEXT(fleh_addrexc)
 	b	.
 	
 
-/*
- * First Level Exception Handler for IRQ
- * Current mode : IRQ
- * IRQ and FIQ are always disabled while running in FIQ handler
- * We do not permit nested interrupt.
- * 
- * Saving area: from user   : PCB. 
- *		from kernel : interrupt stack.
- */
+  
+                                        
+                     
+                                                               
+                                     
+   
+                                   
+                                  
+   
 
 	.text
 	.align 2
@@ -1223,55 +1223,55 @@ LEXT(fleh_addrexc)
 LEXT(fleh_irq)
 	sub		lr, lr, #4
 	
-	cpsie	a									// Re-enable async aborts
+	cpsie	a									                         
 	
 	mrs		sp, spsr
-	tst		sp, #0x0f							// From user? or kernel?
+	tst		sp, #0x0f							                        
 	bne		fleh_irq_kernel
 
 fleh_irq_user:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA					// Get User PCB
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA					               
 	stmia	sp, {r0-r12, sp, lr}^
-	mov		r7, #0								// Zero the frame pointer
+	mov		r7, #0								                         
 	nop
 	str		lr, [sp, SS_PC]
 	mrs		r4, spsr
 	str		r4, [sp, SS_CPSR]
-	mov		r5, sp								// Saved context in r5
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		r6, [r9, ACT_CPUDATAP]				// Get current cpu
-	ldr		sp,	[r6, CPU_ISTACKPTR]				// Set interrupt stack
+	mov		r5, sp								                      
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		r6, [r9, ACT_CPUDATAP]				                  
+	ldr		sp,	[r6, CPU_ISTACKPTR]				                      
 	cpsid	i, #PSR_SVC_MODE
-	ldr		sp, [r9, TH_KSTACKPTR]				// Set kernel stack
+	ldr		sp, [r9, TH_KSTACKPTR]				                   
 	cpsid	i, #PSR_IRQ_MODE
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_user_to_kernel)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #endif
 #if CONFIG_TELEMETRY
-	LOAD_ADDR(r2, telemetry_needs_record)		// Check if a telemetry record was requested...
+	LOAD_ADDR(r2, telemetry_needs_record)		                                               
 	mov		r0, #1
 	ldr		r2, [r2]
 	movs	r2, r2
 	beq		1f
-	mov		r1, #0					// (not a PMI record)
-	bl		EXT(telemetry_mark_curthread)		// ...if so, mark the current thread...
-	mrc		p15, 0, r9, c13, c0, 4				// ...and restore the thread pointer from TPIDRPRW
+	mov		r1, #0					                     
+	bl		EXT(telemetry_mark_curthread)		                                       
+	mrc		p15, 0, r9, c13, c0, 4				                                                  
 1:
 #endif
 
@@ -1284,55 +1284,55 @@ fleh_irq_kernel:
 	stmia	sp, {r0-r12}
 	add		r0, sp, EXC_CTX_SIZE
 
-	str		r0, [sp, SS_SP]						// Save supervisor mode sp
-	str		lr, [sp, SS_LR]                     // Save supervisor mode lr
+	str		r0, [sp, SS_SP]						                          
+	str		lr, [sp, SS_LR]                                               
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_save)					                                           
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mrc		p15, 0, r11, c13, c0, 1				// Get CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mrc		p15, 0, r11, c13, c0, 1				                 
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	mov		r5, sp								// Saved context in r5
+	mov		r5, sp								                      
 
 	cpsid	i, #PSR_IRQ_MODE
 
-	str		lr, [r5, SS_PC]                     // Save LR as the return PC
+	str		lr, [r5, SS_PC]                                                
 	mrs		r4, spsr
-	str		r4, [r5, SS_CPSR]                   // Save the cpsr of the interrupted mode
+	str		r4, [r5, SS_CPSR]                                                           
 
-	ldr		sp, [r9, ACT_CPUDATAP]				// Get current cpu
-	ldr		sp,	[sp, CPU_ISTACKPTR]				// Set interrupt stack
+	ldr		sp, [r9, ACT_CPUDATAP]				                  
+	ldr		sp,	[sp, CPU_ISTACKPTR]				                      
 
 #if CONFIG_TELEMETRY
-	LOAD_ADDR(r2, telemetry_needs_record)		// Check if a telemetry record was requested...
+	LOAD_ADDR(r2, telemetry_needs_record)		                                               
 	mov		r0, #0
 	ldr		r2, [r2]
 	movs	r2, r2
 	beq		1f
-	mov		r1, #0					// (not a PMI record)
-	bl		EXT(telemetry_mark_curthread)		// ...if so, mark the current thread...
-	mrc		p15, 0, r9, c13, c0, 4				// ...and restore the thread pointer from TPIDRPRW
+	mov		r1, #0					                     
+	bl		EXT(telemetry_mark_curthread)		                                       
+	mrc		p15, 0, r9, c13, c0, 4				                                                  
 1:
 #endif
 
 fleh_irq_handler:
-	ldr		r2, [r9, ACT_PREEMPT_CNT]           // Load preemption count
-	add		r2, r2, #1							// Increment count
-	str		r2, [r9, ACT_PREEMPT_CNT]			// Update preemption count
+	ldr		r2, [r9, ACT_PREEMPT_CNT]                                   
+	add		r2, r2, #1							                  
+	str		r2, [r9, ACT_PREEMPT_CNT]			                          
 #ifndef	NO_KDEBUG
 	LOAD_ADDR(r8, kdebug_enable)
 	ldr		r8, [r8]
@@ -1340,21 +1340,21 @@ fleh_irq_handler:
 	movne	r0, r5
 	COND_EXTERN_BLNE(interrupt_trace)
 #endif
-	bl	    EXT(interrupt_stats)                // Record interrupt statistics
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	ldr		r4, [r9, ACT_CPUDATAP]				// Get current cpu
-	str		r5, [r4, CPU_INT_STATE] 			// Saved context in cpu_int_state
-	ldr		r3, [r4, CPU_STAT_IRQ]				// Get IRQ count
-	add		r3, r3, #1					// Increment count
-	str		r3, [r4, CPU_STAT_IRQ]				// Update  IRQ count
-	ldr		r3, [r4, CPU_STAT_IRQ_WAKE]			// Get post-wake IRQ count
-	add		r3, r3, #1					// Increment count
-	str		r3, [r4, CPU_STAT_IRQ_WAKE]			// Update post-wake IRQ count
+	bl	    EXT(interrupt_stats)                                              
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	ldr		r4, [r9, ACT_CPUDATAP]				                  
+	str		r5, [r4, CPU_INT_STATE] 			                                 
+	ldr		r3, [r4, CPU_STAT_IRQ]				                
+	add		r3, r3, #1					                  
+	str		r3, [r4, CPU_STAT_IRQ]				                    
+	ldr		r3, [r4, CPU_STAT_IRQ_WAKE]			                          
+	add		r3, r3, #1					                  
+	str		r3, [r4, CPU_STAT_IRQ_WAKE]			                             
 	ldr		r0, [r4, INTERRUPT_TARGET]
 	ldr		r1, [r4, INTERRUPT_REFCON]
 	ldr		r2, [r4, INTERRUPT_NUB]
 	ldr		r3, [r4, INTERRUPT_SOURCE]
-	ldr		r5, [r4, INTERRUPT_HANDLER]			//  Call second level exception handler
+	ldr		r5, [r4, INTERRUPT_HANDLER]			                                       
 	blx		r5
 #ifndef	NO_KDEBUG
 	movs	r8, r8
@@ -1362,13 +1362,13 @@ fleh_irq_handler:
 #endif
 	bl		EXT(entropy_collect)
 return_from_irq:
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                          
 	mov		r5, #0
-	ldr		r4, [r9, ACT_CPUDATAP]				// Get current cpu
-	str		r5, [r4, CPU_INT_STATE]				// Clear cpu_int_state
-	ldr		r2, [r9, ACT_PREEMPT_CNT]           // Load preemption count
+	ldr		r4, [r9, ACT_CPUDATAP]				                  
+	str		r5, [r4, CPU_INT_STATE]				                      
+	ldr		r2, [r9, ACT_PREEMPT_CNT]                                   
 #if MACH_ASSERT
-	cmp		r2, #0								// verify positive count
+	cmp		r2, #0								                        
 	bgt		1f
 	push	{r7, lr}
 	mov		r7, sp
@@ -1377,28 +1377,28 @@ return_from_irq:
 	b		.
 1:
 #endif
-	sub		r2, r2, #1							// Decrement count
-	str		r2, [r9, ACT_PREEMPT_CNT]			// Update preemption count
+	sub		r2, r2, #1							                  
+	str		r2, [r9, ACT_PREEMPT_CNT]			                          
 
-	mrs		r0, spsr							// For check the previous mode
+	mrs		r0, spsr							                              
 
 	cpsid	i, #PSR_SVC_MODE
 
-	tst		r0, #0x0f							// Check if the previous is from user
-	ldreq   sp, [r9, TH_KSTACKPTR]              // ...If so, reload the kernel stack pointer
-	beq     load_and_go_user                    // ...and return
+	tst		r0, #0x0f							                                     
+	ldreq   sp, [r9, TH_KSTACKPTR]                                                          
+	beq     load_and_go_user                                    
 
 #if __ARM_USER_PROTECT__
-	ldr		r0, [r9, ACT_KPTW_TTB]              // Load kernel ttb
+	ldr		r0, [r9, ACT_KPTW_TTB]                                
 	cmp		r10, r0
 	beq		1f
-	ldr		r10, [r9, ACT_UPTW_TTB]             // Load thread ttb
+	ldr		r10, [r9, ACT_UPTW_TTB]                               
 	cmp		r10, r0
 	beq		1f
-	mcr		p15, 0, r10, c2, c0, 0              // Set TTBR0
-	ldr		r11, [r9, ACT_ASID]                 // Load thread asid
+	mcr		p15, 0, r10, c2, c0, 0                          
+	ldr		r11, [r9, ACT_ASID]                                    
 1:
-	mcr		p15, 0, r11, c13, c0, 1             // set CONTEXTIDR
+	mcr		p15, 0, r11, c13, c0, 1                              
 	isb
 #endif
 	b       load_and_go_sys
@@ -1407,15 +1407,15 @@ return_from_irq:
 L_preemption_count_zero_str:
 	.ascii	"locore.s: preemption count is zero \000"
 	.align 2
-/*
- * First Level Exception Handler for DEC
- * Current mode : IRQ
- * IRQ and FIQ are always disabled while running in FIQ handler
- * We do not permit nested interrupt.
- * 
- * Saving area: from user   : PCB. 
- *		from kernel : interrupt stack.
- */
+  
+                                        
+                     
+                                                               
+                                     
+   
+                                   
+                                  
+   
 
 	.text
 	.align 2
@@ -1424,55 +1424,55 @@ L_preemption_count_zero_str:
 LEXT(fleh_decirq)
 	sub		lr, lr, #4
 	
-	cpsie		af								// Re-enable async aborts/FIQ
+	cpsie		af								                             
 	
 	mrs		sp, spsr
-	tst		sp, #0x0f							// From user? or kernel?
+	tst		sp, #0x0f							                        
 	bne		fleh_decirq_kernel
 
 fleh_decirq_user:
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA					// Get User PCB
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA					               
 	stmia	sp, {r0-r12, sp, lr}^
-	mov		r7, #0								// Zero the frame pointer
+	mov		r7, #0								                         
 	nop
 	str		lr, [sp, SS_PC]
 	mrs		r4, spsr
 	str		r4, [sp, SS_CPSR]
-	mov		r5, sp								// Saved context in r5
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		r6, [r9, ACT_CPUDATAP]				// Get current cpu
-	ldr		sp,	[r6, CPU_ISTACKPTR]				// Set interrupt stack
+	mov		r5, sp								                      
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		r6, [r9, ACT_CPUDATAP]				                  
+	ldr		sp,	[r6, CPU_ISTACKPTR]				                      
 	cpsid	i, #PSR_SVC_MODE
-	ldr		sp, [r9, TH_KSTACKPTR]				// Set kernel stack
+	ldr		sp, [r9, TH_KSTACKPTR]				                   
 	cpsid	i, #PSR_IRQ_MODE
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_user_to_kernel)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 #endif
 #if CONFIG_TELEMETRY
-	LOAD_ADDR(r2, telemetry_needs_record)		// Check if a telemetry record was requested...
+	LOAD_ADDR(r2, telemetry_needs_record)		                                               
 	mov		r0, #1
 	ldr		r2, [r2]
 	movs	r2, r2
 	beq		1f
-	mov 		r1, #0					// (not a PMI record)
-	bl		EXT(telemetry_mark_curthread)		// ...if so, mark the current thread...
-	mrc		p15, 0, r9, c13, c0, 4				// ...and restore the thread pointer from TPIDRPRW
+	mov 		r1, #0					                     
+	bl		EXT(telemetry_mark_curthread)		                                       
+	mrc		p15, 0, r9, c13, c0, 4				                                                  
 1:
 #endif
 
@@ -1485,73 +1485,73 @@ fleh_decirq_kernel:
 	stmia	sp, {r0-r12}
 	add		r0, sp, EXC_CTX_SIZE
 
-	str		r0, [sp, SS_SP]						// Save supervisor mode sp
-	str		lr, [sp, SS_LR]                     // Save supervisor mode lr
+	str		r0, [sp, SS_SP]						                          
+	str		lr, [sp, SS_LR]                                               
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_save)					                                           
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mrc		p15, 0, r11, c13, c0, 1				// Get CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mrc		p15, 0, r11, c13, c0, 1				                 
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	mov		r5, sp								// Saved context in r5
+	mov		r5, sp								                      
 
 	cpsid	i, #PSR_IRQ_MODE
 
-	str		lr, [r5, SS_PC]                     // Save LR as the return PC
+	str		lr, [r5, SS_PC]                                                
 	mrs		r4, spsr
-	str		r4, [r5, SS_CPSR]                   // Save the cpsr of the interrupted mode
+	str		r4, [r5, SS_CPSR]                                                           
 
-	ldr		sp, [r9, ACT_CPUDATAP]				// Get current cpu
-	ldr		sp,	[sp, CPU_ISTACKPTR]				// Set interrupt stack
+	ldr		sp, [r9, ACT_CPUDATAP]				                  
+	ldr		sp,	[sp, CPU_ISTACKPTR]				                      
 
 #if CONFIG_TELEMETRY
-	LOAD_ADDR(r2, telemetry_needs_record)		// Check if a telemetry record was requested...
+	LOAD_ADDR(r2, telemetry_needs_record)		                                               
 	mov		r0, #0
 	ldr		r2, [r2]
 	movs	r2, r2
 	beq		1f
-	mov		r1, #0					// (not a pmi record)
-	bl		EXT(telemetry_mark_curthread)		// ...if so, mark the current thread...
-	mrc		p15, 0, r9, c13, c0, 4				// ...and restore the thread pointer from TPIDRPRW
+	mov		r1, #0					                     
+	bl		EXT(telemetry_mark_curthread)		                                       
+	mrc		p15, 0, r9, c13, c0, 4				                                                  
 1:
 #endif
 
 fleh_decirq_handler:
-	ldr		r2, [r9, ACT_PREEMPT_CNT]           // Load preemption count
-	add		r2, r2, #1							// Increment count
-	str		r2, [r9, ACT_PREEMPT_CNT]			// Update preemption count
-	ldr		r2, [r9, ACT_CPUDATAP]				// Get current cpu
-	str		r5, [r2, CPU_INT_STATE]				// Saved context in cpu_int_state
-	ldr		r3, [r2, CPU_STAT_IRQ]				// Get IRQ count
-	add		r3, r3, #1							// Increment count
-	str		r3, [r2, CPU_STAT_IRQ]				// Update IRQ count
-	ldr		r3, [r2, CPU_STAT_IRQ_WAKE]			// Get post-wake IRQ count
-	add		r3, r3, #1					// Increment count
-	str		r3, [r2, CPU_STAT_IRQ_WAKE]			// Update post-wake IRQ count
+	ldr		r2, [r9, ACT_PREEMPT_CNT]                                   
+	add		r2, r2, #1							                  
+	str		r2, [r9, ACT_PREEMPT_CNT]			                          
+	ldr		r2, [r9, ACT_CPUDATAP]				                  
+	str		r5, [r2, CPU_INT_STATE]				                                 
+	ldr		r3, [r2, CPU_STAT_IRQ]				                
+	add		r3, r3, #1							                  
+	str		r3, [r2, CPU_STAT_IRQ]				                   
+	ldr		r3, [r2, CPU_STAT_IRQ_WAKE]			                          
+	add		r3, r3, #1					                  
+	str		r3, [r2, CPU_STAT_IRQ_WAKE]			                             
 #ifndef NO_KDEBUG
 	LOAD_ADDR(r4, kdebug_enable)
 	ldr		r4, [r4]
 	movs	r4, r4
-	movne	r0, r5								// Pass saved context
+	movne	r0, r5								                     
 	COND_EXTERN_BLNE(interrupt_trace)
 #endif
-	bl		EXT(interrupt_stats)                // Record interrupt statistics
+	bl		EXT(interrupt_stats)                                              
 	mov		r0, #0
-	bl		EXT(rtclock_intr)					// Call second level exception handler
+	bl		EXT(rtclock_intr)					                                      
 #ifndef NO_KDEBUG
 	movs	r4, r4
 	COND_EXTERN_BLNE(interrupt_trace_exit)
@@ -1560,89 +1560,89 @@ fleh_decirq_handler:
 	b		return_from_irq
 
 
-/*
- * First Level Exception Handler for FIQ
- * Current mode : FIQ
- * IRQ and FIQ are always disabled while running in FIQ handler
- * We do not permit nested interrupt.
- * 
- * Saving area: from user   : PCB. 
- *		from kernel : interrupt stack.
- *
- * We have 7 added shadow registers in FIQ mode for fast services.
- * So only we have to save is just 8 general registers and LR.
- * But if the current thread was running on user mode before the FIQ interrupt,
- * All user registers be saved for ast handler routine.
- */
+  
+                                        
+                     
+                                                               
+                                     
+   
+                                   
+                                  
+  
+                                                                  
+                                                              
+                                                                               
+                                                       
+   
 	.text
 	.align 2
 	.globl EXT(fleh_fiq_generic)
 	
 LEXT(fleh_fiq_generic)
-	str		r11, [r10]							// Clear the FIQ source
+	str		r11, [r10]							                       
 
-	ldr		r13, [r8, CPU_TIMEBASE_LOW]			// Load TBL
-	adds	r13, r13, #1						// Increment TBL
-	str		r13, [r8, CPU_TIMEBASE_LOW]			// Store TBL
-	ldreq	r13, [r8, CPU_TIMEBASE_HIGH]		// Load TBU
-	addeq	r13, r13, #1						// Increment TBU
-	streq	r13, [r8, CPU_TIMEBASE_HIGH]		// Store TBU
-	subs	r12, r12, #1						// Decrement, DEC
-	str		r12, [r8, CPU_DECREMENTER]			// Store DEC
-	subspl	pc, lr, #4							// Return unless DEC < 0
+	ldr		r13, [r8, CPU_TIMEBASE_LOW]			           
+	adds	r13, r13, #1						                
+	str		r13, [r8, CPU_TIMEBASE_LOW]			            
+	ldreq	r13, [r8, CPU_TIMEBASE_HIGH]		           
+	addeq	r13, r13, #1						                
+	streq	r13, [r8, CPU_TIMEBASE_HIGH]		            
+	subs	r12, r12, #1						                 
+	str		r12, [r8, CPU_DECREMENTER]			            
+	subspl	pc, lr, #4							                        
 	b		EXT(fleh_dec)
 
 	.text
 	.align	2
 	.globl	EXT(fleh_dec)
 LEXT(fleh_dec)
-	mrs		sp, spsr							// Get the spsr
+	mrs		sp, spsr							               
 	sub		lr, lr, #4
-	tst		sp, #0x0f							// From user? or kernel?
+	tst		sp, #0x0f							                        
 	bne		2f
 
-	/* From user */
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	add		sp, sp, ACT_PCBDATA					// Get User PCB
+	               
+	mrc		p15, 0, sp, c13, c0, 4				                
+	add		sp, sp, ACT_PCBDATA					               
 	
 	stmia	sp, {r0-r12, sp, lr}^
-	mov		r7, #0								// Zero the frame pointer
+	mov		r7, #0								                         
 	nop
 	str		lr, [sp, SS_PC]
 	
 	mrs		r4, spsr
 	str		r4, [sp, SS_CPSR]
 	mov		r5, sp
-	sub		sp, sp, ACT_PCBDATA					// Get User PCB
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu
-	ldr		sp,	[sp, CPU_ISTACKPTR]				// Set interrupt stack
+	sub		sp, sp, ACT_PCBDATA					               
+	ldr		sp, [sp, ACT_CPUDATAP]				                  
+	ldr		sp,	[sp, CPU_ISTACKPTR]				                      
 	mov		r6, sp
 	cpsid	i, #PSR_SVC_MODE
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [r9, TH_KSTACKPTR]				// Set kernel stack
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		sp, [r9, TH_KSTACKPTR]				                   
 
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_save)					// Save the current VFP state to ACT_UVFP
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_save)					                                         
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mrc		p15, 0, r11, c13, c0, 1				// Get CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mrc		p15, 0, r11, c13, c0, 1				                 
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	mov		r0, #1								// Mark this as coming from user context
+	mov		r0, #1								                                        
 	b		4f
 
 2:
-	/* From kernel */
-	tst		sp, #PSR_IRQF						// Test for IRQ masked
-	bne		3f									// We're on the cpu_signal path
+	                 
+	tst		sp, #PSR_IRQF						                      
+	bne		3f									                               
 
 	cpsid   if, #PSR_SVC_MODE
 
@@ -1650,138 +1650,138 @@ LEXT(fleh_dec)
 	stmia	sp, {r0-r12}
 	add		r0, sp, EXC_CTX_SIZE
 
-	str		r0, [sp, SS_SP]						// Save supervisor mode sp
-	str		lr, [sp, SS_LR]                     // Save supervisor mode lr
+	str		r0, [sp, SS_SP]						                          
+	str		lr, [sp, SS_LR]                                               
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_save)					                                           
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mrc		p15, 0, r11, c13, c0, 1				// Get CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mrc		p15, 0, r11, c13, c0, 1				                 
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
-	mov		r5, sp								// Saved context in r5
+	mov		r5, sp								                      
 
 	cpsid   if, #PSR_FIQ_MODE
 
-	mrc     p15, 0, r1, c13, c0, 4              // Read TPIDRPRW
+	mrc     p15, 0, r1, c13, c0, 4                              
 
-	str		lr, [r5, SS_PC]                     // Save LR as the return PC
+	str		lr, [r5, SS_PC]                                                
 	mrs		r4, spsr
-	str		r4, [r5, SS_CPSR]                   // Save the cpsr of the interrupted mode
+	str		r4, [r5, SS_CPSR]                                                           
 
-	ldr		r6, [r1, ACT_CPUDATAP]				// Get current cpu
-	ldr		r6,	[r6, CPU_ISTACKPTR]				// Set interrupt stack
+	ldr		r6, [r1, ACT_CPUDATAP]				                  
+	ldr		r6,	[r6, CPU_ISTACKPTR]				                      
 
-	mov		r0, #0								// Mark this as coming from kernel context
+	mov		r0, #0								                                          
 	b       4f
 
 3:
-	/* cpu_signal path */
-	mrc		p15, 0, sp, c13, c0, 4				// Read TPIDRPRW
-	ldr		sp, [sp, ACT_CPUDATAP]				// Get current cpu
-	ldr		sp,	[sp, CPU_FIQSTACKPTR]			// Set fiq stack
+	                     
+	mrc		p15, 0, sp, c13, c0, 4				                
+	ldr		sp, [sp, ACT_CPUDATAP]				                  
+	ldr		sp,	[sp, CPU_FIQSTACKPTR]			                
 	sub		sp, sp, EXC_CTX_SIZE
 	stmia		sp, {r0-r12}
 	str		lr, [sp, SS_PC]
 	mrs		r4, spsr
 	str		r4, [sp, SS_CPSR]
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_save)					// Save the current VFP state to the stack 
-	mov		r4, #FPSCR_DEFAULT				// Load up the default FPSCR value...
-	fmxr		fpscr, r4					// And shove it into FPSCR
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_save)					                                           
+	mov		r4, #FPSCR_DEFAULT				                                     
+	fmxr		fpscr, r4					                          
 #endif
 #if __ARM_USER_PROTECT__
-	mrc		p15, 0, r10, c2, c0, 0				// Get TTBR0
-	ldr		r3, [r9, ACT_KPTW_TTB]				// Load kernel ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	mrc		p15, 0, r11, c13, c0, 1				// Get CONTEXTIDR
-	mov		r3, #0								// Load kernel asid
-	mcr		p15, 0, r3, c13, c0, 1				// Set CONTEXTIDR
+	mrc		p15, 0, r10, c2, c0, 0				            
+	ldr		r3, [r9, ACT_KPTW_TTB]				                  
+	mcr		p15, 0, r3, c2, c0, 0				            
+	mrc		p15, 0, r11, c13, c0, 1				                 
+	mov		r3, #0								                   
+	mcr		p15, 0, r3, c13, c0, 1				                 
 	isb
 #endif
 
 	ALIGN_STACK r0, r1
-	mov		r0, r8								// Get current cpu in arg 0
-	mov		r1, SIGPdec							// Decrementer signal in arg1
+	mov		r0, r8								                           
+	mov		r1, SIGPdec							                             
 	mov		r2, #0
 	mov		r3, #0
-	bl		EXT(cpu_signal)						// Call cpu_signal
+	bl		EXT(cpu_signal)						                  
 	UNALIGN_STACK
 
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 #if __ARM_VFP__
-	add		r0, sp, SS_SIZE					// Get vfp state pointer
-	bic		r0, #(VSS_ALIGN_NUM - 1)			// Align to arm_vfpsaved_state alignment
-	add		r0, VSS_ALIGN					// Get the actual vfp save area
-	bl		EXT(vfp_load)					// Load the desired VFP state from the stack 
+	add		r0, sp, SS_SIZE					                        
+	bic		r0, #(VSS_ALIGN_NUM - 1)			                                        
+	add		r0, VSS_ALIGN					                               
+	bl		EXT(vfp_load)					                                             
 #endif
 
-	clrex										// clear exclusive memory tag
+	clrex										                             
 #if	__ARM_ENABLE_WFE_
 	sev
 #endif
 #if __ARM_USER_PROTECT__
-	mcr		p15, 0, r10, c2, c0, 0				// Set TTBR0
-	mcr		p15, 0, r11, c13, c0, 1				// Set CONTEXTIDR
+	mcr		p15, 0, r10, c2, c0, 0				            
+	mcr		p15, 0, r11, c13, c0, 1				                 
 	isb
 #endif
 	ldr		lr, [sp, SS_PC]
-	ldmia	sp, {r0-r12}						// Restore saved registers
-	movs	pc, lr								// Return from fiq
+	ldmia	sp, {r0-r12}						                          
+	movs	pc, lr								                  
 
 4:
 	cpsid	i, #PSR_IRQ_MODE
 	cpsie	f
-	mov		sp, r6								// Restore the stack pointer
+	mov		sp, r6								                            
 	ALIGN_STACK r2, r3
-	msr		spsr_cxsf, r4						// Restore the spsr
-	ldr		r2, [r9, ACT_PREEMPT_CNT]           // Load preemption count
-	add		r2, r2, #1							// Increment count
-	str		r2, [r9, ACT_PREEMPT_CNT]			// Update preemption count
-	ldr		r4, [r9, ACT_CPUDATAP]				// Get current cpu
+	msr		spsr_cxsf, r4						                   
+	ldr		r2, [r9, ACT_PREEMPT_CNT]                                   
+	add		r2, r2, #1							                  
+	str		r2, [r9, ACT_PREEMPT_CNT]			                          
+	ldr		r4, [r9, ACT_CPUDATAP]				                  
 	str		r5, [r4, CPU_INT_STATE] 
-	ldr		r3, [r4, CPU_STAT_IRQ]				// Get IRQ count
-	add		r3, r3, #1							// Increment count
-	str		r3, [r4, CPU_STAT_IRQ]				// Update IRQ count
-	ldr		r3, [r4, CPU_STAT_IRQ_WAKE]			// Get post-wake IRQ count
-	add		r3, r3, #1					// Increment count
-	str		r3, [r4, CPU_STAT_IRQ_WAKE]			// Update post-wake IRQ count
+	ldr		r3, [r4, CPU_STAT_IRQ]				                
+	add		r3, r3, #1							                  
+	str		r3, [r4, CPU_STAT_IRQ]				                   
+	ldr		r3, [r4, CPU_STAT_IRQ_WAKE]			                          
+	add		r3, r3, #1					                  
+	str		r3, [r4, CPU_STAT_IRQ_WAKE]			                             
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	movs	r0, r0
 	beq		5f
-	mov	r8, r0							// Stash our "from_user" boolean value
+	mov	r8, r0							                                      
 	bl		EXT(timer_state_event_user_to_kernel)
-	mov	r0, r8							// Restore our "from_user" value
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	mov	r0, r8							                                
+	mrc		p15, 0, r9, c13, c0, 4				                
 5:
 #endif
 #if CONFIG_TELEMETRY
-	LOAD_ADDR(r4, telemetry_needs_record)		// Check if a telemetry record was requested...
+	LOAD_ADDR(r4, telemetry_needs_record)		                                               
 	ldr		r4, [r4]
 	movs		r4, r4
 	beq		6f
-	mov		r1, #0					// (not a PMI record)
-	bl		EXT(telemetry_mark_curthread)		// ...if so, mark the current thread...
-	mrc		p15, 0, r9, c13, c0, 4				// ...and restore the thread pointer from TPIDRPRW
+	mov		r1, #0					                     
+	bl		EXT(telemetry_mark_curthread)		                                       
+	mrc		p15, 0, r9, c13, c0, 4				                                                  
 6:
 #endif
 
@@ -1789,13 +1789,13 @@ LEXT(fleh_dec)
 	LOAD_ADDR(r4, kdebug_enable)
 	ldr     r4, [r4]
 	movs    r4, r4
-	ldrne	r1, [r9, ACT_CPUDATAP]				// Get current cpu
+	ldrne	r1, [r9, ACT_CPUDATAP]				                  
 	ldrne	r0, [r1, CPU_INT_STATE]
 	COND_EXTERN_BLNE(interrupt_trace)
 #endif
-	bl		EXT(interrupt_stats)                // Record interrupt statistics
+	bl		EXT(interrupt_stats)                                              
 	mov		r0, #0
-	bl		EXT(rtclock_intr)					// Call second level exception handler
+	bl		EXT(rtclock_intr)					                                      
 #ifndef NO_KDEBUG
 	movs	r4, r4
 	COND_EXTERN_BLNE(interrupt_trace_exit)
@@ -1804,34 +1804,34 @@ LEXT(fleh_dec)
 
 	b       return_from_irq
 
-/*
- * void thread_syscall_return(kern_return_t r0)
- *
- */
+  
+                                               
+  
+   
 	.text
 	.align 2
 	.globl EXT(thread_syscall_return)
 
 LEXT(thread_syscall_return)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	add		r1, r9, ACT_PCBDATA					// Get User PCB
-	str		r0, [r1, SS_R0]						// set return value
+	mrc		p15, 0, r9, c13, c0, 4				                
+	add		r1, r9, ACT_PCBDATA					               
+	str		r0, [r1, SS_R0]						                   
 #ifndef	NO_KDEBUG
 	LOAD_ADDR(r4, kdebug_enable)
 	ldr		r4, [r4]
 	movs	r4, r4
 	beq		load_and_go_user
-	ldr		r12, [r1, SS_R12]					// Load syscall number
-	rsbs	r1, r12, #0							// make the syscall positive (if negative)
+	ldr		r12, [r1, SS_R12]					                      
+	rsbs	r1, r12, #0							                                          
 	COND_EXTERN_BLGT(mach_syscall_trace_exit)
 #endif
 	b		load_and_go_user
 
-/*
- * void thread_exception_return(void)
- * void thread_bootstrap_return(void)
- *
- */
+  
+                                     
+                                     
+  
+   
 	.text
 	.globl EXT(thread_exception_return)
 	.globl EXT(thread_bootstrap_return)
@@ -1840,124 +1840,124 @@ LEXT(thread_bootstrap_return)
 #if CONFIG_DTRACE
 	bl EXT(dtrace_thread_bootstrap)
 #endif
-	// Fall through 
+	                
 
 LEXT(thread_exception_return)
 
 load_and_go_user:	
-/*
- * Restore user mode states and go back to user mode
- */
-	cpsid	i									// Disable irq
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+  
+                                                    
+   
+	cpsid	i									              
+	mrc		p15, 0, r9, c13, c0, 4				                
 
 	mvn		r0, #0
-	str		r0, [r9, TH_IOTIER_OVERRIDE]			// Reset IO tier override to -1 before returning to user
+	str		r0, [r9, TH_IOTIER_OVERRIDE]			                                                        
 	
-	ldr		r8, [r9, ACT_CPUDATAP]				// Get current cpu
-	ldr		r5, [r8, CPU_PENDING_AST]			// Get ASTs
-	cmp		r5, #0								// Test if ASTs pending
-	beq		return_to_user_now					// Branch if no ASTs
+	ldr		r8, [r9, ACT_CPUDATAP]				                  
+	ldr		r5, [r8, CPU_PENDING_AST]			           
+	cmp		r5, #0								                       
+	beq		return_to_user_now					                    
 
-	bl		EXT(ast_taken_user)					// Handle all ASTs (may continue via thread_exception_return)
+	bl		EXT(ast_taken_user)					                                                             
 
-	mrc		p15, 0, r9, c13, c0, 4				// Reload r9 from TPIDRPRW
-	b	load_and_go_user						// Loop back
+	mrc		p15, 0, r9, c13, c0, 4				                          
+	b	load_and_go_user						            
 
 return_to_user_now:	
 
 #if MACH_ASSERT
-/*
- * Assert that the preemption level is zero prior to the return to user space
- */
-	ldr		r1, [r9, ACT_PREEMPT_CNT]			// Load preemption count
-	cmp		r1, #0						// Test
-	bne		L_lagu_preempt_panic				// Panic if not zero
+  
+                                                                             
+   
+	ldr		r1, [r9, ACT_PREEMPT_CNT]			                        
+	cmp		r1, #0						       
+	bne		L_lagu_preempt_panic				                    
 
-/*
- * Assert that the preemption level is zero prior to the return to user space
- */
-	ldr		r2, [r9, TH_RWLOCK_CNT]				// Load RW lock count
-	cmp		r2, #0						// Test
-	bne		L_lagu_rwlock_cnt_panic				// Panic if not zero
+  
+                                                                             
+   
+	ldr		r2, [r9, TH_RWLOCK_CNT]				                     
+	cmp		r2, #0						       
+	bne		L_lagu_rwlock_cnt_panic				                    
 #endif
 
-/*
- * Assert that we aren't leaking KHEAP_TEMP allocations prior to the return to user space
- */
-	ldr		r1, [r9, TH_TMP_ALLOC_CNT]			// Load temp alloc count
-	cmp		r1, #0						// Test
-	bne		L_lagu_temp_alloc_cnt_panic			// Panic if not zero
+  
+                                                                                         
+   
+	ldr		r1, [r9, TH_TMP_ALLOC_CNT]			                        
+	cmp		r1, #0						       
+	bne		L_lagu_temp_alloc_cnt_panic			                    
 
 #if	!CONFIG_SKIP_PRECISE_USER_KERNEL_TIME
 	bl		EXT(timer_state_event_kernel_to_user)
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
-	ldr		r8, [r9, ACT_CPUDATAP]				// Get current cpu data
-#endif	/* !CONFIG_SKIP_PRECISE_USER_KERNEL_TIME */
+	mrc		p15, 0, r9, c13, c0, 4				                
+	ldr		r8, [r9, ACT_CPUDATAP]				                       
+#endif	                                           
 #if __ARM_DEBUG__ >= 6
 	ldr		r0, [r9, ACT_DEBUGDATA]
 	ldr		r6, [r8, CPU_USER_DEBUG]
-	cmp		r0, r6								// test if debug registers need to be changed
+	cmp		r0, r6								                                             
 	beq		1f
-	bl		EXT(arm_debug_set)					// argument is already in r0
-	mrc		p15, 0, r9, c13, c0, 4				// Read TPIDRPRW
+	bl		EXT(arm_debug_set)					                            
+	mrc		p15, 0, r9, c13, c0, 4				                
 1:
 #endif
 #if __ARM_VFP__
-	add		r0, r9, ACT_UVFP				// Get the address of the user VFP save area
-	bl		EXT(vfp_load)					// Load the desired VFP state from ACT_UVFP
+	add		r0, r9, ACT_UVFP				                                            
+	bl		EXT(vfp_load)					                                           
 #endif
-	add		r0, r9, ACT_PCBDATA					// Get User PCB
-	ldr		r4, [r0, SS_CPSR]					// Get saved cpsr
-	and		r3, r4, #PSR_MODE_MASK				// Extract current mode	
-	cmp		r3, #PSR_USER_MODE					// Check user mode
+	add		r0, r9, ACT_PCBDATA					               
+	ldr		r4, [r0, SS_CPSR]					                 
+	and		r3, r4, #PSR_MODE_MASK				                        
+	cmp		r3, #PSR_USER_MODE					                  
 	movne	r0, r3
 	bne		EXT(ExceptionVectorPanic)
 
-	msr		spsr_cxsf, r4						// Restore spsr(user mode cpsr)
-	mov		sp, r0								// Get User PCB
+	msr		spsr_cxsf, r4						                               
+	mov		sp, r0								               
 
-	clrex										// clear exclusive memory tag
+	clrex										                             
 #if	__ARM_ENABLE_WFE_
 	sev
 #endif
 #if __ARM_USER_PROTECT__
-	ldr     r3, [r9, ACT_UPTW_TTB]              // Load thread ttb
-	mcr		p15, 0, r3, c2, c0, 0				// Set TTBR0
-	ldr		r2, [r9, ACT_ASID]					// Load thread asid
+	ldr     r3, [r9, ACT_UPTW_TTB]                                
+	mcr		p15, 0, r3, c2, c0, 0				            
+	ldr		r2, [r9, ACT_ASID]					                   
 	mcr		p15, 0, r2, c13, c0, 1
 	isb
 #endif
-	ldr		lr, [sp, SS_PC]						// Restore user mode pc
-	ldmia	sp, {r0-r12, sp, lr}^				// Restore the other user mode registers
-	nop											// Hardware problem
-	movs	pc, lr								// Return to user
+	ldr		lr, [sp, SS_PC]						                       
+	ldmia	sp, {r0-r12, sp, lr}^				                                        
+	nop											                   
+	movs	pc, lr								                 
 
-/*
- * r1: tmp alloc count
- * r9: current_thread()
- */
+  
+                      
+                       
+   
 L_lagu_temp_alloc_cnt_panic:
-	mov		r0, r9						// Thread argument
-	blx		EXT(kheap_temp_leak_panic)			// Finally, panic
+	mov		r0, r9						                  
+	blx		EXT(kheap_temp_leak_panic)			                 
 
 #if MACH_ASSERT
-/*
- * r1: current preemption count
- * r9: current_thread()
- */
+  
+                               
+                       
+   
 L_lagu_preempt_panic:
-	adr		r0, L_lagu_preempt_panic_str			// Load the panic string...
-	blx		EXT(panic)					// Finally, panic
+	adr		r0, L_lagu_preempt_panic_str			                           
+	blx		EXT(panic)					                 
 
-/*
- * r2: rwlock count
- * r9: current_thread()
- */
+  
+                   
+                       
+   
 L_lagu_rwlock_cnt_panic:
-	adr		r0, L_lagu_rwlock_cnt_panic_str			// Load the panic string...
-	mov		r1, r9						// Thread argument for panic string
-	blx		EXT(panic)					// Finally, panic
+	adr		r0, L_lagu_rwlock_cnt_panic_str			                           
+	mov		r1, r9						                                   
+	blx		EXT(panic)					                 
 
 	.align  2
 L_lagu_preempt_panic_str:
@@ -1968,7 +1968,7 @@ L_lagu_preempt_panic_str:
 L_lagu_rwlock_cnt_panic_str:
 	.asciz  "load_and_go_user: RW lock count not 0 on thread %p (%u)"
 	.align  2
-#endif /* MACH_ASSERT */
+#endif                  
 
 	.align  2
 L_evimpanic_str:
@@ -1992,4 +1992,4 @@ LEXT(ExceptionVectorPanic)
 LOAD_ADDR_GEN_DEF(mach_trap_table)
 LOAD_ADDR_GEN_DEF(kern_invalid)
 
-/* vim: set ts=4: */
+                    

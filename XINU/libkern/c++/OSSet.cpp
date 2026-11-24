@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOSet.m created by rsulack on Thu 11-Jun-1998 */
+                                                   
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -88,7 +88,7 @@ OSSet::initWithObjects(const OSObject *inObjects[],
 	}
 
 	for (unsigned int i = 0; i < inCount; i++) {
-// xx-review: no test here for failure of setObject()
+                                                     
 		if (members->getCount() < capacity) {
 			setObject(inObjects[i]);
 		} else {
@@ -241,9 +241,9 @@ OSSet::merge(const OSArray * array)
 	bool                    result   = true;
 
 	for (int i = 0; (anObject = array->getObject(i)); i++) {
-		/* setObject() returns false if the object is already in the set,
-		 * so we have to check beforehand here with containsObject().
-		 */
+		                                                                 
+                                                               
+     
 		if (containsObject(anObject)) {
 			continue;
 		}
@@ -435,29 +435,29 @@ OSSet::copyCollection(OSDictionary *cycleDict)
 	}
 
 	do {
-		// Check for a cycle
+		                    
 		ret = super::copyCollection(cycleDict);
 		if (ret) {
-			continue; // Found it
+			continue;            
 		}
 		newSet = OSSet::withCapacity(members->capacity);
 		if (!newSet) {
-			continue; // Couldn't create new set abort
+			continue;                                 
 		}
-		// Insert object into cycle Dictionary
+		                                      
 		cycleDict->setObject((const OSSymbol *) this, newSet.get());
 
 		OSArray *newMembers = newSet->members.get();
 		newMembers->capacityIncrement = members->capacityIncrement;
 
-		// Now copy over the contents into the new duplicate
+		                                                    
 		for (unsigned int i = 0; i < members->count; i++) {
 			OSObject *obj = EXT_CAST(members->array[i].get());
 			OSCollection *coll = OSDynamicCast(OSCollection, obj);
 			if (coll) {
 				OSSharedPtr<OSCollection> newColl = coll->copyCollection(cycleDict);
 				if (newColl) {
-					obj = newColl.get(); // Rely on cycleDict ref for a bit
+					obj = newColl.get();                                   
 				} else {
 					return ret;
 				}

@@ -68,16 +68,16 @@ io_perf_test_io_init(void)
 		T_SKIP("Unable to mount NAND. Skipping test!");
 	}
 
-	/* Mark the main thread as fixed priority */
+	                                            
 	struct sched_param param = {.sched_priority = THR_MANAGER_PRI};
 	T_ASSERT_POSIX_ZERO(pthread_setschedparam(pthread_self(), SCHED_FIFO, &param),
 	    "pthread_setschedparam");
 
-	/* Set I/O Policy to Tier 0 */
+	                              
 	T_ASSERT_POSIX_ZERO(setiopolicy_np(IOPOL_TYPE_DISK, IOPOL_SCOPE_PROCESS,
 	    IOPOL_IMPORTANT), "setiopolicy");
 
-	/* Create data buffer */
+	                        
 	data_buf = malloc(IO_SIZE * 16);
 	T_ASSERT_NOTNULL(data_buf, "Data buffer allocation");
 
@@ -86,7 +86,7 @@ io_perf_test_io_init(void)
 	T_ASSERT_GE_INT((int)read(rndfd, data_buf, IO_SIZE * 16), 0, "read /dev/urandom");
 	close(rndfd);
 
-	/* Create test file */
+	                      
 	int fd = open("/mnt2/test", O_CREAT | O_WRONLY, S_IRUSR);
 	T_ASSERT_POSIX_SUCCESS(fd, 0, "Open /mnt2/test for writing!");
 
@@ -129,7 +129,7 @@ create_thread(uint32_t thread_id, uint32_t priority, bool fixpri,
 	return new_thread;
 }
 
-/* Spin until a specified number of seconds elapses */
+                                                      
 static void
 spin_for_duration(uint32_t seconds)
 {
@@ -162,12 +162,12 @@ spin_thread(void *arg)
 void
 perform_io(dt_stat_time_t stat)
 {
-	/* Open the test data file */
+	                             
 	int test_file_fd = open("/mnt2/test", O_RDONLY);
 	T_WITH_ERRNO;
 	T_ASSERT_POSIX_SUCCESS(test_file_fd, "Open test data file");
 
-	/* Disable caching and read-ahead for the file */
+	                                                 
 	T_ASSERT_POSIX_ZERO(fcntl(test_file_fd, F_NOCACHE, 1), "fcntl F_NOCACHE enable");
 	T_ASSERT_POSIX_ZERO(fcntl(test_file_fd, F_RDAHEAD, 0), "fcntl F_RDAHEAD disable");
 
@@ -175,7 +175,7 @@ perform_io(dt_stat_time_t stat)
 	int ret;
 
 	for (int i = 0; i < WARMUP_ITERATIONS; i++) {
-		/* Warmup loop */
+		                 
 		read(test_file_fd, data_buf, IO_SIZE);
 	}
 
@@ -197,12 +197,12 @@ perform_io(dt_stat_time_t stat)
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.io"), T_META_TAG_PERF);
 
-/* Disable the test on MacOS for now */
+                                       
 T_DECL(read_perf, "Sequential Uncached Read Performance", T_META_TYPE_PERF, T_META_CHECK_LEAKS(NO), T_META_ASROOT(YES), T_META_LTEPHASE(LTE_POSTINIT))
 {
 #if !CONFIG_EMBEDDED
 	T_SKIP("Not supported on MacOS");
-#endif /* !CONFIG_EMBEDDED */
+#endif                       
 
 	io_perf_test_io_init();
 	pthread_setname_np("main thread");
@@ -213,11 +213,11 @@ T_DECL(read_perf, "Sequential Uncached Read Performance", T_META_TYPE_PERF, T_ME
 	perform_io(seq_noload);
 	dt_stat_finalize(seq_noload);
 
-	/*
-	 * We create spinner threads for this test so that all other cores are
-	 * busy. That way the I/O issue thread has to context switch to the
-	 * IOWorkLoop thread and back for the I/O.
-	 */
+	  
+                                                                       
+                                                                    
+                                           
+    
 	T_ASSERT_MACH_SUCCESS(semaphore_create(mach_task_self(), &semaphore,
 	    SYNC_POLICY_FIFO, 0), "semaphore_create");
 

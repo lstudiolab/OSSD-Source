@@ -26,27 +26,27 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Indirect driver for console
- *
- * The purpose of this driver is to provide a device node indirection for
- * the console device, which can be any tty class device.  It does this by
- * externalizing a global pointer "constty", which is then pointed at the
- * console tty device.
- *
- * The default for this pointer is uninitialized; when it is NULL, we fall
- * back to the "km" device, which is a tty BSD wrapper device for the
- * Platform Expert console device.  When it is non-NULL, we call through
- * to the tty device device instead.
- *
- * The registration for this device node is static, and the devfs init
- * code does not externalize a named device for it, to avoid software
- * seeing the device and trying to open it.
- *
- * The upshot of this is that the console driver should not be set as your
- * controlling tty, since you will get a reference to a device which does
- * not have an actual device node in /dev, so its name cannot be looked up.
- */
+  
+                              
+  
+                                                                         
+                                                                          
+                                                                         
+                      
+  
+                                                                          
+                                                                     
+                                                                        
+                                    
+  
+                                                                      
+                                                                     
+                                           
+  
+                                                                          
+                                                                         
+                                                                           
+   
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/conf.h>
@@ -55,17 +55,17 @@
 #include <sys/proc.h>
 #include <sys/uio.h>
 
-struct tty      *constty;               /* current console device */
+struct tty      *constty;                                           
 
-/*
- * The km driver supplied the default console device for the systems
- * (usually a raw frame buffer driver, but potentially a serial driver).
- */
+  
+                                                                    
+                                                                        
+   
 extern struct tty *km_tty[1];
 
-/*
- * cdevsw[] entries for the console device driver
- */
+  
+                                                 
+   
 int cnopen(__unused dev_t dev, int flag, int devtype, proc_t pp);
 int cnclose(__unused dev_t dev, int flag, int mode, proc_t pp);
 int cnread(__unused dev_t dev, struct uio *uio, int ioflag);
@@ -120,15 +120,15 @@ cnioctl(__unused dev_t dev, u_long cmd, caddr_t addr, int flag, struct proc *p)
 {
 	dev = cndev();
 #if 0
-	/*
-	 * Superuser can always use this to wrest control of console
-	 * output from the "virtual" console.
-	 *
-	 * XXX Unfortunately, this code doesn't do what the author thougt
-	 * XXX it did; use of the console device, a TIOCCONS would always
-	 * XXX disassociate the console from a virtual terminal and send
-	 * XXX it back to the fake tty.
-	 */
+	  
+                                                             
+                                      
+   
+                                                                  
+                                                                  
+                                                                 
+                                
+    
 	if ((unsigned) cmd == TIOCCONS && constty) {
 		int error = proc_suser(p);
 		if (!error) {
@@ -136,7 +136,7 @@ cnioctl(__unused dev_t dev, u_long cmd, caddr_t addr, int flag, struct proc *p)
 		}
 		return error;
 	}
-#endif  /* 0 */
+#endif         
 
 	return (*cdevsw[major(dev)].d_ioctl)(dev, cmd, addr, flag, p);
 }

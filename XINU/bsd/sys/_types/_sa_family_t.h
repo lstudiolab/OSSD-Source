@@ -27,6 +27,6 @@
  */
 #ifndef _SA_FAMILY_T
 #define _SA_FAMILY_T
-#include <machine/types.h> /* __uint8_t */
+#include <machine/types.h>                
 typedef __uint8_t               sa_family_t;
-#endif  /* _SA_FAMILY_T */
+#endif                    

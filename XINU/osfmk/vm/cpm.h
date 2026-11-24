@@ -33,26 +33,26 @@
 #ifndef _VM_CPM_H_
 #define _VM_CPM_H_
 
-/*
- *	File:	vm/cpm.h
- *	Author:	Alan Langerman
- *	Date:	April 1995 and January 1996
- *
- *	Contiguous physical memory allocator.
- */
+  
+                 
+                         
+                                    
+  
+                                        
+   
 
 #include <mach_counters.h>
 
 #include <mach/mach_types.h>
 #include <vm/vm_page.h>
-/*
- *	Return a linked list of physically contiguous
- *	wired pages.  Caller is responsible for disposal
- *	via cpm_release.
- *
- *	These pages are all in "gobbled" state when .
- */
+  
+                                                
+                                                   
+                   
+  
+                                                
+   
 extern kern_return_t
 cpm_allocate(vm_size_t size, vm_page_t *list, ppnum_t max_pnum, ppnum_t pnum_mask, boolean_t wire, int flags);
 
-#endif  /* _VM_CPM_H_ */
+#endif                  

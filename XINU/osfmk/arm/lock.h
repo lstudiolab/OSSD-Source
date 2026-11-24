@@ -66,6 +66,6 @@
 
 #warning This header is deprecated. Use <kern/locks.h> instead.
 
-#endif  /* _ARM_LOCK_H_ */
+#endif                    
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

@@ -69,22 +69,22 @@
 
 #if CONFIG_FREEZE
 #include <vm/vm_map.h>
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 #include <sys/kern_memorystatus.h>
 #include <sys/kern_memorystatus_notify.h>
 
-/*
- * Memorystatus klist structures
- */
+  
+                                
+   
 struct klist memorystatus_klist;
 static lck_mtx_t memorystatus_klist_mutex;
 static void memorystatus_klist_lock(void);
 static void memorystatus_klist_unlock(void);
 
-/*
- * Memorystatus kevent filter routines
- */
+  
+                                      
+   
 static int filt_memorystatusattach(struct knote *kn, struct kevent_qos_s *kev);
 static void filt_memorystatusdetach(struct knote *kn);
 static int filt_memorystatus(struct knote *kn, long hint);
@@ -99,9 +99,9 @@ SECURITY_READ_ONLY_EARLY(struct filterops) memorystatus_filtops = {
 	.f_process = filt_memorystatusprocess,
 };
 
-/*
- * Memorystatus notification events
- */
+  
+                                   
+   
 enum {
 	kMemorystatusNoPressure = 0x1,
 	kMemorystatusPressure = 0x2,
@@ -110,14 +110,14 @@ enum {
 	kMemorystatusProcLimitCritical = 0x10
 };
 
-#define INTER_NOTIFICATION_DELAY    (250000)    /* .25 second */
-#define VM_PRESSURE_DECREASED_SMOOTHING_PERIOD        5000    /* milliseconds */
-#define WARNING_NOTIFICATION_RESTING_PERIOD        25    /* seconds */
-#define CRITICAL_NOTIFICATION_RESTING_PERIOD        25    /* seconds */
+#define INTER_NOTIFICATION_DELAY    (250000)                    
+#define VM_PRESSURE_DECREASED_SMOOTHING_PERIOD        5000                      
+#define WARNING_NOTIFICATION_RESTING_PERIOD        25                 
+#define CRITICAL_NOTIFICATION_RESTING_PERIOD        25                 
 
-/*
- * Memorystatus notification helper routines
- */
+  
+                                            
+   
 static vm_pressure_level_t convert_internal_pressure_level_to_dispatch_level(vm_pressure_level_t);
 static boolean_t is_knote_registered_modify_task_pressure_bits(struct knote*, int, task_t, vm_pressure_level_t, vm_pressure_level_t);
 static void memorystatus_klist_reset_all_for_level(vm_pressure_level_t pressure_level_to_clear);
@@ -127,38 +127,38 @@ kern_return_t memorystatus_update_vm_pressure(boolean_t target_foreground_proces
 
 #if VM_PRESSURE_EVENTS
 
-/*
- * This value is the threshold that a process must meet to be considered for scavenging.
- */
+  
+                                                                                        
+   
 #if XNU_TARGET_OS_OSX
-#define VM_PRESSURE_MINIMUM_RSIZE        10    /* MB */
-#else /* XNU_TARGET_OS_OSX */
-#define VM_PRESSURE_MINIMUM_RSIZE        6    /* MB */
-#endif /* XNU_TARGET_OS_OSX */
+#define VM_PRESSURE_MINIMUM_RSIZE        10            
+#else                        
+#define VM_PRESSURE_MINIMUM_RSIZE        6            
+#endif                        
 
 static uint32_t vm_pressure_task_footprint_min = VM_PRESSURE_MINIMUM_RSIZE;
 
 #if DEVELOPMENT || DEBUG
 SYSCTL_UINT(_kern, OID_AUTO, memorystatus_vm_pressure_task_footprint_min, CTLFLAG_RW | CTLFLAG_LOCKED, &vm_pressure_task_footprint_min, 0, "");
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 vm_pressure_level_t memorystatus_vm_pressure_level = kVMPressureNormal;
 
-/*
- * We use this flag to signal if we have any HWM offenders
- * on the system. This way we can reduce the number of wakeups
- * of the memorystatus_thread when the system is between the
- * "pressure" and "critical" threshold.
- *
- * The (re-)setting of this variable is done without any locks
- * or synchronization simply because it is not possible (currently)
- * to keep track of HWM offenders that drop down below their memory
- * limit and/or exit. So, we choose to burn a couple of wasted wakeups
- * by allowing the unguarded modification of this variable.
- */
+  
+                                                          
+                                                              
+                                                            
+                                       
+  
+                                                              
+                                                                   
+                                                                   
+                                                                      
+                                                           
+   
 boolean_t memorystatus_hwm_candidates = 0;
 
-#endif /* VM_PRESSURE_EVENTS */
+#endif                         
 
 #if CONFIG_JETSAM
 
@@ -168,18 +168,18 @@ extern unsigned int memorystatus_available_pages_critical;
 extern unsigned int memorystatus_available_pages_critical_base;
 extern unsigned int memorystatus_available_pages_critical_idle_offset;
 
-#else /* CONFIG_JETSAM */
+#else                    
 
 extern uint64_t memorystatus_available_pages;
 extern uint64_t memorystatus_available_pages_pressure;
 extern uint64_t memorystatus_available_pages_critical;
 
-#endif /* CONFIG_JETSAM */
+#endif                    
 
 extern lck_mtx_t memorystatus_jetsam_fg_band_lock;
 uint32_t memorystatus_jetsam_fg_band_waiters = 0;
-static uint64_t memorystatus_jetsam_fg_band_timestamp_ns = 0; /* nanosec */
-static uint64_t memorystatus_jetsam_fg_band_delay_ns = 5ull * 1000 * 1000 * 1000; /* nanosec */
+static uint64_t memorystatus_jetsam_fg_band_timestamp_ns = 0;              
+static uint64_t memorystatus_jetsam_fg_band_delay_ns = 5ull * 1000 * 1000 * 1000;              
 
 extern boolean_t(*volatile consider_buffer_cache_collect)(int);
 
@@ -193,8 +193,8 @@ filt_memorystatusattach(struct knote *kn, __unused struct kevent_qos_s *kev)
 {
 	int error;
 
-	kn->kn_flags |= EV_CLEAR; /* automatically set */
-	kn->kn_sdata = 0;         /* incoming data is ignored */
+	kn->kn_flags |= EV_CLEAR;                        
+	kn->kn_sdata = 0;                                       
 
 	error = memorystatus_knote_register(kn);
 	if (error) {
@@ -274,28 +274,28 @@ filt_memorystatustouch(struct knote *kn, struct kevent_qos_s *kev)
 
 	memorystatus_klist_lock();
 
-	/*
-	 * copy in new kevent settings
-	 * (saving the "desired" data and fflags).
-	 */
+	  
+                               
+                                           
+    
 
 	prev_kn_sfflags = kn->kn_sfflags;
 	kn->kn_sfflags = (kev->fflags & EVFILT_MEMORYSTATUS_ALL_MASK);
 
 #if XNU_TARGET_OS_OSX
-	/*
-	 * Only on desktop do we restrict notifications to
-	 * one per active/inactive state (soft limits only).
-	 */
+	  
+                                                   
+                                                     
+    
 	if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN) {
-		/*
-		 * Is there previous state to preserve?
-		 */
+		  
+                                         
+     
 		if (prev_kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN) {
-			/*
-			 * This knote was previously interested in proc_limit_warn,
-			 * so yes, preserve previous state.
-			 */
+			  
+                                                              
+                                      
+      
 			if (prev_kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_ACTIVE) {
 				kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_ACTIVE;
 			}
@@ -303,24 +303,24 @@ filt_memorystatustouch(struct knote *kn, struct kevent_qos_s *kev)
 				kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_INACTIVE;
 			}
 		} else {
-			/*
-			 * This knote was not previously interested in proc_limit_warn,
-			 * but it is now.  Set both states.
-			 */
+			  
+                                                                  
+                                      
+      
 			kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_ACTIVE;
 			kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_INACTIVE;
 		}
 	}
 
 	if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL) {
-		/*
-		 * Is there previous state to preserve?
-		 */
+		  
+                                         
+     
 		if (prev_kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL) {
-			/*
-			 * This knote was previously interested in proc_limit_critical,
-			 * so yes, preserve previous state.
-			 */
+			  
+                                                                  
+                                      
+      
 			if (prev_kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_ACTIVE) {
 				kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_ACTIVE;
 			}
@@ -328,22 +328,22 @@ filt_memorystatustouch(struct knote *kn, struct kevent_qos_s *kev)
 				kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_INACTIVE;
 			}
 		} else {
-			/*
-			 * This knote was not previously interested in proc_limit_critical,
-			 * but it is now.  Set both states.
-			 */
+			  
+                                                                      
+                                      
+      
 			kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_ACTIVE;
 			kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_INACTIVE;
 		}
 	}
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
-	/*
-	 * reset the output flags based on a
-	 * combination of the old events and
-	 * the new desired event list.
-	 */
-	//kn->kn_fflags &= kn->kn_sfflags;
+	  
+                                     
+                                     
+                               
+    
+	                                  
 
 	res = (kn->kn_fflags != 0);
 
@@ -393,9 +393,9 @@ memorystatus_knote_register(struct knote *kn)
 
 	memorystatus_klist_lock();
 
-	/*
-	 * Support only userspace visible flags.
-	 */
+	  
+                                         
+    
 	if ((kn->kn_sfflags & EVFILT_MEMORYSTATUS_ALL_MASK) == (unsigned int) kn->kn_sfflags) {
 #if XNU_TARGET_OS_OSX
 		if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN) {
@@ -407,7 +407,7 @@ memorystatus_knote_register(struct knote *kn)
 			kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_ACTIVE;
 			kn->kn_sfflags |= NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_INACTIVE;
 		}
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 		KNOTE_ATTACH(&memorystatus_klist, kn);
 	} else {
@@ -470,9 +470,9 @@ memorystatus_send_dirty_status_change_note(void *data, uint32_t data_length)
 boolean_t
 memorystatus_warn_process(const proc_t p, __unused boolean_t is_active, __unused boolean_t is_fatal, boolean_t limit_exceeded)
 {
-	/*
-	 * This function doesn't take a reference to p or lock it. So it better be the current process.
-	 */
+	  
+                                                                                                
+    
 	assert(p == current_proc());
 	pid_t pid = p->p_pid;
 	boolean_t ret = FALSE;
@@ -482,9 +482,9 @@ memorystatus_warn_process(const proc_t p, __unused boolean_t is_active, __unused
 	uint32_t platform;
 	platform = proc_platform(p);
 
-	/*
-	 * See comment in sysctl_memorystatus_vm_pressure_send.
-	 */
+	  
+                                                        
+    
 
 	memorystatus_klist_lock();
 
@@ -493,130 +493,130 @@ memorystatus_warn_process(const proc_t p, __unused boolean_t is_active, __unused
 		pid_t knote_pid = knote_proc->p_pid;
 
 		if (knote_pid == pid) {
-			/*
-			 * By setting the "fflags" here, we are forcing
-			 * a process to deal with the case where it's
-			 * bumping up into its memory limits. If we don't
-			 * do this here, we will end up depending on the
-			 * system pressure snapshot evaluation in
-			 * filt_memorystatus().
-			 */
+			  
+                                                  
+                                                
+                                                    
+                                                   
+                                            
+                          
+      
 
-			/*
-			 * The type of notification and the frequency are different between
-			 * embedded and desktop.
-			 *
-			 * Embedded processes register for global pressure notifications
-			 * (NOTE_MEMORYSTATUS_PRESSURE_WARN | NOTE_MEMORYSTATUS_PRESSURE_CRITICAL) via UIKit
-			 * (see applicationDidReceiveMemoryWarning in UIKit). We'll warn them here if
-			 * they are near there memory limit. filt_memorystatus() will warn them based
-			 * on the system pressure level.
-			 *
-			 * On desktop, (NOTE_MEMORYSTATUS_PRESSURE_WARN | NOTE_MEMORYSTATUS_PRESSURE_CRITICAL)
-			 * are only expected to fire for system level warnings. Desktop procesess
-			 * register for NOTE_MEMORYSTATUS_PROC_LIMIT_WARN
-			 * if they want to be warned when they approach their limit
-			 * and for NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL to be warned when they
-			 * exceed their limit.
-			 *
-			 * On embedded we continuously warn processes that are approaching their
-			 * memory limit. However on desktop, we only send one warning while
-			 * the process is active/inactive if the limit is soft..
-			 *
-			 */
+			  
+                                                                      
+                           
+     
+                                                                   
+                                                                                       
+                                                                                
+                                                                                
+                                   
+     
+                                                                                         
+                                                                            
+                                                    
+                                                              
+                                                                          
+                         
+     
+                                                                           
+                                                                      
+                                                           
+     
+      
 			if (platform == PLATFORM_MACOS || platform == PLATFORM_MACCATALYST || platform == PLATFORM_DRIVERKIT) {
 				if (!limit_exceeded) {
 					if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN) {
 						found_knote = TRUE;
 						if (!is_fatal) {
-							/*
-							 * Restrict proc_limit_warn notifications when
-							 * non-fatal (soft) limit is at play.
-							 */
+							  
+                                                     
+                                            
+          
 							if (is_active) {
 								if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_ACTIVE) {
-									/*
-									 * Mark this knote for delivery.
-									 */
+									  
+                                         
+            
 									kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_WARN;
-									/*
-									 * And suppress it from future notifications.
-									 */
+									  
+                                                      
+            
 									kn->kn_sfflags &= ~NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_ACTIVE;
 									send_knote_count++;
 								}
 							} else {
 								if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_INACTIVE) {
-									/*
-									 * Mark this knote for delivery.
-									 */
+									  
+                                         
+            
 									kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_WARN;
-									/*
-									 * And suppress it from future notifications.
-									 */
+									  
+                                                      
+            
 									kn->kn_sfflags &= ~NOTE_MEMORYSTATUS_PROC_LIMIT_WARN_INACTIVE;
 									send_knote_count++;
 								}
 							}
 						} else {
-							/*
-							 * No restriction on proc_limit_warn notifications when
-							 * fatal (hard) limit is at play.
-							 */
+							  
+                                                              
+                                        
+          
 							kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_WARN;
 							send_knote_count++;
 						}
 					}
 				} else {
-					/*
-					 * Send this notification when a process has exceeded a soft limit,
-					 */
+					  
+                                                                        
+        
 
 					if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL) {
 						found_knote = TRUE;
 						if (!is_fatal) {
-							/*
-							 * Restrict critical notifications for soft limits.
-							 */
+							  
+                                                          
+          
 
 							if (is_active) {
 								if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_ACTIVE) {
-									/*
-									 * Suppress future proc_limit_critical notifications
-									 * for the active soft limit.
-									 */
+									  
+                                                             
+                                      
+            
 									kn->kn_sfflags &= ~NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_ACTIVE;
 									kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL;
 									send_knote_count++;
 								}
 							} else {
 								if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_INACTIVE) {
-									/*
-									 * Suppress future proc_limit_critical_notifications
-									 * for the inactive soft limit.
-									 */
+									  
+                                                             
+                                        
+            
 									kn->kn_sfflags &= ~NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL_INACTIVE;
 									kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL;
 									send_knote_count++;
 								}
 							}
 						} else {
-							/*
-							 * We should never be trying to send a critical notification for
-							 * a hard limit... the process would be killed before it could be
-							 * received.
-							 */
+							  
+                                                                       
+                                                                        
+                   
+          
 							panic("Caught sending pid %d a critical warning for a fatal limit.\n", pid);
 						}
 					}
 				}
 			} else {
 				if (!limit_exceeded) {
-					/*
-					 * Intentionally set either the unambiguous limit warning,
-					 * the system-wide critical or the system-wide warning
-					 * notification bit.
-					 */
+					  
+                                                               
+                                                           
+                         
+        
 
 					if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_WARN) {
 						kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_WARN;
@@ -632,9 +632,9 @@ memorystatus_warn_process(const proc_t p, __unused boolean_t is_active, __unused
 						send_knote_count++;
 					}
 				} else {
-					/*
-					 * Send this notification when a process has exceeded a soft limit.
-					 */
+					  
+                                                                        
+        
 					if (kn->kn_sfflags & NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL) {
 						kn->kn_fflags = NOTE_MEMORYSTATUS_PROC_LIMIT_CRITICAL;
 						found_knote = TRUE;
@@ -657,16 +657,16 @@ memorystatus_warn_process(const proc_t p, __unused boolean_t is_active, __unused
 	return ret;
 }
 
-/*
- * Can only be set by the current task on itself.
- */
+  
+                                                 
+   
 int
 memorystatus_low_mem_privileged_listener(uint32_t op_flags)
 {
 	boolean_t set_privilege = FALSE;
-	/*
-	 * Need an entitlement check here?
-	 */
+	  
+                                   
+    
 	if (op_flags == MEMORYSTATUS_CMD_PRIVILEGED_LISTENER_ENABLE) {
 		set_privilege = TRUE;
 	} else if (op_flags == MEMORYSTATUS_CMD_PRIVILEGED_LISTENER_DISABLE) {
@@ -692,10 +692,10 @@ memorystatus_is_foreground_locked(proc_t p)
 	       (p->p_memstat_effectivepriority == JETSAM_PRIORITY_FOREGROUND_SUPPORT);
 }
 
-/*
- * This is meant for stackshot and kperf -- it does not take the proc_list_lock
- * to access the p_memstat_dirty field.
- */
+  
+                                                                               
+                                       
+   
 void
 memorystatus_proc_flags_unsafe(void * v, boolean_t *is_dirty, boolean_t *is_dirty_tracked, boolean_t *allow_idle_exit)
 {
@@ -720,18 +720,18 @@ memorystatus_bg_pressure_eligible(proc_t p)
 
 	MEMORYSTATUS_DEBUG(1, "memorystatus_bg_pressure_eligible: pid %d, state 0x%x\n", p->p_pid, p->p_memstat_state);
 
-	/* Foreground processes have already been dealt with at this point, so just test for eligibility */
+	                                                                                                   
 	if (!(p->p_memstat_state & (P_MEMSTAT_TERMINATED | P_MEMSTAT_LOCKED | P_MEMSTAT_SUSPENDED | P_MEMSTAT_FROZEN))) {
 		eligible = TRUE;
 	}
 
 	if (p->p_memstat_effectivepriority < JETSAM_PRIORITY_BACKGROUND_OPPORTUNISTIC) {
-		/*
-		 * IDLE and IDLE_DEFERRED bands contain processes
-		 * that have dropped memory to be under their inactive
-		 * memory limits. And so they can't really give back
-		 * anything.
-		 */
+		  
+                                                   
+                                                        
+                                                      
+              
+     
 		eligible = FALSE;
 	}
 
@@ -747,10 +747,10 @@ memorystatus_send_low_swap_note(void)
 
 	memorystatus_klist_lock();
 	SLIST_FOREACH(kn, &memorystatus_klist, kn_selnext) {
-		/* We call is_knote_registered_modify_task_pressure_bits to check if the sfflags for the
-		 * current note contain NOTE_MEMORYSTATUS_LOW_SWAP. Once we find one note in the memorystatus_klist
-		 * that has the NOTE_MEMORYSTATUS_LOW_SWAP flags in its sfflags set, we call KNOTE with
-		 * kMemoryStatusLowSwap as the hint to process and update all knotes on the memorystatus_klist accordingly. */
+		                                                                                        
+                                                                                                     
+                                                                                         
+                                                                                                                
 		if (is_knote_registered_modify_task_pressure_bits(kn, NOTE_MEMORYSTATUS_LOW_SWAP, NULL, 0, 0) == TRUE) {
 			KNOTE(&memorystatus_klist, kMemorystatusLowSwap);
 			break;
@@ -760,20 +760,20 @@ memorystatus_send_low_swap_note(void)
 	memorystatus_klist_unlock();
 }
 
-#endif /* CONFIG_MEMORYSTATUS */
+#endif                          
 
-/*
- * kn_max - knote
- *
- * knote_pressure_level - to check if the knote is registered for this notification level.
- *
- * task    - task whose bits we'll be modifying
- *
- * pressure_level_to_clear - if the task has been notified of this past level, clear that notification bit so that if/when we revert to that level, the task will be notified again.
- *
- * pressure_level_to_set - the task is about to be notified of this new level. Update the task's bit notification information appropriately.
- *
- */
+  
+                 
+  
+                                                                                          
+  
+                                               
+  
+                                                                                                                                                                                    
+  
+                                                                                                                                            
+  
+   
 
 static boolean_t
 is_knote_registered_modify_task_pressure_bits(struct knote *kn_max, int knote_pressure_level, task_t task, vm_pressure_level_t pressure_level_to_clear, vm_pressure_level_t pressure_level_to_set)
@@ -819,10 +819,10 @@ memorystatus_klist_reset_all_for_level(vm_pressure_level_t pressure_level_to_cle
 	memorystatus_klist_unlock();
 }
 
-/*
- * Used by the vm_pressure_thread which is
- * signalled from within vm_pageout_scan().
- */
+  
+                                          
+                                           
+   
 
 void
 consider_vm_pressure_events(void)
@@ -840,15 +840,15 @@ static struct knote *
 vm_pressure_select_optimal_candidate_to_notify(struct klist *candidate_list, int level, boolean_t target_foreground_process)
 {
 	struct knote    *kn = NULL, *kn_max = NULL;
-	uint64_t    resident_max = 0;/* MB */
+	uint64_t    resident_max = 0;        
 	int        selected_task_importance = 0;
 	static int    pressure_snapshot = -1;
 	boolean_t    pressure_increase = FALSE;
 
 	if (pressure_snapshot == -1) {
-		/*
-		 * Initial snapshot.
-		 */
+		  
+                      
+     
 		pressure_snapshot = level;
 		pressure_increase = TRUE;
 	} else {
@@ -862,21 +862,21 @@ vm_pressure_select_optimal_candidate_to_notify(struct klist *candidate_list, int
 	}
 
 	if (pressure_increase == TRUE) {
-		/*
-		 * We'll start by considering the largest
-		 * unimportant task in our list.
-		 */
+		  
+                                           
+                                  
+     
 		selected_task_importance = INT_MAX;
 	} else {
-		/*
-		 * We'll start by considering the largest
-		 * important task in our list.
-		 */
+		  
+                                           
+                                
+     
 		selected_task_importance = 0;
 	}
 
 	SLIST_FOREACH(kn, candidate_list, kn_selnext) {
-		uint64_t        resident_size = 0;/* MB */
+		uint64_t        resident_size = 0;        
 		proc_t            p = PROC_NULL;
 		struct task*        t = TASK_NULL;
 		int            curr_task_importance = 0;
@@ -894,13 +894,13 @@ vm_pressure_select_optimal_candidate_to_notify(struct klist *candidate_list, int
 
 #if CONFIG_MEMORYSTATUS
 		if (target_foreground_process == TRUE && !memorystatus_is_foreground_locked(p)) {
-			/*
-			 * Skip process not marked foreground.
-			 */
+			  
+                                         
+      
 			proc_rele(p);
 			continue;
 		}
-#endif /* CONFIG_MEMORYSTATUS */
+#endif                          
 
 		t = (struct task *)(p->task);
 
@@ -917,23 +917,23 @@ vm_pressure_select_optimal_candidate_to_notify(struct klist *candidate_list, int
 			proc_rele(p);
 			continue;
 		}
-#endif /* CONFIG_MEMORYSTATUS */
+#endif                          
 
 #if XNU_TARGET_OS_OSX
 		curr_task_importance = task_importance_estimate(t);
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 		curr_task_importance = p->p_memstat_effectivepriority;
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
-		/*
-		 * Privileged listeners are only considered in the multi-level pressure scheme
-		 * AND only if the pressure is increasing.
-		 */
+		  
+                                                                                
+                                            
+     
 		if (level > 0) {
 			if (task_has_been_notified(t, level) == FALSE) {
-				/*
-				 * Is this a privileged listener?
-				 */
+				  
+                                     
+       
 				if (task_low_mem_privileged_listener(t, FALSE, &privileged_listener) == 0) {
 					if (privileged_listener) {
 						kn_max = kn;
@@ -946,56 +946,56 @@ vm_pressure_select_optimal_candidate_to_notify(struct klist *candidate_list, int
 				continue;
 			}
 		} else if (level == 0) {
-			/*
-			 * Task wasn't notified when the pressure was increasing and so
-			 * no need to notify it that the pressure is decreasing.
-			 */
+			  
+                                                                  
+                                                           
+      
 			if ((task_has_been_notified(t, kVMPressureWarning) == FALSE) && (task_has_been_notified(t, kVMPressureCritical) == FALSE)) {
 				proc_rele(p);
 				continue;
 			}
 		}
 
-		/*
-		 * We don't want a small process to block large processes from
-		 * being notified again. <rdar://problem/7955532>
-		 */
-		resident_size = (get_task_phys_footprint(t)) / (1024 * 1024ULL); /* MB */
+		  
+                                                                
+                                                   
+     
+		resident_size = (get_task_phys_footprint(t)) / (1024 * 1024ULL);         
 
 		if (resident_size >= vm_pressure_task_footprint_min) {
 			if (level > 0) {
-				/*
-				 * Warning or Critical Pressure.
-				 */
+				  
+                                    
+       
 				if (pressure_increase) {
 					if ((curr_task_importance < selected_task_importance) ||
 					    ((curr_task_importance == selected_task_importance) && (resident_size > resident_max))) {
-						/*
-						 * We have found a candidate process which is:
-						 * a) at a lower importance than the current selected process
-						 * OR
-						 * b) has importance equal to that of the current selected process but is larger
-						 */
+						  
+                                                    
+                                                                   
+           
+                                                                                      
+         
 
 						consider_knote = TRUE;
 					}
 				} else {
 					if ((curr_task_importance > selected_task_importance) ||
 					    ((curr_task_importance == selected_task_importance) && (resident_size > resident_max))) {
-						/*
-						 * We have found a candidate process which is:
-						 * a) at a higher importance than the current selected process
-						 * OR
-						 * b) has importance equal to that of the current selected process but is larger
-						 */
+						  
+                                                    
+                                                                    
+           
+                                                                                      
+         
 
 						consider_knote = TRUE;
 					}
 				}
 			} else if (level == 0) {
-				/*
-				 * Pressure back to normal.
-				 */
+				  
+                               
+       
 				if ((curr_task_importance > selected_task_importance) ||
 				    ((curr_task_importance == selected_task_importance) && (resident_size > resident_max))) {
 					consider_knote = TRUE;
@@ -1006,10 +1006,10 @@ vm_pressure_select_optimal_candidate_to_notify(struct klist *candidate_list, int
 				resident_max = resident_size;
 				kn_max = kn;
 				selected_task_importance = curr_task_importance;
-				consider_knote = FALSE; /* reset for the next candidate */
+				consider_knote = FALSE;                                   
 			}
 		} else {
-			/* There was no candidate with enough resident memory to scavenge */
+			                                                                    
 			VM_PRESSURE_DEBUG(0, "[vm_pressure] threshold failed for pid %d with %llu resident...\n", p->p_pid, resident_size);
 		}
 		proc_rele(p);
@@ -1034,7 +1034,7 @@ kern_return_t
 memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 {
 	struct knote            *kn_max = NULL;
-	struct knote            *kn_cur = NULL, *kn_temp = NULL;/* for safe list traversal */
+	struct knote            *kn_cur = NULL, *kn_temp = NULL;                             
 	pid_t                target_pid = -1;
 	struct klist            dispatch_klist = { NULL };
 	proc_t                target_proc = PROC_NULL;
@@ -1050,47 +1050,47 @@ memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 	uint64_t             curr_ts = mach_absolute_time();
 
 #if !CONFIG_JETSAM
-#define MAX_IDLE_KILLS 100    /* limit the number of idle kills allowed */
+#define MAX_IDLE_KILLS 100                                                
 
 	int    idle_kill_counter = 0;
 
-	/*
-	 * On desktop we take this opportunity to free up memory pressure
-	 * by immediately killing idle exitable processes. We use a delay
-	 * to avoid overkill.  And we impose a max counter as a fail safe
-	 * in case daemons re-launch too fast.
-	 */
+	  
+                                                                  
+                                                                  
+                                                                  
+                                       
+    
 	while ((memorystatus_vm_pressure_level != kVMPressureNormal) && (idle_kill_counter < MAX_IDLE_KILLS)) {
 		if (memorystatus_idle_exit_from_VM() == FALSE) {
-			/* No idle exitable processes left to kill */
+			                                             
 			break;
 		}
 		idle_kill_counter++;
 
 		if (memorystatus_manual_testing_on == TRUE) {
-			/*
-			 * Skip the delay when testing
-			 * the pressure notification scheme.
-			 */
+			  
+                                 
+                                       
+      
 		} else {
-			delay(1000000); /* 1 second */
+			delay(1000000);               
 		}
 	}
-#endif /* !CONFIG_JETSAM */
+#endif                     
 
 	if (level_snapshot != kVMPressureNormal) {
-		/*
-		 * Check to see if we are still in the 'resting' period
-		 * after having notified all clients interested in
-		 * a particular pressure level.
-		 */
+		  
+                                                         
+                                                    
+                                 
+     
 
 		level_snapshot = memorystatus_vm_pressure_level;
 
 		if (level_snapshot == kVMPressureWarning || level_snapshot == kVMPressureUrgent) {
 			if (next_warning_notification_sent_at_ts) {
 				if (curr_ts < next_warning_notification_sent_at_ts) {
-					delay(INTER_NOTIFICATION_DELAY * 4 /* 1 sec */);
+					delay(INTER_NOTIFICATION_DELAY * 4            );
 					return KERN_SUCCESS;
 				}
 
@@ -1100,7 +1100,7 @@ memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 		} else if (level_snapshot == kVMPressureCritical) {
 			if (next_critical_notification_sent_at_ts) {
 				if (curr_ts < next_critical_notification_sent_at_ts) {
-					delay(INTER_NOTIFICATION_DELAY * 4 /* 1 sec */);
+					delay(INTER_NOTIFICATION_DELAY * 4            );
 					return KERN_SUCCESS;
 				}
 				next_critical_notification_sent_at_ts = 0;
@@ -1110,17 +1110,17 @@ memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 	}
 
 	while (1) {
-		/*
-		 * There is a race window here. But it's not clear
-		 * how much we benefit from having extra synchronization.
-		 */
+		  
+                                                    
+                                                           
+     
 		level_snapshot = memorystatus_vm_pressure_level;
 
 		if (prev_level_snapshot > level_snapshot) {
-			/*
-			 * Pressure decreased? Let's take a little breather
-			 * and see if this condition stays.
-			 */
+			  
+                                                      
+                                      
+      
 			if (smoothing_window_started == FALSE) {
 				smoothing_window_started = TRUE;
 				microuptime(&smoothing_window_start_tstamp);
@@ -1145,24 +1145,24 @@ memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 		if (kn_max == NULL) {
 			memorystatus_klist_unlock();
 
-			/*
-			 * No more level-based clients to notify.
-			 *
-			 * Start the 'resting' window within which clients will not be re-notified.
-			 */
+			  
+                                            
+     
+                                                                              
+      
 
 			if (level_snapshot != kVMPressureNormal) {
 				if (level_snapshot == kVMPressureWarning || level_snapshot == kVMPressureUrgent) {
 					nanoseconds_to_absolutetime(WARNING_NOTIFICATION_RESTING_PERIOD * NSEC_PER_SEC, &curr_ts);
 
-					/* Next warning notification (if nothing changes) won't be sent before...*/
+					                                                                           
 					next_warning_notification_sent_at_ts = mach_absolute_time() + curr_ts;
 				}
 
 				if (level_snapshot == kVMPressureCritical) {
 					nanoseconds_to_absolutetime(CRITICAL_NOTIFICATION_RESTING_PERIOD * NSEC_PER_SEC, &curr_ts);
 
-					/* Next critical notification (if nothing changes) won't be sent before...*/
+					                                                                            
 					next_critical_notification_sent_at_ts = mach_absolute_time() + curr_ts;
 				}
 			}
@@ -1241,10 +1241,10 @@ memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 		}
 
 		if (memorystatus_manual_testing_on == TRUE) {
-			/*
-			 * Testing out the pressure notification scheme.
-			 * No need for delays etc.
-			 */
+			  
+                                                   
+                             
+      
 		} else {
 			uint32_t sleep_interval = INTER_NOTIFICATION_DELAY;
 #if CONFIG_JETSAM
@@ -1257,13 +1257,13 @@ memorystatus_update_vm_pressure(boolean_t target_foreground_process)
 			skip_delay_page_threshold = memorystatus_available_pages_pressure - page_delta;
 
 			if (memorystatus_available_pages <= skip_delay_page_threshold) {
-				/*
-				 * We are nearing the critcal mark fast and can't afford to wait between
-				 * notifications.
-				 */
+				  
+                                                                            
+                     
+       
 				sleep_interval = 0;
 			}
-#endif /* CONFIG_JETSAM */
+#endif                    
 
 			if (sleep_interval) {
 				delay(sleep_interval);
@@ -1306,11 +1306,11 @@ convert_internal_pressure_level_to_dispatch_level(vm_pressure_level_t internal_p
 	return dispatch_level;
 }
 
-/*
- * Notify any kexts that are waiting for notification that jetsam
- * is approaching the foreground bands. They should use this notification
- * to free cached memory.
- */
+  
+                                                                 
+                                                                         
+                         
+   
 void
 memorystatus_issue_fg_band_notify(void)
 {
@@ -1330,16 +1330,16 @@ memorystatus_issue_fg_band_notify(void)
 	}
 	lck_mtx_unlock(&memorystatus_jetsam_fg_band_lock);
 
-	/* Notify the buffer cache, file systems, etc. to jetison everything they can. */
+	                                                                                 
 	if (consider_buffer_cache_collect != NULL) {
 		(void)(*consider_buffer_cache_collect)(1);
 	}
 }
 
 
-/*
- * Memorystatus notification debugging support
- */
+  
+                                              
+   
 
 static int
 sysctl_memorystatus_vm_pressure_level SYSCTL_HANDLER_ARGS
@@ -1353,7 +1353,7 @@ sysctl_memorystatus_vm_pressure_level SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-#endif /* !XNU_TARGET_OS_OSX */
+#endif                         
 	uint32_t dispatch_level = convert_internal_pressure_level_to_dispatch_level(memorystatus_vm_pressure_level);
 
 	return SYSCTL_OUT(req, &dispatch_level, sizeof(dispatch_level));
@@ -1364,17 +1364,17 @@ sysctl_memorystatus_vm_pressure_level SYSCTL_HANDLER_ARGS
 SYSCTL_PROC(_kern, OID_AUTO, memorystatus_vm_pressure_level, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
     0, 0, &sysctl_memorystatus_vm_pressure_level, "I", "");
 
-#else /* DEBUG || DEVELOPMENT */
+#else                           
 
 SYSCTL_PROC(_kern, OID_AUTO, memorystatus_vm_pressure_level, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED | CTLFLAG_MASKED,
     0, 0, &sysctl_memorystatus_vm_pressure_level, "I", "");
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
-/*
- * Trigger levels to test the mechanism.
- * Can be used via a sysctl.
- */
+  
+                                        
+                            
+   
 #define TEST_LOW_MEMORY_TRIGGER_ONE        1
 #define TEST_LOW_MEMORY_TRIGGER_ALL        2
 #define TEST_PURGEABLE_TRIGGER_ONE        3
@@ -1416,11 +1416,11 @@ sysctl_memorypressure_manual_trigger SYSCTL_HANDLER_ARGS
 		return EINVAL;
 	}
 
-	/*
-	 * The pressure level is being set from user-space.
-	 * And user-space uses the constants in sys/event.h
-	 * So we translate those events to our internal levels here.
-	 */
+	  
+                                                    
+                                                    
+                                                             
+    
 	if (pressure_level == NOTE_MEMORYSTATUS_PRESSURE_NORMAL) {
 		memorystatus_manual_testing_level = kVMPressureNormal;
 		force_purge = 0;
@@ -1434,12 +1434,12 @@ sysctl_memorypressure_manual_trigger SYSCTL_HANDLER_ARGS
 
 	memorystatus_vm_pressure_level = memorystatus_manual_testing_level;
 
-	/* purge according to the new pressure level */
+	                                               
 	switch (trigger_request) {
 	case TEST_PURGEABLE_TRIGGER_ONE:
 	case TEST_LOW_MEMORY_PURGEABLE_TRIGGER_ONE:
 		if (force_purge == 0) {
-			/* no purging requested */
+			                          
 			break;
 		}
 		vm_purgeable_object_purge_one_unlocked(force_purge);
@@ -1447,7 +1447,7 @@ sysctl_memorypressure_manual_trigger SYSCTL_HANDLER_ARGS
 	case TEST_PURGEABLE_TRIGGER_ALL:
 	case TEST_LOW_MEMORY_PURGEABLE_TRIGGER_ALL:
 		if (force_purge == 0) {
-			/* no purging requested */
+			                          
 			break;
 		}
 		while (vm_purgeable_object_purge_one_unlocked(force_purge)) {
@@ -1496,22 +1496,22 @@ memorystatus_issue_pressure_kevent(boolean_t pressured)
 	memorystatus_klist_unlock();
 	return TRUE;
 }
-#endif /* CONFIG_JETSAM && VM_PRESSURE_EVENTS */
-#endif /* 0 */
+#endif                                          
+#endif        
 
-/*
- * This routine is used for targeted notifications regardless of system memory pressure
- * and regardless of whether or not the process has already been notified.
- * It bypasses and has no effect on the only-one-notification per soft-limit policy.
- *
- * "memnote" is the current user.
- */
+  
+                                                                                       
+                                                                          
+                                                                                    
+  
+                                 
+   
 
 static int
 sysctl_memorystatus_vm_pressure_send SYSCTL_HANDLER_ARGS
 {
 #pragma unused(arg1, arg2)
-	/* Need to be root or have memorystatus entitlement */
+	                                                      
 	if (!kauth_cred_issuser(kauth_cred_get()) && !IOTaskHasEntitlement(current_task(), MEMORYSTATUS_ENTITLEMENT)) {
 		return EPERM;
 	}
@@ -1519,7 +1519,7 @@ sysctl_memorystatus_vm_pressure_send SYSCTL_HANDLER_ARGS
 	int error = 0, pid = 0;
 	struct knote *kn = NULL;
 	boolean_t found_knote = FALSE;
-	int fflags = 0;    /* filter flags for EVFILT_MEMORYSTATUS */
+	int fflags = 0;                                              
 	uint64_t value = 0;
 
 	error = sysctl_handle_quad(oidp, &value, 0, req);
@@ -1527,34 +1527,34 @@ sysctl_memorystatus_vm_pressure_send SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-	/*
-	 * Find the pid in the low 32 bits of value passed in.
-	 */
+	  
+                                                       
+    
 	pid = (int)(value & 0xFFFFFFFF);
 
-	/*
-	 * Find notification in the high 32 bits of the value passed in.
-	 */
+	  
+                                                                 
+    
 	fflags = (int)((value >> 32) & 0xFFFFFFFF);
 
-	/*
-	 * For backwards compatibility, when no notification is
-	 * passed in, default to the NOTE_MEMORYSTATUS_PRESSURE_WARN
-	 */
+	  
+                                                        
+                                                             
+    
 	if (fflags == 0) {
 		fflags = NOTE_MEMORYSTATUS_PRESSURE_WARN;
-		// printf("memorystatus_vm_pressure_send: using default notification [0x%x]\n", fflags);
+		                                                                                        
 	}
 
-	/* wake up everybody waiting for kVMPressureJetsam */
+	                                                     
 	if (fflags == NOTE_MEMORYSTATUS_JETSAM_FG_BAND) {
 		memorystatus_issue_fg_band_notify();
 		return error;
 	}
 
-	/*
-	 * See event.h ... fflags for EVFILT_MEMORYSTATUS
-	 */
+	  
+                                                  
+    
 	if (!((fflags == NOTE_MEMORYSTATUS_PRESSURE_NORMAL) ||
 	    (fflags == NOTE_MEMORYSTATUS_PRESSURE_WARN) ||
 	    (fflags == NOTE_MEMORYSTATUS_PRESSURE_CRITICAL) ||
@@ -1568,9 +1568,9 @@ sysctl_memorystatus_vm_pressure_send SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-	/*
-	 * Forcibly send pid a memorystatus notification.
-	 */
+	  
+                                                  
+    
 
 	memorystatus_klist_lock();
 
@@ -1579,9 +1579,9 @@ sysctl_memorystatus_vm_pressure_send SYSCTL_HANDLER_ARGS
 		pid_t knote_pid = knote_proc->p_pid;
 
 		if (knote_pid == pid) {
-			/*
-			 * Forcibly send this pid a memorystatus notification.
-			 */
+			  
+                                                         
+      
 			kn->kn_fflags = fflags;
 			found_knote = TRUE;
 		}
@@ -1604,6 +1604,6 @@ sysctl_memorystatus_vm_pressure_send SYSCTL_HANDLER_ARGS
 SYSCTL_PROC(_kern, OID_AUTO, memorystatus_vm_pressure_send, CTLTYPE_QUAD | CTLFLAG_WR | CTLFLAG_LOCKED | CTLFLAG_MASKED | CTLFLAG_ANYBODY,
     0, 0, &sysctl_memorystatus_vm_pressure_send, "Q", "");
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
-#endif /* VM_PRESSURE_EVENTS */
+#endif                         

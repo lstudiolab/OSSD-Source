@@ -42,4 +42,4 @@ void    vm_map_store_entry_unlink_rb( struct vm_map_header*, struct vm_map_entry
 void    vm_map_store_copy_reset_rb( struct vm_map_copy*, struct vm_map_entry*, int);
 void    update_first_free_rb(struct _vm_map*, struct vm_map_entry*, boolean_t new_entry_creation);
 
-#endif /* _VM_VM_MAP_STORE_RB_H */
+#endif                            

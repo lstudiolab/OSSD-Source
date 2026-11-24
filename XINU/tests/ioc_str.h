@@ -151,4 +151,4 @@
 	X(SIOCGKEVFILT) \
 	X(SIOCGKEVVENDOR)
 
-#endif /* ioc_str_h */
+#endif                

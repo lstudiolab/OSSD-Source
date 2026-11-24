@@ -26,7 +26,7 @@ T_DECL(mach_port_deallocate, "mach_port_deallocate deallocates also PORT_SET"){
 
 	T_LOG("Ports created");
 
-	/* do something */
+	                  
 
 	for (i = 0; i < NR_PORTS; i++) {
 		ret = mach_port_mod_refs(mach_task_self(), port[i], MACH_PORT_RIGHT_RECEIVE, -1);

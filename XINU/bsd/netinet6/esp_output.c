@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp_output.c,v 1.1.2.3 2002/04/28 05:40:26 suz Exp $	*/
-/*	$KAME: esp_output.c,v 1.44 2001/07/26 06:53:15 jinmei Exp $	*/
+                                                                                     
+                                                                 
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -60,9 +60,9 @@
 
 #define _IP_VHL
 
-/*
- * RFC1827/2406 Encapsulated Security Payload.
- */
+  
+                                              
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -85,7 +85,7 @@
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <netinet/in_var.h>
-#include <netinet/udp.h> /* for nat traversal */
+#include <netinet/udp.h>                        
 #include <netinet/tcp.h>
 #include <netinet/in_tclass.h>
 
@@ -118,14 +118,14 @@ extern u_int64_t natt_now;
 
 extern lck_mtx_t *sadb_mutex;
 
-/*
- * compute ESP header size.
- */
+  
+                           
+   
 size_t
 esp_hdrsiz(__unused struct ipsecrequest *isr)
 {
 #if 0
-	/* sanity check */
+	                  
 	if (isr == NULL) {
 		panic("esp_hdrsiz: NULL was passed.\n");
 	}
@@ -141,7 +141,7 @@ esp_hdrsiz(__unused struct ipsecrequest *isr)
 		size_t hdrsiz;
 		size_t maxpad;
 
-		/*%%%% this needs to change - no sav in ipsecrequest any more */
+		                                                                
 		sav = isr->sav;
 
 		if (isr->saidx.proto != IPPROTO_ESP) {
@@ -156,7 +156,7 @@ esp_hdrsiz(__unused struct ipsecrequest *isr)
 			goto estimate;
 		}
 
-		/* we need transport mode ESP. */
+		                                 
 		algo = esp_algorithm_lookup(sav->alg_enc);
 		if (!algo) {
 			goto estimate;
@@ -171,13 +171,13 @@ esp_hdrsiz(__unused struct ipsecrequest *isr)
 		} else {
 			maxpad = 4;
 		}
-		maxpad += 1; /* maximum 'extendsiz' is padbound + 1, see esp_output */
+		maxpad += 1;                                                          
 
 		if (sav->flags & SADB_X_EXT_OLD) {
-			/* RFC 1827 */
+			              
 			hdrsiz = sizeof(struct esp) + ivlen + maxpad;
 		} else {
-			/* RFC 2406 */
+			              
 			aalgo = ah_algorithm_lookup(sav->alg_auth);
 			if (aalgo && sav->replay[0] != NULL && sav->key_auth) {
 				authlen = (aalgo->sumsiz)(sav);
@@ -187,10 +187,10 @@ esp_hdrsiz(__unused struct ipsecrequest *isr)
 			hdrsiz = sizeof(struct newesp) + ivlen + maxpad + authlen;
 		}
 
-		/*
-		 * If the security association indicates that NATT is required,
-		 * add the size of the NATT encapsulation header:
-		 */
+		  
+                                                                 
+                                                   
+     
 		if ((sav->flags & SADB_X_EXT_NATT) != 0) {
 			hdrsiz += sizeof(struct udphdr) + 4;
 		}
@@ -201,38 +201,38 @@ esp_hdrsiz(__unused struct ipsecrequest *isr)
 estimate:
 	lck_mtx_unlock(sadb_mutex);
 #endif
-	/*
-	 * ASSUMING:
-	 *	sizeof(struct newesp) > sizeof(struct esp). (8)
-	 *	esp_max_ivlen() = max ivlen for CBC mode
-	 *	17 = (maximum padding length without random padding length)
-	 *	   + (Pad Length field) + (Next Header field).
-	 *	64 = maximum ICV we support.
-	 *  sizeof(struct udphdr) in case NAT traversal is used
-	 */
+	  
+             
+                                                   
+                                            
+                                                               
+                                                  
+                                
+                                                        
+    
 	return sizeof(struct newesp) + esp_max_ivlen() + 17 + AH_MAXSUMSIZE + sizeof(struct udphdr);
 }
 
-/*
- * Modify the packet so that the payload is encrypted.
- * The mbuf (m) must start with IPv4 or IPv6 header.
- * On failure, free the given mbuf and return NULL.
- *
- * on invocation:
- *	m   nexthdrp md
- *	v   v        v
- *	IP ......... payload
- * during the encryption:
- *	m   nexthdrp mprev md
- *	v   v        v     v
- *	IP ............... esp iv payload pad padlen nxthdr
- *	                   <--><-><------><--------------->
- *	                   esplen plen    extendsiz
- *	                       ivlen
- *	                   <-----> esphlen
- *	<-> hlen
- *	<-----------------> espoff
- */
+  
+                                                      
+                                                    
+                                                   
+  
+                 
+                  
+                 
+                       
+                         
+                        
+                       
+                                                      
+                                                      
+                                              
+                               
+                                     
+           
+                             
+   
 static int
 esp_output(
 	struct mbuf *m,
@@ -252,9 +252,9 @@ esp_output(
 	size_t inner_payload_len = 0;
 	u_int8_t inner_protocol = 0;
 	u_int8_t nxt = 0;
-	size_t plen;    /*payload length to be encrypted*/
+	size_t plen;                                      
 	size_t espoff;
-	size_t esphlen; /* sizeof(struct esp/newesp) + ivlen */
+	size_t esphlen;                                        
 	int ivlen;
 	int afnumber;
 	size_t extendsiz;
@@ -277,7 +277,7 @@ esp_output(
 	default:
 		ipseclog((LOG_ERR, "esp_output: unsupported af %d\n", af));
 		KERNEL_DEBUG(DBG_FNC_ESPOUT | DBG_FUNC_END, 1, 0, 0, 0, 0);
-		return 0;       /* no change at all */
+		return 0;                             
 	}
 
 	mbuf_traffic_class_t traffic_class = 0;
@@ -303,7 +303,7 @@ esp_output(
 		traffic_class = rfc4594_dscp_to_tc(dscp);
 	}
 
-	/* some sanity check */
+	                       
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[traffic_class] == NULL) {
 		switch (af) {
 		case AF_INET:
@@ -343,28 +343,28 @@ esp_output(
 	}
 	spi = sav->spi;
 	ivlen = sav->ivlen;
-	/* should be okey */
+	                    
 	if (ivlen < 0) {
 		panic("invalid ivlen");
 	}
 
 	{
-		/*
-		 * insert ESP header.
-		 * XXX inserts ESP header right after IPv4 header.  should
-		 * chase the header chain.
-		 * XXX sequential number
-		 */
+		  
+                       
+                                                            
+                            
+                          
+     
 		struct ip *ip = NULL;
 		struct ip6_hdr *ip6 = NULL;
-		size_t esplen; /* sizeof(struct esp/newesp) */
-		size_t hlen = 0; /* ip header len */
+		size_t esplen;                                
+		size_t hlen = 0;                    
 
 		if (sav->flags & SADB_X_EXT_OLD) {
-			/* RFC 1827 */
+			              
 			esplen = sizeof(struct esp);
 		} else {
-			/* RFC 2406 */
+			              
 			if (sav->flags & SADB_X_EXT_DERIV) {
 				esplen = sizeof(struct esp);
 			} else {
@@ -404,7 +404,7 @@ esp_output(
 			break;
 		}
 
-		/* grab info for packet logging */
+		                                  
 		struct secashead *sah = sav->sah;
 		if (net_mpklog_enabled &&
 		    sah != NULL && sah->ipsec_if != NULL) {
@@ -456,7 +456,7 @@ esp_output(
 			}
 		}
 
-		/* make the packet over-writable */
+		                                   
 		mprev->m_next = NULL;
 		if ((md = ipsec_copypkt(md)) == NULL) {
 			m_freem(m);
@@ -465,12 +465,12 @@ esp_output(
 		}
 		mprev->m_next = md;
 
-		/*
-		 * Translate UDP source port back to its original value.
-		 * SADB_X_EXT_NATT_MULTIPLEUSERS is only set for transort mode.
-		 */
+		  
+                                                          
+                                                                 
+     
 		if ((sav->flags & SADB_X_EXT_NATT_MULTIPLEUSERS) != 0) {
-			/* if not UDP - drop it */
+			                          
 			if (ip->ip_p != IPPROTO_UDP) {
 				IPSEC_STAT_INCREMENT(ipsecstat.out_inval);
 				m_freem(m);
@@ -480,7 +480,7 @@ esp_output(
 
 			udp = mtod(md, struct udphdr *);
 
-			/* if src port not set in sav - find it */
+			                                          
 			if (sav->natt_encapsulated_src_port == 0) {
 				if (key_natt_get_translated_port(sav) == 0) {
 					m_freem(m);
@@ -489,11 +489,11 @@ esp_output(
 				}
 			}
 			if (sav->remote_ike_port == htons(udp->uh_dport)) {
-				/* translate UDP port */
+				                        
 				udp->uh_dport = sav->natt_encapsulated_src_port;
-				udp->uh_sum = 0; /* don't need checksum with ESP auth */
+				udp->uh_sum = 0;                                        
 			} else {
-				/* drop the packet - can't translate the port */
+				                                                
 				IPSEC_STAT_INCREMENT(ipsecstat.out_inval);
 				m_freem(m);
 				error = EINVAL;
@@ -509,11 +509,11 @@ esp_output(
 			espoff += sizeof(struct udphdr);
 		}
 
-		/*
-		 * grow the mbuf to accomodate ESP header.
-		 * before: IP ... payload
-		 * after:  IP ... [UDP] ESP IV payload
-		 */
+		  
+                                            
+                           
+                                        
+     
 		if (M_LEADINGSPACE(md) < esphlen || (md->m_flags & M_EXT) != 0) {
 			MGET(n, M_DONTWAIT, MT_DATA);
 			if (!n) {
@@ -559,19 +559,19 @@ esp_output(
 			}
 			break;
 		case AF_INET6:
-			/* total packet length will be computed in ip6_output() */
+			                                                          
 			break;
 		}
 	}
 
-	/* initialize esp header. */
+	                            
 	esp->esp_spi = spi;
 	if ((sav->flags & SADB_X_EXT_OLD) == 0) {
 		struct newesp *nesp;
 		nesp = (struct newesp *)esp;
 		if (sav->replay[traffic_class]->count == sav->replay[traffic_class]->lastseq) {
 			if ((sav->flags & SADB_X_EXT_CYCSEQ) == 0) {
-				/* XXX Is it noisy ? */
+				                       
 				ipseclog((LOG_WARNING,
 				    "replay counter overflowed. %s\n",
 				    ipsec_logsastr(sav)));
@@ -584,18 +584,18 @@ esp_output(
 		lck_mtx_lock(sadb_mutex);
 		sav->replay[traffic_class]->count++;
 		lck_mtx_unlock(sadb_mutex);
-		/*
-		 * XXX sequence number must not be cycled, if the SA is
-		 * installed by IKE daemon.
-		 */
+		  
+                                                         
+                             
+     
 		nesp->esp_seq = htonl(sav->replay[traffic_class]->count);
 		seq = sav->replay[traffic_class]->count;
 	}
 
 	{
-		/*
-		 * find the last mbuf. make some room for ESP trailer.
-		 */
+		  
+                                                        
+     
 		struct ip *ip = NULL;
 		size_t padbound;
 		u_char *extend;
@@ -607,7 +607,7 @@ esp_output(
 		} else {
 			padbound = 4;
 		}
-		/* ESP packet, including nxthdr field, must be length of 4n */
+		                                                              
 		if (padbound < 4) {
 			padbound = 4;
 		}
@@ -617,7 +617,7 @@ esp_output(
 			extendsiz = padbound + 1;
 		}
 
-		/* random padding */
+		                    
 		switch (af) {
 		case AF_INET:
 			randpadmax = ip4_esp_randpad;
@@ -634,7 +634,7 @@ esp_output(
 		} else {
 			size_t pad;
 
-			/* round */
+			           
 			randpadmax = (int)((randpadmax / padbound) * padbound);
 			pad = (randpadmax - plen + extendsiz) / padbound;
 
@@ -644,15 +644,15 @@ esp_output(
 				pad = 0;
 			}
 
-			/*
-			 * make sure we do not pad too much.
-			 * MLEN limitation comes from the trailer attachment
-			 * code below.
-			 * 256 limitation comes from sequential padding.
-			 * also, the 1-octet length field in ESP trailer imposes
-			 * limitation (but is less strict than sequential padding
-			 * as length field do not count the last 2 octets).
-			 */
+			  
+                                       
+                                                       
+                 
+                                                   
+                                                           
+                                                            
+                                                      
+      
 			if (extendsiz + pad <= MLEN && extendsiz + pad < 256) {
 				extendsiz += pad;
 			}
@@ -663,11 +663,11 @@ esp_output(
 			n = n->m_next;
 		}
 
-		/*
-		 * if M_EXT, the external mbuf data may be shared among
-		 * two consequtive TCP packets, and it may be unsafe to use the
-		 * trailing space.
-		 */
+		  
+                                                         
+                                                                 
+                    
+     
 		if (!(n->m_flags & M_EXT) && extendsiz < M_TRAILINGSPACE(n)) {
 			extend = mtod(n, u_char *) + n->m_len;
 			n->m_len += (int)extendsiz;
@@ -709,30 +709,30 @@ esp_output(
 		if (udp_encapsulate) {
 			*nexthdrp = IPPROTO_UDP;
 
-			/* Fill out the UDP header */
+			                             
 			if (sav->natt_encapsulated_src_port != 0) {
 				udp->uh_sport = (u_short)sav->natt_encapsulated_src_port;
 			} else {
 				udp->uh_sport = htons((u_short)esp_udp_encap_port);
 			}
 			udp->uh_dport = htons(sav->remote_ike_port);
-			// udp->uh_len set later, after all length tweaks are complete
+			                                                              
 			udp->uh_sum = 0;
 
-			/* Update last sent so we know if we need to send keepalive */
+			                                                              
 			sav->natt_last_activity = natt_now;
 		} else {
 			*nexthdrp = IPPROTO_ESP;
 		}
 
-		/* initialize esp trailer. */
+		                             
 		esptail = (struct esptail *)
 		    (mtod(n, u_int8_t *) + n->m_len - sizeof(struct esptail));
 		esptail->esp_nxt = nxt;
 		VERIFY((extendsiz - 2) <= UINT8_MAX);
 		esptail->esp_padlen = (u_int8_t)(extendsiz - 2);
 
-		/* modify IP header (for ESP header part only) */
+		                                                 
 		switch (af) {
 		case AF_INET:
 			ip = mtod(m, struct ip *);
@@ -748,14 +748,14 @@ esp_output(
 			}
 			break;
 		case AF_INET6:
-			/* total packet length will be computed in ip6_output() */
+			                                                          
 			break;
 		}
 	}
 
-	/*
-	 * pre-compute and cache intermediate key
-	 */
+	  
+                                          
+    
 	error = esp_schedule(algo, sav);
 	if (error) {
 		m_freem(m);
@@ -763,16 +763,16 @@ esp_output(
 		goto fail;
 	}
 
-	/*
-	 * encrypt the packet, based on security association
-	 * and the algorithm specified.
-	 */
+	  
+                                                     
+                                
+    
 	if (!algo->encrypt) {
 		panic("internal error: no encrypt function");
 	}
 	KERNEL_DEBUG(DBG_FNC_ENCRYPT | DBG_FUNC_START, 0, 0, 0, 0, 0);
 	if ((*algo->encrypt)(m, espoff, plen + extendsiz, sav, algo, ivlen)) {
-		/* m is already freed */
+		                        
 		ipseclog((LOG_ERR, "packet encryption failure\n"));
 		IPSEC_STAT_INCREMENT(stat->out_inval);
 		error = EINVAL;
@@ -781,9 +781,9 @@ esp_output(
 	}
 	KERNEL_DEBUG(DBG_FNC_ENCRYPT | DBG_FUNC_END, 2, 0, 0, 0, 0);
 
-	/*
-	 * calculate ICV if required.
-	 */
+	  
+                              
+    
 	size_t siz = 0;
 	u_char authbuf[AH_MAXSUMSIZE] __attribute__((aligned(4)));
 
@@ -840,7 +840,7 @@ fill_icv:
 			n = n->m_next;
 		}
 
-		if (!(n->m_flags & M_EXT) && siz < M_TRAILINGSPACE(n)) { /* XXX */
+		if (!(n->m_flags & M_EXT) && siz < M_TRAILINGSPACE(n)) {          
 			n->m_len += siz;
 			m->m_pkthdr.len += siz;
 			p = mtod(n, u_char *) + n->m_len - siz;
@@ -864,7 +864,7 @@ fill_icv:
 		}
 		bcopy(authbuf, p, siz);
 
-		/* modify IP header (for ESP header part only) */
+		                                                 
 		switch (af) {
 		case AF_INET:
 			ip = mtod(m, struct ip *);
@@ -880,7 +880,7 @@ fill_icv:
 			}
 			break;
 		case AF_INET6:
-			/* total packet length will be computed in ip6_output() */
+			                                                          
 			break;
 		}
 	}
@@ -947,7 +947,7 @@ esp4_output(
 		return EINVAL;
 	}
 	ip = mtod(m, struct ip *);
-	/* XXX assumes that m->m_next points to payload */
+	                                                  
 	return esp_output(m, &ip->ip_p, m->m_next, AF_INET, sav);
 }
 

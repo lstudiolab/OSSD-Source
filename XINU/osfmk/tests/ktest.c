@@ -96,19 +96,19 @@ ktest_testcase(int success)
 	ktest_current_time = mach_absolute_time();
 
 	if (success && !ktest_expectfail) {
-		/* PASS */
+		          
 		ktest_passcount++;
 		ktest_testcase_result = T_RESULT_PASS;
 	} else if (!success && !ktest_expectfail) {
-		/* FAIL */
+		          
 		ktest_failcount++;
 		ktest_testcase_result = T_RESULT_FAIL;
 	} else if (success && ktest_expectfail) {
-		/* UXPASS */
+		            
 		ktest_xpasscount++;
 		ktest_testcase_result = T_RESULT_UXPASS;
 	} else if (!success && ktest_expectfail) {
-		/* XFAIL */
+		           
 		ktest_xfailcount++;
 		ktest_testcase_result = T_RESULT_XFAIL;
 	}

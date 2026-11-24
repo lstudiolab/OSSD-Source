@@ -61,7 +61,7 @@
  *	@(#)ttydev.h	8.2 (Berkeley) 1/4/94
  */
 
-/* COMPATIBILITY HEADER FILE */
+                               
 
 #ifndef _SYS_TTYDEV_H_
 #define _SYS_TTYDEV_H_
@@ -85,6 +85,6 @@
 #define EXTB    15
 #define B57600  16
 #define B115200 17
-#endif /* USE_OLD_TTY */
+#endif                  
 
-#endif /* !_SYS_TTYDEV_H_ */
+#endif                      

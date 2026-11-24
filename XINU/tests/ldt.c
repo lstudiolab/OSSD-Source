@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-// #define STANDALONE
+                     
 
 #ifndef STANDALONE
 #include <darwintest.h>
@@ -60,89 +60,89 @@ T_GLOBAL_META(
 
 #define COMPAT_MODE_CS_SELECTOR 0x1f
 #define SYSENTER_SELECTOR 0xb
-/* #define DEBUG 1 */
+                     
 #define P2ROUNDUP(x, align)     (-(-((long)x) & -((long)align)))
 #define MSG 2048
 
 #define NORMAL_RUN_TIME  (10)
 #define TIMEOUT_OVERHEAD (10)
 
-/*
- * General theory of operation:
- * ----------------------------
- * (1) Ensure that all code and data to be accessed from compatibility mode is
- *     located in the low 4GiB of virtual address space.
- * (2) Allocate required segments via the i386_set_ldt() system call, making
- *     sure to set the descriptor type correctly (code vs. data).  Creating
- *     64-bit code segments is not allowed (just use the existing 0x2b selector.)
- * (3) Once you know which selector is associated with the desired code, use a
- *     trampoline (or thunk) to (a) switch to a stack that's located below 4GiB
- *     and (b) save ABI-mandated caller-saved state so that if it's trashed by
- *     compatibility-mode code, it can be restored before returning to 64-bit
- *     mode (if desired), and finally (c) long-jump or long-call (aka far call)
- *     to the segment and desired offset (this example uses an offset of 0 for
- *     simplicity.)
- * (4) Once in compatibility mode, if a framework call or system call is required,
- *     the code must trampoline back to 64-bit mode to do so.  System calls from
- *     compatibility mode code are not supported and will result in invalid opcode
- *     exceptions.  This example includes a simple 64-bit trampoline (which must
- *     be located in the low 4GiB of virtual address space, since it's executed
- *     by compatibility-mode code.)  Note that since the 64-bit ABI mandates that
- *     the stack must be aligned to a 16-byte boundary, the sample trampoline
- *     performs that rounding, to simplify compatibility-mode code.  Additionally,
- *     since 64-bit native code makes use of thread-local storage, the user-mode
- *     GSbase must be restored.  This sample includes two ways to do that-- (a) by
- *     calling into a C implementation that associates the thread-local storage
- *     pointer with a stack range (which will be unique for each thread.), and
- *     (b) by storing the original GSbase in a block of memory installed into
- *     GSbase before calling into compatibility-mode code.  A special machdep
- *     system call restores GSbase as needed.  Note that the sample trampoline
- *     does not save and restore %gs (or most other register state, so that is an
- *     area that may be tailored to the application's requirements.)
- * (5) Once running in compatibility mode, should synchronous or asynchronous
- *     exceptions occur, this sample shows how a mach exception handler (running
- *     in a detached thread, handling exceptions for the entire task) can catch
- *     such exceptions and manipulate thread state to perform recovery (or not.)
- *     Other ways to handle exceptions include installing per-thread exception
- *     servers.  Alternatively, BSD signal handlers can be used.  Note that once a
- *     process installs a custom LDT, *ALL* future signal deliveries will include
- *     ucontext pointers to mcontext structures that include enhanced thread
- *     state embedded (e.g. the %ds, %es, %ss, and GSBase registers) [This assumes
- *     that the SA_SIGINFO is passed to sigaction(2) when registering handlers].
- *     The mcontext size (part of the ucontext) can be used to differentiate between
- *     different mcontext flavors (e.g. those with/without full thread state plus
- *     x87 FP state, AVX state, or AVX2/3 state).
- */
+  
+                               
+                               
+                                                                              
+                                                        
+                                                                            
+                                                                           
+                                                                                 
+                                                                              
+                                                                               
+                                                                              
+                                                                             
+                                                                               
+                                                                              
+                   
+                                                                                  
+                                                                                
+                                                                                  
+                                                                                
+                                                                               
+                                                                                 
+                                                                             
+                                                                                  
+                                                                                
+                                                                                  
+                                                                               
+                                                                              
+                                                                             
+                                                                             
+                                                                              
+                                                                                 
+                                                                    
+                                                                             
+                                                                                
+                                                                               
+                                                                                
+                                                                              
+                                                                                  
+                                                                                 
+                                                                            
+                                                                                  
+                                                                                
+                                                                                    
+                                                                                 
+                                                 
+   
 
-/*
- * This test exercises the custom LDT functionality exposed via the i386_{get,set}_ldt
- * system calls.
- *
- * Tests include:
- * (1a) Exception handling (due to an exception or another thread sending a signal) while
- *      running in compatibility mode;
- * (1b) Signal handling while running in compatibility mode;
- * (2)  Thunking back to 64-bit mode and executing a framework function (e.g. printf)
- * (3)  Ensuring that transitions to compatibility mode and back to 64-bit mode
- *      do not negatively impact system calls and framework calls in 64-bit mode
- * (4)  Use of thread_get_state / thread_set_state to configure a thread to
- *      execute in compatibility mode with the proper LDT code segment (this is
- *      effectively what the exception handler does when the passed-in new_state
- *      is changed (or what the BSD signal handler return handling does when the
- *      mcontext is modified).)
- * (5)  Ensure that compatibility mode code cannot make system calls via sysenter or
- *      old-style int {0x80..0x82}.
- * (6)  Negative testing to ensure errors are returned if the consumer tries
- *      to set a disallowed segment type / Long flag. [TBD]
- */
+  
+                                                                                      
+                
+  
+                 
+                                                                                         
+                                      
+                                                            
+                                                                                     
+                                                                               
+                                                                                
+                                                                           
+                                                                               
+                                                                                
+                                                                                
+                               
+                                                                                    
+                                   
+                                                                            
+                                                           
+   
 
-/*
- * Note that these addresses are not necessarily available due to ASLR, so
- * a robust implementation should determine the proper range to use via
- * another means.
- */
+  
+                                                                          
+                                                                       
+                 
+   
 #ifndef STANDALONE
-/* libdarwintest needs LOTs of stack */
+                                       
 #endif
 #define FIXED_STACK_SIZE (PAGE_SIZE * 16)
 #define FIXED_TRAMP_MAXLEN (PAGE_SIZE * 8)
@@ -164,7 +164,7 @@ typedef struct thread_arg {
 	pthread_mutex_t         mutex;
 	pthread_cond_t          condvar;
 	volatile boolean_t      done;
-	uint32_t                compat_stackaddr;       /* Compatibility mode stack address */
+	uint32_t                compat_stackaddr;                                             
 } thread_arg_t;
 
 typedef struct custom_tsd {
@@ -182,7 +182,7 @@ static far_call_t input_desc = { .seg = COMPAT_MODE_CS_SELECTOR, .off = 0 };
 static uint64_t stackAddr = 0;
 static compat_tramp_t thunkit = NULL;
 static uint64_t thunk64_addr;
-/* stack2gs[0] is initialized in map_lowmem_stack() */
+                                                      
 static stackaddr_to_gsbase_t stack2gs[] = { { 0 } };
 
 extern int compat_mode_trampoline(far_call_t *, void *, uint64_t);
@@ -250,18 +250,18 @@ get_gsbase(void)
 void
 restore_gsbase(uint64_t stackptr)
 {
-	/* Restore GSbase so tsd is accessible in long mode */
+	                                                      
 	uint64_t orig_GSbase = stack_range_to_GSbase(stackptr, 0);
 
 	assert(orig_GSbase != 0);
 	_thread_set_tsd_base(orig_GSbase);
 }
 
-/*
- * Though we've directed all exceptions through the catch_mach_exception_raise_state_identity
- * entry point, we still must provide these two other entry points, otherwise a linker error
- * will occur.
- */
+  
+                                                                                             
+                                                                                            
+              
+   
 kern_return_t
 catch_mach_exception_raise(mach_port_t exception_port,
     mach_port_t thread,
@@ -323,24 +323,24 @@ handle_badinsn_exception(_STRUCT_X86_THREAD_FULL_STATE64 *xtfs64, uint64_t __unu
 	    (unsigned)xtfs64->__ss, xtfs64->__ss64.__rsp,
 	    start_addr, end_addr);
 
-	/*
-	 * We expect to handle 4 invalid opcode exceptions:
-	 * (1) sysenter
-	 * (2) int $0x80
-	 * (3) int $0x81
-	 * (4) int $0x82
-	 * (Note that due to the way the invalid opcode indication was implemented,
-	 * %rip is already set to the next instruction.)
-	 */
+	  
+                                                    
+                
+                 
+                 
+                 
+                                                                            
+                                                 
+    
 	if (xtfs64->__ss64.__rip >= start_addr && xtfs64->__ss64.__rip <= end_addr) {
-		/*
-		 * On return from the failed sysenter, %cs is changed to the
-		 * sysenter code selector and %ss is set to 0x23, so switch them
-		 * back to sane values.
-		 */
+		  
+                                                              
+                                                                  
+                         
+     
 		if ((unsigned)xtfs64->__ss64.__cs == SYSENTER_SELECTOR) {
 			xtfs64->__ss64.__cs = COMPAT_MODE_CS_SELECTOR;
-			xtfs64->__ss = 0x23; /* XXX */
+			xtfs64->__ss = 0x23;          
 		}
 	}
 }
@@ -364,14 +364,14 @@ catch_mach_exception_raise_state_identity(mach_port_t exception_port,
 	_STRUCT_X86_THREAD_FULL_STATE64 *new_xtfs64 = (_STRUCT_X86_THREAD_FULL_STATE64 *)(void *)new_state;
 	uint64_t rip_skip_count = 0;
 
-	/*
-	 * Check the exception code and thread state.
-	 * If we were executing 32-bit code (or 64-bit code on behalf of
-	 * 32-bit code), we could update the thread state to effectively longjmp
-	 * back to a safe location where the victim thread can recover.
-	 * Then again, we could return KERN_NOT_SUPPORTED and allow the process
-	 * to be nuked.
-	 */
+	  
+                                              
+                                                                 
+                                                                         
+                                                                
+                                                                        
+                
+    
 
 	switch (exception) {
 	case EXC_ARITHMETIC:
@@ -395,12 +395,12 @@ catch_mach_exception_raise_state_identity(mach_port_t exception_port,
 		    xtfs64->__ss64.__rip);
 	}
 
-	/*
-	 * If this exception happened in compatibility mode,
-	 * assume it was the intentional division-by-zero and set the
-	 * new state's cs register to just after the div instruction
-	 * to enable the thread to resume.
-	 */
+	  
+                                                     
+                                                              
+                                                             
+                                   
+    
 	if ((unsigned)xtfs64->__ss64.__cs == COMPAT_MODE_CS_SELECTOR) {
 		*new_stateCnt = old_stateCnt;
 		*new_xtfs64 = *xtfs64;
@@ -487,12 +487,12 @@ signal_handler(int signo, siginfo_t *sinfop, void *ucontext)
 
 	mctx.fp_fullp = (_STRUCT_MCONTEXT64_FULL *)uctxp->uc_mcontext;
 
-	/*
-	 * Note that GSbase must be restored before calling into any frameworks
-	 * that might access anything %gs-relative (e.g. TSD) if the signal
-	 * handler was triggered while the thread was running with a non-default
-	 * (system-established) GSbase.
-	 */
+	  
+                                                                        
+                                                                    
+                                                                         
+                                
+    
 
 	if ((signo != SIGFPE && signo != SIGILL) || sinfop->si_signo != signo) {
 #ifndef STANDALONE
@@ -509,13 +509,13 @@ signal_handler(int signo, siginfo_t *sinfop, void *ucontext)
 	    uctxp->uc_mcsize == sizeof(_STRUCT_MCONTEXT64)) {
 		_STRUCT_X86_THREAD_STATE64 *ss64 = &mctx.fp_basep->__ss;
 
-		/*
-		 * The following block is an illustration of what NOT to do.
-		 * Configuring an LDT for the first time in a signal handler
-		 * will likely cause the process to crash.
-		 */
+		  
+                                                              
+                                                              
+                                            
+     
 		if (ENV_set_ldt_in_sighandler == TRUE && !saw_ud2) {
-			/* Set the LDT: */
+			                  
 			int cnt = i386_set_ldt((int)idx, &descs[idx], 1);
 			if (cnt != (int)idx) {
 #ifdef DEBUG
@@ -531,25 +531,25 @@ signal_handler(int signo, siginfo_t *sinfop, void *ucontext)
 #ifdef DEBUG
 			printf("i386_set_ldt returned %d\n", cnt);
 #endif
-			ss64->__rip += 2;       /* ud2 is 2 bytes */
+			ss64->__rip += 2;                           
 
 			saw_ud2 = 1;
 
-			/*
-			 * When we return here, the sigreturn processing code will try to copy a FULL
-			 * thread context from the signal stack, which will likely cause the resumed
-			 * thread to fault and be terminated.
-			 */
+			  
+                                                                                
+                                                                               
+                                        
+      
 			return;
 		}
 
 		restore_gsbase(ss64->__rsp);
 
-		/*
-		 * If we're in this block, either we are dispatching a signal received
-		 * before we installed a custom LDT or we are on a kernel without
-		 * BSD-signalling-sending-full-thread-state support.  It's likely the latter case.
-		 */
+		  
+                                                                        
+                                                                   
+                                                                                    
+     
 #ifndef STANDALONE
 		T_ASSERT_FAIL("This system doesn't support BSD signals with full thread state.");
 #else
@@ -561,10 +561,10 @@ signal_handler(int signo, siginfo_t *sinfop, void *ucontext)
 	    uctxp->uc_mcsize == sizeof(_STRUCT_MCONTEXT64_FULL)) {
 		_STRUCT_X86_THREAD_FULL_STATE64 *ss64 = &mctx.fp_fullp->__ss;
 
-		/*
-		 * Since we're handing this signal on the same thread, we may need to
-		 * restore GSbase.
-		 */
+		  
+                                                                       
+                    
+     
 		uint64_t orig_gsbase = stack_range_to_GSbase(ss64->__ss64.__rsp, 0);
 		if (orig_gsbase != 0 && orig_gsbase != ss64->__gsbase) {
 			restore_gsbase(ss64->__ss64.__rsp);
@@ -576,12 +576,12 @@ signal_handler(int signo, siginfo_t *sinfop, void *ucontext)
 			handle_badinsn_exception(ss64, &rip_skip_count);
 		}
 
-		/*
-		 * If this exception happened in compatibility mode,
-		 * assume it was the intentional division-by-zero and set the
-		 * new state's cs register to just after the div instruction
-		 * to enable the thread to resume.
-		 */
+		  
+                                                      
+                                                               
+                                                              
+                                    
+     
 		if ((unsigned)ss64->__ss64.__cs == COMPAT_MODE_CS_SELECTOR) {
 			ss64->__ss64.__rip += rip_skip_count;
 			fprintf(stderr, "new cs=0x%x rip=0x%llx\n", (unsigned)ss64->__ss64.__cs,
@@ -682,7 +682,7 @@ map_lowmem_stack(void **lowmemstk)
 	}
 
 	if ((uintptr_t)addr > 0xFFFFF000ULL) {
-		/* Error: This kernel does not support MAP_32BIT or there's a bug. */
+		                                                                     
 #ifndef STANDALONE
 		T_ASSERT_FAIL("%s: failed to map a 32-bit-accessible stack", __func__);
 #else
@@ -691,7 +691,7 @@ map_lowmem_stack(void **lowmemstk)
 #endif
 	}
 
-	/* Enforce one page of redzone at the bottom of the stack */
+	                                                            
 	if (mprotect(addr, PAGE_SIZE, PROT_NONE) < 0) {
 		err = errno;
 		(void) munmap(addr, FIXED_STACK_SIZE + PAGE_SIZE);
@@ -728,7 +728,7 @@ map_32bit_code_impl(uint8_t *code_src, size_t code_len, void **codeptr,
 	}
 
 	if ((uintptr_t)addr > 0xFFFFF000ULL) {
-		/* Error: This kernel does not support MAP_32BIT or there's a bug. */
+		                                                                     
 #ifndef STANDALONE
 		T_ASSERT_FAIL("%s: failed to map a 32-bit-accessible trampoline", __func__);
 #else
@@ -745,7 +745,7 @@ map_32bit_code_impl(uint8_t *code_src, size_t code_len, void **codeptr,
 
 	bcopy(code_src, addr, code_len);
 
-	/* Fill the rest of the page with NOPs */
+	                                         
 	if ((sz - code_len) > 0) {
 		memset((void *)((uintptr_t)addr + code_len), 0x90, sz - code_len);
 	}
@@ -793,16 +793,16 @@ call_compatmode(uint32_t stackaddr, uint64_t compat_arg, uint64_t callback)
 {
 	uint64_t rv;
 
-	/*
-	 * Depending on how this is used, this allocation may need to be
-	 * made with an allocator that returns virtual addresses below 4G.
-	 */
+	  
+                                                                 
+                                                                   
+    
 	custom_tsd_t *new_GSbase = malloc(PAGE_SIZE);
 
-	/*
-	 * Change the GSbase (so things like printf will fail unless GSbase is
-	 * restored)
-	 */
+	  
+                                                                       
+             
+    
 	if (new_GSbase != NULL) {
 #ifdef DEBUG
 		fprintf(stderr, "Setting new GS base: %p\n", (void *)new_GSbase);
@@ -848,22 +848,22 @@ hello_from_32bit(void)
 	_thread_set_tsd_base(cur_tsd_base);
 }
 
-/*
- * Thread for executing 32-bit code
- */
+  
+                                   
+   
 static void *
 thread_32bit(void *arg)
 {
 	thread_arg_t *targp = (thread_arg_t *)arg;
 	uint64_t cthread_self = 0;
 
-	/* Save the GSbase for context switch back to 64-bit mode */
+	                                                            
 	cthread_self = get_gsbase();
 
-	/*
-	 * Associate GSbase with the compat-mode stack (which will be used for long mode
-	 * thunk calls as well.)
-	 */
+	  
+                                                                                 
+                         
+    
 	(void)stack_range_to_GSbase(targp->compat_stackaddr, cthread_self);
 
 #ifdef DEBUG
@@ -877,7 +877,7 @@ thread_32bit(void *arg)
 			pthread_cond_wait(&targp->condvar, &targp->mutex);
 		}
 
-		/* Finally, execute the test */
+		                               
 		if (call_compatmode(targp->compat_stackaddr, 0,
 		    (uint64_t)&hello_from_32bit) == 1) {
 			printf("32-bit code test passed\n");
@@ -961,10 +961,10 @@ ldt64_test_setup(pthread_t *cmthreadp, thread_arg_t *cmargp, boolean_t setldt_in
 #endif
 	}
 
-	/*
-	 * Store long_mode_trampoline's address into the constant part of the movabs
-	 * instruction in thunk64
-	 */
+	  
+                                                                             
+                          
+    
 	thunk64_movabs_addr = (uintptr_t)thunkit + ((uintptr_t)thunk64_movabs - (uintptr_t)compat_mode_trampoline);
 	*((uint64_t *)(thunk64_movabs_addr + 2)) = (uint64_t)&long_mode_trampoline;
 
@@ -984,16 +984,16 @@ ldt64_test_setup(pthread_t *cmthreadp, thread_arg_t *cmargp, boolean_t setldt_in
 	printf("i386_get_ldt returned %d\n", cnt);
 #endif
 
-	idx = (unsigned)cnt;      /* Put the desired descriptor in the first available slot */
+	idx = (unsigned)cnt;                                                                  
 
-	/*
-	 * code_32's address for the purposes of this descriptor is the base mapped address of
-	 * the thunkit function + the offset of code_32 from compat_mode_trampoline.
-	 */
+	  
+                                                                                       
+                                                                             
+    
 	code_addr = (uintptr_t)thunkit + ((uintptr_t)code_32 - (uintptr_t)compat_mode_trampoline);
 	thunk64_addr = (uintptr_t)thunkit + ((uintptr_t)thunk64 - (uintptr_t)compat_mode_trampoline);
 
-	/* Initialize desired descriptor */
+	                                   
 	descs[idx].code.limit00 = (unsigned short)(((code_addr >> 12) + 1) & 0xFFFF);
 	descs[idx].code.limit16 = (unsigned char)((((code_addr >> 12) + 1) >> 16) & 0xF);
 	descs[idx].code.base00 = (unsigned short)((code_addr) & 0xFFFF);
@@ -1006,7 +1006,7 @@ ldt64_test_setup(pthread_t *cmthreadp, thread_arg_t *cmargp, boolean_t setldt_in
 	descs[idx].code.present = 1;
 
 	if (setldt_in_sighandler == FALSE) {
-		/* Set the LDT: */
+		                  
 		cnt = i386_set_ldt((int)idx, &descs[idx], 1);
 		if (cnt != (int)idx) {
 #ifndef STANDALONE
@@ -1025,7 +1025,7 @@ ldt64_test_setup(pthread_t *cmthreadp, thread_arg_t *cmargp, boolean_t setldt_in
 	}
 
 
-	/* Read back the LDT to ensure it was set properly */
+	                                                     
 	if ((cnt = i386_get_ldt(0, descs, (int)idx)) > 0) {
 #ifdef DEBUG
 		for (int i = 0; i < cnt; i++) {
@@ -1061,9 +1061,9 @@ ldt64_test_setup(pthread_t *cmthreadp, thread_arg_t *cmargp, boolean_t setldt_in
 static void
 test_ldt64_with_bsdsig(void)
 #else
-/*
- * Main test declarations
- */
+  
+                         
+   
 T_DECL(ldt64_with_bsd_sighandling,
     "Ensures that a 64-bit process can create LDT entries and can execute code in "
     "compatibility mode with BSD signal handling",
@@ -1134,7 +1134,7 @@ T_DECL(ldt64_with_mach_exception_handling,
 	T_SETUPEND;
 #endif
 
-	/* Now repeat with Mach exception handling */
+	                                             
 	init_task_exception_server();
 
 	join_32bit_thread(&cmthread, &cmarg);

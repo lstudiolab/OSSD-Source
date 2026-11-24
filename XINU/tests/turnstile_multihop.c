@@ -1,6 +1,6 @@
-/*
- * turnstile_multihop: Tests turnstile and multi hop priority propagation.
- */
+  
+                                                                          
+   
 
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
@@ -183,7 +183,7 @@ sched_terminate_load(void *load_token)
 }
 
 
-// Find the first num primes, simply as a means of doing work
+                                                             
 static void
 do_work(int num)
 {
@@ -275,7 +275,7 @@ register_port(uint64_t wlid, mach_port_t port)
 
 	struct kevent_qos_s kev_err = { 0 };
 
-	/* Setup workloop for mach msg rcv */
+	                                     
 	r = kevent_id(wlid, &kev, 1, &kev_err, 1, NULL,
 	    NULL, KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_ERROR_EVENTS);
 
@@ -283,10 +283,10 @@ register_port(uint64_t wlid, mach_port_t port)
 	T_QUIET; T_ASSERT_EQ(r, 0, "no errors returned from kevent_id");
 }
 
-/*
- * Basic WL handler callback, it checks the
- * effective Qos of the servicer thread.
- */
+  
+                                           
+                                        
+   
 static void
 workloop_cb_test_intransit(uint64_t *workloop_id, void **eventslist, int *events)
 {
@@ -299,7 +299,7 @@ workloop_cb_test_intransit(uint64_t *workloop_id, void **eventslist, int *events
 	T_LOG("Workloop handler %s called. Received message on 0x%llx",
 	    __func__, *workloop_id);
 
-	/* Skip the test if we can't check Qos */
+	                                         
 	if (geteuid() != 0) {
 		T_SKIP("kevent_qos test requires root privileges to run.");
 	}
@@ -332,7 +332,7 @@ workloop_cb_test_intransit(uint64_t *workloop_id, void **eventslist, int *events
 	T_LOG("Do some CPU work.");
 	do_work(5000);
 
-	/* Check if the override now is IN + 60 boost */
+	                                                
 	T_EXPECT_EFFECTIVE_QOS_EQ(QOS_CLASS_USER_INITIATED,
 	    "dispatch_source event handler QoS should be QOS_CLASS_USER_INITIATED");
 	T_EXPECT_EQ(get_user_promotion_basepri(), 60u,
@@ -349,11 +349,11 @@ workloop_cb_test_intransit(uint64_t *workloop_id, void **eventslist, int *events
 		kev->ext[0] = kev->ext[1] = kev->ext[2] = kev->ext[3] = 0;
 		*events = 1;
 	} else {
-		/* this will unblock the waiter */
+		                                  
 		mach_msg_destroy(hdr);
 		*events = 0;
 
-		/* now that the message is destroyed, the priority should be gone */
+		                                                                    
 		T_EXPECT_EFFECTIVE_QOS_EQ(QOS_CLASS_MAINTENANCE,
 		    "dispatch_source event handler QoS should be QOS_CLASS_MAINTENANCE after destroying message");
 		T_EXPECT_LE(get_user_promotion_basepri(), 0u,
@@ -618,7 +618,7 @@ dispatch_sync_wait(mach_port_t owner_thread, qos_class_t promote_qos)
 					      .ext[EV_EXTIDX_WL_ADDR] = (uint64_t)&dispatch_sync_owner,
 				      }};
 
-	/* Setup workloop to fake dispatch sync wait on a workloop */
+	                                                             
 	r = kevent_id(30, kev, 1, kev_err, 1, NULL,
 	    NULL, KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_ERROR_EVENTS);
 	T_QUIET; T_LOG("dispatch_sync_wait returned\n");
@@ -650,7 +650,7 @@ dispatch_sync_cancel(mach_port_t owner_thread, qos_class_t promote_qos)
 					      .ext[EV_EXTIDX_WL_ADDR] = (uint64_t)&dispatch_sync_owner,
 				      }};
 
-	/* Setup workloop to fake dispatch sync wake on a workloop */
+	                                                             
 	r = kevent_id(30, kev, 1, kev_err, 1, NULL,
 	    NULL, KEVENT_FLAG_WORKLOOP | KEVENT_FLAG_ERROR_EVENTS);
 	T_QUIET; T_LOG("dispatch_sync_cancel returned\n");
@@ -669,7 +669,7 @@ thread_at_sixty(void *arg __unused)
 
 	set_thread_name(__FUNCTION__);
 
-	/* Change our priority to 60 */
+	                               
 	ret = pthread_getschedparam(pthread_self(), &policy, &param);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "pthread_getschedparam");
 
@@ -686,7 +686,7 @@ thread_at_sixty(void *arg __unused)
 	thread_wait_to_boost(in_thread_port, ui_thread_port, 46);
 
 	if (spin_for_ever) {
-		/* Schedule load at Default */
+		                              
 		sched_create_load_at_qos(QOS_CLASS_DEFAULT, &load_token);
 	}
 
@@ -708,7 +708,7 @@ thread_at_ui(void *arg __unused)
 
 	set_thread_name(__FUNCTION__);
 
-	/* Grab the first ulock */
+	                          
 	ull_lock(&lock_UI, 2, UL_UNFAIR_LOCK, 0);
 
 	thread_wait_to_boost(def_thread_port, in_thread_port, 37);
@@ -727,14 +727,14 @@ thread_at_in(void *arg __unused)
 
 	set_thread_name(__FUNCTION__);
 
-	/* Grab the first ulock */
+	                          
 	ull_lock(&lock_IN, 2, UL_UNFAIR_LOCK, 0);
 
 	T_LOG("Thread at IN priority got first lock ");
 
 	thread_wait_to_boost(main_thread_port, def_thread_port, 31);
 
-	/* Create a new thread at QOS_CLASS_USER_INTERACTIVE qos */
+	                                                           
 	thread_create_at_qos(QOS_CLASS_USER_INTERACTIVE, thread_at_ui);
 
 	T_LOG("Thread at IN priority trying to acquire default lock");
@@ -750,14 +750,14 @@ thread_at_default(void *arg __unused)
 
 	set_thread_name(__FUNCTION__);
 
-	/* Grab the first ulock */
+	                          
 	ull_lock(&lock_DEF, 1, UL_UNFAIR_LOCK, 0);
 
 	T_LOG("Thread at DEFAULT priority got first lock ");
 
 	thread_wait_to_block(main_thread_port);
 
-	/* Create a new thread at QOS_CLASS_USER_INITIATED qos */
+	                                                         
 	thread_create_at_qos(QOS_CLASS_USER_INITIATED, thread_at_in);
 
 	T_LOG("Thread at Default priority trying to wait on dispatch sync for maintenance thread");
@@ -790,20 +790,20 @@ thread_at_maintenance(void *arg __unused)
 	special_reply_port = thread_get_special_reply_port();
 	T_QUIET; T_ASSERT_TRUE(MACH_PORT_VALID(special_reply_port), "get_thread_special_reply_port");
 
-	/* Become the dispatch sync owner, dispatch_sync_owner will be set in dispatch_sync_wait function */
+	                                                                                                    
 
-	/* Send a sync message */
+	                         
 	send(conn_port, special_reply_port, MACH_PORT_NULL,
 	    (uint32_t)_pthread_qos_class_encode(QOS_CLASS_MAINTENANCE, 0, 0), 0);
 
-	/* Send an async checkin message */
+	                                   
 	send(service_port, MACH_PORT_NULL, conn_port,
 	    (uint32_t)_pthread_qos_class_encode(QOS_CLASS_MAINTENANCE, 0, 0), 0);
 
-	/* Create a new thread at QOS_CLASS_DEFAULT qos */
+	                                                  
 	thread_create_at_qos(QOS_CLASS_DEFAULT, thread_at_default);
 
-	/* Block on Sync IPC */
+	                       
 	mach_msg_id_t message_id = receive(special_reply_port, service_port);
 
 	T_ASSERT_EQ(message_id, MACH_NOTIFY_SEND_ONCE, "got the expected send-once notification");
@@ -883,21 +883,21 @@ T_HELPER_DECL(server_kevent_id,
 	        spin_for_ever = false; \
 	}
 
-/*
- * Test 1: Test multihop priority boosting with ulocks, dispatch sync and sync IPC.
- *
- * Create thread's at different Qos and acquire a ulock and block on next ulock/dispatch sync
- * creating a sync chain. The last hop the chain is blocked on Sync IPC.
- */
+  
+                                                                                   
+  
+                                                                                             
+                                                                        
+   
 TEST_MULTIHOP("server_kevent_id", "three_ulock_sync_ipc_hop", three_ulock_sync_ipc_hop)
 
 TEST_MULTIHOP("server_kevent_id", "three_ulock_sync_ipc_hop_noimportance", three_ulock_sync_ipc_hop_noimportance)
 
-/*
- * Test 2: Test multihop priority boosting with ulocks, dispatch sync and sync IPC.
- *
- * Create thread's at different Qos and acquire a ulock and block on next ulock/dispatch sync
- * creating a sync chain. The last hop the chain is blocked on Sync IPC.
- * Before the last priority 60 thread blocks on ulock, it also starts spinforeverd at priority 31.
- */
+  
+                                                                                   
+  
+                                                                                             
+                                                                        
+                                                                                                  
+   
 TEST_MULTIHOP_SPIN("server_kevent_id", "three_ulock_sync_ipc_hop", three_ulock_sync_ipc_hop_spin)

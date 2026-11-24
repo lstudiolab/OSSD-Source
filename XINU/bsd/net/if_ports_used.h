@@ -42,25 +42,25 @@
 
 #define IP_PORTRANGE_SIZE 65536
 
-/*
- * The sysctl "net.link.generic.system.port_used.list" returns:
- *  - one "struct xnpigen" as a preamble
- *  - zero or more "struct net_port_info" according to xng_npi_count
- *
- * The list may contain information several interfaces if several drivers
- * queried the list of port to offload
- *
- * The same local port may have more than one "struct net_port_info" on
- * a given interface, for example when a local server has mutiple clients
- * connections
- */
+  
+                                                               
+                                        
+                                                                    
+  
+                                                                         
+                                      
+  
+                                                                       
+                                                                         
+              
+   
 
 struct xnpigen {
-	uint32_t        xng_len; /* length of this data structure */
-	uint32_t        xng_gen; /* how many times the list was built */
-	uint32_t        xng_npi_count; /* number of net_port_info following */
-	uint32_t        xng_npi_size; /* number of struct net_port_info  */
-	uuid_t          xng_wakeuuid; /* WakeUUID when list was built */
+	uint32_t        xng_len;                                    
+	uint32_t        xng_gen;                                        
+	uint32_t        xng_npi_count;                                        
+	uint32_t        xng_npi_size;                                      
+	uuid_t          xng_wakeuuid;                                   
 };
 
 union in_addr_4_6 {
@@ -80,10 +80,10 @@ union in_addr_4_6 {
 struct net_port_info {
 	uint16_t                npi_if_index;
 	uint16_t                npi_flags;
-	struct timeval32        npi_timestamp; /* when passed to driver */
+	struct timeval32        npi_timestamp;                            
 	uuid_t                  npi_flow_uuid;
-	in_port_t               npi_local_port; /* network byte order */
-	in_port_t               npi_foreign_port; /* network byte order */
+	in_port_t               npi_local_port;                         
+	in_port_t               npi_foreign_port;                         
 	union in_addr_4_6       npi_local_addr_;
 	union in_addr_4_6       npi_foreign_addr_;
 	pid_t                   npi_owner_pid;
@@ -108,7 +108,7 @@ struct inpcb;
 void if_ports_used_add_inpcb(const uint32_t ifindex, const struct inpcb *inp);
 
 
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /* PRIVATE */
+#endif                         
+#endif              
 
-#endif /* _NET_IF_PORT_USED_H_ */
+#endif                           

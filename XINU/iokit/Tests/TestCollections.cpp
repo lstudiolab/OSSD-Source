@@ -44,14 +44,14 @@ testArray()
 	OSObject *cache[numStrCache], *str, *sym;
 	OSArray *array1, *array2;
 
-	// Do first test without memory leak tests to initialise the metaclass
+	                                                                      
 	array1 = OSArray::withCapacity(1);
 	TEST_ASSERT('A', "0a", array1);
 	if (array1) {
 		array1->release();
 	}
 
-	// Grow the symbol pool to maximum
+	                                  
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = (OSObject *) OSSymbol::withCStringNoCopy(strCache[i]);
 	}
@@ -59,7 +59,7 @@ testArray()
 		cache[i]->release();
 	}
 
-	// Create and destroy an array
+	                              
 	spaceCheck = checkPointSpace();
 	array1 = OSArray::withCapacity(1);
 	TEST_ASSERT('A', "1a", array1);
@@ -89,8 +89,8 @@ testArray()
 	}
 	res = res && checkSpace("(A)1", spaceCheck, 0);
 
-	// Check the creation of a sizable OSArray from an array of IOObjects
-	// Also check indexing into the array.
+	                                                                     
+	                                      
 	spaceCheck = checkPointSpace();
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = OSString::withCStringNoCopy(strCache[i]);
@@ -117,9 +117,9 @@ testArray()
 	}
 	res = res && checkSpace("(A)2", spaceCheck, 0);
 
-	// Test array creation from another array by both the setObject method
-	// and the withArray factory.  And test __takeObject code first
-	// with tail removal then with head removal
+	                                                                      
+	                                                               
+	                                           
 	spaceCheck = checkPointSpace();
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = OSString::withCStringNoCopy(strCache[i]);
@@ -180,7 +180,7 @@ testArray()
 	}
 	res = res && checkSpace("(A)3", spaceCheck, 0);
 
-	// Test object replacement from one array to another
+	                                                    
 	spaceCheck = checkPointSpace();
 	array1 = OSArray::withCapacity(numStrCache);
 	TEST_ASSERT('A', "4a", array1);
@@ -240,7 +240,7 @@ testArray()
 	}
 	res = res && checkSpace("(A)4", spaceCheck, 0);
 
-	// Test array duplicate removal
+	                               
 	spaceCheck = checkPointSpace();
 	array1 = OSArray::withCapacity(numStrCache);
 	TEST_ASSERT('A', "5a", array1);
@@ -252,19 +252,19 @@ testArray()
 		}
 		TEST_ASSERT('A', "5b", numStrCache == (int) array1->getCount());
 
-		// remove duplicates
+		                    
 		for (i = 0; (sym = array1->getObject(i));) {
 			if (sym->getRetainCount() == 1) {
 				i++;
 			} else {
-				//sym = array1->__takeObject(i);
-				//sym->release();
+				                                
+				                 
 				array1->removeObject(i);
 			}
 		}
 		TEST_ASSERT('A', "5c", numStrCache != (int) array1->getCount());
 
-		// check to see that all symbols are really there
+		                                                 
 		for (count = 0, i = 0; i < numStrCache; i++) {
 			sym = (OSObject *) OSSymbol::withCStringNoCopy(strCache[i]);
 			for (count2 = false, j = 0; (str = array1->getObject(j)); j++) {
@@ -298,14 +298,14 @@ testSet()
 	OSSet *set1, *set2;
 	OSArray *array;
 
-	// Do first test without memory leak tests to initialise the metaclass
+	                                                                      
 	set1 = OSSet::withCapacity(1);
 	TEST_ASSERT('S', "0a", set1);
 	if (set1) {
 		set1->release();
 	}
 
-	// Grow the symbol pool to maximum
+	                                  
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = (OSObject *) OSSymbol::withCStringNoCopy(strCache[i]);
 	}
@@ -313,7 +313,7 @@ testSet()
 		cache[i]->release();
 	}
 
-	// Create and destroy an set
+	                            
 	spaceCheck = checkPointSpace();
 	set1 = OSSet::withCapacity(1);
 	TEST_ASSERT('S', "1a", set1);
@@ -344,8 +344,8 @@ testSet()
 	}
 	res = res && checkSpace("(S)1", spaceCheck, 0);
 
-	// Check the creation of a sizable OSSet from an set of IOObjects
-	// Also check member test of set.
+	                                                                 
+	                                 
 	spaceCheck = checkPointSpace();
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = OSString::withCStringNoCopy(strCache[i]);
@@ -371,9 +371,9 @@ testSet()
 	}
 	res = res && checkSpace("(S)2", spaceCheck, 0);
 
-	// Test set creation from another set by both the setObject method
-	// and the withArray factory.  And test __takeObject code first
-	// with tail removal then with head removal
+	                                                                  
+	                                                               
+	                                           
 	spaceCheck = checkPointSpace();
 	for (i = 0; i < numStrCache; i++) {
 		cache[i] = OSString::withCStringNoCopy(strCache[i]);
@@ -434,7 +434,7 @@ testSet()
 	}
 	res = res && checkSpace("(S)3", spaceCheck, 0);
 
-	// Test duplicate removal
+	                         
 	spaceCheck = checkPointSpace();
 	set2 = 0;
 	set1 = OSSet::withCapacity(numStrCache);
@@ -470,7 +470,7 @@ testSet()
 	}
 	res = res && checkSpace("(S)4", spaceCheck, 0);
 
-	// Test array duplicate removal
+	                               
 	spaceCheck = checkPointSpace();
 	array = OSArray::withCapacity(numStrCache);
 	for (i = 0; i < numStrCache; i++) {
@@ -514,14 +514,14 @@ testDictionary()
 	OSDictionary *dict1, *dict2;
 	int i, numSymbols, count1, count2;
 
-	// Do first test without memory leak tests to initialise the metaclass
+	                                                                      
 	dict1 = OSDictionary::withCapacity(1);
 	TEST_ASSERT('D', "0a", dict1);
 	if (dict1) {
 		dict1->release();
 	}
 
-	// Grow the symbol pool to maximum
+	                                  
 	for (i = 0; i < numStrCache; i++) {
 		symCache[i] = OSSymbol::withCStringNoCopy(strCache[i]);
 	}
@@ -529,7 +529,7 @@ testDictionary()
 		symCache[i]->release();
 	}
 
-	// Create and destroy a dictionary
+	                                  
 	spaceCheck = checkPointSpace();
 	dict1 = OSDictionary::withCapacity(1);
 	TEST_ASSERT('D', "1a", dict1);
@@ -560,8 +560,8 @@ testDictionary()
 	}
 	res = res && checkSpace("(D)1", spaceCheck, 0);
 
-	// Check the creation of a sizable OSDictionary from an array of IOObjects
-	// Also check indexing into the array.
+	                                                                          
+	                                      
 	spaceCheck = checkPointSpace();
 	for (i = 0, numSymbols = 0; i < numStrCache; i++) {
 		sym = OSSymbol::withCStringNoCopy(strCache[i]);
@@ -602,8 +602,8 @@ testDictionary()
 	TEST_ASSERT('D', "2g", count1 == numSymbols);
 	res = res && checkSpace("(D)2", spaceCheck, 0);
 
-	// Check the creation of a sizable Dictionary from an array of IOStrings
-	// Also check searching dictionary use OSString for a key.
+	                                                                        
+	                                                          
 	spaceCheck = checkPointSpace();
 	for (i = 0, numSymbols = 0; i < numStrCache; i++) {
 		sym = OSSymbol::withCStringNoCopy(strCache[i]);
@@ -658,9 +658,9 @@ testDictionary()
 	TEST_ASSERT('D', "3h", count1 == numSymbols);
 	res = res && checkSpace("(D)3", spaceCheck, 0);
 
-	// Check the creation of a small dictionary then grow it one item at a time
-	// Create a new dictionary from the old dictionary.
-	// Finally remove each item permanently.
+	                                                                           
+	                                                   
+	                                        
 	spaceCheck = checkPointSpace();
 	for (i = 0, numSymbols = 0; i < numStrCache; i++) {
 		sym = OSSymbol::withCStringNoCopy(strCache[i]);
@@ -751,7 +751,7 @@ testIterator()
 	OSCollectionIterator *iter1, *iter2;
 	int i, numSymbols, count1, count2, count3;
 
-	// Setup symbol and string pools
+	                                
 	for (i = 0, numSymbols = 0; i < numStrCache; i++) {
 		sym = OSSymbol::withCStringNoCopy(strCache[i]);
 		if (1 == sym->getRetainCount()) {
@@ -763,7 +763,7 @@ testIterator()
 		}
 	}
 
-	// Test the array iterator
+	                          
 	spaceCheck = checkPointSpace();
 	iter1 = iter2 = 0;
 	array = OSArray::withCapacity(numSymbols);
@@ -833,7 +833,7 @@ testIterator()
 	}
 	res = res && checkSpace("(I)1", spaceCheck, 0);
 
-	// Test the set iterator
+	                        
 	spaceCheck = checkPointSpace();
 	iter1 = 0;
 	set = OSSet::withCapacity(numSymbols);
@@ -904,7 +904,7 @@ testIterator()
 	}
 	res = res && checkSpace("(I)2", spaceCheck, 0);
 
-	// Test the dictionary iterator
+	                               
 	spaceCheck = checkPointSpace();
 	iter1 = 0;
 	dict = OSDictionary::withCapacity(numSymbols);
@@ -997,4 +997,4 @@ testIterator()
 	}
 }
 
-#endif /* DEBUG */
+#endif            

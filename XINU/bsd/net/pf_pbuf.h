@@ -40,10 +40,10 @@ enum pbuf_action {
 #define PBUF_ACTION_RV_FAILURE  (-1)
 
 struct pbuf_memory {
-	uint8_t *pm_buffer;     // Pointer to start of buffer
-	u_int pm_buffer_len;    // Total length of buffer
-	u_int pm_offset;        // Offset to start of payload
-	u_int pm_len;           // Length of payload
+	uint8_t *pm_buffer;                                  
+	u_int pm_buffer_len;                             
+	u_int pm_offset;                                     
+	u_int pm_len;                               
 	uint32_t pm_csum_flags;
 	uint32_t pm_csum_data;
 	uint8_t pm_proto;
@@ -69,7 +69,7 @@ typedef struct pbuf {
 	uint32_t        pb_packet_len;
 	uint32_t        pb_contig_len;
 	uint32_t        *pb_csum_flags;
-	uint32_t        *pb_csum_data;    /* data field used by csum routines */
+	uint32_t        *pb_csum_data;                                          
 	uint8_t         *pb_proto;
 	uint8_t         *pb_flowsrc;
 	uint32_t        *pb_flowid;
@@ -105,4 +105,4 @@ uint16_t        pbuf_inet6_cksum(const pbuf_t *, uint32_t, uint32_t, uint32_t);
 
 mbuf_svc_class_t pbuf_get_service_class(const pbuf_t *);
 
-#endif /* __PBUF_H__ */
+#endif                 

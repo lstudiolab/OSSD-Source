@@ -73,7 +73,7 @@ typedef struct lockstat_probe {
 
 lockstat_probe_t lockstat_probes[] =
 {
-	// Mutex probes
+	               
 	LOCKSTAT_PROBE(LS_LCK_MTX_LOCK, LSA_ACQUIRE, LS_LCK_MTX_LOCK_ACQUIRE, "lck_mtx_t"),
 	LOCKSTAT_PROBE(LS_LCK_MTX_LOCK, LSA_SPIN, LS_LCK_MTX_LOCK_SPIN, "lck_mtx_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_MTX_LOCK, LSA_BLOCK, LS_LCK_MTX_LOCK_BLOCK, "lck_mtx_t", "uint64_t"),
@@ -81,7 +81,7 @@ lockstat_probe_t lockstat_probes[] =
 	LOCKSTAT_PROBE(LS_LCK_MTX_TRY_SPIN_LOCK, LSA_ACQUIRE, LS_LCK_MTX_TRY_SPIN_LOCK_ACQUIRE, "lck_mtx_t"),
 	LOCKSTAT_PROBE(LS_LCK_MTX_UNLOCK, LSA_RELEASE, LS_LCK_MTX_UNLOCK_RELEASE, "lck_mtx_t"),
 	LOCKSTAT_PROBE(LS_LCK_MTX_LOCK_SPIN_LOCK, LSA_ACQUIRE, LS_LCK_MTX_LOCK_SPIN_ACQUIRE, "lck_mtx_t"),
-	// Extended mutexes are only implemented on Intel
+	                                                 
 #if defined(__x86_64__)
 	LOCKSTAT_PROBE(LS_LCK_MTX_EXT_LOCK, LSA_SPIN, LS_LCK_MTX_EXT_LOCK_SPIN, "lck_mtx_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_MTX_EXT_LOCK, LSA_ACQUIRE, LS_LCK_MTX_EXT_LOCK_ACQUIRE, "lck_mtx_t"),
@@ -89,30 +89,30 @@ lockstat_probe_t lockstat_probes[] =
 	LOCKSTAT_PROBE(LS_LCK_MTX_EXT_UNLOCK, LSA_RELEASE, LS_LCK_MTX_EXT_UNLOCK_RELEASE, "lck_mtx_t"),
 #endif
 
-	// RW lock probes
-	// TODO: This should not be a uint64_t !
+	                 
+	                                        
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_SHARED, LSR_ACQUIRE, LS_LCK_RW_LOCK_SHARED_ACQUIRE, "lck_rw_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_SHARED, LSR_BLOCK, LS_LCK_RW_LOCK_SHARED_BLOCK, "lck_rw_t", "uint64_t", "_Bool", "_Bool", "int"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_SHARED, LSR_SPIN, LS_LCK_RW_LOCK_SHARED_SPIN, "lck_rw_t", "uint64_t", "_Bool", "_Bool", "int"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_EXCL, LSR_ACQUIRE, LS_LCK_RW_LOCK_EXCL_ACQUIRE, "lck_rw_t", "uint64_t"),
-	// TODO: This should NOT be a uint64_t
+	                                      
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_EXCL, LSR_BLOCK, LS_LCK_RW_LOCK_EXCL_BLOCK, "lck_rw_t", "uint64_t", "_Bool", "_Bool", "int"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_EXCL, LSR_SPIN, LS_LCK_RW_LOCK_EXCL_SPIN, "lck_rw_t", "uint64_t", "int"),
 	LOCKSTAT_PROBE(LS_LCK_RW_DONE, LSR_RELEASE, LS_LCK_RW_DONE_RELEASE, "lck_rw_t", "_Bool"),
-	// TODO : This should NOT be a uint64_t
+	                                       
 	LOCKSTAT_PROBE(LS_LCK_RW_TRY_LOCK_SHARED, LSR_ACQUIRE, LS_LCK_RW_TRY_LOCK_SHARED_ACQUIRE, "lck_rw_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_RW_TRY_LOCK_EXCL, LSR_ACQUIRE, LS_LCK_RW_TRY_LOCK_EXCL_ACQUIRE, "lck_rw_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_SHARED_TO_EXCL, LSR_UPGRADE, LS_LCK_RW_LOCK_SHARED_TO_EXCL_UPGRADE, "lck_rw_t", "_Bool"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_SHARED_TO_EXCL, LSR_SPIN, LS_LCK_RW_LOCK_SHARED_TO_EXCL_SPIN, "lck_rw_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_SHARED_TO_EXCL, LSR_BLOCK, LS_LCK_RW_LOCK_SHARED_TO_EXCL_BLOCK, "lck_rw_t", "uint64_t", "_Bool", "_Bool", "int"),
 
-	// Spin lock probes
-	//TODO : Separate the probes for the hw_bit from the probe for the normal hw locks
+	                   
+	                                                                                  
 	LOCKSTAT_PROBE(LS_LCK_SPIN_LOCK, LSS_ACQUIRE, LS_LCK_SPIN_LOCK_ACQUIRE, "hw_lock_t"),
 	LOCKSTAT_PROBE(LS_LCK_SPIN_LOCK, LSS_SPIN, LS_LCK_SPIN_LOCK_SPIN, "hw_lock_t", "uint64_t", "uint64_t"),
 	LOCKSTAT_PROBE(LS_LCK_SPIN_UNLOCK, LSS_RELEASE, LS_LCK_SPIN_UNLOCK_RELEASE, "hw_lock_t"),
 	LOCKSTAT_PROBE(LS_LCK_RW_LOCK_EXCL_TO_SHARED, LSR_DOWNGRADE, LS_LCK_RW_LOCK_EXCL_TO_SHARED_DOWNGRADE, "lck_rw_t"),
-	// Ticket lock probes
+	                     
 	LOCKSTAT_PROBE(LS_LCK_TICKET_LOCK, LST_ACQUIRE, LS_LCK_TICKET_LOCK_ACQUIRE, "lck_ticket_t"),
 	LOCKSTAT_PROBE(LS_LCK_TICKET_LOCK, LST_RELEASE, LS_LCK_TICKET_LOCK_RELEASE, "lck_ticket_t"),
 	LOCKSTAT_PROBE(LS_LCK_TICKET_LOCK, LST_SPIN, LS_LCK_TICKET_LOCK_SPIN, "lck_ticket_t"),
@@ -125,11 +125,11 @@ dtrace_id_t lockstat_probemap[LS_NPROBES];
 
 static dtrace_provider_id_t lockstat_id;
 
-/*ARGSUSED*/
+            
 static int
 lockstat_enable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg) /* __APPLE__ */
+#pragma unused(arg)                
 
 	lockstat_probe_t *probe = parg;
 
@@ -141,11 +141,11 @@ lockstat_enable(void *arg, dtrace_id_t id, void *parg)
 	return 0;
 }
 
-/*ARGSUSED*/
+            
 static void
 lockstat_disable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg, id) /* __APPLE__ */
+#pragma unused(arg, id)                
 
 	lockstat_probe_t *probe = parg;
 
@@ -155,11 +155,11 @@ lockstat_disable(void *arg, dtrace_id_t id, void *parg)
 	membar_producer();
 }
 
-/*ARGSUSED*/
+            
 static void
 lockstat_provide(void *arg, const dtrace_probedesc_t *desc)
 {
-#pragma unused(arg, desc) /* __APPLE__ */
+#pragma unused(arg, desc)                
 
 	int i = 0;
 
@@ -179,7 +179,7 @@ lockstat_provide(void *arg, const dtrace_probedesc_t *desc)
 }
 
 
-/*ARGSUSED*/
+            
 static void
 lockstat_destroy(void *arg, dtrace_id_t id, void *parg)
 {

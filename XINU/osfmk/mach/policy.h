@@ -53,63 +53,63 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _MACH_POLICY_H_
 #define _MACH_POLICY_H_
 
-/*
- *	mach/policy.h
- *
- *	Definitions for scheduing policy.
- */
+  
+                
+  
+                                    
+   
 
-/*
- *  All interfaces defined here are obsolete.
- */
+  
+                                             
+   
 
 #include <mach/boolean.h>
 #include <mach/message.h>
 #include <mach/vm_types.h>
 
-/*
- *	Old scheduling control interface
- */
+  
+                                   
+   
 typedef int                             policy_t;
 typedef integer_t                       *policy_info_t;
 typedef integer_t                       *policy_base_t;
 typedef integer_t                       *policy_limit_t;
 
-/*
- *	Policy definitions.  Policies should be powers of 2,
- *	but cannot be or'd together other than to test for a
- *	policy 'class'.
- */
-#define POLICY_NULL             0       /* none			*/
-#define POLICY_TIMESHARE        1       /* timesharing		*/
-#define POLICY_RR               2       /* fixed round robin	*/
-#define POLICY_FIFO             4       /* fixed fifo		*/
+  
+                                                       
+                                                       
+                  
+   
+#define POLICY_NULL             0                   
+#define POLICY_TIMESHARE        1                         
+#define POLICY_RR               2                              
+#define POLICY_FIFO             4                        
 
 #define __NEW_SCHEDULING_FRAMEWORK__
 
-/*
- *	Check if policy is of 'class' fixed-priority.
- */
+  
+                                                
+   
 #define POLICYCLASS_FIXEDPRI    (POLICY_RR | POLICY_FIFO)
 
-/*
- *	Check if policy is valid.
- */
+  
+                            
+   
 #define invalid_policy(policy)                  \
 	((policy) != POLICY_TIMESHARE &&        \
 	 (policy) != POLICY_RR &&               \
 	 (policy) != POLICY_FIFO)
 
 
-/*
- *      Types for TIMESHARE policy
- */
+  
+                                  
+   
 struct policy_timeshare_base {
 	integer_t               base_priority;
 };
@@ -141,9 +141,9 @@ typedef struct policy_timeshare_info    policy_timeshare_info_data_t;
 	(sizeof(struct policy_timeshare_info)/sizeof(integer_t)))
 
 
-/*
- *	Types for the ROUND ROBIN (RR) policy
- */
+  
+                                        
+   
 struct policy_rr_base {
 	integer_t               base_priority;
 	integer_t               quantum;
@@ -175,9 +175,9 @@ typedef struct policy_rr_info           policy_rr_info_data_t;
 	(sizeof(struct policy_rr_info)/sizeof(integer_t)))
 
 
-/*
- *      Types for the FIRST-IN-FIRST-OUT (FIFO) policy
- */
+  
+                                                      
+   
 struct policy_fifo_base {
 	integer_t               base_priority;
 };
@@ -206,9 +206,9 @@ typedef struct policy_fifo_info         policy_fifo_info_data_t;
 #define POLICY_FIFO_INFO_COUNT  ((mach_msg_type_number_t)       \
 	(sizeof(struct policy_fifo_info)/sizeof(integer_t)))
 
-/*
- *      Aggregate policy types
- */
+  
+                              
+   
 
 struct policy_bases {
 	policy_timeshare_base_data_t    ts;
@@ -232,4 +232,4 @@ typedef struct policy_bases             policy_base_data_t;
 typedef struct policy_limits            policy_limit_data_t;
 typedef struct policy_infos             policy_info_data_t;
 
-#endif  /* _MACH_POLICY_H_ */
+#endif                       

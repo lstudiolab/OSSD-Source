@@ -28,10 +28,10 @@ _SYSREG_TO_DOCNAME_MAP = {
     'ESR_EL1': 'AArch64-esr_el1.xml'
 }
 
-## Actual definition at the bottom of the file
+                                              
 _SYSREG_TO_DECODE_FUNC_MAP = None
 
-# Macro: decode_sysreg
+                      
 @lldb_command('decode_sysreg')
 def DecodeSysreg(cmd_args=None):
     """ Print out human-understandable explanation of a system register value
@@ -42,7 +42,7 @@ def DecodeSysreg(cmd_args=None):
         ESR_EL1
     """
 
-    ## For now, require exactly 2 arguments
+                                           
     if not cmd_args or len(cmd_args) != 2:
         raise ArgumentError("Missing arguments.")
 
@@ -53,7 +53,7 @@ def DecodeSysreg(cmd_args=None):
         raise ArgumentError("{} is not supported".format(reg_name))
 
     _SYSREG_TO_DECODE_FUNC_MAP[reg_name](reg_value)
-# EndMacro: decode_sysreg
+                         
 
 
 lldb_alias('decode_esr', 'decode_sysreg esr_el1')
@@ -157,7 +157,7 @@ def _PrintEsrIssField(elem, regval):
             print '\r\n'
             print '\r\n'
 
-        ## Dump all possible values
+                                   
         all_field_values = elem.findall('./field_values/field_value_instance//field_value')
         all_field_values_str = [fv.text for fv in all_field_values]
         if all_field_values_str != []:

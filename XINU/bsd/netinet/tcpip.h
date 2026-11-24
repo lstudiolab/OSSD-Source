@@ -65,23 +65,23 @@
 #define _NETINET_TCPIP_H_
 #include <sys/appleapiopts.h>
 #include <netinet/ip_var.h>
-/*
- * Tcp+ip header, after ip options removed.
- */
+  
+                                           
+   
 struct tcpiphdr {
-	struct  ipovly ti_i;            /* overlaid ip structure */
-	struct  tcphdr ti_t;            /* tcp header */
+	struct  ipovly ti_i;                                       
+	struct  tcphdr ti_t;                            
 };
 #ifdef notyet
-/*
- * Tcp+ip header, after ip options removed but including TCP options.
- */
+  
+                                                                     
+   
 struct full_tcpiphdr {
-	struct  ipovly ti_i;            /* overlaid ip structure */
-	struct  tcphdr ti_t;            /* tcp header */
-	char    ti_o[TCP_MAXOLEN];      /* space for tcp options */
+	struct  ipovly ti_i;                                       
+	struct  tcphdr ti_t;                            
+	char    ti_o[TCP_MAXOLEN];                                 
 };
-#endif /* notyet */
+#endif             
 #define ti_x1           ti_i.ih_x1
 #define ti_pr           ti_i.ih_pr
 #define ti_len          ti_i.ih_len

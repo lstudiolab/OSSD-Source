@@ -26,28 +26,28 @@
 #include <config.h>
 
 
-/*
- * Config has a global notion of which machine type is
- * being used.  It uses the name of the machine in choosing
- * files and directories.  Thus if the name of the machine is ``vax'',
- * it will build from ``Makefile.vax'' and use ``../vax/inline''
- * in the makerules, etc.
- */
+  
+                                                      
+                                                           
+                                                                      
+                                                                
+                         
+   
 const char      *machinename;
 
-/*
- * In order to configure and build outside the kernel source tree,
- * we may wish to specify where the source tree lives.
- */
+  
+                                                                  
+                                                      
+   
 const char *source_directory;
 const char *object_directory;
 char *config_directory;
 
-/*
- * A set of options may also be specified which are like CPU types,
- * but which may also specify values for the options.
- * A separate set of options may be defined for make-style options.
- */
+  
+                                                                   
+                                                     
+                                                                   
+   
 struct opt *opt, *mkopt, *opt_tail, *mkopt_tail;
 
 int     do_trace;

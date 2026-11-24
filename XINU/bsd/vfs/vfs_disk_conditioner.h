@@ -37,6 +37,6 @@ int disk_conditioner_set_info(mount_t, disk_conditioner_info *);
 
 boolean_t disk_conditioner_mount_is_ssd(mount_t);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* !_VFS_DISK_CONDITIONER_H_ */
+#endif                                

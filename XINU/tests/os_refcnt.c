@@ -22,7 +22,7 @@ void handle_panic(const char *func, char *str, ...);
 
 T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
-/* import some of the refcnt internal state for testing */
+                                                          
 extern bool ref_debug_enable;
 os_refgrp_decl_extern(global_ref_group);
 

@@ -42,14 +42,14 @@
 
 kern_return_t ptrauth_data_tests(void);
 
-/*
- * Given an existing PAC pointer (ptr), its declaration type (decl), the (key)
- * used to sign it and the string discriminator (discr), extract the raw pointer
- * along with the signature and compare it with one computed on the fly
- * via ptrauth_sign_unauthenticated().
- *
- * If the two mismatch, return an error and fail the test.
- */
+  
+                                                                              
+                                                                                
+                                                                       
+                                      
+  
+                                                          
+   
 #define VALIDATE_PTR(decl, ptr, key, discr) { \
 	decl raw = *(decl *)&(ptr);      \
 	decl cmp = ptrauth_sign_unauthenticated(ptr, key, \
@@ -60,10 +60,10 @@ kern_return_t ptrauth_data_tests(void);
 	} \
 }
 
-/*
- * Allocate the containing structure, and store a pointer to the desired member,
- * which should be subject to pointer signing.
- */
+  
+                                                                                
+                                              
+   
 #define ALLOC_VALIDATE_DATA_PTR(structure, decl, member, discr) { \
 	structure *tmp =  kheap_alloc(KHEAP_TEMP, sizeof(structure), Z_WAITOK | Z_ZERO); \
 	if (!tmp) return KERN_NO_SPACE; \
@@ -74,16 +74,16 @@ kern_return_t ptrauth_data_tests(void);
 
 #define VALIDATE_DATA_PTR(decl, ptr, discr) VALIDATE_PTR(decl, ptr, ptrauth_key_process_independent_data, discr)
 
-/*
- * Validate that a pointer that is supposed to be signed, is, and that the signature
- * matches based on signing key, location and discriminator
- */
+  
+                                                                                    
+                                                           
+   
 kern_return_t
 ptrauth_data_tests(void)
 {
 	int kr = KERN_SUCCESS;
 
-	/* task_t */
+	            
 	ALLOC_VALIDATE_DATA_PTR(struct task, vm_map_t, map, "task.map");
 	ALLOC_VALIDATE_DATA_PTR(struct task, struct ipc_port *, itk_task_ports[0], "task.itk_task_ports");
 	ALLOC_VALIDATE_DATA_PTR(struct task, struct ipc_port *, itk_settable_self, "task.itk_settable_self");
@@ -97,24 +97,24 @@ ptrauth_data_tests(void)
 	ALLOC_VALIDATE_DATA_PTR(struct task, struct ipc_port *, itk_resume, "task.itk_resume");
 	ALLOC_VALIDATE_DATA_PTR(struct task, struct ipc_port *, itk_seatbelt, "task.itk_seatbelt");
 
-	/* _vm_map */
+	             
 	ALLOC_VALIDATE_DATA_PTR(struct _vm_map, pmap_t, pmap, "_vm_map.pmap");
 
-	/* pmap */
+	          
 	ALLOC_VALIDATE_DATA_PTR(struct pmap, tt_entry_t *, tte, "pmap.tte");
 	ALLOC_VALIDATE_DATA_PTR(struct pmap, pmap_t, nested_pmap, "pmap.nested_pmap");
 
-	/* ipc_port */
+	              
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_port, ipc_kobject_t, ip_kobject, "ipc_port.kobject");
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_port, ipc_kobject_label_t, ip_kolabel, "ipc_port.kolabel");
 
-	/* ipc_kobject_label */
+	                       
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_kobject_label, ipc_kobject_t, ikol_kobject, "ipc_kobject_label.ikol_kobject");
 
-	/* ipc_entry */
+	               
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_entry, struct ipc_object *, ie_object, "ipc_entry.ie_object");
 
-	/* ipc_kmsg */
+	              
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_kmsg, struct ipc_port *, ikm_prealloc, "kmsg.ikm_prealloc");
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_kmsg, void *, ikm_data, "kmsg.ikm_data");
 	ALLOC_VALIDATE_DATA_PTR(struct ipc_kmsg, mach_msg_header_t *, ikm_header, "kmsg.ikm_header");
@@ -123,5 +123,5 @@ ptrauth_data_tests(void)
 	return kr;
 }
 
-#endif /*  __has_feature(ptrauth_calls) */
-#endif /* DEVELOPMENT || DEBUG */
+#endif                                    
+#endif                           

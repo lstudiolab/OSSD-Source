@@ -44,22 +44,22 @@
 #include <UserNotification/KUNCUserNotifications.h>
 
 #ifdef KERNEL_CF
-// external
+           
 #include <IOKit/IOCFSerialize.h>
 #include <IOKit/IOCFUnserialize.h>
 #endif
 
 #if CONFIG_USER_NOTIFICATION
-/*
- * DEFINES AND STRUCTURES
- */
+  
+                         
+   
 
 struct UNDReply {
-	decl_lck_mtx_data(, lock);                               /* UNDReply lock */
+	decl_lck_mtx_data(, lock);                                                  
 	int                             userLandNotificationKey;
 	KUNCUserNotificationCallBack    callback;
 	boolean_t                       inprogress;
-	ipc_port_t                      self_port;      /* Our port */
+	ipc_port_t                      self_port;                    
 };
 
 #define UNDReply_lock(reply)            lck_mtx_lock(&reply->lock)
@@ -67,7 +67,7 @@ struct UNDReply {
 
 extern lck_grp_t LockCompatGroup;
 
-/* forward declarations */
+                          
 void UNDReply_deallocate(
 	UNDReplyRef             reply);
 
@@ -111,15 +111,15 @@ UNDServer_deallocate(
 	}
 }
 
-/*
- * UND Mig Callbacks
- */
+  
+                    
+   
 
 kern_return_t
 UNDAlertCompletedWithResult_rpc(
 	UNDReplyRef             reply,
 	int                     result,
-	xmlData_t               keyRef,         /* raw XML bytes */
+	xmlData_t               keyRef,                            
 #ifdef KERNEL_CF
 	mach_msg_type_number_t  keyLen)
 #else
@@ -137,11 +137,11 @@ UNDAlertCompletedWithResult_rpc(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/*
-	 * JMM - No C vesion of the Unserialize code in-kernel
-	 * and no C type for a CFDictionary either.  For now,
-	 * just pass the raw keyRef through.
-	 */
+	  
+                                                       
+                                                      
+                                     
+    
 #ifdef KERNEL_CF
 	if (keyRef && keyLen) {
 		dict = IOCFUnserialize(keyRef, NULL, NULL, &xmlError);
@@ -151,7 +151,7 @@ UNDAlertCompletedWithResult_rpc(
 		CFShow(xmlError);
 		CFRelease(xmlError);
 	}
-#endif /* KERNEL_CF */
+#endif                
 
 	if (reply->callback) {
 		(reply->callback)((int)(KUNCUserNotificationID)reply, result, dict);
@@ -165,14 +165,14 @@ UNDAlertCompletedWithResult_rpc(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine: UNDNotificationCreated_rpc
- *
- *		Intermediate routine.  Allows the kernel mechanism
- *		to be informed that the notification request IS
- *		being processed by the user-level daemon, and how
- *		to identify that request.
- */
+  
+                                      
+  
+                                                      
+                                                   
+                                                     
+                             
+   
 kern_return_t
 UNDNotificationCreated_rpc(
 	UNDReplyRef     reply,
@@ -192,9 +192,9 @@ UNDNotificationCreated_rpc(
 	return KERN_SUCCESS;
 }
 
-/*
- * KUNC Functions
- */
+  
+                 
+   
 
 
 KUNCUserNotificationID
@@ -382,15 +382,15 @@ KUNCUserNotificationDisplayFromBundle(
 	return MACH_SEND_INVALID_DEST;
 }
 
-/*
- *	Routine: convert_port_to_UNDReply
- *
- *		MIG helper routine to convert from a mach port to a
- *		UNDReply object.
- *
- *	Assumptions:
- *		Nothing locked.
- */
+  
+                                    
+  
+                                                       
+                    
+  
+               
+                   
+   
 UNDReplyRef
 convert_port_to_UNDReply(
 	ipc_port_t port)
@@ -412,9 +412,9 @@ convert_port_to_UNDReply(
 }
 #endif
 
-/*
- *      User interface for setting the host UserNotification Daemon port.
- */
+  
+                                                                         
+   
 
 kern_return_t
 host_set_UNDServer(
@@ -429,9 +429,9 @@ host_set_UNDServer(
 #endif
 }
 
-/*
- *      User interface for retrieving the UserNotification Daemon port.
- */
+  
+                                                                       
+   
 
 kern_return_t
 host_get_UNDServer(

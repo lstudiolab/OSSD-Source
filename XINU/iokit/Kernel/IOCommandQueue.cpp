@@ -51,7 +51,7 @@
 #define IOStatisticsInitializeCounter()
 #define IOStatisticsActionCall()
 
-#endif /* IOKITSTATS */
+#endif                 
 
 #define NUM_FIELDS_IN_COMMAND   4
 typedef struct commandEntryTag {
@@ -62,25 +62,25 @@ typedef struct commandEntryTag {
 
 OSDefineMetaClassAndStructors(IOCommandQueue, IOEventSource)
 
-/*[
- *  Instance Methods
- *
- *  initWithNext:owner:action:size:
- *   - initWithNext: (IOEventSource *) inNext
- *           owner: (id) inOwner
- *           action: (SEL) inAction
- *             size: (int) inSize;
- *
- *  Primary initialiser for the IOCommandQueue class.  Returns an
- *  IOCommandQueue object that is initialised with the next object in
- *  the chain and the owner and action. On return the signalWorkAvailableIMP
- *  has been cached for this function.
- *
- *  If the object fails to initialise for some reason then [self free] will
- *  be called and nil will be returned.
- *
- *  See also: initWithNext:owner:action:(IOEventSource)
- *  ]*/
+   
+                    
+  
+                                   
+                                             
+                                
+                                   
+                                  
+  
+                                                                 
+                                                                     
+                                                                            
+                                      
+  
+                                                                           
+                                       
+  
+                                                       
+       
 bool
 IOCommandQueue::init(OSObject *inOwner,
     IOCommandQueueAction inAction,
@@ -95,7 +95,7 @@ IOCommandQueue::init(OSObject *inOwner,
 		return false;
 	}
 
-	size = inSize + 1; /* Allocate one more entry than needed */
+	size = inSize + 1;                                          
 
 	queue = (void *)kalloc(size * sizeof(commandEntryT));
 	if (!queue) {
@@ -129,13 +129,13 @@ IOCommandQueue::commandQueue(OSObject *inOwner,
 	return me;
 }
 
-/*[
- *  free
- *   - free
- *
- *  Mandatory free of the object independent of the current retain count.
- *  Returns nil.
- *  ]*/
+   
+        
+           
+  
+                                                                         
+                
+       
 void
 IOCommandQueue::free()
 {
@@ -195,22 +195,22 @@ IOCommandQueue::checkForWork()
 	return consumerIndex != producerIndex;
 }
 
-/*[
- *  enqueueSleep:command:
- *   - (kern_return_t) enqueueSleepRaw: (BOOL) gotoSleep
- *                              field0: (void *) field0 field1: (void *) field1
- *                              field2: (void *) field2 field3: (void *) field3;
- *
- *  Key method that enqueues the four input fields onto the command queue
- *  and calls signalWorkAvailable to indicate that work is available to the
- *  consumer.  This routine is safe against multiple threaded producers.
- *
- *  A family of convenience functions have been provided to assist with the
- *  enqueueing of an method selector and an integer tag.  This relies on the
- *  IODevice rawCommandOccurred... command to forward on the requests.
- *
- *  See also: signalWorkAvailable, checkForWork
- *  ]*/
+   
+                         
+                                                        
+                                                                               
+                                                                                
+  
+                                                                         
+                                                                           
+                                                                        
+  
+                                                                           
+                                                                            
+                                                                      
+  
+                                               
+       
 #if NUM_FIELDS_IN_COMMAND != 4
 #error IOCommandQueue::enqueueCommand needs to be updated
 #endif
@@ -223,7 +223,7 @@ IOCommandQueue::enqueueCommand(bool gotoSleep,
 	kern_return_t rtn = KERN_SUCCESS;
 	int retry;
 
-	/* Make sure there is room in the queue before doing anything else */
+	                                                                     
 
 	if (gotoSleep) {
 		retry = 0;
@@ -242,14 +242,14 @@ IOCommandQueue::enqueueCommand(bool gotoSleep,
 		return rtn;
 	}
 
-	/* Block other producers */
+	                           
 	IOTakeLock(producerLock);
 
-	/*
-	 * Make sure that we update the current producer entry before we
-	 * increment the producer pointer.  This avoids a nasty race as the
-	 * test for work is producerIndex != consumerIndex and a signal.
-	 */
+	  
+                                                                 
+                                                                    
+                                                                 
+    
 	{
 		commandEntryT *q = (commandEntryT *) queue;
 		int localIndex = producerIndex;
@@ -261,13 +261,13 @@ IOCommandQueue::enqueueCommand(bool gotoSleep,
 		producerIndex = 0;
 	}
 
-	/* Clear to allow other producers to go now */
+	                                              
 	IOUnlock(producerLock);
 
-	/*
-	 * Right we have created some new work, we had better make sure that
-	 * we notify the work loop that it has to test producerIndex.
-	 */
+	  
+                                                                     
+                                                              
+    
 	signalWorkAvailable();
 	return rtn;
 }
@@ -279,7 +279,7 @@ IOCommandQueue::performAndFlush(OSObject *target,
 	int numEntries;
 	kern_return_t rtn;
 
-	// Set the defaults if necessary
+	                                
 	if (!target) {
 		target = owner;
 	}
@@ -287,12 +287,12 @@ IOCommandQueue::performAndFlush(OSObject *target,
 		inAction = (IOCommandQueueAction) action;
 	}
 
-	// Lock out the producers first
+	                               
 	do {
 		rtn = semaphore_timedwait(producerSema, MACH_TIMESPEC_ZERO);
 	} while (rtn == KERN_SUCCESS);
 
-	// now step over all remaining entries in the command queue
+	                                                           
 	for (numEntries = 0; consumerIndex != producerIndex;) {
 		void *field0, *field1, *field2, *field3;
 
@@ -311,7 +311,7 @@ IOCommandQueue::performAndFlush(OSObject *target,
 		(*inAction)(target, field0, field1, field2, field3);
 	}
 
-	// finally refill the producer semaphore to size - 1
+	                                                    
 	for (int i = 1; i < size; i++) {
 		semaphore_signal(producerSema);
 	}
@@ -319,4 +319,4 @@ IOCommandQueue::performAndFlush(OSObject *target,
 	return numEntries;
 }
 
-#endif /* !defined(__LP64__) */
+#endif                         

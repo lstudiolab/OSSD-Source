@@ -13,7 +13,7 @@ T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 #define CS_OPS_CLEARPLATFORM 13
 #endif
 
-#define WINDOW 1 /* seconds */
+#define WINDOW 1              
 #define MAX_ATTEMP_PER_SEC 10
 #define ITER 30
 #define RETRY 5
@@ -72,7 +72,7 @@ check_host_info(struct all_host_info* data, unsigned long iter, char lett)
 	char* datap;
 	unsigned long i, j;
 
-	/* check that for the shorter revisions no data is copied on the bytes of diff with the longer */
+	                                                                                                 
 	for (j = 0; j < iter; j++) {
 		datap = (char*) &data[j].host_vm_info64_rev0;
 		for (i = (HOST_VM_INFO64_REV0_COUNT * sizeof(int)); i < (HOST_VM_INFO64_REV1_COUNT * sizeof(int)); i++) {
@@ -98,7 +98,7 @@ check_host_info(struct all_host_info* data, unsigned long iter, char lett)
 
 	datap = (char*) data;
 
-	/* check that after MAX_ATTEMP_PER_SEC data are all the same */
+	                                                               
 	for (i = 0; i < sizeof(struct all_host_info); i++) {
 		for (j = MAX_ATTEMP_PER_SEC - 1; j < iter - 1; j++) {
 			T_QUIET; T_ASSERT_EQ(datap[i + (j * sizeof(struct all_host_info))], datap[i + ((j + 1) * sizeof(struct all_host_info))], "all_host_info iter %lu does not match iter %lu", j, j + 1);
@@ -154,7 +154,7 @@ T_DECL(test_host_statistics, "testing rate limit for host_statistics",
 	data = malloc(ITER * sizeof(struct all_host_info));
 	T_QUIET; T_ASSERT_NE(data, NULL, "malloc");
 
-	/* check the size of the data structure against the bytes in COUNT*/
+	                                                                    
 	T_QUIET; T_ASSERT_EQ(sizeof(data[0].host_vm_info64_rev0), HOST_VM_INFO64_COUNT * sizeof(int), "HOST_VM_INFO64_COUNT");
 	T_QUIET; T_ASSERT_EQ(sizeof(data[0].host_extmod_info64), HOST_EXTMOD_INFO64_COUNT * sizeof(int), "HOST_EXTMOD_INFO64_COUNT");
 	T_QUIET; T_ASSERT_EQ(sizeof(data[0].host_load_info), HOST_LOAD_INFO_COUNT * sizeof(int), "HOST_LOAD_INFO_COUNT");
@@ -162,11 +162,11 @@ T_DECL(test_host_statistics, "testing rate limit for host_statistics",
 	T_QUIET; T_ASSERT_EQ(sizeof(data[0].host_cpu_load_info), HOST_CPU_LOAD_INFO_COUNT * sizeof(int), "HOST_CPU_LOAD_INFO_COUNT");
 	T_QUIET; T_ASSERT_EQ(sizeof(data[0].host_expired_task_info2), TASK_POWER_INFO_V2_COUNT * sizeof(int), "TASK_POWER_INFO_V2_COUNT");
 
-	/* check that the latest revision is the COUNT */
+	                                                 
 	T_QUIET; T_ASSERT_EQ(HOST_VM_INFO64_REV1_COUNT, HOST_VM_INFO64_COUNT, "HOST_VM_INFO64_REV1_COUNT");
 	T_QUIET; T_ASSERT_EQ(HOST_VM_INFO_REV2_COUNT, HOST_VM_INFO_COUNT, "HOST_VM_INFO_REV2_COUNT");
 
-	/* check that the previous revision are smaller than the latest */
+	                                                                  
 	T_QUIET; T_ASSERT_LE(HOST_VM_INFO64_REV0_COUNT, HOST_VM_INFO64_REV1_COUNT, "HOST_VM_INFO64_REV0");
 	T_QUIET; T_ASSERT_LE(HOST_VM_INFO_REV0_COUNT, HOST_VM_INFO_REV2_COUNT, "HOST_VM_INFO_REV0_COUNT");
 	T_QUIET; T_ASSERT_LE(HOST_VM_INFO_REV1_COUNT, HOST_VM_INFO_REV2_COUNT, "HOST_VM_INFO_REV1_COUNT");
@@ -179,7 +179,7 @@ T_DECL(test_host_statistics, "testing rate limit for host_statistics",
 	window = (WINDOW * NSEC_PER_SEC * timebaseInfo.denom) / timebaseInfo.numer;
 	retry = 0;
 
-	/* try to get ITER copies of host_info within window time, in such a way we should hit for sure a cached copy */
+	                                                                                                                
 	do {
 		start = mach_continuous_time();
 		get_host_info(data, self, ITER);

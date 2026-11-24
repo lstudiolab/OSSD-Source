@@ -153,4 +153,4 @@ public:
 	OSMetaClassDeclareReservedUnused(IOCPUInterruptController, 5);
 };
 
-#endif /* ! _IOKIT_CPU_H */
+#endif                     

@@ -16,19 +16,19 @@
 
 T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
-/*
- * Test to validate that suspended-spawn DTRTs when a SIGKILL is recieved
- * while the process is waiting for SIGCONT.
- *
- * Also test that suspended-spawn correctly looks like a SIGSTOP while it's suspended.
- *
- * <rdar://problem/26184412> posix_spawn non-exec with POSIX_SPAWN_START_SUSPENDED, then killing instead of SIGCONT-ing causes unkillable hung processes
- */
+  
+                                                                         
+                                            
+  
+                                                                                      
+  
+                                                                                                                                                        
+   
 
 static void
 spawn_and_signal(int signal)
 {
-	/* do not buffer output to stdout */
+	                                    
 	setvbuf(stdout, NULL, _IONBF, 0);
 
 	int ret;

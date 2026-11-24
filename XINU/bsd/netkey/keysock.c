@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$KAME: keysock.c,v 1.13 2000/03/25 07:24:13 sumikawa Exp $	*/
+                                                                
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -57,7 +57,7 @@
  * SUCH DAMAGE.
  */
 
-/* This code has derived from sys/net/rtsock.c on FreeBSD2.2.5 */
+                                                                 
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -99,12 +99,12 @@ static struct domain *keydomain = NULL;
 
 extern lck_mtx_t *pfkey_stat_mutex;
 
-/*
- * key_output()
- */
+  
+               
+   
 int
 #ifdef __APPLE__
-/* No variable argument support? */
+                                   
 key_output(struct mbuf *m, struct socket *so)
 #else
 #if __STDC__
@@ -164,7 +164,7 @@ va_dcl
 
 #if IPSEC_DEBUG
 	KEYDEBUG(KEYDEBUG_KEY_DUMP, kdebug_mbuf(m));
-#endif /* defined(IPSEC_DEBUG) */
+#endif                           
 
 	msg = mtod(m, struct sadb_msg *);
 	PFKEY_STAT_INCREMENT(pfkeystat.out_msgtype[msg->sadb_msg_type]);
@@ -188,9 +188,9 @@ end:
 	return error;
 }
 
-/*
- * send message to the socket.
- */
+  
+                              
+   
 static int
 key_sendup0(struct rawcb *rp, struct mbuf *m, int promisc)
 {
@@ -219,7 +219,7 @@ key_sendup0(struct rawcb *rp, struct mbuf *m, int promisc)
 		pmsg->sadb_msg_version = PF_KEY_V2;
 		pmsg->sadb_msg_type = SADB_X_PROMISC;
 		pmsg->sadb_msg_len = (u_int16_t)PFKEY_UNIT64(m->m_pkthdr.len);
-		/* pid and seq? */
+		                  
 
 		PFKEY_STAT_INCREMENT(pfkeystat.in_msgtype[pmsg->sadb_msg_type]);
 	}
@@ -237,7 +237,7 @@ key_sendup0(struct rawcb *rp, struct mbuf *m, int promisc)
 }
 
 
-/* so can be NULL if target != KEY_SENDUP_ONE */
+                                                
 int
 key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 {
@@ -266,7 +266,7 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 			return ENOBUFS;
 		}
 #else
-		/* don't bother pulling it up just for stats */
+		                                               
 #endif
 	}
 	if (m->m_len >= sizeof(struct sadb_msg)) {
@@ -289,11 +289,11 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 		kp = (struct keycb *)rp;
 
 		socket_lock(rp->rcb_socket, 1);
-		/*
-		 * If you are in promiscuous mode, and when you get broadcasted
-		 * reply, you'll get two PF_KEY messages.
-		 * (based on pf_key@inner.net message on 14 Oct 1998)
-		 */
+		  
+                                                                 
+                                           
+                                                       
+     
 		if (((struct keycb *)rp)->kp_promisc) {
 			if ((n = m_copy(m, 0, (int)M_COPYALL)) != NULL) {
 				(void)key_sendup0(rp, n, 1);
@@ -301,7 +301,7 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 			}
 		}
 
-		/* the exact target will be processed later */
+		                                              
 		if (so && sotorawcb(so) == rp) {
 			socket_unlock(rp->rcb_socket, 1);
 			continue;
@@ -310,7 +310,7 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 		sendup = 0;
 		switch (target) {
 		case KEY_SENDUP_ONE:
-			/* the statement has no effect */
+			                                 
 			break;
 		case KEY_SENDUP_ALL:
 			sendup++;
@@ -327,7 +327,7 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 			socket_unlock(rp->rcb_socket, 1);
 			continue;
 		} else {
-			sendup = 0;  // clear for next iteration
+			sendup = 0;                             
 		}
 		if ((n = m_copy(m, 0, (int)M_COPYALL)) == NULL) {
 #if IPSEC_DEBUG
@@ -340,11 +340,11 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 			return ENOBUFS;
 		}
 
-		/*
-		 * ignore error even if queue is full.  PF_KEY does not
-		 * guarantee the delivery of the message.
-		 * this is important when target == KEY_SENDUP_ALL.
-		 */
+		  
+                                                         
+                                           
+                                                     
+     
 		key_sendup0(rp, n, 0);
 		socket_unlock(rp->rcb_socket, 1);
 		n = NULL;
@@ -363,10 +363,10 @@ key_sendup_mbuf(struct socket *so, struct mbuf *m, int target)
 	return error;
 }
 
-/*
- * key_abort()
- * derived from net/rtsock.c:rts_abort()
- */
+  
+              
+                                        
+   
 static int
 key_abort(struct socket *so)
 {
@@ -375,10 +375,10 @@ key_abort(struct socket *so)
 	return error;
 }
 
-/*
- * key_attach()
- * derived from net/rtsock.c:rts_attach()
- */
+  
+               
+                                         
+   
 static int
 key_attach(struct socket *so, int proto, struct proc *p)
 {
@@ -386,10 +386,10 @@ key_attach(struct socket *so, int proto, struct proc *p)
 	int error;
 
 	if (sotorawcb(so) != 0) {
-		return EISCONN; /* XXX panic? */
+		return EISCONN;                 
 	}
 	kp = (struct keycb *)_MALLOC(sizeof(*kp), M_PCB,
-	    M_WAITOK | M_ZERO); /* XXX */
+	    M_WAITOK | M_ZERO);          
 	if (kp == 0) {
 		return ENOBUFS;
 	}
@@ -409,8 +409,8 @@ key_attach(struct socket *so, int proto, struct proc *p)
 		return error;
 	}
 
-	/* so is already locked when calling key_attach */
-	if (kp->kp_raw.rcb_proto.sp_protocol == PF_KEY) { /* XXX: AF_KEY */
+	                                                  
+	if (kp->kp_raw.rcb_proto.sp_protocol == PF_KEY) {                  
 		key_cb.key_count++;
 	}
 	key_cb.any_count++;
@@ -420,34 +420,34 @@ key_attach(struct socket *so, int proto, struct proc *p)
 	return 0;
 }
 
-/*
- * key_bind()
- * derived from net/rtsock.c:rts_bind()
- */
+  
+             
+                                       
+   
 static int
 key_bind(struct socket *so, struct sockaddr *nam, struct proc *p)
 {
 	int error;
-	error = raw_usrreqs.pru_bind(so, nam, p); /* xxx just EINVAL */
+	error = raw_usrreqs.pru_bind(so, nam, p);                      
 	return error;
 }
 
-/*
- * key_connect()
- * derived from net/rtsock.c:rts_connect()
- */
+  
+                
+                                          
+   
 static int
 key_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 {
 	int error;
-	error = raw_usrreqs.pru_connect(so, nam, p); /* XXX just EINVAL */
+	error = raw_usrreqs.pru_connect(so, nam, p);                      
 	return error;
 }
 
-/*
- * key_detach()
- * derived from net/rtsock.c:rts_detach()
- */
+  
+               
+                                         
+   
 static int
 key_detach(struct socket *so)
 {
@@ -455,7 +455,7 @@ key_detach(struct socket *so)
 	int error;
 
 	if (kp != 0) {
-		if (kp->kp_raw.rcb_proto.sp_protocol == PF_KEY) { /* XXX: AF_KEY */
+		if (kp->kp_raw.rcb_proto.sp_protocol == PF_KEY) {                  
 			key_cb.key_count--;
 		}
 		key_cb.any_count--;
@@ -467,10 +467,10 @@ key_detach(struct socket *so)
 	return error;
 }
 
-/*
- * key_disconnect()
- * derived from net/rtsock.c:key_disconnect()
- */
+  
+                   
+                                             
+   
 static int
 key_disconnect(struct socket *so)
 {
@@ -479,10 +479,10 @@ key_disconnect(struct socket *so)
 	return error;
 }
 
-/*
- * key_peeraddr()
- * derived from net/rtsock.c:rts_peeraddr()
- */
+  
+                 
+                                           
+   
 static int
 key_peeraddr(struct socket *so, struct sockaddr **nam)
 {
@@ -491,10 +491,10 @@ key_peeraddr(struct socket *so, struct sockaddr **nam)
 	return error;
 }
 
-/*
- * key_send()
- * derived from net/rtsock.c:rts_send()
- */
+  
+             
+                                       
+   
 static int
 key_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam,
     struct mbuf *control, struct proc *p)
@@ -504,10 +504,10 @@ key_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam,
 	return error;
 }
 
-/*
- * key_shutdown()
- * derived from net/rtsock.c:rts_shutdown()
- */
+  
+                 
+                                           
+   
 static int
 key_shutdown(struct socket *so)
 {
@@ -516,10 +516,10 @@ key_shutdown(struct socket *so)
 	return error;
 }
 
-/*
- * key_sockaddr()
- * derived from net/rtsock.c:rts_sockaddr()
- */
+  
+                 
+                                           
+   
 static int
 key_sockaddr(struct socket *so, struct sockaddr **nam)
 {
@@ -543,12 +543,12 @@ static struct pr_usrreqs key_usrreqs = {
 	.pru_soreceive =        soreceive,
 };
 
-/* sysctl */
+            
 SYSCTL_NODE(_net, PF_KEY, key, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "Key Family");
 
-/*
- * Definitions of protocols supported in the KEY domain.
- */
+  
+                                                        
+   
 
 extern struct domain keydomain_s;
 

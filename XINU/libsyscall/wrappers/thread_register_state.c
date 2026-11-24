@@ -65,9 +65,9 @@ thread_get_register_pointer_values(thread_t thread, uintptr_t *sp, size_t *lengt
 		return ret;
 	}
 
-	// If the provided pointer value is > PAGE_SIZE, add it to the output array
-	// if there's available space.  (Values between 0 and PAGE_SIZE are the NULL page
-	// and not valid pointers.)
+	                                                                           
+	                                                                                 
+	                           
 #define push_register_value(p) do { \
     if ((uintptr_t)p > PAGE_SIZE) { \
 	if (out_length < in_length && values) \
@@ -90,7 +90,7 @@ thread_get_register_pointer_values(thread_t thread, uintptr_t *sp, size_t *lengt
 #elif defined(__x86_64__)
 	if (sp) {
 		if (state.__rsp > 128) {
-			*sp = state.__rsp - 128 /* redzone */;
+			*sp = state.__rsp - 128              ;
 		} else {
 			*sp = 0;
 		}
@@ -124,7 +124,7 @@ thread_get_register_pointer_values(thread_t thread, uintptr_t *sp, size_t *lengt
 	if (sp) {
 		uintptr_t __sp = arm_thread_state64_get_sp(state);
 		if (__sp > 128) {
-			*sp = __sp - 128 /* redzone */;
+			*sp = __sp - 128              ;
 		} else {
 			*sp = 0;
 		}

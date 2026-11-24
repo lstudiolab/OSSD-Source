@@ -21,51 +21,51 @@
 #include <sys/tty.h>
 #include <sys/conf.h>
 
-/* Prototypes that should be elsewhere: */
+                                          
 extern dev_t    chrtoblk(dev_t dev);
 extern int      chrtoblk_set(int cdev, int bdev);
 
 struct bdevsw   bdevsw[] =
 {
-	/*
-	 *	For block devices, every other block of 8 slots is
-	 *	reserved to NeXT.  The other slots are available for
-	 *	the user.  This way we can both add new entries without
-	 *	running into each other.  Be sure to fill in NeXT's
-	 *	8 reserved slots when you jump over us -- we'll do the
-	 *	same for you.
-	 */
+	  
+                                                      
+                                                        
+                                                           
+                                                       
+                                                          
+                 
+    
 
-	/* 0 - 7 are reserved to NeXT */
+	                                
 
-	NO_BDEVICE,             /* 0 */
-	NO_BDEVICE,             /* 1 */
-	NO_BDEVICE,             /* 2 */
-	NO_BDEVICE,             /* 3 */
-	NO_BDEVICE,             /* 4 */
-	NO_BDEVICE,             /* 5 */
-	NO_BDEVICE,             /* 6 */
-	NO_BDEVICE,             /* 7 */
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
 
-	/* 8 - 15 are reserved to the user */
-	NO_BDEVICE,             /* 8 */
-	NO_BDEVICE,             /* 9 */
-	NO_BDEVICE,             /* 10 */
-	NO_BDEVICE,             /* 11 */
-	NO_BDEVICE,             /* 12 */
-	NO_BDEVICE,             /* 13 */
-	NO_BDEVICE,             /* 14 */
-	NO_BDEVICE,             /* 15 */
+	                                     
+	NO_BDEVICE,                    
+	NO_BDEVICE,                    
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
 
-	/* 16 - 23 are reserved to NeXT */
-	NO_BDEVICE,             /* 16 */
-	NO_BDEVICE,             /* 17 */
-	NO_BDEVICE,             /* 18 */
-	NO_BDEVICE,             /* 18 */
-	NO_BDEVICE,             /* 20 */
-	NO_BDEVICE,             /* 21 */
-	NO_BDEVICE,             /* 22 */
-	NO_BDEVICE,             /* 23 */
+	                                  
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
+	NO_BDEVICE,                     
 };
 
 const int nblkdev = sizeof(bdevsw) / sizeof(bdevsw[0]);
@@ -164,9 +164,9 @@ extern d_ioctl_t        oslogioctl;
 #define nullreset       (d_reset_t *)&nulldev
 
 struct cdevsw cdevsw[] = {
-	/*
-	 * To add character devices to this table dynamically, use cdevsw_add.
-	 */
+	  
+                                                                       
+    
 
 	[0] = {
 		cnopen, cnclose, cnread, cnwrite,
@@ -221,10 +221,10 @@ const int nchrdev = sizeof(cdevsw) / sizeof(cdevsw[0]);
 
 uint64_t cdevsw_flags[sizeof(cdevsw) / sizeof(cdevsw[0])];
 
-#include        <sys/vnode.h>   /* for VCHR and VBLK */
-/*
- * return true if a disk
- */
+#include        <sys/vnode.h>                          
+  
+                        
+   
 int
 isdisk(dev_t dev, int type)
 {
@@ -248,9 +248,9 @@ isdisk(dev_t dev, int type)
 
 static int chrtoblktab[] = {[0 ... nchrdev] = NODEV };
 
-/*
- * convert chr dev to blk dev
- */
+  
+                             
+   
 dev_t
 chrtoblk(dev_t dev)
 {

@@ -37,7 +37,7 @@
 #include <kern/macro_help.h>
 #include <sys/errno.h>
 #include <sys/sysctl.h>
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 #define SBUF_ISSET(s, f)        ((s)->s_flags & (f))
 #define SBUF_SETFLAG(s, f)      do { (s)->s_flags |= (f); } while (0)
@@ -53,17 +53,17 @@
 #define SBUF_MAXEXTENDSIZE      PAGE_SIZE
 #define SBUF_MAXEXTENDINCR      PAGE_SIZE
 
-/*!
- * @function sbuf_delete
- *
- * @brief
- * Destroys an sbuf.  Frees the underlying buffer if it's allocated on the heap
- * (indicated by SBUF_ISDYNAMIC) and frees the sbuf if it itself is allocated
- * on the heap (SBUF_ISDYNSTRUCT).
- *
- * @param s
- * The sbuf to destroy.
- */
+   
+                        
+  
+         
+                                                                               
+                                                                             
+                                  
+  
+           
+                       
+   
 void
 sbuf_delete(struct sbuf *s)
 {
@@ -77,20 +77,20 @@ sbuf_delete(struct sbuf *s)
 	}
 }
 
-/*!
- * @function sbuf_extendsize
- *
- * @brief
- * Attempts to extend the size of an sbuf to the value pointed to by size.
- *
- * @param size
- * Points to a size_t containing the desired size for input and receives the
- * actual new size on success (which will be greater than or equal to the
- * requested size).
- *
- * @returns
- * 0 on success, -1 on failure.
- */
+   
+                            
+  
+         
+                                                                          
+  
+              
+                                                                            
+                                                                         
+                   
+  
+           
+                               
+   
 static int
 sbuf_extendsize(size_t *size)
 {
@@ -107,7 +107,7 @@ sbuf_extendsize(size_t *size)
 			new_size *= 2;
 		}
 	} else {
-		/* round up to nearest page: */
+		                               
 		new_size = (target_size + PAGE_SIZE - 1) & ~PAGE_MASK;
 	}
 
@@ -119,35 +119,35 @@ sbuf_extendsize(size_t *size)
 	return 0;
 }
 
-/*!
- * @function sbuf_new
- *
- * @brief
- * Allocates and/or initializes an sbuf.
- *
- * @param s
- * An optional existing sbuf to initialize.  If NULL, a new one is allocated on
- * the heap.
- *
- * @param buf
- * An optional existing backing buffer to assign to the sbuf.  If NULL, a new
- * one is allocated on the heap.
- *
- * @param length_
- * The initial size of the sbuf.  The actual size may be greater than this
- * value.
- *
- * @param flags
- * The flags to set on the sbuf.  Accepted values are:
- *
- *   - SBUF_FIXEDLEN:   Do not allow the backing buffer to dynamically expand
- *                      to accommodate appended data.
- *   - SBUF_AUTOEXPAND: Automatically reallocate the backing buffer using the
- *                      heap if required.
- *
- * @returns
- * The new and/or initialized sbuf on success, or NULL on failure.
- */
+   
+                     
+  
+         
+                                        
+  
+           
+                                                                               
+            
+  
+             
+                                                                             
+                                
+  
+                 
+                                                                          
+         
+  
+               
+                                                      
+  
+                                                                             
+                                                     
+                                                                             
+                                         
+  
+           
+                                                                  
+   
 struct sbuf *
 sbuf_new(struct sbuf *s, char *buf, int length_, int flags)
 {
@@ -181,10 +181,10 @@ sbuf_new(struct sbuf *s, char *buf, int length_, int flags)
 		goto fail;
 	}
 
-	/*
-	 * we always need at least 1 byte for \0, so s_size of 0 will cause an
-	 * underflow in sbuf_capacity.
-	 */
+	  
+                                                                       
+                               
+    
 	if (length == 0) {
 		goto fail;
 	}
@@ -204,21 +204,21 @@ fail:
 	return NULL;
 }
 
-/*!
- * @function sbuf_setpos
- *
- * @brief
- * Set the current position of the sbuf.
- *
- * @param s
- * The sbuf to modify.
- *
- * @param pos
- * The new position to set.  Must be less than or equal to the current position.
- *
- * @returns
- * 0 on success, -1 on failure.
- */
+   
+                        
+  
+         
+                                        
+  
+           
+                      
+  
+             
+                                                                                
+  
+           
+                               
+   
 int
 sbuf_setpos(struct sbuf *s, int pos)
 {
@@ -230,16 +230,16 @@ sbuf_setpos(struct sbuf *s, int pos)
 	return 0;
 }
 
-/*!
- * @function sbuf_clear
- *
- * @brief
- * Resets the position/length of the sbuf data to zero and clears the finished
- * and overflow flags.
- *
- * @param s
- * The sbuf to clear.
- */
+   
+                       
+  
+         
+                                                                              
+                      
+  
+           
+                     
+   
 void
 sbuf_clear(struct sbuf *s)
 {
@@ -248,21 +248,21 @@ sbuf_clear(struct sbuf *s)
 	sbuf_setpos(s, 0);
 }
 
-/*!
- * @function sbuf_extend
- *
- * @brief
- * Attempt to extend the size of an sbuf's backing buffer by @a addlen bytes.
- *
- * @param s
- * The sbuf to extend.
- *
- * @param addlen
- * How many bytes to increase the size by.
- *
- * @returns
- * 0 on success, -1 on failure.
- */
+   
+                        
+  
+         
+                                                                             
+  
+           
+                      
+  
+                
+                                          
+  
+           
+                               
+   
 static int OS_WARN_RESULT
 sbuf_extend(struct sbuf *s, size_t addlen)
 {
@@ -302,42 +302,42 @@ sbuf_extend(struct sbuf *s, size_t addlen)
 	return 0;
 }
 
-/*!
- * @function sbuf_capacity
- *
- * @brief
- * Get the current capacity of an sbuf: how many more bytes we can append given
- * the current size and position.
- *
- * @param s
- * The sbuf to get the capacity of.
- *
- * @returns
- * The current sbuf capacity.
- */
+   
+                          
+  
+         
+                                                                               
+                                 
+  
+           
+                                   
+  
+           
+                             
+   
 static size_t
 sbuf_capacity(const struct sbuf *s)
 {
-	/* 1 byte reserved for \0: */
+	                             
 	return (size_t)(s->s_size - s->s_len - 1);
 }
 
-/*!
- * @function sbuf_ensure_capacity
- *
- * @brief
- * Ensure that an sbuf can accommodate @a add_len bytes, reallocating the
- * backing buffer if necessary.
- *
- * @param s
- * The sbuf.
- *
- * @param wanted
- * The minimum capacity to ensure @a s has.
- *
- * @returns
- * 0 if the minimum capacity is met by @a s, or -1 on error.
- */
+   
+                                 
+  
+         
+                                                                         
+                               
+  
+           
+            
+  
+                
+                                           
+  
+           
+                                                            
+   
 static int
 sbuf_ensure_capacity(struct sbuf *s, size_t wanted)
 {
@@ -351,25 +351,25 @@ sbuf_ensure_capacity(struct sbuf *s, size_t wanted)
 	return sbuf_extend(s, wanted - size);
 }
 
-/*!
- * @function sbuf_bcat
- *
- * @brief
- * Append data to an sbuf.
- *
- * @param s
- * The sbuf.
- *
- * @param data
- * The data to append.
- *
- * @param len
- * The length of the data.
- *
- * @returns
- * 0 on success, -1 on failure.  Will always fail if the sbuf is marked as
- * overflowed.
- */
+   
+                      
+  
+         
+                          
+  
+           
+            
+  
+              
+                      
+  
+             
+                          
+  
+           
+                                                                          
+              
+   
 int
 sbuf_bcat(struct sbuf *s, const void *data, size_t len)
 {
@@ -383,30 +383,30 @@ sbuf_bcat(struct sbuf *s, const void *data, size_t len)
 	}
 
 	bcopy(data, s->s_buf + s->s_len, len);
-	s->s_len += (int)len; /* safe */
+	s->s_len += (int)len;           
 
 	return 0;
 }
 
-/*!
- * @function sbuf_bcpy
- *
- * @brief
- * Set the entire sbuf data, possibly reallocating the backing buffer to
- * accommodate.
- *
- * @param s
- * The sbuf.
- *
- * @param data
- * The data to set.
- *
- * @param len
- * The length of the data to set.
- *
- * @returns
- * 0 on success or -1 on failure.  Will clear the finished/overflowed flags.
- */
+   
+                      
+  
+         
+                                                                        
+               
+  
+           
+            
+  
+              
+                   
+  
+             
+                                 
+  
+           
+                                                                            
+   
 int
 sbuf_bcpy(struct sbuf *s, const void *data, size_t len)
 {
@@ -414,45 +414,45 @@ sbuf_bcpy(struct sbuf *s, const void *data, size_t len)
 	return sbuf_bcat(s, data, len);
 }
 
-/*!
- * @function sbuf_cat
- *
- * @brief
- * Append a string to an sbuf, possibly expanding the backing buffer to
- * accommodate.
- *
- * @param s
- * The sbuf.
- *
- * @param str
- * The string to append.
- *
- * @returns
- * 0 on success, -1 on failure.  Always fails if the sbuf is marked as
- * overflowed.
- */
+   
+                     
+  
+         
+                                                                       
+               
+  
+           
+            
+  
+             
+                        
+  
+           
+                                                                      
+              
+   
 int
 sbuf_cat(struct sbuf *s, const char *str)
 {
 	return sbuf_bcat(s, str, strlen(str));
 }
 
-/*!
- * @function sbuf_cpy
- *
- * @brief
- * Set the entire sbuf data to the given nul-terminated string, possibly
- * expanding the backing buffer to accommodate it if necessary.
- *
- * @param s
- * The sbuf.
- *
- * @param str
- * The string to set the sbuf data to.
- *
- * @returns
- * 0 on success, -1 on failure.  Clears and resets the sbuf first.
- */
+   
+                     
+  
+         
+                                                                        
+                                                               
+  
+           
+            
+  
+             
+                                      
+  
+           
+                                                                  
+   
 int
 sbuf_cpy(struct sbuf *s, const char *str)
 {
@@ -460,25 +460,25 @@ sbuf_cpy(struct sbuf *s, const char *str)
 	return sbuf_cat(s, str);
 }
 
-/*!
- * @function sbuf_vprintf
- *
- * @brief
- * Formatted-print into an sbuf using a va_list.
- *
- * @param s
- * The sbuf.
- *
- * @param fmt
- * The format string.
- *
- * @param ap
- * The format string argument data.
- *
- * @returns
- * 0 on success, -1 on failure.  Always fails if the sbuf is marked as
- * overflowed.
- */
+   
+                         
+  
+         
+                                                
+  
+           
+            
+  
+             
+                     
+  
+            
+                                   
+  
+           
+                                                                      
+              
+   
 int
 sbuf_vprintf(struct sbuf *s, const char *fmt, va_list ap)
 {
@@ -495,7 +495,7 @@ sbuf_vprintf(struct sbuf *s, const char *fmt, va_list ap)
 		capacity = sbuf_capacity(s);
 
 		va_copy(ap_copy, ap);
-		/* +1 for \0.  safe because we already accommodate this. */
+		                                                           
 		result = vsnprintf(&s->s_buf[s->s_len], capacity + 1, fmt, ap_copy);
 		va_end(ap_copy);
 
@@ -514,22 +514,22 @@ sbuf_vprintf(struct sbuf *s, const char *fmt, va_list ap)
 	return -1;
 }
 
-/*!
- * @function sbuf_printf
- *
- * @brief
- * Formatted-print into an sbuf using variadic arguments.
- *
- * @param s
- * The sbuf.
- *
- * @param fmt
- * The format string.
- *
- * @returns
- * 0 on success, -1 on failure.  Always fails if the sbuf is marked as
- * overflowed.
- */
+   
+                        
+  
+         
+                                                         
+  
+           
+            
+  
+             
+                     
+  
+           
+                                                                      
+              
+   
 int
 sbuf_printf(struct sbuf *s, const char *fmt, ...)
 {
@@ -542,22 +542,22 @@ sbuf_printf(struct sbuf *s, const char *fmt, ...)
 	return result;
 }
 
-/*!
- * @function sbuf_putc
- *
- * @brief
- * Append a single character to an sbuf.  Ignores '\0'.
- *
- * @param s
- * The sbuf.
- *
- * @param c_
- * The character to append.
- *
- * @returns
- * 0 on success, -1 on failure.  This function will always fail if the sbuf is
- * marked as overflowed.
- */
+   
+                      
+  
+         
+                                                       
+  
+           
+            
+  
+            
+                           
+  
+           
+                                                                              
+                        
+   
 int
 sbuf_putc(struct sbuf *s, int c_)
 {
@@ -585,18 +585,18 @@ isspace(char ch)
 	return ch == ' ' || ch == '\n' || ch == '\t';
 }
 
-/*!
- * @function sbuf_trim
- *
- * @brief
- * Removes whitespace from the end of an sbuf.
- *
- * @param s
- * The sbuf.
- *
- * @returns
- * 0 on success or -1 if the sbuf is marked as overflowed.
- */
+   
+                      
+  
+         
+                                              
+  
+           
+            
+  
+           
+                                                          
+   
 int
 sbuf_trim(struct sbuf *s)
 {
@@ -611,72 +611,72 @@ sbuf_trim(struct sbuf *s)
 	return 0;
 }
 
-/*!
- * @function sbuf_overflowed
- *
- * @brief
- * Indicates whether the sbuf is marked as overflowed.
- *
- * @param s
- * The sbuf.
- *
- * @returns
- * 1 if the sbuf has overflowed or 0 otherwise.
- */
+   
+                            
+  
+         
+                                                      
+  
+           
+            
+  
+           
+                                               
+   
 int
 sbuf_overflowed(struct sbuf *s)
 {
 	return !!SBUF_HASOVERFLOWED(s);
 }
 
-/*!
- * @function sbuf_finish
- *
- * @brief
- * Puts a trailing nul byte onto the sbuf data.
- *
- * @param s
- * The sbuf.
- */
+   
+                        
+  
+         
+                                               
+  
+           
+            
+   
 void
 sbuf_finish(struct sbuf *s)
 {
-	/* safe because we always reserve a byte at the end for \0: */
+	                                                              
 	s->s_buf[s->s_len] = '\0';
 	SBUF_CLEARFLAG(s, SBUF_OVERFLOWED);
 	SBUF_SETFLAG(s, SBUF_FINISHED);
 }
 
-/*!
- * @function sbuf_data
- *
- * @brief
- * Gets a pointer to the sbuf backing data.
- *
- * @param s
- * The sbuf.
- *
- * @returns
- * A pointer to the sbuf data.
- */
+   
+                      
+  
+         
+                                           
+  
+           
+            
+  
+           
+                              
+   
 char *
 sbuf_data(struct sbuf *s)
 {
 	return s->s_buf;
 }
 
-/*!
- * @function sbuf_len
- *
- * @brief
- * Retrieves the current length of the sbuf data.
- *
- * @param s
- * The sbuf
- *
- * @returns
- * The length of the sbuf data or -1 if the sbuf is marked as overflowed.
- */
+   
+                     
+  
+         
+                                                 
+  
+           
+           
+  
+           
+                                                                         
+   
 int
 sbuf_len(struct sbuf *s)
 {
@@ -687,18 +687,18 @@ sbuf_len(struct sbuf *s)
 	return s->s_len;
 }
 
-/*!
- * @function sbuf_done
- *
- * @brief
- * Tests if the sbuf is marked as finished.
- *
- * @param s
- * The sbuf.
- *
- * @returns
- * 1 if the sbuf is marked as finished or 0 if not.
- */
+   
+                      
+  
+         
+                                           
+  
+           
+            
+  
+           
+                                                   
+   
 int
 sbuf_done(struct sbuf *s)
 {
@@ -707,9 +707,9 @@ sbuf_done(struct sbuf *s)
 
 #if DEBUG || DEVELOPMENT
 
-/*
- * a = assertion string
- */
+  
+                       
+   
 #define SBUF_FAIL(a)                                                             \
     MACRO_BEGIN                                                                  \
 	printf("sbuf_tests: failed assertion: %s\n", a);                         \
@@ -722,9 +722,9 @@ sbuf_done(struct sbuf *s)
 #define SBUF_PASS \
     ++passed
 
-/*
- * x = expression
- */
+  
+                 
+   
 #define SBUF_ASSERT(x)     \
     MACRO_BEGIN            \
 	if (x) {           \
@@ -737,11 +737,11 @@ sbuf_done(struct sbuf *s)
 #define SBUF_ASSERT_NOT(x) \
     SBUF_ASSERT(!(x))
 
-/*
- * e = expected
- * a = actual
- * c = comparator
- */
+  
+               
+             
+                 
+   
 #define SBUF_ASSERT_CMP(e, a, c)         \
     MACRO_BEGIN                          \
 	if ((a) c (e)) {                 \
@@ -763,10 +763,10 @@ sbuf_done(struct sbuf *s)
     const char *what = NULL; \
     const char *should = NULL;
 
-/*
- * include the trailing semi-colons here intentionally to allow for block-like
- * appearance:
- */
+  
+                                                                              
+              
+   
 #define SBUF_TESTING(f) \
     MACRO_BEGIN         \
 	what = (f);     \
@@ -1435,7 +1435,7 @@ sysctl_sbuf_tests SYSCTL_HANDLER_ARGS
 		}
 	}
 
-	/* also tests sbuf_vprintf: */
+	                              
 	SBUF_TESTING("sbuf_printf")
 	{
 		SBUF_SHOULD("support simple printing")
@@ -1796,4 +1796,4 @@ sysctl_sbuf_tests SYSCTL_HANDLER_ARGS
 
 SYSCTL_PROC(_kern, OID_AUTO, sbuf_test, CTLTYPE_STRING | CTLFLAG_RW | CTLFLAG_KERN | CTLFLAG_MASKED, 0, 0, sysctl_sbuf_tests, "A", "sbuf tests");
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           

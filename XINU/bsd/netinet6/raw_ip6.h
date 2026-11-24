@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/raw_ip6.h,v 1.1.2.1 2001/07/03 11:01:55 ume Exp $	*/
-/*	$KAME: raw_ip6.h,v 1.2 2001/05/27 13:28:35 itojun Exp $	*/
+                                                                                  
+                                                             
 
 /*
  * Copyright (C) 2001 WIDE Project.
@@ -62,21 +62,21 @@
 #define _NETINET6_RAW_IP6_H_
 #include <sys/appleapiopts.h>
 
-/*
- * ICMPv6 stat is counted separately.  see netinet/icmp6.h
- */
+  
+                                                          
+   
 struct rip6stat {
-	u_quad_t rip6s_ipackets;        /* total input packets */
-	u_quad_t rip6s_isum;            /* input checksum computations */
-	u_quad_t rip6s_badsum;          /* of above, checksum error */
-	u_quad_t rip6s_nosock;          /* no matching socket */
-	u_quad_t rip6s_nosockmcast;     /* of above, arrived as multicast */
-	u_quad_t rip6s_fullsock;        /* not delivered, input socket full */
+	u_quad_t rip6s_ipackets;                                 
+	u_quad_t rip6s_isum;                                             
+	u_quad_t rip6s_badsum;                                        
+	u_quad_t rip6s_nosock;                                  
+	u_quad_t rip6s_nosockmcast;                                         
+	u_quad_t rip6s_fullsock;                                              
 
-	u_quad_t rip6s_opackets;        /* total output packets */
+	u_quad_t rip6s_opackets;                                  
 };
 
 #ifdef BSD_KERNEL_PRIVATE
 extern struct rip6stat rip6stat;
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET6_RAW_IP6_H_ */
+#endif                         
+#endif                           

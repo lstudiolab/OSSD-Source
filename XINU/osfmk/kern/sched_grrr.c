@@ -91,15 +91,15 @@ grrr_rescale_work(grrr_run_queue_t rq);
 static void
 grrr_runqueue_init(grrr_run_queue_t             runq);
 
-/* Map Mach priorities to ones suitable for proportional sharing */
+                                                                   
 static grrr_proportional_priority_t grrr_priority_mapping[NRQS];
 
-/* Map each proportional priority to its group */
+                                                 
 static grrr_group_index_t grrr_group_mapping[NUM_GRRR_PROPORTIONAL_PRIORITIES];
 
 uint32_t                        grrr_rescale_tick;
 
-#endif /* defined(CONFIG_SCHED_GRRR_CORE) */
+#endif                                      
 
 #if defined(CONFIG_SCHED_GRRR)
 
@@ -267,7 +267,7 @@ sched_grrr_timebase_init(void)
 {
 	uint64_t        abstime;
 
-	/* standard timeslicing quantum */
+	                                  
 	clock_interval_to_absolutetime_interval(
 		grrr_quantum_us, NSEC_PER_USEC, &abstime);
 	assert((abstime >> 32) == 0 && (uint32_t)abstime != 0);
@@ -299,9 +299,9 @@ sched_grrr_maintenance_continuation(void)
 
 	grrr_rescale_tick++;
 
-	/*
-	 *  Compute various averages.
-	 */
+	  
+                              
+    
 	compute_averages(1);
 
 	if (sched_grrr_tick_deadline == 0) {
@@ -313,7 +313,7 @@ sched_grrr_maintenance_continuation(void)
 
 	assert_wait_deadline((event_t)sched_grrr_maintenance_continuation, THREAD_UNINT, sched_grrr_tick_deadline);
 	thread_block((thread_continue_t)sched_grrr_maintenance_continuation);
-	/*NOTREACHED*/
+	              
 }
 
 static thread_t
@@ -408,18 +408,18 @@ sched_grrr_processor_queue_remove(
 	pset_lock(pset);
 
 	if (processor == thread->runq) {
-		/*
-		 *	Thread is on a run queue and we have a lock on
-		 *	that run queue.
-		 */
+		  
+                                                   
+                    
+     
 		grrr_run_queue_t                rq = &processor->grrr_runq;
 
 		grrr_remove(rq, thread);
 	} else {
-		/*
-		 *	The thread left the run queue before we could
-		 *	lock the run queue.
-		 */
+		  
+                                                  
+                        
+     
 		assert(thread->runq == PROCESSOR_NULL);
 		processor = PROCESSOR_NULL;
 	}
@@ -457,7 +457,7 @@ sched_grrr_processor_queue_has_priority(processor_t             processor,
 	return FALSE;
 }
 
-/* Implement sched_preempt_pri in code */
+                                         
 static boolean_t
 sched_grrr_priority_is_urgent(int priority)
 {
@@ -548,7 +548,7 @@ sched_grrr_thread_update_scan(__unused sched_update_scan_context_t scan_context)
 	return;
 }
 
-#endif /* defined(CONFIG_SCHED_GRRR) */
+#endif                                 
 
 #if defined(CONFIG_SCHED_GRRR_CORE)
 
@@ -557,17 +557,17 @@ grrr_priority_mapping_init(void)
 {
 	unsigned int i;
 
-	/* Map 0->0 up to 10->20 */
+	                           
 	for (i = 0; i <= 10; i++) {
 		grrr_priority_mapping[i] = (grrr_proportional_priority_t)(2 * i);
 	}
 
-	/* Map user priorities 11->33 up to 51 -> 153 */
+	                                                
 	for (i = 11; i <= 51; i++) {
 		grrr_priority_mapping[i] = (grrr_proportional_priority_t)(3 * i);
 	}
 
-	/* Map high priorities 52->180 up to 127->255 */
+	                                                
 	for (i = 52; i <= 127; i++) {
 		grrr_priority_mapping[i] = (grrr_proportional_priority_t)(128 + i);
 	}
@@ -575,13 +575,13 @@ grrr_priority_mapping_init(void)
 	for (i = 0; i < NUM_GRRR_PROPORTIONAL_PRIORITIES; i++) {
 #if 0
 		unsigned j, k;
-		/* Calculate log(i); */
+		                       
 		for (j = 0, k = 1; k <= i; j++, k *= 2) {
 			;
 		}
 #endif
 
-		/* Groups of 4 */
+		                 
 		grrr_group_mapping[i] = (grrr_group_index_t)(i >> 2);
 	}
 }
@@ -600,7 +600,7 @@ grrr_intragroup_schedule(grrr_group_t group)
 		thread = (thread_t)(void *)queue_first(&group->clients);
 	}
 
-	if (1 /* deficit */) {
+	if (1              ) {
 		group->current_client = (thread_t)(void *)queue_next((queue_entry_t)thread);
 		if (queue_end(&group->clients, (queue_entry_t)group->current_client)) {
 			group->current_client = (thread_t)(void *)queue_first(&group->clients);
@@ -636,20 +636,20 @@ grrr_intergroup_schedule(grrr_run_queue_t rq)
 	group->work++;
 
 	if (queue_end(&rq->sorted_group_list, queue_next((queue_entry_t)group))) {
-		/* last group, go back to beginning */
+		                                      
 		group = (grrr_group_t)queue_first(&rq->sorted_group_list);
 	} else {
 		grrr_group_t nextgroup = (grrr_group_t)queue_next((queue_entry_t)group);
 		uint64_t orderleft, orderright;
 
-		/*
-		 * The well-ordering condition for intergroup selection is:
-		 *
-		 * (group->work+1) / (nextgroup->work+1) > (group->weight) / (nextgroup->weight)
-		 *
-		 * Multiply both sides by their denominators to avoid division
-		 *
-		 */
+		  
+                                                             
+    
+                                                                                  
+    
+                                                                
+    
+     
 		orderleft = (group->work + 1) * ((uint64_t)nextgroup->weight);
 		orderright = (nextgroup->work + 1) * ((uint64_t)group->weight);
 		if (orderleft > orderright) {
@@ -702,7 +702,7 @@ grrr_rescale_work(grrr_run_queue_t rq)
 {
 	grrr_group_index_t index;
 
-	/* avoid overflow by scaling by 1/8th */
+	                                        
 	for (index = 0; index < NUM_GRRR_GROUPS; index++) {
 		rq->groups[index].work >>= 3;
 	}
@@ -724,13 +724,13 @@ grrr_enqueue(
 	group = &rq->groups[gindex];
 
 	if (group->count == 0) {
-		/* Empty group, this is the first client */
+		                                           
 		enqueue_tail(&group->clients, (queue_entry_t)thread);
 		group->count = 1;
 		group->weight = gpriority;
 		group->current_client = thread;
 	} else {
-		/* Insert before the current client */
+		                                      
 		if (group->current_client == THREAD_NULL ||
 		    queue_first(&group->clients) == (queue_entry_t)group->current_client) {
 			enqueue_head(&group->clients, (queue_entry_t)thread);
@@ -741,7 +741,7 @@ grrr_enqueue(
 		group->count++;
 		group->weight += gpriority;
 
-		/* Since there was already a client, this is on the per-processor sorted list already */
+		                                                                                        
 		remqueue((queue_entry_t)group);
 	}
 
@@ -782,7 +782,7 @@ grrr_select(grrr_run_queue_t    rq)
 				rq->current_group = GRRR_GROUP_NULL;
 			}
 		} else {
-			/* Need to re-insert in sorted location */
+			                                          
 			grrr_sorted_list_insert_group(rq, group);
 		}
 
@@ -822,7 +822,7 @@ grrr_remove(
 			rq->current_group = GRRR_GROUP_NULL;
 		}
 	} else {
-		/* Need to re-insert in sorted location */
+		                                          
 		grrr_sorted_list_insert_group(rq, group);
 	}
 
@@ -836,31 +836,31 @@ static void
 grrr_sorted_list_insert_group(grrr_run_queue_t rq,
     grrr_group_t group)
 {
-	/* Simple insertion sort */
+	                           
 	if (queue_empty(&rq->sorted_group_list)) {
 		enqueue_tail(&rq->sorted_group_list, (queue_entry_t)group);
 	} else {
 		grrr_group_t search_group;
 
-		/* Start searching from the head (heaviest weight) for the first
-		 * element less than us, so we can insert before it
-		 */
+		                                                                
+                                                     
+     
 		search_group = (grrr_group_t)queue_first(&rq->sorted_group_list);
 		while (!queue_end(&rq->sorted_group_list, (queue_entry_t)search_group)) {
 			if (search_group->weight < group->weight) {
-				/* we should be before this */
+				                              
 				search_group = (grrr_group_t)queue_prev((queue_entry_t)search_group);
 				break;
 			}
 			if (search_group->weight == group->weight) {
-				/* Use group index as a tie breaker */
+				                                      
 				if (search_group->index < group->index) {
 					search_group = (grrr_group_t)queue_prev((queue_entry_t)search_group);
 					break;
 				}
 			}
 
-			/* otherwise, our weight is too small, keep going */
+			                                                    
 			search_group = (grrr_group_t)queue_next((queue_entry_t)search_group);
 		}
 
@@ -872,4 +872,4 @@ grrr_sorted_list_insert_group(grrr_run_queue_t rq,
 	}
 }
 
-#endif /* defined(CONFIG_SCHED_GRRR_CORE) */
+#endif                                      

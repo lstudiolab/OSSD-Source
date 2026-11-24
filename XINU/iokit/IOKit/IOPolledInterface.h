@@ -109,7 +109,7 @@ public:
 	OSMetaClassDeclareReservedUnused(IOPolledInterface, 15);
 };
 
-#endif /* defined(__cplusplus) */
+#endif                           
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -117,13 +117,13 @@ public:
 #include <IOKit/IOTypes.h>
 #include <IOKit/IOHibernatePrivate.h>
 
-// kern_open_file_for_direct_io() flags
+                                       
 enum{
 	kIOPolledFileCreate    = 0x00000001,
 	kIOPolledFileHibernate = 0x00000002,
 };
 
-// kern_open_file_for_direct_io() oflags
+                                        
 enum{
 	kIOPolledFileSSD    = 0x00000001
 };
@@ -200,7 +200,7 @@ IOReturn IOPolledFilePollersSetup(IOPolledFileIOVars * vars, uint32_t openState)
 
 LIBKERN_RETURNS_NOT_RETAINED IOMemoryDescriptor * IOPolledFileGetIOBuffer(IOPolledFileIOVars * vars);
 
-#endif /* defined(__cplusplus) */
+#endif                           
 
 #if defined(__cplusplus)
 #define __C     "C"
@@ -271,8 +271,8 @@ extern void IOPolledFileMountChange(struct mount * mp, uint32_t op);
 
 __END_DECLS
 
-#endif /* _SYS_CONF_H_ */
+#endif                   
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _IOPOLLEDINTERFACE_H_ */
+#endif                            

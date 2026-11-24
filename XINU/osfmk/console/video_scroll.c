@@ -36,9 +36,9 @@ video_scroll_up(void * start, void * end, void * dest)
 }
 
 void
-video_scroll_down(void * start,      /* HIGH addr */
-    void * end,                      /* LOW addr */
-    void * dest)                     /* HIGH addr */
+video_scroll_down(void * start,                     
+    void * end,                                    
+    void * dest)                                    
 {
 	bcopy(end, dest, ((char *)start - (char *)end) << 2);
 }

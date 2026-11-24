@@ -39,6 +39,6 @@
 #error architecture not supported
 #endif
 
-#endif	/* _MACH_MACHINE_SYSCALL_SW_H_ */
+#endif	                                 
 
-#endif	/* PRIVATE */
+#endif	             

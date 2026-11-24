@@ -28,7 +28,7 @@
 
 #include <netinet/in.h>
 
-/* XXX ctype.h is missing, see libkern/stdio/scanf.c */
+                                                       
 #if 1
 static inline int
 isspace(char c)
@@ -49,10 +49,10 @@ inet_aton(const char *cp, struct in_addr *addr)
 	c = (const char *)cp;
 	n = 0;
 
-	/*
-	 * Run through the string, grabbing numbers until
-	 * the end of the string, or some error
-	 */
+	  
+                                                  
+                                        
+    
 	gotend = 0;
 	while (!gotend) {
 		unsigned long l;
@@ -65,24 +65,24 @@ inet_aton(const char *cp, struct in_addr *addr)
 
 		val = (in_addr_t)l;
 
-		/*
-		 * If the whole string is invalid, endptr will equal
-		 * c.. this way we can make sure someone hasn't
-		 * gone '.12' or something which would get past
-		 * the next check.
-		 */
+		  
+                                                      
+                                                 
+                                                 
+                    
+     
 		if (endptr == c) {
 			return 0;
 		}
 		parts[n] = val;
 		c = endptr;
 
-		/* Check the next character past the previous number's end */
+		                                                             
 		switch (*c) {
 		case '.':
 
-			/* Make sure we only do 3 dots .. */
-			if (n == 3) {   /* Whoops. Quit. */
+			                                    
+			if (n == 3) {                      
 				return 0;
 			}
 			n++;
@@ -98,36 +98,36 @@ inet_aton(const char *cp, struct in_addr *addr)
 				gotend = 1;
 				break;
 			} else {
-				/* Invalid character, then fail. */
+				                                   
 				return 0;
 			}
 		}
 	}
 
-	/* Concoct the address according to the number of parts specified. */
+	                                                                     
 	switch (n) {
-	case 0:                         /* a -- 32 bits */
+	case 0:                                           
 
-		/*
-		 * Nothing is necessary here.  Overflow checking was
-		 * already done in strtoul().
-		 */
+		  
+                                                      
+                               
+     
 		break;
-	case 1:                         /* a.b -- 8.24 bits */
+	case 1:                                               
 		if (val > 0xffffff || parts[0] > 0xff) {
 			return 0;
 		}
 		val |= parts[0] << 24;
 		break;
 
-	case 2:                         /* a.b.c -- 8.8.16 bits */
+	case 2:                                                   
 		if (val > 0xffff || parts[0] > 0xff || parts[1] > 0xff) {
 			return 0;
 		}
 		val |= (parts[0] << 24) | (parts[1] << 16);
 		break;
 
-	case 3:                         /* a.b.c.d -- 8.8.8.8 bits */
+	case 3:                                                      
 		if (val > 0xff || parts[0] > 0xff || parts[1] > 0xff ||
 		    parts[2] > 0xff) {
 			return 0;

@@ -54,6 +54,6 @@ extern mach_port_t convert_arcade_register_to_port(arcade_register_t arcade_reg)
 
 extern arcade_register_t convert_port_to_arcade_register(mach_port_t port);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _KERN_ARCADE_H_ */
+#endif                      

@@ -145,7 +145,7 @@ proc_setthread_cpupercent(uint8_t percentage, uint32_t ms_refill)
 {
 	uint32_t arg = 0;
 
-	/* Pack percentage and refill into a 32-bit number to match existing kernel implementation */
+	                                                                                             
 	if ((percentage >= 100) || (ms_refill & ~0xffffffU)) {
 		errno = EINVAL;
 		return -1;
@@ -411,20 +411,20 @@ proc_terminate(pid_t pid, int *sig)
 	return 0;
 }
 
-/*
- * XXX the _fatal() variant both checks for an existing monitor
- * (with important policy effects on first party background apps)
- * and validates inputs.
- */
+  
+                                                               
+                                                                 
+                        
+   
 int
 proc_set_cpumon_params(pid_t pid, int percentage, int interval)
 {
 	proc_policy_cpuusage_attr_t attr;
 
-	/* no argument validation ...
-	 * task_set_cpuusage() ignores 0 values and squashes negative
-	 * values into uint32_t.
-	 */
+	                             
+                                                              
+                         
+    
 
 	attr.ppattr_cpu_attr = PROC_POLICY_RSRCACT_NOTIFY_EXC;
 	attr.ppattr_cpu_percentage = percentage;
@@ -494,18 +494,18 @@ proc_disable_cpumon(pid_t pid)
 }
 
 
-/*
- * Turn on the CPU usage monitor using the supplied parameters, and make
- * violations of the monitor fatal.
- *
- * Returns:  0 on success;
- *	    -1 on failure and sets errno
- */
+  
+                                                                        
+                                   
+  
+                          
+                                   
+   
 int
 proc_set_cpumon_params_fatal(pid_t pid, int percentage, int interval)
 {
 	int current_percentage = 0;
-	int current_interval = 0;   /* intervals are in seconds */
+	int current_interval = 0;                                 
 	int ret = 0;
 
 	if ((percentage <= 0) || (interval <= 0)) {
@@ -513,33 +513,33 @@ proc_set_cpumon_params_fatal(pid_t pid, int percentage, int interval)
 		return -1;
 	}
 
-	/*
-	 * Do a simple query to see if CPU monitoring is
-	 * already active.  If either the percentage or the
-	 * interval is nonzero, then CPU monitoring is
-	 * already in use for this process.
-	 *
-	 * XXX: need set...() and set..fatal() to behave similarly.
-	 * Currently, this check prevents 1st party apps (which get a
-	 * default non-fatal monitor) not to get a fatal monitor.
-	 */
+	  
+                                                 
+                                                    
+                                               
+                                    
+   
+                                                            
+                                                              
+                                                          
+    
 	(void)proc_get_cpumon_params(pid, &current_percentage, &current_interval);
 	if (current_percentage || current_interval) {
-		/*
-		 * The CPU monitor appears to be active.
-		 * We choose not to disturb those settings.
-		 */
+		  
+                                          
+                                             
+     
 		errno = EBUSY;
 		return -1;
 	}
 
 	if ((ret = proc_set_cpumon_params(pid, percentage, interval)) != 0) {
-		/* Failed to activate the CPU monitor */
+		                                        
 		return ret;
 	}
 
 	if ((ret = proc_rlimit_control(pid, RLIMIT_CPU_USAGE_MONITOR, (void *)(uintptr_t)CPUMON_MAKE_FATAL)) != 0) {
-		/* Failed to set termination, back out the CPU monitor settings. */
+		                                                                   
 		(void)proc_disable_cpumon(pid);
 	}
 
@@ -746,7 +746,7 @@ proc_pidbind(int pid, uint64_t threadid, int bind)
 
 	switch (bind) {
 	case PROC_PIDBIND_CLEAR:
-		passpid = getpid();             /* ignore pid on clear */
+		passpid = getpid();                                      
 		break;
 	case PROC_PIDBIND_SET:
 		break;
@@ -765,10 +765,10 @@ proc_can_use_foreground_hw(int pid, uint32_t *reason)
 {
 	return __proc_info(PROC_INFO_CALL_CANUSEFGHW, pid, 0, 0, reason, sizeof(*reason));
 }
-#endif /* (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR) */
+#endif                                                 
 
 
-/* Donate importance to adaptive processes from this process */
+                                                               
 int
 proc_donate_importance_boost()
 {
@@ -780,13 +780,13 @@ proc_donate_importance_boost()
 	    PROC_POLICY_APPTYPE,
 	    PROC_POLICY_IOS_DONATEIMP,
 	    NULL, getpid(), (uint64_t)0);
-#else /* (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR) */
+#else                                                 
 	rval = __process_policy(PROC_POLICY_SCOPE_PROCESS,
 	    PROC_POLICY_ACTION_SET,
 	    PROC_POLICY_BOOST,
 	    PROC_POLICY_IMP_DONATION,
 	    NULL, getpid(), 0);
-#endif /* (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR) */
+#endif                                                 
 
 	if (rval == 0) {
 		return 0;
@@ -801,24 +801,24 @@ proc_importance_bad_assertion(char *reason)
 	(void)reason;
 }
 
-/*
- * Use the address of these variables as the token.  This way, they can be
- * printed in the debugger as useful names.
- */
+  
+                                                                          
+                                           
+   
 uint64_t important_boost_assertion_token = 0xfafafafafafafafa;
 uint64_t normal_boost_assertion_token    = 0xfbfbfbfbfbfbfbfb;
 uint64_t non_boost_assertion_token       = 0xfcfcfcfcfcfcfcfc;
 uint64_t denap_boost_assertion_token     = 0xfdfdfdfdfdfdfdfd;
 
-/*
- * Accept the boost on a message, or request another boost assertion
- * if we have already accepted the implicit boost for this message.
- *
- * Returns EOVERFLOW if an attempt is made to take an extra assertion when not boosted.
- *
- * Returns EIO if the message was not a boosting message.
- * TODO: Return a 'non-boost' token instead.
- */
+  
+                                                                    
+                                                                   
+  
+                                                                                       
+  
+                                                         
+                                            
+   
 int
 proc_importance_assertion_begin_with_msg(mach_msg_header_t  *msg,
     __unused mach_msg_trailer_t *trailer,
@@ -833,19 +833,19 @@ proc_importance_assertion_begin_with_msg(mach_msg_header_t  *msg,
 #define LEGACYBOOSTMASK (MACH_MSGH_BITS_VOUCHER_MASK | MACH_MSGH_BITS_RAISEIMP)
 #define LEGACYBOOSTED(m) (((m)->msgh_bits & LEGACYBOOSTMASK) == MACH_MSGH_BITS_RAISEIMP)
 
-	/* Is this a legacy boosted message? */
+	                                       
 	if (LEGACYBOOSTED(msg)) {
-		/*
-		 * Have we accepted the implicit boost for this message yet?
-		 * If we haven't accepted it yet, no need to call into kernel.
-		 */
+		  
+                                                              
+                                                                
+     
 		if ((msg->msgh_bits & MACH_MSGH_BITS_IMPHOLDASRT) == 0) {
 			msg->msgh_bits |= MACH_MSGH_BITS_IMPHOLDASRT;
 			*assertion_token = (uint64_t) &important_boost_assertion_token;
 			return 0;
 		}
 
-		/* Request an additional boost count */
+		                                       
 		rval = __process_policy(PROC_POLICY_SCOPE_PROCESS,
 		    PROC_POLICY_ACTION_HOLD,
 		    PROC_POLICY_BOOST,
@@ -866,10 +866,10 @@ proc_importance_assertion_begin_with_msg(mach_msg_header_t  *msg,
 }
 
 
-/*
- * Drop a boost assertion.
- * Returns EOVERFLOW on boost assertion underflow.
- */
+  
+                          
+                                                  
+   
 int
 proc_importance_assertion_complete(uint64_t assertion_token)
 {
@@ -899,13 +899,13 @@ proc_importance_assertion_complete(uint64_t assertion_token)
 	}
 }
 
-/*
- * Accept the De-Nap boost on a message, or request another boost assertion
- * if we have already accepted the implicit boost for this message.
- *
- * Interface is deprecated before it really got started - just as synonym
- * for proc_importance_assertion_begin_with_msg() now.
- */
+  
+                                                                           
+                                                                   
+  
+                                                                         
+                                                      
+   
 int
 proc_denap_assertion_begin_with_msg(mach_msg_header_t  *msg,
     uint64_t           *assertion_token)
@@ -917,12 +917,12 @@ proc_denap_assertion_begin_with_msg(mach_msg_header_t  *msg,
 }
 
 
-/*
- * Drop a denap boost assertion.
- *
- * Interface is deprecated before it really got started - just a synonym
- * for proc_importance_assertion_complete() now.
- */
+  
+                                
+  
+                                                                        
+                                                
+   
 int
 proc_denap_assertion_complete(uint64_t assertion_token)
 {
@@ -941,7 +941,7 @@ proc_clear_vmpressure(pid_t pid)
 	}
 }
 
-/* set the current process as one who can resume suspended processes due to low virtual memory. Need to be root */
+                                                                                                                  
 int
 proc_set_owner_vmpressure(void)
 {
@@ -954,7 +954,7 @@ proc_set_owner_vmpressure(void)
 	return 0;
 }
 
-/* mark yourself to delay idle sleep on disk IO */
+                                                  
 int
 proc_set_delayidlesleep(void)
 {
@@ -967,7 +967,7 @@ proc_set_delayidlesleep(void)
 	return 0;
 }
 
-/* Reset yourself to delay idle sleep on disk IO, if already set */
+                                                                   
 int
 proc_clear_delayidlesleep(void)
 {
@@ -980,7 +980,7 @@ proc_clear_delayidlesleep(void)
 	return 0;
 }
 
-/* disable the launch time backgroudn policy and restore the process to default group */
+                                                                                        
 int
 proc_disable_apptype(pid_t pid, int apptype)
 {
@@ -999,7 +999,7 @@ proc_disable_apptype(pid_t pid, int apptype)
 	}
 }
 
-/* re-enable the launch time background policy if it had been disabled. */
+                                                                          
 int
 proc_enable_apptype(pid_t pid, int apptype)
 {
@@ -1026,9 +1026,9 @@ proc_suppress(__unused pid_t pid, __unused uint64_t *generation)
 	return 0;
 }
 
-#endif /* !TARGET_OS_SIMULATOR */
+#endif                           
 
-#endif /* !(TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR) */
+#endif                                                  
 
 int
 proc_set_no_smt(void)

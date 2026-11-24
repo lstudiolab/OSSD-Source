@@ -38,7 +38,7 @@ rsa_make_pub(rsa_pub_ctx *pub,
 {
 	if ((exp_nbytes > RSA_MAX_KEY_BITSIZE / 8)
 	    || (mod_nbytes > RSA_MAX_KEY_BITSIZE / 8)) {
-		return -1; // Too big
+		return -1;           
 	}
 	ccrsa_ctx_n(pub->key) = ccn_nof(RSA_MAX_KEY_BITSIZE);
 	return g_crypto_funcs->ccrsa_make_pub_fn(pub->key,

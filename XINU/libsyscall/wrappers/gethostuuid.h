@@ -39,4 +39,4 @@ int gethostuuid(uuid_t, const struct timespec *) __OSX_AVAILABLE_BUT_DEPRECATED_
 int gethostuuid(uuid_t, const struct timespec *) __OSX_AVAILABLE_STARTING(__MAC_10_5, __IPHONE_NA);
 #endif
 
-#endif /* __GETHOSTUUID_H */
+#endif                      

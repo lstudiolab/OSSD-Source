@@ -58,21 +58,21 @@
 #include <mach/vm_statistics.h>
 
 #include <vm/vm_kern.h>
-#include <vm/vm_protos.h> /* last */
-#include <vm/vm_map.h>          /* current_map() */
-#include <mach/mach_vm.h>       /* mach_vm_region_recurse() */
-#include <mach/task.h>          /* task_suspend() */
-#include <kern/task.h>          /* get_task_numacts() */
+#include <vm/vm_protos.h>           
+#include <vm/vm_map.h>                             
+#include <mach/mach_vm.h>                                     
+#include <mach/task.h>                              
+#include <kern/task.h>                                  
 
 #include <security/audit/audit.h>
 
 #if CONFIG_MACF
 #include <security/mac_framework.h>
-#endif /* CONFIG_MACF */
+#endif                  
 
 typedef struct {
-	int     flavor;                 /* the number for this flavor */
-	mach_msg_type_number_t  count;  /* count of ints in this flavor */
+	int     flavor;                                                 
+	mach_msg_type_number_t  count;                                    
 } mythread_state_flavor_t;
 
 #if defined (__i386__) || defined (__x86_64__)
@@ -93,7 +93,7 @@ int mynum_flavors = 3;
 #elif defined (__arm64__)
 mythread_state_flavor_t thread_flavor_array[] = {
 	{ARM_THREAD_STATE64, ARM_THREAD_STATE64_COUNT},
-	/* ARM64_TODO: VFP */
+	                     
 	{ARM_EXCEPTION_STATE64, ARM_EXCEPTION_STATE64_COUNT}
 };
 int mynum_flavors = 2;
@@ -112,21 +112,21 @@ typedef struct {
 
 extern int freespace_mb(vnode_t vp);
 
-/* XXX not in a Mach header anywhere */
+                                       
 kern_return_t thread_getstatus(thread_t act, int flavor,
     thread_state_t tstate, mach_msg_type_number_t *count);
 void task_act_iterate_wth_args(task_t, void (*)(thread_t, void *), void *);
 
 #ifdef SECURE_KERNEL
-__XNU_PRIVATE_EXTERN int do_coredump = 0;       /* default: don't dump cores */
+__XNU_PRIVATE_EXTERN int do_coredump = 0;                                      
 #else
-__XNU_PRIVATE_EXTERN int do_coredump = 1;       /* default: dump cores */
+__XNU_PRIVATE_EXTERN int do_coredump = 1;                                
 #endif
-__XNU_PRIVATE_EXTERN int sugid_coredump = 0; /* default: but not SGUID binaries */
+__XNU_PRIVATE_EXTERN int sugid_coredump = 0;                                      
 
 
-/* cpu_type returns only the most generic indication of the current CPU. */
-/* in a core we want to know the kind of process. */
+                                                                           
+                                                    
 
 static cpu_type_t
 process_cpu_type(proc_t core_proc)
@@ -178,9 +178,9 @@ collectth_state(thread_t th_act, void *tirp)
 	struct thread_command   *tc;
 	tir_t *t = (tir_t *)tirp;
 
-	/*
-	 *	Fill in thread command structure.
-	 */
+	  
+                                     
+    
 	header = t->header;
 	hoffset = t->hoffset;
 	flavors = t->flavors;
@@ -190,11 +190,11 @@ collectth_state(thread_t th_act, void *tirp)
 	tc->cmdsize = (uint32_t)(sizeof(struct thread_command)
 	    + t->tstate_size);
 	hoffset += sizeof(struct thread_command);
-	/*
-	 * Follow with a struct thread_state_flavor and
-	 * the appropriate thread state struct for each
-	 * thread state flavor.
-	 */
+	  
+                                                
+                                                
+                        
+    
 	for (i = 0; i < t->flavor_count; i++) {
 		*(mythread_state_flavor_t *)(header + hoffset) =
 		    flavors[i];
@@ -208,33 +208,33 @@ collectth_state(thread_t th_act, void *tirp)
 	t->hoffset = hoffset;
 }
 
-/*
- * coredump
- *
- * Description:	Create a core image on the file "core" for the process
- *		indicated
- *
- * Parameters:	core_proc			Process to dump core [*]
- *				reserve_mb			If non-zero, leave filesystem with
- *									at least this much free space.
- *				coredump_flags	Extra options (ignore rlimit, run fsync)
- *
- * Returns:	0				Success
- *		!0				Failure errno
- *
- * IMPORTANT:	This function can only be called on the current process, due
- *		to assumptions below; see variable declaration section for
- *		details.
- */
+  
+           
+  
+                                                                      
+             
+  
+                                                   
+                                                     
+                                         
+                                                             
+  
+                        
+                       
+  
+                                                                          
+                                                              
+            
+   
 #define MAX_TSTATE_FLAVORS      10
 int
 coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 {
-/* Begin assumptions that limit us to only the current process */
+                                                                 
 	vfs_context_t ctx = vfs_context_current();
 	vm_map_t        map = current_map();
 	task_t          task = current_task();
-/* End assumptions */
+                     
 	kauth_cred_t cred = vfs_context_ucred(ctx);
 	int error = 0;
 	struct vnode_attr va;
@@ -261,8 +261,8 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 	mach_msg_type_number_t vbrcount = 0;
 	tir_t tir1;
 	struct vnode * vp;
-	struct mach_header      *mh = NULL;     /* protected by is_64 */
-	struct mach_header_64   *mh64 = NULL;   /* protected by is_64 */
+	struct mach_header      *mh = NULL;                             
+	struct mach_header_64   *mh64 = NULL;                           
 	int             is_64 = 0;
 	size_t          mach_header_sz = sizeof(struct mach_header);
 	size_t          segment_command_sz = sizeof(struct segment_command);
@@ -271,8 +271,8 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		panic("coredump() called against proc that is not current_proc: %p", core_proc);
 	}
 
-	if (do_coredump == 0 ||         /* Not dumping at all */
-	    ((sugid_coredump == 0) &&   /* Not dumping SUID/SGID binaries */
+	if (do_coredump == 0 ||                                 
+	    ((sugid_coredump == 0) &&                                       
 	    ((kauth_cred_getsvuid(cred) != kauth_cred_getruid(cred)) ||
 	    (kauth_cred_getsvgid(cred) != kauth_cred_getrgid(cred))))) {
 		error = EFAULT;
@@ -304,8 +304,8 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 
 	alloced_name = zalloc_flags(ZV_NAMEI, Z_NOWAIT | Z_ZERO);
 
-	/* create name according to sysctl'able format string */
-	/* if name creation fails, fall back to historical behaviour... */
+	                                                        
+	                                                                  
 	if (alloced_name == NULL ||
 	    proc_core_name(core_proc->p_comm, kauth_cred_getuid(cred),
 	    core_proc->p_pid, alloced_name, MAXPATHLEN)) {
@@ -322,14 +322,14 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 
 	VATTR_INIT(&va);
 	VATTR_WANTED(&va, va_nlink);
-	/* Don't dump to non-regular files or files with links. */
+	                                                          
 	if (vp->v_type != VREG ||
 	    vnode_getattr(vp, &va, ctx) || va.va_nlink != 1) {
 		error = EFAULT;
 		goto out;
 	}
 
-	VATTR_INIT(&va);        /* better to do it here than waste more stack in vnode_setsize */
+	VATTR_INIT(&va);                                                                         
 	VATTR_SET(&va, va_data_size, 0);
 	if (core_proc == initproc) {
 		VATTR_SET(&va, va_dataprotect_class, PROTECTION_CLASS_D);
@@ -343,14 +343,14 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		goto out;
 	}
 
-	/*
-	 *	If the task is modified while dumping the file
-	 *	(e.g., changes in threads or VM, the resulting
-	 *	file will not necessarily be correct.
-	 */
+	  
+                                                  
+                                                  
+                                         
+    
 
 	thread_count = get_task_numacts(task);
-	segment_count = get_vmmap_entries(map); /* XXX */
+	segment_count = get_vmmap_entries(map);          
 	tir1.flavor_count = sizeof(thread_flavor_array) / sizeof(mythread_state_flavor_t);
 	bcopy(thread_flavor_array, flavors, sizeof(thread_flavor_array));
 	tstate_size = 0;
@@ -363,19 +363,19 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		size_t lhs;
 		size_t rhs;
 
-		/* lhs = segment_count * segment_command_sz */
+		                                              
 		if (os_mul_overflow(segment_count, segment_command_sz, &lhs)) {
 			error = ENOMEM;
 			goto out;
 		}
 
-		/* rhs = (tstate_size + sizeof(struct thread_command)) * thread_count */
+		                                                                        
 		if (os_add_and_mul_overflow(tstate_size, sizeof(struct thread_command), thread_count, &rhs)) {
 			error = ENOMEM;
 			goto out;
 		}
 
-		/* command_size = lhs + rhs */
+		                              
 		if (os_add_overflow(lhs, rhs, &command_size)) {
 			error = ENOMEM;
 			goto out;
@@ -392,9 +392,9 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		goto out;
 	}
 
-	/*
-	 *	Set up Mach-O header.
-	 */
+	  
+                         
+    
 	if (is_64) {
 		mh64 = (struct mach_header_64 *)header;
 		mh64->magic = MH_MAGIC_64;
@@ -403,7 +403,7 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		mh64->filetype = MH_CORE;
 		mh64->ncmds = (uint32_t)(segment_count + thread_count);
 		mh64->sizeofcmds = (uint32_t)command_size;
-		mh64->reserved = 0;             /* 8 byte alignment */
+		mh64->reserved = 0;                                   
 	} else {
 		mh = (struct mach_header *)header;
 		mh->magic = MH_MAGIC;
@@ -414,21 +414,21 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		mh->sizeofcmds = (uint32_t)command_size;
 	}
 
-	hoffset = mach_header_sz;       /* offset into header */
-	foffset = round_page(header_size);      /* offset into file */
-	vmoffset = MACH_VM_MIN_ADDRESS;         /* offset into VM */
+	hoffset = mach_header_sz;                               
+	foffset = round_page(header_size);                            
+	vmoffset = MACH_VM_MIN_ADDRESS;                             
 
-	/*
-	 * We use to check for an error, here, now we try and get
-	 * as much as we can
-	 */
+	  
+                                                          
+                     
+    
 	while (segment_count > 0) {
 		struct segment_command          *sc;
 		struct segment_command_64       *sc64;
 
-		/*
-		 *	Get region information for next region.
-		 */
+		  
+                                            
+     
 
 		while (1) {
 			vbrcount = VM_REGION_SUBMAP_INFO_COUNT_64;
@@ -438,12 +438,12 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 			    &vbrcount)) != KERN_SUCCESS) {
 				break;
 			}
-			/*
-			 * If we get a valid mapping back, but we're dumping
-			 * a 32 bit process,  and it's over the allowable
-			 * address space of a 32 bit process, it's the same
-			 * as if mach_vm_region_recurse() failed.
-			 */
+			  
+                                                       
+                                                    
+                                                      
+                                            
+      
 			if (!(is_64) &&
 			    (vmoffset + vmsize > VM_MAX_ADDRESS)) {
 				kret = KERN_INVALID_ADDRESS;
@@ -463,14 +463,14 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		prot = vbr.protection;
 		maxprot = vbr.max_protection;
 		inherit = vbr.inheritance;
-		/*
-		 *	Fill in segment command structure.
-		 */
+		  
+                                       
+     
 		if (is_64) {
 			sc64 = (struct segment_command_64 *)(header + hoffset);
 			sc64->cmd = LC_SEGMENT_64;
 			sc64->cmdsize = sizeof(struct segment_command_64);
-			/* segment name is zeroed by kmem_alloc */
+			                                          
 			sc64->segname[0] = 0;
 			sc64->vmaddr = vmoffset;
 			sc64->vmsize = vmsize;
@@ -484,31 +484,31 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 			sc = (struct segment_command *) (header + hoffset);
 			sc->cmd = LC_SEGMENT;
 			sc->cmdsize = sizeof(struct segment_command);
-			/* segment name is zeroed by kmem_alloc */
+			                                          
 			sc->segname[0] = 0;
 			sc->vmaddr = CAST_DOWN_EXPLICIT(uint32_t, vmoffset);
 			sc->vmsize = CAST_DOWN_EXPLICIT(uint32_t, vmsize);
-			sc->fileoff = CAST_DOWN_EXPLICIT(uint32_t, foffset); /* will never truncate */
-			sc->filesize = CAST_DOWN_EXPLICIT(uint32_t, vmsize); /* will never truncate */
+			sc->fileoff = CAST_DOWN_EXPLICIT(uint32_t, foffset);                          
+			sc->filesize = CAST_DOWN_EXPLICIT(uint32_t, vmsize);                          
 			sc->maxprot = maxprot;
 			sc->initprot = prot;
 			sc->nsects = 0;
 			sc->flags = 0;
 		}
 
-		/*
-		 *	Write segment out.  Try as hard as possible to
-		 *	get read access to the data.
-		 */
+		  
+                                                   
+                                 
+     
 		if ((prot & VM_PROT_READ) == 0) {
 			mach_vm_protect(map, vmoffset, vmsize, FALSE,
 			    prot | VM_PROT_READ);
 		}
-		/*
-		 *	Only actually perform write if we can read.
-		 *	Note: if we can't read, then we end up with
-		 *	a hole in the file.
-		 */
+		  
+                                                
+                                                
+                        
+     
 		if ((maxprot & VM_PROT_READ) == VM_PROT_READ
 		    && vbr.user_tag != VM_MEMORY_IOKIT
 		    && coredumpok(map, vmoffset)) {
@@ -523,13 +523,13 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 		segment_count--;
 	}
 
-	/*
-	 * If there are remaining segments which have not been written
-	 * out because break in the loop above, then they were not counted
-	 * because they exceed the real address space of the executable
-	 * type: remove them from the header's count.  This is OK, since
-	 * we are allowed to have a sparse area following the segments.
-	 */
+	  
+                                                               
+                                                                   
+                                                                
+                                                                 
+                                                                
+    
 	if (is_64) {
 		mh64->ncmds -= segment_count;
 		mh64->sizeofcmds -= segment_count * segment_command_sz;
@@ -544,10 +544,10 @@ coredump(proc_t core_proc, uint32_t reserve_mb, int coredump_flags)
 	tir1.tstate_size = tstate_size;
 	task_act_iterate_wth_args(task, collectth_state, &tir1);
 
-	/*
-	 *	Write out the Mach header at the beginning of the
-	 *	file.  OK to use a 32 bit write for this.
-	 */
+	  
+                                                     
+                                             
+    
 	error = vn_rdwr(UIO_WRITE, vp, (caddr_t)header, (int)MIN(header_size, INT_MAX), (off_t)0,
 	    UIO_SYSSPACE, IO_NOCACHE | IO_NODELOCKED | IO_UNIT, cred, (int *) 0, core_proc);
 	kmem_free(kernel_map, header, header_size);
@@ -571,10 +571,10 @@ out2:
 	return error;
 }
 
-#else /* CONFIG_COREDUMP */
+#else                      
 
-/* When core dumps aren't needed, no need to compile this file at all */
+                                                                        
 
 #error assertion failed: this section is not compiled
 
-#endif /* CONFIG_COREDUMP */
+#endif                      

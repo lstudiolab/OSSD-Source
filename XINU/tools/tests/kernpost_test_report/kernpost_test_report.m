@@ -23,7 +23,7 @@
 
 #define PERR(_msg) perror("error: " _msg)
 
-/* XNUPost KCData constants */
+                              
 NSString * const kXNUPostKCDataKeyTestConfig      = @"xnupost_testconfig";
 NSString * const kXNUPostKCDataKeyOSVersion       = @"osversion";
 NSString * const kXNUPostKCDataKeyBootargs        = @"boot_args";
@@ -37,7 +37,7 @@ NSString * const kXNUPostKCDataKeyEndTime         = @"end_time";
 NSString * const kXNUPostKCDataKeyRetval          = @"retval";
 NSString * const kXNUPostKCDataKeyExpectedRetval  = @"expected_retval";
 
-/* Resultbundle info constants */
+                                 
 NSString * const kRBInfoKeyVersion         = @"version";
 NSString * const kRBInfoKeyCategory        = @"test_category";
 NSString * const kRBInfoKeyTestID          = @"test_id";
@@ -207,10 +207,10 @@ export_to_plist(void * raw_buf, size_t raw_size)
 	}
 }
 
-#define RESULTBUNDLE_TIME_STR_SIZE (30) // 0000-00-00T00:00:00.000+00:00'\0'
+#define RESULTBUNDLE_TIME_STR_SIZE (30)                                     
 #define RESULTBUNLDE_TIME_MS_INDEX (20)
 #define RESULTBUNLDE_TIME_TZ_COLON_INDEX (26)
-#define RESULTBUNDLE_TIME_MS_STR_SIZE (4) // 000'\0'
+#define RESULTBUNDLE_TIME_MS_STR_SIZE (4)           
 #define MSEC_PER_USEC 1000ull
 
 static void
@@ -225,14 +225,14 @@ get_estimated_time_str_resultbundle(char * output_str, uint64_t mach_abs_time_us
 	localtime_r(&est_sec, &tm_info);
 	strftime(output_str, RESULTBUNDLE_TIME_STR_SIZE, "%Y-%m-%dT%H:%M:%S.000%z", &tm_info);
 
-	/* Fill out milliseconds */
+	                           
 	char ms_str[RESULTBUNDLE_TIME_MS_STR_SIZE] = {0};
 	snprintf(ms_str, RESULTBUNDLE_TIME_MS_STR_SIZE, "%03llu", est_usec_fraction / MSEC_PER_USEC);
 	for (i = 0; i < 3; i++) {
 		output_str[RESULTBUNLDE_TIME_MS_INDEX + i] = ms_str[i];
 	}
 
-	/* Add colon for timezone offset */
+	                                   
 	for (i = RESULTBUNDLE_TIME_STR_SIZE - 1; i > RESULTBUNLDE_TIME_TZ_COLON_INDEX; i--) {
 		output_str[i] = output_str[i - 1];
 	}

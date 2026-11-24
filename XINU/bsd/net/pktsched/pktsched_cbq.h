@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_cbq.h,v 1.8 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_cbq.h,v 1.12 2003/10/03 05:05:15 kjc Exp $	*/
+                                                               
+                                                            
 
 /*
  * Copyright (c) Sun Microsystems, Inc. 1993-1998 All rights reserved.
@@ -74,30 +74,30 @@
 extern "C" {
 #endif
 
-/* class flags should be same as class flags in rm_class.h */
-#define CBQCLF_RED              RMCF_RED        /* use RED */
-#define CBQCLF_ECN              RMCF_ECN        /* use ECN with RED/BLUE/SFB */
-#define CBQCLF_RIO              RMCF_RIO        /* use RIO */
-#define CBQCLF_FLOWVALVE        RMCF_FLOWVALVE  /* use flowvalve/penalty-box */
-#define CBQCLF_CLEARDSCP        RMCF_CLEARDSCP  /* clear diffserv codepoint */
-#define CBQCLF_BORROW           0x0020          /* borrow from parent */
+                                                             
+#define CBQCLF_RED              RMCF_RED                     
+#define CBQCLF_ECN              RMCF_ECN                                       
+#define CBQCLF_RIO              RMCF_RIO                     
+#define CBQCLF_FLOWVALVE        RMCF_FLOWVALVE                                 
+#define CBQCLF_CLEARDSCP        RMCF_CLEARDSCP                                
+#define CBQCLF_BORROW           0x0020                                  
 
-/* class flags only for root class */
-#define CBQCLF_WRR              RMCF_WRR        /* weighted-round robin */
-#define CBQCLF_EFFICIENT        RMCF_EFFICIENT  /* work-conserving */
+                                     
+#define CBQCLF_WRR              RMCF_WRR                                  
+#define CBQCLF_EFFICIENT        RMCF_EFFICIENT                       
 
-/* class flags for special classes */
-#define CBQCLF_ROOTCLASS        0x1000          /* root class */
-#define CBQCLF_DEFCLASS         0x2000          /* default class */
-#define CBQCLF_CLASSMASK        0xf000          /* class mask */
+                                     
+#define CBQCLF_ROOTCLASS        0x1000                          
+#define CBQCLF_DEFCLASS         0x2000                             
+#define CBQCLF_CLASSMASK        0xf000                          
 
-#define CBQCLF_BLUE             RMCF_BLUE       /* use BLUE */
-#define CBQCLF_SFB              RMCF_SFB        /* use SFB */
-#define CBQCLF_FLOWCTL          RMCF_FLOWCTL    /* enable flow ctl advisories */
+#define CBQCLF_BLUE             RMCF_BLUE                     
+#define CBQCLF_SFB              RMCF_SFB                     
+#define CBQCLF_FLOWCTL          RMCF_FLOWCTL                                    
 
 #ifdef BSD_KERNEL_PRIVATE
-#define CBQCLF_LAZY             0x10000000 /* on-demand resource allocation */
-#endif /* BSD_KERNEL_PRIVATE */
+#define CBQCLF_LAZY             0x10000000                                    
+#endif                         
 
 #define CBQCLF_USERFLAGS                                                   \
 	(CBQCLF_RED | CBQCLF_ECN | CBQCLF_RIO | CBQCLF_FLOWVALVE |         \
@@ -113,7 +113,7 @@ extern "C" {
 #define CBQCLF_BITS \
 	"\020\1RED\2ECN\3RIO\4FLOWVALVE\5CLEARDSCP\6BORROW" \
 	"\11WRR\12EFFICIENT\15ROOT\16DEFAULT\21BLUE\22SFB\23FLOWCTL"
-#endif /* !BSD_KERNEL_PRIVATE */
+#endif                          
 
 #define CBQ_MAXQSIZE            200
 #define CBQ_MAXPRI              RM_MAXPRIO
@@ -122,14 +122,14 @@ typedef struct cbq_classstats {
 	u_int32_t       handle;
 	u_int32_t       depth;
 
-	struct pktcntr  xmit_cnt;       /* packets sent in this class */
-	struct pktcntr  drop_cnt;       /* dropped packets */
-	u_int32_t       over;           /* # times went over limit */
-	u_int32_t       borrows;        /* # times tried to borrow */
-	u_int32_t       overactions;    /* # times invoked overlimit action */
-	u_int32_t       delays;         /* # times invoked delay actions */
+	struct pktcntr  xmit_cnt;                                       
+	struct pktcntr  drop_cnt;                            
+	u_int32_t       over;                                        
+	u_int32_t       borrows;                                     
+	u_int32_t       overactions;                                          
+	u_int32_t       delays;                                            
 
-	/* other static class parameters useful for debugging */
+	                                                        
 	int             priority;
 	int             maxidle;
 	int             minidle;
@@ -138,13 +138,13 @@ typedef struct cbq_classstats {
 	int             ns_per_byte;
 	int             wrr_allot;
 
-	int             qcnt;           /* # packets in queue */
+	int             qcnt;                                   
 	int             avgidle;
 
-	/* RED, RIO, BLUE, SFB related info */
+	                                      
 	classq_type_t   qtype;
 	union {
-		/* RIO has 3 red stats */
+		                         
 		struct red_stats        red[RIO_NDROPPREC];
 		struct blue_stats       blue;
 		struct sfb_stats        sfb;
@@ -155,5 +155,5 @@ typedef struct cbq_classstats {
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* !_NET_PKTSCHED_PKTSCHED_CBQ_H_ */
+#endif              
+#endif                                     

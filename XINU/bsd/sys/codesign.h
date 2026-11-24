@@ -35,31 +35,31 @@
 #include <System/kern/cs_blobs.h>
 #endif
 
-/* MAC flags used by F_ADDFILESIGS_* */
-#define MAC_VNODE_CHECK_DYLD_SIM 0x1   /* tells the MAC framework that dyld-sim is being loaded */
+                                       
+#define MAC_VNODE_CHECK_DYLD_SIM 0x1                                                              
 
 #define CLEAR_LV_ENTITLEMENT "com.apple.private.security.clear-library-validation"
 #define OVERRIDE_PLUGIN_HOST_ENTITLEMENT "com.apple.private.security.override-plugin-host-detection"
 
-/* csops  operations */
-#define CS_OPS_STATUS           0       /* return status */
-#define CS_OPS_MARKINVALID      1       /* invalidate process */
-#define CS_OPS_MARKHARD         2       /* set HARD flag */
-#define CS_OPS_MARKKILL         3       /* set KILL flag (sticky) */
+                       
+#define CS_OPS_STATUS           0                          
+#define CS_OPS_MARKINVALID      1                               
+#define CS_OPS_MARKHARD         2                          
+#define CS_OPS_MARKKILL         3                                   
 #ifdef KERNEL_PRIVATE
-/* CS_OPS_PIDPATH		4	*/
+                       
 #endif
-#define CS_OPS_CDHASH           5       /* get code directory hash */
-#define CS_OPS_PIDOFFSET        6       /* get offset of active Mach-o slice */
-#define CS_OPS_ENTITLEMENTS_BLOB 7      /* get entitlements blob */
-#define CS_OPS_MARKRESTRICT     8       /* set RESTRICT flag (sticky) */
-#define CS_OPS_SET_STATUS       9       /* set codesign flags */
-#define CS_OPS_BLOB             10      /* get codesign blob */
-#define CS_OPS_IDENTITY         11      /* get codesign identity */
-#define CS_OPS_CLEARINSTALLER   12      /* clear INSTALLER flag */
-#define CS_OPS_CLEARPLATFORM 13 /* clear platform binary status (DEVELOPMENT-only) */
-#define CS_OPS_TEAMID       14  /* get team id */
-#define CS_OPS_CLEAR_LV     15  /* clear the library validation flag */
+#define CS_OPS_CDHASH           5                                    
+#define CS_OPS_PIDOFFSET        6                                              
+#define CS_OPS_ENTITLEMENTS_BLOB 7                                 
+#define CS_OPS_MARKRESTRICT     8                                       
+#define CS_OPS_SET_STATUS       9                               
+#define CS_OPS_BLOB             10                             
+#define CS_OPS_IDENTITY         11                                 
+#define CS_OPS_CLEARINSTALLER   12                                
+#define CS_OPS_CLEARPLATFORM 13                                                      
+#define CS_OPS_TEAMID       14                   
+#define CS_OPS_CLEAR_LV     15                                         
 
 #define CS_MAX_TEAMID_LEN       64
 
@@ -69,12 +69,12 @@
 #include <mach/message.h>
 
 __BEGIN_DECLS
-/* code sign operations */
+                          
 int csops(pid_t pid, unsigned int  ops, void * useraddr, size_t usersize);
 int csops_audittoken(pid_t pid, unsigned int  ops, void * useraddr, size_t usersize, audit_token_t * token);
 __END_DECLS
 
-#else /* !KERNEL */
+#else              
 
 #include <mach/machine.h>
 #include <mach/vm_types.h>
@@ -136,9 +136,9 @@ const CS_GenericBlob *
 void *          csblob_entitlements_dictionary_copy(struct cs_blob *csblob);
 void            csblob_entitlements_dictionary_set(struct cs_blob *csblob, void * entitlements);
 
-/*
- * Mostly convenience functions below
- */
+  
+                                     
+   
 
 const   char * csproc_get_teamid(struct proc *);
 const   char * csproc_get_identity(struct proc *);
@@ -185,13 +185,13 @@ int     csproc_get_platform_path(struct proc *);
 extern int cs_enforcement_panic;
 #endif
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 
 __END_DECLS
 
 
 
-#endif /* KERNEL */
+#endif             
 
-#endif /* _SYS_CODESIGN_H_ */
+#endif                       

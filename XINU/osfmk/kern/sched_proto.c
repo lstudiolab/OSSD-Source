@@ -243,7 +243,7 @@ sched_proto_timebase_init(void)
 {
 	uint64_t        abstime;
 
-	/* standard timeslicing quantum */
+	                                  
 	clock_interval_to_absolutetime_interval(
 		proto_quantum_us, NSEC_PER_USEC, &abstime);
 	assert((abstime >> 32) == 0 && (uint32_t)abstime != 0);
@@ -260,7 +260,7 @@ sched_proto_timebase_init(void)
 static void
 sched_proto_processor_init(processor_t processor __unused)
 {
-	/* No per-processor state */
+	                            
 }
 
 static void
@@ -275,7 +275,7 @@ sched_proto_maintenance_continuation(void)
 
 	sched_proto_tick++;
 
-	/* Every 8 seconds, switch to another processor */
+	                                                  
 	if ((sched_proto_tick & 0x7) == 0) {
 		processor_t new_processor;
 
@@ -288,9 +288,9 @@ sched_proto_maintenance_continuation(void)
 	}
 
 
-	/*
-	 *  Compute various averages.
-	 */
+	  
+                              
+    
 	compute_averages(1);
 
 	if (sched_proto_tick_deadline == 0) {
@@ -302,7 +302,7 @@ sched_proto_maintenance_continuation(void)
 
 	assert_wait_deadline((event_t)sched_proto_maintenance_continuation, THREAD_UNINT, sched_proto_tick_deadline);
 	thread_block((thread_continue_t)sched_proto_maintenance_continuation);
-	/*NOTREACHED*/
+	              
 }
 
 static thread_t
@@ -322,15 +322,15 @@ sched_proto_choose_thread(processor_t           processor,
 	pri = rq->highq;
 	count = rq->count;
 
-	/*
-	 * Since we don't depress priorities, a high priority thread
-	 * may get selected over and over again. Put a runqueue
-	 * generation number in the thread structure so that we
-	 * can ensure that we've cycled through all runnable tasks
-	 * before coming back to a high priority thread. This isn't
-	 * perfect, especially if the number of runnable threads always
-	 * stays high, but is a workable approximation
-	 */
+	  
+                                                             
+                                                        
+                                                        
+                                                           
+                                                            
+                                                                
+                                               
+    
 
 	while (count > 0 && pri >= priority) {
 		cqe_foreach_element_safe(thread, queue, runq_links) {
@@ -386,10 +386,10 @@ sched_proto_choose_processor(   processor_set_t         pset,
 {
 	processor = proto_processor;
 
-	/*
-	 *	Check that the correct processor set is
-	 *	returned locked.
-	 */
+	  
+                                           
+                    
+    
 	if (pset != processor->processor_set) {
 		pset_unlock(pset);
 
@@ -421,7 +421,7 @@ static void
 sched_proto_processor_queue_shutdown(
 	processor_t                    processor)
 {
-	/* With a global runqueue, just stop choosing this processor */
+	                                                               
 	(void)processor;
 }
 
@@ -438,16 +438,16 @@ sched_proto_processor_queue_remove(
 
 	simple_lock(rqlock, LCK_GRP_NULL);
 	if (processor == thread->runq) {
-		/*
-		 *	Thread is on a run queue and we have a lock on
-		 *	that run queue.
-		 */
+		  
+                                                   
+                    
+     
 		run_queue_remove(rq, thread);
 	} else {
-		/*
-		 *	The thread left the run queue before we could
-		 *      lock the run queue.
-		 */
+		  
+                                                  
+                             
+     
 		assert(thread->runq == PROCESSOR_NULL);
 		processor = PROCESSOR_NULL;
 	}
@@ -487,7 +487,7 @@ sched_proto_processor_queue_has_priority(processor_t            processor __unus
 	return result;
 }
 
-/* Implement sched_preempt_pri in code */
+                                         
 static boolean_t
 sched_proto_priority_is_urgent(int priority)
 {

@@ -66,33 +66,33 @@
  *	@(#)systm.h	8.7 (Berkeley) 3/29/95
  */
 
-/*
- * The `securelevel' variable controls the security level of the system.
- * It can only be decreased by process 1 (/sbin/init).
- *
- * Security levels are as follows:
- *   -1	permannently insecure mode - always run system in level 0 mode.
- *    0	insecure mode - immutable and append-only flags make be turned off.
- *	All devices may be read or written subject to permission modes.
- *    1	secure mode - immutable and append-only flags may not be changed;
- *	raw disks of mounted filesystems, /dev/mem, and /dev/kmem are
- *	read-only.
- *    2	highly secure mode - same as (1) plus raw disks are always
- *	read-only whether mounted or not. This level precludes tampering
- *	with filesystems by unmounting them, but also inhibits running
- *	newfs while the system is secured.
- *
- * In normal operation, the system runs in level 0 mode while single user
- * and in level 1 mode while multiuser. If level 2 mode is desired while
- * running multiuser, it can be set in the multiuser startup script
- * (/etc/rc.local) using sysctl(1). If it is desired to run the system
- * in level 0 mode while multiuser, initialize the variable securelevel
- * in /sys/kern/kern_sysctl.c to -1. Note that it is NOT initialized to
- * zero as that would allow the vmunix binary to be patched to -1.
- * Without initialization, securelevel loads in the BSS area which only
- * comes into existence when the kernel is loaded and hence cannot be
- * patched by a stalking hacker.
- */
+  
+                                                                        
+                                                      
+  
+                                  
+                                                                       
+                                                                           
+                                                                  
+                                                                         
+                                                                
+             
+                                                                  
+                                                                   
+                                                                 
+                                     
+  
+                                                                         
+                                                                        
+                                                                   
+                                                                      
+                                                                       
+                                                                       
+                                                                  
+                                                                       
+                                                                     
+                                
+   
 
 #ifndef _SYS_SYSTM_H_
 #define _SYS_SYSTM_H_
@@ -117,37 +117,37 @@ __BEGIN_DECLS
 __END_DECLS
 
 #ifdef BSD_KERNEL_PRIVATE
-extern char version[];                  /* system version */
+extern char version[];                                      
 extern const char *const copyright;     /* system copyright */
 
 
-extern int      boothowto;      /* reboot flags, from console subsystem */
+extern int      boothowto;                                                
 extern int      show_space;
 extern int      minimalboot;
 #if CONFIG_DARKBOOT
 extern int      darkboot;
 #endif
 
-extern const int nblkdev; /* number of entries in bdevsw */
-extern const int nchrdev; /* number of entries in cdevsw */
-#endif /* BSD_KERNEL_PRIVATE */
+extern const int nblkdev;                                  
+extern const int nchrdev;                                  
+#endif                         
 
 #ifdef KERNEL_PRIVATE
 
-extern int securelevel;         /* system security level */
-extern dev_t rootdev;           /* root device */
-extern struct vnode *rootvp;    /* vnode equivalent to above */
+extern int securelevel;                                    
+extern dev_t rootdev;                            
+extern struct vnode *rootvp;                                   
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #define SYSINIT(a, b, c, d, e)
 #define MALLOC_DEFINE(a, b, c)
 
 #define getenv_int(a, b) (*b = 0)
 #define KASSERT(exp, msg)
-/*
- * General function declarations.
- */
+  
+                                 
+   
 __BEGIN_DECLS
 
 #ifdef BSD_KERNEL_PRIVATE
@@ -184,7 +184,7 @@ void __pthread_testcancel(int presyscall);
 void throttle_info_get_last_io_time(mount_t mp, struct timeval *tv);
 void update_last_io_time(mount_t mp);
 void throttle_info_end_io(buf_t bp);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef KERNEL_PRIVATE
 void    timeout(void (*)(void *), void *arg, int ticks);
@@ -193,7 +193,7 @@ void    untimeout(void (*)(void *), void *arg);
 int     bsd_hostname(char *, size_t, size_t*);
 int     vslock(user_addr_t addr, user_size_t len);
 int     vsunlock(user_addr_t addr, user_size_t len, int dirtied);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 int     nullop(void);
 int     nulldev(void);
@@ -229,7 +229,7 @@ void    throttle_info_mount_rel(mount_t mp);
 void    throttle_info_release(void *throttle_info);
 void    throttle_info_update(void *throttle_info, int flags);
 uint32_t throttle_lowpri_io(int sleep_amount);
-/* returns TRUE if the throttle_lowpri_io called with the same sleep_amount would've slept */
+                                                                                             
 int     throttle_lowpri_io_will_be_throttled(int sleep_amount);
 void    throttle_set_thread_io_policy(int policy);
 int     throttle_get_thread_effective_io_policy(void);
@@ -240,16 +240,16 @@ int     throttle_info_ref_by_mask(uint64_t throttle_mask, throttle_info_handle_t
 void    throttle_info_rel_by_mask(throttle_info_handle_t throttle_info_handle);
 void    throttle_info_update_by_mask(void *throttle_info_handle, int flags);
 void    throttle_info_disable_throttle(int devno, boolean_t isfusion);
-/*
- * 'throttle_info_handle' acquired via 'throttle_info_ref_by_mask'
- * 'policy' should be specified as either IOPOL_UTILITY or IPOL_THROTTLE,
- * all other values will be treated as IOPOL_NORMAL (i.e. no throttling)
- */
+  
+                                                                  
+                                                                         
+                                                                        
+   
 int     throttle_info_io_will_be_throttled(void *throttle_info_handle, int policy);
 
 #ifdef KERNEL_PRIVATE
 
-/* returned by throttle_io_will_be_throttled */
+                                               
 #define THROTTLE_DISENGAGED     0
 #define THROTTLE_ENGAGED        1
 #define THROTTLE_NOW            2
@@ -269,8 +269,8 @@ void *exec_spawnattr_getmacpolicyinfo(const void *macextensions, const char *pol
 
 void sys_override_io_throttle(boolean_t enable_override);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
-#endif /* !_SYS_SYSTM_H_ */
+#endif                     

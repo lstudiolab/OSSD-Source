@@ -14,7 +14,7 @@
 
 #include <corecrypto/cc_config.h>
 
-/* Only intel systems have these runtime switches today. */
+                                                           
 
 #if defined(__x86_64__) || defined(__i386__)
 
@@ -41,7 +41,7 @@
     #define CC_HAS_ADX() (_get_cpu_capabilities() & kHasADX)
 
 #elif CC_SGX
-// SGX has no cpuid function, so these will fail
+                                                
     #define CC_HAS_AESNI() 0
     #define CC_HAS_SupplementalSSE3() 0
     #define CC_HAS_AVX1() 0
@@ -84,6 +84,6 @@
 
 #endif
 
-#endif  // defined(__x86_64__) || defined(__i386__)
+#endif                                             
 
-#endif /* CORECRYPTO_CC_RUNTIME_CONFIG_H_ */
+#endif                                      

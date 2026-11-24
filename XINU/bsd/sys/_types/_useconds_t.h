@@ -27,6 +27,6 @@
  */
 #ifndef _USECONDS_T
 #define _USECONDS_T
-#include <sys/_types.h> /* __darwin_useconds_t */
+#include <sys/_types.h>                          
 typedef __darwin_useconds_t     useconds_t;
-#endif /* _USECONDS_T */
+#endif                  

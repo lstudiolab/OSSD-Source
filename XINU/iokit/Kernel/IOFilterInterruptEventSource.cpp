@@ -53,7 +53,7 @@ do { \
 #define IOStatisticsInitializeCounter()
 #define IOStatisticsInterrupt()
 
-#endif /* IOKITSTATS */
+#endif                 
 
 #define super IOInterruptEventSource
 
@@ -68,9 +68,9 @@ OSMetaClassDefineReservedUnused(IOFilterInterruptEventSource, 5);
 OSMetaClassDefineReservedUnused(IOFilterInterruptEventSource, 6);
 OSMetaClassDefineReservedUnused(IOFilterInterruptEventSource, 7);
 
-/*
- * Implement the call throughs for the private protection conversion
- */
+  
+                                                                    
+   
 bool
 IOFilterInterruptEventSource::init(OSObject *inOwner,
     Action inAction,
@@ -207,7 +207,7 @@ IOFilterInterruptEventSource::getFilterActionBlock() const
 
 void
 IOFilterInterruptEventSource::normalInterruptOccurred
-(void */*refcon*/, IOService */*prov*/, int /*source*/)
+(void *          , IOService *        , int           )
 {
 	bool        filterRes;
 	uint64_t    startTime = 0;
@@ -229,7 +229,7 @@ IOFilterInterruptEventSource::normalInterruptOccurred
 		}
 	}
 
-	// Call the filter.
+	                   
 	if (kFilterBlock & flags) {
 		filterRes = (filterActionBlock)(this);
 	} else {
@@ -260,7 +260,7 @@ IOFilterInterruptEventSource::normalInterruptOccurred
 
 void
 IOFilterInterruptEventSource::disableInterruptOccurred
-(void */*refcon*/, IOService *prov, int source)
+(void *          , IOService *prov, int source)
 {
 	bool        filterRes;
 	uint64_t    startTime = 0;
@@ -282,7 +282,7 @@ IOFilterInterruptEventSource::disableInterruptOccurred
 		}
 	}
 
-	// Call the filter.
+	                   
 	if (kFilterBlock & flags) {
 		filterRes = (filterActionBlock)(this);
 	} else {
@@ -306,7 +306,7 @@ IOFilterInterruptEventSource::disableInterruptOccurred
 	}
 
 	if (filterRes) {
-		prov->disableInterrupt(source); /* disable the interrupt */
+		prov->disableInterrupt(source);                            
 		signalInterrupt();
 	}
 }

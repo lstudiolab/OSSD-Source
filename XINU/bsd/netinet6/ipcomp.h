@@ -1,5 +1,5 @@
-/*	$FreeBSD: src/sys/netinet6/ipcomp.h,v 1.1.2.2 2001/07/03 11:01:54 ume Exp $	*/
-/*	$KAME: ipcomp.h,v 1.8 2000/09/26 07:55:14 itojun Exp $	*/
+                                                                                 
+                                                            
 
 /*
  * Copyright (C) 1999 WIDE Project.
@@ -30,9 +30,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC2393 IP payload compression protocol (IPComp).
- */
+  
+                                                    
+   
 
 #ifndef _NETINET6_IPCOMP_H_
 #define _NETINET6_IPCOMP_H_
@@ -40,17 +40,17 @@
 #include <netinet6/ipsec.h>
 
 struct ipcomp {
-	u_int8_t comp_nxt;      /* Next Header */
-	u_int8_t comp_flags;    /* reserved, must be zero */
-	u_int16_t comp_cpi;     /* Compression parameter index */
+	u_int8_t comp_nxt;                       
+	u_int8_t comp_flags;                                
+	u_int16_t comp_cpi;                                      
 };
 
-/* well-known algorithm number (in CPI), from RFC2409 */
-#define IPCOMP_OUI      1       /* vendor specific */
-#define IPCOMP_DEFLATE  2       /* RFC2394 */
-#define IPCOMP_LZS      3       /* RFC2395 */
+                                                        
+#define IPCOMP_OUI      1                            
+#define IPCOMP_DEFLATE  2                    
+#define IPCOMP_LZS      3                    
 #define IPCOMP_MAX      4
 
 #define IPCOMP_CPI_NEGOTIATE_MIN        256
 
-#endif /* _NETINET6_IPCOMP_H_ */
+#endif                          

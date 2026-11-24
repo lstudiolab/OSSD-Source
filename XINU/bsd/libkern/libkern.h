@@ -59,19 +59,19 @@
  *
  *	@(#)libkern.h	8.1 (Berkeley) 6/10/93
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _LIBKERN_LIBKERN_H_
 #define _LIBKERN_LIBKERN_H_
 
 #include <sys/appleapiopts.h>
 #include <stdint.h>
-#include <stdarg.h>     /* for platform-specific va_list */
+#include <stdarg.h>                                        
 #include <string.h>
 #include <machine/limits.h>
 #include <sys/cdefs.h>
@@ -81,23 +81,23 @@
 #include <libkern/copyio.h>
 
 #if defined(__arm__) || defined(__arm64__)
-#include <arm/arch.h> /* for _ARM_ARCH_* */
+#include <arm/arch.h>                      
 #endif
 
 #ifdef __APPLE_API_OBSOLETE
-/* BCD conversions. */
+                      
 extern u_char const     bcd2bin_data[];
 extern u_char const     bin2bcd_data[];
 
 #define bcd2bin(bcd)    (bcd2bin_data[bcd])
 #define bin2bcd(bin)    (bin2bcd_data[bin])
-#endif /* __APPLE_API_OBSOLETE */
+#endif                           
 
 #ifdef __APPLE_API_PRIVATE
 extern char const       hex2ascii_data[];
 
 #define hex2ascii(hex)  (hex2ascii_data[hex])
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
 __BEGIN_DECLS
 static inline int
@@ -143,7 +143,7 @@ ulmin(u_int32_t a, u_int32_t b)
 
 
 
-/* Prototypes for non-quad routines. */
+                                       
 extern int      ffs(unsigned int);
 extern int      ffsll(unsigned long long);
 extern int      fls(unsigned int);
@@ -158,15 +158,15 @@ extern char     *strsep(char **, const char *);
 extern void     *memchr(const void *, int, size_t);
 extern void     url_decode(char *str);
 
-/*
- * NOTE: snprintf() returns the full length of the formatted string even if it
- * couldn't fit in the supplied buffer.
- * Use scnprintf() if you need the actual number of bytes (minus the \0)
- */
+  
+                                                                              
+                                       
+                                                                        
+   
 int     snprintf(char *, size_t, const char *, ...) __printflike(3, 4);
 int     scnprintf(char *, size_t, const char *, ...) __printflike(3, 4);
 
-/* sprintf() is being deprecated. Please use snprintf() instead. */
+                                                                   
 int     sprintf(char *bufp, const char *, ...) __deprecated __printflike(2, 3);
 int     sscanf(const char *, char const *, ...) __scanflike(2, 3);
 int     printf(const char *, ...) __printflike(1, 2);
@@ -223,7 +223,7 @@ extern void     osobject_retain(void * object);
 extern void     osobject_release(void * object);
 #endif
 
-/* vsprintf() is being deprecated. Please use vsnprintf() instead. */
+                                                                     
 extern int      vsprintf(char *bufp, const char *, va_list) __deprecated __printflike(2, 0);
 
 #ifdef KERNEL_PRIVATE
@@ -245,20 +245,20 @@ static inline int
 clz(unsigned int num)
 {
 #if (__arm__ || __arm64__)
-	// On ARM, clz(0) is defined to return number of bits in the input type
+	                                                                       
 	return __builtin_clz(num);
 #else
-	// On Intel, clz(0) is undefined
+	                                
 	return num ? __builtin_clz(num) : sizeof(num) * CHAR_BIT;
 #endif
 }
 
 #if XNU_KERNEL_PRIVATE
 
-/*
- * Define a function that for whatever reason needs to exist, but must never be
- * called.
- */
+  
+                                                                               
+          
+   
 #define UNSUPPORTED_API(funcname, ...) \
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
@@ -269,4 +269,4 @@ clz(unsigned int num)
 
 __END_DECLS
 
-#endif /* _LIBKERN_LIBKERN_H_ */
+#endif                          

@@ -53,21 +53,21 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/*
- */
-/*
- *	File:	ipc/ipc_object.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Definitions for IPC objects, for which tasks have capabilities.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
+  
+   
+  
+                         
+                      
+             
+  
+                                                                  
+   
 
 #ifndef _IPC_IPC_OBJECT_H_
 #define _IPC_IPC_OBJECT_H_
@@ -81,7 +81,7 @@
 #include <ipc/ipc_types.h>
 #include <libkern/OSAtomic.h>
 
-typedef natural_t ipc_object_refs_t;    /* for ipc/ipc_object.h		*/
+typedef natural_t ipc_object_refs_t;                               
 typedef natural_t ipc_object_bits_t;
 typedef natural_t ipc_object_type_t;
 
@@ -93,63 +93,63 @@ __options_closed_decl(ipc_object_copyout_flags_t, uint32_t, {
 
 __options_closed_decl(ipc_object_copyin_flags_t, uint32_t, {
 	IPC_OBJECT_COPYIN_FLAGS_NONE                     = 0x0,
-	IPC_OBJECT_COPYIN_FLAGS_ALLOW_IMMOVABLE_SEND     = 0x1, /* Dest port contains an immovable send right */
-	IPC_OBJECT_COPYIN_FLAGS_SOFT_FAIL_IMMOVABLE_SEND = 0x2, /* Silently fail copyin without guard exception */
+	IPC_OBJECT_COPYIN_FLAGS_ALLOW_IMMOVABLE_SEND     = 0x1,                                                 
+	IPC_OBJECT_COPYIN_FLAGS_SOFT_FAIL_IMMOVABLE_SEND = 0x2,                                                   
 	IPC_OBJECT_COPYIN_FLAGS_ALLOW_DEAD_SEND_ONCE     = 0x4,
 	IPC_OBJECT_COPYIN_FLAGS_DEADOK                   = 0x8,
 });
 
-/*
- * The ipc_object is used to both tag and reference count these two data
- * structures, and (Noto Bene!) pointers to either of these or the
- * ipc_object at the head of these are freely cast back and forth; hence
- * the ipc_object MUST BE FIRST in the ipc_common_data.
- *
- * If the RPC implementation enabled user-mode code to use kernel-level
- * data structures (as ours used to), this peculiar structuring would
- * avoid having anything in user code depend on the kernel configuration
- * (with which lock size varies).
- */
+  
+                                                                        
+                                                                  
+                                                                        
+                                                       
+  
+                                                                       
+                                                                     
+                                                                        
+                                 
+   
 struct ipc_object {
 	ipc_object_bits_t io_bits;
 	ipc_object_refs_t io_references;
 	lck_spin_t        io_lock_data;
 } __attribute__((aligned(8)));
 
-/*
- * If another object type needs to participate in io_kotype()-based
- * dispatching, it must include a stub structure as the first
- * element
- */
+  
+                                                                   
+                                                             
+          
+   
 struct ipc_object_header {
 	ipc_object_bits_t io_bits;
 #ifdef __LP64__
-	natural_t         io_padding; /* pad to natural boundary */
+	natural_t         io_padding;                              
 #endif
 };
 
-/*
- * Legacy defines.  Should use IPC_OBJECT_NULL, etc...
- */
+  
+                                                      
+   
 #define IO_NULL                 ((ipc_object_t) 0)
 #define IO_DEAD                 ((ipc_object_t) ~0UL)
 #define IO_VALID(io)            (((io) != IO_NULL) && ((io) != IO_DEAD))
 
-/*
- *	IPC steals the high-order bits from the kotype to use
- *	for its own purposes.  This allows IPC to record facts
- *	about ports that aren't otherwise obvious from the
- *	existing port fields.  In particular, IPC can optionally
- *	mark a port for no more senders detection.  Any change
- *	to IO_BITS_PORT_INFO must be coordinated with bitfield
- *	definitions in ipc_port.h.
- */
-#define IO_BITS_PORT_INFO       0x0000f000      /* stupid port tricks */
-#define IO_BITS_KOTYPE          0x000003ff      /* used by the object */
-#define IO_BITS_KOBJECT         0x00000800      /* port belongs to a kobject */
-#define IO_BITS_KOLABEL         0x00000400      /* The kobject has a label */
-#define IO_BITS_OTYPE           0x7fff0000      /* determines a zone */
-#define IO_BITS_ACTIVE          0x80000000      /* is object alive? */
+  
+                                                        
+                                                         
+                                                     
+                                                           
+                                                         
+                                                         
+                             
+   
+#define IO_BITS_PORT_INFO       0x0000f000                              
+#define IO_BITS_KOTYPE          0x000003ff                              
+#define IO_BITS_KOBJECT         0x00000800                                     
+#define IO_BITS_KOLABEL         0x00000400                                   
+#define IO_BITS_OTYPE           0x7fff0000                             
+#define IO_BITS_ACTIVE          0x80000000                            
 
 #define io_active(io)           (((io)->io_bits & IO_BITS_ACTIVE) != 0)
 
@@ -160,12 +160,12 @@ struct ipc_object_header {
 #define io_makebits(active, otype, kotype)      \
 	(((active) ? IO_BITS_ACTIVE : 0) | ((otype) << 16) | (kotype))
 
-/*
- * Object types: ports, port sets, kernel-loaded ports
- */
+  
+                                                      
+   
 #define IOT_PORT                0
 #define IOT_PORT_SET            1
-#define IOT_NUMBER              2               /* number of types used */
+#define IOT_NUMBER              2                                         
 
 extern zone_t ipc_object_zones[IOT_NUMBER];
 extern lck_grp_t        ipc_lck_grp;
@@ -180,10 +180,10 @@ extern void     io_free(
 	unsigned int    otype,
 	ipc_object_t    object);
 
-/*
- * Here we depend on the ipc_object being first within the kernel struct
- * (ipc_port and ipc_pset).
- */
+  
+                                                                        
+                           
+   
 #define io_lock_init(io) \
 	lck_spin_init(&(io)->io_lock_data, &ipc_lck_grp, &ipc_lck_attr)
 #define io_lock_destroy(io) \
@@ -202,18 +202,18 @@ extern boolean_t io_lock_try(
 
 #define _VOLATILE_ volatile
 
-/* Sanity check the ref count.  If it is 0, we may be doubly zfreeing.
- * If it is larger than max int, it has been corrupted or leaked,
- * probably by being modified into an address (this is architecture
- * dependent, but it's safe to assume there cannot really be max int
- * references unless some code is leaking the io_reference without leaking
- * object). Saturate the io_reference on release kernel if it reaches
- * max int to avoid use after free.
- *
- * NOTE: The 0 test alone will not catch double zfreeing of ipc_port
- * structs, because the io_references field is the first word of the struct,
- * and zfree modifies that to point to the next free zone element.
- */
+                                                                      
+                                                                 
+                                                                   
+                                                                    
+                                                                          
+                                                                     
+                                   
+  
+                                                                    
+                                                                            
+                                                                  
+   
 #define IO_MAX_REFERENCES                                               \
 	(unsigned)(~0U ^ (1U << (sizeof(int)*BYTE_SIZE - 1)))
 
@@ -259,43 +259,43 @@ io_release(ipc_object_t io)
 	} while (OSCompareAndSwap(old_io_references, new_io_references,
 	    &((io)->io_references)) == FALSE);
 
-	/* If we just removed the last reference count */
+	                                                 
 	if (1 == old_io_references) {
-		/* Free the object */
+		                     
 		io_free(io_otype((io)), (io));
 	}
 }
 
-/*
- * Retrieve a label for use in a kernel call that takes a security
- * label as a parameter. If necessary, io_getlabel acquires internal
- * (not io_lock) locks, and io_unlocklabel releases them.
- */
+  
+                                                                  
+                                                                    
+                                                         
+   
 
 struct label;
 extern struct label *io_getlabel(ipc_object_t obj);
 #define io_unlocklabel(obj)
 
-/*
- * Exported interfaces
- */
+  
+                      
+   
 
-/* Take a reference to an object */
+                                   
 extern void ipc_object_reference(
 	ipc_object_t    object);
 
-/* Release a reference to an object */
+                                      
 extern void ipc_object_release(
 	ipc_object_t    object);
 
-/* Look up an object in a space */
+                                  
 extern kern_return_t ipc_object_translate(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	mach_port_right_t       right,
 	ipc_object_t            *objectp);
 
-/* Look up two objects in a space, locking them in the order described */
+                                                                         
 extern kern_return_t ipc_object_translate_two(
 	ipc_space_t             space,
 	mach_port_name_t        name1,
@@ -305,22 +305,22 @@ extern kern_return_t ipc_object_translate_two(
 	mach_port_right_t       right2,
 	ipc_object_t            *objectp2);
 
-/* Validate an object as belonging to the correct zone */
+                                                         
 extern void ipc_object_validate(
 	ipc_object_t object);
 
-/* Allocate a dead-name entry */
+                                
 extern kern_return_t
 ipc_object_alloc_dead(
 	ipc_space_t             space,
 	mach_port_name_t        *namep);
 
-/*  Allocate a dead-name entry, with a specific name */
+                                                       
 extern kern_return_t ipc_object_alloc_dead_name(
 	ipc_space_t             space,
 	mach_port_name_t        name);
 
-/* Allocate an object */
+                        
 extern kern_return_t ipc_object_alloc(
 	ipc_space_t             space,
 	ipc_object_type_t       otype,
@@ -329,7 +329,7 @@ extern kern_return_t ipc_object_alloc(
 	mach_port_name_t        *namep,
 	ipc_object_t            *objectp);
 
-/* Allocate an object, with a specific name */
+                                              
 extern kern_return_t ipc_object_alloc_name(
 	ipc_space_t             space,
 	ipc_object_type_t       otype,
@@ -338,11 +338,11 @@ extern kern_return_t ipc_object_alloc_name(
 	mach_port_name_t        name,
 	ipc_object_t            *objectp);
 
-/* Convert a send type name to a received type name */
+                                                      
 extern mach_msg_type_name_t ipc_object_copyin_type(
 	mach_msg_type_name_t    msgt_name);
 
-/* Copyin a capability from a space */
+                                      
 extern kern_return_t ipc_object_copyin(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -352,28 +352,28 @@ extern kern_return_t ipc_object_copyin(
 	mach_msg_guard_flags_t  *guard_flags,
 	ipc_object_copyin_flags_t copyin_flags);
 
-/* Copyin a naked capability from the kernel */
+                                               
 extern void ipc_object_copyin_from_kernel(
 	ipc_object_t            object,
 	mach_msg_type_name_t    msgt_name);
 
-/* Destroy a naked capability */
+                                
 extern void ipc_object_destroy(
 	ipc_object_t            object,
 	mach_msg_type_name_t    msgt_name);
 
-/* Destroy a naked destination capability */
+                                            
 extern void ipc_object_destroy_dest(
 	ipc_object_t            object,
 	mach_msg_type_name_t    msgt_name);
 
-/* Insert a send right into an object already in the current space */
+                                                                     
 extern kern_return_t ipc_object_insert_send_right(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	mach_msg_type_name_t    msgt_name);
 
-/* Copyout a capability, placing it into a space */
+                                                   
 extern kern_return_t ipc_object_copyout(
 	ipc_space_t             space,
 	ipc_object_t            object,
@@ -383,18 +383,18 @@ extern kern_return_t ipc_object_copyout(
 	mach_msg_guard_flags_t  *guard_flags,
 	mach_port_name_t        *namep);
 
-/* Copyout a capability with a name, placing it into a space */
+                                                               
 extern kern_return_t ipc_object_copyout_name(
 	ipc_space_t             space,
 	ipc_object_t            object,
 	mach_msg_type_name_t    msgt_name,
 	mach_port_name_t        name);
 
-/* Translate/consume the destination right of a message */
+                                                          
 extern void ipc_object_copyout_dest(
 	ipc_space_t             space,
 	ipc_object_t            object,
 	mach_msg_type_name_t    msgt_name,
 	mach_port_name_t        *namep);
 
-#endif  /* _IPC_IPC_OBJECT_H_ */
+#endif                          

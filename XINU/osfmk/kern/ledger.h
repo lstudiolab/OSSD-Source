@@ -32,17 +32,17 @@
 #ifndef _KERN_LEDGER_H_
 #define _KERN_LEDGER_H_
 
-#include <mach/mach_types.h>    /* ledger_t */
+#include <mach/mach_types.h>                  
 
 #ifdef MACH_KERNEL_PRIVATE
 #include <os/refcnt.h>
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 #define LEDGER_INFO             0
 #define LEDGER_ENTRY_INFO       1
 #define LEDGER_TEMPLATE_INFO    2
 #define LEDGER_LIMIT            3
-/* LEDGER_MAX_CMD always tracks the index of the last ledger command. */
+                                                                        
 #define LEDGER_MAX_CMD          LEDGER_LIMIT
 
 #define LEDGER_NAME_MAX 32
@@ -60,16 +60,16 @@ struct ledger_template_info {
 };
 
 #ifdef MACH_KERNEL_PRIVATE
-/*
- * These definitions are only here to allow pmap.c to determine the expected
- * size of a ledger at build time.  Direct access to ledger fields or to
- * ledger entries is prohibited.
- */
+  
+                                                                            
+                                                                        
+                                
+   
 
-/*
- * The explicit alignment is to ensure that atomic operations don't panic
- * on ARM.
- */
+  
+                                                                         
+          
+   
 struct ledger_entry {
 	volatile uint32_t        le_flags;
 #define LEDGER_PERCENT_NONE  UINT16_MAX
@@ -79,17 +79,17 @@ struct ledger_entry {
 	volatile ledger_amount_t le_debit  __attribute__((aligned(8)));
 	union {
 		struct {
-			/*
-			 * XXX - the following two fields can go away if we move all of
-			 * the refill logic into process policy
-			 */
+			  
+                                                                  
+                                          
+      
 			uint64_t le_refill_period;
 			uint64_t le_last_refill;
 		} le_refill;
 		struct {
-			ledger_amount_t le_lifetime_max; /* Process lifetime peak */
+			ledger_amount_t le_lifetime_max;                            
 #if CONFIG_LEDGER_INTERVAL_MAX
-			ledger_amount_t le_interval_max; /* Interval peak XXX better name needed */
+			ledger_amount_t le_interval_max;                                           
 #endif
 		} _le_max;
 	} _le;
@@ -102,15 +102,15 @@ struct ledger {
 	struct ledger_template *l_template;
 	struct ledger_entry     l_entries[0] __attribute__((aligned(8)));
 };
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 struct ledger_entry_info {
 	int64_t         lei_balance;
 	int64_t         lei_credit;
 	int64_t         lei_debit;
 	uint64_t        lei_limit;
-	uint64_t        lei_refill_period;      /* In nanoseconds */
-	uint64_t        lei_last_refill;        /* Time since last refill */
+	uint64_t        lei_refill_period;                          
+	uint64_t        lei_last_refill;                                    
 };
 
 struct ledger_limit_args {
@@ -125,15 +125,15 @@ typedef struct ledger_template *ledger_template_t;
 
 #define LEDGER_VALID(ledger)    (ledger != LEDGER_NULL)
 
-/* Action to take when a ledger goes into deficit */
+                                                    
 #define LEDGER_ACTION_IGNORE    0x0000
 #define LEDGER_ACTION_BLOCK     0x0010
 #define LEDGER_ACTION_CALLBACK  0x0020
 #define LEDGER_ACTION_MASK      0x00f0
 
-/*
- * Types of warnings that trigger a callback.
- */
+  
+                                             
+   
 #define LEDGER_WARNING_ROSE_ABOVE       1
 #define LEDGER_WARNING_DIPPED_BELOW     2
 
@@ -154,7 +154,7 @@ extern kern_return_t ledger_track_credit_only(ledger_template_t template,
     int entry);
 extern int ledger_key_lookup(ledger_template_t template, const char *key);
 
-/* value of entry type */
+                         
 #define LEDGER_CREATE_ACTIVE_ENTRIES    0
 #define LEDGER_CREATE_INACTIVE_ENTRIES  1
 extern ledger_t ledger_instantiate(ledger_template_t template, int entry_type);
@@ -169,7 +169,7 @@ extern kern_return_t ledger_set_limit(ledger_t ledger, int entry,
 #if CONFIG_LEDGER_INTERVAL_MAX
 extern kern_return_t ledger_get_interval_max(ledger_t ledger, int entry,
     ledger_amount_t *max_interval_balance, int reset);
-#endif /* CONFIG_LEDGER_INTERVAL_MAX */
+#endif                                 
 extern kern_return_t ledger_get_lifetime_max(ledger_t ledger, int entry,
     ledger_amount_t *max_lifetime_balance);
 extern kern_return_t ledger_get_actions(ledger_t ledger, int entry, int *actions);
@@ -210,7 +210,7 @@ extern void ledger_ast(thread_t thread);
 extern void ledger_reference(ledger_t ledger);
 extern void ledger_dereference(ledger_t ledger);
 
-/* Support for ledger() syscall */
+                                  
 #ifdef LEDGER_DEBUG
 extern int ledger_limit(task_t task, struct ledger_limit_args *args);
 #endif
@@ -225,6 +225,6 @@ ledger_get_entry_info(ledger_t ledger, int entry,
 
 extern int ledger_template_info(void **buf, int *len);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif  /* _KERN_LEDGER_H_ */
+#endif                       

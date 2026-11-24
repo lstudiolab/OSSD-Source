@@ -44,10 +44,10 @@
 #include <pexpert/arm64/board_config.h>
 #if XNU_MONITOR_PPL_HIB
 #include <IOKit/SEPHibernator.h>
-#endif /* XNU_MONITOR_PPL_HIB */
-#endif /* defined(__arm64__) */
+#endif                          
+#endif                         
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 OSDefineMetaClassAndAbstractStructors(IOPolledInterface, OSObject);
 
@@ -68,7 +68,7 @@ OSMetaClassDefineReservedUnused(IOPolledInterface, 13);
 OSMetaClassDefineReservedUnused(IOPolledInterface, 14);
 OSMetaClassDefineReservedUnused(IOPolledInterface, 15);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #ifndef kIOMediaPreferredBlockSizeKey
 #define kIOMediaPreferredBlockSizeKey   "Preferred Block Size"
@@ -76,7 +76,7 @@ OSMetaClassDefineReservedUnused(IOPolledInterface, 15);
 
 enum { kDefaultIOSize = 128 * 1024 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 class IOPolledFilePollers : public OSObject
 {
@@ -96,7 +96,7 @@ public:
 
 OSDefineMetaClassAndStructors(IOPolledFilePollers, OSObject)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOPolledFilePollers *
 IOPolledFilePollers::copyPollers(IOService * media)
@@ -156,12 +156,12 @@ IOPolledFilePollers::copyPollers(IOService * media)
 	return vars;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static IOReturn
 IOPolledFilePollersIODone(IOPolledFilePollers * vars, bool abortable);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static IOReturn
 IOPolledFilePollersProbe(IOPolledFilePollers * vars)
@@ -182,7 +182,7 @@ IOPolledFilePollersProbe(IOPolledFilePollers * vars)
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFilePollersOpen(IOPolledFileIOVars * filevars, uint32_t state, bool abortable)
@@ -233,7 +233,7 @@ IOPolledFilePollersOpen(IOPolledFileIOVars * filevars, uint32_t state, bool abor
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFilePollersClose(IOPolledFileIOVars * filevars, uint32_t state)
@@ -285,7 +285,7 @@ IOPolledFilePollersClose(IOPolledFileIOVars * filevars, uint32_t state)
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledInterface::setEncryptionKey(const uint8_t * key, size_t keySize)
@@ -293,7 +293,7 @@ IOPolledInterface::setEncryptionKey(const uint8_t * key, size_t keySize)
 	return kIOReturnUnsupported;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFilePollersSetEncryptionKey(IOPolledFileIOVars * filevars,
@@ -318,7 +318,7 @@ IOPolledFilePollersSetEncryptionKey(IOPolledFileIOVars * filevars,
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOMemoryDescriptor *
 IOPolledFileGetIOBuffer(IOPolledFileIOVars * vars)
@@ -326,7 +326,7 @@ IOPolledFileGetIOBuffer(IOPolledFileIOVars * vars)
 	return vars->pollers->ioBuffer;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static void
 IOPolledIOComplete(void *   target,
@@ -339,7 +339,7 @@ IOPolledIOComplete(void *   target,
 	vars->ioStatus = status;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static IOReturn
 IOStartPolledIO(IOPolledFilePollers * vars,
@@ -374,7 +374,7 @@ IOStartPolledIO(IOPolledFilePollers * vars,
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static IOReturn
 IOPolledFilePollersIODone(IOPolledFilePollers * vars, bool abortable)
@@ -431,8 +431,8 @@ IOPolledFilePollersIODone(IOPolledFilePollers * vars, bool abortable)
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
+                                                                           
 
 struct _OpenFileContext {
 	OSData * extents;
@@ -451,7 +451,7 @@ file_extent_callback(void * ref, uint64_t start, uint64_t length)
 	ctx->size += length;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static IOService *
 IOCopyMediaForDev(dev_t device)
@@ -493,7 +493,7 @@ IOCopyMediaForDev(dev_t device)
 	return result;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #if defined(__i386__) || defined(__x86_64__)
 #define APFSMEDIA_GETHIBERKEY         "getHiberKey"
@@ -520,19 +520,19 @@ IOGetVolumeCryptKey(dev_t block_dev,
 	}
 
 	callerKeySize = *keySize;
-	// Try APFS first
+	                 
 	{
 		uuid_t volUuid = {0};
 		err = part->callPlatformFunction(APFSMEDIA_GETHIBERKEY, false, &volUuid, volumeCryptKey, keySize, keySize);
 		if (kIOReturnBadArgument == err) {
-			// apfs fails on buffer size >32
+			                                
 			*keySize = 32;
 			err = part->callPlatformFunction(APFSMEDIA_GETHIBERKEY, false, &volUuid, volumeCryptKey, keySize, keySize);
 		}
 		if (err != kIOReturnSuccess) {
 			*keySize = 0;
 		} else {
-			// No need to create uuid string if it's not requested
+			                                                      
 			if (pKeyUUID) {
 				uuid_string_t volUuidStr;
 				uuid_unparse(volUuid, volUuidStr);
@@ -544,11 +544,11 @@ IOGetVolumeCryptKey(dev_t block_dev,
 		}
 	}
 
-	// Then old CS path
+	                   
 	err = part->callPlatformFunction(PLATFORM_FUNCTION_GET_MEDIA_ENCRYPTION_KEY_UUID, false,
 	    (void *) &keyUUID, (void *) &keyStoreUUID, NULL, NULL);
 	if ((kIOReturnSuccess == err) && keyUUID && keyStoreUUID) {
-//        IOLog("got volume key %s\n", keyStoreUUID->getCStringNoCopy());
+                                                                         
 
 		if (!sKeyStore) {
 			sKeyStore = (IOService *) IORegistryEntry::fromPath(AKS_SERVICE_PATH, gIOServicePlane);
@@ -572,7 +572,7 @@ IOGetVolumeCryptKey(dev_t block_dev,
 		bzero(&vek, sizeof(vek));
 
 		if (pKeyUUID) {
-			// Create a copy because the caller would release it
+			                                                    
 			*pKeyUUID = OSString::withString(keyUUID);
 		}
 	}
@@ -580,9 +580,9 @@ IOGetVolumeCryptKey(dev_t block_dev,
 	part->release();
 	return err;
 }
-#endif /* defined(__i386__) || defined(__x86_64__) */
+#endif                                               
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #if defined(__arm64__)
 static IOReturn
@@ -593,9 +593,9 @@ IOGetHibernationCryptKey(uint8_t * hibernationKey,
 {
 	return kIOReturnNotFound;
 }
-#endif /* defined(__arm64__) */
+#endif                         
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFileOpen(const char * filename,
@@ -635,9 +635,9 @@ IOPolledFileOpen(const char * filename,
 		    &file_extent_callback, &ctx,
 		    setFileSize,
 		    fsFreeSize,
-		    // write file:
+		                  
 		    0, write_file_addr, write_file_len,
-		    // results
+		              
 		    &block_dev,
 		    &image_dev,
 		    &vars->block0,
@@ -723,7 +723,7 @@ IOPolledFileOpen(const char * filename,
 		*fileVars    = vars;
 		vars->fileExtents = extentsData;
 
-		// make imagePath
+		                 
 		OSData * data = NULL;
 		if (imagePath) {
 #if defined(__i386__) || defined(__x86_64__)
@@ -755,10 +755,10 @@ IOPolledFileOpen(const char * filename,
 			*imagePath = data;
 		}
 
-		// Release key UUID if we have one
+		                                  
 		if (keyUUID) {
 			keyUUID->release();
-			keyUUID = NULL; // Just in case
+			keyUUID = NULL;                
 		}
 	}while (false);
 
@@ -793,7 +793,7 @@ IOPolledFileOpen(const char * filename,
 	return result;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFileClose(IOPolledFileIOVars ** pVars,
@@ -831,7 +831,7 @@ IOPolledFileClose(IOPolledFileIOVars ** pVars,
 	return kIOReturnSuccess;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFilePollersSetup(IOPolledFileIOVars * vars,
@@ -874,7 +874,7 @@ IOPolledFilePollersSetup(IOPolledFileIOVars * vars,
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFileSeek(IOPolledFileIOVars * vars, uint64_t position)
@@ -908,7 +908,7 @@ IOPolledFileSeek(IOPolledFileIOVars * vars, uint64_t position)
 	return kIOReturnSuccess;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFileWrite(IOPolledFileIOVars * vars,
@@ -921,7 +921,7 @@ IOPolledFileWrite(IOPolledFileIOVars * vars,
 
 	do{
 		if (!bytes && !size) {
-			// seek to end of block & flush
+			                               
 			size = vars->position & (vars->blockSize - 1);
 			if (size) {
 				size = vars->blockSize - size;
@@ -938,10 +938,10 @@ IOPolledFileWrite(IOPolledFileIOVars * vars,
 
 		if (bytes) {
 #if KASAN
-			/* Since this may copy mach-o segments in bulk, use the nosan variants of bcopy to
-			 * avoid triggering global redzone sanitizer violations when accessing
-			 * interstices between 'C' structures
-			 */
+			                                                                                  
+                                                                         
+                                        
+      
 			__nosan_bcopy(bytes, vars->buffer + vars->bufferHalf + vars->bufferOffset, copy);
 #else
 			bcopy(bytes, vars->buffer + vars->bufferHalf + vars->bufferOffset, copy);
@@ -979,7 +979,7 @@ IOPolledFileWrite(IOPolledFileIOVars * vars,
 				clock_get_uptime(&startTime);
 
 				assert(encryptLen <= UINT_MAX);
-				// encrypt the buffer
+				                     
 				aes_encrypt_cbc(vars->buffer + vars->bufferHalf + encryptStart,
 				    &cryptvars->aes_iv[0],
 				    (unsigned int) (encryptLen / AES_BLOCK_SIZE),
@@ -991,12 +991,12 @@ IOPolledFileWrite(IOPolledFileIOVars * vars,
 				SUB_ABSOLUTETIME(&vars->cryptTime, &startTime);
 				vars->cryptBytes += encryptLen;
 
-				// save initial vector for following encrypts
+				                                             
 				bcopy(vars->buffer + vars->bufferHalf + encryptStart + encryptLen - AES_BLOCK_SIZE,
 				    &cryptvars->aes_iv[0],
 				    AES_BLOCK_SIZE);
 			}
-#endif /* CRYPTO */
+#endif             
 
 			err = IOPolledFilePollersIODone(vars->pollers, true);
 			if (kIOReturnSuccess != err) {
@@ -1006,7 +1006,7 @@ IOPolledFileWrite(IOPolledFileIOVars * vars,
 			if (vars->position & (vars->blockSize - 1)) {
 				HIBLOG("misaligned file pos %qx\n", vars->position);
 			}
-//if (length != vars->bufferSize) HIBLOG("short write of %qx ends@ %qx\n", length, offset + length);
+                                                                                                    
 
 			err = IOStartPolledIO(vars->pollers, kIOPolledWrite, vars->bufferHalf, offset, length);
 			if (kIOReturnSuccess != err) {
@@ -1043,12 +1043,12 @@ IOPolledFileWrite(IOPolledFileIOVars * vars,
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFileFlush(IOPolledFileIOVars * vars)
 {
-	// Only supported by the underlying polled mode driver on embedded currently (expect kIOReturnUnsupported on other platforms)
+	                                                                                                                             
 	IOReturn err = kIOReturnSuccess;
 
 	err = IOPolledFilePollersIODone(vars->pollers, true);
@@ -1067,7 +1067,7 @@ IOPolledFileFlush(IOPolledFileIOVars * vars)
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOPolledFileRead(IOPolledFileIOVars * vars,
@@ -1077,7 +1077,7 @@ IOPolledFileRead(IOPolledFileIOVars * vars,
 	IOReturn    err = kIOReturnSuccess;
 	IOByteCount copy;
 
-//    bytesWritten += size;
+                           
 
 	do{
 		copy = vars->bufferLimit - vars->bufferOffset;
@@ -1095,7 +1095,7 @@ IOPolledFileRead(IOPolledFileIOVars * vars,
 		}
 		size -= copy;
 		vars->bufferOffset += copy;
-//	vars->position += copy;
+                          
 
 		if ((vars->bufferOffset == vars->bufferLimit) && (vars->position < vars->readEnd)) {
 			if (!vars->pollers->io) {
@@ -1139,7 +1139,7 @@ IOPolledFileRead(IOPolledFileIOVars * vars,
 
 			vars->lastRead = length;
 			if (length) {
-//if (length != vars->bufferSize) HIBLOG("short read of %qx ends@ %qx\n", length, offset + length);
+                                                                                                   
 				err = IOStartPolledIO(vars->pollers, kIOPolledRead, vars->bufferHalf, offset, length);
 				if (kIOReturnSuccess != err) {
 					break;
@@ -1155,12 +1155,12 @@ IOPolledFileRead(IOPolledFileIOVars * vars,
 				uint8_t thisVector[AES_BLOCK_SIZE];
 				AbsoluteTime startTime, endTime;
 
-				// save initial vector for following decrypts
+				                                             
 				bcopy(&cryptvars->aes_iv[0], &thisVector[0], AES_BLOCK_SIZE);
 				bcopy(vars->buffer + vars->bufferHalf + lastReadLength - AES_BLOCK_SIZE,
 				    &cryptvars->aes_iv[0], AES_BLOCK_SIZE);
 
-				// decrypt the buffer
+				                     
 				clock_get_uptime(&startTime);
 
 				assert(lastReadLength <= UINT_MAX);
@@ -1175,11 +1175,11 @@ IOPolledFileRead(IOPolledFileIOVars * vars,
 				SUB_ABSOLUTETIME(&vars->cryptTime, &startTime);
 				vars->cryptBytes += lastReadLength;
 			}
-#endif /* CRYPTO */
+#endif             
 		}
 	}while (size);
 
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           

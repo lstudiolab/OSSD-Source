@@ -91,12 +91,12 @@ host_create_mach_voucher(mach_port_name_t host,
 	rv = host_create_mach_voucher_trap(host, recipes, recipesCnt, voucher);
 
 #ifdef __x86_64__
-	/* REMOVE once XBS kernel has new trap */
-	if (rv == ((1 << 24) | 70)) { /* see mach/i386/syscall_sw.h */
+	                                         
+	if (rv == ((1 << 24) | 70)) {                                 
 		rv = MACH_SEND_INVALID_DEST;
 	}
 #elif defined(__i386__)
-	/* REMOVE once XBS kernel has new trap */
+	                                         
 	if (rv == (kern_return_t)(-70)) {
 		rv = MACH_SEND_INVALID_DEST;
 	}

@@ -273,7 +273,7 @@ _kernelrpc_mach_port_insert_right_trap(struct _kernelrpc_mach_port_insert_right_
 		switch (args->polyPoly) {
 		case MACH_MSG_TYPE_MAKE_SEND:
 		case MACH_MSG_TYPE_COPY_SEND:
-			/* fastpath MAKE_SEND / COPY_SEND which is the most common case */
+			                                                                  
 			rv = ipc_object_insert_send_right(task->itk_space, args->poly,
 			    args->polyPoly);
 			goto done;
@@ -313,19 +313,19 @@ _kernelrpc_mach_port_get_attributes_trap(struct _kernelrpc_mach_port_get_attribu
 		goto done;
 	}
 
-	// MIG does not define the type or size of the mach_port_info_t out array
-	// anywhere, so derive them from the field in the generated reply struct
+	                                                                         
+	                                                                        
 #define MACH_PORT_INFO_OUT (((__Reply__mach_port_get_attributes_from_user_t*)NULL)->port_info_out)
-#define MACH_PORT_INFO_STACK_LIMIT 80 // current size is 68 == 17 * sizeof(integer_t)
+#define MACH_PORT_INFO_STACK_LIMIT 80                                                
 	_Static_assert(sizeof(MACH_PORT_INFO_OUT) < MACH_PORT_INFO_STACK_LIMIT,
 	    "mach_port_info_t has grown significantly, reevaluate stack usage");
 	const mach_msg_type_number_t max_count = (sizeof(MACH_PORT_INFO_OUT) / sizeof(MACH_PORT_INFO_OUT[0]));
 	typeof(MACH_PORT_INFO_OUT[0]) info[max_count];
 
-	/*
-	 * zero out our stack buffer because not all flavors of
-	 * port_get_attributes initialize the whole struct
-	 */
+	  
+                                                        
+                                                   
+    
 	bzero(info, sizeof(MACH_PORT_INFO_OUT));
 
 	if (copyin(CAST_USER_ADDR_T(args->count), &count, sizeof(count))) {
@@ -536,9 +536,9 @@ _kernelrpc_mach_port_request_notification_trap(
 	}
 
 	if (IP_VALID(previous)) {
-		// Remove once <rdar://problem/45522961> is fixed.
-		// We need to make ith_knote NULL as ipc_object_copyout() uses
-		// thread-argument-passing and its value should not be garbage
+		                                                  
+		                                                              
+		                                                              
 		current_thread()->ith_knote = ITH_KNOTE_NULL;
 		rv = ipc_object_copyout(task->itk_space, ip_to_object(previous),
 		    MACH_MSG_TYPE_PORT_SEND_ONCE, IPC_OBJECT_COPYOUT_FLAGS_NONE, NULL, NULL, &previous_name);
@@ -575,7 +575,7 @@ host_create_mach_voucher_trap(struct host_create_mach_voucher_args *args)
 		return MIG_ARRAY_TOO_LARGE;
 	}
 
-	/* keep small recipes on the stack for speed */
+	                                               
 	uint8_t buf[MACH_VOUCHER_TRAP_STACK_LIMIT];
 	uint8_t *krecipes = buf;
 
@@ -629,7 +629,7 @@ mach_voucher_extract_attr_recipe_trap(struct mach_voucher_extract_attr_recipe_ar
 		return MACH_SEND_INVALID_DEST;
 	}
 
-	/* keep small recipes on the stack for speed */
+	                                               
 	uint8_t buf[MACH_VOUCHER_TRAP_STACK_LIMIT];
 	uint8_t *krecipe = buf;
 	mach_msg_type_number_t max_sz = sz;
@@ -667,30 +667,30 @@ done:
 	return kr;
 }
 
-/*
- * Mach Trap: task_dyld_process_info_notify_get_trap
- *
- * Return an array of active dyld notifier port names for current_task(). User
- * is responsible for allocating the memory for the mach port names array
- * and deallocating the port names inside the array returned.
- *
- * Does not consume any reference.
- *
- * Args:
- *     names_addr: Address for mach port names array.          (In param only)
- *     names_count_addr: Number of active dyld notifier ports. (In-Out param)
- *         In:  Number of slots available for copyout in caller
- *         Out: Actual number of ports copied out
- *
- * Returns:
- *
- *     KERN_SUCCESS: A valid namesCnt is returned. (Can be zero)
- *     KERN_INVALID_ARGUMENT: Arguments are invalid.
- *     KERN_MEMORY_ERROR: Memory copyio operations failed.
- *     KERN_NO_SPACE: User allocated memory for port names copyout is insufficient.
- *
- *     Other error code see task_info().
- */
+  
+                                                    
+  
+                                                                              
+                                                                         
+                                                             
+  
+                                  
+  
+        
+                                                                              
+                                                                             
+                                                               
+                                                 
+  
+           
+  
+                                                                
+                                                    
+                                                          
+                                                                                   
+  
+                                        
+   
 kern_return_t
 task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_trap_args *args)
 {
@@ -700,7 +700,7 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 	ipc_port_t copyout_ports[DYLD_MAX_PROCESS_INFO_NOTIFY_COUNT];
 	ipc_port_t release_ports[DYLD_MAX_PROCESS_INFO_NOTIFY_COUNT];
 	uint32_t copyout_count = 0, release_count = 0, active_count = 0;
-	mach_vm_address_t ports_addr; /* a user space address */
+	mach_vm_address_t ports_addr;                           
 	mach_port_name_t new_name;
 	natural_t user_names_count = 0;
 	ipc_port_t sright;
@@ -739,7 +739,7 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 
 	if (current_task()->itk_dyld_notify == NULL) {
 		itk_unlock(current_task());
-		(void)copyoutmap_atomic32(current_task()->map, MACH_PORT_NULL, (vm_map_address_t)ports_addr); /* reset magic */
+		(void)copyoutmap_atomic32(current_task()->map, MACH_PORT_NULL, (vm_map_address_t)ports_addr);                  
 		lck_mtx_unlock(&g_dyldinfo_mtx);
 
 		kr = copyout(&copyout_count, (vm_map_address_t)args->names_count_addr, sizeof(natural_t));
@@ -753,10 +753,10 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 		} else {
 			sright = ipc_port_copy_send(*portp);
 			if (IP_VALID(sright)) {
-				copyout_ports[active_count++] = sright; /* donates */
+				copyout_ports[active_count++] = sright;              
 				sright = IPC_PORT_NULL;
 			} else {
-				release_ports[release_count++] = *portp; /* donates */
+				release_ports[release_count++] = *portp;              
 				*portp = IPC_PORT_NULL;
 			}
 		}
@@ -764,25 +764,25 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 
 	task_dyld_process_info_update_helper(current_task(), active_count,
 	    (vm_map_address_t)ports_addr, release_ports, release_count);
-	/* itk_lock, g_dyldinfo_mtx are unlocked upon return */
+	                                                       
 
 	for (int i = 0; i < active_count; i++) {
-		sright = copyout_ports[i]; /* donates */
+		sright = copyout_ports[i];              
 		copyout_ports[i] = IPC_PORT_NULL;
 
 		assert(IP_VALID(sright));
 		ip_reference(sright);
-		/*
-		 * Below we consume each send right in copyout_ports, and if copyout_send
-		 * succeeds, replace it with a port ref; otherwise release the port ref.
-		 *
-		 * We can reuse copyout_ports array for this purpose since
-		 * copyout_count <= active_count.
-		 */
-		new_name = ipc_port_copyout_send(sright, current_space()); /* consumes */
+		  
+                                                                           
+                                                                          
+    
+                                                            
+                                   
+     
+		new_name = ipc_port_copyout_send(sright, current_space());               
 		if (MACH_PORT_VALID(new_name)) {
 			copyout_names[copyout_count] = new_name;
-			copyout_ports[copyout_count] = sright; /* now holds port ref */
+			copyout_ports[copyout_count] = sright;                         
 			copyout_count++;
 		} else {
 			ip_release(sright);
@@ -796,7 +796,7 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 		goto copyout_failed;
 	}
 
-	/* copyout to caller's local copy */
+	                                    
 	kr = copyout(copyout_names, (vm_map_address_t)args->names_addr,
 	    copyout_count * sizeof(mach_port_name_t));
 	if (kr) {
@@ -810,7 +810,7 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 		goto copyout_failed;
 	}
 
-	/* now, release port refs on copyout_ports */
+	                                             
 	for (int i = 0; i < copyout_count; i++) {
 		sright = copyout_ports[i];
 		assert(IP_VALID(sright));
@@ -821,30 +821,30 @@ task_dyld_process_info_notify_get_trap(struct task_dyld_process_info_notify_get_
 
 
 copyout_failed:
-	/*
-	 * No locks are held beyond this point.
-	 *
-	 * Release port refs on copyout_ports, and deallocate ports that we copied out
-	 * earlier.
-	 */
+	  
+                                        
+   
+                                                                               
+            
+    
 	for (int i = 0; i < copyout_count; i++) {
 		sright = copyout_ports[i];
 		assert(IP_VALID(sright));
 
 		if (ipc_right_lookup_write(current_space(), copyout_names[i], &entry)) {
-			/* userspace has deallocated the name we copyout */
+			                                                   
 			ip_release(sright);
 			continue;
 		}
-		/* space is locked and active */
+		                                
 		if (entry->ie_object == ip_to_object(sright) ||
 		    IE_BITS_TYPE(entry->ie_bits) == MACH_PORT_TYPE_DEAD_NAME) {
-			(void)ipc_right_dealloc(current_space(), copyout_names[i], entry); /* unlocks space */
+			(void)ipc_right_dealloc(current_space(), copyout_names[i], entry);                    
 		} else {
 			is_write_unlock(current_space());
 		}
 
-		/* space is unlocked */
+		                       
 		ip_release(sright);
 	}
 

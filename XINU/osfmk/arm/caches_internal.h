@@ -53,22 +53,22 @@ extern void clean_dcache64(addr64_t addr, unsigned count, int phys);
 extern void CleanPoC_Dcache(void);
 extern void CleanPoU_Dcache(void);
 
-/*
- * May not actually perform a flush on platforms
- * where AP caches are snooped by all agents on SoC.
- *
- * This is the one you need unless you really know what
- * you're doing.
- */
+  
+                                                
+                                                    
+  
+                                                       
+                
+   
 extern void CleanPoC_DcacheRegion(vm_offset_t va, size_t length);
 
-/*
- * Always actually flushes the cache, even on platforms
- * where AP caches are snooped by all agents.  You
- * probably don't need to use this.  Intended for use in
- * panic save routine (where caches will be yanked by reset
- * and coherency doesn't help).
- */
+  
+                                                       
+                                                  
+                                                        
+                                                           
+                               
+   
 extern void CleanPoC_DcacheRegion_Force(vm_offset_t va, size_t length);
 
 extern void CleanPoU_DcacheRegion(vm_offset_t va, size_t length);
@@ -98,4 +98,4 @@ extern void platform_cache_clean(void);
 extern void platform_cache_shutdown(void);
 extern void platform_cache_disable(void);
 
-#endif /* #ifndef _ARM_CACHES_INTERNAL */
+#endif                                   

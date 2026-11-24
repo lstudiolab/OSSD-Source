@@ -23,9 +23,9 @@ thumb32_instword_to_arm(uint16_t hw1, uint16_t hw2)
 int dtrace_decode_arm(uint32_t instr);
 int dtrace_decode_thumb(uint32_t instr);
 
-/*
- * VFP decoder - shared between ARM and THUMB32 mode
- */
+  
+                                                    
+   
 
 static
 int
@@ -42,7 +42,7 @@ static
 int
 vfp_64transfer(uint32_t instr)
 {
-	/* These instructions all use RD and RN */
+	                                          
 	if (ARM_RD(instr) != REG_PC && ARM_RN(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
 	}
@@ -54,7 +54,7 @@ static
 int
 vfp_transfer(uint32_t instr)
 {
-	/* These instructions all use RD only */
+	                                        
 	if (ARM_RD(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
 	}
@@ -68,12 +68,12 @@ vfp_loadstore(uint32_t instr)
 {
 	int opcode = BITS(instr, 20, 0x1F);
 
-	/* Instrument VLDR */
+	                     
 	if ((opcode & 0x13) == 0x11 && ARM_RN(instr) == REG_PC) {
 		return FASTTRAP_T_VLDR_PC_IMMED;
 	}
 
-	/* These instructions all use RN only */
+	                                        
 	if (ARM_RN(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
 	}
@@ -81,9 +81,9 @@ vfp_loadstore(uint32_t instr)
 	return FASTTRAP_T_INV;
 }
 
-/*
- * ARM decoder
- */
+  
+              
+   
 
 static
 int
@@ -92,7 +92,7 @@ arm_unconditional_misc(uint32_t instr)
 	int op = BITS(instr, 20, 0x7F);
 
 	if ((op & 0x60) == 0x20) {
-		/* VFP data processing uses its own registers */
+		                                                
 		return FASTTRAP_T_COMMON;
 	}
 
@@ -111,9 +111,9 @@ arm_unconditional(uint32_t instr)
 		return arm_unconditional_misc(instr);
 	}
 
-	/* The rest are privileged or BL/BLX, do not instrument */
+	                                                          
 
-	/* Do not need to instrument BL/BLX either, see comment in arm_misc(uint32_t) */
+	                                                                                
 
 	return FASTTRAP_T_INV;
 }
@@ -122,17 +122,17 @@ static
 int
 arm_syscall_coproc(uint32_t instr)
 {
-	/* Instrument any VFP data processing instructions, ignore the rest */
+	                                                                      
 
 	int op1 = BITS(instr, 20, 0x3F), coproc = BITS(instr, 8, 0xF), op = BITS(instr, 4, 0x1);
 
 	if ((op1 & 0x3E) == 0 || (op1 & 0x30) == 0x30) {
-		/* Undefined or swi */
+		                      
 		return FASTTRAP_T_INV;
 	}
 
 	if ((coproc & 0xE) == 0xA) {
-		/* VFP instruction */
+		                     
 
 		if ((op1 & 0x20) == 0 && (op1 & 0x3A) != 0) {
 			return vfp_loadstore(instr);
@@ -143,9 +143,9 @@ arm_syscall_coproc(uint32_t instr)
 		}
 
 		if ((op1 & 0x30) == 0x20) {
-			/* VFP data processing or 8, 16, or 32 bit move between ARM reg and VFP reg */
+			                                                                              
 			if (op == 0) {
-				/* VFP data processing uses its own registers */
+				                                                
 				return FASTTRAP_T_COMMON;
 			} else {
 				return vfp_transfer(instr);
@@ -168,12 +168,12 @@ arm_branch_link_blockdata(uint32_t instr)
 		}
 		return FASTTRAP_T_INV;
 	} else {
-		/* Only emulate a use of the pc if it's a return from function: ldmia sp!, { ... pc } */
+		                                                                                        
 		if (op == 0x0B && ARM_RN(instr) == REG_SP && uses_pc == 1) {
 			return FASTTRAP_T_LDM_PC;
 		}
 
-		/* stmia sp!, { ... lr } doesn't touch the pc, but it is very common, so special case it */
+		                                                                                           
 		if (op == 0x12 && ARM_RN(instr) == REG_SP && uses_lr == 1) {
 			return FASTTRAP_T_STM_LR;
 		}
@@ -192,7 +192,7 @@ arm_signed_multiplies(uint32_t instr)
 {
 	int op1 = BITS(instr, 20, 0x7), op2 = BITS(instr, 5, 0x7);
 
-	/* smlald, smlsld, smmls use RD in addition to RM, RS, and RN */
+	                                                                
 	if ((op1 == 0x4 && (op2 & 0x4) == 0) || (op1 == 0x5 && (op2 & 0x6) == 0x6)) {
 		if (ARM_RD(instr) == REG_PC) {
 			return FASTTRAP_T_INV;
@@ -212,7 +212,7 @@ arm_pack_unpack_sat_reversal(uint32_t instr)
 {
 	int op1 = BITS(instr, 20, 0x7), op2 = BITS(instr, 5, 0x7);
 
-	/* pkh, sel use RN in addition to RD and RM */
+	                                              
 	if ((op1 == 0 && (op2 & 0x1) == 0) || (op1 == 0 && op2 == 0x5)) {
 		if (ARM_RN(instr) == REG_PC) {
 			return FASTTRAP_T_INV;
@@ -271,14 +271,14 @@ arm_media(uint32_t instr)
 	}
 
 	if (op1 == 0x1F && op2 == 0x7) {
-		/* Undefined instruction */
+		                           
 		return FASTTRAP_T_INV;
 	}
 
 	if (op1 == 0x18 && op2 == 0) {
-		/* usad8 usada8 */
-		/* The registers are named differently in the reference manual for this instruction
-		 * but the following positions are correct */
+		                  
+		                                                                                   
+                                               
 
 		if (ARM_RM(instr) != REG_PC && ARM_RS(instr) != REG_PC && ARM_RN(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
@@ -288,7 +288,7 @@ arm_media(uint32_t instr)
 	}
 
 	if ((op1 & 0x1E) == 0x1C && (op2 & 0x3) == 0) {
-		/* bfc bfi */
+		             
 		if (ARM_RD(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -297,7 +297,7 @@ arm_media(uint32_t instr)
 	}
 
 	if (((op1 & 0x1E) == 0x1A || (op1 & 0x1E) == 0x1E) && ((op2 & 0x3) == 0x2)) {
-		/* sbfx ubfx */
+		               
 		if (ARM_RM(instr) != REG_PC && ARM_RD(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -312,16 +312,16 @@ static
 int
 arm_loadstore_wordbyte(uint32_t instr)
 {
-	/* Instrument PC relative load with immediate, ignore any other uses of the PC */
+	                                                                                 
 	int R = BITS(instr, 25, 0x1), L = BITS(instr, 20, 0x1);
 
 	if (R == 1) {
-		/* Three register load/store */
+		                               
 		if (ARM_RM(instr) != REG_PC && ARM_RD(instr) != REG_PC && ARM_RN(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
 	} else {
-		/* Immediate load/store, but still do not support ldr pc, [pc...] */
+		                                                                    
 		if (L == 1 && ARM_RN(instr) == REG_PC && ARM_RD(instr) != REG_PC) {
 			return FASTTRAP_T_LDR_PC_IMMED;
 		}
@@ -355,10 +355,10 @@ arm_misc(uint32_t instr)
 		return FASTTRAP_T_BX_REG;
 	}
 
-	/* We do not need to emulate BLX for entry/return probes; if we eventually support full offset
-	 * tracing, then we will. This is because BLX overwrites the link register, so a function that
-	 * can execute this as its first instruction is a special function indeed.
-	 */
+	                                                                                              
+                                                                                               
+                                                                           
+    
 
 	if (op2 == 0x5) {
 		return arm_saturating(instr);
@@ -371,7 +371,7 @@ static
 int
 arm_msr_hints(__unused uint32_t instr)
 {
-	/* These deal with the psr, not instrumented */
+	                                               
 
 	return FASTTRAP_T_INV;
 }
@@ -380,8 +380,8 @@ static
 int
 arm_sync_primitive(__unused uint32_t instr)
 {
-	/* TODO will instrumenting these interfere with any kernel usage of these instructions? */
-	/* Don't instrument for now */
+	                                                                                          
+	                              
 
 	return FASTTRAP_T_INV;
 }
@@ -393,7 +393,7 @@ arm_extra_loadstore_unpriv(uint32_t instr)
 	int op = BITS(instr, 20, 0x1), __unused op2 = BITS(instr, 5, 0x3), immed = BITS(instr, 22, 0x1);
 
 	if (op == 0 && (op2 & 0x2) == 0x2) {
-		/* Unpredictable or undefined */
+		                                
 		return FASTTRAP_T_INV;
 	}
 
@@ -416,15 +416,15 @@ arm_extra_loadstore(uint32_t instr)
 {
 	int op1 = BITS(instr, 20, 0x1F);
 
-	/* There are two variants, and we do not instrument either of them that use the PC */
+	                                                                                     
 
 	if ((op1 & 0x4) == 0) {
-		/* Variant 1, register */
+		                         
 		if (ARM_RM(instr) != REG_PC && ARM_RD(instr) != REG_PC && ARM_RN(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
 	} else {
-		/* Variant 2, immediate */
+		                          
 		if (ARM_RD(instr) != REG_PC && ARM_RN(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -437,9 +437,9 @@ static
 int
 arm_halfword_multiply(uint32_t instr)
 {
-	/* Not all multiply instructions use all four registers. The ones that don't should have those
-	 * register locations set to 0, so we can test them anyway.
-	 */
+	                                                                                              
+                                                            
+    
 
 	if (ARM_RN(instr) != REG_PC && ARM_RD(instr) != REG_PC && ARM_RS(instr) != REG_PC && ARM_RM(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
@@ -452,9 +452,9 @@ static
 int
 arm_multiply(uint32_t instr)
 {
-	/* Not all multiply instructions use all four registers. The ones that don't should have those
-	 * register locations set to 0, so we can test them anyway.
-	 */
+	                                                                                              
+                                                            
+    
 
 	if (ARM_RN(instr) != REG_PC && ARM_RD(instr) != REG_PC && ARM_RS(instr) != REG_PC && ARM_RM(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
@@ -467,7 +467,7 @@ static
 int
 arm_dataproc_immed(uint32_t instr)
 {
-	/* All these instructions are either two registers, or one register and have 0 where the other reg would be used */
+	                                                                                                                   
 	if (ARM_RN(instr) != REG_PC && ARM_RD(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
 	}
@@ -479,7 +479,7 @@ static
 int
 arm_dataproc_regshift(uint32_t instr)
 {
-	/* All these instructions are either four registers, or three registers and have 0 where there last reg would be used */
+	                                                                                                                        
 	if (ARM_RN(instr) != REG_PC && ARM_RD(instr) != REG_PC && ARM_RS(instr) != REG_PC && ARM_RM(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
 	}
@@ -494,7 +494,7 @@ arm_dataproc_reg(uint32_t instr)
 	int op1 = BITS(instr, 20, 0x1F), op2 = BITS(instr, 7, 0x1F), op3 = BITS(instr, 5, 0x3);
 
 	if (op1 == 0x11 || op1 == 0x13 || op1 == 0x15 || op1 == 0x17) {
-		/* These are comparison flag setting instructions and do not have RD */
+		                                                                       
 		if (ARM_RN(instr) != REG_PC && ARM_RM(instr) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -502,15 +502,15 @@ arm_dataproc_reg(uint32_t instr)
 		return FASTTRAP_T_INV;
 	}
 
-	/* The rest can, in theory, write or use the PC. The only one we instrument is mov pc, reg.
-	 * movs pc, reg is a privileged instruction so we don't instrument that variant. The s bit
-	 * is bit 0 of op1 and should be zero.
-	 */
+	                                                                                           
+                                                                                           
+                                       
+    
 	if (op1 == 0x1A && op2 == 0 && op3 == 0 && ARM_RD(instr) == REG_PC) {
 		return FASTTRAP_T_MOV_PC_REG;
 	}
 
-	/* Any instruction at this point is a three register instruction or two register instruction with RN = 0 */
+	                                                                                                           
 	if (ARM_RN(instr) != REG_PC && ARM_RD(instr) != REG_PC && ARM_RM(instr) != REG_PC) {
 		return FASTTRAP_T_COMMON;
 	}
@@ -562,7 +562,7 @@ arm_dataproc_misc(uint32_t instr)
 		}
 
 		if (op1 == 0x10) {
-			/* 16 bit immediate load (mov (immed)) [encoding A2] */
+			                                                       
 			if (ARM_RD(instr) != REG_PC) {
 				return FASTTRAP_T_COMMON;
 			}
@@ -571,7 +571,7 @@ arm_dataproc_misc(uint32_t instr)
 		}
 
 		if (op1 == 0x14) {
-			/* high halfword 16 bit immediate load (movt) [encoding A1] */
+			                                                              
 			if (ARM_RD(instr) != REG_PC) {
 				return FASTTRAP_T_COMMON;
 			}
@@ -624,9 +624,9 @@ dtrace_decode_arm(uint32_t instr)
 }
 
 
-/*
- * Thumb 16-bit decoder
- */
+  
+                       
+   
 
 static
 int
@@ -648,10 +648,10 @@ thumb16_misc(uint16_t instr)
 	int opcode = BITS(instr, 5, 0x7F);
 
 	if ((opcode & 0x70) == 0x30 || (opcode & 0x70) == 0x70) {
-		/* setend, cps, breakpoint, or if-then, not instrumentable */
+		                                                             
 		return FASTTRAP_T_INV;
 	} else if ((opcode & 0x78) == 0x28) {
-		/* Doesn't modify pc, but this happens a lot so make this a special case for emulation */
+		                                                                                         
 		return FASTTRAP_T_PUSH_LR;
 	} else if ((opcode & 0x78) == 0x68) {
 		return FASTTRAP_T_POP_PC;
@@ -659,7 +659,7 @@ thumb16_misc(uint16_t instr)
 		return FASTTRAP_T_CB_N_Z;
 	}
 
-	/* All other instructions work on low regs only and are instrumentable */
+	                                                                         
 	return FASTTRAP_T_COMMON;
 }
 
@@ -667,7 +667,7 @@ static
 int
 thumb16_loadstore_single(__unused uint16_t instr)
 {
-	/* These all access the low registers or SP only */
+	                                                   
 	return FASTTRAP_T_COMMON;
 }
 
@@ -678,17 +678,17 @@ thumb16_data_special_and_branch(uint16_t instr)
 	int opcode = BITS(instr, 6, 0xF);
 
 	if (opcode == 0x4) {
-		/* Unpredictable */
+		                   
 		return FASTTRAP_T_INV;
 	} else if ((opcode & 0xC) == 0xC) {
-		/* bx or blx */
-		/* Only instrument the bx */
+		               
+		                            
 		if ((opcode & 0x2) == 0) {
 			return FASTTRAP_T_BX_REG;
 		}
 		return FASTTRAP_T_INV;
 	} else {
-		/* Data processing on high registers, only instrument mov pc, reg */
+		                                                                    
 		if ((opcode & 0xC) == 0x8 && THUMB16_HRD(instr) == REG_PC) {
 			return FASTTRAP_T_CPY_PC;
 		}
@@ -705,7 +705,7 @@ static
 int
 thumb16_data_proc(__unused uint16_t instr)
 {
-	/* These all access the low registers only */
+	                                             
 	return FASTTRAP_T_COMMON;
 }
 
@@ -713,7 +713,7 @@ static
 int
 thumb16_shift_addsub_move_compare(__unused uint16_t instr)
 {
-	/* These all access the low registers only */
+	                                             
 	return FASTTRAP_T_COMMON;
 }
 
@@ -736,7 +736,7 @@ dtrace_decode_thumb16(uint16_t instr)
 	}
 
 	if ((opcode & 0x3E) == 0x12) {
-		/* ldr (literal) */
+		                   
 		return FASTTRAP_T_LDR_PC_IMMED;
 	}
 
@@ -745,12 +745,12 @@ dtrace_decode_thumb16(uint16_t instr)
 	}
 
 	if ((opcode & 0x3E) == 0x28) {
-		/* adr, uses the pc */
+		                      
 		return FASTTRAP_T_INV;
 	}
 
 	if ((opcode & 0x3E) == 0x2A) {
-		/* add (sp plus immediate) */
+		                             
 		return FASTTRAP_T_COMMON;
 	}
 
@@ -759,12 +759,12 @@ dtrace_decode_thumb16(uint16_t instr)
 	}
 
 	if ((opcode & 0x3E) == 0x30) {
-		/* stm - can't access high registers */
+		                                       
 		return FASTTRAP_T_COMMON;
 	}
 
 	if ((opcode & 0x3E) == 0x32) {
-		/* ldm - can't access high registers */
+		                                       
 		return FASTTRAP_T_COMMON;
 	}
 
@@ -773,36 +773,36 @@ dtrace_decode_thumb16(uint16_t instr)
 	}
 
 	if ((opcode & 0x3E) == 0x38) {
-		/* b unconditional */
+		                     
 		return FASTTRAP_T_B_UNCOND;
 	}
 
 	return FASTTRAP_T_INV;
 }
 
-/*
- * Thumb 32-bit decoder
- */
+  
+                       
+   
 
 static
 int
 thumb32_coproc(uint16_t instr1, uint16_t instr2)
 {
-	/* Instrument any VFP data processing instructions, ignore the rest */
+	                                                                      
 
 	int op1 = BITS(instr1, 4, 0x3F), coproc = BITS(instr2, 8, 0xF), op = BITS(instr2, 4, 0x1);
 
 	if ((op1 & 0x3E) == 0) {
-		/* Undefined */
+		               
 		return FASTTRAP_T_INV;
 	}
 
 	if ((coproc & 0xE) == 0xA || (op1 & 0x30) == 0x30) {
-		/* VFP instruction */
+		                     
 		uint32_t instr = thumb32_instword_to_arm(instr1, instr2);
 
 		if ((op1 & 0x30) == 0x30) {
-			/* VFP data processing uses its own registers */
+			                                                
 			return FASTTRAP_T_COMMON;
 		}
 
@@ -815,9 +815,9 @@ thumb32_coproc(uint16_t instr1, uint16_t instr2)
 		}
 
 		if ((op1 & 0x30) == 0x20) {
-			/* VFP data processing or 8, 16, or 32 bit move between ARM reg and VFP reg */
+			                                                                              
 			if (op == 0) {
-				/* VFP data processing uses its own registers */
+				                                                
 				return FASTTRAP_T_COMMON;
 			} else {
 				return vfp_transfer(instr);
@@ -835,12 +835,12 @@ thumb32_longmultiply(uint16_t instr1, uint16_t instr2)
 	int op1 = BITS(instr1, 4, 0x7), op2 = BITS(instr2, 4, 0xF);
 
 	if ((op1 == 1 && op2 == 0xF) || (op1 == 0x3 && op2 == 0xF)) {
-		/* Three register instruction */
+		                                
 		if (THUMB32_RM(instr1, instr2) != REG_PC && THUMB32_RD(instr1, instr2) != REG_PC && THUMB32_RN(instr1, instr2) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
 	} else {
-		/* Four register instruction */
+		                               
 		if (THUMB32_RM(instr1, instr2) != REG_PC && THUMB32_RD(instr1, instr2) != REG_PC &&
 		    THUMB32_RT(instr1, instr2) != REG_PC && THUMB32_RN(instr1, instr2) != REG_PC) {
 			return FASTTRAP_T_COMMON;
@@ -942,7 +942,7 @@ thumb32_dataproc_regshift(uint16_t instr1, uint16_t instr2)
 	int op = BITS(instr1, 5, 0xF), S = BITS(instr1, 4, 0x1);
 
 	if (op == 0 || op == 0x4 || op == 0x8 || op == 0xD) {
-		/* These become test instructions if S is 1 and Rd is PC, otherwise they are data instructions. */
+		                                                                                                  
 		if (S == 1) {
 			if (THUMB32_RM(instr1, instr2) != REG_PC && THUMB32_RN(instr1, instr2) != REG_PC) {
 				return FASTTRAP_T_COMMON;
@@ -954,12 +954,12 @@ thumb32_dataproc_regshift(uint16_t instr1, uint16_t instr2)
 			}
 		}
 	} else if (op == 0x2 || op == 0x3) {
-		/* These become moves if RN is PC, otherwise they are data insts. We don't instrument mov pc, reg here */
+		                                                                                                         
 		if (THUMB32_RM(instr1, instr2) != REG_PC && THUMB32_RD(instr1, instr2) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
 	} else {
-		/* Normal three register instruction */
+		                                       
 		if (THUMB32_RM(instr1, instr2) != REG_PC && THUMB32_RD(instr1, instr2) != REG_PC && THUMB32_RN(instr1, instr2) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -974,9 +974,9 @@ thumb32_store_single(uint16_t instr1, uint16_t instr2)
 {
 	int op1 = BITS(instr1, 5, 0x7), op2 = BITS(instr2, 6, 0x3F);
 
-	/* Do not support any use of the pc yet */
+	                                          
 	if ((op1 == 0 || op1 == 1 || op1 == 2) && (op2 & 0x20) == 0) {
-		/* str (register) uses RM */
+		                            
 		if (THUMB32_RM(instr1, instr2) == REG_PC) {
 			return FASTTRAP_T_INV;
 		}
@@ -995,7 +995,7 @@ thumb32_loadbyte_memhint(uint16_t instr1, uint16_t instr2)
 {
 	int op1 = BITS(instr1, 7, 0x3), __unused op2 = BITS(instr2, 6, 0x3F);
 
-	/* Do not support any use of the pc yet */
+	                                          
 	if ((op1 == 0 || op1 == 0x2) && THUMB32_RM(instr1, instr2) == REG_PC) {
 		return FASTTRAP_T_INV;
 	}
@@ -1013,7 +1013,7 @@ thumb32_loadhalfword_memhint(uint16_t instr1, uint16_t instr2)
 {
 	int op1 = BITS(instr1, 7, 0x3), op2 = BITS(instr2, 6, 0x3F);
 
-	/* Do not support any use of the PC yet */
+	                                          
 	if (op1 == 0 && op2 == 0 && THUMB32_RM(inst1, instr2) == REG_PC) {
 		return FASTTRAP_T_INV;
 	}
@@ -1036,7 +1036,7 @@ thumb32_loadword(uint16_t instr1, uint16_t instr2)
 	}
 
 	if (op1 == 0 && op2 == 0) {
-		/* ldr (register) uses an additional reg */
+		                                           
 		if (THUMB32_RM(instr1, instr2) == REG_PC) {
 			return FASTTRAP_T_INV;
 		}
@@ -1053,7 +1053,7 @@ static
 int
 thumb32_loadstore_double_exclusive_table(__unused uint16_t instr1, __unused uint16_t instr2)
 {
-	/* Don't instrument any of these */
+	                                   
 
 	return FASTTRAP_T_INV;
 }
@@ -1065,16 +1065,16 @@ thumb32_loadstore_multiple(uint16_t instr1, uint16_t instr2)
 	int op = BITS(instr1, 7, 0x3), L = BITS(instr1, 4, 0x1), uses_pc = BITS(instr2, 15, 0x1), uses_lr = BITS(instr2, 14, 0x1);
 
 	if (op == 0 || op == 0x3) {
-		/* Privileged instructions: srs, rfe */
+		                                       
 		return FASTTRAP_T_INV;
 	}
 
-	/* Only emulate a use of the pc if it's a return from function: ldmia sp!, { ... pc }, aka pop { ... pc } */
+	                                                                                                            
 	if (op == 0x1 && L == 1 && THUMB32_RN(instr1, instr2) == REG_SP && uses_pc == 1) {
 		return FASTTRAP_T_LDM_PC;
 	}
 
-	/* stmia sp!, { ... lr }, aka push { ... lr } doesn't touch the pc, but it is very common, so special case it */
+	                                                                                                                
 	if (op == 0x2 && L == 0 && THUMB32_RN(instr1, instr2) == REG_SP && uses_lr == 1) {
 		return FASTTRAP_T_STM_LR;
 	}
@@ -1090,7 +1090,7 @@ static
 int
 thumb32_misc_control(__unused uint16_t instr1, __unused uint16_t instr2)
 {
-	/* Privileged, and instructions dealing with ThumbEE */
+	                                                       
 	return FASTTRAP_T_INV;
 }
 
@@ -1098,7 +1098,7 @@ static
 int
 thumb32_cps_hints(__unused uint16_t instr1, __unused uint16_t instr2)
 {
-	/* Privileged */
+	                
 	return FASTTRAP_T_INV;
 }
 
@@ -1136,8 +1136,8 @@ thumb32_dataproc_plain_immed(uint16_t instr1, uint16_t instr2)
 	int op = BITS(instr1, 4, 0x1F);
 
 	if (op == 0x04 || op == 0x0C || op == 0x16) {
-		/* mov, movt, bfi, bfc */
-		/* These use only RD */
+		                         
+		                       
 		if (THUMB32_RD(instr1, instr2) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -1157,14 +1157,14 @@ thumb32_dataproc_mod_immed(uint16_t instr1, uint16_t instr2)
 	int op = BITS(instr1, 5, 0xF), S = BITS(instr1, 4, 0x1);
 
 	if (op == 0x2 || op == 0x3) {
-		/* These allow REG_PC in RN, but it doesn't mean use the PC! */
+		                                                               
 		if (THUMB32_RD(instr1, instr2) != REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
 	}
 
 	if (op == 0 || op == 0x4 || op == 0x8 || op == 0xD) {
-		/* These are test instructions, if the sign bit is set and RD is the PC. */
+		                                                                           
 		if (S && THUMB32_RD(instr1, instr2) == REG_PC) {
 			return FASTTRAP_T_COMMON;
 		}
@@ -1237,7 +1237,7 @@ dtrace_decode_thumb32(uint16_t instr1, uint16_t instr2)
 		}
 
 		if ((op2 & 0x67) == 0x07) {
-			/* Undefined instruction */
+			                           
 			return FASTTRAP_T_INV;
 		}
 

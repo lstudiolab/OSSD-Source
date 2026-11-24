@@ -34,5 +34,5 @@ void rorgn_lockdown(void);
 extern vm_offset_t ctrr_begin, ctrr_end;
 #if CONFIG_CSR_FROM_DT
 extern bool csr_unsafe_kernel_text;
-#endif /* CONFIG_CSR_FROM_DT */
-#endif /* defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR) */
+#endif                         
+#endif                                                                       

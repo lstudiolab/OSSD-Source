@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *		Header files for the Low Memory Globals (lg)
- */
+  
+                                                
+   
 #ifndef _LOW_MEMORY_GLOBALS_H_
 #define _LOW_MEMORY_GLOBALS_H_
 
@@ -37,37 +37,37 @@
 
 #define LOWGLO_LAYOUT_MAGIC             0xC0DEC0DE
 
-#pragma pack(4) /* Make sure the structure stays as we defined it */
+#pragma pack(4)                                                     
 typedef struct lowglo {
-	unsigned char lgVerCode[8];         /* 0xffff1000 System verification code */
-	uint32_t      lgZero[2];            /* 0xffff1008 Double constant 0 */
-	uint32_t      lgStext;              /* 0xffff1010 Start of kernel text */
-	uint32_t      lgRsv014[2];          /* 0xffff1014 Reserved */
-	uint32_t      lgVersion;            /* 0xffff101C Pointer to kernel version string */
-	uint32_t      lgRsv020[216];        /* 0xffff1020 Reserved */
-	uint32_t      lgKmodptr;            /* 0xffff1380 Pointer to kmod, debugging aid */
-	uint32_t      lgTransOff;           /* 0xffff1384 Pointer to kdp_trans_off, debugging aid */
-	uint32_t      lgRsv388[3];          /* 0xffff1388 Reserved */
-	uint32_t      lgOSVersion;          /* 0xffff1394 Pointer to OS version string */
-	uint32_t      lgRsv398;             /* 0xffff1398 Reserved */
-	uint32_t      lgRebootFlag;         /* 0xffff139C Pointer to debugger reboot trigger */
-	uint32_t      lgManualPktAddr;      /* 0xffff13A0 Pointer to manual packet structure */
-	uint32_t      lgRsv3A4;             /* 0xffff13A4 Reserved */
-	uint32_t      lgPmapMemQ;           /* 0xffff13A8 Pointer to PMAP memory queue */
-	uint32_t      lgPmapMemPageOffset;  /* 0xffff13AC Offset of physical page member in vm_page_with_ppnum_t */
-	uint32_t      lgPmapMemChainOffset; /* 0xffff13B0 Offset of listq in vm_page_t or vm_page_with_ppnum_t */
-	uint32_t      lgStaticAddr;         /* 0xffff13B4 Static allocation address */
-	uint32_t      lgStaticSize;         /* 0xffff13B8 Static allocation size */
-	uint32_t      lgLayoutMajorVersion; /* 0xffff13BC Lowglo layout major version */
-	uint32_t      lgLayoutMagic;        /* 0xffff13C0 Magic value evaluated to determine if lgLayoutVersion is valid */
-	uint32_t      lgPmapMemStartAddr;   /* 0xffff13C4 Pointer to start of vm_page_t array */
-	uint32_t      lgPmapMemEndAddr;     /* 0xffff13C8 Pointer to end of vm_page_t array */
-	uint32_t      lgPmapMemPagesize;    /* 0xffff13CC size of vm_page_t */
-	uint32_t      lgPmapMemFirstppnum;  /* 0xffff13D0 physical page number of the first vm_page_t in the array */
-	uint32_t      lgLayoutMinorVersion; /* 0xffff13D4 Lowglo layout minor version */
-	uint32_t      lgPageShift;          /* 0xffff13D8 Number of shifts from page number to size */
-	uint32_t      lgVmFirstPhys;        /* 0xffff13DC First physical address of kernel-managed DRAM (inclusive) */
-	uint32_t      lgVmLastPhys;         /* 0xffff13E0 Last physical address of kernel-managed DRAM (exclusive) */
+	unsigned char lgVerCode[8];                                                  
+	uint32_t      lgZero[2];                                              
+	uint32_t      lgStext;                                                   
+	uint32_t      lgRsv014[2];                                   
+	uint32_t      lgVersion;                                                             
+	uint32_t      lgRsv020[216];                                 
+	uint32_t      lgKmodptr;                                                           
+	uint32_t      lgTransOff;                                                                   
+	uint32_t      lgRsv388[3];                                   
+	uint32_t      lgOSVersion;                                                       
+	uint32_t      lgRsv398;                                      
+	uint32_t      lgRebootFlag;                                                            
+	uint32_t      lgManualPktAddr;                                                         
+	uint32_t      lgRsv3A4;                                      
+	uint32_t      lgPmapMemQ;                                                        
+	uint32_t      lgPmapMemPageOffset;                                                                         
+	uint32_t      lgPmapMemChainOffset;                                                                      
+	uint32_t      lgStaticAddr;                                                   
+	uint32_t      lgStaticSize;                                                
+	uint32_t      lgLayoutMajorVersion;                                             
+	uint32_t      lgLayoutMagic;                                                                                       
+	uint32_t      lgPmapMemStartAddr;                                                       
+	uint32_t      lgPmapMemEndAddr;                                                       
+	uint32_t      lgPmapMemPagesize;                                      
+	uint32_t      lgPmapMemFirstppnum;                                                                           
+	uint32_t      lgLayoutMinorVersion;                                             
+	uint32_t      lgPageShift;                                                                    
+	uint32_t      lgVmFirstPhys;                                                                                  
+	uint32_t      lgVmLastPhys;                                                                                  
 } lowglo;
 #pragma pack()
 
@@ -77,4 +77,4 @@ void patch_low_glo(void);
 void patch_low_glo_static_region(uint32_t address, uint32_t size);
 void patch_low_glo_vm_page_info(void *, void *, uint32_t);
 
-#endif /* _LOW_MEMORY_GLOBALS_H_ */
+#endif                             

@@ -38,6 +38,6 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_LOCK_H_ */
+#endif                       
 
 #endif

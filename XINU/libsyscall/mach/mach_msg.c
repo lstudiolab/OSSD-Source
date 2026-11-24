@@ -68,14 +68,14 @@ extern int proc_importance_assertion_complete(uint64_t assertion_handle);
 
 #define LIBMACH_OPTIONS (MACH_SEND_INTERRUPT|MACH_RCV_INTERRUPT)
 
-/*
- *	Routine:	mach_msg
- *	Purpose:
- *		Send and/or receive a message.  If the message operation
- *		is interrupted, and the user did not request an indication
- *		of that fact, then restart the appropriate parts of the
- *              operation.
- */
+  
+                    
+           
+                                                            
+                                                              
+                                                           
+                          
+   
 mach_msg_return_t
 mach_msg(msg, option, send_size, rcv_size, rcv_name, timeout, notify)
 mach_msg_header_t *msg;
@@ -88,17 +88,17 @@ mach_port_t notify;
 {
 	mach_msg_return_t mr;
 
-	/*
-	 * Consider the following cases:
-	 *	1) Errors in pseudo-receive (eg, MACH_SEND_INTERRUPTED
-	 *	plus special bits).
-	 *	2) Use of MACH_SEND_INTERRUPT/MACH_RCV_INTERRUPT options.
-	 *	3) RPC calls with interruptions in one/both halves.
-	 *
-	 * We refrain from passing the option bits that we implement
-	 * to the kernel.  This prevents their presence from inhibiting
-	 * the kernel's fast paths (when it checks the option value).
-	 */
+	  
+                                 
+                                                          
+                       
+                                                             
+                                                       
+   
+                                                             
+                                                                
+                                                              
+    
 
 	mr = MACH_MSG_TRAP(msg, option & ~LIBMACH_OPTIONS,
 	    send_size, rcv_size, rcv_name,
@@ -128,22 +128,22 @@ mach_port_t notify;
 	return mr;
 }
 
-/*
- *	Routine:	mach_msg_overwrite
- *	Purpose:
- *		Send and/or receive a message.  If the message operation
- *		is interrupted, and the user did not request an indication
- *		of that fact, then restart the appropriate parts of the
- *              operation.
- *
- *		Distinct send and receive buffers may be specified.  If
- *		no separate receive buffer is specified, the msg parameter
- *		will be used for both send and receive operations.
- *
- *		In addition to a distinct receive buffer, that buffer may
- *		already contain scatter control information to direct the
- *		receiving of the message.
- */
+  
+                              
+           
+                                                            
+                                                              
+                                                           
+                          
+  
+                                                           
+                                                              
+                                                      
+  
+                                                             
+                                                             
+                             
+   
 mach_msg_return_t
 mach_msg_overwrite(msg, option, send_size, rcv_limit, rcv_name, timeout,
     notify, rcv_msg, rcv_scatter_size)
@@ -159,17 +159,17 @@ mach_msg_size_t rcv_scatter_size;
 {
 	mach_msg_return_t mr;
 
-	/*
-	 * Consider the following cases:
-	 *	1) Errors in pseudo-receive (eg, MACH_SEND_INTERRUPTED
-	 *	plus special bits).
-	 *	2) Use of MACH_SEND_INTERRUPT/MACH_RCV_INTERRUPT options.
-	 *	3) RPC calls with interruptions in one/both halves.
-	 *
-	 * We refrain from passing the option bits that we implement
-	 * to the kernel.  This prevents their presence from inhibiting
-	 * the kernel's fast paths (when it checks the option value).
-	 */
+	  
+                                 
+                                                          
+                       
+                                                             
+                                                       
+   
+                                                             
+                                                                
+                                                              
+    
 
 	mr = mach_msg_overwrite_trap(msg, option & ~LIBMACH_OPTIONS,
 	    send_size, rcv_limit, rcv_name,
@@ -224,25 +224,25 @@ mach_msg_destroy_port(mach_port_t port, mach_msg_type_name_t type)
 		switch (type) {
 		case MACH_MSG_TYPE_MOVE_SEND:
 		case MACH_MSG_TYPE_MOVE_SEND_ONCE:
-			/* destroy the send/send-once right */
+			                                      
 			(void) mach_port_deallocate(mach_task_self_, port);
 			break;
 
 		case MACH_MSG_TYPE_MOVE_RECEIVE:
-			/* destroy the receive right */
+			                               
 			(void) mach_port_mod_refs(mach_task_self_, port,
 			    MACH_PORT_RIGHT_RECEIVE, -1);
 			break;
 
 		case MACH_MSG_TYPE_MAKE_SEND:
-			/* create a send right and then destroy it */
+			                                             
 			(void) mach_port_insert_right(mach_task_self_, port,
 			    port, MACH_MSG_TYPE_MAKE_SEND);
 			(void) mach_port_deallocate(mach_task_self_, port);
 			break;
 
 		case MACH_MSG_TYPE_MAKE_SEND_ONCE:
-			/* create a send-once right and then destroy it */
+			                                                  
 			(void) mach_port_extract_right(mach_task_self_, port,
 			    MACH_MSG_TYPE_MAKE_SEND_ONCE,
 			    &port, &type);
@@ -261,31 +261,31 @@ mach_msg_destroy_memory(vm_offset_t addr, vm_size_t size)
 }
 
 
-/*
- *	Routine:	mach_msg_destroy
- *	Purpose:
- *		mach_msg_destroy is useful in two contexts.
- *
- *		First, it can deallocate all port rights and
- *		out-of-line memory in a received message.
- *		When a server receives a request it doesn't want,
- *		it needs this functionality.
- *
- *		Second, it can mimic the side-effects of a msg-send
- *		operation.  The effect is as if the message were sent
- *		and then destroyed inside the kernel.  When a server
- *		can't send a reply (because the client died),
- *		it needs this functionality.
- */
+  
+                            
+           
+                                               
+  
+                                                
+                                             
+                                                     
+                                
+  
+                                                       
+                                                         
+                                                        
+                                                 
+                                
+   
 void
 mach_msg_destroy(mach_msg_header_t *msg)
 {
 	mach_msg_bits_t mbits = msg->msgh_bits;
 
-	/*
-	 *	The msgh_local_port field doesn't hold a port right.
-	 *	The receive operation consumes the destination port right.
-	 */
+	  
+                                                        
+                                                              
+    
 
 	mach_msg_destroy_port(msg->msgh_remote_port, MACH_MSGH_BITS_REMOTE(mbits));
 	mach_msg_destroy_port(msg->msgh_voucher_port, MACH_MSGH_BITS_VOUCHER(mbits));
@@ -304,9 +304,9 @@ mach_msg_destroy(mach_msg_header_t *msg)
 			case MACH_MSG_PORT_DESCRIPTOR: {
 				mach_msg_port_descriptor_t *dsc;
 
-				/*
-				 * Destroy port rights carried in the message
-				 */
+				  
+                                                 
+       
 				dsc = &daddr->port;
 				mach_msg_destroy_port(dsc->name, dsc->disposition);
 				daddr = (mach_msg_descriptor_t *)(dsc + 1);
@@ -316,9 +316,9 @@ mach_msg_destroy(mach_msg_header_t *msg)
 			case MACH_MSG_OOL_DESCRIPTOR: {
 				mach_msg_ool_descriptor_t *dsc;
 
-				/*
-				 * Destroy memory carried in the message
-				 */
+				  
+                                            
+       
 				dsc = &daddr->out_of_line;
 				if (dsc->deallocate) {
 					mach_msg_destroy_memory((vm_offset_t)dsc->address,
@@ -331,9 +331,9 @@ mach_msg_destroy(mach_msg_header_t *msg)
 			case MACH_MSG_OOL_VOLATILE_DESCRIPTOR: {
 				mach_msg_ool_descriptor_t *dsc;
 
-				/*
-				 * Just skip it.
-				 */
+				  
+                    
+       
 				dsc = &daddr->out_of_line;
 				daddr = (mach_msg_descriptor_t *)(dsc + 1);
 				break;
@@ -344,18 +344,18 @@ mach_msg_destroy(mach_msg_header_t *msg)
 				mach_msg_ool_ports_descriptor_t     *dsc;
 				mach_msg_type_number_t              j;
 
-				/*
-				 * Destroy port rights carried in the message
-				 */
+				  
+                                                 
+       
 				dsc = &daddr->ool_ports;
 				ports = (mach_port_t *) dsc->address;
 				for (j = 0; j < dsc->count; j++, ports++) {
 					mach_msg_destroy_port(*ports, dsc->disposition);
 				}
 
-				/*
-				 * Destroy memory carried in the message
-				 */
+				  
+                                            
+       
 				if (dsc->deallocate) {
 					mach_msg_destroy_memory((vm_offset_t)dsc->address,
 					    dsc->count * sizeof(mach_port_t));
@@ -367,13 +367,13 @@ mach_msg_destroy(mach_msg_header_t *msg)
 			case MACH_MSG_GUARDED_PORT_DESCRIPTOR: {
 				mach_msg_guarded_port_descriptor_t *dsc;
 				mach_msg_guard_flags_t flags;
-				/*
-				 * Destroy port right carried in the message
-				 */
+				  
+                                                
+       
 				dsc = &daddr->guarded_port;
 				flags = dsc->flags;
 				if ((flags & MACH_MSG_GUARD_FLAGS_UNGUARDED_ON_SEND) == 0) {
-					/* Need to unguard before destroying the port */
+					                                                
 					mach_port_unguard(mach_task_self_, dsc->name, (uint64_t)dsc->context);
 				}
 				mach_msg_destroy_port(dsc->name, dsc->disposition);
@@ -394,10 +394,10 @@ mach_msg_server_is_recoverable_send_error(kern_return_t kr)
 	case MACH_SEND_INTERRUPTED:
 		return TRUE;
 	default:
-		/*
-		 * Other errors mean that the message may have been partially destroyed
-		 * by the kernel, and these can't be recovered and may leak resources.
-		 */
+		  
+                                                                         
+                                                                        
+     
 		return FALSE;
 	}
 }
@@ -405,12 +405,12 @@ mach_msg_server_is_recoverable_send_error(kern_return_t kr)
 static kern_return_t
 mach_msg_server_mig_return_code(mig_reply_error_t *reply)
 {
-	/*
-	 * If the message is complex, it is assumed that the reply was successful,
-	 * as the RetCode is where the count of out of line descriptors is.
-	 *
-	 * If not, we read RetCode.
-	 */
+	  
+                                                                           
+                                                                    
+   
+                            
+    
 	if (reply->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) {
 		return KERN_SUCCESS;
 	}
@@ -420,13 +420,13 @@ mach_msg_server_mig_return_code(mig_reply_error_t *reply)
 static void
 mach_msg_server_consume_unsent_message(mach_msg_header_t *hdr)
 {
-	/* mach_msg_destroy doesn't handle the local port */
+	                                                    
 	mach_port_t port = hdr->msgh_local_port;
 	if (MACH_PORT_VALID(port)) {
 		switch (MACH_MSGH_BITS_LOCAL(hdr->msgh_bits)) {
 		case MACH_MSG_TYPE_MOVE_SEND:
 		case MACH_MSG_TYPE_MOVE_SEND_ONCE:
-			/* destroy the send/send-once right */
+			                                      
 			(void) mach_port_deallocate(mach_task_self_, port);
 			hdr->msgh_local_port = MACH_PORT_NULL;
 			break;
@@ -435,17 +435,17 @@ mach_msg_server_consume_unsent_message(mach_msg_header_t *hdr)
 	mach_msg_destroy(hdr);
 }
 
-/*
- *	Routine:	mach_msg_server_once
- *	Purpose:
- *		A simple generic server function.  It allows more flexibility
- *		than mach_msg_server by processing only one message request
- *		and then returning to the user.  Note that more in the way
- *              of error codes are returned to the user; specifically, any
- *              failing error from mach_msg calls will be returned
- *		(though errors from the demux routine or the routine it
- *		calls will not be).
- */
+  
+                                
+           
+                                                                 
+                                                               
+                                                              
+                                                                          
+                                                                  
+                                                           
+                       
+   
 mach_msg_return_t
 mach_msg_server_once(
 	boolean_t (*demux)(mach_msg_header_t *, mach_msg_header_t *),
@@ -514,7 +514,7 @@ mach_msg_server_once(
 	}
 
 	if (mr == MACH_MSG_SUCCESS) {
-		/* we have a request message */
+		                               
 
 		old_state = voucher_mach_msg_adopt(&bufRequest->Head);
 
@@ -527,23 +527,23 @@ mach_msg_server_once(
 			bufReply->Head.msgh_remote_port = MACH_PORT_NULL;
 			break;
 		default:
-			/*
-			 * destroy the request - but not the reply port
-			 * (MIG moved it into the bufReply).
-			 */
+			  
+                                                  
+                                       
+      
 			bufRequest->Head.msgh_remote_port = MACH_PORT_NULL;
 			mach_msg_destroy(&bufRequest->Head);
 		}
 
-		/*
-		 *	We don't want to block indefinitely because the client
-		 *	isn't receiving messages from the reply port.
-		 *	If we have a send-once right for the reply port, then
-		 *	this isn't a concern because the send won't block.
-		 *	If we have a send right, we need to use MACH_SEND_TIMEOUT.
-		 *	To avoid falling off the kernel's fast RPC path unnecessarily,
-		 *	we only supply MACH_SEND_TIMEOUT when absolutely necessary.
-		 */
+		  
+                                                           
+                                                  
+                                                          
+                                                       
+                                                               
+                                                                   
+                                                                
+     
 		if (bufReply->Head.msgh_remote_port != MACH_PORT_NULL) {
 			mr = mach_msg(&bufReply->Head,
 			    (MACH_MSGH_BITS_REMOTE(bufReply->Head.msgh_bits) ==
@@ -571,12 +571,12 @@ mach_msg_server_once(
 	return mr;
 }
 
-/*
- *	Routine:	mach_msg_server
- *	Purpose:
- *		A simple generic server function.  Note that changes here
- *              should be considered for duplication above.
- */
+  
+                           
+           
+                                                             
+                                                           
+   
 mach_msg_return_t
 mach_msg_server(
 	boolean_t (*demux)(mach_msg_header_t *, mach_msg_header_t *),
@@ -636,7 +636,7 @@ mach_msg_server(
 		    MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
 		while (mr == MACH_MSG_SUCCESS) {
-			/* we have another request message */
+			                                     
 
 			buffers_swapped = FALSE;
 			old_state = voucher_mach_msg_adopt(&bufRequest->Head);
@@ -651,23 +651,23 @@ mach_msg_server(
 				bufReply->Head.msgh_remote_port = MACH_PORT_NULL;
 				break;
 			default:
-				/*
-				 * destroy the request - but not the reply port
-				 * (MIG moved it into the bufReply).
-				 */
+				  
+                                                   
+                                        
+       
 				bufRequest->Head.msgh_remote_port = MACH_PORT_NULL;
 				mach_msg_destroy(&bufRequest->Head);
 			}
 
-			/*
-			 * We don't want to block indefinitely because the client
-			 * isn't receiving messages from the reply port.
-			 * If we have a send-once right for the reply port, then
-			 * this isn't a concern because the send won't block.
-			 * If we have a send right, we need to use MACH_SEND_TIMEOUT.
-			 * To avoid falling off the kernel's fast RPC path,
-			 * we only supply MACH_SEND_TIMEOUT when absolutely necessary.
-			 */
+			  
+                                                            
+                                                   
+                                                           
+                                                        
+                                                                
+                                                      
+                                                                 
+      
 			if (bufReply->Head.msgh_remote_port != MACH_PORT_NULL) {
 				if (request_alloc == reply_alloc) {
 					mig_reply_error_t *bufTemp;
@@ -681,7 +681,7 @@ mach_msg_server(
 						bufReply->Head.msgh_size, request_size, rcv_name,
 						MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
-					/* swap request and reply */
+					                            
 					bufTemp = bufRequest;
 					bufRequest = bufReply;
 					bufReply = bufTemp;
@@ -698,12 +698,12 @@ mach_msg_server(
 						&bufRequest->Head, 0);
 				}
 
-				/*
-				 * Need to destroy the reply msg in case if there was a send timeout or
-				 * invalid destination. The reply msg would be swapped with request msg
-				 * if buffers_swapped is true, thus destroy request msg instead of
-				 * reply msg in such cases.
-				 */
+				  
+                                                                           
+                                                                           
+                                                                      
+                               
+       
 				if (mach_msg_server_is_recoverable_send_error(mr)) {
 					if (buffers_swapped) {
 						mach_msg_server_consume_unsent_message(&bufRequest->Head);
@@ -723,7 +723,7 @@ mach_msg_server(
 			mr = mach_msg(&bufRequest->Head, MACH_RCV_MSG | MACH_RCV_VOUCHER | options,
 			    0, request_size, rcv_name,
 			    MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-		} /* while (mr == MACH_MSG_SUCCESS) */
+		}                                     
 
 		if ((mr == MACH_RCV_TOO_LARGE) && (options & MACH_RCV_LARGE)) {
 			new_request_alloc = (mach_msg_size_t)round_page(bufRequest->Head.msgh_size +
@@ -736,7 +736,7 @@ mach_msg_server(
 		}
 
 		break;
-	} /* for(;;) */
+	}              
 
 	(void)vm_deallocate(self,
 	    (vm_address_t) bufRequest,
@@ -747,12 +747,12 @@ mach_msg_server(
 	return mr;
 }
 
-/*
- *	Routine:	mach_msg_server_importance
- *	Purpose:
- *		A simple generic server function which handles importance
- *              promotion assertions for adaptive daemons.
- */
+  
+                                      
+           
+                                                             
+                                                          
+   
 mach_msg_return_t
 mach_msg_server_importance(
 	boolean_t (*demux)(mach_msg_header_t *, mach_msg_header_t *),

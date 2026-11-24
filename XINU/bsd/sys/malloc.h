@@ -61,12 +61,12 @@
  *
  *	@(#)malloc.h	8.5 (Berkeley) 5/3/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _SYS_MALLOC_H_
 #define _SYS_MALLOC_H_
@@ -75,13 +75,13 @@
 
 
 #ifdef KERNEL
-/*
- * flags to malloc
- */
+  
+                  
+   
 #define M_WAITOK        0x0000
 #define M_NOWAIT        0x0001
-#define M_ZERO          0x0004          /* bzero the allocation */
-#define M_NULL          0x0008          /* return NULL if space is unavailable*/
+#define M_ZERO          0x0004                                    
+#define M_NULL          0x0008                                                  
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -90,64 +90,64 @@
 
 ZONE_VIEW_DECLARE(ZV_NAMEI);
 
-/*
- * Types of memory to be allocated (not all are used by us)
- */
-#define M_DEVBUF        2       /* device driver memory */
-#define M_PCB           4       /* protocol control block */
-#define M_RTABLE        5       /* routing tables */
-#define M_IFADDR        9       /* interface address */
-#define M_SONAME        11      /* socket name */
-#define M_PGRP          17      /* process group header */
-#define M_FHANDLE       21      /* network file handle */
-#define M_NFSNODE       24      /* NFS vnode private part */
-#define M_VNODE         25      /* Dynamically allocated vnodes */
-#define M_CACHE         26      /* Dynamically allocated cache entries */
-#define M_DQUOT         27      /* UFS quota entries */
-#define M_PROC_UUID_POLICY      28      /* proc UUID policy entries */
-#define M_SHM           29      /* SVID compatible shared memory segments */
-#define M_LOCKF         40      /* Byte-range locking structures */
-#define M_PROC          41      /* Proc structures */
-#define M_NETADDR       49      /* Export host address structure */
-#define M_NFSSVC        50      /* NFS server structure */
-#define M_NFSD          52      /* NFS server daemon structure */
-#define M_IPMOPTS       53      /* internet multicast options */
-#define M_IFMADDR       55      /* link-level multicast address */
-#define M_NFSBIO        58      /* NFS client I/O buffers */
-#define M_NFSBIGFH      61      /* NFS version 3 file handle */
-#define M_TTYS          65      /* allocated tty structures */
-#define M_OFILETABL     73      /* Open file descriptor table */
-#define M_TEMP          80      /* misc temporary data buffers */
-#define M_SECA          81      /* security associations, key management */
+  
+                                                           
+   
+#define M_DEVBUF        2                                 
+#define M_PCB           4                                   
+#define M_RTABLE        5                           
+#define M_IFADDR        9                              
+#define M_SONAME        11                       
+#define M_PGRP          17                                
+#define M_FHANDLE       21                               
+#define M_NFSNODE       24                                  
+#define M_VNODE         25                                        
+#define M_CACHE         26                                               
+#define M_DQUOT         27                             
+#define M_PROC_UUID_POLICY      28                                    
+#define M_SHM           29                                                  
+#define M_LOCKF         40                                         
+#define M_PROC          41                           
+#define M_NETADDR       49                                         
+#define M_NFSSVC        50                                
+#define M_NFSD          52                                       
+#define M_IPMOPTS       53                                      
+#define M_IFMADDR       55                                        
+#define M_NFSBIO        58                                  
+#define M_NFSBIGFH      61                                     
+#define M_TTYS          65                                    
+#define M_OFILETABL     73                                      
+#define M_TEMP          80                                       
+#define M_SECA          81                                                 
 #define M_DEVFS         82
-#define M_UDFNODE       84      /* UDF inodes */
-#define M_UDFMNT        85      /* UDF mount structures */
-#define M_IP6OPT        87      /* IPv6 options management */
-#define M_KQUEUE        94      /* kqueue system */
-#define M_KAUTH         100     /* kauth subsystem */
-#define M_DUMMYNET      101     /* dummynet */
-#define M_MACTEMP       104     /* MAC framework */
-#define M_SBUF          105     /* string buffers */
-#define M_SELECT        107     /* per-thread select memory */
-#define M_INMFILTER     110     /* IPv4 multicast PCB-layer source filter */
-#define M_IN6MFILTER    112     /* IPv6 multicast PCB-layer source filter */
-#define M_IP6MOPTS      113     /* IPv6 multicast options */
+#define M_UDFNODE       84                      
+#define M_UDFMNT        85                                
+#define M_IP6OPT        87                                   
+#define M_KQUEUE        94                         
+#define M_KAUTH         100                          
+#define M_DUMMYNET      101                   
+#define M_MACTEMP       104                        
+#define M_SBUF          105                         
+#define M_SELECT        107                                   
+#define M_INMFILTER     110                                                 
+#define M_IN6MFILTER    112                                                 
+#define M_IP6MOPTS      113                                 
 #define M_IP6CGA        117
-#define M_NECP          118     /* General NECP policy data */
-#define M_FD_VN_DATA    122     /* Per fd vnode data */
-#define M_FD_DIRBUF     123     /* Directory entries' buffer */
-#define M_NETAGENT      124     /* Network Agents */
-#define M_EVENTHANDLER  125     /* Eventhandler */
-#define M_LLTABLE       126     /* Link layer table */
-#define M_NWKWQ         127     /* Network work queue */
-#define M_CFIL          128     /* Content Filter */
+#define M_NECP          118                                   
+#define M_FD_VN_DATA    122                            
+#define M_FD_DIRBUF     123                                    
+#define M_NETAGENT      124                         
+#define M_EVENTHANDLER  125                       
+#define M_LLTABLE       126                           
+#define M_NWKWQ         127                             
+#define M_CFIL          128                         
 
-#define M_LAST          129     /* Must be last type + 1 */
+#define M_LAST          129                                
 
-/*
- * If you need accounting consider using
- * KALLOC_HEAP_DEFINE to define a view.
- */
+  
+                                        
+                                       
+   
 #define KM_SHM          KHEAP_DEFAULT
 
 #define MALLOC(space, cast, size, type, flags)                      \
@@ -188,17 +188,17 @@ extern void     *__REALLOC(
 	vm_allocation_site_t *site)  __attribute__((alloc_size(2)));
 
 #pragma GCC visibility pop
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 
-#define M_PCB           4       /* protocol control block (smb) */
-#define M_RTABLE        5       /* routing tables */
-#define M_IFADDR        9       /* interface address (IOFireWireIP)*/
-#define M_SONAME        11      /* socket name (smb) */
-#define M_LOCKF         40      /* Byte-range locking structures (msdos) */
-#define M_TEMP          80      /* misc temporary data buffers */
-#define M_UDFNODE       84      /* UDF inodes (udf)*/
-#define M_UDFMNT        85      /* UDF mount structures (udf)*/
-#define M_KAUTH         100     /* kauth subsystem (smb) */
+#define M_PCB           4                                         
+#define M_RTABLE        5                           
+#define M_IFADDR        9                                            
+#define M_SONAME        11                             
+#define M_LOCKF         40                                                 
+#define M_TEMP          80                                       
+#define M_UDFNODE       84                           
+#define M_UDFMNT        85                                     
+#define M_KAUTH         100                                
 
 #define MALLOC(space, cast, size, type, flags) \
 	(space) = (cast)_MALLOC(size, type, flags)
@@ -231,8 +231,8 @@ extern void     _FREE_ZONE(
 	size_t          size,
 	int             type);
 
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* KERNEL */
+#endif              
 
-#endif  /* _SYS_MALLOC_H_ */
+#endif                      

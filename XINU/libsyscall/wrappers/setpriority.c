@@ -28,10 +28,10 @@
 extern int __setpriority(int which, id_t who, int prio);
 extern void _pthread_clear_qos_tsd(mach_port_t);
 
-/*
- * Stub function to account for special case return code from setpriority
- * when called with PRIO_DARWIN_THREAD.
- */
+  
+                                                                         
+                                       
+   
 int
 setpriority(int which, id_t who, int prio)
 {

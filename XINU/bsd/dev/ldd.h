@@ -25,23 +25,23 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	@(#)ldd.h	2.0	03/20/90	(c) 1990 NeXT
- *
- * ldd.h - kernel prototypes used by loadable device drivers
- *
- * HISTORY
- * 22-May-91	Gregg Kellogg (gk) at NeXT
- *	Split out public interface.
- *
- * 16-Aug-90  Gregg Kellogg (gk) at NeXT
- *	Removed a lot of stuff that's defined in other header files.
- *	Eventually this file should either go away or contain only imports of
- *	other files.
- *
- * 20-Mar-90	Doug Mitchell at NeXT
- *	Created.
- *
- */
+                                       
+  
+                                                            
+  
+          
+                                       
+                              
+  
+                                        
+                                                               
+                                                                        
+               
+  
+                                  
+           
+  
+   
 
 #ifndef _BSD_DEV_LDD_PRIV_
 #define _BSD_DEV_LDD_PRIV_
@@ -51,4 +51,4 @@
 
 typedef int (*PFI)();
 
-#endif  /* _BSD_DEV_LDD_PRIV_ */
+#endif                          

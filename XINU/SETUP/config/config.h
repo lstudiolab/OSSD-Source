@@ -50,9 +50,9 @@
  *	@(#)config.h	5.8 (Berkeley) 6/18/88
  */
 
-/*
- * Config.
- */
+  
+          
+   
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -62,53 +62,53 @@
 
 struct file_list {
 	struct  file_list *f_next;
-	char    *f_fn;                  /* the name */
-	u_char  f_type;                 /* see below */
-	u_char  f_flags;                /* see below */
-	short   f_special;              /* requires special make rule */
+	char    *f_fn;                                
+	u_char  f_type;                                
+	u_char  f_flags;                               
+	short   f_special;                                              
 	char    *f_needs;
-	char    *f_extra;               /* stuff to add to make line */
+	char    *f_extra;                                              
 };
 
-/*
- * Types.
- */
+  
+         
+   
 #define DRIVER          1
 #define NORMAL          2
 #define INVISIBLE       3
 #define PROFILING       4
 
-/*
- * Attributes (flags).
- */
-#define CONFIGDEP       0x01    /* obsolete? */
-#define OPTIONSDEF      0x02    /* options definition entry */
-#define LIBRARYDEP      0x04    /* include file in library build */
+  
+                      
+   
+#define CONFIGDEP       0x01                   
+#define OPTIONSDEF      0x02                                  
+#define LIBRARYDEP      0x04                                       
 
 struct device {
-	int     d_type;                 /* CONTROLLER, DEVICE, bus adaptor */
-	const char      *d_name;        /* name of device (e.g. rk11) */
-	int     d_slave;                /* slave number */
-#define QUES    -1      /* -1 means '?' */
-#define UNKNOWN -2      /* -2 means not set yet */
-	int     d_flags;                /* nlags for device init */
-	struct  device *d_next;         /* Next one in list */
-	char    *d_init;                /* pseudo device init routine name */
+	int     d_type;                                                      
+	const char      *d_name;                                        
+	int     d_slave;                                  
+#define QUES    -1                        
+#define UNKNOWN -2                                
+	int     d_flags;                                           
+	struct  device *d_next;                               
+	char    *d_init;                                                     
 };
 
-/*
- * Config has a global notion of which machine type is
- * being used.  It uses the name of the machine in choosing
- * files and directories.  Thus if the name of the machine is ``vax'',
- * it will build from ``Makefile.vax'' and use ``../vax/inline''
- * in the makerules, etc.
- */
+  
+                                                      
+                                                           
+                                                                      
+                                                                
+                         
+   
 extern const char       *machinename;
 
-/*
- * In order to configure and build outside the kernel source tree,
- * we may wish to specify where the source tree lives.
- */
+  
+                                                                  
+                                                      
+   
 extern const char *source_directory;
 extern const char *object_directory;
 extern char *config_directory;
@@ -117,11 +117,11 @@ FILE *fopenp(const char *fpath, char *file, char *complete, const char *ftype);
 const char *get_VPATH(void);
 #define VPATH   get_VPATH()
 
-/*
- * A set of options may also be specified which are like CPU types,
- * but which may also specify values for the options.
- * A separate set of options may be defined for make-style options.
- */
+  
+                                                                   
+                                                     
+                                                                   
+   
 struct opt {
 	char    *op_name;
 	char    *op_value;
@@ -154,7 +154,7 @@ extern int      profiling;
 #define DEV_MASK 0x7
 #define DEV_SHIFT  3
 
-/* External function references */
+                                  
 char *get_rest(FILE *fp);
 
 int yyparse(void);

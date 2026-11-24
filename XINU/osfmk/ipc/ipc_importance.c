@@ -51,24 +51,24 @@ extern int      proc_selfpid(void);
 extern uint64_t proc_uniqueid(void *p);
 extern char     *proc_name_address(void *p);
 
-/*
- * Globals for delayed boost drop processing.
- */
+  
+                                             
+   
 static queue_head_t ipc_importance_delayed_drop_queue;
 static thread_call_t ipc_importance_delayed_drop_call;
 static uint64_t ipc_importance_delayed_drop_timestamp;
 static boolean_t ipc_importance_delayed_drop_call_requested = FALSE;
 
-#define DENAP_DROP_TARGET (1000 * NSEC_PER_MSEC) /* optimum denap delay */
-#define DENAP_DROP_SKEW    (100 * NSEC_PER_MSEC) /* request skew for wakeup */
-#define DENAP_DROP_LEEWAY  (2 * DENAP_DROP_SKEW)  /* specified wakeup leeway */
+#define DENAP_DROP_TARGET (1000 * NSEC_PER_MSEC)                          
+#define DENAP_DROP_SKEW    (100 * NSEC_PER_MSEC)                              
+#define DENAP_DROP_LEEWAY  (2 * DENAP_DROP_SKEW)                               
 
 #define DENAP_DROP_DELAY (DENAP_DROP_TARGET + DENAP_DROP_SKEW)
 #define DENAP_DROP_FLAGS (THREAD_CALL_DELAY_SYS_NORMAL | THREAD_CALL_DELAY_LEEWAY)
 
-/*
- * Importance Voucher Attribute Manager
- */
+  
+                                       
+   
 static LCK_SPIN_DECLARE_ATTR(ipc_importance_lock_data, &ipc_lck_grp, &ipc_lck_attr);
 
 #define ipc_importance_lock() \
@@ -164,17 +164,17 @@ static void ipc_importance_task_propagate_assertion_locked(ipc_importance_task_t
 
 static ipc_importance_inherit_t ipc_importance_inherit_from_task(task_t from_task, task_t to_task);
 
-/*
- *	Routine:	ipc_importance_kmsg_link
- *	Purpose:
- *		Link the kmsg onto the appropriate propagation chain.
- *		If the element is a task importance, we link directly
- *		on its propagation chain. Otherwise, we link onto the
- *		destination task of the inherit.
- *	Conditions:
- *		Importance lock held.
- *		Caller is donating an importance elem reference to the kmsg.
- */
+  
+                                    
+           
+                                                         
+                                                         
+                                                         
+                                    
+              
+                         
+                                                                
+   
 static void
 ipc_importance_kmsg_link(
 	ipc_kmsg_t              kmsg,
@@ -192,19 +192,19 @@ ipc_importance_kmsg_link(
 	kmsg->ikm_importance = elem;
 }
 
-/*
- *	Routine:	ipc_importance_kmsg_unlink
- *	Purpose:
- *		Unlink the kmsg from its current propagation chain.
- *		If the element is a task importance, we unlink directly
- *		from its propagation chain. Otherwise, we unlink from the
- *		destination task of the inherit.
- *	Returns:
- *		The reference to the importance element it was linked on.
- *	Conditions:
- *		Importance lock held.
- *		Caller is responsible for dropping reference on returned elem.
- */
+  
+                                      
+           
+                                                       
+                                                           
+                                                             
+                                    
+           
+                                                             
+              
+                         
+                                                                  
+   
 static ipc_importance_elem_t
 ipc_importance_kmsg_unlink(
 	ipc_kmsg_t              kmsg)
@@ -224,17 +224,17 @@ ipc_importance_kmsg_unlink(
 	return elem;
 }
 
-/*
- *	Routine:	ipc_importance_inherit_link
- *	Purpose:
- *		Link the inherit onto the appropriate propagation chain.
- *		If the element is a task importance, we link directly
- *		on its propagation chain. Otherwise, we link onto the
- *		destination task of the inherit.
- *	Conditions:
- *		Importance lock held.
- *		Caller is donating an elem importance reference to the inherit.
- */
+  
+                                       
+           
+                                                            
+                                                         
+                                                         
+                                    
+              
+                         
+                                                                   
+   
 static void
 ipc_importance_inherit_link(
 	ipc_importance_inherit_t inherit,
@@ -252,19 +252,19 @@ ipc_importance_inherit_link(
 	inherit->iii_from_elem = elem;
 }
 
-/*
- *	Routine:	ipc_importance_inherit_find
- *	Purpose:
- *		Find an existing inherit that links the from element to the
- *		to_task at a given nesting depth.  As inherits from other
- *		inherits are actually linked off the original inherit's donation
- *		receiving task, we have to conduct our search from there if
- *		the from element is an inherit.
- *	Returns:
- *		A pointer (not a reference) to the matching inherit.
- *	Conditions:
- *		Importance lock held.
- */
+  
+                                       
+           
+                                                               
+                                                             
+                                                                    
+                                                               
+                                   
+           
+                                                        
+              
+                         
+   
 static ipc_importance_inherit_t
 ipc_importance_inherit_find(
 	ipc_importance_elem_t from,
@@ -287,19 +287,19 @@ ipc_importance_inherit_find(
 	return III_NULL;
 }
 
-/*
- *	Routine:	ipc_importance_inherit_unlink
- *	Purpose:
- *		Unlink the inherit from its current propagation chain.
- *		If the element is a task importance, we unlink directly
- *		from its propagation chain. Otherwise, we unlink from the
- *		destination task of the inherit.
- *	Returns:
- *		The reference to the importance element it was linked on.
- *	Conditions:
- *		Importance lock held.
- *		Caller is responsible for dropping reference on returned elem.
- */
+  
+                                         
+           
+                                                          
+                                                           
+                                                             
+                                    
+           
+                                                             
+              
+                         
+                                                                  
+   
 static ipc_importance_elem_t
 ipc_importance_inherit_unlink(
 	ipc_importance_inherit_t inherit)
@@ -320,13 +320,13 @@ ipc_importance_inherit_unlink(
 	return elem;
 }
 
-/*
- *	Routine:	ipc_importance_reference
- *	Purpose:
- *		Add a reference to the importance element.
- *	Conditions:
- *		Caller must hold a reference on the element.
- */
+  
+                                    
+           
+                                              
+              
+                                                
+   
 void
 ipc_importance_reference(ipc_importance_elem_t elem)
 {
@@ -334,14 +334,14 @@ ipc_importance_reference(ipc_importance_elem_t elem)
 	ipc_importance_reference_internal(elem);
 }
 
-/*
- *	Routine:	ipc_importance_release_locked
- *	Purpose:
- *		Release a reference on an importance attribute value,
- *		unlinking and deallocating the attribute if the last reference.
- *	Conditions:
- *		Entered with importance lock held, leaves with it unlocked.
- */
+  
+                                         
+           
+                                                         
+                                                                   
+              
+                                                               
+   
 static void
 ipc_importance_release_locked(ipc_importance_elem_t elem)
 {
@@ -373,24 +373,24 @@ ipc_importance_release_locked(ipc_importance_elem_t elem)
 	if (IIE_REFS(elem) < expected + 1) {
 		panic("ipc_importance_release_locked (%p)", elem);
 	}
-#endif /* IMPORTANCE_DEBUG */
+#endif                       
 
 	if (0 < ipc_importance_release_internal(elem)) {
 		ipc_importance_unlock();
 		return;
 	}
 
-	/* last ref */
+	              
 
 	switch (IIE_TYPE(elem)) {
-	/* just a "from" task reference to drop */
+	                                          
 	case IIE_TYPE_TASK:
 	{
 		ipc_importance_task_t task_elem;
 
 		task_elem = (ipc_importance_task_t)elem;
 
-		/* the task can't still hold a reference on the task importance */
+		                                                                  
 		assert(TASK_NULL == task_elem->iit_task);
 
 #if DEVELOPMENT || DEBUG
@@ -403,7 +403,7 @@ ipc_importance_release_locked(ipc_importance_elem_t elem)
 		break;
 	}
 
-	/* dropping an inherit element */
+	                                 
 	case IIE_TYPE_INHERIT:
 	{
 		ipc_importance_inherit_t inherit = (ipc_importance_inherit_t)elem;
@@ -413,26 +413,26 @@ ipc_importance_release_locked(ipc_importance_elem_t elem)
 		assert(IIT_NULL != to_task);
 		assert(ipc_importance_task_is_any_receiver_type(to_task));
 
-		/* unlink the inherit from its source element */
+		                                                
 		from_elem = ipc_importance_inherit_unlink(inherit);
 		assert(IIE_NULL != from_elem);
 
-		/*
-		 * The attribute might have pending external boosts if the attribute
-		 * was given out during exec, drop them from the appropriate destination
-		 * task.
-		 *
-		 * The attribute will not have any pending external boosts if the
-		 * attribute was given out to voucher system since it would have been
-		 * dropped by ipc_importance_release_value, but there is not way to
-		 * detect that, thus if the attribute has a pending external boost,
-		 * drop them from the appropriate destination task.
-		 *
-		 * The inherit attribute from exec and voucher system would not
-		 * get deduped to each other, thus dropping the external boost
-		 * from destination task at two different places will not have
-		 * any unintended side effects.
-		 */
+		  
+                                                                      
+                                                                          
+          
+    
+                                                                   
+                                                                       
+                                                                     
+                                                                     
+                                                     
+    
+                                                                 
+                                                                
+                                                                
+                                 
+     
 		assert(inherit->iii_externcnt >= inherit->iii_externdrop);
 		if (inherit->iii_donating) {
 			uint32_t assertcnt = III_EXTERN(inherit);
@@ -446,7 +446,7 @@ ipc_importance_release_locked(ipc_importance_elem_t elem)
 			inherit->iii_externdrop = 0;
 			inherit->iii_donating = FALSE;
 
-			/* adjust the internal assertions - and propagate as needed */
+			                                                              
 			if (ipc_importance_task_check_transition(to_task, IIT_UPDATE_DROP, assertcnt)) {
 				ipc_importance_task_propagate_assertion_locked(to_task, IIT_UPDATE_DROP, TRUE);
 			}
@@ -455,29 +455,29 @@ ipc_importance_release_locked(ipc_importance_elem_t elem)
 			inherit->iii_externdrop = 0;
 		}
 
-		/* release the reference on the source element */
+		                                                 
 		ipc_importance_release_locked(from_elem);
-		/* unlocked on return */
+		                        
 
-		/* release the reference on the destination task */
+		                                                   
 		ipc_importance_task_release(to_task);
 
-		/* free the inherit */
+		                      
 		zfree(ipc_importance_inherit_zone, inherit);
 		break;
 	}
 	}
 }
 
-/*
- *	Routine:	ipc_importance_release
- *	Purpose:
- *		Release a reference on an importance attribute value,
- *		unlinking and deallocating the attribute if the last reference.
- *	Conditions:
- *		nothing locked on entrance, nothing locked on exit.
- *		May block.
- */
+  
+                                  
+           
+                                                         
+                                                                   
+              
+                                                       
+              
+   
 void
 ipc_importance_release(ipc_importance_elem_t elem)
 {
@@ -487,19 +487,19 @@ ipc_importance_release(ipc_importance_elem_t elem)
 
 	ipc_importance_lock();
 	ipc_importance_release_locked(elem);
-	/* unlocked */
+	              
 }
 
-/*
- *	Routine:	ipc_importance_task_reference
- *
- *
- *	Purpose:
- *		Retain a reference on a task importance attribute value.
- *	Conditions:
- *		nothing locked on entrance, nothing locked on exit.
- *		caller holds a reference already.
- */
+  
+                                         
+  
+  
+           
+                                                            
+              
+                                                       
+                                     
+   
 void
 ipc_importance_task_reference(ipc_importance_task_t task_elem)
 {
@@ -512,15 +512,15 @@ ipc_importance_task_reference(ipc_importance_task_t task_elem)
 	ipc_importance_reference(&task_elem->iit_elem);
 }
 
-/*
- *	Routine:	ipc_importance_task_release
- *	Purpose:
- *		Release a reference on a task importance attribute value,
- *		unlinking and deallocating the attribute if the last reference.
- *	Conditions:
- *		nothing locked on entrance, nothing locked on exit.
- *		May block.
- */
+  
+                                       
+           
+                                                             
+                                                                   
+              
+                                                       
+              
+   
 void
 ipc_importance_task_release(ipc_importance_task_t task_elem)
 {
@@ -533,18 +533,18 @@ ipc_importance_task_release(ipc_importance_task_t task_elem)
 	incr_ref_counter(task_elem->iit_elem.iie_task_refs_dropped);
 #endif
 	ipc_importance_release_locked(&task_elem->iit_elem);
-	/* unlocked */
+	              
 }
 
-/*
- *	Routine:	ipc_importance_task_release_locked
- *	Purpose:
- *		Release a reference on a task importance attribute value,
- *		unlinking and deallocating the attribute if the last reference.
- *	Conditions:
- *		importance lock held on entry, nothing locked on exit.
- *		May block.
- */
+  
+                                              
+           
+                                                             
+                                                                   
+              
+                                                          
+              
+   
 static void
 ipc_importance_task_release_locked(ipc_importance_task_t task_elem)
 {
@@ -556,35 +556,35 @@ ipc_importance_task_release_locked(ipc_importance_task_t task_elem)
 	incr_ref_counter(task_elem->iit_elem.iie_task_refs_dropped);
 #endif
 	ipc_importance_release_locked(&task_elem->iit_elem);
-	/* unlocked */
+	              
 }
 
-/*
- * Routines for importance donation/inheritance/boosting
- */
+  
+                                                        
+   
 
 
-/*
- * External importance assertions are managed by the process in userspace
- * Internal importance assertions are the responsibility of the kernel
- * Assertions are changed from internal to external via task_importance_externalize_assertion
- */
+  
+                                                                         
+                                                                      
+                                                                                             
+   
 
-/*
- *	Routine:	ipc_importance_task_check_transition
- *	Purpose:
- *		Increase or decrement the internal task importance counter of the
- *		specified task and determine if propagation and a task policy
- *		update is required.
- *
- *		If it is already enqueued for a policy update, steal it from that queue
- *		(as we are reversing that update before it happens).
- *
- *	Conditions:
- *		Called with the importance lock held.
- *		It is the caller's responsibility to perform the propagation of the
- *		transition and/or policy changes by checking the return value.
- */
+  
+                                                
+           
+                                                                     
+                                                                 
+                       
+  
+                                                                           
+                                                        
+  
+              
+                                         
+                                                                       
+                                                                  
+   
 static boolean_t
 ipc_importance_task_check_transition(
 	ipc_importance_task_t task_imp,
@@ -610,10 +610,10 @@ ipc_importance_task_check_transition(
 	    proc_selfpid(), target_pid, task_imp->iit_assertcnt, IIT_EXTERN(task_imp), 0);
 #endif
 
-	/* snapshot the effective boosting status before making any changes */
+	                                                                      
 	before_boosted = (task_imp->iit_assertcnt > 0);
 
-	/* Adjust the assertcnt appropriately */
+	                                        
 	if (boost) {
 		task_imp->iit_assertcnt += delta;
 #if IMPORTANCE_TRACE
@@ -621,15 +621,15 @@ ipc_importance_task_check_transition(
 		    task_t, current_task(), int, proc_selfpid(), int, delta, int, task_imp->iit_assertcnt);
 #endif
 	} else {
-		// assert(delta <= task_imp->iit_assertcnt);
+		                                            
 		if (task_imp->iit_assertcnt < delta + IIT_EXTERN(task_imp)) {
-			/* TODO: Turn this back into a panic <rdar://problem/12592649> */
+			                                                                 
 			task_imp->iit_assertcnt = IIT_EXTERN(task_imp);
 		} else {
 			task_imp->iit_assertcnt -= delta;
 		}
 #if IMPORTANCE_TRACE
-		// This convers both legacy and voucher-based importance.
+		                                                         
 		DTRACE_BOOST4(drop_boost, task_t, target_task, int, target_pid, int, delta, int, task_imp->iit_assertcnt);
 #endif
 	}
@@ -639,28 +639,28 @@ ipc_importance_task_check_transition(
 	    proc_selfpid(), target_pid, task_imp->iit_assertcnt, IIT_EXTERN(task_imp), 0);
 #endif
 
-	/* did the change result in an effective donor status change? */
+	                                                                
 	after_boosted = (task_imp->iit_assertcnt > 0);
 
 	if (after_boosted != before_boosted) {
-		/*
-		 * If the task importance is already on an update queue, we just reversed the need for a
-		 * pending policy update.  If the queue is any other than the delayed-drop-queue, pull it
-		 * off that queue and release the reference it got going onto the update queue.  If it is
-		 * the delayed-drop-queue we leave it in place in case it comes back into the drop state
-		 * before its time delay is up.
-		 *
-		 * We still need to propagate the change downstream to reverse the assertcnt effects,
-		 * but we no longer need to update this task's boost policy state.
-		 *
-		 * Otherwise, mark it as needing a policy update.
-		 */
+		  
+                                                                                          
+                                                                                           
+                                                                                           
+                                                                                          
+                                 
+    
+                                                                                       
+                                                                    
+    
+                                                   
+     
 		assert(0 == task_imp->iit_updatepolicy);
 		if (NULL != task_imp->iit_updateq) {
 			if (&ipc_importance_delayed_drop_queue != task_imp->iit_updateq) {
 				queue_remove(task_imp->iit_updateq, task_imp, ipc_importance_task_t, iit_updates);
 				task_imp->iit_updateq = NULL;
-				ipc_importance_task_release_internal(task_imp); /* can't be last ref */
+				ipc_importance_task_release_internal(task_imp);                        
 			}
 		} else {
 			task_imp->iit_updatepolicy = 1;
@@ -672,18 +672,18 @@ ipc_importance_task_check_transition(
 }
 
 
-/*
- *	Routine:	ipc_importance_task_propagate_helper
- *	Purpose:
- *		Increase or decrement the internal task importance counter of all
- *		importance tasks inheriting from the specified one.  If this causes
- *		that importance task to change state, add it to the list of tasks
- *		to do a policy update against.
- *	Conditions:
- *		Called with the importance lock held.
- *		It is the caller's responsibility to iterate down the generated list
- *		and propagate any subsequent assertion changes from there.
- */
+  
+                                                
+           
+                                                                     
+                                                                       
+                                                                     
+                                  
+              
+                                         
+                                                                        
+                                                              
+   
 static void
 ipc_importance_task_propagate_helper(
 	ipc_importance_task_t task_imp,
@@ -692,10 +692,10 @@ ipc_importance_task_propagate_helper(
 {
 	ipc_importance_task_t temp_task_imp;
 
-	/*
-	 * iterate the downstream kmsgs, adjust their boosts,
-	 * and capture the next task to adjust for each message
-	 */
+	  
+                                                      
+                                                        
+    
 
 	ipc_kmsg_t temp_kmsg;
 
@@ -704,13 +704,13 @@ ipc_importance_task_propagate_helper(
 		mach_port_delta_t delta;
 		ipc_port_t port;
 
-		/* toggle the kmsg importance bit as a barrier to parallel adjusts */
+		                                                                     
 		if (IIT_UPDATE_HOLD == type) {
 			if (MACH_MSGH_BITS_RAISED_IMPORTANCE(hdr->msgh_bits)) {
 				continue;
 			}
 
-			/* mark the message as now carrying importance */
+			                                                 
 			hdr->msgh_bits |= MACH_MSGH_BITS_RAISEIMP;
 			delta = 1;
 		} else {
@@ -718,12 +718,12 @@ ipc_importance_task_propagate_helper(
 				continue;
 			}
 
-			/* clear the message as now carrying importance */
+			                                                  
 			hdr->msgh_bits &= ~MACH_MSGH_BITS_RAISEIMP;
 			delta = -1;
 		}
 
-		/* determine the task importance to adjust as result (if any) */
+		                                                                
 		port = hdr->msgh_remote_port;
 		assert(IP_VALID(port));
 		ip_lock(port);
@@ -732,27 +732,27 @@ ipc_importance_task_propagate_helper(
 			ip_unlock(port);
 		}
 
-		/* no task importance to adjust associated with the port? */
+		                                                            
 		if (IIT_NULL == temp_task_imp) {
 			continue;
 		}
 
-		/* hold a reference on temp_task_imp */
+		                                       
 
-		/* Adjust the task assertions and determine if an edge was crossed */
+		                                                                     
 		if (ipc_importance_task_check_transition(temp_task_imp, type, 1)) {
 			incr_ref_counter(temp_task_imp->iit_elem.iie_task_refs_added_transition);
 			queue_enter(propagation, temp_task_imp, ipc_importance_task_t, iit_props);
-			/* reference donated */
+			                       
 		} else {
 			ipc_importance_task_release_internal(temp_task_imp);
 		}
 	}
 
-	/*
-	 * iterate the downstream importance inherits
-	 * and capture the next task importance to boost for each
-	 */
+	  
+                                              
+                                                          
+    
 	ipc_importance_inherit_t temp_inherit;
 
 	queue_iterate(&task_imp->iit_inherits, temp_inherit, ipc_importance_inherit_t, iii_inheritance) {
@@ -762,37 +762,37 @@ ipc_importance_task_propagate_helper(
 		assert(IIT_NULL != temp_task_imp);
 
 		if (IIT_UPDATE_HOLD == type) {
-			/* if no undropped externcnts in the inherit, nothing to do */
+			                                                              
 			if (0 == assertcnt) {
 				assert(temp_inherit->iii_donating == FALSE);
 				continue;
 			}
 
-			/* nothing to do if the inherit is already donating (forced donation) */
+			                                                                        
 			if (temp_inherit->iii_donating) {
 				continue;
 			}
 
-			/* mark it donating and contribute to the task externcnts */
+			                                                            
 			temp_inherit->iii_donating = TRUE;
 			temp_task_imp->iit_externcnt += temp_inherit->iii_externcnt;
 			temp_task_imp->iit_externdrop += temp_inherit->iii_externdrop;
 		} else {
-			/* if no contributing assertions, move on */
+			                                            
 			if (0 == assertcnt) {
 				assert(temp_inherit->iii_donating == FALSE);
 				continue;
 			}
 
-			/* nothing to do if the inherit is not donating */
+			                                                  
 			if (!temp_inherit->iii_donating) {
 				continue;
 			}
 
-			/* mark it no longer donating */
+			                                
 			temp_inherit->iii_donating = FALSE;
 
-			/* remove the contribution the inherit made to the to-task */
+			                                                             
 			assert(IIT_EXTERN(temp_task_imp) >= III_EXTERN(temp_inherit));
 			assert(temp_task_imp->iit_externcnt >= temp_inherit->iii_externcnt);
 			assert(temp_task_imp->iit_externdrop >= temp_inherit->iii_externdrop);
@@ -800,7 +800,7 @@ ipc_importance_task_propagate_helper(
 			temp_task_imp->iit_externdrop -= temp_inherit->iii_externdrop;
 		}
 
-		/* Adjust the task assertions and determine if an edge was crossed */
+		                                                                     
 		assert(ipc_importance_task_is_any_receiver_type(temp_task_imp));
 		if (ipc_importance_task_check_transition(temp_task_imp, type, assertcnt)) {
 			ipc_importance_task_reference(temp_task_imp);
@@ -810,16 +810,16 @@ ipc_importance_task_propagate_helper(
 	}
 }
 
-/*
- *	Routine:	ipc_importance_task_process_updates
- *	Purpose:
- *	        Process the queue of task importances and apply the policy
- *		update called for.  Only process tasks in the queue with an
- *		update timestamp less than the supplied max.
- *	Conditions:
- *		Called and returns with importance locked.
- *		May drop importance lock and block temporarily.
- */
+  
+                                               
+           
+                                                                     
+                                                               
+                                                
+              
+                                              
+                                                   
+   
 static void
 ipc_importance_task_process_updates(
 	queue_t   supplied_queue,
@@ -830,14 +830,14 @@ ipc_importance_task_process_updates(
 	queue_head_t second_chance;
 	queue_t queue = supplied_queue;
 
-	/*
-	 * This queue will hold the task's we couldn't trylock on first pass.
-	 * By using a second (private) queue, we guarantee all tasks that get
-	 * entered on this queue have a timestamp under the maximum.
-	 */
+	  
+                                                                      
+                                                                      
+                                                             
+    
 	queue_init(&second_chance);
 
-	/* process any resulting policy updates */
+	                                          
 retry:
 	while (!queue_empty(queue)) {
 		task_t target_task;
@@ -847,52 +847,52 @@ retry:
 		assert(0 == task_imp->iit_updatepolicy);
 		assert(queue == task_imp->iit_updateq);
 
-		/* if timestamp is too big, we're done */
+		                                         
 		if (task_imp->iit_updatetime > max_timestamp) {
 			break;
 		}
 
-		/* we were given a reference on each task in the queue */
+		                                                         
 
-		/* remove it from the supplied queue */
+		                                       
 		queue_remove(queue, task_imp, ipc_importance_task_t, iit_updates);
 		task_imp->iit_updateq = NULL;
 
 		target_task = task_imp->iit_task;
 
-		/* Is it well on the way to exiting? */
+		                                       
 		if (TASK_NULL == target_task) {
 			ipc_importance_task_release_locked(task_imp);
-			/* importance unlocked */
+			                         
 			ipc_importance_lock();
 			continue;
 		}
 
-		/* Has the update been reversed on the hysteresis queue? */
+		                                                           
 		if (0 < task_imp->iit_assertcnt &&
 		    queue == &ipc_importance_delayed_drop_queue) {
 			ipc_importance_task_release_locked(task_imp);
-			/* importance unlocked */
+			                         
 			ipc_importance_lock();
 			continue;
 		}
 
-		/*
-		 * Can we get the task lock out-of-order?
-		 * If not, stick this back on the second-chance queue.
-		 */
+		  
+                                           
+                                                        
+     
 		if (!task_lock_try(target_task)) {
 			boolean_t should_wait_lock = (queue == &second_chance);
 			task_imp->iit_updateq = &second_chance;
 
-			/*
-			 * If we're already processing second-chances on
-			 * tasks, keep this task on the front of the queue.
-			 * We will wait for the task lock before coming
-			 * back and trying again, and we have a better
-			 * chance of re-acquiring the lock if we come back
-			 * to it right away.
-			 */
+			  
+                                                   
+                                                      
+                                                  
+                                                 
+                                                     
+                       
+      
 			if (should_wait_lock) {
 				task_reference(target_task);
 				queue_enter_first(&second_chance, task_imp,
@@ -913,29 +913,29 @@ retry:
 			continue;
 		}
 
-		/* is it going away? */
+		                       
 		if (!target_task->active) {
 			task_unlock(target_task);
 			ipc_importance_task_release_locked(task_imp);
-			/* importance unlocked */
+			                         
 			ipc_importance_lock();
 			continue;
 		}
 
-		/* take a task reference for while we don't have the importance lock */
+		                                                                       
 		task_reference(target_task);
 
-		/* count the transition */
+		                          
 		if (boost) {
 			task_imp->iit_transitions++;
 		}
 
 		ipc_importance_unlock();
 
-		/* apply the policy adjust to the target task (while it is still locked) */
+		                                                                           
 		task_update_boost_locked(target_task, boost, &pend_token);
 
-		/* complete the policy update with the task unlocked */
+		                                                       
 		ipc_importance_task_release(task_imp);
 		task_unlock(target_task);
 		task_policy_update_complete_unlocked(target_task, &pend_token);
@@ -944,7 +944,7 @@ retry:
 		ipc_importance_lock();
 	}
 
-	/* If there are tasks we couldn't update the first time, try again */
+	                                                                     
 	if (!queue_empty(&second_chance)) {
 		queue = &second_chance;
 		goto retry;
@@ -952,17 +952,17 @@ retry:
 }
 
 
-/*
- *	Routine:	ipc_importance_task_delayed_drop_scan
- *	Purpose:
- *	        The thread call routine to scan the delayed drop queue,
- *		requesting all updates with a deadline up to the last target
- *		for the thread-call (which is DENAP_DROP_SKEW beyond the first
- *		thread's optimum delay).
- *		update to drop its boost.
- *	Conditions:
- *		Nothing locked
- */
+  
+                                                 
+           
+                                                                  
+                                                                
+                                                                  
+                            
+                             
+              
+                  
+   
 static void
 ipc_importance_task_delayed_drop_scan(
 	__unused void *arg1,
@@ -970,14 +970,14 @@ ipc_importance_task_delayed_drop_scan(
 {
 	ipc_importance_lock();
 
-	/* process all queued task drops with timestamps up to TARGET(first)+SKEW */
+	                                                                            
 	ipc_importance_task_process_updates(&ipc_importance_delayed_drop_queue,
 	    FALSE,
 	    ipc_importance_delayed_drop_timestamp);
 
-	/* importance lock may have been temporarily dropped */
+	                                                       
 
-	/* If there are any entries left in the queue, re-arm the call here */
+	                                                                      
 	if (!queue_empty(&ipc_importance_delayed_drop_queue)) {
 		ipc_importance_task_t task_imp;
 		uint64_t deadline;
@@ -1003,26 +1003,26 @@ ipc_importance_task_delayed_drop_scan(
 	ipc_importance_unlock();
 }
 
-/*
- *	Routine:	ipc_importance_task_delayed_drop
- *	Purpose:
- *		Queue the specified task importance for delayed policy
- *		update to drop its boost.
- *	Conditions:
- *		Called with the importance lock held.
- */
+  
+                                            
+           
+                                                          
+                             
+              
+                                         
+   
 static void
 ipc_importance_task_delayed_drop(ipc_importance_task_t task_imp)
 {
-	uint64_t timestamp = mach_absolute_time(); /* no mach_approximate_time() in kernel */
+	uint64_t timestamp = mach_absolute_time();                                           
 
 	assert(ipc_importance_delayed_drop_call != NULL);
 
-	/*
-	 * If still on an update queue from a previous change,
-	 * remove it first (and use that reference).  Otherwise, take
-	 * a new reference for the delay drop update queue.
-	 */
+	  
+                                                       
+                                                              
+                                                    
+    
 	if (NULL != task_imp->iit_updateq) {
 		queue_remove(task_imp->iit_updateq, task_imp,
 		    ipc_importance_task_t, iit_updates);
@@ -1036,7 +1036,7 @@ ipc_importance_task_delayed_drop(ipc_importance_task_t task_imp)
 	queue_enter(&ipc_importance_delayed_drop_queue, task_imp,
 	    ipc_importance_task_t, iit_updates);
 
-	/* request the delayed thread-call if not already requested */
+	                                                              
 	if (!ipc_importance_delayed_drop_call_requested) {
 		uint64_t deadline;
 		uint64_t leeway;
@@ -1058,15 +1058,15 @@ ipc_importance_task_delayed_drop(ipc_importance_task_t task_imp)
 }
 
 
-/*
- *	Routine:	ipc_importance_task_propagate_assertion_locked
- *	Purpose:
- *		Propagate the importance transition type to every item
- *		If this causes a boost to be applied, determine if that
- *		boost should propagate downstream.
- *	Conditions:
- *		Called with the importance lock held.
- */
+  
+                                                          
+           
+                                                          
+                                                           
+                                      
+              
+                                         
+   
 static void
 ipc_importance_task_propagate_assertion_locked(
 	ipc_importance_task_t task_imp,
@@ -1083,11 +1083,11 @@ ipc_importance_task_propagate_assertion_locked(
 
 	ipc_importance_assert_held();
 
-	/*
-	 * If we're going to update the policy for the provided task,
-	 * enqueue it on the propagate queue itself.  Otherwise, only
-	 * enqueue downstream things.
-	 */
+	  
+                                                              
+                                                              
+                              
+    
 	if (update_task_imp) {
 		ipc_importance_task_reference(task_imp);
 		incr_ref_counter(task_imp->iit_elem.iie_task_refs_added_transition);
@@ -1096,34 +1096,34 @@ ipc_importance_task_propagate_assertion_locked(
 		ipc_importance_task_propagate_helper(task_imp, type, &propagate);
 	}
 
-	/*
-	 * for each item on the propagation list, propagate any change downstream,
-	 * adding new tasks to propagate further if they transistioned as well.
-	 */
+	  
+                                                                           
+                                                                        
+    
 	while (!queue_empty(&propagate)) {
 		boolean_t need_update;
 
 		queue_remove_first(&propagate, temp_task_imp, ipc_importance_task_t, iit_props);
-		/* hold a reference on temp_task_imp */
+		                                       
 
 		assert(IIT_NULL != temp_task_imp);
 
-		/* only propagate for receivers not already marked as a donor */
+		                                                                
 		if (!ipc_importance_task_is_marked_donor(temp_task_imp) &&
 		    ipc_importance_task_is_marked_receiver(temp_task_imp)) {
 			ipc_importance_task_propagate_helper(temp_task_imp, type, &propagate);
 		}
 
-		/* if we have a policy update to apply, enqueue a reference for later processing */
+		                                                                                   
 		need_update = (0 != temp_task_imp->iit_updatepolicy);
 		temp_task_imp->iit_updatepolicy = 0;
 		if (need_update && TASK_NULL != temp_task_imp->iit_task) {
 			if (NULL == temp_task_imp->iit_updateq) {
-				/*
-				 * If a downstream task that needs an update is subjects to AppNap,
-				 * drop boosts according to the delay hysteresis.  Otherwise,
-				 * immediate update it.
-				 */
+				  
+                                                                       
+                                                                 
+                           
+       
 				if (!boost && temp_task_imp != task_imp &&
 				    ipc_importance_delayed_drop_call != NULL &&
 				    ipc_importance_task_is_marked_denap_receiver(temp_task_imp)) {
@@ -1141,7 +1141,7 @@ ipc_importance_task_propagate_assertion_locked(
 					}
 				}
 			} else {
-				/* Must already be on the AppNap hysteresis queue */
+				                                                    
 				assert(ipc_importance_delayed_drop_call != NULL);
 				assert(ipc_importance_task_is_marked_denap_receiver(temp_task_imp));
 			}
@@ -1150,25 +1150,25 @@ ipc_importance_task_propagate_assertion_locked(
 		ipc_importance_task_release_internal(temp_task_imp);
 	}
 
-	/* apply updates to task (may drop importance lock) */
+	                                                      
 	if (!queue_empty(&updates)) {
 		ipc_importance_task_process_updates(&updates, boost, 0);
 	}
 }
 
-/*
- *	Routine:	ipc_importance_task_hold_internal_assertion_locked
- *	Purpose:
- *		Increment the assertion count on the task importance.
- *		If this results in a boost state change in that task,
- *		prepare to update task policy for this task AND, if
- *		if not just waking out of App Nap, all down-stream
- *		tasks that have a similar transition through inheriting
- *		this update.
- *	Conditions:
- *		importance locked on entry and exit.
- *		May temporarily drop importance lock and block.
- */
+  
+                                                              
+           
+                                                         
+                                                         
+                                                       
+                                                      
+                                                           
+                
+              
+                                        
+                                                   
+   
 static kern_return_t
 ipc_importance_task_hold_internal_assertion_locked(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1178,19 +1178,19 @@ ipc_importance_task_hold_internal_assertion_locked(ipc_importance_task_t task_im
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_importance_task_drop_internal_assertion_locked
- *	Purpose:
- *		Decrement the assertion count on the task importance.
- *		If this results in a boost state change in that task,
- *		prepare to update task policy for this task AND, if
- *		if not just waking out of App Nap, all down-stream
- *		tasks that have a similar transition through inheriting
- *		this update.
- *	Conditions:
- *		importance locked on entry and exit.
- *		May temporarily drop importance lock and block.
- */
+  
+                                                              
+           
+                                                         
+                                                         
+                                                       
+                                                      
+                                                           
+                
+              
+                                        
+                                                   
+   
 static kern_return_t
 ipc_importance_task_drop_internal_assertion_locked(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1200,18 +1200,18 @@ ipc_importance_task_drop_internal_assertion_locked(ipc_importance_task_t task_im
 	return KERN_SUCCESS;
 }
 
-/*
- *      Routine:        ipc_importance_task_hold_internal_assertion
- *      Purpose:
- *              Increment the assertion count on the task importance.
- *              If this results in a 0->1 change in that count,
- *              prepare to update task policy for this task AND
- *              (potentially) all down-stream tasks that have a
- *		similar transition through inheriting this update.
- *      Conditions:
- *              Nothing locked
- *              May block after dropping importance lock.
- */
+  
+                                                                   
+                
+                                                                     
+                                                               
+                                                               
+                                                               
+                                                      
+                   
+                              
+                                                         
+   
 int
 ipc_importance_task_hold_internal_assertion(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1225,18 +1225,18 @@ ipc_importance_task_hold_internal_assertion(ipc_importance_task_t task_imp, uint
 	return ret;
 }
 
-/*
- *	Routine:	ipc_importance_task_drop_internal_assertion
- *	Purpose:
- *		Decrement the assertion count on the task importance.
- *		If this results in a X->0 change in that count,
- *		prepare to update task policy for this task AND
- *		all down-stream tasks that have a similar transition
- *		through inheriting this drop update.
- *	Conditions:
- *		Nothing locked on entry.
- *		May block after dropping importance lock.
- */
+  
+                                                       
+           
+                                                         
+                                                   
+                                                   
+                                                        
+                                        
+              
+                            
+                                             
+   
 kern_return_t
 ipc_importance_task_drop_internal_assertion(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1250,18 +1250,18 @@ ipc_importance_task_drop_internal_assertion(ipc_importance_task_t task_imp, uint
 	return ret;
 }
 
-/*
- *      Routine:        ipc_importance_task_hold_file_lock_assertion
- *      Purpose:
- *              Increment the file lock assertion count on the task importance.
- *              If this results in a 0->1 change in that count,
- *              prepare to update task policy for this task AND
- *              (potentially) all down-stream tasks that have a
- *		similar transition through inheriting this update.
- *      Conditions:
- *              Nothing locked
- *              May block after dropping importance lock.
- */
+  
+                                                                    
+                
+                                                                               
+                                                               
+                                                               
+                                                               
+                                                      
+                   
+                              
+                                                         
+   
 kern_return_t
 ipc_importance_task_hold_file_lock_assertion(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1278,18 +1278,18 @@ ipc_importance_task_hold_file_lock_assertion(ipc_importance_task_t task_imp, uin
 	return ret;
 }
 
-/*
- *	Routine:	ipc_importance_task_drop_file_lock_assertion
- *	Purpose:
- *		Decrement the assertion count on the task importance.
- *		If this results in a X->0 change in that count,
- *		prepare to update task policy for this task AND
- *		all down-stream tasks that have a similar transition
- *		through inheriting this drop update.
- *	Conditions:
- *		Nothing locked on entry.
- *		May block after dropping importance lock.
- */
+  
+                                                        
+           
+                                                         
+                                                   
+                                                   
+                                                        
+                                        
+              
+                            
+                                             
+   
 kern_return_t
 ipc_importance_task_drop_file_lock_assertion(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1308,19 +1308,19 @@ ipc_importance_task_drop_file_lock_assertion(ipc_importance_task_t task_imp, uin
 	return ret;
 }
 
-/*
- *	Routine:	ipc_importance_task_hold_legacy_external_assertion
- *	Purpose:
- *		Increment the external assertion count on the task importance.
- *		This cannot result in an 0->1 transition, as the caller must
- *		already hold an external boost.
- *	Conditions:
- *		Nothing locked on entry.
- *		May block after dropping importance lock.
- *		A queue of task importance structures is returned
- *		by ipc_importance_task_hold_assertion_locked(). Each
- *		needs to be updated (outside the importance lock hold).
- */
+  
+                                                              
+           
+                                                                  
+                                                                
+                                   
+              
+                            
+                                             
+                                                     
+                                                        
+                                                           
+   
 kern_return_t
 ipc_importance_task_hold_legacy_external_assertion(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1342,8 +1342,8 @@ ipc_importance_task_hold_legacy_external_assertion(ipc_importance_task_t task_im
 #endif
 
 	if (IIT_LEGACY_EXTERN(task_imp) == 0) {
-		/* Only allowed to take a new boost assertion when holding an external boost */
-		/* save data for diagnostic printf below */
+		                                                                               
+		                                           
 		target_assertcnt = task_imp->iit_assertcnt;
 		target_externcnt = IIT_EXTERN(task_imp);
 		target_legacycnt = IIT_LEGACY_EXTERN(task_imp);
@@ -1363,7 +1363,7 @@ ipc_importance_task_hold_legacy_external_assertion(ipc_importance_task_t task_im
 #if IMPORTANCE_TRACE
 	KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE, (IMPORTANCE_CODE(IMP_ASSERTION, (IMP_HOLD | TASK_POLICY_EXTERNAL))) | DBG_FUNC_END,
 	    proc_selfpid(), target_pid, task_imp->iit_assertcnt, IIT_LEGACY_EXTERN(task_imp), 0);
-	// This covers the legacy case where a task takes an extra boost.
+	                                                                 
 	DTRACE_BOOST5(receive_boost, task_t, target_task, int, target_pid, int, proc_selfpid(), int, count, int, task_imp->iit_assertcnt);
 #endif
 
@@ -1378,20 +1378,20 @@ ipc_importance_task_hold_legacy_external_assertion(ipc_importance_task_t task_im
 	return ret;
 }
 
-/*
- *	Routine:	ipc_importance_task_drop_legacy_external_assertion
- *	Purpose:
- *		Drop the legacy external assertion count on the task and
- *		reflect that change to total external assertion count and
- *		then onto the internal importance count.
- *
- *		If this results in a X->0 change in the internal,
- *		count, prepare to update task policy for this task AND
- *		all down-stream tasks that have a similar transition
- *		through inheriting this update.
- *	Conditions:
- *		Nothing locked on entry.
- */
+  
+                                                              
+           
+                                                            
+                                                             
+                                            
+  
+                                                     
+                                                          
+                                                        
+                                   
+              
+                            
+   
 kern_return_t
 ipc_importance_task_drop_legacy_external_assertion(ipc_importance_task_t task_imp, uint32_t count)
 {
@@ -1416,24 +1416,24 @@ ipc_importance_task_drop_legacy_external_assertion(ipc_importance_task_t task_im
 #endif
 
 	if (count > IIT_LEGACY_EXTERN(task_imp)) {
-		/* Process over-released its boost count - save data for diagnostic printf */
-		/* TODO: If count > 1, we should clear out as many external assertions as there are left. */
+		                                                                             
+		                                                                                            
 		target_assertcnt = task_imp->iit_assertcnt;
 		target_externcnt = IIT_EXTERN(task_imp);
 		target_legacycnt = IIT_LEGACY_EXTERN(task_imp);
 		ret = KERN_FAILURE;
 	} else {
-		/*
-		 * decrement legacy external count from the top level and reflect
-		 * into internal for this and all subsequent updates.
-		 */
+		  
+                                                                   
+                                                       
+     
 		assert(ipc_importance_task_is_any_receiver_type(task_imp));
 		assert(IIT_EXTERN(task_imp) >= count);
 
 		task_imp->iit_legacy_externdrop += count;
 		task_imp->iit_externdrop += count;
 
-		/* reset extern counters (if appropriate) */
+		                                            
 		if (IIT_LEGACY_EXTERN(task_imp) == 0) {
 			if (IIT_EXTERN(task_imp) != 0) {
 				task_imp->iit_externcnt -= task_imp->iit_legacy_externcnt;
@@ -1446,7 +1446,7 @@ ipc_importance_task_drop_legacy_external_assertion(ipc_importance_task_t task_im
 			task_imp->iit_legacy_externdrop = 0;
 		}
 
-		/* reflect the drop to the internal assertion count (and effect any importance change) */
+		                                                                                         
 		if (ipc_importance_task_check_transition(task_imp, IIT_UPDATE_DROP, count)) {
 			ipc_importance_task_propagate_assertion_locked(task_imp, IIT_UPDATE_DROP, TRUE);
 		}
@@ -1460,7 +1460,7 @@ ipc_importance_task_drop_legacy_external_assertion(ipc_importance_task_t task_im
 
 	ipc_importance_unlock();
 
-	/* delayed printf for user-supplied data failures */
+	                                                    
 	if (KERN_FAILURE == ret && TASK_NULL != target_task) {
 		printf("BUG in process %s[%d]: over-released legacy external boost assertions (%d total, %d external, %d legacy-external)\n",
 		    proc_name_address(target_task->bsd_info), task_pid(target_task),
@@ -1472,7 +1472,7 @@ ipc_importance_task_drop_legacy_external_assertion(ipc_importance_task_t task_im
 
 
 #if LEGACY_IMPORTANCE_DELIVERY
-/* Transfer an assertion to legacy userspace responsibility */
+                                                              
 static kern_return_t
 ipc_importance_task_externalize_legacy_assertion(ipc_importance_task_t task_imp, uint32_t count, __unused int sender_pid)
 {
@@ -1494,7 +1494,7 @@ ipc_importance_task_externalize_legacy_assertion(ipc_importance_task_t task_imp,
 #endif
 
 	ipc_importance_lock();
-	/* assert(task_imp->iit_assertcnt >= IIT_EXTERN(task_imp) + count); */
+	                                                                      
 	assert(IIT_EXTERN(task_imp) >= IIT_LEGACY_EXTERN(task_imp));
 	task_imp->iit_legacy_externcnt += count;
 	task_imp->iit_externcnt += count;
@@ -1503,23 +1503,23 @@ ipc_importance_task_externalize_legacy_assertion(ipc_importance_task_t task_imp,
 #if IMPORTANCE_TRACE
 	KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE, (IMPORTANCE_CODE(IMP_ASSERTION, IMP_EXTERN)) | DBG_FUNC_END,
 	    proc_selfpid(), target_pid, task_imp->iit_assertcnt, IIT_LEGACY_EXTERN(task_imp), 0);
-	// This is the legacy boosting path
+	                                   
 	DTRACE_BOOST5(receive_boost, task_t, target_task, int, target_pid, int, sender_pid, int, count, int, IIT_LEGACY_EXTERN(task_imp));
-#endif /* IMPORTANCE_TRACE */
+#endif                       
 
 	return KERN_SUCCESS;
 }
-#endif /* LEGACY_IMPORTANCE_DELIVERY */
+#endif                                 
 
-/*
- *	Routine:	ipc_importance_task_update_live_donor
- *	Purpose:
- *		Read the live donor status and update the live_donor bit/propagate the change in importance.
- *	Conditions:
- *		Nothing locked on entrance, nothing locked on exit.
- *
- *		TODO: Need tracepoints around this function...
- */
+  
+                                                 
+           
+                                                                                                
+              
+                                                       
+  
+                                                  
+   
 void
 ipc_importance_task_update_live_donor(ipc_importance_task_t task_imp)
 {
@@ -1530,17 +1530,17 @@ ipc_importance_task_update_live_donor(ipc_importance_task_t task_imp)
 
 	assert(task_imp != NULL);
 
-	/*
-	 * Nothing to do if the task is not marked as expecting
-	 * live donor updates.
-	 */
+	  
+                                                        
+                       
+    
 	if (!ipc_importance_task_is_marked_live_donor(task_imp)) {
 		return;
 	}
 
 	ipc_importance_lock();
 
-	/* If the task got disconnected on the way here, no use (or ability) adjusting live donor status */
+	                                                                                                   
 	target_task = task_imp->iit_task;
 	if (TASK_NULL == target_task) {
 		ipc_importance_unlock();
@@ -1548,7 +1548,7 @@ ipc_importance_task_update_live_donor(ipc_importance_task_t task_imp)
 	}
 	before_donor = ipc_importance_task_is_marked_donor(task_imp);
 
-	/* snapshot task live donor status - may change, but another call will accompany the change */
+	                                                                                              
 	task_live_donor = target_task->effective_policy.tep_live_donor;
 
 #if IMPORTANCE_TRACE
@@ -1559,16 +1559,16 @@ ipc_importance_task_update_live_donor(ipc_importance_task_t task_imp)
 	    target_pid, task_imp->iit_donor, task_live_donor, before_donor, 0);
 #endif
 
-	/* update the task importance live donor status based on the task's value */
+	                                                                            
 	task_imp->iit_donor = task_live_donor;
 
 	after_donor = ipc_importance_task_is_marked_donor(task_imp);
 
-	/* Has the effectiveness of being a donor changed as a result of this update? */
+	                                                                                
 	if (before_donor != after_donor) {
 		iit_update_type_t type;
 
-		/* propagate assertions without updating the current task policy (already handled) */
+		                                                                                     
 		if (0 == before_donor) {
 			task_imp->iit_transitions++;
 			type = IIT_UPDATE_HOLD;
@@ -1588,16 +1588,16 @@ ipc_importance_task_update_live_donor(ipc_importance_task_t task_imp)
 }
 
 
-/*
- *	Routine:	ipc_importance_task_mark_donor
- *	Purpose:
- *		Set the task importance donor flag.
- *	Conditions:
- *		Nothing locked on entrance, nothing locked on exit.
- *
- *		This is only called while the task is being constructed,
- *		so no need to update task policy or propagate downstream.
- */
+  
+                                          
+           
+                                       
+              
+                                                       
+  
+                                                            
+                                                             
+   
 void
 ipc_importance_task_mark_donor(ipc_importance_task_t task_imp, boolean_t donating)
 {
@@ -1621,15 +1621,15 @@ ipc_importance_task_mark_donor(ipc_importance_task_t task_imp, boolean_t donatin
 	ipc_importance_unlock();
 }
 
-/*
- *	Routine:	ipc_importance_task_marked_donor
- *	Purpose:
- *		Query the donor flag for the given task importance.
- *	Conditions:
- *		May be called without taking the importance lock.
- *		In that case, donor status can change so you must
- *		check only once for each donation event.
- */
+  
+                                            
+           
+                                                       
+              
+                                                     
+                                                     
+                                            
+   
 boolean_t
 ipc_importance_task_is_marked_donor(ipc_importance_task_t task_imp)
 {
@@ -1639,15 +1639,15 @@ ipc_importance_task_is_marked_donor(ipc_importance_task_t task_imp)
 	return 0 != task_imp->iit_donor;
 }
 
-/*
- *	Routine:	ipc_importance_task_mark_live_donor
- *	Purpose:
- *		Indicate that the task is eligible for live donor updates.
- *	Conditions:
- *		Nothing locked on entrance, nothing locked on exit.
- *
- *		This is only called while the task is being constructed.
- */
+  
+                                               
+           
+                                                              
+              
+                                                       
+  
+                                                            
+   
 void
 ipc_importance_task_mark_live_donor(ipc_importance_task_t task_imp, boolean_t live_donating)
 {
@@ -1658,15 +1658,15 @@ ipc_importance_task_mark_live_donor(ipc_importance_task_t task_imp, boolean_t li
 	ipc_importance_unlock();
 }
 
-/*
- *	Routine:	ipc_importance_task_is_marked_live_donor
- *	Purpose:
- *		Query the live donor and donor flags for the given task importance.
- *	Conditions:
- *		May be called without taking the importance lock.
- *		In that case, donor status can change so you must
- *		check only once for each donation event.
- */
+  
+                                                    
+           
+                                                                       
+              
+                                                     
+                                                     
+                                            
+   
 boolean_t
 ipc_importance_task_is_marked_live_donor(ipc_importance_task_t task_imp)
 {
@@ -1676,15 +1676,15 @@ ipc_importance_task_is_marked_live_donor(ipc_importance_task_t task_imp)
 	return 0 != task_imp->iit_live_donor;
 }
 
-/*
- *	Routine:	ipc_importance_task_is_donor
- *	Purpose:
- *		Query the full donor status for the given task importance.
- *	Conditions:
- *		May be called without taking the importance lock.
- *		In that case, donor status can change so you must
- *		check only once for each donation event.
- */
+  
+                                        
+           
+                                                              
+              
+                                                     
+                                                     
+                                            
+   
 boolean_t
 ipc_importance_task_is_donor(ipc_importance_task_t task_imp)
 {
@@ -1696,14 +1696,14 @@ ipc_importance_task_is_donor(ipc_importance_task_t task_imp)
 	       task_imp->iit_assertcnt > 0);
 }
 
-/*
- *	Routine:	ipc_importance_task_is_never_donor
- *	Purpose:
- *		Query if a given task can ever donate importance.
- *	Conditions:
- *		May be called without taking the importance lock.
- *		Condition is permanent for a give task.
- */
+  
+                                              
+           
+                                                     
+              
+                                                     
+                                           
+   
 boolean_t
 ipc_importance_task_is_never_donor(ipc_importance_task_t task_imp)
 {
@@ -1715,15 +1715,15 @@ ipc_importance_task_is_never_donor(ipc_importance_task_t task_imp)
 	       !ipc_importance_task_is_marked_receiver(task_imp);
 }
 
-/*
- *	Routine:	ipc_importance_task_mark_receiver
- *	Purpose:
- *		Update the task importance receiver flag.
- *	Conditions:
- *		Nothing locked on entrance, nothing locked on exit.
- *		This can only be invoked before the task is discoverable,
- *		so no worries about atomicity(?)
- */
+  
+                                             
+           
+                                             
+              
+                                                       
+                                                             
+                                    
+   
 void
 ipc_importance_task_mark_receiver(ipc_importance_task_t task_imp, boolean_t receiving)
 {
@@ -1735,7 +1735,7 @@ ipc_importance_task_mark_receiver(ipc_importance_task_t task_imp, boolean_t rece
 		assert(task_imp->iit_externcnt == 0);
 		assert(task_imp->iit_externdrop == 0);
 		assert(task_imp->iit_denap == 0);
-		task_imp->iit_receiver = 1;  /* task can receive importance boost */
+		task_imp->iit_receiver = 1;                                         
 	} else if (task_imp->iit_receiver) {
 		assert(task_imp->iit_denap == 0);
 		if (task_imp->iit_assertcnt != 0 || IIT_EXTERN(task_imp) != 0) {
@@ -1747,14 +1747,14 @@ ipc_importance_task_mark_receiver(ipc_importance_task_t task_imp, boolean_t rece
 }
 
 
-/*
- *	Routine:	ipc_importance_task_marked_receiver
- *	Purpose:
- *		Query the receiver flag for the given task importance.
- *	Conditions:
- *		May be called without taking the importance lock as
- *		the importance flag can never change after task init.
- */
+  
+                                               
+           
+                                                          
+              
+                                                       
+                                                         
+   
 boolean_t
 ipc_importance_task_is_marked_receiver(ipc_importance_task_t task_imp)
 {
@@ -1762,15 +1762,15 @@ ipc_importance_task_is_marked_receiver(ipc_importance_task_t task_imp)
 }
 
 
-/*
- *	Routine:	ipc_importance_task_mark_denap_receiver
- *	Purpose:
- *		Update the task importance de-nap receiver flag.
- *	Conditions:
- *		Nothing locked on entrance, nothing locked on exit.
- *		This can only be invoked before the task is discoverable,
- *		so no worries about atomicity(?)
- */
+  
+                                                   
+           
+                                                    
+              
+                                                       
+                                                             
+                                    
+   
 void
 ipc_importance_task_mark_denap_receiver(ipc_importance_task_t task_imp, boolean_t denap)
 {
@@ -1781,7 +1781,7 @@ ipc_importance_task_mark_denap_receiver(ipc_importance_task_t task_imp, boolean_
 		assert(task_imp->iit_assertcnt == 0);
 		assert(task_imp->iit_externcnt == 0);
 		assert(task_imp->iit_receiver == 0);
-		task_imp->iit_denap = 1;  /* task can receive de-nap boost */
+		task_imp->iit_denap = 1;                                     
 	} else if (task_imp->iit_denap) {
 		assert(task_imp->iit_receiver == 0);
 		if (0 < task_imp->iit_assertcnt || 0 < IIT_EXTERN(task_imp)) {
@@ -1793,45 +1793,45 @@ ipc_importance_task_mark_denap_receiver(ipc_importance_task_t task_imp, boolean_
 }
 
 
-/*
- *	Routine:	ipc_importance_task_marked_denap_receiver
- *	Purpose:
- *		Query the de-nap receiver flag for the given task importance.
- *	Conditions:
- *		May be called without taking the importance lock as
- *		the de-nap flag can never change after task init.
- */
+  
+                                                     
+           
+                                                                 
+              
+                                                       
+                                                     
+   
 boolean_t
 ipc_importance_task_is_marked_denap_receiver(ipc_importance_task_t task_imp)
 {
 	return IIT_NULL != task_imp && 0 != task_imp->iit_denap;
 }
 
-/*
- *	Routine:	ipc_importance_task_is_denap_receiver
- *	Purpose:
- *		Query the full de-nap receiver status for the given task importance.
- *		For now, that is simply whether the receiver flag is set.
- *	Conditions:
- *		May be called without taking the importance lock as
- *		the de-nap receiver flag can never change after task init.
- */
+  
+                                                 
+           
+                                                                        
+                                                             
+              
+                                                       
+                                                              
+   
 boolean_t
 ipc_importance_task_is_denap_receiver(ipc_importance_task_t task_imp)
 {
 	return ipc_importance_task_is_marked_denap_receiver(task_imp);
 }
 
-/*
- *	Routine:	ipc_importance_task_is_any_receiver_type
- *	Purpose:
- *		Query if the task is marked to receive boosts - either
- *		importance or denap.
- *	Conditions:
- *		May be called without taking the importance lock as both
- *		the importance and de-nap receiver flags can never change
- *		after task init.
- */
+  
+                                                    
+           
+                                                          
+                        
+              
+                                                            
+                                                             
+                    
+   
 boolean_t
 ipc_importance_task_is_any_receiver_type(ipc_importance_task_t task_imp)
 {
@@ -1839,46 +1839,46 @@ ipc_importance_task_is_any_receiver_type(ipc_importance_task_t task_imp)
 	       ipc_importance_task_is_marked_denap_receiver(task_imp);
 }
 
-#if 0 /* currently unused */
+#if 0                       
 
-/*
- *	Routine:	ipc_importance_inherit_reference
- *	Purpose:
- *		Add a reference to the inherit importance element.
- *	Conditions:
- *		Caller most hold a reference on the inherit element.
- */
+  
+                                            
+           
+                                                      
+              
+                                                        
+   
 static inline void
 ipc_importance_inherit_reference(ipc_importance_inherit_t inherit)
 {
 	ipc_importance_reference(&inherit->iii_elem);
 }
-#endif /* currently unused */
+#endif                       
 
-/*
- *	Routine:	ipc_importance_inherit_release_locked
- *	Purpose:
- *		Release a reference on an inherit importance attribute value,
- *		unlinking and deallocating the attribute if the last reference.
- *	Conditions:
- *		Entered with importance lock held, leaves with it unlocked.
- */
+  
+                                                 
+           
+                                                                 
+                                                                   
+              
+                                                               
+   
 static inline void
 ipc_importance_inherit_release_locked(ipc_importance_inherit_t inherit)
 {
 	ipc_importance_release_locked(&inherit->iii_elem);
 }
 
-#if 0 /* currently unused */
-/*
- *	Routine:	ipc_importance_inherit_release
- *	Purpose:
- *		Release a reference on an inherit importance attribute value,
- *		unlinking and deallocating the attribute if the last reference.
- *	Conditions:
- *		nothing locked on entrance, nothing locked on exit.
- *		May block.
- */
+#if 0                       
+  
+                                          
+           
+                                                                 
+                                                                   
+              
+                                                       
+              
+   
 void
 ipc_importance_inherit_release(ipc_importance_inherit_t inherit)
 {
@@ -1886,21 +1886,21 @@ ipc_importance_inherit_release(ipc_importance_inherit_t inherit)
 		ipc_importance_release(&inherit->iii_elem);
 	}
 }
-#endif /* 0 currently unused */
+#endif                         
 
-/*
- *	Routine:	ipc_importance_for_task
- *	Purpose:
- *		Create a reference for the specified task's base importance
- *		element.  If the base importance element doesn't exist, make it and
- *		bind it to the active task.  If the task is inactive, there isn't
- *		any need to return a new reference.
- *	Conditions:
- *		If made is true, a "made" reference is returned (for donating to
- *		the voucher system).  Otherwise	an internal reference is returned.
- *
- *		Nothing locked on entry.  May block.
- */
+  
+                                   
+           
+                                                               
+                                                                       
+                                                                     
+                                       
+              
+                                                                    
+                                                                      
+  
+                                        
+   
 ipc_importance_task_t
 ipc_importance_for_task(task_t task, boolean_t made)
 {
@@ -1910,7 +1910,7 @@ ipc_importance_for_task(task_t task, boolean_t made)
 	assert(TASK_NULL != task);
 
 retry:
-	/* No use returning anything for inactive task */
+	                                                 
 	if (!task->active) {
 		return IIT_NULL;
 	}
@@ -1918,7 +1918,7 @@ retry:
 	ipc_importance_lock();
 	task_elem = task->task_imp_base;
 	if (IIT_NULL != task_elem) {
-		/* Add a made reference (borrowing active task ref to do it) */
+		                                                               
 		if (made) {
 			if (0 == task_elem->iit_made++) {
 				assert(IIT_REFS_MAX > IIT_REFS(task_elem));
@@ -1938,15 +1938,15 @@ retry:
 	}
 	first_pass = FALSE;
 
-	/* Need to make one - may race with others (be prepared to drop) */
+	                                                                   
 	task_elem = zalloc_flags(ipc_importance_task_zone, Z_WAITOK | Z_ZERO);
 	if (IIT_NULL == task_elem) {
 		goto retry;
 	}
 
-	task_elem->iit_bits = IIE_TYPE_TASK | 2; /* one for task, one for return/made */
+	task_elem->iit_bits = IIE_TYPE_TASK | 2;                                        
 	task_elem->iit_made = (made) ? 1 : 0;
-	task_elem->iit_task = task; /* take actual ref when we're sure */
+	task_elem->iit_task = task;                                      
 #if IIE_REF_DEBUG
 	ipc_importance_counter_init(&task_elem->iit_elem);
 #endif
@@ -1960,14 +1960,14 @@ retry:
 		return IIT_NULL;
 	}
 
-	/* did we lose the race? */
+	                           
 	if (IIT_NULL != task->task_imp_base) {
 		ipc_importance_unlock();
 		zfree(ipc_importance_task_zone, task_elem);
 		goto retry;
 	}
 
-	/* we won the race */
+	                     
 	task->task_imp_base = task_elem;
 	task_reference(task);
 #if DEVELOPMENT || DEBUG
@@ -2007,23 +2007,23 @@ task_importance_task_get_pid(ipc_importance_task_t iit)
 #endif
 }
 
-/*
- *	Routine:	ipc_importance_reset_locked
- *	Purpose:
- *		Reset a task's IPC importance (the task is going away or exec'ing)
- *
- *		Remove the donor bit and legacy externalized assertions from the
- *		current task importance and see if that wipes out downstream donations.
- *	Conditions:
- *		importance lock held.
- */
+  
+                                       
+           
+                                                                      
+  
+                                                                    
+                                                                           
+              
+                         
+   
 
 static void
 ipc_importance_reset_locked(ipc_importance_task_t task_imp, boolean_t donor)
 {
 	boolean_t before_donor, after_donor;
 
-	/* remove the donor bit, live-donor bit and externalized boosts */
+	                                                                  
 	before_donor = ipc_importance_task_is_donor(task_imp);
 	if (donor) {
 		task_imp->iit_donor = 0;
@@ -2034,7 +2034,7 @@ ipc_importance_reset_locked(ipc_importance_task_t task_imp, boolean_t donor)
 	task_imp->iit_externcnt -= task_imp->iit_legacy_externcnt;
 	task_imp->iit_externdrop -= task_imp->iit_legacy_externdrop;
 
-	/* assert(IIT_LEGACY_EXTERN(task_imp) <= task_imp->iit_assertcnt); */
+	                                                                     
 	if (IIT_EXTERN(task_imp) < task_imp->iit_assertcnt) {
 		task_imp->iit_assertcnt -= IIT_LEGACY_EXTERN(task_imp);
 	} else {
@@ -2044,22 +2044,22 @@ ipc_importance_reset_locked(ipc_importance_task_t task_imp, boolean_t donor)
 	task_imp->iit_legacy_externdrop = 0;
 	after_donor = ipc_importance_task_is_donor(task_imp);
 
-	/* propagate a downstream drop if there was a change in donor status */
+	                                                                       
 	if (after_donor != before_donor) {
 		ipc_importance_task_propagate_assertion_locked(task_imp, IIT_UPDATE_DROP, FALSE);
 	}
 }
 
-/*
- *	Routine:	ipc_importance_reset
- *	Purpose:
- *		Reset a task's IPC importance
- *
- *		The task is being reset, although staying around. Arrange to have the
- *		external state of the task reset from the importance.
- *	Conditions:
- *		importance lock not held.
- */
+  
+                                
+           
+                                 
+  
+                                                                         
+                                                         
+              
+                             
+   
 
 void
 ipc_importance_reset(ipc_importance_task_t task_imp, boolean_t donor)
@@ -2072,22 +2072,22 @@ ipc_importance_reset(ipc_importance_task_t task_imp, boolean_t donor)
 	ipc_importance_unlock();
 }
 
-/*
- *	Routine:	ipc_importance_disconnect_task
- *	Purpose:
- *		Disconnect a task from its importance.
- *
- *		Clear the task pointer from the importance and drop the
- *		reference the task held on the importance object.  Before
- *		doing that, reset the effects the current task holds on
- *		the importance and see if that wipes out downstream donations.
- *
- *		We allow the upstream boosts to continue to affect downstream
- *		even though the local task is being effectively pulled from
- *		the chain.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                          
+           
+                                          
+  
+                                                           
+                                                             
+                                                           
+                                                                  
+  
+                                                                 
+                                                               
+              
+              
+                   
+   
 void
 ipc_importance_disconnect_task(task_t task)
 {
@@ -2097,43 +2097,43 @@ ipc_importance_disconnect_task(task_t task)
 	ipc_importance_lock();
 	task_imp = task->task_imp_base;
 
-	/* did somebody beat us to it? */
+	                                 
 	if (IIT_NULL == task_imp) {
 		ipc_importance_unlock();
 		task_unlock(task);
 		return;
 	}
 
-	/* disconnect the task from this importance */
+	                                              
 	assert(task_imp->iit_task == task);
 	task_imp->iit_task = TASK_NULL;
 	task->task_imp_base = IIT_NULL;
 	task_unlock(task);
 
-	/* reset the effects the current task hold on the importance */
+	                                                               
 	ipc_importance_reset_locked(task_imp, TRUE);
 
 	ipc_importance_task_release_locked(task_imp);
-	/* importance unlocked */
+	                         
 
-	/* deallocate the task now that the importance is unlocked */
+	                                                             
 	task_deallocate(task);
 }
 
-/*
- *	Routine:	ipc_importance_exec_switch_task
- *	Purpose:
- *		Switch importance task base from old task to new task in exec.
- *
- *		Create an ipc importance linkage from old task to new task,
- *		once the linkage is created, switch the importance task base
- *		from old task to new task. After the switch, the linkage will
- *		represent importance linkage from new task to old task with
- *		watch port importance inheritance linked to new task.
- *	Conditions:
- *		Nothing locked.
- *		Returns a reference on importance inherit.
- */
+  
+                                           
+           
+                                                                  
+  
+                                                               
+                                                                
+                                                                 
+                                                               
+                                                         
+              
+                   
+                                              
+   
 ipc_importance_inherit_t
 ipc_importance_exec_switch_task(
 	task_t old_task,
@@ -2145,10 +2145,10 @@ ipc_importance_exec_switch_task(
 
 	task_importance_reset(old_task);
 
-	/* Create an importance linkage from old_task to new_task */
+	                                                            
 	inherit = ipc_importance_inherit_from_task(old_task, new_task);
 
-	/* Switch task importance base from old task to new task */
+	                                                           
 	ipc_importance_lock();
 
 	old_task_imp = old_task->task_imp_base;
@@ -2161,9 +2161,9 @@ ipc_importance_exec_switch_task(
 	new_task->task_imp_base = old_task_imp;
 
 #if DEVELOPMENT || DEBUG
-	/*
-	 * Update the pid an proc name for importance base if any
-	 */
+	  
+                                                          
+    
 	task_importance_update_owner_info(new_task);
 #endif
 	ipc_importance_unlock();
@@ -2171,27 +2171,27 @@ ipc_importance_exec_switch_task(
 	return inherit;
 }
 
-/*
- *	Routine:	ipc_importance_check_circularity
- *	Purpose:
- *		Check if queueing "port" in a message for "dest"
- *		would create a circular group of ports and messages.
- *
- *		If no circularity (FALSE returned), then "port"
- *		is changed from "in limbo" to "in transit".
- *
- *		That is, we want to set port->ip_destination == dest,
- *		but guaranteeing that this doesn't create a circle
- *		port->ip_destination->ip_destination->... == port
- *
- *		Additionally, if port was successfully changed to "in transit",
- *		propagate boost assertions from the "in limbo" port to all
- *		the ports in the chain, and, if the destination task accepts
- *		boosts, to the destination task.
- *
- *	Conditions:
- *		No ports locked.  References held for "port" and "dest".
- */
+  
+                                            
+           
+                                                    
+                                                        
+  
+                                                   
+                                               
+  
+                                                         
+                                                      
+                                                     
+  
+                                                                   
+                                                              
+                                                                
+                                    
+  
+              
+                                                            
+   
 
 boolean_t
 ipc_importance_check_circularity(
@@ -2215,25 +2215,25 @@ ipc_importance_check_circularity(
 	}
 	base = dest;
 
-	/* Check if destination needs a turnstile */
+	                                            
 	ipc_port_send_turnstile_prepare(dest);
 
-	/* port is in limbo, so donation status is safe to latch */
+	                                                           
 	if (port->ip_impdonation != 0) {
 		imp_lock_held = TRUE;
 		ipc_importance_lock();
 	}
 
-	/*
-	 *	First try a quick check that can run in parallel.
-	 *	No circularity if dest is not in transit.
-	 */
+	  
+                                                     
+                                             
+    
 	ip_lock(port);
 
-	/*
-	 * Even if port is just carrying assertions for others,
-	 * we need the importance lock.
-	 */
+	  
+                                                        
+                                
+    
 	if (port->ip_impcount > 0 && !imp_lock_held) {
 		if (!ipc_importance_lock_try()) {
 			ip_unlock(port);
@@ -2250,32 +2250,32 @@ ipc_importance_check_circularity(
 			goto not_circular;
 		}
 
-		/* dest is in transit; further checking necessary */
+		                                                    
 
 		ip_unlock(dest);
 	}
 	ip_unlock(port);
 
-	/*
-	 * We're about to pay the cost to serialize,
-	 * just go ahead and grab importance lock.
-	 */
+	  
+                                             
+                                           
+    
 	if (!imp_lock_held) {
 		ipc_importance_lock();
 		imp_lock_held = TRUE;
 	}
 
-	ipc_port_multiple_lock(); /* massive serialization */
+	ipc_port_multiple_lock();                            
 
 	took_base_ref = ipc_port_destination_chain_lock(dest, &base);
-	/* all ports in chain from dest to base, inclusive, are locked */
+	                                                                 
 
 	if (port == base) {
-		/* circularity detected! */
+		                           
 
 		ipc_port_multiple_unlock();
 
-		/* port (== base) is in limbo */
+		                                
 
 		require_ip_active(port);
 		assert(port->ip_receiver_name == MACH_PORT_NULL);
@@ -2286,7 +2286,7 @@ ipc_importance_check_circularity(
 		while (base != IP_NULL) {
 			ipc_port_t next;
 
-			/* base is in transit or in limbo */
+			                                    
 
 			require_ip_active(base);
 			assert(base->ip_receiver_name == MACH_PORT_NULL);
@@ -2304,27 +2304,27 @@ ipc_importance_check_circularity(
 		return TRUE;
 	}
 
-	/*
-	 *	The guarantee:  lock port while the entire chain is locked.
-	 *	Once port is locked, we can take a reference to dest,
-	 *	add port to the chain, and unlock everything.
-	 */
+	  
+                                                               
+                                                         
+                                                 
+    
 
 	ip_lock(port);
 	ipc_port_multiple_unlock();
 
 not_circular:
-	/* port is in limbo */
+	                      
 	imq_lock(&port->ip_messages);
 
 	require_ip_active(port);
 	assert(port->ip_receiver_name == MACH_PORT_NULL);
 	assert(port->ip_destination == IP_NULL);
 
-	/* Port is being enqueued in a kmsg, remove the watchport boost in order to push on destination port */
+	                                                                                                       
 	watchport_elem = ipc_port_clear_watchport_elem_internal(port);
 
-	/* Check if the port is being enqueued as a part of sync bootstrap checkin */
+	                                                                             
 	if (dest->ip_specialreply && dest->ip_sync_bootstrap_checkin) {
 		port->ip_sync_bootstrap_checkin = 1;
 	}
@@ -2332,28 +2332,28 @@ not_circular:
 	ip_reference(dest);
 	port->ip_destination = dest;
 
-	/* must have been in limbo or still bound to a task */
+	                                                      
 	assert(port->ip_tempowner != 0);
 
-	/*
-	 * We delayed dropping assertions from a specific task.
-	 * Cache that info now (we'll drop assertions and the
-	 * task reference below).
-	 */
+	  
+                                                        
+                                                      
+                          
+    
 	release_imp_task = port->ip_imp_task;
 	if (IIT_NULL != release_imp_task) {
 		port->ip_imp_task = IIT_NULL;
 	}
 	assertcnt = port->ip_impcount;
 
-	/* take the port out of limbo w.r.t. assertions */
+	                                                  
 	port->ip_tempowner = 0;
 
-	/*
-	 * Setup linkage for source port if it has a send turnstile i.e. it has
-	 * a thread waiting in send or has a port enqueued in it or has sync ipc
-	 * push from a special reply port.
-	 */
+	  
+                                                                        
+                                                                         
+                                   
+    
 	if (port_send_turnstile(port)) {
 		send_turnstile = turnstile_prepare((uintptr_t)port,
 		    port_send_turnstile_address(port),
@@ -2362,24 +2362,24 @@ not_circular:
 		turnstile_update_inheritor(send_turnstile, port_send_turnstile(dest),
 		    (TURNSTILE_INHERITOR_TURNSTILE | TURNSTILE_IMMEDIATE_UPDATE));
 
-		/* update complete and turnstile complete called after dropping all locks */
+		                                                                            
 	}
 	imq_unlock(&port->ip_messages);
 
-	/* now unlock chain */
+	                      
 
 	ip_unlock(port);
 
 	for (;;) {
 		ipc_port_t next;
-		/* every port along chain track assertions behind it */
+		                                                       
 		ipc_port_impcount_delta(dest, assertcnt, base);
 
 		if (dest == base) {
 			break;
 		}
 
-		/* port is in transit */
+		                        
 
 		require_ip_active(dest);
 		assert(dest->ip_receiver_name == MACH_PORT_NULL);
@@ -2391,37 +2391,37 @@ not_circular:
 		dest = next;
 	}
 
-	/* base is not in transit */
+	                            
 	assert(!ip_active(base) ||
 	    (base->ip_receiver_name != MACH_PORT_NULL) ||
 	    (base->ip_destination == IP_NULL));
 
-	/*
-	 * Find the task to boost (if any).
-	 * We will boost "through" ports that don't know
-	 * about inheritance to deliver receive rights that
-	 * do.
-	 */
+	  
+                                    
+                                                 
+                                                    
+       
+    
 	if (ip_active(base) && (assertcnt > 0)) {
 		assert(imp_lock_held);
 		if (base->ip_tempowner != 0) {
 			if (IIT_NULL != base->ip_imp_task) {
-				/* specified tempowner task */
+				                              
 				imp_task = base->ip_imp_task;
 				assert(ipc_importance_task_is_any_receiver_type(imp_task));
 			}
-			/* otherwise don't boost current task */
+			                                        
 		} else if (base->ip_receiver_name != MACH_PORT_NULL) {
 			ipc_space_t space = base->ip_receiver;
 
-			/* only spaces with boost-accepting tasks */
+			                                            
 			if (space->is_task != TASK_NULL &&
 			    ipc_importance_task_is_any_receiver_type(space->is_task->task_imp_base)) {
 				imp_task = space->is_task->task_imp_base;
 			}
 		}
 
-		/* take reference before unlocking base */
+		                                          
 		if (imp_task != IIT_NULL) {
 			ipc_importance_task_reference(imp_task);
 		}
@@ -2432,11 +2432,11 @@ not_circular:
 		ip_release(base);
 	}
 
-	/* All locks dropped, call turnstile_update_inheritor_complete for source port's turnstile */
+	                                                                                             
 	if (send_turnstile) {
 		turnstile_update_inheritor_complete(send_turnstile, TURNSTILE_INTERLOCK_NOT_HELD);
 
-		/* Take the mq lock to call turnstile complete */
+		                                                 
 		imq_lock(&port->ip_messages);
 		turnstile_complete((uintptr_t)port, port_send_turnstile_address(port), NULL, TURNSTILE_SYNC_IPC);
 		send_turnstile = TURNSTILE_NULL;
@@ -2444,15 +2444,15 @@ not_circular:
 		turnstile_cleanup();
 	}
 
-	/*
-	 * Transfer assertions now that the ports are unlocked.
-	 * Avoid extra overhead if transferring to/from the same task.
-	 *
-	 * NOTE: If a transfer is occurring, the new assertions will
-	 * be added to imp_task BEFORE the importance lock is unlocked.
-	 * This is critical - to avoid decrements coming from the kmsgs
-	 * beating the increment to the task.
-	 */
+	  
+                                                        
+                                                               
+   
+                                                             
+                                                                
+                                                                
+                                      
+    
 	boolean_t transfer_assertions = (imp_task != release_imp_task);
 
 	if (imp_task != IIT_NULL) {
@@ -2488,16 +2488,16 @@ not_circular:
 	return FALSE;
 }
 
-/*
- *	Routine:	ipc_importance_send
- *	Purpose:
- *		Post the importance voucher attribute [if sent] or a static
- *		importance boost depending upon options and conditions.
- *	Conditions:
- *		Destination port locked on entry and exit, may be dropped during the call.
- *	Returns:
- *		A boolean identifying if the port lock was tempoarily dropped.
- */
+  
+                               
+           
+                                                               
+                                                           
+              
+                                                                              
+           
+                                                                  
+   
 boolean_t
 ipc_importance_send(
 	ipc_kmsg_t              kmsg,
@@ -2512,7 +2512,7 @@ ipc_importance_send(
 
 	assert(IP_VALID(port));
 
-	/* If no donation to be made, return quickly */
+	                                               
 	if ((port->ip_impdonation == 0) ||
 	    (option & MACH_SEND_NOIMPORTANCE) != 0) {
 		return port_lock_dropped;
@@ -2520,9 +2520,9 @@ ipc_importance_send(
 
 	task = current_task();
 
-	/* If forced sending a static boost, go update the port */
+	                                                          
 	if ((option & MACH_SEND_IMPORTANCE) != 0) {
-		/* acquire the importance lock while trying to hang on to port lock */
+		                                                                      
 		if (!ipc_importance_lock_try()) {
 			port_lock_dropped = TRUE;
 			ip_unlock(port);
@@ -2534,14 +2534,14 @@ ipc_importance_send(
 	task_imp = task->task_imp_base;
 	assert(IIT_NULL != task_imp);
 
-	/* If the sender can never donate importance, nothing to do */
+	                                                              
 	if (ipc_importance_task_is_never_donor(task_imp)) {
 		return port_lock_dropped;
 	}
 
 	elem = IIE_NULL;
 
-	/* If importance receiver and passing a voucher, look for importance in there */
+	                                                                                
 	if (IP_VALID(kmsg->ikm_voucher) &&
 	    ipc_importance_task_is_marked_receiver(task_imp)) {
 		mach_voucher_attr_value_handle_t vals[MACH_VOUCHER_ATTR_VALUE_MAX_NESTED];
@@ -2551,16 +2551,16 @@ ipc_importance_send(
 		assert(ip_kotype(kmsg->ikm_voucher) == IKOT_VOUCHER);
 		voucher = (ipc_voucher_t)ip_get_kobject(kmsg->ikm_voucher);
 
-		/* check to see if the voucher has an importance attribute */
+		                                                             
 		val_count = MACH_VOUCHER_ATTR_VALUE_MAX_NESTED;
 		kr = mach_voucher_attr_control_get_values(ipc_importance_control, voucher,
 		    vals, &val_count);
 		assert(KERN_SUCCESS == kr);
 
-		/*
-		 * Only use importance associated with our task (either directly
-		 * or through an inherit that donates to our task).
-		 */
+		  
+                                                                  
+                                                     
+     
 		if (0 < val_count) {
 			ipc_importance_elem_t check_elem;
 
@@ -2578,32 +2578,32 @@ ipc_importance_send(
 		}
 	}
 
-	/* If we haven't found an importance attribute to send yet, use the task's */
+	                                                                             
 	if (IIE_NULL == elem) {
 		elem = (ipc_importance_elem_t)task_imp;
 	}
 
-	/* take a reference for the message to hold */
+	                                              
 	ipc_importance_reference_internal(elem);
 
-	/* acquire the importance lock while trying to hang on to port lock */
+	                                                                      
 	if (!ipc_importance_lock_try()) {
 		port_lock_dropped = TRUE;
 		ip_unlock(port);
 		ipc_importance_lock();
 	}
 
-	/* link kmsg onto the donor element propagation chain */
+	                                                        
 	ipc_importance_kmsg_link(kmsg, elem);
-	/* elem reference transfered to kmsg */
+	                                       
 
 	incr_ref_counter(elem->iie_kmsg_refs_added);
 
-	/* If the sender isn't currently a donor, no need to apply boost */
+	                                                                   
 	if (!ipc_importance_task_is_donor(task_imp)) {
 		ipc_importance_unlock();
 
-		/* re-acquire port lock, if needed */
+		                                     
 		if (TRUE == port_lock_dropped) {
 			ip_lock(port);
 		}
@@ -2612,15 +2612,15 @@ ipc_importance_send(
 	}
 
 portupdate:
-	/* Mark the fact that we are (currently) donating through this message */
+	                                                                         
 	kmsg->ikm_header->msgh_bits |= MACH_MSGH_BITS_RAISEIMP;
 
-	/*
-	 * If we need to relock the port, do it with the importance still locked.
-	 * This assures we get to add the importance boost through the port to
-	 * the task BEFORE anyone else can attempt to undo that operation if
-	 * the sender lost donor status.
-	 */
+	  
+                                                                          
+                                                                       
+                                                                     
+                                 
+    
 	if (TRUE == port_lock_dropped) {
 		ip_lock(port);
 	}
@@ -2636,23 +2636,23 @@ portupdate:
 		KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE, (IMPORTANCE_CODE(IMP_MSG, IMP_MSG_SEND)) | DBG_FUNC_START,
 		    task_pid(task), sender_pid, imp_msgh_id, 0, 0);
 	}
-#endif /* IMPORTANCE_TRACE */
+#endif                       
 
 	mach_port_delta_t delta = 1;
 	boolean_t need_port_lock;
 	task_imp = IIT_NULL;
 
-	/* adjust port boost count (with importance and port locked) */
+	                                                               
 	need_port_lock = ipc_port_importance_delta_internal(port, IPID_OPTION_NORMAL, &delta, &task_imp);
-	/* hold a reference on task_imp */
+	                                  
 
-	/* if we need to adjust a task importance as a result, apply that here */
+	                                                                         
 	if (IIT_NULL != task_imp && delta != 0) {
 		assert(delta == 1);
 
-		/* if this results in a change of state, propagate the transistion */
+		                                                                     
 		if (ipc_importance_task_check_transition(task_imp, IIT_UPDATE_HOLD, delta)) {
-			/* can't hold the port lock during task transition(s) */
+			                                                        
 			if (!need_port_lock) {
 				need_port_lock = TRUE;
 				ip_unlock(port);
@@ -2663,7 +2663,7 @@ portupdate:
 
 	if (task_imp) {
 		ipc_importance_task_release_locked(task_imp);
-		/* importance unlocked */
+		                         
 	} else {
 		ipc_importance_unlock();
 	}
@@ -2676,20 +2676,20 @@ portupdate:
 	return port_lock_dropped;
 }
 
-/*
- *	Routine:	ipc_importance_inherit_from_kmsg
- *	Purpose:
- *		Create a "made" reference for an importance attribute representing
- *		an inheritance between the sender of a message (if linked) and the
- *		current task importance.  If the message is not linked, a static
- *		boost may be created, based on the boost state of the message.
- *
- *		Any transfer from kmsg linkage to inherit linkage must be atomic.
- *
- *		If the task is inactive, there isn't any need to return a new reference.
- *	Conditions:
- *		Nothing locked on entry.  May block.
- */
+  
+                                            
+           
+                                                                      
+                                                                      
+                                                                    
+                                                                  
+  
+                                                                     
+  
+                                                                            
+              
+                                        
+   
 static ipc_importance_inherit_t
 ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 {
@@ -2705,22 +2705,22 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 	boolean_t donating;
 	uint32_t depth = 1;
 
-	/* The kmsg must have an importance donor or static boost to proceed */
+	                                                                       
 	if (IIE_NULL == kmsg->ikm_importance &&
 	    !MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits)) {
 		return III_NULL;
 	}
 
-	/*
-	 * No need to set up an inherit linkage if the dest isn't a receiver
-	 * of one type or the other.
-	 */
+	  
+                                                                     
+                             
+    
 	if (!ipc_importance_task_is_any_receiver_type(task_self->task_imp_base)) {
 		ipc_importance_lock();
 		goto out_locked;
 	}
 
-	/* Grab a reference on the importance of the destination */
+	                                                           
 	task_imp = ipc_importance_for_task(task_self, FALSE);
 
 	ipc_importance_lock();
@@ -2731,13 +2731,13 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 
 	incr_ref_counter(task_imp->iit_elem.iie_task_refs_added_inherit_from);
 
-	/* If message is already associated with an inherit... */
+	                                                         
 	if (IIE_TYPE_INHERIT == IIE_TYPE(from_elem)) {
 		ipc_importance_inherit_t from_inherit = (ipc_importance_inherit_t)from_elem;
 
-		/* already targeting our task? - just use it */
+		                                               
 		if (from_inherit->iii_to_task == task_imp) {
-			/* clear self-donation if not also present in inherit */
+			                                                        
 			if (!from_inherit->iii_donating &&
 			    MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits)) {
 				kmsg->ikm_header->msgh_bits &= ~MACH_MSGH_BITS_RAISEIMP;
@@ -2748,63 +2748,63 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 			ipc_importance_task_t to_task;
 			ipc_importance_elem_t unlinked_from;
 
-			/*
-			 * Chain too long. Switch to looking
-			 * directly at the from_inherit's to-task
-			 * as our source of importance.
-			 */
+			  
+                                       
+                                            
+                                  
+      
 			to_task = from_inherit->iii_to_task;
 			ipc_importance_task_reference(to_task);
 			from_elem = (ipc_importance_elem_t)to_task;
 			depth = III_DEPTH_RESET | 1;
 
-			/* Fixup the kmsg linkage to reflect change */
+			                                              
 			unlinked_from = ipc_importance_kmsg_unlink(kmsg);
 			assert(unlinked_from == (ipc_importance_elem_t)from_inherit);
 			ipc_importance_kmsg_link(kmsg, from_elem);
 			ipc_importance_inherit_release_locked(from_inherit);
-			/* importance unlocked */
+			                         
 			ipc_importance_lock();
 		} else {
-			/* inheriting from an inherit */
+			                                
 			depth = from_inherit->iii_depth + 1;
 		}
 	}
 
-	/*
-	 * Don't allow a task to inherit from itself (would keep it permanently
-	 * boosted even if all other donors to the task went away).
-	 */
+	  
+                                                                        
+                                                            
+    
 
 	if (from_elem == (ipc_importance_elem_t)task_imp) {
 		goto out_locked;
 	}
 
-	/*
-	 * But if the message isn't associated with any linked source, it is
-	 * intended to be permanently boosting (static boost from kernel).
-	 * In that case DO let the process permanently boost itself.
-	 */
+	  
+                                                                     
+                                                                   
+                                                             
+    
 	if (IIE_NULL == from_elem) {
 		assert(MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits));
 		ipc_importance_task_reference_internal(task_imp);
 		from_elem = (ipc_importance_elem_t)task_imp;
 	}
 
-	/*
-	 * Now that we have the from_elem figured out,
-	 * check to see if we already have an inherit for this pairing
-	 */
+	  
+                                               
+                                                               
+    
 	while (III_NULL == inherit) {
 		inherit = ipc_importance_inherit_find(from_elem, task_imp, depth);
 
-		/* Do we have to allocate a new inherit */
+		                                          
 		if (III_NULL == inherit) {
 			if (III_NULL != alloc) {
 				break;
 			}
 
-			/* allocate space */
+			                    
 			ipc_importance_unlock();
 			alloc = (ipc_importance_inherit_t)
 			    zalloc(ipc_importance_inherit_zone);
@@ -2812,22 +2812,22 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 		}
 	}
 
-	/* snapshot the donating status while we have importance locked */
+	                                                                  
 	donating = MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits);
 
 	if (III_NULL != inherit) {
-		/* We found one, piggyback on that */
+		                                     
 		assert(0 < III_REFS(inherit));
 		assert(0 < IIE_REFS(inherit->iii_from_elem));
 		assert(inherit->iii_externcnt >= inherit->iii_made);
 
-		/* add in a made reference */
+		                             
 		if (0 == inherit->iii_made++) {
 			assert(III_REFS_MAX > III_REFS(inherit));
 			ipc_importance_inherit_reference_internal(inherit);
 		}
 
-		/* Reflect the inherit's change of status into the task boosts */
+		                                                                 
 		if (0 == III_EXTERN(inherit)) {
 			assert(!inherit->iii_donating);
 			inherit->iii_donating = donating;
@@ -2839,10 +2839,10 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 			assert(donating == inherit->iii_donating);
 		}
 
-		/* add in a external reference for this use of the inherit */
+		                                                             
 		inherit->iii_externcnt++;
 	} else {
-		/* initialize the previously allocated space */
+		                                               
 		inherit = alloc;
 		inherit->iii_bits = IIE_TYPE_INHERIT | 1;
 		inherit->iii_made = 1;
@@ -2859,10 +2859,10 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 			inherit->iii_donating = FALSE;
 		}
 
-		/*
-		 * Chain our new inherit on the element it inherits from.
-		 * The new inherit takes our reference on from_elem.
-		 */
+		  
+                                                           
+                                                      
+     
 		ipc_importance_inherit_link(inherit, from_elem);
 
 #if IIE_REF_DEBUG
@@ -2873,25 +2873,25 @@ ipc_importance_inherit_from_kmsg(ipc_kmsg_t kmsg)
 	}
 
 out_locked:
-	/*
-	 * for those paths that came straight here: snapshot the donating status
-	 * (this should match previous snapshot for other paths).
-	 */
+	  
+                                                                         
+                                                          
+    
 	donating = MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits);
 
-	/* unlink the kmsg inheritance (if any) */
+	                                          
 	elem = ipc_importance_kmsg_unlink(kmsg);
 	assert(elem == from_elem);
 
-	/* If found inherit and donating, reflect that in the task externcnt */
+	                                                                       
 	if (III_NULL != inherit && donating) {
 		task_imp->iit_externcnt++;
-		/* The owner of receive right might have changed, take the internal assertion */
+		                                                                                
 		ipc_importance_task_hold_internal_assertion_locked(task_imp, 1);
-		/* may have dropped and retaken importance lock */
+		                                                  
 	}
 
-	/* If we didn't create a new inherit, we have some resources to release */
+	                                                                          
 	if (III_NULL == inherit || inherit != alloc) {
 		if (IIE_NULL != from_elem) {
 			if (III_NULL != inherit) {
@@ -2900,7 +2900,7 @@ out_locked:
 				incr_ref_counter(from_elem->iie_kmsg_refs_dropped);
 			}
 			ipc_importance_release_locked(from_elem);
-			/* importance unlocked */
+			                         
 		} else {
 			ipc_importance_unlock();
 		}
@@ -2916,49 +2916,49 @@ out_locked:
 			zfree(ipc_importance_inherit_zone, alloc);
 		}
 	} else {
-		/* from_elem and task_imp references transferred to new inherit */
+		                                                                  
 		ipc_importance_unlock();
 	}
 
-	/*
-	 * decrement port boost count
-	 * This is OK to do without the importance lock as we atomically
-	 * unlinked the kmsg and snapshot the donating state while holding
-	 * the importance lock
-	 */
+	  
+                              
+                                                                 
+                                                                   
+                       
+    
 	if (donating || cleared_self_donation) {
 		ip_lock(port);
-		/* drop importance from port and destination task */
+		                                                    
 		if (ipc_port_importance_delta(port, IPID_OPTION_NORMAL, -1) == FALSE) {
 			ip_unlock(port);
 		}
 	}
 
 	if (III_NULL != inherit) {
-		/* have an associated importance attr, even if currently not donating */
+		                                                                        
 		kmsg->ikm_header->msgh_bits |= MACH_MSGH_BITS_RAISEIMP;
 	} else {
-		/* we won't have an importance attribute associated with our message */
+		                                                                       
 		kmsg->ikm_header->msgh_bits &= ~MACH_MSGH_BITS_RAISEIMP;
 	}
 
 	return inherit;
 }
 
-/*
- *	Routine:	ipc_importance_inherit_from_task
- *	Purpose:
- *		Create a reference for an importance attribute representing
- *		an inheritance between the to_task and from_task. The iii
- *		created will be marked as III_FLAGS_FOR_OTHERS.
- *
- *		It will not dedup any iii which are not marked as III_FLAGS_FOR_OTHERS.
- *
- *		If the task is inactive, there isn't any need to return a new reference.
- *	Conditions:
- *		Nothing locked on entry.  May block.
- *		It should not be called from voucher subsystem.
- */
+  
+                                            
+           
+                                                               
+                                                             
+                                                   
+  
+                                                                           
+  
+                                                                            
+              
+                                        
+                                                   
+   
 static ipc_importance_inherit_t
 ipc_importance_inherit_from_task(
 	task_t from_task,
@@ -2983,16 +2983,16 @@ ipc_importance_inherit_from_task(
 		goto out_locked;
 	}
 
-	/*
-	 * No need to set up an inherit linkage if the to_task or from_task
-	 * isn't a receiver of one type or the other.
-	 */
+	  
+                                                                    
+                                              
+    
 	if (!ipc_importance_task_is_any_receiver_type(to_task_imp) ||
 	    !ipc_importance_task_is_any_receiver_type(from_task_imp)) {
 		goto out_locked;
 	}
 
-	/* Do not allow to create a linkage to self */
+	                                              
 	if (to_task_imp == from_task_imp) {
 		goto out_locked;
 	}
@@ -3000,20 +3000,20 @@ ipc_importance_inherit_from_task(
 	incr_ref_counter(to_task_imp->iit_elem.iie_task_refs_added_inherit_from);
 	incr_ref_counter(from_elem->iie_kmsg_refs_added);
 
-	/*
-	 * Now that we have the from_elem figured out,
-	 * check to see if we already have an inherit for this pairing
-	 */
+	  
+                                               
+                                                               
+    
 	while (III_NULL == inherit) {
 		inherit = ipc_importance_inherit_find(from_elem, to_task_imp, depth);
 
-		/* Do we have to allocate a new inherit */
+		                                          
 		if (III_NULL == inherit) {
 			if (III_NULL != alloc) {
 				break;
 			}
 
-			/* allocate space */
+			                    
 			ipc_importance_unlock();
 			alloc = (ipc_importance_inherit_t)
 			    zalloc(ipc_importance_inherit_zone);
@@ -3021,19 +3021,19 @@ ipc_importance_inherit_from_task(
 		}
 	}
 
-	/* snapshot the donating status while we have importance locked */
+	                                                                  
 	donating = ipc_importance_task_is_donor(from_task_imp);
 
 	if (III_NULL != inherit) {
-		/* We found one, piggyback on that */
+		                                     
 		assert(0 < III_REFS(inherit));
 		assert(0 < IIE_REFS(inherit->iii_from_elem));
 
-		/* Take a reference for inherit */
+		                                  
 		assert(III_REFS_MAX > III_REFS(inherit));
 		ipc_importance_inherit_reference_internal(inherit);
 
-		/* Reflect the inherit's change of status into the task boosts */
+		                                                                 
 		if (0 == III_EXTERN(inherit)) {
 			assert(!inherit->iii_donating);
 			inherit->iii_donating = donating;
@@ -3045,10 +3045,10 @@ ipc_importance_inherit_from_task(
 			assert(donating == inherit->iii_donating);
 		}
 
-		/* add in a external reference for this use of the inherit */
+		                                                             
 		inherit->iii_externcnt++;
 	} else {
-		/* initialize the previously allocated space */
+		                                               
 		inherit = alloc;
 		inherit->iii_bits = IIE_TYPE_INHERIT | 1;
 		inherit->iii_made = 0;
@@ -3065,10 +3065,10 @@ ipc_importance_inherit_from_task(
 			inherit->iii_donating = FALSE;
 		}
 
-		/*
-		 * Chain our new inherit on the element it inherits from.
-		 * The new inherit takes our reference on from_elem.
-		 */
+		  
+                                                           
+                                                      
+     
 		ipc_importance_inherit_link(inherit, from_elem);
 
 #if IIE_REF_DEBUG
@@ -3080,15 +3080,15 @@ ipc_importance_inherit_from_task(
 
 out_locked:
 
-	/* If found inherit and donating, reflect that in the task externcnt */
+	                                                                       
 	if (III_NULL != inherit && donating) {
 		to_task_imp->iit_externcnt++;
-		/* take the internal assertion */
+		                                 
 		ipc_importance_task_hold_internal_assertion_locked(to_task_imp, 1);
-		/* may have dropped and retaken importance lock */
+		                                                  
 	}
 
-	/* If we didn't create a new inherit, we have some resources to release */
+	                                                                          
 	if (III_NULL == inherit || inherit != alloc) {
 		if (IIE_NULL != from_elem) {
 			if (III_NULL != inherit) {
@@ -3097,7 +3097,7 @@ out_locked:
 				incr_ref_counter(from_elem->iie_kmsg_refs_dropped);
 			}
 			ipc_importance_release_locked(from_elem);
-			/* importance unlocked */
+			                         
 		} else {
 			ipc_importance_unlock();
 		}
@@ -3113,27 +3113,27 @@ out_locked:
 			zfree(ipc_importance_inherit_zone, alloc);
 		}
 	} else {
-		/* from_elem and to_task_imp references transferred to new inherit */
+		                                                                     
 		ipc_importance_unlock();
 	}
 
 	return inherit;
 }
 
-/*
- *	Routine:	ipc_importance_receive
- *	Purpose:
- *		Process importance attributes in a received message.
- *
- *		If an importance voucher attribute was sent, transform
- *		that into an attribute value reflecting the inheritance
- *		from the sender to the receiver.
- *
- *		If a static boost is received (or the voucher isn't on
- *		a voucher-based boost), export a static boost.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                  
+           
+                                                        
+  
+                                                          
+                                                           
+                                    
+  
+                                                          
+                                                  
+              
+                   
+   
 void
 ipc_importance_receive(
 	ipc_kmsg_t              kmsg,
@@ -3148,7 +3148,7 @@ ipc_importance_receive(
 	    mach_round_msg(kmsg->ikm_header->msgh_size)))->msgh_audit.val[5];
 #endif
 
-	/* convert to a voucher with an inherit importance attribute? */
+	                                                                
 	if ((option & MACH_RCV_VOUCHER) != 0) {
 		uint8_t recipes[2 * sizeof(ipc_voucher_attr_recipe_data_t) +
 		sizeof(mach_voucher_attr_value_handle_t)];
@@ -3159,7 +3159,7 @@ ipc_importance_receive(
 		ipc_importance_inherit_t inherit;
 		kern_return_t kr;
 
-		/* set up recipe to copy the old voucher */
+		                                           
 		if (IP_VALID(kmsg->ikm_voucher)) {
 			ipc_voucher_t sent_voucher = (ipc_voucher_t)ip_get_kobject(kmsg->ikm_voucher);
 
@@ -3170,25 +3170,25 @@ ipc_importance_receive(
 			recipe_size += sizeof(*recipe);
 		}
 
-		/*
-		 * create an inheritance attribute from the kmsg (may be NULL)
-		 * transferring any boosts from the kmsg linkage through the
-		 * port directly to the new inheritance object.
-		 */
+		  
+                                                                
+                                                              
+                                                 
+     
 		inherit = ipc_importance_inherit_from_kmsg(kmsg);
 		handle = (mach_voucher_attr_value_handle_t)inherit;
 
 		assert(IIE_NULL == kmsg->ikm_importance);
 
-		/*
-		 * Only create a new voucher if we have an inherit object
-		 * (from the ikm_importance field of the incoming message), OR
-		 * we have a valid incoming voucher. If we have neither of
-		 * these things then there is no need to create a new voucher.
-		 */
+		  
+                                                           
+                                                                
+                                                            
+                                                                
+     
 		if (IP_VALID(kmsg->ikm_voucher) || inherit != III_NULL) {
-			/* replace the importance attribute with the handle we created */
-			/*  our made reference on the inherit is donated to the voucher */
+			                                                                 
+			                                                                  
 			recipe = (ipc_voucher_attr_recipe_t)&recipes[recipe_size];
 			recipe->key = MACH_VOUCHER_ATTR_KEY_IMPORTANCE;
 			recipe->command = MACH_VOUCHER_ATTR_SET_VALUE_HANDLE;
@@ -3203,7 +3203,7 @@ ipc_importance_receive(
 			    &recv_voucher);
 			assert(KERN_SUCCESS == kr);
 
-			/* swap the voucher port (and set voucher bits in case it didn't already exist) */
+			                                                                                  
 			kmsg->ikm_header->msgh_bits |= (MACH_MSG_TYPE_MOVE_SEND << 16);
 			ipc_port_release_send(kmsg->ikm_voucher);
 			kmsg->ikm_voucher = convert_voucher_to_port(recv_voucher);
@@ -3211,8 +3211,8 @@ ipc_importance_receive(
 				impresult = 2;
 			}
 		}
-	} else { /* Don't want a voucher */
-		/* got linked importance? have to drop */
+	} else {                           
+		                                         
 		if (IIE_NULL != kmsg->ikm_importance) {
 			ipc_importance_elem_t elem;
 
@@ -3222,28 +3222,28 @@ ipc_importance_receive(
 			elem->iie_kmsg_refs_dropped++;
 #endif
 			ipc_importance_release_locked(elem);
-			/* importance unlocked */
+			                         
 		}
 
-		/* With kmsg unlinked, can safely examine message importance attribute. */
+		                                                                          
 		if (MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits)) {
 			ipc_port_t port = kmsg->ikm_header->msgh_remote_port;
 #if LEGACY_IMPORTANCE_DELIVERY
 			ipc_importance_task_t task_imp = task_self->task_imp_base;
 
-			/* The owner of receive right might have changed, take the internal assertion */
+			                                                                                
 			if (KERN_SUCCESS == ipc_importance_task_hold_internal_assertion(task_imp, 1)) {
 				ipc_importance_task_externalize_legacy_assertion(task_imp, 1, sender_pid);
 				impresult = 1;
 			} else
 #endif
 			{
-				/* The importance boost never applied to task (clear the bit) */
+				                                                                
 				kmsg->ikm_header->msgh_bits &= ~MACH_MSGH_BITS_RAISEIMP;
 				impresult = 0;
 			}
 
-			/* Drop the boost on the port and the owner of the receive right */
+			                                                                   
 			ip_lock(port);
 			if (ipc_port_importance_delta(port, IPID_OPTION_NORMAL, -1) == FALSE) {
 				ip_unlock(port);
@@ -3258,34 +3258,34 @@ ipc_importance_receive(
 		    kmsg->ikm_header->msgh_id, impresult, 0);
 	}
 	if (impresult == 2) {
-		/*
-		 * This probe only covers new voucher-based path.  Legacy importance
-		 * will trigger the probe in ipc_importance_task_externalize_assertion()
-		 * above and have impresult==1 here.
-		 */
+		  
+                                                                      
+                                                                          
+                                      
+     
 		DTRACE_BOOST5(receive_boost, task_t, task_self, int, task_pid(task_self),
 		    int, sender_pid, int, 1, int, task_self->task_imp_base->iit_assertcnt);
 	}
-#endif /* IMPORTANCE_TRACE */
+#endif                       
 }
 
-/*
- *	Routine:	ipc_importance_unreceive
- *	Purpose:
- *		Undo receive of importance attributes in a message.
- *
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                    
+           
+                                                       
+  
+              
+                   
+   
 void
 ipc_importance_unreceive(
 	ipc_kmsg_t              kmsg,
 	mach_msg_option_t       __unused option)
 {
-	/* importance should already be in the voucher and out of the kmsg */
+	                                                                     
 	assert(IIE_NULL == kmsg->ikm_importance);
 
-	/* See if there is a legacy boost to be dropped from receiver */
+	                                                                
 	if (MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits)) {
 		ipc_importance_task_t task_imp;
 
@@ -3294,31 +3294,31 @@ ipc_importance_unreceive(
 		if (!IP_VALID(kmsg->ikm_voucher) && IIT_NULL != task_imp) {
 			ipc_importance_task_drop_legacy_external_assertion(task_imp, 1);
 		}
-		/*
-		 * ipc_kmsg_copyout_dest() will consume the voucher
-		 * and any contained importance.
-		 */
+		  
+                                                     
+                                  
+     
 	}
 }
 
-/*
- *	Routine:	ipc_importance_clean
- *	Purpose:
- *		Clean up importance state in a kmsg that is being cleaned.
- *		Unlink the importance chain if one was set up, and drop
- *		the reference this kmsg held on the donor.  Then check to
- *		if importance was carried to the port, and remove that if
- *		needed.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                
+           
+                                                              
+                                                           
+                                                             
+                                                             
+           
+              
+                   
+   
 void
 ipc_importance_clean(
 	ipc_kmsg_t              kmsg)
 {
 	ipc_port_t              port;
 
-	/* Is the kmsg still linked? If so, remove that first */
+	                                                        
 	if (IIE_NULL != kmsg->ikm_importance) {
 		ipc_importance_elem_t   elem;
 
@@ -3326,16 +3326,16 @@ ipc_importance_clean(
 		elem = ipc_importance_kmsg_unlink(kmsg);
 		assert(IIE_NULL != elem);
 		ipc_importance_release_locked(elem);
-		/* importance unlocked */
+		                         
 	}
 
-	/* See if there is a legacy importance boost to be dropped from port */
+	                                                                       
 	if (MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits)) {
 		kmsg->ikm_header->msgh_bits &= ~MACH_MSGH_BITS_RAISEIMP;
 		port = kmsg->ikm_header->msgh_remote_port;
 		if (IP_VALID(port)) {
 			ip_lock(port);
-			/* inactive ports already had their importance boosts dropped */
+			                                                                
 			if (!ip_active(port) ||
 			    ipc_port_importance_delta(port, IPID_OPTION_NORMAL, -1) == FALSE) {
 				ip_unlock(port);
@@ -3351,9 +3351,9 @@ ipc_importance_assert_clean(__assert_only ipc_kmsg_t kmsg)
 	assert(!MACH_MSGH_BITS_RAISED_IMPORTANCE(kmsg->ikm_header->msgh_bits));
 }
 
-/*
- * IPC Importance Attribute Manager definition
- */
+  
+                                              
+   
 
 static kern_return_t
 ipc_importance_release_value(
@@ -3413,16 +3413,16 @@ const struct ipc_voucher_attr_manager ipc_importance_manager = {
 #define IMPORTANCE_ASSERT_KEY(key) assert(MACH_VOUCHER_ATTR_KEY_IMPORTANCE == (key))
 #define IMPORTANCE_ASSERT_MANAGER(manager) assert(&ipc_importance_manager == (manager))
 
-/*
- *	Routine:	ipc_importance_release_value [Voucher Attribute Manager Interface]
- *	Purpose:
- *		Release what the voucher system believes is the last "made" reference
- *		on an importance attribute value handle.  The sync parameter is used to
- *		avoid races with new made references concurrently being returned to the
- *		voucher system in other threads.
- *	Conditions:
- *		Nothing locked on entry.  May block.
- */
+  
+                                                                              
+           
+                                                                         
+                                                                           
+                                                                           
+                                    
+              
+                                        
+   
 static kern_return_t
 ipc_importance_release_value(
 	ipc_voucher_attr_manager_t              __assert_only manager,
@@ -3440,20 +3440,20 @@ ipc_importance_release_value(
 
 	ipc_importance_lock();
 
-	/* Any oustanding made refs? */
+	                               
 	if (sync != elem->iie_made) {
 		assert(sync < elem->iie_made);
 		ipc_importance_unlock();
 		return KERN_FAILURE;
 	}
 
-	/* clear made */
+	                
 	elem->iie_made = 0;
 
-	/*
-	 * If there are pending external boosts represented by this attribute,
-	 * drop them from the apropriate task
-	 */
+	  
+                                                                       
+                                      
+    
 	if (IIE_TYPE_INHERIT == IIE_TYPE(elem)) {
 		ipc_importance_inherit_t inherit = (ipc_importance_inherit_t)elem;
 
@@ -3472,7 +3472,7 @@ ipc_importance_release_value(
 			inherit->iii_externdrop = 0;
 			inherit->iii_donating = FALSE;
 
-			/* adjust the internal assertions - and propagate if needed */
+			                                                              
 			if (ipc_importance_task_check_transition(imp_task, IIT_UPDATE_DROP, assertcnt)) {
 				ipc_importance_task_propagate_assertion_locked(imp_task, IIT_UPDATE_DROP, TRUE);
 			}
@@ -3482,24 +3482,24 @@ ipc_importance_release_value(
 		}
 	}
 
-	/* drop the made reference on elem */
+	                                     
 	ipc_importance_release_locked(elem);
-	/* returns unlocked */
+	                      
 
 	return KERN_SUCCESS;
 }
 
 
-/*
- *	Routine:	ipc_importance_get_value [Voucher Attribute Manager Interface]
- *	Purpose:
- *		Convert command and content data into a reference on a [potentially new]
- *		attribute value.  The importance attribute manager will only allow the
- *		caller to get a value for the current task's importance, or to redeem
- *		an importance attribute from an existing voucher.
- *	Conditions:
- *		Nothing locked on entry.  May block.
- */
+  
+                                                                          
+           
+                                                                            
+                                                                          
+                                                                         
+                                                     
+              
+                                        
+   
 static kern_return_t
 ipc_importance_get_value(
 	ipc_voucher_attr_manager_t                      __assert_only manager,
@@ -3524,12 +3524,12 @@ ipc_importance_get_value(
 	}
 
 	*out_flags = MACH_VOUCHER_ATTR_VALUE_FLAGS_NONE;
-	/* never an out voucher */
+	                          
 
 	switch (command) {
 	case MACH_VOUCHER_ATTR_REDEEM:
 
-		/* redeem of previous values is the value */
+		                                            
 		if (0 < prev_value_count) {
 			elem = (ipc_importance_elem_t)prev_values[0];
 			assert(IIE_NULL != elem);
@@ -3543,7 +3543,7 @@ ipc_importance_get_value(
 			return KERN_SUCCESS;
 		}
 
-		/* redeem of default is default */
+		                                  
 		*out_value = 0;
 		*out_value_voucher = IPC_VOUCHER_NULL;
 		return KERN_SUCCESS;
@@ -3552,35 +3552,35 @@ ipc_importance_get_value(
 		self = current_task();
 
 		elem = (ipc_importance_elem_t)ipc_importance_for_task(self, TRUE);
-		/* made reference added (or IIE_NULL which isn't referenced) */
+		                                                               
 
 		*out_value = (mach_voucher_attr_value_handle_t)elem;
 		*out_value_voucher = IPC_VOUCHER_NULL;
 		return KERN_SUCCESS;
 
 	default:
-		/*
-		 * every other command is unknown
-		 *
-		 * Specifically, there is no mechanism provided to construct an
-		 * importance attribute for a task/process from just a pid or
-		 * task port.  It has to be copied (or redeemed) from a previous
-		 * voucher that has it.
-		 */
+		  
+                                   
+    
+                                                                 
+                                                               
+                                                                  
+                         
+     
 		return KERN_INVALID_ARGUMENT;
 	}
 }
 
-/*
- *	Routine:	ipc_importance_extract_content [Voucher Attribute Manager Interface]
- *	Purpose:
- *		Extract meaning from the attribute value present in a voucher.  While
- *		the real goal is to provide commands and data that can reproduce the
- *		voucher's value "out of thin air", this isn't possible with importance
- *		attribute values.  Instead, return debug info to help track down dependencies.
- *	Conditions:
- *		Nothing locked on entry.  May block.
- */
+  
+                                                                                
+           
+                                                                         
+                                                                        
+                                                                          
+                                                                                  
+              
+                                        
+   
 static kern_return_t
 ipc_importance_extract_content(
 	ipc_voucher_attr_manager_t                      __assert_only manager,
@@ -3602,7 +3602,7 @@ ipc_importance_extract_content(
 	IMPORTANCE_ASSERT_MANAGER(manager);
 	IMPORTANCE_ASSERT_KEY(key);
 
-	/* the first non-default value provides the data */
+	                                                   
 	for (i = 0; i < value_count; i++) {
 		elem = (ipc_importance_elem_t)values[i];
 		if (IIE_NULL == elem) {
@@ -3629,7 +3629,7 @@ ipc_importance_extract_content(
 			pid = task_importance_task_get_pid(task_imp);
 			ipc_importance_unlock();
 			pos += scnprintf(buf + pos, size - pos, "pid %d", pid);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 			if (III_NULL == inherit) {
 				break;
@@ -3641,22 +3641,22 @@ ipc_importance_extract_content(
 			elem = inherit->iii_from_elem;
 		}
 
-		pos++; /* account for terminating \0 */
+		pos++;                                 
 		break;
 	}
-	*out_command = MACH_VOUCHER_ATTR_NOOP; /* cannot be used to regenerate value */
+	*out_command = MACH_VOUCHER_ATTR_NOOP;                                         
 	*in_out_content_size = pos;
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_importance_command [Voucher Attribute Manager Interface]
- *	Purpose:
- *		Run commands against the importance attribute value found in a voucher.
- *		No such commands are currently supported.
- *	Conditions:
- *		Nothing locked on entry.  May block.
- */
+  
+                                                                        
+           
+                                                                           
+                                             
+              
+                                        
+   
 static kern_return_t
 ipc_importance_command(
 	ipc_voucher_attr_manager_t              __assert_only manager,
@@ -3689,7 +3689,7 @@ ipc_importance_command(
 		return KERN_NOT_SUPPORTED;
 	}
 
-	/* the first non-default value of the apropos type provides the data */
+	                                                                       
 	inherit = III_NULL;
 	for (i = 0; i < value_count; i++) {
 		ipc_importance_elem_t elem = (ipc_importance_elem_t)values[i];
@@ -3716,19 +3716,19 @@ ipc_importance_command(
 	to_task = inherit->iii_to_task;
 	assert(ipc_importance_task_is_any_receiver_type(to_task));
 
-	/* if not donating to a denap receiver, it was called incorrectly */
+	                                                                    
 	if (!ipc_importance_task_is_marked_denap_receiver(to_task)) {
 		ipc_importance_unlock();
-		return KERN_INVALID_TASK; /* keeps dispatch happy */
+		return KERN_INVALID_TASK;                           
 	}
 
-	/* Enough external references left to drop? */
+	                                              
 	if (III_EXTERN(inherit) < refs) {
 		ipc_importance_unlock();
 		return KERN_FAILURE;
 	}
 
-	/* re-base external and internal counters at the inherit and the to-task (if apropos) */
+	                                                                                        
 	if (inherit->iii_donating) {
 		assert(IIT_EXTERN(to_task) >= III_EXTERN(inherit));
 		assert(to_task->iit_externcnt >= inherit->iii_externcnt);
@@ -3742,20 +3742,20 @@ ipc_importance_command(
 			to_task->iit_externdrop -= inherit->iii_externdrop;
 
 
-			/* Start AppNap delay hysteresis - even if not the last boost for the task. */
+			                                                                              
 			if (ipc_importance_delayed_drop_call != NULL &&
 			    ipc_importance_task_is_marked_denap_receiver(to_task)) {
 				ipc_importance_task_delayed_drop(to_task);
 			}
 
-			/* drop task assertions associated with the dropped boosts */
+			                                                             
 			if (ipc_importance_task_check_transition(to_task, IIT_UPDATE_DROP, refs)) {
 				ipc_importance_task_propagate_assertion_locked(to_task, IIT_UPDATE_DROP, TRUE);
-				/* may have dropped and retaken importance lock */
+				                                                  
 			}
 		} else {
-			/* assert(to_task->iit_assertcnt >= refs + externcnt); */
-			/* defensive deduction in case of assertcnt underflow */
+			                                                         
+			                                                        
 			if (to_task->iit_assertcnt > refs + externcnt) {
 				to_task->iit_assertcnt -= refs;
 			} else {
@@ -3767,7 +3767,7 @@ ipc_importance_command(
 		externcnt = III_EXTERN(inherit);
 	}
 
-	/* capture result (if requested) */
+	                                   
 	if (NULL != outrefsp) {
 		*outrefsp = externcnt;
 	}
@@ -3776,16 +3776,16 @@ ipc_importance_command(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_importance_manager_release [Voucher Attribute Manager Interface]
- *	Purpose:
- *		Release the Voucher system's reference on the IPC importance attribute
- *		manager.
- *	Conditions:
- *		As this can only occur after the manager drops the Attribute control
- *		reference granted back at registration time, and that reference is never
- *		dropped, this should never be called.
- */
+  
+                                                                                
+           
+                                                                          
+            
+              
+                                                                        
+                                                                            
+                                         
+   
 __abortlike
 static void
 ipc_importance_manager_release(
@@ -3795,13 +3795,13 @@ ipc_importance_manager_release(
 	panic("Voucher importance manager released");
 }
 
-/*
- *	Routine:	ipc_importance_init
- *	Purpose:
- *		Initialize the  IPC importance manager.
- *	Conditions:
- *		Zones and Vouchers are already initialized.
- */
+  
+                               
+           
+                                           
+              
+                                               
+   
 void
 ipc_importance_init(void)
 {
@@ -3816,18 +3816,18 @@ ipc_importance_init(void)
 	}
 }
 
-/*
- *	Routine:	ipc_importance_thread_call_init
- *	Purpose:
- *		Initialize the IPC importance code dependent upon
- *		thread-call support being available.
- *	Conditions:
- *		Thread-call mechanism is already initialized.
- */
+  
+                                           
+           
+                                                     
+                                        
+              
+                                                 
+   
 void
 ipc_importance_thread_call_init(void)
 {
-	/* initialize delayed drop queue and thread-call */
+	                                                   
 	queue_init(&ipc_importance_delayed_drop_queue);
 	ipc_importance_delayed_drop_call =
 	    thread_call_allocate(ipc_importance_task_delayed_drop_scan, NULL);
@@ -3836,12 +3836,12 @@ ipc_importance_thread_call_init(void)
 	}
 }
 
-/*
- * Routing: task_importance_list_pids
- * Purpose: list pids where task in donating importance.
- * Conditions: To be called only from kdp stackshot code.
- *             Will panic the system otherwise.
- */
+  
+                                     
+                                                        
+                                                         
+                                               
+   
 extern int
 task_importance_list_pids(task_t task, int flags, char *pid_list, unsigned int max_count)
 {
@@ -3861,7 +3861,7 @@ task_importance_list_pids(task_t task, int flags, char *pid_list, unsigned int m
 	int target_pid = 0, previous_pid;
 
 	queue_iterate(&task_imp->iit_inherits, temp_inherit, ipc_importance_inherit_t, iii_inheritance) {
-		/* check space in buffer */
+		                           
 		if (pidcount >= max_count) {
 			break;
 		}

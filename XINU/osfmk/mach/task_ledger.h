@@ -32,20 +32,20 @@
 #ifndef _MACH_TASK_LEDGER_H_
 #define _MACH_TASK_LEDGER_H_
 
-/*
- * Evolving and likely to change.
- */
+  
+                                 
+   
 
-/*
- * Definitions for task ledger line items
- */
-#define ITEM_THREADS            0       /* number of threads	*/
-#define ITEM_TASKS              1       /* number of tasks	*/
+  
+                                         
+   
+#define ITEM_THREADS            0                              
+#define ITEM_TASKS              1                            
 
-#define ITEM_VM                 2       /* virtual space (bytes)*/
+#define ITEM_VM                 2                                 
 
-#define LEDGER_N_ITEMS          3       /* Total line items	*/
+#define LEDGER_N_ITEMS          3                             
 
-#define LEDGER_UNLIMITED        0       /* ignored item.maximum	*/
+#define LEDGER_UNLIMITED        0                                 
 
-#endif  /* _MACH_TASK_LEDGER_H_ */
+#endif                            

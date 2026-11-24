@@ -98,7 +98,7 @@
 #include <i386/Diagnostics.h>
 #include <i386/pmCPU.h>
 #include <i386/tsc.h>
-#include <i386/locks.h> /* LcksOpts */
+#include <i386/locks.h>               
 #include <i386/acpi.h>
 #if DEBUG
 #include <machine/pal_routines.h>
@@ -110,7 +110,7 @@ extern void xcpm_bootstrap(void);
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #include <san/kasan.h>
 
@@ -138,10 +138,10 @@ extern const char       version[];
 extern const char       version_variant[];
 extern int              nx_enabled;
 
-/*
- * Set initial values so that ml_phys_* routines can use the booter's ID mapping
- * to touch physical space before the kernel's physical aperture exists.
- */
+  
+                                                                                
+                                                                        
+   
 uint64_t                physmap_base = 0;
 uint64_t                physmap_max = 4 * GB;
 
@@ -153,10 +153,10 @@ pml4_entry_t            *IdlePML4;
 int                     kernPhysPML4Index;
 int                     kernPhysPML4EntryCount;
 
-/*
- * These are 4K mapping page table pages from KPTphys[] that we wound
- * up not using. They get ml_static_mfree()'d once the VM is initialized.
- */
+  
+                                                                     
+                                                                         
+   
 ppnum_t                 released_PT_ppn = 0;
 uint32_t                released_PT_cnt = 0;
 
@@ -176,10 +176,10 @@ int insn_copyin_count;
 char *physfree;
 void idt64_remap(void);
 
-/*
- * Note: ALLOCPAGES() can only be used safely within Idle_PTs_init()
- * due to the mutation of physfree.
- */
+  
+                                                                    
+                                   
+   
 static void *
 ALLOCPAGES(int npages)
 {
@@ -224,9 +224,9 @@ x86_64_post_sleep(uint64_t new_cr3)
 
 
 
-// Set up the physical mapping - NPHYSMAP GB of memory mapped at a high address
-// NPHYSMAP is determined by the maximum supported RAM size plus 4GB to account
-// the PCI hole (which is less 4GB but not more).
+                                                                               
+                                                                               
+                                                 
 
 static int
 physmap_init_L2(uint64_t *physStart, pt_entry_t **l2ptep)
@@ -259,7 +259,7 @@ physmap_init_L3(int startIndex, uint64_t highest_phys, uint64_t *physStart, pt_e
 	unsigned i;
 	int ret;
 	pt_entry_t *l2pte;
-	pt_entry_t *physmapL3 = ALLOCPAGES(1);  /* ALLOCPAGES bzeroes the memory */
+	pt_entry_t *physmapL3 = ALLOCPAGES(1);                                     
 
 	if (physmapL3 == NULL) {
 		DBG("physmap_init_L3 page alloc failed when initting L3 for  physAddr 0x%llx.\n", *physStart);
@@ -299,19 +299,19 @@ physmap_init(uint8_t phys_random_L3, uint64_t *new_physmap_base, uint64_t *new_p
 	}
 #endif
 
-	/*
-	 * Add 4GB to the loader-provided physical memory size to account for MMIO space
-	 * XXX in a perfect world, we'd scan PCI buses and count the max memory requested in BARs by
-	 * XXX all enumerated device, then add more for hot-pluggable devices.
-	 */
+	  
+                                                                                 
+                                                                                             
+                                                                       
+    
 	highest_physaddr = kernelBootArgs->PhysicalMemorySize + 4 * GB;
 
-	/*
-	 * Calculate the number of PML4 entries we'll need.  The total number of entries is
-	 * pdpte_count = (((highest_physaddr) >> PDPT_SHIFT) + entropy_value +
-	 *               ((highest_physaddr & PDPT_MASK) == 0 ? 0 : 1))
-	 * pml4e_count = pdpte_count >> (PML4_SHIFT - PDPT_SHIFT)
-	 */
+	  
+                                                                                    
+                                                                       
+                                                                
+                                                          
+    
 	assert(highest_physaddr < (UINT64_MAX - PDPTMASK));
 	pdpte_count = (unsigned) (((highest_physaddr + PDPTMASK) >> PDPTSHIFT) + phys_random_L3);
 	kernPhysPML4EntryCount = (pdpte_count + ((1U << (PML4SHIFT - PDPTSHIFT)) - 1)) >> (PML4SHIFT - PDPTSHIFT);
@@ -328,17 +328,17 @@ physmap_init(uint8_t phys_random_L3, uint64_t *new_physmap_base, uint64_t *new_p
 #endif
 	}
 
-	kernPhysPML4Index = KERNEL_KEXTS_INDEX - kernPhysPML4EntryCount;        /* utb: KERNEL_PHYSMAP_PML4_INDEX */
+	kernPhysPML4Index = KERNEL_KEXTS_INDEX - kernPhysPML4EntryCount;                                            
 
-	/*
-	 * XXX: Make sure that the addresses returned for physmapL3 and physmapL2 plus their extents
-	 * are in the system-available memory range
-	 */
+	  
+                                                                                             
+                                            
+    
 
 
-	/* We assume NX support. Mark all levels of the PHYSMAP NX
-	 * to avoid granting executability via a single bit flip.
-	 */
+	                                                          
+                                                          
+    
 #if DEVELOPMENT || DEBUG
 	uint32_t reg[4];
 	do_cpuid(0x80000000, reg);
@@ -346,7 +346,7 @@ physmap_init(uint8_t phys_random_L3, uint64_t *new_physmap_base, uint64_t *new_p
 		do_cpuid(0x80000001, reg);
 		assert(reg[edx] & CPUID_EXTFEATURE_XD);
 	}
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 	L3_start_index = phys_random_L3;
 
@@ -355,7 +355,7 @@ physmap_init(uint8_t phys_random_L3, uint64_t *new_physmap_base, uint64_t *new_p
 	    pml4_index++) {
 		if (physmap_init_L3(L3_start_index, highest_physaddr, &physAddr, &l3pte) < 0) {
 			panic("Physmap page table initialization failed");
-			/* NOTREACHED */
+			                
 		}
 
 		L3_start_index = 0;
@@ -367,10 +367,10 @@ physmap_init(uint8_t phys_random_L3, uint64_t *new_physmap_base, uint64_t *new_p
 	}
 
 	*new_physmap_base = KVADDR(kernPhysPML4Index, phys_random_L3, 0, 0);
-	/*
-	 * physAddr contains the last-mapped physical address, so that's what we
-	 * add to physmap_base to derive the ending VA for the physmap.
-	 */
+	  
+                                                                         
+                                                                
+    
 	*new_physmap_max = *new_physmap_base + physAddr;
 
 	DBG("Physical address map base: 0x%qx\n", *new_physmap_base);
@@ -387,35 +387,35 @@ Idle_PTs_init(void)
 	uint64_t        rand64;
 	uint64_t        new_physmap_base, new_physmap_max;
 
-	/* Allocate the "idle" kernel page tables: */
-	KPTphys  = ALLOCPAGES(NKPT);            /* level 1 */
-	IdlePTD  = ALLOCPAGES(NPGPTD);          /* level 2 */
-	IdlePDPT = ALLOCPAGES(1);               /* level 3 */
-	IdlePML4 = ALLOCPAGES(1);               /* level 4 */
+	                                             
+	KPTphys  = ALLOCPAGES(NKPT);                         
+	IdlePTD  = ALLOCPAGES(NPGPTD);                       
+	IdlePDPT = ALLOCPAGES(1);                            
+	IdlePML4 = ALLOCPAGES(1);                            
 
-	// Fill the lowest level with everything up to physfree
+	                                                       
 	fillkpt(KPTphys,
 	    INTEL_PTE_WRITE, 0, 0, (int)(((uintptr_t)physfree) >> PAGE_SHIFT));
 
-	/* IdlePTD */
+	             
 	fillkpt(IdlePTD,
 	    INTEL_PTE_WRITE, (uintptr_t)ID_MAP_VTOP(KPTphys), 0, NKPT);
 
-	// IdlePDPT entries
+	                   
 	fillkpt(IdlePDPT,
 	    INTEL_PTE_WRITE, (uintptr_t)ID_MAP_VTOP(IdlePTD), 0, NPGPTD);
 
-	// IdlePML4 single entry for kernel space.
+	                                          
 	fillkpt(IdlePML4 + KERNEL_PML4_INDEX,
 	    INTEL_PTE_WRITE, (uintptr_t)ID_MAP_VTOP(IdlePDPT), 0, 1);
 
 	postcode(VSTART_PHYSMAP_INIT);
 
-	/*
-	 * early_random() cannot be called more than one time before the cpu's
-	 * gsbase is initialized, so use the full 64-bit value to extract the
-	 * two 8-bit entropy values needed for address randomization.
-	 */
+	  
+                                                                       
+                                                                      
+                                                              
+    
 	rand64 = early_random();
 	physmap_init(rand64 & 0xFF, &new_physmap_base, &new_physmap_max);
 	doublemap_init((rand64 >> 8) & 0xFF);
@@ -423,23 +423,23 @@ Idle_PTs_init(void)
 
 	postcode(VSTART_SET_CR3);
 
-	/*
-	 * Switch to the page tables. We set physmap_base and physmap_max just
-	 * before switching to the new page tables to avoid someone calling
-	 * kprintf() or otherwise using physical memory in between.
-	 * This is needed because kprintf() writes to physical memory using
-	 * ml_phys_read_data and PHYSMAP_PTOV, which requires physmap_base to be
-	 * set correctly.
-	 */
+	  
+                                                                       
+                                                                    
+                                                            
+                                                                    
+                                                                         
+                  
+    
 	physmap_base = new_physmap_base;
 	physmap_max = new_physmap_max;
 	set_cr3_raw((uintptr_t)ID_MAP_VTOP(IdlePML4));
 }
 
-/*
- * Release any still unused, preallocated boot kernel page tables.
- * start..end is the VA range currently unused.
- */
+  
+                                                                  
+                                               
+   
 void
 Idle_PTs_release(vm_offset_t start, vm_offset_t end)
 {
@@ -450,31 +450,31 @@ Idle_PTs_release(vm_offset_t start, vm_offset_t end)
 	ppnum_t pn;
 	uint32_t cnt;
 
-	/*
-	 * Align start to the next large page boundary
-	 */
+	  
+                                               
+    
 	start = ((start + I386_LPGMASK) & ~I386_LPGMASK);
 
-	/*
-	 * convert start into an index in KPTphys[]
-	 */
+	  
+                                            
+    
 	index_start = (uint32_t)((start - KERNEL_BASE) >> PAGE_SHIFT);
 
-	/*
-	 * Find the ending index in KPTphys[]
-	 */
+	  
+                                      
+    
 	index_limit = (uint32_t)((end - KERNEL_BASE) >> PAGE_SHIFT);
 
 	if (index_limit > NKPT * PTE_PER_PAGE) {
 		index_limit = NKPT * PTE_PER_PAGE;
 	}
 
-	/*
-	 * Make sure all the 4K page tables are empty.
-	 * If not, panic a development/debug kernel.
-	 * On a production kernel, since this would stop us from booting,
-	 * just abort the operation.
-	 */
+	  
+                                               
+                                             
+                                                                  
+                             
+    
 	for (i = index_start; i < index_limit; ++i) {
 		assert(KPTphys[i] == 0);
 		if (KPTphys[i] != 0) {
@@ -482,9 +482,9 @@ Idle_PTs_release(vm_offset_t start, vm_offset_t end)
 		}
 	}
 
-	/*
-	 * Now figure out the indices into the 2nd level page tables, IdlePTD[].
-	 */
+	  
+                                                                         
+    
 	index_start >>= PTPGSHIFT;
 	index_limit >>= PTPGSHIFT;
 	if (index_limit > NPGPTD * PTE_PER_PAGE) {
@@ -496,11 +496,11 @@ Idle_PTs_release(vm_offset_t start, vm_offset_t end)
 	}
 
 
-	/*
-	 * Now check the pages referenced from Level 2 tables.
-	 * They should be contiguous, assert fail if not on development/debug.
-	 * In production, just fail the removal to allow the system to boot.
-	 */
+	  
+                                                       
+                                                                       
+                                                                     
+    
 	pn_first = 0;
 	cnt = 0;
 	for (i = index_start; i < index_limit; ++i) {
@@ -521,17 +521,17 @@ Idle_PTs_release(vm_offset_t start, vm_offset_t end)
 		++cnt;
 	}
 
-	/*
-	 * Good to go, clear the level 2 entries and invalidate the TLB
-	 */
+	  
+                                                                
+    
 	for (i = index_start; i < index_limit; ++i) {
 		IdlePTD[i] = 0;
 	}
 	set_cr3_raw(get_cr3_raw());
 
-	/*
-	 * Remember these PFNs to be released later in pmap_lowmem_finalize()
-	 */
+	  
+                                                                      
+    
 	released_PT_ppn = pn_first;
 	released_PT_cnt = cnt;
 #if DEVELOPMENT || DEBUG
@@ -550,7 +550,7 @@ extern void vstart_trap_handler;
 	        0                                       \
 	},
 
-/* Recursive macro to iterate 0..31 */
+                                      
 #define L0(x, n)  x(n)
 #define L1(x, n)  L0(x,n-1)     L0(x,n)
 #define L2(x, n)  L1(x,n-2)     L1(x,n)
@@ -559,11 +559,11 @@ extern void vstart_trap_handler;
 #define L5(x, n)  L4(x,n-16)    L4(x,n)
 #define FOR_0_TO_31(x) L5(x,31)
 
-/*
- * Bootstrap IDT. Active only during early startup.
- * Only the trap vectors are defined since interrupts are masked.
- * All traps point to a common handler.
- */
+  
+                                                   
+                                                                 
+                                       
+   
 struct fake_descriptor64 master_boot_idt64[IDTSZ]
 __attribute__((section("__HIB,__desc")))
 __attribute__((aligned(PAGE_SIZE))) = {
@@ -623,68 +623,68 @@ i386_slide_and_rebase_image(uintptr_t kstart_addr)
 	uintptr_t slide;
 
 	k_mh = &_mh_execute_header;
-	/*
-	 * If we're not booting, an MH_FILESET, we don't need to slide
-	 * anything because EFI has done that for us. When booting an
-	 * MH_FILESET, EFI will slide the kernel proper, but not the kexts.
-	 * Below, we infer the slide by comparing the slid address of the
-	 * kernel's mach-o header and the unslid vmaddr of the first segment
-	 * of the mach-o (which is assumed to always point to the mach-o
-	 * header).
-	 */
+	  
+                                                               
+                                                              
+                                                                    
+                                                                  
+                                                                     
+                                                                 
+            
+    
 	if (!kernel_mach_header_is_in_fileset(k_mh)) {
 		DBG("[MH] kcgen-style KC\n");
 		return;
 	}
 
-	/*
-	 * The kernel is part of a MH_FILESET kernel collection: determine slide
-	 * based on first segment's mach-o vmaddr.
-	 */
+	  
+                                                                         
+                                           
+    
 	seg = (kernel_segment_command_t *)((uintptr_t)k_mh + sizeof(*k_mh));
 	assert(seg->cmd == LC_SEGMENT_KERNEL);
 	slide = (uintptr_t)k_mh - seg->vmaddr;
 	DBG("[MH] Sliding new-style KC: %llu\n", (unsigned long long)slide);
 
-	/*
-	 * The kernel collection mach-o header should be the start address
-	 * passed to us by EFI.
-	 */
+	  
+                                                                   
+                        
+    
 	kc_mh  = (kernel_mach_header_t *)(kstart_addr);
 	assert(kc_mh->filetype == MH_FILESET);
 
 	PE_set_kc_header(KCKindPrimary, kc_mh, slide);
 
-	/*
-	 * rebase/slide all the kexts in the collection
-	 * (EFI should have already rebased the kernel)
-	 */
+	  
+                                                
+                                                
+    
 	kernel_collection_slide(kc_mh, (const void **) (void *)collection_base_pointers);
 
 
-	/*
-	 * Now adjust the vmaddr fields of all mach-o headers
-	 * and symbols in this MH_FILESET
-	 */
+	  
+                                                      
+                                  
+    
 	kernel_collection_adjust_mh_addrs(kc_mh, slide, false,
 	    NULL, NULL, NULL, NULL, NULL, NULL, &kc_highest_nonlinkedit_vmaddr);
 }
 
-/*
- * vstart() is called in the natural mode (64bit for K64, 32 for K32)
- * on a set of bootstrap pagetables which use large, 2MB pages to map
- * all of physical memory in both. See idle_pt.c for details.
- *
- * In K64 this identity mapping is mirrored the top and bottom 512GB
- * slots of PML4.
- *
- * The bootstrap processor called with argument boot_args_start pointing to
- * the boot-args block. The kernel's (4K page) page tables are allocated and
- * initialized before switching to these.
- *
- * Non-bootstrap processors are called with argument boot_args_start NULL.
- * These processors switch immediately to the existing kernel page tables.
- */
+  
+                                                                     
+                                                                     
+                                                             
+  
+                                                                    
+                 
+  
+                                                                           
+                                                                            
+                                         
+  
+                                                                          
+                                                                          
+   
 __attribute__((noreturn))
 void
 vstart(vm_offset_t boot_args_start)
@@ -699,23 +699,23 @@ vstart(vm_offset_t boot_args_start)
 
 	postcode(VSTART_ENTRY);
 
-	/*
-	 * Set-up temporary trap handlers during page-table set-up.
-	 */
+	  
+                                                            
+    
 
 	if (is_boot_cpu) {
 		vstart_idt_init(TRUE);
 		postcode(VSTART_IDT_INIT);
 
-		/*
-		 * Ensure that any %gs-relative access results in an immediate fault
-		 * until gsbase is properly initialized below
-		 */
+		  
+                                                                      
+                                               
+     
 		wrmsr64(MSR_IA32_GS_BASE, EARLY_GSBASE_MAGIC);
 
-		/*
-		 * Get startup parameters.
-		 */
+		  
+                            
+     
 		kernelBootArgs = (boot_args *)boot_args_start;
 		lphysfree = kernelBootArgs->kaddr + kernelBootArgs->ksize;
 		physfree = (void *)(uintptr_t)((lphysfree + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
@@ -739,21 +739,21 @@ vstart(vm_offset_t boot_args_start)
 
 		if (kernelBootArgs->Version >= 2 && kernelBootArgs->Revision >= 1 &&
 		    kernelBootArgs->KC_hdrs_vaddr != 0) {
-			/*
-			 * slide the header addresses in all mach-o segments and sections, and
-			 * perform any new-style chained-fixup sliding for kexts, as necessary.
-			 * Note that efiboot has already loaded the kernel and all LC_SEGMENT_64s
-			 * that correspond to the kexts present in the primary KC, into slid addresses.
-			 */
+			  
+                                                                         
+                                                                          
+                                                                            
+                                                                                  
+      
 			i386_slide_and_rebase_image((uintptr_t)ml_static_ptovirt(kernelBootArgs->KC_hdrs_vaddr));
 		}
 
-		/*
-		 * Setup boot args given the physical start address.
-		 * Note: PE_init_platform needs to be called before Idle_PTs_init
-		 * because access to the DeviceTree is required to read the
-		 * random seed before generating a random physical map slide.
-		 */
+		  
+                                                      
+                                                                   
+                                                             
+                                                               
+     
 		kernelBootArgs = (boot_args *)
 		    ml_static_ptovirt(boot_args_start);
 		DBG("i386_init(0x%lx) kernelBootArgs=%p\n",
@@ -770,14 +770,14 @@ vstart(vm_offset_t boot_args_start)
 		postcode(VSTART_IDLE_PTS_INIT);
 
 #if KASAN
-		/* Init kasan and map whatever was stolen from physfree */
+		                                                          
 		kasan_init();
 		kasan_notify_stolen((uintptr_t)ml_static_ptovirt((vm_offset_t)physfree));
 #endif
 
 #if MONOTONIC
 		mt_early_init();
-#endif /* MONOTONIC */
+#endif                
 
 		first_avail = (vm_offset_t)ID_MAP_VTOP(physfree);
 
@@ -788,18 +788,18 @@ vstart(vm_offset_t boot_args_start)
 		cpu_desc_load(cpu_datap(0));
 
 		postcode(VSTART_CPU_MODE_INIT);
-		cpu_syscall_init(cpu_datap(0)); /* cpu_syscall_init() will be
-		                                 * invoked on the APs
-		                                 * via i386_init_slave()
-		                                 */
+		cpu_syscall_init(cpu_datap(0));                              
+                                                       
+                                                          
+                                     
 	} else {
-		/* Slave CPUs should use the basic IDT until i386_init_slave() */
+		                                                                 
 		vstart_idt_init(FALSE);
 
-		/* Switch to kernel's page tables (from the Boot PTs) */
+		                                                        
 		set_cr3_raw((uintptr_t)ID_MAP_VTOP(IdlePML4));
 
-		/* Find our logical cpu number */
+		                                 
 		cpu = lapic_to_cpu[lapic_safe_apicid()];
 #if DEBUG
 		gsbase = rdmsr64(MSR_IA32_GS_BASE);
@@ -809,11 +809,11 @@ vstart(vm_offset_t boot_args_start)
 		DBG("CPU: %d, GSBASE initial value: 0x%llx\n", cpu, (unsigned long long)gsbase);
 #endif
 
-		/*
-		 * Before we can discover our local APIC ID, we need to potentially
-		 * initialize X2APIC, if it's enabled and firmware started us with
-		 * the APIC in legacy mode.
-		 */
+		  
+                                                                     
+                                                                    
+                             
+     
 		lapic_init_slave();
 	}
 
@@ -829,10 +829,10 @@ pstate_trace(void)
 {
 }
 
-/*
- *	Cpu initialization.  Running virtual, but without MACH VM
- *	set up.
- */
+  
+                                                            
+          
+   
 void
 i386_init(void)
 {
@@ -846,13 +846,13 @@ i386_init(void)
 
 	pal_i386_init();
 	tsc_init();
-	rtclock_early_init();   /* mach_absolute_time() now functional */
+	rtclock_early_init();                                            
 
 	kernel_debug_string_early("i386_init");
 	pstate_trace();
 
 #if CONFIG_MCA
-	/* Initialize machine-check handling */
+	                                       
 	mca_cpu_init();
 #endif
 
@@ -861,16 +861,16 @@ i386_init(void)
 	kernel_debug_string_early("kernel_startup_bootstrap");
 	kernel_startup_bootstrap();
 
-	/*
-	 * Initialize the timer callout world
-	 */
+	  
+                                      
+    
 	timer_call_init();
 
 	cpu_init();
 
 	postcode(CPU_INIT_D);
 
-	/* setup debugging output if one has been chosen */
+	                                                   
 	kernel_startup_initialize_upto(STARTUP_SUB_KPRINTF);
 	kprintf("kprintf initialized\n");
 
@@ -879,10 +879,10 @@ i386_init(void)
 	}
 
 	if (PE_parse_boot_argn("insn_capcnt", &insn_copyin_count, sizeof(insn_copyin_count))) {
-		/*
-		 * Enforce max and min values (allowing 0 to disable copying completely)
-		 * for the instruction copyin count
-		 */
+		  
+                                                                          
+                                     
+     
 		if (insn_copyin_count > x86_INSTRUCTION_STATE_MAX_INSN_BYTES ||
 		    (insn_copyin_count != 0 && insn_copyin_count < 64)) {
 			insn_copyin_count = DEFAULT_INSN_COPYIN_COUNT;
@@ -911,16 +911,16 @@ i386_init(void)
 		}
 	}
 #endif
-	/* But allow that to be overridden via boot-arg: */
+	                                                   
 	if (!PE_parse_boot_argn("lbr_support", &last_branch_support_enabled,
 	    sizeof(last_branch_support_enabled))) {
-		/* Disable LBR support by default due to its high context switch overhead */
+		                                                                            
 		last_branch_support_enabled = false;
 	}
 
 	serialmode = 0;
 	if (PE_parse_boot_argn("serial", &serialmode, sizeof(serialmode))) {
-		/* We want a serial keyboard and/or console */
+		                                              
 		kprintf("Serial mode specified: %08X\n", serialmode);
 		int force_sync = serialmode & SERIALMODE_SYNCDRAIN;
 		if (force_sync || PE_parse_boot_argn("drain_uart_sync", &force_sync, sizeof(force_sync))) {
@@ -936,10 +936,10 @@ i386_init(void)
 	if (serialmode & SERIALMODE_OUTPUT) {
 		serial_console_enabled = true;
 		(void)switch_to_serial_console();
-		disableConsoleOutput = FALSE; /* Allow printfs to happen */
+		disableConsoleOutput = FALSE;                              
 	}
 
-	/* setup console output */
+	                          
 	kernel_debug_string_early("PE_init_printf");
 	PE_init_printf(FALSE);
 
@@ -960,9 +960,9 @@ i386_init(void)
 		}
 	}
 
-	/*
-	 * debug support for > 4G systems
-	 */
+	  
+                                  
+    
 	PE_parse_boot_argn("himemory_mode", &vm_himemory_mode, sizeof(vm_himemory_mode));
 	if (!vm_himemory_mode) {
 		kprintf("himemory_mode disabled\n");
@@ -985,15 +985,15 @@ i386_init(void)
 		nx_enabled = 0;
 	}
 
-	/*
-	 * VM initialization, after this we're using page tables...
-	 * Thn maximum number of cpus must be set beforehand.
-	 */
+	  
+                                                            
+                                                      
+    
 	kernel_debug_string_early("i386_vm_init");
 	i386_vm_init(maxmemtouse, IA32e, kernelBootArgs);
 
-	/* create the console for verbose or pretty mode */
-	/* Note: doing this prior to tsc_init() allows for graceful panic! */
+	                                                   
+	                                                                     
 	PE_init_platform(TRUE, kernelBootArgs);
 	PE_create_console();
 
@@ -1003,7 +1003,7 @@ i386_init(void)
 
 #if MONOTONIC
 	mt_cpu_up(cpu_datap(0));
-#endif /* MONOTONIC */
+#endif                
 
 	processor_bootstrap();
 	thread_t thread = thread_bootstrap();
@@ -1023,7 +1023,7 @@ do_init_slave(boolean_t fast_restart)
 	postcode(I386_INIT_SLAVE);
 
 	if (!fast_restart) {
-		/* Ensure that caching and write-through are enabled */
+		                                                       
 		set_cr0(get_cr0() & ~(CR0_NW | CR0_CD));
 
 		DBG("i386_init_slave() CPU%d: phys (%d) active.\n",
@@ -1039,14 +1039,14 @@ do_init_slave(boolean_t fast_restart)
 #endif
 
 		LAPIC_INIT();
-		/*
-		 * Note that the true argument here does not necessarily mean we're
-		 * here from a resume (this code path is also executed on boot).
-		 * The implementation of lapic_configure checks to see if the
-		 * state variable has been initialized, as it would be before
-		 * sleep.  If it has not been, it's construed as an indicator of
-		 * first boot.
-		 */
+		  
+                                                                     
+                                                                  
+                                                               
+                                                               
+                                                                  
+                
+     
 		lapic_configure(true);
 		LAPIC_DUMP();
 		LAPIC_CPU_MAP_DUMP();
@@ -1056,17 +1056,17 @@ do_init_slave(boolean_t fast_restart)
 #if CONFIG_MTRR
 		mtrr_update_cpu();
 #endif
-		/* update CPU microcode and apply CPU workarounds */
+		                                                    
 		ucode_update_wake_and_apply_cpu_was();
 
-		/* Enable LBRs on non-boot CPUs */
+		                                  
 		i386_lbr_init(cpuid_info(), false);
 	} else {
 		init_param = FAST_SLAVE_INIT;
 	}
 
 #if CONFIG_VMX
-	/* resume VT operation */
+	                         
 	vmx_resume(FALSE);
 #endif
 
@@ -1076,38 +1076,38 @@ do_init_slave(boolean_t fast_restart)
 	}
 #endif
 
-	cpu_thread_init();      /* not strictly necessary */
+	cpu_thread_init();                                  
 
-	cpu_init();     /* Sets cpu_running which starter cpu waits for */
+	cpu_init();                                                       
 
 
 #if MONOTONIC
 	mt_cpu_up(current_cpu_datap());
-#endif /* MONOTONIC */
+#endif                
 
 	slave_main(init_param);
 
 	panic("do_init_slave() returned from slave_main()");
 }
 
-/*
- * i386_init_slave() is called from pstart.
- * We're in the cpu's interrupt stack with interrupts disabled.
- * At this point we are in legacy mode. We need to switch on IA32e
- * if the mode is set to 64-bits.
- */
+  
+                                           
+                                                               
+                                                                  
+                                 
+   
 void
 i386_init_slave(void)
 {
 	do_init_slave(FALSE);
 }
 
-/*
- * i386_init_slave_fast() is called from pmCPUHalt.
- * We're running on the idle thread and need to fix up
- * some accounting and get it so that the scheduler sees this
- * CPU again.
- */
+  
+                                                   
+                                                      
+                                                             
+             
+   
 void
 i386_init_slave_fast(void)
 {
@@ -1115,7 +1115,7 @@ i386_init_slave_fast(void)
 }
 
 
-/* TODO: Evaluate global PTEs for the double-mapped translations */
+                                                                   
 
 uint64_t dblmap_base, dblmap_max;
 kernel_segment_command_t *hdescseg;
@@ -1129,12 +1129,12 @@ extern uint64_t idt64_hndl_table0[];
 void
 doublemap_init(uint8_t randL3)
 {
-	dblmapL3 = ALLOCPAGES(1); // for 512 1GiB entries
+	dblmapL3 = ALLOCPAGES(1);                        
 	dblallocs++;
 
 	struct {
 		pt_entry_t entries[PTE_PER_PAGE];
-	} * dblmapL2 = ALLOCPAGES(1); // for 512 2MiB entries
+	} * dblmapL2 = ALLOCPAGES(1);                        
 	dblallocs++;
 
 	dblmapL3[randL3] = ((uintptr_t)ID_MAP_VTOP(&dblmapL2[0]))
@@ -1155,7 +1155,7 @@ doublemap_init(uint8_t randL3)
 	vm_offset_t thdesce = thdescb + thdescszr;
 
 	assert((hdescb & 0xFFF) == 0);
-	/* Mirror HIB translations into the double-mapped pagetable subtree*/
+	                                                                     
 	for (int i = 0; hdescc < hdesce; i++) {
 		struct {
 			pt_entry_t entries[PTE_PER_PAGE];
@@ -1166,9 +1166,9 @@ doublemap_init(uint8_t randL3)
 		for (int j = 0; j < MIN(PTE_PER_PAGE, hdescn); j++) {
 			uint64_t template = INTEL_PTE_VALID;
 			if ((hdescc >= thdescb) && (hdescc < thdesce)) {
-				/* executable */
+				                
 			} else {
-				template |= INTEL_PTE_WRITE | INTEL_PTE_NX;  /* Writeable, NX */
+				template |= INTEL_PTE_WRITE | INTEL_PTE_NX;                     
 			}
 			dblmapL1[0].entries[j] = ((uintptr_t)ID_MAP_VTOP(hdescc)) | template;
 			hdescc += PAGE_SIZE;
@@ -1179,23 +1179,23 @@ doublemap_init(uint8_t randL3)
 
 	dblmap_base = KVADDR(KERNEL_DBLMAP_PML4_INDEX, randL3, 0, 0);
 	dblmap_max = dblmap_base + hdescszr;
-	/* Calculate the double-map distance, which accounts for the current
-	 * KASLR slide
-	 */
+	                                                                    
+               
+    
 
 	dblmap_dist = dblmap_base - hdescb;
-	idt64_hndl_table0[1] = DBLMAP(idt64_hndl_table0[1]);    /* 64-bit exit trampoline */
-	idt64_hndl_table0[3] = DBLMAP(idt64_hndl_table0[3]);    /* 32-bit exit trampoline */
+	idt64_hndl_table0[1] = DBLMAP(idt64_hndl_table0[1]);                                
+	idt64_hndl_table0[3] = DBLMAP(idt64_hndl_table0[3]);                                
 	idt64_hndl_table0[6] = (uint64_t)(uintptr_t)&kernel_stack_mask;
 
 	extern cpu_data_t cpshadows[], scdatas[];
 	uintptr_t cd1 = (uintptr_t) &cpshadows[0];
 	uintptr_t cd2 = (uintptr_t) &scdatas[0];
-/* Record the displacement from the kernel's per-CPU data pointer, eventually
- * programmed into GSBASE, to the "shadows" in the doublemapped
- * region. These are not aliases, but separate physical allocations
- * containing data required in the doublemapped trampolines.
- */
+                                                                             
+                                                               
+                                                                   
+                                                            
+   
 	idt64_hndl_table0[2] = dblmap_dist + cd1 - cd2;
 
 	DBG("Double map base: 0x%qx\n", dblmap_base);
@@ -1207,9 +1207,9 @@ vm_offset_t dyn_dblmap(vm_offset_t, vm_offset_t);
 
 #include <i386/pmap_internal.h>
 
-/* Use of this routine is expected to be synchronized by callers
- * Creates non-executable aliases.
- */
+                                                                
+                                  
+   
 vm_offset_t
 dyn_dblmap(vm_offset_t cva, vm_offset_t sz)
 {
@@ -1222,10 +1222,10 @@ dyn_dblmap(vm_offset_t cva, vm_offset_t sz)
 	dblmap_max += sz;
 	return ava - cva;
 }
-/* Adjust offsets interior to the bootstrap interrupt descriptor table to redirect
- * control to the double-mapped interrupt vectors. The IDTR proper will be
- * programmed via cpu_desc_load()
- */
+                                                                                  
+                                                                          
+                                 
+   
 void
 idt64_remap(void)
 {

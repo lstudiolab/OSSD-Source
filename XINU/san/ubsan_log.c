@@ -29,30 +29,30 @@
 #include <os/atomic_private.h>
 #include <kern/cpu_data.h>
 #include <kern/kalloc.h>
-#include <kern/simple_lock.h> // hw_wait_while_equals
+#include <kern/simple_lock.h>                        
 #include <libkern/libkern.h>
 #include <sys/sysctl.h>
 #include "ubsan.h"
 
-/*
- * To dump the violation log:
- *   $ sysctl kern.ubsan.log
- *
- * To reset:
- *   $ sysctl kern.ubsan.logentries=0
- */
+  
+                             
+                            
+  
+            
+                                     
+   
 
 static const size_t ubsan_log_size = 2048;
 struct ubsan_violation ubsan_log[ubsan_log_size];
 
-/*
- * Implement a fixed-size buffer FIFO, similar to the Chase-Lev DeQueue.
- *
- * See https://fzn.fr/readings/ppopp13.pdf for explanations on barriers.
- */
-_Atomic size_t ubsan_log_head = 0; /* first valid entry */
-_Atomic size_t ubsan_log_tail = 0; /* next free slot (reader) */
-_Atomic size_t ubsan_log_next = 0; /* next free slot (writer) */
+  
+                                                                        
+  
+                                                                        
+   
+_Atomic size_t ubsan_log_head = 0;                        
+_Atomic size_t ubsan_log_tail = 0;                              
+_Atomic size_t ubsan_log_next = 0;                              
 
 static const bool ubsan_logging = true;
 
@@ -69,7 +69,7 @@ ubsan_log_append(struct ubsan_violation *violation)
 		return;
 	}
 
-	/* reserve a slot */
+	                    
 	size_t i, e, n;
 
 	disable_preemption();
@@ -78,18 +78,18 @@ ubsan_log_append(struct ubsan_violation *violation)
 		n = next_entry(i);
 		if (n == os_atomic_load(&ubsan_log_tail, acquire)) {
 		        enable_preemption();
-		        return; /* full */
+		        return;           
 		}
 	});
 
 	ubsan_log[i] = *violation;
 	os_atomic_thread_fence(release);
 
-	/* make the entry available */
+	                              
 again:
 	os_atomic_rmw_loop(&ubsan_log_head, e, n, relaxed, {
 		if (e != i) {
-		        // we need to wait for another enqueuer
+		                                               
 		        os_atomic_rmw_loop_give_up({
 				hw_wait_while_equals((void **)&ubsan_log_head, (void *)e);
 				goto again;
@@ -112,7 +112,7 @@ sysctl_ubsan_log_dump SYSCTL_HANDLER_ARGS
 	tail = os_atomic_load(&ubsan_log_tail, relaxed);
 
 	if (tail == head) {
-		return 0; /* log is empty */
+		return 0;                   
 	}
 
 	char *buf = kheap_alloc(KHEAP_TEMP, sz, Z_WAITOK | Z_ZERO);

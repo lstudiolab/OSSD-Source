@@ -33,9 +33,9 @@
 #include <arm/vmparam.h>
 #include <arm/cpu_data_internal.h>
 
-/*
- * Copy values from saved_state to ts32.
- */
+  
+                                        
+   
 void
 saved_state_to_thread_state32(const arm_saved_state_t *saved_state, arm_thread_state32_t *ts32)
 {
@@ -52,9 +52,9 @@ saved_state_to_thread_state32(const arm_saved_state_t *saved_state, arm_thread_s
 	}
 }
 
-/*
- * Copy values from ts32 to saved_state.
- */
+  
+                                        
+   
 void
 thread_state32_to_saved_state(const arm_thread_state32_t *ts32, arm_saved_state_t *saved_state)
 {

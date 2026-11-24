@@ -51,8 +51,8 @@
 
 #define MAX_EDITR_RETRIES       16
 
-/* Older SoCs require 32-bit accesses for DBGWRAP;
- * newer ones require 64-bit accesses. */
+                                                  
+                                         
 #ifdef HAS_32BIT_DBGWRAP
 typedef uint32_t dbgwrap_reg_t;
 #else
@@ -108,8 +108,8 @@ ml_dbgwrap_halt_cpu(int cpu_index, uint64_t timeout_ns)
 		return DBGWRAP_ERR_UNSUPPORTED;
 	}
 
-	/* Only one cpu is allowed to initiate the halt sequence, to prevent cpus from cross-halting
-	 * each other.  The first cpu to request a halt may then halt any and all other cpus besides itself. */
+	                                                                                            
+                                                                                                        
 	int curcpu = cpu_number();
 	if (cpu_index == curcpu) {
 		return DBGWRAP_ERR_SELF_HALT;
@@ -126,7 +126,7 @@ ml_dbgwrap_halt_cpu(int cpu_index, uint64_t timeout_ns)
 		return DBGWRAP_WARN_ALREADY_HALTED;
 	}
 
-	/* Clear all other writable bits besides dbgHalt; none of the power-down or reset bits must be set. */
+	                                                                                                      
 	*dbgWrapReg = DBGWRAP_DBGHALT;
 
 	if (timeout_ns != 0) {
@@ -172,8 +172,8 @@ ml_dbgwrap_stuff_instr(cpu_data_t *cdp, uint32_t instr, uint64_t timeout_ns, dbg
 			}
 		}
 		if (edscr_val & EDSCR_ERR) {
-			/* If memory access mode was enable by a debugger, clear it.
-			 * This will cause ERR to be set on any attempt to use EDITR. */
+			                                                            
+                                                                   
 			if (edscr_val & EDSCR_MA) {
 				*edscr = edscr_val & ~EDSCR_MA;
 			}
@@ -201,8 +201,8 @@ ml_dbgwrap_read_dtr(cpu_data_t *cdp, uint64_t timeout_ns, dbgwrap_status_t *stat
 	nanoseconds_to_absolutetime(timeout_ns, &interval);
 	uint64_t deadline = mach_absolute_time() + interval;
 
-	/* Per armv8 debug spec, writes to DBGDTR_EL0 on target cpu will set EDSCR.TXFull,
-	 * with bits 63:32 available in EDDTRRX and bits 31:0 availabe in EDDTRTX. */
+	                                                                                  
+                                                                              
 	volatile uint32_t *edscr = (volatile uint32_t *)(cdp->coresight_base[CORESIGHT_ED] + EDSCR_REG_OFFSET);
 
 	while (!(*edscr & EDSCR_TXFULL)) {
@@ -230,16 +230,16 @@ ml_dbgwrap_halt_cpu_with_state(int cpu_index, uint64_t timeout_ns, dbgwrap_threa
 		return DBGWRAP_ERR_UNSUPPORTED;
 	}
 
-	/* Ensure memory-mapped coresight registers can be written */
+	                                                             
 	*((volatile uint32_t *)(cdp->coresight_base[CORESIGHT_ED] + ARM_DEBUG_OFFSET_DBGLAR)) = ARM_DBG_LOCK_ACCESS_KEY;
 
 	dbgwrap_status_t status = ml_dbgwrap_halt_cpu(cpu_index, timeout_ns);
 
-	/* A core that is not fully powered (e.g. idling in wfi) can still be halted; the dbgwrap
-	 * register and certain coresight registers such EDPRSR are in the always-on domain.
-	 * However, EDSCR/EDITR are not in the always-on domain and will generate a parity abort
-	 * on read.  EDPRSR can be safely read in all cases, and the OS lock defaults to being set
-	 * but we clear it first thing, so use that to detect the offline state. */
+	                                                                                         
+                                                                                     
+                                                                                         
+                                                                                           
+                                                                            
 	if (*((volatile uint32_t *)(cdp->coresight_base[CORESIGHT_ED] + EDPRSR_REG_OFFSET)) & EDPRSR_OSLK) {
 		bzero(state, sizeof(*state));
 		return DBGWRAP_WARN_CPU_OFFLINE;
@@ -248,45 +248,45 @@ ml_dbgwrap_halt_cpu_with_state(int cpu_index, uint64_t timeout_ns, dbgwrap_threa
 	uint32_t instr;
 
 	for (unsigned int i = 0; i < (sizeof(state->x) / sizeof(state->x[0])); ++i) {
-		instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | i; // msr DBGDTR0, x<i>
+		instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | i;                     
 		ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
 		state->x[i] = ml_dbgwrap_read_dtr(cdp, timeout_ns, &status);
 	}
 
-	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 29; // msr DBGDTR0, fp
+	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 29;                   
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
 	state->fp = ml_dbgwrap_read_dtr(cdp, timeout_ns, &status);
 
-	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 30; // msr DBGDTR0, lr
+	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 30;                   
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
 	state->lr = ml_dbgwrap_read_dtr(cdp, timeout_ns, &status);
 
-	/* Stack pointer (x31) can't be used as a register operand for msr; register 31 is treated as xzr
-	 * rather than sp when used as the transfer operand there.  Instead, load sp into a GPR
-	 * we've already saved off and then store that register in the DTR.  I've chosen x18
-	 * as the temporary GPR since it's reserved by the arm64 ABI and unused by xnu, so overwriting
-	 * it poses the least risk of causing trouble for external debuggers. */
+	                                                                                                 
+                                                                                        
+                                                                                     
+                                                                                               
+                                                                         
 
-	instr = (0x91U << 24) | (31 << 5) | 18; // mov x18, sp
+	instr = (0x91U << 24) | (31 << 5) | 18;               
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
-	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 18; // msr DBGDTR0, x18
+	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 18;                    
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
 	state->sp = ml_dbgwrap_read_dtr(cdp, timeout_ns, &status);
 
-	/* reading PC (e.g. through adr) is undefined in debug state.  Instead use DLR_EL0,
-	 * which contains PC at time of entry into debug state.*/
+	                                                                                   
+                                                          
 
-	instr = (0xD53U << 20) | (1 << 19) | (3 << 16) | (4 << 12) | (5 << 8) | (1 << 5) | 18; // mrs    x18, DLR_EL0
+	instr = (0xD53U << 20) | (1 << 19) | (3 << 16) | (4 << 12) | (5 << 8) | (1 << 5) | 18;                       
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
-	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 18; // msr DBGDTR0, x18
+	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 18;                    
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
 	state->pc = ml_dbgwrap_read_dtr(cdp, timeout_ns, &status);
 
-	/* reading CPSR is undefined in debug state.  Instead use DSPSR_EL0,
-	 * which contains CPSR at time of entry into debug state.*/
-	instr = (0xD53U << 20) | (1 << 19) | (3 << 16) | (4 << 12) | (5 << 8) | 18; // mrs    x18, DSPSR_EL0
+	                                                                    
+                                                            
+	instr = (0xD53U << 20) | (1 << 19) | (3 << 16) | (4 << 12) | (5 << 8) | 18;                         
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
-	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 18; // msr DBGDTR0, x18
+	instr = (0xD51U << 20) | (2 << 19) | (3 << 16) | (4 << 8) | 18;                    
 	ml_dbgwrap_stuff_instr(cdp, instr, timeout_ns, &status);
 	state->cpsr = (uint32_t)ml_dbgwrap_read_dtr(cdp, timeout_ns, &status);
 

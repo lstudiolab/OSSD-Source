@@ -31,7 +31,7 @@
 #if __cplusplus >= 201103L
 #define NULL nullptr
 #else
-#undef __null  // VC++ hack.
+#undef __null               
 #define NULL __null
 #endif
 #else
@@ -57,14 +57,14 @@ typedef __WCHAR_TYPE__ wchar_t;
 #define offsetof(t, d) __builtin_offsetof(t, d)
 #endif
 
-#endif /* __STDDEF_H */
+#endif                 
 
-/* Some C libraries expect to see a wint_t here. Others (notably MinGW) will use
-__WINT_TYPE__ directly; accommodate both by requiring __need_wint_t */
+                                                                                
+                                                                      
 #if defined(__need_wint_t)
 #if !defined(_WINT_T)
 #define _WINT_T
 typedef __WINT_TYPE__ wint_t;
-#endif /* _WINT_T */
+#endif              
 #undef __need_wint_t
-#endif /* __need_wint_t */
+#endif                    

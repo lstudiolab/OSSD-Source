@@ -45,7 +45,7 @@
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #include <machine/atomic.h>
 #include <arm64/proc_reg.h>
@@ -64,24 +64,24 @@
 extern int debug_task;
 extern bool need_wa_rdar_55577508;
 
-/* zone for debug_state area */
+                               
 ZONE_DECLARE(ads_zone, "arm debug state", sizeof(arm_debug_state_t), ZC_NONE);
 ZONE_DECLARE(user_ss_zone, "user save state", sizeof(arm_context_t), ZC_NONE);
 
-/*
- * Routine: consider_machine_collect
- *
- */
+  
+                                    
+  
+   
 void
 consider_machine_collect(void)
 {
 	pmap_gc();
 }
 
-/*
- * Routine: consider_machine_adjust
- *
- */
+  
+                                   
+  
+   
 void
 consider_machine_adjust(void)
 {
@@ -93,14 +93,14 @@ consider_machine_adjust(void)
 static inline void
 machine_thread_switch_cpu_data(thread_t old, thread_t new)
 {
-	/*
-	 * We build with -fno-strict-aliasing, so the load through temporaries
-	 * is required so that this generates a single load / store pair.
-	 */
+	  
+                                                                       
+                                                                  
+    
 	cpu_data_t *datap = old->machine.CpuDatap;
 	vm_offset_t base  = old->machine.pcpu_data_base;
 
-	/* TODO: Should this be ordered? */
+	                                   
 
 	old->machine.CpuDatap = NULL;
 	old->machine.pcpu_data_base = 0;
@@ -109,13 +109,13 @@ machine_thread_switch_cpu_data(thread_t old, thread_t new)
 	new->machine.pcpu_data_base = base;
 }
 
-/**
- * routine: machine_switch_pmap_and_extended_context
- *
- * Helper function used by machine_switch_context and machine_stack_handoff to switch the
- * extended context and switch the pmap if necessary.
- *
- */
+   
+                                                    
+  
+                                                                                         
+                                                     
+  
+   
 
 static inline void
 machine_switch_pmap_and_extended_context(thread_t old, thread_t new)
@@ -128,18 +128,18 @@ machine_switch_pmap_and_extended_context(thread_t old, thread_t new)
 	if (old->map->pmap != new_pmap) {
 		pmap_switch(new_pmap);
 	} else {
-		/*
-		 * If the thread is preempted while performing cache or TLB maintenance,
-		 * it may be migrated to a different CPU between the completion of the relevant
-		 * maintenance instruction and the synchronizing DSB.   ARM requires that the
-		 * synchronizing DSB must be issued *on the PE that issued the maintenance instruction*
-		 * in order to guarantee completion of the instruction and visibility of its effects.
-		 * Issue DSB here to enforce that guarantee.  We only do this for the case in which
-		 * the pmap isn't changing, as we expect pmap_switch() to issue DSB when it updates
-		 * TTBR0.  Note also that cache maintenance may be performed in userspace, so we
-		 * cannot further limit this operation e.g. by setting a per-thread flag to indicate
-		 * a pending kernel TLB or cache maintenance instruction.
-		 */
+		  
+                                                                          
+                                                                                 
+                                                                               
+                                                                                         
+                                                                                       
+                                                                                     
+                                                                                     
+                                                                                  
+                                                                                      
+                                                           
+     
 		__builtin_arm_dsb(DSB_ISH);
 	}
 
@@ -147,10 +147,10 @@ machine_switch_pmap_and_extended_context(thread_t old, thread_t new)
 	machine_thread_switch_cpu_data(old, new);
 }
 
-/*
- * Routine: machine_switch_context
- *
- */
+  
+                                  
+  
+   
 thread_t
 machine_switch_context(thread_t old,
     thread_continue_t continuation,
@@ -165,7 +165,7 @@ machine_switch_context(thread_t old,
 #endif
 
 #define machine_switch_context_kprintf(x...) \
-	/* kprintf("machine_switch_context: " x) */
+	                                           
 
 	if (old == new) {
 		panic("machine_switch_context");
@@ -190,10 +190,10 @@ machine_thread_on_core(thread_t thread)
 }
 
 
-/*
- * Routine: machine_thread_create
- *
- */
+  
+                                 
+  
+   
 kern_return_t
 machine_thread_create(thread_t thread,
     task_t task)
@@ -202,13 +202,13 @@ machine_thread_create(thread_t thread,
 	kern_return_t result = KERN_SUCCESS;
 
 #define machine_thread_create_kprintf(x...) \
-	/* kprintf("machine_thread_create: " x) */
+	                                          
 
 	machine_thread_create_kprintf("thread = %x\n", thread);
 
 	if (current_thread() != thread) {
 		thread->machine.CpuDatap = (cpu_data_t *)0;
-		// setting this offset will cause trying to use it to panic
+		                                                           
 		thread->machine.pcpu_data_base = (vm_offset_t)VM_MIN_KERNEL_ADDRESS;
 	}
 	thread->machine.preemption_count = 0;
@@ -224,7 +224,7 @@ machine_thread_create(thread_t thread,
 
 
 	if (task != kernel_task) {
-		/* If this isn't a kernel thread, we'll have userspace state. */
+		                                                                
 		thread->machine.contextData = (arm_context_t *)zalloc(user_ss_zone);
 
 		if (!thread->machine.contextData) {
@@ -272,17 +272,17 @@ done:
 	return result;
 }
 
-/*
- * Routine: machine_thread_destroy
- *
- */
+  
+                                  
+  
+   
 void
 machine_thread_destroy(thread_t thread)
 {
 	arm_context_t *thread_user_ss;
 
 	if (thread->machine.contextData) {
-		/* Disassociate the user save state from the thread before we free it. */
+		                                                                         
 		thread_user_ss = thread->machine.contextData;
 		thread->machine.upcb = NULL;
 		thread->machine.uNeon = NULL;
@@ -302,39 +302,39 @@ machine_thread_destroy(thread_t thread)
 }
 
 
-/*
- * Routine: machine_thread_init
- *
- */
+  
+                               
+  
+   
 void
 machine_thread_init(void)
 {
 }
 
-/*
- * Routine:	machine_thread_template_init
- *
- */
+  
+                                        
+  
+   
 void
 machine_thread_template_init(thread_t __unused thr_template)
 {
-	/* Nothing to do on this platform. */
+	                                     
 }
 
-/*
- * Routine: get_useraddr
- *
- */
+  
+                        
+  
+   
 user_addr_t
 get_useraddr()
 {
 	return get_saved_state_pc(current_thread()->machine.upcb);
 }
 
-/*
- * Routine: machine_stack_detach
- *
- */
+  
+                                
+  
+   
 vm_offset_t
 machine_stack_detach(thread_t thread)
 {
@@ -351,10 +351,10 @@ machine_stack_detach(thread_t thread)
 }
 
 
-/*
- * Routine: machine_stack_attach
- *
- */
+  
+                                
+  
+   
 void
 machine_stack_attach(thread_t thread,
     vm_offset_t stack)
@@ -365,7 +365,7 @@ machine_stack_attach(thread_t thread,
 	uint32_t current_el;
 
 #define machine_stack_attach_kprintf(x...) \
-	/* kprintf("machine_stack_attach: " x) */
+	                                         
 
 	KERNEL_DEBUG(MACHDBG_CODE(DBG_MACH_SCHED, MACH_STACK_ATTACH),
 	    (uintptr_t)thread_tid(thread), thread->priority, thread->sched_pri, 0, 0);
@@ -382,16 +382,16 @@ machine_stack_attach(thread_t thread,
 	savestate->fp = 0;
 	savestate->sp = thread->machine.kstackptr;
 
-	/*
-	 * The PC and CPSR of the kernel stack saved state are never used by context switch
-	 * code, and should never be used on exception return either. We're going to poison
-	 * these values to ensure they never get copied to the exception frame and used to
-	 * hijack control flow or privilege level on exception return.
-	 */
+	  
+                                                                                    
+                                                                                    
+                                                                                   
+                                                               
+    
 
 	const uint32_t default_cpsr = PSR64_KERNEL_POISON;
 #if defined(HAS_APPLE_PAC)
-	/* Sign the initial kernel stack saved state */
+	                                               
 	boolean_t intr = ml_set_interrupts_enabled(FALSE);
 	asm volatile (
                 "mov	x0, %[ss]"                              "\n"
@@ -429,17 +429,17 @@ machine_stack_attach(thread_t thread,
 	savestate->lr = (uintptr_t)thread_continue;
 	savestate->cpsr = default_cpsr;
 	savestate->pc = 0;
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 	neon_savestate = &context->ns;
 	neon_savestate->fpcr = FPCR_DEFAULT;
 	machine_stack_attach_kprintf("thread = %p pc = %llx, sp = %llx\n", thread, savestate->lr, savestate->sp);
 }
 
 
-/*
- * Routine: machine_stack_handoff
- *
- */
+  
+                                 
+  
+   
 void
 machine_stack_handoff(thread_t old,
     thread_t new)
@@ -470,10 +470,10 @@ machine_stack_handoff(thread_t old,
 }
 
 
-/*
- * Routine: call_continuation
- *
- */
+  
+                             
+  
+   
 void
 call_continuation(thread_continue_t continuation,
     void *parameter,
@@ -481,7 +481,7 @@ call_continuation(thread_continue_t continuation,
     boolean_t enable_interrupts)
 {
 #define call_continuation_kprintf(x...) \
-	/* kprintf("call_continuation_kprintf:" x) */
+	                                             
 
 	call_continuation_kprintf("thread = %p continuation = %p, stack = %p\n", current_thread(), continuation, current_thread()->machine.kstackptr);
 	Call_continuation(continuation, parameter, wresult, enable_interrupts);
@@ -517,7 +517,7 @@ arm_debug_set32(arm_debug_state_t *debug_state)
 	intr = ml_set_interrupts_enabled(FALSE);
 	cpu_data_ptr = getCpuDatap();
 
-	// Set current user debug
+	                         
 	cpu_data_ptr->cpu_user_debug = debug_state;
 
 	if (NULL == debug_state) {
@@ -669,27 +669,27 @@ arm_debug_set32(arm_debug_state_t *debug_state)
 	}
 #endif
 
-	/*
-	 * Breakpoint/Watchpoint Enable
-	 */
+	  
+                                
+    
 	if (all_ctrls != 0) {
-		update_mdscr(0, 0x8000); // MDSCR_EL1[MDE]
+		update_mdscr(0, 0x8000);                  
 	} else {
 		update_mdscr(0x8000, 0);
 	}
 
-	/*
-	 * Software debug single step enable
-	 */
+	  
+                                     
+    
 	if (debug_state->uds.ds32.mdscr_el1 & 0x1) {
-		update_mdscr(0x8000, 1); // ~MDE | SS : no brk/watch while single stepping (which we've set)
+		update_mdscr(0x8000, 1);                                                                    
 
 		mask_saved_state_cpsr(current_thread()->machine.upcb, PSR64_SS, 0);
 	} else {
 		update_mdscr(0x1, 0);
 
 #if SINGLE_STEP_RETIRE_ERRATA
-		// Workaround for radar 20619637
+		                                
 		__builtin_arm_isb(ISB_SY);
 #endif
 	}
@@ -709,7 +709,7 @@ arm_debug_set64(arm_debug_state_t *debug_state)
 	intr = ml_set_interrupts_enabled(FALSE);
 	cpu_data_ptr = getCpuDatap();
 
-	// Set current user debug
+	                         
 	cpu_data_ptr->cpu_user_debug = debug_state;
 
 	if (NULL == debug_state) {
@@ -861,27 +861,27 @@ arm_debug_set64(arm_debug_state_t *debug_state)
 	}
 #endif
 
-	/*
-	 * Breakpoint/Watchpoint Enable
-	 */
+	  
+                                
+    
 	if (all_ctrls != 0) {
-		update_mdscr(0, 0x8000); // MDSCR_EL1[MDE]
+		update_mdscr(0, 0x8000);                  
 	} else {
 		update_mdscr(0x8000, 0);
 	}
 
-	/*
-	 * Software debug single step enable
-	 */
+	  
+                                     
+    
 	if (debug_state->uds.ds64.mdscr_el1 & 0x1) {
-		update_mdscr(0x8000, 1); // ~MDE | SS : no brk/watch while single stepping (which we've set)
+		update_mdscr(0x8000, 1);                                                                    
 
 		mask_saved_state_cpsr(current_thread()->machine.upcb, PSR64_SS, 0);
 	} else {
 		update_mdscr(0x1, 0);
 
 #if SINGLE_STEP_RETIRE_ERRATA
-		// Workaround for radar 20619637
+		                                
 		__builtin_arm_isb(ISB_SY);
 #endif
 	}
@@ -971,10 +971,10 @@ debug_state_is_valid64(arm_debug_state64_t *debug_state)
 	return TRUE;
 }
 
-/*
- * Duplicate one arm_debug_state_t to another.  "all" parameter
- * is ignored in the case of ARM -- Is this the right assumption?
- */
+  
+                                                               
+                                                                 
+   
 void
 copy_legacy_debug_state(arm_legacy_debug_state_t * src,
     arm_legacy_debug_state_t * target,
@@ -1023,7 +1023,7 @@ machine_thread_set_tsd_base(thread_t         thread,
 
 	thread->machine.cthread_self = tsd_base;
 
-	/* For current thread, make the TSD base active immediately */
+	                                                              
 	if (thread == current_thread()) {
 		uint64_t cpunum, tpidrro_el0;
 
@@ -1062,4 +1062,4 @@ arm_user_jop_disabled(void)
 {
 	return FALSE;
 }
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   

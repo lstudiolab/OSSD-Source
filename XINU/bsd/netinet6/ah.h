@@ -1,5 +1,5 @@
-/*	$FreeBSD: src/sys/netinet6/ah.h,v 1.3.2.2 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: ah.h,v 1.13 2000/10/18 21:28:00 itojun Exp $	*/
+                                                                             
+                                                         
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -30,29 +30,29 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1826/2402 authentication header.
- */
+  
+                                      
+   
 
 #ifndef _NETINET6_AH_H_
 #define _NETINET6_AH_H_
 #include <sys/appleapiopts.h>
 
 struct ah {
-	u_int8_t        ah_nxt;         /* Next Header */
-	u_int8_t        ah_len;         /* Length of data, in 32bit */
-	u_int16_t       ah_reserve;     /* Reserved for future use */
-	u_int32_t       ah_spi;         /* Security parameter index */
-	/* variable size, 32bit bound*/	/* Authentication data */
+	u_int8_t        ah_nxt;                          
+	u_int8_t        ah_len;                                       
+	u_int16_t       ah_reserve;                                  
+	u_int32_t       ah_spi;                                       
+	                               	                         
 };
 
 struct newah {
-	u_int8_t        ah_nxt;         /* Next Header */
-	u_int8_t        ah_len;         /* Length of data + 1, in 32bit */
-	u_int16_t       ah_reserve;     /* Reserved for future use */
-	u_int32_t       ah_spi;         /* Security parameter index */
-	u_int32_t       ah_seq;         /* Sequence number field */
-	/* variable size, 32bit bound*/	/* Authentication data */
+	u_int8_t        ah_nxt;                          
+	u_int8_t        ah_len;                                           
+	u_int16_t       ah_reserve;                                  
+	u_int32_t       ah_spi;                                       
+	u_int32_t       ah_seq;                                    
+	                               	                         
 };
 
 #ifdef BSD_KERNEL_PRIVATE
@@ -60,25 +60,25 @@ struct secasvar;
 
 struct ah_algorithm_state {
 	struct secasvar *sav;
-	void* foo;      /*per algorithm data - maybe*/
+	void* foo;                                    
 };
 
 struct ah_algorithm {
 	int (*sumsiz)(struct secasvar *);
 	int (*mature)(struct secasvar *);
-	u_int16_t keymin;     /* in bits */
-	u_int16_t keymax;     /* in bits */
+	u_int16_t keymin;                  
+	u_int16_t keymax;                  
 	const char *name;
 	int (*init)(struct ah_algorithm_state *, struct secasvar *);
 	void (*update)(struct ah_algorithm_state *, caddr_t, size_t);
 	void (*result)(struct ah_algorithm_state *, caddr_t, size_t);
 };
 
-#define AH_MAXSUMSIZE   64 // sha2-512's output size
+#define AH_MAXSUMSIZE   64                          
 
 extern const struct ah_algorithm *ah_algorithm_lookup(int);
 
-/* cksum routines */
+                    
 extern size_t ah_hdrlen(struct secasvar *);
 
 extern size_t ah_hdrsiz(struct ipsecrequest *);
@@ -86,6 +86,6 @@ extern void ah4_input(struct mbuf *, int);
 extern int ah4_output(struct mbuf *, struct secasvar *);
 extern int ah4_calccksum(struct mbuf *, caddr_t, size_t,
     const struct ah_algorithm *, struct secasvar *);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _NETINET6_AH_H_ */
+#endif                      

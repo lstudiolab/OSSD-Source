@@ -90,10 +90,10 @@
 #error unsupported architecture
 #endif
 
-/* There is another definition of ALIGN for .c sources */
+                                                         
 #ifdef __ASSEMBLER__
 #define ALIGN 4,0x90
-#endif /* __ASSEMBLER__ */
+#endif                    
 
 #ifndef FALIGN
 #define FALIGN ALIGN
@@ -113,20 +113,20 @@
 #define LBc(x,n) n ## :
 #define LBb(x,n) n ## b
 #define LBf(x,n) n ## f
-#else /* __STDC__ */
+#else               
 #ifndef __NO_UNDERSCORES__
-#define LCL(x) L/**/x
-#define EXT(x) _/**/x
-#define LEXT(x) _/**/x/**/:
-#else /* __NO_UNDERSCORES__ */
-#define	LCL(x)	.L/**/x
+#define LCL(x) L    x
+#define EXT(x) _    x
+#define LEXT(x) _    x    :
+#else                         
+#define	LCL(x)	.L    x
 #define EXT(x) x
-#define LEXT(x) x/**/:
-#endif /* __NO_UNDERSCORES__ */
-#define LBc(x,n) n/**/:
-#define LBb(x,n) n/**/b
-#define LBf(x,n) n/**/f
-#endif /* __STDC__ */
+#define LEXT(x) x    :
+#endif                         
+#define LBc(x,n) n    :
+#define LBb(x,n) n    b
+#define LBf(x,n) n    f
+#endif               
 
 #define SVC .byte 0x9a; .long 0; .word 0x7
 
@@ -158,7 +158,7 @@
 			Egaddr(%eax,_mcount_ptr);\
 			Gpop;\
 			call *(%eax);
-#endif /* __SHARED__ */
+#endif                 
 
 #ifdef __ELF__
 #define ELF_FUNC(x)	.type x,@function
@@ -180,7 +180,7 @@
 #define	ASENTRY(x) 	.globl x; .align FALIGN; x ## : ELF_FUNC(x) MCOUNT
 #else
 #define	ASENTRY(x) 	.globl x; .align FALIGN; x: ELF_FUNC(x) MCOUNT
-#endif /* __STDC__ */
+#endif               
 
 #define	DATA(x)		.globl EXT(x); ELF_DATA(EXT(x)); .align ALIGN; LEXT(x)
 
@@ -189,21 +189,21 @@
 #define ENDDATA(x)	END(x)
 #define Enddata(x)	End(x)
 
-/*
- * ELF shared library accessor macros.
- * Gpush saves the %ebx register used for the GOT address
- * Gpop pops %ebx if we need a GOT
- * Gload loads %ebx with the GOT address if shared libraries are used
- * Gcall calls an external function.
- * Gotoff allows you to reference local labels.
- * Gotoff2 allows you to reference local labels with an index reg.
- * Gotoff3 allows you to reference local labels with an index reg & size.
- * Gaddr loads up a register with an address of an external item.
- * Gstack is the number of bytes that Gpush pushes on the stack.
- *
- * Varients of the above with E or L prefixes do EXT(name) or LCL(name)
- * respectively.
- */
+  
+                                      
+                                                         
+                                  
+                                                                     
+                                    
+                                               
+                                                                  
+                                                                         
+                                                                 
+                                                                
+  
+                                                                       
+                
+   
 
 #ifndef __SHARED__
 #define Gpush
@@ -220,7 +220,7 @@
 #define Gstack			0
 
 #else
-#ifdef __ELF__			/* ELF shared libraries */
+#ifdef __ELF__			                          
 #define Gpush			pushl %ebx
 #define Gpop			popl %ebx
 #define Gload			call 9f; 9: popl %ebx; addl $_GLOBAL_OFFSET_TABLE_+[.-9b],%ebx
@@ -234,7 +234,7 @@
 #define Gmemstore(reg,lab,tmp)	movl lab@GOT(%ebx),tmp; movl reg,(tmp)
 #define Gstack			4
 
-#else				/* ROSE shared libraries */
+#else				                           
 #define Gpush
 #define Gpop
 #define Gload
@@ -247,11 +247,11 @@
 #define Gmemload(lab,reg)	movl 9f,reg; movl (reg),reg; .data; .align ALIGN; 9: .long lab; .text
 #define Gmemstore(reg,lab,tmp)	movl 9f,tmp; movl reg,(tmp); .data; .align ALIGN; 9: .long lab; .text
 #define Gstack			0
-#endif	/* __ELF__ */
-#endif	/* __SHARED__ */
+#endif	             
+#endif	                
 
-/* Egotoff is not provided, since external symbols should not use @GOTOFF
-   relocations.  */
+                                                                         
+                   
 #define Egcall(func)		Gcall(EXT(func))
 #define Egaddr(to,lab)		Gaddr(to,EXT(lab))
 #define Egcmp(lab,reg)		Gcmp(EXT(lab),reg)
@@ -266,28 +266,28 @@
 #define Lgmemstore(reg,lab,tmp)	movl reg,Lgotoff(lab)
 
 #ifndef __ASSEMBLER__
-/* These defines are here for .c files that wish to reference global symbols
- * within __asm__ statements. 
- */
+                                                                            
+                              
+   
 #ifndef __NO_UNDERSCORES__
 #define CC_SYM_PREFIX "_"
 #else
 #define CC_SYM_PREFIX ""
-#endif /* __NO_UNDERSCORES__ */
-#endif /* __ASSEMBLER__ */
+#endif                         
+#endif                    
 
-/*
- * The following macros make calls into C code.
- * They dynamically align the stack to 16 bytes.
- */
+  
+                                               
+                                                
+   
 #if defined(__i386__)
-/*
- * Arguments are moved (not pushed) onto the correctly aligned stack.
- * NOTE: ESI is destroyed in the process, and hence cannot
- * be directly used as a parameter. Users of this macro must
- * independently preserve ESI (a non-volatile) if the routine is
- * intended to be called from C, for instance.
- */
+  
+                                                                     
+                                                          
+                                                            
+                                                                
+                                              
+   
 
 #define CCALL(fn)			\
 	movl	%esp, %esi		;\
@@ -312,7 +312,7 @@
 	call	EXT(fn)			;\
 	movl	%esi, %esp
 
-/* This variant exists to permit adjustment of the stack by "dtrace" */
+                                                                       
 #define CCALL1WITHSP(fn, arg1)		\
 	movl	%esp, %esi		;\
 	subl	$12, %esp		;\
@@ -324,10 +324,10 @@
 	call	EXT(fn)			;\
 	movl	8(%esp), %esp
 
-/*
- * CCALL5 is used for callee functions with 3 arguments but
- * where arg2 (a3:a2) and arg3 (a5:a4) are 64-bit values.
- */
+  
+                                                           
+                                                         
+   
 #define CCALL5(fn, a1, a2, a3, a4, a5)	\
 	movl	%esp, %esi		;\
 	subl	$20, %esp		;\
@@ -342,7 +342,7 @@
 
 #elif defined(__x86_64__)
 
-/* This variant exists to permit adjustment of the stack by "dtrace" */
+                                                                       
 #define CCALLWITHSP(fn)				 \
 	mov	%rsp, %r12			;\
 	sub	$8, %rsp			;\
@@ -377,4 +377,4 @@
 #error unsupported architecture
 #endif
 
-#endif /* _I386_ASM_H_ */
+#endif                   

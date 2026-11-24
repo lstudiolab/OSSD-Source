@@ -112,7 +112,7 @@ net_str_id_find_internal(const char *string, u_int32_t *out_id,
 
 	*out_id = 0;
 
-	/* Look for an existing entry */
+	                                
 	lck_mtx_lock(net_str_id_lock);
 	SLIST_FOREACH(entry, &net_str_id_list, nsi_next) {
 		if (strcmp(string, entry->nsi_string) == 0) {
@@ -160,7 +160,7 @@ net_str_id_find_internal(const char *string, u_int32_t *out_id,
 	((a) > 0 ? (1 + (((a) - 1) | (sizeof(uint32_t) - 1))) : sizeof(uint32_t))
 
 int
-sysctl_if_family_ids SYSCTL_HANDLER_ARGS /* XXX bad syntax! */
+sysctl_if_family_ids SYSCTL_HANDLER_ARGS                      
 {
 #pragma unused(oidp)
 #pragma unused(arg1)
@@ -183,7 +183,7 @@ sysctl_if_family_ids SYSCTL_HANDLER_ARGS /* XXX bad syntax! */
 		if (str_size > NET_ID_STR_MAX_LEN) {
 			str_size = NET_ID_STR_MAX_LEN;
 		}
-		str_size += 1; // make room for end-of-string
+		str_size += 1;                               
 		iffmid_size = ROUNDUP32(offsetof(struct net_str_id_entry, nsi_string) + str_size);
 
 		if (iffmid_size > max_size) {

@@ -33,7 +33,7 @@
 #include <mach/machine/vm_types.h>
 #include <i386/pmap.h>
 
-/* data required for JTAG extraction of coredump */
+                                                   
 typedef struct _kdp_jtag_coredump_t {
 	uint64_t signature;
 	uint64_t version;
@@ -46,13 +46,13 @@ typedef struct _kdp_jtag_coredump_t {
 	uint64_t physmap_base;
 } kdp_jtag_coredump_t;
 
-/* signature used to verify kdp_jtag_coredump_t structure */
+                                                            
 #define KDP_JTAG_COREDUMP_SIGNATURE     0x434f524544554d50
 
-/* version of kdp_jtag_coredump_t structure */
+                                              
 #define KDP_JTAG_COREDUMP_VERSION_1     1
 
 void kdp_map_debug_pagetable_window(void);
 void kdp_jtag_coredump_init(void);
 
-#endif /* _KDP_X86_COMMON_H_ */
+#endif                         

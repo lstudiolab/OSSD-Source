@@ -86,9 +86,9 @@
 #include <i386/fpu.h>
 #include <i386/misc_protos.h>
 
-/*
- *	pmap_zero_page zeros the specified (machine independent) page.
- */
+  
+                                                                 
+   
 void
 pmap_zero_page(
 	ppnum_t pn)
@@ -98,10 +98,10 @@ pmap_zero_page(
 	bzero_phys((addr64_t)i386_ptob(pn), PAGE_SIZE);
 }
 
-/*
- *	pmap_zero_part_page
- *	zeros the specified (machine independent) part of a page.
- */
+  
+                      
+                                                            
+   
 void
 pmap_zero_part_page(
 	ppnum_t         pn,
@@ -114,9 +114,9 @@ pmap_zero_part_page(
 	bzero_phys((addr64_t)(i386_ptob(pn) + offset), (uint32_t)len);
 }
 
-/*
- *	pmap_copy_page copies the specified (machine independent) pages.
- */
+  
+                                                                   
+   
 void
 pmap_copy_part_page(
 	ppnum_t         psrc,
@@ -143,10 +143,10 @@ pmap_copy_part_page(
 	    len);
 }
 
-/*
- *      pmap_copy_part_lpage copies part of a virtually addressed page
- *      to a physically addressed page.
- */
+  
+                                                                      
+                                       
+   
 void
 pmap_copy_part_lpage(
 	__unused vm_offset_t    src,
@@ -159,10 +159,10 @@ pmap_copy_part_lpage(
 	assert((dst_offset + len) <= PAGE_SIZE);
 }
 
-/*
- *      pmap_copy_part_rpage copies part of a physically addressed page
- *      to a virtually addressed page.
- */
+  
+                                                                       
+                                      
+   
 void
 pmap_copy_part_rpage(
 	__unused ppnum_t                psrc,
@@ -175,11 +175,11 @@ pmap_copy_part_rpage(
 	assert((src_offset + len) <= PAGE_SIZE);
 }
 
-/*
- *	kvtophys(addr)
- *
- *	Convert a kernel virtual address to a physical address
- */
+  
+                 
+  
+                                                         
+   
 addr64_t
 kvtophys(
 	vm_offset_t addr)
@@ -210,9 +210,9 @@ ml_copy_phys(addr64_t src64, addr64_t dst64, vm_size_t bytes)
 	mp_disable_preemption();
 	addr64_t debug_pa = 0;
 
-	/* If either destination or source are outside the
-	 * physical map, establish a physical window onto the target frame.
-	 */
+	                                                  
+                                                                    
+    
 	assert(physmap_enclosed(src64) || physmap_enclosed(dst64));
 
 	if (physmap_enclosed(src64) == FALSE) {
@@ -227,33 +227,33 @@ ml_copy_phys(addr64_t src64, addr64_t dst64, vm_size_t bytes)
 		src = PHYSMAP_PTOV(src64);
 		dst = PHYSMAP_PTOV(dst64);
 	}
-	/* DRK: debugger only routine, we don't bother checking for an
-	 * identical mapping.
-	 */
+	                                                              
+                      
+    
 	if (debug_pa) {
 		if (debugger_window_kva == 0) {
 			panic("%s: invoked in non-debug mode", __FUNCTION__);
 		}
-		/* Establish a cache-inhibited physical window; some platforms
-		 * may not cover arbitrary ranges with MTRRs
-		 */
+		                                                              
+                                              
+     
 		pmap_store_pte(debugger_ptep, debug_pa | INTEL_PTE_NCACHE | INTEL_PTE_RW | INTEL_PTE_REF | INTEL_PTE_MOD | INTEL_PTE_VALID);
 		pmap_tlbi_range(0, ~0ULL, true, 0);
 #if     DEBUG
 		kprintf("Remapping debugger physical window at %p to 0x%llx\n", (void *)debugger_window_kva, debug_pa);
 #endif
 	}
-	/* ensure we stay within a page */
+	                                  
 	if (((((uint32_t)src64 & (I386_PGBYTES - 1)) + bytes) > I386_PGBYTES) || ((((uint32_t)dst64 & (I386_PGBYTES - 1)) + bytes) > I386_PGBYTES)) {
 		panic("ml_copy_phys spans pages, src: 0x%llx, dst: 0x%llx", src64, dst64);
 	}
 
-	/*
-	 * For device register access from the debugger,
-	 * 2-byte/16-bit, 4-byte/32-bit and 8-byte/64-bit copies are handled
-	 * by assembly routines ensuring the required access widths.
-	 * 1-byte and other copies are handled by the regular _bcopy.
-	 */
+	  
+                                                 
+                                                                     
+                                                             
+                                                              
+    
 	switch (bytes) {
 	case 2:
 		err = _bcopy2(src, dst);

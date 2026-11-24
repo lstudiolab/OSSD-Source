@@ -31,7 +31,7 @@
 #include <i386/lapic.h>
 #include <i386/mp.h>
 #include <i386/proc_reg.h>
-#include <kern/assert.h> /* static_assert, assert */
+#include <kern/assert.h>                            
 #include <kern/monotonic.h>
 #include <os/overflow.h>
 #include <sys/errno.h>
@@ -39,28 +39,28 @@
 #include <x86_64/monotonic.h>
 #include <kern/kpc.h>
 
-/*
- * Sanity check the compiler.
- */
+  
+                             
+   
 
 #ifndef __has_builtin
 #define __has_builtin(x) 0
-#endif /* !defined(__has_builtin) */
+#endif                              
 #if !__has_builtin(__builtin_ia32_rdpmc)
 #error requires __builtin_ia32_rdpmc builtin
-#endif /* !__has_builtin(__builtin_ia32_rdpmc) */
+#endif                                           
 
 #pragma mark core counters
 
 bool mt_core_supported = false;
 
-/*
- * PMC[0-2]_{RD,WR} allow reading and writing the fixed PMCs.
- *
- * There are separate defines for access type because the read side goes through
- * the rdpmc instruction, which has a different counter encoding than the msr
- * path.
- */
+  
+                                                             
+  
+                                                                                
+                                                                             
+        
+   
 #define PMC_FIXED_RD(CTR) ((UINT64_C(1) << 30) | (CTR))
 #define PMC_FIXED_WR(CTR) (MSR_IA32_PERF_FIXED_CTR0 + (CTR))
 #define PMC0_RD PMC_FIXED_RD(0)
@@ -119,39 +119,39 @@ mt_core_set_snap(unsigned int ctr, uint64_t count)
 	}
 }
 
-/*
- * FIXED_CTR_CTRL controls which rings fixed counters are enabled in and if they
- * deliver PMIs.
- *
- * Each fixed counters has 4 bits: [0:1] controls which ring it's enabled in,
- * [2] counts all hardware threads in each logical core (we don't want this),
- * and [3] enables PMIs on overflow.
- */
+  
+                                                                                
+                
+  
+                                                                             
+                                                                             
+                                    
+   
 
 #define FIXED_CTR_CTRL 0x38d
 
-/*
- * Fixed counters are enabled in all rings, so hard-code this register state to
- * enable in all rings and deliver PMIs.
- */
+  
+                                                                               
+                                        
+   
 #define FIXED_CTR_CTRL_INIT (0x888)
 #define FIXED_CTR_CTRL_ENABLE (0x333)
 
-/*
- * GLOBAL_CTRL controls which counters are enabled -- the high 32-bits control
- * the fixed counters and the lower half is for the configurable counters.
- */
+  
+                                                                              
+                                                                          
+   
 
 #define GLOBAL_CTRL 0x38f
 
-/*
- * Fixed counters are always enabled -- and there are three of them.
- */
+  
+                                                                    
+   
 #define GLOBAL_CTRL_FIXED_EN (((UINT64_C(1) << 3) - 1) << 32)
 
-/*
- * GLOBAL_STATUS reports the state of counters, like those that have overflowed.
- */
+  
+                                                                                
+   
 #define GLOBAL_STATUS 0x38e
 
 #define CTR_MAX ((UINT64_C(1) << 48) - 1)
@@ -255,7 +255,7 @@ mt_check_for_pmi(struct mt_cpu *mtc, x86_saved_state_t *state)
 		if (status & CTR_FIX_POS(i)) {
 			uint64_t prior = CTR_MAX - mtc->mtc_snaps[i];
 			assert(prior <= CTR_MAX);
-			prior += 1; /* wrapped */
+			prior += 1;              
 
 			uint64_t delta = mt_mtc_update_count(mtc, i);
 			mtc->mtc_counts[i] += delta;
@@ -279,7 +279,7 @@ mt_check_for_pmi(struct mt_cpu *mtc, x86_saved_state_t *state)
 		}
 	}
 
-	/* if any of the configurable counters overflowed, tell kpc */
+	                                                              
 	if (status & ((UINT64_C(1) << 4) - 1)) {
 		extern void kpc_pmi_handler(void);
 		kpc_pmi_handler();

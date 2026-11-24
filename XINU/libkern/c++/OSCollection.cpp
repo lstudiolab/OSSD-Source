@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOArray.h created by rsulack on Thu 11-Sep-1997 */
+                                                     
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -95,10 +95,10 @@ OSCollection::copyCollection(OSDictionary *cycleDict)
 
 		return OSSharedPtr<OSCollection>(reinterpret_cast<OSCollection *>(obj), OSRetain);
 	} else {
-		// If we are here it means that there is a collection subclass that
-		// hasn't overridden the copyCollection method.  In which case just
-		// return a reference to ourselves.
-		// Hopefully this collection will not be inserted into the registry
+		                                                                   
+		                                                                   
+		                                   
+		                                                                   
 		return OSSharedPtr<OSCollection>(this, OSRetain);
 	}
 }

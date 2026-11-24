@@ -196,7 +196,7 @@ IODMAEventSource::setFrameSize(UInt8 byteCount)
 	return dmaController->setFrameSize(dmaIndex, byteCount);
 }
 
-// protected
+            
 
 bool
 IODMAEventSource::checkForWork(void)

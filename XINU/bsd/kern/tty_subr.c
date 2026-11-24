@@ -54,10 +54,10 @@
  *
  */
 
-/*
- * We use the NetBSD based clist system, it is much more efficient than the
- * old style clist stuff used by free bsd.
- */
+  
+                                                                           
+                                          
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -66,19 +66,19 @@
 #include <sys/malloc.h>
 
 
-/*
- * At compile time, choose:
- * There are two ways the TTY_QUOTE bit can be stored. If QBITS is
- * defined we allocate an array of bits -- 1/8th as much memory but
- * setbit(), clrbit(), and isset() take more cpu. If QBITS is
- * undefined, we just use an array of bytes.
- *
- * If TTY_QUOTE functionality isn't required by a line discipline,
- * it can free c_cq and set it to NULL. This speeds things up,
- * and also does not use any extra memory. This is useful for (say)
- * a SLIP line discipline that wants a 32K ring buffer for data
- * but doesn't need quoting.
- */
+  
+                           
+                                                                  
+                                                                   
+                                                             
+                                            
+  
+                                                                  
+                                                              
+                                                                   
+                                                               
+                            
+   
 #define QBITS
 
 #ifdef QBITS
@@ -88,18 +88,18 @@
 #endif
 
 
-/*
- * Initialize clists.
- */
+  
+                     
+   
 void
 cinit(void)
 {
 }
 
-/*
- * Initialize a particular clist. Ok, they are really ring buffers,
- * of the specified length, with/without quoting support.
- */
+  
+                                                                   
+                                                         
+   
 int
 clalloc(struct clist *clp, int size, int quot)
 {
@@ -139,9 +139,9 @@ clfree(struct clist *clp)
 }
 
 
-/*
- * Get a character from a clist.
- */
+  
+                                
+   
 int
 getc(struct clist *clp)
 {
@@ -173,17 +173,17 @@ out:
 	return c;
 }
 
-/*
- * Copy clist to buffer.
- * Return number of bytes moved.
- */
+  
+                        
+                                
+   
 int
 q_to_b(struct clist *clp, u_char *cp, int count)
 {
 	size_t cc;
 	u_char *p = cp;
 
-	/* optimize this while loop */
+	                              
 	while (count > 0 && clp->c_cc > 0) {
 		cc = clp->c_cl - clp->c_cf;
 		if (clp->c_cf >= clp->c_cl) {
@@ -207,10 +207,10 @@ q_to_b(struct clist *clp, u_char *cp, int count)
 	return (int)MIN(INT32_MAX, p - cp);
 }
 
-/*
- * Return count of contiguous characters in clist.
- * Stop counting if flag&character is non-null.
- */
+  
+                                                  
+                                               
+   
 int
 ndqb(struct clist *clp, int flag)
 {
@@ -257,9 +257,9 @@ out:
 	return (int)count;
 }
 
-/*
- * Flush count bytes from clist.
- */
+  
+                                
+   
 void
 ndflush(struct clist *clp, int count)
 {
@@ -270,7 +270,7 @@ ndflush(struct clist *clp, int count)
 		clp->c_cf = clp->c_cl = (u_char *)0;
 		return;
 	}
-	/* optimize this while loop */
+	                              
 	while (count > 0 && clp->c_cc > 0) {
 		cc = clp->c_cl - clp->c_cf;
 		if (clp->c_cf >= clp->c_cl) {
@@ -291,9 +291,9 @@ ndflush(struct clist *clp, int count)
 	}
 }
 
-/*
- * Put a character into the output queue.
- */
+  
+                                         
+   
 int
 putc(int c, struct clist *clp)
 {
@@ -302,7 +302,7 @@ putc(int c, struct clist *clp)
 	if (clp->c_cc == 0) {
 		if (!clp->c_cs) {
 #if DIAGNOSTIC
-			//printf("putc: required clalloc\n");
+			                                     
 #endif
 			if (clalloc(clp, 1024, 1)) {
 				return -1;
@@ -341,12 +341,12 @@ putc(int c, struct clist *clp)
 }
 
 #ifdef QBITS
-/*
- * optimized version of
- *
- * for (i = 0; i < len; i++)
- *	clrbit(cp, off + len);
- */
+  
+                       
+  
+                            
+                         
+   
 void
 clrbits(u_char *cp, int off, int len)
 {
@@ -371,7 +371,7 @@ clrbits(u_char *cp, int off, int len)
 		cp[sby++] &= mask;
 
 		mask = (u_char)((1 << ebi) - 1);
-		/* handle remainder bits, if any, for a non-0 ebi value */
+		                                                          
 		if (mask) {
 			cp[eby] &= ~mask;
 		}
@@ -383,10 +383,10 @@ clrbits(u_char *cp, int off, int len)
 }
 #endif
 
-/*
- * Copy buffer to clist.
- * Return number of bytes not transfered.
- */
+  
+                        
+                                         
+   
 int
 b_to_q(const u_char *cp, int count, struct clist *clp)
 {
@@ -414,7 +414,7 @@ b_to_q(const u_char *cp, int count, struct clist *clp)
 		goto out;
 	}
 
-	/* optimize this while loop */
+	                              
 	while (count > 0 && clp->c_cc < clp->c_cn) {
 		cc = clp->c_ce - clp->c_cl;
 		if (clp->c_cf > clp->c_cl) {
@@ -449,21 +449,21 @@ out:
 
 static int cc;
 
-/*
- * Given a non-NULL pointer into the clist return the pointer
- * to the next character in the list or return NULL if no more chars.
- *
- * Callers must not allow getc's to happen between firstc's and getc's
- * so that the pointer becomes invalid.  Note that interrupts are NOT
- * masked.
- */
+  
+                                                             
+                                                                     
+  
+                                                                      
+                                                                     
+          
+   
 u_char *
 nextc(struct clist *clp, u_char *cp, int *c)
 {
 	if (clp->c_cf == cp) {
-		/*
-		 * First time initialization.
-		 */
+		  
+                               
+     
 		cc = clp->c_cc;
 	}
 	if (cc == 0 || cp == NULL) {
@@ -490,16 +490,16 @@ nextc(struct clist *clp, u_char *cp, int *c)
 	return cp;
 }
 
-/*
- * Given a non-NULL pointer into the clist return the pointer
- * to the first character in the list or return NULL if no more chars.
- *
- * Callers must not allow getc's to happen between firstc's and getc's
- * so that the pointer becomes invalid.  Note that interrupts are NOT
- * masked.
- *
- * *c is set to the NEXT character
- */
+  
+                                                             
+                                                                      
+  
+                                                                      
+                                                                     
+          
+  
+                                  
+   
 u_char *
 firstc(struct clist *clp, int *c)
 {
@@ -525,9 +525,9 @@ firstc(struct clist *clp, int *c)
 	return clp->c_cf;
 }
 
-/*
- * Remove the last character in the clist and return it.
- */
+  
+                                                        
+   
 int
 unputc(struct clist *clp)
 {
@@ -563,9 +563,9 @@ out:
 	return c;
 }
 
-/*
- * Put the chars in the from queue on the end of the to queue.
- */
+  
+                                                              
+   
 void
 catq(struct clist *from, struct clist *to)
 {

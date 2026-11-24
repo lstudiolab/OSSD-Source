@@ -37,4 +37,4 @@
 #ifndef _MACH_MK_TRAPS_H_
 #define _MACH_MK_TRAPS_H_
 
-#endif /* _MACH_MK_TRAPS_H_ */
+#endif                        

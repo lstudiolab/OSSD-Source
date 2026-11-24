@@ -29,47 +29,47 @@
 #ifndef __MUNGE_H__
 #define __MUNGE_H__
 
-/*
- * Syscall argument mungers.
- *
- * The data to be munged has been explicitly copied in to the argument
- * area, and will be munged in place in the uu_arg[] array. These
- * mungers are for 32-bit app's syscalls, since 64-bit args are copied
- * from the save area to the uu_args in the order the
- * syscall ABI calls for.
- *
- * The issue is that the incoming args are 32-bit, but we must expand
- * them in place into 64-bit args, as if they were from a 64-bit process.
- *
- * There are several functions in this file with the following prototype
- *
- *	void	munge_XXXX(void *uu_args);
- *
- * The name of the function encodes the number and type of the parameters,
- * as follows:
- *
- *	w = a 32-bit value such as an int or a 32-bit ptr, that does not
- *	    require sign extension.  These are handled by zeroing a word
- *          of output, and copying a word from input to output.
- *
- *	s = a 32-bit value such as a long, which must be sign-extended to
- *	    a 64-bit long-long in the uu_args.  These are handled by
- *	    loading a word of input and sign extending it to a double,
- *          and storing two words of output.
- *
- *	l = a 64-bit long-long.  These are handled by copying two words
- *          of input to the output.
- *
- * For example, "munge_wls" takes a word, a long-long, and a word.  This
- * takes four words in the uu_arg[] area: the first word is in one, the
- * long-long takes two, and the final word is in the fourth.  We store six
- * words: the low word is left in place, followed by a 0, followed by the
- * two words of the long-long, followed by the low word and the sign extended
- * high word of the preceeding low word.
- *
- * Because this is an in-place modification, we actually start at the end
- * of uu_arg[] and work our way back to the beginning of the array.
- */
+  
+                            
+  
+                                                                      
+                                                                 
+                                                                      
+                                                     
+                         
+  
+                                                                     
+                                                                         
+  
+                                                                        
+  
+                                  
+  
+                                                                          
+              
+  
+                                                                   
+                                                                   
+                                                               
+  
+                                                                    
+                                                               
+                                                                 
+                                            
+  
+                                                                  
+                                   
+  
+                                                                        
+                                                                       
+                                                                          
+                                                                         
+                                                                             
+                                        
+  
+                                                                         
+                                                                   
+   
 
 #if __arm__ && (__BIGGEST_ALIGNMENT__ > 4)
 int munge_w(const void *regs, void *args);
@@ -178,5 +178,5 @@ void munge_lwwwwwww(void *args);
 void munge_wwlww(void *args);
 void munge_wwlwww(void *args);
 void munge_wwlwwwl(void *args);
-#endif /* __arm__ && (__BIGGEST_ALIGNMENT__ > 4) */
-#endif /* __MUNGE_H__ */
+#endif                                             
+#endif                  

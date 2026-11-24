@@ -72,7 +72,7 @@
 #include <sys/appleapiopts.h>
 #include <sys/cdefs.h>
 #include <sys/termios.h>
-#include <sys/select.h>         /* For struct selinfo. */
+#include <sys/select.h>                                  
 
 
 #ifdef KERNEL
@@ -81,69 +81,69 @@ __BEGIN_DECLS
 #include <kern/locks.h>
 __END_DECLS
 
-/*
- * NetBSD Clists are actually ring buffers. The c_cc, c_cf, c_cl fields have
- * exactly the same behaviour as in true clists.
- * if c_cq is NULL, the ring buffer has no TTY_QUOTE functionality
- * (but, saves memory and cpu time)
- *
- * *DON'T* play with c_cs, c_ce, c_cq, or c_cl outside tty_subr.c!!!
- */
+  
+                                                                            
+                                                
+                                                                  
+                                   
+  
+                                                                    
+   
 struct clist {
-	int     c_cc;           /* count of characters in queue */
-	int     c_cn;           /* total ring buffer length */
-	u_char  *c_cf;          /* points to first character */
-	u_char  *c_cl;          /* points to next open character */
-	u_char  *c_cs;          /* start of ring buffer */
-	u_char  *c_ce;          /* c_ce + c_len */
-	u_char  *c_cq;          /* N bits/bytes long, see tty_subr.c */
+	int     c_cc;                                             
+	int     c_cn;                                         
+	u_char  *c_cf;                                         
+	u_char  *c_cl;                                             
+	u_char  *c_cs;                                    
+	u_char  *c_ce;                            
+	u_char  *c_cq;                                                 
 };
 
 #ifndef TTYCLSIZE
 #define TTYCLSIZE 1024
 #endif
 
-/*
- * Per-tty structure.
- *
- * Should be split in two, into device and tty drivers.
- * Glue could be masks of what to echo and circular buffer
- * (low, high, timeout).
- */
+  
+                     
+  
+                                                       
+                                                          
+                        
+   
 struct tty {
-	lck_mtx_t       t_lock;         /* Per tty lock */
+	lck_mtx_t       t_lock;                           
 
-	struct  clist t_rawq;           /* Device raw input queue. */
-	long    t_rawcc;                /* Raw input queue statistics. */
-	struct  clist t_canq;           /* Device canonical queue. */
-	long    t_cancc;                /* Canonical queue statistics. */
-	struct  clist t_outq;           /* Device output queue. */
-	long    t_outcc;                /* Output queue statistics. */
-	int     t_line;                 /* Interface to device drivers. */
-	dev_t   t_dev;                  /* Device. */
-	int     t_state;                /* Device and driver (TS*) state. */
-	int     t_flags;                /* Tty flags. */
-	int     t_timeout;              /* Timeout for ttywait() */
-	struct  pgrp *t_pgrp;           /* Foreground process group. */
-	struct  session *t_session;     /* Enclosing session. */
-	struct  selinfo t_rsel;         /* Tty read/oob select. */
-	struct  selinfo t_wsel;         /* Tty write select. */
-	struct  termios t_termios;      /* Termios state. */
-	struct  winsize t_winsize;      /* Window size. */
-	                                /* Start output. */
+	struct  clist t_rawq;                                        
+	long    t_rawcc;                                                 
+	struct  clist t_canq;                                        
+	long    t_cancc;                                                 
+	struct  clist t_outq;                                     
+	long    t_outcc;                                              
+	int     t_line;                                                   
+	dev_t   t_dev;                               
+	int     t_state;                                                    
+	int     t_flags;                                
+	int     t_timeout;                                         
+	struct  pgrp *t_pgrp;                                          
+	struct  session *t_session;                             
+	struct  selinfo t_rsel;                                   
+	struct  selinfo t_wsel;                                
+	struct  termios t_termios;                          
+	struct  winsize t_winsize;                        
+	                                                   
 	void    (*t_oproc)(struct tty *);
-	/* Stop output. */
+	                  
 	void    (*t_stop)(struct tty *, int);
-	/* Set hardware state. */
+	                         
 	int     (*t_param)(struct tty *, struct termios *);
-	void    *t_sc;                  /* XXX: net/if_sl.c:sl_softc. */
-	int     t_column;               /* Tty output column. */
-	int     t_rocount, t_rocol;     /* Tty. */
-	int     t_hiwat;                /* High water mark. */
-	int     t_lowat;                /* Low water mark. */
-	int     t_gen;                  /* Generation number. */
-	void    *t_iokit;               /* IOKit management */
-	int     t_refcnt;               /* reference count */
+	void    *t_sc;                                                  
+	int     t_column;                                       
+	int     t_rocount, t_rocol;               
+	int     t_hiwat;                                      
+	int     t_lowat;                                     
+	int     t_gen;                                          
+	void    *t_iokit;                                     
+	int     t_refcnt;                                    
 };
 
 #define TTY_NULL (struct tty *)NULL
@@ -159,15 +159,15 @@ struct tty {
 #define t_time          t_termios.c_time
 
 
-#define TTIPRI  25                      /* Sleep priority for tty reads. */
-#define TTOPRI  26                      /* Sleep priority for tty writes. */
+#define TTIPRI  25                                                         
+#define TTOPRI  26                                                          
 
-/*
- * User data unfortunately has to be copied through buffers on the way to
- * and from clists.  The buffers are on the stack so their sizes must be
- * fairly small.
- */
-#define IBUFSIZ 384                     /* Should be >= max value of MIN. */
+  
+                                                                         
+                                                                        
+                
+   
+#define IBUFSIZ 384                                                         
 #define OBUFSIZ 100
 
 #ifndef TTYHOG
@@ -181,50 +181,50 @@ struct tty {
 #else
 struct tty;
 struct clist;
-#endif /* KERNEL */
+#endif             
 
-/* These flags are kept in t_state. */
-#define TS_SO_OLOWAT    0x00001         /* Wake up when output <= low water. */
-#define TS_ASYNC        0x00002         /* Tty in async I/O mode. */
-#define TS_BUSY         0x00004         /* Draining output. */
-#define TS_CARR_ON      0x00008         /* Carrier is present. */
-#define TS_FLUSH        0x00010         /* Outq has been flushed during DMA. */
-#define TS_ISOPEN       0x00020         /* Open has completed. */
-#define TS_TBLOCK       0x00040         /* Further input blocked. */
-#define TS_TIMEOUT      0x00080         /* Wait for output char processing. */
-#define TS_TTSTOP       0x00100         /* Output paused. */
+                                      
+#define TS_SO_OLOWAT    0x00001                                                
+#define TS_ASYNC        0x00002                                     
+#define TS_BUSY         0x00004                               
+#define TS_CARR_ON      0x00008                                  
+#define TS_FLUSH        0x00010                                                
+#define TS_ISOPEN       0x00020                                  
+#define TS_TBLOCK       0x00040                                     
+#define TS_TIMEOUT      0x00080                                               
+#define TS_TTSTOP       0x00100                             
 #ifdef notyet
-#define TS_WOPEN        0x00200         /* Open in progress. */
+#define TS_WOPEN        0x00200                                
 #endif
-#define TS_XCLUDE       0x00400         /* Tty requires exclusivity. */
+#define TS_XCLUDE       0x00400                                        
 
-/* State for intra-line fancy editing work. */
-#define TS_BKSL         0x00800         /* State for lowercase \ work. */
-#define TS_CNTTB        0x01000         /* Counting tab width, ignore FLUSHO. */
-#define TS_ERASE        0x02000         /* Within a \.../ for PRTRUB. */
-#define TS_LNCH         0x04000         /* Next character is literal. */
-#define TS_TYPEN        0x08000         /* Retyping suspended input (PENDIN). */
+                                              
+#define TS_BKSL         0x00800                                          
+#define TS_CNTTB        0x01000                                                 
+#define TS_ERASE        0x02000                                         
+#define TS_LNCH         0x04000                                         
+#define TS_TYPEN        0x08000                                                 
 #define TS_LOCAL        (TS_BKSL | TS_CNTTB | TS_ERASE | TS_LNCH | TS_TYPEN)
 
-/* Extras. */
-#define TS_CAN_BYPASS_L_RINT 0x010000   /* Device in "raw" mode. */
-#define TS_CONNECTED    0x020000        /* Connection open. */
-#define TS_SNOOP        0x040000        /* Device is being snooped on. */
-#define TS_SO_OCOMPLETE 0x080000        /* Wake up when output completes. */
-#define TS_ZOMBIE       0x100000        /* Connection lost. */
+             
+#define TS_CAN_BYPASS_L_RINT 0x010000                              
+#define TS_CONNECTED    0x020000                              
+#define TS_SNOOP        0x040000                                         
+#define TS_SO_OCOMPLETE 0x080000                                            
+#define TS_ZOMBIE       0x100000                              
 
-/* Hardware flow-control-invoked bits. */
-#define TS_CAR_OFLOW    0x200000        /* For MDMBUF (XXX handle in driver). */
+                                         
+#define TS_CAR_OFLOW    0x200000                                                
 #ifdef notyet
-#define TS_CTS_OFLOW    0x400000        /* For CCTS_OFLOW. */
-#define TS_DSR_OFLOW    0x800000        /* For CDSR_OFLOW. */
+#define TS_CTS_OFLOW    0x400000                             
+#define TS_DSR_OFLOW    0x800000                             
 #endif
 
-#define TS_IOCTL_NOT_OK 0x1000000       /* Workaround <rdar://....> */
-#define TS_REVOKE       0x2000000       /* Terminal getting revoked */
+#define TS_IOCTL_NOT_OK 0x1000000                                     
+#define TS_REVOKE       0x2000000                                     
 
 
-/* Character type information. */
+                                 
 #define ORDINARY        0
 #define CONTROL         1
 #define BACKSPACE       2
@@ -238,24 +238,24 @@ struct speedtab {
 	int sp_code;
 };
 
-/* Modem control commands (driver). */
+                                      
 #define DMSET           0
 #define DMBIS           1
 #define DMBIC           2
 #define DMGET           3
 
-/* Flags on a character passed to ttyinput. */
-#define TTY_CHARMASK    0x000000ff      /* Character mask */
-#define TTY_QUOTE       0x00000100      /* Character quoted */
-#define TTY_ERRORMASK   0xff000000      /* Error mask */
-#define TTY_FE          0x01000000      /* Framing error */
-#define TTY_PE          0x02000000      /* Parity error */
-#define TTY_OE          0x04000000      /* Overrun error */
-#define TTY_BI          0x08000000      /* Break condition */
+                                              
+#define TTY_CHARMASK    0x000000ff                          
+#define TTY_QUOTE       0x00000100                            
+#define TTY_ERRORMASK   0xff000000                      
+#define TTY_FE          0x01000000                         
+#define TTY_PE          0x02000000                        
+#define TTY_OE          0x04000000                         
+#define TTY_BI          0x08000000                           
 
 #ifdef KERNEL
 
-/* Unique sleep addresses. */
+                             
 #define TSA_CARR_ON(tp)         ((void *)&(tp)->t_rawq)
 #define TSA_HUP_OR_INPUT(tp)    ((void *)&(tp)->t_rawq.c_cf)
 #define TSA_OCOMPLETE(tp)       ((void *)&(tp)->t_outq.c_cl)
@@ -285,16 +285,16 @@ void    clrbits(u_char *cp, int off, int len);
 
 #ifdef KERNEL_PRIVATE
 void    tty_init(void);
-/*
- * The locked version of this function is used from routines which hold
- * the tty_lock(), such as ttcompat() in tty_compat.c
- */
+  
+                                                                       
+                                                     
+   
 int     ttioctl_locked(struct tty *tp, u_long com, caddr_t data, int flag,
     struct proc *p);
 
 int     ttcompat(struct tty *tp, u_long com, caddr_t data, int flag,
     struct proc *p);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 void tty_lock(struct tty *tp);
 void tty_unlock(struct tty *tp);
@@ -314,7 +314,7 @@ int      ttwrite(struct tty *tp, struct uio *uio, int flag);
 void     ttwwakeup(struct tty *tp);
 void     ttyblock(struct tty *tp);
 int      ttycheckoutq(struct tty *tp, int wait);
-int      ttyclose(struct tty *tp);      /* LEGACY: avoid using */
+int      ttyclose(struct tty *tp);                               
 void     ttyflush(struct tty *tp, int rw);
 void     ttyinfo(struct tty *tp);
 void     ttyinfo_locked(struct tty *tp);
@@ -336,15 +336,15 @@ extern void ttyhold(struct tty *tp);
 
 #define PTS_MAJOR 4
 #define PTC_MAJOR 5
-/*
- * If you need accounting consider using
- * KALLOC_HEAP_DEFINE to define a view.
- */
+  
+                                        
+                                       
+   
 #define KM_TTYS     KHEAP_DEFAULT
-#endif /* defined(XNU_KERNEL_PRIVATE) */
+#endif                                  
 
 __END_DECLS
 
-#endif /* KERNEL */
+#endif             
 
-#endif /* !_SYS_TTY_H_ */
+#endif                   

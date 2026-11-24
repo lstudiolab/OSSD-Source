@@ -40,11 +40,11 @@ rotl(const uint64_t x, int k)
 	return (x << k) | (x >> (64 - k));
 }
 
-/*
- * This is the jump function for the generator. It is equivalent to 2^64 calls
- * to next(); it can be used to generate 2^64 non-overlapping subsequences for
- * parallel computations.
- */
+  
+                                                                              
+                                                                              
+                         
+   
 void
 dtrace_xoroshiro128_plus_jump(uint64_t * const state,
     uint64_t * const jump_state)
@@ -69,10 +69,10 @@ dtrace_xoroshiro128_plus_jump(uint64_t * const state,
 	jump_state[1] = s1;
 }
 
-/*
- * xoroshiro128+ - XOR/rotate/shift/rotate
- * xorshift.di.unimi.it
- */
+  
+                                          
+                       
+   
 uint64_t
 dtrace_xoroshiro128_plus_next(uint64_t * const state)
 {

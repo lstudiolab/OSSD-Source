@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* -*- compile-command: "xcrun --sdk iphoneos.internal make sioc-if-addr-bounds" -*- */
+                                                                                       
 
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -56,13 +56,13 @@
 T_GLOBAL_META(T_META_NAMESPACE("xnu.net"));
 
 #ifndef STRINGIFY
-#define __STR(x)        #x              /* just a helper macro */
+#define __STR(x)        #x                                       
 #define STRINGIFY(x)    __STR(x)
-#endif /* STRINGIFY */
+#endif                
 
 #define IF_NAME       "bridge"
 
-/* On some platforms with DEBUG kernel, we need to wait a while */
+                                                                  
 #define SIFCREATE_RETRY 600
 
 #define PATTERN_SIZE 8
@@ -107,10 +107,10 @@ ifnet_set_flags(int s, const char * ifname,
 	ifr.ifr_flags &= ~(flags_clear);
 	flags_after = (uint16_t)ifr.ifr_flags;
 	if (flags_before == flags_after) {
-		/* nothing to do */
+		                   
 		ret = 0;
 	} else {
-		/* issue the ioctl */
+		                     
 		T_QUIET;
 		T_ASSERT_POSIX_SUCCESS(ioctl(s, SIOCSIFFLAGS, &ifr),
 		    "SIOCSIFFLAGS %s 0x%x",
@@ -134,13 +134,13 @@ ifnet_create(int s, char * ifname, size_t ifname_size)
 			T_LOG("SIOCSIFCREATE %s: %s", ifname,
 			    strerror(error));
 			if (error == EBUSY) {
-				/* interface is tearing down, try again */
+				                                          
 				usleep(10000);
 			} else if (error == EEXIST) {
-				/* interface exists, try destroying it */
+				                                         
 				(void)ifnet_destroy(s, ifname, false);
 			} else {
-				/* unexpected failure */
+				                        
 				break;
 			}
 		} else {
@@ -149,7 +149,7 @@ ifnet_create(int s, char * ifname, size_t ifname_size)
 		}
 	}
 	if (error == 0) {
-		/* Copy back the interface name with unit number */
+		                                                   
 		strlcpy(ifname, ifr.ifr_name, ifname_size);
 		error = ifnet_set_flags(s, ifname, IFF_UP, 0);
 	}
@@ -335,7 +335,7 @@ print_address(const char *pre, const struct sockaddr *sa, const char *post, u_ch
 		return;
 	}
 
-	// If not forced
+	                
 	if (asFamily == AF_UNSPEC) {
 		asFamily = sa->sa_family;
 	}
@@ -491,7 +491,7 @@ find_unused_pattern_in_rt_if_list(unsigned char *pattern, size_t pattern_size)
 
 	T_QUIET; T_ASSERT_NOTNULL(pattern_buf = calloc(1, pattern_size), "pattern_buf calloc(1, %zd)", pattern_size);
 
-	/* Try 10 times to find an unused pattern */
+	                                            
 	for (i = 1; i < 255; i++) {
 		if (check_rt_if_list_for_pattern(NULL, i, pattern_size) == 0) {
 			found_pattern = true;
@@ -526,7 +526,7 @@ struct ioc_ifreq {
 	uint8_t salen;
 	uint8_t safamily;
 	const char *sastr;
-	int error; // 0 means no error, -1, end of list, otherwise expected errno
+	int error;                                                               
 };
 
 static struct ioc_ifreq ioc_list[] = {
@@ -680,7 +680,7 @@ struct ioc_ifra {
 	uint8_t mask_fam;
 	const char *mask_str;
 
-	int error; // 0 means no error, -1, end of list, otherwise expected errno
+	int error;                                                               
 };
 
 static struct ioc_ifra ioc_ifra_list[] = {

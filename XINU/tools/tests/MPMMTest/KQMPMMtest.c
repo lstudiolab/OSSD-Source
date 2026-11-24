@@ -27,20 +27,20 @@
 
 typedef struct {
 	mach_msg_header_t       header;
-	mach_msg_trailer_t      trailer;                // subtract this when sending
+	mach_msg_trailer_t      trailer;                                             
 } ipc_trivial_message;
 
 typedef struct {
 	mach_msg_header_t       header;
 	u_int32_t               numbers[0];
-	mach_msg_trailer_t      trailer;                // subtract this when sending
+	mach_msg_trailer_t      trailer;                                             
 } ipc_inline_message;
 
 typedef struct {
 	mach_msg_header_t               header;
 	mach_msg_body_t                 body;
 	mach_msg_ool_descriptor_t       descriptor;
-	mach_msg_trailer_t              trailer;        // subtract this when sending
+	mach_msg_trailer_t              trailer;                                     
 } ipc_complex_message;
 
 enum {
@@ -64,7 +64,7 @@ typedef union {
 	pthread_t       tid;
 } thread_id_t;
 
-/* Global options */
+                    
 static boolean_t        verbose = FALSE;
 static boolean_t        affinity = FALSE;
 static boolean_t        timeshare = FALSE;
@@ -129,7 +129,7 @@ parse_args(int argc, char *argv[])
 	mach_msg_type_number_t          count;
 	kern_return_t                   result;
 
-	/* Initialize defaults */
+	                         
 	msg_type = msg_type_trivial;
 	num_ints = 64;
 	num_msgs = 100000;
@@ -433,7 +433,7 @@ retry:
 			exit(1);
 		}
 		if (err == 0) {
-			// printf("kevent64: returned zero\n");
+			                                       
 			goto retry;
 		}
 
@@ -535,12 +535,12 @@ calibrate_client_work(void)
 {
 	long            dummy;
 	struct timeval  nowtv;
-	struct timeval  warmuptv = { 0, 100 * 1000 }; /* 100ms */
+	struct timeval  warmuptv = { 0, 100 * 1000 };            
 	struct timeval  starttv;
 	struct timeval  endtv;
 
 	if (client_spin) {
-		/* Warm-up the stepper first... */
+		                                  
 		gettimeofday(&nowtv, NULL);
 		timeradd(&nowtv, &warmuptv, &endtv);
 		do {
@@ -548,7 +548,7 @@ calibrate_client_work(void)
 			gettimeofday(&nowtv, NULL);
 		} while (timercmp(&nowtv, &endtv, < ));
 
-		/* Now do the calibration */
+		                            
 		while (TRUE) {
 			gettimeofday(&starttv, NULL);
 			client_spin_loop(calibration_count, client_work_atom);
@@ -609,7 +609,7 @@ client(void *threadarg)
 	args.server_num = server_num;
 	thread_setup(server_num + 1);
 
-	/* find server port */
+	                      
 	ret = task_get_bootstrap_port(mach_task_self(), &bsport);
 	if (KERN_SUCCESS != ret) {
 		mach_error("task_get_bootstrap_port(): ", ret);
@@ -625,7 +625,7 @@ client(void *threadarg)
 
 	setup_client_ports(&args);
 
-	/* Allocate and touch memory */
+	                               
 	if (client_pages) {
 		unsigned        i;
 		client_memory = (long *) malloc(client_pages * PAGE_SIZE);
@@ -634,7 +634,7 @@ client(void *threadarg)
 		}
 	}
 
-	/* start message loop */
+	                        
 	for (idx = 0; idx < num_msgs; idx++) {
 		req = args.req_msg;
 		reply = args.reply_msg;
@@ -763,7 +763,7 @@ wait_for_servers(void)
 	mach_port_t     bsport, servport;
 	kern_return_t   ret;
 
-	/* find server port */
+	                      
 	ret = task_get_bootstrap_port(mach_task_self(), &bsport);
 	if (KERN_SUCCESS != ret) {
 		mach_error("task_get_bootstrap_port(): ", ret);
@@ -782,7 +782,7 @@ wait_for_servers(void)
 		if (ret == KERN_SUCCESS) {
 			return;
 		}
-		usleep(100 * 1000);     /* 100ms */
+		usleep(100 * 1000);                
 	}
 	fprintf(stderr, "Server(s) failed to register\n");
 	exit(1);
@@ -802,10 +802,10 @@ main(int argc, char *argv[])
 
 	calibrate_client_work();
 
-	/*
-	 * If we're using affinity create an empty namespace now
-	 * so this is shared by all our offspring.
-	 */
+	  
+                                                         
+                                           
+    
 	if (affinity) {
 		thread_setup(0);
 	}
@@ -817,7 +817,7 @@ main(int argc, char *argv[])
 	}
 	for (i = 0; i < num_servers; i++) {
 		server_port_name[i] = (char *) malloc(sizeof("PORT.pppppp.xx"));
-		/* PORT names include pid of main process for disambiguation */
+		                                                               
 		sprintf(server_port_name[i], "PORT.%06d.%02d", getpid(), i);
 		thread_spawn(&server_id[i], server, (void *) (long) i);
 	}
@@ -826,10 +826,10 @@ main(int argc, char *argv[])
 	int totalmsg = num_msgs * totalclients;
 	struct timeval starttv, endtv, deltatv;
 
-	/*
-	 * Wait for all servers to have registered all ports before starting
-	 * the clients and the clock.
-	 */
+	  
+                                                                     
+                              
+    
 	wait_for_servers();
 
 	printf("%d server%s, %d client%s per server (%d total) %u messages...",
@@ -839,9 +839,9 @@ main(int argc, char *argv[])
 	    totalmsg);
 	fflush(stdout);
 
-	/* Call gettimeofday() once and throw away result; some implementations
-	 * (like Mach's) cache some time zone info on first call.
-	 */
+	                                                                       
+                                                          
+    
 	gettimeofday(&starttv, NULL);
 	gettimeofday(&starttv, NULL);
 
@@ -858,7 +858,7 @@ main(int argc, char *argv[])
 		}
 	}
 
-	/* Wait for servers to complete */
+	                                  
 	for (i = 0; i < num_servers; i++) {
 		thread_join(&server_id[i]);
 	}
@@ -869,7 +869,7 @@ main(int argc, char *argv[])
 		thread_join(&client_id[i]);
 	}
 
-	/* report results */
+	                    
 	deltatv.tv_sec = endtv.tv_sec - starttv.tv_sec;
 	deltatv.tv_usec = endtv.tv_usec - starttv.tv_usec;
 	if (endtv.tv_usec < starttv.tv_usec) {

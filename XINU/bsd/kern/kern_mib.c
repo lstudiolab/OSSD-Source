@@ -77,7 +77,7 @@
 #include <machine/smp.h>
 #endif
 
-#include <sys/param.h>  /* XXX prune includes */
+#include <sys/param.h>                          
 #include <sys/systm.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
@@ -118,14 +118,14 @@ extern vm_map_t bsd_pageable_map;
 #include <machine/machine_routines.h>
 #include <machine/cpu_capabilities.h>
 
-#include <mach/mach_host.h>             /* for host_info() */
+#include <mach/mach_host.h>                                  
 
 #if defined(__i386__) || defined(__x86_64__)
-#include <i386/cpuid.h> /* for cpuid_info() */
+#include <i386/cpuid.h>                       
 #endif
 
 #if defined(__arm__) || defined(__arm64__)
-#include <arm/cpuid.h>          /* for cpuid_info() & cache_info() */
+#include <arm/cpuid.h>                                               
 #endif
 
 
@@ -133,7 +133,7 @@ extern vm_map_t bsd_pageable_map;
 #define MAX(a, b) (a >= b ? a : b)
 #endif
 
-/* XXX This should be in a BSD accessible Mach header, but isn't. */
+                                                                    
 extern unsigned int vm_page_wire_count;
 
 static int      cputhreadtype, cpu64bit;
@@ -176,9 +176,9 @@ SYSCTL_NODE(_kern, OID_AUTO, bridge, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
 
 #define SYSCTL_RETURN(r, x)     SYSCTL_OUT(r, &x, sizeof(x))
 
-/******************************************************************************
- * hw.* MIB
- */
+                                                                               
+           
+   
 
 #define CTLHW_RETQUAD   (1U << 31)
 #define CTLHW_LOCAL     (1U << 30)
@@ -194,10 +194,10 @@ SYSCTL_NODE(_kern, OID_AUTO, bridge, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
 #define HW_LOCAL_CPUSUBFAMILY   (9 | CTLHW_LOCAL)
 
 
-/*
- * Supporting some variables requires us to do "real" work.  We
- * gather some of that here.
- */
+  
+                                                               
+                            
+   
 static int
 sysctl_hw_generic(__unused struct sysctl_oid *oidp, __unused void *arg1,
     int arg2, struct sysctl_req *req)
@@ -211,10 +211,10 @@ sysctl_hw_generic(__unused struct sysctl_oid *oidp, __unused void *arg1,
 	kern_return_t kret;
 	mach_msg_type_number_t count = HOST_BASIC_INFO_COUNT;
 
-	/*
-	 * Test and mask off the 'return quad' flag.
-	 * Note that only some things here support it.
-	 */
+	  
+                                             
+                                               
+    
 	doquad = arg2 & CTLHW_RETQUAD;
 	arg2 &= ~CTLHW_RETQUAD;
 
@@ -223,12 +223,12 @@ sysctl_hw_generic(__unused struct sysctl_oid *oidp, __unused void *arg1,
 #define BSD_HOST 1
 	kret = host_info((host_t)BSD_HOST, HOST_BASIC_INFO, (host_info_t)&hinfo, &count);
 
-	/*
-	 * Handle various OIDs.
-	 *
-	 * OIDs that can return int or quad set val and qval and then break.
-	 * Errors and int-only values return inline.
-	 */
+	  
+                        
+   
+                                                                     
+                                             
+    
 	switch (arg2) {
 	case HW_NCPU:
 		if (kret == KERN_SUCCESS) {
@@ -354,27 +354,27 @@ sysctl_hw_generic(__unused struct sysctl_oid *oidp, __unused void *arg1,
 		dummy[64] = 0;
 		return SYSCTL_OUT(req, dummy, strlen(dummy) + 1);
 
-		/*
-		 * Deprecated variables.  We still support these for
-		 * backwards compatibility purposes only.
-		 */
+		  
+                                                      
+                                           
+     
 #if XNU_TARGET_OS_OSX && defined(__arm64__)
-	/* The following two are kludged for backward
-	 * compatibility. Use hw.product/hw.target for something
-	 * consistent instead. */
+	                                             
+                                                         
+                          
 
 	case HW_MACHINE:
 		bzero(dummy, sizeof(dummy));
 		if (proc_platform(req->p) == PLATFORM_IOS) {
-			/* iOS-on-Mac processes don't expect the macOS kind of
-			 * hw.machine, e.g. "arm64", but are used to seeing
-			 * a product string on iOS, which we here hardcode
-			 * to return as "iPad8,6" for compatibility.
-			 *
-			 * Another reason why hw.machine and hw.model are
-			 * trouble and hw.target+hw.product should be used
-			 * instead.
-			 */
+			                                                      
+                                                      
+                                                     
+                                               
+     
+                                                    
+                                                     
+              
+      
 
 			strlcpy(dummy, "iPad8,6", sizeof(dummy));
 		}
@@ -435,16 +435,16 @@ sysctl_hw_generic(__unused struct sysctl_oid *oidp, __unused void *arg1,
 	default:
 		return ENOTSUP;
 	}
-	/*
-	 * Callers may come to us with either int or quad buffers.
-	 */
+	  
+                                                           
+    
 	if (doquad) {
 		return SYSCTL_RETURN(req, qval);
 	}
 	return SYSCTL_RETURN(req, val);
 }
 
-/* hw.pagesize and hw.tbfrequency are expected as 64 bit values */
+                                                                  
 static int
 sysctl_pagesize
 (__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
@@ -461,9 +461,9 @@ sysctl_pagesize32
 	long long l;
 #if __arm64__
 	l = (long long) (1 << page_shift_user32);
-#else /* __arm64__ */
+#else                
 	l = (long long) PAGE_SIZE;
-#endif /* __arm64__ */
+#endif                
 	return sysctl_io_number(req, l, sizeof(l), NULL, NULL);
 }
 
@@ -475,9 +475,9 @@ sysctl_tbfrequency
 	return sysctl_io_number(req, l, sizeof(l), NULL, NULL);
 }
 
-/*
- * Called by IOKit on Intel, or by sysctl_load_devicetree_entries()
- */
+  
+                                                                   
+   
 void
 sysctl_set_osenvironment(unsigned int size, const void* value)
 {
@@ -497,13 +497,13 @@ sysctl_unblock_osenvironment(void)
 	thread_wakeup((event_t) &osenvironment_initialized);
 }
 
-/*
- * Create sysctl entries coming from device tree.
- *
- * Entries from device tree are loaded here because SecureDTLookupEntry() only works before
- * PE_init_iokit(). Doing this also avoids the extern-C hackery to access these entries
- * from IORegistry (which requires C++).
- */
+  
+                                                 
+  
+                                                                                           
+                                                                                       
+                                        
+   
 __startup_func
 static void
 sysctl_load_devicetree_entries(void)
@@ -516,12 +516,12 @@ sysctl_load_devicetree_entries(void)
 		return;
 	}
 
-	/* load osenvironment */
+	                        
 	if (kSuccess == SecureDTGetProperty(chosen, "osenvironment", (void const **) &value, &size)) {
 		sysctl_set_osenvironment(size, value);
 	}
 
-	/* load ephemeral_storage */
+	                            
 	if (kSuccess == SecureDTGetProperty(chosen, "ephemeral-storage", (void const **) &value, &size)) {
 		if (size == sizeof(uint32_t)) {
 			ephemeral_storage = *(uint32_t const *)value;
@@ -529,7 +529,7 @@ sysctl_load_devicetree_entries(void)
 		}
 	}
 
-	/* load use_recovery_securityd */
+	                                 
 	if (kSuccess == SecureDTGetProperty(chosen, "use-recovery-securityd", (void const **) &value, &size)) {
 		if (size == sizeof(uint32_t)) {
 			use_recovery_securityd = *(uint32_t const *)value;
@@ -659,12 +659,12 @@ sysctl_cpu_frequency
 #endif
 }
 
-/*
- *  This sysctl will signal to userspace that a serial console is desired:
- *
- *    hw.serialdebugmode = 1 will load the serial console job in the multi-user session;
- *    hw.serialdebugmode = 2 will load the serial console job in the base system as well
- */
+  
+                                                                          
+  
+                                                                                        
+                                                                                        
+   
 static int
 sysctl_serialdebugmode
 (__unused struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)
@@ -680,9 +680,9 @@ sysctl_serialdebugmode
 	return sysctl_io_number(req, serialdebugmode, sizeof(serialdebugmode), NULL, NULL);
 }
 
-/*
- * hw.* MIB variables.
- */
+  
+                      
+   
 SYSCTL_PROC(_hw, HW_NCPU, ncpu, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, HW_NCPU, sysctl_hw_generic, "I", "");
 SYSCTL_PROC(_hw, HW_AVAILCPU, activecpu, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, HW_AVAILCPU, sysctl_hw_generic, "I", "");
 SYSCTL_PROC(_hw, OID_AUTO, physicalcpu, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, HW_LOCAL_PHYSICALCPU, sysctl_hw_generic, "I", "");
@@ -718,13 +718,13 @@ SYSCTL_QUAD(_hw, OID_AUTO, prffrequency, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOC
 SYSCTL_QUAD(_hw, OID_AUTO, prffrequency_min, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &gPEClockFrequencyInfo.prf_frequency_min_hz, "");
 SYSCTL_QUAD(_hw, OID_AUTO, prffrequency_max, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &gPEClockFrequencyInfo.prf_frequency_max_hz, "");
 SYSCTL_QUAD(_hw, OID_AUTO, fixfrequency, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &gPEClockFrequencyInfo.fix_frequency_hz, "");
-#endif /* __arm__ || __arm64__ */
+#endif                           
 SYSCTL_PROC(_hw, OID_AUTO, tbfrequency, CTLTYPE_QUAD | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, 0, sysctl_tbfrequency, "Q", "");
 #if XNU_TARGET_OS_OSX
 SYSCTL_QUAD(_hw, HW_MEMSIZE, memsize, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &max_mem_actual, "");
 #else
 SYSCTL_QUAD(_hw, HW_MEMSIZE, memsize, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &max_mem, "");
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 SYSCTL_INT(_hw, OID_AUTO, packages, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &packages, 0, "");
 SYSCTL_PROC(_hw, OID_AUTO, osenvironment, CTLTYPE_STRING | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, 0, sysctl_osenvironment, "A", "");
 SYSCTL_PROC(_hw, OID_AUTO, ephemeral_storage, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, 0, sysctl_ephemeral_storage, "I", "");
@@ -732,34 +732,34 @@ SYSCTL_PROC(_hw, OID_AUTO, use_recovery_securityd, CTLTYPE_INT | CTLFLAG_RD | CT
 SYSCTL_PROC(_hw, OID_AUTO, use_kernelmanagerd, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, 0, 0, sysctl_use_kernelmanagerd, "I", "");
 SYSCTL_PROC(_hw, OID_AUTO, serialdebugmode, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED, 0, 0, sysctl_serialdebugmode, "I", "");
 
-/*
- * Optional CPU features can register nodes below hw.optional.
- *
- * If the feature is not present, the node should either not be registered,
- * or it should return 0.  If the feature is present, the node should return
- * 1.
- */
+  
+                                                              
+  
+                                                                           
+                                                                            
+     
+   
 SYSCTL_NODE(_hw, OID_AUTO, optional, CTLFLAG_RW | CTLFLAG_LOCKED, NULL, "optional features");
 
-SYSCTL_INT(_hw_optional, OID_AUTO, floatingpoint, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (int *)NULL, 1, "");      /* always set */
+SYSCTL_INT(_hw_optional, OID_AUTO, floatingpoint, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (int *)NULL, 1, "");                      
 
-/*
- * Optional device hardware features can be registered by drivers below hw.features
- */
+  
+                                                                                   
+   
 SYSCTL_EXTENSIBLE_NODE(_hw, OID_AUTO, features, CTLFLAG_RD | CTLFLAG_LOCKED, NULL, "hardware features");
 
-/*
- * Deprecated variables.  These are supported for backwards compatibility
- * purposes only.  The MASKED flag requests that the variables not be
- * printed by sysctl(8) and similar utilities.
- *
- * The variables named *_compat here are int-sized versions of variables
- * that are now exported as quads.  The int-sized versions are normally
- * looked up only by number, wheras the quad-sized versions should be
- * looked up by name.
- *
- * The *_compat nodes are *NOT* visible within the kernel.
- */
+  
+                                                                         
+                                                                     
+                                              
+  
+                                                                        
+                                                                       
+                                                                     
+                     
+  
+                                                          
+   
 
 SYSCTL_PROC(_hw, HW_PAGESIZE, pagesize_compat, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_MASKED | CTLFLAG_LOCKED, 0, HW_PAGESIZE, sysctl_hw_generic, "I", "");
 SYSCTL_PROC(_hw, HW_BUS_FREQ, busfrequency_compat, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_MASKED | CTLFLAG_LOCKED, 0, HW_LOCAL_FREQUENCY_CLOCK_RATE, sysctl_bus_frequency, "I", "");
@@ -805,7 +805,7 @@ SYSCTL_PROC(_hw_optional, OID_AUTO, sse3, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KER
 SYSCTL_PROC(_hw_optional, OID_AUTO, supplementalsse3, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(kHasSupplementalSSE3), 0, sysctl_cpu_capability, "I", "");
 SYSCTL_PROC(_hw_optional, OID_AUTO, sse4_1, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(kHasSSE4_1), 0, sysctl_cpu_capability, "I", "");
 SYSCTL_PROC(_hw_optional, OID_AUTO, sse4_2, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(kHasSSE4_2), 0, sysctl_cpu_capability, "I", "");
-/* "x86_64" is actually a preprocessor symbol on the x86_64 kernel, so we have to hack this */
+                                                                                              
 #undef x86_64
 SYSCTL_PROC(_hw_optional, OID_AUTO, x86_64, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(k64Bit), 0, sysctl_cpu_capability, "I", "");
 SYSCTL_PROC(_hw_optional, OID_AUTO, aes, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(kHasAES), 0, sysctl_cpu_capability, "I", "");
@@ -830,7 +830,7 @@ SYSCTL_PROC(_hw_optional, OID_AUTO, avx512vl, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG
 SYSCTL_PROC(_hw_optional, OID_AUTO, avx512ifma, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(kHasAVX512IFMA), 0, sysctl_cpu_capability, "I", "");
 SYSCTL_PROC(_hw_optional, OID_AUTO, avx512vbmi, CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, (void *) capability(kHasAVX512VBMI), 0, sysctl_cpu_capability, "I", "");
 #undef capability
-#endif /* !__i386__ && !__x86_64 && !CONFIG_X86_64_COMPAT */
+#endif                                                      
 
 #if defined (__arm__) || defined (__arm64__)
 int watchpoint_flag = 0;
@@ -846,9 +846,9 @@ int gARMv82SHA3 = 0;
 
 #if defined (__arm__)
 int arm64_flag = 0;
-#elif defined (__arm64__) /* end __arm__*/
+#elif defined (__arm64__)                 
 int arm64_flag = 1;
-#else /* end __arm64__*/
+#else                   
 int arm64_flag = 0;
 #endif
 
@@ -890,10 +890,10 @@ static int ptrauth = 0;
 SYSCTL_INT(_hw_optional, OID_AUTO, ptrauth, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &ptrauth, 0, "");
 #endif
 
-/*
- * Without this little ifdef dance, the preprocessor replaces "arm64" with "1",
- * leaving us with a less-than-helpful sysctl.hwoptional.1.
- */
+  
+                                                                               
+                                                           
+   
 #ifdef arm64
 #undef arm64
 SYSCTL_INT(_hw_optional, OID_AUTO, arm64, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &arm64_flag, 0, "");
@@ -901,15 +901,15 @@ SYSCTL_INT(_hw_optional, OID_AUTO, arm64, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LO
 #else
 SYSCTL_INT(_hw_optional, OID_AUTO, arm64, CTLFLAG_RD | CTLFLAG_KERN | CTLFLAG_LOCKED, &arm64_flag, 0, "");
 #endif
-#endif /* !__arm__ && ! __arm64__ */
+#endif                              
 
 
-/******************************************************************************
- * Generic MIB initialisation.
- *
- * This is a hack, and should be replaced with SYSINITs
- * at some point.
- */
+                                                                               
+                              
+  
+                                                       
+                 
+   
 void
 sysctl_mib_init(void)
 {
@@ -922,25 +922,25 @@ sysctl_mib_init(void)
 #endif
 
 #if defined (__i386__) || defined (__x86_64__)
-	/* hw.cacheconfig */
+	                    
 	cacheconfig[0] = ml_cpu_cache_sharing(0);
 	cacheconfig[1] = ml_cpu_cache_sharing(1);
 	cacheconfig[2] = ml_cpu_cache_sharing(2);
 	cacheconfig[3] = ml_cpu_cache_sharing(3);
 	cacheconfig[4] = 0;
 
-	/* hw.cachesize */
+	                  
 	cachesize[0] = ml_cpu_cache_size(0);
 	cachesize[1] = ml_cpu_cache_size(1);
 	cachesize[2] = ml_cpu_cache_size(2);
 	cachesize[3] = ml_cpu_cache_size(3);
 	cachesize[4] = 0;
 
-	/* hw.packages */
+	                 
 	packages = (int)(roundup(ml_cpu_cache_sharing(0), cpuid_info()->thread_count)
 	    / cpuid_info()->thread_count);
 
-#elif defined(__arm__) || defined(__arm64__) /* end __i386 */
+#elif defined(__arm__) || defined(__arm64__)                 
 	watchpoint_flag = arm_debug_info()->num_watchpoint_pairs;
 	breakpoint_flag = arm_debug_info()->num_breakpoint_pairs;
 
@@ -958,7 +958,7 @@ sysctl_mib_init(void)
 	cacheconfig[6] = 0;
 
 	cachesize[0] = ml_get_machine_mem();
-	cachesize[1] = cache_info()->c_dsize; /* Using the DCache */
+	cachesize[1] = cache_info()->c_dsize;                       
 	cachesize[2] = cache_info()->c_l2size;
 	cachesize[3] = 0;
 	cachesize[4] = 0;
@@ -966,7 +966,7 @@ sysctl_mib_init(void)
 	packages = 1;
 #else
 #error unknown architecture
-#endif /* !__i386__ && !__x86_64 && !__arm__ && !__arm64__ */
+#endif                                                       
 }
 
 __startup_func
@@ -975,13 +975,13 @@ sysctl_mib_startup(void)
 {
 	cputhreadtype = cpu_threadtype();
 
-	/*
-	 * Populate the optional portion of the hw.* MIB.
-	 *
-	 * XXX This could be broken out into parts of the code
-	 *     that actually directly relate to the functions in
-	 *     question.
-	 */
+	  
+                                                  
+   
+                                                       
+                                                         
+                 
+    
 
 	if (cputhreadtype != CPU_THREADTYPE_NONE) {
 		sysctl_register_oid_early(&sysctl__hw_cputhreadtype);

@@ -67,23 +67,23 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 #ifdef KERNEL
-#include <machine/types.h>      /* user_time_t */
-#include <stdint.h>             /* uint64_t */
-#else /* !KERNEL */
+#include <machine/types.h>                       
+#include <stdint.h>                           
+#else              
 #include <Availability.h>
-#endif /* KERNEL */
+#endif             
 
-/*
- * [XSI] The fd_set type shall be defined as described in <sys/select.h>.
- * The timespec structure shall be defined as described in <time.h>
- */
+  
+                                                                         
+                                                                   
+   
 #include <sys/_types/_fd_def.h>
 #include <sys/_types/_timespec.h>
 #include <sys/_types/_timeval.h>
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 #include <sys/_types/_timeval64.h>
-#endif /* !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE) */
+#endif                                                             
 
 #ifdef KERNEL
 #include <sys/_types/_user_timespec.h>
@@ -94,34 +94,34 @@
 #include <sys/_types/_user64_timeval.h>
 #include <sys/_types/_user32_itimerval.h>
 #include <sys/_types/_user64_itimerval.h>
-#endif /* KERNEL */
+#endif             
 
 #include <sys/_types/_time_t.h>
 #include <sys/_types/_suseconds_t.h>
 
-/*
- * Structure used as a parameter by getitimer(2) and setitimer(2) system
- * calls.
- */
+  
+                                                                        
+         
+   
 struct  itimerval {
-	struct  timeval it_interval;    /* timer interval */
-	struct  timeval it_value;       /* current value */
+	struct  timeval it_interval;                        
+	struct  timeval it_value;                          
 };
 
-/*
- * Names of the interval timers, and structure
- * defining a timer setting.
- */
+  
+                                              
+                            
+   
 #define ITIMER_REAL     0
 #define ITIMER_VIRTUAL  1
 #define ITIMER_PROF     2
 
-/*
- * Select uses bit masks of file descriptors in longs.  These macros
- * manipulate such bit fields (the filesystem macros use chars).  The
- * extra protection here is to permit application redefinition above
- * the default size.
- */
+  
+                                                                    
+                                                                     
+                                                                    
+                    
+   
 #include <sys/_types/_fd_setsize.h>
 #include <sys/_types/_fd_set.h>
 #include <sys/_types/_fd_clr.h>
@@ -148,18 +148,18 @@ struct  itimerval {
 }
 
 struct timezone {
-	int     tz_minuteswest; /* minutes west of Greenwich */
-	int     tz_dsttime;     /* type of dst correction */
+	int     tz_minuteswest;                                
+	int     tz_dsttime;                                 
 };
-#define DST_NONE        0       /* not on dst */
-#define DST_USA         1       /* USA style dst */
-#define DST_AUST        2       /* Australian style dst */
-#define DST_WET         3       /* Western European dst */
-#define DST_MET         4       /* Middle European dst */
-#define DST_EET         5       /* Eastern European dst */
-#define DST_CAN         6       /* Canada */
+#define DST_NONE        0                       
+#define DST_USA         1                          
+#define DST_AUST        2                                 
+#define DST_WET         3                                 
+#define DST_MET         4                                
+#define DST_EET         5                                 
+#define DST_CAN         6                   
 
-/* Operations on timevals. */
+                             
 #define timerclear(tvp)         (tvp)->tv_sec = (tvp)->tv_usec = 0
 #define timerisset(tvp)         ((tvp)->tv_sec || (tvp)->tv_usec)
 #define timercmp(tvp, uvp, cmp)                                         \
@@ -185,19 +185,19 @@ struct timezone {
 	        }                                                       \
 	} while (0)
 
-#define timevalcmp(l, r, cmp)   timercmp(l, r, cmp) /* freebsd */
+#define timevalcmp(l, r, cmp)   timercmp(l, r, cmp)              
 
-/*
- * Getkerninfo clock information structure
- */
+  
+                                          
+   
 struct clockinfo {
-	int     hz;             /* clock frequency */
-	int     tick;           /* micro-seconds per hz tick */
-	int     tickadj;        /* clock skew rate for adjtime() */
-	int     stathz;         /* statistics clock frequency */
-	int     profhz;         /* profiling clock frequency */
+	int     hz;                                  
+	int     tick;                                          
+	int     tickadj;                                           
+	int     stathz;                                         
+	int     profhz;                                        
 };
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 
 #ifdef XNU_KERNEL_PRIVATE
 #define SETTIME_ENTITLEMENT "com.apple.private.settime"
@@ -225,17 +225,17 @@ void    boottime_timeval(struct timeval *tv);
 void    inittodr(time_t base);
 int     ratecheck(struct timeval *lasttime, const struct timeval *mininterval);
 int     ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 
-#else /* !KERNEL */
+#else              
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 #include <time.h>
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 
 __BEGIN_DECLS
 
@@ -244,12 +244,12 @@ int     adjtime(const struct timeval *, struct timeval *);
 int     futimes(int, const struct timeval *);
 int     lutimes(const char *, const struct timeval *) __OSX_AVAILABLE_STARTING(__MAC_10_5, __IPHONE_2_0);
 int     settimeofday(const struct timeval *, const struct timezone *);
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 
 int     getitimer(int, struct itimerval *);
 int     gettimeofday(struct timeval * __restrict, void * __restrict);
 
-#include <sys/_select.h>        /* select() prototype */
+#include <sys/_select.h>                                
 
 int     setitimer(int, const struct itimerval * __restrict,
     struct itimerval * __restrict);
@@ -257,6 +257,6 @@ int     utimes(const char *, const struct timeval *);
 
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
-#endif /* !_SYS_TIME_H_ */
+#endif                    

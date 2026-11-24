@@ -54,4 +54,4 @@ public:
 	OSMetaClassDeclareReservedUnused(IOWatchDogTimer, 3);
 };
 
-#endif /* !_IOWATCHDOGTIMER_H */
+#endif                          

@@ -1,4 +1,4 @@
-/*	$KAME: key.h,v 1.11 2000/03/25 07:24:12 sumikawa Exp $	*/
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -101,5 +101,5 @@ extern bool key_custom_ipsec_token_is_valid(void *);
 extern int key_reserve_custom_ipsec(void **, union sockaddr_in_4_6 *, union sockaddr_in_4_6 *, u_int8_t proto);
 extern void key_release_custom_ipsec(void **);
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETKEY_KEY_H_ */
+#endif                         
+#endif                     

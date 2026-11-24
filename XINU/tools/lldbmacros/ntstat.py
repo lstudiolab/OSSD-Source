@@ -149,7 +149,7 @@ def ShowNstatCtrl(inctrl):
     for src in IterateTAILQ_HEAD(ctrl.ncs_src_queue, 'ns_control_link'):
         ShowNstatSrc(src)
 
-# Macro: showallntstat
+                      
 
 @lldb_command('showallntstat')
 def ShowAllNtstat(cmd_args=None) :
@@ -172,4 +172,4 @@ def ShowAllNtstat(cmd_args=None) :
     for procdetails in IterateTAILQ_HEAD(procdetails_head, 'pdet_link'):
         ShowNstatProcdetails(procdetails)
 
-# EndMacro: showallntstat
+                         

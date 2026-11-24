@@ -28,8 +28,8 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- */
+  
+   
 
 #ifndef _KERN_CLOCK_H_
 #define _KERN_CLOCK_H_
@@ -51,30 +51,30 @@
 typedef unsigned long           clock_sec_t;
 typedef unsigned int            clock_usec_t, clock_nsec_t;
 
-#else   /* __LP64__ */
+#else                 
 
 typedef uint32_t                        clock_sec_t;
 typedef uint32_t                        clock_usec_t, clock_nsec_t;
 
-#endif  /* __LP64__ */
+#endif                
 
 #ifdef  MACH_KERNEL_PRIVATE
 
 #include <kern/queue.h>
 
-/*
- * Clock operations list structure. Contains vectors to machine
- * dependent clock routines.
- */
+  
+                                                               
+                            
+   
 struct  clock_ops {
-	int             (*c_config)(void);              /* configuration */
+	int             (*c_config)(void);                                 
 
-	int             (*c_init)(void);                /* initialize */
+	int             (*c_init)(void);                                
 
-	kern_return_t   (*c_gettime)(   /* get time */
+	kern_return_t   (*c_gettime)(                 
 		mach_timespec_t                 *cur_time);
 
-	kern_return_t   (*c_getattr)(   /* get attributes */
+	kern_return_t   (*c_getattr)(                       
 		clock_flavor_t                  flavor,
 		clock_attr_t                    attr,
 		mach_msg_type_number_t  *count);
@@ -82,34 +82,34 @@ struct  clock_ops {
 typedef const struct clock_ops  *clock_ops_t;
 typedef struct clock_ops        clock_ops_data_t;
 
-/*
- * Actual clock object data structure. Contains the machine
- * dependent operations list and clock operation ports.
- */
+  
+                                                           
+                                                       
+   
 struct  clock {
-	clock_ops_t             cl_ops;         /* operations list */
-	struct ipc_port         *cl_service;    /* service port */
-	struct ipc_port         *cl_control;    /* control port */
+	clock_ops_t             cl_ops;                              
+	struct ipc_port         *cl_service;                      
+	struct ipc_port         *cl_control;                      
 };
 typedef struct clock            clock_data_t;
 
-/*
- * Configure the clock system.
- */
+  
+                              
+   
 extern void             clock_config(void);
 extern void             clock_oldconfig(void);
 
-/*
- * Initialize the clock system.
- */
+  
+                               
+   
 extern void             clock_init(void);
 extern void             clock_oldinit(void);
 
 extern void             clock_timebase_init(void);
 
-/*
- * Initialize the clock ipc service facility.
- */
+  
+                                             
+   
 extern void             clock_service_create(void);
 
 extern void clock_gettimeofday_set_commpage(
@@ -129,7 +129,7 @@ extern void             nanotime_to_absolutetime(
 	clock_nsec_t    nanosecs,
 	uint64_t                *result);
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 __BEGIN_DECLS
 
@@ -187,11 +187,11 @@ extern void                     clock_get_calendar_nanotime_nowait(
 	clock_sec_t                     *secs,
 	clock_nsec_t            *nanosecs);
 
-#endif  /* CONFIG_DTRACE */
+#endif                     
 
 boolean_t kdp_clock_is_locked(void);
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
 extern void                     clock_get_calendar_microtime(
 	clock_sec_t                     *secs,
@@ -253,19 +253,19 @@ extern void                             nanoseconds_to_absolutetime(
 	uint64_t                nanoseconds,
 	uint64_t                *result);
 
-/*
- * Absolute <-> Continuous Time conversion routines
- *
- * It is the caller's responsibility to ensure that these functions are
- * synchronized with respect to updates to the continuous timebase.  The
- * returned value is only valid until the next update to the continuous
- * timebase.
- *
- * If the value to be returned by continuoustime_to_absolutetime would be
- * negative, zero is returned.  This occurs when the provided continuous time
- * is less the amount of the time the system spent asleep and /must/ be
- * handled.
- */
+  
+                                                   
+  
+                                                                       
+                                                                        
+                                                                       
+            
+  
+                                                                         
+                                                                             
+                                                                       
+           
+   
 extern uint64_t                 absolutetime_to_continuoustime(
 	uint64_t                abstime);
 extern uint64_t                 continuoustime_to_absolutetime(
@@ -279,9 +279,9 @@ extern uint64_t hwclock_conttime_offset;
 
 #ifdef  KERNEL_PRIVATE
 
-/*
- * Obsolete interfaces.
- */
+  
+                       
+   
 
 #ifndef __LP64__
 
@@ -310,20 +310,20 @@ extern uint64_t hwclock_conttime_offset;
 
 #include <Availability.h>
 
-/* Use mach_absolute_time() */
+                              
 extern mach_timespec_t  clock_get_system_value(void) __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_8, __IPHONE_2_0, __IPHONE_6_0);
 
 extern mach_timespec_t  clock_get_calendar_value(void) __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_10_0, __MAC_10_8, __IPHONE_2_0, __IPHONE_6_0);
 
-#else   /* __LP64__ */
+#else                 
 
 #ifdef  XNU_KERNEL_PRIVATE
 
 #define MACH_TIMESPEC_ZERO      ((mach_timespec_t) { 0, 0 } )
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* __LP64__ */
+#endif                
 
 extern void                             delay_for_interval(
 	uint32_t                interval,
@@ -336,10 +336,10 @@ extern void                             delay_for_interval_with_leeway(
 
 #ifdef  XNU_KERNEL_PRIVATE
 extern void delay(int usec);
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 __END_DECLS
 
-#endif  /* _KERN_CLOCK_H_ */
+#endif                      

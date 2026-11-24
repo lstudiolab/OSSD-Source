@@ -1,10 +1,10 @@
-/*
- * persona_mgr.c
- * Tool to manage personas
- *
- * Jeremy C. Andrus <jeremy_andrus@apple.com>
- *
- */
+  
+                
+                          
+  
+                                             
+  
+   
 #include <ctype.h>
 #include <err.h>
 #include <errno.h>
@@ -26,7 +26,7 @@
 
 #include "persona_test.h"
 
-/* internal */
+              
 #include <libproc.h>
 #include <spawn_private.h>
 #include <sys/persona.h>
@@ -142,12 +142,12 @@ persona_op_support(void)
 }
 
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- *
- * Main Entry Point
- *
- * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- */
+                                                                        
+  
+                   
+  
+                                                                        
+   
 static void
 usage_main(const char *progname, const char *msg, int verbose)
 {
@@ -192,9 +192,9 @@ main(int argc, char **argv)
 	uid_t uid = (uid_t)-1;
 	pid_t pid = (pid_t)-1;
 
-	/*
-	 * Defaults
-	 */
+	  
+            
+    
 	g.verbose = 0;
 
 	if (geteuid() != 0) {
@@ -226,9 +226,9 @@ main(int argc, char **argv)
 	memset(&kinfo, 0, sizeof(kinfo));
 	kinfo.persona_gmuid = KAUTH_UID_NONE;
 
-	/*
-	 * Argument parse
-	 */
+	  
+                  
+    
 	optind = 2;
 	while ((ch = getopt(argc, argv, "vi:t:p:u:g:l:G:m:h")) != -1) {
 		switch (ch) {
@@ -244,7 +244,7 @@ main(int argc, char **argv)
 				kinfo.persona_type = PERSONA_GUEST;
 			} else if (strncmp(optarg, "managed", 8) == 0) {
 				kinfo.persona_type = PERSONA_MANAGED;
-			} else if (strncmp(optarg, "priv", 4) == 0) { /* shortcut... */
+			} else if (strncmp(optarg, "priv", 4) == 0) {                  
 				kinfo.persona_type = PERSONA_PRIV;
 			} else if (strncmp(optarg, "system", 7) == 0) {
 				kinfo.persona_type = PERSONA_SYSTEM;
@@ -265,7 +265,7 @@ main(int argc, char **argv)
 			break;
 		case 'u':
 			ret = atoi(optarg);
-			/* allow invalid / -1 as a wildcard for lookup */
+			                                                 
 			if (ret < 0 && persona_op != PERSONA_OP_LOOKUP) {
 				err("Invalid UID:%s (%d)", optarg, ret);
 			}
@@ -311,10 +311,10 @@ main(int argc, char **argv)
 	}
 
 	if (kinfo.persona_gmuid != KAUTH_UID_NONE && kinfo.persona_ngroups == 0) {
-		/*
-		 * In order to set the group membership UID, we need to set at
-		 * least one group: make it equal to either the GID or UID
-		 */
+		  
+                                                                
+                                                            
+     
 		kinfo.persona_ngroups = 1;
 		if (kinfo.persona_gid) {
 			kinfo.persona_groups[0] = kinfo.persona_gid;

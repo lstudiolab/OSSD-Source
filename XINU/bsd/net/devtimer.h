@@ -26,10 +26,10 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * devtimer.h
- * - timer source based on <kern/thread_call.h>
- */
+  
+             
+                                               
+   
 
 
 #ifndef _NET_DEVTIMER_H
@@ -92,4 +92,4 @@ devtimer_current_time(void);
 int32_t
 devtimer_current_secs(void);
 
-#endif /* _NET_DEVTIMER_H */
+#endif                      

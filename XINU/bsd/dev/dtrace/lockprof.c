@@ -52,19 +52,19 @@ extern unsigned int lck_grp_cnt;
 extern void lck_grp_reference(lck_grp_t *grp);
 extern void lck_grp_deallocate(lck_grp_t *grp);
 
-#define LOCKPROF_MAX 10000 /* maximum number of lockprof probes */
-static uint32_t lockprof_count; /* current number of lockprof probes */
+#define LOCKPROF_MAX 10000                                        
+static uint32_t lockprof_count;                                        
 
 enum probe_flags {
-	/*
-	 * Counts time spent spinning/blocking
-	 */
+	  
+                                       
+    
 	TIME_EVENT = 0x01,
-	/*
-	 * Requires LCK_GRP_ATTR_STAT to be set on the lock
-	 * group, either via lck_grp_attr_setsta on the lock group,
-	 * or globally via the lcks=3 boot-arg
-	 */
+	  
+                                                    
+                                                            
+                                       
+    
 	STAT_NEEDED = 0x02
 };
 
@@ -85,26 +85,26 @@ static const struct {
 	{"adaptive-miss-", STAT_NEEDED, offsetof(lck_grp_t, lck_grp_mtxcnt), offsetof(lck_grp_stats_t, lgss_mtx_miss)},
 	{"adaptive-wait-", STAT_NEEDED, offsetof(lck_grp_t, lck_grp_mtxcnt), offsetof(lck_grp_stats_t, lgss_mtx_wait)},
 	{"adaptive-direct-wait-", STAT_NEEDED, offsetof(lck_grp_t, lck_grp_mtxcnt), offsetof(lck_grp_stats_t, lgss_mtx_direct_wait)},
-#endif /* HAS_EXT_MUTEXES */
+#endif                      
 	{NULL, false, 0, 0}
 };
 
-/*
- * Default defined probes for counting events
- */
+  
+                                             
+   
 const static int hold_defaults[] = {
-	10000 /* 10000 events */
+	10000                   
 };
 
-/*
- * Default defined probes for time events
- */
+  
+                                         
+   
 const static struct {
 	unsigned int time;
 	const char *suffix;
 	uint64_t mult;
 } cont_defaults[] = {
-	{100, "ms", NANOSEC / MILLISEC} /* 100 ms */
+	{100, "ms", NANOSEC / MILLISEC}             
 };
 
 typedef struct lockprof_probe {
@@ -227,9 +227,9 @@ lockprof_provide(void *arg, const dtrace_probedesc_t *desc)
 	}
 
 
-	/*
-	 * We need to start before any time suffix.
-	 */
+	  
+                                            
+    
 	for (i = strlen(name); i >= len; i--) {
 		if (name[i] >= '0' && name[i] <= '9') {
 			break;
@@ -237,9 +237,9 @@ lockprof_provide(void *arg, const dtrace_probedesc_t *desc)
 		suffix = &name[i];
 	}
 
-	/*
-	 * Now determine the numerical value present in the probe name.
-	 */
+	  
+                                                                
+    
 	for (uint64_t m = 1; i >= len; i--) {
 		if (name[i] < '0' || name[i] > '9') {
 			return;
@@ -293,10 +293,10 @@ lockprof_enable(void *arg, dtrace_id_t id, void *parg)
 		return -1;
 	}
 
-	/*
-	 * lockprof_enable/disable are called with
-	 * dtrace_lock held
-	 */
+	  
+                                           
+                    
+    
 	if (stat->lgs_limit != 0) {
 		return -1;
 	}
@@ -408,7 +408,7 @@ static const struct cdevsw lockprof_cdevsw =
 };
 
 
-#endif /* LOCK_STATS */
+#endif                 
 void lockprof_init(void);
 void
 lockprof_init(void)
@@ -433,5 +433,5 @@ lockprof_init(void)
 		panic("dtrace: devfs_make_node failed for lockprof");
 	}
 
-#endif /* LOCK_STATS */
+#endif                 
 }

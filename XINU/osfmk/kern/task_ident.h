@@ -26,14 +26,14 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *
- * A task identity token represents the identity of a mach task without carrying task
- * access capabilities. In applicable scenarios, task identity token can be moved between
- * tasks and be upgraded to desired level of task port flavor (namely, task name port,
- * inspect port, read port or control port) upon use.
- *
- */
+  
+  
+                                                                                     
+                                                                                         
+                                                                                      
+                                                     
+  
+   
 
 #ifndef _KERN_TASK_IDENT_H
 #define _KERN_TASK_IDENT_H
@@ -50,6 +50,6 @@ ipc_port_t convert_task_id_token_to_port(task_id_token_t token);
 
 task_id_token_t convert_port_to_task_id_token(ipc_port_t port);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _KERN_TASK_IDENT_H */
+#endif                         

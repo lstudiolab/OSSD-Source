@@ -32,30 +32,30 @@
 
 #ifndef __APPLE_API_STANDARD
 #define __APPLE_API_STANDARD
-#endif /* __APPLE_API_STANDARD */
+#endif                           
 
 #ifndef __APPLE_API_STABLE
 #define __APPLE_API_STABLE
-#endif /* __APPLE_API_STABLE */
+#endif                         
 
 #ifndef __APPLE_API_STRICT_CONFORMANCE
 
 #ifndef __APPLE_API_EVOLVING
 #define __APPLE_API_EVOLVING
-#endif /* __APPLE_API_EVOLVING */
+#endif                           
 
 #ifndef __APPLE_API_UNSTABLE
 #define __APPLE_API_UNSTABLE
-#endif /* __APPLE_API_UNSTABLE */
+#endif                           
 
 #ifndef __APPLE_API_PRIVATE
 #define __APPLE_API_PRIVATE
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
 #ifndef __APPLE_API_OBSOLETE
 #define __APPLE_API_OBSOLETE
-#endif /* __APPLE_API_OBSOLETE */
+#endif                           
 
-#endif /* __APPLE_API_STRICT_CONFORMANCE */
+#endif                                     
 
-#endif /* __SYS_APPLEAPIOPTS_H__ */
+#endif                             

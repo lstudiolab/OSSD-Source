@@ -1,8 +1,8 @@
 from xnu import *
 
-######################################
-# Helper functions
-######################################
+                                      
+                  
+                                      
 def GetMemMappedPciCfgAddrFromRegistry():
     """ Retrieve the base address of the memory mapped PCI config space. It is
         found in registry entry AppleACPIPlatformExpert, property acpi-mmcfg-seg0.
@@ -34,8 +34,8 @@ def GetMemMappedPciCfgAddrBase():
             int base address of memory mapped PCI config space
     """
     if GetMemMappedPciCfgAddrBase.kgm_pci_cfg_base == -1:
-        # Retrieve the base address from the registry if it hasn't been
-        # initialized yet
+                                                                       
+                         
         GetMemMappedPciCfgAddrBase.kgm_pci_cfg_base = GetMemMappedPciCfgAddrFromRegistry()
     return GetMemMappedPciCfgAddrBase.kgm_pci_cfg_base
 
@@ -78,13 +78,13 @@ def ShowPciCfgBytes(bus, dev, func, offset):
             bus, dev, func, offset: int - bus, dev, function, and offset of the
             PCI config space register
     """
-    # Print mem-mapped address at beginning of each 16-byte line
+                                                                
     phys_addr = MakeMemMappedPciCfgAddr(bus, dev, func, offset)
     read_vals = [DoPciCfgRead(32, bus, dev, func, offset + byte) 
                     for byte in range(0, 16, 4)]
-    # It would be nicer to have a shorter format that we could loop
-    # over, but each call to print results in a newline which 
-    # would prevent us from printing all 16 bytes on one line.
+                                                                   
+                                                              
+                                                              
     bytes_fmt = "{:08x}:" + "{:02x} " * 16
     print bytes_fmt.format(
         phys_addr,
@@ -102,16 +102,16 @@ def DoPciCfgDump(bus, dev, func):
         Params:
             bus, dev, func: int - bus, dev, function of PCI config space to dump
     """
-    # Check for a valid PCI device
+                                  
     vendor_id = DoPciCfgRead(16, bus, dev, func, 0)
     if (vendor_id == 0xbad10ad) or not (vendor_id > 0 and vendor_id < 0xffff):
         return
-    # Show the standard PCI config space
+                                        
     print "address: 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n"
     print "--------------------------------------------------------"
     for offset in range(0, 256, 16):
         ShowPciCfgBytes(bus, dev, func, offset)
-    # Check for PCIE extended capability config space
+                                                     
     if DoPciCfgRead(8, bus, dev, func, 256) < 0xff:
         print " \n"
         for offset in range(256, 4096, 16):
@@ -153,9 +153,9 @@ def DoPciCfgScan(max_bus, dump):
             print "{:03x}:{:03x}:{:03x}".format(bus, dev, func)
             DoPciCfgDump(bus, dev, func)
 
-######################################
-# LLDB commands
-######################################
+                                      
+               
+                                      
 @lldb_command('pci_cfg_read')
 def PciCfgRead(cmd_args=None):
     """ Read PCI config space at the specified bus, device, function, and offset

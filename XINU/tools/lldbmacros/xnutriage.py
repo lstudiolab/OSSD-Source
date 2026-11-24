@@ -8,7 +8,7 @@ import xnudefines
 import re
 import os.path
 
-# Macro: xi
+           
 def OutputAddress(cmd_args=None):
     """ Returns out address and symbol corresponding to it without newline
         Parameters: <address whose symbol is needed>
@@ -43,9 +43,9 @@ def SymbolicateWithInstruction(cmd_args=None):
     a = ArgumentStringToInt(cmd_args[0])
     print OutputAddress([a])
 
-# Macro: xi
+           
 
-# Macro: newbt
+              
 @lldb_command('newbt')
 def NewBt(cmd_args=None):
     """ Prints all the instructions by walking the given stack pointer
@@ -72,9 +72,9 @@ def NewBt(cmd_args=None):
                 print address + ": " + cmd_out1[1].split(':', 1)[1]
         a = dereference(kern.GetValueFromAddress(unsigned(a), 'uintptr_t *'))
 
-# EndMacro: newbt
+                 
 
-# Macro: parseLR
+                
 @lldb_command('parseLR')
 def parseLR(cmd_args=None):
     """ Decode the LR value from panic log into source code location
@@ -101,9 +101,9 @@ def parseLR(cmd_args=None):
 
     else:
         print "Currently unsupported on x86_64 architecture"
-#EndMacro: parseLR
+                  
 
-# Macro: parseLRfromfile
+                        
 @lldb_command('parseLRfromfile')
 def parseLRfromfile(cmd_args=None):
     """ Decode the LR value from file into source code location
@@ -120,5 +120,5 @@ def parseLRfromfile(cmd_args=None):
             print "(lldb) list *{:s}".format(sp)
             print lldb_run_command("list *{:s}".format(sp))
 
-#EndMacro: parseLRfromfile
+                          
 

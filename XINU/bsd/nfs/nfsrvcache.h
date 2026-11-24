@@ -72,11 +72,11 @@
 #include <sys/appleapiopts.h>
 
 #ifdef __APPLE_API_PRIVATE
-/*
- * Definitions for the server recent request cache
- */
+  
+                                                  
+   
 
-/* Network address hash list element */
+                                       
 union nethostaddr {
 	in_addr_t had_inetaddr;
 	struct in6_addr had_inet6addr;
@@ -86,18 +86,18 @@ union nethostaddr {
 #define NFSRVCACHESIZ   64
 
 struct nfsrvcache {
-	TAILQ_ENTRY(nfsrvcache) rc_lru;         /* LRU chain */
-	LIST_ENTRY(nfsrvcache) rc_hash;         /* Hash chain */
-	u_int32_t       rc_xid;                         /* rpc id number */
+	TAILQ_ENTRY(nfsrvcache) rc_lru;                        
+	LIST_ENTRY(nfsrvcache) rc_hash;                         
+	u_int32_t       rc_xid;                                            
 	union {
-		mbuf_t ru_repmb;                /* Reply mbuf list OR */
-		int ru_repstat;                 /* Reply status */
+		mbuf_t ru_repmb;                                        
+		int ru_repstat;                                   
 	} rc_un;
-	sa_family_t rc_family;                  /* address family */
-	union nethostaddr rc_haddr;             /* Host address */
-	u_int32_t rc_proc;                      /* rpc proc number */
-	u_char  rc_state;               /* Current state of request */
-	u_char  rc_flag;                /* Flag bits */
+	sa_family_t rc_family;                                      
+	union nethostaddr rc_haddr;                               
+	u_int32_t rc_proc;                                           
+	u_char  rc_state;                                             
+	u_char  rc_flag;                               
 };
 
 #define rc_reply        rc_un.ru_repmb
@@ -106,18 +106,18 @@ struct nfsrvcache {
 #define rc_inet6addr    rc_haddr.had_inet6addr
 #define rc_nam          rc_haddr.had_nam
 
-/* Cache entry states */
+                        
 #define RC_UNUSED       0
 #define RC_INPROG       1
 #define RC_DONE         2
 
-/* Return values */
+                   
 #define RC_DROPIT       0
 #define RC_REPLY        1
 #define RC_DOIT         2
 #define RC_CHECKIT      3
 
-/* Flag bits */
+               
 #define RC_LOCKED       0x01
 #define RC_WANTED       0x02
 #define RC_REPSTATUS    0x04
@@ -125,5 +125,5 @@ struct nfsrvcache {
 #define RC_INETADDR     0x20
 #define RC_NAM          0x40
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* _NFS_NFSRVCACHE_H_ */
+#endif                          
+#endif                         

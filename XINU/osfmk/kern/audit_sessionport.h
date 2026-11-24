@@ -37,5 +37,5 @@ void audit_session_portdestroy(ipc_port_t *);
 void audit_session_nosenders(mach_msg_header_t *);
 void audit_session_aiaref(struct auditinfo_addr *);
 void audit_session_aiaunref(struct auditinfo_addr *);
-#endif /* _KERN_AUDIT_SESSIONPORT_H_ */
-#endif /* KERNEL_PRIVATE */
+#endif                                 
+#endif                     

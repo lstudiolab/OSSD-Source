@@ -62,4 +62,4 @@ ccdes_cbc_cksum(const void *in, void *out, size_t length,
                 const void *key, size_t key_nbytes, const void *ivec);
 
 
-#endif /* _CORECRYPTO_CCDES_H_ */
+#endif                           

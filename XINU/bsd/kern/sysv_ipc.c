@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$NetBSD: sysv_ipc.c,v 1.7 1994/06/29 06:33:11 cgd Exp $	*/
+                                                             
 
 /*
  * Copyright (c) 1994 Herb Peyerl <hpeyerl@novatel.ca>
@@ -60,59 +60,59 @@
 
 #include <sys/param.h>
 #include <sys/ipc.h>
-#include <sys/stat.h>   /* mode constants */
+#include <sys/stat.h>                       
 #include <sys/ucred.h>
 #include <sys/kauth.h>
 
 
-/*
- * Check for ipc permission
- */
+  
+                           
+   
 
 
-/*
- * ipc_perm
- *
- *	perm->mode			mode of the object
- *	mode				mode bits we want to test
- *
- * Returns:	0			Success
- *		EPERM
- *		EACCES
- *
- * Notes:	The IPC_M bit is special, in that it may only be granted to
- *		root, the creating user, or the owning user.
- *
- *		This code does not use posix_cred_access() because of the
- *		need to check both creator and owner separately when we are
- *		considering a rights grant.  Because of this, we need to do
- *		two evaluations when the values are inequal, which can lead
- *		us to defeat the callout avoidance optimization.  So we do
- *		the work here, inline.  This is less than optimal for any
- *		future work involving opacity of of POSIX credentials.
- *
- *		Setting up the mode_owner / mode_group / mode_world implicitly
- *		masks the IPC_M bit off.  This is intentional.
- *
- *		See the posix_cred_access() implementation for algorithm
- *		information.
- */
+  
+           
+  
+                                  
+                                    
+  
+                       
+         
+          
+  
+                                                                     
+                                                
+  
+                                                             
+                                                               
+                                                               
+                                                               
+                                                              
+                                                             
+                                                          
+  
+                                                                  
+                                                  
+  
+                                                            
+                
+   
 int
 ipcperm(kauth_cred_t cred, struct ipc_perm *perm, int mode_req)
 {
-	uid_t   uid = kauth_cred_getuid(cred);  /* avoid multiple calls */
+	uid_t   uid = kauth_cred_getuid(cred);                            
 	int     want_mod_controlinfo = (mode_req & IPC_M);
 	int     is_member;
 	mode_t  mode_owner = (perm->mode & S_IRWXU);
 	mode_t  mode_group = (mode_t)((perm->mode & S_IRWXG) << 3);
 	mode_t  mode_world = (mode_t)((perm->mode & S_IRWXO) << 6);
 
-	/* Grant all rights to super user */
+	                                    
 	if (!suser(cred, (u_short *)NULL)) {
 		return 0;
 	}
 
-	/* Grant or deny rights based on ownership */
+	                                             
 	if (uid == perm->cuid || uid == perm->uid) {
 		if (want_mod_controlinfo) {
 			return 0;
@@ -120,17 +120,17 @@ ipcperm(kauth_cred_t cred, struct ipc_perm *perm, int mode_req)
 
 		return (mode_req & mode_owner) == mode_req ? 0 : EACCES;
 	} else {
-		/* everyone else who wants to modify control info is denied */
+		                                                              
 		if (want_mod_controlinfo) {
 			return EPERM;
 		}
 	}
 
-	/*
-	 * Combined group and world rights check, if no owner rights; positive
-	 * asssertion of gid/cgid equality avoids an extra callout in the
-	 * common case.
-	 */
+	  
+                                                                       
+                                                                  
+                
+    
 	if ((mode_req & mode_group & mode_world) == mode_req) {
 		return 0;
 	} else {

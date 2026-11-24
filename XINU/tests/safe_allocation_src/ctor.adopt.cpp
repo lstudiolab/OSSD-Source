@@ -1,7 +1,7 @@
-//
-// Tests for
-//  explicit safe_allocation(T* data, size_t n, adopt_memory_t);
-//
+  
+            
+                                                                
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

@@ -59,12 +59,12 @@
  *
  *	@(#)sys_socket.c	8.1 (Berkeley) 6/10/93
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -73,7 +73,7 @@
 #include <sys/protosw.h>
 #include <sys/socket.h>
 #include <sys/socketvar.h>
-#include <sys/filio.h>                  /* XXX */
+#include <sys/filio.h>                           
 #include <sys/sockio.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
@@ -89,9 +89,9 @@
 #include <security/mac_framework.h>
 #endif
 
-/*
- * File operations on sockets.
- */
+  
+                              
+   
 static int soo_read(struct fileproc *, struct uio *, int, vfs_context_t ctx);
 static int soo_write(struct fileproc *, struct uio *, int, vfs_context_t ctx);
 static int soo_close(struct fileglob *, vfs_context_t ctx);
@@ -108,7 +108,7 @@ const struct fileops socketops = {
 	.fo_kqfilter = soo_kqfilter,
 };
 
-/* ARGSUSED */
+              
 static int
 soo_read(struct fileproc *fp, struct uio *uio, __unused int flags,
     __unused vfs_context_t ctx)
@@ -121,7 +121,7 @@ soo_read(struct fileproc *fp, struct uio *uio, __unused int flags,
 	    int *flagsp);
 
 	if ((so = (struct socket *)fp->fp_glob->fg_data) == NULL) {
-		/* This is not a valid open file descriptor */
+		                                              
 		return EBADF;
 	}
 
@@ -131,7 +131,7 @@ soo_read(struct fileproc *fp, struct uio *uio, __unused int flags,
 	return stat;
 }
 
-/* ARGSUSED */
+              
 static int
 soo_write(struct fileproc *fp, struct uio *uio, __unused int flags,
     vfs_context_t ctx)
@@ -144,7 +144,7 @@ soo_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 	proc_t procp;
 
 	if ((so = (struct socket *)fp->fp_glob->fg_data) == NULL) {
-		/* This is not a valid open file descriptor */
+		                                              
 		return EBADF;
 	}
 
@@ -152,7 +152,7 @@ soo_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 
 	stat = (*fsosend)(so, 0, uio, 0, 0, 0);
 
-	/* Generation of SIGPIPE can be controlled per socket */
+	                                                        
 	procp = vfs_context_proc(ctx);
 	if (stat == EPIPE && !(so->so_flags & SOF_NOSIGPIPE)) {
 		psignal(procp, SIGPIPE);
@@ -176,7 +176,7 @@ soioctl(struct socket *so, u_long cmd, caddr_t data, struct proc *p)
 
 	socket_lock(so, 1);
 
-	/* call the socket filter's ioctl handler anything but ours */
+	                                                              
 	if (IOCGROUP(cmd) != 'i' && IOCGROUP(cmd) != 'r') {
 		switch (cmd) {
 		case SIOCGASSOCIDS32:
@@ -187,7 +187,7 @@ soioctl(struct socket *so, u_long cmd, caddr_t data, struct proc *p)
 		case SIOCGCONNINFO64:
 		case SIOCSCONNORDER:
 		case SIOCGCONNORDER:
-			/* don't pass to filter */
+			                          
 			break;
 
 		default:
@@ -200,7 +200,7 @@ soioctl(struct socket *so, u_long cmd, caddr_t data, struct proc *p)
 	}
 
 	switch (cmd) {
-	case FIONBIO:                   /* int */
+	case FIONBIO:                            
 		bcopy(data, &int_arg, sizeof(int_arg));
 		if (int_arg) {
 			so->so_state |= SS_NBIO;
@@ -210,7 +210,7 @@ soioctl(struct socket *so, u_long cmd, caddr_t data, struct proc *p)
 
 		goto out;
 
-	case FIOASYNC:                  /* int */
+	case FIOASYNC:                           
 		bcopy(data, &int_arg, sizeof(int_arg));
 		if (int_arg) {
 			so->so_state |= SS_ASYNC;
@@ -223,45 +223,45 @@ soioctl(struct socket *so, u_long cmd, caddr_t data, struct proc *p)
 		}
 		goto out;
 
-	case FIONREAD:                  /* int */
+	case FIONREAD:                           
 		bcopy(&so->so_rcv.sb_cc, data, sizeof(u_int32_t));
 		goto out;
 
-	case SIOCSPGRP:                 /* int */
+	case SIOCSPGRP:                          
 		bcopy(data, &so->so_pgid, sizeof(pid_t));
 		goto out;
 
-	case SIOCGPGRP:                 /* int */
+	case SIOCGPGRP:                          
 		bcopy(&so->so_pgid, data, sizeof(pid_t));
 		goto out;
 
-	case SIOCATMARK:                /* int */
+	case SIOCATMARK:                         
 		int_arg = (so->so_state & SS_RCVATMARK) != 0;
 		bcopy(&int_arg, data, sizeof(int_arg));
 		goto out;
 
-	case SIOCSETOT:                 /* int; deprecated */
+	case SIOCSETOT:                                      
 		error = EOPNOTSUPP;
 		goto out;
 
-	case SIOCGASSOCIDS32:           /* so_aidreq32 */
-	case SIOCGASSOCIDS64:           /* so_aidreq64 */
-	case SIOCGCONNIDS32:            /* so_cidreq32 */
-	case SIOCGCONNIDS64:            /* so_cidreq64 */
-	case SIOCGCONNINFO32:           /* so_cinforeq32 */
-	case SIOCGCONNINFO64:           /* so_cinforeq64 */
-	case SIOCSCONNORDER:            /* so_cordreq */
-	case SIOCGCONNORDER:            /* so_cordreq */
+	case SIOCGASSOCIDS32:                            
+	case SIOCGASSOCIDS64:                            
+	case SIOCGCONNIDS32:                             
+	case SIOCGCONNIDS64:                             
+	case SIOCGCONNINFO32:                              
+	case SIOCGCONNINFO64:                              
+	case SIOCSCONNORDER:                            
+	case SIOCGCONNORDER:                            
 		error = (*so->so_proto->pr_usrreqs->pru_control)(so,
 		    cmd, data, NULL, p);
 		goto out;
 	}
 
-	/*
-	 * Interface/routing/protocol specific ioctls:
-	 * interface and routing ioctls should have a
-	 * different entry since a socket's unnecessary
-	 */
+	  
+                                               
+                                              
+                                                
+    
 	if (IOCGROUP(cmd) == 'i') {
 		error = ifioctllocked(so, cmd, data, p);
 	} else {
@@ -290,7 +290,7 @@ soo_ioctl(struct fileproc *fp, u_long cmd, caddr_t data, vfs_context_t ctx)
 	proc_t procp = vfs_context_proc(ctx);
 
 	if ((so = (struct socket *)fp->fp_glob->fg_data) == NULL) {
-		/* This is not a valid open file descriptor */
+		                                              
 		return EBADF;
 	}
 
@@ -352,9 +352,9 @@ int
 soo_stat(struct socket *so, void *ub, int isstat64)
 {
 	int ret;
-	/* warning avoidance ; protected by isstat64 */
+	                                               
 	struct stat *sb = (struct stat *)0;
-	/* warning avoidance ; protected by isstat64 */
+	                                               
 	struct stat64 *sb64 = (struct stat64 *)0;
 
 #if CONFIG_MACF_SOCKET_SUBSET
@@ -404,7 +404,7 @@ soo_stat(struct socket *so, void *ub, int isstat64)
 	return ret;
 }
 
-/* ARGSUSED */
+              
 static int
 soo_close(struct fileglob *fg, __unused vfs_context_t ctx)
 {
@@ -442,28 +442,28 @@ soo_drain(struct fileproc *fp, __unused vfs_context_t ctx)
 	return error;
 }
 
-/*
- * 's' group ioctls.
- *
- * The switch statement below does nothing at runtime, as it serves as a
- * compile time check to ensure that all of the socket 's' ioctls (those
- * in the 's' group going thru soo_ioctl) that are made available by the
- * networking stack is unique.  This works as long as this routine gets
- * updated each time a new interface ioctl gets added.
- *
- * Any failures at compile time indicates duplicated ioctl values.
- */
+  
+                    
+  
+                                                                        
+                                                                        
+                                                                        
+                                                                       
+                                                      
+  
+                                                                  
+   
 static __attribute__((unused)) void
 soioctl_cassert(void)
 {
-	/*
-	 * This is equivalent to _CASSERT() and the compiler wouldn't
-	 * generate any instructions, thus for compile time only.
-	 */
+	  
+                                                              
+                                                          
+    
 	switch ((u_long)0) {
 	case 0:
 
-	/* bsd/sys/sockio.h */
+	                      
 	case SIOCSHIWAT:
 	case SIOCGHIWAT:
 	case SIOCSLOWAT:

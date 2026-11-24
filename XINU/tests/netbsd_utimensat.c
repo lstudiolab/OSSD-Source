@@ -1,4 +1,4 @@
-/*	$NetBSD: t_utimensat.c,v 1.6 2017/01/10 15:13:56 christos Exp $ */
+                                                                     
 
 /*-
  * Copyright (c) 2012 The NetBSD Foundation, Inc.
@@ -63,12 +63,12 @@ chtmpdir(void)
 	T_SETUPBEGIN;
 	T_ASSERT_POSIX_ZERO(chdir(dt_tmpdir()), NULL);
 
-	// <rdar://problem/31780295> dt_tmpdir() should guarantee a clean directory for each run
+	                                                                                        
 	unlink(FILEPATH);
 	unlink(LINK);
 	rmdir(DIRPATH);
 
-	// Skip the test if the current working directory is not on APFS.
+	                                                                 
 	struct statfs sfs = { 0 };
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(statfs(".", &sfs), NULL);
 	if (memcmp(&sfs.f_fstypename[0], "apfs", strlen("apfs")) != 0) {
@@ -180,7 +180,7 @@ T_DECL(netbsd_utimensat_fdlink, "See that utimensat works on symlink")
 	struct stat st;
 
 	T_ASSERT_POSIX_ZERO(mkdir(DIRPATH, 0755), NULL);
-	T_ASSERT_POSIX_ZERO(symlink(FILEPATH, LINK), NULL); /* NB: FILE does not exists */
+	T_ASSERT_POSIX_ZERO(symlink(FILEPATH, LINK), NULL);                               
 
 	T_ASSERT_POSIX_SUCCESS((dfd = open(DIRPATH, O_RDONLY, 0)), NULL);
 

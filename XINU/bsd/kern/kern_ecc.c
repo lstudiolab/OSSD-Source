@@ -49,9 +49,9 @@ get_ecc_data_handler(__unused struct sysctl_oid *oidp, __unused void *arg1, __un
 	}
 
 	if (KERN_SUCCESS != ecc_log_get_next_event(&ev)) {
-		/*
-		 * EAGAIN would be better, but sysctl infrastructure
-		 * interprets that */
+		  
+                                                      
+                       
 		return EBUSY;
 	}
 

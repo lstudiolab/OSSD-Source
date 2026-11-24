@@ -1,7 +1,7 @@
-//
-// Tests for
-//      safe_allocation& operator=(safe_allocation&& other);
-//
+  
+            
+                                                            
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>
@@ -16,7 +16,7 @@ template <typename T>
 static void
 tests()
 {
-	// Move-assign non-null to non-null
+	                                   
 	{
 		{
 			tracked_safe_allocation<T> from(10, libkern::allocate_memory);
@@ -42,7 +42,7 @@ tests()
 		CHECK(!tracking_allocator::did_deallocate);
 	}
 
-	// Move-assign null to non-null
+	                               
 	{
 		{
 			tracked_safe_allocation<T> from = nullptr;
@@ -67,7 +67,7 @@ tests()
 		CHECK(!tracking_allocator::did_deallocate);
 	}
 
-	// Move-assign non-null to null
+	                               
 	{
 		{
 			tracked_safe_allocation<T> from(10, libkern::allocate_memory);
@@ -93,7 +93,7 @@ tests()
 		CHECK(!tracking_allocator::did_deallocate);
 	}
 
-	// Move-assign null to null
+	                           
 	{
 		{
 			tracked_safe_allocation<T> from = nullptr;
@@ -118,7 +118,7 @@ tests()
 		CHECK(!tracking_allocator::did_deallocate);
 	}
 
-	// Move-assign to self
+	                      
 	{
 		{
 			tracked_safe_allocation<T> obj(10, libkern::allocate_memory);

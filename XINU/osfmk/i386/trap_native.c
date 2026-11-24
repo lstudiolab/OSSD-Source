@@ -53,12 +53,12 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- * Hardware trap/fault handler.
- */
+  
+                               
+   
 
 #include <types.h>
 #include <i386/eflags.h>
@@ -105,9 +105,9 @@ extern volatile int panic_double_fault_cpu;
 
 
 #if defined(__x86_64__) && DEBUG
-/*
- * K64 debug - fatal handler for debug code in the trap vectors.
- */
+  
+                                                                
+   
 extern void __dead2
 panic_idt64(x86_saved_state_t *rsp);
 void
@@ -123,27 +123,27 @@ __dead2
 static void
 panic_64(x86_saved_state_t *sp, __unused int pc, __unused const char *msg, boolean_t do_mca_dump)
 {
-	/* Set postcode (DEBUG only) */
+	                               
 	postcode(pc);
 
-	/*
-	 * Issue an I/O port read if one has been requested - this is an
-	 * event logic analyzers can use as a trigger point.
-	 */
+	  
+                                                                 
+                                                     
+    
 	panic_notify();
 
 
-	/*
-	 * Break kprintf lock in case of recursion,
-	 * and record originally faulted instruction address.
-	 */
+	  
+                                            
+                                                      
+    
 	kprintf_break_lock();
 
 	if (do_mca_dump) {
 #if CONFIG_MCA
-		/*
-		 * Dump the contents of the machine check MSRs (if any).
-		 */
+		  
+                                                          
+     
 		mca_dump();
 #endif
 	}

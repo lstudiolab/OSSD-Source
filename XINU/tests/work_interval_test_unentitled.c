@@ -1,4 +1,4 @@
-/* test that the header doesn't implicitly depend on others */
+                                                              
 #include <sys/work_interval.h>
 
 #include <stdlib.h>
@@ -36,12 +36,12 @@ set_realtime(pthread_t thread)
 	mach_port_t target_thread = pthread_mach_thread_np(thread);
 	T_EXPECT_NE(target_thread, MACH_PORT_NULL, "pthread_mach_thread_np");
 
-	/* 1s 100ms 10ms */
+	                   
 	pol.period      = (uint32_t)nanos_to_abs(1000000000);
 	pol.constraint  = (uint32_t)nanos_to_abs(100000000);
 	pol.computation = (uint32_t)nanos_to_abs(10000000);
 
-	pol.preemptible = 0; /* Ignored by OS */
+	pol.preemptible = 0;                    
 	kr = thread_policy_set(target_thread, THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) &pol,
 	    THREAD_TIME_CONSTRAINT_POLICY_COUNT);
 	T_ASSERT_MACH_SUCCESS(kr, "thread_policy_set(THREAD_TIME_CONSTRAINT_POLICY)");

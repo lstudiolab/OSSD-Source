@@ -18,18 +18,18 @@ namespace os {
 typedef decltype(nullptr) nullptr_t;
 #endif
 
-/*
- * Reference removal
- */
+  
+                    
+   
 
 template <class _T> struct remove_reference       {typedef _T type;};
 template <class _T> struct remove_reference<_T&>  {typedef _T type;};
 template <class _T> struct remove_reference<_T &&> {typedef _T type;};
 template <class _T> using remove_reference_t = typename remove_reference<_T>::type;
 
-/*
- * Const removal
- */
+  
+                
+   
 
 template <class _T> struct remove_const           {typedef _T type;};
 template <class _T> struct remove_const<const _T> {typedef _T type;};
@@ -38,9 +38,9 @@ template <class _T> using remove_const_t = typename remove_const<_T>::type;
 template <class T> struct is_lvalue_reference { static constexpr bool value = false; };
 template <class T> struct is_lvalue_reference<T&> { static constexpr bool value = true; };
 
-/*
- * Move
- */
+  
+       
+   
 
 template <class _T>
 inline typename remove_reference<_T>::type &&
@@ -72,9 +72,9 @@ constexpr T && forward(os::remove_reference_t<T>&& t) noexcept {
 	return static_cast<T &&>(t);
 }
 
-// Moves [first, last) into the range ending at d_last,
-// proceeding backwards (from last to first)
-// UB if d_last is within (first, last]
+                                                       
+                                            
+                                       
 template <class T>
 T*
 move_backward(T* first, T* last, T* d_last)
@@ -114,4 +114,4 @@ uninitialized_value_construct(T* first, T* last)
 }
 }
 
-#endif /* _OS_CPP_UTIL_H */
+#endif                     

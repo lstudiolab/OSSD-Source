@@ -56,12 +56,12 @@ extern cpu_data_t cpshadows[];
 #if DEVELOPMENT || DEBUG
 void iotrace_init(int ncpus);
 void traptrace_init(int ncpus);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 
-/* Re-sort double-mapped CPU data shadows after topology discovery sorts the
- * primary CPU data structures by physical/APIC CPU ID.
- */
+                                                                            
+                                                       
+   
 static void
 cpu_shadow_sort(int ncpus)
 {
@@ -73,15 +73,15 @@ cpu_shadow_sort(int ncpus)
 	}
 }
 
-/*
- * cpu_topology_sort() is called after all processors have been registered but
- * before any non-boot processor is started.  We establish canonical logical
- * processor numbering - logical cpus must be contiguous, zero-based and
- * assigned in physical (local apic id) order.  This step is required because
- * the discovery/registration order is non-deterministic - cores are registered
- * in differing orders over boots.  Enforcing canonical numbering simplifies
- * identification of processors.
- */
+  
+                                                                              
+                                                                            
+                                                                        
+                                                                             
+                                                                               
+                                                                            
+                                
+   
 void
 cpu_topology_sort(int ncpus)
 {
@@ -101,7 +101,7 @@ cpu_topology_sort(int ncpus)
 	PE_parse_boot_argn("cpus_per_pset", &cpus_per_pset, sizeof(cpus_per_pset));
 #endif
 
-	/* Lights out for this */
+	                         
 	istate = ml_set_interrupts_enabled(FALSE);
 
 	if (topo_dbg) {
@@ -114,10 +114,10 @@ cpu_topology_sort(int ncpus)
 		}
 	}
 
-	/*
-	 * Re-order the cpu_data_ptr vector sorting by physical id.
-	 * Skip the boot processor, it's required to be correct.
-	 */
+	  
+                                                            
+                                                         
+    
 	if (ncpus > 1) {
 		qsort((void *) &cpu_data_ptr[1],
 		    ncpus - 1,
@@ -133,9 +133,9 @@ cpu_topology_sort(int ncpus)
 		}
 	}
 
-	/*
-	 * Finalize logical numbers and map kept by the lapic code.
-	 */
+	  
+                                                            
+    
 	for (i = 0; i < ncpus; i++) {
 		cpu_data_t      *cpup = cpu_datap(i);
 
@@ -159,19 +159,19 @@ cpu_topology_sort(int ncpus)
 #if DEVELOPMENT || DEBUG
 	iotrace_init(ncpus);
 	traptrace_init(ncpus);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-	/*
-	 * Let the CPU Power Management know that the topology is stable.
-	 */
+	  
+                                                                  
+    
 	topoParms.stable = TRUE;
 	pmCPUStateInit();
 
-	/*
-	 * Iterate over all logical cpus finding or creating the affinity set
-	 * for their LLC cache. Each affinity set possesses a processor set
-	 * into which each logical processor is added.
-	 */
+	  
+                                                                      
+                                                                    
+                                               
+    
 	TOPO_DBG("cpu_topology_start() creating affinity sets:ncpus=%d max_cpus=%d\n", ncpus, machine_info.max_cpus);
 	for (i = 0; i < machine_info.max_cpus; i++) {
 		cpu_data_t              *cpup = cpu_datap(i);
@@ -218,7 +218,7 @@ cpu_topology_sort(int ncpus)
 	}
 
 	if (machine_info.max_cpus < machine_info.logical_cpu_max) {
-		/* boot-args cpus=n is set, so adjust max numbers to match */
+		                                                             
 		int logical_max = machine_info.max_cpus;
 		int physical_max = logical_max;
 		if (machine_info.logical_cpu_max != machine_info.physical_cpu_max) {
@@ -229,16 +229,16 @@ cpu_topology_sort(int ncpus)
 	}
 }
 
-/* We got a request to start a CPU. Check that this CPU is within the
- * max cpu limit set before we do.
- */
+                                                                     
+                                  
+   
 kern_return_t
 cpu_topology_start_cpu( int cpunum )
 {
 	int             ncpus = machine_info.max_cpus;
 	int             i = cpunum;
 
-	/* Decide whether to start a CPU, and actually start it */
+	                                                          
 	TOPO_DBG("cpu_topology_start() processor_start():\n");
 	if (i < ncpus) {
 		TOPO_DBG("\tlcpu %d\n", cpu_datap(i)->cpu_number);
@@ -448,4 +448,4 @@ traptrace_init(int ncpus)
 	}
 }
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           

@@ -39,22 +39,22 @@ enum {
 	BPF_TAP_INPUT_OUTPUT
 };
 
-/*
- * DLIL_DESC_ETYPE2 - native_type must point to 2 byte ethernet raw protocol,
- *                    variants.native_type_length must be set to 2
- * DLIL_DESC_SAP - native_type must point to 3 byte SAP protocol
- *                 variants.native_type_length must be set to 3
- * DLIL_DESC_SNAP - native_type must point to 5 byte SNAP protocol
- *                  variants.native_type_length must be set to 5
- *
- * All protocols must be in Network byte order.
- *
- * Future interface families may define more protocol types they know about.
- * The type implies the offset and context of the protocol data at native_type.
- * The length of the protocol data specified at native_type must be set in
- * variants.native_type_length.
- */
-/* Ethernet specific types */
+  
+                                                                             
+                                                                  
+                                                                
+                                                               
+                                                                  
+                                                                
+  
+                                               
+  
+                                                                            
+                                                                               
+                                                                          
+                               
+   
+                             
 #define DLIL_DESC_ETYPE2        4
 #define DLIL_DESC_SAP           5
 #define DLIL_DESC_SNAP          6
@@ -69,7 +69,7 @@ enum {
 #include <kern/locks.h>
 
 #ifdef BSD_KERNEL_PRIVATE
-/* Operations on timespecs. */
+                              
 #define net_timerclear(tvp)     (tvp)->tv_sec = (tvp)->tv_nsec = 0
 
 #define net_timerisset(tvp)     ((tvp)->tv_sec || (tvp)->tv_nsec)
@@ -117,18 +117,18 @@ enum {
 	(tvp)->tv_sec = (__darwin_time_t)__sec;                         \
 	(tvp)->tv_nsec = (long)(__nsp - __sec * NSEC_PER_SEC);          \
 } while (0)
-#else /* 32 bit */
-/*
- * NSEC needs to be < 2^31*10^9 to be representable in a struct timespec
- * because __darwin_time_t is 32 bit on 32-bit platforms. This bound
- * is < 2^61. We get a first approximation to convert into seconds using
- * the following values.
- * a = floor(NSEC / 2^29)
- * inv = floor(2^61 / 10^9)
- *
- * The approximation of seconds is correct or too low by 1 unit.
- * So we fix it by computing the remainder.
- */
+#else             
+  
+                                                                        
+                                                                    
+                                                                        
+                        
+                         
+                           
+  
+                                                                
+                                           
+   
 #define net_nsectimer(nsp, tvp) do {                                    \
 	u_int64_t __nsp = *(nsp);                                       \
 	net_timerclear(tvp);                                            \
@@ -141,7 +141,7 @@ enum {
 	(tvp)->tv_nsec =                                                \
 	    (long)((__rem >= NSEC_PER_SEC) ? (__rem - NSEC_PER_SEC) : __rem);   \
 } while(0)
-#endif /* 32 bit */
+#endif             
 
 struct ifnet;
 struct mbuf;
@@ -151,57 +151,57 @@ struct iff_filter;
 
 #define DLIL_THREADNAME_LEN     32
 
-/*
- * DLIL threading info
- */
+  
+                      
+   
 struct dlil_threading_info {
 	decl_lck_mtx_data(, dlth_lock);
-	class_queue_t   dlth_pkts;      /* queue of pkts */
-	struct ifnet    *dlth_ifp;      /* pointer to interface */
-	struct ifnet_stat_increment_param dlth_stats; /* incremental stats */
-	uint32_t       dlth_flags;      /* thread flags (see below) */
-	uint32_t       dlth_wtot;       /* # of wakeup requests */
+	class_queue_t   dlth_pkts;                         
+	struct ifnet    *dlth_ifp;                                
+	struct ifnet_stat_increment_param dlth_stats;                        
+	uint32_t       dlth_flags;                                    
+	uint32_t       dlth_wtot;                                 
 
-	/* strategy (sync or async) */
+	                              
 	errno_t (*dlth_strategy)(struct dlil_threading_info *,
 	    struct ifnet *, struct mbuf *, struct mbuf *,
 	    const struct ifnet_stat_increment_param *, boolean_t,
 	    struct thread *);
 
-	/*
-	 * Thread affinity (workloop and DLIL threads).
-	 */
-	boolean_t       dlth_affinity;          /* affinity set is available */
-	uint32_t        dlth_affinity_tag;      /* affinity tag */
-	struct thread   *dlth_thread;           /* DLIL worker thread */
-	struct thread   *dlth_driver_thread;    /* driver/workloop thread */
-	struct thread   *dlth_poller_thread;    /* poll thread */
+	  
+                                                
+    
+	boolean_t       dlth_affinity;                                         
+	uint32_t        dlth_affinity_tag;                        
+	struct thread   *dlth_thread;                                   
+	struct thread   *dlth_driver_thread;                                
+	struct thread   *dlth_poller_thread;                     
 
-	lck_grp_t       *dlth_lock_grp; /* lock group (for lock stats) */
-	char            dlth_name[DLIL_THREADNAME_LEN]; /* name storage */
+	lck_grp_t       *dlth_lock_grp;                                  
+	char            dlth_name[DLIL_THREADNAME_LEN];                   
 
 #if IFNET_INPUT_SANITY_CHK
-	/*
-	 * For debugging.
-	 */
-	uint64_t        dlth_pkts_cnt;          /* total # of packets */
+	  
+                  
+    
+	uint64_t        dlth_pkts_cnt;                                  
 #endif
 };
 
-/*
- * DLIL input thread info (for main/loopback input thread)
- */
+  
+                                                          
+   
 struct dlil_main_threading_info {
 	struct dlil_threading_info      inp;
-	class_queue_t                   lo_rcvq_pkts; /* queue of lo0 pkts */
+	class_queue_t                   lo_rcvq_pkts;                        
 };
 
-/*
- * Valid values for dlth_flags.
- *
- * The following are shared with kpi_protocol.c so that it may wakeup
- * the input thread to run through packets queued for protocol input.
- */
+  
+                               
+  
+                                                                     
+                                                                     
+   
 #define DLIL_INPUT_RUNNING              0x80000000
 #define DLIL_INPUT_WAITING              0x40000000
 #define DLIL_PROTO_REGISTER             0x20000000
@@ -210,15 +210,15 @@ struct dlil_main_threading_info {
 #define DLIL_INPUT_TERMINATE_COMPLETE   0x04000000
 #define DLIL_INPUT_EMBRYONIC            0x00000001
 
-/*
- * Flags for dlil_attach_filter()
- */
-#define DLIL_IFF_TSO            0x01    /* Interface filter supports TSO */
-#define DLIL_IFF_INTERNAL       0x02    /* Apple internal -- do not count towards stats */
+  
+                                 
+   
+#define DLIL_IFF_TSO            0x01                                       
+#define DLIL_IFF_INTERNAL       0x02                                                      
 
-/* Input poll interval definitions */
-#define IF_RXPOLL_INTERVALTIME_MIN      (1ULL * 1000)           /* 1 us */
-#define IF_RXPOLL_INTERVALTIME          (1ULL * 1000 * 1000)    /* 1 ms */
+                                     
+#define IF_RXPOLL_INTERVALTIME_MIN      (1ULL * 1000)                     
+#define IF_RXPOLL_INTERVALTIME          (1ULL * 1000 * 1000)              
 
 extern int dlil_verbose;
 extern uint32_t hwcksum_dbg;
@@ -239,53 +239,53 @@ extern void ifp_if_start(struct ifnet *);
 
 extern errno_t dlil_set_bpf_tap(ifnet_t, bpf_tap_mode, bpf_packet_func);
 
-/*
- * Send arp internal bypasses the check for IPv4LL.
- */
+  
+                                                   
+   
 extern errno_t dlil_send_arp_internal(ifnet_t, u_int16_t,
     const struct sockaddr_dl *, const struct sockaddr *,
     const struct sockaddr_dl *, const struct sockaddr *);
 
-/*
- * The following constants are used with the net_thread_mark_apply and
- * net_thread_is_unmarked functions to control the bits in the uu_network_marks
- * field of the uthread structure.
- */
-#define NET_THREAD_HELD_PF      0x1     /* thread is holding PF lock */
-#define NET_THREAD_HELD_DOMAIN  0x2     /* thread is holding domain_proto_mtx */
-#define NET_THREAD_CKREQ_LLADDR 0x4     /* thread reqs MACF check for LLADDR */
+  
+                                                                      
+                                                                               
+                                  
+   
+#define NET_THREAD_HELD_PF      0x1                                    
+#define NET_THREAD_HELD_DOMAIN  0x2                                             
+#define NET_THREAD_CKREQ_LLADDR 0x4                                            
 
-/*
- * net_thread_marks_t is a pointer to a phantom structure type used for
- * manipulating the uthread:uu_network_marks field.  As an example...
- *
- *   static const u_int32_t bits = NET_THREAD_CKREQ_LLADDR;
- *   struct uthread *uth = get_bsdthread_info(current_thread());
- *
- *   net_thread_marks_t marks = net_thread_marks_push(bits);
- *   VERIFY((uth->uu_network_marks & NET_THREAD_CKREQ_LLADDR) != 0);
- *   net_thread_marks_pop(marks);
- *
- * The net_thread_marks_push() function returns an encoding of the bits
- * that were changed from zero to one in the uu_network_marks field. When
- * the net_thread_marks_pop() function later processes that value, it
- * resets the bits to their previous value.
- *
- * The net_thread_unmarks_push() and net_thread_unmarks_pop() functions
- * are similar to net_thread_marks_push() and net_thread_marks_pop() except
- * they clear the marks bits in the guarded section rather than set them.
- *
- * The net_thread_is_marked() and net_thread_is_unmarked() functions return
- * the subset of the bits that are currently set or cleared (respectively)
- * in the uthread:uu_network_marks field.
- *
- * Finally, the value of the net_thread_marks_none constant is provided for
- * comparing for equality with the value returned when no bits in the marks
- * field are changed by the push.
- *
- * It is not significant that a value of type net_thread_marks_t may
- * compare as equal to the NULL pointer.
- */
+  
+                                                                       
+                                                                     
+  
+                                                           
+                                                                
+  
+                                                            
+                                                                    
+                                 
+  
+                                                                       
+                                                                         
+                                                                     
+                                           
+  
+                                                                       
+                                                                           
+                                                                         
+  
+                                                                           
+                                                                          
+                                         
+  
+                                                                           
+                                                                           
+                                 
+  
+                                                                    
+                                        
+   
 struct net_thread_marks;
 typedef const struct net_thread_marks *net_thread_marks_t;
 
@@ -338,14 +338,14 @@ extern errno_t ifnet_input_poll(struct ifnet *, struct mbuf *,
     struct mbuf *, const struct ifnet_stat_increment_param *);
 
 
-/*
- * dlil_if_acquire is obsolete. Use ifnet_allocate.
- */
+  
+                                                   
+   
 extern int dlil_if_acquire(u_int32_t, const void *, size_t, const char *, struct ifnet **);
-/*
- * dlil_if_release is obsolete. The equivalent is called automatically when
- * an interface is detached.
- */
+  
+                                                                           
+                            
+   
 extern void dlil_if_release(struct ifnet *ifp);
 
 extern errno_t dlil_if_ref(struct ifnet *);
@@ -380,10 +380,10 @@ extern errno_t dlil_input_handler(struct ifnet *, struct mbuf *,
     boolean_t, struct thread *);
 
 
-/*
- * This is mostly called from the context of the DLIL input thread;
- * because of that there is no need for atomic operations.
- */
+  
+                                                                   
+                                                          
+   
 __attribute__((always_inline))
 static inline void
 ifp_inc_traffic_class_in(struct ifnet *ifp, struct mbuf *m)
@@ -419,11 +419,11 @@ ifp_inc_traffic_class_in(struct ifnet *ifp, struct mbuf *m)
 	}
 }
 
-/*
- * This is called from DLIL output, hence multiple threads could end
- * up modifying the statistics.  We trade off acccuracy for performance
- * by not using atomic operations here.
- */
+  
+                                                                    
+                                                                       
+                                       
+   
 __attribute__((always_inline))
 static inline void
 ifp_inc_traffic_class_out(struct ifnet *ifp, struct mbuf *m)
@@ -458,7 +458,7 @@ ifp_inc_traffic_class_out(struct ifnet *ifp, struct mbuf *m)
 		ifp->if_tc.ifi_opvbytes += (u_int64_t)m->m_pkthdr.len;
 	}
 }
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* KERNEL_PRIVATE */
-#endif /* KERNEL */
-#endif /* DLIL_H */
+#endif                         
+#endif                     
+#endif             
+#endif             

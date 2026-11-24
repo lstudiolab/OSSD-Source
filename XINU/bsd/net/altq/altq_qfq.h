@@ -32,4 +32,4 @@
 #include <net/pfvar.h>
 #include <net/altq/altq.h>
 
-#endif /* _NET_ALTQ_ALTQ_QFQ_H_ */
+#endif                            

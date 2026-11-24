@@ -6,7 +6,7 @@ from kcdata import kcdata_item_iterator, KCObject, GetTypeForName, KCCompressedB
 from collections import namedtuple
 import heapq
 
-# From the defines in bsd/sys/kdebug.h:
+                                       
 
 KdebugClassNames = {
     1: "MACH",
@@ -57,7 +57,7 @@ def GetKdebugTypefilter(typefilter):
     classes = 256
     subclasses_per_class = 256
 
-    # 8 bits at a time
+                      
     subclasses_per_element = 64
     cur_typefilter = cast(typefilter, 'uint64_t *')
     subclasses_fmts = ' '.join(['{:02x}'] * 8)
@@ -69,7 +69,7 @@ def GetKdebugTypefilter(typefilter):
         print_class = False
         subclasses = [0] * elements_per_class
 
-        # check subclass ranges for set bits, remember those subclasses
+                                                                       
         for j in xrange(0, elements_per_class):
             element = unsigned(cur_typefilter[i * elements_per_class + j])
             if element != 0:
@@ -77,11 +77,11 @@ def GetKdebugTypefilter(typefilter):
             if print_class:
                 subclasses[j] = element
 
-        ## if any of the bits were set in a class, print the entire class
+                                                                         
         if print_class:
             out_str += '{:<20s}'.format(GetKdebugClassName(i))
             for element in subclasses:
-                # split up the 64-bit values into byte-sized pieces
+                                                                   
                 bytes = [unsigned((element >> i) & 0xff) for i in (0, 8, 16, 24, 32, 40, 48, 56)]
                 out_str += subclasses_fmts.format(*bytes)
                 out_str += ' '
@@ -296,14 +296,14 @@ class KDCPU(object):
         self.kdstorep = kdstoreinfo.kd_list_head
 
         if self.kdstorep.raw == xnudefines.KDS_PTR_NULL:
-            # Returns an empty iterrator. It will immediatelly stop at
-            # first call to __next__().
+                                                                      
+                                       
             return
 
         self.iter_store = self.get_kdstore(self.kdstorep)
 
-        # XXX Doesn't have the same logic to avoid un-mergeable events
-        #     (respecting barrier_min and bufindx) as the C code.
+                                                                      
+                                                                 
 
         self.iter_idx = self.iter_store.kds_readlast
 
@@ -314,13 +314,13 @@ class KDCPU(object):
         buf = kern.globals.kd_bufs[kdstorep.buffer_index]
         return addressof(buf.kdsb_addr[kdstorep.offset])
 
-    # Event iterator implementation returns KDEvent instance
+                                                            
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        # This CPU is out of events
+                                   
         if self.iter_store is None:
             raise StopIteration
 
@@ -331,18 +331,18 @@ class KDCPU(object):
         keventp = addressof(self.iter_store.kds_records[self.iter_idx])
         timestamp = unsigned(keventp.timestamp)
 
-        # check for writer overrun
+                                  
         if timestamp < self.iter_store.kds_timestamp:
             raise StopIteration
 
-        # Advance iterator
+                          
         self.iter_idx += 1
 
         if self.iter_idx == xnudefines.EVENTS_PER_STORAGE_UNIT:
             snext = self.iter_store.kds_next
             if snext.raw == xnudefines.KDS_PTR_NULL:
-                # Terminate iteration in next loop. Current element is the
-                # last one in this CPU buffer.
+                                                                          
+                                              
                 self.iter_store = None
             else:
                 self.iter_store = self.get_kdstore(snext)
@@ -350,7 +350,7 @@ class KDCPU(object):
 
         return KDEvent(timestamp, keventp)
 
-    # Python 2 compatibility
+                            
     def next(self):
         return self.__next__()
 
@@ -367,10 +367,10 @@ def IterateKdebugEvents():
     barrier_min = ctrl.oldest_time
 
     if (ctrl.kdebug_flags & xnudefines.KDBG_WRAPPED) != 0:
-        # TODO Yield a wrap event with the barrier_min timestamp.
+                                                                 
         pass
 
-    # Merge sort all events from all CPUs.
+                                          
     cpus = [KDCPU(cpuid) for cpuid in range(ctrl.kdebug_cpus)]
 
     for event in heapq.merge(*cpus):
@@ -447,12 +447,12 @@ def SaveKdebugTrace(cmd_args=None, cmd_options={}):
 
         numer, denom = GetTimebaseInfo()
 
-        # XXX The kernel doesn't have a solid concept of the wall time.
+                                                                       
         wall_abstime = 0
         wall_secs = 0
         wall_usecs = 0
 
-        # XXX 32-bit is NYI
+                           
         k64 = True
         event_size = unsigned(64)
 
@@ -461,18 +461,18 @@ def SaveKdebugTrace(cmd_args=None, cmd_options={}):
                 numer, denom, wall_abstime, wall_secs, wall_usecs, 0, 0,
                 0x1 if k64 else 0)
         f.write(file_hdr)
-        file_offset += 16 + FILEHDR_SIZE # chunk header plus file header
+        file_offset += 16 + FILEHDR_SIZE                                
 
         skip_nevents = nevents - limit_nevents if limit_nevents else 0
         if skip_nevents > 0:
             print('omitting {} events from the beginning'.format(skip_nevents))
 
         events_hdr = struct.pack(
-                CHUNKHDR_PACK, EVENTS_TAG, 0, 0, 0) # size will be filled in later
+                CHUNKHDR_PACK, EVENTS_TAG, 0, 0, 0)                               
         f.write(events_hdr)
-        file_offset += 16 # header size
+        file_offset += 16              
         event_size_offset = file_offset - FUTURE_SIZE
-        # Future events timestamp -- doesn't need to be set for merged events.
+                                                                              
         f.write(struct.pack('Q', 0))
         file_offset += FUTURE_SIZE
 
@@ -500,7 +500,7 @@ def SaveKdebugTrace(cmd_args=None, cmd_options={}):
             file_offset += event_size
             f.write(event)
             written_nevents += 1
-            # Periodically update the CLI with progress.
+                                                        
             if written_nevents % 1000 == 0:
                 sys.stderr.write('wrote {}/{} ({:4.2f}%) events'.format(
                         written_nevents, limit_nevents,
@@ -511,8 +511,8 @@ def SaveKdebugTrace(cmd_args=None, cmd_options={}):
         if verbose:
             print('events end at offset {}'.format(file_offset))
 
-        # Normally, the chunk would need to be padded to 8, but events are
-        # already aligned.
+                                                                          
+                          
 
         kcdata = kern.globals.kc_panic_data
         kcdata_addr = unsigned(kcdata.kcd_addr_begin)
@@ -550,7 +550,7 @@ def SaveKdebugTrace(cmd_args=None, cmd_options={}):
         else:
             print('stackshot is not available, trace file may not be usable!')
 
-        # After the number of events is known, fix up the events chunk size.
+                                                                            
         events_data_size = unsigned(written_nevents * event_size) + FUTURE_SIZE
         f.seek(event_size_offset)
         f.write(struct.pack('Q', events_data_size))

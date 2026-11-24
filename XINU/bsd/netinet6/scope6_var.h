@@ -59,10 +59,10 @@
 #define _NETINET6_SCOPE6_VAR_H_
 #include <sys/appleapiopts.h>
 
-/*
- * 16 is correspondent to 4bit multicast scope field.
- * i.e. from node-local to global with some reserved/unassigned types.
- */
+  
+                                                     
+                                                                      
+   
 #define SCOPE6_ID_MAX   16
 
 #ifdef BSD_KERNEL_PRIVATE
@@ -82,5 +82,5 @@ extern int in6_setscope(struct in6_addr *, struct ifnet *, u_int32_t *);
 extern int in6_clearscope(struct in6_addr *);
 extern void rtkey_to_sa6(struct rtentry *, struct sockaddr_in6 *);
 extern void rtgw_to_sa6(struct rtentry *, struct sockaddr_in6 *);
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET6_SCOPE6_VAR_H_ */
+#endif                         
+#endif                              

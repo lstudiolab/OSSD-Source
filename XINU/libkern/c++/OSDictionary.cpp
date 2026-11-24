@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* OSDictionary.m created by rsulack on Fri 12-Sep-1997 */
-/* OSDictionary.cpp converted to C++ by gvdl on Fri 1998-10-30 */
-/* OSDictionary.cpp rewritten by gvdl on Fri 1998-10-30 */
+                                                          
+                                                                 
+                                                          
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -92,7 +92,7 @@ OSDictionary::initWithCapacity(unsigned int inCapacity)
 	}
 
 	unsigned int size = inCapacity * sizeof(dictEntry);
-//fOptions |= kSort;
+                    
 
 	dictionary = (dictEntry *) kalloc_container(size);
 	if (!dictionary) {
@@ -325,11 +325,11 @@ OSDictionary::ensureCapacity(unsigned int newCapacity)
 		return capacity;
 	}
 
-	// round up
+	           
 	finalCapacity = (((newCapacity - 1) / capacityIncrement) + 1)
 	    * capacityIncrement;
 
-	// integer overflow check
+	                         
 	if (finalCapacity < newCapacity) {
 		return capacity;
 	}
@@ -338,10 +338,10 @@ OSDictionary::ensureCapacity(unsigned int newCapacity)
 
 	newDict = (dictEntry *) kallocp_container(&newSize);
 	if (newDict) {
-		// use all of the actual allocation size
+		                                        
 		finalCapacity = (newSize / sizeof(dictEntry));
 		if (finalCapacity > UINT_MAX) {
-			// failure, too large
+			                     
 			kfree(newDict, newSize);
 			return capacity;
 		}
@@ -385,7 +385,7 @@ setObject(const OSSymbol *aKey, const OSMetaClassBase *anObject, bool onlyAdd)
 		return false;
 	}
 
-	// if the key exists, replace the object
+	                                        
 
 	if (fOptions & kSort) {
 		i = OSSymbol::bsearch(aKey, &dictionary[0], count, sizeof(dictionary[0]));
@@ -411,7 +411,7 @@ setObject(const OSSymbol *aKey, const OSMetaClassBase *anObject, bool onlyAdd)
 		return true;
 	}
 
-	// add new key, possibly extending our capacity
+	                                               
 	if (count >= capacity && count >= ensureCapacity(count + 1)) {
 		return false;
 	}
@@ -463,7 +463,7 @@ OSDictionary::removeObject(const OSSymbol *aKey)
 		return;
 	}
 
-	// if the key exists, remove the object
+	                                       
 
 	if (fOptions & kSort) {
 		i = OSSymbol::bsearch(aKey, &dictionary[0], count, sizeof(dictionary[0]));
@@ -491,7 +491,7 @@ OSDictionary::removeObject(const OSSymbol *aKey)
 }
 
 
-// Returns true on success, false on an error condition.
+                                                        
 bool
 OSDictionary::merge(const OSDictionary *srcDict)
 {
@@ -528,13 +528,13 @@ OSDictionary::getObject(const OSSymbol *aKey) const
 		return NULL;
 	}
 
-	// if the key exists, return the object
-	//
-	// inline OSSymbol::bsearch in this performance critical codepath
-	// for performance, the compiler can't do that due to the genericity
-	// of OSSymbol::bsearch
-	//
-	// If we have less than 4 objects, scanning is faster.
+	                                       
+	  
+	                                                                 
+	                                                                    
+	                       
+	  
+	                                                      
 	if (count > 4 && (fOptions & kSort)) {
 		while (l < r) {
 			i = (l + r) / 2;
@@ -559,7 +559,7 @@ OSDictionary::getObject(const OSSymbol *aKey) const
 	return NULL;
 }
 
-// Wrapper macros
+                 
 #define OBJECT_WRAP_1(cmd, k)                                           \
 {                                                                       \
     OSSharedPtr<const OSSymbol> tmpKey = k;                                         \
@@ -733,7 +733,7 @@ OSDictionary::serialize(OSSerialize *s) const
 	for (unsigned i = 0; i < count; i++) {
 		const OSSymbol *key = dictionary[i].key.get();
 
-		// due the nature of the XML syntax, this must be a symbol
+		                                                          
 		if (!key->metaCast("OSSymbol")) {
 			return false;
 		}
@@ -778,7 +778,7 @@ OSDictionary::setOptions(unsigned options, unsigned mask, void *)
 {
 	unsigned old = super::setOptions(options, mask);
 	if ((old ^ options) & mask) {
-		// Value changed need to recurse over all of the child collections
+		                                                                  
 		for (unsigned i = 0; i < count; i++) {
 			OSCollection *v = OSDynamicCast(OSCollection, dictionary[i].value.get());
 			if (v) {
@@ -810,7 +810,7 @@ OSDictionary::copyCollection(OSDictionary *cycleDict)
 	}
 
 	do {
-		// Check for a cycle
+		                    
 		ret = super::copyCollection(cycleDict);
 		if (ret) {
 			continue;
@@ -821,7 +821,7 @@ OSDictionary::copyCollection(OSDictionary *cycleDict)
 			continue;
 		}
 
-		// Insert object into cycle Dictionary
+		                                      
 		cycleDict->setObject((const OSSymbol *) this, newDict.get());
 
 		for (unsigned int i = 0; i < count; i++) {

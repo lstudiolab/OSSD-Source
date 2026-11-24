@@ -24,10 +24,10 @@
 #include <sys/errno.h>
 #include <sys/semaphore.h>
 
-/*
- * system call stubs are no longer generated for these from
- * syscalls.master. Instead, provide simple stubs here.
- */
+  
+                                                           
+                                                       
+   
 
 int
 sem_destroy(sem_t *s __unused)

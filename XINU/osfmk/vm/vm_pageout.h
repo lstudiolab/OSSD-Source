@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_pageout.h
- *	Author:	Avadis Tevanian, Jr.
- *	Date:	1986
- *
- *	Declarations for the pageout daemon interface.
- */
+  
+   
+  
+                        
+                               
+             
+  
+                                                 
+   
 
 #ifndef _VM_VM_PAGEOUT_H_
 #define _VM_VM_PAGEOUT_H_
@@ -89,45 +89,45 @@
 
 #define VM_PAGE_AVAILABLE_COUNT()               ((unsigned int)(vm_page_cleaned_count))
 
-/* externally manipulated counters */
+                                     
 extern unsigned int vm_pageout_cleaned_fault_reactivated;
 
 #if CONFIG_FREEZE
 extern boolean_t memorystatus_freeze_enabled;
 
 struct freezer_context {
-	/*
-	 * All these counters & variables track the task
-	 * being frozen.
-	 * Currently we only freeze one task at a time. Should that
-	 * change, we'll need to add support for multiple freezer contexts.
-	 */
+	  
+                                                 
+                 
+                                                            
+                                                                    
+    
 
-	task_t  freezer_ctx_task; /* Task being frozen. */
+	task_t  freezer_ctx_task;                         
 
-	void    *freezer_ctx_chead; /* The chead used to track c_segs allocated */
-	                            /* to freeze the task.*/
+	void    *freezer_ctx_chead;                                               
+	                                                    
 
-	uint64_t        freezer_ctx_swapped_bytes; /* Tracks # of compressed bytes.*/
+	uint64_t        freezer_ctx_swapped_bytes;                                   
 
-	int     freezer_ctx_uncompressed_pages; /* Tracks # of uncompressed pages frozen. */
+	int     freezer_ctx_uncompressed_pages;                                             
 
-	char    *freezer_ctx_compressor_scratch_buf; /* Scratch buffer for the compressor algorithm. */
+	char    *freezer_ctx_compressor_scratch_buf;                                                   
 };
 
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 #define VM_DYNAMIC_PAGING_ENABLED() (VM_CONFIG_COMPRESSOR_IS_ACTIVE)
 
 #if VM_PRESSURE_EVENTS
 extern boolean_t vm_pressure_events_enabled;
-#endif /* VM_PRESSURE_EVENTS */
+#endif                         
 
 
-/*
- * the following codes are used in the DBG_MACH_WORKINGSET subclass
- * of the DBG_MACH class
- */
+  
+                                                                   
+                        
+   
 #define VM_DISCONNECT_ALL_PAGE_MAPPINGS         0x00
 #define VM_DISCONNECT_TASK_PAGE_MAPPINGS        0x01
 #define VM_REAL_FAULT_ADDR_INTERNAL             0x02
@@ -265,7 +265,7 @@ extern kern_return_t      vm_page_alloc_list(
 	kma_flags_t flags,
 	vm_page_t  *list);
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
 extern struct vnode * upl_lookup_vnode(upl_t upl);
 
@@ -278,7 +278,7 @@ extern kern_return_t    mach_vm_pressure_level_monitor(boolean_t wait_for_pressu
 
 #if XNU_TARGET_OS_OSX
 extern kern_return_t    vm_pageout_wait(uint64_t deadline);
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 #ifdef  MACH_KERNEL_PRIVATE
 
@@ -288,21 +288,21 @@ extern unsigned int     vm_pageout_scan_event_counter;
 extern unsigned int     vm_page_anonymous_count;
 
 
-/*
- * must hold the page queues lock to
- * manipulate this structure
- */
+  
+                                    
+                            
+   
 struct vm_pageout_queue {
-	vm_page_queue_head_t pgo_pending;  /* laundry pages to be processed by pager's iothread */
-	uint64_t        pgo_tid;           /* thread ID of I/O thread that services this queue */
-	unsigned int    pgo_laundry;       /* current count of laundry pages on queue or in flight */
+	vm_page_queue_head_t pgo_pending;                                                         
+	uint64_t        pgo_tid;                                                                 
+	unsigned int    pgo_laundry;                                                                 
 	unsigned int    pgo_maxlaundry;
 
 	uint32_t
-	    pgo_idle:1,        /* iothread is blocked waiting for work to do */
-	    pgo_busy:1,        /* iothread is currently processing request from pgo_pending */
-	    pgo_throttled:1,   /* vm_pageout_scan thread needs a wakeup when pgo_laundry drops */
-	    pgo_lowpriority:1, /* iothread is set to use low priority I/O */
+	    pgo_idle:1,                                                        
+	    pgo_busy:1,                                                                       
+	    pgo_throttled:1,                                                                     
+	    pgo_lowpriority:1,                                              
 	    pgo_draining:1,
 	    pgo_inited:1,
 	    pgo_unused_bits:26;
@@ -315,9 +315,9 @@ extern struct   vm_pageout_queue        vm_pageout_queue_internal;
 extern struct   vm_pageout_queue        vm_pageout_queue_external;
 
 
-/*
- *	Routines exported to Mach.
- */
+  
+                             
+   
 extern void             vm_pageout(void);
 
 extern kern_return_t    vm_pageout_internal_start(void);
@@ -331,7 +331,7 @@ extern void             vm_pageout_cluster(
 extern void             vm_pageout_initialize_page(
 	vm_page_t       m);
 
-/* UPL exported routines and structures */
+                                          
 
 #define upl_lock_init(object)   lck_mtx_init(&(object)->Lock, &vm_object_lck_grp, &vm_object_lck_attr)
 #define upl_lock_destroy(object)        lck_mtx_destroy(&(object)->Lock, &vm_object_lck_grp)
@@ -363,7 +363,7 @@ struct _vector_upl {
 
 typedef struct _vector_upl* vector_upl_t;
 
-/* universal page list structure */
+                                   
 
 #if UPL_DEBUG
 #define UPL_DEBUG_STACK_FRAMES  16
@@ -386,18 +386,18 @@ struct upl_io_completion {
 
 
 struct upl {
-	decl_lck_mtx_data(, Lock);      /* Synchronization */
+	decl_lck_mtx_data(, Lock);                           
 	int             ref_count;
 	int             ext_ref_count;
 	int             flags;
-	/*
-	 * XXX CAUTION: to accomodate devices with "mixed page sizes",
-	 * u_offset and u_size are now byte-aligned and no longer
-	 * page-aligned, on all devices.
-	 */
+	  
+                                                               
+                                                          
+                                 
+    
 	vm_object_offset_t u_offset;
-	upl_size_t      u_size;       /* size in bytes of the address space */
-	vm_offset_t     kaddr;      /* secondary mapping in kernel */
+	upl_size_t      u_size;                                               
+	vm_offset_t     kaddr;                                       
 	vm_object_t     map_object;
 	ppnum_t         highest_page;
 	void*           vector_upl;
@@ -410,7 +410,7 @@ struct upl {
 #endif
 #if CONFIG_IOSCHED || UPL_DEBUG
 	thread_t        upl_creator;
-	queue_chain_t   uplq;       /* List of outstanding upls on an obj */
+	queue_chain_t   uplq;                                               
 #endif
 #if     UPL_DEBUG
 	uintptr_t       ubc_alias1;
@@ -421,10 +421,10 @@ struct upl {
 	void    *upl_create_retaddr[UPL_DEBUG_STACK_FRAMES];
 
 	struct  ucd     upl_commit_records[UPL_DEBUG_COMMIT_RECORDS];
-#endif  /* UPL_DEBUG */
+#endif                 
 };
 
-/* upl struct flags */
+                      
 #define UPL_PAGE_LIST_MAPPED    0x1
 #define UPL_KERNEL_MAPPED       0x2
 #define UPL_CLEAR_DIRTY         0x4
@@ -446,7 +446,7 @@ struct upl {
 #define UPL_DECMP_REQ           0x80000
 #define UPL_DECMP_REAL_IO       0x100000
 
-/* flags for upl_create flags parameter */
+                                          
 #define UPL_CREATE_EXTERNAL     0
 #define UPL_CREATE_INTERNAL     0x1
 #define UPL_CREATE_LITE         0x2
@@ -493,18 +493,18 @@ extern kern_return_t vm_object_super_upl_request(
 	upl_control_flags_t     cntrl_flags,
 	vm_tag_t            tag);
 
-/* should be just a regular vm_map_enter() */
+                                             
 extern kern_return_t vm_map_enter_upl(
 	vm_map_t                map,
 	upl_t                   upl,
 	vm_map_offset_t         *dst_addr);
 
-/* should be just a regular vm_map_remove() */
+                                              
 extern kern_return_t vm_map_remove_upl(
 	vm_map_t                map,
 	upl_t                   upl);
 
-/* wired  page list structure */
+                                
 typedef uint32_t *wpl_array_t;
 
 extern struct vm_page_delayed_work*
@@ -524,25 +524,25 @@ extern kern_return_t vm_paging_map_object(
 	vm_object_offset_t      offset,
 	vm_prot_t               protection,
 	boolean_t               can_unlock_object,
-	vm_map_size_t           *size,          /* IN/OUT */
-	vm_map_offset_t         *address,       /* OUT */
-	boolean_t               *need_unmap);   /* OUT */
+	vm_map_size_t           *size,                      
+	vm_map_offset_t         *address,                
+	boolean_t               *need_unmap);            
 extern void vm_paging_unmap_object(
 	vm_object_t             object,
 	vm_map_offset_t         start,
 	vm_map_offset_t         end);
 decl_simple_lock_data(extern, vm_paging_lock);
 
-/*
- * Backing store throttle when BS is exhausted
- */
+  
+                                              
+   
 extern unsigned int    vm_backing_store_low;
 
 extern void vm_pageout_steal_laundry(
 	vm_page_t page,
 	boolean_t queues_locked);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 #if UPL_DEBUG
 extern kern_return_t  upl_ubc_alias_set(
@@ -553,7 +553,7 @@ extern int  upl_ubc_alias_get(
 	upl_t upl,
 	uintptr_t * al,
 	uintptr_t * al2);
-#endif /* UPL_DEBUG */
+#endif                
 
 extern void vm_countdirtypages(void);
 
@@ -611,25 +611,25 @@ extern void vm_pageout_disconnect_all_pages(void);
 
 
 struct  vm_config {
-	boolean_t       compressor_is_present;          /* compressor is initialized and can be used by the freezer, the sweep or the pager */
-	boolean_t       compressor_is_active;           /* pager can actively compress pages...  'compressor_is_present' must be set */
-	boolean_t       swap_is_present;                /* swap is initialized and can be used by the freezer, the sweep or the pager */
-	boolean_t       swap_is_active;                 /* pager can actively swap out compressed segments... 'swap_is_present' must be set */
-	boolean_t       freezer_swap_is_active;         /* freezer can swap out frozen tasks... "compressor_is_present + swap_is_present" must be set */
+	boolean_t       compressor_is_present;                                                                                                
+	boolean_t       compressor_is_active;                                                                                          
+	boolean_t       swap_is_present;                                                                                                
+	boolean_t       swap_is_active;                                                                                                       
+	boolean_t       freezer_swap_is_active;                                                                                                         
 };
 
 extern  struct vm_config        vm_config;
 
 
-#define VM_PAGER_NOT_CONFIGURED                         0x0     /* no compresser or swap configured */
-#define VM_PAGER_DEFAULT                                0x1     /* Use default pager... DEPRECATED */
-#define VM_PAGER_COMPRESSOR_NO_SWAP                     0x2     /* Active in-core compressor only. */
-#define VM_PAGER_COMPRESSOR_WITH_SWAP                   0x4     /* Active in-core compressor + swap backend. */
-#define VM_PAGER_FREEZER_DEFAULT                        0x8     /* Freezer backed by default pager... DEPRECATED */
-#define VM_PAGER_FREEZER_COMPRESSOR_NO_SWAP             0x10    /* Freezer backed by in-core compressor only i.e. frozen data remain in-core compressed.*/
-#define VM_PAGER_COMPRESSOR_NO_SWAP_PLUS_FREEZER_COMPRESSOR_WITH_SWAP   0x20    /* Active in-core compressor + Freezer backed by in-core compressor with swap support too.*/
+#define VM_PAGER_NOT_CONFIGURED                         0x0                                           
+#define VM_PAGER_DEFAULT                                0x1                                          
+#define VM_PAGER_COMPRESSOR_NO_SWAP                     0x2                                          
+#define VM_PAGER_COMPRESSOR_WITH_SWAP                   0x4                                                    
+#define VM_PAGER_FREEZER_DEFAULT                        0x8                                                        
+#define VM_PAGER_FREEZER_COMPRESSOR_NO_SWAP             0x10                                                                                              
+#define VM_PAGER_COMPRESSOR_NO_SWAP_PLUS_FREEZER_COMPRESSOR_WITH_SWAP   0x20                                                                                                
 
-#define VM_PAGER_MAX_MODES                              6       /* Total number of vm compressor modes supported */
+#define VM_PAGER_MAX_MODES                              6                                                          
 
 
 #define VM_CONFIG_COMPRESSOR_IS_PRESENT         (vm_config.compressor_is_present == TRUE)
@@ -638,7 +638,7 @@ extern  struct vm_config        vm_config;
 #define VM_CONFIG_SWAP_IS_ACTIVE                (vm_config.swap_is_active == TRUE)
 #define VM_CONFIG_FREEZER_SWAP_IS_ACTIVE        (vm_config.freezer_swap_is_active == TRUE)
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -653,16 +653,16 @@ struct vm_pageout_state {
 	unsigned int vm_page_speculative_target;
 
 	unsigned int vm_pageout_swap_wait;
-	unsigned int vm_pageout_idle_wait;      /* milliseconds */
-	unsigned int vm_pageout_empty_wait;     /* milliseconds */
-	unsigned int vm_pageout_burst_wait;     /* milliseconds */
-	unsigned int vm_pageout_deadlock_wait;  /* milliseconds */
+	unsigned int vm_pageout_idle_wait;                        
+	unsigned int vm_pageout_empty_wait;                       
+	unsigned int vm_pageout_burst_wait;                       
+	unsigned int vm_pageout_deadlock_wait;                    
 	unsigned int vm_pageout_deadlock_relief;
 	unsigned int vm_pageout_burst_inactive_throttle;
 
 	unsigned int vm_pageout_inactive;
-	unsigned int vm_pageout_inactive_used;  /* debugging */
-	unsigned int vm_pageout_inactive_clean; /* debugging */
+	unsigned int vm_pageout_inactive_used;                 
+	unsigned int vm_pageout_inactive_clean;                
 
 	uint32_t vm_page_filecache_min;
 	uint32_t vm_page_filecache_min_divisor;
@@ -684,9 +684,9 @@ struct vm_pageout_state {
 
 extern struct vm_pageout_state vm_pageout_state;
 
-/*
- * This structure is used to track the VM_INFO instrumentation
- */
+  
+                                                              
+   
 struct vm_pageout_vminfo {
 	unsigned long vm_pageout_considered_page;
 	unsigned long vm_pageout_considered_bq_internal;
@@ -724,11 +724,11 @@ extern struct vm_pageout_vminfo vm_pageout_vminfo;
 
 #if DEVELOPMENT || DEBUG
 
-/*
- *	This structure records the pageout daemon's actions:
- *	how many pages it looks at and what happens to those pages.
- *	No locking needed because only one thread modifies the fields.
- */
+  
+                                                       
+                                                              
+                                                                 
+   
 struct vm_pageout_debug {
 	uint32_t vm_pageout_balanced;
 	uint32_t vm_pageout_scan_event_counter;
@@ -746,7 +746,7 @@ struct vm_pageout_debug {
 	uint32_t vm_pageout_cleaned_nolock;
 	uint32_t vm_pageout_cleaned_reference_reactivated;
 	uint32_t vm_pageout_cleaned_volatile_reactivated;
-	uint32_t vm_pageout_cleaned_reactivated;  /* debugging; how many cleaned pages are found to be referenced on pageout (and are therefore reactivated) */
+	uint32_t vm_pageout_cleaned_reactivated;                                                                                                               
 	uint32_t vm_pageout_cleaned_fault_reactivated;
 
 	uint32_t vm_pageout_dirty_no_pager;
@@ -775,9 +775,9 @@ struct vm_pageout_debug {
 	uint32_t vm_page_slide_counter;
 	uint32_t vm_page_slide_errors;
 	uint32_t vm_page_throttle_count;
-	/*
-	 * Statistics about UPL enforcement of copy-on-write obligations.
-	 */
+	  
+                                                                  
+    
 	unsigned long upl_cow;
 	unsigned long upl_cow_again;
 	unsigned long upl_cow_pages;
@@ -823,4 +823,4 @@ typedef struct vmct_stats_s {
 } vmct_stats_t;
 #endif
 #endif
-#endif  /* _VM_VM_PAGEOUT_H_ */
+#endif                         

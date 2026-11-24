@@ -34,26 +34,26 @@
 #include <i386/pmap_internal.h>
 #include <i386/pmap_pcid.h>
 
-/*
- * PCID (Process context identifier) aka tagged TLB support.
- * On processors with this feature, unless disabled via the -pmap_pcid_disable
- * boot-arg, the following algorithm is in effect:
- * Each processor maintains an array of tag refcounts indexed by tag.
- * Each address space maintains an array of tags indexed by CPU number.
- * Each address space maintains a coherency vector, indexed by CPU
- * indicating that the TLB state for that address space has a pending
- * invalidation.
- * On a context switch, a refcounted tag is lazily assigned to the newly
- * dispatched (CPU, address space) tuple.
- * When an inactive address space is invalidated on a remote CPU, it is marked
- * for invalidation upon the next dispatch. Some invalidations are
- * also processed at the user/kernel boundary.
- * Provisions are made for the case where a CPU is overcommmitted, i.e.
- * more active address spaces exist than the number of logical tags
- * provided for by the processor architecture (currently 4096).
- * The algorithm assumes the processor remaps the logical tags
- * to physical TLB context IDs in an LRU fashion for efficiency. (DRK '10)
- */
+  
+                                                            
+                                                                              
+                                                  
+                                                                     
+                                                                       
+                                                                  
+                                                                     
+                
+                                                                        
+                                         
+                                                                              
+                                                                  
+                                              
+                                                                       
+                                                                   
+                                                               
+                                                              
+                                                                          
+   
 
 uint32_t        pmap_pcid_ncpus;
 boolean_t       pmap_pcid_disabled = FALSE;
@@ -77,7 +77,7 @@ pmap_pcid_configure(void)
 		printf("PMAP: PCID feature disabled, %u\n", pmap_pcid_disabled);
 		kprintf("PMAP: PCID feature disabled %u\n", pmap_pcid_disabled);
 	}
-	/* no_shared_cr3+PCID is currently unsupported */
+	                                                 
 
 #if     DEBUG
 	if (pmap_pcid_disabled == FALSE) {
@@ -92,10 +92,10 @@ pmap_pcid_configure(void)
 #endif
 	if (pmap_pcid_disabled || no_shared_cr3) {
 		unsigned i;
-		/* Reset PCID status, as we may have picked up
-		 * strays if discovered prior to platform
-		 * expert initialization.
-		 */
+		                                              
+                                           
+                           
+     
 		for (i = 0; i < real_ncpus; i++) {
 			if (cpu_datap(i)) {
 				cpu_datap(i)->cpu_pmap_pcid_enabled = FALSE;
@@ -105,9 +105,9 @@ pmap_pcid_configure(void)
 		cpu_datap(ccpu)->cpu_pmap_pcid_enabled = FALSE;
 		return;
 	}
-	/* DRKTODO: assert if features haven't been discovered yet. Redundant
-	 * invocation of cpu_mode_init and descendants masks this for now.
-	 */
+	                                                                     
+                                                                   
+    
 	if ((cpuid_features() & CPUID_FEATURE_PCID)) {
 		pcid_present = TRUE;
 	} else {
@@ -163,9 +163,9 @@ pmap_pcid_initialize(pmap_t p)
 	pmap_assert(nc >= real_ncpus);
 	for (i = 0; i < nc; i++) {
 		p->pmap_pcid_cpus[i] = PMAP_PCID_INVALID_PCID;
-		/* We assume here that the coherency vector is zeroed by
-		 * pmap_create
-		 */
+		                                                        
+                
+     
 	}
 }
 
@@ -177,9 +177,9 @@ pmap_pcid_initialize_kernel(pmap_t p)
 
 	for (i = 0; i < nc; i++) {
 		p->pmap_pcid_cpus[i] = 0;
-		/* We assume here that the coherency vector is zeroed by
-		 * pmap_create
-		 */
+		                                                        
+                
+     
 	}
 }
 
@@ -199,14 +199,14 @@ pmap_pcid_allocate_pcid(int ccpu)
 			return i;
 		}
 	}
-	/* Linear scan to discover free slot, with hint. Room for optimization
-	 * but with intelligent prefetchers this should be
-	 * adequately performant, as it is invoked
-	 * only on first dispatch of a new address space onto
-	 * a given processor. DRKTODO: use larger loads and
-	 * zero byte discovery -- any pattern != ~1 should
-	 * signify a free slot.
-	 */
+	                                                                      
+                                                   
+                                           
+                                                      
+                                                    
+                                                   
+                        
+    
 	for (i = PMAP_PCID_MIN_PCID; i < PMAP_PCID_MAX_PCID; i++) {
 		pcid_ref_t cur_refcount = cpu_pcid_refcounts[i];
 
@@ -223,9 +223,9 @@ pmap_pcid_allocate_pcid(int ccpu)
 		}
 	}
 	pmap_assert(cur_min_index > 0 && cur_min_index < PMAP_PCID_MAX_PCID);
-	/* Consider "rebalancing" tags actively in highly oversubscribed cases
-	 * perhaps selecting tags with lower activity.
-	 */
+	                                                                      
+                                               
+    
 
 	old_count = __sync_fetch_and_add(&cpu_pcid_refcounts[cur_min_index], 1);
 	pmap_assert(old_count < PMAP_PCID_MAX_REFCOUNT);
@@ -319,7 +319,7 @@ pmap_pcid_activate(pmap_t tpmap, int ccpu, boolean_t nopagezero, boolean_t copyi
 	if (__improbable(pending_flush || pcid_conflict)) {
 		pmap_pcid_validate_cpu(tpmap, ccpu);
 	}
-	/* Consider making this a unique id */
+	                                      
 	pcdata->cpu_pcid_last_pmap_dispatched[new_pcid] = tpmap;
 
 	pmap_assert(new_pcid < PMAP_PCID_MAX_PCID);
@@ -328,11 +328,11 @@ pmap_pcid_activate(pmap_t tpmap, int ccpu, boolean_t nopagezero, boolean_t copyi
 #if     PMAP_ASSERT
 	pcid_record_array[ccpu % PCID_RECORD_SIZE] = tpmap->pm_cr3 | new_pcid | (((uint64_t)(!(pending_flush || pcid_conflict))) << 63);
 	pml4_entry_t *pml4 = pmap64_pml4(tpmap, 0ULL);
-	/* Diagnostic to detect pagetable anchor corruption */
+	                                                      
 	if (pml4[KERNEL_PML4_INDEX] != kernel_pmap->pm_pml4[KERNEL_PML4_INDEX]) {
 		__asm__ volatile ("int3");
 	}
-#endif  /* PMAP_ASSERT */
+#endif                   
 
 	pmap_paddr_t ncr3 = tpmap->pm_cr3;
 
@@ -351,15 +351,15 @@ pmap_pcid_activate(pmap_t tpmap, int ccpu, boolean_t nopagezero, boolean_t copyi
 
 	bool preserve = !pcid_conflict && !pending_flush;
 	if (preserve == true) {
-		/* We did not previously observe a pending invalidation for this
-		 * ASID. However, the load from the coherency vector
-		 * could've been reordered ahead of the store to the
-		 * active_cr3 field (in the context switch path, our
-		 * caller). Re-consult the pending invalidation vector
-		 * after the CR3 write. We rely on MOV CR3's documented
-		 * serializing property to avoid insertion of an expensive
-		 * barrier. (DRK)
-		 */
+		                                                                
+                                                      
+                                                      
+                                                      
+                                                        
+                                                         
+                                                            
+                   
+     
 		pending_flush = (tpmap->pmap_pcid_coherency_vector[ccpu] != 0);
 		if (__improbable(pending_flush != 0)) {
 			pmap_pcid_validate_cpu(tpmap, ccpu);
@@ -401,7 +401,7 @@ invpcid(invpcid_type_t itype, pcid_t ipcid, uint64_t iaddr)
 	ipcdt.ipcid_and_rsvd = ipcid;
 	ipcdt.iaddr = iaddr;
 
-	uint64_t iptype = itype; //promote to workaround assembler bug
+	uint64_t iptype = itype;                                      
 
 	__asm__ volatile ("invpcid %0, %1" :: "m" (ipcdt), "r" (iptype) : "memory");
 }
@@ -417,7 +417,7 @@ pmap_tlbi_range(uint64_t startv, uint64_t endv, bool global, uint16_t pcid)
 		if (global) {
 			invpcid(INP_ALLG, 0, 0ULL);
 		} else {
-			/* TODO: separate large page invalidation check */
+			                                                  
 			if ((endv - startv) >= INP_MAX) {
 				invpcid(INP_ASPACE, pcid, 0ULL);
 				if (pcid) {

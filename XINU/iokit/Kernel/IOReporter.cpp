@@ -40,11 +40,11 @@ OSDefineMetaClassAndStructors(IOReporter, OSObject);
 
 static OSSharedPtr<const OSSymbol> gIOReportNoChannelName;
 
-// * We might someday want an IOReportManager (vs. these static funcs)
+                                                                      
 
-/**************************************/
-/***         STATIC METHODS         ***/
-/**************************************/
+                                        
+                                        
+                                        
 IOReturn
 IOReporter::configureAllReports(OSSet *reporters,
     IOReportChannelList *channelList,
@@ -74,7 +74,7 @@ IOReporter::configureAllReports(OSSet *reporters,
 			if (rep) {
 				(void)rep->configureReport(channelList, action, result, destination);
 			} else {
-				rval = kIOReturnUnsupported; // kIOReturnNotFound?
+				rval = kIOReturnUnsupported;                      
 				goto finish;
 			}
 		}
@@ -95,7 +95,7 @@ finish:
 	return rval;
 }
 
-// the duplication in these functions almost makes one want Objective-C SEL* ;)
+                                                                               
 IOReturn
 IOReporter::updateAllReports(OSSet *reporters,
     IOReportChannelList *channelList,
@@ -126,7 +126,7 @@ IOReporter::updateAllReports(OSSet *reporters,
 			if (rep) {
 				(void)rep->updateReport(channelList, action, result, destination);
 			} else {
-				rval = kIOReturnUnsupported; // kIOReturnNotFound?
+				rval = kIOReturnUnsupported;                      
 				goto finish;
 			}
 		}
@@ -147,9 +147,9 @@ finish:
 }
 
 
-/**************************************/
-/***       COMMON INIT METHODS      ***/
-/**************************************/
+                                        
+                                        
+                                        
 
 bool
 IOReporter::init(IOService *reportingService,
@@ -158,7 +158,7 @@ IOReporter::init(IOService *reportingService,
 {
 	bool success = false;
 
-	// ::free() relies on these being initialized
+	                                             
 	_reporterLock = NULL;
 	_configLock = NULL;
 	_elements = NULL;
@@ -185,12 +185,12 @@ IOReporter::init(IOService *reportingService,
 	}
 	_channelDimension = channelType.nelements;
 	_channelType = channelType;
-	// FIXME: need to look up dynamically
+	                                     
 	if (unit == kIOReportUnitHWTicks) {
 #if defined(__arm__) || defined(__arm64__)
 		unit = kIOReportUnit24MHzTicks;
 #elif defined(__i386__) || defined(__x86_64__)
-		// Most, but not all Macs use 1GHz
+		                                  
 		unit = kIOReportUnit1GHzTicks;
 #else
 #error kIOReportUnitHWTicks not defined
@@ -198,27 +198,27 @@ IOReporter::init(IOService *reportingService,
 	}
 	_unit = unit;
 
-	// Allocate a reporter (data) lock
+	                                  
 	_reporterLock = IOSimpleLockAlloc();
 	if (!_reporterLock) {
 		goto finish;
 	}
 	_reporterIsLocked = false;
 
-	// Allocate a config lock
+	                         
 	_configLock = IOLockAlloc();
 	if (!_configLock) {
 		goto finish;
 	}
 	_reporterConfigIsLocked = false;
 
-	// Allocate channel names array
+	                               
 	_channelNames = OSArray::withCapacity(1);
 	if (!_channelNames) {
 		goto finish;
 	}
 
-	// success
+	          
 	success = true;
 
 finish:
@@ -226,9 +226,9 @@ finish:
 }
 
 
-/*******************************/
-/***      PUBLIC METHODS     ***/
-/*******************************/
+                                 
+                                 
+                                 
 
 void
 IOReporter::initialize(void)
@@ -236,8 +236,8 @@ IOReporter::initialize(void)
 	gIOReportNoChannelName = OSSymbol::withCString("_NO_NAME_4");
 }
 
-// init() [possibly via init*()] must be called before free()
-// to ensure that _<var> = NULL
+                                                             
+                               
 void
 IOReporter::free(void)
 {
@@ -260,18 +260,18 @@ IOReporter::free(void)
 	super::free();
 }
 
-/*
- #define TESTALLOC() do { \
- *   void *tbuf;                 \
- *   tbuf = IOMalloc(10);        \
- *   IOFree(tbuf, 10);           \
- *   IORLOG("%s:%d - _reporterIsLocked = %d & allocation successful", \
- *           __PRETTY_FUNCTION__, __LINE__, _reporterIsLocked); \
- *  } while (0);
- */
+  
+                           
+                                  
+                                  
+                                  
+                                                                       
+                                                                 
+                
+   
 IOReturn
 IOReporter::addChannel(uint64_t channelID,
-    const char *channelName /* = NULL */)
+    const char *channelName             )
 {
 	IOReturn res = kIOReturnError, kerr;
 	OSSharedPtr<const OSSymbol> symChannelName;
@@ -279,21 +279,21 @@ IOReporter::addChannel(uint64_t channelID,
 
 	IORLOG("IOReporter::addChannel %llx", channelID);
 
-	// protect instance variables (but not contents)
+	                                                
 	lockReporterConfig();
 
-	// FIXME: Check if any channel is already present and return error
+	                                                                  
 
-	// addChannel() always adds one channel
+	                                       
 	oldNChannels = _nChannels;
 	if (oldNChannels < 0 || oldNChannels > INT_MAX - 1) {
 		res = kIOReturnOverrun;
 		goto finish;
 	}
 	newNChannels = oldNChannels + 1;
-	freeNChannels = newNChannels;   // until swap success
+	freeNChannels = newNChannels;                        
 
-	// Expand addChannel()-specific data structure
+	                                              
 	if (_channelNames->ensureCapacity((unsigned)newNChannels) <
 	    (unsigned)newNChannels) {
 		res = kIOReturnNoMemory; goto finish;
@@ -304,29 +304,29 @@ IOReporter::addChannel(uint64_t channelID,
 			res = kIOReturnNoMemory; goto finish;
 		}
 	} else {
-		// grab a reference to our shared global
+		                                        
 		symChannelName = gIOReportNoChannelName;
 	}
 
-	// allocate new buffers into _swap* variables
+	                                             
 	if ((kerr = handleSwapPrepare(newNChannels))) {
-		// on error, channels are *not* swapped
+		                                       
 		res = kerr; goto finish;
 	}
 
-	// exchange main and _swap* buffers with buffer contents protected
-	// IOReporter::handleAddChannelSwap() also increments _nElements, etc
+	                                                                  
+	                                                                     
 	lockReporter();
 	res = handleAddChannelSwap(channelID, symChannelName.get());
 	unlockReporter();
-	// On failure, handleAddChannelSwap() leaves *new* buffers in _swap*.
-	// On success, it's the old buffers, so we put the right size in here.
+	                                                                     
+	                                                                      
 	if (res == kIOReturnSuccess) {
 		freeNChannels = oldNChannels;
 	}
 
 finish:
-	// free up not-in-use buffers (tracked by _swap*)
+	                                                 
 	handleSwapCleanup(freeNChannels);
 
 	unlockReporterConfig();
@@ -386,9 +386,9 @@ IOReporter::updateReport(IOReportChannelList *channelList,
 }
 
 
-/*******************************/
-/***    PROTECTED METHODS    ***/
-/*******************************/
+                                 
+                                 
+                                 
 
 
 void
@@ -428,10 +428,10 @@ IOReporter::handleSwapPrepare(int newNChannels)
 	int newNElements;
 	size_t newElementsSize, newECSize;
 
-	// analyzer appeasement
+	                       
 	newElementsSize = newECSize = 0;
 
-	//IORLOG("IOReporter::handleSwapPrepare");
+	                                          
 
 	IOREPORTER_CHECK_CONFIG_LOCK();
 
@@ -446,14 +446,14 @@ IOReporter::handleSwapPrepare(int newNChannels)
 		panic("IOReporter::_swap* already in use");
 	}
 
-	// calculate the number of elements given #ch & the dimension of each
+	                                                                     
 	if (newNChannels < 0 || newNChannels > INT_MAX / _channelDimension) {
 		res = kIOReturnOverrun;
 		goto finish;
 	}
 	newNElements = newNChannels * _channelDimension;
 
-	// Allocate memory for the new array of report elements
+	                                                       
 	PREFL_MEMOP_FAIL(newNElements, IOReportElement);
 	newElementsSize = (size_t)newNElements * sizeof(IOReportElement);
 	_swapElements = (IOReportElement *)IOMalloc(newElementsSize);
@@ -462,7 +462,7 @@ IOReporter::handleSwapPrepare(int newNChannels)
 	}
 	memset(_swapElements, 0, newElementsSize);
 
-	// Allocate memory for the new array of channel watch counts
+	                                                            
 	PREFL_MEMOP_FAIL(newNChannels, int);
 	newECSize = (size_t)newNChannels * sizeof(int);
 	_swapEnableCounts = (int *)IOMalloc(newECSize);
@@ -471,7 +471,7 @@ IOReporter::handleSwapPrepare(int newNChannels)
 	}
 	memset(_swapEnableCounts, 0, newECSize);
 
-	// success
+	          
 	res = kIOReturnSuccess;
 
 finish:
@@ -500,7 +500,7 @@ IOReporter::handleAddChannelSwap(uint64_t channel_id,
 	IOReportElement *tmpElements = NULL;
 	bool swapComplete = false;
 
-	//IORLOG("IOReporter::handleSwap");
+	                                   
 
 	IOREPORTER_CHECK_CONFIG_LOCK();
 	IOREPORTER_CHECK_LOCK();
@@ -510,8 +510,8 @@ IOReporter::handleAddChannelSwap(uint64_t channel_id,
 		goto finish;
 	}
 
-	// Copy any existing elements to the new location
-	//IORLOG("handleSwap (base) -> copying %u elements over...", _nChannels);
+	                                                 
+	                                                                         
 	if (_elements) {
 		PREFL_MEMOP_PANIC(_nElements, IOReportElement);
 		memcpy(_swapElements, _elements,
@@ -522,7 +522,7 @@ IOReporter::handleAddChannelSwap(uint64_t channel_id,
 		    (size_t)_nChannels * sizeof(int));
 	}
 
-	// Update principal instance variables, keep old buffers for cleanup
+	                                                                    
 	tmpElements = _elements;
 	_elements = _swapElements;
 	_swapElements = tmpElements;
@@ -533,35 +533,35 @@ IOReporter::handleAddChannelSwap(uint64_t channel_id,
 
 	swapComplete = true;
 
-	// but _nChannels & _nElements is still the old (one smaller) size
+	                                                                  
 
-	// Initialize new element metadata (existing elements copied above)
+	                                                                   
 	for (cnt = 0; cnt < _channelDimension; cnt++) {
 		_elements[_nElements + cnt].channel_id = channel_id;
 		_elements[_nElements + cnt].provider_id = _driver_id;
 		_elements[_nElements + cnt].channel_type = _channelType;
 		_elements[_nElements + cnt].channel_type.element_idx = ((int16_t) cnt);
 
-		//IOREPORTER_DEBUG_ELEMENT(_swapNElements + cnt);
+		                                                 
 	}
 
-	// Store a channel name at the end
+	                                  
 	if (!_channelNames->setObject((unsigned)_nChannels, symChannelName)) {
-		// Should never happen because we ensured capacity in addChannel()
+		                                                                  
 		res = kIOReturnNoMemory;
 		goto finish;
 	}
 
-	// And update the metadata: addChannel() always adds just one channel
+	                                                                     
 	_nChannels += 1;
 	_nElements += _channelDimension;
 
-	// success
+	          
 	res = kIOReturnSuccess;
 
 finish:
 	if (res && swapComplete) {
-		// unswap so new buffers get cleaned up instead of old
+		                                                      
 		tmpElements = _elements;
 		_elements = _swapElements;
 		_swapElements = tmpElements;
@@ -586,7 +586,7 @@ IOReporter::handleSwapCleanup(int swapNChannels)
 
 	IOREPORTER_CHECK_CONFIG_LOCK();
 
-	// release buffers no longer used after swapping
+	                                                
 	if (_swapElements) {
 		PREFL_MEMOP_PANIC(swapNElements, IOReportElement);
 		IOFree(_swapElements, (size_t)swapNElements * sizeof(IOReportElement));
@@ -600,9 +600,9 @@ IOReporter::handleSwapCleanup(int swapNChannels)
 }
 
 
-// The reporter wants to know if its channels have observers.
-// Eventually we'll add some sort of bool ::anyChannelsInUse() which
-// clients can use to cull unused reporters after configureReport(disable).
+                                                             
+                                                                    
+                                                                           
 IOReturn
 IOReporter::handleConfigureReport(IOReportChannelList *channelList,
     IOReportConfigureAction action,
@@ -614,19 +614,19 @@ IOReporter::handleConfigureReport(IOReportChannelList *channelList,
 	uint32_t chIdx;
 	int *nElements, *nChannels;
 
-	// Check on channelList and result because used below
+	                                                     
 	if (!channelList || !result) {
 		goto finish;
 	}
 
-	//IORLOG("IOReporter::configureReport action %u for %u channels",
-	//       action, channelList->nchannels);
+	                                                                 
+	                                         
 
-	// Make sure channel is present, increase matching watch count, 'result'
+	                                                                        
 	for (chIdx = 0; chIdx < channelList->nchannels; chIdx++) {
 		if (getChannelIndex(channelList->channels[chIdx].channel_id,
 		    &channel_index) == kIOReturnSuccess) {
-			// IORLOG("reporter %p recognizes channel %lld", this, channelList->channels[chIdx].channel_id);
+			                                                                                                
 
 			switch (action) {
 			case kIOReportEnable:
@@ -655,7 +655,7 @@ IOReporter::handleConfigureReport(IOReportChannelList *channelList,
 		}
 	}
 
-	// success
+	          
 	res = kIOReturnSuccess;
 
 finish:
@@ -681,7 +681,7 @@ IOReporter::handleUpdateReport(IOReportChannelList *channelList,
 
 	dest = OSDynamicCast(IOBufferMemoryDescriptor, (OSObject *)destination);
 	if (dest == NULL) {
-		// Invalid destination
+		                      
 		res = kIOReturnBadArgument;
 		goto finish;
 	}
@@ -693,9 +693,9 @@ IOReporter::handleUpdateReport(IOReportChannelList *channelList,
 	for (chIdx = 0; chIdx < channelList->nchannels; chIdx++) {
 		if (getChannelIndex(channelList->channels[chIdx].channel_id,
 		    &channel_index) == kIOReturnSuccess) {
-			//IORLOG("%s - found channel_id %llx @ index %d", __func__,
-			//       channelList->channels[chIdx].channel_id,
-			//       channel_index);
+			                                                           
+			                                                 
+			                        
 
 			switch (action) {
 			case kIOReportCopyChannelData:
@@ -720,7 +720,7 @@ IOReporter::handleUpdateReport(IOReportChannelList *channelList,
 		}
 	}
 
-	// success
+	          
 	res = kIOReturnSuccess;
 
 finish:
@@ -747,7 +747,7 @@ IOReporter::handleCreateLegend(void)
 IOReturn
 IOReporter::setElementValues(int element_index,
     IOReportElementValues *values,
-    uint64_t record_time /* = 0 */)
+    uint64_t record_time          )
 {
 	IOReturn res = kIOReturnError;
 
@@ -766,7 +766,7 @@ IOReporter::setElementValues(int element_index,
 
 	_elements[element_index].timestamp = record_time;
 
-	//IOREPORTER_DEBUG_ELEMENT(index);
+	                                  
 
 	res = kIOReturnSuccess;
 
@@ -829,7 +829,7 @@ IOReporter::updateReportChannel(int channel_index,
 
 	chElems = _elements[start_element_idx].channel_type.nelements;
 
-	// make sure we don't go beyond the end of _elements[_nElements-1]
+	                                                                  
 	if (start_element_idx + chElems > _nElements) {
 		goto finish;
 	}
@@ -837,7 +837,7 @@ IOReporter::updateReportChannel(int channel_index,
 	PREFL_MEMOP_FAIL(chElems, IOReportElement);
 	size2cpy = (size_t)chElems * sizeof(IOReportElement);
 
-	// make sure there's space in the destination
+	                                             
 	if (size2cpy > (destination->getCapacity() - destination->getLength())) {
 		IORLOG("CRITICAL ERROR: Report Buffer Overflow (buffer cap %luB, length %luB, size2cpy %luB",
 		    (unsigned long)destination->getCapacity(),
@@ -947,7 +947,7 @@ IOReporter::getChannelIndices(uint64_t channel_id,
 		}
 
 		if (channel_id == _elements[elemIdx].channel_id) {
-			// The channel index does not care about the depth of elements...
+			                                                                 
 			*channel_index = chIdx;
 			*element_index = elemIdx;
 
@@ -960,12 +960,12 @@ finish:
 	return res;
 }
 
-/********************************/
-/***      PRIVATE METHODS     ***/
-/********************************/
+                                  
+                                  
+                                  
 
 
-// copyChannelIDs relies on the caller to take lock
+                                                   
 OSSharedPtr<OSArray>
 IOReporter::copyChannelIDs()
 {
@@ -982,7 +982,7 @@ IOReporter::copyChannelIDs()
 	for (cnt = 0; cnt < _nChannels; cnt++) {
 		cnt2 = cnt * _channelDimension;
 
-		// Encapsulate the Channel ID in OSNumber
+		                                         
 		tmpNum = OSNumber::withNumber(_elements[cnt2].channel_id, 64);
 		if (!tmpNum) {
 			IORLOG("ERROR: Could not create array of channelIDs");
@@ -997,8 +997,8 @@ IOReporter::copyChannelIDs()
 }
 
 
-// DO NOT REMOVE THIS METHOD WHICH IS THE MAIN LEGEND CREATION FUNCTION
-/*static */ OSSharedPtr<IOReportLegendEntry>
+                                                                       
+            OSSharedPtr<IOReportLegendEntry>
 IOReporter::legendWith(OSArray *channelIDs,
     OSArray *channelNames,
     IOReportChannelType channelType,
@@ -1013,7 +1013,7 @@ IOReporter::legendWith(OSArray *channelIDs,
 	OSSharedPtr<OSDictionary> channelInfoDict;
 	OSSharedPtr<IOReportLegendEntry> legendEntry = nullptr;
 
-	// No need to check validity of channelNames because param is optional
+	                                                                      
 	if (!channelIDs) {
 		goto finish;
 	}
@@ -1024,10 +1024,10 @@ IOReporter::legendWith(OSArray *channelIDs,
 	for (cnt = 0; cnt < chCnt; cnt++) {
 		tmpChannelArray = OSArray::withCapacity(3);
 
-		// Encapsulate the Channel ID in OSNumber
+		                                         
 		tmpChannelArray->setObject(kIOReportChannelIDIdx, channelIDs->getObject(cnt));
 
-		// Encapsulate the Channel Type in OSNumber
+		                                           
 		memcpy(&type64, &channelType, sizeof(type64));
 		tmpNum = OSNumber::withNumber(type64, 64);
 		if (!tmpNum) {
@@ -1036,20 +1036,20 @@ IOReporter::legendWith(OSArray *channelIDs,
 		tmpChannelArray->setObject(kIOReportChannelTypeIdx, tmpNum.get());
 		tmpNum.reset();
 
-		// Encapsulate the Channel Name in OSSymbol
-		// Use channelNames if provided
+		                                           
+		                               
 		if (channelNames != NULL) {
 			tmpSymbol = OSDynamicCast(OSSymbol, channelNames->getObject(cnt));
 			if (tmpSymbol && tmpSymbol != gIOReportNoChannelName) {
 				tmpChannelArray->setObject(kIOReportChannelNameIdx, tmpSymbol);
-			} // Else, skip and leave name field empty
+			}                                         
 		}
 
 		channelLegendArray->setObject(cnt, tmpChannelArray.get());
 		tmpChannelArray.reset();
 	}
 
-	// Stuff the legend entry only if we have channels...
+	                                                     
 	if (channelLegendArray->getCount() != 0) {
 		channelInfoDict = OSDictionary::withCapacity(1);
 

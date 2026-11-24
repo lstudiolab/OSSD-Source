@@ -25,12 +25,12 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
 /*
  * HISTORY
  * @OSF_COPYRIGHT@
@@ -71,24 +71,24 @@ extern void     *memset(void *, int, size_t);
 extern int      memset_s(void *, size_t, int, size_t);
 
 #ifdef XNU_KERNEL_PRIVATE
-/* memcmp_zero_ptr_aligned() checks string s of n bytes contains all zeros.
- * Address and size of the string s must be pointer-aligned.
- * Return 0 if true, 1 otherwise. Also return 0 if n is 0.
- */
+                                                                           
+                                                            
+                                                          
+   
 extern unsigned long memcmp_zero_ptr_aligned(const void *s, size_t n);
 #endif
 
 extern size_t   strlen(const char *);
 extern size_t   strnlen(const char *, size_t);
 
-/* strcpy() and strncpy() are deprecated. Please use strlcpy() instead. */
+                                                                          
 __kpi_deprecated_arm64_macos_unavailable
 extern char     *strcpy(char *, const char *) __deprecated;
 
 __kpi_deprecated_arm64_macos_unavailable
 extern char     *strncpy(char *, const char *, size_t);
 
-/* strcat() and strncat() are deprecated. Please use strlcat() instead. */
+                                                                          
 __kpi_deprecated_arm64_macos_unavailable
 extern char     *strcat(char *, const char *) __deprecated;
 
@@ -131,7 +131,7 @@ extern int      timingsafe_bcmp(const void *b1, const void *b2, size_t n);
 #endif
 
 
-/* __nochk_ functions for opting out of type 1 bounds checking */
+                                                                 
 __attribute__((always_inline)) static inline void *
 __nochk_memcpy(void *dest, const void *src, size_t len)
 {
@@ -149,15 +149,15 @@ __nochk_bcopy(const void *src, void *dest, size_t len)
 }
 
 #if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_13
-/* older deployment target */
+                             
 #elif defined(KASAN) || (defined (_FORTIFY_SOURCE) && _FORTIFY_SOURCE == 0)
-/* _FORTIFY_SOURCE disabled */
-#else /* _chk macros */
+                              
+#else                  
 
 #if defined XNU_KERNEL_PRIVATE || defined(_FORTIFY_SOURCE_STRICT)
-/* Stricter checking is optional for kexts. When type is set to 1, __builtin_object_size
- * returns the size of the closest surrounding sub-object, which would detect copying past
- * the end of a struct member. */
+                                                                                        
+                                                                                          
+                                 
 #define BOS_COPY_TYPE 1
 #else
 #define BOS_COPY_TYPE 0
@@ -199,9 +199,9 @@ __nochk_bcopy(const void *src, void *dest, size_t len)
 #define bcopy(src, dest, len) __builtin___memmove_chk(dest, src, len, XNU_BOS(dest, BOS_COPY_TYPE))
 #endif
 
-#endif /* _chk macros */
+#endif                  
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* _STRING_H_ */
+#endif                  

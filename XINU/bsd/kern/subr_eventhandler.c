@@ -72,15 +72,15 @@ SYSCTL_INT(_kern_eventhandler, OID_AUTO, debug, CTLFLAG_RW | CTLFLAG_LOCKED,
 
 struct eventhandler_entry_arg eventhandler_entry_dummy_arg = { .ee_fm_uuid = { 0 }, .ee_fr_uuid = { 0 } };
 
-/* List of 'slow' lists */
+                          
 static struct eventhandler_lists_ctxt evthdlr_lists_ctxt_glb;
 static LCK_GRP_DECLARE(eventhandler_mutex_grp, "eventhandler");
 
-static unsigned int eg_size;    /* size of eventhandler_entry_generic */
-static struct mcache *eg_cache; /* mcache for eventhandler_entry_generic */
+static unsigned int eg_size;                                            
+static struct mcache *eg_cache;                                            
 
-static unsigned int el_size;    /* size of eventhandler_list */
-static struct mcache *el_cache; /* mcache for eventhandler_list */
+static unsigned int el_size;                                   
+static struct mcache *el_cache;                                   
 
 LCK_GRP_DECLARE(el_lock_grp, "eventhandler list");
 LCK_ATTR_DECLARE(el_lock_attr, 0, 0);
@@ -104,9 +104,9 @@ eventhandler_lists_ctxt_init(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt)
 	    &eventhandler_mutex_grp, LCK_ATTR_NULL);
 }
 
-/*
- * Initialize the eventhandler mutex and list.
- */
+  
+                                              
+   
 void
 eventhandler_init(void)
 {
@@ -128,10 +128,10 @@ eventhandler_reap_caches(boolean_t purge)
 	mcache_reap_now(el_cache, purge);
 }
 
-/*
- * Insertion is O(n) due to the priority scan, but optimises to O(1)
- * if all priorities are identical.
- */
+  
+                                                                    
+                                   
+   
 static eventhandler_tag
 eventhandler_register_internal(
 	struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
@@ -147,18 +147,18 @@ eventhandler_register_internal(
 		evthdlr_lists_ctxt = &evthdlr_lists_ctxt_glb;
 	}
 
-	VERIFY(evthdlr_lists_ctxt->eventhandler_lists_initted); /* eventhandler registered too early */
-	VERIFY(epn != NULL); /* cannot register NULL event */
+	VERIFY(evthdlr_lists_ctxt->eventhandler_lists_initted);                                        
+	VERIFY(epn != NULL);                                 
 
-	/* lock the eventhandler lists */
+	                                 
 	lck_mtx_lock_spin(&evthdlr_lists_ctxt->eventhandler_mutex);
 
-	/* Do we need to find/create the (slow) list? */
+	                                                
 	if (list == NULL) {
-		/* look for a matching, existing list */
+		                                        
 		list = _eventhandler_find_list(evthdlr_lists_ctxt, name);
 
-		/* Do we need to create the list? */
+		                                    
 		if (list == NULL) {
 			lck_mtx_convert_spin(&evthdlr_lists_ctxt->eventhandler_mutex);
 			new_list = mcache_alloc(el_cache, MCR_SLEEP);
@@ -187,7 +187,7 @@ eventhandler_register_internal(
 	KASSERT(epn->ee_priority != EHE_DEAD_PRIORITY,
 	    ("%s: handler for %s registered with dead priority", __func__, name));
 
-	/* sort it into the list */
+	                           
 	evhlog((LOG_DEBUG, "%s: adding item %p (function %p to \"%s\"", __func__, (void *)VM_KERNEL_ADDRPERM(epn),
 	    (void *)VM_KERNEL_UNSLIDE(((struct eventhandler_entry_generic *)epn)->func), name));
 	EHL_LOCK(list);
@@ -212,7 +212,7 @@ eventhandler_register(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
 {
 	struct eventhandler_entry_generic       *eg;
 
-	/* allocate an entry for this handler, populate it */
+	                                                     
 	eg = mcache_alloc(eg_cache, MCR_SLEEP);
 	if (eg == NULL) {
 		evhlog((LOG_DEBUG, "%s: Can't allocate entry to register for event list "
@@ -234,15 +234,15 @@ eventhandler_deregister(struct eventhandler_list *list, eventhandler_tag tag)
 
 	EHL_LOCK_ASSERT(list, LCK_MTX_ASSERT_OWNED);
 	if (ep != NULL) {
-		/* remove just this entry */
+		                            
 		if (list->el_runcount == 0) {
 			evhlog((LOG_DEBUG, "%s: removing item %p from \"%s\"", __func__, (void *)VM_KERNEL_ADDRPERM(ep),
 			    list->el_name));
-			/*
-			 * We may have purged the list because of certain events.
-			 * Make sure that is not the case when a specific entry
-			 * is being removed.
-			 */
+			  
+                                                            
+                                                          
+                       
+      
 			if (!TAILQ_EMPTY(&list->el_entries)) {
 				TAILQ_REMOVE(&list->el_entries, ep, ee_link);
 			}
@@ -254,7 +254,7 @@ eventhandler_deregister(struct eventhandler_list *list, eventhandler_tag tag)
 			ep->ee_priority = EHE_DEAD_PRIORITY;
 		}
 	} else {
-		/* remove entire list */
+		                        
 		if (list->el_runcount == 0) {
 			evhlog((LOG_DEBUG, "%s: removing all items from \"%s\"", __func__,
 			    list->el_name));
@@ -277,9 +277,9 @@ eventhandler_deregister(struct eventhandler_list *list, eventhandler_tag tag)
 	EHL_UNLOCK(list);
 }
 
-/*
- * Internal version for use when eventhandler list is already locked.
- */
+  
+                                                                     
+   
 static struct eventhandler_list *
 _eventhandler_find_list(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
     const char *name)
@@ -297,9 +297,9 @@ _eventhandler_find_list(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
 	return list;
 }
 
-/*
- * Lookup a "slow" list by name.  Returns with the list locked.
- */
+  
+                                                               
+   
 struct eventhandler_list *
 eventhandler_find_list(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
     const char *name)
@@ -314,7 +314,7 @@ eventhandler_find_list(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
 		return NULL;
 	}
 
-	/* scan looking for the requested list */
+	                                         
 	lck_mtx_lock_spin(&evthdlr_lists_ctxt->eventhandler_mutex);
 	list = _eventhandler_find_list(evthdlr_lists_ctxt, name);
 	if (list != NULL) {
@@ -326,9 +326,9 @@ eventhandler_find_list(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt,
 	return list;
 }
 
-/*
- * Prune "dead" entries from an eventhandler list.
- */
+  
+                                                  
+   
 void
 eventhandler_prune_list(struct eventhandler_list *list)
 {
@@ -349,12 +349,12 @@ eventhandler_prune_list(struct eventhandler_list *list)
 	}
 }
 
-/*
- * This should be called when last reference to an object
- * is being released.
- * The individual event type lists must be purged when the object
- * becomes defunct.
- */
+  
+                                                         
+                     
+                                                                 
+                   
+   
 void
 eventhandler_lists_ctxt_destroy(struct eventhandler_lists_ctxt *evthdlr_lists_ctxt)
 {

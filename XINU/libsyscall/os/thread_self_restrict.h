@@ -28,4 +28,4 @@
 
 #ifndef OS_THREAD_SELF_RESTRICT_H
 #define OS_THREAD_SELF_RESTRICT_H
-#endif /* OS_THREAD_SELF_RESTRICT_H */
+#endif                                

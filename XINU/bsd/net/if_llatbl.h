@@ -77,11 +77,11 @@ extern lck_rw_t                *lltable_rwlock;
 #define LLTABLE_WUNLOCK()       lck_rw_done(lltable_rwlock)
 #define LLTABLE_LOCK_ASSERT()   LCK_RW_ASSERT(lltable_rwlock, LCK_RW_ASSERT_EXCLUSIVE)
 
-#define LLE_MAX_LINKHDR         24      /* Full IB header */
-/*
- * Code referencing llentry must at least hold
- * a shared lock
- */
+#define LLE_MAX_LINKHDR         24                          
+  
+                                              
+                
+   
 struct llentry {
 	LIST_ENTRY(llentry)      lle_next;
 	union {
@@ -89,36 +89,36 @@ struct llentry {
 		struct in6_addr addr6;
 	} r_l3addr;
 #if 0
-	char                    r_linkdata[LLE_MAX_LINKHDR]; /* L2 data */
-	uint8_t                 r_hdrlen;       /* length for LL header */
+	char                    r_linkdata[LLE_MAX_LINKHDR];              
+	uint8_t                 r_hdrlen;                                 
 	uint8_t                 spare0[3];
 #endif
-	uint16_t                r_flags;        /* LLE runtime flags */
-	uint16_t                r_skip_req;     /* feedback from fast path */
+	uint16_t                r_flags;                               
+	uint16_t                r_skip_req;                                  
 
 	struct lltable           *lle_tbl;
 	struct llentries         *lle_head;
 	void                    (*lle_free)(struct llentry *);
 	struct mbuf              *la_hold;
-	int                      la_numheld;  /* # of packets currently held */
+	int                      la_numheld;                                   
 	u_int64_t                        la_expire;
 	uint16_t                 la_flags;
 	uint16_t                 la_asked;
 	uint16_t                 la_preempt;
-	int16_t                  ln_state;      /* IPv6 has ND6_LLINFO_NOSTATE == -2 */
+	int16_t                  ln_state;                                             
 	uint16_t                 ln_router;
 	time_t                   ln_ntick;
-	time_t                  lle_remtime;    /* Real time remaining */
-	time_t                  lle_hittime;    /* Time when r_skip_req was unset */
+	time_t                  lle_remtime;                             
+	time_t                  lle_hittime;                                        
 	int                      lle_refcnt;
 	union {
 		uint64_t        mac_aligned;
 		uint16_t        mac16[3];
 	} ll_addr;
-	LIST_ENTRY(llentry)     lle_chain;      /* chain of deleted items */
+	LIST_ENTRY(llentry)     lle_chain;                                  
 	thread_call_t           lle_timer;
-	u_int64_t ln_lastused;  /* last used timestamp */
-	struct  if_llreach *ln_llreach; /* link-layer reachability record */
+	u_int64_t ln_lastused;                           
+	struct  if_llreach *ln_llreach;                                     
 	decl_lck_rw_data(, lle_lock);
 	decl_lck_mtx_data(, req_mtx);
 };
@@ -162,7 +162,7 @@ extern lck_attr_t     *lle_lock_attr;
 	        LLE_REMREF(lle);                                \
 	        LLE_WUNLOCK(lle);                               \
 	}                                                       \
-	/* guard against invalid refs */                        \
+	                                                        \
 	(lle) = NULL;                                           \
 } while (0)
 
@@ -218,25 +218,25 @@ struct lltable {
 MALLOC_DECLARE(M_LLTABLE);
 #endif
 
-/*
- * LLentry flags
- */
-#define LLE_DELETED     0x0001  /* entry must be deleted */
-#define LLE_STATIC      0x0002  /* entry is static */
-#define LLE_IFADDR      0x0004  /* entry is interface addr */
-#define LLE_VALID       0x0008  /* ll_addr is valid */
-#define LLE_REDIRECT    0x0010  /* installed by redirect; has host rtentry */
-#define LLE_PUB         0x0020  /* publish entry ??? */
-#define LLE_LINKED      0x0040  /* linked to lookup structure */
-/* LLE request flags */
-#define LLE_EXCLUSIVE   0x2000  /* return lle xlocked  */
-#define LLE_UNLOCKED    0x4000  /* return lle unlocked */
-#define LLE_ADDRONLY    0x4000  /* return lladdr instead of full header */
-#define LLE_CREATE      0x8000  /* hint to avoid lle lookup */
+  
+                
+   
+#define LLE_DELETED     0x0001                             
+#define LLE_STATIC      0x0002                       
+#define LLE_IFADDR      0x0004                               
+#define LLE_VALID       0x0008                        
+#define LLE_REDIRECT    0x0010                                               
+#define LLE_PUB         0x0020                         
+#define LLE_LINKED      0x0040                                  
+                       
+#define LLE_EXCLUSIVE   0x2000                           
+#define LLE_UNLOCKED    0x4000                           
+#define LLE_ADDRONLY    0x4000                                            
+#define LLE_CREATE      0x8000                                
 
-/* LLE flags used by fastpath code */
-#define RLLE_VALID      0x0001          /* entry is valid */
-#define RLLE_IFADDR     LLE_IFADDR      /* entry is ifaddr */
+                                     
+#define RLLE_VALID      0x0001                              
+#define RLLE_IFADDR     LLE_IFADDR                           
 
 #define LLATBL_HASH(key, mask) \
     (((((((key >> 8) ^ key) >> 8) ^ key) >> 8) ^ key) & mask)
@@ -256,7 +256,7 @@ size_t          llentry_free(struct llentry *);
 struct llentry  *llentry_alloc(struct ifnet *, struct lltable *,
     struct sockaddr_storage *);
 
-/* helper functions */
+                      
 size_t lltable_drop_entry_queue(struct llentry *);
 void lltable_set_entry_addr(struct ifnet *ifp, struct llentry *lle,
     const char *ll_addr);
@@ -279,9 +279,9 @@ int lltable_get_af(const struct lltable *llt);
 
 int lltable_foreach_lle(struct lltable *llt, llt_foreach_cb_t *f,
     void *farg);
-/*
- * Generic link layer address lookup function.
- */
+  
+                                              
+   
 static __inline struct llentry *
 lla_lookup(struct lltable *llt, uint16_t flags, const struct sockaddr *l3addr)
 {
@@ -299,4 +299,4 @@ enum {
 
 typedef void (*lle_event_fn)(struct eventhandler_entry_arg, struct llentry *, int);
 EVENTHANDLER_DECLARE(lle_event, lle_event_fn);
-#endif  /* _NET_IF_LLATBL_H_ */
+#endif                         

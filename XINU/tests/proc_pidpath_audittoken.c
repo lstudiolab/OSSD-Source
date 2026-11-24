@@ -90,7 +90,7 @@ show_pidpaths(void)
 		}
 		T_PASS("%5d %s\n", pid, buffer);
 
-		token.val[7]--; /* Change to idversion so the next call fails */
+		token.val[7]--;                                                 
 		ret = proc_pidpath_audittoken(&token, buffer, sizeof(buffer));
 		T_ASSERT_LE(ret, 0, "proc_pidpath_audittoken() failed as expected due to incorrect idversion");
 		T_ASSERT_EQ(errno, ESRCH, "errno is ESRCH as expected");

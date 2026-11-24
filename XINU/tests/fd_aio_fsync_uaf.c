@@ -1,7 +1,7 @@
-/*
- * Proof of Concept / Test Case
- * XNU: aio_work_thread use-after-free for AIO_FSYNC entries
- */
+  
+                               
+                                                            
+   
 #include <err.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -35,9 +35,9 @@ attempt(int fd)
 		ap[n].aio_sigevent.sigev_notify = SIGEV_NONE;
 	}
 
-	/*
-	 * fire them off and exit.
-	 */
+	  
+                           
+    
 	for (n = 0; n < NREQUESTS; ++n) {
 		aio_fsync((n & 1) ? O_SYNC : O_DSYNC, &ap[n]);
 	}
@@ -52,7 +52,7 @@ T_DECL(lio_listio_race_63669270, "test for the lightspeed/unc0ver UaF")
 	char path[128];
 	uint64_t end = clock_gettime_nsec_np(CLOCK_UPTIME_RAW) + 10 * NSEC_PER_SEC;
 
-	/* we need a valid fd: */
+	                         
 	strcpy(path, "/tmp/aio_fsync_uaf.XXXXXX");
 	T_EXPECT_POSIX_SUCCESS(fd = mkstemp(path), "mkstemp");
 	T_EXPECT_POSIX_SUCCESS(unlink(path), "unlink");

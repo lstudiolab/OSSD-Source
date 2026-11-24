@@ -9,8 +9,8 @@
 
 #include <darwintest.h>
 
-// rdar://58566604
-// Exercise races of signal delivery vs exec in multi-threaded processes
+                  
+                                                                        
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.exec"),
     T_META_CHECK_LEAKS(false),

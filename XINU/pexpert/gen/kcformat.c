@@ -36,8 +36,8 @@
 vm_offset_t kc_highest_nonlinkedit_vmaddr = 0;
 int vnode_put(void *vp);
 
-// FIXME: should come from mach-o/fixup_chains.h
-// Index in basePointers array used by chained rebase in dyld_kernel_fixups.h
+                                                
+                                                                             
 typedef enum kc_index {
 	primary_kc_index = 0,
 	pageable_kc_index = 1,
@@ -45,7 +45,7 @@ typedef enum kc_index {
 } kc_index_t;
 
 #if defined(__x86_64__) || defined(__i386__)
-/* FIXME: This should be locked down during early boot */
+                                                         
 void *collection_base_pointers[KCNumKinds] = {};
 kernel_mach_header_t * collection_mach_headers[KCNumKinds] = {};
 uintptr_t collection_slide[KCNumKinds] = {};
@@ -56,7 +56,7 @@ SECURITY_READ_ONLY_LATE(void *) collection_base_pointers[KCNumKinds];
 SECURITY_READ_ONLY_LATE(kernel_mach_header_t *) collection_mach_headers[KCNumKinds];
 SECURITY_READ_ONLY_LATE(uintptr_t) collection_slide[KCNumKinds];
 SECURITY_READ_ONLY_LATE(void *) collection_vp[KCNumKinds];
-#endif //(__x86_64__) || defined(__i386__)
+#endif                                    
 
 static inline kc_index_t
 kc_kind2index(kc_kind_t type)
@@ -167,16 +167,16 @@ PE_get_kc_base_pointers(void)
 	return (const void * const*)collection_base_pointers;
 }
 
-/*
- * Prelinked kexts in an MH_FILESET start with address 0,
- * the slide for such kexts is calculated from the base
- * address of the first kext mapped in that KC. Return the
- * slide based on the type of the KC.
- *
- * Prelinked kexts booted from a non MH_FILESET KC are
- * marked as KCKindUnknown, for such cases, return
- * the kernel slide.
- */
+  
+                                                         
+                                                       
+                                                          
+                                     
+  
+                                                      
+                                                  
+                    
+   
 uintptr_t
 PE_get_kc_slide(kc_kind_t type)
 {
@@ -195,7 +195,7 @@ PE_get_primary_kc_format(kc_format_t *type)
 			*type = KCFormatFileset;
 		} else {
 #if defined(__arm__) || defined(__arm64__)
-			/* From osfmk/arm/arm_init.c */
+			                               
 			extern bool static_kernelcache;
 			if (static_kernelcache) {
 				*type = KCFormatStatic;

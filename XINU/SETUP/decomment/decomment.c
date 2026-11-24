@@ -21,26 +21,26 @@
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-/*
- * decomment.c
- *
- * Removes all comments and (optionally) whitespace from an input file.
- * Writes result on stdout.
- */
+  
+              
+  
+                                                                       
+                           
+   
 
 #include <stdio.h>
-#include <ctype.h>      /* for isspace */
+#include <ctype.h>                       
 #include <libc.h>
 
-/*
- * State of input scanner.
- */
+  
+                          
+   
 typedef enum {
 	IS_NORMAL,
-	IS_SLASH,               // encountered opening '/'
-	IS_IN_COMMENT,          // within / * * / comment
-	IS_STAR,                // encountered closing '*'
-	IS_IN_END_COMMENT       // within / / comment
+	IS_SLASH,                                         
+	IS_IN_COMMENT,                                   
+	IS_STAR,                                          
+	IS_IN_END_COMMENT                            
 } input_state_t;
 
 static void usage(char **argv);
@@ -83,9 +83,9 @@ main(int argc, char **argv)
 		switch (input_state) {
 		case IS_NORMAL:
 			if (bufchar == '/') {
-				/*
-				 * Might be start of a comment.
-				 */
+				  
+                                   
+       
 				input_state = IS_SLASH;
 			} else {
 				if (!(remove_whitespace && isspace(bufchar))) {
@@ -97,26 +97,26 @@ main(int argc, char **argv)
 		case IS_SLASH:
 			switch (bufchar) {
 			case '*':
-				/*
-				 * Start of normal comment.
-				 */
+				  
+                               
+       
 				input_state = IS_IN_COMMENT;
 				break;
 
 			case '/':
-				/*
-				 * Start of 'to-end-of-line' comment.
-				 */
+				  
+                                         
+       
 				input_state = IS_IN_END_COMMENT;
 				break;
 
 			default:
-				/*
-				 * Not the start of comment. Emit the '/'
-				 * we skipped last char in case we were
-				 * entering a comment this time, then the
-				 * current char.
-				 */
+				  
+                                             
+                                           
+                                             
+                    
+       
 				putchar_unlocked('/');
 				if (!(remove_whitespace && isspace(bufchar))) {
 					putchar_unlocked(bufchar);
@@ -128,9 +128,9 @@ main(int argc, char **argv)
 
 		case IS_IN_COMMENT:
 			if (bufchar == '*') {
-				/*
-				 * Maybe ending comment...
-				 */
+				  
+                              
+       
 				input_state = IS_STAR;
 			}
 			break;
@@ -139,23 +139,23 @@ main(int argc, char **argv)
 		case IS_STAR:
 			switch (bufchar) {
 			case '/':
-				/*
-				 * End of normal comment.
-				 */
+				  
+                             
+       
 				input_state = IS_NORMAL;
 				break;
 
 			case '*':
-				/*
-				 * Still could be one char away from end
-				 * of comment.
-				 */
+				  
+                                            
+                  
+       
 				break;
 
 			default:
-				/*
-				 * Still inside comment, no end in sight.
-				 */
+				  
+                                             
+       
 				input_state = IS_IN_COMMENT;
 				break;
 			}
@@ -163,22 +163,22 @@ main(int argc, char **argv)
 
 		case IS_IN_END_COMMENT:
 			if (bufchar == '\n') {
-				/*
-				 * End of comment. Emit the newline if
-				 * appropriate.
-				 */
+				  
+                                          
+                   
+       
 				if (!remove_whitespace) {
 					putchar_unlocked(bufchar);
 				}
 				input_state = IS_NORMAL;
 			}
 			break;
-		} /* switch input_state */
-	}         /* main read loop */
+		}                         
+	}                             
 
-	/*
-	 * Done.
-	 */
+	  
+         
+    
 	return exit_code;
 }
 

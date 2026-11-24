@@ -1,6 +1,6 @@
-/* This tests thread_t uaf vulnerability in the XNU kernel due to
- * a race condition in unp_connect
- */
+                                                                 
+                                  
+   
 
 #include <sys/un.h>
 #include <sys/socket.h>
@@ -29,9 +29,9 @@ server_thread1(char* path)
 	T_ASSERT_POSIX_SUCCESS(bind(server_sock,
 	    (struct sockaddr *) &server_sockaddr, sizeof(server_sockaddr)), NULL);
 
-	/*********************************/
-	/* Listen for any client sockets */
-	/*********************************/
+	                                   
+	                                   
+	                                   
 	T_ASSERT_POSIX_SUCCESS(listen(server_sock, -1), NULL);
 
 	return;
@@ -51,9 +51,9 @@ server_thread2(char* path)
 	T_ASSERT_POSIX_SUCCESS(bind(server_sock,
 	    (struct sockaddr *) &server_sockaddr, sizeof(server_sockaddr)), NULL);
 
-	/*********************************/
-	/* Listen for any client sockets */
-	/*********************************/
+	                                   
+	                                   
+	                                   
 	T_ASSERT_POSIX_SUCCESS(listen(server_sock, -1), NULL);
 
 	return;
@@ -66,7 +66,7 @@ try_to_connect(char* path)
 	memset(&server_sockaddr, 0, sizeof(struct sockaddr_un));
 	server_sockaddr.sun_family = AF_UNIX;
 	strcpy(server_sockaddr.sun_path, path);
-	//unlink(server_sockaddr.sun_path);
+	                                   
 
 	while (g_start == 0) {
 		usleep(100);

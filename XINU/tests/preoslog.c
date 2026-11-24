@@ -6,26 +6,26 @@
 
 #include "test_utils.h"
 
-/*
- * Any change to this structure must be reflected in iBoot / MacEFI / PanicDump / XNU Tests and vice versa.
- */
+  
+                                                                                                           
+   
 typedef struct  __attribute__((packed)) {
-	uint32_t magic; /* g_valid_magic if valid */
-	uint32_t size; /* Size of the preoslog buffer including the header */
-	uint32_t offset; /* Write pointer. Indicates where in the buffer new log entry would go */
-	uint8_t source; /* Indicates who filled in the buffer (e.g. iboot vs MacEFI) */
-	uint8_t wrapped; /* If equal to 1, the preoslog ring buffer wrapped at least once */
-	char data[]; /* log buffer */
+	uint32_t magic;                             
+	uint32_t size;                                                       
+	uint32_t offset;                                                                          
+	uint8_t source;                                                                
+	uint8_t wrapped;                                                                    
+	char data[];                 
 } preoslog_header_t;
 
 static const char* g_sysctl_kern_version = "kern.version";
 static const char* g_sysctl_kern_preoslog = "kern.preoslog";
 static const uint32_t g_valid_magic = 'LSOP';
 
-/*
- * Defines substrings to look up in preoslog buffer.
- * To pass the test, one of the entries should match a substring in preoslog buffer.
- */
+  
+                                                    
+                                                                                    
+   
 static const char* g_preoslog_buffer_string[] = {"serial output"};
 
 static boolean_t
@@ -41,13 +41,13 @@ check_for_substrings(const char* string, size_t len)
 	return res;
 }
 
-/*
- *       Valid cases:
- *       1. Development & Debug iBoot/macEFI provides a preoslog buffer.
- *       2. Release iBoot/macEFI doesn't provide a presoslog buffer.
- *       3. Development & Debug xnu provids kern.preoslog sysctl.
- *       4. Release xnu doesn't provide kern.preoslog sysctl.
- */
+  
+                     
+                                                                        
+                                                                    
+                                                                 
+                                                             
+   
 
 T_DECL(test_preoslog, "Validate kern.preoslog sysctl has expected log content from the boot loader")
 {
@@ -62,25 +62,25 @@ T_DECL(test_preoslog, "Validate kern.preoslog sysctl has expected log content fr
 	size_t upper_buffer_size = 0;
 	boolean_t found = FALSE;
 
-	// kern.preoslog is writable
+	                            
 	ret = sysctlbyname(g_sysctl_kern_preoslog, buffer, &size, &tmp, sizeof(tmp));
 	T_ASSERT_POSIX_SUCCESS(ret, "kern.preoslog write check");
 
 	ret = sysctlbyname(g_sysctl_kern_preoslog, NULL, &size, NULL, 0);
 	if (!is_development_kernel()) {
-		// kern.preoslog mustn't exist on release builds of xnu
+		                                                       
 		T_ASSERT_NE(ret, 0, "get size kern.preoslog ret != 0 on release builds");
 		T_ASSERT_POSIX_ERROR(ret, ENOENT, " get size kern.preoslog errno==ENOENT on release builds");
 		return;
 	}
 
-	/*
-	 * Everything below is applicable only to development & debug xnu
-	 */
+	  
+                                                                  
+    
 
 	T_ASSERT_POSIX_SUCCESS(ret, "get size for kern.preoslog");
 	if (size == 0) {
-		// No preoslog buffer available, valid case if iboot is release
+		                                                               
 		return;
 	}
 

@@ -32,12 +32,12 @@
 #ifndef _BSM_AUDIT_RECORD_H_
 #define _BSM_AUDIT_RECORD_H_
 
-#include <bsm/audit.h>          /* token_t */
-#include <sys/time.h>                   /* struct timeval */
+#include <bsm/audit.h>                       
+#include <sys/time.h>                                       
 
-/*
- * Token type identifiers.
- */
+  
+                          
+   
 #define AUT_INVALID             0x00
 #define AUT_OTHER_FILE32        0x11
 #define AUT_OHEADER             0x12
@@ -104,10 +104,10 @@
 #define AUT_IN_ADDR_EX          0x7e
 #define AUT_SOCKET_EX           0x7f
 
-/*
- * Pre-64-bit BSM, 32-bit tokens weren't explicitly named as '32'.  We have
- * compatibility defines.
- */
+  
+                                                                           
+                         
+   
 #define AUT_HEADER              AUT_HEADER32
 #define AUT_ARG                 AUT_ARG32
 #define AUT_RETURN              AUT_RETURN32
@@ -115,30 +115,30 @@
 #define AUT_PROCESS             AUT_PROCESS32
 #define AUT_OTHER_FILE          AUT_OTHER_FILE32
 
-/*
- * The values for the following token ids are not defined by BSM.
- *
- * XXXRW: Not sure how to handle these in OpenBSM yet, but I'll give them
- * names more consistent with Sun's BSM.  These originally came from Apple's
- * BSM.
- */
-#define AUT_SOCKINET32          0x80            /* XXX */
-#define AUT_SOCKINET128         0x81            /* XXX */
-#define AUT_SOCKUNIX            0x82            /* XXX */
+  
+                                                                 
+  
+                                                                         
+                                                                            
+       
+   
+#define AUT_SOCKINET32          0x80                     
+#define AUT_SOCKINET128         0x81                     
+#define AUT_SOCKUNIX            0x82                     
 
-/* Apple specific tokens*/
+                          
 #define AUT_IDENTITY            0xed
 #define AUT_KRB5_PRINCIPAL      0xee
 #define AUT_CERT_HASH           0xef
 
-/* print values for the arbitrary token */
+                                          
 #define AUP_BINARY      0
 #define AUP_OCTAL       1
 #define AUP_DECIMAL     2
 #define AUP_HEX         3
 #define AUP_STRING      4
 
-/* data-types for the arbitrary token */
+                                        
 #define AUR_BYTE        0
 #define AUR_CHAR        AUR_BYTE
 #define AUR_SHORT       1
@@ -146,7 +146,7 @@
 #define AUR_INT         AUR_INT32
 #define AUR_INT64       3
 
-/* ... and their sizes */
+                         
 #define AUR_BYTE_SIZE       sizeof(u_char)
 #define AUR_CHAR_SIZE       AUR_BYTE_SIZE
 #define AUR_SHORT_SIZE      sizeof(uint16_t)
@@ -154,19 +154,19 @@
 #define AUR_INT_SIZE        AUR_INT32_SIZE
 #define AUR_INT64_SIZE      sizeof(uint64_t)
 
-/* Modifiers for the header token */
-#define PAD_NOTATTR  0x4000   /* nonattributable event */
-#define PAD_FAILURE  0x8000   /* fail audit event */
+                                    
+#define PAD_NOTATTR  0x4000                              
+#define PAD_FAILURE  0x8000                         
 
 #define AUDIT_MAX_GROUPS      16
 
-/*
- * A number of BSM versions are floating around and defined.  Here are
- * constants for them.  OpenBSM uses the same token types, etc, used in the
- * Solaris BSM version, but has a separate version number in order to
- * identify a potentially different event identifier name space.
- */
-#define AUDIT_HEADER_VERSION_OLDDARWIN  1       /* In retrospect, a mistake. */
+  
+                                                                      
+                                                                           
+                                                                     
+                                                                
+   
+#define AUDIT_HEADER_VERSION_OLDDARWIN  1                                      
 #define AUDIT_HEADER_VERSION_SOLARIS    2
 #define AUDIT_HEADER_VERSION_TSOL25     3
 #define AUDIT_HEADER_VERSION_TSOL       4
@@ -185,7 +185,7 @@
 #define __AUDIT_API_14_DEPRECATED
 #endif
 
-/* BSM library calls */
+                       
 
 __BEGIN_DECLS
 
@@ -369,9 +369,9 @@ token_t *au_to_identity(uint32_t signer_type, const char* signing_id,
     uint8_t* cdhash, uint16_t cdhash_len)
 __AUDIT_API_14_DEPRECATED;
 
-/*
- * BSM library routines for converting between local and BSM constant spaces.
- */
+  
+                                                                             
+   
 int      au_bsm_to_domain(u_short bsm_domain, int *local_domainp)
 __AUDIT_API_DEPRECATED;
 int      au_bsm_to_errno(u_char bsm_error, int *errorp)
@@ -392,4 +392,4 @@ __AUDIT_API_DEPRECATED;
 
 __END_DECLS
 
-#endif /* ! _BSM_AUDIT_RECORD_H_ */
+#endif                             

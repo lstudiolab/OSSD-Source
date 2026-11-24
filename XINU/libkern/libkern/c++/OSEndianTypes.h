@@ -29,7 +29,7 @@
  *   gvdl    20050620    Created
  */
 
-// xx-review: are these even used anywhere? Grep turns up squat.
+                                                                
 
 
 /*!
@@ -46,81 +46,81 @@
  * @updated 2005-07-25
  */
 
-// Header doc magic trick for simple documentation
+                                                  
 #if 0
-/*!
- * @typedef BigUInt16
- * @abstract A Big-endian unsigned integer scalar size 16 - UInt16
- */
+   
+                     
+                                                                  
+   
 typedef class BigUInt16 BigUInt16;
 
-/*!
- * @typedef BigSInt16
- * @abstract A Big-endian signed integer scalar size 16 - SInt16
- */
+   
+                     
+                                                                
+   
 typedef class BigSInt16 BigSInt16;
 
-/*!
- * @typedef BigUInt32
- * @abstract A Big-endian unsigned integer scalar size 32 - UInt32
- */
+   
+                     
+                                                                  
+   
 typedef class BigUInt32 BigUInt32;
 
-/*!
- * @typedef BigSInt32
- * @abstract A Big-endian signed integer scalar size 32 - SInt32
- */
+   
+                     
+                                                                
+   
 typedef class BigSInt32 BigSInt32;
 
-/*!
- * @typedef BigUInt64
- * @abstract A Big-endian unsigned integer scalar size 64 - UInt64
- */
+   
+                     
+                                                                  
+   
 typedef class BigUInt64 BigUInt64;
 
-/*!
- * @typedef BigSInt64
- * @abstract A Big-endian signed integer scalar size 64 - SInt64
- */
+   
+                     
+                                                                
+   
 typedef class BigSInt64 BigSInt64;
 
-/*!
- * @typedef LittleUInt16
- * @abstract A Little-endian unsigned integer scalar size 16 - UInt16
- */
+   
+                        
+                                                                     
+   
 typedef class LittleUInt16 LittleUInt16;
 
-/*!
- * @typedef LittleSInt16
- * @abstract A Little-endian signed integer scalar size 16 - SInt16
- */
+   
+                        
+                                                                   
+   
 typedef class LittleSInt16 LittleSInt16;
 
-/*!
- * @typedef LittleUInt32
- * @abstract A Little-endian unsigned integer scalar size 32 - UInt32
- */
+   
+                        
+                                                                     
+   
 typedef class LittleUInt32 LittleUInt32;
 
-/*!
- * @typedef LittleSInt32
- * @abstract A Little-endian signed integer scalar size 32 - SInt32
- */
+   
+                        
+                                                                   
+   
 typedef class LittleSInt32 LittleSInt32;
 
-/*!
- * @typedef LittleUInt64
- * @abstract A Little-endian unsigned integer scalar size 64 - UInt64
- */
+   
+                        
+                                                                     
+   
 typedef class LittleUInt64 LittleUInt64;
 
-/*!
- * @typedef LittleSInt64
- * @abstract A Little-endian signed integer scalar size 64 - SInt64
- */
+   
+                        
+                                                                   
+   
 typedef class LittleSInt64 LittleSInt64;
 
-#endif /* 0 - headerdoc trick */
+#endif                          
 
 #ifndef _OS_OSENDIANHELPER_H
 #define _OS_OSENDIANHELPER_H
@@ -130,9 +130,9 @@ typedef class LittleSInt64 LittleSInt64;
 #include <libkern/OSTypes.h>
 #include <libkern/OSByteOrder.h>
 
-// Probably should really be using templates, this is one of the few cases
-// where they do make sense.  But as the kernel is not allowed to export
-// template based C++ APIs we have to use sophisticated macros instead
+                                                                          
+                                                                        
+                                                                      
 #define __OSEndianSignIntSizeDEF(argname, argend, argtype, argsize) {  \
 public:                                                                \
     typedef argtype ## argsize        Value;                           \
@@ -177,8 +177,8 @@ class LittleSInt64 __OSEndianSignIntSizeDEF(LittleSInt64, Little, SInt, 64);
 
 #undef __OSEndianSignIntSizeDEF
 
-#endif /* __cplusplus
-        */
+#endif               
+          
 
-#endif /* ! _OS_OSENDIANHELPER_H
-        */
+#endif                          
+          

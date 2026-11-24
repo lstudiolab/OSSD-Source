@@ -13,7 +13,7 @@ typedef struct {
 	mach_msg_body_t     body;
 	mach_msg_guarded_port_descriptor_t guarded_port_descriptor1;
 	mach_msg_guarded_port_descriptor_t guarded_port_descriptor2;
-	mach_msg_trailer_t  trailer;            // subtract this when sending
+	mach_msg_trailer_t  trailer;                                         
 } ipc_complex_message;
 
 static ipc_complex_message icm_request = {};
@@ -57,7 +57,7 @@ parse_args(struct args *args)
 	args->client_pid = getpid();
 }
 
-/* Create a mach IPC listener which will respond to the client's message */
+                                                                           
 void
 server_setup(struct args* args)
 {
@@ -82,11 +82,11 @@ server_setup(struct args* args)
 	    args->server_port_name);
 }
 
-/* Server process loop
- *
- * Listens for message.
- *
- */
+                      
+  
+                       
+  
+   
 void
 server(struct args *args)
 {
@@ -142,7 +142,7 @@ server(struct args *args)
 void
 client(struct args *args)
 {
-	//Find the bootstrap port
+	                         
 	mach_port_t bsport;
 	mach_port_t guarded_port;
 	mach_port_t unguarded_port;
@@ -150,12 +150,12 @@ client(struct args *args)
 	kern_return_t ret = task_get_bootstrap_port(mach_task_self(), &bsport);
 	T_ASSERT_MACH_SUCCESS(ret, "client: task_get_bootstrap_port()");
 
-	//Look up the service port
+	                          
 	ret = bootstrap_look_up(bsport, (char *)args->server_port_name,
 	    &args->server_port);
 	T_ASSERT_MACH_SUCCESS(ret, "client: bootstrap_look_up()");
 
-	//Create the unguarded port
+	                           
 	ret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE,
 	    &unguarded_port);
 	T_ASSERT_MACH_SUCCESS(ret, "client: mach_port_allocate() reply port");
@@ -167,7 +167,7 @@ client(struct args *args)
 	ret = mach_port_construct(mach_task_self(), &opts, 0x10, &guarded_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(ret, "mach_port_construct");
 
-	//Construct the message
+	                       
 	mach_msg_header_t *request = (mach_msg_header_t *)args->request_msg;
 	request->msgh_bits = MACH_MSGH_BITS_SET(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND_ONCE,
 	    0, 0) | MACH_MSGH_BITS_COMPLEX;
@@ -192,7 +192,7 @@ client(struct args *args)
 
 	mach_msg_option_t option = MACH_SEND_MSG;
 
-	//Listen for the reply on the reply port
+	                                        
 	T_LOG("client: Sending request\n");
 	ret = mach_msg(request,
 	    option,
@@ -211,7 +211,7 @@ T_DECL(mo_immovable_receive, "Send a message containing a guard port descriptor 
 	args.request_msg_size -= sizeof(mach_msg_trailer_t);
 	args.reply_msg_size -= sizeof(mach_msg_trailer_t);
 
-	//Create the server
+	                   
 	pid_t pid = fork();
 	if (pid == 0) {
 		T_LOG("Server is up");

@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-// #include <Availability.h>
+                            
 #include <sys/cdefs.h>
 
 #if defined(__clang__) && ((defined(__apple_build_version__) && __apple_build_version__ > 5010000))
@@ -35,25 +35,25 @@
 #endif
 
 
-//  AES INSTRUCTIONS
-// aese.16b	v0, v1
-// aesd.16b	v0, v1
-// aesmc.16b	v0, v1
-// aesimc.16b	v0, v1
+                    
+                  
+                  
+                   
+                    
 
-// SHA1 INTRINSICS
-// sha1su0.4s	v0, v1, v2
-// sha1su1.4s	v0, v1
-// sha1c.4s	v0, v1, v2		// or q0, s1, v2.4s
-// sha1m.4s	v0, v1, v2		// or q0, s1, v2.4s
-// sha1p.4s	v0, v1, v2		// or q0, s1, v2.4s
-// sha1h.4s	v0, v1		// or s0, s1
+                  
+                        
+                    
+                                           
+                                           
+                                           
+                                
 
-// SHA256 INTRINSICS
-// sha256su0.4s	v0, v1
-// sha256su1.4s	v0, v1, v2
-// sha256h.4s		v0, v1, v2		// or q0, q1, v2.4s
-// sha256h2.4s	v0, v1, v2		// or q0, q1, v2.4s
+                    
+                      
+                          
+                                              
+                                              
 
 
 #if __USES_V_CRYPTO_INTRINSICS == 1

@@ -67,10 +67,10 @@
 #include <../bsd/sys/sysent.h>
 
 
-/*
- * Duplicate parent state in child
- * for U**X fork.
- */
+  
+                                  
+                 
+   
 kern_return_t
 machine_thread_dup(
 	thread_t            parent,
@@ -81,35 +81,35 @@ machine_thread_dup(
 	pcb_t           parent_pcb = THREAD_TO_PCB(parent);
 	pcb_t           child_pcb = THREAD_TO_PCB(child);
 
-	/*
-	 * Copy over the x86_saved_state registers
-	 */
+	  
+                                           
+    
 	if (thread_is_64bit_addr(parent)) {
 		bcopy(USER_REGS64(parent), USER_REGS64(child), sizeof(x86_saved_state64_t));
 	} else {
 		bcopy(USER_REGS32(parent), USER_REGS32(child), sizeof(x86_saved_state32_t));
 	}
 
-	/*
-	 * Check to see if parent is using floating point
-	 * and if so, copy the registers to the child
-	 */
+	  
+                                                  
+                                              
+    
 	fpu_dup_fxstate(parent, child);
 
 #ifdef  MACH_BSD
-	/*
-	 * Copy the parent's cthread id and USER_CTHREAD descriptor, if 32-bit.
-	 */
+	  
+                                                                        
+    
 	child_pcb->cthread_self = parent_pcb->cthread_self;
 	if (!thread_is_64bit_addr(parent)) {
 		child_pcb->cthread_desc = parent_pcb->cthread_desc;
 	}
 
-	/*
-	 * FIXME - should a user specified LDT, TSS and V86 info
-	 * be duplicated as well?? - probably not.
-	 */
-	// duplicate any use LDT entry that was set I think this is appropriate.
+	  
+                                                         
+                                           
+    
+	                                                                        
 	if (parent_pcb->uldt_selector != 0) {
 		child_pcb->uldt_selector = parent_pcb->uldt_selector;
 		child_pcb->uldt_desc = parent_pcb->uldt_desc;
@@ -145,66 +145,66 @@ thread_set_parent(thread_t parent, int pid)
 	}
 }
 
-/*
- * thread_fast_set_cthread_self: Sets the machine kernel thread ID of the
- * current thread to the given thread ID; fast version for 32-bit processes
- *
- * Parameters:    self                    Thread ID to set
- *
- * Returns:        0                      Success
- *                !0                      Not success
- */
+  
+                                                                         
+                                                                           
+  
+                                                          
+  
+                                                 
+                                                     
+   
 kern_return_t
 thread_fast_set_cthread_self(uint32_t self)
 {
 	machine_thread_set_tsd_base(current_thread(), self);
-	return USER_CTHREAD; /* N.B.: not a kern_return_t! */
+	return USER_CTHREAD;                                 
 }
 
-/*
- * thread_fast_set_cthread_self64: Sets the machine kernel thread ID of the
- * current thread to the given thread ID; fast version for 64-bit processes
- *
- * Parameters:    self                    Thread ID
- *
- * Returns:        0                      Success
- *                !0                      Not success
- */
+  
+                                                                           
+                                                                           
+  
+                                                   
+  
+                                                 
+                                                     
+   
 kern_return_t
 thread_fast_set_cthread_self64(uint64_t self)
 {
 	machine_thread_set_tsd_base(current_thread(), self);
-	return USER_CTHREAD; /* N.B.: not a kern_return_t! */
+	return USER_CTHREAD;                                 
 }
 
-/*
- * thread_set_user_ldt routine is the interface for the user level
- * settable ldt entry feature.  allowing a user to create arbitrary
- * ldt entries seems to be too large of a security hole, so instead
- * this mechanism is in place to allow user level processes to have
- * an ldt entry that can be used in conjunction with the FS register.
- *
- * Swapping occurs inside the pcb.c file along with initialization
- * when a thread is created. The basic functioning theory is that the
- * pcb->uldt_selector variable will contain either 0 meaning the
- * process has not set up any entry, or the selector to be used in
- * the FS register. pcb->uldt_desc contains the actual descriptor the
- * user has set up stored in machine usable ldt format.
- *
- * Currently one entry is shared by all threads (USER_SETTABLE), but
- * this could be changed in the future by changing how this routine
- * allocates the selector. There seems to be no real reason at this
- * time to have this added feature, but in the future it might be
- * needed.
- *
- * address is the linear address of the start of the data area size
- * is the size in bytes of the area flags should always be set to 0
- * for now. in the future it could be used to set R/W permisions or
- * other functions. Currently the segment is created as a data segment
- * up to 1 megabyte in size with full read/write permisions only.
- *
- * this call returns the segment selector or -1 if any error occurs
- */
+  
+                                                                  
+                                                                   
+                                                                   
+                                                                   
+                                                                     
+  
+                                                                  
+                                                                     
+                                                                
+                                                                  
+                                                                     
+                                                       
+  
+                                                                    
+                                                                   
+                                                                   
+                                                                 
+          
+  
+                                                                   
+                                                                   
+                                                                   
+                                                                      
+                                                                 
+  
+                                                                   
+   
 kern_return_t
 thread_set_user_ldt(uint32_t address, uint32_t size, uint32_t flags)
 {
@@ -212,31 +212,31 @@ thread_set_user_ldt(uint32_t address, uint32_t size, uint32_t flags)
 	struct fake_descriptor temp;
 
 	if (flags != 0) {
-		return -1;              // flags not supported
+		return -1;                                    
 	}
 	if (size > 0xFFFFF) {
-		return -1;              // size too big, 1 meg is the limit
+		return -1;                                                 
 	}
 	mp_disable_preemption();
 
-	// create a "fake" descriptor so we can use fix_desc()
-	// to build a real one...
-	//   32 bit default operation size
-	//   standard read/write perms for a data segment
+	                                                      
+	                         
+	                                  
+	                                                 
 	pcb = THREAD_TO_PCB(current_thread());
 	temp.offset = address;
 	temp.lim_or_seg = size;
 	temp.size_or_wdct = SZ_32;
 	temp.access = ACC_P | ACC_PL_U | ACC_DATA_W;
 
-	// turn this into a real descriptor
+	                                   
 	fix_desc(&temp, 1);
 
-	// set up our data in the pcb
+	                             
 	pcb->uldt_desc = *(struct real_descriptor*)&temp;
-	pcb->uldt_selector = USER_SETTABLE;             // set the selector value
+	pcb->uldt_selector = USER_SETTABLE;                                      
 
-	// now set it up in the current table...
+	                                        
 	*ldt_desc_p(USER_SETTABLE) = *(struct real_descriptor*)&temp;
 
 	mp_enable_preemption();

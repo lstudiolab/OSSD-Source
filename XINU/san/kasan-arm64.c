@@ -62,7 +62,7 @@ vm_offset_t physmap_vtop;
 vm_offset_t shadow_pbase;
 vm_offset_t shadow_ptop;
 #if HIBERNATION
-// if we're building a kernel with hibernation support, hibernate_write_image depends on this symbol
+                                                                                                    
 vm_offset_t shadow_pnext;
 #else
 static vm_offset_t shadow_pnext;
@@ -76,7 +76,7 @@ extern vm_offset_t excepstack, excepstack_top;
 
 void kasan_bootstrap(boot_args *, vm_offset_t pgtable);
 
-#define KASAN_OFFSET_ARM64 0xe000000000000000ULL /* Defined in makedefs/MakeInc.def */
+#define KASAN_OFFSET_ARM64 0xe000000000000000ULL                                      
 
 #if defined(ARM_LARGE_MEMORY)
 #define KASAN_SHADOW_MIN  (VM_MAX_KERNEL_ADDRESS+1)
@@ -135,22 +135,22 @@ kasan_map_shadow_internal(vm_offset_t address, vm_size_t size, bool is_zero, boo
 		uint64_t *base = cpu_tte;
 		uint64_t *pte;
 
-		/* lookup L1 entry */
+		                     
 		pte = base + ((shadow_base & ARM_TT_L1_INDEX_MASK) >> ARM_TT_L1_SHIFT);
 		if (*pte & ARM_TTE_VALID) {
 			assert((*pte & ARM_TTE_TYPE_MASK) == ARM_TTE_TYPE_TABLE);
 		} else {
-			/* create new L1 table */
+			                         
 			*pte = ((uint64_t)alloc_zero_page() & ARM_TTE_TABLE_MASK) | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE;
 		}
 		base = (uint64_t *)phystokv(*pte & ARM_TTE_TABLE_MASK);
 
-		/* lookup L2 entry */
+		                     
 		pte = base + ((shadow_base & ARM_TT_L2_INDEX_MASK) >> ARM_TT_L2_SHIFT);
 		if (*pte & ARM_TTE_VALID) {
 			assert((*pte & ARM_TTE_TYPE_MASK) == ARM_TTE_TYPE_TABLE);
 		} else {
-			/* create new L3 table */
+			                         
 			*pte = ((uint64_t)alloc_zero_page() & ARM_TTE_TABLE_MASK) | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE;
 		}
 		base = (uint64_t *)phystokv(*pte & ARM_TTE_TABLE_MASK);
@@ -159,20 +159,20 @@ kasan_map_shadow_internal(vm_offset_t address, vm_size_t size, bool is_zero, boo
 			continue;
 		}
 
-		/* lookup L3 entry */
+		                     
 		pte = base + ((shadow_base & ARM_TT_L3_INDEX_MASK) >> ARM_TT_L3_SHIFT);
 		if ((*pte & ARM_PTE_TYPE_VALID) &&
 		    ((((*pte) & ARM_PTE_APMASK) != ARM_PTE_AP(AP_RONA)) || is_zero)) {
-			/* nothing to do - page already mapped and we are not
-			 * upgrading */
+			                                                     
+                  
 		} else {
-			/* create new L3 entry */
+			                         
 			uint64_t newpte;
 			if (is_zero) {
-				/* map the zero page RO */
+				                          
 				newpte = (uint64_t)zero_page_phys | ARM_PTE_AP(AP_RONA);
 			} else {
-				/* map a fresh page RW */
+				                         
 				newpte = (uint64_t)alloc_zero_page() | ARM_PTE_AP(AP_RWNA);
 			}
 			newpte |= ARM_PTE_TYPE_VALID
@@ -194,9 +194,9 @@ kasan_map_shadow(vm_offset_t address, vm_size_t size, bool is_zero)
 	kasan_map_shadow_internal(address, size, is_zero, true);
 }
 
-/*
- * TODO: mappings here can be reclaimed after kasan_init()
- */
+  
+                                                          
+   
 static void
 kasan_map_shadow_early(vm_offset_t address, vm_size_t size, bool is_zero)
 {
@@ -213,50 +213,50 @@ kasan_map_shadow_early(vm_offset_t address, vm_size_t size, bool is_zero)
 
 		uint64_t *base = (uint64_t *)bootstrap_pgtable_phys;
 
-		/* lookup L1 entry */
+		                     
 		pte = base + ((virt_shadow_target & ARM_TT_L1_INDEX_MASK) >> ARM_TT_L1_SHIFT);
 		if (*pte & ARM_TTE_VALID) {
 			assert((*pte & ARM_TTE_TYPE_MASK) == ARM_TTE_TYPE_TABLE);
 		} else {
-			/* create new L1 table */
+			                         
 			vm_address_t pg = alloc_page();
 			__nosan_bzero((void *)pg, ARM_PGBYTES);
 			*pte = ((uint64_t)pg & ARM_TTE_TABLE_MASK) | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE;
 		}
 		base = (uint64_t *)(*pte & ARM_TTE_TABLE_MASK);
 
-		/* lookup L2 entry */
+		                     
 		pte = base + ((virt_shadow_target & ARM_TT_L2_INDEX_MASK) >> ARM_TT_L2_SHIFT);
 		if (*pte & ARM_TTE_VALID) {
 			assert((*pte & ARM_TTE_TYPE_MASK) == ARM_TTE_TYPE_TABLE);
 		} else {
-			/* create new L3 table */
+			                         
 			vm_address_t pg = alloc_page();
 			__nosan_bzero((void *)pg, ARM_PGBYTES);
 			*pte = ((uint64_t)pg & ARM_TTE_TABLE_MASK) | ARM_TTE_VALID | ARM_TTE_TYPE_TABLE;
 		}
 		base = (uint64_t *)(*pte & ARM_TTE_TABLE_MASK);
 
-		/* lookup L3 entry */
+		                     
 		pte = base + ((virt_shadow_target & ARM_TT_L3_INDEX_MASK) >> ARM_TT_L3_SHIFT);
 
 		if ((*pte & (ARM_PTE_TYPE | ARM_PTE_APMASK)) == (ARM_PTE_TYPE_VALID | ARM_PTE_AP(AP_RWNA))) {
-			/* L3 entry valid and mapped RW - do nothing */
+			                                               
 		} else {
-			/* Not mapped, or mapped RO - create new L3 entry or upgrade to RW */
+			                                                                     
 
 			uint64_t newpte;
 			if (is_zero) {
-				/* map the zero page RO */
+				                          
 				newpte = (uint64_t)zero_page_phys | ARM_PTE_AP(AP_RONA);
 			} else {
-				/* map a fresh page RW */
+				                         
 				vm_address_t pg = alloc_page();
 				__nosan_bzero((void *)pg, ARM_PGBYTES);
 				newpte = pg | ARM_PTE_AP(AP_RWNA);
 			}
 
-			/* add the default attributes */
+			                                
 			newpte |= ARM_PTE_TYPE_VALID
 			    | ARM_PTE_AF
 			    | ARM_PTE_SH(SH_OUTER_MEMORY)
@@ -274,19 +274,19 @@ kasan_map_shadow_early(vm_offset_t address, vm_size_t size, bool is_zero)
 void
 kasan_arch_init(void)
 {
-	/* Map the physical aperture */
+	                               
 	kasan_map_shadow(physmap_vbase, physmap_vtop - physmap_vbase, true);
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
-	/* Pre-allocate all the L3 page table pages to avoid triggering KTRR */
+	                                                                       
 	kasan_map_shadow_internal(VM_MIN_KERNEL_ADDRESS, VM_MAX_KERNEL_ADDRESS - VM_MIN_KERNEL_ADDRESS + 1, false, false);
 #endif
 }
 
-/*
- * Steal memory for the shadow, and shadow map the bootstrap page tables so we can
- * run until kasan_init(). Called while running with identity (V=P) map active.
- */
+  
+                                                                                  
+                                                                               
+   
 void
 kasan_bootstrap(boot_args *args, vm_offset_t pgtable)
 {
@@ -304,21 +304,21 @@ kasan_bootstrap(boot_args *args, vm_offset_t pgtable)
 
 	args->memSize -= tosteal;
 
-	/* Initialize the page allocator */
+	                                   
 	shadow_pbase = vm_map_round_page(pbase + args->memSize, ARM_PGMASK);
 	shadow_ptop = shadow_pbase + tosteal;
 	shadow_pnext = shadow_pbase;
 	shadow_pages_total = (uint32_t)((shadow_ptop - shadow_pbase) / ARM_PGBYTES);
 
-	/* Set aside a page of zeros we can use for dummy shadow mappings */
+	                                                                    
 	zero_page_phys = alloc_page();
 	__nosan_bzero((void *)zero_page_phys, ARM_PGBYTES);
 
-	/* Shadow the KVA bootstrap mapping: start of kernel Mach-O to end of physical */
+	                                                                                 
 	bootstrap_pgtable_phys = pgtable;
 	kasan_map_shadow_early(kernel_vbase + extra, args->memSize - extra, true);
 
-	/* Shadow the early stacks */
+	                             
 	vm_offset_t p2v = args->virtBase - args->physBase;
 
 	vm_offset_t intstack_virt = (vm_offset_t)&intstack + p2v;
@@ -343,21 +343,21 @@ kasan_is_shadow_mapped(uintptr_t shadowp)
 	assert(shadowp >= KASAN_SHADOW_MIN);
 	assert(shadowp < KASAN_SHADOW_MAX);
 
-	/* lookup L1 entry */
+	                     
 	pte = base + ((shadowp & ARM_TT_L1_INDEX_MASK) >> ARM_TT_L1_SHIFT);
 	if (!(*pte & ARM_TTE_VALID)) {
 		return false;
 	}
 	base = (uint64_t *)phystokv(*pte & ARM_TTE_TABLE_MASK);
 
-	/* lookup L2 entry */
+	                     
 	pte = base + ((shadowp & ARM_TT_L2_INDEX_MASK) >> ARM_TT_L2_SHIFT);
 	if (!(*pte & ARM_TTE_VALID)) {
 		return false;
 	}
 	base = (uint64_t *)phystokv(*pte & ARM_TTE_TABLE_MASK);
 
-	/* lookup L3 entry */
+	                     
 	pte = base + ((shadowp & ARM_TT_L3_INDEX_MASK) >> ARM_TT_L3_SHIFT);
 	if (!(*pte & ARM_PTE_TYPE_VALID)) {
 		return false;

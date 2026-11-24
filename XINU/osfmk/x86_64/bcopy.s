@@ -53,61 +53,61 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #include <i386/asm.h>
 
-/* void *memcpy((void *) to, (const void *) from, (size_t) bcount) */
-/*			rdi,	 	     rsi,	      rdx   */
-/*
- * Note: memcpy does not support overlapping copies
- */
+                                                                     
+                                    
+  
+                                                   
+   
 ENTRY(memcpy)
-	movq	%rdi, %rax			/* return destination */
+	movq	%rdi, %rax			                        
 	movq	%rdx,%rcx
-	cld					/* copy forwards */
+	cld					                   
 	rep
 	movsb
 	ret
 
-/* void bcopy((const char *) from, (char *) to, (unsigned int) count) */
-/*			      rdi, 	   rsi,			 rdx  */
+                                                                        
+                                   
 
 ENTRY(bcopy_no_overwrite)
 	xchgq	%rsi,%rdi
 	jmp	EXT(memcpy)
 
-/*
- * bcopy(src, dst, cnt)
- *       rdi, rsi, rdx
- *  ws@tools.de     (Wolfgang Solfrank, TooLs GmbH) +49-228-985800
- */
+  
+                       
+                      
+                                                                  
+   
 ENTRY(bcopy)
 	xchgq	%rsi,%rdi
 	movq	%rdx,%rcx
 
 	movq	%rdi,%rax
 	subq	%rsi,%rax
-	cmpq	%rcx,%rax			/* overlapping && src < dst? */
+	cmpq	%rcx,%rax			                               
 	jb	1f
 
-	cld					/* nope, copy forwards */
+	cld					                         
 	rep
 	movsb
 	ret
 
-	/* ALIGN_TEXT */
+	                
 1:
-	addq	%rcx,%rdi			/* copy backwards */
+	addq	%rcx,%rdi			                    
 	addq	%rcx,%rsi
 	decq	%rdi
 	decq	%rsi
-	andq	$7,%rcx				/* any fractional bytes? */
+	andq	$7,%rcx				                           
 	std
 	rep
 	movsb
-	movq	%rdx,%rcx			/* copy remainder by 32-bit words */
+	movq	%rdx,%rcx			                                    
 	shrq	$3,%rcx
 	subq	$7,%rsi
 	subq	$7,%rdi

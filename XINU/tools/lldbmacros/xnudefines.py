@@ -137,7 +137,7 @@ filetype_strings = { DTYPE_VNODE: 'VNODE',
 mach_msg_type_descriptor_strings = {0: "PORT", 1: "OOLDESC", 2: "OOLPORTS", 3: "OOLVOLATILE"}
 
 proc_state_strings = [ "", "Idle", "Run", "Sleep", "Stop", "Zombie", "Reaping" ]
-proc_flag_explain_strings = ["!0x00000004 - process is 32 bit",  #only exception that does not follow bit settings
+proc_flag_explain_strings = ["!0x00000004 - process is 32 bit",                                                   
                              "0x00000001 - may hold advisory locks",
                              "0x00000002 - has a controlling tty",
                              "0x00000004 - process is 64 bit",
@@ -171,8 +171,8 @@ proc_flag_explain_strings = ["!0x00000004 - process is 32 bit",  #only exception
                              "0x40000000 - no zombies when children exit",
                              "0x80000000 - don't hang on remote FS ops"
                              ]
-#File: xnu/osfmk/kern/ipc_kobject.h
-# string representations for Kobject types
+                                   
+                                          
 kobject_types = ['', 'THREAD_CONTROL', 'TASK_CONTROL', 'HOST', 'HOST_PRIV', 'PROCESSOR', 'PSET', 'PSET_NAME', 'TIMER', 'PAGER_REQ', 'DEVICE', 'XMM_OBJECT', 'XMM_PAGER', 'XMM_KERNEL', 'XMM_REPLY',
                      'NOTDEF 15', 'NOTDEF 16', 'HOST_SEC', 'LEDGER', 'MASTER_DEV', 'TASK_NAME', 'SUBSYTEM', 'IO_DONE_QUE', 'SEMAPHORE', 'LOCK_SET', 'CLOCK', 'CLOCK_CTRL' , 'IOKIT_SPARE',
                       'NAMED_MEM', 'IOKIT_CON', 'IOKIT_OBJ', 'UPL', 'MEM_OBJ_CONTROL', 'AU_SESSIONPORT', 'FILEPORT', 'LABELH', 'TASK_RESUME', 'VOUCHER', 'VOUCHER_ATTR_CONTROL', 'WORK_INTERVAL',
@@ -215,8 +215,8 @@ AURR_PANIC_VERSION = 1
 CRASHLOG_PANIC_STRING_LEN = 32
 AURR_CRASHLOG_PANIC_VERSION = 2
 
-# File:EXTERNAL_HEADER/mach-o/loader.h
-# (struct proc *)->p_platform
+                                      
+                             
 P_PLATFORM_MACOS = 1
 P_PLATFORM_IOS = 2
 P_PLATFORM_TVOS = 3

@@ -58,7 +58,7 @@ struct netagent {
 	char netagent_desc[128];
 	uint32_t netagent_flags;
 	uint32_t netagent_data_size;
-	/*uint8_t netagent_data[0];*/
+	                             
 };
 
 static void *
@@ -147,14 +147,14 @@ T_DECL(netagent_race_infodisc_56244905, "Netagent race between register and post
 	unsigned long leaked;
 
 	T_SETUPBEGIN;
-	/* set up the event socket so we can receive notifications: */
+	                                                              
 	T_ASSERT_POSIX_SUCCESS(evsock = socket(AF_SYSTEM, SOCK_RAW, SYSPROTO_EVENT), NULL);
 	T_ASSERT_POSIX_SUCCESS(ioctl(evsock, SIOCSKEVFILT, &kev_req), NULL);
 
-	/* this is the socket we'll race on: */
+	                                       
 	T_ASSERT_POSIX_SUCCESS(s = socket(AF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL), NULL);
 
-	/* connect to netagent: */
+	                          
 	bzero(&ci, sizeof(ci));
 	strcpy(ci.ctl_name, "com.apple.net.netagent");
 	T_ASSERT_POSIX_SUCCESS(ioctl(s, CTLIOCGINFO, &ci), NULL);
@@ -165,12 +165,12 @@ T_DECL(netagent_race_infodisc_56244905, "Netagent race between register and post
 	T_ASSERT_POSIX_SUCCESS(connect(s, (const struct sockaddr *)&sc, sizeof(sc)), NULL);
 	T_SETUPEND;
 
-	/* variant 1: */
-	/* spin off the racer threads: */
+	                
+	                                 
 	T_ASSERT_POSIX_ZERO(pthread_create(&reg_th, NULL, register_message_racer, &s), NULL);
 	T_ASSERT_POSIX_ZERO(pthread_create(&unreg_th, NULL, unregister_racer, &s), NULL);
 
-	/* keep going until we're done: */
+	                                  
 	for (n = 0; n < NITERS; ++n) {
 		bzero(&ev, sizeof(ev));
 
@@ -198,12 +198,12 @@ check1:
 
 	finished = 0;
 
-	/* variant 2: */
-	/* spin off the racer threads: */
+	                
+	                                 
 	T_ASSERT_POSIX_ZERO(pthread_create(&reg_th, NULL, register_sockopt_racer, &s), NULL);
 	T_ASSERT_POSIX_ZERO(pthread_create(&unreg_th, NULL, unregister_racer, &s), NULL);
 
-	/* keep going until we're done: */
+	                                  
 	for (n = 0; n < NITERS; ++n) {
 		bzero(&ev, sizeof(ev));
 

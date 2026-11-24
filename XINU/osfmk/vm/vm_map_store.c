@@ -29,7 +29,7 @@
 #include <kern/backtrace.h>
 #include <mach/sdt.h>
 #include <vm/vm_map_store.h>
-#include <vm/vm_pageout.h> /* for vm_debug_events */
+#include <vm/vm_pageout.h>                          
 
 #if MACH_ASSERT
 boolean_t
@@ -64,7 +64,7 @@ boolean_t
 vm_map_store_lookup_entry(
 	vm_map_t                map,
 	vm_map_offset_t         address,
-	vm_map_entry_t          *entry)         /* OUT */
+	vm_map_entry_t          *entry)                  
 {
 #ifdef VM_MAP_STORE_USE_LL
 	return vm_map_store_lookup_entry_ll( map, address, entry );
@@ -73,7 +73,7 @@ vm_map_store_lookup_entry(
 		return vm_map_store_lookup_entry_rb( map, address, entry );
 	} else {
 		panic("VM map lookups need RB tree support.\n");
-		return FALSE; /* For compiler warning.*/
+		return FALSE;                           
 	}
 #endif
 }
@@ -97,33 +97,33 @@ vm_map_store_update( vm_map_t map, vm_map_entry_t entry, int update_type )
 	}
 }
 
-/*
- *  vm_map_store_find_last_free:
- *
- *  Finds and returns in O_ENTRY the entry *after* the last hole (if one exists) in MAP.
- *  Returns NULL if map is full and no hole can be found.
- */
+  
+                                
+  
+                                                                                        
+                                                         
+   
 void
 vm_map_store_find_last_free(
 	vm_map_t map,
-	vm_map_entry_t *o_entry)        /* OUT */
+	vm_map_entry_t *o_entry)                 
 {
-	/* TODO: Provide a RB implementation for this routine. */
+	                                                         
 	vm_map_store_find_last_free_ll(map, o_entry);
 }
 
-/*
- *	vm_map_entry_{un,}link:
- *
- *	Insert/remove entries from maps (or map copies).
- *	The _vm_map_store_entry_{un,}link variants are used at
- *	some places where updating first_free is not needed &
- *	copy maps are being modified. Also note the first argument
- *	is the map header.
- *	Modifying the vm_map_store_entry_{un,}link functions to
- *	deal with these call sites made the interface confusing
- *	and clunky.
- */
+  
+                          
+  
+                                                   
+                                                         
+                                                        
+                                                             
+                     
+                                                          
+                                                          
+              
+   
 
 void
 _vm_map_store_entry_link( struct vm_map_header * mapHdr, vm_map_entry_t after_where, vm_map_entry_t entry)

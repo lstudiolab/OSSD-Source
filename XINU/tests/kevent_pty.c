@@ -1,6 +1,6 @@
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
-#endif /* T_NAMESPACE */
+#endif                  
 
 #include <Block.h>
 #include <darwintest.h>
@@ -280,7 +280,7 @@ T_DECL(master_read_data_set,
 	dispatch_activate(src);
 	T_SETUPEND;
 
-	// Let's not fill up the TTY's buffer, otherwise write(2) will block.
+	                                                                     
 	char buf[512] = "";
 
 	int ret = 0;

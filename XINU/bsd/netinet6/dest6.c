@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$FreeBSD: src/sys/netinet6/dest6.c,v 1.1.2.3 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: dest6.c,v 1.27 2001/03/29 05:34:30 itojun Exp $	*/
+                                                                                
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -77,9 +77,9 @@
 #include <netinet6/ip6_var.h>
 #include <netinet/icmp6.h>
 
-/*
- * Destination options header processing.
- */
+  
+                                         
+   
 int
 dest6_input(struct mbuf **mp, int *offp, int proto)
 {
@@ -89,7 +89,7 @@ dest6_input(struct mbuf **mp, int *offp, int proto)
 	struct ip6_dest *dstopts = NULL;
 	u_int8_t *opt = NULL;
 
-	/* validation of the length of the header */
+	                                            
 	IP6_EXTHDR_CHECK(m, off, sizeof(*dstopts), return IPPROTO_DONE);
 	dstopts = (struct ip6_dest *)(mtod(m, caddr_t) + off);
 	dstoptlen = (dstopts->ip6d_len + 1) << 3;
@@ -100,7 +100,7 @@ dest6_input(struct mbuf **mp, int *offp, int proto)
 	dstoptlen -= sizeof(struct ip6_dest);
 	opt = (u_int8_t *)dstopts + sizeof(struct ip6_dest);
 
-	/* search header for all options. */
+	                                    
 	for (optlen = 0; dstoptlen > 0; dstoptlen -= optlen, opt += optlen) {
 		if (*opt != IP6OPT_PAD1 &&
 		    (dstoptlen < IP6OPT_MINLEN || *(opt + 1) + 2 > dstoptlen)) {
@@ -116,7 +116,7 @@ dest6_input(struct mbuf **mp, int *offp, int proto)
 			optlen = *(opt + 1) + 2;
 			break;
 
-		default:                /* unknown option */
+		default:                                    
 			optlen = ip6_unknown_opt(opt, m,
 			    opt - mtod(m, u_int8_t *));
 			if (optlen == -1) {

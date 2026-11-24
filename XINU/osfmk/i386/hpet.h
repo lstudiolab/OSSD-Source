@@ -29,42 +29,42 @@
 #ifndef _I386_HPET_H_
 #define _I386_HPET_H_
 
-/*
- * HPET kernel functions to support the HPET KEXT and the
- * power management KEXT.
- */
+  
+                                                         
+                         
+   
 
 
-/*
- *	Memory mapped registers for the HPET
- */
+  
+                                       
+   
 typedef struct hpetReg {
-	uint64_t        GCAP_ID;                /* General capabilities */
+	uint64_t        GCAP_ID;                                          
 	uint64_t        rsv1;
-	uint64_t        GEN_CONF;               /* General configuration */
+	uint64_t        GEN_CONF;                                          
 	uint64_t        rsv2;
-	uint64_t        GINTR_STA;              /* General Interrupt status */
+	uint64_t        GINTR_STA;                                            
 	uint64_t        rsv3[25];
-	uint64_t        MAIN_CNT;               /* Main counter */
+	uint64_t        MAIN_CNT;                                 
 	uint64_t        rsv4;
-	uint64_t        TIM0_CONF;              /* Timer 0 config and cap */
+	uint64_t        TIM0_CONF;                                          
 #define                 TIM_CONF 0
 #define                 Tn_INT_ENB_CNF 4
-	uint64_t        TIM0_COMP;              /* Timer 0 comparator */
+	uint64_t        TIM0_COMP;                                      
 #define                 TIM_COMP 8
 	uint64_t        rsv5[2];
-	uint64_t        TIM1_CONF;              /* Timer 1 config and cap */
-	uint64_t        TIM1_COMP;              /* Timer 1 comparator */
+	uint64_t        TIM1_CONF;                                          
+	uint64_t        TIM1_COMP;                                      
 	uint64_t        rsv6[2];
-	uint64_t        TIM2_CONF;              /* Timer 2 config and cap */
-	uint64_t        TIM2_COMP;              /* Timer 2 comparator */
+	uint64_t        TIM2_CONF;                                          
+	uint64_t        TIM2_COMP;                                      
 	uint64_t        rsv7[2];
 } hpetReg;
 typedef struct  hpetReg hpetReg_t;
 
 typedef struct hpetTimer {
-	uint64_t        Config;         /* Timer config and capabilities */
-	uint64_t        Compare;        /* Timer comparitor */
+	uint64_t        Config;                                            
+	uint64_t        Compare;                              
 } hpetTimer_t;
 
 struct hpetInfo {
@@ -86,7 +86,7 @@ struct hpetRequest {
 };
 typedef struct hpetRequest hpetRequest_t;
 
-#define HPET_REQFL_64BIT        0x00000001      /* Timer is 64 bits */
+#define HPET_REQFL_64BIT        0x00000001                            
 
 extern uint64_t hpetFemto;
 extern uint64_t hpetFreq;
@@ -119,6 +119,6 @@ extern void hpet_get_info(hpetInfo_t *info);
 #define hpetAddr        0xFED00000
 #define hptcAE          0x80
 
-#endif  /* _I386_HPET_H_ */
+#endif                     
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

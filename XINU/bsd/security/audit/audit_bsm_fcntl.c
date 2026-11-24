@@ -247,7 +247,7 @@ static const bsm_fcntl_cmd_t bsm_fcntl_cmdtab[] = {
 	{ BSM_F_FS_SPECIFIC_13, FCNTL_FS_SPECIFIC_BASE + 13},
 	{ BSM_F_FS_SPECIFIC_14, FCNTL_FS_SPECIFIC_BASE + 14},
 	{ BSM_F_FS_SPECIFIC_15, FCNTL_FS_SPECIFIC_BASE + 15},
-#endif  /* FCNTL_FS_SPECIFIC_BASE */
+#endif                              
 };
 static const int bsm_fcntl_cmd_count = sizeof(bsm_fcntl_cmdtab) /
     sizeof(bsm_fcntl_cmdtab[0]);
@@ -304,4 +304,4 @@ au_bsm_to_fcntl_cmd(u_short bsm_fcntl_cmd, int *local_fcntl_cmdp)
 	*local_fcntl_cmdp = bfcp->bfc_local_fcntl_cmd;
 	return 0;
 }
-#endif /* CONFIG_AUDIT */
+#endif                   

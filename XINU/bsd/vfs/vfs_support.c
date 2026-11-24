@@ -50,16 +50,16 @@
 
 #include <vfs/vfs_support.h>
 #include <sys/kauth.h>
-#include <sys/ubc.h>    /* ubc_upl_abort_range() */
+#include <sys/ubc.h>                               
 
 
-struct vnop_create_args /* {
-                         *  struct vnode *a_dvp;
-                         *  struct vnode **a_vpp;
-                         *  struct componentname *a_cnp;
-                         *  struct vnode_vattr *a_vap;
-                         *  vfs_context_t a_context;
-                         *  } */;
+struct vnop_create_args     
+                                                
+                                                 
+                                                        
+                                                      
+                                                    
+                                ;
 
 int
 nop_create(__unused struct vnop_create_args *ap)
@@ -80,12 +80,12 @@ err_create(struct vnop_create_args *ap)
 }
 
 
-struct vnop_whiteout_args /* {
-                           *  struct vnode *a_dvp;
-                           *  struct componentname *a_cnp;
-                           *  int a_flags;
-                           *  vfs_context_t a_context;
-                           *  } */;
+struct vnop_whiteout_args     
+                                                  
+                                                          
+                                          
+                                                      
+                                  ;
 
 int
 nop_whiteout(__unused struct vnop_whiteout_args *ap)
@@ -100,13 +100,13 @@ err_whiteout(__unused struct vnop_whiteout_args *ap)
 }
 
 
-struct vnop_mknod_args /* {
-                        *  struct vnode *a_dvp;
-                        *  struct vnode **a_vpp;
-                        *  struct componentname *a_cnp;
-                        *  struct vnode_vattr *a_vap;
-                        *  vfs_context_t a_context;
-                        *  } */;
+struct vnop_mknod_args     
+                                               
+                                                
+                                                       
+                                                     
+                                                   
+                               ;
 
 int
 nop_mknod(__unused struct vnop_mknod_args *ap)
@@ -126,11 +126,11 @@ err_mknod(struct vnop_mknod_args *ap)
 	return ENOTSUP;
 }
 
-struct vnop_open_args /* {
-                       *  struct vnode *a_vp;
-                       *  int  a_mode;
-                       *  vfs_context_t a_context;
-                       *  } */;
+struct vnop_open_args     
+                                             
+                                      
+                                                  
+                              ;
 
 int
 nop_open(__unused struct vnop_open_args *ap)
@@ -145,11 +145,11 @@ err_open(__unused struct vnop_open_args *ap)
 }
 
 
-struct vnop_close_args /* {
-                        *  struct vnode *a_vp;
-                        *  int  a_fflag;
-                        *  vfs_context_t a_context;
-                        *  } */;
+struct vnop_close_args     
+                                              
+                                        
+                                                   
+                               ;
 
 int
 nop_close(__unused struct vnop_close_args *ap)
@@ -164,11 +164,11 @@ err_close(__unused struct vnop_close_args *ap)
 }
 
 
-struct vnop_access_args /* {
-                         *  struct vnode *a_vp;
-                         *  int  a_mode;
-                         *  vfs_context_t a_context;
-                         *  } */;
+struct vnop_access_args     
+                                               
+                                        
+                                                    
+                                ;
 
 int
 nop_access(__unused struct vnop_access_args *ap)
@@ -183,11 +183,11 @@ err_access(__unused struct vnop_access_args *ap)
 }
 
 
-struct vnop_getattr_args /* {
-                          *  struct vnode *a_vp;
-                          *  struct vnode_vattr *a_vap;
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_getattr_args     
+                                                
+                                                       
+                                                     
+                                 ;
 
 int
 nop_getattr(__unused struct vnop_getattr_args *ap)
@@ -202,11 +202,11 @@ err_getattr(__unused struct vnop_getattr_args *ap)
 }
 
 
-struct vnop_setattr_args /* {
-                          *  struct vnode *a_vp;
-                          *  struct vnode_vattr *a_vap;
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_setattr_args     
+                                                
+                                                       
+                                                     
+                                 ;
 
 int
 nop_setattr(__unused struct vnop_setattr_args *ap)
@@ -220,12 +220,12 @@ err_setattr(__unused struct vnop_setattr_args *ap)
 	return ENOTSUP;
 }
 
-struct vnop_read_args /*  {
-                       *  struct vnode *a_vp;
-                       *  struct uio *a_uio;
-                       *  int a_ioflag;
-                       *  vfs_context_t a_context;
-                       *  } */;
+struct vnop_read_args      
+                                             
+                                            
+                                       
+                                                  
+                              ;
 
 int
 nop_read(__unused struct vnop_read_args *ap)
@@ -240,12 +240,12 @@ err_read(__unused struct vnop_read_args *ap)
 }
 
 
-struct vnop_write_args /*  {
-                        *  struct vnode *a_vp;
-                        *  struct uio *a_uio;
-                        *  int a_ioflag;
-                        *  vfs_context_t a_context;
-                        *  } */;
+struct vnop_write_args      
+                                              
+                                             
+                                        
+                                                   
+                               ;
 
 int
 nop_write(__unused struct vnop_write_args *ap)
@@ -260,14 +260,14 @@ err_write(__unused struct vnop_write_args *ap)
 }
 
 
-struct vnop_ioctl_args /* {
-                        *  struct vnode *a_vp;
-                        *  u_long a_command;
-                        *  caddr_t a_data;
-                        *  int a_fflag;
-                        *  kauth_cred_t a_cred;
-                        *  struct proc *a_p;
-                        *  } */;
+struct vnop_ioctl_args     
+                                              
+                                            
+                                          
+                                       
+                                               
+                                            
+                               ;
 
 int
 nop_ioctl(__unused struct vnop_ioctl_args *ap)
@@ -282,14 +282,14 @@ err_ioctl(__unused struct vnop_ioctl_args *ap)
 }
 
 
-struct vnop_select_args /* {
-                         *  struct vnode *a_vp;
-                         *  int a_which;
-                         *  int a_fflags;
-                         *  kauth_cred_t a_cred;
-                         *  void *a_wql;
-                         *  struct proc *a_p;
-                         *  } */;
+struct vnop_select_args     
+                                               
+                                        
+                                         
+                                                
+                                        
+                                             
+                                ;
 
 int
 nop_select(__unused struct vnop_select_args *ap)
@@ -304,12 +304,12 @@ err_select(__unused struct vnop_select_args *ap)
 }
 
 
-struct vnop_exchange_args /* {
-                           *  struct vnode *a_fvp;
-                           *  struct vnode *a_tvp;
-                           *  int a_options;
-                           *  vfs_context_t a_context;
-                           *  } */;
+struct vnop_exchange_args     
+                                                  
+                                                  
+                                            
+                                                      
+                                  ;
 
 int
 nop_exchange(__unused struct vnop_exchange_args *ap)
@@ -324,11 +324,11 @@ err_exchange(__unused struct vnop_exchange_args *ap)
 }
 
 
-struct vnop_revoke_args /* {
-                         *  struct vnode *a_vp;
-                         *  int a_flags;
-                         *  vfs_context_t a_context;
-                         *  } */;
+struct vnop_revoke_args     
+                                               
+                                        
+                                                    
+                                ;
 
 int
 nop_revoke(struct vnop_revoke_args *ap)
@@ -344,12 +344,12 @@ err_revoke(struct vnop_revoke_args *ap)
 }
 
 
-struct vnop_mmap_args /* {
-                       *  struct vnode *a_vp;
-                       *  int a_fflags;
-                       *  kauth_cred_t a_cred;
-                       *  struct proc *a_p;
-                       *  } */;
+struct vnop_mmap_args     
+                                             
+                                       
+                                              
+                                           
+                              ;
 
 int
 nop_mmap(__unused struct vnop_mmap_args *ap)
@@ -364,11 +364,11 @@ err_mmap(__unused struct vnop_mmap_args *ap)
 }
 
 
-struct vnop_fsync_args /* {
-                        *  struct vnode *a_vp;
-                        *  int a_waitfor;
-                        *  vfs_context_t a_context;
-                        *  } */;
+struct vnop_fsync_args     
+                                              
+                                         
+                                                   
+                               ;
 
 int
 nop_fsync(__unused struct vnop_fsync_args *ap)
@@ -383,13 +383,13 @@ err_fsync(__unused struct vnop_fsync_args *ap)
 }
 
 
-struct vnop_remove_args /* {
-                         *  struct vnode *a_dvp;
-                         *  struct vnode *a_vp;
-                         *  struct componentname *a_cnp;
-                         *  int a_flags;
-                         *  vfs_context_t a_context;
-                         *  } */;
+struct vnop_remove_args     
+                                                
+                                               
+                                                        
+                                        
+                                                    
+                                ;
 
 int
 nop_remove(__unused struct vnop_remove_args *ap)
@@ -405,12 +405,12 @@ err_remove(struct vnop_remove_args *ap)
 }
 
 
-struct vnop_link_args /* {
-                       *  struct vnode *a_vp;
-                       *  struct vnode *a_tdvp;
-                       *  struct componentname *a_cnp;
-                       *  vfs_context_t a_context;
-                       *  } */;
+struct vnop_link_args     
+                                             
+                                               
+                                                      
+                                                  
+                              ;
 
 int
 nop_link(__unused struct vnop_link_args *ap)
@@ -426,15 +426,15 @@ err_link(struct vnop_link_args *ap)
 }
 
 
-struct vnop_rename_args /* {
-                         *  struct vnode *a_fdvp;
-                         *  struct vnode *a_fvp;
-                         *  struct componentname *a_fcnp;
-                         *  struct vnode *a_tdvp;
-                         *  struct vnode *a_tvp;
-                         *  struct componentname *a_tcnp;
-                         *  vfs_context_t a_context;
-                         *  } */;
+struct vnop_rename_args     
+                                                 
+                                                
+                                                         
+                                                 
+                                                
+                                                         
+                                                    
+                                ;
 
 int
 nop_rename(__unused struct vnop_rename_args *ap)
@@ -450,13 +450,13 @@ err_rename(struct vnop_rename_args *ap)
 }
 
 
-struct vnop_mkdir_args /* {
-                        *  struct vnode *a_dvp;
-                        *  struct vnode **a_vpp;
-                        *  struct componentname *a_cnp;
-                        *  struct vnode_vattr *a_vap;
-                        *  vfs_context_t a_context;
-                        *  } */;
+struct vnop_mkdir_args     
+                                               
+                                                
+                                                       
+                                                     
+                                                   
+                               ;
 
 int
 nop_mkdir(__unused struct vnop_mkdir_args *ap)
@@ -471,12 +471,12 @@ err_mkdir(__unused struct vnop_mkdir_args *ap)
 }
 
 
-struct vnop_rmdir_args /* {
-                        *  struct vnode *a_dvp;
-                        *  struct vnode *a_vp;
-                        *  struct componentname *a_cnp;
-                        *  vfs_context_t a_context;
-                        *  } */;
+struct vnop_rmdir_args     
+                                               
+                                              
+                                                       
+                                                   
+                               ;
 
 int
 nop_rmdir(__unused struct vnop_rmdir_args *ap)
@@ -492,14 +492,14 @@ err_rmdir(struct vnop_rmdir_args *ap)
 }
 
 
-struct vnop_symlink_args /* {
-                          *  struct vnode *a_dvp;
-                          *  struct vnode **a_vpp;
-                          *  struct componentname *a_cnp;
-                          *  struct vnode_vattr *a_vap;
-                          *  char *a_target;
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_symlink_args     
+                                                 
+                                                  
+                                                         
+                                                       
+                                            
+                                                     
+                                 ;
 
 int
 nop_symlink(__unused struct vnop_symlink_args *ap)
@@ -520,14 +520,14 @@ err_symlink(struct vnop_symlink_args *ap)
 }
 
 
-struct vnop_readdir_args /* {
-                          *  vnode_t a_vp;
-                          *  struct uio *a_uio;
-                          *  int a_flags;
-                          *  int *a_eofflag;
-                          *  int *a_numdirent;
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_readdir_args     
+                                          
+                                               
+                                         
+                                            
+                                              
+                                                     
+                                 ;
 
 int
 nop_readdir(__unused struct vnop_readdir_args *ap)
@@ -542,18 +542,18 @@ err_readdir(__unused struct vnop_readdir_args *ap)
 }
 
 
-struct vnop_readdirattr_args /* {
-                              *  struct vnodeop_desc *a_desc;
-                              *  vnode_t a_vp;
-                              *  struct attrlist *a_alist;
-                              *  struct uio *a_uio;
-                              *  u_long a_maxcount;
-                              *  u_long a_options;
-                              *  u_long *a_newstate;
-                              *  int *a_eofflag;
-                              *  u_long *a_actualcount;
-                              *  vfs_context_t a_context;
-                              *  } */;
+struct vnop_readdirattr_args     
+                                                             
+                                              
+                                                          
+                                                   
+                                                   
+                                                  
+                                                    
+                                                
+                                                       
+                                                         
+                                     ;
 
 int
 nop_readdirattr(struct vnop_readdirattr_args *ap)
@@ -571,11 +571,11 @@ err_readdirattr(struct vnop_readdirattr_args *ap)
 }
 
 
-struct vnop_readlink_args /* {
-                           *  struct vnode *vp;
-                           *  struct uio *uio;
-                           *  vfs_context_t a_context;
-                           *  } */;
+struct vnop_readlink_args     
+                                               
+                                              
+                                                      
+                                  ;
 
 int
 nop_readlink(__unused struct vnop_readlink_args *ap)
@@ -590,10 +590,10 @@ err_readlink(__unused struct vnop_readlink_args *ap)
 }
 
 
-struct vnop_inactive_args /* {
-                           *  struct vnode *a_vp;
-                           *  vfs_context_t a_context;
-                           *  } */;
+struct vnop_inactive_args     
+                                                 
+                                                      
+                                  ;
 
 int
 nop_inactive(__unused struct vnop_inactive_args *ap)
@@ -609,10 +609,10 @@ err_inactive(struct vnop_inactive_args *ap)
 }
 
 
-struct vnop_reclaim_args /* {
-                          *  struct vnode *a_vp;
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_reclaim_args     
+                                                
+                                                     
+                                 ;
 
 int
 nop_reclaim(__unused struct vnop_reclaim_args *ap)
@@ -627,9 +627,9 @@ err_reclaim(__unused struct vnop_reclaim_args *ap)
 }
 
 
-struct vnop_strategy_args /* {
-                           *  struct buf *a_bp;
-                           *  } */;
+struct vnop_strategy_args     
+                                               
+                                  ;
 
 int
 nop_strategy(__unused struct vnop_strategy_args *ap)
@@ -644,12 +644,12 @@ err_strategy(__unused struct vnop_strategy_args *ap)
 }
 
 
-struct vnop_pathconf_args /* {
-                           *  struct vnode *a_vp;
-                           *  int a_name;
-                           *  int32_t *a_retval;
-                           *  vfs_context_t a_context;
-                           *  } */;
+struct vnop_pathconf_args     
+                                                 
+                                         
+                                                
+                                                      
+                                  ;
 
 int
 nop_pathconf(__unused struct vnop_pathconf_args *ap)
@@ -664,14 +664,14 @@ err_pathconf(__unused struct vnop_pathconf_args *ap)
 }
 
 
-struct vnop_advlock_args /* {
-                          *  struct vnode *a_vp;
-                          *  caddr_t a_id;
-                          *  int a_op;
-                          *  struct flock *a_fl;
-                          *  int a_flags;
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_advlock_args     
+                                                
+                                          
+                                      
+                                                
+                                         
+                                                     
+                                 ;
 
 int
 nop_advlock(__unused struct vnop_advlock_args *ap)
@@ -687,14 +687,14 @@ err_advlock(__unused struct vnop_advlock_args *ap)
 
 
 
-struct vnop_allocate_args /* {
-                           *  struct vnode *a_vp;
-                           *  off_t a_length;
-                           *  u_int32_t a_flags;
-                           *  off_t *a_bytesallocated;
-                           *  off_t a_offset;
-                           *  vfs_context_t a_context;
-                           *  } */;
+struct vnop_allocate_args     
+                                                 
+                                             
+                                                
+                                                      
+                                             
+                                                      
+                                  ;
 
 int
 nop_allocate(struct vnop_allocate_args *ap)
@@ -710,9 +710,9 @@ err_allocate(struct vnop_allocate_args *ap)
 	return ENOTSUP;
 }
 
-struct vnop_bwrite_args /* {
-                         *  struct buf *a_bp;
-                         *  } */;
+struct vnop_bwrite_args     
+                                             
+                                ;
 
 int
 nop_bwrite(struct vnop_bwrite_args *ap)
@@ -727,15 +727,15 @@ err_bwrite(__unused struct vnop_bwrite_args *ap)
 }
 
 
-struct vnop_pagein_args /* {
-                         *  struct vnode        *a_vp,
-                         *  upl_t		a_pl,
-                         *  vm_offset_t	a_pl_offset,
-                         *  off_t		a_foffset,
-                         *  size_t		a_size,
-                         *  int		a_flags
-                         *  vfs_context_t a_context;
-                         *  } */;
+struct vnop_pagein_args     
+                                                      
+                                        
+                                                    
+                                             
+                                           
+                                        
+                                                    
+                                ;
 
 int
 nop_pagein(struct vnop_pagein_args *ap)
@@ -758,15 +758,15 @@ err_pagein(struct vnop_pagein_args *ap)
 }
 
 
-struct vnop_pageout_args /* {
-                          *  struct vnode       *a_vp,
-                          *  upl_t		a_pl,
-                          *  vm_offset_t	a_pl_offset,
-                          *  off_t		a_foffset,
-                          *  size_t		a_size,
-                          *  int		a_flags
-                          *  vfs_context_t a_context;
-                          *  } */;
+struct vnop_pageout_args     
+                                                      
+                                         
+                                                     
+                                              
+                                            
+                                         
+                                                     
+                                 ;
 
 int
 nop_pageout(struct vnop_pageout_args *ap)
@@ -789,21 +789,21 @@ err_pageout(struct vnop_pageout_args *ap)
 }
 
 
-struct vnop_searchfs /* {
-                      *  struct vnode *a_vp;
-                      *  void *a_searchparams1;
-                      *  void *a_searchparams2;
-                      *  struct attrlist *a_searchattrs;
-                      *  u_long a_maxmatches;
-                      *  struct timeval *a_timelimit;
-                      *  struct attrlist *a_returnattrs;
-                      *  u_long *a_nummatches;
-                      *  u_long a_scriptcode;
-                      *  u_long a_options;
-                      *  struct uio	*a_uio;
-                      *  struct searchstate	*a_searchstate;
-                      *  vfs_context_t a_context;
-                      *  } */;
+struct vnop_searchfs     
+                                            
+                                               
+                                               
+                                                        
+                                             
+                                                     
+                                                        
+                                              
+                                             
+                                          
+                                           
+                                                           
+                                                 
+                             ;
 
 int
 nop_searchfs(struct vnop_searchfs_args *ap)
@@ -819,14 +819,14 @@ err_searchfs(struct vnop_searchfs_args *ap)
 	return ENOTSUP;
 }
 
-struct vnop_copyfile_args /*{
-                           *  struct vnodeop_desc *a_desc;
-                           *  struct vnode *a_fvp;
-                           *  struct vnode *a_tdvp;
-                           *  struct vnode *a_tvp;
-                           *  struct componentname *a_tcnp;
-                           *  int a_flags;
-                           *  }*/;
+struct vnop_copyfile_args    
+                                                          
+                                                  
+                                                   
+                                                  
+                                                           
+                                          
+                                 ;
 
 int
 nop_copyfile(__unused struct vnop_copyfile_args *ap)
@@ -843,16 +843,16 @@ err_copyfile(struct vnop_copyfile_args *ap)
 }
 
 
-struct vnop_blktooff_args /* {
-                           *  struct vnode *a_vp;
-                           *  daddr64_t a_lblkno;
-                           *  off_t *a_offset;
-                           *  } */;
+struct vnop_blktooff_args     
+                                                 
+                                                 
+                                              
+                                  ;
 
 int
 nop_blktooff(struct vnop_blktooff_args *ap)
 {
-	*ap->a_offset = (off_t)-1;      /* failure */
+	*ap->a_offset = (off_t)-1;                   
 	return 0;
 }
 
@@ -863,16 +863,16 @@ err_blktooff(struct vnop_blktooff_args *ap)
 	return ENOTSUP;
 }
 
-struct vnop_offtoblk_args /* {
-                           *  struct vnode *a_vp;
-                           *  off_t a_offset;
-                           *  daddr64_t *a_lblkno;
-                           *  } */;
+struct vnop_offtoblk_args     
+                                                 
+                                             
+                                                  
+                                  ;
 
 int
 nop_offtoblk(struct vnop_offtoblk_args *ap)
 {
-	*ap->a_lblkno = (daddr64_t)-1;  /* failure */
+	*ap->a_lblkno = (daddr64_t)-1;               
 	return 0;
 }
 
@@ -883,15 +883,15 @@ err_offtoblk(struct vnop_offtoblk_args *ap)
 	return ENOTSUP;
 }
 
-struct vnop_blockmap_args /* {
-                           *  struct vnode *a_vp;
-                           *  off_t a_foffset;
-                           *  size_t a_size;
-                           *  daddr64_t *a_bpn;
-                           *  size_t *a_run;
-                           *  void *a_poff;
-                           *  int a_flags;
-                           *  } */;
+struct vnop_blockmap_args     
+                                                 
+                                              
+                                            
+                                               
+                                            
+                                           
+                                          
+                                  ;
 
 int
 nop_blockmap(__unused struct vnop_blockmap_args *ap)

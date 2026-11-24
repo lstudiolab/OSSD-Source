@@ -1,7 +1,7 @@
-//
-// Tests for
-//  ~intrusive_shared_ptr();
-//
+  
+            
+                            
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <darwintest.h>
@@ -11,7 +11,7 @@
 struct T { int i; };
 
 T_DECL(dtor, "intrusive_shared_ptr.dtor") {
-	// Destroy a non-null shared pointer
+	                                    
 	{
 		T obj{0};
 		test_policy::retain_count = 3;
@@ -24,7 +24,7 @@ T_DECL(dtor, "intrusive_shared_ptr.dtor") {
 		CHECK(test_policy::retain_count == 2);
 	}
 
-	// Destroy a null shared pointer
+	                                
 	{
 		test_policy::retain_count = 3;
 
@@ -33,6 +33,6 @@ T_DECL(dtor, "intrusive_shared_ptr.dtor") {
 			CHECK(test_policy::retain_count == 3);
 		}
 
-		CHECK(test_policy::retain_count == 3); // not decremented
+		CHECK(test_policy::retain_count == 3);                   
 	}
 }

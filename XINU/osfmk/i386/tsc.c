@@ -29,11 +29,11 @@
  * @OSF_COPYRIGHT@
  */
 
-/*
- *	File:		i386/tsc.c
- *	Purpose:	Initializes the TSC and the various conversion
- *			factors needed by other parts of the system.
- */
+  
+                    
+                                                          
+                                                 
+   
 
 
 #include <mach/mach_types.h>
@@ -48,7 +48,7 @@
 #include <kern/assert.h>
 #include <mach/vm_prot.h>
 #include <vm/pmap.h>
-#include <vm/vm_kern.h>         /* for kernel_map */
+#include <vm/vm_kern.h>                             
 #include <architecture/i386/pio.h>
 #include <i386/machine_cpu.h>
 #include <i386/cpuid.h>
@@ -81,7 +81,7 @@ uint64_t        tsc_at_boot = 0;
 #define bitmask(h, l)    ((bit(h)|(bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x, h, l) (((x) & bitmask(h,l)) >> l)
 
-/* Decimal powers: */
+                     
 #define kilo (1000ULL)
 #define Mega (kilo * kilo)
 #define Giga (kilo * Mega)
@@ -90,10 +90,10 @@ uint64_t        tsc_at_boot = 0;
 
 #define CPU_FAMILY_PENTIUM_M    (0x6)
 
-/*
- * This routine extracts a frequency property in Hz from the device tree.
- * Also reads any initial TSC value at boot from the device tree.
- */
+  
+                                                                         
+                                                                 
+   
 static uint64_t
 EFI_get_frequency(const char *prop)
 {
@@ -107,9 +107,9 @@ EFI_get_frequency(const char *prop)
 		return 0;
 	}
 
-	/*
-	 * While we're here, see if EFI published an initial TSC value.
-	 */
+	  
+                                                                
+    
 	if (SecureDTGetProperty(entry, "InitialTSC", &value, &size) == kSuccess) {
 		if (size == sizeof(uint64_t)) {
 			tsc_at_boot = *(uint64_t const *) value;
@@ -131,10 +131,10 @@ EFI_get_frequency(const char *prop)
 	return frequency;
 }
 
-/*
- * Initialize the various conversion factors needed by code referencing
- * the TSC.
- */
+  
+                                                                       
+           
+   
 void
 tsc_init(void)
 {
@@ -168,14 +168,14 @@ tsc_init(void)
 	case CPUFAMILY_INTEL_KABYLAKE:
 	case CPUFAMILY_INTEL_ICELAKE:
 	case CPUFAMILY_INTEL_SKYLAKE: {
-		/*
-		 * SkyLake and later has an Always Running Timer (ART) providing
-		 * the reference frequency. CPUID leaf 0x15 determines the
-		 * rationship between this and the TSC frequency expressed as
-		 *   -	multiplier (numerator, N), and
-		 *   -	divisor (denominator, M).
-		 * So that TSC = ART * N / M.
-		 */
+		  
+                                                                  
+                                                            
+                                                               
+                                       
+                                  
+                               
+     
 		i386_cpu_info_t *infop = cpuid_info();
 		cpuid_tsc_leaf_t *tsc_leafp = &infop->cpuid_tsc_leaf;
 		uint64_t         N = (uint64_t) tsc_leafp->numerator;
@@ -184,14 +184,14 @@ tsc_init(void)
 
 		refFreq = EFI_get_frequency("ARTFrequency");
 		if (refFreq == 0) {
-			/*
-			 * Intel Scalable Processor (Xeon-SP) CPUs use a different
-			 * ART frequency.  Use that default here if EFI didn't
-			 * specify the frequency.  Since Xeon-SP uses the same
-			 * DisplayModel / DisplayFamily as Xeon-W, we need to
-			 * use the platform ID (or, as XNU calls it, the "processor
-			 * flag") to differentiate the two.
-			 */
+			  
+                                                             
+                                                         
+                                                         
+                                                        
+                                                              
+                                      
+      
 			if (cpuid_family() == 0x06 &&
 			    infop->cpuid_model == CPUID_MODEL_SKYLAKE_W &&
 			    is_xeon_sp(infop->cpuid_processor_flag)) {
@@ -204,7 +204,7 @@ tsc_init(void)
 		assert(N != 0);
 		assert(M != 1);
 		tscFreq = refFreq * N / M;
-		busFreq = tscFreq;              /* bus is APIC frequency */
+		busFreq = tscFreq;                                         
 
 		kprintf(" ART: Frequency = %6d.%06dMHz, N/M = %lld/%llu\n",
 		    (uint32_t)(refFreq / Mega),
@@ -217,15 +217,15 @@ tsc_init(void)
 		uint64_t msr_flex_ratio;
 		uint64_t msr_platform_info;
 
-		/* See if FLEX_RATIO is being used */
+		                                     
 		msr_flex_ratio = rdmsr64(MSR_FLEX_RATIO);
 		msr_platform_info = rdmsr64(MSR_PLATFORM_INFO);
 		flex_ratio_min = (uint32_t)bitfield(msr_platform_info, 47, 40);
 		flex_ratio_max = (uint32_t)bitfield(msr_platform_info, 15, 8);
-		/* No BIOS-programed flex ratio. Use hardware max as default */
+		                                                               
 		tscGranularity = flex_ratio_max;
 		if (msr_flex_ratio & bit(16)) {
-			/* Flex Enabled: Use this MSR if less than max */
+			                                                 
 			flex_ratio = (uint32_t)bitfield(msr_flex_ratio, 15, 8);
 			if (flex_ratio < flex_ratio_max) {
 				tscGranularity = flex_ratio;
@@ -233,9 +233,9 @@ tsc_init(void)
 		}
 
 		busFreq = EFI_get_frequency("FSBFrequency");
-		/* If EFI isn't configured correctly, use a constant
-		 * value. See 6036811.
-		 */
+		                                                    
+                        
+     
 		if (busFreq == 0) {
 			busFreq = BASE_NHM_CLOCK_SOURCE;
 		}
@@ -273,15 +273,15 @@ tsc_init(void)
 		tscFCvtn2t = busFCvtn2t;
 		tscFCvtt2n = busFCvtt2n;
 	} else {
-		/*
-		 * Get the TSC increment.  The TSC is incremented by this
-		 * on every bus tick.  Calculate the TSC conversion factors
-		 * to and from nano-seconds.
-		 * The tsc granularity is also called the "bus ratio".
-		 * If the N/2 bit is set this indicates the bus ration is
-		 * 0.5 more than this - i.e.  that the true bus ratio
-		 * is (2*tscGranularity + 1)/2.
-		 */
+		  
+                                                           
+                                                             
+                              
+                                                        
+                                                           
+                                                       
+                                 
+     
 		if (N_by_2_bus_ratio) {
 			tscFCvtt2n = busFCvtt2n * 2 / (1 + 2 * tscGranularity);
 		} else {
@@ -291,9 +291,9 @@ tsc_init(void)
 		tscFreq = ((1 * Giga) << 32) / tscFCvtt2n;
 		tscFCvtn2t = 0xFFFFFFFFFFFFFFFFULL / tscFCvtt2n;
 
-		/*
-		 * Calculate conversion from BUS to TSC
-		 */
+		  
+                                         
+     
 		bus2tsc = tmrCvt(busFCvtt2n, tscFCvtn2t);
 	}
 
@@ -345,7 +345,7 @@ cpu_data_tsc_sync_deltas_string(char *buf, uint32_t buflen,
 		offset += cnt;
 	}
 	if (offset >= 1) {
-		buf[offset - 1] = 0;    /* Clip the final, trailing space */
+		buf[offset - 1] = 0;                                        
 	}
 }
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           

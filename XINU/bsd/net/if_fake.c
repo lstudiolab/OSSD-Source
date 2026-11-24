@@ -26,20 +26,20 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * if_fake.c
- * - fake network interface used for testing
- * - "feth" (e.g. "feth0", "feth1") is a virtual ethernet interface that allows
- *   two instances to have their output/input paths "crossed-over" so that
- *   output on one is input on the other
- */
+  
+            
+                                            
+                                                                               
+                                                                          
+                                        
+   
 
-/*
- * Modification History:
- *
- * September 9, 2015	Dieter Siegmund (dieter@apple.com)
- * - created
- */
+  
+                        
+  
+                                                       
+            
+   
 
 #include <sys/param.h>
 #include <sys/kernel.h>
@@ -122,9 +122,9 @@ SYSCTL_INT(_net_link_fake, OID_AUTO, multibuflet, CTLFLAG_RW | CTLFLAG_LOCKED,
     &if_fake_multibuflet, 0, "Fake interface using multi-buflet packets");
 
 typedef enum {
-	IFF_PP_MODE_GLOBAL = 0,         /* share a global pool */
-	IFF_PP_MODE_PRIVATE = 1,        /* creates its own rx/tx pool */
-	IFF_PP_MODE_PRIVATE_SPLIT = 2,  /* creates its own split rx & tx pool */
+	IFF_PP_MODE_GLOBAL = 0,                                  
+	IFF_PP_MODE_PRIVATE = 1,                                        
+	IFF_PP_MODE_PRIVATE_SPLIT = 2,                                          
 } iff_pktpool_mode_t;
 static iff_pktpool_mode_t if_fake_pktpool_mode = 0;
 SYSCTL_INT(_net_link_fake, OID_AUTO, pktpool_mode, CTLFLAG_RW | CTLFLAG_LOCKED,
@@ -216,13 +216,13 @@ SYSCTL_PROC(_net_link_fake, OID_AUTO, trailer_length,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED, 0, 0,
     feth_trailer_length_sysctl, "IU", "Fake interface frame trailer length");
 
-/* sysctl net.link.fake.max_mtu */
+                                  
 #define FETH_MAX_MTU_DEFAULT    2048
 #define FETH_MAX_MTU_MAX        ((16 * 1024) - ETHER_HDR_LEN)
 
 static unsigned int if_fake_max_mtu = FETH_MAX_MTU_DEFAULT;
 
-/* sysctl net.link.fake.buflet_size */
+                                      
 #define FETH_BUFLET_SIZE_MIN            512
 #define FETH_BUFLET_SIZE_MAX            2048
 
@@ -264,7 +264,7 @@ feth_buflet_size_sysctl SYSCTL_HANDLER_ARGS
 	error = sysctl_io_number(req, if_fake_buflet_size,
 	    sizeof(if_fake_buflet_size), &new_value, &changed);
 	if (error == 0 && changed != 0) {
-		/* must be a power of 2 between min and max */
+		                                              
 		if (new_value > FETH_BUFLET_SIZE_MAX ||
 		    new_value < FETH_BUFLET_SIZE_MIN ||
 		    !is_power_of_two(new_value) ||
@@ -307,11 +307,11 @@ SYSCTL_PROC(_net_link_fake, OID_AUTO, user_access,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED,
     0, 0, feth_user_access_sysctl, "IU", "Fake interface user access");
 
-/* sysctl net.link.fake.if_adv_intvl (unit: millisecond) */
+                                                           
 #define FETH_IF_ADV_INTVL_MIN            10
 #define FETH_IF_ADV_INTVL_MAX            INT_MAX
 
-static int if_fake_if_adv_interval = 0; /* no interface advisory */
+static int if_fake_if_adv_interval = 0;                            
 static int
 feth_if_adv_interval_sysctl SYSCTL_HANDLER_ARGS
 {
@@ -337,14 +337,14 @@ SYSCTL_PROC(_net_link_fake, OID_AUTO, if_adv_intvl,
     feth_if_adv_interval_sysctl, "IU",
     "Fake interface will generate interface advisories reports at the specified interval in ms");
 
-/* sysctl net.link.fake.tx_drops */
-/*
- * Fake ethernet will drop packet on the transmit path at the specified
- * rate, i.e drop one in every if_fake_tx_drops number of packets.
- */
+                                   
+  
+                                                                       
+                                                                  
+   
 #define FETH_TX_DROPS_MIN            0
 #define FETH_TX_DROPS_MAX            INT_MAX
-static int if_fake_tx_drops = 0; /* no packets are dropped */
+static int if_fake_tx_drops = 0;                             
 static int
 feth_fake_tx_drops_sysctl SYSCTL_HANDLER_ARGS
 {
@@ -370,9 +370,9 @@ SYSCTL_PROC(_net_link_fake, OID_AUTO, tx_drops,
     feth_fake_tx_drops_sysctl, "IU",
     "Fake interface will intermittently drop packets on Tx path");
 
-/**
-** virtual ethernet structures, types
-**/
+   
+                                     
+   
 
 #define IFF_NUM_TX_RINGS_WMM_MODE       4
 #define IFF_NUM_RX_RINGS_WMM_MODE       1
@@ -390,11 +390,11 @@ typedef uint16_t        iff_flags_t;
 
 
 struct if_fake {
-	char                    iff_name[IFNAMSIZ]; /* our unique id */
+	char                    iff_name[IFNAMSIZ];                    
 	ifnet_t                 iff_ifp;
 	iff_flags_t             iff_flags;
 	uint32_t                iff_retain_count;
-	ifnet_t                 iff_peer;       /* the other end */
+	ifnet_t                 iff_peer;                          
 	int                     iff_media_current;
 	int                     iff_media_active;
 	uint32_t                iff_media_count;
@@ -471,7 +471,7 @@ static struct if_clone
     sizeof(struct if_fake));
 static  void interface_link_event(ifnet_t ifp, u_int32_t event_code);
 
-/* some media words to pretend to be ethernet */
+                                                
 static int default_media_words[] = {
 	IFM_MAKEWORD(IFM_ETHER, 0, 0, 0),
 	IFM_MAKEWORD(IFM_ETHER, IFM_10G_T, IFM_FDX, 0),
@@ -491,9 +491,9 @@ static int default_media_words[] = {
 #define default_media_words_count (sizeof(default_media_words)          \
 	                           / sizeof (default_media_words[0]))
 
-/**
-** veth locks
-**/
+   
+             
+   
 static inline lck_grp_t *
 my_lck_grp_alloc_init(const char * grp_name)
 {
@@ -625,9 +625,9 @@ feth_release(if_fake_ref fakeif)
 }
 
 
-/**
-** feth interface routines
-**/
+   
+                          
+   
 static void
 feth_ifnet_set_attrs(if_fake_ref fakeif, ifnet_t ifp)
 {
@@ -706,7 +706,7 @@ feth_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	fakeif->iff_fcs = if_fake_fcs;
 	fakeif->iff_trailer_length = if_fake_trailer_length;
 
-	/* use the interface name as the unique id for ifp recycle */
+	                                                             
 	if ((unsigned int)
 	    snprintf(fakeif->iff_name, sizeof(fakeif->iff_name), "%s%d",
 	    ifc->ifc_name, unit) >= sizeof(fakeif->iff_name)) {
@@ -767,7 +767,7 @@ feth_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 
 	ifnet_set_lladdr(ifp, mac_address, sizeof(mac_address));
 
-	/* attach as ethernet */
+	                        
 	bpfattach(ifp, DLT_EN10MB, sizeof(struct ether_header));
 	return 0;
 }
@@ -966,7 +966,7 @@ feth_start(ifnet_t ifp)
 	fcs = fakeif->iff_fcs;
 	trailer_len = fakeif->iff_trailer_length;
 
-	/* check for pending TX */
+	                          
 	m = fakeif->iff_pending_tx_packet;
 	if (m != NULL) {
 		if (peer != NULL) {
@@ -1010,14 +1010,14 @@ feth_start(ifnet_t ifp)
 	if (fakeif != NULL) {
 		fakeif->iff_start_busy = FALSE;
 		if (save_m != NULL && fakeif->iff_peer != NULL) {
-			/* save it for next time */
+			                           
 			fakeif->iff_pending_tx_packet = save_m;
 			save_m = NULL;
 		}
 	}
 	feth_unlock();
 	if (save_m != NULL) {
-		/* didn't save packet, so free it */
+		                                    
 		m_freem(save_m);
 	}
 }
@@ -1039,7 +1039,7 @@ feth_output(ifnet_t ifp, struct mbuf * m)
 	m_freem(m);
 	m = NULL;
 	if (copy_m == NULL) {
-		/* count this as an output error */
+		                                   
 		ifnet_stat_increment_out(ifp, 0, 0, 1);
 		return 0;
 	}
@@ -1077,7 +1077,7 @@ feth_config(ifnet_t ifp, ifnet_t peer)
 		goto done;
 	}
 	if (peer != NULL) {
-		/* connect to peer */
+		                     
 		if_fake_ref     peer_fakeif;
 
 		peer_fakeif = ifnet_get_if_fake(peer);
@@ -1096,13 +1096,13 @@ feth_config(ifnet_t ifp, ifnet_t peer)
 		peer_fakeif->iff_peer = ifp;
 		connected = TRUE;
 	} else if (fakeif->iff_peer != NULL) {
-		/* disconnect from peer */
+		                          
 		if_fake_ref     peer_fakeif;
 
 		peer = fakeif->iff_peer;
 		peer_fakeif = ifnet_get_if_fake(peer);
 		if (peer_fakeif == NULL) {
-			/* should not happen */
+			                       
 			error = EINVAL;
 			goto done;
 		}
@@ -1114,7 +1114,7 @@ feth_config(ifnet_t ifp, ifnet_t peer)
 done:
 	feth_unlock();
 
-	/* generate link status event if we connect or disconnect */
+	                                                            
 	if (connected) {
 		interface_link_event(ifp, KEV_DL_LINK_ON);
 		interface_link_event(peer, KEV_DL_LINK_ON);
@@ -1132,7 +1132,7 @@ feth_set_media(ifnet_t ifp, struct if_fake_request * iffr)
 	int             error;
 
 	if (iffr->iffr_media.iffm_count > IF_FAKE_MEDIA_LIST_MAX) {
-		/* list is too long */
+		                      
 		return EINVAL;
 	}
 	feth_lock();
@@ -1145,8 +1145,8 @@ feth_set_media(ifnet_t ifp, struct if_fake_request * iffr)
 	bcopy(iffr->iffr_media.iffm_list, fakeif->iff_media_list,
 	    iffr->iffr_media.iffm_count * sizeof(fakeif->iff_media_list[0]));
 #if 0
-	/* XXX: "auto-negotiate" active with peer? */
-	/* generate link status event? */
+	                                             
+	                                 
 	fakeif->iff_media_current = iffr->iffr_media.iffm_current;
 #endif
 	error = 0;
@@ -1197,7 +1197,7 @@ feth_set_drvspec(ifnet_t ifp, uint32_t cmd, u_int32_t len,
 			break;
 		}
 
-		/* ensure nul termination */
+		                            
 		iffr.iffr_peer_name[IFNAMSIZ - 1] = '\0';
 		peer = ifunit(iffr.iffr_peer_name);
 		if (peer == NULL) {
@@ -1386,14 +1386,14 @@ feth_ioctl(ifnet_t ifp, u_long cmd, void * data)
 
 	case SIOCSIFFLAGS:
 		if ((ifp->if_flags & IFF_UP) != 0) {
-			/* marked up, set running if not already set */
+			                                               
 			if ((ifp->if_flags & IFF_RUNNING) == 0) {
-				/* set running */
+				                 
 				error = ifnet_set_flags(ifp, IFF_RUNNING,
 				    IFF_RUNNING);
 			}
 		} else if ((ifp->if_flags & IFF_RUNNING) != 0) {
-			/* marked down, clear running */
+			                                
 			error = ifnet_set_flags(ifp, 0, IFF_RUNNING);
 		}
 		break;

@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_red.h,v 1.5 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_red.h,v 1.8 2003/07/10 12:07:49 kjc Exp $	*/
+                                                               
+                                                           
 
 /*
  * Copyright (C) 1997-2003
@@ -61,20 +61,20 @@
 #ifdef PRIVATE
 #ifdef BSD_KERNEL_PRIVATE
 #include <net/classq/if_classq.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * simpler versions of red parameters and statistics used by other
- * disciplines (e.g., CBQ)
- */
+  
+                                                                  
+                          
+   
 struct redparams {
-	int th_min;             /* red min threshold */
-	int th_max;             /* red max threshold */
-	int inv_pmax;           /* inverse of max drop probability */
+	int th_min;                                    
+	int th_max;                                    
+	int inv_pmax;                                                
 };
 
 struct red_stats {
@@ -88,5 +88,5 @@ struct red_stats {
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_CLASSQ_RED_H_ */
+#endif              
+#endif                                

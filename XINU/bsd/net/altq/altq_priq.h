@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_priq.h,v 1.7 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_priq.h,v 1.7 2003/10/03 05:05:15 kjc Exp $	*/
+                                                                
+                                                            
 /*
  * Copyright (C) 2000-2003
  *	Sony Computer Science Laboratories Inc.  All rights reserved.
@@ -61,4 +61,4 @@
 #include <net/altq/altq.h>
 #include <net/pktsched/pktsched_priq.h>
 
-#endif /* _NET_ALTQ_ALTQ_PRIQ_H_ */
+#endif                             

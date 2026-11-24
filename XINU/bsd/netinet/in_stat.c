@@ -28,8 +28,8 @@
 
 #include <netinet/in_stat.h>
 
-#define IN_STAT_ACTIVITY_GRANULARITY            8       /* 8 sec granularity */
-#define IN_STAT_ACTIVITY_TIME_SEC_SHIFT         3       /* 8 sec per bit */
+#define IN_STAT_ACTIVITY_GRANULARITY            8                              
+#define IN_STAT_ACTIVITY_TIME_SEC_SHIFT         3                          
 #define IN_STAT_ACTIVITY_BITMAP_TOTAL_SIZE      ((uint64_t) 128)
 #define IN_STAT_ACTIVITY_BITMAP_FIELD_SIZE      ((uint64_t) 64)
 #define IN_STAT_ACTIVITY_TOTAL_TIME             ((uint64_t) (8 * 128))
@@ -41,7 +41,7 @@ in_stat_set_activity_bitmap(activity_bitmap_t *activity, uint64_t now)
 	uint64_t elapsed_time, slot;
 	uint64_t *bitmap;
 	if (activity->start == 0) {
-		// Align all activity maps
+		                          
 		activity->start = now - (now % IN_STAT_ACTIVITY_GRANULARITY);
 	}
 	elapsed_time = now - activity->start;
@@ -62,10 +62,10 @@ in_stat_set_activity_bitmap(activity_bitmap_t *activity, uint64_t now)
 		} else {
 			uint64_t shift =
 			    slot - (IN_STAT_ACTIVITY_BITMAP_TOTAL_SIZE - 1);
-			/*
-			 * Move the start time and bitmap forward to
-			 * cover the lost time
-			 */
+			  
+                                               
+                         
+      
 			activity->start +=
 			    (shift << IN_STAT_ACTIVITY_TIME_SEC_SHIFT);
 			if (shift > IN_STAT_ACTIVITY_BITMAP_FIELD_SIZE) {
@@ -81,10 +81,10 @@ in_stat_set_activity_bitmap(activity_bitmap_t *activity, uint64_t now)
 				uint64_t mask_lower, tmp;
 				uint64_t b1_low, b0_high;
 
-				/*
-				 * generate a mask with all of lower
-				 * 'shift' bits set
-				 */
+				  
+                                        
+                       
+       
 				tmp = (((uint64_t)1) << (shift - 1));
 				mask_lower = ((tmp - 1) ^ tmp);
 				activity->bitmap[0] >>= shift;

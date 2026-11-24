@@ -53,14 +53,14 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Author: David B. Golub, Carnegie Mellon University
- *	Date:   8/89
- *
- *      Initialize device service as part of kernel task.
- */
+  
+   
+  
+                                                     
+               
+  
+                                                         
+   
 
 #include <mach/mach_types.h>
 #include <mach/port.h>

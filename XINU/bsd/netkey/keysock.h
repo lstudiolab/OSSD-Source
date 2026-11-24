@@ -1,4 +1,4 @@
-/*	$KAME: keysock.h,v 1.7 2000/03/25 07:24:14 sumikawa Exp $	*/
+                                                               
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -33,29 +33,29 @@
 #define _NETKEY_KEYSOCK_H_
 #include <sys/appleapiopts.h>
 
-/* statistics for pfkey socket */
+                                 
 struct pfkeystat {
-	/* kernel -> userland */
-	u_quad_t out_total;             /* # of total calls */
-	u_quad_t out_bytes;             /* total bytecount */
-	u_quad_t out_msgtype[256];      /* message type histogram */
-	u_quad_t out_invlen;            /* invalid length field */
-	u_quad_t out_invver;            /* invalid version field */
-	u_quad_t out_invmsgtype;        /* invalid message type field */
-	u_quad_t out_tooshort;          /* msg too short */
-	u_quad_t out_nomem;             /* memory allocation failure */
-	u_quad_t out_dupext;            /* duplicate extension */
-	u_quad_t out_invexttype;        /* invalid extension type */
-	u_quad_t out_invsatype;         /* invalid sa type */
-	u_quad_t out_invaddr;           /* invalid address extension */
-	/* userland -> kernel */
-	u_quad_t in_total;              /* # of total calls */
-	u_quad_t in_bytes;              /* total bytecount */
-	u_quad_t in_msgtype[256];       /* message type histogram */
-	u_quad_t in_msgtarget[3];       /* one/all/registered */
-	u_quad_t in_nomem;              /* memory allocation failure */
-	/* others */
-	u_quad_t sockerr;               /* # of socket related errors */
+	                        
+	u_quad_t out_total;                                   
+	u_quad_t out_bytes;                                  
+	u_quad_t out_msgtype[256];                                  
+	u_quad_t out_invlen;                                      
+	u_quad_t out_invver;                                       
+	u_quad_t out_invmsgtype;                                        
+	u_quad_t out_tooshort;                             
+	u_quad_t out_nomem;                                            
+	u_quad_t out_dupext;                                     
+	u_quad_t out_invexttype;                                    
+	u_quad_t out_invsatype;                              
+	u_quad_t out_invaddr;                                          
+	                        
+	u_quad_t in_total;                                    
+	u_quad_t in_bytes;                                   
+	u_quad_t in_msgtype[256];                                   
+	u_quad_t in_msgtarget[3];                               
+	u_quad_t in_nomem;                                             
+	            
+	u_quad_t sockerr;                                               
 };
 
 #define KEY_SENDUP_ONE          0
@@ -67,9 +67,9 @@ struct pfkeystat {
 	{lck_mtx_lock(pfkey_stat_mutex); (x)++; lck_mtx_unlock(pfkey_stat_mutex);}
 
 struct keycb {
-	struct rawcb kp_raw;    /* rawcb */
-	int kp_promisc;         /* promiscuous mode */
-	int kp_registered;      /* registered socket */
+	struct rawcb kp_raw;               
+	int kp_promisc;                               
+	int kp_registered;                             
 };
 
 extern struct pfkeystat pfkeystat;
@@ -84,6 +84,6 @@ extern int key_usrreq(struct socket *,
 
 extern int key_sendup(struct socket *, struct sadb_msg *, u_int, int);
 extern int key_sendup_mbuf(struct socket *, struct mbuf *, int);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /*_NETKEY_KEYSOCK_H_*/
+#endif                       

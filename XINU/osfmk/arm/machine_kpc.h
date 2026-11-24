@@ -51,10 +51,10 @@
 
 typedef uint64_t kpc_config_t;
 
-/* Size to the maximum number of counters we could read from every class in one go */
+                                                                                     
 #define KPC_MAX_COUNTERS (KPC_ARM_FIXED_COUNT + KPC_ARM_CONFIGURABLE_COUNT + 1)
 
-/* arm32 uses fixed counter shadows */
+                                      
 #define FIXED_COUNTER_SHADOW  (1)
 
-#endif /* _MACHINE_ARM_KPC_H */
+#endif                         

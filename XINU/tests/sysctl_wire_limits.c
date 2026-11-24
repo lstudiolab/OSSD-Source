@@ -54,10 +54,10 @@ T_DECL(user_wire_amount, "max_mem > user_wire_amount >= 0.7 * max_mem") {
 	T_QUIET; T_ASSERT_GE(wire, max_mem * 70 / 100, "wire limit is too small.");
 }
 
-/*
- * Sets the no wire limit, and ensures that the wire_limit
- * changes correctly.
- */
+  
+                                                          
+                     
+   
 static void
 set_no_wire_limit(vm_map_size_t value, uint64_t max_mem)
 {
@@ -71,10 +71,10 @@ set_no_wire_limit(vm_map_size_t value, uint64_t max_mem)
 	T_QUIET; T_ASSERT_EQ(max_mem - wire, value, "no wire size is incorrect");
 }
 
-/*
- * Sets the wire limit, and ensures that the no_wire_limit
- * changes correctly.
- */
+  
+                                                          
+                     
+   
 static void
 set_wire_limit(vm_map_size_t value, uint64_t max_mem)
 {
@@ -104,10 +104,10 @@ T_DECL(set_global_no_user_wire_amount, "Setting no_user_wire_amount changes glob
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "user_wire sysctl failed");
 	T_QUIET; T_ASSERT_EQ(max_mem - wire, no_wire, "no wire size is incorrect");
 
-	// Set the no_wire limit and ensure that the wire_size changed.
+	                                                               
 	set_no_wire_limit(no_wire + no_wire_delta, max_mem);
 	set_no_wire_limit(no_wire, max_mem);
-	// Set the wire limit and ensure that the no_wire_limit has changed
+	                                                                   
 	set_wire_limit(wire - no_wire_delta, max_mem);
 	set_wire_limit(wire, max_mem);
 }
@@ -126,23 +126,23 @@ T_DECL(set_user_wire_limit, "Set user_wire_limit", T_META_ASROOT(true)) {
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "user_wire sysctl get failed");
 	T_QUIET; T_ASSERT_EQ(wire, original_wire + wire_delta, "user_wire sysctl didn't set the correct value.");
 
-	// Cleanup
+	          
 	ret = sysctlbyname(g_sysctl_per_task_wire_name, NULL, 0, &original_wire, wire_size);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "user_wire sysctl set failed");
 }
 
 #if TARGET_OS_OSX
-/*
- * Test that wiring up to the limit doesn't hang the system.
- * We only test this on OS X. On all other platforms, we'd expect
- * to get jetsamm'ed for doing this.
- */
+  
+                                                            
+                                                                 
+                                    
+   
 static void *
 wire_to_limit(size_t limit, size_t *size)
 {
-	// Trying to wire directly to the limit is likely to fail
-	// repeatedly since other wired pages are probably coming and going
-	// so we just try to get close.
+	                                                         
+	                                                                   
+	                               
 	const unsigned int wiggle_room_pages = 1000;
 	int ret;
 	unsigned int current_wired, current_free;
@@ -195,4 +195,4 @@ T_DECL(wire_stress_test, "wire up to global_user_wire_limit and spin for 120 sec
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "Unable to unlock memory.");
 	free(buffer);
 }
-#endif /* TARGET_OS_OSX */
+#endif                    

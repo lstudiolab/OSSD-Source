@@ -70,143 +70,143 @@
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
 #include <stdint.h>
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          
 
 #ifndef KERNEL
 #include <Availability.h>
 #endif
 
-/* [XSI] The timeval structure shall be defined as described in
- * <sys/time.h>
- */
+                                                               
+               
+   
 #include <sys/_types/_timeval.h>
 #ifdef KERNEL
 #include <sys/_types/_user32_timeval.h>
 #include <sys/_types/_user64_timeval.h>
 #endif
 
-/* The id_t type shall be defined as described in <sys/types.h> */
+                                                                  
 #include <sys/_types/_id_t.h>
 
 
-/*
- * Resource limit type (low 63 bits, excluding the sign bit)
- */
+  
+                                                            
+   
 typedef __uint64_t      rlim_t;
 
 
-/*****
- * PRIORITY
- */
+      
+           
+   
 
-/*
- * Possible values of the first parameter to getpriority()/setpriority(),
- * used to indicate the type of the second parameter.
- */
-#define PRIO_PROCESS    0               /* Second argument is a PID */
-#define PRIO_PGRP       1               /* Second argument is a GID */
-#define PRIO_USER       2               /* Second argument is a UID */
+  
+                                                                         
+                                                     
+   
+#define PRIO_PROCESS    0                                             
+#define PRIO_PGRP       1                                             
+#define PRIO_USER       2                                             
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define PRIO_DARWIN_THREAD      3               /* Second argument is always 0 (current thread) */
-#define PRIO_DARWIN_PROCESS     4               /* Second argument is a PID */
+#define PRIO_DARWIN_THREAD      3                                                                 
+#define PRIO_DARWIN_PROCESS     4                                             
 
 #ifdef PRIVATE
 
-#define PRIO_DARWIN_GPU         5               /* Second argument is a PID */
+#define PRIO_DARWIN_GPU         5                                             
 
 #define PRIO_DARWIN_GPU_ALLOW   0x1
 #define PRIO_DARWIN_GPU_DENY    0x2
 
-#define PRIO_DARWIN_ROLE        6               /* Second argument is a PID */
+#define PRIO_DARWIN_ROLE        6                                             
 
-#define PRIO_DARWIN_ROLE_DEFAULT        0x0     /* Reset to default state */
-#define PRIO_DARWIN_ROLE_UI_FOCAL       0x1     /* On  screen,     focal UI */
-#define PRIO_DARWIN_ROLE_UI             0x2     /* On  screen UI,  focal unknown */
-#define PRIO_DARWIN_ROLE_NON_UI         0x3     /* Off screen, non-focal UI */
-#define PRIO_DARWIN_ROLE_UI_NON_FOCAL   0x4     /* On  screen, non-focal UI */
-#define PRIO_DARWIN_ROLE_TAL_LAUNCH     0x5     /* Throttled-launch (for OS X TAL resume) */
-#define PRIO_DARWIN_ROLE_DARWIN_BG      0x6     /* Throttled for running in the background */
+#define PRIO_DARWIN_ROLE_DEFAULT        0x0                                 
+#define PRIO_DARWIN_ROLE_UI_FOCAL       0x1                                   
+#define PRIO_DARWIN_ROLE_UI             0x2                                        
+#define PRIO_DARWIN_ROLE_NON_UI         0x3                                   
+#define PRIO_DARWIN_ROLE_UI_NON_FOCAL   0x4                                   
+#define PRIO_DARWIN_ROLE_TAL_LAUNCH     0x5                                                 
+#define PRIO_DARWIN_ROLE_DARWIN_BG      0x6                                                  
 
-#endif /* PRIVATE */
+#endif              
 
-/*
- * Range limitations for the value of the third parameter to setpriority().
- */
+  
+                                                                           
+   
 #define PRIO_MIN        -20
 #define PRIO_MAX        20
 
-/*
- * use PRIO_DARWIN_BG to set the current thread into "background" state
- * which lowers CPU, disk IO, and networking priorites until thread terminates
- * or "background" state is revoked
- */
+  
+                                                                       
+                                                                              
+                                   
+   
 #define PRIO_DARWIN_BG 0x1000
 
-/*
- * use PRIO_DARWIN_NONUI to restrict a process's ability to make calls to
- * the GPU. (deprecated)
- */
+  
+                                                                         
+                        
+   
 #define PRIO_DARWIN_NONUI 0x1001
 
-#endif  /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                           
 
 
 
-/*****
- * RESOURCE USAGE
- */
+      
+                 
+   
 
-/*
- * Possible values of the first parameter to getrusage(), used to indicate
- * the scope of the information to be returned.
- */
-#define RUSAGE_SELF     0               /* Current process information */
-#define RUSAGE_CHILDREN -1              /* Current process' children */
+  
+                                                                          
+                                               
+   
+#define RUSAGE_SELF     0                                                
+#define RUSAGE_CHILDREN -1                                             
 
-/*
- * A structure representing an accounting of resource utilization.  The
- * address of an instance of this structure is the second parameter to
- * getrusage().
- *
- * Note: All values other than ru_utime and ru_stime are implementaiton
- *       defined and subject to change in a future release.  Their use
- *       is discouraged for standards compliant programs.
- */
+  
+                                                                       
+                                                                      
+               
+  
+                                                                       
+                                                                      
+                                                         
+   
 struct  rusage {
-	struct timeval ru_utime;        /* user time used (PL) */
-	struct timeval ru_stime;        /* system time used (PL) */
+	struct timeval ru_utime;                                 
+	struct timeval ru_stime;                                   
 #if __DARWIN_C_LEVEL < __DARWIN_C_FULL
-	long    ru_opaque[14];          /* implementation defined */
+	long    ru_opaque[14];                                      
 #else
-	/*
-	 * Informational aliases for source compatibility with programs
-	 * that need more information than that provided by standards,
-	 * and which do not mind being OS-dependent.
-	 */
-	long    ru_maxrss;              /* max resident set size (PL) */
-#define ru_first        ru_ixrss        /* internal: ruadd() range start */
-	long    ru_ixrss;               /* integral shared memory size (NU) */
-	long    ru_idrss;               /* integral unshared data (NU)  */
-	long    ru_isrss;               /* integral unshared stack (NU) */
-	long    ru_minflt;              /* page reclaims (NU) */
-	long    ru_majflt;              /* page faults (NU) */
-	long    ru_nswap;               /* swaps (NU) */
-	long    ru_inblock;             /* block input operations (atomic) */
-	long    ru_oublock;             /* block output operations (atomic) */
-	long    ru_msgsnd;              /* messages sent (atomic) */
-	long    ru_msgrcv;              /* messages received (atomic) */
-	long    ru_nsignals;            /* signals received (atomic) */
-	long    ru_nvcsw;               /* voluntary context switches (atomic) */
-	long    ru_nivcsw;              /* involuntary " */
-#define ru_last         ru_nivcsw       /* internal: ruadd() range end */
-#endif  /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+	  
+                                                                
+                                                               
+                                             
+    
+	long    ru_maxrss;                                              
+#define ru_first        ru_ixrss                                           
+	long    ru_ixrss;                                                     
+	long    ru_idrss;                                                 
+	long    ru_isrss;                                                 
+	long    ru_minflt;                                      
+	long    ru_majflt;                                    
+	long    ru_nswap;                               
+	long    ru_inblock;                                                  
+	long    ru_oublock;                                                   
+	long    ru_msgsnd;                                          
+	long    ru_msgrcv;                                              
+	long    ru_nsignals;                                           
+	long    ru_nvcsw;                                                        
+	long    ru_nivcsw;                                 
+#define ru_last         ru_nivcsw                                        
+#endif                                           
 };
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-/*
- * Flavors for proc_pid_rusage().
- */
+  
+                                 
+   
 #define RUSAGE_INFO_V0  0
 #define RUSAGE_INFO_V1  1
 #define RUSAGE_INFO_V2  2
@@ -215,10 +215,10 @@ struct  rusage {
 #define RUSAGE_INFO_V5  5
 #define RUSAGE_INFO_CURRENT     RUSAGE_INFO_V5
 
-/*
- * Flags for RUSAGE_INFO_V5
- */
-#define RU_PROC_RUNS_RESLIDE    0x00000001      /* proc has reslid shared cache */
+  
+                           
+   
+#define RU_PROC_RUNS_RESLIDE    0x00000001                                        
 
 typedef void *rusage_info_t;
 
@@ -390,7 +390,7 @@ struct rusage_info_v5 {
 
 typedef struct rusage_info_v5 rusage_info_current;
 
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          
 
 #ifdef KERNEL
 
@@ -409,118 +409,118 @@ struct rusage_info_child {
 };
 
 struct  user64_rusage {
-	struct user64_timeval ru_utime; /* user time used */
-	struct user64_timeval ru_stime; /* system time used */
-	user64_long_t   ru_maxrss;              /* max resident set size */
-	user64_long_t   ru_ixrss;               /* integral shared memory size */
-	user64_long_t   ru_idrss;               /* integral unshared data " */
-	user64_long_t   ru_isrss;               /* integral unshared stack " */
-	user64_long_t   ru_minflt;              /* page reclaims */
-	user64_long_t   ru_majflt;              /* page faults */
-	user64_long_t   ru_nswap;               /* swaps */
-	user64_long_t   ru_inblock;             /* block input operations */
-	user64_long_t   ru_oublock;             /* block output operations */
-	user64_long_t   ru_msgsnd;              /* messages sent */
-	user64_long_t   ru_msgrcv;              /* messages received */
-	user64_long_t   ru_nsignals;    /* signals received */
-	user64_long_t   ru_nvcsw;               /* voluntary context switches */
-	user64_long_t   ru_nivcsw;              /* involuntary " */
+	struct user64_timeval ru_utime;                     
+	struct user64_timeval ru_stime;                       
+	user64_long_t   ru_maxrss;                                         
+	user64_long_t   ru_ixrss;                                                
+	user64_long_t   ru_idrss;                                             
+	user64_long_t   ru_isrss;                                              
+	user64_long_t   ru_minflt;                                 
+	user64_long_t   ru_majflt;                               
+	user64_long_t   ru_nswap;                          
+	user64_long_t   ru_inblock;                                         
+	user64_long_t   ru_oublock;                                          
+	user64_long_t   ru_msgsnd;                                 
+	user64_long_t   ru_msgrcv;                                     
+	user64_long_t   ru_nsignals;                          
+	user64_long_t   ru_nvcsw;                                               
+	user64_long_t   ru_nivcsw;                                 
 };
 
 struct  user32_rusage {
-	struct user32_timeval ru_utime; /* user time used */
-	struct user32_timeval ru_stime; /* system time used */
-	user32_long_t   ru_maxrss;              /* max resident set size */
-	user32_long_t   ru_ixrss;               /* integral shared memory size */
-	user32_long_t   ru_idrss;               /* integral unshared data " */
-	user32_long_t   ru_isrss;               /* integral unshared stack " */
-	user32_long_t   ru_minflt;              /* page reclaims */
-	user32_long_t   ru_majflt;              /* page faults */
-	user32_long_t   ru_nswap;               /* swaps */
-	user32_long_t   ru_inblock;             /* block input operations */
-	user32_long_t   ru_oublock;             /* block output operations */
-	user32_long_t   ru_msgsnd;              /* messages sent */
-	user32_long_t   ru_msgrcv;              /* messages received */
-	user32_long_t   ru_nsignals;    /* signals received */
-	user32_long_t   ru_nvcsw;               /* voluntary context switches */
-	user32_long_t   ru_nivcsw;              /* involuntary " */
+	struct user32_timeval ru_utime;                     
+	struct user32_timeval ru_stime;                       
+	user32_long_t   ru_maxrss;                                         
+	user32_long_t   ru_ixrss;                                                
+	user32_long_t   ru_idrss;                                             
+	user32_long_t   ru_isrss;                                              
+	user32_long_t   ru_minflt;                                 
+	user32_long_t   ru_majflt;                               
+	user32_long_t   ru_nswap;                          
+	user32_long_t   ru_inblock;                                         
+	user32_long_t   ru_oublock;                                          
+	user32_long_t   ru_msgsnd;                                 
+	user32_long_t   ru_msgrcv;                                     
+	user32_long_t   ru_nsignals;                          
+	user32_long_t   ru_nvcsw;                                               
+	user32_long_t   ru_nivcsw;                                 
 };
 
-#endif /* KERNEL */
+#endif             
 
 
-/*****
- * RESOURCE LIMITS
- */
+      
+                  
+   
 
-/*
- * Symbolic constants for resource limits; since all limits are representable
- * as a type rlim_t, we are permitted to define RLIM_SAVED_* in terms of
- * RLIM_INFINITY.
- */
-#define RLIM_INFINITY   (((__uint64_t)1 << 63) - 1)     /* no limit */
-#define RLIM_SAVED_MAX  RLIM_INFINITY   /* Unrepresentable hard limit */
-#define RLIM_SAVED_CUR  RLIM_INFINITY   /* Unrepresentable soft limit */
+  
+                                                                             
+                                                                        
+                 
+   
+#define RLIM_INFINITY   (((__uint64_t)1 << 63) - 1)                   
+#define RLIM_SAVED_MAX  RLIM_INFINITY                                   
+#define RLIM_SAVED_CUR  RLIM_INFINITY                                   
 
-/*
- * Possible values of the first parameter to getrlimit()/setrlimit(), to
- * indicate for which resource the operation is being performed.
- */
-#define RLIMIT_CPU      0               /* cpu time per process */
-#define RLIMIT_FSIZE    1               /* file size */
-#define RLIMIT_DATA     2               /* data segment size */
-#define RLIMIT_STACK    3               /* stack size */
-#define RLIMIT_CORE     4               /* core file size */
-#define RLIMIT_AS       5               /* address space (resident set size) */
+  
+                                                                        
+                                                                
+   
+#define RLIMIT_CPU      0                                         
+#define RLIMIT_FSIZE    1                              
+#define RLIMIT_DATA     2                                      
+#define RLIMIT_STACK    3                               
+#define RLIMIT_CORE     4                                   
+#define RLIMIT_AS       5                                                      
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define RLIMIT_RSS      RLIMIT_AS       /* source compatibility alias */
-#define RLIMIT_MEMLOCK  6               /* locked-in-memory address space */
-#define RLIMIT_NPROC    7               /* number of processes */
-#endif  /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
-#define RLIMIT_NOFILE   8               /* number of open files */
+#define RLIMIT_RSS      RLIMIT_AS                                       
+#define RLIMIT_MEMLOCK  6                                                   
+#define RLIMIT_NPROC    7                                        
+#endif                                           
+#define RLIMIT_NOFILE   8                                         
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define RLIM_NLIMITS    9               /* total number of resource limits */
-#endif  /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
-#define _RLIMIT_POSIX_FLAG      0x1000  /* Set bit for strict POSIX */
+#define RLIM_NLIMITS    9                                                    
+#endif                                           
+#define _RLIMIT_POSIX_FLAG      0x1000                                
 
-/*
- * A structure representing a resource limit.  The address of an instance
- * of this structure is the second parameter to getrlimit()/setrlimit().
- */
+  
+                                                                         
+                                                                        
+   
 struct rlimit {
-	rlim_t  rlim_cur;               /* current (soft) limit */
-	rlim_t  rlim_max;               /* maximum value for rlim_cur */
+	rlim_t  rlim_cur;                                         
+	rlim_t  rlim_max;                                               
 };
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-/*
- * proc_rlimit_control()
- *
- * Resource limit flavors
- */
-#define RLIMIT_WAKEUPS_MONITOR          0x1 /* Configure the wakeups monitor. */
-#define RLIMIT_CPU_USAGE_MONITOR        0x2 /* Configure the CPU usage monitor. */
-#define RLIMIT_THREAD_CPULIMITS         0x3 /* Configure a blocking, per-thread, CPU limits. */
-#define RLIMIT_FOOTPRINT_INTERVAL       0x4 /* Configure memory footprint interval tracking */
+  
+                        
+  
+                         
+   
+#define RLIMIT_WAKEUPS_MONITOR          0x1                                     
+#define RLIMIT_CPU_USAGE_MONITOR        0x2                                       
+#define RLIMIT_THREAD_CPULIMITS         0x3                                                    
+#define RLIMIT_FOOTPRINT_INTERVAL       0x4                                                   
 
-/*
- * Flags for wakeups monitor control.
- */
+  
+                                     
+   
 #define WAKEMON_ENABLE                  0x01
 #define WAKEMON_DISABLE                 0x02
 #define WAKEMON_GET_PARAMS              0x04
 #define WAKEMON_SET_DEFAULTS            0x08
-#define WAKEMON_MAKE_FATAL              0x10 /* Configure the task so that violations are fatal. */
+#define WAKEMON_MAKE_FATAL              0x10                                                       
 
-/*
- * Flags for CPU usage monitor control.
- */
+  
+                                       
+   
 #define CPUMON_MAKE_FATAL               0x1000
 
-/*
- * Flags for memory footprint interval tracking.
- */
-#define FOOTPRINT_INTERVAL_RESET        0x1 /* Reset the footprint interval counter to zero */
+  
+                                                
+   
+#define FOOTPRINT_INTERVAL_RESET        0x1                                                   
 
 struct proc_rlimit_control_wakeupmon {
 	uint32_t wm_flags;
@@ -528,16 +528,16 @@ struct proc_rlimit_control_wakeupmon {
 };
 
 #if PRIVATE
-/*
- * Flags for I/O monitor control.
- */
+  
+                                 
+   
 #define IOMON_ENABLE                    0x01
 #define IOMON_DISABLE                   0x02
 
-#endif /* PRIVATE */
+#endif              
 
 
-/* I/O type */
+              
 #define IOPOL_TYPE_DISK 0
 #if PRIVATE
 #define IOPOL_TYPE_VFS_HFS_CASE_SENSITIVITY 1
@@ -550,12 +550,12 @@ struct proc_rlimit_control_wakeupmon {
 #define IOPOL_TYPE_VFS_IGNORE_PERMISSIONS 7
 #define IOPOL_TYPE_VFS_SKIP_MTIME_UPDATE 8
 
-/* scope */
+           
 #define IOPOL_SCOPE_PROCESS   0
 #define IOPOL_SCOPE_THREAD    1
 #define IOPOL_SCOPE_DARWIN_BG 2
 
-/* I/O Priority */
+                  
 #define IOPOL_DEFAULT           0
 #define IOPOL_IMPORTANT         1
 #define IOPOL_PASSIVE           2
@@ -563,7 +563,7 @@ struct proc_rlimit_control_wakeupmon {
 #define IOPOL_UTILITY           4
 #define IOPOL_STANDARD          5
 
-/* compatibility with older names */
+                                    
 #define IOPOL_APPLICATION       IOPOL_STANDARD
 #define IOPOL_NORMAL            IOPOL_IMPORTANT
 
@@ -595,28 +595,28 @@ struct proc_rlimit_control_wakeupmon {
 #define IOPOL_VFS_SKIP_MTIME_UPDATE_ON 1
 
 #ifdef PRIVATE
-/*
- * Structures for use in communicating via iopolicysys() between Libc and the
- * kernel.  Not to be used by user programs directly.
- */
+  
+                                                                             
+                                                     
+   
 
-/*
- * the command to iopolicysys()
- */
-#define IOPOL_CMD_GET           0x00000001      /* Get I/O policy */
-#define IOPOL_CMD_SET           0x00000002      /* Set I/O policy */
+  
+                               
+   
+#define IOPOL_CMD_GET           0x00000001                          
+#define IOPOL_CMD_SET           0x00000002                          
 
-/*
- * Second parameter to iopolicysys()
- */
+  
+                                    
+   
 struct _iopol_param_t {
-	int iop_scope;  /* current process or a thread */
+	int iop_scope;                                   
 	int iop_iotype;
 	int iop_policy;
 };
 
-#endif  /* PRIVATE */
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif               
+#endif                                          
 
 #ifndef KERNEL
 
@@ -624,15 +624,15 @@ __BEGIN_DECLS
 int     getpriority(int, id_t);
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
 int     getiopolicy_np(int, int) __OSX_AVAILABLE_STARTING(__MAC_10_5, __IPHONE_2_0);
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          
 int     getrlimit(int, struct rlimit *) __DARWIN_ALIAS(getrlimit);
 int     getrusage(int, struct rusage *);
 int     setpriority(int, id_t, int);
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
 int     setiopolicy_np(int, int, int) __OSX_AVAILABLE_STARTING(__MAC_10_5, __IPHONE_2_0);
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          
 int     setrlimit(int, const struct rlimit *) __DARWIN_ALIAS(setrlimit);
 __END_DECLS
 
-#endif  /* !KERNEL */
-#endif  /* !_SYS_RESOURCE_H_ */
+#endif               
+#endif                         

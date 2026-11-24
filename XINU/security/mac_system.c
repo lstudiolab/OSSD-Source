@@ -75,7 +75,7 @@ mac_system_check_acct(kauth_cred_t cred, struct vnode *vp)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -93,7 +93,7 @@ mac_system_check_host_priv(kauth_cred_t cred)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -110,7 +110,7 @@ mac_system_check_info(kauth_cred_t cred, const char *info_type)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -127,7 +127,7 @@ mac_system_check_nfsd(kauth_cred_t cred)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -144,7 +144,7 @@ mac_system_check_reboot(kauth_cred_t cred, int howto)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -162,7 +162,7 @@ mac_system_check_settime(kauth_cred_t cred)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -179,7 +179,7 @@ mac_system_check_swapon(kauth_cred_t cred, struct vnode *vp)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -195,7 +195,7 @@ mac_system_check_swapoff(kauth_cred_t cred, struct vnode *vp)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -213,7 +213,7 @@ mac_system_check_sysctlbyname(kauth_cred_t cred, const char *namestring, int *na
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}
@@ -231,7 +231,7 @@ mac_system_check_kas_info(kauth_cred_t cred, int selector)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_system_enforce) {
 		return 0;
 	}

@@ -44,11 +44,11 @@ public:
 	void free( void ) APPLE_KEXT_OVERRIDE;
 
 public:
-	IOService *     whatObject; // interested driver
-	int32_t         timer;      // -1, 0, or positive number of ticks
-	IOPMinformee *  nextInList; // linkage pointer
-	AbsoluteTime    startTime;  // start time of last inform
-	bool            active;     // enable flag
+	IOService *     whatObject;                     
+	int32_t         timer;                                           
+	IOPMinformee *  nextInList;                   
+	AbsoluteTime    startTime;                              
+	bool            active;                   
 };
 
-#endif /* !_IOKIT_IOPMINFORMEE_H */
+#endif                             

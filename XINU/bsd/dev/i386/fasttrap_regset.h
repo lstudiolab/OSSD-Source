@@ -32,30 +32,30 @@
 #ifndef	_FASTTRAP_REGSET_H
 #define	_FASTTRAP_REGSET_H
 
-/*
- * APPLE NOTE: This file was orginally uts/intel/sys/regset.h
- */
+  
+                                                             
+   
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * The names and offsets defined here should be specified by the
- * AMD64 ABI suppl.
- *
- * We make fsbase and gsbase part of the lwp context (since they're
- * the only way to access the full 64-bit address range via the segment
- * registers) and thus belong here too.  However we treat them as
- * read-only; if %fs or %gs are updated, the results of the descriptor
- * table lookup that those updates implicitly cause will be reflected
- * in the corresponding fsbase and/or gsbase values the next time the
- * context can be inspected.  However it is NOT possible to override
- * the fsbase/gsbase settings via this interface.
- *
- * Direct modification of the base registers (thus overriding the
- * descriptor table base address) can be achieved with _lwp_setprivate.
- */
+  
+                                                                
+                   
+  
+                                                                   
+                                                                       
+                                                                 
+                                                                      
+                                                                     
+                                                                     
+                                                                    
+                                                 
+  
+                                                                 
+                                                                       
+   
 
 #define	REG_GSBASE	27
 #define	REG_FSBASE	26
@@ -87,12 +87,12 @@ extern "C" {
 #define	REG_R14		1
 #define	REG_R15		0
 
-/*
- * The names and offsets defined here are specified by i386 ABI suppl.
- */
+  
+                                                                      
+   
 
-#define	SS		18	/* only stored on a privilege transition */
-#define	UESP		17	/* only stored on a privilege transition */
+#define	SS		18	                                           
+#define	UESP		17	                                           
 #define	EFL		16
 #define	CS		15
 #define	EIP		14
@@ -122,4 +122,4 @@ extern "C" {
 }
 #endif
 
-#endif	/* _FASTTRAP_REGSET_H */
+#endif	                        

@@ -63,11 +63,11 @@ struct frame {
 	uintptr_t retaddr;
 };
 
-/*ARGSUSED*/
+            
 uint64_t
 sdt_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 {
-#pragma unused(arg,id,parg)     /* __APPLE__ */
+#pragma unused(arg,id,parg)                    
 
 	uint64_t val = 0;
 	struct frame *fp = (struct frame *)__builtin_frame_address(0);
@@ -75,10 +75,10 @@ sdt_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 	uintptr_t pc;
 	int i;
 
-	/*
-	 * A total of eight arguments are passed via registers;  any argument
-	 * with an index of 7 or lower is therefore in a register.
-	 */
+	  
+                                                                      
+                                                           
+    
 
 	int inreg = 7;
 
@@ -89,63 +89,63 @@ sdt_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 		if (dtrace_invop_callsite_pre != NULL
 		    && pc > (uintptr_t)dtrace_invop_callsite_pre
 		    && pc <= (uintptr_t)dtrace_invop_callsite_post) {
-			/*
-			 * When we pass through the invalid op handler,
-			 * we expect to find the save area structure,
-			 * pushed on the stack where we took the trap.
-			 * If the argument we seek is passed in a register, then
-			 * we can load it directly from this saved area.
-			 * If the argument we seek is passed on the stack, then
-			 * we increment the frame pointer further, to find the
-			 * pushed args
-			 */
+			  
+                                                  
+                                                
+                                                 
+                                                           
+                                                   
+                                                          
+                                                         
+                 
+      
 
-			/* fp points to the dtrace_invop activation */
-			fp = fp->backchain; /* fbt_perfCallback  */
-			fp = fp->backchain; /* sleh_synchronous */
-			fp = fp->backchain; /* fleh_synchronous */
+			                                              
+			fp = fp->backchain;                        
+			fp = fp->backchain;                       
+			fp = fp->backchain;                       
 
 			arm_saved_state_t *tagged_regs = (arm_saved_state_t *)((uintptr_t *)&fp[1]);
 			arm_saved_state64_t *saved_state = saved_state64(tagged_regs);
 
 			if (argno <= inreg) {
-				/* The argument will be in a register */
+				                                        
 				stack = (uintptr_t *)&saved_state->x[0];
 			} else {
-				/* The argument will be found on the stack */
+				                                             
 				fp = (struct frame *)(saved_state->sp);
-				stack = (uintptr_t *)&fp[0]; /* Find marshalled arguments */
+				stack = (uintptr_t *)&fp[0];                                
 				argno -= (inreg + 1);
 			}
 			goto load;
 		}
 	}
 
-	/*
-	 * We know that we did not come through a trap to get into
-	 * dtrace_probe() --  We arrive here when the provider has
-	 * called dtrace_probe() directly.
-	 * The probe ID is the first argument to dtrace_probe().
-	 * We must advance beyond that to get the argX.
-	 */
-	argno++; /* Advance past probeID */
+	  
+                                                           
+                                                           
+                                   
+                                                         
+                                                
+    
+	argno++;                           
 
 	if (argno <= inreg) {
-		/*
-		 * This shouldn't happen.  If the argument is passed in a
-		 * register then it should have been, well, passed in a
-		 * register...
-		 */
+		  
+                                                           
+                                                         
+                
+     
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 		return 0;
 	}
 
 	argno -= (inreg + 1);
-	stack = (uintptr_t *)&fp[1]; /* Find marshalled arguments */
+	stack = (uintptr_t *)&fp[1];                                
 
 load:
 	DTRACE_CPUFLAG_SET(CPU_DTRACE_NOFAULT);
-	/* dtrace_probe arguments arg0 .. arg4 are 64bits wide */
+	                                                         
 	val = (uint64_t)(*(((uintptr_t *)stack) + argno));
 	DTRACE_CPUFLAG_CLEAR(CPU_DTRACE_NOFAULT);
 	return val;

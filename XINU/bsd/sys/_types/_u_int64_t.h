@@ -28,4 +28,4 @@
 #ifndef _U_INT64_T
 #define _U_INT64_T
 typedef unsigned long long      u_int64_t;
-#endif /* _U_INT64_T */
+#endif                 

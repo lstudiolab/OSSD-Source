@@ -31,12 +31,12 @@
 #include <sys/mman.h>
 #include <mach/vm_param.h>
 
-/*
- * Stub function to account for the differences in standard compliance
- * while maintaining binary backward compatibility.
- *
- * This is only the legacy behavior.
- */
+  
+                                                                      
+                                                   
+  
+                                    
+   
 extern int __mprotect(void *, size_t, int);
 
 int
@@ -46,24 +46,24 @@ mprotect(void *addr, size_t len, int prot)
 	size_t  offset;
 	int     rv;
 
-	/*
-	 * Page-align "addr" since the system now requires it
-	 * for standards compliance.
-	 * Update "len" to reflect the alignment.
-	 */
+	  
+                                                      
+                             
+                                          
+    
 	offset = ((uintptr_t) addr) & PAGE_MASK;
 	aligned_addr = (void *) (((uintptr_t) addr) & ~PAGE_MASK);
 	len += offset;
 	rv = __mprotect(aligned_addr, len, prot);
 	if (rv == -1 && errno == ENOMEM) {
-		/*
-		 * Standards now require that we return ENOMEM if there was
-		 * a hole in the address range.  Panther and earlier used
-		 * to return an EINVAL error, so honor backwards compatibility.
-		 */
+		  
+                                                             
+                                                           
+                                                                 
+     
 		errno = EINVAL;
 	}
 	return rv;
 }
 
-#endif /* NO_SYSCALL_LEGACY */
+#endif                        

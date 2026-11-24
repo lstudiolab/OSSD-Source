@@ -42,9 +42,9 @@
 .globl _memset
 .globl _secure_memset
 
-/*****************************************************************************
- *  bzero entrypoint                                                         *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 .text
 .align 4
@@ -58,45 +58,45 @@ ___bzero:
     cmp     x2,      #128
     b.cc    L_memsetSmall
 
-/*****************************************************************************
- *  Large buffer zero engine                                                 *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 L_bzeroLarge:
-//  Write the first 64 bytes of the buffer without regard to alignment, then
-//  advance x3 to point to a cacheline-aligned location within the buffer, and
-//  decrement the length accordingly.
+                                                                            
+                                                                              
+                                     
     stp     x1, x1, [x0]
     stp     x1, x1, [x0, #16]
     stp     x1, x1, [x0, #32]
     stp     x1, x1, [x0, #48]
     add     x3,      x0, #64
     and     x3,      x3, #-64
-    add     x2,      x2, x0   // end of buffer
-    add     x4,      x3, #64  // end of first cacheline to zero
-    subs    x2,      x2, x4   // if the end of the buffer comes first, jump
-    b.ls    1f                //    directly to the cleanup pass.
-0:  dc      zva,     x3       // zero cacheline
-    add     x3,      x3, #64  // increment pointer
-    subs    x2,      x2, #64  // decrement length
+    add     x2,      x2, x0                   
+    add     x4,      x3, #64                                   
+    subs    x2,      x2, x4                                                
+    b.ls    1f                                                   
+0:  dc      zva,     x3                        
+    add     x3,      x3, #64                      
+    subs    x2,      x2, #64                     
     b.hi    0b
-1:  add     x3,      x3, x2   // back up pointer to (end of buffer) - 64.
-    stp     x1, x1, [x3]      // and store 64 bytes to reach end of buffer.
+1:  add     x3,      x3, x2                                              
+    stp     x1, x1, [x3]                                                   
     stp     x1, x1, [x3, #16]
     stp     x1, x1, [x3, #32]
     stp     x1, x1, [x3, #48]
     POP_FRAME
     ARM64_STACK_EPILOG
 
-/*****************************************************************************
- *  memset entrypoint                                                        *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 .align 4
-/*
- * It is important that secure_memset remains defined in assembly to avoid
- * compiler optimizations.
- */
+  
+                                                                          
+                          
+   
 _secure_memset:
 _memset:
     ARM64_STACK_PROLOG
@@ -108,21 +108,21 @@ _memset:
     cmp     x2,      #64
     b.cc    L_memsetSmall
 
-/*****************************************************************************
- *  Large buffer store engine                                                *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 L_memsetLarge:
-//  Write the first 64 bytes of the buffer without regard to alignment, then
-//  advance x3 to point to an aligned location within the buffer, and
-//  decrement the length accordingly.
+                                                                            
+                                                                     
+                                     
     stp     x1, x1, [x0]
     add     x3,      x0, #16
     and     x3,      x3, #-16
-    add     x2,      x2, x0   // end of buffer
-    add     x4,      x3, #64  // end of first aligned 64-byte store
-    subs    x2,      x2, x4   // if the end of the buffer comes first, jump
-    b.ls    1f                //    directly to the cleanup store.
+    add     x2,      x2, x0                   
+    add     x4,      x3, #64                                       
+    subs    x2,      x2, x4                                                
+    b.ls    1f                                                    
 0:  stnp    x1, x1, [x3]
     stnp    x1, x1, [x3, #16]
     stnp    x1, x1, [x3, #32]
@@ -130,7 +130,7 @@ L_memsetLarge:
     add     x3,      x3, #64
     subs    x2,      x2, #64
     b.hi    0b
-1:  add     x3,      x3, x2   // back up pointer to (end of buffer) - 64.
+1:  add     x3,      x3, x2                                              
     stp     x1, x1, [x3]
     stp     x1, x1, [x3, #16]
     stp     x1, x1, [x3, #32]
@@ -138,9 +138,9 @@ L_memsetLarge:
     POP_FRAME
     ARM64_STACK_EPILOG
 
-/*****************************************************************************
- *  Small buffer store engine                                                *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 0:  str     x1,     [x3],#8
 L_memsetSmall:

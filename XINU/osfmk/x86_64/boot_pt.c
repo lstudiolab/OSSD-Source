@@ -27,22 +27,22 @@
  */
 #include <i386/pmap.h>
 
-/*
- * These pagetables are used during early processor startup during
- * the transition from protected mode to 64-bit mode and the jump
- * to high kernel address space.
- *
- * They are required to be at the base of the kernel and specifically
- * the base of the special __HIB section.
- *
- * These tables are statically-defined as physical-zero-based.
- * Startup code in start.s rebases these according to the actual physical
- * base address.
- */
+  
+                                                                  
+                                                                 
+                                
+  
+                                                                     
+                                         
+  
+                                                              
+                                                                         
+                
+   
 
-/*
- * NB: This must be located at the kernel's base address!
- */
+  
+                                                         
+   
 #define PML4_PROT (INTEL_PTE_VALID | INTEL_PTE_WRITE)
 pml4_entry_t    BootPML4[PTE_PER_PAGE]
 __attribute__((section("__HIB, __bootPT"))) = {
@@ -87,4 +87,4 @@ pd_entry_t      BootPTD[2048]
 __attribute__((section("__HIB, __bootPT"))) = {
 	FOR_0_TO_2047(ID_MAP_2MEG)
 };
-#endif /* MACHINE_BOOTSTRAPPTD */
+#endif                           

@@ -38,7 +38,7 @@ class SymbolLookup:
         last = (0, ' ', '<start of file>')
         if( addr > SLIDE ):
             addr -= SLIDE
-        # stupid linear search... feel free to improve
+                                                      
         for s in self.symbols:
             if s[0] == addr:
                 return self.padded(s[2])
@@ -63,7 +63,7 @@ def usage():
     print "usage: %s [filename] [slide]" % sys.argv[0]
     print "\tor speficy a filename in your SYMBOLIFY_KERNEL environment variable"
 
-    # die now
+             
     sys.exit(1)
 
 KERNEL_FILE = None

@@ -66,7 +66,7 @@ read_plist_version_info(char **version_plist_vers, char **compat_version_plist_v
 	int version_plist_fd = open(SYSTEM_VERSION_PLIST_PATH, O_RDONLY);
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_GT(version_plist_fd, 0, "opened %s", SYSTEM_VERSION_PLIST_PATH);
 
-	// Resolve the full path of the file we've opened, verify it was either shimmed or not (as expected)
+	                                                                                                    
 	int ret = fcntl(version_plist_fd, F_GETPATH, opened_path);
 	T_QUIET; T_WITH_ERRNO; T_EXPECT_NE(ret, -1, "F_GETPATH on opened SystemVersion.plist");
 	if (ret != -1) {
@@ -82,7 +82,7 @@ read_plist_version_info(char **version_plist_vers, char **compat_version_plist_v
 		}
 	}
 
-	// Read and parse the plists
+	                            
 	dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 	dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 	xpc_create_from_plist_descriptor(version_plist_fd, queue, ^(xpc_object_t object) {
@@ -149,7 +149,7 @@ read_sysctl_version_info(char **vers, char **compat_vers)
 
 	return;
 }
-#endif // TARGET_OS_OSX
+#endif                 
 
 T_DECL(test_system_version_compat_disabled,
     "Tests reading system product information without system version compat enabled")
@@ -159,17 +159,17 @@ T_DECL(test_system_version_compat_disabled,
 	char *plist_vers = NULL, *plist_compat_vers = NULL;
 	char *sysctl_vers = NULL, *sysctl_compat_vers = NULL;
 
-	// Read plist version data
+	                          
 	read_plist_version_info(&plist_vers, &plist_compat_vers, false);
 
-	// Read sysctl version data
+	                           
 	read_sysctl_version_info(&sysctl_vers, &sysctl_compat_vers);
 
-	// Verify the normal data matches
+	                                 
 	T_EXPECT_EQ_STR(plist_vers, sysctl_vers, "%s %s matches %s value", SYSTEM_VERSION_PLIST_PATH,
 	    PRODUCT_VERSION_KEY, PRODUCT_VERSION_SYSCTL);
 
-	// Verify that the compatibility data matches
+	                                             
 	T_EXPECT_EQ_STR(plist_compat_vers, sysctl_compat_vers, "%s %s matches %s value", SYSTEM_VERSION_COMPAT_PLIST_PATH,
 	    PRODUCT_VERSION_KEY, PRODUCT_VERSION_COMPAT_SYSCTL);
 
@@ -180,9 +180,9 @@ T_DECL(test_system_version_compat_disabled,
 	free(sysctl_compat_vers);
 
 	T_PASS("verified version information without system version compat");
-#else // TARGET_OS_OSX
+#else                 
 	T_SKIP("system version compat only supported on macOS");
-#endif // TARGET_OS_OSX
+#endif                 
 }
 
 T_DECL(test_system_version_compat_enabled,
@@ -194,23 +194,23 @@ T_DECL(test_system_version_compat_enabled,
 	char *plist_vers = NULL, *plist_compat_vers = NULL;
 	char *sysctl_vers = NULL, *sysctl_compat_vers = NULL;
 
-	// Read plist version data
+	                          
 	read_plist_version_info(&plist_vers, &plist_compat_vers, true);
 
-	// Read sysctl version data
+	                           
 	read_sysctl_version_info(&sysctl_vers, &sysctl_compat_vers);
 
-	// The version information should match from all sources with the shim enabled
+	                                                                              
 
-	// Verify the normal data matches
+	                                 
 	T_EXPECT_EQ_STR(plist_vers, sysctl_vers, "%s %s matches %s value", SYSTEM_VERSION_PLIST_PATH,
 	    PRODUCT_VERSION_KEY, PRODUCT_VERSION_SYSCTL);
 
-	// Verify that the compatibility data matches
+	                                             
 	T_EXPECT_EQ_STR(plist_compat_vers, sysctl_compat_vers, "%s %s matches %s value", SYSTEM_VERSION_COMPAT_PLIST_PATH,
 	    PRODUCT_VERSION_KEY, PRODUCT_VERSION_COMPAT_SYSCTL);
 
-	// Verify the normal data matches the compatibility data
+	                                                        
 	T_EXPECT_EQ_STR(plist_vers, plist_compat_vers, "%s matches in both %s and %s", PRODUCT_VERSION_KEY,
 	    SYSTEM_VERSION_PLIST_PATH, SYSTEM_VERSION_COMPAT_PLIST_PATH);
 
@@ -220,9 +220,9 @@ T_DECL(test_system_version_compat_enabled,
 	free(sysctl_compat_vers);
 
 	T_PASS("verified version information with Mac OS X shim enabled");
-#else // TARGET_OS_OSX
+#else                 
 	T_SKIP("system version compat only supported on macOS");
-#endif // TARGET_OS_OSX
+#endif                 
 }
 
 T_DECL(test_system_version_compat_enabled_ios,
@@ -234,15 +234,15 @@ T_DECL(test_system_version_compat_enabled_ios,
 
 	check_ios_version_plist_exists();
 
-	// Read out the ProductVersion from SystemVersion.plist and ensure that it contains the same value as the
-	// iOSSupportVersion key
+	                                                                                                         
+	                        
 
 	__block char *read_plist_vers = NULL, *read_ios_support_version = NULL;
 
 	int version_plist_fd = open(SYSTEM_VERSION_PLIST_PATH, O_RDONLY);
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_GT(version_plist_fd, 0, "opened %s", SYSTEM_VERSION_PLIST_PATH);
 
-	// Resolve the full path of the file we've opened, verify it was shimmed as expected
+	                                                                                    
 	int ret = fcntl(version_plist_fd, F_GETPATH, opened_path);
 	T_QUIET; T_WITH_ERRNO; T_EXPECT_NE(ret, -1, "F_GETPATH on opened SystemVersion.plist");
 	if (ret != -1) {
@@ -252,7 +252,7 @@ T_DECL(test_system_version_compat_enabled_ios,
 		    "opened file path shimmed (iOS)");
 	}
 
-	// Read and parse the attributes from the SystemVersion plist
+	                                                             
 	dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 	dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 	xpc_create_from_plist_descriptor(version_plist_fd, queue, ^(xpc_object_t object) {
@@ -282,13 +282,13 @@ T_DECL(test_system_version_compat_enabled_ios,
 	close(version_plist_fd);
 	version_plist_fd = -1;
 
-	// Verify the data matches
+	                          
 	T_EXPECT_EQ_STR(read_plist_vers, read_ios_support_version, "%s %s matches %s value", SYSTEM_VERSION_PLIST_PATH,
 	    PRODUCT_VERSION_KEY, IOS_SUPPORT_VERSION_KEY);
 
 	T_PASS("verified version information with iOS shim enabled");
 
-#else // TARGET_OS_OSX
+#else                 
 	T_SKIP("iOS system version shim only supported on macOS");
-#endif // TARGET_OS_OSX
+#endif                 
 }

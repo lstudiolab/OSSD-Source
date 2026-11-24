@@ -40,43 +40,43 @@ extern "C" {
 #define IOREPORT_ABORT panic
 #endif
 
-/*
- *   Background
- *
- *   These macros allow non-I/O Kit software to generate IOReporting
- *   reports.  Clients must prevent concurrent access to any given
- *   report buffer from multiple threads.
- *
- *   While these macros allow non-I/O Kit software to participate
- *   in IOReporting, an IOService instance must lend its driver ID,
- *   respond to the appropriate IOService overrides, and shuttle
- *   data back and forth.  In some cases, it may be useful to have
- *   the I/O Kit driver initialize the report buffer with the
- *   appropriate macro.
- */
+  
+               
+  
+                                                                    
+                                                                  
+                                         
+  
+                                                                 
+                                                                   
+                                                                
+                                                                  
+                                                             
+                       
+   
 
 
-/* ----- Reporting Single Integers (SimpleReport) ----- */
+                                                          
 
-/*
- * The buffer size required for a SimpleReport.
- */
+  
+                                               
+   
 
 #define SIMPLEREPORT_BUFSIZE   (sizeof(IOReportElement))
 
 
-/*
- * Initialize a buffer to hold a SimpleReport.
- *
- *                  void* buffer - ptr to SIMPLEREPORT_BUFSIZE bytes
- *                size_t bufSize - sanity check of buffer's size
- *           uint64_t providerID - registry Entry ID of the reporting service
- *            uint64_t channelID - the report's channel ID
- * IOReportCategories categories - categories of this channel
- *
- * If the buffer is not of sufficient size, the macro calls IOREPORT_ABORT().
- * If that returns, the buffer is left full of '&'.
- */
+  
+                                              
+  
+                                                                    
+                                                                
+                                                                             
+                                                          
+                                                             
+  
+                                                                             
+                                                   
+   
 
 #define SIMPLEREPORT_INIT(buf, bufSize, providerID, channelID, cats)  \
 do {  \
@@ -101,12 +101,12 @@ do {  \
 } while(0)
 
 
-/*
- * Set a SimpleReport to a new value.
- *
- *    void* simp_buf - ptr to memory initialized by SIMPLEREPORT_INIT()
- * int64_t new_value - new value for the report
- */
+  
+                                     
+  
+                                                                       
+                                               
+   
 
 #define SIMPLEREPORT_SETVALUE(simp_buf, new_value)  \
 do {  \
@@ -117,12 +117,12 @@ do {  \
 } while(0)
 
 
-/*
- * Increment the value of a SimpleReport.
- *
- *    void* simp_buf - ptr to memory initialized by SIMPLEREPORT_INIT()
- * int64_t increment - amount by which to increment the value
- */
+  
+                                         
+  
+                                                                       
+                                                             
+   
 #define SIMPLEREPORT_INCREMENTVALUE(simp_buf, new_value)  \
 do {  \
     IOReportElement *__elem = (IOReportElement *)(simp_buf);  \
@@ -132,16 +132,16 @@ do {  \
 } while(0)
 
 
-/*
- * Prepare a SimpleReport for
- * IOService::updateReport(kIOReportCopyChannelData...)
- *
- * void* simp_buf  - Ptr to memory updated by SIMPLEREPORT_SETVALUE()
- * void* ptr2cpy   - On return, 'ptr2cpy' points to the memory that needs to be
- *                   copied for kIOReportCopyChannelData.
- * size_t size2cpy - On return, 'size2cpy' is set to the size of the report
- *                   data that needs to be copied for kIOReportCopyChannelData.
- */
+  
+                             
+                                                       
+  
+                                                                     
+                                                                               
+                                                         
+                                                                           
+                                                                               
+   
 
 #define SIMPLEREPORT_UPDATEPREP(simp_buf, ptr2cpy, size2cpy)  \
 do {  \
@@ -150,13 +150,13 @@ do {  \
 } while(0)
 
 
-/*
- * Update the result field received as a parameter for
- * kIOReportGetDimensions & kIOReportCopyChannelData actions.
- *
- * IOReportConfigureAction action - configure/updateReport() 'action' param
- *                   void* result - configure/updateReport() 'result' param
- */
+  
+                                                      
+                                                             
+  
+                                                                           
+                                                                           
+   
 
 #define SIMPLEREPORT_UPDATERES(action, result)  \
 do {  \
@@ -167,67 +167,67 @@ do {  \
 } while (0)
 
 
-/*
- * Get the 64-bit channel ID of a SimpleReport.
- *
- * void* simp_buf - ptr to memory initialized by SIMPLEREPORT_INIT()
- */
+  
+                                               
+  
+                                                                    
+   
 
 #define SIMPLEREPORT_GETCHID(simp_buf)  \
     (((IOReportElement *)(simp_buf))->channel_id)
 
-/*
- * Get the IOReportChannelType of a SimpleReport.
- *
- * void* simp_buf - ptr to memory initialized by SIMPLEREPORT_INIT()
- */
+  
+                                                 
+  
+                                                                    
+   
 
 #define SIMPLEREPORT_GETCHTYPE(simp_buf)  \
     (*(uint64_t*)&(((IOReportElement *)(simp_buf))->channel_type))
 
 
-/*
- * Get the integer value of a SimpleReport.
- *
- * void* simp_buf - memory initialized by SIMPLEREPORT_INIT()
- */
+  
+                                           
+  
+                                                             
+   
 
 #define SIMPLEREPORT_GETVALUE(simp_buf)  \
     (((IOSimpleReportValues*)&(((IOReportElement*)(simp_buf))->values))  \
 	    ->simple_value)
 
 
-/* ----- State Machine Reporting (StateReport) ----- */
+                                                       
 
-// Internal struct for StateReport
+                                  
 typedef struct {
 	uint16_t        curr_state;
 	uint64_t        update_ts;
-	IOReportElement elem[]; // Array of elements
+	IOReportElement elem[];                     
 } IOStateReportInfo;
 
-/*
- * Determine the size required for a StateReport buffer.
- *
- * int nstates - number of states to be reported
- */
+  
+                                                        
+  
+                                                
+   
 #define STATEREPORT_BUFSIZE(nstates)  \
     (sizeof(IOStateReportInfo) + (nstates) * sizeof(IOReportElement))
 
 
-/*
- * Initialize a StateReport buffer.
- *
- *              uint16_t nstates - number of states to be reported
- *                  void* buffer - ptr to STATEREPORT_BUFSIZE(nstates) bytes
- *                size_t bufSize - sanity check of buffer's size
- *           uint64_t providerID - registry Entry ID of the reporting service
- *            uint64_t channelID - ID of this channel, see IOREPORT_MAKEID()
- * IOReportCategories categories - categories of this channel
- *
- * If the buffer is not of sufficient size, the macro invokes IOREPORT_ABORT.
- * If that returns, the buffer is left full of '&'.
- */
+  
+                                   
+  
+                                                                  
+                                                                            
+                                                                
+                                                                             
+                                                                            
+                                                             
+  
+                                                                             
+                                                   
+   
 #define STATEREPORT_INIT(nstates, buf, bufSize, providerID, channelID, cats) \
 do {  \
     memset((buf), '&', (bufSize));  \
@@ -259,15 +259,15 @@ do {  \
     }  \
 } while(0)
 
-/*
- * Initialize the state id field of a state with the specified value.  By
- * default, STATEREPORT_INIT() initializes the state IDs with the index of
- * that state.  This macro can be used to provide a more descriptive state id.
- *
- *   void* state_buf - ptr to memory initialized by STATEREPORT_INIT()
- * unsigned stateIdx - index of the state, out of bounds -> no-op
- *  uint64_t stateID - new state id, see IOREPORT_MAKEID()
- */
+  
+                                                                         
+                                                                          
+                                                                              
+  
+                                                                      
+                                                                 
+                                                          
+   
 #define STATEREPORT_SETSTATEID(state_buf, stateIdx, stateID)  \
 do {  \
     IOStateReportInfo *__info = (IOStateReportInfo *)(state_buf);  \
@@ -279,13 +279,13 @@ do {  \
 } while (0)
 
 
-/*
- * Set the state of a StateReport.
- *
- *      void* state_buf - pointer to memory initialized by STATEREPORT_INIT()
- * unsigned newStateIdx - index of new state, out of bounds -> no-op
- *  uint64_t changeTime - time at which the transition occurred
- */
+  
+                                  
+  
+                                                                             
+                                                                    
+                                                               
+   
 #define STATEREPORT_SETSTATE(state_buf, newStateIdx, changeTime)  \
 do {  \
     IOStateReportInfo *__info = (IOStateReportInfo *)(state_buf);  \
@@ -302,15 +302,15 @@ do {  \
     }  \
 } while(0)
 
-/*
- * Prepare a StateReport for
- * IOService::updateReport(kIOReportCopyChannelData...)
- *
- *      void* state_buf - ptr to memory initialized by STATEREPORT_INIT()
- * uint64_t currentTime - current timestamp
- *        void* ptr2cpy - filled in with pointer to buffer to be copied out
- *      size_t size2cpy - filled in with the size of the buffer to copy out
- */
+  
+                            
+                                                       
+  
+                                                                         
+                                           
+                                                                           
+                                                                           
+   
 #define STATEREPORT_UPDATEPREP(state_buf, currentTime, ptr2cpy, size2cpy)  \
 do {  \
     IOStateReportInfo *__info = (IOStateReportInfo *)(state_buf);  \
@@ -327,14 +327,14 @@ do {  \
     }  \
 } while(0)
 
-/*
- * Update the result field received as a parameter for kIOReportGetDimensions &
- * kIOReportCopyChannelData actions.
- *
- *                void* state_buf - memory initialized by STATEREPORT_INIT()
- * IOReportConfigureAction action - configure/updateReport() 'action'
- *                   void* result - configure/updateReport() 'result'
- */
+  
+                                                                               
+                                    
+  
+                                                                            
+                                                                     
+                                                                     
+   
 
 #define STATEREPORT_UPDATERES(state_buf, action, result)  \
 do {  \
@@ -348,71 +348,71 @@ do {  \
 } while (0)
 
 
-/*
- * Get the 64-bit channel ID of a StateReport.
- *
- * void* state_buf - ptr to memory initialized by STATEREPORT_INIT()
- */
+  
+                                              
+  
+                                                                    
+   
 #define STATEREPORT_GETCHID(state_buf)  \
     (((IOStateReportInfo *)(state_buf))->elem[0].channel_id)
 
-/*
- * Get the IOReportChannelType of a StateReport.
- *
- * void* state_buf - ptr to memory initialized by STATEREPORT_INIT()
- */
+  
+                                                
+  
+                                                                    
+   
 #define STATEREPORT_GETCHTYPE(state_buf)  \
     (*(uint64_t*)&(((IOStateReportInfo *)(state_buf))->elem[0].channel_type))
 
-/*
- * Get the number of transitions into a given state.
- *
- *   void* state_buf - ptr to memory initialized by STATEREPORT_INIT()
- * unsigned stateIdx - index of state, out of bounds -> kIOReportInvalidValue
- *
- */
+  
+                                                    
+  
+                                                                      
+                                                                             
+  
+   
 #define STATEREPORT_GETTRANSITIONS(state_buf, stateIdx)  \
     (((stateIdx) < ((IOStateReportInfo *)(state_buf))->elem[0].channel_type.nelements)  \
 	? ((IOStateReportValues*)&(((IOStateReportInfo*)(state_buf))->elem[(stateIdx)].values))->intransitions  \
 	: kIOReportInvalidValue)
 
-/*
- * Get the total number of ticks spent in a given state.
- *
- *   void* state_buf - ptr to memory initialized by STATEREPORT_INIT()
- * unsigned stateIdx - index of state, out of bounds -> kIOReportInvalidValue
- */
+  
+                                                        
+  
+                                                                      
+                                                                             
+   
 #define STATEREPORT_GETTICKS(state_buf, stateIdx)  \
     (((stateIdx) < ((IOStateReportInfo*)(state_buf))->elem[0].channel_type.nelements)  \
 	? ((IOStateReportValues*)&(((IOStateReportInfo*)(state_buf))->elem[(stateIdx)].values))->upticks  \
 	: kIOReportInvalidValue)
 
 
-/* ----- Reporting an Array of Integers (SimpleArrayReport) ----- */
+                                                                    
 
-/*
- * Determine the buffer size for a SimpleArrayReport.
- *
- * int nValues - number of values to be reported
- */
+  
+                                                     
+  
+                                                
+   
 
 #define SIMPLEARRAY_BUFSIZE(nValues) \
     ((((nValues)/IOR_VALUES_PER_ELEMENT) + (((nValues) % IOR_VALUES_PER_ELEMENT) ? 1:0)) \
 	* sizeof(IOReportElement))
 
-/*
- * Initialize a buffer for use as a SimpleArrayReport.
- *
- *                   int nValues   - number of elements to be reported
- *                     void* buf   - ptr to SIMPLEARRAY_BUFSIZE(nValues) bytes
- *                size_t bufSize   - sanity check of buffer's size
- *           uint64_t providerID   - registry Entry ID of the reporting service
- *            uint64_t channelID   - ID of this channel, see IOREPORT_MAKEID()
- * IOReportCategories categories   - categories of this channel
- *
- * If the buffer is not of sufficient size, the macro invokes IOREPORT_ABORT().
- * If that returns, the buffer is left full of '&'.
- */
+  
+                                                      
+  
+                                                                      
+                                                                              
+                                                                  
+                                                                               
+                                                                              
+                                                               
+  
+                                                                               
+                                                   
+   
 
 #define SIMPLEARRAY_INIT(nValues, buf, bufSize, providerID, channelID, cats) \
 do {  \
@@ -445,7 +445,7 @@ do {  \
 } while(0)
 
 
-/* SimpleArrayReport helpers */
+                               
 
     #define __SA_FINDREP(array_buf, idx)  \
 	IOSimpleArrayReportValues *__rep;  \
@@ -461,13 +461,13 @@ do {  \
 	((((IOReportElement*)(array_buf))->channel_type.nelements)  \
 	    * IOR_VALUES_PER_ELEMENT) - 1
 
-/*
- * Set a value at a specified index in a SimpleArrayReport.
- *
- *   void* array_bufbuf - ptr to memory initialized by SIMPLEARRAY_INIT()
- *        unsigned idx  - array index, out of bounds -> no-op
- *    uint64_t newValue - new value to be stored at array[idx]
- */
+  
+                                                           
+  
+                                                                         
+                                                             
+                                                              
+   
 #define SIMPLEARRAY_SETVALUE(array_buf, idx, newValue) \
 do {  \
     __SA_FINDREP((array_buf), (idx)) \
@@ -475,13 +475,13 @@ do {  \
     } \
 } while(0)
 
-/*
- * Increment an array value within a SimpleArrayReport.
- *
- *     void* array_buf - ptr to memory initialized by SIMPLEARRAY_INIT()
- *       unsigned idx  - array index to increment, out of bounds -> no-op
- *      int64_t value  - amount by which to increment array[idx]
- */
+  
+                                                       
+  
+                                                                        
+                                                                         
+                                                                
+   
 #define SIMPLEARRAY_INCREMENTVALUE(array_buf, idx, value)  \
 do {  \
     __SA_FINDREP((array_buf), (idx)) \
@@ -490,14 +490,14 @@ do {  \
 } while(0)
 
 
-/*
- * Prepare a SimpleArrayReport for
- * IOService::updateReport(kIOReportCopyChannelData...)
- *
- *      void* array_buf - ptr to memory initialized by SIMPLEARRAY_INIT()
- *        void* ptr2cpy - filled in with pointer to buffer to be copied out
- *      size_t size2cpy - filled in with the size of the buffer to copy out
- */
+  
+                                  
+                                                       
+  
+                                                                         
+                                                                           
+                                                                           
+   
 
 #define SIMPLEARRAY_UPDATEPREP(array_buf, ptr2cpy, size2cpy) \
 do {  \
@@ -508,14 +508,14 @@ do {  \
 } while(0)
 
 
-/*
- * Update the result field received as a parameter for kIOReportGetDimensions &
- * kIOReportCopyChannelData actions.
- *
- *                void* array_buf - memory initialized by SIMPLEARRAY_INIT()
- * IOReportConfigureAction action - configure/updateReport() 'action'
- *                   void* result - configure/updateReport() 'result'
- */
+  
+                                                                               
+                                    
+  
+                                                                            
+                                                                     
+                                                                     
+   
 
 #define SIMPLEARRAY_UPDATERES(array_buf, action, result) \
 do {  \
@@ -528,29 +528,29 @@ do {  \
 } while (0)
 
 
-/*
- * Get the 64-bit channel ID of a SimpleArrayReport.
- *
- * void* array_buf - ptr to memory initialized by SIMPLEARRAY_INIT()
- */
+  
+                                                    
+  
+                                                                    
+   
 #define SIMPLEARRAY_GETCHID(array_buf)  \
     (((IOReportElement *)(array_buf))->channel_id)
 
 
-/*
- * Get the IOReportChannelType of a SimpleArrayReport.
- *
- * void* simp_buf - ptr to memory initialized by SIMPLEREPORT_INIT()
- */
+  
+                                                      
+  
+                                                                    
+   
 #define SIMPLEARRAY_GETCHTYPE(array_buf)  \
     (*(uint64_t*)&(((IOReportElement *)(array_buf))->channel_type))
 
-/*
- * Get a value from a SimpleArrayReport.
- *
- * void* array_buf - ptr to memory initialized by SIMPLEARRAY_INIT()
- *   unsigned idx  - index of the value, out of bounds -> kIOReportInvalidValue
- */
+  
+                                        
+  
+                                                                    
+                                                                               
+   
 #define SIMPLEARRAY_GETVALUE(array_buf, idx)  \
     (((idx) > __SA_MAXINDEX(array_buf) || (idx) < 0) ? kIOReportInvalidIntValue :  \
     ((IOSimpleArrayReportValues*)&(  \
@@ -558,36 +558,36 @@ do {  \
 	    ->simple_values[(idx) % IOR_VALUES_PER_ELEMENT])
 
 
-/* ----- Histogram Reporting (HistogramReport) ----- */
+                                                       
 
-// Internal struct for HistogramReport
+                                      
 typedef struct {
 	int             bucketWidth;
-	IOReportElement elem[]; // Array of elements
+	IOReportElement elem[];                     
 } IOHistReportInfo;
 
-/*
- * Determine the size required for a HistogramReport buffer.
- *
- * int nbuckets - number of buckets in the histogram
- */
+  
+                                                            
+  
+                                                    
+   
 #define HISTREPORT_BUFSIZE(nbuckets)  \
     (sizeof(IOHistReportInfo) + ((nbuckets) * sizeof(IOReportElement)))
 
-/*
- * Initialize a HistogramReport buffer. Supports only linear scale histogram.
- *
- *             uint16_t nbuckets - number of buckets data is combined into
- *          uint32_t bucketWidth - size of each bucket
- *                  void* buffer - ptr to HISTREPORT_BUFSIZE(nbuckets) bytes
- *                size_t bufSize - sanity check of buffer's size
- *           uint64_t providerID - registry Entry ID of the reporting service
- *            uint64_t channelID - ID of this channel, see IOREPORT_MAKEID()
- * IOReportCategories categories - categories of this channel
- *
- * If the buffer is not of sufficient size, the macro invokes IOREPORT_ABORT.
- * If that returns, the buffer is left full of '&'.
- */
+  
+                                                                             
+  
+                                                                          
+                                                      
+                                                                            
+                                                                
+                                                                             
+                                                                            
+                                                             
+  
+                                                                             
+                                                   
+   
 #define HISTREPORT_INIT(nbuckets, bktSize, buf, bufSize, providerID, channelID, cats) \
 do {  \
     memset((buf), '&', (bufSize));  \
@@ -615,13 +615,13 @@ do {  \
     }  \
 } while (0)
 
-/*
- * Update histogram with a new value.
- *
- *
- *      void* hist_buf - pointer to memory initialized by HISTREPORT_INIT()
- *        int64_t value - new value to add to the histogram
- */
+  
+                                     
+  
+  
+                                                                           
+                                                           
+   
 #define HISTREPORT_TALLYVALUE(hist_buf, value) \
 do {  \
     IOHistReportInfo   *__info = (IOHistReportInfo *)(hist_buf);  \
@@ -647,14 +647,14 @@ do {  \
     }  \
 } while (0)
 
-/*
- * Prepare a HistogramReport for
- * IOService::updateReport(kIOReportCopyChannelData...)
- *
- *      void* array_buf - ptr to memory initialized by HISTREPORT_INIT()
- *        void* ptr2cpy - filled in with pointer to buffer to be copied out
- *      size_t size2cpy - filled in with the size of the buffer to copy out
- */
+  
+                                
+                                                       
+  
+                                                                        
+                                                                           
+                                                                           
+   
 
 #define HISTREPORT_UPDATEPREP(hist_buf, ptr2cpy, size2cpy) \
 do {  \
@@ -664,14 +664,14 @@ do {  \
 } while(0)
 
 
-/*
- * Update the result field received as a parameter for kIOReportGetDimensions &
- * kIOReportCopyChannelData actions.
- *
- *                void* array_buf - memory initialized by HISTREPORT_INIT()
- * IOReportConfigureAction action - configure/updateReport() 'action'
- *                   void* result - configure/updateReport() 'result'
- */
+  
+                                                                               
+                                    
+  
+                                                                           
+                                                                     
+                                                                     
+   
 
 #define HISTREPORT_UPDATERES(hist_buf, action, result) \
 do {  \
@@ -682,19 +682,19 @@ do {  \
     }  \
 } while (0)
 
-/*
- * Get the 64-bit channel ID of a HistogramReport.
- *
- * void* hist_buf - ptr to memory initialized by HISTREPORT_INIT()
- */
+  
+                                                  
+  
+                                                                  
+   
 #define HISTREPORT_GETCHID(hist_buf)  \
     (((IOHistReportInfo *)(hist_buf))->elem[0].channel_id)
 
-/*
- * Get the IOReportChannelType of a HistogramReport.
- *
- * void* hist_buf - ptr to memory initialized by HISTREPORT_INIT()
- */
+  
+                                                    
+  
+                                                                  
+   
 #define HISTREPORT_GETCHTYPE(hist_buf)  \
     (*(uint64_t*)&(((IOHistReportInfo *)(hist_buf))->elem[0].channel_type))
 
@@ -702,4 +702,4 @@ do {  \
 }
 #endif
 
-#endif // _IOREPORT_MACROS_H_
+#endif                       

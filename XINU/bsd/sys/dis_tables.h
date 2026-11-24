@@ -32,17 +32,17 @@
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
  */
-/*
- * HISTORY
- */
+  
+          
+   
 
 #ifndef _SYS_DIS_TABLES_H_
 #define _SYS_DIS_TABLES_H_
 
-/*
- * Machine dependent constants
- */
+  
+                              
+   
 
 #include <machine/dis_tables.h>
 
-#endif  /* _SYS_DIS_TABLES_H_ */
+#endif                          

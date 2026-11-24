@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
-** This file contains compatibilty wrapper header for things that used
-** to be generated from mach/sync.defs.  Now that code is split into two
-** different interface generator files, so include the two resulting
-** headers here.
-*/
+  
+                                                                      
+                                                                        
+                                                                    
+                
+  
 #include <mach/semaphore.h>
 #include <mach/lock_set.h>

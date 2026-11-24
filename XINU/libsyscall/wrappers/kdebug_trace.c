@@ -43,30 +43,30 @@ extern uint64_t __kdebug_trace_string(uint32_t debugid, uint64_t str_id,
 static int kdebug_signpost_internal(uint32_t debugid, uintptr_t arg1,
     uintptr_t arg2, uintptr_t arg3, uintptr_t arg4);
 
-/*
- * GENERAL API DESIGN NOTE!
- *
- * Trace API's are expected to avoid performing checks until tracing has
- * been enabled. This includes checks that might cause error codes to be
- * returned.
- *
- * Trace invocations via wrapper and syscall must have the same behavior.
- *
- * Note that the userspace API is chosing to optimize fastpath, non-error
- * performance by eliding validation of each debugid. This means that error
- * cases which could have been caught in userspace will make a syscall
- * before returning with the correct error code. This tradeoff in performance
- * is intentional.
- */
+  
+                           
+  
+                                                                        
+                                                                        
+            
+  
+                                                                         
+  
+                                                                         
+                                                                           
+                                                                      
+                                                                             
+                  
+   
 
 void *
 kdebug_typefilter(void)
 {
 	static void* typefilter;
 
-	/* We expect kdebug_typefilter_bitmap to be valid (the if is not executed) */
+	                                                                             
 	if (__builtin_expect(!typefilter, 0)) {
-		// Map the typefilter if it can be mapped.
+		                                          
 		void* ptr = NULL;
 		size_t ptr_size = 0;
 
@@ -91,22 +91,22 @@ kdebug_is_enabled(uint32_t debugid)
 	}
 
 	if ((state & KDEBUG_COMMPAGE_ENABLE_TYPEFILTER) > 0) {
-		/*
-		 * Typefilter rules...
-		 *
-		 * If no typefilter is available (even if due to error),
-		 * debugids are allowed.
-		 *
-		 * The typefilter will always allow DBG_TRACE; this is a kernel
-		 * invariant. There is no need for an explicit check here.
-		 *
-		 * NOTE: The typefilter will always allow DBG_TRACE, but
-		 * it is not legal to inject DBG_TRACE via kdebug_trace.
-		 * Attempts to do so will not be detected here, but will be
-		 * detected in the kernel, and an error will be returned. Per
-		 * the API design note at the top of this file, this is a
-		 * deliberate choice.
-		 */
+		  
+                        
+    
+                                                          
+                          
+    
+                                                                 
+                                                            
+    
+                                                          
+                                                          
+                                                             
+                                                               
+                                                           
+                       
+     
 		uint8_t* typefilter = kdebug_typefilter();
 		if (typefilter && isset(typefilter, KDBG_EXTRACT_CSC(debugid)) == 0) {
 			return FALSE;

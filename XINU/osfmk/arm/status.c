@@ -46,21 +46,21 @@ typedef struct arm_vfpv2_state  arm_vfpv2_state_t;
 	(sizeof (arm_vfpv2_state_t)/sizeof(uint32_t)))
 
 
-/*
- * Forward definitions
- */
+  
+                      
+   
 void
 thread_set_child(thread_t child, int pid);
 
 void
 thread_set_parent(thread_t parent, int pid);
 
-/*
- * Maps state flavor to number of words in the state:
- */
-/* __private_extern__ */
+  
+                                                     
+   
+                        
 unsigned int    _MachineStateCount[] = {
-	/* FLAVOR_LIST */ 0,
+	                  0,
 	[ARM_THREAD_STATE]    = ARM_THREAD_STATE_COUNT,
 	[ARM_VFP_STATE]       = ARM_VFP_STATE_COUNT,
 	[ARM_EXCEPTION_STATE] = ARM_EXCEPTION_STATE_COUNT,
@@ -77,7 +77,7 @@ machine_thread_state_convert_to_user(
 	__unused thread_state_t tstate,
 	__unused mach_msg_type_number_t *count)
 {
-	// No conversion to userspace representation on this platform
+	                                                             
 	return KERN_SUCCESS;
 }
 
@@ -88,7 +88,7 @@ machine_thread_state_convert_from_user(
 	__unused thread_state_t tstate,
 	__unused mach_msg_type_number_t count)
 {
-	// No conversion from userspace representation on this platform
+	                                                               
 	return KERN_SUCCESS;
 }
 
@@ -97,7 +97,7 @@ machine_thread_siguctx_pointer_convert_to_user(
 	__unused thread_t thread,
 	__unused user_addr_t *uctxp)
 {
-	// No conversion to userspace representation on this platform
+	                                                             
 	return KERN_SUCCESS;
 }
 
@@ -107,14 +107,14 @@ machine_thread_function_pointers_convert_from_user(
 	__unused user_addr_t *fptrs,
 	__unused uint32_t count)
 {
-	// No conversion from userspace representation on this platform
+	                                                               
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine:	machine_thread_get_state
- *
- */
+  
+                                    
+  
+   
 kern_return_t
 machine_thread_get_state(
 	thread_t thread,
@@ -122,8 +122,8 @@ machine_thread_get_state(
 	thread_state_t tstate,
 	mach_msg_type_number_t * count)
 {
-#define machine_thread_get_state_kprintf(x...)  /* kprintf("machine_thread_get
-	                                         * _state: " x) */
+#define machine_thread_get_state_kprintf(x...)                                
+                                                           
 
 	switch (flavor) {
 	case THREAD_STATE_FLAVOR_LIST:
@@ -278,10 +278,10 @@ machine_thread_get_state(
 }
 
 
-/*
- * Routine:	machine_thread_get_kern_state
- *
- */
+  
+                                         
+  
+   
 kern_return_t
 machine_thread_get_kern_state(
 	thread_t thread,
@@ -289,13 +289,13 @@ machine_thread_get_kern_state(
 	thread_state_t tstate,
 	mach_msg_type_number_t * count)
 {
-#define machine_thread_get_kern_state_kprintf(x...)     /* kprintf("machine_threa
-	                                                 * d_get_kern_state: "
-	                                                 * x) */
+#define machine_thread_get_kern_state_kprintf(x...)                              
+                                                                       
+                                                         
 
-	/*
-	 * This works only for an interrupted kernel thread
-	 */
+	  
+                                                    
+    
 	if (thread != current_thread() || getCpuDatap()->cpu_int_state == NULL) {
 		return KERN_FAILURE;
 	}
@@ -332,10 +332,10 @@ machine_thread_get_kern_state(
 
 extern long long arm_debug_get(void);
 
-/*
- * Routine:	machine_thread_set_state
- *
- */
+  
+                                    
+  
+   
 kern_return_t
 machine_thread_set_state(
 	thread_t thread,
@@ -343,8 +343,8 @@ machine_thread_set_state(
 	thread_state_t tstate,
 	mach_msg_type_number_t count)
 {
-#define machine_thread_set_state_kprintf(x...)  /* kprintf("machine_thread_set
-	                                         * _state: " x) */
+#define machine_thread_set_state_kprintf(x...)                                
+                                                           
 
 	switch (flavor) {
 	case ARM_THREAD_STATE:{
@@ -366,10 +366,10 @@ machine_thread_set_state(
 		saved_state = &thread->machine.PcbData;
 		old_psr = saved_state->cpsr;
 		memcpy((char *) saved_state, (char *) state, sizeof(*state));
-		/*
-		 * do not allow privileged bits of the PSR to be
-		 * changed
-		 */
+		  
+                                                  
+            
+     
 		saved_state->cpsr = (saved_state->cpsr & ~PSR_USER_MASK) | (old_psr & PSR_USER_MASK);
 
 		machine_thread_set_state_kprintf("machine_thread_set_state: pc 0x%x r0 0x%x sp 0x%x\n",
@@ -433,7 +433,7 @@ machine_thread_set_state(
 		}
 
 		for (i = 0; i < 16; i++) {
-			/* do not allow context IDs to be set */
+			                                        
 			if (((state->bcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
 			    || ((state->bcr[i] & ARM_DBG_CR_LINKED_MASK) != ARM_DBG_CR_LINKED_UNLINKED)
 			    || ((state->wcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
@@ -458,7 +458,7 @@ machine_thread_set_state(
 			}
 
 			for (i = 0; i < 16; i++) {
-				/* set appropriate priviledge; mask out unknown bits */
+				                                                       
 				thread_state->bcr[i] = (state->bcr[i] & (ARM_DBG_CR_ADDRESS_MASK_MASK
 				    | ARM_DBGBCR_MATCH_MASK
 				    | ARM_DBG_CR_BYTE_ADDRESS_SELECT_MASK
@@ -509,10 +509,10 @@ machine_thread_reset_pc(thread_t thread, mach_vm_address_t pc)
 	set_saved_state_pc(get_user_regs(thread), (register_t)pc);
 }
 
-/*
- * Routine:	machine_thread_state_initialize
- *
- */
+  
+                                           
+  
+   
 kern_return_t
 machine_thread_state_initialize(
 	thread_t thread)
@@ -536,28 +536,28 @@ machine_thread_state_initialize(
 void
 vfp_state_initialize(struct arm_vfpsaved_state *vfp_state)
 {
-	/* Set default VFP state to RunFast mode:
-	 *
-	 * - flush-to-zero mode
-	 * - default NaN mode
-	 * - no enabled exceptions
-	 *
-	 * On the VFP11, this allows the use of floating point without
-	 * trapping to support code, which we do not provide.  With
-	 * the Cortex-A8, this allows the use of the (much faster) NFP
-	 * pipeline for single-precision operations.
-	 */
+	                                         
+   
+                        
+                      
+                           
+   
+                                                               
+                                                            
+                                                               
+                                             
+    
 
 	bzero(vfp_state, sizeof(*vfp_state));
 	vfp_state->fpscr = FPSCR_DEFAULT;
 }
-#endif /* __ARM_VFP__ */
+#endif                  
 
 
-/*
- * Routine:	machine_thread_dup
- *
- */
+  
+                              
+  
+   
 kern_return_t
 machine_thread_dup(
 	thread_t self,
@@ -587,10 +587,10 @@ machine_thread_dup(
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine:	get_user_regs
- *
- */
+  
+                         
+  
+   
 struct arm_saved_state *
 get_user_regs(
 	thread_t thread)
@@ -598,10 +598,10 @@ get_user_regs(
 	return &thread->machine.PcbData;
 }
 
-/*
- * Routine:	find_user_regs
- *
- */
+  
+                          
+  
+   
 struct arm_saved_state *
 find_user_regs(
 	thread_t thread)
@@ -609,17 +609,17 @@ find_user_regs(
 	return get_user_regs(thread);
 }
 
-/*
- * Routine:	find_kern_regs
- *
- */
+  
+                          
+  
+   
 struct arm_saved_state *
 find_kern_regs(
 	thread_t thread)
 {
-	/*
-	 * This works only for an interrupted kernel thread
-	 */
+	  
+                                                    
+    
 	if (thread != current_thread() || getCpuDatap()->cpu_int_state == NULL) {
 		return (struct arm_saved_state *) NULL;
 	} else {
@@ -628,10 +628,10 @@ find_kern_regs(
 }
 
 #if __ARM_VFP__
-/*
- *	Find the user state floating point context.  If there is no user state context,
- *	we just return a 0.
- */
+  
+                                                                                  
+                      
+   
 
 struct arm_vfpsaved_state *
 find_user_vfp(
@@ -639,7 +639,7 @@ find_user_vfp(
 {
 	return &thread->machine.PcbData.VFPdata;
 }
-#endif /* __ARM_VFP__ */
+#endif                  
 
 arm_debug_state_t *
 find_debug_state(
@@ -648,10 +648,10 @@ find_debug_state(
 	return thread->machine.DebugData;
 }
 
-/*
- * Routine:	thread_userstack
- *
- */
+  
+                            
+  
+   
 kern_return_t
 thread_userstack(
 	__unused thread_t thread,
@@ -696,12 +696,12 @@ thread_userstack(
 	return KERN_SUCCESS;
 }
 
-/*
- * thread_userstackdefault:
- *
- * Return the default stack location for the
- * thread, if otherwise unknown.
- */
+  
+                           
+  
+                                            
+                                
+   
 kern_return_t
 thread_userstackdefault(
 	mach_vm_offset_t *default_user_stack,
@@ -712,17 +712,17 @@ thread_userstackdefault(
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine:	thread_setuserstack
- *
- */
+  
+                               
+  
+   
 void
 thread_setuserstack(thread_t thread, mach_vm_address_t user_stack)
 {
 	struct arm_saved_state *sv;
 
-#define thread_setuserstack_kprintf(x...)       /* kprintf("thread_setuserstac
-	                                         * k: " x) */
+#define thread_setuserstack_kprintf(x...)                                     
+                                                      
 
 	sv = get_user_regs(thread);
 
@@ -733,10 +733,10 @@ thread_setuserstack(thread_t thread, mach_vm_address_t user_stack)
 	return;
 }
 
-/*
- * Routine:	thread_adjuserstack
- *
- */
+  
+                               
+  
+   
 user_addr_t
 thread_adjuserstack(thread_t thread, int adjust)
 {
@@ -749,17 +749,17 @@ thread_adjuserstack(thread_t thread, int adjust)
 	return sv->sp;
 }
 
-/*
- * Routine:	thread_setentrypoint
- *
- */
+  
+                                
+  
+   
 void
 thread_setentrypoint(thread_t thread, mach_vm_offset_t entry)
 {
 	struct arm_saved_state *sv;
 
-#define thread_setentrypoint_kprintf(x...)      /* kprintf("thread_setentrypoi
-	                                         * nt: " x) */
+#define thread_setentrypoint_kprintf(x...)                                    
+                                                       
 
 	sv = get_user_regs(thread);
 
@@ -770,10 +770,10 @@ thread_setentrypoint(thread_t thread, mach_vm_offset_t entry)
 	return;
 }
 
-/*
- * Routine:	thread_entrypoint
- *
- */
+  
+                             
+  
+   
 kern_return_t
 thread_entrypoint(
 	__unused thread_t thread,
@@ -794,9 +794,9 @@ thread_entrypoint(
 
 		state = (struct arm_thread_state *) tstate;
 
-		/*
-		 * If a valid entry point is specified, use it.
-		 */
+		  
+                                                 
+     
 		if (state->pc) {
 			*entry_point = CAST_USER_ADDR_T(state->pc);
 		} else {
@@ -813,10 +813,10 @@ thread_entrypoint(
 }
 
 
-/*
- * Routine:	thread_set_child
- *
- */
+  
+                            
+  
+   
 void
 thread_set_child(
 	thread_t child,
@@ -831,10 +831,10 @@ thread_set_child(
 }
 
 
-/*
- * Routine:	thread_set_parent
- *
- */
+  
+                             
+  
+   
 void
 thread_set_parent(
 	thread_t parent,
@@ -856,10 +856,10 @@ struct arm_act_context {
 #endif
 };
 
-/*
- * Routine:	act_thread_csave
- *
- */
+  
+                            
+  
+   
 void           *
 act_thread_csave(void)
 {
@@ -896,10 +896,10 @@ act_thread_csave(void)
 	return ic;
 }
 
-/*
- * Routine:	act_thread_catt
- *
- */
+  
+                           
+  
+   
 void
 act_thread_catt(void *ctx)
 {
@@ -933,10 +933,10 @@ out:
 	kfree(ic, sizeof(struct arm_act_context));
 }
 
-/*
- * Routine:	act_thread_catt
- *
- */
+  
+                           
+  
+   
 void
 act_thread_cfree(void *ctx)
 {
@@ -959,11 +959,11 @@ thread_set_wq_state32(thread_t thread, thread_state_t tstate)
 		thread_lock(thread);
 	}
 
-	/*
-	 * do not zero saved_state, it can be concurrently accessed
-	 * and zero is not a valid state for some of the registers,
-	 * like sp.
-	 */
+	  
+                                                            
+                                                            
+            
+    
 	thread_state32_to_saved_state(state, saved_state);
 	saved_state->cpsr = PSR_USERDFLT;
 

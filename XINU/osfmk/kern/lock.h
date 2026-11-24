@@ -53,13 +53,13 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- *	File:	kern/lock.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Higher Level Locking primitives definitions
- */
+  
+                    
+                                                    
+             
+  
+                                              
+   
 
 #ifdef  KERNEL_PRIVATE
 
@@ -70,6 +70,6 @@
 
 #warning This header is deprecated. Use <kern/locks.h> instead.
 
-#endif  /* _KERN_LOCK_H_ */
+#endif                     
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

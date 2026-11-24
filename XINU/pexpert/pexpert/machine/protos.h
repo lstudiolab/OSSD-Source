@@ -32,11 +32,11 @@
 #include "pexpert/i386/protos.h"
 #elif defined (__arm__) || defined (__arm64__)
 #ifdef PRIVATE
-/* pexpert/arm/protos.h isn't installed into the public SDK. */
+                                                               
 #include "pexpert/arm/protos.h"
-#endif /* PRIVATE */
+#endif              
 #else
 #error architecture not supported
 #endif
 
-#endif /* _PEXPERT_MACHINE_PROTOS_H */
+#endif                                

@@ -69,21 +69,21 @@
  *
  *	@(#)mbuf.h	8.3 (Berkeley) 1/21/94
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _SYS_MBUF_H_
 #define _SYS_MBUF_H_
 
 #include <sys/appleapiopts.h>
 #include <sys/cdefs.h>
-#include <sys/_types/_u_int32_t.h> /* u_int32_t */
-#include <sys/_types/_u_int64_t.h> /* u_int64_t */
-#include <sys/_types/_u_short.h> /* u_short */
+#include <sys/_types/_u_int32_t.h>                
+#include <sys/_types/_u_int64_t.h>                
+#include <sys/_types/_u_short.h>              
 
 #ifdef KERNEL
 #include <sys/kpi_mbuf.h>
@@ -93,86 +93,86 @@
 #include <sys/lock.h>
 #include <sys/queue.h>
 #include <machine/endian.h>
-/*
- * Mbufs are of a single size, MSIZE (machine/param.h), which
- * includes overhead.  An mbuf may add a single "mbuf cluster" of size
- * MCLBYTES/MBIGCLBYTES/M16KCLBYTES (also in machine/param.h), which has
- * no additional overhead and is used instead of the internal data area;
- * this is done when at least MINCLSIZE of data must be stored.
- */
+  
+                                                             
+                                                                      
+                                                                        
+                                                                        
+                                                               
+   
 
-/*
- * The following _MLEN and _MHLEN macros are private to xnu.  Private code
- * that are outside of xnu must use the mbuf_get_{mlen,mhlen} routines since
- * the sizes of the structures are dependent upon specific xnu configs.
- */
-#define _MLEN           (MSIZE - sizeof(struct m_hdr))  /* normal data len */
-#define _MHLEN          (_MLEN - sizeof(struct pkthdr)) /* data len w/pkthdr */
+  
+                                                                          
+                                                                            
+                                                                       
+   
+#define _MLEN           (MSIZE - sizeof(struct m_hdr))                       
+#define _MHLEN          (_MLEN - sizeof(struct pkthdr))                        
 
 #define NMBPGSHIFT      (PAGE_SHIFT - MSIZESHIFT)
-#define NMBPG           (1 << NMBPGSHIFT)       /* # of mbufs per page */
+#define NMBPG           (1 << NMBPGSHIFT)                                
 
 #define NCLPGSHIFT      (PAGE_SHIFT - MCLSHIFT)
-#define NCLPG           (1 << NCLPGSHIFT)       /* # of cl per page */
+#define NCLPG           (1 << NCLPGSHIFT)                             
 
 #define NBCLPGSHIFT     (PAGE_SHIFT - MBIGCLSHIFT)
-#define NBCLPG          (1 << NBCLPGSHIFT)      /* # of big cl per page */
+#define NBCLPG          (1 << NBCLPGSHIFT)                                
 
 #define NMBPCLSHIFT     (MCLSHIFT - MSIZESHIFT)
-#define NMBPCL          (1 << NMBPCLSHIFT)      /* # of mbufs per cl */
+#define NMBPCL          (1 << NMBPCLSHIFT)                             
 
 #define NCLPJCLSHIFT    (M16KCLSHIFT - MCLSHIFT)
-#define NCLPJCL         (1 << NCLPJCLSHIFT)     /* # of cl per jumbo cl */
+#define NCLPJCL         (1 << NCLPJCLSHIFT)                               
 
 #define NCLPBGSHIFT     (MBIGCLSHIFT - MCLSHIFT)
-#define NCLPBG          (1 << NCLPBGSHIFT)      /* # of cl per big cl */
+#define NCLPBG          (1 << NCLPBGSHIFT)                              
 
 #define NMBPBGSHIFT     (MBIGCLSHIFT - MSIZESHIFT)
-#define NMBPBG          (1 << NMBPBGSHIFT)      /* # of mbufs per big cl */
+#define NMBPBG          (1 << NMBPBGSHIFT)                                 
 
-/*
- * Macros for type conversion
- * mtod(m,t) -	convert mbuf pointer to data pointer of correct type
- * mtodo(m, o) -- Same as above but with offset 'o' into data.
- * dtom(x) -	convert data pointer within mbuf to mbuf pointer (XXX)
- */
+  
+                             
+                                                                   
+                                                              
+                                                                   
+   
 #define mtod(m, t)      ((t)m_mtod(m))
 #define mtodo(m, o)     ((void *)(mtod(m, uint8_t *) + (o)))
 #define dtom(x)         m_dtom(x)
 
-/* header at beginning of each mbuf: */
+                                       
 struct m_hdr {
-	struct mbuf     *mh_next;       /* next buffer in chain */
-	struct mbuf     *mh_nextpkt;    /* next chain in queue/record */
-	caddr_t         mh_data;        /* location of data */
-	int32_t         mh_len;         /* amount of data in this mbuf */
-	u_int16_t       mh_type;        /* type of data in this mbuf */
-	u_int16_t       mh_flags;       /* flags; see below */
+	struct mbuf     *mh_next;                                 
+	struct mbuf     *mh_nextpkt;                                    
+	caddr_t         mh_data;                              
+	int32_t         mh_len;                                          
+	u_int16_t       mh_type;                                       
+	u_int16_t       mh_flags;                             
 #if __arm__ && (__BIGGEST_ALIGNMENT__ > 4)
-/* This is needed because of how _MLEN is defined and used. Ideally, _MLEN
- * should be defined using the offsetof(struct mbuf, M_dat), since there is
- * no guarantee that mbuf.M_dat will start where mbuf.m_hdr ends. The compiler
- * may (and does in the armv7k case) insert padding between m_hdr and M_dat in
- * mbuf. We cannot easily use offsetof, however, since _MLEN is referenced
- * in the definition of mbuf.
- */
+                                                                          
+                                                                           
+                                                                              
+                                                                              
+                                                                          
+                             
+   
 } __attribute__((aligned(8)));
 #else
 };
 #endif
 
-/*
- * Packet tag structure (see below for details).
- */
+  
+                                                
+   
 struct m_tag {
-	uint64_t               m_tag_cookie;   /* Error checking */
+	uint64_t               m_tag_cookie;                       
 #ifndef __LP64__
-	uint32_t               pad;            /* For structure alignment */
-#endif /* !__LP64__ */
-	SLIST_ENTRY(m_tag)      m_tag_link;     /* List of packet tags */
-	uint16_t               m_tag_type;     /* Module specific type */
-	uint16_t               m_tag_len;      /* Length of data */
-	uint32_t               m_tag_id;       /* Module ID */
+	uint32_t               pad;                                         
+#endif                
+	SLIST_ENTRY(m_tag)      m_tag_link;                              
+	uint16_t               m_tag_type;                               
+	uint16_t               m_tag_len;                          
+	uint32_t               m_tag_id;                      
 };
 
 #define M_TAG_ALIGN(len) \
@@ -181,78 +181,78 @@ struct m_tag {
 #define M_TAG_VALID_PATTERN     0xfeedfacefeedfaceULL
 #define M_TAG_FREE_PATTERN      0xdeadbeefdeadbeefULL
 
-/*
- * Packet tag header structure (at the top of mbuf).  Pointers are
- * 32-bit in ILP32; m_tag needs 64-bit alignment, hence padded.
- */
+  
+                                                                  
+                                                               
+   
 struct m_taghdr {
 #ifndef __LP64__
-	u_int32_t               pad;            /* For structure alignment */
-#endif /* !__LP64__ */
-	u_int64_t               refcnt;         /* Number of tags in this mbuf */
+	u_int32_t               pad;                                         
+#endif                
+	u_int64_t               refcnt;                                          
 };
 
-/*
- * Driver auxiliary metadata tag (KERNEL_TAG_TYPE_DRVAUX).
- */
+  
+                                                          
+   
 struct m_drvaux_tag {
-	u_int32_t       da_family;      /* IFNET_FAMILY values */
-	u_int32_t       da_subfamily;   /* IFNET_SUBFAMILY values */
-	u_int32_t       da_reserved;    /* for future */
-	u_int32_t       da_length;      /* length of following data */
+	u_int32_t       da_family;                               
+	u_int32_t       da_subfamily;                               
+	u_int32_t       da_reserved;                    
+	u_int32_t       da_length;                                    
 };
 
-/* Values for pftag_flags (16-bit wide) */
-#define PF_TAG_GENERATED                0x1     /* pkt generated by PF */
+                                          
+#define PF_TAG_GENERATED                0x1                              
 #define PF_TAG_FRAGCACHE                0x2
 #define PF_TAG_TRANSLATE_LOCALHOST      0x4
 #if PF_ECN
-#define PF_TAG_HDR_INET                 0x8     /* hdr points to IPv4 */
-#define PF_TAG_HDR_INET6                0x10    /* hdr points to IPv6 */
-#endif /* PF_ECN */
-#define PF_TAG_REASSEMBLED              0x20    /* pkt reassembled by PF */
-#define PF_TAG_REFRAGMENTED             0x40    /* pkt refragmented by PF */
-/*
- * PF mbuf tag
- */
+#define PF_TAG_HDR_INET                 0x8                             
+#define PF_TAG_HDR_INET6                0x10                            
+#endif             
+#define PF_TAG_REASSEMBLED              0x20                               
+#define PF_TAG_REFRAGMENTED             0x40                                
+  
+              
+   
 struct pf_mtag {
-	u_int16_t       pftag_flags;    /* PF_TAG flags */
-	u_int16_t       pftag_rtableid; /* alternate routing table id */
+	u_int16_t       pftag_flags;                      
+	u_int16_t       pftag_rtableid;                                 
 	u_int16_t       pftag_tag;
 	u_int16_t       pftag_routed;
 #if PF_ECN
-	void            *pftag_hdr;     /* saved hdr pos in mbuf, for ECN */
-#endif /* PF_ECN */
+	void            *pftag_hdr;                                         
+#endif             
 };
 
-/* System reserved PF tags */
+                             
 #define PF_TAG_ID_SYSTEM_SERVICE        0xff00
 #define PF_TAG_ID_STACK_DROP            0xff01
 
-/*
- * PF fragment tag
- */
+  
+                  
+   
 struct pf_fragment_tag {
-	uint32_t ft_id;     /* fragment id */
-	uint16_t ft_hdrlen; /* header length of reassembled pkt */
-	uint16_t ft_unfragpartlen; /* length of the per-fragment headers */
-	uint16_t ft_extoff; /* last extension header offset or 0 */
-	uint16_t ft_maxlen; /* maximum fragment payload length */
+	uint32_t ft_id;                      
+	uint16_t ft_hdrlen;                                       
+	uint16_t ft_unfragpartlen;                                         
+	uint16_t ft_extoff;                                        
+	uint16_t ft_maxlen;                                      
 };
 
-/*
- * TCP mbuf tag
- */
+  
+               
+   
 struct tcp_pktinfo {
 	union {
 		struct {
-			uint32_t segsz;        /* segment size (actual MSS) */
-			uint32_t start_seq;    /* start seq of this packet */
+			uint32_t segsz;                                       
+			uint32_t start_seq;                                  
 			pid_t     pid;
 			pid_t     e_pid;
 		} __tx;
 		struct {
-			uint8_t  seg_cnt;    /* # of coalesced TCP pkts */
+			uint8_t  seg_cnt;                                 
 		} __rx;
 	} __offload;
 #define tso_segsz       proto_mtag.__pr_u.tcp.tm_tcp.__offload.__tx.segsz
@@ -262,13 +262,13 @@ struct tcp_pktinfo {
 #define seg_cnt         proto_mtag.__pr_u.tcp.tm_tcp.__offload.__rx.seg_cnt
 };
 
-/*
- * MPTCP mbuf tag
- */
+  
+                 
+   
 struct mptcp_pktinfo {
-	uint64_t       mtpi_dsn;       /* MPTCP Data Sequence Number */
-	uint32_t       mtpi_rel_seq;   /* Relative Seq Number */
-	uint16_t       mtpi_length;    /* Length of mapping */
+	uint64_t       mtpi_dsn;                                       
+	uint32_t       mtpi_rel_seq;                            
+	uint16_t       mtpi_length;                           
 	uint16_t       mtpi_csum;
 #define mp_dsn          proto_mtag.__pr_u.tcp.tm_mptcp.mtpi_dsn
 #define mp_rseq         proto_mtag.__pr_u.tcp.tm_mptcp.mtpi_rel_seq
@@ -276,16 +276,16 @@ struct mptcp_pktinfo {
 #define mp_csum         proto_mtag.__pr_u.tcp.tm_mptcp.mtpi_csum
 };
 
-/*
- * TCP specific mbuf tag.  Note that the current implementation uses
- * MPTCP metadata strictly between MPTCP and the TCP subflow layers,
- * hence tm_tcp and tm_mptcp are mutually exclusive.  This also means
- * that TCP messages functionality is currently incompatible with MPTCP.
- */
+  
+                                                                    
+                                                                    
+                                                                     
+                                                                        
+   
 struct tcp_mtag {
 	union {
-		struct tcp_pktinfo      tm_tcp;         /* TCP and below */
-		struct mptcp_pktinfo    tm_mptcp;       /* MPTCP-TCP only */
+		struct tcp_pktinfo      tm_tcp;                            
+		struct mptcp_pktinfo    tm_mptcp;                           
 	};
 };
 
@@ -314,25 +314,25 @@ struct driver_mtag_ {
 #define drv_flowid              builtin_mtag._drv_mtag._drv_flowid
 };
 
-/*
- * Protocol specific mbuf tag (at most one protocol metadata per mbuf).
- *
- * Care must be taken to ensure that they are mutually exclusive, e.g.
- * IPsec policy ID implies no TCP segment offload (which is fine given
- * that the former is used on the virtual ipsec interface that does
- * not advertise the TSO capability.)
- */
+  
+                                                                       
+  
+                                                                      
+                                                                      
+                                                                   
+                                     
+   
 struct proto_mtag_ {
 	union {
-		struct tcp_mtag tcp;            /* TCP specific */
-		struct udp_mtag         udp;    /* UDP specific */
-		struct rawip_mtag       rawip;  /* raw IPv4/IPv6 specific */
+		struct tcp_mtag tcp;                              
+		struct udp_mtag         udp;                      
+		struct rawip_mtag       rawip;                              
 	} __pr_u;
 };
 
-/*
- * NECP specific mbuf tag.
- */
+  
+                          
+   
 struct necp_mtag_ {
 	u_int32_t       necp_policy_id;
 	u_int32_t       necp_skip_policy_id;
@@ -343,9 +343,9 @@ struct necp_mtag_ {
 
 union builtin_mtag {
 	struct {
-		struct proto_mtag_ _proto_mtag; /* built-in protocol-specific tag */
-		struct pf_mtag  _pf_mtag;       /* built-in PF tag */
-		struct necp_mtag_ _necp_mtag; /* built-in NECP tag */
+		struct proto_mtag_ _proto_mtag;                                     
+		struct pf_mtag  _pf_mtag;                            
+		struct necp_mtag_ _necp_mtag;                        
 	} _net_mtag;
 	struct driver_mtag_ _drv_mtag;
 #define necp_mtag builtin_mtag._net_mtag._necp_mtag
@@ -353,109 +353,109 @@ union builtin_mtag {
 #define driver_mtag builtin_mtag._drv_mtag
 };
 
-/*
- * Record/packet header in first mbuf of chain; valid only if M_PKTHDR set.
- */
+  
+                                                                           
+   
 struct pkthdr {
-	struct ifnet *rcvif;            /* rcv interface */
-	/* variables for ip and tcp reassembly */
-	void    *pkt_hdr;               /* pointer to packet header */
-	int32_t len;                    /* total packet length */
-	/* variables for hardware checksum */
-	/* Note: csum_flags is used for hardware checksum and VLAN */
-	u_int32_t csum_flags;           /* flags regarding checksum */
+	struct ifnet *rcvif;                               
+	                                         
+	void    *pkt_hdr;                                             
+	int32_t len;                                             
+	                                     
+	                                                             
+	u_int32_t csum_flags;                                         
 	union {
 		struct {
-			u_int16_t val;   /* checksum value */
-			u_int16_t start; /* checksum start offset */
+			u_int16_t val;                       
+			u_int16_t start;                            
 		} _csum_rx;
 #define csum_rx_val     _csum_rx.val
 #define csum_rx_start   _csum_rx.start
 		struct {
-			u_int16_t start; /* checksum start offset */
-			u_int16_t stuff; /* checksum stuff offset */
+			u_int16_t start;                            
+			u_int16_t stuff;                            
 		} _csum_tx;
 #define csum_tx_start   _csum_tx.start
 #define csum_tx_stuff   _csum_tx.stuff
-		/*
-		 * Generic data field used by csum routines.
-		 * It gets used differently in different contexts.
-		 */
+		  
+                                              
+                                                    
+     
 		u_int32_t csum_data;
 	};
-	u_int16_t vlan_tag;             /* VLAN tag, host byte order */
-	/*
-	 * Packet classifier info
-	 *
-	 * PKTF_FLOW_ID set means valid flow ID.  A non-zero flow ID value
-	 * means the packet has been classified by one of the flow sources.
-	 * It is also a prerequisite for flow control advisory, which is
-	 * enabled by additionally setting PKTF_FLOW_ADV.
-	 *
-	 * The protocol value is a best-effort representation of the payload.
-	 * It is opportunistically updated and used only for optimization.
-	 * It is not a substitute for parsing the protocol header(s); use it
-	 * only as a hint.
-	 *
-	 * If PKTF_IFAINFO is set, pkt_ifainfo contains one or both of the
-	 * indices of interfaces which own the source and/or destination
-	 * addresses of the packet.  For the local/loopback case (PKTF_LOOP),
-	 * both should be valid, and thus allows for the receiving end to
-	 * quickly determine the actual interfaces used by the the addresses;
-	 * they may not necessarily be the same or refer to the loopback
-	 * interface.  Otherwise, in the non-local/loopback case, the indices
-	 * are opportunistically set, and because of that only one may be set
-	 * (0 means the index has not been determined.)  In addition, the
-	 * interface address flags are also recorded.  This allows us to avoid
-	 * storing the corresponding {in,in6}_ifaddr in an mbuf tag.  Ideally
-	 * this would be a superset of {ia,ia6}_flags, but the namespaces are
-	 * overlapping at present, so we'll need a new set of values in future
-	 * to achieve this.  For now, we will just rely on the address family
-	 * related code paths examining this mbuf to interpret the flags.
-	 */
-	u_int8_t pkt_proto;             /* IPPROTO value */
-	u_int8_t pkt_flowsrc;           /* FLOWSRC values */
-	u_int32_t pkt_flowid;           /* flow ID */
-	u_int32_t pkt_flags;            /* PKTF flags (see below) */
-	u_int32_t pkt_svc;              /* MBUF_SVC value */
+	u_int16_t vlan_tag;                                            
+	  
+                          
+   
+                                                                   
+                                                                    
+                                                                 
+                                                  
+   
+                                                                      
+                                                                   
+                                                                     
+                   
+   
+                                                                   
+                                                                 
+                                                                      
+                                                                  
+                                                                      
+                                                                 
+                                                                      
+                                                                      
+                                                                  
+                                                                       
+                                                                      
+                                                                      
+                                                                       
+                                                                      
+                                                                  
+    
+	u_int8_t pkt_proto;                                
+	u_int8_t pkt_flowsrc;                               
+	u_int32_t pkt_flowid;                        
+	u_int32_t pkt_flags;                                        
+	u_int32_t pkt_svc;                                  
 
-	u_int32_t pkt_compl_context;            /* Packet completion context */
+	u_int32_t pkt_compl_context;                                           
 
 	union {
 		struct {
-			u_int16_t src;          /* ifindex of src addr i/f */
-			u_int16_t src_flags;    /* src PKT_IFAIFF flags */
-			u_int16_t dst;          /* ifindex of dst addr i/f */
-			u_int16_t dst_flags;    /* dst PKT_IFAIFF flags */
+			u_int16_t src;                                       
+			u_int16_t src_flags;                              
+			u_int16_t dst;                                       
+			u_int16_t dst_flags;                              
 		} _pkt_iaif;
 #define src_ifindex     _pkt_iaif.src
 #define src_iff         _pkt_iaif.src_flags
 #define dst_ifindex     _pkt_iaif.dst
 #define dst_iff         _pkt_iaif.dst_flags
-		u_int64_t pkt_ifainfo;  /* data field used by ifainfo */
+		u_int64_t pkt_ifainfo;                                  
 		struct {
-			u_int32_t if_data; /* bytes in interface queue */
-			u_int32_t sndbuf_data; /* bytes in socket buffer */
-		} _pkt_bsr;     /* Buffer status report used by cellular interface */
+			u_int32_t if_data;                               
+			u_int32_t sndbuf_data;                             
+		} _pkt_bsr;                                                          
 #define bufstatus_if    _pkt_bsr.if_data
 #define bufstatus_sndbuf        _pkt_bsr.sndbuf_data
 	};
-	u_int64_t pkt_timestamp;        /* TX: enqueue time, RX: receive timestamp */
+	u_int64_t pkt_timestamp;                                                     
 
-	/*
-	 * Tags (external and built-in)
-	 */
-	SLIST_HEAD(packet_tags, m_tag) tags; /* list of external tags */
+	  
+                                
+    
+	SLIST_HEAD(packet_tags, m_tag) tags;                            
 	union builtin_mtag builtin_mtag;
 
 	uint32_t comp_gencnt;
 	uint32_t padding;
-	/*
-	 * Module private scratch space (32-bit aligned), currently 16-bytes
-	 * large. Anything stored here is not guaranteed to survive across
-	 * modules.  The AQM layer (outbound) uses all 16-bytes for both
-	 * packet scheduling and flow advisory information.
-	 */
+	  
+                                                                     
+                                                                   
+                                                                 
+                                                    
+    
 	struct {
 		union {
 			u_int8_t        __mpriv8[16];
@@ -475,102 +475,102 @@ struct pkthdr {
 #define pkt_mpriv_srcid pkt_mpriv.__mpriv_u.__mpriv32[2].__mpriv32_u.__val32
 #define pkt_mpriv_fidx  pkt_mpriv.__mpriv_u.__mpriv32[3].__mpriv32_u.__val32
 
-	u_int32_t redzone;              /* red zone */
-	u_int32_t pkt_compl_callbacks;  /* Packet completion callbacks */
+	u_int32_t redzone;                            
+	u_int32_t pkt_compl_callbacks;                                   
 };
 
-/*
- * Flow data source type.  A data source module is responsible for generating
- * a unique flow ID and associating it to each data flow as pkt_flowid.
- * This is required for flow control/advisory, as it allows the output queue
- * to identify the data source object and inform that it can resume its
- * transmission (in the event it was flow controlled.)
- */
-#define FLOWSRC_INPCB           1       /* flow ID generated by INPCB */
-#define FLOWSRC_IFNET           2       /* flow ID generated by interface */
-#define FLOWSRC_PF              3       /* flow ID generated by PF */
-#define FLOWSRC_CHANNEL         4       /* flow ID generated by channel */
+  
+                                                                             
+                                                                       
+                                                                            
+                                                                       
+                                                      
+   
+#define FLOWSRC_INPCB           1                                       
+#define FLOWSRC_IFNET           2                                           
+#define FLOWSRC_PF              3                                    
+#define FLOWSRC_CHANNEL         4                                         
 
-/*
- * FLOWSRC_MPKL_INPUT is not a true flow data source and is used for
- * multi-layer packet logging. We're usurping the pkt_flowsrc field because
- * the mbuf packet header ran out of space and pkt_flowsrc is normally
- * used on output so we assume we can safely overwrite the normal semantic of
- * the field.
- * This value is meant to be used on incoming packet from a lower level protocol
- * to pass information to some upper level protocol. When FLOWSRC_MPKL_INPUT
- * is set, the following fields are used:
- * - pkt_proto: the IP protocol ID of the lower level protocol
- * - pkt_flowid: the identifier of the packet at the lower protocol.
- * For example ESP would set pkt_proto to IPPROTO_ESP and pkt_flowid to the SPI.
- */
+  
+                                                                    
+                                                                           
+                                                                      
+                                                                             
+             
+                                                                                
+                                                                            
+                                         
+                                                              
+                                                                    
+                                                                                
+   
 
-/*
- * Packet flags.  Unlike m_flags, all packet flags are copied along when
- * copying m_pkthdr, i.e. no equivalent of M_COPYFLAGS here.  These flags
- * (and other classifier info) will be cleared during DLIL input.
- *
- * Some notes about M_LOOP and PKTF_LOOP:
- *
- *    - M_LOOP flag is overloaded, and its use is discouraged.  Historically,
- *	that flag was used by the KAME implementation for allowing certain
- *	certain exceptions to be made in the IP6_EXTHDR_CHECK() logic; this
- *	was originally meant to be set as the packet is looped back to the
- *	system, and in some circumstances temporarily set in ip6_output().
- *	Over time, this flag was used by the pre-output routines to indicate
- *	to the DLIL frameout and output routines, that the packet may be
- *	looped back to the system under the right conditions.  In addition,
- *	this is an mbuf flag rather than an mbuf packet header flag.
- *
- *    - PKTF_LOOP is an mbuf packet header flag, which is set if and only
- *	if the packet was looped back to the system.  This flag should be
- *	used instead for newer code.
- */
-#define PKTF_FLOW_ID            0x1     /* pkt has valid flowid value */
-#define PKTF_FLOW_ADV           0x2     /* pkt triggers local flow advisory */
-#define PKTF_FLOW_LOCALSRC      0x4     /* pkt is locally originated  */
-#define PKTF_FLOW_RAWSOCK       0x8     /* pkt locally generated by raw sock */
-#define PKTF_PRIO_PRIVILEGED    0x10    /* packet priority is privileged */
-#define PKTF_PROXY_DST          0x20    /* processed but not locally destined */
-#define PKTF_INET_RESOLVE       0x40    /* IPv4 resolver packet */
-#define PKTF_INET6_RESOLVE      0x80    /* IPv6 resolver packet */
-#define PKTF_RESOLVE_RTR        0x100   /* pkt is for resolving router */
-#define PKTF_SKIP_PKTAP         0x200   /* pkt has already passed through pktap */
-#define PKTF_MPTCP              0x800   /* TCP with MPTCP metadata */
-#define PKTF_MPSO               0x1000  /* MPTCP socket meta data */
-#define PKTF_LOOP               0x2000  /* loopbacked packet */
-#define PKTF_IFAINFO            0x4000  /* pkt has valid interface addr info */
-#define PKTF_SO_BACKGROUND      0x8000  /* data is from background source */
-#define PKTF_FORWARDED          0x10000 /* pkt was forwarded from another i/f */
-#define PKTF_PRIV_GUARDED       0x20000 /* pkt_mpriv area guard enabled */
-#define PKTF_KEEPALIVE          0x40000 /* pkt is kernel-generated keepalive */
-#define PKTF_SO_REALTIME        0x80000 /* data is realtime traffic */
-#define PKTF_VALID_UNSENT_DATA  0x100000 /* unsent data is valid */
-#define PKTF_TCP_REXMT          0x200000 /* packet is TCP retransmission */
-#define PKTF_REASSEMBLED        0x400000 /* Packet was reassembled */
-#define PKTF_TX_COMPL_TS_REQ    0x800000 /* tx completion timestamp requested */
-#define PKTF_TS_VALID           0x1000000 /* pkt timestamp is valid */
-#define PKTF_DRIVER_MTAG        0x2000000 /* driver mbuf tags fields inited */
-#define PKTF_NEW_FLOW           0x4000000 /* Data from a new flow */
-#define PKTF_START_SEQ          0x8000000 /* valid start sequence */
-#define PKTF_LAST_PKT           0x10000000 /* last packet in the flow */
-#define PKTF_MPTCP_REINJ        0x20000000 /* Packet has been reinjected for MPTCP */
-#define PKTF_MPTCP_DFIN         0x40000000 /* Packet is a data-fin */
-#define PKTF_HBH_CHKED          0x80000000 /* HBH option is checked */
+  
+                                                                        
+                                                                         
+                                                                 
+  
+                                         
+  
+                                                                             
+                                                                     
+                                                                      
+                                                                     
+                                                                     
+                                                                       
+                                                                   
+                                                                      
+                                                               
+  
+                                                                         
+                                                                    
+                               
+   
+#define PKTF_FLOW_ID            0x1                                     
+#define PKTF_FLOW_ADV           0x2                                           
+#define PKTF_FLOW_LOCALSRC      0x4                                     
+#define PKTF_FLOW_RAWSOCK       0x8                                            
+#define PKTF_PRIO_PRIVILEGED    0x10                                       
+#define PKTF_PROXY_DST          0x20                                            
+#define PKTF_INET_RESOLVE       0x40                              
+#define PKTF_INET6_RESOLVE      0x80                              
+#define PKTF_RESOLVE_RTR        0x100                                    
+#define PKTF_SKIP_PKTAP         0x200                                             
+#define PKTF_MPTCP              0x800                                
+#define PKTF_MPSO               0x1000                              
+#define PKTF_LOOP               0x2000                         
+#define PKTF_IFAINFO            0x4000                                         
+#define PKTF_SO_BACKGROUND      0x8000                                      
+#define PKTF_FORWARDED          0x10000                                         
+#define PKTF_PRIV_GUARDED       0x20000                                   
+#define PKTF_KEEPALIVE          0x40000                                        
+#define PKTF_SO_REALTIME        0x80000                               
+#define PKTF_VALID_UNSENT_DATA  0x100000                           
+#define PKTF_TCP_REXMT          0x200000                                   
+#define PKTF_REASSEMBLED        0x400000                             
+#define PKTF_TX_COMPL_TS_REQ    0x800000                                        
+#define PKTF_TS_VALID           0x1000000                             
+#define PKTF_DRIVER_MTAG        0x2000000                                     
+#define PKTF_NEW_FLOW           0x4000000                           
+#define PKTF_START_SEQ          0x8000000                           
+#define PKTF_LAST_PKT           0x10000000                              
+#define PKTF_MPTCP_REINJ        0x20000000                                           
+#define PKTF_MPTCP_DFIN         0x40000000                           
+#define PKTF_HBH_CHKED          0x80000000                            
 
-/* flags related to flow control/advisory and identification */
+                                                               
 #define PKTF_FLOW_MASK  \
 	(PKTF_FLOW_ID | PKTF_FLOW_ADV | PKTF_FLOW_LOCALSRC | PKTF_FLOW_RAWSOCK)
 
-/*
- * Description of external storage mapped into mbuf, valid only if M_EXT set.
- */
+  
+                                                                             
+   
 typedef void (*m_ext_free_func_t)(caddr_t, u_int, caddr_t);
 struct m_ext {
-	caddr_t ext_buf;                /* start of buffer */
-	m_ext_free_func_t ext_free;     /* free routine if not the usual */
-	u_int   ext_size;               /* size of buffer, for ext_free */
-	caddr_t ext_arg;                /* additional ext_free argument */
+	caddr_t ext_buf;                                     
+	m_ext_free_func_t ext_free;                                        
+	u_int   ext_size;                                                 
+	caddr_t ext_arg;                                                  
 	struct ext_ref {
 		struct mbuf *paired;
 		u_int16_t minref;
@@ -582,23 +582,23 @@ struct m_ext {
 	} *ext_refflags;
 };
 
-/* define m_ext to a type since it gets redefined below */
+                                                          
 typedef struct m_ext _m_ext_t;
 
-/*
- * The mbuf object
- */
+  
+                  
+   
 struct mbuf {
 	struct m_hdr m_hdr;
 	union {
 		struct {
-			struct pkthdr MH_pkthdr;        /* M_PKTHDR set */
+			struct pkthdr MH_pkthdr;                          
 			union {
-				struct m_ext MH_ext;    /* M_EXT set */
+				struct m_ext MH_ext;                   
 				char    MH_databuf[_MHLEN];
 			} MH_dat;
 		} MH;
-		char    M_databuf[_MLEN];               /* !M_PKTHDR, !M_EXT */
+		char    M_databuf[_MLEN];                                      
 	} M_dat;
 };
 
@@ -617,59 +617,59 @@ struct mbuf {
 #define m_pftag(_m)     (&(_m)->m_pkthdr.builtin_mtag._net_mtag._pf_mtag)
 #define m_necptag(_m)   (&(_m)->m_pkthdr.builtin_mtag._net_mtag._necp_mtag)
 
-/* mbuf flags (private) */
-#define M_EXT           0x0001  /* has associated external storage */
-#define M_PKTHDR        0x0002  /* start of record */
-#define M_EOR           0x0004  /* end of record */
-#define M_PROTO1        0x0008  /* protocol-specific */
-#define M_PROTO2        0x0010  /* protocol-specific */
-#define M_PROTO3        0x0020  /* protocol-specific */
-#define M_LOOP          0x0040  /* packet is looped back (also see PKTF_LOOP) */
-#define M_PROTO5        0x0080  /* protocol-specific */
+                          
+#define M_EXT           0x0001                                       
+#define M_PKTHDR        0x0002                       
+#define M_EOR           0x0004                     
+#define M_PROTO1        0x0008                         
+#define M_PROTO2        0x0010                         
+#define M_PROTO3        0x0020                         
+#define M_LOOP          0x0040                                                  
+#define M_PROTO5        0x0080                         
 
-/* mbuf pkthdr flags, also in m_flags (private) */
-#define M_BCAST         0x0100  /* send/received as link-level broadcast */
-#define M_MCAST         0x0200  /* send/received as link-level multicast */
-#define M_FRAG          0x0400  /* packet is a fragment of a larger packet */
-#define M_FIRSTFRAG     0x0800  /* packet is first fragment */
-#define M_LASTFRAG      0x1000  /* packet is last fragment */
-#define M_PROMISC       0x2000  /* packet is promiscuous (shouldn't go to stack) */
-#define M_HASFCS        0x4000  /* packet has FCS */
-#define M_TAGHDR        0x8000  /* m_tag hdr structure at top of mbuf data */
+                                                  
+#define M_BCAST         0x0100                                             
+#define M_MCAST         0x0200                                             
+#define M_FRAG          0x0400                                               
+#define M_FIRSTFRAG     0x0800                                
+#define M_LASTFRAG      0x1000                               
+#define M_PROMISC       0x2000                                                     
+#define M_HASFCS        0x4000                      
+#define M_TAGHDR        0x8000                                               
 
-/*
- * Flags to purge when crossing layers.
- */
+  
+                                       
+   
 #define M_PROTOFLAGS \
 	(M_PROTO1|M_PROTO2|M_PROTO3|M_PROTO5)
 
-/* flags copied when copying m_pkthdr */
+                                        
 #define M_COPYFLAGS                                                     \
 	(M_PKTHDR|M_EOR|M_PROTO1|M_PROTO2|M_PROTO3 |                    \
 	M_LOOP|M_PROTO5|M_BCAST|M_MCAST|M_FRAG |                        \
 	M_FIRSTFRAG|M_LASTFRAG|M_PROMISC|M_HASFCS)
 
-/* flags indicating hw checksum support and sw checksum requirements */
-#define CSUM_IP                 0x0001          /* will csum IP */
-#define CSUM_TCP                0x0002          /* will csum TCP */
-#define CSUM_UDP                0x0004          /* will csum UDP */
-#define CSUM_IP_FRAGS           0x0008          /* will csum IP fragments */
-#define CSUM_FRAGMENT           0x0010          /* will do IP fragmentation */
-#define CSUM_TCPIPV6            0x0020          /* will csum TCP for IPv6 */
-#define CSUM_UDPIPV6            0x0040          /* will csum UDP for IPv6 */
-#define CSUM_FRAGMENT_IPV6      0x0080          /* will do IPv6 fragmentation */
+                                                                       
+#define CSUM_IP                 0x0001                            
+#define CSUM_TCP                0x0002                             
+#define CSUM_UDP                0x0004                             
+#define CSUM_IP_FRAGS           0x0008                                      
+#define CSUM_FRAGMENT           0x0010                                        
+#define CSUM_TCPIPV6            0x0020                                      
+#define CSUM_UDPIPV6            0x0040                                      
+#define CSUM_FRAGMENT_IPV6      0x0080                                          
 
-#define CSUM_IP_CHECKED         0x0100          /* did csum IP */
-#define CSUM_IP_VALID           0x0200          /*   ... the csum is valid */
-#define CSUM_DATA_VALID         0x0400          /* csum_data field is valid */
-#define CSUM_PSEUDO_HDR         0x0800          /* csum_data has pseudo hdr */
-#define CSUM_PARTIAL            0x1000          /* simple Sum16 computation */
-#define CSUM_ZERO_INVERT        0x2000          /* invert 0 to -0 (0xffff) */
+#define CSUM_IP_CHECKED         0x0100                           
+#define CSUM_IP_VALID           0x0200                                       
+#define CSUM_DATA_VALID         0x0400                                        
+#define CSUM_PSEUDO_HDR         0x0800                                        
+#define CSUM_PARTIAL            0x1000                                        
+#define CSUM_ZERO_INVERT        0x2000                                       
 
 #define CSUM_DELAY_DATA         (CSUM_TCP | CSUM_UDP)
-#define CSUM_DELAY_IP           (CSUM_IP)       /* IPv4 only: no IPv6 IP cksum */
+#define CSUM_DELAY_IP           (CSUM_IP)                                        
 #define CSUM_DELAY_IPV6_DATA    (CSUM_TCPIPV6 | CSUM_UDPIPV6)
-#define CSUM_DATA_IPV6_VALID    CSUM_DATA_VALID /* csum_data field is valid */
+#define CSUM_DATA_IPV6_VALID    CSUM_DATA_VALID                               
 
 #define CSUM_TX_FLAGS                                                   \
 	(CSUM_DELAY_IP | CSUM_DELAY_DATA | CSUM_DELAY_IPV6_DATA |       \
@@ -684,22 +684,22 @@ struct mbuf {
 
 
 
-/*
- * Note: see also IF_HWASSIST_CSUM defined in <net/if_var.h>
- */
+  
+                                                            
+   
 
-/* VLAN tag present */
-#define CSUM_VLAN_TAG_VALID     0x00010000      /* vlan_tag field is valid */
+                      
+#define CSUM_VLAN_TAG_VALID     0x00010000                                   
 
-/* checksum start adjustment has been done */
+                                             
 #define CSUM_ADJUST_DONE        0x00020000
 
-/* VLAN encapsulation present */
-#define CSUM_VLAN_ENCAP_PRESENT    0x00040000      /* mbuf has vlan encapsulation */
+                                
+#define CSUM_VLAN_ENCAP_PRESENT    0x00040000                                       
 
-/* TCP Segment Offloading requested on this mbuf */
-#define CSUM_TSO_IPV4           0x00100000      /* This mbuf needs to be segmented by the NIC */
-#define CSUM_TSO_IPV6           0x00200000      /* This mbuf needs to be segmented by the NIC */
+                                                   
+#define CSUM_TSO_IPV4           0x00100000                                                      
+#define CSUM_TSO_IPV6           0x00200000                                                      
 
 #define TSO_IPV4_OK(_ifp, _m)                                           \
     (((_ifp)->if_hwassist & IFNET_TSO_IPV4) &&                          \
@@ -717,38 +717,38 @@ struct mbuf {
     (!((_ifp)->if_hwassist & IFNET_TSO_IPV6) &&                         \
     ((_m)->m_pkthdr.csum_flags & CSUM_TSO_IPV6))                        \
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/* mbuf types */
-#define MT_FREE         0       /* should be on free list */
-#define MT_DATA         1       /* dynamic (data) allocation */
-#define MT_HEADER       2       /* packet header */
-#define MT_SOCKET       3       /* socket structure */
-#define MT_PCB          4       /* protocol control block */
-#define MT_RTABLE       5       /* routing tables */
-#define MT_HTABLE       6       /* IMP host tables */
-#define MT_ATABLE       7       /* address resolution tables */
-#define MT_SONAME       8       /* socket name */
-#define MT_SOOPTS       10      /* socket options */
-#define MT_FTABLE       11      /* fragment reassembly header */
-#define MT_RIGHTS       12      /* access rights */
-#define MT_IFADDR       13      /* interface address */
-#define MT_CONTROL      14      /* extra-data protocol message */
-#define MT_OOBDATA      15      /* expedited data  */
-#define MT_TAG          16      /* volatile metadata associated to pkts */
-#define MT_MAX          32      /* enough? */
+                
+#define MT_FREE         0                                   
+#define MT_DATA         1                                      
+#define MT_HEADER       2                          
+#define MT_SOCKET       3                             
+#define MT_PCB          4                                   
+#define MT_RTABLE       5                           
+#define MT_HTABLE       6                            
+#define MT_ATABLE       7                                      
+#define MT_SONAME       8                        
+#define MT_SOOPTS       10                          
+#define MT_FTABLE       11                                      
+#define MT_RIGHTS       12                         
+#define MT_IFADDR       13                             
+#define MT_CONTROL      14                                       
+#define MT_OOBDATA      15                           
+#define MT_TAG          16                                                
+#define MT_MAX          32                   
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * mbuf allocation/deallocation macros:
- *
- *	MGET(struct mbuf *m, int how, int type)
- * allocates an mbuf and initializes it to contain internal data.
- *
- *	MGETHDR(struct mbuf *m, int how, int type)
- * allocates an mbuf and initializes it to contain a packet header
- * and internal data.
- */
+  
+                                       
+  
+                                          
+                                                                 
+  
+                                             
+                                                                  
+                     
+   
 
 #if 1
 #define MCHECK(m) m_mcheck(m)
@@ -760,18 +760,18 @@ struct mbuf {
 
 #define MGETHDR(m, how, type)   ((m) = m_gethdr((how), (type)))
 
-/*
- * Mbuf cluster macros.
- * MCLALLOC(caddr_t p, int how) allocates an mbuf cluster.
- * MCLGET adds such clusters to a normal mbuf;
- * the flag M_EXT is set upon success.
- * MCLFREE releases a reference to a cluster allocated by MCLALLOC,
- * freeing the cluster if the reference count has reached 0.
- *
- * Normal mbuf clusters are normally treated as character arrays
- * after allocation, but use the first word of the buffer as a free list
- * pointer while on the free list.
- */
+  
+                       
+                                                          
+                                              
+                                      
+                                                                   
+                                                            
+  
+                                                                
+                                                                        
+                                  
+   
 union mcluster {
 	union   mcluster *mcl_next;
 	char    mcl_buf[MCLBYTES];
@@ -783,17 +783,17 @@ union mcluster {
 
 #define MCLGET(m, how)          ((m) = m_mclget(m, how))
 
-/*
- * Mbuf big cluster
- */
+  
+                   
+   
 union mbigcluster {
 	union mbigcluster       *mbc_next;
 	char                    mbc_buf[MBIGCLBYTES];
 };
 
-/*
- * Mbuf jumbo cluster
- */
+  
+                     
+   
 union m16kcluster {
 	union m16kcluster       *m16kcl_next;
 	char                    m16kcl_buf[M16KCLBYTES];
@@ -801,19 +801,19 @@ union m16kcluster {
 
 #define MCLHASREFERENCE(m)      m_mclhasreference(m)
 
-/*
- * MFREE(struct mbuf *m, struct mbuf *n)
- * Free a single mbuf and associated external storage.
- * Place the successor, if any, in n.
- */
+  
+                                        
+                                                      
+                                     
+   
 
 #define MFREE(m, n) ((n) = m_free(m))
 
-/*
- * Copy mbuf pkthdr from from to to.
- * from must have M_PKTHDR set, and to must be empty.
- * aux pointer will be moved to `to'.
- */
+  
+                                    
+                                                     
+                                     
+   
 #define M_COPY_PKTHDR(to, from)         m_copy_pkthdr(to, from)
 
 #define M_COPY_PFTAG(to, from)          m_copy_pftag(to, from)
@@ -822,34 +822,34 @@ union m16kcluster {
 
 #define M_COPY_CLASSIFIER(to, from)     m_copy_classifier(to, from)
 
-/*
- * Evaluate TRUE if it's safe to write to the mbuf m's data region (this can
- * be both the local data payload, or an external buffer area, depending on
- * whether M_EXT is set).
- */
+  
+                                                                            
+                                                                           
+                         
+   
 #define M_WRITABLE(m)   (((m)->m_flags & M_EXT) == 0 || !MCLHASREFERENCE(m))
 
-/*
- * These macros are mapped to the appropriate KPIs, so that private code
- * can be simply recompiled in order to be forward-compatible with future
- * changes toward the struture sizes.
- */
-#define MLEN            mbuf_get_mlen()         /* normal mbuf data len */
-#define MHLEN           mbuf_get_mhlen()        /* data len in an mbuf w/pkthdr */
-#define MINCLSIZE       mbuf_get_minclsize()    /* cluster usage threshold */
-/*
- * Return the address of the start of the buffer associated with an mbuf,
- * handling external storage, packet-header mbufs, and regular data mbufs.
- */
+  
+                                                                        
+                                                                         
+                                     
+   
+#define MLEN            mbuf_get_mlen()                                   
+#define MHLEN           mbuf_get_mhlen()                                          
+#define MINCLSIZE       mbuf_get_minclsize()                                 
+  
+                                                                         
+                                                                          
+   
 #define M_START(m)                                                      \
 	(((m)->m_flags & M_EXT) ? (m)->m_ext.ext_buf :                  \
 	 ((m)->m_flags & M_PKTHDR) ? &(m)->m_pktdat[0] :                \
 	 &(m)->m_dat[0])
 
-/*
- * Return the size of the buffer associated with an mbuf, handling external
- * storage, packet-header mbufs, and regular data mbufs.
- */
+  
+                                                                           
+                                                        
+   
 #define M_SIZE(m)                                                       \
 	(((m)->m_flags & M_EXT) ? (m)->m_ext.ext_size :                 \
 	 ((m)->m_flags & M_PKTHDR) ? MHLEN :                            \
@@ -859,55 +859,55 @@ union m16kcluster {
 #define MH_ALIGN(m, len)        m_align(m, len)
 #define MEXT_ALIGN(m, len)      m_align(m, len)
 
-/*
- * Compute the amount of space available before the current start of data in
- * an mbuf.
- *
- * The M_WRITABLE() is a temporary, conservative safety measure: the burden
- * of checking writability of the mbuf data area rests solely with the caller.
- */
+  
+                                                                            
+           
+  
+                                                                           
+                                                                              
+   
 #define M_LEADINGSPACE(m)                                               \
 	(M_WRITABLE(m) ? ((m)->m_data - M_START(m)) : 0)
 
-/*
- * Compute the amount of space available after the end of data in an mbuf.
- *
- * The M_WRITABLE() is a temporary, conservative safety measure: the burden
- * of checking writability of the mbuf data area rests solely with the caller.
- */
+  
+                                                                          
+  
+                                                                           
+                                                                              
+   
 #define M_TRAILINGSPACE(m)                                              \
 	(M_WRITABLE(m) ?                                                \
 	    ((M_START(m) + M_SIZE(m)) - ((m)->m_data + (m)->m_len)) : 0)
 
-/*
- * Arrange to prepend space of size plen to mbuf m.
- * If a new mbuf must be allocated, how specifies whether to wait.
- * If how is M_DONTWAIT and allocation fails, the original mbuf chain
- * is freed and m is set to NULL.
- */
+  
+                                                   
+                                                                  
+                                                                     
+                                 
+   
 #define M_PREPEND(m, plen, how, align)  \
     ((m) = m_prepend_2((m), (plen), (how), (align)))
 
-/* change mbuf to new type */
+                             
 #define MCHTYPE(m, t)           m_mchtype(m, t)
 
-/* compatiblity with 4.3 */
+                           
 #define m_copy(m, o, l)         m_copym((m), (o), (l), M_DONTWAIT)
 
-#define MBSHIFT         20                              /* 1MB */
+#define MBSHIFT         20                                       
 #define MBSIZE          (1 << MBSHIFT)
-#define GBSHIFT         30                              /* 1GB */
+#define GBSHIFT         30                                       
 #define GBSIZE          (1 << GBSHIFT)
 
-/*
- * M_STRUCT_GET ensures that intermediate protocol header (from "off" to
- * "off+len") is located in single mbuf, on contiguous memory region.
- * The pointer to the region will be returned to pointer variable "val",
- * with type "typ".
- *
- * M_STRUCT_GET0 does the same, except that it aligns the structure at
- * very top of mbuf.  GET0 is likely to make memory copy than GET.
- */
+  
+                                                                        
+                                                                     
+                                                                        
+                   
+  
+                                                                      
+                                                                  
+   
 #define M_STRUCT_GET(val, typ, m, off, len)                             \
 do {                                                                    \
 	struct mbuf *t;                                                 \
@@ -963,18 +963,18 @@ do {                                                                    \
 	}                                                               \
 } while (0)
 
-/*
- * Simple mbuf queueing system
- *
- * This is basically a SIMPLEQ adapted to mbuf use (i.e. using
- * m_nextpkt instead of field.sqe_next).
- *
- * m_next is ignored, so queueing chains of mbufs is possible
- */
+  
+                              
+  
+                                                              
+                                        
+  
+                                                             
+   
 #define MBUFQ_HEAD(name)                                        \
 struct name {                                                   \
-	struct mbuf *mq_first;  /* first packet */              \
-	struct mbuf **mq_last;  /* addr of last next packet */  \
+	struct mbuf *mq_first;                                  \
+	struct mbuf **mq_last;                                  \
 }
 
 #define MBUFQ_INIT(q)           do {                            \
@@ -1045,12 +1045,12 @@ struct name {                                                   \
 #define MBUFQ_EMPTY(q)          ((q)->mq_first == NULL)
 #define MBUFQ_FIRST(q)          ((q)->mq_first)
 #define MBUFQ_NEXT(m)           ((m)->m_nextpkt)
-/*
- * mq_last is initialized to point to mq_first, so check if they're
- * equal and return NULL when the list is empty.  Otherwise, we need
- * to subtract the offset of MBUQ_NEXT (i.e. m_nextpkt field) to get
- * to the base mbuf address to return to caller.
- */
+  
+                                                                   
+                                                                    
+                                                                    
+                                                
+   
 #define MBUFQ_LAST(head)                                        \
 	(((head)->mq_last == &MBUFQ_FIRST(head)) ? NULL :       \
 	((struct mbuf *)(void *)((char *)(head)->mq_last -      \
@@ -1058,137 +1058,137 @@ struct name {                                                   \
 
 #define max_linkhdr     (int)P2ROUNDUP(_max_linkhdr, sizeof (uint32_t))
 #define max_protohdr    (int)P2ROUNDUP(_max_protohdr, sizeof (uint32_t))
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Mbuf statistics (legacy).
- */
+  
+                            
+   
 struct mbstat {
-	u_int32_t       m_mbufs;        /* mbufs obtained from page pool */
-	u_int32_t       m_clusters;     /* clusters obtained from page pool */
-	u_int32_t       m_spare;        /* spare field */
-	u_int32_t       m_clfree;       /* free clusters */
-	u_int32_t       m_drops;        /* times failed to find space */
-	u_int32_t       m_wait;         /* times waited for space */
-	u_int32_t       m_drain;        /* times drained protocols for space */
-	u_short         m_mtypes[256];  /* type specific mbuf allocations */
-	u_int32_t       m_mcfail;       /* times m_copym failed */
-	u_int32_t       m_mpfail;       /* times m_pullup failed */
-	u_int32_t       m_msize;        /* length of an mbuf */
-	u_int32_t       m_mclbytes;     /* length of an mbuf cluster */
-	u_int32_t       m_minclsize;    /* min length of data to allocate a cluster */
-	u_int32_t       m_mlen;         /* length of data in an mbuf */
-	u_int32_t       m_mhlen;        /* length of data in a header mbuf */
-	u_int32_t       m_bigclusters;  /* clusters obtained from page pool */
-	u_int32_t       m_bigclfree;    /* free clusters */
-	u_int32_t       m_bigmclbytes;  /* length of an mbuf cluster */
-	u_int32_t       m_forcedefunct; /* times we force defunct'ed an app's sockets */
+	u_int32_t       m_mbufs;                                           
+	u_int32_t       m_clusters;                                           
+	u_int32_t       m_spare;                         
+	u_int32_t       m_clfree;                          
+	u_int32_t       m_drops;                                        
+	u_int32_t       m_wait;                                     
+	u_int32_t       m_drain;                                               
+	u_short         m_mtypes[256];                                      
+	u_int32_t       m_mcfail;                                 
+	u_int32_t       m_mpfail;                                  
+	u_int32_t       m_msize;                               
+	u_int32_t       m_mclbytes;                                    
+	u_int32_t       m_minclsize;                                                  
+	u_int32_t       m_mlen;                                        
+	u_int32_t       m_mhlen;                                             
+	u_int32_t       m_bigclusters;                                        
+	u_int32_t       m_bigclfree;                       
+	u_int32_t       m_bigmclbytes;                                 
+	u_int32_t       m_forcedefunct;                                                 
 };
 
-/* Compatibillity with 10.3 */
+                              
 struct ombstat {
-	u_int32_t       m_mbufs;        /* mbufs obtained from page pool */
-	u_int32_t       m_clusters;     /* clusters obtained from page pool */
-	u_int32_t       m_spare;        /* spare field */
-	u_int32_t       m_clfree;       /* free clusters */
-	u_int32_t       m_drops;        /* times failed to find space */
-	u_int32_t       m_wait;         /* times waited for space */
-	u_int32_t       m_drain;        /* times drained protocols for space */
-	u_short         m_mtypes[256];  /* type specific mbuf allocations */
-	u_int32_t       m_mcfail;       /* times m_copym failed */
-	u_int32_t       m_mpfail;       /* times m_pullup failed */
-	u_int32_t       m_msize;        /* length of an mbuf */
-	u_int32_t       m_mclbytes;     /* length of an mbuf cluster */
-	u_int32_t       m_minclsize;    /* min length of data to allocate a cluster */
-	u_int32_t       m_mlen;         /* length of data in an mbuf */
-	u_int32_t       m_mhlen;        /* length of data in a header mbuf */
+	u_int32_t       m_mbufs;                                           
+	u_int32_t       m_clusters;                                           
+	u_int32_t       m_spare;                         
+	u_int32_t       m_clfree;                          
+	u_int32_t       m_drops;                                        
+	u_int32_t       m_wait;                                     
+	u_int32_t       m_drain;                                               
+	u_short         m_mtypes[256];                                      
+	u_int32_t       m_mcfail;                                 
+	u_int32_t       m_mpfail;                                  
+	u_int32_t       m_msize;                               
+	u_int32_t       m_mclbytes;                                    
+	u_int32_t       m_minclsize;                                                  
+	u_int32_t       m_mlen;                                        
+	u_int32_t       m_mhlen;                                             
 };
 
-/*
- * mbuf class statistics.
- */
+  
+                         
+   
 #define MAX_MBUF_CNAME  15
 
 #if defined(XNU_KERNEL_PRIVATE)
-/* For backwards compatibility with 32-bit userland process */
+                                                              
 struct omb_class_stat {
-	char            mbcl_cname[MAX_MBUF_CNAME + 1]; /* class name */
-	u_int32_t       mbcl_size;      /* buffer size */
-	u_int32_t       mbcl_total;     /* # of buffers created */
-	u_int32_t       mbcl_active;    /* # of active buffers */
-	u_int32_t       mbcl_infree;    /* # of available buffers */
-	u_int32_t       mbcl_slab_cnt;  /* # of available slabs */
-	u_int64_t       mbcl_alloc_cnt; /* # of times alloc is called */
-	u_int64_t       mbcl_free_cnt;  /* # of times free is called */
-	u_int64_t       mbcl_notified;  /* # of notified wakeups */
-	u_int64_t       mbcl_purge_cnt; /* # of purges so far */
-	u_int64_t       mbcl_fail_cnt;  /* # of allocation failures */
-	u_int32_t       mbcl_ctotal;    /* total only for this class */
-	u_int32_t       mbcl_release_cnt; /* amount of memory returned */
-	/*
-	 * Cache layer statistics
-	 */
-	u_int32_t       mbcl_mc_state;  /* cache state (see below) */
-	u_int32_t       mbcl_mc_cached; /* # of cached buffers */
-	u_int32_t       mbcl_mc_waiter_cnt;  /* # waiters on the cache */
-	u_int32_t       mbcl_mc_wretry_cnt;  /* # of wait retries */
-	u_int32_t       mbcl_mc_nwretry_cnt; /* # of no-wait retry attempts */
-	u_int64_t       mbcl_reserved[4];    /* for future use */
+	char            mbcl_cname[MAX_MBUF_CNAME + 1];                 
+	u_int32_t       mbcl_size;                       
+	u_int32_t       mbcl_total;                               
+	u_int32_t       mbcl_active;                             
+	u_int32_t       mbcl_infree;                                
+	u_int32_t       mbcl_slab_cnt;                            
+	u_int64_t       mbcl_alloc_cnt;                                 
+	u_int64_t       mbcl_free_cnt;                                 
+	u_int64_t       mbcl_notified;                             
+	u_int64_t       mbcl_purge_cnt;                         
+	u_int64_t       mbcl_fail_cnt;                                
+	u_int32_t       mbcl_ctotal;                                   
+	u_int32_t       mbcl_release_cnt;                                
+	  
+                          
+    
+	u_int32_t       mbcl_mc_state;                               
+	u_int32_t       mbcl_mc_cached;                          
+	u_int32_t       mbcl_mc_waiter_cnt;                              
+	u_int32_t       mbcl_mc_wretry_cnt;                         
+	u_int32_t       mbcl_mc_nwretry_cnt;                                  
+	u_int64_t       mbcl_reserved[4];                        
 } __attribute__((__packed__));
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 typedef struct mb_class_stat {
-	char            mbcl_cname[MAX_MBUF_CNAME + 1]; /* class name */
-	u_int32_t       mbcl_size;      /* buffer size */
-	u_int32_t       mbcl_total;     /* # of buffers created */
-	u_int32_t       mbcl_active;    /* # of active buffers */
-	u_int32_t       mbcl_infree;    /* # of available buffers */
-	u_int32_t       mbcl_slab_cnt;  /* # of available slabs */
+	char            mbcl_cname[MAX_MBUF_CNAME + 1];                 
+	u_int32_t       mbcl_size;                       
+	u_int32_t       mbcl_total;                               
+	u_int32_t       mbcl_active;                             
+	u_int32_t       mbcl_infree;                                
+	u_int32_t       mbcl_slab_cnt;                            
 #if defined(KERNEL) || defined(__LP64__)
-	u_int32_t       mbcl_pad;       /* padding */
-#endif /* KERNEL || __LP64__ */
-	u_int64_t       mbcl_alloc_cnt; /* # of times alloc is called */
-	u_int64_t       mbcl_free_cnt;  /* # of times free is called */
-	u_int64_t       mbcl_notified;  /* # of notified wakeups */
-	u_int64_t       mbcl_purge_cnt; /* # of purges so far */
-	u_int64_t       mbcl_fail_cnt;  /* # of allocation failures */
-	u_int32_t       mbcl_ctotal;    /* total only for this class */
-	u_int32_t       mbcl_release_cnt; /* amount of memory returned */
-	/*
-	 * Cache layer statistics
-	 */
-	u_int32_t       mbcl_mc_state;  /* cache state (see below) */
-	u_int32_t       mbcl_mc_cached; /* # of cached buffers */
-	u_int32_t       mbcl_mc_waiter_cnt;  /* # waiters on the cache */
-	u_int32_t       mbcl_mc_wretry_cnt;  /* # of wait retries */
-	u_int32_t       mbcl_mc_nwretry_cnt; /* # of no-wait retry attempts */
-	u_int32_t       mbcl_peak_reported; /* last usage peak reported */
-	u_int32_t       mbcl_reserved[7];    /* for future use */
+	u_int32_t       mbcl_pad;                    
+#endif                         
+	u_int64_t       mbcl_alloc_cnt;                                 
+	u_int64_t       mbcl_free_cnt;                                 
+	u_int64_t       mbcl_notified;                             
+	u_int64_t       mbcl_purge_cnt;                         
+	u_int64_t       mbcl_fail_cnt;                                
+	u_int32_t       mbcl_ctotal;                                   
+	u_int32_t       mbcl_release_cnt;                                
+	  
+                          
+    
+	u_int32_t       mbcl_mc_state;                               
+	u_int32_t       mbcl_mc_cached;                          
+	u_int32_t       mbcl_mc_waiter_cnt;                              
+	u_int32_t       mbcl_mc_wretry_cnt;                         
+	u_int32_t       mbcl_mc_nwretry_cnt;                                  
+	u_int32_t       mbcl_peak_reported;                               
+	u_int32_t       mbcl_reserved[7];                        
 } mb_class_stat_t;
 
-#define MCS_DISABLED    0       /* cache is permanently disabled */
-#define MCS_ONLINE      1       /* cache is online */
-#define MCS_PURGING     2       /* cache is being purged */
-#define MCS_OFFLINE     3       /* cache is offline (resizing) */
+#define MCS_DISABLED    0                                          
+#define MCS_ONLINE      1                            
+#define MCS_PURGING     2                                  
+#define MCS_OFFLINE     3                                        
 
 #if defined(XNU_KERNEL_PRIVATE)
-/* For backwards compatibility with 32-bit userland process */
+                                                              
 struct omb_stat {
-	u_int32_t               mbs_cnt;        /* number of classes */
-	struct omb_class_stat   mbs_class[1];   /* class array */
+	u_int32_t               mbs_cnt;                               
+	struct omb_class_stat   mbs_class[1];                    
 } __attribute__((__packed__));
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 typedef struct mb_stat {
-	u_int32_t       mbs_cnt;        /* number of classes */
+	u_int32_t       mbs_cnt;                               
 #if defined(KERNEL) || defined(__LP64__)
-	u_int32_t       mbs_pad;        /* padding */
-#endif /* KERNEL || __LP64__ */
-	mb_class_stat_t mbs_class[1];   /* class array */
+	u_int32_t       mbs_pad;                     
+#endif                         
+	mb_class_stat_t mbs_class[1];                    
 } mb_stat_t;
 
 #ifdef PRIVATE
-#define MLEAK_STACK_DEPTH       16      /* Max PC stack depth */
+#define MLEAK_STACK_DEPTH       16                              
 
 typedef struct mleak_trace_stat {
 	u_int64_t       mltr_collisions;
@@ -1199,72 +1199,72 @@ typedef struct mleak_trace_stat {
 } mleak_trace_stat_t;
 
 typedef struct mleak_stat {
-	u_int32_t               ml_isaddr64;    /* 64-bit KVA? */
-	u_int32_t               ml_cnt;         /* number of traces */
-	mleak_trace_stat_t      ml_trace[1];    /* trace array */
+	u_int32_t               ml_isaddr64;                     
+	u_int32_t               ml_cnt;                               
+	mleak_trace_stat_t      ml_trace[1];                     
 } mleak_stat_t;
 
 struct mleak_table {
-	u_int32_t mleak_capture;        /* sampling capture counter */
-	u_int32_t mleak_sample_factor;  /* sample factor */
+	u_int32_t mleak_capture;                                      
+	u_int32_t mleak_sample_factor;                     
 
-	/* Times two active records want to occupy the same spot */
+	                                                           
 	u_int64_t alloc_collisions;
 	u_int64_t trace_collisions;
 
-	/* Times new record lands on spot previously occupied by freed alloc */
+	                                                                       
 	u_int64_t alloc_overwrites;
 	u_int64_t trace_overwrites;
 
-	/* Times a new alloc or trace is put into the hash table */
+	                                                           
 	u_int64_t alloc_recorded;
 	u_int64_t trace_recorded;
 
-	/* Total number of outstanding allocs */
+	                                        
 	u_int64_t outstanding_allocs;
 
-	/* Times mleak_log returned false because couldn't acquire the lock */
+	                                                                      
 	u_int64_t total_conflicts;
 };
-#endif /* PRIVATE */
+#endif              
 
 #ifdef KERNEL_PRIVATE
 __BEGIN_DECLS
 
-/*
- * Exported (private)
- */
+  
+                     
+   
 
-extern struct mbstat mbstat;                    /* statistics */
+extern struct mbstat mbstat;                                    
 
 __END_DECLS
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef XNU_KERNEL_PRIVATE
 __BEGIN_DECLS
 
-/*
- * Not exported (xnu private)
- */
+  
+                             
+   
 
-/* flags to m_get/MGET */
-/* Need to include malloc.h to get right options for malloc  */
+                         
+                                                               
 #include        <sys/malloc.h>
 
 struct mbuf;
 
-/* length to m_copy to copy all */
+                                  
 #define M_COPYALL       1000000000
 
 #define M_DONTWAIT      M_NOWAIT
 #define M_WAIT          M_WAITOK
 
-/* modes for m_copym and variants */
-#define M_COPYM_NOOP_HDR        0       /* don't copy/move pkthdr contents */
-#define M_COPYM_COPY_HDR        1       /* copy pkthdr from old to new */
-#define M_COPYM_MOVE_HDR        2       /* move pkthdr from old to new */
-#define M_COPYM_MUST_COPY_HDR   3       /* MUST copy pkthdr from old to new */
-#define M_COPYM_MUST_MOVE_HDR   4       /* MUST move pkthdr from old to new */
+                                    
+#define M_COPYM_NOOP_HDR        0                                            
+#define M_COPYM_COPY_HDR        1                                        
+#define M_COPYM_MOVE_HDR        2                                        
+#define M_COPYM_MUST_COPY_HDR   3                                             
+#define M_COPYM_MUST_MOVE_HDR   4                                             
 
 extern void m_freem(struct mbuf *) __XNU_INTERNAL(m_freem);
 extern u_int64_t mcl_to_paddr(char *);
@@ -1286,15 +1286,15 @@ extern void m_mclfree(caddr_t p);
 extern int mbuf_get_class(struct mbuf *m);
 extern bool mbuf_class_under_pressure(struct mbuf *m);
 
-/*
- * On platforms which require strict alignment (currently for anything but
- * i386 or x86_64), this macro checks whether the data pointer of an mbuf
- * is 32-bit aligned (this is the expected minimum alignment for protocol
- * headers), and assert otherwise.
- */
+  
+                                                                          
+                                                                         
+                                                                         
+                                  
+   
 #if defined(__i386__) || defined(__x86_64__)
 #define MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(_m)
-#else /* !__i386__ && !__x86_64__ */
+#else                               
 #define MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(_m) do {                    \
 	if (!IS_P2ALIGNED((_m)->m_data, sizeof (u_int32_t))) {          \
 	        if (((_m)->m_flags & M_PKTHDR) &&                       \
@@ -1311,37 +1311,37 @@ extern bool mbuf_class_under_pressure(struct mbuf *m);
 	        }                                                       \
 	}                                                               \
 } while (0)
-#endif /* !__i386__ && !__x86_64__ */
+#endif                               
 
-/* Maximum number of MBUF_SC values (excluding MBUF_SC_UNSPEC) */
+                                                                 
 #define MBUF_SC_MAX_CLASSES     10
 
-/*
- * These conversion macros rely on the corresponding MBUF_SC and
- * MBUF_TC values in order to establish the following mapping:
- *
- *	MBUF_SC_BK_SYS	] ==>	MBUF_TC_BK
- *	MBUF_SC_BK	]
- *
- *	MBUF_SC_BE	] ==>	MBUF_TC_BE
- *	MBUF_SC_RD	]
- *	MBUF_SC_OAM	]
- *
- *	MBUF_SC_AV	] ==>	MBUF_TC_VI
- *	MBUF_SC_RV	]
- *	MBUF_SC_VI	]
- *	MBUF_SC_SIG	]
- *
- *	MBUF_SC_VO	] ==>	MBUF_TC_VO
- *	MBUF_SC_CTL	]
- *
- * The values assigned to each service class allows for a fast mapping to
- * the corresponding MBUF_TC traffic class values, as well as to retrieve the
- * assigned index; therefore care must be taken when comparing against these
- * values.  Use the corresponding class and index macros to retrieve the
- * corresponding portion, and never assume that a higher class corresponds
- * to a higher index.
- */
+  
+                                                                
+                                                              
+  
+                                  
+               
+  
+                              
+               
+                
+  
+                              
+               
+               
+                
+  
+                              
+                
+  
+                                                                         
+                                                                             
+                                                                            
+                                                                        
+                                                                          
+                     
+   
 #define MBUF_SCVAL(x)           ((x) & 0xffff)
 #define MBUF_SCIDX(x)           ((((x) >> 16) & 0xff) >> 3)
 #define MBUF_SC2TC(_sc)         (MBUF_SCVAL(_sc) >> 7)
@@ -1394,19 +1394,19 @@ extern bool mbuf_class_under_pressure(struct mbuf *m);
 	c == SCVAL_RV || c == SCVAL_VI || c == SCVAL_SIG ||             \
 	c == SCVAL_VO || SCVAL_CTL)
 
-extern unsigned char *mbutl;    /* start VA of mbuf pool */
-extern unsigned char *embutl;   /* end VA of mbuf pool */
-extern unsigned int nmbclusters;        /* number of mapped clusters */
-extern int njcl;                /* # of jumbo clusters  */
-extern int njclbytes;   /* size of a jumbo cluster */
-extern int max_hdr;             /* largest link+protocol header */
-extern int max_datalen; /* MHLEN - max_hdr */
+extern unsigned char *mbutl;                               
+extern unsigned char *embutl;                            
+extern unsigned int nmbclusters;                                       
+extern int njcl;                                          
+extern int njclbytes;                                
+extern int max_hdr;                                               
+extern int max_datalen;                      
 
-/* Use max_linkhdr instead of _max_linkhdr */
-extern int _max_linkhdr;        /* largest link-level header */
+                                             
+extern int _max_linkhdr;                                       
 
-/* Use max_protohdr instead of _max_protohdr */
-extern int _max_protohdr;       /* largest protocol header */
+                                               
+extern int _max_protohdr;                                    
 
 __private_extern__ unsigned int mbuf_default_ncl(uint64_t);
 __private_extern__ void mbinit(void);
@@ -1477,32 +1477,32 @@ __private_extern__ void m_ext_paired_activate(struct mbuf *);
 
 __private_extern__ void mbuf_drain(boolean_t);
 
-/*
- * Packets may have annotations attached by affixing a list of "packet
- * tags" to the pkthdr structure.  Packet tags are dynamically allocated
- * semi-opaque data structures that have a fixed header (struct m_tag)
- * that specifies the size of the memory block and an <id,type> pair that
- * identifies it. The id identifies the module and the type identifies the
- * type of data for that module. The id of zero is reserved for the kernel.
- *
- * Note that the packet tag returned by m_tag_allocate has the default
- * memory alignment implemented by malloc.  To reference private data one
- * can use a construct like:
- *
- *      struct m_tag *mtag = m_tag_allocate(...);
- *      struct foo *p = (struct foo *)(mtag+1);
- *
- * if the alignment of struct m_tag is sufficient for referencing members
- * of struct foo.  Otherwise it is necessary to embed struct m_tag within
- * the private data structure to insure proper alignment; e.g.
- *
- *      struct foo {
- *              struct m_tag    tag;
- *              ...
- *      };
- *      struct foo *p = (struct foo *) m_tag_allocate(...);
- *      struct m_tag *mtag = &p->tag;
- */
+  
+                                                                      
+                                                                        
+                                                                      
+                                                                         
+                                                                          
+                                                                           
+  
+                                                                      
+                                                                         
+                            
+  
+                                                 
+                                               
+  
+                                                                         
+                                                                         
+                                                              
+  
+                    
+                                    
+                   
+          
+                                                           
+                                     
+   
 
 #define KERNEL_MODULE_TAG_ID    0
 
@@ -1522,7 +1522,7 @@ enum {
 	KERNEL_TAG_TYPE_PF_REASS                = 14,
 };
 
-/* Packet tag routines */
+                         
 __private_extern__ struct  m_tag *m_tag_alloc(u_int32_t, u_int16_t, int, int);
 __private_extern__ struct  m_tag *m_tag_create(u_int32_t, u_int16_t, int, int,
     struct mbuf *);
@@ -1570,5 +1570,5 @@ __private_extern__ void m_do_tx_compl_callback(struct mbuf *, struct ifnet *);
 __private_extern__ mbuf_tx_compl_func m_get_tx_compl_callback(u_int32_t);
 
 __END_DECLS
-#endif /* XNU_KERNEL_PRIVATE */
-#endif  /* !_SYS_MBUF_H_ */
+#endif                         
+#endif                     

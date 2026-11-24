@@ -34,16 +34,16 @@
 #include <stdint.h>
 
 typedef struct activity_bitmap {
-	uint64_t        start;          /* Start timestamp using uptime */
-	uint64_t        bitmap[2];      /* 128 bit map, each bit == 8 sec */
+	uint64_t        start;                                            
+	uint64_t        bitmap[2];                                          
 } activity_bitmap_t;
 
-#endif /* PRIVATE */
+#endif              
 
 #ifdef BSD_KERNEL_PRIVATE
 
 extern void in_stat_set_activity_bitmap(activity_bitmap_t *activity, uint64_t now);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* __NETINET_IN_STAT_H__ */
+#endif                            

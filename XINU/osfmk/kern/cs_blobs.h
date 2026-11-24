@@ -31,70 +31,70 @@
 
 #include <stdint.h>
 
-/* code signing attributes of a process */
-#define CS_VALID                    0x00000001  /* dynamically valid */
-#define CS_ADHOC                    0x00000002  /* ad hoc signed */
-#define CS_GET_TASK_ALLOW           0x00000004  /* has get-task-allow entitlement */
-#define CS_INSTALLER                0x00000008  /* has installer entitlement */
+                                          
+#define CS_VALID                    0x00000001                         
+#define CS_ADHOC                    0x00000002                     
+#define CS_GET_TASK_ALLOW           0x00000004                                      
+#define CS_INSTALLER                0x00000008                                 
 
-#define CS_FORCED_LV                0x00000010  /* Library Validation required by Hardened System Policy */
-#define CS_INVALID_ALLOWED          0x00000020  /* (macOS Only) Page invalidation allowed by task port policy */
+#define CS_FORCED_LV                0x00000010                                                             
+#define CS_INVALID_ALLOWED          0x00000020                                                                  
 
-#define CS_HARD                     0x00000100  /* don't load invalid pages */
-#define CS_KILL                     0x00000200  /* kill process if it becomes invalid */
-#define CS_CHECK_EXPIRATION         0x00000400  /* force expiration checking */
-#define CS_RESTRICT                 0x00000800  /* tell dyld to treat restricted */
+#define CS_HARD                     0x00000100                                
+#define CS_KILL                     0x00000200                                          
+#define CS_CHECK_EXPIRATION         0x00000400                                 
+#define CS_RESTRICT                 0x00000800                                     
 
-#define CS_ENFORCEMENT              0x00001000  /* require enforcement */
-#define CS_REQUIRE_LV               0x00002000  /* require library validation */
-#define CS_ENTITLEMENTS_VALIDATED   0x00004000  /* code signature permits restricted entitlements */
-#define CS_NVRAM_UNRESTRICTED       0x00008000  /* has com.apple.rootless.restricted-nvram-variables.heritable entitlement */
+#define CS_ENFORCEMENT              0x00001000                           
+#define CS_REQUIRE_LV               0x00002000                                  
+#define CS_ENTITLEMENTS_VALIDATED   0x00004000                                                      
+#define CS_NVRAM_UNRESTRICTED       0x00008000                                                                               
 
-#define CS_RUNTIME                  0x00010000  /* Apply hardened runtime policies */
-#define CS_LINKER_SIGNED            0x00020000  /* Automatically signed by the linker */
+#define CS_RUNTIME                  0x00010000                                       
+#define CS_LINKER_SIGNED            0x00020000                                          
 
 #define CS_ALLOWED_MACHO            (CS_ADHOC | CS_HARD | CS_KILL | CS_CHECK_EXPIRATION | \
 	                             CS_RESTRICT | CS_ENFORCEMENT | CS_REQUIRE_LV | CS_RUNTIME | CS_LINKER_SIGNED)
 
-#define CS_EXEC_SET_HARD            0x00100000  /* set CS_HARD on any exec'ed process */
-#define CS_EXEC_SET_KILL            0x00200000  /* set CS_KILL on any exec'ed process */
-#define CS_EXEC_SET_ENFORCEMENT     0x00400000  /* set CS_ENFORCEMENT on any exec'ed process */
-#define CS_EXEC_INHERIT_SIP         0x00800000  /* set CS_INSTALLER on any exec'ed process */
+#define CS_EXEC_SET_HARD            0x00100000                                          
+#define CS_EXEC_SET_KILL            0x00200000                                          
+#define CS_EXEC_SET_ENFORCEMENT     0x00400000                                                 
+#define CS_EXEC_INHERIT_SIP         0x00800000                                               
 
-#define CS_KILLED                   0x01000000  /* was killed by kernel for invalidity */
-#define CS_DYLD_PLATFORM            0x02000000  /* dyld used to load this is a platform binary */
-#define CS_PLATFORM_BINARY          0x04000000  /* this is a platform binary */
-#define CS_PLATFORM_PATH            0x08000000  /* platform binary by the fact of path (osx only) */
+#define CS_KILLED                   0x01000000                                           
+#define CS_DYLD_PLATFORM            0x02000000                                                   
+#define CS_PLATFORM_BINARY          0x04000000                                 
+#define CS_PLATFORM_PATH            0x08000000                                                      
 
-#define CS_DEBUGGED                 0x10000000  /* process is currently or has previously been debugged and allowed to run with invalid pages */
-#define CS_SIGNED                   0x20000000  /* process has a signature (may have gone invalid) */
-#define CS_DEV_CODE                 0x40000000  /* code is dev signed, cannot be loaded into prod signed code (will go away with rdar://problem/28322552) */
-#define CS_DATAVAULT_CONTROLLER     0x80000000  /* has Data Vault controller entitlement */
+#define CS_DEBUGGED                 0x10000000                                                                                                  
+#define CS_SIGNED                   0x20000000                                                       
+#define CS_DEV_CODE                 0x40000000                                                                                                              
+#define CS_DATAVAULT_CONTROLLER     0x80000000                                             
 
 #define CS_ENTITLEMENT_FLAGS        (CS_GET_TASK_ALLOW | CS_INSTALLER | CS_DATAVAULT_CONTROLLER | CS_NVRAM_UNRESTRICTED)
 
-/* executable segment flags */
+                              
 
-#define CS_EXECSEG_MAIN_BINARY          0x1             /* executable segment denotes main binary */
-#define CS_EXECSEG_ALLOW_UNSIGNED       0x10            /* allow unsigned pages (for debugging) */
-#define CS_EXECSEG_DEBUGGER             0x20            /* main binary is debugger */
-#define CS_EXECSEG_JIT                  0x40            /* JIT enabled */
-#define CS_EXECSEG_SKIP_LV              0x80            /* OBSOLETE: skip library validation */
-#define CS_EXECSEG_CAN_LOAD_CDHASH      0x100           /* can bless cdhash for execution */
-#define CS_EXECSEG_CAN_EXEC_CDHASH      0x200           /* can execute blessed cdhash */
+#define CS_EXECSEG_MAIN_BINARY          0x1                                                         
+#define CS_EXECSEG_ALLOW_UNSIGNED       0x10                                                      
+#define CS_EXECSEG_DEBUGGER             0x20                                         
+#define CS_EXECSEG_JIT                  0x40                             
+#define CS_EXECSEG_SKIP_LV              0x80                                                   
+#define CS_EXECSEG_CAN_LOAD_CDHASH      0x100                                               
+#define CS_EXECSEG_CAN_EXEC_CDHASH      0x200                                           
 
-/*
- * Magic numbers used by Code Signing
- */
+  
+                                     
+   
 enum {
-	CSMAGIC_REQUIREMENT = 0xfade0c00,               /* single Requirement blob */
-	CSMAGIC_REQUIREMENTS = 0xfade0c01,              /* Requirements vector (internal requirements) */
-	CSMAGIC_CODEDIRECTORY = 0xfade0c02,             /* CodeDirectory blob */
-	CSMAGIC_EMBEDDED_SIGNATURE = 0xfade0cc0, /* embedded form of signature data */
-	CSMAGIC_EMBEDDED_SIGNATURE_OLD = 0xfade0b02,    /* XXX */
-	CSMAGIC_EMBEDDED_ENTITLEMENTS = 0xfade7171,     /* embedded entitlements */
-	CSMAGIC_DETACHED_SIGNATURE = 0xfade0cc1, /* multi-arch collection of embedded signatures */
-	CSMAGIC_BLOBWRAPPER = 0xfade0b01,       /* CMS Signature, among other things */
+	CSMAGIC_REQUIREMENT = 0xfade0c00,                                            
+	CSMAGIC_REQUIREMENTS = 0xfade0c01,                                                               
+	CSMAGIC_CODEDIRECTORY = 0xfade0c02,                                     
+	CSMAGIC_EMBEDDED_SIGNATURE = 0xfade0cc0,                                      
+	CSMAGIC_EMBEDDED_SIGNATURE_OLD = 0xfade0b02,             
+	CSMAGIC_EMBEDDED_ENTITLEMENTS = 0xfade7171,                                
+	CSMAGIC_DETACHED_SIGNATURE = 0xfade0cc1,                                                   
+	CSMAGIC_BLOBWRAPPER = 0xfade0b01,                                              
 
 	CS_SUPPORTSSCATTER = 0x20100,
 	CS_SUPPORTSTEAMID = 0x20200,
@@ -103,23 +103,23 @@ enum {
 	CS_SUPPORTSRUNTIME = 0x20500,
 	CS_SUPPORTSLINKAGE = 0x20600,
 
-	CSSLOT_CODEDIRECTORY = 0,                               /* slot index for CodeDirectory */
+	CSSLOT_CODEDIRECTORY = 0,                                                                 
 	CSSLOT_INFOSLOT = 1,
 	CSSLOT_REQUIREMENTS = 2,
 	CSSLOT_RESOURCEDIR = 3,
 	CSSLOT_APPLICATION = 4,
 	CSSLOT_ENTITLEMENTS = 5,
 
-	CSSLOT_ALTERNATE_CODEDIRECTORIES = 0x1000, /* first alternate CodeDirectory, if any */
-	CSSLOT_ALTERNATE_CODEDIRECTORY_MAX = 5,         /* max number of alternate CD slots */
-	CSSLOT_ALTERNATE_CODEDIRECTORY_LIMIT = CSSLOT_ALTERNATE_CODEDIRECTORIES + CSSLOT_ALTERNATE_CODEDIRECTORY_MAX, /* one past the last */
+	CSSLOT_ALTERNATE_CODEDIRECTORIES = 0x1000,                                            
+	CSSLOT_ALTERNATE_CODEDIRECTORY_MAX = 5,                                               
+	CSSLOT_ALTERNATE_CODEDIRECTORY_LIMIT = CSSLOT_ALTERNATE_CODEDIRECTORIES + CSSLOT_ALTERNATE_CODEDIRECTORY_MAX,                        
 
-	CSSLOT_SIGNATURESLOT = 0x10000,                 /* CMS Signature */
+	CSSLOT_SIGNATURESLOT = 0x10000,                                    
 	CSSLOT_IDENTIFICATIONSLOT = 0x10001,
 	CSSLOT_TICKETSLOT = 0x10002,
 
-	CSTYPE_INDEX_REQUIREMENTS = 0x00000002,         /* compat with amfi */
-	CSTYPE_INDEX_ENTITLEMENTS = 0x00000005,         /* compat with amfi */
+	CSTYPE_INDEX_REQUIREMENTS = 0x00000002,                               
+	CSTYPE_INDEX_ENTITLEMENTS = 0x00000005,                               
 
 	CS_HASHTYPE_SHA1 = 1,
 	CS_HASHTYPE_SHA256 = 2,
@@ -130,13 +130,13 @@ enum {
 	CS_SHA256_LEN = 32,
 	CS_SHA256_TRUNCATED_LEN = 20,
 
-	CS_CDHASH_LEN = 20,                                             /* always - larger hashes are truncated */
-	CS_HASH_MAX_SIZE = 48, /* max size of the hash we'll support */
+	CS_CDHASH_LEN = 20,                                                                                       
+	CS_HASH_MAX_SIZE = 48,                                         
 
-/*
- * Currently only to support Legacy VPN plugins, and Mac App Store
- * but intended to replace all the various platform code, dev code etc. bits.
- */
+  
+                                                                  
+                                                                             
+   
 	CS_SIGNER_TYPE_UNKNOWN = 0,
 	CS_SIGNER_TYPE_LEGACYVPN = 5,
 	CS_SIGNER_TYPE_MAC_APP_STORE = 6,
@@ -149,51 +149,51 @@ enum {
 #define KERNEL_HAVE_CS_CODEDIRECTORY 1
 #define KERNEL_CS_CODEDIRECTORY_HAVE_PLATFORM 1
 
-/*
- * C form of a CodeDirectory.
- */
+  
+                             
+   
 typedef struct __CodeDirectory {
-	uint32_t magic;                                 /* magic number (CSMAGIC_CODEDIRECTORY) */
-	uint32_t length;                                /* total length of CodeDirectory blob */
-	uint32_t version;                               /* compatibility version */
-	uint32_t flags;                                 /* setup and mode flags */
-	uint32_t hashOffset;                    /* offset of hash slot element at index zero */
-	uint32_t identOffset;                   /* offset of identifier string */
-	uint32_t nSpecialSlots;                 /* number of special hash slots */
-	uint32_t nCodeSlots;                    /* number of ordinary (code) hash slots */
-	uint32_t codeLimit;                             /* limit to main image signature range */
-	uint8_t hashSize;                               /* size of each hash in bytes */
-	uint8_t hashType;                               /* type of hash (cdHashType* constants) */
-	uint8_t platform;                               /* platform identifier; zero if not platform binary */
-	uint8_t pageSize;                               /* log2(page size in bytes); 0 => infinite */
-	uint32_t spare2;                                /* unused (must be zero) */
+	uint32_t magic;                                                                           
+	uint32_t length;                                                                        
+	uint32_t version;                                                          
+	uint32_t flags;                                                           
+	uint32_t hashOffset;                                                                   
+	uint32_t identOffset;                                                    
+	uint32_t nSpecialSlots;                                                   
+	uint32_t nCodeSlots;                                                              
+	uint32_t codeLimit;                                                                      
+	uint8_t hashSize;                                                               
+	uint8_t hashType;                                                                         
+	uint8_t platform;                                                                                     
+	uint8_t pageSize;                                                                            
+	uint32_t spare2;                                                           
 
 	char end_earliest[0];
 
-	/* Version 0x20100 */
-	uint32_t scatterOffset;                 /* offset of optional scatter vector */
+	                     
+	uint32_t scatterOffset;                                                        
 	char end_withScatter[0];
 
-	/* Version 0x20200 */
-	uint32_t teamOffset;                    /* offset of optional team identifier */
+	                     
+	uint32_t teamOffset;                                                            
 	char end_withTeam[0];
 
-	/* Version 0x20300 */
-	uint32_t spare3;                                /* unused (must be zero) */
-	uint64_t codeLimit64;                   /* limit to main image signature range, 64 bits */
+	                     
+	uint32_t spare3;                                                           
+	uint64_t codeLimit64;                                                                     
 	char end_withCodeLimit64[0];
 
-	/* Version 0x20400 */
-	uint64_t execSegBase;                   /* offset of executable segment */
-	uint64_t execSegLimit;                  /* limit of executable segment */
-	uint64_t execSegFlags;                  /* executable segment flags */
+	                     
+	uint64_t execSegBase;                                                     
+	uint64_t execSegLimit;                                                   
+	uint64_t execSegFlags;                                                
 	char end_withExecSeg[0];
-	/* Version 0x20500 */
+	                     
 	uint32_t runtime;
 	uint32_t preEncryptOffset;
 	char end_withPreEncryptOffset[0];
 
-	/* Version 0x20600 */
+	                     
 	uint8_t linkageHashType;
 	uint8_t linkageTruncated;
 	uint16_t spare4;
@@ -202,44 +202,44 @@ typedef struct __CodeDirectory {
 	char end_withLinkage[0];
 
 
-	/* followed by dynamic content as located by offset fields above */
+	                                                                   
 } CS_CodeDirectory
 __attribute__ ((aligned(1)));
 
-/*
- * Structure of an embedded-signature SuperBlob
- */
+  
+                                               
+   
 
 typedef struct __BlobIndex {
-	uint32_t type;                                  /* type of entry */
-	uint32_t offset;                                /* offset of entry */
+	uint32_t type;                                                     
+	uint32_t offset;                                                     
 } CS_BlobIndex
 __attribute__ ((aligned(1)));
 
 typedef struct __SC_SuperBlob {
-	uint32_t magic;                                 /* magic number */
-	uint32_t length;                                /* total length of SuperBlob */
-	uint32_t count;                                 /* number of index entries following */
-	CS_BlobIndex index[];                   /* (count) entries */
-	/* followed by Blobs in no particular order as indicated by offsets in index */
+	uint32_t magic;                                                   
+	uint32_t length;                                                               
+	uint32_t count;                                                                        
+	CS_BlobIndex index[];                                        
+	                                                                               
 } CS_SuperBlob
 __attribute__ ((aligned(1)));
 
 #define KERNEL_HAVE_CS_GENERICBLOB 1
 typedef struct __SC_GenericBlob {
-	uint32_t magic;                                 /* magic number */
-	uint32_t length;                                /* total length of blob */
+	uint32_t magic;                                                   
+	uint32_t length;                                                          
 	char data[];
 } CS_GenericBlob
 __attribute__ ((aligned(1)));
 
 typedef struct __SC_Scatter {
-	uint32_t count;                                 // number of pages; zero for sentinel (only)
-	uint32_t base;                                  // first page number
-	uint64_t targetOffset;                  // offset in target
-	uint64_t spare;                                 // reserved
+	uint32_t count;                                                                             
+	uint32_t base;                                                      
+	uint64_t targetOffset;                                     
+	uint64_t spare;                                            
 } SC_Scatter
 __attribute__ ((aligned(1)));
 
 
-#endif /* _KERN_CODESIGN_H */
+#endif                       

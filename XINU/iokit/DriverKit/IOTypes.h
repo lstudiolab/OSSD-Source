@@ -32,7 +32,7 @@
 
 #ifndef IOKIT
 #define IOKIT 1
-#endif /* !IOKIT */
+#endif             
 
 #if KERNEL
 #include <IOKit/system.h>
@@ -63,9 +63,9 @@ extern "C" {
 #endif
 #endif
 
-/*
- * Simple data types.
- */
+  
+                     
+   
 #include <stdbool.h>
 #include <libkern/OSTypes.h>
 
@@ -139,28 +139,28 @@ typedef struct{
 } IOAddressRange;
 #endif
 
-/*
- * Map between #defined or enum'd constants and text description.
- */
+  
+                                                                 
+   
 typedef struct {
 	int value;
 	const char *name;
 } IONamedValue;
 
 
-/*
- * Memory alignment -- specified as a power of two.
- */
+  
+                                                   
+   
 typedef unsigned int    IOAlignment;
 
 #define IO_NULL_VM_TASK         ((vm_task_t)0)
 
 
-/*
- * Pull in machine specific stuff.
- */
+  
+                                  
+   
 
-//#include <IOKit/machine/IOTypes.h>
+                                    
 
 #ifndef MACH_KERNEL
 
@@ -173,10 +173,10 @@ typedef OSObject * io_object_t;
 #else
 typedef struct OSObject * io_object_t;
 #endif
-#else /* KERNEL */
+#else             
 typedef mach_port_t     io_object_t;
-#endif /* KERNEL */
-#endif /* __IOKIT_PORTS_DEFINED__ */
+#endif             
+#endif                              
 
 #include <device/device_types.h>
 
@@ -189,9 +189,9 @@ typedef io_object_t     uext_object_t;
 
 #define IO_OBJECT_NULL  ((io_object_t) 0)
 
-#endif /* MACH_KERNEL */
+#endif                  
 
-// IOConnectMapMemory memoryTypes
+                                 
 enum {
 	kIODefaultMemoryType        = 0
 };
@@ -209,7 +209,7 @@ enum {
 	kIOPostedCombinedReordered  = 9,
 };
 
-// IOMemory mapping options
+                           
 enum {
 	kIOMapAnywhere                = 0x00000001,
 
@@ -240,13 +240,13 @@ enum {
 	kIOMapOverwrite               = 0x20000000
 };
 
-/*! @enum Scale Factors
- *   @discussion Used when a scale_factor parameter is required to define a unit of time.
- *   @constant kNanosecondScale Scale factor for nanosecond based times.
- *   @constant kMicrosecondScale Scale factor for microsecond based times.
- *   @constant kMillisecondScale Scale factor for millisecond based times.
- *   @constant kTickScale Scale factor for the standard (100Hz) tick.
- *   @constant kSecondScale Scale factor for second based times. */
+                       
+                                                                                         
+                                                                        
+                                                                          
+                                                                          
+                                                                     
+                                                                   
 
 enum {
 	kNanosecondScale  = 1,
@@ -260,7 +260,7 @@ enum {
 	kIOConnectMethodVarOutputSize = -3
 };
 
-/* compatibility types */
+                         
 
 #ifndef KERNEL
 
@@ -272,7 +272,7 @@ typedef unsigned int IODeviceNumber;
 }
 #endif
 
-#else /* !PLATFORM_DriverKit */
+#else                          
 
 #include <stdint.h>
 
@@ -296,7 +296,7 @@ typedef IOPhysicalLength64       IOPhysicalLength;
 
 typedef uint64_t       IOVirtualAddress;
 
-#endif /* PLATFORM_DriverKit */
+#endif                         
 
 enum {
 	kIOMaxBusStall40usec = 40000,
@@ -308,4 +308,4 @@ enum {
 	kIOMaxBusStallNone   = 0,
 };
 
-#endif /* ! __IOKIT_IOTYPES_H */
+#endif                          

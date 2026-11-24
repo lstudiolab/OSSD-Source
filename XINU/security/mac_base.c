@@ -62,12 +62,12 @@
  *
  */
 
-/*-
- * Framework for extensible kernel access control.  This file contains
- * Kernel and userland interface to the framework, policy registration
- * and composition.  Per-object interfaces, controls, and labeling may be
- * found in src/sys/mac/.  Sample policies may be found in src/sys/mac*.
- */
+   
+                                                                      
+                                                                      
+                                                                         
+                                                                        
+   
 
 #include <stdarg.h>
 #include <string.h>
@@ -107,10 +107,10 @@
 
 #include <libkern/section_keywords.h>
 
-/*
- * define MB_DEBUG to display run-time debugging information
- * #define MB_DEBUG 1
- */
+  
+                                                            
+                     
+   
 
 #ifdef MB_DEBUG
 #define DPRINTF(x)      printf x
@@ -125,11 +125,11 @@ SYSCTL_NODE(, OID_AUTO, security, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
 SYSCTL_EXTENSIBLE_NODE(_security, OID_AUTO, mac, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "TrustedBSD MAC policy controls");
 
-/*
- * Declare that the kernel provides MAC support, version 1.  This permits
- * modules to refuse to be loaded if the necessary support isn't present,
- * even if it's pre-boot.
- */
+  
+                                                                         
+                                                                         
+                         
+   
 #if 0
 MODULE_VERSION(kernel_mac_support, 1);
 #endif
@@ -143,29 +143,29 @@ static unsigned int mac_slot_offsets_free = (1 << MAC_MAX_SLOTS) - 1;
 SYSCTL_UINT(_security_mac, OID_AUTO, max_slots, CTLFLAG_RD | CTLFLAG_LOCKED,
     &mac_max_slots, 0, "");
 
-/*
- * Has the kernel started generating labeled objects yet?  All read/write
- * access to this variable is serialized during the boot process.  Following
- * the end of serialization, we don't update this flag; no locking.
- */
+  
+                                                                         
+                                                                            
+                                                                   
+   
 int     mac_late = 0;
 
-/*
- * Flag to indicate whether or not we should allocate label storage for
- * new vnodes.  Since most dynamic policies we currently work with don't
- * rely on vnode labeling, try to avoid paying the cost of mtag allocation
- * unless specifically notified of interest.  One result of this is
- * that if a dynamically loaded policy requests vnode labels, it must
- * be able to deal with a NULL label being returned on any vnodes that
- * were already in flight when the policy was loaded.  Since the policy
- * already has to deal with uninitialized labels, this probably won't
- * be a problem.
- */
+  
+                                                                       
+                                                                        
+                                                                          
+                                                                   
+                                                                     
+                                                                      
+                                                                       
+                                                                     
+                
+   
 #if CONFIG_MACF_LAZY_VNODE_LABELS
 unsigned int    mac_label_vnodes = 1;
 #else
 unsigned int    mac_label_vnodes = 0;
-#endif /* CONFIG_MACF_LAZY_VNODE_LABELS */
+#endif                                    
 SYSCTL_UINT(_security_mac, OID_AUTO, labelvnodes, SECURITY_MAC_CTLFLAGS
 #if CONFIG_MACF_LAZY_VNODE_LABELS
     | CTLFLAG_RD
@@ -224,28 +224,28 @@ unsigned int    mac_vnode_enforce = 1;
 SYSCTL_UINT(_security_mac, OID_AUTO, vnode_enforce, SECURITY_MAC_CTLFLAGS,
     &mac_vnode_enforce, 0, "Enforce MAC policy on vnode operations");
 
-/*
- * mac_policy_list holds the list of policy modules.  Modules with a
- * handle lower than staticmax are considered "static" and cannot be
- * unloaded.  Such policies can be invoked without holding the busy count.
- *
- * Modules with a handle at or above the staticmax high water mark
- * are considered to be "dynamic" policies.  A busy count is maintained
- * for the list, stored in mac_policy_busy.  The busy count is protected
- * by mac_policy_mtx; the list may be modified only while the busy
- * count is 0, requiring that the lock be held to prevent new references
- * to the list from being acquired.  For almost all operations,
- * incrementing the busy count is sufficient to guarantee consistency,
- * as the list cannot be modified while the busy count is elevated.
- * For a few special operations involving a change to the list of
- * active policies, the mtx itself must be held.
- */
+  
+                                                                    
+                                                                    
+                                                                          
+  
+                                                                  
+                                                                       
+                                                                        
+                                                                  
+                                                                        
+                                                               
+                                                                      
+                                                                   
+                                                                 
+                                                
+   
 static LCK_GRP_DECLARE(mac_lck_grp, "MAC lock");
 static LCK_MTX_DECLARE(mac_policy_mtx, &mac_lck_grp);
 
-/*
- * Policy list array allocation chunk size. Each entry holds a pointer.
- */
+  
+                                                                       
+   
 #define MAC_POLICY_LIST_CHUNKSIZE 8
 
 static int mac_policy_busy;
@@ -257,13 +257,13 @@ SECURITY_READ_ONLY_LATE(static struct mac_policy_list_element) mac_policy_static
 mac_policy_list_t mac_policy_list;
 #endif
 
-/*
- * mac_label_element_list holds the master list of label namespaces for
- * all the policies. When a policy is loaded, each of it's label namespace
- * elements is added to the master list if not already present. When a
- * policy is unloaded, the namespace elements are removed if no other
- * policy is interested in that namespace element.
- */
+  
+                                                                       
+                                                                          
+                                                                      
+                                                                     
+                                                  
+   
 struct mac_label_element_list_t mac_label_element_list;
 struct mac_label_element_list_t mac_static_label_element_list;
 
@@ -327,9 +327,9 @@ mac_policy_list_unbusy(void)
 	lck_mtx_unlock(&mac_policy_mtx);
 }
 
-/*
- * Early pre-malloc MAC initialization, including appropriate SMP locks.
- */
+  
+                                                                        
+   
 void
 mac_policy_init(void)
 {
@@ -352,25 +352,25 @@ mac_policy_init(void)
 	LIST_INIT(&mac_static_label_element_list);
 }
 
-/* Function pointer set up for loading security extensions.
- * It is set to an actual function after OSlibkernInit()
- * has been called, and is set back to 0 by OSKextRemoveKextBootstrap()
- * after bsd_init().
- */
+                                                           
+                                                        
+                                                                       
+                    
+   
 void (*load_security_extensions_function)(void) = 0;
 
-/*
- * Init after early Mach startup, but before BSD
- */
+  
+                                                
+   
 void
 mac_policy_initmach(void)
 {
-	/*
-	 * For the purposes of modules that want to know if they were
-	 * loaded "early", set the mac_late flag once we've processed
-	 * modules either linked into the kernel, or loaded before the
-	 * kernel startup.
-	 */
+	  
+                                                              
+                                                              
+                                                               
+                   
+    
 
 	if (load_security_extensions_function) {
 		load_security_extensions_function();
@@ -378,9 +378,9 @@ mac_policy_initmach(void)
 	mac_late = 1;
 }
 
-/*
- * BSD startup.
- */
+  
+               
+   
 void
 mac_policy_initbsd(void)
 {
@@ -389,13 +389,13 @@ mac_policy_initbsd(void)
 
 	printf("MAC Framework successfully initialized\n");
 
-	/* Call bsd init functions of already loaded policies */
+	                                                        
 
-	/*
-	 * Using the exclusive lock means no other framework entry
-	 * points can proceed while initializations are running.
-	 * This may not be necessary.
-	 */
+	  
+                                                           
+                                                         
+                              
+    
 	mac_policy_grab_exclusive();
 
 	for (i = 0; i <= mac_policy_list.maxindex; i++) {
@@ -408,12 +408,12 @@ mac_policy_initbsd(void)
 	mac_policy_release_exclusive();
 }
 
-/*
- * After a policy has been loaded, add the label namespaces managed by the
- * policy to either the static or non-static label namespace list.
- * A namespace is added to the the list only if it is not already on one of
- * the lists.
- */
+  
+                                                                          
+                                                                  
+                                                                           
+             
+   
 void
 mac_policy_addto_labellist(mac_policy_handle_t handle, int static_entry)
 {
@@ -440,11 +440,11 @@ mac_policy_addto_labellist(mac_policy_handle_t handle, int static_entry)
 		list = &mac_label_element_list;
 	}
 
-	/*
-	 * Before we grab the policy list lock, allocate enough memory
-	 * to contain the potential new elements so we don't have to
-	 * give up the lock, or allocate with the lock held.
-	 */
+	  
+                                                               
+                                                             
+                                                     
+    
 	MALLOC(new_mles, struct mac_label_element **,
 	    sizeof(struct mac_label_element *) *
 	    mpc->mpc_labelname_count, M_MACTEMP, M_WAITOK | M_ZERO);
@@ -470,10 +470,10 @@ mac_policy_addto_labellist(mac_policy_handle_t handle, int static_entry)
 		if (*(name = mpc->mpc_labelnames[idx]) == '?') {
 			name++;
 		}
-		/*
-		 * Check both label element lists and add to the
-		 * appropriate list only if not already on a list.
-		 */
+		  
+                                                  
+                                                    
+     
 		LIST_FOREACH(mle, &mac_static_label_element_list, mle_list) {
 			if (*(name2 = mle->mle_name) == '?') {
 				name2++;
@@ -500,7 +500,7 @@ mac_policy_addto_labellist(mac_policy_handle_t handle, int static_entry)
 			LIST_INSERT_HEAD(list, mle, mle_list);
 			mle_free++;
 		}
-		/* Add policy handler as a listener. */
+		                                       
 		new_mlls[mll_free]->mll_handle = handle;
 		LIST_INSERT_HEAD(&mle->mle_listeners, new_mlls[mll_free],
 		    mll_list);
@@ -510,7 +510,7 @@ mac_policy_addto_labellist(mac_policy_handle_t handle, int static_entry)
 		mac_policy_release_exclusive();
 	}
 
-	/* Free up any unused label elements and listeners */
+	                                                     
 	for (idx = mle_free; idx < mpc->mpc_labelname_count; idx++) {
 		FREE(new_mles[idx], M_MACTEMP);
 	}
@@ -521,14 +521,14 @@ mac_policy_addto_labellist(mac_policy_handle_t handle, int static_entry)
 	FREE(new_mlls, M_MACTEMP);
 }
 
-/*
- * After a policy has been unloaded, remove the label namespaces that the
- * the policy manages from the non-static list of namespaces.
- * The removal only takes place when no other policy is interested in the
- * namespace.
- *
- * Must be called with the policy exclusive lock held.
- */
+  
+                                                                         
+                                                             
+                                                                         
+             
+  
+                                                      
+   
 void
 mac_policy_removefrom_labellist(mac_policy_handle_t handle)
 {
@@ -546,12 +546,12 @@ mac_policy_removefrom_labellist(mac_policy_handle_t handle)
 		return;
 	}
 
-	/*
-	 * Unregister policy as being interested in any label
-	 * namespaces.  If no other policy is listening, remove
-	 * that label element from the list.  Note that we only
-	 * have to worry about the non-static list.
-	 */
+	  
+                                                      
+                                                        
+                                                        
+                                            
+    
 	LIST_FOREACH(mle, &mac_label_element_list, mle_list) {
 		LIST_FOREACH(mll, &mle->mle_listeners, mll_list) {
 			if (mll->mll_handle == handle) {
@@ -567,10 +567,10 @@ mac_policy_removefrom_labellist(mac_policy_handle_t handle)
 	}
 }
 
-/*
- * After the policy list has changed, walk the list to update any global
- * flags.
- */
+  
+                                                                        
+         
+   
 static void
 mac_policy_updateflags(void)
 {
@@ -590,7 +590,7 @@ mac_policy_fixup_mmd_list(struct mac_module_data *new)
 		ele = &(new->data[i]);
 		DPRINTF(("fixup_mmd: ele %p\n", ele));
 		DPRINTF(("   key %p value %p\n", ele->key, ele->value));
-		mmd_fixup_ele(old, new, ele); /* Fix up key/value ptrs.       */
+		mmd_fixup_ele(old, new, ele);                                   
 		DPRINTF(("   key %p value %p\n", ele->key, ele->value));
 		if (ele->value_type == MAC_DATA_TYPE_ARRAY) {
 			arr = (struct mac_module_data_list *)ele->value;
@@ -625,10 +625,10 @@ mac_policy_register(struct mac_policy_conf *mpc, mac_policy_handle_t *handlep,
 	int error, slot, static_entry = 0;
 	u_int i;
 
-	/*
-	 * Some preliminary checks to make sure the policy's conf structure
-	 * contains the required fields.
-	 */
+	  
+                                                                    
+                                 
+    
 	if (mpc->mpc_name == NULL) {
 		panic("policy's name is not set\n");
 	}
@@ -658,7 +658,7 @@ mac_policy_register(struct mac_policy_conf *mpc, mac_policy_handle_t *handlep,
 
 	if (mac_policy_list.numloaded >= mac_policy_list.max) {
 #if XNU_TARGET_OS_OSX
-		/* allocate new policy list array, zero new chunk */
+		                                                    
 		tmac_policy_list_element =
 		    kalloc((sizeof(struct mac_policy_list_element) *
 		    MAC_POLICY_LIST_CHUNKSIZE) * (mac_policy_list.chunks + 1));
@@ -666,28 +666,28 @@ mac_policy_register(struct mac_policy_conf *mpc, mac_policy_handle_t *handlep,
 		    sizeof(struct mac_policy_list_element) *
 		    MAC_POLICY_LIST_CHUNKSIZE);
 
-		/* copy old entries into new list */
+		                                    
 		memcpy(tmac_policy_list_element, mac_policy_list.entries,
 		    sizeof(struct mac_policy_list_element) *
 		    MAC_POLICY_LIST_CHUNKSIZE * mac_policy_list.chunks);
 
-		/* free old array */
+		                    
 		kfree(mac_policy_list.entries,
 		    sizeof(struct mac_policy_list_element) *
 		    MAC_POLICY_LIST_CHUNKSIZE * mac_policy_list.chunks);
 
 		mac_policy_list.entries = tmac_policy_list_element;
 
-		/* Update maximums, etc */
+		                          
 		mac_policy_list.max += MAC_POLICY_LIST_CHUNKSIZE;
 		mac_policy_list.chunks++;
 #else
 		printf("out of space in mac_policy_list.\n");
 		return ENOMEM;
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 	}
 
-	/* Check for policy with same name already loaded */
+	                                                    
 	for (i = 0; i <= mac_policy_list.maxindex; i++) {
 		if (mac_policy_list.entries[i].mpc == NULL) {
 			continue;
@@ -713,19 +713,19 @@ mac_policy_register(struct mac_policy_conf *mpc, mac_policy_handle_t *handlep,
 	mpc->mpc_runtime_flags |= MPC_RUNTIME_FLAG_REGISTERED;
 
 	if (xd) {
-		struct mac_module_data *mmd = xd; /* module data from plist */
+		struct mac_module_data *mmd = xd;                             
 
-		/* Make a copy of the data. */
+		                              
 		mpc->mpc_data = (void *)kalloc(mmd->size);
 		if (mpc->mpc_data != NULL) {
 			memcpy(mpc->mpc_data, mmd, mmd->size);
 
-			/* Fix up pointers after copy. */
+			                                 
 			mac_policy_fixup_mmd_list(mpc->mpc_data);
 		}
 	}
 
-	/* Find the first free handle in the list (using our hint). */
+	                                                              
 	for (i = mac_policy_list.freehint; i < mac_policy_list.max; i++) {
 		if (mac_policy_list.entries[i].mpc == NULL) {
 			*handlep = i;
@@ -734,13 +734,13 @@ mac_policy_register(struct mac_policy_conf *mpc, mac_policy_handle_t *handlep,
 		}
 	}
 
-	/*
-	 * If we are loading a MAC module before the framework has
-	 * finished initializing or the module is not unloadable and
-	 * we can place its handle adjacent to the last static entry,
-	 * bump the static policy high water mark.
-	 * Static policies can get by with weaker locking requirements.
-	 */
+	  
+                                                           
+                                                             
+                                                              
+                                           
+                                                                
+    
 	if (!mac_late ||
 	    ((mpc->mpc_loadtime_flags & MPC_LOADTIME_FLAG_UNLOADOK) == 0 &&
 	    *handlep == mac_policy_list.staticmax)) {
@@ -750,13 +750,13 @@ mac_policy_register(struct mac_policy_conf *mpc, mac_policy_handle_t *handlep,
 
 	mac_policy_list.entries[*handlep].mpc = mpc;
 
-	/* Update counters, etc */
+	                          
 	if (*handlep > mac_policy_list.maxindex) {
 		mac_policy_list.maxindex = *handlep;
 	}
 	mac_policy_list.numloaded++;
 
-	/* Per-policy initialization. */
+	                                
 	printf("calling mpo_policy_init for %s\n", mpc->mpc_name);
 	if (mpc->mpc_ops->mpo_policy_init != NULL) {
 		(*(mpc->mpc_ops->mpo_policy_init))(mpc);
@@ -793,11 +793,11 @@ mac_policy_unregister(mac_policy_handle_t handle)
 {
 	struct mac_policy_conf *mpc;
 
-	/*
-	 * If we fail the load, we may get a request to unload.  Check
-	 * to see if we did the run-time registration, and if not,
-	 * silently succeed.
-	 */
+	  
+                                                               
+                                                           
+                     
+    
 	mac_policy_grab_exclusive();
 	mpc = mac_get_mpc(handle);
 	if ((mpc->mpc_runtime_flags & MPC_RUNTIME_FLAG_REGISTERED) == 0) {
@@ -806,18 +806,18 @@ mac_policy_unregister(mac_policy_handle_t handle)
 	}
 
 #if 0
-	/*
-	 * Don't allow unloading modules with private data.
-	 */
+	  
+                                                    
+    
 	if (mpc->mpc_field_off != NULL) {
 		MAC_POLICY_LIST_UNLOCK();
 		return EBUSY;
 	}
 #endif
-	/*
-	 * Only allow the unload to proceed if the module is unloadable
-	 * by its own definition.
-	 */
+	  
+                                                                
+                          
+    
 	if ((mpc->mpc_loadtime_flags & MPC_LOADTIME_FLAG_UNLOADOK) == 0) {
 		mac_policy_release_exclusive();
 		return EBUSY;
@@ -861,24 +861,24 @@ mac_policy_unregister(mac_policy_handle_t handle)
 	return 0;
 }
 
-/*
- * Define an error value precedence, and given two arguments, selects the
- * value with the higher precedence.
- */
+  
+                                                                         
+                                    
+   
 int
 mac_error_select(int error1, int error2)
 {
-	/* Certain decision-making errors take top priority. */
+	                                                       
 	if (error1 == EDEADLK || error2 == EDEADLK) {
 		return EDEADLK;
 	}
 
-	/* Invalid arguments should be reported where possible. */
+	                                                          
 	if (error1 == EINVAL || error2 == EINVAL) {
 		return EINVAL;
 	}
 
-	/* Precedence goes to "visibility", with both process and file. */
+	                                                                  
 	if (error1 == ESRCH || error2 == ESRCH) {
 		return ESRCH;
 	}
@@ -887,17 +887,17 @@ mac_error_select(int error1, int error2)
 		return ENOENT;
 	}
 
-	/* Precedence goes to DAC/MAC protections. */
+	                                             
 	if (error1 == EACCES || error2 == EACCES) {
 		return EACCES;
 	}
 
-	/* Precedence goes to privilege. */
+	                                   
 	if (error1 == EPERM || error2 == EPERM) {
 		return EPERM;
 	}
 
-	/* Precedence goes to error over success; otherwise, arbitrary. */
+	                                                                  
 	if (error1 != 0) {
 		return error1;
 	}
@@ -918,7 +918,7 @@ mac_label_destroy(struct label *label)
 	    ("destroying uninitialized label"));
 
 	bzero(label, sizeof(*label));
-	/* implicit: label->l_flags &= ~MAC_FLAG_INITIALIZED; */
+	                                                        
 }
 
 int
@@ -931,11 +931,11 @@ mac_check_structmac_consistent(struct user_mac *mac)
 	return 0;
 }
 
-/*
- * Get the external forms of labels from all policies, for a single
- * label namespace or "*" for all namespaces.  Returns ENOENT if no policy
- * is registered for the namespace, unless the namespace begins with a '?'.
- */
+  
+                                                                   
+                                                                          
+                                                                           
+   
 static int
 mac_label_externalize(size_t mpo_externalize_off, struct label *label,
     const char *element, struct sbuf *sb)
@@ -993,13 +993,13 @@ element_loop:
 				if (error != ENOENT) {
 					goto done;
 				}
-				/*
-				 * If a policy doesn't have a label to
-				 * externalize it returns ENOENT.  This
-				 * may occur for policies that support
-				 * multiple label elements for some
-				 * (but not all) object types.
-				 */
+				  
+                                          
+                                           
+                                          
+                                       
+                                  
+       
 				sbuf_setpos(sb, sb_pos);
 				error = 0;
 				continue;
@@ -1011,7 +1011,7 @@ element_loop:
 			count++;
 		}
 	}
-	/* If there are dynamic policies present, check their elements too. */
+	                                                                      
 	if (!busy && mac_policy_list_conditional_busy() == 1) {
 		element_list = &mac_label_element_list;
 		busy = TRUE;
@@ -1023,18 +1023,18 @@ done:
 	}
 	if (!error && count == 0) {
 		if (!all_labels && !ignorenotfound) {
-			error = ENOENT; /* XXX: ENOLABEL? */
+			error = ENOENT;                     
 		}
 	}
 	return error;
 }
 
-/*
- * Get the external forms of labels from all policies, for all label
- * namespaces contained in a list.
- *
- * XXX This may be leaking an sbuf.
- */
+  
+                                                                    
+                                  
+  
+                                   
+   
 int
 mac_externalize(size_t mpo_externalize_off, struct label *label,
     const char *elementlist, char *outbuf, size_t outbuflen)
@@ -1045,35 +1045,35 @@ mac_externalize(size_t mpo_externalize_off, struct label *label,
 	struct sbuf sb;
 	int error = 0, len;
 
-	/* allocate a scratch buffer the size of the string */
+	                                                      
 	MALLOC(scratch_base, char *, strlen(elementlist) + 1, M_MACTEMP, M_WAITOK);
 	if (scratch_base == NULL) {
 		error = ENOMEM;
 		goto out;
 	}
 
-	/* copy the elementlist to the scratch buffer */
+	                                                
 	strlcpy(scratch_base, elementlist, strlen(elementlist) + 1);
 
-	/*
-	 * set up a temporary pointer that can be used to iterate the
-	 * scratch buffer without losing the allocation address
-	 */
+	  
+                                                              
+                                                        
+    
 	scratch = scratch_base;
 
-	/*
-	 * initialize an sbuf mapping over the output buffer (or newly-allocated internal buffer, if
-	 * outbuf is NULL), up to sbuf's limit of INT_MAX.
-	 */
+	  
+                                                                                             
+                                                   
+    
 	if (outbuflen > INT_MAX) {
 		outbuflen = INT_MAX;
 	}
 	if (sbuf_new(&sb, outbuf, (int)outbuflen, SBUF_FIXEDLEN) == NULL) {
-		/* could not allocate interior buffer */
+		                                        
 		error = ENOMEM;
 		goto out;
 	}
-	/* iterate the scratch buffer; NOTE: buffer contents modified! */
+	                                                                 
 	while ((element = strsep(&scratch, ",")) != NULL) {
 		error = mac_label_externalize(mpo_externalize_off, label,
 		    element, &sb);
@@ -1082,7 +1082,7 @@ mac_externalize(size_t mpo_externalize_off, struct label *label,
 		}
 	}
 	if ((len = sbuf_len(&sb)) > 0) {
-		sbuf_setpos(&sb, len - 1);      /* trim trailing comma */
+		sbuf_setpos(&sb, len - 1);                               
 	}
 	sbuf_finish(&sb);
 
@@ -1094,10 +1094,10 @@ out:
 	return error;
 }
 
-/*
- * Have all policies set the internal form of a label, for a single
- * label namespace.
- */
+  
+                                                                   
+                   
+   
 static int
 mac_label_internalize(size_t mpo_internalize_off, struct label *label,
     char *element_name, char *element_data)
@@ -1138,7 +1138,7 @@ element_loop:
 			count++;
 		}
 	}
-	/* If there are dynamic policies present, check their elements too. */
+	                                                                      
 	if (!busy && mac_policy_list_conditional_busy() == 1) {
 		element_list = &mac_label_element_list;
 		busy = TRUE;
@@ -1174,7 +1174,7 @@ mac_internalize(size_t mpo_internalize_off, struct label *label,
 	return error;
 }
 
-/* system calls */
+                  
 
 int
 __mac_get_pid(struct proc *p, struct __mac_get_pid_args *uap, int *ret __unused)
@@ -1435,7 +1435,7 @@ __mac_get_fd(proc_t p, struct __mac_get_fd_args *uap, int *ret __unused)
 	case DTYPE_ATALK:
 	case DTYPE_NETPOLICY:
 	default:
-		error = ENOSYS;           // only sockets/vnodes so far
+		error = ENOSYS;                                        
 		break;
 	}
 	fp_drop(p, uap->fd, fp, 0);
@@ -1630,7 +1630,7 @@ __mac_set_fd(proc_t p, struct __mac_set_fd_args *uap, int *ret __unused)
 	case DTYPE_ATALK:
 	case DTYPE_NETPOLICY:
 	default:
-		error = ENOSYS;          // only sockets/vnodes so far
+		error = ENOSYS;                                       
 		break;
 	}
 
@@ -1726,21 +1726,21 @@ __mac_set_link(proc_t p, struct __mac_set_link_args *uap,
 	return mac_set_filelink(p, uap->mac_p, uap->path_p, 0);
 }
 
-/*
- * __mac_syscall: Perform a MAC policy system call
- *
- * Parameters:    p                       Process calling this routine
- *                uap                     User argument descriptor (see below)
- *                retv                    (Unused)
- *
- * Indirect:      uap->policy             Name of target MAC policy
- *                uap->call               MAC policy-specific system call to perform
- *                uap->arg                MAC policy-specific system call arguments
- *
- * Returns:        0                      Success
- *                !0                      Not success
- *
- */
+  
+                                                  
+  
+                                                                      
+                                                                              
+                                                  
+  
+                                                                   
+                                                                                    
+                                                                                   
+  
+                                                 
+                                                     
+  
+   
 int
 __mac_syscall(proc_t p, struct __mac_syscall_args *uap, int *retv __unused)
 {
@@ -1844,19 +1844,19 @@ mac_mount_label_get(struct mount *mp, user_addr_t mac_p)
 	return error;
 }
 
-/*
- * __mac_get_mount: Get mount point label information for a given pathname
- *
- * Parameters:    p                        (ignored)
- *                uap                      User argument descriptor (see below)
- *                ret                      (ignored)
- *
- * Indirect:      uap->path                Pathname
- *                uap->mac_p               MAC info
- *
- * Returns:        0                       Success
- *                !0                       Not success
- */
+  
+                                                                          
+  
+                                                    
+                                                                               
+                                                    
+  
+                                                   
+                                                   
+  
+                                                  
+                                                      
+   
 int
 __mac_get_mount(proc_t p __unused, struct __mac_get_mount_args *uap,
     int *ret __unused)
@@ -1882,15 +1882,15 @@ __mac_get_mount(proc_t p __unused, struct __mac_get_mount_args *uap,
 	return error;
 }
 
-/*
- * mac_schedule_userret()
- *
- * Schedule a callback to the mpo_thread_userret hook. The mpo_thread_userret
- * hook is called just before the thread exit from the kernel in ast_taken().
- *
- * Returns:	 0		Success
- *              !0		Not successful
- */
+  
+                         
+  
+                                                                             
+                                                                             
+  
+                       
+                                  
+   
 int
 mac_schedule_userret(void)
 {
@@ -1898,29 +1898,29 @@ mac_schedule_userret(void)
 	return 0;
 }
 
-/*
- * mac_do_machexc()
- *
- * Do a Mach exception.  This should only be done in the mpo_thread_userret
- * callback.
- *
- * params:	code		exception code
- *              subcode		exception subcode
- *              flags		flags:
- *                              MAC_DOEXCF_TRACED  Only do exception if being
- *                                                 ptrace()'ed.
- *
- *
- * Returns:	 0		Success
- *              !0		Not successful
- */
+  
+                   
+  
+                                                                           
+            
+  
+                               
+                                          
+                             
+                                                                             
+                                                               
+  
+  
+                       
+                                  
+   
 int
 mac_do_machexc(int64_t code, int64_t subcode, uint32_t flags)
 {
 	mach_exception_data_type_t  codes[EXCEPTION_CODE_MAX];
 	proc_t p = current_proc();
 
-	/* Only allow execption codes in MACF's reserved range. */
+	                                                          
 	if ((code < EXC_MACF_MIN) || (code > EXC_MACF_MAX)) {
 		return 1;
 	}
@@ -1931,14 +1931,14 @@ mac_do_machexc(int64_t code, int64_t subcode, uint32_t flags)
 	}
 
 
-	/* Send the Mach exception */
+	                             
 	codes[0] = (mach_exception_data_type_t)code;
 	codes[1] = (mach_exception_data_type_t)subcode;
 
 	return bsd_exception(EXC_SOFTWARE, codes, 2) != KERN_SUCCESS;
 }
 
-#else /* MAC */
+#else          
 
 void (*load_security_extensions_function)(void) = 0;
 
@@ -2036,4 +2036,4 @@ mac_vnode_check_trigger_resolve(vfs_context_t ctx __unused, struct vnode *dvp __
 	return 0;
 }
 
-#endif /* !MAC */
+#endif           

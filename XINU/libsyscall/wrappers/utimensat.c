@@ -37,10 +37,10 @@ static struct timespec times_now[2] = {
 	{ .tv_nsec = UTIME_NOW }
 };
 
-/*
- * Resolve any UTIME_NOW or UTIME_OMIT and return the attributes buffer and
- * attributes to pass.  Assumes times_in is writable.
- */
+  
+                                                                           
+                                                     
+   
 static int
 prepare_times_array_and_attrs(struct timespec times_in[2],
     struct timespec times_out[2], size_t *times_out_size)
@@ -54,9 +54,9 @@ prepare_times_array_and_attrs(struct timespec times_in[2],
 	    times_in[1].tv_nsec == UTIME_NOW) {
 		struct timespec now = {};
 		{
-			/*
-			 * TODO: Replace with nanosecond time when available
-			 */
+			  
+                                                       
+      
 			struct timeval tv;
 			if (__commpage_gettimeofday(&tv) != 0) {
 				__gettimeofday(&tv, NULL);

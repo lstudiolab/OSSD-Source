@@ -33,15 +33,15 @@
 #include <stdbool.h>
 
 struct san_type_desc {
-	uint16_t type; // 0: integer, 1: float
+	uint16_t type;                        
 	union {
 		struct {
 			uint16_t issigned : 1;
 			uint16_t width    : 15;
-		}; /* int descriptor */
+		};                     
 		struct {
 			uint16_t float_desc;
-		}; /* float descriptor */
+		};                       
 	};
 	const char name[];
 };
@@ -189,9 +189,9 @@ struct ubsan_buf {
 void ubsan_log_append(struct ubsan_violation *);
 void ubsan_format(struct ubsan_violation *, struct ubsan_buf *);
 
-/*
- * UBSan ABI
- */
+  
+            
+   
 
 void __ubsan_handle_add_overflow(struct ubsan_overflow_desc *, uint64_t lhs, uint64_t rhs);
 void __ubsan_handle_add_overflow_abort(struct ubsan_overflow_desc *, uint64_t lhs, uint64_t rhs);
@@ -235,4 +235,4 @@ void __ubsan_handle_type_mismatch_v1_abort(struct ubsan_align_desc *, uint64_t v
 void __ubsan_handle_vla_bound_not_positive(struct ubsan_vla_bound_desc *, uint64_t);
 void __ubsan_handle_vla_bound_not_positive_abort(struct ubsan_vla_bound_desc *, uint64_t);
 
-#endif /* _UBSAN_H_ */
+#endif                

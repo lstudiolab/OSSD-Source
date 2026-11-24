@@ -25,20 +25,20 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * dhcp_options.c
- * - routines to parse and access dhcp options
- *   and create new dhcp option areas
- * - handles overloaded areas as well as vendor-specific options
- *   that are encoded using the RFC 2132 encoding
- */
+  
+                 
+                                              
+                                     
+                                                                
+                                                 
+   
 
-/*
- * Modification History
- *
- * March 15, 2002	Dieter Siegmund (dieter@apple)
- * - imported from bootp project
- */
+  
+                       
+  
+                                                
+                                
+   
 
 #include <string.h>
 #include <sys/types.h>
@@ -53,9 +53,9 @@
 
 #ifdef  DHCP_DEBUG
 #define dprintf(x) printf x;
-#else   /* !DHCP_DEBUG */
+#else                    
 #define dprintf(x)
-#endif  /* DHCP_DEBUG */
+#endif                  
 
 static __inline__ void
 my_free(void * ptr)
@@ -82,10 +82,10 @@ my_realloc(void * oldptr, int oldsize, int newsize)
 	return data;
 }
 #else
-/*
- * To build:
- * xcrun -sdk macosx.internal cc -DTEST_DHCP_OPTIONS -o /tmp/dhcp_options dhcp_options.c -I ..
- */
+  
+            
+                                                                                              
+   
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -95,11 +95,11 @@ my_realloc(void * oldptr, int oldsize, int newsize)
 #define dprintf(x) printf x;
 #endif
 
-/*
- * Functions: ptrlist_*
- * Purpose:
- *   A dynamically growable array of pointers.
- */
+  
+                       
+           
+                                              
+   
 
 #define PTRLIST_NUMBER          16
 
@@ -176,7 +176,7 @@ ptrlist_add(ptrlist_t * list, const void * element)
 	return TRUE;
 }
 
-/* concatenates extra onto list */
+                                  
 static boolean_t
 ptrlist_concat(ptrlist_t * list, ptrlist_t * extra)
 {
@@ -205,12 +205,12 @@ ptrlist_concat(ptrlist_t * list, ptrlist_t * extra)
 }
 
 
-/*
- * Functions: dhcpol_*
- *
- * Purpose:
- *   Routines to parse/access existing options buffers.
- */
+  
+                      
+  
+           
+                                                       
+   
 boolean_t
 dhcpol_add(dhcpol_t * list, const void * element)
 {
@@ -247,15 +247,15 @@ dhcpol_concat(dhcpol_t * list, dhcpol_t * extra)
 	return ptrlist_concat((ptrlist_t *)list, (ptrlist_t *)extra);
 }
 
-/*
- * Function: dhcpol_parse_buffer
- *
- * Purpose:
- *   Parse the given buffer into DHCP options, returning the
- *   list of option pointers in the given dhcpol_t.
- *   Parsing continues until we hit the end of the buffer or
- *   the end tag.
- */
+  
+                                
+  
+           
+                                                            
+                                                   
+                                                            
+                 
+   
 boolean_t
 dhcpol_parse_buffer(dhcpol_t * list, const void * buffer, int length)
 {
@@ -273,12 +273,12 @@ dhcpol_parse_buffer(dhcpol_t * list, const void * buffer, int length)
 
 		switch (tag) {
 		case dhcptag_end_e:
-			/* remember that it was terminated */
+			                                     
 			dhcpol_add(list, scan);
 			scan++;
 			len--;
 			break;
-		case dhcptag_pad_e: /* ignore pad */
+		case dhcptag_pad_e:                 
 			scan++;
 			len--;
 			break;
@@ -297,7 +297,7 @@ dhcpol_parse_buffer(dhcpol_t * list, const void * buffer, int length)
 		}
 	}
 	if (len < 0) {
-		/* ran off the end */
+		                     
 		dprintf(("dhcp_options: parse failed near tag %d\n", tag));
 		dhcpol_free(list);
 		return FALSE;
@@ -305,18 +305,18 @@ dhcpol_parse_buffer(dhcpol_t * list, const void * buffer, int length)
 	return TRUE;
 }
 
-/*
- * Function: dhcpol_find
- *
- * Purpose:
- *   Finds the first occurence of the given option, and returns its
- *   length and the option data pointer.
- *
- *   The optional start parameter allows this function to
- *   return the next start point so that successive
- *   calls will retrieve the next occurence of the option.
- *   Before the first call, *start should be set to 0.
- */
+  
+                        
+  
+           
+                                                                   
+                                        
+  
+                                                         
+                                                   
+                                                          
+                                                      
+   
 const void *
 dhcpol_find(dhcpol_t * list, int tag, int * len_p, int * start)
 {
@@ -346,23 +346,23 @@ dhcpol_find(dhcpol_t * list, int tag, int * len_p, int * start)
 	return NULL;
 }
 
-/*
- * Function: dhcpol_parse_packet
- *
- * Purpose:
- *    Parse the option areas in the DHCP packet.
- *    Verifies that the packet has the right magic number,
- *    then parses and accumulates the option areas.
- *    First the pkt->dp_options is parsed.  If that contains
- *    the overload option, it parses pkt->dp_file if specified,
- *    then parses pkt->dp_sname if specified.
- */
+  
+                                
+  
+           
+                                                
+                                                          
+                                                   
+                                                            
+                                                               
+                                             
+   
 boolean_t
 dhcpol_parse_packet(dhcpol_t * options, const struct dhcp * pkt, int len)
 {
 	char                rfc_magic[4] = RFC_OPTIONS_MAGIC;
 
-	dhcpol_init(options);   /* make sure it's empty */
+	dhcpol_init(options);                             
 
 	if (len < (sizeof(*pkt) + RFC_MAGIC_SIZE)) {
 		dprintf(("dhcp_options: packet is too short: %d < %d\n",
@@ -377,13 +377,13 @@ dhcpol_parse_packet(dhcpol_t * options, const struct dhcp * pkt, int len)
 	    len - sizeof(*pkt) - RFC_MAGIC_SIZE) == FALSE) {
 		return FALSE;
 	}
-	{ /* get overloaded options */
+	{                             
 		const uint8_t * overload;
 		int             overload_len;
 
 		overload = dhcpol_find(options, dhcptag_option_overload_e,
 		    &overload_len, NULL);
-		if (overload && overload_len == 1) { /* has overloaded options */
+		if (overload && overload_len == 1) {                             
 			dhcpol_t    extra;
 
 			dhcpol_init(&extra);
@@ -492,4 +492,4 @@ main(void)
 	}
 	exit(0);
 }
-#endif /* TEST_DHCP_OPTIONS */
+#endif                        

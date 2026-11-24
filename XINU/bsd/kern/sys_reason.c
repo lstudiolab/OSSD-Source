@@ -37,9 +37,9 @@
 
 extern int maxproc;
 
-/*
- * Lock group attributes for os_reason subsystem
- */
+  
+                                                
+   
 static LCK_GRP_DECLARE(os_reason_lock_grp, "os_reason_lock");
 static ZONE_DECLARE(os_reason_zone, "os reasons",
     sizeof(struct os_reason), ZC_ZFREE_CLEARMEM);
@@ -49,16 +49,16 @@ os_refgrp_decl(static, os_reason_refgrp, "os_reason", NULL);
 static int os_reason_alloc_buffer_internal(os_reason_t cur_reason, uint32_t osr_bufsize,
     zalloc_flags_t flags);
 
-/*
- * Creates a new reason and initializes it with the provided reason
- * namespace and code. Also sets up the buffer and kcdata_descriptor
- * associated with the reason. Returns a pointer to the newly created
- * reason.
- *
- * Returns:
- * REASON_NULL if unable to allocate a reason or initialize the nested buffer
- * a pointer to the reason otherwise
- */
+  
+                                                                   
+                                                                    
+                                                                     
+          
+  
+           
+                                                                             
+                                    
+   
 os_reason_t
 os_reason_create(uint32_t osr_namespace, uint64_t osr_code)
 {
@@ -89,40 +89,40 @@ os_reason_dealloc_buffer(os_reason_t cur_reason)
 	bzero(&cur_reason->osr_kcd_descriptor, sizeof(cur_reason->osr_kcd_descriptor));
 }
 
-/*
- * Allocates and initializes a buffer of specified size for the reason. This function
- * may block and should not be called from extremely performance sensitive contexts
- * (i.e. jetsam). Also initializes the kcdata descriptor accordingly. If there is an
- * existing buffer, we dealloc the buffer before allocating a new one and
- * clear the associated kcdata descriptor. If osr_bufsize is passed as 0,
- * we deallocate the existing buffer and then return.
- *
- * Returns:
- * 0 on success
- * EINVAL if the passed reason pointer is invalid or the requested size is
- *        larger than REASON_BUFFER_MAX_SIZE
- * EIO if we fail to initialize the kcdata buffer
- */
+  
+                                                                                     
+                                                                                   
+                                                                                    
+                                                                         
+                                                                         
+                                                     
+  
+           
+               
+                                                                          
+                                            
+                                                 
+   
 int
 os_reason_alloc_buffer(os_reason_t cur_reason, uint32_t osr_bufsize)
 {
 	return os_reason_alloc_buffer_internal(cur_reason, osr_bufsize, Z_WAITOK);
 }
 
-/*
- * Allocates and initializes a buffer of specified size for the reason. Also
- * initializes the kcdata descriptor accordingly. If there is an existing
- * buffer, we dealloc the buffer before allocating a new one and
- * clear the associated kcdata descriptor. If osr_bufsize is passed as 0,
- * we deallocate the existing buffer and then return.
- *
- * Returns:
- * 0 on success
- * EINVAL if the passed reason pointer is invalid or the requested size is
- *        larger than REASON_BUFFER_MAX_SIZE
- * ENOMEM if unable to allocate memory for the buffer
- * EIO if we fail to initialize the kcdata buffer
- */
+  
+                                                                            
+                                                                         
+                                                                
+                                                                         
+                                                     
+  
+           
+               
+                                                                          
+                                            
+                                                     
+                                                 
+   
 int
 os_reason_alloc_buffer_noblock(os_reason_t cur_reason, uint32_t osr_bufsize)
 {
@@ -175,10 +175,10 @@ os_reason_alloc_buffer_internal(os_reason_t cur_reason, uint32_t osr_bufsize,
 	return 0;
 }
 
-/*
- * Returns a pointer to the kcdata descriptor associated with the specified
- * reason if there is a buffer allocated.
- */
+  
+                                                                           
+                                         
+   
 struct kcdata_descriptor *
 os_reason_get_kcdata_descriptor(os_reason_t cur_reason)
 {
@@ -200,9 +200,9 @@ os_reason_get_kcdata_descriptor(os_reason_t cur_reason)
 	return &cur_reason->osr_kcd_descriptor;
 }
 
-/*
- * Takes a reference on the passed reason.
- */
+  
+                                          
+   
 void
 os_reason_ref(os_reason_t cur_reason)
 {
@@ -216,10 +216,10 @@ os_reason_ref(os_reason_t cur_reason)
 	return;
 }
 
-/*
- * Drops a reference on the passed reason, deallocates
- * the reason if no references remain.
- */
+  
+                                                      
+                                      
+   
 void
 os_reason_free(os_reason_t cur_reason)
 {
@@ -242,9 +242,9 @@ os_reason_free(os_reason_t cur_reason)
 	zfree(os_reason_zone, cur_reason);
 }
 
-/*
- * Sets flags on the passed reason.
- */
+  
+                                   
+   
 void
 os_reason_set_flags(os_reason_t cur_reason, uint64_t flags)
 {
@@ -257,9 +257,9 @@ os_reason_set_flags(os_reason_t cur_reason, uint64_t flags)
 	lck_mtx_unlock(&cur_reason->osr_lock);
 }
 
-/*
- * Allocates space and sets description data in kcd_descriptor on the passed reason.
- */
+  
+                                                                                    
+   
 void
 os_reason_set_description_data(os_reason_t cur_reason, uint32_t type, void *reason_data, uint32_t reason_data_len)
 {

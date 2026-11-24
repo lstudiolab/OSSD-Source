@@ -25,13 +25,13 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-#include <stdint.h> // For uintptr_t.
+#include <stdint.h>                  
 #include <string.h>
 #include <libkern/mkext.h>
 
 
-#define BASE 65521L /* largest prime smaller than 65536 */
-#define NMAX 5552  // the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
+#define BASE 65521L                                       
+#define NMAX 5552                                                                  
 
 #define DO1(buf, i)  {s1 += buf[i]; s2 += s1;}
 #define DO2(buf, i)  DO1(buf,i); DO1(buf,i+1);
@@ -42,8 +42,8 @@
 u_int32_t
 mkext_adler32(uint8_t *buf, int32_t len)
 {
-	unsigned long s1 = 1; // adler & 0xffff;
-	unsigned long s2 = 0; // (adler >> 16) & 0xffff;
+	unsigned long s1 = 1;                   
+	unsigned long s2 = 0;                           
 	int k;
 
 
@@ -68,39 +68,39 @@ mkext_adler32(uint8_t *buf, int32_t len)
 }
 
 
-/**************************************************************
-*   LZSS.C -- A Data Compression Program
-***************************************************************
-*    4/6/1989 Haruhiko Okumura
-*    Use, distribute, and modify this program freely.
-*    Please send me your improved versions.
-*        PC-VAN      SCIENCE
-*        NIFTY-Serve PAF01022
-*        CompuServe  74050,1022
-*
-**************************************************************/
+                                                               
+                                        
+                                                               
+                              
+                                                     
+                                           
+                            
+                             
+                               
+ 
+                                                               
 
-#define N         4096  /* size of ring buffer - must be power of 2 */
-#define F         18    /* upper limit for match_length */
-#define THRESHOLD 2     /* encode string into position and length
-	                 *  if match_length is greater than this */
+#define N         4096                                                
+#define F         18                                      
+#define THRESHOLD 2                                              
+                                                            
 #if !KERNEL
-#define NIL       N     /* index for root of binary search trees */
+#define NIL       N                                                
 #endif
 
 struct encode_state {
-	/*
-	 * left & right children & parent. These constitute binary search trees.
-	 */
+	  
+                                                                         
+    
 	int lchild[N + 1], rchild[N + 257], parent[N + 1];
 
-	/* ring buffer of size N, with extra F-1 bytes to aid string comparison */
+	                                                                          
 	u_int8_t text_buf[N + F - 1];
 
-	/*
-	 * match_length of longest match.
-	 * These are set by the insert_node() procedure.
-	 */
+	  
+                                  
+                                                 
+    
 	int match_position, match_length;
 };
 
@@ -108,7 +108,7 @@ struct encode_state {
 int
 decompress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen)
 {
-	/* ring buffer of size N, with extra F-1 bytes to aid string comparison */
+	                                                                          
 	u_int8_t text_buf[N + F - 1];
 	u_int8_t *dststart = dst;
 	u_int8_t *dstend = dst + dstlen;
@@ -131,8 +131,8 @@ decompress_lzss(u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen
 			} else {
 				break;
 			}
-			flags = c | 0xFF00; /* uses higher byte cleverly */
-		} /* to count eight */
+			flags = c | 0xFF00;                                
+		}                     
 		if (flags & 1) {
 			if (src < srcend) {
 				c = *src++;
@@ -175,15 +175,15 @@ finish:
 
 #if !KERNEL
 
-/*
- * initialize state, mostly the trees
- *
- * For i = 0 to N - 1, rchild[i] and lchild[i] will be the right and left
- * children of node i.  These nodes need not be initialized.  Also, parent[i]
- * is the parent of node i.  These are initialized to NIL (= N), which stands
- * for 'not used.'  For i = 0 to 255, rchild[N + i + 1] is the root of the
- * tree for strings that begin with character i.  These are initialized to NIL.
- * Note there are 256 trees. */
+  
+                                     
+  
+                                                                         
+                                                                             
+                                                                             
+                                                                          
+                                                                               
+                               
 static void
 init_state(struct encode_state *sp)
 {
@@ -202,14 +202,14 @@ init_state(struct encode_state *sp)
 	}
 }
 
-/*
- * Inserts string of length F, text_buf[r..r+F-1], into one of the trees
- * (text_buf[r]'th tree) and returns the longest-match position and length
- * via the global variables match_position and match_length.
- * If match_length = F, then removes the old node in favor of the new one,
- * because the old one will be deleted sooner. Note r plays double role,
- * as tree node and position in buffer.
- */
+  
+                                                                        
+                                                                          
+                                                            
+                                                                          
+                                                                        
+                                       
+   
 static void
 insert_node(struct encode_state *sp, int r)
 {
@@ -261,17 +261,17 @@ insert_node(struct encode_state *sp, int r)
 	} else {
 		sp->lchild[sp->parent[p]] = r;
 	}
-	sp->parent[p] = NIL; /* remove p */
+	sp->parent[p] = NIL;               
 }
 
-/* deletes node p from tree */
+                              
 static void
 delete_node(struct encode_state *sp, int p)
 {
 	int  q;
 
 	if (sp->parent[p] == NIL) {
-		return; /* not in tree */
+		return;                  
 	}
 	if (sp->rchild[p] == NIL) {
 		q = sp->lchild[p];
@@ -300,4 +300,4 @@ delete_node(struct encode_state *sp, int p)
 	sp->parent[p] = NIL;
 }
 
-#endif /* !KERNEL */
+#endif              

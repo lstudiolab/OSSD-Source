@@ -31,7 +31,7 @@ run_test(void)
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kr, "mach_memory_info");
 	T_QUIET; T_ASSERT_EQ(nameCnt, infoCnt, "zone name and info counts don't match");
 
-	/* Match the names of the kalloc zones against their element sizes. */
+	                                                                      
 	for (i = 0; i < nameCnt; i++) {
 		if (strncmp(name[i].mzn_name, kalloc_str, strlen(kalloc_str)) == 0) {
 			size = strtoul(&(name[i].mzn_name[strlen(kalloc_str)]), NULL, 10);

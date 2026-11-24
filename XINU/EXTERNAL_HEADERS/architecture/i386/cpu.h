@@ -36,9 +36,9 @@
  *	Created.
  */
 
-/*
- * Control register 0
- */
+  
+                     
+   
  
 typedef struct _cr0 {
     unsigned int	pe	:1,

@@ -25,7 +25,7 @@ class Process(object):
             'default_packet_timeout': '10', 'distribution_id': None
         }
 
-        ## if cputype is arm assume its ios
+                                           
         if (cputype & 0xc) != 0xc:
             self.hinfo['ostype'] = 'ios'
         self.ptrsize = ptrsize
@@ -46,7 +46,7 @@ class Process(object):
 
     def readMemory(self, address, size):
         logging.critical("readMemory: Not Implemented: readMemory")
-        #E08 means read failed
+                              
         return 'E08'
 
     def writeMemory(self, address, data, size):
@@ -55,8 +55,8 @@ class Process(object):
         return 'E09'
 
     def getRegisterInfo(regnum):
-        #something similar to
-        #"name:x1;bitsize:64;offset:8;encoding:uint;format:hex;gcc:1;dwarf:1;set:General Purpose Registers;"
+                             
+                                                                                                            
         logging.critical("getRegisterInfo: Not Implemented: getRegisterInfo")
         return 'E45'
 
@@ -85,7 +85,7 @@ class Process(object):
         raise NotImplementedError('getSharedLibInfoAddress is not Implemented')
 
     def getSignalInfo(self):
-        # return the signal info in required format.
+                                                    
         return "T02" + "threads:" + self.getThreadsInfo() + ';'
 
     def getThreadsInfo(self):

@@ -53,17 +53,17 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- * Setjmp/longjmp buffer for i386.
- */
+  
+                                  
+   
 #ifndef _I386_SETJMP_H_
 #define _I386_SETJMP_H_
 
 typedef struct jmp_buf {
-	int     jmp_buf[6];     /* ebx, esi, edi, ebp, esp, eip */
+	int     jmp_buf[6];                                       
 } jmp_buf_t;
 
-#endif  /* _I386_SETJMP_H_ */
+#endif                       

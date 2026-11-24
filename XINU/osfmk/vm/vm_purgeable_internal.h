@@ -21,18 +21,18 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/*
- * Purgeable spelling rules
- * It is believed that the correct spelling is
- * { 'p', 'u', 'r', 'g', 'e', 'a', 'b', 'l', 'e' }.
- * However, there is one published API that likes to spell it without the
- * first 'e', vm_purgable_control(). Since we can't change that API,
- * here are the rules.
- * All qualifiers defined in vm_purgable.h are spelled without the e.
- * All other qualifiers are spelled with the e.
- * Right now, there are remains of the wrong spelling throughout the code,
- * vm_object_t.purgable for example. We expect to change these on occasion.
- */
+  
+                           
+                                              
+                                                   
+                                                                         
+                                                                    
+                      
+                                                                     
+                                               
+                                                                          
+                                                                           
+   
 
 #ifndef __VM_PURGEABLE_INTERNAL__
 #define __VM_PURGEABLE_INTERNAL__
@@ -52,9 +52,9 @@ typedef uint32_t token_cnt_t;
 
 #define NUM_VOLATILE_GROUPS 8
 struct purgeable_q {
-	token_idx_t token_q_head;    /* first token */
-	token_idx_t token_q_tail;    /* last token  */
-	token_idx_t token_q_unripe;  /* first token which is not ripe */
+	token_idx_t token_q_head;                     
+	token_idx_t token_q_tail;                     
+	token_idx_t token_q_unripe;                                     
 	int32_t new_pages;
 	queue_head_t objq[NUM_VOLATILE_GROUPS];
 	enum purgeable_q_type type;
@@ -74,50 +74,50 @@ extern int32_t token_new_pagecount;
 extern int available_for_purge;
 
 
-/*
- * Locking:
- * the token counters are protected by the vm_page_queue_lock, since they're
- * mostly used in that context and we don't want to do a lot of extra locking
- * the purgeable page queues are protected by a separate lock since they're
- * mostly used on a user context and we don't want any contention with the
- * pageout daemon.
- */
+  
+           
+                                                                            
+                                                                             
+                                                                           
+                                                                          
+                  
+   
 decl_lck_mtx_data(extern, vm_purgeable_queue_lock);
 
-/* add a new token to queue. called by vm_object_purgeable_control */
-/* enter with page queue locked */
+                                                                     
+                                  
 kern_return_t vm_purgeable_token_add(purgeable_q_t queue);
 
-/* enter with page queue locked */
+                                  
 void vm_purgeable_token_delete_first(purgeable_q_t queue);
 void vm_purgeable_token_delete_last(purgeable_q_t queue);
 
-/*
- * decrement token counters.
- * enter with page queue locked
- */
+  
+                            
+                               
+   
 void vm_purgeable_q_advance_all(void);
 
-/* the object purger. purges the next eligible object from memory. */
-/* returns TRUE if an object was purged, otherwise FALSE. */
+                                                                     
+                                                            
 boolean_t vm_purgeable_object_purge_one(int force_purge_below_group, int flags);
 
-/* purge all volatile objects now */
+                                    
 void vm_purgeable_object_purge_all(void);
 
-/* insert purgeable object into queue */
+                                        
 void vm_purgeable_object_add(vm_object_t object, purgeable_q_t queue, int group);
 
-/* look for object. If found, remove from purgeable queue. */
+                                                             
 purgeable_q_t vm_purgeable_object_remove(vm_object_t object);
 
-/* statistics for purgable objects in all queues */
+                                                   
 void vm_purgeable_stats(vm_purgeable_info_t info, task_t target_task);
 
 #if DEVELOPMENT || DEBUG
-/* statistics for purgeable object usage in all queues for a task */
+                                                                    
 kern_return_t vm_purgeable_account(task_t task, pvm_account_info_t acnt_info);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 uint64_t vm_purgeable_purge_task_owned(task_t task);
 void vm_purgeable_nonvolatile_enqueue(vm_object_t object, task_t task);
@@ -129,14 +129,14 @@ void vm_object_owner_compressed_update(vm_object_t      object,
 
 #define PURGEABLE_LOOP_MAX 64
 
-#define TOKEN_ADD               0x40    /* 0x100 */
-#define TOKEN_DELETE            0x41    /* 0x104 */
-#define TOKEN_RIPEN             0x42    /* 0x108 */
-#define OBJECT_ADD              0x48    /* 0x120 */
-#define OBJECT_REMOVE           0x49    /* 0x124 */
-#define OBJECT_PURGE            0x4a    /* 0x128 */
-#define OBJECT_PURGE_ALL        0x4b    /* 0x12c */
-#define OBJECT_PURGE_ONE        0x4c    /* 0x12d */
-#define OBJECT_PURGE_LOOP       0x4e    /* 0x12e */
+#define TOKEN_ADD               0x40               
+#define TOKEN_DELETE            0x41               
+#define TOKEN_RIPEN             0x42               
+#define OBJECT_ADD              0x48               
+#define OBJECT_REMOVE           0x49               
+#define OBJECT_PURGE            0x4a               
+#define OBJECT_PURGE_ALL        0x4b               
+#define OBJECT_PURGE_ONE        0x4c               
+#define OBJECT_PURGE_LOOP       0x4e               
 
-#endif /* __VM_PURGEABLE_INTERNAL__ */
+#endif                                

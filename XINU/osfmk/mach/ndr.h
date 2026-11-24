@@ -48,14 +48,14 @@ typedef struct {
 	unsigned char       reserved2;
 } NDR_record_t;
 
-/*
- * MIG supported protocols for Network Data Representation
- */
+  
+                                                          
+   
 #define  NDR_PROTOCOL_2_0      0
 
-/*
- * NDR 2.0 format flag type definition and values.
- */
+  
+                                                  
+   
 #define  NDR_INT_BIG_ENDIAN    0
 #define  NDR_INT_LITTLE_ENDIAN 1
 #define  NDR_FLOAT_IEEE        0
@@ -67,23 +67,23 @@ typedef struct {
 
 extern NDR_record_t NDR_record;
 
-/* NDR conversion off by default */
+                                   
 
 #if !defined(__NDR_convert__)
 #define __NDR_convert__ 0
-#endif /* !defined(__NDR_convert__) */
+#endif                                
 
 #ifndef __NDR_convert__int_rep__
 #define __NDR_convert__int_rep__ __NDR_convert__
-#endif /* __NDR_convert__int_rep__ */
+#endif                               
 
 #ifndef __NDR_convert__char_rep__
 #define __NDR_convert__char_rep__ 0
-#endif /* __NDR_convert__char_rep__ */
+#endif                                
 
 #ifndef __NDR_convert__float_rep__
 #define __NDR_convert__float_rep__ 0
-#endif /* __NDR_convert__float_rep__ */
+#endif                                 
 
 #if __NDR_convert__
 
@@ -184,7 +184,7 @@ __END_DECLS
 #define __NDR_convert__int_rep__mach_msg_type_number_t(v, f) \
 	__NDR_convert__int_rep__uint32_t(v,f)
 
-#endif /* __NDR_convert__int_rep__ */
+#endif                               
 
 #if __NDR_convert__char_rep__
 
@@ -192,7 +192,7 @@ __END_DECLS
 #define __NDR_convert__char_rep__char(v, f)      __NDR_convert__NOOP
 #define __NDR_convert__char_rep__string(v, f, l)  __NDR_convert__NOOP
 
-#endif /* __NDR_convert__char_rep__ */
+#endif                                
 
 #if __NDR_convert__float_rep__
 
@@ -200,8 +200,8 @@ __END_DECLS
 #define __NDR_convert__float_rep__float(v, f)    __NDR_convert__NOOP
 #define __NDR_convert__float_rep__double(v, f)   __NDR_convert__NOOP
 
-#endif /* __NDR_convert__float_rep__ */
+#endif                                 
 
-#endif /* __NDR_convert__ */
+#endif                      
 
-#endif /* _MACH_NDR_H_ */
+#endif                   

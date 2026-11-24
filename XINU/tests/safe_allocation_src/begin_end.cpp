@@ -1,11 +1,11 @@
-//
-// Tests for
-//  iterator begin();
-//  const_iterator begin() const;
-//
-//  iterator end();
-//  const_iterator end() const;
-//
+  
+            
+                     
+                                 
+  
+                   
+                               
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>
@@ -22,7 +22,7 @@ tests()
 {
 	using A = test_safe_allocation<T>;
 
-	// Check begin()/end() for a non-null allocation
+	                                                
 	{
 		A array(10, libkern::allocate_memory);
 		T* data = array.data();
@@ -40,7 +40,7 @@ tests()
 		CHECK(end.unsafe_discard_bounds() == data + 10);
 	}
 
-	// Check begin()/end() for a null allocation
+	                                            
 	{
 		A array = nullptr;
 		test_bounded_ptr<T> begin = array.begin();
@@ -58,7 +58,7 @@ tests()
 		CHECK(begin == end);
 	}
 
-	// Check associated types
+	                         
 	{
 		static_assert(std::is_same_v<typename A::iterator, test_bounded_ptr<T> >);
 		static_assert(std::is_same_v<typename A::const_iterator, test_bounded_ptr<T const> >);

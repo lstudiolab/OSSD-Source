@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_TRAP_H */
+#endif                      

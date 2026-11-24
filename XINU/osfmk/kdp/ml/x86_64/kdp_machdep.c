@@ -36,8 +36,8 @@
 #include <kdp/kdp_internal.h>
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
-#include <IOKit/IOPlatformExpert.h> /* for PE_halt_restart */
-#include <kern/machine.h> /* for halt_all_cpus */
+#include <IOKit/IOPlatformExpert.h>                          
+#include <kern/machine.h>                        
 #include <libkern/OSAtomic.h>
 
 #include <kern/thread.h>
@@ -328,13 +328,13 @@ print_saved_state(void *state)
 void
 kdp_sync_cache(void)
 {
-	return; /* No op here. */
+	return;                  
 }
 
 void
 kdp_call(void)
 {
-	__asm__ volatile ("int	$3");   /* Let the processor do the work */
+	__asm__ volatile ("int	$3");                                      
 }
 
 
@@ -443,8 +443,8 @@ kdp_i386_trap(
 	enable_preemption();
 	ml_set_interrupts_enabled(prev_interrupts_state);
 
-	/* If the instruction single step bit is set, disable kernel preemption
-	 */
+	                                                                       
+    
 	if (saved_state->isf.rflags & EFL_TF) {
 		disable_preemption();
 	}
@@ -502,12 +502,12 @@ machine_trace_thread(thread_t thread,
 	for (framecount = 0; framecount < nframes; framecount++) {
 		*tracebuf++ = prev_eip;
 
-		/* Invalid frame, or hit fence */
+		                                 
 		if (!stackptr || (stackptr == fence)) {
 			break;
 		}
 
-		/* Unaligned frame */
+		                     
 		if (stackptr & 0x0000003) {
 			break;
 		}
@@ -552,7 +552,7 @@ machine_trace_thread(thread_t thread,
 
 
 #define RETURN_OFFSET64 8
-/* Routine to encapsulate the 64-bit address read hack*/
+                                                        
 unsigned
 machine_read64(addr64_t srcaddr, caddr_t dstaddr, uint32_t len)
 {

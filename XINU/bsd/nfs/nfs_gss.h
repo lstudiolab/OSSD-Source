@@ -45,135 +45,135 @@ enum rpcsec_gss_proc {
 };
 
 enum rpcsec_gss_service {
-	RPCSEC_GSS_SVC_NONE             = 1,    // sec=krb5
-	RPCSEC_GSS_SVC_INTEGRITY        = 2,    // sec=krb5i
-	RPCSEC_GSS_SVC_PRIVACY          = 3,    // sec=krb5p
+	RPCSEC_GSS_SVC_NONE             = 1,               
+	RPCSEC_GSS_SVC_INTEGRITY        = 2,                
+	RPCSEC_GSS_SVC_PRIVACY          = 3,                
 };
 
-/* encoded krb5 OID */
+                      
 extern u_char krb5_mech_oid[11];
 
 
-/*
- * RFC 2203 and friends don't define maximums for token lengths
- * and context handles. We try to pick reasonable values here.
- *
- * N.B. Kerberos mech tokens can be quite large from the output
- * of a gss_init_sec_context if it includes a large PAC.
- */
+  
+                                                               
+                                                              
+  
+                                                               
+                                                        
+   
 
 #define GSS_MAX_CTX_HANDLE_LEN          256
 #define GSS_MAX_TOKEN_LEN               64*1024
 
-/*
- * Put a "reasonble" bound on MIC lengths
- */
+  
+                                         
+   
 #define GSS_MAX_MIC_LEN                 2048
 
-#define GSS_MAXSEQ                      0x80000000      // The biggest sequence number
-#define GSS_SVC_MAXCONTEXTS             500000          // Max contexts supported
-#define GSS_SVC_SEQWINDOW               256             // Server's sequence window
-#define GSS_CLNT_SEQLISTMAX             32              // Max length of req seq num list
+#define GSS_MAXSEQ                      0x80000000                                    
+#define GSS_SVC_MAXCONTEXTS             500000                                   
+#define GSS_SVC_SEQWINDOW               256                                        
+#define GSS_CLNT_SEQLISTMAX             32                                               
 
 #define MAX_SKEYLEN     32
 #define MAX_LUCIDLEN    (sizeof (lucid_context) + MAX_SKEYLEN)
 #define GSS_MAX_NEG_CACHE_ENTRIES 16
 #define GSS_NEG_CACHE_TO 3
-#define GSS_PRINT_DELAY  (8 * 3600)     // Wait day before printing the same error message
+#define GSS_PRINT_DELAY  (8 * 3600)                                                       
 
-/*
- * The client's RPCSEC_GSS context information
- */
+  
+                                              
+   
 struct nfs_gss_clnt_ctx {
 	lck_mtx_t               gss_clnt_mtx;
-	thread_t                gss_clnt_thread;        // Thread creating context
+	thread_t                gss_clnt_thread;                                  
 	TAILQ_ENTRY(nfs_gss_clnt_ctx)   gss_clnt_entries;
-	uint32_t                gss_clnt_flags;         // Flag bits - see below
-	int32_t                 gss_clnt_refcnt;        // Reference count
-	kauth_cred_t            gss_clnt_cred;          // Owner of this context
-	uint8_t                 *gss_clnt_principal;    // Principal to use for this credential
-	size_t                  gss_clnt_prinlen;       // Length of principal
-	gssd_nametype           gss_clnt_prinnt;        // Name type of principal
-	char                    *gss_clnt_display;      // display name of principal
-	uint32_t                gss_clnt_proc;          // Current GSS proc for cred
-	uint32_t                gss_clnt_seqnum;        // GSS sequence number
-	uint32_t                gss_clnt_service;       // Indicates krb5, krb5i or krb5p
-	uint8_t                 *gss_clnt_handle;       // Identifies server context
-	uint32_t                gss_clnt_handle_len;    // Size of server's ctx handle
-	time_t                  gss_clnt_nctime;        // When context was put in the negative cache
-	uint32_t                gss_clnt_seqwin;        // Server's seq num window
-	uint32_t                *gss_clnt_seqbits;      // Bitmap to track seq numbers in use
-	mach_port_t             gss_clnt_mport;         // Mach port for gssd upcall
-	uint32_t                gss_clnt_verflen;       // RPC verifier length from server
-	uint8_t                 *gss_clnt_verf;         // RPC verifier from server
-	uint8_t                 *gss_clnt_svcname;      // Service name e.g. "nfs/big.apple.com"
-	size_t                  gss_clnt_svcnamlen;     // Service name length
-	gssd_nametype           gss_clnt_svcnt;         // Service name type
-	gssd_cred               gss_clnt_cred_handle;   // Opaque cred handle from gssd
-	gssd_ctx                gss_clnt_context;       // Opaque context handle from gssd
-	gss_ctx_id_t            gss_clnt_ctx_id;        // Underlying gss context
-	uint8_t                 *gss_clnt_token;        // GSS token exchanged via gssd & server
-	uint32_t                gss_clnt_tokenlen;      // Length of token
-	uint32_t                gss_clnt_gssd_flags;    // Special flag bits to gssd
-	uint32_t                gss_clnt_major;         // GSS major result from gssd or server
-	uint32_t                gss_clnt_minor;         // GSS minor result from gssd or server
-	time_t                  gss_clnt_ptime;         // When last error message was printed
+	uint32_t                gss_clnt_flags;                                 
+	int32_t                 gss_clnt_refcnt;                          
+	kauth_cred_t            gss_clnt_cred;                                  
+	uint8_t                 *gss_clnt_principal;                                           
+	size_t                  gss_clnt_prinlen;                             
+	gssd_nametype           gss_clnt_prinnt;                                 
+	char                    *gss_clnt_display;                                  
+	uint32_t                gss_clnt_proc;                                      
+	uint32_t                gss_clnt_seqnum;                              
+	uint32_t                gss_clnt_service;                                        
+	uint8_t                 *gss_clnt_handle;                                   
+	uint32_t                gss_clnt_handle_len;                                  
+	time_t                  gss_clnt_nctime;                                                     
+	uint32_t                gss_clnt_seqwin;                                  
+	uint32_t                *gss_clnt_seqbits;                                           
+	mach_port_t             gss_clnt_mport;                                     
+	uint32_t                gss_clnt_verflen;                                         
+	uint8_t                 *gss_clnt_verf;                                    
+	uint8_t                 *gss_clnt_svcname;                                              
+	size_t                  gss_clnt_svcnamlen;                           
+	gssd_nametype           gss_clnt_svcnt;                             
+	gssd_cred               gss_clnt_cred_handle;                                  
+	gssd_ctx                gss_clnt_context;                                         
+	gss_ctx_id_t            gss_clnt_ctx_id;                                 
+	uint8_t                 *gss_clnt_token;                                                
+	uint32_t                gss_clnt_tokenlen;                        
+	uint32_t                gss_clnt_gssd_flags;                                
+	uint32_t                gss_clnt_major;                                                
+	uint32_t                gss_clnt_minor;                                                
+	time_t                  gss_clnt_ptime;                                               
 };
 
-/*
- * gss_clnt_flags
- */
-#define GSS_CTX_COMPLETE        0x00000001      // Context is complete
-#define GSS_CTX_INVAL           0x00000002      // Context is invalid
-#define GSS_CTX_STICKY          0x00000004      // Context has been set by user
-#define GSS_NEEDSEQ             0x00000008      // Need a sequence number
-#define GSS_NEEDCTX             0x00000010      // Need the context
-#define GSS_CTX_DESTROY         0x00000020      // Context is being destroyed, don't cache
-#define GSS_CTX_USECOUNT        0x00000040      // Mount vnode's user count has been updated
+  
+                 
+   
+#define GSS_CTX_COMPLETE        0x00000001                            
+#define GSS_CTX_INVAL           0x00000002                           
+#define GSS_CTX_STICKY          0x00000004                                     
+#define GSS_NEEDSEQ             0x00000008                               
+#define GSS_NEEDCTX             0x00000010                         
+#define GSS_CTX_DESTROY         0x00000020                                                
+#define GSS_CTX_USECOUNT        0x00000040                                                  
 
-/*
- * The server's RPCSEC_GSS context information
- */
+  
+                                              
+   
 struct nfs_gss_svc_ctx {
 	lck_mtx_t               gss_svc_mtx;
 	LIST_ENTRY(nfs_gss_svc_ctx)     gss_svc_entries;
-	uint32_t                gss_svc_handle;         // Identifies server context to client
-	uint32_t                gss_svc_refcnt;         // Reference count
-	uint32_t                gss_svc_proc;           // Current GSS proc from cred
-	uid_t                   gss_svc_uid;            // UID of this user
-	gid_t                   gss_svc_gids[NGROUPS];  // GIDs of this user
-	uint32_t                gss_svc_ngroups;        // Count of gids
-	uint64_t                gss_svc_incarnation;    // Delete ctx if we exceed this + ttl value
-	uint32_t                gss_svc_seqmax;         // Current max GSS sequence number
-	uint32_t                gss_svc_seqwin;         // GSS sequence number window
-	uint32_t                *gss_svc_seqbits;       // Bitmap to track seq numbers
-	gssd_cred               gss_svc_cred_handle;    // Opaque cred handle from gssd
-	gssd_ctx                gss_svc_context;        // Opaque context handle from gssd
-	gss_ctx_id_t            gss_svc_ctx_id;         // Underlying gss context
-	u_char                  *gss_svc_token;         // GSS token exchanged via gssd & client
-	uint32_t                gss_svc_tokenlen;       // Length of token
-	uint32_t                gss_svc_major;          // GSS major result from gssd
-	uint32_t                gss_svc_minor;          // GSS minor result from gssd
+	uint32_t                gss_svc_handle;                                               
+	uint32_t                gss_svc_refcnt;                           
+	uint32_t                gss_svc_proc;                                        
+	uid_t                   gss_svc_uid;                               
+	gid_t                   gss_svc_gids[NGROUPS];                      
+	uint32_t                gss_svc_ngroups;                        
+	uint64_t                gss_svc_incarnation;                                               
+	uint32_t                gss_svc_seqmax;                                           
+	uint32_t                gss_svc_seqwin;                                      
+	uint32_t                *gss_svc_seqbits;                                     
+	gssd_cred               gss_svc_cred_handle;                                   
+	gssd_ctx                gss_svc_context;                                          
+	gss_ctx_id_t            gss_svc_ctx_id;                                  
+	u_char                  *gss_svc_token;                                                 
+	uint32_t                gss_svc_tokenlen;                         
+	uint32_t                gss_svc_major;                                       
+	uint32_t                gss_svc_minor;                                       
 };
 
 #define SVC_CTX_HASHSZ  64
 #define SVC_CTX_HASH(handle)    ((handle) % SVC_CTX_HASHSZ)
 LIST_HEAD(nfs_gss_svc_ctx_hashhead, nfs_gss_svc_ctx);
 
-/*
- * Macros to manipulate bits in the sequence window
- */
+  
+                                                   
+   
 #define win_getbit(bits, bit)      ((bits[(bit) / 32] &   (1 << (bit) % 32)) != 0)
 #define win_setbit(bits, bit)   do { bits[(bit) / 32] |=  (1 << (bit) % 32); } while (0)
 #define win_resetbit(bits, bit) do { bits[(bit) / 32] &= ~(1 << (bit) % 32); } while (0)
 
-/*
- * Server context stale times
- */
-#define GSS_CTX_PEND            5               // seconds
-#define GSS_CTX_EXPIRE          (8 * 3600)      // seconds
-#define GSS_CTX_TTL_MIN         1               // seconds
-#define GSS_TIMER_PERIOD        300             // seconds
+  
+                             
+   
+#define GSS_CTX_PEND            5                         
+#define GSS_CTX_EXPIRE          (8 * 3600)                
+#define GSS_CTX_TTL_MIN         1                         
+#define GSS_TIMER_PERIOD        300                       
 #define MSECS_PER_SEC           1000
 
 #define auth_is_kerberized(auth) \
@@ -206,4 +206,4 @@ void    nfs_gss_svc_ctx_deref(struct nfs_gss_svc_ctx *);
 void    nfs_gss_svc_cleanup(void);
 
 __END_DECLS
-#endif /* _NFS_NFS_GSS_H_ */
+#endif                      

@@ -39,7 +39,7 @@
 # endif
 #endif
 
-/* Generic byte swapping functions. */
+                                      
 
 __DARWIN_OS_INLINE
 __uint16_t
@@ -101,4 +101,4 @@ _OSSwapInt64(
 #error Unknown architecture
 #endif
 
-#endif /* ! _OS__OSBYTEORDERI386_H */
+#endif                               

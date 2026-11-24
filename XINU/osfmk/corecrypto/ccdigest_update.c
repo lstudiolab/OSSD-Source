@@ -41,17 +41,17 @@ ccdigest_update(const struct ccdigest_info *di, ccdigest_ctx_t ctx, size_t len, 
 	const char * data_ptr = data;
 	size_t nblocks, nbytes;
 
-	// Sanity check to recover from ctx corruptions.
+	                                                
 	if (ccdigest_num(di, ctx) >= di->block_size) {
 		ccdigest_num(di, ctx) = 0;
 	}
 
 	while (len > 0) {
 		if (ccdigest_num(di, ctx) == 0 && len > di->block_size) {
-			if (di->block_size == 1 << 6) { // md5 & sha1 & sha256
+			if (di->block_size == 1 << 6) {                       
 				nblocks = len >> 6;
 				nbytes = nblocks << 6;
-			} else if (di->block_size == 1 << 7) { // sha384 & sha512
+			} else if (di->block_size == 1 << 7) {                   
 				nblocks = len >> 7;
 				nbytes = nblocks << 7;
 			} else {
@@ -66,7 +66,7 @@ ccdigest_update(const struct ccdigest_info *di, ccdigest_ctx_t ctx, size_t len, 
 		} else {
 			size_t n = CC_MIN(di->block_size - ccdigest_num(di, ctx), len);
 			cc_memcpy(ccdigest_data(di, ctx) + ccdigest_num(di, ctx), data_ptr, n);
-			/* typecast: less than block size, will always fit into an int */
+			                                                                 
 			ccdigest_num(di, ctx) += (unsigned int)n;
 			len -= n;
 			data_ptr += n;

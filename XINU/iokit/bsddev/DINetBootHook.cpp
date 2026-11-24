@@ -25,59 +25,59 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *  DINetBootHook.c
- *  DiskImages
- *
- *  Created by Byron Han on Sat Apr 13 2002.
- *
- *	Revision History
- *
- *	$Log: DINetBootHook.cpp,v $
- *	Revision 1.4  2005/07/29 21:49:57  lindak
- *	Merge of branch "chardonnay" to pick up all chardonnay changes in Leopard
- *	as of xnu-792.7.4
- *
- *	Revision 1.3.1558.1  2005/06/24 01:47:25  lindak
- *	Bringing over all of the Karma changes into chardonnay.
- *
- *	Revision 1.1.1.1  2005/02/24 21:48:06  akosut
- *	Import xnu-764 from Tiger8A395
- *
- *	Revision 1.3  2002/06/16 20:36:02  lindak
- *	Merged PR-2957314 into Jaguar (siegmund: netboot kernel code needs to set
- *	com.apple.AppleDiskImageController.load to boolean Yes)
- *
- *	Revision 1.2.40.2  2002/06/15 03:50:38  dieter
- *	- corrected com.apple.AppleDiskImageController.load string
- *
- *	Revision 1.2.40.1  2002/06/15 03:01:08  dieter
- *	Bug #: 2957314
- *	- add call to force IOHDIXController to get loaded/matched
- *
- *	Revision 1.2  2002/05/03 18:08:39  lindak
- *	Merged PR-2909558 into Jaguar (siegmund POST WWDC: add support for NetBoot
- *	over IOHDIXController)
- *
- *	Revision 1.1.2.1  2002/04/24 22:29:12  dieter
- *	Bug #: 2909558
- *	- added IOHDIXController netboot stubs
- *
- *	Revision 1.3  2002/04/16 00:41:37  han
- *	migrated code out of here to IOHDIXController's setProperty method
- *
- *	Revision 1.2  2002/04/14 23:53:53  han
- *	eliminate qDEBUG=1, use emums instead of hard coded string constants
- *
- *	Revision 1.1  2002/04/14 22:54:42  han
- *	Renamed from DINetBookHook.c.
- *	First stab at implementing this code.
- *
- *	Revision 1.1  2002/04/13 19:22:28  han
- *	added stub file DINetBookHook.c
- *
- *
- */
+  
+                   
+              
+  
+                                            
+  
+                   
+  
+                              
+                                            
+                                                                            
+                    
+  
+                                                   
+                                                          
+  
+                                                
+                                 
+  
+                                            
+                                                                            
+                                                          
+  
+                                                 
+                                                             
+  
+                                                 
+                 
+                                                             
+  
+                                            
+                                                                             
+                         
+  
+                                                
+                 
+                                         
+  
+                                         
+                                                                     
+  
+                                         
+                                                                       
+  
+                                         
+                                
+                                        
+  
+                                         
+                                  
+  
+  
+   
 #ifndef qDEBUG
 #define qDEBUG 0
 #endif
@@ -113,7 +113,7 @@ di_load_controller( void )
 		IOService::getResourceService()->publishResource("com.apple.AppleDiskImageController.load", kOSBooleanTrue);
 		IOService::getResourceService()->waitQuiet();
 
-		// first find IOHDIXController
+		                              
 		matchDictionary = IOService::serviceMatching(kIOHDIXControllerClassName);
 		if (!matchDictionary) {
 			break;
@@ -143,11 +143,11 @@ di_load_controller( void )
 }
 
 extern "C" {
-/* FIXME: removable should be replaced with a struct (so it could be easily
- * extensible in the future). However, since there is no common header file
- * between imageboot and NetBoot, we opt for a simple bool for now.
- * Refactor this into a common header file.
- */
+                                                                           
+                                                                           
+                                                                   
+                                           
+   
 static int
 di_add_properties(IOService *controller, bool removable)
 {
@@ -169,7 +169,7 @@ di_root_image_ext(const char *path, char *devname, size_t devsz, dev_t *dev_p, b
 	OSString                *       myDevName                       = NULL;
 	OSNumber                *       myDevT                          = NULL;
 
-	// sanity check arguments please
+	                                
 	if (devname) {
 		*devname = 0;
 	}
@@ -193,25 +193,25 @@ di_root_image_ext(const char *path, char *devname, size_t devsz, dev_t *dev_p, b
 		goto NoIOHDIXController;
 	}
 
-	// okay create path object
+	                          
 	pathString = OSString::withCString(path);
 	if (!pathString) {
 		res = kIOReturnNoMemory;
 		goto CannotCreatePathOSString;
 	}
 
-	/*
-	 * This is a bit racy, as two concurrent attached could have
-	 * different properties. However, since we query the result and dev
-	 * below locklessly, the existing code is already racy, so we
-	 * keep the status quo.
-	 */
+	  
+                                                             
+                                                                    
+                                                              
+                        
+    
 	res = di_add_properties(controller, removable);
 	if (res) {
 		goto error_add_properties;
 	}
 
-	// do it
+	        
 	if (!controller->setProperty(kDIRootImageKey, pathString)) {
 		IOLog("IOHDIXController::setProperty(%s, %s) failed.\n", kDIRootImageKey, pathString->getCStringNoCopy());
 	}
@@ -227,7 +227,7 @@ di_root_image_ext(const char *path, char *devname, size_t devsz, dev_t *dev_p, b
 		goto di_root_image_FAILED;
 	}
 
-	// success - grab
+	                 
 	myDevT = OSDynamicCast(OSNumber, controller->getProperty(kDIRootImageDevTKey));
 	if (myDevT) {
 		*dev_p = myDevT->unsigned32BitValue();
@@ -246,15 +246,15 @@ di_root_image_ext(const char *path, char *devname, size_t devsz, dev_t *dev_p, b
 		goto di_root_image_FAILED;
 	}
 
-	/*
-	 * NOTE: The attached disk image may trigger IOKit matching. At the very least, an IOMedia
-	 * must claim it.  More complex scenarios might include a GPT containing a partition mapping
-	 * to an APFS container, both of which need to probe and claim their respective media devices.
-	 *
-	 * After the attach is complete, we should quiesce the disk image controller before returning
-	 * from this function successfully.  If we failed to quiesce, then we should treat it as a hard
-	 * failure, to make it more obvious to triage.
-	 */
+	  
+                                                                                           
+                                                                                             
+                                                                                               
+   
+                                                                                              
+                                                                                                
+                                               
+    
 	res = controller->waitQuiet((NSEC_PER_SEC * kDIMatchQuiesceTimeout));
 	if (res) {
 		IOLog("failed to quiesce attached disk image (%s)! \n", devname);
@@ -266,7 +266,7 @@ CannotCreatePathOSString:
 NoIOHDIXController:
 error_add_properties:
 
-	// clean up memory allocations
+	                              
 	if (pathString) {
 		pathString->release();
 	}
@@ -277,15 +277,15 @@ error_add_properties:
 	return res;
 }
 
-/*
- *       Name:		di_root_image
- *       Function:	mount the disk image returning the dev node
- *       Parameters:	path	->		path/url to disk image
- *                               devname	<-		dev node used to set the rootdevice global variable
- *                               dev_p	<-		device number generated from major/minor numbers
- *       Comments:
- *       This is an exported function. Changing this will break API.
- */
+  
+                             
+                                                              
+                                                    
+                                                                                                
+                                                                                           
+                  
+                                                                    
+   
 int
 di_root_image(const char *path, char *devname, size_t devsz, dev_t *dev_p)
 {
@@ -307,7 +307,7 @@ di_root_ramfile_buf(void *buf, size_t bufsz, char *devname, size_t devsz, dev_t 
 
 	controller = di_load_controller();
 	if (controller) {
-		/* attach the image */
+		                      
 		controller->setProperty(kDIRootRamFileKey, mem);
 		controller->release();
 	} else {
@@ -367,7 +367,7 @@ di_root_ramfile( IORegistryEntry * entry )
 	do {
 		data = OSDynamicCast(OSData, entry->getProperty("boot-ramdmg-size"));
 		if (!data || (data->getLength() != sizeof(uint64_t))) {
-			break; // bad disk image size
+			break;                       
 		}
 		dmgSize = *(uint64_t *) data->getBytesNoCopy();
 		if (!dmgSize) {
@@ -377,9 +377,9 @@ di_root_ramfile( IORegistryEntry * entry )
 		data = OSDynamicCast(OSData, entry->getProperty("boot-ramdmg-extents"));
 		if (!data || (data->getLength() == 0) ||
 		    ((data->getLength() & (sizeof(IOAddressRange) - 1)) != 0)) {
-			break; // bad extents
+			break;               
 		}
-		// make modifications to local copy
+		                                   
 		extentData  = OSData::withData(data);
 		assert(extentData);
 
@@ -388,7 +388,7 @@ di_root_ramfile( IORegistryEntry * entry )
 		extentSize  = 0;
 		remain = dmgSize;
 
-		// truncate extent length to enclosing disk image
+		                                                 
 		for (uint32_t i = 0; i < extentCount; i++) {
 			length = extentList[i].length;
 			if (!length) {
@@ -404,7 +404,7 @@ di_root_ramfile( IORegistryEntry * entry )
 			remain -= length;
 		}
 		if (extentSize < dmgSize) {
-			break; // not enough extent bytes for enclosing disk image
+			break;                                                    
 		}
 		mem = IOMemoryDescriptor::withAddressRanges(
 			extentList, extentCount,

@@ -53,7 +53,7 @@
 kern_return_t
 thread_setsinglestep(__unused thread_t thread, __unused int on)
 {
-	return KERN_FAILURE; /* XXX TODO */
+	return KERN_FAILURE;               
 }
 
 #if CONFIG_DTRACE
@@ -65,6 +65,6 @@ dtrace_get_cpu_int_stack_top(void)
 {
 	return getCpuDatap()->intstack_top;
 }
-#endif /* CONFIG_DTRACE */
+#endif                    
 
-#endif                          /* MACH_BSD */
+#endif                                        

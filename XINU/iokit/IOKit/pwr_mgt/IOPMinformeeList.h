@@ -39,9 +39,9 @@ class IOPMinformeeList : public OSObject
 	friend class IOPMinformee;
 
 private:
-// pointer to first informee in the list
+                                        
 	IOPMinformee       *firstItem;
-// how many informees are in the list
+                                     
 	unsigned long       length;
 
 public:
@@ -52,8 +52,8 @@ public:
 
 	LIBKERN_RETURNS_NOT_RETAINED IOPMinformee *appendNewInformee( IOService * newObject );
 
-// OBSOLETE
-// do not use addToList(); Use appendNewInformee() instead
+           
+                                                          
 	IOReturn addToList(LIBKERN_CONSUMED IOPMinformee *   newInformee );
 	IOReturn removeFromList( IOService * theItem );
 
@@ -62,6 +62,6 @@ public:
 
 	LIBKERN_RETURNS_NOT_RETAINED IOPMinformee * findItem( IOService * driverOrChild );
 
-// This lock must be held while modifying list or length
+                                                        
 	static IORecursiveLock * getSharedRecursiveLock( void );
 };

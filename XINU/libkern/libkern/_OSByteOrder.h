@@ -29,17 +29,17 @@
 #ifndef _OS__OSBYTEORDER_H
 #define _OS__OSBYTEORDER_H
 
-/*
- * This header is normally included from <libkern/OSByteOrder.h>.  However,
- * <sys/_endian.h> also includes this in the case of little-endian
- * architectures, so that we can map OSByteOrder routines to the hton* and ntoh*
- * macros.  This results in the asymmetry below; we only include
- * <libkern/arch/_OSByteOrder.h> for little-endian architectures.
- */
+  
+                                                                           
+                                                                  
+                                                                                
+                                                                
+                                                                 
+   
 
 #include <sys/_types.h>
 
-/* Macros for swapping constant values in the preprocessing stage. */
+                                                                     
 #define __DARWIN_OSSwapConstInt16(x) \
     ((__uint16_t)((((__uint16_t)(x) & 0xff00U) >> 8) | \
 	        (((__uint16_t)(x) & 0x00ffU) << 8)))
@@ -90,7 +90,7 @@
 #define __DARWIN_OSSwapInt64(x) \
     (__builtin_constant_p(x) ? __DARWIN_OSSwapConstInt64(x) : _OSSwapInt64(x))
 
-#else /* ! __GNUC__ */
+#else                 
 
 #if defined(__i386__) || defined(__x86_64__)
 
@@ -128,6 +128,6 @@ _OSSwapInt64(
 
 #define __DARWIN_OSSwapInt64(x) _OSSwapInt64(x)
 
-#endif /* __GNUC__ */
+#endif               
 
-#endif /* ! _OS__OSBYTEORDER_H */
+#endif                           

@@ -37,37 +37,37 @@
 
 #include <i386/hw_lock_types.h>
 
-#define enaLkDeb                0x00000001      /* Request debug in default attribute */
-#define enaLkStat               0x00000002      /* Request statistic in default attribute */
-#define disLkRWPrio             0x00000004      /* Disable RW lock priority promotion */
-#define enaLkTimeStat           0x00000008      /* Request time statistics in default attribute */
+#define enaLkDeb                0x00000001                                              
+#define enaLkStat               0x00000002                                                  
+#define disLkRWPrio             0x00000004                                              
+#define enaLkTimeStat           0x00000008                                                        
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 #if     defined(MACH_KERNEL_PRIVATE)
 typedef struct {
 	volatile uintptr_t      interlock;
 #if     MACH_LDEBUG
-	unsigned long   lck_spin_pad[9];        /* XXX - usimple_lock_data_t */
+	unsigned long   lck_spin_pad[9];                                       
 #endif
 } lck_spin_t;
 
-#define LCK_SPIN_TAG_DESTROYED          0x00002007      /* lock marked as Destroyed */
+#define LCK_SPIN_TAG_DESTROYED          0x00002007                                    
 
-#else /* MACH_KERNEL_PRIVATE */
+#else                          
 #ifdef  KERNEL_PRIVATE
 typedef struct {
 	unsigned long    opaque[10];
 } lck_spin_t;
-#else /* KERNEL_PRIVATE */
+#else                     
 typedef struct __lck_spin_t__   lck_spin_t;
 #endif
 #endif
 
 #ifdef  MACH_KERNEL_PRIVATE
-/* The definition of this structure, including the layout of the
- * state bitfield, is tailored to the asm implementation in i386_lock.s
- */
+                                                                
+                                                                       
+   
 typedef struct _lck_mtx_ {
 	union {
 		struct {
@@ -76,17 +76,17 @@ typedef struct _lck_mtx_ {
 				struct {
 					volatile uint32_t
 					    lck_mtx_waiters:16,
-					    lck_mtx_pri:8, // unused
+					    lck_mtx_pri:8,          
 					    lck_mtx_ilocked:1,
 					    lck_mtx_mlocked:1,
-					    lck_mtx_promoted:1, // unused
+					    lck_mtx_promoted:1,          
 					    lck_mtx_spin:1,
 					    lck_mtx_is_ext:1,
 					    lck_mtx_pad3:3;
 				};
 				uint32_t        lck_mtx_state;
 			};
-			/* Pad field used as a canary, initialized to ~0 */
+			                                                   
 			uint32_t                        lck_mtx_pad32;
 		};
 		struct {
@@ -104,11 +104,11 @@ typedef struct _lck_mtx_ {
 #define LCK_MTX_MLOCKED_MSK             0x02000000
 #define LCK_MTX_SPIN_MSK                0x08000000
 
-/* This pattern must subsume the interlocked, mlocked and spin bits */
-#define LCK_MTX_TAG_INDIRECT                    0x07ff1007      /* lock marked as Indirect  */
-#define LCK_MTX_TAG_DESTROYED                   0x07fe2007      /* lock marked as Destroyed */
+                                                                      
+#define LCK_MTX_TAG_INDIRECT                    0x07ff1007                                    
+#define LCK_MTX_TAG_DESTROYED                   0x07fe2007                                    
 
-/* Adaptive spin before blocking */
+                                   
 extern uint64_t         MutexSpin;
 extern uint64_t         low_MutexSpin;
 extern int64_t         high_MutexSpin;
@@ -169,7 +169,7 @@ typedef struct _lck_mtx_ext_ {
 #define LCK_MTX_EVENT(lck)        ((event_t)(((unsigned int*)(lck))+(sizeof(lck_mtx_t)-1)/sizeof(unsigned int)))
 #define LCK_EVENT_TO_MUTEX(event) ((lck_mtx_t *)(uintptr_t)(((unsigned int *)(event)) - ((sizeof(lck_mtx_t)-1)/sizeof(unsigned int))))
 
-#else /* MACH_KERNEL_PRIVATE */
+#else                          
 #ifdef  XNU_KERNEL_PRIVATE
 typedef struct {
 	unsigned long           opaque[2];
@@ -198,21 +198,21 @@ typedef struct __lck_mtx_ext_t__        lck_mtx_ext_t;
 #ifdef  MACH_KERNEL_PRIVATE
 typedef union _lck_rw_t_internal_ {
 	struct {
-		volatile uint16_t       lck_rw_shared_count;    /* No. of accepted readers */
-		volatile uint8_t        lck_rw_interlock;       /* Interlock byte */
+		volatile uint16_t       lck_rw_shared_count;                                 
+		volatile uint8_t        lck_rw_interlock;                           
 		volatile uint8_t
-		    lck_rw_priv_excl:1,                         /* Writers prioritized if set */
-		    lck_rw_want_upgrade:1,                      /* Read-to-write upgrade waiting */
-		    lck_rw_want_write:1,                        /* Writer waiting or locked for write */
-		    lck_r_waiting:1,                            /* Reader is sleeping on lock */
-		    lck_w_waiting:1,                            /* Writer is sleeping on lock */
-		    lck_rw_can_sleep:1,                         /* Can attempts to lock go to sleep? */
-		    lck_rw_padb6:2;                             /* padding */
-		uint32_t                lck_rw_tag;             /* This can be obsoleted when stats are in */
-		thread_t                lck_rw_owner;           /* Unused */
+		    lck_rw_priv_excl:1,                                                         
+		    lck_rw_want_upgrade:1,                                                         
+		    lck_rw_want_write:1,                                                                
+		    lck_r_waiting:1,                                                            
+		    lck_w_waiting:1,                                                            
+		    lck_rw_can_sleep:1,                                                                
+		    lck_rw_padb6:2;                                          
+		uint32_t                lck_rw_tag;                                                          
+		thread_t                lck_rw_owner;                       
 	};
 	struct {
-		uint32_t                data;                   /* Single word for count, ilk, and bitfields */
+		uint32_t                data;                                                                  
 		uint32_t                lck_rw_pad4;
 		uint32_t                lck_rw_pad8;
 		uint32_t                lck_rw_pad12;
@@ -255,7 +255,7 @@ static_assert(sizeof(lck_rw_t) == LCK_RW_T_SIZE);
 #define LCK_RW_ATTR_DIS_MYLOCK  0x10000000
 #define LCK_RW_ATTR_DIS_MYLOCKb 28
 
-#define LCK_RW_TAG_DESTROYED            0x00002007      /* lock marked as Destroyed */
+#define LCK_RW_TAG_DESTROYED            0x00002007                                    
 
 #define RW_LOCK_READER_EVENT(x)   ((event_t) (((unsigned char*) (x)) + (offsetof(lck_rw_t, lck_rw_tag))))
 #define RW_LOCK_WRITER_EVENT(x)   ((event_t) (((unsigned char*) (x)) + (offsetof(lck_rw_t, lck_rw_pad8))))
@@ -273,12 +273,12 @@ static_assert(sizeof(lck_rw_t) == LCK_RW_T_SIZE);
 #define LOCK_SNOOP_SPINS        1000
 #define LOCK_PRETEST            1
 
-/* hw_lock_lock static panic deadline, in timebase units. hw_lock_to() uses
- * LockTimeoutTSC computed at startup
- */
-#define LOCK_PANIC_TIMEOUT      0xf000000  /* 251e6 TSC ticks */
+                                                                           
+                                     
+   
+#define LOCK_PANIC_TIMEOUT      0xf000000                       
 
-#endif  // LOCK_PRIVATE
+#endif                 
 
 #else
 #ifdef  KERNEL_PRIVATE
@@ -297,5 +297,5 @@ typedef struct __lck_rw_t__     lck_rw_t;
 
 extern void             kernel_preempt_check(void);
 
-#endif /* MACH_KERNEL_PRIVATE */
-#endif  /* _I386_LOCKS_H_ */
+#endif                          
+#endif                      

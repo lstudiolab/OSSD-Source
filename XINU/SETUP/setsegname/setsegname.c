@@ -31,8 +31,8 @@
 
 #include <stdbool.h>
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static int
 writeFile(int fd, const void * data, size_t length)
 {
@@ -49,8 +49,8 @@ writeFile(int fd, const void * data, size_t length)
 	return error;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static int
 readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 {
@@ -81,9 +81,9 @@ readFile(const char *path, vm_offset_t * objAddr, vm_size_t * objSize)
 
 		*objSize = stat_buf.st_size;
 
-		*objAddr = (vm_offset_t)mmap(NULL /* address */, *objSize,
-		    PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE /* flags */,
-		    fd, 0 /* offset */);
+		*objAddr = (vm_offset_t)mmap(NULL              , *objSize,
+		    PROT_READ | PROT_WRITE, MAP_FILE | MAP_PRIVATE            ,
+		    fd, 0             );
 
 		if ((void *)*objAddr == MAP_FAILED) {
 			*objAddr = 0;
@@ -111,8 +111,8 @@ usage(void)
 	exit(1);
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 int
 main(int argc, char * argv[])
 {
@@ -176,7 +176,7 @@ main(int argc, char * argv[])
 	switch (hdr->magic) {
 	case MH_CIGAM:
 		swap = true;
-	// fall thru
+	            
 	case MH_MAGIC:
 		ncmds = hdr->ncmds;
 		cmds  = (typeof(cmds))(hdr + 1);
@@ -184,7 +184,7 @@ main(int argc, char * argv[])
 
 	case MH_CIGAM_64:
 		swap = true;
-	// fall thru
+	            
 	case MH_MAGIC_64:
 		hdr64 = (typeof(hdr64))hdr;
 		ncmds = hdr64->ncmds;

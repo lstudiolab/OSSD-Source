@@ -50,9 +50,9 @@ struct kxld_symtab_iterator {
 	boolean_t negate;
 };
 
-/*******************************************************************************
-* Constructors and Destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 size_t kxld_symtab_sizeof(void)
 __attribute__((const, visibility("hidden")));
@@ -61,13 +61,13 @@ __attribute__((const, visibility("hidden")));
 kern_return_t kxld_symtab_init_from_macho_32(KXLDSymtab *symtab,
     struct symtab_command *src, u_char *macho, KXLDSeg * kernel_linkedit_seg)
 __attribute__((nonnull(1, 2), visibility("hidden")));
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
 kern_return_t kxld_symtab_init_from_macho_64(KXLDSymtab *symtab,
     struct symtab_command *src, u_char *macho, KXLDSeg * kernel_linkedit_seg)
 __attribute__((nonnull(1, 2), visibility("hidden")));
-#endif /* KXLD_USER_OR_ILP64 */
+#endif                         
 
 void kxld_symtab_iterator_init(KXLDSymtabIterator *iter,
     const KXLDSymtab *symtab, KXLDSymPredicateTest test, boolean_t negate)
@@ -79,9 +79,9 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_symtab_deinit(KXLDSymtab *symtab)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 u_int kxld_symtab_get_num_symbols(const KXLDSymtab *symtab)
 __attribute__((pure, nonnull, visibility("hidden")));
@@ -122,9 +122,9 @@ __attribute__((nonnull, visibility("hidden")));
 u_int kxld_symtab_iterator_get_num_remaining(const KXLDSymtabIterator *iter)
 __attribute__((pure, nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Modifiers
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 kern_return_t kxld_symtab_index_symbols_by_name(KXLDSymtab *symtab)
 __attribute__((nonnull, visibility("hidden")));
@@ -146,4 +146,4 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_symtab_iterator_reset(KXLDSymtabIterator *iter)
 __attribute__((nonnull, visibility("hidden")));
 
-#endif /* _KXLD_SYMTAB_H_ */
+#endif                      

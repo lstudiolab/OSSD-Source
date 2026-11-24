@@ -16,7 +16,7 @@ setCount(MD5_CTX *ctx, uint64_t count)
 	ctx->count[1] = (uint32_t)count;
 }
 
-/* Copy a ccdigest ctx into a legacy MD5 context */
+                                                   
 static void
 DiToMD5(const struct ccdigest_info *di, struct ccdigest_ctx *di_ctx, MD5_CTX *md5_ctx)
 {
@@ -25,7 +25,7 @@ DiToMD5(const struct ccdigest_info *di, struct ccdigest_ctx *di_ctx, MD5_CTX *md
 	memcpy(md5_ctx->state, ccdigest_state_ccn(di, di_ctx), di->state_size);
 }
 
-/* Copy a legacy MD5 context into a ccdigest ctx  */
+                                                    
 static void
 MD5ToDi(const struct ccdigest_info *di, MD5_CTX *md5_ctx, struct ccdigest_ctx *di_ctx)
 {

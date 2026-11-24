@@ -65,7 +65,7 @@ test1_start(struct kmod_info *ki, void *data)
 {
 	IOLog("test buffer start:\n%s\n:test buffer end.\n", testBuffer);
 
-	// test unserialize
+	                   
 	OSString *errmsg;
 	OSObject *d = OSUnserialize(testBuffer, &errmsg);
 	if (!d) {
@@ -73,7 +73,7 @@ test1_start(struct kmod_info *ki, void *data)
 		return KMOD_RETURN_SUCCESS;
 	}
 
-	// test serialize
+	                 
 	OSSerialize *s = OSSerialize::withCapacity(5);
 	if (!d->serialize(s)) {
 		IOLog("serialization failed\n");
@@ -83,7 +83,7 @@ test1_start(struct kmod_info *ki, void *data)
 	IOLog("serialized object's length = %d, capacity = %d\n", s->getLength(), s->getCapacity());
 	IOLog("object unformatted = %s\n", s->text());
 
-	// try second time
+	                  
 	OSObject *d2 = OSUnserializeXML(s->text(), &errmsg);
 	if (!d2) {
 		IOLog("%s\n", errmsg->getCStringNoCopy());

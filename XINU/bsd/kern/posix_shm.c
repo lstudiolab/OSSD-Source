@@ -29,23 +29,23 @@
  *	Copyright (c) 1990, 1996-1998 Apple Computer, Inc.
  *	All Rights Reserved.
  */
-/*
- * posix_shm.c : Support for POSIX shared memory APIs
- *
- *	File:	posix_shm.c
- *	Author:	Ananthakrishna Ramesh
- *
- * HISTORY
- * 2-Sep-1999	A.Ramesh
- *	Created for MacOSX
- *
- */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                     
+  
+                    
+                                
+  
+          
+                      
+                     
+  
+   
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/cdefs.h>
 #include <sys/param.h>
@@ -89,33 +89,33 @@
 #define f_ops fp_glob->fg_ops
 #define f_data fp_glob->fg_data
 
-/*
- * Used to construct the list of memory objects
- * assigned to a populated shared memory segment.
- */
+  
+                                               
+                                                 
+   
 typedef struct pshm_mobj {
 	void                  *pshmo_memobject;
 	memory_object_size_t  pshmo_size;
 	SLIST_ENTRY(pshm_mobj) pshmo_next;
 } pshm_mobj_t;
 
-/*
- * This represents an existing Posix shared memory object.
- *
- * It comes into existence with a shm_open(...O_CREAT...)
- * call and goes away only after it has been shm_unlink()ed
- * and the last remaining shm_open() file reference is closed.
- *
- * To keep track of that lifetime, pshm_usecount is used as a reference
- * counter. It's incremented for every successful shm_open() and
- * one extra time for the shm_unlink() to release. Internally
- * you can temporarily use an additional reference whenever the
- * subsystem lock has to be dropped for other reasons.
- */
+  
+                                                          
+  
+                                                         
+                                                           
+                                                              
+  
+                                                                       
+                                                                
+                                                             
+                                                               
+                                                      
+   
 typedef struct internal_pshminfo {
 	struct pshminfo pshm_hdr;
 	SLIST_HEAD(pshm_mobjhead, pshm_mobj) pshm_mobjs;
-	RB_ENTRY(internal_pshminfo) pshm_links;        /* links for red/black tree */
+	RB_ENTRY(internal_pshminfo) pshm_links;                                      
 } pshm_info_t;
 #define pshm_flags    pshm_hdr.pshm_flags
 #define pshm_usecount pshm_hdr.pshm_usecount
@@ -125,35 +125,35 @@ typedef struct internal_pshminfo {
 #define pshm_gid      pshm_hdr.pshm_gid
 #define pshm_label    pshm_hdr.pshm_label
 
-/* Values for pshm_flags that are still used */
-#define PSHM_ALLOCATED  0x004   /* backing storage is allocated */
-#define PSHM_MAPPED     0x008   /* mapped at least once */
-#define PSHM_INUSE      0x010   /* mapped at least once */
-#define PSHM_REMOVED    0x020   /* no longer in the name cache due to shm_unlink() */
-#define PSHM_ALLOCATING 0x100   /* storage is being allocated */
+                                               
+#define PSHM_ALLOCATED  0x004                                     
+#define PSHM_MAPPED     0x008                             
+#define PSHM_INUSE      0x010                             
+#define PSHM_REMOVED    0x020                                                        
+#define PSHM_ALLOCATING 0x100                                   
 
-/*
- * These handle reference counting pshm_info_t structs using pshm_usecount.
- */
+  
+                                                                           
+   
 static int pshm_ref(pshm_info_t *pinfo);
 static void pshm_deref(pshm_info_t *pinfo);
 #define PSHM_MAXCOUNT UINT_MAX
 
-/*
- * For every shm_open, we get a new one of these.
- * The only reason we don't just use pshm_info directly is that
- * you can query the mapped memory objects via proc_pidinfo to
- * query the mapped address. Note that even this is a hack. If
- * you mmap() the same fd multiple times, we only save/report
- * one address.
- */
+  
+                                                 
+                                                               
+                                                              
+                                                              
+                                                             
+               
+   
 typedef struct pshmnode {
 	off_t       mapp_addr;
 	pshm_info_t *pinfo;
 } pshmnode_t;
 
 
-/* compare function for the red black tree */
+                                             
 static int
 pshm_compare(pshm_info_t *a, pshm_info_t *b)
 {
@@ -169,15 +169,15 @@ pshm_compare(pshm_info_t *a, pshm_info_t *b)
 }
 
 
-/*
- * shared memory "paths" are stored in a red black tree for lookup
- */
-u_long pshmnument;    /* count of entries allocated in the red black tree */
+  
+                                                                  
+   
+u_long pshmnument;                                                          
 RB_HEAD(pshmhead, internal_pshminfo) pshm_head;
 RB_PROTOTYPE(pshmhead, internal_pshminfo, pshm_links, pshm_compare)
 RB_GENERATE(pshmhead, internal_pshminfo, pshm_links, pshm_compare)
 
-/* lookup, add, remove functions */
+                                   
 static pshm_info_t *pshm_cache_search(pshm_info_t * look);
 static void pshm_cache_add(pshm_info_t *entry);
 static void pshm_cache_delete(pshm_info_t *entry);
@@ -200,9 +200,9 @@ static const struct fileops pshmops = {
 	.fo_kqfilter = fo_no_kqfilter,
 };
 
-/*
- * Everything here is protected by a single mutex.
- */
+  
+                                                  
+   
 static LCK_GRP_DECLARE(psx_shm_subsys_lck_grp, "posix shared memory");
 static LCK_MTX_DECLARE(psx_shm_subsys_mutex, &psx_shm_subsys_lck_grp);
 
@@ -210,9 +210,9 @@ static LCK_MTX_DECLARE(psx_shm_subsys_mutex, &psx_shm_subsys_lck_grp);
 #define PSHM_SUBSYS_UNLOCK() lck_mtx_unlock(& psx_shm_subsys_mutex)
 #define PSHM_SUBSYS_ASSERT_HELD()  LCK_MTX_ASSERT(&psx_shm_subsys_mutex, LCK_MTX_ASSERT_OWNED)
 
-/*
- * Lookup an entry in the cache. Only the name is used from "look".
- */
+  
+                                                                   
+   
 static pshm_info_t *
 pshm_cache_search(pshm_info_t *look)
 {
@@ -220,9 +220,9 @@ pshm_cache_search(pshm_info_t *look)
 	return RB_FIND(pshmhead, &pshm_head, look);
 }
 
-/*
- * Add a new entry to the cache.
- */
+  
+                                
+   
 static void
 pshm_cache_add(pshm_info_t *entry)
 {
@@ -236,9 +236,9 @@ pshm_cache_add(pshm_info_t *entry)
 	pshmnument++;
 }
 
-/*
- * Remove the given entry from the red black tree.
- */
+  
+                                                  
+   
 static void
 pshm_cache_delete(pshm_info_t *entry)
 {
@@ -248,21 +248,21 @@ pshm_cache_delete(pshm_info_t *entry)
 	pshmnument--;
 }
 
-/*
- * Initialize the red black tree.
- */
+  
+                                 
+   
 void
 pshm_cache_init(void)
 {
 	RB_INIT(&pshm_head);
 }
 
-/*
- * Invalidate all entries and delete all objects associated with them
- * XXX - due to the reference counting, this only works if all userland
- * references to it via file descriptors are also closed already. Is this
- * known to be called after all user processes are killed?
- */
+  
+                                                                     
+                                                                       
+                                                                         
+                                                          
+   
 int
 pshm_cache_purge_all(__unused proc_t proc)
 {
@@ -277,7 +277,7 @@ pshm_cache_purge_all(__unused proc_t proc)
 	PSHM_SUBSYS_LOCK();
 	RB_FOREACH_SAFE(p, pshmhead, &pshm_head, tmp) {
 		error = pshm_unlink_internal(p);
-		if (error) {  /* XXX: why give up on failure, should keep going */
+		if (error) {                                                      
 			goto out;
 		}
 	}
@@ -293,11 +293,11 @@ out:
 	return error;
 }
 
-/*
- * Utility to get the shared memory name from userspace and
- * populate a pshm_info_t with it. If there's a problem
- * reading the name or it's malformed, will return an error code.
- */
+  
+                                                           
+                                                       
+                                                                 
+   
 static int
 pshm_get_name(pshm_info_t *pinfo, const user_addr_t user_addr)
 {
@@ -311,16 +311,16 @@ pshm_get_name(pshm_info_t *pinfo, const user_addr_t user_addr)
 	}
 	assert(bytes_copied <= PSHMNAMLEN + 1);
 	assert(pinfo->pshm_hdr.pshm_name[bytes_copied - 1] == 0);
-	if (bytes_copied < 2) { /* 2: expect at least one character and terminating zero */
+	if (bytes_copied < 2) {                                                            
 		return EINVAL;
 	}
 	AUDIT_ARG(text, &pinfo->pshm_hdr.pshm_name[0]);
 	return 0;
 }
 
-/*
- * Process a shm_open() system call.
- */
+  
+                                    
+   
 int
 shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 {
@@ -338,28 +338,28 @@ shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 	AUDIT_ARG(fflags, uap->oflag);
 	AUDIT_ARG(mode, cmode);
 
-	/*
-	 * Allocate data structures we need. We parse the userspace name into
-	 * a pshm_info_t, even when we don't need to O_CREAT.
-	 */
+	  
+                                                                      
+                                                      
+    
 	new_pinfo = kheap_alloc(KM_SHM, sizeof(pshm_info_t), Z_WAITOK | Z_ZERO);
 	if (new_pinfo == NULL) {
 		error = ENOSPC;
 		goto bad;
 	}
 
-	/*
-	 * Get and check the name.
-	 */
+	  
+                           
+    
 	error = pshm_get_name(new_pinfo, uap->name);
 	if (error != 0) {
 		goto bad;
 	}
 
-	/*
-	 * Attempt to allocate a new fp. If unsuccessful, the fp will be
-	 * left unmodified (NULL).
-	 */
+	  
+                                                                 
+                           
+    
 	error = falloc(p, &fp, &indx, vfs_context_current());
 	if (error) {
 		goto bad;
@@ -373,9 +373,9 @@ shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 		goto bad;
 	}
 
-	/*
-	 * Will need a new pnode for the file pointer
-	 */
+	  
+                                              
+    
 	new_pnode = kheap_alloc(KM_SHM, sizeof(pshmnode_t),
 	    Z_WAITOK | Z_ZERO);
 	if (new_pnode == NULL) {
@@ -383,12 +383,12 @@ shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 		goto bad;
 	}
 
-	/*
-	 * If creating a new segment, fill in its information.
-	 * If we find a pre-exisitng one in cache lookup we'll just toss this one later.
-	 */
+	  
+                                                       
+                                                                                 
+    
 	if (fmode & O_CREAT) {
-		new_pinfo->pshm_usecount = 2; /* one each for: file pointer, shm_unlink */
+		new_pinfo->pshm_usecount = 2;                                             
 		new_pinfo->pshm_length = 0;
 		new_pinfo->pshm_mode = cmode;
 		new_pinfo->pshm_uid = kauth_getuid();
@@ -404,30 +404,30 @@ shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 #endif
 	}
 
-	/*
-	 * Look up the named shared memory segment in the cache, possibly adding
-	 * it for O_CREAT.
-	 */
+	  
+                                                                         
+                   
+    
 	PSHM_SUBSYS_LOCK();
 
 	pinfo = pshm_cache_search(new_pinfo);
 	if (pinfo != NULL) {
 		incache = true;
 
-		/* Get a new reference to go with the file pointer.*/
+		                                                     
 		error = pshm_ref(pinfo);
 		if (error) {
-			pinfo = NULL;      /* so cleanup code doesn't deref */
+			pinfo = NULL;                                         
 			goto bad_locked;
 		}
 
-		/* can't have pre-existing if O_EXCL */
+		                                       
 		if ((fmode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) {
 			error = EEXIST;
 			goto bad_locked;
 		}
 
-		/* O_TRUNC is only valid while length is not yet set */
+		                                                       
 		if ((fmode & O_TRUNC) &&
 		    (pinfo->pshm_flags & (PSHM_ALLOCATING | PSHM_ALLOCATED))) {
 			error = EINVAL;
@@ -436,23 +436,23 @@ shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 	} else {
 		incache = false;
 
-		/* if it wasn't found, must have O_CREAT */
+		                                           
 		if (!(fmode & O_CREAT)) {
 			error = ENOENT;
 			goto bad_locked;
 		}
 
-		/* Add the new region to the cache. */
+		                                      
 		pinfo = new_pinfo;
 		pshm_cache_add(pinfo);
-		new_pinfo = NULL;       /* so that it doesn't get free'd */
+		new_pinfo = NULL;                                          
 	}
 
 	PSHM_SUBSYS_UNLOCK();
 
-	/*
-	 * Check we have permission to access any pre-existing segment
-	 */
+	  
+                                                               
+    
 	if (incache) {
 		if (fmode & O_CREAT) {
 			AUDIT_ARG(posix_ipc_perm, pinfo->pshm_uid,
@@ -489,18 +489,18 @@ shm_open(proc_t p, struct shm_open_args *uap, int32_t *retval)
 bad_locked:
 	PSHM_SUBSYS_UNLOCK();
 bad:
-	/*
-	 * Drop any new reference to a pre-existing shared memory region.
-	 */
+	  
+                                                                  
+    
 	if (incache && pinfo != NULL) {
 		PSHM_SUBSYS_LOCK();
 		pshm_deref(pinfo);
 		PSHM_SUBSYS_UNLOCK();
 	}
 
-	/*
-	 * Delete any allocated unused data structures.
-	 */
+	  
+                                                
+    
 	kheap_free(KM_SHM, new_pnode, sizeof(pshmnode_t));
 
 	if (fp != NULL) {
@@ -520,10 +520,10 @@ done:
 }
 
 
-/*
- * The truncate call associates memory with shared memory region. It can
- * only be succesfully done with a non-zero length once per shared memory region.
- */
+  
+                                                                        
+                                                                                 
+   
 int
 pshm_truncate(
 	__unused proc_t       p,
@@ -549,11 +549,11 @@ pshm_truncate(
 	}
 
 #if 0
-	/*
-	 * Can't enforce this yet, some third party tools don't
-	 * specify O_RDWR like they ought to. See radar 48692182
-	 */
-	/* ftruncate() requires write permission */
+	  
+                                                        
+                                                         
+    
+	                                           
 	if (!(fp->f_flag & FWRITE)) {
 		return EINVAL;
 	}
@@ -570,7 +570,7 @@ pshm_truncate(
 		return EINVAL;
 	}
 
-	/* We only allow one ftruncate() per lifetime of the shm object. */
+	                                                                   
 	if (pinfo->pshm_flags & (PSHM_ALLOCATING | PSHM_ALLOCATED)) {
 		PSHM_SUBSYS_UNLOCK();
 		return EINVAL;
@@ -583,17 +583,17 @@ pshm_truncate(
 		return error;
 	}
 #endif
-	/*
-	 * Grab an extra reference, so we can drop the lock while allocating and
-	 * ensure the objects don't disappear.
-	 */
+	  
+                                                                         
+                                       
+    
 	error = pshm_ref(pinfo);
 	if (error) {
 		PSHM_SUBSYS_UNLOCK();
 		return error;
 	}
 
-	/* set ALLOCATING, so another truncate can't start */
+	                                                     
 	pinfo->pshm_flags |= PSHM_ALLOCATING;
 	total_size = vm_map_round_page(length, vm_map_page_mask(user_map));
 
@@ -601,7 +601,7 @@ pshm_truncate(
 	for (alloc_size = 0; alloc_size < total_size; alloc_size += mosize) {
 		PSHM_SUBSYS_UNLOCK();
 
-		/* get a memory object back some of the shared memory */
+		                                                        
 		mosize = MIN(total_size - alloc_size, ANON_MAX_SIZE);
 		kret = mach_make_memory_entry_64(VM_MAP_NULL, &mosize, 0,
 		    MAP_MEM_NAMED_CREATE | VM_PROT_DEFAULT, &mem_object, 0);
@@ -610,7 +610,7 @@ pshm_truncate(
 			goto out;
 		}
 
-		/* get a list entry to track the memory object */
+		                                                 
 		pshmobj = kheap_alloc(KM_SHM, sizeof(pshm_mobj_t), Z_WAITOK);
 		if (pshmobj == NULL) {
 			kret = KERN_NO_SPACE;
@@ -621,7 +621,7 @@ pshm_truncate(
 
 		PSHM_SUBSYS_LOCK();
 
-		/* link in the new entry */
+		                           
 		pshmobj->pshmo_memobject = (void *)mem_object;
 		pshmobj->pshmo_size = mosize;
 		SLIST_NEXT(pshmobj, pshmo_next) = NULL;
@@ -634,16 +634,16 @@ pshm_truncate(
 		pshmobj_last = pshmobj;
 	}
 
-	/* all done, change flags to ALLOCATED and return success */
+	                                                            
 	pinfo->pshm_flags |= PSHM_ALLOCATED;
 	pinfo->pshm_flags &= ~(PSHM_ALLOCATING);
 	pinfo->pshm_length = total_size;
-	pshm_deref(pinfo);              /* drop the "allocating" reference */
+	pshm_deref(pinfo);                                                   
 	PSHM_SUBSYS_UNLOCK();
 	return 0;
 
 out:
-	/* clean up any partially allocated objects */
+	                                              
 	PSHM_SUBSYS_LOCK();
 	while ((pshmobj = SLIST_FIRST(&pinfo->pshm_mobjs)) != NULL) {
 		SLIST_REMOVE_HEAD(&pinfo->pshm_mobjs, pshmo_next);
@@ -653,7 +653,7 @@ out:
 		PSHM_SUBSYS_LOCK();
 	}
 	pinfo->pshm_flags &= ~PSHM_ALLOCATING;
-	pshm_deref(pinfo);              /* drop the "allocating" reference */
+	pshm_deref(pinfo);                                                   
 	PSHM_SUBSYS_UNLOCK();
 
 	switch (kret) {
@@ -670,8 +670,8 @@ out:
 int
 pshm_stat(pshmnode_t *pnode, void *ub, int isstat64)
 {
-	struct stat *sb = (struct stat *)0;     /* warning avoidance ; protected by isstat64 */
-	struct stat64 * sb64 = (struct stat64 *)0;  /* warning avoidance ; protected by isstat64 */
+	struct stat *sb = (struct stat *)0;                                                    
+	struct stat64 * sb64 = (struct stat64 *)0;                                                 
 	pshm_info_t *pinfo;
 #if CONFIG_MACF
 	int error;
@@ -711,16 +711,16 @@ pshm_stat(pshmnode_t *pnode, void *ub, int isstat64)
 	return 0;
 }
 
-/*
- * Verify access to a shared memory region.
- */
+  
+                                           
+   
 static int
 pshm_access(pshm_info_t *pinfo, int mode, kauth_cred_t cred, __unused proc_t p)
 {
 	mode_t mode_req = ((mode & FREAD) ? S_IRUSR : 0) |
 	    ((mode & FWRITE) ? S_IWUSR : 0);
 
-	/* Otherwise, user id 0 always gets access. */
+	                                              
 	if (!suser(cred, NULL)) {
 		return 0;
 	}
@@ -763,7 +763,7 @@ pshm_mmap(
 		return EINVAL;
 	}
 
-	/* Can't allow write permission if the shm_open() didn't allow them. */
+	                                                                       
 	if (!(fp->f_flag & FWRITE)) {
 		if (prot & VM_PROT_WRITE) {
 			return EPERM;
@@ -817,7 +817,7 @@ pshm_mmap(
 		return error;
 	}
 #endif
-	/* Grab an extra reference, so we can drop the lock while mapping. */
+	                                                                     
 	error = pshm_ref(pinfo);
 	if (error) {
 		PSHM_SUBSYS_UNLOCK();
@@ -838,19 +838,19 @@ pshm_mmap(
 			goto out_deref;
 		}
 
-		/*
-		 * We do not get rid of the existing mappings here because
-		 * it wouldn't be atomic (see comment in mmap()).  We let
-		 * Mach VM know that we want it to replace any existing
-		 * mapping with the new one.
-		 */
+		  
+                                                            
+                                                           
+                                                         
+                              
+     
 		alloc_flags = VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE;
 	}
 	docow = false;
 
 	mapped_size = 0;
 	vmk_flags = VM_MAP_KERNEL_FLAGS_NONE;
-	/* reserve the entire space first... */
+	                                       
 	kret = vm_map_enter_mem_object(user_map,
 	    &user_addr,
 	    user_size,
@@ -869,12 +869,12 @@ pshm_mmap(
 		goto out_deref;
 	}
 
-	/* Now overwrite with the real mappings. */
+	                                           
 	for (map_pos = 0, pshmobj = SLIST_FIRST(&pinfo->pshm_mobjs);
 	    user_size != 0;
 	    map_pos += pshmobj->pshmo_size, pshmobj = SLIST_NEXT(pshmobj, pshmo_next)) {
 		if (pshmobj == NULL) {
-			/* nothing there to map !? */
+			                             
 			goto out_deref;
 		}
 		if (file_pos >= map_pos + pshmobj->pshmo_size) {
@@ -915,7 +915,7 @@ pshm_mmap(
 	PSHM_SUBSYS_UNLOCK();
 out_deref:
 	PSHM_SUBSYS_LOCK();
-	pshm_deref(pinfo);      /* drop the extra reference we had while mapping. */
+	pshm_deref(pinfo);                                                          
 	PSHM_SUBSYS_UNLOCK();
 	if (kret != KERN_SUCCESS) {
 		if (mapped_size != 0) {
@@ -939,9 +939,9 @@ out_deref:
 	}
 }
 
-/*
- * Remove a shared memory region name from the name lookup cache.
- */
+  
+                                                                 
+   
 static int
 pshm_unlink_internal(pshm_info_t *pinfo)
 {
@@ -954,7 +954,7 @@ pshm_unlink_internal(pshm_info_t *pinfo)
 	pshm_cache_delete(pinfo);
 	pinfo->pshm_flags |= PSHM_REMOVED;
 
-	/* release the "unlink" reference */
+	                                    
 	pshm_deref(pinfo);
 
 	return 0;
@@ -967,9 +967,9 @@ shm_unlink(proc_t p, struct shm_unlink_args *uap, __unused int32_t *retval)
 	pshm_info_t *pinfo = NULL;
 	pshm_info_t *name_pinfo = NULL;
 
-	/*
-	 * Get the name from user args.
-	 */
+	  
+                                
+    
 	name_pinfo = kheap_alloc(KHEAP_TEMP, sizeof(pshm_info_t),
 	    Z_WAITOK | Z_ZERO);
 	if (name_pinfo == NULL) {
@@ -999,13 +999,13 @@ shm_unlink(proc_t p, struct shm_unlink_args *uap, __unused int32_t *retval)
 
 	AUDIT_ARG(posix_ipc_perm, pinfo->pshm_uid, pinfo->pshm_gid, pinfo->pshm_mode);
 
-	/*
-	 * Following file semantics, unlink should normally be allowed
-	 * for users with write permission only. We also allow the creator
-	 * of a segment to be able to delete, even w/o write permission.
-	 * That's because there's no equivalent of write permission for the
-	 * directory containing a file.
-	 */
+	  
+                                                               
+                                                                   
+                                                                 
+                                                                    
+                                
+    
 	error = pshm_access(pinfo, FWRITE, kauth_cred_get(), p);
 	if (error != 0 && pinfo->pshm_uid != kauth_getuid()) {
 		goto bad_unlock;
@@ -1019,10 +1019,10 @@ bad:
 	return error;
 }
 
-/*
- * Add a new reference to a shared memory region.
- * Fails if we will overflow the reference counter.
- */
+  
+                                                 
+                                                   
+   
 static int
 pshm_ref(pshm_info_t *pinfo)
 {
@@ -1035,10 +1035,10 @@ pshm_ref(pshm_info_t *pinfo)
 	return 0;
 }
 
-/*
- * Dereference a pshm_info_t. Delete the region if
- * this was the final reference count.
- */
+  
+                                                  
+                                      
+   
 static void
 pshm_deref(pshm_info_t *pinfo)
 {
@@ -1048,7 +1048,7 @@ pshm_deref(pshm_info_t *pinfo)
 	if (pinfo->pshm_usecount == 0) {
 		panic("negative usecount in pshm_close\n");
 	}
-	pinfo->pshm_usecount--; /* release this fd's reference */
+	pinfo->pshm_usecount--;                                  
 
 	if (pinfo->pshm_usecount == 0) {
 #if CONFIG_MACF
@@ -1056,23 +1056,23 @@ pshm_deref(pshm_info_t *pinfo)
 #endif
 		PSHM_SUBSYS_UNLOCK();
 
-		/*
-		 * Release references to any backing objects.
-		 */
+		  
+                                               
+     
 		while ((pshmobj = SLIST_FIRST(&pinfo->pshm_mobjs)) != NULL) {
 			SLIST_REMOVE_HEAD(&pinfo->pshm_mobjs, pshmo_next);
 			mach_memory_entry_port_release(pshmobj->pshmo_memobject);
 			kheap_free(KM_SHM, pshmobj, sizeof(pshm_mobj_t));
 		}
 
-		/* free the pinfo itself */
+		                           
 		kheap_free(KM_SHM, pinfo, sizeof(pshm_info_t));
 
 		PSHM_SUBSYS_LOCK();
 	}
 }
 
-/* vfs_context_t passed to match prototype for struct fileops */
+                                                                
 static int
 pshm_closefile(struct fileglob *fg, __unused vfs_context_t ctx)
 {
@@ -1084,7 +1084,7 @@ pshm_closefile(struct fileglob *fg, __unused vfs_context_t ctx)
 	pnode = (pshmnode_t *)fg->fg_data;
 	if (pnode != NULL) {
 		error = 0;
-		fg->fg_data = NULL; /* set fg_data to NULL to avoid racing close()es */
+		fg->fg_data = NULL;                                                    
 		if (pnode->pinfo != NULL) {
 			pshm_deref(pnode->pinfo);
 			pnode->pinfo = NULL;

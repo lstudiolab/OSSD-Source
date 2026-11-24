@@ -93,7 +93,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
-	/* Do switch parsing: */
+	                        
 	while ((c = getopt(argc, argv, "hiv:")) != -1) {
 		switch (c) {
 		case 'i':

@@ -15,7 +15,7 @@
 enum {
     CCERR_OK = 0,
 
-    /* the default error code */
+                                
     CCERR_INTERNAL = -1,
 
     CCERR_INTEGRITY = -2,
@@ -43,18 +43,18 @@ enum {
     CCEC_GENERATE_NOT_SUPPORTED = -21,
     CCEC_GENERATE_INVALID_INPUT = -22,
 
-    // Program error: buffer too small or encrypted message is too small
+                                                                        
     CCRSA_INVALID_INPUT = -23,
-    // Invalid crypto configuration: Hash length versus RSA key size
+                                                                    
     CCRSA_INVALID_CONFIG = -24,
     CCRSA_ENCODING_ERROR = -25,
     CCRSA_DECODING_ERROR = -26,
 
-    // The data is invalid (we won't say more for security)
+                                                           
     CCRSA_PRIVATE_OP_ERROR = -27,
     CCRSA_KEY_ERROR = -28,
 
-    // Key generation specific
+                              
     CCRSA_KEYGEN_PRIME_NOT_FOUND = -29,
     CCRSA_KEYGEN_PRIME_NEED_NEW_SEED = -30,
     CCRSA_KEYGEN_PRIME_TOO_MANY_ITERATIONS = -31,
@@ -96,10 +96,10 @@ enum {
     CCDRBG_STATUS_ERROR = -61,
     CCDRBG_STATUS_NEED_RESEED = -62,
     CCDRBG_STATUS_PARAM_ERROR = -63,
-    // If this value is returned, the caller must abort or panic the process for
-    // security reasons. for example in the case of catastrophic error in
-    // http://csrc.nist.gov/publications/drafts/800-90/sp800_90a_r1_draft.pdf
-    // ccdrbg calls abort() or panic(), if they are available in the system.
+                                                                                
+                                                                         
+                                                                             
+                                                                            
     CCDRBG_STATUS_ABORT = -64,
 
     CCKPRNG_NEED_ENTROPY = -65,
@@ -111,11 +111,11 @@ enum {
     CCMODE_NOT_SUPPORTED = -70,
     CCMODE_INTERNAL_ERROR = -71,
 
-    // Configuration or unexpected issue
+                                        
     CCPOST_GENERIC_FAILURE = -72,
     CCPOST_LIBRARY_ERROR = -73,
     CCPOST_INTEGRITY_ERROR = -74,
-    // Output of the algo is not as expected
+                                            
     CCPOST_KAT_FAILURE = -75,
 
     CCKPRNG_SEEDFILE_OPEN = -76,
@@ -135,7 +135,7 @@ enum {
     CCVRF_POINT_INVALID_PUBLIC_KEY = -88,
     CCVRF_VERIFY_FAILURE = -89,
 
-    // Error codes for Authenticated Encryption Modes
+                                                     
     CCMODE_TAG_LENGTH_REQUEST_TOO_LONG = -100,
     CCMODE_TAG_LENGTH_TOO_SHORT = -101,
     CCMODE_NONCE_EMPTY = -102,
@@ -143,7 +143,7 @@ enum {
     CCMODE_DECRYPTION_OR_VERIFICATION_ERR=-104,
     CCMODE_BUFFER_OUT_IN_OVERLAP = -105,
 
-    // Error codes for Secret Sharing
+                                     
     CCSS_ELEMENT_TOO_LARGE_FOR_FIELD = -120,
     CCSS_NOT_ENOUGH_SHARES = -121,
     CCSS_TOO_MANY_SHARES = -122,
@@ -171,4 +171,4 @@ enum {
 #define CCDRBG_STATUS_OK CCERR_OK
 #define CCKPRNG_OK CCERR_OK
 
-#endif /* _CORECRYPTO_CC_ERROR_H_ */
+#endif                              

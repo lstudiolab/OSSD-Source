@@ -40,7 +40,7 @@ SHA256_Init(SHA256_CTX *ctx)
 	const struct ccdigest_info *di;
 	di = g_crypto_funcs->ccsha256_di;
 
-	/* Make sure the context size for the digest info fits in the one we have */
+	                                                                            
 	if (ccdigest_di_size(di) > sizeof(SHA256_CTX)) {
 		panic("%s: inconsistent size for SHA256 context", __FUNCTION__);
 	}
@@ -72,7 +72,7 @@ SHA384_Init(SHA384_CTX *ctx)
 	const struct ccdigest_info *di;
 	di = g_crypto_funcs->ccsha384_di;
 
-	/* Make sure the context size for the digest info fits in the one we have */
+	                                                                            
 	if (ccdigest_di_size(di) > sizeof(SHA384_CTX)) {
 		panic("%s: inconsistent size for SHA384 context", __FUNCTION__);
 	}
@@ -105,7 +105,7 @@ SHA512_Init(SHA512_CTX *ctx)
 	const struct ccdigest_info *di;
 	di = g_crypto_funcs->ccsha512_di;
 
-	/* Make sure the context size for the digest info fits in the one we have */
+	                                                                            
 	if (ccdigest_di_size(di) > sizeof(SHA512_CTX)) {
 		panic("%s: inconsistent size for SHA512 context", __FUNCTION__);
 	}
@@ -133,7 +133,7 @@ SHA512_Final(void *digest, SHA512_CTX *ctx)
 
 #else
 
-/* As these are part of the KPI, we need to stub them out for any kernel configuration that does not support SHA2. */
+                                                                                                                     
 
 void UNSUPPORTED_API(SHA256_Init, SHA256_CTX *ctx);
 void UNSUPPORTED_API(SHA384_Init, SHA384_CTX *ctx);

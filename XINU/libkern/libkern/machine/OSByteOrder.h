@@ -41,7 +41,7 @@
 # endif
 #endif
 
-/* Generic byte swapping functions. */
+                                      
 
 OS_INLINE
 uint16_t
@@ -70,7 +70,7 @@ _OSSwapInt64(
 	return OSSwapConstInt64(data);
 }
 
-/* Functions for byte reversed loads. */
+                                        
 
 OS_INLINE
 uint16_t
@@ -105,7 +105,7 @@ OSReadSwapInt64(
 	return _OSSwapInt64(data);
 }
 
-/* Functions for byte reversed stores. */
+                                         
 
 OS_INLINE
 void
@@ -140,4 +140,4 @@ OSWriteSwapInt64(
 	*(volatile uint64_t *)((uintptr_t)base + byteOffset) = _OSSwapInt64(data);
 }
 
-#endif /* ! _OS_OSBYTEORDERMACHINE_H */
+#endif                                 

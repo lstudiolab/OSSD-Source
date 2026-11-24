@@ -24,11 +24,11 @@
 #ifndef log_encode_types_h
 #define log_encode_types_h
 
-/*
- * These are IPIs between xnu and libtrace, used to have common encoding
- * and implementation for kernel logging and user logging. They are subject
- * to change at any point.
- */
+  
+                                                                        
+                                                                           
+                          
+   
 
 #include <os/base.h>
 #include <os/log.h>
@@ -46,14 +46,14 @@ OS_ENUM(os_log_fmt_hdr_flags, uint8_t,
     );
 
 OS_ENUM(os_log_fmt_cmd_type, uint8_t,
-    OSLF_CMD_TYPE_SCALAR      = 0, // %u, %lld, %x, %p, %g, ...
-    OSLF_CMD_TYPE_COUNT       = 1, // %.16P, %.*s
-    OSLF_CMD_TYPE_STRING      = 2, // %s
-    OSLF_CMD_TYPE_POINTER     = 3, // %P
-    OSLF_CMD_TYPE_OBJECT      = 4, // %@
-    OSLF_CMD_TYPE_WIDE_STRING = 5, // %S
-    OSLF_CMD_TYPE_ERRNO       = 6, // %m
-    OSLF_CMD_TYPE_MASK        = 7, // %{mask.foo}...
+    OSLF_CMD_TYPE_SCALAR      = 0,                             
+    OSLF_CMD_TYPE_COUNT       = 1,               
+    OSLF_CMD_TYPE_STRING      = 2,      
+    OSLF_CMD_TYPE_POINTER     = 3,      
+    OSLF_CMD_TYPE_OBJECT      = 4,      
+    OSLF_CMD_TYPE_WIDE_STRING = 5,      
+    OSLF_CMD_TYPE_ERRNO       = 6,      
+    OSLF_CMD_TYPE_MASK        = 7,                  
     );
 
 OS_ENUM(os_log_fmt_cmd_flags, uint8_t,
@@ -122,8 +122,8 @@ typedef struct os_log_context_s {
 	size_t                      ctx_buffer_sz;
 	os_log_fmt_hdr_t            ctx_hdr;
 	char                        *ctx_pubdata[OS_LOG_MAX_PUB_ARGS];
-	uint16_t                    ctx_content_off; // offset into buffer->hdr_data
-	uint16_t                    ctx_content_sz; // size not including the header
+	uint16_t                    ctx_content_off;                                
+	uint16_t                    ctx_content_sz;                                 
 	uint16_t                    ctx_pubdata_sz;
 	uint16_t                    ctx_pubdata_cnt;
 	firehose_tracepoint_flags_t ctx_ft_flags;
@@ -131,4 +131,4 @@ typedef struct os_log_context_s {
 	uint8_t                     ctx_allocated : 1;
 } *os_log_context_t;
 
-#endif /* log_encode_types_h */
+#endif                         

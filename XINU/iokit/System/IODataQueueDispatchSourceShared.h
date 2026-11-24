@@ -16,7 +16,7 @@ typedef struct _IODataQueueMemory {
 struct IODataQueueDispatchSource_IVars {
 	IODataQueueMemory         * dataQueue;
 	IODataQueueDispatchSource * source;
-//    IODispatchQueue           * queue;
+                                        
 	IOMemoryDescriptor        * memory;
 	OSAction                  * dataAvailableAction;
 	OSAction                  * dataServicedAction;
@@ -209,7 +209,7 @@ IODataQueueDispatchSource::SetDataServicedHandler_Impl(
 	return ret;
 }
 
-#endif /* KERNEL */
+#endif             
 
 void
 IODataQueueDispatchSource::SendDataAvailable(void)
@@ -299,7 +299,7 @@ IODataQueueDispatchSource::Peek(IODataQueueClientDequeueEntryBlock callback)
 		return kIOReturnNoMemory;
 	}
 
-	// Read head and tail with acquire barrier
+	                                          
 	headOffset = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->head, __ATOMIC_RELAXED);
 	tailOffset = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->tail, __ATOMIC_ACQUIRE);
 
@@ -319,17 +319,17 @@ IODataQueueDispatchSource::Peek(IODataQueueClientDequeueEntryBlock callback)
 		}
 		headSize &= ~3U;
 
-		// Check if there's enough room before the end of the queue for a header.
-		// If there is room, check if there's enough room to hold the header and
-		// the data.
+		                                                                         
+		                                                                        
+		            
 
 		if ((headOffset > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) ||
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize) ||
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > UINT32_MAX - headSize) ||
 		    (headOffset + headSize + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize)) {
-			// No room for the header or the data, wrap to the beginning of the queue.
-			// Note: wrapping even with the UINT32_MAX checks, as we have to support
-			// queueSize of UINT32_MAX
+			                                                                          
+			                                                                        
+			                          
 			entry = dataQueue->queue;
 			callerDataSize  = entry->size;
 			dataSize = entry->size;
@@ -386,7 +386,7 @@ IODataQueueDispatchSource::DequeueWithCoalesce(bool * sendDataServiced,
 		return kIOReturnNoMemory;
 	}
 
-	// Read head and tail with acquire barrier
+	                                          
 	headOffset = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->head, __ATOMIC_RELAXED);
 	tailOffset = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->tail, __ATOMIC_ACQUIRE);
 
@@ -406,15 +406,15 @@ IODataQueueDispatchSource::DequeueWithCoalesce(bool * sendDataServiced,
 		}
 		headSize &= ~3U;
 
-		// we wrapped around to beginning, so read from there
-		// either there was not even room for the header
+		                                                     
+		                                                
 		if ((headOffset > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) ||
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize) ||
-		    // or there was room for the header, but not for the data
+		                                                             
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > UINT32_MAX - headSize) ||
 		    (headOffset + headSize + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize)) {
-			// Note: we have to wrap to the beginning even with the UINT32_MAX checks
-			// because we have to support a queueSize of UINT32_MAX.
+			                                                                         
+			                                                        
 			entry           = dataQueue->queue;
 			callerDataSize  = entry->size;
 
@@ -427,7 +427,7 @@ IODataQueueDispatchSource::DequeueWithCoalesce(bool * sendDataServiced,
 				return kIOReturnError;
 			}
 			newHeadOffset   = dataSize + DATA_QUEUE_ENTRY_HEADER_SIZE;
-			// else it is at the end
+			                        
 		} else {
 			entry = head;
 
@@ -439,7 +439,7 @@ IODataQueueDispatchSource::DequeueWithCoalesce(bool * sendDataServiced,
 			newHeadOffset   = headOffset + headSize + DATA_QUEUE_ENTRY_HEADER_SIZE;
 		}
 	} else {
-		// empty queue
+		              
 		if (dataQueue->needServicedCallback) {
 			*sendDataServiced = true;
 		}
@@ -454,11 +454,11 @@ IODataQueueDispatchSource::DequeueWithCoalesce(bool * sendDataServiced,
 	__c11_atomic_store((_Atomic uint32_t *)&dataQueue->head, newHeadOffset, __ATOMIC_RELEASE);
 
 	if (newHeadOffset == tailOffset) {
-		//
-		// If we are making the queue empty, then we need to make sure
-		// that either the enqueuer notices, or we notice the enqueue
-		// that raced with our making of the queue empty.
-		//
+		  
+		                                                              
+		                                                             
+		                                                 
+		  
 		__c11_atomic_thread_fence(__ATOMIC_SEQ_CST);
 	}
 
@@ -501,7 +501,7 @@ IODataQueueDispatchSource::EnqueueWithCoalesce(uint32_t callerDataSize,
 	}
 	queueSize = ivars->queueByteCount;
 
-	// Force a single read of head and tail
+	                                       
 	tail = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->tail, __ATOMIC_RELAXED);
 	head = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->head, __ATOMIC_ACQUIRE);
 
@@ -510,19 +510,19 @@ IODataQueueDispatchSource::EnqueueWithCoalesce(uint32_t callerDataSize,
 	}
 	dataSize &= ~3U;
 
-	// Check for overflow of entrySize
+	                                  
 	if (os_add_overflow(DATA_QUEUE_ENTRY_HEADER_SIZE, dataSize, &entrySize)) {
 		return kIOReturnOverrun;
 	}
 
-	// Check for underflow of (getQueueSize() - tail)
+	                                                 
 	if (queueSize < tail || queueSize < head) {
 		return kIOReturnUnderrun;
 	}
 
 	newTail = tail;
 	if (tail >= head) {
-		// Is there enough room at the end for the entry?
+		                                                 
 		if ((entrySize <= (UINT32_MAX - tail)) &&
 		    ((tail + entrySize) <= queueSize)) {
 			entry = (IODataQueueEntry *)((uintptr_t)dataQueue->queue + tail);
@@ -531,24 +531,24 @@ IODataQueueDispatchSource::EnqueueWithCoalesce(uint32_t callerDataSize,
 
 			entry->size = callerDataSize;
 
-			// The tail can be out of bound when the size of the new entry
-			// exactly matches the available space at the end of the queue.
-			// The tail can range from 0 to queueSize inclusive.
+			                                                              
+			                                                               
+			                                                    
 
 			newTail = tail + entrySize;
-		} else if (head > entrySize) { // Is there enough room at the beginning?
+		} else if (head > entrySize) {                                          
 			entry = (IODataQueueEntry *)((uintptr_t)dataQueue->queue);
 
 			callback(&entry->data, callerDataSize);
 
-			// Wrap around to the beginning, but do not allow the tail to catch
-			// up to the head.
+			                                                                   
+			                  
 
 			entry->size = callerDataSize;
 
-			// We need to make sure that there is enough room to set the size before
-			// doing this. The user client checks for this and will look for the size
-			// at the beginning if there isn't room for it at the end.
+			                                                                        
+			                                                                         
+			                                                          
 
 			if ((queueSize - tail) >= DATA_QUEUE_ENTRY_HEADER_SIZE) {
 				((IODataQueueEntry *)((uintptr_t)dataQueue->queue + tail))->size = dataSize;
@@ -556,11 +556,11 @@ IODataQueueDispatchSource::EnqueueWithCoalesce(uint32_t callerDataSize,
 
 			newTail = entrySize;
 		} else {
-			retVal = kIOReturnOverrun; // queue is full
+			retVal = kIOReturnOverrun;                 
 		}
 	} else {
-		// Do not allow the tail to catch up to the head when the queue is full.
-		// That's why the comparison uses a '>' rather than '>='.
+		                                                                        
+		                                                         
 
 		if ((head - tail) > entrySize) {
 			entry = (IODataQueueEntry *)((uintptr_t)dataQueue->queue + tail);
@@ -571,37 +571,37 @@ IODataQueueDispatchSource::EnqueueWithCoalesce(uint32_t callerDataSize,
 
 			newTail = tail + entrySize;
 		} else {
-			retVal = kIOReturnOverrun; // queue is full
+			retVal = kIOReturnOverrun;                 
 		}
 	}
 
-	// Send notification (via mach message) that data is available.
+	                                                               
 
 	if (retVal == kIOReturnSuccess) {
-		// Publish the data we just enqueued
+		                                    
 		__c11_atomic_store((_Atomic uint32_t *)&dataQueue->tail, newTail, __ATOMIC_RELEASE);
 
 		if (tail != head) {
-			//
-			// The memory barrier below pairs with the one in dequeue
-			// so that either our store to the tail cannot be missed by
-			// the next dequeue attempt, or we will observe the dequeuer
-			// making the queue empty.
-			//
-			// Of course, if we already think the queue is empty,
-			// there's no point paying this extra cost.
-			//
+			  
+			                                                         
+			                                                           
+			                                                            
+			                          
+			  
+			                                                     
+			                                           
+			  
 			__c11_atomic_thread_fence(__ATOMIC_SEQ_CST);
 			head = __c11_atomic_load((_Atomic uint32_t *)&dataQueue->head, __ATOMIC_RELAXED);
 		}
 
 		if (tail == head) {
-			// Send notification that data is now available.
+			                                                
 			*sendDataAvailable = true;
 			retVal = kIOReturnSuccess;
 		}
 	} else if (retVal == kIOReturnOverrun) {
-		// ask to be notified of Dequeue()
+		                                  
 		dataQueue->needServicedCallback = true;
 		*sendDataAvailable = true;
 	}

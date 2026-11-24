@@ -1,18 +1,18 @@
-/*
- * persona_test.h
- *
- * Jeremy C. Andrus <jeremy_andrus@apple.com>
- *
- */
+  
+                 
+  
+                                             
+  
+   
 #ifndef _PERSONA_TEST_H_
 #define _PERSONA_TEST_H_
 
-/* internal */
+              
 #include <spawn_private.h>
 #include <sys/persona.h>
 #include <sys/spawn_internal.h>
 
-//#define DEBUG
+               
 
 enum {
 	PA_NONE          = 0x0000,
@@ -34,9 +34,9 @@ struct persona_args {
 };
 
 
-/*
- * Error codes emitted on failure
- */
+  
+                                 
+   
 #define ERR_SYSTEM          -1
 #define ERR_SPAWN            30
 #define ERR_SPAWN_ATTR       31
@@ -225,4 +225,4 @@ parse_groupspec(struct kpersona_info *kinfo, char *spec)
 	return 0;
 }
 
-#endif /* _PERSONA_TEST_H_ */
+#endif                       

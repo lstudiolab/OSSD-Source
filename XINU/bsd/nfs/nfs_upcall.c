@@ -54,7 +54,7 @@ struct nfsrv_uc_arg {
 	TAILQ_ENTRY(nfsrv_uc_arg) nua_svcq;
 	socket_t nua_so;
 	struct nfsrv_sock *nua_slp;
-	int nua_waitflag;  /* Should always be MBUF_DONTWAIT */
+	int nua_waitflag;                                      
 	uint32_t nua_flags;
 	uint32_t nua_qi;
 };
@@ -87,9 +87,9 @@ uint32_t nfsrv_uc_queue_max_seen;
 volatile uint32_t nfsrv_uc_queue_count;
 #endif
 
-/*
- * Thread that dequeues up-calls and runs the nfsrv_rcv routine
- */
+  
+                                                               
+   
 static void
 nfsrv_uc_thread(void *arg, wait_result_t wr __unused)
 {
@@ -141,25 +141,25 @@ nfsrv_uc_thread(void *arg, wait_result_t wr __unused)
 	thread_terminate(current_thread());
 }
 
-/*
- * Dequeue a closed nfsrv_sock if needed from the up-call queue.
- * Call from nfsrv_zapsock
- */
+  
+                                                                
+                          
+   
 void
 nfsrv_uc_dequeue(struct nfsrv_sock *slp)
 {
 	struct nfsrv_uc_arg *ap = slp->ns_ua;
 	struct nfsrv_uc_queue *myqueue = &nfsrv_uc_queue_tbl[ap->nua_qi];
 
-	/*
-	 * We assume that the socket up-calls have been stop and the socket
-	 * is shutting down so no need for acquiring the lock to check that
-	 * the flag is cleared.
-	 */
+	  
+                                                                    
+                                                                    
+                        
+    
 	if (ap == NULL || (ap->nua_flags & NFS_UC_QUEUED) == 0) {
 		return;
 	}
-	/* If we're queued we might race with nfsrv_uc_thread */
+	                                                        
 	lck_mtx_lock(&myqueue->ucq_lock);
 	if (ap->nua_flags & NFS_UC_QUEUED) {
 		printf("nfsrv_uc_dequeue remove %p\n", ap);
@@ -174,9 +174,9 @@ nfsrv_uc_dequeue(struct nfsrv_sock *slp)
 	lck_mtx_unlock(&myqueue->ucq_lock);
 }
 
-/*
- * Allocate and initialize globals for nfsrv_sock up-call support.
- */
+  
+                                                                  
+   
 void
 nfsrv_uc_init(void)
 {
@@ -188,10 +188,10 @@ nfsrv_uc_init(void)
 	}
 }
 
-/*
- * Start up-call threads to service nfsrv_sock(s)
- * Called from the first call of nfsrv_uc_addsock
- */
+  
+                                                 
+                                                 
+   
 static void
 nfsrv_uc_start(void)
 {
@@ -205,13 +205,13 @@ nfsrv_uc_start(void)
 #endif
 	DPRINT("nfsrv_uc_start\n");
 
-	/* Wait until previous shutdown finishes */
+	                                           
 	lck_mtx_lock(&nfsrv_uc_shutdown_lock);
 	while (nfsrv_uc_shutdown || nfsrv_uc_thread_count > 0) {
 		msleep(&nfsrv_uc_thread_count, &nfsrv_uc_shutdown_lock, PSOCK, "nfsd_upcall_shutdown_wait", NULL);
 	}
 
-	/* Start up-call threads */
+	                           
 	for (i = 0; i < NFS_UC_HASH_SZ; i++) {
 		error = kernel_thread_start(nfsrv_uc_thread, (void *)(uintptr_t)i, &nfsrv_uc_queue_tbl[nfsrv_uc_thread_count].ucq_thd);
 		if (!error) {
@@ -233,10 +233,10 @@ out:
 	lck_mtx_unlock(&nfsrv_uc_shutdown_lock);
 }
 
-/*
- * Stop the up-call threads.
- * Called from nfsrv_uc_cleanup.
- */
+  
+                            
+                                
+   
 static void
 nfsrv_uc_stop(void)
 {
@@ -245,7 +245,7 @@ nfsrv_uc_stop(void)
 
 	DPRINT("Entering nfsrv_uc_stop\n");
 
-	/* Signal up-call threads to stop */
+	                                    
 	nfsrv_uc_shutdown = 1;
 	for (i = 0; i < thread_count; i++) {
 		lck_mtx_lock(&nfsrv_uc_queue_tbl[i].ucq_lock);
@@ -253,13 +253,13 @@ nfsrv_uc_stop(void)
 		lck_mtx_unlock(&nfsrv_uc_queue_tbl[i].ucq_lock);
 	}
 
-	/* Wait until they are done shutting down */
+	                                            
 	lck_mtx_lock(&nfsrv_uc_shutdown_lock);
 	while (nfsrv_uc_thread_count > 0) {
 		msleep(&nfsrv_uc_thread_count, &nfsrv_uc_shutdown_lock, PSOCK, "nfsd_upcall_shutdown_stop", NULL);
 	}
 
-	/* Deallocate old threads */
+	                            
 	for (i = 0; i < nfsrv_uc_thread_count; i++) {
 		if (nfsrv_uc_queue_tbl[i].ucq_thd != THREAD_NULL) {
 			thread_deallocate(nfsrv_uc_queue_tbl[i].ucq_thd);
@@ -267,17 +267,17 @@ nfsrv_uc_stop(void)
 		nfsrv_uc_queue_tbl[i].ucq_thd = THREAD_NULL;
 	}
 
-	/* Enable restarting */
+	                       
 	nfsrv_uc_shutdown = 0;
 	lck_mtx_unlock(&nfsrv_uc_shutdown_lock);
 }
 
-/*
- * Shutdown up-calls for nfsrv_socks.
- *	Make sure nothing is queued on the up-call queues
- *	Shutdown the up-call threads
- * Called from nfssvc_cleanup.
- */
+  
+                                     
+                                                    
+                               
+                              
+   
 void
 nfsrv_uc_cleanup(void)
 {
@@ -285,10 +285,10 @@ nfsrv_uc_cleanup(void)
 
 	DPRINT("Entering nfsrv_uc_cleanup\n");
 
-	/*
-	 * Every thing should be dequeued at this point or will be as sockets are closed
-	 * but to be safe, we'll make sure.
-	 */
+	  
+                                                                                 
+                                    
+    
 	for (i = 0; i < NFS_UC_HASH_SZ; i++) {
 		struct nfsrv_uc_queue *queue = &nfsrv_uc_queue_tbl[i];
 
@@ -304,14 +304,14 @@ nfsrv_uc_cleanup(void)
 	nfsrv_uc_stop();
 }
 
-/*
- * This is the nfs up-call routine for server sockets.
- * We used to set nfsrv_rcv as the up-call routine, but
- * recently that seems like we are doing to much work for
- * the interface thread, so we just queue the arguments
- * that we would have gotten for nfsrv_rcv and let a
- * worker thread dequeue them and pass them on to nfsrv_rcv.
- */
+  
+                                                      
+                                                       
+                                                         
+                                                       
+                                                    
+                                                            
+   
 static void
 nfsrv_uc_proxy(socket_t so, void *arg, int waitflag)
 {
@@ -324,7 +324,7 @@ nfsrv_uc_proxy(socket_t so, void *arg, int waitflag)
 	DPRINT("\tUp-call queued on %d for wakeup of %p\n", qi, myqueue);
 	if (uap == NULL || uap->nua_flags & NFS_UC_QUEUED) {
 		lck_mtx_unlock(&myqueue->ucq_lock);
-		return;  /* Already queued or freed */
+		return;                               
 	}
 
 	uap->nua_so = so;
@@ -341,7 +341,7 @@ nfsrv_uc_proxy(socket_t so, void *arg, int waitflag)
 	{
 		uint32_t count = OSIncrementAtomic(&nfsrv_uc_queue_count);
 
-		/* This is a bit racey but just for debug */
+		                                            
 		if (count > nfsrv_uc_queue_max_seen) {
 			nfsrv_uc_queue_max_seen = count;
 		}
@@ -355,11 +355,11 @@ nfsrv_uc_proxy(socket_t so, void *arg, int waitflag)
 }
 
 
-/*
- * Set the up-call routine on the socket associated with the passed in
- * nfsrv_sock.
- * Assumes nfsd_mutex is held.
- */
+  
+                                                                      
+              
+                              
+   
 void
 nfsrv_uc_addsock(struct nfsrv_sock *slp, int start)
 {
@@ -370,11 +370,11 @@ nfsrv_uc_addsock(struct nfsrv_sock *slp, int start)
 		nfsrv_uc_start();
 	}
 
-	/*
-	 * We don't take a lock since once we're up nfsrv_uc_thread_count does
-	 * not change until shutdown and then we should not be adding sockets to
-	 * generate up-calls.
-	 */
+	  
+                                                                       
+                                                                         
+                      
+    
 	if (nfsrv_uc_thread_count) {
 		MALLOC(arg, struct nfsrv_uc_arg *, sizeof(struct nfsrv_uc_arg), M_TEMP, M_WAITOK | M_ZERO);
 		if (arg == NULL) {
@@ -393,10 +393,10 @@ direct:
 		sock_setupcall(slp->ns_so, nfsrv_rcv, slp);
 	}
 
-	/* just playin' it safe */
+	                          
 	sock_setsockopt(slp->ns_so, SOL_SOCKET, SO_UPCALLCLOSEWAIT, &on, sizeof(on));
 
 	return;
 }
 
-#endif /* CONFIG_NFS_SERVER */
+#endif                        

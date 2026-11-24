@@ -29,11 +29,11 @@
  * @OSF_COPYRIGHT@
  */
 
-/*
- * Define a service to map from a kernel-generated port name
- * to server-defined "type" and "value" data to be associated
- * with the port.
- */
+  
+                                                            
+                                                             
+                 
+   
 #include <mach/port_obj.h>
 #include <mach/mach.h>
 

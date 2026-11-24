@@ -10,8 +10,8 @@
 #include <darwintest_utils.h>
 
 
-#define DAY 86400 /*1 day in sec*/
-#define ERROR 2 /*2 us of error tolerance*/
+#define DAY 86400                 
+#define ERROR 2                            
 
 T_DECL(settimeofday_29192647,
     "Verify that the syscall settimeofday is effective",
@@ -27,7 +27,7 @@ T_DECL(settimeofday_29192647,
 	T_QUIET;
 	T_ASSERT_POSIX_ZERO(gettimeofday(&time, NULL), NULL);
 
-	/* increment the time of one day */
+	                                   
 	new_time = time.tv_sec + DAY;
 
 	time.tv_sec = new_time;
@@ -41,10 +41,10 @@ T_DECL(settimeofday_29192647,
 	T_QUIET;
 	T_ASSERT_POSIX_ZERO(gettimeofday(&time, NULL), NULL);
 
-	/* expext to be past new_time */
+	                                
 	T_EXPECT_GE_LONG(time.tv_sec, new_time, "Time successfully changed");
 
-	/* set the time back to previous value */
+	                                         
 	if (time.tv_sec >= new_time) {
 		time.tv_sec = time.tv_sec - DAY;
 		time.tv_usec = 0;
@@ -73,7 +73,7 @@ get_abs_to_us_scale_factor(uint64_t* numer, uint64_t* denom)
 
 	new_time_usec = (uint64_t)time.tv_sec * USEC_PER_SEC + (uint64_t)time.tv_nsec / 1000;
 
-	/* this is conversion factors from abs to nanos */
+	                                                  
 	T_ASSERT_EQ(mach_timebase_info(&timebaseInfo), KERN_SUCCESS, NULL);
 
 	new_time_usec -= old_time_usec;
@@ -96,7 +96,7 @@ get_abs_to_us_scale_factor(uint64_t* numer, uint64_t* denom)
 }
 
 
-#define ADJSTMENT 3333 /*3333 us*/
+#define ADJSTMENT 3333            
 #define ADJTIME_OFFSET_PER_SEC 500
 
 T_DECL(adjtime_29192647,
@@ -129,9 +129,9 @@ T_DECL(adjtime_29192647,
 		T_SKIP("adjtime_29192647 test requires LTE to run.");
 	}
 
-	/*
-	 * Calibrate scale factor for converting from abs time to usec
-	 */
+	  
+                                                               
+    
 	get_abs_to_us_scale_factor(&num, &den);
 
 	T_QUIET; T_ASSERT_EQ(mach_get_times(&old_abstime, NULL, &time), KERN_SUCCESS, NULL);
@@ -143,19 +143,19 @@ T_DECL(adjtime_29192647,
 
 	T_LOG("Attemping to adjust the time of %d", ADJSTMENT);
 
-	/*
-	 * If more than one second of adjustment
-	 * the system slews at a rate of 5ms/s otherwise 500us/s
-	 * until the last second is slewed the final < 500 usecs.
-	 */
+	  
+                                         
+                                                         
+                                                          
+    
 	T_WITH_ERRNO;
 	T_ASSERT_POSIX_ZERO(adjtime(&adj, NULL), NULL);
 
-	/*
-	 * Wait that the full adjustment is applied.
-	 * Note, add 2 more secs for take into account division error
-	 * and that the last block of adj is fully elapsed.
-	 */
+	  
+                                             
+                                                              
+                                                    
+    
 	sleep_time = (ADJSTMENT) / (ADJTIME_OFFSET_PER_SEC)+2;
 
 	T_LOG("Waiting for %u sec\n", sleep_time);
@@ -168,7 +168,7 @@ T_DECL(adjtime_29192647,
 	us_delta = new_time_usec - old_time_usec;
 	us_delta -= ADJSTMENT;
 
-	/* abs time is not affected by adjtime */
+	                                         
 	abs_delta = new_abstime - old_abstime;
 
 	abs_delta *= num;
@@ -176,15 +176,15 @@ T_DECL(adjtime_29192647,
 
 	diff = (long) us_delta - (long) abs_delta;
 
-	/* expext that us_delta == abs_delta */
+	                                       
 	T_EXPECT_LE_LONG(diff, (long) ERROR, "Check abs time vs calendar time");
 
 	T_EXPECT_GE_LONG(diff, (long) -ERROR, "Check abs time vs calendar time");
 }
 
-#define FREQ_PPM 222 /*222 PPM(us/s)*/
+#define FREQ_PPM 222                  
 #define SHIFT_PLL 4
-#define OFFSET_US 123 /*123us*/
+#define OFFSET_US 123          
 
 T_DECL(ntp_adjtime_29192647,
     "Verify that the syscall ntp_adjtime is effective",
@@ -217,19 +217,19 @@ T_DECL(ntp_adjtime_29192647,
 		T_SKIP("adjtime_29192647 test requires LTE to run.");
 	}
 
-	/*
-	 * Calibrate scale factor for converting from abs time to usec
-	 */
+	  
+                                                               
+    
 	get_abs_to_us_scale_factor(&num, &den);
 
-	/*
-	 * scale frequency using ntp_adjtime;
-	 */
+	  
+                                      
+    
 	memset(&ntptime, 0, sizeof(ntptime));
 
 	ntptime.modes = MOD_STATUS;
 	ntptime.status = TIME_OK;
-	/* ntp input freq is in ppm (us/s) * 2^16, max freq is 500 ppm */
+	                                                                 
 	freq = (FREQ_PPM) * 65536;
 	ntptime.modes |= MOD_FREQUENCY;
 	ntptime.freq = freq;
@@ -261,7 +261,7 @@ T_DECL(ntp_adjtime_29192647,
 	time_conv *= num;
 	time_conv /= den;
 
-	app = time_conv / USEC_PER_SEC; //sec elapsed
+	app = time_conv / USEC_PER_SEC;              
 
 	time_delta = time_conv;
 	time_delta += app * (FREQ_PPM);
@@ -272,14 +272,14 @@ T_DECL(ntp_adjtime_29192647,
 
 	diff = (long) us_delta - (long) time_delta;
 
-	/* expext that us_delta == time_delta */
+	                                        
 	T_EXPECT_LE_LONG(diff, (long) ERROR, "Check abs time vs calendar time");
 
 	T_EXPECT_GE_LONG(diff, (long) -ERROR, "Check abs time vs calendar time");
 
 	memset(&ntptime, 0, sizeof(ntptime));
 
-	/* reset freq to zero */
+	                        
 	freq = 0;
 	ntptime.modes = MOD_STATUS;
 	ntptime.status = TIME_OK;
@@ -294,23 +294,23 @@ T_DECL(ntp_adjtime_29192647,
 
 	sleep(1);
 
-	/*
-	 * adjust the phase using ntp_adjtime;
-	 */
+	  
+                                       
+    
 	memset(&ntptime, 0, sizeof(ntptime));
 	ntptime.modes |= MOD_STATUS;
 	ntptime.status = TIME_OK;
 	ntptime.status |= STA_PLL | STA_FREQHOLD;
 
-	/* ntp input phase can be both ns or us (MOD_MICRO), max offset is 500 ms */
+	                                                                            
 	ntptime.offset = OFFSET_US;
 	ntptime.modes |= MOD_OFFSET | MOD_MICRO;
 
-	/*
-	 * The system will slew each sec of:
-	 * slew = ntp.offset >> (SHIFT_PLL + time_constant);
-	 * ntp.offset -= slew;
-	 */
+	  
+                                     
+                                                     
+                       
+    
 	offset = (OFFSET_US) * 1000;
 	sleep_time = 2;
 
@@ -348,7 +348,7 @@ T_DECL(ntp_adjtime_29192647,
 
 	diff = (long) us_delta - (long) abs_delta;
 
-	/* expext that us_delta == abs_delta */
+	                                       
 	T_EXPECT_LE_LONG(diff, (long) ERROR, "Check abs time vs calendar time");
 
 	T_EXPECT_GE_LONG(diff, (long) -ERROR, "Check abs time vs calendar time");

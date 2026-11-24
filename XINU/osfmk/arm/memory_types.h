@@ -30,22 +30,22 @@
 
 #include <machine/config.h>
 
-/*
- * WIMG control
- */
+  
+               
+   
 #define VM_MEM_INNER                      0x10
-#define VM_MEM_RT                         0x10 // intentionally alias VM_MEM_INNER; will be used with mutually exclusive caching policies
+#define VM_MEM_RT                         0x10                                                                                           
 #define VM_MEM_EARLY_ACK                  0x20
 
-#define VM_WIMG_DEFAULT                   (VM_MEM_COHERENT) // 0x2
-#define VM_WIMG_COPYBACK                  (VM_MEM_COHERENT) // 0x2
-#define VM_WIMG_INNERWBACK                (VM_MEM_COHERENT | VM_MEM_INNER) // 0x12
-#define VM_WIMG_IO                        (VM_MEM_COHERENT | VM_MEM_NOT_CACHEABLE | VM_MEM_GUARDED) // 0x7
-#define VM_WIMG_POSTED                    (VM_MEM_COHERENT | VM_MEM_NOT_CACHEABLE | VM_MEM_GUARDED | VM_MEM_EARLY_ACK) // 0x27
-#define VM_WIMG_WTHRU                     (VM_MEM_WRITE_THROUGH | VM_MEM_COHERENT | VM_MEM_GUARDED) // 0xb
-#define VM_WIMG_WCOMB                     (VM_MEM_NOT_CACHEABLE | VM_MEM_COHERENT) // 0x6
-#define VM_WIMG_RT                        (VM_WIMG_IO | VM_MEM_RT) // 0x17
-#define VM_WIMG_POSTED_REORDERED          (VM_MEM_NOT_CACHEABLE | VM_MEM_COHERENT | VM_MEM_WRITE_THROUGH | VM_MEM_EARLY_ACK) // 0x2e
-#define VM_WIMG_POSTED_COMBINED_REORDERED (VM_MEM_NOT_CACHEABLE | VM_MEM_COHERENT | VM_MEM_EARLY_ACK) // 0x26
+#define VM_WIMG_DEFAULT                   (VM_MEM_COHERENT)       
+#define VM_WIMG_COPYBACK                  (VM_MEM_COHERENT)       
+#define VM_WIMG_INNERWBACK                (VM_MEM_COHERENT | VM_MEM_INNER)        
+#define VM_WIMG_IO                        (VM_MEM_COHERENT | VM_MEM_NOT_CACHEABLE | VM_MEM_GUARDED)       
+#define VM_WIMG_POSTED                    (VM_MEM_COHERENT | VM_MEM_NOT_CACHEABLE | VM_MEM_GUARDED | VM_MEM_EARLY_ACK)        
+#define VM_WIMG_WTHRU                     (VM_MEM_WRITE_THROUGH | VM_MEM_COHERENT | VM_MEM_GUARDED)       
+#define VM_WIMG_WCOMB                     (VM_MEM_NOT_CACHEABLE | VM_MEM_COHERENT)       
+#define VM_WIMG_RT                        (VM_WIMG_IO | VM_MEM_RT)        
+#define VM_WIMG_POSTED_REORDERED          (VM_MEM_NOT_CACHEABLE | VM_MEM_COHERENT | VM_MEM_WRITE_THROUGH | VM_MEM_EARLY_ACK)        
+#define VM_WIMG_POSTED_COMBINED_REORDERED (VM_MEM_NOT_CACHEABLE | VM_MEM_COHERENT | VM_MEM_EARLY_ACK)        
 
-#endif /* _ARM_MEMORY_TYPES_H_ */
+#endif                           

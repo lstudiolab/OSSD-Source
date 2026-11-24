@@ -52,7 +52,7 @@ enum {
 	kIOServiceMessageNotificationType           = 160,
 	kLastIOKitNotificationType                  = 199,
 
-	// reserved bits
+	                
 	kIOKitNoticationTypeMask                    = 0x00000FFF,
 	kIOKitNoticationTypeSizeAdjShift            = 30,
 	kIOKitNoticationMsgSizeMask                 = 3,
@@ -84,7 +84,7 @@ enum {
 
 
 
-// --------------
+                 
 enum {
 	kOSAsyncRef64Count  = 8,
 	kOSAsyncRef64Size   = kOSAsyncRef64Count * ((int) sizeof(io_user_reference_t))
@@ -92,7 +92,7 @@ enum {
 typedef io_user_reference_t OSAsyncReference64[kOSAsyncRef64Count];
 
 struct OSNotificationHeader64 {
-	mach_msg_size_t     size;       /* content size */
+	mach_msg_size_t     size;                         
 	natural_t           type;
 	OSAsyncReference64  reference;
 
@@ -109,7 +109,7 @@ struct IOServiceInterestContent64 {
 	io_user_reference_t messageArgument[1];
 };
 #pragma pack()
-// --------------
+                 
 
 #if !KERNEL_USER32
 
@@ -120,7 +120,7 @@ enum {
 typedef natural_t OSAsyncReference[kOSAsyncRefCount];
 
 struct OSNotificationHeader {
-	mach_msg_size_t     size;       /* content size */
+	mach_msg_size_t     size;                         
 	natural_t           type;
 	OSAsyncReference    reference;
 
@@ -138,7 +138,7 @@ struct IOServiceInterestContent {
 };
 #pragma pack()
 
-#endif /* KERNEL_USER32  */
+#endif                     
 
 struct IOAsyncCompletionContent {
 	IOReturn result;
@@ -159,4 +159,4 @@ typedef struct IOAsyncCompletionContent IOAsyncCompletionContent;
 }
 #endif
 
-#endif /*  __OS_OSMESSAGENOTIFICATION_H */
+#endif                                    

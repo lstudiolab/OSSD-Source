@@ -35,14 +35,14 @@
  * domain. The author hereby disclaims copyright to this source code.
  */
 
-/*
- * http://burtleburtle.net/bob/hash/
- *
- * lookup3.c, by Bob Jenkins, May 2006, Public Domain.
- *
- * You can use this free for any purpose.  It's in the public domain.
- * It has no warranty.
- */
+  
+                                    
+  
+                                                      
+  
+                                                                     
+                      
+   
 
 #include <stdbool.h>
 #include <sys/types.h>
@@ -62,17 +62,17 @@ static inline u_int64_t mh3_fmix64(u_int64_t);
 #define ROTL32(x, r)    (((x) << (r)) | ((x) >> (32 - (r))))
 #define ROTL64(x, r)    (((x) << (r)) | ((x) >> (64 - (r))))
 
-/*
- * The following hash algorithms are selected based on performance:
- *
- * 64-bit:	MurmurHash3_x64_128
- * 32-bit:	JHash
- */
+  
+                                                                   
+  
+                              
+                
+   
 #if   defined(__LP64__)
 net_flowhash_fn_t *net_flowhash = net_flowhash_mh3_x64_128;
-#else /* !__LP64__ */
+#else                
 net_flowhash_fn_t *net_flowhash = net_flowhash_jhash;
-#endif /* !__LP64__ */
+#endif                
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__arm64__)
 static inline u_int32_t
@@ -86,7 +86,7 @@ getblock64(const u_int64_t *p, int i)
 {
 	return p[i];
 }
-#else /* !__i386__ && !__x86_64__ && !__arm64__*/
+#else                                            
 static inline u_int32_t
 getblock32(const u_int32_t *p, int i)
 {
@@ -102,13 +102,13 @@ getblock32(const u_int32_t *p, int i)
 		    (((u_int32_t)bytes[1]) << 16) |
 		    (((u_int32_t)bytes[2]) << 8) |
 		    ((u_int32_t)bytes[3]);
-#else /* LITTLE_ENDIAN */
+#else                    
 		value =
 		    (((u_int32_t)bytes[3]) << 24) |
 		    (((u_int32_t)bytes[2]) << 16) |
 		    (((u_int32_t)bytes[1]) << 8) |
 		    ((u_int32_t)bytes[0]);
-#endif /* LITTLE_ENDIAN */
+#endif                    
 	}
 	return value;
 }
@@ -132,7 +132,7 @@ getblock64(const u_int64_t *p, int i)
 		    (((u_int64_t)bytes[5]) << 16) |
 		    (((u_int64_t)bytes[6]) << 8) |
 		    ((u_int64_t)bytes[7]);
-#else /* LITTLE_ENDIAN */
+#else                    
 		value =
 		    (((u_int64_t)bytes[7]) << 56) |
 		    (((u_int64_t)bytes[6]) << 48) |
@@ -142,11 +142,11 @@ getblock64(const u_int64_t *p, int i)
 		    (((u_int64_t)bytes[2]) << 16) |
 		    (((u_int64_t)bytes[1]) << 8) |
 		    ((u_int64_t)bytes[0]);
-#endif /* LITTLE_ENDIAN */
+#endif                    
 	}
 	return value;
 }
-#endif /* !__i386__ && !__x86_64 && !__arm64__ */
+#endif                                           
 
 static inline u_int32_t
 mh3_fmix32(u_int32_t h)
@@ -172,9 +172,9 @@ mh3_fmix64(u_int64_t k)
 	return k;
 }
 
-/*
- * MurmurHash3_x86_32
- */
+  
+                     
+   
 #define MH3_X86_32_C1   0xcc9e2d51
 #define MH3_X86_32_C2   0x1b873593
 
@@ -188,7 +188,7 @@ net_flowhash_mh3_x86_32(const void *key, u_int32_t len, const u_int32_t seed)
 	u_int32_t h1 = seed, k1;
 	int i;
 
-	/* body */
+	          
 	blocks = (const u_int32_t *)(const void *)(data + nblocks * 4);
 
 	for (i = -nblocks; i; i++) {
@@ -203,7 +203,7 @@ net_flowhash_mh3_x86_32(const void *key, u_int32_t len, const u_int32_t seed)
 		h1 = h1 * 5 + 0xe6546b64;
 	}
 
-	/* tail */
+	          
 	tail = (const u_int8_t *)(const void *)(data + nblocks * 4);
 	k1 = 0;
 
@@ -223,7 +223,7 @@ net_flowhash_mh3_x86_32(const void *key, u_int32_t len, const u_int32_t seed)
 	}
 	;
 
-	/* finalization */
+	                  
 	h1 ^= len;
 
 	h1 = mh3_fmix32(h1);
@@ -231,9 +231,9 @@ net_flowhash_mh3_x86_32(const void *key, u_int32_t len, const u_int32_t seed)
 	return h1;
 }
 
-/*
- * MurmurHash3_x64_128
- */
+  
+                      
+   
 #define MH3_X64_128_C1  0x87c37b91114253d5LLU
 #define MH3_X64_128_C2  0x4cf5ad432745937fLLU
 
@@ -248,7 +248,7 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 	u_int64_t h2 = seed, k2;
 	u_int32_t i;
 
-	/* body */
+	          
 	blocks = (const u_int64_t *)(const void *)data;
 
 	for (i = 0; i < nblocks; i++) {
@@ -260,9 +260,9 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 		__asm__ ( "rol   $31, %[k1]\n\t" :[k1] "+r" (k1) : :);
 #elif defined(__arm64__)
 		__asm__ ( "ror   %[k1], %[k1], #(64-31)\n\t" :[k1] "+r" (k1) : :);
-#else /* !__x86_64__ && !__arm64__ */
+#else                                
 		k1 = ROTL64(k1, 31);
-#endif /* !__x86_64__ && !__arm64__ */
+#endif                                
 		k1 *= MH3_X64_128_C2;
 		h1 ^= k1;
 
@@ -270,9 +270,9 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 		__asm__ ( "rol   $27, %[h1]\n\t" :[h1] "+r" (h1) : :);
 #elif defined(__arm64__)
 		__asm__ ( "ror   %[h1], %[h1], #(64-27)\n\t" :[h1] "+r" (h1) : :);
-#else /* !__x86_64__ && !__arm64__ */
+#else                                
 		h1 = ROTL64(h1, 27);
-#endif /* !__x86_64__ && !__arm64__ */
+#endif                                
 		h1 += h2;
 		h1 = h1 * 5 + 0x52dce729;
 
@@ -281,9 +281,9 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 		__asm__ ( "rol   $33, %[k2]\n\t" :[k2] "+r" (k2) : :);
 #elif defined(__arm64__)
 		__asm__ ( "ror   %[k2], %[k2], #(64-33)\n\t" :[k2] "+r" (k2) : :);
-#else /* !__x86_64__ && !__arm64__ */
+#else                                
 		k2 = ROTL64(k2, 33);
-#endif /* !__x86_64__ && !__arm64__ */
+#endif                                
 		k2 *= MH3_X64_128_C1;
 		h2 ^= k2;
 
@@ -291,14 +291,14 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 		__asm__ ( "rol   $31, %[h2]\n\t" :[h2] "+r" (h2) : :);
 #elif defined(__arm64__)
 		__asm__ ( "ror   %[h2], %[h2], #(64-31)\n\t" :[h2] "+r" (h2) : :);
-#else /* !__x86_64__ && !__arm64__ */
+#else                                
 		h2 = ROTL64(h2, 31);
-#endif /* !__x86_64__ && !__arm64__ */
+#endif                                
 		h2 += h1;
 		h2 = h2 * 5 + 0x38495ab5;
 	}
 
-	/* tail */
+	          
 	tail = (const u_int8_t *)(const void *)(data + nblocks * 16);
 	k1 = 0;
 	k2 = 0;
@@ -329,9 +329,9 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 		__asm__ ( "rol   $33, %[k2]\n\t" :[k2] "+r" (k2) : :);
 #elif defined(__arm64__)
 		__asm__ ( "ror   %[k2], %[k2], #(64-33)\n\t" :[k2] "+r" (k2) : :);
-#else /* !__x86_64__ && !__arm64__ */
+#else                                
 		k2 = ROTL64(k2, 33);
-#endif /* !__x86_64__ && !__arm64__ */
+#endif                                
 		k2 *= MH3_X64_128_C1;
 		h2 ^= k2;
 		OS_FALLTHROUGH;
@@ -363,15 +363,15 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 		__asm__ ( "rol   $31, %[k1]\n\t" :[k1] "+r" (k1) : :);
 #elif defined(__arm64__)
 		__asm__ ( "ror   %[k1], %[k1], #(64-31)\n\t" :[k1] "+r" (k1) : :);
-#else /* !__x86_64__ && !__arm64__ */
+#else                                
 		k1 = ROTL64(k1, 31);
-#endif /* !__x86_64__ && !__arm64__ */
+#endif                                
 		k1 *= MH3_X64_128_C2;
 		h1 ^= k1;
 	}
 	;
 
-	/* finalization */
+	                  
 	h1 ^= len;
 	h2 ^= len;
 
@@ -384,7 +384,7 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 	h1 += h2;
 	h2 += h1;
 
-	/* throw all but lowest 32-bit */
+	                                 
 	return h1 & 0xffffffff;
 }
 
@@ -410,25 +410,25 @@ net_flowhash_mh3_x64_128(const void *key, u_int32_t len, const u_int32_t seed)
 }
 
 #if BYTE_ORDER == BIG_ENDIAN
-/*
- * hashbig()
- */
+  
+            
+   
 u_int32_t
 net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 {
 	u_int32_t a, b, c;
 
-	/* Set up the internal state */
+	                               
 	a = b = c = JHASH_INIT + len + seed;
 
 	if (ALIGNED32(key)) {
-		/* read 32-bit chunks */
+		                        
 		const u_int32_t *k = (const u_int32_t *)key;
 
-		/*
-		 * all but last block:
-		 * aligned reads and affect 32 bits of (a,b,c)
-		 */
+		  
+                        
+                                                
+     
 		while (len > 12) {
 			a += k[0];
 			b += k[1];
@@ -438,16 +438,16 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 			k += 3;
 		}
 
-		/*
-		 * handle the last (probably partial) block
-		 *
-		 * "k[2] << 8" actually reads beyond the end of the string,
-		 * but then shifts out the part it's not allowed to read.
-		 * Because the string is aligned, the illegal read is in
-		 * the same word as the rest of the string.  The masking
-		 * trick does make the hash noticably faster for short
-		 * strings (like English words).
-		 */
+		  
+                                             
+    
+                                                             
+                                                           
+                                                          
+                                                          
+                                                        
+                                  
+     
 		switch (len) {
 		case 12:
 			c += k[2];
@@ -510,7 +510,7 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 			break;
 
 		case 0:
-			/* zero length requires no mixing */
+			                                    
 			return c;
 		}
 
@@ -519,10 +519,10 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 		return c;
 	}
 
-	/* need to read the key one byte at a time */
+	                                             
 	const u_int8_t *k = (const u_int8_t *)key;
 
-	/* all but the last block: affect some 32 bits of (a,b,c) */
+	                                                            
 	while (len > 12) {
 		a += ((u_int32_t)k[0]) << 24;
 		a += ((u_int32_t)k[1]) << 16;
@@ -541,7 +541,7 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 		k += 12;
 	}
 
-	/* last block: affect all 32 bits of (c) */
+	                                           
 	switch (len) {
 	case 12:
 		c += k[11];
@@ -581,7 +581,7 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 		break;
 
 	case 0:
-		/* zero length requires no mixing */
+		                                    
 		return c;
 	}
 
@@ -589,35 +589,35 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 
 	return c;
 }
-#else /* LITTLE_ENDIAN */
-/*
- * hashlittle()
- */
+#else                    
+  
+               
+   
 u_int32_t
 net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 {
 	u_int32_t a, b, c;
 
-	/* Set up the internal state */
+	                               
 	a = b = c = JHASH_INIT + len + seed;
 
 #if defined(__i386__) || defined(__x86_64__)
-	/*
-	 * On i386/x86_64, it is faster to read 32-bit chunks if the key
-	 * is aligned 32-bit OR not 16-bit, and perform 16-bit reads if it
-	 * is aligned 16-bit.
-	 */
+	  
+                                                                 
+                                                                   
+                      
+    
 	if (ALIGNED32(key) || !ALIGNED16(key)) {
-#else /* !defined(__i386__) && !defined(__x86_64__) */
+#else                                                 
 	if (ALIGNED32(key)) {
-#endif /* !defined(__i386__) && !defined(__x86_64__) */
-		/* read 32-bit chunks */
+#endif                                                 
+		                        
 		const u_int32_t *k = (const u_int32_t *)key;
 
-		/*
-		 * all but last block:
-		 * aligned reads and affect 32 bits of (a,b,c)
-		 */
+		  
+                        
+                                                
+     
 		while (len > 12) {
 			a += k[0];
 			b += k[1];
@@ -627,16 +627,16 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 			k += 3;
 		}
 
-		/*
-		 * handle the last (probably partial) block
-		 *
-		 * "k[2] & 0xffffff" actually reads beyond the end of the
-		 * string, but then masks off the part it's not allowed
-		 * to read.  Because the string is aligned, the masked-off
-		 * tail is in the same word as the rest of the string.
-		 * The masking trick does make the hash noticably faster
-		 * for short strings (like English words).
-		 */
+		  
+                                             
+    
+                                                           
+                                                         
+                                                            
+                                                        
+                                                          
+                                            
+     
 		switch (len) {
 		case 12:
 			c += k[2];
@@ -699,7 +699,7 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 			break;
 
 		case 0:
-			/* zero length requires no mixing */
+			                                    
 			return c;
 		}
 
@@ -709,12 +709,12 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 	}
 #if !defined(__i386__) && !defined(__x86_64__)
 	else if (ALIGNED16(key)) {
-#endif /* !defined(__i386__) && !defined(__x86_64__) */
-	/* read 16-bit chunks */
+#endif                                                 
+	                        
 	const u_int16_t *k = (const u_int16_t *)key;
 	const u_int8_t *k8;
 
-	/* all but last block: aligned reads and different mixing */
+	                                                            
 	while (len > 12) {
 		a += k[0] + (((u_int32_t)k[1]) << 16);
 		b += k[2] + (((u_int32_t)k[3]) << 16);
@@ -724,7 +724,7 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 		k += 6;
 	}
 
-	/* handle the last (probably partial) block */
+	                                              
 	k8 = (const u_int8_t *)k;
 	switch (len) {
 	case 12:
@@ -777,7 +777,7 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 		break;
 
 	case 0:
-		/* zero length requires no mixing */
+		                                    
 		return c;
 	}
 
@@ -787,10 +787,10 @@ net_flowhash_jhash(const void *key, u_int32_t len, const u_int32_t seed)
 #if !defined(__i386__) && !defined(__x86_64__)
 }
 
-/* need to read the key one byte at a time */
+                                             
 const u_int8_t *k = (const u_int8_t *)key;
 
-/* all but the last block: affect some 32 bits of (a,b,c) */
+                                                            
 while (len > 12) {
 	a += k[0];
 	a += ((u_int32_t)k[1]) << 8;
@@ -809,7 +809,7 @@ while (len > 12) {
 	k += 12;
 }
 
-/* last block: affect all 32 bits of (c) */
+                                           
 switch (len) {
 case 12:
 	c += ((u_int32_t)k[11]) << 24;
@@ -849,13 +849,13 @@ case 1:
 	break;
 
 case 0:
-	/* zero length requires no mixing */
+	                                    
 	return c;
 }
 
 JHASH_FINAL(a, b, c);
 
 return c;
-#endif /* !defined(__i386__) && !defined(__x86_64__) */
+#endif                                                 
 }
-#endif /* LITTLE_ENDIAN */
+#endif                    

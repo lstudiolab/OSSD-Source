@@ -34,19 +34,19 @@
 #define STACKSHOT_CONFIG_TYPE 1
 
 typedef struct stackshot_config {
-	/* Input options */
-	int             sc_pid;                 /* PID to trace, or -1 for the entire system */
-	uint64_t        sc_flags;               /* Stackshot flags */
-	uint64_t        sc_delta_timestamp;     /* Retrieve a delta stackshot of system state that has changed since this time */
+	                   
+	int             sc_pid;                                                                
+	uint64_t        sc_flags;                                    
+	uint64_t        sc_delta_timestamp;                                                                                      
 
-	/* Stackshot results */
-	uint64_t        sc_buffer;              /* Pointer to stackshot buffer */
-	uint32_t        sc_size;                /* Length of the stackshot buffer */
+	                       
+	uint64_t        sc_buffer;                                               
+	uint32_t        sc_size;                                                    
 
-	/* Internals */
-	uint64_t        sc_out_buffer_addr;     /* Location where the kernel should copy the address of the newly mapped buffer in user space */
-	uint64_t        sc_out_size_addr;       /* Location where the kernel should copy the size of the stackshot buffer */
-	uint64_t                sc_pagetable_mask;      /* Mask of page table levels to dump, must pass STACKSHOT_PAGE_TABLES */
+	               
+	uint64_t        sc_out_buffer_addr;                                                                                                     
+	uint64_t        sc_out_size_addr;                                                                                   
+	uint64_t                sc_pagetable_mask;                                                                              
 } stackshot_config_t;
 
 #ifndef KERNEL
@@ -63,6 +63,6 @@ int stackshot_config_set_pagetable_mask(stackshot_config_t * stackshot_config, u
 int stackshot_config_dealloc_buffer(stackshot_config_t * stackshot_config);
 int stackshot_config_dealloc(stackshot_config_t * stackshot_config);
 
-#endif /* ! KERNEL */
+#endif               
 
-#endif /* _SYS_STACKSHOT_H */
+#endif                       

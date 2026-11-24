@@ -15,10 +15,10 @@ set_priority(pid_t pid, int32_t priority, uint64_t user_data, boolean_t is_asser
 	memorystatus_priority_properties_t mjp = { 0 };
 
 	if (is_assertion_driven) {
-		/*
-		 * Control over an assertion driven priority will be
-		 * relinquished when priority == JETSAM_PRIORITY_IDLE
-		 */
+		  
+                                                      
+                                                       
+     
 		if (priority == JETSAM_PRIORITY_IDLE) {
 			T_LOG("Relinquish ...assertion... priority(%d) for pid[%d]", priority, pid);
 		} else {
@@ -64,13 +64,13 @@ check_properties(pid_t pid, int32_t expected_priority, int32_t expected_limit_mb
 	T_ASSERT_TRUE(ret, "verify_assertion_state failed");
 
 
-	/*
-	 * These tests use well defined limits, so we don't try to handle defaults like
-	 * a limit of <= 0 which typically applies a system-wide per process limit.
-	 */
+	  
+                                                                                
+                                                                            
+    
 
 	if ((actual_priority != expected_priority) || (actual_limit_mb != expected_limit_mb) || (actual_user_data != expected_user_data)) {
-		/* we have a mismatch */
+		                        
 		T_LOG("%s test failed: %s\n", test, PROP_CHECK_ERROR_STRING);
 
 		if (actual_priority != expected_priority) {
@@ -152,7 +152,7 @@ get_priority_props(pid_t pid, boolean_t verbose, int32_t *priority, int32_t *lim
 
 	int size = memorystatus_control(MEMORYSTATUS_CMD_GET_PRIORITY_LIST, pid, 0, &entry, sizeof(entry));
 
-	/* validate size returned */
+	                            
 	if (size <= 0) {
 		T_ASSERT_FAIL("get_priority: can't get list size: %d!\n", size);
 	}
@@ -203,15 +203,15 @@ verify_assertion_state(uint32_t state, boolean_t expected_assertion_state)
 	}
 
 	if (state & kMemorystatusAssertion) {
-		/*
-		 * An assertion driven jetsam priority is at play.
-		 */
+		  
+                                                    
+     
 		actual_assertion_state = ASSERTION_STATE_IS_SET;
 		actual_string = "ASSERTION_STATE_IS_SET";
 	} else {
-		/*
-		 * There is no assertion driven jetsam priority in place.
-		 */
+		  
+                                                           
+     
 		actual_assertion_state = ASSERTION_STATE_IS_RELINQUISHED;
 		actual_string = "ASSERTION_STATE_IS_RELINQUISHED";
 	}
@@ -221,8 +221,8 @@ verify_assertion_state(uint32_t state, boolean_t expected_assertion_state)
 		return true;
 	} else {
 		T_FAIL("state 0x%x:  %s but expected %s", state, actual_string, expected_string);
-		// log_state(state);
-		return false;   /* failed */
+		                    
+		return false;               
 	}
 }
 

@@ -36,9 +36,9 @@
 #include <sys/_types/_fsobj_id_t.h>
 #include <sys/_types/_uuid_t.h>
 
-/* These definitions must be kept in sync with the ones in
- * osfmk/mach/mach_types.defs.
- */
+                                                          
+                              
+   
 
 struct dyld_kernel_image_info {
 	uuid_t uuid;
@@ -49,18 +49,18 @@ struct dyld_kernel_image_info {
 
 struct dyld_kernel_process_info {
 	struct dyld_kernel_image_info cache_image_info;
-	uint64_t timestamp;         // mach_absolute_time of last time dyld change to image list
-	uint32_t imageCount;        // number of images currently loaded into process
-	uint32_t initialImageCount; // number of images statically loaded into process (before any dlopen() calls)
-	uint8_t dyldState;          // one of dyld_process_state_* values
-	boolean_t no_cache;         // process is running without a dyld cache
-	boolean_t private_cache;    // process is using a private copy of its dyld cache
+	uint64_t timestamp;                                                                     
+	uint32_t imageCount;                                                         
+	uint32_t initialImageCount;                                                                               
+	uint8_t dyldState;                                               
+	boolean_t no_cache;                                                   
+	boolean_t private_cache;                                                        
 };
 
-/* typedefs so our MIG is sane */
+                                 
 
 typedef struct dyld_kernel_image_info dyld_kernel_image_info_t;
 typedef struct dyld_kernel_process_info dyld_kernel_process_info_t;
 typedef dyld_kernel_image_info_t *dyld_kernel_image_info_array_t;
 
-#endif /* _MACH_DYLIB_INFO_H_ */
+#endif                          

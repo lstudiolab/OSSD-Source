@@ -34,7 +34,7 @@
 #include <sys/cdefs.h>
 #include <mach/message.h>
 
-/* Sandbox-specific calls for task based message filtering */
+                                                             
 typedef boolean_t (*mach_msg_fetch_filter_policy_cbfunc_t) (struct task *task, void *portlabel,
     mach_msg_id_t msgid, mach_msg_filter_id *fpid);
 
@@ -43,7 +43,7 @@ struct mach_msg_filter_callbacks {
 	const mach_msg_fetch_filter_policy_cbfunc_t fetch_filter_policy;
 };
 
-#define MACH_MSG_FILTER_CALLBACKS_VERSION_0 (0) /* up-to fetch_filter_policy */
+#define MACH_MSG_FILTER_CALLBACKS_VERSION_0 (0)                                
 #define MACH_MSG_FILTER_CALLBACKS_CURRENT MACH_MSG_FILTER_CALLBACKS_VERSION_0
 
 __BEGIN_DECLS
@@ -52,10 +52,10 @@ int mach_msg_filter_register_callback(const struct mach_msg_filter_callbacks *ca
 
 __END_DECLS
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #if XNU_KERNEL_PRIVATE
 boolean_t mach_msg_fetch_filter_policy(void *portlabel, mach_msg_id_t msgh_id, mach_msg_filter_id *fid);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _KERN_MACH_FILTER_H_ */
+#endif                           

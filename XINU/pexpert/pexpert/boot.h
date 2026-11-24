@@ -30,4 +30,4 @@
 
 #include <pexpert/machine/boot.h>
 
-#endif /* _PEXPERT_BOOT_H_ */
+#endif                       

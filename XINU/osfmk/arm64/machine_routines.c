@@ -62,7 +62,7 @@
 #include <IOKit/IOPlatformExpert.h>
 #if HIBERNATION
 #include <IOKit/IOHibernatePrivate.h>
-#endif /* HIBERNATION */
+#endif                  
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
 #include <arm64/amcc_rorgn.h>
@@ -70,13 +70,13 @@
 
 #include <libkern/section_keywords.h>
 
-/**
- * On supported hardware, debuggable builds make the HID bits read-only
- * without locking them.  This lets people manually modify HID bits while
- * debugging, since they can use a debugging tool to first reset the HID
- * bits back to read/write.  However it will still catch xnu changes that
- * accidentally write to HID bits after they've been made read-only.
- */
+   
+                                                                       
+                                                                         
+                                                                        
+                                                                         
+                                                                    
+   
 #if HAS_TWO_STAGE_SPR_LOCK && !(DEVELOPMENT || DEBUG)
 #define USE_TWO_STAGE_SPR_LOCK
 #endif
@@ -102,7 +102,7 @@ int64_t high_MutexSpin;
 static uint64_t ml_wfe_hint_max_interval;
 #define MAX_WFE_HINT_INTERVAL_US (500ULL)
 
-/* Must be less than cpu_idle_latency to ensure ml_delay_should_spin is true */
+                                                                               
 TUNABLE(uint32_t, yield_delay_us, "yield_delay_us", 0);
 
 extern vm_offset_t   segLOWEST;
@@ -110,16 +110,16 @@ extern vm_offset_t   segLOWESTTEXT;
 extern vm_offset_t   segLASTB;
 extern unsigned long segSizeLAST;
 
-/* ARM64 specific bounds; used to test for presence in the kernelcache. */
+                                                                          
 extern vm_offset_t   vm_kernelcache_base;
 extern vm_offset_t   vm_kernelcache_top;
 
 #if defined(HAS_IPI)
 unsigned int gFastIPI = 1;
-#define kDeferredIPITimerDefault (64 * NSEC_PER_USEC) /* in nanoseconds */
+#define kDeferredIPITimerDefault (64 * NSEC_PER_USEC)                     
 static TUNABLE_WRITEABLE(uint64_t, deferred_ipi_timer_ns, "fastipitimeout",
     kDeferredIPITimerDefault);
-#endif /* defined(HAS_IPI) */
+#endif                       
 
 thread_t Idle_context(void);
 
@@ -130,38 +130,38 @@ SECURITY_READ_ONLY_LATE(static ml_topology_info_t) topology_info = {
 	.cpus = topology_cpu_array,
 	.clusters = topology_cluster_array,
 };
-/**
- * Represents the offset of each cluster within a hypothetical array of MAX_CPUS
- * entries of an arbitrary data type.  This is intended for use by specialized consumers
- * that must quickly access per-CPU data using only the physical CPU ID (MPIDR_EL1),
- * as follows:
- *	hypothetical_array[cluster_offsets[AFF1] + AFF0]
- * Most consumers should instead use general-purpose facilities such as PERCPU or
- * ml_get_cpu_number().
- */
+   
+                                                                                
+                                                                                        
+                                                                                    
+              
+                                                   
+                                                                                 
+                       
+   
 SECURITY_READ_ONLY_LATE(int64_t) cluster_offsets[MAX_CPU_CLUSTER_PHY_ID + 1];
 
 SECURITY_READ_ONLY_LATE(static uint32_t) arm64_eventi = UINT32_MAX;
 
 extern uint32_t lockdown_done;
 
-/**
- * Represents regions of virtual address space that should be reserved
- * (pre-mapped) in each user address space.
- */
+   
+                                                                      
+                                           
+   
 SECURITY_READ_ONLY_LATE(static struct vm_reserved_region) vm_reserved_regions[] = {
 	{
 		.vmrr_name = "GPU Carveout",
 		.vmrr_addr = MACH_VM_MIN_GPU_CARVEOUT_ADDRESS,
 		.vmrr_size = (vm_map_size_t)(MACH_VM_MAX_GPU_CARVEOUT_ADDRESS - MACH_VM_MIN_GPU_CARVEOUT_ADDRESS)
 	},
-	/*
-	 * Reserve the virtual memory space representing the commpage nesting region
-	 * to prevent user processes from allocating memory within it. The actual
-	 * page table entries for the commpage are inserted by vm_commpage_enter().
-	 * This vm_map_enter() just prevents userspace from allocating/deallocating
-	 * anything within the entire commpage nested region.
-	 */
+	  
+                                                                             
+                                                                          
+                                                                            
+                                                                            
+                                                      
+    
 	{
 		.vmrr_name = "commpage nesting",
 		.vmrr_addr = _COMM_PAGE64_NESTING_START,
@@ -177,10 +177,10 @@ ml_cpu_signal_type(unsigned int cpu_mpidr, uint32_t type)
 {
 #if HAS_CLUSTER
 	uint64_t local_mpidr;
-	/* NOTE: this logic expects that we are called in a non-preemptible
-	 * context, or at least one in which the calling thread is bound
-	 * to a single CPU.  Otherwise we may migrate between choosing which
-	 * IPI mechanism to use and issuing the IPI. */
+	                                                                   
+                                                                 
+                                                                     
+                                                
 	MRS(local_mpidr, "MPIDR_EL1");
 	if (MPIDR_CLUSTER_ID(local_mpidr) == MPIDR_CLUSTER_ID(cpu_mpidr)) {
 		uint64_t x = type | MPIDR_CPU_ID(cpu_mpidr);
@@ -217,23 +217,23 @@ void
 ml_cpu_signal_deferred_adjust_timer(uint64_t nanosecs)
 {
 #if defined(HAS_IPI)
-	/* adjust IPI_CR timer countdown value for deferred IPI
-	 * accepts input in nanosecs, convert to absolutetime (REFCLK ticks),
-	 * clamp maximum REFCLK ticks to 0xFFFF (16 bit field)
-	 *
-	 * global register, should only require a single write to update all
-	 * CPU cores: from Skye ACC user spec section 5.7.3.3
-	 *
-	 * IPICR is a global register but there are two copies in ACC: one at pBLK and one at eBLK.
-	 * IPICR write SPR token also traverses both pCPM and eCPM rings and updates both copies.
-	 */
+	                                                       
+                                                                      
+                                                       
+   
+                                                                     
+                                                      
+   
+                                                                                            
+                                                                                          
+    
 	uint64_t abstime;
 
 	nanoseconds_to_absolutetime(nanosecs, &abstime);
 
 	abstime = MIN(abstime, 0xFFFF);
 
-	/* update deferred_ipi_timer_ns with the new clamped value */
+	                                                             
 	absolutetime_to_nanoseconds(abstime, &deferred_ipi_timer_ns);
 
 	MSR("IPICR_EL1", abstime);
@@ -282,9 +282,9 @@ ml_cpu_signal_retract(unsigned int cpu_mpidr __unused)
 void
 machine_idle(void)
 {
-	/* Interrupts are expected to be masked on entry or re-entry via
-	 * Idle_load_context()
-	 */
+	                                                                
+                       
+    
 	assert((__builtin_arm_rsr("DAIF") & DAIF_IRQF) == DAIF_IRQF);
 	Idle_context();
 	__builtin_arm_wsr("DAIFClr", (DAIFSC_IRQF | DAIFSC_FIQF));
@@ -349,7 +349,7 @@ get_arm_cpu_version(void)
 {
 	uint32_t value = machine_read_midr();
 
-	/* Compose the register values into 8 bits; variant[7:4], revision[3:0]. */
+	                                                                           
 	return ((value & MIDR_EL1_REV_MASK) >> MIDR_EL1_REV_SHIFT) | ((value & MIDR_EL1_VAR_MASK) >> (MIDR_EL1_VAR_SHIFT - 4));
 }
 
@@ -364,12 +364,12 @@ ml_feature_supported(uint32_t feature_bit)
 	return aidr_el1_value & feature_bit;
 }
 
-/*
- * user_cont_hwclock_allowed()
- *
- * Indicates whether we allow EL0 to read the virtual timebase (CNTVCT_EL0)
- * as a continuous time source (e.g. from mach_continuous_time)
- */
+  
+                              
+  
+                                                                           
+                                                               
+   
 boolean_t
 user_cont_hwclock_allowed(void)
 {
@@ -394,15 +394,15 @@ machine_startup(__unused boot_args * args)
 	if (!PE_parse_boot_argn("fastipi", &gFastIPI, sizeof(gFastIPI))) {
 		gFastIPI = 1;
 	}
-#endif /* defined(HAS_IPI) && (DEVELOPMENT || DEBUG)*/
+#endif                                                
 
 	machine_conf();
 
-	/*
-	 * Kick off the kernel bootstrap.
-	 */
+	  
+                                  
+    
 	kernel_bootstrap();
-	/* NOTREACHED */
+	                
 }
 
 typedef void (*invalidate_fn_t)(void);
@@ -428,34 +428,34 @@ machine_lockdown(void)
 
 #if CONFIG_KERNEL_INTEGRITY
 #if KERNEL_INTEGRITY_WT
-	/* Watchtower
-	 *
-	 * Notify the monitor about the completion of early kernel bootstrap.
-	 * From this point forward it will enforce the integrity of kernel text,
-	 * rodata and page tables.
-	 */
+	             
+   
+                                                                      
+                                                                         
+                           
+    
 
 #ifdef MONITOR
 	monitor_call(MONITOR_LOCKDOWN, 0, 0, 0);
 #endif
-#endif /* KERNEL_INTEGRITY_WT */
+#endif                          
 
 #if XNU_MONITOR
 	pmap_lockdown_ppl();
 #endif
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
-	/* KTRR
-	 *
-	 * Lock physical KTRR region. KTRR region is read-only. Memory outside
-	 * the region is not executable at EL1.
-	 */
+	       
+   
+                                                                       
+                                        
+    
 
 	rorgn_lockdown();
-#endif /* defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR) */
+#endif                                                                       
 
 
-#endif /* CONFIG_KERNEL_INTEGRITY */
+#endif                              
 
 
 	if (NULL != invalidate_hmac_function) {
@@ -477,14 +477,14 @@ machine_boot_info(
 void
 slave_machine_init(__unused void *param)
 {
-	cpu_machine_init();     /* Initialize the processor */
-	clock_init();           /* Init the clock */
+	cpu_machine_init();                                   
+	clock_init();                               
 }
 
-/*
- *	Routine:        machine_processor_shutdown
- *	Function:
- */
+  
+                                             
+            
+   
 thread_t
 machine_processor_shutdown(
 	__unused thread_t thread,
@@ -528,25 +528,25 @@ virtual_timeout_inflate32(unsigned int vti, uint32_t timeout, uint32_t max_timeo
 	return timeout << vti;
 }
 
-/*
- * Some timeouts are later adjusted or used in calculations setting
- * other values. In order to avoid overflow, cap the max timeout as
- * 2^47ns (~39 hours). (How did we determine this number?)
- */
+  
+                                                                   
+                                                                   
+                                                          
+   
 static const uint64_t max_timeout_ns = 1ULL << 47;
 
-/*
- * Inflate a timeout in nanosecond.
- */
+  
+                                   
+   
 uint64_t
 virtual_timeout_inflate_ns(unsigned int vti, uint64_t timeout)
 {
 	return virtual_timeout_inflate64(vti, timeout, max_timeout_ns);
 }
 
-/*
- * Inflate a timeout in absolutetime.
- */
+  
+                                     
+   
 uint64_t
 virtual_timeout_inflate_abs(unsigned int vti, uint64_t timeout)
 {
@@ -555,9 +555,9 @@ virtual_timeout_inflate_abs(unsigned int vti, uint64_t timeout)
 	return virtual_timeout_inflate64(vti, timeout, max_timeout);
 }
 
-/*
- * Inflate a timeout in absolutetime (32-bit).
- */
+  
+                                              
+   
 static uint64_t
 virtual_timeout_inflate_abs_32(unsigned int vti, uint32_t timeout)
 {
@@ -565,9 +565,9 @@ virtual_timeout_inflate_abs_32(unsigned int vti, uint32_t timeout)
 	return virtual_timeout_inflate32(vti, timeout, max_timeout);
 }
 
-/*
- * Inflate a timeout in microseconds.
- */
+  
+                                     
+   
 static uint32_t
 virtual_timeout_inflate_us(unsigned int vti, uint64_t timeout)
 {
@@ -575,12 +575,12 @@ virtual_timeout_inflate_us(unsigned int vti, uint64_t timeout)
 	return virtual_timeout_inflate32(vti, timeout, max_timeout);
 }
 
-#endif /* APPLEVIRTUALPLATFORM */
+#endif                           
 
-/*
- *      Routine:        ml_init_lock_timeout
- *      Function:
- */
+  
+                                            
+                 
+   
 void
 ml_init_lock_timeout(void)
 {
@@ -648,35 +648,35 @@ MACRO_END
 	VIRTUAL_TIMEOUT_INFLATE_ABS(TLockTimeOut);
 	VIRTUAL_TIMEOUT_INFLATE_ABS(MutexSpin);
 	VIRTUAL_TIMEOUT_INFLATE_ABS(low_MutexSpin);
-#endif /* APPLEVIRTUALPLATFORM */
+#endif                           
 
-	/*
-	 * high_MutexSpin should be initialized as low_MutexSpin * real_ncpus, but
-	 * real_ncpus is not set at this time
-	 *
-	 * NOTE: active spinning is disabled in arm. It can be activated
-	 * by setting high_MutexSpin through the sysctl.
-	 */
+	  
+                                                                           
+                                      
+   
+                                                                 
+                                                 
+    
 	high_MutexSpin = low_MutexSpin;
 
 	nanoseconds_to_absolutetime(MAX_WFE_HINT_INTERVAL_US * NSEC_PER_USEC, &ml_wfe_hint_max_interval);
 }
 
-/*
- * This is called when all of the ml_processor_info_t structures have been
- * initialized and all the processors have been started through processor_start().
- *
- * Required by the scheduler subsystem.
- */
+  
+                                                                          
+                                                                                  
+  
+                                       
+   
 void
 ml_cpu_init_completed(void)
 {
 }
 
-/*
- * This is called from the machine-independent routine cpu_up()
- * to perform machine-dependent info updates.
- */
+  
+                                                               
+                                             
+   
 void
 ml_cpu_up(void)
 {
@@ -684,10 +684,10 @@ ml_cpu_up(void)
 	os_atomic_inc(&machine_info.logical_cpu, relaxed);
 }
 
-/*
- * This is called from the machine-independent routine cpu_down()
- * to perform machine-dependent info updates.
- */
+  
+                                                                 
+                                             
+   
 void
 ml_cpu_down(void)
 {
@@ -696,25 +696,25 @@ ml_cpu_down(void)
 	os_atomic_dec(&machine_info.physical_cpu, relaxed);
 	os_atomic_dec(&machine_info.logical_cpu, relaxed);
 
-	/*
-	 * If we want to deal with outstanding IPIs, we need to
-	 * do relatively early in the processor_doshutdown path,
-	 * as we pend decrementer interrupts using the IPI
-	 * mechanism if we cannot immediately service them (if
-	 * IRQ is masked).  Do so now.
-	 *
-	 * We aren't on the interrupt stack here; would it make
-	 * more sense to disable signaling and then enable
-	 * interrupts?  It might be a bit cleaner.
-	 */
+	  
+                                                        
+                                                         
+                                                   
+                                                       
+                               
+   
+                                                        
+                                                   
+                                           
+    
 	cpu_data_ptr = getCpuDatap();
 	cpu_data_ptr->cpu_running = FALSE;
 
 	if (cpu_data_ptr != &BootCpuData) {
-		/*
-		 * Move all of this cpu's timers to the master/boot cpu,
-		 * and poke it in case there's a sooner deadline for it to schedule.
-		 */
+		  
+                                                          
+                                                                      
+     
 		timer_queue_shutdown(&cpu_data_ptr->rtclock_timer.queue);
 		cpu_xcall(BootCpuData.cpu_number, &timer_queue_expire_local, NULL);
 	}
@@ -722,10 +722,10 @@ ml_cpu_down(void)
 	cpu_signal_handler_internal(TRUE);
 }
 
-/*
- *	Routine:        ml_cpu_get_info
- *	Function:
- */
+  
+                                  
+            
+   
 void
 ml_cpu_get_info(ml_cpu_info_t * ml_cpu_info)
 {
@@ -777,16 +777,16 @@ halt_cpu(void)
 	halt_all_cpus(FALSE);
 }
 
-/*
- *	Routine:        machine_signal_idle
- *	Function:
- */
+  
+                                      
+            
+   
 void
 machine_signal_idle(
 	processor_t processor)
 {
 	cpu_signal(processor_to_cpu_datap(processor), SIGPnop, (void *)NULL, (void *)NULL);
-	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_AST), processor->cpu_id, 0 /* nop */, 0, 0, 0);
+	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_AST), processor->cpu_id, 0          , 0, 0, 0);
 }
 
 void
@@ -794,7 +794,7 @@ machine_signal_idle_deferred(
 	processor_t processor)
 {
 	cpu_signal_deferred(processor_to_cpu_datap(processor));
-	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_DEFERRED_AST), processor->cpu_id, 0 /* nop */, 0, 0, 0);
+	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_DEFERRED_AST), processor->cpu_id, 0          , 0, 0, 0);
 }
 
 void
@@ -802,13 +802,13 @@ machine_signal_idle_cancel(
 	processor_t processor)
 {
 	cpu_signal_cancel(processor_to_cpu_datap(processor));
-	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_CANCEL_AST), processor->cpu_id, 0 /* nop */, 0, 0, 0);
+	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_CANCEL_AST), processor->cpu_id, 0          , 0, 0, 0);
 }
 
-/*
- *	Routine:        ml_install_interrupt_handler
- *	Function:	Initialize Interrupt Handler
- */
+  
+                                               
+                                         
+   
 void
 ml_install_interrupt_handler(
 	void *nub,
@@ -832,29 +832,29 @@ ml_install_interrupt_handler(
 	(void) ml_set_interrupts_enabled(current_state);
 }
 
-/*
- *	Routine:        ml_init_interrupt
- *	Function:	Initialize Interrupts
- */
+  
+                                    
+                                  
+   
 void
 ml_init_interrupt(void)
 {
 #if defined(HAS_IPI)
-	/*
-	 * ml_init_interrupt will get called once for each CPU, but this is redundant
-	 * because there is only one global copy of the register for skye. do it only
-	 * on the bootstrap cpu
-	 */
+	  
+                                                                              
+                                                                              
+                        
+    
 	if (getCpuDatap()->cluster_master) {
 		ml_cpu_signal_deferred_adjust_timer(deferred_ipi_timer_ns);
 	}
 #endif
 }
 
-/*
- *	Routine:        ml_init_timebase
- *	Function:	register and setup Timebase, Decremeter services
- */
+  
+                                   
+                                                             
+   
 void
 ml_init_timebase(
 	void            *args,
@@ -940,7 +940,7 @@ ml_is_boot_cpu(const DTEntry entry)
 static void
 ml_read_chip_revision(unsigned int *rev __unused)
 {
-	// The CPU_VERSION_* macros are only defined on APPLE_ARM64_ARCH_FAMILY builds
+	                                                                              
 #ifdef APPLE_ARM64_ARCH_FAMILY
 	DTEntry         entryP;
 
@@ -980,12 +980,12 @@ ml_parse_cpu_topology(void)
 	while (kSuccess == SecureDTIterateEntries(&iter, &child)) {
 		boolean_t is_boot_cpu = ml_is_boot_cpu(child);
 
-		// If the number of CPUs is constrained by the cpus= boot-arg, and the boot CPU hasn't
-		// been added to the topology struct yet, and we only have one slot left, then skip
-		// every other non-boot CPU in order to leave room for the boot CPU.
-		//
-		// e.g. if the boot-args say "cpus=3" and CPU4 is the boot CPU, then the cpus[]
-		// array will list CPU0, CPU1, and CPU4.  CPU2-CPU3 and CPU5-CPUn will be omitted.
+		                                                                                      
+		                                                                                   
+		                                                                    
+		  
+		                                                                               
+		                                                                                  
 		if (topology_info.num_cpus >= (cpu_boot_arg - 1) && topology_info.boot_cpu == NULL && !is_boot_cpu) {
 			continue;
 		}
@@ -1022,11 +1022,11 @@ ml_parse_cpu_topology(void)
 			cpu->cluster_type = CLUSTER_TYPE_P;
 		}
 
-		/*
-		 * Since we want to keep a linear cluster ID space, we cannot just rely
-		 * on the value provided by EDT. Instead, use the MPIDR value to see if we have
-		 * seen this exact cluster before. If so, then reuse that cluster ID for this CPU.
-		 */
+		  
+                                                                         
+                                                                                 
+                                                                                    
+     
 #if HAS_CLUSTER
 		uint32_t phys_cluster_id = MPIDR_CLUSTER_ID(cpu->phys_id);
 #else
@@ -1051,9 +1051,9 @@ ml_parse_cpu_topology(void)
 			assert(cluster_phys_to_logical[phys_cluster_id] == -1);
 			cluster_phys_to_logical[phys_cluster_id] = cpu->cluster_id;
 
-			// Since we don't have a per-cluster EDT node, this is repeated in each CPU node.
-			// If we wind up with a bunch of these, we might want to create separate per-cluster
-			// EDT nodes and have the CPU nodes reference them through a phandle.
+			                                                                                 
+			                                                                                    
+			                                                                     
 			ml_read_reg_range(child, "acc-impl-reg", &cluster->acc_IMPL_pa, &cluster->acc_IMPL_len);
 			ml_read_reg_range(child, "cpm-impl-reg", &cluster->cpm_IMPL_pa, &cluster->cpm_IMPL_len);
 		}
@@ -1078,11 +1078,11 @@ ml_parse_cpu_topology(void)
 	}
 
 #if HAS_CLUSTER
-	/*
-	 * Build the cluster offset array, ensuring that the region reserved
-	 * for each physical cluster contains enough entries to be indexed
-	 * by the maximum physical CPU ID (AFF0) within the cluster.
-	 */
+	  
+                                                                     
+                                                                   
+                                                             
+    
 	unsigned int cur_cluster_offset = 0;
 	for (int i = 0; i <= MAX_CPU_CLUSTER_PHY_ID; i++) {
 		if (cluster_phys_to_logical[i] != -1) {
@@ -1092,24 +1092,24 @@ ml_parse_cpu_topology(void)
 	}
 	assert(cur_cluster_offset <= MAX_CPUS);
 #else
-	/*
-	 * For H10, there are really 2 physical clusters, but they are not separated
-	 * into distinct ACCs.  AFF1 therefore always reports 0, and AFF0 numbering
-	 * is linear across both clusters.   For the purpose of MPIDR_EL1-based indexing,
-	 * treat H10 and earlier devices as though they contain a single cluster.
-	 */
+	  
+                                                                             
+                                                                            
+                                                                                  
+                                                                          
+    
 	cluster_offsets[0] = 0;
 #endif
 	assert(topology_info.boot_cpu != NULL);
 	ml_read_chip_revision(&topology_info.chip_revision);
 
-	/*
-	 * Set TPIDRRO_EL0 to indicate the correct cpu number, as we may
-	 * not be booting from cpu 0.  Userspace will consume the current
-	 * CPU number through this register.  For non-boot cores, this is
-	 * done in start.s (start_cpu) using the cpu_number field of the
-	 * per-cpu data object.
-	 */
+	  
+                                                                 
+                                                                  
+                                                                  
+                                                                 
+                        
+    
 	assert(__builtin_arm_rsr64("TPIDRRO_EL0") == 0);
 	__builtin_arm_wsr64("TPIDRRO_EL0", (uint64_t)topology_info.boot_cpu->cpu_id);
 }
@@ -1204,7 +1204,7 @@ ml_get_cpu_number_local(void)
 	uint64_t mpidr_el1_value = 0;
 	unsigned cpu_id;
 
-	/* We identify the CPU based on the constant bits of MPIDR_EL1. */
+	                                                                  
 	MRS(mpidr_el1_value, "MPIDR_EL1");
 	cpu_id = ml_get_cpu_number((uint32_t)mpidr_el1_value);
 
@@ -1219,7 +1219,7 @@ ml_get_cluster_number_local()
 	uint64_t mpidr_el1_value = 0;
 	unsigned cluster_id;
 
-	/* We identify the cluster based on the constant bits of MPIDR_EL1. */
+	                                                                      
 	MRS(mpidr_el1_value, "MPIDR_EL1");
 	cluster_id = ml_get_cluster_number((uint32_t)mpidr_el1_value);
 
@@ -1262,7 +1262,7 @@ ml_lockdown_handler_register(lockdown_handler_t f, void *this)
 	}
 
 	assert(lockdown_done);
-	f(this); // XXX: f this whole function
+	f(this);                              
 
 	return KERN_SUCCESS;
 }
@@ -1333,24 +1333,24 @@ ml_processor_register(ml_processor_info_t *in_processor_info,
 
 #if HAS_CLUSTER
 	this_cpu_datap->cluster_master = !OSTestAndSet(this_cpu_datap->cpu_cluster_id, &cluster_initialized);
-#else /* HAS_CLUSTER */
+#else                  
 	this_cpu_datap->cluster_master = is_boot_cpu;
-#endif /* HAS_CLUSTER */
+#endif                  
 
 #if !defined(RC_HIDE_XNU_FIRESTORM) && (MAX_CPU_CLUSTERS > 2)
 	{
-		/* Workaround for the existing scheduler
-		 * code, which only supports a limited number of psets.
-		 *
-		 * To get around that limitation, we distribute all cores into
-		 * two psets according to their cluster type, instead of
-		 * having a dedicated pset per cluster ID.
-		 */
+		                                        
+                                                         
+    
+                                                                
+                                                          
+                                            
+     
 
 		pset_cluster_type_t pset_cluster_type;
 
-		/* For this workaround, we don't expect seeing anything else
-		 * than E or P clusters. */
+		                                                            
+                             
 		switch (in_processor_info->cluster_type) {
 		case CLUSTER_TYPE_E:
 			pset_cluster_type = PSET_AMP_E;
@@ -1371,9 +1371,9 @@ ml_processor_register(ml_processor_info_t *in_processor_info,
 		kprintf("%s>chosen pset with cluster id %d cluster type %d for core:\n",
 		    __FUNCTION__, pset->pset_cluster_id, pset->pset_cluster_type);
 	}
-#else /* !defined(RC_HIDE_XNU_FIRESTORM) && (MAX_CPU_CLUSTERS > 2) */
+#else                                                                
 	pset = pset_find(in_processor_info->cluster_id, processor_pset(master_processor));
-#endif /* !defined(RC_HIDE_XNU_FIRESTORM) && (MAX_CPU_CLUSTERS > 2) */
+#endif                                                                
 
 	assert(pset != NULL);
 	kprintf("%s>cpu_id %p cluster_id %d cpu_number %d is type %d\n", __FUNCTION__, in_processor_info->cpu_id, in_processor_info->cluster_id, this_cpu_datap->cpu_number, in_processor_info->cluster_type);
@@ -1383,12 +1383,12 @@ ml_processor_register(ml_processor_info_t *in_processor_info,
 		processor_init(processor, this_cpu_datap->cpu_number, pset);
 
 		if (this_cpu_datap->cpu_l2_access_penalty) {
-			/*
-			 * Cores that have a non-zero L2 access penalty compared
-			 * to the boot processor should be de-prioritized by the
-			 * scheduler, so that threads use the cores with better L2
-			 * preferentially.
-			 */
+			  
+                                                           
+                                                           
+                                                             
+                     
+      
 			processor_set_primary(processor, master_processor);
 		}
 	}
@@ -1399,7 +1399,7 @@ ml_processor_register(ml_processor_info_t *in_processor_info,
 	*pmi_handler_out = mt_cpmu_aic_pmi;
 #else
 	*pmi_handler_out = NULL;
-#endif /* CPMU_AIC_PMI && MONOTONIC */
+#endif                                
 	if (in_processor_info->idle_tickle != (idle_tickle_t *) NULL) {
 		*in_processor_info->idle_tickle = (idle_tickle_t) cpu_idle_tickle;
 	}
@@ -1408,11 +1408,11 @@ ml_processor_register(ml_processor_info_t *in_processor_info,
 	if (kpc_register_cpu(this_cpu_datap) != TRUE) {
 		goto processor_register_error;
 	}
-#endif /* KPC */
+#endif          
 
 	if (!is_boot_cpu) {
 		random_cpu_init(this_cpu_datap->cpu_number);
-		// now let next CPU register itself
+		                                   
 		OSIncrementAtomic((SInt32*)&real_ncpus);
 	}
 
@@ -1421,7 +1421,7 @@ ml_processor_register(ml_processor_info_t *in_processor_info,
 processor_register_error:
 #if KPC
 	kpc_unregister_cpu(this_cpu_datap);
-#endif /* KPC */
+#endif          
 	if (!is_boot_cpu) {
 		cpu_data_free(this_cpu_datap);
 	}
@@ -1438,27 +1438,27 @@ ml_init_arm_debug_interface(
 	do_debugid();
 }
 
-/*
- *	Routine:        init_ast_check
- *	Function:
- */
+  
+                                 
+            
+   
 void
 init_ast_check(
 	__unused processor_t processor)
 {
 }
 
-/*
- *	Routine:        cause_ast_check
- *	Function:
- */
+  
+                                  
+            
+   
 void
 cause_ast_check(
 	processor_t processor)
 {
 	if (current_processor() != processor) {
 		cpu_signal(processor_to_cpu_datap(processor), SIGPast, (void *)NULL, (void *)NULL);
-		KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_AST), processor->cpu_id, 1 /* ast */, 0, 0, 0);
+		KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_AST), processor->cpu_id, 1          , 0, 0, 0);
 	}
 }
 
@@ -1471,17 +1471,17 @@ ml_get_power_state(boolean_t *icp, boolean_t *pidlep)
 	*pidlep = (cpu_idle_count == real_ncpus);
 }
 
-/*
- *	Routine:        ml_cause_interrupt
- *	Function:	Generate a fake interrupt
- */
+  
+                                     
+                                      
+   
 void
 ml_cause_interrupt(void)
 {
-	return;                 /* BS_XXX */
+	return;                             
 }
 
-/* Map memory map IO space */
+                             
 vm_offset_t
 ml_io_map(
 	vm_offset_t phys_addr,
@@ -1490,7 +1490,7 @@ ml_io_map(
 	return io_map(phys_addr, size, VM_WIMG_IO);
 }
 
-/* Map memory map IO space (with protections specified) */
+                                                          
 vm_offset_t
 ml_io_map_with_prot(
 	vm_offset_t phys_addr,
@@ -1515,7 +1515,7 @@ ml_io_unmap(vm_offset_t addr, vm_size_t sz)
 	kmem_free(kernel_map, addr, sz);
 }
 
-/* boot memory allocation */
+                            
 vm_offset_t
 ml_static_malloc(
 	__unused vm_size_t size)
@@ -1545,14 +1545,14 @@ ml_static_slide(
 	vm_offset_t slid_vaddr = vaddr + vm_kernel_slide;
 
 	if ((slid_vaddr < vm_kernelcache_base) || (slid_vaddr >= vm_kernelcache_top)) {
-		/* This is only intended for use on kernelcache addresses. */
+		                                                             
 		return 0;
 	}
 
-	/*
-	 * Because the address is in the kernelcache, we can do a simple
-	 * slide calculation.
-	 */
+	  
+                                                                 
+                      
+    
 	return slid_vaddr;
 }
 
@@ -1561,7 +1561,7 @@ ml_static_unslide(
 	vm_offset_t vaddr)
 {
 	if ((vaddr < vm_kernelcache_base) || (vaddr >= vm_kernelcache_top)) {
-		/* This is only intended for use on kernelcache addresses. */
+		                                                             
 		return 0;
 	}
 
@@ -1572,7 +1572,7 @@ extern tt_entry_t *arm_kva_to_tte(vm_offset_t va);
 
 kern_return_t
 ml_static_protect(
-	vm_offset_t vaddr, /* kernel virtual address */
+	vm_offset_t vaddr,                             
 	vm_size_t size,
 	vm_prot_t new_prot)
 {
@@ -1587,7 +1587,7 @@ ml_static_protect(
 		return KERN_FAILURE;
 	}
 
-	assert((vaddr & (PAGE_SIZE - 1)) == 0); /* must be page aligned */
+	assert((vaddr & (PAGE_SIZE - 1)) == 0);                           
 
 	if ((new_prot & VM_PROT_WRITE) && (new_prot & VM_PROT_EXECUTE)) {
 		panic("ml_static_protect(): WX request on %p", (void *) vaddr);
@@ -1596,7 +1596,7 @@ ml_static_protect(
 		panic("ml_static_protect(): attempt to inject executable mapping on %p", (void *) vaddr);
 	}
 
-	/* Set up the protection bits, and block bits so we can validate block mappings. */
+	                                                                                   
 	if (new_prot & VM_PROT_WRITE) {
 		arm_prot |= ARM_PTE_AP(AP_RWNA);
 		arm_block_prot |= ARM_TTE_BLOCK_AP(AP_RWNA);
@@ -1632,10 +1632,10 @@ ml_static_protect(
 			if (((*tte2) & ARM_TTE_TYPE_MASK) != ARM_TTE_TYPE_TABLE) {
 				if ((((*tte2) & ARM_TTE_TYPE_MASK) == ARM_TTE_TYPE_BLOCK) &&
 				    ((*tte2 & (ARM_TTE_BLOCK_NXMASK | ARM_TTE_BLOCK_PNXMASK | ARM_TTE_BLOCK_APMASK)) == arm_block_prot)) {
-					/*
-					 * We can support ml_static_protect on a block mapping if the mapping already has
-					 * the desired protections.  We still want to run checks on a per-page basis.
-					 */
+					  
+                                                                                      
+                                                                                  
+        
 					continue;
 				}
 
@@ -1647,11 +1647,11 @@ ml_static_protect(
 			ptmp = *pte_p;
 
 			if ((ptmp & ARM_PTE_HINT_MASK) && ((ptmp & (ARM_PTE_APMASK | ARM_PTE_PNXMASK | ARM_PTE_NXMASK)) != arm_prot)) {
-				/*
-				 * The contiguous hint is similar to a block mapping for ml_static_protect; if the existing
-				 * protections do not match the desired protections, then we will fail (as we cannot update
-				 * this mapping without updating other mappings as well).
-				 */
+				  
+                                                                                               
+                                                                                               
+                                                             
+       
 				result = KERN_FAILURE;
 				break;
 			}
@@ -1664,10 +1664,10 @@ ml_static_protect(
 
 					ptep_iter = pte_p;
 					for (i = 0; i < 4; i++, ptep_iter++) {
-						/* Note that there is a hole in the HINT sanity checking here. */
+						                                                                 
 						ptmp = *ptep_iter;
 
-						/* We only need to update the page tables if the protections do not match. */
+						                                                                             
 						if ((ptmp & (ARM_PTE_APMASK | ARM_PTE_PNXMASK | ARM_PTE_NXMASK)) != arm_prot) {
 							ptmp = (ptmp & ~(ARM_PTE_APMASK | ARM_PTE_PNXMASK | ARM_PTE_NXMASK)) | arm_prot;
 							*ptep_iter = ptmp;
@@ -1676,7 +1676,7 @@ ml_static_protect(
 				}
 			} else {
 				ptmp = *pte_p;
-				/* We only need to update the page tables if the protections do not match. */
+				                                                                             
 				if ((ptmp & (ARM_PTE_APMASK | ARM_PTE_PNXMASK | ARM_PTE_NXMASK)) != arm_prot) {
 					ptmp = (ptmp & ~(ARM_PTE_APMASK | ARM_PTE_PNXMASK | ARM_PTE_NXMASK)) | arm_prot;
 					*pte_p = ptmp;
@@ -1695,10 +1695,10 @@ ml_static_protect(
 	return result;
 }
 
-/*
- *	Routine:        ml_static_mfree
- *	Function:
- */
+  
+                                  
+            
+   
 void
 ml_static_mfree(
 	vm_offset_t vaddr,
@@ -1711,7 +1711,7 @@ ml_static_mfree(
 	uint32_t    freed_kernelcache_pages = 0;
 
 #if defined(__arm64__) && (DEVELOPMENT || DEBUG)
-	/* For testing hitting a bad ram page */
+	                                        
 	static int count = 0;
 	static int bad_at_cnt = -1;
 	static bool first = true;
@@ -1720,26 +1720,26 @@ ml_static_mfree(
 		(void)PE_parse_boot_argn("bad_static_mfree", &bad_at_cnt, sizeof(bad_at_cnt));
 		first = false;
 	}
-#endif /* defined(__arm64__) && (DEVELOPMENT || DEBUG) */
+#endif                                                   
 
-	/* It is acceptable (if bad) to fail to free. */
+	                                                
 	if (vaddr < VM_MIN_KERNEL_ADDRESS) {
 		return;
 	}
 
-	assert((vaddr & (PAGE_SIZE - 1)) == 0); /* must be page aligned */
+	assert((vaddr & (PAGE_SIZE - 1)) == 0);                           
 
 	for (vaddr_cur = vaddr;
 	    vaddr_cur < trunc_page_64(vaddr + size);
 	    vaddr_cur += PAGE_SIZE) {
 		ppn = pmap_find_phys(kernel_pmap, vaddr_cur);
 		if (ppn != (vm_offset_t) NULL) {
-			/*
-			 * It is not acceptable to fail to update the protections on a page
-			 * we will release to the VM.  We need to either panic or continue.
-			 * For now, we'll panic (to help flag if there is memory we can
-			 * reclaim).
-			 */
+			  
+                                                                      
+                                                                      
+                                                                  
+               
+      
 			if (ml_static_protect(vaddr_cur, PAGE_SIZE, VM_PROT_WRITE | VM_PROT_READ) != KERN_SUCCESS) {
 				panic("Failed ml_static_mfree on %p", (void *) vaddr_cur);
 			}
@@ -1748,14 +1748,14 @@ ml_static_mfree(
 			bool is_bad = pmap_is_bad_ram(ppn);
 #if DEVELOPMENT || DEBUG
 			is_bad |= (count++ == bad_at_cnt);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 			if (is_bad) {
 				++bad_page_cnt;
 				vm_page_create_retired(ppn);
 				continue;
 			}
-#endif /* defined(__arm64__) */
+#endif                         
 
 			vm_page_create(ppn, (ppn + 1));
 			freed_pages++;
@@ -1775,20 +1775,20 @@ ml_static_mfree(
 }
 
 
-/* virtual to physical on wired pages */
+                                        
 vm_offset_t
 ml_vtophys(vm_offset_t vaddr)
 {
 	return kvtophys(vaddr);
 }
 
-/*
- * Routine: ml_nofault_copy
- * Function: Perform a physical mode copy if the source and destination have
- * valid translations in the kernel pmap. If translations are present, they are
- * assumed to be wired; e.g., no attempt is made to guarantee that the
- * translations obtained remain valid for the duration of the copy process.
- */
+  
+                           
+                                                                            
+                                                                               
+                                                                      
+                                                                           
+   
 vm_size_t
 ml_nofault_copy(vm_offset_t virtsrc, vm_offset_t virtdst, vm_size_t size)
 {
@@ -1825,15 +1825,15 @@ ml_nofault_copy(vm_offset_t virtsrc, vm_offset_t virtdst, vm_size_t size)
 	return nbytes;
 }
 
-/*
- *	Routine:        ml_validate_nofault
- *	Function: Validate that ths address range has a valid translations
- *			in the kernel pmap.  If translations are present, they are
- *			assumed to be wired; i.e. no attempt is made to guarantee
- *			that the translation persist after the check.
- *  Returns: TRUE if the range is mapped and will not cause a fault,
- *			FALSE otherwise.
- */
+  
+                                      
+                                                                     
+                                                               
+                                                              
+                                                  
+                                                                    
+                     
+   
 
 boolean_t
 ml_validate_nofault(
@@ -1956,9 +1956,9 @@ ml_interrupt_prewarm(__unused uint64_t deadline)
 	return KERN_FAILURE;
 }
 
-/*
- * Assumes fiq, irq disabled.
- */
+  
+                             
+   
 void
 ml_set_decrementer(uint32_t dec_value)
 {
@@ -1979,9 +1979,9 @@ ml_get_hwclock()
 {
 	uint64_t timebase;
 
-	// ISB required by ARMV7C.b section B8.1.2 & ARMv8 section D6.1.2
-	// "Reads of CNT[PV]CT[_EL0] can occur speculatively and out of order relative
-	// to other instructions executed on the same processor."
+	                                                                 
+	                                                                              
+	                                                         
 	__builtin_arm_isb(ISB_SY);
 	timebase = __builtin_arm_rsr64("CNTVCT_EL0");
 
@@ -1994,9 +1994,9 @@ ml_get_timebase()
 	return ml_get_hwclock() + getCpuDatap()->cpu_base_timebase;
 }
 
-/*
- * Get the speculative timebase without an ISB.
- */
+  
+                                               
+   
 uint64_t
 ml_get_speculative_timebase()
 {
@@ -2073,9 +2073,9 @@ set_cache_trap_recover(thread_t thread)
 	thread->recover = (vm_address_t)ptrauth_auth_and_resign(fun,
 	    ptrauth_key_function_pointer, 0,
 	    ptrauth_key_function_pointer, ptrauth_blend_discriminator(&thread->recover, PAC_DISCRIMINATOR_RECOVER));
-#else /* defined(HAS_APPLE_PAC) */
+#else                             
 	thread->recover = (vm_address_t)cache_trap_recover;
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 }
 
 static void
@@ -2085,7 +2085,7 @@ dcache_flush_trap(vm_map_address_t start, vm_map_size_t size)
 	thread_t thread = current_thread();
 	vm_offset_t old_recover = thread->recover;
 
-	/* Check bounds */
+	                  
 	if (task_has_64Bit_addr(current_task())) {
 		if (end > MACH_VM_MAX_ADDRESS) {
 			cache_trap_error(thread, end & ((1 << ARM64_CLINE_SHIFT) - 1));
@@ -2102,17 +2102,17 @@ dcache_flush_trap(vm_map_address_t start, vm_map_size_t size)
 
 	set_cache_trap_recover(thread);
 
-	/*
-	 * We're coherent on Apple ARM64 CPUs, so this could be a nop.  However,
-	 * if the region given us is bad, it would be good to catch it and
-	 * crash, ergo we still do the flush.
-	 */
+	  
+                                                                         
+                                                                   
+                                      
+    
 	FlushPoC_DcacheRegion(start, (uint32_t)size);
 
-	/* Restore recovery function */
+	                               
 	thread->recover = old_recover;
 
-	/* Return (caller does exception return) */
+	                                           
 }
 
 static void
@@ -2122,7 +2122,7 @@ icache_invalidate_trap(vm_map_address_t start, vm_map_size_t size)
 	thread_t thread = current_thread();
 	vm_offset_t old_recover = thread->recover;
 
-	/* Check bounds */
+	                  
 	if (task_has_64Bit_addr(current_task())) {
 		if (end > MACH_VM_MAX_ADDRESS) {
 			cache_trap_error(thread, end & ((1 << ARM64_CLINE_SHIFT) - 1));
@@ -2139,13 +2139,13 @@ icache_invalidate_trap(vm_map_address_t start, vm_map_size_t size)
 
 	set_cache_trap_recover(thread);
 
-	/* Invalidate iCache to point of unification */
+	                                               
 	InvalidatePoU_IcacheRegion(start, (uint32_t)size);
 
-	/* Restore recovery function */
+	                               
 	thread->recover = old_recover;
 
-	/* Return (caller does exception return) */
+	                                           
 }
 
 __attribute__((noreturn))
@@ -2154,27 +2154,27 @@ platform_syscall(arm_saved_state_t *state)
 {
 	uint32_t code;
 
-#define platform_syscall_kprintf(x...) /* kprintf("platform_syscall: " x) */
+#define platform_syscall_kprintf(x...)                                      
 
 	code = (uint32_t)get_saved_state_reg(state, 3);
 	switch (code) {
 	case 0:
-		/* I-Cache flush */
+		                   
 		platform_syscall_kprintf("icache flush requested.\n");
 		icache_invalidate_trap(get_saved_state_reg(state, 0), get_saved_state_reg(state, 1));
 		break;
 	case 1:
-		/* D-Cache flush */
+		                   
 		platform_syscall_kprintf("dcache flush requested.\n");
 		dcache_flush_trap(get_saved_state_reg(state, 0), get_saved_state_reg(state, 1));
 		break;
 	case 2:
-		/* set cthread */
+		                 
 		platform_syscall_kprintf("set cthread self.\n");
 		thread_set_cthread_self(get_saved_state_reg(state, 0));
 		break;
 	case 3:
-		/* get cthread */
+		                 
 		platform_syscall_kprintf("get cthread self.\n");
 		set_saved_state_reg(state, 0, thread_get_cthread_self());
 		break;
@@ -2189,7 +2189,7 @@ platform_syscall(arm_saved_state_t *state)
 static void
 _enable_timebase_event_stream(uint32_t bit_index)
 {
-	uint64_t cntkctl; /* One wants to use 32 bits, but "mrs" prefers it this way */
+	uint64_t cntkctl;                                                              
 
 	if (bit_index >= 64) {
 		panic("%s: invalid bit index (%u)", __FUNCTION__, bit_index);
@@ -2199,12 +2199,12 @@ _enable_timebase_event_stream(uint32_t bit_index)
 
 	cntkctl |= (bit_index << CNTKCTL_EL1_EVENTI_SHIFT);
 	cntkctl |= CNTKCTL_EL1_EVNTEN;
-	cntkctl |= CNTKCTL_EL1_EVENTDIR; /* 1->0; why not? */
+	cntkctl |= CNTKCTL_EL1_EVENTDIR;                     
 
-	/*
-	 * If the SOC supports it (and it isn't broken), enable
-	 * EL0 access to the timebase registers.
-	 */
+	  
+                                                        
+                                         
+    
 	if (user_timebase_type() != USER_TIMEBASE_NONE) {
 		cntkctl |= (CNTKCTL_EL1_PL0PCTEN | CNTKCTL_EL1_PL0VCTEN);
 	}
@@ -2212,23 +2212,23 @@ _enable_timebase_event_stream(uint32_t bit_index)
 	__builtin_arm_wsr64("CNTKCTL_EL1", cntkctl);
 }
 
-/*
- * Turn timer on, unmask that interrupt.
- */
+  
+                                        
+   
 static void
 _enable_virtual_timer(void)
 {
-	uint64_t cntvctl = CNTV_CTL_EL0_ENABLE; /* One wants to use 32 bits, but "mrs" prefers it this way */
+	uint64_t cntvctl = CNTV_CTL_EL0_ENABLE;                                                              
 
 	__builtin_arm_wsr64("CNTV_CTL_EL0", cntvctl);
-	/* disable the physical timer as a precaution, as its registers reset to architecturally unknown values */
+	                                                                                                          
 	__builtin_arm_wsr64("CNTP_CTL_EL0", CNTP_CTL_EL0_IMASKED);
 }
 
 void
 fiq_context_init(boolean_t enable_fiq __unused)
 {
-	/* Interrupts still disabled. */
+	                                
 	assert(ml_get_interrupts_enabled() == FALSE);
 	_enable_virtual_timer();
 }
@@ -2242,7 +2242,7 @@ wfe_timeout_init(void)
 void
 wfe_timeout_configure(void)
 {
-	/* Could fill in our own ops here, if we needed them */
+	                                                       
 	uint64_t        ticks_per_sec, ticks_per_event, events_per_sec = 0;
 	uint32_t        bit_index;
 
@@ -2255,26 +2255,26 @@ wfe_timeout_configure(void)
 	} else {
 #if defined(ARM_BOARD_WFE_TIMEOUT_NS)
 		events_per_sec = NSEC_PER_SEC / ARM_BOARD_WFE_TIMEOUT_NS;
-#else /* !defined(ARM_BOARD_WFE_TIMEOUT_NS) */
-		/* Default to 1usec (or as close as we can get) */
+#else                                         
+		                                                  
 		events_per_sec = USEC_PER_SEC;
-#endif /* !defined(ARM_BOARD_WFE_TIMEOUT_NS) */
+#endif                                         
 	}
 	ticks_per_sec = gPEClockFrequencyInfo.timebase_frequency_hz;
 	ticks_per_event = ticks_per_sec / events_per_sec;
-	bit_index = flsll(ticks_per_event) - 1; /* Highest bit set */
+	bit_index = flsll(ticks_per_event) - 1;                      
 
-	/* Round up to power of two */
+	                              
 	if ((ticks_per_event & ((1 << bit_index) - 1)) != 0) {
 		bit_index++;
 	}
 
-	/*
-	 * The timer can only trigger on rising or falling edge,
-	 * not both; we don't care which we trigger on, but we
-	 * do need to adjust which bit we are interested in to
-	 * account for this.
-	 */
+	  
+                                                         
+                                                       
+                                                       
+                     
+    
 	if (bit_index != 0) {
 		bit_index--;
 	}
@@ -2291,10 +2291,10 @@ ml_delay_should_spin(uint64_t interval)
 	if (cdp->cpu_idle_latency) {
 		return (interval < cdp->cpu_idle_latency) ? TRUE : FALSE;
 	} else {
-		/*
-		 * Early boot, latency is unknown. Err on the side of blocking,
-		 * which should always be safe, even if slow
-		 */
+		  
+                                                                 
+                                              
+     
 		return FALSE;
 	}
 }
@@ -2336,10 +2336,10 @@ ml_energy_stat(thread_t t)
 void
 ml_gpu_stat_update(__unused uint64_t gpu_ns_delta)
 {
-	/*
-	 * For now: update the resource coalition stats of the
-	 * current thread's coalition
-	 */
+	  
+                                                       
+                              
+    
 	task_coalition_update_gpu_stats(current_task(), gpu_ns_delta);
 }
 
@@ -2382,12 +2382,12 @@ timer_state_event_kernel_to_user(void)
 {
 	timer_state_event(FALSE);
 }
-#endif /* !CONFIG_SKIP_PRECISE_USER_KERNEL_TIME || HAS_FAST_CNTVCT */
+#endif                                                               
 
-/*
- * The following are required for parts of the kernel
- * that cannot resolve these functions as inlines:
- */
+  
+                                                     
+                                                  
+   
 extern thread_t current_act(void) __attribute__((const));
 thread_t
 current_act(void)
@@ -2411,11 +2411,11 @@ ex_cb_info_t;
 
 ex_cb_info_t ex_cb_info[EXCB_CLASS_MAX];
 
-/*
- * Callback registration
- * Currently we support only one registered callback per class but
- * it should be possible to support more callbacks
- */
+  
+                        
+                                                                  
+                                                  
+   
 kern_return_t
 ex_cb_register(
 	ex_cb_class_t   cb_class,
@@ -2436,9 +2436,9 @@ ex_cb_register(
 	return KERN_FAILURE;
 }
 
-/*
- * Called internally by platform kernel to invoke the registered callback for class
- */
+  
+                                                                                   
+   
 ex_cb_action_t
 ex_cb_invoke(
 	ex_cb_class_t   cb_class,
@@ -2482,11 +2482,11 @@ ml_task_set_rop_pid(task_t task, task_t parent_task, boolean_t inherit)
 	}
 }
 
-/**
- * jop_pid may be inherited from the parent task or generated inside the shared
- * region.  Unfortunately these two parameters are available at very different
- * times during task creation, so we need to split this into two steps.
- */
+   
+                                                                               
+                                                                              
+                                                                       
+   
 void
 ml_task_set_jop_pid(task_t task, task_t parent_task, boolean_t inherit)
 {
@@ -2501,21 +2501,21 @@ void
 ml_task_set_jop_pid_from_shared_region(task_t task)
 {
 	vm_shared_region_t sr = vm_shared_region_get(task);
-	/*
-	 * If there's no shared region, we can assign the key arbitrarily.  This
-	 * typically happens when Mach-O image activation failed part of the way
-	 * through, and this task is in the middle of dying with SIGKILL anyway.
-	 */
+	  
+                                                                         
+                                                                         
+                                                                         
+    
 	if (__improbable(!sr)) {
 		task->jop_pid = early_random();
 		return;
 	}
 	vm_shared_region_deallocate(sr);
 
-	/*
-	 * Similarly we have to worry about jetsam having killed the task and
-	 * already cleared the shared_region_id.
-	 */
+	  
+                                                                      
+                                         
+    
 	task_lock(task);
 	if (task->shared_region_id != NULL) {
 		task->jop_pid = shared_region_find_key(task->shared_region_id);
@@ -2530,17 +2530,17 @@ ml_thread_set_jop_pid(thread_t thread, task_t task)
 {
 	thread->machine.jop_pid = task->jop_pid;
 }
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 #if defined(HAS_APPLE_PAC)
 #define _ml_auth_ptr_unchecked(_ptr, _suffix, _modifier) \
 	asm volatile ("aut" #_suffix " %[ptr], %[modifier]" : [ptr] "+r"(_ptr) : [modifier] "r"(_modifier));
 
-/*
- * ml_auth_ptr_unchecked: call this instead of ptrauth_auth_data
- * instrinsic when you don't want to trap on auth fail.
- *
- */
+  
+                                                                
+                                                       
+  
+   
 void *
 ml_auth_ptr_unchecked(void *ptr, ptrauth_key key, uint64_t modifier)
 {
@@ -2561,7 +2561,7 @@ ml_auth_ptr_unchecked(void *ptr, ptrauth_key key, uint64_t modifier)
 
 	return ptr;
 }
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 #ifdef CONFIG_XNUPOST
 void
@@ -2579,7 +2579,7 @@ ml_expect_fault_end(void)
 	thread->machine.expected_fault_handler = NULL;
 	thread->machine.expected_fault_addr = 0;
 }
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 void
 ml_hibernate_active_pre(void)
@@ -2589,7 +2589,7 @@ ml_hibernate_active_pre(void)
 
 		hibernate_rebuild_vm_structs();
 	}
-#endif /* HIBERNATION */
+#endif                  
 }
 
 void
@@ -2601,43 +2601,43 @@ ml_hibernate_active_post(void)
 		hibernate_vm_lock_end();
 		current_cpu_datap()->cpu_hibernate = 0;
 	}
-#endif /* HIBERNATION */
+#endif                  
 }
 
-/**
- * Return back a machine-dependent array of address space regions that should be
- * reserved by the VM (pre-mapped in the address space). This will prevent user
- * processes from allocating or deallocating from within these regions.
- *
- * @param vm_is64bit True if the process has a 64-bit address space.
- * @param regions An out parameter representing an array of regions to reserve.
- *
- * @return The number of reserved regions returned through `regions`.
- */
+   
+                                                                                
+                                                                               
+                                                                       
+  
+                                                                    
+                                                                               
+  
+                                                                     
+   
 size_t
 ml_get_vm_reserved_regions(bool vm_is64bit, struct vm_reserved_region **regions)
 {
 	assert(regions != NULL);
 
-	/**
-	 * Reserved regions only apply to 64-bit address spaces. This is because
-	 * we only expect to grow the maximum user VA address on 64-bit address spaces
-	 * (we've essentially already reached the max for 32-bit spaces). The reserved
-	 * regions should safely fall outside of the max user VA for 32-bit processes.
-	 */
+	   
+                                                                         
+                                                                               
+                                                                               
+                                                                               
+    
 	if (vm_is64bit) {
 		*regions = vm_reserved_regions;
 		return ARRAY_COUNT(vm_reserved_regions);
 	} else {
-		/* Don't reserve any VA regions on arm64_32 processes. */
+		                                                         
 		*regions = NULL;
 		return 0;
 	}
 }
-/* These WFE recommendations are expected to be updated on a relatively
- * infrequent cadence, possibly from a different cluster, hence
- * false cacheline sharing isn't expected to be material
- */
+                                                                       
+                                                               
+                                                        
+   
 static uint64_t arm64_cluster_wfe_recs[MAX_CPU_CLUSTERS];
 
 uint32_t
@@ -2646,15 +2646,15 @@ ml_update_cluster_wfe_recommendation(uint32_t wfe_cluster_id, uint64_t wfe_timeo
 	assert(wfe_cluster_id < MAX_CPU_CLUSTERS);
 	assert(wfe_timeout_abstime_interval <= ml_wfe_hint_max_interval);
 	os_atomic_store(&arm64_cluster_wfe_recs[wfe_cluster_id], wfe_timeout_abstime_interval, relaxed);
-	return 0; /* Success */
+	return 0;              
 }
 
 uint64_t
 ml_cluster_wfe_timeout(uint32_t wfe_cluster_id)
 {
-	/* This and its consumer does not synchronize vis-a-vis updates
-	 * of the recommendation; races are acceptable.
-	 */
+	                                                               
+                                                
+    
 	uint64_t wfet = os_atomic_load(&arm64_cluster_wfe_recs[wfe_cluster_id], relaxed);
 	return wfet;
 }

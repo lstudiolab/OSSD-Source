@@ -1,18 +1,18 @@
-#!/bin/sh
 
-#
-# This shell-script is argument-compatible with xcrun(1) as invoked
-# by xnu's Makefiles. Additionally, it supports caching tools
-# in the local build directory. It is tightly coupled to exactly
-# the queries that MakeInc.cmd makes, in exactly the order it makes
-# them. ./tools/remote_build.sh invokes this indirectly in caching
-# mode, so '$(XCRUN) -sdk foo -find bar' copies 'bar' from wherever
-# it is on-disk into ./BUILD/BuildData, and returns that path to the
-# caller. In '-u' mode on a remote build server, cache tools
-# relative to the current build directory are returned without
-# actually calling through to xcrun(1), since the remote build
-# server may not even have Xcode installed.
-#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 SDKROOT=""
 FINDTOOL=""
@@ -21,7 +21,7 @@ VERBOSE=""
 OBJROOT=""
 CACHE=0
 
-# echo "Calling $0 $@" 1>&2
+
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -85,14 +85,14 @@ function CreateFile() {
 if [ $CACHE -eq 1 ]; then
 
     if [ -n "$SDKQUERY" ]; then
-	# MakeInc.cmd makes SDK queries up-front first. Generally the
-	# SDKROOT that is an input to these are one of:
-	# "macosx" => Host SDK
-	# "iphonehostXXX" => iPhone Host SDK
-	# other shortcut or full path => Target SDK
-	#
-	# Once an initial lookup is made, subsequent SDKROOTs for
-	# that same SDK may use a full path or cached path
+
+
+
+
+
+
+
+
 	SDKTYPE=""
 	case "$SDKROOT" in
 	    macosx)
@@ -110,8 +110,8 @@ if [ $CACHE -eq 1 ]; then
 		;;
 	esac
 
-	# A cached SDK path can be passed to xcrun, so
-	# we need the original on-disk path
+
+
 	if [ -f "$SDKROOT/.realsdkpath" ]; then
 	    REALSDKROOT=`cat "$SDKROOT/.realsdkpath"`
 	else
@@ -125,7 +125,7 @@ if [ $CACHE -eq 1 ]; then
 	
 	case $SDKQUERY in
 	    -show-sdk-path)
-		# Cache the SDK locally, and transform the resulting SDKPROPERTY
+
 		if [ -z "$SDKPROPERTY" ]; then
 		    SDKPROPERTY="/"
 		    SDKNAME="Slash.sdk"
@@ -177,9 +177,9 @@ if [ $CACHE -eq 1 ]; then
 
     elif [ -n "$FINDTOOL" ]; then
 
-	# We assume SDK Queries have been performed first and subsequent
-	# SDKROOTs used to find tools are all using cached SDKs in
-	# the build directory, in which case metadata is present
+
+
+
 
 	if [ ! -f "$SDKROOT/.realsdkpath" ]; then
 	    exit 1
@@ -196,7 +196,7 @@ if [ $CACHE -eq 1 ]; then
 	    exit $?
 	fi
 
-	# Keep the parent directory when caching tools, along with Host vs. Target
+
 	TOOLNAME=$(basename "${TOOLPATH}")
 	TOOLDIR=$(basename $(dirname "${TOOLPATH}"))
 	if [ "$SDKTYPE" = "host" ]; then
@@ -231,9 +231,9 @@ if [ $CACHE -eq 1 ]; then
     fi
 fi
 
-# When using cached SDK information, first try to do
-# an initial classification, and then read properties from
-# cached locations
+
+
+
 SDKTYPE=""
 case "$SDKROOT" in
     macosx)

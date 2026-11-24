@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$apfw: pf_table.c,v 1.4 2008/08/27 00:01:32 jhw Exp $ */
-/*	$OpenBSD: pf_table.c,v 1.68 2006/05/02 10:08:45 dhartmei Exp $	*/
+                                                           
+                                                                    
 
 /*
  * Copyright (c) 2002 Cedric Berger
@@ -379,25 +379,25 @@ pfr_del_addrs(struct pfr_table *tbl, user_addr_t _addr, int size,
 	if (kt->pfrkt_flags & PFR_TFLAG_CONST) {
 		return EPERM;
 	}
-	/*
-	 * there are two algorithms to choose from here.
-	 * with:
-	 *   n: number of addresses to delete
-	 *   N: number of addresses in the table
-	 *
-	 * one is O(N) and is better for large 'n'
-	 * one is O(n*LOG(N)) and is better for small 'n'
-	 *
-	 * following code try to decide which one is best.
-	 */
+	  
+                                                 
+         
+                                      
+                                         
+   
+                                           
+                                                  
+   
+                                                   
+    
 	for (i = kt->pfrkt_cnt; i > 0; i >>= 1) {
 		log++;
 	}
 	if (size > kt->pfrkt_cnt / log) {
-		/* full table scan */
+		                     
 		pfr_mark_addrs(kt);
 	} else {
-		/* iterate over addresses to delete */
+		                                      
 		for (i = 0; i < size; i++, addr += sizeof(ad)) {
 			if (COPYIN(addr, &ad, sizeof(ad), flags)) {
 				return EFAULT;
@@ -689,7 +689,7 @@ pfr_get_astats(struct pfr_table *tbl, user_addr_t addr, int *size,
 	int                      rv;
 	u_int64_t                tzero = pf_calendar_time_second();
 
-	/* XXX PFR_FLAG_CLSTATS disabled */
+	                                   
 	ACCEPT_FLAGS(flags, PFR_FLAG_ATOMIC);
 	if (pfr_validate_table(tbl, 0, 0)) {
 		return EINVAL;
@@ -798,7 +798,7 @@ pfr_validate_addr(struct pfr_addr *ad)
 			return -1;
 		}
 		break;
-#endif /* INET */
+#endif           
 	case AF_INET6:
 		if (ad->pfra_net > 128) {
 			return -1;
@@ -1215,11 +1215,11 @@ pfr_walktree(struct radix_node *rn, void *arg)
 		break;
 	case PFRW_POOL_GET:
 		if (ke->pfrke_not) {
-			break; /* negative entries are ignored */
+			break;                                   
 		}
 		if (!w->pfrw_cnt--) {
 			w->pfrw_kentry = ke;
-			return 1; /* finish search */
+			return 1;                    
 		}
 		break;
 	case PFRW_DYNADDR_UPDATE:
@@ -1330,7 +1330,7 @@ pfr_add_tables(user_addr_t tbl, int size, int *nadd, int flags)
 				goto _skip;
 			}
 
-			/* find or create root table */
+			                               
 			bzero(key.pfrkt_anchor, sizeof(key.pfrkt_anchor));
 			r = RB_FIND(pfr_ktablehead, &pfr_ktables, &key);
 			if (r != NULL) {
@@ -1471,7 +1471,7 @@ pfr_get_tstats(struct pfr_table *filter, user_addr_t tbl, int *size,
 
 	LCK_MTX_ASSERT(pf_lock, LCK_MTX_ASSERT_OWNED);
 
-	/* XXX PFR_FLAG_CLSTATS disabled */
+	                                   
 	ACCEPT_FLAGS(flags, PFR_FLAG_ATOMIC | PFR_FLAG_ALLRSETS);
 	if (pfr_fix_anchor(filter->pfrt_anchor)) {
 		return EINVAL;
@@ -1687,7 +1687,7 @@ pfr_ina_define(struct pfr_table *tbl, user_addr_t addr, int size,
 			goto _skip;
 		}
 
-		/* find or create root table */
+		                               
 		bzero(&key, sizeof(key));
 		strlcpy(key.pfrkt_name, tbl->pfrt_name,
 		    sizeof(key.pfrkt_name));
@@ -1862,7 +1862,7 @@ pfr_commit_ktable(struct pfr_ktable *kt, u_int64_t tzero)
 			pfr_clstats_ktable(kt, tzero, 1);
 		}
 	} else if (kt->pfrkt_flags & PFR_TFLAG_ACTIVE) {
-		/* kt might contain addresses */
+		                                
 		struct pfr_kentryworkq   addrq, addq, changeq, delq, garbageq;
 		struct pfr_kentry       *p, *q, *next;
 		struct pfr_addr          ad;
@@ -1875,7 +1875,7 @@ pfr_commit_ktable(struct pfr_ktable *kt, u_int64_t tzero)
 		SLIST_INIT(&garbageq);
 		pfr_clean_node_mask(shadow, &addrq);
 		for (p = SLIST_FIRST(&addrq); p != NULL; p = next) {
-			next = SLIST_NEXT(p, pfrke_workq);      /* XXX */
+			next = SLIST_NEXT(p, pfrke_workq);               
 			pfr_copyout_addr(&ad, p);
 			q = pfr_lookup_addr(kt, &ad, 1);
 			if (q != NULL) {
@@ -1896,7 +1896,7 @@ pfr_commit_ktable(struct pfr_ktable *kt, u_int64_t tzero)
 		pfr_clstats_kentries(&changeq, tzero, INVERT_NEG_FLAG);
 		pfr_destroy_kentries(&garbageq);
 	} else {
-		/* kt cannot contain addresses */
+		                                 
 		SWAP(struct radix_node_head *, kt->pfrkt_ip4,
 		    shadow->pfrkt_ip4);
 		SWAP(struct radix_node_head *, kt->pfrkt_ip6,
@@ -1947,10 +1947,10 @@ pfr_validate_table(struct pfr_table *tbl, int allowedflags, int no_reserved)
 	return 0;
 }
 
-/*
- * Rewrite anchors referenced by tables to remove slashes
- * and check for validity.
- */
+  
+                                                         
+                          
+   
 static int
 pfr_fix_anchor(char *anchor)
 {
@@ -2207,7 +2207,7 @@ pfr_lookup_table(struct pfr_table *tbl)
 {
 	LCK_MTX_ASSERT(pf_lock, LCK_MTX_ASSERT_OWNED);
 
-	/* struct pfr_ktable start like a struct pfr_table */
+	                                                     
 	return RB_FIND(pfr_ktablehead, &pfr_ktables,
 	           (struct pfr_ktable *)(void *)tbl);
 }
@@ -2236,7 +2236,7 @@ pfr_match_addr(struct pfr_ktable *kt, struct pf_addr *a, sa_family_t af)
 			ke = NULL;
 		}
 		break;
-#endif /* INET */
+#endif           
 	case AF_INET6:
 		bcopy(a, &pfr_sin6.sin6_addr, sizeof(pfr_sin6.sin6_addr));
 		ke = (struct pfr_kentry *)rn_match(&pfr_sin6, kt->pfrkt_ip6);
@@ -2278,7 +2278,7 @@ pfr_update_stats(struct pfr_ktable *kt, struct pf_addr *a, sa_family_t af,
 			ke = NULL;
 		}
 		break;
-#endif /* INET */
+#endif           
 	case AF_INET6:
 		bcopy(a, &pfr_sin6.sin6_addr, sizeof(pfr_sin6.sin6_addr));
 		ke = (struct pfr_kentry *)rn_match(&pfr_sin6, kt->pfrkt_ip6);
@@ -2404,28 +2404,28 @@ _next_block:
 	*rmask = SUNION2PF(&pfr_mask, af);
 
 	if (use_counter) {
-		/* is supplied address within block? */
+		                                       
 		if (!PF_MATCHA(0, *raddr, *rmask, counter, af)) {
-			/* no, go to next block in table */
+			                                   
 			idx++;
 			use_counter = 0;
 			goto _next_block;
 		}
 		PF_ACPY(addr, counter, af);
 	} else {
-		/* use first address of block */
+		                                
 		PF_ACPY(addr, *raddr, af);
 	}
 
 	if (!KENTRY_NETWORK(ke)) {
-		/* this is a single IP address - no possible nested block */
+		                                                            
 		PF_ACPY(counter, addr, af);
 		*pidx = idx;
 		kt->pfrkt_match++;
 		return 0;
 	}
 	for (;;) {
-		/* we don't want to use a nested block */
+		                                         
 		if (af == AF_INET) {
 			ke2 = (struct pfr_kentry *)rn_match(&pfr_sin,
 			    kt->pfrkt_ip4);
@@ -2433,24 +2433,24 @@ _next_block:
 			ke2 = (struct pfr_kentry *)rn_match(&pfr_sin6,
 			    kt->pfrkt_ip6);
 		} else {
-			return -1; /* never happens */
+			return -1;                    
 		}
-		/* no need to check KENTRY_RNF_ROOT() here */
+		                                             
 		if (ke2 == ke) {
-			/* lookup return the same block - perfect */
+			                                            
 			PF_ACPY(counter, addr, af);
 			*pidx = idx;
 			kt->pfrkt_match++;
 			return 0;
 		}
 
-		/* we need to increase the counter past the nested block */
+		                                                           
 		pfr_prepare_network(&mask, AF_INET, ke2->pfrke_net);
 		PF_POOLMASK(addr, addr, SUNION2PF(&mask, af), &pfr_ffaddr, af);
 		PF_AINC(addr, af);
 		if (!PF_MATCHA(0, *raddr, *rmask, addr, af)) {
-			/* ok, we reached the end of our main block */
-			/* go to next block in table */
+			                                              
+			                               
 			idx++;
 			use_counter = 0;
 			goto _next_block;
@@ -2475,7 +2475,7 @@ pfr_kentry_byidx(struct pfr_ktable *kt, int idx, int af)
 		(void) kt->pfrkt_ip4->rnh_walktree(kt->pfrkt_ip4,
 		    pfr_walktree, &w);
 		return w.pfrw_kentry;
-#endif /* INET */
+#endif           
 	case AF_INET6:
 		(void) kt->pfrkt_ip6->rnh_walktree(kt->pfrkt_ip6,
 		    pfr_walktree, &w);

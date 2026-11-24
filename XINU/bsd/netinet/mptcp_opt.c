@@ -57,9 +57,9 @@ static int mptcp_validate_join_hmac(struct tcpcb *, u_char*, int);
 static int mptcp_snd_mpprio(struct tcpcb *tp, u_char *cp, int optlen);
 static void mptcp_send_remaddr_opt(struct tcpcb *, struct mptcp_remaddr_opt *);
 
-/*
- * MPTCP Options Output Processing
- */
+  
+                                  
+   
 
 static unsigned
 mptcp_setup_first_subflow_syn_opts(struct socket *so, u_char *opt, unsigned optlen)
@@ -77,9 +77,9 @@ mptcp_setup_first_subflow_syn_opts(struct socket *so, u_char *opt, unsigned optl
 		return optlen;
 	}
 
-	/*
-	 * Avoid retransmitting the MP_CAPABLE option.
-	 */
+	  
+                                               
+    
 	if (ret == 0 &&
 	    tp->t_rxtshift > mptcp_mpcap_retries &&
 	    !(tptomptp(tp)->mpt_mpte->mpte_flags & MPTE_FORCE_ENABLE)) {
@@ -210,7 +210,7 @@ mptcp_send_mpfail(struct tcpcb *tp, u_char *opt, unsigned int optlen)
 		return optlen;
 	}
 
-	/* if option space low give up */
+	                                 
 	if ((MAX_TCPOPTLEN - optlen) < sizeof(struct mptcp_mpfail_opt)) {
 		tp->t_mpflags &= ~TMPF_SND_MPFAIL;
 		return optlen;
@@ -254,7 +254,7 @@ mptcp_send_infinite_mapping(struct tcpcb *tp, u_char *opt, unsigned int optlen)
 		csum_len = 2;
 	}
 
-	/* try later */
+	               
 	if ((MAX_TCPOPTLEN - optlen) < (len + csum_len)) {
 		return optlen;
 	}
@@ -269,10 +269,10 @@ mptcp_send_infinite_mapping(struct tcpcb *tp, u_char *opt, unsigned int optlen)
 		    MPTCP_DATASEQ_LOW32(mp_tp->mpt_dsn_at_csum_fail);
 		infin_opt.mdss_subflow_seqn = mp_tp->mpt_ssn_at_csum_fail;
 	} else {
-		/*
-		 * If MPTCP fallback happens, but TFO succeeds, the data on the
-		 * SYN does not belong to the MPTCP data sequence space.
-		 */
+		  
+                                                                 
+                                                          
+     
 		if ((tp->t_tfo_stats & TFO_S_SYN_DATA_ACKED) &&
 		    ((mp_tp->mpt_local_idsn + 1) == mp_tp->mpt_snduna)) {
 			infin_opt.mdss_subflow_seqn = 1;
@@ -299,7 +299,7 @@ mptcp_send_infinite_mapping(struct tcpcb *tp, u_char *opt, unsigned int optlen)
 	memcpy(opt + optlen, &infin_opt, len);
 	optlen += len;
 	if (csum_len != 0) {
-		/* The checksum field is set to 0 for infinite mapping */
+		                                                         
 		uint16_t csum = 0;
 		memcpy(opt + optlen, &csum, csum_len);
 		optlen += csum_len;
@@ -345,7 +345,7 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 	u_int32_t old_mpt_flags = tp->t_mpflags & TMPF_MPTCP_SIGNALS;
 
 	if (mptcp_enable == 0 || mp_tp == NULL || tp->t_state == TCPS_CLOSED) {
-		/* do nothing */
+		                
 		goto ret_optlen;
 	}
 
@@ -355,7 +355,7 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 		do_csum = TRUE;
 	}
 
-	/* tcp_output handles the SYN path separately */
+	                                                
 	if (flags & TH_SYN) {
 		goto ret_optlen;
 	}
@@ -392,7 +392,7 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 		    sizeof(struct mptcp_mpcapable_opt_rsp1);
 		mptcp_opt.mmc_common.mmco_subtype = MPO_CAPABLE;
 		mptcp_opt.mmc_common.mmco_version = mp_tp->mpt_version;
-		/* HMAC-SHA1 is the proposal */
+		                               
 		mptcp_opt.mmc_common.mmco_flags |= MPCAP_PROPOSAL_SBIT;
 		if (mp_tp->mpt_flags & MPTCPF_CHECKSUM) {
 			mptcp_opt.mmc_common.mmco_flags |= MPCAP_CHECKSUM_CBIT;
@@ -406,7 +406,7 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 		if (!tp->t_mpuna) {
 			tp->t_mpuna = tp->snd_una;
 		} else {
-			/* its a retransmission of the MP_CAPABLE ACK */
+			                                                
 		}
 
 		*do_not_compress = TRUE;
@@ -420,7 +420,7 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 		if (!tp->t_mpuna) {
 			tp->t_mpuna = tp->snd_una;
 		}
-		/* Start a timer to retransmit the ACK */
+		                                         
 		tp->t_timer[TCPT_JACK_RXMT] =
 		    OFFSET_FROM_START(tp, tcp_jack_rxmt);
 
@@ -431,10 +431,10 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 	if (!(tp->t_mpflags & (TMPF_MPTCP_TRUE | TMPF_PREESTABLISHED))) {
 		goto ret_optlen;
 	}
-	/*
-	 * From here on, all options are sent only if MPTCP_TRUE
-	 * or when data is sent early on as in Fast Join
-	 */
+	  
+                                                         
+                                                 
+    
 
 	if ((tp->t_mpflags & TMPF_MPTCP_TRUE) &&
 	    (tp->t_mpflags & TMPF_SND_REM_ADDR)) {
@@ -483,27 +483,27 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 }
 
 #define CHECK_DATALEN {                                                             \
-	/* MPTCP socket does not support IP options */                              \
+	                                                                            \
 	if ((len + optlen + dssoptlen) > tp->t_maxopd) {                            \
 	        os_log_error(mptcp_log_handle, "%s: nosp %d len %d opt %d %d %d\n", \
 	            __func__, len, dssoptlen, optlen,                               \
 	            tp->t_maxseg, tp->t_maxopd);                                    \
-	/* remove option length from payload len */                         \
+	                                                                    \
 	        len = tp->t_maxopd - optlen - dssoptlen;                            \
 	}                                                                           \
 }
 
 	if ((tp->t_mpflags & TMPF_SEND_DSN) &&
 	    (send_64bit_dsn)) {
-		/*
-		 * If there was the need to send 64-bit Data ACK along
-		 * with 64-bit DSN, then 26 or 28 bytes would be used.
-		 * With timestamps and NOOP padding that will cause
-		 * overflow. Hence, in the rare event that both 64-bit
-		 * DSN and 64-bit ACK have to be sent, delay the send of
-		 * 64-bit ACK until our 64-bit DSN is acked with a 64-bit ack.
-		 * XXX If this delay causes issue, remove the 2-byte padding.
-		 */
+		  
+                                                        
+                                                        
+                                                     
+                                                        
+                                                          
+                                                                
+                                                               
+     
 		struct mptcp_dss64_ack32_opt dsn_ack_opt;
 		uint8_t dssoptlen = sizeof(dsn_ack_opt);
 		uint16_t dss_csum;
@@ -612,7 +612,7 @@ mptcp_setup_opts(struct tcpcb *tp, int32_t off, u_char *opt,
 		goto ret_optlen;
 	}
 
-	/* 32-bit Data ACK option */
+	                            
 	if ((tp->t_mpflags & TMPF_MPTCP_ACKNOW) &&
 	    (!send_64bit_ack) &&
 	    !(tp->t_mpflags & TMPF_SEND_DSN) &&
@@ -638,7 +638,7 @@ do_ack32_only:
 		goto ret_optlen;
 	}
 
-	/* 64-bit Data ACK option */
+	                            
 	if ((tp->t_mpflags & TMPF_MPTCP_ACKNOW) &&
 	    (send_64bit_ack) &&
 	    !(tp->t_mpflags & TMPF_SEND_DSN) &&
@@ -656,10 +656,10 @@ do_ack64_only:
 		dack_opt.mdss_copt.mdss_subtype = MPO_DSS;
 		dack_opt.mdss_copt.mdss_flags |= (MDSS_A | MDSS_a);
 		dack_opt.mdss_ack = mptcp_hton64(mp_tp->mpt_rcvnxt);
-		/*
-		 * The other end should retransmit 64-bit DSN until it
-		 * receives a 64-bit ACK.
-		 */
+		  
+                                                        
+                           
+     
 		mp_tp->mpt_flags &= ~MPTCPF_SND_64BITACK;
 		memcpy(opt + optlen, &dack_opt, dssoptlen);
 		optlen += dssoptlen;
@@ -668,7 +668,7 @@ do_ack64_only:
 		goto ret_optlen;
 	}
 
-	/* 32-bit DSS+Data ACK option */
+	                                
 	if ((tp->t_mpflags & TMPF_SEND_DSN) &&
 	    (!send_64bit_dsn) &&
 	    (!send_64bit_ack) &&
@@ -725,7 +725,7 @@ do_ack64_only:
 		goto ret_optlen;
 	}
 
-	/* 32-bit DSS + 64-bit DACK option */
+	                                     
 	if ((tp->t_mpflags & TMPF_SEND_DSN) &&
 	    (!send_64bit_dsn) &&
 	    (send_64bit_ack) &&
@@ -808,10 +808,10 @@ do_ack64_only:
 
 		bzero(&dss_ack_opt, sizeof(dss_ack_opt));
 
-		/*
-		 * Data FIN occupies one sequence space.
-		 * Don't send it if it has been Acked.
-		 */
+		  
+                                          
+                                        
+     
 		if ((mp_tp->mpt_sndnxt + 1 != mp_tp->mpt_sndmax) ||
 		    (mp_tp->mpt_snduna == mp_tp->mpt_sndmax)) {
 			goto ret_optlen;
@@ -842,21 +842,21 @@ ret_optlen:
 	if (TRUE == *p_mptcp_acknow) {
 		u_int32_t new_mpt_flags = tp->t_mpflags & TMPF_MPTCP_SIGNALS;
 
-		/*
-		 * If none of the above mpflags were acted on by
-		 * this routine, reset these flags and set p_mptcp_acknow
-		 * to false.
-		 *
-		 * XXX The reset value of p_mptcp_acknow can be used
-		 * to communicate tcp_output to NOT send a pure ack without any
-		 * MPTCP options as it will be treated as a dup ack.
-		 * Since the instances of mptcp_setup_opts not acting on
-		 * these options are mostly corner cases and sending a dup
-		 * ack here would only have an impact if the system
-		 * has sent consecutive dup acks before this false one,
-		 * we haven't modified the logic in tcp_output to avoid
-		 * that.
-		 */
+		  
+                                                  
+                                                           
+              
+    
+                                                      
+                                                                 
+                                                      
+                                                          
+                                                            
+                                                     
+                                                         
+                                                         
+          
+     
 		if (old_mpt_flags == new_mpt_flags) {
 			tp->t_mpflags &= ~TMPF_MPTCP_SIGNALS;
 			*p_mptcp_acknow = FALSE;
@@ -872,9 +872,9 @@ ret_optlen:
 	return optlen;
 }
 
-/*
- * MPTCP Options Input Processing
- */
+  
+                                 
+   
 
 static int
 mptcp_sanitize_option(struct tcpcb *tp, int mptcp_subtype)
@@ -885,13 +885,13 @@ mptcp_sanitize_option(struct tcpcb *tp, int mptcp_subtype)
 	switch (mptcp_subtype) {
 	case MPO_CAPABLE:
 		break;
-	case MPO_JOIN:                  /* fall through */
-	case MPO_DSS:                   /* fall through */
-	case MPO_FASTCLOSE:             /* fall through */
-	case MPO_FAIL:                  /* fall through */
-	case MPO_REMOVE_ADDR:           /* fall through */
-	case MPO_ADD_ADDR:              /* fall through */
-	case MPO_PRIO:                  /* fall through */
+	case MPO_JOIN:                                    
+	case MPO_DSS:                                     
+	case MPO_FASTCLOSE:                               
+	case MPO_FAIL:                                    
+	case MPO_REMOVE_ADDR:                             
+	case MPO_ADD_ADDR:                                
+	case MPO_PRIO:                                    
 		if (mp_tp->mpt_state < MPTCPS_ESTABLISHED) {
 			ret = 0;
 		}
@@ -911,7 +911,7 @@ mptcp_valid_mpcapable_common_opt(u_char *cp)
 	struct mptcp_mpcapable_opt_common *rsp =
 	    (struct mptcp_mpcapable_opt_common *)cp;
 
-	/* mmco_kind, mmco_len and mmco_subtype are validated before */
+	                                                               
 
 	if (!(rsp->mmco_flags & MPCAP_PROPOSAL_SBIT)) {
 		return 0;
@@ -934,25 +934,25 @@ mptcp_do_mpcapable_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th,
 	struct mptcb *mp_tp = tptomptp(tp);
 	struct mptses *mpte = mp_tp->mpt_mpte;
 
-	/* Only valid on SYN/ACK */
+	                           
 	if ((th->th_flags & (TH_SYN | TH_ACK)) != (TH_SYN | TH_ACK)) {
 		return;
 	}
 
-	/* Validate the kind, len, flags */
+	                                   
 	if (mptcp_valid_mpcapable_common_opt(cp) != 1) {
 		tcpstat.tcps_invalid_mpcap++;
 		return;
 	}
 
-	/* handle SYN/ACK retransmission by acknowledging with ACK */
+	                                                             
 	if (mp_tp->mpt_state >= MPTCPS_ESTABLISHED) {
 		return;
 	}
 
-	/* A SYN/ACK contains peer's key and flags */
+	                                             
 	if (optlen != sizeof(struct mptcp_mpcapable_opt_rsp)) {
-		/* complain */
+		              
 		os_log_error(mptcp_log_handle, "%s - %lx: SYN_ACK optlen = %d, sizeof mp opt = %lu \n",
 		    __func__, (unsigned long)VM_KERNEL_ADDRPERM(mpte), optlen,
 		    sizeof(struct mptcp_mpcapable_opt_rsp));
@@ -960,10 +960,10 @@ mptcp_do_mpcapable_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th,
 		return;
 	}
 
-	/*
-	 * If checksum flag is set, enable MPTCP checksum, even if
-	 * it was not negotiated on the first SYN.
-	 */
+	  
+                                                           
+                                           
+    
 	if (((struct mptcp_mpcapable_opt_common *)cp)->mmco_flags &
 	    MPCAP_CHECKSUM_CBIT) {
 		mp_tp->mpt_flags |= MPTCPF_CHECKSUM;
@@ -973,14 +973,14 @@ mptcp_do_mpcapable_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th,
 	    MPCAP_UNICAST_IPBIT) {
 		mpte->mpte_flags |= MPTE_UNICAST_IP;
 
-		/* We need an explicit signal for the addresses - zero the existing ones */
+		                                                                           
 		memset(&mpte->mpte_sub_dst_v4, 0, sizeof(mpte->mpte_sub_dst_v4));
 		memset(&mpte->mpte_sub_dst_v6, 0, sizeof(mpte->mpte_sub_dst_v6));
 	}
 
 	rsp = (struct mptcp_mpcapable_opt_rsp *)cp;
 	mp_tp->mpt_remotekey = rsp->mmc_localkey;
-	/* For now just downgrade to the peer's version */
+	                                                  
 	mp_tp->mpt_peer_version = rsp->mmc_common.mmco_version;
 	if (rsp->mmc_common.mmco_version < mp_tp->mpt_version) {
 		mp_tp->mpt_version = rsp->mmc_common.mmco_version;
@@ -1009,7 +1009,7 @@ mptcp_do_mpjoin_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th, int optlen)
 	struct mptcp_mpjoin_opt_rsp *join_rsp =
 	    (struct mptcp_mpjoin_opt_rsp *)cp;
 
-	/* Only valid on SYN/ACK */
+	                           
 	if ((th->th_flags & (TH_SYN | TH_ACK)) != (TH_SYN | TH_ACK)) {
 		return;
 	}
@@ -1019,7 +1019,7 @@ mptcp_do_mpjoin_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th, int optlen)
 		    __func__, (unsigned long)VM_KERNEL_ADDRPERM(tptomptp(tp)->mpt_mpte),
 		    optlen, sizeof(struct mptcp_mpjoin_opt_rsp));
 		tp->t_mpflags &= ~TMPF_PREESTABLISHED;
-		/* send RST and close */
+		                        
 		MPTCP_JOPT_ERROR_PATH(tp);
 		return;
 	}
@@ -1033,7 +1033,7 @@ mptcp_do_mpjoin_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th, int optlen)
 		    __func__, (unsigned long)VM_KERNEL_ADDRPERM(tptomptp(tp)->mpt_mpte),
 		    error);
 		tp->t_mpflags &= ~TMPF_PREESTABLISHED;
-		/* send RST and close */
+		                        
 		MPTCP_JOPT_ERROR_PATH(tp);
 		return;
 	}
@@ -1058,7 +1058,7 @@ mptcp_validate_join_hmac(struct tcpcb *tp, u_char* hmac, int mac_len)
 	    digest);
 
 	if (bcmp(digest, hmac, mac_len) == 0) {
-		return 0; /* matches */
+		return 0;              
 	} else {
 		printf("%s: remote key %llx local key %llx remote rand %x "
 		    "local rand %x \n", __func__, mp_tp->mpt_remotekey, mp_tp->mpt_localkey,
@@ -1067,10 +1067,10 @@ mptcp_validate_join_hmac(struct tcpcb *tp, u_char* hmac, int mac_len)
 	}
 }
 
-/*
- * Update the mptcb send state variables, but the actual sbdrop occurs
- * in MPTCP layer
- */
+  
+                                                                      
+                 
+   
 void
 mptcp_data_ack_rcvd(struct mptcb *mp_tp, struct tcpcb *tp, u_int64_t full_dack)
 {
@@ -1097,11 +1097,11 @@ mptcp_data_ack_rcvd(struct mptcb *mp_tp, struct tcpcb *tp, u_int64_t full_dack)
 		}
 
 		mp_tp->mpt_snduna += acked;
-		/* In degraded mode, we may get some Data ACKs */
+		                                                 
 		if ((tp->t_mpflags & TMPF_TCP_FALLBACK) &&
 		    !(mp_tp->mpt_flags & MPTCPF_POST_FALLBACK_SYNC) &&
 		    MPTCP_SEQ_GT(mp_tp->mpt_sndnxt, mp_tp->mpt_snduna)) {
-			/* bring back sndnxt to retransmit MPTCP data */
+			                                                
 			mp_tp->mpt_sndnxt = mp_tp->mpt_dsn_at_csum_fail;
 			mp_tp->mpt_flags |= MPTCPF_POST_FALLBACK_SYNC;
 			tp->t_inpcb->inp_socket->so_flags1 |=
@@ -1203,7 +1203,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	switch (dss_rsp->mdss_flags) {
 	case (MDSS_M):
 	{
-		/* 32-bit DSS, No Data ACK */
+		                             
 		struct mptcp_dsn_opt *dss_rsp1;
 		dss_rsp1 = (struct mptcp_dsn_opt *)cp;
 
@@ -1220,7 +1220,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_A):
 	{
-		/* 32-bit Data ACK, no DSS */
+		                             
 		struct mptcp_data_ack_opt *dack_opt;
 		dack_opt = (struct mptcp_data_ack_opt *)cp;
 
@@ -1235,7 +1235,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_M | MDSS_A):
 	{
-		/* 32-bit Data ACK + 32-bit DSS */
+		                                  
 		struct mptcp_dss_ack_opt *dss_ack_rsp;
 		dss_ack_rsp = (struct mptcp_dss_ack_opt *)cp;
 		u_int64_t full_dsn;
@@ -1268,7 +1268,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_M | MDSS_m):
 	{
-		/* 64-bit DSS , No Data ACK */
+		                              
 		struct mptcp_dsn64_opt *dsn64;
 		dsn64 = (struct mptcp_dsn64_opt *)cp;
 		u_int64_t full_dsn;
@@ -1295,7 +1295,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_A | MDSS_a):
 	{
-		/* 64-bit Data ACK, no DSS */
+		                             
 		struct mptcp_data_ack64_opt *dack64;
 		dack64 = (struct mptcp_data_ack64_opt *)cp;
 
@@ -1310,7 +1310,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_M | MDSS_m | MDSS_A):
 	{
-		/* 64-bit DSS + 32-bit Data ACK */
+		                                  
 		struct mptcp_dss64_ack32_opt *dss_ack_rsp;
 		dss_ack_rsp = (struct mptcp_dss64_ack32_opt *)cp;
 		u_int64_t full_dsn;
@@ -1343,7 +1343,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_M | MDSS_A | MDSS_a):
 	{
-		/* 32-bit DSS + 64-bit Data ACK */
+		                                  
 		struct mptcp_dss32_ack64_opt *dss32_ack64_opt;
 		dss32_ack64_opt = (struct mptcp_dss32_ack64_opt *)cp;
 		u_int64_t full_dsn;
@@ -1377,7 +1377,7 @@ mptcp_do_dss_opt_meat(u_char *cp, struct tcpcb *tp, struct tcphdr *th)
 	}
 	case (MDSS_M | MDSS_m | MDSS_A | MDSS_a):
 	{
-		/* 64-bit DSS + 64-bit Data ACK */
+		                                  
 		struct mptcp_dss64_ack64_opt *dss64_ack64;
 		dss64_ack64 = (struct mptcp_dss64_ack64_opt *)cp;
 		u_int64_t full_dsn;
@@ -1461,16 +1461,16 @@ mptcp_do_fastclose_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th)
 		return;
 	}
 
-	/*
-	 * fastclose could make us more vulnerable to attacks, hence
-	 * accept only those that are at the next expected sequence number.
-	 */
+	  
+                                                             
+                                                                    
+    
 	if (th->th_seq != tp->rcv_nxt) {
 		tcpstat.tcps_invalid_opt++;
 		return;
 	}
 
-	/* Reset this flow */
+	                     
 	tp->t_mpflags |= TMPF_FASTCLOSERCV;
 
 	if (tp->t_inpcb->inp_socket != NULL) {
@@ -1488,16 +1488,16 @@ mptcp_do_mpfail_opt(struct tcpcb *tp, u_char *cp, struct tcphdr *th)
 	struct mptcb *mp_tp;
 	int error = 0;
 
-	/*
-	 * mpfail could make us more vulnerable to attacks. Hence accept
-	 * only those that are the next expected sequence number.
-	 */
+	  
+                                                                 
+                                                          
+    
 	if (th->th_seq != tp->rcv_nxt) {
 		tcpstat.tcps_invalid_opt++;
 		return;
 	}
 
-	/* A packet without RST, must atleast have the ACK bit set */
+	                                                             
 	if ((th->th_flags != TH_ACK) && (th->th_flags != TH_RST)) {
 		return;
 	}
@@ -1622,7 +1622,7 @@ tcp_do_mptcp_options(struct tcpcb *tp, u_char *cp, struct tcphdr *th,
 
 	socket_lock_assert_owned(mptetoso(mp_tp->mpt_mpte));
 
-	/* All MPTCP options have atleast 4 bytes */
+	                                            
 	if (optlen < 4) {
 		return;
 	}
@@ -1652,7 +1652,7 @@ tcp_do_mptcp_options(struct tcpcb *tp, u_char *cp, struct tcphdr *th,
 	case MPO_ADD_ADDR:
 		mptcp_do_add_addr_opt(mp_tp->mpt_mpte, cp);
 		break;
-	case MPO_REMOVE_ADDR:           /* fall through */
+	case MPO_REMOVE_ADDR:                             
 	case MPO_PRIO:
 		to->to_flags |= TOF_MPTCP;
 		break;
@@ -1662,7 +1662,7 @@ tcp_do_mptcp_options(struct tcpcb *tp, u_char *cp, struct tcphdr *th,
 	return;
 }
 
-/* REMOVE_ADDR option is sent when a source address goes away */
+                                                                
 static void
 mptcp_send_remaddr_opt(struct tcpcb *tp, struct mptcp_remaddr_opt *opt)
 {
@@ -1678,7 +1678,7 @@ mptcp_send_remaddr_opt(struct tcpcb *tp, struct mptcp_remaddr_opt *opt)
 	tp->t_mpflags &= ~TMPF_SND_REM_ADDR;
 }
 
-/* We send MP_PRIO option based on the values set by the SIOCSCONNORDER ioctl */
+                                                                                
 static int
 mptcp_snd_mpprio(struct tcpcb *tp, u_char *cp, int optlen)
 {

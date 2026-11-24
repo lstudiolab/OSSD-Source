@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * file: pe_init.c
- *    i386 platform expert initialization.
- */
+  
+                  
+                                          
+   
 
 #include <console/video_console.h>
 #include <sys/types.h>
@@ -48,13 +48,13 @@
 
 #include "boot_images.h"
 
-/* extern references */
+                       
 extern void pe_identify_machine(void * args);
 extern int kdb_printf(const char *format, ...) __printflike(1, 2);
-/* private globals */
+                     
 PE_state_t  PE_state;
 
-/* Clock Frequency Info */
+                          
 clock_frequency_info_t gPEClockFrequencyInfo;
 
 void *gPEEFISystemTable;
@@ -128,9 +128,9 @@ PE_init_iokit(void)
 
 	kprintf("Kernel boot args: '%s'\n", PE_boot_args());
 
-	/*
-	 * Fetch the CLUT and the noroot image.
-	 */
+	  
+                                        
+    
 
 	if (kSuccess == SecureDTLookupEntry(NULL, "/chosen/memory-map", &entry)) {
 		if (kSuccess == SecureDTGetProperty(entry, "BootCLUT", (void const **) &map, &size)) {
@@ -174,20 +174,20 @@ PE_init_iokit(void)
 		default_noroot_data   = failedBootPict;
 	}
 
-	/*
-	 * Initialize the spinning wheel (progress indicator).
-	 */
+	  
+                                                       
+    
 	vc_progress_initialize(&default_progress,
 	    default_progress_data1x,
 	    default_progress_data2x,
 	    default_progress_data3x,
 	    (unsigned char *) appleClut8);
 
-	/*
-	 * x86 only minimally enforces lockdown in hardware.  Additionally, some pre-lockdown functionality
-	 * such as commpage initialization requires IOKit enumeration of CPUs, which is heavily entangled
-	 * with the ACPI stack.  Therefore, we start the IOKit matching process immediately on x86.
-	 */
+	  
+                                                                                                    
+                                                                                                  
+                                                                                            
+    
 	InitIOKit(PE_state.deviceTreeHead);
 	StartIOKitMatching();
 }
@@ -195,7 +195,7 @@ PE_init_iokit(void)
 void
 PE_lockdown_iokit(void)
 {
-	/* Ensure that at least the CPUs have been enumerated before moving forward. */
+	                                                                               
 	ml_wait_max_cpus();
 }
 
@@ -207,19 +207,19 @@ PE_init_platform(boolean_t vm_initialized, void * _args)
 	if (PE_state.initialized == FALSE) {
 		PE_state.initialized        = TRUE;
 
-		// New EFI-style
+		                
 		PE_state.bootArgs           = _args;
 		PE_state.deviceTreeHead     = (void *) ml_static_ptovirt(args->deviceTreeP);
 		PE_state.deviceTreeSize     = args->deviceTreeLength;
 		if (args->Video.v_baseAddr) {
-			PE_state.video.v_baseAddr   = args->Video.v_baseAddr;// remains physical address
+			PE_state.video.v_baseAddr   = args->Video.v_baseAddr;                           
 			PE_state.video.v_rowBytes   = args->Video.v_rowBytes;
 			PE_state.video.v_depth      = args->Video.v_depth;
 			PE_state.video.v_display    = args->Video.v_display;
 			PE_state.video.v_rotate     = args->Video.v_rotate;
 
-			/* EFI doesn't have a good way of describing rotation internally,
-			 * so it flips width and height in portrait mode. We flip it back. */
+			                                                                 
+                                                                        
 			if (PE_state.video.v_rotate == kDataRotate90 ||
 			    PE_state.video.v_rotate == kDataRotate270) {
 				PE_state.video.v_width  = args->Video.v_height;
@@ -232,13 +232,13 @@ PE_init_platform(boolean_t vm_initialized, void * _args)
 			strlcpy(PE_state.video.v_pixelFormat, "PPPPPPPP",
 			    sizeof(PE_state.video.v_pixelFormat));
 		} else {
-			PE_state.video.v_baseAddr   = args->VideoV1.v_baseAddr;// remains physical address
+			PE_state.video.v_baseAddr   = args->VideoV1.v_baseAddr;                           
 			PE_state.video.v_rowBytes   = args->VideoV1.v_rowBytes;
 			PE_state.video.v_width      = args->VideoV1.v_width;
 			PE_state.video.v_height     = args->VideoV1.v_height;
 			PE_state.video.v_depth      = args->VideoV1.v_depth;
 			PE_state.video.v_display    = args->VideoV1.v_display;
-			PE_state.video.v_rotate     = kDataRotate0; /* no room for rotation info */
+			PE_state.video.v_rotate     = kDataRotate0;                                
 			strlcpy(PE_state.video.v_pixelFormat, "PPPPPPPP",
 			    sizeof(PE_state.video.v_pixelFormat));
 		}
@@ -346,14 +346,14 @@ PE_call_timebase_callback(void)
 	}
 }
 
-/*
- * The default (non-functional) PE_poll_input handler.
- */
+  
+                                                      
+   
 int
 PE_stub_poll_input(__unused unsigned int options, char * c)
 {
 	*c = 0xff;
-	return 1; /* 0 for success, 1 for unsupported */
+	return 1;                                       
 }
 
 boolean_t
@@ -373,7 +373,7 @@ PE_sync_panic_buffers(void)
 {
 }
 
-/* rdar://problem/21244753 */
+                             
 uint32_t
 PE_i_can_has_debugger(uint32_t *debug_flags)
 {
@@ -418,19 +418,19 @@ PE_init_panicheader()
 	return;
 }
 
-/*
- * Tries to update the panic header to keep it consistent on nested panics.
- *
- * NOTE: The purpose of this function is NOT to detect/correct corruption in the panic region,
- *       it is to update the panic header to make it consistent when we nest panics.
- *
- * We try to avoid nested panics/asserts on x86 because they are difficult to debug, so log any
- * inconsistencies we find.
- */
+  
+                                                                           
+  
+                                                                                              
+                                                                                    
+  
+                                                                                               
+                           
+   
 void
 PE_update_panicheader_nestedpanic()
 {
-	/* If the panic log offset is not set, re-init the panic header */
+	                                                                  
 	if (panic_info->mph_panic_log_offset == 0) {
 		PE_init_panicheader();
 		panic_info->mph_panic_flags |= MACOS_PANIC_HEADER_FLAG_NESTED_PANIC;
@@ -439,21 +439,21 @@ PE_update_panicheader_nestedpanic()
 
 	panic_info->mph_panic_flags |= MACOS_PANIC_HEADER_FLAG_NESTED_PANIC;
 
-	/* Usually indicative of corruption in the panic region */
+	                                                          
 	if (!(((panic_info->mph_stackshot_offset == 0) && (panic_info->mph_stackshot_len == 0)) ||
 	    ((panic_info->mph_stackshot_offset != 0) && (panic_info->mph_stackshot_len != 0)))) {
 		kdb_printf("panic_info contains invalid stackshot metadata: mph_stackshot_offset 0x%x mph_stackshot_len 0x%x\n",
 		    panic_info->mph_stackshot_offset, panic_info->mph_stackshot_len);
 	}
 
-	/*
-	 * macOS panic logs contain nested panic data, if we've already closed the panic log,
-	 * begin the other log.
-	 */
+	  
+                                                                                      
+                        
+    
 	if ((panic_info->mph_panic_log_len != 0) && (panic_info->mph_other_log_offset == 0)) {
 		panic_info->mph_other_log_offset = PE_get_offset_into_panic_region(debug_buf_ptr);
 
-		/* Usually indicative of corruption in the panic region */
+		                                                          
 		if (panic_info->mph_other_log_len != 0) {
 			kdb_printf("panic_info contains invalid other log metadata (zero offset but non-zero length), length was 0x%x, zeroing value\n",
 			    panic_info->mph_other_log_len);

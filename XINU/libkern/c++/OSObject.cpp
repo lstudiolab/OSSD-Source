@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* OSObject.cpp created by gvdl on Fri 1998-11-17 */
+                                                    
 
 #include <libkern/c++/OSObject.h>
 #include <libkern/c++/OSString.h>
@@ -46,13 +46,13 @@ size_t debug_ivars_size;
 __END_DECLS
 
 
-// OSDefineMetaClassAndAbstractStructors(OSObject, 0);
-/* Class global data */
+                                                      
+                       
 OSObject::MetaClass OSObject::gMetaClass;
 const OSMetaClass * const OSObject::metaClass = &OSObject::gMetaClass;
 const OSMetaClass * const OSObject::superClass = NULL;
 
-/* Class member functions - Can't use defaults */
+                                                 
 OSObject::~OSObject()
 {
 }
@@ -67,13 +67,13 @@ OSObject::MetaClass::alloc() const
 	return NULL;
 }
 
-/* The OSObject::MetaClass constructor */
+                                         
 OSObject::MetaClass::MetaClass()
 	: OSMetaClass("OSObject", OSObject::superClass, sizeof(OSObject))
 {
 }
 
-// Virtual Padding
+                  
 OSMetaClassDefineReservedUnused(OSObject, 0);
 OSMetaClassDefineReservedUnused(OSObject, 1);
 OSMetaClassDefineReservedUnused(OSObject, 2);
@@ -112,7 +112,7 @@ OSObject::taggedTryRetain(const void *tag) const
 	UInt32 origCount;
 	UInt32 newCount;
 
-	// Increment the collection bucket.
+	                                   
 	if ((const void *) OSTypeID(OSCollection) == tag) {
 		inc |= (1UL << 16);
 	}
@@ -121,24 +121,24 @@ OSObject::taggedTryRetain(const void *tag) const
 		origCount = *countP;
 		if (((UInt16) origCount | 0x1) == 0xffff) {
 			if (origCount & 0x1) {
-				// If count == 0xffff that means we are freeing now so we can
-				// just return obviously somebody is cleaning up dangling
-				// references.
+				                                                             
+				                                                         
+				              
 				return false;
 			} else {
-				// If count == 0xfffe then we have wrapped our reference count.
-				// We should stop counting now as this reference must be
-				// leaked rather than accidently wrapping around the clock and
-				// freeing a very active object later.
+				                                                               
+				                                                        
+				                                                              
+				                                      
 
 #if !DEBUG
-				break; // Break out of update loop which pegs the reference
-#else /* DEBUG */
-				// @@@ gvdl: eventually need to make this panic optional
-				// based on a boot argument i.e. debug= boot flag
+				break;                                                     
+#else            
+				                                                        
+				                                                 
 				panic("OSObject::refcount: "
 				    "About to wrap the reference count, reference leak?");
-#endif /* !DEBUG */
+#endif             
 			}
 		}
 
@@ -171,7 +171,7 @@ OSObject::taggedRelease(const void *tag, const int when) const
 	UInt32 newCount;
 	UInt32 actualCount;
 
-	// Increment the collection bucket.
+	                                   
 	if ((const void *) OSTypeID(OSCollection) == tag) {
 		dec |= (1UL << 16);
 	}
@@ -181,23 +181,23 @@ OSObject::taggedRelease(const void *tag, const int when) const
 
 		if (((UInt16) origCount | 0x1) == 0xffff) {
 			if (origCount & 0x1) {
-				// If count == 0xffff that means we are freeing now so we can
-				// just return obviously somebody is cleaning up some dangling
-				// references.  So we blow out immediately.
+				                                                             
+				                                                              
+				                                           
 				return;
 			} else {
-				// If count == 0xfffe then we have wrapped our reference
-				// count.  We should stop counting now as this reference must be
-				// leaked rather than accidently freeing an active object later.
+				                                                        
+				                                                                
+				                                                                
 
 #if !DEBUG
-				return; // return out of function which pegs the reference
-#else /* DEBUG */
-				// @@@ gvdl: eventually need to make this panic optional
-				// based on a boot argument i.e. debug= boot flag
+				return;                                                   
+#else            
+				                                                        
+				                                                 
 				panic("OSObject::refcount: %s",
 				    "About to unreference a pegged object, reference leak?");
-#endif /* !DEBUG */
+#endif             
 			}
 		}
 		actualCount = origCount - dec;
@@ -208,23 +208,23 @@ OSObject::taggedRelease(const void *tag, const int when) const
 		}
 	} while (!OSCompareAndSwap(origCount, newCount, const_cast<UInt32 *>(countP)));
 
-	//
-	// This panic means that we have just attempted to release an object
-	// whose retain count has gone to less than the number of collections
-	// it is a member off.  Take a panic immediately.
-	// In fact the panic MAY not be a registry corruption but it is
-	// ALWAYS the wrong thing to do.  I call it a registry corruption 'cause
-	// the registry is the biggest single use of a network of collections.
-	//
-// xxx - this error message is overly-specific;
-// xxx - any code in the kernel could trip this,
-// xxx - and it applies as noted to all collections, not just the registry
+	  
+	                                                                    
+	                                                                     
+	                                                 
+	                                                               
+	                                                                        
+	                                                                      
+	  
+                                               
+                                                
+                                                                          
 	if ((UInt16) actualCount < (actualCount >> 16)) {
 		panic("A kext releasing a(n) %s has corrupted the registry.",
 		    getClassName(this));
 	}
 
-	// Check for a 'free' condition and that if we are first through
+	                                                                
 	if (newCount == 0xffff) {
 		(const_cast<OSObject *>(this))->free();
 	}
@@ -388,19 +388,19 @@ OSObject::trackingAccumSize(size_t size)
 }
 #endif
 
-/* Class member functions - Can't use defaults */
-/* During constructor vtable is always OSObject's - can't call any subclass */
+                                                 
+                                                                              
 
 OSObject::OSObject()
 {
 	retainCount = 1;
-//    if (kIOTracking & gIOKitDebug) getMetaClass()->trackedInstance(this);
+                                                                           
 }
 
 OSObject::OSObject(const OSMetaClass *)
 {
 	retainCount = 1;
-//    if (kIOTracking & gIOKitDebug) getMetaClass()->trackedInstance(this);
+                                                                           
 }
 
 

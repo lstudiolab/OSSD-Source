@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_priq.h,v 1.7 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_priq.h,v 1.7 2003/10/03 05:05:15 kjc Exp $	*/
+                                                                
+                                                            
 /*
  * Copyright (C) 2000-2003
  *	Sony Computer Science Laboratories Inc.  All rights reserved.
@@ -69,20 +69,20 @@
 extern "C" {
 #endif
 
-#define PRIQ_MAXPRI     16      /* upper limit of the number of priorities */
+#define PRIQ_MAXPRI     16                                                   
 
-/* priq class flags */
-#define PRCF_RED                0x0001  /* use RED */
-#define PRCF_ECN                0x0002  /* use ECN with RED/BLUE/SFB */
-#define PRCF_RIO                0x0004  /* use RIO */
-#define PRCF_CLEARDSCP          0x0010  /* clear diffserv codepoint */
-#define PRCF_BLUE               0x0100  /* use BLUE */
-#define PRCF_SFB                0x0200  /* use SFB */
-#define PRCF_FLOWCTL            0x0400  /* enable flow control advisories */
-#define PRCF_DEFAULTCLASS       0x1000  /* default class */
+                      
+#define PRCF_RED                0x0001               
+#define PRCF_ECN                0x0002                                 
+#define PRCF_RIO                0x0004               
+#define PRCF_CLEARDSCP          0x0010                                
+#define PRCF_BLUE               0x0100                
+#define PRCF_SFB                0x0200               
+#define PRCF_FLOWCTL            0x0400                                      
+#define PRCF_DEFAULTCLASS       0x1000                     
 #ifdef BSD_KERNEL_PRIVATE
-#define PRCF_LAZY               0x10000000 /* on-demand resource allocation */
-#endif /* BSD_KERNEL_PRIVATE */
+#define PRCF_LAZY               0x10000000                                    
+#endif                         
 
 #define PRCF_USERFLAGS                                                  \
 	(PRCF_RED | PRCF_ECN | PRCF_RIO | PRCF_CLEARDSCP | PRCF_BLUE |  \
@@ -95,7 +95,7 @@ extern "C" {
 #else
 #define PRCF_BITS \
 	"\020\1RED\2ECN\3RIO\5CLEARDSCP\11BLUE\12SFB\13FLOWCTL\15DEFAULT"
-#endif /* !BSD_KERNEL_PRIVATE */
+#endif                          
 
 struct priq_classstats {
 	u_int32_t               class_handle;
@@ -104,13 +104,13 @@ struct priq_classstats {
 	u_int32_t               qlength;
 	u_int32_t               qlimit;
 	u_int32_t               period;
-	struct pktcntr          xmitcnt;  /* transmitted packet counter */
-	struct pktcntr          dropcnt;  /* dropped packet counter */
+	struct pktcntr          xmitcnt;                                  
+	struct pktcntr          dropcnt;                              
 
-	/* RED, RIO, BLUE, SFB related info */
+	                                      
 	classq_type_t           qtype;
 	union {
-		/* RIO has 3 red stats */
+		                         
 		struct red_stats        red[RIO_NDROPPREC];
 		struct blue_stats       blue;
 		struct sfb_stats        sfb;
@@ -121,5 +121,5 @@ struct priq_classstats {
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _NET_PKTSCHED_PKTSCHED_PRIQ_H_ */
+#endif              
+#endif                                     

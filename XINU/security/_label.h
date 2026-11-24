@@ -64,10 +64,10 @@
 #ifndef _SECURITY_LABEL_H_
 #define _SECURITY_LABEL_H_
 
-/*
- * XXXMAC: This shouldn't be exported to userland, but is because of ucred.h
- * and various other messes.
- */
+  
+                                                                            
+                            
+   
 #if defined(XNU_TARGET_OS_OSX)
 #define MAC_MAX_SLOTS   7
 #else
@@ -78,7 +78,7 @@
 #endif
 #endif
 
-#define MAC_FLAG_INITIALIZED    0x0000001       /* Is initialized for use. */
+#define MAC_FLAG_INITIALIZED    0x0000001                                    
 
 struct label {
 	int     l_flags;
@@ -88,4 +88,4 @@ struct label {
 	}       l_perpolicy[MAC_MAX_SLOTS];
 };
 
-#endif /* !_SECURITY_LABEL_H_ */
+#endif                          

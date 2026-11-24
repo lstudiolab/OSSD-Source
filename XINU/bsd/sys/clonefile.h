@@ -29,9 +29,9 @@
 #ifndef _SYS_CLONEFILE_H_
 #define _SYS_CLONEFILE_H_
 
-/* Options for clonefile calls */
-#define CLONE_NOFOLLOW      0x0001     /* Don't follow symbolic links */
-#define CLONE_NOOWNERCOPY   0x0002     /* Don't copy ownership information from source */
+                                 
+#define CLONE_NOFOLLOW      0x0001                                      
+#define CLONE_NOOWNERCOPY   0x0002                                                       
 
 #ifndef KERNEL
 
@@ -50,6 +50,6 @@ int clonefile(const char *, const char *, uint32_t) __OSX_AVAILABLE(10.12) __IOS
 
 __END_DECLS
 
-#endif /* KERNEL */
+#endif             
 
-#endif /* _SYS_CLONEFILE_H_ */
+#endif                        

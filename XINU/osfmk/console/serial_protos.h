@@ -49,13 +49,13 @@ extern uint32_t serialmode;
 #define SERIALMODE_OUTPUT    0x1
 #define SERIALMODE_INPUT     0x2
 #define SERIALMODE_SYNCDRAIN 0x4
-#define SERIALMODE_BASE_TTY  0x8 /* Load Base/Recovery/FVUnlock TTY */
+#define SERIALMODE_BASE_TTY  0x8                                      
 
 extern uint32_t cons_ops_index;
 extern const uint32_t nconsops;
 extern unsigned int disable_serial_output;
 #if defined(__arm__) || defined(__arm64__)
-/* ARM64_TODO */
+                
 extern void *console_cpu_alloc(boolean_t);
 extern void console_cpu_free(void *);
 void console_init(void);
@@ -95,11 +95,11 @@ void console_printbuf_clear(struct console_printbuf_state * info);
 int console_write_try(char * str, int size);
 
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif /* _CONSOLE_SERIAL_PROTOS_H_ */
+#endif                                

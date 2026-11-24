@@ -53,37 +53,37 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/*
- */
-/*
- *	File:	kern/ipc_kobject.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Declarations for letting a port represent a kernel object.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
+  
+   
+  
+                           
+                      
+             
+  
+                                                             
+   
 
 #ifdef MACH_KERNEL_PRIVATE
 #include <ipc/ipc_kmsg.h>
 #include <ipc/ipc_port.h>
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 #ifndef _KERN_IPC_KOBJECT_H_
 #define _KERN_IPC_KOBJECT_H_
 
 #ifdef KERNEL_PRIVATE
-/*
- * This is the legacy in-kernel ipc-object mechanism.  Over the next
- * several months, this will be phased out in favor of a mechanism that
- * is less Mach IPC specific, and common across in-mach, in-kernel-component,
- * and user-level-component (Plugin) models.
- */
+  
+                                                                    
+                                                                       
+                                                                             
+                                            
+   
 #include <mach/machine/vm_types.h>
 #include <mach/mach_types.h>
 
@@ -141,14 +141,14 @@ typedef natural_t       ipc_kobject_type_t;
 #define IKOT_HYPERVISOR                 49
 #define IKOT_TASK_ID_TOKEN              50
 
-/*
- * Add new entries here and adjust IKOT_UNKNOWN.
- * Please keep ipc/ipc_object.c:ikot_print_array up to date.
- */
-#define IKOT_UNKNOWN                    51      /* magic catchall */
-#define IKOT_MAX_TYPE   (IKOT_UNKNOWN+1)        /* # of IKOT_ types	*/
+  
+                                                
+                                                            
+   
+#define IKOT_UNKNOWN                    51                          
+#define IKOT_MAX_TYPE   (IKOT_UNKNOWN+1)                              
 
-/* set the bitstring index for kobject */
+                                         
 extern kern_return_t ipc_kobject_set_kobjidx(
 	int                         msgid,
 	int                         index);
@@ -156,19 +156,19 @@ extern kern_return_t ipc_kobject_set_kobjidx(
 #ifdef MACH_KERNEL_PRIVATE
 
 struct ipc_kobject_label {
-	ipc_label_t   ikol_label;       /* [private] mandatory access label */
-	ipc_kobject_t XNU_PTRAUTH_SIGNED_PTR("ipc_kobject_label.ikol_kobject") ikol_kobject;     /* actual kobject address */
+	ipc_label_t   ikol_label;                                             
+	ipc_kobject_t XNU_PTRAUTH_SIGNED_PTR("ipc_kobject_label.ikol_kobject") ikol_kobject;                                 
 };
 
-/* initialization of kobject subsystem */
+                                         
 extern void ipc_kobject_init(void);
 
-/* Dispatch a kernel server function */
+                                       
 extern ipc_kmsg_t ipc_kobject_server(
 	ipc_kmsg_t                  request,
 	mach_msg_option_t           option);
 
-/* Make a port represent a kernel object of the given type */
+                                                             
 extern void ipc_kobject_set(
 	ipc_port_t                  port,
 	ipc_kobject_t               kobject,
@@ -180,29 +180,29 @@ extern void ipc_kobject_set_atomically(
 	ipc_kobject_type_t          type);
 
 __options_decl(ipc_kobject_alloc_options_t, uint32_t, {
-	/* Just make the naked port */
+	                              
 	IPC_KOBJECT_ALLOC_NONE      = 0x00000000,
-	/* Make a send right */
+	                       
 	IPC_KOBJECT_ALLOC_MAKE_SEND = 0x00000001,
-	/* Register for no-more-senders */
+	                                  
 	IPC_KOBJECT_ALLOC_NSREQUEST = 0x00000002,
-	/* Make it no grant port */
+	                           
 	IPC_KOBJECT_ALLOC_NO_GRANT  = 0x00000004,
-	/* Make all the send rights immovable */
+	                                        
 	IPC_KOBJECT_ALLOC_IMMOVABLE_SEND = 0x00000008,
-	/* Add a label structure to the port */
+	                                       
 	IPC_KOBJECT_ALLOC_LABEL = 0x00000010,
-	/* Make all rights pinned (non dealloc-able) in an ipc space*/
+	                                                              
 	IPC_KOBJECT_ALLOC_PINNED    = 0x00000020,
 });
 
-/* Allocates a kobject port, never fails */
+                                           
 extern ipc_port_t ipc_kobject_alloc_port(
 	ipc_kobject_t               kobject,
 	ipc_kobject_type_t          type,
 	ipc_kobject_alloc_options_t options);
 
-/* Allocates a kobject port, never fails */
+                                           
 extern ipc_port_t ipc_kobject_alloc_labeled_port(
 	ipc_kobject_t               kobject,
 	ipc_kobject_type_t          type,
@@ -212,7 +212,7 @@ extern ipc_port_t ipc_kobject_alloc_labeled_port(
 extern ipc_port_t ipc_kobject_alloc_subst_once(
 	ipc_port_t                  target);
 
-/* Makes a send right, lazily allocating a kobject port, arming for no-senders, never fails */
+                                                                                              
 extern boolean_t ipc_kobject_make_send_lazy_alloc_port(
 	ipc_port_t                 *port_store,
 	ipc_kobject_t               kobject,
@@ -221,14 +221,14 @@ extern boolean_t ipc_kobject_make_send_lazy_alloc_port(
 	boolean_t                   should_ptrauth,
 	uint64_t                    ptrauth_discriminator) __result_use_check;
 
-/* Makes a send right, lazily allocating a kobject port, arming for no-senders, never fails */
+                                                                                              
 extern boolean_t ipc_kobject_make_send_lazy_alloc_labeled_port(
 	ipc_port_t                 *port_store,
 	ipc_kobject_t               kobject,
 	ipc_kobject_type_t          type,
 	ipc_label_t                 label) __result_use_check;
 
-/* Get the kobject address associated with a port */
+                                                    
 static inline ipc_kobject_t
 ipc_kobject_get(ipc_port_t port)
 {
@@ -241,7 +241,7 @@ ipc_kobject_get(ipc_port_t port)
 	return 0;
 }
 
-/* Check if a kobject can be copied out to a given space */
+                                                           
 extern bool     ipc_kobject_label_check(
 	ipc_space_t                 space,
 	ipc_port_t                  port,
@@ -265,7 +265,7 @@ ip_label_check(
 	return ipc_kobject_label_check(space, port, msgt_name, flags, subst_portp);
 }
 
-/* Release any kernel object resources associated with a port */
+                                                                
 extern void ipc_kobject_destroy(
 	ipc_port_t                  port);
 
@@ -274,7 +274,7 @@ extern void ipc_kobject_destroy(
 extern kern_return_t
 uext_server(ipc_kmsg_t request, ipc_kmsg_t * reply);
 
-/* These boot-args decide if the pinned and immovable ports can be copied out to IPC space */
+                                                                                             
 __options_decl(ipc_control_port_options_t, uint32_t, {
 	IPC_CONTROL_PORT_OPTIONS_NONE           = 0x00,
 
@@ -289,8 +289,8 @@ extern ipc_control_port_options_t ipc_control_port_options;
 extern bool pinned_control_port_enabled;
 extern bool immovable_control_port_enabled;
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* _KERN_IPC_KOBJECT_H_ */
+#endif                           

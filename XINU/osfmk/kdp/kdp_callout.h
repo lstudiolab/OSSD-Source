@@ -37,14 +37,14 @@ typedef enum {
 __BEGIN_DECLS
 typedef void (*kdp_callout_fn_t)(void *arg, kdp_event_t event);
 
-/*
- * Register fn(arg, event) to be called at kdp entry/exit.
- * The callouts are made in a single-threaded environment, interrupts are
- * disabled and processors other than the callout processor quiesced.
- * N.B. callouts are strictly limited in what they can do: they must execute
- * with interrupts disabled and they can't call back into the kernel for any
- * non-trivial service.
- */
+  
+                                                          
+                                                                         
+                                                                     
+                                                                            
+                                                                            
+                       
+   
 extern void kdp_register_callout(kdp_callout_fn_t fn, void *arg);
 
 __END_DECLS

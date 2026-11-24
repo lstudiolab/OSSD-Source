@@ -29,7 +29,7 @@
 #include <pexpert/pexpert.h>
 #if __arm64__
 #include <pexpert/arm64/board_config.h>
-#endif /* __arm64__ */
+#endif                
 
 #include <arm/cpuid_internal.h>
 #include <arm/pmap.h>
@@ -53,7 +53,7 @@ configure_misc_apple_regs(void)
 {
 }
 
-#endif /* __arm64__ */
+#endif                
 
 #if HAS_APPLE_PAC
 
@@ -82,11 +82,11 @@ vmapple_pac_get_default_keys()
         );
 }
 
-#endif /* HAS_PARAVIRTUALIZED_PAC */
+#endif                              
 
-/**
- * Returns the default ROP key.
- */
+   
+                               
+   
 uint64_t
 ml_default_rop_pid(void)
 {
@@ -95,12 +95,12 @@ ml_default_rop_pid(void)
 	return vmapple_default_rop_pid;
 #else
 	return 0;
-#endif /* HAS_PARAVIRTUALIZED_PAC */
+#endif                              
 }
 
-/**
- * Returns the default JOP key.
- */
+   
+                               
+   
 uint64_t
 ml_default_jop_pid(void)
 {
@@ -109,6 +109,6 @@ ml_default_jop_pid(void)
 	return vmapple_default_jop_pid;
 #else
 	return 0;
-#endif /* HAS_PARAVIRTUALIZED_PAC */
+#endif                              
 }
-#endif /* HAS_APPLE_PAC */
+#endif                    

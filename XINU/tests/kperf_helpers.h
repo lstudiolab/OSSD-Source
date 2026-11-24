@@ -14,4 +14,4 @@ void configure_kperf_stacks_timer(pid_t pid, unsigned int period_ms,
 #define PERF_STK_KDATA UINT32_C(0x2502000c)
 #define PERF_STK_UDATA UINT32_C(0x25020010)
 
-#endif /* !defined(KPERF_HELPERS_H) */
+#endif                                

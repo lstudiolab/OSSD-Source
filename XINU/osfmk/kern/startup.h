@@ -43,52 +43,52 @@ __BEGIN_DECLS
 
 #pragma GCC visibility push(hidden)
 
-/*!
- * @enum startup_subsystem_id_t
- *
- * @abstract
- * Represents a stage of kernel intialization, ubnd allows for subsystems
- * to register initializers for a specific stage.
- *
- * @discussion
- * Documentation of each subsystem initialization sequence exists in
- * @file doc/startup.md.
- */
+   
+                               
+  
+            
+                                                                         
+                                                 
+  
+              
+                                                                    
+                        
+   
 __enum_decl(startup_subsystem_id_t, uint32_t, {
-	STARTUP_SUB_NONE = 0,         /**< reserved for the startup subsystem  */
+	STARTUP_SUB_NONE = 0,                                                    
 
-	STARTUP_SUB_TUNABLES,         /**< support for the tunables subsystem  */
-	STARTUP_SUB_LOCKS_EARLY,      /**< early locking, before zalloc        */
-	STARTUP_SUB_KPRINTF,          /**< kprintf initialization              */
+	STARTUP_SUB_TUNABLES,                                                    
+	STARTUP_SUB_LOCKS_EARLY,                                                 
+	STARTUP_SUB_KPRINTF,                                                     
 
-	STARTUP_SUB_PMAP_STEAL,       /**< to perform various pmap carveouts   */
-	STARTUP_SUB_VM_KERNEL,        /**< once the kernel VM is ready         */
-	STARTUP_SUB_KMEM,             /**< once kmem is ready                  */
-	STARTUP_SUB_KMEM_ALLOC,       /**< once kmem_alloc is ready            */
-	STARTUP_SUB_ZALLOC,           /**< initialize zalloc and kalloc        */
-	STARTUP_SUB_PERCPU,           /**< initialize the percpu subsystem     */
-	STARTUP_SUB_LOCKS,            /**< various subsystem locks             */
+	STARTUP_SUB_PMAP_STEAL,                                                  
+	STARTUP_SUB_VM_KERNEL,                                                   
+	STARTUP_SUB_KMEM,                                                        
+	STARTUP_SUB_KMEM_ALLOC,                                                  
+	STARTUP_SUB_ZALLOC,                                                      
+	STARTUP_SUB_PERCPU,                                                      
+	STARTUP_SUB_LOCKS,                                                       
 
-	STARTUP_SUB_CODESIGNING,      /**< codesigning subsystem               */
-	STARTUP_SUB_OSLOG,            /**< oslog and kernel loggging           */
-	STARTUP_SUB_MACH_IPC,         /**< Mach IPC                            */
-	STARTUP_SUB_SYSCTL,           /**< registers sysctls                   */
-	STARTUP_SUB_EARLY_BOOT,       /**< interrupts/premption are turned on  */
+	STARTUP_SUB_CODESIGNING,                                                 
+	STARTUP_SUB_OSLOG,                                                       
+	STARTUP_SUB_MACH_IPC,                                                    
+	STARTUP_SUB_SYSCTL,                                                      
+	STARTUP_SUB_EARLY_BOOT,                                                  
 
-	STARTUP_SUB_LOCKDOWN = ~0u,   /**< reserved for the startup subsystem  */
+	STARTUP_SUB_LOCKDOWN = ~0u,                                              
 });
 
-/*!
- * Stores the last subsystem to have been fully initialized;
- */
+   
+                                                            
+   
 extern startup_subsystem_id_t startup_phase;
 
-/*!
- * @enum startup_debug_t
- *
- * @abstract
- * Flags set in the @c startup_debug global to configure startup debugging.
- */
+   
+                        
+  
+            
+                                                                           
+   
 __options_decl(startup_debug_t, uint32_t, {
 	STARTUP_DEBUG_NONE    = 0x00000000,
 	STARTUP_DEBUG_VERBOSE = 0x00000001,
@@ -100,31 +100,31 @@ extern startup_debug_t startup_debug;
 #define startup_debug  STARTUP_DEBUG_NONE
 #endif
 
-/*!
- * @enum startup_rank
- *
- * @abstract
- * Specifies in which rank a given initializer runs within a given section
- * to register initializers for a specific rank within the subsystem.
- *
- * @description
- * A startup function, declared with @c STARTUP or @c STARTUP_ARG, can specify
- * an rank within the subsystem they initialize.
- *
- * @c STARTUP_RANK_NTH(n) will let callbacks be run at stage @c n (0-based).
- *
- * @c STARTUP_RANK_FIRST, @c STARTUP_RANK_SECOND, @c STARTUP_RANK_THIRD and
- * @c STARTUP_RANK_FOURTH are given as conveniency names for these.
- *
- * @c STARTUP_RANK_MIDDLE is a reserved value that will let startup functions
- * run after all the @c STARTUP_RANK_NTH(n) ones have.
- *
- * @c STARTUP_RANK_NTH_LATE_NTH(n) will let callbacks be run then in @c n rank
- * after the @c STARTUP_RANK_MIDDLE ones (0-based).
- *
- * @c STARTUP_RANK_LAST callbacks will run absolutely last after everything
- * else did for this subsystem.
- */
+   
+                     
+  
+            
+                                                                          
+                                                                     
+  
+               
+                                                                              
+                                                
+  
+                                                                            
+  
+                                                                           
+                                                                   
+  
+                                                                             
+                                                      
+  
+                                                                              
+                                                   
+  
+                                                                           
+                               
+   
 __enum_decl(startup_rank_t, uint32_t, {
 #define STARTUP_RANK_NTH(n) \
 	(enum startup_rank)(n)
@@ -142,113 +142,113 @@ __enum_decl(startup_rank_t, uint32_t, {
 });
 
 #if KASAN
-/*
- * The use of weird sections that get unmapped confuse the hell out of kasan,
- * so for KASAN leave things in regular __TEXT/__DATA segments
- */
+  
+                                                                             
+                                                              
+   
 #define STARTUP_CODE_SEGSECT "__TEXT,__text"
 #define STARTUP_DATA_SEGSECT "__DATA,__init"
 #define STARTUP_HOOK_SEGMENT "__DATA"
 #define STARTUP_HOOK_SECTION "__init_entry_set"
 #elif defined(__x86_64__)
-/* Intel doesn't have a __BOOTDATA but doesn't protect __KLD */
+                                                               
 #define STARTUP_CODE_SEGSECT "__TEXT,__text"
 #define STARTUP_DATA_SEGSECT "__KLDDATA,__init"
 #define STARTUP_HOOK_SEGMENT "__KLDDATA"
 #define STARTUP_HOOK_SECTION "__init_entry_set"
 #else
-/* arm protects __KLD early, so use __BOOTDATA for data */
+                                                          
 #define STARTUP_CODE_SEGSECT "__TEXT,__text"
 #define STARTUP_DATA_SEGSECT "__BOOTDATA,__init"
 #define STARTUP_HOOK_SEGMENT "__BOOTDATA"
 #define STARTUP_HOOK_SECTION "__init_entry_set"
 #endif
 
-/*!
- * @macro __startup_func
- *
- * @abstract
- * Attribute to place on functions used only during the kernel startup phase.
- *
- * @description
- * Code marked with this attribute will be unmapped after kernel lockdown.
- */
+   
+                        
+  
+            
+                                                                             
+  
+               
+                                                                          
+   
 #define __startup_func \
 	__PLACE_IN_SECTION(STARTUP_CODE_SEGSECT) \
 	__attribute__((cold, visibility("hidden")))
 
-/*!
- * @macro __startup_data
- *
- * @abstract
- * Attribute to place on globals used during the kernel startup phase.
- *
- * @description
- * Data marked with this attribute will be unmapped after kernel lockdown.
- */
+   
+                        
+  
+            
+                                                                      
+  
+               
+                                                                          
+   
 #define __startup_data \
 	__PLACE_IN_SECTION(STARTUP_DATA_SEGSECT)
 
-/*!
- * @macro STARTUP
- *
- * @abstract
- * Declares a kernel startup callback.
- */
+   
+                 
+  
+            
+                                      
+   
 #define STARTUP(subsystem, rank, func) \
 	__STARTUP(func, __LINE__, subsystem, rank, func)
 
-/*!
- * @macro STARTUP_ARG
- *
- * @abstract
- * Declares a kernel startup callback that takes an argument.
- */
+   
+                     
+  
+            
+                                                             
+   
 #define STARTUP_ARG(subsystem, rank, func, arg) \
 	__STARTUP_ARG(func, __LINE__, subsystem, rank, func, arg)
 
-/*!
- * @macro TUNABLE
- *
- * @abstract
- * Declares a read-only kernel tunable that is read from a boot-arg with
- * a default value, without further processing.
- *
- * @param type_t
- * Should be an integer type or bool.
- *
- * @param var
- * The name of the C variable to use for storage.
- *
- * @param key
- * The name of the boot-arg to parse for initialization
- *
- * @param default_value
- * The default value for the tunable if the boot-arg is absent.
- */
+   
+                 
+  
+            
+                                                                        
+                                               
+  
+                
+                                     
+  
+             
+                                                 
+  
+             
+                                                       
+  
+                       
+                                                               
+   
 #define TUNABLE(type_t, var, key, default_value) \
 	SECURITY_READ_ONLY_LATE(type_t) var = default_value; \
 	__TUNABLE(type_t, var, key)
 
-/*!
- * @macro TUNABLE_WRITEABLE
- *
- * @abstract
- * Declares a writeable kernel tunable that is read from a boot-arg with
- * a default value, without further processing.
- *
- * @param type_t
- * Should be an integer type or bool.
- *
- * @param var
- * The name of the C variable to use for storage.
- *
- * @param key
- * The name of the boot-arg to parse for initialization
- *
- * @param default_value
- * The default value for the tunable if the boot-arg is absent.
- */
+   
+                           
+  
+            
+                                                                        
+                                               
+  
+                
+                                     
+  
+             
+                                                 
+  
+             
+                                                       
+  
+                       
+                                                               
+   
 #define TUNABLE_WRITEABLE(type_t, var, key, default_value) \
 	type_t var = default_value; \
 	__TUNABLE(type_t, var, key)
@@ -304,42 +304,42 @@ struct startup_tunable_spec {
 	bool        var_is_bool;
 };
 
-/*
- * Kernel and machine startup declarations
- */
+  
+                                          
+   
 
-/* Initialize kernel */
+                       
 extern void kernel_startup_bootstrap(void);
 extern void kernel_startup_initialize_upto(startup_subsystem_id_t upto);
 extern void kernel_startup_tunable_init(const struct startup_tunable_spec *);
 extern void kernel_bootstrap(void);
 
-/* Initialize machine dependent stuff */
+                                        
 extern void machine_init(void);
 
 extern void slave_main(void *machine_param);
 
-/*
- * The following must be implemented in machine dependent code.
- */
+  
+                                                               
+   
 
-/* Slave cpu initialization */
+                              
 extern void slave_machine_init(void *machine_param);
 
-/* Device subystem initialization */
+                                    
 extern void device_service_create(void);
 
 #ifdef  MACH_BSD
 
-/* BSD subsystem initialization */
+                                  
 extern void bsd_init(void);
 
-#endif  /* MACH_BSD */
+#endif                
 
 #pragma GCC visibility pop
 
 __END_DECLS
 
-#endif  /* _KERN_STARTUP_H_ */
+#endif                        
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

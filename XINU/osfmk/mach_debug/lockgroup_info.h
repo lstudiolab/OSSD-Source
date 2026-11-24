@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	mach/lockgroup_info.h
- *
- *	Definitions for host_lockgroup_info call.
- */
+  
+                              
+  
+                                            
+   
 
 #ifndef _MACH_DEBUG_LOCKGROUP_INFO_H_
 #define _MACH_DEBUG_LOCKGROUP_INFO_H_
@@ -71,4 +71,4 @@ typedef struct lockgroup_info {
 
 typedef lockgroup_info_t *lockgroup_info_array_t;
 
-#endif  /* _MACH_DEBUG_LOCKGROUP_INFO_H_ */
+#endif                                     

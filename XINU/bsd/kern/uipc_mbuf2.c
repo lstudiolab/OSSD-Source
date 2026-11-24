@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$NetBSD: uipc_mbuf.c,v 1.40 1999/04/01 00:23:25 thorpej Exp $	*/
+                                                                   
 
 /*
  * Copyright (C) 1999 WIDE Project.
@@ -90,15 +90,15 @@
  *
  *	@(#)uipc_mbuf.c	8.4 (Berkeley) 2/14/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 
-/*#define PULLDOWN_DEBUG*/
+                          
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -111,16 +111,16 @@
 #include <netinet/ip6.h>
 #include <netinet6/ip6_var.h>
 
-/*
- * ensure that [off, off + len) is contiguous on the mbuf chain "m".
- * packet chain before "off" is kept untouched.
- * if offp == NULL, the target will start at <retval, 0> on resulting chain.
- * if offp != NULL, the target will start at <retval, *offp> on resulting chain.
- *
- * on error return (NULL return value), original "m" will be freed.
- *
- * XXX M_TRAILINGSPACE/M_LEADINGSPACE on shared cluster (sharedcluster)
- */
+  
+                                                                    
+                                               
+                                                                            
+                                                                                
+  
+                                                                   
+  
+                                                                       
+   
 struct mbuf *
 m_pulldown(struct mbuf *m, int off, int len, int *offp)
 {
@@ -128,7 +128,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	int hlen = 0, tlen = 0, olen = 0;
 	int sharedcluster = 0;
 
-	/* check invalid arguments. */
+	                              
 	VERIFY(len >= 0 && off >= 0);
 
 	if (m == NULL) {
@@ -136,7 +136,7 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 	}
 	if (len > MCLBYTES) {
 		m_freem(m);
-		return NULL;    /* impossible */
+		return NULL;                    
 	}
 	int tmp_len = 0;
 	if (os_add_overflow(off, len, &tmp_len)) {
@@ -156,12 +156,12 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 #endif
 	n = m;
 
-	/*
-	 * Iterate and make n point to the mbuf
-	 * within which the first byte at length
-	 * offset is contained from the start of
-	 * mbuf chain.
-	 */
+	  
+                                        
+                                         
+                                         
+               
+    
 	while (n != NULL && off > 0) {
 		if (n->m_len > off) {
 			break;
@@ -170,45 +170,45 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 		n = n->m_next;
 	}
 
-	/* be sure to point non-empty mbuf */
+	                                     
 	while (n != NULL && n->m_len == 0) {
 		n = n->m_next;
 	}
 
 	if (!n) {
 		m_freem(m);
-		return NULL;    /* mbuf chain too short */
+		return NULL;                              
 	}
 
-	/*
-	 * the target data is on <n, off>.
-	 * if we got enough data on the mbuf "n", we're done.
-	 *
-	 * It should be noted, that we should only do this either
-	 * when offset is 0, i.e. data is pointing to the start
-	 * or when the caller specifies an out argument to get
-	 * the offset value in the mbuf to work with data pointer
-	 * correctly.
-	 *
-	 * If offset is not 0 and caller did not provide out-argument
-	 * to get offset, we should split the mbuf even when the length
-	 * is contained in current mbuf.
-	 */
+	  
+                                   
+                                                      
+   
+                                                          
+                                                        
+                                                       
+                                                          
+              
+   
+                                                              
+                                                                
+                                 
+    
 	if ((off == 0 || offp) && len <= n->m_len - off) {
 		goto ok;
 	}
 
-	/*
-	 * when len <= n->m_len - off and off != 0, it is a special case.
-	 * len bytes from <n, off> sits in single mbuf, but the caller does
-	 * not like the starting position (off).
-	 * chop the current mbuf into two pieces, set off to 0.
-	 */
+	  
+                                                                  
+                                                                    
+                                         
+                                                        
+    
 	if (len <= n->m_len - off) {
 		o = m_copym(n, off, n->m_len - off, M_DONTWAIT);
 		if (o == NULL) {
 			m_freem(m);
-			return NULL;    /* ENOBUFS */
+			return NULL;                 
 		}
 		n->m_len = off;
 		o->m_next = n->m_next;
@@ -218,33 +218,33 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 		goto ok;
 	}
 
-	/*
-	 * we need to take hlen from <n, off> and tlen from <n->m_next, 0>,
-	 * and construct contiguous mbuf with m_len == len.
-	 * note that hlen + tlen == len, and tlen > 0.
-	 *
-	 * Read these variables as head length and tail length
-	 */
+	  
+                                                                    
+                                                    
+                                               
+   
+                                                       
+    
 	hlen = n->m_len - off;
 	tlen = len - hlen;
 
-	/*
-	 * ensure that we have enough trailing data on mbuf chain.
-	 * if not, we can do nothing about the chain.
-	 */
+	  
+                                                           
+                                              
+    
 	olen = 0;
 	for (o = n->m_next; o != NULL; o = o->m_next) {
 		olen += o->m_len;
 	}
 	if (hlen + olen < len) {
 		m_freem(m);
-		return NULL;    /* mbuf chain too short */
+		return NULL;                              
 	}
 
-	/*
-	 * easy cases first.
-	 * we need to use m_copydata() to get data from <n->m_next, 0>.
-	 */
+	  
+                     
+                                                                
+    
 	if ((n->m_flags & M_EXT) == 0) {
 		sharedcluster = 0;
 	} else {
@@ -257,11 +257,11 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 		}
 	}
 
-	/*
-	 * If we have enough space left in current mbuf to accomodate
-	 * tail length, copy tail length worth of data starting with next mbuf
-	 * and adjust the length of next one accordingly.
-	 */
+	  
+                                                              
+                                                                       
+                                                  
+    
 	if ((off == 0 || offp) && M_TRAILINGSPACE(n) >= tlen
 	    && !sharedcluster) {
 		m_copydata(n->m_next, 0, tlen, mtod(n, caddr_t) + n->m_len);
@@ -270,12 +270,12 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 		goto ok;
 	}
 
-	/*
-	 * If have enough leading space in next mbuf to accomodate head length
-	 * of current mbuf, and total resulting length of next mbuf is greater
-	 * than or equal to requested len bytes, then just copy hlen from
-	 * current to the next one and adjust sizes accordingly.
-	 */
+	  
+                                                                       
+                                                                       
+                                                                  
+                                                         
+    
 	if ((off == 0 || offp) && M_LEADINGSPACE(n->m_next) >= hlen &&
 	    (n->m_next->m_len + hlen) >= len && !sharedcluster) {
 		n->m_next->m_data -= hlen;
@@ -287,28 +287,28 @@ m_pulldown(struct mbuf *m, int off, int len, int *offp)
 		goto ok;
 	}
 
-	/*
-	 * now, we need to do the hard way.  don't m_copy as there's no room
-	 * on both end.
-	 */
+	  
+                                                                     
+                
+    
 	MGET(o, M_DONTWAIT, m->m_type);
 	if (o == NULL) {
 		m_freem(m);
-		return NULL;    /* ENOBUFS */
+		return NULL;                 
 	}
-	if (len > MHLEN) {      /* use MHLEN just for safety */
+	if (len > MHLEN) {                                     
 		MCLGET(o, M_DONTWAIT);
 		if ((o->m_flags & M_EXT) == 0) {
 			m_freem(m);
 			m_free(o);
-			return NULL;    /* ENOBUFS */
+			return NULL;                 
 		}
 	}
-	/* get hlen from <n, off> into <o, 0> */
+	                                        
 	o->m_len = hlen;
 	bcopy(mtod(n, caddr_t) + off, mtod(o, caddr_t), hlen);
 	n->m_len -= hlen;
-	/* get tlen from <n->m_next, 0> into <o, hlen> */
+	                                                 
 	m_copydata(n->m_next, 0, tlen, mtod(o, caddr_t) + o->m_len);
 	o->m_len += tlen;
 	m_adj(n->m_next, tlen);
@@ -334,10 +334,10 @@ ok:
 	return n;
 }
 
-/*
- * Create and return an m_tag, either by re-using space in a previous tag
- * or by allocating a new mbuf/cluster
- */
+  
+                                                                         
+                                      
+   
 struct m_tag *
 m_tag_create(u_int32_t id, u_int16_t type, int len, int wait, struct mbuf *buf)
 {
@@ -352,14 +352,14 @@ m_tag_create(u_int32_t id, u_int16_t type, int len, int wait, struct mbuf *buf)
 		return m_tag_alloc(id, type, len, wait);
 	}
 
-	/*
-	 * We've exhausted all external cases. Now, go through the m_tag
-	 * chain and see if we can fit it in any of them.
-	 * If not (t == NULL), call m_tag_alloc to store it in a new mbuf.
-	 */
+	  
+                                                                 
+                                                  
+                                                                   
+    
 	p = SLIST_FIRST(&buf->m_pkthdr.tags);
 	while (p != NULL) {
-		/* 2KCL m_tag */
+		                
 		if (M_TAG_ALIGN(p->m_tag_len) +
 		    sizeof(struct m_taghdr) > MLEN) {
 			p = SLIST_NEXT(p, m_tag_link);
@@ -374,7 +374,7 @@ m_tag_create(u_int32_t id, u_int16_t type, int len, int wait, struct mbuf *buf)
 		VERIFY(IS_P2ALIGNED(hdr + 1, sizeof(u_int64_t)));
 		VERIFY(m->m_flags & M_TAGHDR && !(m->m_flags & M_EXT));
 
-		/* The mbuf can store this m_tag */
+		                                   
 		if (M_TAG_ALIGN(len) <= MLEN - m->m_len) {
 			t = (struct m_tag *)(void *)(m->m_data + m->m_len);
 			VERIFY(IS_P2ALIGNED(t, sizeof(u_int64_t)));
@@ -401,7 +401,7 @@ m_tag_create(u_int32_t id, u_int16_t type, int len, int wait, struct mbuf *buf)
 	return t;
 }
 
-/* Get a packet tag structure along with specified data following. */
+                                                                     
 struct m_tag *
 m_tag_alloc(u_int32_t id, u_int16_t type, int len, int wait)
 {
@@ -451,7 +451,7 @@ m_tag_alloc(u_int32_t id, u_int16_t type, int len, int wait)
 }
 
 
-/* Free a packet tag. */
+                        
 void
 m_tag_free(struct m_tag *t)
 {
@@ -468,13 +468,13 @@ m_tag_free(struct m_tag *t)
 
 		VERIFY(IS_P2ALIGNED(hdr + 1, sizeof(u_int64_t)));
 
-		/* No other tags in this mbuf */
+		                                
 		if (--hdr->refcnt == 0) {
 			m_free(m);
 			return;
 		}
 
-		/* Pattern-fill the header */
+		                             
 		u_int64_t *fill_ptr = (u_int64_t *)t;
 		u_int64_t *end_ptr = (u_int64_t *)(t + 1);
 		while (fill_ptr < end_ptr) {
@@ -486,7 +486,7 @@ m_tag_free(struct m_tag *t)
 	}
 }
 
-/* Prepend a packet tag. */
+                           
 void
 m_tag_prepend(struct mbuf *m, struct m_tag *t)
 {
@@ -495,7 +495,7 @@ m_tag_prepend(struct mbuf *m, struct m_tag *t)
 	SLIST_INSERT_HEAD(&m->m_pkthdr.tags, t, m_tag_link);
 }
 
-/* Unlink a packet tag. */
+                          
 void
 m_tag_unlink(struct mbuf *m, struct m_tag *t)
 {
@@ -505,7 +505,7 @@ m_tag_unlink(struct mbuf *m, struct m_tag *t)
 	SLIST_REMOVE(&m->m_pkthdr.tags, t, m_tag, m_tag_link);
 }
 
-/* Unlink and free a packet tag. */
+                                   
 void
 m_tag_delete(struct mbuf *m, struct m_tag *t)
 {
@@ -513,7 +513,7 @@ m_tag_delete(struct mbuf *m, struct m_tag *t)
 	m_tag_free(t);
 }
 
-/* Unlink and free a packet tag chain, starting from given tag. */
+                                                                  
 void
 m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
 {
@@ -538,7 +538,7 @@ m_tag_delete_chain(struct mbuf *m, struct m_tag *t)
 	m_tag_delete(m, p);
 }
 
-/* Find a tag, starting from a given position. */
+                                                 
 struct m_tag *
 m_tag_locate(struct mbuf *m, u_int32_t id, u_int16_t type, struct m_tag *t)
 {
@@ -562,7 +562,7 @@ m_tag_locate(struct mbuf *m, u_int32_t id, u_int16_t type, struct m_tag *t)
 	return NULL;
 }
 
-/* Copy a single tag. */
+                        
 struct m_tag *
 m_tag_copy(struct m_tag *t, int how)
 {
@@ -574,16 +574,16 @@ m_tag_copy(struct m_tag *t, int how)
 	if (p == NULL) {
 		return NULL;
 	}
-	bcopy(t + 1, p + 1, t->m_tag_len); /* Copy the data */
+	bcopy(t + 1, p + 1, t->m_tag_len);                    
 	return p;
 }
 
-/*
- * Copy two tag chains. The destination mbuf (to) loses any attached
- * tags even if the operation fails. This should not be a problem, as
- * m_tag_copy_chain() is typically called with a newly-allocated
- * destination mbuf.
- */
+  
+                                                                    
+                                                                     
+                                                                
+                    
+   
 int
 m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
 {
@@ -609,24 +609,24 @@ m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
 	return 1;
 }
 
-/* Initialize dynamic and static tags on an mbuf. */
+                                                    
 void
 m_tag_init(struct mbuf *m, int all)
 {
 	VERIFY(m->m_flags & M_PKTHDR);
 
 	SLIST_INIT(&m->m_pkthdr.tags);
-	/*
-	 * If the caller wants to preserve static mbuf tags
-	 * (e.g. m_dup_pkthdr), don't zero them out.
-	 */
+	  
+                                                    
+                                             
+    
 	if (all) {
 		bzero(&m->m_pkthdr.builtin_mtag._net_mtag,
 		    sizeof(m->m_pkthdr.builtin_mtag._net_mtag));
 	}
 }
 
-/* Get first tag in chain. */
+                             
 struct m_tag *
 m_tag_first(struct mbuf *m)
 {
@@ -635,7 +635,7 @@ m_tag_first(struct mbuf *m)
 	return SLIST_FIRST(&m->m_pkthdr.tags);
 }
 
-/* Get next tag in chain. */
+                            
 struct m_tag *
 m_tag_next(struct mbuf *m, struct m_tag *t)
 {
@@ -649,7 +649,7 @@ m_tag_next(struct mbuf *m, struct m_tag *t)
 int
 m_set_traffic_class(struct mbuf *m, mbuf_traffic_class_t tc)
 {
-	u_int32_t val = MBUF_TC2SCVAL(tc);      /* just the val portion */
+	u_int32_t val = MBUF_TC2SCVAL(tc);                                
 
 	return m_set_service_class(m, m_service_class_from_val(val));
 }
@@ -733,7 +733,7 @@ m_service_class_from_idx(u_int32_t i)
 	}
 
 	VERIFY(0);
-	/* NOTREACHED */
+	                
 	return sc;
 }
 
@@ -778,7 +778,7 @@ m_service_class_from_val(u_int32_t v)
 	}
 
 	VERIFY(0);
-	/* NOTREACHED */
+	                
 	return sc;
 }
 
@@ -786,18 +786,18 @@ uint16_t
 m_adj_sum16(struct mbuf *m, uint32_t start, uint32_t dataoff,
     uint32_t datalen, uint32_t sum)
 {
-	uint32_t total_sub = 0;                 /* total to subtract */
-	uint32_t mlen = m_pktlen(m);            /* frame length */
-	uint32_t bytes = (dataoff + datalen);   /* bytes covered by sum */
+	uint32_t total_sub = 0;                                        
+	uint32_t mlen = m_pktlen(m);                              
+	uint32_t bytes = (dataoff + datalen);                             
 	int len;
 
 	ASSERT(bytes <= mlen);
 
-	/*
-	 * Take care of excluding (len > 0) or including (len < 0)
-	 * extraneous octets at the beginning of the packet, taking
-	 * into account the start offset.
-	 */
+	  
+                                                           
+                                                            
+                                  
+    
 	len = (dataoff - start);
 	if (len > 0) {
 		total_sub = m_sum16(m, start, len);
@@ -805,9 +805,9 @@ m_adj_sum16(struct mbuf *m, uint32_t start, uint32_t dataoff,
 		sum += m_sum16(m, dataoff, -len);
 	}
 
-	/*
-	 * Take care of excluding any postpended extraneous octets.
-	 */
+	  
+                                                            
+    
 	len = (mlen - bytes);
 	if (len > 0) {
 		struct mbuf *m0 = m;
@@ -818,7 +818,7 @@ m_adj_sum16(struct mbuf *m, uint32_t start, uint32_t dataoff,
 			if (__improbable(m == NULL)) {
 				panic("%s: invalid mbuf chain %p [off %u, "
 				    "len %u]", __func__, m0, off0, len);
-				/* NOTREACHED */
+				                
 			}
 			if (off < m->m_len) {
 				break;
@@ -827,7 +827,7 @@ m_adj_sum16(struct mbuf *m, uint32_t start, uint32_t dataoff,
 			m = m->m_next;
 		}
 
-		/* if we started on odd-alignment, swap the value */
+		                                                    
 		if ((uintptr_t)(mtod(m, uint8_t *) + off) & 1) {
 			total_sub += ((extra << 8) & 0xffff) | (extra >> 8);
 		} else {
@@ -837,9 +837,9 @@ m_adj_sum16(struct mbuf *m, uint32_t start, uint32_t dataoff,
 		total_sub = (total_sub >> 16) + (total_sub & 0xffff);
 	}
 
-	/*
-	 * 1's complement subtract any extraneous octets.
-	 */
+	  
+                                                  
+    
 	if (total_sub != 0) {
 		if (total_sub >= sum) {
 			sum = ~(total_sub - sum) & 0xffff;
@@ -848,10 +848,10 @@ m_adj_sum16(struct mbuf *m, uint32_t start, uint32_t dataoff,
 		}
 	}
 
-	/* fold 32-bit to 16-bit */
-	sum = (sum >> 16) + (sum & 0xffff);     /* 17-bit */
-	sum = (sum >> 16) + (sum & 0xffff);     /* 16-bit + carry */
-	sum = (sum >> 16) + (sum & 0xffff);     /* final carry */
+	                           
+	sum = (sum >> 16) + (sum & 0xffff);                 
+	sum = (sum >> 16) + (sum & 0xffff);                         
+	sum = (sum >> 16) + (sum & 0xffff);                      
 
 	return sum & 0xffff;
 }
@@ -861,17 +861,17 @@ m_sum16(struct mbuf *m, uint32_t off, uint32_t len)
 {
 	int mlen;
 
-	/*
-	 * Sanity check
-	 *
-	 * Use m_length2() instead of m_length(), as we cannot rely on
-	 * the caller setting m_pkthdr.len correctly, if the mbuf is
-	 * a M_PKTHDR one.
-	 */
+	  
+                
+   
+                                                               
+                                                             
+                   
+    
 	if ((mlen = m_length2(m, NULL)) < (off + len)) {
 		panic("%s: mbuf %p len (%d) < off+len (%d+%d)\n", __func__,
 		    m, mlen, off, len);
-		/* NOTREACHED */
+		                
 	}
 
 	return (uint16_t)os_cpu_in_cksum_mbuf(m, len, off, 0);

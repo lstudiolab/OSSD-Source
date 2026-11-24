@@ -49,5 +49,5 @@ _STRUCT_USER32_TIMEX
 	user32_long_t   errcnt;
 	user32_long_t   stbcnt;
 };
-#endif /* _STRUCT_USER32_TIMEX */
-#endif /* KERNEL */
+#endif                           
+#endif             

@@ -92,12 +92,12 @@ T_DECL(stackshot_spawn_exit, "tests taking many stackshots while children proces
 		                T_LOG("completed %d stackshots", num_stackshots);
 			}
 
-		        // Sleep between each stackshot
+		                                       
 		        usleep(100);
 		}
 	});
 
-	// <rdar://problem/39739547> META option for T_HELPER_DECL to not output test begin on start
+	                                                                                            
 	posix_spawn_file_actions_t actions;
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(posix_spawn_file_actions_init(&actions), "create spawn actions");
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(posix_spawn_file_actions_addopen(&actions, STDOUT_FILENO, "/dev/null", O_WRONLY, 0),

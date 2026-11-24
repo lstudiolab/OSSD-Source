@@ -2,7 +2,7 @@
 #include <inttypes.h>
 #if __arm64__
 #include <mach/arm/processor_info.h>
-#endif /* __arm64__ */
+#endif                
 #include <mach/mach.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -16,7 +16,7 @@ T_DECL(processor_cpu_stat64,
 {
 #if !__arm64__
 	T_SKIP("processor statistics only available on ARM");
-#else /* !__arm64__ */
+#else                 
 	host_t host = mach_host_self();
 	host_t priv_port = MACH_PORT_NULL;
 
@@ -100,7 +100,7 @@ T_DECL(processor_cpu_stat64,
 
 	free(prestats);
 	free(poststats);
-#endif /* __arm64__ */
+#endif                
 }
 
 

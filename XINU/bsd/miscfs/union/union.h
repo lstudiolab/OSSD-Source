@@ -68,4 +68,4 @@
 #define __UNION_UNION_H__
 
 
-#endif /* __UNION_UNION_H__ */
+#endif                        

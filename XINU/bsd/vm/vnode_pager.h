@@ -46,41 +46,41 @@
 #include <vm/vm_protos.h>
 #include <vm/vm_pager.h>
 
-/*
- *  Vstructs are the internal (to us) description of a unit of backing store.
- *  The are the link between memory objects and the backing store they represent.
- *  For the vnode pager, backing store comes in two flavors: normal files and
- *  swap files.
- *
- *  For objects that page to and from normal files (e.g. objects that represent
- *  program text segments), we maintain some simple parameters that allow us to
- *  access the file's contents directly through the vnode interface.
- *
- *  Data for objects without associated vnodes is maintained in the swap files.
- *  Each object that uses one of these as backing store has a vstruct indicating
- *  the swap file of preference (vs_pf) and a mapping between contiguous object
- *  offsets and swap file offsets (vs_pmap).  Each entry in this mapping specifies
- *  the pager file to use, and the offset of the page in that pager file.  These
- *  mapping entries are of type pfMapEntry.
- */
+  
+                                                                             
+                                                                                 
+                                                                             
+               
+  
+                                                                               
+                                                                               
+                                                                    
+  
+                                                                               
+                                                                                
+                                                                               
+                                                                                  
+                                                                                
+                                           
+   
 
-/*
- * Pager file structure.  One per swap file.
- */
+  
+                                            
+   
 typedef struct pager_file {
-	queue_chain_t   pf_chain;       /* link to other paging files */
-	struct  vnode   *pf_vp;         /* vnode of paging file */
-	u_int           pf_count;       /* Number of vstruct using this file */
-	u_char          *pf_bmap;       /* Map of used blocks */
-	long            pf_npgs;        /* Size of file in pages */
-	long            pf_pfree;       /* Number of unused pages */
-	long            pf_lowat;       /* Low water page */
-	long            pf_hipage;      /* Highest page allocated */
-	long            pf_hint;        /* Lowest page unallocated */
-	char            *pf_name;       /* Filename of this file */
+	queue_chain_t   pf_chain;                                       
+	struct  vnode   *pf_vp;                                   
+	u_int           pf_count;                                              
+	u_char          *pf_bmap;                               
+	long            pf_npgs;                                   
+	long            pf_pfree;                                   
+	long            pf_lowat;                           
+	long            pf_hipage;                                  
+	long            pf_hint;                                     
+	char            *pf_name;                                  
 	boolean_t       pf_prefer;
-	int             pf_index;       /* index into the pager_file array */
-	void *          pf_lock;        /* Lock for alloc and dealloc */
+	int             pf_index;                                            
+	void *          pf_lock;                                        
 } *pager_file_t;
 
 #define PAGER_FILE_NULL (pager_file_t) 0
@@ -97,36 +97,36 @@ extern struct bs_map  bs_port_table[];
 
 
 
-/*
- * Pager file data structures.
- */
+  
+                              
+   
 #define INDEX_NULL      0
 typedef struct {
-	unsigned int index:8;   /* paging file this block is in */
-	unsigned int offset:24; /* page number where block resides */
+	unsigned int index:8;                                     
+	unsigned int offset:24;                                      
 } pf_entry;
 
 typedef enum {
-	IS_INODE,               /* Local disk */
-	IS_RNODE                /* NFS */
+	IS_INODE,                               
+	IS_RNODE                         
 } vpager_fstype;
 
-/*
- *  Basic vnode pager structure.  One per object, backing-store pair.
- */
+  
+                                                                     
+   
 typedef struct vstruct {
-	boolean_t       is_device;      /* Must be first - see vm_pager.h */
-	pager_file_t    vs_pf;          /* Pager file this uses */
-	pf_entry        **vs_pmap;      /* Map of pages into paging file */
+	boolean_t       is_device;                                          
+	pager_file_t    vs_pf;                                    
+	pf_entry        **vs_pmap;                                         
 	unsigned int
-	/* boolean_t */ vs_swapfile:1;  /* vnode is a swapfile */
-	short           vs_count;       /* use count */
-	int             vs_size;        /* size of this chunk in pages*/
-	struct vnode    *vs_vp;         /* vnode to page to */
+	                vs_swapfile:1;                           
+	short           vs_count;                      
+	int             vs_size;                                        
+	struct vnode    *vs_vp;                               
 } *vnode_pager_t;
 
 #define VNODE_PAGER_NULL        ((vnode_pager_t) 0)
 
-#endif  /* KERNEL */
+#endif              
 
-#endif  /* _VNODE_PAGER_ */
+#endif                     

@@ -52,7 +52,7 @@
 #include <sys/proc.h>
 #include "IOKitKernelInternal.h"
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #include <DriverKit/IODispatchQueue.h>
 #include <DriverKit/OSObject.h>
@@ -67,15 +67,15 @@
 #include <DriverKit/IOServiceNotificationDispatchSource.h>
 #include <DriverKit/IOUserServer.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #include <System/IODataQueueDispatchSourceShared.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 SECURITY_READ_ONLY_LATE(SInt64)    gIODKDebug = kIODKEnable;
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 struct IOPStrings;
 
@@ -99,7 +99,7 @@ public:
 };
 OSDefineMetaClassAndStructors(OSUserMetaClass, OSObject);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 class IOUserService : public IOService
 {
@@ -113,7 +113,7 @@ class IOUserService : public IOService
 
 OSDefineMetaClassAndStructors(IOUserService, IOService)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 class IOUserUserClient : public IOUserClient
 {
@@ -134,7 +134,7 @@ public:
 
 OSDefineMetaClassAndStructors(IOUserServerCheckInToken, OSObject);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 
 bool
@@ -151,11 +151,11 @@ IOUserService::start(IOService * provider)
 	return ok;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #undef super
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 struct IODispatchQueue_IVars {
 	IOUserServer * userServer;
@@ -176,7 +176,7 @@ struct OSAction_IVars {
 	void                 * reference[0];
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOService::GetRegistryEntryID_Impl(
@@ -361,7 +361,7 @@ IOService::RequireMaxBusStall_Impl(
 	return kIOReturnSuccess;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOMemoryDescriptor::_CopyState_Impl(
@@ -493,7 +493,7 @@ IOMemoryDescriptor::CreateSubMemoryDescriptor_Impl(
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOMemoryDescriptor::CreateWithMemoryDescriptors_Impl(
@@ -535,7 +535,7 @@ IOMemoryDescriptor::CreateWithMemoryDescriptors_Impl(
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * */
+                                                                                                                        
 
 kern_return_t
 IOUserClient::CreateMemoryDescriptorFromClient_Impl(
@@ -587,7 +587,7 @@ IOUserClient::CreateMemoryDescriptorFromClient_Impl(
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOMemoryMap::_CopyState_Impl(
@@ -605,7 +605,7 @@ IOMemoryMap::_CopyState_Impl(
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOBufferMemoryDescriptor::Create_Impl(
@@ -620,7 +620,7 @@ IOBufferMemoryDescriptor::Create_Impl(
 	IOMemoryDescriptorReserved * reserved;
 
 	if (options & ~((uint64_t) kIOMemoryDirectionOutIn)) {
-		// no other options currently defined
+		                                     
 		return kIOReturnBadArgument;
 	}
 	bmdOptions = (options & kIOMemoryDirectionOutIn) | kIOMemoryKernelUserShared;
@@ -651,7 +651,7 @@ IOBufferMemoryDescriptor::SetLength_Impl(
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IODMACommand::Create_Impl(
@@ -666,7 +666,7 @@ IODMACommand::Create_Impl(
 	IOMapper             * mapper;
 
 	if (options & ~((uint64_t) kIODMACommandCreateNoOptions)) {
-		// no other options currently defined
+		                                     
 		return kIOReturnBadArgument;
 	}
 
@@ -716,11 +716,11 @@ IODMACommand::PrepareForDMA_Impl(
 	UInt64   genOffset;
 
 	if (options & ~((uint64_t) kIODMACommandPrepareForDMANoOptions)) {
-		// no other options currently defined
+		                                     
 		return kIOReturnBadArgument;
 	}
 
-	// uses IOMD direction
+	                      
 	ret = memory->prepare();
 	if (kIOReturnSuccess != ret) {
 		return ret;
@@ -769,7 +769,7 @@ IODMACommand::CompleteDMA_Impl(
 	IOMemoryDescriptor * md;
 
 	if (options & ~((uint64_t) kIODMACommandCompleteDMANoOptions)) {
-		// no other options currently defined
+		                                     
 		return kIOReturnBadArgument;
 	}
 	if (!fActive) {
@@ -841,7 +841,7 @@ IODMACommand::PerformOperation_Impl(
 	    (kIODMACommandPerformOperationOptionRead
 	    | kIODMACommandPerformOperationOptionWrite
 	    | kIODMACommandPerformOperationOptionZero))) {
-		// no other options currently defined
+		                                     
 		return kIOReturnBadArgument;
 	}
 
@@ -895,7 +895,7 @@ IODMACommand::PerformOperation_Impl(
 				ret = kIOReturnUnderrun;
 				break;
 			}
-		} else {       /* kIODMACommandPerformOperationOptionRead */
+		} else {                                                    
 			copiedDMA = readBytes(dmaOffset, buffer, length);
 			if (copiedDMA != length) {
 				ret = kIOReturnUnderrun;
@@ -920,16 +920,16 @@ IODMACommand::PerformOperation_Impl(
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static kern_return_t
 OSActionCreateWithTypeNameInternal(OSObject * target, uint64_t targetmsgid, uint64_t msgid, size_t referenceSize, OSString * typeName, bool fromKernel, OSAction ** action)
 {
 	OSAction * inst = NULL;
 	vm_size_t  allocsize;
-	const OSSymbol *sym = NULL; // must release
-	OSObject *obj = NULL; // must release
-	const OSMetaClass *actionMetaClass = NULL; // do not release
+	const OSSymbol *sym = NULL;                
+	OSObject *obj = NULL;                
+	const OSMetaClass *actionMetaClass = NULL;                  
 	kern_return_t ret;
 
 	if (os_add_overflow(referenceSize, sizeof(OSAction_IVars), &allocsize)) {
@@ -938,7 +938,7 @@ OSActionCreateWithTypeNameInternal(OSObject * target, uint64_t targetmsgid, uint
 	}
 
 	if (fromKernel && typeName) {
-		/* The action is being constructed in the kernel with a type name */
+		                                                                    
 		sym = OSSymbol::withString(typeName);
 		actionMetaClass = OSMetaClass::getMetaClassWithName(sym);
 		if (actionMetaClass && actionMetaClass->getSuperClass() == OSTypeID(OSAction)) {
@@ -948,8 +948,8 @@ OSActionCreateWithTypeNameInternal(OSObject * target, uint64_t targetmsgid, uint
 				goto finish;
 			}
 			inst = OSDynamicCast(OSAction, obj);
-			obj = NULL; // prevent release
-			assert(inst); // obj is a subclass of OSAction so the dynamic cast should always work
+			obj = NULL;                   
+			assert(inst);                                                                        
 		} else {
 			DKLOG("Attempted to create action object with type \"%s\" which does not inherit from OSAction\n", typeName->getCStringNoCopy());
 			ret = kIOReturnBadArgument;
@@ -979,7 +979,7 @@ OSActionCreateWithTypeNameInternal(OSObject * target, uint64_t targetmsgid, uint
 	inst->ivars->typeName      = typeName;
 
 	*action = inst;
-	inst = NULL; // prevent release
+	inst = NULL;                   
 	ret = kIOReturnSuccess;
 
 finish:
@@ -1062,7 +1062,7 @@ OSAction::Aborted_Impl(void)
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 struct IODispatchSource_IVars {
 	queue_chain_t           link;
@@ -1100,7 +1100,7 @@ IODispatchSource::SetEnable_Impl(
 	return SetEnableWithCompletion(enable, NULL);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 struct IOInterruptDispatchSource_IVars {
 	IOService    * provider;
@@ -1329,7 +1329,7 @@ IOInterruptDispatchSource::InterruptOccurred_Impl(
 {
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 enum {
 	kIOServiceNotificationTypeCount = kIOServiceNotificationTypeLast + 1,
@@ -1392,7 +1392,7 @@ IOServiceNotificationDispatchSource::Create_Impl(
 		return kIOReturnNoMemory;
 	}
 
-	inst->ivars->notifier = IOService::addMatchingNotification(gIOMatchedNotification, matching, 0 /*priority*/,
+	inst->ivars->notifier = IOService::addMatchingNotification(gIOMatchedNotification, matching, 0             ,
 	    ^bool (IOService * newService, IONotifier * notifier) {
 		bool         notifyReady = false;
 		IONotifier * interest;
@@ -1602,7 +1602,7 @@ IOServiceNotificationDispatchSource::DeliverNotifications(IOServiceNotificationB
 	return kIOReturnUnsupported;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOUserServer::waitInterruptTrap(void * p1, void * p2, void * p3, void * p4, void * p5, void * p6)
@@ -1671,7 +1671,7 @@ IOUserServer::waitInterruptTrap(void * p1, void * p2, void * p3, void * p4, void
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IOUserServer::Create_Impl(
@@ -1729,7 +1729,7 @@ IOUserServer::LoadModule_Impl(
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 IODispatchQueue::Create_Impl(
@@ -1805,7 +1805,7 @@ IODispatchQueue::OnQueue()
 	return false;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 
 kern_return_t
@@ -1842,7 +1842,7 @@ OSMetaClassBase::Invoke(IORPC rpc)
 			}
 			if ((service = OSDynamicCast(IOService, object))
 			    && service->reserved->uvars) {
-				// xxx other classes
+				                    
 				us = service->reserved->uvars->userServer;
 			}
 		}
@@ -1865,7 +1865,7 @@ OSMetaClassBase::Invoke(IORPC rpc)
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 struct IOPStrings {
 	uint32_t     dataSize;
@@ -1904,13 +1904,13 @@ OSUserMetaClass::free()
 	OSObject::free();
 }
 
-/*
- * Sets the loadTag of the associated OSKext
- * in the dext task.
- * NOTE: different instances of the same OSKext
- * (so same BounleID but different tasks)
- * will have the same loadTag.
- */
+  
+                                            
+                    
+                                               
+                                         
+                              
+   
 void
 IOUserServer::setTaskLoadTag(OSKext *kext)
 {
@@ -1931,10 +1931,10 @@ IOUserServer::setTaskLoadTag(OSKext *kext)
 	}
 }
 
-/*
- * Sets the OSKext uuid as the uuid of the userspace
- * dext executable.
- */
+  
+                                                    
+                   
+   
 void
 IOUserServer::setDriverKitUUID(OSKext *kext)
 {
@@ -2188,7 +2188,7 @@ IOUserServer::queueForObject(OSObject * obj, uint64_t msgid)
 	    && uvars->userMeta->methods) {
 		uint32_t idx, baseIdx;
 		uint32_t lim;
-		// bsearch
+		          
 		for (baseIdx = 0, lim = uvars->userMeta->methodCount; lim; lim >>= 1) {
 			idx = baseIdx + (lim >> 1);
 			if (msgid == uvars->userMeta->methods[idx]) {
@@ -2199,11 +2199,11 @@ IOUserServer::queueForObject(OSObject * obj, uint64_t msgid)
 				}
 				break;
 			} else if (msgid > uvars->userMeta->methods[idx]) {
-				// move right
+				             
 				baseIdx += (lim >> 1) + 1;
 				lim--;
 			}
-			// else move left
+			                 
 		}
 	}
 	return queue;
@@ -2247,7 +2247,7 @@ IOUserServer::objectInstantiate(OSObject * obj, IORPC rpc, IORPCMessage * messag
 	service = OSDynamicCast(IOService, obj);
 	action = OSDynamicCast(OSAction, obj);
 	if (!service) {
-		// xxx other classes hosted
+		                           
 		resultFlags |= kOSObjectRPCKernel;
 		resultFlags |= kOSObjectRPCRemote;
 	} else {
@@ -2261,7 +2261,7 @@ IOUserServer::objectInstantiate(OSObject * obj, IORPC rpc, IORPCMessage * messag
 			resultFlags |= kOSObjectRPCRemote;
 			resultFlags |= kOSObjectRPCKernel;
 		} else if (this != service->reserved->uvars->userServer) {
-			// remote, use base class
+			                         
 			resultFlags |= kOSObjectRPCRemote;
 		}
 		if (service->reserved->uvars && service->reserved->uvars->userServer) {
@@ -2301,7 +2301,7 @@ IOUserServer::objectInstantiate(OSObject * obj, IORPC rpc, IORPCMessage * messag
 		if (userMeta) {
 			if (kOSObjectRPCRemote & resultFlags) {
 				if (!action) {
-					/* Special case: For OSAction subclasses, do not use the superclass */
+					                                                                      
 					while (userMeta && !(kOSClassCanRemote & userMeta->description->flags)) {
 						userMeta = userMeta->superMeta;
 					}
@@ -2430,7 +2430,7 @@ IOUserServer::objectInstantiate(OSObject * obj, IORPC rpc, IORPCMessage * messag
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOReturn
 IOUserServer::kernelDispatch(OSObject * obj, IORPC rpc)
@@ -2462,7 +2462,7 @@ IOUserServer::kernelDispatch(OSObject * obj, IORPC rpc)
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 OSObject *
 IOUserServer::target(OSAction * action, IORPCMessage * message)
@@ -2478,10 +2478,10 @@ IOUserServer::target(OSAction * action, IORPCMessage * message)
 	if (kIORPCMessageRemote & message->flags) {
 		object->retain();
 #ifndef __clang_analyzer__
-		// Hide the release of 'action' from the clang static analyzer to suppress
-		// an overrelease diagnostic. The analyzer doesn't have a way to express the
-		// non-standard contract of this method, which is that it releases 'action' when
-		// the message flags have kIORPCMessageRemote set.
+		                                                                          
+		                                                                            
+		                                                                                
+		                                                  
 		action->release();
 #endif
 	}
@@ -2492,7 +2492,7 @@ IOUserServer::target(OSAction * action, IORPCMessage * message)
 	return object;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 kern_return_t
 uext_server(ipc_kmsg_t requestkmsg, ipc_kmsg_t * pReply)
@@ -2580,24 +2580,24 @@ IOUserServer::server(ipc_kmsg_t requestkmsg, ipc_kmsg_t * pReply)
 	oneway = (0 != (kIORPCMessageOneway & message->flags));
 	assert(oneway || (MACH_PORT_NULL != msgin->msgh.msgh_local_port));
 
-	// includes trailer size
+	                        
 	replyAlloc = oneway ? 0 : MAX_UEXT_REPLY_SIZE;
 	if (replyAlloc) {
 		replykmsg = ipc_kmsg_alloc(replyAlloc);
 		if (replykmsg == NULL) {
-//			printf("uext_server: dropping request\n");
-			//	ipc_kmsg_trace_send(request, option);
+                                               
+			                                        
 			consumeObjects(message, msgin->msgh.msgh_size);
 			ipc_kmsg_destroy(requestkmsg);
 			return KERN_MEMORY_FAILURE;
 		}
 
 		msgout = (typeof(msgout))ipc_kmsg_msg_header(replykmsg);
-		/*
-		 * MIG should really assure no data leakage -
-		 * but until it does, pessimistically zero the
-		 * whole reply buffer.
-		 */
+		  
+                                               
+                                                
+                        
+     
 		bzero((void *)msgout, replyAlloc);
 	}
 
@@ -2611,10 +2611,10 @@ IOUserServer::server(ipc_kmsg_t requestkmsg, ipc_kmsg_t * pReply)
 		ret = kIOReturnBadArgument;
 	}
 
-	// release objects
+	                  
 	consumeObjects(message, msgin->msgh.msgh_size);
 
-	// release ports
+	                
 	copyInObjects(msgin, message, msgin->msgh.msgh_size, false, true);
 
 	if (!oneway) {
@@ -2624,7 +2624,7 @@ IOUserServer::server(ipc_kmsg_t requestkmsg, ipc_kmsg_t * pReply)
 			if (!reply) {
 				ret = kIOReturnIPCError;
 			} else {
-				ret = copyOutObjects(msgout, reply, replySize, (kIORPCVersionCurrentReply == msgout->msgh.msgh_id) /* =>!InvokeReply */);
+				ret = copyOutObjects(msgout, reply, replySize, (kIORPCVersionCurrentReply == msgout->msgh.msgh_id)                     );
 			}
 		}
 		if (kIOReturnSuccess != ret) {
@@ -2642,7 +2642,7 @@ IOUserServer::server(ipc_kmsg_t requestkmsg, ipc_kmsg_t * pReply)
 		}
 
 		msgout->msgh.msgh_bits = MACH_MSGH_BITS_COMPLEX |
-		    MACH_MSGH_BITS_SET(MACH_MSGH_BITS_LOCAL(msgin->msgh.msgh_bits) /*remote*/, 0 /*local*/, 0, 0);
+		    MACH_MSGH_BITS_SET(MACH_MSGH_BITS_LOCAL(msgin->msgh.msgh_bits)           , 0          , 0, 0);
 
 		msgout->msgh.msgh_remote_port  = msgin->msgh.msgh_local_port;
 		msgout->msgh.msgh_local_port   = MACH_PORT_NULL;
@@ -2656,7 +2656,7 @@ IOUserServer::server(ipc_kmsg_t requestkmsg, ipc_kmsg_t * pReply)
 	return oneway ? MIG_NO_REPLY : KERN_SUCCESS;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #define MAX_OBJECT_COUNT(mach, size, message) \
 	((uint32_t)(((((size) + ((uintptr_t) (mach))) - ((uintptr_t) (&message->objects[0]))) / sizeof(OSObjectRef))))
@@ -2726,13 +2726,13 @@ IOUserServerUEXTTrap(OSObject * object, void * p1, void * p2, void * p3, void * 
 	mach  = (typeof(mach))(p - refs * sizeof(*descs) - sizeof(*mach));
 
 	mach->msgh.msgh_id   = kIORPCVersionCurrent;
-	mach->msgh.msgh_size = (mach_msg_size_t) (sizeof(IORPCMessageMach) + refs * sizeof(*descs) + inSize); // totalSize was checked
+	mach->msgh.msgh_size = (mach_msg_size_t) (sizeof(IORPCMessageMach) + refs * sizeof(*descs) + inSize);                         
 	mach->msgh_body.msgh_descriptor_count = ((mach_msg_size_t) refs);
 
 	rpc.message   = mach;
 	rpc.sendSize  = mach->msgh.msgh_size;
 	rpc.reply     = (IORPCMessageMach *) (p + inSize);
-	rpc.replySize = ((uint32_t) (sizeof(buffer.buffer) - inSize));    // inSize was checked
+	rpc.replySize = ((uint32_t) (sizeof(buffer.buffer) - inSize));                         
 
 	message->objects[0] = 0;
 	if ((action = OSDynamicCast(OSAction, object))) {
@@ -2791,7 +2791,7 @@ IOUserServerUEXTTrap(OSObject * object, void * p1, void * p2, void * p3, void * 
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOReturn
 IOUserServer::rpc(IORPC rpc)
@@ -2880,7 +2880,7 @@ IOUserServer::rpc(IORPC rpc)
 			DKLOG("mach_msg() failed 0x%x\n", ret);
 		}
 		if (!message_moved) {
-			// release ports
+			                
 			copyInObjects(mach, message, sendSize, false, true);
 		}
 	}
@@ -2889,7 +2889,7 @@ IOUserServer::rpc(IORPC rpc)
 		if (kIORPCVersionCurrentReply != mach->msgh.msgh_id) {
 			ret = (MACH_NOTIFY_SEND_ONCE == mach->msgh.msgh_id) ? MIG_SERVER_DIED : MIG_REPLY_MISMATCH;
 		} else if ((replySize = mach->msgh.msgh_size) < (sizeof(IORPCMessageMach) + sizeof(IORPCMessage))) {
-//				printf("BAD REPLY SIZE\n");
+                                 
 			ret = MIG_BAD_ARGUMENTS;
 		} else {
 			if (!(MACH_MSGH_BITS_COMPLEX & mach->msgh.msgh_bits)) {
@@ -2899,7 +2899,7 @@ IOUserServer::rpc(IORPC rpc)
 			if (!message) {
 				ret = kIOReturnIPCError;
 			} else if (message->msgid != msgid) {
-//					printf("BAD REPLY ID\n");
+                                
 				ret = MIG_BAD_ARGUMENTS;
 			} else {
 				bool isError = (0 != (kIORPCMessageError & message->flags));
@@ -2921,7 +2921,7 @@ IOUserServer::rpc(IORPC rpc)
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IORPCMessage *
 IORPCMessageFromMach(IORPCMessageMach * msg, bool reply)
@@ -2985,10 +2985,10 @@ IOUserServer::copyObjectForSendRight(ipc_port_t port, ipc_kobject_type_t type)
 	return object;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-// Create a vm_map_copy_t or kalloc'ed data for memory
-// to be copied out. ipc will free after the copyout.
+                                                      
+                                                     
 
 static kern_return_t
 copyoutkdata(const void * data, vm_size_t len, void ** buf)
@@ -2997,7 +2997,7 @@ copyoutkdata(const void * data, vm_size_t len, void ** buf)
 	vm_map_copy_t       copy;
 
 	err = vm_map_copyin( kernel_map, CAST_USER_ADDR_T(data), len,
-	    false /* src_destroy */, &copy);
+	    false                  , &copy);
 
 	assert( err == KERN_SUCCESS );
 	if (err == KERN_SUCCESS) {
@@ -3007,7 +3007,7 @@ copyoutkdata(const void * data, vm_size_t len, void ** buf)
 	return err;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IOReturn
 IOUserServer::copyOutObjects(IORPCMessageMach * mach, IORPCMessage * message,
@@ -3028,8 +3028,8 @@ IOUserServer::copyOutObjects(IORPCMessageMach * mach, IORPCMessage * message,
 
 	refs           = message->objectRefs;
 	maxObjectCount = MAX_OBJECT_COUNT(mach, size, message);
-//	assert(refs <= mach->msgh_body.msgh_descriptor_count);
-//	assert(refs <= maxObjectCount);
+                                                         
+                                  
 	if (refs > mach->msgh_body.msgh_descriptor_count) {
 		return kIOReturnBadArgument;
 	}
@@ -3055,7 +3055,7 @@ IOUserServer::copyOutObjects(IORPCMessageMach * mach, IORPCMessage * message,
 				}
 				message->objects[idx] = 0;
 			}
-//		    desc->type        = MACH_MSG_PORT_DESCRIPTOR;
+                                                     
 			desc->disposition = MACH_MSG_TYPE_MOVE_SEND;
 			desc->name        = port;
 			desc->pad2        = 0;
@@ -3094,7 +3094,7 @@ IOUserServer::copyOutObjects(IORPCMessageMach * mach, IORPCMessage * message,
 				message->objects[idx] = 0;
 			}
 			ool = (typeof(ool))desc;
-//		    ool->type        = MACH_MSG_OOL_DESCRIPTOR;
+                                                   
 			ool->deallocate  = false;
 			ool->copy        = MACH_MSG_PHYSICAL_COPY;
 			ool->size        = length;
@@ -3164,8 +3164,8 @@ IOUserServer::copyInObjects(IORPCMessageMach * mach, IORPCMessage * message,
 
 	refs           = message->objectRefs;
 	maxObjectCount = MAX_OBJECT_COUNT(mach, size, message);
-//	assert(refs <= mach->msgh_body.msgh_descriptor_count);
-//	assert(refs <= maxObjectCount);
+                                                         
+                                  
 	if (refs > mach->msgh_body.msgh_descriptor_count) {
 		return kIOReturnBadArgument;
 	}
@@ -3204,7 +3204,7 @@ IOUserServer::copyInObjects(IORPCMessageMach * mach, IORPCMessage * message,
 				kr = vm_map_copyout(kernel_map, &copyoutdata, (vm_map_copy_t) ool->address);
 				if (KERN_SUCCESS == kr) {
 					object = OSUnserializeXML((const char *) copyoutdata, ool->size);
-					// vm_map_copyout() has consumed the vm_map_copy_t in the message
+					                                                                 
 					ool->size = 0;
 					ool->address = NULL;
 					kr = vm_deallocate(kernel_map, copyoutdata, ool->size);
@@ -3261,7 +3261,7 @@ IOUserServer::consumeObjects(IORPCMessage * message, size_t messageSize)
 	return kIOReturnSuccess;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 bool
 IOUserServer::finalize(IOOptionBits options)
@@ -3314,14 +3314,14 @@ IOUserServer::finalize(IOOptionBits options)
 	return IOUserClient::finalize(options);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #undef super
 #define super IOUserClient
 
 OSDefineMetaClassAndStructors(IOUserServer, IOUserClient)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOUserClient * IOUserServer::withTask(task_t owningTask)
 {
@@ -3354,7 +3354,7 @@ IOUserClient * IOUserServer::withTask(task_t owningTask)
 		}
 	}
 
-	/* Mark the current task's space as eligible for uext object ports */
+	                                                                     
 	iokit_label_dext_task(inst->fOwningTask);
 
 	inst->fLock     = IOLockAlloc();
@@ -3381,9 +3381,9 @@ IOUserServer::clientClose(void)
 	}
 	IOLockUnlock(fLock);
 
-	// if this was a an expected exit, termination and stop should have detached at this
-	// point, so send any provider still attached and not owned by this user server
-	// the ClientCrashed() notification
+	                                                                                    
+	                                                                               
+	                                   
 	if (services) {
 		services->iterateObjects(^bool (OSObject * obj) {
 			IOService * service;
@@ -3485,7 +3485,7 @@ IOUserServer::registerClass(OSClassDescription * desc, uint32_t size, OSUserMeta
 		assert(false);
 		return kIOReturnBadArgument;
 	}
-	// overlaps?
+	            
 	if ((desc->queueNamesOffset >= desc->methodOptionsOffset) && (desc->queueNamesOffset < methodOptionsEnd)) {
 		assert(false);
 		return kIOReturnBadArgument;
@@ -3550,13 +3550,13 @@ IOUserServer::registerClass(OSClassDescription * desc, uint32_t size, OSUserMeta
 	IOLockLock(fLock);
 	cls->superMeta = OSDynamicCast(OSUserMetaClass, fClasses->getObject(desc->superName));
 	if (fClasses->getObject(sym) != NULL) {
-		/* class with this name exists */
+		                                 
 		ret = kIOReturnBadArgument;
 	} else {
 		if (fClasses->setObject(sym, cls)) {
 			*pCls = cls;
 		} else {
-			/* could not add class to fClasses */
+			                                     
 			ret = kIOReturnNoMemory;
 		}
 	}
@@ -3661,7 +3661,7 @@ IOUserServer::getTargetAndTrapForIndex( IOService **targetP, UInt32 index )
 	return (IOExternalTrap *)&trapTemplate[index];
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOReturn
 IOUserServer::serviceAttach(IOService * service, IOService * provider)
@@ -3710,7 +3710,7 @@ IOUserServer::serviceAttach(IOService * service, IOService * provider)
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #define kDriverKitUCPrefix "com.apple.developer.driverkit.userclient-access."
 
@@ -3787,7 +3787,7 @@ IOUserServer::serviceNewUserClient(IOService * service, task_t owningTask, void 
 	return result;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static IOPMPowerState
     sPowerStates[] = {
@@ -4471,14 +4471,14 @@ IOService::Stop_async_Impl(
 {
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #undef super
 #define super IOUserClient
 
 OSDefineMetaClassAndStructors(IOUserUserClient, IOUserClient)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOReturn
 IOUserUserClient::setTask(task_t task)
@@ -4595,7 +4595,7 @@ IOUserUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments * 
 	}
 
 	if (MACH_PORT_NULL != args->asyncWakePort) {
-		// this retain is for the OSAction to release
+		                                             
 		iokit_make_port_send(args->asyncWakePort);
 		kr = CreateActionKernelCompletion(sizeof(IOUserUserClientActionRef), &action);
 		assert(KERN_SUCCESS == kr);
@@ -4631,11 +4631,11 @@ IOUserUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments * 
 	OSSafeReleaseNULL(action);
 
 	if (kIOReturnSuccess != kr) {
-		// mig will destroy any async port
+		                                  
 		return kr;
 	}
 	if (MACH_PORT_NULL != args->asyncWakePort) {
-		// this release is for the mig created send right
+		                                                 
 		iokit_release_port_send(args->asyncWakePort);
 	}
 
@@ -4657,7 +4657,7 @@ IOUserUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments * 
 	return kr;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOUserServerCheckInToken::setNoSendersNotification(IOUserServerCheckInNotificationHandler handler,
@@ -4694,4 +4694,4 @@ IOUserServerCheckInToken::create()
 	return me;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         

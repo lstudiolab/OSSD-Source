@@ -53,21 +53,21 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- *	File:	mach/vm_sync.h
- *
- *	Virtual memory synchronisation definitions.
- *
- */
+  
+                       
+  
+                                              
+  
+   
 
 #ifndef _MACH_VM_SYNC_H_
 #define _MACH_VM_SYNC_H_
 
 typedef unsigned                vm_sync_t;
 
-/*
- *	Synchronization flags, defined as bits within the vm_sync_t type
- */
+  
+                                                                   
+   
 
 #define VM_SYNC_ASYNCHRONOUS    ((vm_sync_t) 0x01)
 #define VM_SYNC_SYNCHRONOUS     ((vm_sync_t) 0x02)
@@ -77,4 +77,4 @@ typedef unsigned                vm_sync_t;
 #define VM_SYNC_CONTIGUOUS      ((vm_sync_t) 0x20)
 #define VM_SYNC_REUSABLEPAGES   ((vm_sync_t) 0x40)
 
-#endif  /* _MACH_VM_SYNC_H_ */
+#endif                        

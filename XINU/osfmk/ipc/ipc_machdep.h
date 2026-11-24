@@ -28,35 +28,35 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * HISTORY
- *
- * Revision 1.1.1.1  1998/09/22 21:05:29  wsanchez
- * Import of Mac OS X kernel (~semeria)
- *
- * Revision 1.1.1.1  1998/03/07 02:26:16  wsanchez
- * Import of OSF Mach kernel (~mburg)
- *
- * Revision 1.1.6.1  1995/01/06  19:45:43  devrcs
- *      mk6 CR668 - 1.3b26 merge
- *      new file for mk6
- *      [1994/10/12  22:19:20  dwm]
- *
- * Revision 1.1.3.1  1994/05/06  18:47:26  tmt
- *      Merge this file in from the osc1.3dec tree.
- *      [1994/03/30  21:33:42  berube]
- *      Created from mk80.
- *      [93/10/05            bruel]
- *
- * $EndLog$
- */
-/* CMU_HIST */
-/*
- * Revision 2.2  93/01/14  17:32:59  danner
- *      Created.
- *      [92/12/10            af]
- */
-/* CMU_END_HIST */
+  
+          
+  
+                                                  
+                                       
+  
+                                                  
+                                     
+  
+                                                 
+                                
+                        
+                                   
+  
+                                              
+                                                   
+                                      
+                          
+                                   
+  
+           
+   
+              
+  
+                                           
+                
+                                
+   
+                  
 /*
  * Mach Operating System
  * Copyright (c) 1991,1990,1989 Carnegie Mellon University
@@ -83,16 +83,16 @@
  * the rights to redistribute these changes.
  */
 
-/*
- * At times, we need to know the size of a port in bits
- */
+  
+                                                       
+   
 
-/* 64 bit machines */
+                     
 #if     defined(__alpha)
 #define PORT_T_SIZE_IN_BITS     64
 #endif
 
-/* default, 32 bit machines */
+                              
 #if     !defined(PORT_T_SIZE_IN_BITS)
 #define PORT_T_SIZE_IN_BITS     32
 #endif

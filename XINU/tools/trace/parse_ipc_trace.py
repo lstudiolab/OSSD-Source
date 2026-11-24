@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# machtrace_parse.py
-# Parse Mach IPC kmsg data trace from XNU
-#
-# Jeremy C. Andrus <jeremy_andrus@apple.com>
-#
+                    
+                                         
+ 
+                                            
+ 
 from __future__ import division
 
 import argparse
@@ -279,7 +279,7 @@ class IPCEdge:
             else:
                 self._data['ool'] += df['ool']
                 self._msgs['ool'] += 1
-        # Complex messages can contain ports and data
+                                                     
         if f & self.F_COMPLEX:
             nports = f & self.F_PORTS_MASK
             if nports > 0:
@@ -440,9 +440,9 @@ class IPCGraph:
                 .format(node.nname, tcolor, bgcolor, node.label()))
 
     def print_dot_edge(self, nm, edge, ofile):
-        #weight = 100 * edge.dweight / self.maxdweight
-        ##if weight < 1:
-        #    weight = 1
+                                                      
+                        
+                       
         weight = edge.dweight
         penwidth = edge.weight / 512
         if penwidth < 0.5:
@@ -494,7 +494,7 @@ class IPCGraph:
             cnodes = []
             for nm, e in self.edges.iteritems():
                 nicename = e.src.nicename
-                # Find all nodes to which 'follow' nodes communicate
+                                                                    
                 if e.src.nicename in follow:
                     printedges[nm] = e
                     if not e.selfedge() and not e.dst in cnodes:
@@ -507,7 +507,7 @@ class IPCGraph:
             lvl += 1
             for f in follow:
                 sys.stderr.write("{}following {}\n".format('  |--'*lvl, f))
-        # END: while len(follow)
+                                
         for k, v in self.nodes.iteritems():
             if v.nicename in visited:
                 self.print_dot_node(ofile, v)
@@ -567,7 +567,7 @@ class IPCGraph:
         for f in IPCEdge.DFLAVORS:
             tdata += self.totals['D'+f]
             tmsgs += self.totals['n'+f]
-        # we account for 0-sized messages differently
+                                                     
         tmsgs += self.msgs[0]['std']
         ofile.write("Nodes:{:d}\nEdges:{:d}\n".format(len(self.nodes),len(self.edges)))
         ofile.write("Total Messages,{}\nTotal Data,{}\n".format(tmsgs, tdata))
@@ -612,7 +612,7 @@ class IPCGraph:
 
             cdf = {f:0 for f in IPCEdge.DFLAVORS}
             dcdf = {f:0 for f in IPCEdge.DFLAVORS}
-            if k > 0: # Only use messages with data size > 0
+            if k > 0:                                       
                 for f in IPCEdge.DFLAVORS:
                     if self.totals['n'+f] > 0:
                         cdf[f] = int(100 * totalmsgs[f] / self.totals['n'+f])
@@ -758,7 +758,7 @@ def convert_raw_tracefiles(args):
             sys.stderr.write("Failure to convert raw trace file '{:s}'\ncmd: '{:s}'\n".format(args.raw[0].name, cmd))
             sys.exit(1)
         args.tracefile.append(open(tfile, 'r'))
-    # END: for rawfile in args.raw
+                                  
 
 
 def parse_tracefile_line(line, exclude, include, exflags, incflags, active_proc, graph, base=16):
@@ -793,14 +793,14 @@ def parse_tracefile_line(line, exclude, include, exflags, incflags, active_proc,
                 return
             if incflags and (flags & int(incflags[0], 0)) != int(incflags[0], 0):
                 return
-        # create a graph edge
+                             
         if (flags & IPCEdge.F_TRACED):
             graph.addmsg(src, sendpid, dst, destpid, val[5], val[6], float(val[0]))
-    # END: MACH_IPC_kmsg_info
+                             
 
-#
-# Main
-#
+ 
+      
+ 
 def main(argv=sys.argv):
     """ Main program entry point.
 
@@ -818,19 +818,19 @@ def main(argv=sys.argv):
 
     parser = argparse.ArgumentParser(description='Parse an XNU Mach IPC kmsg ktrace file')
 
-    # output a DOT formatted graph file
+                                       
     parser.add_argument('--printgraph', '-g', dest='graph', default=None, type=argparse.FileType('w'), help='Output a DOT connectivity graph from the trace data')
     parser.add_argument('--graphname', dest='name', default='ipcgraph', help='A name for the DOT graph output')
     parser.add_argument('--graphfollow', dest='follow', nargs='+', metavar='NAME', help='Graph only the transitive closure of services / processes which communicate with the given service(s)')
 
-    # output a CDF of message data
+                                  
     parser.add_argument('--printfreq', '-f', dest='freq', default=None, type=argparse.FileType('w'), help='Output a frequency distribution of message data (in CSV format)')
     parser.add_argument('--gnuplot', dest='gnuplot', action='store_true', help='Write out a gnuplot file along with the frequency distribution data')
 
-    # output a simple summary of message data
+                                             
     parser.add_argument('--printsummary', '-s', dest='summary', default=None, type=argparse.FileType('w'), help='Output a summary of all messages in the trace data')
 
-    # Output a CSV grid of node data/messages
+                                             
     parser.add_argument('--printnodegrid', '-n', dest='nodegrid', default=None, type=argparse.FileType('w'), help='Output a CSV grid of all messages/data sent between nodes (defaults to # messages)')
     parser.add_argument('--ngridtype', dest='ngridtype', default=None, choices=['msgs', 'data'], help='Used with the --printnodegrid argument, this option control whether the grid will be # of messages sent between nodes, or amount of data sent between nodes')
     parser.add_argument('--ngridfilter', dest='ngridfilter', default=None, nargs='+', choices=IPCEdge.DTYPES, help='Used with the --printnodegrid argument, this option controls the type of messages or data counted')
@@ -867,24 +867,24 @@ def main(argv=sys.argv):
     idx = 0
     while idx < nfiles:
         active_proc = {}
-        # Parse a ps output file (generated by ios_trace_ipc.sh)
-        # This pre-fills the active_proc list
+                                                                
+                                             
         if args.psfile and len(args.psfile) > idx:
             sys.stderr.write("Parsing {:s}...\n".format(args.psfile[idx].name))
             for line in args.psfile[idx]:
                 if line.strip() == '':
                     continue
                 parse_tracefile_line(line.strip(), None, None, None, None, active_proc, graph, 10)
-        # END: for line in psfile
+                                 
 
         sys.stderr.write("Parsing {:s}...\n".format(args.tracefile[idx].name))
         for line in args.tracefile[idx]:
             if line.strip() == '':
                 continue
             parse_tracefile_line(line.strip(), args.exclude, args.include, args.exflags, args.incflags, active_proc, graph)
-        # END: for line in tracefile
+                                    
         idx += 1
-    # END: foreach tracefile/psfile
+                                   
 
     if args.graph:
         if args.follow and len(args.follow) > 0:

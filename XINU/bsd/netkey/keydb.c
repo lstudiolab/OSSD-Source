@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$KAME: keydb.c,v 1.61 2000/03/25 07:24:13 sumikawa Exp $	*/
+                                                              
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -81,11 +81,11 @@ extern lck_mtx_t  *sadb_mutex;
 
 MALLOC_DEFINE(M_SECA, "key mgmt", "security associations, key management");
 
-// static void keydb_delsecasvar(struct secasvar *); // not used
+                                                                
 
-/*
- * secpolicy management
- */
+  
+                       
+   
 struct secpolicy *
 keydb_newsecpolicy(void)
 {
@@ -103,9 +103,9 @@ keydb_delsecpolicy(struct secpolicy *p)
 	_FREE(p, M_SECA);
 }
 
-/*
- * secashead management
- */
+  
+                       
+   
 struct secashead *
 keydb_newsecashead(void)
 {
@@ -140,9 +140,9 @@ struct secashead *p;
 
 
 
-/*
- * secasvar management (reference counted)
- */
+  
+                                          
+   
 struct secasvar *
 keydb_newsecasvar()
 {
@@ -175,7 +175,7 @@ struct secasvar *p;
 	LCK_MTX_ASSERT(sadb_mutex, LCK_MTX_ASSERT_OWNED);
 
 	p->refcnt--;
-	/* negative refcnt will cause panic intentionally */
+	                                                    
 	if (p->refcnt <= 0) {
 		keydb_delsecasvar(p);
 	}
@@ -193,9 +193,9 @@ struct secasvar *p;
 }
 #endif
 
-/*
- * secreplay management
- */
+  
+                       
+   
 struct secreplay *
 keydb_newsecreplay(u_int8_t wsize)
 {
@@ -241,9 +241,9 @@ keydb_delsecreplay(struct secreplay *p)
 }
 
 #if 0
-/*	NOT USED
- * secreg management
- */
+           
+                    
+   
 struct secreg *
 keydb_newsecreg()
 {

@@ -32,10 +32,10 @@
 /*
  * @APPLE_FREE_COPYRIGHT@
  */
-/*
- *	File:		arm/commpage/commpage.c
- *	Purpose:	Set up and export a RO/RW page
- */
+  
+                                 
+                                          
+   
 #include <libkern/section_keywords.h>
 #include <mach/mach_types.h>
 #include <mach/machine.h>
@@ -48,7 +48,7 @@
 #include <vm/vm_map.h>
 #include <vm/vm_protos.h>
 #include <ipc/ipc_port.h>
-#include <arm/cpuid.h>          /* for cpuid_info() & cache_info() */
+#include <arm/cpuid.h>                                               
 #include <arm/rtclock.h>
 #include <libkern/OSAtomic.h>
 #include <stdatomic.h>
@@ -75,7 +75,7 @@ SECURITY_READ_ONLY_LATE(vm_address_t)   sharedpage_rw_text_addr = 0;
 extern user64_addr_t commpage_text64_location;
 extern user32_addr_t commpage_text32_location;
 
-/* For sysctl access from BSD side */
+                                     
 extern int      gARMv81Atomics;
 extern int      gARMv8Crc32;
 extern int      gARMv82FHM;
@@ -88,7 +88,7 @@ commpage_populate(void)
 	uint16_t        c2;
 	int cpufamily;
 
-	// Create the data and the text commpage
+	                                        
 	vm_map_address_t kernel_data_addr, kernel_text_addr, user_text_addr;
 	pmap_create_sharedpages(&kernel_data_addr, &kernel_text_addr, &user_text_addr);
 
@@ -139,13 +139,13 @@ commpage_populate(void)
 	*((uint8_t*)(_COMM_PAGE_USER_PAGE_SHIFT_32 + _COMM_PAGE_RW_OFFSET)) = (uint8_t) page_shift_user32;
 	*((uint8_t*)(_COMM_PAGE_USER_PAGE_SHIFT_64 + _COMM_PAGE_RW_OFFSET)) = (uint8_t) SIXTEENK_PAGE_SHIFT;
 #elif (__ARM_ARCH_7K__ >= 2)
-	/* enforce 16KB alignment for watch targets with new ABI */
+	                                                           
 	*((uint8_t*)(_COMM_PAGE_USER_PAGE_SHIFT_32 + _COMM_PAGE_RW_OFFSET)) = (uint8_t) SIXTEENK_PAGE_SHIFT;
 	*((uint8_t*)(_COMM_PAGE_USER_PAGE_SHIFT_64 + _COMM_PAGE_RW_OFFSET)) = (uint8_t) SIXTEENK_PAGE_SHIFT;
-#else /* __arm64__ */
+#else                
 	*((uint8_t*)(_COMM_PAGE_USER_PAGE_SHIFT_32 + _COMM_PAGE_RW_OFFSET)) = (uint8_t) PAGE_SHIFT;
 	*((uint8_t*)(_COMM_PAGE_USER_PAGE_SHIFT_64 + _COMM_PAGE_RW_OFFSET)) = (uint8_t) PAGE_SHIFT;
-#endif /* __arm64__ */
+#endif                
 
 	commpage_update_timebase();
 	commpage_update_mach_continuous_time(0);
@@ -155,10 +155,10 @@ commpage_populate(void)
 	clock_get_boottime_microtime(&secs, &microsecs);
 	commpage_update_boottime(secs * USEC_PER_SEC + microsecs);
 
-	/*
-	 * set commpage approximate time to zero for initialization.
-	 * scheduler shall populate correct value before running user thread
-	 */
+	  
+                                                             
+                                                                     
+    
 	*((uint64_t *)(_COMM_PAGE_APPROX_TIME + _COMM_PAGE_RW_OFFSET)) = 0;
 #ifdef CONFIG_MACH_APPROXIMATE_TIME
 	*((uint8_t *)(_COMM_PAGE_APPROX_TIME_SUPPORTED + _COMM_PAGE_RW_OFFSET)) = 1;
@@ -179,25 +179,25 @@ commpage_populate(void)
 #define COMMPAGE_TEXT_SEGMENT "__TEXT_EXEC"
 #define COMMPAGE_TEXT_SECTION "__commpage_text"
 
-/* Get a pointer to the start of the ARM PFZ code section. This macro tell the
- * linker that the storage for the variable here is at the start of the section */
+                                                                              
+                                                                                  
 extern char commpage_text_start[]
 __SECTION_START_SYM(COMMPAGE_TEXT_SEGMENT, COMMPAGE_TEXT_SECTION);
 
-/* Get a pointer to the end of the ARM PFZ code section. This macro tell the
- * linker that the storage for the variable here is at the end of the section */
+                                                                            
+                                                                                
 extern char commpage_text_end[]
 __SECTION_END_SYM(COMMPAGE_TEXT_SEGMENT, COMMPAGE_TEXT_SECTION);
 
-/* This is defined in the commpage text section as a symbol at the start of the preemptible
- * functions */
+                                                                                           
+               
 extern char commpage_text_preemptible_functions;
 
 #if CONFIG_ARM_PFZ
 static size_t size_of_pfz = 0;
 #endif
 
-/* This is the opcode for brk #666 */
+                                     
 #define BRK_666_OPCODE 0xD4205340
 
 void
@@ -211,14 +211,14 @@ commpage_text_populate(void)
 	assert(size_of_commpage_text <= PAGE_SIZE);
 	assert(size_of_commpage_text > 0);
 
-	/* Get the size of the PFZ half of the comm page text section. */
+	                                                                 
 	size_of_pfz = &commpage_text_preemptible_functions - commpage_text_start;
 
-	// Copy the code segment of comm page text section into the PFZ
+	                                                               
 	memcpy((void *) _COMM_PAGE64_TEXT_START_ADDRESS, (void *) commpage_text_start, size_of_commpage_text);
 
-	// Make sure to populate the rest of it with brk 666 so that undefined code
-	// doesn't get  run
+	                                                                           
+	                   
 	memset((char *) _COMM_PAGE64_TEXT_START_ADDRESS + size_of_commpage_text, BRK_666_OPCODE,
 	    PAGE_SIZE - size_of_commpage_text);
 #endif
@@ -274,9 +274,9 @@ commpage_set_timestamp(
 
 }
 
-/*
- * Update _COMM_PAGE_MEMORY_PRESSURE.  Called periodically from vm's compute_memory_pressure()
- */
+  
+                                                                                              
+   
 
 void
 commpage_set_memory_pressure(
@@ -288,9 +288,9 @@ commpage_set_memory_pressure(
 	*((uint32_t *)(_COMM_PAGE_MEMORY_PRESSURE + _COMM_PAGE_RW_OFFSET)) = pressure;
 }
 
-/*
- * Determine number of CPUs on this system.
- */
+  
+                                           
+   
 static int
 commpage_cpus( void )
 {
@@ -326,9 +326,9 @@ _get_commpage_text_priv_address(void)
 	return sharedpage_rw_text_addr;
 }
 
-/*
- * Initialize _cpu_capabilities vector
- */
+  
+                                      
+   
 static void
 commpage_init_cpu_capabilities( void )
 {
@@ -360,7 +360,7 @@ commpage_init_cpu_capabilities( void )
 
 	bits |= (cpus << kNumCPUsShift);
 
-	bits |= kFastThreadLocalStorage;        // TPIDRURO for TLS
+	bits |= kFastThreadLocalStorage;                           
 
 #if     __ARM_VFP__
 	bits |= kHasVfp;
@@ -419,9 +419,9 @@ commpage_init_cpu_capabilities( void )
 	*((uint64_t *)(_COMM_PAGE_CPU_CAPABILITIES64 + _COMM_PAGE_RW_OFFSET)) = _cpu_capabilities;
 }
 
-/*
- * Updated every time a logical CPU goes offline/online
- */
+  
+                                                       
+   
 void
 commpage_update_active_cpus(void)
 {
@@ -432,9 +432,9 @@ commpage_update_active_cpus(void)
 
 }
 
-/*
- * Update the commpage bits for mach_absolute_time and mach_continuous_time (for userspace)
- */
+  
+                                                                                           
+   
 void
 commpage_update_timebase(void)
 {
@@ -443,14 +443,14 @@ commpage_update_timebase(void)
 	}
 }
 
-/*
- * Update the commpage with current kdebug state. This currently has bits for
- * global trace state, and typefilter enablement. It is likely additional state
- * will be tracked in the future.
- *
- * INVARIANT: This value will always be 0 if global tracing is disabled. This
- * allows simple guard tests of "if (*_COMM_PAGE_KDEBUG_ENABLE) { ... }"
- */
+  
+                                                                             
+                                                                               
+                                 
+  
+                                                                             
+                                                                        
+   
 void
 commpage_update_kdebug_state(void)
 {
@@ -459,7 +459,7 @@ commpage_update_kdebug_state(void)
 	}
 }
 
-/* Ditto for atm_diagnostic_config */
+                                     
 void
 commpage_update_atm_diagnostic_config(uint32_t diagnostic_config)
 {
@@ -468,11 +468,11 @@ commpage_update_atm_diagnostic_config(uint32_t diagnostic_config)
 	}
 }
 
-/*
- * Update the commpage data with the state of multiuser mode for
- * this device. Allowing various services in userspace to avoid
- * IPC in the (more common) non-multiuser environment.
- */
+  
+                                                                
+                                                               
+                                                      
+   
 void
 commpage_update_multiuser_config(uint32_t multiuser_config)
 {
@@ -481,10 +481,10 @@ commpage_update_multiuser_config(uint32_t multiuser_config)
 	}
 }
 
-/*
- * update the commpage data for
- * last known value of mach_absolute_time()
- */
+  
+                               
+                                           
+   
 
 void
 commpage_update_mach_approximate_time(uint64_t abstime)
@@ -497,10 +497,10 @@ commpage_update_mach_approximate_time(uint64_t abstime)
 		saved_data = atomic_load_explicit((_Atomic uint64_t *)approx_time_base,
 		    memory_order_relaxed);
 		if (saved_data < abstime) {
-			/* ignoring the success/fail return value assuming that
-			 * if the value has been updated since we last read it,
-			 * "someone" has a newer timestamp than us and ours is
-			 * now invalid. */
+			                                                       
+                                                          
+                                                         
+                     
 			atomic_compare_exchange_strong_explicit((_Atomic uint64_t *)approx_time_base,
 			    &saved_data, abstime, memory_order_relaxed, memory_order_relaxed);
 		}
@@ -510,10 +510,10 @@ commpage_update_mach_approximate_time(uint64_t abstime)
 #endif
 }
 
-/*
- * update the commpage data's total system sleep time for
- * userspace call to mach_continuous_time()
- */
+  
+                                                         
+                                           
+   
 void
 commpage_update_mach_continuous_time(uint64_t sleeptime)
 {
@@ -526,7 +526,7 @@ commpage_update_mach_continuous_time(uint64_t sleeptime)
 		do {
 			old = *c_time_base;
 		} while (!OSCompareAndSwap64(old, sleeptime, c_time_base));
-#endif /* __arm64__ */
+#endif                
 	}
 }
 
@@ -536,9 +536,9 @@ commpage_update_mach_continuous_time_hw_offset(uint64_t offset)
 	*((uint64_t *)(_COMM_PAGE_CONT_HW_TIMEBASE + _COMM_PAGE_RW_OFFSET)) = offset;
 }
 
-/*
- * update the commpage's value for the boot time
- */
+  
+                                                
+   
 void
 commpage_update_boottime(uint64_t value)
 {
@@ -551,14 +551,14 @@ commpage_update_boottime(uint64_t value)
 		do {
 			old_value = *cp;
 		} while (!OSCompareAndSwap64(old_value, value, cp));
-#endif /* __arm64__ */
+#endif                
 	}
 }
 
-/*
- * set the commpage's remote time params for
- * userspace call to mach_bridge_remote_time()
- */
+  
+                                            
+                                              
+   
 void
 commpage_set_remotetime_params(double rate, uint64_t base_local_ts, uint64_t base_remote_ts)
 {
@@ -570,26 +570,26 @@ commpage_set_remotetime_params(double rate, uint64_t base_local_ts, uint64_t bas
 		paramsp->rate = rate;
 		paramsp->base_remote_ts = base_remote_ts;
 		__asm__ volatile ("dmb ish" ::: "memory");
-		paramsp->base_local_ts = base_local_ts;  //This will act as a generation count
+		paramsp->base_local_ts = base_local_ts;                                       
 #else
 		(void)rate;
 		(void)base_local_ts;
 		(void)base_remote_ts;
-#endif /* __arm64__ */
+#endif                
 	}
 }
 
 
-/*
- * After this counter has incremented, all running CPUs are guaranteed to
- * have quiesced, i.e. executed serially dependent memory barriers.
- * This is only tracked for CPUs running in userspace, therefore only useful
- * outside the kernel.
- *
- * Note that you can't know which side of those barriers your read was from,
- * so you have to observe 2 increments in order to ensure that you saw a
- * serially dependent barrier chain across all running CPUs.
- */
+  
+                                                                         
+                                                                   
+                                                                            
+                      
+  
+                                                                            
+                                                                        
+                                                            
+   
 uint64_t
 commpage_increment_cpu_quiescent_counter(void)
 {
@@ -601,14 +601,14 @@ commpage_increment_cpu_quiescent_counter(void)
 
 	_Atomic uint64_t *sched_gen = (_Atomic uint64_t *)(_COMM_PAGE_CPU_QUIESCENT_COUNTER +
 	    _COMM_PAGE_RW_OFFSET);
-	/*
-	 * On 32bit architectures, double-wide atomic load or stores are a CAS,
-	 * so the atomic increment is the most efficient way to increment the
-	 * counter.
-	 *
-	 * On 64bit architectures however, because the update is synchronized by
-	 * the cpu mask, relaxed loads and stores is more efficient.
-	 */
+	  
+                                                                        
+                                                                      
+            
+   
+                                                                         
+                                                             
+    
 #if __LP64__
 	old_gen = os_atomic_load(sched_gen, relaxed);
 	os_atomic_store(sched_gen, old_gen + 1, relaxed);
@@ -618,9 +618,9 @@ commpage_increment_cpu_quiescent_counter(void)
 	return old_gen;
 }
 
-/*
- * update the commpage with if dtrace user land probes are enabled
- */
+  
+                                                                  
+   
 void
 commpage_update_dof(boolean_t enabled)
 {
@@ -631,9 +631,9 @@ commpage_update_dof(boolean_t enabled)
 #endif
 }
 
-/*
- * update the dyld global config flags
- */
+  
+                                      
+   
 void
 commpage_update_dyld_flags(uint64_t value)
 {

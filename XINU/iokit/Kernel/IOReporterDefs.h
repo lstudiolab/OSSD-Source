@@ -29,9 +29,9 @@
 #ifndef _IOEPORTERDEFS_H
 #define _IOEPORTERDEFS_H
 
-//#include "IOReportHubCommon.h"
+                                
 
-//#define IORDEBUG_IOLOG
+                        
 
 #if defined(IORDEBUG_IOLOG)
 #define IORLOG(fmt, args...)    \
@@ -52,7 +52,7 @@ do {                            \
 #define IORERROR(fmt, args...)
 #endif
 
-// overflow detection routines
+                              
 #if (SIZE_T_MAX < INT_MAX)
 #error "(SIZE_T_MAX < INT_MAX) -> PREFL_MEMOP_*()) unsafe for size_t"
 #endif
@@ -77,7 +77,7 @@ do {                            \
     }  \
 } while(0)
 
-//#include "IOReportHubCommon.h"//
+                                  
 
 
 
@@ -110,4 +110,4 @@ do {                                                                    \
     }                                                                   \
 } while(0)                                                              \
 
-#endif /* ! _IOEPORTERDEFS_H */
+#endif                         

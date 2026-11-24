@@ -30,10 +30,10 @@ mach_timebase_info(mach_timebase_info_t info)
 {
 	static mach_timebase_info_data_t cached_info;
 
-	/*
-	 * This is racy, but because it is safe to initialize twice we avoid a
-	 * barrier in the fast path by risking double initialization.
-	 */
+	  
+                                                                       
+                                                              
+    
 	if (cached_info.numer == 0 || cached_info.denom == 0) {
 		kern_return_t kr = mach_timebase_info_trap(&cached_info);
 		if (kr != KERN_SUCCESS) {

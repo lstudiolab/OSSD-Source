@@ -82,7 +82,7 @@ class UserThreadObject(object):
                 retval = unsigned(getattr(self.saved_state, name))
             return retval
 
-        #TODO for i386
+                      
 
     def getName(self):
         return str(self.thread_id)
@@ -173,8 +173,8 @@ class UserProcess(target.Process):
         return 'T02' + self.getRegisterCombinedDataForThread(th_id) + 'threads:' + self.getThreadsInfo()+';'
 
     def getRegisterInfo(self, regnum):
-        #something similar to
-        #"name:x1;bitsize:64;offset:8;encoding:uint;format:hex;gcc:1;dwarf:1;set:General Purpose Registers;"
+                             
+                                                                                                            
         if regnum >= len(self.registerset):
             logging.debug("No register_info for number %d." % regnum)
             return 'E45'
@@ -191,8 +191,8 @@ class UserProcess(target.Process):
 
     def getProcessInfo(self):
         retval = ''
-        #pid:d22c;parent-pid:d34d;real-uid:ecf;real-gid:b;effective-uid:ecf;effective-gid:b;cputype:1000007;cpusubtype:3;
-        #ostype:macosx;vendor:apple;endian:little;ptrsize:8;
+                                                                                                                         
+                                                            
         pinfo = {'effective-uid': 'ecf', 'effective-gid': 'b', 'endian': 'little', 'vendor': 'apple'}
         pinfo['pid'] = "%x" % (GetProcPIDForTask(self.task))
         pinfo['parent-pid'] = "%x" % (unsigned(self.proc.p_ppid))

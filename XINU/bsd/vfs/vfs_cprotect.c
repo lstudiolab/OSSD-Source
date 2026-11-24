@@ -33,51 +33,51 @@
 #include <sys/content_protection.h>
 #include <libkern/crypto/sha1.h>
 #include <libkern/libkern.h>
-//for write protection
+                      
 #include <vm/vm_kern.h>
 #include <vm/vm_map.h>
 
 #define PTR_ADD(type, base, offset)             (type)((uintptr_t)(base) + (offset))
 
-// -- struct cpx --
+                   
 
-/*
- * This structure contains the unwrapped key and is passed to the lower layers.
- * It is private so users must use the accessors declared in sys/cprotect.h
- * to read/write it.
- */
+  
+                                                                               
+                                                                           
+                    
+   
 
-// cpx_flags defined in cprotect.h
+                                  
 enum {
 	CPX_SEP_WRAPPEDKEY                      = 0x01,
 	CPX_IV_AES_CTX_INITIALIZED      = 0x02,
 	CPX_USE_OFFSET_FOR_IV           = 0x04,
 
-	// Using AES IV context generated from key
+	                                          
 	CPX_IV_AES_CTX_VFS                      = 0x08,
 	CPX_SYNTHETIC_OFFSET_FOR_IV = 0x10,
 	CPX_COMPOSITEKEY            = 0x20,
 
-	//write page protection
+	                       
 	CPX_WRITE_PROTECTABLE           = 0x40
 };
 
-/*
- * variable-length CPX structure. See fixed-length variant in cprotect.h
- */
+  
+                                                                        
+   
 struct cpx {
 #if DEBUG
 	uint32_t                cpx_magic1;
 #endif
-	aes_encrypt_ctx         *cpx_iv_aes_ctx_ptr;// Pointer to context used for generating the IV
+	aes_encrypt_ctx         *cpx_iv_aes_ctx_ptr;                                                
 	cpx_flags_t             cpx_flags;
 	uint16_t                cpx_max_key_len;
 	uint16_t                cpx_key_len;
-	//fixed length up to here.  cpx_cached_key is variable-length
+	                                                             
 	uint8_t                 cpx_cached_key[];
 };
 
-/* Allows us to switch between CPX types */
+                                           
 typedef union cpxunion {
 	struct cpx cpx_var;
 	fcpx_t cpx_fixed;
@@ -88,14 +88,14 @@ ZONE_DECLARE(cpx_zone, "cpx",
 ZONE_DECLARE(aes_ctz_zone, "AES ctx",
     sizeof(aes_encrypt_ctx), ZC_ZFREE_CLEARMEM | ZC_NOENCRYPT);
 
-// Note: see struct fcpx defined in sys/cprotect.h
+                                                  
 
-// -- cpx_t accessors --
+                        
 
 size_t
 cpx_size(size_t key_len)
 {
-	// This should pick up the 'magic' word in DEBUG for free.
+	                                                          
 	size_t size = sizeof(struct cpx) + key_len;
 
 	return size;
@@ -113,48 +113,48 @@ cpx_alloc(size_t key_len, bool needs_ctx)
 	cpx_t cpx = NULL;
 
 #if CONFIG_KEYPAGE_WP
-	/*
-	 * Macs only use 1 key per volume, so force it into its own page.
-	 * This way, we can write-protect as needed.
-	 */
+	  
+                                                                  
+                                             
+    
 	size_t cpsize = cpx_size(key_len);
 
-	// silence warning for needs_ctx
+	                                
 	(void) needs_ctx;
 
 	if (cpsize < PAGE_SIZE) {
-		/*
-		 * Don't use MALLOC to allocate the page-sized structure.  Instead,
-		 * use kmem_alloc to bypass KASAN since we are supplying our own
-		 * unilateral write protection on this page. Note that kmem_alloc
-		 * can block.
-		 */
+		  
+                                                                     
+                                                                  
+                                                                   
+               
+     
 		if (kmem_alloc(kernel_map, (vm_offset_t *)&cpx, PAGE_SIZE, VM_KERN_MEMORY_FILE)) {
-			/*
-			 * returning NULL at this point (due to failed allocation) would just
-			 * result in a panic. fall back to attempting a normal MALLOC, and don't
-			 * let the cpx get marked PROTECTABLE.
-			 */
+			  
+                                                                        
+                                                                           
+                                         
+      
 			MALLOC(cpx, cpx_t, cpx_size(key_len), M_TEMP, M_WAITOK);
 		} else {
-			//mark the page as protectable, since kmem_alloc succeeded.
+			                                                           
 			cpx->cpx_flags |= CPX_WRITE_PROTECTABLE;
 		}
 	} else {
 		panic("cpx_size too large ! (%lu)", cpsize);
 	}
 #else
-	/* If key page write protection disabled, just switch to zalloc */
+	                                                                  
 
-	// error out if you try to request a key that's too big
+	                                                       
 	if (key_len > VFS_CP_MAX_CACHEBUFLEN) {
 		return NULL;
 	}
 
-	// the actual key array is fixed-length, but the amount of usable content can vary, via 'key_len'
+	                                                                                                 
 	cpx = zalloc_flags(cpx_zone, Z_WAITOK | Z_ZERO);
 
-	// if our encryption type needs it, alloc the context
+	                                                     
 	if (needs_ctx) {
 		cpx_alloc_ctx(cpx);
 	}
@@ -172,12 +172,12 @@ cpx_alloc_ctx(cpx_t cpx)
 	(void) cpx;
 #else
 	if (cpx->cpx_iv_aes_ctx_ptr) {
-		// already allocated?
+		                     
 		return 0;
 	}
 
 	cpx->cpx_iv_aes_ctx_ptr = zalloc_flags(aes_ctz_zone, Z_WAITOK | Z_ZERO);
-#endif // CONFIG_KEYPAGE_WP
+#endif                     
 
 	return 0;
 }
@@ -191,7 +191,7 @@ cpx_free_ctx(cpx_t cpx)
 	if (cpx->cpx_iv_aes_ctx_ptr) {
 		zfree(aes_ctz_zone, cpx->cpx_iv_aes_ctx_ptr);
 	}
-#endif // CONFIG_KEYPAGE_WP
+#endif                     
 }
 
 void
@@ -210,8 +210,8 @@ cpx_writeprotect(cpx_t cpx)
 }
 
 #if DEBUG
-static const uint32_t cpx_magic1 = 0x7b787063;          // cpx{
-static const uint32_t cpx_magic2 = 0x7870637d;          // }cpx
+static const uint32_t cpx_magic1 = 0x7b787063;                 
+static const uint32_t cpx_magic2 = 0x7870637d;                 
 #endif
 
 void
@@ -223,21 +223,21 @@ cpx_free(cpx_t cpx)
 #endif
 
 #if CONFIG_KEYPAGE_WP
-	/* unprotect the page before bzeroing */
+	                                        
 	void *cpxstart = (void*)cpx;
 	void *cpxend = (void*)((uint8_t*)cpx + PAGE_SIZE);
 	if (cpx->cpx_flags & CPX_WRITE_PROTECTABLE) {
 		vm_map_protect(kernel_map, (vm_map_offset_t)cpxstart, (vm_map_offset_t)cpxend, (VM_PROT_DEFAULT), FALSE);
 
-		//now zero the memory after un-protecting it
+		                                            
 		bzero(cpx->cpx_cached_key, cpx->cpx_max_key_len);
 
-		//If we are here, then we used kmem_alloc to get the page. Must use kmem_free to drop it.
+		                                                                                         
 		kmem_free(kernel_map, (vm_offset_t)cpx, PAGE_SIZE);
 		return;
 	}
 #else
-	// free the context if it wasn't already freed
+	                                              
 	cpx_free_ctx(cpx);
 	zfree(cpx_zone, cpx);
 	return;
@@ -339,12 +339,12 @@ cpx_set_key_len(struct cpx *cpx, uint16_t key_len)
 	cpx->cpx_key_len = key_len;
 
 	if (ISSET(cpx->cpx_flags, CPX_IV_AES_CTX_VFS)) {
-		/*
-		 * We assume that if the key length is being modified, the key
-		 * has changed.  As a result, un-set any bits related to the
-		 * AES context, if needed. They should be re-generated
-		 * on-demand.
-		 */
+		  
+                                                                
+                                                              
+                                                        
+               
+     
 		CLR(cpx->cpx_flags, CPX_IV_AES_CTX_INITIALIZED | CPX_IV_AES_CTX_VFS);
 	}
 }
@@ -382,15 +382,15 @@ cpx_iv_aes_ctx(struct cpx *cpx)
 	}
 
 	SHA1_CTX sha1ctxt;
-	uint8_t digest[SHA_DIGEST_LENGTH]; /* Kiv */
+	uint8_t digest[SHA_DIGEST_LENGTH];          
 
-	/* First init the cp_cache_iv_key[] */
+	                                      
 	SHA1Init(&sha1ctxt);
 
-	/*
-	 * We can only use this when the keys are generated in the AP; As a result
-	 * we only use the first 32 bytes of key length in the cache key
-	 */
+	  
+                                                                           
+                                                                 
+    
 	SHA1Update(&sha1ctxt, cpx->cpx_cached_key, cpx->cpx_key_len);
 	SHA1Final(digest, &sha1ctxt);
 
@@ -425,7 +425,7 @@ cpx_copy(const struct cpx *src, cpx_t dst)
 	memcpy(cpx_key(dst), cpx_key(src), key_len);
 	dst->cpx_flags = src->cpx_flags;
 	if (ISSET(dst->cpx_flags, CPX_IV_AES_CTX_INITIALIZED)) {
-		*(dst->cpx_iv_aes_ctx_ptr) = *(src->cpx_iv_aes_ctx_ptr); // deep copy
+		*(dst->cpx_iv_aes_ctx_ptr) = *(src->cpx_iv_aes_ctx_ptr);             
 	}
 }
 
@@ -499,13 +499,13 @@ cp_key_store_action_for_volume(uuid_t volume_uuid, cp_key_store_action_t action)
 int
 cp_is_valid_class(int isdir, int32_t protectionclass)
 {
-	/*
-	 * The valid protection classes are from 0 -> N
-	 * We use a signed argument to detect unassigned values from
-	 * directory entry creation time in HFS.
-	 */
+	  
+                                                
+                                                             
+                                         
+    
 	if (isdir) {
-		/* Directories are not allowed to have F, but they can have "NONE" */
+		                                                                     
 		return (protectionclass >= PROTECTION_CLASS_DIR_NONE) &&
 		       (protectionclass <= PROTECTION_CLASS_D);
 	} else {
@@ -514,11 +514,11 @@ cp_is_valid_class(int isdir, int32_t protectionclass)
 	}
 }
 
-/*
- * Parses versions of the form 12A316, i.e. <major><minor><revision> and
- * returns a uint32_t in the form 0xaabbcccc where aa = <major>,
- * bb = <ASCII char>, cccc = <revision>.
- */
+  
+                                                                        
+                                                                
+                                        
+   
 static cp_key_os_version_t
 parse_os_version(const char *vers)
 {

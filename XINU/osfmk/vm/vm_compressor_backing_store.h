@@ -43,13 +43,13 @@
 
 #define MAX_SWAP_FILE_SIZE              (128 * 1024 * 1024ULL)
 
-#else /* !XNU_TARGET_OS_OSX */
+#else                         
 
 #define MIN_SWAP_FILE_SIZE              (256 * 1024 * 1024ULL)
 
 #define MAX_SWAP_FILE_SIZE              (1 * 1024 * 1024 * 1024ULL)
 
-#endif /* !XNU_TARGET_OS_OSX */
+#endif                         
 
 #define COMPRESSED_SWAP_CHUNK_SIZE      (C_SEG_BUFSIZE)
 
@@ -117,7 +117,7 @@ extern int vm_swapfile_io(struct vnode *vp, uint64_t offset, uint64_t start, int
 #if CONFIG_FREEZE
 boolean_t vm_swap_max_budget(uint64_t *);
 int vm_swap_vol_get_budget(struct vnode* vp, uint64_t *freeze_daily_budget);
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 #if RECORD_THE_COMPRESSED_DATA
 extern int vm_record_file_write(struct vnode *vp, uint64_t offset, char *buf, int size);

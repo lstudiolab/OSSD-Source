@@ -38,28 +38,28 @@
 #include <libkern/crypto/md5.h>
 #include <libkern/crypto/crypto_internal.h>
 
-/*
- * Since all records are located contiguously in memory,
- * we use indices to them as the primary lookup mechanism,
- * and to maintain the linked list of active records
- * in chronological order.
- */
-#define BTLOG_MAX_RECORDS (0xFFFFFF /* 16777215 */ )
+  
+                                                        
+                                                          
+                                                    
+                          
+   
+#define BTLOG_MAX_RECORDS (0xFFFFFF                )
 #define BTLOG_RECORDINDEX_NONE (0xFFFFFF)
 
-/*
- * Each record is a stack with a reference count and a list of
- * log elements that refer to it.
- *
- * Each log element is placed in a hash bucket that is contained
- * within the btlog structure. It contains the index to the record
- * that it references.
- *
- * So you can go from an address to the corresp. stack by hashing the address,
- * finding the hash head and traversing the chain of log elements
- * till you find the hash bucket with an address that matches your
- * address (if it exists) or creating a new bucket to hold this new address.
- */
+  
+                                                              
+                                 
+  
+                                                                
+                                                                  
+                      
+  
+                                                                              
+                                                                 
+                                                                  
+                                                                            
+   
 
 #define ELEMENT_HASH_BUCKET_COUNT (256)
 #define BTLOG_HASHELEMINDEX_NONE BTLOG_RECORDINDEX_NONE
@@ -67,18 +67,18 @@
 #define ZELEMS_DEFAULT  (8000)
 size_t  zelems_count = 0;
 
-typedef uint32_t btlog_recordindex_t; /* only 24 bits used */
+typedef uint32_t btlog_recordindex_t;                        
 
-/*
- * Queue head for the queue of elements connected to a particular record (stack).
- * For quick removal of the oldest element referencing the least popular stack. Useful for LEAKS mode.
- */
+  
+                                                                                 
+                                                                                                      
+   
 TAILQ_HEAD(_element_record_queue, btlog_element);
 
-/*
- * Queue head for the queue of elements that hash to the same bucket.
- * For quick removal of the oldest element ever logged.  Useful for CORRUPTION mode where we use only bucket i.e. FIFO.
- */
+  
+                                                                     
+                                                                                                                       
+   
 TAILQ_HEAD(_element_hash_queue, btlog_element);
 
 typedef struct btlog_record {
@@ -87,32 +87,32 @@ typedef struct btlog_record {
 	uint32_t            ref_count;
 	uint32_t            bthash;
 	struct _element_record_queue        element_record_queue;
-	void                *bt[];/* variable sized, based on btlog_t params */
+	void                *bt[];                                             
 } btlog_record_t;
 
 typedef struct btlog_element {
 	btlog_recordindex_t     recindex:24,
 	    operation:8;
 	uintptr_t elem;
-	TAILQ_ENTRY(btlog_element) element_record_link; /* Links to other elements pointing to the same stack. */
+	TAILQ_ENTRY(btlog_element) element_record_link;                                                          
 
-	TAILQ_ENTRY(btlog_element) element_hash_link; /* Links to other elements in the same hash chain.
-	                                               * During LEAKS mode, this is used as a singly-linked list because
-	                                               * we don't want to initialize ELEMENT_HASH_BUCKET_COUNT heads.
-	                                               *
-	                                               * During CORRUPTION mode with a single hash chain, this is used as a doubly-linked list.
-	                                               */
+	TAILQ_ENTRY(btlog_element) element_hash_link;                                                   
+                                                                                                                 
+                                                                                                              
+                                                 
+                                                                                                                                        
+                                                  
 } btlog_element_t;
 
 struct btlog {
-	vm_address_t    btlog_buffer;   /* all memory for this btlog_t */
+	vm_address_t    btlog_buffer;                                    
 	vm_size_t       btlog_buffersize;
 
-	uintptr_t       btrecords;  /* use btlog_recordindex_t to lookup */
-	size_t          btrecord_btdepth;/* BT entries per record */
+	uintptr_t       btrecords;                                         
+	size_t          btrecord_btdepth;                           
 	size_t          btrecord_size;
 
-	btlog_recordindex_t head; /* active record list */
+	btlog_recordindex_t head;                         
 	btlog_recordindex_t tail;
 	btlog_recordindex_t activerecord;
 	btlog_recordindex_t freelist_records;
@@ -121,15 +121,15 @@ struct btlog {
 	size_t              active_element_count;
 	btlog_element_t     *freelist_elements;
 	union {
-		btlog_element_t                 **elem_recindex_hashtbl; /* LEAKS mode: We use an array of ELEMENT_HASH_BUCKET_COUNT buckets. */
-		struct _element_hash_queue      *element_hash_queue; /* CORRUPTION mode: We use a single hash bucket i.e. queue */
+		btlog_element_t                 **elem_recindex_hashtbl;                                                                        
+		struct _element_hash_queue      *element_hash_queue;                                                              
 	} elem_linkage_un;
 
 	decl_simple_lock_data(, btlog_lock);
-	boolean_t   caller_will_remove_entries_for_element;/* If TRUE, this means that the caller is interested in keeping track of abandoned / leaked elements.
-	                                                    * And so they want to be in charge of explicitly removing elements. Depending on this variable we
-	                                                    * will choose what kind of data structure to use for the elem_linkage_un union above.
-	                                                    */
+	boolean_t   caller_will_remove_entries_for_element;                                                                                                     
+                                                                                                                                                      
+                                                                                                                                          
+                                                       
 };
 
 #define lookup_btrecord(btlog, index) \
@@ -157,24 +157,24 @@ lookup_btrecord_byhash(btlog_t *btlog, uint32_t md5_hash, void *bt[], size_t btc
 	while (recindex != BTLOG_RECORDINDEX_NONE) {
 		assert(!TAILQ_EMPTY(&record->element_record_queue));
 		if (record->bthash == md5_hash) {
-			/*
-			 * Make sure that the incoming stack actually matches the
-			 * stack in this record. Since we only save off a
-			 * part of the md5 hash there can be collisions sometimes.
-			 * This comparison isn't costly because, in case of collisions,
-			 * usually the first few frames are different.
-			 */
+			  
+                                                            
+                                                    
+                                                             
+                                                                  
+                                                 
+      
 
 			stack_matched = TRUE;
 
 			if (btcount < btlog->btrecord_btdepth) {
 				if (record->bt[btcount] != NULL) {
-					/*
-					 * If the stack depth passed in is smaller than
-					 * the recorded stack and we have a valid pointer
-					 * in the recorded stack at that depth, then we
-					 * don't need to do any further checks.
-					 */
+					  
+                                                    
+                                                      
+                                                    
+                                            
+        
 					stack_matched = FALSE;
 					goto next;
 				}
@@ -254,7 +254,7 @@ btlog_create(size_t numrecords,
 		return NULL;
 	}
 
-	/* btlog_record_t is variable-sized, calculate needs now */
+	                                                           
 	btrecord_size = sizeof(btlog_record_t)
 	    + sizeof(void *) * record_btdepth;
 
@@ -262,20 +262,20 @@ btlog_create(size_t numrecords,
 	buffersize_needed = round_page(buffersize_needed);
 
 	if (zelems_count == 0) {
-		zelems_count = ((max_mem + (1024 * 1024 * 1024) /*GB*/) >> 30) * ZELEMS_DEFAULT;
+		zelems_count = ((max_mem + (1024 * 1024 * 1024)       ) >> 30) * ZELEMS_DEFAULT;
 
 		if (PE_parse_boot_argn("zelems", &zelems_count, sizeof(zelems_count)) == TRUE) {
-			/*
-			 * Need a max? With this scheme, it should be possible to tune the default
-			 * so that we don't need a boot-arg to request more elements.
-			 */
+			  
+                                                                             
+                                                                
+      
 			printf("Set number of log elements per btlog to: %ld\n", zelems_count);
 		}
 	}
 	elemsize_needed = sizeof(btlog_element_t) * zelems_count;
 	elemsize_needed = round_page(elemsize_needed);
 
-	/* since rounding to a page size might hold more, recalculate */
+	                                                                
 	numrecords = MIN(BTLOG_MAX_RECORDS,
 	    (buffersize_needed - sizeof(btlog_t)) / btrecord_size);
 
@@ -346,15 +346,15 @@ btlog_create(size_t numrecords,
 		btlog->elem_linkage_un.elem_recindex_hashtbl[i] = 0;
 	}
 
-	/* populate freelist_records with all records in order */
+	                                                         
 	btlog->freelist_records = 0;
 	for (i = 0; i < (numrecords - 1); i++) {
 		btlog_record_t *rec = lookup_btrecord(btlog, i);
 		rec->next = (btlog_recordindex_t)(i + 1);
 	}
-	lookup_btrecord(btlog, i)->next = BTLOG_RECORDINDEX_NONE; /* terminate */
+	lookup_btrecord(btlog, i)->next = BTLOG_RECORDINDEX_NONE;                
 
-	/* populate freelist_elements with all elements in order */
+	                                                           
 	free_elem = (uintptr_t)btlog->freelist_elements;
 
 	for (i = 0; i < (zelems_count - 1); i++) {
@@ -367,17 +367,17 @@ btlog_create(size_t numrecords,
 	return btlog;
 }
 
-/* Assumes btlog is already locked */
+                                     
 static btlog_recordindex_t
 btlog_get_record_from_freelist(btlog_t *btlog)
 {
 	btlog_recordindex_t     recindex = btlog->freelist_records;
 
 	if (recindex == BTLOG_RECORDINDEX_NONE) {
-		/* nothing on freelist */
+		                         
 		return BTLOG_RECORDINDEX_NONE;
 	} else {
-		/* remove the head of the freelist_records */
+		                                             
 		btlog_record_t *record = lookup_btrecord(btlog, recindex);
 		btlog->freelist_records = record->next;
 		return recindex;
@@ -407,7 +407,7 @@ btlog_add_record_to_freelist(btlog_t *btlog, btlog_recordindex_t recindex)
 		btlog->freelist_records = recindex;
 
 		if (btlog->head == BTLOG_RECORDINDEX_NONE) {
-			/* active list is now empty, update tail */
+			                                           
 			btlog->tail = BTLOG_RECORDINDEX_NONE;
 			assert(btlog->active_record_count == 0);
 		}
@@ -433,7 +433,7 @@ btlog_add_record_to_freelist(btlog_t *btlog, btlog_recordindex_t recindex)
 }
 
 
-/* Assumes btlog is already locked */
+                                     
 static void
 btlog_evict_elements_from_record(btlog_t *btlog, int num_elements_to_evict)
 {
@@ -442,14 +442,14 @@ btlog_evict_elements_from_record(btlog_t *btlog, int num_elements_to_evict)
 	btlog_element_t         *recelem = NULL;
 
 	if (recindex == BTLOG_RECORDINDEX_NONE) {
-		/* nothing on active list */
+		                            
 		panic("BTLog: Eviction requested on btlog (0x%lx) with an empty active list.\n", (uintptr_t) btlog);
 	} else {
 		while (num_elements_to_evict) {
-			/*
-			 * LEAKS: reap the oldest element within the record with the lowest refs.
-			 * CORRUPTION: reap the oldest element overall and drop its reference on the record
-			 */
+			  
+                                                                            
+                                                                                      
+      
 
 			if (btlog->caller_will_remove_entries_for_element) {
 				uint32_t                max_refs_threshold = UINT32_MAX;
@@ -462,7 +462,7 @@ btlog_evict_elements_from_record(btlog_t *btlog, int num_elements_to_evict)
 					record  = lookup_btrecord(btlog, recindex);
 
 					if (btlog->activerecord == recindex || record->ref_count > max_refs_threshold) {
-						/* skip this record */
+						                      
 					} else {
 						prev_evictindex = precindex;
 						evict_index = recindex;
@@ -487,9 +487,9 @@ btlog_evict_elements_from_record(btlog_t *btlog, int num_elements_to_evict)
 				record = lookup_btrecord(btlog, recindex);
 			}
 
-			/*
-			 * Here we have the element to drop (recelem), its record and the record index.
-			 */
+			  
+                                                                                  
+      
 
 			while (recelem && num_elements_to_evict) {
 				TAILQ_REMOVE(&record->element_record_queue, recelem, element_record_link);
@@ -535,10 +535,10 @@ btlog_evict_elements_from_record(btlog_t *btlog, int num_elements_to_evict)
 				if (record->ref_count == 0) {
 					btlog_add_record_to_freelist(btlog, recindex);
 
-					/*
-					 * LEAKS: All done with this record. Need the next least popular record.
-					 * CORRUPTION: We don't care about records. We'll just pick the next oldest element.
-					 */
+					  
+                                                                             
+                                                                                         
+        
 
 					if (btlog->caller_will_remove_entries_for_element) {
 						break;
@@ -557,14 +557,14 @@ btlog_evict_elements_from_record(btlog_t *btlog, int num_elements_to_evict)
 	}
 }
 
-/* Assumes btlog is already locked */
+                                     
 static void
 btlog_append_record_to_activelist(btlog_t *btlog, btlog_recordindex_t recindex)
 {
 	assert(recindex != BTLOG_RECORDINDEX_NONE);
 
 	if (btlog->head == BTLOG_RECORDINDEX_NONE) {
-		/* empty active list, update both head and tail */
+		                                                  
 		btlog->head = btlog->tail = recindex;
 	} else {
 		btlog_record_t *record = lookup_btrecord(btlog, btlog->tail);
@@ -583,11 +583,11 @@ retry:
 	free_elem = btlog->freelist_elements;
 
 	if ((uintptr_t)free_elem == BTLOG_HASHELEMINDEX_NONE) {
-		/* nothing on freelist */
+		                         
 		btlog_evict_elements_from_record(btlog, 1);
 		goto retry;
 	} else {
-		/* remove the head of the freelist */
+		                                     
 		uintptr_t next_elem = *(uintptr_t*)free_elem;
 		btlog->freelist_elements = (btlog_element_t *)next_elem;
 		return free_elem;
@@ -642,17 +642,17 @@ btlog_add_entry(btlog_t *btlog,
 		assert(record->operation == operation);
 	} else {
 retry:
-		/* If there's a free record, use it */
+		                                      
 		recindex = btlog_get_record_from_freelist(btlog);
 		if (recindex == BTLOG_RECORDINDEX_NONE) {
-			/* Use the first active record (FIFO age-out) */
+			                                                
 			btlog_evict_elements_from_record(btlog, ((2 * sizeof(btlog_record_t)) / sizeof(btlog_element_t)));
 			goto retry;
 		}
 
 		record = lookup_btrecord(btlog, recindex);
 
-		/* we always add to the tail, so there is no next pointer */
+		                                                            
 		record->next = BTLOG_RECORDINDEX_NONE;
 		record->operation = operation;
 		record->bthash = md5_buffer[0];
@@ -828,11 +828,11 @@ btlog_copy_backtraces_for_elements(btlog_t      * btlog,
 	btlog_unlock(btlog);
 }
 
-/*
- * Returns the number of records in the btlog struct.
- *
- * Called by the mach_zone_get_btlog_records() MIG routine.
- */
+  
+                                                     
+  
+                                                           
+   
 size_t
 get_btlog_records_count(btlog_t *btlog)
 {
@@ -842,12 +842,12 @@ get_btlog_records_count(btlog_t *btlog)
 	return (btlog->btlog_buffersize - sizeof(btlog_t)) / btlog->btrecord_size;
 }
 
-/*
- * Copies out relevant info from btlog_record_t's to zone_btrecord_t's. 'numrecs' points to the number of records
- * the 'records' buffer can hold. Upon return 'numrecs' points to the number of records actually copied out.
- *
- * Called by the mach_zone_get_btlog_records() MIG routine.
- */
+  
+                                                                                                                 
+                                                                                                            
+  
+                                                           
+   
 void
 get_btlog_records(btlog_t *btlog, zone_btrecord_t *records, unsigned int *numrecs)
 {
@@ -862,7 +862,7 @@ get_btlog_records(btlog_t *btlog, zone_btrecord_t *records, unsigned int *numrec
 	if (btlog->btlog_buffersize > sizeof(btlog_t)) {
 		count = (unsigned int)((btlog->btlog_buffersize - sizeof(btlog_t)) / btlog->btrecord_size);
 	}
-	/* Copy out only as many records as the pre-allocated buffer size permits. */
+	                                                                             
 	if (count > *numrecs) {
 		count = *numrecs;
 	}
@@ -890,4 +890,4 @@ get_btlog_records(btlog_t *btlog, zone_btrecord_t *records, unsigned int *numrec
 	btlog_unlock(btlog);
 }
 
-#endif  /* DEBUG || DEVELOPMENT */
+#endif                            

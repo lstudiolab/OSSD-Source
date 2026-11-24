@@ -67,28 +67,28 @@
 #include <net/if_mib.h>
 #include <net/if_var.h>
 
-/*
- * A sysctl(3) MIB for generic interface information.  This information
- * is exported in the net.link.generic branch, which has the following
- * structure:
- *
- * net.link.generic	.system			- system-wide control variables
- *						  and statistics (node)
- *			.ifdata.<ifindex>.general
- *						- what's in `struct ifdata'
- *						  plus some other info
- *			.ifdata.<ifindex>.linkspecific
- *						- a link-type-specific data
- *						  structure (as might be used
- *						  by an SNMP agent
- *
- * Perhaps someday we will make addresses accessible via this interface
- * as well (then there will be four such...).  The reason that the
- * index comes before the last element in the name is because it
- * seems more orthogonal that way, particularly with the possibility
- * of other per-interface data living down here as well (e.g., integrated
- * services stuff).
- */
+  
+                                                                       
+                                                                      
+             
+  
+                                                             
+                               
+                              
+                                   
+                              
+                                   
+                                   
+                                     
+                          
+  
+                                                                       
+                                                                  
+                                                                
+                                                                    
+                                                                         
+                   
+   
 
 SYSCTL_DECL(_net_link_generic);
 
@@ -121,9 +121,9 @@ make_ifmibdata(struct ifnet *ifp, int *name, struct sysctl_req *req)
 
 	case IFDATA_GENERAL:
 		bzero(&ifmd, sizeof(ifmd));
-		/*
-		 * Make sure the interface is in use
-		 */
+		  
+                                      
+     
 		if (ifnet_is_attached(ifp, 0)) {
 			snprintf(ifmd.ifmd_name, sizeof(ifmd.ifmd_name), "%s",
 			    if_name(ifp));
@@ -162,7 +162,7 @@ make_ifmibdata(struct ifnet *ifp, int *name, struct sysctl_req *req)
 		ifp->if_snd.ifq_maxlen = ifmd.ifmd_snd_maxlen;
 		ifp->if_snd.ifq_drops = ifmd.ifmd_snd_drops;
 #undef COPY
-#endif /* IF_MIB_WR */
+#endif                
 		break;
 
 	case IFDATA_LINKSPECIFIC:
@@ -176,7 +176,7 @@ make_ifmibdata(struct ifnet *ifp, int *name, struct sysctl_req *req)
 		if (error) {
 			break;
 		}
-#endif /* IF_MIB_WR */
+#endif                
 		break;
 
 	case IFDATA_SUPPLEMENTAL: {
@@ -210,7 +210,7 @@ make_ifmibdata(struct ifnet *ifp, int *name, struct sysctl_req *req)
 }
 
 int
-sysctl_ifdata SYSCTL_HANDLER_ARGS /* XXX bad syntax! */
+sysctl_ifdata SYSCTL_HANDLER_ARGS                      
 {
 #pragma unused(oidp)
 	int *name = (int *)arg1;
@@ -241,7 +241,7 @@ sysctl_ifdata SYSCTL_HANDLER_ARGS /* XXX bad syntax! */
 }
 
 int
-sysctl_ifalldata SYSCTL_HANDLER_ARGS /* XXX bad syntax! */
+sysctl_ifalldata SYSCTL_HANDLER_ARGS                      
 {
 #pragma unused(oidp)
 	int *name = (int *)arg1;

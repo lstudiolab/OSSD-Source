@@ -31,26 +31,26 @@
 #include <kern/kalloc.h>
 #include <machine/cpu_affinity.h>
 
-/*
- * Affinity involves 2 objects:
- * - affinity namespace:
- *	shared by a task family, this controls affinity tag lookup and
- *	allocation; it anchors all affinity sets in one namespace
- * - affinity set:
- *      anchors all threads with membership of this affinity set
- *	and which share an affinity tag in the owning namespace.
- *
- * Locking:
- * - The task lock protects the creation of an affinity namespace.
- * - The affinity namespace mutex protects the inheritance of a namespace
- *   and its thread membership. This includes its destruction when the task
- *   reference count goes to zero.
- * - The thread mutex protects a thread's affinity set membership, but in
- *   addition, the thread_lock is taken to write thread->affinity_set since this
- *   field (representng the active affinity set) is read by the scheduler.
- *
- * The lock ordering is: task lock, thread mutex, namespace mutex, thread lock.
- */
+  
+                               
+                        
+                                                                 
+                                                            
+                  
+                                                                
+                                                           
+  
+           
+                                                                  
+                                                                         
+                                                                           
+                                  
+                                                                         
+                                                                                
+                                                                          
+  
+                                                                               
+   
 
 #if AFFINITY_DEBUG
 #define DBG(x...)       kprintf("DBG: " x)
@@ -74,23 +74,23 @@ static void affinity_set_place(affinity_space_t aspc, affinity_set_t aset);
 static void affinity_set_add(affinity_set_t aset, thread_t thread);
 static affinity_set_t affinity_set_remove(affinity_set_t aset, thread_t thread);
 
-/*
- * The following globals may be modified by the sysctls
- *   kern.affinity_sets_enabled	- disables hinting if cleared
- *   kern.affinity_sets_mapping	- controls cache distribution policy
- * See bsd/kern_sysctl.c
- *
- * Affinity sets are not used on embedded, which typically only
- * has a single pset, and last-processor affinity is
- * more important than pset affinity.
- */
+  
+                                                       
+                                                             
+                                                                    
+                        
+  
+                                                               
+                                                    
+                                     
+   
 #if !defined(XNU_TARGET_OS_OSX)
 boolean_t       affinity_sets_enabled = FALSE;
 int             affinity_sets_mapping = 0;
-#else /* !defined(XNU_TARGET_OS_OSX) */
+#else                                  
 boolean_t       affinity_sets_enabled = TRUE;
 int             affinity_sets_mapping = 1;
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 boolean_t
 thread_affinity_is_supported(void)
@@ -99,11 +99,11 @@ thread_affinity_is_supported(void)
 }
 
 
-/*
- * thread_affinity_get()
- * Return the affinity tag for a thread.
- * Called with the thread mutex held.
- */
+  
+                        
+                                        
+                                     
+   
 uint32_t
 thread_affinity_get(thread_t thread)
 {
@@ -119,11 +119,11 @@ thread_affinity_get(thread_t thread)
 }
 
 
-/*
- * thread_affinity_set()
- * Place a thread in an affinity set identified by a tag.
- * Called with thread referenced but not locked.
- */
+  
+                        
+                                                         
+                                                
+   
 kern_return_t
 thread_affinity_set(thread_t thread, uint32_t tag)
 {
@@ -156,7 +156,7 @@ thread_affinity_set(thread_t thread, uint32_t tag)
 
 	thread_mtx_lock(thread);
 	if (!thread->active) {
-		/* Beaten to lock and the thread is dead */
+		                                           
 		thread_mtx_unlock(thread);
 		return KERN_TERMINATED;
 	}
@@ -164,9 +164,9 @@ thread_affinity_set(thread_t thread, uint32_t tag)
 	lck_mtx_lock(&aspc->aspc_lock);
 	aset = thread->affinity_set;
 	if (aset != NULL) {
-		/*
-		 * Remove thread from current affinity set
-		 */
+		  
+                                            
+     
 		DBG("thread_affinity_set(%p,%u) removing from aset %p\n",
 		    thread, tag, aset);
 		empty_aset = affinity_set_remove(aset, thread);
@@ -175,16 +175,16 @@ thread_affinity_set(thread_t thread, uint32_t tag)
 	if (tag != THREAD_AFFINITY_TAG_NULL) {
 		aset = affinity_set_find(aspc, tag);
 		if (aset != NULL) {
-			/*
-			 * Add thread to existing affinity set
-			 */
+			  
+                                         
+      
 			DBG("thread_affinity_set(%p,%u) found aset %p\n",
 			    thread, tag, aset);
 		} else {
-			/*
-			 * Use the new affinity set, add this thread
-			 * and place it in a suitable processor set.
-			 */
+			  
+                                               
+                                               
+      
 			if (empty_aset != NULL) {
 				aset = empty_aset;
 				empty_aset = NULL;
@@ -207,10 +207,10 @@ thread_affinity_set(thread_t thread, uint32_t tag)
 	lck_mtx_unlock(&aspc->aspc_lock);
 	thread_mtx_unlock(thread);
 
-	/*
-	 * If we wound up not using an empty aset we created,
-	 * free it here.
-	 */
+	  
+                                                      
+                 
+    
 	if (empty_aset != NULL) {
 		affinity_set_free(empty_aset);
 	}
@@ -222,10 +222,10 @@ thread_affinity_set(thread_t thread, uint32_t tag)
 	return KERN_SUCCESS;
 }
 
-/*
- * task_affinity_create()
- * Called from task create.
- */
+  
+                         
+                           
+   
 void
 task_affinity_create(task_t parent_task, task_t child_task)
 {
@@ -235,20 +235,20 @@ task_affinity_create(task_t parent_task, task_t child_task)
 
 	assert(aspc);
 
-	/*
-	 * Bump the task reference count on the shared namespace and
-	 * give it to the child.
-	 */
+	  
+                                                             
+                         
+    
 	lck_mtx_lock(&aspc->aspc_lock);
 	aspc->aspc_task_count++;
 	child_task->affinity_space = aspc;
 	lck_mtx_unlock(&aspc->aspc_lock);
 }
 
-/*
- * task_affinity_deallocate()
- * Called from task_deallocate() when there's a namespace to dereference.
- */
+  
+                             
+                                                                         
+   
 void
 task_affinity_deallocate(task_t task)
 {
@@ -267,12 +267,12 @@ task_affinity_deallocate(task_t task)
 	}
 }
 
-/*
- * task_affinity_info()
- * Return affinity tag info (number, min, max) for the task.
- *
- * Conditions: task is locked.
- */
+  
+                       
+                                                            
+  
+                              
+   
 kern_return_t
 task_affinity_info(
 	task_t                  task,
@@ -311,11 +311,11 @@ task_affinity_info(
 	return KERN_SUCCESS;
 }
 
-/*
- * Called from thread_dup() during fork() with child's mutex held.
- * Set the child into the parent's affinity set.
- * Note the affinity space is shared.
- */
+  
+                                                                  
+                                                
+                                     
+   
 void
 thread_affinity_dup(thread_t parent, thread_t child)
 {
@@ -341,11 +341,11 @@ thread_affinity_dup(thread_t parent, thread_t child)
 	thread_mtx_unlock(parent);
 }
 
-/*
- * thread_affinity_terminate()
- * Remove thread from any affinity set.
- * Called with the thread mutex locked.
- */
+  
+                              
+                                       
+                                       
+   
 void
 thread_affinity_terminate(thread_t thread)
 {
@@ -362,11 +362,11 @@ thread_affinity_terminate(thread_t thread)
 	lck_mtx_unlock(&aspc->aspc_lock);
 }
 
-/*
- * thread_affinity_exec()
- * Called from execve() to cancel any current affinity - a new image implies
- * the calling thread terminates any expressed or inherited affinity.
- */
+  
+                         
+                                                                            
+                                                                     
+   
 void
 thread_affinity_exec(thread_t thread)
 {
@@ -375,9 +375,9 @@ thread_affinity_exec(thread_t thread)
 	}
 }
 
-/*
- * Create an empty affinity namespace data structure.
- */
+  
+                                                     
+   
 static affinity_space_t
 affinity_space_alloc(void)
 {
@@ -396,9 +396,9 @@ affinity_space_alloc(void)
 	return aspc;
 }
 
-/*
- * Destroy the given empty affinity namespace data structure.
- */
+  
+                                                             
+   
 static void
 affinity_space_free(affinity_space_t aspc)
 {
@@ -410,10 +410,10 @@ affinity_space_free(affinity_space_t aspc)
 }
 
 
-/*
- * Create an empty affinity set data structure
- * entering it into a list anchored by the owning task.
- */
+  
+                                              
+                                                       
+   
 static affinity_set_t
 affinity_set_alloc(void)
 {
@@ -435,10 +435,10 @@ affinity_set_alloc(void)
 	return aset;
 }
 
-/*
- * Destroy the given empty affinity set data structure
- * after removing it from the parent task.
- */
+  
+                                                      
+                                          
+   
 static void
 affinity_set_free(affinity_set_t aset)
 {
@@ -448,10 +448,10 @@ affinity_set_free(affinity_set_t aset)
 	kfree(aset, sizeof(struct affinity_set));
 }
 
-/*
- * Add a thread to an affinity set.
- * The caller must have the thread mutex and space locked.
- */
+  
+                                   
+                                                          
+   
 static void
 affinity_set_add(affinity_set_t aset, thread_t thread)
 {
@@ -468,10 +468,10 @@ affinity_set_add(affinity_set_t aset, thread_t thread)
 	splx(s);
 }
 
-/*
- * Remove a thread from an affinity set returning the set if now empty.
- * The caller must have the thread mutex and space locked.
- */
+  
+                                                                       
+                                                          
+   
 static affinity_set_t
 affinity_set_remove(affinity_set_t aset, thread_t thread)
 {
@@ -502,10 +502,10 @@ affinity_set_remove(affinity_set_t aset, thread_t thread)
 	}
 }
 
-/*
- * Find an affinity set in the parent task with the given affinity tag.
- * The caller must have the space locked.
- */
+  
+                                                                       
+                                         
+   
 static affinity_set_t
 affinity_set_find(affinity_space_t space, uint32_t tag)
 {
@@ -523,13 +523,13 @@ affinity_set_find(affinity_space_t space, uint32_t tag)
 	return NULL;
 }
 
-/*
- * affinity_set_place() assigns an affinity set to a suitable processor_set.
- * The selection criteria is:
- *  - the set currently occupied by the least number of affinities
- *    belonging to the owning the task.
- * The caller must have the space locked.
- */
+  
+                                                                            
+                             
+                                                                  
+                                       
+                                         
+   
 static void
 affinity_set_place(affinity_space_t aspc, affinity_set_t new_aset)
 {
@@ -539,14 +539,14 @@ affinity_set_place(affinity_space_t aspc, affinity_set_t new_aset)
 	affinity_set_t  aset;
 
 	if (__improbable(num_cpu_asets > MAX_CPUS)) {
-		// If this triggers then the array needs to be made bigger.
+		                                                           
 		panic("num_cpu_asets = %d > %d too big in %s\n", num_cpu_asets, MAX_CPUS, __FUNCTION__);
 	}
 
-	/*
-	 * Scan the affinity sets calculating the number of sets
-	 * occupy the available physical affinities.
-	 */
+	  
+                                                         
+                                             
+    
 	queue_iterate(&aspc->aspc_affinities,
 	    aset, affinity_set_t, aset_affinities) {
 		if (aset->aset_num < num_cpu_asets) {
@@ -556,13 +556,13 @@ affinity_set_place(affinity_space_t aspc, affinity_set_t new_aset)
 		}
 	}
 
-	/*
-	 * Find the least occupied set (or the first empty set).
-	 * To distribute placements somewhat, start searching from
-	 * a cpu affinity chosen randomly per namespace:
-	 *   [(unsigned int)aspc % 127] % num_cpu_asets
-	 * unless this mapping policy is overridden.
-	 */
+	  
+                                                         
+                                                           
+                                                 
+                                                
+                                             
+    
 	if (affinity_sets_mapping == 0) {
 		i_least_occupied = 0;
 	} else {
@@ -581,7 +581,7 @@ affinity_set_place(affinity_space_t aspc, affinity_set_t new_aset)
 	new_aset->aset_num = i_least_occupied;
 	new_aset->aset_pset = ml_affinity_to_pset(i_least_occupied);
 
-	/* Add the new affinity set to the group */
+	                                           
 	new_aset->aset_space = aspc;
 	queue_enter(&aspc->aspc_affinities,
 	    new_aset, affinity_set_t, aset_affinities);

@@ -40,13 +40,13 @@
     #include <libkern/OSKextLibPrivate.h>
     #include <mach/vm_param.h>
     #include <mach-o/fat.h>
-#else /* !KERNEL */
+#else              
     #include <architecture/byte_order.h>
     #include <mach/mach_init.h>
     #include <mach-o/arch.h>
     #include <mach-o/swap.h>
 
-#endif /* KERNEL */
+#endif             
 
 #define DEBUG_ASSERT_COMPONENT_NAME_STRING "kxld"
 #include <AssertMacros.h>
@@ -75,9 +75,9 @@ struct kxld_kext {
 	boolean_t vtable_index_created;
 };
 
-/*******************************************************************************
-* Prototypes
-*******************************************************************************/
+                                                                                
+            
+                                                                                
 
 static kern_return_t export_symbols_through_interface(
 	const KXLDObject *kext, const KXLDObject *interface,
@@ -105,16 +105,16 @@ static const KXLDSym *get_metaclass_symbol_from_super_meta_class_pointer_symbol(
 
 static kern_return_t validate_symbols(KXLDKext *kext);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 size_t
 kxld_kext_sizeof(void)
 {
 	return sizeof(KXLDKext);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_kext_init(KXLDKext *kext, KXLDObject *kext_object,
     KXLDObject *interface_object)
@@ -138,8 +138,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_kext_clear(KXLDKext *kext)
 {
@@ -162,8 +162,8 @@ kxld_kext_clear(KXLDKext *kext)
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_kext_deinit(KXLDKext *kext)
 {
@@ -182,8 +182,8 @@ kxld_kext_deinit(KXLDKext *kext)
 	bzero(kext, sizeof(*kext));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_kext_export_symbols(const KXLDKext *kext,
     KXLDDict *defined_symbols_by_name,
@@ -210,8 +210,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 export_symbols_through_interface(const KXLDObject *kext,
     const KXLDObject *interface, KXLDDict *defined_symbols_by_name,
@@ -231,7 +231,7 @@ export_symbols_through_interface(const KXLDObject *kext,
 	interface_symtab = kxld_object_get_symtab(interface);
 
 	if (defined_symbols_by_name) {
-		/* Add exported symbols */
+		                          
 		(void) kxld_symtab_iterator_init(&iter, interface_symtab,
 		    kxld_sym_is_undefined, FALSE);
 		while ((interface_sym = kxld_symtab_iterator_get_next(&iter))) {
@@ -250,7 +250,7 @@ export_symbols_through_interface(const KXLDObject *kext,
 			require_noerr(rval, finish);
 		}
 
-		/* Add indirect symbols */
+		                          
 		(void) kxld_symtab_iterator_init(&iter, interface_symtab,
 		    kxld_sym_is_indirect, FALSE);
 		while ((interface_sym = kxld_symtab_iterator_get_next(&iter))) {
@@ -270,7 +270,7 @@ export_symbols_through_interface(const KXLDObject *kext,
 		}
 	}
 
-	/* Add obsolete symbols */
+	                          
 	if (obsolete_symbols_by_name) {
 		(void) kxld_symtab_iterator_init(&iter, interface_symtab,
 		    kxld_sym_is_obsolete, FALSE);
@@ -281,7 +281,7 @@ export_symbols_through_interface(const KXLDObject *kext,
 		}
 	}
 
-	/* Add C++ symbols */
+	                     
 	if (defined_cxx_symbols_by_value) {
 		(void) kxld_symtab_iterator_init(&iter, kext_symtab,
 		    kxld_sym_is_cxx, FALSE);
@@ -297,8 +297,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 export_symbols(const KXLDObject *kext, KXLDDict *defined_symbols_by_name,
     KXLDDict *defined_cxx_symbols_by_value)
@@ -327,8 +327,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_kext_export_vtables(KXLDKext *kext, const KXLDDict *defined_cxx_symbols,
     const KXLDDict *defined_symbols, KXLDDict *vtables)
@@ -357,8 +357,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_kext_get_vmsize_for_seg_by_name(const KXLDKext *kext,
     const char *segname,
@@ -367,8 +367,8 @@ kxld_kext_get_vmsize_for_seg_by_name(const KXLDKext *kext,
 	(void) kxld_object_get_vmsize_for_seg_by_name(kext->kext, segname, vmsize);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_kext_get_vmsize(const KXLDKext *kext,
     u_long *header_size, u_long *vmsize)
@@ -376,16 +376,16 @@ kxld_kext_get_vmsize(const KXLDKext *kext,
 	(void) kxld_object_get_vmsize(kext->kext, header_size, vmsize);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_kext_set_linked_object_size(KXLDKext *kext, u_long vmsize)
 {
 	(void) kxld_object_set_linked_object_size(kext->kext, vmsize);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_kext_export_linked_object(const KXLDKext *kext,
     void *linked_object,
@@ -407,8 +407,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_kext_relocate(KXLDKext *kext,
     kxld_addr_t link_address,
@@ -424,13 +424,13 @@ kxld_kext_relocate(KXLDKext *kext,
 	check(defined_symbols);
 	check(obsolete_symbols);
 
-	/* Kexts that are being relocated need symbols indexed by value for vtable
-	 * creation and patching. Note that we don't need to index by value for
-	 * dependencies that have already been linked because their symbols are
-	 * already in the global cxx value table. It's important to index the
-	 * symbols by value before we relocate the symbols because the vtable
-	 * entries will still have unrelocated values.
-	 */
+	                                                                          
+                                                                        
+                                                                        
+                                                                      
+                                                                      
+                                               
+    
 	rval = kxld_object_index_cxx_symbols_by_value(kext->kext);
 	require_noerr(rval, finish);
 
@@ -443,7 +443,7 @@ kxld_kext_relocate(KXLDKext *kext,
 	rval = resolve_symbols(kext, defined_symbols, obsolete_symbols);
 	require_noerr(rval, finish);
 
-	rval = create_vtables(kext, defined_cxx_symbols, /* defined_symbols */ NULL);
+	rval = create_vtables(kext, defined_cxx_symbols,                       NULL);
 	require_noerr(rval, finish);
 
 	if (isSplitKext == FALSE) {
@@ -462,20 +462,20 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* The defined symbols argument is optional.  When supplied, create_vtables()
-* will look for vtable symbols in the defined_symbols dictionary.  Otherwise,
-* it will look in the kext's symbol table for vtable symbols.
-*
-* We do this because there are two types of KXLDKext objects that call
-* create_vtables(), those that have been linked, and those that haven't.  The
-* linked kexts export their symbols into the global symbol table that is used
-* for symbol resolution, so we can look there for vtable symbols without
-* having to index their local symbol table separately.
-*
-* Unlinked kexts haven't yet had their symbols exported into the global table,
-* so we have to index their local symbol table separately.
-*******************************************************************************/
+                                                                                
+                                                                            
+                                                                             
+                                                             
+ 
+                                                                      
+                                                                             
+                                                                             
+                                                                        
+                                                      
+ 
+                                                                              
+                                                          
+                                                                                
 static kern_return_t
 create_vtables(KXLDKext *kext, const KXLDDict *defined_cxx_symbols,
     const KXLDDict *defined_symbols)
@@ -499,15 +499,15 @@ create_vtables(KXLDKext *kext, const KXLDDict *defined_cxx_symbols,
 	symtab = kxld_object_get_symtab(kext->kext);
 
 	if (kxld_object_is_linked(kext->kext)) {
-		/* Create a vtable object for every vtable symbol */
+		                                                    
 		kxld_symtab_iterator_init(&iter, symtab, kxld_sym_is_vtable, FALSE);
 		nvtables = kxld_symtab_iterator_get_num_remaining(&iter);
 	} else {
-		/* We walk over the super metaclass pointer symbols because classes
-		 * with them are the only ones that need patching.  Then we double the
-		 * number of vtables we're expecting, because every pointer will have a
-		 * class vtable and a MetaClass vtable.
-		 */
+		                                                                   
+                                                                        
+                                                                         
+                                         
+     
 		kxld_symtab_iterator_init(&iter, symtab,
 		    kxld_sym_is_super_metaclass_pointer, FALSE);
 		nvtables = kxld_symtab_iterator_get_num_remaining(&iter) * 2;
@@ -532,10 +532,10 @@ create_vtables(KXLDKext *kext, const KXLDDict *defined_cxx_symbols,
 		    defined_cxx_symbols);
 		require_noerr(rval, finish);
 
-		/* meta_vtable_sym will be null when we don't support strict
-		 * patching and can't find the metaclass vtable. If that's the
-		 * case, we just reduce the expect number of vtables by 1.
-		 */
+		                                                            
+                                                                
+                                                            
+     
 		if (!kxld_object_is_linked(kext->kext)) {
 			if (meta_vtable_sym) {
 				meta_vtable = kxld_array_get_item(&kext->vtables, i++);
@@ -557,8 +557,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 get_vtable_syms_from_smcp(KXLDKext *kext, const KXLDDict *defined_symbols,
     KXLDSym *super_metaclass_ptr_sym, KXLDSym **vtable_sym_out,
@@ -584,17 +584,17 @@ get_vtable_syms_from_smcp(KXLDKext *kext, const KXLDDict *defined_symbols,
 
 	symtab = kxld_object_get_symtab(kext->kext);
 
-	/* Get the class name from the smc pointer */
+	                                             
 	rval = kxld_sym_get_class_name_from_super_metaclass_pointer(
 		super_metaclass_ptr_sym, class_name, sizeof(class_name));
 	require_noerr(rval, finish);
 
-	/* Get the vtable name from the class name */
+	                                             
 	rval = kxld_sym_get_vtable_name_from_class_name(class_name,
 	    vtable_name, sizeof(vtable_name));
 	require_noerr(rval, finish);
 
-	/* Get the vtable symbol */
+	                           
 	if (defined_symbols) {
 		vtable_sym = kxld_dict_find(defined_symbols, vtable_name);
 	} else {
@@ -605,12 +605,12 @@ get_vtable_syms_from_smcp(KXLDKext *kext, const KXLDDict *defined_symbols,
 	    kxld_log(kKxldLogPatching, kKxldLogErr, kKxldLogMissingVtable,
 	    vtable_name, class_name));
 
-	/* Get the meta vtable name from the class name */
+	                                                  
 	rval = kxld_sym_get_meta_vtable_name_from_class_name(class_name,
 	    meta_vtable_name, sizeof(meta_vtable_name));
 	require_noerr(rval, finish);
 
-	/* Get the meta vtable symbol */
+	                                
 	if (defined_symbols) {
 		meta_vtable_sym = kxld_dict_find(defined_symbols, meta_vtable_name);
 	} else {
@@ -648,8 +648,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
     const KXLDDict *obsolete_symbols)
@@ -671,16 +671,16 @@ resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
 
 	symtab = kxld_object_get_symtab(kext->kext);
 
-	/* Check if the kext tests for weak symbols */
+	                                              
 	sym = kxld_symtab_get_symbol_by_name(symtab, KXLD_WEAK_TEST_SYMBOL);
 	tests_for_weak = (sym != NULL);
 
-	/* Check for duplicate symbols */
+	                                 
 	kxld_symtab_iterator_init(&iter, symtab, kxld_sym_is_exported, FALSE);
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {
 		defined_sym = kxld_dict_find(defined_symbols, sym->name);
 		if (defined_sym) {
-			/* Not a problem if the symbols have the same address */
+			                                                        
 			if (defined_sym->link_addr == sym->link_addr) {
 				continue;
 			}
@@ -699,13 +699,13 @@ resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
 	}
 	require_noerr_action(error, finish, rval = KERN_FAILURE);
 
-	/* Resolve undefined and indirect symbols */
+	                                            
 
-	/* Iterate over all unresolved symbols */
+	                                         
 	kxld_symtab_iterator_init(&iter, symtab,
 	    kxld_sym_is_unresolved, FALSE);
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {
-		/* Common symbols are not supported */
+		                                      
 		if (kxld_sym_is_common(sym)) {
 			if (!error) {
 				error = TRUE;
@@ -722,7 +722,7 @@ resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
 			kxld_log(kKxldLogLinking, kKxldLogErr, "\t%s",
 			    kxld_demangle(sym->name, &demangled_name, &demangled_length));
 		} else {
-			/* Find the address of the defined symbol */
+			                                            
 			if (kxld_sym_is_undefined(sym)) {
 				name = sym->name;
 			} else {
@@ -730,11 +730,11 @@ resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
 			}
 			defined_sym = kxld_dict_find(defined_symbols, name);
 
-			/* Resolve the symbol.  If a definition cannot be found, then:
-			 * 1) Psuedokexts log a warning and proceed
-			 * 2) Actual kexts delay the error until validation in case vtable
-			 *    patching replaces the undefined symbol.
-			 */
+			                                                              
+                                              
+                                                                     
+                                                
+      
 
 			if (defined_sym) {
 				rval = kxld_sym_resolve(sym, defined_sym->link_addr);
@@ -748,8 +748,8 @@ resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
 			} else if (kxld_sym_is_weak(sym)) {
 				kxld_addr_t addr = 0;
 
-				/* Make sure that the kext has referenced gOSKextUnresolved.
-				 */
+				                                                            
+       
 				require_action(tests_for_weak, finish,
 				    rval = KERN_FAILURE;
 				    kxld_log(kKxldLogLinking, kKxldLogErr,
@@ -758,15 +758,15 @@ resolve_symbols(KXLDKext *kext, const KXLDDict *defined_symbols,
 				    "OSKextSymbolIsResolved(). (found in <libkern/OSKextLib.h>)"));
 
 #if KERNEL
-				/* Get the address of the default weak address.
-				 */
+				                                               
+       
 				addr = (kxld_addr_t) &kext_weak_symbol_referenced;
 #else
-				/* This is run during symbol generation only, so we only
-				 * need a filler value here.
-				 */
+				                                                        
+                                
+       
 				addr = 0xF00DD00D;
-#endif /* KERNEL */
+#endif             
 
 				rval = kxld_sym_resolve(sym, addr);
 				require_noerr(rval, finish);
@@ -785,28 +785,28 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* We must patch vtables to ensure binary compatibility, and to perform that
-* patching, we have to determine the vtables' inheritance relationships.  The
-* MetaClass system gives us a way to do that:
-*   1) Iterate over all of the super MetaClass pointer symbols.  Every class
-*      that inherits from OSObject will have a pointer in its MetaClass that
-*      points to the MetaClass's super MetaClass.
-*   2) Derive the name of the class from the super MetaClass pointer.
-*   3) Derive the name of the class's vtable from the name of the class
-*   4) Follow the super MetaClass pointer to get the address of the super
-*      MetaClass's symbol
-*   5) Look up the super MetaClass symbol by address
-*   6) Derive the super class's name from the super MetaClass name
-*   7) Derive the super class's vtable from the super class's name
-* This procedure will allow us to find all of the OSObject-derived classes and
-* their super classes, and thus patch all of the vtables.
-*
-* We also have to take care to patch up the MetaClass's vtables.  The
-* MetaClasses follow a parallel hierarchy to the classes, so once we have the
-* class name and super class name, we can also derive the MetaClass name and
-* the super MetaClass name, and thus find and patch their vtables as well.
-*******************************************************************************/
+                                                                                
+                                                                           
+                                                                             
+                                             
+                                                                            
+                                                                            
+                                                 
+                                                                     
+                                                                       
+                                                                         
+                         
+                                                    
+                                                                  
+                                                                  
+                                                                              
+                                                         
+ 
+                                                                     
+                                                                             
+                                                                            
+                                                                          
+                                                                                
 
 #define kOSMetaClassVTableName "__ZTV11OSMetaClass"
 
@@ -845,7 +845,7 @@ patch_vtables(KXLDKext *kext, KXLDDict *patched_vtables,
 	rval = create_vtable_index(kext);
 	require_noerr(rval, finish);
 
-	/* Find each super meta class pointer symbol */
+	                                               
 
 	kxld_symtab_iterator_init(&iter, symtab,
 	    kxld_sym_is_super_metaclass_pointer, FALSE);
@@ -856,39 +856,39 @@ patch_vtables(KXLDKext *kext, KXLDDict *patched_vtables,
 		nprogress = 0;
 		kxld_symtab_iterator_reset(&iter);
 		while ((super_metaclass_pointer = kxld_symtab_iterator_get_next(&iter))) {
-			/* Get the class name from the smc pointer */
+			                                             
 			rval = kxld_sym_get_class_name_from_super_metaclass_pointer(
 				super_metaclass_pointer, class_name, sizeof(class_name));
 			require_noerr(rval, finish);
 
-			/* Get the vtable name from the class name */
+			                                             
 			rval = kxld_sym_get_vtable_name_from_class_name(class_name,
 			    vtable_name, sizeof(vtable_name));
 			require_noerr(rval, finish);
 
-			/* Get the vtable and make sure it hasn't been patched */
+			                                                         
 			vtable = kxld_dict_find(&kext->vtable_index, vtable_name);
 			require_action(vtable, finish, rval = KERN_FAILURE;
 			    kxld_log(kKxldLogPatching, kKxldLogErr, kKxldLogMissingVtable,
 			    vtable_name, class_name));
 
 			if (!vtable->is_patched) {
-				/* Find the SMCP's meta class symbol */
+				                                       
 				metaclass = get_metaclass_symbol_from_super_meta_class_pointer_symbol(
 					kext, super_metaclass_pointer);
 				require_action(metaclass, finish, rval = KERN_FAILURE);
 
-				/* Get the super class name from the super metaclass */
+				                                                       
 				rval = kxld_sym_get_class_name_from_metaclass(metaclass,
 				    super_class_name, sizeof(super_class_name));
 				require_noerr(rval, finish);
 
-				/* Get the super vtable name from the class name */
+				                                                   
 				rval = kxld_sym_get_vtable_name_from_class_name(super_class_name,
 				    super_vtable_name, sizeof(super_vtable_name));
 				require_noerr(rval, finish);
 
-				/* Get the super vtable if it's been patched */
+				                                               
 				super_vtable = kxld_dict_find(patched_vtables, super_vtable_name);
 
 				if (failure) {
@@ -896,9 +896,9 @@ patch_vtables(KXLDKext *kext, KXLDDict *patched_vtables,
 					unpatched_super_vtable = kxld_dict_find(&kext->vtable_index,
 					    super_vtable_name);
 
-					/* If the parent's vtable hasn't been patched, warn that
-					 * this vtable is unpatchable because of the parent.
-					 */
+					                                                        
+                                                         
+        
 					if (!super_vtable) {
 						kxld_log(kKxldLogPatching, kKxldLogErr,
 						    "The %s was not patched because its parent, "
@@ -916,14 +916,14 @@ patch_vtables(KXLDKext *kext, KXLDDict *patched_vtables,
 					continue;
 				}
 
-				/* Get the final symbol's name from the super vtable */
+				                                                       
 				rval = kxld_sym_get_final_sym_name_from_class_name(super_class_name,
 				    final_sym_name, sizeof(final_sym_name));
 				require_noerr(rval, finish);
 
-				/* Verify that the final symbol does not exist.  First check
-				 * all the externally defined symbols, then check locally.
-				 */
+				                                                            
+                                                              
+       
 				final_sym = kxld_dict_find(defined_symbols, final_sym_name);
 				if (!final_sym) {
 					final_sym = kxld_symtab_get_locally_defined_symbol_by_name(
@@ -939,25 +939,25 @@ patch_vtables(KXLDKext *kext, KXLDDict *patched_vtables,
 					continue;
 				}
 
-				/* Patch the class's vtable */
+				                              
 				rval = kxld_vtable_patch(vtable, super_vtable, kext->kext);
 				if (rval) {
 					continue;
 				}
 
-				/* Add the class's vtable to the set of patched vtables */
+				                                                          
 				rval = kxld_dict_insert(patched_vtables, vtable->name, vtable);
 				require_noerr(rval, finish);
 
-				/* Get the meta vtable name from the class name */
+				                                                  
 				rval = kxld_sym_get_meta_vtable_name_from_class_name(class_name,
 				    vtable_name, sizeof(vtable_name));
 				require_noerr(rval, finish);
 
-				/* Get the meta vtable.  Whether or not it should exist has already
-				 * been tested in create_vtables(), so if it doesn't exist and we're
-				 * still running, we can safely skip it.
-				 */
+				                                                                   
+                                                                        
+                                            
+       
 				vtable = kxld_dict_find(&kext->vtable_index, vtable_name);
 				if (!vtable) {
 					++nprogress;
@@ -966,25 +966,25 @@ patch_vtables(KXLDKext *kext, KXLDDict *patched_vtables,
 				}
 				require_action(!vtable->is_patched, finish, rval = KERN_FAILURE);
 
-				/* There is no way to look up a metaclass vtable at runtime, but
-				 * we know that every class's metaclass inherits directly from
-				 * OSMetaClass, so we just hardcode that vtable name here.
-				 */
+				                                                                
+                                                                  
+                                                              
+       
 				len = strlcpy(super_vtable_name, kOSMetaClassVTableName,
 				    sizeof(super_vtable_name));
 				require_action(len == const_strlen(kOSMetaClassVTableName),
 				    finish, rval = KERN_FAILURE);
 
-				/* Get the super meta vtable */
+				                               
 				super_vtable = kxld_dict_find(patched_vtables, super_vtable_name);
 				require_action(super_vtable && super_vtable->is_patched,
 				    finish, rval = KERN_FAILURE);
 
-				/* Patch the meta class's vtable */
+				                                   
 				rval = kxld_vtable_patch(vtable, super_vtable, kext->kext);
 				require_noerr(rval, finish);
 
-				/* Add the MetaClass's vtable to the set of patched vtables */
+				                                                              
 				rval = kxld_dict_insert(patched_vtables, vtable->name, vtable);
 				require_noerr(rval, finish);
 
@@ -1010,8 +1010,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 create_vtable_index(KXLDKext *kext)
 {
@@ -1024,7 +1024,7 @@ create_vtable_index(KXLDKext *kext)
 		goto finish;
 	}
 
-	/* Map vtable names to the vtable structures */
+	                                               
 	rval = kxld_dict_init(&kext->vtable_index, kxld_dict_string_hash,
 	    kxld_dict_string_cmp, kext->vtables.nitems);
 	require_noerr(rval, finish);
@@ -1041,8 +1041,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static const KXLDSym *
 get_metaclass_symbol_from_super_meta_class_pointer_symbol(KXLDKext *kext,
     KXLDSym *super_metaclass_pointer_sym)
@@ -1055,17 +1055,17 @@ get_metaclass_symbol_from_super_meta_class_pointer_symbol(KXLDKext *kext,
 	check(kext);
 	check(super_metaclass_pointer_sym);
 
-	/* Get the relocation entry that fills in the super metaclass pointer. */
+	                                                                         
 	reloc = kxld_object_get_reloc_at_symbol(kext->kext,
 	    super_metaclass_pointer_sym);
 	require_action(reloc, finish, rval = KERN_FAILURE);
 
-	/* Get the section of the super metaclass pointer. */
+	                                                     
 	sect = kxld_object_get_section_by_index(kext->kext,
 	    super_metaclass_pointer_sym->sectnum);
 	require_action(sect, finish, rval = KERN_FAILURE);
 
-	/* Get the symbol that will be filled into the super metaclass pointer. */
+	                                                                          
 	metaclass = kxld_object_get_symbol_of_reloc(kext->kext, reloc, sect);
 
 
@@ -1079,8 +1079,8 @@ finish:
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 validate_symbols(KXLDKext *kext)
 {
@@ -1091,7 +1091,7 @@ validate_symbols(KXLDKext *kext)
 	char *demangled_name = NULL;
 	size_t demangled_length = 0;
 
-	/* Check for any unresolved symbols */
+	                                      
 	kxld_symtab_iterator_init(&iter, kxld_object_get_symtab(kext->kext),
 	    kxld_sym_is_unresolved, FALSE);
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {

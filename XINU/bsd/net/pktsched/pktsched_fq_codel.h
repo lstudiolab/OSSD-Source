@@ -36,7 +36,7 @@
 #ifdef BSD_KERNEL_PRIVATE
 #include <net/flowadv.h>
 #include <net/pktsched/pktsched.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,20 +66,20 @@ struct fcl_stat {
 	u_int32_t fcl_pkts_compressed;
 };
 
-/*
- * Use the top most 8 bits of flow id as the tag for set associative
- * hashing
- */
+  
+                                                                    
+          
+   
 
 #define FQ_IF_HASH_TAG_SIZE     8
 #define FQ_IF_HASH_TAG_SHIFT    24
 #define FQ_IF_HASH_TAG_MASK     0xFF
 #define FQ_IF_HASH_TABLE_SIZE   (1 << FQ_IF_HASH_TAG_SIZE)
 
-/* Set the quantum to be one MTU */
+                                   
 #define FQ_IF_DEFAULT_QUANTUM   1500
 
-/* Max number of service classes currently supported */
+                                                       
 #define FQ_IF_MAX_CLASSES       10
 _Static_assert(FQ_IF_MAX_CLASSES < 127,
     "maximum number of classes needs to fit in a single byte");
@@ -91,17 +91,17 @@ typedef u_int32_t pktsched_bitmap_t;
 struct if_ifclassq_stats;
 
 enum fq_if_state {
-	FQ_IF_ER = 0,           /* eligible, ready */
-	FQ_IF_IR = 1,           /* ineligible, ready */
-	FQ_IF_EB = 2,           /* eligible blocked */
-	FQ_IF_IB = 3,           /* ineligible, blocked */
+	FQ_IF_ER = 0,                                
+	FQ_IF_IR = 1,                                  
+	FQ_IF_EB = 2,                                 
+	FQ_IF_IB = 3,                                    
 	FQ_IF_MAX_STATE
 };
 
-/*
- * This priority index is used for QFQ state bitmaps, lower index gets
- * higher priority
- */
+  
+                                                                      
+                  
+   
 #define FQ_IF_BK_SYS_INDEX      9
 #define FQ_IF_BK_INDEX  8
 #define FQ_IF_BE_INDEX  7
@@ -117,33 +117,33 @@ enum fq_if_state {
 typedef SLIST_HEAD(, flowq) flowq_list_t;
 typedef STAILQ_HEAD(, flowq) flowq_stailq_t;
 typedef struct fq_if_classq {
-	uint32_t fcl_pri;      /* class priority, lower the better */
-	uint32_t fcl_service_class;    /* service class */
-	uint16_t fcl_quantum;          /* quantum in bytes */
-	uint32_t fcl_drr_max;          /* max flows per class for DRR */
-	int64_t fcl_budget;             /* budget for this classq */
-	flowq_stailq_t fcl_new_flows;   /* List of new flows */
-	flowq_stailq_t fcl_old_flows;   /* List of old flows */
+	uint32_t fcl_pri;                                            
+	uint32_t fcl_service_class;                       
+	uint16_t fcl_quantum;                                
+	uint32_t fcl_drr_max;                                           
+	int64_t fcl_budget;                                         
+	flowq_stailq_t fcl_new_flows;                          
+	flowq_stailq_t fcl_old_flows;                          
 	struct fcl_stat fcl_stat;
 } fq_if_classq_t;
 
 typedef struct fq_codel_sched_data {
-	struct ifclassq *fqs_ifq;       /* back pointer to ifclassq */
-	u_int64_t       fqs_target_qdelay;      /* Target queue delay (ns) */
-	u_int64_t       fqs_update_interval;    /* update interval (ns) */
-	flowq_list_t    fqs_flows[FQ_IF_HASH_TABLE_SIZE]; /* flows table */
+	struct ifclassq *fqs_ifq;                                     
+	u_int64_t       fqs_target_qdelay;                                   
+	u_int64_t       fqs_update_interval;                              
+	flowq_list_t    fqs_flows[FQ_IF_HASH_TABLE_SIZE];                  
 	pktsched_bitmap_t       fqs_bitmaps[FQ_IF_MAX_STATE];
-	u_int32_t       fqs_pkt_droplimit;      /* drop limit */
-	u_int8_t        fqs_throttle;   /* throttle on or off */
-	u_int8_t        fqs_flags;      /* flags */
+	u_int32_t       fqs_pkt_droplimit;                      
+	u_int8_t        fqs_throttle;                           
+	u_int8_t        fqs_flags;                 
 #define FQS_DRIVER_MANAGED      0x1
-	fq_if_classq_t  fqs_classq[FQ_IF_MAX_CLASSES]; /* class queues */
-	struct flowadv_fclist   fqs_fclist; /* flow control state */
-	struct flowq    *fqs_large_flow; /* flow has highest number of bytes */
+	fq_if_classq_t  fqs_classq[FQ_IF_MAX_CLASSES];                   
+	struct flowadv_fclist   fqs_fclist;                         
+	struct flowq    *fqs_large_flow;                                       
 	classq_pkt_type_t       fqs_ptype;
 } fq_if_t;
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 struct fq_codel_flowstats {
 	u_int32_t       fqst_min_qdelay;
@@ -224,11 +224,11 @@ extern void fq_if_destroy_flow(fq_if_t *, fq_if_classq_t *,
     struct flowq *, bool);
 
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PRIVATE */
-#endif /* _NET_PKTSCHED_PKTSCHED_FQ_CODEL_H_ */
+#endif              
+#endif                                         

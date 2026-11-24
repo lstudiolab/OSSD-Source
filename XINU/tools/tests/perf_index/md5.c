@@ -41,12 +41,12 @@ md5_compress(uint32_t *state, unsigned long nblocks, const void *in)
 	const unsigned char *buf = in;
 
 	while (nblocks--) {
-		/* copy the state into 512-bits into W[0..15] */
+		                                                
 		for (i = 0; i < 16; i++) {
 			W[i] = ((uint32_t*)buf)[i];
 		}
 
-		/* copy state */
+		                
 		a = s[0];
 		b = s[1];
 		c = s[2];
@@ -117,7 +117,7 @@ md5_compress(uint32_t *state, unsigned long nblocks, const void *in)
 		II(c, d, a, b, W[2], 15, 0x2ad7d2bb)
 		II(b, c, d, a, W[9], 21, 0xeb86d391)
 
-		/* store state */
+		                 
 		s[0] += a;
 		s[1] += b;
 		s[2] += c;

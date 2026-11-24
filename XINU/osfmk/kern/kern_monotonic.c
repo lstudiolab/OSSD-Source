@@ -44,29 +44,29 @@ _Atomic uint64_t mt_retrograde = 0;
 
 #define MT_KDBG_IC_CPU_CSWITCH MT_KDBG_INSTRS_CYCLES(1)
 
-/*
- * Updating the thread counters takes place in the context switch path, so it
- * cannot introduce too much overhead.  Thus, updating takes no locks, instead
- * updating a generation count to an odd value to indicate that it's in the
- * critical section and that readers should wait until the generation count
- * returns to an even value.
- *
- * Reading the counters also needs to not see any "torn" states of the counters,
- * where a few of the counters are from a previous state and the rest are from
- * the current state.  For this reason, the reader redrives the entire read
- * operation if it sees mismatching generation counts at the beginning and end
- * of reading.
- */
+  
+                                                                             
+                                                                              
+                                                                           
+                                                                           
+                            
+  
+                                                                                
+                                                                              
+                                                                           
+                                                                              
+              
+   
 
 #define MAXSPINS   100
 #define MAXRETRIES 10
 
-/*
- * Write the fixed counter values for the thread `thread` into `counts_out`.
- *
- * This function does not include the accumulated counter values since the
- * thread's last context switch or quantum expiration.
- */
+  
+                                                                            
+  
+                                                                          
+                                                      
+   
 int
 mt_fixed_thread_counts(thread_t thread, uint64_t *counts_out)
 {
@@ -74,13 +74,13 @@ mt_fixed_thread_counts(thread_t thread, uint64_t *counts_out)
 	uint64_t spins = 0, retries = 0;
 	uint64_t counts[MT_CORE_NFIXED];
 
-	/*
-	 * Try to read a thread's counter values by ensuring its gen count is
-	 * even.  If it's odd, it means that a thread is trying to update its
-	 * counters.
-	 *
-	 * Spin until the gen count is even.
-	 */
+	  
+                                                                      
+                                                                      
+             
+   
+                                     
+    
 spin:
 	start_gen = atomic_load_explicit(&thread->t_monotonic.mth_gen,
 	    memory_order_acquire);
@@ -97,15 +97,15 @@ retry:
 		counts[i] = thread->t_monotonic.mth_counts[i];
 	}
 
-	/*
-	 * After reading the counters, check the gen count again.  If it is
-	 * different from the value that we started with, the thread raced
-	 * writing its counters with us reading them.  We need to redrive the
-	 * entire operation.
-	 *
-	 * Go back to check if the value we just read was even and try to read
-	 * again.
-	 */
+	  
+                                                                    
+                                                                   
+                                                                      
+                     
+   
+                                                                       
+          
+    
 	end_gen = atomic_load_explicit(&thread->t_monotonic.mth_gen,
 	    memory_order_acquire);
 	if (end_gen != start_gen) {
@@ -117,10 +117,10 @@ retry:
 		goto retry;
 	}
 
-	/*
-	 * Only after getting a consistent snapshot of the counters should we
-	 * write them into the provided buffer.
-	 */
+	  
+                                                                      
+                                        
+    
 	for (int i = 0; i < MT_CORE_NFIXED; i++) {
 		counts_out[i] = counts[i];
 	}
@@ -141,32 +141,32 @@ mt_update_thread(thread_t thread)
 	uint64_t counts[MT_CORE_NFIXED], counts_since[MT_CORE_NFIXED];
 	mt_fixed_counts_internal(counts, counts_since);
 
-	/*
-	 * Enter the update cycle by incrementing the gen count to be odd --
-	 * this tells any readers to spin on the gen count, waiting for it to go
-	 * even.
-	 */
+	  
+                                                                     
+                                                                         
+         
+    
 	__assert_only uint64_t enter_gen = atomic_fetch_add_explicit(
 		&thread->t_monotonic.mth_gen, 1, memory_order_release);
-	/*
-	 * Should not have pre-empted a modification to the counts.
-	 */
+	  
+                                                            
+    
 	assert((enter_gen & 1) == 0);
 
 	for (int i = 0; i < MT_CORE_NFIXED; i++) {
 		thread->t_monotonic.mth_counts[i] += counts_since[i];
 	}
 
-	/*
-	 * Exit the update by making the gen count even again.  Readers check
-	 * the gen count for equality, and will redrive the reads if the values
-	 * before and after reading don't match.
-	 */
+	  
+                                                                      
+                                                                        
+                                         
+    
 	__assert_only uint64_t exit_gen = atomic_fetch_add_explicit(
 		&thread->t_monotonic.mth_gen, 1, memory_order_release);
-	/*
-	 * Make sure no other writers came through behind us.
-	 */
+	  
+                                                      
+    
 	assert(exit_gen == (enter_gen + 1));
 
 	return true;
@@ -186,9 +186,9 @@ mt_sched_update(thread_t thread)
 		KDBG_RELEASE(MT_KDBG_IC_CPU_CSWITCH,
 #ifdef MT_CORE_INSTRS
 		    mtc->mtc_counts[MT_CORE_INSTRS],
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 		    0,
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 		    mtc->mtc_counts[MT_CORE_CYCLES]);
 	}
 }
@@ -217,10 +217,10 @@ mt_fixed_task_counts(task_t task, uint64_t *counts_out)
 	bool needs_current = false;
 	int r = 0;
 	queue_iterate(&task->threads, thread, thread_t, task_threads) {
-		/*
-		 * Get the current thread's counters after doing this
-		 * processing, without holding the task lock.
-		 */
+		  
+                                                       
+                                               
+     
 		if (thread == curthread) {
 			needs_current = true;
 			continue;
@@ -332,7 +332,7 @@ mt_update_fixed_counts(void)
 	__builtin_ia32_lfence();
 #elif defined(__arm__) || defined(__arm64__)
 	__builtin_arm_isb(ISB_SY);
-#endif /* !defined(__x86_64__) && (defined(__arm__) || defined(__arm64__)) */
+#endif                                                                       
 
 	mt_fixed_counts_internal(NULL, NULL);
 }
@@ -344,7 +344,7 @@ mt_fixed_counts(uint64_t *counts)
 	__builtin_ia32_lfence();
 #elif defined(__arm__) || defined(__arm64__)
 	__builtin_arm_isb(ISB_SY);
-#endif /* !defined(__x86_64__) && (defined(__arm__) || defined(__arm64__)) */
+#endif                                                                       
 
 	int intrs_en = ml_set_interrupts_enabled(FALSE);
 	mt_fixed_counts_internal(counts, NULL);
@@ -376,7 +376,7 @@ mt_cur_task_fixed_counts(uint64_t *counts)
 	mt_fixed_task_counts(curtask, counts);
 }
 
-/* FIXME these should only update the counter that is being accessed */
+                                                                       
 
 uint64_t
 mt_cur_thread_instrs(void)
@@ -396,9 +396,9 @@ mt_cur_thread_instrs(void)
 	ml_set_interrupts_enabled(intrs_en);
 
 	return count;
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 	return 0;
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 }
 
 uint64_t
@@ -432,9 +432,9 @@ mt_cur_cpu_instrs(void)
 
 	mt_fixed_counts(counts);
 	return counts[MT_CORE_INSTRS];
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 	return 0;
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 }
 
 uint64_t
@@ -481,17 +481,17 @@ mt_perfcontrol(uint64_t *instrs, uint64_t *cycles)
 
 	struct mt_cpu *mtc = mt_cur_cpu();
 
-	/*
-	 * The performance controller queries the hardware directly, so provide the
-	 * last snapshot we took for the core.  This is the value from when we
-	 * updated the thread counts.
-	 */
+	  
+                                                                            
+                                                                       
+                              
+    
 
 #ifdef MT_CORE_INSTRS
 	*instrs = mtc->mtc_snaps[MT_CORE_INSTRS];
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 	*instrs = 0;
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 
 	*cycles = mtc->mtc_snaps[MT_CORE_CYCLES];
 }
@@ -503,9 +503,9 @@ mt_stackshot_thread(thread_t thread, uint64_t *instrs, uint64_t *cycles)
 
 #ifdef MT_CORE_INSTRS
 	*instrs = thread->t_monotonic.mth_counts[MT_CORE_INSTRS];
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 	*instrs = 0;
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 
 	*cycles = thread->t_monotonic.mth_counts[MT_CORE_CYCLES];
 }
@@ -517,18 +517,18 @@ mt_stackshot_task(task_t task, uint64_t *instrs, uint64_t *cycles)
 
 #ifdef MT_CORE_INSTRS
 	*instrs = task->task_monotonic.mtk_counts[MT_CORE_INSTRS];
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 	*instrs = 0;
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 
 	*cycles = task->task_monotonic.mtk_counts[MT_CORE_CYCLES];
 }
 
-/*
- * Maintain reset values for the fixed instruction and cycle counters so
- * clients can be notified after a given number of those events occur.  This is
- * only used by microstackshot.
- */
+  
+                                                                        
+                                                                               
+                               
+   
 
 bool mt_microstackshots = false;
 unsigned int mt_microstackshot_ctr = 0;

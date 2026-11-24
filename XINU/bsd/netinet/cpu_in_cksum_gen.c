@@ -65,35 +65,35 @@
 #include <mach/boolean.h>
 #include <pexpert/pexpert.h>
 #define CKSUM_ERR(fmt, args...) kprintf(fmt, ## args)
-#else /* !KERNEL */
+#else              
 #ifndef LIBSYSCALL_INTERFACE
 #error "LIBSYSCALL_INTERFACE not defined"
-#endif /* !LIBSYSCALL_INTERFACE */
+#endif                            
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <strings.h>
 #include <mach/boolean.h>
-#endif /* !KERNEL */
+#endif              
 
-/* compile time assert */
+                         
 #ifndef _CASSERT
 #define _CASSERT(x)     _Static_assert(x, "compile-time assertion failed")
-#endif /* !_CASSERT */
+#endif                
 
 #ifndef VERIFY
 #define VERIFY(EX) ((void)0)
-#endif /* !VERIFY */
+#endif              
 
 #ifndef CKSUM_ERR
 #define CKSUM_ERR(fmt, args...) ((void)0)
-#endif /* !CKSUM_ERR */
+#endif                 
 
 #define PREDICT_TRUE(x)         __builtin_expect(!!((long)(x)), 1L)
 #define PREDICT_FALSE(x)        __builtin_expect(!!((long)(x)), 0L)
 
-/* fake mbuf struct used only for calling os_cpu_in_cksum_mbuf() */
+                                                                   
 struct _mbuf {
 	struct _mbuf    *_m_next;
 	void            *_m_pad;
@@ -107,21 +107,21 @@ extern uint32_t os_cpu_in_cksum_mbuf(struct _mbuf *, int, int, uint32_t);
 uint32_t
 os_cpu_in_cksum(const void *data, uint32_t len, uint32_t initial_sum)
 {
-	/*
-	 * If data is 4-bytes aligned (conditional), length is multiple
-	 * of 4-bytes (required), and the amount to checksum is small,
-	 * this would be quicker; this is suitable for IPv4/TCP header.
-	 */
+	  
+                                                                
+                                                               
+                                                                
+    
 	if (
 #if !defined(__arm64__) && !defined(__x86_64__)
 		IS_P2ALIGNED(data, sizeof(uint32_t)) &&
-#endif /* !__arm64__ && !__x86_64__ */
+#endif                                
 		len <= 64 && (len & 3) == 0) {
 		uint8_t *p = __DECONST(uint8_t *, data);
 		uint64_t sum = initial_sum;
 
 		switch (len) {
-		case 20:                /* simple IPv4 or TCP header */
+		case 20:                                               
 			sum += *(uint32_t *)(void *)p;
 			sum += *(uint32_t *)(void *)(p + 4);
 			sum += *(uint32_t *)(void *)(p + 8);
@@ -129,7 +129,7 @@ os_cpu_in_cksum(const void *data, uint32_t len, uint32_t initial_sum)
 			sum += *(uint32_t *)(void *)(p + 16);
 			break;
 
-		case 32:                /* TCP header + timestamp option */
+		case 32:                                                   
 			sum += *(uint32_t *)(void *)p;
 			sum += *(uint32_t *)(void *)(p + 4);
 			sum += *(uint32_t *)(void *)(p + 8);
@@ -149,30 +149,30 @@ os_cpu_in_cksum(const void *data, uint32_t len, uint32_t initial_sum)
 			break;
 		}
 
-		/* fold 64-bit to 16-bit (deferred carries) */
-		sum = (sum >> 32) + (sum & 0xffffffff); /* 33-bit */
-		sum = (sum >> 16) + (sum & 0xffff);     /* 17-bit + carry */
-		sum = (sum >> 16) + (sum & 0xffff);     /* 16-bit + carry */
-		sum = (sum >> 16) + (sum & 0xffff);     /* final carry */
+		                                              
+		sum = (sum >> 32) + (sum & 0xffffffff);             
+		sum = (sum >> 16) + (sum & 0xffff);                         
+		sum = (sum >> 16) + (sum & 0xffff);                         
+		sum = (sum >> 16) + (sum & 0xffff);                      
 
 		return sum & 0xffff;
 	}
 
-	/*
-	 * Otherwise, let os_cpu_in_cksum_mbuf() handle it; it only looks
-	 * at 3 fields: {next,data,len}, and since it doesn't care about
-	 * the authenticity of the mbuf, we use a fake one here.  Make
-	 * sure the offsets are as expected.
-	 */
+	  
+                                                                  
+                                                                 
+                                                               
+                                     
+    
 #if defined(__LP64__)
 	_CASSERT(offsetof(struct _mbuf, _m_next) == 0);
 	_CASSERT(offsetof(struct _mbuf, _m_data) == 16);
 	_CASSERT(offsetof(struct _mbuf, _m_len) == 24);
-#else /* !__LP64__ */
+#else                
 	_CASSERT(offsetof(struct _mbuf, _m_next) == 0);
 	_CASSERT(offsetof(struct _mbuf, _m_data) == 8);
 	_CASSERT(offsetof(struct _mbuf, _m_len) == 12);
-#endif /* !__LP64__ */
+#endif                
 #ifdef KERNEL
 	_CASSERT(offsetof(struct _mbuf, _m_next) ==
 	    offsetof(struct mbuf, m_next));
@@ -180,7 +180,7 @@ os_cpu_in_cksum(const void *data, uint32_t len, uint32_t initial_sum)
 	    offsetof(struct mbuf, m_data));
 	_CASSERT(offsetof(struct _mbuf, _m_len) ==
 	    offsetof(struct mbuf, m_len));
-#endif /* KERNEL */
+#endif             
 	struct _mbuf m = {
 		._m_next = NULL,
 		._m_data = __DECONST(uint8_t *, data),
@@ -192,28 +192,28 @@ os_cpu_in_cksum(const void *data, uint32_t len, uint32_t initial_sum)
 
 #if defined(__i386__) || defined(__x86_64__)
 
-/*
- * Checksum routine for Internet Protocol family headers (Portable Version).
- *
- * This routine is very heavily used in the network
- * code and should be modified for each CPU to be as fast as possible.
- *
- * A discussion of different implementation techniques can be found in
- * RFC 1071.
- *
- * The default implementation for 32-bit architectures is using
- * a 32-bit accumulator and operating on 16-bit operands.
- *
- * The default implementation for 64-bit architectures is using
- * a 64-bit accumulator and operating on 32-bit operands.
- *
- * Both versions are unrolled to handle 32 Byte / 64 Byte fragments as core
- * of the inner loop. After each iteration of the inner loop, a partial
- * reduction is done to avoid carry in long packets.
- */
+  
+                                                                            
+  
+                                                   
+                                                                      
+  
+                                                                      
+            
+  
+                                                               
+                                                         
+  
+                                                               
+                                                         
+  
+                                                                           
+                                                                       
+                                                    
+   
 
 #if !defined(__LP64__)
-/* 32-bit version */
+                    
 uint32_t
 os_cpu_in_cksum_mbuf(struct _mbuf *m, int len, int off, uint32_t initial_sum)
 {
@@ -266,7 +266,7 @@ post_initial_offset:
 
 		partial = 0;
 		if ((uintptr_t)data & 1) {
-			/* Align on word boundary */
+			                            
 			started_on_odd = !started_on_odd;
 #if BYTE_ORDER == LITTLE_ENDIAN
 			partial = *data << 8;
@@ -319,10 +319,10 @@ post_initial_offset:
 			data += 16;
 			mlen -= 16;
 		}
-		/*
-		 * mlen is not updated below as the remaining tests
-		 * are using bit masks, which are not affected.
-		 */
+		  
+                                                     
+                                                 
+     
 		if (mlen & 8) {
 			partial += *(uint16_t *)(void *)data;
 			partial += *(uint16_t *)(void *)(data + 2);
@@ -352,10 +352,10 @@ post_initial_offset:
 			partial = (partial << 8) + (partial >> 24);
 		}
 		sum += (partial >> 16) + (partial & 0xffff);
-		/*
-		 * Reduce sum to allow potential byte swap
-		 * in the next iteration without carry.
-		 */
+		  
+                                            
+                                         
+     
 		sum = (sum >> 16) + (sum & 0xffff);
 	}
 	final_acc = ((sum >> 16) & 0xffff) + (sum & 0xffff);
@@ -363,8 +363,8 @@ post_initial_offset:
 	return final_acc & 0xffff;
 }
 
-#else /* __LP64__ */
-/* 64-bit version */
+#else               
+                    
 uint32_t
 os_cpu_in_cksum_mbuf(struct _mbuf *m, int len, int off, uint32_t initial_sum)
 {
@@ -417,7 +417,7 @@ post_initial_offset:
 
 		partial = 0;
 		if ((uintptr_t)data & 1) {
-			/* Align on word boundary */
+			                            
 			started_on_odd = !started_on_odd;
 #if BYTE_ORDER == LITTLE_ENDIAN
 			partial = *data << 8;
@@ -467,10 +467,10 @@ post_initial_offset:
 				partial = 0;
 			}
 		}
-		/*
-		 * mlen is not updated below as the remaining tests
-		 * are using bit masks, which are not affected.
-		 */
+		  
+                                                     
+                                                 
+     
 		if (mlen & 32) {
 			partial += *(uint32_t *)(void *)data;
 			partial += *(uint32_t *)(void *)(data + 4);
@@ -516,10 +516,10 @@ trailing_bytes:
 			partial = (partial << 8) + (partial >> 56);
 		}
 		sum += (partial >> 32) + (partial & 0xffffffff);
-		/*
-		 * Reduce sum to allow potential byte swap
-		 * in the next iteration without carry.
-		 */
+		  
+                                            
+                                         
+     
 		sum = (sum >> 32) + (sum & 0xffffffff);
 	}
 	final_acc = (sum >> 48) + ((sum >> 32) & 0xffff) +
@@ -528,6 +528,6 @@ trailing_bytes:
 	final_acc = (final_acc >> 16) + (final_acc & 0xffff);
 	return final_acc & 0xffff;
 }
-#endif /* __LP64 */
+#endif             
 
-#endif /* __i386__ || __x86_64__ */
+#endif                             

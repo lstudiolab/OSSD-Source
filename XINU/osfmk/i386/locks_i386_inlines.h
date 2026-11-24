@@ -33,14 +33,14 @@
 #include <kern/lock_stat.h>
 #include <kern/turnstile.h>
 
-// Enforce program order of loads and stores.
+                                             
 #define ordered_load(target) os_atomic_load(target, compiler_acq_rel)
 #define ordered_store_release(target, value) ({ \
 	        os_atomic_store(target, value, release); \
 	        os_compiler_barrier(); \
 })
 
-/* Enforce program order of loads and stores. */
+                                                
 #define ordered_load_mtx_state(lock)                    ordered_load(&(lock)->lck_mtx_state)
 #define ordered_store_mtx_state_release(lock, value)            ordered_store_release(&(lock)->lck_mtx_state, (value))
 #define ordered_store_mtx_owner(lock, value)    os_atomic_store(&(lock)->lck_mtx_owner, (value), compiler_acq_rel)
@@ -70,7 +70,7 @@ lck_mtx_lock_finish_inline(
 {
 	assert(state & LCK_MTX_ILOCKED_MSK);
 
-	/* release the interlock and re-enable preemption */
+	                                                    
 	lck_mtx_ilk_unlock_inline(mutex, state);
 
 #if     CONFIG_DTRACE
@@ -91,7 +91,7 @@ lck_mtx_lock_finish_inline_with_cleanup(
 {
 	assert(state & LCK_MTX_ILOCKED_MSK);
 
-	/* release the interlock and re-enable preemption */
+	                                                    
 	lck_mtx_ilk_unlock_inline(mutex, state);
 
 	turnstile_cleanup();
@@ -111,7 +111,7 @@ lck_mtx_try_lock_finish_inline(
 	lck_mtx_t       *mutex,
 	uint32_t        state)
 {
-	/* release the interlock and re-enable preemption */
+	                                                    
 	lck_mtx_ilk_unlock_inline(mutex, state);
 
 #if     CONFIG_DTRACE
@@ -125,7 +125,7 @@ lck_mtx_convert_spin_finish_inline(
 	lck_mtx_t       *mutex,
 	uint32_t        state)
 {
-	/* release the interlock and acquire it as mutex */
+	                                                   
 	state &= ~(LCK_MTX_ILOCKED_MSK | LCK_MTX_SPIN_MSK);
 	state |= LCK_MTX_MLOCKED_MSK;
 
@@ -147,7 +147,7 @@ lck_mtx_unlock_finish_inline(
 	} else {
 		LOCKSTAT_RECORD(LS_LCK_MTX_UNLOCK_RELEASE, mutex, 0);
 	}
-#endif  // CONFIG_DTRACE
+#endif                  
 }
 
-#endif /* _I386_LOCKS_I386_INLINES_H_ */
+#endif                                  

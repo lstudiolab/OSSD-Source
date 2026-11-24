@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * 24 Nov  1998 suurballe  Created.
- */
+  
+                                   
+   
 
 #include <IOKit/IOService.h>
 

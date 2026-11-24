@@ -25,8 +25,8 @@
 #if CORECRYPTO_DEBUG_ENABLE_CC_REQUIRE_PRINTS
 
 #if !CC_KERNEL
-    #include <string.h> // for strstr
-#endif // !CC_KERNEL
+    #include <string.h>              
+#endif              
 
 CC_UNUSED static char *cc_strstr(const char *file) {
 #if CC_KERNEL
@@ -42,7 +42,7 @@ CC_UNUSED static char *cc_strstr(const char *file) {
 #define __CC_DEBUG_REQUIRE_MESSAGE(name, assertion, label, message, file, line, value) \
 {char *___t = cc_strstr(file); cc_printf( "require: %s, %s%s:%d\n", assertion, (message!=0) ? message : "", ___t==NULL?file:___t, line);}
 
-#endif // CORECRYPTO_DEBUG_ENABLE_CC_REQUIRE_PRINTS
+#endif                                             
 
 #ifndef cc_require
 #if (__CC_DEBUG_ASSERT_PRODUCTION_CODE) || (!CORECRYPTO_DEBUG_ENABLE_CC_REQUIRE_PRINTS)
@@ -147,4 +147,4 @@ CC_UNUSED static char *cc_strstr(const char *file) {
 #endif
 #endif
 
-#endif /* _CORECRYPTO_CC_MACROS_H_ */
+#endif                               

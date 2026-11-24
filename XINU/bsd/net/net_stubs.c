@@ -45,7 +45,7 @@ STUB(bpfattach);
 #if !SKYWALK
 STUB(bpf_tap_packet_in);
 STUB(bpf_tap_packet_out);
-#endif /* SKYWALK */
+#endif              
 STUB(ctl_deregister);
 STUB(ctl_enqueuedata);
 STUB(ctl_enqueuembuf);
@@ -472,9 +472,9 @@ STUB(vsock_reset_transport);
 STUB(vsock_put_message);
 #undef STUB
 
-/*
- * Called from vm_pageout.c. Nothing to be done when there's no networking.
- */
+  
+                                                                           
+   
 void mbuf_drain(boolean_t);
 void
 mbuf_drain(boolean_t)
@@ -482,4 +482,4 @@ mbuf_drain(boolean_t)
 	return;
 }
 
-#endif /* !NETWORKING */
+#endif                  

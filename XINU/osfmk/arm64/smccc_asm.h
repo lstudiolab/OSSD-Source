@@ -33,28 +33,28 @@
 #error "This header should only be used in .s files"
 #endif
 
-/*
- * SAVE_SMCCC_CLOBBERED_REGISTERS
- *
- * Saves x0-x3 to stack in preparation for an hvc/smc call.
- */
+  
+                                 
+  
+                                                           
+   
 
 .macro  SAVE_SMCCC_CLOBBERED_REGISTERS
 stp             x0, x1, [sp, #- 16]!
 stp             x2, x3, [sp, #- 16]!
 .endmacro
 
-/*
- * LOAD_SMCCC_CLOBBERED_REGISTERS
- *
- * Loads x0-x3 from stack after an hvc/smc call.
- */
+  
+                                 
+  
+                                                
+   
 
 .macro  LOAD_SMCCC_CLOBBERED_REGISTERS
 ldp             x2, x3, [sp], #16
 ldp             x0, x1, [sp], #16
 .endmacro
 
-#endif /* _ARM64_SMCCC_ASM_H_ */
+#endif                          
 
-/* vim: set ts=4 ft=asm: */
+                           

@@ -1,46 +1,46 @@
-#!/usr/bin/perl
-#
+
+
 # Copyright (c) 2006-2014 Apple Inc. All rights reserved.
-#
-# @APPLE_OSREFERENCE_LICENSE_HEADER_START@
-# 
-# This file contains Original Code and/or Modifications of Original Code
+
+
+
+
 # as defined in and that are subject to the Apple Public Source License
-# Version 2.0 (the 'License'). You may not use this file except in
-# compliance with the License. Please obtain a copy of the License at
-# http://www.opensource.apple.com/apsl/ and read it before using this
-# file.
-# 
-# The Original Code and all software distributed under the License are
-# distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
-# EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
-# INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
-# Please see the License for the specific language governing rights and
-# limitations under the License.
-# 
-# @APPLE_OSREFERENCE_LICENSE_HEADER_END@
-#
-##########################################################################
-#
-# % create-syscalls.pl syscalls.master custom-directory platforms-directory platform-name out-directory
-#
-# This script fills the the out-directory with a Makefile.inc and *.s
-# files to create the double-underbar syscall stubs.  It reads the
-# syscall.master file to get the symbol names and number of arguments,
-# and whether Libsystem should automatically create the (non-double-underbar)
-# stubs if Libc doesn't provide a wrapper.  Which system calls will get
-# the automatic treatment is writen to the libsyscall.list file, also
-# written to the out-directory.
-#
-# The custom-directory contains:
-# 1. SYS.h - used by the automatically created *.s and custom files
-# 2. custom.s - contains architecture specific additional system calls and
-#    auxilliary routines (like cerror)
-# 3. special case double-underbar stub files - which are copied into
-#    the out-directory
-#
-##########################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 use strict;
 use File::Basename ();
@@ -58,7 +58,7 @@ my $CustomDir;
 my $PlatformsDir;
 my $PlatformName;
 my $OutDir;
-# size in bytes of known types (only used for i386)
+
 my %TypeBytes = (
     'au_asid_t'		=> 4,
     'sae_associd_t'	=> 4,
@@ -94,9 +94,9 @@ my %TypeBytes = (
     'uuid_t'		=> 4,
 );
 
-# Types that potentially have different sizes in user-space compared to
-# kernel-space as well as whether the value should be sign/zero-extended when
-# passing the user/kernel boundary.
+
+
+
 my %UserKernelMismatchTypes = (
     'long'          => 'SIGN_EXTEND',
     'size_t'        => 'ZERO_EXTEND',
@@ -105,8 +105,8 @@ my %UserKernelMismatchTypes = (
     'user_ssize_t'  => 'SIGN_EXTEND'
 );
 
-# Moving towards storing all data in this hash, then we always know
-# if data is aliased or not, or promoted or not.
+
+
 my %Symbols = (
     "syscall" => {
         c_sym => "syscall",
@@ -121,8 +121,8 @@ my %Symbols = (
     },
 );
 
-# An explicit list of cancelable syscalls. For creating stubs that call the
-# cancellable version of cerror.
+
+
 my @Cancelable = qw/
 	accept access aio_suspend
 	close connect connectx
@@ -146,18 +146,18 @@ sub usage {
     die "Usage: $MyName syscalls.master custom-directory platforms-directory platform-name out-directory\n";
 }
 
-##########################################################################
-# Read the syscall.master file and collect the system call names and number
-# of arguments.  It looks for the NO_SYSCALL_STUB quailifier following the
-# prototype to determine if no automatic stub should be created by Libsystem.
-#
-# The `sys_` prefix is stripped from syscall names, and is only kept for
-# the kernel symbol in order to avoid namespace clashes and identify
-# syscalls more easily.
-#
-# For the #if lines in syscall.master, all macros are assumed to be defined,
-# except COMPAT_GETFSSTAT (assumed undefined).
-##########################################################################
+
+
+
+
+
+
+
+
+
+
+
+
 sub readMaster {
     my $file = shift;
     local $_;
@@ -208,7 +208,7 @@ sub readMaster {
             for my $type (@a) {
                 $type =~ s/\s*\w+$//; # remove the argument name
 
-                # Calculate the size of all the arguments (only used for i386)
+
                 if($type =~ /\*$/) {
                     $argbytes += 4; # a pointer type
                 } else {
@@ -217,7 +217,7 @@ sub readMaster {
                     die "$MyName: $name: unknown type '$type'\n" unless defined($b);
                     $argbytes += $b;
                 }
-                # Determine which arguments might need to be zero/sign-extended
+
                 if(exists $UserKernelMismatchTypes{$type}) {
                     $mismatch_args{$index} = $UserKernelMismatchTypes{$type};
                 }
@@ -299,8 +299,8 @@ sub readAliases {
                 my ($alias, $target_symbol) = split;
                 if (defined($target_symbol)) {
                     foreach my $sym (values %Symbols) {
-                        # I've eliminated most of the ugly from this script except
-                        # the need to try stripping underbars here.
+
+
                         if ($$sym{is_private}) {
                             next unless $$sym{asm_sym} eq $target_symbol;
                         } else {
@@ -312,8 +312,8 @@ sub readAliases {
                         die "$MyName: $arch $$sym{asm_sym} -> $alias: Duplicate alias.\n" if grep { $_ eq $alias } @{$$sym{aliases}{$arch}};
                         push(@{$$sym{aliases}{$arch}}, $alias);
                         
-                        # last thing to do, if we aliased over a first class symbol, we need
-                        # to mark it
+
+
                         my $c = $sym_to_c{$alias};
                         if ($Symbols{$c}) {
                             push(@{$Symbols{$c}{except}}, $arch);
@@ -325,11 +325,11 @@ sub readAliases {
     }
 }
 
-##########################################################################
-# Make a __xxx.s file: if it exists in the $CustomDir, just copy it, otherwise
-# create one.  We define the macro __SYSCALL_32BIT_ARG_BYTES so that SYS.h could
-# use that to define __SYSCALL dependent on the arguments' total size.
-##########################################################################
+
+
+
+
+
 sub writeStubForSymbol {
     my ($f, $symbol) = @_;
 
@@ -386,8 +386,8 @@ sub writeStubForSymbol {
         }
         printf $f "#endif\n\n";
     } else {
-        # actually this isnt an inconsistency. kernel can expose what it wants but if all our arches
-        # override it we need to honour that.
+
+
     }
 
     if ($$symbol{allow_missing}) {
@@ -441,9 +441,9 @@ readMaster($ARGV[0]);
 checkForCustomStubs($CustomDir);
 readAliases($PlatformsDir, $PlatformName);
 
-##########################################################################
-# copy the files specified in @Copy from the $CustomDir to $OutDir
-##########################################################################
+
+
+
 for(@Copy) {
     my $custom = File::Spec->join($CustomDir, $_);
     my $path = File::Spec->join($OutDir, $_);
@@ -451,9 +451,9 @@ for(@Copy) {
     File::Copy::copy($custom, $path) || die "$MyName: copy($custom, $path): $!\n";
 }
 
-##########################################################################
-# make all the *.s files
-##########################################################################
+
+
+
 my @src;
 my($k, $sym);
 while (($k, $sym) = each %Symbols)
@@ -483,9 +483,9 @@ while (($k, $sym) = each %Symbols)
 	push(@src, $srcname);
 }
 
-##########################################################################
-# create the Makefile.inc file from the list for files in @src and @CustomSrc
-##########################################################################
+
+
+
 my $path = File::Spec->join($OutDir, 'stubs.list');
 my $f = IO::File->new($path, 'w');
 my @sources = sort(@src, @CustomSrc);

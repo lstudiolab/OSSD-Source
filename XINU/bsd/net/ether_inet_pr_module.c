@@ -58,12 +58,12 @@
  * SUCH DAMAGE.
  *
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2006 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 
 #include <sys/param.h>
@@ -93,16 +93,16 @@
 
 #include <net/dlil.h>
 
-/* #include "vlan.h" */
+                       
 #if NVLAN > 0
 #include <net/if_vlan_var.h>
-#endif /* NVLAN > 0 */
+#endif                
 #include <net/ether_if_module.h>
 #if CONFIG_MACF
 #include <security/mac_framework.h>
 #endif
 
-/* Local function declarations */
+                                 
 extern void *kdp_get_interface(void);
 extern void kdp_set_ip_and_mac_addresses(struct in_addr *ipaddr,
     struct ether_addr *macaddr);
@@ -124,7 +124,7 @@ ether_inet_arp_input(struct ifnet *ifp, struct mbuf *m)
 
 	ea = mbuf_data(m);
 
-	/* Verify this is an ethernet/ip arp and address lengths are correct */
+	                                                                       
 	if (ntohs(ea->arp_hrd) != ARPHRD_ETHER ||
 	    ntohs(ea->arp_pro) != ETHERTYPE_IP ||
 	    ea->arp_pln != sizeof(struct in_addr) ||
@@ -133,7 +133,7 @@ ether_inet_arp_input(struct ifnet *ifp, struct mbuf *m)
 		return;
 	}
 
-	/* Verify the sender is not broadcast */
+	                                        
 	if (bcmp(ea->arp_sha, etherbroadcastaddr, ETHER_ADDR_LEN) == 0) {
 		mbuf_freem(m);
 		return;
@@ -153,7 +153,7 @@ ether_inet_arp_input(struct ifnet *ifp, struct mbuf *m)
 	sender_hw.sdl_alen = ETHER_ADDR_LEN;
 	bcopy(ea->arp_sha, LLADDR(&sender_hw), ETHER_ADDR_LEN);
 
-	/* update L2 reachability record, if present */
+	                                               
 	arp_llreach_set_reachable(ifp, LLADDR(&sender_hw), ETHER_ADDR_LEN);
 
 	arp_ip_handle_input(ifp, ntohs(ea->arp_op), &sender_hw, &sender_ip,
@@ -161,11 +161,11 @@ ether_inet_arp_input(struct ifnet *ifp, struct mbuf *m)
 	mbuf_freem(m);
 }
 
-/*
- * Process a received Ethernet packet;
- * the packet is in the mbuf chain m without
- * the ether header, which is provided separately.
- */
+  
+                                      
+                                            
+                                                  
+   
 static errno_t
 ether_inet_input(ifnet_t ifp, protocol_family_t protocol_family,
     mbuf_t m_list)
@@ -175,37 +175,37 @@ ether_inet_input(ifnet_t ifp, protocol_family_t protocol_family,
 	mbuf_t  *tailptr = &m_list;
 	mbuf_t  nextpkt;
 
-	/* Strip ARP and non-IP packets out of the list */
+	                                                  
 	for (m = m_list; m; m = nextpkt) {
 		struct ether_header *eh = mbuf_pkthdr_header(m);
 		struct ifnet *mifp;
 
-		/*
-		 * Trust the ifp in the mbuf, rather than ifproto's
-		 * since the packet could have been injected via
-		 * a dlil_input_packet_list() using an ifp that is
-		 * different than the one where the packet really
-		 * came from.
-		 */
+		  
+                                                     
+                                                  
+                                                    
+                                                   
+               
+     
 		mifp = mbuf_pkthdr_rcvif(m);
 
 		nextpkt = m->m_nextpkt;
 
 		if (eh->ether_type == htons(ETHERTYPE_IP)) {
-			/*
-			 * Update L2 reachability record, if present
-			 * (and if not a broadcast sender).
-			 */
+			  
+                                               
+                                      
+      
 			if (bcmp(eh->ether_shost, etherbroadcastaddr,
 			    ETHER_ADDR_LEN) != 0) {
 				arp_llreach_set_reachable(mifp, eh->ether_shost,
 				    ETHER_ADDR_LEN);
 			}
-			/* put this packet in the list */
+			                                 
 			*tailptr = m;
 			tailptr = &m->m_nextpkt;
 		} else {
-			/* Pass ARP packets to arp input */
+			                                   
 			m->m_nextpkt = NULL;
 			if (eh->ether_type == htons(ETHERTYPE_ARP)) {
 				ether_inet_arp_input(mifp, m);
@@ -217,7 +217,7 @@ ether_inet_input(ifnet_t ifp, protocol_family_t protocol_family,
 
 	*tailptr = NULL;
 
-	/* Pass IP list to ip input */
+	                              
 	if (m_list != NULL && proto_input(PF_INET, m_list) != 0) {
 		mbuf_freem_list(m_list);
 	}
@@ -239,9 +239,9 @@ ether_inet_pre_output(ifnet_t ifp, protocol_family_t protocol_family,
 		return ENETDOWN;
 	}
 
-	/*
-	 * Tell ether_frameout it's ok to loop packet unless negated below.
-	 */
+	  
+                                                                    
+    
 	m->m_flags |= M_LOOP;
 
 	switch (dst_netaddr->sa_family) {
@@ -322,13 +322,13 @@ ether_inet_prmod_ioctl(ifnet_t ifp, protocol_family_t protocol_family,
 	int error = 0;
 
 	switch (command) {
-	case SIOCSIFADDR:               /* struct ifaddr pointer */
-	case SIOCAIFADDR: {             /* struct ifaddr pointer */
-		/*
-		 * Note: caller of ifnet_ioctl() passes in pointer to
-		 * struct ifaddr as parameter to SIOC{A,S}IFADDR, for
-		 * legacy reasons.
-		 */
+	case SIOCSIFADDR:                                          
+	case SIOCAIFADDR: {                                        
+		  
+                                                       
+                                                       
+                    
+     
 		struct ifaddr *ifa = data;
 
 		if (!(ifnet_flags(ifp) & IFF_RUNNING)) {
@@ -346,14 +346,14 @@ ether_inet_prmod_ioctl(ifnet_t ifp, protocol_family_t protocol_family,
 			break;
 		}
 
-		/*
-		 * Register new IP and MAC addresses with the kernel
-		 * debugger if the interface is the same as was registered
-		 * by IOKernelDebugger. If no interface was registered,
-		 * fall back and just match against en0 interface.
-		 * Do this only for the first address of the interface
-		 * and not for aliases.
-		 */
+		  
+                                                      
+                                                            
+                                                         
+                                                    
+                                                        
+                         
+     
 		if ((kdp_get_interface() != 0 &&
 		    kdp_get_interface() == ifp->if_softc) ||
 		    (kdp_get_interface() == 0 && ifp->if_unit == 0)) {
@@ -363,7 +363,7 @@ ether_inet_prmod_ioctl(ifnet_t ifp, protocol_family_t protocol_family,
 		break;
 	}
 
-	case SIOCGIFADDR: {             /* struct ifreq */
+	case SIOCGIFADDR: {                               
 		struct ifreq *ifr = data;
 		ifnet_guarded_lladdr_copy_bytes(ifp, ifr->ifr_addr.sa_data,
 		    ETHER_ADDR_LEN);
@@ -435,17 +435,17 @@ ether_inet_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 	mbuf_setlen(m, sizeof(*ea));
 	mbuf_pkthdr_setlen(m, sizeof(*ea));
 
-	/* Move the data pointer in the mbuf to the end, aligned to 4 bytes */
+	                                                                      
 	datap = mbuf_datastart(m);
 	datap += mbuf_trailingspace(m);
 	datap -= (((uintptr_t)datap) & 0x3);
 	mbuf_setdata(m, datap, sizeof(*ea));
 	ea = mbuf_data(m);
 
-	/*
-	 * Prepend the ethernet header, we will send the raw frame;
-	 * callee frees the original mbuf when allocation fails.
-	 */
+	  
+                                                            
+                                                         
+    
 	result = mbuf_prepend(&m, sizeof(*eh), MBUF_DONTWAIT);
 	if (result != 0) {
 		return result;
@@ -454,14 +454,14 @@ ether_inet_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 	eh = mbuf_data(m);
 	eh->ether_type = htons(ETHERTYPE_ARP);
 
-	/* Fill out the arp header */
+	                             
 	ea->arp_pro = htons(ETHERTYPE_IP);
 	ea->arp_hln = sizeof(ea->arp_sha);
 	ea->arp_pln = sizeof(ea->arp_spa);
 	ea->arp_hrd = htons(ARPHRD_ETHER);
 	ea->arp_op = htons(arpop);
 
-	/* Sender Hardware */
+	                     
 	if (sender_hw != NULL) {
 		bcopy(CONST_LLADDR(sender_hw), ea->arp_sha,
 		    sizeof(ea->arp_sha));
@@ -470,13 +470,13 @@ ether_inet_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 	}
 	ifnet_lladdr_copy_bytes(ifp, eh->ether_shost, sizeof(eh->ether_shost));
 
-	/* Sender IP */
+	               
 	if (sender_ip != NULL) {
 		bcopy(&sender_ip->sin_addr, ea->arp_spa, sizeof(ea->arp_spa));
 	} else {
 		struct ifaddr *ifa;
 
-		/* Look for an IP address to use as our source */
+		                                                 
 		ifnet_lock_shared(ifp);
 		TAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link) {
 			IFA_LOCK(ifa);
@@ -498,7 +498,7 @@ ether_inet_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 		}
 	}
 
-	/* Target Hardware */
+	                     
 	if (target_hw == NULL) {
 		bzero(ea->arp_tha, sizeof(ea->arp_tha));
 		bcopy(etherbroadcastaddr, eh->ether_dhost,
@@ -516,29 +516,29 @@ ether_inet_arp(ifnet_t ifp, u_short arpop, const struct sockaddr_dl *sender_hw,
 		}
 	}
 
-	/* Target IP */
+	               
 	bcopy(&target_ip->sin_addr, ea->arp_tpa, sizeof(ea->arp_tpa));
 
-	/*
-	 * PKTF_{INET,INET6}_RESOLVE_RTR are mutually exclusive, so make
-	 * sure only one of them is set (just in case.)
-	 */
+	  
+                                                                 
+                                                
+    
 	m->m_pkthdr.pkt_flags &= ~(PKTF_INET6_RESOLVE | PKTF_RESOLVE_RTR);
 	m->m_pkthdr.pkt_flags |= PKTF_INET_RESOLVE;
-	/*
-	 * If this is an ARP request for a (default) router, mark
-	 * the packet accordingly so that the driver can find out,
-	 * in case it needs to perform driver-specific action(s).
-	 */
+	  
+                                                          
+                                                           
+                                                          
+    
 	if (arpop == ARPOP_REQUEST && (target_ip->sin_other & SIN_ROUTER)) {
 		m->m_pkthdr.pkt_flags |= PKTF_RESOLVE_RTR;
 	}
 
 	if (ifp->if_eflags & IFEF_TXSTART) {
-		/*
-		 * Use control service class if the interface
-		 * supports transmit-start model
-		 */
+		  
+                                               
+                                  
+     
 		(void) m_set_service_class(m, MBUF_SC_CTL);
 	}
 

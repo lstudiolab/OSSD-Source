@@ -128,10 +128,10 @@ NXSwapDouble(NXSwappedDouble x)
     return (NXSwappedDouble)OSSwapInt64((uint64_t)x);
 }
 
-/*
- * Identify the byte order
- * of the current host.
- */
+  
+                          
+                       
+   
 
 enum NXByteOrder {
     NX_UnknownByteOrder,
@@ -368,4 +368,4 @@ NXSwapHostFloatToLittle(
     return (NXSwappedFloat)OSSwapHostToLittleInt32((uint32_t)NXConvertHostFloatToSwapped(x));
 }
 
-#endif	/* _ARCHITECTURE_BYTE_ORDER_H_ */
+#endif	                                 

@@ -54,17 +54,17 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
 #ifndef _I386_USER_LDT_H_
 #define _I386_USER_LDT_H_
 
-/*
- * User LDT management.
- *
- * Each task may have its own LDT.
- */
+  
+                       
+  
+                                  
+   
 
 #define LDT_AUTO_ALLOC  0xffffffff
 
@@ -72,9 +72,9 @@
 #include <i386/seg.h>
 
 struct user_ldt {
-	unsigned int start;             /* first descriptor in table */
-	unsigned int count;             /* how many descriptors in table */
-	struct real_descriptor  ldt[0]; /* descriptor table (variable) */
+	unsigned int start;                                            
+	unsigned int count;                                                
+	struct real_descriptor  ldt[0];                                  
 };
 typedef struct user_ldt *       user_ldt_t;
 
@@ -84,7 +84,7 @@ extern void     user_ldt_free(
 	user_ldt_t      uldt);
 extern void     user_ldt_set(
 	thread_t        thread);
-#else /* !KERNEL */
+#else              
 #include <sys/cdefs.h>
 
 union ldt_entry;
@@ -93,6 +93,6 @@ __BEGIN_DECLS
 int i386_get_ldt(int, union ldt_entry *, int);
 int i386_set_ldt(int, const union ldt_entry *, int);
 __END_DECLS
-#endif /* KERNEL */
+#endif             
 
-#endif  /* _I386_USER_LDT_H_ */
+#endif                         

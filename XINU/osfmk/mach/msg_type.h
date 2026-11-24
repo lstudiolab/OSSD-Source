@@ -28,33 +28,33 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * HISTORY
- *
- * Revision 1.1.1.1  1998/09/22 21:05:30  wsanchez
- * Import of Mac OS X kernel (~semeria)
- *
- * Revision 1.1.1.1  1998/03/07 02:25:46  wsanchez
- * Import of OSF Mach kernel (~mburg)
- *
- * Revision 1.2.6.1  1994/09/23  02:40:41  ezf
- *      change marker to not FREE
- *      [1994/09/22  21:41:56  ezf]
- *
- * Revision 1.2.2.2  1993/06/09  02:42:32  gm
- *      Added to OSF/1 R1.3 from NMK15.0.
- *      [1993/06/02  21:17:31  jeffc]
- *
- * Revision 1.2  1993/04/19  16:37:56  devrcs
- *      ansi C conformance changes
- *      [1993/02/02  18:53:54  david]
- *
- * Revision 1.1  1992/09/30  02:31:51  robert
- *      Initial revision
- *
- * $EndLog$
- */
-/* CMU_HIST */
+  
+          
+  
+                                                  
+                                       
+  
+                                                  
+                                     
+  
+                                              
+                                 
+                                   
+  
+                                             
+                                         
+                                     
+  
+                                             
+                                  
+                                     
+  
+                                             
+                        
+  
+           
+   
+              
 /*
  * Revision 2.3  91/05/14  16:58:02  mrt
  *      Correcting copyright
@@ -76,7 +76,7 @@
  *	defined MSG_TYPE_CAMELOT, and MSG_TYPE_ENCRYPTED
  *
  */
-/* CMU_ENDHIST */
+                 
 /*
  * Mach Operating System
  * Copyright (c) 1991,1990,1989,1988,1987 Carnegie Mellon University
@@ -102,22 +102,22 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *    This file defines user msg types that may be ored into
- *    the msg_type field in a msg header. Values 0-5 are reserved
- *    for use by the kernel and are defined in message.h.
- *
- */
+  
+   
+  
+                                                            
+                                                                 
+                                                         
+  
+   
 
 #ifndef MSG_TYPE_H_
 #define MSG_TYPE_H_
 
 #define MSG_TYPE_CAMELOT        (1 << 6)
 #define MSG_TYPE_ENCRYPTED      (1 << 7)
-#define MSG_TYPE_RPC            (1 << 8)        /* Reply expected */
+#define MSG_TYPE_RPC            (1 << 8)                            
 
 #include <mach/message.h>
 
-#endif  /* MSG_TYPE_H_ */
+#endif                   

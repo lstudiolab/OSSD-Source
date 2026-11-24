@@ -38,7 +38,7 @@
 #include <IOKit/IOService.h>
 #include <IOKit/IOInterrupts.h>
 
-// NMI Interrupt Constants
+                          
 enum{
 	kExtInt9_NMIIntSource      = 0x800506E0,
 	kNMIIntLevelMask           = 0x00004000,
@@ -55,7 +55,7 @@ private:
 	bool mask_NMI;
 
 	struct ExpansionData { };
-	ExpansionData * reserved; // Reserved for future use
+	ExpansionData * reserved;                           
 
 public:
 	IOService *rootDomain;
@@ -63,7 +63,7 @@ public:
 	virtual IOReturn initNMI(IOInterruptController *parentController, OSData *parentSource);
 	virtual IOReturn handleInterrupt(void *refCon, IOService *nub, int source);
 
-// Power handling methods:
+                          
 	virtual IOReturn powerStateWillChangeTo(IOPMPowerFlags, unsigned long, IOService*) APPLE_KEXT_OVERRIDE;
 
 	OSMetaClassDeclareReservedUnused(AppleNMI, 0);
@@ -72,4 +72,4 @@ public:
 	OSMetaClassDeclareReservedUnused(AppleNMI, 3);
 };
 
-#endif /* ! _IOKIT_APPLENMI_H */
+#endif                          

@@ -54,10 +54,10 @@
  * SUCH DAMAGE.
  *
  */
-/*
- * ECN consideration on tunnel ingress/egress operation.
- * http://www.aciri.org/floyd/papers/draft-ipsec-ecn-00.txt
- */
+  
+                                                        
+                                                           
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -73,9 +73,9 @@
 #include <netinet/ip_ecn.h>
 #include <netinet6/ip6_ecn.h>
 
-/*
- * modify outer ECN (TOS) field on ingress operation (tunnel encapsulation).
- */
+  
+                                                                            
+   
 void
 ip_ecn_ingress(int mode, u_int8_t *outer, const u_int8_t *inner)
 {
@@ -85,19 +85,19 @@ ip_ecn_ingress(int mode, u_int8_t *outer, const u_int8_t *inner)
 
 	*outer = *inner;
 	switch (mode) {
-	case ECN_NORMAL:                /* ECN normal mode, copy flags */
+	case ECN_NORMAL:                                                 
 		break;
-	case ECN_COMPATIBILITY:         /* ECN compatibility mode */
+	case ECN_COMPATIBILITY:                                     
 		*outer &= ~IPTOS_ECN_MASK;
 		break;
-	case ECN_NOCARE:        /* no consideration to ECN */
+	case ECN_NOCARE:                                     
 		break;
 	}
 }
 
-/*
- * modify inner ECN (TOS) field on egress operation (tunnel decapsulation).
- */
+  
+                                                                           
+   
 int
 ip_ecn_egress(int mode, const u_int8_t *outer, u_int8_t *inner)
 {
@@ -106,7 +106,7 @@ ip_ecn_egress(int mode, const u_int8_t *outer, u_int8_t *inner)
 	}
 
 	switch (mode) {
-	/* Process ECN for both normal and compatibility modes */
+	                                                         
 	case ECN_NORMAL:
 	case ECN_COMPATIBILITY:
 		if (((*outer & IPTOS_ECN_MASK) == IPTOS_ECN_CE) &&
@@ -117,7 +117,7 @@ ip_ecn_egress(int mode, const u_int8_t *outer, u_int8_t *inner)
 			*inner = *outer;
 		}
 		break;
-	case ECN_NOCARE:        /* no consideration to ECN */
+	case ECN_NOCARE:                                     
 		break;
 	}
 	return 1;
@@ -157,10 +157,10 @@ ip6_ecn_egress(int mode, const u_int32_t *outer, u_int32_t *inner)
 	return 1;
 }
 
-/*
- * Modify outer IPv6 ECN (Traffic Class) field according to inner IPv4 TOS field
- * on ingress operation (tunnel encapsulation).
- */
+  
+                                                                                
+                                               
+   
 void
 ip46_ecn_ingress(int mode, u_int32_t *outer, const u_int8_t *tos)
 {
@@ -175,10 +175,10 @@ ip46_ecn_ingress(int mode, u_int32_t *outer, const u_int8_t *tos)
 	*outer |= htonl((u_int32_t)outer8 << 20);
 }
 
-/*
- * Modify inner IPv4 ECN (TOS) field according to output IPv6 ECN (Traffic Class)
- * on egress operation (tunnel decapsulation).
- */
+  
+                                                                                 
+                                              
+   
 int
 ip46_ecn_egress(int mode, const u_int32_t *outer, u_int8_t *tos)
 {
@@ -192,10 +192,10 @@ ip46_ecn_egress(int mode, const u_int32_t *outer, u_int8_t *tos)
 	return ip_ecn_egress(mode, &outer8, tos);
 }
 
-/*
- * Modify outer IPv4 TOS field according to inner IPv6 ECN (Traffic Class)
- * on ingress operation (tunnel encapsulation).
- */
+  
+                                                                          
+                                               
+   
 void
 ip64_ecn_ingress(int mode, u_int8_t *outer, const u_int32_t *inner)
 {
@@ -209,10 +209,10 @@ ip64_ecn_ingress(int mode, u_int8_t *outer, const u_int32_t *inner)
 	ip_ecn_ingress(mode, outer, &inner8);
 }
 
-/*
- * Modify inner IPv6 ECN (Traffic Class) according to outer IPv4 TOS field
- * on egress operation (tunnel decapsulation).
- */
+  
+                                                                          
+                                              
+   
 int
 ip64_ecn_egress(int mode, const u_int8_t *outer, u_int32_t *inner)
 {

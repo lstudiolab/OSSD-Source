@@ -33,19 +33,19 @@
 #ifdef KERNEL_PRIVATE
 #include <sys/time.h>
 #include <mach/boolean.h>
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/* five histogram bins are separated by four dividing "bars" */
+                                                               
 #define NET_PERF_BARS 4
 
 typedef struct net_perf {
-	uint64_t np_total_pkts; /* total packets input or output during measurement */
-	uint64_t np_total_usecs;        /* microseconds elapsed during measurement */
-	uint64_t np_hist1;              /* histogram bin 1 */
-	uint64_t np_hist2;              /* histogram bin 2 */
-	uint64_t np_hist3;              /* histogram bin 3 */
-	uint64_t np_hist4;              /* histogram bin 4 */
-	uint64_t np_hist5;              /* histogram bin 5 */
+	uint64_t np_total_pkts;                                                       
+	uint64_t np_total_usecs;                                                     
+	uint64_t np_hist1;                                   
+	uint64_t np_hist2;                                   
+	uint64_t np_hist3;                                   
+	uint64_t np_hist4;                                   
+	uint64_t np_hist5;                                   
 	uint8_t np_hist_bars[NET_PERF_BARS];
 } net_perf_t;
 
@@ -56,6 +56,6 @@ void net_perf_measure_time(net_perf_t *npp, struct timeval *start, uint64_t num_
 void net_perf_histogram(net_perf_t *npp, uint64_t num_pkts);
 boolean_t net_perf_validate_bins(uint64_t bins);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* _NET_NET_PERF_H_ */
+#endif                       

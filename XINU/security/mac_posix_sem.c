@@ -125,7 +125,7 @@ mac_posixsem_check_create(kauth_cred_t cred, const char *name)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_posixsem_enforce) {
 		return 0;
 	}
@@ -142,7 +142,7 @@ mac_posixsem_check_open(kauth_cred_t cred, struct pseminfo *psem)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_posixsem_enforce) {
 		return 0;
 	}
@@ -160,7 +160,7 @@ mac_posixsem_check_post(kauth_cred_t cred, struct pseminfo *psem)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_posixsem_enforce) {
 		return 0;
 	}
@@ -178,7 +178,7 @@ mac_posixsem_check_unlink(kauth_cred_t cred, struct pseminfo *psem,
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_posixsem_enforce) {
 		return 0;
 	}
@@ -195,7 +195,7 @@ mac_posixsem_check_wait(kauth_cred_t cred, struct pseminfo *psem)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_posixsem_enforce) {
 		return 0;
 	}

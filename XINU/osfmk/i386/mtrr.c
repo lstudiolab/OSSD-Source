@@ -37,13 +37,13 @@
 #include <i386/machine_check.h>
 
 struct mtrr_var_range {
-	uint64_t  base;         /* in IA32_MTRR_PHYSBASE format */
-	uint64_t  mask;         /* in IA32_MTRR_PHYSMASK format */
-	uint32_t  refcnt;       /* var ranges reference count */
+	uint64_t  base;                                           
+	uint64_t  mask;                                           
+	uint32_t  refcnt;                                       
 };
 
 struct mtrr_fix_range {
-	uint64_t  types;        /* fixed-range type octet */
+	uint64_t  types;                                    
 };
 
 typedef struct mtrr_var_range mtrr_var_range_t;
@@ -63,14 +63,14 @@ decl_simple_lock_data(static, mtrr_lock);
 #define MTRR_LOCK()     simple_lock(&mtrr_lock, LCK_GRP_NULL);
 #define MTRR_UNLOCK()   simple_unlock(&mtrr_lock);
 
-//#define MTRR_DEBUG 1
+                      
 #if     MTRR_DEBUG
 #define DBG(x...)       kprintf(x)
 #else
 #define DBG(x...)
 #endif
 
-/* Private functions */
+                       
 static void mtrr_get_var_ranges(mtrr_var_range_t * range, int count);
 static void mtrr_set_var_ranges(const mtrr_var_range_t * range, int count);
 static void mtrr_get_fix_ranges(mtrr_fix_range_t * range);
@@ -86,9 +86,9 @@ static int  var_range_overlap(mtrr_var_range_t * range, addr64_t address,
 #define CACHE_CONTROL_MTRR              (NULL)
 #define CACHE_CONTROL_PAT               ((void *)1)
 
-/*
- * MTRR MSR bit fields.
- */
+  
+                       
+   
 #define IA32_MTRR_DEF_TYPE_MT           0x000000ff
 #define IA32_MTRR_DEF_TYPE_FE           0x00000400
 #define IA32_MTRR_DEF_TYPE_E            0x00000800
@@ -97,23 +97,23 @@ static int  var_range_overlap(mtrr_var_range_t * range, addr64_t address,
 #define IA32_MTRRCAP_FIX                0x00000100
 #define IA32_MTRRCAP_WC                 0x00000400
 
-/* 0 < bits <= 64 */
+                    
 #define PHYS_BITS_TO_MASK(bits) \
 	((((1ULL << (bits-1)) - 1) << 1) | 1)
 
-/*
- * Default mask for 36 physical address bits, this can
- * change depending on the cpu model.
- */
+  
+                                                      
+                                     
+   
 static uint64_t mtrr_phys_mask = PHYS_BITS_TO_MASK(36);
 
 #define IA32_MTRR_PHYMASK_VALID         0x0000000000000800ULL
 #define IA32_MTRR_PHYSBASE_MASK         (mtrr_phys_mask & ~0x0000000000000FFFULL)
 #define IA32_MTRR_PHYSBASE_TYPE         0x00000000000000FFULL
 
-/*
- * Variable-range mask to/from length conversions.
- */
+  
+                                                  
+   
 #define MASK_TO_LEN(mask) \
 	((~((mask) & IA32_MTRR_PHYSBASE_MASK) & mtrr_phys_mask) + 1)
 
@@ -122,9 +122,9 @@ static uint64_t mtrr_phys_mask = PHYS_BITS_TO_MASK(36);
 
 #define LSB(x)          ((x) & (~((x) - 1)))
 
-/*
- * Fetch variable-range MTRR register pairs.
- */
+  
+                                            
+   
 static void
 mtrr_get_var_ranges(mtrr_var_range_t * range, int count)
 {
@@ -134,7 +134,7 @@ mtrr_get_var_ranges(mtrr_var_range_t * range, int count)
 		range[i].base = rdmsr64(MSR_IA32_MTRR_PHYSBASE(i));
 		range[i].mask = rdmsr64(MSR_IA32_MTRR_PHYSMASK(i));
 
-		/* bump ref count for firmware configured ranges */
+		                                                   
 		if (range[i].mask & IA32_MTRR_PHYMASK_VALID) {
 			range[i].refcnt = 1;
 		} else {
@@ -143,9 +143,9 @@ mtrr_get_var_ranges(mtrr_var_range_t * range, int count)
 	}
 }
 
-/*
- * Update variable-range MTRR register pairs.
- */
+  
+                                             
+   
 static void
 mtrr_set_var_ranges(const mtrr_var_range_t * range, int count)
 {
@@ -157,15 +157,15 @@ mtrr_set_var_ranges(const mtrr_var_range_t * range, int count)
 	}
 }
 
-/*
- * Fetch all fixed-range MTRR's. Note MSR offsets are not consecutive.
- */
+  
+                                                                      
+   
 static void
 mtrr_get_fix_ranges(mtrr_fix_range_t * range)
 {
 	int i;
 
-	/* assume 11 fix range registers */
+	                                   
 	range[0].types = rdmsr64(MSR_IA32_MTRR_FIX64K_00000);
 	range[1].types = rdmsr64(MSR_IA32_MTRR_FIX16K_80000);
 	range[2].types = rdmsr64(MSR_IA32_MTRR_FIX16K_A0000);
@@ -174,15 +174,15 @@ mtrr_get_fix_ranges(mtrr_fix_range_t * range)
 	}
 }
 
-/*
- * Update all fixed-range MTRR's.
- */
+  
+                                 
+   
 static void
 mtrr_set_fix_ranges(const struct mtrr_fix_range * range)
 {
 	int i;
 
-	/* assume 11 fix range registers */
+	                                   
 	wrmsr64(MSR_IA32_MTRR_FIX64K_00000, range[0].types);
 	wrmsr64(MSR_IA32_MTRR_FIX16K_80000, range[1].types);
 	wrmsr64(MSR_IA32_MTRR_FIX16K_A0000, range[2].types);
@@ -199,7 +199,7 @@ mtrr_check_fix_ranges(const struct mtrr_fix_range * range)
 
 	DBG("CPU%d: %s\n", get_cpu_number(), __FUNCTION__);
 
-	/* assume 11 fix range registers */
+	                                   
 	match = range[0].types == rdmsr64(MSR_IA32_MTRR_FIX64K_00000) &&
 	    range[1].types == rdmsr64(MSR_IA32_MTRR_FIX16K_80000) &&
 	    range[2].types == rdmsr64(MSR_IA32_MTRR_FIX16K_A0000);
@@ -258,26 +258,26 @@ mtrr_msr_dump(void)
 	DBG("\nMTRRcap = 0x%llx MTRRdefType = 0x%llx\n",
 	    rdmsr64(MSR_IA32_MTRRCAP), rdmsr64(MSR_IA32_MTRR_DEF_TYPE));
 }
-#endif /* MTRR_DEBUG */
+#endif                 
 
-/*
- * Called by the boot processor (BP) early during boot to initialize MTRR
- * support.  The MTRR state on the BP is saved, any additional processors
- * will have the same settings applied to ensure MTRR consistency.
- */
+  
+                                                                         
+                                                                         
+                                                                  
+   
 void
 mtrr_init(void)
 {
-	/* no reason to init more than once */
+	                                      
 	if (mtrr_initialized == TRUE) {
 		return;
 	}
 
-	/* check for presence of MTRR feature on the processor */
+	                                                         
 	if ((cpuid_features() & CPUID_FEATURE_MTRR) == 0) {
-		return;  /* no MTRR feature */
+		return;                       
 	}
-	/* use a lock to serialize MTRR changes */
+	                                          
 	bzero((void *)&mtrr_state, sizeof(mtrr_state));
 	simple_lock_init(&mtrr_lock, 0);
 
@@ -285,7 +285,7 @@ mtrr_init(void)
 	mtrr_state.MTRRdefType = rdmsr64(MSR_IA32_MTRR_DEF_TYPE);
 	mtrr_state.var_count   = (unsigned int)(mtrr_state.MTRRcap & IA32_MTRRCAP_VCNT);
 
-	/* allocate storage for variable ranges (can block?) */
+	                                                       
 	if (mtrr_state.var_count) {
 		mtrr_state.var_range = (mtrr_var_range_t *)
 		    zalloc_permanent(sizeof(mtrr_var_range_t) *
@@ -295,13 +295,13 @@ mtrr_init(void)
 		}
 	}
 
-	/* fetch the initial firmware configured variable ranges */
+	                                                           
 	if (mtrr_state.var_count) {
 		mtrr_get_var_ranges(mtrr_state.var_range,
 		    mtrr_state.var_count);
 	}
 
-	/* fetch the initial firmware configured fixed ranges */
+	                                                        
 	if (mtrr_state.MTRRcap & IA32_MTRRCAP_FIX) {
 		mtrr_get_fix_ranges(mtrr_state.fix_range);
 	}
@@ -309,16 +309,16 @@ mtrr_init(void)
 	mtrr_initialized = TRUE;
 
 #if MTRR_DEBUG
-	mtrr_msr_dump();        /* dump firmware settings */
+	mtrr_msr_dump();                                    
 #endif
 }
 
-/*
- * Performs the Intel recommended procedure for changing the MTRR
- * in a MP system. Leverage rendezvous mechanism for the required
- * barrier synchronization among all processors. This function is
- * called from the rendezvous IPI handler, and mtrr_update_cpu().
- */
+  
+                                                                 
+                                                                 
+                                                                 
+                                                                 
+   
 static void
 mtrr_update_action(void * cache_control_type)
 {
@@ -328,15 +328,15 @@ mtrr_update_action(void * cache_control_type)
 	cr0 = get_cr0();
 	cr4 = get_cr4();
 
-	/* enter no-fill cache mode */
+	                              
 	tmp = cr0 | CR0_CD;
 	tmp &= ~CR0_NW;
 	set_cr0(tmp);
 
-	/* flush caches */
+	                  
 	wbinvd();
 
-	/* clear the PGE flag in CR4 */
+	                               
 	if (cr4 & CR4_PGE) {
 		set_cr4(cr4 & ~CR4_PGE);
 	} else {
@@ -344,27 +344,27 @@ mtrr_update_action(void * cache_control_type)
 	}
 
 	if (CACHE_CONTROL_PAT == cache_control_type) {
-		/* Change PA6 attribute field to WC */
+		                                      
 		uint64_t pat = rdmsr64(MSR_IA32_CR_PAT);
 		DBG("CPU%d PAT: was 0x%016llx\n", get_cpu_number(), pat);
-		/*
-		 * Intel doc states:
-		 * "The IA32_PAT MSR contains eight page attribute fields: PA0 through PA7.
-		 * The three low-order bits of each field are used to specify a memory type.
-		 * The five high-order bits of each field are reserved, and must be set to all 0s."
-		 * So, we zero-out the high 5 bits of the PA6 entry here:
-		 */
+		  
+                      
+                                                                             
+                                                                              
+                                                                                     
+                                                           
+     
 		pat &= ~(0xFFULL << 48);
 		pat |=  (0x01ULL << 48);
 		wrmsr64(MSR_IA32_CR_PAT, pat);
 		DBG("CPU%d PAT: is  0x%016llx\n",
 		    get_cpu_number(), rdmsr64(MSR_IA32_CR_PAT));
 	} else {
-		/* disable all MTRR ranges */
+		                             
 		wrmsr64(MSR_IA32_MTRR_DEF_TYPE,
 		    mtrr_state.MTRRdefType & ~IA32_MTRR_DEF_TYPE_E);
 
-		/* apply MTRR settings */
+		                         
 		if (mtrr_state.var_count) {
 			mtrr_set_var_ranges(mtrr_state.var_range,
 			    mtrr_state.var_count);
@@ -374,18 +374,18 @@ mtrr_update_action(void * cache_control_type)
 			mtrr_set_fix_ranges(mtrr_state.fix_range);
 		}
 
-		/* enable all MTRR range registers (what if E was not set?) */
+		                                                              
 		wrmsr64(MSR_IA32_MTRR_DEF_TYPE,
 		    mtrr_state.MTRRdefType | IA32_MTRR_DEF_TYPE_E);
 	}
 
-	/* flush all caches and TLBs a second time */
+	                                             
 	wbinvd();
 	set_cr3_raw(get_cr3_raw());
-	/* restore normal cache mode */
+	                               
 	set_cr0(cr0);
 
-	/* restore PGE flag */
+	                      
 	if (cr4 & CR4_PGE) {
 		set_cr4(cr4);
 	}
@@ -396,7 +396,7 @@ mtrr_update_action(void * cache_control_type)
 static void
 mtrr_update_setup(__unused void * param_not_used)
 {
-	/* disable interrupts before the first barrier */
+	                                                 
 	current_cpu_datap()->cpu_iflag = ml_set_interrupts_enabled(FALSE);
 	DBG("CPU%d: %s\n", get_cpu_number(), __FUNCTION__);
 }
@@ -404,14 +404,14 @@ mtrr_update_setup(__unused void * param_not_used)
 static void
 mtrr_update_teardown(__unused void * param_not_used)
 {
-	/* restore interrupt flag following MTRR changes */
+	                                                   
 	ml_set_interrupts_enabled(current_cpu_datap()->cpu_iflag);
 	DBG("CPU%d: %s\n", get_cpu_number(), __FUNCTION__);
 }
 
-/*
- * Update MTRR settings on all processors.
- */
+  
+                                          
+   
 kern_return_t
 mtrr_update_all_cpus(void)
 {
@@ -428,11 +428,11 @@ mtrr_update_all_cpus(void)
 	return KERN_SUCCESS;
 }
 
-/*
- * Verify that a processor has been set with the BSP's MTRR settings. Called
- * during slave processor initialization to check and set MTRR settings
- * discovered on the boot processor by mtrr_init().
- */
+  
+                                                                            
+                                                                       
+                                                   
+   
 kern_return_t
 mtrr_update_cpu(void)
 {
@@ -446,21 +446,21 @@ mtrr_update_cpu(void)
 
 	MTRR_LOCK();
 
-	/* Check MSR_IA32_MTRR_DEF_TYPE MSR */
+	                                      
 	match = mtrr_state.MTRRdefType == rdmsr64(MSR_IA32_MTRR_DEF_TYPE);
 
-	/* Check MSR_IA32_MTRRCAP MSR */
+	                                
 	if (match) {
 		match = mtrr_state.MTRRcap == rdmsr64(MSR_IA32_MTRRCAP);
 	}
 
-	/* Check variable ranges */
+	                           
 	if (match && mtrr_state.var_count) {
 		match = mtrr_check_var_ranges(mtrr_state.var_range,
 		    mtrr_state.var_count);
 	}
 
-	/* Check fixed ranges */
+	                        
 	if (match && (mtrr_state.MTRRcap & IA32_MTRRCAP_FIX)) {
 		match = mtrr_check_fix_ranges(mtrr_state.fix_range);
 	}
@@ -486,10 +486,10 @@ mtrr_update_cpu(void)
 	return KERN_SUCCESS;
 }
 
-/*
- * Add a MTRR range to associate the physical memory range specified
- * with a given memory caching type.
- */
+  
+                                                                    
+                                    
+   
 kern_return_t
 mtrr_range_add(addr64_t address, uint64_t length, uint32_t type)
 {
@@ -506,7 +506,7 @@ mtrr_range_add(addr64_t address, uint64_t length, uint32_t type)
 		return KERN_NOT_SUPPORTED;
 	}
 
-	/* check memory type (GPF exception for undefined types) */
+	                                                           
 	if ((type != MTRR_TYPE_UNCACHEABLE) &&
 	    (type != MTRR_TYPE_WRITECOMBINE) &&
 	    (type != MTRR_TYPE_WRITETHROUGH) &&
@@ -515,21 +515,21 @@ mtrr_range_add(addr64_t address, uint64_t length, uint32_t type)
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/* check WC support if requested */
+	                                   
 	if ((type == MTRR_TYPE_WRITECOMBINE) &&
 	    (mtrr_state.MTRRcap & IA32_MTRRCAP_WC) == 0) {
 		return KERN_NOT_SUPPORTED;
 	}
 
-	/* leave the fix range area below 1MB alone */
+	                                              
 	if (address < 0x100000 || mtrr_state.var_count == 0) {
 		return KERN_NOT_SUPPORTED;
 	}
 
-	/*
-	 * Length must be a power of 2 given by 2^n, where n >= 12.
-	 * Base address alignment must be larger than or equal to length.
-	 */
+	  
+                                                            
+                                                                  
+    
 	if ((length < 0x1000) ||
 	    (LSB(length) != length) ||
 	    (address && (length > LSB(address)))) {
@@ -538,29 +538,29 @@ mtrr_range_add(addr64_t address, uint64_t length, uint32_t type)
 
 	MTRR_LOCK();
 
-	/*
-	 * Check for overlap and locate a free range.
-	 */
+	  
+                                              
+    
 	for (i = 0, free_range = NULL; i < mtrr_state.var_count; i++) {
 		vr = &mtrr_state.var_range[i];
 
 		if (vr->refcnt == 0) {
-			/* free range candidate if no overlaps are found */
+			                                                   
 			free_range = vr;
 			continue;
 		}
 
 		overlap = var_range_overlap(vr, address, length, type);
 		if (overlap > 0) {
-			/*
-			 * identical overlap permitted, increment ref count.
-			 * no hardware update required.
-			 */
+			  
+                                                       
+                                  
+      
 			free_range = vr;
 			break;
 		}
 		if (overlap < 0) {
-			/* unsupported overlapping of memory types */
+			                                             
 			free_range = NULL;
 			break;
 		}
@@ -585,10 +585,10 @@ mtrr_range_add(addr64_t address, uint64_t length, uint32_t type)
 	return ret;
 }
 
-/*
- * Remove a previously added MTRR range. The same arguments used for adding
- * the memory range must be supplied again.
- */
+  
+                                                                           
+                                           
+   
 kern_return_t
 mtrr_range_remove(addr64_t address, uint64_t length, uint32_t type)
 {
@@ -611,7 +611,7 @@ mtrr_range_remove(addr64_t address, uint64_t length, uint32_t type)
 
 		if (vr->refcnt &&
 		    var_range_overlap(vr, address, length, type) > 0) {
-			/* found specified variable range */
+			                                    
 			if (--mtrr_state.var_range[i].refcnt == 0) {
 				var_range_encode(vr, address, length, type, 0);
 				cpu_update = 1;
@@ -637,9 +637,9 @@ mtrr_range_remove(addr64_t address, uint64_t length, uint32_t type)
 	return result;
 }
 
-/*
- * Variable range helper routines
- */
+  
+                                 
+   
 static void
 var_range_encode(mtrr_var_range_t * range, addr64_t address,
     uint64_t length, uint32_t type, int valid)
@@ -657,27 +657,27 @@ var_range_overlap(mtrr_var_range_t * range, addr64_t address,
 {
 	uint64_t  v_address, v_length;
 	uint32_t  v_type;
-	int       result = 0;  /* no overlap, or overlap ok */
+	int       result = 0;                                 
 
 	v_address = range->base & IA32_MTRR_PHYSBASE_MASK;
 	v_type    = (uint32_t)(range->base & IA32_MTRR_PHYSBASE_TYPE);
 	v_length  = MASK_TO_LEN(range->mask);
 
-	/* detect range overlap */
+	                          
 	if ((v_address >= address && v_address < (address + length)) ||
 	    (address >= v_address && address < (v_address + v_length))) {
 		if (v_address == address && v_length == length && v_type == type) {
-			result = 1; /* identical overlap ok */
+			result = 1;                           
 		} else if (v_type == MTRR_TYPE_UNCACHEABLE &&
 		    type == MTRR_TYPE_UNCACHEABLE) {
-			/* UC ranges can overlap */
+			                           
 		} else if ((v_type == MTRR_TYPE_UNCACHEABLE &&
 		    type == MTRR_TYPE_WRITEBACK) ||
 		    (v_type == MTRR_TYPE_WRITEBACK &&
 		    type == MTRR_TYPE_UNCACHEABLE)) {
-			/* UC/WB can overlap - effective type becomes UC */
+			                                                   
 		} else {
-			/* anything else may cause undefined behavior */
+			                                                
 			result = -1;
 		}
 	}
@@ -685,9 +685,9 @@ var_range_overlap(mtrr_var_range_t * range, addr64_t address,
 	return result;
 }
 
-/*
- * Initialize PAT (Page Attribute Table)
- */
+  
+                                        
+   
 void
 pat_init(void)
 {
@@ -703,7 +703,7 @@ pat_init(void)
 	pat = rdmsr64(MSR_IA32_CR_PAT);
 	DBG("CPU%d PAT: was 0x%016llx\n", get_cpu_number(), pat);
 
-	/* Change PA6 attribute field to WC if required */
+	                                                  
 	if ((pat & (0x07ULL << 48)) != (0x01ULL << 48)) {
 		mtrr_update_action(CACHE_CONTROL_PAT);
 	}

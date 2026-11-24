@@ -39,7 +39,7 @@ mac_necp_check_open(proc_t proc, int flags)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -63,7 +63,7 @@ mac_necp_check_client_action(proc_t proc, struct fileglob *fg, uint32_t action)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}

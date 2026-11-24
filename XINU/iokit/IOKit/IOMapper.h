@@ -35,7 +35,7 @@ __BEGIN_DECLS
 #include <IOKit/IOTypes.h>
 #include <mach/vm_types.h>
 
-// These are C accessors to the system mapper for non-IOKit clients
+                                                                   
 ppnum_t IOMapperIOVMAlloc(unsigned pages);
 void IOMapperIOVMFree(ppnum_t addr, unsigned pages);
 ppnum_t IOMapperInsertPage(ppnum_t addr, unsigned offset, ppnum_t page);
@@ -57,7 +57,7 @@ class IOMapper : public IOService
 {
 	OSDeclareAbstractStructors(IOMapper);
 
-// Give the platform expert access to setMapperRequired();
+                                                          
 	friend class IOPlatformExpert;
 	friend class IOMemoryDescriptor;
 	friend class IOGeneralMemoryDescriptor;
@@ -66,7 +66,7 @@ private:
 	enum SystemMapperState {
 		kNoMapper  = 0,
 		kUnknown   = 1,
-		kHasMapper = 2, // Any other value is pointer to a live mapper
+		kHasMapper = 2,                                               
 		kWaitMask  = 3,
 	};
 protected:
@@ -89,7 +89,7 @@ public:
 	virtual bool start(IOService *provider) APPLE_KEXT_OVERRIDE;
 	virtual void free() APPLE_KEXT_OVERRIDE;
 
-// To get access to the system mapper IOMapper::gSystem
+                                                       
 	static IOMapper *gSystem;
 
 	static void
@@ -103,7 +103,7 @@ public:
 	static OSPtr<IOMapper>  copyMapperForDevice(IOService * device);
 	static OSPtr<IOMapper>  copyMapperForDeviceWithIndex(IOService * device, unsigned int index);
 
-// { subclasses
+               
 
 	virtual uint64_t getPageSize(void) const = 0;
 
@@ -130,7 +130,7 @@ public:
 
 	virtual uint64_t mapToPhysicalAddress(uint64_t mappedAddress) = 0;
 
-// }
+    
 
 private:
 	OSMetaClassDeclareReservedUnused(IOMapper, 0);
@@ -151,6 +151,6 @@ private:
 	OSMetaClassDeclareReservedUnused(IOMapper, 15);
 };
 
-#endif /* __cplusplus */
+#endif                  
 
-#endif /* !__IOKIT_IOMAPPER_H */
+#endif                          

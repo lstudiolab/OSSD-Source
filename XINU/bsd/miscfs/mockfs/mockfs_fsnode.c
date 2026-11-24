@@ -38,22 +38,22 @@
 
 #include <libkern/libkern.h>
 
-/*
- * For the moment, most operations that change the fsnode will be called only in the context of
- *   mockfs_mountroot, so they should not need to use a mutex.  The exceptions are mockfs_fsnode_vnode,
- *   and mockfs_fsnode_drop_vnode, which will use a tree-wide mutex (that lives in the mockfs_mount_t
- *   for the mount).
- *
- * mockfs_fsnode_child_by_type doesn't require locking right now (we're only looking at the structure of
- *   the node tree, which should not change during VNOP operations.
- */
+  
+                                                                                               
+                                                                                                       
+                                                                                                     
+                    
+  
+                                                                                                        
+                                                                   
+   
 
-/* mockfs_fsnode_create:
- *   Given a mount (mp) and mockfs node type (type), creates a new fsnode for that mountpoint (*fsnpp).
- *   For the moment (while type == fileid) we should have at most one node of any given type.
- *
- * Returns 0 on success, or an error.
- */
+                        
+                                                                                                       
+                                                                                             
+  
+                                     
+   
 int
 mockfs_fsnode_create(mount_t mp, uint8_t type, mockfs_fsnode_t * fsnpp)
 {
@@ -74,10 +74,10 @@ mockfs_fsnode_create(mount_t mp, uint8_t type, mockfs_fsnode_t * fsnpp)
 	case MOCKFS_DEV:
 		break;
 	case MOCKFS_FILE:
-		/*
-		 * For a regular file, size is meaningful, but it will always be equal to the
-		 * size of the backing device.
-		 */
+		  
+                                                                               
+                                
+     
 		new_size = mp->mnt_devvp->v_specinfo->si_devsize;
 		break;
 	default:
@@ -100,13 +100,13 @@ done:
 	return rvalue;
 }
 
-/*
- * mockfs_fsnode_destroy:
- *   Given a node (fsnp), tears down and deallocates that node and the entire subtree that it is the
- *   root of (deallocates you, and your children, and your children's children! ...for three months).
- *
- * Returns 0 on success, or an error.
- */
+  
+                         
+                                                                                                    
+                                                                                                     
+  
+                                     
+   
 int
 mockfs_fsnode_destroy(mockfs_fsnode_t fsnp)
 {
@@ -114,31 +114,31 @@ mockfs_fsnode_destroy(mockfs_fsnode_t fsnp)
 
 	rvalue = 0;
 
-	/*
-	 * We will not destroy a root node that is actively pointed to by the mount structure; the
-	 *   mount must drop the reference to the mockfs tree before we can deallocate it.
-	 */
+	  
+                                                                                           
+                                                                                   
+    
 	if (!fsnp || (((mockfs_mount_t)fsnp->mnt->mnt_data)->mockfs_root == fsnp)) {
 		rvalue = EINVAL;
 		goto done;
 	}
 
-	/*
-	 * For now, panic in this case; I don't expect anyone to ask us to destroy a node with a live
-	 *   vfs reference, but this will tell me if that assumption is untrue.
-	 */
+	  
+                                                                                              
+                                                                        
+    
 	if (fsnp->vp) {
 		panic("mockfs_fsnode_destroy called on node with live vnode; fsnp = %p (in case gdb is screwing with you)", fsnp);
 	}
 
-	/*
-	 * If this node has children, we need to destroy them.
-	 *
-	 * At least for now, we aren't guaranteeing destroy will be clean; we may get partway through
-	 *   and encounter an error, in which case we will panic (we may still have a sane tree, but
-	 *   we've failed to destroy the subtree, which means someone called destroy when they should
-	 *   not have done so).
-	 */
+	  
+                                                       
+   
+                                                                                              
+                                                                                             
+                                                                                              
+                        
+    
 	if (fsnp->child_a) {
 		if ((rvalue = mockfs_fsnode_destroy(fsnp->child_a))) {
 			panic("mockfs_fsnode_destroy failed on child_a; fsnp = %p (in case gdb is screwing with you), rvalue = %d", fsnp, rvalue);
@@ -151,9 +151,9 @@ mockfs_fsnode_destroy(mockfs_fsnode_t fsnp)
 		}
 	}
 
-	/*
-	 * We need to orphan this node before we destroy it.
-	 */
+	  
+                                                     
+    
 	if (fsnp->parent) {
 		if ((rvalue = mockfs_fsnode_orphan(fsnp))) {
 			panic("mockfs_fsnode_orphan failed during destroy; fsnp = %p (in case gdb is screwing with you), rvalue = %d", fsnp, rvalue);
@@ -165,12 +165,12 @@ done:
 	return rvalue;
 }
 
-/*
- * mockfs_fsnode_adopt:
- *   Given two nodes (parent, child), makes one node the child of the other node.
- *
- * Returns 0 on success, or an error.
- */
+  
+                       
+                                                                                 
+  
+                                     
+   
 int
 mockfs_fsnode_adopt(mockfs_fsnode_t parent, mockfs_fsnode_t child)
 {
@@ -178,30 +178,30 @@ mockfs_fsnode_adopt(mockfs_fsnode_t parent, mockfs_fsnode_t child)
 
 	rvalue = 0;
 
-	/*
-	 * The child must be an orphan, and the parent cannot be the child.
-	 */
+	  
+                                                                    
+    
 	if ((!parent || !child || child->parent) && (parent != child)) {
 		rvalue = EINVAL;
 		goto done;
 	}
 
-	/*
-	 * Nodes are actually tied to a specific mount, so assert that both nodes belong to the same mount.
-	 */
+	  
+                                                                                                    
+    
 	if (parent->mnt != child->mnt) {
 		rvalue = EINVAL;
 		goto done;
 	}
 
-	/*
-	 * TODO: Get rid of this check if I ever get around to making the tree non-binary.
-	 * TODO: Enforce that the parent cannot have two children of the same type (for the moment, this is
-	 *   implicit in the structure of the tree constructed by mockfs_mountroot, so we don't need to
-	 *   worry about it).
-	 *
-	 * Can the parent support another child (food, shelter, unused pointers)?
-	 */
+	  
+                                                                                   
+                                                                                                    
+                                                                                                
+                      
+   
+                                                                          
+    
 	if (!parent->child_a) {
 		parent->child_a = child;
 		child->parent = parent;
@@ -216,11 +216,11 @@ done:
 	return rvalue;
 }
 
-/*
- * mockfs_fsnode_orphan:
- *
- * Returns 0 on success, or an error.
- */
+  
+                        
+  
+                                     
+   
 int
 mockfs_fsnode_orphan(mockfs_fsnode_t fsnp)
 {
@@ -234,9 +234,9 @@ mockfs_fsnode_orphan(mockfs_fsnode_t fsnp)
 		goto done;
 	}
 
-	/*
-	 * Disallow orphaning a node with a live vnode for now.
-	 */
+	  
+                                                        
+    
 	if (fsnp->vp) {
 		panic("mockfs_fsnode_orphan called on node with live vnode; fsnp = %p (in case gdb is screwing with you)", fsnp);
 	}
@@ -257,17 +257,17 @@ done:
 	return rvalue;
 }
 
-/*
- * mockfs_fsnode_child_by_type:
- *   Given a node (parent) and a type (type), returns the first child (*child) found corresponding to the
- *   requested type.  This method exists to support lookup (which is responsible for mapping names, which
- *   we have no conception of currently, onto vnodes).
- *
- * This should be safe, as we are walking the read-only parts of the filesystem structure (not touching
- *   the vnode).
- *
- * Returns 0 on success, or an error.
- */
+  
+                               
+                                                                                                         
+                                                                                                         
+                                                      
+  
+                                                                                                       
+                
+  
+                                     
+   
 int
 mockfs_fsnode_child_by_type(mockfs_fsnode_t parent, uint8_t type, mockfs_fsnode_t * child)
 {
@@ -292,13 +292,13 @@ done:
 	return rvalue;
 }
 
-/*
- * mockfs_fsnode_vnode:
- *   Given a mockfs node (fsnp), returns a vnode (*vpp) corresponding to the mockfs node; the vnode will
- *   have an iocount on it.
- *
- * Returns 0 on success, or an error.
- */
+  
+                       
+                                                                                                        
+                           
+  
+                                     
+   
 int
 mockfs_fsnode_vnode(mockfs_fsnode_t fsnp, vnode_t * vpp)
 {
@@ -316,17 +316,17 @@ mockfs_fsnode_vnode(mockfs_fsnode_t fsnp, vnode_t * vpp)
 	lck_mtx_lock(&mockfs_mnt->mockfs_mnt_mtx);
 
 	if (fsnp->vp) {
-		/*
-		 * The vnode already exists; this should be easy.
-		 */
+		  
+                                                   
+     
 		rvalue = vnode_get(fsnp->vp);
 		if (!rvalue) {
 			*vpp = fsnp->vp;
 		}
 	} else {
-		/*
-		 * We need to create the vnode; this will be unpleasant.
-		 */
+		  
+                                                          
+     
 		vnfs_param.vnfs_mp = fsnp->mnt;
 		vnfs_param.vnfs_vtype = (fsnp->type == MOCKFS_FILE) ? VREG : VDIR;
 		vnfs_param.vnfs_str = "mockfs";
@@ -342,9 +342,9 @@ mockfs_fsnode_vnode(mockfs_fsnode_t fsnp, vnode_t * vpp)
 		rvalue = vnode_create(VNCREATE_FLAVOR, VCREATESIZE, &vnfs_param, &fsnp->vp);
 
 		if ((!rvalue) && (fsnp->type == MOCKFS_FILE) && (mockfs_mnt->mockfs_memory_backed)) {
-			/*
-			 * We're memory backed; point the pager towards the backing store of the device.
-			 */
+			  
+                                                                                   
+      
 			ubc_mem_object = ubc_getobject(fsnp->vp, 0);
 
 			if (!ubc_mem_object) {
@@ -369,14 +369,14 @@ done:
 	return rvalue;
 }
 
-/*
- * mockfs_fsnode_vnode:
- *   Given a mockfs node (fsnp) that has a vnode associated with it, causes them to drop their
- *   references to each other.  This exists to support mockfs_reclaim.  This method will grab the tree
- *   mutex, as this will mutate the tree.
- *
- * Returns 0 on success, or an error.
- */
+  
+                       
+                                                                                              
+                                                                                                      
+                                         
+  
+                                     
+   
 int
 mockfs_fsnode_drop_vnode(mockfs_fsnode_t fsnp)
 {

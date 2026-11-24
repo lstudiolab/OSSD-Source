@@ -58,9 +58,9 @@ sysctl_entropy_collect SYSCTL_HANDLER_ARGS
 	return SYSCTL_OUT(req, entropy_analysis_buffer, req->oldlen);
 }
 
-// Get current size of entropy buffer in bytes
+                                              
 SYSCTL_UINT(_kern_entropy, OID_AUTO, entropy_buffer_size, CTLFLAG_RD | CTLFLAG_MASKED | CTLFLAG_NOAUTO, &entropy_analysis_buffer_size, 0, NULL);
-// Collect contents from entropy buffer
+                                       
 SYSCTL_PROC(_kern_entropy, OID_AUTO, entropy_collect,
     CTLTYPE_OPAQUE | CTLFLAG_RD | CTLFLAG_MASKED | CTLFLAG_NOAUTO,
     NULL, 0, sysctl_entropy_collect, "-", NULL);

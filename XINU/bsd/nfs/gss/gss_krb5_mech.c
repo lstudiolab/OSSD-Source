@@ -122,7 +122,7 @@ uint32_t gss_krb5_cfx_unwrap_mbuf(uint32_t *, gss_ctx_id_t, mbuf_t *, size_t, in
 int gss_krb5_mech_is_initialized(void);
 void gss_krb5_mech_init(void);
 
-/* Debugging routines */
+                        
 void
 printmbuf(const char *str, mbuf_t mb, uint32_t offset, uint32_t len)
 {
@@ -166,9 +166,9 @@ printgbuf(const char *str, gss_buffer_t buf)
 	}
 }
 
-/*
- * Initialize the data structures for the gss kerberos mech.
- */
+  
+                                                            
+   
 #define GSS_KRB5_NOT_INITIALIZED        0
 #define GSS_KRB5_INITIALIZING   1
 #define GSS_KRB5_INITIALIZED    2
@@ -185,14 +185,14 @@ gss_krb5_mech_init(void)
 {
 	extern void IOSleep(int);
 
-	/* Once initted always initted */
+	                                 
 	if (gss_krb5_mech_initted == GSS_KRB5_INITIALIZED) {
 		return;
 	}
 
-	/* make sure we init only once */
+	                                 
 	if (!OSCompareAndSwap(GSS_KRB5_NOT_INITIALIZED, GSS_KRB5_INITIALIZING, &gss_krb5_mech_initted)) {
-		/* wait until initialization is complete */
+		                                           
 		while (!gss_krb5_mech_is_initialized()) {
 			IOSleep(10);
 		}
@@ -215,9 +215,9 @@ gss_release_buffer(uint32_t *minor, gss_buffer_t buf)
 	return GSS_S_COMPLETE;
 }
 
-/*
- * GSS mbuf routines
- */
+  
+                    
+   
 
 size_t
 gss_mbuf_len(mbuf_t mb, size_t offset)
@@ -230,26 +230,26 @@ gss_mbuf_len(mbuf_t mb, size_t offset)
 	return (offset > len) ? 0 : len - offset;
 }
 
-/*
- * Split an mbuf in a chain into two mbufs such that the original mbuf
- * points to the original mbuf and the new mbuf points to the rest of the
- * chain. The first mbuf length is the first len bytes and the second
- * mbuf contains the remaining bytes. if len is zero or equals
- * mbuf_len(mb) the don't create a new mbuf. We are already at an mbuf
- * boundary. Return the mbuf that starts at the offset.
- */
+  
+                                                                      
+                                                                         
+                                                                     
+                                                              
+                                                                      
+                                                       
+   
 static errno_t
 split_one_mbuf(mbuf_t mb, size_t offset, mbuf_t *nmb, int join)
 {
 	errno_t error;
 
 	*nmb = mb;
-	/* We don't have an mbuf or we're alread on an mbuf boundary */
+	                                                               
 	if (mb == NULL || offset == 0) {
 		return 0;
 	}
 
-	/* If the mbuf length is offset then the next mbuf is the one we want */
+	                                                                        
 	if (mbuf_len(mb) == offset) {
 		*nmb = mbuf_next(mb);
 		if (!join) {
@@ -268,31 +268,31 @@ split_one_mbuf(mbuf_t mb, size_t offset, mbuf_t *nmb, int join)
 	}
 
 	if (mbuf_flags(*nmb) & MBUF_PKTHDR) {
-		/* We don't want to copy the pkthdr. mbuf_split does that. */
+		                                                             
 		error = mbuf_setflags_mask(*nmb, ~MBUF_PKTHDR, MBUF_PKTHDR);
 	}
 
 	if (join) {
-		/* Join the chain again */
+		                          
 		mbuf_setnext(mb, *nmb);
 	}
 
 	return 0;
 }
 
-/*
- * Given an mbuf with an offset and length return the chain such that
- * offset and offset + *subchain_length are on mbuf boundaries.  If
- * *mbuf_length is less that the length of the chain after offset
- * return that length in *mbuf_length. The mbuf sub chain starting at
- * offset is returned in *subchain. If an error occurs return the
- * corresponding errno. Note if there are less than offset bytes then
- * subchain will be set to NULL and *subchain_length will be set to
- * zero. If *subchain_length is 0; then set it to the length of the
- * chain starting at offset. Join parameter is used to indicate whether
- * the mbuf chain will be joined again as on chain, just rearranged so
- * that offset and subchain_length are on mbuf boundaries.
- */
+  
+                                                                     
+                                                                   
+                                                                 
+                                                                     
+                                                                 
+                                                                     
+                                                                   
+                                                                   
+                                                                       
+                                                                      
+                                                          
+   
 
 errno_t
 gss_normalize_mbuf(mbuf_t chain, size_t offset, size_t *subchain_length, mbuf_t *subchain, mbuf_t *tail, int join)
@@ -312,7 +312,7 @@ gss_normalize_mbuf(mbuf_t chain, size_t offset, size_t *subchain_length, mbuf_t 
 		len -= mbuf_len(mb);
 	}
 
-	/* if we don't have offset bytes just return */
+	                                               
 	if (mb == NULL) {
 		return 0;
 	}
@@ -359,9 +359,9 @@ gss_join_mbuf(mbuf_t head, mbuf_t body, mbuf_t tail)
 	return mb;
 }
 
-/*
- * Prepend size bytes to the mbuf chain.
- */
+  
+                                        
+   
 errno_t
 gss_prepend_mbuf(mbuf_t *chain, uint8_t *bytes, size_t size)
 {
@@ -416,16 +416,16 @@ gss_strip_mbuf(mbuf_t chain, int size)
 }
 
 
-/*
- * Kerberos mech generic crypto support for mbufs
- */
+  
+                                                 
+   
 
-/*
- * Walk the mbuf after the given offset calling the passed in crypto function
- * for len bytes. Note the length, len should be a multiple of the  blocksize and
- * there should be at least len bytes available after the offset in the mbuf chain.
- * padding should be done before calling this routine.
- */
+  
+                                                                             
+                                                                                 
+                                                                                   
+                                                      
+   
 int
 mbuf_walk(mbuf_t mbp, size_t offset, size_t len, size_t blocksize, int (*crypto_fn)(void *, uint8_t *data, size_t length), void *ctx)
 {
@@ -434,31 +434,31 @@ mbuf_walk(mbuf_t mbp, size_t offset, size_t len, size_t blocksize, int (*crypto_
 	uint8_t *ptr;
 	int error = 0;
 
-	/* Move to the start of the chain */
+	                                    
 	for (mb = mbp; mb && len > 0; mb = mbuf_next(mb)) {
 		ptr = mbuf_data(mb);
 		mlen = mbuf_len(mb);
 		if (offset >= mlen) {
-			/* Offset not yet reached */
+			                            
 			offset -= mlen;
 			continue;
 		}
-		/* Found starting point in chain */
+		                                   
 		ptr += offset;
 		mlen -= offset;
 		offset = 0;
 
-		/*
-		 * Handle the data in this mbuf. If the length to
-		 * walk is less than the data in the mbuf, set
-		 * the mbuf length left to be the length left
-		 */
+		  
+                                                   
+                                                
+                                               
+     
 		mlen = mlen < len ? mlen : len;
-		/* Figure out how much is a multple of blocksize */
+		                                                   
 		residue = mlen % blocksize;
-		/* And addjust the mleft length to be the largest multiple of blocksized */
+		                                                                           
 		mlen -= residue;
-		/* run our hash/encrypt/decrpyt function */
+		                                           
 		if (mlen > 0) {
 			error = crypto_fn(ctx, ptr, mlen);
 			if (error) {
@@ -467,17 +467,17 @@ mbuf_walk(mbuf_t mbp, size_t offset, size_t len, size_t blocksize, int (*crypto_
 			ptr += mlen;
 			len -= mlen;
 		}
-		/*
-		 * If we have a residue then to get a full block for our crypto
-		 * function, we need to copy the residue into our block size
-		 * block and use the next mbuf to get the rest of the data for
-		 * the block.  N.B. We generally assume that from the offset
-		 * passed in, that the total length, len, is a multple of
-		 * blocksize and that there are at least len bytes in the chain
-		 * from the offset.  We also assume there is at least (blocksize
-		 * - residue) size data in any next mbuf for residue > 0. If not
-		 * we attemp to pullup bytes from down the chain.
-		 */
+		  
+                                                                 
+                                                              
+                                                                
+                                                              
+                                                           
+                                                                 
+                                                                  
+                                                                  
+                                                   
+     
 		if (residue) {
 			mbuf_t nmb = mbuf_next(mb);
 			uint8_t *nptr = NULL, block[blocksize];
@@ -487,10 +487,10 @@ mbuf_walk(mbuf_t mbp, size_t offset, size_t len, size_t blocksize, int (*crypto_
 			offset = blocksize - residue;
 			if (len < offset) {
 				offset = len;
-				/*
-				 * We don't have enough bytes so zero the block
-				 * so that any trailing bytes will be zero.
-				 */
+				  
+                                                   
+                                               
+       
 				cc_clear(sizeof(block), block);
 			}
 			memcpy(block, ptr, residue);
@@ -667,7 +667,7 @@ krb5_mic_mbuf(crypto_ctx_t ctx, gss_buffer_t header,
 }
 
 errno_t
-/* __attribute__((optnone)) */
+                              
 krb5_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t len, int encrypt, cccbc_ctx *ks)
 {
 	struct crypt_walker_ctx wctx;
@@ -691,7 +691,7 @@ krb5_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t len, int encrypt, cccbc_ct
 
 	if ((ctx->flags & CRYPTO_CTS_ENABLE) && ctx->mpad == 1) {
 		uint8_t block[ccmode->block_size];
-		/* if the length is less than or equal to a blocksize. We just encrypt the block */
+		                                                                                   
 		if (len <= ccmode->block_size) {
 			if (len < ccmode->block_size) {
 				memset(block, 0, sizeof(block));
@@ -699,12 +699,12 @@ krb5_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t len, int encrypt, cccbc_ct
 			}
 			plen = ccmode->block_size;
 		} else {
-			/* determine where the last two blocks are */
+			                                             
 			size_t r = len % ccmode->block_size;
 
 			cts_len  = r ? r + ccmode->block_size : 2 * ccmode->block_size;
 			plen = len - cts_len;
-			/* If plen is 0 we only have two blocks to crypt with ccpad below */
+			                                                                    
 			if (plen == 0) {
 				lmb = *mbp;
 			} else {
@@ -750,9 +750,9 @@ krb5_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t len, int encrypt, cccbc_ct
 	return 0;
 }
 
-/*
- * Key derivation routines
- */
+  
+                          
+   
 
 static int
 rr13(unsigned char *buf, size_t len)
@@ -771,7 +771,7 @@ rr13(unsigned char *buf, size_t len)
 
 		memcpy(tmp, buf, bytes);
 		if (lbit) {
-			/* pad final byte with inital bits */
+			                                     
 			tmp[bytes - 1] &= 0xff << (8 - lbit);
 			for (i = lbit; i < 8; i += len) {
 				tmp[bytes - 1] |= buf[0] >> i;
@@ -781,16 +781,16 @@ rr13(unsigned char *buf, size_t len)
 			ssize_t bb;
 			ssize_t b1, s1, b2, s2;
 
-			/* calculate first bit position of this byte */
+			                                               
 			bb = 8 * i - bits;
 			while (bb < 0) {
 				bb += len;
 			}
-			/* byte offset and shift count */
+			                                 
 			b1 = bb / 8;
 			s1 = bb % 8;
 			if ((size_t)bb + 8 > bytes * 8) {
-				/* watch for wraparound */
+				                          
 				s2 = (len + 8 - s1) % 8;
 			} else {
 				s2 = 8 - s1;
@@ -803,7 +803,7 @@ rr13(unsigned char *buf, size_t len)
 }
 
 
-/* Add `b' to `a', both being one's complement numbers. */
+                                                          
 static void
 add1(unsigned char *a, unsigned char *b, size_t len)
 {
@@ -826,8 +826,8 @@ add1(unsigned char *a, unsigned char *b, size_t len)
 static int
 krb5_n_fold(const void *instr, size_t len, void *foldstr, size_t size)
 {
-	/* if len < size we need at most N * len bytes, ie < 2 * size;
-	 *  if len > size we need at most 2 * len */
+	                                                              
+                                             
 	int ret = 0;
 	size_t maxlen = 2 * lmax(size, len);
 	size_t l = 0;
@@ -927,10 +927,10 @@ krb5_3des_key_derivation(crypto_ctx_t ctx, const void *cons, size_t conslen, voi
 	FREE(rawkey, M_TEMP);
 }
 
-/*
- * Create a key schecule
- *
- */
+  
+                        
+  
+   
 void
 cc_key_schedule_create(crypto_ctx_t ctx)
 {
@@ -1045,7 +1045,7 @@ gss_crypto_ctx_init(struct crypto_ctx *ctx, lucid_context_t lucid)
 		assert(ctx->di);
 		ctx->flags = CRYPTO_CTS_ENABLE;
 		ctx->mpad = 1;
-		ctx->digest_size = 12; /* 96 bits */
+		ctx->digest_size = 12;              
 		krb5_make_usage(ctx->gss_ctx->initiate ?
 		    KRB5_USAGE_INITIATOR_SIGN : KRB5_USAGE_ACCEPTOR_SIGN,
 		    0x99, usage_string);
@@ -1066,7 +1066,7 @@ gss_crypto_ctx_init(struct crypto_ctx *ctx, lucid_context_t lucid)
 		assert(ctx->di);
 		ctx->flags = 0;
 		ctx->mpad = ctx->enc_mode->block_size;
-		ctx->digest_size = 20; /* 160 bits */
+		ctx->digest_size = 20;               
 		krb5_make_usage(KRB5_USAGE_ACCEPTOR_SIGN, 0x99, usage_string);
 		krb5_3des_key_derivation(ctx, usage_string, KRB5_USAGE_LEN, &ctx->ckey[GSS_SND]);
 		krb5_3des_key_derivation(ctx, usage_string, KRB5_USAGE_LEN, &ctx->ckey[GSS_RCV]);
@@ -1080,19 +1080,19 @@ gss_crypto_ctx_init(struct crypto_ctx *ctx, lucid_context_t lucid)
 	return 0;
 }
 
-/*
- * CFX gss support routines
- */
-/* From Heimdal cfx.h file RFC 4121 Cryptoo framework extensions */
+  
+                           
+   
+                                                                   
 typedef struct gss_cfx_mic_token_desc_struct {
-	uint8_t TOK_ID[2];      /* 04 04 */
+	uint8_t TOK_ID[2];                 
 	uint8_t Flags;
 	uint8_t Filler[5];
 	uint8_t SND_SEQ[8];
 } gss_cfx_mic_token_desc, *gss_cfx_mic_token;
 
 typedef struct gss_cfx_wrap_token_desc_struct {
-	uint8_t TOK_ID[2];      /* 05 04 */
+	uint8_t TOK_ID[2];                 
 	uint8_t Flags;
 	uint8_t Filler;
 	uint8_t EC[2];
@@ -1100,7 +1100,7 @@ typedef struct gss_cfx_wrap_token_desc_struct {
 	uint8_t SND_SEQ[8];
 } gss_cfx_wrap_token_desc, *gss_cfx_wrap_token;
 
-/* End of cfx.h file */
+                       
 
 #define CFXSentByAcceptor       (1 << 0)
 #define CFXSealed               (1 << 1)
@@ -1158,11 +1158,11 @@ gss_krb5_cfx_verify_mic_token(gss_ctx_id_t ctx, gss_cfx_mic_token token)
 }
 
 uint32_t
-gss_krb5_cfx_get_mic(uint32_t *minor,           /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    gss_qop_t qop __unused,                     /* qop_req (ignored) */
-    gss_buffer_t mbp,                           /* message mbuf */
-    gss_buffer_t mic /* message_token */)
+gss_krb5_cfx_get_mic(uint32_t *minor,                             
+    gss_ctx_id_t ctx,                                               
+    gss_qop_t qop __unused,                                            
+    gss_buffer_t mbp,                                             
+    gss_buffer_t mic                    )
 {
 	gss_cfx_mic_token_desc token;
 	lucid_context_t lctx = &ctx->gss_lucid_ctx;
@@ -1185,7 +1185,7 @@ gss_krb5_cfx_get_mic(uint32_t *minor,           /* minor_status */
 		token.Flags |= CFXAcceptorSubkey;
 	}
 	memcpy(&token.SND_SEQ, &seq, sizeof(lctx->send_seq));
-	lctx->send_seq++; //XXX should only update this below on success? Heimdal seems to do it this way
+	lctx->send_seq++;                                                                                
 	header.value = &token;
 	header.length = sizeof(gss_cfx_mic_token_desc);
 
@@ -1203,11 +1203,11 @@ gss_krb5_cfx_get_mic(uint32_t *minor,           /* minor_status */
 }
 
 uint32_t
-gss_krb5_cfx_verify_mic(uint32_t *minor,        /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    gss_buffer_t mbp,                           /* message_buffer */
-    gss_buffer_t mic,                           /* message_token */
-    gss_qop_t *qop /* qop_state */)
+gss_krb5_cfx_verify_mic(uint32_t *minor,                          
+    gss_ctx_id_t ctx,                                               
+    gss_buffer_t mbp,                                               
+    gss_buffer_t mic,                                              
+    gss_qop_t *qop                )
 {
 	gss_cfx_mic_token token = mic->value;
 	lucid_context_t lctx = &ctx->gss_lucid_ctx;
@@ -1239,7 +1239,7 @@ gss_krb5_cfx_verify_mic(uint32_t *minor,        /* minor_status */
 	*minor = krb5_mic(cctx, NULL, mbp, &header, digest, &verified, 0, 0);
 
 	if (verified) {
-		//XXX  errors and such? Sequencing and replay? Not supported in RPCSEC_GSS
+		                                                                          
 		memcpy(&seq, token->SND_SEQ, sizeof(uint64_t));
 		seq = ntohll(seq);
 		lctx->recv_seq = seq;
@@ -1250,13 +1250,13 @@ out:
 }
 
 uint32_t
-gss_krb5_cfx_get_mic_mbuf(uint32_t *minor,      /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    gss_qop_t qop __unused,                       /* qop_req (ignored) */
-    mbuf_t mbp,                         /* message mbuf */
-    size_t offset,                              /* offest */
-    size_t len,                         /* length */
-    gss_buffer_t mic /* message_token */)
+gss_krb5_cfx_get_mic_mbuf(uint32_t *minor,                        
+    gss_ctx_id_t ctx,                                               
+    gss_qop_t qop __unused,                                              
+    mbuf_t mbp,                                           
+    size_t offset,                                          
+    size_t len,                                     
+    gss_buffer_t mic                    )
 {
 	gss_cfx_mic_token_desc token;
 	lucid_context_t lctx = &ctx->gss_lucid_ctx;
@@ -1281,7 +1281,7 @@ gss_krb5_cfx_get_mic_mbuf(uint32_t *minor,      /* minor_status */
 	}
 
 	memcpy(&token.SND_SEQ, &seq, sizeof(lctx->send_seq));
-	lctx->send_seq++; //XXX should only update this below on success? Heimdal seems to do it this way
+	lctx->send_seq++;                                                                                
 
 	header.length = sizeof(token);
 	header.value = &token;
@@ -1302,13 +1302,13 @@ gss_krb5_cfx_get_mic_mbuf(uint32_t *minor,      /* minor_status */
 
 
 uint32_t
-gss_krb5_cfx_verify_mic_mbuf(uint32_t *minor,   /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    mbuf_t mbp,                                         /* message_buffer */
-    size_t offset,                                      /* offset */
-    size_t len,                                         /* length */
-    gss_buffer_t mic,                           /* message_token */
-    gss_qop_t *qop /* qop_state */)
+gss_krb5_cfx_verify_mic_mbuf(uint32_t *minor,                     
+    gss_ctx_id_t ctx,                                               
+    mbuf_t mbp,                                                             
+    size_t offset,                                                  
+    size_t len,                                                     
+    gss_buffer_t mic,                                              
+    gss_qop_t *qop                )
 {
 	gss_cfx_mic_token token = mic->value;
 	lucid_context_t lctx = &ctx->gss_lucid_ctx;
@@ -1340,7 +1340,7 @@ gss_krb5_cfx_verify_mic_mbuf(uint32_t *minor,   /* minor_status */
 		return GSS_S_FAILURE;
 	}
 
-	//XXX  errors and such? Sequencing and replay? Not Supported RPCSEC_GSS
+	                                                                       
 	memcpy(&seq, token->SND_SEQ, sizeof(uint64_t));
 	seq = ntohll(seq);
 	lctx->recv_seq = seq;
@@ -1368,7 +1368,7 @@ krb5_cfx_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t *len, int encrypt, int
 		if (ctx->mpad > 1) {
 			r = ctx->mpad - (tlen % ctx->mpad);
 		}
-		/* We expect that r == 0 from krb5_cfx_wrap */
+		                                              
 		if (r != 0) {
 			uint8_t mpad[r];
 			memset(mpad, 0, r);
@@ -1400,21 +1400,21 @@ krb5_cfx_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t *len, int encrypt, int
 			return EBADRPC;
 		}
 		tlen = *len - ctx->digest_size;
-		/* get the digest */
+		                    
 		error = mbuf_copydata(*mbp, tlen, ctx->digest_size, digest);
-		/* Remove the digest from the mbuffer */
+		                                        
 		error = gss_strip_mbuf(*mbp, -ctx->digest_size);
 		if (error) {
 			return error;
 		}
 
 		if (reverse) {
-			/*
-			 * Derive a key schedule that the sender can unwrap with. This
-			 * is so that RPCSEC_GSS can restore encrypted arguments for
-			 * resending. We do that because the RPCSEC_GSS sequence number in
-			 * the rpc header is prepended to the body of the message before wrapping.
-			 */
+			  
+                                                                 
+                                                               
+                                                                     
+                                                                             
+      
 			void *ekey;
 			uint8_t usage_string[KRB5_USAGE_LEN];
 			lucid_context_t lctx = ctx->gss_ctx;
@@ -1439,7 +1439,7 @@ krb5_cfx_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t *len, int encrypt, int
 		if (!verf) {
 			return EBADRPC;
 		}
-		/* strip off the confounder */
+		                              
 		assert(ccmode->block_size <= INT_MAX);
 		error = gss_strip_mbuf(*mbp, (int)ccmode->block_size);
 		if (error) {
@@ -1451,13 +1451,13 @@ krb5_cfx_crypt_mbuf(crypto_ctx_t ctx, mbuf_t *mbp, size_t *len, int encrypt, int
 }
 
 uint32_t
-gss_krb5_cfx_wrap_mbuf(uint32_t *minor,         /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    int conf_flag,                              /* conf_req_flag */
-    gss_qop_t qop __unused,                     /* qop_req */
-    mbuf_t *mbp,                                /* input/output message_buffer */
-    size_t len,                                 /* mbuf chain length */
-    int *conf /* conf_state */)
+gss_krb5_cfx_wrap_mbuf(uint32_t *minor,                           
+    gss_ctx_id_t ctx,                                               
+    int conf_flag,                                                 
+    gss_qop_t qop __unused,                                  
+    mbuf_t *mbp,                                                                 
+    size_t len,                                                        
+    int *conf                 )
 {
 	gss_cfx_wrap_token_desc token;
 	lucid_context_t lctx = &ctx->gss_lucid_ctx;
@@ -1534,9 +1534,9 @@ gss_krb5_cfx_wrap_mbuf(uint32_t *minor,         /* minor_status */
 	return GSS_S_COMPLETE;
 }
 
-/*
- * Given a wrap token the has a rrc, move the trailer back to the end.
- */
+  
+                                                                      
+   
 static void
 gss_krb5_cfx_unwrap_rrc_mbuf(mbuf_t header, size_t rrc)
 {
@@ -1547,12 +1547,12 @@ gss_krb5_cfx_unwrap_rrc_mbuf(mbuf_t header, size_t rrc)
 }
 
 uint32_t
-gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,      /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    mbuf_t *mbp,                                /* input/output message_buffer */
-    size_t len,                                 /* mbuf chain length */
-    int *conf_flag,                             /* conf_state */
-    gss_qop_t *qop /* qop state */)
+gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,                        
+    gss_ctx_id_t ctx,                                               
+    mbuf_t *mbp,                                                                 
+    size_t len,                                                        
+    int *conf_flag,                                             
+    gss_qop_t *qop                )
 {
 	gss_cfx_wrap_token_desc token;
 	lucid_context_t lctx = &ctx->gss_lucid_ctx;
@@ -1567,7 +1567,7 @@ gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,      /* minor_status */
 	gss_strip_mbuf(*mbp, sizeof(gss_cfx_wrap_token_desc));
 	len -= sizeof(gss_cfx_wrap_token_desc);
 
-	/* Check for valid token */
+	                           
 	if (token.TOK_ID[0] != wrap_cfx_token.TOK_ID[0] ||
 	    token.TOK_ID[1] != wrap_cfx_token.TOK_ID[1] ||
 	    token.Filler != wrap_cfx_token.Filler) {
@@ -1580,7 +1580,7 @@ gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,      /* minor_status */
 		goto badrpc;
 	}
 
-	/* XXX Sequence replay detection */
+	                                   
 	memcpy(&seq, token.SND_SEQ, sizeof(seq));
 	seq = ntohll(seq);
 	lctx->recv_seq = seq;
@@ -1595,7 +1595,7 @@ gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,      /* minor_status */
 	if (conf) {
 		gss_cfx_wrap_token_desc etoken;
 
-		if (rrc) { /* Handle Right rotation count */
+		if (rrc) {                                  
 			gss_krb5_cfx_unwrap_rrc_mbuf(*mbp, rrc);
 		}
 		error = krb5_cfx_crypt_mbuf(cctx, mbp, &len, 0, reverse);
@@ -1610,13 +1610,13 @@ gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,      /* minor_status */
 			goto badrpc;
 		}
 		mbuf_copydata(*mbp, len, sizeof(gss_cfx_wrap_token_desc), &etoken);
-		/* Verify etoken with the token wich should be the same, except the rc field is always zero */
+		                                                                                              
 		token.RRC[0] = token.RRC[1] = 0;
 		if (memcmp(&token, &etoken, sizeof(gss_cfx_wrap_token_desc)) != 0) {
 			printf("Encrypted token mismach\n");
 			goto badrpc;
 		}
-		/* strip the encrypted token and any pad bytes */
+		                                                 
 		gss_strip_mbuf(*mbp, -(sizeof(gss_cfx_wrap_token_desc) + ec));
 		len -= (sizeof(gss_cfx_wrap_token_desc) + ec);
 	} else {
@@ -1630,7 +1630,7 @@ gss_krb5_cfx_unwrap_mbuf(uint32_t * minor,      /* minor_status */
 		len -= cctx->digest_size;
 		mbuf_copydata(*mbp, len, cctx->digest_size, digest);
 		gss_strip_mbuf(*mbp, -cctx->digest_size);
-		/* When calculating the mic header fields ec and rcc must be zero */
+		                                                                    
 		token.EC[0] = token.EC[1] = token.RRC[0] = token.RRC[1] = 0;
 		header.value = &token;
 		header.length = sizeof(gss_cfx_wrap_token_desc);
@@ -1646,32 +1646,32 @@ badrpc:
 	return GSS_S_FAILURE;
 }
 
-/*
- * RFC 1964 3DES support
- */
+  
+                        
+   
 
 typedef struct gss_1964_mic_token_desc_struct {
-	uint8_t TOK_ID[2];      /* 01 01 */
+	uint8_t TOK_ID[2];                 
 	uint8_t Sign_Alg[2];
-	uint8_t Filler[4];      /* ff ff ff ff */
+	uint8_t Filler[4];                       
 } gss_1964_mic_token_desc, *gss_1964_mic_token;
 
 typedef struct gss_1964_wrap_token_desc_struct {
-	uint8_t TOK_ID[2];      /* 02 01 */
+	uint8_t TOK_ID[2];                 
 	uint8_t Sign_Alg[2];
 	uint8_t Seal_Alg[2];
-	uint8_t Filler[2];      /* ff ff */
+	uint8_t Filler[2];                 
 } gss_1964_wrap_token_desc, *gss_1964_wrap_token;
 
 typedef struct gss_1964_delete_token_desc_struct {
-	uint8_t TOK_ID[2];      /* 01 02 */
+	uint8_t TOK_ID[2];                 
 	uint8_t Sign_Alg[2];
-	uint8_t Filler[4];      /* ff ff ff ff */
+	uint8_t Filler[4];                       
 } gss_1964_delete_token_desc, *gss_1964_delete_token;
 
 typedef struct gss_1964_header_desc_struct {
-	uint8_t App0;           /* 0x60 Application 0 constructed */
-	uint8_t AppLen[];       /* Variable Der length */
+	uint8_t App0;                                               
+	uint8_t AppLen[];                                
 } gss_1964_header_desc, *gss_1964_header;
 
 typedef union {
@@ -1681,13 +1681,13 @@ typedef union {
 } gss_1964_tok_type __attribute__((transparent_union));
 
 typedef struct gss_1964_token_body_struct {
-	uint8_t OIDType;        /* 0x06 */
-	uint8_t OIDLen;         /* 0x09 */
-	uint8_t kerb_mech[9];   /* Der Encode kerberos mech 1.2.840.113554.1.2.2
-	                         *  0x2a, 0x86, 0x48, 0x86, 0xf7, 0x12, 0x01, 0x02, 0x02 */
+	uint8_t OIDType;                  
+	uint8_t OIDLen;                   
+	uint8_t kerb_mech[9];                                                   
+                                                                                    
 	gss_1964_tok_type body;
 	uint8_t SND_SEQ[8];
-	uint8_t Hash[];         /* Mic */
+	uint8_t Hash[];                  
 } gss_1964_token_body_desc, *gss_1964_token_body;
 
 
@@ -1716,7 +1716,7 @@ gss_1964_token_body_desc body_1964_token = {
 	.kerb_mech = "\x2a\x86\x48\x86\xf7\x12\x01\x02\x02",
 };
 
-#define GSS_KRB5_3DES_MAXTOKSZ (sizeof(gss_1964_header_desc) + 5 /* max der length supported */ + sizeof(gss_1964_token_body_desc))
+#define GSS_KRB5_3DES_MAXTOKSZ (sizeof(gss_1964_header_desc) + 5                                + sizeof(gss_1964_token_body_desc))
 
 uint32_t gss_krb5_3des_get_mic(uint32_t *, gss_ctx_id_t, gss_qop_t, gss_buffer_t, gss_buffer_t);
 uint32_t gss_krb5_3des_verify_mic(uint32_t *, gss_ctx_id_t, gss_buffer_t, gss_buffer_t, gss_qop_t *);
@@ -1725,9 +1725,9 @@ uint32_t gss_krb5_3des_verify_mic_mbuf(uint32_t *, gss_ctx_id_t, mbuf_t, size_t,
 uint32_t gss_krb5_3des_wrap_mbuf(uint32_t *, gss_ctx_id_t, int, gss_qop_t, mbuf_t *, size_t, int *);
 uint32_t gss_krb5_3des_unwrap_mbuf(uint32_t *, gss_ctx_id_t, mbuf_t *, size_t, int *, gss_qop_t *);
 
-/*
- * Decode an ASN.1 DER length field
- */
+  
+                                   
+   
 static ssize_t
 gss_krb5_der_length_get(uint8_t **pp)
 {
@@ -1750,9 +1750,9 @@ gss_krb5_der_length_get(uint8_t **pp)
 	return len;
 }
 
-/*
- * Determine size of ASN.1 DER length
- */
+  
+                                     
+   
 static int
 gss_krb5_der_length_size(size_t len)
 {
@@ -1763,9 +1763,9 @@ gss_krb5_der_length_size(size_t len)
 	        len < (1 << 24) ? 4 : 5;
 }
 
-/*
- * Encode an ASN.1 DER length field
- */
+  
+                                   
+   
 static void
 gss_krb5_der_length_put(uint8_t **pp, size_t len)
 {
@@ -1802,8 +1802,8 @@ gss_krb5_3des_token_put(gss_ctx_id_t ctx, gss_1964_tok_type body, gss_buffer_t h
 	tokptr = token->AppLen;
 	gss_krb5_der_length_put(&tokptr, toklen + datalen);
 	tokbody = (gss_1964_token_body)tokptr;
-	*tokbody = body_1964_token;  /* Initalize the token body */
-	tokbody->body = body;  /* and now set the body to the token type passed in */
+	*tokbody = body_1964_token;                                
+	tokbody->body = body;                                                        
 	seq = htonl(seq);
 	for (int i = 0; i < 4; i++) {
 		tokbody->SND_SEQ[i] = (uint8_t)((seq >> (i * 8)) & 0xff);
@@ -1912,11 +1912,11 @@ gss_krb5_3des_token_get(gss_ctx_id_t ctx, gss_buffer_t intok,
 }
 
 uint32_t
-gss_krb5_3des_get_mic(uint32_t *minor,          /* minor status */
-    gss_ctx_id_t ctx,                           /* krb5 context id */
-    gss_qop_t qop __unused,                     /* qop_req (ignored) */
-    gss_buffer_t mbp,                           /* message buffer in */
-    gss_buffer_t mic)                           /* mic token out */
+gss_krb5_3des_get_mic(uint32_t *minor,                            
+    gss_ctx_id_t ctx,                                                
+    gss_qop_t qop __unused,                                            
+    gss_buffer_t mbp,                                                  
+    gss_buffer_t mic)                                              
 {
 	gss_1964_mic_token_desc tokbody = mic_1964_token;
 	crypto_ctx_t cctx = &ctx->gss_cryptor;
@@ -1926,18 +1926,18 @@ gss_krb5_3des_get_mic(uint32_t *minor,          /* minor status */
 
 	hash.length = cctx->digest_size;
 	hash.value = hashval;
-	tokbody.Sign_Alg[0] = 0x04; /* lctx->keydata.lucid_protocol_u.data_1964.sign_alg */
+	tokbody.Sign_Alg[0] = 0x04;                                                        
 	tokbody.Sign_Alg[1] = 0x00;
 	header.length = sizeof(gss_1964_mic_token_desc);
 	header.value = &tokbody;
 
-	/* Hash the data */
+	                   
 	*minor = krb5_mic(cctx, &header, mbp, NULL, hashval, NULL, 0, 0);
 	if (*minor) {
 		return GSS_S_FAILURE;
 	}
 
-	/* Make the token */
+	                    
 	gss_krb5_3des_token_put(ctx, tokbody, &hash, 0, mic);
 
 	return GSS_S_COMPLETE;
@@ -1957,7 +1957,7 @@ gss_krb5_3des_verify_mic(uint32_t *minor,
 	gss_buffer_desc header;
 	int verf;
 
-	mtok.Sign_Alg[0] = 0x04; /* lctx->key_data.lucid_protocol_u.data_1964.sign_alg */
+	mtok.Sign_Alg[0] = 0x04;                                                         
 	mtok.Sign_Alg[1] = 0x00;
 	hash.length = cctx->digest_size;
 	hash.value = hashval;
@@ -1998,18 +1998,18 @@ gss_krb5_3des_get_mic_mbuf(uint32_t *minor,
 
 	hash.length = cctx->digest_size;
 	hash.value = hashval;
-	tokbody.Sign_Alg[0] = 0x04; /* lctx->key_data.lucid_protocol_u.data_4121.sign_alg */
+	tokbody.Sign_Alg[0] = 0x04;                                                         
 	tokbody.Sign_Alg[1] = 0x00;
 	header.length = sizeof(gss_1964_mic_token_desc);
 	header.value = &tokbody;
 
-	/* Hash the data */
+	                   
 	*minor = krb5_mic_mbuf(cctx, &header, mbp, offset, len, NULL, hashval, NULL, 0, 0);
 	if (*minor) {
 		return GSS_S_FAILURE;
 	}
 
-	/* Make the token */
+	                    
 	gss_krb5_3des_token_put(ctx, tokbody, &hash, 0, mic);
 
 	return GSS_S_COMPLETE;
@@ -2031,7 +2031,7 @@ gss_krb5_3des_verify_mic_mbuf(uint32_t *minor,
 	gss_1964_mic_token_desc mtok = mic_1964_token;
 	int verf;
 
-	mtok.Sign_Alg[0] = 0x04; /* lctx->key_data.lucic_protocol_u.data1964.sign_alg */
+	mtok.Sign_Alg[0] = 0x04;                                                        
 	mtok.Sign_Alg[1] = 0x00;
 	hash.length = cctx->digest_size;
 	hash.value = hashval;
@@ -2081,15 +2081,15 @@ gss_krb5_3des_wrap_mbuf(uint32_t *minor,
 
 	hash.length = cctx->digest_size;
 	hash.value = hashval;
-	tokbody.Sign_Alg[0] = 0x04; /* lctx->key_data.lucid_protocol_u.data_1964.sign_alg */
+	tokbody.Sign_Alg[0] = 0x04;                                                         
 	tokbody.Sign_Alg[1] = 0x00;
-	/* conf_flag ? lctx->key_data.lucid_protocol_u.data_1964.seal_alg : 0xffff */
+	                                                                             
 	tokbody.Seal_Alg[0] = conf_flag ? 0x02 : 0xff;
 	tokbody.Seal_Alg[1] = conf_flag ? 0x00 : 0xff;
 	header.length = sizeof(gss_1964_wrap_token_desc);
 	header.value = &tokbody;
 
-	/* Prepend confounder */
+	                        
 	assert(ccmode->block_size <= UINT_MAX);
 	read_random(confounder, (u_int)ccmode->block_size);
 	*minor = gss_prepend_mbuf(mbp, confounder, ccmode->block_size);
@@ -2097,7 +2097,7 @@ gss_krb5_3des_wrap_mbuf(uint32_t *minor,
 		return GSS_S_FAILURE;
 	}
 
-	/* Append trailer of up to 8 bytes and set pad length in each trailer byte */
+	                                                                             
 	padlen = 8 - len % 8;
 	for (int i = 0; i < padlen; i++) {
 		pad[i] = padlen;
@@ -2109,13 +2109,13 @@ gss_krb5_3des_wrap_mbuf(uint32_t *minor,
 
 	len += ccmode->block_size + padlen;
 
-	/* Hash the data */
+	                   
 	*minor = krb5_mic_mbuf(cctx, &header, *mbp, 0, len, NULL, hashval, NULL, 0, 0);
 	if (*minor) {
 		return GSS_S_FAILURE;
 	}
 
-	/* Make the token */
+	                    
 	gss_krb5_3des_token_put(ctx, tokbody, &hash, len, &mic);
 
 	if (conf_flag) {
@@ -2191,9 +2191,9 @@ gss_krb5_3des_unwrap_mbuf(uint32_t *minor,
 		*conf_state = cflag;
 	}
 
-	/*
-	 * Seperate off the header
-	 */
+	  
+                           
+    
 	*minor = gss_normalize_mbuf(*mbp, offset, &length, &smb, &tmb, 0);
 	if (*minor) {
 		return GSS_S_FAILURE;
@@ -2201,7 +2201,7 @@ gss_krb5_3des_unwrap_mbuf(uint32_t *minor,
 
 	assert(tmb == NULL);
 
-	/* Decrypt the chain if needed */
+	                                 
 	if (cflag) {
 		*minor = krb5_crypt_mbuf(cctx, &smb, length, 0, NULL);
 		if (*minor) {
@@ -2209,7 +2209,7 @@ gss_krb5_3des_unwrap_mbuf(uint32_t *minor,
 		}
 	}
 
-	/* Verify the mic */
+	                    
 	header.length = sizeof(gss_1964_wrap_token_desc);
 	header.value = &wrap;
 
@@ -2221,13 +2221,13 @@ gss_krb5_3des_unwrap_mbuf(uint32_t *minor,
 		return GSS_S_BAD_SIG;
 	}
 
-	/* Get the pad bytes */
+	                       
 	*minor = mbuf_copydata(smb, length - 1, 1, &padlen);
 	if (*minor) {
 		return GSS_S_FAILURE;
 	}
 
-	/* Strip the confounder and trailing pad bytes */
+	                                                 
 	gss_strip_mbuf(smb, -padlen);
 	assert(ccmode->block_size <= INT_MAX);
 	gss_strip_mbuf(smb, (int)ccmode->block_size);
@@ -2262,7 +2262,7 @@ supported_etype(uint32_t proto, etypes etype)
 
 	switch (proto) {
 	case 0:
-		/* RFC 1964 */
+		              
 		proto_name = "RFC 1964 krb5 gss mech";
 		switch (etype) {
 		case DES3_CBC_SHA1_KD:
@@ -2272,7 +2272,7 @@ supported_etype(uint32_t proto, etypes etype)
 		}
 		break;
 	case 1:
-		/* RFC 4121 */
+		              
 		proto_name = "RFC 4121 krb5 gss mech";
 		switch (etype) {
 		case AES256_CTS_HMAC_SHA1_96:
@@ -2291,15 +2291,15 @@ supported_etype(uint32_t proto, etypes etype)
 	return 0;
 }
 
-/*
- * Kerberos gss mech entry points
- */
+  
+                                 
+   
 uint32_t
-gss_krb5_get_mic(uint32_t *minor,       /* minor_status */
-    gss_ctx_id_t ctx,                   /* context_handle */
-    gss_qop_t qop,                      /* qop_req */
-    gss_buffer_t mbp,                   /* message buffer */
-    gss_buffer_t mic /* message_token */)
+gss_krb5_get_mic(uint32_t *minor,                         
+    gss_ctx_id_t ctx,                                       
+    gss_qop_t qop,                                   
+    gss_buffer_t mbp,                                       
+    gss_buffer_t mic                    )
 {
 	uint32_t minor_stat = 0;
 
@@ -2308,7 +2308,7 @@ gss_krb5_get_mic(uint32_t *minor,       /* minor_status */
 	}
 	*minor = 0;
 
-	/* Validate context */
+	                      
 	if (ctx == NULL || ((lucid_context_version_t)ctx)->version != 1) {
 		return GSS_S_NO_CONTEXT;
 	}
@@ -2320,10 +2320,10 @@ gss_krb5_get_mic(uint32_t *minor,       /* minor_status */
 
 	switch (ctx->gss_lucid_ctx.key_data.proto) {
 	case 0:
-		/* RFC 1964 DES3 case */
+		                        
 		return gss_krb5_3des_get_mic(minor, ctx, qop, mbp, mic);
 	case 1:
-		/* RFC 4121 CFX case */
+		                       
 		return gss_krb5_cfx_get_mic(minor, ctx, qop, mbp, mic);
 	}
 
@@ -2331,11 +2331,11 @@ gss_krb5_get_mic(uint32_t *minor,       /* minor_status */
 }
 
 uint32_t
-gss_krb5_verify_mic(uint32_t *minor,            /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    gss_buffer_t mbp,                           /* message_buffer */
-    gss_buffer_t mic,                           /* message_token */
-    gss_qop_t *qop /* qop_state */)
+gss_krb5_verify_mic(uint32_t *minor,                              
+    gss_ctx_id_t ctx,                                               
+    gss_buffer_t mbp,                                               
+    gss_buffer_t mic,                                              
+    gss_qop_t *qop                )
 {
 	uint32_t minor_stat = 0;
 	gss_qop_t qop_val = GSS_C_QOP_DEFAULT;
@@ -2349,7 +2349,7 @@ gss_krb5_verify_mic(uint32_t *minor,            /* minor_status */
 
 	*minor = 0;
 
-	/* Validate context */
+	                      
 	if (ctx == NULL || ((lucid_context_version_t)ctx)->version != 1) {
 		return GSS_S_NO_CONTEXT;
 	}
@@ -2361,23 +2361,23 @@ gss_krb5_verify_mic(uint32_t *minor,            /* minor_status */
 
 	switch (ctx->gss_lucid_ctx.key_data.proto) {
 	case 0:
-		/* RFC 1964 DES3 case */
+		                        
 		return gss_krb5_3des_verify_mic(minor, ctx, mbp, mic, qop);
 	case 1:
-		/* RFC 4121 CFX case */
+		                       
 		return gss_krb5_cfx_verify_mic(minor, ctx, mbp, mic, qop);
 	}
 	return GSS_S_COMPLETE;
 }
 
 uint32_t
-gss_krb5_get_mic_mbuf(uint32_t *minor,  /* minor_status */
-    gss_ctx_id_t ctx,                   /* context_handle */
-    gss_qop_t qop,                      /* qop_req */
-    mbuf_t mbp,                         /* message mbuf */
-    size_t offset,                      /* offest */
-    size_t len,                         /* length */
-    gss_buffer_t mic /* message_token */)
+gss_krb5_get_mic_mbuf(uint32_t *minor,                    
+    gss_ctx_id_t ctx,                                       
+    gss_qop_t qop,                                   
+    mbuf_t mbp,                                           
+    size_t offset,                                  
+    size_t len,                                     
+    gss_buffer_t mic                    )
 {
 	uint32_t minor_stat = 0;
 
@@ -2390,7 +2390,7 @@ gss_krb5_get_mic_mbuf(uint32_t *minor,  /* minor_status */
 		len = ~(size_t)0;
 	}
 
-	/* Validate context */
+	                      
 	if (ctx == NULL || ((lucid_context_version_t)ctx)->version != 1) {
 		return GSS_S_NO_CONTEXT;
 	}
@@ -2402,10 +2402,10 @@ gss_krb5_get_mic_mbuf(uint32_t *minor,  /* minor_status */
 
 	switch (ctx->gss_lucid_ctx.key_data.proto) {
 	case 0:
-		/* RFC 1964 DES3 case */
+		                        
 		return gss_krb5_3des_get_mic_mbuf(minor, ctx, qop, mbp, offset, len, mic);
 	case 1:
-		/* RFC 4121 CFX case */
+		                       
 		return gss_krb5_cfx_get_mic_mbuf(minor, ctx, qop, mbp, offset, len, mic);
 	}
 
@@ -2413,13 +2413,13 @@ gss_krb5_get_mic_mbuf(uint32_t *minor,  /* minor_status */
 }
 
 uint32_t
-gss_krb5_verify_mic_mbuf(uint32_t *minor,               /* minor_status */
-    gss_ctx_id_t ctx,                                   /* context_handle */
-    mbuf_t mbp,                                         /* message_buffer */
-    size_t offset,                              /* offset */
-    size_t len,                                         /* length */
-    gss_buffer_t mic,                                   /* message_token */
-    gss_qop_t *qop /* qop_state */)
+gss_krb5_verify_mic_mbuf(uint32_t *minor,                                 
+    gss_ctx_id_t ctx,                                                       
+    mbuf_t mbp,                                                             
+    size_t offset,                                          
+    size_t len,                                                     
+    gss_buffer_t mic,                                                      
+    gss_qop_t *qop                )
 {
 	uint32_t minor_stat = 0;
 	gss_qop_t qop_val = GSS_C_QOP_DEFAULT;
@@ -2437,7 +2437,7 @@ gss_krb5_verify_mic_mbuf(uint32_t *minor,               /* minor_status */
 		len = ~(size_t)0;
 	}
 
-	/* Validate context */
+	                      
 	if (ctx == NULL || ((lucid_context_version_t)ctx)->version != 1) {
 		return GSS_S_NO_CONTEXT;
 	}
@@ -2449,10 +2449,10 @@ gss_krb5_verify_mic_mbuf(uint32_t *minor,               /* minor_status */
 
 	switch (ctx->gss_lucid_ctx.key_data.proto) {
 	case 0:
-		/* RFC 1964 DES3 case */
+		                        
 		return gss_krb5_3des_verify_mic_mbuf(minor, ctx, mbp, offset, len, mic, qop);
 	case 1:
-		/* RFC 4121 CFX case */
+		                       
 		return gss_krb5_cfx_verify_mic_mbuf(minor, ctx, mbp, offset, len, mic, qop);
 	}
 
@@ -2460,14 +2460,14 @@ gss_krb5_verify_mic_mbuf(uint32_t *minor,               /* minor_status */
 }
 
 uint32_t
-gss_krb5_wrap_mbuf(uint32_t *minor,     /* minor_status */
-    gss_ctx_id_t ctx,                   /* context_handle */
-    int conf_flag,                      /* conf_req_flag */
-    gss_qop_t qop,                      /* qop_req */
-    mbuf_t *mbp,                        /* input/output message_buffer */
-    size_t offset,                      /* offset */
-    size_t len,                         /* length */
-    int *conf_state /* conf state */)
+gss_krb5_wrap_mbuf(uint32_t *minor,                       
+    gss_ctx_id_t ctx,                                       
+    int conf_flag,                                         
+    gss_qop_t qop,                                   
+    mbuf_t *mbp,                                                         
+    size_t offset,                                  
+    size_t len,                                     
+    int *conf_state                 )
 {
 	uint32_t major = GSS_S_FAILURE, minor_stat = 0;
 	mbuf_t smb, tmb;
@@ -2482,7 +2482,7 @@ gss_krb5_wrap_mbuf(uint32_t *minor,     /* minor_status */
 
 	*minor = 0;
 
-	/* Validate context */
+	                      
 	if (ctx == NULL || ((lucid_context_version_t)ctx)->version != 1) {
 		return GSS_S_NO_CONTEXT;
 	}
@@ -2496,11 +2496,11 @@ gss_krb5_wrap_mbuf(uint32_t *minor,     /* minor_status */
 
 	switch (ctx->gss_lucid_ctx.key_data.proto) {
 	case 0:
-		/* RFC 1964 DES3 case */
+		                        
 		major = gss_krb5_3des_wrap_mbuf(minor, ctx, conf_flag, qop, &smb, len, conf_state);
 		break;
 	case 1:
-		/* RFC 4121 CFX case */
+		                       
 		major = gss_krb5_cfx_wrap_mbuf(minor, ctx, conf_flag, qop, &smb, len, conf_state);
 		break;
 	}
@@ -2516,13 +2516,13 @@ gss_krb5_wrap_mbuf(uint32_t *minor,     /* minor_status */
 }
 
 uint32_t
-gss_krb5_unwrap_mbuf(uint32_t * minor,          /* minor_status */
-    gss_ctx_id_t ctx,                           /* context_handle */
-    mbuf_t *mbp,                                /* input/output message_buffer */
-    size_t offset,                              /* offset */
-    size_t len,                                 /* length */
-    int *conf_flag,                             /* conf_state */
-    gss_qop_t *qop /* qop state */)
+gss_krb5_unwrap_mbuf(uint32_t * minor,                            
+    gss_ctx_id_t ctx,                                               
+    mbuf_t *mbp,                                                                 
+    size_t offset,                                          
+    size_t len,                                             
+    int *conf_flag,                                             
+    gss_qop_t *qop                )
 {
 	uint32_t major = GSS_S_FAILURE, minor_stat = 0;
 	gss_qop_t qop_val = GSS_C_QOP_DEFAULT;
@@ -2539,7 +2539,7 @@ gss_krb5_unwrap_mbuf(uint32_t * minor,          /* minor_status */
 		conf_flag = &conf_val;
 	}
 
-	/* Validate context */
+	                      
 	if (ctx == NULL || ((lucid_context_version_t)ctx)->version != 1) {
 		return GSS_S_NO_CONTEXT;
 	}
@@ -2553,11 +2553,11 @@ gss_krb5_unwrap_mbuf(uint32_t * minor,          /* minor_status */
 
 	switch (ctx->gss_lucid_ctx.key_data.proto) {
 	case 0:
-		/* RFC 1964 DES3 case */
+		                        
 		major = gss_krb5_3des_unwrap_mbuf(minor, ctx, &smb, len, conf_flag, qop);
 		break;
 	case 1:
-		/* RFC 4121 CFX case */
+		                       
 		major = gss_krb5_cfx_unwrap_mbuf(minor, ctx, &smb, len, conf_flag, qop);
 		break;
 	}
@@ -2698,7 +2698,7 @@ gss_krb5_make_context(void *data, uint32_t datalen)
 		return NULL;
 	}
 
-	/* Set up crypto context */
+	                           
 	gss_crypto_ctx_init(&ctx->gss_cryptor, &ctx->gss_lucid_ctx);
 	FREE(data, M_TEMP);
 

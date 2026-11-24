@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/ah_input.c,v 1.1.2.6 2002/04/28 05:40:26 suz Exp $	*/
-/*	$KAME: ah_input.c,v 1.67 2002/01/07 11:39:56 kjc Exp $	*/
+                                                                                   
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -58,9 +58,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1826/2402 authentication header.
- */
+  
+                                      
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -145,7 +145,7 @@ ah4_input(struct mbuf *m, int off)
 		}
 	}
 
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip = mtod(m, struct ip *);
@@ -157,7 +157,7 @@ ah4_input(struct mbuf *m, int off)
 	hlen = (u_int8_t)(ip->ip_hl << 2);
 #endif
 
-	/* find the sassoc. */
+	                      
 	spi = ah->ah_spi;
 
 	if ((sav = key_allocsa(AF_INET,
@@ -193,35 +193,35 @@ ah4_input(struct mbuf *m, int off)
 	siz = (*algo->sumsiz)(sav);
 	siz1 = ((siz + 3) & ~(4 - 1));
 
-	/*
-	 * sanity checks for header, 1.
-	 */
+	  
+                                
+    
 	{
 		int sizoff;
 
 		sizoff = (sav->flags & SADB_X_EXT_OLD) ? 0 : 4;
 
-		/*
-		 * Here, we do not do "siz1 == siz".  This is because the way
-		 * RFC240[34] section 2 is written.  They do not require truncation
-		 * to 96 bits.
-		 * For example, Microsoft IPsec stack attaches 160 bits of
-		 * authentication data for both hmac-md5 and hmac-sha1.  For hmac-sha1,
-		 * 32 bits of padding is attached.
-		 *
-		 * There are two downsides to this specification.
-		 * They have no real harm, however, they leave us fuzzy feeling.
-		 * - if we attach more than 96 bits of authentication data onto AH,
-		 *   we will never notice about possible modification by rogue
-		 *   intermediate nodes.
-		 *   Since extra bits in AH checksum is never used, this constitutes
-		 *   no real issue, however, it is wacky.
-		 * - even if the peer attaches big authentication data, we will never
-		 *   notice the difference, since longer authentication data will just
-		 *   work.
-		 *
-		 * We may need some clarification in the spec.
-		 */
+		  
+                                                               
+                                                                     
+                
+                                                            
+                                                                         
+                                    
+    
+                                                   
+                                                                  
+                                                                     
+                                                                
+                          
+                                                                      
+                                           
+                                                                       
+                                                                        
+            
+    
+                                                
+     
 		if (siz1 < siz) {
 			ipseclog((LOG_NOTICE, "sum length too short in IPv4 AH input "
 			    "(%u, should be at least %u): %s\n",
@@ -247,7 +247,7 @@ ah4_input(struct mbuf *m, int off)
 				IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 				goto fail;
 			}
-			/* Expect 32-bit aligned data ptr on strict-align platforms */
+			                                                              
 			MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 			ip = mtod(m, struct ip *);
@@ -255,12 +255,12 @@ ah4_input(struct mbuf *m, int off)
 		}
 	}
 
-	/*
-	 * check for sequence number.
-	 */
+	  
+                              
+    
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[0] != NULL) {
 		if (ipsec_chkreplay(ntohl(((struct newah *)ah)->ah_seq), sav, 0)) {
-			; /*okey*/
+			;         
 		} else {
 			IPSEC_STAT_INCREMENT(ipsecstat.in_ahreplay);
 			ipseclog((LOG_WARNING,
@@ -270,10 +270,10 @@ ah4_input(struct mbuf *m, int off)
 		}
 	}
 
-	/*
-	 * alright, it seems sane.  now we are going to check the
-	 * cryptographic checksum.
-	 */
+	  
+                                                          
+                           
+    
 	cksum = _MALLOC(siz1, M_TEMP, M_NOWAIT);
 	if (!cksum) {
 		ipseclog((LOG_DEBUG, "IPv4 AH input: "
@@ -282,10 +282,10 @@ ah4_input(struct mbuf *m, int off)
 		goto fail;
 	}
 
-	/*
-	 * some of IP header fields are flipped to the host endian.
-	 * convert them back to network endian.  VERY stupid.
-	 */
+	  
+                                                            
+                                                      
+    
 	if ((ip->ip_len + hlen) > UINT16_MAX) {
 		ipseclog((LOG_DEBUG, "IPv4 AH input: "
 		    "bad length ip header len %u, total len %u\n",
@@ -302,9 +302,9 @@ ah4_input(struct mbuf *m, int off)
 		goto fail;
 	}
 	IPSEC_STAT_INCREMENT(ipsecstat.in_ahhist[sav->alg_auth]);
-	/*
-	 * flip them back.
-	 */
+	  
+                   
+    
 	ip->ip_len = ntohs(ip->ip_len) - hlen;
 	ip->ip_off = ntohs(ip->ip_off);
 
@@ -312,10 +312,10 @@ ah4_input(struct mbuf *m, int off)
 		caddr_t sumpos = NULL;
 
 		if (sav->flags & SADB_X_EXT_OLD) {
-			/* RFC 1826 */
+			              
 			sumpos = (caddr_t)(ah + 1);
 		} else {
-			/* RFC 2402 */
+			              
 			sumpos = (caddr_t)(((struct newah *)ah) + 1);
 		}
 
@@ -344,9 +344,9 @@ ah4_input(struct mbuf *m, int off)
 		goto fail;
 	}
 
-	/*
-	 * update sequence number.
-	 */
+	  
+                           
+    
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[0] != NULL) {
 		if (ipsec_updatereplay(ntohl(((struct newah *)ah)->ah_seq), sav, 0)) {
 			IPSEC_STAT_INCREMENT(ipsecstat.in_ahreplay);
@@ -354,12 +354,12 @@ ah4_input(struct mbuf *m, int off)
 		}
 	}
 
-	/* was it transmitted over the IPsec tunnel SA? */
+	                                                  
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1826 */
+		              
 		stripsiz = sizeof(struct ah) + siz1;
 	} else {
-		/* RFC 2402 */
+		              
 		stripsiz = sizeof(struct newah) + siz1;
 	}
 	if (ipsec4_tunnel_validate(m, (int)(off + stripsiz), nxt, sav, &ifamily)) {
@@ -367,13 +367,13 @@ ah4_input(struct mbuf *m, int off)
 		struct sockaddr_storage addr;
 		struct sockaddr_in *ipaddr;
 
-		/*
-		 * strip off all the headers that precedes AH.
-		 *	IP xx AH IP' payload -> IP' payload
-		 *
-		 * XXX more sanity checks
-		 * XXX relationship with gif?
-		 */
+		  
+                                                
+                                        
+    
+                           
+                               
+     
 		u_int8_t tos, otos;
 		int sum;
 
@@ -393,7 +393,7 @@ ah4_input(struct mbuf *m, int off)
 		}
 		ip = mtod(m, struct ip *);
 		otos = ip->ip_tos;
-		/* ECN consideration. */
+		                        
 		if (ip_ecn_egress(ip4_ipsec_ecn, &tos, &ip->ip_tos) == 0) {
 			IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 			goto fail;
@@ -403,7 +403,7 @@ ah4_input(struct mbuf *m, int off)
 			sum = ~ntohs(ip->ip_sum) & 0xffff;
 			sum += (~otos & 0xffff) + ip->ip_tos;
 			sum = (sum >> 16) + (sum & 0xffff);
-			sum += (sum >> 16); /* add carry */
+			sum += (sum >> 16);                
 			ip->ip_sum = htons(~sum & 0xffff);
 		}
 
@@ -417,25 +417,25 @@ ah4_input(struct mbuf *m, int off)
 		}
 
 #if 1
-		/*
-		 * Should the inner packet be considered authentic?
-		 * My current answer is: NO.
-		 *
-		 * host1 -- gw1 === gw2 -- host2
-		 *	In this case, gw2 can trust the	authenticity of the
-		 *	outer packet, but NOT inner.  Packet may be altered
-		 *	between host1 and gw1.
-		 *
-		 * host1 -- gw1 === host2
-		 *	This case falls into the same scenario as above.
-		 *
-		 * host1 === host2
-		 *	This case is the only case when we may be able to leave
-		 *	M_AUTHIPHDR and M_AUTHIPDGM set.
-		 *	However, if host1 is wrongly configured, and allows
-		 *	attacker to inject some packet with src=host1 and
-		 *	dst=host2, you are in risk.
-		 */
+		  
+                                                     
+                              
+    
+                                  
+                                                        
+                                                        
+                           
+    
+                           
+                                                     
+    
+                    
+                                                            
+                                     
+                                                        
+                                                      
+                                
+     
 		m->m_flags &= ~M_AUTHIPHDR;
 		m->m_flags &= ~M_AUTHIPDGM;
 #endif
@@ -453,18 +453,18 @@ ah4_input(struct mbuf *m, int off)
 		ipaddr->sin_len = sizeof(*ipaddr);
 		ipaddr->sin_addr = ip->ip_dst;
 
-		// update the receiving interface address based on the inner address
+		                                                                    
 		ifa = ifa_ifwithaddr((struct sockaddr *)&addr);
 		if (ifa) {
 			m->m_pkthdr.rcvif = ifa->ifa_ifp;
 			IFA_REMREF(ifa);
 		}
 
-		// Input via IPsec interface
+		                            
 		lck_mtx_lock(sadb_mutex);
 		ifnet_t ipsec_if = sav->sah->ipsec_if;
 		if (ipsec_if != NULL) {
-			// If an interface is found, add a reference count before dropping the lock
+			                                                                           
 			ifnet_reference(ipsec_if);
 		}
 		lck_mtx_unlock(sadb_mutex);
@@ -484,15 +484,15 @@ ah4_input(struct mbuf *m, int off)
 		}
 		nxt = IPPROTO_DONE;
 	} else {
-		/*
-		 * strip off AH.
-		 */
+		  
+                  
+     
 
 		ip = mtod(m, struct ip *);
-		/*
-		 * We do deep-copy since KAME requires that
-		 * the packet is placed in a single external mbuf.
-		 */
+		  
+                                             
+                                                    
+     
 		ovbcopy((caddr_t)ip, (caddr_t)(((u_char *)ip) + stripsiz), off);
 		m->m_data += stripsiz;
 		m->m_len -= stripsiz;
@@ -512,7 +512,7 @@ ah4_input(struct mbuf *m, int off)
 		ip->ip_len = htons(ntohs(ip->ip_len) - stripsiz);
 #endif
 		ip->ip_p = (u_char)nxt;
-		/* forget about IP hdr checksum, the check has already been passed */
+		                                                                     
 
 		key_sa_recordxfer(sav, m);
 		if (ipsec_addhist(m, IPPROTO_AH, spi) != 0) {
@@ -525,11 +525,11 @@ ah4_input(struct mbuf *m, int off)
 		    struct ip *, ip, struct ip6_hdr *, NULL);
 
 		if (nxt != IPPROTO_DONE) {
-			// Input via IPsec interface
+			                            
 			lck_mtx_lock(sadb_mutex);
 			ifnet_t ipsec_if = sav->sah->ipsec_if;
 			if (ipsec_if != NULL) {
-				// If an interface is found, add a reference count before dropping the lock
+				                                                                           
 				ifnet_reference(ipsec_if);
 			}
 			lck_mtx_unlock(sadb_mutex);
@@ -581,7 +581,7 @@ fail:
 	}
 	return;
 }
-#endif /* INET */
+#endif           
 
 int
 ah6_input(struct mbuf **mp, int *offp, int proto)
@@ -603,13 +603,13 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 
 	IP6_EXTHDR_CHECK(m, off, sizeof(struct ah), {return IPPROTO_DONE;});
 	ah = (struct ah *)(void *)(mtod(m, caddr_t) + off);
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip6 = mtod(m, struct ip6_hdr *);
 	nxt = ah->ah_nxt;
 
-	/* find the sassoc.  */
+	                       
 	spi = ah->ah_spi;
 
 	if (ntohs(ip6->ip6_plen) == 0) {
@@ -652,18 +652,18 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 	siz = (*algo->sumsiz)(sav);
 	siz1 = ((siz + 3) & ~(4 - 1));
 
-	/*
-	 * sanity checks for header, 1.
-	 */
+	  
+                                
+    
 	{
 		int sizoff;
 
 		sizoff = (sav->flags & SADB_X_EXT_OLD) ? 0 : 4;
 
-		/*
-		 * Here, we do not do "siz1 == siz".  See ah4_input() for complete
-		 * description.
-		 */
+		  
+                                                                    
+                 
+     
 		if (siz1 < siz) {
 			ipseclog((LOG_NOTICE, "sum length too short in IPv6 AH input "
 			    "(%u, should be at least %u): %s\n",
@@ -687,12 +687,12 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		ah = (struct ah *)(void *)(mtod(m, caddr_t) + off);
 	}
 
-	/*
-	 * check for sequence number.
-	 */
+	  
+                              
+    
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[0] != NULL) {
 		if (ipsec_chkreplay(ntohl(((struct newah *)ah)->ah_seq), sav, 0)) {
-			; /*okey*/
+			;         
 		} else {
 			IPSEC_STAT_INCREMENT(ipsec6stat.in_ahreplay);
 			ipseclog((LOG_WARNING,
@@ -703,10 +703,10 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		}
 	}
 
-	/*
-	 * alright, it seems sane.  now we are going to check the
-	 * cryptographic checksum.
-	 */
+	  
+                                                          
+                           
+    
 	cksum = _MALLOC(siz1, M_TEMP, M_NOWAIT);
 	if (!cksum) {
 		ipseclog((LOG_DEBUG, "IPv6 AH input: "
@@ -726,10 +726,10 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		caddr_t sumpos = NULL;
 
 		if (sav->flags & SADB_X_EXT_OLD) {
-			/* RFC 1826 */
+			              
 			sumpos = (caddr_t)(ah + 1);
 		} else {
-			/* RFC 2402 */
+			              
 			sumpos = (caddr_t)(((struct newah *)ah) + 1);
 		}
 
@@ -758,9 +758,9 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		goto fail;
 	}
 
-	/*
-	 * update sequence number.
-	 */
+	  
+                           
+    
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[0] != NULL) {
 		if (ipsec_updatereplay(ntohl(((struct newah *)ah)->ah_seq), sav, 0)) {
 			IPSEC_STAT_INCREMENT(ipsec6stat.in_ahreplay);
@@ -768,26 +768,26 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		}
 	}
 
-	/* was it transmitted over the IPsec tunnel SA? */
+	                                                  
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1826 */
+		              
 		stripsiz = sizeof(struct ah) + siz1;
 	} else {
-		/* RFC 2402 */
+		              
 		stripsiz = sizeof(struct newah) + siz1;
 	}
 	if (ipsec6_tunnel_validate(m, (int)(off + stripsiz), nxt, sav, &ifamily)) {
 		ifaddr_t ifa;
 		struct sockaddr_storage addr;
 		struct sockaddr_in6 *ip6addr;
-		/*
-		 * strip off all the headers that precedes AH.
-		 *	IP6 xx AH IP6' payload -> IP6' payload
-		 *
-		 * XXX more sanity checks
-		 * XXX relationship with gif?
-		 */
-		u_int32_t flowinfo;     /*net endian*/
+		  
+                                                
+                                           
+    
+                           
+                               
+     
+		u_int32_t flowinfo;                   
 
 		if (ifamily == AF_INET) {
 			ipseclog((LOG_NOTICE, "ipsec tunnel protocol mismatch "
@@ -798,10 +798,10 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		flowinfo = ip6->ip6_flow;
 		m_adj(m, (int)(off + stripsiz));
 		if (m->m_len < sizeof(*ip6)) {
-			/*
-			 * m_pullup is prohibited in KAME IPv6 input processing
-			 * but there's no other way!
-			 */
+			  
+                                                          
+                               
+      
 			m = m_pullup(m, sizeof(*ip6));
 			if (!m) {
 				IPSEC_STAT_INCREMENT(ipsec6stat.in_inval);
@@ -809,7 +809,7 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 			}
 		}
 		ip6 = mtod(m, struct ip6_hdr *);
-		/* ECN consideration. */
+		                        
 		if (ip6_ecn_egress(ip6_ipsec_ecn, &flowinfo, &ip6->ip6_flow) == 0) {
 			IPSEC_STAT_INCREMENT(ipsec6stat.in_inval);
 			goto fail;
@@ -824,10 +824,10 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 			goto fail;
 		}
 
-		/*
-		 * should the inner packet be considered authentic?
-		 * see comment in ah4_input().
-		 */
+		  
+                                                     
+                                
+     
 		m->m_flags &= ~M_AUTHIPHDR;
 		m->m_flags &= ~M_AUTHIPDGM;
 
@@ -844,18 +844,18 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		ip6addr->sin6_len = sizeof(*ip6addr);
 		ip6addr->sin6_addr = ip6->ip6_dst;
 
-		// update the receiving interface address based on the inner address
+		                                                                    
 		ifa = ifa_ifwithaddr((struct sockaddr *)&addr);
 		if (ifa) {
 			m->m_pkthdr.rcvif = ifa->ifa_ifp;
 			IFA_REMREF(ifa);
 		}
 
-		// Input via IPsec interface
+		                            
 		lck_mtx_lock(sadb_mutex);
 		ifnet_t ipsec_if = sav->sah->ipsec_if;
 		if (ipsec_if != NULL) {
-			// If an interface is found, add a reference count before dropping the lock
+			                                                                           
 			ifnet_reference(ipsec_if);
 		}
 		lck_mtx_unlock(sadb_mutex);
@@ -876,30 +876,30 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 		}
 		nxt = IPPROTO_DONE;
 	} else {
-		/*
-		 * strip off AH.
-		 */
+		  
+                  
+     
 		char *prvnxtp;
 
-		/*
-		 * Copy the value of the next header field of AH to the
-		 * next header field of the previous header.
-		 * This is necessary because AH will be stripped off below.
-		 */
-		prvnxtp = ip6_get_prevhdr(m, off); /* XXX */
+		  
+                                                         
+                                              
+                                                             
+     
+		prvnxtp = ip6_get_prevhdr(m, off);          
 		*prvnxtp = (u_int8_t)nxt;
 
 		ip6 = mtod(m, struct ip6_hdr *);
-		/*
-		 * We do deep-copy since KAME requires that
-		 * the packet is placed in a single mbuf.
-		 */
+		  
+                                             
+                                           
+     
 		ovbcopy((caddr_t)ip6, ((caddr_t)ip6) + stripsiz, off);
 		m->m_data += stripsiz;
 		m->m_len -= stripsiz;
 		m->m_pkthdr.len -= stripsiz;
 		ip6 = mtod(m, struct ip6_hdr *);
-		/* XXX jumbogram */
+		                   
 		ip6->ip6_plen = htons((u_int16_t)(ntohs(ip6->ip6_plen) - stripsiz));
 
 		key_sa_recordxfer(sav, m);
@@ -908,11 +908,11 @@ ah6_input(struct mbuf **mp, int *offp, int proto)
 			goto fail;
 		}
 
-		// Input via IPsec interface
+		                            
 		lck_mtx_lock(sadb_mutex);
 		ifnet_t ipsec_if = sav->sah->ipsec_if;
 		if (ipsec_if != NULL) {
-			// If an interface is found, add a reference count before dropping the lock
+			                                                                           
 			ifnet_reference(ipsec_if);
 		}
 		lck_mtx_unlock(sadb_mutex);
@@ -975,7 +975,7 @@ ah6_ctlinput(int cmd, struct sockaddr *sa, void *d)
 		return;
 	}
 
-	/* if the parameter is from icmp6, decode it. */
+	                                                
 	if (d != NULL) {
 		ip6cp = (struct ip6ctlparam *)d;
 		m = ip6cp->ip6c_m;
@@ -987,21 +987,21 @@ ah6_ctlinput(int cmd, struct sockaddr *sa, void *d)
 	}
 
 	if (ip6) {
-		/*
-		 * XXX: We assume that when ip6 is non NULL,
-		 * M and OFF are valid.
-		 */
+		  
+                                              
+                         
+     
 
-		/* check if we can safely examine src and dst ports */
+		                                                      
 		if (m->m_pkthdr.len < off + sizeof(ah)) {
 			return;
 		}
 
 		if (m->m_len < off + sizeof(ah)) {
-			/*
-			 * this should be rare case,
-			 * so we compromise on this copy...
-			 */
+			  
+                               
+                                      
+      
 			m_copydata(m, off, sizeof(ah), (caddr_t)&ah);
 			ahp = &ah;
 		} else {
@@ -1011,10 +1011,10 @@ ah6_ctlinput(int cmd, struct sockaddr *sa, void *d)
 		if (cmd == PRC_MSGSIZE) {
 			int valid = 0;
 
-			/*
-			 * Check to see if we have a valid SA corresponding to
-			 * the address in the ICMP message payload.
-			 */
+			  
+                                                         
+                                              
+      
 			sa6_src = ip6cp->ip6c_src;
 			sa6_dst = (struct sockaddr_in6 *)(void *)sa;
 			sav = key_allocsa(AF_INET6,
@@ -1029,20 +1029,20 @@ ah6_ctlinput(int cmd, struct sockaddr *sa, void *d)
 				key_freesav(sav, KEY_SADB_UNLOCKED);
 			}
 
-			/* XXX Further validation? */
+			                             
 
-			/*
-			 * Depending on the value of "valid" and routing table
-			 * size (mtudisc_{hi,lo}wat), we will:
-			 * - recalcurate the new MTU and create the
-			 *   corresponding routing entry, or
-			 * - ignore the MTU change notification.
-			 */
+			  
+                                                         
+                                         
+                                              
+                                       
+                                           
+      
 			icmp6_mtudisc_update((struct ip6ctlparam *)d, valid);
 		}
 
-		/* we normally notify single pcb here */
+		                                        
 	} else {
-		/* we normally notify any pcb here */
+		                                     
 	}
 }

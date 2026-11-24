@@ -81,29 +81,29 @@
 struct  timezone tz = { .tz_minuteswest = 0, .tz_dsttime = 0 };
 
 #if !defined(__x86_64__)
-#define NPROC 1000          /* Account for TOTAL_CORPSES_ALLOWED by making this slightly lower than we can. */
+#define NPROC 1000                                                                                            
 #define NPROC_PER_UID 950
 #else
 #define NPROC (20 + 32 * 32)
 #define NPROC_PER_UID (NPROC/2)
 #endif
 
-/* NOTE: maxproc and hard_maxproc values are subject to device specific scaling in bsd_scale_setup */
-#define HNPROC 2500     /* based on thread_max */
+                                                                                                     
+#define HNPROC 2500                              
 int     maxproc = NPROC;
 int     maxprocperuid = NPROC_PER_UID;
 
 #if !defined(__x86_64__)
-int hard_maxproc = NPROC;       /* hardcoded limit -- for ARM the number of processes is limited by the ASID space */
+int hard_maxproc = NPROC;                                                                                            
 #else
-int hard_maxproc = HNPROC;      /* hardcoded limit */
+int hard_maxproc = HNPROC;                           
 #endif
 
-int nprocs = 0; /* XXX */
+int nprocs = 0;          
 
-//#define	NTEXT (80 + NPROC / 8)			/* actually the object cache */
-int desiredvnodes = 0;                          /* desiredvnodes is set explicitly in unix_startup.c */
-uint32_t kern_maxvnodes = 0;            /* global, to be read from the device tree */
+                                                                  
+int desiredvnodes = 0;                                                                                 
+uint32_t kern_maxvnodes = 0;                                                         
 
 #define MAXFILES (OPEN_MAX + 2048)
 int     maxfiles = MAXFILES;
@@ -112,9 +112,9 @@ unsigned int    ncallout = 16 + 2 * NPROC;
 unsigned int nmbclusters = NMBCLUSTERS;
 int     nport = NPROC / 2;
 
-/*
- *  async IO (aio) configurable limits
- */
+  
+                                      
+   
 int aio_max_requests = CONFIG_AIO_MAX;
 int aio_max_requests_per_process = CONFIG_AIO_PROCESS_MAX;
 int aio_worker_threads = CONFIG_AIO_THREAD_COUNT;

@@ -54,17 +54,17 @@
  * SUCH DAMAGE.
  *
  */
-/*
- * ECN consideration on tunnel ingress/egress operation.
- * http://www.aciri.org/floyd/papers/draft-ipsec-ecn-00.txt
- */
+  
+                                                        
+                                                           
+   
 #include <sys/appleapiopts.h>
 
 #ifdef BSD_KERNEL_PRIVATE
-#define ECN_NORMAL              1       /* ECN normal mode */
-#define ECN_COMPATIBILITY       0       /* ECN comptability mode */
-#define ECN_NOCARE              (-1)    /* Ignore ECN. Use caution with this mode. */
+#define ECN_NORMAL              1                            
+#define ECN_COMPATIBILITY       0                                  
+#define ECN_NOCARE              (-1)                                                 
 
 extern void ip_ecn_ingress(int, u_int8_t *, const u_int8_t *);
 extern int ip_ecn_egress(int, const u_int8_t *, u_int8_t *);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         

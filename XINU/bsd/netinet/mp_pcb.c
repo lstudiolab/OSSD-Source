@@ -48,12 +48,12 @@
 static lck_grp_t        *mp_lock_grp;
 static lck_attr_t       *mp_lock_attr;
 static lck_grp_attr_t   *mp_lock_grp_attr;
-decl_lck_mtx_data(static, mp_lock);             /* global MULTIPATH lock */
+decl_lck_mtx_data(static, mp_lock);                                        
 decl_lck_mtx_data(static, mp_timeout_lock);
 
 static TAILQ_HEAD(, mppcbinfo) mppi_head = TAILQ_HEAD_INITIALIZER(mppi_head);
 
-static boolean_t mp_timeout_run;        /* MP timer is scheduled to run */
+static boolean_t mp_timeout_run;                                          
 static boolean_t mp_garbage_collecting;
 static boolean_t mp_ticking;
 static void mp_sched_timeout(void);
@@ -92,11 +92,11 @@ mp_timeout(void *arg)
 	uint32_t t_act = 0;
 	uint32_t gc_act = 0;
 
-	/*
-	 * Update coarse-grained networking timestamp (in sec.); the idea
-	 * is to piggy-back on the timeout callout to update the counter
-	 * returnable via net_uptime().
-	 */
+	  
+                                                                  
+                                                                 
+                                
+    
 	net_update_uptime();
 
 	lck_mtx_lock_spin(&mp_timeout_lock);
@@ -128,7 +128,7 @@ mp_timeout(void *arg)
 		lck_mtx_lock_spin(&mp_timeout_lock);
 	}
 
-	/* lock was dropped above, so check first before overriding */
+	                                                              
 	if (!mp_garbage_collecting) {
 		mp_garbage_collecting = (gc_act != 0);
 	}
@@ -136,7 +136,7 @@ mp_timeout(void *arg)
 		mp_ticking = (t_act != 0);
 	}
 
-	/* re-arm the timer if there's work to do */
+	                                            
 	mp_timeout_run = FALSE;
 	mp_sched_timeout();
 	lck_mtx_unlock(&mp_timeout_lock);
@@ -182,7 +182,7 @@ mp_pcbinfo_attach(struct mppcbinfo *mppi)
 		if (mppi0 == mppi) {
 			panic("%s: mppi %p already in the list\n",
 			    __func__, mppi);
-			/* NOTREACHED */
+			                
 		}
 	}
 	TAILQ_INSERT_TAIL(&mppi_head, mppi, mppi_entry);
@@ -291,14 +291,14 @@ mptcp_pcbdispose(struct mppcb *mpp)
 
 #if NECP
 	necp_mppcb_dispose(mpp);
-#endif /* NECP */
+#endif           
 
 	sofreelastref(mp_so, 0);
 	if (mp_so->so_rcv.sb_cc > 0 || mp_so->so_snd.sb_cc > 0) {
-		/*
-		 * selthreadclear() already called
-		 * during sofreelastref() above.
-		 */
+		  
+                                    
+                                  
+     
 		sbrelease(&mp_so->so_rcv);
 		sbrelease(&mp_so->so_snd);
 	}
@@ -319,9 +319,9 @@ mp_getaddr_v4(struct socket *mp_so, struct sockaddr **nam, boolean_t peer)
 	struct mptses *mpte = mpsotompte(mp_so);
 	struct sockaddr_in *sin;
 
-	/*
-	 * Do the malloc first in case it blocks.
-	 */
+	  
+                                          
+    
 	MALLOC(sin, struct sockaddr_in *, sizeof(*sin), M_SONAME, M_WAITOK);
 	if (sin == NULL) {
 		return ENOBUFS;

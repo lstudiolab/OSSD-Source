@@ -1,19 +1,19 @@
-#!/bin/bash
-#
-# Script that rsyncs a source/build tree to a remote server, performs a build,
-# and copies the result back
-#
 
-# This script is invoked instead of the initial recursive make(1) in ./Makefile.
-# First it must cache all binaries that might be used during the build by
-# calling "make print_exports" (any target would work) with an overriden xcrun(1)
-# which caches tools an SDKs into ./BUILD/obj/BuildTools. When the combined
-# source+build tree is rsync-ed to the remote server, we run a script to
-# re-initiate the build using an overriden xcrun(1) which hands back
-# cached tools in ./BUILD/obj/BuildTools instead of whatever Xcode tools are on
-# the remote system (or if no Xcode tools are installed remotely). Finally,
-# the build results are copied back locally.
-#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function die() {
     echo "$1" 1>&2
@@ -36,7 +36,7 @@ for arg in "$@"; do
 	    continue
 	    ;;
 	REMOTEBUILD=*)
-	    # Don't restart another remote build remotely
+
 	    ;;
 	SRCROOT=*)
 	    continue
@@ -54,7 +54,7 @@ for arg in "$@"; do
 	    continue
 	    ;;
 	RC_XBS=*)
-	    # Remote build isn't chrooted or special in any way
+
 	    arg="VERBOSE=YES"
 	    continue
 	    ;;
@@ -72,7 +72,7 @@ RSYNC_ARGS="-azvh"
 ARGS[$index]="REMOTEBUILD="
 REMOTEARGS[$index]="\"REMOTEBUILD=\""
 
-# For some targets like installsrc, we can't to a remote build
+
 SKIPREMOTE=0
 case $TARGET in
     clean)
@@ -102,7 +102,7 @@ fi
 SRC="$(pwd -P)"
 SRCNAME="$(basename $SRC)"
 
-# Pick up build locations passed in the environment
+
 OBJROOT="${OBJROOT}"
 SYMROOT="${SYMROOT}"
 DSTROOT="${DSTROOT}"
@@ -154,14 +154,14 @@ echo "Caching build tools..." 1>&2
 mkdir -p "${BUILDTOOLSDIR}" || die "Could not create BUILDTOOLSDIR"
 $MAKE print_exports "${ARGS[@]}" XCRUN="${SRC}/tools/xcrun_cache.sh -c \"${BUILDTOOLSDIR}\"" >/dev/null || die "Could not cache build tools"
 
-# Cache the make(1) binary itself
+
 MAKE_SDKROOT=`"${SRC}/tools/xcrun_cache.sh" -u "${BUILDTOOLSDIR}" -sdk / -show-sdk-path`
 "${SRC}/tools/xcrun_cache.sh" -c "${BUILDTOOLSDIR}" -sdk "${MAKE_SDKROOT}" -find make >/dev/null || die "Could not cache make"
 
-# Create a canned build script that can restart the build on the remote server.
+
 mkdir -p "${BUILDSCRIPTDIR}" || die "Could not create BUILDSCRIPTDIR"
 cat > "${BUILDSCRIPTDIR}/${BUILDSCRIPTNAME}" <<EOF
-#!/bin/sh
+
 mkdir -p /private/tmp
 mkdir -p /private/var/tmp
 mkdir -p "\${TMPDIR}"
@@ -183,8 +183,8 @@ fi
 exit \$ret
 EOF
 chmod a+x "${BUILDSCRIPTDIR}/${BUILDSCRIPTNAME}"
-#echo "Build script is:"
-#cat "${BUILDSCRIPTDIR}/${BUILDSCRIPTNAME}"
+
+
 
 mkdir -p "${BUILDTOOLSDIR}/empty"
 
@@ -205,7 +205,7 @@ else
 	REMOTEBUILDPATH="/tmp/$WHOAMI"
     fi
 
-# Construct a unique remote path
+
     eval `stat -s "${SRC}"`
 
     REMOTEBUILDPATH="${REMOTEBUILDPATH}/$st_ino/${SRCNAME}/"
@@ -213,27 +213,27 @@ else
 
     ssh $REMOTEBUILD "mkdir -p \"${REMOTEBUILDPATH}/BUILD/\"{obj,sym,dst}" || die "Could not make remote build directory"
 
-    # Copy source only
+
     rsync $RSYNC_ARGS --delete --exclude=\*~ --exclude=.svn --exclude=.git --exclude=/BUILD . $REMOTEBUILD:"${REMOTEBUILDPATH}" || die "Could not rsync source tree"
 
-    # Copy partial OBJROOT (just build tools and build script), and optionally delete everything else
+
     rsync $RSYNC_ARGS --delete $RSYNC_DELETE_EXCLUDED --include=/build.sh --include=/BuildTools --include=/BuildTools/\*\* --exclude=\* "${OBJROOT}/" $REMOTEBUILD:"${REMOTEBUILDPATH}/BUILD/obj/" || die "Could not rsync build tree"
 
-    # Delete remote SYMROOT if it has been deleted locally
+
     if [ "$RSYNC_DELETE_SYMROOT" -eq 1 ]; then
 	rsync $RSYNC_ARGS --delete "${BUILDTOOLSDIR}/empty/" $REMOTEBUILD:"${REMOTEBUILDPATH}/BUILD/sym/" || die "Could not rsync delete SYMROOT"
     fi
 
-    # Delete remote DSTROOT if it has been deleted locally
+
     if [ "$RSYNC_DELETE_DSTROOT" -eq 1 ]; then
 	rsync $RSYNC_ARGS --delete "${BUILDTOOLSDIR}/empty/" $REMOTEBUILD:"${REMOTEBUILDPATH}/BUILD/dst/" || die "Could not rsync delete DSTROOT"
     fi
 
-    # Start the build
+
     echo ssh $REMOTEBUILD "/bin/bash -c 'cd \"${REMOTEBUILDPATH}\" && ${REMOTE_BUILDSCRIPTREL}/${BUILDSCRIPTNAME}'" 1>&2
     ssh $REMOTEBUILD "/bin/bash -c 'cd \"${REMOTEBUILDPATH}\" && ${REMOTE_BUILDSCRIPTREL}/${BUILDSCRIPTNAME}'" || die "Could not complete remote build"
 
-    # Copy back build results except for object files (which might be several GB)
+
     echo "Copying results back..."
     rsync $RSYNC_ARGS --no-o --no-g --exclude=\*.o --exclude=\*.cpo --exclude=\*.d --exclude=\*.cpd --exclude=\*.non_lto --exclude=\*.ctf $REMOTEBUILD:"${REMOTEBUILDPATH}/BUILD/obj/" "${OBJROOT}/" || die "Could not rsync build results"
     rsync $RSYNC_ARGS --no-o --no-g $REMOTEBUILD:"${REMOTEBUILDPATH}/BUILD/sym/" "${SYMROOT}/" || die "Could not rsync build results"

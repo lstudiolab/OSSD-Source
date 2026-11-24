@@ -28,13 +28,13 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- *(C)UNIX System Laboratories, Inc. all or some portions of this file are
- * derived from material licensed to the University of California by
- * American Telephone and Telegraph Co. or UNIX System Laboratories,
- * Inc. and are reproduced herein with the permission of UNIX System
- * Laboratories, Inc.
- */
+  
+                                                                         
+                                                                    
+                                                                    
+                                                                    
+                     
+   
 
 /*
  * Mach Operating System
@@ -61,8 +61,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 /*
  * Copyright (c) 1988 Regents of the University of California.
  * All rights reserved.
@@ -123,15 +123,15 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
-/*
- * Random device subroutines and stubs.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
+  
+                                       
+   
 
 #include <vm/vm_kern.h>
 #include <kern/misc_protos.h>
@@ -139,7 +139,7 @@
 #include <sys/malloc.h>
 #include <libkern/section_keywords.h>
 
-/* String routines, from CMU */
+                               
 #ifdef  strcpy
 #undef strcmp
 #undef strncmp
@@ -147,7 +147,7 @@
 #undef strlen
 #endif
 
-/* to prevent recursion in the _chk functions */
+                                                
 #undef strcat
 #undef strncpy
 #undef strncat
@@ -156,19 +156,19 @@
 #undef memmove
 #undef strlcpy
 #undef strlcat
-/*
- * Abstract:
- *      strcmp (s1, s2) compares the strings "s1" and "s2".
- *      It returns 0 if the strings are identical. It returns
- *      > 0 if the first character that differs in the two strings
- *      is larger in s1 than in s2 or if s1 is longer than s2 and
- *      the contents are identical up to the length of s2.
- *      It returns < 0 if the first differing character is smaller
- *      in s1 than in s2 or if s1 is shorter than s2 and the
- *      contents are identical upto the length of s1.
- * Deprecation Warning:
- *	strcmp() is being deprecated. Please use strncmp() instead.
- */
+  
+            
+                                                           
+                                                             
+                                                                  
+                                                                 
+                                                          
+                                                                  
+                                                            
+                                                     
+                       
+                                                              
+   
 
 int
 strcmp(
@@ -181,25 +181,25 @@ strcmp(
 		a = *s1++;
 		b = *s2++;
 		if (a != b) {
-			return a - b;     /* includes case when
-			                   *  'a' is zero and 'b' is not zero
-			                   *  or vice versa */
+			return a - b;                          
+                                                        
+                                         
 		}
 	} while (a != '\0');
 
-	return 0;       /* both are zero */
+	return 0;                          
 }
 
-/*
- * Abstract:
- *      strncmp (s1, s2, n) compares the strings "s1" and "s2"
- *      in exactly the same way as strcmp does.  Except the
- *      comparison runs for at most "n" characters.
- */
+  
+            
+                                                              
+                                                           
+                                                   
+   
 
 #if !defined __arm__ && !defined __arm64__
-// ARM implementation in ../arm/strncmp.s
-// ARM64 implementation in ../arm64/strncmp.s
+                                         
+                                             
 int
 strncmp(
 	const char *s1,
@@ -212,24 +212,24 @@ strncmp(
 		a = *s1++;
 		b = *s2++;
 		if (a != b) {
-			return a - b;     /* includes case when
-			                   *  'a' is zero and 'b' is not zero
-			                   *  or vice versa */
+			return a - b;                          
+                                                        
+                                         
 		}
 		if (a == '\0') {
-			return 0;       /* both are zero */
+			return 0;                          
 		}
 		n--;
 	}
 
 	return 0;
 }
-#endif // #ifndef __arm__
+#endif                   
 
 
-//
-// Lame implementation just for use by strcasecmp/strncasecmp
-//
+  
+                                                             
+  
 static int
 tolower(unsigned char ch)
 {
@@ -308,14 +308,14 @@ strrchr(const char *s, int c)
 }
 
 #if CONFIG_VSPRINTF
-/*
- * Abstract:
- *      strcpy copies the contents of the string "from" including
- *      the null terminator to the string "to". A pointer to "to"
- *      is returned.
- * Deprecation Warning:
- *	strcpy() is being deprecated. Please use strlcpy() instead.
- */
+  
+            
+                                                                 
+                                                                 
+                    
+                       
+                                                              
+   
 char *
 strcpy(
 	char *to,
@@ -331,17 +331,17 @@ strcpy(
 }
 #endif
 
-/*
- * Abstract:
- *      strncpy copies "count" characters from the "from" string to
- *      the "to" string. If "from" contains less than "count" characters
- *      "to" will be padded with null characters until exactly "count"
- *      characters have been written. The return value is a pointer
- *      to the "to" string.
- */
+  
+            
+                                                                   
+                                                                        
+                                                                      
+                                                                   
+                           
+   
 
 #if !defined __arm__ && !defined __arm64__
-// ARM and ARM64 implementation in ../arm/strncpy.c
+                                                   
 #undef strncpy
 char *
 strncpy(
@@ -363,16 +363,16 @@ strncpy(
 	}
 	return os1;
 }
-#endif // #ifndef __arm__
+#endif                   
 
-/*
- * atoi:
- *
- *      This function converts an ascii string into an integer.
- *
- * input        : string
- * output       : a number
- */
+  
+        
+  
+                                                               
+  
+                        
+                          
+   
 
 int
 atoi(const char *cp)
@@ -386,21 +386,21 @@ atoi(const char *cp)
 	return number;
 }
 
-/*
- * Does the same thing as strlen, except only looks up
- * to max chars inside the buffer.
- * Taken from archive/kern-stuff/sbf_machine.c in
- * seatbelt.
- * inputs:
- *      s	string whose length is to be measured
- *	max	maximum length of string to search for null
- * outputs:
- *	length of s or max; whichever is smaller
- */
+  
+                                                      
+                                  
+                                                 
+            
+          
+                                               
+                                                  
+           
+                                           
+   
 
 #if !defined __arm__ && !defined __arm64__
-// ARM implementation in ../arm/strnlen.s
-// ARM64 implementation in ../arm64/strnlen.s
+                                         
+                                             
 #undef strnlen
 size_t
 strnlen(const char *s, size_t max)
@@ -412,17 +412,17 @@ strnlen(const char *s, size_t max)
 
 	return p - s;
 }
-#endif // #ifndef __arm__
+#endif                   
 
-/*
- * convert an integer to an ASCII string.
- * inputs:
- *	num	integer to be converted
- *	str	string pointer.
- *
- * outputs:
- *	pointer to string start.
- */
+  
+                                         
+          
+                              
+                      
+  
+           
+                           
+   
 
 char *
 itoa(
@@ -451,10 +451,10 @@ itoa(
 }
 
 #if CONFIG_VSPRINTF
-/*
- * Deprecation Warning:
- *	strcat() is being deprecated. Please use strlcat() instead.
- */
+  
+                       
+                                                              
+   
 char *
 strcat(
 	char *dest,
@@ -472,13 +472,13 @@ strcat(
 }
 #endif
 
-/*
- * Appends src to string dst of size siz (unlike strncat, siz is the
- * full size of dst, not space left).  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
- * Returns strlen(src) + MIN(siz, strlen(initial dst)).
- * If retval >= siz, truncation occurred.
- */
+  
+                                                                    
+                                                               
+                                                                      
+                                                       
+                                         
+   
 #undef strlcat
 size_t
 strlcat(char *dst, const char *src, size_t siz)
@@ -488,7 +488,7 @@ strlcat(char *dst, const char *src, size_t siz)
 	size_t n = siz;
 	size_t dlen;
 
-	/* Find the end of dst and adjust bytes left but don't go past end */
+	                                                                     
 	while (n-- != 0 && *d != '\0') {
 		d++;
 	}
@@ -507,17 +507,17 @@ strlcat(char *dst, const char *src, size_t siz)
 	}
 	*d = '\0';
 
-	return dlen + (s - src);       /* count does not include NUL */
+	return dlen + (s - src);                                       
 }
 
-/*
- * Copy src to string dst of size siz.  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz == 0).
- * Returns strlen(src); if retval >= siz, truncation occurred.
- */
+  
+                                                                
+                                                            
+                                                              
+   
 
 #if !defined __arm__ && !defined __arm64__
-// ARM and ARM64 implementation in ../arm/strlcpy.c
+                                                   
 #undef strlcpy
 size_t
 strlcpy(char *dst, const char *src, size_t siz)
@@ -526,7 +526,7 @@ strlcpy(char *dst, const char *src, size_t siz)
 	const char *s = src;
 	size_t n = siz;
 
-	/* Copy as many bytes as will fit */
+	                                    
 	if (n != 0 && --n != 0) {
 		do {
 			if ((*d++ = *s++) == 0) {
@@ -535,47 +535,47 @@ strlcpy(char *dst, const char *src, size_t siz)
 		} while (--n != 0);
 	}
 
-	/* Not enough room in dst, add NUL and traverse rest of src */
+	                                                              
 	if (n == 0) {
 		if (siz != 0) {
-			*d = '\0';              /* NUL-terminate dst */
+			*d = '\0';                                     
 		}
 		while (*s++) {
 			;
 		}
 	}
 
-	return s - src - 1;    /* count does not include NUL */
+	return s - src - 1;                                    
 }
 #endif
 
-/*
- * STRDUP
- *
- * Description: The STRDUP function allocates sufficient memory for a copy
- *              of the string "string", does the copy, and returns a pointer
- *              it. The pointer may subsequently be used as an argument to
- *              the macro FREE().
- *
- * Parameters:  string		String to be duplicated
- *              type		type of memory to be allocated (normally
- *                              M_TEMP)
- *
- * Returns:     char *          A pointer to the newly allocated string with
- *                              duplicated contents in it.
- *
- *              NULL		If MALLOC() fails.
- *
- * Note:        This function can *not* be called from interrupt context as
- *              it calls MALLOC with M_WAITOK.  In fact, you really
- *              shouldn't be doing string manipulation in interrupt context
- *              ever.
- *
- *              This function name violates the kernel style(9) guide
- *              by being all caps.  This was done on purpose to emphasize
- *              one should use FREE() with the allocated buffer.
- *
- */
+  
+         
+  
+                                                                          
+                                                                            
+                                                                          
+                                 
+  
+                                               
+                                                              
+                                       
+  
+                                                                            
+                                                          
+  
+                                        
+  
+                                                                           
+                                                                   
+                                                                           
+                     
+  
+                                                                     
+                                                                         
+                                                                
+  
+   
 char *
 STRDUP(const char *string, int type)
 {
@@ -591,9 +591,9 @@ STRDUP(const char *string, int type)
 	return copy;
 }
 
-/*
- * Return TRUE(1) if string 2 is a prefix of string 1.
- */
+  
+                                                      
+   
 int
 strprefix(const char *s1, const char *s2)
 {

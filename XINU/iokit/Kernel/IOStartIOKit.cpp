@@ -77,7 +77,7 @@ IOKitInitializeTime( void )
 	t.tv_sec = 30;
 	t.tv_nsec = 0;
 
-// RTC is not present on this target
+                                    
 #ifndef BCM2837
 	IOService::waitForService(
 		IOService::resourceMatching("IORTC"), &t );
@@ -109,7 +109,7 @@ iokit_post_constructor_init(void)
 	IORootParent::initialize();
 	IOReporter::initialize();
 
-	// Initializes IOPMinformeeList class-wide shared lock
+	                                                      
 	IOPMinformeeList::getSharedRecursiveLock();
 
 	obj = OSString::withCString( version );
@@ -125,9 +125,9 @@ iokit_post_constructor_init(void)
 	}
 }
 
-/*****
- * Pointer into bootstrap KLD segment for functions never used past startup.
- */
+      
+                                                                            
+   
 void (*record_startup_extensions_function)(void) = NULL;
 
 void
@@ -138,9 +138,9 @@ InitIOKit(void *dtTop)
 	if (PE_parse_boot_argn( "io", &debugFlags, sizeof(debugFlags))) {
 		gIOKitDebug = debugFlags;
 	}
-	// Enable IOWaitQuiet panics on arm64 macOS except on KASAN.
-	// existing 3rd party KEXTs may hold the registry busy on x86 RELEASE kernels.
-	// Enabling this on other platforms is tracked in rdar://66364108
+	                                                            
+	                                                                              
+	                                                                 
 #if XNU_TARGET_OS_OSX && defined(__arm64__) && !KASAN
 	else {
 		gIOKitDebug |= kIOWaitQuietPanics;
@@ -151,7 +151,7 @@ InitIOKit(void *dtTop)
 		gIOKitTrace = debugFlags;
 	}
 
-	// Compat for boot-args
+	                       
 	gIOKitTrace |= (gIOKitDebug & kIOTraceCompatBootArgs);
 
 	if (PE_parse_boot_argn( "pmtimeout", &debugFlags, sizeof(debugFlags))) {
@@ -163,13 +163,13 @@ InitIOKit(void *dtTop)
 	}
 
 
-	//
-	// Have to start IOKit environment before we attempt to start
-	// the C++ runtime environment.  At some stage we have to clean up
-	// the initialisation path so that OS C++ can initialise independantly
-	// of iokit basic service initialisation, or better we have IOLib stuff
-	// initialise as basic OS services.
-	//
+	  
+	                                                             
+	                                                                  
+	                                                                      
+	                                                                       
+	                                   
+	  
 	IOLibInit();
 	OSlibkernInit();
 	IOMachPortInitialize();
@@ -189,9 +189,9 @@ InitIOKit(void *dtTop)
 	}
 	gRootNub->attach(NULL);
 
-	/* If the bootstrap segment set up a function to record startup
-	 * extensions, call it now.
-	 */
+	                                                               
+                            
+    
 	if (record_startup_extensions_function) {
 		record_startup_extensions_function();
 	}
@@ -214,11 +214,11 @@ StartIOKitMatching(void)
 	}
 
 #if !NO_KEXTD
-	/* Add a busy count to keep the registry busy until kextd has
-	 * completely finished launching. This is decremented when kextd
-	 * messages the kernel after the in-kernel linker has been
-	 * removed and personalities have been sent.
-	 */
+	                                                             
+                                                                 
+                                                           
+                                             
+    
 	IOService::getServiceRoot()->adjustBusy(1);
 #endif
 }
@@ -254,4 +254,4 @@ IORecordProgressBackbuffer(void * buffer, size_t size, uint32_t theme)
 		chosen->release();
 	}
 }
-}; /* extern "C" */
+};                 

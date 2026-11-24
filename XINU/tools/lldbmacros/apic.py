@@ -1,18 +1,18 @@
 from xnu import *
 from misc import DoReadMsr64, DoWriteMsr64
 
-######################################
-# Globals
-######################################
+                                      
+         
+                                      
 lapic_base_addr = 0xfee00000
 ioapic_base_addr = 0xfec00000
 ioapic_index_off = 0x0
 ioapic_data_off = 0x10
 
 
-######################################
-# LAPIC Helper functions
-######################################
+                                      
+                        
+                                      
 def IsArchX86_64():
     """ Determines if target machine is x86_64  
         Returns:
@@ -67,9 +67,9 @@ def DoLapicWrite32(offset, val, cpu):
     else:
         return WritePhysInt(lapic_base_addr + offset, val, 32)
 
-######################################
-# LAPIC Register Print functions
-######################################
+                                      
+                                
+                                      
 def GetLapicVersionFields(reg_val):
     """ Helper function for DoLapicDump that prints the fields of the
         version register. 
@@ -154,7 +154,7 @@ def DoLapicDump():
     """
     print "LAPIC operating mode: {:s}".format(
         "x2APIC" if IsX2ApicEnabled() else "xAPIC")
-    # LAPIC register offset, register name, field formatting function
+                                                                     
     lapic_dump_table = [
         (0x020, "ID", None),
         (0x030, "VERSION", GetLapicVersionFields),
@@ -207,9 +207,9 @@ def DoLapicDump():
             print "LAPIC[{:#05x}] {:21s}: {:#010x} {:s}".format(reg[0], reg[1],
                 reg_val, reg[2](reg_val))
 
-######################################
-# IOAPIC Helper functions
-######################################
+                                      
+                         
+                                      
 def DoIoApicRead(offset):
     """ Read the specified IOAPIC register
         Params:
@@ -233,10 +233,10 @@ def DoIoApicWrite(offset, val):
 def DoIoApicDump():
     """ Prints all IOAPIC registers
     """
-    # Show IOAPIC ID register
+                             
     ioapic_id = DoIoApicRead(0)
     print "IOAPIC[0x00] {:9s}: {:#010x}".format("ID", ioapic_id)
-    # Show IOAPIC Version register
+                                  
     ioapic_ver = DoIoApicRead(1)
     maxredir = ((ioapic_ver >> 16) & 0xff) + 1
     print "IOAPIC[0x01] {:9s}: {:#010x}".format("VERSION", ioapic_ver) +\
@@ -244,7 +244,7 @@ def DoIoApicDump():
             maxredir,
             ioapic_ver >> 15 & 0x1,
             ioapic_ver & 0xff)
-    # Show IOAPIC redirect regsiters
+                                    
     for redir in range(maxredir):
         redir_val_lo = DoIoApicRead(0x10 + redir * 2)
         redir_val_hi = DoIoApicRead(0x10 + (redir * 2) + 1)
@@ -255,9 +255,9 @@ def DoIoApicDump():
             redir_val_lo,
             GetApicFields(redir_val_lo))
 
-######################################
-# LLDB commands
-######################################
+                                      
+               
+                                      
 @lldb_command('lapic_read32')
 def LapicRead32(cmd_args=None):
     """ Read the LAPIC register at the specified offset. The CPU can

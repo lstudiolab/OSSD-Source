@@ -45,19 +45,19 @@
 
 typedef int load_return_t;
 
-/*
- * Structure describing the result from calling load_machfile(), if that
- * function returns LOAD_SUCCESS.
- */
+  
+                                                                        
+                                 
+   
 typedef struct _load_result {
 	user_addr_t             mach_header;
 	user_addr_t             entry_point;
 
-	// The user stack pointer and addressable user stack size.
+	                                                          
 	user_addr_t             user_stack;
 	mach_vm_size_t          user_stack_size;
 
-	// The allocation containing the stack and guard area.
+	                                                      
 	user_addr_t             user_stack_alloc;
 	mach_vm_size_t          user_stack_alloc_size;
 
@@ -74,7 +74,7 @@ typedef struct _load_result {
 	    using_lcmain            : 1,
 #if __arm64__
 	    legacy_footprint        : 1,
-#endif /* __arm64__ */
+#endif                
 	is_64bit_addr           : 1,
 	    is_64bit_data           : 1,
 	    custom_stack            : 1,
@@ -111,17 +111,17 @@ validate_potential_simulator_binary(
 	off_t                    macho_size);
 
 #define LOAD_SUCCESS            0
-#define LOAD_BADARCH            1       /* CPU type/subtype not found */
-#define LOAD_BADMACHO           2       /* malformed mach-o file */
-#define LOAD_SHLIB              3       /* shlib version mismatch */
-#define LOAD_FAILURE            4       /* Miscellaneous error */
-#define LOAD_NOSPACE            5       /* No VM available */
-#define LOAD_PROTECT            6       /* protection violation */
-#define LOAD_RESOURCE           7       /* resource allocation failure */
-#define LOAD_ENOENT             8       /* resource not found */
-#define LOAD_IOERROR            9       /* IO error */
-#define LOAD_DECRYPTFAIL        10      /* FP decrypt failure */
-#define LOAD_BADMACHO_UPX       11      /* malformed mach-o file */
-#define LOAD_BADARCH_X86        12      /* -no32exec boot-arg + attempted load of 32bit x86 binary */
+#define LOAD_BADARCH            1                                       
+#define LOAD_BADMACHO           2                                  
+#define LOAD_SHLIB              3                                   
+#define LOAD_FAILURE            4                                
+#define LOAD_NOSPACE            5                            
+#define LOAD_PROTECT            6                                 
+#define LOAD_RESOURCE           7                                        
+#define LOAD_ENOENT             8                               
+#define LOAD_IOERROR            9                     
+#define LOAD_DECRYPTFAIL        10                              
+#define LOAD_BADMACHO_UPX       11                                 
+#define LOAD_BADARCH_X86        12                                                                   
 
-#endif  /* _BSD_KERN_MACH_LOADER_H_ */
+#endif                                

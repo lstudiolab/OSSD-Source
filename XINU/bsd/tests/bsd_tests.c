@@ -51,7 +51,7 @@ extern kern_return_t arm64_lock_test(void);
 #endif
 #if defined(__arm__) || defined(__arm64__)
 extern kern_return_t pmap_test(void);
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 kern_return_t kalloc_test(void);
 kern_return_t ipi_test(void);
 #if defined(KERNEL_INTEGRITY_CTRR)
@@ -69,17 +69,17 @@ struct xnupost_test bsd_post_tests[] = {
 #ifdef __arm64__
 	XNUPOST_TEST_CONFIG_BASIC(arm64_lock_test),
 #endif
-#if !KASAN // <rdar://71151361>
+#if !KASAN                     
 #if defined(__arm__) || defined(__arm64__)
 	XNUPOST_TEST_CONFIG_BASIC(pmap_test),
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 #if defined(KERNEL_INTEGRITY_CTRR)
 	XNUPOST_TEST_CONFIG_BASIC(ctrr_test),
 #endif
 #if __ARM_PAN_AVAILABLE__
 	XNUPOST_TEST_CONFIG_BASIC(arm64_late_pan_test),
 #endif
-#endif /* !KASAN */
+#endif             
 	XNUPOST_TEST_CONFIG_BASIC(kalloc_test),
 	XNUPOST_TEST_CONFIG_BASIC(ipi_test),
 #if HAS_TWO_STAGE_SPR_LOCK
@@ -87,12 +87,12 @@ struct xnupost_test bsd_post_tests[] = {
 #endif
 #if !KASAN
 	XNUPOST_TEST_CONFIG_BASIC(copyio_test),
-#endif /* KASAN */
+#endif            
 };
 
 uint32_t bsd_post_tests_count = sizeof(bsd_post_tests) / sizeof(xnupost_test_data_t);
 
-extern uint64_t last_loaded_timestamp; /* updated by OSKext::load() */
+extern uint64_t last_loaded_timestamp;                                
 extern uint64_t kernel_post_args;
 int
 bsd_list_tests()
@@ -104,7 +104,7 @@ bsd_list_tests()
 	uint64_t prev_load_time    = last_loaded_timestamp;
 	int no_load_counter        = 5;
 	int absolute_break_counter = 15;
-	int delay_duration_usecs   = 300000; /* 0.3 second for kext loading to stabilize */
+	int delay_duration_usecs   = 300000;                                               
 
 	while (no_load_counter > 0) {
 		printf("bsd_list_tests:INFO waiting for %d usecs\n", delay_duration_usecs);
@@ -156,7 +156,7 @@ kalloc_test()
 	return KERN_SUCCESS;
 }
 
-/* kcdata type definition */
+                            
 #define XNUPOST_TNAME_MAXLEN 132
 
 struct kcdata_subtype_descriptor kc_xnupost_test_def[] = {
@@ -180,7 +180,7 @@ kern_return_t xnupost_copyout_test(xnupost_test_t t, mach_vm_address_t outaddr);
 int
 xnupost_copyout_test(xnupost_test_t t, mach_vm_address_t outaddr)
 {
-	/* code to copyout test config */
+	                                 
 	int kret         = 0;
 	size_t namelen = 0;
 
@@ -236,8 +236,8 @@ xnupost_get_estimated_testdata_size(void)
 	uint32_t total_tests = bsd_post_tests_count + kernel_post_tests_count;
 	uint32_t elem_size = kc_xnupost_test_def[kc_xnupost_test_def_count - 1].kcs_elem_offset +
 	    kcs_get_elem_size(&kc_xnupost_test_def[kc_xnupost_test_def_count - 1]);
-	uint32_t retval = 1024; /* account for type definition and mach timebase */
-	retval += 1024;         /* kernel version and boot-args string data */
+	uint32_t retval = 1024;                                                    
+	retval += 1024;                                                       
 	retval += (total_tests * elem_size);
 
 	return retval;
@@ -270,14 +270,14 @@ xnupost_export_testdata(void * outp, size_t size_in, uint32_t * lenp)
 	kret = kcdata_memory_static_init(&kcd, (mach_vm_address_t)outp, KCDATA_BUFFER_BEGIN_XNUPOST_CONFIG, size, KCFLAG_USE_COPYOUT);
 	RET_IF_OP_FAIL;
 
-	/* add mach timebase info */
+	                            
 	clock_timebase_info(&timebase);
 	kret = kcdata_get_memory_addr(&kcd, KCDATA_TYPE_TIMEBASE, sizeof(timebase), &user_addr);
 	RET_IF_OP_FAIL;
 	kret = copyout(&timebase, (user_addr_t)user_addr, sizeof(timebase));
 	RET_IF_OP_FAIL;
 
-	/* save boot-args and osversion string */
+	                                         
 	length_to_copy = MIN((uint32_t)(strlen(version) + 1), OSVERSIZE);
 	kret           = kcdata_get_memory_addr(&kcd, STACKSHOT_KCTYPE_OSVERSION, length_to_copy, &user_addr);
 	RET_IF_OP_FAIL;
@@ -290,12 +290,12 @@ xnupost_export_testdata(void * outp, size_t size_in, uint32_t * lenp)
 	kret = copyout(PE_boot_args(), (user_addr_t)user_addr, length_to_copy);
 	RET_IF_OP_FAIL;
 
-	/* add type definition to buffer */
+	                                   
 	kret = kcdata_add_type_definition(&kcd, XNUPOST_KCTYPE_TESTCONFIG, kctype_name, &kc_xnupost_test_def[0],
 	    kc_xnupost_test_def_count);
 	RET_IF_OP_FAIL;
 
-	/* add the tests to buffer as array */
+	                                      
 	uint32_t total_tests = bsd_post_tests_count + kernel_post_tests_count;
 	uint32_t elem_size = kc_xnupost_test_def[kc_xnupost_test_def_count - 1].kcs_elem_offset +
 	    kcs_get_elem_size(&kc_xnupost_test_def[kc_xnupost_test_def_count - 1]);

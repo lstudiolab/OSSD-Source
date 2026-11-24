@@ -39,4 +39,4 @@ uint32_t        crc32(uint32_t crc, const void *bufp, size_t len);
 
 __END_DECLS
 
-#endif /* _LIBKERN_CRC_H_ */
+#endif                      

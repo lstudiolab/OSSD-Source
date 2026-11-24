@@ -47,9 +47,9 @@ isprint(int ch)
 	return ch >= 0x20 && ch <= 0x7e;
 }
 
-/*
- * In-place decode of URL percent-encoded str
- */
+  
+                                             
+   
 void
 url_decode(char *str)
 {
@@ -60,7 +60,7 @@ url_decode(char *str)
 	while (*str) {
 		if (*str == '%') {
 			char c = 0;
-			char *esc = str++; /* remember the start of the escape sequence */
+			char *esc = str++;                                                
 
 			if (*str) {
 				c += hex2int(*str++);
@@ -70,8 +70,8 @@ url_decode(char *str)
 			}
 
 			if (isprint(c)) {
-				/* overwrite the '%' with the new char, and bump the rest of the
-				 * string down a few characters */
+				                                                                
+                                      
 				*esc++ = c;
 				str = memmove(esc, str, strlen(str) + 1);
 			}

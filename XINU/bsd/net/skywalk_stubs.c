@@ -37,7 +37,7 @@ int                                                             \
 _name(void)                                                     \
 {                                                               \
 	panic("stub called in a config with no SKYWALK");       \
-	/* NOTREACHED */                                        \
+	                                                        \
 	__builtin_unreachable();                                \
 }
 
@@ -184,4 +184,4 @@ STUB(bpf_tap_packet_in);
 STUB(bpf_tap_packet_out);
 #endif
 #undef STUB
-#endif /* !SKYWALK */
+#endif               

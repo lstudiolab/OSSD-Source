@@ -29,13 +29,13 @@
  * Copyright (C) Apple Computer 1998
  * ALL Rights Reserved
  */
-/*
- * This file represents the interfaces that used to come
- * from creating the user headers from the mach_debug.defs file.
- * Because mach_debug.defs was decomposed, this file now just
- * wraps up all the new interface headers generated from
- * each of the new .defs resulting from that decomposition.
- */
+  
+                                                        
+                                                                
+                                                             
+                                                        
+                                                           
+   
 #ifndef _MACH_DEBUG_MACH_DEBUG_H_
 #define _MACH_DEBUG_MACH_DEBUG_H_
 
@@ -45,4 +45,4 @@
 #include <mach/mach_port.h>
 #include <mach/mach_interface.h>
 
-#endif /* _MACH_DEBUG_MACH_DEBUG_H_ */
+#endif                                

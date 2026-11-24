@@ -60,15 +60,15 @@
  * Version 2.0.
  * Copyright (c) 2005 SPARTA, Inc.
  */
-/*
- */
-/*
- *	File:	kern/ipc_kobject.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Functions for letting a port represent a kernel object.
- */
+  
+   
+  
+                           
+                      
+             
+  
+                                                          
+   
 
 #include <mach_debug.h>
 #include <mach_ipc_test.h>
@@ -124,10 +124,10 @@
 
 #if     MACH_MACHINE_ROUTINES
 #include <machine/machine_routines.h>
-#endif  /* MACH_MACHINE_ROUTINES */
+#endif                             
 #if     XK_PROXY
 #include <uk_xkern/xk_uproxy_server.h>
-#endif  /* XK_PROXY */
+#endif                
 
 #include <kern/counter.h>
 #include <kern/ipc_tt.h>
@@ -140,7 +140,7 @@
 
 #if CONFIG_ARCADE
 #include <kern/arcade.h>
-#endif /* CONFIG_ARCADE */
+#endif                    
 
 #include <ipc/ipc_kmsg.h>
 #include <ipc/ipc_port.h>
@@ -162,11 +162,11 @@ extern char *proc_name_address(void *p);
 struct proc;
 extern int proc_pid(struct proc *p);
 
-/*
- *	Routine:	ipc_kobject_notify
- *	Purpose:
- *		Deliver notifications to kobjects that care about them.
- */
+  
+                              
+           
+                                                           
+   
 boolean_t
 ipc_kobject_notify(
 	mach_msg_header_t *request_header,
@@ -186,11 +186,11 @@ typedef struct {
 
 #ifndef max
 #define max(a, b)        (((a) > (b)) ? (a) : (b))
-#endif /* max */
+#endif          
 
 static SECURITY_READ_ONLY_LATE(mig_hash_t) mig_buckets[MAX_MIG_ENTRIES];
 static SECURITY_READ_ONLY_LATE(int) mig_table_max_displ;
-SECURITY_READ_ONLY_LATE(int) mach_kobj_count; /* count of total number of kobjects */
+SECURITY_READ_ONLY_LATE(int) mach_kobj_count;                                        
 
 static ZONE_DECLARE(ipc_kobject_label_zone, "ipc kobject labels",
     sizeof(struct ipc_kobject_label), ZC_NONE);
@@ -223,13 +223,13 @@ static const struct mig_subsystem *mig_e[] = {
 
 #if     XK_PROXY
 	(const struct mig_subsystem *)&do_uproxy_xk_uproxy_subsystem,
-#endif /* XK_PROXY */
+#endif               
 #if     MACH_MACHINE_ROUTINES
 	(const struct mig_subsystem *)&MACHINE_SUBSYSTEM,
-#endif  /* MACH_MACHINE_ROUTINES */
+#endif                             
 #if     MCMSG && iPSC860
 	(const struct mig_subsystem *)&mcmsg_info_subsystem,
-#endif  /* MCMSG && iPSC860 */
+#endif                        
 	(const struct mig_subsystem *)&catch_exc_subsystem,
 	(const struct mig_subsystem *)&catch_mach_exc_subsystem,
 #if CONFIG_ARCADE
@@ -253,7 +253,7 @@ mig_init(void)
 
 		for (j = 0; j < range; j++) {
 			if (mig_e[i]->routine[j].stub_routine) {
-				/* Only put real entries in the table */
+				                                        
 				nentry = j + mig_e[i]->start;
 				for (pos = MIG_HASH(nentry) % MAX_MIG_ENTRIES, howmany = 1;
 				    mig_buckets[pos].num;
@@ -286,10 +286,10 @@ mig_init(void)
 }
 STARTUP(MACH_IPC, STARTUP_RANK_FIRST, mig_init);
 
-/*
- * Do a hash table lookup for given msgh_id. Return 0
- * if not found.
- */
+  
+                                                     
+                
+   
 static mig_hash_t *
 find_mig_hash_entry(int msgh_id)
 {
@@ -308,12 +308,12 @@ find_mig_hash_entry(int msgh_id)
 	return ptr;
 }
 
-/*
- *      Routine:	ipc_kobject_set_kobjidx
- *      Purpose:
- *              Set the index for the kobject filter
- *              mask for a given message ID.
- */
+  
+                                        
+                
+                                                    
+                                            
+   
 kern_return_t
 ipc_kobject_set_kobjidx(
 	int       msgh_id,
@@ -331,15 +331,15 @@ ipc_kobject_set_kobjidx(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	ipc_kobject_server
- *	Purpose:
- *		Handle a message sent to the kernel.
- *		Generates a reply message.
- *		Version for Untyped IPC.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                              
+           
+                                        
+                              
+                            
+              
+                   
+   
 
 ipc_kmsg_t
 ipc_kobject_server(
@@ -374,17 +374,17 @@ ipc_kobject_server(
 		}
 	}
 
-	/* Find corresponding mig_hash entry, if any */
+	                                               
 	ptr = find_mig_hash_entry(request_msgh_id);
 
-	/* Get the reply_size. */
+	                         
 	if (ptr == (mig_hash_t *)0) {
 		reply_size = sizeof(mig_reply_error_t);
 	} else {
 		reply_size = ptr->size;
 	}
 
-	/* round up for trailer size */
+	                               
 	reply_size += MAX_TRAILER_SIZE;
 	reply = ipc_kmsg_alloc(reply_size);
 
@@ -395,18 +395,18 @@ ipc_kobject_server(
 		return IKM_NULL;
 	}
 
-	/*
-	 * Initialize reply message.
-	 */
+	  
+                             
+    
 	{
 #define InP     ((mach_msg_header_t *) request->ikm_header)
 #define OutP    ((mig_reply_error_t *) reply->ikm_header)
 
-		/*
-		 * MIG should really assure no data leakage -
-		 * but until it does, pessimistically zero the
-		 * whole reply buffer.
-		 */
+		  
+                                               
+                                                
+                        
+     
 		bzero((void *)OutP, reply_size);
 
 		OutP->NDR = NDR_record;
@@ -423,17 +423,17 @@ ipc_kobject_server(
 #undef  OutP
 	}
 
-	/*
-	 * Find the routine to call, and call it
-	 * to perform the kernel function
-	 */
+	  
+                                         
+                                  
+    
 	ipc_kmsg_trace_send(request, option);
 	{
 		if (ptr) {
-			/*
-			 * Check if the port is a task port, if its a task port then
-			 * snapshot the task exec token before the mig routine call.
-			 */
+			  
+                                                               
+                                                               
+      
 			if (ikot == IKOT_TASK_CONTROL) {
 				task = convert_port_to_task_with_exec_token(port, &exec_token, TRUE);
 			}
@@ -443,10 +443,10 @@ ipc_kobject_server(
 			task_t curtask = current_task();
 			uint8_t *filter_mask = curtask->mach_kobj_filter_mask;
 
-			/* Check kobject mig filter mask, if exists. */
+			                                               
 			if (__improbable(filter_mask != NULL && idx != KOBJ_IDX_NOT_SET &&
 			    !bitstr_test(filter_mask, idx))) {
-				/* Not in filter mask, evaluate policy. */
+				                                          
 				if (mac_task_kobj_msg_evaluate != NULL) {
 					kr = mac_task_kobj_msg_evaluate(get_bsdtask_info(curtask),
 					    request_msgh_id, idx);
@@ -456,7 +456,7 @@ ipc_kobject_server(
 					}
 				}
 			}
-#endif /* CONFIG_MACF */
+#endif                  
 
 			(*ptr->routine)(request->ikm_header, reply->ikm_header);
 
@@ -464,7 +464,7 @@ ipc_kobject_server(
 skip_kobjcall:
 #endif
 
-			/* Check if the exec token changed during the mig routine */
+			                                                            
 			if (task != TASK_NULL) {
 				if (exec_token != task->exec_token) {
 					exec_token_changed = TRUE;
@@ -478,7 +478,7 @@ skip_kobjcall:
 #if DEVELOPMENT || DEBUG
 				printf("ipc_kobject_server: bogus kernel message, id=%d\n",
 				    request->ikm_header->msgh_id);
-#endif  /* DEVELOPMENT || DEBUG */
+#endif                            
 				_MIG_MSGID_INVALID(request->ikm_header->msgh_id);
 
 				((mig_reply_error_t *) reply->ikm_header)->RetCode
@@ -498,17 +498,17 @@ skip_kobjcall:
 	}
 
 msgdone:
-	/*
-	 *	Destroy destination. The following code differs from
-	 *	ipc_object_destroy in that we release the send-once
-	 *	right instead of generating a send-once notification
-	 *	(which would bring us here again, creating a loop).
-	 *	It also differs in that we only expect send or
-	 *	send-once rights, never receive rights.
-	 *
-	 *	We set msgh_remote_port to IP_NULL so that the kmsg
-	 *	destroy routines don't try to destroy the port twice.
-	 */
+	  
+                                                        
+                                                       
+                                                        
+                                                       
+                                                  
+                                           
+   
+                                                       
+                                                         
+    
 	switch (MACH_MSGH_BITS_REMOTE(request->ikm_header->msgh_bits)) {
 	case MACH_MSG_TYPE_PORT_SEND:
 		ipc_port_release_send(request->ikm_header->msgh_remote_port);
@@ -524,10 +524,10 @@ msgdone:
 		panic("ipc_kobject_server: strange destination rights");
 	}
 
-	/*
-	 *	Destroy voucher.  The kernel MIG servers never take ownership
-	 *	of vouchers sent in messages.  Swallow any such rights here.
-	 */
+	  
+                                                                 
+                                                                
+    
 	if (IP_VALID(request->ikm_voucher)) {
 		assert(MACH_MSG_TYPE_PORT_SEND ==
 		    MACH_MSGH_BITS_VOUCHER(request->ikm_header->msgh_bits));
@@ -536,29 +536,29 @@ msgdone:
 	}
 
 	if ((kr == KERN_SUCCESS) || (kr == MIG_NO_REPLY)) {
-		/*
-		 *	The server function is responsible for the contents
-		 *	of the message.  The reply port right is moved
-		 *	to the reply message, and we have deallocated
-		 *	the destination port right, so we just need
-		 *	to free the kmsg.
-		 */
+		  
+                                                        
+                                                   
+                                                  
+                                                
+                      
+     
 		ipc_kmsg_free(request);
 	} else {
-		/*
-		 *	The message contents of the request are intact.
-		 *	Destroy everthing except the reply port right,
-		 *	which is needed in the reply message.
-		 */
+		  
+                                                    
+                                                   
+                                          
+     
 		request->ikm_header->msgh_local_port = MACH_PORT_NULL;
 		ipc_kmsg_destroy(request);
 	}
 
 	if (kr == MIG_NO_REPLY) {
-		/*
-		 *	The server function will send a reply message
-		 *	using the reply port right, which it has saved.
-		 */
+		  
+                                                  
+                                                    
+     
 
 		if (reply) {
 			ipc_kmsg_free(reply);
@@ -571,31 +571,31 @@ msgdone:
 	}
 
 	if (!IP_VALID(replyp)) {
-		/*
-		 *	Can't queue the reply message if the destination
-		 *	(the reply port) isn't valid.
-		 */
+		  
+                                                     
+                                  
+     
 
 		ipc_kmsg_destroy(reply);
 
 		return IKM_NULL;
 	} else if (replyp->ip_receiver == ipc_space_kernel) {
-		/*
-		 * Don't send replies to kobject kernel ports
-		 */
+		  
+                                               
+     
 #if DEVELOPMENT || DEBUG
 		printf("%s: refusing to send reply to kobject %d port (id:%d)\n",
 		    __func__, ip_kotype(replyp), request_msgh_id);
-#endif  /* DEVELOPMENT || DEBUG */
+#endif                            
 		ipc_kmsg_destroy(reply);
 		return IKM_NULL;
 	}
 
-	/* Fail the MIG call if the task exec token changed during the call */
+	                                                                      
 	if (kr == KERN_SUCCESS && exec_token_changed) {
-		/*
-		 *	Create a new reply msg with error and destroy the old reply msg.
-		 */
+		  
+                                                                     
+     
 		ipc_kmsg_t new_reply = ipc_kmsg_alloc(reply_size);
 
 		if (new_reply == IKM_NULL) {
@@ -603,9 +603,9 @@ msgdone:
 			ipc_kmsg_destroy(reply);
 			return IKM_NULL;
 		}
-		/*
-		 *	Initialize the new reply message.
-		 */
+		  
+                                      
+     
 		{
 #define OutP_new        ((mig_reply_error_t *) new_reply->ikm_header)
 #define OutP_old        ((mig_reply_error_t *) reply->ikm_header)
@@ -620,17 +620,17 @@ msgdone:
 			OutP_new->Head.msgh_voucher_port = MACH_PORT_NULL;
 			OutP_new->Head.msgh_id = OutP_old->Head.msgh_id;
 
-			/* Set the error as KERN_INVALID_TASK */
+			                                        
 			OutP_new->RetCode = KERN_INVALID_TASK;
 
 #undef  OutP_new
 #undef  OutP_old
 		}
 
-		/*
-		 *	Destroy everything in reply except the reply port right,
-		 *	which is needed in the new reply message.
-		 */
+		  
+                                                             
+                                              
+     
 		reply->ikm_header->msgh_remote_port = MACH_PORT_NULL;
 		ipc_kmsg_destroy(reply);
 
@@ -648,17 +648,17 @@ msgdone:
 	return reply;
 }
 
-/*
- *	Routine:	ipc_kobject_set
- *	Purpose:
- *		Make a port represent a kernel object of the given type.
- *		The caller is responsible for handling refs for the
- *		kernel object, if necessary.
- *	Conditions:
- *		Nothing locked.  The port must be active if setting
- *		a kobject linkage.  Clearing a linkage is OK on an
- *		inactive port.
- */
+  
+                           
+           
+                                                            
+                                                       
+                                
+              
+                                                       
+                                                      
+                  
+   
 void
 ipc_kobject_set(
 	ipc_port_t                      port,
@@ -679,7 +679,7 @@ ipc_kobject_set_atomically(
 	assert(type == IKOT_NONE || ip_active(port));
 #if     MACH_ASSERT
 	port->ip_spares[2] = (port->ip_object.io_bits & IO_BITS_KOTYPE);
-#endif  /* MACH_ASSERT */
+#endif                   
 	port->ip_object.io_bits = (port->ip_object.io_bits & ~IO_BITS_KOTYPE) | type;
 	if (ip_is_kolabeled(port)) {
 		ipc_kobject_label_t labelp = port->ip_kolabel;
@@ -688,18 +688,18 @@ ipc_kobject_set_atomically(
 		port->ip_kobject = kobject;
 	}
 	if (type != IKOT_NONE) {
-		/* Once set, this bit can never be unset */
+		                                           
 		port->ip_object.io_bits |= IO_BITS_KOBJECT;
 	}
 }
 
-/*
- *	Routine:	ipc_kobject_init_port
- *	Purpose:
- *		Initialize a kobject port with the given types and options.
- *
- *		This function never fails.
- */
+  
+                                 
+           
+                                                               
+  
+                              
+   
 static inline void
 ipc_kobject_init_port(
 	ipc_port_t port,
@@ -727,16 +727,16 @@ ipc_kobject_init_port(
 	}
 }
 
-/*
- *	Routine:	ipc_kobject_alloc_port
- *	Purpose:
- *		Allocate a kobject port in the kernel space of the specified type.
- *
- *		This function never fails.
- *
- *	Conditions:
- *		No locks held (memory is allocated)
- */
+  
+                                  
+           
+                                                                      
+  
+                              
+  
+              
+                                       
+   
 ipc_port_t
 ipc_kobject_alloc_port(
 	ipc_kobject_t           kobject,
@@ -753,17 +753,17 @@ ipc_kobject_alloc_port(
 	return port;
 }
 
-/*
- *	Routine:	ipc_kobject_alloc_labeled_port
- *	Purpose:
- *		Allocate a kobject port and associated mandatory access label
- *		in the kernel space of the specified type.
- *
- *		This function never fails.
- *
- *	Conditions:
- *		No locks held (memory is allocated)
- */
+  
+                                          
+           
+                                                                 
+                                              
+  
+                              
+  
+              
+                                       
+   
 
 ipc_port_t
 ipc_kobject_alloc_labeled_port(
@@ -805,20 +805,20 @@ ipc_kobject_subst_once_notify(mach_msg_header_t *msg)
 	ipc_port_dealloc_kernel(port);
 }
 
-/*
- *	Routine:	ipc_kobject_alloc_subst_once
- *	Purpose:
- *		Make a port that will be substituted by the kolabel
- *		rules once, preventing the next substitution (of its target)
- *		to happen if any.
- *
- *	Returns:
- *		A port with a send right, that will substitute to its "kobject".
- *
- *	Conditions:
- *		No locks held (memory is allocated)
- *		`target` has a refcount that this function consumes
- */
+  
+                                        
+           
+                                                       
+                                                                
+                     
+  
+           
+                                                                    
+  
+              
+                                       
+                                                       
+   
 ipc_port_t
 ipc_kobject_alloc_subst_once(
 	ipc_port_t                  target)
@@ -828,30 +828,30 @@ ipc_kobject_alloc_subst_once(
 	           IPC_KOBJECT_ALLOC_MAKE_SEND | IPC_KOBJECT_ALLOC_NSREQUEST);
 }
 
-/*
- *	Routine:	ipc_kobject_make_send_lazy_alloc_port
- *	Purpose:
- *		Make a send once for a kobject port.
- *
- *		A location owning this port is passed in port_store.
- *		If no port exists, a port is made lazily.
- *
- *		A send right is made for the port, and if this is the first one
- *		(possibly not for the first time), then the no-more-senders
- *		notification is rearmed.
- *
- *		When a notification is armed, the kobject must donate
- *		one of its references to the port. It is expected
- *		the no-more-senders notification will consume this reference.
- *
- *	Returns:
- *		TRUE if a notification was armed
- *		FALSE else
- *
- *	Conditions:
- *		Nothing is locked, memory can be allocated.
- *		The caller must be able to donate a kobject reference to the port.
- */
+  
+                                                 
+           
+                                        
+  
+                                                        
+                                             
+  
+                                                                   
+                                                               
+                            
+  
+                                                         
+                                                     
+                                                                 
+  
+           
+                                    
+              
+  
+              
+                                               
+                                                                      
+   
 boolean_t
 ipc_kobject_make_send_lazy_alloc_port(
 	ipc_port_t              *port_store,
@@ -867,13 +867,13 @@ ipc_kobject_make_send_lazy_alloc_port(
 	port = os_atomic_load(port_store, dependency);
 
 #if __has_feature(ptrauth_calls)
-	/* If we're on a ptrauth system and this port is signed, authenticate and strip the pointer */
+	                                                                                              
 	if (should_ptrauth && IP_VALID(port)) {
 		port = ptrauth_auth_data(port,
 		    ptrauth_key_process_independent_data,
 		    ptrauth_blend_discriminator(port_store, ptrauth_discriminator));
 	}
-#endif // __has_feature(ptrauth_calls)
+#endif                                
 
 	if (!IP_VALID(port)) {
 		port = ipc_kobject_alloc_port(kobject, type,
@@ -889,13 +889,13 @@ ipc_kobject_make_send_lazy_alloc_port(
 		}
 #else
 		port_addr = port;
-#endif // __has_feature(ptrauth_calls)
+#endif                                
 
 		if (os_atomic_cmpxchgv(port_store, IP_NULL, port_addr, &previous, release)) {
 			return TRUE;
 		}
 
-		// undo what ipc_kobject_alloc_port() did above
+		                                               
 		port->ip_nsrequest = IP_NULL;
 		port->ip_mscount = 0;
 		port->ip_sorights = 0;
@@ -920,30 +920,30 @@ ipc_kobject_make_send_lazy_alloc_port(
 	return rc;
 }
 
-/*
- *	Routine:	ipc_kobject_make_send_lazy_alloc_labeled_port
- *	Purpose:
- *		Make a send once for a kobject port.
- *
- *		A location owning this port is passed in port_store.
- *		If no port exists, a port is made lazily.
- *
- *		A send right is made for the port, and if this is the first one
- *		(possibly not for the first time), then the no-more-senders
- *		notification is rearmed.
- *
- *		When a notification is armed, the kobject must donate
- *		one of its references to the port. It is expected
- *		the no-more-senders notification will consume this reference.
- *
- *	Returns:
- *		TRUE if a notification was armed
- *		FALSE else
- *
- *	Conditions:
- *		Nothing is locked, memory can be allocated.
- *		The caller must be able to donate a kobject reference to the port.
- */
+  
+                                                         
+           
+                                        
+  
+                                                        
+                                             
+  
+                                                                   
+                                                               
+                            
+  
+                                                         
+                                                     
+                                                                 
+  
+           
+                                    
+              
+  
+              
+                                               
+                                                                      
+   
 boolean_t
 ipc_kobject_make_send_lazy_alloc_labeled_port(
 	ipc_port_t              *port_store,
@@ -963,7 +963,7 @@ ipc_kobject_make_send_lazy_alloc_labeled_port(
 			return TRUE;
 		}
 
-		// undo what ipc_kobject_alloc_port() did above
+		                                               
 		port->ip_nsrequest = IP_NULL;
 		port->ip_mscount = 0;
 		port->ip_sorights = 0;
@@ -993,22 +993,22 @@ ipc_kobject_make_send_lazy_alloc_labeled_port(
 }
 
 
-/*
- *	Routine:	ipc_kobject_destroy
- *	Purpose:
- *		Release any kernel object resources associated
- *		with the port, which is being destroyed.
- *
- *		This path to free object resources should only be
- *      needed when resources are associated with a user's port.
- *      In the normal case, when the kernel is the receiver,
- *      the code calling ipc_port_dealloc_kernel should clean
- *      up the object resources.
- *
- *      Cleans up any kobject label that might be present.
- *	Conditions:
- *		The port is not locked, but it is dead.
- */
+  
+                               
+           
+                                                  
+                                            
+  
+                                                     
+                                                                
+                                                            
+                                                             
+                                
+  
+                                                          
+              
+                                           
+   
 
 void
 ipc_kobject_destroy(
@@ -1046,18 +1046,18 @@ ipc_kobject_destroy(
 	}
 }
 
-/*
- *	Routine:	ipc_kobject_label_substitute_task
- *	Purpose:
- *		Substitute a task control port for its immovable
- *		equivalent when the receiver is that task.
- *	Conditions:
- *		Space is write locked and active.
- *		Port is locked and active.
- *	Returns:
- *		- IP_NULL port if no substitution is to be done
- *		- a valid port if a substitution needs to happen
- */
+  
+                                             
+           
+                                                    
+                                              
+              
+                                     
+                              
+           
+                                                   
+                                                    
+   
 static ipc_port_t
 ipc_kobject_label_substitute_task(
 	ipc_space_t             space,
@@ -1075,18 +1075,18 @@ ipc_kobject_label_substitute_task(
 	return IP_NULL;
 }
 
-/*
- *	Routine:	ipc_kobject_label_substitute_thread
- *	Purpose:
- *		Substitute a thread control port for its immovable
- *		equivalent when it belongs to the receiver task.
- *	Conditions:
- *		Space is write locked and active.
- *		Port is locked and active.
- *	Returns:
- *		- IP_NULL port if no substitution is to be done
- *		- a valid port if a substitution needs to happen
- */
+  
+                                               
+           
+                                                      
+                                                    
+              
+                                     
+                              
+           
+                                                   
+                                                    
+   
 static ipc_port_t
 ipc_kobject_label_substitute_thread(
 	ipc_space_t             space,
@@ -1104,26 +1104,26 @@ ipc_kobject_label_substitute_thread(
 	return IP_NULL;
 }
 
-/*
- *	Routine:	ipc_kobject_label_check
- *	Purpose:
- *		Check to see if the space is allowed to possess
- *		a right for the given port. In order to qualify,
- *		the space label must contain all the privileges
- *		listed in the port/kobject label.
- *
- *	Conditions:
- *		Space is write locked and active.
- *		Port is locked and active.
- *
- *	Returns:
- *		Whether the copyout is authorized.
- *
- *		If a port substitution is requested, the space is unlocked,
- *		the port is unlocked and its "right" consumed.
- *
- *		As of now, substituted ports only happen for send rights.
- */
+  
+                                   
+           
+                                                   
+                                                    
+                                                   
+                                     
+  
+              
+                                     
+                              
+  
+           
+                                      
+  
+                                                               
+                                                  
+  
+                                                             
+   
 bool
 ipc_kobject_label_check(
 	ipc_space_t                     space,
@@ -1140,12 +1140,12 @@ ipc_kobject_label_check(
 
 	*subst_portp = IP_NULL;
 
-	/* Unlabled ports/kobjects are always allowed */
+	                                                
 	if (!ip_is_kolabeled(port)) {
 		return true;
 	}
 
-	/* Never OK to copyout the receive right for a labeled kobject */
+	                                                                 
 	if (msgt_name == MACH_MSG_TYPE_PORT_RECEIVE) {
 		panic("ipc_kobject_label_check: attempted receive right "
 		    "copyout for labeled kobject");
@@ -1170,7 +1170,7 @@ ipc_kobject_label_check(
 			subst = ipc_kobject_label_substitute_thread(space, port);
 			break;
 		case IPC_LABEL_SUBST_ONCE:
-			/* the next check will _not_ substitute */
+			                                          
 			*flags |= IPC_OBJECT_COPYOUT_FLAGS_NO_LABEL_CHECK;
 			subst = ip_get_kobject(port);
 			break;
@@ -1206,11 +1206,11 @@ ipc_kobject_notify(
 	trailer = (mach_msg_max_trailer_t *)
 	    ((vm_offset_t)request_header + request_header->msgh_size);
 
-	/*
-	 * The kobject notification is privileged and can change the
-	 * refcount on kernel-internal objects - make sure
-	 * that the message wasn't faked!
-	 */
+	  
+                                                             
+                                                   
+                                  
+    
 	if (0 != bcmp(&trailer->msgh_audit, &KERNEL_AUDIT_TOKEN,
 	    sizeof(trailer->msgh_audit))) {
 		return FALSE;
@@ -1250,13 +1250,13 @@ ipc_kobject_notify(
 		case IKOT_NAMED_ENTRY:
 			ip_lock(port);
 
-			/*
-			 * Bring the sequence number and mscount in
-			 * line with ipc_port_destroy assertion.
-			 */
+			  
+                                              
+                                           
+      
 			port->ip_mscount = 0;
 			port->ip_messages.imq_seqno = 0;
-			ipc_port_destroy(port);         /* releases lock */
+			ipc_port_destroy(port);                            
 			return TRUE;
 
 		case IKOT_UPL:

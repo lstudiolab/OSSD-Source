@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp6.h,v 1.2.2.2 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: esp.h,v 1.16 2000/10/18 21:28:00 itojun Exp $	*/
+                                                                               
+                                                          
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -58,9 +58,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1827/2406 Encapsulated Security Payload.
- */
+  
+                                              
+   
 
 #ifndef _NETINET6_ESP6_H_
 #define _NETINET6_ESP6_H_
@@ -73,6 +73,6 @@ extern int esp6_input(struct mbuf **, int *, int);
 extern int esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface);
 
 extern void esp6_ctlinput(int, struct sockaddr *, void *, struct ifnet *);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _NETINET6_ESP6_H_ */
+#endif                        

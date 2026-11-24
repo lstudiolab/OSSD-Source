@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOMemoryCursor.cpp created by wgulland on 1999-3-02 */
+                                                         
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -35,7 +35,7 @@
 #include <IOKit/IOMemoryDescriptor.h>
 #include <libkern/OSByteOrder.h>
 
-/**************************** class IOMemoryCursor ***************************/
+                                                                               
 
 #undef super
 #define super OSObject
@@ -59,7 +59,7 @@ IOMemoryCursor::withSpecification(SegmentFunction  inSegFunc,
 	return me;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                               
 
 bool
 IOMemoryCursor::initWithSpecification(SegmentFunction  inSegFunc,
@@ -67,7 +67,7 @@ IOMemoryCursor::initWithSpecification(SegmentFunction  inSegFunc,
     IOPhysicalLength inMaxTransferSize,
     IOPhysicalLength inAlignment)
 {
-// @@@ gvdl: Remove me
+                      
 #if 1
 	static UInt sMaxDBDMASegment;
 	if (!sMaxDBDMASegment) {
@@ -101,12 +101,12 @@ IOMemoryCursor::initWithSpecification(SegmentFunction  inSegFunc,
 		maxTransferSize = (IOPhysicalLength) - 1;
 	}
 	alignMask           = inAlignment - 1;
-	assert(alignMask == 0);         // No alignment code yet!
+	assert(alignMask == 0);                                  
 
 	return true;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                               
 
 UInt32
 IOMemoryCursor::genPhysicalSegments(IOMemoryDescriptor *inDescriptor,
@@ -128,12 +128,12 @@ IOMemoryCursor::genPhysicalSegments(IOMemoryDescriptor *inDescriptor,
 		inMaxTransferSize = (typeof(inMaxTransferSize))maxTransferSize;
 	}
 
-	/*
-	 * Iterate over the packet, translating segments where allowed
-	 *
-	 * If we finished cleanly return number of segments found
-	 * and update the position in the descriptor.
-	 */
+	  
+                                                               
+   
+                                                          
+                                              
+    
 	PhysicalSegment curSeg = { 0, 0 };
 	UInt curSegIndex = 0;
 	UInt curTransferSize = 0;
@@ -194,7 +194,7 @@ IOMemoryCursor::genPhysicalSegments(IOMemoryDescriptor *inDescriptor,
 	return curSegIndex;
 }
 
-/************************ class IONaturalMemoryCursor ************************/
+                                                                               
 
 #undef super
 #define super IOMemoryCursor
@@ -235,7 +235,7 @@ IONaturalMemoryCursor::initWithSpecification(IOPhysicalLength inMaxSegmentSize,
 	           inAlignment);
 }
 
-/************************** class IOBigMemoryCursor **************************/
+                                                                               
 
 #undef super
 #define super IOMemoryCursor
@@ -285,7 +285,7 @@ IOBigMemoryCursor::initWithSpecification(IOPhysicalLength inMaxSegmentSize,
 	           inAlignment);
 }
 
-/************************* class IOLittleMemoryCursor ************************/
+                                                                               
 
 #undef super
 #define super IOMemoryCursor
@@ -324,7 +324,7 @@ IOLittleMemoryCursor::withSpecification(IOPhysicalLength inMaxSegmentSize,
 	return me;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                               
 
 bool
 IOLittleMemoryCursor::initWithSpecification(IOPhysicalLength inMaxSegmentSize,

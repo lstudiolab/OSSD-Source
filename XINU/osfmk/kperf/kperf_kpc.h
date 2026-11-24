@@ -30,12 +30,12 @@
 #define __KPERF_KPC_H__
 
 #if KPC
-#include <kern/kpc.h> /* KPC_MAX_COUNTERS */
+#include <kern/kpc.h>                       
 #endif
 
 void kperf_kpc_thread_ast(thread_t thread);
 
-/* KPC sample data */
+                     
 struct kpcdata {
 	int      curcpu;
 	uint32_t running;
@@ -51,4 +51,4 @@ void kperf_kpc_thread_log(const struct kpcdata *);
 void kperf_kpc_cpu_log(const struct kpcdata *);
 void kperf_kpc_config_log(const struct kpcdata *);
 
-#endif /* __KPERF_KPC_H__ */
+#endif                      

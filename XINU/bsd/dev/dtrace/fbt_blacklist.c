@@ -30,28 +30,28 @@
 #define KASAN_ONLY(s) #s,
 #else
 #define KASAN_ONLY(s)
-#endif /* KASAN */
+#endif            
 
 #if defined(__arm__) || defined(__arm64__)
 #define ARM_ONLY(s) #s,
 #else
 #define ARM_ONLY(s)
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 #if defined(__x86_64__)
 #define X86_ONLY(s) #s,
 #else
 #define X86_ONLY(s)
-#endif /* defined(__x86_64__) */
+#endif                          
 
-/*
- * Routine prefixes that must not be probed, either because they are used in
- * the exception path, by dtrace code in probe context, or are general
- * critical routines that must never be probed.
- *
- * All routines whose name start with one of these will be ignored.
- *
- * This must be kept in asciibetical order for purposes of bsearch().
- */
+  
+                                                                            
+                                                                      
+                                               
+  
+                                                                   
+  
+                                                                     
+   
 const char * fbt_blacklist[] =
 {
 	CRITICAL(Call_DebuggerC)
@@ -70,16 +70,16 @@ const char * fbt_blacklist[] =
 	CRITICAL(SavePanicInfo)
 	CLOSURE(SetIdlePop)
 	CRITICAL(SysChoked)
-	CRITICAL(_ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass) /* OSMetaClassBase::safeMetaCast */
-	CRITICAL(_ZN16IOPlatformExpert11haltRestartEj) /* IOPlatformExpert::haltRestart */
-	CRITICAL(_ZN18IODTPlatformExpert11haltRestartEj) /* IODTPlatformExpert::haltRestart */
-	ARM_ONLY(_ZN8ASPNVRAM4syncEv) /* ASPNVRAM::sync */
-	CRITICAL(_ZN9IODTNVRAM13savePanicInfoEPhy) /* IODTNVRAM::savePanicInfo */
-	CRITICAL(_ZN9IOService14newTemperatureElPS_) /* IOService::newTemperature */
-	CRITICAL(_ZN9IOService26temperatureCriticalForZoneEPS_) /* IOService::temperatureCriticalForZone */
-	CRITICAL(_ZNK11OSMetaClass13checkMetaCastEPK15OSMetaClassBase) /* OSMetaClass::checkMetaCast */
-	CRITICAL(_ZNK15OSMetaClassBase8metaCastEPK11OSMetaClass) /* OSMetaClassBase::metaCast */
-	CRITICAL(_ZNK6OSData14getBytesNoCopyEv) /* Data::getBytesNoCopy, IOHibernateSystemWake path */
+	CRITICAL(_ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass)                                    
+	CRITICAL(_ZN16IOPlatformExpert11haltRestartEj)                                    
+	CRITICAL(_ZN18IODTPlatformExpert11haltRestartEj)                                      
+	ARM_ONLY(_ZN8ASPNVRAM4syncEv)                     
+	CRITICAL(_ZN9IODTNVRAM13savePanicInfoEPhy)                               
+	CRITICAL(_ZN9IOService14newTemperatureElPS_)                                
+	CRITICAL(_ZN9IOService26temperatureCriticalForZoneEPS_)                                            
+	CRITICAL(_ZNK11OSMetaClass13checkMetaCastEPK15OSMetaClassBase)                                 
+	CRITICAL(_ZNK15OSMetaClassBase8metaCastEPK11OSMetaClass)                                
+	CRITICAL(_ZNK6OSData14getBytesNoCopyEv)                                                       
 	KASAN_ONLY(__asan)
 	ARM_ONLY(__div)
 	CLOSURE(__dtrace_probe)
@@ -250,11 +250,11 @@ const char * fbt_blacklist[] =
 };
 #define BLACKLIST_COUNT (sizeof(fbt_blacklist)/sizeof(fbt_blacklist[0]))
 
-/*
- * Modules that should not be probed.
- *
- * This must be kept in asciibetical order for purposes of bsearch().
- */
+  
+                                     
+  
+                                                                     
+   
 static const char* fbt_module_blacklist[] = {
 	X86_ONLY(com.apple.driver.AppleACPIEC)
 	X86_ONLY(com.apple.driver.AppleACPIPlatform)
@@ -281,9 +281,9 @@ _cmp(const void *a, const void *b)
 
 
 #pragma clang diagnostic pop
-/*
- * Module validation
- */
+  
+                    
+   
 bool
 fbt_module_excluded(struct modctl* ctl)
 {
@@ -304,9 +304,9 @@ fbt_module_excluded(struct modctl* ctl)
 	return excluded;
 }
 
-/*
- * FBT probe name validation
- */
+  
+                            
+   
 bool
 fbt_excluded(const char* name)
 {
@@ -339,16 +339,16 @@ sysctl_dtrace_ignore_fbt_blacklist SYSCTL_HANDLER_ARGS
 			return ERANGE;
 		}
 
-		/*
-		 * We do not allow setting the blacklist back to on, as we have no way
-		 * of knowing if those unsafe probes are still used.
-		 *
-		 * If we are using kernel symbols, we also do not allow any change,
-		 * since the symbols are jettison'd after the first pass.
-		 *
-		 * We do not need to take any locks here because those symbol modes
-		 * are permanent and do not change after boot.
-		 */
+		  
+                                                                        
+                                                      
+    
+                                                                     
+                                                           
+    
+                                                                     
+                                                
+     
 		if (value != 1 || dtrace_kernel_symbol_mode == DTRACE_KERNEL_SYMBOLS_NEVER ||
 		    dtrace_kernel_symbol_mode == DTRACE_KERNEL_SYMBOLS_ALWAYS_FROM_KERNEL) {
 			return EPERM;
@@ -375,5 +375,5 @@ fbt_blacklist_init(void)
 			panic("unordered fbt blacklist %s > %s", fbt_blacklist[i - 1], fbt_blacklist[i]);
 		}
 	}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 }

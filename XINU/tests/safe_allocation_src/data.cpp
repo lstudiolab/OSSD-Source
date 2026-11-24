@@ -1,8 +1,8 @@
-//
-// Tests for
-//      T* data();
-//      T const* data() const;
-//
+  
+            
+                  
+                              
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>

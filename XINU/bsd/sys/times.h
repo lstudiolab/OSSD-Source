@@ -73,17 +73,17 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
-/* [XSI] The clock_t type shall be defined as described in <sys/types.h> */
+                                                                           
 #include <sys/_types/_clock_t.h>
 
-/*
- * [XSI] Structure whose address is passed as the first parameter to times()
- */
+  
+                                                                            
+   
 struct tms {
-	clock_t tms_utime;      /* [XSI] User CPU time */
-	clock_t tms_stime;      /* [XSI] System CPU time */
-	clock_t tms_cutime;     /* [XSI] Terminated children user CPU time */
-	clock_t tms_cstime;     /* [XSI] Terminated children System CPU time */
+	clock_t tms_utime;                               
+	clock_t tms_stime;                                 
+	clock_t tms_cutime;                                                  
+	clock_t tms_cstime;                                                    
 };
 
 #ifndef KERNEL
@@ -91,4 +91,4 @@ __BEGIN_DECLS
 clock_t times(struct tms *);
 __END_DECLS
 #endif
-#endif /* !_SYS_TIMES_H_ */
+#endif                     

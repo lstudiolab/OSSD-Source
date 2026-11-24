@@ -1,7 +1,7 @@
-//
-// Tests for
-//  bounded_array_ref<T, TrappingPolicy> slice(size_t n, size_t m) const;
-//
+  
+            
+                                                                         
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"
@@ -22,7 +22,7 @@ tests()
 {
 	T array[5] = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// Slices starting at 0
+	                       
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(0, 0);
@@ -59,7 +59,7 @@ tests()
 		CHECK(tracking_policy::message == "bounded_array_ref: invalid slice provided, the indices are of bounds for the bounded_array_ref");
 	}
 
-	// Slices starting at 1 (near the beginning)
+	                                            
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(1, 0);
@@ -95,7 +95,7 @@ tests()
 		CHECK(tracking_policy::did_trap);
 	}
 
-	// Slices starting at 3 (in the middle)
+	                                       
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(3, 0);
@@ -121,7 +121,7 @@ tests()
 		CHECK(tracking_policy::did_trap);
 	}
 
-	// Slices starting at 4 (near the end)
+	                                      
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(4, 0);
@@ -140,7 +140,7 @@ tests()
 		CHECK(tracking_policy::did_trap);
 	}
 
-	// Slices starting at the end
+	                             
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(5, 0);
@@ -159,7 +159,7 @@ tests()
 		CHECK(tracking_policy::did_trap);
 	}
 
-	// Slices starting after the end
+	                                
 	{
 		tracking_bounded_array_ref<T> view(array);
 		tracking_policy::reset();
@@ -179,7 +179,7 @@ tests()
 		CHECK(tracking_policy::did_trap);
 	}
 
-	// Slices overflowing a uint32_t
+	                                
 	{
 		std::uint32_t n = std::numeric_limits<std::uint32_t>::max() / 2 + 1;
 		std::uint32_t m = std::numeric_limits<std::uint32_t>::max() / 2 + 1;
@@ -190,7 +190,7 @@ tests()
 		CHECK(tracking_policy::message == "bounded_array_ref: n + m is larger than the size of any bounded_array_ref");
 	}
 
-	// Check the documented range equivalent
+	                                        
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(3, 2);
@@ -198,7 +198,7 @@ tests()
 		CHECK(slice.end() == view.begin() + 3 + 2);
 	}
 
-	// Chaining calls to slice()
+	                            
 	{
 		test_bounded_array_ref<T> view(array);
 		test_bounded_array_ref<T> slice = view.slice(1, 4).slice(2, 2);
@@ -207,7 +207,7 @@ tests()
 		CHECK(&slice[1] == &array[4]);
 	}
 
-	// Slicing an empty view
+	                        
 	{
 		test_bounded_array_ref<T> view;
 		test_bounded_array_ref<T> slice = view.slice(0, 0);

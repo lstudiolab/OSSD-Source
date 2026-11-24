@@ -35,8 +35,8 @@
 #include "kxld_util.h"
 #include "kxld_uuid.h"
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_uuid_init_from_macho(KXLDuuid *uuid, struct uuid_command *src)
 {
@@ -47,24 +47,24 @@ kxld_uuid_init_from_macho(KXLDuuid *uuid, struct uuid_command *src)
 	uuid->has_uuid = TRUE;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_uuid_clear(KXLDuuid *uuid)
 {
 	bzero(uuid, sizeof(*uuid));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_uuid_get_macho_header_size(void)
 {
 	return sizeof(struct uuid_command);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_uuid_export_macho(const KXLDuuid *uuid, u_char *buf,
     u_long *header_offset, u_long header_size)

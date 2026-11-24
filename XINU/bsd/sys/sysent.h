@@ -42,31 +42,31 @@ typedef void    sy_munge_t(void *);
 typedef int     sy_munge_t(const void *, void *);
 #endif
 
-struct sysent {         /* system call table */
-	sy_call_t       *sy_call;       /* implementing function */
+struct sysent {                                
+	sy_call_t       *sy_call;                                  
 #if CONFIG_REQUIRES_U32_MUNGING || (__arm__ && (__BIGGEST_ALIGNMENT__ > 4))
-	sy_munge_t      *sy_arg_munge32; /* system call arguments munger for 32-bit process */
+	sy_munge_t      *sy_arg_munge32;                                                      
 #endif
-	int32_t         sy_return_type; /* system call return types */
-	int16_t         sy_narg;        /* number of args */
-	uint16_t        sy_arg_bytes;   /* Total size of arguments in bytes for
-	                                 * 32-bit system calls
-	                                 */
+	int32_t         sy_return_type;                               
+	int16_t         sy_narg;                            
+	uint16_t        sy_arg_bytes;                                          
+                                                       
+                                    
 };
 
 extern const struct sysent sysent[];
 extern const unsigned int nsysent;
 
-/*
- * Valid values for sy_cancel
- */
-#define _SYSCALL_CANCEL_NONE    0               /* Not a cancellation point */
-#define _SYSCALL_CANCEL_PRE             1               /* Canbe cancelled on entry itself */
-#define _SYSCALL_CANCEL_POST    2               /* Can only be cancelled after syscall is run */
+  
+                             
+   
+#define _SYSCALL_CANCEL_NONE    0                                             
+#define _SYSCALL_CANCEL_PRE             1                                                    
+#define _SYSCALL_CANCEL_POST    2                                                               
 
-/*
- * Valid values for sy_return_type
- */
+  
+                                  
+   
 #define _SYSCALL_RET_NONE               0
 #define _SYSCALL_RET_INT_T              1
 #define _SYSCALL_RET_UINT_T             2
@@ -76,7 +76,7 @@ extern const unsigned int nsysent;
 #define _SYSCALL_RET_SSIZE_T    6
 #define _SYSCALL_RET_UINT64_T   7
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* KERNEL_PRIVATE */
+#endif                          
+#endif                     
 
-#endif /* !_SYS_SYSENT_H_ */
+#endif                      

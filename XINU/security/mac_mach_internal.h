@@ -58,9 +58,9 @@
 #warning "MAC policy is not KPI, see Technical Q&A QA1574, this header will be removed in next version"
 #endif
 
-/* mac_do_machexc() flags */
-#define	MAC_DOEXCF_TRACED	0x01	/* Only do mach exeception if
-					   being ptrace()'ed */
+                            
+#define	MAC_DOEXCF_TRACED	0x01	                             
+                            
 struct exception_action;
 struct proc;
 struct uthread;
@@ -73,7 +73,7 @@ int	mac_schedule_userret(void);
 void mac_policy_init(void);
 void mac_policy_initmach(void);
 
-/* tasks */
+           
 int	mac_task_check_expose_task(struct task *t, mach_task_flavor_t flavor);
 int	mac_task_check_task_id_token_get_task(struct task *t, mach_task_flavor_t flavor);
 int	mac_task_check_set_host_special_port(struct task *task,
@@ -85,10 +85,10 @@ int	mac_task_check_set_host_exception_ports(struct task *task,
 int mac_task_check_get_movable_control_port(void);
 int mac_task_check_dyld_process_info_notify_register(void);
 
-/* See rdar://problem/58989880 */
+                                 
 #ifndef bitstr_test
 #   define bitstr_test(name, bit) ((name)[((bit) >> 3)] & (1 << ((bit) & 0x7)))
-#endif /* ! bitstr_test */
+#endif                    
 
 typedef int (*mac_task_mach_filter_cbfunc_t)(struct proc *bsdinfo, int num);
 typedef int (*mac_task_kobj_filter_cbfunc_t)(struct proc *bsdinfo, int msgid, int index);
@@ -103,11 +103,11 @@ int  mac_task_register_filter_callbacks(
 		const mac_task_mach_filter_cbfunc_t mach_cbfunc,
 		const mac_task_kobj_filter_cbfunc_t kobj_cbfunc);
 
-/* threads */
+             
 void	act_set_astmacf(struct thread *);
 void	mac_thread_userret(struct thread *);
 
-/* exception actions */
+                       
 struct label *mac_exc_create_label(void);
 void mac_exc_free_label(struct label *label);
 
@@ -126,6 +126,6 @@ int mac_proc_check_remote_thread_create(struct task *task, int flavor, thread_st
 struct label *mac_exc_create_label_for_proc(struct proc *proc);
 struct label *mac_exc_create_label_for_current_proc(void);
 
-#endif /* MAC */
+#endif          
 
-#endif	/* !_SECURITY_MAC_MACH_INTERNAL_H_ */
+#endif	                                     

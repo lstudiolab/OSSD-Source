@@ -74,5 +74,5 @@ extern int vsock_put_message(struct vsock_address src, struct vsock_address dst,
 
 __END_DECLS
 
-#endif /* KERNEL_PRIVATE */
-#endif /* _VSOCK_TRANSPORT_H_ */
+#endif                     
+#endif                          

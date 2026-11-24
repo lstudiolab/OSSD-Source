@@ -32,7 +32,7 @@
 #if __has_feature(ptrauth_calls)
 #include <mach/vm_param.h>
 #include <ptrauth.h>
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 #include "log_encode.h"
 #include "log_mem.h"
@@ -58,12 +58,12 @@ is_kernel_pointer(void *arg, size_t arg_len)
 	(void) memcpy(&value, arg, arg_len);
 
 #if __has_feature(ptrauth_calls)
-	/**
-	 * Strip out the pointer authentication code before
-	 * checking whether the pointer is a kernel address.
-	 */
+	   
+                                                    
+                                                     
+    
 	value = (unsigned long long)VM_KERNEL_STRIP_PTR(value);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 	return value >= VM_MIN_KERNEL_AND_KEXT_ADDRESS && value <= VM_MAX_KERNEL_ADDRESS;
 }
@@ -91,20 +91,20 @@ static void
 log_range_update(os_log_fmt_range_t range, uint16_t offset, uint16_t length)
 {
 	range->offset = offset;
-	/*
-	 * Truncated flag may have already been set earlier, hence do not
-	 * overwrite it blindly.
-	 */
+	  
+                                                                  
+                         
+    
 	if (length < range->length) {
 		range->truncated = true;
 	}
 	range->length = length;
 }
 
-/*
- * Stores a command in the main section. The value itself is wrapped in
- * the os_log_fmt_cmd_t struct.
- */
+  
+                                                                       
+                               
+   
 static void
 log_add_cmd(os_log_context_t ctx, os_log_fmt_cmd_type_t type, uint8_t flags,
     void *arg, size_t arg_size)
@@ -125,10 +125,10 @@ log_add_cmd(os_log_context_t ctx, os_log_fmt_cmd_type_t type, uint8_t flags,
 	log_context_cursor_advance(ctx, cmd_sz);
 }
 
-/*
- * Collect details about argument which needs to be stored in the pubdata
- * section.
- */
+  
+                                                                         
+           
+   
 static void
 log_collect_public_range_data(os_log_context_t ctx, os_log_fmt_range_t range, void *arg)
 {
@@ -181,9 +181,9 @@ log_add_range_arg(os_log_context_t ctx, os_log_fmt_cmd_type_t type, os_log_fmt_c
 	return 0;
 }
 
-/*
- * Adds a scalar argument value to the main section.
- */
+  
+                                                    
+   
 static int
 log_add_arg(os_log_context_t ctx, os_log_fmt_cmd_type_t type, void *arg, size_t arg_len)
 {
@@ -215,7 +215,7 @@ log_encode_public_data(os_log_context_t ctx)
 
 		os_log_fmt_range_t const range __attribute__((aligned(8))) = (os_log_fmt_range_t)&cmd->cmd_data;
 
-		// Fix offset and length of the argument data in the hdr.
+		                                                         
 		log_range_update(range, ctx->ctx_content_off - orig_content_off,
 		    MIN(range->length, ctx->ctx_content_sz - ctx->ctx_content_off));
 
@@ -245,7 +245,7 @@ log_expand(os_log_context_t ctx, size_t new_size)
 	}
 	assert(final_size >= new_size);
 
-	// address length header + already stored data
+	                                              
 	const size_t hdr_size = (uint8_t *)ctx->ctx_hdr - ctx->ctx_buffer;
 	const size_t copy_size = hdr_size + sizeof(*ctx->ctx_hdr) + ctx->ctx_content_sz;
 	assert(copy_size <= new_size);
@@ -272,7 +272,7 @@ log_encode_fmt_arg(void *arg, size_t arg_len, os_log_fmt_cmd_type_t type, os_log
 	switch (type) {
 	case OSLF_CMD_TYPE_COUNT:
 	case OSLF_CMD_TYPE_SCALAR:
-		// Scrub kernel pointers.
+		                         
 		if (doprnt_hide_pointers && is_kernel_pointer(arg, arg_len)) {
 			rc = log_add_range_arg(ctx, type, OSLF_CMD_FLAG_PRIVATE, NULL, 0);
 			ctx->ctx_hdr->hdr_flags |= OSLF_HDR_FLAG_HAS_PRIVATE;
@@ -300,7 +300,7 @@ log_encode_fmt(os_log_context_t ctx, const char *format, va_list args)
 		++percent;
 
 		if (percent[0] == '%') {
-			percent = strchr(percent + 1, '%'); // Find next format after %%
+			percent = strchr(percent + 1, '%');                             
 			continue;
 		}
 
@@ -313,12 +313,12 @@ log_encode_fmt(os_log_context_t ctx, const char *format, va_list args)
 			int err = 0;
 
 			switch (ch = percent[0]) {
-			/* type of types or other */
-			case 'l': // longer
+			                            
+			case 'l':          
 				type++;
 				break;
 
-			case 'h': // shorter
+			case 'h':           
 				type--;
 				break;
 
@@ -338,7 +338,7 @@ log_encode_fmt(os_log_context_t ctx, const char *format, va_list args)
 				type = OST_LONGLONG;
 				break;
 
-			case '.': // precision
+			case '.':             
 				if ((percent[1]) == '*') {
 					prec = va_arg(args, int);
 					err = log_encode_fmt_arg(&prec, sizeof(prec), OSLF_CMD_TYPE_COUNT, ctx);
@@ -348,7 +348,7 @@ log_encode_fmt(os_log_context_t ctx, const char *format, va_list args)
 					percent++;
 					continue;
 				} else {
-					// we have to read the precision and do the right thing
+					                                                       
 					const char *fmt = percent + 1;
 					prec = 0;
 					while (isdigit(ch = *fmt++)) {
@@ -363,10 +363,10 @@ log_encode_fmt(os_log_context_t ctx, const char *format, va_list args)
 				}
 				break;
 
-			case '-': // left-align
-			case '+': // force sign
-			case ' ': // prefix non-negative with space
-			case '#': // alternate
+			case '-':              
+			case '+':              
+			case ' ':                                  
+			case '#':             
 			case '\'': // group by thousands
 				break;
 

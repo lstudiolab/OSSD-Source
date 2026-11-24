@@ -70,36 +70,36 @@
 
 #include <net/raw_cb.h>
 
-/*
- * Routines to manage the raw protocol control blocks.
- *
- * TODO:
- *	hash lookups by protocol family/protocol + address family
- *	take care of unique address problems per AF?
- *	redo address binding to allow wildcards
- */
+  
+                                                      
+  
+        
+                                                            
+                                               
+                                          
+   
 
 struct rawcb_list_head rawcb_list;
 
 static uint32_t raw_sendspace = RAWSNDQ;
 static uint32_t raw_recvspace = RAWRCVQ;
-extern lck_mtx_t        *raw_mtx;       /*### global raw cb mutex for now */
+extern lck_mtx_t        *raw_mtx;                                           
 
-/*
- * Allocate a control block and a nominal amount
- * of buffer space for the socket.
- */
+  
+                                                
+                                  
+   
 int
 raw_attach(struct socket *so, int proto)
 {
 	struct rawcb *rp = sotorawcb(so);
 	int error;
 
-	/*
-	 * It is assumed that raw_attach is called
-	 * after space has been allocated for the
-	 * rawcb.
-	 */
+	  
+                                           
+                                          
+          
+    
 	if (rp == 0) {
 		return ENOBUFS;
 	}
@@ -116,10 +116,10 @@ raw_attach(struct socket *so, int proto)
 	return 0;
 }
 
-/*
- * Detach the raw connection block and discard
- * socket resources.
- */
+  
+                                              
+                    
+   
 void
 raw_detach(struct rawcb *rp)
 {
@@ -145,9 +145,9 @@ raw_detach(struct rawcb *rp)
 	FREE(rp, M_PCB);
 }
 
-/*
- * Disconnect and possibly release resources.
- */
+  
+                                             
+   
 void
 raw_disconnect(struct rawcb *rp)
 {
@@ -159,11 +159,11 @@ raw_disconnect(struct rawcb *rp)
 	}
 	rp->rcb_faddr = 0;
 #endif
-	/*
-	 * A multipath subflow socket would have its SS_NOFDREF set by default,
-	 * so check for SOF_MP_SUBFLOW socket flag before detaching the PCB;
-	 * when the socket is closed for real, SOF_MP_SUBFLOW would be cleared.
-	 */
+	  
+                                                                        
+                                                                     
+                                                                        
+    
 	if (!(so->so_flags & SOF_MP_SUBFLOW) && (so->so_state & SS_NOFDREF)) {
 		raw_detach(rp);
 	}

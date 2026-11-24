@@ -55,13 +55,13 @@
  * rights to redistribute these changes.
  */
 
-/*
- *	File:	errorlib.h
- *	Author:	Douglas Orr, Carnegie Mellon University
- *	Date:	Mar. 1988
- *
- *	Error bases for subsytems errors.
- */
+  
+                   
+                                                  
+                  
+  
+                                    
+   
 
 #include <mach/error.h>
 

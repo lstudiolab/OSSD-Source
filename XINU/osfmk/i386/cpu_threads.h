@@ -32,10 +32,10 @@
 #include <i386/cpu_topology.h>
 #include <i386/mp.h>
 
-/*
- * These are defined here rather than in cpu_topology.h so as to keep
- * cpu_topology.h from having a dependency on cpu_data.h.
- */
+  
+                                                                     
+                                                         
+   
 #define CPU_THREAD_MASK                 0x00000001
 #define cpu_to_core_lapic(cpu)          (cpu_to_lapic[cpu] & ~CPU_THREAD_MASK)
 #define cpu_to_core_cpu(cpu)            (lapic_to_cpu[cpu_to_core_lapic(cpu)])
@@ -51,7 +51,7 @@
 #define cpu_to_die(cpu)                 ((cpu_to_lcpu(cpu) != NULL) ? _cpu_to_lcpu(cpu)->die : NULL)
 #define cpu_to_package(cpu)             ((cpu_to_lcpu(cpu) != NULL) ? _cpu_to_lcpu(cpu)->package : NULL)
 
-/* Fast access: */
+                  
 #define x86_lcpu()                      (&current_cpu_datap()->lcpu)
 #define x86_core()                      (x86_lcpu()->core)
 #define x86_die()                       (x86_lcpu()->die)
@@ -62,7 +62,7 @@
 #define cpu_is_same_package(cpu1, cpu2)  (cpu_to_package(cpu1) == cpu_to_package(cpu2))
 #define cpus_share_cache(cpu1, cpu2, _cl) (cpu_to_lcpu(cpu1)->caches[_cl] == cpu_to_lcpu(cpu2)->caches[_cl])
 
-/* always take the x86_topo_lock with mp_safe_spin_lock */
+                                                          
 boolean_t       mp_safe_spin_lock(usimple_lock_t lock);
 extern decl_simple_lock_data(, x86_topo_lock);
 
@@ -82,4 +82,4 @@ extern boolean_t        topo_dbg;
 	                kprintf(x);     \
 	} while (0)                     \
 
-#endif /* _I386_CPU_THREADS_H_ */
+#endif                           

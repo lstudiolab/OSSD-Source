@@ -239,11 +239,11 @@ sched_amp_choose_thread(
 
 	if ((spill_pri > bound_runq->highq) &&
 	    (spill_pri > main_runq->highq)) {
-		/*
-		 * There is a higher priority thread on the P-core runq,
-		 * so returning THREAD_NULL here will cause thread_select()
-		 * to call sched_amp_steal_thread() to try to get it.
-		 */
+		  
+                                                          
+                                                             
+                                                       
+     
 		return THREAD_NULL;
 	}
 
@@ -407,7 +407,7 @@ sched_amp_processor_queue_shutdown(processor_t processor)
 	thread_t        thread;
 	queue_head_t    tqueue;
 
-	/* We only need to migrate threads if this is the last active or last recommended processor in the pset */
+	                                                                                                          
 	if ((pset->online_processor_count > 0) && pset_is_recommended(pset)) {
 		pset_unlock(pset);
 		return;
@@ -446,16 +446,16 @@ sched_amp_processor_queue_remove(
 	rq = amp_runq_for_thread(processor, thread);
 
 	if (processor == thread->runq) {
-		/*
-		 * Thread is on a run queue and we have a lock on
-		 * that run queue.
-		 */
+		  
+                                                   
+                    
+     
 		run_queue_remove(rq, thread);
 	} else {
-		/*
-		 * The thread left the run queue before we could
-		 * lock the run queue.
-		 */
+		  
+                                                  
+                        
+     
 		assert(thread->runq == PROCESSOR_NULL);
 		processor = PROCESSOR_NULL;
 	}
@@ -465,10 +465,10 @@ sched_amp_processor_queue_remove(
 	return processor != PROCESSOR_NULL;
 }
 
-/*
- * sched_amp_steal_thread()
- *
- */
+  
+                           
+  
+   
 thread_t
 sched_amp_steal_thread(processor_set_t pset)
 {
@@ -494,7 +494,7 @@ sched_amp_steal_thread(processor_set_t pset)
 
 		pset_lock(pset);
 
-		/* Allow steal if load average still OK, no idle cores, and more threads on runq than active cores DISPATCHING */
+		                                                                                                                 
 		if ((sched_get_pset_load_average(pset, 0) >= sched_amp_steal_threshold(pset, spill_pending)) &&
 		    (pset->pset_runq.count > bit_count(pset->cpu_state_map[PROCESSOR_DISPATCHING])) &&
 		    (bit_count(pset->recommended_bitmask & pset->cpu_state_map[PROCESSOR_IDLE]) == 0)) {
@@ -519,10 +519,10 @@ sched_amp_thread_update_scan(sched_update_scan_context_t scan_context)
 	thread_t                thread;
 	spl_t                   s;
 
-	/*
-	 *  We update the threads associated with each processor (bound and idle threads)
-	 *  and then update the threads in each pset runqueue.
-	 */
+	  
+                                                                                  
+                                                       
+    
 
 	do {
 		do {
@@ -549,7 +549,7 @@ sched_amp_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while ((processor = processor->processor_list) != NULL);
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 
@@ -580,7 +580,7 @@ sched_amp_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while (((node = node->node_list) != NULL) && ((pset = node->psets) != NULL));
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 }
@@ -589,12 +589,12 @@ static bool
 pcores_recommended(thread_t thread)
 {
 	if (pcore_set->online_processor_count == 0) {
-		/* No pcores available */
+		                         
 		return false;
 	}
 
 	if (!pset_is_recommended(ecore_set)) {
-		/* No E cores recommended, must use P cores */
+		                                              
 		return true;
 	}
 
@@ -605,7 +605,7 @@ pcores_recommended(thread_t thread)
 	return pset_is_recommended(pcore_set);
 }
 
-/* Return true if this thread should not continue running on this processor */
+                                                                              
 static bool
 sched_amp_thread_avoid_processor(processor_t processor, thread_t thread)
 {
@@ -625,7 +625,7 @@ sched_amp_thread_avoid_processor(processor_t processor, thread_t thread)
 static processor_t
 sched_amp_choose_processor(processor_set_t pset, processor_t processor, thread_t thread)
 {
-	/* Bound threads don't call this function */
+	                                            
 	assert(thread->bound_processor == PROCESSOR_NULL);
 
 	processor_set_t nset = pset;
@@ -648,7 +648,7 @@ again:
 		pset_lock(nset);
 	}
 
-	/* Now that the chosen pset is definitely locked, make sure nothing important has changed */
+	                                                                                            
 	if (!pset_is_recommended(nset)) {
 		pset = nset;
 		goto again;
@@ -731,6 +731,6 @@ sysctl_task_set_cluster_type(char cluster_type)
 
 	thread_block(THREAD_CONTINUE_NULL);
 }
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-#endif /* __AMP__ */
+#endif              

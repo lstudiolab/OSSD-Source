@@ -30,13 +30,13 @@
 #ifndef _LOCKD_MACH_TYPES_H_
 #define _LOCKD_MACH_TYPES_H_
 
-/*
- * XXX NFSV3_MAX_FH_SIZE is defined in sys/mount.h, but we can't include
- * that here. Osfmk includes libsa/types.h which causes massive conflicts
- * with sys/types.h that get indirectly included with sys/mount.h. In user
- * land below will work on a build that does not yet have the new macro
- * definition.
- */
+  
+                                                                        
+                                                                         
+                                                                          
+                                                                       
+              
+   
 
 #ifndef NFSV3_MAX_FH_SIZE
 #define NFSV3_MAX_FH_SIZE 64

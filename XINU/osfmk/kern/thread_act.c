@@ -86,10 +86,10 @@ static void thread_suspended(void *arg, wait_result_t result);
 static void thread_set_apc_ast(thread_t thread);
 static void thread_set_apc_ast_locked(thread_t thread);
 
-/*
- * Internal routine to mark a thread as started.
- * Always called with the thread mutex locked.
- */
+  
+                                                
+                                              
+   
 void
 thread_start(
 	thread_t                        thread)
@@ -98,21 +98,21 @@ thread_start(
 	thread->started = TRUE;
 }
 
-/*
- * Internal routine to mark a thread as waiting
- * right after it has been created.  The caller
- * is responsible to call wakeup()/thread_wakeup()
- * or thread_terminate() to get it going.
- *
- * Always called with the thread mutex locked.
- *
- * Task and task_threads mutexes also held
- * (so nobody can set the thread running before
- * this point)
- *
- * Converts TH_UNINT wait to THREAD_INTERRUPTIBLE
- * to allow termination from this point forward.
- */
+  
+                                               
+                                               
+                                                  
+                                         
+  
+                                              
+  
+                                          
+                                               
+              
+  
+                                                 
+                                                
+   
 void
 thread_start_in_assert_wait(
 	thread_t                        thread,
@@ -126,14 +126,14 @@ thread_start_in_assert_wait(
 	spl = splsched();
 	waitq_lock(waitq);
 
-	/* clear out startup condition (safe because thread not started yet) */
+	                                                                       
 	thread_lock(thread);
 	assert(!thread->started);
 	assert((thread->state & (TH_WAIT | TH_UNINT)) == (TH_WAIT | TH_UNINT));
 	thread->state &= ~(TH_WAIT | TH_UNINT);
 	thread_unlock(thread);
 
-	/* assert wait interruptibly forever */
+	                                       
 	wait_result = waitq_assert_wait64_locked(waitq, CAST_EVENT64_T(event),
 	    interruptible,
 	    TIMEOUT_URGENCY_SYS_NORMAL,
@@ -142,7 +142,7 @@ thread_start_in_assert_wait(
 	    thread);
 	assert(wait_result == THREAD_WAITING);
 
-	/* mark thread started while we still hold the waitq lock */
+	                                                            
 	thread_lock(thread);
 	thread->started = TRUE;
 	thread_unlock(thread);
@@ -151,10 +151,10 @@ thread_start_in_assert_wait(
 	splx(spl);
 }
 
-/*
- * Internal routine to terminate a thread.
- * Sometimes called with task already locked.
- */
+  
+                                          
+                                             
+   
 kern_return_t
 thread_terminate_internal(
 	thread_t                        thread,
@@ -175,7 +175,7 @@ thread_terminate_internal(
 		} else {
 			thread_start(thread);
 		}
-		/* This bit can be reliably tested only if the thread is still active */
+		                                                                        
 		test_pin_bit = (options == TH_TERMINATE_OPTION_UNPIN) ? true : false;
 	} else {
 		result = KERN_TERMINATED;
@@ -185,11 +185,11 @@ thread_terminate_internal(
 		thread_affinity_terminate(thread);
 	}
 
-	/*
-	 * <rdar://problem/53562036> thread_terminate shouldn't be allowed on pthread
-	 * Until thread_terminate is disallowed for pthreads, always unpin the pinned port
-	 * when the thread is being terminated.
-	 */
+	  
+                                                                              
+                                                                                   
+                                        
+    
 	ipc_thread_port_unpin(thread->ith_self, test_pin_bit);
 
 	thread_mtx_unlock(thread);
@@ -201,9 +201,9 @@ thread_terminate_internal(
 	return result;
 }
 
-/*
- * Terminate a thread.
- */
+  
+                      
+   
 kern_return_t
 thread_terminate(
 	thread_t                thread)
@@ -212,25 +212,25 @@ thread_terminate(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	/* Kernel threads can't be terminated without their own cooperation */
+	                                                                      
 	if (thread->task == kernel_task && thread != current_thread()) {
 		return KERN_FAILURE;
 	}
 
 	kern_return_t result = thread_terminate_internal(thread, TH_TERMINATE_OPTION_NONE);
 
-	/*
-	 * If a kernel thread is terminating itself, force handle the APC_AST here.
-	 * Kernel threads don't pass through the return-to-user AST checking code,
-	 * but all threads must finish their own termination in thread_apc_ast.
-	 */
+	  
+                                                                            
+                                                                           
+                                                                        
+    
 	if (thread->task == kernel_task) {
 		assert(thread->active == FALSE);
 		thread_ast_clear(thread, AST_APC);
 		thread_apc_ast(thread);
 
 		panic("thread_terminate");
-		/* NOTREACHED */
+		                
 	}
 
 	return result;
@@ -250,13 +250,13 @@ thread_terminate_pinned(
 	return result;
 }
 
-/*
- * Suspend execution of the specified thread.
- * This is a recursive-style suspension of the thread, a count of
- * suspends is maintained.
- *
- * Called with thread mutex held.
- */
+  
+                                             
+                                                                 
+                          
+  
+                                 
+   
 void
 thread_hold(thread_t thread)
 {
@@ -266,21 +266,21 @@ thread_hold(thread_t thread)
 	}
 }
 
-/*
- * Decrement internal suspension count, setting thread
- * runnable when count falls to zero.
- *
- * Because the wait is abortsafe, we can't be guaranteed that the thread
- * is currently actually waiting even if suspend_parked is set.
- *
- * Called with thread mutex held.
- */
+  
+                                                      
+                                     
+  
+                                                                        
+                                                               
+  
+                                 
+   
 void
 thread_release(thread_t thread)
 {
 	assertf(thread->suspend_count > 0, "thread %p over-resumed", thread);
 
-	/* fail-safe on non-assert builds */
+	                                    
 	if (thread->suspend_count == 0) {
 		return;
 	}
@@ -351,11 +351,11 @@ thread_resume(thread_t thread)
 	return result;
 }
 
-/*
- *	thread_depress_abort_from_user:
- *
- *	Prematurely abort priority depression if there is one.
- */
+  
+                                  
+  
+                                                         
+   
 kern_return_t
 thread_depress_abort_from_user(thread_t thread)
 {
@@ -379,12 +379,12 @@ thread_depress_abort_from_user(thread_t thread)
 }
 
 
-/*
- * Indicate that the thread should run the AST_APC callback
- * to detect an abort condition.
- *
- * Called with thread mutex held.
- */
+  
+                                                           
+                                
+  
+                                 
+   
 static void
 act_abort(
 	thread_t        thread)
@@ -464,7 +464,7 @@ thread_abort_safely(
 	return result;
 }
 
-/*** backward compatibility hacks ***/
+                                      
 #include <mach/thread_info.h>
 #include <mach/thread_special_ports.h>
 #include <ipc/ipc_port.h>
@@ -500,8 +500,8 @@ static inline kern_return_t
 thread_get_state_internal(
 	thread_t                thread,
 	int                                             flavor,
-	thread_state_t                  state,                  /* pointer to OUT array */
-	mach_msg_type_number_t  *state_count,   /*IN/OUT*/
+	thread_state_t                  state,                                            
+	mach_msg_type_number_t  *state_count,             
 	boolean_t                               to_user)
 {
 	kern_return_t           result = KERN_SUCCESS;
@@ -550,7 +550,7 @@ thread_get_state_internal(
 	return result;
 }
 
-/* No prototype, since thread_act_server.h has the _to_user version if KERNEL_SERVER */
+                                                                                       
 
 kern_return_t
 thread_get_state(
@@ -563,8 +563,8 @@ kern_return_t
 thread_get_state(
 	thread_t                thread,
 	int                                             flavor,
-	thread_state_t                  state,                  /* pointer to OUT array */
-	mach_msg_type_number_t  *state_count)   /*IN/OUT*/
+	thread_state_t                  state,                                            
+	mach_msg_type_number_t  *state_count)             
 {
 	return thread_get_state_internal(thread, flavor, state, state_count, FALSE);
 }
@@ -573,16 +573,16 @@ kern_return_t
 thread_get_state_to_user(
 	thread_t                thread,
 	int                                             flavor,
-	thread_state_t                  state,                  /* pointer to OUT array */
-	mach_msg_type_number_t  *state_count)   /*IN/OUT*/
+	thread_state_t                  state,                                            
+	mach_msg_type_number_t  *state_count)             
 {
 	return thread_get_state_internal(thread, flavor, state, state_count, TRUE);
 }
 
-/*
- *	Change thread's machine-dependent state.  Called with nothing
- *	locked.  Returns same way.
- */
+  
+                                                                
+                             
+   
 static inline kern_return_t
 thread_set_state_internal(
 	thread_t                thread,
@@ -641,7 +641,7 @@ out:
 	return result;
 }
 
-/* No prototype, since thread_act_server.h has the _from_user version if KERNEL_SERVER */
+                                                                                         
 kern_return_t
 thread_set_state(
 	thread_t                thread,
@@ -674,10 +674,10 @@ thread_convert_thread_state(
 	thread_t                thread,
 	int                     direction,
 	thread_state_flavor_t   flavor,
-	thread_state_t          in_state,          /* pointer to IN array */
+	thread_state_t          in_state,                                   
 	mach_msg_type_number_t  in_state_count,
-	thread_state_t          out_state,         /* pointer to OUT array */
-	mach_msg_type_number_t  *out_state_count)   /*IN/OUT*/
+	thread_state_t          out_state,                                   
+	mach_msg_type_number_t  *out_state_count)             
 {
 	kern_return_t kr;
 	thread_t to_thread = THREAD_NULL;
@@ -705,16 +705,16 @@ thread_convert_thread_state(
 		from_thread = thread;
 	}
 
-	/* Authenticate and convert thread state to kernel representation */
+	                                                                    
 	kr = machine_thread_state_convert_from_user(from_thread, flavor,
 	    in_state, state_count);
 
-	/* Return early if one of the thread was jop disabled while other wasn't */
+	                                                                           
 	if (kr != KERN_SUCCESS) {
 		return kr;
 	}
 
-	/* Convert thread state to target thread user representation */
+	                                                               
 	kr = machine_thread_state_convert_to_user(to_thread, flavor,
 	    in_state, &state_count);
 
@@ -730,13 +730,13 @@ thread_convert_thread_state(
 	return kr;
 }
 
-/*
- * Kernel-internal "thread" interfaces used outside this file:
- */
+  
+                                                              
+   
 
-/* Initialize (or re-initialize) a thread state.  Called from execve
- * with nothing locked, returns same way.
- */
+                                                                    
+                                         
+   
 kern_return_t
 thread_state_initialize(
 	thread_t                thread)
@@ -868,12 +868,12 @@ thread_dup2(
 	return result;
 }
 
-/*
- *	thread_setstatus:
- *
- *	Set the status of the specified thread.
- *	Called with (and returns with) no locks held.
- */
+  
+                    
+  
+                                          
+                                                
+   
 kern_return_t
 thread_setstatus(
 	thread_t                thread,
@@ -894,11 +894,11 @@ thread_setstatus_from_user(
 	return thread_set_state_from_user(thread, flavor, tstate, count);
 }
 
-/*
- *	thread_getstatus:
- *
- *	Get the status of the specified thread.
- */
+  
+                    
+  
+                                          
+   
 kern_return_t
 thread_getstatus(
 	thread_t                thread,
@@ -919,10 +919,10 @@ thread_getstatus_to_user(
 	return thread_get_state_to_user(thread, flavor, tstate, count);
 }
 
-/*
- *	Change thread's machine-dependent userspace TSD base.
- *  Called with nothing locked.  Returns same way.
- */
+  
+                                                        
+                                                  
+   
 kern_return_t
 thread_set_tsd_base(
 	thread_t                        thread,
@@ -964,14 +964,14 @@ thread_set_tsd_base(
 	return result;
 }
 
-/*
- * thread_set_apc_ast:
- *
- * Register the AST_APC callback that handles suspension and
- * termination, if it hasn't been installed already.
- *
- * Called with the thread mutex held.
- */
+  
+                      
+  
+                                                            
+                                                    
+  
+                                     
+   
 static void
 thread_set_apc_ast(thread_t thread)
 {
@@ -984,13 +984,13 @@ thread_set_apc_ast(thread_t thread)
 	splx(s);
 }
 
-/*
- * thread_set_apc_ast_locked:
- *
- * Do the work of registering for the AST_APC callback.
- *
- * Called with the thread mutex and scheduling lock held.
- */
+  
+                             
+  
+                                                       
+  
+                                                         
+   
 static void
 thread_set_apc_ast_locked(thread_t thread)
 {
@@ -1009,18 +1009,18 @@ thread_set_apc_ast_locked(thread_t thread)
 	}
 }
 
-/*
- * Activation control support routines internal to this file:
- *
- */
+  
+                                                             
+  
+   
 
-/*
- * thread_suspended
- *
- * Continuation routine for thread suspension.  It checks
- * to see whether there has been any new suspensions.  If so, it
- * installs the AST_APC handler again.
- */
+  
+                   
+  
+                                                         
+                                                                
+                                      
+   
 __attribute__((noreturn))
 static void
 thread_suspended(__unused void *parameter, wait_result_t result)
@@ -1042,13 +1042,13 @@ thread_suspended(__unused void *parameter, wait_result_t result)
 	thread_mtx_unlock(thread);
 
 	thread_exception_return();
-	/*NOTREACHED*/
+	              
 }
 
-/*
- * thread_apc_ast - handles AST_APC and drives thread suspension and termination.
- * Called with nothing locked.  Returns (if it returns) the same way.
- */
+  
+                                                                                 
+                                                                     
+   
 void
 thread_apc_ast(thread_t thread)
 {
@@ -1059,7 +1059,7 @@ thread_apc_ast(thread_t thread)
 	spl_t s = splsched();
 	thread_lock(thread);
 
-	/* TH_SFLAG_POLLDEPRESS is OK to have here */
+	                                             
 	assert((thread->sched_flags & TH_SFLAG_DEPRESS) == 0);
 
 	thread->sched_flags &= ~TH_SFLAG_ABORTED_MASK;
@@ -1067,14 +1067,14 @@ thread_apc_ast(thread_t thread)
 	splx(s);
 
 	if (!thread->active) {
-		/* Thread is ready to terminate, time to tear it down */
+		                                                        
 		thread_mtx_unlock(thread);
 
 		thread_terminate_self();
-		/*NOTREACHED*/
+		              
 	}
 
-	/* If we're suspended, go to sleep and wait for someone to wake us up. */
+	                                                                         
 	if (thread->suspend_count > 0) {
 		thread->suspend_parked = TRUE;
 		assert_wait(&thread->suspend_count,
@@ -1082,14 +1082,14 @@ thread_apc_ast(thread_t thread)
 		thread_mtx_unlock(thread);
 
 		thread_block(thread_suspended);
-		/*NOTREACHED*/
+		              
 	}
 
 	thread_mtx_unlock(thread);
 }
 
 
-/* Prototype, see justification above */
+                                        
 kern_return_t
 act_set_state(
 	thread_t                                thread,
@@ -1125,7 +1125,7 @@ act_set_state_from_user(
 	return thread_set_state_from_user(thread, flavor, state, count);
 }
 
-/* Prototype, see justification above */
+                                        
 kern_return_t
 act_get_state(
 	thread_t                                thread,
@@ -1188,14 +1188,14 @@ act_set_ast(
 	splx(s);
 }
 
-/*
- * set AST on thread without causing an AST check
- * and without taking the thread lock
- *
- * If thread is not the current thread, then it may take
- * up until the next context switch or quantum expiration
- * on that thread for it to notice the AST.
- */
+  
+                                                 
+                                     
+  
+                                                        
+                                                         
+                                           
+   
 static void
 act_set_ast_async(thread_t  thread,
     ast_t     ast)
@@ -1221,17 +1221,17 @@ act_set_astkevent(thread_t thread, uint16_t bits)
 {
 	os_atomic_or(&thread->kevent_ast_bits, bits, relaxed);
 
-	/* kevent AST shouldn't send immediate IPIs */
+	                                              
 	act_set_ast_async(thread, AST_KEVENT);
 }
 
 uint16_t
 act_clear_astkevent(thread_t thread, uint16_t bits)
 {
-	/*
-	 * avoid the atomic operation if none of the bits is set,
-	 * which will be the common case.
-	 */
+	  
+                                                          
+                                  
+    
 	uint16_t cur = os_atomic_load(&thread->kevent_ast_bits, relaxed);
 	if (cur & bits) {
 		cur = os_atomic_andnot_orig(&thread->kevent_ast_bits, bits, relaxed);
@@ -1249,7 +1249,7 @@ void
 act_set_kperf(
 	thread_t        thread)
 {
-	/* safety check */
+	                  
 	if (thread != current_thread()) {
 		if (!ml_get_interrupts_enabled()) {
 			panic("unsafe act_set_kperf operation");
@@ -1274,14 +1274,14 @@ act_set_astledger(thread_t thread)
 	act_set_ast(thread, AST_LEDGER);
 }
 
-/*
- * The ledger AST may need to be set while already holding
- * the thread lock.  This routine skips sending the IPI,
- * allowing us to avoid the lock hold.
- *
- * However, it means the targeted thread must context switch
- * to recognize the ledger AST.
- */
+  
+                                                          
+                                                        
+                                      
+  
+                                                            
+                               
+   
 void
 act_set_astledger_async(thread_t thread)
 {

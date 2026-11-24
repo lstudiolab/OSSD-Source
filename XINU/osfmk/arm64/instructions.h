@@ -163,4 +163,4 @@
 #define ARM64_INSTR_SWP_RT_SHIFT  0
 #define ARM64_INSTR_SWP_RT_GET(x) (((x) >> ARM64_INSTR_SWP_RT_SHIFT) & ARM64_INSTR_SWP_RT_MASK)
 
-#endif /* _INSTRUCTIONS_H_ */
+#endif                       

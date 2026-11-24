@@ -71,7 +71,7 @@
 
 #include <sys/appleapiopts.h>
 #include <sys/cdefs.h>
-#include <sys/select.h>                 /* For struct selinfo. */
+#include <sys/select.h>                                          
 #include <sys/queue.h>
 #include <sys/lock.h>
 #include <sys/param.h>
@@ -84,7 +84,7 @@
 #include <mach/boolean.h>
 
 #ifdef XNU_KERNEL_PRIVATE
-#include <mach/coalition.h>             /* COALITION_NUM_TYPES */
+#include <mach/coalition.h>                                      
 #endif
 
 #ifndef KERNEL
@@ -98,139 +98,139 @@ struct pgrp;
 struct proc;
 struct proc_ident;
 
-/* Exported fields for kern sysctls */
+                                      
 struct extern_proc {
 	union {
 		struct {
-			struct  proc *__p_forw; /* Doubly-linked run/sleep queue. */
+			struct  proc *__p_forw;                                     
 			struct  proc *__p_back;
 		} p_st1;
-		struct timeval __p_starttime;   /* process start time */
+		struct timeval __p_starttime;                           
 	} p_un;
 #define p_forw p_un.p_st1.__p_forw
 #define p_back p_un.p_st1.__p_back
 #define p_starttime p_un.__p_starttime
-	struct  vmspace *p_vmspace;     /* Address space. */
-	struct  sigacts *p_sigacts;     /* Signal actions, state (PROC ONLY). */
-	int     p_flag;                 /* P_* flags. */
-	char    p_stat;                 /* S* process status. */
-	pid_t   p_pid;                  /* Process identifier. */
-	pid_t   p_oppid;         /* Save parent pid during ptrace. XXX */
-	int     p_dupfd;         /* Sideways return value from fdopen. XXX */
-	/* Mach related  */
-	caddr_t user_stack;     /* where user stack was allocated */
-	void    *exit_thread;   /* XXX Which thread is exiting? */
-	int             p_debugger;             /* allow to debug */
-	boolean_t       sigwait;        /* indication to suspend */
-	/* scheduling */
-	u_int   p_estcpu;        /* Time averaged value of p_cpticks. */
-	int     p_cpticks;       /* Ticks of cpu time. */
-	fixpt_t p_pctcpu;        /* %cpu for this process during p_swtime */
-	void    *p_wchan;        /* Sleep address. */
-	char    *p_wmesg;        /* Reason for sleep. */
-	u_int   p_swtime;        /* Time swapped in or out. */
-	u_int   p_slptime;       /* Time since last blocked. */
-	struct  itimerval p_realtimer;  /* Alarm timer. */
-	struct  timeval p_rtime;        /* Real time. */
-	u_quad_t p_uticks;              /* Statclock hits in user mode. */
-	u_quad_t p_sticks;              /* Statclock hits in system mode. */
-	u_quad_t p_iticks;              /* Statclock hits processing intr. */
-	int     p_traceflag;            /* Kernel trace points. */
-	struct  vnode *p_tracep;        /* Trace to vnode. */
-	int     p_siglist;              /* DEPRECATED. */
-	struct  vnode *p_textvp;        /* Vnode of executable. */
-	int     p_holdcnt;              /* If non-zero, don't swap. */
-	sigset_t p_sigmask;     /* DEPRECATED. */
-	sigset_t p_sigignore;   /* Signals being ignored. */
-	sigset_t p_sigcatch;    /* Signals being caught by user. */
-	u_char  p_priority;     /* Process priority. */
-	u_char  p_usrpri;       /* User-priority based on p_cpu and p_nice. */
-	char    p_nice;         /* Process "nice" value. */
+	struct  vmspace *p_vmspace;                         
+	struct  sigacts *p_sigacts;                                             
+	int     p_flag;                                 
+	char    p_stat;                                         
+	pid_t   p_pid;                                           
+	pid_t   p_oppid;                                                 
+	int     p_dupfd;                                                     
+	                   
+	caddr_t user_stack;                                         
+	void    *exit_thread;                                     
+	int             p_debugger;                                 
+	boolean_t       sigwait;                                   
+	                
+	u_int   p_estcpu;                                               
+	int     p_cpticks;                               
+	fixpt_t p_pctcpu;                                                   
+	void    *p_wchan;                            
+	char    *p_wmesg;                               
+	u_int   p_swtime;                                     
+	u_int   p_slptime;                                     
+	struct  itimerval p_realtimer;                    
+	struct  timeval p_rtime;                        
+	u_quad_t p_uticks;                                                
+	u_quad_t p_sticks;                                                  
+	u_quad_t p_iticks;                                                   
+	int     p_traceflag;                                      
+	struct  vnode *p_tracep;                             
+	int     p_siglist;                               
+	struct  vnode *p_textvp;                                  
+	int     p_holdcnt;                                            
+	sigset_t p_sigmask;                      
+	sigset_t p_sigignore;                               
+	sigset_t p_sigcatch;                                       
+	u_char  p_priority;                            
+	u_char  p_usrpri;                                                     
+	char    p_nice;                                    
 	char    p_comm[MAXCOMLEN + 1];
-	struct  pgrp *p_pgrp;   /* Pointer to process group. */
-	struct  user *p_addr;   /* Kernel virtual addr of u-area (PROC ONLY). */
-	u_short p_xstat;        /* Exit status for wait; also stop signal. */
-	u_short p_acflag;       /* Accounting flags. */
-	struct  rusage *p_ru;   /* Exit information. XXX */
+	struct  pgrp *p_pgrp;                                  
+	struct  user *p_addr;                                                   
+	u_short p_xstat;                                                     
+	u_short p_acflag;                              
+	struct  rusage *p_ru;                              
 };
 
 
-/* Status values. */
-#define SIDL    1               /* Process being created by fork. */
-#define SRUN    2               /* Currently runnable. */
-#define SSLEEP  3               /* Sleeping on an address. */
-#define SSTOP   4               /* Process debugging or suspension. */
-#define SZOMB   5               /* Awaiting collection by parent. */
+                    
+#define SIDL    1                                                   
+#define SRUN    2                                        
+#define SSLEEP  3                                            
+#define SSTOP   4                                                     
+#define SZOMB   5                                                   
 
-/* These flags are kept in extern_proc.p_flag. */
-#define P_ADVLOCK       0x00000001      /* Process may hold POSIX adv. lock */
-#define P_CONTROLT      0x00000002      /* Has a controlling terminal */
-#define P_LP64          0x00000004      /* Process is LP64 */
-#define P_NOCLDSTOP     0x00000008      /* No SIGCHLD when children stop */
+                                                 
+#define P_ADVLOCK       0x00000001                                            
+#define P_CONTROLT      0x00000002                                      
+#define P_LP64          0x00000004                           
+#define P_NOCLDSTOP     0x00000008                                         
 
-#define P_PPWAIT        0x00000010      /* Parent waiting for chld exec/exit */
-#define P_PROFIL        0x00000020      /* Has started profiling */
-#define P_SELECT        0x00000040      /* Selecting; wakeup/waiting danger */
-#define P_CONTINUED     0x00000080      /* Process was stopped and continued */
+#define P_PPWAIT        0x00000010                                             
+#define P_PROFIL        0x00000020                                 
+#define P_SELECT        0x00000040                                            
+#define P_CONTINUED     0x00000080                                             
 
-#define P_SUGID         0x00000100      /* Has set privileges since last exec */
-#define P_SYSTEM        0x00000200      /* Sys proc: no sigs, stats or swap */
-#define P_TIMEOUT       0x00000400      /* Timing out during sleep */
-#define P_TRACED        0x00000800      /* Debugged process being traced */
+#define P_SUGID         0x00000100                                              
+#define P_SYSTEM        0x00000200                                            
+#define P_TIMEOUT       0x00000400                                   
+#define P_TRACED        0x00000800                                         
 
-#define P_DISABLE_ASLR  0x00001000      /* Disable address space layout randomization */
-#define P_WEXIT         0x00002000      /* Working on exiting */
-#define P_EXEC          0x00004000      /* Process called exec. */
+#define P_DISABLE_ASLR  0x00001000                                                      
+#define P_WEXIT         0x00002000                              
+#define P_EXEC          0x00004000                                
 
-/* Should be moved to machine-dependent areas. */
-#define P_OWEUPC        0x00008000      /* Owe process an addupc() call at next ast. */
+                                                 
+#define P_OWEUPC        0x00008000                                                     
 
-#define P_AFFINITY      0x00010000      /* xxx */
-#define P_TRANSLATED    0x00020000      /* xxx */
-#define P_CLASSIC       P_TRANSLATED    /* xxx */
+#define P_AFFINITY      0x00010000               
+#define P_TRANSLATED    0x00020000               
+#define P_CLASSIC       P_TRANSLATED             
 
-#define P_DELAYIDLESLEEP 0x00040000     /* Process is marked to delay idle sleep on disk IO */
-#define P_CHECKOPENEVT  0x00080000      /* check if a vnode has the OPENEVT flag set on open */
+#define P_DELAYIDLESLEEP 0x00040000                                                           
+#define P_CHECKOPENEVT  0x00080000                                                             
 
-#define P_DEPENDENCY_CAPABLE    0x00100000      /* process is ok to call vfs_markdependency() */
-#define P_REBOOT        0x00200000      /* Process called reboot() */
-#define P_RESV6         0x00400000      /* used to be P_TBE */
-#define P_RESV7         0x00800000      /* (P_SIGEXC)signal exceptions */
+#define P_DEPENDENCY_CAPABLE    0x00100000                                                      
+#define P_REBOOT        0x00200000                                   
+#define P_RESV6         0x00400000                            
+#define P_RESV7         0x00800000                                       
 
-#define P_THCWD         0x01000000      /* process has thread cwd  */
-#define P_RESV9         0x02000000      /* (P_VFORK)process has vfork children */
-#define P_ADOPTPERSONA  0x04000000      /* process adopted a persona (used to be P_NOATTACH) */
-#define P_RESV11        0x08000000      /* (P_INVFORK) proc in vfork */
+#define P_THCWD         0x01000000                                   
+#define P_RESV9         0x02000000                                               
+#define P_ADOPTPERSONA  0x04000000                                                             
+#define P_RESV11        0x08000000                                     
 
-#define P_NOSHLIB       0x10000000      /* no shared libs are in use for proc */
-                                        /* flag set on exec */
-#define P_FORCEQUOTA    0x20000000      /* Force quota for root */
-#define P_NOCLDWAIT     0x40000000      /* No zombies when chil procs exit */
-#define P_NOREMOTEHANG  0x80000000      /* Don't hang on remote FS ops */
+#define P_NOSHLIB       0x10000000                                              
+                                                              
+#define P_FORCEQUOTA    0x20000000                                
+#define P_NOCLDWAIT     0x40000000                                           
+#define P_NOREMOTEHANG  0x80000000                                       
 
-#define P_INMEM         0               /* Obsolete: retained for compilation */
-#define P_NOSWAP        0               /* Obsolete: retained for compilation */
-#define P_PHYSIO        0               /* Obsolete: retained for compilation */
-#define P_FSTRACE       0               /* Obsolete: retained for compilation */
-#define P_SSTEP         0               /* Obsolete: retained for compilation */
+#define P_INMEM         0                                                       
+#define P_NOSWAP        0                                                       
+#define P_PHYSIO        0                                                       
+#define P_FSTRACE       0                                                       
+#define P_SSTEP         0                                                       
 
-#define P_DIRTY_TRACK                           0x00000001      /* track dirty state */
-#define P_DIRTY_ALLOW_IDLE_EXIT                 0x00000002      /* process can be idle-exited when clean */
-#define P_DIRTY_DEFER                           0x00000004      /* defer initial opt-in to idle-exit */
-#define P_DIRTY                                 0x00000008      /* process is dirty */
-#define P_DIRTY_SHUTDOWN                        0x00000010      /* process is dirty during shutdown */
-#define P_DIRTY_TERMINATED                      0x00000020      /* process has been marked for termination */
-#define P_DIRTY_BUSY                            0x00000040      /* serialization flag */
-#define P_DIRTY_MARKED                          0x00000080      /* marked dirty previously */
-#define P_DIRTY_AGING_IN_PROGRESS               0x00000100      /* aging in one of the 'aging bands' */
-#define P_DIRTY_LAUNCH_IN_PROGRESS              0x00000200      /* launch is in progress */
-#define P_DIRTY_DEFER_ALWAYS                    0x00000400      /* defer going to idle-exit after every dirty->clean transition.
-	                                                         * For legacy jetsam policy only. This is the default with the other policies.*/
+#define P_DIRTY_TRACK                           0x00000001                             
+#define P_DIRTY_ALLOW_IDLE_EXIT                 0x00000002                                                 
+#define P_DIRTY_DEFER                           0x00000004                                             
+#define P_DIRTY                                 0x00000008                            
+#define P_DIRTY_SHUTDOWN                        0x00000010                                            
+#define P_DIRTY_TERMINATED                      0x00000020                                                   
+#define P_DIRTY_BUSY                            0x00000040                              
+#define P_DIRTY_MARKED                          0x00000080                                   
+#define P_DIRTY_AGING_IN_PROGRESS               0x00000100                                             
+#define P_DIRTY_LAUNCH_IN_PROGRESS              0x00000200                                 
+#define P_DIRTY_DEFER_ALWAYS                    0x00000400                                                                      
+                                                                                                                                         
 
 #define P_DIRTY_IS_DIRTY                        (P_DIRTY | P_DIRTY_SHUTDOWN)
 #define P_DIRTY_IDLE_EXIT_ENABLED               (P_DIRTY_TRACK|P_DIRTY_ALLOW_IDLE_EXIT)
 
-#endif /* XNU_KERNEL_PRIVATE || !KERNEL */
+#endif                                    
 
 #ifdef KERNEL
 __BEGIN_DECLS
@@ -246,116 +246,116 @@ extern int      msleep(void *chan, lck_mtx_t *mtx, int pri, const char *wmesg, s
 extern void     wakeup(void *chan);
 extern void wakeup_one(caddr_t chan);
 
-/* proc kpis */
-/* this routine returns the pid of the current process */
+               
+                                                         
 extern int proc_selfpid(void);
-/* this routine returns the pid of the parent of the current process */
+                                                                       
 extern int proc_selfppid(void);
-/* this routine returns the csflags of the current process */
+                                                             
 extern uint64_t proc_selfcsflags(void);
-/* this routine populates the given flags param with the csflags of the given process. Returns 0 on success, -1 on error. */
+                                                                                                                            
 extern int proc_csflags(proc_t p, uint64_t* flags);
-/* this routine returns sends a signal signum to the process identified by the pid */
+                                                                                     
 extern void proc_signal(int pid, int signum);
-/* this routine checks whether any signal identified by the mask are pending in the  process identified by the pid. The check is  on all threads of the process. */
+                                                                                                                                                                   
 extern int proc_issignal(int pid, sigset_t mask);
-/* this routine returns 1 if the pid1 is inferior of pid2 */
+                                                            
 extern int proc_isinferior(int pid1, int pid2);
-/* this routine copies the process's name of the executable to the passed in buffer. It
- * is always null terminated. The size of the buffer is to be passed in as well. This
- * routine is to be used typically for debugging
- */
+                                                                                       
+                                                                                     
+                                                
+   
 void proc_name(int pid, char * buf, int size);
-/* returns the 32-byte name if it exists, otherwise returns the 16-byte name */
+                                                                               
 extern char *proc_best_name(proc_t p);
-/* This routine is simillar to proc_name except it returns for current process */
+                                                                                 
 void proc_selfname(char * buf, int size);
 
-/* find a process with a given pid. This comes with a reference which needs to be dropped by proc_rele */
+                                                                                                         
 extern proc_t proc_find(int pid);
-/* find a process with a given process identity */
+                                                  
 extern proc_t proc_find_ident(struct proc_ident const *i);
-/* returns a handle to current process which is referenced. The reference needs to be dropped with proc_rele */
+                                                                                                               
 extern proc_t proc_self(void);
-/* releases the held reference on the process */
+                                                
 extern int proc_rele(proc_t p);
-/* returns the pid of the given process */
+                                          
 extern int proc_pid(proc_t);
-/* returns the pid of the parent of a given process */
+                                                      
 extern int proc_ppid(proc_t);
-/* returns the original pid of the parent of a given process */
+                                                               
 extern int proc_original_ppid(proc_t);
-/* returns the start time of the given process */
+                                                 
 extern int proc_starttime(proc_t, struct timeval *);
-/* returns the platform (macos, ios, watchos, tvos, ...) of the given process */
+                                                                                
 extern uint32_t proc_platform(const proc_t);
-/* returns the minimum sdk version used by the current process */
+                                                                 
 extern uint32_t proc_min_sdk(proc_t);
-/* returns the sdk version used by the current process */
+                                                         
 extern uint32_t proc_sdk(proc_t);
-/* returns 1 if the process is marked for no remote hangs */
+                                                            
 extern int proc_noremotehang(proc_t);
-/* returns 1 if the process is marked for force quota */
+                                                        
 extern int proc_forcequota(proc_t);
-/* returns 1 if the process is chrooted */
+                                          
 extern int proc_chrooted(proc_t);
-/* returns TRUE if a sync EXC_RESOURCE should be sent for the process */
+                                                                        
 extern boolean_t proc_send_synchronous_EXC_RESOURCE(proc_t p);
 
-/* this routine returns 1 if the process is running with a 64bit address space, else 0 */
+                                                                                         
 extern int proc_is64bit(proc_t);
-/* this routine returns 1 if the process is running with a 64bit register state, else 0 */
+                                                                                          
 extern int proc_is64bit_data(proc_t);
-/* this routine returns 1 if the process is initproc */
+                                                       
 extern int proc_isinitproc(proc_t);
-/* is this process exiting? */
+                              
 extern int proc_exiting(proc_t);
-/* returns whether the process has started down proc_exit() */
+                                                              
 extern int proc_in_teardown(proc_t);
-/* this routine returns error if the process is not one with super user privileges */
+                                                                                     
 int proc_suser(proc_t p);
-/* returns the cred assicaited with the process; temporary api */
+                                                                 
 kauth_cred_t proc_ucred(proc_t p);
-/* returns 1 if the process is tainted by uid or gid changes,e else 0 */
+                                                                        
 extern int proc_issetugid(proc_t p);
 
 extern int proc_tbe(proc_t);
 
-/*!
- *  @function proc_gettty
- *  @abstract Copies the associated tty vnode for a given process if it exists. The caller needs to decrement the iocount of the vnode.
- *  @return 0 on success. ENOENT if the process has no associated TTY. EINVAL if arguments are NULL or vnode_getwithvid fails.
- */
+   
+                         
+                                                                                                                                       
+                                                                                                                              
+   
 extern int proc_gettty(proc_t p, vnode_t *vp);
 
-/* this routine populates the associated tty device for a given process if it exists, returns 0 on success or else returns EINVAL */
+                                                                                                                                    
 extern int proc_gettty_dev(proc_t p, dev_t *dev);
 
-/*!
- *  @function proc_selfpgrpid
- *  @abstract Get the process group id for the current process, as with proc_pgrpid().
- *  @return pgrpid of current process.
- */
+   
+                             
+                                                                                      
+                                      
+   
 pid_t proc_selfpgrpid(void);
 
-/*!
- *  @function proc_pgrpid
- *  @abstract Get the process group id for the passed-in process.
- *  @param p Process whose pgrpid to grab.
- *  @return pgrpid for "p".
- */
+   
+                         
+                                                                 
+                                          
+                           
+   
 pid_t proc_pgrpid(proc_t p);
 
-/*!
- *  @function proc_sessionid
- *  @abstract Get the process session id for the passed-in process.
- *  @param p Process whose session id to grab.
- *  @return session id of current process.
- */
+   
+                            
+                                                                   
+                                              
+                                          
+   
 pid_t proc_sessionid(proc_t p);
 
 #ifdef KERNEL_PRIVATE
-// mark a process as being allowed to call vfs_markdependency()
+                                                               
 void bsd_set_dependency_capable(task_t task);
 #ifdef  __arm__
 static inline int
@@ -365,7 +365,7 @@ IS_64BIT_PROCESS(__unused proc_t p)
 }
 #else
 extern int IS_64BIT_PROCESS(proc_t);
-#endif /* __arm__ */
+#endif              
 
 extern int      tsleep(void *chan, int pri, const char *wmesg, int timo);
 extern int      msleep1(void *chan, lck_mtx_t *mtx, int pri, const char *wmesg, u_int64_t timo);
@@ -379,63 +379,63 @@ extern uint32_t proc_getuid(proc_t);
 extern uint32_t proc_getgid(proc_t);
 extern int proc_getcdhash(proc_t, unsigned char *);
 
-/*!
- *  @function    proc_pidbackgrounded
- *  @abstract    KPI to determine if a process is currently backgrounded.
- *  @discussion  The process may move into or out of background state at any time,
- *             so be prepared for this value to be outdated immediately.
- *  @param pid   PID of the process to be queried.
- *  @param state Pointer to a value which will be set to 1 if the process
- *             is currently backgrounded, 0 otherwise.
- *  @return      ESRCH if pid cannot be found or has started exiting.
- *
- *             EINVAL if state is NULL.
- */
+   
+                                     
+                                                                         
+                                                                                  
+                                                                        
+                                                  
+                                                                         
+                                                      
+                                                                     
+  
+                                       
+   
 extern int proc_pidbackgrounded(pid_t pid, uint32_t* state);
 
-/*
- * This returns an unique 64bit id of a given process.
- * Caller needs to hold proper reference on the
- * passed in process strucutre.
- */
+  
+                                                      
+                                               
+                               
+   
 extern uint64_t proc_uniqueid(proc_t);
 
-/* unique 64bit id for process's original parent */
+                                                   
 extern uint64_t proc_puniqueid(proc_t);
 
 extern void proc_set_responsible_pid(proc_t target_proc, pid_t responsible_pid);
 
-/* return 1 if process is forcing case-sensitive HFS+ access, 0 for default */
+                                                                              
 extern int proc_is_forcing_hfs_case_sensitivity(proc_t);
 
-/* return true if the process is translated, false for default */
+                                                                 
 extern boolean_t proc_is_translated(proc_t);
 
-/* true if the process ignores errors from content protection APIs */
+                                                                     
 extern bool proc_ignores_content_protection(proc_t proc);
 
-/* true if the file system shouldn't update mtime for operations by the process */
+                                                                                  
 extern bool proc_skip_mtime_update(proc_t proc);
 
-/*!
- *  @function    proc_exitstatus
- *  @abstract    KPI to determine a process's exit status.
- *  @discussion  This function is not safe to call if the process could be
- *               concurrently stopped or started, but it can be called from a
- *               mpo_proc_notify_exit callback.
- *  @param p     The process to be queried.
- *  @return      Value in the same format as wait()'s output parameter.
- */
+   
+                                
+                                                          
+                                                                          
+                                                                             
+                                               
+                                           
+                                                                       
+   
 extern int proc_exitstatus(proc_t p);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef XNU_KERNEL_PRIVATE
 
 extern void proc_getexecutableuuid(proc_t, unsigned char *, unsigned long);
 extern int proc_get_originatorbgstate(uint32_t *is_backgrounded);
 
-/* Kernel interface to get the uuid of the originator of the work.*/
+                                                                    
 extern int proc_pidoriginatoruuid(uuid_t uuid_buf, uint32_t buffersize);
 
 extern uint64_t proc_was_throttled(proc_t);
@@ -446,18 +446,18 @@ extern void proc_coalitionids(proc_t, uint64_t[COALITION_NUM_TYPES]);
 
 #ifdef CONFIG_32BIT_TELEMETRY
 extern void proc_log_32bit_telemetry(proc_t p);
-#endif /* CONFIG_32BIT_TELEMETRY */
+#endif                             
 extern uint64_t get_current_unique_pid(void);
-#endif /* XNU_KERNEL_PRIVATE*/
+#endif                        
 
 #ifdef KERNEL_PRIVATE
-/* If buf argument is NULL, the necessary length to allocate will be set in buflen */
+                                                                                     
 extern int proc_selfexecutableargs(uint8_t *buf, size_t *buflen);
 extern off_t proc_getexecutableoffset(proc_t p);
-extern vnode_t proc_getexecutablevnode(proc_t); /* Returned with iocount, use vnode_put() to drop */
+extern vnode_t proc_getexecutablevnode(proc_t);                                                     
 extern int networking_memstatus_callout(proc_t p, uint32_t);
 
-/* System call filtering for BSD syscalls, mach traps and kobject routines. */
+                                                                              
 #define SYSCALL_MASK_UNIX 0
 #define SYSCALL_MASK_MACH 1
 #define SYSCALL_MASK_KOBJ 2
@@ -481,15 +481,15 @@ extern int proc_set_syscall_filter_mask(proc_t p, int which, unsigned char *mask
 extern int proc_set_filter_message_flag(proc_t p, boolean_t flag);
 extern int proc_get_filter_message_flag(proc_t p, boolean_t *flag);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 __END_DECLS
 
-#endif  /* KERNEL */
+#endif              
 
 #ifdef PRIVATE
 
-/* Values for pid_shutdown_sockets */
+                                     
 #define SHUTDOWN_SOCKET_LEVEL_DISCONNECT_SVC            0x00000001
 #define SHUTDOWN_SOCKET_LEVEL_DISCONNECT_ALL            0x00000002
 
@@ -506,22 +506,22 @@ __BEGIN_DECLS
 int pid_suspend(int pid);
 int pid_resume(int pid);
 __API_AVAILABLE(macos(11.3), ios(14.5), tvos(14.5), watchos(7.3))
-int task_inspect_for_pid(unsigned int target_tport, int pid, unsigned int *t);  /* Returns task inspect port */
+int task_inspect_for_pid(unsigned int target_tport, int pid, unsigned int *t);                                 
 __API_AVAILABLE(macos(11.3), ios(14.5), tvos(14.5), watchos(7.3))
-int task_read_for_pid(unsigned int target_tport, int pid, unsigned int *t);     /* Returns task read port */
+int task_read_for_pid(unsigned int target_tport, int pid, unsigned int *t);                                 
 
 #if defined(__arm__) || defined(__arm64__)
 int pid_hibernate(int pid);
-#endif /* defined(__arm__) || defined(__arm64__)  */
+#endif                                              
 int pid_shutdown_sockets(int pid, int level);
 int pid_shutdown_networking(int pid, int level);
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
-/* Entitlement to allow non-root processes to suspend/resume any task */
+                                                                        
 #define PROCESS_RESUME_SUSPEND_ENTITLEMENT "com.apple.private.process.suspend-resume.any"
 
-#endif /* PRIVATE */
+#endif              
 
-#endif  /* !_SYS_PROC_H_ */
+#endif                     

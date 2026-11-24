@@ -61,17 +61,17 @@
  *	@(#)mman.h	8.1 (Berkeley) 6/2/93
  */
 
-/*
- * Currently unsupported:
- *
- * [TYM]	POSIX_TYPED_MEM_ALLOCATE
- * [TYM]	POSIX_TYPED_MEM_ALLOCATE_CONTIG
- * [TYM]	POSIX_TYPED_MEM_MAP_ALLOCATABLE
- * [TYM]	struct posix_typed_mem_info
- * [TYM]	posix_mem_offset()
- * [TYM]	posix_typed_mem_get_info()
- * [TYM]	posix_typed_mem_open()
- */
+  
+                         
+  
+                                 
+                                        
+                                        
+                                    
+                           
+                                   
+                               
+   
 
 #ifndef _SYS_MMAN_H_
 #define _SYS_MMAN_H_
@@ -81,10 +81,10 @@
 
 #include <sys/_types.h>
 
-/*
- * [various] The mode_t, off_t, and size_t types shall be defined as
- * described in <sys/types.h>
- */
+  
+                                                                    
+                             
+   
 #include <sys/_types/_mode_t.h>
 #include <sys/_types/_off_t.h>
 #include <sys/_types/_size_t.h>
@@ -92,112 +92,112 @@
 #ifndef KERNEL
 #if __DARWIN_C_LEVEL >= 200809L
 #include <Availability.h>
-#endif /* __DARWIN_C_LEVEL */
-#endif /* KERNEL */
+#endif                       
+#endif             
 
-/*
- * Protections are chosen from these bits, or-ed together
- */
-#define PROT_NONE       0x00    /* [MC2] no permissions */
-#define PROT_READ       0x01    /* [MC2] pages can be read */
-#define PROT_WRITE      0x02    /* [MC2] pages can be written */
-#define PROT_EXEC       0x04    /* [MC2] pages can be executed */
+  
+                                                         
+   
+#define PROT_NONE       0x00                              
+#define PROT_READ       0x01                                 
+#define PROT_WRITE      0x02                                    
+#define PROT_EXEC       0x04                                     
 
-/*
- * Flags contain sharing type and options.
- * Sharing types; choose one.
- */
-#define MAP_SHARED      0x0001          /* [MF|SHM] share changes */
-#define MAP_PRIVATE     0x0002          /* [MF|SHM] changes are private */
+  
+                                          
+                             
+   
+#define MAP_SHARED      0x0001                                      
+#define MAP_PRIVATE     0x0002                                            
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-#define MAP_COPY        MAP_PRIVATE     /* Obsolete */
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#define MAP_COPY        MAP_PRIVATE                   
+#endif                                              
 
-/*
- * Other flags
- */
-#define MAP_FIXED        0x0010 /* [MF|SHM] interpret addr exactly */
+  
+              
+   
+#define MAP_FIXED        0x0010                                      
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-#define MAP_RENAME       0x0020 /* Sun: rename private pages to file */
-#define MAP_NORESERVE    0x0040 /* Sun: don't reserve needed swap area */
-#define MAP_RESERVED0080 0x0080 /* previously unimplemented MAP_INHERIT */
-#define MAP_NOEXTEND     0x0100 /* for MAP_FILE, don't change file size */
-#define MAP_HASSEMAPHORE 0x0200 /* region may contain semaphores */
-#define MAP_NOCACHE      0x0400 /* don't cache pages for this mapping */
-#define MAP_JIT          0x0800 /* Allocate a region that will be used for JIT purposes */
+#define MAP_RENAME       0x0020                                        
+#define MAP_NORESERVE    0x0040                                          
+#define MAP_RESERVED0080 0x0080                                           
+#define MAP_NOEXTEND     0x0100                                           
+#define MAP_HASSEMAPHORE 0x0200                                    
+#define MAP_NOCACHE      0x0400                                         
+#define MAP_JIT          0x0800                                                           
 
-/*
- * Mapping type
- */
-#define MAP_FILE        0x0000  /* map from file (default) */
-#define MAP_ANON        0x1000  /* allocated from memory, swap space */
+  
+               
+   
+#define MAP_FILE        0x0000                               
+#define MAP_ANON        0x1000                                         
 #define MAP_ANONYMOUS   MAP_ANON
 
-/*
- * The MAP_RESILIENT_* flags can be used when the caller wants to map some
- * possibly unreliable memory and be able to access it safely, possibly
- * getting the wrong contents rather than raising any exception.
- * For safety reasons, such mappings have to be read-only (PROT_READ access
- * only).
- *
- * MAP_RESILIENT_CODESIGN:
- *      accessing this mapping will not generate code-signing violations,
- *	even if the contents are tainted.
- * MAP_RESILIENT_MEDIA:
- *	accessing this mapping will not generate an exception if the contents
- *	are not available (unreachable removable or remote media, access beyond
- *	end-of-file, ...).  Missing contents will be replaced with zeroes.
- */
-#define MAP_RESILIENT_CODESIGN  0x2000 /* no code-signing failures */
-#define MAP_RESILIENT_MEDIA     0x4000 /* no backing-store failures */
+  
+                                                                          
+                                                                       
+                                                                
+                                                                           
+         
+  
+                          
+                                                                         
+                                    
+                       
+                                                                        
+                                                                          
+                                                                     
+   
+#define MAP_RESILIENT_CODESIGN  0x2000                               
+#define MAP_RESILIENT_MEDIA     0x4000                                
 
 #if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500
-#define MAP_32BIT       0x8000          /* Return virtual addresses <4G only */
-#endif /* defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500 */
+#define MAP_32BIT       0x8000                                                 
+#endif                                                                                            
 
 
-/*
- * Flags used to support translated processes.
- */
-#define MAP_TRANSLATED_ALLOW_EXECUTE 0x20000 /* allow execute in translated processes */
+  
+                                              
+   
+#define MAP_TRANSLATED_ALLOW_EXECUTE 0x20000                                            
 
-#define MAP_UNIX03       0x40000 /* UNIX03 compliance */
+#define MAP_UNIX03       0x40000                        
 
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
-/*
- * Process memory locking
- */
-#define MCL_CURRENT     0x0001  /* [ML] Lock only current memory */
-#define MCL_FUTURE      0x0002  /* [ML] Lock all future memory as well */
+  
+                         
+   
+#define MCL_CURRENT     0x0001                                     
+#define MCL_FUTURE      0x0002                                           
 
-/*
- * Error return from mmap()
- */
-#define MAP_FAILED      ((void *)-1)    /* [MF|SHM] mmap failed */
+  
+                           
+   
+#define MAP_FAILED      ((void *)-1)                              
 
-/*
- * msync() flags
- */
-#define MS_ASYNC        0x0001  /* [MF|SIO] return immediately */
-#define MS_INVALIDATE   0x0002  /* [MF|SIO] invalidate all cached data */
-#define MS_SYNC         0x0010  /* [MF|SIO] msync synchronously */
+  
+                
+   
+#define MS_ASYNC        0x0001                                   
+#define MS_INVALIDATE   0x0002                                           
+#define MS_SYNC         0x0010                                    
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-#define MS_KILLPAGES    0x0004  /* invalidate pages, leave mapped */
-#define MS_DEACTIVATE   0x0008  /* deactivate pages, leave mapped */
+#define MS_KILLPAGES    0x0004                                      
+#define MS_DEACTIVATE   0x0008                                      
 
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
 
-/*
- * Advice to madvise
- */
-#define POSIX_MADV_NORMAL       0       /* [MC1] no further special treatment */
-#define POSIX_MADV_RANDOM       1       /* [MC1] expect random page refs */
-#define POSIX_MADV_SEQUENTIAL   2       /* [MC1] expect sequential page refs */
-#define POSIX_MADV_WILLNEED     3       /* [MC1] will need these pages */
-#define POSIX_MADV_DONTNEED     4       /* [MC1] dont need these pages */
+  
+                    
+   
+#define POSIX_MADV_NORMAL       0                                               
+#define POSIX_MADV_RANDOM       1                                          
+#define POSIX_MADV_SEQUENTIAL   2                                              
+#define POSIX_MADV_WILLNEED     3                                        
+#define POSIX_MADV_DONTNEED     4                                        
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 #define MADV_NORMAL             POSIX_MADV_NORMAL
@@ -205,72 +205,72 @@
 #define MADV_SEQUENTIAL         POSIX_MADV_SEQUENTIAL
 #define MADV_WILLNEED           POSIX_MADV_WILLNEED
 #define MADV_DONTNEED           POSIX_MADV_DONTNEED
-#define MADV_FREE               5       /* pages unneeded, discard contents */
-#define MADV_ZERO_WIRED_PAGES   6       /* zero the wired pages that have not been unwired before the entry is deleted */
-#define MADV_FREE_REUSABLE      7       /* pages can be reused (by anyone) */
-#define MADV_FREE_REUSE         8       /* caller wants to reuse those pages */
+#define MADV_FREE               5                                             
+#define MADV_ZERO_WIRED_PAGES   6                                                                                        
+#define MADV_FREE_REUSABLE      7                                            
+#define MADV_FREE_REUSE         8                                              
 #define MADV_CAN_REUSE          9
-#define MADV_PAGEOUT            10      /* page out now (internal only) */
+#define MADV_PAGEOUT            10                                        
 
-/*
- * Return bits from mincore
- */
-#define MINCORE_INCORE           0x1     /* Page is incore */
-#define MINCORE_REFERENCED       0x2     /* Page has been referenced by us */
-#define MINCORE_MODIFIED         0x4     /* Page has been modified by us */
-#define MINCORE_REFERENCED_OTHER 0x8     /* Page has been referenced */
-#define MINCORE_MODIFIED_OTHER  0x10     /* Page has been modified */
-#define MINCORE_PAGED_OUT       0x20     /* Page has been paged out */
-#define MINCORE_COPIED          0x40     /* Page has been copied */
-#define MINCORE_ANONYMOUS       0x80     /* Page belongs to an anonymous object */
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+  
+                           
+   
+#define MINCORE_INCORE           0x1                         
+#define MINCORE_REFERENCED       0x2                                         
+#define MINCORE_MODIFIED         0x4                                       
+#define MINCORE_REFERENCED_OTHER 0x8                                   
+#define MINCORE_MODIFIED_OTHER  0x10                                 
+#define MINCORE_PAGED_OUT       0x20                                  
+#define MINCORE_COPIED          0x40                               
+#define MINCORE_ANONYMOUS       0x80                                              
+#endif                                              
 
 #ifdef PRIVATE
 
-/*
- * Crypt ID for decryption flow
- */
-#define CRYPTID_NO_ENCRYPTION     0         /* File is unencrypted */
-#define CRYPTID_APP_ENCRYPTION    1         /* App binary is encrypted */
-#define CRYPTID_MODEL_ENCRYPTION  2         /* ML Model is encrypted */
+  
+                               
+   
+#define CRYPTID_NO_ENCRYPTION     0                                  
+#define CRYPTID_APP_ENCRYPTION    1                                      
+#define CRYPTID_MODEL_ENCRYPTION  2                                    
 
-/*
- * Model encryption header
- */
+  
+                          
+   
 typedef struct {
 	__uint64_t version;
 	__uint64_t originalSize;
 	__uint64_t reserved[4];
 } model_encryption_header_t;
 
-#endif /* #ifdef PRIVATE */
+#endif                     
 
 
 #ifndef KERNEL
 
 __BEGIN_DECLS
-/* [ML] */
+          
 int     mlockall(int);
 int     munlockall(void);
-/* [MR] */
+          
 int     mlock(const void *, size_t);
 #ifndef _MMAP
 #define _MMAP
-/* [MC3]*/
+          
 void *  mmap(void *, size_t, int, int, int, off_t) __DARWIN_ALIAS(mmap);
 #endif
-/* [MPR] */
+           
 int     mprotect(void *, size_t, int) __DARWIN_ALIAS(mprotect);
-/* [MF|SIO] */
+              
 int     msync(void *, size_t, int) __DARWIN_ALIAS_C(msync);
-/* [MR] */
+          
 int     munlock(const void *, size_t);
-/* [MC3]*/
+          
 int     munmap(void *, size_t) __DARWIN_ALIAS(munmap);
-/* [SHM] */
+           
 int     shm_open(const char *, int, ...);
 int     shm_unlink(const char *);
-/* [ADV] */
+           
 int     posix_madvise(void *, size_t, int);
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
@@ -285,25 +285,25 @@ int mremap_encrypted(void *, size_t, __uint32_t, __uint32_t, __uint32_t);
 
 __END_DECLS
 
-#else   /* KERNEL */
+#else               
 #ifdef XNU_KERNEL_PRIVATE
-void pshm_cache_init(void);     /* for bsd_init() */
+void pshm_cache_init(void);                         
 
-/*
- * XXX routine exported by posix_shm.c, but never used there, only used in
- * XXX kern_mman.c in the implementation of mmap().
- */
+  
+                                                                          
+                                                   
+   
 struct mmap_args;
 struct fileproc;
 int pshm_mmap(struct proc *p, struct mmap_args *uap, user_addr_t *retval,
     struct fileproc *fp, off_t pageoff);
-/* Really need to overhaul struct fileops to avoid this... */
+                                                             
 struct pshmnode;
 struct stat;
 int pshm_stat(struct pshmnode *pnode, void *ub, int isstat64);
 struct fileproc;
 int pshm_truncate(struct proc *p, struct fileproc *fp, int fd, off_t length, int32_t *retval);
 
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /* KERNEL */
-#endif /* !_SYS_MMAN_H_ */
+#endif                         
+#endif             
+#endif                    

@@ -30,5 +30,5 @@ extern void if_headless_init(void);
 void
 if_headless_init(void)
 {
-	/* nothing here */
+	                  
 }

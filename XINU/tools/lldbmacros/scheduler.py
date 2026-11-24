@@ -5,9 +5,9 @@ from misc import *
 from memory import *
 from ipc import *
 
-# TODO: write scheduler related macros here
+                                           
 
-# Macro: showallprocrunqcount
+                             
 
 @lldb_command('showallprocrunqcount')
 def ShowAllProcRunQCount(cmd_args=None):
@@ -18,12 +18,12 @@ def ShowAllProcRunQCount(cmd_args=None):
     while processor_itr:
         out_str += "{:d}\t\t{:d}\n".format(processor_itr.cpu_id, processor_itr.runq.count)
         processor_itr = processor_itr.processor_list
-    # out_str += "RT:\t\t{:d}\n".format(kern.globals.rt_runq.count)
+                                                                   
     print out_str
 
-# EndMacro: showallprocrunqcount
+                                
 
-# Macro: showinterrupts
+                       
 
 @lldb_command('showinterrupts')
 def ShowInterrupts(cmd_args=None):
@@ -49,9 +49,9 @@ def ShowInterrupts(cmd_args=None):
             x = x + 1
         y = y + 1
 
-# EndMacro: showinterrupts
+                          
 
-# Macro: showactiveinterrupts
+                             
 
 @lldb_command('showactiveinterrupts')
 def ShowActiveInterrupts(cmd_args=None):
@@ -87,9 +87,9 @@ def ShowActiveInterrupts(cmd_args=None):
             active = dereference(kern.GetValueFromAddress((current_pointer + aic_him_offset) + (4 * group_count), 'uintptr_t *'))
         else:
             mask = mask << 1
-# EndMacro: showactiveinterrupts
+                                
 
-# Macro: showirqbyipitimerratio
+                               
 @lldb_command('showirqbyipitimerratio')
 def ShowIrqByIpiTimerRatio(cmd_args=None):
     """ Prints the ratio of IRQ by sum of IPI & TMR counts for each CPU
@@ -112,9 +112,9 @@ def ShowIrqByIpiTimerRatio(cmd_args=None):
         y = y + 1
     print out_str
 
-# EndMacro: showirqbyipitimerratio
+                                  
 
-#Macro: showinterruptsourceinfo
+                               
 @lldb_command('showinterruptsourceinfo')
 def showinterruptsourceinfo(cmd_args = None):
     """  Extract information of interrupt source causing interrupt storms.
@@ -122,16 +122,16 @@ def showinterruptsourceinfo(cmd_args = None):
     if not cmd_args:
         print "No arguments passed"
         return False
-    #Dump IOInterruptVector object
+                                  
     print "--- Dumping IOInterruptVector object ---\n"
     object_info = lldb_run_command("dumpobject {:s} IOInterruptVector".format(cmd_args[0]))
     print object_info
     print "--- Dumping IOFilterInterruptEventSource object ---\n"
-    #Dump the IOFilterInterruptEventSource object.
+                                                  
     target_info=re.search('target =\s+(.*)',object_info)
     target= target_info.group()
     target= target.split()
-    #Dump the Object pointer of the source who is triggering the Interrupts.
+                                                                            
     vector_info=lldb_run_command("dumpobject {:s} ".format(target[2]))
     print vector_info
     owner_info= re.search('owner =\s+(.*)',vector_info)
@@ -141,7 +141,7 @@ def showinterruptsourceinfo(cmd_args = None):
     out=lldb_run_command(" dumpobject {:s}".format(owner[2]))
     print out
 
-# EndMacro: showinterruptsourceinfo
+                                   
 
 @lldb_command('showcurrentabstime')
 def ShowCurremtAbsTime(cmd_args=None):
@@ -341,7 +341,7 @@ def ShowAbstimeToNanoTime(cmd_args=[]):
     else:
         print "{:d} ns, {:f} us, {:f} ms, {:f} s".format(ns, us, ms, s)
 
- # Macro: showschedhistory
+                          
 
 def GetRecentTimestamp():
     """
@@ -408,7 +408,7 @@ def ShowThreadSchedHistory(thread, most_recent_dispatch):
 
     if unsigned(thread.uthread) != 0:
         uthread = Cast(thread.uthread, 'uthread *')
-        # Doing the straightforward thing blows up weirdly, so use some indirections to get back on track
+                                                                                                         
         if unsigned(uthread.pth_name) != 0 :
             thread_name = str(kern.GetValueFromAddress(unsigned(uthread.pth_name), 'char*'))
 
@@ -431,7 +431,7 @@ def ShowThreadSchedHistory(thread, most_recent_dispatch):
     if (unsigned(thread.bound_processor) != 0):
         sched_mode+="-bound"
 
-    # TH_SFLAG_THROTTLED
+                        
     if (unsigned(thread.sched_flags) & 0x0004):
         sched_mode+="-BG"
 
@@ -571,13 +571,13 @@ def ShowSchedHistory(cmd_args=None, cmd_options=None):
             ShowThreadSchedHistory(thread, most_recent_dispatch)
 
 
-# EndMacro: showschedhistory
+                            
 
 def int32(n):
     n = n & 0xffffffff
     return (n ^ 0x80000000) - 0x80000000
 
-# Macro: showallprocessors
+                          
 
 def ShowGroupSetSummary(runq, task_map):
     """ Internal function to print summary of group run queue
@@ -745,7 +745,7 @@ def ShowScheduler(cmd_args=None):
         else:
             print "multiq scheduler config: deep-drain {g.deep_drain:d}, ceiling {g.drain_ceiling:d}, depth limit {g.drain_depth_limit:d}, band limit {g.drain_band_limit:d}\n".format(g=kern.globals)
 
-        # Create a group->task mapping
+                                      
         task_map = {}
         for task in kern.tasks:
             task_map[unsigned(task.sched_group)] = task
@@ -774,7 +774,7 @@ def ShowScheduler(cmd_args=None):
                 runq = kern.GetValueFromAddress(unsigned(addressof(pset.pset_runq)), 'struct run_queue *')
                 ShowGroupSetSummary(runq, task_map)
                 print "All Groups:\n"
-                # TODO: Possibly output task header for each group
+                                                                  
                 for group in IterateQueue(kern.globals.sched_groups, "sched_group_t", "sched_groups"):
                     if (group.runq.count != 0) :
                         task = task_map.get(unsigned(group), "Unknown task!")
@@ -882,7 +882,7 @@ def ShowScheduler(cmd_args=None):
 
     print "\n"
 
-# EndMacro: showallprocessors
+                             
 
 
 def ParanoidIterateLinkageChain(queue_head, element_type, field_name, field_ofst=0, circleQueue=False):
@@ -910,17 +910,17 @@ def ParanoidIterateLinkageChain(queue_head, element_type, field_name, field_ofst
     if type(element_type) is str:
         element_type = gettype(element_type)
 
-    # Some ways of constructing a queue head seem to end up with the
-    # struct object as the value and not a pointer to the struct head
-    # In that case, addressof will give us a pointer to the struct, which is what we need
+                                                                    
+                                                                     
+                                                                                         
     if not queue_head.GetSBValue().GetType().IsPointerType() :
         queue_head = addressof(queue_head)
 
     if circleQueue:
-        # Mosh the value into a brand new value, to really get rid of its old cvalue history
+                                                                                            
         queue_head = kern.GetValueFromAddress(unsigned(queue_head), 'struct circle_queue_head *').head
     else:
-        # Mosh the value into a brand new value, to really get rid of its old cvalue history
+                                                                                            
         queue_head = kern.GetValueFromAddress(unsigned(queue_head), 'struct queue_entry *')
 
     if unsigned(queue_head) == 0:
@@ -995,8 +995,8 @@ def LinkageChainEmpty(queue_head):
     if not queue_head.GetSBValue().GetType().IsPointerType() :
         queue_head = addressof(queue_head)
 
-    # Mosh the value into a brand new value, to really get rid of its old cvalue history
-    # avoid using GetValueFromAddress
+                                                                                        
+                                     
     queue_head = value(queue_head.GetSBValue().CreateValueFromExpression(None,'(void *)'+str(unsigned(queue_head))))
     queue_head = cast(queue_head, 'struct queue_entry *')
 
@@ -1030,7 +1030,7 @@ def IterateBitmap(bitmap):
         i = lsb_first(bitmap)
 
 
-# Macro: showallcallouts
+                        
 
 from kevent import GetKnoteKqueue
 
@@ -1051,7 +1051,7 @@ def ShowThreadCall(prefix, call, recent_timestamp, is_pending=False):
     strip_func = kern.StripKernelPAC(unsigned(func))
 
     func_syms = kern.SymbolicateFromAddress(strip_func)
-    # returns an array of SBSymbol
+                                  
 
     if func_syms and func_syms[0] :
         func_name = func_syms[0].GetName()
@@ -1065,8 +1065,8 @@ def ShowThreadCall(prefix, call, recent_timestamp, is_pending=False):
                     param0 = iotes.owner
                     param1 = unsigned(iotes)
                 except AttributeError:
-                    # This is horrible, horrible, horrible.  But it works.  Needed because IOEventSource hides the action member in an
-                    # anonymous union when XNU_PRIVATE_SOURCE is set.  To grab it, we work backwards from the enabled member.
+                                                                                                                                      
+                                                                                                                             
                     func = dereference(kern.GetValueFromAddress(addressof(iotes.enabled) - sizeof('IOEventSource::Action'), 'uint64_t *'))
                     param0 = iotes.owner
                     param1 = unsigned(iotes)
@@ -1076,7 +1076,7 @@ def ShowThreadCall(prefix, call, recent_timestamp, is_pending=False):
 
                 is_iotes = True
 
-                # re-symbolicate the func we found inside the IOTES
+                                                                   
                 strip_func = kern.StripKernelPAC(unsigned(func))
                 func_syms = kern.SymbolicateFromAddress(strip_func)
                 if func_syms and func_syms[0] :
@@ -1084,7 +1084,7 @@ def ShowThreadCall(prefix, call, recent_timestamp, is_pending=False):
                 else :
                     func_name = str(FindKmodNameForAddr(func))
 
-                # cast from IOThread to thread_t, because IOThread is sometimes opaque
+                                                                                      
                 thread = Cast(thread, 'thread_t')
                 thread_id = thread.thread_id
                 thread_name = GetThreadName(thread)
@@ -1144,7 +1144,7 @@ def ShowThreadCall(prefix, call, recent_timestamp, is_pending=False):
         pending_time = kern.GetNanotimeFromAbstime(pending_time) / 1000000000.0
 
     flags = int(call.tc_flags)
-    # TODO: extract this out of the thread_call_flags_t enum
+                                                            
     thread_call_flags = {0x0:'', 0x1:'A', 0x2:'W', 0x4:'D', 0x8:'R', 0x10:'S', 0x20:'O',
             0x40:'P', 0x80:'L', 0x100:'C'}
 
@@ -1314,5 +1314,5 @@ def ShowAllCallouts(cmd_args=None):
     print "Thread Call Threads:"
     PrintThreadCallThreads()
 
-# EndMacro: showallcallouts
+                           
 

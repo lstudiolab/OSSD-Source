@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * MD5.H - header file for MD5.C
- */
+  
+                                
+   
 
 /*
  * Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
@@ -63,11 +63,11 @@ __BEGIN_DECLS
 
 #define MD5_DIGEST_LENGTH       16
 
-/* MD5 context. */
+                  
 typedef struct {
-	u_int32_t state[4];     /* state (ABCD) */
-	u_int32_t count[2];     /* number of bits, modulo 2^64 (lsb first) */
-	unsigned char buffer[64];       /* input buffer */
+	u_int32_t state[4];                       
+	u_int32_t count[2];                                                  
+	unsigned char buffer[64];                         
 } MD5_CTX;
 
 extern void MD5Init(MD5_CTX *);
@@ -76,4 +76,4 @@ extern void MD5Final(unsigned char [MD5_DIGEST_LENGTH], MD5_CTX *);
 
 __END_DECLS
 
-#endif /* _CRYPTO_MD5_H_ */
+#endif                     

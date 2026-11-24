@@ -26,13 +26,13 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * This header provides some gory details to implement the <os/atomic_private.h>
- * interfaces. Nothing in this header should be called directly, no promise is
- * made to keep this interface stable.
- *
- * Architecture overrides.
- */
+  
+                                                                                
+                                                                              
+                                      
+  
+                          
+   
 
 #ifndef __OS_ATOMIC_PRIVATE_H__
 #error "Do not include <os/atomic_private_arch.h> directly, use <os/atomic_private.h>"
@@ -46,10 +46,10 @@
 #if defined(__arm__)
 
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
-/*
- * On armv7, we do provide fine grained dependency injection, so
- * memory_order_dependency maps to relaxed as far as thread fences are concerned
- */
+  
+                                                                
+                                                                                
+   
 #undef _os_atomic_mo_dependency
 #define _os_atomic_mo_dependency      memory_order_relaxed
 
@@ -62,7 +62,7 @@
 	os_compiler_barrier(acquire); \
 	_dep; \
 })
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 
 #define os_atomic_clear_exclusive()  __builtin_arm_clrex()
 
@@ -81,10 +81,10 @@
 
 #if !OS_ATOMIC_HAS_STARVATION_FREE_RMW && !OS_ATOMIC_CONFIG_STARVATION_FREE_ONLY
 
-/*
- * armv7 override of os_atomic_rmw_loop
- * documentation for os_atomic_rmw_loop is in <os/atomic_private.h>
- */
+  
+                                       
+                                                                   
+   
 #undef os_atomic_rmw_loop
 #define os_atomic_rmw_loop(p, ov, nv, m, ...)  ({ \
 	int _result = 0; uint32_t _err = 0; \
@@ -93,7 +93,7 @@
 	        ov = __builtin_arm_ldrex(_p); \
 	        __VA_ARGS__; \
 	        if (!_err) { \
-	/* release barrier only done for the first loop iteration */ \
+	                                                             \
 	                _os_memory_fence_before_atomic(m); \
 	        } \
 	        _err = __builtin_arm_strex(nv, _p); \
@@ -107,27 +107,27 @@
 	_result; \
 })
 
-/*
- * armv7 override of os_atomic_rmw_loop_give_up
- * documentation for os_atomic_rmw_loop_give_up is in <os/atomic_private.h>
- */
+  
+                                               
+                                                                           
+   
 #undef os_atomic_rmw_loop_give_up
 #define os_atomic_rmw_loop_give_up(...) \
 	({ os_atomic_clear_exclusive(); __VA_ARGS__; break; })
 
-#endif // !OS_ATOMIC_HAS_STARVATION_FREE_RMW && !OS_ATOMIC_CONFIG_STARVATION_FREE_ONLY
+#endif                                                                                
 
-#endif // __arm__
+#endif           
 
 #pragma mark - arm64
 
 #if defined(__arm64__)
 
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
-/*
- * On arm64, we do provide fine grained dependency injection, so
- * memory_order_dependency maps to relaxed as far as thread fences are concerned
- */
+  
+                                                                
+                                                                                
+   
 #undef _os_atomic_mo_dependency
 #define _os_atomic_mo_dependency      memory_order_relaxed
 
@@ -151,10 +151,10 @@
 	_dep; \
 })
 #endif
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 
 #if defined(__ARM_ARCH_8_4__)
-/* on armv8.4 16-byte aligned load/store pair is atomic */
+                                                          
 #undef os_atomic_load_is_plain
 #define os_atomic_load_is_plain(p)   (sizeof(*(p)) <= 16)
 #endif
@@ -178,10 +178,10 @@
 
 #if !OS_ATOMIC_HAS_STARVATION_FREE_RMW && !OS_ATOMIC_CONFIG_STARVATION_FREE_ONLY
 
-/*
- * arm64 (without armv81 atomics) override of os_atomic_rmw_loop
- * documentation for os_atomic_rmw_loop is in <os/atomic_private.h>
- */
+  
+                                                                
+                                                                   
+   
 #undef os_atomic_rmw_loop
 #define os_atomic_rmw_loop(p, ov, nv, m, ...)  ({ \
 	int _result = 0; \
@@ -204,16 +204,16 @@
 	_result; \
 })
 
-/*
- * arm64 override of os_atomic_rmw_loop_give_up
- * documentation for os_atomic_rmw_loop_give_up is in <os/atomic_private.h>
- */
+  
+                                               
+                                                                           
+   
 #undef os_atomic_rmw_loop_give_up
 #define os_atomic_rmw_loop_give_up(...) \
 	({ os_atomic_clear_exclusive(); __VA_ARGS__; break; })
 
-#endif // !OS_ATOMIC_HAS_STARVATION_FREE_RMW && !OS_ATOMIC_CONFIG_STARVATION_FREE_ONLY
+#endif                                                                                
 
-#endif // __arm64__
+#endif             
 
-#endif /* __OS_ATOMIC_PRIVATE_ARCH_H__ */
+#endif                                   

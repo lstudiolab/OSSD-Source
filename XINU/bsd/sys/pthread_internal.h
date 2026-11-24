@@ -44,4 +44,4 @@ void workq_mark_exiting(struct proc *);
 void workq_exit(struct proc *);
 void pthread_init(void);
 
-#endif /* _SYS_PTHREAD_INTERNAL_H_ */
+#endif                               

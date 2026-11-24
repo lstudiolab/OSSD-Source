@@ -35,4 +35,4 @@
 template <typename T>
 using OSBoundedArrayRef = libkern::bounded_array_ref<T, os_detail::panic_trapping_policy>;
 
-#endif /* !XNU_LIBKERN_LIBKERN_CXX_OS_BOUNDED_ARRAY_REF_H */
+#endif                                                      

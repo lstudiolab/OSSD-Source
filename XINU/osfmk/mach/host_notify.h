@@ -36,4 +36,4 @@
 #define HOST_CALENDAR_CHANGED_REPLYID   950
 #define HOST_CALENDAR_SET_REPLYID               951
 
-#endif /* _MACH_HOST_NOTIFY_H_ */
+#endif                           

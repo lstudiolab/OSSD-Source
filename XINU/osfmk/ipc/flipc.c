@@ -25,12 +25,12 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	File:	ipc/flipc.h
- *	Author:	Dean Reece
- *	Date:	2016
- *
- *	Implementation of fast local ipc (flipc).
- */
+                    
+                     
+             
+  
+                                            
+   
 
 
 #include <mach/mach_types.h>
@@ -56,14 +56,14 @@
 #pragma pack(4)
 
 
-/*** FLIPC Internal Implementation (private to flipc.c) ***/
+                                                            
 
 ZONE_DECLARE(flipc_port_zone, "flipc ports",
     sizeof(struct flipc_port), ZC_NOENCRYPT);
 
-/*  Get the mnl_name associated with local ipc_port <lport>.
- *  Returns MNL_NAME_NULL if <lport> is invalid or not a flipc port.
- */
+                                                            
+                                                                    
+   
 static inline mnl_name_t
 mnl_name_from_port(ipc_port_t lport)
 {
@@ -79,9 +79,9 @@ mnl_name_from_port(ipc_port_t lport)
 }
 
 
-/*  Lookup the ipc_port associated with mnl_name <name>.
- *  Returns IP_NULL if <name> is invalid or not a known mnl object.
- */
+                                                        
+                                                                   
+   
 static inline ipc_port_t
 mnl_name_to_port(mnl_name_t name)
 {
@@ -97,20 +97,20 @@ mnl_name_to_port(mnl_name_t name)
 }
 
 
-/*  flipc_port_create() is called to convert a regular mach port into a
- *  flipc port (i.e., the port has one or more rights off-node).
- *  <lport> must be locked on entry and is not unlocked on return.
- */
+                                                                       
+                                                                
+                                                                  
+   
 static kern_return_t
 flipc_port_create(ipc_port_t lport, mach_node_t node, mnl_name_t name)
 {
-	/* Ensure parameters are valid and not already linked */
+	                                                        
 	assert(IP_VALID(lport));
 	assert(MACH_NODE_VALID(node));
 	assert(MNL_NAME_VALID(name));
 	assert(!FPORT_VALID(lport->ip_messages.imq_fport));
 
-	/* Allocate and initialize a flipc port */
+	                                          
 	flipc_port_t fport = (flipc_port_t) zalloc(flipc_port_zone);
 	if (!FPORT_VALID(fport)) {
 		return KERN_RESOURCE_SHORTAGE;
@@ -124,11 +124,11 @@ flipc_port_create(ipc_port_t lport, mach_node_t node, mnl_name_t name)
 		fport->state = FPORT_STATE_PROXY;
 	}
 
-	/* Link co-structures (lport is locked) */
+	                                          
 	fport->lport = lport;
 	lport->ip_messages.imq_fport = fport;
 
-	/* Add fport to the name hash table; revert link if insert fails */
+	                                                                   
 	kern_return_t kr =  mnl_obj_insert((mnl_obj_t)fport);
 	if (kr != KERN_SUCCESS) {
 		lport->ip_messages.imq_fport = FPORT_NULL;
@@ -140,22 +140,22 @@ flipc_port_create(ipc_port_t lport, mach_node_t node, mnl_name_t name)
 }
 
 
-/*  flipc_port_destroy() is called to convert a flipc port back to a
- *  local-only ipc port (i.e., the port has no remaining off-node rights).
- *  This will dispose of any undelivered flipc messages, generating NAKs if
- *  needed.  <lport> must be locked on entry and is not unlocked on return.
- */
+                                                                    
+                                                                          
+                                                                           
+                                                                           
+   
 static void
 flipc_port_destroy(ipc_port_t lport)
 {
-	/* Ensure parameter is valid, and linked to an fport with a valid name */
+	                                                                         
 	assert(IP_VALID(lport));
 	ipc_mqueue_t port_mq = &lport->ip_messages;
 	flipc_port_t fport = port_mq->data.port.fport;
 	assert(FPORT_VALID(fport));
 	assert(MNL_NAME_VALID(fport->obj.name));
 
-	/* Dispose of any undelivered messages */
+	                                         
 	int m = port_mq->data.port.msgcount;
 	if (m > 0) {
 		ipc_kmsg_t kmsg;
@@ -163,7 +163,7 @@ flipc_port_destroy(ipc_port_t lport)
 		printf("flipc: destroying %p with %d undelivered msgs\n", lport, m);
 #endif
 
-		/* Logic was lifted from ipc_mqueue_select_on_thread() */
+		                                                         
 		while (m--) {
 			kmsg = ipc_kmsg_queue_first(&port_mq->imq_messages);
 			assert(kmsg != IKM_NULL);
@@ -176,7 +176,7 @@ flipc_port_destroy(ipc_port_t lport)
 		}
 	}
 
-	/* Remove from name hash table, unlink co-structures, and free fport */
+	                                                                       
 	mnl_obj_remove(fport->obj.name);
 	lport->ip_messages.data.port.fport = FPORT_NULL;
 	fport->lport = IP_NULL;
@@ -184,18 +184,18 @@ flipc_port_destroy(ipc_port_t lport)
 }
 
 
-/*
- *	Routine:	flipc_msg_size_from_kmsg(ipc_kmsg_t kmsg)
- *	Purpose:
- *		Compute the size of the buffer needed to hold the translated flipc
- *      message.  All identifiers are converted to flipc_names which are 64b.
- *      If this node's pointers are a different size, we have to allow for
- *      expansion of the descriptors as appropriate.
- *	Conditions:
- *		Nothing locked.
- *	Returns:
- *		size of the message as it would be sent over the flipc link.
- */
+  
+                                                     
+           
+                                                                      
+                                                                             
+                                                                          
+                                                    
+              
+                   
+           
+                                                                
+   
 static mach_msg_size_t
 flipc_msg_size_from_kmsg(ipc_kmsg_t kmsg)
 {
@@ -209,11 +209,11 @@ flipc_msg_size_from_kmsg(ipc_kmsg_t kmsg)
 }
 
 
-/*  Translate a kmsg into a flipc msg suitable to transmit over the mach node
- *  link.  All in-line rights and objects are similarly processed.  If the msg
- *  moves a receive right, then queued messages may need to be moved as a
- *  result, causing this function to ultimately be recursive.
- */
+                                                                             
+                                                                              
+                                                                         
+                                                             
+   
 static kern_return_t
 mnl_msg_from_kmsg(ipc_kmsg_t kmsg, mnl_msg_t *fmsgp)
 {
@@ -230,18 +230,18 @@ mnl_msg_from_kmsg(ipc_kmsg_t kmsg, mnl_msg_t *fmsgp)
 		return KERN_RESOURCE_SHORTAGE;
 	}
 
-	/* Setup flipc message header */
+	                                
 	fmsg->sub = MACH_NODE_SUB_FLIPC;
 	fmsg->cmd = FLIPC_CMD_IPCMESSAGE;
-	fmsg->node_id = localnode_id;   // Message is from us
-	fmsg->qos = 0; // not used
-	fmsg->size = fsize; // Payload size (does NOT include mnl_msg header)
+	fmsg->node_id = localnode_id;                        
+	fmsg->qos = 0;            
+	fmsg->size = fsize;                                                  
 	fmsg->object = kmsg->ikm_header->msgh_remote_port->ip_messages.data.port.fport->obj.name;
 
-	/* Copy body of message */
+	                          
 	bcopy((const void*)kmsg->ikm_header, (void*)MNL_MSG_PAYLOAD(fmsg), fsize);
 
-	// Convert port fields
+	                      
 	mach_msg_header_t *mmsg = (mach_msg_header_t*)MNL_MSG_PAYLOAD(fmsg);
 	mmsg->msgh_remote_port = (mach_port_t)fmsg->object;
 	mmsg->msgh_local_port = (mach_port_t)
@@ -254,7 +254,7 @@ mnl_msg_from_kmsg(ipc_kmsg_t kmsg, mnl_msg_t *fmsgp)
 }
 
 
-/* lifted from ipc_mig.c:mach_msg_send_from_kernel_proper() */
+                                                              
 static mach_msg_return_t
 mach_msg_send_from_remote_kernel(mach_msg_header_t      *msg,
     mach_msg_size_t        send_size,
@@ -274,7 +274,7 @@ mach_msg_send_from_remote_kernel(mach_msg_header_t      *msg,
 		return mr;
 	}
 
-	kmsg->ikm_node = node;  // node that needs to receive message ack
+	kmsg->ikm_node = node;                                           
 	mr = ipc_kmsg_send(kmsg,
 	    MACH_SEND_KERNEL_DEFAULT,
 	    MACH_MSG_TIMEOUT_NONE);
@@ -286,10 +286,10 @@ mach_msg_send_from_remote_kernel(mach_msg_header_t      *msg,
 }
 
 
-/*  Translate a flipc msg <fmsg> into a kmsg and post it to the appropriate
- *	port.  <node> is the node that originated the message, not necessarily the
- *	node we received it from.  This will block if the receiving port is full.
- */
+                                                                           
+                                                                             
+                                                                            
+   
 static mach_msg_return_t
 flipc_cmd_ipc(mnl_msg_t     fmsg,
     mach_node_t   node,
@@ -297,23 +297,23 @@ flipc_cmd_ipc(mnl_msg_t     fmsg,
 {
 	mach_msg_header_t *mmsg;
 
-	// Convert flipc message into mach message in place to avoid alloc/copy
+	                                                                       
 	mmsg = (mach_msg_header_t*)MNL_MSG_PAYLOAD(fmsg);
 	mmsg->msgh_size = fmsg->size;
 	mmsg->msgh_remote_port = mnl_name_to_port(fmsg->object);
 	mmsg->msgh_local_port = mnl_name_to_port((mnl_name_t)mmsg->msgh_local_port);
 	mmsg->msgh_voucher_port = (mach_port_name_t)MACH_PORT_NULL;
 	mmsg->msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, 0);
-	// unchanged: msgh_id
+	                     
 
 	return mach_msg_send_from_remote_kernel(mmsg, fmsg->size, node);
 }
 
 
-/*  Called when an ACKMESSAGE packet is received. <name> indicates
- *	the flipc name of the port holding the messages to be acknowledged.
- *	<msg_count> indicates the number of messages being acked for this node:port.
- */
+                                                                  
+                                                                      
+                                                                               
+   
 static void
 flipc_cmd_ack(flipc_ack_msg_t   fmsg,
     mach_node_t       node    __unused,
@@ -331,7 +331,7 @@ flipc_cmd_ack(flipc_ack_msg_t   fmsg,
 	ipc_mqueue_t lport_mq = &lport->ip_messages;
 	imq_lock(lport_mq);
 
-	assert(fport->peek_count >= msg_count); // Can't ack what we haven't peeked!
+	assert(fport->peek_count >= msg_count);                                     
 
 	while (msg_count--) {
 		ipc_mqueue_select_on_thread(lport_mq, IMQ_NULL, 0, 0, thread);
@@ -349,16 +349,16 @@ flipc_cmd_ack(flipc_ack_msg_t   fmsg,
 
 
 
-/*** FLIPC Node Managment Functions (called by mach node layer) ***/
+                                                                    
 
 
-/*  flipc_node_prepare() is called by mach node layer when a remote node is
- *  registered by a link driver, or when the bootstrap port changes for the
- *  local node.  This is the flipc layer's opportunity to initialize per-node
- *  flipc state, and to convert the node's bootstrap port into a flipc port.
- *  Note that the node is not yet in the mach node table.
- *  Returns KERN_SUCCESS on success; otherwise node is not prepared.
- */
+                                                                           
+                                                                           
+                                                                             
+                                                                            
+                                                         
+                                                                    
+   
 kern_return_t
 flipc_node_prepare(mach_node_t node)
 {
@@ -379,13 +379,13 @@ flipc_node_prepare(mach_node_t node)
 }
 
 
-/*  flipc_node_retire() is called by mach node layer when a remote node is
- *  terminated by a link driver, or when the local node's bootstrap port
- *  becomes invalid.  This is the flipc layer's opportunity to free per-node
- *  flipc state, and to revert the node's bootstrap port to a local ipc port.
- *  <node> must be locked by the caller.
- *  Returns KERN_SUCCESS on success.
- */
+                                                                          
+                                                                        
+                                                                            
+                                                                             
+                                        
+                                    
+   
 kern_return_t
 flipc_node_retire(mach_node_t node)
 {
@@ -404,13 +404,13 @@ flipc_node_retire(mach_node_t node)
 }
 
 
-/*** FLIPC Message Functions (called by mach node layer) ***/
+                                                             
 
 
-/*  The node layer calls flipc_msg_to_remote_node() to fetch the next message
- *  for <node>.  This function will block until a message is available or the
- *  node is terminated, in which case it returns MNL_MSG_NULL.
- */
+                                                                             
+                                                                             
+                                                              
+   
 mnl_msg_t
 flipc_msg_to_remote_node(mach_node_t  to_node,
     uint32_t     flags __unused)
@@ -426,7 +426,7 @@ flipc_msg_to_remote_node(mach_node_t  to_node,
 	ipc_mqueue_t port_mq = IMQ_NULL;
 
 	while (!to_node->dead) {
-		/* Fetch next message from proxy port */
+		                                        
 		ipc_mqueue_receive(portset_mq, MACH_PEEK_MSG, 0, 0, THREAD_ABORTSAFE);
 
 		thread_t thread = current_thread();
@@ -451,39 +451,39 @@ flipc_msg_to_remote_node(mach_node_t  to_node,
 				port_mq->data.port.fport->peek_count++;
 			}
 
-			/* Clean up outstanding prepost on port_mq.
-			 * This also unlocks port_mq.
-			 */
+			                                           
+                                
+      
 			ipc_mqueue_release_peek_ref(port_mq);
 			assert(get_preemption_level() == 0);
 
-			/* DANGER:  The code below must be allowed to allocate so it can't
-			 * run under the protection of the imq_lock, but that leaves mqueue
-			 * open for business for a small window before we examine kmsg.
-			 * This SHOULD be OK, since we are the only thread looking.
-			 */
+			                                                                  
+                                                                      
+                                                                  
+                                                              
+      
 			if (kmsg != IKM_NULL) {
 				mnl_msg_from_kmsg(kmsg, (mnl_msg_t*)&fmsg);
 			}
 		} else {
-			/* Must be from the control_port, which is not a flipc port */
+			                                                              
 			assert(!FPORT_VALID(port_mq->data.port.fport));
 
-			/* This is a simplified copy of ipc_mqueue_select_on_thread() */
+			                                                                
 			kmsg = ipc_kmsg_queue_first(&port_mq->imq_messages);
 			assert(kmsg != IKM_NULL);
 			ipc_kmsg_rmqueue(&port_mq->imq_messages, kmsg);
 			ipc_mqueue_release_msgcount(port_mq, portset_mq);
 			imq_unlock(port_mq);
 			current_task()->messages_received++;
-			ip_release(to_node->control_port); // Should derive ref from port_mq
+			ip_release(to_node->control_port);                                  
 
-			/* We just pass the kmsg payload as the fmsg.
-			 * flipc_msg_free() will notice and free the kmsg properly.
-			 */
+			                                             
+                                                              
+      
 			mach_msg_header_t *hdr = kmsg->ikm_header;
 			fmsg = (mnl_msg_t)(&hdr[1]);
-			/* Stash kmsg pointer just before fmsg */
+			                                         
 			*(ipc_kmsg_t*)((vm_offset_t)fmsg - sizeof(vm_offset_t)) = kmsg;
 		}
 
@@ -496,20 +496,20 @@ flipc_msg_to_remote_node(mach_node_t  to_node,
 }
 
 
-/*  The mach node layer calls this to deliver an incoming message.  It is the
- *  responsibility of the caller to release the received message buffer after
- *  return.
- */
+                                                                             
+                                                                             
+           
+   
 void
 flipc_msg_from_node(mach_node_t from_node   __unused,
     mnl_msg_t   msg,
     uint32_t    flags)
 {
-	/*  Note that if flipc message forwarding is supported, the from_node arg
-	 *  may not match fmsg->node_id.  The former is the node from which we
-	 *	received the message; the latter is the node that originated the
-	 *	message.  We use the originating node, which is where the ack goes.
-	 */
+	                                                                         
+                                                                       
+                                                                    
+                                                                       
+    
 	assert(msg->sub == MACH_NODE_SUB_FLIPC);
 	mach_node_t node = mach_node_for_id_locked(msg->node_id, FALSE, FALSE);
 	MACH_NODE_UNLOCK(node);
@@ -533,40 +533,40 @@ flipc_msg_from_node(mach_node_t from_node   __unused,
 }
 
 
-/*  The node layer calls flipc_msg_free() to dispose of sent messages that
- *  originated in the FLIPC layer.  This allows us to repurpose the payload
- *  of an ack or nak kmsg as a flipc message to avoid a copy - we detect
- *  such messages here and free them appropriately.
- */
+                                                                          
+                                                                           
+                                                                        
+                                                   
+   
 void
 flipc_msg_free(mnl_msg_t    msg,
     uint32_t     flags)
 {
 	switch (msg->cmd) {
-	case FLIPC_CMD_ACKMESSAGE:  // Flipc msg is a kmsg in disguise...
-	case FLIPC_CMD_NAKMESSAGE:  // Convert back to kmsg for disposal
+	case FLIPC_CMD_ACKMESSAGE:                                       
+	case FLIPC_CMD_NAKMESSAGE:                                      
 		ipc_kmsg_free(*(ipc_kmsg_t*)((vm_offset_t)msg - sizeof(vm_offset_t)));
 		break;
 
-	default:    // Flipc msg is not a kmsg in disguise; dispose of normally
+	default:                                                               
 		mnl_msg_free(msg, flags);
 		break;
 	}
 }
 
 
-/*** FLIPC Message Functions (called by mach ipc subsystem) ***/
+                                                                
 
-/*	Ack's one message sent to <mqueue> from <node>.  A new kmsg is allocated
- *  and filled in as an ack, then posted to the node's contol port.  This will
- *  wake the link driver (if sleeping) and cause the ack to be included with
- *  normal IPC traffic.
- *
- *  This function immediately returns if <fport> or <node> is invalid, so it
- *  is safe & quick to call speculatively.
- *
- *	Called from mach ipc_mqueue.c when a flipc-originated message is consumed.
- */
+                                                                           
+                                                                              
+                                                                            
+                       
+  
+                                                                            
+                                          
+  
+                                                                             
+   
 void
 flipc_msg_ack(mach_node_t   node,
     ipc_mqueue_t  mqueue,
@@ -600,12 +600,12 @@ flipc_msg_ack(mach_node_t   node,
 		return;
 	}
 
-	/* We have a valid node id & obj name, and a port to send the ack to. */
+	                                                                        
 	ipc_kmsg_t kmsg = ipc_kmsg_alloc(sizeof(struct flipc_ack_msg) + MAX_TRAILER_SIZE);
-	assert((unsigned long long)kmsg >= 4ULL);//!= IKM_NULL);
+	assert((unsigned long long)kmsg >= 4ULL);               
 	mach_msg_header_t *msg = kmsg->ikm_header;
 
-	/* Fill in the mach_msg_header struct */
+	                                        
 	msg->msgh_bits = MACH_MSGH_BITS_SET(0, 0, 0, 0);
 	msg->msgh_size = sizeof(msg);
 	msg->msgh_remote_port = ack_port;
@@ -613,15 +613,15 @@ flipc_msg_ack(mach_node_t   node,
 	msg->msgh_voucher_port = MACH_PORT_NULL;
 	msg->msgh_id = FLIPC_CMD_ID;
 
-	/* Fill in the flipc_ack_msg struct */
+	                                      
 	flipc_ack_msg_t fmsg = (flipc_ack_msg_t)(&msg[1]);
 	fmsg->resend_to = HOST_LOCAL_NODE;
-	fmsg->msg_count = 1; // Might want to coalesce acks to a node/name pair
+	fmsg->msg_count = 1;                                                   
 
-	/* Fill in the mnl_msg struct */
+	                                
 	fmsg->mnl.sub = MACH_NODE_SUB_FLIPC;
 	fmsg->mnl.cmd = delivered ? FLIPC_CMD_ACKMESSAGE : FLIPC_CMD_NAKMESSAGE;
-	fmsg->mnl.qos = 0;    // Doesn't do anything yet
+	fmsg->mnl.qos = 0;                              
 	fmsg->mnl.flags = 0;
 	fmsg->mnl.node_id = nid;
 	fmsg->mnl.object = name;
@@ -637,7 +637,7 @@ flipc_msg_ack(mach_node_t   node,
 	imq_lock(ack_mqueue);
 	ip_unlock(ack_port);
 
-	/* ipc_mqueue_send() unlocks ack_mqueue */
+	                                          
 	mmr = ipc_mqueue_send(ack_mqueue, kmsg, 0, 0);
 #else
 	kern_return_t kr;

@@ -69,20 +69,20 @@
 #ifdef __APPLE_API_PRIVATE
 #include <vfs/vfs_support.h>
 
-/*
- * This structure defines the information maintained about
- * special devices. It is allocated in checkalias and freed
- * in vgone.
- */
+  
+                                                          
+                                                           
+            
+   
 struct specinfo {
 	struct  vnode **si_hashchain;
 	struct  vnode *si_specnext;
 	long    si_flags;
 	dev_t   si_rdev;
 	int32_t si_opencount;
-	daddr_t si_size;                /* device block size in bytes */
-	daddr64_t       si_lastr;       /* last read blkno (read-ahead) */
-	u_int64_t       si_devsize;     /* actual device size in bytes */
+	daddr_t si_size;                                                
+	daddr64_t       si_lastr;                                         
+	u_int64_t       si_devsize;                                      
 
 	u_int8_t        si_initted;
 	u_int8_t        si_throttleable;
@@ -90,9 +90,9 @@ struct specinfo {
 	u_int32_t       si_devbsdunit;
 	u_int64_t       si_throttle_mask;
 };
-/*
- * Exported shorthand
- */
+  
+                     
+   
 #define v_rdev v_specinfo->si_rdev
 #define v_hashchain v_specinfo->si_hashchain
 #define v_specnext v_specinfo->si_specnext
@@ -101,15 +101,15 @@ struct specinfo {
 #define v_specdevsize v_specinfo->si_devsize
 #define v_speclastr v_specinfo->si_lastr
 
-/*
- * Flags for specinfo
- */
-#define SI_MOUNTEDON    0x0001  /* block special device is mounted on */
-#define SI_ALIASED      0x0002  /* multiple active vnodes refer to this device */
+  
+                     
+   
+#define SI_MOUNTEDON    0x0001                                          
+#define SI_ALIASED      0x0002                                                   
 
-/*
- * Special device management
- */
+  
+                            
+   
 #define SPECHSZ 64
 #if     ((SPECHSZ & (SPECHSZ - 1)) == 0)
 #define SPECHASH(rdev)  (((rdev>>21)+(rdev))&(SPECHSZ-1))
@@ -119,9 +119,9 @@ struct specinfo {
 
 extern struct vnode *speclisth[SPECHSZ];
 
-/*
- * Prototypes for special file operations on vnodes.
- */
+  
+                                                    
+   
 extern  int(**spec_vnodeop_p)(void *);
 struct  nameidata;
 struct  componentname;
@@ -136,7 +136,7 @@ int spec_offtoblk(struct  vnop_offtoblk_args *);
 int spec_fsync_internal(vnode_t, int, vfs_context_t);
 int spec_blockmap(struct  vnop_blockmap_args *);
 int spec_kqfilter(vnode_t vp, struct knote *kn, struct kevent_qos_s *kev);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 int     spec_ebadf(void *);
 
@@ -177,5 +177,5 @@ int     spec_pathconf(struct vnop_pathconf_args *);
 #define spec_bwrite (int (*) (struct  vnop_bwrite_args *))nop_bwrite
 __END_DECLS
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* _MISCFS_SPECFS_SPECDEV_H_ */
+#endif                          
+#endif                                

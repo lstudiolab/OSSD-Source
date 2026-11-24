@@ -65,9 +65,9 @@ struct persona_modify_info {
 };
 
 #ifdef PRIVATE
-/* Redeem bank voucher on behalf of another process while changing the persona */
+                                                                                 
 #define ENTITLEMENT_PERSONA_MODIFY    "com.apple.private.persona.modify"
 #define ENTITLEMENT_PERSONA_NO_PROPAGATE "com.apple.private.personas.no.propagate"
-#endif /* PRIVATE */
+#endif              
 
-#endif /* _BANK_BANK_TYPES_H_ */
+#endif                          

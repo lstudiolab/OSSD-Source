@@ -47,38 +47,38 @@ __BEGIN_DECLS
 #define IOCTL_VM_SOCKETS_GET_LOCAL_CID _IOR('s',  209, uint32_t)
 
 struct sockaddr_vm {
-	__uint8_t      svm_len;        /* total length */
-	sa_family_t    svm_family;     /* Address family: AF_VSOCK */
+	__uint8_t      svm_len;                          
+	sa_family_t    svm_family;                                   
 	__uint16_t     svm_reserved1;
-	__uint32_t     svm_port;       /* Port # in host byte order */
-	__uint32_t     svm_cid;        /* Address in host byte order */
+	__uint32_t     svm_port;                                      
+	__uint32_t     svm_cid;                                        
 } __attribute__((__packed__));
 
 typedef u_quad_t vsock_gen_t;
 
 struct xvsockpcb {
-	u_int32_t      xv_len;            /* length of this structure */
+	u_int32_t      xv_len;                                          
 	u_int64_t      xv_vsockpp;
-	u_int32_t      xvp_local_cid;     /* local address cid */
-	u_int32_t      xvp_local_port;    /* local address port */
-	u_int32_t      xvp_remote_cid;    /* remote address cid */
-	u_int32_t      xvp_remote_port;   /* remote address port */
-	u_int32_t      xvp_rxcnt;         /* bytes received */
-	u_int32_t      xvp_txcnt;         /* bytes transmitted */
-	u_int32_t      xvp_peer_rxhiwat;  /* peer's receive buffer */
-	u_int32_t      xvp_peer_rxcnt;    /* bytes received by peer */
-	pid_t          xvp_last_pid;      /* last pid */
-	vsock_gen_t    xvp_gencnt;        /* vsock generation count */
+	u_int32_t      xvp_local_cid;                            
+	u_int32_t      xvp_local_port;                            
+	u_int32_t      xvp_remote_cid;                            
+	u_int32_t      xvp_remote_port;                            
+	u_int32_t      xvp_rxcnt;                             
+	u_int32_t      xvp_txcnt;                                
+	u_int32_t      xvp_peer_rxhiwat;                             
+	u_int32_t      xvp_peer_rxcnt;                                
+	pid_t          xvp_last_pid;                    
+	vsock_gen_t    xvp_gencnt;                                    
 	struct xsocket xv_socket;
 };
 
 struct  xvsockpgen {
-	u_int32_t      xvg_len;      /* length of this structure */
-	u_int64_t      xvg_count;    /* number of PCBs at this time */
-	vsock_gen_t    xvg_gen;      /* generation count at this time */
-	so_gen_t       xvg_sogen;    /* current socket generation count */
+	u_int32_t      xvg_len;                                    
+	u_int64_t      xvg_count;                                     
+	vsock_gen_t    xvg_gen;                                         
+	so_gen_t       xvg_sogen;                                         
 };
 
 __END_DECLS
 
-#endif /* _VSOCK_H_ */
+#endif                

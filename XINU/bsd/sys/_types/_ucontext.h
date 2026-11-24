@@ -27,33 +27,33 @@
  */
 #ifndef _STRUCT_UCONTEXT
 
-#include <sys/cdefs.h> /* __DARWIN_UNIX03 */
+#include <sys/cdefs.h>                      
 
 #if __DARWIN_UNIX03
 #define _STRUCT_UCONTEXT        struct __darwin_ucontext
-#else /* !__DARWIN_UNIX03 */
+#else                       
 #define _STRUCT_UCONTEXT        struct ucontext
-#endif /* __DARWIN_UNIX03 */
+#endif                      
 
-#include <machine/types.h> /* __darwin_size_t */
-#include <machine/_mcontext.h> /* _STRUCT_MCONTEXT */
-#include <sys/_types.h> /* __darwin_sigset_t */
-#include <sys/_types/_sigaltstack.h> /* _STRUCT_SIGALTSTACK */
+#include <machine/types.h>                      
+#include <machine/_mcontext.h>                       
+#include <sys/_types.h>                        
+#include <sys/_types/_sigaltstack.h>                          
 
 _STRUCT_UCONTEXT
 {
 	int                     uc_onstack;
-	__darwin_sigset_t       uc_sigmask;     /* signal mask used by this context */
-	_STRUCT_SIGALTSTACK     uc_stack;       /* stack used by this context */
-	_STRUCT_UCONTEXT        *uc_link;       /* pointer to resuming context */
-	__darwin_size_t         uc_mcsize;      /* size of the machine context passed in */
-	_STRUCT_MCONTEXT        *uc_mcontext;   /* pointer to machine specific context */
+	__darwin_sigset_t       uc_sigmask;                                           
+	_STRUCT_SIGALTSTACK     uc_stack;                                       
+	_STRUCT_UCONTEXT        *uc_link;                                        
+	__darwin_size_t         uc_mcsize;                                                 
+	_STRUCT_MCONTEXT        *uc_mcontext;                                            
 #ifdef _XOPEN_SOURCE
 	_STRUCT_MCONTEXT        __mcontext_data;
-#endif /* _XOPEN_SOURCE */
+#endif                    
 };
 
-/* user context */
-typedef _STRUCT_UCONTEXT        ucontext_t;     /* [???] user context */
+                  
+typedef _STRUCT_UCONTEXT        ucontext_t;                             
 
-#endif /* _STRUCT_UCONTEXT */
+#endif                       

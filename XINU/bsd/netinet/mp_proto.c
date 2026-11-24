@@ -63,7 +63,7 @@ struct domain mpdomain_s = {
 	.dom_init =             mp_dinit,
 };
 
-/* Initialize the PF_MULTIPATH domain, and add in the pre-defined protos */
+                                                                           
 void
 mp_dinit(struct domain *dp)
 {

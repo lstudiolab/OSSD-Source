@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_right.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Declarations of functions to manipulate IPC capabilities.
- */
+  
+   
+  
+                        
+                      
+             
+  
+                                                            
+   
 
 #ifndef _IPC_IPC_RIGHT_H_
 #define _IPC_IPC_RIGHT_H_
@@ -74,13 +74,13 @@
 #define ipc_right_lookup_read           ipc_right_lookup_write
 #define ipc_right_lookup_two_read       ipc_right_lookup_two_write
 
-/* Find an entry in a space, given the name */
+                                              
 extern kern_return_t ipc_right_lookup_write(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_entry_t             *entryp);
 
-/* Find two entries in a space, given two names */
+                                                  
 extern kern_return_t ipc_right_lookup_two_write(
 	ipc_space_t             space,
 	mach_port_name_t        name1,
@@ -88,14 +88,14 @@ extern kern_return_t ipc_right_lookup_two_write(
 	mach_port_name_t        name2,
 	ipc_entry_t             *entryp2);
 
-/* Translate (space, object) -> (name, entry) */
+                                                
 extern bool          ipc_right_reverse(
 	ipc_space_t             space,
 	ipc_object_t            object,
 	mach_port_name_t        *namep,
 	ipc_entry_t             *entryp);
 
-/* Make a notification request, returning the previous send-once right */
+                                                                         
 extern kern_return_t ipc_right_request_alloc(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -104,7 +104,7 @@ extern kern_return_t ipc_right_request_alloc(
 	ipc_port_t              notify,
 	ipc_port_t              *previousp);
 
-/* Cancel a notification request and return the send-once right */
+                                                                  
 extern ipc_port_t ipc_right_request_cancel(
 	ipc_space_t             space,
 	ipc_port_t              port,
@@ -115,11 +115,11 @@ extern ipc_port_t ipc_right_request_cancel(
 	         ((entry->ie_request == IE_REQ_NONE) ? IP_NULL :                \
 	         ipc_right_request_cancel((space), (port), (name), (entry)))
 
-/* Check if an entry is being used */
+                                     
 extern bool      ipc_right_inuse(
 	ipc_entry_t             entry);
 
-/* Check if the port has died */
+                                
 extern boolean_t ipc_right_check(
 	ipc_space_t              space,
 	ipc_port_t               port,
@@ -127,13 +127,13 @@ extern boolean_t ipc_right_check(
 	ipc_entry_t              entry,
 	ipc_object_copyin_flags_t flags);
 
-/* Clean up an entry in a dead space */
+                                       
 extern void ipc_right_terminate(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_entry_t             entry);
 
-/* Destroy an entry in a space */
+                                 
 extern kern_return_t ipc_right_destroy(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -141,13 +141,13 @@ extern kern_return_t ipc_right_destroy(
 	boolean_t               check_guard,
 	uint64_t                guard);
 
-/* Release a send/send-once/dead-name user reference */
+                                                       
 extern kern_return_t ipc_right_dealloc(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_entry_t             entry);
 
-/* Modify the user-reference count for a right */
+                                                 
 extern kern_return_t ipc_right_delta(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -155,7 +155,7 @@ extern kern_return_t ipc_right_delta(
 	mach_port_right_t       right,
 	mach_port_delta_t       delta);
 
-/* Destroy a receive right; Modify ref count for send rights */
+                                                               
 extern kern_return_t ipc_right_destruct(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -163,7 +163,7 @@ extern kern_return_t ipc_right_destruct(
 	mach_port_delta_t       srdelta,
 	uint64_t                guard);
 
-/* Retrieve information about a right */
+                                        
 extern kern_return_t ipc_right_info(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -171,14 +171,14 @@ extern kern_return_t ipc_right_info(
 	mach_port_type_t        *typep,
 	mach_port_urefs_t       *urefsp);
 
-/* Check if a subsequent ipc_right_copyin of the reply port will succeed */
+                                                                           
 extern boolean_t ipc_right_copyin_check_reply(
 	ipc_space_t              space,
 	mach_port_name_t         reply_name,
 	ipc_entry_t              reply_entry,
 	mach_msg_type_name_t     reply_type);
 
-/* Copyin a capability from a space */
+                                      
 extern kern_return_t ipc_right_copyin(
 	ipc_space_t               space,
 	mach_port_name_t          name,
@@ -192,7 +192,7 @@ extern kern_return_t ipc_right_copyin(
 	mach_port_context_t       context,
 	mach_msg_guard_flags_t    *guard_flags);
 
-/* Copyin a pair of dispositions from a space */
+                                                
 extern kern_return_t ipc_right_copyin_two(
 	ipc_space_t               space,
 	mach_port_name_t          name,
@@ -203,7 +203,7 @@ extern kern_return_t ipc_right_copyin_two(
 	ipc_port_t                *sorightp,
 	ipc_port_t                *releasep);
 
-/* Copyout a capability to a space */
+                                     
 extern kern_return_t ipc_right_copyout(
 	ipc_space_t             space,
 	mach_port_name_t        name,
@@ -214,4 +214,4 @@ extern kern_return_t ipc_right_copyout(
 	mach_msg_guard_flags_t  *guard_flags,
 	ipc_object_t            object);
 
-#endif  /* _IPC_IPC_RIGHT_H_ */
+#endif                         

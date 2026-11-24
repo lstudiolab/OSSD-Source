@@ -6,9 +6,9 @@
 #define _OS_OSBYTEORDERARM_H
 
 #include <stdint.h>
-#include <arm/arch.h> /* for _ARM_ARCH_6 */
+#include <arm/arch.h>                      
 
-/* Generic byte swapping functions. */
+                                      
 
 __DARWIN_OS_INLINE
 uint16_t
@@ -16,7 +16,7 @@ _OSSwapInt16(
 	uint16_t        _data
 	)
 {
-	/* Reduces to 'rev16' with clang */
+	                                   
 	return (uint16_t)(_data << 8 | _data >> 8);
 }
 
@@ -29,7 +29,7 @@ _OSSwapInt32(
 #if defined(__llvm__)
 	_data = __builtin_bswap32(_data);
 #else
-	/* This actually generates the best code */
+	                                           
 	_data = (((_data ^ (_data >> 16 | (_data << 16))) & 0xFF00FFFF) >> 8) ^ (_data >> 8 | _data << 24);
 #endif
 
@@ -50,7 +50,7 @@ _OSSwapInt64(
 		uint32_t _ul[2];
 	} _u;
 
-	/* This actually generates the best code */
+	                                           
 	_u._ul[0] = (uint32_t)(_data >> 32);
 	_u._ul[1] = (uint32_t)(_data & 0xffffffff);
 	_u._ul[0] = _OSSwapInt32(_u._ul[0]);
@@ -59,7 +59,7 @@ _OSSwapInt64(
 #endif
 }
 
-/* Functions for byte reversed loads. */
+                                        
 
 struct _OSUnalignedU16 {
 	volatile uint16_t __val;
@@ -139,7 +139,7 @@ OSReadSwapInt64(
 }
 #endif
 
-/* Functions for byte reversed stores. */
+                                         
 
 #if defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE)
 __DARWIN_OS_INLINE
@@ -213,4 +213,4 @@ OSWriteSwapInt64(
 }
 #endif
 
-#endif /* ! _OS_OSBYTEORDERARM_H */
+#endif                             

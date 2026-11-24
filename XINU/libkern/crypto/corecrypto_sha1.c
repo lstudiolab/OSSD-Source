@@ -16,7 +16,7 @@ setCount(SHA1_CTX *ctx, uint64_t count)
 	ctx->c.b64[0] = count;
 }
 
-/* Copy a ccdigest ctx into a legacy SHA1 context */
+                                                    
 static void
 DiToSHA1(const struct ccdigest_info *di, struct ccdigest_ctx *di_ctx, SHA1_CTX *sha1_ctx)
 {
@@ -25,7 +25,7 @@ DiToSHA1(const struct ccdigest_info *di, struct ccdigest_ctx *di_ctx, SHA1_CTX *
 	memcpy(sha1_ctx->h.b8, ccdigest_state_ccn(di, di_ctx), di->state_size);
 }
 
-/* Copy a legacy SHA1 context into a ccdigest ctx  */
+                                                     
 static void
 SHA1ToDi(const struct ccdigest_info *di, SHA1_CTX *sha1_ctx, struct ccdigest_ctx *di_ctx)
 {
@@ -73,12 +73,12 @@ SHA1Final(void *digest, SHA1_CTX *ctx)
 void
 SHA1UpdateUsePhysicalAddress(SHA1_CTX *ctx, const void *data, size_t len)
 {
-	//TODO: What the hell ?
+	                       
 	SHA1Update(ctx, data, len);
 }
 #endif
 
-/* This is not publicised in header, but exported in libkern.exports */
+                                                                       
 void SHA1Final_r(SHA1_CTX *context, void *digest);
 void
 SHA1Final_r(SHA1_CTX *context, void *digest)
@@ -87,10 +87,10 @@ SHA1Final_r(SHA1_CTX *context, void *digest)
 }
 
 
-/*
- * This function is called by the SHA1 hardware kext during its init.
- * This will register the function to call to perform SHA1 using hardware.
- */
+  
+                                                                     
+                                                                          
+   
 #include <sys/types.h>
 #include <libkern/OSAtomic.h>
 #include <sys/systm.h>
@@ -104,14 +104,14 @@ void
 sha1_hardware_hook(Boolean option, InKernelPerformSHA1Func func, void *ref)
 {
 	if (option) {
-		// Establish the hook. The hardware is ready.
+		                                             
 		OSCompareAndSwapPtr((void*)NULL, (void*)ref, (void * volatile*)&SHA1Ref);
 
 		if (!OSCompareAndSwapPtr((void *)NULL, (void *)func, (void * volatile *)&performSHA1WithinKernelOnly)) {
 			panic("sha1_hardware_hook: Called twice.. Should never happen\n");
 		}
 	} else {
-		// The hardware is going away. Tear down the hook.
+		                                                  
 		performSHA1WithinKernelOnly = NULL;
 		SHA1Ref = NULL;
 	}

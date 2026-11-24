@@ -41,8 +41,8 @@ static void pfkey_process_message_test_encapsulate_panic(uint8_t **mhp, int pfke
 static void(*const process_pfkey_message_tests[])(uint8_t * *mhp, int pfkey_socket) =
 {
 	NULL,
-	pfkey_process_message_test_encapsulate_panic,    // TEST_IPSEC_IPv4_ENCAPSULATE_PANIC
-	pfkey_process_message_test_encapsulate_panic,    // TEST_IPSEC_IPv6_ENCAPSULATE_PANIC
+	pfkey_process_message_test_encapsulate_panic,                                        
+	pfkey_process_message_test_encapsulate_panic,                                        
 };
 
 static void
@@ -184,7 +184,7 @@ send_pkey_add_sa(int pfkey_socket, uint32_t spi, const char *src, const char *ds
 	soft_lifetime_payload->sadb_lifetime_exttype = SADB_EXT_LIFETIME_SOFT;
 	tlen += sizeof(*soft_lifetime_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey send update sa");
 }
@@ -207,7 +207,7 @@ send_pfkey_flush_sa(int pfkey_socket)
 	msg_payload->sadb_msg_pid = (u_int32_t)getpid();
 	tlen += sizeof(*msg_payload);
 
-	// Update the total length
+	                          
 	msg_payload->sadb_msg_len = PFKEY_UNIT64(tlen);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(send(pfkey_socket, payload, (size_t)PFKEY_UNUNIT64(msg_payload->sadb_msg_len), 0), "pfkey flush sa");
 }
@@ -231,24 +231,24 @@ pfkey_align(struct sadb_msg *msg, uint8_t **mhp)
 	struct sadb_ext *ext;
 	int i;
 	uint8_t *p;
-	uint8_t *ep;     /* XXX should be passed from upper layer */
+	uint8_t *ep;                                                
 
-	/* validity check */
+	                    
 	T_QUIET; T_ASSERT_NOTNULL(msg, "pfkey align msg");
 	T_QUIET; T_ASSERT_NOTNULL(mhp, "pfkey align mhp");
 
-	/* initialize */
+	                
 	for (i = 0; i < SADB_EXT_MAX + 1; i++) {
 		mhp[i] = NULL;
 	}
 
 	mhp[0] = (void *)msg;
 
-	/* initialize */
+	                
 	p = (void *) msg;
 	ep = p + PFKEY_UNUNIT64(msg->sadb_msg_len);
 
-	/* skip base header */
+	                      
 	p += sizeof(struct sadb_msg);
 
 	while (p < ep) {
@@ -259,7 +259,7 @@ pfkey_align(struct sadb_msg *msg, uint8_t **mhp)
 
 		T_QUIET; T_EXPECT_NULL(mhp[ext->sadb_ext_type], "duplicate extension type %u payload", ext->sadb_ext_type);
 
-		/* set pointer */
+		                 
 		switch (ext->sadb_ext_type) {
 		case SADB_EXT_SA:
 		case SADB_EXT_LIFETIME_CURRENT:
@@ -269,9 +269,9 @@ pfkey_align(struct sadb_msg *msg, uint8_t **mhp)
 		case SADB_EXT_ADDRESS_DST:
 		case SADB_EXT_ADDRESS_PROXY:
 		case SADB_EXT_KEY_AUTH:
-		/* XXX should to be check weak keys. */
+		                                       
 		case SADB_EXT_KEY_ENCRYPT:
-		/* XXX should to be check weak keys. */
+		                                       
 		case SADB_EXT_IDENTITY_SRC:
 		case SADB_EXT_IDENTITY_DST:
 		case SADB_EXT_SENSITIVITY:
@@ -406,7 +406,7 @@ pfkey_setup_socket(void)
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pfkey_socket = socket(PF_KEY, SOCK_RAW, PF_KEY_V2), NULL);
 
 	if (sysctlbyname("kern.ipc.maxsockbuf", &oldmax, &oldmaxsize, &newmax, sizeof(newmax)) != 0) {
-		bufsiz = 233016;        /* Max allowed by default */
+		bufsiz = 233016;                                    
 	} else {
 		bufsiz = newbufk * 1024;
 	}

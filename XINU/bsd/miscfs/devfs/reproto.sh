@@ -1,9 +1,9 @@
-#!/bin/sh
-#
-# This used to be a shell script, but had to become more sophisticated
-# to allow for KNF function definitions.  So rewrote in perl, but wrapped
-# as a shell script.
-#
+
+
+
+
+
+
 exec /usr/bin/perl << *EOF*
 open(PROTO, ">devfs_proto.h") || die "Cannot open devfs_proto.h\n";
 

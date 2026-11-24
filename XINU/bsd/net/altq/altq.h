@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq.h,v 1.4 2006/10/12 19:59:08 peter Exp $ */
-/*	$KAME: altq.h,v 1.10 2003/07/10 12:07:47 kjc Exp $	*/
+                                                           
+                                                        
 
 /*
  * Copyright (C) 1998-2003
@@ -60,13 +60,13 @@
 #ifdef PRIVATE
 #include <net/pktsched/pktsched.h>
 
-/* altq discipline type */
-#define ALTQT_NONE      PKTSCHEDT_NONE  /* reserved */
-#define ALTQT_CBQ       PKTSCHEDT_CBQ   /* cbq */
-#define ALTQT_HFSC      PKTSCHEDT_HFSC  /* hfsc */
-#define ALTQT_PRIQ      PKTSCHEDT_PRIQ  /* priority queue */
-#define ALTQT_FAIRQ     PKTSCHEDT_FAIRQ /* fairq */
-#define ALTQT_QFQ       PKTSCHEDT_QFQ   /* quick fair queueing */
-#define ALTQT_MAX       PKTSCHEDT_MAX   /* should be max disc type + 1 */
-#endif /* PRIVATE */
-#endif /* _ALTQ_ALTQ_H_ */
+                          
+#define ALTQT_NONE      PKTSCHEDT_NONE                
+#define ALTQT_CBQ       PKTSCHEDT_CBQ            
+#define ALTQT_HFSC      PKTSCHEDT_HFSC            
+#define ALTQT_PRIQ      PKTSCHEDT_PRIQ                      
+#define ALTQT_FAIRQ     PKTSCHEDT_FAIRQ            
+#define ALTQT_QFQ       PKTSCHEDT_QFQ                            
+#define ALTQT_MAX       PKTSCHEDT_MAX                                    
+#endif              
+#endif                    

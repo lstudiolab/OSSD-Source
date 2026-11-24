@@ -29,17 +29,17 @@
  *	Copyright (c) 1990, 1996-1998 Apple Computer, Inc.
  *	All Rights Reserved.
  */
-/*
- * posix_shm.c : Support for POSIX semaphore APIs
- *
- *	File:	posix_sem.c
- *	Author:	Ananthakrishna Ramesh
- *
- * HISTORY
- * 2-Sep-1999	A.Ramesh
- *	Created for MacOSX
- *
- */
+  
+                                                 
+  
+                    
+                                
+  
+          
+                      
+                     
+  
+   
 
 #ifndef _SYS_POSIX_SEM_H_
 #define _SYS_POSIX_SEM_H_
@@ -50,7 +50,7 @@
 
 struct label;
 
-#define PSEMNAMLEN      31      /* maximum name segment length we bother with */
+#define PSEMNAMLEN      31                                                      
 
 struct pseminfo {
 	unsigned int    psem_flags;
@@ -58,7 +58,7 @@ struct pseminfo {
 	mode_t          psem_mode;
 	uid_t           psem_uid;
 	gid_t           psem_gid;
-	char            psem_name[PSEMNAMLEN + 1];      /* segment name */
+	char            psem_name[PSEMNAMLEN + 1];                        
 	void *          psem_semobject;
 	struct label *  psem_label;
 	pid_t           psem_creator_pid;

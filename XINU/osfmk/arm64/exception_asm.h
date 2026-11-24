@@ -31,11 +31,11 @@
 #include "assym.s"
 
 #if XNU_MONITOR
-/* Exit path defines; for controlling PPL -> kernel transitions. */
-#define PPL_EXIT_DISPATCH   0 /* This is a clean exit after a PPL request. */
-#define PPL_EXIT_PANIC_CALL 1 /* The PPL has called panic. */
-#define PPL_EXIT_BAD_CALL   2 /* The PPL request failed. */
-#define PPL_EXIT_EXCEPTION  3 /* The PPL took an exception. */
+                                                                   
+#define PPL_EXIT_DISPATCH   0                                                
+#define PPL_EXIT_PANIC_CALL 1                                
+#define PPL_EXIT_BAD_CALL   2                              
+#define PPL_EXIT_EXCEPTION  3                                 
 
 
 #define KERNEL_MODE_ELR      ELR_GL11
@@ -54,17 +54,17 @@
 #define GUARDED_MODE_VBAR    VBAR_EL1
 #define GUARDED_MODE_TPIDR   TPIDR_EL1
 
-/*
- * LOAD_PMAP_CPU_DATA
- *
- * Loads the PPL per-CPU data array entry for the current CPU.
- *   arg0 - Address of the PPL per-CPU data is returned through this
- *   arg1 - Scratch register
- *   arg2 - Scratch register
- *
- */
+  
+                     
+  
+                                                              
+                                                                    
+                            
+                            
+  
+   
 .macro LOAD_PMAP_CPU_DATA
-	/* Get the CPU ID. */
+	                     
 	mrs		$0, MPIDR_EL1
 	ubfx	$1, $0, MPIDR_AFF1_SHIFT, MPIDR_AFF1_WIDTH
 	adrp	$2, EXT(cluster_offsets)@page
@@ -74,73 +74,73 @@
 	and		$0, $0, MPIDR_AFF0_MASK
 	add		$0, $0, $1
 
-	/* Get the PPL CPU data array. */
+	                                 
 	adrp	$1, EXT(pmap_cpu_data_array)@page
 	add		$1, $1, EXT(pmap_cpu_data_array)@pageoff
 
-	/*
-	 * Sanity check the CPU ID (this is not a panic because this pertains to
-	 * the hardware configuration; this should only fail if our
-	 * understanding of the hardware is incorrect).
-	 */
+	  
+                                                                         
+                                                            
+                                                
+    
 	cmp		$0, MAX_CPUS
 	b.hs	.
 
 	mov		$2, PMAP_CPU_DATA_ARRAY_ENTRY_SIZE
-	/* Get the PPL per-CPU data. */
+	                               
 	madd	$0, $0, $2, $1
 .endmacro
 
-/*
- * GET_PMAP_CPU_DATA
- *
- * Retrieves the PPL per-CPU data for the current CPU.
- *   arg0 - Address of the PPL per-CPU data is returned through this
- *   arg1 - Scratch register
- *   arg2 - Scratch register
- *
- */
+  
+                    
+  
+                                                      
+                                                                    
+                            
+                            
+  
+   
 .macro GET_PMAP_CPU_DATA
 	LOAD_PMAP_CPU_DATA $0, $1, $2
 .endmacro
 
-#endif /* XNU_MONITOR */
+#endif                  
 
-/*
- * INIT_SAVED_STATE_FLAVORS
- *
- * Initializes the saved state flavors of a new saved state structure
- *  arg0 - saved state pointer
- *  arg1 - 32-bit scratch reg
- *  arg2 - 32-bit scratch reg
- */
+  
+                           
+  
+                                                                     
+                              
+                             
+                             
+   
 .macro INIT_SAVED_STATE_FLAVORS
-	mov		$1, ARM_SAVED_STATE64                                   // Set saved state to 64-bit flavor
+	mov		$1, ARM_SAVED_STATE64                                                                      
 	mov		$2, ARM_SAVED_STATE64_COUNT
 	stp		$1, $2, [$0, SS_FLAVOR]
-	mov		$1, ARM_NEON_SAVED_STATE64                              // Set neon state to 64-bit flavor
+	mov		$1, ARM_NEON_SAVED_STATE64                                                                
 	str		$1, [$0, NS_FLAVOR]
 	mov		$1, ARM_NEON_SAVED_STATE64_COUNT
 	str		$1, [$0, NS_COUNT]
 .endmacro
 
-/*
- * SPILL_REGISTERS
- *
- * Spills the current set of registers (excluding x0, x1, sp) to the specified
- * save area.
- *
- * On CPUs with PAC, the kernel "A" keys are used to create a thread signature.
- * These keys are deliberately kept loaded into the CPU for later kernel use.
- *
- *   arg0 - KERNEL_MODE or HIBERNATE_MODE
- *   x0 - Address of the save area
- */
+  
+                  
+  
+                                                                              
+             
+  
+                                                                               
+                                                                             
+  
+                                         
+                                  
+   
 #define KERNEL_MODE 0
 #define HIBERNATE_MODE 1
 
 .macro SPILL_REGISTERS	mode
-	stp		x2, x3, [x0, SS64_X2]                                   // Save remaining GPRs
+	stp		x2, x3, [x0, SS64_X2]                                                         
 	stp		x4, x5, [x0, SS64_X4]
 	stp		x6, x7, [x0, SS64_X6]
 	stp		x8, x9, [x0, SS64_X8]
@@ -156,7 +156,7 @@
 	stp		x28, fp,  [x0, SS64_X28]
 	str		lr, [x0, SS64_LR]
 
-	/* Save arm_neon_saved_state64 */
+	                                 
 
 	stp		q0, q1, [x0, NS64_Q0]
 	stp		q2, q3, [x0, NS64_Q2]
@@ -175,28 +175,28 @@
 	stp		q28, q29, [x0, NS64_Q28]
 	stp		q30, q31, [x0, NS64_Q30]
 
-	mrs		x22, ELR_EL1                                                     // Get exception link register
-	mrs		x23, SPSR_EL1                                                   // Load CPSR into var reg x23
+	mrs		x22, ELR_EL1                                                                                   
+	mrs		x23, SPSR_EL1                                                                                
 	mrs		x24, FPSR
 	mrs		x25, FPCR
 
 #if defined(HAS_APPLE_PAC)
 	.if \mode != HIBERNATE_MODE
 
-	/* Save x1 and LR to preserve across call */
+	                                            
 	mov		x21, x1
 	mov		x20, lr
 
-	/*
-	 * Create thread state signature
-	 *
-	 * Arg0: The ARM context pointer
-	 * Arg1: The PC value to sign
-	 * Arg2: The CPSR value to sign
-	 * Arg3: The LR value to sign
-	 * Arg4: The X16 value to sign
-	 * Arg5: The X17 value to sign
-	 */
+	  
+                                 
+   
+                                 
+                              
+                                
+                              
+                               
+                               
+    
 	mov		x1, x22
 	mov		w2, w23
 	mov		x3, x20
@@ -206,10 +206,10 @@
 	mov		lr, x20
 	mov		x1, x21
 	.endif
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
-	str		x22, [x0, SS64_PC]                                               // Save ELR to PCB
-	str		w23, [x0, SS64_CPSR]                                    // Save CPSR to PCB
+	str		x22, [x0, SS64_PC]                                                                 
+	str		w23, [x0, SS64_CPSR]                                                       
 	str		w24, [x0, NS64_FPSR]
 	str		w25, [x0, NS64_FPCR]
 
@@ -224,57 +224,57 @@
 	b	.
 .endmacro
 
-// SP0 is expected to already be selected
+                                         
 .macro SWITCH_TO_KERN_STACK
-	ldr		x1, [x1, TH_KSTACKPTR]	// Load the top of the kernel stack to x1
-	mov		sp, x1			// Set the stack pointer to the kernel stack
+	ldr		x1, [x1, TH_KSTACKPTR]	                                         
+	mov		sp, x1			                                            
 .endmacro
 
-// SP0 is expected to already be selected
+                                         
 .macro SWITCH_TO_INT_STACK
 	mrs		x1, TPIDR_EL1
 	ldr		x1, [x1, ACT_CPUDATAP]
 	ldr		x1, [x1, CPU_ISTACKPTR]
-	mov		sp, x1			// Set the stack pointer to the interrupt stack
+	mov		sp, x1			                                               
 .endmacro
 
-/*
- * REENABLE_DAIF
- *
- * Restores the DAIF bits to their original state (well, the AIF bits at least).
- *   arg0 - DAIF bits (read from the DAIF interface) to restore
- */
+  
+                
+  
+                                                                                
+                                                               
+   
 .macro REENABLE_DAIF
-	/* AIF enable. */
+	                 
 	tst		$0, #(DAIF_IRQF | DAIF_FIQF | DAIF_ASYNCF)
 	b.eq		3f
 
-	/* IF enable. */
+	                
 	tst		$0, #(DAIF_IRQF | DAIF_FIQF)
 	b.eq		2f
 
-	/* A enable. */
+	               
 	tst		$0, #(DAIF_ASYNCF)
 	b.eq		1f
 
-	/* Enable nothing. */
+	                     
 	b		4f
 
-	/* A enable. */
+	               
 1:
 	msr		DAIFClr, #(DAIFSC_ASYNCF)
 	b		4f
 
-	/* IF enable. */
+	                
 2:
 	msr		DAIFClr, #(DAIFSC_IRQF | DAIFSC_FIQF)
 	b		4f
 
-	/* AIF enable. */
+	                 
 3:
 	msr		DAIFClr, #(DAIFSC_IRQF | DAIFSC_FIQF | DAIFSC_ASYNCF)
 
-	/* Done! */
+	           
 4:
 .endmacro
 

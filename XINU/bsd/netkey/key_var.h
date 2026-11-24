@@ -1,4 +1,4 @@
-/*	$KAME: key_var.h,v 1.5 2000/02/22 14:06:41 itojun Exp $	*/
+                                                             
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -33,7 +33,7 @@
 #define _NETKEY_KEY_VAR_H_
 #include <sys/appleapiopts.h>
 
-/* sysctl */
+            
 #define KEYCTL_DEBUG_LEVEL              1
 #define KEYCTL_SPI_TRY                  2
 #define KEYCTL_SPI_MIN_VALUE            3
@@ -90,5 +90,5 @@
 #define _KEYBITS(key) ((u_int)((key)->sadb_key_bits))
 #define _KEYBUF(key) ((caddr_t)((caddr_t)(key) + sizeof(struct sadb_key)))
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETKEY_KEY_VAR_H_ */
+#endif                         
+#endif                         

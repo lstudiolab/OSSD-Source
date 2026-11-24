@@ -33,7 +33,7 @@
 #define IOSTATISTICS_SIG_USERCLIENT 'IOSU'
 #define IOSTATISTICS_SIG_WORKLOOP   'IOSW'
 
-/* Update when the binary format changes */
+                                           
 #define IOSTATISTICS_VER                        0x2
 
 enum {
@@ -59,11 +59,11 @@ enum {
 	kIOStatisticsUserClient
 };
 
-/* Keep our alignments as intended */
+                                     
 
 #pragma pack(4)
 
-/* Event Counters */
+                    
 
 typedef struct IOStatisticsInterruptEventSources {
 	uint32_t created;
@@ -105,13 +105,13 @@ typedef struct IOStatisticsUserClients {
 	uint32_t clientCalls;
 } IOStatisticsUserClients;
 
-/* General mode */
+                  
 
 typedef struct IOStatisticsHeader {
-	uint32_t sig; /* 'IOST' */
-	uint32_t ver; /* incremented with every data revision */
+	uint32_t sig;             
+	uint32_t ver;                                           
 
-	uint32_t seq; /* sequence ID */
+	uint32_t seq;                  
 
 	uint32_t globalStatsOffset;
 	uint32_t kextStatsOffset;
@@ -121,13 +121,13 @@ typedef struct IOStatisticsHeader {
 	uint32_t kextIdentifiersOffset;
 	uint32_t classNamesOffset;
 
-	/* struct IOStatisticsGlobal */
-	/* struct IOStatisticsKext */
-	/* struct IOStatisticsMemory */
-	/* struct IOStatisticsClass */
-	/* struct IOStatisticsCounter */
-	/* struct IOStatisticsKextIdentifier */
-	/* struct IOStatisticsClassName */
+	                               
+	                             
+	                               
+	                              
+	                                
+	                                       
+	                                  
 } IOStatisticsHeader;
 
 typedef struct IOStatisticsGlobal {
@@ -140,8 +140,8 @@ typedef struct IOStatisticsKext {
 	uint32_t loadTag;
 	uint32_t loadSize;
 	uint32_t wiredSize;
-	uint32_t classes; /* Number of classes owned */
-	uint32_t classIndexes[]; /* Variable length array of owned class indexes */
+	uint32_t classes;                              
+	uint32_t classIndexes[];                                                   
 } IOStatisticsKext;
 
 typedef struct IOStatisticsMemory {
@@ -181,7 +181,7 @@ typedef struct IOStatisticsClassName {
 	char name[kIOStatisticsClassNameLength];
 } IOStatisticsClassName;
 
-/* WorkLoop mode */
+                   
 
 typedef struct IOStatisticsWorkLoop {
 	uint32_t attachedEventSources;
@@ -192,14 +192,14 @@ typedef struct IOStatisticsWorkLoop {
 } IOStatisticsWorkLoop;
 
 typedef struct IOStatisticsWorkLoopHeader {
-	uint32_t sig; /* 'IOSW */
-	uint32_t ver; /* incremented with every data revision */
-	uint32_t seq; /* sequence ID */
+	uint32_t sig;            
+	uint32_t ver;                                           
+	uint32_t seq;                  
 	uint32_t workloopCount;
 	struct IOStatisticsWorkLoop workLoopStats;
 } IOStatisticsWorkLoopHeader;
 
-/* UserClient mode */
+                     
 
 typedef struct IOStatisticsUserClientCall {
 	char processName[kIOStatisticsProcessNameLength];
@@ -208,13 +208,13 @@ typedef struct IOStatisticsUserClientCall {
 } IOStatisticsUserClientCall;
 
 typedef struct IOStatisticsUserClientHeader {
-	uint32_t sig; /* 'IOSU */
-	uint32_t ver; /* incremented with every data revision */
-	uint32_t seq; /* sequence ID */
+	uint32_t sig;            
+	uint32_t ver;                                           
+	uint32_t seq;                  
 	uint32_t processes;
 	struct IOStatisticsUserClientCall userClientCalls[];
 } IOStatisticsUserClientHeader;
 
 #pragma pack()
 
-#endif /* _IOKIT_STATISTICS_H */
+#endif                          

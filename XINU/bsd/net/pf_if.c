@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$apfw: pf_if.c,v 1.4 2008/08/27 00:01:32 jhw Exp $ */
-/*	$OpenBSD: pf_if.c,v 1.46 2006/12/13 09:01:59 itojun Exp $ */
+                                                        
+                                                               
 
 /*
  * Copyright 2005 Henning Brauer <henning@openbsd.org>
@@ -116,7 +116,7 @@ RB_GENERATE(pfi_ifhead, pfi_kif, pfik_tree, pfi_if_compare);
 void
 pfi_initialize(void)
 {
-	if (pfi_all != NULL) {  /* already initialized */
+	if (pfi_all != NULL) {                           
 		return;
 	}
 
@@ -153,7 +153,7 @@ pfi_kif_get(const char *kif_name)
 		return kif;
 	}
 
-	/* create new one */
+	                    
 	if ((kif = _MALLOC(sizeof(*kif), PFI_MTYPE, M_WAITOK | M_ZERO)) == NULL) {
 		return NULL;
 	}
@@ -251,9 +251,9 @@ pfi_attach_ifnet(struct ifnet *ifp)
 	pfi_kif_update(kif);
 }
 
-/*
- * Caller holds ifnet lock as writer (exclusive);
- */
+  
+                                                 
+   
 void
 pfi_detach_ifnet(struct ifnet *ifp)
 {
@@ -291,7 +291,7 @@ pfi_match_addr(struct pfi_dynaddr *dyn, struct pf_addr *a, sa_family_t af)
 		default:
 			return pfr_match_addr(dyn->pfid_kt, a, AF_INET);
 		}
-#endif /* INET */
+#endif           
 	case AF_INET6:
 		switch (dyn->pfid_acnt6) {
 		case 0:
@@ -397,7 +397,7 @@ pfi_kif_update(struct pfi_kif *kif)
 
 	LCK_MTX_ASSERT(pf_lock, LCK_MTX_ASSERT_OWNED);
 
-	/* update all dynaddr */
+	                        
 	TAILQ_FOREACH(p, &kif->pfik_dynaddrs, entry)
 	pfi_dynaddr_update(p);
 }
@@ -416,7 +416,7 @@ pfi_dynaddr_update(struct pfi_dynaddr *dyn)
 	kt = dyn->pfid_kt;
 
 	if (kt->pfrkt_larg != pfi_update) {
-		/* this table needs to be brought up-to-date */
+		                                               
 		pfi_table_update(kt, kif, dyn->pfid_net, dyn->pfid_iflags);
 		kt->pfrkt_larg = pfi_update;
 	}
@@ -552,7 +552,7 @@ pfi_address_add(struct sockaddr *sa, uint8_t af, uint8_t net)
 			return;
 		}
 		memcpy(p, pfi_buffer, pfi_buffer_max * sizeof(*pfi_buffer));
-		/* no need to zero buffer */
+		                            
 		_FREE(pfi_buffer, PFI_MTYPE);
 		pfi_buffer = p;
 		pfi_buffer_max = new_max;
@@ -573,7 +573,7 @@ pfi_address_add(struct sockaddr *sa, uint8_t af, uint8_t net)
 			p->pfra_ip6addr.s6_addr16[1] = 0;
 		}
 	}
-	/* mask network address bits */
+	                               
 	if (net < 128) {
 		((caddr_t)p)[p->pfra_net / 8] &= ~(0xFF >> (p->pfra_net % 8));
 	}
@@ -656,7 +656,7 @@ pfi_update_status(const char *name, struct pf_status *pfs)
 			}
 		}
 	} else {
-		/* just clear statistics */
+		                           
 		bzero(p->pfik_packets, sizeof(p->pfik_packets));
 		bzero(p->pfik_bytes, sizeof(p->pfik_bytes));
 		p->pfik_tzero = pf_calendar_time_second();
@@ -684,7 +684,7 @@ pfi_get_ifaces(const char *name, user_addr_t buf, int *size)
 			}
 			pfi_kif_ref(p, PFI_KIF_REF_RULE);
 
-			/* return the user space version of pfi_kif */
+			                                              
 			bzero(&u, sizeof(u));
 			bcopy(p->pfik_name, &u.pfik_name, sizeof(u.pfik_name));
 			bcopy(p->pfik_packets, &u.pfik_packets,
@@ -718,17 +718,17 @@ pfi_skip_if(const char *filter, struct pfi_kif *p)
 		return 0;
 	}
 	if (strcmp(p->pfik_name, filter) == 0) {
-		return 0;     /* exact match */
+		return 0;                      
 	}
 	n = strlen(filter);
 	if (n < 1 || n >= IFNAMSIZ) {
-		return 1;     /* sanity check */
+		return 1;                       
 	}
 	if (filter[n - 1] >= '0' && filter[n - 1] <= '9') {
-		return 1;     /* only do exact match in that case */
+		return 1;                                           
 	}
 	if (strncmp(p->pfik_name, filter, n)) {
-		return 1;     /* prefix doesn't match */
+		return 1;                               
 	}
 	return p->pfik_name[n] < '0' || p->pfik_name[n] > '9';
 }
@@ -765,7 +765,7 @@ pfi_clear_flags(const char *name, int flags)
 	return 0;
 }
 
-/* from pf_print_state.c */
+                           
 uint8_t
 pfi_unmask(void *addr)
 {

@@ -41,21 +41,21 @@ __BEGIN_DECLS
 
 typedef unsigned int            lck_sleep_action_t;
 
-#define LCK_SLEEP_DEFAULT       0x00    /* Release the lock while waiting for the event, then reclaim */
-/* RW locks are returned in the same mode */
-#define LCK_SLEEP_UNLOCK        0x01    /* Release the lock and return unheld */
-#define LCK_SLEEP_SHARED        0x02    /* Reclaim the lock in shared mode (RW only) */
-#define LCK_SLEEP_EXCLUSIVE     0x04    /* Reclaim the lock in exclusive mode (RW only) */
-#define LCK_SLEEP_SPIN          0x08    /* Reclaim the lock in spin mode (mutex only) */
-#define LCK_SLEEP_PROMOTED_PRI  0x10    /* Sleep at a promoted priority */
-#define LCK_SLEEP_SPIN_ALWAYS   0x20    /* Reclaim the lock in spin-always mode (mutex only) */
+#define LCK_SLEEP_DEFAULT       0x00                                                                    
+                                            
+#define LCK_SLEEP_UNLOCK        0x01                                            
+#define LCK_SLEEP_SHARED        0x02                                                   
+#define LCK_SLEEP_EXCLUSIVE     0x04                                                      
+#define LCK_SLEEP_SPIN          0x08                                                    
+#define LCK_SLEEP_PROMOTED_PRI  0x10                                      
+#define LCK_SLEEP_SPIN_ALWAYS   0x20                                                           
 
-#define LCK_SLEEP_MASK          0x3f    /* Valid actions */
+#define LCK_SLEEP_MASK          0x3f                       
 
 typedef unsigned int            lck_wake_action_t;
 
-#define LCK_WAKE_DEFAULT                0x00 /* If waiters are present, transfer their push to the wokenup thread */
-#define LCK_WAKE_DO_NOT_TRANSFER_PUSH   0x01 /* Do not transfer waiters push when waking up */
+#define LCK_WAKE_DEFAULT                0x00                                                                        
+#define LCK_WAKE_DO_NOT_TRANSFER_PUSH   0x01                                                  
 
 #ifdef  XNU_KERNEL_PRIVATE
 #include <kern/startup.h>
@@ -69,9 +69,9 @@ extern lck_attr_t      LockDefaultLckAttr;
 #define LCK_ATTR_NONE                   0
 #define LCK_ATTR_DEBUG                  0x00000001
 #define LCK_ATTR_RW_SHARED_PRIORITY     0x00010000
-#else /* !XNU_KERNEL_PRIVATE */
+#else                          
 typedef struct __lck_attr__ lck_attr_t;
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 
 #define LCK_ATTR_NULL (lck_attr_t *)NULL
 
@@ -89,11 +89,11 @@ extern  void            lck_attr_cleardebug(
 #ifdef  XNU_KERNEL_PRIVATE
 
 #if __x86_64__
-/*
- * Extended mutexes are only implemented on x86_64
- */
+  
+                                                  
+   
 #define HAS_EXT_MUTEXES 1
-#endif /* __x86_64__ */
+#endif                 
 
 typedef union {
 	uint16_t tcurnext;
@@ -115,7 +115,7 @@ void lck_ticket_lock(lck_ticket_t *tlock, lck_grp_t *grp);
 #else
 void lck_ticket_lock(lck_ticket_t *tlock);
 #define lck_ticket_lock(tlock, grp) lck_ticket_lock(tlock)
-#endif /* LOCK_STATS */
+#endif                 
 
 void lck_ticket_unlock(lck_ticket_t *tlock);
 void lck_ticket_assert_owned(lck_ticket_t *tlock);
@@ -201,7 +201,7 @@ extern boolean_t        lck_spin_try_lock_nopreempt_grp(
 	lck_spin_t              *lck,
 	lck_grp_t               *grp);
 
-/* NOT SAFE: To be used only by kernel debugger to avoid deadlock. */
+                                                                     
 extern boolean_t        kdp_lck_spin_is_acquired(
 	lck_spin_t              *lck);
 
@@ -252,139 +252,139 @@ extern wait_result_t    lck_mtx_sleep_deadline(
 	uint64_t                deadline);
 
 #ifdef KERNEL_PRIVATE
-/*
- * Name: lck_spin_sleep_with_inheritor
- *
- * Description: deschedule the current thread and wait on the waitq associated with event to be woken up.
- *              While waiting, the sched priority of the waiting thread will contribute to the push of the event that will
- *              be directed to the inheritor specified.
- *              An interruptible mode and deadline can be specified to return earlier from the wait.
- *
- * Args:
- *   Arg1: lck_spin_t lock used to protect the sleep. The lock will be dropped while sleeping and reaquired before returning according to the sleep action specified.
- *   Arg2: sleep action. LCK_SLEEP_DEFAULT, LCK_SLEEP_UNLOCK.
- *   Arg3: event to wait on.
- *   Arg4: thread to propagate the event push to.
- *   Arg5: interruptible flag for wait.
- *   Arg6: deadline for wait.
- *
- * Conditions: Lock must be held. Returns with the lock held according to the sleep action specified.
- *             Lock will be dropped while waiting.
- *             The inheritor specified cannot run in user space until another inheritor is specified for the event or a
- *             wakeup for the event is called.
- *
- * Returns: result of the wait.
- */
+  
+                                      
+  
+                                                                                                         
+                                                                                                                          
+                                                       
+                                                                                                    
+  
+        
+                                                                                                                                                                     
+                                                             
+                            
+                                                 
+                                       
+                             
+  
+                                                                                                     
+                                                  
+                                                                                                                       
+                                              
+  
+                               
+   
 extern wait_result_t lck_spin_sleep_with_inheritor(lck_spin_t *lock, lck_sleep_action_t lck_sleep_action, event_t event, thread_t inheritor, wait_interrupt_t interruptible, uint64_t deadline);
 
-/*
- * Name: lck_mtx_sleep_with_inheritor
- *
- * Description: deschedule the current thread and wait on the waitq associated with event to be woken up.
- *              While waiting, the sched priority of the waiting thread will contribute to the push of the event that will
- *              be directed to the inheritor specified.
- *              An interruptible mode and deadline can be specified to return earlier from the wait.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the sleep. The lock will be dropped while sleeping and reaquired before returning according to the sleep action specified.
- *   Arg2: sleep action. LCK_SLEEP_DEFAULT, LCK_SLEEP_UNLOCK, LCK_SLEEP_SPIN, LCK_SLEEP_SPIN_ALWAYS.
- *   Arg3: event to wait on.
- *   Arg4: thread to propagate the event push to.
- *   Arg5: interruptible flag for wait.
- *   Arg6: deadline for wait.
- *
- * Conditions: Lock must be held. Returns with the lock held according to the sleep action specified.
- *             Lock will be dropped while waiting.
- *             The inheritor specified cannot run in user space until another inheritor is specified for the event or a
- *             wakeup for the event is called.
- *
- * Returns: result of the wait.
- */
+  
+                                     
+  
+                                                                                                         
+                                                                                                                          
+                                                       
+                                                                                                    
+  
+        
+                                                                                                                                                                    
+                                                                                                    
+                            
+                                                 
+                                       
+                             
+  
+                                                                                                     
+                                                  
+                                                                                                                       
+                                              
+  
+                               
+   
 extern wait_result_t lck_mtx_sleep_with_inheritor(lck_mtx_t *lock, lck_sleep_action_t lck_sleep_action, event_t event, thread_t inheritor, wait_interrupt_t interruptible, uint64_t deadline);
 
-/*
- * Name: lck_mtx_sleep_with_inheritor
- *
- * Description: deschedule the current thread and wait on the waitq associated with event to be woken up.
- *              While waiting, the sched priority of the waiting thread will contribute to the push of the event that will
- *              be directed to the inheritor specified.
- *              An interruptible mode and deadline can be specified to return earlier from the wait.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the sleep. The lock will be dropped while sleeping and reaquired before returning according to the sleep action specified.
- *   Arg2: sleep action. LCK_SLEEP_DEFAULT, LCK_SLEEP_SHARED, LCK_SLEEP_EXCLUSIVE.
- *   Arg3: event to wait on.
- *   Arg4: thread to propagate the event push to.
- *   Arg5: interruptible flag for wait.
- *   Arg6: deadline for wait.
- *
- * Conditions: Lock must be held. Returns with the lock held according to the sleep action specified.
- *             Lock will be dropped while waiting.
- *             The inheritor specified cannot run in user space until another inheritor is specified for the event or a
- *             wakeup for the event is called.
- *
- * Returns: result of the wait.
- */
+  
+                                     
+  
+                                                                                                         
+                                                                                                                          
+                                                       
+                                                                                                    
+  
+        
+                                                                                                                                                                   
+                                                                                  
+                            
+                                                 
+                                       
+                             
+  
+                                                                                                     
+                                                  
+                                                                                                                       
+                                              
+  
+                               
+   
 extern wait_result_t lck_rw_sleep_with_inheritor(lck_rw_t *lock, lck_sleep_action_t lck_sleep_action, event_t event, thread_t inheritor, wait_interrupt_t interruptible, uint64_t deadline);
 
-/*
- * Name: wakeup_one_with_inheritor
- *
- * Description: wake up one waiter for event if any. The thread woken up will be the one with the higher sched priority waiting on event.
- *              The push for the event will be transferred from the last inheritor to the woken up thread.
- *
- * Args:
- *   Arg1: event to wake from.
- *   Arg2: wait result to pass to the woken up thread.
- *   Arg3: pointer for storing the thread wokenup.
- *
- * Returns: KERN_NOT_WAITING if no threads were waiting, KERN_SUCCESS otherwise.
- *
- * Conditions: The new inheritor wokenup cannot run in user space until another inheritor is specified for the event or a
- *             wakeup for the event is called.
- *             A reference for the wokenup thread is acquired.
- *             NOTE: this cannot be called from interrupt context.
- */
+  
+                                  
+  
+                                                                                                                                         
+                                                                                                          
+  
+        
+                              
+                                                      
+                                                  
+  
+                                                                                
+  
+                                                                                                                         
+                                              
+                                                              
+                                                                  
+   
 extern kern_return_t wakeup_one_with_inheritor(event_t event, wait_result_t result, lck_wake_action_t action, thread_t *thread_wokenup);
 
-/*
- * Name: wakeup_all_with_inheritor
- *
- * Description: wake up all waiters waiting for event. The old inheritor will lose the push.
- *
- * Args:
- *   Arg1: event to wake from.
- *   Arg2: wait result to pass to the woken up threads.
- *
- * Returns: KERN_NOT_WAITING if no threads were waiting, KERN_SUCCESS otherwise.
- *
- * Conditions: NOTE: this cannot be called from interrupt context.
- */
+  
+                                  
+  
+                                                                                            
+  
+        
+                              
+                                                       
+  
+                                                                                
+  
+                                                                  
+   
 extern kern_return_t wakeup_all_with_inheritor(event_t event, wait_result_t result);
 
-/*
- * Name: change_sleep_inheritor
- *
- * Description: Redirect the push of the waiting threads of event to the new inheritor specified.
- *
- * Args:
- *   Arg1: event to redirect the push.
- *   Arg2: new inheritor for event.
- *
- * Returns: KERN_NOT_WAITING if no threads were waiting, KERN_SUCCESS otherwise.
- *
- * Conditions: In case of success, the new inheritor cannot run in user space until another inheritor is specified for the event or a
- *             wakeup for the event is called.
- *             NOTE: this cannot be called from interrupt context.
- */
+  
+                               
+  
+                                                                                                 
+  
+        
+                                      
+                                   
+  
+                                                                                
+  
+                                                                                                                                     
+                                              
+                                                                  
+   
 extern kern_return_t change_sleep_inheritor(event_t event, thread_t inheritor);
 
-/*
- * gate structure
- */
+  
+                 
+   
 typedef struct gate {
-	uintptr_t gate_data; // thread holder, interlock bit and waiter bit
-	struct turnstile *turnstile; // protected by the interlock bit
+	uintptr_t gate_data;                                               
+	struct turnstile *turnstile;                                  
 } gate_t;
 
 #define GATE_ILOCK_BIT   0
@@ -403,426 +403,426 @@ typedef struct gate {
 #define GATE_STATE_TO_THREAD(state) (thread_t)(state & GATE_THREAD_MASK)
 #define GATE_THREAD_TO_STATE(thread) ((uintptr_t)thread)
 
-/*
- * Possible gate_wait_result_t values.
- */
+  
+                                      
+   
 typedef int gate_wait_result_t;
 #define GATE_HANDOFF       0
 #define GATE_OPENED        1
 #define GATE_TIMED_OUT     2
 #define GATE_INTERRUPTED   3
 
-/*
- * Gate flags used by gate_assert
- */
+  
+                                 
+   
 #define GATE_ASSERT_CLOSED         0
 #define GATE_ASSERT_OPEN           1
 #define GATE_ASSERT_HELD           2
 
-/*
- * Gate flags used by gate_handoff
- */
+  
+                                  
+   
 #define GATE_HANDOFF_DEFAULT                    0
 #define GATE_HANDOFF_OPEN_IF_NO_WAITERS         1
 
 #define GATE_EVENT(gate)     ((event_t) gate)
 #define EVENT_TO_GATE(event) ((gate_t *) event)
 
-/*
- * Name: decl_lck_rw_gate_data
- *
- * Description: declares a gate variable with specified storage class.
- *              The gate itself will be stored in this variable and it is the caller's responsibility
- *              to ensure that this variable's memory is going to be accessible by all threads that will use
- *              the gate.
- *              Every gate function will require a pointer to this variable as parameter. The same pointer should
- *              be used in every thread.
- *
- *              The variable needs to be initialized once with lck_rw_gate_init() and destroyed once with
- *              lck_rw_gate_destroy() when not needed anymore.
- *
- *              The gate will be used in conjunction with a lck_rw_t.
- *
- * Args:
- *   Arg1: storage class.
- *   Arg2: variable name.
- */
+  
+                              
+  
+                                                                      
+                                                                                                     
+                                                                                                            
+                         
+                                                                                                                 
+                                        
+  
+                                                                                                         
+                                                              
+  
+                                                                     
+  
+        
+                         
+                         
+   
 #define decl_lck_rw_gate_data(class, name)                              class gate_t name
 
-/*
- * Name: lck_rw_gate_init
- *
- * Description: initializes a variable declared with decl_lck_rw_gate_data.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- */
+  
+                         
+  
+                                                                           
+  
+        
+                                                  
+                                                                        
+   
 extern void lck_rw_gate_init(lck_rw_t *lock, gate_t *gate);
 
-/*
- * Name: lck_rw_gate_destroy
- *
- * Description: destroys a variable previously initialized.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- */
+  
+                            
+  
+                                                           
+  
+        
+                                                  
+                                                                        
+   
 extern void lck_rw_gate_destroy(lck_rw_t *lock, gate_t *gate);
 
-/*
- * Name: lck_rw_gate_try_close
- *
- * Description: Tries to close the gate.
- *              In case of success the current thread will be set as
- *              the holder of the gate.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *
- * Returns:
- *          KERN_SUCCESS in case the gate was successfully closed. The current thread is the new holder
- *          of the gate.
- *          A matching lck_rw_gate_open() or lck_rw_gate_handoff() needs to be called later on
- *          to wake up possible waiters on the gate before returning to userspace.
- *          If the intent is to conditionally probe the gate before waiting, the lock must not be dropped
- *          between the calls to lck_rw_gate_try_close() and lck_rw_gate_wait().
- *
- *          KERN_FAILURE in case the gate was already closed. Will panic if the current thread was already the holder of the gate.
- *          lck_rw_gate_wait() should be called instead if the intent is to unconditionally wait on this gate.
- *          The calls to lck_rw_gate_try_close() and lck_rw_gate_wait() should
- *          be done without dropping the lock that is protecting the gate in between.
- */
+  
+                              
+  
+                                        
+                                                                    
+                                       
+  
+        
+                                                  
+                                                                        
+  
+                                                             
+  
+           
+                                                                                                       
+                        
+                                                                                              
+                                                                                  
+                                                                                                         
+                                                                                
+  
+                                                                                                                                  
+                                                                                                              
+                                                                              
+                                                                                     
+   
 extern kern_return_t lck_rw_gate_try_close(lck_rw_t *lock, gate_t *gate);
 
-/*
- * Name: lck_rw_gate_close
- *
- * Description: Closes the gate. The current thread will be set as
- *              the holder of the gate. Will panic if the gate is already closed.
- *              A matching lck_rw_gate_open() or lck_rw_gate_handoff() needs to be called later on
- *              to wake up possible waiters on the gate before returning to userspace.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The gate must be open.
- *
- */
+  
+                          
+  
+                                                                  
+                                                                                 
+                                                                                                  
+                                                                                      
+  
+        
+                                                  
+                                                                        
+  
+                                                             
+                                     
+  
+   
 extern void lck_rw_gate_close(lck_rw_t *lock, gate_t *gate);
 
 
-/*
- * Name: lck_rw_gate_open
- *
- * Description: Opens the gate and wakes up possible waiters.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The current thread must be the holder of the gate.
- *
- */
+  
+                         
+  
+                                                             
+  
+        
+                                                  
+                                                                        
+  
+                                                             
+                                                                 
+  
+   
 extern void lck_rw_gate_open(lck_rw_t *lock, gate_t *gate);
 
-/*
- * Name: lck_rw_gate_handoff
- *
- * Description: Tries to transfer the ownership of the gate. The waiter with highest sched
- *              priority will be selected as the new holder of the gate, and woken up,
- *              with the gate remaining in the closed state throughout.
- *              If no waiters are present, the gate will be kept closed and KERN_NOT_WAITING
- *              will be returned.
- *              GATE_HANDOFF_OPEN_IF_NO_WAITERS flag can be used to specify if the gate should be opened in
- *              case no waiters were found.
- *
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *   Arg3: flags - GATE_HANDOFF_DEFAULT or GATE_HANDOFF_OPEN_IF_NO_WAITERS
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The current thread must be the holder of the gate.
- *
- * Returns:
- *          KERN_SUCCESS in case one of the waiters became the new holder.
- *          KERN_NOT_WAITING in case there were no waiters.
- *
- */
+  
+                            
+  
+                                                                                          
+                                                                                      
+                                                                       
+                                                                                            
+                                 
+                                                                                                           
+                                           
+  
+  
+        
+                                                  
+                                                                        
+                                                                          
+  
+                                                             
+                                                                 
+  
+           
+                                                                          
+                                                           
+  
+   
 extern kern_return_t lck_rw_gate_handoff(lck_rw_t *lock, gate_t *gate, int flags);
 
-/*
- * Name: lck_rw_gate_steal
- *
- * Description: Set the current ownership of the gate. It sets the current thread as the
- *              new holder of the gate.
- *              A matching lck_rw_gate_open() or lck_rw_gate_handoff() needs to be called later on
- *              to wake up possible waiters on the gate before returning to userspace.
- *              NOTE: the previous holder should not call lck_rw_gate_open() or lck_rw_gate_handoff()
- *              anymore.
- *
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The gate must be closed and the current thread must not already be the holder.
- *
- */
+  
+                          
+  
+                                                                                        
+                                       
+                                                                                                  
+                                                                                      
+                                                                                                     
+                        
+  
+  
+        
+                                                  
+                                                                        
+  
+                                                             
+                                                                                             
+  
+   
 extern void lck_rw_gate_steal(lck_rw_t *lock, gate_t *gate);
 
-/*
- * Name: lck_rw_gate_wait
- *
- * Description: Waits for the current thread to become the holder of the gate or for the
- *              gate to become open. An interruptible mode and deadline can be specified
- *              to return earlier from the wait.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *   Arg3: sleep action. LCK_SLEEP_DEFAULT, LCK_SLEEP_SHARED, LCK_SLEEP_EXCLUSIVE.
- *   Arg3: interruptible flag for wait.
- *   Arg4: deadline
- *
- * Conditions: Lock must be held. Returns with the lock held according to the sleep action specified.
- *             Lock will be dropped while waiting.
- *             The gate must be closed.
- *
- * Returns: Reason why the thread was woken up.
- *          GATE_HANDOFF - the current thread was handed off the ownership of the gate.
- *                         A matching lck_rw_gate_open() or lck_rw_gate_handoff() needs to be called later on
- *                         to wake up possible waiters on the gate before returning to userspace.
- *          GATE_OPENED - the gate was opened by the holder.
- *          GATE_TIMED_OUT - the thread was woken up by a timeout.
- *          GATE_INTERRUPTED - the thread was interrupted while sleeping.
- *
- */
+  
+                         
+  
+                                                                                        
+                                                                                        
+                                                
+  
+        
+                                                  
+                                                                        
+                                                                                  
+                                       
+                   
+  
+                                                                                                     
+                                                  
+                                       
+  
+                                               
+                                                                                       
+                                                                                                             
+                                                                                                 
+                                                            
+                                                                  
+                                                                         
+  
+   
 extern gate_wait_result_t lck_rw_gate_wait(lck_rw_t *lock, gate_t *gate, lck_sleep_action_t lck_sleep_action, wait_interrupt_t interruptible, uint64_t deadline);
 
-/*
- * Name: lck_rw_gate_assert
- *
- * Description: asserts that the gate is in the specified state.
- *
- * Args:
- *   Arg1: lck_rw_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_rw_gate_data.
- *   Arg3: flags to specified assert type.
- *         GATE_ASSERT_CLOSED - the gate is currently closed
- *         GATE_ASSERT_OPEN - the gate is currently opened
- *         GATE_ASSERT_HELD - the gate is currently closed and the current thread is the holder
- */
+  
+                           
+  
+                                                                
+  
+        
+                                                  
+                                                                        
+                                          
+                                                            
+                                                          
+                                                                                               
+   
 extern void lck_rw_gate_assert(lck_rw_t *lock, gate_t *gate, int flags);
 
-/*
- * Name: decl_lck_mtx_gate_data
- *
- * Description: declares a gate variable with specified storage class.
- *              The gate itself will be stored in this variable and it is the caller's responsibility
- *              to ensure that this variable's memory is going to be accessible by all threads that will use
- *              the gate.
- *              Every gate function will require a pointer to this variable as parameter. The same pointer should
- *              be used in every thread.
- *
- *              The variable needs to be initialized once with lck_mtx_gate_init() and destroyed once with
- *              lck_mtx_gate_destroy() when not needed anymore.
- *
- *              The gate will be used in conjunction with a lck_mtx_t.
- *
- * Args:
- *   Arg1: storage class.
- *   Arg2: variable name.
- */
+  
+                               
+  
+                                                                      
+                                                                                                     
+                                                                                                            
+                         
+                                                                                                                 
+                                        
+  
+                                                                                                          
+                                                               
+  
+                                                                      
+  
+        
+                         
+                         
+   
 #define decl_lck_mtx_gate_data(class, name)                             class gate_t name
 
-/*
- * Name: lck_mtx_gate_init
- *
- * Description: initializes a variable declared with decl_lck_mtx_gate_data.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- */
+  
+                          
+  
+                                                                            
+  
+        
+                                                   
+                                                                         
+   
 extern void lck_mtx_gate_init(lck_mtx_t *lock, gate_t *gate);
 
-/*
- * Name: lck_mtx_gate_destroy
- *
- * Description: destroys a variable previously initialized
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- */
+  
+                             
+  
+                                                          
+  
+        
+                                                   
+                                                                         
+   
 extern void lck_mtx_gate_destroy(lck_mtx_t *lock, gate_t *gate);
 
-/*
- * Name: lck_mtx_gate_try_close
- *
- * Description: Tries to close the gate.
- *              In case of success the current thread will be set as
- *              the holder of the gate.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *
- * Returns:
- *          KERN_SUCCESS in case the gate was successfully closed. The current thread is the new holder
- *          of the gate.
- *          A matching lck_mtx_gate_open() or lck_mtx_gate_handoff() needs to be called later on
- *          to wake up possible waiters on the gate before returning to userspace.
- *          If the intent is to conditionally probe the gate before waiting, the lock must not be dropped
- *          between the calls to lck_mtx_gate_try_close() and lck_mtx_gate_wait().
- *
- *          KERN_FAILURE in case the gate was already closed. Will panic if the current thread was already the holder of the gate.
- *          lck_mtx_gate_wait() should be called instead if the intent is to unconditionally wait on this gate.
- *          The calls to lck_mtx_gate_try_close() and lck_mtx_gate_wait() should
- *          be done without dropping the lock that is protecting the gate in between.
- */
+  
+                               
+  
+                                        
+                                                                    
+                                       
+  
+        
+                                                   
+                                                                         
+  
+                                                             
+  
+           
+                                                                                                       
+                        
+                                                                                                
+                                                                                  
+                                                                                                         
+                                                                                  
+  
+                                                                                                                                  
+                                                                                                               
+                                                                                
+                                                                                     
+   
 extern kern_return_t lck_mtx_gate_try_close(lck_mtx_t *lock, gate_t *gate);
 
-/*
- * Name: lck_mtx_gate_close
- *
- * Description: Closes the gate. The current thread will be set as
- *              the holder of the gate. Will panic if the gate is already closed.
- *              A matching lck_mtx_gate_open() or lck_mtx_gate_handoff() needs to be called later on
- *              to wake up possible waiters on the gate before returning to userspace.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The gate must be open.
- *
- */
+  
+                           
+  
+                                                                  
+                                                                                 
+                                                                                                    
+                                                                                      
+  
+        
+                                                   
+                                                                         
+  
+                                                             
+                                     
+  
+   
 extern void lck_mtx_gate_close(lck_mtx_t *lock, gate_t *gate);
 
-/*
- * Name: lck_mtx_gate_open
- *
- * Description: Opens of the gate and wakes up possible waiters.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The current thread must be the holder of the gate.
- *
- */
+  
+                          
+  
+                                                                
+  
+        
+                                                   
+                                                                         
+  
+                                                             
+                                                                 
+  
+   
 extern void lck_mtx_gate_open(lck_mtx_t *lock, gate_t *gate);
 
-/*
- * Name: lck_mtx_gate_handoff
- *
- * Description: Set the current ownership of the gate. The waiter with highest sched
- *              priority will be selected as the new holder of the gate, and woken up,
- *              with the gate remaining in the closed state throughout.
- *              If no waiters are present, the gate will be kept closed and KERN_NOT_WAITING
- *              will be returned.
- *              OPEN_ON_FAILURE flag can be used to specify if the gate should be opened in
- *              case no waiters were found.
- *
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *   Arg3: flags - GATE_NO_FALGS or OPEN_ON_FAILURE
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The current thread must be the holder of the gate.
- *
- * Returns:
- *          KERN_SUCCESS in case one of the waiters became the new holder.
- *          KERN_NOT_WAITING in case there were no waiters.
- *
- */
+  
+                             
+  
+                                                                                    
+                                                                                      
+                                                                       
+                                                                                            
+                                 
+                                                                                           
+                                           
+  
+  
+        
+                                                   
+                                                                         
+                                                   
+  
+                                                             
+                                                                 
+  
+           
+                                                                          
+                                                           
+  
+   
 extern kern_return_t lck_mtx_gate_handoff(lck_mtx_t *lock, gate_t *gate, int flags);
 
-/*
- * Name: lck_mtx_gate_steal
- *
- * Description: Steals the ownership of the gate. It sets the current thread as the
- *              new holder of the gate.
- *              A matching lck_mtx_gate_open() or lck_mtx_gate_handoff() needs to be called later on
- *              to wake up possible waiters on the gate before returning to userspace.
- *              NOTE: the previous holder should not call lck_mtx_gate_open() or lck_mtx_gate_handoff()
- *              anymore.
- *
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *
- * Conditions: Lock must be held. Returns with the lock held.
- *             The gate must be closed and the current thread must not already be the holder.
- *
- */
+  
+                           
+  
+                                                                                   
+                                       
+                                                                                                    
+                                                                                      
+                                                                                                       
+                        
+  
+  
+        
+                                                   
+                                                                         
+  
+                                                             
+                                                                                             
+  
+   
 extern void lck_mtx_gate_steal(lck_mtx_t *lock, gate_t *gate);
 
-/*
- * Name: lck_mtx_gate_wait
- *
- * Description: Waits for the current thread to become the holder of the gate or for the
- *              gate to become open. An interruptible mode and deadline can be specified
- *              to return earlier from the wait.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *   Arg3: sleep action. LCK_SLEEP_DEFAULT, LCK_SLEEP_UNLOCK, LCK_SLEEP_SPIN, LCK_SLEEP_SPIN_ALWAYS.
- *   Arg3: interruptible flag for wait.
- *   Arg4: deadline
- *
- * Conditions: Lock must be held. Returns with the lock held according to the sleep action specified.
- *             Lock will be dropped while waiting.
- *             The gate must be closed.
- *
- * Returns: Reason why the thread was woken up.
- *          GATE_HANDOFF - the current thread was handed off the ownership of the gate.
- *                         A matching lck_mtx_gate_open() or lck_mtx_gate_handoff() needs to be called later on
- *                         to wake up possible waiters on the gate before returning to userspace.
- *          GATE_OPENED - the gate was opened by the holder.
- *          GATE_TIMED_OUT - the thread was woken up by a timeout.
- *          GATE_INTERRUPTED - the thread was interrupted while sleeping.
- *
- */
+  
+                          
+  
+                                                                                        
+                                                                                        
+                                                
+  
+        
+                                                   
+                                                                         
+                                                                                                    
+                                       
+                   
+  
+                                                                                                     
+                                                  
+                                       
+  
+                                               
+                                                                                       
+                                                                                                               
+                                                                                                 
+                                                            
+                                                                  
+                                                                         
+  
+   
 extern gate_wait_result_t lck_mtx_gate_wait(lck_mtx_t *lock, gate_t *gate, lck_sleep_action_t lck_sleep_action, wait_interrupt_t interruptible, uint64_t deadline);
 
-/*
- * Name: lck_mtx_gate_assert
- *
- * Description: asserts that the gate is in the specified state.
- *
- * Args:
- *   Arg1: lck_mtx_t lock used to protect the gate.
- *   Arg2: pointer to the gate data declared with decl_lck_mtx_gate_data.
- *   Arg3: flags to specified assert type.
- *         GATE_ASSERT_CLOSED - the gate is currently closed
- *         GATE_ASSERT_OPEN - the gate is currently opened
- *         GATE_ASSERT_HELD - the gate is currently closed and the current thread is the holder
- */
+  
+                            
+  
+                                                                
+  
+        
+                                                   
+                                                                         
+                                          
+                                                            
+                                                          
+                                                                                               
+   
 extern void lck_mtx_gate_assert(lck_mtx_t *lock, gate_t *gate, int flags);
 
 
-#endif //KERNEL_PRIVATE
+#endif                 
 
 #if DEVELOPMENT || DEBUG
 #define FULL_CONTENDED 0
@@ -876,7 +876,7 @@ extern void             lck_spin_assert(
 extern boolean_t        kdp_lck_rw_lock_is_acquired_exclusive(
 	lck_rw_t                *lck);
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 extern void             lck_mtx_assert(
 	lck_mtx_t               *lck,
@@ -886,21 +886,21 @@ extern void             lck_mtx_assert(
 #define LCK_MTX_ASSERT(lck, type) lck_mtx_assert((lck),(type))
 #define LCK_SPIN_ASSERT(lck, type) lck_spin_assert((lck),(type))
 #define LCK_RW_ASSERT(lck, type) lck_rw_assert((lck),(type))
-#else /* MACH_ASSERT */
+#else                  
 #define LCK_MTX_ASSERT(lck, type)
 #define LCK_SPIN_ASSERT(lck, type)
 #define LCK_RW_ASSERT(lck, type)
-#endif /* MACH_ASSERT */
+#endif                  
 
 #if DEBUG
 #define LCK_MTX_ASSERT_DEBUG(lck, type) lck_mtx_assert((lck),(type))
 #define LCK_SPIN_ASSERT_DEBUG(lck, type) lck_spin_assert((lck),(type))
 #define LCK_RW_ASSERT_DEBUG(lck, type) lck_rw_assert((lck),(type))
-#else /* DEBUG */
+#else            
 #define LCK_MTX_ASSERT_DEBUG(lck, type)
 #define LCK_SPIN_ASSERT_DEBUG(lck, type)
 #define LCK_RW_ASSERT_DEBUG(lck, type)
-#endif /* DEBUG */
+#endif            
 
 #define LCK_ASSERT_OWNED                1
 #define LCK_ASSERT_NOTOWNED             2
@@ -976,18 +976,18 @@ extern boolean_t        lck_rw_lock_yield_shared(
 
 extern void             lck_rw_lock_exclusive(
 	lck_rw_t                *lck);
-/*
- *	Grabs the lock exclusive.
- *	Returns true iff the thread spun or blocked while attempting to
- *	acquire the lock.
- *
- *	Note that the return value is ONLY A HEURISTIC w.r.t. the lock's
- *	contention.
- *
- *	This routine IS EXPERIMENTAL.
- *	It's only used for the vm object lock, and use for other subsystems
- *	is UNSUPPORTED.
- */
+  
+                            
+                                                                  
+                    
+  
+                                                                   
+              
+  
+                                
+                                                                      
+                  
+   
 extern bool                             lck_rw_lock_exclusive_check_contended(
 	lck_rw_t                *lck);
 
@@ -995,11 +995,11 @@ extern void             lck_rw_unlock_exclusive(
 	lck_rw_t                *lck);
 
 #ifdef  XNU_KERNEL_PRIVATE
-/*
- * CAUTION
- * read-write locks do not have a concept of ownership, so lck_rw_assert()
- * merely asserts that someone is holding the lock, not necessarily the caller.
- */
+  
+          
+                                                                          
+                                                                               
+   
 extern void             lck_rw_assert(
 	lck_rw_t                *lck,
 	unsigned int            type);
@@ -1008,7 +1008,7 @@ extern void lck_rw_clear_promotion(thread_t thread, uintptr_t trace_obj);
 extern void lck_rw_set_promotion_locked(thread_t thread);
 
 uintptr_t unslide_for_kdebug(void* object);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef  KERNEL_PRIVATE
 
@@ -1095,24 +1095,24 @@ extern void             lck_mtx_startup_init(
 extern void             lck_rw_startup_init(
 	struct lck_rw_startup_spec *spec);
 
-/*
- * Auto-initializing locks declarations
- * ------------------------------------
- *
- * Unless you need to configure your locks in very specific ways,
- * there is no point creating explicit lock attributes. For most
- * static locks, these declaration macros can be used:
- *
- * - LCK_SPIN_DECLARE for spinlocks,
- * - LCK_MTX_EARLY_DECLARE for mutexes initialized before memory
- *   allocations are possible,
- * - LCK_MTX_DECLARE for mutexes,
- * - LCK_RW_DECLARE for reader writer locks.
- *
- * For cases when some particular attributes need to be used,
- * these come in *_ATTR variants that take a variable declared with
- * LCK_ATTR_DECLARE as an argument.
- */
+  
+                                       
+                                       
+  
+                                                                 
+                                                                
+                                                      
+  
+                                    
+                                                                
+                              
+                                 
+                                            
+  
+                                                             
+                                                                   
+                                   
+   
 #define LCK_ATTR_DECLARE(var, set_flags, clear_flags) \
 	SECURITY_READ_ONLY_LATE(lck_attr_t) var; \
 	static __startup_data struct lck_attr_startup_spec \
@@ -1161,8 +1161,8 @@ extern void             lck_rw_startup_init(
 #define LCK_RW_DECLARE(var, grp) \
 	LCK_RW_DECLARE_ATTR(var, grp, LCK_ATTR_NULL)
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
-#endif /* _KERN_LOCKS_H_ */
+#endif                     

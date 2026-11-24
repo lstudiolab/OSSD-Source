@@ -36,51 +36,51 @@
 #ifdef BSD_KERNEL_PRIVATE
 #include <sys/mbuf.h>
 #include <sys/socketvar.h>
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 __BEGIN_DECLS
 
 #ifdef PRIVATE
 
-/*
- * Kernel control name for an instance of a Content Filter
- * Use CTLIOCGINFO to find out the corresponding kernel control id
- * to be set in the sc_id field of sockaddr_ctl for connect(2)
- * Note: the sc_unit is ephemeral
- */
+  
+                                                          
+                                                                  
+                                                              
+                                 
+   
 #define CONTENT_FILTER_CONTROL_NAME "com.apple.content-filter"
 
-/*
- * Opaque socket identifier
- */
+  
+                           
+   
 typedef uint64_t cfil_sock_id_t;
 
 #define CFIL_SOCK_ID_NONE UINT64_MAX
 
 
-/*
- * CFIL_OPT_NECP_CONTROL_UNIT
- * To set or get the NECP filter control unit for the kernel control socket
- * The option level is SYSPROTO_CONTROL
- */
-#define CFIL_OPT_NECP_CONTROL_UNIT      1       /* uint32_t */
+  
+                             
+                                                                           
+                                       
+   
+#define CFIL_OPT_NECP_CONTROL_UNIT      1                     
 
-/*
- * CFIL_OPT_GET_SOCKET_INFO
- * To get information about a given socket that is being filtered.
- */
-#define CFIL_OPT_GET_SOCKET_INFO        2       /* uint32_t */
+  
+                           
+                                                                  
+   
+#define CFIL_OPT_GET_SOCKET_INFO        2                     
 
-/*
- * struct cfil_opt_sock_info
- *
- * Contains information about a socket that is being filtered.
- */
+  
+                            
+  
+                                                              
+   
 struct cfil_opt_sock_info {
 	cfil_sock_id_t  cfs_sock_id;
-	int                             cfs_sock_family;        /* e.g. PF_INET */
-	int                             cfs_sock_type;          /* e.g. SOCK_STREAM */
-	int                             cfs_sock_protocol;      /* e.g. IPPROTO_TCP */
+	int                             cfs_sock_family;                          
+	int                             cfs_sock_type;                                
+	int                             cfs_sock_protocol;                            
 	union sockaddr_in_4_6   cfs_local;
 	union sockaddr_in_4_6   cfs_remote;
 	pid_t                   cfs_pid;
@@ -89,9 +89,9 @@ struct cfil_opt_sock_info {
 	uuid_t                  cfs_e_uuid;
 };
 
-/*
- * How many filter may be active simultaneously
- */
+  
+                                               
+   
 #if !TARGET_OS_OSX && !defined(XNU_TARGET_OS_OSX)
 #define CFIL_MAX_FILTER_COUNT   2
 #else
@@ -99,9 +99,9 @@ struct cfil_opt_sock_info {
 #endif
 
 
-/*
- * Crypto Support
- */
+  
+                 
+   
 #define CFIL_CRYPTO 1
 #define CFIL_CRYPTO_SIGNATURE_SIZE 32
 #define CFIL_CRYPTO_DATA_EVENT 1
@@ -129,43 +129,43 @@ typedef struct cfil_crypto_data {
 	u_int64_t byte_count_out;
 } *cfil_crypto_data_t;
 
-/*
- * Types of messages
- *
- * Event messages flow from kernel to user space while action
- * messages flow in the reverse direction.
- * A message in entirely represented by a packet sent or received
- * on a Content Filter kernel control socket.
- */
-#define CFM_TYPE_EVENT 1        /* message from kernel */
-#define CFM_TYPE_ACTION 2       /* message to kernel */
+  
+                    
+  
+                                                             
+                                          
+                                                                 
+                                             
+   
+#define CFM_TYPE_EVENT 1                                 
+#define CFM_TYPE_ACTION 2                              
 
-/*
- * Operations associated with events from kernel
- */
-#define CFM_OP_SOCKET_ATTACHED 1        /* a socket has been attached */
-#define CFM_OP_SOCKET_CLOSED 2          /* a socket is being closed */
-#define CFM_OP_DATA_OUT 3               /* data being sent */
-#define CFM_OP_DATA_IN 4                /* data being received */
-#define CFM_OP_DISCONNECT_OUT 5         /* no more outgoing data */
-#define CFM_OP_DISCONNECT_IN 6          /* no more incoming data */
-#define CFM_OP_STATS 7                  /* periodic stats report(s) */
+  
+                                                
+   
+#define CFM_OP_SOCKET_ATTACHED 1                                        
+#define CFM_OP_SOCKET_CLOSED 2                                        
+#define CFM_OP_DATA_OUT 3                                    
+#define CFM_OP_DATA_IN 4                                         
+#define CFM_OP_DISCONNECT_OUT 5                                    
+#define CFM_OP_DISCONNECT_IN 6                                     
+#define CFM_OP_STATS 7                                                
 
-/*
- * Operations associated with action from filter to kernel
- */
-#define CFM_OP_DATA_UPDATE 16           /* update pass or peek offsets */
-#define CFM_OP_DROP 17                  /* shutdown socket, no more data */
-#define CFM_OP_BLESS_CLIENT 18          /* mark a client flow as already filtered, passes a uuid */
-#define CFM_OP_SET_CRYPTO_KEY 19        /* assign client crypto key for message signing */
+  
+                                                          
+   
+#define CFM_OP_DATA_UPDATE 16                                            
+#define CFM_OP_DROP 17                                                     
+#define CFM_OP_BLESS_CLIENT 18                                                                     
+#define CFM_OP_SET_CRYPTO_KEY 19                                                          
 
-/*
- * struct cfil_msg_hdr
- *
- * Header common to all messages
- */
+  
+                      
+  
+                                
+   
 struct cfil_msg_hdr {
-	uint32_t        cfm_len;        /* total length */
+	uint32_t        cfm_len;                          
 	uint32_t        cfm_version;
 	uint32_t        cfm_type;
 	uint32_t        cfm_op;
@@ -174,32 +174,32 @@ struct cfil_msg_hdr {
 
 #define CFM_VERSION_CURRENT 1
 
-/*
- * Connection Direction
- */
+  
+                       
+   
 #define CFS_CONNECTION_DIR_IN  0
 #define CFS_CONNECTION_DIR_OUT 1
 
 #define CFS_AUDIT_TOKEN            1
 
-/*
- * struct cfil_msg_sock_attached
- *
- * Information about a new socket being attached to the content filter
- *
- * Action: No reply is expected as this does not block the creation of the
- * TCP/IP but timely action must be taken to avoid user noticeable delays.
- *
- * Valid Types: CFM_TYPE_EVENT
- *
- * Valid Op: CFM_OP_SOCKET_ATTACHED
- */
+  
+                                
+  
+                                                                      
+  
+                                                                          
+                                                                          
+  
+                              
+  
+                                   
+   
 struct cfil_msg_sock_attached {
 	struct cfil_msg_hdr     cfs_msghdr;
-	int                     cfs_sock_family;        /* e.g. PF_INET */
-	int                     cfs_sock_type;          /* e.g. SOCK_STREAM */
-	int                     cfs_sock_protocol;      /* e.g. IPPROTO_TCP */
-	int                     cfs_unused;             /* padding */
+	int                     cfs_sock_family;                          
+	int                     cfs_sock_type;                                
+	int                     cfs_sock_protocol;                            
+	int                     cfs_unused;                          
 	pid_t                   cfs_pid;
 	pid_t                   cfs_e_pid;
 	uuid_t                  cfs_uuid;
@@ -207,31 +207,31 @@ struct cfil_msg_sock_attached {
 	union sockaddr_in_4_6   cfs_src;
 	union sockaddr_in_4_6   cfs_dst;
 	int                     cfs_conn_dir;
-	unsigned int            cfs_audit_token[8];             /* Must match audit_token_t */
+	unsigned int            cfs_audit_token[8];                                           
 	cfil_crypto_signature   cfs_signature;
 	uint32_t                cfs_signature_length;
 };
 
-/*
- * CFIL data flags
- */
-#define CFD_DATA_FLAG_IP_HEADER         0x00000001          /* Data includes IP header */
+  
+                  
+   
+#define CFD_DATA_FLAG_IP_HEADER         0x00000001                                       
 
-/*
- * struct cfil_msg_data_event
- *
- * Event for the content fiter to act on a span of data
- * A data span is described by a pair of offsets over the cumulative
- * number of bytes sent or received on the socket.
- *
- * Action: The event must be acted upon but the filter may buffer
- * data spans until it has enough content to make a decision.
- * The action must be timely to avoid user noticeable delays.
- *
- * Valid Type: CFM_TYPE_EVENT
- *
- * Valid Ops: CFM_OP_DATA_OUT, CFM_OP_DATA_IN
- */
+  
+                             
+  
+                                                       
+                                                                    
+                                                  
+  
+                                                                 
+                                                             
+                                                             
+  
+                             
+  
+                                             
+   
 struct cfil_msg_data_event {
 	struct cfil_msg_hdr     cfd_msghdr;
 	union sockaddr_in_4_6   cfc_src;
@@ -241,27 +241,27 @@ struct cfil_msg_data_event {
 	cfil_crypto_signature   cfd_signature;
 	uint32_t                cfd_signature_length;
 	uint32_t                cfd_flags;
-	/* Actual content data immediatly follows */
+	                                            
 };
 
 #define CFI_MAX_TIME_LOG_ENTRY 6
-/*
- * struct cfil_msg_sock_closed
- *
- * Information about a socket being closed to the content filter
- *
- * Action: No reply is expected as this does not block the closing of the
- * TCP/IP.
- *
- * Valid Types: CFM_TYPE_EVENT
- *
- * Valid Op: CFM_OP_SOCKET_CLOSED
- */
+  
+                              
+  
+                                                                
+  
+                                                                         
+          
+  
+                              
+  
+                                 
+   
 struct cfil_msg_sock_closed {
 	struct cfil_msg_hdr     cfc_msghdr;
 	struct timeval64        cfc_first_event;
 	uint32_t                cfc_op_list_ctr;
-	uint32_t                cfc_op_time[CFI_MAX_TIME_LOG_ENTRY];    /* time interval in microseconds since first event */
+	uint32_t                cfc_op_time[CFI_MAX_TIME_LOG_ENTRY];                                                         
 	unsigned char           cfc_op_list[CFI_MAX_TIME_LOG_ENTRY];
 	uint64_t                cfc_byte_inbound_count;
 	uint64_t                cfc_byte_outbound_count;
@@ -269,17 +269,17 @@ struct cfil_msg_sock_closed {
 	uint32_t                cfc_signature_length;
 } __attribute__((aligned(8)));
 
-/*
- * struct cfil_msg_stats_report
- *
- * Statistics report for flow(s).
- *
- * Action: No reply is expected.
- *
- * Valid Types: CFM_TYPE_EVENT
- *
- * Valid Op: CFM_OP_STATS
- */
+  
+                               
+  
+                                 
+  
+                                
+  
+                              
+  
+                         
+   
 struct cfil_msg_sock_stats {
 	cfil_sock_id_t          cfs_sock_id;
 	uint64_t                cfs_byte_inbound_count;
@@ -293,55 +293,55 @@ struct cfil_msg_stats_report {
 	struct cfil_msg_sock_stats cfr_stats[];
 } __attribute__((aligned(8)));
 
-/*
- * struct cfil_msg_action
- *
- * Valid Type: CFM_TYPE_ACTION
- *
- * Valid Ops: CFM_OP_DATA_UPDATE, CFM_OP_DROP
- *
- * For CFM_OP_DATA_UPDATE:
- *
- * cfa_in_pass_offset and cfa_out_pass_offset indicates how much data is
- * allowed to pass. A zero value does not modify the corresponding pass offset.
- *
- * cfa_in_peek_offset and cfa_out_peek_offset lets the filter specify how much
- * data it needs to make a decision: the kernel will deliver data up to that
- * offset (if less than cfa_pass_offset it is ignored). Use CFM_MAX_OFFSET
- * if you don't value the corresponding peek offset to be updated.
- */
+  
+                         
+  
+                              
+  
+                                             
+  
+                          
+  
+                                                                        
+                                                                               
+  
+                                                                              
+                                                                            
+                                                                          
+                                                                  
+   
 struct cfil_msg_action {
 	struct cfil_msg_hdr     cfa_msghdr;
 	uint64_t                cfa_in_pass_offset;
 	uint64_t                cfa_in_peek_offset;
 	uint64_t                cfa_out_pass_offset;
 	uint64_t                cfa_out_peek_offset;
-	uint32_t                cfa_stats_frequency; // Statistics frequency in milliseconds
+	uint32_t                cfa_stats_frequency;                                        
 };
 
-/*
- * struct cfil_msg_bless_client
- *
- * Marks a client UUID as already filtered at a higher level.
- *
- * Valid Type: CFM_TYPE_ACTION
- *
- * Valid Ops: CFM_OP_BLESS_CLIENT
- */
+  
+                               
+  
+                                                             
+  
+                              
+  
+                                 
+   
 struct cfil_msg_bless_client {
 	struct cfil_msg_hdr     cfb_msghdr;
 	uuid_t cfb_client_uuid;
 };
 
-/*
- * struct cfil_msg_set_crypto_key
- *
- * Filter assigning client crypto key to CFIL for message signing
- *
- * Valid Type: CFM_TYPE_ACTION
- *
- * Valid Ops: CFM_OP_SET_CRYPTO_KEY
- */
+  
+                                 
+  
+                                                                 
+  
+                              
+  
+                                   
+   
 struct cfil_msg_set_crypto_key {
 	struct cfil_msg_hdr     cfb_msghdr;
 	cfil_crypto_key         crypto_key;
@@ -349,9 +349,9 @@ struct cfil_msg_set_crypto_key {
 
 #define CFM_MAX_OFFSET  UINT64_MAX
 
-/*
- * Statistics retrieved via sysctl(3)
- */
+  
+                                     
+   
 struct cfil_filter_stat {
 	uint32_t        cfs_len;
 	uint32_t        cfs_filter_id;
@@ -398,9 +398,9 @@ struct cfil_sock_stat {
 	struct cfil_entry_stat  ces_entries[CFIL_MAX_FILTER_COUNT];
 };
 
-/*
- * Global statistics
- */
+  
+                    
+   
 struct cfil_stats {
 	int32_t cfs_ctl_connect_ok;
 	int32_t cfs_ctl_connect_fail;
@@ -489,7 +489,7 @@ struct cfil_stats {
 	int64_t cfs_inject_q_in_passed __attribute__((aligned(8)));
 	int64_t cfs_inject_q_out_passed __attribute__((aligned(8)));
 };
-#endif /* PRIVATE */
+#endif              
 
 #ifdef BSD_KERNEL_PRIVATE
 
@@ -536,8 +536,8 @@ extern struct m_tag *cfil_dgram_get_socket_state(struct mbuf *m, uint32_t *state
     uint32_t *options, struct sockaddr **faddr, int *inp_flags);
 extern boolean_t cfil_dgram_peek_socket_state(struct mbuf *m, int *inp_flags);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
-#endif /* __CONTENT_FILTER_H__ */
+#endif                           

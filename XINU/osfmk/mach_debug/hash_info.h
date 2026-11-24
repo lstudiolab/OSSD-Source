@@ -53,23 +53,23 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _MACH_DEBUG_HASH_INFO_H_
 #define _MACH_DEBUG_HASH_INFO_H_
 
-#include <mach/machine/vm_types.h> /* natural_t */
+#include <mach/machine/vm_types.h>                
 
-/*
- *	Remember to update the mig type definitions
- *	in mach_debug_types.defs when adding/removing fields.
- */
+  
+                                              
+                                                        
+   
 
 typedef struct hash_info_bucket {
-	natural_t       hib_count;      /* number of records in bucket */
+	natural_t       hib_count;                                       
 } hash_info_bucket_t;
 
 typedef hash_info_bucket_t *hash_info_bucket_array_t;
 
-#endif  /* _MACH_DEBUG_HASH_INFO_H_ */
+#endif                                

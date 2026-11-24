@@ -49,7 +49,7 @@ read_node(uint8_t *node)
 	if (uuid_get_ethernet(node) == 0) {
 		return;
 	}
-#endif /* NETWORKING */
+#endif                 
 
 	read_random(node, 6);
 	node[0] |= 0x01;

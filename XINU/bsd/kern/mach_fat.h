@@ -42,4 +42,4 @@ load_return_t fatfile_getbestarch_for_cputype(cpu_type_t cputype, cpu_subtype_t 
 load_return_t fatfile_getarch_with_bits(integer_t archbits,
     vm_offset_t data_ptr, vm_size_t data_size, struct fat_arch *archret);
 
-#endif /* _BSD_KERN_MACH_FAT_H_ */
+#endif                            

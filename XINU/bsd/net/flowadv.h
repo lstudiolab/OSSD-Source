@@ -34,18 +34,18 @@
 #include <sys/queue.h>
 
 
-#define FADV_SUCCESS            0       /* success */
-#define FADV_FLOW_CONTROLLED    1       /* regular flow control */
-#define FADV_SUSPENDED          2       /* flow control due to suspension */
+#define FADV_SUCCESS            0                    
+#define FADV_FLOW_CONTROLLED    1                                 
+#define FADV_SUSPENDED          2                                           
 
 struct flowadv {
-	int32_t         code;           /* FADV advisory code */
+	int32_t         code;                                   
 };
 
 #ifdef BSD_KERNEL_PRIVATE
 struct flowadv_fcentry {
 	STAILQ_ENTRY(flowadv_fcentry) fce_link;
-	u_int32_t       fce_flowsrc_type;       /* FLOWSRC values */
+	u_int32_t       fce_flowsrc_type;                           
 	u_int32_t       fce_flowid;
 };
 
@@ -62,6 +62,6 @@ extern void flowadv_reap_caches(boolean_t);
 
 __END_DECLS
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* KERNEL_PRIVATE */
-#endif /* _NET_FLOWADV_H_ */
+#endif                         
+#endif                     
+#endif                      

@@ -27,6 +27,6 @@
  */
 #ifndef _IN_PORT_T
 #define _IN_PORT_T
-#include <machine/types.h> /* __uint16_t */
+#include <machine/types.h>                 
 typedef __uint16_t              in_port_t;
-#endif /* _IN_PORT_T */
+#endif                 

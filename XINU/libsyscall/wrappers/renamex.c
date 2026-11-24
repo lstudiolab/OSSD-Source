@@ -42,7 +42,7 @@ renamex_np(const char *old, const char *new, unsigned int flags)
 	return renameatx_np(AT_FDCWD, old, AT_FDCWD, new, flags);
 }
 
-// Deprecated
+             
 int
 rename_ext(const char *old, const char *new, unsigned int flags)
 {

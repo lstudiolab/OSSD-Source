@@ -36,13 +36,13 @@
 
 #ifdef MACH_KERNEL_PRIVATE
 void atm_init(void);
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 #ifdef XNU_KERNEL_PRIVATE
 void atm_reset(void);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 kern_return_t atm_set_diagnostic_config(uint32_t);
 uint32_t atm_get_diagnostic_config(void);
 
-#endif /* _ATM_ATM_INTERNAL_H_ */
+#endif                           

@@ -139,7 +139,7 @@ fq_getq_flow_mbuf(fq_if_t *fqs, fq_if_classq_t *fq_cl, fq_t *fq,
 
 		ifclassq_set_packet_metadata(ifq, ifp, &pkt.pktsched_pkt);
 
-		/* Check if the limit is reached */
+		                                   
 		if (*pkt_cnt >= pkt_limit || *byte_cnt >= byte_limit) {
 			limit_reached = TRUE;
 		}
@@ -158,13 +158,13 @@ fq_if_alloc(struct ifnet *ifp, classq_pkt_type_t ptype)
 	fqs->fqs_ifq = &ifp->if_snd;
 	fqs->fqs_ptype = ptype;
 
-	/* Calculate target queue delay */
+	                                  
 	ifclassq_calc_target_qdelay(ifp, &fqs->fqs_target_qdelay);
 
-	/* Calculate update interval */
+	                               
 	ifclassq_calc_update_interval(&fqs->fqs_update_interval);
 
-	/* Configure packet drop limit across all queues */
+	                                                   
 	fqs->fqs_pkt_droplimit = IFCQ_PKT_DROP_LIMIT(&ifp->if_snd);
 	STAILQ_INIT(&fqs->fqs_fclist);
 	return fqs;
@@ -205,13 +205,13 @@ fq_if_service_to_priority(fq_if_t *fqs, mbuf_svc_class_t svc)
 			pri = FQ_IF_VO_INDEX;
 			break;
 		default:
-			pri = FQ_IF_BE_INDEX; /* Use best effort by default */
+			pri = FQ_IF_BE_INDEX;                                 
 			break;
 		}
 		return pri;
 	}
 
-	/* scheduler is not managed by the driver */
+	                                            
 	switch (svc) {
 	case MBUF_SC_BK_SYS:
 		pri = FQ_IF_BK_SYS_INDEX;
@@ -247,7 +247,7 @@ fq_if_service_to_priority(fq_if_t *fqs, mbuf_svc_class_t svc)
 		pri = FQ_IF_CTL_INDEX;
 		break;
 	default:
-		pri = FQ_IF_BE_INDEX; /* Use best effort by default */
+		pri = FQ_IF_BE_INDEX;                                 
 		break;
 	}
 	return pri;
@@ -290,7 +290,7 @@ fq_if_enqueue_classq(struct ifclassq *ifq, classq_pkt_t *head,
 	fq_cl = &fqs->fqs_classq[pri];
 
 	if (__improbable(svc == MBUF_SC_BK_SYS && fqs->fqs_throttle == 1)) {
-		/* BK_SYS is currently throttled */
+		                                   
 		atomic_add_32(&fq_cl->fcl_stat.fcl_throttle_drops, 1);
 		pktsched_free_pkt(&pkt);
 		*pdrop = TRUE;
@@ -304,17 +304,17 @@ fq_if_enqueue_classq(struct ifclassq *ifq, classq_pkt_t *head,
 	    !FQ_IF_CLASSQ_IDLE(fq_cl)) {
 		if (((fqs->fqs_bitmaps[FQ_IF_ER] | fqs->fqs_bitmaps[FQ_IF_EB]) &
 		    (1 << pri)) == 0) {
-			/*
-			 * this group is not in ER or EB groups,
-			 * mark it as IB
-			 */
+			  
+                                           
+                   
+      
 			pktsched_bit_set(pri, &fqs->fqs_bitmaps[FQ_IF_IB]);
 		}
 	}
 
 	if (__improbable(ret != 0)) {
 		if (ret == CLASSQEQ_SUCCESS_FC) {
-			/* packet enqueued, return advisory feedback */
+			                                               
 			ret = EQFULL;
 			*pdrop = FALSE;
 		} else if (ret == CLASSQEQ_COMPRESSED) {
@@ -336,10 +336,10 @@ fq_if_enqueue_classq(struct ifclassq *ifq, classq_pkt_t *head,
 				goto done;
 			default:
 				VERIFY(0);
-				/* NOTREACHED */
+				                
 				__builtin_unreachable();
 			}
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		}
 	} else {
@@ -353,7 +353,7 @@ done:
 	if (__improbable((ret == EQFULL) && (ifclassq_flow_control_adv == 0))) {
 		ret = 0;
 	}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	return ret;
 }
 
@@ -413,7 +413,7 @@ fq_dqlist_remove(flowq_dqlist_t *fq_dqlist_head, fq_t *fq, classq_pkt_t *head,
 			break;
 		default:
 			VERIFY(0);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		}
 	}
@@ -468,7 +468,7 @@ fq_if_dequeue_classq_multi(struct ifclassq *ifq, u_int32_t maxpktcnt,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -487,11 +487,11 @@ fq_if_dequeue_classq_multi(struct ifclassq *ifq, u_int32_t maxpktcnt,
 		}
 		pri = pktsched_ffs(fqs->fqs_bitmaps[FQ_IF_ER]);
 		if (pri == 0) {
-			/*
-			 * There are no ER flows, move the highest
-			 * priority one from EB if there are any in that
-			 * category
-			 */
+			  
+                                             
+                                                   
+              
+      
 			pri = pktsched_ffs(fqs->fqs_bitmaps[FQ_IF_EB]);
 			VERIFY(pri > 0);
 			pktsched_bit_clr((pri - 1),
@@ -499,11 +499,11 @@ fq_if_dequeue_classq_multi(struct ifclassq *ifq, u_int32_t maxpktcnt,
 			pktsched_bit_set((pri - 1),
 			    &fqs->fqs_bitmaps[FQ_IF_ER]);
 		}
-		pri--; /* index starts at 0 */
+		pri--;                        
 		fq_cl = &fqs->fqs_classq[pri];
 
 		if (fq_cl->fcl_budget <= 0) {
-			/* Update the budget */
+			                       
 			fq_cl->fcl_budget += (min(fq_cl->fcl_drr_max,
 			    fq_cl->fcl_stat.fcl_flows_cnt) *
 			    fq_cl->fcl_quantum);
@@ -529,10 +529,10 @@ fq_if_dequeue_classq_multi(struct ifclassq *ifq, u_int32_t maxpktcnt,
 		total_pktcnt += pktcnt;
 		total_bytecnt += bytecnt;
 
-		/*
-		 * If the class has exceeded the budget but still has data
-		 * to send, move it to IB
-		 */
+		  
+                                                            
+                           
+     
 state_change:
 		if (!FQ_IF_CLASSQ_IDLE(fq_cl)) {
 			if (fq_cl->fcl_budget <= 0) {
@@ -594,18 +594,18 @@ fq_if_dequeue_sc_classq_multi(struct ifclassq *ifq, mbuf_svc_class_t svc,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
 	STAILQ_INIT(&fq_dqlist_head);
 	pri = fq_if_service_to_priority(fqs, svc);
 	fq_cl = &fqs->fqs_classq[pri];
-	/*
-	 * Now we have the queue for a particular service class. We need
-	 * to dequeue as many packets as needed, first from the new flows
-	 * and then from the old flows.
-	 */
+	  
+                                                                 
+                                                                  
+                                
+    
 	while (total_pktcnt < maxpktcnt && total_bytecnt < maxbytecnt &&
 	    fq_cl->fcl_stat.fcl_pkt_cnt > 0) {
 		classq_pkt_t head = CLASSQ_PKT_INITIALIZER(head);
@@ -698,10 +698,10 @@ static void
 fq_if_purge_classq(fq_if_t *fqs, fq_if_classq_t *fq_cl)
 {
 	fq_t *fq, *tfq;
-	/*
-	 * Take each flow from new/old flow list and flush mbufs
-	 * in that flow
-	 */
+	  
+                                                         
+                
+    
 	STAILQ_FOREACH_SAFE(fq, &fq_cl->fcl_new_flows, fq_actlink, tfq) {
 		fq_if_purge_flow(fqs, fq, NULL, NULL);
 	}
@@ -748,7 +748,7 @@ fq_if_purge_sc(fq_if_t *fqs, cqrq_purge_sc_t *req)
 	req->packets = req->bytes = 0;
 	VERIFY(req->flow != 0);
 
-	/* packet type is needed only if we want to create a flow queue */
+	                                                                  
 	fq = fq_if_hash_pkt(fqs, req->flow, req->sc, 0, FALSE, QP_INVALID);
 
 	if (fq != NULL) {
@@ -779,9 +779,9 @@ fq_if_calc_quantum(struct ifnet *ifp)
 		break;
 	}
 
-	/*
-	 * XXX: Skywalk native interface doesn't support HW TSO offload.
-	 */
+	  
+                                                                 
+    
 	if (((ifp->if_eflags & IFEF_SKYWALK_NATIVE) == 0) &&
 	    ((ifp->if_hwassist & IFNET_TSOF) != 0)) {
 		VERIFY(ifp->if_tso_v4_mtu <= UINT16_MAX);
@@ -793,7 +793,7 @@ fq_if_calc_quantum(struct ifnet *ifp)
 	quantum = MAX(FQ_CODEL_DEFAULT_QUANTUM, quantum);
 #if DEBUG || DEVELOPMENT
 	quantum = (fq_codel_quantum != 0) ? fq_codel_quantum : quantum;
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	return quantum;
 }
 
@@ -882,7 +882,7 @@ fq_if_throttle(fq_if_t *fqs, cqrq_throttle_t *tr)
 		return EALREADY;
 	}
 
-	/* Throttling is allowed on BK_SYS class only */
+	                                                
 	index = fq_if_service_to_priority(fqs, MBUF_SC_BK_SYS);
 	switch (tr->level) {
 	case IFNET_THROTTLE_OFF:
@@ -921,9 +921,9 @@ fq_if_request_classq(struct ifclassq *ifq, cqrq_t rq, void *arg)
 
 	IFCQ_LOCK_ASSERT_HELD(ifq);
 
-	/*
-	 * These are usually slow operations, convert the lock ahead of time
-	 */
+	  
+                                                                     
+    
 	IFCQ_CONVERT_LOCK(fqs->fqs_ifq);
 	switch (rq) {
 	case CLASSQRQ_PURGE:
@@ -978,7 +978,7 @@ fq_if_setup_ifclassq(struct ifclassq *ifq, u_int32_t flags,
 		_FQ_CLASSQ_INIT(fqs, VI, quantum);
 		_FQ_CLASSQ_INIT(fqs, VO, quantum);
 	} else {
-		/* SIG shares same INDEX with VI */
+		                                   
 		_CASSERT(SCIDX_SIG == SCIDX_VI);
 		_CASSERT(FQ_IF_SIG_INDEX == FQ_IF_VI_INDEX);
 
@@ -1029,7 +1029,7 @@ fq_if_hash_pkt(fq_if_t *fqs, u_int32_t flowid, mbuf_svc_class_t svc_class,
 	if (fq == NULL && create == TRUE) {
 		ASSERT(ptype == QP_MBUF);
 
-		/* If the flow is not already on the list, allocate it */
+		                                                         
 		IFCQ_CONVERT_LOCK(fqs->fqs_ifq);
 		fq = fq_alloc(ptype);
 		if (fq != NULL) {
@@ -1043,10 +1043,10 @@ fq_if_hash_pkt(fq_if_t *fqs, u_int32_t flowid, mbuf_svc_class_t svc_class,
 		}
 	}
 
-	/*
-	 * If getq time is not set because this is the first packet or after
-	 * idle time, set it now so that we can detect a stall.
-	 */
+	  
+                                                                     
+                                                        
+    
 	if (fq != NULL && fq->fq_getqtime == 0) {
 		fq->fq_getqtime = now;
 	}
@@ -1081,10 +1081,10 @@ static void
 fq_if_empty_old_flow(fq_if_t *fqs, fq_if_classq_t *fq_cl, fq_t *fq,
     bool remove_hash, bool destroy)
 {
-	/*
-	 * Remove the flow queue if it is empty
-	 * and delete it
-	 */
+	  
+                                        
+                 
+    
 	STAILQ_REMOVE(&fq_cl->fcl_old_flows, fq, flowq,
 	    fq_actlink);
 	fq->fq_flags &= ~FQF_OLD_FLOW;
@@ -1092,7 +1092,7 @@ fq_if_empty_old_flow(fq_if_t *fqs, fq_if_classq_t *fq_cl, fq_t *fq,
 	VERIFY(fq->fq_bytes == 0);
 
 	if (remove_hash) {
-		/* Remove from the hash list */
+		                               
 		fq_if_destroy_flow(fqs, fq_cl, fq, destroy);
 	}
 }
@@ -1100,7 +1100,7 @@ fq_if_empty_old_flow(fq_if_t *fqs, fq_if_classq_t *fq_cl, fq_t *fq,
 static void
 fq_if_empty_new_flow(fq_t *fq, fq_if_classq_t *fq_cl, bool add_to_old)
 {
-	/* Move to the end of old queue list */
+	                                       
 	STAILQ_REMOVE(&fq_cl->fcl_new_flows, fq,
 	    flowq, fq_actlink);
 	fq->fq_flags &= ~FQF_NEW_FLOW;
@@ -1126,7 +1126,7 @@ fq_if_drop_packet(fq_if_t *fqs)
 	if (fq == NULL) {
 		return;
 	}
-	/* queue can not be empty on the largest flow */
+	                                                
 	VERIFY(!fq_empty(fq));
 
 	fq_cl = &fqs->fqs_classq[fq->fq_sc_index];
@@ -1145,7 +1145,7 @@ fq_if_drop_packet(fq_if_t *fqs)
 		break;
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -1200,19 +1200,19 @@ fq_if_add_fcentry(fq_if_t *fqs, pktsched_pkt_t *pkt, uint8_t flowsrc,
 		os_log(OS_LOG_DEFAULT, "%s: skipped flow control", __func__);
 		return TRUE;
 	}
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	STAILQ_FOREACH(fce, &fqs->fqs_fclist, fce_link) {
 		if ((uint8_t)fce->fce_flowsrc_type == flowsrc &&
 		    fce->fce_flowid == fq->fq_flowhash) {
-			/* Already on flowcontrol list */
+			                                 
 			return TRUE;
 		}
 	}
 	IFCQ_CONVERT_LOCK(fqs->fqs_ifq);
 	fce = pktsched_alloc_fcentry(pkt, fqs->fqs_ifq->ifcq_ifp, M_WAITOK);
 	if (fce != NULL) {
-		/* XXX Add number of bytes in the queue */
+		                                          
 		STAILQ_INSERT_TAIL(&fqs->fqs_fclist, fce, fce_link);
 		fq_cl->fcl_stat.fcl_flow_control++;
 		os_log(OS_LOG_DEFAULT, "%s: num: %d, scidx: %d, flowsrc: %d, "
@@ -1272,14 +1272,14 @@ fq_if_dequeue(fq_if_t *fqs, fq_if_classq_t *fq_cl, uint32_t pktlimit,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
-	/*
-	 * maximum byte limit should not be greater than the budget for
-	 * this class
-	 */
+	  
+                                                                
+              
+    
 	if (bytelimit > fq_cl->fcl_budget && !drvmgmt) {
 		bytelimit = fq_cl->fcl_budget;
 	}
@@ -1343,11 +1343,11 @@ fq_if_dequeue(fq_if_t *fqs, fq_if_classq_t *fq_cl, uint32_t pktlimit,
 		} else if (fq->fq_deficit <= 0) {
 			STAILQ_REMOVE(&fq_cl->fcl_old_flows, fq,
 			    flowq, fq_actlink);
-			/*
-			 * Move to the end of the old queues list. We do not
-			 * need to update the flow count since this flow
-			 * will be added to the tail again
-			 */
+			  
+                                                       
+                                                   
+                                     
+      
 			STAILQ_INSERT_TAIL(&temp_stailq, fq, fq_actlink);
 			fq->fq_deficit += fq_cl->fcl_quantum;
 		}
@@ -1462,7 +1462,7 @@ fq_if_getqstats_ifclassq(struct ifclassq *ifq, u_int32_t qid,
 	fcls->fcls_pkts_compressible = fq_cl->fcl_stat.fcl_pkts_compressible;
 	fcls->fcls_pkts_compressed = fq_cl->fcl_stat.fcl_pkts_compressed;
 
-	/* Gather per flow stats */
+	                           
 	flowstat_cnt = min((fcls->fcls_newflows_cnt +
 	    fcls->fcls_oldflows_cnt), FQ_IF_MAX_FLOWSTATS);
 	i = 0;
@@ -1471,7 +1471,7 @@ fq_if_getqstats_ifclassq(struct ifclassq *ifq, u_int32_t qid,
 			break;
 		}
 
-		/* leave space for a few old flows */
+		                                     
 		if ((flowstat_cnt - i) < fcls->fcls_oldflows_cnt &&
 		    i >= (FQ_IF_MAX_FLOWSTATS >> 1)) {
 			break;

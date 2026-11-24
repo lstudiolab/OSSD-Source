@@ -28,9 +28,9 @@ volatile boolean_t checking = true;
 char vec_str_buf[8196];
 char karray_str_buf[1024];
 
-/*
- * ymm defines/globals/prototypes
- */
+  
+                                 
+   
 #define STOP_COOKIE_256 0x01234567
 #if defined(__x86_64__)
 #define YMM_MAX                 16
@@ -54,9 +54,9 @@ VECTOR256       vec256array1[YMM_MAX] VEC256ALIGN;
 VECTOR256       vec256array2[YMM_MAX] VEC256ALIGN;
 VECTOR256       vec256array3[YMM_MAX] VEC256ALIGN;
 
-/*
- * zmm defines/globals/prototypes
- */
+  
+                                 
+   
 #define STOP_COOKIE_512 0x0123456789abcdefULL
 #if defined(__x86_64__)
 #define ZMM_MAX                 32
@@ -92,9 +92,9 @@ kern_return_t _thread_get_state_avx(thread_t thread, int flavor, thread_state_t 
 kern_return_t _thread_get_state_avx512(thread_t thread, int flavor, thread_state_t state,
     mach_msg_type_number_t *state_count);
 
-/*
- * Common functions
- */
+  
+                   
+   
 
 int
 memcmp_unoptimized(const void *s1, const void *s2, size_t n)
@@ -146,9 +146,9 @@ require_avx512(void)
 	}
 }
 
-/*
- * ymm functions
- */
+  
+                
+   
 
 static inline void
 store_ymm(VECTOR256 *vec256array)
@@ -310,15 +310,15 @@ ymm_sigalrm_handler(int signum __unused, siginfo_t *info __unused, void *ctx)
 
 	T_LOG("Got SIGALRM");
 
-	/* Check for AVX state */
+	                         
 	T_QUIET;
 	T_ASSERT_GE(contextp->uc_mcsize, MCONTEXT_SIZE_256, "check context size");
 
-	/* Check that the state in the context is what's set and expected */
+	                                                                    
 	copy_ymm_state_to_vector(avx_state, vec256array3);
 	assert_ymm_eq(vec256array3, vec256array0, sizeof(vec256array1));
 
-	/* Change the context and break the main loop */
+	                                                
 	xp[0] = STOP_COOKIE_256;
 	yp[0] = STOP_COOKIE_256;
 	checking = FALSE;
@@ -328,22 +328,22 @@ kern_return_t
 _thread_get_state_avx(
 	thread_t                thread,
 	int                     flavor,
-	thread_state_t          state,          /* pointer to OUT array */
-	mach_msg_type_number_t  *state_count)   /*IN/OUT*/
+	thread_state_t          state,                                    
+	mach_msg_type_number_t  *state_count)             
 {
 	kern_return_t rv;
 	VECTOR256 ymms[YMM_MAX];
 
-	/*
-	 * We must save and restore the YMMs across thread_get_state() because
-	 * code in thread_get_state changes at least one xmm register AFTER the
-	 * thread_get_state has saved the state in userspace.  While it's still
-	 * possible for something to muck with %xmms BEFORE making the mach
-	 * system call (and rendering this save/restore useless), that does not
-	 * currently occur, and since we depend on the avx state saved in the
-	 * thread_get_state to be the same as that manually copied from YMMs after
-	 * thread_get_state returns, we have to go through these machinations.
-	 */
+	  
+                                                                       
+                                                                        
+                                                                        
+                                                                    
+                                                                        
+                                                                      
+                                                                           
+                                                                       
+    
 	store_ymm(ymms);
 
 	rv = thread_get_state(thread, flavor, state, state_count);
@@ -395,15 +395,15 @@ ymm_integrity(int time)
 	T_LOG("Running for %ds…", time);
 	start_timer(time, ymm_sigalrm_handler);
 
-	/* re-populate because printing mucks up XMMs */
+	                                                
 	populate_ymm();
 
-	/* Check state until timer fires */
+	                                   
 	while (checking) {
 		check_ymm();
 	}
 
-	/* Check that the sig handler changed out AVX state */
+	                                                      
 	store_ymm(vec256array1);
 
 	uint32_t *p = (uint32_t *) &vec256array1[7];
@@ -418,9 +418,9 @@ ymm_integrity(int time)
 	T_PASS("No ymm register corruption occurred");
 }
 
-/*
- * zmm functions
- */
+  
+                
+   
 
 static inline void
 store_opmask(OPMASK k[])
@@ -542,22 +542,22 @@ kern_return_t
 _thread_get_state_avx512(
 	thread_t                thread,
 	int                     flavor,
-	thread_state_t          state,          /* pointer to OUT array */
-	mach_msg_type_number_t  *state_count)   /*IN/OUT*/
+	thread_state_t          state,                                    
+	mach_msg_type_number_t  *state_count)             
 {
 	kern_return_t rv;
 	VECTOR512 zmms[ZMM_MAX];
 
-	/*
-	 * We must save and restore the ZMMs across thread_get_state() because
-	 * code in thread_get_state changes at least one xmm register AFTER the
-	 * thread_get_state has saved the state in userspace.  While it's still
-	 * possible for something to muck with %XMMs BEFORE making the mach
-	 * system call (and rendering this save/restore useless), that does not
-	 * currently occur, and since we depend on the avx512 state saved in the
-	 * thread_get_state to be the same as that manually copied from ZMMs after
-	 * thread_get_state returns, we have to go through these machinations.
-	 */
+	  
+                                                                       
+                                                                        
+                                                                        
+                                                                    
+                                                                        
+                                                                         
+                                                                           
+                                                                       
+    
 	store_zmm(zmms);
 
 	rv = thread_get_state(thread, flavor, state, state_count);
@@ -760,17 +760,17 @@ zmm_sigalrm_handler(int signum __unused, siginfo_t *info __unused, void *ctx)
 	uint64_t *zp = (uint64_t *) &avx_state->__fpu_zmmh7;
 	uint64_t *kp = (uint64_t *) &avx_state->__fpu_k0;
 
-	/* Check for AVX512 state */
+	                            
 	T_QUIET;
 	T_ASSERT_GE(contextp->uc_mcsize, MCONTEXT_SIZE_512, "check context size");
 
-	/* Check that the state in the context is what's set and expected */
+	                                                                    
 	copy_zmm_state_to_vector(avx_state, vec512array3);
 	assert_zmm_eq(vec512array3, vec512array0, sizeof(vec512array1));
 	copy_state_to_opmask(avx_state, karray3);
 	assert_opmask_eq(karray3, karray0);
 
-	/* Change the context and break the main loop */
+	                                                
 	xp[0] = STOP_COOKIE_512;
 	yp[0] = STOP_COOKIE_512;
 	zp[0] = STOP_COOKIE_512;
@@ -829,16 +829,16 @@ zmm_integrity(int time)
 	T_LOG("Running for %ds…", time);
 	start_timer(time, zmm_sigalrm_handler);
 
-	/* re-populate because printing mucks up XMMs */
+	                                                
 	populate_zmm();
 	populate_opmask();
 
-	/* Check state until timer fires */
+	                                   
 	while (checking) {
 		check_zmm();
 	}
 
-	/* Check that the sig handler changed our AVX state */
+	                                                      
 	store_zmm(vec512array1);
 	store_opmask(karray1);
 
@@ -857,9 +857,9 @@ zmm_integrity(int time)
 	T_PASS("No zmm register corruption occurred");
 }
 
-/*
- * Main test declarations
- */
+  
+                         
+   
 T_DECL(ymm_integrity,
     "Quick soak test to verify that AVX "
     "register state is maintained correctly",

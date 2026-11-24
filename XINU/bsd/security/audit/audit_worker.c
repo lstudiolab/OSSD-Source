@@ -76,20 +76,20 @@
 #include <netinet/in.h>
 #include <netinet/in_pcb.h>
 
-/*
- * Worker thread that will schedule disk I/O, etc.
- */
+  
+                                                  
+   
 static thread_t audit_thread;
 
-/*
- * audit_ctx and audit_vp are the stored credential and vnode to use for
- * active audit trail.  They are protected by audit_worker_sl, which will be
- * held across all I/O and all rotation to prevent them from being replaced
- * (rotated) while in use.  The audit_file_rotate_wait flag is set when the
- * kernel has delivered a trigger to auditd to rotate the trail, and is
- * cleared when the next rotation takes place.  It is also protected by
- * audit_worker_sl.
- */
+  
+                                                                        
+                                                                            
+                                                                           
+                                                                           
+                                                                       
+                                                                       
+                   
+   
 static int                      audit_file_rotate_wait;
 static struct slck              audit_worker_sl;
 static struct vfs_context       audit_ctx;
@@ -102,16 +102,16 @@ static struct vnode             *audit_vp;
 #define AUDIT_WORKER_SX_ASSERT()        slck_assert(&audit_worker_sl, SL_OWNED)
 #define AUDIT_WORKER_SX_DESTROY()       slck_destroy(&audit_worker_sl)
 
-/*
- * The audit_q_draining flag is set when audit is disabled and the audit
- * worker queue is being drained.
- */
+  
+                                                                        
+                                 
+   
 static int                      audit_q_draining;
 
-/*
- * The special kernel audit record, audit_drain_kar, is used to mark the end of
- * the queue when draining it.
- */
+  
+                                                                               
+                              
+   
 static struct kaudit_record     audit_drain_kar = {
 	.k_ar = {
 		.ar_event = AUE_NULL,
@@ -119,14 +119,14 @@ static struct kaudit_record     audit_drain_kar = {
 	.k_ar_commit = AR_DRAIN_QUEUE,
 };
 
-/*
- * Write an audit record to a file, performed as the last stage after both
- * preselection and BSM conversion.  Both space management and write failures
- * are handled in this function.
- *
- * No attempt is made to deal with possible failure to deliver a trigger to
- * the audit daemon, since the message is asynchronous anyway.
- */
+  
+                                                                          
+                                                                             
+                                
+  
+                                                                           
+                                                              
+   
 static void
 audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
     size_t len)
@@ -140,23 +140,23 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 	uint64_t temp;
 	off_t file_size;
 
-	AUDIT_WORKER_SX_ASSERT();       /* audit_file_rotate_wait. */
+	AUDIT_WORKER_SX_ASSERT();                                    
 
 	if (vp == NULL) {
 		return;
 	}
 
 	if (vnode_getwithref(vp)) {
-		return /*(ENOENT)*/;
+		return             ;
 	}
 
 	mnt_stat = &vp->v_mount->mnt_vfsstat;
 
-	/*
-	 * First, gather statistics on the audit log file and file system so
-	 * that we know how we're doing on space.  Consider failure of these
-	 * operations to indicate a future inability to write to the file.
-	 */
+	  
+                                                                     
+                                                                     
+                                                                   
+    
 	error = vfs_update_vfsstat(vp->v_mount, ctx, VFS_KERNEL_EVENT);
 	if (error) {
 		goto fail;
@@ -167,42 +167,42 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 	}
 	audit_fstat.af_currsz = (u_quad_t)file_size;
 
-	/*
-	 * We handle four different space-related limits:
-	 *
-	 * - A fixed (hard) limit on the minimum free blocks we require on
-	 *   the file system, and results in record loss, a trigger, and
-	 *   possible fail stop due to violating invariants.
-	 *
-	 * - An administrative (soft) limit, which when fallen below, results
-	 *   in the kernel notifying the audit daemon of low space.
-	 *
-	 * - An audit trail size limit, which when gone above, results in the
-	 *   kernel notifying the audit daemon that rotation is desired.
-	 *
-	 * - The total depth of the kernel audit record exceeding free space,
-	 *   which can lead to possible fail stop (with drain), in order to
-	 *   prevent violating invariants.  Failure here doesn't halt
-	 *   immediately, but prevents new records from being generated.
-	 *
-	 * Possibly, the last of these should be handled differently, always
-	 * allowing a full queue to be lost, rather than trying to prevent
-	 * loss.
-	 *
-	 * First, handle the hard limit, which generates a trigger and may
-	 * fail stop.  This is handled in the same manner as ENOSPC from
-	 * VOP_WRITE, and results in record loss.
-	 */
+	  
+                                                  
+   
+                                                                   
+                                                                 
+                                                     
+   
+                                                                      
+                                                            
+   
+                                                                      
+                                                                 
+   
+                                                                      
+                                                                    
+                                                              
+                                                                 
+   
+                                                                     
+                                                                   
+         
+   
+                                                                   
+                                                                 
+                                          
+    
 	if (mnt_stat->f_bfree < AUDIT_HARD_LIMIT_FREE_BLOCKS) {
 		error = ENOSPC;
 		goto fail_enospc;
 	}
 
-	/*
-	 * Second, handle falling below the soft limit, if defined; we send
-	 * the daemon a trigger and continue processing the record.  Triggers
-	 * are limited to 1/sec.
-	 */
+	  
+                                                                    
+                                                                      
+                         
+    
 	if (audit_qctrl.aq_minfree != 0) {
 		temp = mnt_stat->f_blocks / (100 / audit_qctrl.aq_minfree);
 		if (mnt_stat->f_bfree < temp &&
@@ -213,11 +213,11 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 		}
 	}
 
-	/*
-	 * If the current file is getting full, generate a rotation trigger
-	 * to the daemon.  This is only approximate, which is fine as more
-	 * records may be generated before the daemon rotates the file.
-	 */
+	  
+                                                                    
+                                                                   
+                                                                
+    
 	if ((audit_fstat.af_filesz != 0) && (audit_file_rotate_wait == 0) &&
 	    ((u_quad_t)file_size >= audit_fstat.af_filesz)) {
 		AUDIT_WORKER_SX_ASSERT();
@@ -226,17 +226,17 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 		(void)audit_send_trigger(AUDIT_TRIGGER_ROTATE_KERNEL);
 	}
 
-	/*
-	 * If the estimated amount of audit data in the audit event queue
-	 * (plus records allocated but not yet queued) has reached the amount
-	 * of free space on the disk, then we need to go into an audit fail
-	 * stop state, in which we do not permit the allocation/committing of
-	 * any new audit records.  We continue to process records but don't
-	 * allow any activities that might generate new records.  In the
-	 * future, we might want to detect when space is available again and
-	 * allow operation to continue, but this behavior is sufficient to
-	 * meet fail stop requirements in CAPP.
-	 */
+	  
+                                                                  
+                                                                      
+                                                                    
+                                                                      
+                                                                    
+                                                                 
+                                                                     
+                                                                   
+                                        
+    
 	if (audit_fail_stop) {
 		if ((unsigned long)((audit_q_len + audit_pre_q_len + 1) *
 		    MAX_AUDIT_RECORD_SIZE) / mnt_stat->f_bsize >=
@@ -248,11 +248,11 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 			}
 			audit_in_failure = 1;
 		} else if (audit_in_failure) {
-			/*
-			 * Note: if we want to handle recovery, this is the
-			 * spot to do it: unset audit_in_failure, and issue a
-			 * wakeup on the cv.
-			 */
+			  
+                                                      
+                                                        
+                       
+      
 		}
 	}
 
@@ -265,15 +265,15 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 		goto fail;
 	}
 
-	/*
-	 * Catch completion of a queue drain here; if we're draining and the
-	 * queue is now empty, fail stop.  That audit_fail_stop is implicitly
-	 * true, since audit_in_failure can only be set of audit_fail_stop is
-	 * set.
-	 *
-	 * Note: if we handle recovery from audit_in_failure, then we need to
-	 * make panic here conditional.
-	 */
+	  
+                                                                     
+                                                                      
+                                                                      
+        
+   
+                                                                      
+                                
+    
 	if (audit_in_failure) {
 		if (audit_q_len == 0 && audit_pre_q_len == 0) {
 			(void)VNOP_FSYNC(vp, MNT_WAIT, ctx);
@@ -285,11 +285,11 @@ audit_record_write(struct vnode *vp, struct vfs_context *ctx, void *data,
 	return;
 
 fail_enospc:
-	/*
-	 * ENOSPC is considered a special case with respect to failures, as
-	 * this can reflect either our preemptive detection of insufficient
-	 * space, or ENOSPC returned by the vnode write call.
-	 */
+	  
+                                                                    
+                                                                    
+                                                      
+    
 	if (audit_fail_stop) {
 		(void)VNOP_FSYNC(vp, MNT_WAIT, ctx);
 		panic("Audit log space exhausted and fail-stop set.");
@@ -297,12 +297,12 @@ fail_enospc:
 	(void)audit_send_trigger(AUDIT_TRIGGER_NO_SPACE);
 	audit_suspended = 1;
 
-	/* FALLTHROUGH */
+	                 
 fail:
-	/*
-	 * We have failed to write to the file, so the current record is
-	 * lost, which may require an immediate system halt.
-	 */
+	  
+                                                                 
+                                                     
+    
 	if (audit_panic_on_write_fail) {
 		(void)VNOP_FSYNC(vp, MNT_WAIT, ctx);
 		panic("audit_worker: write error %d\n", error);
@@ -312,13 +312,13 @@ fail:
 	vnode_put(vp);
 }
 
-/*
- * Given a kernel audit record, process as required.  Kernel audit records
- * are converted to one, or possibly two, BSM records, depending on whether
- * there is a user audit record present also.  Kernel records need be
- * converted to BSM before they can be written out.  Both types will be
- * written to disk, and audit pipes.
- */
+  
+                                                                          
+                                                                           
+                                                                     
+                                                                       
+                                    
+   
 static void
 audit_worker_process_record(struct kaudit_record *ar)
 {
@@ -329,11 +329,11 @@ audit_worker_process_record(struct kaudit_record *ar)
 	int error, sorf;
 	int trail_locked;
 
-	/*
-	 * We hold the audit_worker_sl lock over both writes, if there are
-	 * two, so that the two records won't be split across a rotation and
-	 * end up in two different trail files.
-	 */
+	  
+                                                                   
+                                                                     
+                                        
+    
 	if (((ar->k_ar_commit & AR_COMMIT_USER) &&
 	    (ar->k_ar_commit & AR_PRESELECT_USER_TRAIL)) ||
 	    (ar->k_ar_commit & AR_PRESELECT_TRAIL)) {
@@ -343,10 +343,10 @@ audit_worker_process_record(struct kaudit_record *ar)
 		trail_locked = 0;
 	}
 
-	/*
-	 * First, handle the user record, if any: commit to the system trail
-	 * and audit pipes as selected.
-	 */
+	  
+                                                                     
+                                
+    
 	if ((ar->k_ar_commit & AR_COMMIT_USER) &&
 	    (ar->k_ar_commit & AR_PRESELECT_USER_TRAIL)) {
 		AUDIT_WORKER_SX_ASSERT();
@@ -403,10 +403,10 @@ audit_worker_process_record(struct kaudit_record *ar)
 	}
 
 	if (ar->k_ar_commit & AR_PRESELECT_FILTER) {
-		/*
-		 *  XXXss - This needs to be generalized so new filters can
-		 *  be easily plugged in.
-		 */
+		  
+                                                             
+                           
+     
 		audit_sdev_submit(auid, ar->k_ar.ar_subj_asid, bsm->data,
 		    bsm->len);
 	}
@@ -418,15 +418,15 @@ out:
 	}
 }
 
-/*
- * The audit_worker thread is responsible for watching the event queue,
- * dequeueing records, converting them to BSM format, and committing them to
- * disk.  In order to minimize lock thrashing, records are dequeued in sets
- * to a thread-local work queue.
- *
- * Note: this means that the effect bound on the size of the pending record
- * queue is 2x the length of the global queue.
- */
+  
+                                                                       
+                                                                            
+                                                                           
+                                
+  
+                                                                           
+                                              
+   
 __attribute__((noreturn))
 static void
 audit_worker(void)
@@ -444,21 +444,21 @@ audit_worker(void)
 	while (1) {
 		mtx_assert(&audit_mtx, MA_OWNED);
 
-		/*
-		 * Wait for a record.
-		 */
+		  
+                       
+     
 		while (TAILQ_EMPTY(&audit_q)) {
 			cv_wait_continuation(&audit_worker_cv, &audit_mtx,
 			    (thread_continue_t)audit_worker);
 		}
 
-		/*
-		 * If there are records in the global audit record queue,
-		 * transfer them to a thread-local queue and process them
-		 * one by one.  If we cross the low watermark threshold,
-		 * signal any waiting processes that they may wake up and
-		 * continue generating records.
-		 */
+		  
+                                                           
+                                                           
+                                                          
+                                                           
+                                 
+     
 		lowater_signal = 0;
 		while ((ar = TAILQ_FIRST(&audit_q))) {
 			TAILQ_REMOVE(&audit_q, ar, k_q);
@@ -487,15 +487,15 @@ audit_worker(void)
 	}
 }
 
-/*
- * audit_rotate_vnode() is called by a user or kernel thread to configure or
- * de-configure auditing on a vnode.  The arguments are the replacement
- * credential (referenced) and vnode (referenced and opened) to substitute
- * for the current credential and vnode, if any.  If either is set to NULL,
- * both should be NULL, and this is used to indicate that audit is being
- * disabled.  Any previous cred/vnode will be closed and freed.  We re-enable
- * generating rotation requests to auditd.
- */
+  
+                                                                            
+                                                                       
+                                                                          
+                                                                           
+                                                                        
+                                                                             
+                                          
+   
 void
 audit_rotate_vnode(kauth_cred_t cred, struct vnode *vp)
 {
@@ -508,20 +508,20 @@ audit_rotate_vnode(kauth_cred_t cred, struct vnode *vp)
 
 	mtx_lock(&audit_mtx);
 	if (audit_enabled && (NULL == vp)) {
-		/* Auditing is currently enabled but will be disabled. */
+		                                                         
 
-		/*
-		 * Disable auditing now so nothing more is added while the
-		 * audit worker thread is draining the audit record queue.
-		 */
+		  
+                                                            
+                                                            
+     
 		audit_enabled = 0;
 
-		/*
-		 * Drain the auditing queue by inserting a drain record at the
-		 * end of the queue and waiting for the audit worker thread
-		 * to find this record and signal that it is done before
-		 * we close the audit trail.
-		 */
+		  
+                                                                
+                                                             
+                                                          
+                              
+     
 		audit_q_draining = 1;
 		while (audit_q_len >= audit_qctrl.aq_hiwater) {
 			cv_wait(&audit_watermark_cv, &audit_mtx);
@@ -531,17 +531,17 @@ audit_rotate_vnode(kauth_cred_t cred, struct vnode *vp)
 		cv_signal(&audit_worker_cv);
 	}
 
-	/* If the audit queue is draining then wait here until it's done. */
+	                                                                    
 	while (audit_q_draining) {
 		cv_wait(&audit_drain_cv, &audit_mtx);
 	}
 	mtx_unlock(&audit_mtx);
 
 
-	/*
-	 * Rotate the vnode/cred, and clear the rotate flag so that we will
-	 * send a rotate trigger if the new file fills.
-	 */
+	  
+                                                                    
+                                                
+    
 	AUDIT_WORKER_SX_XLOCK();
 	old_audit_cred = audit_ctx.vc_ucred;
 	old_audit_vp = audit_vp;
@@ -551,9 +551,9 @@ audit_rotate_vnode(kauth_cred_t cred, struct vnode *vp)
 	audit_enabled = (audit_vp != NULL);
 	AUDIT_WORKER_SX_XUNLOCK();
 
-	/*
-	 * If there was an old vnode/credential, close and free.
-	 */
+	  
+                                                         
+    
 	if (old_audit_vp != NULL) {
 		if (vnode_get(old_audit_vp) == 0) {
 			vn_close(old_audit_vp, AUDIT_CLOSE_FLAGS,

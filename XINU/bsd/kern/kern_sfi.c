@@ -43,13 +43,13 @@
 #include <sys/priv.h>
 #include <kern/policy_internal.h>
 
-/*
- * This file provides the syscall-based configuration facility
- * for Selective Forced Idle (SFI). Input arguments have basic checking
- * applied here, although more specific semantic checking is done in
- * osfmk/kern/sfi.c. All copyin()/copyout() operations are performed
- * in this source file.
- */
+  
+                                                              
+                                                                       
+                                                                    
+                                                                    
+                       
+   
 
 #define SFI_DEBUG 0
 
@@ -87,7 +87,7 @@ sfi_ctl(struct proc *p __unused, struct sfi_ctl_args *uap, int32_t *retval __unu
 		}
 
 		if (uap->time == 0) {
-			/* actually a cancel */
+			                       
 			kret = sfi_window_cancel();
 		} else {
 			kret = sfi_set_window(uap->time);
@@ -128,7 +128,7 @@ sfi_ctl(struct proc *p __unused, struct sfi_ctl_args *uap, int32_t *retval __unu
 		}
 
 		if (uap->time == 0) {
-			/* actually a cancel */
+			                       
 			kret = sfi_class_offtime_cancel(uap->sfi_class);
 		} else {
 			kret = sfi_set_class_offtime(uap->sfi_class, uap->time);
@@ -167,7 +167,7 @@ proc_apply_sfi_managed(proc_t p, void * arg)
 	pid_t pid = p->p_pid;
 	boolean_t managed_enabled = (flags == SFI_PROCESS_SET_MANAGED)? TRUE : FALSE;
 
-	if (pid == 0) {         /* ignore setting on kernproc */
+	if (pid == 0) {                                         
 		return PROC_RETURNED;
 	}
 
@@ -211,7 +211,7 @@ sfi_pidctl(struct proc *p __unused, struct sfi_pidctl_args *uap, int32_t *retval
 		}
 
 		if (uap->pid == 0) {
-			/* only allow SFI_PROCESS_SET_UNMANAGED for pid 0 */
+			                                                    
 			if (uap->sfi_flags != SFI_PROCESS_SET_UNMANAGED) {
 				return EINVAL;
 			}

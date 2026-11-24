@@ -26,10 +26,10 @@
 #define _NONSTD_SOURCE
 #include <sys/cdefs.h>
 
-/*
- * We need conformance on so that EOPNOTSUPP=102.  But the routine symbol
- * will still be the legacy (undecorated) one.
- */
+  
+                                                                         
+                                              
+   
 #undef __DARWIN_UNIX03
 #define __DARWIN_UNIX03 1
 
@@ -39,15 +39,15 @@
 
 ssize_t __sendto_nocancel(int, const void *, size_t, int, const struct sockaddr *, socklen_t);
 
-/*
- * sendto stub, legacy version
- */
+  
+                              
+   
 ssize_t
 sendto(int s, const void *msg, size_t len, int flags, const struct sockaddr *to, socklen_t tolen)
 {
 	int ret = __sendto_nocancel(s, msg, len, flags, to, tolen);
 
-	/* use ENOTSUP for legacy behavior */
+	                                     
 	if (ret < 0 && errno == EOPNOTSUPP) {
 		errno = ENOTSUP;
 	}

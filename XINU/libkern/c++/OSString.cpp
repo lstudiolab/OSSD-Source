@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOString.m created by rsulack on Wed 17-Sep-1997 */
-/* IOString.cpp converted to C++ on Tue 1998-9-22 */
+                                                      
+                                                    
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -212,12 +212,12 @@ OSString::withStringOfLength(const char *cString, size_t length)
 
 
 
-/* @@@ gvdl */
+              
 #if 0
 OSString *
 OSString::stringWithFormat(const char *format, ...)
 {
-#ifndef KERNEL                  // mach3xxx
+#ifndef KERNEL                             
 	OSString *me;
 	va_list argList;
 
@@ -228,7 +228,7 @@ OSString::stringWithFormat(const char *format, ...)
 	va_start(argList, format);
 	me = stringWithCapacity(256);
 	me->length = vsnprintf(me->string, 256, format, argList);
-	me->length++;   // we include the null in the length
+	me->length++;                                       
 	if (me->Length > 256) {
 		me->Length = 256;
 	}
@@ -239,7 +239,7 @@ OSString::stringWithFormat(const char *format, ...)
 	return 0;
 #endif
 }
-#endif /* 0 */
+#endif        
 
 void
 OSString::free()
@@ -329,11 +329,11 @@ OSString::isEqualTo(const OSData *obj) const
 	const char * dataPtr = (const char *) obj->getBytesNoCopy();
 
 	if (dataLen != length) {
-		// check for the fact that OSData may be a buffer that
-		// that includes a termination byte and will thus have
-		// a length of the actual string length PLUS 1. In this
-		// case we verify that the additional byte is a terminator
-		// and if so count the two lengths as being the same.
+		                                                      
+		                                                      
+		                                                       
+		                                                          
+		                                                     
 
 		if ((dataLen - length) == 1) {
 			if (dataPtr[dataLen - 1] != 0) {

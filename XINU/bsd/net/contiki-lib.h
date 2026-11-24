@@ -67,4 +67,4 @@
 #include "lib/mmem.h"
 #include "lib/random.h"
 
-#endif /* CONTIKI_LIB_H_ */
+#endif                     

@@ -16,7 +16,7 @@ int
 mach_server_data_setup(void **buffer)
 {
 	if (0 != access(TEST_TXT_FILE, F_OK)) {
-		/* create a test file */
+		                        
 		const size_t lorem_text_length = strlen(lorem_text);
 		int w_fd = open(TEST_TXT_FILE, O_WRONLY | O_CREAT | O_TRUNC, (mode_t)0666);
 		size_t required_length = 450783;
@@ -32,7 +32,7 @@ mach_server_data_setup(void **buffer)
 		close(w_fd);
 	}
 
-	/* Sample data set needs to be mapped in our space */
+	                                                     
 	fd = open(TEST_TXT_FILE, O_RDONLY | O_EXCL, 0666);
 
 	if (fd < 0) {
@@ -85,7 +85,7 @@ mach_server_construct_header(ipc_message_t *message, mach_port_t replyPort)
 {
 	bzero(message, sizeof(*message));
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND_ONCE) | MACH_MSGH_BITS_COMPLEX;
-	message->header.msgh_remote_port = persistentReplyPort;//serverPort;
+	message->header.msgh_remote_port = persistentReplyPort;             
 	message->header.msgh_local_port = replyPort;
 	message->header.msgh_size = sizeof(*message);
 	message->header.msgh_id = 1;
@@ -101,7 +101,7 @@ mach_server_contruct_payload(ipc_message_t         *message,
     int                                     vm_op)
 {
 	if (port == MACH_PORT_NULL) {
-		message->address = src;//LD TODO: (src + 8193);
+		message->address = src;                        
 	} else {
 		message->body.msgh_descriptor_count = 1;
 		message->port_descriptor.name = port;
@@ -150,7 +150,7 @@ mach_server_create_allocation(mach_vm_address_t *src, mach_vm_size_t size, void 
 void
 server_error_out(mach_port_t port)
 {
-	/* All done here...*/
+	                     
 	kern_return_t ret;
 
 	mach_msg_size_t messageSize = sizeof(ipc_message_t) + sizeof(mach_msg_trailer_t) + 64;

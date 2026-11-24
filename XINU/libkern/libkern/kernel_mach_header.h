@@ -25,16 +25,16 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File: libkern/kernel_mach_header.h
- *
- *	Definitions for accessing mach-o headers.
- *
- * NOTE:	These functions work on Mach-O headers compatible with
- *		the currently running kernel, and cannot be used against mach
- *		headers other than that of the currently running kernel.
- *
- */
+  
+                                     
+  
+                                            
+  
+                                                               
+                                                                 
+                                                            
+  
+   
 
 #ifndef _KERNEL_MACH_HEADER_
 #define _KERNEL_MACH_HEADER_
@@ -81,13 +81,13 @@ typedef struct nlist            kernel_nlist_t;
 
 extern kernel_mach_header_t _mh_execute_header;
 
-/*
- * If the 'MH_DYLIB_IN_CACHE' bit is set in a kernel or kext mach-o header flag,
- * then that mach-o has been linked by the new KernelCollectionBuilder into
- * an MH_FILESET kernel collection. This bit is typically reserved for dylibs
- * that are part of the dyld-shared-cache, but when applied to constituents of
- * a kernel collection, it has this special meaning.
- */
+  
+                                                                                
+                                                                           
+                                                                             
+                                                                              
+                                                    
+   
 #define kernel_mach_header_is_in_fileset(_mh) ((_mh)->flags & MH_DYLIB_IN_CACHE)
 
 vm_offset_t getlastaddr(void);
@@ -121,4 +121,4 @@ void *getuuidfromheader(kernel_mach_header_t *, unsigned long *);
 }
 #endif
 
-#endif  /* _KERNEL_MACH_HEADER_ */
+#endif                            

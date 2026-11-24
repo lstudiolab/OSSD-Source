@@ -44,12 +44,12 @@ T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
 #if TARGET_OS_OSX && defined(_COMM_PAGE_TEXT_ATOMIC_ENQUEUE)
 
-/* Keys and discriminators */
+                             
 #define COMMPAGE_PFZ_BASE_AUTH_KEY ptrauth_key_process_independent_code
 #define COMMPAGE_PFZ_FN_AUTH_KEY ptrauth_key_function_pointer
 #define COMMPAGE_PFZ_BASE_DISCRIMINATOR ptrauth_string_discriminator("pfz")
 
-/* Auth and sign macros */
+                          
 #define SIGN_COMMPAGE_PFZ_BASE_PTR(ptr) \
 	ptrauth_sign_unauthenticated(ptr, COMMPAGE_PFZ_BASE_AUTH_KEY, COMMPAGE_PFZ_BASE_DISCRIMINATOR)
 #define AUTH_COMMPAGE_PFZ_BASE_PTR(ptr) \
@@ -75,12 +75,12 @@ get_pfz_base(void)
 static void
 undefined_function(void)
 {
-	// We can use the same commpage_pfz_base as parent since the PFZ is slide
-	// once per boot and is same across all processes
+	                                                                         
+	                                                 
 	void (*undefined)(void);
 	uintptr_t addr = (uintptr_t) (void *) AUTH_COMMPAGE_PFZ_BASE_PTR(commpage_pfz_base);
 	addr += _COMM_PAGE_TEXT_ATOMIC_DEQUEUE;
-	addr += 4; // Jump ahead
+	addr += 4;              
 	undefined = SIGN_COMMPAGE_PFZ_FUNCTION_PTR((void *)addr);
 
 	return undefined();
@@ -93,7 +93,7 @@ typedef struct {
 
 T_DECL(test_arm_pfz, "Validate that ARM PFZ is mapped in",
     T_META_CHECK_LEAKS(false), T_META_IGNORECRASHES(".*undefined_function*"),
-    T_META_ENABLED(false) /* rdar://62615792 */)
+    T_META_ENABLED(false)                      )
 {
 	static dispatch_once_t pred;
 	dispatch_once(&pred, ^{
@@ -117,7 +117,7 @@ T_DECL(test_arm_pfz, "Validate that ARM PFZ is mapped in",
 	T_ASSERT_EQ(node_ptr, NULL, "Dequeuing from empty list correctly");
 
 	int child_pid = 0;
-	if ((child_pid = fork()) == 0) { // Child should call undefined function
+	if ((child_pid = fork()) == 0) {                                        
 		return undefined_function();
 	} else {
 		int status = 0;
@@ -130,7 +130,7 @@ T_DECL(test_arm_pfz, "Validate that ARM PFZ is mapped in",
 }
 
 T_DECL(test_rdar_65270017, "Testing for rdar 65270017",
-    T_META_CHECK_LEAKS(false), T_META_ENABLED(false) /* rdar://65270017 */)
+    T_META_CHECK_LEAKS(false), T_META_ENABLED(false)                      )
 {
 	static dispatch_once_t pred;
 	dispatch_once(&pred, ^{
@@ -138,7 +138,7 @@ T_DECL(test_rdar_65270017, "Testing for rdar 65270017",
 	});
 
 	struct OSAtomicFifoHeadWrapper {
-		// Embedded OSFifoQueueHead structure inside the structure
+		                                                          
 		void *first;
 		void *last;
 		int opaque;
@@ -201,7 +201,7 @@ T_DECL(test_65270017_contended, "multithreaded testing for radar 65270017")
 	uint64_t __block t = 0;
 
 	struct OSAtomicFifoHeadWrapper {
-		// Embedded OSFifoQueueHead structure inside the structure
+		                                                          
 		void *first;
 		void *last;
 		int opaque;
@@ -234,7 +234,7 @@ T_DECL(test_65270017_contended, "multithreaded testing for radar 65270017")
 
 	dispatch_apply(WIDE, global_q, ^(size_t i) {
 		dispatch_apply(SMALL, global_q, ^(size_t idx) {
-			OSAtomicFifoEnqueue(q1, &(elements[i][idx]), offset); // contended enqueue on q1
+			OSAtomicFifoEnqueue(q1, &(elements[i][idx]), offset);                           
 		});
 
 		uint32_t count = 0;

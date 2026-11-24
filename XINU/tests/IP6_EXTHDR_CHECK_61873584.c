@@ -56,8 +56,8 @@ T_DECL(IP6_EXTHDR_CHECK_ICMPV6_61873584, "ICMPv6 test for IP6_EXTHDR_CHECK stale
 	packet1.frag.ip6f_reserved = 0;
 	packet1.frag.ip6f_offlg = htons(0) | IP6F_MORE_FRAG;
 	packet1.frag.ip6f_ident = id;
-	// Use IPPROTO_RAW for "assertion failed: m->m_flags & M_PKTHDR" panic
-	// Use IPPROTO_ICMPV6 for "m_free: freeing an already freed mbuf" panic
+	                                                                      
+	                                                                       
 	packet1.dest.ip6d_nxt = IPPROTO_RAW;
 	packet1.dest.ip6d_len = 1;
 	packet1.dest_opt.ip6o_type = IP6OPT_PADN;

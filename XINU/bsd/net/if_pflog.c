@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$apfw: if_pflog.c,v 1.4 2008/08/27 00:01:32 jhw Exp $		*/
-/*	$OpenBSD: if_pflog.c,v 1.22 2006/12/15 09:31:20 otto Exp $	*/
+                                                            
+                                                                
 /*
  * The authors of this code are John Ioannidis (ji@tla.org),
  * Angelos D. Keromytis (kermit@csd.uch.gr) and
@@ -119,7 +119,7 @@ static struct if_clone pflog_cloner =
     IF_CLONE_INITIALIZER(PFLOGNAME, pflog_clone_create, pflog_clone_destroy,
     0, (PFLOGIFS_MAX - 1), PFLOGIF_ZONE_MAX_ELEM, sizeof(struct pflog_softc));
 
-struct ifnet *pflogifs[PFLOGIFS_MAX];   /* for fast access */
+struct ifnet *pflogifs[PFLOGIFS_MAX];                        
 
 void
 pfloginit(void)
@@ -142,10 +142,10 @@ pflog_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	int error = 0;
 
 	if (unit >= PFLOGIFS_MAX) {
-		/* Either the interface cloner or our initializer is broken */
+		                                                              
 		panic("%s: unit (%d) exceeds max (%d)", __func__, unit,
 		    PFLOGIFS_MAX);
-		/* NOTREACHED */
+		                
 	}
 
 	if ((pflogif = if_clone_softc_allocate(&pflog_cloner)) == NULL) {
@@ -239,7 +239,7 @@ pflog_clone_destroy(struct ifnet *ifp)
 	if ((error = pflog_remove(ifp)) != 0) {
 		goto done;
 	}
-	/* bpfdetach() is taken care of as part of interface detach */
+	                                                              
 	(void)ifnet_detach(ifp);
 done:
 	return error;
@@ -372,7 +372,7 @@ pflog_packet(struct pfi_kif *kif, pbuf_t *pbuf, sa_family_t af, u_int8_t dir,
 		ip->ip_sum = 0;
 		ip->ip_sum = in_cksum(m, ip->ip_hl << 2);
 	}
-#endif /* INET */
+#endif           
 
 	atomic_add_64(&ifn->if_opackets, 1);
 	atomic_add_64(&ifn->if_obytes, m->m_pkthdr.len);
@@ -389,6 +389,6 @@ pflog_packet(struct pfi_kif *kif, pbuf_t *pbuf, sa_family_t af, u_int8_t dir,
 	default:
 		break;
 	}
-#endif /* NBPFILTER > 0 */
+#endif                    
 	return 0;
 }

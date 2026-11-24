@@ -74,9 +74,9 @@
 #include <sys/queue.h>
 #include <stdint.h>
 
-/*
- * Definitions of device driver entry switches
- */
+  
+                                              
+   
 
 struct buf;
 struct proc;
@@ -84,18 +84,18 @@ struct tty;
 struct uio;
 struct vnode;
 
-/*
- * Types for d_type.
- * These are returned by ioctl FIODTYPE
- */
+  
+                    
+                                       
+   
 #define D_TAPE  1
 #define D_DISK  2
 #define D_TTY   3
 
 #ifdef KERNEL
-/*
- * Device switch function types.
- */
+  
+                                
+   
 typedef int  open_close_fcn_t(dev_t dev, int flags, int devtype,
     struct proc *p);
 
@@ -104,7 +104,7 @@ typedef struct tty *d_devtotty_t(dev_t dev);
 typedef void strategy_fcn_t(struct buf *bp);
 typedef int  ioctl_fcn_t(dev_t dev, u_long cmd, caddr_t data,
     int fflag, struct proc *p);
-typedef int  dump_fcn_t(void);     /* parameters vary by architecture */
+typedef int  dump_fcn_t(void);                                          
 typedef int  psize_fcn_t(dev_t dev);
 typedef int  read_write_fcn_t(dev_t dev, struct uio *uio, int ioflag);
 typedef int  stop_fcn_t(struct tty *tp, int rw);
@@ -128,10 +128,10 @@ int             enodev(void);
 void    enodev_strat(void);
 __END_DECLS
 
-/*
- * Versions of enodev() pointer, cast to appropriate function type. For use
- * in empty devsw slots.
- */
+  
+                                                                           
+                        
+   
 #define eno_opcl                ((open_close_fcn_t *)&enodev)
 #define eno_strat               ((strategy_fcn_t *)&enodev_strat)
 #define eno_ioctl               ((ioctl_fcn_t *)&enodev)
@@ -143,13 +143,13 @@ __END_DECLS
 #define eno_mmap                ((mmap_fcn_t *)&enodev)
 #define eno_select              ((select_fcn_t *)&enodev)
 
-/* For source backward compatibility only! */
+                                             
 #define eno_getc                ((void *)&enodev)
 #define eno_putc                ((void *)&enodev)
 
-/*
- * Block device switch table
- */
+  
+                            
+   
 struct bdevsw {
 	open_close_fcn_t        *d_open;
 	open_close_fcn_t        *d_close;
@@ -167,19 +167,19 @@ d_write_t       nowrite;
 #ifdef KERNEL_PRIVATE
 extern struct bdevsw bdevsw[];
 extern int (*bootcache_contains_block)(dev_t device, u_int64_t blkno);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * Contents of empty bdevsw slot.
- */
+  
+                                 
+   
 #define  NO_BDEVICE                                             \
 	{ eno_opcl,	eno_opcl,	eno_strat, eno_ioctl,   \
 	  eno_dump,	eno_psize,	0       }
 
 
-/*
- * Character device switch table
- */
+  
+                                
+   
 struct cdevsw {
 	open_close_fcn_t        *d_open;
 	open_close_fcn_t        *d_close;
@@ -206,12 +206,12 @@ extern uint64_t cdevsw_flags[];
 #define CDEVSW_IS_PTS        0x08
 
 struct thread;
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 
-/*
- * Contents of empty cdevsw slot.
- */
+  
+                                 
+   
 
 #define  NO_CDEVICE                                                      \
     {                                                                   \
@@ -221,7 +221,7 @@ struct thread;
 	eno_putc,	0                                               \
     }
 
-#endif /* KERNEL */
+#endif             
 
 #ifdef  KERNEL_PRIVATE
 typedef int  l_open_t (dev_t dev, struct tty *tp);
@@ -234,9 +234,9 @@ typedef int  l_rint_t (int c, struct tty *tp);
 typedef void l_start_t(struct tty *tp);
 typedef int  l_modem_t(struct tty *tp, int flag);
 
-/*
- * Line discipline switch table
- */
+  
+                               
+   
 struct linesw {
 	l_open_t        *l_open;
 	l_close_t       *l_close;
@@ -254,14 +254,14 @@ extern const int nlinesw;
 
 int ldisc_register(int, struct linesw *);
 void ldisc_deregister(int);
-#define LDISC_LOAD      -1              /* Loadable line discipline */
+#define LDISC_LOAD      -1                                            
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * Swap device table
- */
+  
+                    
+   
 struct swdevt {
 	dev_t   sw_dev;
 	int     sw_flags;
@@ -270,31 +270,31 @@ struct swdevt {
 };
 #define SW_FREED        0x01
 #define SW_SEQUENTIAL   0x02
-#define sw_freed        sw_flags        /* XXX compat */
+#define sw_freed        sw_flags                        
 
 extern struct swdevt swdevt[];
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 
 #ifdef KERNEL
-/*
- * ***_free finds free slot;
- * ***_add adds entries to the devsw table
- * If int arg is -1; finds a free slot
- * Returns the major number if successful
- *  else -1
- */
+  
+                            
+                                          
+                                      
+                                         
+           
+   
 __BEGIN_DECLS
 #ifdef KERNEL_PRIVATE
 extern struct cdevsw cdevsw[];
 extern int cdevsw_setkqueueok(int, const struct cdevsw*, int);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef BSD_KERNEL_PRIVATE
 extern void devsw_lock(dev_t, int);
 extern void devsw_unlock(dev_t, int);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 int  bdevsw_isfree(int);
 int  bdevsw_add(int, const struct bdevsw *);
@@ -305,6 +305,6 @@ int  cdevsw_add_with_bdev(int index, const struct cdevsw * csw, int bdev);
 int  cdevsw_remove(int, const struct cdevsw *);
 int  isdisk(dev_t, int);
 __END_DECLS
-#endif /* KERNEL */
+#endif             
 
-#endif /* _SYS_CONF_H_ */
+#endif                   

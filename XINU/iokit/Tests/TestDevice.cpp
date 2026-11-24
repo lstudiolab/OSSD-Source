@@ -148,7 +148,7 @@ producer(void *inProducerId)
 		sDevice->enqueueCommand
 		(true, command, i, (void *) (i % (producerId + 1)));
 		if (!(i % (producerId + 1))) {
-			/* cthread_yield() */;
+			                     ;
 		}
 		logPrintf(("TestDevice(%d): %d\n", producerId, i));
 	}
@@ -202,4 +202,4 @@ testWorkLoop()
 	logPrintf(("TestDevice: exiting\n"));
 }
 
-#endif /* DEBUG */
+#endif            

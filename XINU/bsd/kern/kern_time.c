@@ -60,12 +60,12 @@
  *
  *	@(#)kern_time.c	8.4 (Berkeley) 5/26/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/resourcevar.h>
@@ -80,7 +80,7 @@
 #include <sys/mount_internal.h>
 #include <sys/sysproto.h>
 #include <sys/signalvar.h>
-#include <sys/protosw.h> /* for net_uptime2timeval() */
+#include <sys/protosw.h>                               
 
 #include <kern/clock.h>
 #include <kern/task.h>
@@ -92,9 +92,9 @@
 #include <sys/time.h>
 #include <kern/remote_time.h>
 
-#define HZ      100     /* XXX */
+#define HZ      100              
 
-/* simple lock used to access timezone, tz structure */
+                                                       
 static LCK_GRP_DECLARE(tz_slock_grp, "tzlock");
 static LCK_SPIN_DECLARE(tz_slock, &tz_slock_grp);
 
@@ -103,16 +103,16 @@ static void             setthetime(
 
 static boolean_t timeval_fixusec(struct timeval *t1);
 
-/*
- * Time of day and interval timer support.
- *
- * These routines provide the kernel entry points to get and set
- * the time-of-day and per-process interval timers.  Subroutines
- * here provide support for adding and subtracting timeval structures
- * and decrementing interval timers, optionally reloading the interval
- * timers when they expire.
- */
-/* ARGSUSED */
+  
+                                          
+  
+                                                                
+                                                                
+                                                                     
+                                                                      
+                           
+   
+              
 int
 gettimeofday(
 	struct proc     *p,
@@ -120,7 +120,7 @@ gettimeofday(
 	__unused int32_t *retval)
 {
 	int error = 0;
-	struct timezone ltz; /* local copy */
+	struct timezone ltz;                 
 	clock_sec_t secs;
 	clock_usec_t usecs;
 	uint64_t mach_time;
@@ -130,7 +130,7 @@ gettimeofday(
 	}
 
 	if (uap->tp) {
-		/* Casting secs through a uint32_t to match arm64 commpage */
+		                                                             
 		if (IS_64BIT_PROCESS(p)) {
 			struct user64_timeval user_atv = {};
 			user_atv.tv_sec = (uint32_t)secs;
@@ -162,10 +162,10 @@ gettimeofday(
 	return error;
 }
 
-/*
- * XXX Y2038 bug because of setthetime() argument
- */
-/* ARGSUSED */
+  
+                                                 
+   
+              
 int
 settimeofday(__unused struct proc *p, struct settimeofday_args  *uap, __unused int32_t *retval)
 {
@@ -175,7 +175,7 @@ settimeofday(__unused struct proc *p, struct settimeofday_args  *uap, __unused i
 
 	bzero(&atv, sizeof(atv));
 
-	/* Check that this task is entitled to set the time or it is root */
+	                                                                    
 	if (!IOTaskHasEntitlement(current_task(), SETTIME_ENTITLEMENT)) {
 #if CONFIG_MACF
 		error = mac_system_check_settime(kauth_cred_get());
@@ -190,7 +190,7 @@ settimeofday(__unused struct proc *p, struct settimeofday_args  *uap, __unused i
 #endif
 	}
 
-	/* Verify all parameters before changing time */
+	                                                
 	if (uap->tv) {
 		if (IS_64BIT_PROCESS(p)) {
 			struct user64_timeval user_atv;
@@ -211,7 +211,7 @@ settimeofday(__unused struct proc *p, struct settimeofday_args  *uap, __unused i
 		return error;
 	}
 	if (uap->tv) {
-		/* only positive values of sec/usec are accepted */
+		                                                   
 		if (atv.tv_sec < 0 || atv.tv_usec < 0) {
 			return EPERM;
 		}
@@ -235,29 +235,29 @@ setthetime(
 	clock_set_calendar_microtime(tv->tv_sec, tv->tv_usec);
 }
 
-/*
- *	Verify the calendar value.  If negative,
- *	reset to zero (the epoch).
- */
+  
+                                           
+                             
+   
 void
 inittodr(
 	__unused time_t base)
 {
 	struct timeval  tv;
 
-	/*
-	 * Assertion:
-	 * The calendar has already been
-	 * set up from the platform clock.
-	 *
-	 * The value returned by microtime()
-	 * is gotten from the calendar.
-	 */
+	  
+              
+                                 
+                                   
+   
+                                     
+                                
+    
 	microtime(&tv);
 
 	if (tv.tv_sec < 0 || tv.tv_usec < 0) {
 		printf("WARNING: preposterous time in Real Time Clock");
-		tv.tv_sec = 0;          /* the UNIX epoch */
+		tv.tv_sec = 0;                              
 		tv.tv_usec = 0;
 		setthetime(&tv);
 		printf(" -- CHECK AND RESET THE DATE!\n");
@@ -286,29 +286,29 @@ boottime_timeval(struct timeval *tv)
 	tv->tv_usec = microsecs;
 }
 
-/*
- * Get value of an interval timer.  The process virtual and
- * profiling virtual time timers are kept internally in the
- * way they are specified externally: in time until they expire.
- *
- * The real time interval timer expiration time (p_rtime)
- * is kept as an absolute time rather than as a delta, so that
- * it is easy to keep periodic real-time signals from drifting.
- *
- * The real time timer is processed by a callout routine.
- * Since a callout may be delayed in real time due to
- * other processing in the system, it is possible for the real
- * time callout routine (realitexpire, given below), to be delayed
- * in real time past when it is supposed to occur.  It does not
- * suffice, therefore, to reload the real time .it_value from the
- * real time .it_interval.  Rather, we compute the next time in
- * absolute time when the timer should go off.
- *
- * Returns:	0			Success
- *		EINVAL			Invalid argument
- *	copyout:EFAULT			Bad address
- */
-/* ARGSUSED */
+  
+                                                           
+                                                           
+                                                                
+  
+                                                         
+                                                              
+                                                               
+  
+                                                         
+                                                     
+                                                              
+                                                                  
+                                                               
+                                                                 
+                                                               
+                                              
+  
+                       
+                             
+                               
+   
+              
 int
 getitimer(struct proc *p, struct getitimer_args *uap, __unused int32_t *retval)
 {
@@ -323,11 +323,11 @@ getitimer(struct proc *p, struct getitimer_args *uap, __unused int32_t *retval)
 	proc_spinlock(p);
 	switch (uap->which) {
 	case ITIMER_REAL:
-		/*
-		 * If time for real time timer has passed return 0,
-		 * else return difference between current time and
-		 * time for the timer to go off.
-		 */
+		  
+                                                     
+                                                    
+                                  
+     
 		aitv = p->p_realtimer;
 		if (timerisset(&p->p_rtime)) {
 			struct timeval          now;
@@ -374,14 +374,14 @@ getitimer(struct proc *p, struct getitimer_args *uap, __unused int32_t *retval)
 	}
 }
 
-/*
- * Returns:	0			Success
- *		EINVAL			Invalid argument
- *	copyin:EFAULT			Bad address
- *	getitimer:EINVAL		Invalid argument
- *	getitimer:EFAULT		Bad address
- */
-/* ARGSUSED */
+  
+                       
+                             
+                              
+                                     
+                                
+   
+              
 int
 setitimer(struct proc *p, struct setitimer_args *uap, int32_t *retval)
 {
@@ -476,14 +476,14 @@ setitimer(struct proc *p, struct setitimer_args *uap, int32_t *retval)
 	return 0;
 }
 
-/*
- * Real interval timer expired:
- * send process whose timer expired an alarm signal.
- * If time is not set up to reload, then just return.
- * Else compute next time timer should go off which is > current time.
- * This is where delay in processing this timeout causes multiple
- * SIGALRM calls to be compressed into one.
- */
+  
+                               
+                                                    
+                                                     
+                                                                      
+                                                                 
+                                           
+   
 void
 realitexpire(
 	struct proc *p)
@@ -498,10 +498,10 @@ realitexpire(
 	assert(p->p_ractive > 0);
 
 	if (--p->p_ractive > 0 || r != p) {
-		/*
-		 * bail, because either proc is exiting
-		 * or there's another active thread call
-		 */
+		  
+                                         
+                                          
+     
 		proc_spinunlock(p);
 
 		if (r != NULL) {
@@ -511,10 +511,10 @@ realitexpire(
 	}
 
 	if (!timerisset(&p->p_realtimer.it_interval)) {
-		/*
-		 * p_realtimer was cleared while this call was pending,
-		 * send one last SIGALRM, but don't re-arm
-		 */
+		  
+                                                         
+                                            
+     
 		timerclear(&p->p_rtime);
 		proc_spinunlock(p);
 
@@ -525,16 +525,16 @@ realitexpire(
 
 	proc_spinunlock(p);
 
-	/*
-	 * Send the signal before re-arming the next thread call,
-	 * so in case psignal blocks, we won't create yet another thread call.
-	 */
+	  
+                                                          
+                                                                       
+    
 
 	psignal(p, SIGALRM);
 
 	proc_spinlock(p);
 
-	/* Should we still re-arm the next thread call? */
+	                                                  
 	if (!timerisset(&p->p_realtimer.it_interval)) {
 		timerclear(&p->p_rtime);
 		proc_spinunlock(p);
@@ -572,13 +572,13 @@ realitexpire(
 	proc_rele(p);
 }
 
-/*
- * Called once in proc_exit to clean up after an armed or pending realitexpire
- *
- * This will only be called after the proc refcount is drained,
- * so realitexpire cannot be currently holding a proc ref.
- * i.e. it will/has gotten PROC_NULL from proc_find.
- */
+  
+                                                                              
+  
+                                                               
+                                                          
+                                                    
+   
 void
 proc_free_realitimer(proc_t p)
 {
@@ -610,10 +610,10 @@ proc_free_realitimer(proc_t p)
 	thread_call_free(call);
 }
 
-/*
- * Check that a proposed value to load into the .it_value or
- * .it_interval part of an interval timer is acceptable.
- */
+  
+                                                            
+                                                        
+   
 int
 itimerfix(
 	struct timeval *tv)
@@ -628,8 +628,8 @@ itimerfix(
 int
 timespec_is_valid(const struct timespec *ts)
 {
-	/* The INT32_MAX limit ensures the timespec is safe for clock_*() functions
-	 * which accept 32-bit ints. */
+	                                                                           
+                                
 	if (ts->tv_sec < 0 || ts->tv_sec > INT32_MAX ||
 	    ts->tv_nsec < 0 || (unsigned long long)ts->tv_nsec > NSEC_PER_SEC) {
 		return 0;
@@ -637,16 +637,16 @@ timespec_is_valid(const struct timespec *ts)
 	return 1;
 }
 
-/*
- * Decrement an interval timer by a specified number
- * of microseconds, which must be less than a second,
- * i.e. < 1000000.  If the timer expires, then reload
- * it.  In this case, carry over (usec - old value) to
- * reduce the value reloaded into the timer so that
- * the timer does not drift.  This routine assumes
- * that it is called in a context where the timers
- * on which it is operating cannot change in value.
- */
+  
+                                                    
+                                                     
+                                                     
+                                                      
+                                                   
+                                                  
+                                                  
+                                                   
+   
 int
 itimerdecr(proc_t p,
     struct itimerval *itp, int usec)
@@ -655,7 +655,7 @@ itimerdecr(proc_t p,
 
 	if (itp->it_value.tv_usec < usec) {
 		if (itp->it_value.tv_sec == 0) {
-			/* expired, and already in next interval */
+			                                           
 			usec -= itp->it_value.tv_usec;
 			goto expire;
 		}
@@ -668,7 +668,7 @@ itimerdecr(proc_t p,
 		proc_spinunlock(p);
 		return 1;
 	}
-	/* expired, exactly at end of interval */
+	                                         
 expire:
 	if (timerisset(&itp->it_interval)) {
 		itp->it_value = itp->it_interval;
@@ -680,19 +680,19 @@ expire:
 			}
 		}
 	} else {
-		itp->it_value.tv_usec = 0;              /* sec is already 0 */
+		itp->it_value.tv_usec = 0;                                    
 	}
 	proc_spinunlock(p);
 	return 0;
 }
 
-/*
- * Add and subtract routines for timevals.
- * N.B.: subtract routine doesn't deal with
- * results which are before the beginning,
- * it just gets very confused in this case.
- * Caveat emptor.
- */
+  
+                                          
+                                           
+                                          
+                                           
+                 
+   
 void
 timevaladd(
 	struct timeval *t1,
@@ -742,10 +742,10 @@ timeval_fixusec(
 	return TRUE;
 }
 
-/*
- * Return the best possible estimate of the time in the timeval
- * to which tvp points.
- */
+  
+                                                               
+                       
+   
 void
 microtime(
 	struct timeval  *tvp)
@@ -785,9 +785,9 @@ microuptime(
 	tvp->tv_usec = tv_usec;
 }
 
-/*
- * Ditto for timespec.
- */
+  
+                      
+   
 void
 nanotime(
 	struct timespec *tsp)
@@ -838,9 +838,9 @@ tstoabstime(struct timespec *ts)
 }
 
 #if NETWORKING
-/*
- * ratecheck(): simple time-based rate-limit checking.
- */
+  
+                                                      
+   
 int
 ratecheck(struct timeval *lasttime, const struct timeval *mininterval)
 {
@@ -851,10 +851,10 @@ ratecheck(struct timeval *lasttime, const struct timeval *mininterval)
 	delta = tv;
 	timevalsub(&delta, lasttime);
 
-	/*
-	 * check for 0,0 is so that the message will be seen at least once,
-	 * even if interval is huge.
-	 */
+	  
+                                                                    
+                             
+    
 	if (timevalcmp(&delta, mininterval, >=) ||
 	    (lasttime->tv_sec == 0 && lasttime->tv_usec == 0)) {
 		*lasttime = tv;
@@ -864,9 +864,9 @@ ratecheck(struct timeval *lasttime, const struct timeval *mininterval)
 	return rv;
 }
 
-/*
- * ppsratecheck(): packets (or events) per second limitation.
- */
+  
+                                                             
+   
 int
 ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 {
@@ -877,14 +877,14 @@ ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 
 	timersub(&tv, lasttime, &delta);
 
-	/*
-	 * Check for 0,0 so that the message will be seen at least once.
-	 * If more than one second has passed since the last update of
-	 * lasttime, reset the counter.
-	 *
-	 * we do increment *curpps even in *curpps < maxpps case, as some may
-	 * try to use *curpps for stat purposes as well.
-	 */
+	  
+                                                                 
+                                                               
+                                
+   
+                                                                      
+                                                 
+    
 	if ((lasttime->tv_sec == 0 && lasttime->tv_usec == 0) ||
 	    delta.tv_sec >= 1) {
 		*lasttime = tv;
@@ -898,25 +898,25 @@ ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 		rv = 0;
 	}
 
-#if 1 /* DIAGNOSTIC? */
-	/* be careful about wrap-around */
+#if 1                  
+	                                  
 	if (*curpps + 1 > 0) {
 		*curpps = *curpps + 1;
 	}
 #else
-	/*
-	 * assume that there's not too many calls to this function.
-	 * not sure if the assumption holds, as it depends on *caller's*
-	 * behavior, not the behavior of this function.
-	 * IMHO it is wrong to make assumption on the caller's behavior,
-	 * so the above #if is #if 1, not #ifdef DIAGNOSTIC.
-	 */
+	  
+                                                            
+                                                                 
+                                                
+                                                                 
+                                                     
+    
 	*curpps = *curpps + 1;
 #endif
 
 	return rv;
 }
-#endif /* NETWORKING */
+#endif                 
 
 int
 __mach_bridge_remote_time(__unused struct proc *p, struct __mach_bridge_remote_time_args *mbrt_args, uint64_t *retval)

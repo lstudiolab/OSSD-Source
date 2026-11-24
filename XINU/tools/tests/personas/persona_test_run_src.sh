@@ -1,17 +1,17 @@
-#!/bin/bash
-# persona_test_run.sh
-#
-# This file aims to be a comprehensive test suite for the persona subsystem.
-# It uses two tools:
-#   1. persona_mgr - create, destroy, lookup personas
-#   2. persona_spawn - spawn processes into personas with a variety of options
-# The script relies heavily on the particular output of these tools, so if you
-# are modifying / extending those tools, this file also need to be updated to
-# properly capture the new output. Specifically, the get_persona_info function
-# needs to be maintained / updated.
-#
-# NOTE: the function get_persona_info() also needs to be kept up to date with
-# the types of personas found in bsd/sys/persona.h
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 PERSONA_MGR="${PWD}/persona_mgr"
 PERSONA_SPAWN="${PWD}/persona_spawn"
@@ -45,12 +45,12 @@ function check_for_persona_support() {
 check_for_persona_support
 
 
-## bail [failure_msg]
-#
-# exit the script with an error code that corresponds to the line number
-# from which this function was invoked. Because we want to exit with a
-# non-zero exit code, we use: 1 + (254 % line).
-#
+
+
+
+
+
+
 function bail() {
 	local msg="$1"
 	local line=$2
@@ -61,11 +61,11 @@ function bail() {
 	exit $((1 + $line % 254))
 }
 
-## check_return [message_on_failure]
-#
-# Check the return value of the previous command or script line. If the
-# value of '$?' is not 0, then call bail() with an appropriate message.
-#
+
+
+
+
+
 function check_return() {
 	local err=$?
 	local msg=$1
@@ -81,12 +81,12 @@ function check_return() {
 	return 0
 }
 
-## expect_failure [message_on_success]
-#
-# Check the return value of the previous command or script line. If the
-# value of '$?' is 0 (success), then call bail() with a message saying
-# that we expected this previous command/line to fail.
-# 
+
+
+
+
+
+
 function expect_failure() {
 	local err=$?
 	local msg=$1
@@ -102,10 +102,10 @@ function expect_failure() {
 	return 0
 }
 
-## test_num [debug_info] [number]
-#
-# Check that a variable value is a number, bail() on error.
-#
+
+
+
+
 function test_num() {
 	local type=$1
 	local num=$2
@@ -124,7 +124,7 @@ function test_num() {
 	return 0
 }
 
-## global variables used to return values to callers
+
 _ID=-1
 _TYPE="invalid"
 _LOGIN=""
@@ -133,10 +133,10 @@ _GID=-1
 _NGROUPS=-1
 _GROUPS=""
 
-## get_persona_info {persona_id} {persona_login}
-#
-# Lookup persona info for the given ID/login. At least one of the ID/login
-# parameters must be valid
+
+
+
+
 function get_persona_info() {
 	local pna_id=${1:-1}
 	local pna_login=${2:- }
@@ -168,9 +168,9 @@ function get_persona_info() {
 
 	local type=$(cat "${file}" | grep "+type: " | head -1 | sed 's/.*+type:[ ]*\([0-9][0-9]*\).*/\1/')
 	test_num "+type lookup:${largs}" "$type"
-	##
-	## NOTE: keep in sync with bsd/sys/persona.h types!
-	##
+
+
+
 	if [ $type -eq 1 ]; then
 		_TYPE=guest
 	elif [ $type -eq 2 ]; then
@@ -188,7 +188,7 @@ function get_persona_info() {
 		bail "invalid login for pna_id:$_ID: '$_LOGIN'" $line
 	fi
 
-	# these are always the same
+
 	_UID=$_ID
 
 	_GID=$(cat "${file}" | grep "+gid: " | head -1 | sed 's/.*+gid:[ ]*\([0-9][0-9]*\).*/\1/')
@@ -208,12 +208,12 @@ function get_persona_info() {
 	fi
 }
 
-## validate_child_info [output_file] [persona_id] {uid} {gid} {groups}
-#
-# Parse the output of the 'persona_spawn' command and validate that
-# the new child process is in the correct persona with the correct
-# process attributes.
-#
+
+
+
+
+
+
 function validate_child_info() {
 	local file=$1
 	local pna_id=$2
@@ -226,11 +226,11 @@ function validate_child_info() {
 	fi
 	local l=( )
 
-	# get the child's PID
+
 	local cpid="$(cat "$file" | grep "Child: PID:" | sed 's/.*Child: PID:\([0-9][0-9]*\).*/\1/')"
 	test_num "Child PID" "$cpid" $line
 
-	# validate the child's persona
+
 	l=( $(cat "$file" | grep "Child: Persona:" | sed 's/.*Child: Persona: \([0-9][0-9]*\) (err:\([0-9][0-9]*\))/\1 \2/') )
 	if [ ${#l[@]} -ne 2 ]; then
 		bail "Invalid Child[$cpid] Persona line" $line
@@ -242,7 +242,7 @@ function validate_child_info() {
 		bail "Child[$cpid] persona:${l[0]} != specified persona:$pna_id" $line
 	fi
 
-	# Validate the UID/GID
+
 	l=( $(cat "$file" | grep "Child: UID:" | sed 's/.*UID:\([0-9][0-9]*\), GID:\([0-9][0-9]*\).*/\1 \2/') )
 	if [ ${#l[@]} -ne 2 ]; then
 		bail "Invalid Child[$cpid] UID/GID output" $line
@@ -258,18 +258,18 @@ function validate_child_info() {
 		fi
 	fi
 
-	# TODO: validate / verify groups?
+
 
 	return 0
 }
 
 
-## spawn_child [persona_id] {uid} {gid} {group_spec}
-#
-# Create a child process that is spawn'd into the persona given by
-# the first argument (pna_id). The new process can have its UID, GID,
-# and group membership properties overridden.
-#
+
+
+
+
+
+
 function spawn_child() {
 	local pna_id=$1
 	local uid=${2:--1}
@@ -299,9 +299,9 @@ function spawn_child() {
 	${PERSONA_SPAWN} -v $spawn_args ${PERSONA_SPAWN} child -v -E > "${TMPDIR}/$file"
 	check_return "child info: $file" $line
 
-	# Grab the specified persona's info so we can
-	# verify the child's info against it.
-	# This function puts data into global variables, e.g. _ID, _GID, etc.
+
+
+
 	get_persona_info ${pna_id} " " $line
 	if [ $uid -lt 0 ]; then
 		uid=$_UID
@@ -310,15 +310,15 @@ function spawn_child() {
 		gid=$_GID
 	fi
 	if [ "$groups" == " " ]; then
-		# convert a bash array into a comma-separated list for validation
+
 		local _g="${_GROUPS[@]}"
 		groups="${_g// /,}"
 	fi
 
 	validate_child_info "${TMPDIR}/$file" "$pna_id" "$uid" "$gid" "$groups" $line
 
-	## validate that the first child spawned into a persona *cannot* spawn
-	## into a different persona...
+
+
 	if [ $uid -eq 0 ]; then
 		${PERSONA_SPAWN} -v $spawn_args ${PERSONA_SPAWN_UNENTITLED} child -v -E -R spawn -v $spawn_args -I ${TEST_DEFAULT_PERSONA} /bin/echo "This is running in the system persona"
 		expect_failure "Spawned child that re-execs into non-default persona" $line
@@ -326,11 +326,11 @@ function spawn_child() {
 	return 0
 }
 
-## get_created_id [output_file]
-#
-# Parse the output of the 'persona_mgr' command to determine the ID
-# of the newly created persona.
-#
+
+
+
+
+
 function get_created_id() {
 	local file=$1
 	local o=$(cat "$file" | grep "Created persona" | sed 's/.*Created persona \([0-9][0-9]*\):/\1/')
@@ -338,12 +338,12 @@ function get_created_id() {
 	return 0
 }
 
-## create_persona [login_name] [persona_type] {persona_id} {gid} {group_spec}
-#
-# Create a new persona with given parameters.
-#
-# Returns: the newly created persona ID via the global variable, $_ID
-#
+
+
+
+
+
+
 function create_persona() {
 	local name=${1}
 	local type=${2}
@@ -360,7 +360,7 @@ function create_persona() {
 	fi
 
 	local file="persona.at${line}"
-	# persona ID of '-1' is auto-assigned
+
 	local spawn_args="-v -l $name -i $pna_id"
 	if [ $pna_id -eq -1 ]; then
 		file+=".auto"
@@ -383,10 +383,10 @@ function create_persona() {
 	echo "CREATE: $file"
 	${PERSONA_MGR} create ${spawn_args} > "${TMPDIR}/${file}"
 	check_return "persona creation: ${file}" $line
-	# test output should include persona creation output for later debugging
+
 	cat "${TMPDIR}/${file}"
 
-	# validate the output of the persona_mgr tool (what we think we created)
+
 	_ID=`get_created_id "${TMPDIR}/${file}"`
 	test_num "persona_id for $file" "$_ID" $line
 	if [ ${pna_id} -gt 0 ]; then
@@ -395,8 +395,8 @@ function create_persona() {
 		fi
 	fi
 
-	# validate the entire persona information (what a kpersona_lookup says we created)
-	# This function puts data into global variables, e.g. _ID, _LOGIN, _GID, etc.
+
+
 	echo "VALIDATE: ${file}"
 	get_persona_info ${pna_id} "$name" $line
 	if [ "$name" != "$_LOGIN" ]; then
@@ -425,10 +425,10 @@ function create_persona() {
 	return 0
 }
 
-## destroy_persona [persona_id]
-#
-# Destroy the given persona.
-#
+
+
+
+
 function destroy_persona() {
 	local pna_id=$1
 	local line=$2
@@ -441,21 +441,21 @@ function destroy_persona() {
 	check_return "destruction of ${pna_id}" $line
 }
 
-#
-#
-# Begin Tests!
-#
-#
+
+
+
+
+
 echo "Running persona tests [$LINENO] ($TMPDIR)"
 
-##
-## Test Group 0: basic creation + spawn tests
-##
+
+
+
 
 create_persona "test_default_persona" "guest" 9999
 TEST_DEFAULT_PERSONA=$_ID
 
-# default group, specific ID
+
 create_persona "test0_1" "guest" 1001
 P0ID=$_ID
 
@@ -469,7 +469,7 @@ spawn_child $P0ID 1100 -1 1000,2000,3000
 spawn_child $P0ID -1 -1 1000,2000,3000
 destroy_persona $P0ID
 
-# specific ID, non-default group
+
 create_persona "test0_2" "guest" 1002 2000
 P0ID=$_ID
 spawn_child $P0ID
@@ -482,7 +482,7 @@ spawn_child $P0ID 1100 -1 1000,2000,3000
 spawn_child $P0ID -1 -1 1000,2000,3000
 destroy_persona $P0ID
 
-# non-default set of groups
+
 create_persona "test0_3" "guest" 1003 2000 2000,3000,4000
 P0ID=$_ID
 spawn_child $P0ID
@@ -496,11 +496,11 @@ spawn_child $P0ID -1 -1 1111,2222,3333
 destroy_persona $P0ID
 
 
-##
-## Test Group 1: persona creation / re-creation
-##
 
-# Create 3 personas with auto-assigned IDs
+
+
+
+
 create_persona "test1_1" "guest"
 P1ID=$_ID
 create_persona "test1_2" "managed"
@@ -517,18 +517,18 @@ if [ $D1 -ne $D2 -o $D1 -ne $D3 -o $D2 -ne $D3 ]; then
 	bail "inconsistent automatic Persona ID increment: $D1,$D2,$D3 ($P1ID,$P2ID,$P3ID,$P4ID)"
 fi
 
-# make sure we can't re-allocate the same name / ID
+
 ${PERSONA_MGR} create -v -l test1_1 -t guest -i -1 && expect_failure "re-create same name:test1_1 type:guest"
 ${PERSONA_MGR} create -v -l test1_1 -t managed -i -1 && expect_failure "re-create same name:test1_1 type:managed"
 ${PERSONA_MGR} create -v -l test1_1_new -t managed -i $P1ID && expect_failure "re-create $P1ID with new name:test1_1_new type:managed"
 
-##
-## Test Group 2: auto-assigned ID tricks
-##
 
-# Notice the difference in IDs, then try to create a persona by
-# specifying an ID that will match the next auto-assigned ID
-# (should succeed)
+
+
+
+
+
+
 P5ID_REQ=$(($P4ID + $D2))
 create_persona "test2_1" "guest" ${P5ID_REQ}
 P5ID=$_ID
@@ -536,17 +536,17 @@ if [ ! $P5ID -eq ${P5ID_REQ} ]; then
 	bail "test2_1: ${P5ID_REQ} != $P5ID"
 fi
 
-# try to create a persona with auto-assigned ID
-# (resulting persona should have ID != P5ID)
+
+
 create_persona "test2_2" "guest"
 P6ID=$_ID
 if [ $P6ID -eq $P5ID ]; then
 	bail "created duplicate persona IDs: $P6ID == $P5ID"
 fi
 
-##
-## Test Group 3: persona destruction
-##
+
+
+
 
 destroy_persona $P1ID
 destroy_persona $P2ID
@@ -555,8 +555,8 @@ destroy_persona $P4ID
 destroy_persona $P5ID
 destroy_persona $P6ID
 
-# try to re-destroy the personas
-# (should fail)
+
+
 ${PERSONA_MGR} destroy -v -i $P1ID && expect_failure "re-destroy (1/2) $P1ID"
 ${PERSONA_MGR} destroy -v -i $P1ID && expect_failure "re-destroy (2/2) $P1ID"
 ${PERSONA_MGR} destroy -v -i $P2ID && expect_failure "re-destroy $P2ID"
@@ -567,7 +567,7 @@ ${PERSONA_MGR} destroy -v -i $P6ID && expect_failure "re-destroy $P6ID"
 
 destroy_persona ${TEST_DEFAULT_PERSONA}
 
-# cleanup
+
 rm -rf "${TMPDIR}"
 
 echo ""

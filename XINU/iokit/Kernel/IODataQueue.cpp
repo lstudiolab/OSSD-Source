@@ -119,8 +119,8 @@ IODataQueue::initWithCapacity(UInt32 size)
 	bzero(dataQueue, allocSize);
 
 	dataQueue->queueSize    = size;
-//  dataQueue->head         = 0;
-//  dataQueue->tail         = 0;
+                                
+                                
 
 	return true;
 }
@@ -128,12 +128,12 @@ IODataQueue::initWithCapacity(UInt32 size)
 Boolean
 IODataQueue::initWithEntries(UInt32 numEntries, UInt32 entrySize)
 {
-	// Checking overflow for (numEntries + 1)*(entrySize + DATA_QUEUE_ENTRY_HEADER_SIZE):
-	//  check (entrySize + DATA_QUEUE_ENTRY_HEADER_SIZE)
+	                                                                                     
+	                                                    
 	if ((entrySize > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) ||
-	    //  check (numEntries + 1)
+	                              
 	    (numEntries > UINT32_MAX - 1) ||
-	    //  check (numEntries + 1)*(entrySize + DATA_QUEUE_ENTRY_HEADER_SIZE)
+	                                                                         
 	    (entrySize + DATA_QUEUE_ENTRY_HEADER_SIZE > UINT32_MAX / (numEntries + 1))) {
 		return false;
 	}
@@ -169,24 +169,24 @@ IODataQueue::enqueue(void * data, UInt32 dataSize)
 	UInt32             queueSize;
 	IODataQueueEntry * entry;
 
-	// Check for overflow of entrySize
+	                                  
 	if (dataSize > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) {
 		return false;
 	}
 
-	// Force a single read of head and tail
-	// See rdar://problem/40780584 for an explanation of relaxed/acquire barriers
+	                                       
+	                                                                             
 	tail = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->tail, __ATOMIC_RELAXED);
 	head = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->head, __ATOMIC_ACQUIRE);
 
-	// Check for underflow of (dataQueue->queueSize - tail)
+	                                                       
 	queueSize = ((IODataQueueInternal *) notifyMsg)->queueSize;
 	if ((queueSize < tail) || (queueSize < head)) {
 		return false;
 	}
 
 	if (tail >= head) {
-		// Is there enough room at the end for the entry?
+		                                                 
 		if ((entrySize <= UINT32_MAX - tail) &&
 		    ((tail + entrySize) <= queueSize)) {
 			entry = (IODataQueueEntry *)((UInt8 *)dataQueue->queue + tail);
@@ -194,20 +194,20 @@ IODataQueue::enqueue(void * data, UInt32 dataSize)
 			entry->size = dataSize;
 			__nochk_memcpy(&entry->data, data, dataSize);
 
-			// The tail can be out of bound when the size of the new entry
-			// exactly matches the available space at the end of the queue.
-			// The tail can range from 0 to dataQueue->queueSize inclusive.
+			                                                              
+			                                                               
+			                                                               
 
 			newTail = tail + entrySize;
-		} else if (head > entrySize) { // Is there enough room at the beginning?
-			// Wrap around to the beginning, but do not allow the tail to catch
-			// up to the head.
+		} else if (head > entrySize) {                                          
+			                                                                   
+			                  
 
 			dataQueue->queue->size = dataSize;
 
-			// We need to make sure that there is enough room to set the size before
-			// doing this. The user client checks for this and will look for the size
-			// at the beginning if there isn't room for it at the end.
+			                                                                        
+			                                                                         
+			                                                          
 
 			if ((queueSize - tail) >= DATA_QUEUE_ENTRY_HEADER_SIZE) {
 				((IODataQueueEntry *)((UInt8 *)dataQueue->queue + tail))->size = dataSize;
@@ -216,11 +216,11 @@ IODataQueue::enqueue(void * data, UInt32 dataSize)
 			__nochk_memcpy(&dataQueue->queue->data, data, dataSize);
 			newTail = entrySize;
 		} else {
-			return false; // queue is full
+			return false;                 
 		}
 	} else {
-		// Do not allow the tail to catch up to the head when the queue is full.
-		// That's why the comparison uses a '>' rather than '>='.
+		                                                                        
+		                                                         
 
 		if ((head - tail) > entrySize) {
 			entry = (IODataQueueEntry *)((UInt8 *)dataQueue->queue + tail);
@@ -229,29 +229,29 @@ IODataQueue::enqueue(void * data, UInt32 dataSize)
 			__nochk_memcpy(&entry->data, data, dataSize);
 			newTail = tail + entrySize;
 		} else {
-			return false; // queue is full
+			return false;                 
 		}
 	}
 
-	// Publish the data we just enqueued
+	                                    
 	__c11_atomic_store((_Atomic UInt32 *)&dataQueue->tail, newTail, __ATOMIC_RELEASE);
 
 	if (tail != head) {
-		//
-		// The memory barrier below paris with the one in ::dequeue
-		// so that either our store to the tail cannot be missed by
-		// the next dequeue attempt, or we will observe the dequeuer
-		// making the queue empty.
-		//
-		// Of course, if we already think the queue is empty,
-		// there's no point paying this extra cost.
-		//
+		  
+		                                                           
+		                                                           
+		                                                            
+		                          
+		  
+		                                                     
+		                                           
+		  
 		__c11_atomic_thread_fence(__ATOMIC_SEQ_CST);
 		head = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->head, __ATOMIC_RELAXED);
 	}
 
 	if (tail == head) {
-		// Send notification (via mach message) that data is now available.
+		                                                                   
 		sendDataAvailableNotification();
 	}
 	return true;
@@ -279,12 +279,12 @@ IODataQueue::sendDataAvailableNotification()
 	if (msgh->msgh_remote_port) {
 		kr = mach_msg_send_from_kernel_with_options(msgh, msgh->msgh_size, MACH_SEND_TIMEOUT, MACH_MSG_TIMEOUT_NONE);
 		switch (kr) {
-		case MACH_SEND_TIMED_OUT: // Notification already sent
+		case MACH_SEND_TIMED_OUT:                             
 		case MACH_MSG_SUCCESS:
 		case MACH_SEND_NO_BUFFER:
 			break;
 		default:
-			IOLog("%s: dataAvailableNotification failed - msg_send returned: %d\n", /*getName()*/ "IODataQueue", kr);
+			IOLog("%s: dataAvailableNotification failed - msg_send returned: %d\n",               "IODataQueue", kr);
 			break;
 		}
 	}

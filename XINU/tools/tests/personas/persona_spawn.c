@@ -1,10 +1,10 @@
-/*
- * spawn_persona.c
- * Use new POSIX spawn attributes to create a new process in a persona
- *
- * Jeremy C. Andrus <jeremy_andrus@apple.com>
- *
- */
+  
+                  
+                                                                      
+  
+                                             
+  
+   
 #include <ctype.h>
 #include <err.h>
 #include <errno.h>
@@ -26,7 +26,7 @@
 
 #include "persona_test.h"
 
-/* internal */
+              
 #include <libproc.h>
 #include <spawn_private.h>
 #include <sys/persona.h>
@@ -43,12 +43,12 @@ static struct test_config {
 } g;
 
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- *
- * Child Management
- *
- * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- */
+                                                                        
+  
+                   
+  
+                                                                        
+   
 struct child {
 	TAILQ_ENTRY(child) sibling;
 	int pid;
@@ -151,7 +151,7 @@ spawn_child(int argc, char **argv, struct persona_args *pa)
 
 	infov("\tspawned child PID: %d", child->pid);
 
-	/* link the processes onto the global children list */
+	                                                      
 	pthread_mutex_lock(&g_child_mtx);
 	TAILQ_INSERT_TAIL(&g_children, child, sibling);
 	++g_nchildren;
@@ -249,12 +249,12 @@ child_main_loop(int argc, char **argv)
 }
 
 
-/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- *
- * Main Entry Point
- *
- * = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
- */
+                                                                        
+  
+                   
+  
+                                                                        
+   
 static void
 main_sighandler(int sig)
 {
@@ -297,9 +297,9 @@ main(int argc, char **argv)
 
 	pthread_mutex_init(&g_child_mtx, NULL);
 
-	/*
-	 * Defaults
-	 */
+	  
+            
+    
 	g.verbose = 0;
 	g.wait_for_children = 1;
 
@@ -315,12 +315,12 @@ main(int argc, char **argv)
 		}
 		optind++;
 
-		/*
-		 * If we get here, then the child wants us to continue running
-		 * to potentially spawn yet another child process. This is
-		 * helpful when testing inherited personas and verifying
-		 * persona restrictions.
-		 */
+		  
+                                                                
+                                                            
+                                                          
+                          
+     
 	}
 
 	if (geteuid() != 0) {
@@ -333,9 +333,9 @@ main(int argc, char **argv)
 	pa.flags = PA_NONE;
 	pa.kinfo.persona_id = getuid();
 
-	/*
-	 * Argument parse for default overrides:
-	 */
+	  
+                                         
+    
 	while ((ch = getopt(argc, argv, "Vg:G:I:u:vwh")) != -1) {
 		switch (ch) {
 		case 'V':

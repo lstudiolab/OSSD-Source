@@ -17,9 +17,9 @@ T_GLOBAL_META(
 	);
 
 #ifdef DT_IOSMARK
-#define MEMSIZE                 (1UL<<29)       /* 512 MB */
+#define MEMSIZE                 (1UL<<29)                   
 #else
-#define MEMSIZE                 (1UL<<27)       /* 128 MB */
+#define MEMSIZE                 (1UL<<27)                   
 #endif
 
 #define VM_TAG1                 100
@@ -77,7 +77,7 @@ static void *thread_setup(void *arg);
 static void run_test(int fault_type, int mapping_variant, size_t memsize);
 static void setup_and_run_test(int test, int threads);
 
-/* Allocates memory using the default mmap behavior. Each VM region created is capped at 128 MB. */
+                                                                                                   
 static void
 map_mem_regions_default(int fault_type, size_t memsize)
 {
@@ -89,11 +89,11 @@ map_mem_regions_default(int fault_type, size_t memsize)
 	T_QUIET; T_ASSERT_NE((void *)memblock, MAP_FAILED, "mmap");
 
 	if (fault_type == SOFT_FAULT) {
-		/* Fault in all the pages of the original region. */
+		                                                    
 		for (ptr = memblock; ptr < memblock + memsize; ptr += pgsize) {
 			val = *ptr;
 		}
-		/* Remap the region so that subsequent accesses result in read soft faults. */
+		                                                                              
 		T_QUIET; T_ASSERT_MACH_SUCCESS(vm_remap(mach_task_self(), (vm_address_t *)&memblock_share,
 		    memsize, 0, VM_FLAGS_ANYWHERE, mach_task_self(), (vm_address_t)memblock, FALSE,
 		    &curprot, &maxprot, VM_INHERIT_DEFAULT), "vm_remap");
@@ -101,7 +101,7 @@ map_mem_regions_default(int fault_type, size_t memsize)
 	setup_per_thread_regions(memblock, memblock_share, fault_type, memsize);
 }
 
-/* Creates a single VM region by mapping in a named memory entry. */
+                                                                    
 static void
 map_mem_regions_single(int fault_type, size_t memsize)
 {
@@ -112,28 +112,28 @@ map_mem_regions_single(int fault_type, size_t memsize)
 	vm_offset_t addr1 = 0;
 	mach_port_t mem_handle = MACH_PORT_NULL;
 
-	/* Allocate a region and fault in all the pages. */
+	                                                   
 	T_QUIET; T_ASSERT_MACH_SUCCESS(vm_allocate(mach_task_self(), &addr1, size, VM_FLAGS_ANYWHERE), "vm_allocate");
 	for (ptr = (char *)addr1; ptr < (char *)addr1 + memsize; ptr += pgsize) {
 		val = *ptr;
 	}
 
-	/* Create a named memory entry from the region allocated above, and de-allocate said region. */
+	                                                                                               
 	T_QUIET; T_ASSERT_MACH_SUCCESS(mach_make_memory_entry(mach_task_self(), &size, addr1, VM_PROT_ALL | MAP_MEM_NAMED_CREATE,
 	    &mem_handle, MACH_PORT_NULL), "mach_make_memory_entry");
 	T_QUIET; T_ASSERT_MACH_SUCCESS(vm_deallocate(mach_task_self(), addr1, size), "vm_deallocate");
 
-	/* Map in the named entry and deallocate it. */
+	                                               
 	T_QUIET; T_ASSERT_MACH_SUCCESS(vm_map(mach_task_self(), (vm_address_t *)&memblock, size, 0, VM_FLAGS_ANYWHERE, mem_handle, 0,
 	    FALSE, VM_PROT_DEFAULT, VM_PROT_ALL, VM_INHERIT_NONE), "vm_map");
 	T_QUIET; T_ASSERT_MACH_SUCCESS(mach_port_deallocate(mach_task_self(), mem_handle), "mach_port_deallocate");
 
 	if (fault_type == SOFT_FAULT) {
-		/* Fault in all the pages of the original region. */
+		                                                    
 		for (ptr = memblock; ptr < memblock + memsize; ptr += pgsize) {
 			val = *ptr;
 		}
-		/* Remap the region so that subsequent accesses result in read soft faults. */
+		                                                                              
 		T_QUIET; T_ASSERT_MACH_SUCCESS(vm_remap(mach_task_self(), (vm_address_t *)&memblock_share,
 		    memsize, 0, VM_FLAGS_ANYWHERE, mach_task_self(), (vm_address_t)memblock, FALSE,
 		    &curprot, &maxprot, VM_INHERIT_DEFAULT), "vm_remap");
@@ -141,7 +141,7 @@ map_mem_regions_single(int fault_type, size_t memsize)
 	setup_per_thread_regions(memblock, memblock_share, fault_type, memsize);
 }
 
-/* Allocates a separate VM region for each thread. */
+                                                     
 static void
 map_mem_regions_multiple(int fault_type, size_t memsize)
 {
@@ -170,12 +170,12 @@ map_mem_regions_multiple(int fault_type, size_t memsize)
 		memregion_config_per_thread[i].region_len = region_len;
 
 		if (fault_type == SOFT_FAULT) {
-			/* Fault in all the pages of the original region. */
+			                                                    
 			for (ptr = memblock; ptr < memblock + region_len; ptr += pgsize) {
 				val = *ptr;
 			}
 			memblock_share = NULL;
-			/* Remap the region so that subsequent accesses result in read soft faults. */
+			                                                                              
 			T_QUIET; T_ASSERT_MACH_SUCCESS(vm_remap(mach_task_self(), (vm_address_t *)&memblock_share,
 			    region_len, 0, VM_FLAGS_ANYWHERE, mach_task_self(), (vm_address_t)memblock, FALSE,
 			    &curprot, &maxprot, VM_INHERIT_DEFAULT), "vm_remap");
@@ -279,11 +279,11 @@ thread_setup(void *arg)
 
 	fault_pages(my_index);
 
-	/* Up the finished count */
+	                           
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_mutex_lock(&finished_thread_count_lock), "pthread_mutex_lock");
 	finished_thread_count++;
 	if (finished_thread_count == num_threads) {
-		/* All the threads are done. Wake up the main thread */
+		                                                       
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_cond_signal(&threads_finished_cvar), "pthread_cond_signal");
 	}
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_mutex_unlock(&finished_thread_count_lock), "pthread_mutex_unlock");
@@ -322,16 +322,16 @@ execute_threads(void)
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_mutex_unlock(&ready_thread_count_lock), "pthread_mutex_unlock");
 
 	T_STAT_MEASURE(runtime) {
-		/* Ungate the threads */
+		                        
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_cond_broadcast(&start_cvar), "pthread_cond_broadcast");
-		/* Wait for the threads to finish */
+		                                    
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_mutex_lock(&finished_thread_count_lock), "pthread_mutex_lock");
 		while (finished_thread_count != num_threads) {
 			T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_cond_wait(&threads_finished_cvar, &finished_thread_count_lock), "pthread_cond_wait");
 		}
 	};
 
-	/* Join the threads */
+	                      
 	for (thread_index = 0; thread_index < num_threads; thread_index++) {
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_join(threads[thread_index], &thread_retval_ptr),
 		    "pthread_join");
@@ -423,7 +423,7 @@ T_DECL(read_soft_fault_multithreaded,
 	char *e;
 	int nthreads;
 
-	/* iOSMark passes in the no. of threads via an env. variable */
+	                                                               
 	if ((e = getenv("DT_STAT_NTHREADS"))) {
 		nthreads = (int)strtol(e, NULL, 0);
 	} else {
@@ -447,7 +447,7 @@ T_DECL(zero_fill_fault_multithreaded,
 	char *e;
 	int nthreads;
 
-	/* iOSMark passes in the no. of threads via an env. variable */
+	                                                               
 	if ((e = getenv("DT_STAT_NTHREADS"))) {
 		nthreads = (int)strtol(e, NULL, 0);
 	} else {

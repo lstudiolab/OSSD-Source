@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _ARM_TRAP_H_
 #define _ARM_TRAP_H_
 
-/*
- * Hardware trap vectors for ARM.
- */
+  
+                                 
+   
 
 #define T_RESET                 0
 #define T_UNDEF                 1
@@ -77,12 +77,12 @@
 	           "prefetch abort", "data abort", "irq interrupt", \
 	           "fast interrupt", "perfmon"
 
-/*
- * Page-fault trap codes.
- */
-#define T_PF_PROT               0x1             /* protection violation */
-#define T_PF_WRITE              0x2             /* write access */
-#define T_PF_USER               0x4             /* from user state */
+  
+                         
+   
+#define T_PF_PROT               0x1                                       
+#define T_PF_WRITE              0x2                               
+#define T_PF_USER               0x4                                  
 
 #if defined(MACH_KERNEL_PRIVATE)
 
@@ -106,29 +106,29 @@
 	(((op) == THUMB_GDB_INSTR1) || ((op) == THUMB_GDB_INSTR2))
 
 
-#define ARM_STR                 0x04000000      /* STR */
-#define ARM_STRH                0x000000B0      /* STRH */
-#define ARM_STRH_MASK           0x0E1000F0      /* STRH MASK */
-#define ARM_SDX_MASK            0x0C100000      /* SINGLE DATA TRANSFER */
-#define ARM_SNGL_DX_MASK        0x0C000000      /* SINGLE DATA TRANSFER MASK */
+#define ARM_STR                 0x04000000               
+#define ARM_STRH                0x000000B0                
+#define ARM_STRH_MASK           0x0E1000F0                     
+#define ARM_SDX_MASK            0x0C100000                                
+#define ARM_SNGL_DX_MASK        0x0C000000                                     
 #define ARM_SDX                 0x04000000
 
-#define ARM_STM                 0x08000000      /* STM */
-#define ARM_BDX_MASK            0x0E100000      /* BLOCK DATA TRANSFER */
-#define ARM_BLK_MASK            0x0E000000      /* BLOCK DATA TRANSFER */
-#define ARM_BDX                 0x08000000      /* BLOCK DATA TRANSFER */
+#define ARM_STM                 0x08000000               
+#define ARM_BDX_MASK            0x0E100000                               
+#define ARM_BLK_MASK            0x0E000000                               
+#define ARM_BDX                 0x08000000                               
 
 #define ARM_WRITE_BACK          0x00200000
 #define ARM_BASE_REG            0x000F0000
 #define ARM_INCREMENT           0x00800000
 
-#define ARM_STC                 0x0C000000      /* STC */
-#define ARM_CDX_MASK            ARM_BDX_MASK    /* COPROCESSOR DATA TRANSFER */
+#define ARM_STC                 0x0C000000               
+#define ARM_CDX_MASK            ARM_BDX_MASK                                   
 #define ARM_CBLK_MASK           ARM_BLK_MASK
-#define ARM_CDX                 0x0C000000      /* COPROCESSOR DATA TRANSFER */
+#define ARM_CDX                 0x0C000000                                     
 
-#define ARM_SWP                 0x01000090      /* SWP */
-#define ARM_SWP_MASK            0x0FB00FF0      /* SWP */
+#define ARM_SWP                 0x01000090               
+#define ARM_SWP_MASK            0x0FB00FF0               
 
 #define ARM_POST_INDEXING       0x01000000
 #define ARM_IMMEDIATE           0x02000000
@@ -148,52 +148,52 @@
 #define IS_THUMB32(op)  (       \
 	(((op) & 0xE000) == 0xE000) && (((op) & 0x1800) != 0x0000))
 
-#define THUMB_LDR_1_MASK        0x8800          /* (1) forms of LD* instructions */
-#define THUMB_STR_1_MASK        0xF800          /* (1) forms of ST* instructions */
-#define THUMB_STR_2_MASK        0xFE00          /* (2) forms of ST* instructions */
-#define THUMB_STR_3_MASK        0xF800          /* (3) forms of ST* instructions */
-#define THUMB_PUSH_MASK         0xFE00          /* PUSH instruction */
+#define THUMB_LDR_1_MASK        0x8800                                             
+#define THUMB_STR_1_MASK        0xF800                                             
+#define THUMB_STR_2_MASK        0xFE00                                             
+#define THUMB_STR_3_MASK        0xF800                                             
+#define THUMB_PUSH_MASK         0xFE00                                
 
-#define THUMB_LDRH_1            0x8800          /* LDRH(1) */
-#define THUMB_STMIA             0xC000          /* STMIA */
-#define THUMB_STR_1             0x6000          /* STR(1) */
-#define THUMB_STR_2             0x5000          /* STR(2) */
-#define THUMB_STR_3             0x9000          /* STR(3) */
-#define THUMB_STRB_1            0x7000          /* STRB(1) */
-#define THUMB_STRB_2            0x5400          /* STRB(2) */
-#define THUMB_STRH_1            0x8000          /* STRH(1) */
-#define THUMB_STRH_2            0x5200          /* STRH(2) */
-#define THUMB_PUSH              0xB400          /* PUSH */
-#define THUMB_LDMIA             0xC800          /* LDMIA */
-#define THUMB_POP               0xBC00          /* POP */
+#define THUMB_LDRH_1            0x8800                       
+#define THUMB_STMIA             0xC000                     
+#define THUMB_STR_1             0x6000                      
+#define THUMB_STR_2             0x5000                      
+#define THUMB_STR_3             0x9000                      
+#define THUMB_STRB_1            0x7000                       
+#define THUMB_STRB_2            0x5400                       
+#define THUMB_STRH_1            0x8000                       
+#define THUMB_STRH_2            0x5200                       
+#define THUMB_PUSH              0xB400                    
+#define THUMB_LDMIA             0xC800                     
+#define THUMB_POP               0xBC00                   
 
 
-/*
- * Shifts, masks, and other values for load/store multiple decoding; largely needed for
- * supporting misaligned accesses.
- */
-#define THUMB_STR_1_BASE_OFFSET 8               /* Offset of the base register field */
-#define THUMB_PUSH_EXTRA_OFFSET 8               /* Offset of the "extra" register field */
-#define ARM_STM_BASE_OFFSET     16              /* Offset of the base register field */
-#define ARM_STM_LOAD_OFFSET     20              /* Offset of the load flag */
-#define ARM_STM_WBACK_OFFSET    21              /* Offset of the writeback flag */
-#define ARM_STM_INCR_OFFSET     23              /* Offset of the increment flag */
-#define ARM_STM_BEFORE_OFFSET   24              /* Offset of the pre-index flag */
-#define ARM_REG_LIST_LR_OFFSET  14              /* Offset of LR in the register list */
-#define ARM_REG_LIST_PC_OFFSET  15              /* Offset of PC in the register list */
+  
+                                                                                       
+                                  
+   
+#define THUMB_STR_1_BASE_OFFSET 8                                                      
+#define THUMB_PUSH_EXTRA_OFFSET 8                                                         
+#define ARM_STM_BASE_OFFSET     16                                                     
+#define ARM_STM_LOAD_OFFSET     20                                           
+#define ARM_STM_WBACK_OFFSET    21                                                
+#define ARM_STM_INCR_OFFSET     23                                                
+#define ARM_STM_BEFORE_OFFSET   24                                                
+#define ARM_REG_LIST_LR_OFFSET  14                                                     
+#define ARM_REG_LIST_PC_OFFSET  15                                                     
 
-#define THUMB_STR_REG_LIST_MASK 0x000000FF      /* Offset of the reg list is 0 */
+#define THUMB_STR_REG_LIST_MASK 0x000000FF                                       
 #define THUMB_STR_1_BASE_MASK   0x00000700
 #define THUMB_PUSH_EXTRA_MASK   0x00000100
-#define ARM_STM_REG_LIST_MASK   0x0000FFFF      /* Offset of the reg list is 0 */
+#define ARM_STM_REG_LIST_MASK   0x0000FFFF                                       
 #define ARM_STM_BASE_MASK       0x000F0000
 #define ARM_STM_LOAD_MASK       0x00100000
 #define ARM_STM_WBACK_MASK      0x00200000
 #define ARM_STM_INCR_MASK       0x00800000
 #define ARM_STM_BEFORE_MASK     0x01000000
-#define ARM_COND_MASK           0xF0000000      /* Mask for the condition code */
+#define ARM_COND_MASK           0xF0000000                                       
 
-#define ARM_COND_UNCOND         0xF0000000      /* Instruction does not support condition codes */
+#define ARM_COND_UNCOND         0xF0000000                                                        
 
 #define ARM_SIMD_MASK0          0xFE000000
 #define ARM_SIMD_CODE0          0xF2000000
@@ -244,9 +244,9 @@
 extern boolean_t arm_force_fast_fault(ppnum_t, vm_prot_t, int, void *);
 extern kern_return_t arm_fast_fault(pmap_t, vm_map_address_t, vm_prot_t, bool, bool);
 
-/*
- * Determines if the aborted instruction is read or write operation
- */
+  
+                                                                   
+   
 #define arm_fault_type(op, spsr, vaddr) \
        (((((op)&ARM_CDX_MASK) == ARM_STC) || \
 	 (((op)&ARM_STRH_MASK) == ARM_STRH) || \
@@ -272,8 +272,8 @@ typedef kern_return_t (*perfCallback)(
 	int,
 	int);
 
-#endif  /* !ASSEMBLER && MACH_KERNEL */
+#endif                                 
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* _ARM_TRAP_H_ */
+#endif                    

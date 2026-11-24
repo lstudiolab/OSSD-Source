@@ -12,18 +12,18 @@
 #include <sys/sysproto.h>
 #include <sys/systm.h>
 
-/* Coalitions syscalls */
+                         
 
-/*
- * Create a new, empty coalition and return its ID.
- *
- * Returns:
- * EINVAL	Flags parameter was invalid
- * ENOMEM	Unable to allocate kernel resources for a new coalition
- * EFAULT	cidp parameter pointed to invalid memory.
- *
- * Returns with reference held for userspace caller.
- */
+  
+                                                   
+  
+           
+                                     
+                                                                 
+                                                   
+  
+                                                    
+   
 static
 int
 coalition_create_syscall(user_addr_t cidp, uint32_t flags)
@@ -45,7 +45,7 @@ coalition_create_syscall(user_addr_t cidp, uint32_t flags)
 
 	kr = coalition_create_internal(type, role, privileged, &coal, &cid);
 	if (kr != KERN_SUCCESS) {
-		/* for now, the only kr is KERN_RESOURCE_SHORTAGE */
+		                                                    
 		error = ENOMEM;
 		goto out;
 	}
@@ -56,19 +56,19 @@ out:
 	return error;
 }
 
-/*
- * Request to terminate the coalition identified by ID.
- * Attempts to spawn into this coalition using the posix_spawnattr will begin
- * failing. Processes already within the coalition may still fork.
- * Arms the 'coalition is empty' notification when the coalition's active
- * count reaches zero.
- *
- * Returns:
- * ESRCH	No coalition with that ID could be found.
- * EALREADY	The coalition with that ID has already been terminated.
- * EFAULT	cidp parameter pointed to invalid memory.
- * EPERM	Caller doesn't have permission to terminate that coalition.
- */
+  
+                                                       
+                                                                             
+                                                                  
+                                                                         
+                      
+  
+           
+                                                  
+                                                                   
+                                                   
+                                                                    
+   
 static
 int
 coalition_request_terminate_syscall(user_addr_t cidp, uint32_t flags)
@@ -117,22 +117,22 @@ coalition_request_terminate_syscall(user_addr_t cidp, uint32_t flags)
 	return error;
 }
 
-/*
- * Request the kernel to deallocate the coalition identified by ID, which
- * must be both terminated and empty. This balances the reference taken
- * in coalition_create.
- * The memory containing the coalition object may not be freed just yet, if
- * other kernel operations still hold references to it.
- *
- * Returns:
- * EINVAL	Flags parameter was invalid
- * ESRCH	Coalition ID refers to a coalition that doesn't exist.
- * EBUSY	Coalition has not yet been terminated.
- * EBUSY	Coalition is still active.
- * EFAULT	cidp parameter pointed to invalid memory.
- * EPERM	Caller doesn't have permission to terminate that coalition.
- * Consumes one reference, "held" by caller since coalition_create
- */
+  
+                                                                         
+                                                                       
+                       
+                                                                           
+                                                       
+  
+           
+                                     
+                                                               
+                                               
+                                   
+                                                   
+                                                                    
+                                                                  
+   
 static
 int
 coalition_reap_syscall(user_addr_t cidp, uint32_t flags)
@@ -181,9 +181,9 @@ coalition_reap_syscall(user_addr_t cidp, uint32_t flags)
 	return error;
 }
 
-/* Syscall demux.
- * Returns EPERM if the calling process is not privileged to make this call.
- */
+                 
+                                                                            
+   
 int
 coalition(proc_t p, struct coalition_args *cap, __unused int32_t *retval)
 {
@@ -213,7 +213,7 @@ coalition(proc_t p, struct coalition_args *cap, __unused int32_t *retval)
 	return error;
 }
 
-/* This is a temporary interface, likely to be changed by 15385642. */
+                                                                      
 static int __attribute__ ((noinline))
 coalition_info_resource_usage(coalition_t coal, user_addr_t buffer, user_size_t bufsize)
 {
@@ -230,7 +230,7 @@ coalition_info_resource_usage(coalition_t coal, user_addr_t buffer, user_size_t 
 	case KERN_SUCCESS:
 		break;
 	default:
-		return EIO; /* shrug */
+		return EIO;            
 	}
 
 	return copyout(&cru, buffer, MIN(bufsize, sizeof(cru)));
@@ -257,9 +257,9 @@ coalition_info_set_name_internal(coalition_t coal, user_addr_t buffer, user_size
 	return error;
 }
 
-#else /* CONFIG_THREAD_GROUPS */
+#else                           
 #define coalition_info_set_name_internal(...) 0
-#endif /* CONFIG_THREAD_GROUPS */
+#endif                           
 
 static int
 coalition_info_efficiency(coalition_t coal, user_addr_t buffer, user_size_t bufsize)
@@ -282,7 +282,7 @@ coalition_info_efficiency(coalition_t coal, user_addr_t buffer, user_size_t bufs
 		struct thread_group *tg = coalition_get_thread_group(coal);
 		thread_group_set_flags(tg, THREAD_GROUP_FLAGS_EFFICIENT);
 		thread_group_release(tg);
-#endif /* CONFIG_THREAD_GROUPS */
+#endif                           
 	}
 	return error;
 }
@@ -329,7 +329,7 @@ coalition_info(proc_t p, struct coalition_info_args *uap, __unused int32_t *retv
 	if (coal == COALITION_NULL) {
 		return ESRCH;
 	}
-	/* TODO: priv check? EPERM or ESRCH? */
+	                                       
 
 	if (IS_64BIT_PROCESS(p)) {
 		user64_size_t size64;
@@ -602,7 +602,7 @@ out:
 	proc_rele(tproc);
 
 	if (npids < 0) {
-		/* npids is a negative errno */
+		                               
 		return -npids;
 	}
 
@@ -662,6 +662,6 @@ SYSCTL_INT(_kern, OID_AUTO, unrestrict_coalitions,
     CTLFLAG_RW, &unrestrict_coalition_syscalls, 0,
     "unrestrict the coalition interface");
 
-#endif /* DEVELOPMENT */
+#endif                  
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           

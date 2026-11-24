@@ -51,9 +51,9 @@ struct kxld_symtab {
 	boolean_t name_index_initialized;
 };
 
-/*******************************************************************************
-* Prototypes
-*******************************************************************************/
+                                                                                
+            
+                                                                                
 
 static kern_return_t init_macho(KXLDSymtab *symtab, struct symtab_command *src,
     u_char *macho, KXLDSeg * kernel_linkedit_seg,
@@ -74,8 +74,8 @@ __attribute__((nonnull));
 static boolean_t sym_is_defined_cxx(const KXLDSym *sym);
 static boolean_t sym_is_name_indexed(const KXLDSym *sym);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 size_t
 kxld_symtab_sizeof()
 {
@@ -83,31 +83,31 @@ kxld_symtab_sizeof()
 }
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_init_from_macho_32(KXLDSymtab *symtab, struct symtab_command *src,
     u_char *macho, KXLDSeg * kernel_linkedit_seg)
 {
 	return init_macho(symtab, src, macho, kernel_linkedit_seg,
-	           /* is_32_bit */ TRUE);
+	                           TRUE);
 }
-#endif /* KXLD_USER_ILP32 */
+#endif                      
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_init_from_macho_64(KXLDSymtab *symtab, struct symtab_command *src,
     u_char *macho, KXLDSeg * kernel_linkedit_seg)
 {
 	return init_macho(symtab, src, macho, kernel_linkedit_seg,
-	           /* is_32_bit */ FALSE);
+	                           FALSE);
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_macho(KXLDSymtab *symtab, struct symtab_command *src,
     u_char *macho, KXLDSeg * kernel_linkedit_seg,
@@ -121,29 +121,29 @@ init_macho(KXLDSymtab *symtab, struct symtab_command *src,
 	check(src);
 	check(macho);
 
-	/* Initialize the symbol array */
+	                                 
 
 	rval = kxld_array_init(&symtab->syms, sizeof(KXLDSym), src->nsyms);
 	require_noerr(rval, finish);
 
-	/* Initialize the string table */
+	                                 
 
 	if (kernel_linkedit_seg) {
-		/* If initing the kernel file in memory, we can't trust
-		 * the symtab offsets directly, because the kernel file has been mapped
-		 * into memory and the mach-o offsets are disk-based.
-		 *
-		 * The symoff is an offset relative to the linkedit segment
-		 * so we just subtract the fileoffset of the linkedit segment
-		 * to get its relative start.
-		 *
-		 * The strings table is an actual pointer, so we calculate that from
-		 * the linkedit's vmaddr.
-		 *
-		 * Further, the init_syms_... functions need an adjusted base
-		 * pointer instead of the beginning of the macho, so we substitute
-		 * the base of the linkedit segment.
-		 */
+		                                                       
+                                                                         
+                                                       
+    
+                                                             
+                                                               
+                               
+    
+                                                                      
+                           
+    
+                                                               
+                                                                    
+                                      
+     
 
 		symoff = (u_long)(src->symoff - kernel_linkedit_seg->fileoff);
 		symtab->strings = (char *)(uintptr_t)kernel_linkedit_seg->base_addr +
@@ -156,17 +156,17 @@ init_macho(KXLDSymtab *symtab, struct symtab_command *src,
 
 	symtab->strsize = src->strsize;
 
-	/* Initialize the symbols */
+	                            
 
 	KXLD_3264_FUNC(is_32_bit, rval,
 	    init_syms_32, init_syms_64,
 	    symtab, macho_or_linkedit, symoff, src->nsyms);
 	require_noerr(rval, finish);
 
-	/* Some symbols must be forced private for compatibility */
+	                                                           
 	(void) restrict_private_symbols(symtab);
 
-	/* Save the output */
+	                     
 
 	rval = KERN_SUCCESS;
 
@@ -175,9 +175,9 @@ finish:
 }
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-* In the running kernel, 'macho' is actually the start of the linkedit segment.
-*******************************************************************************/
+                                                                                
+                                                                               
+                                                                                
 static kern_return_t
 init_syms_32(KXLDSymtab *symtab, u_char *macho, u_long offset, u_int nsyms)
 {
@@ -199,12 +199,12 @@ init_syms_32(KXLDSymtab *symtab, u_char *macho, u_long offset, u_int nsyms)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-* In the running kernel, 'macho' is actually the start of the linkedit segment.
-*******************************************************************************/
+                                                                                
+                                                                               
+                                                                                
 static kern_return_t
 init_syms_64(KXLDSymtab *symtab, u_char *macho, u_long offset, u_int nsyms)
 {
@@ -226,14 +226,14 @@ init_syms_64(KXLDSymtab *symtab, u_char *macho, u_long offset, u_int nsyms)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
-/*******************************************************************************
-* Temporary workaround for PR-6668105
-* new, new[], delete, and delete[] may be overridden globally in a kext.
-* We should do this with some sort of weak symbols, but we'll use a whitelist
-* for now to minimize risk.
-*******************************************************************************/
+                                                                                
+                                     
+                                                                        
+                                                                             
+                           
+                                                                                
 static void
 restrict_private_symbols(KXLDSymtab *symtab)
 {
@@ -263,8 +263,8 @@ restrict_private_symbols(KXLDSymtab *symtab)
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_symtab_iterator_init(KXLDSymtabIterator *iter, const KXLDSymtab *symtab,
     KXLDSymPredicateTest test, boolean_t negate)
@@ -279,8 +279,8 @@ kxld_symtab_iterator_init(KXLDSymtabIterator *iter, const KXLDSymtab *symtab,
 	iter->negate = negate;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_symtab_clear(KXLDSymtab *symtab)
 {
@@ -295,8 +295,8 @@ kxld_symtab_clear(KXLDSymtab *symtab)
 	symtab->name_index_initialized = 0;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_symtab_deinit(KXLDSymtab *symtab)
 {
@@ -308,8 +308,8 @@ kxld_symtab_deinit(KXLDSymtab *symtab)
 	bzero(symtab, sizeof(*symtab));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_int
 kxld_symtab_get_num_symbols(const KXLDSymtab *symtab)
 {
@@ -318,8 +318,8 @@ kxld_symtab_get_num_symbols(const KXLDSymtab *symtab)
 	return symtab->syms.nitems;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSym *
 kxld_symtab_get_symbol_by_index(const KXLDSymtab *symtab, u_int idx)
 {
@@ -328,8 +328,8 @@ kxld_symtab_get_symbol_by_index(const KXLDSymtab *symtab, u_int idx)
 	return kxld_array_get_item(&symtab->syms, idx);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSym *
 kxld_symtab_get_symbol_by_name(const KXLDSymtab *symtab, const char *name)
 {
@@ -347,8 +347,8 @@ kxld_symtab_get_symbol_by_name(const KXLDSymtab *symtab, const char *name)
 	return NULL;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSym *
 kxld_symtab_get_locally_defined_symbol_by_name(const KXLDSymtab *symtab,
     const char *name)
@@ -359,8 +359,8 @@ kxld_symtab_get_locally_defined_symbol_by_name(const KXLDSymtab *symtab,
 	return kxld_dict_find(&symtab->name_index, name);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSym *
 kxld_symtab_get_cxx_symbol_by_value(const KXLDSymtab *symtab, kxld_addr_t value)
 {
@@ -369,8 +369,8 @@ kxld_symtab_get_cxx_symbol_by_value(const KXLDSymtab *symtab, kxld_addr_t value)
 	return kxld_dict_find(&symtab->cxx_index, &value);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_get_sym_index(const KXLDSymtab *symtab, const KXLDSym *sym,
     u_int *symindex)
@@ -386,22 +386,22 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_symtab_get_macho_header_size(void)
 {
 	return sizeof(struct symtab_command);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_long
 kxld_symtab_get_macho_data_size(const KXLDSymtab *symtab, boolean_t is_32_bit)
 {
 	KXLDSymtabIterator iter;
 	KXLDSym *sym = NULL;
-	u_long size = 1; /* strtab start padding */
+	u_long size = 1;                           
 	u_int nsyms = 0;
 
 	check(symtab);
@@ -425,8 +425,8 @@ kxld_symtab_get_macho_data_size(const KXLDSymtab *symtab, boolean_t is_32_bit)
 	return size;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_export_macho(const KXLDSymtab *symtab, u_char *buf,
     u_long *header_offset, u_long header_size,
@@ -440,7 +440,7 @@ kxld_symtab_export_macho(const KXLDSymtab *symtab, u_char *buf,
 	u_char *nl = NULL;
 	u_long nlistsize = 0;
 	char *strtab = NULL;
-	u_long stroff = 1; /* strtab start padding */
+	u_long stroff = 1;                           
 
 	check(symtab);
 	check(buf);
@@ -452,16 +452,16 @@ kxld_symtab_export_macho(const KXLDSymtab *symtab, u_char *buf,
 	symtabhdr = (struct symtab_command *) ((void *) (buf + *header_offset));
 	*header_offset += sizeof(*symtabhdr);
 
-	/* Initialize the symbol table header */
+	                                        
 
-	// note - this assumes LC_SYMTAB is always before the LC_DYSYMTAB in the
-	// macho header we are processing.
+	                                                                        
+	                                  
 	symtabhdr->cmd = LC_SYMTAB;
 	symtabhdr->cmdsize = (uint32_t) sizeof(*symtabhdr);
 	symtabhdr->symoff = (uint32_t) *data_offset;
-	symtabhdr->strsize = 1; /* strtab start padding */
+	symtabhdr->strsize = 1;                           
 
-	/* Find the size of the symbol and string tables */
+	                                                   
 
 	kxld_symtab_iterator_init(&iter, symtab,
 	    kxld_sym_is_defined_locally, FALSE);
@@ -482,11 +482,11 @@ kxld_symtab_export_macho(const KXLDSymtab *symtab, u_char *buf,
 	require_action(symtabhdr->stroff + symtabhdr->strsize <= data_size, finish,
 	    rval = KERN_FAILURE);
 
-	/* Get pointers to the symbol and string tables */
+	                                                  
 	nl = buf + symtabhdr->symoff;
 	strtab = (char *) (buf + symtabhdr->stroff);
 
-	/* Copy over the symbols */
+	                           
 
 	kxld_symtab_iterator_reset(&iter);
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {
@@ -499,12 +499,12 @@ kxld_symtab_export_macho(const KXLDSymtab *symtab, u_char *buf,
 		stroff += rval;
 	}
 
-	/* Update the data offset */
+	                            
 	*data_offset += (symtabhdr->nsyms * nlistsize) + stroff;
 
 	*data_offset = (*data_offset + 7) & ~7;
-	// at this point data_offset will be the offset just past the
-	// symbols and strings in the __LINKEDIT data
+	                                                             
+	                                             
 
 
 #if SPLIT_KEXTS_DEBUG
@@ -534,8 +534,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 u_int
 kxld_symtab_iterator_get_num_remaining(const KXLDSymtabIterator *iter)
 {
@@ -551,8 +551,8 @@ kxld_symtab_iterator_get_num_remaining(const KXLDSymtabIterator *iter)
 	return count;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_index_cxx_symbols_by_value(KXLDSymtab *symtab)
 {
@@ -568,16 +568,16 @@ kxld_symtab_index_cxx_symbols_by_value(KXLDSymtab *symtab)
 		goto finish;
 	}
 
-	/* Count the number of C++ symbols */
+	                                     
 	kxld_symtab_iterator_init(&iter, symtab, sym_is_defined_cxx, FALSE);
 	nsyms = kxld_symtab_iterator_get_num_remaining(&iter);
 
-	/* Create the dictionary */
+	                           
 	rval = kxld_dict_init(&symtab->cxx_index, kxld_dict_kxldaddr_hash,
 	    kxld_dict_kxldaddr_cmp, nsyms);
 	require_noerr(rval, finish);
 
-	/* Insert the non-stab symbols */
+	                                 
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {
 		rval = kxld_dict_insert(&symtab->cxx_index, &sym->base_addr, sym);
 		require_noerr(rval, finish);
@@ -590,16 +590,16 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 sym_is_defined_cxx(const KXLDSym *sym)
 {
 	return kxld_sym_is_defined_locally(sym) && kxld_sym_is_cxx(sym);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_index_symbols_by_name(KXLDSymtab *symtab)
 {
@@ -615,16 +615,16 @@ kxld_symtab_index_symbols_by_name(KXLDSymtab *symtab)
 		goto finish;
 	}
 
-	/* Count the number of symbols we need to index by name */
+	                                                          
 	kxld_symtab_iterator_init(&iter, symtab, sym_is_name_indexed, FALSE);
 	nsyms = kxld_symtab_iterator_get_num_remaining(&iter);
 
-	/* Create the dictionary */
+	                           
 	rval = kxld_dict_init(&symtab->name_index, kxld_dict_string_hash,
 	    kxld_dict_string_cmp, nsyms);
 	require_noerr(rval, finish);
 
-	/* Insert the non-stab symbols */
+	                                 
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {
 		rval = kxld_dict_insert(&symtab->name_index, sym->name, sym);
 		require_noerr(rval, finish);
@@ -636,16 +636,16 @@ finish:
 
 	return rval;
 }
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 sym_is_name_indexed(const KXLDSym *sym)
 {
 	return kxld_sym_is_defined_locally(sym) && !kxld_sym_is_stab(sym);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_symtab_relocate(KXLDSymtab *symtab, const KXLDArray *sectarray)
 {
@@ -672,12 +672,12 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* This extends the symbol table and initializes the new symbol.  We insert the
-* symbol into the name index, but we don't bother with the c++ value index
-* because it is based on the base_addr of the symbol, and the base_addr of
-* all synthesized symbols will be 0.
-*******************************************************************************/
+                                                                                
+                                                                              
+                                                                          
+                                                                          
+                                    
+                                                                                
 kern_return_t
 kxld_symtab_add_symbol(KXLDSymtab *symtab, char *name, kxld_addr_t link_addr,
     KXLDSym **symout)
@@ -702,8 +702,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSym *
 kxld_symtab_iterator_get_next(KXLDSymtabIterator *iter)
 {
@@ -731,8 +731,8 @@ kxld_symtab_iterator_get_next(KXLDSymtabIterator *iter)
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_symtab_iterator_reset(KXLDSymtabIterator *iter)
 {

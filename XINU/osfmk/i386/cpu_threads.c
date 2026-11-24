@@ -38,7 +38,7 @@
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #define DIVISOR_GUARD(denom)                            \
 	if ((denom) == 0) {                             \
@@ -129,39 +129,39 @@ x86_LLC_info(void)
 			continue;
 		}
 
-		/*
-		 * Only worry about it if it's a deeper level than
-		 * what we've seen before.
-		 */
+		  
+                                                    
+                            
+     
 		if (cachep->level > cache_level) {
 			cache_level = cachep->level;
 
-			/*
-			 * Save the number of CPUs sharing this cache.
-			 */
+			  
+                                                 
+      
 			nCPUsSharing = cpuinfo->cache_sharing[i];
 		}
 	}
 
-	/*
-	 * Make the level of the LLC be 0 based.
-	 */
+	  
+                                         
+    
 	topoParms.LLCDepth = cache_level - 1;
 
-	/*
-	 * nCPUsSharing represents the *maximum* number of cores or
-	 * logical CPUs sharing the cache.
-	 */
+	  
+                                                            
+                                   
+    
 	topoParms.maxSharingLLC = nCPUsSharing;
 
 	topoParms.nCoresSharingLLC = nCPUsSharing / (cpuinfo->thread_count /
 	    cpuinfo->core_count);
 	topoParms.nLCPUsSharingLLC = nCPUsSharing;
 
-	/*
-	 * nCPUsSharing may not be the number of *active* cores or
-	 * threads that are sharing the cache.
-	 */
+	  
+                                                           
+                                       
+    
 	if (nCPUsSharing > cpuinfo->core_count) {
 		topoParms.nCoresSharingLLC = cpuinfo->core_count;
 	}
@@ -181,22 +181,22 @@ initTopoParms(void)
 
 	PE_parse_boot_argn("-topo", &topo_dbg, sizeof(topo_dbg));
 
-	/*
-	 * We need to start with getting the LLC information correct.
-	 */
+	  
+                                                              
+    
 	x86_LLC_info();
 
-	/*
-	 * Compute the number of threads (logical CPUs) per core.
-	 */
+	  
+                                                          
+    
 	DIVISOR_GUARD(cpuinfo->core_count);
 	topoParms.nLThreadsPerCore = cpuinfo->thread_count / cpuinfo->core_count;
 	DIVISOR_GUARD(cpuinfo->cpuid_cores_per_package);
 	topoParms.nPThreadsPerCore = cpuinfo->cpuid_logical_per_package / cpuinfo->cpuid_cores_per_package;
 
-	/*
-	 * Compute the number of dies per package.
-	 */
+	  
+                                           
+    
 	DIVISOR_GUARD(topoParms.nCoresSharingLLC);
 	topoParms.nLDiesPerPackage = cpuinfo->core_count / topoParms.nCoresSharingLLC;
 	DIVISOR_GUARD(topoParms.nPThreadsPerCore);
@@ -204,27 +204,27 @@ initTopoParms(void)
 	topoParms.nPDiesPerPackage = cpuinfo->cpuid_cores_per_package / (topoParms.maxSharingLLC / topoParms.nPThreadsPerCore);
 
 
-	/*
-	 * Compute the number of cores per die.
-	 */
+	  
+                                        
+    
 	topoParms.nLCoresPerDie = topoParms.nCoresSharingLLC;
 	topoParms.nPCoresPerDie = (topoParms.maxSharingLLC / topoParms.nPThreadsPerCore);
 
-	/*
-	 * Compute the number of threads per die.
-	 */
+	  
+                                          
+    
 	topoParms.nLThreadsPerDie = topoParms.nLThreadsPerCore * topoParms.nLCoresPerDie;
 	topoParms.nPThreadsPerDie = topoParms.nPThreadsPerCore * topoParms.nPCoresPerDie;
 
-	/*
-	 * Compute the number of cores per package.
-	 */
+	  
+                                            
+    
 	topoParms.nLCoresPerPackage = topoParms.nLCoresPerDie * topoParms.nLDiesPerPackage;
 	topoParms.nPCoresPerPackage = topoParms.nPCoresPerDie * topoParms.nPDiesPerPackage;
 
-	/*
-	 * Compute the number of threads per package.
-	 */
+	  
+                                              
+    
 	topoParms.nLThreadsPerPackage = topoParms.nLThreadsPerCore * topoParms.nLCoresPerPackage;
 	topoParms.nPThreadsPerPackage = topoParms.nPThreadsPerCore * topoParms.nPCoresPerPackage;
 
@@ -264,11 +264,11 @@ x86_cache_free(x86_cpu_cache_t *cache)
 	x86_caches = cache;
 }
 
-/*
- * This returns a list of cache structures that represent the
- * caches for a CPU.  Some of the structures may have to be
- * "freed" if they are actually shared between CPUs.
- */
+  
+                                                             
+                                                           
+                                                    
+   
 static x86_cpu_cache_t *
 x86_cache_list(void)
 {
@@ -278,10 +278,10 @@ x86_cache_list(void)
 	struct cpu_cache    *cachep;
 	int                 i;
 
-	/*
-	 * Cons up a list driven not by CPUID leaf 4 (deterministic cache params)
-	 * but by the table above plus parameters already cracked from cpuid...
-	 */
+	  
+                                                                          
+                                                                        
+    
 	for (i = 0, cachep = &cpu_caches[0]; i < LCACHE_MAX; i++, cachep++) {
 		if (cachep->type == 0 || cpuid_info()->cache_size[i] == 0) {
 			continue;
@@ -596,9 +596,9 @@ x86_cache_add_lcpu(x86_cpu_cache_t *cache, x86_lcpu_t *lcpu)
 	x86_cpu_cache_t     *cur_cache;
 	int                 i;
 
-	/*
-	 * Put the new CPU into the list of the cache.
-	 */
+	  
+                                               
+    
 	cur_cache = lcpu->caches[cache->level - 1];
 	lcpu->caches[cache->level - 1] = cache;
 	cache->next = cur_cache;
@@ -625,69 +625,69 @@ x86_lcpu_add_caches(x86_lcpu_t *lcpu)
 
 	assert(lcpu != NULL);
 
-	/*
-	 * Add the cache data to the topology.
-	 */
+	  
+                                       
+    
 	list = x86_cache_list();
 
 	mp_safe_spin_lock(&x86_topo_lock);
 
 	while (list != NULL) {
-		/*
-		 * Remove the cache from the front of the list.
-		 */
+		  
+                                                 
+     
 		cur = list;
 		list = cur->next;
 		cur->next = NULL;
 		level = cur->level - 1;
 
-		/*
-		 * If the cache isn't shared then just put it where it
-		 * belongs.
-		 */
+		  
+                                                        
+             
+     
 		if (cur->maxcpus == 1) {
 			x86_cache_add_lcpu(cur, lcpu);
 			continue;
 		}
 
-		/*
-		 * We'll assume that all of the caches at a particular level
-		 * have the same sharing.  So if we have a cache already at
-		 * this level, we'll just skip looking for the match.
-		 */
+		  
+                                                              
+                                                             
+                                                       
+     
 		if (lcpu->caches[level] != NULL) {
 			x86_cache_free(cur);
 			continue;
 		}
 
-		/*
-		 * This is a shared cache, so we have to figure out if
-		 * this is the first time we've seen this cache.  We do
-		 * this by searching through the topology and seeing if
-		 * this cache is already described.
-		 *
-		 * Assume that L{LLC-1} are all at the core level and that
-		 * LLC is shared at the die level.
-		 */
+		  
+                                                        
+                                                         
+                                                         
+                                     
+    
+                                                            
+                                    
+     
 		if (level < topoParms.LLCDepth) {
-			/*
-			 * Shared at the core.
-			 */
+			  
+                         
+      
 			core = lcpu->core;
 			cur_lcpu = core->lcpus;
 			while (cur_lcpu != NULL) {
-				/*
-				 * Skip ourselves.
-				 */
+				  
+                      
+       
 				if (cur_lcpu == lcpu) {
 					cur_lcpu = cur_lcpu->next_in_core;
 					continue;
 				}
 
-				/*
-				 * If there's a cache on this logical CPU,
-				 * then use that one.
-				 */
+				  
+                                              
+                         
+       
 				match = x86_match_cache(cur_lcpu->caches[level], cur);
 				if (match != NULL) {
 					x86_cache_free(cur);
@@ -699,24 +699,24 @@ x86_lcpu_add_caches(x86_lcpu_t *lcpu)
 				cur_lcpu = cur_lcpu->next_in_core;
 			}
 		} else {
-			/*
-			 * Shared at the die.
-			 */
+			  
+                        
+      
 			die = lcpu->die;
 			cur_lcpu = die->lcpus;
 			while (cur_lcpu != NULL) {
-				/*
-				 * Skip ourselves.
-				 */
+				  
+                      
+       
 				if (cur_lcpu == lcpu) {
 					cur_lcpu = cur_lcpu->next_in_die;
 					continue;
 				}
 
-				/*
-				 * If there's a cache on this logical CPU,
-				 * then use that one.
-				 */
+				  
+                                              
+                         
+       
 				match = x86_match_cache(cur_lcpu->caches[level], cur);
 				if (match != NULL) {
 					x86_cache_free(cur);
@@ -729,10 +729,10 @@ x86_lcpu_add_caches(x86_lcpu_t *lcpu)
 			}
 		}
 
-		/*
-		 * If a shared cache wasn't found, then this logical CPU must
-		 * be the first one encountered.
-		 */
+		  
+                                                               
+                                  
+     
 		if (!found) {
 			x86_cache_add_lcpu(cur, lcpu);
 		}
@@ -822,14 +822,14 @@ cpu_thread_alloc(int cpu)
 	cpu_data_t  *cpup;
 	uint32_t    phys_cpu;
 
-	/*
-	 * Only allow one to manipulate the topology at a time.
-	 */
+	  
+                                                        
+    
 	mp_safe_spin_lock(&x86_topo_lock);
 
-	/*
-	 * Make sure all of the topology parameters have been initialized.
-	 */
+	  
+                                                                   
+    
 	if (!topoParmsInited) {
 		initTopoParms();
 	}
@@ -840,24 +840,24 @@ cpu_thread_alloc(int cpu)
 
 	x86_lcpu_init(cpu);
 
-	/*
-	 * Assume that all cpus have the same features.
-	 */
+	  
+                                                
+    
 	if (cpu_is_hyperthreaded()) {
 		cpup->cpu_threadtype = CPU_THREADTYPE_INTEL_HTT;
 	} else {
 		cpup->cpu_threadtype = CPU_THREADTYPE_NONE;
 	}
 
-	/*
-	 * Get the package that the logical CPU is in.
-	 */
+	  
+                                               
+    
 	do {
 		pkg = x86_package_find(cpu);
 		if (pkg == NULL) {
-			/*
-			 * Package structure hasn't been created yet, do it now.
-			 */
+			  
+                                                           
+      
 			simple_unlock(&x86_topo_lock);
 			pkg = x86_package_alloc(cpu);
 			mp_safe_spin_lock(&x86_topo_lock);
@@ -866,23 +866,23 @@ cpu_thread_alloc(int cpu)
 				continue;
 			}
 
-			/*
-			 * Add the new package to the global list of packages.
-			 */
+			  
+                                                         
+      
 			pkg->next = x86_pkgs;
 			x86_pkgs = pkg;
 		}
 	} while (pkg == NULL);
 
-	/*
-	 * Get the die that the logical CPU is in.
-	 */
+	  
+                                           
+    
 	do {
 		die = x86_die_find(cpu);
 		if (die == NULL) {
-			/*
-			 * Die structure hasn't been created yet, do it now.
-			 */
+			  
+                                                       
+      
 			simple_unlock(&x86_topo_lock);
 			die = x86_die_alloc(cpu);
 			mp_safe_spin_lock(&x86_topo_lock);
@@ -891,22 +891,22 @@ cpu_thread_alloc(int cpu)
 				continue;
 			}
 
-			/*
-			 * Add the die to the package.
-			 */
+			  
+                                 
+      
 			x86_package_add_die(pkg, die);
 		}
 	} while (die == NULL);
 
-	/*
-	 * Get the core for this logical CPU.
-	 */
+	  
+                                      
+    
 	do {
 		core = x86_core_find(cpu);
 		if (core == NULL) {
-			/*
-			 * Allocate the core structure now.
-			 */
+			  
+                                      
+      
 			simple_unlock(&x86_topo_lock);
 			core = x86_core_alloc(cpu);
 			mp_safe_spin_lock(&x86_topo_lock);
@@ -915,9 +915,9 @@ cpu_thread_alloc(int cpu)
 				continue;
 			}
 
-			/*
-			 * Add the core to the die & package.
-			 */
+			  
+                                        
+      
 			x86_die_add_core(die, core);
 			x86_package_add_core(pkg, core);
 			machine_info.physical_cpu_max += 1;
@@ -925,15 +925,15 @@ cpu_thread_alloc(int cpu)
 	} while (core == NULL);
 
 
-	/*
-	 * Done manipulating the topology, so others can get in.
-	 */
+	  
+                                                         
+    
 	machine_info.logical_cpu_max += 1;
 	simple_unlock(&x86_topo_lock);
 
-	/*
-	 * Add the logical CPU to the other topology structures.
-	 */
+	  
+                                                         
+    
 	x86_core_add_lcpu(core, &cpup->lcpu);
 	x86_die_add_lcpu(core->die, &cpup->lcpu);
 	x86_package_add_lcpu(core->package, &cpup->lcpu);
@@ -950,24 +950,24 @@ cpu_thread_init(void)
 	x86_core_t  *core;
 	static int  initialized     = 0;
 
-	/*
-	 * If we're the boot processor, we do all of the initialization of
-	 * the CPU topology infrastructure.
-	 */
+	  
+                                                                   
+                                    
+    
 	if (my_cpu == master_cpu && !initialized) {
 		simple_lock_init(&x86_topo_lock, 0);
 
-		/*
-		 * Put this logical CPU into the physical CPU topology.
-		 */
+		  
+                                                         
+     
 		cpup->lcpu.core = cpu_thread_alloc(my_cpu);
 
 		initialized = 1;
 	}
 
-	/*
-	 * Do the CPU accounting.
-	 */
+	  
+                          
+    
 	core = cpup->lcpu.core;
 	mp_safe_spin_lock(&x86_topo_lock);
 	machine_info.logical_cpu += 1;
@@ -981,10 +981,10 @@ cpu_thread_init(void)
 	timer_resync_deadlines();
 }
 
-/*
- * Called for a cpu to halt permanently
- * (as opposed to halting and expecting an interrupt to awaken it).
- */
+  
+                                       
+                                                                   
+   
 __attribute__((noreturn))
 void
 cpu_thread_halt(void)
@@ -1001,21 +1001,21 @@ cpu_thread_halt(void)
 	}
 	simple_unlock(&x86_topo_lock);
 
-	/*
-	 * Let the power management code determine the best way to "stop"
-	 * the processor.
-	 */
+	  
+                                                                  
+                  
+    
 	ml_set_interrupts_enabled(FALSE);
 	while (1) {
 		pmCPUHalt(PM_HALT_NORMAL);
 	}
-	/* NOT REACHED */
+	                 
 }
 
-/*
- * Validates that the topology was built correctly.  Must be called only
- * after the complete topology is built and no other changes are being made.
- */
+  
+                                                                        
+                                                                            
+   
 void
 x86_validate_topology(void)
 {
@@ -1031,12 +1031,12 @@ x86_validate_topology(void)
 		debug_topology_print();
 	}
 
-	/*
-	 * Called after processors are registered but before non-boot processors
-	 * are started:
-	 *  - real_ncpus: number of registered processors driven from MADT
-	 *  - max_ncpus:  max number of processors that will be started
-	 */
+	  
+                                                                         
+                
+                                                                   
+                                                                
+    
 	nCPUs = topoParms.nPackages * topoParms.nLThreadsPerPackage;
 	if (nCPUs != real_ncpus) {
 		panic("x86_validate_topology() %d threads but %d registered from MADT",
@@ -1045,9 +1045,9 @@ x86_validate_topology(void)
 
 	pkg = x86_pkgs;
 	while (pkg != NULL) {
-		/*
-		 * Make sure that the package has the correct number of dies.
-		 */
+		  
+                                                               
+     
 		nDies = 0;
 		die = pkg->dies;
 		while (die != NULL) {
@@ -1063,9 +1063,9 @@ x86_validate_topology(void)
 			TOPO_DBG("Die(%d)->package %d\n",
 			    die->pdie_num, pkg->lpkg_num);
 
-			/*
-			 * Make sure that the die has the correct number of cores.
-			 */
+			  
+                                                             
+      
 			TOPO_DBG("Die(%d)->cores: ", die->pdie_num);
 			nCores = 0;
 			core = die->cores;
@@ -1089,9 +1089,9 @@ x86_validate_topology(void)
 				    topoParms.nLCoresPerDie, nCores, die->pdie_num);
 			}
 
-			/*
-			 * Make sure that the die has the correct number of CPUs.
-			 */
+			  
+                                                            
+      
 			TOPO_DBG("Die(%d)->lcpus: ", die->pdie_num);
 			nCPUs = 0;
 			lcpu = die->lcpus;
@@ -1124,9 +1124,9 @@ x86_validate_topology(void)
 			    topoParms.nLDiesPerPackage, nDies, pkg->lpkg_num);
 		}
 
-		/*
-		 * Make sure that the package has the correct number of cores.
-		 */
+		  
+                                                                
+     
 		nCores = 0;
 		core = pkg->cores;
 		while (core != NULL) {
@@ -1141,9 +1141,9 @@ x86_validate_topology(void)
 			TOPO_DBG("Core(%d)->package %d\n",
 			    core->pcore_num, pkg->lpkg_num);
 
-			/*
-			 * Make sure that the core has the correct number of CPUs.
-			 */
+			  
+                                                             
+      
 			nCPUs = 0;
 			lcpu = core->lcpus;
 			TOPO_DBG("Core(%d)->lcpus: ", core->pcore_num);
@@ -1175,9 +1175,9 @@ x86_validate_topology(void)
 			    topoParms.nLCoresPerPackage, nCores, pkg->lpkg_num);
 		}
 
-		/*
-		 * Make sure that the package has the correct number of CPUs.
-		 */
+		  
+                                                               
+     
 		nCPUs = 0;
 		lcpu = pkg->lcpus;
 		while (lcpu != NULL) {
@@ -1204,9 +1204,9 @@ x86_validate_topology(void)
 	}
 }
 
-/*
- * Prints out the topology
- */
+  
+                          
+   
 static void
 debug_topology_print(void)
 {

@@ -39,7 +39,7 @@ _mach_strlen(const char *str)
 			return (int)(p - str);
 		}
 	}
-	/* NOTREACHED */
+	                
 	return 0;
 }
 
@@ -71,7 +71,7 @@ _mach_vsnprintf(char *buffer, int length, const char *fmt, va_list ap)
 	int width, max = length;
 	char *out_ptr = buffer;
 
-	// we only ever write n-1 bytes so we can put a \0 at the end
+	                                                             
 	length--;
 	while (length > 0 && *fmt) {
 		if (*fmt == '\0') {
@@ -83,8 +83,8 @@ _mach_vsnprintf(char *buffer, int length, const char *fmt, va_list ap)
 			continue;
 		}
 		fmt++;
-		// only going to support a specific subset of sprintf flags
-		// namely %s, %x, with no padding modifiers
+		                                                           
+		                                           
 		switch (*fmt++) {
 		case 's':
 		{
@@ -107,7 +107,7 @@ _mach_vsnprintf(char *buffer, int length, const char *fmt, va_list ap)
 	if (max > 0) {
 		*out_ptr = '\0';
 	}
-	return max - (length + 1); /* don't include the final NULL in the return value */
+	return max - (length + 1);                                                       
 }
 
 int

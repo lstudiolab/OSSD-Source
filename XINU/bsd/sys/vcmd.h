@@ -72,4 +72,4 @@
 
 #define VGETSTATE       _IOR('v', 0, int)
 #define VSETSTATE       _IOW('v', 1, int)
-#endif /* !_SYS_VCMD_H_ */
+#endif                    

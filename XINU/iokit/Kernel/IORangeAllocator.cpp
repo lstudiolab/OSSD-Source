@@ -41,7 +41,7 @@
 #include <IOKit/IOLocks.h>
 #include <IOKit/assert.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #undef super
 #define super OSObject
@@ -49,7 +49,7 @@
 OSDefineMetaClassAndStructors( IORangeAllocator, OSObject )
 
 struct IORangeAllocatorElement {
-	// closed range
+	               
 	IORangeScalar       start;
 	IORangeScalar       end;
 };
@@ -61,7 +61,7 @@ IOLock *        gIORangeAllocatorLock;
 #define UNLOCK()        \
 	if( options & kLocking)	IOUnlock( gIORangeAllocatorLock )
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 bool
 IORangeAllocator::init( IORangeScalar endOfRange,
@@ -145,7 +145,7 @@ IORangeAllocator::setFragmentCapacityIncrement( UInt32 count )
 }
 
 
-// allocate element at index
+                            
 bool
 IORangeAllocator::allocElement( UInt32 index )
 {
@@ -185,7 +185,7 @@ IORangeAllocator::allocElement( UInt32 index )
 	return true;
 }
 
-// destroy element at index
+                           
 void
 IORangeAllocator::deallocElement( UInt32 index )
 {
@@ -339,11 +339,11 @@ IORangeAllocator::deallocate( IORangeScalar data,
 		if (tailContig) {
 			elements[index - 1].end = elements[index].end;
 			deallocElement( index );
-		} else /*safe*/ if (dataEnd > elements[index - 1].end) {
+		} else          if (dataEnd > elements[index - 1].end) {
 			elements[index - 1].end = dataEnd;
 		}
 	} else if (tailContig) {
-		if (data < elements[index].start) { /*safe*/
+		if (data < elements[index].start) {         
 			elements[index].start = data;
 		}
 	} else if (allocElement( index)) {

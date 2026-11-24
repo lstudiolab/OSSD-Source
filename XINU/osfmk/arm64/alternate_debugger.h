@@ -39,6 +39,6 @@ void alternate_debugger_enter(void);
 
 __END_DECLS
 
-#endif /* ALTERNATE_DEBUGGER */
+#endif                         
 
-#endif /* _ALTERNATE_DEBUGGER_H_ */
+#endif                             

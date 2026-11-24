@@ -38,9 +38,9 @@
 
 #include <architecture/i386/sel.h>
 
-/*
- * Task State segment.
- */
+  
+                      
+   
 
 typedef struct tss {
     sel_t		oldtss;
@@ -86,9 +86,9 @@ typedef struct tss {
 
 #define TSS_SIZE(n)	(sizeof (struct tss) + (n))
 
-/*
- * Task State segment descriptor.
- */
+  
+                                 
+   
 
 typedef struct tss_desc {
     unsigned short	limit00;
@@ -104,9 +104,9 @@ typedef struct tss_desc {
     unsigned char	base24;
 } tss_desc_t;
 
-/*
- * Task gate descriptor.
- */
+  
+                        
+   
  
 typedef struct task_gate {
     unsigned short		:16;

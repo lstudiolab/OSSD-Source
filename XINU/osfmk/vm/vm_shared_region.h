@@ -20,12 +20,12 @@
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-/*
- *
- *	File: vm/vm_shared_region.h
- *
- *      protos and struct definitions for shared region
- */
+  
+  
+                              
+  
+                                                       
+   
 
 #ifndef _VM_SHARED_REGION_H_
 #define _VM_SHARED_REGION_H_
@@ -52,18 +52,18 @@ extern int shared_region_debug;
 	        kprintf args;                   \
 	}                                       \
 	MACRO_END
-#else /* DEBUG */
+#else            
 #define SHARED_REGION_DEBUG(args)
-#endif /* DEBUG */
+#endif            
 
 extern int shared_region_trace_level;
 
 extern struct vm_shared_region *primary_system_shared_region;
 
-#define SHARED_REGION_TRACE_NONE_LVL            0 /* no trace */
-#define SHARED_REGION_TRACE_ERROR_LVL           1 /* trace abnormal events */
-#define SHARED_REGION_TRACE_INFO_LVL            2 /* trace all events */
-#define SHARED_REGION_TRACE_DEBUG_LVL           3 /* extra traces for debug */
+#define SHARED_REGION_TRACE_NONE_LVL            0               
+#define SHARED_REGION_TRACE_ERROR_LVL           1                            
+#define SHARED_REGION_TRACE_INFO_LVL            2                       
+#define SHARED_REGION_TRACE_DEBUG_LVL           3                             
 #define SHARED_REGION_TRACE(level, args)                \
 	MACRO_BEGIN                                     \
 	if (shared_region_trace_level >= level) {       \
@@ -97,8 +97,8 @@ typedef struct vm_shared_region *vm_shared_region_t;
 
 #define PAGE_SIZE_FOR_SR_SLIDE  4096
 
-/* Documentation for the slide info format can be found in the dyld project in
- * the file 'launch-cache/dyld_cache_format.h'. */
+                                                                              
+                                                  
 
 
 typedef struct vm_shared_region_slide_info_entry_v2 *vm_shared_region_slide_info_entry_v2_t;
@@ -109,49 +109,49 @@ struct vm_shared_region_slide_info_entry_v2 {
 	uint32_t        page_starts_count;
 	uint32_t        page_extras_offset;
 	uint32_t        page_extras_count;
-	uint64_t        delta_mask;             // which (contiguous) set of bits contains the delta to the next rebase location
+	uint64_t        delta_mask;                                                                                             
 	uint64_t        value_add;
-	// uint16_t	page_starts[page_starts_count];
-	// uint16_t	page_extras[page_extras_count];
+	                                           
+	                                           
 };
 
-#define DYLD_CACHE_SLIDE_PAGE_ATTRS             0xC000  // high bits of uint16_t are flags
-#define DYLD_CACHE_SLIDE_PAGE_ATTR_EXTRA        0x8000  // index is into extras array (not starts array)
-#define DYLD_CACHE_SLIDE_PAGE_ATTR_NO_REBASE    0x4000  // page has no rebasing
-#define DYLD_CACHE_SLIDE_PAGE_ATTR_END          0x8000  // last chain entry for page
-#define DYLD_CACHE_SLIDE_PAGE_VALUE             0x3FFF  // bitwise negation of DYLD_CACHE_SLIDE_PAGE_ATTRS
+#define DYLD_CACHE_SLIDE_PAGE_ATTRS             0xC000                                    
+#define DYLD_CACHE_SLIDE_PAGE_ATTR_EXTRA        0x8000                                                  
+#define DYLD_CACHE_SLIDE_PAGE_ATTR_NO_REBASE    0x4000                         
+#define DYLD_CACHE_SLIDE_PAGE_ATTR_END          0x8000                              
+#define DYLD_CACHE_SLIDE_PAGE_VALUE             0x3FFF                                                    
 #define DYLD_CACHE_SLIDE_PAGE_OFFSET_SHIFT      2
 
 typedef struct vm_shared_region_slide_info_entry_v3 *vm_shared_region_slide_info_entry_v3_t;
 struct vm_shared_region_slide_info_entry_v3 {
-	uint32_t        version;                        // currently 3
-	uint32_t        page_size;                      // currently 4096 (may also be 16384)
+	uint32_t        version;                                      
+	uint32_t        page_size;                                                           
 	uint32_t        page_starts_count;
 	uint64_t        value_add;
-	uint16_t        page_starts[] /* page_starts_count */;
+	uint16_t        page_starts[]                        ;
 };
 
-#define DYLD_CACHE_SLIDE_V3_PAGE_ATTR_NO_REBASE 0xFFFF  // page has no rebasing
+#define DYLD_CACHE_SLIDE_V3_PAGE_ATTR_NO_REBASE 0xFFFF                         
 
 
 typedef struct vm_shared_region_slide_info_entry_v4 *vm_shared_region_slide_info_entry_v4_t;
 struct vm_shared_region_slide_info_entry_v4 {
-	uint32_t    version;        // currently 4
-	uint32_t    page_size;      // currently 4096 (may also be 16384)
+	uint32_t    version;                      
+	uint32_t    page_size;                                           
 	uint32_t    page_starts_offset;
 	uint32_t    page_starts_count;
 	uint32_t    page_extras_offset;
 	uint32_t    page_extras_count;
-	uint64_t    delta_mask;    // which (contiguous) set of bits contains the delta to the next rebase location (0xC0000000)
-	uint64_t    value_add;     // base address of cache
-	// uint16_t    page_starts[page_starts_count];
-	// uint16_t    page_extras[page_extras_count];
+	uint64_t    delta_mask;                                                                                                 
+	uint64_t    value_add;                             
+	                                              
+	                                              
 };
 
-#define DYLD_CACHE_SLIDE4_PAGE_NO_REBASE           0xFFFF  // page has no rebasing
-#define DYLD_CACHE_SLIDE4_PAGE_INDEX               0x7FFF  // index into starts or extras
-#define DYLD_CACHE_SLIDE4_PAGE_USE_EXTRA           0x8000  // index is into extras array (not starts array)
-#define DYLD_CACHE_SLIDE4_PAGE_EXTRA_END           0x8000  // last chain entry for page
+#define DYLD_CACHE_SLIDE4_PAGE_NO_REBASE           0xFFFF                         
+#define DYLD_CACHE_SLIDE4_PAGE_INDEX               0x7FFF                                
+#define DYLD_CACHE_SLIDE4_PAGE_USE_EXTRA           0x8000                                                  
+#define DYLD_CACHE_SLIDE4_PAGE_EXTRA_END           0x8000                              
 
 
 
@@ -168,35 +168,35 @@ union vm_shared_region_slide_info_entry {
     MIN(sizeof(struct vm_shared_region_slide_info_entry_v3), \
     sizeof(struct vm_shared_region_slide_info_entry_v4)))
 
-/*
- * This is the information used by the shared cache pager for sub-sections
- * which must be modified for relocations and/or pointer authentications
- * before it can be used. The shared_region_pager gets source pages from
- * the shared cache file and modifies them -- see shared_region_pager_data_request().
- *
- * A single pager may be used from multiple shared regions provided:
- * - same si_slide_object, si_start, si_end, si_slide, si_ptrauth and si_jop_key
- * - The size and contents of si_slide_info_entry are the same.
- */
+  
+                                                                          
+                                                                        
+                                                                        
+                                                                                     
+  
+                                                                    
+                                                                                
+                                                               
+   
 typedef struct vm_shared_region_slide_info {
-	uint32_t                si_slide;           /* the distance that the file data is relocated */
+	uint32_t                si_slide;                                                             
 	bool                    si_slid;
 #if __has_feature(ptrauth_calls)
 	bool                    si_ptrauth;
 	uint64_t                si_jop_key;
-	struct vm_shared_region *si_shared_region; /* so we can ref/dealloc for authenticated slide info */
-#endif /* __has_feature(ptrauth_calls) */
+	struct vm_shared_region *si_shared_region;                                                         
+#endif                                   
 	mach_vm_address_t       si_slid_address;
-	mach_vm_offset_t        si_start;           /* start offset in si_slide_object */
+	mach_vm_offset_t        si_start;                                                
 	mach_vm_offset_t        si_end;
-	vm_object_t             si_slide_object;    /* The source object for the pages to be modified */
-	mach_vm_size_t          si_slide_info_size; /* size of dyld provided relocation information */
-	vm_shared_region_slide_info_entry_t si_slide_info_entry; /* dyld provided relocation information */
+	vm_object_t             si_slide_object;                                                        
+	mach_vm_size_t          si_slide_info_size;                                                   
+	vm_shared_region_slide_info_entry_t si_slide_info_entry;                                           
 } *vm_shared_region_slide_info_t;
 
-/*
- * Data structure that represents a unique shared cache region.
- */
+  
+                                                               
+   
 struct vm_shared_region {
 	uint32_t                sr_ref_count;
 	uint32_t                sr_slide;
@@ -218,14 +218,14 @@ struct vm_shared_region {
 	bool                    sr_64bit;
 	bool                    sr_persists;
 	bool                    sr_uuid_copied;
-	bool                    sr_stale;              /* This region should never be used again. */
+	bool                    sr_stale;                                                           
 
 #if __has_feature(ptrauth_calls)
-	bool                    sr_reslide;            /* Special shared region for suspected attacked processes */
+	bool                    sr_reslide;                                                                        
 #define NUM_SR_AUTH_SECTIONS 2
 	vm_shared_region_slide_info_t sr_auth_section[NUM_SR_AUTH_SECTIONS];
 	uint_t                  sr_num_auth_section;
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 	uint32_t                sr_images_count;
 	struct dyld_uuid_info_64 *sr_images;
@@ -238,14 +238,14 @@ extern kern_return_t vm_shared_region_slide_page(
 	uint32_t                      pageIndex,
 	uint64_t                      jop_key);
 extern uint64_t shared_region_find_key(char *shared_region_id);
-#else  /* !MACH_KERNEL_PRIVATE */
+#else                            
 
 struct vm_shared_region;
 struct vm_shared_region_slide_info;
 struct vm_shared_region_slide_info_entry;
 struct slide_info_entry_toc;
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 struct _sr_file_mappings {
 	int                     fd;
@@ -327,9 +327,9 @@ extern void vm_shared_region_reslide_stale(void);
 #if __has_feature(ptrauth_calls)
 __attribute__((noinline))
 extern kern_return_t vm_shared_region_auth_remap(vm_shared_region_t sr);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 extern void vm_shared_region_reference(vm_shared_region_t sr);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif  /* _VM_SHARED_REGION_H_ */
+#endif                            

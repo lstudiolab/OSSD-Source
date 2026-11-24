@@ -58,11 +58,11 @@ def GetTurnstileSummary(turnstile):
             turnstile_type, turnstile_state, turnstile.ts_inheritor, inheritor_type,
             turnstile.ts_proprietor, type_and_gencount.ts_gencount)
 
-    #if DEVELOPMENT
+                   
     format_str = " {0: <#020x} {1: <#020x}"
     if hasattr(turnstile, 'ts_thread'):
       out_string += format_str.format(turnstile.ts_thread, turnstile.ts_prev_thread)
-    #endif
+          
     return out_string
 
 def PrintTurnstile(turnstile):
@@ -85,7 +85,7 @@ def PrintTurnstile(turnstile):
         print ""
     return
 
-# Macro: showturnstile
+                      
 @lldb_command('showturnstile')
 def ShowTurnstile(cmd_args=None, cmd_options={}):
     """ show the turnstile and all free turnstiles hanging off the turnstile.
@@ -98,7 +98,7 @@ def ShowTurnstile(cmd_args=None, cmd_options={}):
     print GetTurnstileSummary.header
     PrintTurnstile(turnstile)
     return
-# EndMacro: showturnstile
+                         
 
 @lldb_command('showturnstilehashtable')
 def ShowTurnstileHashTable(cmd_args=None, cmd_options={}):
@@ -113,8 +113,8 @@ def ShowTurnstileHashTable(cmd_args=None, cmd_options={}):
             PrintTurnstile(turnstile)
     return True
 
-#if DEVELOPMENT
-# Macro: showallturnstiles
+               
+                          
 @lldb_command('showallturnstiles')
 def ShowAllTurnstiles(cmd_args=None, cmd_options={}):
     """ A DEVELOPMENT macro that walks the list of all allocated turnstile objects
@@ -128,9 +128,9 @@ def ShowAllTurnstiles(cmd_args=None, cmd_options={}):
     for turnstile in IterateQueue(kern.globals.turnstiles_list, 'struct turnstile *', 'ts_global_elm'):
         PrintTurnstile(turnstile)
     return True
-# EndMacro showallturnstiles
+                            
 
-# Macro: showallbusyturnstiles
+                              
 @lldb_command('showallbusyturnstiles')
 def ShowAllTurnstiles(cmd_args=None, cmd_options={}):
     """ A DEVELOPMENT macro that walks the list of all allocated turnstile objects
@@ -145,7 +145,7 @@ def ShowAllTurnstiles(cmd_args=None, cmd_options={}):
       if turnstile.ts_state & 0x3 == 0:
         PrintTurnstile(turnstile)
     return True
-# EndMacro showallbusyturnstiles
+                                
 
 @lldb_command('showthreadbaseturnstiles', fancy=True)
 def ShowThreadInheritorBase(cmd_args=None, cmd_options={}, O=None):
@@ -174,4 +174,4 @@ def ShowThreadInheritorSched(cmd_args=None, cmd_options={}, O=None):
     with O.table(GetTurnstileSummary.header):
         for turnstile in IterateSchedPriorityQueue(thread.sched_inheritor_queue, 'struct turnstile', 'ts_inheritor_links'):
             PrintTurnstile(turnstile)
-#endif
+      

@@ -18,18 +18,18 @@
  **********************************************************************/
 
 
-/*
- * Adapted from the original sources for FreeBSD and timecounters by:
- * Poul-Henning Kamp <phk@FreeBSD.org>.
- *
- * The 32bit version of the "LP" macros seems a bit past its "sell by"
- * date so I have retained only the 64bit version and included it directly
- * in this file.
- *
- * Only minor changes done to interface with the timecounters over in
- * sys/kern/kern_clock.c.   Some of the comments below may be (even more)
- * confusing and/or plain wrong in that context.
- */
+  
+                                                                     
+                                       
+  
+                                                                      
+                                                                          
+                
+  
+                                                                     
+                                                                         
+                                                
+   
 
 /*
  * Copyright (c) 2017 Apple Computer, Inc. All rights reserved.
@@ -106,69 +106,69 @@ typedef int64_t l_fp;
 	} while (0)
 #define L_GINT(v)       ((v) < 0 ? -(-(v) >> 32) : (v) >> 32)
 
-/*
- * Generic NTP kernel interface
- *
- * These routines constitute the Network Time Protocol (NTP) interfaces
- * for user and daemon application programs. The ntp_gettime() routine
- * provides the time, maximum error (synch distance) and estimated error
- * (dispersion) to client user application programs. The ntp_adjtime()
- * routine is used by the NTP daemon to adjust the calendar clock to an
- * externally derived time. The time offset and related variables set by
- * this routine are used by other routines in this module to adjust the
- * phase and frequency of the clock discipline loop which controls the
- * system clock.
- *
- * When the kernel time is reckoned directly in nanoseconds (NTP_NANO
- * defined), the time at each tick interrupt is derived directly from
- * the kernel time variable. When the kernel time is reckoned in
- * microseconds, (NTP_NANO undefined), the time is derived from the
- * kernel time variable together with a variable representing the
- * leftover nanoseconds at the last tick interrupt. In either case, the
- * current nanosecond time is reckoned from these values plus an
- * interpolated value derived by the clock routines in another
- * architecture-specific module. The interpolation can use either a
- * dedicated counter or a processor cycle counter (PCC) implemented in
- * some architectures.
- *
- */
-/*
- * Phase/frequency-lock loop (PLL/FLL) definitions
- *
- * The nanosecond clock discipline uses two variable types, time
- * variables and frequency variables. Both types are represented as 64-
- * bit fixed-point quantities with the decimal point between two 32-bit
- * halves. On a 32-bit machine, each half is represented as a single
- * word and mathematical operations are done using multiple-precision
- * arithmetic. On a 64-bit machine, ordinary computer arithmetic is
- * used.
- *
- * A time variable is a signed 64-bit fixed-point number in ns and
- * fraction. It represents the remaining time offset to be amortized
- * over succeeding tick interrupts. The maximum time offset is about
- * 0.5 s and the resolution is about 2.3e-10 ns.
- *
- *			1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |s s s|			 ns				   |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |			    fraction				   |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
- * A frequency variable is a signed 64-bit fixed-point number in ns/s
- * and fraction. It represents the ns and fraction to be added to the
- * kernel time variable at each second. The maximum frequency offset is
- * about +-500000 ns/s and the resolution is about 2.3e-10 ns/s.
- *
- *			1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |s s s s s s s s s s s s s|	          ns/s			   |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |			    fraction				   |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- */
+  
+                               
+  
+                                                                       
+                                                                      
+                                                                        
+                                                                      
+                                                                       
+                                                                        
+                                                                       
+                                                                      
+                
+  
+                                                                     
+                                                                     
+                                                                
+                                                                   
+                                                                 
+                                                                       
+                                                                
+                                                              
+                                                                   
+                                                                      
+                      
+  
+   
+  
+                                                  
+  
+                                                                
+                                                                       
+                                                                       
+                                                                    
+                                                                     
+                                                                   
+        
+  
+                                                                  
+                                                                    
+                                                                    
+                                                
+  
+                                                
+                                                                   
+                                                                    
+                        
+                                                                    
+                           
+                                                                    
+  
+                                                                     
+                                                                     
+                                                                       
+                                                                
+  
+                                                
+                                                                   
+                                                                    
+                                                    
+                                                                    
+                           
+                                                                    
+   
 
 #define SHIFT_PLL       4
 #define SHIFT_FLL       2
@@ -204,7 +204,7 @@ static timer_call_data_t ntp_loop_update;
 static uint64_t ntp_loop_deadline;
 static uint32_t ntp_loop_active;
 static uint32_t ntp_loop_period;
-#define NTP_LOOP_PERIOD_INTERVAL (NSEC_PER_SEC) /*1 second interval*/
+#define NTP_LOOP_PERIOD_INTERVAL (NSEC_PER_SEC)                      
 
 void ntp_init(void);
 static void hardupdate(long offset);
@@ -338,18 +338,18 @@ ntp_adjtime(struct proc *p, struct ntp_adjtime_args *uap, int32_t *retval)
 		    __func__, ntv.modes, ntv.offset, ntv.freq, ntv.status, ntv.constant, time_adjtime);
 	}
 #endif
-	/*
-	 * Update selected clock variables - only the superuser can
-	 * change anything. Note that there is no error checking here on
-	 * the assumption the superuser should know what it is doing.
-	 * Note that either the time constant or TAI offset are loaded
-	 * from the ntv.constant member, depending on the mode bits. If
-	 * the STA_PLL bit in the status word is cleared, the state and
-	 * status words are reset to the initial values at boot.
-	 */
+	  
+                                                            
+                                                                 
+                                                              
+                                                               
+                                                                
+                                                                
+                                                         
+    
 	modes = ntv.modes;
 	if (modes) {
-		/* Check that this task is entitled to set the time or it is root */
+		                                                                    
 		if (!IOTaskHasEntitlement(current_task(), SETTIME_ENTITLEMENT)) {
 #if CONFIG_MACF
 			error = mac_system_check_settime(kauth_cred_get());
@@ -380,10 +380,10 @@ ntp_adjtime(struct proc *p, struct ntp_adjtime_args *uap, int32_t *retval)
 		}
 		time_status &= STA_RONLY;
 		time_status |= ntv.status & ~STA_RONLY;
-		/*
-		 * Nor PPS or leaps seconds are supported.
-		 * Filter out unsupported bits.
-		 */
+		  
+                                            
+                                 
+     
 		time_status &= STA_SUPPORTED;
 	}
 	if (modes & MOD_TIMECONST) {
@@ -419,10 +419,10 @@ ntp_adjtime(struct proc *p, struct ntp_adjtime_args *uap, int32_t *retval)
 		} else if (freq < -MAXFREQ) {
 			L_LINT(time_freq, -MAXFREQ);
 		} else {
-			/*
-			 * ntv.freq is [PPM * 2^16] = [us/s * 2^16]
-			 * time_freq is [ns/s * 2^32]
-			 */
+			  
+                                              
+                                
+      
 			time_freq = ntv.freq * 1000LL * 65536LL;
 		}
 	}
@@ -443,10 +443,10 @@ ntp_adjtime(struct proc *p, struct ntp_adjtime_args *uap, int32_t *retval)
 	}
 #endif
 
-	/*
-	 * Retrieve all clock variables. Note that the TAI offset is
-	 * returned only by ntp_gettime();
-	 */
+	  
+                                                             
+                                   
+    
 	if (IS_64BIT_PROCESS(p)) {
 		struct user64_timex user_ntv = {};
 
@@ -472,7 +472,7 @@ ntp_adjtime(struct proc *p, struct ntp_adjtime_args *uap, int32_t *retval)
 		}
 		user_ntv.tolerance = MAXFREQ * SCALE_PPM;
 
-		/* unlock before copyout */
+		                           
 		NTP_UNLOCK(enable);
 
 		error = copyout(&user_ntv, uap->tp, sizeof(user_ntv));
@@ -501,7 +501,7 @@ ntp_adjtime(struct proc *p, struct ntp_adjtime_args *uap, int32_t *retval)
 		}
 		user_ntv.tolerance = MAXFREQ * SCALE_PPM;
 
-		/* unlock before copyout */
+		                           
 		NTP_UNLOCK(enable);
 
 		error = copyout(&user_ntv, uap->tp, sizeof(user_ntv));
@@ -524,9 +524,9 @@ ntp_get_freq(void)
 	return time_freq;
 }
 
-/*
- * Compute the adjustment to add to the next second.
- */
+  
+                                                    
+   
 void
 ntp_update_second(int64_t *adjustment, clock_sec_t secs)
 {
@@ -550,11 +550,11 @@ ntp_update_second(int64_t *adjustment, clock_sec_t secs)
 	L_SUB(time_offset, ftemp);
 	L_ADD(time_adj, time_freq);
 
-	/*
-	 * Apply any correction from adjtime.  If more than one second
-	 * off we slew at a rate of 5ms/s (5000 PPM) else 500us/s (500PPM)
-	 * until the last second is slewed the final < 500 usecs.
-	 */
+	  
+                                                               
+                                                                   
+                                                          
+    
 	if (time_adjtime != 0) {
 		if (time_adjtime > 1000000) {
 			tickrate = 5000;
@@ -593,25 +593,25 @@ ntp_update_second(int64_t *adjustment, clock_sec_t secs)
 	*adjustment = time_adj;
 }
 
-/*
- * hardupdate() - local clock update
- *
- * This routine is called by ntp_adjtime() when an offset is provided
- * to update the local clock phase and frequency.
- * The implementation is of an adaptive-parameter, hybrid
- * phase/frequency-lock loop (PLL/FLL). The routine computes new
- * time and frequency offset estimates for each call.
- * Presumably, calls to ntp_adjtime() occur only when the caller
- * believes the local clock is valid within some bound (+-128 ms with
- * NTP).
- *
- * For uncompensated quartz crystal oscillators and nominal update
- * intervals less than 256 s, operation should be in phase-lock mode,
- * where the loop is disciplined to phase. For update intervals greater
- * than 1024 s, operation should be in frequency-lock mode, where the
- * loop is disciplined to frequency. Between 256 s and 1024 s, the mode
- * is selected by the STA_MODE status bit.
- */
+  
+                                    
+  
+                                                                     
+                                                 
+                                                         
+                                                                
+                                                     
+                                                                
+                                                                     
+        
+  
+                                                                  
+                                                                     
+                                                                       
+                                                                     
+                                                                       
+                                          
+   
 static void
 hardupdate(offset)
 long offset;
@@ -709,7 +709,7 @@ adjtime(struct proc *p, struct adjtime_args *uap, __unused int32_t *retval)
 	struct timeval atv;
 	int error;
 
-	/* Check that this task is entitled to set the time or it is root */
+	                                                                    
 	if (!IOTaskHasEntitlement(current_task(), SETTIME_ENTITLEMENT)) {
 #if CONFIG_MACF
 		error = mac_system_check_settime(kauth_cred_get());
@@ -763,10 +763,10 @@ ntp_loop_update_call(void)
 
 	NTP_LOCK(enable);
 
-	/*
-	 * Update the scale factor used by clock_calend.
-	 * NOTE: clock_update_calendar will call ntp_update_second to compute the next adjustment.
-	 */
+	  
+                                                 
+                                                                                           
+    
 	clock_update_calendar();
 
 	refresh_ntp_loop();
@@ -779,10 +779,10 @@ refresh_ntp_loop(void)
 {
 	NTP_ASSERT_LOCKED();
 	if (--ntp_loop_active == 0) {
-		/*
-		 * Activate the timer only if the next second adjustment might change.
-		 * ntp_update_second checks it and sets updated accordingly.
-		 */
+		  
+                                                                        
+                                                              
+     
 		if (updated) {
 			clock_deadline_for_periodic_event(ntp_loop_period, mach_absolute_time(), &ntp_loop_deadline);
 
@@ -793,11 +793,11 @@ refresh_ntp_loop(void)
 	}
 }
 
-/*
- * This function triggers a timer that each second will calculate the adjustment to
- * provide to clock_calendar to scale the time (used by gettimeofday-family syscalls).
- * The periodic timer will stop when the adjustment will reach a stable value.
- */
+  
+                                                                                   
+                                                                                      
+                                                                              
+   
 static void
 start_ntp_loop(void)
 {

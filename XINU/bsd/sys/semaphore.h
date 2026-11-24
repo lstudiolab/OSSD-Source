@@ -25,24 +25,24 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	@(#)semaphore.h	1.0	2/29/00		*/
+                                  
 
 
 
-/*
- * semaphore.h - POSIX semaphores
- *
- * HISTORY
- * 29-Feb-00	A.Ramesh at Apple
- *	Created for Mac OS X
- */
+  
+                                 
+  
+          
+                              
+                       
+   
 
 #ifndef _SYS_SEMAPHORE_H_
 #define _SYS_SEMAPHORE_H_
 
 typedef int sem_t;
 
-/* this should go in limits.h> */
+                                 
 #define SEM_VALUE_MAX 32767
 #define SEM_FAILED ((sem_t *)-1)
 
@@ -61,8 +61,8 @@ int sem_unlink(const char *);
 int sem_wait(sem_t *) __DARWIN_ALIAS_C(sem_wait);
 __END_DECLS
 
-#else   /* KERNEL */
+#else               
 void psem_cache_init(void);
-#endif  /* KERNEL */
+#endif              
 
-#endif  /* _SYS_SEMAPHORE_H_ */
+#endif                         

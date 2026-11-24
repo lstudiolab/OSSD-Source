@@ -32,7 +32,7 @@
 #include <arm/misc_protos.h>
 #include <arm/thread.h>
 #include <arm/rtclock.h>
-#include <arm/trap.h> /* for IS_ARM_GDB_TRAP() et al */
+#include <arm/trap.h>                                  
 #include <arm64/proc_reg.h>
 #include <arm64/machine_machdep.h>
 #include <arm64/monotonic.h>
@@ -95,7 +95,7 @@
 	copyout_kern(src, dst, size)                   : \
 	copyout(src, dst, size)
 
-// Below is for concatenating a string param to a string literal
+                                                                
 #define STR1(x) #x
 #define STR(x) STR1(x)
 
@@ -178,11 +178,11 @@ mach_syscall(struct arm_saved_state*);
 extern kern_return_t dtrace_user_probe(arm_saved_state_t* regs);
 extern boolean_t dtrace_tally_fault(user_addr_t);
 
-/*
- * Traps for userland processing. Can't include bsd/sys/fasttrap_isa.h, so copy
- * and paste the trap instructions
- * over from that file. Need to keep these in sync!
- */
+  
+                                                                               
+                                  
+                                                   
+   
 #define FASTTRAP_ARM32_INSTR 0xe7ffdefc
 #define FASTTRAP_THUMB32_INSTR 0xdefc
 #define FASTTRAP_ARM64_INSTR 0xe7eeee7e
@@ -191,8 +191,8 @@ extern boolean_t dtrace_tally_fault(user_addr_t);
 #define FASTTRAP_THUMB32_RET_INSTR 0xdefb
 #define FASTTRAP_ARM64_RET_INSTR 0xe7eeee7d
 
-/* See <rdar://problem/4613924> */
-perfCallback tempDTraceTrapHook = NULL; /* Pointer to DTrace fbt trap hook routine */
+                                  
+perfCallback tempDTraceTrapHook = NULL;                                              
 #endif
 
 
@@ -243,7 +243,7 @@ extern void arm64_thread_exception_return(void) __dead2;
 #if defined(HAS_IPI)
 void cpu_signal_handler(void);
 extern unsigned int gFastIPI;
-#endif /* defined(HAS_IPI) */
+#endif                       
 
 static arm_saved_state64_t *original_faulting_state = NULL;
 
@@ -362,11 +362,11 @@ arm64_implementation_specific_error(arm_saved_state_t *state, uint32_t esr, vm_o
 	    state, esr, (void *)far, !!(mpidr & MPIDR_PNE), (void *)migsts,
 	    (void *)lsu_err_sts, (void *)fed_err_sts, (void *)mmu_err_sts,
 	    (void *)l2c_err_sts, (void *)l2c_err_adr, (void *)l2c_err_inf);
-#else // !defined(NO_ECORE) && !defined(HAS_MIGSTS)
+#else                                              
 	uint64_t llc_err_sts, llc_err_adr, llc_err_inf, mpidr;
 #if defined(HAS_DPC_ERR)
 	uint64_t dpc_err_sts = __builtin_arm_rsr64(STR(DPC_ERR_STS));
-#endif // defined(HAS_DPC_ERR)
+#endif                        
 
 	mpidr = __builtin_arm_rsr64("MPIDR_EL1");
 
@@ -399,7 +399,7 @@ arm64_implementation_specific_error(arm_saved_state_t *state, uint32_t esr, vm_o
 	    (void *)lsu_err_sts, (void *)fed_err_sts, (void *)mmu_err_sts,
 	    (void *)llc_err_sts, (void *)llc_err_adr, (void *)llc_err_inf);
 #endif
-#else // !defined(APPLE_ARM64_ARCH_FAMILY)
+#else                                     
 #pragma unused (state, esr, far)
 	panic_plain("Unhandled implementation specific error\n");
 #endif
@@ -512,7 +512,7 @@ sleh_synchronous_sp1(arm_context_t *context, uint32_t esr, vm_offset_t far __unu
 			DebuggerCall(EXC_BREAKPOINT, state);
 		}
 	}
-		OS_FALLTHROUGH; // panic if we return from the debugger
+		OS_FALLTHROUGH;                                        
 	default:
 		panic_with_thread_kernel_state("Synchronous exception taken while SP1 selected", state);
 	}
@@ -548,13 +548,13 @@ thread_exception_return()
 	__builtin_unreachable();
 }
 
-/*
- * check whether task vtimers are running and set thread and CPU BSD AST
- *
- * must be called with interrupts masked so updates of fields are atomic
- * must be emitted inline to avoid generating an FBT probe on the exception path
- *
- */
+  
+                                                                        
+  
+                                                                        
+                                                                                
+  
+   
 __attribute__((__always_inline__))
 static inline void
 task_vtimer_check(thread_t thread)
@@ -579,18 +579,18 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 #ifdef CONFIG_XNUPOST
 	expected_fault_handler_t saved_expected_fault_handler = NULL;
 	uintptr_t saved_expected_fault_addr = 0;
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 	ASSERT_CONTEXT_SANITY(context);
 
 	task_vtimer_check(thread);
 
 #if CONFIG_DTRACE
-	/*
-	 * Handle kernel DTrace probes as early as possible to minimize the likelihood
-	 * that this path will itself trigger a DTrace probe, which would lead to infinite
-	 * probe recursion.
-	 */
+	  
+                                                                               
+                                                                                   
+                    
+    
 	if (__improbable((class == ESR_EC_UNCATEGORIZED) && tempDTraceTrapHook &&
 	    (tempDTraceTrapHook(EXC_BAD_INSTRUCTION, state, 0, 0) == KERN_SUCCESS))) {
 		return;
@@ -598,10 +598,10 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 #endif
 	bool is_user = PSR64_IS_USER(get_saved_state_cpsr(state));
 
-	/*
-	 * Use KERNEL_DEBUG_CONSTANT_IST here to avoid producing tracepoints
-	 * that would disclose the behavior of PT_DENY_ATTACH processes.
-	 */
+	  
+                                                                     
+                                                                 
+    
 	if (is_user) {
 		thread->machine.exception_trace_code = (uint16_t)(ARM64_KDBG_CODE_USER | class);
 		KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,
@@ -614,10 +614,10 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 	}
 
 	if (__improbable(ESR_INSTR_IS_2BYTES(esr))) {
-		/*
-		 * We no longer support 32-bit, which means no 2-byte
-		 * instructions.
-		 */
+		  
+                                                       
+                  
+     
 		if (is_user) {
 			panic("Exception on 2-byte instruction, "
 			    "context=%p, esr=%#x, far=%p",
@@ -627,7 +627,7 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 		}
 	}
 
-	/* Don't run exception handler with recover handler set in case of double fault */
+	                                                                                  
 	if (thread->recover) {
 		recover = thread->recover;
 		thread->recover = (vm_offset_t)NULL;
@@ -645,9 +645,9 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 			expected_fault_handler = saved_expected_fault_handler;
 		}
 	}
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
-	/* Inherit the interrupt masks from previous context */
+	                                                       
 	if (SPSR_INTERRUPTS_ENABLED(get_saved_state_cpsr(state))) {
 		ml_set_interrupts_enabled(TRUE);
 	}
@@ -679,7 +679,7 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 		if ((expected_fault_handler != NULL) && expected_fault_handler(state)) {
 			break;
 		}
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 		panic_with_thread_kernel_state("Kernel instruction fetch abort", state);
 
@@ -751,13 +751,13 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 		__builtin_unreachable();
 
 	case ESR_EC_WATCHPT_MATCH_EL1:
-		/*
-		 * If we hit a watchpoint in kernel mode, probably in a copyin/copyout which we don't want to
-		 * abort.  Turn off watchpoints and keep going; we'll turn them back on in return_from_exception..
-		 */
+		  
+                                                                                               
+                                                                                                    
+     
 		if (FSC_DEBUG_FAULT == ISS_SSDE_FSC(esr)) {
 			arm_debug_set(NULL);
-			break; /* return to first level handler */
+			break;                                    
 		}
 		panic("Unsupported Class %u event code. state=%p class=%u esr=%u far=%p",
 		    class, state, class, esr, (void *)far);
@@ -770,11 +770,11 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 	case ESR_EC_ILLEGAL_INSTR_SET:
 		if (EXCB_ACTION_RERUN !=
 		    ex_cb_invoke(EXCB_CLASS_ILLEGAL_INSTR_SET, far)) {
-			// instruction is not re-executed
+			                                 
 			panic("Illegal instruction set exception. state=%p class=%u esr=%u far=%p spsr=0x%x",
 			    state, class, esr, (void *)far, get_saved_state_cpsr(state));
 		}
-		// must clear this fault in PSR to re-run
+		                                         
 		mask_saved_state_cpsr(state, 0, PSR64_IL);
 		break;
 
@@ -787,7 +787,7 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 		__builtin_unreachable();
 
 	case ESR_EC_WFI_WFE:
-		// Use of WFI or WFE instruction when they have been disabled for EL0
+		                                                                     
 		handle_wf_trap(state);
 		__builtin_unreachable();
 
@@ -806,7 +806,7 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 		thread->machine.expected_fault_handler = saved_expected_fault_handler;
 		thread->machine.expected_fault_addr = saved_expected_fault_addr;
 	}
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 	if (recover) {
 		thread->recover = recover;
@@ -828,10 +828,10 @@ sleh_synchronous(arm_context_t *context, uint32_t esr, vm_offset_t far)
 #endif
 }
 
-/*
- * Uncategorized exceptions are a catch-all for general execution errors.
- * ARM64_TODO: For now, we assume this is for undefined instruction exceptions.
- */
+  
+                                                                         
+                                                                               
+   
 static void
 handle_uncategorized(arm_saved_state_t *state)
 {
@@ -845,21 +845,21 @@ handle_uncategorized(arm_saved_state_t *state)
 #if CONFIG_DTRACE
 
 	if (PSR64_IS_USER64(get_saved_state_cpsr(state))) {
-		/*
-		 * For a 64bit user process, we care about all 4 bytes of the
-		 * instr.
-		 */
+		  
+                                                               
+           
+     
 		if (instr == FASTTRAP_ARM64_INSTR || instr == FASTTRAP_ARM64_RET_INSTR) {
 			if (dtrace_user_probe(state) == KERN_SUCCESS) {
 				return;
 			}
 		}
 	} else if (PSR64_IS_USER32(get_saved_state_cpsr(state))) {
-		/*
-		 * For a 32bit user process, we check for thumb mode, in
-		 * which case we only care about a 2 byte instruction length.
-		 * For non-thumb mode, we care about all 4 bytes of the instructin.
-		 */
+		  
+                                                          
+                                                               
+                                                                     
+     
 		if (get_saved_state_cpsr(state) & PSR64_MODE_USER32_THUMB) {
 			if (((uint16_t)instr == FASTTRAP_THUMB32_INSTR) ||
 			    ((uint16_t)instr == FASTTRAP_THUMB32_RET_INSTR)) {
@@ -877,7 +877,7 @@ handle_uncategorized(arm_saved_state_t *state)
 		}
 	}
 
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 	if (PSR64_IS_KERNEL(get_saved_state_cpsr(state))) {
 		if (IS_ARM_GDB_TRAP(instr)) {
@@ -886,15 +886,15 @@ handle_uncategorized(arm_saved_state_t *state)
 
 			interrupt_state = ml_set_interrupts_enabled(FALSE);
 
-			/* Save off the context here (so that the debug logic
-			 * can see the original state of this thread).
-			 */
+			                                                     
+                                                 
+      
 			current_thread()->machine.kpcb = state;
 
-			/* Hop into the debugger (typically either due to a
-			 * fatal exception, an explicit panic, or a stackshot
-			 * request.
-			 */
+			                                                   
+                                                        
+              
+      
 			DebuggerCall(exception, state);
 
 			current_thread()->machine.kpcb = NULL;
@@ -905,9 +905,9 @@ handle_uncategorized(arm_saved_state_t *state)
 		}
 	}
 
-	/*
-	 * Check for GDB breakpoint via illegal opcode.
-	 */
+	  
+                                                
+    
 	if (IS_ARM_GDB_TRAP(instr)) {
 		exception = EXC_BREAKPOINT;
 		codes[0] = EXC_ARM_BREAKPOINT;
@@ -946,7 +946,7 @@ brk_comment_to_ptrauth_key(uint16_t comment)
 		__builtin_unreachable();
 	}
 }
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 static void
 handle_kernel_breakpoint(arm_saved_state_t *state, uint32_t esr)
@@ -966,7 +966,7 @@ handle_kernel_breakpoint(arm_saved_state_t *state, uint32_t esr)
 
 		panic_with_thread_kernel_state(msg, state);
 	}
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 	const char *msg_fmt = "Break 0x%04X instruction exception from kernel. Panic (by design)";
 	char msg[strlen(msg_fmt) - strlen("0x%04X") + strlen("0xFFFF") + 1];
@@ -987,7 +987,7 @@ handle_breakpoint(arm_saved_state_t *state, uint32_t esr __unused)
 	    brk_comment_is_ptrauth(ISS_BRK_COMMENT(esr))) {
 		exception |= EXC_PTRAUTH_BIT;
 	}
-#endif /* __has_feature(ptrauth_calls) && !__ARM_ARCH_8_6__ */
+#endif                                                        
 
 	codes[1] = get_saved_state_pc(state);
 	exception_triage(exception, codes, numcodes);
@@ -1031,14 +1031,14 @@ inspect_data_abort(uint32_t iss, fault_status_t *fault_code, vm_prot_t *fault_ty
 	getCpuDatap()->cpu_stat.data_ex_cnt++;
 	*fault_code = ISS_DA_FSC(iss);
 
-	/*
-	 * Cache maintenance operations always report faults as write access.
-	 * Change these to read access, unless they report a permission fault.
-	 * Only certain cache maintenance operations (e.g. 'dc ivac') require write
-	 * access to the mapping, but if a cache maintenance operation that only requires
-	 * read access generates a permission fault, then we will not be able to handle
-	 * the fault regardless of whether we treat it as a read or write fault.
-	 */
+	  
+                                                                      
+                                                                       
+                                                                            
+                                                                                  
+                                                                                
+                                                                         
+    
 	if ((iss & ISS_DA_WNR) && (!(iss & ISS_DA_CM) || is_permission_fault(*fault_code))) {
 		*fault_type = (VM_PROT_READ | VM_PROT_WRITE);
 	} else {
@@ -1053,10 +1053,10 @@ fault_addr_bit(vm_offset_t fault_addr, unsigned int bit)
 	return (bool)((fault_addr >> bit) & 1);
 }
 
-/**
- * Determines whether a fault address taken at EL0 contains a PAC error code
- * corresponding to the specified kind of ptrauth key.
- */
+   
+                                                                            
+                                                      
+   
 static bool
 user_fault_addr_matches_pac_error_code(vm_offset_t fault_addr, bool data_key)
 {
@@ -1069,12 +1069,12 @@ user_fault_addr_matches_pac_error_code(vm_offset_t fault_addr, bool data_key)
 		poison_shift = 61;
 	}
 
-	/* PAC error codes are always in the form key_number:NOT(key_number) */
+	                                                                       
 	bool poison_bit_1 = fault_addr_bit(fault_addr, poison_shift);
 	bool poison_bit_2 = fault_addr_bit(fault_addr, poison_shift + 1);
 	return poison_bit_1 != poison_bit_2;
 }
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 static void
 handle_pc_align(arm_saved_state_t *ss)
@@ -1092,7 +1092,7 @@ handle_pc_align(arm_saved_state_t *ss)
 	if (user_fault_addr_matches_pac_error_code(get_saved_state_pc(ss), false)) {
 		exc |= EXC_PTRAUTH_BIT;
 	}
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 	codes[0] = EXC_ARM_DA_ALIGN;
 	codes[1] = get_saved_state_pc(ss);
@@ -1117,7 +1117,7 @@ handle_sp_align(arm_saved_state_t *ss)
 	if (user_fault_addr_matches_pac_error_code(get_saved_state_sp(ss), true)) {
 		exc |= EXC_PTRAUTH_BIT;
 	}
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 	codes[0] = EXC_ARM_SP_ALIGN;
 	codes[1] = get_saved_state_sp(ss);
@@ -1159,7 +1159,7 @@ handle_fp_trap(arm_saved_state_t *state, uint32_t esr)
 	COPYIN(get_saved_state_pc(state), (char *)&instr, sizeof(instr));
 	codes[1] = instr;
 
-	/* The floating point trap flags are only valid if TFV is set. */
+	                                                                 
 	if (!fp_exceptions_enabled) {
 		exc = EXC_BAD_INSTRUCTION;
 		codes[0] = EXC_ARM_UNDEFINED;
@@ -1187,21 +1187,21 @@ handle_fp_trap(arm_saved_state_t *state, uint32_t esr)
 
 
 
-/*
- * handle_alignment_fault_from_user:
- *   state: Saved state
- *
- * Attempts to deal with an alignment fault from userspace (possibly by
- * emulating the faulting instruction).  If emulation failed due to an
- * unservicable fault, the ESR for that fault will be stored in the
- * recovery_esr field of the thread by the exception code.
- *
- * Returns:
- *   -1:     Emulation failed (emulation of state/instr not supported)
- *   0:      Successfully emulated the instruction
- *   EFAULT: Emulation failed (probably due to permissions)
- *   EINVAL: Emulation failed (probably due to a bad address)
- */
+  
+                                    
+                       
+  
+                                                                       
+                                                                      
+                                                                   
+                                                          
+  
+           
+                                                                      
+                                                  
+                                                           
+                                                             
+   
 static int
 handle_alignment_fault_from_user(arm_saved_state_t *state, kern_return_t *vmfr)
 {
@@ -1226,7 +1226,7 @@ handle_sw_step_debug(arm_saved_state_t *state)
 		panic_with_thread_kernel_state("SW_STEP_DEBUG exception from kernel.", state);
 	}
 
-	// Disable single step and unmask interrupts (in the saved state, anticipating next exception return)
+	                                                                                                     
 	if (thread->machine.DebugData != NULL) {
 		thread->machine.DebugData->uds.ds64.mdscr_el1 &= ~0x1;
 	} else {
@@ -1235,7 +1235,7 @@ handle_sw_step_debug(arm_saved_state_t *state)
 
 	mask_saved_state_cpsr(thread->machine.upcb, 0, PSR64_SS | DAIF_IRQF | DAIF_FIQF);
 
-	// Special encoding for gdb single step event on ARM
+	                                                    
 	exc = EXC_BREAKPOINT;
 	codes[0] = 1;
 	codes[1] = 0;
@@ -1253,20 +1253,20 @@ set_saved_state_pc_to_recovery_handler(arm_saved_state_t *iss, vm_offset_t recov
 	const char *panic_msg = "Illegal thread->recover value %p";
 
 	MANIPULATE_SIGNED_THREAD_STATE(iss,
-	    // recover = (vm_offset_t)ptrauth_auth_data((void *)recover, ptrauth_key_function_pointer,
-	    //     ptrauth_blend_discriminator(&thread->recover, PAC_DISCRIMINATOR_RECOVER));
+	                                                                                              
+	                                                                                     
 	    "mov	x1, %[recover]		\n"
 	    "mov	x6, %[disc]		\n"
 	    "autia	x1, x6			\n"
-	    // if (recover != (vm_offset_t)ptrauth_strip((void *)recover, ptrauth_key_function_pointer)) {
+	                                                                                                  
 	    "mov	x6, x1			\n"
 	    "xpaci	x6			\n"
 	    "cmp	x1, x6			\n"
 	    "beq	1f			\n"
-	    //         panic("Illegal thread->recover value %p", (void *)recover);
+	                                                                          
 	    "mov	x0, %[panic_msg]	\n"
 	    "bl		_panic			\n"
-	    // }
+	        
 	    "1:					\n"
 	    "str	x1, [x0, %[SS64_PC]]	\n",
 	    [recover]     "r"(recover),
@@ -1294,7 +1294,7 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 		panic_with_thread_kernel_state("Apparently on interrupt stack when taking user abort!\n", state);
 	}
 
-	thread->iotier_override = THROTTLE_LEVEL_NONE; /* Reset IO tier override before handling abort from userspace */
+	thread->iotier_override = THROTTLE_LEVEL_NONE;                                                                  
 
 	if (is_vm_fault(fault_code)) {
 		vm_map_t        map = thread->map;
@@ -1308,8 +1308,8 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 		}
 
 #if CONFIG_DTRACE
-		if (thread->t_dtrace_inprobe) { /* Executing under dtrace_probe? */
-			if (dtrace_tally_fault(vm_fault_addr)) { /* Should a user mode fault under dtrace be ignored? */
+		if (thread->t_dtrace_inprobe) {                                    
+			if (dtrace_tally_fault(vm_fault_addr)) {                                                        
 				if (recover) {
 					thread->machine.recover_esr = esr;
 					thread->machine.recover_far = vm_fault_addr;
@@ -1328,14 +1328,14 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 
 #if CONFIG_PGTRACE
 		if (pgtrace_enabled) {
-			/* Check to see if trace bit is set */
+			                                      
 			result = pmap_pgtrace_fault(map->pmap, fault_addr, state);
 			if (result == KERN_SUCCESS) {
 				return;
 			}
 		}
 #endif
-		/* check to see if it is just a pmap ref/modify fault */
+		                                                        
 
 		if (!is_translation_fault(fault_code)) {
 			result = arm_fast_fault(map->pmap,
@@ -1347,19 +1347,19 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 		}
 
 		{
-			/* We have to fault the page in */
+			                                  
 			result = vm_fault(map, vm_fault_addr, fault_type,
-			    /* change_wiring */ FALSE, VM_KERN_MEMORY_NONE, THREAD_ABORTSAFE,
-			    /* caller_pmap */ NULL, /* caller_pmap_addr */ 0);
+			                        FALSE, VM_KERN_MEMORY_NONE, THREAD_ABORTSAFE,
+			                      NULL,                        0);
 		}
 		if (result == KERN_SUCCESS || result == KERN_ABORTED) {
 			return;
 		}
 
-		/*
-		 * vm_fault() should never return KERN_FAILURE for page faults from user space.
-		 * If it does, we're leaking preemption disables somewhere in the kernel.
-		 */
+		  
+                                                                                 
+                                                                           
+     
 		if (__improbable(result == KERN_FAILURE)) {
 			panic("vm_fault() KERN_FAILURE from user fault on thread %p", thread);
 		}
@@ -1371,43 +1371,43 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 		thread->machine.recover_far = 0;
 		int result = handle_alignment_fault_from_user(state, &vmfkr);
 		if (result == 0) {
-			/* Successfully emulated, or instruction
-			 * copyin() for decode/emulation failed.
-			 * Continue, or redrive instruction.
-			 */
+			                                        
+                                           
+                                       
+      
 			thread_exception_return();
 		} else if (((result == EFAULT) || (result == EINVAL)) &&
 		    (thread->machine.recover_esr == 0)) {
-			/*
-			 * If we didn't actually take a fault, but got one of
-			 * these errors, then we failed basic sanity checks of
-			 * the fault address.  Treat this as an invalid
-			 * address.
-			 */
+			  
+                                                        
+                                                         
+                                                  
+              
+      
 			codes[0] = KERN_INVALID_ADDRESS;
 		} else if ((result == EFAULT) &&
 		    (thread->machine.recover_esr)) {
-			/*
-			 * Since alignment aborts are prioritized
-			 * ahead of translation aborts, the misaligned
-			 * atomic emulation flow may have triggered a
-			 * VM pagefault, which the VM could not resolve.
-			 * Report the VM fault error in codes[]
-			 */
+			  
+                                            
+                                                 
+                                                
+                                                   
+                                          
+      
 
 			codes[0] = vmfkr;
 			assertf(vmfkr != KERN_SUCCESS, "Unexpected vmfkr 0x%x", vmfkr);
-			/* Cause ESR_EC to reflect an EL0 abort */
+			                                          
 			thread->machine.recover_esr &= ~ESR_EC_MASK;
 			thread->machine.recover_esr |= (ESR_EC_DABORT_EL0 << ESR_EC_SHIFT);
 			set_saved_state_esr(thread->machine.upcb, thread->machine.recover_esr);
 			set_saved_state_far(thread->machine.upcb, thread->machine.recover_far);
 			fault_addr = thread->machine.recover_far;
 		} else {
-			/* This was just an unsupported alignment
-			 * exception. Misaligned atomic emulation
-			 * timeouts fall in this category.
-			 */
+			                                         
+                                            
+                                     
+      
 			codes[0] = EXC_ARM_DA_ALIGN;
 		}
 	} else if (is_parity_error(fault_code)) {
@@ -1429,7 +1429,7 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 	if (user_fault_addr_matches_pac_error_code(fault_addr, is_data_abort)) {
 		exc |= EXC_PTRAUTH_BIT;
 	}
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 	exception_triage(exc, codes, numcodes);
 	__builtin_unreachable();
 }
@@ -1438,14 +1438,14 @@ handle_user_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr
 static int
 is_pan_fault(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_addr, fault_status_t fault_code)
 {
-	// PAN (Privileged Access Never) fault occurs for data read/write in EL1 to
-	// virtual address that is readable/writeable from both EL1 and EL0
+	                                                                           
+	                                                                   
 
-	// To check for PAN fault, we evaluate if the following conditions are true:
-	// 1. This is a permission fault
-	// 2. PAN is enabled
-	// 3. AT instruction (on which PAN has no effect) on the same faulting address
-	// succeeds
+	                                                                            
+	                                
+	                    
+	                                                                              
+	           
 
 	vm_offset_t pa;
 
@@ -1471,14 +1471,14 @@ handle_kernel_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_ad
 
 #ifndef CONFIG_XNUPOST
 	(void)expected_fault_handler;
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 #if CONFIG_DTRACE
-	if (is_vm_fault(fault_code) && thread->t_dtrace_inprobe) { /* Executing under dtrace_probe? */
-		if (dtrace_tally_fault(fault_addr)) { /* Should a fault under dtrace be ignored? */
-			/*
-			 * Point to next instruction, or recovery handler if set.
-			 */
+	if (is_vm_fault(fault_code) && thread->t_dtrace_inprobe) {                                    
+		if (dtrace_tally_fault(fault_addr)) {                                              
+			  
+                                                            
+      
 			if (recover) {
 				thread->machine.recover_esr = esr;
 				thread->machine.recover_far = fault_addr;
@@ -1493,7 +1493,7 @@ handle_kernel_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_ad
 	}
 #endif
 
-#if !CONFIG_PGTRACE /* This will be moved next to pgtrace fault evaluation */
+#if !CONFIG_PGTRACE                                                          
 	if (ml_at_interrupt_context()) {
 		panic_with_thread_kernel_state("Unexpected abort while on interrupt stack.", state);
 	}
@@ -1504,17 +1504,17 @@ handle_kernel_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_ad
 		vm_map_t      map;
 		int           interruptible;
 
-		/*
-		 * Ensure no faults in the physical aperture. This could happen if
-		 * a page table is incorrectly allocated from the read only region
-		 * when running with KTRR.
-		 */
+		  
+                                                                    
+                                                                    
+                            
+     
 
 #ifdef CONFIG_XNUPOST
 		if (expected_fault_handler && expected_fault_handler(state)) {
 			return;
 		}
-#endif /* CONFIG_XNUPOST */
+#endif                     
 
 		if (fault_addr >= gVirtBase && fault_addr < static_memory_end) {
 			panic_with_thread_kernel_state("Unexpected fault in kernel static region\n", state);
@@ -1526,19 +1526,19 @@ handle_kernel_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_ad
 		} else {
 			map = thread->map;
 
-			/**
-			 * In the case that the recovery handler is set (e.g., during copyio
-			 * and dtrace probes), we don't want the vm_fault() operation to be
-			 * aborted early. Those code paths can't handle restarting the
-			 * vm_fault() operation so don't allow it to return early without
-			 * creating the wanted mapping.
-			 */
+			   
+                                                                       
+                                                                      
+                                                                 
+                                                                    
+                                  
+      
 			interruptible = (recover) ? THREAD_UNINT : THREAD_ABORTSAFE;
 		}
 
 #if CONFIG_PGTRACE
 		if (pgtrace_enabled) {
-			/* Check to see if trace bit is set */
+			                                      
 			result = pmap_pgtrace_fault(map->pmap, fault_addr, state);
 			if (result == KERN_SUCCESS) {
 				return;
@@ -1550,7 +1550,7 @@ handle_kernel_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_ad
 		}
 #endif
 
-		/* check to see if it is just a pmap ref/modify fault */
+		                                                        
 		if (!is_translation_fault(fault_code)) {
 			result = arm_fast_fault(map->pmap,
 			    fault_addr,
@@ -1561,21 +1561,21 @@ handle_kernel_abort(arm_saved_state_t *state, uint32_t esr, vm_offset_t fault_ad
 		}
 
 		if (result != KERN_PROTECTION_FAILURE) {
-			/*
-			 *  We have to "fault" the page in.
-			 */
+			  
+                                      
+      
 			result = vm_fault(map, fault_addr, fault_type,
-			    /* change_wiring */ FALSE, VM_KERN_MEMORY_NONE, interruptible,
-			    /* caller_pmap */ NULL, /* caller_pmap_addr */ 0);
+			                        FALSE, VM_KERN_MEMORY_NONE, interruptible,
+			                      NULL,                        0);
 		}
 
 		if (result == KERN_SUCCESS) {
 			return;
 		}
 
-		/*
-		 *  If we have a recover handler, invoke it now.
-		 */
+		  
+                                                  
+     
 		if (recover) {
 			thread->machine.recover_esr = esr;
 			thread->machine.recover_far = fault_addr;
@@ -1626,14 +1626,14 @@ handle_svc(arm_saved_state_t *state)
 	thread_t thread  = current_thread();
 	struct   proc *p;
 
-#define handle_svc_kprintf(x...) /* kprintf("handle_svc: " x) */
+#define handle_svc_kprintf(x...)                                
 
 #define TRACE_SYSCALL 1
 #if TRACE_SYSCALL
 	syscall_trace(state);
 #endif
 
-	thread->iotier_override = THROTTLE_LEVEL_NONE; /* Reset IO tier override before handling SVC from userspace */
+	thread->iotier_override = THROTTLE_LEVEL_NONE;                                                                
 
 	if (trap_no == (int)PLATFORM_SYSCALL_TRAP_NO) {
 		platform_syscall(state);
@@ -1652,11 +1652,11 @@ handle_svc(arm_saved_state_t *state)
 			return;
 		}
 
-		/* Counting perhaps better in the handler, but this is how it's been done */
+		                                                                            
 		thread->syscalls_mach++;
 		mach_syscall(state);
 	} else {
-		/* Counting perhaps better in the handler, but this is how it's been done */
+		                                                                            
 		thread->syscalls_unix++;
 		p = get_bsdthreadtask_info(thread);
 
@@ -1762,7 +1762,7 @@ sleh_irq(arm_saved_state_t *state)
 #if USE_APPLEARMSMP
 	PE_handle_ext_interrupt();
 #else
-	/* Run the registered interrupt handler. */
+	                                           
 	cdp->interrupt_handler(cdp->interrupt_target,
 	    cdp->interrupt_refCon,
 	    cdp->interrupt_nub,
@@ -1789,7 +1789,7 @@ sleh_fiq(arm_saved_state_t *state)
 
 #if MONOTONIC_FIQ
 	uint64_t pmcr0 = 0, upmsr = 0;
-#endif /* MONOTONIC_FIQ */
+#endif                    
 
 #if defined(HAS_IPI)
 	boolean_t    is_ipi = FALSE;
@@ -1806,12 +1806,12 @@ sleh_fiq(arm_saved_state_t *state)
 	if (is_ipi) {
 		type = DBG_INTR_TYPE_IPI;
 	} else
-#endif /* defined(HAS_IPI) */
+#endif                       
 #if MONOTONIC_FIQ
 	if (mt_pmi_pending(&pmcr0, &upmsr)) {
 		type = DBG_INTR_TYPE_PMI;
 	} else
-#endif /* MONOTONIC_FIQ */
+#endif                    
 	if (ml_get_timer_pending()) {
 		type = DBG_INTR_TYPE_TIMER;
 	}
@@ -1824,41 +1824,41 @@ sleh_fiq(arm_saved_state_t *state)
 
 #if defined(HAS_IPI)
 	if (is_ipi) {
-		/*
-		 * Order is important here: we must ack the IPI by writing IPI_SR
-		 * before we call cpu_signal_handler().  Otherwise, there will be
-		 * a window between the completion of pending-signal processing in
-		 * cpu_signal_handler() and the ack during which a newly-issued
-		 * IPI to this CPU may be lost.  ISB is required to ensure the msr
-		 * is retired before execution of cpu_signal_handler().
-		 */
+		  
+                                                                   
+                                                                   
+                                                                    
+                                                                 
+                                                                    
+                                                         
+     
 		MSR("IPISR_EL1", ipi_sr);
 		__builtin_arm_isb(ISB_SY);
 		cpu_signal_handler();
 	} else
-#endif /* defined(HAS_IPI) */
+#endif                       
 #if MONOTONIC_FIQ
 	if (type == DBG_INTR_TYPE_PMI) {
 		INTERRUPT_MASKED_DEBUG_START(mt_fiq, DBG_INTR_TYPE_PMI);
 		mt_fiq(getCpuDatap(), pmcr0, upmsr);
 		INTERRUPT_MASKED_DEBUG_END();
 	} else
-#endif /* MONOTONIC_FIQ */
+#endif                    
 	{
-		/*
-		 * We don't know that this is a timer, but we don't have insight into
-		 * the other interrupts that go down this path.
-		 */
+		  
+                                                                       
+                                                 
+     
 
 		cpu_data_t *cdp = getCpuDatap();
 
-		cdp->cpu_decrementer = -1; /* Large */
+		cdp->cpu_decrementer = -1;            
 
-		/*
-		 * ARM64_TODO: whether we're coming from userland is ignored right now.
-		 * We can easily thread it through, but not bothering for the
-		 * moment (AArch32 doesn't either).
-		 */
+		  
+                                                                         
+                                                               
+                                     
+     
 		INTERRUPT_MASKED_DEBUG_START(rtclock_intr, DBG_INTR_TYPE_TIMER);
 		rtclock_intr(TRUE);
 		INTERRUPT_MASKED_DEBUG_END();
@@ -1928,10 +1928,10 @@ thread_syscall_return(kern_return_t error)
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(thread)->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* MACH_ASSERT */
+#endif                  
 
 	if (kdebug_enable) {
-		/* Invert syscall number (negative for a mach syscall) */
+		                                                         
 		mach_syscall_trace_exit(error, (-1) * get_saved_state_svc_number(state));
 	}
 
@@ -1942,7 +1942,7 @@ void
 syscall_trace(
 	struct arm_saved_state * regs __unused)
 {
-	/* kprintf("syscall: %d\n", saved_state64(regs)->x[16]);  */
+	                                                            
 }
 
 static void
@@ -1962,7 +1962,7 @@ sleh_interrupt_handler_prologue(arm_saved_state_t *state, unsigned int type)
 	if (telemetry_needs_record) {
 		telemetry_mark_curthread((boolean_t)is_user, FALSE);
 	}
-#endif /* CONFIG_TELEMETRY */
+#endif                       
 }
 
 static void
@@ -1970,7 +1970,7 @@ sleh_interrupt_handler_epilogue(void)
 {
 #if KPERF
 	kperf_interrupt();
-#endif /* KPERF */
+#endif            
 	KDBG_RELEASE(MACHDBG_CODE(DBG_MACH_EXCP_INTR, 0) | DBG_FUNC_END);
 }
 

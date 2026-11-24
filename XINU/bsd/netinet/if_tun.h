@@ -47,7 +47,7 @@
 
 #ifdef KERNEL_PRIVATE
 struct tun_softc {
-	u_short tun_flags;              /* misc flags */
+	u_short tun_flags;                              
 #define TUN_OPEN        0x0001
 #define TUN_INITED      0x0002
 #define TUN_RCOLL       0x0004
@@ -59,22 +59,22 @@ struct tun_softc {
 
 #define TUN_READY       (TUN_OPEN | TUN_INITED | TUN_IASET)
 
-	struct  ifnet tun_if;           /* the interface */
-	int     tun_pgrp;               /* the process group - if any */
-	struct  selinfo tun_rsel;       /* read select */
-	struct  selinfo tun_wsel;       /* write select (not used) */
+	struct  ifnet tun_if;                              
+	int     tun_pgrp;                                               
+	struct  selinfo tun_rsel;                        
+	struct  selinfo tun_wsel;                                    
 #if NBPFILTER > 0
 	caddr_t         tun_bpf;
 #endif
 };
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/* ioctl's for get/set debug */
+                               
 #define TUNSDEBUG       _IOW('t', 90, int)
 #define TUNGDEBUG       _IOR('t', 89, int)
 
-/* Maximum packet size */
+                         
 #define TUNMTU          1500
 
-#endif /* !_NET_IF_TUN_H_ */
+#endif                      

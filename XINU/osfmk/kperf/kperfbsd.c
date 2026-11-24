@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*  sysctl interface for parameters from user-land */
+                                                     
 
 #include <kern/debug.h>
 #include <libkern/libkern.h>
@@ -48,7 +48,7 @@
 
 #include <sys/ktrace.h>
 
-/* Requests from kperf sysctls. */
+                                  
 enum kperf_request {
 	REQ_SAMPLING,
 	REQ_RESET,
@@ -87,23 +87,23 @@ int kperf_debug_level = 0;
 
 #if DEVELOPMENT || DEBUG
 _Atomic long long kperf_pending_ipis = 0;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-/*
- * kperf has unique requirements from sysctl.
- *
- * For simple queries like the number of actions, the normal sysctl style
- * of get/set works well.
- *
- * However, when requesting information about something specific, like an
- * action, user space needs to provide some contextual information.  This
- * information is stored in a uint64_t array that includes the context, like
- * the action ID it is interested in.  If user space is getting the value from
- * the kernel, then the get side of the sysctl is valid.  If it is setting the
- * value, then the get pointers are left NULL.
- *
- * These functions handle marshalling and unmarshalling data from sysctls.
- */
+  
+                                             
+  
+                                                                         
+                         
+  
+                                                                         
+                                                                         
+                                                                            
+                                                                              
+                                                                              
+                                              
+  
+                                                                          
+   
 
 static int
 kperf_sysctl_get_set_uint32(struct sysctl_req *req,
@@ -207,10 +207,10 @@ kperf_sysctl_get_set_unsigned_uint32(struct sysctl_req *req,
 	}
 }
 
-/*
- * These functions are essentially the same as the generic
- * kperf_sysctl_get_set_unsigned_uint32, except they have unique input sizes.
- */
+  
+                                                          
+                                                                             
+   
 
 static int
 sysctl_timer_period(struct sysctl_req *req)
@@ -289,7 +289,7 @@ sysctl_bless(struct sysctl_req *req)
 	return ktrace_set_owning_pid(value);
 }
 
-/* sysctl handlers that use the generic functions */
+                                                    
 
 static int
 sysctl_action_samplers(struct sysctl_req *req)
@@ -494,7 +494,7 @@ kperf_sysctl SYSCTL_HANDLER_ARGS
 		}
 	}
 
-	/* which request */
+	                   
 	switch (type) {
 	case REQ_ACTION_COUNT:
 		ret = sysctl_action_count(req);
@@ -583,14 +583,14 @@ kperf_sysctl_bless_handler SYSCTL_HANDLER_ARGS
 
 	ktrace_lock();
 
-	/* if setting a new "blessed pid" (ktrace owning pid) */
+	                                                        
 	if (req->newptr != USER_ADDR_NULL) {
-		/*
-		 * root can bypass the ktrace check when a flag is set (for
-		 * backwards compatibility) or when ownership is maintained over
-		 * subsystems resets (to allow the user space process that set
-		 * ownership to unset it).
-		 */
+		  
+                                                             
+                                                                  
+                                                                
+                            
+     
 		if (!((ktrace_root_set_owner_allowed ||
 		    ktrace_keep_ownership_on_reset) &&
 		    kauth_cred_issuser(kauth_cred_get()))) {
@@ -606,7 +606,7 @@ kperf_sysctl_bless_handler SYSCTL_HANDLER_ARGS
 		}
 	}
 
-	/* which request */
+	                   
 	if ((uintptr_t)arg1 == REQ_BLESS) {
 		ret = sysctl_bless(req);
 	} else {
@@ -618,12 +618,12 @@ kperf_sysctl_bless_handler SYSCTL_HANDLER_ARGS
 	return ret;
 }
 
-/* root kperf node */
+                     
 
 SYSCTL_NODE(, OID_AUTO, kperf, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "kperf");
 
-/* actions */
+             
 
 SYSCTL_NODE(_kperf, OID_AUTO, action, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "action");
@@ -670,7 +670,7 @@ SYSCTL_PROC(_kperf_action, OID_AUTO, kcallstack_depth,
     sizeof(int), kperf_sysctl, "I",
     "Maximum number of frames to include in kernel callstacks");
 
-/* timers */
+            
 
 SYSCTL_NODE(_kperf, OID_AUTO, timer, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "timer");
@@ -699,7 +699,7 @@ SYSCTL_PROC(_kperf_timer, OID_AUTO, pet_timer,
     (void *)REQ_TIMER_PET,
     sizeof(int), kperf_sysctl, "I", "Which timer ID does PET");
 
-/* kdebug trigger */
+                    
 
 SYSCTL_NODE(_kperf, OID_AUTO, kdebug, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "kdebug");
@@ -715,7 +715,7 @@ SYSCTL_PROC(_kperf_kdebug, OID_AUTO, filter,
     (void*)REQ_KDEBUG_FILTER,
     sizeof(int), kperf_sysctl, "P", "The filter that determines which kdebug events trigger a sample");
 
-/* lazy sampling */
+                   
 
 SYSCTL_NODE(_kperf, OID_AUTO, lazy, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "lazy");
@@ -744,7 +744,7 @@ SYSCTL_PROC(_kperf_lazy, OID_AUTO, cpu_action,
     sizeof(uint64_t), kperf_sysctl, "UQ",
     "Which action to fire for lazy CPU samples");
 
-/* misc */
+          
 
 SYSCTL_PROC(_kperf, OID_AUTO, sampling,
     CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_ANYBODY | CTLFLAG_LOCKED
@@ -758,7 +758,7 @@ SYSCTL_PROC(_kperf, OID_AUTO, reset,
     0, kperf_sysctl, "-", "Reset kperf");
 
 SYSCTL_PROC(_kperf, OID_AUTO, blessed_pid,
-    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED         /* must be root */
+    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED                           
     | CTLFLAG_MASKED,
     (void *)REQ_BLESS,
     sizeof(int), kperf_sysctl_bless_handler, "I", "Blessed pid");
@@ -790,7 +790,7 @@ SYSCTL_PROC(_kperf, OID_AUTO, lightweight_pet,
     sizeof(int), kperf_sysctl, "I",
     "Status of lightweight PET mode");
 
-/* limits */
+            
 
 SYSCTL_NODE(_kperf, OID_AUTO, limits, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "limits");
@@ -832,7 +832,7 @@ SYSCTL_PROC(_kperf_limits, OID_AUTO, timer_min_bg_pet_period_ns,
     (void *)REQ_LIM_BG_PET_PERIOD_NS, sizeof(uint64_t), kperf_sysctl_limits,
     "Q", "Minimum background PET timer period in nanoseconds");
 
-/* debug */
+           
 SYSCTL_INT(_kperf, OID_AUTO, debug_level, CTLFLAG_RW | CTLFLAG_LOCKED,
     &kperf_debug_level, 0, "debug level");
 
@@ -840,4 +840,4 @@ SYSCTL_INT(_kperf, OID_AUTO, debug_level, CTLFLAG_RW | CTLFLAG_LOCKED,
 SYSCTL_QUAD(_kperf, OID_AUTO, already_pending_ipis,
     CTLFLAG_RD | CTLFLAG_LOCKED,
     &kperf_pending_ipis, "");
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           

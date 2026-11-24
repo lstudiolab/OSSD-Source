@@ -72,32 +72,32 @@ struct vnode;
 #if IMPORTANCE_INHERITANCE
 #define LF_NOT_BOOSTED  0
 #define LF_BOOSTED      1
-#endif /* IMPORTANCE_INHERITANCE */
+#endif                             
 
-/*
- * The lockf structure is a kernel structure which contains the information
- * associated with a byte range lock.  The lockf structures are linked into
- * the vnode structure.  Locks are sorted by the starting byte of the lock for
- * efficiency after they have been committed; uncommitted locks are on the list
- * head so they may quickly be accessed, and are both short lived and transient.
- */
+  
+                                                                           
+                                                                           
+                                                                              
+                                                                               
+                                                                                
+   
 TAILQ_HEAD(locklist, lockf);
 
 struct lockf {
-	short   lf_flags;           /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
-	short   lf_type;            /* Lock type: F_RDLCK, F_WRLCK */
+	short   lf_flags;                                                    
+	short   lf_type;                                             
 #if IMPORTANCE_INHERITANCE
-	int     lf_boosted;         /* Is the owner of the lock boosted */
+	int     lf_boosted;                                               
 #endif
-	off_t   lf_start;           /* Byte # of the start of the lock */
-	off_t   lf_end;             /* Byte # of the end of the lock (-1=EOF) */
-	caddr_t lf_id;              /* Id of the resource holding the lock */
-	struct  lockf **lf_head;    /* Back pointer to the head of the locf list */
-	struct  vnode *lf_vnode;    /* Back pointer to the inode */
-	struct  lockf *lf_next;     /* Pointer to the next lock on this inode */
-	struct  locklist lf_blkhd;  /* List of requests blocked on this lock */
-	TAILQ_ENTRY(lockf) lf_block;/* A request waiting for a lock */
-	struct  proc *lf_owner;     /* The proc that did the SETLK, if known */
+	off_t   lf_start;                                                
+	off_t   lf_end;                                                         
+	caddr_t lf_id;                                                       
+	struct  lockf **lf_head;                                                   
+	struct  vnode *lf_vnode;                                   
+	struct  lockf *lf_next;                                                 
+	struct  locklist lf_blkhd;                                             
+	TAILQ_ENTRY(lockf) lf_block;                                  
+	struct  proc *lf_owner;                                                
 };
 
 __BEGIN_DECLS
@@ -113,8 +113,8 @@ void    lf_abort_advlocks(vnode_t);
 void    lf_print(char *, struct lockf *);
 void    lf_printlist(char *, struct lockf *);
 #endif
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 __END_DECLS
 
-#endif /* !_SYS_LOCKF_H_ */
+#endif                     

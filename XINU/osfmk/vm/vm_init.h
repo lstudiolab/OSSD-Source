@@ -34,4 +34,4 @@
 
 extern void vm_mem_bootstrap(void);
 
-#endif /* VM_INIT_H */
+#endif                

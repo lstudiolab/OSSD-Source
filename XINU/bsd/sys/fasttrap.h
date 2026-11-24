@@ -39,7 +39,7 @@ extern "C" {
 #define	FASTTRAPIOC		(('m' << 24) | ('r' << 16) | ('f' << 8))
 #else
 #define	FASTTRAPIOC		_IO('d', 0)
-#endif /* __APPLE__ */
+#endif                
 #define	FASTTRAPIOC_MAKEPROBE	(FASTTRAPIOC | 1)
 #define	FASTTRAPIOC_GETINSTR	(FASTTRAPIOC | 2)
 
@@ -61,7 +61,7 @@ typedef enum fasttrap_provider_type {
 	DTFTP_PROVIDER_ONESHOT
 } fasttrap_provider_type_t;
 
-/* Moved from fasttrap.c */
+                           
 #define	FASTTRAP_PID_NAME		"pid"
 #define	FASTTRAP_OBJC_NAME		"objc"
 #define	FASTTRAP_ONESHOT_NAME		"oneshot"
@@ -74,7 +74,7 @@ typedef struct fasttrap_probe_spec {
 	fasttrap_provider_type_t	ftps_provider_type;
 	fasttrap_probe_type_t		ftps_probe_type;
 #if defined(__arm__) || defined(__arm64__)
-	uint32_t			ftps_arch_subinfo;	// For any additional per probe architecture specific data
+	uint32_t			ftps_arch_subinfo;	                                                          
 #endif
 #endif
 	char				ftps_func[DTRACE_FUNCNAMELEN];
@@ -82,10 +82,10 @@ typedef struct fasttrap_probe_spec {
 
 #if defined(__APPLE__)
 #if defined(__arm__) || defined(__arm64__)
-	// We already have 'padding' from the ftps_arch_subinfo above
+	                                                             
 #else
 #if !defined(__LP64__)
-	uint32_t			pad; /* Explicit pad to keep ILP32 and LP64 lined up. */
+	uint32_t			pad;                                                    
 #endif
 #endif
 #endif
@@ -101,25 +101,25 @@ typedef struct fasttrap_instr_query {
 	fasttrap_instr_t	ftiq_instr;
 } fasttrap_instr_query_t;
 
-/*
- * To support the fasttrap provider from very early in a process's life,
- * the run-time linker, ld.so.1, has a program header of type PT_SUNWDTRACE
- * which points to a data object which must be PT_SUNWDTRACE_SIZE bytes.
- * This structure mimics the fasttrap provider section of the ulwp_t structure.
- * When the fasttrap provider is changed to require new or different
- * instructions, the data object in ld.so.1 and the thread initializers in libc
- * (libc_init() and _thrp_create()) need to be updated to include the new
- * instructions, and PT_SUNWDTRACE needs to be changed to a new unique number
- * (while the old value gets assigned something like PT_SUNWDTRACE_1). Since the
- * linker must be backward compatible with old Solaris releases, it must have
- * program headers for each of the PT_SUNWDTRACE versions. The kernel's
- * elfexec() function only has to look for the latest version of the
- * PT_SUNWDTRACE program header.
- */
+  
+                                                                        
+                                                                           
+                                                                        
+                                                                               
+                                                                    
+                                                                               
+                                                                         
+                                                                             
+                                                                                
+                                                                             
+                                                                       
+                                                                    
+                                
+   
 #define	PT_SUNWDTRACE_SIZE	FASTTRAP_SUNWDTRACE_SIZE
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif	/* _SYS_FASTTRAP_H */
+#endif	                     

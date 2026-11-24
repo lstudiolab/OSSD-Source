@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-/*
- * Name the various locking functions...
- */
+  
+                                        
+   
 #define LS_LCK_MTX_LOCK                 "lck_mtx_lock"
 #define LS_LCK_MTX_SPIN_LOCK            "lck_mtx_spin_lock"
 #define LS_LCK_MTX_UNLOCK               "lck_mtx_unlock"
@@ -90,4 +90,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* _SYS_LOCKSTAT_H */
+#endif                       

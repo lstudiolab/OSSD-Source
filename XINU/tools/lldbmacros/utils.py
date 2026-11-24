@@ -1,4 +1,4 @@
-#General Utility functions for debugging or introspection
+                                                         
 
 """ Please make sure you read the README file COMPLETELY BEFORE reading anything below.
     It is very critical that you read coding guidelines in Section E in README file. 
@@ -10,7 +10,7 @@ from core.cvalue import *
 from core.configuration import *
 from core.lazytarget import *
 
-#DONOTTOUCHME: exclusive use for lldb_run_command only. 
+                                                        
 lldb_run_command_state = {'active':False}
 
 def lldb_run_command(cmdstring):
@@ -21,7 +21,7 @@ def lldb_run_command(cmdstring):
     global lldb_run_command_state
     retval =""
     res = lldb.SBCommandReturnObject()
-    # set special attribute to notify xnu framework to not print on stdout
+                                                                          
     lldb_run_command_state['active'] = True
     lldb.debugger.GetCommandInterpreter().HandleCommand(cmdstring, res)
     lldb_run_command_state['active'] = False
@@ -361,13 +361,13 @@ def addDSYM(uuid, info):
         print "Error: Unable to find syms for %s" % uuid
         return False
     if not uuid in _dsymlist:
-        # add the dsym itself
+                             
         cmd_str = "target modules add --uuid %s" % uuid
         debuglog(cmd_str)
         lldb.debugger.HandleCommand(cmd_str)
-        # set up source path
-        #lldb.debugger.HandleCommand("settings append target.source-map %s %s" % (info["DBGBuildSourcePath"], info["DBGSourcePath"]))
-        # modify the list to show we loaded this
+                            
+                                                                                                                                     
+                                                
         _dsymlist[uuid] = True
 
 def loadDSYM(uuid, load_address, sections=[]):
@@ -422,15 +422,15 @@ def dsymForUUID(uuid):
     import plistlib
     output = subprocess.check_output(["/usr/local/bin/dsymForUUID", "--copyExecutable", uuid])
     if output:
-        # because of <rdar://12713712>
-        #plist = plistlib.readPlistFromString(output)
-        #beginworkaround
+                                      
+                                                     
+                        
         keyvalue_extract_re = re.compile("<key>(.*?)</key>\s*<string>(.*?)</string>",re.IGNORECASE|re.MULTILINE|re.DOTALL)
         plist={}
         plist[uuid] = {}
         for item in keyvalue_extract_re.findall(output):
             plist[uuid][item[0]] = item[1]
-        #endworkaround
+                      
         if plist and plist[uuid]:
             return plist[uuid]
     return None

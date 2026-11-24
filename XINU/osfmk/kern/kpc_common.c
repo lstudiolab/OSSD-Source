@@ -51,20 +51,20 @@ uint32_t kpc_actionid[KPC_MAX_COUNTERS];
 #define COUNTERBUF_SIZE (machine_info.logical_cpu_max * \
 	                 COUNTERBUF_SIZE_PER_CPU)
 
-/* locks */
+           
 static LCK_GRP_DECLARE(kpc_config_lckgrp, "kpc");
 static LCK_MTX_DECLARE(kpc_config_lock, &kpc_config_lckgrp);
 
-/* state specifying if all counters have been requested by kperf */
+                                                                   
 static boolean_t force_all_ctrs = FALSE;
 
-/* power manager */
+                   
 static kpc_pm_handler_t kpc_pm_handler;
 static boolean_t kpc_pm_has_custom_config;
 static uint64_t kpc_pm_pmc_mask;
 #if MACH_ASSERT
 static bool kpc_calling_pm = false;
-#endif /* MACH_ASSERT */
+#endif                  
 
 boolean_t kpc_context_switch_active = FALSE;
 bool kpc_supported = true;
@@ -93,16 +93,16 @@ kpc_register_cpu(struct cpu_data *cpu_data)
 	assert(cpu_data->cpu_kpc_shadow == NULL);
 	assert(cpu_data->cpu_kpc_reload == NULL);
 
-	/*
-	 * Buffers allocated through kpc_counterbuf_alloc() are large enough to
-	 * store all PMCs values from all CPUs. This mimics the userspace API.
-	 * This does not suit well with the per-CPU kpc buffers, since:
-	 *      1. Buffers don't need to be this large.
-	 *      2. The actual number of CPUs is not known at this point.
-	 *
-	 * CPUs are asked to callout into kpc when being registered, we'll
-	 * allocate the memory here.
-	 */
+	  
+                                                                        
+                                                                       
+                                                                
+                                                
+                                                                 
+   
+                                                                   
+                             
+    
 
 	if ((cpu_data->cpu_kpc_buf[0] = kpc_percpu_alloc()) == NULL) {
 		goto error;
@@ -117,7 +117,7 @@ kpc_register_cpu(struct cpu_data *cpu_data)
 		goto error;
 	}
 
-	/* success */
+	             
 	return TRUE;
 
 error:
@@ -175,39 +175,39 @@ kpc_force_all_ctrs(task_t task, int val)
 	boolean_t new_state = val ? TRUE : FALSE;
 	boolean_t old_state = kpc_get_force_all_ctrs();
 
-	/*
-	 * Refuse to do the operation if the counters are already forced by
-	 * another task.
-	 */
+	  
+                                                                    
+                 
+    
 	if (kpc_get_force_all_ctrs() && !kpc_task_get_forced_all_ctrs(task)) {
 		return EACCES;
 	}
 
-	/* nothing to do if the state is not changing */
+	                                                
 	if (old_state == new_state) {
 		return 0;
 	}
 
-	/* notify the power manager */
+	                              
 	if (kpc_pm_handler) {
 #if MACH_ASSERT
 		kpc_calling_pm = true;
-#endif /* MACH_ASSERT */
+#endif                  
 		kpc_pm_handler( new_state ? FALSE : TRUE );
 #if MACH_ASSERT
 		kpc_calling_pm = false;
-#endif /* MACH_ASSERT */
+#endif                  
 	}
 
-	/*
-	 * This is a force -- ensure that counters are forced, even if power
-	 * management fails to acknowledge it.
-	 */
+	  
+                                                                     
+                                       
+    
 	if (force_all_ctrs != new_state) {
 		force_all_ctrs = new_state;
 	}
 
-	/* update the task bits */
+	                          
 	kpc_task_set_forced_all_ctrs(task, new_state);
 
 	return 0;
@@ -216,20 +216,20 @@ kpc_force_all_ctrs(task_t task, int val)
 void
 kpc_pm_acknowledge(boolean_t available_to_pm)
 {
-	/*
-	 * Force-all-counters should still be true when the counters are being
-	 * made available to power management and false when counters are going
-	 * to be taken away.
-	 */
+	  
+                                                                       
+                                                                        
+                     
+    
 	assert(force_all_ctrs == available_to_pm);
-	/*
-	 * Make sure power management isn't playing games with us.
-	 */
+	  
+                                                           
+    
 	assert(kpc_calling_pm == true);
 
-	/*
-	 * Counters being available means no one is forcing all counters.
-	 */
+	  
+                                                                  
+    
 	force_all_ctrs = available_to_pm ? FALSE : TRUE;
 }
 
@@ -262,12 +262,12 @@ kpc_controls_counter(uint32_t ctr)
 		return kpc_controls_fixed_counters();
 	}
 
-	/*
-	 * By default kpc manages all PMCs, but if the Power Manager registered
-	 * with custom_config=TRUE, the Power Manager manages its reserved PMCs.
-	 * However, kpc takes ownership back if a task acquired all PMCs via
-	 * force_all_ctrs.
-	 */
+	  
+                                                                        
+                                                                         
+                                                                     
+                   
+    
 	pmc_mask = (1ULL << (ctr - kpc_fixed_count()));
 	if ((pmc_mask & kpc_pm_pmc_mask) && kpc_pm_has_custom_config && !force_all_ctrs) {
 		return FALSE;
@@ -299,7 +299,7 @@ kpc_get_running(void)
 	return cur_state;
 }
 
-/* may be called from an IPI */
+                               
 int
 kpc_get_curcpu_counters(uint32_t classes, int *curcpu, uint64_t *buf)
 {
@@ -310,7 +310,7 @@ kpc_get_curcpu_counters(uint32_t classes, int *curcpu, uint64_t *buf)
 
 	enabled = ml_set_interrupts_enabled(FALSE);
 
-	/* grab counters and CPU number as close as possible */
+	                                                       
 	if (curcpu) {
 		*curcpu = cpu_number();
 	}
@@ -337,18 +337,18 @@ kpc_get_curcpu_counters(uint32_t classes, int *curcpu, uint64_t *buf)
 	return offset;
 }
 
-/* generic counter reading function, public api */
+                                                  
 int
 kpc_get_cpu_counters(boolean_t all_cpus, uint32_t classes,
     int *curcpu, uint64_t *buf)
 {
 	assert(buf);
 
-	/*
-	 * Unlike reading the current CPU counters, reading counters from all
-	 * CPUs is architecture dependent. This allows kpc to make the most of
-	 * the platform if memory mapped registers is supported.
-	 */
+	  
+                                                                      
+                                                                       
+                                                         
+    
 	if (all_cpus) {
 		return kpc_get_all_cpus_counters(classes, curcpu, buf);
 	} else {
@@ -375,7 +375,7 @@ kpc_get_shadow_counters(boolean_t all_cpus, uint32_t classes,
 	}
 
 	for (int cpu = 0; cpu < machine_info.logical_cpu_max; ++cpu) {
-		/* filter if the caller did not request all cpus */
+		                                                   
 		if (!all_cpus && (cpu != curcpu_id)) {
 			continue;
 		}
@@ -476,9 +476,9 @@ kpc_get_config(uint32_t classes, kpc_config_t *current_config)
 	}
 
 	if (classes & KPC_CLASS_RAWPMU_MASK) {
-		// Client shouldn't ask for config words that aren't available.
-		// Most likely, they'd misinterpret the returned buffer if we
-		// allowed this.
+		                                                               
+		                                                             
+		                
 		if (kpc_multiple_clients()) {
 			return EPERM;
 		}
@@ -500,12 +500,12 @@ kpc_set_config(uint32_t classes, kpc_config_t *configv)
 
 	assert(configv);
 
-	/* don't allow RAWPMU configuration when sharing counters */
+	                                                            
 	if ((classes & KPC_CLASS_RAWPMU_MASK) && kpc_multiple_clients()) {
 		return EPERM;
 	}
 
-	/* no clients have the right to modify both classes */
+	                                                      
 	if ((classes & (KPC_CLASS_CONFIGURABLE_MASK)) &&
 	    (classes & (KPC_CLASS_POWER_MASK))) {
 		return EPERM;
@@ -513,7 +513,7 @@ kpc_set_config(uint32_t classes, kpc_config_t *configv)
 
 	lck_mtx_lock(&kpc_config_lock);
 
-	/* translate the power class for the machine layer */
+	                                                     
 	if (classes & KPC_CLASS_POWER_MASK) {
 		mp_config.classes |= KPC_CLASS_CONFIGURABLE_MASK;
 	}
@@ -531,7 +531,7 @@ kpc_get_counterbuf_size(void)
 	return COUNTERBUF_SIZE;
 }
 
-/* allocate a buffer large enough for all possible counters */
+                                                              
 uint64_t *
 kpc_counterbuf_alloc(void)
 {
@@ -584,7 +584,7 @@ kpc_set_period(uint32_t classes, uint64_t *val)
 
 	assert(val);
 
-	/* no clients have the right to modify both classes */
+	                                                      
 	if ((classes & (KPC_CLASS_CONFIGURABLE_MASK)) &&
 	    (classes & (KPC_CLASS_POWER_MASK))) {
 		return EPERM;
@@ -604,7 +604,7 @@ kpc_set_period(uint32_t classes, uint64_t *val)
 	}
 #endif
 
-	/* translate the power class for the machine layer */
+	                                                     
 	if (classes & KPC_CLASS_POWER_MASK) {
 		mp_config.classes |= KPC_CLASS_CONFIGURABLE_MASK;
 	}
@@ -628,7 +628,7 @@ kpc_get_period(uint32_t classes, uint64_t *val)
 	lck_mtx_lock(&kpc_config_lock);
 
 	if (classes & KPC_CLASS_FIXED_MASK) {
-		/* convert reload values to periods */
+		                                      
 		count = kpc_get_counter_count(KPC_CLASS_FIXED_MASK);
 		for (uint32_t i = 0; i < count; ++i) {
 			*val++ = kpc_fixed_max() - FIXED_RELOAD(i);
@@ -638,7 +638,7 @@ kpc_get_period(uint32_t classes, uint64_t *val)
 	if (classes & KPC_CLASS_CONFIGURABLE_MASK) {
 		pmc_mask = kpc_get_configurable_pmc_mask(KPC_CLASS_CONFIGURABLE_MASK);
 
-		/* convert reload values to periods */
+		                                      
 		count = kpc_configurable_count();
 		for (uint32_t i = 0; i < count; ++i) {
 			if ((1ULL << i) & pmc_mask) {
@@ -650,7 +650,7 @@ kpc_get_period(uint32_t classes, uint64_t *val)
 	if (classes & KPC_CLASS_POWER_MASK) {
 		pmc_mask = kpc_get_configurable_pmc_mask(KPC_CLASS_POWER_MASK);
 
-		/* convert reload values to periods */
+		                                      
 		count = kpc_configurable_count();
 		for (uint32_t i = 0; i < count; ++i) {
 			if ((1ULL << i) & pmc_mask) {
@@ -672,8 +672,8 @@ kpc_set_actionid(uint32_t classes, uint32_t *val)
 
 	assert(val);
 
-	/* NOTE: what happens if a pmi occurs while actionids are being
-	 * set is undefined. */
+	                                                               
+                        
 	lck_mtx_lock(&kpc_config_lock);
 
 	if (classes & KPC_CLASS_FIXED_MASK) {
@@ -760,15 +760,15 @@ kpc_set_running(uint32_t classes)
 		.classes = classes, .cfg_target_mask = 0ULL, .cfg_state_mask = 0ULL
 	};
 
-	/* target all available PMCs */
+	                               
 	mp_config.cfg_target_mask = kpc_get_configurable_pmc_mask(all_cfg_classes);
 
-	/* translate the power class for the machine layer */
+	                                                     
 	if (classes & KPC_CLASS_POWER_MASK) {
 		mp_config.classes |= KPC_CLASS_CONFIGURABLE_MASK;
 	}
 
-	/* generate the state of each configurable PMCs */
+	                                                  
 	mp_config.cfg_state_mask = kpc_get_configurable_pmc_mask(classes);
 
 	return kpc_set_running_arch(&mp_config);
@@ -787,15 +787,15 @@ kpc_reserve_pm_counters(uint64_t pmc_mask, kpc_pm_handler_t handler,
 	uint64_t all_mask = (1ULL << kpc_configurable_count()) - 1;
 	uint64_t req_mask = 0ULL;
 
-	/* pre-condition */
+	                   
 	assert(handler != NULL);
 	assert(kpc_pm_handler == NULL);
 
-	/* check number of counters requested */
+	                                        
 	req_mask = (pmc_mask & all_mask);
 	assert(kpc_popcount(req_mask) <= kpc_configurable_count());
 
-	/* save the power manager states */
+	                                   
 	kpc_pm_has_custom_config = custom_config;
 	kpc_pm_pmc_mask = req_mask;
 	kpc_pm_handler = handler;
@@ -803,7 +803,7 @@ kpc_reserve_pm_counters(uint64_t pmc_mask, kpc_pm_handler_t handler,
 	printf("kpc: pm registered pmc_mask=%llx custom_config=%d\n",
 	    req_mask, custom_config);
 
-	/* post-condition */
+	                    
 	{
 		uint32_t cfg_count = kpc_get_counter_count(KPC_CLASS_CONFIGURABLE_MASK);
 		uint32_t pwr_count = kpc_popcount(kpc_pm_pmc_mask);
@@ -817,17 +817,17 @@ kpc_reserve_pm_counters(uint64_t pmc_mask, kpc_pm_handler_t handler,
 void
 kpc_release_pm_counters(void)
 {
-	/* pre-condition */
+	                   
 	assert(kpc_pm_handler != NULL);
 
-	/* release the counters */
+	                          
 	kpc_pm_has_custom_config = FALSE;
 	kpc_pm_pmc_mask = 0ULL;
 	kpc_pm_handler = NULL;
 
 	printf("kpc: pm released counters\n");
 
-	/* post-condition */
+	                    
 	assert(kpc_get_counter_count(KPC_CLASS_CONFIGURABLE_MASK) == kpc_configurable_count());
 }
 
@@ -843,7 +843,7 @@ kpc_get_configurable_pmc_mask(uint32_t classes)
 	uint32_t configurable_count = kpc_configurable_count();
 	uint64_t cfg_mask = 0ULL, pwr_mask = 0ULL, all_cfg_pmcs_mask = 0ULL;
 
-	/* not configurable classes or no configurable counters */
+	                                                          
 	if (((classes & (KPC_CLASS_CONFIGURABLE_MASK | KPC_CLASS_POWER_MASK)) == 0) ||
 	    (configurable_count == 0)) {
 		goto exit;
@@ -860,11 +860,11 @@ kpc_get_configurable_pmc_mask(uint32_t classes)
 		}
 	}
 
-	/*
-	 * The power class exists iff:
-	 *      - No tasks acquired all PMCs
-	 *      - PM registered and uses kpc to interact with PMCs
-	 */
+	  
+                               
+                                     
+                                                           
+    
 	if ((force_all_ctrs == FALSE) &&
 	    (kpc_pm_handler != NULL) &&
 	    (kpc_pm_has_custom_config == FALSE) &&
@@ -873,7 +873,7 @@ kpc_get_configurable_pmc_mask(uint32_t classes)
 	}
 
 exit:
-	/* post-conditions */
+	                     
 	assert(((cfg_mask | pwr_mask) & (~all_cfg_pmcs_mask)) == 0 );
 	assert( kpc_popcount(cfg_mask | pwr_mask) <= kpc_configurable_count());
 	assert((cfg_mask & pwr_mask) == 0ULL );

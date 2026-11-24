@@ -18,4 +18,4 @@ using SharedPtr = T *;
 extern SharedPtr<T> return_shared_as_raw(T*);
 extern SharedPtr<T> return_raw_as_shared(T*);
 
-#endif // !TESTS_INTRUSIVE_SHARED_PTR_ABI_HELPER_H
+#endif                                            

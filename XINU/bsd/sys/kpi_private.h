@@ -29,9 +29,9 @@
 #ifndef _SYS_KPI_PRIVATE_H
 #define _SYS_KPI_PRIVATE_H
 
-/*
- * Assorted odds and ends for exported private KPI (internal use only)
- */
+  
+                                                                      
+   
 
 #ifdef KERNEL
 #include <sys/types.h>
@@ -40,13 +40,13 @@ __BEGIN_DECLS
 
 #ifdef KERNEL_PRIVATE
 
-/* kernel-exported qsort */
+                           
 void kx_qsort(void* array, size_t nm, size_t member_size, int (*)(const void *, const void *));
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 __END_DECLS
 
 
-#endif  /* KERNEL  */
-#endif /* !_SYS_KPI_PRIVATE_H */
+#endif               
+#endif                          

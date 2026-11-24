@@ -32,13 +32,13 @@
 #ifndef _SYS_NETPORT_H_
 #define _SYS_NETPORT_H_
 
-#include <_types/_uint32_t.h> /* uint32_t */
+#include <_types/_uint32_t.h>               
 
 typedef uint32_t        netaddr_t;
 
-/*
- * Network Port structure.
- */
+  
+                          
+   
 typedef struct {
 	long        np_uid_high;
 	long        np_uid_low;
@@ -51,4 +51,4 @@ typedef struct {
 	np_uid_t    np_sid;
 } network_port_t;
 
-#endif  /* !_SYS_NETPORT_H_ */
+#endif                        

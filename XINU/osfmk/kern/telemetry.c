@@ -80,33 +80,33 @@ struct micro_snapshot_buffer {
 void telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro_snapshot_buffer * current_buffer);
 int telemetry_buffer_gather(user_addr_t buffer, uint32_t *length, boolean_t mark, struct micro_snapshot_buffer * current_buffer);
 
-#define TELEMETRY_DEFAULT_SAMPLE_RATE (1) /* 1 sample every 1 second */
+#define TELEMETRY_DEFAULT_SAMPLE_RATE (1)                              
 #define TELEMETRY_DEFAULT_BUFFER_SIZE (16*1024)
 #define TELEMETRY_MAX_BUFFER_SIZE (64*1024)
 
-#define TELEMETRY_DEFAULT_NOTIFY_LEEWAY (4*1024) // Userland gets 4k of leeway to collect data after notification
-#define TELEMETRY_MAX_UUID_COUNT (128) // Max of 128 non-shared-cache UUIDs to log for symbolication
+#define TELEMETRY_DEFAULT_NOTIFY_LEEWAY (4*1024)                                                                 
+#define TELEMETRY_MAX_UUID_COUNT (128)                                                              
 
 uint32_t                        telemetry_sample_rate = 0;
 volatile boolean_t      telemetry_needs_record = FALSE;
 volatile boolean_t      telemetry_needs_timer_arming_record = FALSE;
 
-/*
- * If TRUE, record micro-stackshot samples for all tasks.
- * If FALSE, only sample tasks which are marked for telemetry.
- */
+  
+                                                         
+                                                              
+   
 boolean_t telemetry_sample_all_tasks = FALSE;
 boolean_t telemetry_sample_pmis = FALSE;
-uint32_t telemetry_active_tasks = 0; // Number of tasks opted into telemetry
+uint32_t telemetry_active_tasks = 0;                                        
 
 uint32_t telemetry_timestamp = 0;
 
-/*
- * The telemetry_buffer is responsible
- * for timer samples and interrupt samples that are driven by
- * compute_averages().  It will notify its client (if one
- * exists) when it has enough data to be worth flushing.
- */
+  
+                                      
+                                                             
+                                                         
+                                                        
+   
 struct micro_snapshot_buffer telemetry_buffer = {
 	.buffer = 0,
 	.size = 0,
@@ -114,7 +114,7 @@ struct micro_snapshot_buffer telemetry_buffer = {
 	.end_point = 0
 };
 
-int                                     telemetry_bytes_since_last_mark = -1; // How much data since buf was last marked?
+int                                     telemetry_bytes_since_last_mark = -1;                                            
 int                                     telemetry_buffer_notify_at = 0;
 
 LCK_GRP_DECLARE(telemetry_lck_grp, "telemetry group");
@@ -152,9 +152,9 @@ telemetry_init(void)
 
 	if (!PE_parse_boot_argn("telemetry_notification_leeway",
 	    &telemetry_notification_leeway, sizeof(telemetry_notification_leeway))) {
-		/*
-		 * By default, notify the user to collect the buffer when there is this much space left in the buffer.
-		 */
+		  
+                                                                                                        
+     
 		telemetry_notification_leeway = TELEMETRY_DEFAULT_NOTIFY_LEEWAY;
 	}
 	if (telemetry_notification_leeway >= telemetry_buffer.size) {
@@ -169,16 +169,16 @@ telemetry_init(void)
 		telemetry_sample_rate = TELEMETRY_DEFAULT_SAMPLE_RATE;
 	}
 
-	/*
-	 * To enable telemetry for all tasks, include "telemetry_sample_all_tasks=1" in boot-args.
-	 */
+	  
+                                                                                           
+    
 	if (!PE_parse_boot_argn("telemetry_sample_all_tasks",
 	    &telemetry_sample_all_tasks, sizeof(telemetry_sample_all_tasks))) {
 #if !defined(XNU_TARGET_OS_OSX) && !(DEVELOPMENT || DEBUG)
 		telemetry_sample_all_tasks = FALSE;
 #else
 		telemetry_sample_all_tasks = TRUE;
-#endif /* !defined(XNU_TARGET_OS_OSX) && !(DEVELOPMENT || DEBUG) */
+#endif                                                             
 	}
 
 	kprintf("Telemetry: Sampling %stasks once per %u second%s\n",
@@ -186,12 +186,12 @@ telemetry_init(void)
 	    telemetry_sample_rate, telemetry_sample_rate == 1 ? "" : "s");
 }
 
-/*
- * Enable or disable global microstackshots (ie telemetry_sample_all_tasks).
- *
- * enable_disable == 1: turn it on
- * enable_disable == 0: turn it off
- */
+  
+                                                                            
+  
+                                  
+                                   
+   
 void
 telemetry_global_ctl(int enable_disable)
 {
@@ -202,16 +202,16 @@ telemetry_global_ctl(int enable_disable)
 	}
 }
 
-/*
- * Opt the given task into or out of the telemetry stream.
- *
- * Supported reasons (callers may use any or all of):
- *     TF_CPUMON_WARNING
- *     TF_WAKEMON_WARNING
- *
- * enable_disable == 1: turn it on
- * enable_disable == 0: turn it off
- */
+  
+                                                          
+  
+                                                     
+                        
+                         
+  
+                                  
+                                   
+   
 void
 telemetry_task_ctl(task_t task, uint32_t reasons, int enable_disable)
 {
@@ -242,10 +242,10 @@ telemetry_task_ctl_locked(task_t task, uint32_t reasons, int enable_disable)
 	} else {
 		task->t_flags &= ~reasons;
 		if (((origflags & TF_TELEMETRY) != 0) && ((task->t_flags & TF_TELEMETRY) == 0)) {
-			/*
-			 * If this task went from having at least one telemetry bit to having none,
-			 * the net change was to disable telemetry for the task.
-			 */
+			  
+                                                                              
+                                                           
+      
 			OSDecrementAtomic(&telemetry_active_tasks);
 #if TELEMETRY_DEBUG
 			printf("%s: telemetry ON -> OFF (%d active)\n", proc_name_address(task->bsd_info), telemetry_active_tasks);
@@ -254,20 +254,20 @@ telemetry_task_ctl_locked(task_t task, uint32_t reasons, int enable_disable)
 	}
 }
 
-/*
- * Determine if the current thread is eligible for telemetry:
- *
- * telemetry_sample_all_tasks: All threads are eligible. This takes precedence.
- * telemetry_active_tasks: Count of tasks opted in.
- * task->t_flags & TF_TELEMETRY: This task is opted in.
- */
+  
+                                                             
+  
+                                                                               
+                                                   
+                                                       
+   
 static boolean_t
 telemetry_is_active(thread_t thread)
 {
 	task_t task = thread->task;
 
 	if (task == kernel_task) {
-		/* Kernel threads never return to an AST boundary, and are ineligible */
+		                                                                        
 		return FALSE;
 	}
 
@@ -282,11 +282,11 @@ telemetry_is_active(thread_t thread)
 	return FALSE;
 }
 
-/*
- * Userland is arming a timer. If we are eligible for such a record,
- * sample now. No need to do this one at the AST because we're already at
- * a safe place in this system call.
- */
+  
+                                                                    
+                                                                         
+                                    
+   
 int
 telemetry_timer_event(__unused uint64_t deadline, __unused uint64_t interval, __unused uint64_t leeway)
 {
@@ -304,7 +304,7 @@ telemetry_pmi_handler(bool user_mode, __unused void *ctx)
 {
 	telemetry_mark_curthread(user_mode, TRUE);
 }
-#endif /* defined(MT_CORE_INSTRS) && defined(MT_CORE_CYCLES) */
+#endif                                                         
 
 int
 telemetry_pmi_setup(enum telemetry_pmi pmi_ctr, uint64_t period)
@@ -364,26 +364,26 @@ telemetry_pmi_setup(enum telemetry_pmi pmi_ctr, uint64_t period)
 out:
 	TELEMETRY_PMI_UNLOCK();
 	return error;
-#else /* defined(MT_CORE_INSTRS) && defined(MT_CORE_CYCLES) */
+#else                                                         
 #pragma unused(pmi_ctr, period)
 	return 1;
-#endif /* !defined(MT_CORE_INSTRS) || !defined(MT_CORE_CYCLES) */
+#endif                                                           
 }
 
-/*
- * Mark the current thread for an interrupt-based
- * telemetry record, to be sampled at the next AST boundary.
- */
+  
+                                                 
+                                                            
+   
 void
 telemetry_mark_curthread(boolean_t interrupted_userspace, boolean_t pmi)
 {
 	uint32_t ast_bits = 0;
 	thread_t thread = current_thread();
 
-	/*
-	 * If telemetry isn't active for this thread, return and try
-	 * again next time.
-	 */
+	  
+                                                             
+                    
+    
 	if (telemetry_is_active(thread) == FALSE) {
 		return;
 	}
@@ -409,9 +409,9 @@ compute_telemetry(void *arg __unused)
 	}
 }
 
-/*
- * If userland has registered a port for telemetry notifications, send one now.
- */
+  
+                                                                               
+   
 static void
 telemetry_notify_user(void)
 {
@@ -472,18 +472,18 @@ telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro
 		return;
 	}
 
-	/* telemetry_XXX accessed outside of lock for instrumentation only */
+	                                                                     
 	KDBG(MACHDBG_CODE(DBG_MACH_STACKSHOT, MICROSTACKSHOT_RECORD) | DBG_FUNC_START,
 	    microsnapshot_flags, telemetry_bytes_since_last_mark, 0,
 	    (&telemetry_buffer != current_buffer));
 
 	p = get_bsdtask_info(task);
 
-	/*
-	 * Gather up the data we'll need for this sample. The sample is written into the kernel
-	 * buffer with the global telemetry lock held -- so we must do our (possibly faulting)
-	 * copies from userland here, before taking the lock.
-	 */
+	  
+                                                                                        
+                                                                                       
+                                                      
+    
 
 	uintptr_t frames[128];
 	bool user64_regs = false;
@@ -495,12 +495,12 @@ telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro
 	}
 	bool user64_va = task_has_64Bit_addr(task);
 
-	/*
-	 * Retrieve the array of UUID's for binaries used by this task.
-	 * We reach down into DYLD's data structures to find the array.
-	 *
-	 * XXX - make this common with kdp?
-	 */
+	  
+                                                                
+                                                                
+   
+                                    
+    
 	uint32_t uuid_info_count = 0;
 	mach_vm_address_t uuid_info_addr = 0;
 	uint32_t uuid_info_size = 0;
@@ -520,19 +520,19 @@ telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro
 		}
 	}
 
-	/*
-	 * If we get a NULL uuid_info_addr (which can happen when we catch dyld in the middle of updating
-	 * this data structure), we zero the uuid_info_count so that we won't even try to save load info
-	 * for this task.
-	 */
+	  
+                                                                                                  
+                                                                                                 
+                  
+    
 	if (!uuid_info_addr) {
 		uuid_info_count = 0;
 	}
 
-	/*
-	 * Don't copy in an unbounded amount of memory. The main binary and interesting
-	 * non-shared-cache libraries should be in the first few images.
-	 */
+	  
+                                                                                
+                                                                 
+    
 	if (uuid_info_count > TELEMETRY_MAX_UUID_COUNT) {
 		uuid_info_count = TELEMETRY_MAX_UUID_COUNT;
 	}
@@ -547,10 +547,10 @@ telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro
 			return;
 		}
 
-		/*
-		 * Copy in the UUID info array.
-		 * It may be nonresident, in which case just fix up nloadinfos to 0 in the task snapshot.
-		 */
+		  
+                                 
+                                                                                           
+     
 		if (copyin(uuid_info_addr, uuid_info_array, uuid_info_array_size) != 0) {
 			kheap_free(KHEAP_TEMP, uuid_info_array, uuid_info_array_size);
 			uuid_info_array = NULL;
@@ -558,9 +558,9 @@ telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro
 		}
 	}
 
-	/*
-	 * Look for a dispatch queue serial number, and copy it in from userland if present.
-	 */
+	  
+                                                                                     
+    
 	uint64_t dqserialnum = 0;
 	int              dqserialnum_valid = 0;
 
@@ -581,36 +581,36 @@ telemetry_take_sample(thread_t thread, uint8_t microsnapshot_flags, struct micro
 
 	TELEMETRY_LOCK();
 
-	/*
-	 * If our buffer is not backed by anything,
-	 * then we cannot take the sample.  Meant to allow us to deallocate the window
-	 * buffer if it is disabled.
-	 */
+	  
+                                            
+                                                                               
+                             
+    
 	if (!current_buffer->buffer) {
 		goto cancel_sample;
 	}
 
-	/*
-	 * We do the bulk of the operation under the telemetry lock, on assumption that
-	 * any page faults during execution will not cause another AST_TELEMETRY_ALL
-	 * to deadlock; they will just block until we finish. This makes it easier
-	 * to copy into the buffer directly. As soon as we unlock, userspace can copy
-	 * out of our buffer.
-	 */
+	  
+                                                                                
+                                                                             
+                                                                           
+                                                                              
+                      
+    
 
 copytobuffer:
 
 	current_record_start = current_buffer->current_position;
 
 	if ((current_buffer->size - current_buffer->current_position) < sizeof(struct micro_snapshot)) {
-		/*
-		 * We can't fit a record in the space available, so wrap around to the beginning.
-		 * Save the current position as the known end point of valid data.
-		 */
+		  
+                                                                                   
+                                                                    
+     
 		current_buffer->end_point = current_record_start;
 		current_buffer->current_position = 0;
 		if (current_record_start == 0) {
-			/* This sample is too large to fit in the buffer even when we started at 0, so skip it */
+			                                                                                         
 			goto cancel_sample;
 		}
 		goto copytobuffer;
@@ -619,7 +619,7 @@ copytobuffer:
 	msnap = (struct micro_snapshot *)(uintptr_t)(current_buffer->buffer + current_buffer->current_position);
 	msnap->snapshot_magic = STACKSHOT_MICRO_SNAPSHOT_MAGIC;
 	msnap->ms_flags = microsnapshot_flags;
-	msnap->ms_opaque_flags = 0; /* namespace managed by userspace */
+	msnap->ms_opaque_flags = 0;                                     
 	msnap->ms_cpu = cpu_number();
 	msnap->ms_time = secs;
 	msnap->ms_time_microsecs = usecs;
@@ -630,7 +630,7 @@ copytobuffer:
 		current_buffer->end_point = current_record_start;
 		current_buffer->current_position = 0;
 		if (current_record_start == 0) {
-			/* This sample is too large to fit in the buffer even when we started at 0, so skip it */
+			                                                                                         
 			goto cancel_sample;
 		}
 		goto copytobuffer;
@@ -648,13 +648,13 @@ copytobuffer:
 	tsnap->faults = counter_load(&task->faults);
 	tsnap->pageins = task->pageins;
 	tsnap->cow_faults = task->cow_faults;
-	/*
-	 * The throttling counters are maintained as 64-bit counters in the proc
-	 * structure. However, we reserve 32-bits (each) for them in the task_snapshot
-	 * struct to save space and since we do not expect them to overflow 32-bits. If we
-	 * find these values overflowing in the future, the fix would be to simply
-	 * upgrade these counters to 64-bit in the task_snapshot struct
-	 */
+	  
+                                                                         
+                                                                               
+                                                                                   
+                                                                           
+                                                                
+    
 	tsnap->was_throttled = (uint32_t) proc_was_throttled(p);
 	tsnap->did_throttle = (uint32_t) proc_did_throttle(p);
 
@@ -697,23 +697,23 @@ copytobuffer:
 
 	current_buffer->current_position += sizeof(struct task_snapshot);
 
-	/*
-	 * Directly after the task snapshot, place the array of UUID's corresponding to the binaries
-	 * used by this task.
-	 */
+	  
+                                                                                             
+                      
+    
 	if ((current_buffer->size - current_buffer->current_position) < uuid_info_array_size) {
 		current_buffer->end_point = current_record_start;
 		current_buffer->current_position = 0;
 		if (current_record_start == 0) {
-			/* This sample is too large to fit in the buffer even when we started at 0, so skip it */
+			                                                                                         
 			goto cancel_sample;
 		}
 		goto copytobuffer;
 	}
 
-	/*
-	 * Copy the UUID info array into our sample.
-	 */
+	  
+                                             
+    
 	if (uuid_info_array_size > 0) {
 		bcopy(uuid_info_array, (char *)(current_buffer->buffer + current_buffer->current_position), uuid_info_array_size);
 		tsnap->nloadinfos = uuid_info_count;
@@ -721,16 +721,16 @@ copytobuffer:
 
 	current_buffer->current_position += uuid_info_array_size;
 
-	/*
-	 * After the task snapshot & list of binary UUIDs, we place a thread snapshot.
-	 */
+	  
+                                                                               
+    
 
 	if ((current_buffer->size - current_buffer->current_position) < sizeof(struct thread_snapshot)) {
-		/* wrap and overwrite */
+		                        
 		current_buffer->end_point = current_record_start;
 		current_buffer->current_position = 0;
 		if (current_record_start == 0) {
-			/* This sample is too large to fit in the buffer even when we started at 0, so skip it */
+			                                                                                         
 			goto cancel_sample;
 		}
 		goto copytobuffer;
@@ -768,16 +768,16 @@ copytobuffer:
 
 	current_buffer->current_position += sizeof(struct thread_snapshot);
 
-	/*
-	 * If this thread has a dispatch queue serial number, include it here.
-	 */
+	  
+                                                                       
+    
 	if (dqserialnum_valid) {
 		if ((current_buffer->size - current_buffer->current_position) < sizeof(dqserialnum)) {
-			/* wrap and overwrite */
+			                        
 			current_buffer->end_point = current_record_start;
 			current_buffer->current_position = 0;
 			if (current_record_start == 0) {
-				/* This sample is too large to fit in the buffer even when we started at 0, so skip it */
+				                                                                                         
 				goto cancel_sample;
 			}
 			goto copytobuffer;
@@ -795,15 +795,15 @@ copytobuffer:
 		framesize = 4;
 	}
 
-	/*
-	 * If we can't fit this entire stacktrace then cancel this record, wrap to the beginning,
-	 * and start again there so that we always store a full record.
-	 */
+	  
+                                                                                          
+                                                                
+    
 	if ((current_buffer->size - current_buffer->current_position) / framesize < btcount) {
 		current_buffer->end_point = current_record_start;
 		current_buffer->current_position = 0;
 		if (current_record_start == 0) {
-			/* This sample is too large to fit in the buffer even when we started at 0, so skip it */
+			                                                                                         
 			goto cancel_sample;
 		}
 		goto copytobuffer;
@@ -818,20 +818,20 @@ copytobuffer:
 	}
 
 	if (current_buffer->end_point < current_buffer->current_position) {
-		/*
-		 * Each time the cursor wraps around to the beginning, we leave a
-		 * differing amount of unused space at the end of the buffer. Make
-		 * sure the cursor pushes the end point in case we're making use of
-		 * more of the buffer than we did the last time we wrapped.
-		 */
+		  
+                                                                   
+                                                                    
+                                                                     
+                                                             
+     
 		current_buffer->end_point = current_buffer->current_position;
 	}
 
 	thsnap->nuser_frames = btcount;
 
-	/*
-	 * Now THIS is a hack.
-	 */
+	  
+                       
+    
 	if (current_buffer == &telemetry_buffer) {
 		telemetry_bytes_since_last_mark += (current_buffer->current_position - current_record_start);
 		if (telemetry_bytes_since_last_mark > telemetry_buffer_notify_at) {
@@ -866,9 +866,9 @@ log_telemetry_output(vm_offset_t buf, uint32_t pos, uint32_t sz)
 
 	buf += pos;
 
-	/*
-	 * Find and log each timestamp in this chunk of buffer.
-	 */
+	  
+                                                        
+    
 	for (offset = 0; offset < sz; offset++) {
 		p = (struct micro_snapshot *)(buf + offset);
 		if (p->snapshot_magic == STACKSHOT_MICRO_SNAPSHOT_MAGIC) {
@@ -906,27 +906,27 @@ telemetry_buffer_gather(user_addr_t buffer, uint32_t *length, boolean_t mark, st
 		goto out;
 	}
 
-	/*
-	 * Copy the ring buffer out to userland in order sorted by time: least recent to most recent.
-	 * First, we need to search forward from the cursor to find the oldest record in our buffer.
-	 */
+	  
+                                                                                              
+                                                                                             
+    
 	oldest_record_offset = current_buffer->current_position;
 	do {
 		if (((oldest_record_offset + sizeof(uint32_t)) > current_buffer->size) ||
 		    ((oldest_record_offset + sizeof(uint32_t)) > current_buffer->end_point)) {
 			if (*(uint32_t *)(uintptr_t)(current_buffer->buffer) == 0) {
-				/*
-				 * There is no magic number at the start of the buffer, which means
-				 * it's empty; nothing to see here yet.
-				 */
+				  
+                                                                       
+                                           
+       
 				*length = 0;
 				goto out;
 			}
-			/*
-			 * We've looked through the end of the active buffer without finding a valid
-			 * record; that means all valid records are in a single chunk, beginning at
-			 * the very start of the buffer.
-			 */
+			  
+                                                                               
+                                                                              
+                                   
+      
 
 			oldest_record_offset = 0;
 			assert(*(uint32_t *)(uintptr_t)(current_buffer->buffer) == STACKSHOT_MICRO_SNAPSHOT_MAGIC);
@@ -937,17 +937,17 @@ telemetry_buffer_gather(user_addr_t buffer, uint32_t *length, boolean_t mark, st
 			break;
 		}
 
-		/*
-		 * There are no alignment guarantees for micro-stackshot records, so we must search at each
-		 * byte offset.
-		 */
+		  
+                                                                                             
+                 
+     
 		oldest_record_offset++;
 	} while (oldest_record_offset != current_buffer->current_position);
 
-	/*
-	 * If needed, copyout in two chunks: from the oldest record to the end of the buffer, and then
-	 * from the beginning of the buffer up to the current position.
-	 */
+	  
+                                                                                               
+                                                                
+    
 	if (oldest_record_offset != 0) {
 #if TELEMETRY_DEBUG
 		log_telemetry_output(current_buffer->buffer, oldest_record_offset,
@@ -988,34 +988,34 @@ out:
 	return result;
 }
 
-/************************/
-/* BOOT PROFILE SUPPORT */
-/************************/
-/*
- * Boot Profiling
- *
- * The boot-profiling support is a mechanism to sample activity happening on the
- * system during boot. This mechanism sets up a periodic timer and on every timer fire,
- * captures a full backtrace into the boot profiling buffer. This buffer can be pulled
- * out and analyzed from user-space. It is turned on using the following boot-args:
- * "bootprofile_buffer_size" specifies the size of the boot profile buffer
- * "bootprofile_interval_ms" specifies the interval for the profiling timer
- *
- * Process Specific Boot Profiling
- *
- * The boot-arg "bootprofile_proc_name" can be used to specify a certain
- * process that needs to profiled during boot. Setting this boot-arg changes
- * the way stackshots are captured. At every timer fire, the code looks at the
- * currently running process and takes a stackshot only if the requested process
- * is on-core (which makes it unsuitable for MP systems).
- *
- * Trigger Events
- *
- * The boot-arg "bootprofile_type=boot" starts the timer during early boot. Using
- * "wake" starts the timer at AP wake from suspend-to-RAM.
- */
+                          
+                          
+                          
+  
+                 
+  
+                                                                                
+                                                                                       
+                                                                                      
+                                                                                   
+                                                                          
+                                                                           
+  
+                                  
+  
+                                                                        
+                                                                            
+                                                                              
+                                                                                
+                                                         
+  
+                 
+  
+                                                                                 
+                                                          
+   
 
-#define BOOTPROFILE_MAX_BUFFER_SIZE (64*1024*1024) /* see also COPYSIZELIMIT_PANIC */
+#define BOOTPROFILE_MAX_BUFFER_SIZE (64*1024*1024)                                   
 
 vm_offset_t         bootprofile_buffer = 0;
 uint32_t            bootprofile_buffer_size = 0;
@@ -1093,7 +1093,7 @@ bootprofile_init(void)
 
 	clock_interval_to_absolutetime_interval(bootprofile_interval_ms, NSEC_PER_MSEC, &bootprofile_interval_abs);
 
-	/* Both boot args must be set to enable */
+	                                          
 	if ((bootprofile_type == kBootProfileDisabled) || (bootprofile_buffer_size == 0) || (bootprofile_interval_abs == 0)) {
 		return;
 	}
@@ -1151,28 +1151,28 @@ bootprofile_timer_call(
 		goto reprogram;
 	}
 
-	/* Check if process-specific boot profiling is turned on */
+	                                                           
 	if (!bootprofile_all_procs) {
-		/*
-		 * Since boot profiling initializes really early in boot, it is
-		 * possible that at this point, the task/proc is not initialized.
-		 * Nothing to do in that case.
-		 */
+		  
+                                                                 
+                                                                   
+                                
+     
 
 		if ((current_task() != NULL) && (current_task()->bsd_info != NULL) &&
 		    (0 == strncmp(bootprofile_proc_name, proc_name_address(current_task()->bsd_info), 17))) {
 			pid_to_profile = proc_selfpid();
 		} else {
-			/*
-			 * Process-specific boot profiling requested but the on-core process is
-			 * something else. Nothing to do here.
-			 */
+			  
+                                                                          
+                                         
+      
 			BOOTPROFILE_UNLOCK();
 			goto reprogram;
 		}
 	}
 
-	/* initiate a stackshot with whatever portion of the buffer is left */
+	                                                                      
 	if (bootprofile_buffer_current_position < bootprofile_buffer_size) {
 		uint64_t flags = STACKSHOT_KCDATA_FORMAT | STACKSHOT_TRYLOCK | STACKSHOT_SAVE_LOADINFO
 		    | STACKSHOT_GET_GLOBAL_MEM_STATS;
@@ -1181,10 +1181,10 @@ bootprofile_timer_call(
 #endif
 
 
-		/* OR on flags specified in boot-args */
+		                                        
 		flags |= bootprofile_stackshot_flags;
 		if ((flags & STACKSHOT_COLLECT_DELTA_SNAPSHOT) && (bootprofile_delta_since_timestamp == 0)) {
-			/* Can't take deltas until the first one */
+			                                           
 			flags &= ~STACKSHOT_COLLECT_DELTA_SNAPSHOT;
 		}
 
@@ -1198,11 +1198,11 @@ bootprofile_timer_call(
 			bootprofile_buffer_size - bootprofile_buffer_current_position,
 			flags, bootprofile_delta_since_timestamp, 0, &retbytes);
 
-		/*
-		 * We call with STACKSHOT_TRYLOCK because the stackshot lock is coarser
-		 * than the bootprofile lock.  If someone else has the lock we'll just
-		 * try again later.
-		 */
+		  
+                                                                         
+                                                                        
+                     
+     
 
 		if (r == KERN_LOCK_OWNED) {
 			BOOTPROFILE_UNLOCK();
@@ -1219,14 +1219,14 @@ bootprofile_timer_call(
 
 	BOOTPROFILE_UNLOCK();
 
-	/* If we didn't get any data or have run out of buffer space, stop profiling */
+	                                                                               
 	if ((retbytes == 0) || (bootprofile_buffer_current_position == bootprofile_buffer_size)) {
 		return;
 	}
 
 
 reprogram:
-	/* If the user gathered the buffer, no need to keep profiling */
+	                                                                
 	if (bootprofile_interval_abs == 0) {
 		return;
 	}
@@ -1275,7 +1275,7 @@ bootprofile_gather(user_addr_t buffer, uint32_t *length)
 	}
 	*length = bootprofile_buffer_current_position;
 
-	/* cancel future timers */
+	                          
 	bootprofile_interval_abs = 0;
 
 out:

@@ -1,5 +1,5 @@
 #include <sys/param.h>
-#include <sys/systm.h>          /* XXX printf() */
+#include <sys/systm.h>                            
 
 #include <sys/types.h>
 #include <sys/fcntl.h>
@@ -14,33 +14,33 @@
 #include <security/mac_policy.h>
 
 #include <libkern/section_keywords.h>
-#include <libkern/OSDebug.h>    /* OSBPrintBacktrace */
+#include <libkern/OSDebug.h>                           
 
 
-/* forward declaration; see bsd_init.c */
+                                         
 errno_t check_policy_init(int);
-int get_thread_lock_count(thread_t th);         /* forced forward */
+int get_thread_lock_count(thread_t th);                             
 
-/*
- * Policy flags used when the policy is enabled
- *
- * Note:	CHECK_POLICY_CHECK is probably not very useful unless you
- *		are kernel debugging and set a breakpoint.
- */
-#define CHECK_POLICY_CHECK      0x00000001      /* Check on calls */
-#define CHECK_POLICY_FAIL       0x00000002      /* EPERM on fails */
-#define CHECK_POLICY_BACKTRACE  0x00000004      /* Show call stack on fails */
-#define CHECK_POLICY_PANIC      0x00000008      /* Panic on fails */
-#define CHECK_POLICY_PERIODIC   0x00000010      /* Show fails periodically */
+  
+                                               
+  
+                                                                  
+                                              
+   
+#define CHECK_POLICY_CHECK      0x00000001                          
+#define CHECK_POLICY_FAIL       0x00000002                          
+#define CHECK_POLICY_BACKTRACE  0x00000004                                    
+#define CHECK_POLICY_PANIC      0x00000008                          
+#define CHECK_POLICY_PERIODIC   0x00000010                                   
 
 static int policy_flags = 0;
 
 
 #define CHECK_SET_HOOK(x)       .mpo_##x = (mpo_##x##_t *)common_hook,
 
-/*
- * Init; currently, we only print our arrival notice.
- */
+  
+                                                     
+   
 static void
 hook_policy_init(struct mac_policy_conf *mpc)
 {
@@ -50,12 +50,12 @@ hook_policy_init(struct mac_policy_conf *mpc)
 static void
 hook_policy_initbsd(struct mac_policy_conf *mpc)
 {
-	/* called with policy_grab_exclusive mutex held; exempt */
+	                                                          
 	printf("hook_policy_initbsd: %s\n", mpc->mpc_name);
 }
 
 
-/* Implementation */
+                    
 #define CLASS_PERIOD_LIMIT      10000
 #define CLASS_PERIOD_MULT       20
 
@@ -71,30 +71,30 @@ common_hook(void)
 	int     rv = 0;
 
 	if ((i = get_thread_lock_count(current_thread())) != 0) {
-		/*
-		 * fail the MACF check if we hold a lock; this assumes a
-		 * a non-void (authorization) MACF hook.
-		 */
+		  
+                                                          
+                                          
+     
 		if (policy_flags & CHECK_POLICY_FAIL) {
 			rv = EPERM;
 		}
 
-		/*
-		 * display a backtrace if we hold a lock and we are not
-		 * going to panic
-		 */
+		  
+                                                         
+                   
+     
 		if ((policy_flags & (CHECK_POLICY_BACKTRACE | CHECK_POLICY_PANIC)) == CHECK_POLICY_BACKTRACE) {
 			if (policy_flags & CHECK_POLICY_PERIODIC) {
-				/* at exponentially increasing intervals */
+				                                           
 				if (!(policy_check_event % policy_check_period)) {
 					if (policy_check_event <= policy_check_next || policy_check_period == CLASS_PERIOD_LIMIT) {
-						/*
-						 * According to Derek, we could
-						 * technically get a symbolicated name
-						 * here, if we refactered some code
-						 * and set the "keepsyms=1" boot
-						 * argument...
-						 */
+						  
+                                     
+                                            
+                                         
+                                      
+                    
+         
 						OSReportWithBacktrace("calling MACF hook with mutex count %d (event %d) ", i, policy_check_event);
 					}
 				} else {
@@ -104,17 +104,17 @@ common_hook(void)
 					}
 				}
 			} else {
-				/* always */
+				            
 				OSReportWithBacktrace("calling MACF hook with mutex count %d (event %d) ", i, policy_check_event);
 			}
 		}
 
-		/* Panic */
+		           
 		if (policy_flags & CHECK_POLICY_PANIC) {
 			panic("calling MACF hook with mutex count %d\n", i);
 		}
 
-		/* count for non-fatal tracing */
+		                                 
 		policy_check_event++;
 	}
 
@@ -124,12 +124,12 @@ common_hook(void)
 #if (MAC_POLICY_OPS_VERSION != 75)
 # error "struct mac_policy_ops doesn't match definition in mac_policy.h"
 #endif
-/*
- * Policy hooks; one per possible hook
- *
- * Please note that this struct initialization should be kept in sync with
- * security/mac_policy.h (mac_policy_ops struct definition).
- */
+  
+                                      
+  
+                                                                          
+                                                            
+   
 const static struct mac_policy_ops policy_ops = {
 	CHECK_SET_HOOK(audit_check_postselect)
 	CHECK_SET_HOOK(audit_check_preselect)
@@ -259,7 +259,7 @@ const static struct mac_policy_ops policy_ops = {
 	.mpo_reserved45 = (mpo_reserved_hook_t *)common_hook,
 
 	CHECK_SET_HOOK(policy_destroy)
-	/* special hooks for policy init's */
+	                                     
 	.mpo_policy_init = hook_policy_init,
 	.mpo_policy_initbsd = hook_policy_initbsd,
 	CHECK_SET_HOOK(policy_syscall)
@@ -519,31 +519,31 @@ const static struct mac_policy_ops policy_ops = {
 	CHECK_SET_HOOK(iokit_check_get_property)
 };
 
-/*
- * Policy definition
- */
+  
+                    
+   
 static SECURITY_READ_ONLY_LATE(struct mac_policy_conf) policy_conf = {
 	.mpc_name               = "CHECK",
 	.mpc_fullname           = "Check Assumptions Policy",
-	.mpc_field_off          = NULL,         /* no label slot */
-	.mpc_labelnames         = NULL,         /* no policy label names */
-	.mpc_labelname_count    = 0,            /* count of label names is 0 */
-	.mpc_ops                = &policy_ops,  /* policy operations */
+	.mpc_field_off          = NULL,                            
+	.mpc_labelnames         = NULL,                                    
+	.mpc_labelname_count    = 0,                                           
+	.mpc_ops                = &policy_ops,                         
 	.mpc_loadtime_flags     = 0,
 	.mpc_runtime_flags      = 0,
 };
 
 static SECURITY_READ_ONLY_LATE(mac_policy_handle_t) policy_handle;
 
-/*
- * Init routine; for a loadable policy, this would be called during the KEXT
- * initialization; we're going to call this from bsd_init() if the boot
- * argument for checking is present.
- */
+  
+                                                                            
+                                                                       
+                                    
+   
 errno_t
 check_policy_init(int flags)
 {
-	/* Only instantiate the module if we have been asked to do checking */
+	                                                                      
 	if (!flags) {
 		return 0;
 	}

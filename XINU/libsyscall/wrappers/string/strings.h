@@ -90,4 +90,4 @@ size_t   _libkernel_strlcpy(char *, const char *, size_t);
 void     _libkernel_bzero(void *, size_t);
 char    *_libkernel_strchr(const char *, int);
 
-#endif  /* _STRINGS_H_ */
+#endif                   

@@ -39,4 +39,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACH_MACHINE_ASM_H */
+#endif                          

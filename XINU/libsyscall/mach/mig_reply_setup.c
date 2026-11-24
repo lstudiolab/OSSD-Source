@@ -51,15 +51,15 @@
  * the rights to redistribute these changes.
  */
 
-/*
- * Routine to set up a MiG reply message from a request message.
- *
- * Knows about the MiG reply message ID convention:
- *	reply_id = request_id + 100
- *
- * For typed IPC sets up the RetCode type field.  Does NOT set a
- * return code value.
- */
+  
+                                                                
+  
+                                                   
+                              
+  
+                                                                
+                     
+   
 
 #include <mach/mach.h>
 #include <mach/message.h>

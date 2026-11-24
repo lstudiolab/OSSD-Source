@@ -62,22 +62,22 @@ struct frame {
 	uintptr_t retaddr;
 };
 
-/*ARGSUSED*/
+            
 uint64_t
 sdt_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 {
-#pragma unused(arg,id,parg)     /* __APPLE__ */
+#pragma unused(arg,id,parg)                    
 	uint64_t val = 0;
 	struct frame *fp = (struct frame *)__builtin_frame_address(0);
 	uintptr_t *stack;
 	uintptr_t pc;
 	int i;
 
-	/*
-	 * On ARM, up to four args are passed via registers; r0,r1,r2,r3
-	 * So coming into this function, arg >= 4 should be on the stack.
-	 * e.g. arg==5 refers to the 6th arg passed to the probed function.
-	 */
+	  
+                                                                 
+                                                                  
+                                                                    
+    
 	int inreg = 4;
 
 	for (i = 1; i <= aframes; i++) {
@@ -87,68 +87,68 @@ sdt_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 		if (dtrace_invop_callsite_pre != NULL
 		    && pc > (uintptr_t)dtrace_invop_callsite_pre
 		    && pc <= (uintptr_t)dtrace_invop_callsite_post) {
-			/*
-			 * When we pass through the invalid op handler,
-			 * we expect to find the save area structure,
-			 * pushed on the stack where we took the trap.
-			 * If the argument we seek is passed in a register, then
-			 * we can load it directly from this saved area.
-			 * If the argument we seek is passed on the stack, then
-			 * we increment the frame pointer further, to find the
-			 * pushed args
-			 */
+			  
+                                                  
+                                                
+                                                 
+                                                           
+                                                   
+                                                          
+                                                         
+                 
+      
 
-			/* fp points to the dtrace_invop activation */
-			fp = fp->backchain; /* to the fbt_perfCallback activation */
-			fp = fp->backchain; /* to the sleh_undef activation */
+			                                              
+			fp = fp->backchain;                                         
+			fp = fp->backchain;                                   
 
 #if __BIGGEST_ALIGNMENT__ > 4
-			/**
-			 * rdar://problem/24228656: On armv7k, the stack is realigned in sleh_undef2 to
-			 * be 16-bytes aligned and the old value is pushed to
-			 * the stack, so we retrieve it from here
-			 */
+			   
+                                                                                  
+                                                        
+                                            
+      
 			arm_saved_state_t *saved_state = (arm_saved_state_t *)(uintptr_t*)*((uintptr_t *)&fp[1]);
 #else
 			arm_saved_state_t *saved_state = (arm_saved_state_t *)((uintptr_t *)&fp[1]);
 #endif
 			if (argno <= inreg) {
-				/* For clarity only... should not get here */
+				                                             
 				stack = (uintptr_t *)&saved_state->r[0];
 			} else {
 				fp = (struct frame *)(saved_state->sp);
-				stack = (uintptr_t *)&fp[0]; /* Find marshalled arguments */
+				stack = (uintptr_t *)&fp[0];                                
 				argno -= inreg;
 			}
 			goto load;
 		}
 	}
 
-	/*
-	 * We know that we did not come through a trap to get into
-	 * dtrace_probe() --  We arrive here when the provider has
-	 * called dtrace_probe() directly.
-	 * The probe ID is the first argument to dtrace_probe().
-	 * We must advance beyond that to get the argX.
-	 */
-	argno++; /* Advance past probeID */
+	  
+                                                           
+                                                           
+                                   
+                                                         
+                                                
+    
+	argno++;                           
 
 	if (argno <= inreg) {
-		/*
-		 * This shouldn't happen.  If the argument is passed in a
-		 * register then it should have been, well, passed in a
-		 * register...
-		 */
+		  
+                                                           
+                                                         
+                
+     
 		DTRACE_CPUFLAG_SET(CPU_DTRACE_ILLOP);
 		return 0;
 	}
 
 	argno -= (inreg + 1);
-	stack = (uintptr_t *)&fp[1]; /* Find marshalled arguments */
+	stack = (uintptr_t *)&fp[1];                                
 
 load:
 	DTRACE_CPUFLAG_SET(CPU_DTRACE_NOFAULT);
-	/* dtrace_probe arguments arg0 .. arg4 are 64bits wide */
+	                                                         
 	val = (uint64_t)(*(((uintptr_t *)stack) + argno));
 	DTRACE_CPUFLAG_CLEAR(CPU_DTRACE_NOFAULT);
 	return val;

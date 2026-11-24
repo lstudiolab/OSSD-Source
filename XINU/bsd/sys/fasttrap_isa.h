@@ -32,17 +32,17 @@
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
  */
-/*
- * HISTORY
- */
+  
+          
+   
 
 #ifndef	_SYS_FASTTRAP_ISA_H_
 #define _SYS_FASTTRAP_ISA_H_
 
-/*
- * Machine dependent constants
- */
+  
+                              
+   
 
 #include <machine/fasttrap_isa.h>
 
-#endif	/* _SYS_FASTTRAP_ISA_H_ */
+#endif	                          

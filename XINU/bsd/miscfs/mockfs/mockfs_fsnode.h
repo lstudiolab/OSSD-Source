@@ -33,46 +33,46 @@
 
 #include <sys/kernel_types.h>
 
-/*
- * Types for the filesystem nodes; for the moment, these will effectively serve as unique
- * identifiers. This can be generalized later, but at least for the moment, the read-only
- * nature of the filesystem and the terse semantics (you have VDIR and VREG, and VREG
- * always represents the entire backing device) makes this sufficient for now.
- *
- * TODO: Should this include MOCKFS_SBIN?  Right now we tell lookup that when looking in
- *   MOCKFS_ROOT, "sbin" resolves back onto MOCKFS_ROOT; this is a handy hack for aliasing,
- *   but may not mesh well with VFS.
- */
+  
+                                                                                         
+                                                                                         
+                                                                                     
+                                                                              
+  
+                                                                                        
+                                                                                           
+                                    
+   
 enum mockfs_fsnode_type {
 	MOCKFS_ROOT,
 	MOCKFS_DEV,
 	MOCKFS_FILE
 };
 
-/*
- * For the moment, pretend everything is a directory with support for two entries; the
- *   executable binary is a one-to-one mapping with the backing devnode, so this may
- *   actually be all we're interested in.
- *
- * Stash the filesize in here too (this is easier then looking at the devnode for every
- *   VREG access).
- */
+  
+                                                                                      
+                                                                                    
+                                         
+  
+                                                                                       
+                  
+   
 struct mockfs_fsnode {
-	uint64_t               size;    /* Bytes of data; 0 unless type is MOCKFS_FILE */
-	uint8_t                type;    /* Serves as a unique identifier for now */
-	mount_t                mnt;     /* The mount that this node belongs to */
-	vnode_t                vp;      /* vnode for this node (if one exists) */
-	struct mockfs_fsnode * parent;  /* Parent of this node (NULL for root) */
-	                                /* TODO: Replace child_a/child_b with something more flexible */
-	struct mockfs_fsnode * child_a; /* TEMPORARY */
-	struct mockfs_fsnode * child_b; /* TEMPORARY */
+	uint64_t               size;                                                     
+	uint8_t                type;                                               
+	mount_t                mnt;                                              
+	vnode_t                vp;                                               
+	struct mockfs_fsnode * parent;                                           
+	                                                                                                
+	struct mockfs_fsnode * child_a;                
+	struct mockfs_fsnode * child_b;                
 };
 
 typedef struct mockfs_fsnode * mockfs_fsnode_t;
 
-/*
- * See mockfs_fsnode.c for function details.
- */
+  
+                                            
+   
 int mockfs_fsnode_create(mount_t mp, uint8_t type, mockfs_fsnode_t * fsnpp);
 int mockfs_fsnode_destroy(mockfs_fsnode_t fsnp);
 int mockfs_fsnode_adopt(mockfs_fsnode_t parent, mockfs_fsnode_t child);
@@ -81,6 +81,6 @@ int mockfs_fsnode_child_by_type(mockfs_fsnode_t parent, uint8_t type, mockfs_fsn
 int mockfs_fsnode_vnode(mockfs_fsnode_t fsnp, vnode_t * vpp);
 int mockfs_fsnode_drop_vnode(mockfs_fsnode_t fsnp);
 
-#endif /* MOCKFS */
+#endif             
 
-#endif /* MOCKFS_FSNODE_H */
+#endif                      

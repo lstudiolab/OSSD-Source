@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * Mach bootstrap interfaces (obsolete: header included only for compatibility)
- */
+  
+                                                                               
+   
 #ifndef _MACH_BOOTSTRAP_H_
 #define _MACH_BOOTSTRAP_H_
 
-#endif /* _MACH_BOOTSTRAP_H_ */
+#endif                         

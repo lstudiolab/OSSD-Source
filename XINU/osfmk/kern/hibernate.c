@@ -42,7 +42,7 @@
 #include <vm/vm_purgeable_internal.h>
 #include <vm/vm_compressor.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                       
 
 boolean_t       need_to_unlock_decompressor = FALSE;
 
@@ -111,7 +111,7 @@ hibernate_setup(IOHibernateImageHeader * header,
 		hibernate_flush_memory();
 	}
 
-	// no failures hereafter
+	                        
 
 	hibernate_processor_setup(header);
 

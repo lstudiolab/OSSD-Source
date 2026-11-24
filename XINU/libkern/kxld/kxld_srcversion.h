@@ -43,9 +43,9 @@ struct kxld_srcversion {
 	boolean_t   has_srcversion;
 };
 
-/*******************************************************************************
-* Constructors and destructors
-*******************************************************************************/
+                                                                                
+                              
+                                                                                
 
 void kxld_srcversion_init_from_macho(KXLDsrcversion *srcversion, struct source_version_command *src)
 __attribute__((nonnull, visibility("hidden")));
@@ -53,9 +53,9 @@ __attribute__((nonnull, visibility("hidden")));
 void kxld_srcversion_clear(KXLDsrcversion *srcversion)
 __attribute__((nonnull, visibility("hidden")));
 
-/*******************************************************************************
-* Accessors
-*******************************************************************************/
+                                                                                
+           
+                                                                                
 
 u_long kxld_srcversion_get_macho_header_size(void)
 __attribute__((pure, visibility("hidden")));
@@ -65,4 +65,4 @@ kxld_srcversion_export_macho(const KXLDsrcversion *srcversion, u_char *buf,
     u_long *header_offset, u_long header_size)
 __attribute__((pure, nonnull, visibility("hidden")));
 
-#endif /* _KXLD_SRCVERSION_H_ */
+#endif                          

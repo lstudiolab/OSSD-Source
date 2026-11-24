@@ -25,98 +25,98 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
-	This file provides armv7+neon hand implementation of the following function
+  
+                                                                            
 
-	void SHA256_Transform(SHA256_ctx *ctx, char *data, unsigned int num_blocks);
+                                                                             
 
-	which is a C function in sha2.c (from xnu).
+                                            
 
-	sha256 algorithm per block description:
+                                        
 
-		1. W(0:15) = big-endian (per 4 bytes) loading of input data (64 byte) 
-		2. load 8 digests a-h from ctx->state
-		3. for r = 0:15
-				T1 = h + Sigma1(e) + Ch(e,f,g) + K[r] + W[r];
-				d += T1;
-				h = T1 + Sigma0(a) + Maj(a,b,c)
-				permute a,b,c,d,e,f,g,h into h,a,b,c,d,e,f,g
-		4. for r = 16:63
-				W[r] = W[r-16] + sigma1(W[r-2]) + W[r-7] + sigma0(W[r-15]);
-				T1 = h + Sigma1(e) + Ch(e,f,g) + K[r] + W[r];
-				d += T1;
-				h = T1 + Sigma0(a) + Maj(a,b,c)
-				permute a,b,c,d,e,f,g,h into h,a,b,c,d,e,f,g
-				
-	In the assembly implementation:	
-		- a circular window of message schedule W(r:r+15) is updated and stored in q0-q3
-		- its corresponding W+K(r:r+15) is updated and stored in a stack space circular buffer
-		- the 8 digests (a-h) will be stored in GPR or memory
+                                                                        
+                                       
+                 
+                                                 
+            
+                                   
+                                                
+                  
+                                                               
+                                                 
+            
+                                   
+                                                
+    
+                                 
+                                                                                  
+                                                                                        
+                                                       
 
-	the implementation per block looks like
+                                        
 
-	----------------------------------------------------------------------------
+                                                                             
 
-	load W(0:15) (big-endian per 4 bytes) into q0:q3
-	pre_calculate and store W+K(0:15) in stack
+                                                 
+                                           
 
-	load digests a-h from ctx->state;
+                                  
 
-	for (r=0;r<48;r+=4) {
-		digests a-h update and permute round r:r+3
-		update W([r:r+3]%16) and WK([r:r+3]%16) for the next 4th iteration 
-	}
+                      
+                                            
+                                                                     
+  
 
-	for (r=48;r<64;r+=4) {
-		digests a-h update and permute round r:r+3
-	}
+                       
+                                            
+  
 
-	ctx->states += digests a-h;
+                            
 
-	----------------------------------------------------------------------------
+                                                                             
 
-	our implementation (allows multiple blocks per call) pipelines the loading of W/WK of a future block 
-	into the last 16 rounds of its previous block:
+                                                                                                      
+                                               
 
-	----------------------------------------------------------------------------
+                                                                             
 
-	load W(0:15) (big-endian per 4 bytes) into q0:q3 
-	pre_calculate and store W+K(0:15) in stack
+                                                  
+                                           
 
-L_loop:
+       
 
-	load digests a-h from ctx->state;
+                                  
 
-	for (r=0;r<48;r+=4) {
-		digests a-h update and permute round r:r+3
-		update W([r:r+3]%16) and WK([r:r+3]%16) for the next 4th iteration 
-	}
+                      
+                                            
+                                                                     
+  
 
-	num_block--;
-	if (num_block==0)	jmp L_last_block;
+             
+                                    
 
-	for (r=48;r<64;r+=4) {
-		digests a-h update and permute round r:r+3
-		load W([r:r+3]%16) (big-endian per 4 bytes) into q0:q3 
-		pre_calculate and store W+K([r:r+3]%16) in stack
-	}
+                       
+                                            
+                                                         
+                                                  
+  
 
-	ctx->states += digests a-h;
+                            
 
-	jmp	L_loop;
+            
 
-L_last_block:
+             
 
-	for (r=48;r<64;r+=4) {
-		digests a-h update and permute round r:r+3
-	}
+                       
+                                            
+  
 
-	ctx->states += digests a-h;
+                            
 
-	------------------------------------------------------------------------
+                                                                         
 
-	Apple CoreOS vector & numerics
-*/
+                               
+  
 
 #if defined(__arm64__)
 
@@ -206,18 +206,18 @@ _AccelerateCrypto_SHA256_compress:
 	#define	ktable		x3
 
 #ifdef __ILP32__
-    uxtw    numblocks, numblocks        // in arm64_32 size_t is 32-bit, so we need to extend it
+    uxtw    numblocks, numblocks                                                                
 #endif
 
 
 	adrp	ktable, K256@page
-	cbnz	numblocks, 1f						// if number of blocks is nonzero, go on for sha256 transform operation
-	ret		lr							// otherwise, return
+	cbnz	numblocks, 1f						                                                                       
+	ret		lr							                    
 1:
 	add		ktable, ktable, K256@pageoff
 
 #if BUILDKERNEL
-	// save q0-q7, q16-q24 8+8+1=19
+	                               
 	sub		x4, sp, #17*16
 	sub		sp, sp, #17*16
 	st1.4s	{v0, v1, v2, v3}, [x4], #64
@@ -227,25 +227,25 @@ _AccelerateCrypto_SHA256_compress:
 	st1.4s	{v24}, [x4], #16
 #endif
 
-	ld1.4s	{v0,v1,v2,v3}, [data], #64			// w0,w1,w2,w3 need to bswap into big-endian
+	ld1.4s	{v0,v1,v2,v3}, [data], #64			                                            
 
-    rev32.16b	v0, v0					// byte swap of 1st 4 ints
+    rev32.16b	v0, v0					                          
     ldr         q21, [ktable, #16*0]
-    rev32.16b	v1, v1					// byte swap of 2nd 4 ints
+    rev32.16b	v1, v1					                          
     ldr         q16, [hashes, #0]
-    rev32.16b	v2, v2					// byte swap of 3rd 4 ints
+    rev32.16b	v2, v2					                          
     ldr         q17, [hashes, #16]
-    rev32.16b	v3, v3					// byte swap of 4th 4 ints
+    rev32.16b	v3, v3					                          
     ldr         q22, [ktable, #16*1]
 
 	mov.16b		v18, v16
     ldr         q23, [ktable, #16*2]
-    add.4s		v4, v0, v21				// 1st 4 input + K256
+    add.4s		v4, v0, v21				                     
     ldr         q24, [ktable, #16*3]
-    add.4s		v5, v1, v22				// 2nd 4 input + K256
+    add.4s		v5, v1, v22				                     
 	mov.16b		v19, v17
-    add.4s		v6, v2, v23				// 3rd 4 input + K256
-    add.4s		v7, v3, v24				// 4th 4 input + K256
+    add.4s		v6, v2, v23				                     
+    add.4s		v7, v3, v24				                     
     add         ktable, ktable, #16*4
 
 
@@ -258,7 +258,7 @@ _AccelerateCrypto_SHA256_compress:
 	add.4s		$6, $5, $7
 	.endm
 
-	// 4 vector hashes update and load next vector rounds
+	                                                     
 	.macro	sha256_hash_load_round
 	mov.16b		v20, v18
 	SHA256H		18, 19, $0
@@ -273,17 +273,17 @@ _AccelerateCrypto_SHA256_compress:
 	SHA256H2	19, 20, $0
 	.endm
 
-	// 12 vector hash and sequence update rounds
+	                                            
     mov         w4, #3
 L_i_loop:
     mov.16b		v20, v18
-	ldr         q21, [ktable, #0]		// k0
+	ldr         q21, [ktable, #0]		     
 	SHA256SU0	0, 1
-	ldr         q22, [ktable, #16]		// k1
+	ldr         q22, [ktable, #16]		     
 	SHA256H		18, 19, 4
-	ldr         q23, [ktable, #32]		// k2
+	ldr         q23, [ktable, #32]		     
 	SHA256SU1	0, 2, 3
-	ldr         q24, [ktable, #48]		// k3
+	ldr         q24, [ktable, #48]		     
 	SHA256H2	19, 20, 4
     add         ktable, ktable, #64
 	add.4s		v4, v0, v21
@@ -294,7 +294,7 @@ L_i_loop:
 	sha256_round	3, 0, 1, 2, 7, v3, v7, v24
     b.gt            L_i_loop
     
-	subs 		numblocks, numblocks, #1	// pre-decrement num_blocks by 1
+	subs 		numblocks, numblocks, #1	                                
 	b.le		L_wrapup
 
 	sub			ktable, ktable, #256
@@ -330,15 +330,15 @@ L_loop:
 	mov.16b		v16, v18
 	mov.16b		v17, v19
 
-	// 12 vector hash and sequence update rounds
+	                                            
     mov.16b		v20, v18
-	ldr         q21, [ktable, #16*4]		// k0
+	ldr         q21, [ktable, #16*4]		     
 	SHA256SU0	0, 1
-	ldr         q22, [ktable, #16*5]		// k1
+	ldr         q22, [ktable, #16*5]		     
 	SHA256H		18, 19, 4
-	ldr         q23, [ktable, #16*6]		// k2
+	ldr         q23, [ktable, #16*6]		     
 	SHA256SU1	0, 2, 3
-	ldr         q24, [ktable, #16*7]		// k3
+	ldr         q24, [ktable, #16*7]		     
 	SHA256H2	19, 20, 4
 	add.4s		v4, v0, v21
 
@@ -346,13 +346,13 @@ L_loop:
 	sha256_round	2, 3, 0, 1, 6, v2, v6, v23
 	sha256_round	3, 0, 1, 2, 7, v3, v7, v24
     mov.16b		v20, v18
-	ldr         q21, [ktable, #16*8]		// k0
+	ldr         q21, [ktable, #16*8]		     
 	SHA256SU0	0, 1
-	ldr         q22, [ktable, #16*9]		// k1
+	ldr         q22, [ktable, #16*9]		     
 	SHA256H		18, 19, 4
-	ldr         q23, [ktable, #16*10]		// k2
+	ldr         q23, [ktable, #16*10]		     
 	SHA256SU1	0, 2, 3
-	ldr         q24, [ktable, #16*11]		// k3
+	ldr         q24, [ktable, #16*11]		     
 	SHA256H2	19, 20, 4
 	add.4s		v4, v0, v21
 
@@ -361,13 +361,13 @@ L_loop:
 	sha256_round	3, 0, 1, 2, 7, v3, v7, v24
 
     mov.16b		v20, v18
-	ldr         q21, [ktable, #16*12]		// k0
+	ldr         q21, [ktable, #16*12]		     
 	SHA256SU0	0, 1
-	ldr         q22, [ktable, #16*13]		// k1
+	ldr         q22, [ktable, #16*13]		     
 	SHA256H		18, 19, 4
-	ldr         q23, [ktable, #16*14]		// k2
+	ldr         q23, [ktable, #16*14]		     
 	SHA256SU1	0, 2, 3
-	ldr         q24, [ktable, #16*15]		// k3
+	ldr         q24, [ktable, #16*15]		     
 	SHA256H2	19, 20, 4
 	add.4s		v4, v0, v21
 
@@ -375,7 +375,7 @@ L_loop:
 	sha256_round	2, 3, 0, 1, 6, v2, v6, v23
 	sha256_round	3, 0, 1, 2, 7, v3, v7, v24
 
-	subs 		numblocks, numblocks, #1	// pre-decrement num_blocks by 1
+	subs 		numblocks, numblocks, #1	                                
 	b.gt		L_loop
 
 L_wrapup:
@@ -387,10 +387,10 @@ L_wrapup:
 
 	add.4s		v16, v16, v18
 	add.4s		v17, v17, v19
-	st1.4s		{v16,v17}, [hashes]					// hashes q16 : d,c,b,a   q17 : h,g,f,e
+	st1.4s		{v16,v17}, [hashes]					                                       
 
 #if BUILDKERNEL
-	// restore q9-q13, q0-q7, q16-q31
+	                                 
 	ld1.4s	{v0, v1, v2, v3}, [sp], #64
 	ld1.4s	{v4, v5, v6, v7}, [sp], #64
 	ld1.4s	{v16, v17, v18, v19}, [sp], #64
@@ -401,5 +401,5 @@ L_wrapup:
 	ret		lr
 
 
-#endif		// arm64
+#endif		        
 

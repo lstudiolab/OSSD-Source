@@ -1,11 +1,11 @@
-/*
- * Test that sending a message to a voucher with the same voucher as the voucher port
- * with only one send right count with move send before the copy send doesn't panic.
- *
- * clang -o voucherentry voucherentry.c -ldarwintest -Weverything -Wno-gnu-flexible-array-initializer
- *
- * <rdar://problem/18826844>
- */
+  
+                                                                                     
+                                                                                    
+  
+                                                                                                     
+  
+                            
+   
 
 #include <mach/mach.h>
 #include <darwintest.h>
@@ -17,10 +17,10 @@ T_DECL(voucher_entry, "voucher_entry", T_META_CHECK_LEAKS(false), T_META_ALL_VAL
 	kern_return_t kr        = KERN_SUCCESS;
 	mach_voucher_t voucher  = MACH_VOUCHER_NULL;
 
-	/*
-	 * The bank voucher already exists in this process, so using it doesn't
-	 * actually test the problem. Use an importance voucher instead.
-	 */
+	  
+                                                                        
+                                                                 
+    
 	mach_voucher_attr_recipe_data_t recipe = {
 		.key                = MACH_VOUCHER_ATTR_KEY_IMPORTANCE,
 		.command            = MACH_VOUCHER_ATTR_IMPORTANCE_SELF,
@@ -44,7 +44,7 @@ T_DECL(voucher_entry, "voucher_entry", T_META_CHECK_LEAKS(false), T_META_ALL_VAL
 
 	T_ASSERT_EQ(refs, (mach_port_urefs_t)1, "voucher must have only one ref");
 
-	/* First, try with two moves (must fail because there's only one ref) */
+	                                                                        
 	mach_msg_header_t request_msg_1 = {
 		.msgh_remote_port   = voucher,
 		.msgh_local_port    = MACH_PORT_NULL,
@@ -58,7 +58,7 @@ T_DECL(voucher_entry, "voucher_entry", T_META_CHECK_LEAKS(false), T_META_ALL_VAL
 
 	T_ASSERT_MACH_ERROR(MACH_SEND_INVALID_DEST, kr, "send with two moves should fail with invalid dest");
 
-	/* Next, try with a move and a copy (will succeed and destroy the last ref) */
+	                                                                              
 	mach_msg_header_t request_msg_2 = {
 		.msgh_remote_port   = voucher,
 		.msgh_local_port    = MACH_PORT_NULL,
@@ -68,7 +68,7 @@ T_DECL(voucher_entry, "voucher_entry", T_META_CHECK_LEAKS(false), T_META_ALL_VAL
 		.msgh_size          = sizeof(request_msg_2),
 	};
 
-	/* panic happens here */
+	                        
 	kr = mach_msg_send(&request_msg_2);
 
 	T_ASSERT_MACH_SUCCESS(kr, "send with move and copy succeeds");

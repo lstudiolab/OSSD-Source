@@ -65,16 +65,16 @@
  *
  */
 
-/*
- * /dev/fd Filesystem
- */
+  
+                     
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/proc_internal.h>
-#include <sys/kernel.h> /* boottime */
+#include <sys/kernel.h>               
 #include <sys/resourcevar.h>
 #include <sys/filedesc.h>
 #include <sys/kauth.h>
@@ -129,9 +129,9 @@ fdesc_unlock(void)
 }
 
 
-/*
- * Initialise cache headers, create the devfs node
- */
+  
+                                                  
+   
 int
 devfs_fdesc_init()
 {
@@ -139,7 +139,7 @@ devfs_fdesc_init()
 	devnode_t *rootdir = dev_root->de_dnp;
 	devdirent_t *direntp;
 
-	/* XXX Make sure you have the right path... */
+	                                              
 	fdhashtbl = hashinit(NFDCACHE, M_CACHE, &fdhash);
 
 	DEVFS_LOCK();
@@ -150,9 +150,9 @@ devfs_fdesc_init()
 	return error;
 }
 
-/*
- * Called during early startup, no need to synchronize
- */
+  
+                                                      
+   
 int
 devfs_fdesc_makelinks()
 {
@@ -160,7 +160,7 @@ devfs_fdesc_makelinks()
 	devdirent_t *stdin_ent = NULL, *stdout_ent = NULL, *stderr_ent = NULL;
 	devnode_t *root_devnode = dev_root->de_dnp;
 
-	/* We do this ugliness to get around some "const" warnings */
+	                                                             
 	char in[] = "stdin";
 	char out[] = "stdout";
 	char err[] = "stderr";
@@ -229,7 +229,7 @@ loop:
 		}
 	}
 
-	/* Only one thread can add to the hash at a time */
+	                                                   
 	if (fdcache_lock & FDL_LOCKED) {
 		fdcache_lock |= FDL_WANT;
 		msleep((caddr_t) &fdcache_lock, &fdesc_mtx, PINOD, "fdesc_allocvp", NULL);
@@ -273,7 +273,7 @@ loop:
 
 	LIST_INSERT_HEAD(fc, fd, fd_hash);
 out:
-	/* Hold the lock when we get here */
+	                                    
 	fdcache_lock &= ~FDL_LOCKED;
 
 	if (fdcache_lock & FDL_WANT) {
@@ -286,12 +286,12 @@ out:
 	return error;
 }
 
-/*
- * vp is the current namei directory
- * ndp is the name to locate in that directory...
- *
- * This vnop should only be called on the special directory /dev/fd.
- */
+  
+                                    
+                                                 
+  
+                                                                    
+   
 int
 devfs_devfd_lookup(struct vnop_lookup_args *ap)
 {
@@ -362,15 +362,15 @@ fdesc_open(struct vnop_open_args *ap)
 
 	switch (VTOFDESC(vp)->fd_type) {
 	case Fdesc:
-		/*
-		 * XXX Kludge: set uu->uu_dupfd to contain the value of the
-		 * the file descriptor being sought for duplication. The error
-		 * return ensures that the vnode for this device will be
-		 * released by vn_open. Open will detect this special error and
-		 * take the actions in dupfdopen.  Other callers of vn_open or
-		 * vnop_open will simply report the error.
-		 */
-		uu->uu_dupfd = VTOFDESC(vp)->fd_fd;     /* XXX */
+		  
+                                                             
+                                                                
+                                                          
+                                                                 
+                                                                
+                                            
+     
+		uu->uu_dupfd = VTOFDESC(vp)->fd_fd;              
 		error = ENODEV;
 		break;
 	default:
@@ -404,12 +404,12 @@ fdesc_attr(int fd, struct vnode_attr *vap, vfs_context_t a_context)
 			error = vnode_getattr((struct vnode *)fp->fp_glob->fg_data, vap, a_context);
 		}
 		if (error == 0 && vap->va_type == VDIR) {
-			/*
-			 * directories can cause loops in the namespace,
-			 * so turn off the 'x' bits to avoid trouble.
-			 *
-			 * XXX ACLs break this, of course
-			 */
+			  
+                                                   
+                                                
+     
+                                    
+      
 			vap->va_mode &= ~((VEXEC) | (VEXEC >> 3) | (VEXEC >> 6));
 		}
 		(void)vnode_put((struct vnode *) fp->fp_glob->fg_data);
@@ -421,7 +421,7 @@ fdesc_attr(int fd, struct vnode_attr *vap, vfs_context_t a_context)
 		if (FILEGLOB_DTYPE(fp->fp_glob) == DTYPE_SOCKET) {
 			error = soo_stat((struct socket *)fp->fp_glob->fg_data, (void *)&stb, 0);
 		} else
-#endif /* SOCKETS */
+#endif              
 		error = pipe_stat((struct pipe *)fp->fp_glob->fg_data, (void *)&stb, 0);
 
 		if (error == 0) {
@@ -476,14 +476,14 @@ fdesc_getattr(struct vnop_getattr_args *ap)
 		break;
 	}
 
-	/*
-	 * Yes, we do this without locking, but this value is always just
-	 * a snapshot.
-	 */
+	  
+                                                                  
+               
+    
 	if (error == 0) {
 		vp->v_type = (uint16_t)vap->va_type;
 
-		/* We need an inactive to reset type to VNON */
+		                                               
 		vnode_setneedinactive(vp);
 	}
 
@@ -498,9 +498,9 @@ fdesc_setattr(struct vnop_setattr_args *ap)
 	int error;
 	struct proc * p = vfs_context_proc(ap->a_context);
 
-	/*
-	 * Can't mess with the root vnode
-	 */
+	  
+                                  
+    
 	switch (VTOFDESC(ap->a_vp)->fd_type) {
 	case Fdesc:
 		break;
@@ -514,9 +514,9 @@ fdesc_setattr(struct vnop_setattr_args *ap)
 		return error;
 	}
 
-	/*
-	 * Can setattr the underlying vnode, but not sockets!
-	 */
+	  
+                                                      
+    
 	switch (FILEGLOB_DTYPE(fp->fp_glob)) {
 	case DTYPE_VNODE:
 	{
@@ -544,22 +544,22 @@ fdesc_setattr(struct vnop_setattr_args *ap)
 
 #define UIO_MX 16
 
-/*
- *  static struct dirtmp {
- *       u_int32_t d_fileno;
- *       u_short d_reclen;
- *       u_short d_namlen;
- *       char d_name[8];
- *  } rootent[] = {
- *       { FD_DEVFD, UIO_MX, 2, "fd" },
- *       { FD_STDIN, UIO_MX, 5, "stdin" },
- *       { FD_STDOUT, UIO_MX, 6, "stdout" },
- *       { FD_STDERR, UIO_MX, 6, "stderr" },
- *       { 0, 0, 0, "" }
- *  };
- */
+  
+                          
+                            
+                          
+                          
+                        
+                   
+                                       
+                                          
+                                            
+                                            
+                        
+      
+   
 
-/* Only called on /dev/fd */
+                            
 int
 devfs_devfd_readdir(struct vnop_readdir_args *ap)
 {
@@ -568,17 +568,17 @@ devfs_devfd_readdir(struct vnop_readdir_args *ap)
 	off_t i;
 	int error;
 
-	/*
-	 * We don't allow exporting fdesc mounts, and currently local
-	 * requests do not need cookies.
-	 */
+	  
+                                                              
+                                 
+    
 	if (ap->a_flags & (VNODE_READDIR_EXTENDED | VNODE_READDIR_REQSEEKOFF)) {
 		return EINVAL;
 	}
 
-	/*
-	 * There needs to be space for at least one entry.
-	 */
+	  
+                                                   
+    
 	if (uio_resid(uio) < UIO_MX) {
 		return EINVAL;
 	}
@@ -601,9 +601,9 @@ devfs_devfd_readdir(struct vnop_readdir_args *ap)
 			dp->d_reclen = UIO_MX;
 			dp->d_type = DT_UNKNOWN;
 			dp->d_fileno = (ino_t)i + FD_STDIN;
-			/*
-			 * And ship to userland
-			 */
+			  
+                          
+      
 			error = uiomove((caddr_t) dp, UIO_MX, uio);
 			if (error) {
 				break;
@@ -645,10 +645,10 @@ fdesc_inactive(struct vnop_inactive_args *ap)
 {
 	struct vnode *vp = ap->a_vp;
 
-	/*
-	 * Clear out the v_type field to avoid
-	 * nasty things happening in vgone().
-	 */
+	  
+                                       
+                                      
+    
 	vp->v_type = VNON;
 
 	return 0;
@@ -671,9 +671,9 @@ fdesc_reclaim(struct vnop_reclaim_args *ap)
 	return 0;
 }
 
-/*
- * Return POSIX pathconf information applicable to special devices.
- */
+  
+                                                                   
+   
 int
 fdesc_pathconf(struct vnop_pathconf_args *ap)
 {
@@ -691,7 +691,7 @@ fdesc_pathconf(struct vnop_pathconf_args *ap)
 		*ap->a_retval = PIPE_BUF;
 		return 0;
 	case _PC_CHOWN_RESTRICTED:
-		*ap->a_retval = 200112;         /* _POSIX_CHOWN_RESTRICTED */
+		*ap->a_retval = 200112;                                      
 		return 0;
 	case _PC_VDISABLE:
 		*ap->a_retval = _POSIX_VDISABLE;
@@ -699,17 +699,17 @@ fdesc_pathconf(struct vnop_pathconf_args *ap)
 	default:
 		return EINVAL;
 	}
-	/* NOTREACHED */
+	                
 }
 
-/*
- * /dev/fd "should never get here" operation
- */
+  
+                                            
+   
 int
 fdesc_badop(void)
 {
 	return ENOTSUP;
-	/* NOTREACHED */
+	                
 }
 
 #define VOPFUNC int (*)(void *)
@@ -737,41 +737,41 @@ fdesc_badop(void)
 int(**fdesc_vnodeop_p)(void *);
 const struct vnodeopv_entry_desc devfs_fdesc_vnodeop_entries[] = {
 	{ .opve_op = &vnop_default_desc, .opve_impl = (VOPFUNC)vn_default_error },
-	{ .opve_op = &vnop_lookup_desc, .opve_impl = (VOPFUNC)vn_default_error},        /* lookup */
-	{ .opve_op = &vnop_create_desc, .opve_impl = (VOPFUNC)fdesc_create },   /* create */
-	{ .opve_op = &vnop_mknod_desc, .opve_impl = (VOPFUNC)fdesc_mknod },     /* mknod */
-	{ .opve_op = &vnop_open_desc, .opve_impl = (VOPFUNC)fdesc_open },       /* open */
-	{ .opve_op = &vnop_close_desc, .opve_impl = (VOPFUNC)fdesc_close },     /* close */
-	{ .opve_op = &vnop_access_desc, .opve_impl = (VOPFUNC)fdesc_access },   /* access */
-	{ .opve_op = &vnop_getattr_desc, .opve_impl = (VOPFUNC)fdesc_getattr }, /* getattr */
-	{ .opve_op = &vnop_setattr_desc, .opve_impl = (VOPFUNC)fdesc_setattr }, /* setattr */
-	{ .opve_op = &vnop_read_desc, .opve_impl = (VOPFUNC)fdesc_read },       /* read */
-	{ .opve_op = &vnop_write_desc, .opve_impl = (VOPFUNC)fdesc_write },     /* write */
-	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (VOPFUNC)fdesc_ioctl },     /* ioctl */
-	{ .opve_op = &vnop_select_desc, .opve_impl = (VOPFUNC)fdesc_select },   /* select */
-	{ .opve_op = &vnop_revoke_desc, .opve_impl = (VOPFUNC)fdesc_revoke },   /* revoke */
-	{ .opve_op = &vnop_mmap_desc, .opve_impl = (VOPFUNC)fdesc_mmap },       /* mmap */
-	{ .opve_op = &vnop_fsync_desc, .opve_impl = (VOPFUNC)fdesc_fsync },     /* fsync */
-	{ .opve_op = &vnop_remove_desc, .opve_impl = (VOPFUNC)fdesc_remove },   /* remove */
-	{ .opve_op = &vnop_link_desc, .opve_impl = (VOPFUNC)fdesc_link },       /* link */
-	{ .opve_op = &vnop_rename_desc, .opve_impl =  (VOPFUNC)fdesc_rename },   /* rename */
-	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (VOPFUNC)fdesc_mkdir },     /* mkdir */
-	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (VOPFUNC)fdesc_rmdir },     /* rmdir */
-	{ .opve_op = &vnop_symlink_desc, .opve_impl = (VOPFUNC)fdesc_symlink }, /* symlink */
-	{ .opve_op = &vnop_readdir_desc, .opve_impl = (VOPFUNC)vn_default_error},/* readdir */
-	{ .opve_op = &vnop_readlink_desc, .opve_impl = (VOPFUNC)err_readlink}, /* readlink */
-	{ .opve_op = &vnop_inactive_desc, .opve_impl = (VOPFUNC)fdesc_inactive },/* inactive */
-	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (VOPFUNC)fdesc_reclaim }, /* reclaim */
-	{ .opve_op = &vnop_strategy_desc, .opve_impl = (VOPFUNC)fdesc_strategy },       /* strategy */
-	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (VOPFUNC)fdesc_pathconf },       /* pathconf */
-	{ .opve_op = &vnop_advlock_desc, .opve_impl = (VOPFUNC)fdesc_advlock }, /* advlock */
-	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (VOPFUNC)fdesc_bwrite },   /* bwrite */
-	{ .opve_op = &vnop_pagein_desc, .opve_impl = (VOPFUNC)err_pagein },     /* pagein */
-	{ .opve_op = &vnop_pageout_desc, .opve_impl = (VOPFUNC)err_pageout },   /* pageout */
-	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (VOPFUNC)err_copyfile }, /* Copyfile */
-	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)fdesc_blktooff },       /* blktooff */
-	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)fdesc_offtoblk },       /* offtoblk */
-	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (VOPFUNC)fdesc_blockmap },       /* blockmap */
+	{ .opve_op = &vnop_lookup_desc, .opve_impl = (VOPFUNC)vn_default_error},                    
+	{ .opve_op = &vnop_create_desc, .opve_impl = (VOPFUNC)fdesc_create },               
+	{ .opve_op = &vnop_mknod_desc, .opve_impl = (VOPFUNC)fdesc_mknod },                
+	{ .opve_op = &vnop_open_desc, .opve_impl = (VOPFUNC)fdesc_open },                 
+	{ .opve_op = &vnop_close_desc, .opve_impl = (VOPFUNC)fdesc_close },                
+	{ .opve_op = &vnop_access_desc, .opve_impl = (VOPFUNC)fdesc_access },               
+	{ .opve_op = &vnop_getattr_desc, .opve_impl = (VOPFUNC)fdesc_getattr },              
+	{ .opve_op = &vnop_setattr_desc, .opve_impl = (VOPFUNC)fdesc_setattr },              
+	{ .opve_op = &vnop_read_desc, .opve_impl = (VOPFUNC)fdesc_read },                 
+	{ .opve_op = &vnop_write_desc, .opve_impl = (VOPFUNC)fdesc_write },                
+	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (VOPFUNC)fdesc_ioctl },                
+	{ .opve_op = &vnop_select_desc, .opve_impl = (VOPFUNC)fdesc_select },               
+	{ .opve_op = &vnop_revoke_desc, .opve_impl = (VOPFUNC)fdesc_revoke },               
+	{ .opve_op = &vnop_mmap_desc, .opve_impl = (VOPFUNC)fdesc_mmap },                 
+	{ .opve_op = &vnop_fsync_desc, .opve_impl = (VOPFUNC)fdesc_fsync },                
+	{ .opve_op = &vnop_remove_desc, .opve_impl = (VOPFUNC)fdesc_remove },               
+	{ .opve_op = &vnop_link_desc, .opve_impl = (VOPFUNC)fdesc_link },                 
+	{ .opve_op = &vnop_rename_desc, .opve_impl =  (VOPFUNC)fdesc_rename },               
+	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (VOPFUNC)fdesc_mkdir },                
+	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (VOPFUNC)fdesc_rmdir },                
+	{ .opve_op = &vnop_symlink_desc, .opve_impl = (VOPFUNC)fdesc_symlink },              
+	{ .opve_op = &vnop_readdir_desc, .opve_impl = (VOPFUNC)vn_default_error},             
+	{ .opve_op = &vnop_readlink_desc, .opve_impl = (VOPFUNC)err_readlink},               
+	{ .opve_op = &vnop_inactive_desc, .opve_impl = (VOPFUNC)fdesc_inactive },              
+	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (VOPFUNC)fdesc_reclaim },              
+	{ .opve_op = &vnop_strategy_desc, .opve_impl = (VOPFUNC)fdesc_strategy },                     
+	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (VOPFUNC)fdesc_pathconf },                     
+	{ .opve_op = &vnop_advlock_desc, .opve_impl = (VOPFUNC)fdesc_advlock },              
+	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (VOPFUNC)fdesc_bwrite },               
+	{ .opve_op = &vnop_pagein_desc, .opve_impl = (VOPFUNC)err_pagein },                 
+	{ .opve_op = &vnop_pageout_desc, .opve_impl = (VOPFUNC)err_pageout },                
+	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (VOPFUNC)err_copyfile },               
+	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)fdesc_blktooff },                     
+	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)fdesc_offtoblk },                     
+	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (VOPFUNC)fdesc_blockmap },                     
 	{ .opve_op = (struct vnodeop_desc*)NULL, .opve_impl = (VOPFUNC)NULL }
 };
 

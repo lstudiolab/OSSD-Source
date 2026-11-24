@@ -1,10 +1,10 @@
-#!/bin/sh
+
 
 TMPFILE=$(mktemp /var/tmp/iosspeedtracer-$$-XXXXXX)
 TMPFILE2=$(mktemp /var/tmp/iosspeedtracer2-$$-XXXXXX)
 trap 'rm -f $TMPFILE $TMPFILE2' 0
 
-# save stack log for curl
+
 cat > $TMPFILE
 
 if security find-internet-password -s ios.apple.com > $TMPFILE2; then

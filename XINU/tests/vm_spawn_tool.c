@@ -8,7 +8,7 @@ extern char **environ;
 
 #ifndef _POSIX_SPAWN_FORCE_4K_PAGES
 #define _POSIX_SPAWN_FORCE_4K_PAGES 0x1000
-#endif /* _POSIX_SPAWN_FORCE_4K_PAGES */
+#endif                                  
 
 int
 main(int argc, char *argv[])
@@ -37,7 +37,7 @@ main(int argc, char *argv[])
 	}
 	short sp_flags = POSIX_SPAWN_SETEXEC;
 
-	/* Need to set special flags */
+	                               
 	int supported = 0;
 	size_t supported_size = sizeof(supported);
 
@@ -45,10 +45,10 @@ main(int argc, char *argv[])
 	if (r == 0 && supported) {
 		sp_flags |= _POSIX_SPAWN_FORCE_4K_PAGES;
 	} else {
-		/*
-		 * We didnt find debug.vm.mixed_page.supported OR its set to 0.
-		 * Skip the test.
-		 */
+		  
+                                                                 
+                   
+     
 		printf("Hardware doesn't support 4K pages, skipping test...");
 		return 0;
 	}
@@ -56,7 +56,7 @@ main(int argc, char *argv[])
 	posix_spawnattr_setflags(&spawnattrs, sp_flags);
 	posix_spawn(&newpid, prog_path, &fileactions, &spawnattrs, &argv[1], environ);
 
-	/* Should not have reached here */
+	                                  
 	fprintf(stderr, "should not have reached here");
 	return 1;
 }

@@ -41,6 +41,6 @@
 typedef	int	_Bool;
 #endif
 
-#endif /* !__cplusplus */
+#endif                   
 
-#endif /* !_STDBOOL_H_ */
+#endif                   

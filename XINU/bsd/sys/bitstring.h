@@ -66,45 +66,45 @@
 
 typedef uint8_t bitstr_t;
 
-/* internal macros */
-/* byte of the bitstring bit is in */
+                     
+                                     
 #define _bitstr_byte(bit)                                               \
 	((bit) >> 3)
 
-/* mask for the bit within its byte */
+                                      
 #define _bitstr_mask(bit)                                               \
 	(1 << ((bit) & 0x7))
 
-/* external macros */
-/* bytes in a bitstring of nbits bits */
+                     
+                                        
 #define bitstr_size(nbits)                                              \
 	(((nbits) + 7) >> 3)
 
-/* allocate a bitstring on the stack */
+                                       
 #define bit_decl(name, nbits)                                           \
 	((name)[bitstr_size(nbits)])
 
-/* is bit N of bitstring name set? */
+                                     
 #define bitstr_test(name, bit)                                          \
 	((name)[_bitstr_byte(bit)] & _bitstr_mask(bit))
 
-/* set bit N of bitstring name */
+                                 
 #define bitstr_set(name, bit)                                           \
 	((name)[_bitstr_byte(bit)] |= _bitstr_mask(bit))
 
-/* set bit N of bitstring name (atomic) */
+                                          
 #define bitstr_set_atomic(name, bit)                                    \
 	(void)os_atomic_or(&((name)[_bitstr_byte(bit)]), _bitstr_mask(bit), relaxed)
 
-/* clear bit N of bitstring name */
+                                   
 #define bitstr_clear(name, bit)                                         \
 	((name)[_bitstr_byte(bit)] &= ~_bitstr_mask(bit))
 
-/* clear bit N of bitstring name (atomic) */
+                                            
 #define bitstr_clear_atomic(name, bit)                                  \
 	(void)os_atomic_andnot(&((name)[_bitstr_byte(bit)]), _bitstr_mask(bit), relaxed)
 
-/* clear bits start ... stop in bitstring */
+                                            
 #define bitstr_nclear(name, start, stop) do {                           \
 	bitstr_t *_name = (name);                                       \
 	int _start = (start), _stop = (stop);                           \
@@ -121,7 +121,7 @@ typedef uint8_t bitstr_t;
 	}                                                               \
 } while (0)
 
-/* set bits start ... stop in bitstring */
+                                          
 #define bitstr_nset(name, start, stop) do {                             \
 	bitstr_t *_name = (name);                                       \
 	int _start = (start), _stop = (stop);                           \
@@ -138,7 +138,7 @@ typedef uint8_t bitstr_t;
 	}                                                               \
 } while (0)
 
-/* find first bit clear in name */
+                                  
 #define bitstr_ffc(name, nbits, value) do {                             \
 	bitstr_t *_name = (name);                                       \
 	int _byte, _nbits = (nbits);                                    \
@@ -157,7 +157,7 @@ typedef uint8_t bitstr_t;
 	*(value) = _value;                                              \
 } while (0)
 
-/* find first bit set in name */
+                                
 #define bitstr_ffs(name, nbits, value) do {                             \
 	bitstr_t *_name = (name);                                       \
 	int _byte, _nbits = (nbits);                                    \
@@ -176,5 +176,5 @@ typedef uint8_t bitstr_t;
 	*(value) = _value;                                              \
 } while (0)
 
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /* !_SYS_BITSTRING_H_ */
+#endif                         
+#endif                         

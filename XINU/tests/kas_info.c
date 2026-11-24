@@ -123,10 +123,10 @@ disk_kernel_segments(uint64_t **segs_out, size_t *nsegs_out)
 	data = mmap(NULL, (size_t)sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
 	T_ASSERT_NE(data, MAP_FAILED, "mmap kernel file");
 
-	/*
-	 * TODO: If we bring back FAT kernel binaries
-	 * this will need to be fixed to handle them properly
-	 */
+	  
+                                              
+                                                      
+    
 	uint32_t magic = *(uint32_t*)data;
 	struct load_command *cmd = NULL;
 
@@ -149,9 +149,9 @@ disk_kernel_segments(uint64_t **segs_out, size_t *nsegs_out)
 		T_FAIL("kernel file is not a Mach-O file, magic is %x", magic);
 	}
 
-	/* Adjust for the LC_UUID && LC_BUILD_VERSION commands in front of
-	 * load commands for dSYMs
-	 */
+	                                                                  
+                           
+    
 	while (cmd->cmd != LC_SEGMENT && cmd->cmd != LC_SEGMENT_64) {
 		cmd = (struct load_command *) ((uintptr_t) cmd + cmd->cmdsize);
 		nsegs--;
@@ -233,11 +233,11 @@ T_DECL(kernel_segment_location,
 		T_LOG("%zu %llx %llx", i, disk_segs[i], mem_segs[i]);
 	}
 
-	/*
-	 * If the kernel is not a fileset, verify that all
-	 * the segments in memory are the segment on disk
-	 * + the kaslr slide
-	 */
+	  
+                                                   
+                                                  
+                     
+    
 	if (!is_fileset_kc()) {
 		T_LOG("Kernelcache is not a fileset kernelcache");
 

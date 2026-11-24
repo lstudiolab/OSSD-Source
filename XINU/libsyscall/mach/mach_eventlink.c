@@ -34,11 +34,11 @@
 #include <mach/clock_types.h>
 #include <mach/mach_eventlink_types.h>
 
-/*
- * __mach_eventlink* calls are bsd syscalls instead of mach traps because
- * they need to return a 64 bit value in register and mach traps currently
- * does not allow 64 bit return values.
- */
+  
+                                                                         
+                                                                          
+                                       
+   
 uint64_t
 __mach_eventlink_signal(
 	mach_port_t         eventlink_port,

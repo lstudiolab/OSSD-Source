@@ -38,5 +38,5 @@ kern_return_t fileport_invoke(task_t, mach_port_name_t,
 kern_return_t fileport_walk(task_t,
     int (*)(mach_port_name_t, struct fileglob *, void *), void *);
 
-#endif /* _KERN_IPC_MISC_H_ */
-#endif /* KERNEL_PRIVATE */
+#endif                        
+#endif                     

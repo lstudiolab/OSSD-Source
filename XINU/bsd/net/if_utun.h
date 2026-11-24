@@ -40,46 +40,46 @@ errno_t utun_register_control(void);
 
 #endif
 
-/*
- * Name registered by the utun kernel control
- */
+  
+                                             
+   
 #define UTUN_CONTROL_NAME "com.apple.net.utun_control"
 
-/*
- * Socket option names to manage utun
- */
+  
+                                     
+   
 #define UTUN_OPT_FLAGS                                  1
 #define UTUN_OPT_IFNAME                                 2
-#define UTUN_OPT_EXT_IFDATA_STATS                       3       /* get|set (type int) */
-#define UTUN_OPT_INC_IFDATA_STATS_IN                    4       /* set to increment stat counters (type struct utun_stats_param) */
-#define UTUN_OPT_INC_IFDATA_STATS_OUT                   5       /* set to increment stat counters (type struct utun_stats_param) */
+#define UTUN_OPT_EXT_IFDATA_STATS                       3                               
+#define UTUN_OPT_INC_IFDATA_STATS_IN                    4                                                                          
+#define UTUN_OPT_INC_IFDATA_STATS_OUT                   5                                                                          
 
-#define UTUN_OPT_SET_DELEGATE_INTERFACE                 15      /* set the delegate interface (char[]) */
-#define UTUN_OPT_MAX_PENDING_PACKETS                    16      /* the number of packets that can be waiting to be read
-	                                                         * from the control socket at a time */
+#define UTUN_OPT_SET_DELEGATE_INTERFACE                 15                                               
+#define UTUN_OPT_MAX_PENDING_PACKETS                    16                                                             
+                                                                                                
 #define UTUN_OPT_ENABLE_CHANNEL                         17
 #define UTUN_OPT_GET_CHANNEL_UUID                       18
 #define UTUN_OPT_ENABLE_FLOWSWITCH                      19
 
-#define UTUN_OPT_ENABLE_NETIF                           20      /* Must be set before connecting */
-#define UTUN_OPT_SLOT_SIZE                              21      /* Must be set before connecting */
-#define UTUN_OPT_NETIF_RING_SIZE                        22      /* Must be set before connecting */
-#define UTUN_OPT_TX_FSW_RING_SIZE                       23      /* Must be set before connecting */
-#define UTUN_OPT_RX_FSW_RING_SIZE                       24      /* Must be set before connecting */
-#define UTUN_OPT_KPIPE_TX_RING_SIZE                     25      /* Must be set before connecting */
-#define UTUN_OPT_KPIPE_RX_RING_SIZE                     26      /* Must be set before connecting */
-#define UTUN_OPT_ATTACH_FLOWSWITCH                      27      /* Must be set before connecting */
+#define UTUN_OPT_ENABLE_NETIF                           20                                         
+#define UTUN_OPT_SLOT_SIZE                              21                                         
+#define UTUN_OPT_NETIF_RING_SIZE                        22                                         
+#define UTUN_OPT_TX_FSW_RING_SIZE                       23                                         
+#define UTUN_OPT_RX_FSW_RING_SIZE                       24                                         
+#define UTUN_OPT_KPIPE_TX_RING_SIZE                     25                                         
+#define UTUN_OPT_KPIPE_RX_RING_SIZE                     26                                         
+#define UTUN_OPT_ATTACH_FLOWSWITCH                      27                                         
 
-/*
- * Flags for by UTUN_OPT_FLAGS
- */
+  
+                              
+   
 #define UTUN_FLAGS_NO_OUTPUT            0x0001
 #define UTUN_FLAGS_NO_INPUT             0x0002
 #define UTUN_FLAGS_ENABLE_PROC_UUID     0x0004
 
-/*
- * utun stats parameter structure
- */
+  
+                                 
+   
 struct utun_stats_param {
 	u_int64_t       utsp_packets;
 	u_int64_t       utsp_bytes;

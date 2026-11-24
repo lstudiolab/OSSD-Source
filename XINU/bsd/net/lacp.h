@@ -26,18 +26,18 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * lacp.h
- * - definitions for the Link Aggregation Control Protocol (LACP) and
- *   the Link Aggregation Marker Protocol
- */
+  
+         
+                                                                     
+                                         
+   
 
-/*
- * Modification History
- *
- * May 14, 2004	Dieter Siegmund (dieter@apple.com)
- * - created
- */
+  
+                       
+  
+                                                  
+            
+   
 
 #ifndef _NET_LACP_H_
 #define _NET_LACP_H_
@@ -45,9 +45,9 @@
 #include <sys/types.h>
 #include <string.h>
 
-/**
-** Link Aggregation Control Protocol (LACP) definitions
-**/
+   
+                                                       
+   
 #define LACPDU_VERSION_1                1
 
 #define LACPDU_TLV_TYPE_TERMINATOR      0x00
@@ -67,12 +67,12 @@ typedef struct {
 	u_char      system_id[6];
 } lacp_system, *lacp_system_ref;
 
-/*
- * LACP Actor/Partner TLV
- */
+  
+                         
+   
 typedef struct lacp_actor_partner_tlv_s {
-	u_char      lap_tlv_type;       /* 0x01 or 0x02 */
-	u_char      lap_length;         /* 20 */
+	u_char      lap_tlv_type;                         
+	u_char      lap_length;                 
 	u_char      lap_system_priority[2];
 	u_char      lap_system[6];
 	u_char      lap_key[2];
@@ -82,20 +82,20 @@ typedef struct lacp_actor_partner_tlv_s {
 	u_char      lap_reserved[3];
 } lacp_actor_partner_tlv, *lacp_actor_partner_tlv_ref;
 
-/*
- * LACP Collector TLV
- */
+  
+                     
+   
 typedef struct lacp_collector_tlv_s {
-	u_char      lac_tlv_type;       /* 0x03 */
-	u_char      lac_length;         /* 16 */
+	u_char      lac_tlv_type;                 
+	u_char      lac_length;                 
 	u_char      lac_max_delay[2];
 	u_char      lac_reserved[12];
 } lacp_collector_tlv, *lacp_collector_tlv_ref;
 
 
-/*
- * LACP Actor/Partner State bits
- */
+  
+                                
+   
 #define LACP_ACTOR_PARTNER_STATE_LACP_ACTIVITY          0x01
 #define LACP_ACTOR_PARTNER_STATE_LACP_TIMEOUT           0x02
 #define LACP_ACTOR_PARTNER_STATE_AGGREGATION            0x04
@@ -249,12 +249,12 @@ lacp_actor_partner_state_expired(lacp_actor_partner_state state)
 	return (state & LACP_ACTOR_PARTNER_STATE_EXPIRED) != 0;
 }
 
-/*
- * Function: lacp_uint16_set
- * Purpose:
- *   Set a field in a structure that's at least 16 bits to the given
- *   value, putting it into network byte order
- */
+  
+                            
+           
+                                                                    
+                                              
+   
 static __inline__ void
 lacp_uint16_set(uint8_t * field, uint16_t value)
 {
@@ -263,12 +263,12 @@ lacp_uint16_set(uint8_t * field, uint16_t value)
 	return;
 }
 
-/*
- * Function: lacp_uint16_get
- * Purpose:
- *   Get a field in a structure that's at least 16 bits, converting
- *   to host byte order.
- */
+  
+                            
+           
+                                                                   
+                        
+   
 static __inline__ uint16_t
 lacp_uint16_get(const uint8_t * field)
 {
@@ -277,12 +277,12 @@ lacp_uint16_get(const uint8_t * field)
 	return ntohs(tmp_field);
 }
 
-/*
- * Function: lacp_uint32_set
- * Purpose:
- *   Set a field in a structure that's at least 32 bits to the given
- *   value, putting it into network byte order
- */
+  
+                            
+           
+                                                                    
+                                              
+   
 static __inline__ void
 lacp_uint32_set(uint8_t * field, uint32_t value)
 {
@@ -291,12 +291,12 @@ lacp_uint32_set(uint8_t * field, uint32_t value)
 	return;
 }
 
-/*
- * Function: lacp_uint32_get
- * Purpose:
- *   Get a field in a structure that's at least 32 bits, converting
- *   to host byte order.
- */
+  
+                            
+           
+                                                                   
+                        
+   
 static __inline__ uint32_t
 lacp_uint32_get(const uint8_t * field)
 {
@@ -305,9 +305,9 @@ lacp_uint32_get(const uint8_t * field)
 	return ntohl(tmp_field);
 }
 
-/*
- * LACP Actor/Partner TLV access functions
- */
+  
+                                          
+   
 static __inline__ void
 lacp_actor_partner_tlv_set_system_priority(lacp_actor_partner_tlv_ref tlv,
     lacp_system_priority system_priority)
@@ -362,9 +362,9 @@ lacp_actor_partner_tlv_get_port(const lacp_actor_partner_tlv_ref tlv)
 	return (lacp_port)lacp_uint16_get(tlv->lap_port);
 }
 
-/*
- * LACP Collector TLV access functions
- */
+  
+                                      
+   
 static __inline__ void
 lacp_collector_tlv_set_max_delay(lacp_collector_tlv_ref tlv,
     lacp_collector_max_delay delay)
@@ -390,7 +390,7 @@ typedef struct lacpdu_s {
 	u_char              la_reserved[50];
 } lacpdu, *lacpdu_ref;
 
-/* timer values in seconds */
+                             
 #define LACP_FAST_PERIODIC_TIME         1
 #define LACP_SLOW_PERIODIC_TIME         30
 #define LACP_SHORT_TIMEOUT_TIME         3
@@ -398,12 +398,12 @@ typedef struct lacpdu_s {
 #define LACP_CHURN_DETECTION_TIME       60
 #define LACP_AGGREGATE_WAIT_TIME        2
 
-/* packet rate per second */
+                            
 #define LACP_PACKET_RATE                3
 
-/**
-** Link Aggregation Marker Protocol definitions
-**/
+   
+                                               
+   
 #define LA_MARKER_PDU_VERSION_1                 1
 #define LA_MARKER_TLV_TYPE_TERMINATOR           0x00
 #define LA_MARKER_TLV_TYPE_MARKER               0x01
@@ -415,16 +415,16 @@ typedef struct lacpdu_s {
 typedef u_int32_t la_marker_transaction_id;
 
 typedef struct la_marker_pdu_s {
-	u_char              lm_subtype;         /* 0x02 */
-	u_char              lm_version;         /* 0x01 */
-	u_char              lm_marker_tlv_type; /* 0x01 or 0x02 */
-	u_char              lm_marker_tlv_length;/* 16 */
+	u_char              lm_subtype;                   
+	u_char              lm_version;                   
+	u_char              lm_marker_tlv_type;                   
+	u_char              lm_marker_tlv_length;        
 	u_char              lm_requestor_port[2];
 	u_char              lm_requestor_system[6];
 	u_char              lm_requestor_transaction_id[4];
 	u_char              lm_pad[2];
-	u_char              lm_terminator_type; /* 0x00 */
-	u_char              lm_terminator_length;/* 0 */
+	u_char              lm_terminator_type;           
+	u_char              lm_terminator_length;       
 	u_char              lm_reserved[90];
 } la_marker_pdu, *la_marker_pdu_ref,
 la_marker_response_pdu, * la_marker_response_pdu_ref;
@@ -469,4 +469,4 @@ la_marker_pdu_get_requestor_system(la_marker_pdu_ref lmpdu)
 	return *(lacp_system_ref)(lmpdu->lm_requestor_system);
 }
 
-#endif /* _NET_LACP_H_ */
+#endif                   

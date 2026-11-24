@@ -1,7 +1,7 @@
-//
-// Tests for
-//  safe_allocation& operator=(std::nullptr_t);
-//
+  
+            
+                                               
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>
@@ -15,7 +15,7 @@ template <typename T>
 static void
 tests()
 {
-	// Assign to a non-null allocation
+	                                  
 	{
 		tracked_safe_allocation<T> array(10, libkern::allocate_memory);
 		tracking_allocator::reset();
@@ -27,7 +27,7 @@ tests()
 		CHECK(tracking_allocator::did_deallocate);
 	}
 
-	// Assign to a null allocation
+	                              
 	{
 		tracked_safe_allocation<T> array = nullptr;
 		tracking_allocator::reset();

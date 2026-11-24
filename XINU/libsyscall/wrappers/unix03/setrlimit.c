@@ -31,11 +31,11 @@
 
 extern int __setrlimit(int resource, const struct rlimit *rlp);
 
-/*
- * setrlimit stub, for conformance, OR in _RLIMIT_POSIX_FLAG
- *
- * This is for UNIX03 only.
- */
+  
+                                                            
+  
+                           
+   
 int
 setrlimit(int resource, const struct rlimit *rlp)
 {
@@ -43,4 +43,4 @@ setrlimit(int resource, const struct rlimit *rlp)
 	return __setrlimit(resource, rlp);
 }
 
-#endif /* __DARWIN_UNIX03 */
+#endif                      

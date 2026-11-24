@@ -67,32 +67,32 @@
 #include <sys/appleapiopts.h>
 
 #ifdef __APPLE_API_UNSTABLE
-/*
- * 4.3 COMPATIBILITY FILE
- *
- * User visible structures and constants related to terminal handling.
- */
+  
+                         
+  
+                                                                      
+   
 
 struct ttychars {
-	char    tc_erase;       /* erase last character */
-	char    tc_kill;        /* erase entire line */
-	char    tc_intrc;       /* interrupt */
-	char    tc_quitc;       /* quit */
-	char    tc_startc;      /* start output */
-	char    tc_stopc;       /* stop output */
-	char    tc_eofc;        /* end-of-file */
-	char    tc_brkc;        /* input delimiter (like nl) */
-	char    tc_suspc;       /* stop process signal */
-	char    tc_dsuspc;      /* delayed stop process signal */
-	char    tc_rprntc;      /* reprint line */
-	char    tc_flushc;      /* flush output (toggles) */
-	char    tc_werasc;      /* word erase */
-	char    tc_lnextc;      /* literal next character */
+	char    tc_erase;                                 
+	char    tc_kill;                               
+	char    tc_intrc;                      
+	char    tc_quitc;                 
+	char    tc_startc;                        
+	char    tc_stopc;                        
+	char    tc_eofc;                         
+	char    tc_brkc;                                       
+	char    tc_suspc;                                
+	char    tc_dsuspc;                                       
+	char    tc_rprntc;                        
+	char    tc_flushc;                                  
+	char    tc_werasc;                      
+	char    tc_lnextc;                                  
 };
 #ifdef USE_OLD_TTY
-#include <sys/ttydefaults.h>    /* to pick up character defaults */
+#include <sys/ttydefaults.h>                                       
 #endif
 
-#endif /* __APPLE_API_UNSTABLE */
+#endif                           
 
-#endif /* !_SYS_TTYCHARS_H_ */
+#endif                        

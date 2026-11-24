@@ -43,4 +43,4 @@ struct kperf_context;
 extern void kperf_meminfo_sample(task_t, struct meminfo *);
 extern void kperf_meminfo_log(struct meminfo *mi);
 
-#endif /* __KPERF_MEMINFO_H__ */
+#endif                          

@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Internal definitions for kdp module
- */
+  
+                                      
+   
 
 #include <kdp/kdp.h>
 #include <kern/machine.h>
@@ -167,10 +167,10 @@ kdp_sync_cache(
 	void
 	);
 
-/* Return a byte array that can be byte-copied to a memory address
- * to trap into the debugger. Must be 4 bytes or less in the current
- * implementation
- */
+                                                                  
+                                                                    
+                 
+   
 #define MAX_BREAKINSN_BYTES 4
 
 void
@@ -191,24 +191,24 @@ mach_vm_size_t
     kdp_machine_vm_write( caddr_t, mach_vm_address_t, mach_vm_size_t);
 
 mach_vm_size_t
-    kdp_machine_phys_read(kdp_readphysmem64_req_t * rq, caddr_t /* data */,
-    uint16_t /* lcpu */);
+    kdp_machine_phys_read(kdp_readphysmem64_req_t * rq, caddr_t           ,
+    uint16_t           );
 
 mach_vm_size_t
-    kdp_machine_phys_write(kdp_writephysmem64_req_t * rq, caddr_t /* data */,
-    uint16_t /* lcpu */);
+    kdp_machine_phys_write(kdp_writephysmem64_req_t * rq, caddr_t           ,
+    uint16_t           );
 
 int
-    kdp_machine_ioport_read(kdp_readioport_req_t *, caddr_t /* data */, uint16_t /* lcpu */);
+    kdp_machine_ioport_read(kdp_readioport_req_t *, caddr_t           , uint16_t           );
 
 int
-    kdp_machine_ioport_write(kdp_writeioport_req_t *, caddr_t /* data */, uint16_t /* lcpu */);
+    kdp_machine_ioport_write(kdp_writeioport_req_t *, caddr_t           , uint16_t           );
 
 int
-    kdp_machine_msr64_read(kdp_readmsr64_req_t *, caddr_t /* data */, uint16_t /* lcpu */);
+    kdp_machine_msr64_read(kdp_readmsr64_req_t *, caddr_t           , uint16_t           );
 
 int
-    kdp_machine_msr64_write(kdp_writemsr64_req_t *, caddr_t /* data */, uint16_t /* lcpu */);
+    kdp_machine_msr64_write(kdp_writemsr64_req_t *, caddr_t           , uint16_t           );
 
 vm_map_offset_t
 kdp_core_start_addr(void);

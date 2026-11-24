@@ -70,9 +70,9 @@ struct  msgbuf {
 #define MSG_MAGIC       0x063061
 	int             msg_magic;
 	int             msg_size;
-	int             msg_bufx;               /* write pointer */
-	int             msg_bufr;               /* read pointer */
-	char    *msg_bufc;              /* buffer */
+	int             msg_bufx;                                  
+	int             msg_bufr;                                 
+	char    *msg_bufc;                          
 };
 
 #ifdef XNU_KERNEL_PRIVATE
@@ -84,6 +84,6 @@ extern void log_putc_locked(struct msgbuf *, char);
 extern int log_setsize(int size);
 extern int log_dmesg(user_addr_t, uint32_t, int32_t *);
 __END_DECLS
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif  /* !_SYS_MSGBUF_H_ */
+#endif                       

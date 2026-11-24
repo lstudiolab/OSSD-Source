@@ -40,19 +40,19 @@ typedef char *UNDLabel;
 typedef char *UNDKey;
 typedef char *UNDPath;
 
-/*
- * serialized key's, list delimiters, ...
- *	(sent as out-of-line data in a message)
- */
+  
+                                         
+                                          
+   
 typedef const char * xmlData_t;
 
 #ifdef KERNEL_PRIVATE
 #ifdef MACH_KERNEL_PRIVATE
 
-/*
- * UNDReply definition - used to dispatch UserNotification
- * replies back to the in-kernel client.
- */
+  
+                                                          
+                                        
+   
 typedef struct UNDReply *UNDReplyRef;
 
 #include <sys/cdefs.h>
@@ -60,21 +60,21 @@ __BEGIN_DECLS
 extern UNDReplyRef convert_port_to_UNDReply(mach_port_t);
 __END_DECLS
 
-#else /* !MACH_KERNEL_PRIVATE */
+#else                           
 
 typedef struct __UNDReply__ *UNDReplyRef;
 
-#endif /* !MACH_KERNEL_PRIVATE */
+#endif                           
 
-#else /* ! KERNEL_PRIVATE */
+#else                       
 
 typedef mach_port_t UNDReplyRef;
 
-#endif /* ! KERNEL_PRIVATE */
+#endif                       
 
 #define UND_REPLY_NULL ((UNDReplyRef)0)
 #define XML_DATA_NULL   ((xmlData_t)0)
 
-#endif  /* __APPLE_API_PRIVATE */
+#endif                           
 
-#endif  /* __USERNOTIFICATION_UNDTPES_H */
+#endif                                    

@@ -54,7 +54,7 @@
 	        panic msg;                                              \
 } while (0)
 #endif
-#endif  /* DIAGNOSTIC */
+#endif                  
 
 #define AU_MAX_LCK_NAME 32
 
@@ -63,19 +63,19 @@
 #define be32enc(p, d)   *(p) = (d)
 #define be64enc(p, d)   *(p) = (d)
 
-#else /* __DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN */
+#else                                                    
 
 #include <libkern/OSByteOrder.h>
 
 #define be16enc(p, d)   OSWriteSwapInt16(p, 0, d)
 #define be32enc(p, d)   OSWriteSwapInt32(p, 0, d)
 #define be64enc(p, d)   OSWriteSwapInt64(p, 0, d)
-#endif /* __DARWIN_BYTE_ORDER == __DARWIN_LITTLE_ENDIAN */
+#endif                                                    
 
-/*
- * BSD kernel memory allocation.
- */
-#define AUDIT_MALLOC_DEBUG       0      /* Change to 1 for malloc debugging. */
+  
+                                
+   
+#define AUDIT_MALLOC_DEBUG       0                                             
 
 #define M_AUDITUNKNOWN           0
 #define M_AUDITDATA              1
@@ -93,16 +93,16 @@
 
 #ifdef  M_WAITOK
 #undef  M_WAITOK
-#define M_WAITOK        0x0000  /* ok to block */
+#define M_WAITOK        0x0000                   
 #endif
 #ifdef  M_NOWAIT
 #undef  M_NOWAIT
 #endif
-#define M_NOWAIT        0x0001  /* do not block */
+#define M_NOWAIT        0x0001                    
 #ifdef  M_ZERO
 #undef  M_ZERO
 #endif
-#define M_ZERO          0x0004  /* bzero the allocation */
+#define M_ZERO          0x0004                            
 
 #ifdef  M_MAGIC
 #undef  M_MAGIC
@@ -146,7 +146,7 @@ typedef struct au_malloc_type   au_malloc_type_t;
 	        {M_MAGIC, shortdesc }                           \
 	}
 
-#endif /* AUDIT_MALLOC_DEBUG */
+#endif                         
 
 #ifdef  MALLOC_DECLARE
 #undef  MALLOC_DECLARE
@@ -166,17 +166,17 @@ void *_audit_malloc(size_t size, au_malloc_type_t *type, int flags);
 #define free(ad, tp)            _audit_free(ad, audit_##tp)
 void _audit_free(void *addr, au_malloc_type_t *type);
 
-/*
- * BSD condition variable.
- */
+  
+                          
+   
 struct cv {
 	const char      *cv_description;
 	int              cv_waiters;
 };
 
-/*
- * BSD mutex.
- */
+  
+             
+   
 struct mtx {
 	lck_mtx_t       *mtx_lock;
 #if DIAGNOSTIC
@@ -184,9 +184,9 @@ struct mtx {
 #endif
 };
 
-/*
- * BSD rw lock.
- */
+  
+               
+   
 struct rwlock {
 	lck_rw_t        *rw_lock;
 #if DIAGNOSTIC
@@ -194,9 +194,9 @@ struct rwlock {
 #endif
 };
 
-/*
- * Sleep lock.
- */
+  
+              
+   
 struct slck {
 	lck_mtx_t       *sl_mtx;
 	int              sl_locked;
@@ -206,9 +206,9 @@ struct slck {
 #endif
 };
 
-/*
- * Recursive lock.
- */
+  
+                  
+   
 struct rlck {
 	lck_mtx_t       *rl_mtx;
 	uint32_t         rl_recurse;
@@ -218,9 +218,9 @@ struct rlck {
 #endif
 };
 
-/*
- * BSD condition variables functions.
- */
+  
+                                     
+   
 void    _audit_cv_init(struct cv *cvp, const char *desc);
 void    _audit_cv_destroy(struct cv *cvp);
 void    _audit_cv_signal(struct cv *cvp);
@@ -239,9 +239,9 @@ int     _audit_cv_wait_continuation(struct cv *cvp, lck_mtx_t *mp,
 #define cv_wait_continuation(cvp, mp, f) \
     _audit_cv_wait_continuation(cvp, (mp)->mtx_lock, f)
 
-/*
- * BSD Mutexes.
- */
+  
+               
+   
 void    _audit_mtx_init(struct mtx *mp, const char *name);
 void    _audit_mtx_destroy(struct mtx *mp);
 #define mtx_init(mp, name, type, opts) \
@@ -251,9 +251,9 @@ void    _audit_mtx_destroy(struct mtx *mp);
 #define mtx_destroy(mp)         _audit_mtx_destroy(mp)
 #define mtx_yield(mp)           lck_mtx_yield((mp)->mtx_lock)
 
-/*
- * Sleep lock functions.
- */
+  
+                        
+   
 void            _audit_slck_init(struct slck *lp, const char *grpname);
 wait_result_t   _audit_slck_lock(struct slck *lp, int intr);
 void            _audit_slck_unlock(struct slck *lp);
@@ -266,9 +266,9 @@ void            _audit_slck_destroy(struct slck *lp);
 #define slck_unlock(lp)         _audit_slck_unlock((lp))
 #define slck_destroy(lp)        _audit_slck_destroy((lp))
 
-/*
- * Recursive lock functions.
- */
+  
+                            
+   
 void            _audit_rlck_init(struct rlck *lp, const char *grpname);
 void            _audit_rlck_lock(struct rlck *lp);
 void            _audit_rlck_unlock(struct rlck *lp);
@@ -279,9 +279,9 @@ void            _audit_rlck_destroy(struct rlck *lp);
 #define rlck_unlock(lp)         _audit_rlck_unlock((lp))
 #define rlck_destroy(lp)        _audit_rlck_destroy((lp))
 
-/*
- * BSD rw locks.
- */
+  
+                
+   
 void    _audit_rw_init(struct rwlock *lp, const char *name);
 void    _audit_rw_destroy(struct rwlock *lp);
 #define rw_init(lp, name)       _audit_rw_init(lp, name)
@@ -311,13 +311,13 @@ void    _audit_rw_destroy(struct rwlock *lp);
 #define sx_assert(lp, wht)
 #define rlck_assert(lp, wht)
 #define slck_assert(lp, wht)
-#endif /* DIAGNOSTIC */
+#endif                 
 
-/*
- * BSD (IPv6) event rate limiter.
- */
+  
+                                 
+   
 int _audit_ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps);
 #define ppsratecheck(tv, cr, mr)        _audit_ppsratecheck(tv, cr, mr)
 
-#endif /* defined(_KERNEL) || defined(KERNEL) */
-#endif /* _SECURITY_AUDIT_AUDIT_BSD_H */
+#endif                                          
+#endif                                  

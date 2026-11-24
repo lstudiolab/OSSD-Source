@@ -41,4 +41,4 @@ void    vm_map_store_entry_unlink_ll( struct vm_map_header*, struct vm_map_entry
 void    update_first_free_ll(struct _vm_map*, struct vm_map_entry*);
 void    vm_map_store_copy_reset_ll( struct vm_map_copy*, struct vm_map_entry*, int);
 
-#endif /* _VM_VM_MAP_STORE_LL_H */
+#endif                            

@@ -57,17 +57,17 @@
  *
  */
 
-/**
- * \file
- *         Functions for manipulating Rime addresses
- * \author
- *         Adam Dunkels <adam@sics.se>
- */
+   
+        
+                                                    
+          
+                                      
+   
 
-/**
- * \addtogroup linkaddr
- * @{
- */
+   
+                       
+     
+   
 
 #include "linkaddr.h"
 #include <string.h>
@@ -75,30 +75,30 @@
 linkaddr_t linkaddr_node_addr;
 #if LINKADDR_SIZE == 2
 const linkaddr_t linkaddr_null = { { 0, 0 } };
-#else /*LINKADDR_SIZE == 2*/
+#else                       
 #if LINKADDR_SIZE == 8
 const linkaddr_t linkaddr_null = { { 0, 0, 0, 0, 0, 0, 0, 0 } };
-#endif /*LINKADDR_SIZE == 8*/
-#endif /*LINKADDR_SIZE == 2*/
+#endif                       
+#endif                       
 
 
-/*---------------------------------------------------------------------------*/
+                                                                               
 void
 linkaddr_copy(linkaddr_t *dest, const linkaddr_t *src)
 {
 	memcpy(dest, src, LINKADDR_SIZE);
 }
-/*---------------------------------------------------------------------------*/
+                                                                               
 int
 linkaddr_cmp(const linkaddr_t *addr1, const linkaddr_t *addr2)
 {
 	return memcmp(addr1, addr2, LINKADDR_SIZE) == 0;
 }
-/*---------------------------------------------------------------------------*/
+                                                                               
 void
 linkaddr_set_node_addr(linkaddr_t *t)
 {
 	linkaddr_copy(&linkaddr_node_addr, t);
 }
-/*---------------------------------------------------------------------------*/
-/** @} */
+                                                                               
+         

@@ -29,30 +29,30 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * dhcp_options.h
- * - routines to parse and access dhcp options
- */
+  
+                 
+                                              
+   
 
-/*
- * Modification History
- *
- * March 15, 2002	Dieter Siegmund (dieter@apple)
- * - imported from bootp project
- */
+  
+                       
+  
+                                                
+                                
+   
 #include <mach/boolean.h>
 #include <netinet/dhcp.h>
 
 
-/* overloaded option values */
+                              
 #define DHCP_OVERLOAD_FILE      1
 #define DHCP_OVERLOAD_SNAME     2
 #define DHCP_OVERLOAD_BOTH      3
 
-/*
- * DHCP_OPTION_SIZE_MAX
- * - the largest size that an option can be (limited to an 8-bit quantity)
- */
+  
+                       
+                                                                          
+   
 #define DHCP_OPTION_SIZE_MAX    255
 
 #define DHCP_TAG_OFFSET         0
@@ -62,10 +62,10 @@
 
 
 #define RFC_OPTIONS_MAGIC               { 99, 130, 83, 99 }
-#define RFC_MAGIC_SIZE                  4 /* bytes */
+#define RFC_MAGIC_SIZE                  4            
 
 enum {
-	/* rfc 1497 vendor extensions: 0..18, 255 */
+	                                            
 	dhcptag_pad_e                       = 0,
 	dhcptag_end_e                       = 255,
 	dhcptag_subnet_mask_e               = 1,
@@ -87,7 +87,7 @@ enum {
 	dhcptag_root_path_e                 = 17,
 	dhcptag_extensions_path_e           = 18,
 
-	/* ip layer parameters per host: 19..25 */
+	                                          
 	dhcptag_ip_forwarding_e             = 19,
 	dhcptag_non_local_source_routing_e  = 20,
 	dhcptag_policy_filter_e             = 21,
@@ -96,7 +96,7 @@ enum {
 	dhcptag_path_mtu_aging_timeout_e    = 24,
 	dhcptag_path_mtu_plateau_table_e    = 25,
 
-	/* ip layer parameters per interface: 26..33 */
+	                                               
 	dhcptag_interface_mtu_e             = 26,
 	dhcptag_all_subnets_local_e         = 27,
 	dhcptag_broadcast_address_e         = 28,
@@ -109,12 +109,12 @@ enum {
 	dhcptag_arp_cache_timeout_e         = 35,
 	dhcptag_ethernet_encapsulation_e    = 36,
 
-	/* tcp parameters: 37..39 */
+	                            
 	dhcptag_default_ttl_e               = 37,
 	dhcptag_keepalive_interval_e        = 38,
 	dhcptag_keepalive_garbage_e         = 39,
 
-	/* application & service parameters: 40..49, 64, 65, 68..76, 78, 79, 95 */
+	                                                                          
 	dhcptag_nis_domain_e                = 40,
 	dhcptag_nis_servers_e               = 41,
 	dhcptag_network_time_protocol_servers_e     = 42,
@@ -140,7 +140,7 @@ enum {
 	dhcptag_slp_service_scope_e         = 79,
 	dhcptag_ldap_url_e                  = 95,
 
-	/* dhcp-specific extensions: 50..61, 66, 67 */
+	                                              
 	dhcptag_requested_ip_address_e      = 50,
 	dhcptag_lease_time_e                = 51,
 	dhcptag_option_overload_e           = 52,
@@ -156,26 +156,26 @@ enum {
 	dhcptag_tftp_server_name_e          = 66,
 	dhcptag_bootfile_name_e             = 67,
 
-	/* netinfo parent tags: 112, 113 */
+	                                   
 	dhcptag_netinfo_server_address_e    = 112,
 	dhcptag_netinfo_server_tag_e        = 113,
 
-	/* ad-hoc network disable option */
+	                                   
 	dhcptag_auto_configure_e            = 116,
 };
 typedef uint8_t dhcptag_t;
 
-/*
- * Module: dhcpol (dhcp options list)
- *
- * Purpose:
- *   Routines to parse and retrieve dhcp options.
- */
+  
+                                     
+  
+           
+                                                 
+   
 
 typedef struct {
-	const void * *      array;/* malloc'd array of pointers */
-	int                 size;/* number of elements in array */
-	int                 count;/* number of occupied elements */
+	const void * *      array;                                
+	int                 size;                                 
+	int                 count;                                 
 } ptrlist_t;
 
 typedef ptrlist_t dhcpol_t;
@@ -196,5 +196,5 @@ const void *            dhcpol_find(dhcpol_t * list, int tag, int * len_p,
 boolean_t               dhcpol_parse_packet(dhcpol_t * options,
     const struct dhcp * pkt, int len);
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET_DHCP_OPTIONS_H */
+#endif                         
+#endif                              

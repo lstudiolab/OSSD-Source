@@ -60,16 +60,16 @@
  *	@(#)if_loop.c	8.1 (Berkeley) 6/10/93
  * $FreeBSD: src/sys/net/if_loop.c,v 1.47.2.5 2001/07/03 11:01:41 ume Exp $
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2006 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
-/*
- * Loopback interface driver for protocol testing and timing.
- */
+  
+                                                             
+   
 #include "loop.h"
 #if NLOOP > 0
 
@@ -141,7 +141,7 @@ struct  loopback_header {
 	protocol_family_t       protocol;
 };
 
-/* Local forward declerations */
+                                
 void loopattach(void);
 static errno_t lo_demux(struct ifnet *, struct mbuf *, char *,
     protocol_family_t *);
@@ -210,7 +210,7 @@ lo_framer(struct ifnet *ifp, struct mbuf **m, const struct sockaddr *dest,
 
 	M_PREPEND(*m, sizeof(struct loopback_header), M_WAITOK, 1);
 	if (*m == NULL) {
-		/* Tell caller not to try to free passed-in mbuf */
+		                                                   
 		return EJUSTRETURN;
 	}
 
@@ -273,11 +273,11 @@ lo_tx_compl(struct ifnet *ifp, struct mbuf *m)
 	ifnet_tx_compl(ifp, m);
 }
 
-/*
- * Output callback.
- *
- * This routine is called only when lo_txstart is disabled.
- */
+  
+                   
+  
+                                                           
+   
 static int
 lo_output(struct ifnet *ifp, struct mbuf *m_list)
 {
@@ -291,11 +291,11 @@ lo_output(struct ifnet *ifp, struct mbuf *m_list)
 		VERIFY(m->m_flags & M_PKTHDR);
 		cnt++;
 
-		/*
-		 * Don't overwrite the rcvif field if it is in use.
-		 *  This is used to match multicast packets, sent looping
-		 *  back, with the appropriate group record on input.
-		 */
+		  
+                                                     
+                                                           
+                                                       
+     
 		if (m->m_pkthdr.rcvif == NULL) {
 			m->m_pkthdr.rcvif = ifp;
 		}
@@ -303,7 +303,7 @@ lo_output(struct ifnet *ifp, struct mbuf *m_list)
 		m->m_pkthdr.pkt_flags |= PKTF_LOOP;
 		m->m_pkthdr.pkt_hdr = mtod(m, char *);
 
-		/* loopback checksums are always OK */
+		                                      
 		m->m_pkthdr.csum_data = 0xffff;
 		m->m_pkthdr.csum_flags =
 		    CSUM_DATA_VALID | CSUM_PSEUDO_HDR |
@@ -327,11 +327,11 @@ lo_output(struct ifnet *ifp, struct mbuf *m_list)
 	return ifnet_input_extended(ifp, m_list, m_tail, &s);
 }
 
-/*
- * Pre-enqueue callback.
- *
- * This routine is called only when lo_txstart is enabled.
- */
+  
+                        
+  
+                                                          
+   
 static errno_t
 lo_pre_enqueue(struct ifnet *ifp, struct mbuf *m0)
 {
@@ -344,11 +344,11 @@ lo_pre_enqueue(struct ifnet *ifp, struct mbuf *m0)
 		n = m->m_nextpkt;
 		m->m_nextpkt = NULL;
 
-		/*
-		 * Don't overwrite the rcvif field if it is in use.
-		 *  This is used to match multicast packets, sent looping
-		 *  back, with the appropriate group record on input.
-		 */
+		  
+                                                     
+                                                           
+                                                       
+     
 		if (m->m_pkthdr.rcvif == NULL) {
 			m->m_pkthdr.rcvif = ifp;
 		}
@@ -356,7 +356,7 @@ lo_pre_enqueue(struct ifnet *ifp, struct mbuf *m0)
 		m->m_pkthdr.pkt_flags |= PKTF_LOOP;
 		m->m_pkthdr.pkt_hdr = mtod(m, char *);
 
-		/* loopback checksums are always OK */
+		                                      
 		m->m_pkthdr.csum_data = 0xffff;
 		m->m_pkthdr.csum_flags =
 		    CSUM_DATA_VALID | CSUM_PSEUDO_HDR |
@@ -364,10 +364,10 @@ lo_pre_enqueue(struct ifnet *ifp, struct mbuf *m0)
 
 		m_adj(m, sizeof(struct loopback_header));
 
-		/*
-		 * Let the callee free it in case of error,
-		 * and perform any necessary accounting.
-		 */
+		  
+                                             
+                                          
+     
 		(void) ifnet_enqueue(ifp, m);
 
 		m = n;
@@ -376,16 +376,16 @@ lo_pre_enqueue(struct ifnet *ifp, struct mbuf *m0)
 	return error;
 }
 
-/*
- * Start output callback.
- *
- * This routine is invoked by the start worker thread; because we never call
- * it directly, there is no need do deploy any serialization mechanism other
- * than what's already used by the worker thread, i.e. this is already single
- * threaded.
- *
- * This routine is called only when lo_txstart is enabled.
- */
+  
+                         
+  
+                                                                            
+                                                                            
+                                                                             
+            
+  
+                                                          
+   
 static void
 lo_start(struct ifnet *ifp)
 {
@@ -413,7 +413,7 @@ lo_start(struct ifnet *ifp)
 		LO_BPF_TAP_OUT_MULTI(m);
 		lo_tx_compl(ifp, m);
 
-		/* stats are required for extended variant */
+		                                             
 		s.packets_in = cnt;
 		s.packets_out = cnt;
 		s.bytes_in = len;
@@ -423,10 +423,10 @@ lo_start(struct ifnet *ifp)
 	}
 }
 
-/*
- * This is a common pre-output route used by INET and INET6. This could
- * (should?) be split into separate pre-output routines for each protocol.
- */
+  
+                                                                       
+                                                                          
+   
 static errno_t
 lo_pre_output(struct ifnet *ifp, protocol_family_t protocol_family,
     struct mbuf **m, const struct sockaddr *dst, void *route, char *frame_type,
@@ -457,10 +457,10 @@ lo_pre_output(struct ifnet *ifp, protocol_family_t protocol_family,
 	return 0;
 }
 
-/*
- *  lo_input - This should work for all attached protocols that use the
- *             ifq/schednetisr input mechanism.
- */
+  
+                                                                       
+                                               
+   
 static errno_t
 lo_input(struct ifnet *ifp, protocol_family_t protocol_family, struct mbuf *m)
 {
@@ -487,51 +487,51 @@ lo_input(struct ifnet *ifp, protocol_family_t protocol_family, struct mbuf *m)
 	return 0;
 }
 
-/* ARGSUSED */
+              
 static void
 lo_rtrequest(int cmd, struct rtentry *rt, struct sockaddr *sa)
 {
 #pragma unused(cmd, sa)
 	if (rt != NULL) {
 		RT_LOCK_ASSERT_HELD(rt);
-		rt->rt_rmx.rmx_mtu = rt->rt_ifp->if_mtu; /* for ISO */
-		/*
-		 * For optimal performance, the send and receive buffers
-		 * should be at least twice the MTU plus a little more for
-		 * overhead.
-		 */
+		rt->rt_rmx.rmx_mtu = rt->rt_ifp->if_mtu;              
+		  
+                                                          
+                                                            
+              
+     
 		rt->rt_rmx.rmx_recvpipe = rt->rt_rmx.rmx_sendpipe = 3 * LOMTU;
 	}
 }
 
-/*
- * Process an ioctl request.
- */
+  
+                            
+   
 static errno_t
 lo_ioctl(struct ifnet *ifp, u_long cmd, void *data)
 {
 	int error = 0;
 
 	switch (cmd) {
-	case SIOCSIFADDR: {             /* struct ifaddr pointer */
+	case SIOCSIFADDR: {                                        
 		struct ifaddr *ifa = data;
 
 		ifnet_set_flags(ifp, IFF_UP | IFF_RUNNING, IFF_UP | IFF_RUNNING);
 		IFA_LOCK_SPIN(ifa);
 		ifa->ifa_rtrequest = lo_rtrequest;
 		IFA_UNLOCK(ifa);
-		/*
-		 * Everything else is done at a higher level.
-		 */
+		  
+                                               
+     
 		break;
 	}
 
-	case SIOCADDMULTI:              /* struct ifreq */
-	case SIOCDELMULTI: {            /* struct ifreq */
+	case SIOCADDMULTI:                                
+	case SIOCDELMULTI: {                              
 		struct ifreq *ifr = data;
 
 		if (ifr == NULL) {
-			error = EAFNOSUPPORT;           /* XXX */
+			error = EAFNOSUPPORT;                    
 			break;
 		}
 		switch (ifr->ifr_addr.sa_family) {
@@ -549,14 +549,14 @@ lo_ioctl(struct ifnet *ifp, u_long cmd, void *data)
 		break;
 	}
 
-	case SIOCSIFMTU: {              /* struct ifreq */
+	case SIOCSIFMTU: {                                
 		struct ifreq *ifr = data;
 
 		bcopy(&ifr->ifr_mtu, &ifp->if_mtu, sizeof(int));
 		break;
 	}
 
-	case SIOCSIFFLAGS:              /* struct ifreq */
+	case SIOCSIFFLAGS:                                
 	case SIOCSIFTIMESTAMPENABLE:
 	case SIOCSIFTIMESTAMPDISABLE:
 		break;
@@ -567,7 +567,7 @@ lo_ioctl(struct ifnet *ifp, u_long cmd, void *data)
 	}
 	return error;
 }
-#endif /* NLOOP > 0 */
+#endif                
 
 
 static errno_t
@@ -595,7 +595,7 @@ lo_reg_if_mods(void)
 {
 	int error;
 
-	/* Register protocol registration functions */
+	                                              
 	if ((error = proto_register_plumber(PF_INET,
 	    APPLE_IF_FAM_LOOPBACK, lo_attach_proto, NULL)) != 0) {
 		printf("proto_register_plumber failed for AF_INET "
@@ -632,7 +632,7 @@ lo_set_bpf_tap(struct ifnet *ifp, bpf_tap_mode mode,
 	return 0;
 }
 
-/* ARGSUSED */
+              
 void
 loopattach(void)
 {
@@ -676,7 +676,7 @@ loopattach(void)
 	if (result != 0) {
 		panic("%s: couldn't allocate loopback ifnet (%d)\n",
 		    __func__, result);
-		/* NOTREACHED */
+		                
 	}
 
 	ifnet_set_mtu(lo_ifp, LOMTU);
@@ -694,12 +694,12 @@ loopattach(void)
 	if (result != 0) {
 		panic("%s: couldn't attach loopback ifnet (%d)\n",
 		    __func__, result);
-		/* NOTREACHED */
+		                
 	}
-	/*
-	 * Disable ECN on loopback as ECN serves no purpose and otherwise
-	 * TCP connections are subject to heuristics like SYN retransmits on RST
-	 */
+	  
+                                                                  
+                                                                         
+    
 	if_clear_eflags(lo_ifp, IFEF_ECN_ENABLE);
 	if_set_eflags(lo_ifp, IFEF_ECN_DISABLE);
 

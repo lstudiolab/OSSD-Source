@@ -47,4 +47,4 @@ boolean_t binary_match(cpu_type_t mask_bits, cpu_type_t req_cpu,
     cpu_subtype_t req_subcpu, cpu_type_t test_cpu,
     cpu_subtype_t test_subcpu);
 
-#endif /* _BSD_MACHINE_EXEC_H_ */
+#endif                           

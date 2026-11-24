@@ -88,4 +88,4 @@ public:
 };
 
 
-#endif /* ! _IOKIT_APPLEPLATFORM_H */
+#endif                               

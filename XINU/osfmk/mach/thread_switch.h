@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _MACH_THREAD_SWITCH_H_
 #define _MACH_THREAD_SWITCH_H_
@@ -64,21 +64,21 @@
 #include <mach/message.h>
 #include <mach/mach_traps.h>
 
-/*
- *	Constant definitions for thread_switch trap.
- */
+  
+                                               
+   
 
 #define SWITCH_OPTION_NONE                      0
 #define SWITCH_OPTION_DEPRESS           1
 #define SWITCH_OPTION_WAIT                      2
 #ifdef PRIVATE
-/* Workqueue should not consider thread blocked, and option_time is in us */
+                                                                            
 #define SWITCH_OPTION_DISPATCH_CONTENTION       3
-/* Handoff to lock owner and temporarily grant matching IO throttling policy */
+                                                                               
 #define SWITCH_OPTION_OSLOCK_DEPRESS    4
 #define SWITCH_OPTION_OSLOCK_WAIT       5
-#endif /* PRIVATE */
+#endif              
 
 #define valid_switch_option(opt)        (0 <= (opt) && (opt) <= 5)
 
-#endif  /* _MACH_THREAD_SWITCH_H_ */
+#endif                              

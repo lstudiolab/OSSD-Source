@@ -29,17 +29,17 @@
 
 #include "string.h"
 
-/*
- * Get next token from string *stringp, where tokens are possibly-empty
- * strings separated by characters from delim.
- *
- * Writes NULs into the string at *stringp to end tokens.
- * delim need not remain constant from call to call.
- * On return, *stringp points past the last NUL written (if there might
- * be further tokens), or is NULL (if there are definitely no more tokens).
- *
- * If *stringp is NULL, strsep returns NULL.
- */
+  
+                                                                       
+                                              
+  
+                                                         
+                                                    
+                                                                       
+                                                                           
+  
+                                            
+   
 __attribute__((visibility("hidden")))
 char *
 strsep(char **stringp, const char *delim)
@@ -67,5 +67,5 @@ strsep(char **stringp, const char *delim)
 			}
 		} while (sc != 0);
 	}
-	/* NOTREACHED */
+	                
 }

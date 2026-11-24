@@ -42,7 +42,7 @@ __BEGIN_DECLS
 #ifndef _GUARDID_T
 #define _GUARDID_T
 typedef __uint64_t guardid_t;
-#endif /* _GUARDID_T */
+#endif                 
 
 #if !defined(KERNEL)
 extern int guarded_open_np(const char *path,
@@ -57,62 +57,62 @@ extern int change_fdguard_np(int fd, const guardid_t *guard, u_int guardflags,
 extern ssize_t guarded_write_np(int fd, const guardid_t *guard, const void *buf, size_t nbyte);
 extern ssize_t guarded_pwrite_np(int fd, const guardid_t *guard, const void *buf, size_t nbyte, off_t offset);
 extern ssize_t guarded_writev_np(int fd, const guardid_t *guard, const struct iovec *iovp, int iovcnt);
-#endif /* KERNEL */
+#endif             
 
 #ifndef GUARD_TYPE_FD
-/* temporary source compat: use <kern/exc_guard.h> instead */
+                                                             
 #define GUARD_TYPE_FD           0x2
 #endif
 
-/*
- * File descriptor guard flavors.
- */
+  
+                                 
+   
 
-/*
- * Forbid close(2), and the implicit close() that a dup2(2) may do.
- * Forces close-on-fork to be set immutably too.
- */
+  
+                                                                   
+                                                
+   
 #define GUARD_CLOSE             (1u << 0)
 
-/*
- * Forbid dup(2), dup2(2), and fcntl(2) subcodes F_DUPFD, F_DUPFD_CLOEXEC
- * on a guarded fd. Also forbids open's of a guarded fd via /dev/fd/
- * (an implicit dup.)
- */
+  
+                                                                         
+                                                                    
+                     
+   
 #define GUARD_DUP               (1u << 1)
 
-/*
- * Forbid sending a guarded fd via a socket
- */
+  
+                                           
+   
 #define GUARD_SOCKET_IPC        (1u << 2)
 
-/*
- * Forbid creating a fileport from a guarded fd
- */
+  
+                                               
+   
 #define GUARD_FILEPORT          (1u << 3)
 
-/*
- * Forbid writes on a guarded fd
- */
+  
+                                
+   
 #define GUARD_WRITE             (1u << 4)
 
-/*
- * Violating a guard results in an error (EPERM), and potentially
- * an exception with one or more of the following bits set.
- */
+  
+                                                                 
+                                                           
+   
 enum guard_fd_exception_codes {
-	kGUARD_EXC_CLOSE        = 1u << 0,      /* close of a guarded fd */
-	kGUARD_EXC_DUP          = 1u << 1,      /* dup of a guarded fd */
-	kGUARD_EXC_NOCLOEXEC    = 1u << 2,      /* clear close-on-exec */
-	kGUARD_EXC_SOCKET_IPC   = 1u << 3,      /* sendmsg of a guarded fd */
-	kGUARD_EXC_FILEPORT     = 1u << 4,      /* fileport_makeport .. */
-	kGUARD_EXC_MISMATCH     = 1u << 5,      /* wrong guard for guarded fd */
-	kGUARD_EXC_WRITE        = 1u << 6       /* write on a guarded fd */
+	kGUARD_EXC_CLOSE        = 1u << 0,                                 
+	kGUARD_EXC_DUP          = 1u << 1,                               
+	kGUARD_EXC_NOCLOEXEC    = 1u << 2,                               
+	kGUARD_EXC_SOCKET_IPC   = 1u << 3,                                   
+	kGUARD_EXC_FILEPORT     = 1u << 4,                                
+	kGUARD_EXC_MISMATCH     = 1u << 5,                                      
+	kGUARD_EXC_WRITE        = 1u << 6                                  
 };
 
-/*
- * Experimental guarded vnode support
- */
+  
+                                     
+   
 #define VNG_RENAME_TO           (1u << 0)
 #define VNG_RENAME_FROM         (1u << 1)
 #define VNG_UNLINK              (1u << 2)
@@ -132,9 +132,9 @@ struct vnguard_set {
 };
 
 struct vnguard_getattr {
-	int vga_fd;             /* in */
-	unsigned vga_attrs;     /* out */
-	guardid_t vga_guard;    /* in */
+	int vga_fd;                     
+	unsigned vga_attrs;              
+	guardid_t vga_guard;            
 };
 
 #define VNG_SYSC_PING           0
@@ -143,10 +143,10 @@ struct vnguard_getattr {
 
 #define VNG_POLICY_NAME         "vnguard"
 
-/*
- * Violating a guard may result in an error (EPERM), and potentially
- * an exception with one or more of the following bits set.
- */
+  
+                                                                    
+                                                           
+   
 enum guard_vn_exception_codes {
 	kGUARD_EXC_RENAME_TO    = VNG_RENAME_TO,
 	kGUARD_EXC_RENAME_FROM  = VNG_RENAME_FROM,
@@ -157,7 +157,7 @@ enum guard_vn_exception_codes {
 	kGUARD_EXC_EXCHDATA     = VNG_EXCHDATA,
 };
 
-/* Guard violation behaviors: not all combinations make sense */
+                                                                
 
 #define kVNG_POLICY_LOGMSG      (1u << 0)
 #define kVNG_POLICY_EPERM       (1u << 1)
@@ -169,12 +169,12 @@ enum guard_vn_exception_codes {
 #if defined(KERNEL)
 extern int vnguard_exceptions_active(void);
 extern void vnguard_policy_init(void);
-#endif /* KERNEL */
+#endif             
 
-#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                             
 
 __END_DECLS
 
-#endif /* PRIVATE */
+#endif              
 
-#endif /* !_SYS_GUARDED_H_ */
+#endif                       

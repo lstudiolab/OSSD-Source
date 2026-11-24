@@ -31,9 +31,9 @@
  *      The Regents of the University of California.  All rights reserved.
  */
 
-/*
- * Kernel Debugging Protocol UDP implementation.
- */
+  
+                                                
+   
 
 #include <mach/boolean.h>
 #include <mach/mach_types.h>
@@ -56,15 +56,15 @@
 
 #include <vm/vm_map.h>
 #include <vm/vm_protos.h>
-#include <vm/vm_kern.h> /* kernel_map */
+#include <vm/vm_kern.h>                 
 
 #include <mach/memory_object_types.h>
 #include <machine/pal_routines.h>
 
 #include <sys/msgbuf.h>
 
-/* we just want the link status flags, so undef KERNEL_PRIVATE for this
- * header file. */
+                                                                       
+                  
 #undef KERNEL_PRIVATE
 #include <net/if_media.h>
 #define KERNEL_PRIVATE
@@ -81,48 +81,48 @@ extern int kdp_snapshot;
 
 #ifdef CONFIG_KDP_INTERACTIVE_DEBUGGING
 
-extern int      inet_aton(const char *, struct kdp_in_addr *); /* in libkern */
+extern int      inet_aton(const char *, struct kdp_in_addr *);                 
 extern char    *inet_ntoa_r(struct kdp_in_addr ina, char *buf,
-    size_t buflen); /* in libkern */
+    size_t buflen);                 
 
-#define DO_ALIGN        1             /* align all packet data accesses */
-#define KDP_SERIAL_IPADDR  0xABADBABE /* IP address used for serial KDP */
+#define DO_ALIGN        1                                                 
+#define KDP_SERIAL_IPADDR  0xABADBABE                                     
 #define LINK_UP_STATUS     (IFM_AVALID | IFM_ACTIVE)
 
 extern int kdp_getc(void);
 extern int reattach_wait;
 
-static u_short ip_id;                          /* ip packet ctr, for ids */
+static u_short ip_id;                                                      
 
-/*	@(#)udp_usrreq.c	2.2 88/05/23 4.0NFSSRC SMI;	from UCB 7.1 6/5/86	*/
+                                                                      
 
-/*
- * UDP protocol implementation.
- * Per RFC 768, August, 1980.
- */
-#define UDP_TTL 60 /* default time to live for UDP packets */
+  
+                               
+                             
+   
+#define UDP_TTL 60                                           
 static u_char udp_ttl = UDP_TTL;
 static unsigned char    exception_seq;
 
 struct kdp_ipovly {
-	uint32_t ih_next, ih_prev;      /* for protocol sequence q's */
-	u_char  ih_x1;                  /* (unused) */
-	u_char  ih_pr;                  /* protocol */
-	short   ih_len;                 /* protocol length */
-	struct  kdp_in_addr ih_src;     /* source internet address */
-	struct  kdp_in_addr ih_dst;     /* destination internet address */
+	uint32_t ih_next, ih_prev;                                     
+	u_char  ih_x1;                                
+	u_char  ih_pr;                                
+	short   ih_len;                                      
+	struct  kdp_in_addr ih_src;                                  
+	struct  kdp_in_addr ih_dst;                                       
 };
 
 struct kdp_udphdr {
-	u_short uh_sport;               /* source port */
-	u_short uh_dport;               /* destination port */
-	short   uh_ulen;                /* udp length */
-	u_short uh_sum;                 /* udp checksum */
+	u_short uh_sport;                                
+	u_short uh_dport;                                     
+	short   uh_ulen;                                
+	u_short uh_sum;                                   
 };
 
 struct  kdp_udpiphdr {
-	struct  kdp_ipovly ui_i;        /* overlaid ip structure */
-	struct  kdp_udphdr ui_u;        /* udp header */
+	struct  kdp_ipovly ui_i;                                   
+	struct  kdp_udphdr ui_u;                        
 };
 #define ui_next         ui_i.ih_next
 #define ui_prev         ui_i.ih_prev
@@ -142,28 +142,28 @@ struct kdp_ip {
 		struct {
 			unsigned int
 #ifdef __LITTLE_ENDIAN__
-			    ip_xhl:4,   /* header length */
-			    ip_xv:4,    /* version */
-			    ip_xtos:8,  /* type of service */
-			    ip_xlen:16; /* total length */
+			    ip_xhl:4,                      
+			    ip_xv:4,                 
+			    ip_xtos:8,                       
+			    ip_xlen:16;                   
 #endif
 #ifdef __BIG_ENDIAN__
-			ip_xv:4,        /* version */
-			ip_xhl:4,       /* header length */
-			ip_xtos:8,      /* type of service */
-			ip_xlen:16;     /* total length */
+			ip_xv:4,                     
+			ip_xhl:4,                          
+			ip_xtos:8,                           
+			ip_xlen:16;                       
 #endif
 		} ip_x;
 	} ip_vhltl;
-	u_short ip_id;                  /* identification */
-	short   ip_off;                 /* fragment offset field */
-#define IP_DF 0x4000                    /* dont fragment flag */
-#define IP_MF 0x2000                    /* more fragments flag */
-#define IP_OFFMASK 0x1fff               /* mask for fragmenting bits */
-	u_char  ip_ttl;                 /* time to live */
-	u_char  ip_p;                   /* protocol */
-	u_short ip_sum;                 /* checksum */
-	struct  kdp_in_addr ip_src, ip_dst;  /* source and dest address */
+	u_short ip_id;                                      
+	short   ip_off;                                            
+#define IP_DF 0x4000                                            
+#define IP_MF 0x2000                                             
+#define IP_OFFMASK 0x1fff                                              
+	u_char  ip_ttl;                                   
+	u_char  ip_p;                                 
+	u_short ip_sum;                               
+	struct  kdp_in_addr ip_src, ip_dst;                               
 };
 #define ip_v            ip_vhltl.ip_x.ip_xv
 #define ip_hl           ip_vhltl.ip_x.ip_xhl
@@ -173,40 +173,40 @@ struct kdp_ip {
 #define IPPROTO_UDP     17
 #define IPVERSION       4
 
-#define ETHERTYPE_IP    0x0800  /* IP protocol */
+#define ETHERTYPE_IP    0x0800                   
 
-/*
- * Ethernet Address Resolution Protocol.
- *
- * See RFC 826 for protocol description.  Structure below is adapted
- * to resolving internet addresses.  Field names used correspond to
- * RFC 826.
- */
+  
+                                        
+  
+                                                                    
+                                                                   
+           
+   
 
-#define ETHERTYPE_ARP   0x0806  /* Addr. resolution protocol */
+#define ETHERTYPE_ARP   0x0806                                 
 
 struct  kdp_arphdr {
-	u_short ar_hrd;         /* format of hardware address */
-#define ARPHRD_ETHER    1       /* ethernet hardware format */
-#define ARPHRD_FRELAY   15      /* frame relay hardware format */
-	u_short ar_pro;         /* format of protocol address */
-	u_char  ar_hln;         /* length of hardware address */
-	u_char  ar_pln;         /* length of protocol address */
-	u_short ar_op;          /* one of: */
-#define ARPOP_REQUEST   1       /* request to resolve address */
-#define ARPOP_REPLY     2       /* response to previous request */
-#define ARPOP_REVREQUEST 3      /* request protocol address given hardware */
-#define ARPOP_REVREPLY  4       /* response giving protocol address */
-#define ARPOP_INVREQUEST 8      /* request to identify peer */
-#define ARPOP_INVREPLY  9       /* response identifying peer */
+	u_short ar_hrd;                                         
+#define ARPHRD_ETHER    1                                     
+#define ARPHRD_FRELAY   15                                       
+	u_short ar_pro;                                         
+	u_char  ar_hln;                                         
+	u_char  ar_pln;                                         
+	u_short ar_op;                       
+#define ARPOP_REQUEST   1                                       
+#define ARPOP_REPLY     2                                         
+#define ARPOP_REVREQUEST 3                                                   
+#define ARPOP_REVREPLY  4                                             
+#define ARPOP_INVREQUEST 8                                    
+#define ARPOP_INVREPLY  9                                      
 };
 
 struct  kdp_ether_arp {
-	struct  kdp_arphdr ea_hdr;              /* fixed-size header */
-	u_char  arp_sha[ETHER_ADDR_LEN];        /* sender hardware address */
-	u_char  arp_spa[4];                     /* sender protocol address */
-	u_char  arp_tha[ETHER_ADDR_LEN];        /* target hardware address */
-	u_char  arp_tpa[4];                     /* target protocol address */
+	struct  kdp_arphdr ea_hdr;                                     
+	u_char  arp_sha[ETHER_ADDR_LEN];                                     
+	u_char  arp_spa[4];                                                  
+	u_char  arp_tha[ETHER_ADDR_LEN];                                     
+	u_char  arp_tpa[4];                                                  
 };
 #define arp_hrd ea_hdr.ar_hrd
 #define arp_pro ea_hdr.ar_pro
@@ -241,12 +241,12 @@ struct {
 static const char
 *exception_message[] = {
 	"Unknown",
-	"Memory access",        /* EXC_BAD_ACCESS */
-	"Failed instruction",   /* EXC_BAD_INSTRUCTION */
-	"Arithmetic",           /* EXC_ARITHMETIC */
-	"Emulation",            /* EXC_EMULATION */
-	"Software",             /* EXC_SOFTWARE */
-	"Breakpoint"            /* EXC_BREAKPOINT */
+	"Memory access",                            
+	"Failed instruction",                            
+	"Arithmetic",                               
+	"Emulation",                               
+	"Software",                               
+	"Breakpoint"                                
 };
 
 volatile int kdp_flag = 0;
@@ -358,7 +358,7 @@ kdp_timer_callout_init(void)
 }
 
 
-/* only send/receive data if the link is up */
+                                              
 inline static void
 wait_for_link(void)
 {
@@ -554,7 +554,7 @@ kdp_reply(
 		kdp_panic("kdp_reply: no input packet");
 	}
 
-	/* Packet size cannot be larger than the static space allocated for it. */
+	                                                                          
 	if (pkt.len > KDP_MAXPACKET) {
 		kdp_panic("kdp_send: packet too large (%d > %u)", pkt.len, KDP_MAXPACKET);
 	}
@@ -606,14 +606,14 @@ kdp_reply(
 
 	pkt.len += (unsigned int)sizeof(struct kdp_ether_header);
 
-	// save reply for possible retransmission
+	                                         
 	if (!sideband) {
 		bcopy((char *)&pkt, (char *)&saved_reply, sizeof(saved_reply));
 	}
 
 	kdp_send_data(&pkt.data[pkt.off], pkt.len);
 
-	// increment expected sequence number
+	                                     
 	if (!sideband) {
 		exception_seq++;
 	}
@@ -632,7 +632,7 @@ kdp_send(
 		kdp_panic("kdp_send: no input packet");
 	}
 
-	/* Packet size cannot be larger than the static space allocated for it. */
+	                                                                          
 	if (pkt.len > KDP_MAXPACKET) {
 		kdp_panic("kdp_send: packet too large (%d > %u)", pkt.len, KDP_MAXPACKET);
 	}
@@ -695,12 +695,12 @@ debugger_if_necessary(void)
 }
 
 
-/* We don't interpret this pointer, we just give it to the bsd stack
- *  so it can decide when to set the MAC and IP info. We'll
- *  early initialize the MAC/IP info if we can so that we can use
- *  KDP early in boot. These values may subsequently get over-written
- *  when the interface gets initialized for real.
- */
+                                                                    
+                                                           
+                                                                 
+                                                                     
+                                                 
+   
 void
 kdp_set_interface(void *ifp, const struct kdp_ether_addr *macaddr)
 {
@@ -711,7 +711,7 @@ kdp_set_interface(void *ifp, const struct kdp_ether_addr *macaddr)
 	kdp_current_ifp = ifp;
 
 	if (PE_parse_boot_argn("kdp_ip_addr", kdpstr, sizeof(kdpstr))) {
-		/* look for a static ip address */
+		                                  
 		if (inet_aton(kdpstr, &addr) == FALSE) {
 			goto done;
 		}
@@ -719,7 +719,7 @@ kdp_set_interface(void *ifp, const struct kdp_ether_addr *macaddr)
 		goto config_network;
 	}
 
-	/* use saved ip address */
+	                          
 	save_ip_in_nvram = TRUE;
 
 	len = sizeof(kdpstr);
@@ -738,12 +738,12 @@ config_network:
 		kdp_current_mac_address = *macaddr;
 	}
 
-	/* we can't drop into the debugger at this point because the
-	 *  link will likely not be up. when getDebuggerLinkStatus() support gets
-	 *  added to the appropriate network drivers, adding the
-	 *  following will enable this capability:
-	 *  debugger_if_necessary();
-	 */
+	                                                            
+                                                                          
+                                                         
+                                           
+                             
+    
 done:
 	return;
 }
@@ -768,7 +768,7 @@ kdp_set_ip_and_mac_addresses(
 		goto done;
 	}
 
-	/* don't replace if serial debugging is configured */
+	                                                     
 	if (!KDP_SERIAL_ENABLED() ||
 	    (kdp_current_ip_address != KDP_SERIAL_IPADDR)) {
 		kdp_current_mac_address = *macaddr;
@@ -783,7 +783,7 @@ kdp_set_ip_and_mac_addresses(
 		goto done;
 	}
 
-	/* throttle writes if needed */
+	                               
 	if (!throttle_val) {
 		nanoseconds_to_absolutetime(KDP_THROTTLE_VALUE, &throttle_val);
 	}
@@ -849,12 +849,12 @@ kdp_arp_dispatch(void)
 static void
 kdp_process_arp_reply(struct kdp_ether_arp *ea)
 {
-	/* Are we interested in ARP replies? */
+	                                       
 	if (flag_arp_resolved == TRUE) {
 		return;
 	}
 
-	/* Did we receive a reply from the right source? */
+	                                                   
 	if (((struct kdp_in_addr *)(ea->arp_spa))->s_addr != target_ip) {
 		return;
 	}
@@ -865,9 +865,9 @@ kdp_process_arp_reply(struct kdp_ether_arp *ea)
 	return;
 }
 
-/* ARP responses are enabled when the DB_ARP bit of the debug boot arg
- * is set.
- */
+                                                                      
+          
+   
 
 static void
 kdp_arp_reply(struct kdp_ether_arp *ea)
@@ -915,7 +915,7 @@ kdp_arp_reply(struct kdp_ether_arp *ea)
 		eh->ether_type = htons(ETHERTYPE_ARP);
 		(void)memcpy(&pkt.data[pkt.off], ea, sizeof(*ea));
 		pkt.off -= (unsigned int)sizeof(struct kdp_ether_header);
-		/* pkt.len is still the length we want, ether_header+ether_arp */
+		                                                                 
 		kdp_send_data(&pkt.data[pkt.off], pkt.len);
 	}
 }
@@ -941,7 +941,7 @@ kdp_poll(void)
 	}
 
 	pkt.off = pkt.len = 0;
-	kdp_receive_data(pkt.data, &pkt.len, 3 /* ms */);
+	kdp_receive_data(pkt.data, &pkt.len, 3         );
 
 	if (pkt.len == 0) {
 		return;
@@ -992,10 +992,10 @@ kdp_poll(void)
 			return;
 		}
 	}
-	/* If we receive a kernel debugging packet whilst a
-	 * core dump is in progress, abort the transfer and
-	 * enter the debugger if not told otherwise.
-	 */
+	                                                   
+                                                    
+                                             
+    
 	else if (flag_panic_dump_in_progress) {
 		if (!flag_dont_abort_panic_dump) {
 			abort_panic_transfer();
@@ -1011,17 +1011,17 @@ kdp_poll(void)
 		adr.rmt.in = ui->ui_src;
 	}
 
-	/*
-	 * Calculate kdp packet length.
-	 */
+	  
+                                
+    
 	pkt.len = ntohs((u_short)ui->ui_ulen) - (unsigned int)sizeof(struct kdp_udphdr);
 	pkt.input = TRUE;
 }
 
 
-/* Create and transmit an ARP resolution request for the target IP address.
- * This is modeled on ether_inet_arp()/RFC 826.
- */
+                                                                           
+                                               
+   
 
 static void
 transmit_ARP_request(uint32_t ip_addr)
@@ -1030,36 +1030,36 @@ transmit_ARP_request(uint32_t ip_addr)
 	struct kdp_ether_arp    *ea = (struct kdp_ether_arp *) &pkt.data[sizeof(struct kdp_ether_header)];
 
 	KDP_DEBUG("Transmitting ARP request\n");
-	/* Populate the ether_header */
+	                               
 	eh->ether_type = htons(ETHERTYPE_ARP);
 	enaddr_copy(&kdp_current_mac_address, eh->ether_shost);
 	enaddr_copy(&etherbroadcastaddr, eh->ether_dhost);
 
-	/* Populate the ARP header */
+	                             
 	ea->arp_pro = htons(ETHERTYPE_IP);
 	ea->arp_hln = sizeof(ea->arp_sha);
 	ea->arp_pln = sizeof(ea->arp_spa);
 	ea->arp_hrd = htons(ARPHRD_ETHER);
 	ea->arp_op = htons(ARPOP_REQUEST);
 
-	/* Target fields */
+	                   
 	enaddr_copy(&etherbroadcastaddr, ea->arp_tha);
 	memcpy(ea->arp_tpa, (void *) &ip_addr, sizeof(ip_addr));
 
-	/* Source fields */
+	                   
 	enaddr_copy(&kdp_current_mac_address, ea->arp_sha);
 	memcpy(ea->arp_spa, (void *) &kdp_current_ip_address, sizeof(kdp_current_ip_address));
 
 	pkt.off = 0;
 	pkt.len = sizeof(struct kdp_ether_header) + sizeof(struct kdp_ether_arp);
-	/* Transmit */
+	              
 	kdp_send_data(&pkt.data[pkt.off], pkt.len);
 }
 
 static boolean_t
 kdp_arp_resolve(uint32_t arp_target_ip, struct kdp_ether_addr *resolved_MAC)
 {
-	int poll_count = 256; /* ~770 ms modulo broadcast/delayed traffic? */
+	int poll_count = 256;                                                
 	char tretries = 0;
 
 #define NUM_ARP_TX_RETRIES 5
@@ -1089,13 +1089,13 @@ TRANSMIT_RETRY:
 		return TRUE;
 	}
 
-	if (!flag_panic_dump_in_progress || pkt.input) { /* we received a debugging packet, bail*/
+	if (!flag_panic_dump_in_progress || pkt.input) {                                          
 		printf("Received a debugger packet,transferring control to debugger\n");
-		/* Indicate that we should wait in the debugger when we return */
+		                                                                 
 		kdp_flag |= DBG_POST_CORE;
 		pkt.input = FALSE;
 		return FALSE;
-	} else { /* We timed out */
+	} else {                   
 		if (0 == poll_count) {
 			poll_count = 256;
 			goto TRANSMIT_RETRY;
@@ -1112,7 +1112,7 @@ kdp_handler(
 	unsigned short          reply_port;
 	kdp_hdr_t               aligned_hdr, *hdr = &aligned_hdr;
 
-	kdp.saved_state = saved_state;  // see comment in kdp_raise_exception
+	kdp.saved_state = saved_state;                                       
 
 	do {
 		while (!pkt.input) {
@@ -1125,7 +1125,7 @@ kdp_handler(
 		hdr = (kdp_hdr_t *)&pkt.data[pkt.off];
 #endif
 
-		// ignore replies -- we're not expecting them anyway.
+		                                                     
 		if (hdr->is_reply) {
 			goto again;
 		}
@@ -1134,9 +1134,9 @@ kdp_handler(
 			exception_seq = hdr->seq;
 		}
 
-		// check for retransmitted request
+		                                  
 		if (hdr->seq == (exception_seq - 1)) {
-			/* retransmit last reply */
+			                           
 			kdp_send_data(&saved_reply.data[saved_reply.off],
 			    saved_reply.len);
 			goto again;
@@ -1147,16 +1147,16 @@ kdp_handler(
 			goto again;
 		}
 
-		/* This is a manual side-channel to the main KDP protocol.
-		 * A client like GDB/kgmacros can manually construct
-		 * a request, set the input flag, issue a dummy KDP request,
-		 * and then manually collect the result
-		 */
+		                                                          
+                                                      
+                                                              
+                                         
+     
 		if (manual_pkt.input) {
 			kdp_hdr_t *manual_hdr = (kdp_hdr_t *)&manual_pkt.data;
 			unsigned short manual_port_unused = 0;
 			if (!manual_hdr->is_reply) {
-				/* process */
+				             
 				int packet_length = manual_pkt.len;
 				kdp_packet((unsigned char *)&manual_pkt.data,
 				    &packet_length,
@@ -1171,9 +1171,9 @@ kdp_handler(
 		    (unsigned short *)&reply_port)) {
 			boolean_t sideband = FALSE;
 
-			/* if it's an already connected error message,
-			* send a sideband reply for that. for successful connects,
-			* make sure the sequence number is correct. */
+			                                              
+                                                             
+                                                 
 			if (hdr->request == KDP_CONNECT) {
 				kdp_connect_reply_t *rp =
 				    (kdp_connect_reply_t *) &pkt.data[pkt.off];
@@ -1201,11 +1201,11 @@ kdp_connection_wait(void)
 	struct kdp_ether_addr   kdp_mac_addr = kdp_get_mac_addr();
 	unsigned int            ip_addr = ntohl(kdp_get_ip_address());
 
-	/*
-	 * Do both a printf() and a kprintf() of the MAC and IP so that
-	 * they will print out on headless machines but not be added to
-	 * the panic.log
-	 */
+	  
+                                                                
+                                                                
+                 
+    
 
 	if (KDP_SERIAL_ENABLED()) {
 		printf("Using serial KDP.\n");
@@ -1283,7 +1283,7 @@ kdp_connection_wait(void)
 #endif
 		if (hdr->request == KDP_HOSTREBOOT) {
 			kdp_machine_reboot();
-			/* should not return! */
+			                        
 		}
 		if (((hdr->request == KDP_CONNECT) || (hdr->request == KDP_REATTACH)) &&
 		    !hdr->is_reply && (hdr->seq == exception_seq)) {
@@ -1351,7 +1351,7 @@ kdp_send_exception(
 	} while (kdp.exception_ack_needed && timeout_count--);
 
 	if (kdp.exception_ack_needed) {
-		// give up & disconnect
+		                       
 		printf("kdp: exception ack timeout\n");
 		if (current_debugger == KDP_CUR_DB) {
 			active_debugger = 0;
@@ -1385,15 +1385,15 @@ kdp_debugger_loop(
 
 	kdp_sync_cache();
 
-	/* XXX WMG it seems that sometimes it doesn't work to let kdp_handler
-	 * do this. I think the client and the host can get out of sync.
-	 */
+	                                                                     
+                                                                 
+    
 	kdp.saved_state = saved_state;
 	kdp.kdp_cpu = cpu_number();
 	kdp.kdp_thread = current_thread();
 
 	if (kdp_en_setmode) {
-		(*kdp_en_setmode)(TRUE); /* enabling link mode */
+		(*kdp_en_setmode)(TRUE);                         
 	}
 	if (pkt.input) {
 		kdp_panic("kdp_raise_exception");
@@ -1434,17 +1434,17 @@ again:
 	}
 
 	if (kdp.is_conn) {
-		kdp.is_halted = TRUE;           /* XXX */
+		kdp.is_halted = TRUE;                    
 		kdp_handler(saved_state);
 		if (!kdp.is_conn) {
 			kdp_remove_all_breakpoints();
 			printf("Remote debugger disconnected.\n");
 		}
 	}
-	/* Allow triggering a panic core dump when connected to the machine
-	 * Continuing after setting kdp_trigger_core_dump should do the
-	 * trick.
-	 */
+	                                                                   
+                                                                
+          
+    
 
 	if (1 == kdp_trigger_core_dump) {
 		kdp_flag |= KDP_PANIC_DUMP_ENABLED;
@@ -1455,14 +1455,14 @@ again:
 		kdp_trigger_core_dump = 0;
 	}
 
-	/* Trigger a reboot if the user has set this flag through the
-	 * debugger.Ideally, this would be done through the HOSTREBOOT packet
-	 * in the protocol,but that will need gdb support,and when it's
-	 * available, it should work automatically.
-	 */
+	                                                             
+                                                                      
+                                                                
+                                            
+    
 	if (1 == flag_kdp_trigger_reboot) {
 		kdp_machine_reboot();
-		/* If we're still around, reset the flag */
+		                                           
 		flag_kdp_trigger_reboot = 0;
 	}
 
@@ -1475,7 +1475,7 @@ again:
 	kdp_sync_cache();
 
 #if defined(__x86_64__)
-	/* We only support returning from KDP on x86 */
+	                                               
 	if (reattach_wait == 1)
 #endif
 	{
@@ -1484,7 +1484,7 @@ again:
 
 exit_debugger_loop:
 	if (kdp_en_setmode) {
-		(*kdp_en_setmode)(FALSE); /* link cleanup */
+		(*kdp_en_setmode)(FALSE);                   
 	}
 }
 
@@ -1526,7 +1526,7 @@ create_panic_header(unsigned int request, const char *corename,
 	ui->ui_pr = IPPROTO_UDP;
 	ui->ui_len = htons((u_short)pkt.len + sizeof(struct kdp_udphdr));
 	ui->ui_src.s_addr = (uint32_t)kdp_current_ip_address;
-	/* Already in network byte order via inet_aton() */
+	                                                   
 	ui->ui_dst.s_addr = panic_server_ip;
 	ui->ui_sport = htons(panicd_port);
 	ui->ui_dport = ((request == KDP_WRQ) ? htons(panicd_port) : last_panic_port);
@@ -1558,11 +1558,11 @@ create_panic_header(unsigned int request, const char *corename,
 
 	if (request == KDP_WRQ) {
 		char *cp = coreh->th_u.tu_rpl;
-		/* Calculate available string space (remaining space after accounting for mandatory components). */
+		                                                                                                   
 		size_t length_remaining = (sizeof(pkt.data) - pkt.off - offsetof(struct corehdr, th_u)
 		    - sizeof(kdp_crashdump_feature_mask) - sizeof(kdp_crashdump_pkt_size));
 
-		/* account for the extra NULL characters that have been added historically */
+		                                                                             
 		int len = snprintf(cp, length_remaining, "%s%c%s%c%s", corename, '\0', mode, '\0', KDP_FEATURE_MASK_STRING);
 		if (len < 0) {
 			kdb_printf("Unable to create core header packet.\n");
@@ -1573,11 +1573,11 @@ create_panic_header(unsigned int request, const char *corename,
 		}
 		cp += len;
 
-		/* Append feature flags. The value is already converted with htonl in startup code. */
+		                                                                                      
 		bcopy(&kdp_crashdump_feature_mask, cp, sizeof(kdp_crashdump_feature_mask));
 		cp += sizeof(kdp_crashdump_feature_mask);
 
-		/* Override default packet size from boot arguments (if present). */
+		                                                                    
 		kdp_crashdump_pkt_size = KDP_LARGE_CRASHDUMP_PKT_SIZE;
 		if (PE_parse_boot_argn("kdp_crashdump_pkt_size", &kdp_crashdump_pkt_size, sizeof(kdp_crashdump_pkt_size)) &&
 		    (kdp_crashdump_pkt_size > KDP_LARGE_CRASHDUMP_PKT_SIZE)) {
@@ -1669,7 +1669,7 @@ kdp_send_crashdump_pkt(unsigned int request, char *corename,
 	tretries = rretries = 0;
 	poll_count = KDP_CRASHDUMP_POLL_COUNT;
 	pkt.off = pkt.len = 0;
-	if (request == KDP_WRQ) { /* longer timeout for initial request */
+	if (request == KDP_WRQ) {                                         
 		poll_count += 1000;
 	}
 
@@ -1677,11 +1677,11 @@ TRANSMIT_RETRY:
 	tretries++;
 
 	if (tretries >= 15) {
-/* The crashdump server is unreachable for some reason. This could be a network
- * issue or, if we've been especially unfortunate, we've hit Radar 2760413,
- * which is a long standing problem with the IOKit polled mode network driver
- * shim which can prevent transmits/receives completely.
- */
+                                                                               
+                                                                           
+                                                                             
+                                                        
+   
 		printf("Cannot contact panic server, timing out.\n");
 		return -3;
 	}
@@ -1697,9 +1697,9 @@ TRANSMIT_RETRY:
 	}
 
 	if (request == KDP_DATA) {
-		/* as all packets are kdp_crashdump_pkt_size in length, the last packet
-		 * may end up with trailing bits. make sure that those
-		 * bits aren't confusing. */
+		                                                                       
+                                                        
+                              
 		if (length < kdp_crashdump_pkt_size) {
 			kdp_crashdump_short_pkt++;
 			memset(th->th_data + length, 'Y',
@@ -1726,7 +1726,7 @@ TRANSMIT_RETRY:
 
 	kdp_send_data(&pkt.data[pkt.off], pkt.len);
 
-	/* Listen for the ACK */
+	                        
 RECEIVE_RETRY:
 	while (!pkt.input && flag_panic_dump_in_progress && poll_count) {
 		kdp_poll();
@@ -1767,15 +1767,15 @@ RECEIVE_RETRY:
 				}
 			}
 		}
-	} else if (!flag_panic_dump_in_progress) { /* we received a debugging packet, bail*/
+	} else if (!flag_panic_dump_in_progress) {                                          
 		printf("Received a debugger packet,transferring control to debugger\n");
-		/* Configure that if not set ..*/
+		                                 
 		kdp_flag |= DBG_POST_CORE;
 		return -2;
-	} else {         /* We timed out */
+	} else {                           
 		if (0 == poll_count) {
 			poll_count = 1000;
-			kdp_us_spin((tretries % 4) * panic_timeout);        /* capped linear backoff */
+			kdp_us_spin((tretries % 4) * panic_timeout);                                   
 			goto TRANSMIT_RETRY;
 		}
 	}
@@ -1809,15 +1809,15 @@ isdigit(char c)
 	return (c > 47) && (c < 58);
 }
 
-/* Horrid hack to extract xnu version if possible - a much cleaner approach
- * would be to have the integrator run a script which would copy the
- * xnu version into a string or an int somewhere at project submission
- * time - makes assumptions about sizeof(version), but will not fail if
- * it changes, but may be incorrect.
- */
-/* 2006: Incorporated a change from Darwin user P. Lovell to extract
- * the minor kernel version numbers from the version string.
- */
+                                                                           
+                                                                    
+                                                                      
+                                                                       
+                                    
+   
+                                                                    
+                                                            
+   
 static int
 kdp_get_xnu_version(char *versionbuf)
 {
@@ -1834,12 +1834,12 @@ kdp_get_xnu_version(char *versionbuf)
 		if (versionpos) {
 			strncpy(vstr, versionpos, sizeof(vstr));
 			vstr[sizeof(vstr) - 1] = '\0';
-			vptr = vstr + 4; /* Begin after "xnu-" */
+			vptr = vstr + 4;                         
 			while (*vptr && (isdigit(*vptr) || *vptr == '.')) {
 				vptr++;
 			}
 			*vptr = '\0';
-			/* Remove trailing period, if any */
+			                                    
 			if (*(--vptr) == '.') {
 				*vptr = '\0';
 			}
@@ -1874,21 +1874,21 @@ kdp_set_dump_info(const uint32_t flags, const char *filename,
 		corename_specified = FALSE;
 	}
 
-	/* Accept only valid UDP port numbers. */
+	                                         
 	if (port && port <= USHRT_MAX) {
 		panicd_port = (unsigned short)port;
 	} else {
 		kdb_printf("kdp_set_dump_info: Skipping invalid panicd port %d (using %d)\n", port, panicd_port);
 	}
 
-	/* on a disconnect, should we stay in KDP or not? */
+	                                                    
 	noresume_on_disconnect = (flags & KDP_DUMPINFO_NORESUME) ? 1 : 0;
 
 	if ((flags & KDP_DUMPINFO_DUMP) == 0) {
 		return;
 	}
 
-	/* the rest of the commands can modify kdp_flags */
+	                                                   
 	cmd = flags & KDP_DUMPINFO_MASK;
 	if (cmd == KDP_DUMPINFO_DISABLE) {
 		kdp_flag &= ~KDP_PANIC_DUMP_ENABLED;
@@ -1912,7 +1912,7 @@ kdp_set_dump_info(const uint32_t flags, const char *filename,
 		kdp_flag |= SYSTEM_LOG_DUMP;
 	}
 
-	/* trigger a dump */
+	                    
 	kdp_flag |= DBG_POST_CORE;
 
 	flag_dont_abort_panic_dump = (flags & KDP_DUMPINFO_NOINTR) ?
@@ -1964,7 +1964,7 @@ kdp_get_dump_info(kdp_dumpinfo_reply_t *rp)
 }
 
 
-/* Primary dispatch routine for the system dump */
+                                                  
 void
 kdp_panic_dump(void)
 {
@@ -2002,7 +2002,7 @@ kdp_panic_dump(void)
 
 	if (!corename_specified) {
 		coresuffix[0] = 0;
-		/* Panic log bit takes precedence over core dump bit */
+		                                                       
 		if ((debugger_panic_str != (char *) 0) && (kdp_flag & PANIC_LOG_DUMP)) {
 			strlcpy(coreprefix, "paniclog", sizeof(coreprefix));
 		} else if (kdp_flag & SYSTEM_LOG_DUMP) {
@@ -2076,7 +2076,7 @@ kdp_panic_dump(void)
 		goto panic_dump_exit;
 	}
 
-	/* Just the panic log requested */
+	                                  
 	if ((debugger_panic_str != (char *) 0) && (kdp_flag & PANIC_LOG_DUMP)) {
 		kdb_printf_unbuffered("Transmitting panic log, please wait: ");
 		kdp_send_crashdump_data(KDP_DATA, corename_str,
@@ -2087,7 +2087,7 @@ kdp_panic_dump(void)
 		goto panic_dump_exit;
 	}
 
-	/* maybe we wanted the systemlog */
+	                                   
 	if (kdp_flag & SYSTEM_LOG_DUMP) {
 		long start_off = msgbufp->msg_bufx;
 		long len;
@@ -2097,7 +2097,7 @@ kdp_panic_dump(void)
 			len = msgbufp->msg_size - start_off;
 			kdp_send_crashdump_data(KDP_DATA, corename_str, len,
 			    msgbufp->msg_bufc + start_off);
-			/* seek to remove trailing bytes */
+			                                   
 			kdp_send_crashdump_seek(corename_str, len);
 			start_off  = 0;
 		}
@@ -2112,7 +2112,7 @@ kdp_panic_dump(void)
 		goto panic_dump_exit;
 	}
 
-	/* We want a core dump if we're here */
+	                                       
 	kern_dump(KERN_DUMP_NET);
 
 panic_dump_exit:
@@ -2142,7 +2142,7 @@ static boolean_t needs_serial_init = TRUE;
 static void
 kdp_serial_send(void *rpkt, unsigned int rpkt_len)
 {
-	//	printf("tx\n");
+	                  
 	kdp_serialize_packet((unsigned char *)rpkt, rpkt_len, pal_serial_putc_nocr);
 }
 
@@ -2152,14 +2152,14 @@ kdp_serial_receive(void *rpkt, unsigned int *rpkt_len, unsigned int timeout)
 	int readkar;
 	uint64_t now, deadline;
 
-	clock_interval_to_deadline(timeout, 1000 * 1000 /* milliseconds */, &deadline);
+	clock_interval_to_deadline(timeout, 1000 * 1000                   , &deadline);
 
-//	printf("rx\n");
+                  
 	for (clock_get_uptime(&now); now < deadline; clock_get_uptime(&now)) {
 		readkar = pal_serial_getc();
 		if (readkar >= 0) {
 			unsigned char *packet;
-			//			printf("got char %02x\n", readkar);
+			                                        
 			if ((packet = kdp_unserialize_packet((unsigned char)readkar, rpkt_len))) {
 				memcpy(rpkt, packet, *rpkt_len);
 				return;
@@ -2172,7 +2172,7 @@ kdp_serial_receive(void *rpkt, unsigned int *rpkt_len, unsigned int timeout)
 static boolean_t
 kdp_serial_setmode(boolean_t active)
 {
-	if (active == FALSE) { /* leaving KDP */
+	if (active == FALSE) {                  
 		return TRUE;
 	}
 
@@ -2189,16 +2189,16 @@ kdp_serial_setmode(boolean_t active)
 static void
 kdp_serial_callout(__unused void *arg, kdp_event_t event)
 {
-	/*
-	 * When we stop KDP, set the bit to re-initialize the console serial
-	 * port the next time we send/receive a KDP packet.  We don't do it on
-	 * KDP_EVENT_ENTER directly because it also gets called when we trap to
-	 * KDP for non-external debugging, i.e., stackshot or core dumps.
-	 *
-	 * Set needs_serial_init on exit (and initialization, see above) and not
-	 * enter because enter is sent multiple times and causes excess
-	 * reinitialization.
-	 */
+	  
+                                                                     
+                                                                       
+                                                                        
+                                                                  
+   
+                                                                         
+                                                                
+                     
+    
 
 	switch (event) {
 	case KDP_EVENT_PANICLOG:
@@ -2210,20 +2210,20 @@ kdp_serial_callout(__unused void *arg, kdp_event_t event)
 	}
 }
 
-#endif /* CONFIG_SERIAL_KDP */
+#endif                        
 
 void
 kdp_init(void)
 {
 	strlcpy(kdp_kernelversion_string, version, sizeof(kdp_kernelversion_string));
 
-	/* Relies on platform layer calling panic_init() before kdp_init() */
+	                                                                     
 	assert(startup_phase >= STARTUP_SUB_TUNABLES);
 	if (kernel_uuid_string[0] != '\0') {
-		/*
-		 * Update kdp_kernelversion_string with our UUID
-		 * generated at link time.
-		 */
+		  
+                                                  
+                            
+     
 
 		strlcat(kdp_kernelversion_string, "; UUID=", sizeof(kdp_kernelversion_string));
 		strlcat(kdp_kernelversion_string, kernel_uuid_string, sizeof(kdp_kernelversion_string));
@@ -2260,16 +2260,16 @@ kdp_init(void)
 	boolean_t kdp_not_serial = kdp_match_name_found ? (strncmp(kdpname, "serial", sizeof(kdpname))) : TRUE;
 
 #if defined(__arm__) || defined(__arm64__)
-	//respect any custom debugger boot-args
+	                                       
 	if (kdp_match_name_found && kdp_not_serial) {
 		return;
 	}
-#else /* defined(__arm__) || defined(__arm64__) */
-	// serial must be explicitly requested
+#else                                             
+	                                      
 	if (!kdp_match_name_found || kdp_not_serial) {
 		return;
 	}
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 #if defined(__arm__) || defined(__arm64__)
 	if (kdp_not_serial && PE_consistent_debug_enabled() && debug_boot_arg) {
@@ -2277,7 +2277,7 @@ kdp_init(void)
 	} else {
 		printf("Serial requested, consistent debug disabled or debug boot arg not present, configuring debugging over serial\n");
 	}
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 	kprintf("Initializing serial KDP\n");
 
@@ -2285,7 +2285,7 @@ kdp_init(void)
 	kdp_register_link(NULL, kdp_serial_setmode);
 	kdp_register_send_receive(kdp_serial_send, kdp_serial_receive);
 
-	/* fake up an ip and mac for early serial debugging */
+	                                                      
 	macaddr.ether_addr_octet[0] = 's';
 	macaddr.ether_addr_octet[1] = 'e';
 	macaddr.ether_addr_octet[2] = 'r';
@@ -2295,20 +2295,20 @@ kdp_init(void)
 	ipaddr.s_addr = KDP_SERIAL_IPADDR;
 	kdp_set_ip_and_mac_addresses(&ipaddr, &macaddr);
 
-#endif /* CONFIG_SERIAL_KDP */
+#endif                        
 }
 
-#else /* CONFIG_KDP_INTERACTIVE_DEBUGGING */
+#else                                       
 void
 kdp_init(void)
 {
 }
-#endif /* CONFIG_KDP_INTERACTIVE_DEBUGGING */
+#endif                                       
 
 #if !(MACH_KDP && CONFIG_KDP_INTERACTIVE_DEBUGGING)
 static struct kdp_ether_addr kdp_current_mac_address = {.ether_addr_octet = {0, 0, 0, 0, 0, 0}};
 
-/* XXX ugly forward declares to stop warnings */
+                                                
 void *kdp_get_interface(void);
 void kdp_set_ip_and_mac_addresses(struct kdp_in_addr *, struct kdp_ether_addr *);
 void kdp_set_gateway_mac(void *);
@@ -2373,7 +2373,7 @@ kdp_unregister_link(__unused kdp_link_t link, __unused kdp_mode_t mode)
 {
 }
 
-#endif /* !(MACH_KDP && CONFIG_KDP_INTERACTIVE_DEBUGGING) */
+#endif                                                      
 
 #if !CONFIG_KDP_INTERACTIVE_DEBUGGING
 extern __attribute__((noreturn)) void panic_spin_forever(void);
@@ -2402,9 +2402,9 @@ kdp_raise_exception(
 
 #if CONFIG_KDP_INTERACTIVE_DEBUGGING
 	kdp_debugger_loop(exception, code, subcode, saved_state);
-#else /* CONFIG_KDP_INTERACTIVE_DEBUGGING */
+#else                                       
 
 	assert(current_debugger != KDP_CUR_DB);
 	panic_spin_forever();
-#endif /* CONFIG_KDP_INTERACTIVE_DEBUGGING */
+#endif                                       
 }

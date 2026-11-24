@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* TCP-cache to store and retrieve TCP-related information */
+                                                             
 
 #include <net/flowhash.h>
 #include <net/route.h>
@@ -60,36 +60,36 @@ struct tcp_heuristic {
 
 	struct tcp_heuristic_key        th_key;
 
-	char            th_val_start[0]; /* Marker for memsetting to 0 */
+	char            th_val_start[0];                                 
 
-	uint8_t         th_tfo_data_loss; /* The number of times a SYN+data has been lost */
-	uint8_t         th_tfo_req_loss; /* The number of times a SYN+cookie-req has been lost */
-	uint8_t         th_tfo_data_rst; /* The number of times a SYN+data has received a RST */
-	uint8_t         th_tfo_req_rst; /* The number of times a SYN+cookie-req has received a RST */
-	uint8_t         th_mptcp_loss; /* The number of times a SYN+MP_CAPABLE has been lost */
-	uint8_t         th_mptcp_success; /* The number of times MPTCP-negotiation has been successful */
-	uint8_t         th_ecn_loss; /* The number of times a SYN+ecn has been lost */
-	uint8_t         th_ecn_aggressive; /* The number of times we did an aggressive fallback */
-	uint8_t         th_ecn_droprst; /* The number of times ECN connections received a RST after first data pkt */
-	uint8_t         th_ecn_droprxmt; /* The number of times ECN connection is dropped after multiple retransmits */
-	uint8_t         th_ecn_synrst;  /* number of times RST was received in response to an ECN enabled SYN */
-	uint32_t        th_tfo_enabled_time; /* The moment when we reenabled TFO after backing off */
-	uint32_t        th_tfo_backoff_until; /* Time until when we should not try out TFO */
-	uint32_t        th_tfo_backoff; /* Current backoff timer */
-	uint32_t        th_mptcp_backoff; /* Time until when we should not try out MPTCP */
-	uint32_t        th_ecn_backoff; /* Time until when we should not try out ECN */
+	uint8_t         th_tfo_data_loss;                                                   
+	uint8_t         th_tfo_req_loss;                                                         
+	uint8_t         th_tfo_data_rst;                                                        
+	uint8_t         th_tfo_req_rst;                                                              
+	uint8_t         th_mptcp_loss;                                                         
+	uint8_t         th_mptcp_success;                                                                
+	uint8_t         th_ecn_loss;                                                  
+	uint8_t         th_ecn_aggressive;                                                        
+	uint8_t         th_ecn_droprst;                                                                              
+	uint8_t         th_ecn_droprxmt;                                                                               
+	uint8_t         th_ecn_synrst;                                                                          
+	uint32_t        th_tfo_enabled_time;                                                         
+	uint32_t        th_tfo_backoff_until;                                                
+	uint32_t        th_tfo_backoff;                            
+	uint32_t        th_mptcp_backoff;                                                  
+	uint32_t        th_ecn_backoff;                                                
 
-	uint8_t         th_tfo_in_backoff:1, /* Are we avoiding TFO due to the backoff timer? */
-	    th_mptcp_in_backoff:1,             /* Are we avoiding MPTCP due to the backoff timer? */
-	    th_mptcp_heuristic_disabled:1;             /* Are heuristics disabled? */
+	uint8_t         th_tfo_in_backoff:1,                                                    
+	    th_mptcp_in_backoff:1,                                                                  
+	    th_mptcp_heuristic_disabled:1;                                           
 
-	char            th_val_end[0]; /* Marker for memsetting to 0 */
+	char            th_val_end[0];                                 
 };
 
 struct tcp_heuristics_head {
 	SLIST_HEAD(tcp_heur_bucket, tcp_heuristic) tcp_heuristics;
 
-	/* Per-hashbucket lock to avoid lock-contention */
+	                                                  
 	lck_mtx_t       thh_mtx;
 };
 
@@ -114,7 +114,7 @@ struct tcp_cache {
 struct tcp_cache_head {
 	SLIST_HEAD(tcp_cache_bucket, tcp_cache) tcp_caches;
 
-	/* Per-hashbucket lock to avoid lock-contention */
+	                                                  
 	lck_mtx_t       tch_mtx;
 };
 
@@ -129,10 +129,10 @@ static uint32_t tcp_cache_hash_seed;
 
 size_t tcp_cache_size;
 
-/*
- * The maximum depth of the hash-bucket. This way we limit the tcp_cache to
- * TCP_CACHE_BUCKET_SIZE * tcp_cache_size and have "natural" garbage collection
- */
+  
+                                                                           
+                                                                               
+   
 #define TCP_CACHE_BUCKET_SIZE 5
 
 static struct tcp_cache_head *tcp_cache;
@@ -175,14 +175,14 @@ tcp_min_to_hz(uint32_t minutes)
 	return minutes * 60 * TCP_RETRANSHZ;
 }
 
-/*
- * This number is coupled with tcp_ecn_timeout, because we want to prevent
- * integer overflow. Need to find an unexpensive way to prevent integer overflow
- * while still allowing a dynamic sysctl.
- */
+  
+                                                                          
+                                                                                
+                                         
+   
 #define TCP_CACHE_OVERFLOW_PROTECT      9
 
-/* Number of SYN-losses we accept */
+                                    
 #define TFO_MAX_COOKIE_LOSS     2
 #define ECN_MAX_SYN_LOSS        2
 #define MPTCP_MAX_SYN_LOSS      2
@@ -191,7 +191,7 @@ tcp_min_to_hz(uint32_t minutes)
 #define ECN_MAX_DROPRXMT        4
 #define ECN_MAX_SYNRST          4
 
-/* Flags for setting/unsetting loss-heuristics, limited to 4 bytes */
+                                                                     
 #define TCPCACHE_F_TFO_REQ      0x01
 #define TCPCACHE_F_TFO_DATA     0x02
 #define TCPCACHE_F_ECN          0x04
@@ -202,7 +202,7 @@ tcp_min_to_hz(uint32_t minutes)
 #define TCPCACHE_F_TFO_DATA_RST 0x80
 #define TCPCACHE_F_ECN_SYNRST   0x100
 
-/* Always retry ECN after backing off to this level for some heuristics */
+                                                                          
 #define ECN_RETRY_LIMIT 9
 
 #define TCP_CACHE_INC_IFNET_STAT(_ifp_, _af_, _stat_) { \
@@ -215,12 +215,12 @@ tcp_min_to_hz(uint32_t minutes)
 	}\
 }
 
-/*
- * Round up to next higher power-of 2.  See "Bit Twiddling Hacks".
- *
- * Might be worth moving this to a library so that others
- * (e.g., scale_to_powerof2()) can use this as well instead of a while-loop.
- */
+  
+                                                                  
+  
+                                                         
+                                                                            
+   
 static uint32_t
 tcp_cache_roundup2(uint32_t a)
 {
@@ -249,11 +249,11 @@ tcp_cache_hash_src(struct tcp_cache_key_src *tcks, struct tcp_heuristic_key *key
 		ret = ifnet_get_netsignature(ifp, AF_INET6, &len, &flags,
 		    key->thk_net_signature);
 
-		/*
-		 * ifnet_get_netsignature only returns EINVAL if ifn is NULL
-		 * (we made sure that in the other cases it does not). So,
-		 * in this case we should take the connection's address.
-		 */
+		  
+                                                              
+                                                            
+                                                          
+     
 		if (ret == ENOENT || ret == EINVAL) {
 			memcpy(&key->thk_ip.addr6, &tcks->laddr.addr6, sizeof(struct in6_addr));
 		}
@@ -264,11 +264,11 @@ tcp_cache_hash_src(struct tcp_cache_key_src *tcks, struct tcp_heuristic_key *key
 		ret = ifnet_get_netsignature(ifp, AF_INET, &len, &flags,
 		    key->thk_net_signature);
 
-		/*
-		 * ifnet_get_netsignature only returns EINVAL if ifn is NULL
-		 * (we made sure that in the other cases it does not). So,
-		 * in this case we should take the connection's address.
-		 */
+		  
+                                                              
+                                                            
+                                                          
+     
 		if (ret == ENOENT || ret == EINVAL) {
 			memcpy(&key->thk_ip.addr, &tcks->laddr.addr, sizeof(struct in_addr));
 		}
@@ -306,16 +306,16 @@ tcp_cache_unlock(struct tcp_cache_head *head)
 	lck_mtx_unlock(&head->tch_mtx);
 }
 
-/*
- * Make sure that everything that happens after tcp_getcache_with_lock()
- * is short enough to justify that you hold the per-bucket lock!!!
- *
- * Otherwise, better build another lookup-function that does not hold the
- * lock and you copy out the bits and bytes.
- *
- * That's why we provide the head as a "return"-pointer so that the caller
- * can give it back to use for tcp_cache_unlock().
- */
+  
+                                                                        
+                                                                  
+  
+                                                                         
+                                            
+  
+                                                                          
+                                                  
+   
 static struct tcp_cache *
 tcp_getcache_with_lock(struct tcp_cache_key_src *tcks,
     int create, struct tcp_cache_head **headarg)
@@ -331,7 +331,7 @@ tcp_getcache_with_lock(struct tcp_cache_key_src *tcks,
 
 	lck_mtx_lock(&head->tch_mtx);
 
-	/*** First step: Look for the tcp_cache in our bucket ***/
+	                                                          
 	SLIST_FOREACH(tpcache, &head->tcp_caches, list) {
 		if (memcmp(&tpcache->tc_key, &key, sizeof(key)) == 0) {
 			break;
@@ -340,13 +340,13 @@ tcp_getcache_with_lock(struct tcp_cache_key_src *tcks,
 		i++;
 	}
 
-	/*** Second step: If it's not there, create/recycle it ***/
+	                                                           
 	if ((tpcache == NULL) && create) {
 		if (i >= TCP_CACHE_BUCKET_SIZE) {
 			struct tcp_cache *oldest_cache = NULL;
 			uint32_t max_age = 0;
 
-			/* Look for the oldest tcp_cache in the bucket */
+			                                                 
 			SLIST_FOREACH(tpcache, &head->tcp_caches, list) {
 				uint32_t age = tcp_now - tpcache->tc_last_access;
 				if (age > max_age) {
@@ -358,10 +358,10 @@ tcp_getcache_with_lock(struct tcp_cache_key_src *tcks,
 
 			tpcache = oldest_cache;
 
-			/* We recycle, thus let's indicate that there is no cookie */
+			                                                             
 			tpcache->tc_tfo_cookie_len = 0;
 		} else {
-			/* Create a new cache and add it to the list */
+			                                               
 			tpcache = _MALLOC(sizeof(struct tcp_cache), M_TEMP,
 			    M_NOWAIT | M_ZERO);
 			if (tpcache == NULL) {
@@ -379,7 +379,7 @@ tcp_getcache_with_lock(struct tcp_cache_key_src *tcks,
 		goto out_null;
 	}
 
-	/* Update timestamp for garbage collection purposes */
+	                                                      
 	tpcache->tc_last_access = tcp_now;
 	*headarg = head;
 
@@ -417,7 +417,7 @@ tcp_cache_set_cookie_common(struct tcp_cache_key_src *tcks, u_char *cookie, uint
 	struct tcp_cache_head *head;
 	struct tcp_cache *tpcache;
 
-	/* Call lookup/create function */
+	                                 
 	tpcache = tcp_getcache_with_lock(tcks, 1, &head);
 	if (tpcache == NULL) {
 		return;
@@ -445,7 +445,7 @@ tcp_cache_get_cookie_common(struct tcp_cache_key_src *tcks, u_char *cookie, uint
 	struct tcp_cache_head *head;
 	struct tcp_cache *tpcache;
 
-	/* Call lookup/create function */
+	                                 
 	tpcache = tcp_getcache_with_lock(tcks, 1, &head);
 	if (tpcache == NULL) {
 		return 0;
@@ -456,10 +456,10 @@ tcp_cache_get_cookie_common(struct tcp_cache_key_src *tcks, u_char *cookie, uint
 		return 0;
 	}
 
-	/*
-	 * Not enough space - this should never happen as it has been checked
-	 * in tcp_tfo_check. So, fail here!
-	 */
+	  
+                                                                      
+                                    
+    
 	VERIFY(tpcache->tc_tfo_cookie_len <= *len);
 
 	memcpy(cookie, tpcache->tc_tfo_cookie, tpcache->tc_tfo_cookie_len);
@@ -470,14 +470,14 @@ tcp_cache_get_cookie_common(struct tcp_cache_key_src *tcks, u_char *cookie, uint
 	return 1;
 }
 
-/*
- * Get the cookie related to 'tp', and copy it into 'cookie', provided that len
- * is big enough (len designates the available memory.
- * Upon return, 'len' is set to the cookie's length.
- *
- * Returns 0 if we should request a cookie.
- * Returns 1 if the cookie has been found and written.
- */
+  
+                                                                               
+                                                      
+                                                    
+  
+                                           
+                                                      
+   
 int
 tcp_cache_get_cookie(struct tcpcb *tp, u_char *cookie, uint8_t *len)
 {
@@ -494,7 +494,7 @@ tcp_cache_get_cookie_len_common(struct tcp_cache_key_src *tcks)
 	struct tcp_cache *tpcache;
 	unsigned int cookie_len;
 
-	/* Call lookup/create function */
+	                                 
 	tpcache = tcp_getcache_with_lock(tcks, 1, &head);
 	if (tpcache == NULL) {
 		return 0;
@@ -537,20 +537,20 @@ tcp_heuristic_unlock(struct tcp_heuristics_head *head)
 	lck_mtx_unlock(&head->thh_mtx);
 }
 
-/*
- * Make sure that everything that happens after tcp_getheuristic_with_lock()
- * is short enough to justify that you hold the per-bucket lock!!!
- *
- * Otherwise, better build another lookup-function that does not hold the
- * lock and you copy out the bits and bytes.
- *
- * That's why we provide the head as a "return"-pointer so that the caller
- * can give it back to use for tcp_heur_unlock().
- *
- *
- * ToDo - way too much code-duplication. We should create an interface to handle
- * bucketized hashtables with recycling of the oldest element.
- */
+  
+                                                                            
+                                                                  
+  
+                                                                         
+                                            
+  
+                                                                          
+                                                 
+  
+  
+                                                                                
+                                                              
+   
 static struct tcp_heuristic *
 tcp_getheuristic_with_lock(struct tcp_cache_key_src *tcks,
     int create, struct tcp_heuristics_head **headarg)
@@ -566,7 +566,7 @@ tcp_getheuristic_with_lock(struct tcp_cache_key_src *tcks,
 
 	lck_mtx_lock(&head->thh_mtx);
 
-	/*** First step: Look for the tcp_heur in our bucket ***/
+	                                                         
 	SLIST_FOREACH(tpheur, &head->tcp_heuristics, list) {
 		if (memcmp(&tpheur->th_key, &key, sizeof(key)) == 0) {
 			break;
@@ -575,13 +575,13 @@ tcp_getheuristic_with_lock(struct tcp_cache_key_src *tcks,
 		i++;
 	}
 
-	/*** Second step: If it's not there, create/recycle it ***/
+	                                                           
 	if ((tpheur == NULL) && create) {
 		if (i >= TCP_CACHE_BUCKET_SIZE) {
 			struct tcp_heuristic *oldest_heur = NULL;
 			uint32_t max_age = 0;
 
-			/* Look for the oldest tcp_heur in the bucket */
+			                                                
 			SLIST_FOREACH(tpheur, &head->tcp_heuristics, list) {
 				uint32_t age = tcp_now - tpheur->th_last_access;
 				if (age > max_age) {
@@ -593,11 +593,11 @@ tcp_getheuristic_with_lock(struct tcp_cache_key_src *tcks,
 
 			tpheur = oldest_heur;
 
-			/* We recycle - set everything to 0 */
+			                                      
 			bzero(tpheur->th_val_start,
 			    tpheur->th_val_end - tpheur->th_val_start);
 		} else {
-			/* Create a new heuristic and add it to the list */
+			                                                   
 			tpheur = _MALLOC(sizeof(struct tcp_heuristic), M_TEMP,
 			    M_NOWAIT | M_ZERO);
 			if (tpheur == NULL) {
@@ -608,10 +608,10 @@ tcp_getheuristic_with_lock(struct tcp_cache_key_src *tcks,
 			SLIST_INSERT_HEAD(&head->tcp_heuristics, tpheur, list);
 		}
 
-		/*
-		 * Set to tcp_now, to make sure it won't be > than tcp_now in the
-		 * near future.
-		 */
+		  
+                                                                   
+                 
+     
 		tpheur->th_ecn_backoff = tcp_now;
 		tpheur->th_tfo_backoff_until = tcp_now;
 		tpheur->th_mptcp_backoff = tcp_now;
@@ -624,7 +624,7 @@ tcp_getheuristic_with_lock(struct tcp_cache_key_src *tcks,
 		goto out_null;
 	}
 
-	/* Update timestamp for garbage collection purposes */
+	                                                      
 	tpheur->th_last_access = tcp_now;
 	*headarg = head;
 
@@ -641,10 +641,10 @@ tcp_heuristic_reset_counters(struct tcp_cache_key_src *tcks, uint8_t flags)
 	struct tcp_heuristics_head *head;
 	struct tcp_heuristic *tpheur;
 
-	/*
-	 * Always create heuristics here because MPTCP needs to write success
-	 * into it. Thus, we always end up creating them.
-	 */
+	  
+                                                                      
+                                                  
+    
 	tpheur = tcp_getheuristic_with_lock(tcks, 1, &head);
 	if (tpheur == NULL) {
 		return;
@@ -699,7 +699,7 @@ tcp_heuristic_reset_counters(struct tcp_cache_key_src *tcks, uint8_t flags)
 			if (tpheur->th_mptcp_success == MPTCP_SUCCESS_TRIGGER) {
 				os_log(mptcp_log_handle, "%s disabling heuristics for 12 hours", __func__);
 				tpheur->th_mptcp_heuristic_disabled = 1;
-				/* Disable heuristics for 12 hours */
+				                                     
 				tpheur->th_mptcp_backoff = tcp_now + tcp_min_to_hz(tcp_ecn_timeout * 12);
 			}
 		}
@@ -765,7 +765,7 @@ __tcp_heuristic_tfo_middlebox_common(struct tcp_heuristic *tpheur)
 
 	tpheur->th_tfo_backoff_until = tcp_now + tpheur->th_tfo_backoff;
 
-	/* Then, increase the backoff time */
+	                                     
 	tpheur->th_tfo_backoff *= 2;
 
 	if (tpheur->th_tfo_backoff > tcp_min_to_hz(tcp_backoff_maximum)) {
@@ -804,7 +804,7 @@ tcp_heuristic_inc_counters(struct tcp_cache_key_src *tcks,
 		return;
 	}
 
-	/* Limit to prevent integer-overflow during exponential backoff */
+	                                                                  
 	if ((flags & TCPCACHE_F_TFO_DATA) && tpheur->th_tfo_data_loss < TCP_CACHE_OVERFLOW_PROTECT) {
 		tpheur->th_tfo_data_loss++;
 
@@ -859,10 +859,10 @@ tcp_heuristic_inc_counters(struct tcp_cache_key_src *tcks,
 	    tpheur->th_mptcp_heuristic_disabled == 0) {
 		tpheur->th_mptcp_loss++;
 		if (tpheur->th_mptcp_loss >= MPTCP_MAX_SYN_LOSS) {
-			/*
-			 * Yes, we take tcp_ecn_timeout, to avoid adding yet
-			 * another sysctl that is just used for testing.
-			 */
+			  
+                                                       
+                                                   
+      
 			tpheur->th_mptcp_backoff = tcp_now +
 			    (tcp_min_to_hz(tcp_ecn_timeout) <<
 			    (tpheur->th_mptcp_loss - MPTCP_MAX_SYN_LOSS));
@@ -1052,19 +1052,19 @@ tcp_heuristic_ecn_aggressive_common(struct tcp_cache_key_src *tcks)
 	}
 
 	if (TSTMP_GT(tpheur->th_ecn_backoff, tcp_now)) {
-		/* We are already in aggressive mode */
+		                                       
 		tcp_heuristic_unlock(head);
 		return;
 	}
 
-	/* Must be done before, otherwise we will start off with expo-backoff */
+	                                                                        
 	tpheur->th_ecn_backoff = tcp_now +
 	    (tcp_min_to_hz(tcp_ecn_timeout) << (tpheur->th_ecn_aggressive));
 
-	/*
-	 * Ugly way to prevent integer overflow... limit to prevent in
-	 * overflow during exp. backoff.
-	 */
+	  
+                                                               
+                                 
+    
 	if (tpheur->th_ecn_aggressive < TCP_CACHE_OVERFLOW_PROTECT) {
 		tpheur->th_ecn_aggressive++;
 	}
@@ -1094,7 +1094,7 @@ tcp_heuristic_do_tfo_common(struct tcp_cache_key_src *tcks)
 		return TRUE;
 	}
 
-	/* Get the tcp-heuristic. */
+	                            
 	tpheur = tcp_getheuristic_with_lock(tcks, 0, &head);
 	if (tpheur == NULL) {
 		return TRUE;
@@ -1131,12 +1131,12 @@ tcp_heuristic_do_tfo(struct tcpcb *tp)
 
 	return FALSE;
 }
-/*
- * @return:
- *         0	Enable MPTCP (we are still discovering middleboxes)
- *         -1	Enable MPTCP (heuristics have been temporarily disabled)
- *         1	Disable MPTCP
- */
+  
+           
+                                                                
+                                                                      
+                          
+   
 int
 tcp_heuristic_do_mptcp(struct tcpcb *tp)
 {
@@ -1152,7 +1152,7 @@ tcp_heuristic_do_mptcp(struct tcpcb *tp)
 
 	tcp_cache_key_src_create(tp, &tcks);
 
-	/* Get the tcp-heuristic. */
+	                            
 	tpheur = tcp_getheuristic_with_lock(&tcks, 0, &head);
 	if (tpheur == NULL) {
 		return 0;
@@ -1207,7 +1207,7 @@ tcp_heuristic_do_ecn_common(struct tcp_cache_key_src *tcks)
 		return TRUE;
 	}
 
-	/* Get the tcp-heuristic. */
+	                            
 	tpheur = tcp_getheuristic_with_lock(tcks, 0, &head);
 	if (tpheur == NULL) {
 		return ret;
@@ -1216,7 +1216,7 @@ tcp_heuristic_do_ecn_common(struct tcp_cache_key_src *tcks)
 	if (TSTMP_GT(tpheur->th_ecn_backoff, tcp_now)) {
 		ret = FALSE;
 	} else {
-		/* Reset the following counters to start re-evaluating */
+		                                                         
 		if (tpheur->th_ecn_droprst >= ECN_RETRY_LIMIT) {
 			tpheur->th_ecn_droprst = 0;
 		}
@@ -1227,7 +1227,7 @@ tcp_heuristic_do_ecn_common(struct tcp_cache_key_src *tcks)
 			tpheur->th_ecn_synrst = 0;
 		}
 
-		/* Make sure it follows along */
+		                                
 		tpheur->th_ecn_backoff = tcp_now;
 	}
 
@@ -1421,7 +1421,7 @@ sysctl_cleartfocache(void)
 	}
 }
 
-/* This sysctl is useful for testing purposes only */
+                                                     
 static int tcpcleartfo = 0;
 
 static int sysctl_cleartfo SYSCTL_HANDLER_ARGS
@@ -1438,11 +1438,11 @@ static int sysctl_cleartfo SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-	/*
-	 * The actual value does not matter. If the value is set, it triggers
-	 * the clearing of the TFO cache. If a future implementation does not
-	 * use the route entry to hold the TFO cache, replace the route sysctl.
-	 */
+	  
+                                                                      
+                                                                      
+                                                                        
+    
 
 	if (val != oldval) {
 		sysctl_cleartfocache();
@@ -1463,15 +1463,15 @@ tcp_cache_init(void)
 	uint64_t sane_size_meg = sane_size / 1024 / 1024;
 	int i;
 
-	/*
-	 * On machines with <100MB of memory this will result in a (full) cache-size
-	 * of 32 entries, thus 32 * 5 * 64bytes = 10KB. (about 0.01 %)
-	 * On machines with > 4GB of memory, we have a cache-size of 1024 entries,
-	 * thus about 327KB.
-	 *
-	 * Side-note: we convert to uint32_t. If sane_size is more than
-	 * 16000 TB, we loose precision. But, who cares? :)
-	 */
+	  
+                                                                             
+                                                               
+                                                                           
+                     
+   
+                                                                
+                                                    
+    
 	tcp_cache_size = tcp_cache_roundup2((uint32_t)(sane_size_meg >> 2));
 	if (tcp_cache_size < 32) {
 		tcp_cache_size = 32;

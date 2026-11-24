@@ -47,8 +47,8 @@
 #define IS_NONCOHERENT(type)    (MAPTYPE(type) == kNonCoherent)
 
 enum{
-	kWalkSyncIn       = 0x01,// bounce -> md
-	kWalkSyncOut      = 0x02,// bounce <- md
+	kWalkSyncIn       = 0x01,               
+	kWalkSyncOut      = 0x02,               
 	kWalkSyncAlways   = 0x04,
 	kWalkPreflight    = 0x08,
 	kWalkDoubleBuffer = 0x10,
@@ -64,7 +64,7 @@ enum{
 
 
 #if 1
-// no direction => OutIn
+                        
 #define SHOULD_COPY_DIR(op, direction)                                      \
 	((kIODirectionNone == (direction))                                  \
 	    || (kWalkSyncAlways & (op))                                     \
@@ -85,7 +85,7 @@ enum{
 #define LOGTAG          0x87654321
 #endif
 
-/**************************** class IODMACommand ***************************/
+                                                                             
 
 #undef super
 #define super IOCommand
@@ -272,7 +272,7 @@ IODMACommand::setSpecification(SegmentFunction        outSegFunc,
 		if (!numAddressBits) {
 			numAddressBits = 32;
 		} else if (numAddressBits > 32) {
-			return kIOReturnBadArgument;  // Wrong output function for bits
+			return kIOReturnBadArgument;                                   
 		}
 	}
 
@@ -281,10 +281,10 @@ IODMACommand::setSpecification(SegmentFunction        outSegFunc,
 	}
 
 	if (!maxSegmentSize) {
-		maxSegmentSize--;               // Set Max segment to -1
+		maxSegmentSize--;                                       
 	}
 	if (!maxTransferSize) {
-		maxTransferSize--;              // Set Max transfer to -1
+		maxTransferSize--;                                       
 	}
 	if (mapper && !OSDynamicCast(IOMapper, mapper)) {
 		device = mapper;
@@ -353,32 +353,32 @@ IODMACommand::free()
 
 	fMapper.reset();
 
-	// Correct use of this class when setting an IOMemoryDescriptor
-	// in fMemory via setMemoryDescriptor(desc) is, for the caller, to
-	// have a matching call to clearMemoryDescriptor() before releasing
-	// the object. The matching call has also the effect of releasing
-	// the ref taken on the IOMemoryDescriptor in setMemoryDescriptor().
-	//
-	// A number of "misbehaving" drivers has been found during testing,
-	// whereby a matching call to clearMemoryDescriptor() is missing:
-	//
-	// rdar://59947343
-	// rdar://59946968
-	//
-	// Both the approaches taken in said drivers are wrong, but have gone
-	// basically silent with fMemory being a regular pointer. With fMemory
-	// becoming a OSSharedPtr, the IODMACommand destructor expects to find
-	// either fMemory reset (through the call to clearMemoryDescriptor()) or
-	// a reference hold for the release.
-	//
-	// For this reason, this workaround of detaching fMemory is put in
-	// place here, choosing the leak over the panic for misbehaving
-	// drivers. Once all instances are fixed, this workaround will be
-	// removed.
-	//
-	// Note: all well behaving drivers that have matching calls for
-	// setMemoryDescriptor() and clearMemoryDescriptor() are unaffected
-	// since fMemory will be null at this point.
+	                                                               
+	                                                                  
+	                                                                   
+	                                                                 
+	                                                                    
+	  
+	                                                                   
+	                                                                 
+	  
+	                  
+	                  
+	  
+	                                                                     
+	                                                                      
+	                                                                      
+	                                                                        
+	                                    
+	  
+	                                                                  
+	                                                               
+	                                                                 
+	           
+	  
+	                                                               
+	                                                                   
+	                                            
 	fMemory.detach();
 
 	super::free();
@@ -399,9 +399,9 @@ IODMACommand::setMemoryDescriptor(const IOMemoryDescriptor *mem, bool autoPrepar
 	}
 
 	if (fMemory) {
-		// As we are almost certainly being called from a work loop thread
-		// if fActive is true it is probably not a good time to potentially
-		// block.  Just test for it and return an error
+		                                                                  
+		                                                                   
+		                                               
 		if (fActive) {
 			return kIOReturnBusy;
 		}
@@ -591,7 +591,7 @@ IODMACommand::segmentOp(
 					    (kWalkSyncIn & op) ? "->" : "<-",
 					    address, chunk, op);
 
-					if (kWalkSyncIn & op) { // cppvNoModSnk
+					if (kWalkSyncIn & op) {                
 						copypv(remapAddr, cpuAddr, (unsigned int) chunk,
 						    cppvPsnk | cppvFsnk | cppvPsrc | cppvNoRefSrc );
 					} else {
@@ -613,7 +613,7 @@ IODMACommand::segmentOp(
 OSSharedPtr<IOBufferMemoryDescriptor>
 IODMACommand::createCopyBuffer(IODirection direction, UInt64 length)
 {
-	mach_vm_address_t mask = 0xFFFFF000;    //state->fSourceAlignMask
+	mach_vm_address_t mask = 0xFFFFF000;                             
 	return IOBufferMemoryDescriptor::inTaskWithPhysicalMask(kernel_task,
 	           direction, length, mask);
 }
@@ -830,7 +830,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 	IOReturn                  ret = kIOReturnSuccess;
 	uint32_t       mappingOptions = fMappingOptions;
 
-	// check specification has been set
+	                                   
 	if (!fOutSeg) {
 		return kIOReturnNotReady;
 	}
@@ -920,7 +920,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 			    && mapArgs.fAllocLength
 			    && (mapArgs.fAllocLength != mapArgs.fLength)) {
 				do {
-					// multisegment case
+					                    
 					IOMDDMAWalkSegmentState  walkState;
 					IOMDDMAWalkSegmentArgs * walkArgs = (IOMDDMAWalkSegmentArgs *) (void *)&walkState;
 					IOOptionBits             mdOp;
@@ -964,7 +964,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 					if (LOGTAG == fMemory->getTag()) {
 						IOLog("DMA[%p] alloc 0x%qx, 0x%qx\n", this, mapArgs.fAlloc, mapArgs.fAllocLength);
 					}
-#endif /* defined(LOGTAG) */
+#endif                      
 
 					state->fMapSegments = IONewZero(IODMACommandMapSegment, segCount);
 					if (!state->fMapSegments) {
@@ -1001,7 +1001,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 						if (LOGTAG == fMemory->getTag()) {
 							IOLog("DMA[%p] phys[%d] 0x%qx, 0x%qx\n", this, segCount, (uint64_t) phys, (uint64_t) segLen);
 						}
-#endif /* defined(LOGTAG) */
+#endif                      
 
 						align = (phys & mapperPageMask);
 
@@ -1009,7 +1009,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 						if (LOGTAG == fMemory->getTag()) {
 							IOLog("DMA[%p] runs[%d] dmaoff 0x%qx, mapoff 0x%qx, align 0x%qx\n", this, segCount, index, insertOffset, align);
 						}
-#endif /* defined(LOGTAG) */
+#endif                      
 
 						assert(segCount < state->fMapSegmentsCount);
 						state->fMapSegments[segCount].fDMAOffset = state->fPreparedOffset + index;
@@ -1017,7 +1017,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 						state->fMapSegments[segCount].fPageOffset = align;
 						index  += segLen;
 
-						// segment page align
+						                     
 						segLen  = ((phys + segLen + mapperPageMask) & ~mapperPageMask);
 						phys   -= align;
 						segLen -= phys;
@@ -1028,7 +1028,7 @@ IODMACommand::prepare(UInt64 offset, UInt64 length, bool flushCache, bool synchr
 					if (LOGTAG == fMemory->getTag()) {
 						IOLog("IODMACommand fMapSegmentsCount %d\n", state->fMapSegmentsCount);
 					}
-#endif /* defined(LOGTAG) */
+#endif                      
 				} while (false);
 			}
 			if (kIOReturnSuccess == ret) {
@@ -1146,10 +1146,10 @@ IODMACommand::synchronize(IOOptionBits options)
 		if (state->fDoubleBuffer) {
 			return kIOReturnSuccess;
 		}
-		ret = complete(false /* invalidateCache */, true /* synchronize */);
+		ret = complete(false                      , true                  );
 		state->fCursor = false;
 		state->fForceDoubleBuffer = true;
-		ret = prepare(state->fPreparedOffset, state->fPreparedLength, false /* flushCache */, true /* synchronize */);
+		ret = prepare(state->fPreparedOffset, state->fPreparedLength, false                 , true                  );
 
 		return ret;
 	} else if (state->fCursor) {
@@ -1328,7 +1328,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 	maxPhys--;
 
 	while (internalState->fIOVMAddrValid || (state->fOffset < memLength)) {
-		// state = next seg
+		                   
 		if (!internalState->fIOVMAddrValid) {
 			IOReturn rtn;
 
@@ -1351,20 +1351,20 @@ IODMACommand::genIOVMSegments(uint32_t op,
 					uint64_t ind;
 					uint64_t off2Ind = internalState->fOffset2Index;
 
-					// Validate the previous offset
+					                               
 					if (offset
 					    && (offset == internalState->fNextOffset || off2Ind <= offset)) {
 						ind = internalState->fIndex;
 					} else {
-						ind = off2Ind = 0; // Start from beginning
+						ind = off2Ind = 0;                        
 					}
 #if defined(LOGTAG)
 					if (LOGTAG == fMemory->getTag()) {
 						IOLog("DMA[%p] offsets 0x%qx, 0x%qx, 0x%qx ind %qd\n", this, offset, internalState->fPreparedOffset, internalState->fNextOffset, ind);
 					}
-#endif /* defined(LOGTAG) */
+#endif                      
 
-					// Scan through iopl info blocks looking for block containing offset
+					                                                                    
 					while (ind < internalState->fMapSegmentsCount && offset >= internalState->fMapSegments[ind].fDMAOffset) {
 						ind++;
 					}
@@ -1373,16 +1373,16 @@ IODMACommand::genIOVMSegments(uint32_t op,
 					} else {
 						length = memLength;
 					}
-					length -= offset;       // Remainder within iopl
+					length -= offset;                               
 
-					// Go back to actual range as search goes past it
+					                                                 
 					ind--;
 					off2Ind = internalState->fMapSegments[ind].fDMAOffset;
 
-					// Subtract offset till this iopl in total list
+					                                               
 					runOffset = offset - off2Ind;
 
-					// Compute an offset relative to the mapped base
+					                                                
 
 					runOffset += internalState->fMapSegments[ind].fPageOffset;
 					address = internalState->fLocalMapperAllocBase + internalState->fMapSegments[ind].fMapOffset + runOffset;
@@ -1390,7 +1390,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 					if (LOGTAG == fMemory->getTag()) {
 						IOLog("DMA[%p] addrlen 0x%qx, 0x%qx\n", this, address, length);
 					}
-#endif /* defined(LOGTAG) */
+#endif                      
 
 					state->fIOVMAddr = address;
 					state->fLength   = length;
@@ -1446,13 +1446,13 @@ IODMACommand::genIOVMSegments(uint32_t op,
 					internalState->fIOVMAddrValid = state->fIOVMAddr = 0;
 				}
 			} else if (rtn == kIOReturnOverrun) {
-				internalState->fIOVMAddrValid = state->fIOVMAddr = state->fLength = 0; // At end
+				internalState->fIOVMAddrValid = state->fIOVMAddr = state->fLength = 0;          
 			} else {
 				return rtn;
 			}
 		}
 
-		// seg = state, offset = end of seg
+		                                   
 		if (!curSegValid) {
 			UInt64 length                 = state->fLength;
 			offset                       += length;
@@ -1463,7 +1463,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 		}
 
 		if (!internalState->fIOVMAddrValid) {
-			// maxPhys
+			          
 			if ((kWalkClient & op) && (curSeg.fIOVMAddr + curSeg.fLength - 1) > maxPhys) {
 				if (internalState->fCursor) {
 					curSegValid = curSeg.fIOVMAddr = 0;
@@ -1519,10 +1519,10 @@ IODMACommand::genIOVMSegments(uint32_t op,
 				}
 			}
 
-			// reduce size of output segment
+			                                
 			uint64_t reduce, leftover = 0;
 
-			// fMaxSegmentSize
+			                  
 			if (curSeg.fLength > fMaxSegmentSize) {
 				leftover      += curSeg.fLength - fMaxSegmentSize;
 				curSeg.fLength = fMaxSegmentSize;
@@ -1530,7 +1530,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 				internalState->fIOVMAddrValid = true;
 			}
 
-			// alignment current length
+			                           
 
 			reduce = (curSeg.fLength & fAlignMaskLength);
 			if (reduce && (curSeg.fLength > reduce)) {
@@ -1540,7 +1540,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 				internalState->fIOVMAddrValid = true;
 			}
 
-			// alignment next address
+			                         
 
 			reduce = (state->fIOVMAddr & fAlignMaskInternalSegments);
 			if (reduce && (curSeg.fLength > reduce)) {
@@ -1558,7 +1558,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 				offset          -= leftover;
 			}
 
-			//
+			  
 
 			if (internalState->fCursor) {
 				bool misaligned;
@@ -1583,7 +1583,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 			if (offset >= memLength) {
 				curSeg.fLength   -= (offset - memLength);
 				offset = memLength;
-				internalState->fIOVMAddrValid = state->fIOVMAddr = state->fLength = 0; // At end
+				internalState->fIOVMAddrValid = state->fIOVMAddr = state->fLength = 0;          
 				break;
 			}
 		}
@@ -1596,7 +1596,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 			if ((LOGTAG == fMemory->getTag()) && (kWalkClient == op)) {
 				IOLog("DMA[%p] outseg 0x%qx, 0x%qx\n", this, curSeg.fIOVMAddr, curSeg.fLength);
 			}
-#endif /* defined(LOGTAG) */
+#endif                      
 			ret = (*outSegFunc)(reference, this, curSeg, segmentsP, segIndex++);
 			curSegValid = curSeg.fIOVMAddr = 0;
 			if (kIOReturnSuccess != ret) {
@@ -1610,7 +1610,7 @@ IODMACommand::genIOVMSegments(uint32_t op,
 		if ((LOGTAG == fMemory->getTag()) && (kWalkClient == op)) {
 			IOLog("DMA[%p] outseg 0x%qx, 0x%qx\n", this, curSeg.fIOVMAddr, curSeg.fLength);
 		}
-#endif /* defined(LOGTAG) */
+#endif                      
 		ret = (*outSegFunc)(reference, this, curSeg, segmentsP, segIndex++);
 	}
 

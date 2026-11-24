@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-#include <sys/param.h>  /* for definition of NULL */
+#include <sys/param.h>                              
 #include <sys/errno.h>
 #include <sys/malloc.h>
 #include <sys/socket.h>
@@ -54,13 +54,13 @@
 
 #include <stdbool.h>
 
-/*
- * kipf_lock and kipf_ref protect the linkage of the list of IP filters
- * An IP filter can be removed only when kipf_ref is zero
- * If an IP filter cannot be removed because kipf_ref is not null, then
- * the IP filter is marjed and kipf_delayed_remove is set so that when
- * kipf_ref eventually goes down to zero, the IP filter is removed
- */
+  
+                                                                       
+                                                         
+                                                                       
+                                                                      
+                                                                  
+   
 decl_lck_mtx_data(static, kipf_lock_data);
 static lck_mtx_t *kipf_lock = &kipf_lock_data;
 static u_int32_t kipf_ref = 0;
@@ -117,7 +117,7 @@ ipf_unref(void)
 				lck_mtx_unlock(kipf_lock);
 				ipf_detach(cookie);
 				lck_mtx_lock(kipf_lock);
-				/* In case some filter got to run while we released the lock */
+				                                                               
 				if (kipf_ref != 0) {
 					break;
 				}
@@ -160,7 +160,7 @@ ipf_add(
 
 	*filter_ref = (ipfilter_t)new_filter;
 
-	/* This will force TCP to re-evaluate its use of TSO */
+	                                                       
 	OSAddAtomic(1, &kipf_count);
 	routegenid_update();
 
@@ -206,7 +206,7 @@ ipf_input_detached(void *cookie, mbuf_t *data, int offset, u_int8_t protocol)
 
 #if DEBUG
 	printf("ipf_input_detached\n");
-#endif /* DEBUG */
+#endif            
 
 	return 0;
 }
@@ -218,7 +218,7 @@ ipf_output_detached(void *cookie, mbuf_t *data, ipf_pktopts_t options)
 
 #if DEBUG
 	printf("ipf_output_detached\n");
-#endif /* DEBUG */
+#endif            
 
 	return 0;
 }
@@ -242,9 +242,9 @@ ipf_remove(
 			ipf_detach_func ipf_detach = match->ipf_filter.ipf_detach;
 			void* cookie = match->ipf_filter.cookie;
 
-			/*
-			 * Cannot detach when they are filters running
-			 */
+			  
+                                                 
+      
 			if (kipf_ref) {
 				kipf_delayed_remove++;
 				TAILQ_INSERT_TAIL(&tbr_filters, match, ipf_tbr);
@@ -262,7 +262,7 @@ ipf_remove(
 				}
 				FREE(match, M_IFADDR);
 
-				/* This will force TCP to re-evaluate its use of TSO */
+				                                                       
 				OSAddAtomic(-1, &kipf_count);
 				routegenid_update();
 			}
@@ -309,9 +309,9 @@ ipf_inject_input(
 	}
 
 	if (filter_ref == 0 && m->m_pkthdr.rcvif == 0) {
-		/*
-		 * Search for interface with the local address
-		 */
+		  
+                                                
+     
 		switch (proto) {
 		case PF_INET:
 			pkt_dst = &ip->ip_dst;
@@ -342,9 +342,9 @@ ipf_inject_input(
 			break;
 		}
 
-		/*
-		 * If none found, fallback to loopback
-		 */
+		  
+                                        
+     
 		if (m->m_pkthdr.rcvif == NULL) {
 			m->m_pkthdr.rcvif = lo_ifp;
 		}
@@ -390,7 +390,7 @@ ipf_injectv4_out(mbuf_t data, ipfilter_t filter_ref, ipf_pktopts_t options)
 	ipoa.ipoa_sotc = SO_TC_UNSPEC;
 	ipoa.ipoa_netsvctype = _NET_SERVICE_TYPE_UNSPEC;
 
-	/* Make the IP header contiguous in the mbuf */
+	                                               
 	if ((size_t)m->m_len < sizeof(struct ip)) {
 		m = m_pullup(m, sizeof(struct ip));
 		if (m == NULL) {
@@ -442,18 +442,18 @@ ipf_injectv4_out(mbuf_t data, ipfilter_t filter_ref, ipf_pktopts_t options)
 
 	bzero(&ro, sizeof(struct route));
 
-	/* Put ip_len and ip_off in host byte order, ip_output expects that */
+	                                                                      
 
 #if BYTE_ORDER != BIG_ENDIAN
 	NTOHS(ip->ip_len);
 	NTOHS(ip->ip_off);
 #endif
 
-	/* Send; enforce source interface selection via IP_OUTARGS flag */
+	                                                                  
 	error = ip_output(m, NULL, &ro,
 	    IP_ALLOWBROADCAST | IP_RAWOUTPUT | IP_OUTARGS, imo, &ipoa);
 
-	/* Release the route */
+	                       
 	ROUTE_RELEASE(&ro);
 
 	if (imo != NULL) {
@@ -479,7 +479,7 @@ ipf_injectv6_out(mbuf_t data, ipfilter_t filter_ref, ipf_pktopts_t options)
 	ip6oa.ip6oa_sotc = SO_TC_UNSPEC;
 	ip6oa.ip6oa_netsvctype = _NET_SERVICE_TYPE_UNSPEC;
 
-	/* Make the IP header contiguous in the mbuf */
+	                                               
 	if ((size_t)m->m_len < sizeof(struct ip6_hdr)) {
 		m = m_pullup(m, sizeof(struct ip6_hdr));
 		if (m == NULL) {
@@ -531,14 +531,14 @@ ipf_injectv6_out(mbuf_t data, ipfilter_t filter_ref, ipf_pktopts_t options)
 
 	bzero(&ro, sizeof(struct route_in6));
 
-	/*
-	 * Send  mbuf and ifscope information. Check for correctness
-	 * of ifscope information is done while searching for a route in
-	 * ip6_output.
-	 */
+	  
+                                                             
+                                                                 
+               
+    
 	error = ip6_output(m, NULL, &ro, IPV6_OUTARGS, im6o, NULL, &ip6oa);
 
-	/* Release the route */
+	                       
 	ROUTE_RELEASE(&ro);
 
 	if (im6o != NULL) {
@@ -558,7 +558,7 @@ ipf_inject_output(
 	u_int8_t        vers;
 	errno_t         error = 0;
 
-	/* Make one byte of the header contiguous in the mbuf */
+	                                                        
 	if (m->m_len < 1) {
 		m = m_pullup(m, 1);
 		if (m == NULL) {

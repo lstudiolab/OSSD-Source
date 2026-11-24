@@ -56,6 +56,6 @@ typedef struct panic_phys_range {
 boolean_t panic_phys_range_before(const void *addr, uint64_t *pphys,
     panic_phys_range_t *range);
 
-#endif // XNU_KERNEL_PRIVATE
+#endif                      
 
-#endif // PANICHOOKS_H_
+#endif                 

@@ -70,7 +70,7 @@ def _showStructPacking(ctx, symbol, begin_offset=0, symsize=0, typedef=None, out
 
     if not outerSize or outerSize == sym_size:
         outstr = format_offset(begin_offset, sym_size)
-    elif outerSize < sym_size: # happens with c++ inheritance
+    elif outerSize < sym_size:                               
         outstr = format_offset(begin_offset, outerSize)
     else:
         outstr = O.format("{:s}{VT.DarkRed}{{{:s}}}{VT.Default}",
@@ -222,4 +222,4 @@ def showStructInfo(cmd_args=None, cmd_options={}, O=None):
 
     _showStructPacking(ctx, sym, 0)
 
-# EndMacro: showstructinto
+                          

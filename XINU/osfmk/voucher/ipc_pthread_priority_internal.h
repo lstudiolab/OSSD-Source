@@ -34,4 +34,4 @@
 extern void ipc_pthread_priority_init(void);
 
 
-#endif /* _VOUCHER_IPC_PTHREAD_PRIORITY_INTERNAL_H_ */
+#endif                                                

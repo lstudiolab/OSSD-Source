@@ -72,7 +72,7 @@ typedef struct {
 	mach_msg_header_t   header;
 	mach_msg_body_t     body;
 	mach_msg_port_descriptor_t port_descriptor;
-	mach_msg_trailer_t  trailer;            // subtract this when sending
+	mach_msg_trailer_t  trailer;                                         
 } ipc_complex_message;
 
 struct args {
@@ -94,7 +94,7 @@ parse_args(struct args *args)
 	args->server_port = MACH_PORT_NULL;
 }
 
-/* Create a mach IPC listener which will respond to the client's message */
+                                                                           
 void
 server_setup(struct args *args)
 {
@@ -142,7 +142,7 @@ exception_server_thread(void *arg)
 	mach_port_t exc_port = *(mach_port_t *)arg;
 	T_EXPECT_NE(exc_port, MACH_PORT_NULL, "exception port is not null");
 
-	/* Handle exceptions on exc_port */
+	                                   
 	kr = mach_msg_server(mach_exc_server, 4096, exc_port, 0);
 	T_EXPECT_MACH_SUCCESS(kr, "mach_msg_server");
 
@@ -167,28 +167,28 @@ T_DECL(catch_exception, "Send guard port descriptor to another process", T_META_
 
 	T_LOG("Check if task_exc_guard exception has been enabled\n");
 	sysctlbyname("kern.task_exc_guard_default", &task_exc_guard, &te_size, NULL, 0);
-	//TODO: check if sysctlbyname is successful
+	                                           
 
-	/* Create the bootstrap port */
+	                               
 	parse_args(server_args);
 	server_setup(server_args);
 
-	/* Create the exception port for the server */
+	                                              
 	mach_port_t exc_port = create_exception_port();
 	T_EXPECT_NOTNULL(exc_port, "Create a new exception port");
 
 	pthread_t s_exc_thread;
 
-	/* Create exception serving thread */
+	                                     
 	int ret = pthread_create(&s_exc_thread, NULL, exception_server_thread, &exc_port);
 	T_EXPECT_POSIX_SUCCESS(ret, "pthread_create exception_server_thread");
 
-	/* Get current exception ports */
+	                                 
 	kr = task_get_exception_ports(task, EXC_MASK_GUARD, &mask,
 	    &maskCount, &handler, &behavior, &flavor);
 	T_EXPECT_MACH_SUCCESS(kr, "task_get_exception_ports");
 
-	/* Initialize posix_spawn attributes */
+	                                       
 	posix_spawnattr_init(&attrs);
 
 	int err = posix_spawnattr_setexceptionports_np(&attrs, EXC_MASK_GUARD, exc_port,
@@ -202,7 +202,7 @@ T_DECL(catch_exception, "Send guard port descriptor to another process", T_META_
 	T_EXPECT_POSIX_SUCCESS(err, "posix_spawn immovable_send_client");
 
 	int child_status;
-	/* Wait for child and check for exception */
+	                                            
 	if (-1 == wait4(-1, &child_status, 0, NULL)) {
 		T_FAIL("wait4: child mia");
 	}

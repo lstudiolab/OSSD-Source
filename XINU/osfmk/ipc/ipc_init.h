@@ -28,38 +28,38 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * HISTORY
- *
- * Revision 1.1.1.1  1998/09/22 21:05:29  wsanchez
- * Import of Mac OS X kernel (~semeria)
- *
- * Revision 1.1.1.1  1998/03/07 02:26:15  wsanchez
- * Import of OSF Mach kernel (~mburg)
- *
- * Revision 1.1.6.1  1994/09/23  02:07:56  ezf
- *      change marker to not FREE
- *      [1994/09/22  21:29:04  ezf]
- *
- * Revision 1.1.2.4  1993/07/22  16:16:03  rod
- *      Add ANSI prototypes.  CR #9523.
- *      [1993/07/22  13:29:57  rod]
- *
- * Revision 1.1.2.3  1993/06/07  22:10:25  jeffc
- *      CR9176 - ANSI C violations: trailing tokens on CPP
- *      directives, extra semicolons after decl_ ..., asm keywords
- *      [1993/06/07  19:01:24  jeffc]
- *
- * Revision 1.1.2.2  1993/06/02  23:31:04  jeffc
- *      Added to OSF/1 R1.3 from NMK15.0.
- *      [1993/06/02  21:09:31  jeffc]
- *
- * Revision 1.1  1992/09/30  02:28:50  robert
- *      Initial revision
- *
- * $EndLog$
- */
-/* CMU_HIST */
+  
+          
+  
+                                                  
+                                       
+  
+                                                  
+                                     
+  
+                                              
+                                 
+                                   
+  
+                                              
+                                       
+                                   
+  
+                                                
+                                                          
+                                                                  
+                                     
+  
+                                                
+                                         
+                                     
+  
+                                             
+                        
+  
+           
+   
+              
 /*
  * Revision 2.4  91/05/14  16:32:45  mrt
  *      Correcting copyright
@@ -73,7 +73,7 @@
  *      [90/03/26  20:55:26  rpd]
  *
  */
-/* CMU_ENDHIST */
+                 
 /*
  * Mach Operating System
  * Copyright (c) 1991,1990,1989 Carnegie Mellon University
@@ -99,24 +99,24 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_init.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Declarations of functions to initialize the IPC system.
- */
+  
+   
+  
+                       
+                      
+             
+  
+                                                          
+   
 
 #ifndef _IPC_IPC_INIT_H_
 #define _IPC_IPC_INIT_H_
 
-/*
- * Exported interfaces
- */
+  
+                      
+   
 
-/* IPC initialization dependent on thread call support */
+                                                         
 extern void ipc_thread_call_init(void);
 
-#endif  /* _IPC_IPC_INIT_H_ */
+#endif                        

@@ -27,10 +27,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/*
- * A simple allocator on a top of a plain byte array. Primarily intended to
- * support OS kernel logging in order to avoid dependency to VM.
- */
+  
+                                                                           
+                                                                
+   
 typedef struct logmem_s {
 	lck_spin_t *lm_lock;
 	uint8_t     *lm_mem;
@@ -44,13 +44,13 @@ typedef struct logmem_s {
 	uint32_t    lm_cnt_free;
 } logmem_t;
 
-/*
- * Static initializer for global instances of logmem. Size order defines the
- * total amount of logmem memory, the min and max order set the minimum and the
- * maximum size respectively of the memory allocatable by the given logmem.
- * Local or dynamically allocated instances of logmem should not be initialized
- * by this macro.
- */
+  
+                                                                            
+                                                                               
+                                                                           
+                                                                               
+                 
+   
 #define LOGMEM_STATIC_INIT(name, size_order, min_order, max_order) \
     SIMPLE_LOCK_DECLARE(name##_lck, 0); \
     logmem_t name = { \
@@ -63,22 +63,22 @@ typedef struct logmem_s {
 	.lm_cnt_free = (1 << (size_order)) \
     };
 
-/*
- * Allocates memory from a respective logmem. Returns a pointer to the beginning
- * of the allocated block. The resulting size of the allocated block is equal or
- * bigger than the size passed in during the call.
- */
+  
+                                                                                
+                                                                                
+                                                  
+   
 void *logmem_alloc(logmem_t *, size_t *);
 
-/*
- * Frees memory previously allocated by logmem_alloc(). The caller must call
- * logmem_free() with exact pointer and size value returned by logmem_alloc().
- */
+  
+                                                                            
+                                                                              
+   
 void logmem_free(logmem_t *, void *, size_t);
 
-/*
- * Returns the maximum memory size allocatable by the logmem.
- */
+  
+                                                             
+   
 size_t logmem_max_size(const logmem_t *);
 
-#endif /* log_mem_h */
+#endif                

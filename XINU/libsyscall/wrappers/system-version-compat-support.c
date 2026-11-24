@@ -29,13 +29,13 @@
 
 #if TARGET_OS_OSX && !defined(__i386__)
 
-/*
- * Support for the open compatibilty shim for macOS. These NULL
- * function pointers need to be built into libsyscall_static. They
- * are hooked up to the actual functions from libsyscall_dynamic
- * if/when they are used (generally only for older binaries where we
- * need to shim the version information).
- */
+  
+                                                               
+                                                                  
+                                                                
+                                                                    
+                                         
+   
 
 #include "system-version-compat-support.h"
 #include <stdbool.h>
@@ -51,4 +51,4 @@ int (*system_version_compat_open_shim)(int opened_fd, int openat_fd, const char 
     int (*close_syscall)(int), int (*open_syscall)(const char *, int, mode_t),
     int (*openat_syscall)(int, const char *, int, mode_t),
     int (*fcntl_syscall)(int, int, long)) = NULL;
-#endif /* TARGET_OS_OSX && && !defined(__i386__) */
+#endif                                             

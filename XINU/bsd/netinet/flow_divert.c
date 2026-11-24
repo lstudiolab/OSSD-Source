@@ -69,7 +69,7 @@
 #include <corecrypto/cc.h>
 #if CONTENT_FILTER
 #include <net/content_filter.h>
-#endif /* CONTENT_FILTER */
+#endif                     
 
 #define FLOW_DIVERT_CONNECT_STARTED             0x00000001
 #define FLOW_DIVERT_READ_CLOSED                 0x00000002
@@ -294,7 +294,7 @@ flow_divert_pcb_insert(struct flow_divert_pcb *fd_cb, uint32_t ctl_unit)
 
 	if (exist == NULL) {
 		fd_cb->group = group;
-		FDRETAIN(fd_cb);                /* The group now has a reference */
+		FDRETAIN(fd_cb);                                                   
 	} else {
 		fd_cb->hash = 0;
 		error = EEXIST;
@@ -319,7 +319,7 @@ flow_divert_pcb_create(socket_t so)
 	new_pcb->so = so;
 	new_pcb->log_level = nil_pcb.log_level;
 
-	FDRETAIN(new_pcb);      /* Represents the socket's reference */
+	FDRETAIN(new_pcb);                                             
 
 	return new_pcb;
 }
@@ -354,7 +354,7 @@ flow_divert_pcb_remove(struct flow_divert_pcb *fd_cb)
 		FDLOG(LOG_INFO, fd_cb, "Removing from group %d, ref count = %d", group->ctl_unit, fd_cb->ref_count);
 		RB_REMOVE(fd_pcb_tree, &group->pcb_tree, fd_cb);
 		fd_cb->group = NULL;
-		FDRELEASE(fd_cb);                               /* Release the group's reference */
+		FDRELEASE(fd_cb);                                                                  
 		lck_rw_done(&group->lck);
 	}
 }
@@ -374,7 +374,7 @@ flow_divert_packet_init(struct flow_divert_pcb *fd_cb, uint8_t packet_type, mbuf
 	hdr.packet_type = packet_type;
 	hdr.conn_id = htonl(fd_cb->hash);
 
-	/* Lay down the header */
+	                         
 	error = mbuf_copyback(*packet, 0, sizeof(hdr), &hdr, MBUF_DONTWAIT);
 	if (error) {
 		FDLOG(LOG_ERR, fd_cb, "mbuf_copyback(hdr) failed: %d", error);
@@ -552,7 +552,7 @@ flow_divert_packet_verify_hmac(mbuf_t packet, uint32_t ctl_unit)
 		goto done;
 	}
 
-	/* Chop off the HMAC TLV */
+	                           
 	error = mbuf_split(packet, hmac_offset, MBUF_WAITOK, &tail);
 	if (error) {
 		goto done;
@@ -676,7 +676,7 @@ flow_divert_update_closed_state(struct flow_divert_pcb *fd_cb, int how, Boolean 
 		fd_cb->flags |= FLOW_DIVERT_WRITE_CLOSED;
 		if (tunnel || !(fd_cb->flags & FLOW_DIVERT_CONNECT_STARTED)) {
 			fd_cb->flags |= FLOW_DIVERT_TUNNEL_WR_CLOSED;
-			/* If the tunnel is not accepting writes any more, then flush the send buffer */
+			                                                                                
 			sbflush(&fd_cb->so->so_snd);
 		}
 	}
@@ -755,31 +755,31 @@ flow_divert_trie_insert(struct flow_divert_trie *trie, uint16_t string_start, si
 		string_remainder = string_end - string_idx;
 
 		if (node_idx < (TRIE_NODE(trie, current).start + TRIE_NODE(trie, current).length)) {
-			/*
-			 * We did not reach the end of the current node's string.
-			 * We need to split the current node into two:
-			 *   1. A new node that contains the prefix of the node that matches
-			 *      the prefix of the string being inserted.
-			 *   2. The current node modified to point to the remainder
-			 *      of the current node's string.
-			 */
+			  
+                                                            
+                                                 
+                                                                       
+                                                   
+                                                              
+                                        
+      
 			uint16_t prefix = trie_node_alloc(trie);
 			if (prefix == NULL_TRIE_IDX) {
 				FDLOG0(LOG_ERR, &nil_pcb, "Ran out of trie nodes while splitting an existing node");
 				return NULL_TRIE_IDX;
 			}
 
-			/*
-			 * Prefix points to the portion of the current nodes's string that has matched
-			 * the input string thus far.
-			 */
+			  
+                                                                                 
+                                
+      
 			TRIE_NODE(trie, prefix).start = TRIE_NODE(trie, current).start;
 			TRIE_NODE(trie, prefix).length = (node_idx - TRIE_NODE(trie, current).start);
 
-			/*
-			 * Prefix has the current node as the child corresponding to the first byte
-			 * after the split.
-			 */
+			  
+                                                                              
+                      
+      
 			TRIE_NODE(trie, prefix).child_map = trie_child_map_alloc(trie);
 			if (TRIE_NODE(trie, prefix).child_map == NULL_TRIE_IDX) {
 				FDLOG0(LOG_ERR, &nil_pcb, "Ran out of child maps while splitting an existing node");
@@ -787,31 +787,31 @@ flow_divert_trie_insert(struct flow_divert_trie *trie, uint16_t string_start, si
 			}
 			TRIE_CHILD(trie, prefix, TRIE_BYTE(trie, node_idx)) = current;
 
-			/* Parent has the prefix as the child correspoding to the first byte in the prefix */
+			                                                                                     
 			TRIE_CHILD(trie, parent, TRIE_BYTE(trie, TRIE_NODE(trie, prefix).start)) = prefix;
 
-			/* Current node is adjusted to point to the remainder */
+			                                                        
 			TRIE_NODE(trie, current).start = node_idx;
 			TRIE_NODE(trie, current).length -= TRIE_NODE(trie, prefix).length;
 
-			/* We want to insert the new leaf (if any) as a child of the prefix */
+			                                                                      
 			current = prefix;
 		}
 
 		if (string_remainder > 0) {
-			/*
-			 * We still have bytes in the string that have not been matched yet.
-			 * If the current node has children, iterate to the child corresponding
-			 * to the next byte in the string.
-			 */
+			  
+                                                                       
+                                                                          
+                                     
+      
 			if (TRIE_NODE(trie, current).child_map != NULL_TRIE_IDX) {
 				child = TRIE_CHILD(trie, current, TRIE_BYTE(trie, string_idx));
 			}
 		}
-	} /* while (child != NULL_TRIE_IDX) */
+	}                                     
 
 	if (string_remainder > 0) {
-		/* Add a new leaf containing the remainder of the string */
+		                                                           
 		uint16_t leaf = trie_node_alloc(trie);
 		if (leaf == NULL_TRIE_IDX) {
 			FDLOG0(LOG_ERR, &nil_pcb, "Ran out of trie nodes while inserting a new leaf");
@@ -825,7 +825,7 @@ flow_divert_trie_insert(struct flow_divert_trie *trie, uint16_t string_start, si
 		}
 		TRIE_NODE(trie, leaf).length = string_remainder;
 
-		/* Set the new leaf as the child of the current node */
+		                                                       
 		if (TRIE_NODE(trie, current).child_map == NULL_TRIE_IDX) {
 			TRIE_NODE(trie, current).child_map = trie_child_map_alloc(trie);
 			if (TRIE_NODE(trie, current).child_map == NULL_TRIE_IDX) {
@@ -835,7 +835,7 @@ flow_divert_trie_insert(struct flow_divert_trie *trie, uint16_t string_start, si
 		}
 		TRIE_CHILD(trie, current, TRIE_BYTE(trie, TRIE_NODE(trie, leaf).start)) = leaf;
 		current = leaf;
-	} /* else duplicate or this string is a prefix of one of the existing strings */
+	}                                                                               
 
 	return current;
 }
@@ -860,10 +860,10 @@ flow_divert_trie_search(struct flow_divert_trie *trie, const uint8_t *string_byt
 
 		if (node_idx == node_end) {
 			if (string_bytes[string_idx] == '\0') {
-				return current; /* Got an exact match */
+				return current;                         
 			} else if (string_idx == strlen(APPLE_WEBCLIP_ID_PREFIX) &&
 			    0 == strncmp((const char *)string_bytes, APPLE_WEBCLIP_ID_PREFIX, string_idx)) {
-				return current; /* Got an apple webclip id prefix match */
+				return current;                                           
 			} else if (TRIE_NODE(trie, current).child_map != NULL_TRIE_IDX) {
 				next = TRIE_CHILD(trie, current, string_bytes[string_idx]);
 			}
@@ -885,11 +885,11 @@ static int
 flow_divert_find_proc_by_uuid_callout(proc_t p, void *arg)
 {
 	struct uuid_search_info *info = (struct uuid_search_info *)arg;
-	int result = PROC_RETURNED_DONE; /* By default, we didn't find the process */
+	int result = PROC_RETURNED_DONE;                                             
 
 	if (info->found_signing_id != NULL) {
 		if (!info->found_multiple_signing_ids) {
-			/* All processes that were found had the same signing identifier, so just claim this first one and be done. */
+			                                                                                                              
 			info->found_proc = p;
 			result = PROC_CLAIMED_DONE;
 		} else {
@@ -1001,10 +1001,10 @@ flow_divert_add_proc_info(struct flow_divert_pcb *fd_cb, proc_t proc, const char
 		goto done;
 	}
 
-	/*
-	 * If signing_id is not NULL then it came from the flow divert token and will be added
-	 * as part of the token, so there is no need to add it here.
-	 */
+	  
+                                                                                       
+                                                             
+    
 	if (signing_id == NULL && proc_cs_id != NULL) {
 		error = flow_divert_packet_append_tlv(connect_packet,
 		    (is_effective ? FLOW_DIVERT_TLV_SIGNING_ID : FLOW_DIVERT_TLV_APP_REAL_SIGNING_ID),
@@ -1450,23 +1450,23 @@ flow_divert_tunnel_how_closed(struct flow_divert_pcb *fd_cb)
 	return -1;
 }
 
-/*
- * Determine what close messages if any need to be sent to the tunnel. Returns TRUE if the tunnel is closed for both reads and
- * writes. Returns FALSE otherwise.
- */
+  
+                                                                                                                              
+                                   
+   
 static void
 flow_divert_send_close_if_needed(struct flow_divert_pcb *fd_cb)
 {
 	int             how             = -1;
 
-	/* Do not send any close messages if there is still data in the send buffer */
+	                                                                              
 	if (fd_cb->so->so_snd.sb_cc == 0) {
 		if ((fd_cb->flags & (FLOW_DIVERT_READ_CLOSED | FLOW_DIVERT_TUNNEL_RD_CLOSED)) == FLOW_DIVERT_READ_CLOSED) {
-			/* Socket closed reads, but tunnel did not. Tell tunnel to close reads */
+			                                                                         
 			how = SHUT_RD;
 		}
 		if ((fd_cb->flags & (FLOW_DIVERT_WRITE_CLOSED | FLOW_DIVERT_TUNNEL_WR_CLOSED)) == FLOW_DIVERT_WRITE_CLOSED) {
-			/* Socket closed writes, but tunnel did not. Tell tunnel to close writes */
+			                                                                           
 			if (how == SHUT_RD) {
 				how = SHUT_RDWR;
 			} else {
@@ -1478,7 +1478,7 @@ flow_divert_send_close_if_needed(struct flow_divert_pcb *fd_cb)
 	if (how != -1) {
 		FDLOG(LOG_INFO, fd_cb, "sending close, how = %d", how);
 		if (flow_divert_send_close(fd_cb, how) != ENOBUFS) {
-			/* Successfully sent the close packet. Record the ways in which the tunnel has been closed */
+			                                                                                             
 			if (how != SHUT_RD) {
 				fd_cb->flags |= FLOW_DIVERT_TUNNEL_WR_CLOSED;
 			}
@@ -1556,7 +1556,7 @@ flow_divert_send_buffered_data(struct flow_divert_pcb *fd_cb, Boolean force)
 		return;
 	}
 
-	/* Ignore the send window if force is enabled */
+	                                                
 	if (!force && (to_send > fd_cb->send_window)) {
 		to_send = fd_cb->send_window;
 	}
@@ -1599,7 +1599,7 @@ flow_divert_send_buffered_data(struct flow_divert_pcb *fd_cb, Boolean force)
 
 			m = buffer;
 			if (toaddr != NULL) {
-				/* look for data in the chain */
+				                                
 				do {
 					m = m->m_next;
 					if (m != NULL && m->m_type == MT_DATA) {
@@ -1607,7 +1607,7 @@ flow_divert_send_buffered_data(struct flow_divert_pcb *fd_cb, Boolean force)
 					}
 				} while (m);
 				if (m == NULL) {
-					/* unexpected */
+					                
 					FDLOG0(LOG_ERR, fd_cb, "failed to find type MT_DATA in the mbuf chain.");
 					goto move_on;
 				}
@@ -1658,7 +1658,7 @@ flow_divert_send_app_data(struct flow_divert_pcb *fd_cb, mbuf_t data, struct soc
 	}
 
 	if (fd_cb->so->so_snd.sb_cc > 0) {
-		to_send = 0;    /* If the send buffer is non-empty, then we can't send anything */
+		to_send = 0;                                                                      
 	}
 
 	if (SOCK_TYPE(fd_cb->so) == SOCK_STREAM) {
@@ -1736,7 +1736,7 @@ flow_divert_send_app_data(struct flow_divert_pcb *fd_cb, mbuf_t data, struct soc
 				fd_cb->send_window -= to_send;
 			}
 		} else {
-			/* buffer it */
+			               
 			if (sbspace(&fd_cb->so->so_snd) >= (int)mbuf_pkthdr_len(data)) {
 				if (toaddr != NULL) {
 					if (!sbappendaddr(&fd_cb->so->so_snd, toaddr, data, NULL, &error)) {
@@ -1971,14 +1971,14 @@ flow_divert_disable(struct flow_divert_pcb *fd_cb)
 
 	FDLOG0(LOG_NOTICE, fd_cb, "Skipped all flow divert services, disabling flow divert");
 
-	/* Restore the IP state */
+	                          
 	inp = sotoinpcb(so);
 	inp->inp_vflag = fd_cb->original_vflag;
 	inp->inp_faddr.s_addr = INADDR_ANY;
 	inp->inp_fport = 0;
 	memset(&(inp->in6p_faddr), 0, sizeof(inp->in6p_faddr));
 	inp->in6p_fport = 0;
-	/* If flow divert set the local address, clear it out */
+	                                                        
 	if (fd_cb->flags & FLOW_DIVERT_DID_SET_LOCAL_ADDR) {
 		inp->inp_laddr.s_addr = INADDR_ANY;
 		memset(&(inp->in6p_laddr), 0, sizeof(inp->in6p_laddr));
@@ -1986,24 +1986,24 @@ flow_divert_disable(struct flow_divert_pcb *fd_cb)
 	inp->inp_last_outifp = fd_cb->original_last_outifp;
 	inp->in6p_last_outifp = fd_cb->original_last_outifp6;
 
-	/* Dis-associate the socket */
+	                              
 	so->so_flags &= ~SOF_FLOW_DIVERT;
 	so->so_flags1 |= SOF1_FLOW_DIVERT_SKIP;
 	so->so_fd_pcb = NULL;
 	fd_cb->so = NULL;
 
-	/* Remove from the group */
+	                           
 	flow_divert_pcb_remove(fd_cb);
 
-	FDRELEASE(fd_cb); /* Release the socket's reference */
+	FDRELEASE(fd_cb);                                     
 
-	/* Revert back to the original protocol */
+	                                          
 	so->so_proto = pffindproto(SOCK_DOM(so), SOCK_PROTO(so), SOCK_TYPE(so));
 
 	last_proc = proc_find(so->last_pid);
 
 	if (do_connect) {
-		/* Connect using the original protocol */
+		                                         
 		error = (*so->so_proto->pr_usrreqs->pru_connect)(so, remote_endpoint, (last_proc != NULL ? last_proc : current_proc()));
 		if (error) {
 			FDLOG(LOG_ERR, fd_cb, "Failed to connect using the socket's original protocol: %d", error);
@@ -2013,11 +2013,11 @@ flow_divert_disable(struct flow_divert_pcb *fd_cb)
 
 	buffer = so->so_snd.sb_mb;
 	if (buffer == NULL) {
-		/* No buffered data, done */
+		                            
 		goto done;
 	}
 
-	/* Send any buffered data using the original protocol */
+	                                                        
 	if (SOCK_TYPE(so) == SOCK_STREAM) {
 		mbuf_t data_to_send = NULL;
 		size_t data_len = so->so_snd.sb_cc;
@@ -2051,7 +2051,7 @@ flow_divert_disable(struct flow_divert_pcb *fd_cb)
 		MBUFQ_HEAD(send_queue_head) send_queue;
 		MBUFQ_INIT(&send_queue);
 
-		/* Flush the send buffer, moving all records to a temporary queue */
+		                                                                    
 		while (sb->sb_mb != NULL) {
 			mbuf_t record = sb->sb_mb;
 			mbuf_t m = record;
@@ -2173,11 +2173,11 @@ flow_divert_scope(struct flow_divert_pcb *fd_cb, int out_if_index, bool derive_n
 
 	if (current_ifp != NULL) {
 		if (current_ifp->if_index == out_if_index) {
-			/* No change */
+			               
 			return;
 		}
 
-		/* Scope the socket to the given interface */
+		                                             
 		error = inp_bindif(inp, out_if_index, &new_ifp);
 		if (error != 0) {
 			FDLOG(LOG_ERR, fd_cb, "failed to scope to %d because inp_bindif returned %d", out_if_index, error);
@@ -2185,7 +2185,7 @@ flow_divert_scope(struct flow_divert_pcb *fd_cb, int out_if_index, bool derive_n
 		}
 
 		if (derive_new_address && fd_cb->original_remote_endpoint != NULL) {
-			/* Get the appropriate address for the given interface */
+			                                                         
 			if (inp->inp_vflag & INP_IPV6) {
 				inp->in6p_laddr = sa6_any.sin6_addr;
 				error = in6_pcbladdr(inp, fd_cb->original_remote_endpoint, &(fd_cb->local_endpoint.sin6.sin6_addr), NULL);
@@ -2206,7 +2206,7 @@ flow_divert_scope(struct flow_divert_pcb *fd_cb, int out_if_index, bool derive_n
 		ifnet_head_done();
 	}
 
-	/* Update the "last interface" of the socket */
+	                                               
 	if (new_ifp != NULL) {
 		if (inp->inp_vflag & INP_IPV6) {
 			inp->in6p_last_outifp = new_ifp;
@@ -2427,25 +2427,25 @@ set_socket_state:
 			flow_divert_disconnect_socket(so);
 		} else {
 #if NECP
-			/* Update NECP client with connected five-tuple */
+			                                                  
 			if (!uuid_is_null(inp->necp_client_uuid)) {
 				socket_unlock(so, 0);
 				necp_client_assign_from_socket(so->last_pid, inp->necp_client_uuid, inp);
 				socket_lock(so, 0);
 			}
-#endif /* NECP */
+#endif           
 
 			flow_divert_send_buffered_data(fd_cb, FALSE);
 			soisconnected(so);
 		}
 
-		/* We don't need the connect packet any more */
+		                                               
 		if (fd_cb->connect_packet != NULL) {
 			mbuf_freem(fd_cb->connect_packet);
 			fd_cb->connect_packet = NULL;
 		}
 
-		/* We don't need the original remote endpoint any more */
+		                                                         
 		if (fd_cb->original_remote_endpoint != NULL) {
 			FREE(fd_cb->original_remote_endpoint, M_SONAME);
 			fd_cb->original_remote_endpoint = NULL;
@@ -2514,7 +2514,7 @@ flow_divert_create_control_mbuf(struct flow_divert_pcb *fd_cb)
 	struct inpcb *inp = sotoinpcb(fd_cb->so);
 	bool is_cfil_enabled = false;
 #if CONTENT_FILTER
-	/* Content Filter needs to see the local address */
+	                                                   
 	is_cfil_enabled = (inp->inp_socket && inp->inp_socket->so_cfil_db != NULL);
 #endif
 	if ((inp->inp_vflag & INP_IPV4) &&
@@ -2564,7 +2564,7 @@ flow_divert_handle_data(struct flow_divert_pcb *fd_cb, mbuf_t packet, size_t off
 		if (SOCK_TYPE(fd_cb->so) == SOCK_DGRAM) {
 			uint32_t val_size = 0;
 
-			/* check if we got remote address with data */
+			                                              
 			memset(&remote_address, 0, sizeof(remote_address));
 			error = flow_divert_packet_get_tlv(packet, (int)offset, FLOW_DIVERT_TLV_REMOTE_ADDR, sizeof(remote_address), &remote_address, &val_size);
 			if (error || val_size > sizeof(remote_address)) {
@@ -2574,7 +2574,7 @@ flow_divert_handle_data(struct flow_divert_pcb *fd_cb, mbuf_t packet, size_t off
 				if (remote_address.ss_len > sizeof(remote_address)) {
 					remote_address.ss_len = sizeof(remote_address);
 				}
-				/* validate the address */
+				                          
 				if (flow_divert_is_sockaddr_valid((struct sockaddr *)&remote_address)) {
 					got_remote_sa = TRUE;
 				} else {
@@ -2813,7 +2813,7 @@ flow_divert_handle_app_map_create(struct flow_divert_group *group, mbuf_t packet
 
 	lck_rw_lock_exclusive(&group->lck);
 
-	/* Re-set the current trie */
+	                             
 	if (group->signing_id_trie.memory != NULL) {
 		FREE(group->signing_id_trie.memory, M_TEMP);
 	}
@@ -2822,7 +2822,7 @@ flow_divert_handle_app_map_create(struct flow_divert_group *group, mbuf_t packet
 
 	memset(&new_trie, 0, sizeof(new_trie));
 
-	/* Get the number of shared prefixes in the new set of signing ID strings */
+	                                                                            
 	error = flow_divert_packet_get_tlv(packet, offset, FLOW_DIVERT_TLV_PREFIX_COUNT, sizeof(prefix_count), &prefix_count, NULL);
 
 	if (prefix_count < 0 || error) {
@@ -2831,7 +2831,7 @@ flow_divert_handle_app_map_create(struct flow_divert_group *group, mbuf_t packet
 		return;
 	}
 
-	/* Compute the number of signing IDs and the total amount of bytes needed to store them */
+	                                                                                          
 	for (cursor = flow_divert_packet_find_tlv(packet, offset, FLOW_DIVERT_TLV_SIGNING_ID, &error, 0);
 	    cursor >= 0;
 	    cursor = flow_divert_packet_find_tlv(packet, cursor, FLOW_DIVERT_TLV_SIGNING_ID, &error, 1)) {
@@ -2856,13 +2856,13 @@ flow_divert_handle_app_map_create(struct flow_divert_group *group, mbuf_t packet
 		return;
 	}
 
-	if (os_add3_overflow(prefix_count, signing_id_count, 1, &nodes_count)) { /* + 1 for the root node */
+	if (os_add3_overflow(prefix_count, signing_id_count, 1, &nodes_count)) {                            
 		lck_rw_done(&group->lck);
 		FDLOG0(LOG_ERR, &nil_pcb, "Overflow while computing the number of nodes");
 		return;
 	}
 
-	if (os_add_overflow(prefix_count, 1, &maps_count)) { /* + 1 for the root node */
+	if (os_add_overflow(prefix_count, 1, &maps_count)) {                            
 		lck_rw_done(&group->lck);
 		FDLOG0(LOG_ERR, &nil_pcb, "Overflow while computing the number of maps");
 		return;
@@ -2904,7 +2904,7 @@ flow_divert_handle_app_map_create(struct flow_divert_group *group, mbuf_t packet
 	new_trie.nodes_count = (uint16_t)nodes_count;
 	new_trie.child_maps_count = (uint16_t)maps_count;
 
-	/* Initialize the free lists */
+	                               
 	new_trie.nodes = (struct flow_divert_trie_node *)new_trie.memory;
 	new_trie.nodes_free_next = 0;
 	memset(new_trie.nodes, 0, nodes_mem_size);
@@ -2917,10 +2917,10 @@ flow_divert_handle_app_map_create(struct flow_divert_group *group, mbuf_t packet
 	new_trie.bytes_free_next = 0;
 	memset(new_trie.bytes, 0, bytes_mem_size);
 
-	/* The root is an empty node */
+	                               
 	new_trie.root = trie_node_alloc(&new_trie);
 
-	/* Add each signing ID to the trie */
+	                                     
 	for (cursor = flow_divert_packet_find_tlv(packet, offset, FLOW_DIVERT_TLV_SIGNING_ID, &error, 0);
 	    cursor >= 0;
 	    cursor = flow_divert_packet_find_tlv(packet, cursor, FLOW_DIVERT_TLV_SIGNING_ID, &error, 1)) {
@@ -3003,7 +3003,7 @@ flow_divert_input(mbuf_t packet, struct flow_divert_group *group)
 		goto done;
 	}
 
-	fd_cb = flow_divert_pcb_lookup(hdr.conn_id, group);             /* This retains the PCB */
+	fd_cb = flow_divert_pcb_lookup(hdr.conn_id, group);                                       
 	if (fd_cb == NULL) {
 		if (hdr.packet_type != FLOW_DIVERT_PKT_CLOSE && hdr.packet_type != FLOW_DIVERT_PKT_READ_NOTIFY) {
 			FDLOG(LOG_NOTICE, &nil_pcb, "got a %s message from group %d for an unknown pcb: %u", flow_divert_packet_type2str(hdr.packet_type), group->ctl_unit, hdr.conn_id);
@@ -3088,12 +3088,12 @@ flow_divert_detach(struct socket *so)
 	FDLOG(LOG_INFO, fd_cb, "Detaching, ref count = %d", fd_cb->ref_count);
 
 	if (fd_cb->group != NULL) {
-		/* Last-ditch effort to send any buffered data */
+		                                                 
 		flow_divert_send_buffered_data(fd_cb, TRUE);
 
 		flow_divert_update_closed_state(fd_cb, SHUT_RDWR, FALSE);
 		flow_divert_send_close_if_needed(fd_cb);
-		/* Remove from the group */
+		                           
 		flow_divert_pcb_remove(fd_cb);
 	}
 
@@ -3103,7 +3103,7 @@ flow_divert_detach(struct socket *so)
 	FDUNLOCK(fd_cb);
 	socket_lock(so, 0);
 
-	FDRELEASE(fd_cb);       /* Release the socket's reference */
+	FDRELEASE(fd_cb);                                           
 }
 
 static int
@@ -3124,7 +3124,7 @@ flow_divert_close(struct socket *so)
 	flow_divert_update_closed_state(fd_cb, SHUT_RDWR, FALSE);
 	flow_divert_send_close_if_needed(fd_cb);
 
-	/* Remove from the group */
+	                           
 	flow_divert_pcb_remove(fd_cb);
 
 	return 0;
@@ -3429,9 +3429,9 @@ flow_divert_connect_out_internal(struct socket *so, struct sockaddr *to, proc_t 
 			goto done;
 		}
 
-		if (SOCK_TYPE(so) == SOCK_STREAM || /* TCP or */
-		    !implicit || /* connect() was called or */
-		    ((inp->inp_vflag & INP_IPV6) && !IN6_IS_ADDR_UNSPECIFIED(&inp->in6p_laddr)) || /* local address is not un-specified */
+		if (SOCK_TYPE(so) == SOCK_STREAM ||             
+		    !implicit ||                              
+		    ((inp->inp_vflag & INP_IPV6) && !IN6_IS_ADDR_UNSPECIFIED(&inp->in6p_laddr)) ||                                        
 		    ((inp->inp_vflag & INP_IPV4) && inp->inp_laddr.s_addr != INADDR_ANY)) {
 			fd_cb->flags |= FLOW_DIVERT_SHOULD_SET_LOCAL_ADDR;
 		}
@@ -3492,7 +3492,7 @@ flow_divert_connect_out(struct socket *so, struct sockaddr *to, proc_t p)
 			return error;
 		}
 	}
-#endif /* CONTENT_FILTER */
+#endif                     
 
 	return flow_divert_connect_out_internal(so, to, p, false);
 }
@@ -3516,7 +3516,7 @@ flow_divert_connectx_out_common(struct socket *so, struct sockaddr *dst,
 		return error;
 	}
 
-	/* if there is data, send it */
+	                               
 	if (auio != NULL) {
 		user_ssize_t datalen = 0;
 
@@ -3532,21 +3532,21 @@ flow_divert_connectx_out_common(struct socket *so, struct sockaddr *dst,
 			*bytes_written = datalen - uio_resid(auio);
 		}
 
-		/*
-		 * sosend returns EWOULDBLOCK if it's a non-blocking
-		 * socket or a timeout occured (this allows to return
-		 * the amount of queued data through sendit()).
-		 *
-		 * However, connectx() returns EINPROGRESS in case of a
-		 * blocking socket. So we change the return value here.
-		 */
+		  
+                                                      
+                                                       
+                                                 
+    
+                                                         
+                                                         
+     
 		if (error == EWOULDBLOCK) {
 			error = EINPROGRESS;
 		}
 	}
 
 	if (error == 0 && pcid != NULL) {
-		*pcid = 1;      /* there is only 1 connection for a TCP */
+		*pcid = 1;                                                
 	}
 
 	return error;
@@ -3595,14 +3595,14 @@ flow_divert_data_out(struct socket *so, int flags, mbuf_t data, struct sockaddr 
 
 	if (flags & MSG_OOB) {
 		error = EINVAL;
-		goto done; /* We don't support OOB data */
+		goto done;                                
 	}
 
 #if CONTENT_FILTER
-	/*
-	 * If the socket is subject to a UDP Content Filter and no remote address is passed in,
-	 * retrieve the CFIL saved remote address from the mbuf and use it.
-	 */
+	  
+                                                                                        
+                                                                    
+    
 	if (to == NULL && so->so_cfil_db) {
 		struct sockaddr *cfil_faddr = NULL;
 		cfil_tag = cfil_dgram_get_socket_state(data, NULL, NULL, &cfil_faddr, NULL);
@@ -3613,7 +3613,7 @@ flow_divert_data_out(struct socket *so, int flags, mbuf_t data, struct sockaddr 
 	}
 #endif
 
-	/* Implicit connect */
+	                      
 	if (!(fd_cb->flags & FLOW_DIVERT_CONNECT_STARTED)) {
 		FDLOG0(LOG_INFO, fd_cb, "implicit connect");
 
@@ -3864,7 +3864,7 @@ flow_divert_token_set(struct socket *so, struct sockopt *sopt)
 		goto done;
 	}
 
-	/* A valid kernel control unit is required */
+	                                             
 	ctl_unit = ntohl(ctl_unit);
 	aggregate_unit = ntohl(aggregate_unit);
 
@@ -3992,14 +3992,14 @@ flow_divert_token_get(struct socket *so, struct sockopt *sopt)
 	}
 
 	if (sopt->sopt_val == USER_ADDR_NULL) {
-		/* If the caller passed NULL to getsockopt, just set the size of the token and return */
+		                                                                                        
 		sopt->sopt_valsize = mbuf_pkthdr_len(token);
 		goto done;
 	}
 
 	error = soopt_mcopyout(sopt, token);
 	if (error) {
-		token = NULL;   /* For some reason, soopt_mcopyout() frees the mbuf if it fails */
+		token = NULL;                                                                     
 		goto done;
 	}
 
@@ -4112,7 +4112,7 @@ flow_divert_kctl_disconnect(kern_ctl_ref kctlref __unused, uint32_t unit, void *
 			group->token_key_size = 0;
 		}
 
-		/* Re-set the current trie */
+		                             
 		if (group->signing_id_trie.memory != NULL) {
 			FREE(group->signing_id_trie.memory, M_TEMP);
 		}
@@ -4242,17 +4242,17 @@ flow_divert_init(void)
 	g_flow_divert_in_protosw.pr_usrreqs = &g_flow_divert_in_usrreqs;
 	g_flow_divert_in_protosw.pr_ctloutput = flow_divert_ctloutput;
 
-	/*
-	 * Socket filters shouldn't attach/detach to/from this protosw
-	 * since pr_protosw is to be used instead, which points to the
-	 * real protocol; if they do, it is a bug and we should panic.
-	 */
+	  
+                                                               
+                                                               
+                                                               
+    
 	g_flow_divert_in_protosw.pr_filter_head.tqh_first =
 	    (struct socket_filter *)(uintptr_t)0xdeadbeefdeadbeef;
 	g_flow_divert_in_protosw.pr_filter_head.tqh_last =
 	    (struct socket_filter **)(uintptr_t)0xdeadbeefdeadbeef;
 
-	/* UDP */
+	         
 	g_udp_protosw = pffindproto(AF_INET, IPPROTO_UDP, SOCK_DGRAM);
 	VERIFY(g_udp_protosw != NULL);
 
@@ -4273,11 +4273,11 @@ flow_divert_init(void)
 	g_flow_divert_in_udp_protosw.pr_usrreqs = &g_flow_divert_in_usrreqs;
 	g_flow_divert_in_udp_protosw.pr_ctloutput = flow_divert_ctloutput;
 
-	/*
-	 * Socket filters shouldn't attach/detach to/from this protosw
-	 * since pr_protosw is to be used instead, which points to the
-	 * real protocol; if they do, it is a bug and we should panic.
-	 */
+	  
+                                                               
+                                                               
+                                                               
+    
 	g_flow_divert_in_udp_protosw.pr_filter_head.tqh_first =
 	    (struct socket_filter *)(uintptr_t)0xdeadbeefdeadbeef;
 	g_flow_divert_in_udp_protosw.pr_filter_head.tqh_last =
@@ -4301,17 +4301,17 @@ flow_divert_init(void)
 
 	g_flow_divert_in6_protosw.pr_usrreqs = &g_flow_divert_in6_usrreqs;
 	g_flow_divert_in6_protosw.pr_ctloutput = flow_divert_ctloutput;
-	/*
-	 * Socket filters shouldn't attach/detach to/from this protosw
-	 * since pr_protosw is to be used instead, which points to the
-	 * real protocol; if they do, it is a bug and we should panic.
-	 */
+	  
+                                                               
+                                                               
+                                                               
+    
 	g_flow_divert_in6_protosw.pr_filter_head.tqh_first =
 	    (struct socket_filter *)(uintptr_t)0xdeadbeefdeadbeef;
 	g_flow_divert_in6_protosw.pr_filter_head.tqh_last =
 	    (struct socket_filter **)(uintptr_t)0xdeadbeefdeadbeef;
 
-	/* UDP6 */
+	          
 	g_udp6_protosw = (struct ip6protosw *)pffindproto(AF_INET6, IPPROTO_UDP, SOCK_DGRAM);
 
 	VERIFY(g_udp6_protosw != NULL);
@@ -4332,11 +4332,11 @@ flow_divert_init(void)
 
 	g_flow_divert_in6_udp_protosw.pr_usrreqs = &g_flow_divert_in6_udp_usrreqs;
 	g_flow_divert_in6_udp_protosw.pr_ctloutput = flow_divert_ctloutput;
-	/*
-	 * Socket filters shouldn't attach/detach to/from this protosw
-	 * since pr_protosw is to be used instead, which points to the
-	 * real protocol; if they do, it is a bug and we should panic.
-	 */
+	  
+                                                               
+                                                               
+                                                               
+    
 	g_flow_divert_in6_udp_protosw.pr_filter_head.tqh_first =
 	    (struct socket_filter *)(uintptr_t)0xdeadbeefdeadbeef;
 	g_flow_divert_in6_udp_protosw.pr_filter_head.tqh_last =

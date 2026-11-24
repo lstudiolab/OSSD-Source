@@ -1,7 +1,7 @@
-//
-// Tests for
-//  explicit bounded_array_ref(T* data, size_t n);
-//
+  
+            
+                                                  
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"
@@ -22,12 +22,12 @@ tests()
 {
 	T array[5] = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^
-	//   |
-	//  ptr
-	//
-	//   ^------------------- view -----------------------^
+	                                                               
+	      
+	      
+	       
+	  
+	                                                       
 	{
 		T* ptr = &array[0];
 		test_bounded_array_ref<T> view(ptr, 5);
@@ -39,12 +39,12 @@ tests()
 		CHECK(view[3] == T{3});
 		CHECK(view[4] == T{4});
 	}
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//   ^
-	//   |
-	//  ptr
-	//
-	//   ^----- view -----^
+	                                                               
+	      
+	      
+	       
+	  
+	                       
 	{
 		T* ptr = &array[0];
 		test_bounded_array_ref<T> view(ptr, 3);
@@ -54,12 +54,12 @@ tests()
 		CHECK(view[1] == T{1});
 		CHECK(view[2] == T{2});
 	}
-	// T{0}     T{1}     T{2}     T{3}     T{4}     <one-past-last>
-	//                              ^
-	//                              |
-	//                             ptr
-	//
-	//                              ^------- view --------^
+	                                                               
+	                                 
+	                                 
+	                                  
+	  
+	                                                       
 	{
 		T* ptr = &array[3];
 		test_bounded_array_ref<T> view(ptr, 2);
@@ -68,25 +68,25 @@ tests()
 		CHECK(view[0] == T{3});
 		CHECK(view[1] == T{4});
 	}
-	// Check with a valid pointer and a size of 0.
+	                                              
 	{
 		T* ptr = &array[0];
 		test_bounded_array_ref<T> view(ptr, static_cast<std::size_t>(0));
 		CHECK(view.size() == 0);
 	}
-	// Check with a null pointer and a size of 0.
+	                                             
 	{
 		T* ptr = nullptr;
 		test_bounded_array_ref<T> view(ptr, static_cast<std::size_t>(0));
 		CHECK(view.size() == 0);
 	}
-	// Check with a non-null but invalid pointer and a size of 0.
+	                                                             
 	{
 		T* ptr = &array[5];
 		test_bounded_array_ref<T> view(ptr, static_cast<std::size_t>(0));
 		CHECK(view.size() == 0);
 	}
-	// Make sure there's no ambiguity between constructors.
+	                                                       
 	{
 		T* ptr = &array[0];
 		std::ptrdiff_t size = 5;
@@ -95,7 +95,7 @@ tests()
 		CHECK(view.size() == 5);
 	}
 
-	// Make sure we can create nested bounded_array_refs
+	                                                    
 	{
 		int array1[] = {1, 2, 3, 4, 5};
 		int array2[] = {6, 7, 8};

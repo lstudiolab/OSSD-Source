@@ -63,18 +63,18 @@ mpsc_test_pingpong_invoke(mpsc_queue_chain_t elm, mpsc_daemon_queue_t dq)
 	}
 }
 
-/*
- * The point of this test is to exercise the enqueue/unlock-drain race
- * since the MPSC queue tries to mimize wakeups when it knows it's useless.
- *
- * It also ensures basic enqueue properties,
- * and will panic if anything goes wrong to help debugging state.
- *
- * Performance wise, we will always go through the wakeup codepath,
- * hence this is mostly a benchmark of
- * assert_wait()/clear_wait()/thread_block()/thread_wakeup()
- * rather than a benchmark of the MPSC queues.
- */
+  
+                                                                      
+                                                                           
+  
+                                            
+                                                                 
+  
+                                                                   
+                                      
+                                                            
+                                              
+   
 int
 mpsc_test_pingpong(uint64_t count, uint64_t *out)
 {

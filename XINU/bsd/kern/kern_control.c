@@ -26,14 +26,14 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Kernel Control domain - allows control connections to
- *  and to read/write data.
- *
- * Vincent Lubet, 040506
- * Christophe Allie, 010928
- * Justin C. Walker, 990319
- */
+  
+                                                        
+                           
+  
+                        
+                           
+                           
+   
 
 #include <sys/types.h>
 #include <sys/param.h>
@@ -58,29 +58,29 @@
 #include <kern/thread.h>
 
 struct kctl {
-	TAILQ_ENTRY(kctl)       next;           /* controller chain */
+	TAILQ_ENTRY(kctl)       next;                                 
 	kern_ctl_ref            kctlref;
 
-	/* controller information provided when registering */
-	char                    name[MAX_KCTL_NAME];    /* unique identifier */
+	                                                      
+	char                    name[MAX_KCTL_NAME];                           
 	u_int32_t               id;
 	u_int32_t               reg_unit;
 
-	/* misc communication information */
-	u_int32_t               flags;          /* support flags */
-	u_int32_t               recvbufsize;    /* request more than the default buffer size */
-	u_int32_t               sendbufsize;    /* request more than the default buffer size */
+	                                    
+	u_int32_t               flags;                             
+	u_int32_t               recvbufsize;                                                   
+	u_int32_t               sendbufsize;                                                   
 
-	/* Dispatch functions */
-	ctl_setup_func          setup;          /* Setup contact */
-	ctl_bind_func           bind;           /* Prepare contact */
-	ctl_connect_func        connect;        /* Make contact */
-	ctl_disconnect_func     disconnect;     /* Break contact */
-	ctl_send_func           send;           /* Send data to nke */
-	ctl_send_list_func      send_list;      /* Send list of packets */
-	ctl_setopt_func         setopt;         /* set kctl configuration */
-	ctl_getopt_func         getopt;         /* get kctl configuration */
-	ctl_rcvd_func           rcvd;           /* Notify nke when client reads data */
+	                        
+	ctl_setup_func          setup;                             
+	ctl_bind_func           bind;                                
+	ctl_connect_func        connect;                          
+	ctl_disconnect_func     disconnect;                        
+	ctl_send_func           send;                                 
+	ctl_send_list_func      send_list;                                
+	ctl_setopt_func         setopt;                                     
+	ctl_getopt_func         getopt;                                     
+	ctl_rcvd_func           rcvd;                                                  
 
 	TAILQ_HEAD(, ctl_cb)    kcb_head;
 	u_int32_t               lastunit;
@@ -92,13 +92,13 @@ enum ctl_status {
 	KCTL_CONNECTING = 1,
 	KCTL_CONNECTED = 2
 };
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 struct ctl_cb {
-	TAILQ_ENTRY(ctl_cb)     next;           /* controller chain */
+	TAILQ_ENTRY(ctl_cb)     next;                                 
 	lck_mtx_t               mtx;
-	struct socket           *so;            /* controlling socket */
-	struct kctl             *kctl;          /* back pointer to controller */
+	struct socket           *so;                                    
+	struct kctl             *kctl;                                          
 	void                    *userdata;
 	struct sockaddr_ctl     sac;
 	u_int32_t               usecount;
@@ -106,7 +106,7 @@ struct ctl_cb {
 	u_int32_t               require_clearing_count;
 #if DEVELOPMENT || DEBUG
 	enum ctl_status         status;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 };
 
 #ifndef ROUNDUP64
@@ -117,23 +117,23 @@ struct ctl_cb {
 #define ADVANCE64(p, n) (void*)((char *)(p) + ROUNDUP64(n))
 #endif
 
-/*
- * Definitions and vars for we support
- */
+  
+                                      
+   
 
-#define CTL_SENDSIZE    (2 * 1024)      /* default buffer size */
-#define CTL_RECVSIZE    (8 * 1024)      /* default buffer size */
+#define CTL_SENDSIZE    (2 * 1024)                               
+#define CTL_RECVSIZE    (8 * 1024)                               
 
-/*
- * Definitions and vars for we support
- */
+  
+                                      
+   
 
 const u_int32_t         ctl_maxunit = 65536;
 static LCK_ATTR_DECLARE(ctl_lck_attr, 0, 0);
 static LCK_GRP_DECLARE(ctl_lck_grp, "Kernel Control Protocol");
 static LCK_MTX_DECLARE_ATTR(ctl_mtx, &ctl_lck_grp, &ctl_lck_attr);
 
-/* all the controllers are chained */
+                                     
 TAILQ_HEAD(kctl_list, kctl) ctl_head = TAILQ_HEAD_INITIALIZER(ctl_head);
 
 static int ctl_attach(struct socket *, int, struct proc *);
@@ -241,7 +241,7 @@ SYSCTL_INT(_net_systm_kctl, OID_AUTO, debug,
 u_int32_t ctl_panic_debug = 0;
 SYSCTL_INT(_net_systm_kctl, OID_AUTO, panicdebug,
     CTLFLAG_RW | CTLFLAG_LOCKED, &ctl_panic_debug, 0, "");
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 #define KCTL_TBL_INC 16
 
@@ -257,9 +257,9 @@ static kern_ctl_ref kctl_make_ref(struct kctl *kctl);
 static void kctl_delete_ref(kern_ctl_ref);
 static struct kctl *kctl_from_ref(kern_ctl_ref);
 
-/*
- * Install the protosw's for the Kernel Control manager.
- */
+  
+                                                        
+   
 __private_extern__ void
 kern_control_init(struct domain *dp)
 {
@@ -284,12 +284,12 @@ kcb_delete(struct ctl_cb *kcb)
 	}
 }
 
-/*
- * Kernel Controller user-request functions
- * attach function must exist and succeed
- * detach not necessary
- * we need a pcb for the per socket mutex
- */
+  
+                                           
+                                         
+                       
+                                         
+   
 static int
 ctl_attach(struct socket *so, int proto, struct proc *p)
 {
@@ -337,10 +337,10 @@ ctl_sofreelastref(struct socket *so)
 	return 0;
 }
 
-/*
- * Use this function and ctl_kcb_require_clearing to serialize
- * critical calls into the kctl subsystem
- */
+  
+                                                              
+                                         
+   
 static void
 ctl_kcb_increment_use_count(struct ctl_cb *kcb, lck_mtx_t *mutex_held)
 {
@@ -357,7 +357,7 @@ ctl_kcb_require_clearing(struct ctl_cb *kcb, lck_mtx_t *mutex_held)
 	assert(kcb->kcb_usecount != 0);
 	kcb->require_clearing_count++;
 	kcb->kcb_usecount--;
-	while (kcb->kcb_usecount > 0) { // we need to wait until no one else is running
+	while (kcb->kcb_usecount > 0) {                                                
 		msleep(&kcb->kcb_usecount, mutex_held, PSOCK | PCATCH, "kcb_usecount", NULL);
 	}
 	kcb->kcb_usecount++;
@@ -394,8 +394,8 @@ ctl_detach(struct socket *so)
 
 	if (kcb->kctl != NULL && kcb->kctl->bind != NULL &&
 	    kcb->userdata != NULL && !(so->so_state & SS_ISCONNECTED)) {
-		// The unit was bound, but not connected
-		// Invoke the disconnected call to cleanup
+		                                        
+		                                          
 		if (kcb->kctl->disconnect != NULL) {
 			socket_unlock(so, 0);
 			(*kcb->kctl->disconnect)(kcb->kctl->kctlref,
@@ -407,7 +407,7 @@ ctl_detach(struct socket *so)
 	soisdisconnected(so);
 #if DEVELOPMENT || DEBUG
 	kcb->status = KCTL_DISCONNECTED;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 	so->so_flags |= SOF_PCBCLEARING;
 	ctl_kcb_done_clearing(kcb);
 	ctl_kcb_decrement_use_count(kcb);
@@ -430,7 +430,7 @@ ctl_setup_kctl(struct socket *so, struct sockaddr *nam, struct proc *p)
 	}
 
 	if (kcb->kctl != NULL) {
-		// Already set up, skip
+		                       
 		return 0;
 	}
 
@@ -478,12 +478,12 @@ ctl_setup_kctl(struct socket *so, struct sockaddr *nam, struct proc *p)
 			return error;
 		}
 	} else {
-		/* Find an unused ID, assumes control IDs are in order */
+		                                                         
 		u_int32_t unit = 1;
 
 		TAILQ_FOREACH(kcb_next, &kctl->kcb_head, next) {
 			if (kcb_next->sac.sc_unit > unit) {
-				/* Found a gap, lets fill it in */
+				                                  
 				break;
 			}
 			unit = kcb_next->sac.sc_unit + 1;
@@ -512,10 +512,10 @@ ctl_setup_kctl(struct socket *so, struct sockaddr *nam, struct proc *p)
 	kctlstat.kcs_connections++;
 	lck_mtx_unlock(&ctl_mtx);
 
-	/*
-	 * rdar://15526688: Limit the send and receive sizes to sb_max
-	 * by using the same scaling as sbreserve()
-	 */
+	  
+                                                               
+                                            
+    
 	sbmaxsize = (u_quad_t)sb_max * MCLBYTES / (MSIZE + MCLBYTES);
 
 	if (kctl->sendbufsize > sbmaxsize) {
@@ -545,7 +545,7 @@ done:
 		soisdisconnected(so);
 #if DEVELOPMENT || DEBUG
 		kcb->status = KCTL_DISCONNECTED;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 		lck_mtx_lock(&ctl_mtx);
 		TAILQ_REMOVE(&kctl->kcb_head, kcb, next);
 		kcb->kctl = NULL;
@@ -615,7 +615,7 @@ ctl_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		panic("kctl already connecting/connected");
 	}
 	kcb->status = KCTL_CONNECTING;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 	error = ctl_setup_kctl(so, nam, p);
 	if (error) {
@@ -636,19 +636,19 @@ ctl_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 	soisconnected(so);
 #if DEVELOPMENT || DEBUG
 	kcb->status = KCTL_CONNECTED;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 end:
 	if (error && kcb->kctl->disconnect) {
-		/*
-		 * XXX Make sure we Don't check the return value
-		 * of disconnect here.
-		 * ipsec/utun_ctl_disconnect will return error when
-		 * disconnect gets called after connect failure.
-		 * However if we decide to check for disconnect return
-		 * value here. Please make sure to revisit
-		 * ipsec/utun_ctl_disconnect.
-		 */
+		  
+                                                  
+                        
+                                                     
+                                                  
+                                                        
+                                            
+                               
+     
 		socket_unlock(so, 0);
 		(*kcb->kctl->disconnect)(kcb->kctl->kctlref, kcb->sac.sc_unit, kcb->userdata);
 		socket_lock(so, 0);
@@ -657,7 +657,7 @@ end:
 		soisdisconnected(so);
 #if DEVELOPMENT || DEBUG
 		kcb->status = KCTL_DISCONNECTED;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 		lck_mtx_lock(&ctl_mtx);
 		TAILQ_REMOVE(&kcb->kctl->kcb_head, kcb, next);
 		kcb->kctl = NULL;
@@ -694,7 +694,7 @@ ctl_disconnect(struct socket *so)
 		soisdisconnected(so);
 #if DEVELOPMENT || DEBUG
 		kcb->status = KCTL_DISCONNECTED;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 		socket_unlock(so, 0);
 		lck_mtx_lock(&ctl_mtx);
@@ -721,7 +721,7 @@ ctl_peeraddr(struct socket *so, struct sockaddr **nam)
 	struct kctl                     *kctl;
 	struct sockaddr_ctl     sc;
 
-	if (kcb == NULL) {      /* sanity check */
+	if (kcb == NULL) {                        
 		return ENOTCONN;
 	}
 
@@ -750,14 +750,14 @@ ctl_sbrcv_trim(struct socket *so)
 		u_int32_t diff;
 		int32_t trim;
 
-		/*
-		 * The difference between the ideal size and the
-		 * current size is the upper bound of the trimage
-		 */
+		  
+                                                  
+                                                   
+     
 		diff = sb->sb_hiwat - sb->sb_idealsize;
-		/*
-		 * We cannot trim below the outstanding data
-		 */
+		  
+                                              
+     
 		trim = sb->sb_hiwat - sb->sb_cc;
 
 		trim = imin(trim, (int32_t)diff);
@@ -819,7 +819,7 @@ ctl_send(struct socket *so, int flags, struct mbuf *m,
 		m_freem(control);
 	}
 
-	if (kcb == NULL) {      /* sanity check */
+	if (kcb == NULL) {                        
 		error = ENOTCONN;
 	}
 
@@ -863,7 +863,7 @@ ctl_send_list(struct socket *so, int flags, struct mbuf *m,
 		m_freem_list(control);
 	}
 
-	if (kcb == NULL) {      /* sanity check */
+	if (kcb == NULL) {                        
 		error = ENOTCONN;
 	}
 
@@ -929,9 +929,9 @@ ctl_rcvbspace(struct socket *so, size_t datasize,
 			error = ENOBUFS;
 		}
 	} else if ((flags & CTL_DATA_CRIT) == 0) {
-		/*
-		 * Reserve 25% for critical messages
-		 */
+		  
+                                      
+     
 		if (space < (sb->sb_hiwat >> 2) ||
 		    space < datasize) {
 			error = ENOBUFS;
@@ -941,9 +941,9 @@ ctl_rcvbspace(struct socket *so, size_t datasize,
 	} else {
 		size_t autorcvbuf_max;
 
-		/*
-		 * Allow overcommit of 25%
-		 */
+		  
+                            
+     
 		autorcvbuf_max = min(sb->sb_idealsize + (sb->sb_idealsize >> 2),
 		    ctl_autorcvbuf_max);
 
@@ -951,9 +951,9 @@ ctl_rcvbspace(struct socket *so, size_t datasize,
 			error = 0;
 		} else if (tcp_cansbgrow(sb) &&
 		    sb->sb_hiwat < autorcvbuf_max) {
-			/*
-			 * Grow with a little bit of leeway
-			 */
+			  
+                                      
+      
 			size_t grow = datasize - space + MSIZE;
 			u_int32_t cc = (u_int32_t)MIN(MIN((sb->sb_hiwat + grow), autorcvbuf_max), UINT32_MAX);
 
@@ -962,9 +962,9 @@ ctl_rcvbspace(struct socket *so, size_t datasize,
 					ctl_autorcvbuf_high = sb->sb_hiwat;
 				}
 
-				/*
-				 * A final check
-				 */
+				  
+                    
+       
 				if ((u_int32_t) sbspace(sb) >= datasize) {
 					error = 0;
 				} else {
@@ -1032,9 +1032,9 @@ bye:
 	return error;
 }
 
-/*
- * Compute space occupied by mbuf like sbappendrecord
- */
+  
+                                                     
+   
 static int
 m_space(struct mbuf *m)
 {
@@ -1059,14 +1059,14 @@ ctl_enqueuembuf_list(void *kctlref, u_int32_t unit, struct mbuf *m_list,
 	int len = 0;
 	u_int32_t kctlflags;
 
-	/*
-	 * Need to point the beginning of the list in case of early exit
-	 */
+	  
+                                                                 
+    
 	m = m_list;
 
-	/*
-	 * kcb_find_socket takes the socket lock with a reference
-	 */
+	  
+                                                          
+    
 	so = kcb_find_socket(kctlref, unit, &kctlflags);
 	if (so == NULL) {
 		error = EINVAL;
@@ -1090,10 +1090,10 @@ ctl_enqueuembuf_list(void *kctlref, u_int32_t unit, struct mbuf *m_list,
 			    __func__, (uint64_t)VM_KERNEL_ADDRPERM(m));
 		}
 
-		/*
-		 * The mbuf is either appended or freed by sbappendrecord()
-		 * so it's not reliable from a data standpoint
-		 */
+		  
+                                                             
+                                                
+     
 		len = m_space(m);
 		if (ctl_rcvbspace(so, len, kctlflags, flags) != 0) {
 			error = ENOBUFS;
@@ -1101,18 +1101,18 @@ ctl_enqueuembuf_list(void *kctlref, u_int32_t unit, struct mbuf *m_list,
 				(SInt64 *)&kctlstat.kcs_enqueue_fullsock);
 			break;
 		} else {
-			/*
-			 * Unlink from the list, m is on its own
-			 */
+			  
+                                           
+      
 			m->m_nextpkt = NULL;
 			so_recv_data_stat(so, m, 0);
 			if (sbappendrecord_nodrop(&so->so_rcv, m) != 0) {
 				needwakeup = 1;
 			} else {
-				/*
-				 * We free or return the remaining
-				 * mbufs in the list
-				 */
+				  
+                                      
+                        
+       
 				m = nextpkt;
 				error = ENOBUFS;
 				OSIncrementAtomic64(
@@ -1212,10 +1212,10 @@ ctl_enqueuedata(void *kctlref, u_int32_t unit, void *data, size_t len,
 		m->m_flags |= M_EOR;
 	}
 	so_recv_data_stat(so, m, 0);
-	/*
-	 * No need to call the "nodrop" variant of sbappend
-	 * because the mbuf is local to the scope of the function
-	 */
+	  
+                                                    
+                                                          
+    
 	if (sbappend(&so->so_rcv, m) != 0) {
 		if ((flags & CTL_DATA_NOWAKEUP) == 0) {
 			sorwakeup(so);
@@ -1334,7 +1334,7 @@ ctl_ctloutput(struct socket *so, struct sockopt *sopt)
 		return EINVAL;
 	}
 
-	if (kcb == NULL) {      /* sanity check */
+	if (kcb == NULL) {                        
 		return ENOTCONN;
 	}
 
@@ -1387,10 +1387,10 @@ ctl_ctloutput(struct socket *so, struct sockopt *sopt)
 				error = ENOMEM;
 				goto out;
 			}
-			/*
-			 * 4108337 - copy user data in case the
-			 * kernel control needs it
-			 */
+			  
+                                          
+                             
+      
 			error = sooptcopyin(sopt, data,
 			    sopt->sopt_valsize, sopt->sopt_valsize);
 		}
@@ -1434,7 +1434,7 @@ ctl_ioctl(struct socket *so, u_long cmd, caddr_t data,
 	int     error = ENOTSUP;
 
 	switch (cmd) {
-	/* get the number of controllers */
+	                                   
 	case CTLIOCGCOUNT: {
 		struct kctl     *kctl;
 		u_int32_t n = 0;
@@ -1473,7 +1473,7 @@ ctl_ioctl(struct socket *so, u_long cmd, caddr_t data,
 		break;
 	}
 
-		/* add controls to get list of NKEs */
+		                                      
 	}
 
 	return error;
@@ -1488,7 +1488,7 @@ kctl_tbl_grow(void)
 	lck_mtx_assert(&ctl_mtx, LCK_MTX_ASSERT_OWNED);
 
 	if (kctl_tbl_growing) {
-		/* Another thread is allocating */
+		                                  
 		kctl_tbl_growing_waiting++;
 
 		do {
@@ -1497,12 +1497,12 @@ kctl_tbl_grow(void)
 		} while (kctl_tbl_growing);
 		kctl_tbl_growing_waiting--;
 	}
-	/* Another thread grew the table */
+	                                   
 	if (kctl_table != NULL && kctl_tbl_count < kctl_tbl_size) {
 		return;
 	}
 
-	/* Verify we have a sane size */
+	                                
 	if (kctl_tbl_size + KCTL_TBL_INC >= UINT16_MAX) {
 		kctlstat.kcs_tbl_size_too_big++;
 		if (ctl_debug) {
@@ -1559,15 +1559,15 @@ kctl_make_ref(struct kctl *kctl)
 		if (kctl_table[i] == NULL) {
 			uintptr_t ref;
 
-			/*
-			 * Reference is index plus one
-			 */
+			  
+                                 
+      
 			kctl_ref_gencnt += 1;
 
-			/*
-			 * Add generation count as salt to reference to prevent
-			 * use after deregister
-			 */
+			  
+                                                          
+                          
+      
 			ref = ((kctl_ref_gencnt << KCTLREF_GENCNT_SHIFT) &
 			    KCTLREF_GENCNT_MASK) +
 			    ((i + 1) & KCTLREF_INDEX_MASK);
@@ -1594,9 +1594,9 @@ kctl_make_ref(struct kctl *kctl)
 static void
 kctl_delete_ref(kern_ctl_ref kctlref)
 {
-	/*
-	 * Reference is index plus one
-	 */
+	  
+                               
+    
 	uintptr_t i = (((uintptr_t)kctlref) & KCTLREF_INDEX_MASK) - 1;
 
 	lck_mtx_assert(&ctl_mtx, LCK_MTX_ASSERT_OWNED);
@@ -1618,9 +1618,9 @@ kctl_delete_ref(kern_ctl_ref kctlref)
 static struct kctl *
 kctl_from_ref(kern_ctl_ref kctlref)
 {
-	/*
-	 * Reference is index plus one
-	 */
+	  
+                               
+    
 	uintptr_t i = (((uintptr_t)kctlref) & KCTLREF_INDEX_MASK) - 1;
 	struct kctl *kctl = NULL;
 
@@ -1638,9 +1638,9 @@ kctl_from_ref(kern_ctl_ref kctlref)
 	return kctl;
 }
 
-/*
- * Register/unregister a NKE
- */
+  
+                            
+   
 errno_t
 ctl_register(struct kern_ctl_reg *userkctl, kern_ctl_ref *kctlref)
 {
@@ -1651,7 +1651,7 @@ ctl_register(struct kern_ctl_reg *userkctl, kern_ctl_ref *kctlref)
 	int             is_extended = 0;
 	int             is_setup = 0;
 
-	if (userkctl == NULL) { /* sanity check */
+	if (userkctl == NULL) {                   
 		return EINVAL;
 	}
 	if (userkctl->ctl_connect == NULL) {
@@ -1675,21 +1675,21 @@ ctl_register(struct kern_ctl_reg *userkctl, kern_ctl_ref *kctlref)
 		return ENOMEM;
 	}
 
-	/*
-	 * Kernel Control IDs
-	 *
-	 * CTL_FLAG_REG_ID_UNIT indicates the control ID and unit number are
-	 * static. If they do not exist, add them to the list in order. If the
-	 * flag is not set, we must find a new unique value. We assume the
-	 * list is in order. We find the last item in the list and add one. If
-	 * this leads to wrapping the id around, we start at the front of the
-	 * list and look for a gap.
-	 */
+	  
+                      
+   
+                                                                     
+                                                                       
+                                                                   
+                                                                       
+                                                                      
+                            
+    
 
 	if ((userkctl->ctl_flags & CTL_FLAG_REG_ID_UNIT) == 0) {
-		/* Must dynamically assign an unused ID */
+		                                          
 
-		/* Verify the same name isn't already registered */
+		                                                   
 		if (ctl_find_by_name(userkctl->ctl_name) != NULL) {
 			kctl_delete_ref(kctl->kctlref);
 			lck_mtx_unlock(&ctl_mtx);
@@ -1697,26 +1697,26 @@ ctl_register(struct kern_ctl_reg *userkctl, kern_ctl_ref *kctlref)
 			return EEXIST;
 		}
 
-		/* Start with 1 in case the list is empty */
+		                                            
 		id = 1;
 		kctl_next = TAILQ_LAST(&ctl_head, kctl_list);
 
 		if (kctl_next != NULL) {
-			/* List was not empty, add one to the last item */
+			                                                  
 			id = kctl_next->id + 1;
 			kctl_next = NULL;
 
-			/*
-			 * If this wrapped the id number, start looking at
-			 * the front of the list for an unused id.
-			 */
+			  
+                                                     
+                                             
+      
 			if (id == 0) {
-				/* Find the next unused ID */
+				                             
 				id = 1;
 
 				TAILQ_FOREACH(kctl_next, &ctl_head, next) {
 					if (kctl_next->id > id) {
-						/* We found a gap */
+						                    
 						break;
 					}
 
@@ -1751,9 +1751,9 @@ ctl_register(struct kern_ctl_reg *userkctl, kern_ctl_ref *kctlref)
 	strlcpy(kctl->name, userkctl->ctl_name, MAX_KCTL_NAME);
 	kctl->flags = userkctl->ctl_flags;
 
-	/*
-	 * Let the caller know the default send and receive sizes
-	 */
+	  
+                                                          
+    
 	if (userkctl->ctl_sendsize == 0) {
 		kctl->sendbufsize = CTL_SENDSIZE;
 		userkctl->ctl_sendsize = kctl->sendbufsize;
@@ -1834,9 +1834,9 @@ ctl_deregister(void *kctlref)
 	return 0;
 }
 
-/*
- * Must be called with global ctl_mtx lock taked
- */
+  
+                                                
+   
 static struct kctl *
 ctl_find_by_name(const char *name)
 {
@@ -1893,10 +1893,10 @@ ctl_name_by_id(u_int32_t id, char *out_name, size_t maxsize)
 	return found ? 0 : ENOENT;
 }
 
-/*
- * Must be called with global ctl_mtx lock taked
- *
- */
+  
+                                                
+  
+   
 static struct kctl *
 ctl_find_by_id_unit(u_int32_t id, u_int32_t unit)
 {
@@ -1914,9 +1914,9 @@ ctl_find_by_id_unit(u_int32_t id, u_int32_t unit)
 	return NULL;
 }
 
-/*
- * Must be called with kernel controller lock taken
- */
+  
+                                                   
+   
 static struct ctl_cb *
 kcb_find(struct kctl *kctl, u_int32_t unit)
 {
@@ -1944,9 +1944,9 @@ kcb_find_socket(kern_ctl_ref kctlref, u_int32_t unit, u_int32_t *kctlflags)
 	lr_saved = __builtin_return_address(0);
 
 	lck_mtx_lock(&ctl_mtx);
-	/*
-	 * First validate the kctlref
-	 */
+	  
+                              
+    
 	if ((kctl = kctl_from_ref(kctlref)) == NULL) {
 		kctlstat.kcs_bad_kctlref++;
 		lck_mtx_unlock(&ctl_mtx);
@@ -1962,20 +1962,20 @@ kcb_find_socket(kern_ctl_ref kctlref, u_int32_t unit, u_int32_t *kctlflags)
 		lck_mtx_unlock(&ctl_mtx);
 		return NULL;
 	}
-	/*
-	 * This prevents the socket from being closed
-	 */
+	  
+                                              
+    
 	kcb->usecount++;
-	/*
-	 * Respect lock ordering: socket before ctl_mtx
-	 */
+	  
+                                                
+    
 	lck_mtx_unlock(&ctl_mtx);
 
 	socket_lock(so, 1);
-	/*
-	 * The socket lock history is more useful if we store
-	 * the address of the caller.
-	 */
+	  
+                                                      
+                              
+    
 	i = (so->next_lock_lr + SO_LCKDBG_MAX - 1) % SO_LCKDBG_MAX;
 	so->lock_lr[i] = lr_saved;
 
@@ -2015,7 +2015,7 @@ ctl_post_msg(u_int32_t event_code, u_int32_t id)
 	ev_msg.kev_subclass = KEV_CTL_SUBCLASS;
 	ev_msg.event_code = event_code;
 
-	/* common nke subclass data */
+	                              
 	bzero(&ctl_ev_data, sizeof(ctl_ev_data));
 	ctl_ev_data.ctl_id = id;
 	ev_msg.dv[0].data_ptr = &ctl_ev_data;
@@ -2042,14 +2042,14 @@ ctl_lock(struct socket *so, int refcount, void *lr)
 	} else {
 		panic("ctl_lock: so=%p NO PCB! lr=%p lrh= %s\n",
 		    so, lr_saved, solockhistory_nr(so));
-		/* NOTREACHED */
+		                
 	}
 
 	if (so->so_usecount < 0) {
 		panic("ctl_lock: so=%p so_pcb=%p lr=%p ref=%x lrh= %s\n",
 		    so, so->so_pcb, lr_saved, so->so_usecount,
 		    solockhistory_nr(so));
-		/* NOTREACHED */
+		                
 	}
 
 	if (refcount) {
@@ -2079,7 +2079,7 @@ ctl_unlock(struct socket *so, int refcount, void *lr)
 	    (uint64_t)VM_KERNEL_ADDRPERM(so->so_pcb,
 	    (uint64_t)VM_KERNEL_ADDRPERM(&((struct ctl_cb *)so->so_pcb)->mtx),
 	    so->so_usecount, (uint64_t)VM_KERNEL_ADDRPERM(lr_saved));
-#endif /* (MORE_KCTLLOCK_DEBUG && (DEVELOPMENT || DEBUG)) */
+#endif                                                      
 	if (refcount) {
 		so->so_usecount--;
 	}
@@ -2087,13 +2087,13 @@ ctl_unlock(struct socket *so, int refcount, void *lr)
 	if (so->so_usecount < 0) {
 		panic("ctl_unlock: so=%p usecount=%x lrh= %s\n",
 		    so, so->so_usecount, solockhistory_nr(so));
-		/* NOTREACHED */
+		                
 	}
 	if (so->so_pcb == NULL) {
 		panic("ctl_unlock: so=%p NO PCB usecount=%x lr=%p lrh= %s\n",
 		    so, so->so_usecount, (void *)lr_saved,
 		    solockhistory_nr(so));
-		/* NOTREACHED */
+		                
 	}
 	mutex_held = &((struct ctl_cb *)so->so_pcb)->mtx;
 
@@ -2165,9 +2165,9 @@ kctl_reg_list SYSCTL_HANDLER_ARGS
         if (error) {
                 goto done;
 	}
-        /*
-         * We are done if there is no pcb
-         */
+          
+                                         
+           
         if (n == 0) {
                 goto done;
 	}
@@ -2209,13 +2209,13 @@ kctl_reg_list SYSCTL_HANDLER_ARGS
 	}
 
         if (error == 0) {
-                /*
-                 * Give the user an updated idea of our state.
-                 * If the generation differs from what we told
-                 * her before, she knows that something happened
-                 * while we were processing this request, and it
-                 * might be necessary to retry.
-                 */
+                  
+                                                              
+                                                              
+                                                                
+                                                                
+                                               
+                   
                 bzero(&xsg, sizeof(xsg));
                 xsg.xg_len = sizeof(xsg);
                 xsg.xg_count = n;
@@ -2275,9 +2275,9 @@ kctl_pcblist SYSCTL_HANDLER_ARGS
         if (error) {
                 goto done;
 	}
-        /*
-         * We are done if there is no pcb
-         */
+          
+                                         
+           
         if (n == 0) {
                 goto done;
 	}
@@ -2323,13 +2323,13 @@ kctl_pcblist SYSCTL_HANDLER_ARGS
 	}
 
         if (error == 0) {
-                /*
-                 * Give the user an updated idea of our state.
-                 * If the generation differs from what we told
-                 * her before, she knows that something happened
-                 * while we were processing this request, and it
-                 * might be necessary to retry.
-                 */
+                  
+                                                              
+                                                              
+                                                                
+                                                                
+                                               
+                   
                 bzero(&xsg, sizeof(xsg));
                 xsg.xg_len = sizeof(xsg);
                 xsg.xg_count = n;

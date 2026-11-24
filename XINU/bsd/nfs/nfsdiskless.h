@@ -74,20 +74,20 @@
 #ifdef __APPLE_API_PRIVATE
 
 struct nfs_dlmount {
-	struct sockaddr_in ndm_saddr;           /* Address of file server */
-	char            ndm_host[MAXHOSTNAMELEN];/* Host name for mount pt */
-	char            *ndm_path;              /* path name for mount pt */
-	char            *ndm_mntfrom;           /* mntfromname for mount pt */
-	u_int32_t               ndm_nfsv3;              /* NFSv3 or NFSv2? */
-	u_int32_t               ndm_sotype;             /* SOCK_STREAM or SOCK_DGRAM? */
-	u_int32_t               ndm_fhlen;              /* length of file handle */
-	u_char          ndm_fh[NFSX_V3FHMAX];   /* The file's file handle */
+	struct sockaddr_in ndm_saddr;                                       
+	char            ndm_host[MAXHOSTNAMELEN];                            
+	char            *ndm_path;                                          
+	char            *ndm_mntfrom;                                         
+	u_int32_t               ndm_nfsv3;                                   
+	u_int32_t               ndm_sotype;                                             
+	u_int32_t               ndm_fhlen;                                         
+	u_char          ndm_fh[NFSX_V3FHMAX];                               
 };
 
 struct nfs_diskless {
-	struct nfs_dlmount nd_root;     /* Mount info for root */
-	struct nfs_dlmount nd_private;  /* Mount info for private */
+	struct nfs_dlmount nd_root;                              
+	struct nfs_dlmount nd_private;                              
 };
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* _NFS_NFSDISKLESS_H_ */
+#endif                          
+#endif                          

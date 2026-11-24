@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOOffset.m created by rsulack on Wed 17-Sep-1997 */
+                                                      
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -186,7 +186,7 @@ OSNumber::serialize(OSSerialize *s) const
 		return false;
 	}
 
-	//XXX    sprintf(temp, "0x%qx", value);
+	                                       
 	if ((value >> 32)) {
 		snprintf(temp, sizeof(temp), "0x%lx%08lx", (unsigned long)(value >> 32),
 		    (unsigned long)(value & 0xFFFFFFFF));

@@ -50,14 +50,14 @@
 
 #ifndef lint
 static char sccsid[] __attribute__((used)) = "@(#)mkheaders.c	5.5 (Berkeley) 6/18/88";
-#endif /* not lint */
+#endif               
 
-/*
- * Make all the .h files for the optional entries
- */
+  
+                                                 
+   
 
 #include <stdio.h>
-#include <unistd.h>     /* unlink */
+#include <unistd.h>                 
 #include <ctype.h>
 #include "config.h"
 #include "parser.h"
@@ -79,10 +79,10 @@ headers(void)
 	}
 }
 
-/*
- * count all the devices of a certain type and recurse to count
- * whatever the device is connected to
- */
+  
+                                                               
+                                      
+   
 void
 do_count(const char *dev, const char *hname, int search)
 {
@@ -110,7 +110,7 @@ do_header(const char *dev, const char *hname, int count)
 	char *file, *name;
 	const char *inw;
 	char *inwcopy;
-	struct file_list *fl = NULL;    /* may exit for(;;) uninitted */
+	struct file_list *fl = NULL;                                    
 	struct file_list *fl_head, *fl_prev;
 	FILE *inf, *outf;
 	int inc, oldcount;
@@ -197,9 +197,9 @@ do_header(const char *dev, const char *hname, int count)
 	(void) fclose(outf);
 }
 
-/*
- * convert a dev name to a .h file name
- */
+  
+                                       
+   
 static char *
 toheader(const char *dev)
 {
@@ -209,9 +209,9 @@ toheader(const char *dev)
 	return hbuf;
 }
 
-/*
- * convert a dev name to a macro name
- */
+  
+                                     
+   
 static char *
 tomacro(const char *dev)
 {

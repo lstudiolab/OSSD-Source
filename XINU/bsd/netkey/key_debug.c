@@ -1,5 +1,5 @@
-/*	$FreeBSD: src/sys/netkey/key_debug.c,v 1.10.2.5 2002/04/28 05:40:28 suz Exp $	*/
-/*	$KAME: key_debug.c,v 1.26 2001/06/27 10:46:50 sakane Exp $	*/
+                                                                                   
+                                                                
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -51,7 +51,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#endif /* !KERNEL */
+#endif              
 
 #if !defined(KERNEL) || (defined(KERNEL) && defined(IPSEC_DEBUG))
 
@@ -72,9 +72,9 @@ static void kdebug_secreplay(struct secreplay *);
 #define panic(param)    { printf(param); exit(-1); }
 #endif
 
-/* NOTE: host byte order */
+                           
 
-/* %%%: about struct sadb_msg */
+                                
 void
 kdebug_sadb(base)
 struct sadb_msg *base;
@@ -82,7 +82,7 @@ struct sadb_msg *base;
 	struct sadb_ext *ext;
 	int tlen, extlen;
 
-	/* sanity check */
+	                  
 	if (base == NULL) {
 		panic("kdebug_sadb: NULL pointer was passed.\n");
 	}
@@ -178,7 +178,7 @@ struct sadb_ext *ext;
 	struct sadb_comb *comb;
 	int len;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_prop: NULL pointer was passed.\n");
 	}
@@ -228,7 +228,7 @@ struct sadb_ext *ext;
 	struct sadb_ident *id = (struct sadb_ident *)ext;
 	int len;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_identity: NULL pointer was passed.\n");
 	}
@@ -242,7 +242,7 @@ struct sadb_ext *ext;
 		    id->sadb_ident_type, (u_int32_t)id->sadb_ident_id);
 		if (len) {
 #ifdef KERNEL
-			ipsec_hexdump((caddr_t)(id + 1), len); /*XXX cast ?*/
+			ipsec_hexdump((caddr_t)(id + 1), len);               
 #else
 			char *p, *ep;
 			printf("\n  str=\"");
@@ -274,7 +274,7 @@ struct sadb_ext *ext;
 	struct sadb_alg *alg;
 	int len;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_supported: NULL pointer was passed.\n");
 	}
@@ -300,7 +300,7 @@ struct sadb_ext *ext;
 {
 	struct sadb_lifetime *lft = (struct sadb_lifetime *)ext;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		printf("kdebug_sadb_lifetime: NULL pointer was passed.\n");
 	}
@@ -321,7 +321,7 @@ struct sadb_ext *ext;
 {
 	struct sadb_sa *sa = (struct sadb_sa *)ext;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_sa: NULL pointer was passed.\n");
 	}
@@ -341,7 +341,7 @@ struct sadb_ext *ext;
 {
 	struct sadb_address *addr = (struct sadb_address *)ext;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_address: NULL pointer was passed.\n");
 	}
@@ -362,7 +362,7 @@ struct sadb_ext *ext;
 {
 	struct sadb_key *key = (struct sadb_key *)ext;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_key: NULL pointer was passed.\n");
 	}
@@ -371,7 +371,7 @@ struct sadb_ext *ext;
 	    key->sadb_key_bits, key->sadb_key_reserved);
 	printf("  key=");
 
-	/* sanity check 2 */
+	                    
 	if ((key->sadb_key_bits >> 3) >
 	    (PFKEY_UNUNIT64(key->sadb_key_len) - sizeof(struct sadb_key))) {
 		printf("kdebug_sadb_key: key length mismatch, bit:%d len:%ld.\n",
@@ -391,7 +391,7 @@ struct sadb_ext *ext;
 {
 	struct sadb_x_sa2 *sa2 = (struct sadb_x_sa2 *)ext;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_x_sa2: NULL pointer was passed.\n");
 	}
@@ -411,7 +411,7 @@ struct sadb_ext *ext;
 {
 	struct sadb_session_id *p = (__typeof__(p))ext;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_session_id: NULL pointer was passed.\n");
 	}
@@ -431,7 +431,7 @@ struct sadb_ext *ext;
 	struct sastat      *stats;
 	int    i;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_sastat: NULL pointer was passed.\n");
 	}
@@ -455,7 +455,7 @@ struct sadb_ext *ext;
 	struct sadb_x_policy *xpl = (struct sadb_x_policy *)ext;
 	struct sockaddr *addr;
 
-	/* sanity check */
+	                  
 	if (ext == NULL) {
 		panic("kdebug_sadb_x_policy: NULL pointer was passed.\n");
 	}
@@ -489,12 +489,12 @@ struct sadb_ext *ext;
 
 			printf(" }\n");
 
-			/* prevent infinite loop */
+			                           
 			if (xisr->sadb_x_ipsecrequest_len <= 0) {
 				printf("kdebug_sadb_x_policy: wrong policy struct.\n");
 				return;
 			}
-			/* prevent overflow */
+			                      
 			if (xisr->sadb_x_ipsecrequest_len > tlen) {
 				printf("invalid ipsec policy length\n");
 				return;
@@ -515,12 +515,12 @@ struct sadb_ext *ext;
 }
 
 #ifdef KERNEL
-/* %%%: about SPD and SAD */
+                            
 void
 kdebug_secpolicy(sp)
 struct secpolicy *sp;
 {
-	/* sanity check */
+	                  
 	if (sp == NULL) {
 		panic("kdebug_secpolicy: NULL pointer was passed.\n");
 	}
@@ -567,7 +567,7 @@ void
 kdebug_secpolicyindex(spidx)
 struct secpolicyindex *spidx;
 {
-	/* sanity check */
+	                  
 	if (spidx == NULL) {
 		panic("kdebug_secpolicyindex: NULL pointer was passed.\n");
 	}
@@ -590,7 +590,7 @@ void
 kdebug_secasindex(saidx)
 struct secasindex *saidx;
 {
-	/* sanity check */
+	                  
 	if (saidx == NULL) {
 		panic("kdebug_secpolicyindex: NULL pointer was passed.\n");
 	}
@@ -612,7 +612,7 @@ void
 kdebug_secasv(sav)
 struct secasvar *sav;
 {
-	/* sanity check */
+	                  
 	if (sav == NULL) {
 		panic("kdebug_secasv: NULL pointer was passed.\n");
 	}
@@ -651,7 +651,7 @@ struct secasvar *sav;
 	}
 
 #if notyet
-	/* XXX: misc[123] ? */
+	                      
 #endif
 
 	return;
@@ -664,7 +664,7 @@ struct secreplay *rpl;
 	size_t len;
 	int l;
 
-	/* sanity check */
+	                  
 	if (rpl == NULL) {
 		panic("kdebug_secreplay: NULL pointer was passed.\n");
 	}
@@ -693,7 +693,7 @@ void
 kdebug_mbufhdr(m)
 struct mbuf *m;
 {
-	/* sanity check */
+	                  
 	if (m == NULL) {
 		return;
 	}
@@ -749,7 +749,7 @@ struct mbuf *m0;
 
 	return;
 }
-#endif /* KERNEL */
+#endif             
 
 void
 kdebug_sockaddr(addr)
@@ -758,12 +758,12 @@ struct sockaddr *addr;
 	struct sockaddr_in *sin4;
 	struct sockaddr_in6 *sin6;
 
-	/* sanity check */
+	                  
 	if (addr == NULL) {
 		panic("kdebug_sockaddr: NULL pointer was passed.\n");
 	}
 
-	/* NOTE: We deal with port number as host byte order. */
+	                                                        
 	printf("sockaddr{ len=%u family=%u", addr->sa_len, addr->sa_family);
 
 	switch (addr->sa_family) {
@@ -827,4 +827,4 @@ int len;
 	return;
 }
 
-#endif /* !defined(KERNEL) || (defined(KERNEL) && defined(IPSEC_DEBUG)) */
+#endif                                                                    

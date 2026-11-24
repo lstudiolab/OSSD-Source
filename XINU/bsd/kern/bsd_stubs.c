@@ -37,16 +37,16 @@
 #include <kern/assert.h>
 #include <sys/conf.h>
 #include <sys/proc_internal.h>
-#include <sys/buf.h> /* for SET */
+#include <sys/buf.h>              
 #include <sys/kernel.h>
 #include <sys/user.h>
 #include <sys/sysent.h>
 #include <sys/sysproto.h>
 
-/* XXX these should be in a common header somwhere, but aren't */
+                                                                 
 extern int chrtoblk_set(int, int);
 
-/* XXX most of these just exist to export; there's no good header for them*/
+                                                                            
 void pcb_synch(void);
 
 typedef struct devsw_lock {
@@ -61,12 +61,12 @@ static LCK_GRP_DECLARE(devsw_lock_grp, "devsw");
 static LCK_MTX_DECLARE(devsw_lock_list_mtx, &devsw_lock_grp);
 static TAILQ_HEAD(, devsw_lock) devsw_locks = TAILQ_HEAD_INITIALIZER(devsw_locks);
 
-/* Just to satisfy pstat command */
+                                   
 int dmmin, dmmax, dmtext;
 
-/*
- * XXX this function only exists to be exported and do nothing.
- */
+  
+                                                               
+   
 void
 pcb_synch(void)
 {
@@ -75,7 +75,7 @@ pcb_synch(void)
 struct proc *
 current_proc(void)
 {
-	/* Never returns a NULL */
+	                          
 	struct uthread * ut;
 	struct proc * p;
 	thread_t thread = current_thread();
@@ -101,19 +101,19 @@ current_proc(void)
 	return p;
 }
 
-/* Device switch add delete routines */
+                                       
 
 const struct bdevsw nobdev = NO_BDEVICE;
 const struct cdevsw nocdev = NO_CDEVICE;
-/*
- *	if index is -1, return a free slot if avaliable
- *	  else see whether the index is free
- *	return the major number that is free else -1
- *
- *	if index is negative, we start
- *	looking for a free slot at the absolute value of index,
- *	instead of starting at 0
- */
+  
+                                                  
+                                       
+                                               
+  
+                                 
+                                                          
+                           
+   
 int
 bdevsw_isfree(int index)
 {
@@ -121,9 +121,9 @@ bdevsw_isfree(int index)
 
 	if (index < 0) {
 		if (index == -1) {
-			index = 1; /* start at 1 to avoid collision with volfs (Radar 2842228) */
+			index = 1;                                                               
 		} else {
-			index = -index; /* start at least this far up in the table */
+			index = -index;                                              
 		}
 		devsw = &bdevsw[index];
 		for (; index < nblkdev; index++, devsw++) {
@@ -144,15 +144,15 @@ bdevsw_isfree(int index)
 	return index;
 }
 
-/*
- *	if index is -1, find a free slot to add
- *	  else see whether the slot is free
- *	return the major number that is used else -1
- *
- *	if index is negative, we start
- *	looking for a free slot at the absolute value of index,
- *	instead of starting at 0
- */
+  
+                                          
+                                      
+                                               
+  
+                                 
+                                                          
+                           
+   
 int
 bdevsw_add(int index, const struct bdevsw * bsw)
 {
@@ -166,10 +166,10 @@ bdevsw_add(int index, const struct bdevsw * bsw)
 	lck_mtx_unlock(&devsw_lock_list_mtx);
 	return index;
 }
-/*
- *	if the slot has the same bsw, then remove
- *	else -1
- */
+  
+                                            
+          
+   
 int
 bdevsw_remove(int index, const struct bdevsw * bsw)
 {
@@ -190,15 +190,15 @@ bdevsw_remove(int index, const struct bdevsw * bsw)
 	return index;
 }
 
-/*
- *	if index is -1, return a free slot if avaliable
- *	  else see whether the index is free
- *	return the major number that is free else -1
- *
- *	if index is negative, we start
- *	looking for a free slot at the absolute value of index,
- *	instead of starting at 0
- */
+  
+                                                  
+                                       
+                                               
+  
+                                 
+                                                          
+                           
+   
 int
 cdevsw_isfree(int index)
 {
@@ -208,7 +208,7 @@ cdevsw_isfree(int index)
 		if (index == -1) {
 			index = 0;
 		} else {
-			index = -index; /* start at least this far up in the table */
+			index = -index;                                              
 		}
 		devsw = &cdevsw[index];
 		for (; index < nchrdev; index++, devsw++) {
@@ -229,20 +229,20 @@ cdevsw_isfree(int index)
 	return index;
 }
 
-/*
- *	if index is -1, find a free slot to add
- *	  else see whether the slot is free
- *	return the major number that is used else -1
- *
- *	if index is negative, we start
- *	looking for a free slot at the absolute value of index,
- *	instead of starting at 0
- *
- * NOTE:	In practice, -1 is unusable, since there are kernel internal
- *		devices that call this function with absolute index values,
- *		which will stomp on free-slot based assignments that happen
- *		before them.  -24 is currently a safe starting point.
- */
+  
+                                          
+                                      
+                                               
+  
+                                 
+                                                          
+                           
+  
+                                                                     
+                                                               
+                                                               
+                                                         
+   
 int
 cdevsw_add(int index, const struct cdevsw * csw)
 {
@@ -256,10 +256,10 @@ cdevsw_add(int index, const struct cdevsw * csw)
 	lck_mtx_unlock(&devsw_lock_list_mtx);
 	return index;
 }
-/*
- *	if the slot has the same csw, then remove
- *	else -1
- */
+  
+                                            
+          
+   
 int
 cdevsw_remove(int index, const struct cdevsw * csw)
 {
@@ -322,22 +322,22 @@ cdevsw_setkqueueok(int maj, const struct cdevsw * csw, int extra_flags)
 	return 0;
 }
 
-#include <pexpert/pexpert.h> /* for PE_parse_boot_arg */
+#include <pexpert/pexpert.h>                            
 
-/*
- * Copy the "hostname" variable into a caller-provided buffer
- * Returns: 0 for success, ENAMETOOLONG for insufficient buffer space.
- * On success, "len" will be set to the number of characters preceding
- * the NULL character in the hostname.
- */
+  
+                                                             
+                                                                      
+                                                                      
+                                      
+   
 int
 bsd_hostname(char *buf, size_t bufsize, size_t *len)
 {
 	int ret;
 	size_t hnlen;
-	/*
-	 * "hostname" is null-terminated
-	 */
+	  
+                                 
+    
 	lck_mtx_lock(&hostname_lock);
 	hnlen = strlen(hostname);
 	if (hnlen < bufsize) {

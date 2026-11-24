@@ -1,22 +1,22 @@
-/*
- * Benchmark VM fault throughput.
- * This test faults memory for a configurable amount of time across a
- * configurable number of threads. Currently it only measures zero fill faults.
- * Currently it supports two variants:
- * 1. Each thread gets its own vm objects to fault in
- * 2. Threads share vm objects
- *
- * We'll add more fault types as we identify problematic user-facing workloads
- * in macro benchmarks.
- *
- * Throughput is reported as pages / second using both wall time and cpu time.
- * CPU time is a more reliable metric for regression testing, but wall time can
- * highlight blocking in the VM.
- *
- * Running this benchmark directly is not recommended.
- * Use fault_throughput.lua which provides a nicer interface and outputs
- * perfdata.
- */
+  
+                                 
+                                                                     
+                                                                               
+                                      
+                                                     
+                              
+  
+                                                                              
+                       
+  
+                                                                              
+                                                                               
+                                
+  
+                                                      
+                                                                        
+            
+   
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -29,12 +29,12 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
-/*
- * TODO: Make this benchmark runnable on linux so we can do a perf comparison.
- * We're mostly using POSIX APIs, but we'll need to replace
- * the sysctls with the /proc equivalents, and replace clock_gettime_nsec_np
- * with the linux equivalent.
- */
+  
+                                                                              
+                                                           
+                                                                            
+                             
+   
 #include <mach/mach.h>
 
 #include <TargetConditionals.h>
@@ -45,32 +45,32 @@
 #include "benchmark/helpers.h"
 
 #if (TARGET_OS_OSX || TARGET_OS_SIMULATOR)
-/*
- * On non-embedded platforms we coalesce vm objects up to 128 MB, so
- * we make the objects 128 MB on that platform to ensure they're not
- * merged with anything else.
- */
+  
+                                                                    
+                                                                    
+                             
+   
 const static size_t kVmObjectSize = 128 * (1UL << 20);
 #else
-/*
- * Embedded platforms don't coalesce vm objects. This number
- * needs to be big enough that faulting it in dwarfs the cost of dequeuing
- * it from the work queue, but can't be too large or else we won't be able
- * to allocate one per thread in the separate-objects benchmark.
- */
+  
+                                                            
+                                                                          
+                                                                          
+                                                                
+   
 const static size_t kVmObjectSize = 4 * (1UL << 20);
-#endif /* (TARGET_OS_OSX || TARGET_OS_SIMULATOR) */
+#endif                                             
 static const clockid_t kWallTimeClock = CLOCK_MONOTONIC_RAW;
 static const clockid_t kThreadCPUTimeClock = CLOCK_THREAD_CPUTIME_ID;
-/* These globals are set dynamically during test setup based on sysctls. */
+                                                                           
 static uint64_t kCacheLineSize = 0;
-/* The VM page size */
+                      
 static size_t kPageSize = 0;
 
 
 typedef struct fault_buffer {
-	unsigned char* fb_start; /* The start of this buffer. */
-	size_t fb_size; /* The size of this buffer in bytes. */
+	unsigned char* fb_start;                                
+	size_t fb_size;                                        
 } fault_buffer_t;
 
 typedef enum test_variant {
@@ -79,41 +79,41 @@ typedef enum test_variant {
 } test_variant_t;
 
 typedef struct test_globals {
-	/* This lock protects: tg_cv, tg_running_count, tg_done, tg_current_iteration, and tg_iterations_completed. */
+	                                                                                                              
 	pthread_mutex_t tg_lock;
 	pthread_cond_t tg_cv;
-	/* The number of currently running threads */
+	                                             
 	unsigned int tg_running_count;
-	/* Set during cleanup to indicate that the benchmark is over. */
+	                                                                
 	bool tg_done;
 	size_t tg_current_iteration;
 	size_t tg_iterations_completed;
 	unsigned int tg_num_threads;
 	test_variant_t tg_variant;
-	/*
-	 * An array of memory objects to fault in.
-	 * This is basically a workqueue of
-	 * contiguous chunks of memory that the worker threads
-	 * will fault in.
-	 */
+	  
+                                           
+                                    
+                                                       
+                  
+    
 	fault_buffer_t *tg_fault_buffer_arr;
 	size_t tg_fault_buffer_arr_length;
-	/*
-	 * To avoid false sharing, we pad the test globals with an extra cache line and place the atomic
-	 * next_fault_buffer_index size_t after the cache line.
-	 */
+	  
+                                                                                                 
+                                                        
+    
 	__unused char padding[];
-	/*
-	 * This field is directly after the padding buffer.
-	 * It is used to synchronize access to tg_fault_buffer_arr.
-	 */
-	//_Atomic size_t tg_next_fault_buffer_index;
+	  
+                                                    
+                                                            
+    
+	                                            
 } test_globals_t;
 
 static const char* kSeparateObjectsArgument = "separate-objects";
 static const char* kShareObjectsArgument = "share-objects";
 
-/* Arguments parsed from the command line */
+                                            
 typedef struct test_args {
 	uint32_t n_threads;
 	uint64_t duration_seconds;
@@ -121,90 +121,90 @@ typedef struct test_args {
 	bool verbose;
 } test_args_t;
 
-/*
- * Fault in the pages in the given buffer.
- */
+  
+                                          
+   
 static void fault_pages(fault_buffer_t *buffer, size_t stride);
-/* Get a unique fault buffer from the global work queue. */
+                                                           
 static fault_buffer_t *get_fault_buffer(test_globals_t* globals);
-/*
- * Grabs buffers from the global test structure and faults them in, using this
- * test variant's stride, until there are no more buffers to grab.
- * Returns the number of microseconds spent on-cpu.
- */
+  
+                                                                              
+                                                                  
+                                                   
+   
 static uint64_t grab_and_fault_pages(test_globals_t* globals);
 
 static bool worker_thread_iteration_setup(size_t current_iteration, test_globals_t *globals);
 static void worker_thread_iteration_complete(test_globals_t *globals);
 
 static void parse_arguments(int argc, char **argv, test_args_t *args);
-/*
- * Sets up the test globals and spawns the background threads to do the faults.
- * Returns an array of size `num_threads`
- * Containing the thread ids of the forked threads.
- */
+  
+                                                                               
+                                         
+                                                   
+   
 static pthread_t* setup_test(test_globals_t *globals, const test_args_t *args, size_t memory_size, bool verbose);
 static test_globals_t *allocate_test_globals(void);
-/* Initializes variables in the globals array. */
+                                                 
 static void init_globals(test_globals_t *globals, const test_args_t *args);
 static inline _Atomic size_t *next_fault_buffer_index_ptr(test_globals_t *globals);
-/*
- * Called on the main thread.
- * Waits for the background threads to be ready, sets up the memory objects,
- * and then starts a faulting iteration.
- * Returns the start (wall) time.
- */
+  
+                             
+                                                                            
+                                        
+                                 
+   
 static uint64_t start_iteration(test_globals_t* globals, test_variant_t variant, bool verbose);
-/*
- * Called on the main thread.
- * Waits for the background threads to complete the iteration and cleans up.
- * Returns the total amount of time spent faulting pages in nanoseconds by all threads thus far.
- */
+  
+                             
+                                                                            
+                                                                                                
+   
 static uint64_t finish_iteration(test_globals_t *globals, uint64_t start_time);
-/*
- * Called on the main thread.
- * Maps buffers and places them in the work queue.
- */
+  
+                             
+                                                  
+   
 static void setup_memory(test_globals_t* globals, test_variant_t variant);
-/*
- * Dump test results as a csv to stdout.
- * Use fault_throughput.lua to convert to perfdata.
- */
+  
+                                        
+                                                   
+   
 static void output_results(const test_globals_t *globals, double walltime_elapsed_seconds, double cputime_elapsed_seconds);
 static void cleanup_test(test_globals_t *globals);
-/*
- * Join the background threads and return the total microseconds
- * of cpu time spent faulting across all of the threads.
- * Takes ownership of the threads array and frees it.
- */
+  
+                                                                
+                                                        
+                                                     
+   
 static uint64_t join_background_threads(test_globals_t *globals, pthread_t *threads);
 static void unmap_fault_buffers(test_globals_t *globals);
-/*
- * Get the stride between each vm object in the fault buffer array.
- */
+  
+                                                                   
+   
 static size_t fault_buffer_stride(const test_globals_t *globals);
 
 int
 main(int argc, char **argv)
 {
-	/* How much memory should the test consume (per-core on the system)? */
+	                                                                       
 #if (TARGET_OS_OSX || TARGET_OS_SIMULATOR)
 	static const size_t memory_per_core = kVmObjectSize;
 #else
 	static const size_t memory_per_core = 25 * (1UL << 20);
-#endif /* (TARGET_OS_OSX || TARGET_OS_SIMULATOR) */
+#endif                                             
 	const size_t kMemSize = memory_per_core * (size_t) get_ncpu();
 	test_globals_t *globals = allocate_test_globals();
-	/* Total wall-time spent faulting in pages. */
+	                                              
 	uint64_t wall_time_elapsed_ns = 0;
-	/* Total cpu-time spent faulting in pages */
+	                                            
 	uint64_t cpu_time_faulting_us = 0;
 	uint64_t start_time_ns;
 	test_args_t args;
 	parse_arguments(argc, argv, &args);
 	pthread_t* threads = setup_test(globals, &args, kMemSize, args.verbose);
 
-	/* Keep doing more iterations until we've hit our (wall) time budget */
+	                                                                       
 	while (wall_time_elapsed_ns < args.duration_seconds * kNumNanosecondsInSecond) {
 		benchmark_log(args.verbose, "----Starting Iteration %lu-----\n", globals->tg_current_iteration + 1);
 		start_time_ns = start_iteration(globals, args.variant, args.verbose);
@@ -223,7 +223,7 @@ main(int argc, char **argv)
 }
 
 
-/* The main loop for the worker threads. */
+                                           
 static void*
 faulting_thread(void* arg)
 {
@@ -242,31 +242,31 @@ faulting_thread(void* arg)
 	return (void*)on_cpu_time_faulting;
 }
 
-/*
- * Called on the worker threads before each iteration to synchronize this
- * iteration start with the other threads.
- * Returns true if the iteration should continue, and false if the test is over.
- */
+  
+                                                                         
+                                          
+                                                                                
+   
 static bool
 worker_thread_iteration_setup(size_t current_iteration, test_globals_t *globals)
 {
 	bool should_continue = false;
 	int ret = 0;
-	// Gate on the other threads being ready to start
+	                                                 
 	ret = pthread_mutex_lock(&globals->tg_lock);
 	assert(ret == 0);
 	globals->tg_running_count++;
 	if (globals->tg_running_count == globals->tg_num_threads) {
-		// All the worker threads are running.
-		// Wake up the main thread so that it can ungate the test.
+		                                      
+		                                                          
 		ret = pthread_cond_broadcast(&globals->tg_cv);
 		assert(ret == 0);
 	}
-	/*
-	 * The main thread will start this iteration by incrementing
-	 * tg_current_iteration. Block until that happens.
-	 * See start_iteration for the wakeup code.
-	 */
+	  
+                                                             
+                                                   
+                                            
+    
 	while (!globals->tg_done && globals->tg_current_iteration != current_iteration) {
 		ret = pthread_cond_wait(&globals->tg_cv, &globals->tg_lock);
 		assert(ret == 0);
@@ -277,25 +277,25 @@ worker_thread_iteration_setup(size_t current_iteration, test_globals_t *globals)
 	return should_continue;
 }
 
-/*
- * Called on the worker threads before each iteration finishes to synchronize
- * with the other threads.
- */
+  
+                                                                             
+                          
+   
 static void
 worker_thread_iteration_complete(test_globals_t *globals)
 {
 	int ret;
-	// Mark ourselves as done and wait for the other threads to finish
+	                                                                  
 	ret = pthread_mutex_lock(&globals->tg_lock);
 	assert(ret == 0);
 	globals->tg_running_count--;
 	if (globals->tg_running_count == 0) {
-		// We're the last one to finish. Mark this iteration as completed and wake everyone up.
+		                                                                                       
 		globals->tg_iterations_completed++;
 		ret = pthread_cond_broadcast(&globals->tg_cv);
 		assert(ret == 0);
 	} else {
-		// Others are running. Wait for them to finish.
+		                                               
 		while (globals->tg_iterations_completed != globals->tg_current_iteration) {
 			ret = pthread_cond_wait(&globals->tg_cv, &globals->tg_lock);
 			assert(ret == 0);
@@ -356,14 +356,14 @@ start_iteration(test_globals_t* globals, test_variant_t variant, bool verbose)
 	ret = pthread_mutex_lock(&globals->tg_lock);
 	assert(ret == 0);
 	benchmark_log(verbose, "Waiting for workers to catch up before starting next iteration.\n");
-	/* Wait until all the threads are ready to go to the next iteration */
+	                                                                      
 	while (globals->tg_running_count != globals->tg_num_threads) {
 		ret = pthread_cond_wait(&globals->tg_cv, &globals->tg_lock);
 	}
 	benchmark_log(verbose, "Workers are all caught up\n");
 	setup_memory(globals, variant);
 	benchmark_log(verbose, "Initialized data structures for iteration. Waking workers.\n");
-	/* Grab a timestamp, tick the current iteration, and wake up the worker threads */
+	                                                                                  
 	start_time = current_timestamp_ns();
 	globals->tg_current_iteration++;
 	ret = pthread_mutex_unlock(&globals->tg_lock);
@@ -399,11 +399,11 @@ setup_memory(test_globals_t* globals, test_variant_t variant)
 		object->fb_start = mmap_buffer(kVmObjectSize);
 		object->fb_size = kVmObjectSize;
 		if (variant == VARIANT_SHARE_VM_OBJECTS) {
-			/*
-			 * Insert another buffer into the work queue for each thread.
-			 * Each buffer starts 1 page past where the previous buffer started into the vm object.
-			 * Since each thread strides by the number of threads * the page size they won't fault in the same pages.
-			 */
+			  
+                                                                
+                                                                                          
+                                                                                                            
+      
 			for (size_t j = 1; j < globals->tg_num_threads; j++) {
 				size_t offset = kPageSize * j;
 				fault_buffer_t *offset_object = &globals->tg_fault_buffer_arr[i + j];
@@ -482,19 +482,19 @@ static void
 init_fault_buffer_arr(test_globals_t *globals, const test_args_t *args, size_t memory_size)
 {
 	if (args->variant == VARIANT_SEPARATE_VM_OBJECTS) {
-		// This variant creates separate vm objects up to memory size bytes total
+		                                                                         
 		globals->tg_fault_buffer_arr_length = memory_size / kVmObjectSize;
 	} else if (args->variant == VARIANT_SHARE_VM_OBJECTS) {
-		// This variant creates separate vm objects up to memory size bytes total
-		// And places a pointer into each vm object for each thread.
+		                                                                         
+		                                                            
 		globals->tg_fault_buffer_arr_length = memory_size / kVmObjectSize * globals->tg_num_threads;
 	} else {
 		fprintf(stderr, "Unsupported test variant.\n");
 		exit(2);
 	}
-	// It doesn't make sense to have more threads than elements in the work queue.
-	// NB: Since we scale memory_size by ncpus, this can only happen if the user
-	// tries to run the benchmark with many more threads than cores.
+	                                                                              
+	                                                                            
+	                                                                
 	assert(globals->tg_fault_buffer_arr_length >= globals->tg_num_threads);
 	globals->tg_fault_buffer_arr = calloc(sizeof(fault_buffer_t), globals->tg_fault_buffer_arr_length);
 	assert(globals->tg_fault_buffer_arr);
@@ -510,7 +510,7 @@ spawn_worker_threads(test_globals_t *globals, unsigned int num_threads)
 	assert(threads);
 	ret = pthread_attr_init(&pthread_attrs);
 	assert(ret == 0);
-	// Spawn the background threads
+	                               
 	for (unsigned int i = 0; i < num_threads; i++) {
 		ret = pthread_create(threads + i, &pthread_attrs, faulting_thread, globals);
 		assert(ret == 0);
@@ -534,7 +534,7 @@ setup_test(test_globals_t *globals, const test_args_t *args, size_t memory_size,
 static uint64_t
 join_background_threads(test_globals_t *globals, pthread_t *threads)
 {
-	// Set the done flag so that the background threads exit
+	                                                        
 	int ret;
 	uint64_t total_cputime_spent_faulting = 0;
 	ret = pthread_mutex_lock(&globals->tg_lock);
@@ -545,7 +545,7 @@ join_background_threads(test_globals_t *globals, pthread_t *threads)
 	ret = pthread_mutex_unlock(&globals->tg_lock);
 	assert(ret == 0);
 
-	// Join the background threads
+	                              
 	for (unsigned int i = 0; i < globals->tg_num_threads; i++) {
 		uint64_t cputime_spent_faulting = 0;
 		ret = pthread_join(threads[i], (void **)&cputime_spent_faulting);

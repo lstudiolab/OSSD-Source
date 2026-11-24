@@ -40,7 +40,7 @@
 #include <libkern/section_keywords.h>
 #include <libkern/version.h>
 
-#include <string.h> /* bcopy */
+#include <string.h>            
 
 #include <kern/processor.h>
 #include <kern/thread.h>
@@ -51,7 +51,7 @@
 #include <vm/vm_shared_region.h>
 #include <libkern/OSKextLibPrivate.h>
 
-#define DO_ALIGN        1       /* align all packet data accesses */
+#define DO_ALIGN        1                                           
 
 #define KDP_TEST_HARNESS 0
 #if KDP_TEST_HARNESS
@@ -63,50 +63,50 @@
 SECURITY_READ_ONLY_EARLY(static kdp_dispatch_t)
 dispatch_table[KDP_INVALID_REQUEST - KDP_CONNECT] =
 {
-/* 0 */ kdp_connect,
-/* 1 */ kdp_disconnect,
-/* 2 */ kdp_hostinfo,
-/* 3 */ kdp_version,
-/* 4 */ kdp_maxbytes,
-/* 5 */ kdp_readmem,
-/* 6 */ kdp_writemem,
-/* 7 */ kdp_readregs,
-/* 8 */ kdp_writeregs,
-/* 9 */ kdp_unknown,
-/* A */ kdp_unknown,
-/* B */ kdp_suspend,
-/* C */ kdp_resumecpus,
-/* D */ kdp_unknown,
-/* E */ kdp_unknown,
-/* F */ kdp_breakpoint_set,
-/*10 */ kdp_breakpoint_remove,
-/*11 */ kdp_regions,
-/*12 */ kdp_reattach,
-/*13 */ kdp_reboot,
-/*14 */ kdp_readmem64,
-/*15 */ kdp_writemem64,
-/*16 */ kdp_breakpoint64_set,
-/*17 */ kdp_breakpoint64_remove,
-/*18 */ kdp_kernelversion,
-/*19 */ kdp_readphysmem64,
-/*1A */ kdp_writephysmem64,
-/*1B */ kdp_readioport,
-/*1C */ kdp_writeioport,
-/*1D */ kdp_readmsr64,
-/*1E */ kdp_writemsr64,
-/*1F */ kdp_dumpinfo,
+        kdp_connect,
+        kdp_disconnect,
+        kdp_hostinfo,
+        kdp_version,
+        kdp_maxbytes,
+        kdp_readmem,
+        kdp_writemem,
+        kdp_readregs,
+        kdp_writeregs,
+        kdp_unknown,
+        kdp_unknown,
+        kdp_suspend,
+        kdp_resumecpus,
+        kdp_unknown,
+        kdp_unknown,
+        kdp_breakpoint_set,
+        kdp_breakpoint_remove,
+        kdp_regions,
+        kdp_reattach,
+        kdp_reboot,
+        kdp_readmem64,
+        kdp_writemem64,
+        kdp_breakpoint64_set,
+        kdp_breakpoint64_remove,
+        kdp_kernelversion,
+        kdp_readphysmem64,
+        kdp_writephysmem64,
+        kdp_readioport,
+        kdp_writeioport,
+        kdp_readmsr64,
+        kdp_writemsr64,
+        kdp_dumpinfo,
 };
 
 kdp_glob_t      kdp;
 
 #define MAX_BREAKPOINTS 100
 
-/*
- * Version 11 of the KDP Protocol adds support for 64-bit wide memory
- * addresses (read/write and breakpoints) as well as a dedicated
- * kernelversion request. Version 12 adds read/writing of physical
- * memory with 64-bit wide memory addresses.
- */
+  
+                                                                     
+                                                                
+                                                                  
+                                            
+   
 #define KDP_VERSION 12
 
 typedef struct{
@@ -138,7 +138,7 @@ kdp_packet(
 	unsigned short      *reply_port
 	)
 {
-	static unsigned     aligned_pkt[1538 / sizeof(unsigned) + 1];// max ether pkt
+	static unsigned     aligned_pkt[1538 / sizeof(unsigned) + 1];                
 	kdp_pkt_t           *rd = (kdp_pkt_t *)&aligned_pkt;
 	size_t              plen = *len;
 	kdp_req_t           req;
@@ -221,7 +221,7 @@ kdp_connect(
 	key   = rq->hdr.key;
 	seq   = rq->hdr.seq;
 	if (kdp.is_conn) {
-		if ((seq == kdp.conn_seq) && /* duplicate request */
+		if ((seq == kdp.conn_seq) &&                        
 		    (rport == kdp.reply_port) &&
 		    (eport == kdp.exception_port) &&
 		    (key == kdp.session_key)) {
@@ -367,7 +367,7 @@ kdp_kernelversion(
 	dprintf(("kdp_kernelversion\n"));
 	slen = strlcpy(rp->version, kdp_kernelversion_string, MAX_KDP_DATA_SIZE);
 
-	rp->hdr.len += slen + 1; /* strlcpy returns the amount copied with NUL */
+	rp->hdr.len += slen + 1;                                                 
 
 	*reply_port = kdp.reply_port;
 	*len = rp->hdr.len;
@@ -1023,7 +1023,7 @@ kdp_reboot(
 
 	kdp_machine_reboot();
 
-	return TRUE; // no, not really, we won't return
+	return TRUE;                                   
 }
 
 static boolean_t
@@ -1179,7 +1179,7 @@ kdp_dumpinfo(
 		    rq->port);
 	}
 
-	/* gather some stats for reply */
+	                                 
 	kdp_get_dump_info(rp);
 
 	*reply_port = kdp.reply_port;

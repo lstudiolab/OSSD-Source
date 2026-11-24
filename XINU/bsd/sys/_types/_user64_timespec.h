@@ -30,8 +30,8 @@
 #define _STRUCT_USER64_TIMESPEC struct user64_timespec
 _STRUCT_USER64_TIMESPEC
 {
-	user64_time_t   tv_sec;         /* seconds */
-	user64_long_t   tv_nsec;        /* and nanoseconds */
+	user64_time_t   tv_sec;                      
+	user64_long_t   tv_nsec;                             
 };
-#endif /* _STRUCT_USER64_TIMESPEC */
-#endif /* KERNEL */
+#endif                              
+#endif             

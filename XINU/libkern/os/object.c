@@ -24,13 +24,13 @@
 #include <kern/assert.h>
 
 
-/* XXX temporary until full vtable and refcount support */
+                                                          
 extern struct os_log_s _os_log_default;
 
 void*
 os_retain(void *obj)
 {
-	/* XXX temporary nop */
+	                       
 	assert(obj == &_os_log_default);
 	return obj;
 }
@@ -38,6 +38,6 @@ os_retain(void *obj)
 void
 os_release(void *obj __unused)
 {
-	/* XXX temporary nop */
+	                       
 	assert(obj == &_os_log_default);
 }

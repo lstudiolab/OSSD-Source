@@ -29,7 +29,7 @@ main(int argc, char **argv, char **env, const char **apple)
 		int pid = fork();
 
 		if (pid > 0) {
-			/* Parent */
+			            
 			int status;
 			if (waitpid(pid, &status, 0) < 0) {
 				retval = 1;
@@ -39,12 +39,12 @@ main(int argc, char **argv, char **env, const char **apple)
 				retval = 1;
 			}
 		} else if (pid == 0) {
-			/* Child */
+			           
 			char *new_argv[] = {argv[0], HELPER_BEHAVIOR_SET, argv[2], NULL};
 			execv(new_argv[0], new_argv);
 			retval = 1;
 		} else if (pid < 0) {
-			/* Failed */
+			            
 			retval = 1;
 		}
 	} else if (!strcmp(behavior, HELPER_BEHAVIOR_SPAWN)) {

@@ -35,12 +35,12 @@
 
 OSDefineMetaClassAndStructors(IOPMPowerSource, IOService)
 
-// *****************************************************************************
-// powerSource
-//
-// Static initializer for IOPMPowerSource. Returns a new instance of the class
-// which the caller must attach to the power plane.
-// *****************************************************************************
+                                                                                
+              
+  
+                                                                              
+                                                   
+                                                                                
 
 IOPMPowerSource *IOPMPowerSource::powerSource(void)
 {
@@ -53,10 +53,10 @@ IOPMPowerSource *IOPMPowerSource::powerSource(void)
 	return NULL;
 }
 
-// *****************************************************************************
-// init
-//
-// *****************************************************************************
+                                                                                
+       
+  
+                                                                                
 bool
 IOPMPowerSource::init(void)
 {
@@ -95,10 +95,10 @@ IOPMPowerSource::init(void)
 	return true;
 }
 
-// *****************************************************************************
-// free
-//
-// *****************************************************************************
+                                                                                
+       
+  
+                                                                                
 void
 IOPMPowerSource::free(void)
 {
@@ -166,12 +166,12 @@ IOPMPowerSource::free(void)
 	super::free();
 }
 
-// *****************************************************************************
-// updateStatus
-//
-// Update power source state in IORegistry and message interested clients
-// notifying them of our change.
-// *****************************************************************************
+                                                                                
+               
+  
+                                                                         
+                                
+                                                                                
 void
 IOPMPowerSource::updateStatus(void)
 {
@@ -179,7 +179,7 @@ IOPMPowerSource::updateStatus(void)
 	OSObject                        *iteratorKey;
 	OSObject                        *obj;
 
-	// do nothing if settings haven't changed
+	                                         
 	if (!settingsChangedSinceUpdate) {
 		return;
 	}
@@ -206,16 +206,16 @@ IOPMPowerSource::updateStatus(void)
 
 	settingsChangedSinceUpdate = false;
 
-	// And up goes the flare
+	                        
 	messageClients(kIOPMMessageBatteryStatusHasChanged);
 }
 
 
-/*******************************************************************************
- *
- * PROTECTED Accessors. All the setters! Yay!
- *
- ******************************************************************************/
+                                                                                
+  
+                                             
+  
+                                                                                
 
 void
 IOPMPowerSource::setPSProperty(const OSSymbol *key, OSObject *val)
@@ -226,24 +226,24 @@ IOPMPowerSource::setPSProperty(const OSSymbol *key, OSObject *val)
 		return;
 	}
 
-	// Compare new setting with existing setting; update
-	// 'settingsChangedSinceUpdate' if the setting has changed.
-	// If values are OSNumbers, do equality comparison.
-	// Otherwise, just compare pointers.
+	                                                    
+	                                                           
+	                                                   
+	                                    
 
 	if ((lastVal = properties->getObject(key))) {
 		if (val->isEqualTo(lastVal)) {
-			// settings didn't change
+			                         
 		} else {
-			// num val is not equal to last val
+			                                   
 			settingsChangedSinceUpdate = true;
 		}
 	} else {
-		// new setting; no last value
+		                             
 		settingsChangedSinceUpdate = true;
 	}
 
-	// here's the part where we go crazy.
+	                                     
 	properties->setObject(key, val);
 }
 
@@ -389,11 +389,11 @@ IOPMPowerSource::setLegacyIOBatteryInfo(OSDictionary *d)
 
 
 
-/*******************************************************************************
- *
- * PUBLIC Accessors. All the getters! Boo!
- *
- ******************************************************************************/
+                                                                                
+  
+                                          
+  
+                                                                                
 
 OSObject *
 IOPMPowerSource::getPSProperty(const OSSymbol *symmie)

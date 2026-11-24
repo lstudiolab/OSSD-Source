@@ -33,15 +33,15 @@
 #include <net/kpi_interface.h>
 
 __BEGIN_DECLS
-/* Not exported */
+                  
 extern int ether_family_init(void);
 
-/*
- * These functions may be used for an interface emulating an ethernet
- * interface and not using IOKit. If you use IOKit and the IOKit
- * Ethernet Family, these functions will be set for you. Use these
- * functions when filling out the ifnet_init_params structure.
- */
+  
+                                                                     
+                                                                
+                                                                  
+                                                              
+   
 errno_t ether_demux(ifnet_t interface, mbuf_t packet, char* header,
     protocol_family_t *protocol);
 errno_t ether_add_proto(ifnet_t interface, protocol_family_t protocol,
@@ -51,20 +51,20 @@ errno_t ether_del_proto(ifnet_t interface, protocol_family_t protocol);
 errno_t ether_frameout(ifnet_t interface, mbuf_t *packet,
     const struct sockaddr *dest, const char *dest_lladdr,
     const char *frame_type, u_int32_t *prepend_len, u_int32_t *postpend_len);
-#else /* !KPI_INTERFACE_EMBEDDED */
+#else                              
 errno_t ether_frameout(ifnet_t interface, mbuf_t *packet,
     const struct sockaddr *dest, const char *dest_lladdr,
     const char *frame_type);
-#endif /* !KPI_INTERFACE_EMBEDDED */
+#endif                              
 #ifdef KERNEL_PRIVATE
 errno_t ether_frameout_extended(ifnet_t interface, mbuf_t *packet,
     const struct sockaddr *dest, const char *dest_lladdr,
     const char *frame_type, u_int32_t *prepend_len, u_int32_t *postpend_len);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 errno_t ether_ioctl(ifnet_t interface, u_int32_t command, void* data);
 errno_t ether_check_multi(ifnet_t ifp, const struct sockaddr *multicast);
 
 __END_DECLS
 
-#endif /* KERNEL */
-#endif /* _NET_IF_ETHER_H */
+#endif             
+#endif                      

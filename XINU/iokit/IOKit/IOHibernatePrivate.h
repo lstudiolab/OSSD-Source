@@ -35,12 +35,12 @@
 
 #define HIBERNATE_HAVE_MACHINE_HEADER 1
 
-// enable the hibernation exception handler on DEBUG and DEVELOPMENT kernels
+                                                                            
 #define HIBERNATE_TRAP_HANDLER (DEBUG || DEVELOPMENT)
 
-#endif /* defined(__arm64__) */
+#endif                         
 
-#endif /* HIBERNATION */
+#endif                  
 
 #ifndef __ASSEMBLER__
 
@@ -55,10 +55,10 @@ __BEGIN_DECLS
 #include <kern/debug.h>
 
 extern int kdb_printf(const char *format, ...) __printflike(1, 2);
-#endif /* KERNEL */
+#endif             
 
-#define HIBERNATE_HMAC_SIZE 48 // SHA384 size in bytes
-#define HIBERNATE_SHA256_SIZE 32 // SHA256 size in bytes
+#define HIBERNATE_HMAC_SIZE 48                        
+#define HIBERNATE_SHA256_SIZE 32                        
 
 struct IOHibernateHibSegment {
 	uint32_t    iBootMemoryRegion;
@@ -144,7 +144,7 @@ struct IOHibernateImageHeader {
 	} __attribute__ ((packed));
 	uint64_t    kernVirtSlide __attribute__ ((packed));
 
-	uint32_t    reserved[47];       // make sizeof == 512
+	uint32_t    reserved[47];                            
 	uint32_t    booterTime0;
 	uint32_t    booterTime1;
 	uint32_t    booterTime2;
@@ -170,7 +170,7 @@ struct IOHibernateImageHeader {
 	uint8_t     image2PagesHMAC[HIBERNATE_HMAC_SIZE];
 	uint8_t     rorgnHMAC[HIBERNATE_HMAC_SIZE];
 	uint8_t     rorgnSHA256[HIBERNATE_SHA256_SIZE];
-#endif /* defined(__arm64__) */
+#endif                         
 
 	uint32_t            fileExtentMapSize;
 	IOPolledFileExtent  fileExtentMap[2];
@@ -181,7 +181,7 @@ enum{
 	kIOHibernateDebugRestoreLogs = 0x00000001
 };
 
-// options & IOHibernateOptions property
+                                        
 enum{
 	kIOHibernateOptionSSD           = 0x00000001,
 	kIOHibernateOptionColor         = 0x00000002,
@@ -219,7 +219,7 @@ struct hibernate_cryptvars_t {
 };
 typedef struct hibernate_cryptvars_t hibernate_cryptvars_t;
 
-#endif /* defined(_AES_H) */
+#endif                      
 
 enum{
 	kIOHibernateHandoffType                 = 0x686f0000,
@@ -263,12 +263,12 @@ enum{
 
 
 struct hibernate_graphics_t {
-	uint64_t physicalAddress; // Base address of video memory
-	int32_t  gfxStatus;     // EFI config restore status
-	uint32_t rowBytes;              // Number of bytes per pixel row
-	uint32_t width;                 // Width
-	uint32_t height;                // Height
-	uint32_t depth;                 // Pixel Depth
+	uint64_t physicalAddress;                                
+	int32_t  gfxStatus;                                 
+	uint32_t rowBytes;                                              
+	uint32_t width;                         
+	uint32_t height;                         
+	uint32_t depth;                               
 
 	uint8_t progressSaveUnder[kIOHibernateProgressCount][kIOHibernateProgressSaveUnderSize];
 };
@@ -297,13 +297,13 @@ static const uint8_t gIOHibernateProgressAlpha                  \
 };
 
 struct hibernate_preview_t {
-	uint32_t  imageCount;   // Number of images
-	uint32_t  width;        // Width
-	uint32_t  height;       // Height
-	uint32_t  depth;        // Pixel Depth
-	uint64_t  lockTime;     // Lock time
-	uint32_t  reservedG[7]; // reserved
-	uint32_t  reservedK[8]; // reserved
+	uint32_t  imageCount;                      
+	uint32_t  width;                
+	uint32_t  height;                
+	uint32_t  depth;                      
+	uint64_t  lockTime;                 
+	uint32_t  reservedG[7];            
+	uint32_t  reservedK[8];            
 };
 typedef struct hibernate_preview_t hibernate_preview_t;
 
@@ -360,7 +360,7 @@ void     IOHibernateSetScreenLocked(uint32_t lockState);
 void     IOHibernateSetWakeCapabilities(uint32_t capability);
 void     IOHibernateSystemRestart(void);
 
-#endif /* __cplusplus */
+#endif                  
 
 struct hibernate_scratch {
 	uint8_t  *curPage;
@@ -423,7 +423,7 @@ hibernate_vm_lock_end(void);
 boolean_t
 hibernate_vm_locks_are_safe(void);
 
-// mark pages not to be saved, based on VM system accounting
+                                                            
 void
 hibernate_page_list_setall(hibernate_page_list_t * page_list,
     hibernate_page_list_t * page_list_wired,
@@ -432,15 +432,15 @@ hibernate_page_list_setall(hibernate_page_list_t * page_list,
     boolean_t discard_all,
     uint32_t * pagesOut);
 
-// mark pages to be saved, or pages not to be saved but available
-// for scratch usage during restore
+                                                                 
+                                   
 void
 hibernate_page_list_setall_machine(hibernate_page_list_t * page_list,
     hibernate_page_list_t * page_list_wired,
     boolean_t preflight,
     uint32_t * pagesOut);
 
-// mark pages not to be saved and not for scratch usage during restore
+                                                                      
 void
 hibernate_page_list_set_volatile( hibernate_page_list_t * page_list,
     hibernate_page_list_t * page_list_wired,
@@ -507,12 +507,12 @@ hibernate_newruntime_map(void * map, vm_size_t map_size,
 extern uint32_t    gIOHibernateState;
 extern uint32_t    gIOHibernateMode;
 extern uint32_t    gIOHibernateDebugFlags;
-extern uint32_t    gIOHibernateFreeTime;        // max time to spend freeing pages (ms)
+extern uint32_t    gIOHibernateFreeTime;                                               
 extern boolean_t   gIOHibernateStandbyDisabled;
 #if !defined(__arm64__)
 extern uint8_t     gIOHibernateRestoreStack[];
 extern uint8_t     gIOHibernateRestoreStackEnd[];
-#endif /* !defined(__arm64__) */
+#endif                          
 extern IOHibernateImageHeader *    gIOHibernateCurrentHeader;
 
 #define HIBLOGFROMPANIC(fmt, args...) \
@@ -525,16 +525,16 @@ extern IOHibernateImageHeader *    gIOHibernateCurrentHeader;
     { if (kernel_debugger_entry_count) { kdb_printf(fmt, ## args); } else { kprintf(fmt, ## args); } }
 
 
-#endif /* KERNEL */
+#endif             
 
-// gIOHibernateState, kIOHibernateStateKey
+                                          
 enum{
 	kIOHibernateStateInactive            = 0,
-	kIOHibernateStateHibernating         = 1,/* writing image */
-	kIOHibernateStateWakingFromHibernate = 2 /* booted and restored image */
+	kIOHibernateStateHibernating         = 1,                   
+	kIOHibernateStateWakingFromHibernate = 2                                
 };
 
-// gIOHibernateMode, kIOHibernateModeKey
+                                        
 enum{
 	kIOHibernateModeOn      = 0x00000001,
 	kIOHibernateModeSleep   = 0x00000002,
@@ -547,7 +547,7 @@ enum{
 	kIOHibernateModeFileResize  = 0x00000100,
 };
 
-// IOHibernateImageHeader.signature
+                                   
 enum{
 	kIOHibernateHeaderSignature        = 0x73696d65,
 	kIOHibernateHeaderInvalidSignature = 0x7a7a7a7a,
@@ -555,7 +555,7 @@ enum{
 	kIOHibernateHeaderDebugDataSignature = 0xfcddfcdd
 };
 
-// kind for hibernate_set_page_state()
+                                      
 enum{
 	kIOHibernatePageStateFree        = 0,
 	kIOHibernatePageStateWiredSave   = 1,
@@ -575,7 +575,7 @@ enum{
 
 #ifndef kIOHibernatePreviewActiveKey
 #define kIOHibernatePreviewActiveKey    "IOHibernatePreviewActive"
-// values for kIOHibernatePreviewActiveKey
+                                          
 enum {
 	kIOHibernatePreviewActive  = 0x00000001,
 	kIOHibernatePreviewUpdates = 0x00000002
@@ -624,6 +624,6 @@ enum{
 
 __END_DECLS
 
-#endif /* !__ASSEMBLER__ */
+#endif                     
 
-#endif /* ! __IOKIT_IOHIBERNATEPRIVATE_H */
+#endif                                     

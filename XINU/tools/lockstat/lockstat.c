@@ -17,54 +17,54 @@
 #include <mach/mach.h>
 #include <mach/host_info.h>
 
-/*
- *	lockstat.c
- *
- *	Utility to display kernel lock contention statistics.
- *	Usage:
- *	lockstat [all, spin, mutex, rw, <lock group name>] {<repeat interval>} {abs}
- *
- *	Argument 1 specifies the type of lock to display contention statistics
- *	for; alternatively, a lock group (a logically grouped set of locks,
- *	which can encompass multiple types of locks) can be specified by name.
- *	When argument 1 is "all", statistics are displayed for all lock groups
- *	which have statistics enabled.
- *	Lock types include mutexes, reader-writer locks and spin locks.
- *	Note that support for gathering contention statistics may not be present
- *	for all types of locks on all platforms.
- *
- *	Argument 2 specifies a periodic interval. The program will display an
- *	updated list of statistics every <repeat interval> seconds. This
- *	argument is optional. The updates display the deltas from the previous
- *	set of statistics, unless "abs" is specified as argument 3.
- *
- *	Argument 3, if "abs", causes the periodically refreshed lock statistics
- *	to be displayed as absolute values rather than deltas from the previous
- *	display.
- *
- *	Types of statistics:
- *	Acquisitions: These can include both normal acquisitions, as well
- *	as acquisition attempts. These are listed in the first column.
- *	Examples include calls to lck_mtx_lock and lck_mtx_try_lock
- *	Misses: Incremented if  a lock acquisition attempt failed, due to
- *	contention.
- *	Waits (Meaningful only for lock types that can block): Incremented
- *	if a lock acquisition attempt proceeded to block.
- *
- *	Direct Waits (currently implemented only on i386/x86_64): For adaptive
- *	locks, such as mutexes, incremented if the owner of the mutex
- *	wasn't active on another processor at the time of the lock
- *	attempt. This indicates that no adaptive spin occurred.
- */
+  
+             
+  
+                                                        
+         
+                                                                               
+  
+                                                                         
+                                                                      
+                                                                         
+                                                                         
+                                 
+                                                                  
+                                                                           
+                                           
+  
+                                                                        
+                                                                   
+                                                                         
+                                                              
+  
+                                                                          
+                                                                          
+           
+  
+                       
+                                                                    
+                                                                 
+                                                              
+                                                                    
+              
+                                                                     
+                                                    
+  
+                                                                         
+                                                                
+                                                             
+                                                          
+   
 
-/*
- * HISTORY
- * 2005: Bernard Semeria
- *		Created.
- * 2006: Derek Kumar
- *		Display i386 specific stats, fix incremental display, add
- *		explanatory block comment.
- */
+  
+          
+                        
+            
+                    
+                                                             
+                              
+   
 void usage(void);
 void print_spin_hdr(void);
 void print_spin(int requested, lockgroup_info_t *lockgroup);

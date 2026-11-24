@@ -116,10 +116,10 @@ fill_socketinfo(struct socket *so, struct socket_info *si)
 		goto out;
 	}
 
-	/*
-	 * The kind of socket is determined by the triplet
-	 * {domain, type, protocol}
-	 */
+	  
+                                                   
+                            
+    
 	domain = SOCK_DOM(so);
 	type = SOCK_TYPE(so);
 	protocol = SOCK_PROTO(so);
@@ -206,7 +206,7 @@ fill_socketinfo(struct socket *so, struct socket_info *si)
 
 		si->soi_kind = SOCKINFO_NDRV;
 
-		/* TDB lock ifnet ???? */
+		                         
 		if (ndrv_cb->nd_if != 0) {
 			struct ifnet *ifp = ndrv_cb->nd_if;
 

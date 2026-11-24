@@ -32,10 +32,10 @@
 #ifdef __cplusplus
 
 
-enum { kIOHibernateAESKeySize = 16 };  /* bytes */
+enum { kIOHibernateAESKeySize = 16 };             
 
-// srcBuffer has to be big enough for a source page, the WKDM
-// compressed output, and a scratch page needed by WKDM
+                                                             
+                                                       
 #define HIBERNATION_SRC_BUFFER_SIZE (2 * page_size + WKdm_SCRATCH_BUF_SIZE_INTERNAL)
 
 struct IOHibernateVars {
@@ -66,7 +66,7 @@ struct IOHibernateVars {
 };
 typedef struct IOHibernateVars IOHibernateVars;
 
-#endif          /* __cplusplus */
+#endif                           
 
 enum{
 	kIOHibernateTagSignature = 0x53000000,
@@ -75,7 +75,7 @@ enum{
 
 #ifdef __cplusplus
 extern "C"
-#endif          /* __cplusplus */
+#endif                           
 uint32_t
 hibernate_sum_page(uint8_t *buf, uint32_t ppnum);
 
@@ -90,7 +90,7 @@ extern unsigned long sectSizeHIBTEXT;
 extern ppnum_t gIOHibernateHandoffPages[];
 extern const uint32_t gIOHibernateHandoffPageCount;
 
-// max address that can fit in a ppnum_t
+                                        
 #define IO_MAX_PAGE_ADDR        (((uint64_t) UINT_MAX) << PAGE_SHIFT)
-// atop() returning ppnum_t
+                           
 #define atop_64_ppnum(x) ((ppnum_t)((uint64_t)(x) >> PAGE_SHIFT))

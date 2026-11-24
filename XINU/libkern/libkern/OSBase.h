@@ -63,19 +63,19 @@ __OSAbsoluteTimePtr(
 
 #define AbsoluteTime_to_scalar(x)       (*(uint64_t *)(x))
 
-/* t1 < = > t2 */
+                 
 #define CMP_ABSOLUTETIME(t1, t2)                                \
 	(AbsoluteTime_to_scalar(t1) >                           \
 	        AbsoluteTime_to_scalar(t2)? (int)+1 :   \
 	 (AbsoluteTime_to_scalar(t1) <                          \
 	        AbsoluteTime_to_scalar(t2)? (int)-1 : 0))
 
-/* t1 += t2 */
+              
 #define ADD_ABSOLUTETIME(t1, t2)                                \
 	(AbsoluteTime_to_scalar(t1) +=                          \
 	                        AbsoluteTime_to_scalar(t2))
 
-/* t1 -= t2 */
+              
 #define SUB_ABSOLUTETIME(t1, t2)                                \
 	(AbsoluteTime_to_scalar(t1) -=                          \
 	                        AbsoluteTime_to_scalar(t2))
@@ -84,8 +84,8 @@ __OSAbsoluteTimePtr(
 	(AbsoluteTime_to_scalar(t1) +=                          \
 	                                        (int32_t)(ticks))
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 __END_DECLS
 
-#endif /* _OS_OSBASE_H */
+#endif                   

@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  *
  */
-/*
- *	@(#)sys_domain.c       1.0 (6/1/2000)
- */
+  
+                                        
+   
 
 #include <sys/param.h>
 #include <sys/protosw.h>
@@ -39,7 +39,7 @@
 
 struct domain *systemdomain = NULL;
 
-/* domain init function */
+                          
 static void systemdomain_init(struct domain *);
 
 struct domain systemdomain_s = {
@@ -60,7 +60,7 @@ systemdomain_init(struct domain *dp)
 
 	systemdomain = dp;
 
-	/* add system domain built in protocol initializers here */
+	                                                           
 	kern_event_init(dp);
 	kern_control_init(dp);
 }

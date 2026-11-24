@@ -36,18 +36,18 @@
 #include <mach/mach_types.h>
 
 #ifndef __OS_VOUCHER_PRIVATE__
-// We cannot include the actual os/voucher_private.h definition of voucher_t
-// here, as that also marks the voucher_XXX functions as exported, which causes
-// a compile error when we attempt to mark them hidden in the .c file.
-//
-// The Libsystem init.c file does include os/voucher_private.h though, as well
-// as this file, and this typedef causes an error if it is unguarded.
+                                                                            
+                                                                               
+                                                                      
+  
+                                                                              
+                                                                     
 struct voucher_s;
 typedef struct voucher_s *voucher_t;
 #endif
 
 typedef const struct _libkernel_functions {
-	/* The following functions are included in version 1 of this structure */
+	                                                                         
 	unsigned long version;
 	void* (*dlsym)(void*, const char*);
 	void* (*malloc)(size_t);
@@ -55,24 +55,24 @@ typedef const struct _libkernel_functions {
 	void* (*realloc)(void*, size_t);
 	void  (*_pthread_exit_if_canceled)(int);
 
-	/* The following functions are included in version 2 of this structure */
+	                                                                         
 	void *reserved1;
 	void *reserved2;
 	void *reserved3;
 	void *reserved4;
 	void *reserved5;
 
-	/* The following functions are included in version 3 of this structure */
+	                                                                         
 	void (*pthread_clear_qos_tsd)(mach_port_t);
 
-	/* The following functions are included in version 4 of this structure */
+	                                                                         
 	int (*pthread_current_stack_contains_np)(const void *, size_t);
 
-	/* Subsequent versions must only add pointers! */
+	                                                 
 } *_libkernel_functions_t;
 
 typedef const struct _libkernel_string_functions {
-	/* The following functions are included in version 1 of this structure */
+	                                                                         
 	unsigned long version;
 	void (*bzero)(void *s, size_t n);
 	void * (*memchr)(const void *s, int c, size_t n);
@@ -90,18 +90,18 @@ typedef const struct _libkernel_string_functions {
 	char * (*strncpy)(char * restrict dst, const char * restrict src, size_t maxlen);
 	size_t (*strnlen)(const char *s, size_t maxlen);
 	char * (*strstr)(const char *s, const char *find);
-	/* Subsequent versions must only add pointers! */
+	                                                 
 } *_libkernel_string_functions_t;
 
 typedef const struct _libkernel_voucher_functions {
-	/* The following functions are included in version 1 of this structure */
+	                                                                         
 	unsigned long version;
 	boolean_t (*voucher_mach_msg_set)(mach_msg_header_t*);
 	void (*voucher_mach_msg_clear)(mach_msg_header_t*);
 	voucher_mach_msg_state_t (*voucher_mach_msg_adopt)(mach_msg_header_t*);
 	void (*voucher_mach_msg_revert)(voucher_mach_msg_state_t);
 
-	/* Subsequent versions must only add pointers! */
+	                                                 
 } *_libkernel_voucher_functions_t;
 
 typedef struct _libkernel_late_init_config {
@@ -110,7 +110,7 @@ typedef struct _libkernel_late_init_config {
 	bool enable_ios_version_compat;
 } *_libkernel_late_init_config_t;
 
-struct ProgramVars; /* forward reference */
+struct ProgramVars;                        
 
 void __libkernel_init(_libkernel_functions_t fns, const char *envp[],
     const char *apple[], const struct ProgramVars *vars);
@@ -121,4 +121,4 @@ kern_return_t __libkernel_voucher_init(_libkernel_voucher_functions_t fns);
 
 void __libkernel_init_late(_libkernel_late_init_config_t config);
 
-#endif // __LIBKERNEL_INIT_H
+#endif                      

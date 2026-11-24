@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #include <mach/mach_types.h>
 #include <mach/boolean.h>
@@ -102,7 +102,7 @@ unsigned long c_tsk_exc_raise = 0;
 unsigned long c_tsk_exc_raise_state = 0;
 unsigned long c_tsk_exc_raise_state_id = 0;
 
-/* forward declarations */
+                          
 kern_return_t exception_deliver(
 	thread_t                thread,
 	exception_type_t        exception,
@@ -122,7 +122,7 @@ kern_return_t bsd_exception(
 	exception_type_t        exception,
 	mach_exception_data_t   code,
 	mach_msg_type_number_t  codeCnt);
-#endif /* MACH_BSD */
+#endif               
 
 #if __has_feature(ptrauth_calls)
 extern int exit_with_pac_exception(
@@ -132,15 +132,15 @@ extern int exit_with_pac_exception(
 	mach_exception_subcode_t subcode);
 
 extern bool proc_is_traced(void *p);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
-/*
- * Routine: exception_init
- * Purpose:
- *   Global initialization of state for exceptions.
- * Conditions:
- *   None.
- */
+  
+                          
+           
+                                                   
+              
+          
+   
 void
 exception_init(void)
 {
@@ -151,18 +151,18 @@ exception_init(void)
 	}
 }
 
-/*
- *	Routine:	exception_deliver
- *	Purpose:
- *		Make an upcall to the exception server provided.
- *	Conditions:
- *		Nothing locked and no resources held.
- *		Called from an exception context, so
- *		thread_exception_return and thread_kdb_return
- *		are possible.
- *	Returns:
- *		KERN_SUCCESS if the exception was handled
- */
+  
+                             
+           
+                                                    
+              
+                                         
+                                        
+                                                 
+                 
+           
+                                             
+   
 kern_return_t
 exception_deliver(
 	thread_t                thread,
@@ -181,18 +181,18 @@ exception_deliver(
 	task_t task;
 	ipc_port_t thread_port = IPC_PORT_NULL, task_port = IPC_PORT_NULL;
 
-	/*
-	 *  Save work if we are terminating.
-	 *  Just go back to our AST handler.
-	 */
+	  
+                                     
+                                     
+    
 	if (!thread->active && !thread->inspection) {
 		return KERN_SUCCESS;
 	}
 
-	/*
-	 * If there are no exception actions defined for this entity,
-	 * we can't deliver here.
-	 */
+	  
+                                                              
+                          
+    
 	if (excp == NULL) {
 		return KERN_FAILURE;
 	}
@@ -204,13 +204,13 @@ exception_deliver(
 
 	excp = &excp[exception];
 
-	/*
-	 * Snapshot the exception action data under lock for consistency.
-	 * Hold a reference to the port over the exception_raise_* calls
-	 * so it can't be destroyed.  This seems like overkill, but keeps
-	 * the port from disappearing between now and when
-	 * ipc_object_copyin_from_kernel is finally called.
-	 */
+	  
+                                                                  
+                                                                 
+                                                                  
+                                                   
+                                                    
+    
 	lck_mtx_lock(mutex);
 	exc_port = excp->port;
 	if (!IP_VALID(exc_port)) {
@@ -242,14 +242,14 @@ exception_deliver(
 	task = thread->task;
 
 #if CONFIG_MACF
-	/* Now is a reasonably good time to check if the exception action is
-	 * permitted for this process, because after this point we will send
-	 * the message out almost certainly.
-	 * As with other failures, exception_triage_thread will go on
-	 * to the next level.
-	 */
+	                                                                    
+                                                                     
+                                     
+                                                              
+                      
+    
 
-	/* The global exception-to-signal translation port is safe to be an exception handler. */
+	                                                                                         
 	if (is_ux_handler_port(exc_port) == FALSE &&
 	    mac_exc_action_check_exception_send(task, excp) != 0) {
 		kr = KERN_FAILURE;
@@ -260,10 +260,10 @@ exception_deliver(
 	if (behavior != EXCEPTION_STATE) {
 		task_reference(task);
 		task_port = convert_task_to_port(task);
-		/* task ref consumed */
+		                       
 		thread_reference(thread);
 		thread_port = convert_thread_to_port(thread);
-		/* thread ref consumed */
+		                         
 	}
 
 	switch (behavior) {
@@ -375,7 +375,7 @@ exception_deliver(
 	default:
 		panic("bad exception behavior!");
 		return KERN_FAILURE;
-	}/* switch */
+	}            
 
 out_release_right:
 
@@ -394,20 +394,20 @@ out_release_right:
 	return kr;
 }
 
-/*
- * Routine: check_exc_receiver_dependency
- * Purpose:
- *      Verify that the port destined for receiving this exception is not
- *      on the current task. This would cause hang in kernel for
- *      EXC_CRASH primarily. Note: If port is transferred
- *      between check and delivery then deadlock may happen.
- *
- * Conditions:
- *		Nothing locked and no resources held.
- *		Called from an exception context.
- * Returns:
- *      KERN_SUCCESS if its ok to send exception message.
- */
+  
+                                         
+           
+                                                                         
+                                                                
+                                                         
+                                                            
+  
+              
+                                         
+                                     
+           
+                                                         
+   
 kern_return_t
 check_exc_receiver_dependency(
 	exception_type_t exception,
@@ -433,19 +433,19 @@ check_exc_receiver_dependency(
 }
 
 
-/*
- *	Routine:	exception_triage_thread
- *	Purpose:
- *		The thread caught an exception.
- *		We make an up-call to the thread's exception server.
- *	Conditions:
- *		Nothing locked and no resources held.
- *		Called from an exception context, so
- *		thread_exception_return and thread_kdb_return
- *		are possible.
- *	Returns:
- *		KERN_SUCCESS if exception is handled by any of the handlers.
- */
+  
+                                   
+           
+                                   
+                                                        
+              
+                                         
+                                        
+                                                 
+                 
+           
+                                                                
+   
 kern_return_t
 exception_triage_thread(
 	exception_type_t        exception,
@@ -461,21 +461,21 @@ exception_triage_thread(
 
 	assert(exception != EXC_RPC_ALERT);
 
-	/*
-	 * If this behavior has been requested by the the kernel
-	 * (due to the boot environment), we should panic if we
-	 * enter this function.  This is intended as a debugging
-	 * aid; it should allow us to debug why we caught an
-	 * exception in environments where debugging is especially
-	 * difficult.
-	 */
+	  
+                                                         
+                                                        
+                                                         
+                                                     
+                                                           
+              
+    
 	if (panic_on_exception_triage) {
 		panic("called exception_triage when it was forbidden by the boot environment");
 	}
 
-	/*
-	 * Try to raise the exception at the activation level.
-	 */
+	  
+                                                       
+    
 	mutex = &thread->mutex;
 	if (KERN_SUCCESS == check_exc_receiver_dependency(exception, thread->exc_actions, mutex)) {
 		kr = exception_deliver(thread, exception, code, codeCnt, thread->exc_actions, mutex);
@@ -484,9 +484,9 @@ exception_triage_thread(
 		}
 	}
 
-	/*
-	 * Maybe the task level will handle it.
-	 */
+	  
+                                        
+    
 	task = thread->task;
 	mutex = &task->itk_lock_data;
 	if (KERN_SUCCESS == check_exc_receiver_dependency(exception, task->exc_actions, mutex)) {
@@ -496,9 +496,9 @@ exception_triage_thread(
 		}
 	}
 
-	/*
-	 * How about at the host level?
-	 */
+	  
+                                
+    
 	host_priv = host_priv_self();
 	mutex = &host_priv->lock;
 
@@ -517,19 +517,19 @@ out:
 	return kr;
 }
 
-/*
- *	Routine:	exception_triage
- *	Purpose:
- *		The current thread caught an exception.
- *		We make an up-call to the thread's exception server.
- *	Conditions:
- *		Nothing locked and no resources held.
- *		Called from an exception context, so
- *		thread_exception_return and thread_kdb_return
- *		are possible.
- *	Returns:
- *		KERN_SUCCESS if exception is handled by any of the handlers.
- */
+  
+                            
+           
+                                           
+                                                        
+              
+                                         
+                                        
+                                                 
+                 
+           
+                                                                
+   
 int debug4k_panic_on_exception = 0;
 kern_return_t
 exception_triage(
@@ -545,10 +545,10 @@ exception_triage(
 		}
 	}
 #if __has_feature(ptrauth_calls)
-	/*
-	 * If it is a ptrauth violation, then check if the task has the TF_PAC_EXC_FATAL
-	 * flag set and isn't being ptraced. If so, terminate the task via exit_with_reason
-	 */
+	  
+                                                                                 
+                                                                                    
+    
 	if (exception & EXC_PTRAUTH_BIT) {
 		exception &= ~EXC_PTRAUTH_BIT;
 
@@ -563,10 +563,10 @@ exception_triage(
 		if (task_is_pac_exception_fatal(current_task()) && !traced_flag) {
 			exit_with_pac_exception(proc, exception, code[0], code[1]);
 			thread_exception_return();
-			/* NOT_REACHABLE */
+			                   
 		}
 	}
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 	return exception_triage_thread(exception, code, codeCnt, thread);
 }
 
@@ -581,9 +581,9 @@ bsd_exception(
 	thread_t                self = current_thread();
 	kern_return_t           kr;
 
-	/*
-	 * Maybe the task level will handle it.
-	 */
+	  
+                                        
+    
 	task = current_task();
 	mutex = &task->itk_lock_data;
 
@@ -596,10 +596,10 @@ bsd_exception(
 }
 
 
-/*
- * Raise an exception on a task.
- * This should tell launchd to launch Crash Reporter for this task.
- */
+  
+                                
+                                                                   
+   
 kern_return_t
 task_exception_notify(exception_type_t exception,
     mach_exception_data_type_t exccode, mach_exception_data_type_t excsubcode)
@@ -618,10 +618,10 @@ task_exception_notify(exception_type_t exception,
 }
 
 
-/*
- *	Handle interface for special performance monitoring
- *	This is a special case of the host exception handler
- */
+  
+                                                      
+                                                       
+   
 kern_return_t
 sys_perf_notify(thread_t thread, int pid)
 {
@@ -630,15 +630,15 @@ sys_perf_notify(thread_t thread, int pid)
 	wait_interrupt_t        wsave;
 	kern_return_t           ret;
 
-	hostp = host_priv_self();       /* Get the host privileged ports */
+	hostp = host_priv_self();                                          
 	mach_exception_data_type_t      code[EXCEPTION_CODE_MAX];
-	code[0] = 0xFF000001;           /* Set terminate code */
-	code[1] = pid;          /* Pass out the pid */
+	code[0] = 0xFF000001;                                   
+	code[1] = pid;                                
 
 	struct task *task = thread->task;
 	xport = hostp->exc_actions[EXC_RPC_ALERT].port;
 
-	/* Make sure we're not catching our own exception */
+	                                                    
 	if (!IP_VALID(xport) ||
 	    !ip_active(xport) ||
 	    task->itk_space == xport->data.receiver) {

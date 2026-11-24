@@ -23,7 +23,7 @@ abs_to_nanos(uint64_t abs)
 }
 
 
-/* Spin until a specified number of seconds elapses */
+                                                      
 static void
 spin_for_duration(uint32_t seconds)
 {
@@ -134,7 +134,7 @@ T_DECL(test_cluster_bound_thread_timeshare, "Make sure the low priority bound th
 
 	T_ASSERT_GT(bound_usr_usec, 75000, "Check that bound thread got atleast 75ms CPU time");
 	T_PASS("Low priority bound threads got some CPU time in the presence of high priority unbound spinners");
-#else /* TARGET_CPU_ARM64 && TARGET_OS_OSX */
+#else                                        
 	T_SKIP("Test not supported on this platform!");
-#endif /* TARGET_CPU_ARM64 && TARGET_OS_OSX */
+#endif                                        
 }

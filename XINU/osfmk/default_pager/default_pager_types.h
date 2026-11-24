@@ -51,6 +51,6 @@
 #define SWAP_FILE_CREATION_ERROR        0x80
 #define USE_EMERGENCY_SWAP_FILE_FIRST   0x100
 
-#endif /* __APPLE_API_UNSTABLE */
+#endif                           
 
-#endif  /* _MACH_DEFAULT_PAGER_TYPES_H_ */
+#endif                                    

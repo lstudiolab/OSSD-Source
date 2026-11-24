@@ -44,7 +44,7 @@
 
 #include "assym.s"
 
-#define	PAUSE		rep; nop
+#define	PAUSE		rep     
 
 #include <i386/pal_lock_asm.h>
 
@@ -54,13 +54,13 @@
 #define LEAF_RET		\
 	ret
 
-/* For x86_64, the varargs ABI requires that %al indicate
- * how many SSE register contain arguments. In our case, 0 */
-#define ALIGN_STACK() 		and  $0xFFFFFFFFFFFFFFF0, %rsp ;
-#define LOAD_STRING_ARG0(label)	leaq label(%rip), %rdi ;
-#define LOAD_ARG1(x)		mov x, %esi ;
-#define LOAD_PTR_ARG1(x)	mov x, %rsi ;
-#define CALL_PANIC()		xorb %al,%al ; call EXT(panic) ;
+                                                         
+                                                             
+#define ALIGN_STACK() 		and  $0xFFFFFFFFFFFFFFF0, %rsp  
+#define LOAD_STRING_ARG0(label)	leaq label(%rip), %rdi  
+#define LOAD_ARG1(x)		mov x, %esi  
+#define LOAD_PTR_ARG1(x)	mov x, %rsi  
+#define CALL_PANIC()		xorb %al,%al                    
 
 #define PREEMPTION_DISABLE				\
 	incl	%gs:CPU_PREEMPTION_LEVEL
@@ -68,84 +68,84 @@
 #define	PREEMPTION_LEVEL_DEBUG 1	
 #if	PREEMPTION_LEVEL_DEBUG
 #define	PREEMPTION_ENABLE				\
-	decl	%gs:CPU_PREEMPTION_LEVEL	;	\
-	js	17f				;	\
-	jnz	19f				;	\
-	testl	$AST_URGENT,%gs:CPU_PENDING_AST	;	\
-	jz	19f				;	\
-	PUSHF					;	\
-	testl	$EFL_IF, S_PC			;	\
-	jz	18f				;	\
-	POPF					;	\
-	int	$(T_PREEMPT)			;	\
-	jmp	19f				;	\
+	decl	%gs:CPU_PREEMPTION_LEVEL	   
+	js	17f				   
+	jnz	19f				   
+	testl	$AST_URGENT,%gs:CPU_PENDING_AST	   
+	jz	19f				   
+	PUSHF					   
+	testl	$EFL_IF, S_PC			   
+	jz	18f				   
+	POPF					   
+	int	$(T_PREEMPT)			   
+	jmp	19f				   
 17:							\
-	call	_preemption_underflow_panic	;	\
+	call	_preemption_underflow_panic	   
 18:							\
-	POPF					;	\
+	POPF					   
 19:
 #else
 #define	PREEMPTION_ENABLE				\
-	decl	%gs:CPU_PREEMPTION_LEVEL	;	\
-	jnz	19f				;	\
-	testl	$AST_URGENT,%gs:CPU_PENDING_AST	;	\
-	jz	19f				;	\
-	PUSHF					;	\
-	testl	$EFL_IF, S_PC			;	\
-	jz	18f				;	\
-	POPF					;	\
-	int	$(T_PREEMPT)			;	\
-	jmp	19f				;	\
+	decl	%gs:CPU_PREEMPTION_LEVEL	   
+	jnz	19f				   
+	testl	$AST_URGENT,%gs:CPU_PENDING_AST	   
+	jz	19f				   
+	PUSHF					   
+	testl	$EFL_IF, S_PC			   
+	jz	18f				   
+	POPF					   
+	int	$(T_PREEMPT)			   
+	jmp	19f				   
 18:							\
-	POPF					;	\
+	POPF					   
 19:
 #endif
 
-/*
- * For most routines, the hw_lock_t pointer is loaded into a
- * register initially, and then either a byte or register-sized
- * word is loaded/stored to the pointer
- */
+  
+                                                            
+                                                               
+                                       
+   
 
-/*
- *	void hw_lock_byte_init(volatile uint8_t *)
- *
- *	Initialize a hardware byte lock.
- */
+  
+                                             
+  
+                                   
+   
 LEAF_ENTRY(hw_lock_byte_init)
-	movb	$0, (%rdi)		/* clear the lock */
+	movb	$0, (%rdi)		                    
 	LEAF_RET
 
-/*
- *	void	hw_lock_byte_lock(uint8_t *lock_byte)
- *
- *	Acquire byte sized lock operand, spinning until it becomes available.
- *	return with preemption disabled.
- */
+  
+                                             
+  
+                                                                        
+                                   
+   
 
 LEAF_ENTRY(hw_lock_byte_lock)
 	PREEMPTION_DISABLE
-	movl	$1, %ecx		/* Set lock value */
+	movl	$1, %ecx		                    
 1:
-	movb	(%rdi), %al		/* Load byte at address */
-	testb	%al,%al			/* lock locked? */
-	jne	3f			/* branch if so */
-	lock; cmpxchg %cl,(%rdi)	/* attempt atomic compare exchange */
+	movb	(%rdi), %al		                          
+	testb	%al,%al			                  
+	jne	3f			                  
+	lock                                                          
 	jne	3f
-	LEAF_RET			/* if yes, then nothing left to do */
+	LEAF_RET			                                     
 3:
-	PAUSE				/* pause for hyper-threading */
-	jmp	1b			/* try again */
+	PAUSE				                               
+	jmp	1b			               
 
-/*
- *	void hw_lock_byte_unlock(uint8_t *lock_byte)
- *
- *	Unconditionally release byte sized lock operand,
- *	release preemption level.
- */
+  
+                                               
+  
+                                                   
+                            
+   
 
 LEAF_ENTRY(hw_lock_byte_unlock)
-	movb $0, (%rdi)		/* Clear the lock byte */
+	movb $0, (%rdi)		                         
 	PREEMPTION_ENABLE
 	LEAF_RET
 

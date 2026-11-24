@@ -66,10 +66,10 @@
 #define HIBERNATE_MIN_PHYSICAL_LBA_4096   (6)
 #define HIBERNATE_MIN_FILE_SIZE           (1024*1024)
 
-/* This function is called from kern_sysctl in the current process context;
- * it is exported with the System6.0.exports, but this appears to be a legacy
- * export, as there are no internal consumers.
- */
+                                                                           
+                                                                             
+                                              
+   
 int
 get_kernel_symfile(__unused proc_t p, __unused char const **symfile);
 int
@@ -127,19 +127,19 @@ kern_ioctl_file_extents(struct kern_direct_file_io_ref_t * ref, u_long theIoctl,
 		p2 = kernproc;
 		do_ioctl = &file_ioctl;
 	} else {
-		/* Partition. */
+		                
 		p1 = ref->vp;
 		p2 = ref->ctx;
 		do_ioctl = &device_ioctl;
 	}
 
 	if (_DKIOCCSPINEXTENT == theIoctl) {
-		/* Tell CS the image size, so it knows whether to place the subsequent pins SSD/HDD */
+		                                                                                      
 		pin.cp_extent.length = end;
 		pin.cp_flags = _DKIOCCSHIBERNATEIMGSIZE;
 		(void) do_ioctl(p1, p2, _DKIOCCSPINEXTENT, (caddr_t)&pin);
 	} else if (_DKIOCCSUNPINEXTENT == theIoctl) {
-		/* Tell CS hibernation is done, so it can stop blocking overlapping writes */
+		                                                                             
 		pin.cp_flags = _DKIOCCSPINDISCARDBLACKLIST;
 		(void) do_ioctl(p1, p2, _DKIOCCSUNPINEXTENT, (caddr_t)&pin);
 	}
@@ -171,7 +171,7 @@ kern_ioctl_file_extents(struct kern_direct_file_io_ref_t * ref, u_long theIoctl,
 			unmap.extents = &extent;
 			unmap.extentsCount = 1;
 			error = do_ioctl(p1, p2, theIoctl, (caddr_t)&unmap);
-//          printf("DKIOCUNMAP(%d) 0x%qx, 0x%qx\n", error, extent.offset, extent.length);
+                                                                                         
 		} else if (_DKIOCCSPINEXTENT == theIoctl) {
 			pin.cp_extent.offset = fileblk;
 			pin.cp_extent.length = filechunk;
@@ -302,7 +302,7 @@ kern_open_file_for_direct_io(const char * name,
 	    name, va.va_data_size, va.va_data_alloc, mpFree, fs_free_size);
 
 	if (ref->vp->v_type == VREG) {
-		/* Don't dump files with links. */
+		                                  
 		if (va.va_nlink != 1) {
 			goto out;
 		}
@@ -355,26 +355,26 @@ kern_open_file_for_direct_io(const char * name,
 			ref->filelength = set_file_size;
 		}
 	} else if ((ref->vp->v_type == VBLK) || (ref->vp->v_type == VCHR)) {
-		/* Partition. */
+		                
 		device = va.va_rdev;
 
 		p1 = ref->vp;
 		p2 = ref->ctx;
 		do_ioctl = &device_ioctl;
 	} else {
-		/* Don't dump to non-regular files. */
+		                                      
 		error = EFAULT;
 		goto out;
 	}
 	ref->device = device;
 
-	// probe for CF
+	               
 	dk_corestorage_info_t cs_info;
 	memset(&cs_info, 0, sizeof(dk_corestorage_info_t));
 	error = do_ioctl(p1, p2, DKIOCCORESTORAGE, (caddr_t)&cs_info);
 	ref->cf = (error == 0) && (cs_info.flags & DK_CORESTORAGE_ENABLE_HOTFILES);
 
-	// get block size
+	                 
 
 	error = do_ioctl(p1, p2, DKIOCGETBLOCKSIZE, (caddr_t) &ref->blksize);
 	if (error) {
@@ -395,7 +395,7 @@ kern_open_file_for_direct_io(const char * name,
 		ref->filelength = fileblk * ref->blksize;
 	}
 
-	// pin logical extents, CS version
+	                                  
 
 	error = kern_ioctl_file_extents(ref, _DKIOCCSPINEXTENT, 0, ref->filelength);
 	if (error && (ENOTTY != error)) {
@@ -403,7 +403,7 @@ kern_open_file_for_direct_io(const char * name,
 	}
 	ref->pinned = (error == 0);
 
-	// pin logical extents, apfs version
+	                                    
 
 	error = VNOP_IOCTL(ref->vp, FSCTL_FREEZE_EXTENTS, NULL, 0, ref->ctx);
 	if (error && (ENOTTY != error)) {
@@ -411,7 +411,7 @@ kern_open_file_for_direct_io(const char * name,
 	}
 	ref->frozen = (error == 0);
 
-	// generate the block list
+	                          
 
 	error = do_ioctl(p1, p2, DKIOCLOCKPHYSICALEXTENTS, NULL);
 	if (error) {
@@ -487,7 +487,7 @@ kern_open_file_for_direct_io(const char * name,
 		do_ioctl = &file_ioctl;
 	}
 
-	// get partition base
+	                     
 
 	if (partitionbase_result) {
 		error = do_ioctl(p1, p2, DKIOCGETBASE, (caddr_t) partitionbase_result);
@@ -496,7 +496,7 @@ kern_open_file_for_direct_io(const char * name,
 		}
 	}
 
-	// get block size & constraints
+	                               
 
 	error = do_ioctl(p1, p2, DKIOCGETBLOCKSIZE, (caddr_t) &blksize);
 	if (error) {
@@ -673,20 +673,20 @@ kern_close_file_for_direct_io(struct kern_direct_file_io_ref_t * ref,
 			p2 = kernproc;
 			do_ioctl = &file_ioctl;
 		} else {
-			/* Partition. */
+			                
 			p1 = ref->vp;
 			p2 = ref->ctx;
 			do_ioctl = &device_ioctl;
 		}
 		(void) do_ioctl(p1, p2, DKIOCUNLOCKPHYSICALEXTENTS, NULL);
 
-		//XXX If unmapping extents then don't also need to unpin; except ...
-		//XXX if file unaligned (HFS 4k / Fusion 128k) then pin is superset and
-		//XXX unmap is subset, so save extra walk over file extents (and the risk
-		//XXX that CF drain starts) vs leaving partial units pinned to SSD
-		//XXX (until whatever was sharing also unmaps).  Err on cleaning up fully.
+		                                                                    
+		                                                                       
+		                                                                         
+		                                                                  
+		                                                                          
 		boolean_t will_unmap = (!ref->pinned || ref->cf) && (discard_end > discard_offset);
-		boolean_t will_unpin = (ref->pinned && ref->cf /* && !will_unmap */);
+		boolean_t will_unpin = (ref->pinned && ref->cf                     );
 
 		(void) kern_ioctl_file_extents(ref, _DKIOCCSUNPINEXTENT, 0, (will_unpin) ? ref->filelength : 0);
 

@@ -71,75 +71,75 @@
 #define _NET_BPFDESC_H_
 #include <sys/appleapiopts.h>
 #ifdef KERNEL_PRIVATE
-/*
- * The items in this header file should be wrapped in #ifdef KERNEL.
- */
+  
+                                                                    
+   
 
 #include <sys/proc.h>
 #include <sys/select.h>
 #include <kern/thread_call.h>
 #include <uuid/uuid.h>
 
-/*
- * Descriptor associated with each open bpf file.
- */
+  
+                                                 
+   
 struct bpf_d {
-	struct bpf_d    *bd_next;       /* Linked list of descriptors */
-	/*
-	 * Buffer slots: two mbuf clusters buffer the incoming packets.
-	 *   The model has three slots.  Sbuf is always occupied.
-	 *   sbuf (store) - Receive interrupt puts packets here.
-	 *   hbuf (hold) - When sbuf is full, put cluster here and
-	 *                 wakeup read (replace sbuf with fbuf).
-	 *   fbuf (free) - When read is done, put cluster here.
-	 * On receiving, if sbuf is full and fbuf is 0, packet is dropped.
-	 */
-	caddr_t         bd_sbuf;        /* store slot */
-	caddr_t         bd_hbuf;        /* hold slot */
-	caddr_t         bd_fbuf;        /* free slot */
-	int             bd_slen;        /* current length of store buffer */
-	int             bd_hlen;        /* current length of hold buffer */
-	u_int32_t       bd_scnt;        /* number of packets in store buffer */
-	u_int32_t       bd_hcnt;        /* number of packets in hold buffer */
+	struct bpf_d    *bd_next;                                       
+	  
+                                                                
+                                                          
+                                                         
+                                                           
+                                                         
+                                                        
+                                                                   
+    
+	caddr_t         bd_sbuf;                        
+	caddr_t         bd_hbuf;                       
+	caddr_t         bd_fbuf;                       
+	int             bd_slen;                                            
+	int             bd_hlen;                                           
+	u_int32_t       bd_scnt;                                               
+	u_int32_t       bd_hcnt;                                              
 
-	int             bd_bufsize;     /* absolute length of buffers */
-	int             bd_hbuf_read;   /* reading from hbuf */
-	int             bd_headdrop;    /* Keep newer packets */
+	int             bd_bufsize;                                     
+	int             bd_hbuf_read;                          
+	int             bd_headdrop;                            
 
-	struct bpf_if  *bd_bif;         /* interface descriptor */
-	u_int32_t       bd_rtout;       /* Read timeout in 'ticks' */
-	struct bpf_insn *bd_filter;     /* filter code */
-	u_int32_t       bd_rcount;      /* number of packets received */
-	u_int32_t       bd_dcount;      /* number of packets dropped */
+	struct bpf_if  *bd_bif;                                   
+	u_int32_t       bd_rtout;                                    
+	struct bpf_insn *bd_filter;                      
+	u_int32_t       bd_rcount;                                      
+	u_int32_t       bd_dcount;                                     
 
-	u_char          bd_promisc;     /* true if listening promiscuously */
-	u_char          bd_state;       /* idle, waiting, or timed out */
-	u_char          bd_immediate;   /* true to return on packet arrival */
-	int             bd_async;       /* non-zero if packet reception should generate signal */
-	int             bd_sig;         /* signal to send upon packet reception */
+	u_char          bd_promisc;                                          
+	u_char          bd_state;                                        
+	u_char          bd_immediate;                                         
+	int             bd_async;                                                                
+	int             bd_sig;                                                   
 #ifdef __APPLE__
 	pid_t           bd_sigio;
 #else
-	struct sigio *  bd_sigio;       /* information for async I/O */
+	struct sigio *  bd_sigio;                                      
 #endif
 
 #if BSD < 199103
-	u_char          bd_selcoll;     /* true if selects collide */
+	u_char          bd_selcoll;                                  
 	int             bd_timedout;
-	struct proc *   bd_selproc;     /* process that last selected us */
+	struct proc *   bd_selproc;                                        
 #else
-	u_char          bd_pad;         /* explicit alignment */
-	struct selinfo  bd_sel;         /* bsd select info */
+	u_char          bd_pad;                                 
+	struct selinfo  bd_sel;                              
 #endif
-	int             bd_hdrcmplt;    /* false to fill in src lladdr automatically */
-	int             bd_seesent;     /* true if bpf should see sent packets */
-	int             bd_oflags;      /* device open flags */
-	thread_call_t   bd_thread_call; /* for BPF timeouts with select */
-	int             bd_traffic_class; /* traffic service class */
-	int             bd_flags;       /* flags */
+	int             bd_hdrcmplt;                                                   
+	int             bd_seesent;                                              
+	int             bd_oflags;                             
+	thread_call_t   bd_thread_call;                                   
+	int             bd_traffic_class;                            
+	int             bd_flags;                  
 
 	int             bd_refcnt;
-#define BPF_REF_HIST    4               /* how many callers to keep around */
+#define BPF_REF_HIST    4                                                    
 	void            *bd_ref_lr[BPF_REF_HIST];
 	void            *bd_unref_lr[BPF_REF_HIST];
 	int             bd_next_ref_lr;
@@ -149,41 +149,41 @@ struct bpf_d {
 	uuid_t          bd_uuid;
 };
 
-/* Values for bd_state */
-#define BPF_IDLE                0    /* no select in progress or kqueue pending */
-#define BPF_WAITING             1    /* waiting for read timeout in select/kqueue */
-#define BPF_TIMED_OUT   2        /* read timeout has expired in select/kqueue */
-#define BPF_DRAINING    3        /* waiting for timeout routine to finish during close */
+                         
+#define BPF_IDLE                0                                                 
+#define BPF_WAITING             1                                                   
+#define BPF_TIMED_OUT   2                                                       
+#define BPF_DRAINING    3                                                                
 
-/* Test whether a BPF is ready for read(). */
+                                             
 #define bpf_ready(bd)   ((bd)->bd_hlen != 0 ||          \
 	                 (((bd)->bd_immediate || (bd)->bd_state == BPF_TIMED_OUT) && \
 	                  (bd)->bd_slen != 0))
 
-/* Values for bd_flags */
-#define BPF_EXTENDED_HDR        0x0001  /* process req. the extended header */
-#define BPF_WANT_PKTAP          0x0002  /* knows how to handle DLT_PKTAP */
-#define BPF_FINALIZE_PKTAP      0x0004  /* finalize pktap header on read */
-#define BPF_KNOTE               0x0008  /* kernel note attached */
-#define BPF_DETACHING           0x0010  /* bpf_d is being detached */
-#define BPF_DETACHED            0x0020  /* bpf_d is detached */
-#define BPF_CLOSING             0x0040  /* bpf_d is being closed */
-#define BPF_TRUNCATE            0x0080  /* truncate the packet payload */
-#define BPF_PKTHDRV2            0x0100  /* pktap header version 2 */
+                         
+#define BPF_EXTENDED_HDR        0x0001                                        
+#define BPF_WANT_PKTAP          0x0002                                     
+#define BPF_FINALIZE_PKTAP      0x0004                                     
+#define BPF_KNOTE               0x0008                            
+#define BPF_DETACHING           0x0010                               
+#define BPF_DETACHED            0x0020                         
+#define BPF_CLOSING             0x0040                             
+#define BPF_TRUNCATE            0x0080                                   
+#define BPF_PKTHDRV2            0x0100                              
 
-/*
- * Descriptor associated with each attached hardware interface.
- */
+  
+                                                               
+   
 struct bpf_if {
-	struct bpf_if *bif_next;        /* list of all interfaces */
-	struct bpf_d *bif_dlist;        /* descriptor list */
-	u_int bif_dlt;                  /* link layer type */
-	u_int bif_hdrlen;               /* length of header (with padding) */
-	u_int bif_exthdrlen;            /* length of ext header */
-	struct ifnet *bif_ifp;          /* corresponding interface */
+	struct bpf_if *bif_next;                                    
+	struct bpf_d *bif_dlist;                             
+	u_int bif_dlt;                                       
+	u_int bif_hdrlen;                                                    
+	u_int bif_exthdrlen;                                      
+	struct ifnet *bif_ifp;                                       
 	bpf_send_func   bif_send;
 	bpf_tap_func    bif_tap;
 };
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 #endif

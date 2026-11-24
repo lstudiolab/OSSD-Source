@@ -1,9 +1,9 @@
 #! /usr/bin/env python                                                                                                                                                                                        
-# -*- coding: utf-8 -*-                                                                                                                                                                                        
+                                                                                                                                                                                                               
 
 from xnu import *
 
-# Macro: pgtrace
+                
 @lldb_command('showpgtrace')
 def ShowPgtrace(cmd_args=None, cmd_options={}):
     """ Display pgtrace buffer contents
@@ -35,4 +35,4 @@ def ShowPgtrace(cmd_args=None, cmd_options={}):
         print entry_str
         
         rd_idx += 1
-# EndMacro
+          

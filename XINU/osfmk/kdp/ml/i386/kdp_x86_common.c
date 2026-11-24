@@ -35,7 +35,7 @@
 
 #include <vm/vm_map.h>
 #include <i386/pmap.h>
-#include <i386/pmap_internal.h> /* pmap_pde */
+#include <i386/pmap_internal.h>               
 #include <i386/mp.h>
 #include <i386/misc_protos.h>
 #include <i386/pio.h>
@@ -54,13 +54,13 @@
 #include <machine/pal_routines.h>
 #include <libkern/kernel_mach_header.h>
 
-// #define KDP_VM_READ_DEBUG 1
-// #define KDP_VM_WRITE_DEBUG 1
+                              
+                               
 
-/*
- * A (potentially valid) physical address is not a kernel address
- * i.e. it'a a user address.
- */
+  
+                                                                 
+                            
+   
 #define IS_PHYS_ADDR(addr)              IS_USERADDR64_CANONICAL(addr)
 
 boolean_t kdp_read_io;
@@ -108,10 +108,10 @@ kdp_machine_vm_read( mach_vm_address_t src, caddr_t dst, mach_vm_size_t len)
 		return ret;
 	}
 
-/* If a different pmap has been specified with kdp_pmap, use it to translate the
- * source (cur_virt_src); otherwise, the source is translated using the
- * kernel_pmap.
- */
+                                                                                
+                                                                       
+               
+   
 	if (kdp_pmap) {
 		src_pmap = kdp_pmap;
 	}
@@ -122,19 +122,19 @@ kdp_machine_vm_read( mach_vm_address_t src, caddr_t dst, mach_vm_size_t len)
 			goto exit;
 		}
 
-/* Always translate the destination buffer using the kernel_pmap */
+                                                                   
 		if (!(cur_phys_dst = kdp_vtophys(kernel_pmap, cur_virt_dst))) {
 			goto exit;
 		}
 
-		/* Validate physical page numbers unless kdp_read_io is set */
+		                                                              
 		if (kdp_read_io == FALSE) {
 			if (!pmap_valid_page(i386_btop(cur_phys_dst)) || !pmap_valid_page(i386_btop(cur_phys_src))) {
 				goto exit;
 			}
 		}
 
-/* Get length left on page */
+                             
 		cnt_src = PAGE_SIZE - (cur_phys_src & PAGE_MASK);
 		cnt_dst = PAGE_SIZE - (cur_phys_dst & PAGE_MASK);
 		if (cnt_src > cnt_dst) {
@@ -146,7 +146,7 @@ kdp_machine_vm_read( mach_vm_address_t src, caddr_t dst, mach_vm_size_t len)
 			cnt = resid;
 		}
 
-/* Do a physical copy */
+                        
 		if (EFAULT == ml_copy_phys(cur_phys_src,
 		    cur_phys_dst,
 		    (vm_size_t)cnt)) {
@@ -189,7 +189,7 @@ kdp_machine_phys_read(kdp_readphysmem64_req_t *rq, caddr_t dst,
 			goto exit;
 		}
 
-/* Get length left on page */
+                             
 		cnt_src = PAGE_SIZE - (cur_phys_src & PAGE_MASK);
 		cnt_dst = PAGE_SIZE - (cur_phys_dst & PAGE_MASK);
 		if (cnt_src > cnt_dst) {
@@ -201,9 +201,9 @@ kdp_machine_phys_read(kdp_readphysmem64_req_t *rq, caddr_t dst,
 			cnt = resid;
 		}
 
-		/* Do a physical copy; use ml_copy_phys() in the event this is
-		 * a short read with potential side effects.
-		 */
+		                                                              
+                                              
+     
 		if (EFAULT == ml_copy_phys(cur_phys_src,
 		    cur_phys_dst,
 		    (vm_size_t)cnt)) {
@@ -217,9 +217,9 @@ exit:
 	return len - resid;
 }
 
-/*
- *
- */
+  
+  
+   
 mach_vm_size_t
 kdp_machine_vm_write( caddr_t src, mach_vm_address_t dst, mach_vm_size_t len)
 {
@@ -245,7 +245,7 @@ kdp_machine_vm_write( caddr_t src, mach_vm_address_t dst, mach_vm_size_t len)
 			goto exit;
 		}
 
-		/* Copy as many bytes as possible without crossing a page */
+		                                                            
 		cnt_src = (unsigned)(PAGE_SIZE - (cur_phys_src & PAGE_MASK));
 		cnt_dst = (unsigned)(PAGE_SIZE - (cur_phys_dst & PAGE_MASK));
 
@@ -259,7 +259,7 @@ kdp_machine_vm_write( caddr_t src, mach_vm_address_t dst, mach_vm_size_t len)
 		}
 
 		if (EFAULT == ml_copy_phys(cur_phys_src, cur_phys_dst, cnt)) {
-			goto exit;              /* Copy stuff over */
+			goto exit;                                   
 		}
 		cur_virt_src += cnt;
 		cur_virt_dst += cnt;
@@ -269,9 +269,9 @@ exit:
 	return len - resid;
 }
 
-/*
- *
- */
+  
+  
+   
 mach_vm_size_t
 kdp_machine_phys_write(kdp_writephysmem64_req_t *rq, caddr_t src,
     uint16_t lcpu)
@@ -301,7 +301,7 @@ kdp_machine_phys_write(kdp_writephysmem64_req_t *rq, caddr_t src,
 			goto exit;
 		}
 
-		/* Copy as many bytes as possible without crossing a page */
+		                                                            
 		cnt_src = (unsigned)(PAGE_SIZE - (cur_phys_src & PAGE_MASK));
 		cnt_dst = (unsigned)(PAGE_SIZE - (cur_phys_dst & PAGE_MASK));
 
@@ -315,7 +315,7 @@ kdp_machine_phys_write(kdp_writephysmem64_req_t *rq, caddr_t src,
 		}
 
 		if (EFAULT == ml_copy_phys(cur_phys_src, cur_phys_dst, cnt)) {
-			goto exit;              /* Copy stuff over */
+			goto exit;                                   
 		}
 		cur_virt_src += cnt;
 		cur_phys_dst += cnt;
@@ -411,10 +411,10 @@ kdp_machine_msr64_write(kdp_writemsr64_req_t *rq, caddr_t data, uint16_t lcpu)
 pt_entry_t *debugger_ptep;
 vm_map_offset_t debugger_window_kva;
 
-/* Establish a pagetable window that can be remapped on demand.
- * This is utilized by the debugger to address regions outside
- * the physical map.
- */
+                                                               
+                                                              
+                    
+   
 
 void
 kdp_map_debug_pagetable_window(void)
@@ -444,7 +444,7 @@ kdp_map_debug_pagetable_window(void)
 	}
 }
 
-/* initialize kdp_jtag_coredump with data needed for JTAG coredump extraction */
+                                                                                
 
 void
 kdp_jtag_coredump_init(void)
@@ -458,7 +458,7 @@ kdp_jtag_coredump_init(void)
 	kdp_jtag_coredump.pmap_memory_region_t_size = (uint64_t) sizeof(pmap_memory_region_t);
 	kdp_jtag_coredump.physmap_base              = (uint64_t) &physmap_base;
 
-	/* update signature last so that JTAG can trust that structure has valid data */
+	                                                                                
 	kdp_jtag_coredump.signature                 = (uint64_t) KDP_JTAG_COREDUMP_SIGNATURE;
 }
 

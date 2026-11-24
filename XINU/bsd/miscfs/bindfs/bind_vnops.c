@@ -106,16 +106,16 @@ bindfs_getattr(struct vnop_getattr_args * args)
 
 		if (error == 0) {
 			if (VATTR_IS_ACTIVE(args->a_vap, va_fsid)) {
-				/* fix up fsid so it doesn't say the underlying fs*/
+				                                                    
 				VATTR_RETURN(args->a_vap, va_fsid, vfs_statfs(vnode_mount(args->a_vp))->f_fsid.val[0]);
 			}
 			if (VATTR_IS_ACTIVE(args->a_vap, va_fsid64)) {
-				/* fix up fsid so it doesn't say the underlying fs*/
+				                                                    
 				VATTR_RETURN(args->a_vap, va_fsid64, vfs_statfs(vnode_mount(args->a_vp))->f_fsid);
 			}
 			struct vnode * parent = vnode_parent(args->a_vp);
 			if (vnode_isvroot(args->a_vp)) {
-				// We can use the lower answers for most questions about the root vnode but need to fix up a few things
+				                                                                                                       
 				if (VATTR_IS_ACTIVE(args->a_vap, va_fileid)) {
 					VATTR_RETURN(args->a_vap, va_fileid, BIND_ROOT_INO);
 				}
@@ -123,12 +123,12 @@ bindfs_getattr(struct vnop_getattr_args * args)
 					VATTR_RETURN(args->a_vap, va_linkid, BIND_ROOT_INO);
 				}
 				if (VATTR_IS_ACTIVE(args->a_vap, va_parentid)) {
-					// The parent of the root is itself
+					                                   
 					VATTR_RETURN(args->a_vap, va_parentid, BIND_ROOT_INO);
 				}
 			} else if (parent != NULL && vnode_isvroot(parent)) {
 				if (VATTR_IS_ACTIVE(args->a_vap, va_parentid)) {
-					// This vnode's parent is the root.
+					                                   
 					VATTR_RETURN(args->a_vap, va_parentid, BIND_ROOT_INO);
 				}
 			}
@@ -176,11 +176,11 @@ bindfs_close(struct vnop_close_args * args)
 	return error;
 }
 
-/*
- * We have to carry on the locking protocol on the bind layer vnodes
- * as we progress through the tree. We also have to enforce read-only
- * if this layer is mounted read-only.
- */
+  
+                                                                    
+                                                                     
+                                      
+   
 static int
 bind_lookup(struct vnop_lookup_args * ap)
 {
@@ -194,13 +194,13 @@ bind_lookup(struct vnop_lookup_args * ap)
 	BINDFSDEBUG("%s parent: %p component: %.*s\n", __FUNCTION__, ap->a_dvp, cnp->cn_namelen, cnp->cn_nameptr);
 
 	mp = vnode_mount(dvp);
-	/* rename and delete are not allowed. this is a read only file system */
+	                                                                        
 	if (cnp->cn_nameiop == DELETE || cnp->cn_nameiop == RENAME || cnp->cn_nameiop == CREATE) {
 		return EROFS;
 	}
 	bind_mp = MOUNTTOBINDMOUNT(mp);
 
-	// . and .. handling
+	                    
 	if (cnp->cn_nameptr[0] == '.') {
 		if (cnp->cn_namelen == 1) {
 			vp = dvp;
@@ -223,10 +223,10 @@ notdot:
 	ldvp = BINDVPTOLOWERVP(dvp);
 	vp = lvp = NULL;
 
-	/*
-	 * Hold ldvp.  The reference on it, owned by dvp, is lost in
-	 * case of dvp reclamation.
-	 */
+	  
+                                                             
+                            
+    
 	error = vnode_getwithref(ldvp);
 	if (error) {
 		return error;
@@ -246,7 +246,7 @@ notdot:
 		if (error == 0) {
 			*ap->a_vpp = vp;
 		}
-		/* if we got lvp, drop the iocount from VNOP_LOOKUP */
+		                                                      
 		if (lvp != NULL) {
 			vnode_put(lvp);
 		}
@@ -255,9 +255,9 @@ notdot:
 	return error;
 }
 
-/*
- * Don't think this needs to do anything
- */
+  
+                                        
+   
 static int
 bind_inactive(__unused struct vnop_inactive_args * ap)
 {
@@ -295,11 +295,11 @@ bind_reclaim(struct vnop_reclaim_args * ap)
 	return 0;
 }
 
-/* Get dirent length padded to 4 byte alignment */
+                                                  
 #define DIRENT_LEN(namelen) \
 	((sizeof(struct dirent) + (namelen + 1) - (__DARWIN_MAXNAMLEN + 1) + 3) & ~3)
 
-/* Get the end of this dirent */
+                                
 #define DIRENT_END(dep) \
 	(((char *)(dep)) + (dep)->d_reclen - 1)
 
@@ -311,8 +311,8 @@ bindfs_readdir(struct vnop_readdir_args * ap)
 	uio_t uio = ap->a_uio;
 
 	BINDFSDEBUG("%s %p\n", __FUNCTION__, ap->a_vp);
-	/* assumption is that any vp that comes through here had to go through lookup
-	 */
+	                                                                             
+    
 
 	if (ap->a_flags & (VNODE_READDIR_EXTENDED | VNODE_READDIR_REQSEEKOFF)) {
 		return EINVAL;
@@ -358,20 +358,20 @@ bindfs_readdir(struct vnop_readdir_args * ap)
 				break;
 			}
 			if (dep->d_name[0] == '.') {
-				/* re-write the inode number for the mount root */
-				/* if vp is the mount root then . = 2 and .. = 2 */
-				/* if the parent of vp is the mount root then .. = 2 */
+				                                                  
+				                                                   
+				                                                       
 				if ((vnode_isvroot(vp) && dep->d_namlen == 1) ||
 				    (dep->d_namlen == 2 && dep->d_name[1] == '.')) {
 					dep->d_ino = BIND_ROOT_INO;
 				}
 			}
-			/* Copy entry64 to user's buffer. */
+			                                    
 			error = uiomove((caddr_t)dep, dep->d_reclen, uio);
-			/* Move to next entry. */
+			                         
 			dep = (struct dirent *)((char *)dep + dep->d_reclen);
 		}
-		/* Update the real offset using the offset we got from VNOP_READDIR. */
+		                                                                       
 		if (error == 0) {
 			uio_setoffset(uio, uio_offset(auio));
 		}
@@ -499,7 +499,7 @@ bindfs_listxattr(struct vnop_listxattr_args * args)
 	return error;
 }
 
-/* relies on v1 paging */
+                         
 static int
 bindfs_pagein(struct vnop_pagein_args * ap)
 {
@@ -515,9 +515,9 @@ bindfs_pagein(struct vnop_pagein_args * ap)
 		return ENOTSUP;
 	}
 
-	/*
-	 * Ask VM/UBC/VFS to do our bidding
-	 */
+	  
+                                    
+    
 	if (vnode_getwithvid(lvp, BINDVPTOLOWERVID(vp)) == 0) {
 		vm_offset_t ioaddr;
 		uio_t auio;
@@ -547,14 +547,14 @@ bindfs_pagein(struct vnop_pagein_args * ap)
 
 		lowersize = ubc_getsize(lvp);
 		if (lowersize != ubc_getsize(vp)) {
-			(void)ubc_setsize(vp, lowersize); /* ignore failures, nothing can be done */
+			(void)ubc_setsize(vp, lowersize);                                           
 		}
 
 		error = VNOP_READ(lvp, auio, ((ap->a_flags & UPL_IOSYNC) ? IO_SYNC : 0), ap->a_context);
 
 		bytes_remaining = uio_resid(auio);
 		if (bytes_remaining > 0 && bytes_remaining <= (user_ssize_t)ap->a_size) {
-			/* zero bytes that weren't read in to the upl */
+			                                                
 			bzero((void*)((uintptr_t)(ioaddr + ap->a_size - bytes_remaining)), (size_t) bytes_remaining);
 		}
 
@@ -571,10 +571,10 @@ exit:
 exit_no_unmap:
 		if ((ap->a_flags & UPL_NOCOMMIT) == 0) {
 			if (!error && (bytes_remaining >= 0) && (bytes_remaining <= (user_ssize_t)ap->a_size)) {
-				/* only commit what was read in (page aligned)*/
+				                                                
 				bytes_to_commit = ap->a_size - bytes_remaining;
 				if (bytes_to_commit) {
-					/* need to make sure bytes_to_commit and byte_remaining are page aligned before calling ubc_upl_commit_range*/
+					                                                                                                              
 					if (bytes_to_commit & PAGE_MASK) {
 						bytes_to_commit = (bytes_to_commit & (~PAGE_MASK)) + (PAGE_MASK + 1);
 						assert(bytes_to_commit <= (off_t)ap->a_size);
@@ -584,7 +584,7 @@ exit_no_unmap:
 					ubc_upl_commit_range(upl, ap->a_pl_offset, (upl_size_t)bytes_to_commit, UPL_COMMIT_FREE_ON_EMPTY);
 				}
 
-				/* abort anything thats left */
+				                               
 				if (bytes_remaining) {
 					ubc_upl_abort_range(upl, ap->a_pl_offset + (upl_offset_t)bytes_to_commit, (upl_size_t)bytes_remaining, UPL_ABORT_ERROR | UPL_ABORT_FREE_ON_EMPTY);
 				}
@@ -611,9 +611,9 @@ bindfs_read(struct vnop_read_args * ap)
 	vp  = ap->a_vp;
 	lvp = BINDVPTOLOWERVP(vp);
 
-	/*
-	 * First some house keeping
-	 */
+	  
+                            
+    
 	if (vnode_getwithvid(lvp, BINDVPTOLOWERVID(vp)) == 0) {
 		if (!vnode_isreg(lvp) && !vnode_islnk(lvp)) {
 			error = EPERM;
@@ -625,9 +625,9 @@ bindfs_read(struct vnop_read_args * ap)
 			goto end;
 		}
 
-		/*
-		 * Now ask VM/UBC/VFS to do our bidding
-		 */
+		  
+                                         
+     
 
 		error = VNOP_READ(lvp, ap->a_uio, ap->a_ioflag, ap->a_context);
 		if (error) {
@@ -639,34 +639,34 @@ end:
 	return error;
 }
 
-/*
- * Global vfs data structures
- */
+  
+                             
+   
 
 static const struct vnodeopv_entry_desc bindfs_vnodeop_entries[] = {
-	{.opve_op = &vnop_default_desc, .opve_impl = (vop_t)bindfs_default},      /* default */
-	{.opve_op = &vnop_getattr_desc, .opve_impl = (vop_t)bindfs_getattr},      /* getattr */
-	{.opve_op = &vnop_open_desc, .opve_impl = (vop_t)bindfs_open},            /* open */
-	{.opve_op = &vnop_close_desc, .opve_impl = (vop_t)bindfs_close},          /* close */
-	{.opve_op = &vnop_inactive_desc, .opve_impl = (vop_t)bind_inactive},      /* inactive */
-	{.opve_op = &vnop_reclaim_desc, .opve_impl = (vop_t)bind_reclaim},        /* reclaim */
-	{.opve_op = &vnop_lookup_desc, .opve_impl = (vop_t)bind_lookup},          /* lookup */
-	{.opve_op = &vnop_readdir_desc, .opve_impl = (vop_t)bindfs_readdir},      /* readdir */
-	{.opve_op = &vnop_readlink_desc, .opve_impl = (vop_t)bindfs_readlink},    /* readlink */
-	{.opve_op = &vnop_pathconf_desc, .opve_impl = (vop_t)bindfs_pathconf},    /* pathconf */
-	{.opve_op = &vnop_fsync_desc, .opve_impl = (vop_t)bindfs_fsync},          /* fsync */
-	{.opve_op = &vnop_mmap_desc, .opve_impl = (vop_t)bindfs_mmap},            /* mmap */
-	{.opve_op = &vnop_mnomap_desc, .opve_impl = (vop_t)bindfs_mnomap},        /* mnomap */
-	{.opve_op = &vnop_getxattr_desc, .opve_impl = (vop_t)bindfs_getxattr},    /* getxattr */
-	{.opve_op = &vnop_pagein_desc, .opve_impl = (vop_t)bindfs_pagein},        /* pagein */
-	{.opve_op = &vnop_read_desc, .opve_impl = (vop_t)bindfs_read},            /* read */
-	{.opve_op = &vnop_listxattr_desc, .opve_impl = (vop_t)bindfs_listxattr},  /* listxattr */
+	{.opve_op = &vnop_default_desc, .opve_impl = (vop_t)bindfs_default},                   
+	{.opve_op = &vnop_getattr_desc, .opve_impl = (vop_t)bindfs_getattr},                   
+	{.opve_op = &vnop_open_desc, .opve_impl = (vop_t)bindfs_open},                      
+	{.opve_op = &vnop_close_desc, .opve_impl = (vop_t)bindfs_close},                     
+	{.opve_op = &vnop_inactive_desc, .opve_impl = (vop_t)bind_inactive},                    
+	{.opve_op = &vnop_reclaim_desc, .opve_impl = (vop_t)bind_reclaim},                     
+	{.opve_op = &vnop_lookup_desc, .opve_impl = (vop_t)bind_lookup},                      
+	{.opve_op = &vnop_readdir_desc, .opve_impl = (vop_t)bindfs_readdir},                   
+	{.opve_op = &vnop_readlink_desc, .opve_impl = (vop_t)bindfs_readlink},                  
+	{.opve_op = &vnop_pathconf_desc, .opve_impl = (vop_t)bindfs_pathconf},                  
+	{.opve_op = &vnop_fsync_desc, .opve_impl = (vop_t)bindfs_fsync},                     
+	{.opve_op = &vnop_mmap_desc, .opve_impl = (vop_t)bindfs_mmap},                      
+	{.opve_op = &vnop_mnomap_desc, .opve_impl = (vop_t)bindfs_mnomap},                    
+	{.opve_op = &vnop_getxattr_desc, .opve_impl = (vop_t)bindfs_getxattr},                  
+	{.opve_op = &vnop_pagein_desc, .opve_impl = (vop_t)bindfs_pagein},                    
+	{.opve_op = &vnop_read_desc, .opve_impl = (vop_t)bindfs_read},                      
+	{.opve_op = &vnop_listxattr_desc, .opve_impl = (vop_t)bindfs_listxattr},                 
 	{.opve_op = NULL, .opve_impl = NULL},
 };
 
 const struct vnodeopv_desc bindfs_vnodeop_opv_desc = {.opv_desc_vector_p = &bindfs_vnodeop_p, .opv_desc_ops = bindfs_vnodeop_entries};
 
-//BINDFS Specific helper function
+                                 
 
 int
 bindfs_getbackingvnode(vnode_t in_vp, vnode_t* out_vpp)
@@ -681,7 +681,7 @@ bindfs_getbackingvnode(vnode_t in_vp, vnode_t* out_vpp)
 	mount_t mp = vnode_mount(in_vp);
 
 	sp = vfs_statfs(mp);
-	//If this isn't a bindfs vnode or it is but it's a special vnode
+	                                                                
 	if (strcmp(sp->f_fstypename, "bindfs") != 0) {
 		*out_vpp = NULLVP;
 		result = ENOENT;

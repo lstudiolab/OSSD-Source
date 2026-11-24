@@ -50,25 +50,25 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- * mig_strncpy.c - by Joshua Block
- *
- * mig_strncpy -- Bounded string copy.  Does what the library routine strncpy
- * OUGHT to do:  Copies the (null terminated) string in src into dest, a
- * buffer of length len.  Assures that the copy is still null terminated
- * and doesn't overflow the buffer, truncating the copy if necessary.
- *
- * Parameters:
- *
- *     dest - Pointer to destination buffer.
- *
- *     src - Pointer to source string.
- *
- *     len - Length of destination buffer.
- *
- * Result:
- *	length of string copied, INCLUDING the trailing 0.
- */
+  
+                                  
+  
+                                                                             
+                                                                        
+                                                                        
+                                                                     
+  
+              
+  
+                                            
+  
+                                      
+  
+                                          
+  
+          
+                                                     
+   
 #include <mach/mig_errors.h>
 
 int
@@ -93,25 +93,25 @@ mig_strncpy(
 	return i;
 }
 
-/*
- * mig_strncpy_zerofill -- Bounded string copy.  Does what the
- * library routine strncpy OUGHT to do:  Copies the (null terminated)
- * string in src into dest, a buffer of length len.  Assures that
- * the copy is still null terminated and doesn't overflow the buffer,
- * truncating the copy if necessary. If the string in src is smaller
- * than given length len, it will zero fill the remaining bytes in dest.
- *
- * Parameters:
- *
- *     dest - Pointer to destination buffer.
- *
- *     src - Pointer to source string.
- *
- *     len - Length of destination buffer.
- *
- * Result:
- *	length of string copied, INCLUDING the trailing 0.
- */
+  
+                                                              
+                                                                     
+                                                                 
+                                                                     
+                                                                    
+                                                                        
+  
+              
+  
+                                            
+  
+                                      
+  
+                                          
+  
+          
+                                                     
+   
 int
 mig_strncpy_zerofill(
 	char *dest,

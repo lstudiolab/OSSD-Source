@@ -27,4 +27,4 @@ extern const cc_fault_canary_t CCRSA_PSS_FAULT_CANARY;
 
 #define CC_FAULT_CANARY_EQUAL(_a_, _b_) (cc_cmp_safe(CC_FAULT_CANARY_SIZE, _a_, _b_) == 0)
 
-#endif /* corecrypto_cc_fault_canary_h */
+#endif                                   

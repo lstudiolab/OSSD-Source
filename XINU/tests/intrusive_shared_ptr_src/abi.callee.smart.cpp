@@ -1,11 +1,11 @@
-//
-// Declare a function as returning a raw pointer (in the header), but
-// implement it by returning a shared pointer. This represents a TU that
-// would have been translated to shared pointers.
-//
-// In this TU, SharedPtr<T> is intrusive_shared_ptr<T>, since USE_SHARED_PTR
-// is defined.
-//
+  
+                                                                     
+                                                                        
+                                                 
+  
+                                                                            
+              
+  
 
 #define USE_SHARED_PTR
 

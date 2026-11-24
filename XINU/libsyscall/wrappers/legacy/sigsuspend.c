@@ -28,4 +28,4 @@
 
 #include "../sigsuspend-base.c"
 
-#endif /* NO_SYSCALL_LEGACY */
+#endif                        

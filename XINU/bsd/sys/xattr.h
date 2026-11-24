@@ -31,25 +31,25 @@
 
 #include <sys/types.h>
 
-/* Options for pathname based xattr calls */
-#define XATTR_NOFOLLOW   0x0001     /* Don't follow symbolic links */
+                                            
+#define XATTR_NOFOLLOW   0x0001                                      
 
-/* Options for setxattr calls */
-#define XATTR_CREATE     0x0002     /* set the value, fail if attr already exists */
-#define XATTR_REPLACE    0x0004     /* set the value, fail if attr does not exist */
+                                
+#define XATTR_CREATE     0x0002                                                     
+#define XATTR_REPLACE    0x0004                                                     
 
-/* Set this to bypass authorization checking (eg. if doing auth-related work) */
+                                                                                
 #define XATTR_NOSECURITY 0x0008
 
-/* Set this to bypass the default extended attribute file (dot-underscore file) */
+                                                                                  
 #define XATTR_NODEFAULT  0x0010
 
-/* option for f/getxattr() and f/listxattr() to expose the HFS Compression extended attributes */
+                                                                                                 
 #define XATTR_SHOWCOMPRESSION 0x0020
 
 #define XATTR_MAXNAMELEN   127
 
-/* See the ATTR_CMN_FNDRINFO section of getattrlist(2) for details on FinderInfo */
+                                                                                   
 #define XATTR_FINDERINFO_NAME     "com.apple.FinderInfo"
 
 #define XATTR_RESOURCEFORK_NAME   "com.apple.ResourceFork"
@@ -66,21 +66,21 @@ __BEGIN_DECLS
 int  xattr_protected(const char *);
 int  xattr_validatename(const char *);
 
-/* Maximum extended attribute size supported by VFS */
+                                                      
 #define XATTR_MAXSIZE           INT32_MAX
 
 #ifdef PRIVATE
-/* Maximum extended attribute size in an Apple Double file */
+                                                             
 #define AD_XATTR_MAXSIZE        XATTR_MAXSIZE
 
-/* Number of bits used to represent the maximum size of
- * extended attribute stored in an Apple Double file.
- */
+                                                       
+                                                     
+   
 #define AD_XATTR_SIZE_BITS      31
-#endif /* PRIVATE */
+#endif              
 
 __END_DECLS
-#endif /* KERNEL */
+#endif             
 
 #ifndef KERNEL
 __BEGIN_DECLS
@@ -102,6 +102,6 @@ ssize_t listxattr(const char *path, char *namebuff, size_t size, int options);
 ssize_t flistxattr(int fd, char *namebuff, size_t size, int options);
 
 __END_DECLS
-#endif /* KERNEL */
+#endif             
 
-#endif /* _SYS_XATTR_H_ */
+#endif                    

@@ -27,7 +27,7 @@
  */
 
 #include <mach/mach_types.h>
-#include <kern/task.h> /* task_ledgers */
+#include <kern/task.h>                   
 #include <kern/ledger.h>
 
 #include <kperf/kperf.h>
@@ -36,7 +36,7 @@
 #include <kperf/context.h>
 #include <kperf/meminfo.h>
 
-/* collect current memory info */
+                                 
 void
 kperf_meminfo_sample(task_t task, struct meminfo *mi)
 {
@@ -69,7 +69,7 @@ kperf_meminfo_sample(task_t task, struct meminfo *mi)
 	BUF_INFO(PERF_MI_SAMPLE | DBG_FUNC_END);
 }
 
-/* log an existing sample into the buffer */
+                                            
 void
 kperf_meminfo_log(struct meminfo *mi)
 {

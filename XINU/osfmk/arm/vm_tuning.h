@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	arm/vm_tuning.h
- *
- *	VM tuning parameters for arm (without reference bits).
- */
+  
+   
+  
+                        
+  
+                                                         
+   
 
 #ifndef _ARM_VM_TUNING_H_
 #define _ARM_VM_TUNING_H_
 
-#endif  /* _ARM_VM_TUNING_H_ */
+#endif                         

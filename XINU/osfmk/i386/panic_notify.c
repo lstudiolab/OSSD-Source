@@ -32,20 +32,20 @@
 #include <pexpert/pexpert.h>
 #include <stdint.h>
 
-/*
- * An I/O port to issue a read from, in the event of a panic.
- * Useful for triggering logic analyzers.
- */
+  
+                                                             
+                                         
+   
 static uint16_t panic_io_port = 0;
 
-/*
- * Similar to the panic_io_port, the pvpanic_io_port is used to notify
- * interested parties (in this case the host/hypervisor), that a panic
- * has occurred.
- * Where it differs from panic_io_port is that it is written and read
- * according to the pvpanic specification:
- * https://raw.githubusercontent.com/qemu/qemu/master/docs/specs/pvpanic.txt
- */
+  
+                                                                      
+                                                                      
+                
+                                                                     
+                                          
+                                                                            
+   
 static uint16_t pvpanic_io_port = 0;
 
 void
@@ -53,13 +53,13 @@ panic_notify_init(void)
 {
 	(void) PE_parse_boot_argn("panic_io_port", &panic_io_port, sizeof(panic_io_port));
 
-	/*
-	 * XXX
-	 * Defer reading the notifcation bit until panic time. This maintains
-	 * backwards compatibility with Apple's QEMU. Once backwards
-	 * compatibilty is no longer needed the check should be performed here
-	 * before setting pvpanic_io_port.
-	 */
+	  
+       
+                                                                      
+                                                             
+                                                                       
+                                   
+    
 	(void) PE_parse_boot_argn("pvpanic_io_port", &pvpanic_io_port, sizeof(pvpanic_io_port));
 }
 

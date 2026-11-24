@@ -50,7 +50,7 @@ get_tpidrro(void)
 {
 	uintptr_t       uthread;
 #if __arm__
-	uthread = __builtin_arm_mrc(15, 0, 13, 0, 3);   // TPIDRURO
+	uthread = __builtin_arm_mrc(15, 0, 13, 0, 3);              
 #else
 	__asm__ volatile ("mrs %0, TPIDRRO_EL0" : "=r" (uthread));
 #endif
@@ -61,7 +61,7 @@ void
 set_tpidrro(uintptr_t uthread)
 {
 #if __arm__
-	__builtin_arm_mcr(15, 0, uthread, 13, 0, 3);    // TPIDRURO
+	__builtin_arm_mcr(15, 0, uthread, 13, 0, 3);               
 #else
 	__asm__ volatile ("msr TPIDRRO_EL0, %0" : : "r" (uthread));
 #endif

@@ -71,52 +71,52 @@
 #include <sys/cdefs.h>
 #ifdef KERNEL_PRIVATE
 #include <kern/locks.h>
-/*
- * Structure per communications domain.
- */
+  
+                                       
+   
 
-/*
- * Forward structure declarations for function prototypes [sic].
- */
+  
+                                                                
+   
 struct  mbuf;
 
 #pragma pack(4)
 
 #ifdef XNU_KERNEL_PRIVATE
-/*
- * Legacy domain.
- *
- * NOTE: Do not modify this structure, as there are modules outside of xnu
- * which rely on the size and layout for binary compatibility.  This structure
- * is simply used by the exported net_{add,del}_domain_old, pffinddomain_old
- * routines.  Internally, domains are stored in the private variant of domain
- * defined down below.
- */
+  
+                 
+  
+                                                                          
+                                                                              
+                                                                            
+                                                                             
+                      
+   
 struct domain_old {
 #else
 struct domain {
-#endif /* !XNU_KERNEL_PRIVATE */
-	int     dom_family;             /* AF_xxx */
+#endif                          
+	int     dom_family;                         
 	const char *dom_name;
-	void    (*dom_init)(void);      /* initialize domain data structures */
-	int     (*dom_externalize)      /* externalize access rights */
+	void    (*dom_init)(void);                                             
+	int     (*dom_externalize)                                     
 	(struct mbuf *);
-	void    (*dom_dispose)          /* dispose of internalized rights */
+	void    (*dom_dispose)                                              
 	(struct mbuf *);
 #ifdef XNU_KERNEL_PRIVATE
-	struct  protosw_old *dom_protosw; /* Chain of protosw's for AF */
+	struct  protosw_old *dom_protosw;                                
 	struct  domain_old *dom_next;
 #else
-	struct  protosw *dom_protosw;   /* Chain of protosw's for AF */
+	struct  protosw *dom_protosw;                                  
 	struct  domain *dom_next;
-#endif /* !XNU_KERNEL_PRIVATE */
-	int     (*dom_rtattach)         /* initialize routing table */
+#endif                          
+	int     (*dom_rtattach)                                       
 	(void **, int);
-	int     dom_rtoffset;           /* an arg to rtattach, in bits */
-	int     dom_maxrtkey;           /* for routing layer */
-	int     dom_protohdrlen;        /* len of protocol header */
-	int     dom_refs;               /* # socreates outstanding */
-	lck_mtx_t *dom_mtx;             /* domain global mutex */
+	int     dom_rtoffset;                                            
+	int     dom_maxrtkey;                                  
+	int     dom_protohdrlen;                                    
+	int     dom_refs;                                            
+	lck_mtx_t *dom_mtx;                                      
 	uint32_t dom_flags;
 	uint32_t reserved[2];
 };
@@ -127,48 +127,48 @@ struct domain {
 
 #include <sys/queue.h>
 
-/*
- * Internal, private and extendable representation of domain.
- */
+  
+                                                             
+   
 struct domain {
-	int     dom_family;             /* AF_xxx */
-	uint32_t dom_flags;             /* domain flags (see below ) */
-	uint32_t dom_refs;              /* # socreates outstanding */
-	lck_mtx_t *dom_mtx;             /* domain global mutex */
+	int     dom_family;                         
+	uint32_t dom_flags;                                            
+	uint32_t dom_refs;                                           
+	lck_mtx_t *dom_mtx;                                      
 	decl_lck_mtx_data(, dom_mtx_s);
-	TAILQ_ENTRY(domain) dom_entry;  /* next domain in list */
-	TAILQ_HEAD(, protosw) dom_protosw; /* protosw chain */
-	void    (*dom_init)             /* initialize domain data structures */
+	TAILQ_ENTRY(domain) dom_entry;                           
+	TAILQ_HEAD(, protosw) dom_protosw;                    
+	void    (*dom_init)                                                    
 	(struct domain *);
-	int     (*dom_externalize)      /* externalize access rights */
+	int     (*dom_externalize)                                     
 	(struct mbuf *);
-	void    (*dom_dispose)          /* dispose of internalized rights */
+	void    (*dom_dispose)                                              
 	(struct mbuf *);
-	int     (*dom_rtattach)         /* initialize routing table */
+	int     (*dom_rtattach)                                       
 	(void **, int);
-	int     dom_rtoffset;           /* an arg to rtattach, in bits */
-	int     dom_maxrtkey;           /* for routing layer */
-	int     dom_protohdrlen;        /* len of protocol header */
+	int     dom_rtoffset;                                            
+	int     dom_maxrtkey;                                  
+	int     dom_protohdrlen;                                    
 	const char *dom_name;
-	struct domain_old *dom_old;     /* domain pointer per net_add_domain */
+	struct domain_old *dom_old;                                            
 };
 
 extern TAILQ_HEAD(domains_head, domain) domains;
 extern struct domain *localdomain;
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Values for dom_flags
- */
+  
+                       
+   
 #define DOM_REENTRANT   0x1
 #ifdef BSD_KERNEL_PRIVATE
-#define DOM_INITIALIZED 0x2             /* domain has been initialized */
-#define DOM_ATTACHED    0x4             /* domain is in the global list */
-#define DOM_OLD         0x10000000      /* domain added via net_add_domain */
+#define DOM_INITIALIZED 0x2                                              
+#define DOM_ATTACHED    0x4                                               
+#define DOM_OLD         0x10000000                                           
 
-/* pseudo-public domain flags */
+                                
 #define DOMF_USERFLAGS  (DOM_REENTRANT)
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 __BEGIN_DECLS
 #ifdef XNU_KERNEL_PRIVATE
@@ -191,8 +191,8 @@ extern struct domain *pffinddomain(int) __XNU_INTERNAL(pffinddomain);
 extern void net_add_domain(struct domain *dp);
 extern int net_del_domain(struct domain *);
 extern struct domain *pffinddomain(int);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 __END_DECLS
-#endif /* KERNEL_PRIVATE */
-#endif /* PRIVATE */
-#endif  /* _SYS_DOMAIN_H_ */
+#endif                     
+#endif              
+#endif                      

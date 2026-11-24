@@ -14,9 +14,9 @@ foo(void)
 	fflush(stdout);
 }
 
-/*
- * volatile to stop the compiler from optimizing away calls to atan()
- */
+  
+                                                                     
+   
 volatile double zero = 0.0;
 
 int
@@ -27,9 +27,9 @@ main(int argc, char **argv)
 	int err;
 	int a;
 
-	/*
-	 * needs to run as root for sysctl.
-	 */
+	  
+                                    
+    
 	if (geteuid() != 0) {
 		printf("Test not running as root\n");
 		exit(-1);

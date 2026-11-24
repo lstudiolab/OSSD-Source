@@ -49,25 +49,25 @@ T_GLOBAL_META(
 #define USLEEP_TIME     5000
 #define WAIT_TIME       (4l)
 #define LENGTHEN_SIZE   500
-#define FIFO_SPACE      8192    /* FIFOS have 8K of buffer space */
+#define FIFO_SPACE      8192                                       
 
-/*
- * These two variables are the non local memory for holding the return
- * values from functions with which pthread_create is called.
- */
+  
+                                                                      
+                                                             
+   
 int thread_status;
 int fifo_read_fd;
 
-/*
- * Types of actions for setup, cleanup, and execution of tests
- */
+  
+                                                              
+   
 typedef enum {CREAT, MKDIR, READ, WRITE, WRITEFD, FILLFD, UNLINK, LSKEE, RMDIR, MKFIFO, LENGTHEN, TRUNC,
 	      SYMLINK, CHMOD, CHOWN, EXCHANGEDATA, RENAME, LSEEK, OPEN, MMAP, NOTHING,
 	      SETXATTR, UTIMES, STAT, HARDLINK, REVOKE, FUNLOCK} action_id_t;
 
-/*
- * Directs an action as mentioned above
- */
+  
+                                       
+   
 typedef struct _action {
 	int             act_dosleep;
 	action_id_t     act_id;
@@ -75,53 +75,53 @@ typedef struct _action {
 	int             act_fd;
 } action_t;
 
-/*
- * A test case.  Specifies setup, an event to look for, an action to take to
- * cause (or not cause) that event, and cleanup.
- */
+  
+                                                                            
+                                                
+   
 typedef struct _test {
 	char *t_testname;
 
-	/* Is this test an expected failure? */
+	                                       
 	int t_known_failure;
 
-	/* Is this test behaving non-deterministically? */
+	                                                  
 	int t_nondeterministic;
 
-	/* Test kevent() or poll() */
+	                             
 	int     t_is_poll_test;
 
-	/* Actions for setting up test */
+	                                 
 	int      t_n_prep_actions;
 	action_t t_prep_actions[5];
 
-	/* Actions for cleaning up test */
+	                                  
 	int      t_n_cleanup_actions;
 	action_t t_cleanup_actions[5];
 
-	/* Action for thred to take while we wait */
+	                                            
 	action_t t_helpthreadact;
 
-	/* File to look for event on */
-	char     *t_watchfile;  /* set event ident IN TEST (can't know fd beforehand)*/
-	int      t_file_is_fifo;/* FIFOs are handled in a special manner */
+	                               
+	char     *t_watchfile;                                                         
+	int      t_file_is_fifo;                                           
 
-	/* Different parameters for poll() vs kevent() */
+	                                                 
 	union {
 		struct kevent   tu_kev;
 		short           tu_pollevents;
 	} t_union;
 
-	/* Do we expect results? */
+	                           
 	int      t_want_event;
 
-	/* Not always used--how much data should we find (EVFILT_{READ,WRITE}) */
+	                                                                         
 	int      t_nbytes;
 
-	/* Hacks for FILT_READ and pipes */
-	int      t_read_to_end_first;   /* Consume all data in file before waiting for event */
-	int      t_write_some_data;     /* Write some data to file before waiting for event (FIFO hack) */
-	int      t_extra_sleep_hack;    /* Sleep before waiting, to let a fifo fill up with data */
+	                                   
+	int      t_read_to_end_first;                                                          
+	int      t_write_some_data;                                                                       
+	int      t_extra_sleep_hack;                                                               
 } test_t;
 
 char *
@@ -185,10 +185,10 @@ get_action_name(action_id_t a)
 	}
 	return "Unknown";
 }
-/*
- * Initialize an action struct.  Whether to sleep, what action to take,
- * and arguments for that action.
- */
+  
+                                                                       
+                                 
+   
 void
 init_action(action_t *act, int sleep, action_id_t call, int nargs, ...)
 {
@@ -205,9 +205,9 @@ init_action(action_t *act, int sleep, action_id_t call, int nargs, ...)
 	va_end(ap);
 }
 
-/*
- * Opening a fifo is complicated: need to open both sides at once
- */
+  
+                                                                 
+   
 void *
 open_fifo_readside(void *arg)
 {
@@ -217,10 +217,10 @@ open_fifo_readside(void *arg)
 	return &fifo_read_fd;
 }
 
-/*
- * Open a fifo, setting read and write descriptors.  Return 0 for success, -1 for failure.
- * Only set FD args upon success; they will be unmodified on failure.
- */
+  
+                                                                                          
+                                                                     
+   
 int
 open_fifo(const char *path, int *readfd, int *writefd)
 {
@@ -251,9 +251,9 @@ open_fifo(const char *path, int *readfd, int *writefd)
 	return res;
 }
 
-/*
- * Just concatenate a directory and a filename, sticking a "/" betwixt them
- */
+  
+                                                                           
+   
 void
 makepath(char *buf, const char *dir, const char *file)
 {
@@ -263,19 +263,19 @@ makepath(char *buf, const char *dir, const char *file)
 }
 
 
-/* Execute a prep, cleanup, or test action; specific tricky notes below.
- *
- * CREAT:       comes to life and given length 1
- * READ:        try to read one char
- * WRITE:	try to write TEST_STRING to file
- * LENGTHEN:	make longer by LENGTHEN_SIZE
- * MMAP:	mmap first 20 bytes of file, write HELLO_WORLD in
- * SETXATTR:	set the KEY attribute to value VAL
- * WRITEFD:	instead of opening fresh, take an FD in the action struct (FIFOs)
- * FILLFD:	write a file until you can no longer.  for filling FIFOS.
- *
- * * Several of these have hard-coded sizes.
- */
+                                                                        
+  
+                                                
+                                    
+                                          
+                                         
+                                                          
+                                               
+                                                                             
+                                                                    
+  
+                                            
+   
 void*
 execute_action(void *actionptr)
 {
@@ -290,7 +290,7 @@ execute_action(void *actionptr)
 
 	T_LOG("Beginning action of type %d: %s\n", act->act_id, get_action_name(act->act_id));
 
-	/* Let other thread get into kevent() sleep */
+	                                              
 	if (SLEEP == act->act_dosleep) {
 		usleep(USLEEP_TIME);
 	}
@@ -304,7 +304,7 @@ execute_action(void *actionptr)
 			res = -1;
 			break;
 		}
-		ftruncate(tmpfd, 1);         /* So that mmap() doesn't fool us */
+		ftruncate(tmpfd, 1);                                             
 		close(tmpfd);
 		res = 0;
 		break;
@@ -375,7 +375,7 @@ execute_action(void *actionptr)
 		res = chmod((char*)args[0], (int)args[1]);
 		break;
 	case CHOWN:
-		/* path, uid, gid */
+		                    
 		res = chown((char*)args[0], (int) args[1], (int) args[2]);
 		break;
 	case EXCHANGEDATA:
@@ -393,7 +393,7 @@ execute_action(void *actionptr)
 		res = close(tmpfd);
 		break;
 	case MMAP:
-		/* It had best already exist with nonzero size */
+		                                                 
 		if ((tmpfd = open((char*)args[0], O_RDWR)) == -1) {
 			T_LOG("open(%s, O_RDWR) failed: %d (%s)\n", args[0], errno, strerror(errno));
 			res = -1;
@@ -461,9 +461,9 @@ execute_action(void *actionptr)
 	return &thread_status;
 }
 
-/*
- * Read until the end of a file, for EVFILT_READ purposes (considers file position)
- */
+  
+                                                                                   
+   
 void
 read_to_end(int fd)
 {
@@ -473,10 +473,10 @@ read_to_end(int fd)
 	}
 }
 
-/*
- * Helper for setup and cleanup; just execute every action in an array
- * of actions.  "failout" parameter indicates whether to stop if one fails.
- */
+  
+                                                                      
+                                                                           
+   
 int
 execute_action_list(action_t *actions, int nactions, int failout)
 {
@@ -495,9 +495,9 @@ execute_action_list(action_t *actions, int nactions, int failout)
 	return res;
 }
 
-/*
- * Execute a full test, return success value.
- */
+  
+                                             
+   
 int
 execute_test(test_t *test)
 {
@@ -516,9 +516,9 @@ execute_test(test_t *test)
 
 	res = execute_action_list(test->t_prep_actions, test->t_n_prep_actions, 1);
 
-	/* If prep succeeded */
+	                       
 	if (0 == res) {
-		/* Create kqueue for kqueue tests*/
+		                                   
 		if (!test->t_is_poll_test) {
 			if ((kqfd = kqueue()) == -1) {
 				T_LOG("kqueue() failed: %d (%s)\n", errno, strerror(errno));
@@ -526,7 +526,7 @@ execute_test(test_t *test)
 		}
 
 		if ((test->t_is_poll_test) || kqfd >= 0) {
-			/* Open the file we're to monitor.  Fifos get special handling */
+			                                                                 
 			if (test->t_file_is_fifo) {
 				filefd = -1;
 				open_fifo(test->t_watchfile, &filefd, &writefd);
@@ -541,10 +541,10 @@ execute_test(test_t *test)
 			if (filefd >= 0) {
 				T_LOG("Opened file to monitor.\n");
 
-				/*
-				 * Fill in the fd to monitor once you know it
-				 * If it's a fifo test, then the helper is definitely going to want the write end.
-				 */
+				  
+                                                 
+                                                                                      
+       
 				test->t_helpthreadact.act_fd = (writefd >= 0 ? writefd : filefd);
 
 				if (test->t_read_to_end_first) {
@@ -556,13 +556,13 @@ execute_test(test_t *test)
 					(void)execute_action(&dowr);
 				}
 
-				/* Helper modifies the file that we're listening on (sleeps first, in general) */
+				                                                                                 
 				thread_status = 0;
 				res = pthread_create(&thr, NULL, execute_action, (void*) &test->t_helpthreadact);
 				if (0 == res) {
 					T_LOG("Created helper thread.\n");
 
-					/* This is ugly business to hack on filling up a FIFO */
+					                                                        
 					if (test->t_extra_sleep_hack) {
 						usleep(USLEEP_TIME);
 					}
@@ -593,7 +593,7 @@ execute_test(test_t *test)
 						}
 					}
 
-					/* Success only if you've succeeded to this point AND joined AND other thread is happy*/
+					                                                                                        
 					status = NULL;
 					res2 = pthread_join(thr, (void **)&status);
 					if (res2 != 0) {
@@ -621,12 +621,12 @@ execute_test(test_t *test)
 		}
 	}
 
-	/* Cleanup work */
+	                  
 	execute_action_list(test->t_cleanup_actions, test->t_n_cleanup_actions, 0);
 
-	/* Success if nothing failed and we either received or did not receive event,
-	 * as expected
-	 */
+	                                                                             
+               
+    
 	if (0 == res) {
 		T_LOG(cnt > 0 ? "Got an event.\n" : "Did not get an event.\n");
 		if (((cnt > 0) && (test->t_want_event)) || ((cnt == 0) && (!test->t_want_event))) {
@@ -652,7 +652,7 @@ execute_test(test_t *test)
 		T_MAYFAIL;
 	} else {
 		if (test->t_known_failure) {
-			// Signal to harness that this test is expected to fail.
+			                                                        
 			T_EXPECTFAIL;
 		}
 	}
@@ -685,7 +685,7 @@ init_test_common(test_t *tst, char *testname, char *watchfile, int nprep, int nc
 		tst->t_is_poll_test = 1;
 		tst->t_union.tu_pollevents = (short)event;
 	} else {
-		/* Can do this because filter is negative, notes are positive */
+		                                                                
 		if (event == EVFILT_READ || event == EVFILT_WRITE) {
 			EV_SET(&tst->t_union.tu_kev, 0, event, EV_ADD | EV_ENABLE, 0, 0, NULL);
 			tst->t_nbytes = want;
@@ -695,22 +695,22 @@ init_test_common(test_t *tst, char *testname, char *watchfile, int nprep, int nc
 	}
 }
 
-/*
- * Initialize a test case, not including its actions.  Meaning: a name for it, what filename to watch,
- * counts of prep and cleanup actions, what event to watch for, and whether you want an event/how many bytes read.
- *
- * "want" does double duty as whether you want an event and how many bytes you might want to read
- * "event" is either an event flag (e.g. NOTE_WRITE) or EVFILT_READ
- */
+  
+                                                                                                      
+                                                                                                                  
+  
+                                                                                                 
+                                                                   
+   
 void
 init_test(test_t *tst, char *testname, char *watchfile, int nprep, int nclean, int event, int want)
 {
 	init_test_common(tst, testname, watchfile, nprep, nclean, event, want, 0);
 }
 
-/*
- * Same as above, but for a poll() test
- */
+  
+                                       
+   
 void
 init_poll_test(test_t *tst, char *testname, char *watchfile, int nprep, int nclean, int event, int want)
 {
@@ -750,7 +750,7 @@ run_note_delete_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, RMDIR, 2, (void*)DIR2, NULL);
 	execute_test(&test);
 
-	/* Do FIFO stuff here */
+	                        
 	init_test(&test, "1.1.6: make a fifo, unlink it", FILE1, 1, 0, NOTE_DELETE, YES_EVENT);
 	test.t_file_is_fifo = 1;
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, MKFIFO, 2, (void*)FILE1, (void*)NULL);
@@ -774,7 +774,7 @@ run_note_delete_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, NULL);
 	execute_test(&test);
 
-	/* ================= */
+	                       
 
 	init_test(&test, "1.2.1: Straight-up rename file", FILE1, 1, 1, NOTE_DELETE, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
@@ -790,7 +790,7 @@ run_note_delete_tests()
 
 	init_test(&test, "1.2.3: Null action on file", FILE1, 1, 1, NOTE_DELETE, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
-	init_action(&test.t_helpthreadact, SLEEP, NOTHING, 2, NULL, NULL); /* The null action */
+	init_action(&test.t_helpthreadact, SLEEP, NOTHING, 2, NULL, NULL);                      
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, (void*)NULL);
 	execute_test(&test);
 
@@ -925,9 +925,9 @@ run_note_write_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
 	execute_test(&test);
 
-	/* exchangedata is not supported on APFS volumes */
+	                                                   
 	if (!path_on_apfs(PDIR)) {
-		/* This actually should not generate an event, though it's in this section */
+		                                                                             
 		makepath(pathbuf, DIR1, FILE1);
 		makepath(otherpathbuf, DIR1, FILE2);
 		init_test(&test, "2.1.14: exchangedata two files in a dir", DIR1, 3, 3, NOTE_WRITE, NO_EVENT);
@@ -944,11 +944,11 @@ run_note_write_tests()
 
 	init_test(&test, "2.1.15: Change a file with mmap()", FILE1, 1, 1, NOTE_WRITE, YES_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
-	init_action(&test.t_helpthreadact, SLEEP, MMAP, 2, (void*)FILE1, (void*)1); /* 1 -> "modify it"*/
+	init_action(&test.t_helpthreadact, SLEEP, MMAP, 2, (void*)FILE1, (void*)1);                      
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, (void*)NULL);
 	execute_test(&test);
 
-	/*================= no-event tests ==================*/
+	                                                       
 	init_test(&test, "2.2.1: just open and close existing file", FILE1, 1, 1, NOTE_WRITE, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
 	init_action(&test.t_helpthreadact, SLEEP, OPEN, 2, (void*)FILE1, NULL);
@@ -973,7 +973,7 @@ run_note_write_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
 	execute_test(&test);
 
-	/* There are no tests 2.2.5 or 2.2.6 */
+	                                       
 
 	init_test(&test, "2.2.7: rename a dir", DIR1, 1, 1, NOTE_WRITE, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, MKDIR, 2, (void*)DIR1, (void*)NULL);
@@ -1049,46 +1049,46 @@ run_note_extend_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, (void*)NULL);
 	execute_test(&test);
 
-	/*
-	 * We won't concern ourselves with lengthening directories: commenting these out
-	 *
-	 *
-	 *  makepath(pathbuf, DIR1, FILE1);
-	 *  init_test(&test, "3.1.2: add a file to a directory with creat()", DIR1, 1, 2, NOTE_EXTEND, YES_EVENT);
-	 *  init_action(&(test.t_prep_actions[0]), NOSLEEP, MKDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  init_action(&test.t_helpthreadact, SLEEP, CREAT, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[1], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  execute_test(&test);
-	 *
-	 *  makepath(pathbuf, DIR1, FILE1);
-	 *  init_test(&test, "3.1.3: add a file to a directory with open()", DIR1, 1, 2, NOTE_EXTEND, YES_EVENT);
-	 *  init_action(&(test.t_prep_actions[0]), NOSLEEP, MKDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  init_action(&test.t_helpthreadact, SLEEP, CREAT, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[1], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  execute_test(&test);
-	 *
-	 *  makepath(pathbuf, DIR1, FILE1);
-	 *  init_test(&test, "3.1.4: add a file to a directory with rename()", DIR1, 2, 2, NOTE_EXTEND, YES_EVENT);
-	 *  init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
-	 *  init_action(&(test.t_prep_actions[1]), NOSLEEP, MKDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  init_action(&test.t_helpthreadact, SLEEP, RENAME, 2, (void*)FILE1, (void*)pathbuf);
-	 *  init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[1], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  execute_test(&test);
-	 */
+	  
+                                                                                 
+   
+   
+                                    
+                                                                                                           
+                                                                                         
+                                                                                      
+                                                                                              
+                                                                                          
+                         
+   
+                                    
+                                                                                                          
+                                                                                         
+                                                                                      
+                                                                                              
+                                                                                          
+                         
+   
+                                    
+                                                                                                            
+                                                                                          
+                                                                                         
+                                                                                        
+                                                                                              
+                                                                                          
+                         
+    
 
-	/* 3.1.5: a placeholder for a potential kernel test */
-	/*
-	 *  makepath(pathbuf, DIR1, DIR2);
-	 *  init_test(&test, "3.1.6: add a file to a directory with mkdir()", DIR1, 1, 2, NOTE_EXTEND, YES_EVENT);
-	 *  init_action(&(test.t_prep_actions[0]), NOSLEEP, MKDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  init_action(&test.t_helpthreadact, SLEEP, MKDIR, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[0], NOSLEEP, RMDIR, 2, (void*)pathbuf, (void*)NULL);
-	 *  init_action(&test.t_cleanup_actions[1], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
-	 *  execute_test(&test);
-	 */
+	                                                      
+	  
+                                   
+                                                                                                           
+                                                                                         
+                                                                                      
+                                                                                             
+                                                                                          
+                         
+    
 	init_test(&test, "3.1.7: lengthen a file with truncate()", FILE1, 1, 1, NOTE_EXTEND, YES_EVENT);
 	test.t_nondeterministic = 1;
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
@@ -1097,7 +1097,7 @@ run_note_extend_tests()
 	execute_test(&test);
 
 
-	/** ========== NO EVENT SECTION ============== **/
+	                                                  
 	init_test(&test, "3.2.1: setxattr() a file", FILE1, 1, 1, NOTE_EXTEND, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
 	init_action(&test.t_helpthreadact, SLEEP, SETXATTR, 2, FILE1, (void*)NULL);
@@ -1196,7 +1196,7 @@ run_note_attrib_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
 	execute_test(&test);
 
-	/* exchangedata is not supported on APFS volumes */
+	                                                   
 	if (!path_on_apfs(PDIR)) {
 		init_test(&test, "4.1.7: exchangedata", FILE1, 2, 2, NOTE_ATTRIB, YES_EVENT);
 		init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
@@ -1221,7 +1221,7 @@ run_note_attrib_tests()
 	execute_test(&test);
 
 
-	/* ====== NO EVENT TESTS ========== */
+	                                      
 
 	init_test(&test, "4.2.1: rename a file", FILE1, 1, 1, NOTE_ATTRIB, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
@@ -1400,7 +1400,7 @@ run_note_link_tests()
 	init_action(&test.t_helpthreadact, SLEEP, RMDIR, 2, (void*)DIR1, (void*)NULL);
 	execute_test(&test);
 
-	/* ============= NO EVENT SECTION ============== */
+	                                                   
 	makepath(pathbuf, DIR1, FILE1);
 	init_test(&test, "5.2.1: make a file in a dir", DIR1, 1, 2, NOTE_LINK, NO_EVENT);
 	test.t_known_failure = 1;
@@ -1499,7 +1499,7 @@ run_note_rename_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, RMDIR, 2, (void*)DIR2, NULL);
 	execute_test(&test);
 
-	/* ========= NO EVENT SECTION =========== */
+	                                            
 
 	init_test(&test, "6.2.1: unlink a file", FILE1, 1, 0, NOTE_RENAME, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 2, (void*)FILE1, (void*)NULL);
@@ -1592,7 +1592,7 @@ run_evfilt_read_tests()
 	init_test(&test, "8.1.4: block, then seek to beginning", FILE1, 2, 1, EVFILT_READ, strlen(TEST_STRING));
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 1, (void*)FILE1);
 	init_action(&(test.t_prep_actions[1]), NOSLEEP, WRITE, 1, (void*)FILE1);
-	test.t_read_to_end_first = 1; /* hack means that we've gotten to EOF before we block */
+	test.t_read_to_end_first = 1;                                                          
 	init_action(&test.t_helpthreadact, SLEEP, LSEEK, 1, (void*)0);
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, NULL);
 	execute_test(&test);
@@ -1605,7 +1605,7 @@ run_evfilt_read_tests()
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, NULL);
 	execute_test(&test);
 
-	/* No result section... */
+	                          
 	init_test(&test, "8.2.1: just rename", FILE1, 2, 1, EVFILT_READ, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 1, (void*)FILE1);
 	init_action(&(test.t_prep_actions[1]), NOSLEEP, TRUNC, 1, (void*)FILE1);
@@ -1622,7 +1622,7 @@ run_evfilt_read_tests()
 	init_test(&test, "8.2.3: write to beginning", FILE1, 2, 1, EVFILT_READ, NO_EVENT);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 1, (void*)FILE1);
 	init_action(&(test.t_prep_actions[1]), NOSLEEP, WRITE, 1, (void*)FILE1);
-	test.t_read_to_end_first = 1; /* hack means that we've gotten to EOF before we block */
+	test.t_read_to_end_first = 1;                                                          
 	init_action(&test.t_helpthreadact, SLEEP, WRITE, 1, (void*)FILE1);
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 1, (void*)FILE1);
 	execute_test(&test);
@@ -1630,7 +1630,7 @@ run_evfilt_read_tests()
 	init_test(&test, "8.1.4: block, then seek to current location", FILE1, 2, 1, EVFILT_READ, 0);
 	init_action(&(test.t_prep_actions[0]), NOSLEEP, CREAT, 1, (void*)FILE1);
 	init_action(&(test.t_prep_actions[1]), NOSLEEP, WRITE, 1, (void*)FILE1);
-	test.t_read_to_end_first = 1; /* hack means that we've gotten to EOF before we block */
+	test.t_read_to_end_first = 1;                                                          
 	init_action(&test.t_helpthreadact, SLEEP, LSEEK, 1, (void*)strlen(TEST_STRING));
 	init_action(&test.t_cleanup_actions[0], NOSLEEP, UNLINK, 2, (void*)FILE1, NULL);
 	execute_test(&test);
@@ -1663,9 +1663,9 @@ write_to_fd(void *arg)
 	return (void*) write(fd, buf, sizeof(buf));
 }
 
-/*
- * We don't (in principle) support EVFILT_WRITE for vnodes; thusly, no tests here
- */
+  
+                                                                                 
+   
 void
 run_evfilt_write_tests()
 {
@@ -1776,8 +1776,8 @@ run_all_tests()
 	run_note_link_tests();
 	run_note_rename_tests();
 #if 0
-	run_note_revoke_tests(); /* Can no longer revoke a regular file--need an unmount test */
-#endif /* 0 */
+	run_note_revoke_tests();                                                                
+#endif        
 	run_evfilt_read_tests();
 	run_evfilt_write_tests();
 	run_poll_tests();

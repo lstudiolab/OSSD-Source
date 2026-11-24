@@ -45,35 +45,35 @@ extern uint64_t LockTimeOutTSC;
 extern uint64_t TLockTimeOut;
 #define TICKET_LOCK_PANIC_TIMEOUT TLockTimeOut
 #endif
-/* "Ticket": A FIFO spinlock with constant backoff
- * cf. Algorithms for Scalable Synchronization on Shared-Memory Multiprocessors
- * by Mellor-Crumney and Scott, 1991
- */
+                                                  
+                                                                               
+                                    
+   
 
-/* TODO: proportional back-off based on desired-current ticket distance
- * This has the potential to considerably reduce snoop traffic
- * but must be tuned carefully
- * TODO: UP implementation.
- * Currently only used within the scheduler, where it is acquired with
- * interrupts masked, and consequently doesn't require a uniprocessor
- * implementation.
- * TODO: Evaluate a bias towards the performant clusters on
- * asymmetric efficient/performant multi-cluster systems, while
- * retaining the starvation-free property. A small intra-cluster bias may
- * be profitable for overall throughput
- */
+                                                                       
+                                                              
+                              
+                           
+                                                                      
+                                                                     
+                  
+                                                           
+                                                               
+                                                                         
+                                       
+   
 
 void
 lck_ticket_init(lck_ticket_t *tlock, lck_grp_t *grp)
 {
 	memset(tlock, 0, sizeof(*tlock));
-	/* Current ticket size limit--tickets can be trivially expanded
-	 * to 16-bits if needed
-	 */
+	                                                               
+                        
+    
 	static_assert(MAX_CPUS < 256);
 
 	__assert_only   lck_ticket_internal *tlocki = &tlock->tu;
-	/* Verify alignment */
+	                      
 	__assert_only uintptr_t tcn = (uintptr_t) &tlocki->tcurnext;
 	__assert_only uintptr_t tc = (uintptr_t) &tlocki->cticket;
 	__assert_only uintptr_t tn = (uintptr_t) &tlocki->nticket;
@@ -90,14 +90,14 @@ static void
 tlock_mark_owned(lck_ticket_t *tlock, thread_t cthread)
 {
 	assert(tlock->lck_owner == 0);
-	/* There is a small pre-emption disabled window (also interrupts masked
-	 * for the pset lock) between the acquisition of the lock and the
-	 * population of the advisory 'owner' thread field
-	 * On architectures with a DCAS (ARM v8.1 or x86), conceivably we could
-	 * populate the next ticket and the thread atomically, with
-	 * possible overhead, potential loss of micro-architectural fwd progress
-	 * properties of an unconditional fetch-add, and a 16 byte alignment requirement.
-	 */
+	                                                                       
+                                                                  
+                                                   
+                                                                        
+                                                            
+                                                                         
+                                                                                  
+    
 	__c11_atomic_store((_Atomic thread_t *)&tlock->lck_owner, cthread, __ATOMIC_RELAXED);
 }
 
@@ -110,17 +110,17 @@ load_exclusive_acquire8(uint8_t *target)
 	value = __builtin_arm_ldrex(target);
 	__c11_atomic_thread_fence(__ATOMIC_ACQUIRE);
 #else
-	value = __builtin_arm_ldaex(target);    // ldaxr
-	/* "Compiler barrier", no barrier instructions are emitted */
+	value = __builtin_arm_ldaex(target);            
+	                                                             
 	atomic_signal_fence(memory_order_acquire);
 #endif
 	return value;
 }
 #endif
 
-/* On contention, poll for ownership
- * Returns when the current ticket is observed equal to "mt"
- */
+                                    
+                                                            
+   
 static void __attribute__((noinline))
 tlock_contended(uint8_t *tp, uint8_t mt, lck_ticket_t *tlock, thread_t cthread LCK_GRP_ARG(lck_grp_t *grp))
 {
@@ -134,7 +134,7 @@ tlock_contended(uint8_t *tp, uint8_t mt, lck_ticket_t *tlock, thread_t cthread L
 	if (__improbable(stat_enabled)) {
 		begin = mach_absolute_time();
 	}
-#endif /* CONFIG_DTRACE || LOCK_STATS */
+#endif                                  
 
 	assertf(tlock->lck_owner != (uintptr_t) cthread, "Recursive ticket lock, owner: %p, current thread: %p", (void *) tlock->lck_owner, (void *) cthread);
 
@@ -144,11 +144,11 @@ tlock_contended(uint8_t *tp, uint8_t mt, lck_ticket_t *tlock, thread_t cthread L
 			if ((cticket = load_exclusive_acquire8(tp)) != mt) {
 				wait_for_event();
 			} else {
-				/* Some micro-architectures may benefit
-				 * from disarming the monitor.
-				 * TODO: determine specific micro-architectures
-				 * which benefit, modern CPUs may not
-				 */
+				                                       
+                                  
+                                                   
+                                         
+       
 				os_atomic_clear_exclusive();
 				tlock_mark_owned(tlock, cthread);
 #if CONFIG_DTRACE || LOCK_STATS
@@ -156,13 +156,13 @@ tlock_contended(uint8_t *tp, uint8_t mt, lck_ticket_t *tlock, thread_t cthread L
 				if (__improbable(stat_enabled)) {
 					lck_grp_ticket_update_spin(tlock LCK_GRP_ARG(grp), mach_absolute_time() - begin);
 				}
-#endif /* CONFIG_DTRACE || LOCK_STATS */
+#endif                                  
 				return;
 			}
-#else /* !WFE */
+#else           
 #if defined(__x86_64__)
 			__builtin_ia32_pause();
-#endif /* x64 */
+#endif          
 			if ((cticket = __c11_atomic_load((_Atomic uint8_t *) tp, __ATOMIC_SEQ_CST)) == mt) {
 				tlock_mark_owned(tlock, cthread);
 #if CONFIG_DTRACE || LOCK_STATS
@@ -170,10 +170,10 @@ tlock_contended(uint8_t *tp, uint8_t mt, lck_ticket_t *tlock, thread_t cthread L
 					lck_grp_ticket_update_spin(tlock LCK_GRP_ARG(grp), mach_absolute_time() - begin);
 				}
 				lck_grp_ticket_update_miss(tlock LCK_GRP_ARG(grp));
-#endif /* CONFIG_DTRACE || LOCK_STATS */
+#endif                                  
 				return;
 			}
-#endif /* !WFE */
+#endif           
 		}
 
 		if (etime == 0) {
@@ -200,13 +200,13 @@ void
 	lck_ticket_internal tlocka;
 
 	disable_preemption_for_thread(cthread);
-	/* Atomically load both the current and next ticket, and increment the
-	 * latter. Wrap of the ticket field is OK as long as the total
-	 * number of contending CPUs is < maximum ticket
-	 */
+	                                                                      
+                                                               
+                                                 
+    
 	tlocka.tcurnext = __c11_atomic_fetch_add((_Atomic uint16_t *)&tlocki->tcurnext, 1U << 8, __ATOMIC_ACQUIRE);
 
-	/* Contention? branch to out of line contended block */
+	                                                       
 	if (__improbable(tlocka.cticket != tlocka.nticket)) {
 		return tlock_contended(&tlocki->cticket, tlocka.nticket, tlock, cthread LCK_GRP_ARG(grp));
 	}
@@ -226,24 +226,24 @@ lck_ticket_unlock(lck_ticket_t *tlock)
 	__c11_atomic_store((_Atomic uintptr_t *)&tlock->lck_owner, 0, __ATOMIC_RELAXED);
 
 #if defined(__x86_64__)
-	/* Communicate desired release semantics to the compiler */
+	                                                           
 	__c11_atomic_thread_fence(__ATOMIC_RELEASE);
-	/* '+ constraint indicates a read modify write */
-	/* I have not yet located a c11 primitive which synthesizes an 'INC <MEM>',
-	 * i.e. a specified-granule non-atomic memory read-modify-write.
-	 */
+	                                                 
+	                                                                           
+                                                                 
+    
 	__asm__ volatile ("incb %0" : "+m"(tlocki->cticket) :: "cc");
-#else /* !x86_64 */
+#else              
 	uint8_t cticket = __c11_atomic_load((_Atomic uint8_t *) &tlocki->cticket, __ATOMIC_RELAXED);
 	cticket++;
 	__c11_atomic_store((_Atomic uint8_t *) &tlocki->cticket, cticket, __ATOMIC_RELEASE);
 #if __arm__
 	set_event();
-#endif  // __arm__
-#endif /* !x86_64 */
+#endif            
+#endif              
 #if CONFIG_DTRACE
 	LOCKSTAT_RECORD(LS_LCK_TICKET_LOCK_RELEASE, tlock);
-#endif /* CONFIG_DTRACE */
+#endif                    
 	enable_preemption();
 }
 

@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * History:
- * 14 December, 2001	Dieter Siegmund (dieter@apple.com)
- * - created
- */
+  
+           
+                                                       
+            
+   
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/kernel.h>
@@ -60,7 +60,7 @@
 #include <sys/imageboot.h>
 #include <pexpert/pexpert.h>
 
-extern int      nfs_mountroot(void);    /* nfs_vfsops.c */
+extern int      nfs_mountroot(void);                      
 extern int (*mountroot)(void);
 
 extern unsigned char    rootdevice[];
@@ -109,18 +109,18 @@ struct netboot_info {
 	size_t              second_image_path_length;
 };
 
-/*
- * Function: parse_booter_path
- * Purpose:
- *   Parse a string of the form:
- *        "<IP>:<host>:<mount>[:<image_path>]"
- *   into the given ip address, host, mount point, and optionally, image_path.
- *
- * Note:
- *   The passed in string is modified i.e. ':' is replaced by '\0'.
- * Example:
- *   "17.202.16.17:seaport:/release/.images/Image9/CurrentHera"
- */
+  
+                              
+           
+                                
+                                              
+                                                                              
+  
+        
+                                                                   
+           
+                                                               
+   
 static __inline__ boolean_t
 parse_booter_path(char * path, struct in_addr * iaddr_p, char const * * host,
     char * * mount_dir, char * * image_path)
@@ -128,7 +128,7 @@ parse_booter_path(char * path, struct in_addr * iaddr_p, char const * * host,
 	char *      start;
 	char *      colon;
 
-	/* IP address */
+	                
 	start = path;
 	colon = strchr(start, ':');
 	if (colon == NULL) {
@@ -139,7 +139,7 @@ parse_booter_path(char * path, struct in_addr * iaddr_p, char const * * host,
 		return FALSE;
 	}
 
-	/* host */
+	          
 	start = colon + 1;
 	colon = strchr(start, ':');
 	if (colon == NULL) {
@@ -148,14 +148,14 @@ parse_booter_path(char * path, struct in_addr * iaddr_p, char const * * host,
 	*colon = '\0';
 	*host = start;
 
-	/* mount */
+	           
 	start = colon + 1;
 	colon = strchr(start, ':');
 	*mount_dir = start;
 	if (colon == NULL) {
 		*image_path = NULL;
 	} else {
-		/* image path */
+		                
 		*colon = '\0';
 		start = colon + 1;
 		*image_path = start;
@@ -163,13 +163,13 @@ parse_booter_path(char * path, struct in_addr * iaddr_p, char const * * host,
 	return TRUE;
 }
 
-/*
- * Function: find_colon
- * Purpose:
- *   Find the next unescaped instance of the colon character.
- *   If a colon is escaped (preceded by a backslash '\' character),
- *   shift the string over by one character to overwrite the backslash.
- */
+  
+                       
+           
+                                                             
+                                                                   
+                                                                       
+   
 static __inline__ char *
 find_colon(char * str)
 {
@@ -194,25 +194,25 @@ find_colon(char * str)
 	return colon;
 }
 
-/*
- * Function: parse_netboot_path
- * Purpose:
- *   Parse a string of the form:
- *        "nfs:<IP>:<mount>[:<image_path>]"
- *   into the given ip address, host, mount point, and optionally, image_path.
- * Notes:
- * - the passed in string is modified i.e. ':' is replaced by '\0'
- * - literal colons must be escaped with a backslash
- *
- * Examples:
- * nfs:17.202.42.112:/Library/NetBoot/NetBootSP0:Jaguar/Jaguar.dmg
- * nfs:17.202.42.112:/Volumes/Foo\:/Library/NetBoot/NetBootSP0:Jaguar/Jaguar.dmg
- */
+  
+                               
+           
+                                
+                                           
+                                                                              
+         
+                                                                  
+                                                    
+  
+            
+                                                                  
+                                                                                
+   
 static __inline__ boolean_t
 parse_netboot_path(char * path, struct in_addr * iaddr_p, char const * * host,
     char * * mount_dir, char * * image_path)
 {
-	static char tmp[MAX_IPv4_STR_LEN]; /* Danger - not thread safe */
+	static char tmp[MAX_IPv4_STR_LEN];                               
 	char *      start;
 	char *      colon;
 
@@ -221,7 +221,7 @@ parse_netboot_path(char * path, struct in_addr * iaddr_p, char const * * host,
 		return FALSE;
 	}
 
-	/* IP address */
+	                
 	start = path + strlen(kNetBootRootPathPrefixNFS);
 	colon = strchr(start, ':');
 	if (colon == NULL) {
@@ -232,14 +232,14 @@ parse_netboot_path(char * path, struct in_addr * iaddr_p, char const * * host,
 		return FALSE;
 	}
 
-	/* mount point */
+	                 
 	start = colon + 1;
 	colon = find_colon(start);
 	*mount_dir = start;
 	if (colon == NULL) {
 		*image_path = NULL;
 	} else {
-		/* image path */
+		                
 		*colon = '\0';
 		start = colon + 1;
 		(void)find_colon(start);
@@ -325,7 +325,7 @@ netboot_info_init(struct in_addr iaddr)
 	info->client_ip = iaddr;
 	info->image_type = kNetBootImageTypeUnknown;
 
-	/* check for a booter-specified path then a NetBoot path */
+	                                                           
 	root_path = zalloc(ZV_NAMEI);
 
 	if (PE_parse_boot_argn("rp0", root_path, MAXPATHLEN) == TRUE
@@ -393,11 +393,11 @@ netboot_info_init(struct in_addr iaddr)
 			printf("netboot: root path uses unrecognized format\n");
 		}
 
-		/* check for image-within-image */
+		                                  
 		if (info->image_path != NULL) {
 			if (PE_parse_boot_argn(IMAGEBOOT_ROOT_ARG, root_path, MAXPATHLEN)
 			    || PE_parse_boot_argn("rp1", root_path, MAXPATHLEN)) {
-				/* rp1/root-dmg is the second-level image */
+				                                            
 				save_path(&info->second_image_path, &info->second_image_path_length,
 				    root_path);
 			}
@@ -534,19 +534,19 @@ route_cmd(int cmd, struct in_addr d, struct in_addr g,
 
 	flags |= more_flags;
 
-	/* destination */
+	                 
 	bzero((caddr_t)&dst, sizeof(dst));
 	dst.sin_len = sizeof(dst);
 	dst.sin_family = AF_INET;
 	dst.sin_addr = d;
 
-	/* gateway */
+	             
 	bzero((caddr_t)&gw, sizeof(gw));
 	gw.sin_len = sizeof(gw);
 	gw.sin_family = AF_INET;
 	gw.sin_addr = g;
 
-	/* mask */
+	          
 	bzero(&mask, sizeof(mask));
 	mask.sin_len = sizeof(mask);
 	mask.sin_family = AF_INET;
@@ -648,7 +648,7 @@ netboot_mountroot(void)
 
 	bzero(&ifr, sizeof(ifr));
 
-	/* find the interface */
+	                        
 	ifp = find_interface();
 	if (ifp == NULL) {
 		printf("netboot: no suitable interface\n");
@@ -658,7 +658,7 @@ netboot_mountroot(void)
 	snprintf(ifr.ifr_name, sizeof(ifr.ifr_name), "%s", if_name(ifp));
 	printf("netboot: using network interface '%s'\n", ifr.ifr_name);
 
-	/* bring it up */
+	                 
 	if ((error = socreate(AF_INET, &so, SOCK_DGRAM, 0)) != 0) {
 		printf("netboot: socreate, error=%d\n", error);
 		goto failed;
@@ -670,7 +670,7 @@ netboot_mountroot(void)
 		goto failed;
 	}
 
-	/* grab information from the registry */
+	                                        
 	if (get_ip_parameters(&iaddr, &netmask, &router) == FALSE) {
 		printf("netboot: can't retrieve IP parameters\n");
 		goto failed;
@@ -689,7 +689,7 @@ netboot_mountroot(void)
 		goto failed;
 	}
 	if (router.s_addr == 0) {
-		/* enable proxy arp if we don't have a router */
+		                                                
 		router.s_addr = iaddr.s_addr;
 	}
 	printf("netboot: adding default route " IP_FORMAT "\n",
@@ -712,20 +712,20 @@ netboot_mountroot(void)
 			}
 			printf("netboot: nfs_mountroot() attempt %u failed; "
 			    "clearing ARP entry and trying again\n", try);
-			/*
-			 * error is either EHOSTDOWN or EHOSTUNREACH, which likely means
-			 * that the port we're plugged into has spanning tree enabled,
-			 * and either the router or the server can't answer our ARP
-			 * requests.  Clear the incomplete ARP entry by removing the
-			 * appropriate route, depending on the error code:
-			 *     EHOSTDOWN		NFS server's route
-			 *     EHOSTUNREACH		router's route
-			 */
+			  
+                                                                   
+                                                                 
+                                                              
+                                                               
+                                                     
+                                       
+                                      
+      
 			switch (error) {
 			default:
-			/* NOT REACHED */
+			                 
 			case EHOSTDOWN:
-				/* remove the server's arp entry */
+				                                   
 				error = host_route_delete(S_netboot_info_p->server_ip,
 				    ifp->if_index);
 				if (error) {

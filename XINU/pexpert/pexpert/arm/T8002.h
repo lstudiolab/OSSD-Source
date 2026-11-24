@@ -13,7 +13,7 @@
 
 #include <pexpert/arm/dockchannel.h>
 
-// AOP_CLOCK frequency * 30 ms
+                              
 #define DOCKCHANNEL_DRAIN_PERIOD                (96000000 * 0.03)
 
 #define rPMGR_EVENT_TMR                         (*(volatile uint32_t *) (timer_base + 0x00000))
@@ -24,4 +24,4 @@
 
 #endif
 
-#endif /* ! _PEXPERT_ARM_T8002_H */
+#endif                             

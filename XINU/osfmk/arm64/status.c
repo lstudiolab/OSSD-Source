@@ -50,17 +50,17 @@ typedef struct arm_vfpv2_state arm_vfpv2_state_t;
 #define ARM_VFPV2_STATE_COUNT \
 	((mach_msg_type_number_t)(sizeof (arm_vfpv2_state_t)/sizeof(uint32_t)))
 
-/*
- * Forward definitions
- */
+  
+                      
+   
 void thread_set_child(thread_t child, int pid);
 void thread_set_parent(thread_t parent, int pid);
 static void free_debug_state(thread_t thread);
 
-/*
- * Maps state flavor to number of words in the state:
- */
-/* __private_extern__ */
+  
+                                                     
+   
+                        
 unsigned int _MachineStateCount[] = {
 	[ARM_UNIFIED_THREAD_STATE] = ARM_UNIFIED_THREAD_STATE_COUNT,
 	[ARM_VFP_STATE] = ARM_VFP_STATE_COUNT,
@@ -79,9 +79,9 @@ unsigned int _MachineStateCount[] = {
 extern zone_t ads_zone;
 
 #if __arm64__
-/*
- * Copy values from saved_state to ts64.
- */
+  
+                                        
+   
 void
 saved_state_to_thread_state64(const arm_saved_state_t * saved_state,
     arm_thread_state64_t *    ts64)
@@ -100,9 +100,9 @@ saved_state_to_thread_state64(const arm_saved_state_t * saved_state,
 	}
 }
 
-/*
- * Copy values from ts64 to saved_state
- */
+  
+                                       
+   
 void
 thread_state64_to_saved_state(const arm_thread_state64_t * ts64,
     arm_saved_state_t *          saved_state)
@@ -110,7 +110,7 @@ thread_state64_to_saved_state(const arm_thread_state64_t * ts64,
 	uint32_t i;
 #if __has_feature(ptrauth_calls)
 	boolean_t intr = ml_set_interrupts_enabled(FALSE);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 
 	assert(is_saved_state64(saved_state));
 
@@ -125,15 +125,15 @@ thread_state64_to_saved_state(const arm_thread_state64_t * ts64,
 	    [psr64_user_mask] "i"(PSR64_USER_MASK),
 	    [not_psr64_user_mask] "i"(~PSR64_USER_MASK)
 	    );
-	/*
-	 * Make writes to ts64->cpsr visible first, since it's useful as a
-	 * canary to detect thread-state corruption.
-	 */
+	  
+                                                                   
+                                             
+    
 	__builtin_arm_dmb(DMB_ST);
 #else
 	set_saved_state_cpsr(saved_state,
 	    (get_saved_state_cpsr(saved_state) & ~PSR64_USER_MASK) | (ts64->cpsr & PSR64_USER_MASK));
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 	set_saved_state_fp(saved_state, ts64->fp);
 	set_saved_state_lr(saved_state, ts64->lr);
 	set_saved_state_sp(saved_state, ts64->sp);
@@ -144,10 +144,10 @@ thread_state64_to_saved_state(const arm_thread_state64_t * ts64,
 
 #if __has_feature(ptrauth_calls)
 	ml_set_interrupts_enabled(intr);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 }
 
-#endif /* __arm64__ */
+#endif                
 
 static kern_return_t
 handle_get_arm32_thread_state(thread_state_t            tstate,
@@ -189,11 +189,11 @@ handle_get_arm_thread_state(thread_state_t            tstate,
     mach_msg_type_number_t *  count,
     const arm_saved_state_t * saved_state)
 {
-	/* In an arm64 world, this flavor can be used to retrieve the thread
-	 * state of a 32-bit or 64-bit thread into a unified structure, but we
-	 * need to support legacy clients who are only aware of 32-bit, so
-	 * check the count to see what the client is expecting.
-	 */
+	                                                                    
+                                                                       
+                                                                   
+                                                        
+    
 	if (*count < ARM_UNIFIED_THREAD_STATE_COUNT) {
 		return handle_get_arm32_thread_state(tstate, count, saved_state);
 	}
@@ -249,11 +249,11 @@ handle_set_arm_thread_state(const thread_state_t   tstate,
     mach_msg_type_number_t count,
     arm_saved_state_t *    saved_state)
 {
-	/* In an arm64 world, this flavor can be used to set the thread state of a
-	 * 32-bit or 64-bit thread from a unified structure, but we need to support
-	 * legacy clients who are only aware of 32-bit, so check the count to see
-	 * what the client is expecting.
-	 */
+	                                                                          
+                                                                            
+                                                                          
+                                 
+    
 	if (count < ARM_UNIFIED_THREAD_STATE_COUNT) {
 		if (!is_saved_state32(saved_state)) {
 			return KERN_INVALID_ARGUMENT;
@@ -281,9 +281,9 @@ handle_set_arm_thread_state(const thread_state_t   tstate,
 }
 
 
-/*
- * Translate thread state arguments to userspace representation
- */
+  
+                                                               
+   
 
 kern_return_t
 machine_thread_state_convert_to_user(
@@ -318,7 +318,7 @@ machine_thread_state_convert_to_user(
 		return KERN_SUCCESS;
 	}
 
-	// Note that kernel threads never have disable_user_jop set
+	                                                           
 	if (current_thread()->machine.disable_user_jop || !thread_is_64bit_addr(current_thread()) ||
 	    thread->machine.disable_user_jop || !thread_is_64bit_addr(thread)
 	    ) {
@@ -328,15 +328,15 @@ machine_thread_state_convert_to_user(
 
 	ts64->flags = 0;
 	if (ts64->lr) {
-		// lr might contain an IB-signed return address (strip is a no-op on unsigned addresses)
+		                                                                                        
 		uintptr_t stripped_lr = (uintptr_t)ptrauth_strip((void *)ts64->lr,
 		    ptrauth_key_return_address);
 		if (ts64->lr != stripped_lr) {
-			// Need to allow already-signed lr value to round-trip as is
+			                                                            
 			ts64->flags |= __DARWIN_ARM_THREAD_STATE64_FLAGS_IB_SIGNED_LR;
 		}
-		// Note that an IB-signed return address that happens to have a 0 signature value
-		// will round-trip correctly even if IA-signed again below (and IA-authd later)
+		                                                                                 
+		                                                                               
 	}
 
 	if (arm_user_jop_disabled()) {
@@ -366,15 +366,15 @@ machine_thread_state_convert_to_user(
 
 	return KERN_SUCCESS;
 #else
-	// No conversion to userspace representation on this platform
+	                                                             
 	(void)thread; (void)flavor; (void)tstate; (void)count;
 	return KERN_SUCCESS;
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 }
 
-/*
- * Translate thread state arguments from userspace representation
- */
+  
+                                                                 
+   
 
 kern_return_t
 machine_thread_state_convert_from_user(
@@ -409,13 +409,13 @@ machine_thread_state_convert_from_user(
 		return KERN_SUCCESS;
 	}
 
-	// Note that kernel threads never have disable_user_jop set
+	                                                           
 	if (current_thread()->machine.disable_user_jop || !thread_is_64bit_addr(current_thread())) {
 		if (thread->machine.disable_user_jop || !thread_is_64bit_addr(thread)) {
 			ts64->flags = __DARWIN_ARM_THREAD_STATE64_FLAGS_NO_PTRAUTH;
 			return KERN_SUCCESS;
 		}
-		// A JOP-disabled process must not set thread state on a JOP-enabled process
+		                                                                            
 		return KERN_PROTECTION_FAILURE;
 	}
 
@@ -424,24 +424,24 @@ machine_thread_state_convert_from_user(
 		    ) {
 			return KERN_SUCCESS;
 		}
-		// Disallow setting unsigned thread state on JOP-enabled processes.
-		// Ignore flag and treat thread state arguments as signed, ptrauth
-		// poisoning will cause resulting thread state to be invalid
+		                                                                   
+		                                                                  
+		                                                            
 		ts64->flags &= ~__DARWIN_ARM_THREAD_STATE64_FLAGS_NO_PTRAUTH;
 	}
 
 	if (ts64->flags & __DARWIN_ARM_THREAD_STATE64_FLAGS_IB_SIGNED_LR) {
-		// lr might contain an IB-signed return address (strip is a no-op on unsigned addresses)
+		                                                                                        
 		uintptr_t stripped_lr = (uintptr_t)ptrauth_strip((void *)ts64->lr,
 		    ptrauth_key_return_address);
 		if (ts64->lr == stripped_lr) {
-			// Don't allow unsigned pointer to be passed through as is. Ignore flag and
-			// treat as IA-signed below (where auth failure may poison the value).
+			                                                                           
+			                                                                      
 			ts64->flags &= ~__DARWIN_ARM_THREAD_STATE64_FLAGS_IB_SIGNED_LR;
 		}
-		// Note that an IB-signed return address that happens to have a 0 signature value
-		// will also have been IA-signed (without this flag being set) and so will IA-auth
-		// correctly below.
+		                                                                                 
+		                                                                                  
+		                   
 	}
 
 	if (arm_user_jop_disabled()) {
@@ -471,15 +471,15 @@ machine_thread_state_convert_from_user(
 
 	return KERN_SUCCESS;
 #else
-	// No conversion from userspace representation on this platform
+	                                                               
 	(void)thread; (void)flavor; (void)tstate; (void)count;
 	return KERN_SUCCESS;
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 }
 
-/*
- * Translate signal context data pointer to userspace representation
- */
+  
+                                                                    
+   
 
 kern_return_t
 machine_thread_siguctx_pointer_convert_to_user(
@@ -504,15 +504,15 @@ machine_thread_siguctx_pointer_convert_to_user(
 
 	return KERN_SUCCESS;
 #else
-	// No conversion to userspace representation on this platform
+	                                                             
 	(void)thread; (void)uctxp;
 	return KERN_SUCCESS;
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 }
 
-/*
- * Translate array of function pointer syscall arguments from userspace representation
- */
+  
+                                                                                      
+   
 
 kern_return_t
 machine_thread_function_pointers_convert_from_user(
@@ -540,16 +540,16 @@ machine_thread_function_pointers_convert_from_user(
 
 	return KERN_SUCCESS;
 #else
-	// No conversion from userspace representation on this platform
+	                                                               
 	(void)thread; (void)fptrs; (void)count;
 	return KERN_SUCCESS;
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 }
 
-/*
- * Routine: machine_thread_get_state
- *
- */
+  
+                                    
+  
+   
 kern_return_t
 machine_thread_get_state(thread_t                 thread,
     thread_flavor_t          flavor,
@@ -769,7 +769,7 @@ machine_thread_get_state(thread_t                 thread,
 
 		state = (struct arm_vfp_state *) tstate;
 		thread_state = neon_state32(thread->machine.uNeon);
-		/* ARM64 TODO: set fpsr and fpcr from state->fpscr */
+		                                                     
 
 		bcopy(thread_state, state, (max + 1) * sizeof(uint32_t));
 		*count = (max + 1);
@@ -812,7 +812,7 @@ machine_thread_get_state(thread_t                 thread,
 		state = (arm_neon_state64_t *)tstate;
 		thread_state = neon_state64(thread->machine.uNeon);
 
-		/* For now, these are identical */
+		                                  
 		assert(sizeof(*state) == sizeof(*thread_state));
 		bcopy(thread_state, state, sizeof(arm_neon_state64_t));
 
@@ -844,19 +844,19 @@ machine_thread_get_state(thread_t                 thread,
 }
 
 
-/*
- * Routine: machine_thread_get_kern_state
- *
- */
+  
+                                         
+  
+   
 kern_return_t
 machine_thread_get_kern_state(thread_t                 thread,
     thread_flavor_t          flavor,
     thread_state_t           tstate,
     mach_msg_type_number_t * count)
 {
-	/*
-	 * This works only for an interrupted kernel thread
-	 */
+	  
+                                                    
+    
 	if (thread != current_thread() || getCpuDatap()->cpu_int_state == NULL) {
 		return KERN_FAILURE;
 	}
@@ -903,9 +903,9 @@ machine_thread_switch_addrmode(thread_t thread)
 		thread->machine.uNeon->nsh.flavor = ARM_NEON_SAVED_STATE64;
 		thread->machine.uNeon->nsh.count = ARM_NEON_SAVED_STATE64_COUNT;
 
-		/*
-		 * Reinitialize the NEON state.
-		 */
+		  
+                                 
+     
 		bzero(&thread->machine.uNeon->uns, sizeof(thread->machine.uNeon->uns));
 		thread->machine.uNeon->ns_64.fpcr = FPCR_DEFAULT;
 	} else {
@@ -914,9 +914,9 @@ machine_thread_switch_addrmode(thread_t thread)
 		thread->machine.uNeon->nsh.flavor = ARM_NEON_SAVED_STATE32;
 		thread->machine.uNeon->nsh.count = ARM_NEON_SAVED_STATE32_COUNT;
 
-		/*
-		 * Reinitialize the NEON state.
-		 */
+		  
+                                 
+     
 		bzero(&thread->machine.uNeon->uns, sizeof(thread->machine.uNeon->uns));
 		thread->machine.uNeon->ns_32.fpcr = FPCR_DEFAULT_32;
 	}
@@ -924,10 +924,10 @@ machine_thread_switch_addrmode(thread_t thread)
 
 extern long long arm_debug_get(void);
 
-/*
- * Routine: machine_thread_set_state
- *
- */
+  
+                                    
+  
+   
 kern_return_t
 machine_thread_set_state(thread_t               thread,
     thread_flavor_t        flavor,
@@ -1004,7 +1004,7 @@ machine_thread_set_state(thread_t               thread,
 		state = (arm_legacy_debug_state_t *) tstate;
 
 		for (i = 0; i < 16; i++) {
-			/* do not allow context IDs to be set */
+			                                        
 			if (((state->bcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
 			    || ((state->bcr[i] & ARM_DBG_CR_LINKED_MASK) != ARM_DBG_CR_LINKED_UNLINKED)
 			    || ((state->wcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
@@ -1027,7 +1027,7 @@ machine_thread_set_state(thread_t               thread,
 			}
 
 			for (i = 0; i < 16; i++) {
-				/* set appropriate privilege; mask out unknown bits */
+				                                                      
 				thread_state->bcr[i] = (state->bcr[i] & (ARM_DBG_CR_ADDRESS_MASK_MASK
 				    | ARM_DBGBCR_MATCH_MASK
 				    | ARM_DBG_CR_BYTE_ADDRESS_SELECT_MASK
@@ -1047,7 +1047,7 @@ machine_thread_set_state(thread_t               thread,
 				thread_state->wvr[i] = state->wvr[i] & ARM_DBG_VR_ADDRESS_MASK;
 			}
 
-			thread_state->mdscr_el1 = 0ULL;         // Legacy customers issuing ARM_DEBUG_STATE dont drive single stepping.
+			thread_state->mdscr_el1 = 0ULL;                                                                                
 		}
 
 		if (thread == current_thread()) {
@@ -1057,7 +1057,7 @@ machine_thread_set_state(thread_t               thread,
 		break;
 	}
 	case ARM_DEBUG_STATE32:
-		/* ARM64_TODO  subtle bcr/wcr semantic differences e.g. wcr and ARM_DBGBCR_TYPE_IVA */
+		                                                                                      
 	{
 		arm_debug_state32_t *state;
 		boolean_t enabled = FALSE;
@@ -1077,7 +1077,7 @@ machine_thread_set_state(thread_t               thread,
 		}
 
 		for (i = 0; i < 16; i++) {
-			/* do not allow context IDs to be set */
+			                                        
 			if (((state->bcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
 			    || ((state->bcr[i] & ARM_DBG_CR_LINKED_MASK) != ARM_DBG_CR_LINKED_UNLINKED)
 			    || ((state->wcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
@@ -1106,7 +1106,7 @@ machine_thread_set_state(thread_t               thread,
 			}
 
 			for (i = 0; i < 16; i++) {
-				/* set appropriate privilege; mask out unknown bits */
+				                                                      
 				thread_state->bcr[i] = (state->bcr[i] & (ARM_DBG_CR_ADDRESS_MASK_MASK
 				    | ARM_DBGBCR_MATCH_MASK
 				    | ARM_DBG_CR_BYTE_ADDRESS_SELECT_MASK
@@ -1154,7 +1154,7 @@ machine_thread_set_state(thread_t               thread,
 		}
 
 		for (i = 0; i < 16; i++) {
-			/* do not allow context IDs to be set */
+			                                        
 			if (((state->bcr[i] & ARM_DBGBCR_TYPE_MASK) != ARM_DBGBCR_TYPE_IVA)
 			    || ((state->bcr[i] & ARM_DBG_CR_LINKED_MASK) != ARM_DBG_CR_LINKED_UNLINKED)
 			    || ((state->wcr[i] & ARM_DBG_CR_LINKED_MASK) != ARM_DBG_CR_LINKED_UNLINKED)) {
@@ -1182,9 +1182,9 @@ machine_thread_set_state(thread_t               thread,
 			}
 
 			for (i = 0; i < 16; i++) {
-				/* set appropriate privilege; mask out unknown bits */
-				thread_state->bcr[i] = (state->bcr[i] & (0         /* Was ARM_DBG_CR_ADDRESS_MASK_MASK deprecated in v8 */
-				    | 0                             /* Was ARM_DBGBCR_MATCH_MASK, ignored in AArch64 state */
+				                                                      
+				thread_state->bcr[i] = (state->bcr[i] & (0                                                                
+				    | 0                                                                                      
 				    | ARM_DBG_CR_BYTE_ADDRESS_SELECT_MASK
 				    | ARM_DBG_CR_ENABLE_MASK))
 				    | ARM_DBGBCR_TYPE_IVA
@@ -1227,7 +1227,7 @@ machine_thread_set_state(thread_t               thread,
 
 		state = (struct arm_vfp_state *) tstate;
 		thread_state = neon_state32(thread->machine.uNeon);
-		/* ARM64 TODO: combine fpsr and fpcr into state->fpscr */
+		                                                         
 
 		bcopy(state, thread_state, (max + 1) * sizeof(uint32_t));
 
@@ -1303,20 +1303,20 @@ machine_thread_reset_pc(thread_t thread, mach_vm_address_t pc)
 	set_saved_state_pc(get_user_regs(thread), (register_t)pc);
 }
 
-/*
- * Routine: machine_thread_state_initialize
- *
- */
+  
+                                           
+  
+   
 kern_return_t
 machine_thread_state_initialize(thread_t thread)
 {
 	arm_context_t *context = thread->machine.contextData;
 
-	/*
-	 * Should always be set up later. For a kernel thread, we don't care
-	 * about this state. For a user thread, we'll set the state up in
-	 * setup_wqthread, bsdthread_create, load_main(), or load_unixthread().
-	 */
+	  
+                                                                     
+                                                                  
+                                                                        
+    
 
 	if (context != NULL) {
 		bzero(&context->ss.uss, sizeof(context->ss.uss));
@@ -1332,21 +1332,21 @@ machine_thread_state_initialize(thread_t thread)
 	thread->machine.DebugData = NULL;
 
 #if defined(HAS_APPLE_PAC)
-	/* Sign the initial user-space thread state */
+	                                              
 	if (thread->machine.upcb != NULL) {
 		boolean_t intr = ml_set_interrupts_enabled(FALSE);
 		ml_sign_thread_state(thread->machine.upcb, 0, 0, 0, 0, 0);
 		ml_set_interrupts_enabled(intr);
 	}
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine: machine_thread_dup
- *
- */
+  
+                              
+  
+   
 kern_return_t
 machine_thread_dup(thread_t self,
     thread_t target,
@@ -1364,7 +1364,7 @@ machine_thread_dup(thread_t self,
 	if (!is_corpse && is_saved_state64(self_saved_state)) {
 		check_and_sign_copied_thread_state(target_saved_state, self_saved_state);
 	}
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 	arm_neon_saved_state_t *self_neon_state = self->machine.uNeon;
 	arm_neon_saved_state_t *target_neon_state = target->machine.uNeon;
@@ -1373,10 +1373,10 @@ machine_thread_dup(thread_t self,
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine: get_user_regs
- *
- */
+  
+                         
+  
+   
 struct arm_saved_state *
 get_user_regs(thread_t thread)
 {
@@ -1389,26 +1389,26 @@ get_user_neon_regs(thread_t thread)
 	return thread->machine.uNeon;
 }
 
-/*
- * Routine: find_user_regs
- *
- */
+  
+                          
+  
+   
 struct arm_saved_state *
 find_user_regs(thread_t thread)
 {
 	return thread->machine.upcb;
 }
 
-/*
- * Routine: find_kern_regs
- *
- */
+  
+                          
+  
+   
 struct arm_saved_state *
 find_kern_regs(thread_t thread)
 {
-	/*
-	 * This works only for an interrupted kernel thread
-	 */
+	  
+                                                    
+    
 	if (thread != current_thread() || getCpuDatap()->cpu_int_state == NULL) {
 		return (struct arm_saved_state *) NULL;
 	} else {
@@ -1436,16 +1436,16 @@ find_debug_state64(thread_t thread)
 	}
 }
 
-/**
- *  Finds the debug state for the given 64 bit thread, allocating one if it
- *  does not exist.
- *
- *  @param thread 64 bit thread to find or allocate debug state for
- *
- *  @returns A pointer to the given thread's 64 bit debug state or a null
- *           pointer if the given thread is null or the allocation of a new
- *           debug state fails.
- */
+   
+                                                                           
+                   
+  
+                                                                   
+  
+                                                                         
+                                                                           
+                               
+   
 arm_debug_state64_t *
 find_or_allocate_debug_state64(thread_t thread)
 {
@@ -1462,16 +1462,16 @@ find_or_allocate_debug_state64(thread_t thread)
 	return thread_state;
 }
 
-/**
- *  Finds the debug state for the given 32 bit thread, allocating one if it
- *  does not exist.
- *
- *  @param thread 32 bit thread to find or allocate debug state for
- *
- *  @returns A pointer to the given thread's 32 bit debug state or a null
- *           pointer if the given thread is null or the allocation of a new
- *           debug state fails.
- */
+   
+                                                                           
+                   
+  
+                                                                   
+  
+                                                                         
+                                                                           
+                               
+   
 arm_debug_state32_t *
 find_or_allocate_debug_state32(thread_t thread)
 {
@@ -1488,11 +1488,11 @@ find_or_allocate_debug_state32(thread_t thread)
 	return thread_state;
 }
 
-/**
- *	Frees a thread's debug state if allocated. Otherwise does nothing.
- *
- *  @param thread thread to free the debug state of
- */
+   
+                                                                     
+  
+                                                   
+   
 static inline void
 free_debug_state(thread_t thread)
 {
@@ -1503,10 +1503,10 @@ free_debug_state(thread_t thread)
 	}
 }
 
-/*
- * Routine: thread_userstack
- *
- */
+  
+                            
+  
+   
 kern_return_t
 thread_userstack(__unused thread_t  thread,
     int                flavor,
@@ -1534,7 +1534,7 @@ thread_userstack(__unused thread_t  thread,
 			break;
 		}
 
-		/* INTENTIONAL FALL THROUGH (see machine_thread_set_state) */
+		                                                             
 		OS_FALLTHROUGH;
 	case ARM_THREAD_STATE32:
 		if (count != ARM_THREAD_STATE32_COUNT) {
@@ -1577,12 +1577,12 @@ thread_userstack(__unused thread_t  thread,
 	return KERN_SUCCESS;
 }
 
-/*
- * thread_userstackdefault:
- *
- * Return the default stack location for the
- * thread, if otherwise unknown.
- */
+  
+                           
+  
+                                            
+                                
+   
 kern_return_t
 thread_userstackdefault(mach_vm_offset_t * default_user_stack,
     boolean_t          is64bit)
@@ -1596,10 +1596,10 @@ thread_userstackdefault(mach_vm_offset_t * default_user_stack,
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine: thread_setuserstack
- *
- */
+  
+                               
+  
+   
 void
 thread_setuserstack(thread_t          thread,
     mach_vm_address_t user_stack)
@@ -1613,10 +1613,10 @@ thread_setuserstack(thread_t          thread,
 	return;
 }
 
-/*
- * Routine: thread_adjuserstack
- *
- */
+  
+                               
+  
+   
 user_addr_t
 thread_adjuserstack(thread_t thread,
     int      adjust)
@@ -1634,10 +1634,10 @@ thread_adjuserstack(thread_t thread,
 }
 
 
-/*
- * Routine: thread_setentrypoint
- *
- */
+  
+                                
+  
+   
 void
 thread_setentrypoint(thread_t         thread,
     mach_vm_offset_t entry)
@@ -1651,10 +1651,10 @@ thread_setentrypoint(thread_t         thread,
 	return;
 }
 
-/*
- * Routine: thread_entrypoint
- *
- */
+  
+                             
+  
+   
 kern_return_t
 thread_entrypoint(__unused thread_t  thread,
     int                flavor,
@@ -1674,9 +1674,9 @@ thread_entrypoint(__unused thread_t  thread,
 
 		state = (struct arm_thread_state *) tstate;
 
-		/*
-		 * If a valid entry point is specified, use it.
-		 */
+		  
+                                                 
+     
 		if (state->pc) {
 			*entry_point = CAST_USER_ADDR_T(state->pc);
 		} else {
@@ -1695,9 +1695,9 @@ thread_entrypoint(__unused thread_t  thread,
 
 		state = (struct arm_thread_state64*) tstate;
 
-		/*
-		 * If a valid entry point is specified, use it.
-		 */
+		  
+                                                 
+     
 		if (state->pc) {
 			*entry_point = CAST_USER_ADDR_T(state->pc);
 		} else {
@@ -1714,10 +1714,10 @@ thread_entrypoint(__unused thread_t  thread,
 }
 
 
-/*
- * Routine: thread_set_child
- *
- */
+  
+                            
+  
+   
 void
 thread_set_child(thread_t child,
     int      pid)
@@ -1731,10 +1731,10 @@ thread_set_child(thread_t child,
 }
 
 
-/*
- * Routine: thread_set_parent
- *
- */
+  
+                             
+  
+   
 void
 thread_set_parent(thread_t parent,
     int      pid)
@@ -1755,10 +1755,10 @@ struct arm_act_context {
 #endif
 };
 
-/*
- * Routine: act_thread_csave
- *
- */
+  
+                            
+  
+   
 void *
 act_thread_csave(void)
 {
@@ -1801,10 +1801,10 @@ act_thread_csave(void)
 	return ic;
 }
 
-/*
- * Routine: act_thread_catt
- *
- */
+  
+                           
+  
+   
 void
 act_thread_catt(void * ctx)
 {
@@ -1842,10 +1842,10 @@ out:
 	kfree(ic, sizeof(struct arm_act_context));
 }
 
-/*
- * Routine: act_thread_catt
- *
- */
+  
+                           
+  
+   
 void
 act_thread_cfree(void *ctx)
 {
@@ -1874,11 +1874,11 @@ thread_set_wq_state32(thread_t       thread,
 		thread_lock(thread);
 	}
 
-	/*
-	 * do not zero saved_state, it can be concurrently accessed
-	 * and zero is not a valid state for some of the registers,
-	 * like sp.
-	 */
+	  
+                                                            
+                                                            
+            
+    
 	thread_state32_to_saved_state(state, saved_state);
 	saved_state_32->cpsr = PSR64_USER32_DEFAULT;
 
@@ -1911,11 +1911,11 @@ thread_set_wq_state64(thread_t       thread,
 		thread_lock(thread);
 	}
 
-	/*
-	 * do not zero saved_state, it can be concurrently accessed
-	 * and zero is not a valid state for some of the registers,
-	 * like sp.
-	 */
+	  
+                                                            
+                                                            
+            
+    
 	thread_state64_to_saved_state(state, saved_state);
 	set_saved_state_cpsr(saved_state, PSR64_USER64_DEFAULT);
 

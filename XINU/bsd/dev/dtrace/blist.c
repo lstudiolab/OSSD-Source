@@ -79,9 +79,9 @@ typedef unsigned int u_daddr_t;
 #define free _FREE
 #define M_SWAP M_TEMP
 
-/*
- * static support functions
- */
+  
+                           
+   
 
 static daddr_t blst_leaf_alloc(blmeta_t *scan, daddr_t blk, int count);
 static daddr_t blst_meta_alloc(blmeta_t *scan, daddr_t blk,
@@ -94,15 +94,15 @@ static void blst_copy(blmeta_t *scan, daddr_t blk, daddr_t radix,
 static daddr_t  blst_radix_init(blmeta_t *scan, daddr_t radix,
     int skip, daddr_t count);
 
-/*
- * blist_create() - create a blist capable of handling up to the specified
- *		    number of blocks
- *
- *	blocks must be greater then 0
- *
- *	The smallest blist consists of a single leaf node capable of
- *	managing BLIST_BMAP_RADIX blocks.
- */
+  
+                                                                          
+                        
+  
+                                
+  
+                                                               
+                                    
+   
 
 blist_t
 blist_create(daddr_t blocks)
@@ -111,9 +111,9 @@ blist_create(daddr_t blocks)
 	int radix;
 	int skip = 0;
 
-	/*
-	 * Calculate radix and skip field used for scanning.
-	 */
+	  
+                                                     
+    
 	radix = BLIST_BMAP_RADIX;
 
 	while (radix < blocks) {
@@ -154,11 +154,11 @@ blist_destroy(blist_t bl)
 	free(bl, M_SWAP);
 }
 
-/*
- * blist_alloc() - reserve space in the block bitmap.  Return the base
- *		     of a contiguous region or SWAPBLK_NONE if space could
- *		     not be allocated.
- */
+  
+                                                                      
+                                                              
+                          
+   
 
 daddr_t
 blist_alloc(blist_t bl, daddr_t count)
@@ -179,11 +179,11 @@ blist_alloc(blist_t bl, daddr_t count)
 	return blk;
 }
 
-/*
- * blist_free() -	free up space in the block bitmap.  Return the base
- *		        of a contiguous region.  Panic if an inconsistancy is
- *			found.
- */
+  
+                                                                     
+                                                                 
+           
+   
 
 void
 blist_free(blist_t bl, daddr_t blkno, daddr_t count)
@@ -199,13 +199,13 @@ blist_free(blist_t bl, daddr_t blkno, daddr_t count)
 	}
 }
 
-/*
- * blist_resize() -	resize an existing radix tree to handle the
- *			specified number of blocks.  This will reallocate
- *			the tree and transfer the previous bitmap to the new
- *			one.  When extending the tree you can specify whether
- *			the new blocks are to left allocated or freed.
- */
+  
+                                                               
+                                                      
+                                                         
+                                                          
+                                                   
+   
 
 void
 blist_resize(blist_t *pbl, daddr_t count, int freenew)
@@ -219,9 +219,9 @@ blist_resize(blist_t *pbl, daddr_t count, int freenew)
 	}
 	blst_copy(save->bl_root, 0, save->bl_radix, save->bl_skip, newbl, count);
 
-	/*
-	 * If resizing upwards, should we free the new space or not?
-	 */
+	  
+                                                             
+    
 	if (freenew && count < newbl->bl_blocks) {
 		blist_free(newbl, count, newbl->bl_blocks - count);
 	}
@@ -230,9 +230,9 @@ blist_resize(blist_t *pbl, daddr_t count, int freenew)
 
 #ifdef BLIST_DEBUG
 
-/*
- * blist_print()    - dump radix tree
- */
+  
+                                     
+   
 
 void
 blist_print(blist_t bl)
@@ -244,24 +244,24 @@ blist_print(blist_t bl)
 
 #endif
 
-/************************************************************************
- *			  ALLOCATION SUPPORT FUNCTIONS			*
- ************************************************************************
- *
- *	These support functions do all the actual work.  They may seem
- *	rather longish, but that's because I've commented them up.  The
- *	actual code is straight forward.
- *
- */
+                                                                         
+                                       
+                                                                         
+  
+                                                                 
+                                                                  
+                                   
+  
+   
 
-/*
- * blist_leaf_alloc() -	allocate at a leaf in the radix tree (a bitmap).
- *
- *	This is the core of the allocator and is optimized for the 1 block
- *	and the BLIST_BMAP_RADIX block allocation cases.  Other cases are
- *	somewhat slower.  The 1 block allocation case is log2 and extremely
- *	quick.
- */
+  
+                                                                        
+  
+                                                                     
+                                                                    
+                                                                      
+         
+   
 
 static daddr_t
 blst_leaf_alloc(blmeta_t *scan, daddr_t blk, int count)
@@ -269,18 +269,18 @@ blst_leaf_alloc(blmeta_t *scan, daddr_t blk, int count)
 	u_daddr_t orig = scan->u.bmu_bitmap;
 
 	if (orig == 0) {
-		/*
-		 * Optimize bitmap all-allocated case.  Also, count = 1
-		 * case assumes at least 1 bit is free in the bitmap, so
-		 * we have to take care of this case here.
-		 */
+		  
+                                                         
+                                                          
+                                            
+     
 		scan->bm_bighint = 0;
 		return SWAPBLK_NONE;
 	}
 	if (count == 1) {
-		/*
-		 * Optimized code to allocate one bit out of the bitmap
-		 */
+		  
+                                                         
+     
 		u_daddr_t mask;
 		int j = BLIST_BMAP_RADIX / 2;
 		int r = 0;
@@ -302,14 +302,14 @@ blst_leaf_alloc(blmeta_t *scan, daddr_t blk, int count)
 	if (count <= BLIST_BMAP_RADIX) {
 #else
 	if (count <= (int)BLIST_BMAP_RADIX) {
-#endif /* __APPLE__ */
-		/*
-		 * non-optimized code to allocate N bits out of the bitmap.
-		 * The more bits, the faster the code runs.  It will run
-		 * the slowest allocating 2 bits, but since there aren't any
-		 * memory ops in the core loop (or shouldn't be, anyway),
-		 * you probably won't notice the difference.
-		 */
+#endif                
+		  
+                                                             
+                                                          
+                                                              
+                                                           
+                                              
+     
 		int j;
 		int n = BLIST_BMAP_RADIX - count;
 		u_daddr_t mask;
@@ -324,21 +324,21 @@ blst_leaf_alloc(blmeta_t *scan, daddr_t blk, int count)
 			mask = (mask << 1);
 		}
 	}
-	/*
-	 * We couldn't allocate count in this subtree, update bighint.
-	 */
+	  
+                                                               
+    
 	scan->bm_bighint = count - 1;
 	return SWAPBLK_NONE;
 }
 
-/*
- * blist_meta_alloc() -	allocate at a meta in the radix tree.
- *
- *	Attempt to allocate at a meta node.  If we can't, we update
- *	bighint and return a failure.  Updating bighint optimize future
- *	calls that hit this node.  We have to check for our collapse cases
- *	and we have a few optimizations strewn in as well.
- */
+  
+                                                             
+  
+                                                              
+                                                                  
+                                                                     
+                                                     
+   
 
 static daddr_t
 blst_meta_alloc(blmeta_t *scan, daddr_t blk, daddr_t count, daddr_t radix,
@@ -348,9 +348,9 @@ blst_meta_alloc(blmeta_t *scan, daddr_t blk, daddr_t count, daddr_t radix,
 	int next_skip = (skip >> BLIST_META_RADIX_SHIFT);
 
 	if (scan->u.bmu_avail == 0) {
-		/*
-		 * ALL-ALLOCATED special case
-		 */
+		  
+                               
+     
 		scan->bm_bighint = count;
 		return SWAPBLK_NONE;
 	}
@@ -358,10 +358,10 @@ blst_meta_alloc(blmeta_t *scan, daddr_t blk, daddr_t count, daddr_t radix,
 	if (scan->u.bmu_avail == radix) {
 		radix >>= BLIST_META_RADIX_SHIFT;
 
-		/*
-		 * ALL-FREE special case, initialize uninitialize
-		 * sublevel.
-		 */
+		  
+                                                   
+              
+     
 		for (i = 1; i <= skip; i += next_skip) {
 			if (scan[i].bm_bighint == (daddr_t)-1) {
 				break;
@@ -380,9 +380,9 @@ blst_meta_alloc(blmeta_t *scan, daddr_t blk, daddr_t count, daddr_t radix,
 
 	for (i = 1; i <= skip; i += next_skip) {
 		if (count <= scan[i].bm_bighint) {
-			/*
-			 * count fits in object
-			 */
+			  
+                          
+      
 			daddr_t r;
 			if (next_skip == 1) {
 				r = blst_leaf_alloc(&scan[i], blk, count);
@@ -398,45 +398,45 @@ blst_meta_alloc(blmeta_t *scan, daddr_t blk, daddr_t count, daddr_t radix,
 				return r;
 			}
 		} else if (scan[i].bm_bighint == (daddr_t)-1) {
-			/*
-			 * Terminator
-			 */
+			  
+                
+      
 			break;
 		} else if (count > radix) {
-			/*
-			 * count does not fit in object even if it were
-			 * complete free.
-			 */
+			  
+                                                  
+                    
+      
 			panic("blist_meta_alloc: allocation too large");
 		}
 		blk += radix;
 	}
 
-	/*
-	 * We couldn't allocate count in this subtree, update bighint.
-	 */
+	  
+                                                               
+    
 	if (scan->bm_bighint >= count) {
 		scan->bm_bighint = count - 1;
 	}
 	return SWAPBLK_NONE;
 }
 
-/*
- * BLST_LEAF_FREE() -	free allocated block from leaf bitmap
- *
- */
+  
+                                                           
+  
+   
 
 static void
 blst_leaf_free(blmeta_t *scan, daddr_t blk, int count)
 {
-	/*
-	 * free some data in this bitmap
-	 *
-	 * e.g.
-	 *	0000111111111110000
-	 *          \_________/\__/
-	 *		v        n
-	 */
+	  
+                                 
+   
+        
+                       
+                            
+               
+    
 	int n = blk & (BLIST_BMAP_RADIX - 1);
 	u_daddr_t mask;
 
@@ -448,25 +448,25 @@ blst_leaf_free(blmeta_t *scan, daddr_t blk, int count)
 	}
 	scan->u.bmu_bitmap |= mask;
 
-	/*
-	 * We could probably do a better job here.  We are required to make
-	 * bighint at least as large as the biggest contiguous block of
-	 * data.  If we just shoehorn it, a little extra overhead will
-	 * be incured on the next allocation (but only that one typically).
-	 */
+	  
+                                                                    
+                                                                
+                                                               
+                                                                    
+    
 	scan->bm_bighint = BLIST_BMAP_RADIX;
 }
 
-/*
- * BLST_META_FREE() - free allocated blocks from radix tree meta info
- *
- *	This support routine frees a range of blocks from the bitmap.
- *	The range must be entirely enclosed by this radix node.  If a
- *	meta node, we break the range down recursively to free blocks
- *	in subnodes (which means that this code can free an arbitrary
- *	range whereas the allocation code cannot allocate an arbitrary
- *	range).
- */
+  
+                                                                     
+  
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                 
+          
+   
 
 static void
 blst_meta_free(blmeta_t *scan, daddr_t freeBlk, daddr_t count, daddr_t radix,
@@ -483,10 +483,10 @@ blst_meta_free(blmeta_t *scan, daddr_t freeBlk, daddr_t count, daddr_t radix,
 #endif
 
 	if (scan->u.bmu_avail == 0) {
-		/*
-		 * ALL-ALLOCATED special case, with possible
-		 * shortcut to ALL-FREE special case.
-		 */
+		  
+                                              
+                                       
+     
 		scan->u.bmu_avail = count;
 		scan->bm_bighint = count;
 
@@ -502,16 +502,16 @@ blst_meta_free(blmeta_t *scan, daddr_t freeBlk, daddr_t count, daddr_t radix,
 					scan[i].u.bmu_avail = 0;
 				}
 			}
-			/* fall through */
+			                  
 		}
 	} else {
 		scan->u.bmu_avail += count;
-		/* scan->bm_bighint = radix; */
+		                               
 	}
 
-	/*
-	 * ALL-FREE special case.
-	 */
+	  
+                          
+    
 
 	if (scan->u.bmu_avail == radix) {
 		return;
@@ -520,9 +520,9 @@ blst_meta_free(blmeta_t *scan, daddr_t freeBlk, daddr_t count, daddr_t radix,
 		panic("blst_meta_free: freeing already free blocks (%d) %d/%d", count, scan->u.bmu_avail, radix);
 	}
 
-	/*
-	 * Break the free down into its components
-	 */
+	  
+                                           
+    
 
 	radix >>= BLIST_META_RADIX_SHIFT;
 
@@ -558,12 +558,12 @@ blst_meta_free(blmeta_t *scan, daddr_t freeBlk, daddr_t count, daddr_t radix,
 	}
 }
 
-/*
- * BLIST_RADIX_COPY() - copy one radix tree to another
- *
- *	Locates free space in the source tree and frees it in the destination
- *	tree.  The space may not already be free in the destination.
- */
+  
+                                                      
+  
+                                                                        
+                                                               
+   
 
 static void
 blst_copy(blmeta_t *scan, daddr_t blk, daddr_t radix,
@@ -572,9 +572,9 @@ blst_copy(blmeta_t *scan, daddr_t blk, daddr_t radix,
 	int next_skip;
 	int i;
 
-	/*
-	 * Leaf node
-	 */
+	  
+             
+    
 
 	if (radix == BLIST_BMAP_RADIX) {
 		u_daddr_t v = scan->u.bmu_bitmap;
@@ -591,32 +591,32 @@ blst_copy(blmeta_t *scan, daddr_t blk, daddr_t radix,
 				}
 			}
 #else
-			int j;   /* Avoid shadow warnings */
+			int j;                              
 
 			for (j = 0; j < (int)BLIST_BMAP_RADIX && j < count; ++j) {
 				if (v & (1 << j)) {
 					blist_free(dest, blk + j, 1);
 				}
 			}
-#endif /* __APPLE__ */
+#endif                
 		}
 		return;
 	}
 
-	/*
-	 * Meta node
-	 */
+	  
+             
+    
 
-	/*
-	 * Source all allocated, leave dest allocated
-	 */
+	  
+                                              
+    
 	if (scan->u.bmu_avail == 0) {
 		return;
 	}
 	if (scan->u.bmu_avail == radix) {
-		/*
-		 * Source all free, free entire dest
-		 */
+		  
+                                      
+     
 		if (count < radix) {
 			blist_free(dest, blk, count);
 		} else {
@@ -660,14 +660,14 @@ blst_copy(blmeta_t *scan, daddr_t blk, daddr_t radix,
 	}
 }
 
-/*
- * BLST_RADIX_INIT() - initialize radix tree
- *
- *	Initialize our meta structures and bitmaps and calculate the exact
- *	amount of space required to manage 'count' blocks - this space may
- *	be considerably less then the calculated radix due to the large
- *	RADIX values we use.
- */
+  
+                                            
+  
+                                                                     
+                                                                     
+                                                                  
+                       
+   
 
 static daddr_t
 blst_radix_init(blmeta_t *scan, daddr_t radix, int skip, daddr_t count)
@@ -676,9 +676,9 @@ blst_radix_init(blmeta_t *scan, daddr_t radix, int skip, daddr_t count)
 	int next_skip;
 	daddr_t memindex = 0;
 
-	/*
-	 * Leaf node
-	 */
+	  
+             
+    
 
 	if (radix == BLIST_BMAP_RADIX) {
 		if (scan) {
@@ -688,11 +688,11 @@ blst_radix_init(blmeta_t *scan, daddr_t radix, int skip, daddr_t count)
 		return memindex;
 	}
 
-	/*
-	 * Meta node.  If allocating the entire object we can special
-	 * case it.  However, we need to figure out how much memory
-	 * is required to manage 'count' blocks, so we continue on anyway.
-	 */
+	  
+                                                              
+                                                            
+                                                                   
+    
 
 	if (scan) {
 		scan->bm_bighint = 0;
@@ -704,9 +704,9 @@ blst_radix_init(blmeta_t *scan, daddr_t radix, int skip, daddr_t count)
 
 	for (i = 1; i <= skip; i += next_skip) {
 		if (count >= radix) {
-			/*
-			 * Allocate the entire object
-			 */
+			  
+                                
+      
 			memindex = i + blst_radix_init(
 				((scan) ? &scan[i] : NULL),
 				radix,
@@ -715,9 +715,9 @@ blst_radix_init(blmeta_t *scan, daddr_t radix, int skip, daddr_t count)
 				);
 			count -= radix;
 		} else if (count > 0) {
-			/*
-			 * Allocate a partial object
-			 */
+			  
+                               
+      
 			memindex = i + blst_radix_init(
 				((scan) ? &scan[i] : NULL),
 				radix,
@@ -726,9 +726,9 @@ blst_radix_init(blmeta_t *scan, daddr_t radix, int skip, daddr_t count)
 				);
 			count = 0;
 		} else {
-			/*
-			 * Add terminator and break out
-			 */
+			  
+                                  
+      
 			if (scan) {
 				scan[i].bm_bighint = (daddr_t)-1;
 			}

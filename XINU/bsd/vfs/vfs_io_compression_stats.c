@@ -143,8 +143,8 @@ io_compression_stats_allocate_compression_buffers(io_compression_stats_alloc_typ
 
 out:
 	if (err) {
-		/* In case of any error, irrespective of whether it is new alloc or resize,
-		 *  dellocate all buffers and fail */
+		                                                                           
+                                       
 		io_compression_stats_deallocate_compression_buffers();
 	}
 	return err;
@@ -217,7 +217,7 @@ sysctl_io_compression_stats_enable SYSCTL_HANDLER_ARGS
 	lck_rw_lock_exclusive(&io_compression_stats_lock);
 	lck_mtx_lock(&iocs_store_buffer_lock);
 	if ((io_compression_stats_enable == 0) && (enable == 1)) {
-		/* Enabling collection of stats. Allocate appropriate buffers */
+		                                                                
 		error = io_compression_stats_allocate_compression_buffers(IO_COMPRESSION_STATS_NEW_ALLOC, io_compression_stats_block_size);
 		if (error == 0) {
 			io_compression_stats_enable = enable;
@@ -264,18 +264,18 @@ sysctl_io_compression_block_size SYSCTL_HANDLER_ARGS
 
 	if (io_compression_stats_block_size != block_size) {
 		if (io_compression_stats_enable == 1) {
-			/* IO compression stats is enabled, rellocate buffers. */
+			                                                         
 			error = io_compression_stats_allocate_compression_buffers(IO_COMPRESSION_STATS_RESIZE, block_size);
 			if (error == 0) {
 				io_compression_stats_block_size = block_size;
 				io_compression_stats_dbg("SUCCESS: setting io_compression_stats_block_size to %d", io_compression_stats_block_size);
 			} else {
-				/* Failed to allocate buffers, disable IO compression stats */
+				                                                              
 				io_compression_stats_enable = 0;
 				io_compression_stats_dbg("Failed: setting io_compression_stats_block_size to %d", io_compression_stats_block_size);
 			}
 		} else {
-			/* IO compression stats is disabled, only set the io_compression_stats_block_size */
+			                                                                                    
 			io_compression_stats_block_size = block_size;
 			io_compression_stats_dbg("SUCCESS: setting io_compression_stats_block_size to %d", io_compression_stats_block_size);
 		}
@@ -309,9 +309,9 @@ iocs_compress_block(uint8_t *block_ptr, uint32_t block_size)
 
 	return compressed_block_size;
 }
-/*
- * Compress buf in chunks of io_compression_stats_block_size
- */
+  
+                                                            
+   
 static uint32_t
 iocs_compress_buffer(vnode_t vn, uint8_t *buf_ptr, uint32_t buf_size)
 {
@@ -342,19 +342,19 @@ log2down(uint32_t x)
 	return 31 - __builtin_clz(x);
 }
 
-/*
- * Once we get the IO compression stats for the entire buffer, we update buffer_size_compressibility_dist,
- * which helps us observe distribution across various io sizes and compression factors.
- * The goal of next two functions is to get the index in this buffer_size_compressibility_dist table.
- */
+  
+                                                                                                          
+                                                                                       
+                                                                                                     
+   
 
-/*
- * Maps IO size to a bucket between 0 - IO_COMPRESSION_STATS_MAX_SIZE_BUCKET
- * for size < 4096 returns 0 and size > 1MB returns IO_COMPRESSION_STATS_MAX_SIZE_BUCKET (9).
- * For IO sizes in-between we arrive at the index based on log2 function.
- * sizes 4097 - 8192 => index = 1,
- * sizes 8193 - 16384 => index = 2, and so on
- */
+  
+                                                                            
+                                                                                             
+                                                                         
+                                  
+                                             
+   
 #define SIZE_COMPRESSION_DIST_SIZE_BUCKET_MIN   4096
 #define SIZE_COMPRESSION_DIST_SIZE_BUCKET_MAX   (1024 * 1024)
 static uint32_t
@@ -370,9 +370,9 @@ get_buffer_size_bucket(uint32_t size)
 	return log2down(size - 1) - IOCS_INDEX_MAP_OFFSET;
 }
 
-/*
- * Maps compression factor to a bucket between 0 - IO_COMPRESSION_STATS_MAX_COMPRESSION_BUCKET
- */
+  
+                                                                                              
+   
 static uint32_t
 get_buffer_compressibility_bucket(uint32_t uncompressed_size, uint32_t compressed_size)
 {
@@ -382,7 +382,7 @@ get_buffer_compressibility_bucket(uint32_t uncompressed_size, uint32_t compresse
 		saved_space_pc = 0;
 	}
 
-	/* saved_space_pc lies bw 0 - 100. log2(saved_space_pc) lies bw 0 - 6 */
+	                                                                        
 	return log2down(saved_space_pc);
 }
 
@@ -403,11 +403,11 @@ io_compression_stats(buf_t bp)
 	}
 
 	if (!lck_rw_try_lock_shared(&io_compression_stats_lock)) {
-		/* sysctl modifying IO compression stats parameters is in progress.
-		 *  Don't block, since malloc might be in progress. */
+		                                                                   
+                                                        
 		return;
 	}
-	/* re-check io_compression_stats_enable with lock */
+	                                                    
 	if (io_compression_stats_enable != 1) {
 		goto out;
 	}
@@ -456,13 +456,13 @@ construct_iocs_sbe_from_vnode(struct vnode *vp, struct iocs_store_buffer_entry *
 	int path_len = MAXPATHLEN;
 
 	vn_getpath(vp, vnpath_scratch_buf, &path_len);
-	/*
-	 * Total path length is path_len, we can copy out IOCS_SBE_PATH_LEN bytes. We are interested
-	 * in first segment of the path to try and figure out the process writing to the file, and we are
-	 * interested in the last segment to figure out extention. So, in cases where
-	 * IOCS_SBE_PATH_LEN < path_len, lets copy out first IOCS_PATH_START_BYTES_TO_COPY bytes and
-	 * last IOCS_PATH_END_BYTES_TO_COPY (last segment includes the null character).
-	 */
+	  
+                                                                                             
+                                                                                                  
+                                                                              
+                                                                                             
+                                                                                
+    
 	if (path_len > IOCS_SBE_PATH_LEN) {
 		strncpy(iocs_sbe->path_name, vnpath_scratch_buf, IOCS_PATH_START_BYTES_TO_COPY);
 		strncpy(iocs_sbe->path_name + IOCS_PATH_START_BYTES_TO_COPY,
@@ -496,7 +496,7 @@ vnode_iocs_record_and_free(struct vnode *vp)
 	iocs_store_buffer.current_position += sizeof(struct iocs_store_buffer_entry);
 
 	if (iocs_store_buffer.current_position + sizeof(struct iocs_store_buffer_entry) > IOCS_STORE_BUFFER_SIZE) {
-		/* We've reached end of the buffer, move back to the top */
+		                                                           
 		iocs_store_buffer.current_position = 0;
 	}
 
@@ -512,7 +512,7 @@ vnode_iocs_record_and_free(struct vnode *vp)
 release:
 	lck_mtx_unlock(&iocs_store_buffer_lock);
 out:
-	/* We need to free io_compression_stats whether or not we were able to record it */
+	                                                                                   
 	bzero(vp->io_compression_stats, sizeof(struct io_compression_stats));
 	zfree(io_compression_stats_zone, vp->io_compression_stats);
 	vp->io_compression_stats = NULL;
@@ -592,12 +592,12 @@ sysctl_io_compression_dump_stats SYSCTL_HANDLER_ARGS
 	}
 
 	if (req->oldptr == USER_ADDR_NULL) {
-		/* Query to figure out size of the buffer */
+		                                            
 		if (inp_flag & IOCS_SYSCTL_LIVE) {
 			req->oldidx = numvnodes * sizeof(struct iocs_store_buffer_entry);
 		} else {
-			/* Buffer size for archived case, let's keep it
-			 * simple and return IOCS store buffer size */
+			                                               
+                                                 
 			req->oldidx = IOCS_STORE_BUFFER_SIZE;
 		}
 		goto out;
@@ -613,7 +613,7 @@ sysctl_io_compression_dump_stats SYSCTL_HANDLER_ARGS
 		goto out;
 	}
 
-	/* reading from store buffer */
+	                               
 	lck_mtx_lock(&iocs_store_buffer_lock);
 
 	if (iocs_store_buffer.buffer == NULL) {
@@ -626,8 +626,8 @@ sysctl_io_compression_dump_stats SYSCTL_HANDLER_ARGS
 	}
 
 	int expected_size = 0;
-	/* Dry run to figure out amount of space required to copy out the
-	 * iocs_store_buffer.buffer */
+	                                                                 
+                               
 	if (iocs_store_buffer.marked_point < iocs_store_buffer.current_position) {
 		expected_size = iocs_store_buffer.current_position - iocs_store_buffer.marked_point;
 	} else {
@@ -700,7 +700,7 @@ vnode_updateiocompressionblockstats(vnode_t vp, uint32_t size_bucket)
 			return ENOMEM;
 		}
 		vnode_lock_spin(vp);
-		/* Re-check with lock */
+		                        
 		if (vp->io_compression_stats == NULL) {
 			vp->io_compression_stats = iocs;
 		} else {
@@ -719,8 +719,8 @@ vnode_updateiocompressionbufferstats(__unused vnode_t vp, __unused uint64_t unco
 		return EINVAL;
 	}
 
-	/* vnode_updateiocompressionblockstats will always be called before vnode_updateiocompressionbufferstats.
-	 * Hence vp->io_compression_stats should already be allocated */
+	                                                                                                         
+                                                                 
 	if (vp->io_compression_stats == NULL) {
 		return EINVAL;
 	}

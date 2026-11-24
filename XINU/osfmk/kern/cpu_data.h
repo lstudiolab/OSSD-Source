@@ -41,7 +41,7 @@
 
 #include <machine/cpu_data.h>
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 __BEGIN_DECLS
 
@@ -55,6 +55,6 @@ extern void             _enable_preemption(void);
 
 __END_DECLS
 
-#endif  /* _KERN_CPU_DATA_H_ */
+#endif                         
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          

@@ -26,17 +26,17 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* Helper macros for 64-bit mode switching */
+                                             
 
 
-/*
- * Long jump to 64-bit space from 32-bit compatibility mode.
- * Effected, in fact, by a long return ..
- *  - we push the 64-bit kernel code selector KERNEL64_CS
- *  - call .+1 to get EIP on stack
- *  - adjust return address after lret
- *  - lret to return to next instruction but 64-bit mode.
- */
+  
+                                                            
+                                         
+                                                         
+                                  
+                                      
+                                                         
+   
 #define	ENTER_64BIT_MODE()			\
 	push	$KERNEL64_CS			;\
 	call    1f				;\
@@ -44,10 +44,10 @@
 	lret					;\
 2:	.code64
 
-/*
- * Long jump to 32-bit compatibility mode from 64-bit space.
- * Effected by long return similar to ENTER_64BIT_MODE.
- */
+  
+                                                            
+                                                       
+   
 #define ENTER_COMPAT_MODE()			\
 	call	3f				;\
 3:	addq	$(4f-3b), (%rsp)		;\

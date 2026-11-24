@@ -59,9 +59,9 @@ struct hv_ion_grp {
 	lck_rw_t lock;
 };
 
-/*
- * Lookup a matching notifier and return it.
- */
+  
+                                            
+   
 static hv_ion_entry_t *
 hv_io_notifier_grp_lookup(const hv_ion_grp_t *grp, const hv_ion_entry_t *key)
 {
@@ -94,10 +94,10 @@ hv_io_notifier_grp_lookup(const hv_ion_grp_t *grp, const hv_ion_entry_t *key)
 	return NULL;
 }
 
-/*
- * Add a new notifier.
- * Return KERN_SUCCESS if the notifier was added, an error otherwise.
- */
+  
+                      
+                                                                     
+   
 kern_return_t
 hv_io_notifier_grp_add(hv_ion_grp_t *grp, const hv_ion_t *notifier)
 {
@@ -138,10 +138,10 @@ hv_io_notifier_grp_add(hv_ion_grp_t *grp, const hv_ion_t *notifier)
 	return KERN_SUCCESS;
 }
 
-/*
- * Remove and free a notifier.
- * Return KERN_SUCCESS if the notifier was removed, an error otherwise.
- */
+  
+                              
+                                                                       
+   
 kern_return_t
 hv_io_notifier_grp_remove(hv_ion_grp_t *grp, const hv_ion_t *notifier)
 {
@@ -172,11 +172,11 @@ hv_io_notifier_grp_remove(hv_ion_grp_t *grp, const hv_ion_t *notifier)
 	return KERN_SUCCESS;
 }
 
-/*
- * Find matching notifiers and notify the port.
- * Returns KERN_SUCCESS if no errors occurred when sending notifications and at
- * least one notification was sent.
- */
+  
+                                               
+                                                                               
+                                   
+   
 kern_return_t
 hv_io_notifier_grp_fire(hv_ion_grp_t *grp, uint64_t addr, size_t size,
     uint64_t value)
@@ -216,10 +216,10 @@ hv_io_notifier_grp_fire(hv_ion_grp_t *grp, uint64_t addr, size_t size,
 		kr = mach_msg_send_from_kernel_with_options(&msg.header, sizeof(msg),
 		    MACH_SEND_TIMEOUT, MACH_MSG_TIMEOUT_NONE);
 
-		/*
-		 * A timeout will occur when the queue is full. Ignore it if so
-		 * configured.
-		 */
+		  
+                                                                 
+                
+     
 		if (kr == MACH_SEND_TIMED_OUT && !(ion->flags & kHV_ION_EXIT_FULL)) {
 			kr = MACH_MSG_SUCCESS;
 		}

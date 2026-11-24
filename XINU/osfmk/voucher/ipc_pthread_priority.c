@@ -43,7 +43,7 @@
 #include <mach/mach_voucher_attr_control.h>
 #include <pthread/priority_private.h>
 
-ipc_voucher_attr_control_t  ipc_pthread_priority_voucher_attr_control;    /* communication channel from PTHPRIORITY to voucher system */
+ipc_voucher_attr_control_t  ipc_pthread_priority_voucher_attr_control;                                                                  
 
 #define IPC_PTHREAD_PRIORITY_VALUE_TO_HANDLE(x) ((mach_voucher_attr_value_handle_t)(x))
 #define HANDLE_TO_IPC_PTHREAD_PRIORITY_VALUE(x) ((ipc_pthread_priority_value_t)(x))
@@ -93,9 +93,9 @@ ipc_pthread_priority_command(
 void
 ipc_pthread_priority_release(ipc_voucher_attr_manager_t __assert_only manager);
 
-/*
- * communication channel from voucher system to IPC_PTHREAD_PRIORITY
- */
+  
+                                                                    
+   
 const struct ipc_voucher_attr_manager ipc_pthread_priority_manager = {
 	.ivam_release_value    = ipc_pthread_priority_release_value,
 	.ivam_get_value        = ipc_pthread_priority_get_value,
@@ -105,17 +105,17 @@ const struct ipc_voucher_attr_manager ipc_pthread_priority_manager = {
 	.ivam_flags            = IVAM_FLAGS_NONE,
 };
 
-/*
- * Routine: ipc_pthread_priority_init
- * Purpose: Initialize the IPC_PTHREAD_PRIORITY subsystem.
- * Returns: None.
- */
+  
+                                     
+                                                          
+                 
+   
 void
 ipc_pthread_priority_init()
 {
 	kern_return_t kr = KERN_SUCCESS;
 
-	/* Register the ipc_pthread_priority manager with the Vouchers sub system. */
+	                                                                             
 	kr = ipc_register_well_known_mach_voucher_attr_manager(
 		&ipc_pthread_priority_manager,
 		0,
@@ -129,17 +129,17 @@ ipc_pthread_priority_init()
 	return;
 }
 
-/*
- * IPC_PTHREAD_PRIORITY Resource Manager Routines.
- */
+  
+                                                  
+   
 
 
-/*
- * Routine: ipc_pthread_priority_release_value
- * Purpose: Release a value, if sync matches the sync count in value.
- * Returns: KERN_SUCCESS: on Successful deletion.
- *          KERN_FAILURE: if sync value does not matches.
- */
+  
+                                              
+                                                                     
+                                                 
+                                                         
+   
 kern_return_t
 ipc_pthread_priority_release_value(
 	ipc_voucher_attr_manager_t              __assert_only manager,
@@ -156,9 +156,9 @@ ipc_pthread_priority_release_value(
 	return KERN_FAILURE;
 }
 
-/*
- * Routine: ipc_pthread_priority_get_value
- */
+  
+                                          
+   
 kern_return_t
 ipc_pthread_priority_get_value(
 	ipc_voucher_attr_manager_t              __assert_only manager,
@@ -179,7 +179,7 @@ ipc_pthread_priority_get_value(
 	assert(MACH_VOUCHER_ATTR_KEY_PTHPRIORITY == key);
 	assert(manager == &ipc_pthread_priority_manager);
 
-	/* never an out voucher */
+	                          
 	*out_value_voucher = IPC_VOUCHER_NULL;
 	*out_flags = MACH_VOUCHER_ATTR_VALUE_FLAGS_NONE;
 
@@ -197,7 +197,7 @@ ipc_pthread_priority_get_value(
 			return kr;
 		}
 
-		/* Callout to pthread kext to get the canonicalized value */
+		                                                            
 		canonicalize_priority_value = (ipc_pthread_priority_value_t)
 		    _pthread_priority_normalize_for_ipc((unsigned long)ipc_pthread_priority_value);
 
@@ -213,12 +213,12 @@ ipc_pthread_priority_get_value(
 	return kr;
 }
 
-/*
- * Routine: ipc_pthread_priority_extract_content
- * Purpose: Extract a set of pthread_priority value from an array of voucher values.
- * Returns: KERN_SUCCESS: on Success.
- *          KERN_NO_SPACE: insufficeint buffer provided to fill an array of pthread_priority values.
- */
+  
+                                                
+                                                                                    
+                                     
+                                                                                                    
+   
 kern_return_t
 ipc_pthread_priority_extract_content(
 	ipc_voucher_attr_manager_t      __assert_only manager,
@@ -258,12 +258,12 @@ ipc_pthread_priority_extract_content(
 	return KERN_INVALID_VALUE;
 }
 
-/*
- * Routine: ipc_pthread_priority_command
- * Purpose: Execute a command against a set of PTHPRIORITY values.
- * Returns: KERN_SUCCESS: On successful execution of command.
- *          KERN_FAILURE: On failure.
- */
+  
+                                        
+                                                                  
+                                                             
+                                     
+   
 kern_return_t
 ipc_pthread_priority_command(
 	ipc_voucher_attr_manager_t                 __assert_only manager,

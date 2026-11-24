@@ -1,23 +1,23 @@
-/*
- * Must come before including darwintest.h
- */
+  
+                                          
+   
 #ifdef T_NAMESPACE
 #undef T_NAMESPACE
-#endif /* defined(T_NAMESPACE) */
+#endif                           
 
 #include <darwintest.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #ifndef PRIVATE
-/*
- * Need new CPU families.
- */
+  
+                         
+   
 #define PRIVATE
 #include <mach/machine.h>
 #undef PRIVATE
-#else /* !defined(PRIVATE) */
+#else                        
 #include <mach/machine.h>
-#endif /* defined(PRIVATE) */
+#endif                       
 #include <ktrace.h>
 #include <mach/mach.h>
 #include <stdint.h>
@@ -175,10 +175,10 @@ spin_task_inspect(__unused void *arg)
 		size = (unsigned int)sizeof(counts);
 		(void)task_inspect(task, TASK_INSPECT_BASIC_COUNTS,
 		    (task_inspect_info_t)&counts[0], &size);
-		/*
-		 * Not realistic for a process to see count values with the high bit
-		 * set, but kernel pointers will be that high.
-		 */
+		  
+                                                                      
+                                                
+     
 		T_QUIET; T_ASSERT_LT(counts[0], 1ULL << 63,
 		        "check for valid count entry 1");
 		T_QUIET; T_ASSERT_LT(counts[1], 1ULL << 63,
@@ -200,11 +200,11 @@ T_DECL(core_fixed_stack_leak_race,
 	T_QUIET; T_ASSERT_NOTNULL(threads, "allocated space for threads");
 
 	T_LOG("creating %d threads to attempt to race around task counts", ncpus);
-	/*
-	 * Have half the threads hammering thread_self_counts and the other half
-	 * trying to get an error to occur inside TASK_INSPECT_BASIC_COUNTS and see
-	 * uninitialized kernel memory.
-	 */
+	  
+                                                                         
+                                                                            
+                                
+    
 	for (int i = 0; i < ncpus; i++) {
 		T_QUIET; T_ASSERT_POSIX_ZERO(pthread_create(&threads[i], NULL,
 		    i & 1 ? spin_task_inspect : spin_thread_self_counts, NULL),

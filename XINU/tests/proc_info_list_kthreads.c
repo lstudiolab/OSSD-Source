@@ -1,8 +1,8 @@
-/*
- * proc_info_list_kthreads
- *
- * list 64 bit thread ids of kernel_task
- */
+  
+                          
+  
+                                        
+   
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,22 +29,22 @@ T_DECL(proc_info_list_kthreads,
     "Test to verify PROC_PIDLISTTHREADIDS returns kernel thread IDs for pid 0",
     T_META_ASROOT(false),
     T_META_CHECK_LEAKS(false))
-#endif /* TARGET_OS_OSX */
+#endif                    
 {
 	int buf_used = 0;
 
 	int thread_count = 0;
 	uint64_t *thread_list = NULL;
 
-	/*
-	 * To use PROC_PIDLISTTHREADIDS, we must pass a buffer of uint64_t's for each thread ID.
-	 * However, there is a TOCTOU race between asking for the thread count
-	 * and asking for the array of identifiers.
-	 *
-	 * Because the process could have allocated more threads since last we asked
-	 * how many threads there are, we instead pass an extra slot in the array,
-	 * and try again if it used that slot.
-	 */
+	  
+                                                                                         
+                                                                       
+                                            
+   
+                                                                             
+                                                                           
+                                       
+    
 
 	int attempt = 1;
 	while (!thread_count && (attempt < MAX_TRIES)) {
@@ -58,7 +58,7 @@ T_DECL(proc_info_list_kthreads,
 		T_LOG("The kernel says it has %d threads", ti.pti_threadnum);
 
 		int expected_size  = ti.pti_threadnum * (int)sizeof(uint64_t);
-		/* tack on five extra to detect newly allocated threads */
+		                                                          
 		int allocated_size = expected_size + EXTRA_THREADS * (int)sizeof(uint64_t);
 		uint64_t *thread_list_tmp = malloc((size_t)allocated_size);
 		T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(thread_list_tmp, "malloc(size = %d) failed", allocated_size);
@@ -70,11 +70,11 @@ T_DECL(proc_info_list_kthreads,
 			T_WITH_ERRNO; T_ASSERT_FAIL("proc_pidinfo(PROC_PIDLISTTHREADIDS) failed");
 		}
 		if (buf_used == expected_size) {
-			/* success, we found the expected number of threads */
+			                                                      
 			thread_list = thread_list_tmp;
 			thread_count = expected_size / (int)sizeof(uint64_t);
 		} else if (buf_used < expected_size) {
-			/* there were fewer threads than we expected, fix up the allocation */
+			                                                                      
 			thread_list = realloc(thread_list_tmp, (size_t)buf_used);
 			thread_count = buf_used / (int)sizeof(uint64_t);
 			T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(thread_list, "realloc(size = %d) failed", buf_used);
@@ -84,10 +84,10 @@ T_DECL(proc_info_list_kthreads,
 				thread_count = buf_used / (int)sizeof(uint64_t);
 				T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(thread_list, "realloc(size = %d) failed", buf_used);
 			} else {
-				/*
-				 * it used all the extra slots, meaning there are more
-				 * threads than we thought, try again!
-				 */
+				  
+                                                          
+                                          
+       
 				T_LOG("expected %d threads, but saw an extra thread: %d",
 				    expected_size / (int)sizeof(uint64_t), buf_used / (int)sizeof(uint64_t));
 				free(thread_list_tmp);

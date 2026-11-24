@@ -50,29 +50,29 @@ extern "C" {
 
 typedef struct flowq {
 	union {
-		MBUFQ_HEAD(mbufq_head) __mbufq; /* mbuf packet queue */
+		MBUFQ_HEAD(mbufq_head) __mbufq;                        
 	} __fq_pktq_u;
-#define FQF_FLOWCTL_CAPABLE 0x01 /* Use flow control instead of drop */
-#define FQF_DELAY_HIGH  0x02    /* Min delay is greater than target */
-#define FQF_NEW_FLOW    0x04    /* Currently on new flows queue */
-#define FQF_OLD_FLOW    0x08    /* Currently on old flows queue */
-#define FQF_FLOWCTL_ON  0x10    /* Currently flow controlled */
-#define FQF_DESTROYED   0x80    /* flowq destroyed */
-	uint8_t        fq_flags;       /* flags */
-	uint8_t        fq_sc_index; /* service_class index */
-	int32_t        fq_deficit;     /* Deficit for scheduling */
-	uint32_t       fq_bytes;       /* Number of bytes in the queue */
-	uint64_t       fq_min_qdelay; /* min queue delay for Codel */
-	uint64_t       fq_updatetime; /* next update interval */
-	uint64_t       fq_getqtime;    /* last dequeue time */
-	SLIST_ENTRY(flowq) fq_hashlink; /* for flow queue hash table */
-	STAILQ_ENTRY(flowq) fq_actlink; /* for new/old flow queues */
-	uint32_t       fq_flowhash;    /* Flow hash */
-	classq_pkt_type_t       fq_ptype; /* Packet type */
-	/* temporary packet queue for dequeued packets */
+#define FQF_FLOWCTL_CAPABLE 0x01                                       
+#define FQF_DELAY_HIGH  0x02                                          
+#define FQF_NEW_FLOW    0x04                                      
+#define FQF_OLD_FLOW    0x08                                      
+#define FQF_FLOWCTL_ON  0x10                                   
+#define FQF_DESTROYED   0x80                         
+	uint8_t        fq_flags;                  
+	uint8_t        fq_sc_index;                          
+	int32_t        fq_deficit;                                 
+	uint32_t       fq_bytes;                                         
+	uint64_t       fq_min_qdelay;                                
+	uint64_t       fq_updatetime;                           
+	uint64_t       fq_getqtime;                           
+	SLIST_ENTRY(flowq) fq_hashlink;                                
+	STAILQ_ENTRY(flowq) fq_actlink;                              
+	uint32_t       fq_flowhash;                   
+	classq_pkt_type_t       fq_ptype;                  
+	                                                 
 	classq_pkt_t   fq_dq_head;
 	classq_pkt_t   fq_dq_tail;
-	STAILQ_ENTRY(flowq) fq_dqlink; /* entry on dequeue flow list */
+	STAILQ_ENTRY(flowq) fq_dqlink;                                 
 	bool           fq_in_dqlist;
 } fq_t;
 
@@ -93,7 +93,7 @@ typedef struct flowq {
 struct fq_codel_sched_data;
 struct fq_if_classq;
 
-/* Function definitions */
+                          
 extern void fq_codel_init(void);
 extern void fq_codel_reap_caches(boolean_t);
 extern fq_t *fq_alloc(classq_pkt_type_t);
@@ -109,6 +109,6 @@ extern void fq_head_drop(struct fq_codel_sched_data *, fq_t *);
 #ifdef __cplusplus
 }
 #endif
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* PRIVATE */
-#endif /* _NET_CLASSQ_CLASSQ_FQ_CODEL_H */
+#endif                         
+#endif              
+#endif                                    

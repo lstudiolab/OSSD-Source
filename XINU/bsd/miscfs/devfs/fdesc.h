@@ -86,12 +86,12 @@ typedef enum {
 } fdntype;
 
 struct fdescnode {
-	LIST_ENTRY(fdescnode)   fd_hash;        /* Hash list */
-	struct vnode            *fd_vnode;      /* Back ptr to vnode */
-	fdntype                 fd_type;        /* Type of this node */
-	int                     fd_fd;          /* Fd to be dup'ed */
-	const char              *fd_link;       /* Link to fd/n */
-	int                     fd_ix;          /* filesystem index */
+	LIST_ENTRY(fdescnode)   fd_hash;                       
+	struct vnode            *fd_vnode;                             
+	fdntype                 fd_type;                               
+	int                     fd_fd;                               
+	const char              *fd_link;                         
+	int                     fd_ix;                                
 };
 
 #define VFSTOFDESC(mp)  ((struct fdescmount *)((mp)->mnt_data))
@@ -123,6 +123,6 @@ extern int(**devfs_devfd_vnodeop_p)(void*);
 extern struct vfsops fdesc_vfsops;
 __END_DECLS
 
-#endif /* KERNEL */
-#endif /* __APPLE_API_PRIVATE */
-#endif /* __FDESC_FDESC_H__ */
+#endif             
+#endif                          
+#endif                        

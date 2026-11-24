@@ -11,40 +11,40 @@
 #include <unistd.h>
 #include <err.h>
 
-/*
- * Pool is another multithreaded test/benchmarking program to evaluate
- * affinity set placement in Leopard.
- *
- * The basic picture is:
- *
- *                  -> producer --                 -> consumer --
- *       free     /                \    work     /                \
- *    -> queue --      ...          --> queue --                   --
- *   |            \                /             \                /  |
- *   |              -> producer --                 -> consumer --    |
- *    ---------------------------------------------------------------
- *
- *       <---------- "stage" ---------> <---------- "stage" --------->
- *
- * There are a series of work stages. Each stage has an input and an output
- * queue and multiple threads. The first stage is the producer and subsequent
- * stages are consumers. By defuaut there are 2 stages. There are N producer
- * and M consumer threads. The are B buffers per producer threads circulating
- * through the system.
- *
- * When affinity is enabled, each producer thread is tagged with an affinity tag
- * 1 .. N - so each runs on a different L2 cache. When a buffer is queued to
- * the work queue it is tagged with this affinity. When a consumer dequeues a
- * work item, it sets its affinity to this tag. Hence consumer threads migrate
- * to the same affinity set where the data was produced.
- *
- * Buffer management uses pthread mutex/condition variables. A thread blocks
- * when no buffer is available on a queue and it is signaled when a buffer
- * is placed on an empty queue. Queues are tailq'a a la <sys/queue.h>.
- * The queue management is centralized in a single routine: what queues to
- * use as input and output and what function to call for processing is
- * data-driven.
- */
+  
+                                                                      
+                                     
+  
+                        
+  
+                                                                 
+                                                                   
+                                                                     
+                                                                      
+                                                                      
+                                                                     
+  
+                                                                      
+  
+                                                                           
+                                                                             
+                                                                            
+                                                                             
+                      
+  
+                                                                                
+                                                                            
+                                                                             
+                                                                              
+                                                        
+  
+                                                                            
+                                                                          
+                                                                      
+                                                                          
+                                                                      
+               
+   
 
 pthread_mutex_t funnel;
 pthread_cond_t  barrier;
@@ -66,9 +66,9 @@ typedef struct work {
 	int                     number;
 } work_t;
 
-/*
- * A work queue, complete with pthread objects for its management
- */
+  
+                                                                 
+   
 typedef struct work_queue {
 	pthread_mutex_t         mtx;
 	pthread_cond_t          cnd;
@@ -76,10 +76,10 @@ typedef struct work_queue {
 	unsigned int            waiters;
 } work_queue_t;
 
-/* Worker functions take a integer array and size */
+                                                    
 typedef void (worker_fn_t)(int *, int);
 
-/* This struct controls the function of a stage */
+                                                  
 #define WORKERS_MAX 10
 typedef struct {
 	int                     stagenum;
@@ -91,7 +91,7 @@ typedef struct {
 	int                     work_todo;
 } stage_info_t;
 
-/* This defines a worker thread */
+                                  
 typedef struct worker_info {
 	int                     setnum;
 	stage_info_t            *stage;
@@ -130,7 +130,7 @@ usage()
 	exit(1);
 }
 
-/* Trivial producer: write to each byte */
+                                          
 void
 writer_fn(int *data, int isize)
 {
@@ -141,7 +141,7 @@ writer_fn(int *data, int isize)
 	}
 }
 
-/* Trivial consumer: read each byte */
+                                      
 void
 reader_fn(int *data, int isize)
 {
@@ -153,7 +153,7 @@ reader_fn(int *data, int isize)
 	}
 }
 
-/* Consumer reading and writing the buffer */
+                                             
 void
 reader_writer_fn(int *data, int isize)
 {
@@ -181,10 +181,10 @@ affinity_set(int tag)
 	}
 }
 
-/*
- * This is the central function for every thread.
- * For each invocation, its role is ets by (a pointer to) a stage_info_t.
- */
+  
+                                                 
+                                                                         
+   
 void *
 manager_fn(void *arg)
 {
@@ -205,10 +205,10 @@ manager_fn(void *arg)
 		printf("thread_policy_set(THREAD_EXTENDED_POLICY) returned %d\n", ret);
 	}
 
-	/*
-	 * If we're using affinity sets and we're a producer
-	 * set our tag to by our thread set number.
-	 */
+	  
+                                                     
+                                            
+    
 	if (affinity && is_producer) {
 		affinity_set(wp->setnum);
 		current_tag = wp->setnum;
@@ -216,10 +216,10 @@ manager_fn(void *arg)
 
 	DBG("Starting %s %d, stage: %d\n", sp->name, wp->setnum, sp->stagenum);
 
-	/*
-	 * Start barrier.
-	 * The tets thread to get here releases everyone and starts the timer.
-	 */
+	  
+                  
+                                                                       
+    
 	pthread_mutex_lock(&funnel);
 	threads_ready++;
 	if (threads_ready == threads) {
@@ -240,11 +240,11 @@ manager_fn(void *arg)
 	do {
 		work_t          *workp;
 
-		/*
-		 * Get a buffer from the input queue.
-		 * Block if none.
-		 * Quit if all work done.
-		 */
+		  
+                                       
+                   
+                           
+     
 		pthread_mutex_lock(&sp->input->mtx);
 		while (1) {
 			if (sp->work_todo == 0) {
@@ -278,13 +278,13 @@ manager_fn(void *arg)
 		DBG("  %s[%d,%d] todo %d work %p data %p\n",
 		    sp->name, wp->setnum, sp->stagenum, iteration, workp, workp->data);
 
-		/* Do our stuff with the buffer */
+		                                  
 		(void) sp->fn(workp->data, workp->isize);
 
-		/*
-		 * Place the buffer on the input queue of the next stage.
-		 * Signal waiters if required.
-		 */
+		  
+                                                           
+                                
+     
 		pthread_mutex_lock(&sp->output->mtx);
 		TAILQ_INSERT_TAIL(&(sp->output->queue), workp, link);
 		if (sp->output->waiters) {
@@ -312,7 +312,7 @@ main(int argc, char *argv[])
 	int                     i;
 	int                     j;
 	int                     k;
-	int                     pages = 256; /* 1MB */
+	int                     pages = 256;          
 	int                     buffers = 2;
 	int                     producers = 2;
 	int                     consumers = 2;
@@ -325,7 +325,7 @@ main(int argc, char *argv[])
 	kern_return_t           ret;
 	int                     c;
 
-	/* Do switch parsing: */
+	                        
 	while ((c = getopt(argc, argv, "ab:i:p:s:twv:")) != -1) {
 		switch (c) {
 		case 'a':
@@ -373,9 +373,9 @@ main(int argc, char *argv[])
 	pthread_mutex_init(&funnel, NULL);
 	pthread_cond_init(&barrier, NULL);
 
-	/*
-	 * Fire up the worker threads.
-	 */
+	  
+                               
+    
 	threads = consumers * (stages - 1) + producers;
 	mutter("Launching %d producer%s with %d stage%s of %d consumer%s\n"
 	    "  with %saffinity, consumer reads%s data\n",
@@ -402,7 +402,7 @@ main(int argc, char *argv[])
 	stage_info = (stage_info_t *) malloc(stages * sizeof(stage_info_t));
 	worker_info = (worker_info_t *) malloc(threads * sizeof(worker_info_t));
 
-	/* Set up the queue for the workers of this thread set: */
+	                                                          
 	for (i = 0; i < stages; i++) {
 		sp = &stage_info[i];
 		sp->stagenum = i;
@@ -422,7 +422,7 @@ main(int argc, char *argv[])
 		stage_info[i].work_todo = iterations;
 	}
 
-	/* Create the producers */
+	                          
 	for (i = 0; i < producers; i++) {
 		work_t  *work_array;
 		int     *data;
@@ -431,7 +431,7 @@ main(int argc, char *argv[])
 		isize = pages * 4096 / sizeof(int);
 		data = (int *) malloc(buffers * pages * 4096);
 
-		/* Set up the empty work buffers */
+		                                   
 		work_array = (work_t *)  malloc(buffers * sizeof(work_t));
 		for (j = 0; j < buffers; j++) {
 			work_array[j].data = data + (isize * j);
@@ -452,7 +452,7 @@ main(int argc, char *argv[])
 		}
 	}
 
-	/* Create consumers */
+	                      
 	for (i = 1; i < stages; i++) {
 		for (j = 0; j < consumers; j++) {
 			wp = &worker_info[producers + (consumers * (i - 1)) + j];
@@ -467,9 +467,9 @@ main(int argc, char *argv[])
 		}
 	}
 
-	/*
-	 * We sit back anf wait for the slaves to finish.
-	 */
+	  
+                                                  
+    
 	for (k = 0; k < threads; k++) {
 		int     i;
 		int     j;
@@ -488,9 +488,9 @@ main(int argc, char *argv[])
 		DBG("Thread %d,%d status %d\n", i, j, status);
 	}
 
-	/*
-	 * See how long the work took.
-	 */
+	  
+                               
+    
 	timer = mach_absolute_time() - timer;
 	timer = timer / 1000000ULL;
 	printf("%d.%03d seconds elapsed.\n",

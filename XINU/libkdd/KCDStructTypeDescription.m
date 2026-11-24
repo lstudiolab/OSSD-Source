@@ -109,12 +109,12 @@ KCDStructTypeDescription () {
 
 - (BOOL)shouldMergeData
 {
-	/*
-	 * If this is a type where the kcdata item itself carries the key name, or
-	 * KCS_SUBTYPE_FLAGS_MERGE was used to define the type, then a member of
-	 * this type should have it's dict merged into the parent container,
-	 * instead of being represented as typename => dict.
-	 */
+	  
+                                                                           
+                                                                         
+                                                                     
+                                                     
+    
 	return _needDescriptionAsKey || _flagsRequestedMerge;
 }
 

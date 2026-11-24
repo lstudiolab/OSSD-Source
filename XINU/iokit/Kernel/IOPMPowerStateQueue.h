@@ -60,4 +60,4 @@ public:
 	bool submitPowerEvent( uint32_t eventType, void * arg0 = NULL, uint64_t arg1 = 0 );
 };
 
-#endif /* _IOPMPOWERSTATEQUEUE_H_ */
+#endif                              

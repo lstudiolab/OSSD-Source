@@ -68,9 +68,9 @@ spinning_thread(void *semp)
 static void
 start_tracing_with_timeout(ktrace_session_t s, unsigned int timeout_secs)
 {
-	// Only set the timeout after we've seen an event that was traced by us.
-	// This helps set a reasonable timeout after we're guaranteed to get a
-	// few events.
+	                                                                        
+	                                                                      
+	              
 	dispatch_queue_t q = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
 
 	ktrace_events_single(s, DISPATCH_AFTER_EVENT,
@@ -124,9 +124,9 @@ timestamp_secs(ktrace_session_t s, uint64_t timestamp)
 
 #pragma mark - timers
 
-// Ensure that kperf is correctly sampling CPUs that are actively scheduling by
-// bringing up threads and ensuring that threads on-core are sampled by each
-// timer fire.
+                                                                               
+                                                                            
+              
 
 T_DECL(kperf_sample_active_cpus,
     "make sure that kperf samples all active CPUs")
@@ -158,9 +158,9 @@ T_DECL(kperf_sample_active_cpus,
 	__block double sum_saturation = 0;
 	__block uint64_t last_nsamples = 0;
 
-	// As a test debugging aid, take an additonal argument that specifies the
-	// number of fires to stop tracing after.  This also turns on additional
-	// logging of scheduler trace events.
+	                                                                         
+	                                                                        
+	                                     
 	int stopafter = 0;
 	if (argc > 0) {
 		stopafter = atoi(argv[0]);
@@ -200,7 +200,7 @@ T_DECL(kperf_sample_active_cpus,
 		T_END;
 	});
 
-	// Track which threads are running on each CPU.
+	                                               
 	static uint64_t tids_on_cpu[MAX_CPUS] = { 0 };
 	void (^switch_cb)(struct trace_point *, const char *name) =
 	    ^(struct trace_point *tp, const char *name) {
@@ -223,7 +223,7 @@ T_DECL(kperf_sample_active_cpus,
 		switch_cb(tp, "hndoff");
 	});
 
-	// Determine the thread IDs of the idle threads on each CPU.
+	                                                            
 	ktrace_events_single(s, SCHED_IDLE, ^(struct trace_point *tp) {
 		if (tp->debugid & DBG_FUNC_END) {
 			return;
@@ -236,8 +236,8 @@ T_DECL(kperf_sample_active_cpus,
 		}
 	});
 
-	// On each timer fire, go through all the cores and mark any threads
-	// that should be sampled.
+	                                                                    
+	                          
 
 	__block int last_fire_cpu = -1;
 	static bool sample_missing[MAX_CPUS] = { false };
@@ -295,12 +295,12 @@ T_DECL(kperf_sample_active_cpus,
 		}
 	});
 
-	// On the timer handler for each CPU, unset the missing sample bitmap.
+	                                                                      
 
 	ktrace_events_single(s, PERF_TMR_HNDLR, ^(struct trace_point *tp) {
 		nsamples++;
 		if ((int)tp->cpuid > ncpus) {
-		        // Skip IOPs; they're not scheduling any relevant threads.
+		                                                                  
 		        return;
 		}
 
@@ -322,7 +322,7 @@ T_DECL(kperf_sample_active_cpus,
 
 	start_tracing_with_timeout(s, TIMEOUT_SECS);
 
-	// Create threads to bring up all of the CPUs.
+	                                              
 
 	dispatch_semaphore_t thread_spinning = dispatch_semaphore_create(0);
 
@@ -409,9 +409,9 @@ T_DECL(kperf_timer_fires_enough_times,
 	dispatch_main();
 }
 
-// kperf_timer_not_oversampling ensures that the profiling timer fires are
-// spaced apart by the programmed timer period.  Otherwise, tools that rely on
-// sample count as a proxy for CPU usage will over-estimate.
+                                                                          
+                                                                              
+                                                            
 
 #define FIRE_PERIOD_THRESHOLD_NS \
 		(TIMER_PERIOD_NS - (uint64_t)(TIMER_PERIOD_NS * 0.05))
@@ -514,7 +514,7 @@ T_DECL(kperf_timer_not_oversampling,
 
 	ktrace_session_t s = ktrace_session_create();
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(s, "ktrace_session_create");
-	// Try not to perturb the system with more work.
+	                                                
 	ktrace_set_collection_interval(s, 1000);
 	__block uint64_t nfires = 0;
 	__block uint64_t first_fire_ns = 0;
@@ -536,7 +536,7 @@ T_DECL(kperf_timer_not_oversampling,
 	__block bool in_stackshot = false;
 	__block uint64_t last_stackshot_ns = 0;
 
-	// Stackshots are the primary source of interrupt latency on the system.
+	                                                                        
 	ktrace_events_single(s, KDBG_EVENTID(DBG_BSD, DBG_BSD_EXCP_SC,
 			SYS_stack_snapshot_with_config), ^(struct trace_point *tp) {
 		bool start = tp->debugid & DBG_FUNC_START;
@@ -553,8 +553,8 @@ T_DECL(kperf_timer_not_oversampling,
 	T_ASSERT_NOTNULL(fire_times, "allocated fire time tracking");
 	fire_times->cq = CIRQ_INIT(uint64_t, HISTORY_LEN);
 
-	// Track the decrementer's latency values to find any unexpectedly long
-	// interrupt latencies that could affect the firing cadence.
+	                                                                       
+	                                                            
 	ktrace_events_single(s, MACHDBG_CODE(DBG_MACH_EXCP_DECI, 0),
 			^(struct trace_point *tp) {
 		uint64_t cur_ns = relns_from_abs(s, tp->timestamp);
@@ -590,10 +590,10 @@ T_DECL(kperf_timer_not_oversampling,
 						timer_latency_ns);
 			}
 
-			// Long interrupt latencies will cause the timer to miss its fire
-			// time and report a fire past when it should have, making the next
-			// period too short.  Keep track of the latency as a leeway
-			// adjustment for the subsequent fire.
+			                                                                 
+			                                                                   
+			                                                           
+			                                      
 			uint64_t fire_period_ns = cur_ns - last_fire_ns;
 			uint64_t fire_period_adj_ns = fire_period_ns +
 			    last_fire_latency_ns + timer_latency_ns;
@@ -644,8 +644,8 @@ T_DECL(kperf_timer_not_oversampling,
 			latency->iv_instant_ns = cur_ns;
 			latency->iv_val = timer_latency_ns;
 
-			// Snapshot this timer fire's interrupt latency, so the next one
-			// can make an adjustment to the period.
+			                                                                
+			                                        
 			last_fire_latency_ns = timer_latency_ns;
 		}
 		last_fire_ns = cur_ns;
@@ -671,7 +671,7 @@ T_DECL(kperf_timer_not_oversampling,
 
 	start_tracing_with_timeout(s, 5);
 
-	// Get all CPUs out of idle.
+	                            
 	uint64_t *counts = kpc_counterbuf_alloc();
 	(void)kpc_get_cpu_counters(true,KPC_CLASS_CONFIGURABLE_MASK, NULL, counts);
 	free(counts);
@@ -771,7 +771,7 @@ expect_kdebug_trigger(const char *filter_desc, const uint32_t *debugids,
 
 	T_ASSERT_POSIX_ZERO(ktrace_start(s, dispatch_get_main_queue()), NULL);
 
-	// Trace the triggering events.
+	                               
 
 	for (unsigned int i = 0; i < n_debugids; i++) {
 		T_ASSERT_POSIX_SUCCESS(kdebug_trace(debugids[i], 0, 0, 0, 0), NULL);
@@ -841,8 +841,8 @@ T_DECL(kperf_kdebug_trigger_debugids,
 	dispatch_main();
 }
 
-// TODO Set a single function specifier filter, expect not to trigger of all
-// events from that class.
+                                                                            
+                          
 
 static void
 reset_kperf(void)
@@ -862,7 +862,7 @@ T_DECL(kperf_kdbg_callstacks,
 	T_QUIET; T_WITH_ERRNO; T_ASSERT_NOTNULL(s, "ktrace_session_create");
 	ktrace_set_collection_interval(s, 100);
 
-	// Make sure BSD events are traced in order to trigger samples on syscalls.
+	                                                                           
 	ktrace_events_class(s, DBG_BSD, ^void (__unused struct trace_point *tp) {});
 
 	ktrace_events_single(s, PERF_STK_UHDR, ^(__unused struct trace_point *tp) {

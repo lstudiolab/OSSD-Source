@@ -83,18 +83,18 @@ extern void             memset_word(
 	int              nwords);
 
 
-/* Move arbitrarily-aligned data from one physical address to another */
+                                                                        
 extern void bcopy_phys(addr64_t from, addr64_t to, vm_size_t nbytes);
 
-/* allow a function to get a quick virtual mapping of a physical page */
+                                                                        
 extern int apply_func_phys(addr64_t src64, vm_size_t bytes, int (*func)(void * buffer, vm_size_t bytes, void * arg), void * arg);
 
 extern int ml_copy_phys(addr64_t, addr64_t, vm_size_t);
 
-/* Flush all cachelines for a page. */
+                                      
 extern void cache_flush_page_phys(ppnum_t pa);
 
-/* Flushing for incoherent I/O */
+                                 
 extern void dcache_incoherent_io_flush64(addr64_t pa, unsigned int count);
 extern void dcache_incoherent_io_store64(addr64_t pa, unsigned int count);
 
@@ -140,7 +140,7 @@ extern void Idle_PTs_release(vm_offset_t start, vm_offset_t end);
 extern ppnum_t released_PT_ppn;
 extern uint32_t released_PT_cnt;
 
-/* Fast-restart parameters */
+                             
 #define FULL_SLAVE_INIT (NULL)
 #define FAST_SLAVE_INIT ((void *)(uintptr_t)1)
 
@@ -154,4 +154,4 @@ extern kern_return_t i386_slide_individual_kext(kernel_mach_header_t *mh, uintpt
 
 extern kern_return_t i386_slide_kext_collection_mh_addrs(kernel_mach_header_t *mh, uintptr_t slide, bool adjust_mach_headers);
 
-#endif /* _I386_MISC_PROTOS_H_ */
+#endif                           

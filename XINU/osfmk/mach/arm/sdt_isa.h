@@ -30,19 +30,19 @@
 #ifndef _MACH_ARM_SDT_ISA_H
 #define _MACH_ARM_SDT_ISA_H
 
-/*
- * Only define when testing.  This makes the calls into actual calls to
- * test functions.
- */
-/* #define DTRACE_CALL_TEST */
+  
+                                                                       
+                  
+   
+                              
 
 #define DTRACE_STRINGIFY(s) #s
 #define DTRACE_TOSTRING(s) DTRACE_STRINGIFY(s)
 
 #if defined(KERNEL)
-/*
- * For the kernel, set an explicit global label so the symbol can be located
- */
+  
+                                                                            
+   
 #ifdef __arm__
 
 #define DTRACE_LABEL(p, n)                                                              \
@@ -58,7 +58,7 @@
 	".long 2b""\n\t"                                                                \
 	".popsection" "\n\t"                                                            \
 	"4:"
-#else /* __arm64__ */
+#else                
 
 #define DTRACE_LABEL(p, n)                                                              \
 	".pushsection __DATA, __sdt_cstring, cstring_literals\n\t"                      \
@@ -74,10 +74,10 @@
 	".popsection" "\n\t"                                                            \
 	"4:"
 #endif
-#else   /* !KERNEL */
+#else                
 #define DTRACE_LABEL(p, n)                                                                      \
 	"__dtrace_probe$" DTRACE_TOSTRING(%=__LINE__) DTRACE_STRINGIFY(_##p##___##n) ":"	"\n\t"
-#endif  /* !KERNEL */
+#endif               
 
 #ifdef DTRACE_CALL_TEST
 
@@ -85,13 +85,13 @@
 	DTRACE_LABEL(p,n)       \
 	DTRACE_CALL_INSN(p,n)
 
-#else   /* !DTRACE_CALL_TEST */
+#else                          
 
 #define DTRACE_CALL(p, n)        \
 	DTRACE_LABEL(p,n)       \
 	DTRACE_NOPS
 
-#endif  /* !DTRACE_CALL_TEST */
+#endif                         
 
 #if defined(__arm__)
 
@@ -170,11 +170,11 @@
 	              : "memory", "r0", "r1", "r2", "r3"                                        \
 	);
 
-/*
- * One of our ARM32 ABIs (armv7k) mandates that the stack be aligned to 16 bytes.
- * We currently apply this constraint to all ARM32 DTRACE_CALL macros; hence the
- * macros below will overallocate for some ABIs.
- */
+  
+                                                                                 
+                                                                                
+                                                
+   
 #define DTRACE_CALL5ARGS(provider, name)                        \
 	asm volatile (                                                                          \
 	              DTRACE_ALLOC_STACK(16)                                                    \
@@ -410,7 +410,7 @@
 	              : "memory", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7"                \
 	);
 
-/* Keep stack 16 byte aligned per ABI requirements */
+                                                     
 #define DTRACE_CALL9ARGS(provider, name)                        \
 	asm volatile (                                                                                  \
 	                      DTRACE_ALLOC_STACK(16)                                                    \
@@ -443,6 +443,6 @@
 	                      : "memory", "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7"                \
 	        );
 
-#endif /* __arm__ */
+#endif              
 
-#endif  /* _MACH_ARM_SDT_ISA_H */
+#endif                           

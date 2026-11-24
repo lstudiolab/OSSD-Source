@@ -68,9 +68,9 @@ unsigned int    bsd_mbuf_cluster_reserve(boolean_t *);
 void bsd_scale_setup(int);
 void bsd_exec_setup(int);
 
-/*
- * Declare these as initialized data so we can patch them.
- */
+  
+                                                          
+   
 
 #ifdef  NBUF
 int             max_nbuf_headers = NBUF;
@@ -90,7 +90,7 @@ SYSCTL_INT(_kern, OID_AUTO, maxnbuf, CTLFLAG_RW | CTLFLAG_LOCKED | CTLFLAG_KERN,
 __private_extern__ int customnbuf = 0;
 int             ncl = 0;
 
-/* Indicates a server boot when set */
+                                      
 TUNABLE(int, serverperfmode, "serverperfmode", 0);
 
 #if SOCKETS
@@ -110,9 +110,9 @@ bsd_startupearly(void)
 	vm_size_t       size;
 	kern_return_t   ret;
 
-	/* clip the number of buf headers upto 16k */
+	                                             
 	if (max_nbuf_headers == 0) {
-		max_nbuf_headers = (int)atop_kernel(sane_size / 50); /* Get 2% of ram, but no more than we can map */
+		max_nbuf_headers = (int)atop_kernel(sane_size / 50);                                                 
 	}
 	if ((customnbuf == 0) && ((unsigned int)max_nbuf_headers > 16384)) {
 		max_nbuf_headers = 16384;
@@ -121,7 +121,7 @@ bsd_startupearly(void)
 		max_nbuf_headers = CONFIG_MIN_NBUF;
 	}
 
-	/* clip the number of hash elements  to 200000 */
+	                                                 
 	if ((customnbuf == 0) && nbuf_hashelements == 0) {
 		nbuf_hashelements = (int)atop_kernel(sane_size / 50);
 		if ((unsigned int)nbuf_hashelements > 200000) {
@@ -191,21 +191,21 @@ bsd_startupearly(void)
 				tcp_recvspace = maxspace;
 			}
 		}
-#endif /* INET */
+#endif           
 	}
-#endif /* SOCKETS */
+#endif              
 
 	if (vnodes_sized == 0) {
 		if (!PE_get_default("kern.maxvnodes", &desiredvnodes, sizeof(desiredvnodes))) {
-			/*
-			 * Size vnodes based on memory
-			 * Number vnodes  is (memsize/64k) + 1024
-			 * This is the calculation that is used by launchd in tiger
-			 * we are clipping the max based on 16G
-			 * ie ((16*1024*1024*1024)/(64 *1024)) + 1024 = 263168;
-			 * CONFIG_VNODES is set to 263168 for "medium" configurations (the default)
-			 * but can be smaller or larger.
-			 */
+			  
+                                 
+                                            
+                                                              
+                                          
+                                                          
+                                                                              
+                                   
+      
 			desiredvnodes  = (int)(sane_size / 65536) + 1024;
 #ifdef CONFIG_VNODES
 			if (desiredvnodes > CONFIG_VNODES) {
@@ -223,10 +223,10 @@ bsd_bufferinit(void)
 #if SOCKETS
 	kern_return_t   ret;
 #endif
-	/*
-	 * Note: Console device initialized in kminit() from bsd_autoconf()
-	 * prior to call to us in bsd_init().
-	 */
+	  
+                                                                    
+                                      
+    
 
 	bsd_startupearly();
 
@@ -243,54 +243,54 @@ bsd_bufferinit(void)
 	if (ret != KERN_SUCCESS) {
 		panic("Failed to allocate mb_map\n");
 	}
-#endif /* SOCKETS */
+#endif              
 
-	/*
-	 * Set up buffers, so they can be used to read disk labels.
-	 */
+	  
+                                                            
+    
 	bufinit();
 }
 
-/* 512 MB (K32) or 2 GB (K64) hard limit on size of the mbuf pool */
+                                                                    
 #if !defined(__LP64__)
 #define MAX_MBUF_POOL   (512 << MBSHIFT)
 #else
 #define MAX_MBUF_POOL   (2ULL << GBSHIFT)
-#endif /* !__LP64__ */
+#endif                
 #define MAX_NCL         (MAX_MBUF_POOL >> MCLSHIFT)
 
 #if SOCKETS
-/*
- * this has been broken out into a separate routine that
- * can be called from the x86 early vm initialization to
- * determine how much lo memory to reserve on systems with
- * DMA hardware that can't fully address all of the physical
- * memory that is present.
- */
+  
+                                                        
+                                                        
+                                                          
+                                                            
+                          
+   
 unsigned int
 bsd_mbuf_cluster_reserve(boolean_t *overridden)
 {
 	int mbuf_pool = 0;
 	static boolean_t was_overridden = FALSE;
 
-	/* If called more than once, return the previously calculated size */
+	                                                                     
 	if (mbuf_poolsz != 0) {
 		goto done;
 	}
 
-	/*
-	 * Some of these are parsed in parse_bsd_args(), but for x86 we get
-	 * here early from i386_vm_init() and so we parse them now, in order
-	 * to correctly compute the size of the low-memory VM pool.  It is
-	 * redundant but rather harmless.
-	 */
+	  
+                                                                    
+                                                                     
+                                                                   
+                                  
+    
 	(void) PE_parse_boot_argn("ncl", &ncl, sizeof(ncl));
 	(void) PE_parse_boot_argn("mbuf_pool", &mbuf_pool, sizeof(mbuf_pool));
 
-	/*
-	 * Convert "mbuf_pool" from MB to # of 2KB clusters; it is
-	 * equivalent to "ncl", except that it uses different unit.
-	 */
+	  
+                                                           
+                                                            
+    
 	if (mbuf_pool != 0) {
 		ncl = (mbuf_pool << MBSHIFT) >> MCLSHIFT;
 	}
@@ -301,21 +301,21 @@ bsd_mbuf_cluster_reserve(boolean_t *overridden)
 		}
 
 		if ((nmbclusters = ncl) == 0) {
-			/* Auto-configure the mbuf pool size */
+			                                       
 			nmbclusters = mbuf_default_ncl(mem_actual);
 		} else {
-			/* Make sure it's not odd in case ncl is manually set */
+			                                                        
 			if (nmbclusters & 0x1) {
 				--nmbclusters;
 			}
 
-			/* And obey the upper limit */
+			                              
 			if (nmbclusters > MAX_NCL) {
 				nmbclusters = MAX_NCL;
 			}
 		}
 
-		/* Round it down to nearest multiple of PAGE_SIZE */
+		                                                    
 		nmbclusters = (unsigned int)P2ROUNDDOWN(nmbclusters, NCLPG);
 	}
 	mbuf_poolsz = nmbclusters << MCLSHIFT;
@@ -346,11 +346,11 @@ bsd_scale_setup(int scale)
 			maxfilesperproc = maxfiles / 2;
 		}
 	}
-	/* Apply server scaling rules */
+	                                
 	if ((scale > 0) && (serverperfmode != 0)) {
 		maxproc = 2500 * scale;
 		hard_maxproc = maxproc;
-		/* no fp usage */
+		                 
 		maxprocperuid = (maxproc * 3) / 4;
 		maxfiles = (150000 * scale);
 		maxfilesperproc = maxfiles / 2;
@@ -358,16 +358,16 @@ bsd_scale_setup(int scale)
 		vnodes_sized = 1;
 		tcp_tfo_backlog = 100 * scale;
 		if (scale > 4) {
-			/* clip somaxconn at 32G level */
+			                                 
 			somaxconn = 2048;
-			/*
-			 * For scale > 4 (> 32G), clip
-			 * tcp_tcbhashsize to 32K
-			 */
+			  
+                                 
+                            
+      
 			tcp_tcbhashsize = 32 * 1024;
 
 			if (scale > 7) {
-				/* clip at 64G level */
+				                       
 				max_cached_sock_count = 165000;
 			} else {
 				max_cached_sock_count = 60000 + ((scale - 1) * 15000);

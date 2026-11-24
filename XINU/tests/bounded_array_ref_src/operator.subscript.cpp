@@ -1,7 +1,7 @@
-//
-// Tests for
-//  T& operator[](ptrdiff_t n) const;
-//
+  
+            
+                                     
+  
 
 #include <libkern/c++/bounded_array_ref.h>
 #include "test_policy.h"

@@ -70,10 +70,10 @@ do_compat(mach_error_t *org_err)
 {
 	mach_error_t            err = *org_err;
 
-	/*
-	 * map old error numbers to
-	 * to new error sys & subsystem
-	 */
+	  
+                            
+                                
+    
 
 	if ((-200 < err) && (err <= -100)) {
 		err = -(err + 100) | IPC_SEND_MOD;
@@ -182,4 +182,4 @@ mach_error_string(mach_error_t err)
 	return mach_error_string_int( err, &diag );
 }
 
-/* vim: set ts=4: */
+                    

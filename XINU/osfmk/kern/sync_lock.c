@@ -29,12 +29,12 @@
  * @OSF_COPYRIGHT@
  *
  */
-/*
- *	File:	kern/sync_lock.c
- *	Author:	Joseph CaraDonna
- *
- *	Contains RT distributed lock synchronization services.
- */
+  
+                         
+                           
+  
+                                                         
+   
 
 #include <mach/mach_types.h>
 #include <mach/lock_set_server.h>
@@ -54,9 +54,9 @@
 
 
 
-/*
- *	OBSOLETE: lock set routines are obsolete
- */
+  
+                                           
+   
 kern_return_t
 lock_set_create(
 	__unused task_t         task,

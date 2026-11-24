@@ -37,7 +37,7 @@
 #include <netinet6/scope6_var.h>
 #include <sys/mcache.h>
 
-#define NDRTI_ZONE_NAME "nd6_route_info"        /* zone name */
+#define NDRTI_ZONE_NAME "nd6_route_info"                       
 
 extern lck_mtx_t *nd6_mutex;
 static struct nd_route_info *nd6_rti_lookup(struct nd_route_info *);
@@ -45,7 +45,7 @@ static struct nd_route_info *nd6_rti_lookup(struct nd_route_info *);
 static ZONE_DECLARE(ndrti_zone, "nd6_route_info",
     sizeof(struct nd_route_info), ZC_ZFREE_CLEARMEM);
 
-static boolean_t nd6_rti_list_busy = FALSE;             /* protected by nd6_mutex */
+static boolean_t nd6_rti_list_busy = FALSE;                                         
 
 
 void
@@ -112,10 +112,10 @@ nd6_rtilist_update(struct nd_route_info *new_rti, struct nd_defrouter *dr)
 
 	if ((rti = nd6_rti_lookup(new_rti)) != NULL) {
 		(void)defrtrlist_update(dr, &rti->nd_rti_router_list);
-		/*
-		 * The above may have removed an entry from default router list.
-		 * If it did and the list is now empty, remove the rti as well.
-		 */
+		  
+                                                                  
+                                                                 
+     
 		if (TAILQ_EMPTY(&rti->nd_rti_router_list)) {
 			TAILQ_REMOVE(&nd_rti_list, rti, nd_rti_entry);
 			ndrti_free(rti);
@@ -128,7 +128,7 @@ nd6_rtilist_update(struct nd_route_info *new_rti, struct nd_defrouter *dr)
 		(void)defrtrlist_update(dr, &rti->nd_rti_router_list);
 		TAILQ_INSERT_HEAD(&nd_rti_list, rti, nd_rti_entry);
 	}
-	/* If rti doesn't exist and lifetime is 0, simply ignore */
+	                                                           
 	nd6_rti_list_signal_done();
 	lck_mtx_unlock(nd6_mutex);
 }

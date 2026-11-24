@@ -298,14 +298,14 @@ get_pcblist_n(short proto, struct sysctl_req *req, struct inpcbinfo *pcbinfo)
 	}
 
 
-	/*
-	 * The process of preparing the PCB list is too time-consuming and
-	 * resource-intensive to repeat twice on every request.
-	 */
+	  
+                                                                   
+                                                        
+    
 	lck_rw_lock_exclusive(pcbinfo->ipi_lock);
-	/*
-	 * OK, now we're committed to doing something.
-	 */
+	  
+                                               
+    
 	gencnt = pcbinfo->ipi_gencnt;
 	n = pcbinfo->ipi_count;
 
@@ -318,9 +318,9 @@ get_pcblist_n(short proto, struct sysctl_req *req, struct inpcbinfo *pcbinfo)
 	if (error) {
 		goto done;
 	}
-	/*
-	 * We are done if there is no pcb
-	 */
+	  
+                                  
+    
 	if (xig.xig_count == 0) {
 		goto done;
 	}
@@ -337,9 +337,9 @@ get_pcblist_n(short proto, struct sysctl_req *req, struct inpcbinfo *pcbinfo)
 		goto done;
 	}
 
-	/*
-	 * Special case TCP to include the connections in time wait
-	 */
+	  
+                                                            
+    
 	if (proto == IPPROTO_TCP) {
 		n = get_tcp_inp_list(inp_list, n, gencnt);
 	} else {
@@ -382,11 +382,11 @@ get_pcblist_n(short proto, struct sysctl_req *req, struct inpcbinfo *pcbinfo)
 				struct  xtcpcb_n *xt = (struct xtcpcb_n *)
 				    ADVANCE64(xsostats, sizeof(*xsostats));
 
-				/*
-				 * inp->inp_ppcb, can only be NULL on
-				 * an initialization race window.
-				 * No need to lock.
-				 */
+				  
+                                         
+                                     
+                       
+       
 				if (inp->inp_ppcb == NULL) {
 					continue;
 				}
@@ -402,13 +402,13 @@ get_pcblist_n(short proto, struct sysctl_req *req, struct inpcbinfo *pcbinfo)
 	}
 
 	if (!error) {
-		/*
-		 * Give the user an updated idea of our state.
-		 * If the generation differs from what we told
-		 * her before, she knows that something happened
-		 * while we were processing this request, and it
-		 * might be necessary to retry.
-		 */
+		  
+                                                
+                                                
+                                                  
+                                                  
+                                 
+     
 		bzero(&xig, sizeof(xig));
 		xig.xig_len = sizeof(xig);
 		xig.xig_gen = pcbinfo->ipi_gencnt;
@@ -462,46 +462,46 @@ inpcb_get_ports_used(uint32_t ifindex, int protocol, uint32_t flags,
 			continue;
 		}
 
-		/*
-		 * ANYTCPSTATEOK means incoming packets cannot be filtered
-		 * reception so cast a wide net of possibilities
-		 */
+		  
+                                                            
+                                                  
+     
 		if (!anytcpstateok &&
 		    ((so->so_state & SS_DEFUNCT) ||
 		    (so->so_state & SS_ISDISCONNECTED))) {
 			continue;
 		}
 
-		/*
-		 * If protocol is specified, filter out inpcbs that
-		 * are not relevant to the protocol family of interest.
-		 */
+		  
+                                                     
+                                                         
+     
 		if (protocol != PF_UNSPEC) {
 			if (protocol == PF_INET) {
-				/*
-				 * If protocol of interest is IPv4, skip the inpcb
-				 * if the family is not IPv4.
-				 * OR
-				 * If the family is IPv4, skip if the IPv4 flow is
-				 * CLAT46 translated.
-				 */
+				  
+                                                      
+                                 
+         
+                                                      
+                         
+       
 				if ((inp->inp_vflag & INP_IPV4) == 0 ||
 				    (inp->inp_flags2 & INP2_CLAT46_FLOW) != 0) {
 					continue;
 				}
 			} else if (protocol == PF_INET6) {
-				/*
-				 * If protocol of interest is IPv6, skip the inpcb
-				 * if the family is not IPv6.
-				 * AND
-				 * The flow is not a CLAT46'd flow.
-				 */
+				  
+                                                      
+                                 
+          
+                                       
+       
 				if ((inp->inp_vflag & INP_IPV6) == 0 &&
 				    (inp->inp_flags2 & INP2_CLAT46_FLOW) == 0) {
 					continue;
 				}
 			} else {
-				/* Protocol family not supported */
+				                                   
 				continue;
 			}
 		}
@@ -549,10 +549,10 @@ inpcb_get_ports_used(uint32_t ifindex, int protocol, uint32_t flags,
 		if (SOCK_PROTO(inp->inp_socket) == IPPROTO_TCP) {
 			struct  tcpcb *tp = sototcpcb(inp->inp_socket);
 
-			/*
-			 * Workaround race where inp_ppcb is NULL during
-			 * socket initialization
-			 */
+			  
+                                                   
+                           
+      
 			if (tp == NULL) {
 				continue;
 			}
@@ -560,36 +560,36 @@ inpcb_get_ports_used(uint32_t ifindex, int protocol, uint32_t flags,
 			switch (tp->t_state) {
 			case TCPS_CLOSED:
 				if (anytcpstateok && inp->inp_fport != 0) {
-					/*
-					 * A foreign port means we had a 4 tuple at
-					 * least a connection attempt so packets
-					 * may be received for the 4 tuple after the
-					 * connection is gone
-					 */
+					  
+                                                
+                                             
+                                                 
+                          
+        
 					break;
 				}
 				continue;
-			/* NOT REACHED */
+			                 
 			case TCPS_LISTEN:
 			case TCPS_SYN_SENT:
 			case TCPS_SYN_RECEIVED:
 			case TCPS_ESTABLISHED:
 			case TCPS_FIN_WAIT_1:
-				/*
-				 * Note: FIN_WAIT_1 is an active state
-				 * because we need our FIN to be
-				 * acknowledged
-				 */
+				  
+                                          
+                                    
+                   
+       
 				break;
 			case TCPS_CLOSE_WAIT:
 			case TCPS_CLOSING:
 			case TCPS_LAST_ACK:
 			case TCPS_FIN_WAIT_2:
-				/*
-				 * In the closing states, the connection
-				 * is active when there is outgoing
-				 * data having to be acknowledged
-				 */
+				  
+                                            
+                                       
+                                     
+       
 				if (!anytcpstateok &&
 				    (activeonly && so->so_snd.sb_cc == 0)) {
 					continue;
@@ -597,14 +597,14 @@ inpcb_get_ports_used(uint32_t ifindex, int protocol, uint32_t flags,
 				break;
 			case TCPS_TIME_WAIT:
 				if (anytcpstateok) {
-					/*
-					 * Packets may still be received for the 4 tuple
-					 * after the connection is gone
-					 */
+					  
+                                                     
+                                    
+        
 					break;
 				}
 				continue;
-				/* NOT REACHED */
+				                 
 			}
 		}
 

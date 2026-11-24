@@ -43,7 +43,7 @@ void kperf_lazy_wait_sample(thread_t thread,
     thread_continue_t continuation, uintptr_t *starting_fp);
 void kperf_lazy_cpu_sample(thread_t thread, unsigned int flags, bool interrupt);
 
-/* accessors for configuration */
+                                 
 int kperf_lazy_get_wait_action(void);
 int kperf_lazy_get_cpu_action(void);
 int kperf_lazy_set_wait_action(int action_id);
@@ -53,4 +53,4 @@ uint64_t kperf_lazy_get_cpu_time_threshold(void);
 int kperf_lazy_set_wait_time_threshold(uint64_t threshold);
 int kperf_lazy_set_cpu_time_threshold(uint64_t threshold);
 
-#endif /* !defined(KPERF_LAZY_H) */
+#endif                             

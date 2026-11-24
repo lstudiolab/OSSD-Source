@@ -38,7 +38,7 @@
 #include <kdp/kdp_udp.h>
 #if !MACH_KDP
 #include <kdp/kdp_callout.h>
-#endif /* !MACH_KDP */
+#endif                
 #include <arm/cpu_data.h>
 #include <arm/cpu_data_internal.h>
 #include <arm/caches_internal.h>
@@ -53,7 +53,7 @@
 
 #define INT_SIZE        (BYTE_SIZE * sizeof (int))
 
-/* machine_routines_asm.s calls these */
+                                        
 extern int copyin_validate(const user_addr_t, uintptr_t, vm_size_t);
 extern int copyin_user_validate(const user_addr_t, uintptr_t, vm_size_t);
 extern int copyout_validate(uintptr_t, const user_addr_t, vm_size_t);
@@ -78,7 +78,7 @@ bcopy_phys(addr64_t src, addr64_t dst, vm_size_t bytes)
 	if (mmu_kvtop_wpreflight(phystokv((pmap_paddr_t) dst)) &&
 	    ((wimg_bits_src & VM_WIMG_MASK) == VM_WIMG_DEFAULT) &&
 	    ((wimg_bits_dst & VM_WIMG_MASK) == VM_WIMG_DEFAULT)) {
-		/* Fast path - dst is writable and both source and destination have default attributes */
+		                                                                                         
 		bcopy((char *)phystokv((pmap_paddr_t) src), (char *)phystokv((pmap_paddr_t) dst), bytes);
 		return;
 	}
@@ -110,7 +110,7 @@ bzero_phys_nc(addr64_t src64, vm_size_t bytes)
 	bzero_phys(src64, bytes);
 }
 
-/* Zero bytes starting at a physical address */
+                                               
 void
 bzero_phys(addr64_t src, vm_size_t bytes)
 {
@@ -119,7 +119,7 @@ bzero_phys(addr64_t src, vm_size_t bytes)
 
 	wimg_bits = pmap_cache_attributes(pn);
 	if (__probable((wimg_bits & VM_WIMG_MASK) == VM_WIMG_DEFAULT)) {
-		/* Fast path - default attributes */
+		                                    
 		bzero((char *)phystokv((pmap_paddr_t) src), bytes);
 	} else {
 		mp_disable_preemption();
@@ -148,9 +148,9 @@ bzero_phys(addr64_t src, vm_size_t bytes)
 	}
 }
 
-/*
- *  Read data from a physical address.
- */
+  
+                                      
+   
 
 
 static unsigned int
@@ -273,9 +273,9 @@ ml_phys_read_double_64(addr64_t paddr64)
 
 
 
-/*
- *  Write data to a physical address.
- */
+  
+                                     
+   
 
 static void
 ml_phys_write_data(pmap_paddr_t paddr, unsigned long data, int size)
@@ -388,36 +388,36 @@ ml_phys_write_double_64(addr64_t paddr64, unsigned long long data)
 }
 
 
-/*
- * Set indicated bit in bit string.
- */
+  
+                                   
+   
 void
 setbit(int bitno, int *s)
 {
 	s[bitno / INT_SIZE] |= 1 << (bitno % INT_SIZE);
 }
 
-/*
- * Clear indicated bit in bit string.
- */
+  
+                                     
+   
 void
 clrbit(int bitno, int *s)
 {
 	s[bitno / INT_SIZE] &= ~(1 << (bitno % INT_SIZE));
 }
 
-/*
- * Test if indicated bit is set in bit string.
- */
+  
+                                              
+   
 int
 testbit(int bitno, int *s)
 {
 	return s[bitno / INT_SIZE] & (1 << (bitno % INT_SIZE));
 }
 
-/*
- * Find first bit set in bit string.
- */
+  
+                                    
+   
 int
 ffsbit(int *s)
 {
@@ -436,10 +436,10 @@ ffs(unsigned int mask)
 		return 0;
 	}
 
-	/*
-	 * NOTE: cannot use __builtin_ffs because it generates a call to
-	 * 'ffs'
-	 */
+	  
+                                                                 
+         
+    
 	return 1 + __builtin_ctz(mask);
 }
 
@@ -450,16 +450,16 @@ ffsll(unsigned long long mask)
 		return 0;
 	}
 
-	/*
-	 * NOTE: cannot use __builtin_ffsll because it generates a call to
-	 * 'ffsll'
-	 */
+	  
+                                                                   
+           
+    
 	return 1 + __builtin_ctzll(mask);
 }
 
-/*
- * Find last bit set in bit string.
- */
+  
+                                   
+   
 int
 fls(unsigned int mask)
 {
@@ -529,12 +529,12 @@ memcmp_zero_ptr_aligned(const void *s, size_t n)
 	a = *(const uint32_t *)p;
 	b = *(const uint32_t *)(end - sizeof(uint32_t));
 
-	/*
-	 * align p to the next 64bit boundary
-	 * align end to the previous 64bit boundary
-	 *
-	 * and do a nice ldrd loop.
-	 */
+	  
+                                      
+                                            
+   
+                            
+    
 	p = (p + sizeof(uint64_t) - 1) & -sizeof(uint64_t);
 	end &= -sizeof(uint64_t);
 
@@ -557,9 +557,9 @@ copypv(addr64_t source, addr64_t sink, unsigned int size, int which)
 	from = CAST_DOWN(void *, source);
 	to = CAST_DOWN(void *, sink);
 
-	if ((which & (cppvPsrc | cppvPsnk)) == 0) {     /* Make sure that only
-		                                         * one is virtual */
-		panic("copypv: no more than 1 parameter may be virtual\n");     /* Not allowed */
+	if ((which & (cppvPsrc | cppvPsnk)) == 0) {                           
+                                                              
+		panic("copypv: no more than 1 parameter may be virtual\n");                      
 	}
 	if (which & cppvPsrc) {
 		from = (void *)phystokv((pmap_paddr_t)from);
@@ -568,13 +568,13 @@ copypv(addr64_t source, addr64_t sink, unsigned int size, int which)
 		to = (void *)phystokv((pmap_paddr_t)to);
 	}
 
-	if ((which & (cppvPsrc | cppvKmap)) == 0) {     /* Source is virtual in
-		                                         * current map */
+	if ((which & (cppvPsrc | cppvKmap)) == 0) {                            
+                                                           
 		retval = copyin((user_addr_t) from, to, size);
-	} else if ((which & (cppvPsnk | cppvKmap)) == 0) { /* Sink is virtual in
-		                                            * current map */
+	} else if ((which & (cppvPsnk | cppvKmap)) == 0) {                      
+                                                              
 		retval = copyout(from, (user_addr_t) to, size);
-	} else {                /* both addresses are physical or kernel map */
+	} else {                                                               
 		bcopy(from, to, size);
 	}
 
@@ -598,14 +598,14 @@ copypv(addr64_t source, addr64_t sink, unsigned int size, int which)
 	return retval;
 }
 
-/*
- * Copy sizes bigger than this value will cause a kernel panic.
- *
- * Yes, this is an arbitrary fixed limit, but it's almost certainly
- * a programming error to be copying more than this amount between
- * user and wired kernel memory in a single invocation on this
- * platform.
- */
+  
+                                                               
+  
+                                                                   
+                                                                  
+                                                              
+            
+   
 const int copysize_limit_panic = (64 * 1024 * 1024);
 
 static inline bool
@@ -638,13 +638,13 @@ copy_validate_user(const user_addr_t user_addr, vm_size_t nbytes, bool kern_to_k
 	return 0;
 }
 
-/*
- * Validate the arguments to copy{in,out} on this platform.
- *
- * Called when nbytes is "large" e.g. more than a page.  Such sizes are
- * infrequent, and very large sizes are likely indications of attempts
- * to exploit kernel programming errors (bugs).
- */
+  
+                                                           
+  
+                                                                       
+                                                                      
+                                               
+   
 static int
 copy_validate(const user_addr_t user_addr,
     uintptr_t kernel_addr, vm_size_t nbytes, bool kern_to_kern_allowed)
@@ -701,16 +701,16 @@ copyoutstr_prevalidate(const void *__unused kaddr, user_addr_t __unused uaddr, s
 
 extern int copyinframe(vm_address_t fp, char *frame);
 
-/*
- * Machine-dependent routine to fill in an array with up to callstack_max
- * levels of return pc information.
- */
+  
+                                                                         
+                                   
+   
 void
 machine_callstack(
 	uintptr_t * buf,
 	vm_size_t callstack_max)
 {
-	/* Captures the USER call stack */
+	                                  
 	uint32_t i = 0;
 	uint32_t frame[2];
 
@@ -737,7 +737,7 @@ machine_callstack(
 	}
 }
 
-#endif                          /* MACH_ASSERT */
+#endif                                           
 
 int
 clr_be_bit(void)
@@ -771,8 +771,8 @@ ml_thread_policy(
 	__unused unsigned policy_id,
 	__unused unsigned policy_info)
 {
-	//    <rdar://problem/7141284>: Reduce print noise
-	//	kprintf("ml_thread_policy() unimplemented\n");
+	                                                  
+	                                                 
 }
 
 #if !MACH_KDP

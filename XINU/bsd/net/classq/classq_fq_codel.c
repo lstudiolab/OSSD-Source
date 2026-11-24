@@ -50,14 +50,14 @@
 
 #include <netinet/tcp_var.h>
 
-static uint32_t flowq_size;                     /* size of flowq */
-static struct mcache *flowq_cache = NULL;       /* mcache for flowq */
+static uint32_t flowq_size;                                        
+static struct mcache *flowq_cache = NULL;                             
 
-#define FQ_ZONE_MAX     (32 * 1024)     /* across all interfaces */
+#define FQ_ZONE_MAX     (32 * 1024)                                
 
-#define DTYPE_NODROP    0       /* no drop */
-#define DTYPE_FORCED    1       /* a "forced" drop */
-#define DTYPE_EARLY     2       /* an "unforced" (early) drop */
+#define DTYPE_NODROP    0                    
+#define DTYPE_FORCED    1                            
+#define DTYPE_EARLY     2                                       
 
 void
 fq_codel_init(void)
@@ -71,7 +71,7 @@ fq_codel_init(void)
 	    0, MCR_SLEEP);
 	if (flowq_cache == NULL) {
 		panic("%s: failed to allocate flowq_cache", __func__);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -125,10 +125,10 @@ fq_detect_dequeue_stall(fq_if_t *fqs, fq_t *flowq, fq_if_classq_t *fq_cl,
 	}
 	maxgetqtime = flowq->fq_getqtime + fqs->fqs_update_interval;
 	if ((*now) > maxgetqtime) {
-		/*
-		 * there was no dequeue in an update interval worth of
-		 * time. It means that the queue is stalled.
-		 */
+		  
+                                                        
+                                              
+     
 		FQ_SET_DELAY_HIGH(flowq);
 		fq_cl->fcl_stat.fcl_dequeue_stall++;
 		os_log_error(OS_LOG_DEFAULT, "%s: dequeue stall num: %d, "
@@ -162,7 +162,7 @@ fq_head_drop(fq_if_t *fqs, fq_t *fq)
 		break;
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -207,7 +207,7 @@ fq_compressor(fq_if_t *fqs, fq_t *fq, fq_if_classq_t *fq_cl,
 			return 0;
 		}
 
-		/* If we got until here, we should merge/replace the segment */
+		                                                               
 		MBUFQ_REMOVE(&fq->fq_mbufq, m);
 		old_pktlen = m_pktlen(m);
 		old_timestamp = m->m_pkthdr.pkt_timestamp;
@@ -242,35 +242,35 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 	pktsched_get_pkt_vars(pkt, &pkt_flags, &pkt_timestamp, &pkt_flowid,
 	    &pkt_flowsrc, &pkt_proto, NULL);
 
-	/*
-	 * XXX Not walking the chain to set this flag on every packet.
-	 * This flag is only used for debugging. Nothing is affected if it's
-	 * not set.
-	 */
+	  
+                                                               
+                                                                     
+            
+    
 	switch (pkt->pktsched_ptype) {
 	case QP_MBUF:
-		/* See comments in <rdar://problem/14040693> */
+		                                               
 		VERIFY(!(*pkt_flags & PKTF_PRIV_GUARDED));
 		*pkt_flags |= PKTF_PRIV_GUARDED;
 		break;
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
-	/*
-	 * Timestamps for every packet must be set prior to entering this path.
-	 */
+	  
+                                                                        
+    
 	now = *pkt_timestamp;
 	ASSERT(now > 0);
 
-	/* find the flowq for this packet */
+	                                    
 	fq = fq_if_hash_pkt(fqs, pkt_flowid, pktsched_get_pkt_svc(pkt),
 	    now, TRUE, pkt->pktsched_ptype);
 	if (__improbable(fq == NULL)) {
 		DTRACE_IP1(memfail__drop, fq_if_t *, fqs);
-		/* drop the packet if we could not allocate a flow queue */
+		                                                           
 		fq_cl->fcl_stat.fcl_drop_memfailure += cnt;
 		return CLASSQEQ_DROP;
 	}
@@ -282,10 +282,10 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 		if ((fq->fq_flags & FQF_FLOWCTL_CAPABLE) &&
 		    (*pkt_flags & PKTF_FLOW_ADV)) {
 			fc_adv = 1;
-			/*
-			 * If the flow is suspended or it is not
-			 * TCP/QUIC, drop the chain.
-			 */
+			  
+                                           
+                               
+      
 			if ((pkt_proto != IPPROTO_TCP) &&
 			    (pkt_proto != IPPROTO_QUIC)) {
 				droptype = DTYPE_EARLY;
@@ -296,11 +296,11 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 			    int, droptype, pktsched_pkt_t *, pkt,
 			    uint32_t, cnt);
 		} else {
-			/*
-			 * Need to drop packets to make room for the new
-			 * ones. Try to drop from the head of the queue
-			 * instead of the latest packets.
-			 */
+			  
+                                                   
+                                                  
+                                    
+      
 			if (!fq_empty(fq)) {
 				uint32_t i;
 
@@ -320,22 +320,22 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 		}
 	}
 
-	/* Set the return code correctly */
+	                                   
 	if (__improbable(fc_adv == 1 && droptype != DTYPE_FORCED)) {
 		if (fq_if_add_fcentry(fqs, pkt, pkt_flowsrc, fq, fq_cl)) {
 			fq->fq_flags |= FQF_FLOWCTL_ON;
-			/* deliver flow control advisory error */
+			                                         
 			if (droptype == DTYPE_NODROP) {
 				ret = CLASSQEQ_SUCCESS_FC;
 			} else {
-				/* dropped due to flow control */
+				                                 
 				ret = CLASSQEQ_DROP_FC;
 			}
 		} else {
-			/*
-			 * if we could not flow control the flow, it is
-			 * better to drop
-			 */
+			  
+                                                  
+                    
+      
 			droptype = DTYPE_FORCED;
 			ret = CLASSQEQ_DROP_FC;
 			fq_cl->fcl_stat.fcl_flow_control_fail++;
@@ -343,22 +343,22 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 		DTRACE_IP3(fc__ret, fq_if_t *, fqs, int, droptype, int, ret);
 	}
 
-	/*
-	 * If the queue length hits the queue limit, drop a chain with the
-	 * same number of packets from the front of the queue for a flow with
-	 * maximum number of bytes. This will penalize heavy and unresponsive
-	 * flows. It will also avoid a tail drop.
-	 */
+	  
+                                                                   
+                                                                      
+                                                                      
+                                          
+    
 	if (__improbable(droptype == DTYPE_NODROP &&
 	    fq_if_at_drop_limit(fqs))) {
 		uint32_t i;
 
 		if (fqs->fqs_large_flow == fq) {
-			/*
-			 * Drop from the head of the current fq. Since a
-			 * new packet will be added to the tail, it is ok
-			 * to leave fq in place.
-			 */
+			  
+                                                   
+                                                    
+                           
+      
 			DTRACE_IP5(large__flow, fq_if_t *, fqs,
 			    fq_if_classq_t *, fq_cl, fq_t *, fq,
 			    pktsched_pkt_t *, pkt, uint32_t, cnt);
@@ -376,10 +376,10 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 				    fq_if_classq_t *, fq_cl, fq_t *, fq,
 				    pktsched_pkt_t *, pkt, uint32_t, cnt);
 
-				/*
-				 * if this fq was freshly created and there
-				 * is nothing to enqueue, free it
-				 */
+				  
+                                               
+                                     
+       
 				if (fq_empty(fq) && !(fq->fq_flags &
 				    (FQF_NEW_FLOW | FQF_OLD_FLOW))) {
 					fq_if_destroy_flow(fqs, fq_cl, fq, true);
@@ -401,11 +401,11 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 	if (__probable(droptype == DTYPE_NODROP)) {
 		uint32_t chain_len = pktsched_get_pkt_len(pkt);
 
-		/*
-		 * We do not compress if we are enqueuing a chain.
-		 * Traversing the chain to look for acks would defeat the
-		 * purpose of batch enqueueing.
-		 */
+		  
+                                                    
+                                                           
+                                 
+     
 		if (cnt == 1) {
 			ret = fq_compressor(fqs, fq, fq_cl, pkt);
 			if (ret != CLASSQEQ_COMPRESSED) {
@@ -422,20 +422,20 @@ fq_addq(fq_if_t *fqs, pktsched_pkt_t *pkt, fq_if_classq_t *fq_cl)
 		fq_cl->fcl_stat.fcl_byte_cnt += chain_len;
 		fq_cl->fcl_stat.fcl_pkt_cnt += cnt;
 
-		/*
-		 * check if this queue will qualify to be the next
-		 * victim queue
-		 */
+		  
+                                                    
+                 
+     
 		fq_if_is_flow_heavy(fqs, fq);
 	} else {
 		DTRACE_IP3(fq_drop, fq_if_t *, fqs, int, droptype, int, ret);
 		return (ret != CLASSQEQ_SUCCESS) ? ret : CLASSQEQ_DROP;
 	}
 
-	/*
-	 * If the queue is not currently active, add it to the end of new
-	 * flows list for that service class.
-	 */
+	  
+                                                                  
+                                      
+    
 	if ((fq->fq_flags & (FQF_NEW_FLOW | FQF_OLD_FLOW)) == 0) {
 		VERIFY(STAILQ_NEXT(fq, fq_actlink) == NULL);
 		STAILQ_INSERT_TAIL(&fq_cl->fcl_new_flows, fq, fq_actlink);
@@ -474,7 +474,7 @@ fq_getq_flow_internal(fq_if_t *fqs, fq_t *fq, pktsched_pkt_t *pkt)
 	IFCQ_DEC_LEN(ifq);
 	IFCQ_DEC_BYTES(ifq, plen);
 
-	/* Reset getqtime so that we don't count idle times */
+	                                                      
 	if (fq_empty(fq)) {
 		fq->fq_getqtime = 0;
 	}
@@ -502,7 +502,7 @@ fq_getq_flow(fq_if_t *fqs, fq_t *fq, pktsched_pkt_t *pkt)
 	nanouptime(&now_ts);
 	now = (now_ts.tv_sec * NSEC_PER_SEC) + now_ts.tv_nsec;
 
-	/* this will compute qdelay in nanoseconds */
+	                                             
 	if (now > *pkt_timestamp) {
 		qdelay = now - *pkt_timestamp;
 	}
@@ -525,7 +525,7 @@ fq_getq_flow(fq_if_t *fqs, fq_t *fq, pktsched_pkt_t *pkt)
 		} else {
 			FQ_CLEAR_DELAY_HIGH(fq);
 		}
-		/* Reset measured queue delay and update time */
+		                                                
 		fq->fq_updatetime = now + fqs->fqs_update_interval;
 		fq->fq_min_qdelay = 0;
 	}
@@ -537,7 +537,7 @@ fq_getq_flow(fq_if_t *fqs, fq_t *fq, pktsched_pkt_t *pkt)
 	}
 
 	if (fq_empty(fq)) {
-		/* Reset getqtime so that we don't count idle times */
+		                                                      
 		fq->fq_getqtime = 0;
 	} else {
 		fq->fq_getqtime = now;
@@ -551,7 +551,7 @@ fq_getq_flow(fq_if_t *fqs, fq_t *fq, pktsched_pkt_t *pkt)
 		break;
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }

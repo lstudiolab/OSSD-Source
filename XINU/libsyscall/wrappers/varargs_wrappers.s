@@ -26,15 +26,15 @@
 #include "../custom/SYS.h"
 #include <mach/arm64/asm.h>
 
-/* 
- * Stubs are to handle the ARM64 ABI for variadic functions' 
- * not matching the ABI used by the system call handler.
- */
+   
+                                                             
+                                                        
+   
 
-/*
- *	sem_t* sem_open(const char *name, int oflag, ...);
- *	sem_t* __sem_open(const char *name, int oflag, int mode, int value);
- */
+  
+                                                     
+                                                                       
+   
 MI_ENTRY_POINT(_sem_open) 
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
@@ -45,19 +45,19 @@ MI_ENTRY_POINT(_sem_open)
 #endif
 	MI_CALL_EXTERNAL(___sem_open)
 #if !__LP64__
-	/* xnu returns a 64-bit '-1' on failure, but pointers must have the high
-	 * 32-bits set to zero. The following instruction is equivalent to
-	 * masking off the top 32-bits.
-	 */
+	                                                                        
+                                                                   
+                                
+    
 	mov w0, w0
 #endif
 	POP_FRAME
 	ARM64_STACK_EPILOG
 
-/* 
- * int shm_open(const char *, int, ...);
- * int __shm_open(const char*, int oflag, int mode);
- */
+   
+                                        
+                                                    
+   
 MI_ENTRY_POINT(_shm_open)
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
@@ -70,10 +70,10 @@ MI_ENTRY_POINT(_shm_open)
 	POP_FRAME
 	ARM64_STACK_EPILOG
 
-/*
- * int msgsys(int, ...);
- * int __msgsys(int which, int a2, int a3, int a4, int a5);
- */
+  
+                        
+                                                           
+   
 MI_ENTRY_POINT(_msgsys)
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
@@ -87,10 +87,10 @@ MI_ENTRY_POINT(_msgsys)
 	MI_CALL_EXTERNAL(___msgsys)
 	POP_FRAME
 
-/*
- * int semsys(int, ...);
- * int __semsys(int which, int a2, int a3, int a4, int a5);
- */
+  
+                        
+                                                           
+   
 MI_ENTRY_POINT(_semsys)
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
@@ -105,10 +105,10 @@ MI_ENTRY_POINT(_semsys)
 	POP_FRAME
 	ARM64_STACK_EPILOG
 
-/* 
- * int	semctl(int, int, int, ...);
- * int __semctl(int semid, int semnum, int cmd, semun_t arg);
- */
+   
+                                  
+                                                             
+   
  MI_ENTRY_POINT(_semctl)
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
@@ -121,10 +121,10 @@ MI_ENTRY_POINT(_semsys)
 	POP_FRAME
 	ARM64_STACK_EPILOG
 
-/* 
- * int	shmsys(int, ...);
- * int __shmsys(int which, int a2, int a3, int a4);
- */
+   
+                        
+                                                   
+   
  MI_ENTRY_POINT(_shmsys)
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
@@ -139,4 +139,4 @@ MI_ENTRY_POINT(_semsys)
 	POP_FRAME
 	ARM64_STACK_EPILOG
 
-#endif /* defined(__arm64__) */
+#endif                         

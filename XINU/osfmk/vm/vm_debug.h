@@ -42,4 +42,4 @@ extern unsigned int     vm_page_info(
 	hash_info_bucket_t      *info,
 	unsigned int            count);
 
-#endif  /* VM_VM_DEBUG_H */
+#endif                     

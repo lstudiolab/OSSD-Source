@@ -40,9 +40,9 @@ extern "C" {
 #include <corecrypto/ccrsa.h>
 #include <corecrypto/ccchacha20poly1305.h>
 
-/* Function types */
+                    
 
-/* digests */
+             
 typedef void (*ccdigest_init_fn_t)(const struct ccdigest_info *di, ccdigest_ctx_t ctx);
 typedef void (*ccdigest_update_fn_t)(const struct ccdigest_info *di, ccdigest_ctx_t ctx,
     unsigned long len, const void *data);
@@ -51,7 +51,7 @@ typedef void (*ccdigest_final_fn_t)(const struct ccdigest_info *di, ccdigest_ctx
 typedef void (*ccdigest_fn_t)(const struct ccdigest_info *di, unsigned long len,
     const void *data, void *digest);
 
-/* hmac */
+          
 typedef void (*cchmac_init_fn_t)(const struct ccdigest_info *di, cchmac_ctx_t ctx,
     unsigned long key_len, const void *key);
 typedef void (*cchmac_update_fn_t)(const struct ccdigest_info *di, cchmac_ctx_t ctx,
@@ -63,7 +63,7 @@ typedef void (*cchmac_fn_t)(const struct ccdigest_info *di, unsigned long key_le
     const void *key, unsigned long data_len, const void *data,
     unsigned char *mac);
 
-/* gcm */
+         
 typedef int (*ccgcm_init_with_iv_fn_t)(const struct ccmode_gcm *mode, ccgcm_ctx *ctx,
     size_t key_nbytes, const void *key,
     const void *iv);
@@ -82,25 +82,25 @@ typedef const struct ccchacha20poly1305_fns {
 	int (*verify)(const struct ccchacha20poly1305_info *info, ccchacha20poly1305_ctx *ctx, const uint8_t *tag);
 } *ccchacha20poly1305_fns_t;
 
-/* pbkdf2 */
+            
 typedef void (*ccpbkdf2_hmac_fn_t)(const struct ccdigest_info *di,
     unsigned long passwordLen, const void *password,
     unsigned long saltLen, const void *salt,
     unsigned long iterations,
     unsigned long dkLen, void *dk);
 
-/* des weak key testing */
+                          
 typedef int (*ccdes_key_is_weak_fn_t)(void *key, unsigned long  length);
 typedef void (*ccdes_key_set_odd_parity_fn_t)(void *key, unsigned long length);
 
-/* CBC padding (such as PKCS7 or CTSx per NIST standard) */
+                                                           
 typedef size_t (*ccpad_cts3_crypt_fn_t)(const struct ccmode_cbc *cbc, cccbc_ctx *cbc_key,
     cccbc_iv *iv, size_t nbytes, const void *in, void *out);
 
-/* rng */
+         
 typedef struct ccrng_state *(*ccrng_fn_t)(int *error);
 
-/* rsa */
+         
 typedef int (*ccrsa_make_pub_fn_t)(ccrsa_pub_ctx_t pubk,
     size_t exp_nbytes, const uint8_t *exp,
     size_t mod_nbytes, const uint8_t *mod);
@@ -111,26 +111,26 @@ typedef int (*ccrsa_verify_pkcs1v15_fn_t)(ccrsa_pub_ctx_t key, const uint8_t *oi
     bool *valid);
 
 typedef struct crypto_functions {
-	/* digests common functions */
+	                              
 	ccdigest_init_fn_t ccdigest_init_fn;
 	ccdigest_update_fn_t ccdigest_update_fn;
 	ccdigest_final_fn_t ccdigest_final_fn;
 	ccdigest_fn_t ccdigest_fn;
-	/* digest implementations */
+	                            
 	const struct ccdigest_info * ccmd5_di;
 	const struct ccdigest_info * ccsha1_di;
 	const struct ccdigest_info * ccsha256_di;
 	const struct ccdigest_info * ccsha384_di;
 	const struct ccdigest_info * ccsha512_di;
 
-	/* hmac common function */
+	                          
 	cchmac_init_fn_t cchmac_init_fn;
 	cchmac_update_fn_t cchmac_update_fn;
 	cchmac_final_fn_t cchmac_final_fn;
 	cchmac_fn_t cchmac_fn;
 
-	/* ciphers modes implementations */
-	/* AES, ecb, cbc and xts */
+	                                   
+	                           
 	const struct ccmode_ecb *ccaes_ecb_encrypt;
 	const struct ccmode_ecb *ccaes_ecb_decrypt;
 	const struct ccmode_cbc *ccaes_cbc_encrypt;
@@ -146,27 +146,27 @@ typedef struct crypto_functions {
 
 	ccchacha20poly1305_fns_t ccchacha20poly1305_fns;
 
-	/* DES, ecb and cbc */
+	                      
 	const struct ccmode_ecb *ccdes_ecb_encrypt;
 	const struct ccmode_ecb *ccdes_ecb_decrypt;
 	const struct ccmode_cbc *ccdes_cbc_encrypt;
 	const struct ccmode_cbc *ccdes_cbc_decrypt;
-	/* Triple DES, ecb and cbc */
+	                             
 	const struct ccmode_ecb *cctdes_ecb_encrypt;
 	const struct ccmode_ecb *cctdes_ecb_decrypt;
 	const struct ccmode_cbc *cctdes_cbc_encrypt;
 	const struct ccmode_cbc *cctdes_cbc_decrypt;
-	/* DES key helper functions */
+	                              
 	ccdes_key_is_weak_fn_t ccdes_key_is_weak_fn;
 	ccdes_key_set_odd_parity_fn_t ccdes_key_set_odd_parity_fn;
-	/* CTS3 padding+encrypt functions */
+	                                    
 	ccpad_cts3_crypt_fn_t ccpad_cts3_encrypt_fn;
 	ccpad_cts3_crypt_fn_t ccpad_cts3_decrypt_fn;
 
-	/* rng */
+	         
 	ccrng_fn_t ccrng_fn;
 
-	/* rsa */
+	         
 	ccrsa_make_pub_fn_t        ccrsa_make_pub_fn;
 	ccrsa_verify_pkcs1v15_fn_t ccrsa_verify_pkcs1v15_fn;
 } *crypto_functions_t;
@@ -177,4 +177,4 @@ int register_crypto_functions(const crypto_functions_t funcs);
 }
 #endif
 
-#endif /*_CRYPTO_REGISTER_CRYPTO_H_*/
+#endif                               

@@ -51,7 +51,7 @@ int vm_record_file_write(struct vnode *vp, uint64_t offset, char *buf, int size)
 
 #if CONFIG_FREEZE
 int vm_swap_vol_get_budget(vnode_t vp, uint64_t *freeze_daily_budget);
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 
 void
@@ -66,11 +66,11 @@ vm_swapfile_open(const char *path, vnode_t *vp)
 		return;
 	}
 
-	/*
-	 * If MNT_IOFLAGS_NOSWAP is set, opening the swap file should fail.
-	 * To avoid a race on the mount we only make this check after creating the
-	 * vnode.
-	 */
+	  
+                                                                    
+                                                                           
+          
+    
 	if ((*vp)->v_mount->mnt_kern_flag & MNTK_NOSWAP) {
 		vnode_put(*vp);
 		vm_swapfile_close((uint64_t)path, *vp);
@@ -123,7 +123,7 @@ vm_swapfile_preallocate(vnode_t vp, uint64_t *size, boolean_t *pin)
 	vfs_context_t   ctx = NULL;
 #if CONFIG_FREEZE
 	struct vnode_attr va;
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 	ctx = vfs_context_kernel();
 
@@ -147,7 +147,7 @@ vm_swapfile_preallocate(vnode_t vp, uint64_t *size, boolean_t *pin)
 
 		if (error) {
 			printf("pin for swap files failed: %d,  file_size = %lld\n", error, file_size);
-			/* this is not fatal, carry on with files wherever they landed */
+			                                                                 
 			*pin = FALSE;
 			error = 0;
 		}
@@ -166,7 +166,7 @@ vm_swapfile_preallocate(vnode_t vp, uint64_t *size, boolean_t *pin)
 		printf("setattr PROTECTION_CLASS_C for swap file failed: %d\n", error);
 		goto done;
 	}
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 done:
 	return error;
@@ -241,9 +241,9 @@ vm_swapfile_io(vnode_t vp, uint64_t offset, uint64_t start, int npages, int flag
 		if (error) {
 #if DEBUG
 			printf("vm_swapfile_io: vnode_pagein failed with %d (vp: %p, offset: 0x%llx, size:%u)\n", error, vp, offset, io_size);
-#else /* DEBUG */
+#else            
 			printf("vm_swapfile_io: vnode_pagein failed with %d.\n", error);
-#endif /* DEBUG */
+#endif            
 		}
 	} else {
 		upl_set_iodone(upl, upl_iodone);
@@ -258,15 +258,15 @@ vm_swapfile_io(vnode_t vp, uint64_t offset, uint64_t start, int npages, int flag
 		if (error) {
 #if DEBUG
 			printf("vm_swapfile_io: vnode_pageout failed with %d (vp: %p, offset: 0x%llx, size:%u)\n", error, vp, offset, io_size);
-#else /* DEBUG */
+#else            
 			printf("vm_swapfile_io: vnode_pageout failed with %d.\n", error);
-#endif /* DEBUG */
+#endif            
 		}
 	}
 
 	return error;
 
-#else /* 1 */
+#else        
 	vfs_context_t ctx;
 	ctx = vfs_context_kernel();
 
@@ -277,15 +277,15 @@ vm_swapfile_io(vnode_t vp, uint64_t offset, uint64_t start, int npages, int flag
 		printf("vn_rdwr: Swap I/O failed with %d\n", error);
 	}
 	return error;
-#endif /* 1 */
+#endif        
 }
 
 
 #define MAX_BATCH_TO_TRIM       256
 
-#define ROUTE_ONLY              0x10            /* if corestorage is present, tell it to just pass */
-                                                /* the DKIOUNMAP command through w/o acting on it */
-                                                /* this is used by the compressed swap system to reclaim empty space */
+#define ROUTE_ONLY              0x10                                                                 
+                                                                                                    
+                                                                                                                       
 
 
 u_int32_t
@@ -307,9 +307,9 @@ vnode_trim_list(vnode_t vp, struct trim_list *tl, boolean_t route_only)
 		return 0;
 	}
 
-	/*
-	 * Get the underlying device vnode and physical block size
-	 */
+	  
+                                                           
+    
 	devvp = vp->v_mount->mnt_devvp;
 	blocksize = vp->v_mount->mnt_devblocksize;
 
@@ -329,8 +329,8 @@ vnode_trim_list(vnode_t vp, struct trim_list *tl, boolean_t route_only)
 	}
 
 	while (tl) {
-		daddr64_t       io_blockno;     /* Block number corresponding to the start of the extent */
-		size_t          io_bytecount;   /* Number of bytes in current extent for the specified range */
+		daddr64_t       io_blockno;                                                                
+		size_t          io_bytecount;                                                                  
 		size_t          trimmed;
 		size_t          remaining_length;
 		off_t           current_offset;
@@ -339,18 +339,18 @@ vnode_trim_list(vnode_t vp, struct trim_list *tl, boolean_t route_only)
 		remaining_length = tl->tl_length;
 		trimmed = 0;
 
-		/*
-		 * We may not get the entire range from tl_offset -> tl_offset+tl_length in a single
-		 * extent from the blockmap call.  Keep looping/going until we are sure we've hit
-		 * the whole range or if we encounter an error.
-		 */
+		  
+                                                                                      
+                                                                                   
+                                                 
+     
 		while (trimmed < tl->tl_length) {
-			/*
-			 * VNOP_BLOCKMAP will tell us the logical to physical block number mapping for the
-			 * specified offset.  It returns blocks in contiguous chunks, so if the logical range is
-			 * broken into multiple extents, it must be called multiple times, increasing the offset
-			 * in each call to ensure that the entire range is covered.
-			 */
+			  
+                                                                                     
+                                                                                           
+                                                                                           
+                                                              
+      
 			error = VNOP_BLOCKMAP(vp, current_offset, remaining_length,
 			    &io_blockno, &io_bytecount, NULL, VNODE_READ | VNODE_BLOCKMAP_NO_TRACK, NULL);
 
@@ -411,4 +411,4 @@ vm_swap_vol_get_budget(vnode_t vp, uint64_t *freeze_daily_budget)
 
 	return err;
 }
-#endif /* CONFIG_FREEZE */
+#endif                    

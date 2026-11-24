@@ -26,17 +26,17 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * file: pal_routines.c
- *       Platform Abstraction Layer routines for ARM
- */
+  
+                       
+                                                    
+   
 
 
 #include <machine/pal_routines.h>
 #include <mach/mach_types.h>
 #include <pexpert/arm/protos.h>
 
-/* Serial routines */
+                     
 int
 pal_serial_init(void)
 {

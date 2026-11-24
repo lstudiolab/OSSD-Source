@@ -45,10 +45,10 @@
 
 #include <kern/locks.h>
 
-/*
- * MPTCP Retransmission Timer comes into play only when subflow level
- * data is acked, but Data ACK is not received. Time is in seconds.
- */
+  
+                                                                     
+                                                                   
+   
 static u_int32_t mptcp_rto = 3;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, rto, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_rto, 0, "MPTCP Retransmission Timeout");
@@ -57,9 +57,9 @@ static int mptcp_nrtos = 3;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, nrto, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_rto, 0, "MPTCP Retransmissions");
 
-/*
- * MPTCP connections timewait interval in seconds.
- */
+  
+                                                  
+   
 static u_int32_t mptcp_tw = 60;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, tw, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_tw, 0, "MPTCP Timewait Period");
@@ -105,7 +105,7 @@ mptcp_timer_demux(struct mptses *mpte, uint64_t now_msecs)
 		}
 		break;
 	case MPTT_TW:
-		/* Allows for break before make XXX */
+		                                      
 		if (mp_tp->mpt_timewait == 0) {
 			VERIFY(0);
 		}
@@ -118,7 +118,7 @@ mptcp_timer_demux(struct mptses *mpte, uint64_t now_msecs)
 		}
 		break;
 	case MPTT_FASTCLOSE:
-		/* TODO XXX */
+		              
 		break;
 	default:
 		break;
@@ -180,16 +180,16 @@ mptcp_start_timer(struct mptses *mpte, int timer_type)
 		mp_tp->mpt_rtseq = mp_tp->mpt_sndnxt;
 		break;
 	case MPTT_TW:
-		/* XXX: Not implemented yet */
+		                              
 		mp_tp->mpt_timer_vals |= MPTT_TW;
 		mp_tp->mpt_timewait = TIMEVAL_TO_HZ(now);
 		break;
 	case MPTT_FASTCLOSE:
-		/* NO-OP */
+		           
 		break;
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 	}
 	mptcp_timer_sched();
 }
@@ -206,10 +206,10 @@ mptcp_cancel_timer(struct mptcb *mp_tp, int timer_type)
 		mp_tp->mpt_timer_vals = 0;
 		break;
 	case MPTT_TW:
-		/* NO-OP */
+		           
 		break;
 	case MPTT_FASTCLOSE:
-		/* NO-OP */
+		           
 		break;
 	default:
 		break;
@@ -262,7 +262,7 @@ mptcp_urgency_timer(void *param0, __unused void *param1)
 void
 mptcp_init_urgency_timer(struct mptses *mpte)
 {
-	/* thread_call_allocate never fails */
+	                                      
 	mpte->mpte_time_thread = thread_call_allocate(mptcp_urgency_timer, mpte);
 }
 
@@ -300,7 +300,7 @@ mptcp_set_urgency_timer(struct mptses *mpte)
 	} else if ((int64_t)(mpte->mpte_time_target - time_now) <= 0) {
 		mp_so->so_usecount++;
 
-		/* Already passed the deadline, trigger subflows now */
+		                                                       
 		mptcp_urgency_timer_locked(mpte);
 	}
 

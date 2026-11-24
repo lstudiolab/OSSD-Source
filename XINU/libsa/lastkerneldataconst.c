@@ -28,18 +28,18 @@
 
 #include <mach/vm_param.h>
 
-/*
- * This file is compiled and linked to be the last .o of the __const section
- * of the __DATA segment (see MakeInc.kernel, lastkernelconstructor is placed
- * in the __LAST segment.)
- *
- * This blank page allows us to safely map the const section RO while the rest
- * of __DATA is RW. This is needed since ld has no way of specifying section size
- * alignment and no straight forward way to specify section ordering.
- */
+  
+                                                                            
+                                                                             
+                          
+  
+                                                                              
+                                                                                 
+                                                                     
+   
 
 #if defined(__arm64__)
-/* PAGE_SIZE on ARM64 is an expression derived from a non-const global variable */
+                                                                                  
 #define PAD_SIZE        PAGE_MAX_SIZE
 #else
 #define PAD_SIZE        PAGE_SIZE

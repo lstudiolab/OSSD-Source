@@ -78,10 +78,10 @@ struct pktap_softc {
 
 #ifndef PKTAP_DEBUG
 #define PKTAP_DEBUG 0
-#endif /* PKTAP_DEBUG */
+#endif                  
 
-#define PKTAP_FILTER_OK 0               /* Packet passes filter checks */
-#define PKTAP_FILTER_SKIP 1             /* Do not tap this packet */
+#define PKTAP_FILTER_OK 0                                                
+#define PKTAP_FILTER_SKIP 1                                         
 
 static int pktap_inited = 0;
 
@@ -114,9 +114,9 @@ do { \
 #define PKTP_LOG_ERROR 0x10
 #define PKTP_LOG_NOPCB 0x20
 
-/*
- * pktap_lck_rw protects the global list of pktap interfaces
- */
+  
+                                                            
+   
 decl_lck_rw_data(static, pktap_lck_rw_data);
 static lck_rw_t *pktap_lck_rw = &pktap_lck_rw_data;
 static lck_grp_t *pktap_lck_grp = NULL;
@@ -195,7 +195,7 @@ pktap_init(void)
 
 	_CASSERT_OFFFSETOF_FIELD(pktap_header, pktap_v2_hdr, pth_flags);
 
-	/* Make sure we're called only once */
+	                                      
 	VERIFY(pktap_inited == 0);
 
 	pktap_inited = 1;
@@ -205,7 +205,7 @@ pktap_init(void)
 	pktap_lck_attr = lck_attr_alloc_init();
 #if PKTAP_DEBUG
 	lck_attr_setdebug(pktap_lck_attr);
-#endif /* PKTAP_DEBUG */
+#endif                  
 	lck_rw_init(pktap_lck_rw, pktap_lck_grp, pktap_lck_attr);
 	lck_grp_attr_free(lck_grp_attr);
 
@@ -235,9 +235,9 @@ pktap_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	}
 	pktap->pktp_unit = unit;
 
-	/*
-	 * By default accept packet from physical interfaces
-	 */
+	  
+                                                     
+    
 	pktap->pktp_filters[0].filter_op = PKTAP_FILTER_OP_PASS;
 	pktap->pktp_filters[0].filter_param = PKTAP_FILTER_PARAM_IF_TYPE;
 	pktap->pktp_filters[0].filter_param_if_type = IFT_ETHER;
@@ -246,20 +246,20 @@ pktap_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 	pktap->pktp_filters[1].filter_op = PKTAP_FILTER_OP_PASS;
 	pktap->pktp_filters[1].filter_param = PKTAP_FILTER_PARAM_IF_TYPE;
 	pktap->pktp_filters[1].filter_param_if_type = IFT_CELLULAR;
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 	pktap->pktp_filters[1].filter_op = PKTAP_FILTER_OP_PASS;
 	pktap->pktp_filters[1].filter_param = PKTAP_FILTER_PARAM_IF_TYPE;
 	pktap->pktp_filters[1].filter_param_if_type = IFT_IEEE1394;
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 	pktap->pktp_filters[2].filter_op = PKTAP_FILTER_OP_PASS;
 	pktap->pktp_filters[2].filter_param = PKTAP_FILTER_PARAM_IF_TYPE;
 	pktap->pktp_filters[2].filter_param_if_type = IFT_OTHER;
 
-	/*
-	 * We do not use a set_bpf_tap() function as we rather rely on the more
-	 * accurate callback passed to bpf_attach()
-	 */
+	  
+                                                                        
+                                            
+    
 	bzero(&if_init, sizeof(if_init));
 	if_init.ver = IFNET_INIT_CURRENT_VERSION;
 	if_init.len = sizeof(if_init);
@@ -292,12 +292,12 @@ pktap_clone_create(struct if_clone *ifc, u_int32_t unit, __unused void *params)
 		goto done;
 	}
 
-	/* Attach DLT_PKTAP as the default DLT */
+	                                         
 	bpf_attach(pktap->pktp_ifp, DLT_PKTAP, sizeof(struct pktap_header),
 	    NULL, pktap_tap_callback);
 	bpf_attach(pktap->pktp_ifp, DLT_RAW, 0, NULL, pktap_tap_callback);
 
-	/* Take a reference and add to the global list */
+	                                                 
 	ifnet_reference(pktap->pktp_ifp);
 	lck_rw_lock_exclusive(pktap_lck_rw);
 	LIST_INSERT_HEAD(&pktap_list, pktap, pktp_link);
@@ -321,13 +321,13 @@ pktap_clone_destroy(struct ifnet *ifp)
 	return error;
 }
 
-/*
- * This function is called whenever a DLT is set on the interface:
- * - When interface is attached to a BPF device via BIOCSETIF for the
- *   default DLT
- * - Whenever a new DLT is selected via BIOCSDLT
- * - When the interface is detached from a BPF device (direction is zero)
- */
+  
+                                                                  
+                                                                     
+                
+                                                
+                                                                         
+   
 __private_extern__ errno_t
 pktap_tap_callback(ifnet_t ifp, u_int32_t dlt, bpf_tap_mode direction)
 {
@@ -364,10 +364,10 @@ pktap_tap_callback(ifnet_t ifp, u_int32_t dlt, bpf_tap_mode direction)
 		break;
 	}
 done:
-	/*
-	 * Attachements count must be positive and we're in trouble
-	 * if we have more that 2**31 attachements
-	 */
+	  
+                                                            
+                                           
+    
 	VERIFY(pktap_total_tap_count >= 0);
 
 	return 0;
@@ -512,20 +512,20 @@ pktap_setdrvspec(ifnet_t ifp, struct ifdrv64 *ifd)
 			printf("%s: copyin - error %d\n", __func__, error);
 			goto done;
 		}
-		/*
-		 * Validate user provided parameters
-		 */
+		  
+                                      
+     
 		for (i = 0; i < PKTAP_MAX_FILTERS; i++) {
 			struct x_pktap_filter *x_filter = user_filters + i;
 
 			switch (x_filter->filter_op) {
 			case PKTAP_FILTER_OP_NONE:
-				/* Following entries must be PKTAP_FILTER_OP_NONE */
+				                                                    
 				got_op_none = 1;
 				break;
 			case PKTAP_FILTER_OP_PASS:
 			case PKTAP_FILTER_OP_SKIP:
-				/* Invalid after PKTAP_FILTER_OP_NONE */
+				                                        
 				if (got_op_none) {
 					error = EINVAL;
 					break;
@@ -547,9 +547,9 @@ pktap_setdrvspec(ifnet_t ifp, struct ifdrv64 *ifd)
 				}
 				break;
 
-			/*
-			 * Do not allow to tap a pktap from a pktap
-			 */
+			  
+                                              
+      
 			case PKTAP_FILTER_PARAM_IF_TYPE:
 				if (x_filter->filter_param_if_type == IFT_PKTAP ||
 				    x_filter->filter_param_if_type > 0xff) {
@@ -592,10 +592,10 @@ pktap_setdrvspec(ifnet_t ifp, struct ifdrv64 *ifd)
 				strlcpy(pktap_filter->filter_param_if_name,
 				    x_filter->filter_param_if_name,
 				    sizeof(pktap_filter->filter_param_if_name));
-				/*
-				 * If name does not end with a number then it's a "wildcard" match
-				 * where we compare the prefix of the interface name
-				 */
+				  
+                                                                      
+                                                        
+       
 				len = strlen(pktap_filter->filter_param_if_name);
 				if (pktap_filter->filter_param_if_name[len] < '0' ||
 				    pktap_filter->filter_param_if_name[len] > '9') {
@@ -694,11 +694,11 @@ pktap_detach(ifnet_t ifp)
 
 	lck_rw_done(pktap_lck_rw);
 
-	/* Drop reference as it's no more on the global list */
+	                                                       
 	ifnet_release(ifp);
 
 	if_clone_softc_deallocate(&pktap_cloner, pktap);
-	/* This is for the reference taken by ifnet_attach() */
+	                                                       
 	(void) ifnet_release(ifp);
 }
 
@@ -706,7 +706,7 @@ __private_extern__ int
 pktap_filter_evaluate(struct pktap_softc *pktap, struct ifnet *ifp)
 {
 	int i;
-	int result = PKTAP_FILTER_SKIP; /* Need positive matching rule to pass */
+	int result = PKTAP_FILTER_SKIP;                                          
 	int match = 0;
 
 	for (i = 0; i < PKTAP_MAX_FILTERS; i++) {
@@ -849,9 +849,9 @@ pktap_v2_set_procinfo(struct pktap_v2_hdr *pktap_v2_hdr,
 		return;
 	}
 
-	/*
-	 * The effective UUID may be set independently from the effective pid
-	 */
+	  
+                                                                      
+    
 	if (soprocinfo->spi_delegated != 0) {
 		pktap_v2_hdr->pth_flags |= PTH_FLAG_PROC_DELEGATED;
 		pktap_v2_hdr->pth_e_pid = soprocinfo->spi_epid;
@@ -901,17 +901,17 @@ __private_extern__ void
 pktap_fill_proc_info(struct pktap_header *hdr, protocol_family_t proto,
     struct mbuf *m, u_int32_t pre, int outgoing, struct ifnet *ifp)
 {
-	/*
-	 * Getting the pid and procname is expensive
-	 * For outgoing, do the lookup only if there's an
-	 * associated socket as indicated by the flowhash
-	 */
+	  
+                                             
+                                                  
+                                                  
+    
 	if (outgoing != 0 && m->m_pkthdr.pkt_flowsrc == FLOWSRC_INPCB) {
-		/*
-		 * To avoid lock ordering issues we delay the proc UUID lookup
-		 * to the BPF read as we cannot
-		 * assume the socket lock is unlocked on output
-		 */
+		  
+                                                                
+                                 
+                                                 
+     
 		hdr->pth_flags |= PTH_FLAG_DELAY_PKTAP;
 		hdr->pth_flags |= PTH_FLAG_SOCKET;
 		hdr->pth_flowid = m->m_pkthdr.pkt_flowid;
@@ -1098,9 +1098,9 @@ pktap_fill_proc_info(struct pktap_header *hdr, protocol_family_t proto,
 			in_pcb_checkstate(inp, WNT_RELEASE, 0);
 		}
 done:
-		/*
-		 * -1 means PID not found
-		 */
+		  
+                           
+     
 		hdr->pth_pid = -1;
 		hdr->pth_epid = -1;
 
@@ -1118,19 +1118,19 @@ pktap_bpf_tap(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 	void (*bpf_tap_func)(ifnet_t, u_int32_t, mbuf_t, void *, size_t) =
 	    outgoing ? bpf_tap_out : bpf_tap_in;
 
-	/*
-	 * Skip the coprocessor interface
-	 */
+	  
+                                  
+    
 	if (!intcoproc_unrestricted && IFNET_IS_INTCOPROC(ifp)) {
 		return;
 	}
 
 	lck_rw_lock_shared(pktap_lck_rw);
 
-	/*
-	 * No need to take the ifnet_lock as the struct ifnet field if_bpf is
-	 * protected by the BPF subsystem
-	 */
+	  
+                                                                      
+                                  
+    
 	LIST_FOREACH(pktap, &pktap_list, pktp_link) {
 		int filter_result;
 
@@ -1140,14 +1140,14 @@ pktap_bpf_tap(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 		}
 
 		if (pktap->pktp_dlt_raw_count > 0) {
-			/* We accept only IPv4 and IPv6 packets for the raw DLT */
+			                                                          
 			if ((proto == AF_INET || proto == AF_INET6) &&
 			    !(m->m_pkthdr.pkt_flags & PKTF_INET_RESOLVE)) {
-				/*
-				 * We can play just with the length of the first mbuf in the
-				 * chain because bpf_tap_imp() disregard the packet length
-				 * of the mbuf packet header.
-				 */
+				  
+                                                                
+                                                              
+                                 
+       
 				if (mbuf_setdata(m, m->m_data + pre, m->m_len - pre) == 0) {
 					bpf_tap_func(pktap->pktp_ifp, DLT_RAW, m, NULL, 0);
 					mbuf_setdata(m, m->m_data - pre, m->m_len + pre);
@@ -1166,29 +1166,29 @@ pktap_bpf_tap(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 			size_t data_adjust = 0;
 			u_int32_t pre_adjust = 0;
 
-			/* Verify the structure is packed */
+			                                    
 			_CASSERT(sizeof(hdr_buffer) == sizeof(struct pktap_header) + sizeof(u_int32_t));
 
 			bzero(&hdr_buffer, sizeof(hdr_buffer));
 			hdr->pth_length = sizeof(struct pktap_header);
 			hdr->pth_type_next = PTH_TYPE_PACKET;
 
-			/*
-			 * Set DLT of packet based on interface type
-			 */
+			  
+                                               
+      
 			switch (ifp->if_type) {
 			case IFT_LOOP:
 			case IFT_GIF:
 			case IFT_STF:
 			case IFT_CELLULAR:
-				/*
-				 * Packets from pdp interfaces have no loopback
-				 * header that contain the protocol number.
-				 * As BPF just concatenate the header and the
-				 * packet content in a single buffer,
-				 * stash the protocol after the pktap header
-				 * and adjust the size of the header accordingly
-				 */
+				  
+                                                   
+                                               
+                                                 
+                                         
+                                                
+                                                    
+       
 				hdr->pth_dlt = DLT_NULL;
 				if (pre == 0) {
 					hdr_buffer.proto = proto;
@@ -1211,11 +1211,11 @@ pktap_bpf_tap(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 			case IFT_OTHER:
 				if (ifp->if_family == IFNET_FAMILY_IPSEC ||
 				    ifp->if_family == IFNET_FAMILY_UTUN) {
-					/*
-					 * For utun:
-					 * - incoming packets do not have the prefix set to four
-					 * - some packets are as small as two bytes!
-					 */
+					  
+                 
+                                                             
+                                                 
+        
 					if (m_pktlen(m) < 4) {
 						goto done;
 					}
@@ -1229,18 +1229,18 @@ pktap_bpf_tap(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 						goto done;
 					}
 
-					/*
-					 * Handle two cases:
-					 * - The old utun encapsulation with the protocol family in network order
-					 * - A raw IPv4 or IPv6 packet
-					 */
+					  
+                         
+                                                                              
+                                   
+        
 					uint8_t data = *(uint8_t *)mbuf_data(m);
 					if ((data >> 4) == 4 || (data >> 4) == 6) {
 						pre = 4;
 					} else {
-						/*
-						 * Skip the protocol in the mbuf as it's in network order
-						 */
+						  
+                                                               
+         
 						pre = 4;
 						data_adjust = 4;
 					}
@@ -1286,11 +1286,11 @@ pktap_bpf_tap(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 				if (data_adjust == 0) {
 					bpf_tap_func(pktap->pktp_ifp, DLT_PKTAP, m, hdr, hdr_size);
 				} else {
-					/*
-					 * We can play just with the length of the first mbuf in the
-					 * chain because bpf_tap_imp() disregard the packet length
-					 * of the mbuf packet header.
-					 */
+					  
+                                                                 
+                                                               
+                                  
+        
 					if (mbuf_setdata(m, m->m_data + data_adjust, m->m_len - data_adjust) == 0) {
 						bpf_tap_func(pktap->pktp_ifp, DLT_PKTAP, m, hdr, hdr_size);
 						mbuf_setdata(m, m->m_data - data_adjust, m->m_len + data_adjust);
@@ -1310,7 +1310,7 @@ pktap_input(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 	char *hdr;
 	char *start;
 
-	/* Fast path */
+	               
 	if (pktap_total_tap_count == 0 ||
 	    (m->m_pkthdr.pkt_flags & PKTF_SKIP_PKTAP) != 0) {
 		return;
@@ -1318,7 +1318,7 @@ pktap_input(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
 
 	hdr = (char *)mbuf_data(m);
 	start = (char *)mbuf_datastart(m);
-	/* Make sure the frame header is fully contained in the  mbuf */
+	                                                                
 	if (frame_header != NULL && frame_header >= start && frame_header <= hdr) {
 		size_t o_len = m->m_len;
 		u_int32_t pre = (u_int32_t)(hdr - frame_header);
@@ -1342,7 +1342,7 @@ __private_extern__ void
 pktap_output(struct ifnet *ifp, protocol_family_t proto, struct mbuf *m,
     u_int32_t pre, u_int32_t post)
 {
-	/* Fast path */
+	               
 	if (pktap_total_tap_count == 0 ||
 	    (m->m_pkthdr.pkt_flags & PKTF_SKIP_PKTAP) != 0) {
 		return;
@@ -1373,9 +1373,9 @@ convert_to_pktap_header_to_v2(struct bpf_packet *bpf_pkt, bool truncate)
 
 	VERIFY(bpf_pkt->bpfp_header_length >= sizeof(struct pktap_header));
 
-	/*
-	 * extra_src_size is the length of the optional link layer header
-	 */
+	  
+                                                                  
+    
 	extra_src_size = bpf_pkt->bpfp_header_length -
 	    sizeof(struct pktap_header);
 
@@ -1387,9 +1387,9 @@ convert_to_pktap_header_to_v2(struct bpf_packet *bpf_pkt, bool truncate)
 
 	COPY_PKTAP_COMMON_FIELDS_TO_V2(pktap_v2_hdr, pktap_header);
 
-	/*
-	 * When truncating don't bother with the process UUIDs
-	 */
+	  
+                                                       
+    
 	if (!truncate) {
 		if ((pktap_header->pth_flags & PTH_FLAG_DELAY_PKTAP)) {
 			pktap_v2_hdr->pth_uuid_offset = pktap_v2_hdr->pth_length;
@@ -1427,10 +1427,10 @@ convert_to_pktap_header_to_v2(struct bpf_packet *bpf_pkt, bool truncate)
 
 		pktap_v2_hdr->pth_ifname_offset = pktap_v2_hdr->pth_length;
 
-		/*
-		 * Note: strlcpy() returns the length of the string so we need
-		 * to add one for the end-of-string
-		 */
+		  
+                                                                
+                                     
+     
 		strsize = 1 + strlcpy((char *)ptr, pktap_header->pth_ifname,
 		    sizeof(pktap_v2_hdr_space->pth_ifname));
 		pktap_v2_hdr->pth_length += strsize;
@@ -1438,9 +1438,9 @@ convert_to_pktap_header_to_v2(struct bpf_packet *bpf_pkt, bool truncate)
 		VERIFY((void *)ptr < (void *)(pktap_v2_hdr_space + 1));
 	}
 
-	/*
-	 * Do not waste space with the process name if we do not have a pid
-	 */
+	  
+                                                                    
+    
 	if (pktap_header->pth_pid != 0 && pktap_header->pth_pid != -1) {
 		if (pktap_header->pth_comm[0] != 0) {
 			size_t strsize;
@@ -1457,17 +1457,17 @@ convert_to_pktap_header_to_v2(struct bpf_packet *bpf_pkt, bool truncate)
 
 			pktap_v2_hdr->pth_comm_offset = pktap_v2_hdr->pth_length;
 
-			*ptr = 0;       /* empty string by default */
+			*ptr = 0;                                    
 			pktap_v2_hdr->pth_length += strsize;
 			ptr += strsize;
 			VERIFY((void *)ptr < (void *)(pktap_v2_hdr_space + 1));
 		}
 	}
 
-	/*
-	 * Do not waste space with the effective process name if we do not have
-	 * an effective pid or it's the same as the pid
-	 */
+	  
+                                                                        
+                                                
+    
 	if (pktap_header->pth_epid != 0 && pktap_header->pth_epid != -1 &&
 	    pktap_header->pth_epid != pktap_header->pth_pid) {
 		if (pktap_header->pth_ecomm[0] != 0) {
@@ -1484,7 +1484,7 @@ convert_to_pktap_header_to_v2(struct bpf_packet *bpf_pkt, bool truncate)
 			size_t strsize = sizeof(pktap_v2_hdr_space->pth_e_comm);
 
 			pktap_v2_hdr->pth_e_comm_offset = pktap_v2_hdr->pth_length;
-			*ptr = 0;       /* empty string by default */
+			*ptr = 0;                                    
 			pktap_v2_hdr->pth_length += strsize;
 			ptr += strsize;
 			VERIFY((void *)ptr < (void *)(pktap_v2_hdr_space + 1));

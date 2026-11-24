@@ -33,25 +33,25 @@
 
 void *__mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off);
 
-/*
- * mmap stub, with preemptory failures due to extra parameter checking
- * mandated for conformance.
- *
- * This is for UNIX03 only.
- */
+  
+                                                                      
+                            
+  
+                           
+   
 void *
 mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off)
 {
-	/*
-	 * Preemptory failures:
-	 *
-	 * o	off is not a multiple of the page size
-	 *      [ This is enforced by the kernel with MAP_UNIX03 ]
-	 * o	flags does not contain either MAP_PRIVATE or MAP_SHARED
-	 * o	len is zero
-	 *
-	 * Now enforced by the kernel when the MAP_UNIX03 flag is provided.
-	 */
+	  
+                        
+   
+                                            
+                                                           
+                                                             
+                 
+   
+                                                                    
+    
 	extern void cerror_nocancel(int);
 	if ((((flags & MAP_PRIVATE) != MAP_PRIVATE) &&
 	    ((flags & MAP_SHARED) != MAP_SHARED)) ||
@@ -75,4 +75,4 @@ mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off)
 	return ptr;
 }
 
-#endif /* __DARWIN_UNIX03 */
+#endif                      

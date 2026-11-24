@@ -124,15 +124,15 @@ tcp_newreno_cleanup(struct tcpcb *tp)
 	return 0;
 }
 
-/* Initialize the congestion window for a connection or
- * handles connections that have been idle for
- * some time. In this state, no acks are
- * expected to clock out any data we send --
- * slow start to get ack "clock" running again.
- *
- * Set the slow-start flight size depending on whether
- * this is a local network or not.
- */
+                                                       
+                                              
+                                        
+                                            
+                                               
+  
+                                                      
+                                  
+   
 void
 tcp_newreno_cwnd_init_or_reset(struct tcpcb *tp)
 {
@@ -140,18 +140,18 @@ tcp_newreno_cwnd_init_or_reset(struct tcpcb *tp)
 }
 
 
-/* Function to handle an in-sequence ack during congestion avoidance phase.
- * This will get called from header prediction code.
- */
+                                                                           
+                                                    
+   
 void
 tcp_newreno_congestion_avd(struct tcpcb *tp, struct tcphdr *th)
 {
 	uint32_t acked = 0;
 	acked = BYTES_ACKED(th, tp);
-	/*
-	 * Grow the congestion window, if the
-	 * connection is cwnd bound.
-	 */
+	  
+                                      
+                             
+    
 	if (tp->snd_cwnd < tp->snd_wnd) {
 		tp->t_bytes_acked += acked;
 		if (tp->t_bytes_acked > tp->snd_cwnd) {
@@ -160,23 +160,23 @@ tcp_newreno_congestion_avd(struct tcpcb *tp, struct tcphdr *th)
 		}
 	}
 }
-/* Function to process an ack.
- */
+                              
+   
 void
 tcp_newreno_ack_rcvd(struct tcpcb *tp, struct tcphdr *th)
 {
-	/*
-	 * RFC 3465 - Appropriate Byte Counting.
-	 *
-	 * If the window is currently less than ssthresh,
-	 * open the window by the number of bytes ACKed by
-	 * the last ACK, however clamp the window increase
-	 * to an upper limit "L".
-	 *
-	 * In congestion avoidance phase, open the window by
-	 * one segment each time "bytes_acked" grows to be
-	 * greater than or equal to the congestion window.
-	 */
+	  
+                                         
+   
+                                                  
+                                                   
+                                                   
+                          
+   
+                                                     
+                                                   
+                                                   
+    
 
 	uint32_t cw = tp->snd_cwnd;
 	uint32_t incr = tp->t_maxseg;
@@ -186,20 +186,20 @@ tcp_newreno_ack_rcvd(struct tcpcb *tp, struct tcphdr *th)
 	if (cw >= tp->snd_ssthresh) {
 		tp->t_bytes_acked += acked;
 		if (tp->t_bytes_acked >= cw) {
-			/* Time to increase the window. */
+			                                  
 			tp->t_bytes_acked -= cw;
 		} else {
-			/* No need to increase yet. */
+			                              
 			incr = 0;
 		}
 	} else {
-		/*
-		 * If the user explicitly enables RFC3465
-		 * use 2*SMSS for the "L" param.  Otherwise
-		 * use the more conservative 1*SMSS.
-		 *
-		 * (See RFC 3465 2.3 Choosing the Limit)
-		 */
+		  
+                                           
+                                             
+                                      
+    
+                                          
+     
 		uint32_t abc_lim;
 		abc_lim = (tp->snd_nxt == tp->snd_max) ? incr * 2 : incr;
 
@@ -233,19 +233,19 @@ tcp_newreno_post_fr(struct tcpcb *tp, struct tcphdr *th)
 		ss = tp->snd_max - tp->snd_una;
 	}
 
-	/*
-	 * Complete ack.  Inflate the congestion window to
-	 * ssthresh and exit fast recovery.
-	 *
-	 * Window inflation should have left us with approx.
-	 * snd_ssthresh outstanding data.  But in case we
-	 * would be inclined to send a burst, better to do
-	 * it via the slow start mechanism.
-	 *
-	 * If the flight size is zero, then make congestion
-	 * window to be worth at least 2 segments to avoid
-	 * delayed acknowledgement (draft-ietf-tcpm-rfc3782-bis-05).
-	 */
+	  
+                                                   
+                                    
+   
+                                                     
+                                                  
+                                                   
+                                    
+   
+                                                    
+                                                   
+                                                             
+    
 	if (ss < (int32_t)tp->snd_ssthresh) {
 		tp->snd_cwnd = max(ss, tp->t_maxseg) + tp->t_maxseg;
 	} else {
@@ -254,36 +254,36 @@ tcp_newreno_post_fr(struct tcpcb *tp, struct tcphdr *th)
 	tp->t_bytes_acked = 0;
 }
 
-/* Function to change the congestion window when the retransmit
- * timer fires.
- */
+                                                               
+               
+   
 void
 tcp_newreno_after_timeout(struct tcpcb *tp)
 {
-	/*
-	 * Close the congestion window down to one segment
-	 * (we'll open it by one segment for each ack we get).
-	 * Since we probably have a window's worth of unacked
-	 * data accumulated, this "slow start" keeps us from
-	 * dumping all that data as back-to-back packets (which
-	 * might overwhelm an intermediate gateway).
-	 *
-	 * There are two phases to the opening: Initially we
-	 * open by one mss on each ack.  This makes the window
-	 * size increase exponentially with time.  If the
-	 * window is larger than the path can handle, this
-	 * exponential growth results in dropped packet(s)
-	 * almost immediately.  To get more time between
-	 * drops but still "push" the network to take advantage
-	 * of improving conditions, we switch from exponential
-	 * to linear window opening at some threshhold size.
-	 * For a threshhold, we use half the current window
-	 * size, truncated to a multiple of the mss.
-	 *
-	 * (the minimum cwnd that will give us exponential
-	 * growth is 2 mss.  We don't allow the threshhold
-	 * to go below this.)
-	 */
+	  
+                                                   
+                                                       
+                                                      
+                                                     
+                                                        
+                                             
+   
+                                                     
+                                                       
+                                                  
+                                                   
+                                                   
+                                                 
+                                                        
+                                                       
+                                                     
+                                                    
+                                             
+   
+                                                   
+                                                   
+                      
+    
 	if (tp->t_state >= TCPS_ESTABLISHED) {
 		u_int win = min(tp->snd_wnd, tp->snd_cwnd) / 2 / tp->t_maxseg;
 		if (win < 2) {
@@ -296,24 +296,24 @@ tcp_newreno_after_timeout(struct tcpcb *tp)
 	}
 }
 
-/*
- * Indicate whether this ack should be delayed.
- * We can delay the ack if:
- *  - delayed acks are enabled and set to 1, same as when value is set to 2.
- *    We kept this for binary compatibility.
- *  - delayed acks are enabled and set to 2, will "ack every other packet"
- *      - if our last ack wasn't a 0-sized window.
- *      - if the peer hasn't sent us a TH_PUSH data packet (this solves 3649245).
- *	        If TH_PUSH is set, take this as a clue that we need to ACK
- *              with no delay. This helps higher level protocols who won't send
- *		us more data even if the window is open because their
- *		last "segment" hasn't been ACKed
- *  - delayed acks are enabled and set to 3,  will do "streaming detection"
- *    (see the comment in tcp_input.c) and
- *      - if we receive more than "maxseg_unacked" full packets in the last 100ms
- *      - if the connection is not in slow-start or idle or loss/recovery states
- *      - if those criteria aren't met, it will ack every other packet.
- */
+  
+                                               
+                           
+                                                                            
+                                            
+                                                                          
+                                                  
+                                                                                 
+                                                                     
+                                                                               
+                                                         
+                                    
+                                                                           
+                                          
+                                                                                 
+                                                                                
+                                                                       
+   
 
 int
 tcp_newreno_delay_ack(struct tcpcb *tp, struct tcphdr *th)
@@ -321,12 +321,12 @@ tcp_newreno_delay_ack(struct tcpcb *tp, struct tcphdr *th)
 	return tcp_cc_delay_ack(tp, th);
 }
 
-/* Switch to newreno from a different CC. If the connection is in
- * congestion avoidance state, it can continue to use the current
- * congestion window because it is going to be conservative. But
- * if the connection is in slow-start, we will halve the congestion
- * window and let newreno work from there.
- */
+                                                                 
+                                                                 
+                                                                
+                                                                   
+                                          
+   
 void
 tcp_newreno_switch_cc(struct tcpcb *tp, uint16_t old_index)
 {
@@ -340,7 +340,7 @@ tcp_newreno_switch_cc(struct tcpcb *tp, uint16_t old_index)
 	}
 	tp->snd_cwnd = max(tcp_initial_cwnd(tp), cwnd * tp->t_maxseg);
 
-	/* Start counting bytes for RFC 3465 again */
+	                                             
 	tp->t_bytes_acked = 0;
 
 	OSIncrementAtomic((volatile SInt32 *)&tcp_cc_newreno.num_sockets);

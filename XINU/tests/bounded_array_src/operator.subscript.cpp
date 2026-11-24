@@ -1,8 +1,8 @@
-//
-// Tests for
-//  T& operator[](ptrdiff_t n);
-//  T const& operator[](ptrdiff_t n) const;
-//
+  
+            
+                               
+                                           
+  
 
 #include <libkern/c++/bounded_array.h>
 #include "test_policy.h"

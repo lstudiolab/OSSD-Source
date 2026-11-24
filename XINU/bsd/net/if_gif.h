@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$KAME: if_gif.h,v 1.7 2000/02/22 14:01:46 itojun Exp $	*/
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -56,16 +56,16 @@
  * SUCH DAMAGE.
  */
 
-/*
- * if_gif.h
- */
+  
+           
+   
 
 #ifndef _NET_IF_GIF_H_
 #define _NET_IF_GIF_H_
 #include <sys/appleapiopts.h>
 
 #include <netinet/in.h>
-/* xxx sigh, why route have struct route instead of pointer? */
+                                                               
 
 #ifdef BSD_KERNEL_PRIVATE
 
@@ -74,26 +74,26 @@ extern void gif_init(void);
 struct encaptab;
 
 struct gif_softc {
-	ifnet_t                 gif_if;    /* pointer back to the interface */
-	struct sockaddr *gif_psrc; /* Physical src addr */
-	struct sockaddr *gif_pdst; /* Physical dst addr */
+	ifnet_t                 gif_if;                                       
+	struct sockaddr *gif_psrc;                        
+	struct sockaddr *gif_pdst;                        
 #ifdef __APPLE__
-	protocol_family_t gif_proto; /* dlil protocol attached */
+	protocol_family_t gif_proto;                             
 #endif
 	union {
-		struct route  gifscr_ro;    /* xxx */
-		struct route_in6 gifscr_ro6; /* xxx */
+		struct route  gifscr_ro;             
+		struct route_in6 gifscr_ro6;          
 	} gifsc_gifscr;
 	int             gif_flags;
 #define IFGIF_DETACHING 0x1
 	int             gif_called;
 	const struct encaptab *encap_cookie4;
 	const struct encaptab *encap_cookie6;
-	TAILQ_ENTRY(gif_softc) gif_link; /* all gif's are linked */
+	TAILQ_ENTRY(gif_softc) gif_link;                           
 	bpf_tap_mode    tap_mode;
 	bpf_packet_func tap_callback;
 	char    gif_ifname[IFNAMSIZ];
-	decl_lck_mtx_data(, gif_lock);  /* lock for gif softc structure */
+	decl_lck_mtx_data(, gif_lock);                                    
 };
 
 #define GIF_LOCK(_sc)           lck_mtx_lock(&(_sc)->gif_lock)
@@ -104,10 +104,10 @@ struct gif_softc {
 #define gif_ro gifsc_gifscr.gifscr_ro
 #define gif_ro6 gifsc_gifscr.gifscr_ro6
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#define GIF_MTU         (1280)  /* Default MTU */
-#define GIF_MTU_MIN     (1280)  /* Minimum MTU */
-#define GIF_MTU_MAX     (8192)  /* Maximum MTU */
+#define GIF_MTU         (1280)                   
+#define GIF_MTU_MIN     (1280)                   
+#define GIF_MTU_MAX     (8192)                   
 
-#endif /* _NET_IF_GIF_H_ */
+#endif                     

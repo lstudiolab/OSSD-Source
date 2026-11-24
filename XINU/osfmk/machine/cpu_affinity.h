@@ -38,6 +38,6 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_CPU_AFFINITY_H */
+#endif                              
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

@@ -52,7 +52,7 @@
 
 u_int32_t machclk_freq = 0;
 u_int64_t machclk_per_sec = 0;
-u_int32_t pktsched_verbose = 0; /* more noise if greater than 1 */
+u_int32_t pktsched_verbose = 0;                                   
 
 static void init_machclk(void);
 
@@ -67,7 +67,7 @@ pktsched_init(void)
 	init_machclk();
 	if (machclk_freq == 0) {
 		panic("%s: no CPU clock available!\n", __func__);
-		/* NOTREACHED */
+		                
 	}
 
 	netem_init();
@@ -76,10 +76,10 @@ pktsched_init(void)
 static void
 init_machclk(void)
 {
-	/*
-	 * Initialize machclk_freq using the timerbase frequency
-	 * value from device specific info.
-	 */
+	  
+                                                         
+                                    
+    
 	machclk_freq = (uint32_t)gPEClockFrequencyInfo.timebase_frequency_hz;
 
 	clock_interval_to_absolutetime_interval(1, NSEC_PER_SEC,
@@ -115,21 +115,21 @@ pktsched_setup(struct ifclassq *ifq, u_int32_t scheduler, u_int32_t sflags,
 
 	VERIFY(machclk_freq != 0);
 
-	/* Nothing to do unless the scheduler type changes */
+	                                                     
 	if (ifq->ifcq_type == scheduler) {
 		return 0;
 	}
 
-	/*
-	 * Remember the flags that need to be restored upon success, as
-	 * they may be cleared when we tear down existing scheduler.
-	 */
+	  
+                                                                
+                                                             
+    
 	rflags = (ifq->ifcq_flags & IFCQF_ENABLED);
 
 	if (ifq->ifcq_type != PKTSCHEDT_NONE) {
 		pktsched_teardown(ifq);
 
-		/* Teardown should have succeeded */
+		                                    
 		VERIFY(ifq->ifcq_type == PKTSCHEDT_NONE);
 		VERIFY(ifq->ifcq_disc == NULL);
 	}
@@ -153,7 +153,7 @@ pktsched_teardown(struct ifclassq *ifq)
 	ifq->ifcq_flags &= ~IFCQF_ENABLED;
 
 	if (ifq->ifcq_type == PKTSCHEDT_FQ_CODEL) {
-		/* Could be PKTSCHEDT_NONE */
+		                             
 		fq_if_teardown_ifclassq(ifq);
 	}
 
@@ -169,7 +169,7 @@ pktsched_getqstats(struct ifclassq *ifq, u_int32_t qid,
 	IFCQ_LOCK_ASSERT_HELD(ifq);
 
 	if (ifq->ifcq_type == PKTSCHEDT_FQ_CODEL) {
-		/* Could be PKTSCHEDT_NONE */
+		                             
 		error = fq_if_getqstats_ifclassq(ifq, qid, ifqs);
 	}
 
@@ -192,7 +192,7 @@ pktsched_pkt_encap(pktsched_pkt_t *pkt, classq_pkt_t *cpkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -213,7 +213,7 @@ pktsched_pkt_encap_chain(pktsched_pkt_t *pkt, classq_pkt_t *cpkt,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -227,7 +227,7 @@ pktsched_clone_pkt(pktsched_pkt_t *pkt1, pktsched_pkt_t *pkt2)
 	ASSERT(pkt1->pktsched_pkt_mbuf != NULL);
 	ASSERT(pkt1->pktsched_pcnt == 1);
 
-	/* allow in place clone, but make sure pkt2->pktsched_pkt won't leak */
+	                                                                       
 	ASSERT((pkt1 == pkt2 && pkt1->pktsched_pkt_mbuf ==
 	    pkt2->pktsched_pkt_mbuf) || (pkt1 != pkt2 &&
 	    pkt2->pktsched_pkt_mbuf == NULL));
@@ -245,7 +245,7 @@ pktsched_clone_pkt(pktsched_pkt_t *pkt1, pktsched_pkt_t *pkt2)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -272,7 +272,7 @@ pktsched_corrupt_packet(pktsched_pkt_t *pkt)
 		break;
 
 	default:
-		/* NOTREACHED */
+		                
 		VERIFY(0);
 		__builtin_unreachable();
 	}
@@ -305,7 +305,7 @@ pktsched_free_pkt(pktsched_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 	pkt->pktsched_pkt = CLASSQ_PKT_INITIALIZER(pkt->pktsched_pkt);
@@ -327,7 +327,7 @@ pktsched_get_pkt_svc(pktsched_pkt_t *pkt)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -368,7 +368,7 @@ pktsched_get_pkt_vars(pktsched_pkt_t *pkt, volatile uint32_t **flags,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -399,7 +399,7 @@ pktsched_alloc_fcentry(pktsched_pkt_t *pkt, struct ifnet *ifp, int how)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -425,7 +425,7 @@ pktsched_get_pkt_sfb_vars(pktsched_pkt_t *pkt, uint32_t **sfb_flags)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 

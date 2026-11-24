@@ -63,32 +63,32 @@ main(
 	}
 
 #if __arm64__
-	// arm64 chdir() syscall
+	                        
 	char chdir_code[] =  {
-		0x90, 0x01, 0x80, 0xd2, // movz   x16, #0xc
-		0x01, 0x10, 0x00, 0xd4, // svc    #0x80
-		0xc0, 0x03, 0x5f, 0xd6, // ret
+		0x90, 0x01, 0x80, 0xd2,                    
+		0x01, 0x10, 0x00, 0xd4,                
+		0xc0, 0x03, 0x5f, 0xd6,       
 	};
 #elif __arm__
-	// armv7 chdir() syscall
+	                        
 	char chdir_code[] = {
-		0x0c, 0xc0, 0xa0, 0xe3, // mov    r12 #0xc
-		0x80, 0x00, 0x00, 0xef, // svc    #0x80
-		0x1e, 0xff, 0x2f, 0xe1, // bx lr
+		0x0c, 0xc0, 0xa0, 0xe3,                   
+		0x80, 0x00, 0x00, 0xef,                
+		0x1e, 0xff, 0x2f, 0xe1,         
 	};
 #elif __x86_64__
-	// x86_64 chdir() syscall
+	                         
 	char chdir_code[] = {
-		0xb8, 0x0c, 0x00, 0x00, 0x02,   // movl   $0x200000c, %eax
-		0x49, 0x89, 0xca,               // movq   %rcx, %r10
-		0x0f, 0x05,                     // syscall
-		0xc3,                           // retq
+		0xb8, 0x0c, 0x00, 0x00, 0x02,                             
+		0x49, 0x89, 0xca,                                   
+		0x0f, 0x05,                               
+		0xc3,                                  
 	};
 #elif __i386__
-	// i386 chdir() syscall
+	                       
 	char chdir_code[] = {
-		0x90,   // nop
-		0xc3,   // retq
+		0x90,         
+		0xc3,          
 	};
 #endif
 	memcpy(page, chdir_code, sizeof chdir_code);
@@ -142,12 +142,12 @@ main(
 	    cmdname);
 
 #if !TARGET_OS_OSX
-	/* fail: unsigned code was executed */
+	                                      
 	fprintf(stdout, "%s: FAIL\n", cmdname);
 	exit(1);
-#else /* !TARGET_OS_OSX */
-	/* no fail: unsigned code is only prohibited on embedded platforms */
+#else                     
+	                                                                     
 	fprintf(stdout, "%s: SUCCESS\n", cmdname);
 	exit(0);
-#endif /* !TARGET_OS_OSX */
+#endif                     
 }

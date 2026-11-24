@@ -37,7 +37,7 @@
 
 struct eventreq {
 	int      er_type;
-#define EV_FD 1    // file descriptor
+#define EV_FD 1                      
 	int      er_handle;
 	void    *er_data;
 	int      er_rcnt;
@@ -77,4 +77,4 @@ __END_DECLS
 
 #endif
 
-#endif /* _SYS_EV_H_ */
+#endif                 

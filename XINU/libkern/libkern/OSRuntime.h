@@ -39,4 +39,4 @@ extern void kern_os_free(void * address);
 
 __END_DECLS
 
-#endif /* _OS_OSRUNTIME_H */
+#endif                      

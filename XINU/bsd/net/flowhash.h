@@ -35,16 +35,16 @@
 extern "C" {
 #endif
 
-/*
- * If 32-bit hash value is too large, use this macro to truncate
- * it to n-bit; masking is a faster operation than modulus.
- */
+  
+                                                                
+                                                           
+   
 #define HASHMASK(n)     ((1UL << (n)) - 1)
 
-/*
- * Returns 32-bit hash value.  Hashes which are capable of returning
- * more bits currently have their results truncated to 32-bit.
- */
+  
+                                                                    
+                                                              
+   
 typedef u_int32_t net_flowhash_fn_t(const void *, u_int32_t, const u_int32_t);
 
 extern net_flowhash_fn_t *net_flowhash;
@@ -55,4 +55,4 @@ extern net_flowhash_fn_t net_flowhash_jhash;
 }
 #endif
 
-#endif /* _NET_FLOWHASH_H_ */
+#endif                       

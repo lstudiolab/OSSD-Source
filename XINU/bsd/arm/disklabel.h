@@ -7,15 +7,15 @@
 #include <sys/appleapiopts.h>
 
 #ifdef __APPLE_API_OBSOLETE
-#define LABELSECTOR     (1024 / DEV_BSIZE)      /* sector containing label */
-#define LABELOFFSET     0                       /* offset of label in sector */
-#define MAXPARTITIONS   8                       /* number of partitions */
-#define RAW_PART        2                       /* raw partition: xx?c */
+#define LABELSECTOR     (1024 / DEV_BSIZE)                                   
+#define LABELOFFSET     0                                                      
+#define MAXPARTITIONS   8                                                 
+#define RAW_PART        2                                                
 
-/* Just a dummy */
+                  
 struct cpu_disklabel {
-	int     cd_dummy;                       /* must have one element. */
+	int     cd_dummy;                                                   
 };
-#endif /* __APPLE_API_OBSOLETE */
+#endif                           
 
-#endif /* _MACHINE_DISKLABEL_H_ */
+#endif                            

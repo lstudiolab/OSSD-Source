@@ -32,16 +32,16 @@
 #include <sys/cdefs.h>
 #include <Availability.h>
 
-/*
- * kas_info() ("Kernel Address Space Info") is a private interface that allows
- * appropriately privileged system components to introspect the overall
- * kernel address space layout.
- */
+  
+                                                                              
+                                                                       
+                               
+   
 
 __BEGIN_DECLS
 
-/* The slide of the main kernel compared to its static link address */
-#define KAS_INFO_KERNEL_TEXT_SLIDE_SELECTOR     (0)     /* returns uint64_t	*/
+                                                                      
+#define KAS_INFO_KERNEL_TEXT_SLIDE_SELECTOR     (0)                           
 #define KAS_INFO_KERNEL_SEGMENT_VMADDR_SELECTOR    (1)
 #define KAS_INFO_MAX_SELECTOR           (2)
 
@@ -49,8 +49,8 @@ __BEGIN_DECLS
 
 int kas_info(int selector, void *value, size_t *size) __OSX_AVAILABLE_STARTING(__MAC_10_8, __IPHONE_6_0);
 
-#endif /* KERNEL */
+#endif             
 
 __END_DECLS
 
-#endif  /* !_SYS_KAS_INFO_H_ */
+#endif                         

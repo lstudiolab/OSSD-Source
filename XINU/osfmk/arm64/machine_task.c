@@ -85,7 +85,7 @@ machine_task_set_state(
 			}
 		}
 
-		copy_legacy_debug_state(tstate, (arm_legacy_debug_state_t *) task->task_debug, FALSE); /* FALSE OR TRUE doesn't matter since we are ignoring it for arm */
+		copy_legacy_debug_state(tstate, (arm_legacy_debug_state_t *) task->task_debug, FALSE);                                                                    
 
 		return KERN_SUCCESS;
 	}
@@ -105,7 +105,7 @@ machine_task_set_state(
 			}
 		}
 
-		copy_debug_state32(tstate, (arm_debug_state32_t *) task->task_debug, FALSE); /* FALSE OR TRUE doesn't matter since we are ignoring it for arm */
+		copy_debug_state32(tstate, (arm_debug_state32_t *) task->task_debug, FALSE);                                                                    
 
 		return KERN_SUCCESS;
 	}
@@ -126,11 +126,11 @@ machine_task_set_state(
 			}
 		}
 
-		copy_debug_state64(tstate, (arm_debug_state64_t *) task->task_debug, FALSE); /* FALSE OR TRUE doesn't matter since we are ignoring it for arm */
+		copy_debug_state64(tstate, (arm_debug_state64_t *) task->task_debug, FALSE);                                                                    
 
 		return KERN_SUCCESS;
 	}
-	case THREAD_STATE_NONE:         /* Using this flavor to clear task_debug */
+	case THREAD_STATE_NONE:                                                    
 	{
 		if (task->task_debug != NULL) {
 			zfree(ads_zone, task->task_debug);
@@ -167,7 +167,7 @@ machine_task_get_state(task_t task,
 		if (task->task_debug == NULL) {
 			bzero(state, sizeof(*tstate));
 		} else {
-			copy_legacy_debug_state((arm_legacy_debug_state_t*) task->task_debug, tstate, FALSE); /* FALSE OR TRUE doesn't matter since we are ignoring it for arm */
+			copy_legacy_debug_state((arm_legacy_debug_state_t*) task->task_debug, tstate, FALSE);                                                                    
 		}
 
 		return KERN_SUCCESS;
@@ -183,7 +183,7 @@ machine_task_get_state(task_t task,
 		if (task->task_debug == NULL) {
 			bzero(state, sizeof(*tstate));
 		} else {
-			copy_debug_state32((arm_debug_state32_t*) task->task_debug, tstate, FALSE); /* FALSE OR TRUE doesn't matter since we are ignoring it for arm */
+			copy_debug_state32((arm_debug_state32_t*) task->task_debug, tstate, FALSE);                                                                    
 		}
 
 		return KERN_SUCCESS;
@@ -199,7 +199,7 @@ machine_task_get_state(task_t task,
 		if (task->task_debug == NULL) {
 			bzero(state, sizeof(*tstate));
 		} else {
-			copy_debug_state64((arm_debug_state64_t*) task->task_debug, tstate, FALSE); /* FALSE OR TRUE doesn't matter since we are ignoring it for arm */
+			copy_debug_state64((arm_debug_state64_t*) task->task_debug, tstate, FALSE);                                                                    
 		}
 
 		return KERN_SUCCESS;

@@ -55,104 +55,104 @@
  * the rights to redistribute these changes.
  */
 
-/*
- *  Common code for printf et al.
- *
- *  The calling routine typically takes a variable number of arguments,
- *  and passes the address of the first one.  This implementation
- *  assumes a straightforward, stack implementation, aligned to the
- *  machine's wordsize.  Increasing addresses are assumed to point to
- *  successive arguments (left-to-right), as is the case for a machine
- *  with a downward-growing stack with arguments pushed right-to-left.
- *
- *  To write, for example, fprintf() using this routine, the code
- *
- *	fprintf(fd, format, args)
- *	FILE *fd;
- *	char *format;
- *	{
- *	_doprnt(format, &args, fd);
- *	}
- *
- *  would suffice.  (This example does not handle the fprintf's "return
- *  value" correctly, but who looks at the return value of fprintf
- *  anyway?)
- *
- *  This version implements the following printf features:
- *
- *	%d	decimal conversion
- *	%u	unsigned conversion
- *	%x	hexadecimal conversion
- *	%X	hexadecimal conversion with capital letters
- *      %D      hexdump, ptr & separator string ("%6D", ptr, ":") -> XX:XX:XX:XX:XX:XX
- *              if you use, "%*D" then there's a length, the data ptr and then the separator
- *	%o	octal conversion
- *	%c	character
- *	%s	string
- *	%m.n	field width, precision
- *	%-m.n	left adjustment
- *	%0m.n	zero-padding
- *	%*.*	width and precision taken from arguments
- *
- *  This version does not implement %f, %e, or %g.
- *
- *  As mentioned, this version does not return any reasonable value.
- *
- *  Permission is granted to use, modify, or propagate this code as
- *  long as this notice is incorporated.
- *
- *  Steve Summit 3/25/87
- *
- *  Tweaked for long long support and extended to support the hexdump %D
- *  specifier by dbg 05/02/02.
- */
+  
+                                 
+  
+                                                                       
+                                                                 
+                                                                   
+                                                                     
+                                                                      
+                                                                      
+  
+                                                                 
+  
+                            
+            
+                
+    
+                              
+    
+  
+                                                                       
+                                                                  
+            
+  
+                                                          
+  
+                        
+                         
+                            
+                                                 
+                                                                                      
+                                                                                            
+                      
+               
+            
+                              
+                        
+                     
+                                                
+  
+                                                  
+  
+                                                                    
+  
+                                                                   
+                                        
+  
+                        
+  
+                                                                        
+                              
+   
 
-/*
- * Added formats for decoding device registers:
- *
- * printf("reg = %b", regval, "<base><arg>*")
- *
- * where <base> is the output base expressed as a control character:
- * i.e. '\10' gives octal, '\20' gives hex.  Each <arg> is a sequence of
- * characters, the first of which gives the bit number to be inspected
- * (origin 1), and the rest (up to a control character (<= 32)) give the
- * name of the register.  Thus
- *	printf("reg = %b\n", 3, "\10\2BITTWO\1BITONE")
- * would produce
- *	reg = 3<BITTWO,BITONE>
- *
- * If the second character in <arg> is also a control character, it
- * indicates the last bit of a bit field.  In this case, printf will extract
- * bits <1> to <2> and print it.  Characters following the second control
- * character are printed before the bit field.
- *	printf("reg = %b\n", 0xb, "\10\4\3FIELD1=\2BITTWO\1BITONE")
- * would produce
- *	reg = b<FIELD1=2,BITONE>
- *
- * The %B format is like %b but the bits are numbered from the most
- * significant (the bit weighted 31), which is called 1, to the least
- * significant, called 32.
- */
-/*
- * Added for general use:
- *	#	prefix for alternate format:
- *		0x (0X) for hex
- *		leading 0 for octal
- *	+	print '+' if positive
- *	blank	print ' ' if positive
- *
- *	z	set length equal to size_t
- *	r	signed, 'radix'
- *	n	unsigned, 'radix'
- *
- *	D,U,O,Z	same as corresponding lower-case versions
- *		(compatibility)
- */
-/*
- * Added support for print long long (64-bit) integers.
- * Use %lld, %Ld or %qd to print a 64-bit int.  Other
- * output bases such as x, X, u, U, o, and O also work.
- */
+  
+                                               
+  
+                                             
+  
+                                                                    
+                                                                        
+                                                                      
+                                                                        
+                              
+                                                 
+                
+                         
+  
+                                                                   
+                                                                            
+                                                                         
+                                              
+                                                              
+                
+                           
+  
+                                                                   
+                                                                     
+                          
+   
+  
+                         
+                                 
+                   
+                       
+                          
+                              
+  
+                               
+                    
+                      
+  
+                                                    
+                   
+   
+  
+                                                       
+                                                     
+                                                       
+   
 
 #include <debug.h>
 #include <mach_kdp.h>
@@ -173,7 +173,7 @@
 
 #ifdef __x86_64__
 #include <i386/cpu_data.h>
-#endif /* __x86_64__ */
+#endif                 
 
 #if __arm__ || __arm64__
 #include <arm/cpu_data_internal.h>
@@ -182,16 +182,16 @@
 #ifdef HAS_APPLE_PAC
 #include <mach/vm_param.h>
 #include <ptrauth.h>
-#endif /* HAS_APPLE_PAC */
+#endif                    
 
 #define isdigit(d) ((d) >= '0' && (d) <= '9')
 #define Ctod(c) ((c) - '0')
 
-#define MAXBUF (sizeof(long long int) * 8)      /* enough for binary */
+#define MAXBUF (sizeof(long long int) * 8)                             
 static char digs[] = "0123456789abcdef";
 
 #if CONFIG_NO_PRINTF_STRINGS
-/* Prevent CPP from breaking the definition below */
+                                                    
 #undef printf
 #endif
 
@@ -207,12 +207,12 @@ _consume_kprintf_args(int a __unused, ...)
 
 static int
 printnum(
-	unsigned long long int  u,      /* number to print */
+	unsigned long long int  u,                           
 	int             base,
 	void                    (*putc)(int, void *),
 	void                    *arg)
 {
-	char    buf[MAXBUF];    /* build number here */
+	char    buf[MAXBUF];                           
 	char *  p = &buf[MAXBUF - 1];
 	int nprinted = 0;
 
@@ -241,10 +241,10 @@ int
 __doprnt(
 	const char      *fmt,
 	va_list                 argp,
-	/* character output routine */
+	                              
 	void                    (*putc)(int, void *arg),
 	void                    *arg,
-	int                     radix,          /* default radix - for '%r' */
+	int                     radix,                                        
 	int                     is_log)
 {
 	int             length;
@@ -343,7 +343,7 @@ __doprnt(
 		}
 
 		if (c == 'l') {
-			c = *++fmt; /* need it if sizeof(int) < sizeof(long) */
+			c = *++fmt;                                            
 			if (sizeof(int) < sizeof(long)) {
 				long_long = 1;
 			}
@@ -371,7 +371,7 @@ __doprnt(
 		}
 
 		truncate = FALSE;
-		capitals = 0;   /* Assume lower case printing */
+		capitals = 0;                                   
 
 		switch (c) {
 		case 'b':
@@ -400,9 +400,9 @@ __doprnt(
 					i = 33 - i;
 				}
 				if (*p <= 32) {
-					/*
-					 * Bit field
-					 */
+					  
+                 
+        
 					int j;
 					if (any) {
 						(*putc)(',', arg);
@@ -458,7 +458,7 @@ __doprnt(
 			const char *p2;
 
 			if (prec == -1) {
-				prec = 0x7fffffff; /* MAXINT */
+				prec = 0x7fffffff;             
 			}
 			p = va_arg(argp, char *);
 
@@ -562,7 +562,7 @@ __doprnt(
 
 		case 'X':
 			base = 16;
-			capitals = 16;  /* Print in upper case */
+			capitals = 16;                           
 			goto print_unsigned;
 
 		case 'r':
@@ -624,7 +624,7 @@ print_unsigned:
 
 print_num:
 			{
-				char        buf[MAXBUF];/* build number here */
+				char        buf[MAXBUF];                       
 				char *      p = &buf[MAXBUF - 1];
 				static char digits[] = "0123456789abcdef0123456789ABCDEF";
 				const char *prefix = NULL;
@@ -639,12 +639,12 @@ print_num:
 					int strl = sizeof(str) - 1;
 
 #ifdef HAS_APPLE_PAC
-					/**
-					 * Strip out the pointer authentication code before
-					 * checking whether the pointer is a kernel address.
-					 */
+					   
+                                                        
+                                                         
+        
 					u = (unsigned long long)VM_KERNEL_STRIP_PTR(u);
-#endif /* HAS_APPLE_PAC */
+#endif                    
 
 					if (u >= VM_MIN_KERNEL_AND_KEXT_ADDRESS && u <= VM_MAX_KERNEL_ADDRESS) {
 						while (*strp != '\0') {
@@ -665,7 +665,7 @@ print_num:
 				}
 
 				do {
-					/* Print in the correct case */
+					                               
 					*p-- = digits[(u % base) + capitals];
 					u /= base;
 				} while (u != 0);
@@ -679,7 +679,7 @@ print_num:
 				}
 
 				if (padc == ' ' && !ladjust) {
-					/* blank padding goes before prefix */
+					                                      
 					while (--length >= 0) {
 						(*putc)(' ', arg);
 						nprinted++;
@@ -696,7 +696,7 @@ print_num:
 					}
 				}
 				if (padc == '0') {
-					/* zero padding goes after sign and prefix */
+					                                             
 					while (--length >= 0) {
 						(*putc)('0', arg);
 						nprinted++;
@@ -735,16 +735,16 @@ dummy_putc(int ch, void *arg)
 {
 	void (*real_putc)(char) = arg;
 
-	/*
-	 * Attempts to panic (or otherwise log to console) during early boot
-	 * can result in _doprnt() and _doprnt_log() being called from
-	 * _kprintf() before PE_init_kprintf() has been called. This causes
-	 * the "putc" param to _doprnt() and _doprnt_log() to be passed as
-	 * NULL. That NULL makes its way here, and we would try jump to it.
-	 * Given that this is a poor idea, and this happens at very early
-	 * boot, there is not a way to report this easily (we are likely
-	 * already panicing), so we'll just do nothing instead of crashing.
-	 */
+	  
+                                                                     
+                                                               
+                                                                    
+                                                                   
+                                                                    
+                                                                  
+                                                                 
+                                                                    
+    
 	if (real_putc) {
 		real_putc((char)ch);
 	}
@@ -754,9 +754,9 @@ void
 _doprnt(
 	const char      *fmt,
 	va_list                 *argp,
-	/* character output routine */
+	                              
 	void                    (*putc)(char),
-	int                     radix)          /* default radix - for '%r' */
+	int                     radix)                                        
 {
 	__doprnt(fmt, *argp, dummy_putc, putc, radix, FALSE);
 }
@@ -765,16 +765,16 @@ void
 _doprnt_log(
 	const char      *fmt,
 	va_list                 *argp,
-	/* character output routine */
+	                              
 	void                    (*putc)(char),
-	int                     radix)          /* default radix - for '%r' */
+	int                     radix)                                        
 {
 	__doprnt(fmt, *argp, dummy_putc, putc, radix, TRUE);
 }
 
 #if     MP_PRINTF
 boolean_t       new_printf_cpu_number = FALSE;
-#endif  /* MP_PRINTF */
+#endif                 
 
 SIMPLE_LOCK_DECLARE(bsd_log_spinlock, 0);
 
@@ -782,19 +782,19 @@ bool bsd_log_lock(bool);
 void bsd_log_lock_safe(void);
 void bsd_log_unlock(void);
 
-/*
- * Locks OS log lock and returns true if successful, false otherwise. Locking
- * always succeeds in a safe context but may block. Locking in an unsafe context
- * never blocks but fails if someone else is already holding the lock.
- *
- * A caller is responsible to decide whether the context is safe or not.
- *
- * As a rule of thumb following cases are *not* considered safe:
- *   - Interrupts are disabled
- *   - Pre-emption is disabled
- *   - When in a debugger
- *   - During a panic
- */
+  
+                                                                             
+                                                                                
+                                                                      
+  
+                                                                        
+  
+                                                                
+                              
+                              
+                         
+                     
+   
 bool
 bsd_log_lock(bool safe)
 {
@@ -806,10 +806,10 @@ bsd_log_lock(bool safe)
 	return true;
 }
 
-/*
- * Locks OS log lock assuming the context is safe. See bsd_log_lock() comment
- * for details.
- */
+  
+                                                                             
+               
+   
 void
 bsd_log_lock_safe(void)
 {
@@ -822,7 +822,7 @@ bsd_log_unlock(void)
 	simple_unlock(&bsd_log_spinlock);
 }
 
-/* derived from boot_gets */
+                            
 void
 safe_gets(
 	char    *str,
@@ -830,7 +830,7 @@ safe_gets(
 {
 	char *lp;
 	char c;
-	char *strmax = str + maxlen - 1; /* allow space for trailing 0 */
+	char *strmax = str + maxlen - 1;                                 
 
 	lp = str;
 	for (;;) {
@@ -863,7 +863,7 @@ safe_gets(
 					*lp++ = c;
 					printf("%c", c);
 				} else {
-					printf("%c", '\007'); /* beep */
+					printf("%c", '\007');           
 				}
 			}
 		}
@@ -906,10 +906,10 @@ vprintf_internal(const char *fmt, va_list ap_in, void *caller)
 
 		va_list ap;
 		va_copy(ap, ap_in);
-		/*
-		 * for early boot printf()s console may not be setup,
-		 * fallback to good old cnputc
-		 */
+		  
+                                                       
+                                
+     
 		if (cpu_data_p->cpu_console_buf != NULL) {
 			console_printbuf_state_init(&info_data, TRUE, TRUE);
 			__doprnt(fmt, ap, console_printbuf_putc, &info_data, 16, TRUE);
@@ -982,12 +982,12 @@ consdebug_log(char c)
 	debug_putc(c);
 }
 
-/*
- * Append contents to the paniclog buffer but don't flush
- * it. This is mainly used for writing the actual paniclog
- * contents since flushing once for every line written
- * would be prohibitively expensive for the paniclog
- */
+  
+                                                         
+                                                          
+                                                      
+                                                    
+   
 int
 paniclog_append_noflush(const char *fmt, ...)
 {
@@ -1052,21 +1052,21 @@ kdb_printf_unbuffered(const char *fmt, ...)
 static void
 copybyte(int c, void *arg)
 {
-	/*
-	 * arg is a pointer (outside pointer) to the pointer
-	 * (inside pointer) which points to the character.
-	 * We pass a double pointer, so that we can increment
-	 * the inside pointer.
-	 */
-	char** p = arg; /* cast outside pointer */
-	**p = (char)c;  /* store character */
-	(*p)++;         /* increment inside pointer */
+	  
+                                                     
+                                                   
+                                                      
+                       
+    
+	char** p = arg;                           
+	**p = (char)c;                       
+	(*p)++;                                       
 }
 
-/*
- * Deprecation Warning:
- *	sprintf() is being deprecated. Please use snprintf() instead.
- */
+  
+                       
+                                                                
+   
 int
 sprintf(char *buf, const char *fmt, ...)
 {
@@ -1080,4 +1080,4 @@ sprintf(char *buf, const char *fmt, ...)
 	*copybyte_str = '\0';
 	return (int)strlen(buf);
 }
-#endif /* CONFIG_VSPRINTF */
+#endif                      

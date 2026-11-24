@@ -26,17 +26,17 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Facilities for performing type- and overflow-checked arithmetic. These
- * functions return non-zero if overflow occured, zero otherwise. In either case,
- * the potentially overflowing operation is fully performed, mod the size of the
- * output type. See:
- * http://clang.llvm.org/docs/LanguageExtensions.html#checked-arithmetic-builtins
- * for full details.
- *
- * The compiler enforces that users of os_*_overflow() check the return value to
- * determine whether overflow occured.
- */
+  
+                                                                         
+                                                                                 
+                                                                                
+                    
+                                                                                 
+                    
+  
+                                                                                
+                                      
+   
 
 #ifndef _OS_OVERFLOW_H
 #define _OS_OVERFLOW_H
@@ -61,9 +61,9 @@ __os_warn_unused(__const bool x)
 
 #else
 # error os_overflow expects type-generic builtins
-#endif /* __has_builtin(...) */
+#endif                         
 
-/* os_add3_overflow(a, b, c) -> (a + b + c) */
+                                              
 #define os_add3_overflow(a, b, c, res) __os_warn_unused(__extension__({ \
 	__typeof(*(res)) _tmp; \
 	bool _s, _t; \
@@ -72,7 +72,7 @@ __os_warn_unused(__const bool x)
 	_s | _t; \
 }))
 
-/* os_mul3_overflow(a, b, c) -> (a * b * c) */
+                                              
 #define os_mul3_overflow(a, b, c, res) __os_warn_unused(__extension__({ \
 	__typeof(*(res)) _tmp; \
 	bool _s, _t; \
@@ -81,7 +81,7 @@ __os_warn_unused(__const bool x)
 	_s | _t; \
 }))
 
-/* os_add_and_mul_overflow(a, b, x) -> (a + b)*x */
+                                                   
 #define os_add_and_mul_overflow(a, b, x, res) __os_warn_unused(__extension__({ \
 	__typeof(*(res)) _tmp; \
 	bool _s, _t; \
@@ -90,7 +90,7 @@ __os_warn_unused(__const bool x)
 	_s | _t; \
 }))
 
-/* os_mul_and_add_overflow(a, x, b) -> a*x + b */
+                                                 
 #define os_mul_and_add_overflow(a, x, b, res) __os_warn_unused(__extension__({ \
 	__typeof(*(res)) _tmp; \
 	bool _s, _t; \
@@ -99,20 +99,20 @@ __os_warn_unused(__const bool x)
 	_s | _t; \
 }))
 
-/* os_convert_overflow(a) -> a [converted to the result type] */
+                                                                
 #define os_convert_overflow(a, res) os_add_overflow((a), 0, (res))
 
-/* os_inc_overflow(res) -> *res += 1 */
+                                       
 #define os_inc_overflow(res) __os_warn_unused(__extension__({ \
 	__typeof((res)) _tmp = (res); \
 	os_add_overflow(*_tmp, 1, _tmp); \
 }))
 
-/* os_dec_overflow(res) -> *res -= 1 */
+                                       
 #define os_dec_overflow(res) __os_warn_unused(__extension__({ \
 	__typeof((res)) _tmp = (res); \
 	os_sub_overflow(*_tmp, 1, _tmp); \
 }))
 
 
-#endif /* _OS_OVERFLOW_H */
+#endif                     

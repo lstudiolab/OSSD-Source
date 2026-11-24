@@ -30,10 +30,10 @@ COMMON_HELP_STRING = """
     -v [-v...]  Each additional -v will increase the verbosity of the command.
     -p <plugin_name>        Send the output of the command to plugin. Please see README for usage of plugins.
 """
-# End Utility functions
-# Debugging specific utility functions
+                       
+                                      
 
-#decorators. Not to be called directly.
+                                       
 
 def static_var(var_name, initial_value):
     def _set_var(obj):
@@ -47,8 +47,8 @@ def header(initial_value):
         return obj
     return _set_header
 
-# holds type declarations done by xnu.
-#DONOTTOUCHME: Exclusive use of lldb_type_summary only.
+                                      
+                                                       
 lldb_summary_definitions = {}
 def lldb_type_summary(types_list):
     """ A function decorator to register a summary for a type in lldb.
@@ -80,8 +80,8 @@ def lldb_type_summary(types_list):
         return obj
     return _get_summary
 
-#global cache of documentation for lldb commands exported by this module
-#DONOTTOUCHME: Exclusive use of lldb_command only.
+                                                                        
+                                                  
 lldb_command_documentation = {}
 
 def lldb_command(cmd_name, option_string = '', fancy=False):
@@ -98,7 +98,7 @@ def lldb_command(cmd_name, option_string = '', fancy=False):
         def _internal_command_function(debugger, command, result, internal_dict):
             global config, lldb_run_command_state
             stream = CommandOutput(cmd_name, result)
-            # need to avoid printing on stdout if called from lldb_run_command.
+                                                                               
             if 'active' in lldb_run_command_state and lldb_run_command_state['active']:
                 debuglog('Running %s from lldb_run_command' % command)
             else:
@@ -149,7 +149,7 @@ However, it is recommended that you report the exception to lldb/kernel debuggin
                 ProcessXNUPluginResult(return_data)
                 plugin.plugin_cleanup()
 
-            #restore the verbose level after command is complete
+                                                                
             config['verbosity'] = def_verbose_level
 
             return
@@ -244,8 +244,8 @@ def ProcessXNUPluginResult(result_data):
             lldb.debugger.HandleCommand(cmd)
     return
 
-# holds tests registered with xnu.
-#DONOTTOUCHME: Exclusive use of xnudebug_test only
+                                  
+                                                  
 lldb_command_tests = {}
 def xnudebug_test(test_name):
     """ A function decoratore to register a test with the framework. Each test is supposed to be of format
@@ -263,10 +263,10 @@ def xnudebug_test(test_name):
     return _test
 
 
-# End Debugging specific utility functions
-# Kernel Debugging specific classes and accessor methods
+                                          
+                                                        
 
-# global access object for target kernel
+                                        
 
 def GetObjectAtIndexFromArray(array_base, index):
     """ Subscript indexing for arrays that are represented in C as pointers.
@@ -301,7 +301,7 @@ def GetLLDBThreadForKernelThread(thread_obj):
     lldb_process = LazyTarget.GetProcess()
     sbthread = lldb_process.GetThreadByID(tid)
     if not sbthread.IsValid():
-        # in case lldb doesnt know about this thread, create one
+                                                                
         if hasattr(lldb_process, "CreateOSPluginThread"):
             debuglog("creating os plugin thread on the fly for {0:d} 0x{1:x}".format(tid, thread_obj))
             lldb_process.CreateOSPluginThread(tid, unsigned(thread_obj))
@@ -332,7 +332,7 @@ def GetKextSymbolInfo(load_addr):
                 break
         return "{:#018x} {:s} + {:#x} \n".format(load_addr, symbol_name, symbol_offset)
 
-    # only for arm64 we do lookup for split kexts.
+                                                  
     cached_kext_info = caching.GetDynamicCacheData("kern.kexts.loadinformation", [])
     if not cached_kext_info and str(GetConnectionProtocol()) == "core":
         cached_kext_info = GetKextLoadInformation()
@@ -383,7 +383,7 @@ def GetThreadBackTrace(thread_obj, verbosity = vHUMAN, prefix = ""):
             out_string += prefix +"stacktop = {:#018x}\n".format(frame_p)
 
         if not function:
-            # No debug info for 'function'.
+                                           
             out_string += prefix
             if not is_continuation:
                 out_string += "{fp:#018x} ".format(fp = frame_p)
@@ -399,7 +399,7 @@ def GetThreadBackTrace(thread_obj, verbosity = vHUMAN, prefix = ""):
                 out_string += "{addr:#018x} {mod}`{symbol} + {offset:#x} \n".format(addr=load_addr,
                     mod=mod_name, symbol=symbol_name, offset=symbol_offset)
         else:
-            # Debug info is available for 'function'.
+                                                     
             func_name = frame.GetFunctionName()
             file_name = frame.GetLineEntry().GetFileSpec().GetFilename()
             line_num = frame.GetLineEntry().GetLine()
@@ -460,7 +460,7 @@ def GetFrameLocalVariable(variable_name, frame_no=0):
       retval = core.cvalue.value(sbval)
     return retval
 
-# Begin Macros for kernel debugging
+                                   
 
 @lldb_command('kgmhelp')
 def KernelDebugCommandsHelp(cmd_args=None):
@@ -526,7 +526,7 @@ def XnuDebugCommand(cmd_args=None):
             print "Disabled debug logging."
         elif command_args[-1].lower().find('dis') < 0 and not config['debug']:
             config['debug'] = True
-            EnableLLDBAPILogging()  # provided by utils.py
+            EnableLLDBAPILogging()                        
             print "Enabled debug logging. \nPlease run 'xnudebug debug disable' to disable it again. "
     if subcommand == 'flushcache':
         print "Current size of cache: {}".format(caching.GetSizeOfCache())
@@ -670,7 +670,7 @@ def ParseMacOSPanicLog(panic_header, cmd_options={}):
         other_log_len = cur_debug_buf_ptr_offset - other_log_begin_offset
     expected_panic_magic = xnudefines.MACOS_PANIC_MAGIC
 
-    # use the global if it's available (on an x86 corefile), otherwise refer to the header
+                                                                                          
     if hasattr(kern.globals, "panic_stackshot_buf"):
         panic_stackshot_addr = unsigned(kern.globals.panic_stackshot_buf)
         panic_stackshot_len = unsigned(kern.globals.panic_stackshot_len)
@@ -728,8 +728,8 @@ def ParseAURRPanicLog(panic_header, cmd_options={}):
     panic_buf = Cast(panic_header, 'char *')
 
     try:
-        # This line will blow up if there's not type info for this struct (older kernel)
-        # We fall back to manual parsing below
+                                                                                        
+                                              
         aurr_panic_header = Cast(panic_header, 'struct efi_aurr_panic_header *')
         panic_log_magic = unsigned(aurr_panic_header.efi_aurr_magic)
         panic_log_version = unsigned(aurr_panic_header.efi_aurr_version)
@@ -741,7 +741,7 @@ def ParseAURRPanicLog(panic_header, cmd_options={}):
         print "*** Warning: trying to manually parse..."
         aurr_panic_header = Cast(panic_header, "uint32_t *")
         panic_log_magic = unsigned(aurr_panic_header[0])
-        # panic_log_crc = unsigned(aurr_panic_header[1])
+                                                        
         panic_log_version = unsigned(aurr_panic_header[2])
         panic_log_reset_cause = unsigned(aurr_panic_header[3])
         panic_log_reset_log_offset = unsigned(aurr_panic_header[4])
@@ -754,14 +754,14 @@ def ParseAURRPanicLog(panic_header, cmd_options={}):
 
     print "AURR Panic Version: %d" % (panic_log_version)
 
-    # When it comes time to extend this in the future, please follow the
-    # construct used below in ShowPanicLog()
+                                                                        
+                                            
     if panic_log_version in (xnudefines.AURR_PANIC_VERSION, xnudefines.AURR_CRASHLOG_PANIC_VERSION):
-        # AURR Report Version 1 (AURR/MacEFI) or 2 (Crashlog)
-        # see macefifirmware/Vendor/Apple/EfiPkg/AppleDebugSupport/Library/Debugger.h
+                                                             
+                                                                                     
         print "Reset Cause: 0x%x (%s)" % (panic_log_reset_cause, reset_cause.get(panic_log_reset_cause, "UNKNOWN"))
 
-        # Adjust panic log string length (cap to maximum supported values)
+                                                                          
         if panic_log_version == xnudefines.AURR_PANIC_VERSION:
             max_string_len = panic_log_reset_log_len
         elif panic_log_version == xnudefines.AURR_CRASHLOG_PANIC_VERSION:
@@ -777,7 +777,7 @@ def ParseAURRPanicLog(panic_header, cmd_options={}):
 
         print out_str
 
-        # Save Crashlog Binary Data (if available)
+                                                  
         if "-S" in cmd_options and panic_log_version == xnudefines.AURR_CRASHLOG_PANIC_VERSION:
             crashlog_binary_offset = panic_log_reset_log_offset + xnudefines.CRASHLOG_PANIC_STRING_LEN
             crashlog_binary_size = (panic_log_reset_log_len > xnudefines.CRASHLOG_PANIC_STRING_LEN) and (panic_log_reset_log_len - xnudefines.CRASHLOG_PANIC_STRING_LEN) or 0
@@ -786,7 +786,7 @@ def ParseAURRPanicLog(panic_header, cmd_options={}):
                 print "No crashlog data found..."
                 return
 
-            # Save to file
+                          
             ts = int(time.time())
             ss_binfile = "/tmp/crashlog_%d.bin" % ts
 
@@ -806,7 +806,7 @@ def ParseUnknownPanicLog(panic_header, cmd_options={}):
     print "Hint: To dump this panic header in order to try manually parsing it, use this command:"
     print " (lldb) memory read -fx -s4 -c64 0x%08x" % int(panic_header)
     print " ^ that will dump the first 256 bytes of the panic region"
-    ## TBD: Hexdump some bits here to allow folks to poke at the region manually?
+                                                                                 
     return
 
 
@@ -825,8 +825,8 @@ def ShowPanicLog(cmd_args=None, cmd_options={}):
             print "macOS panic data requested but unavailable on this device"
             return
         panic_header = kern.globals.mac_panic_header
-        # DEBUG HACK FOR TESTING
-        #panic_header = kern.GetValueFromAddress(0xfffffff054098000, "uint32_t *")
+                                
+                                                                                  
     else:
         panic_header = kern.globals.panic_info
 
@@ -840,7 +840,7 @@ def ShowPanicLog(cmd_args=None, cmd_options={}):
         panic_log_magic = int(dereference(magic_ptr))
 
     if panic_log_magic == 0:
-        # No panic here..
+                         
         return
 
     panic_parsers = {
@@ -849,10 +849,10 @@ def ShowPanicLog(cmd_args=None, cmd_options={}):
         int(xnudefines.EMBEDDED_PANIC_MAGIC) : ParseEmbeddedPanicLog,
     }
 
-    # Find the right parser (fall back to unknown parser above)
+                                                               
     parser = panic_parsers.get(panic_log_magic, ParseUnknownPanicLog)
 
-    # execute it
+                
     return parser(panic_header, cmd_options)
 
 @lldb_command('showbootargs')
@@ -876,7 +876,7 @@ def GetDebuggerStopIDValue():
     proc_uniq_id = 0
     if hasattr(process_obj, 'GetUniqueID'):
         proc_uniq_id = process_obj.GetUniqueID()
-        #FIXME <rdar://problem/13034329> forces us to do this twice
+                                                                   
         proc_uniq_id = process_obj.GetUniqueID()
     else:
         GetDebuggerStopIDValue.last_process_uniq_id +=1
@@ -885,7 +885,7 @@ def GetDebuggerStopIDValue():
     stop_id_str = "{:d}:{:d}".format(proc_uniq_id, stop_id)
     return hash(stop_id_str)
 
-# The initialization code to add your commands
+                                              
 _xnu_framework_init = False
 def __lldb_init_module(debugger, internal_dict):
     global kern, lldb_command_documentation, config, _xnu_framework_init
@@ -1061,8 +1061,8 @@ def Trace_cmd(cmd_args=[], cmd_options={}, headerString=lambda:"", entryString=l
     reverse_sort = '-R' in cmd_options
     backtraces = '-B' in cmd_options
 
-    # entries will be a list of 3-tuples, each holding the CPU on which the iotrace entry was collected,
-    # the original ring index, and the iotrace entry. 
+                                                                                                        
+                                                      
     entries = []
     for x in chosen_cpus:
         ring_slice = [(x, y, ring[x][y]) for y in range(entries_per_cpu)]
@@ -1170,8 +1170,8 @@ def TrapTrace_cmd(cmd_args=[], cmd_options={}):
     Trace_cmd(cmd_args, cmd_options, hdrString, entryString, kern.globals.traptrace_ring,
         kern.globals.traptrace_entries_per_cpu, MAX_TRAPTRACE_BACKTRACES)
 
-# Yields an iterator over all the sysctls from the provided root.
-# Can optionally filter by the given prefix
+                                                                 
+                                           
 def IterateSysctls(root_oid=kern.globals.sysctl__children, prefix="", depth = 0, parent = ""):
     headp = root_oid
     for pp in IterateListEntry(headp, 'struct sysctl_oid *', 'oid_link', 's'):
@@ -1192,8 +1192,8 @@ def IterateSysctls(root_oid=kern.globals.sysctl__children, prefix="", depth = 0,
                     next_parent = parent + "." + next_parent
             else:
                 next_parent = node_str
-            # Only recurse if the next parent starts with our allowed prefix.
-            # Note that it's OK if the parent string is too short (because the prefix might be for a deeper node).
+                                                                             
+                                                                                                                  
             prefix_len = min(len(prefix), len(next_parent))
             if next_parent[:prefix_len] == prefix[:prefix_len]:
                 for x in IterateSysctls(Cast(pp.oid_arg1, "struct sysctl_oid_list *"), prefix, depth + 1, next_parent):
@@ -1258,7 +1258,7 @@ def ShowExperiments(cmd_args=[], cmd_options={}):
     for sysctl, depth, parentstr in IterateSysctls(kern.globals.sysctl__children):
         if sysctl.oid_kind & kExperimentFactorFlag:
             spec = cast(sysctl.oid_arg1, "struct experiment_spec *")
-            # Skip if arg2 isn't set to 1 (indicates an experiment factor created without an experiment_spec).
+                                                                                                              
             if sysctl.oid_arg2 == 1:
                 if spec.modified == 1:
                     fmt = str(sysctl.oid_fmt)
@@ -1267,7 +1267,7 @@ def ShowExperiments(cmd_args=[], cmd_options={}):
                     if t:
                         value = cast(ptr, t)
                     else:
-                        # Unknown type
+                                      
                         continue
                     name = str(parentstr) + "." + str(sysctl.oid_name)
                     print("%s = %d (Default value is %d)" % (name, dereference(value), spec.original_value))

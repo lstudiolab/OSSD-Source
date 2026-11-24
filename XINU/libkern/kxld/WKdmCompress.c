@@ -1,15 +1,15 @@
 #include "WKdm.h"
 
-/***********************************************************************
- *                   THE PACKING ROUTINES
- */
+                                                                        
+                                         
+   
 
-/* WK_pack_2bits()
- * Pack some multiple of four words holding two-bit tags (in the low
- * two bits of each byte) into an integral number of words, i.e.,
- * one fourth as many.
- * NOTE: Pad the input out with zeroes to a multiple of four words!
- */
+                  
+                                                                    
+                                                                 
+                      
+                                                                   
+   
 static WK_word*
 WK_pack_2bits(WK_word* source_buf,
     WK_word* source_end,
@@ -32,11 +32,11 @@ WK_pack_2bits(WK_word* source_buf,
 	return dest_next;
 }
 
-/* WK_pack_4bits()
- * Pack an even number of words holding 4-bit patterns in the low bits
- * of each byte into half as many words.
- * note: pad out the input with zeroes to an even number of words!
- */
+                  
+                                                                      
+                                        
+                                                                  
+   
 
 static WK_word*
 WK_pack_4bits(WK_word* source_buf,
@@ -46,7 +46,7 @@ WK_pack_4bits(WK_word* source_buf,
 	WK_word* src_next = source_buf;
 	WK_word* dest_next = dest_buf;
 
-	/* this loop should probably be unrolled */
+	                                           
 	while (src_next < source_end) {
 		WK_word temp = src_next[0];
 		temp |= (src_next[1] << 4);
@@ -59,10 +59,10 @@ WK_pack_4bits(WK_word* source_buf,
 	return dest_next;
 }
 
-/* pack_3_tenbits()
- * Pack a sequence of three ten bit items into one word.
- * note: pad out the input with zeroes to an even number of words!
- */
+                   
+                                                        
+                                                                  
+   
 static WK_word*
 WK_pack_3_tenbits(WK_word* source_buf,
     WK_word* source_end,
@@ -71,7 +71,7 @@ WK_pack_3_tenbits(WK_word* source_buf,
 	WK_word* src_next = source_buf;
 	WK_word* dest_next = dest_buf;
 
-	/* this loop should probably be unrolled */
+	                                           
 	while (src_next < source_end) {
 		WK_word temp = src_next[0];
 		temp |= (src_next[1] << 10);
@@ -85,9 +85,9 @@ WK_pack_3_tenbits(WK_word* source_buf,
 	return dest_next;
 }
 
-/***************************************************************************
- *  WKdm_compress()---THE COMPRESSOR
- */
+                                                                            
+                                    
+   
 
 unsigned int
 WKdm_compress(WK_word* src_buf,
@@ -96,26 +96,26 @@ WKdm_compress(WK_word* src_buf,
 {
 	DictionaryElement dictionary[DICTIONARY_SIZE];
 
-	/* arrays that hold output data in intermediate form during modeling */
-	/* and whose contents are packed into the actual output after modeling */
+	                                                                       
+	                                                                         
 
-	/* sizes of these arrays should be increased if you want to compress
-	 * pages larger than 4KB
-	 */
-	WK_word tempTagsArray[300];   /* tags for everything          */
-	WK_word tempQPosArray[300];   /* queue positions for matches  */
-	WK_word tempLowBitsArray[1200]; /* low bits for partial matches */
+	                                                                    
+                         
+    
+	WK_word tempTagsArray[300];                                     
+	WK_word tempQPosArray[300];                                     
+	WK_word tempLowBitsArray[1200];                                   
 
-	/* boundary_tmp will be used for keeping track of what's where in
-	 * the compressed page during packing
-	 */
+	                                                                 
+                                      
+    
 	WK_word* boundary_tmp;
 
-	/* Fill pointers for filling intermediate arrays (of queue positions
-	 * and low bits) during encoding.
-	 * Full words go straight to the destination buffer area reserved
-	 * for them.  (Right after where the tags go.)
-	 */
+	                                                                    
+                                  
+                                                                  
+                                               
+    
 	WK_word* next_full_patt;
 	char* next_tag = (char *) tempTagsArray;
 	char* next_qp = (char *) tempQPosArray;
@@ -141,10 +141,10 @@ WKdm_compress(WK_word* src_buf,
 		WK_word dict_word;
 		WK_word input_word = *next_input_word;
 
-		/* compute hash value, which is a byte offset into the dictionary,
-		 * and add it to the base address of the dictionary. Cast back and
-		 * forth to/from char * so no shifts are needed
-		 */
+		                                                                  
+                                                                    
+                                                 
+     
 		dict_location =
 		    (WK_word *)
 		    ((void*) (((char*) dictionary) + HASH_TO_DICT_BYTE_OFFSET(input_word)));
@@ -194,18 +194,18 @@ WKdm_compress(WK_word* src_buf,
 	  printf("\n");}
 #endif
 
-	/* Record (into the header) where we stopped writing full words,
-	 * which is where we will pack the queue positions.  (Recall
-	 * that we wrote the full words directly into the dest buffer
-	 * during modeling.
-	 */
+	                                                                
+                                                             
+                                                              
+                    
+    
 
 	SET_QPOS_AREA_START(dest_buf, next_full_patt);
 
-	/* Pack the tags into the tags area, between the page header
-	 * and the full words area.  We don't pad for the packer
-	 * because we assume that the page size is a multiple of 16.
-	 */
+	                                                            
+                                                         
+                                                             
+    
 
 #ifdef WK_DEBUG
 	printf("about to pack %u bytes holding tags\n",
@@ -229,20 +229,20 @@ WKdm_compress(WK_word* src_buf,
 	printf("packing tags stopped at %u\n", boundary_tmp);
 #endif
 
-	/* Pack the queue positions into the area just after
-	 * the full words.  We have to round up the source
-	 * region to a multiple of two words.
-	 */
+	                                                    
+                                                   
+                                      
+    
 
 	{
 		unsigned int num_bytes_to_pack = (unsigned int)(next_qp - (char *) tempQPosArray);
-		unsigned int num_packed_words = (num_bytes_to_pack + 7) >> 3; // ceil((double) num_bytes_to_pack / 8);
+		unsigned int num_packed_words = (num_bytes_to_pack + 7) >> 3;                                         
 		unsigned int num_source_words = num_packed_words * 2;
 		WK_word* endQPosArray = tempQPosArray + num_source_words;
 
-		/* Pad out the array with zeros to avoid corrupting real packed
-		 *  values. */
-		for (; /* next_qp is already set as desired */
+		                                                               
+                
+		for (;                                        
 		    next_qp < (char*)endQPosArray;
 		    next_qp++) {
 			*next_qp = 0;
@@ -269,30 +269,30 @@ WKdm_compress(WK_word* src_buf,
 		    next_full_patt);
 #ifdef WK_DEBUG
 		printf("Packing of queue positions stopped at %u\n", boundary_tmp);
-#endif // WK_DEBUG
+#endif            
 
-		/* Record (into the header) where we stopped packing queue positions,
-		 * which is where we will start packing low bits.
-		 */
+		                                                                     
+                                                   
+     
 		SET_LOW_BITS_AREA_START(dest_buf, boundary_tmp);
 	}
 
-	/* Pack the low bit patterns into the area just after
-	 * the queue positions.  We have to round up the source
-	 * region to a multiple of three words.
-	 */
+	                                                     
+                                                        
+                                        
+    
 
 	{
 		unsigned int num_tenbits_to_pack =
 		    (unsigned int)(next_low_bits - tempLowBitsArray);
-		unsigned int num_packed_words = (num_tenbits_to_pack + 2) / 3; //ceil((double) num_tenbits_to_pack / 3);
+		unsigned int num_packed_words = (num_tenbits_to_pack + 2) / 3;                                          
 		unsigned int num_source_words = num_packed_words * 3;
 		WK_word* endLowBitsArray = tempLowBitsArray + num_source_words;
 
-		/* Pad out the array with zeros to avoid corrupting real packed
-		 *  values. */
+		                                                               
+                
 
-		for (; /* next_low_bits is already set as desired */
+		for (;                                              
 		    next_low_bits < endLowBitsArray;
 		    next_low_bits++) {
 			*next_low_bits = 0;

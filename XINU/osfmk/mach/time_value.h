@@ -59,9 +59,9 @@
 
 #include <mach/machine/vm_types.h>
 
-/*
- *	Time value returned by kernel.
- */
+  
+                                 
+   
 
 struct time_value {
 	integer_t seconds;
@@ -70,10 +70,10 @@ struct time_value {
 
 typedef struct time_value       time_value_t;
 
-/*
- *	Macros to manipulate time values.  Assume that time values
- *	are normalized (microseconds <= 999999).
- */
+  
+                                                             
+                                           
+   
 #define TIME_MICROS_MAX (1000000)
 
 #define time_value_add_usec(val, micros)        {       \
@@ -93,4 +93,4 @@ typedef struct time_value       time_value_t;
 	}                                                       \
 }
 
-#endif  /* _MACH_TIME_VALUE_H_ */
+#endif                           

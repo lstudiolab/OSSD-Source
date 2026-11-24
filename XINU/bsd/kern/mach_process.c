@@ -83,15 +83,15 @@
 #include <sys/mount_internal.h>
 #include <sys/sysproto.h>
 #include <sys/kdebug.h>
-#include <sys/codesign.h>               /* cs_allow_invalid() */
+#include <sys/codesign.h>                                       
 
 #include <security/audit/audit.h>
 
 #include <kern/task.h>
 #include <kern/thread.h>
 
-#include <mach/task.h>                  /* for task_resume() */
-#include <kern/sched_prim.h>            /* for thread_exception_return() */
+#include <mach/task.h>                                         
+#include <kern/sched_prim.h>                                               
 
 #include <pexpert/pexpert.h>
 
@@ -99,10 +99,10 @@
 #include <security/mac_framework.h>
 #endif
 
-/* XXX ken/bsd_kern.c - prototype should be in common header */
+                                                               
 int get_task_userstop(task_t);
 
-/* Macros to clear/set/test flags. */
+                                     
 #define SET(t, f)       (t) |= (f)
 #define CLR(t, f)       (t) &= ~(f)
 #define ISSET(t, f)     ((t) & (f))
@@ -110,14 +110,14 @@ int get_task_userstop(task_t);
 extern thread_t get_firstthread(task_t);
 
 
-/*
- * sys-trace system call.
- */
+  
+                         
+   
 
 int
 ptrace(struct proc *p, struct ptrace_args *uap, int32_t *retval)
 {
-	struct proc     *t; /* target process */
+	struct proc     *t;                     
 	task_t          task;
 	thread_t        th_act;
 	struct uthread  *ut;
@@ -144,7 +144,7 @@ ptrace(struct proc *p, struct ptrace_args *uap, int32_t *retval)
 			exit1(p, W_EXITCODE(ENOTSUP, 0), retval);
 
 			thread_exception_return();
-			/* NOTREACHED */
+			                
 		}
 		SET(p->p_lflag, P_LNOATTACH);
 		proc_unlock(p);
@@ -162,9 +162,9 @@ ptrace(struct proc *p, struct ptrace_args *uap, int32_t *retval)
 		}
 	}
 
-	/*
-	 *	Intercept and deal with "please trace me" request.
-	 */
+	  
+                                                      
+    
 	if (uap->req == PT_TRACE_ME) {
 retry_trace_me: ;
 		proc_t pproc = proc_parent(p);
@@ -172,12 +172,12 @@ retry_trace_me: ;
 			return EINVAL;
 		}
 #if CONFIG_MACF
-		/*
-		 * NB: Cannot call kauth_authorize_process(..., KAUTH_PROCESS_CANTRACE, ...)
-		 *     since that assumes the process being checked is the current process
-		 *     when, in this case, it is the current process's parent.
-		 *     Most of the other checks in cantrace() don't apply either.
-		 */
+		  
+                                                                              
+                                                                            
+                                                                
+                                                                   
+     
 		struct proc_ident p_ident = proc_ident(p);
 		struct proc_ident pproc_ident = proc_ident(pproc);
 		kauth_cred_t pproc_cred = kauth_cred_proc_ref(pproc);
@@ -194,17 +194,17 @@ retry_trace_me: ;
 		}
 #endif
 		proc_lock(p);
-		/* Make sure the process wasn't re-parented. */
+		                                               
 		if (p->p_ppid != pproc->p_pid) {
 			proc_unlock(p);
 			proc_rele(pproc);
 			goto retry_trace_me;
 		}
 		SET(p->p_lflag, P_LTRACED);
-		/* Non-attached case, our tracer is our parent. */
+		                                                  
 		p->p_oppid = p->p_ppid;
 		proc_unlock(p);
-		/* Child and parent will have to be able to run modified code. */
+		                                                                 
 		cs_allow_invalid(p);
 		cs_allow_invalid(pproc);
 		proc_rele(pproc);
@@ -223,16 +223,16 @@ retry_trace_me: ;
 		}
 	}
 
-	/*
-	 * We do not want ptrace to do anything with kernel or launchd
-	 */
+	  
+                                                               
+    
 	if (uap->pid < 2) {
 		return EPERM;
 	}
 
-	/*
-	 *	Locate victim, and make sure it is traceable.
-	 */
+	  
+                                                 
+    
 	if ((t = proc_find(uap->pid)) == NULL) {
 		return ESRCH;
 	}
@@ -261,7 +261,7 @@ retry_trace_me: ;
 		    t, (uintptr_t)&err, 0, 0);
 
 		if (err == 0) {
-			/* it's OK to attach */
+			                       
 			proc_lock(t);
 			SET(t->p_lflag, P_LTRACED);
 			if (tr_sigexc) {
@@ -269,8 +269,8 @@ retry_trace_me: ;
 			}
 
 			t->p_oppid = t->p_ppid;
-			/* Check whether child and parent are allowed to run modified
-			 * code (they'll have to) */
+			                                                             
+                               
 			proc_unlock(t);
 			cs_allow_invalid(t);
 			cs_allow_invalid(p);
@@ -285,11 +285,11 @@ retry_trace_me: ;
 			t->p_xstat = 0;
 			proc_unlock(t);
 			psignal(t, SIGSTOP);
-			/*
-			 * If the process was stopped, wake up and run through
-			 * issignal() again to properly connect to the tracing
-			 * process.
-			 */
+			  
+                                                         
+                                                         
+              
+      
 			if (stopped) {
 				task_resume(task);
 			}
@@ -298,13 +298,13 @@ retry_trace_me: ;
 		} else {
 			error = err;
 			if (error == ESRCH) {
-				/*
-				 * The target 't' is not valid anymore as it
-				 * could not be found after the MAC check.
-				 */
+				  
+                                                
+                                              
+       
 				return error;
 			}
-			/* not allowed to attach, proper error code returned by kauth_authorize_process */
+			                                                                                  
 			if (ISSET(t->p_lflag, P_LNOATTACH)) {
 				psignal(p, SIGSEGV);
 			}
@@ -312,10 +312,10 @@ retry_trace_me: ;
 		}
 	}
 
-	/*
-	 * You can't do what you want to the process if:
-	 *	(1) It's not being traced at all,
-	 */
+	  
+                                                 
+                                     
+    
 	proc_lock(t);
 	if (!ISSET(t->p_lflag, P_LTRACED)) {
 		proc_unlock(t);
@@ -323,29 +323,29 @@ retry_trace_me: ;
 		goto out;
 	}
 
-	/*
-	 *	(2) it's not being traced by _you_, or
-	 */
+	  
+                                          
+    
 	if (t->p_pptr != p) {
 		proc_unlock(t);
 		error = EBUSY;
 		goto out;
 	}
 
-	/*
-	 *	(3) it's not currently stopped.
-	 */
+	  
+                                   
+    
 	if (t->p_stat != SSTOP) {
 		proc_unlock(t);
 		error = EBUSY;
 		goto out;
 	}
 
-	/*
-	 *	Mach version of ptrace executes request directly here,
-	 *	thus simplifying the interaction of ptrace and signals.
-	 */
-	/* proc lock is held here */
+	  
+                                                          
+                                                           
+    
+	                            
 	switch (uap->req) {
 	case PT_DETACH:
 		if (t->p_oppid != t->p_ppid) {
@@ -357,7 +357,7 @@ retry_trace_me: ;
 				proc_reparentlocked(t, pp, 1, 0);
 				proc_rele(pp);
 			} else {
-				/* original parent exited while traced */
+				                                         
 				proc_list_lock();
 				t->p_listflag |= P_LIST_DEADPARENT;
 				proc_list_unlock();
@@ -373,10 +373,10 @@ retry_trace_me: ;
 		goto resume;
 
 	case PT_KILL:
-		/*
-		 *	Tell child process to kill itself after it
-		 *	is resumed by adding NSIG to p_cursig. [see issig]
-		 */
+		  
+                                               
+                                                       
+     
 		proc_unlock(t);
 #if CONFIG_MACF
 		error = mac_proc_check_signal(p, t, SIGKILL);
@@ -387,8 +387,8 @@ retry_trace_me: ;
 		psignal(t, SIGKILL);
 		goto resume;
 
-	case PT_STEP:                   /* single step the child */
-	case PT_CONTINUE:               /* continue the child */
+	case PT_STEP:                                              
+	case PT_CONTINUE:                                       
 		proc_unlock(t);
 		th_act = (thread_t)get_firstthread(task);
 		if (th_act == THREAD_NULL) {
@@ -396,7 +396,7 @@ retry_trace_me: ;
 			goto out;
 		}
 
-		/* force use of Mach SPIs (and task_for_pid security checks) to adjust PC */
+		                                                                            
 		if (uap->addr != (user_addr_t)1) {
 			error = ENOTSUP;
 			goto out;
@@ -418,10 +418,10 @@ retry_trace_me: ;
 		}
 
 		if (uap->req == PT_STEP) {
-			/*
-			 * set trace bit
-			 * we use sending SIGSTOP as a comparable security check.
-			 */
+			  
+                   
+                                                            
+      
 #if CONFIG_MACF
 			error = mac_proc_check_signal(p, t, SIGSTOP);
 			if (0 != error) {
@@ -433,10 +433,10 @@ retry_trace_me: ;
 				goto out;
 			}
 		} else {
-			/*
-			 * clear trace bit if on
-			 * we use sending SIGCONT as a comparable security check.
-			 */
+			  
+                           
+                                                            
+      
 #if CONFIG_MACF
 			error = mac_proc_check_signal(p, t, SIGCONT);
 			if (0 != error) {
@@ -501,36 +501,36 @@ out:
 }
 
 
-/*
- * determine if one process (cur_procp) can trace another process (traced_procp).
- */
+  
+                                                                                 
+   
 
 int
 cantrace(proc_t cur_procp, kauth_cred_t creds, proc_t traced_procp, int *errp)
 {
 	int             my_err;
 	kauth_cred_t    traced_cred;
-	/*
-	 * You can't trace a process if:
-	 *	(1) it's the process that's doing the tracing,
-	 */
+	  
+                                 
+                                                  
+    
 	if (traced_procp->p_pid == cur_procp->p_pid) {
 		*errp = EINVAL;
 		return 0;
 	}
 
-	/*
-	 *	(2) it's already being traced, or
-	 */
+	  
+                                     
+    
 	if (ISSET(traced_procp->p_lflag, P_LTRACED)) {
 		*errp = EBUSY;
 		return 0;
 	}
 
-	/*
-	 *	(3) it's not owned by you, or is set-id on exec
-	 *	    (unless you're root).
-	 */
+	  
+                                                   
+                             
+    
 	traced_cred = kauth_cred_proc_ref(traced_procp);
 	if ((kauth_cred_getruid(creds) != kauth_cred_getruid(traced_cred) ||
 	    ISSET(traced_procp->p_flag, P_SUGID)) &&
@@ -556,10 +556,10 @@ cantrace(proc_t cur_procp, kauth_cred_t creds, proc_t traced_procp, int *errp)
 	struct proc_ident traced_ident = proc_ident(traced_procp);
 	kauth_cred_t cur_cred = kauth_cred_proc_ref(cur_procp);
 
-	/*
-	 * Drop the proc reference to avoid a deadlock during an upcall and find
-	 * (reference) the proc again so our caller can keep using it.
-	 */
+	  
+                                                                         
+                                                               
+    
 	proc_rele(traced_procp);
 	my_err = mac_proc_check_debug(&cur_ident, cur_cred, &traced_ident);
 	kauth_cred_unref(&cur_cred);

@@ -60,12 +60,12 @@
  *
  *	@(#)vnode.h	8.17 (Berkeley) 5/20/95
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _SYS_VNODE_INTERNAL_H_
 #define _SYS_VNODE_INTERNAL_H_
@@ -94,99 +94,99 @@ struct label;
 LIST_HEAD(buflists, buf);
 
 #if CONFIG_TRIGGERS
-/*
- * VFS Internal (private) trigger vnode resolver info.
- */
+  
+                                                      
+   
 struct vnode_resolve {
-	lck_mtx_t                               vr_lock;   /* protects vnode_resolve_t fields */
+	lck_mtx_t                               vr_lock;                                        
 	trigger_vnode_resolve_callback_t        vr_resolve_func;
 	trigger_vnode_unresolve_callback_t      vr_unresolve_func;
 	trigger_vnode_rearm_callback_t          vr_rearm_func;
 	trigger_vnode_reclaim_callback_t        vr_reclaim_func;
-	void *                                  vr_data;   /* private data for resolver */
+	void *                                  vr_data;                                  
 	uint32_t                                vr_flags;
 	uint32_t                                vr_lastseq;
 };
 typedef struct vnode_resolve *vnode_resolve_t;
 
-/* private vr_flags */
+                      
 #define VNT_RESOLVED        (1UL << 31)
 #define VNT_VFS_UNMOUNTED   (1UL << 30)
 #define VNT_EXTERNAL        (1UL << 29)
 
-#endif /* CONFIG_TRIGGERS */
+#endif                      
 
-/*
- * Reading or writing any of these items requires holding the appropriate lock.
- * v_freelist is locked by the global vnode_list_lock
- * v_mntvnodes is locked by the mount_lock
- * v_nclinks and v_ncchildren are protected by the global name_cache_lock
- * v_cleanblkhd and v_dirtyblkhd and v_iterblkflags are locked via the global buf_mtx
- * the rest of the structure is protected by the vnode_lock
- */
+  
+                                                                               
+                                                     
+                                          
+                                                                         
+                                                                                     
+                                                           
+   
 struct vnode {
-	lck_mtx_t v_lock;                       /* vnode mutex */
-	TAILQ_ENTRY(vnode) v_freelist;          /* vnode freelist */
-	TAILQ_ENTRY(vnode) v_mntvnodes;         /* vnodes for mount point */
-	TAILQ_HEAD(, namecache) v_ncchildren;   /* name cache entries that regard us as their parent */
-	LIST_HEAD(, namecache) v_nclinks;       /* name cache entries that name this vnode */
-	vnode_t  v_defer_reclaimlist;           /* in case we have to defer the reclaim to avoid recursion */
-	uint32_t v_listflag;                    /* flags protected by the vnode_list_lock (see below) */
-	uint32_t v_flag;                        /* vnode flags (see below) */
-	uint16_t v_lflag;                       /* vnode local and named ref flags */
-	uint8_t  v_iterblkflags;                /* buf iterator flags */
-	uint8_t  v_references;                  /* number of times io_count has been granted */
-	int32_t  v_kusecount;                   /* count of in-kernel refs */
-	int32_t  v_usecount;                    /* reference count of users */
-	int32_t  v_iocount;                     /* iocounters */
-	void *   XNU_PTRAUTH_SIGNED_PTR("vnode.v_owner") v_owner; /* act that owns the vnode */
-	uint16_t v_type;                        /* vnode type */
-	uint16_t v_tag;                         /* type of underlying data */
-	uint32_t v_id;                          /* identity of vnode contents */
+	lck_mtx_t v_lock;                                        
+	TAILQ_ENTRY(vnode) v_freelist;                              
+	TAILQ_ENTRY(vnode) v_mntvnodes;                                     
+	TAILQ_HEAD(, namecache) v_ncchildren;                                                          
+	LIST_HEAD(, namecache) v_nclinks;                                                    
+	vnode_t  v_defer_reclaimlist;                                                                        
+	uint32_t v_listflag;                                                                            
+	uint32_t v_flag;                                                     
+	uint16_t v_lflag;                                                            
+	uint8_t  v_iterblkflags;                                        
+	uint8_t  v_references;                                                                 
+	int32_t  v_kusecount;                                                
+	int32_t  v_usecount;                                                  
+	int32_t  v_iocount;                                     
+	void *   XNU_PTRAUTH_SIGNED_PTR("vnode.v_owner") v_owner;                              
+	uint16_t v_type;                                        
+	uint16_t v_tag;                                                      
+	uint32_t v_id;                                                          
 	union {
-		struct mount    * XNU_PTRAUTH_SIGNED_PTR("vnode.v_data") vu_mountedhere;  /* ptr to mounted vfs (VDIR) */
-		struct socket   * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_socket") vu_socket;     /* unix ipc (VSOCK) */
-		struct specinfo * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_specinfo") vu_specinfo;   /* device (VCHR, VBLK) */
-		struct fifoinfo * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_fifoinfo") vu_fifoinfo;   /* fifo (VFIFO) */
-		struct ubc_info * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_ubcinfo") vu_ubcinfo;    /* valid for (VREG) */
+		struct mount    * XNU_PTRAUTH_SIGNED_PTR("vnode.v_data") vu_mountedhere;                                 
+		struct socket   * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_socket") vu_socket;                           
+		struct specinfo * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_specinfo") vu_specinfo;                            
+		struct fifoinfo * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_fifoinfo") vu_fifoinfo;                     
+		struct ubc_info * XNU_PTRAUTH_SIGNED_PTR("vnode.vu_ubcinfo") vu_ubcinfo;                          
 	} v_un;
-	struct  buflists v_cleanblkhd;          /* clean blocklist head */
-	struct  buflists v_dirtyblkhd;          /* dirty blocklist head */
-	struct klist v_knotes;                  /* knotes attached to this vnode */
-	/*
-	 * the following 4 fields are protected
-	 * by the name_cache_lock held in
-	 * excluive mode
-	 */
-	kauth_cred_t    XNU_PTRAUTH_SIGNED_PTR("vnode.v_cred") v_cred; /* last authorized credential */
-	kauth_action_t  v_authorized_actions;   /* current authorized actions for v_cred */
-	int             v_cred_timestamp;       /* determine if entry is stale for MNTK_AUTH_OPAQUE */
-	int             v_nc_generation;        /* changes when nodes are removed from the name cache */
-	/*
-	 * back to the vnode lock for protection
-	 */
-	int32_t         v_numoutput;                    /* num of writes in progress */
-	int32_t         v_writecount;                   /* reference count of writers */
-	const char *v_name;                     /* name component of the vnode */
-	vnode_t XNU_PTRAUTH_SIGNED_PTR("vnode.v_parent") v_parent;                       /* pointer to parent vnode */
-	struct lockf    *v_lockf;               /* advisory lock list head */
-	int(**v_op)(void *);                    /* vnode operations vector */
-	mount_t XNU_PTRAUTH_SIGNED_PTR("vnode.v_mount") v_mount;                        /* ptr to vfs we are in */
-	void *  v_data;                         /* private data for fs */
+	struct  buflists v_cleanblkhd;                                    
+	struct  buflists v_dirtyblkhd;                                    
+	struct klist v_knotes;                                                     
+	  
+                                        
+                                  
+                 
+    
+	kauth_cred_t    XNU_PTRAUTH_SIGNED_PTR("vnode.v_cred") v_cred;                                 
+	kauth_action_t  v_authorized_actions;                                              
+	int             v_cred_timestamp;                                                             
+	int             v_nc_generation;                                                                
+	  
+                                         
+    
+	int32_t         v_numoutput;                                                   
+	int32_t         v_writecount;                                                   
+	const char *v_name;                                                      
+	vnode_t XNU_PTRAUTH_SIGNED_PTR("vnode.v_parent") v_parent;                                                    
+	struct lockf    *v_lockf;                                            
+	int(**v_op)(void *);                                                 
+	mount_t XNU_PTRAUTH_SIGNED_PTR("vnode.v_mount") v_mount;                                                  
+	void *  v_data;                                                  
 #if CONFIG_MACF
-	struct label *v_label;                  /* MAC security label */
+	struct label *v_label;                                          
 #endif
 #if CONFIG_TRIGGERS
-	vnode_resolve_t v_resolve;              /* trigger vnode resolve info (VDIR only) */
-#endif /* CONFIG_TRIGGERS */
+	vnode_resolve_t v_resolve;                                                          
+#endif                      
 #if CONFIG_FIRMLINKS
-	vnode_t v_fmlink;                       /* firmlink if set (VDIR only), Points to source
-	                                         *  if VFLINKTARGET is set, if  VFLINKTARGET is not
-	                                         *  set, points to target */
-#endif /* CONFIG_FIRMLINKS */
+	vnode_t v_fmlink;                                                                       
+                                                                                            
+                                                                     
+#endif                       
 #if CONFIG_IO_COMPRESSION_STATS
-	io_compression_stats_t io_compression_stats;            /* IO compression statistics */
-#endif /* CONFIG_IO_COMPRESSION_STATS */
+	io_compression_stats_t io_compression_stats;                                           
+#endif                                  
 };
 
 #define v_mountedhere   v_un.vu_mountedhere
@@ -196,107 +196,107 @@ struct vnode {
 #define v_ubcinfo       v_un.vu_ubcinfo
 
 
-/*
- * v_iterblkflags
- */
+  
+                 
+   
 #define VBI_ITER                0x1
 #define VBI_ITERWANT            0x2
 #define VBI_CLEAN               0x4
 #define VBI_DIRTY               0x8
 #define VBI_NEWBUF              0x10
 
-/*
- * v_listflag
- */
-#define VLIST_RAGE                0x01          /* vnode is currently in the rapid age list */
-#define VLIST_DEAD                0x02          /* vnode is currently in the dead list */
-#define VLIST_ASYNC_WORK          0x04          /* vnode is currently on the deferred async work queue */
+  
+             
+   
+#define VLIST_RAGE                0x01                                                        
+#define VLIST_DEAD                0x02                                                   
+#define VLIST_ASYNC_WORK          0x04                                                                   
 
-/*
- * v_lflags
- */
-#define VL_SUSPENDED    0x0001          /* vnode is suspended */
-#define VL_DRAIN        0x0002          /* vnode is being drained */
-#define VL_TERMINATE    0x0004          /* vnode is in the process of being recycled */
-#define VL_TERMWANT     0x0008          /* there's a waiter  for recycle finish (vnode_getiocount)*/
-#define VL_DEAD         0x0010          /* vnode is dead, cleaned of filesystem-specific info */
-#define VL_MARKTERM     0x0020          /* vnode should be recycled when no longer referenced */
-#define VL_NEEDINACTIVE 0x0080          /* delay VNOP_INACTIVE until iocount goes to 0 */
+  
+           
+   
+#define VL_SUSPENDED    0x0001                                  
+#define VL_DRAIN        0x0002                                      
+#define VL_TERMINATE    0x0004                                                         
+#define VL_TERMWANT     0x0008                                                                      
+#define VL_DEAD         0x0010                                                                  
+#define VL_MARKTERM     0x0020                                                                  
+#define VL_NEEDINACTIVE 0x0080                                                           
 
-#define VL_LABEL        0x0100          /* vnode is marked for labeling */
-#define VL_LABELWAIT    0x0200          /* vnode is marked for labeling */
-#define VL_LABELED      0x0400          /* vnode is labeled */
+#define VL_LABEL        0x0100                                            
+#define VL_LABELWAIT    0x0200                                            
+#define VL_LABELED      0x0400                                
 #define VL_LWARNED      0x0800
-#define VL_HASSTREAMS   0x1000          /* vnode has had at least one associated named stream vnode (may not have one any longer) */
+#define VL_HASSTREAMS   0x1000                                                                                                      
 
-#define VNAMED_UBC      0x2000          /* ubc named reference */
-#define VNAMED_MOUNT    0x4000          /* mount point named reference */
-#define VNAMED_FSHASH   0x8000          /* FS hash named reference */
+#define VNAMED_UBC      0x2000                                   
+#define VNAMED_MOUNT    0x4000                                           
+#define VNAMED_FSHASH   0x8000                                       
 
-/*
- * v_flags
- */
-#define VROOT           0x000001        /* root of its file system */
-#define VTEXT           0x000002        /* vnode is a pure text prototype */
-#define VSYSTEM         0x000004        /* vnode being used by kernel */
-#define VISTTY          0x000008        /* vnode represents a tty */
-#define VRAGE           0x000010        /* vnode is in rapid age state */
-#define VBDEVVP         0x000020        /* vnode created by bdevvp */
-#define VDEVFLUSH       0x000040        /* device vnode after vflush */
-#define VMOUNT          0x000080        /* mount operation in progress */
-#define VBWAIT          0x000100        /* waiting for output to complete */
-#define VSHARED_DYLD    0x000200        /* vnode is a dyld shared cache file */
-#define VNOCACHE_DATA   0x000400        /* don't keep data cached once it's been consumed */
-#define VSTANDARD       0x000800        /* vnode obtained from common pool */
-#define VAGE            0x001000        /* Insert vnode at head of free list */
-#define VRAOFF          0x002000        /* read ahead disabled */
-#define VNCACHEABLE     0x004000        /* vnode is allowed to be put back in name cache */
+  
+          
+   
+#define VROOT           0x000001                                     
+#define VTEXT           0x000002                                            
+#define VSYSTEM         0x000004                                        
+#define VISTTY          0x000008                                    
+#define VRAGE           0x000010                                         
+#define VBDEVVP         0x000020                                     
+#define VDEVFLUSH       0x000040                                       
+#define VMOUNT          0x000080                                         
+#define VBWAIT          0x000100                                            
+#define VSHARED_DYLD    0x000200                                               
+#define VNOCACHE_DATA   0x000400                                                            
+#define VSTANDARD       0x000800                                             
+#define VAGE            0x001000                                               
+#define VRAOFF          0x002000                                 
+#define VNCACHEABLE     0x004000                                                           
 #if NAMEDSTREAMS
-#define VISSHADOW       0x008000        /* vnode is a shadow file */
+#define VISSHADOW       0x008000                                    
 #endif
-#define VSWAP           0x010000        /* vnode is being used as swapfile */
-#define VTHROTTLED      0x020000        /* writes or pageouts have been throttled */
-/* wakeup tasks waiting when count falls below threshold */
-#define VNOFLUSH        0x040000        /* don't vflush() if SKIPSYSTEM */
-#define VLOCKLOCAL      0x080000        /* this vnode does adv locking in vfs */
-#define VISHARDLINK     0x100000        /* hard link needs special processing on lookup and in volfs */
-#define VISUNION        0x200000        /* union special processing */
-#define VISNAMEDSTREAM  0x400000        /* vnode is a named stream (eg HFS resource fork) */
-#define VOPENEVT        0x800000        /* if process is P_CHECKOPENEVT, then or in the O_EVTONLY flag on open */
+#define VSWAP           0x010000                                             
+#define VTHROTTLED      0x020000                                                    
+                                                           
+#define VNOFLUSH        0x040000                                          
+#define VLOCKLOCAL      0x080000                                                
+#define VISHARDLINK     0x100000                                                                       
+#define VISUNION        0x200000                                      
+#define VISNAMEDSTREAM  0x400000                                                            
+#define VOPENEVT        0x800000                                                                                 
 #define VNEEDSSNAPSHOT 0x1000000
-#define VNOCS          0x2000000        /* is there no code signature available */
-#define VISDIRTY       0x4000000        /* vnode will need IO if reclaimed */
-#define VFASTDEVCANDIDATE  0x8000000        /* vnode is a candidate to store on a fast device */
-#define VAUTOCANDIDATE 0x10000000       /* vnode was automatically marked as a fast-dev candidate */
-#define VFMLINKTARGET  0x20000000       /* vnode is firmlink target */
-/*
- *  0x40000000 not used
- *  0x80000000 not used.
- */
+#define VNOCS          0x2000000                                                  
+#define VISDIRTY       0x4000000                                             
+#define VFASTDEVCANDIDATE  0x8000000                                                            
+#define VAUTOCANDIDATE 0x10000000                                                                   
+#define VFMLINKTARGET  0x20000000                                     
+  
+                       
+                        
+   
 
-/*
- * This structure describes vnode data which is specific to a file descriptor.
- * It is currently used only for file descriptors which are for opened for
- * directories.
- */
+  
+                                                                              
+                                                                          
+               
+   
 struct fd_vn_data {
-	lck_mtx_t fv_lock;   /* Used to serialize directory enumeration on fd */
-	off_t     fv_offset; /* Offset to be used */
-	void      *fv_dircookie; /* If FS doesn't like offsets in directories */
-	caddr_t   fv_buf;    /* Temporary buffer to store directory entries */
-	size_t    fv_bufsiz;  /* Valid size of fv_buf */
-	size_t    fv_bufdone; /* How much of fv_buf is processed */
-	size_t    fv_bufallocsiz; /* Allocation size determined for Buffer*/
-	off_t     fv_soff;   /* Starting FS offset for this buffer */
-	off_t     fv_eoff;   /* Ending FS offset for this buffer */
-	int       fv_eofflag;/* Does fv_eoff represent EOF ? */
+	lck_mtx_t fv_lock;                                                      
+	off_t     fv_offset;                        
+	void      *fv_dircookie;                                                
+	caddr_t   fv_buf;                                                     
+	size_t    fv_bufsiz;                            
+	size_t    fv_bufdone;                                      
+	size_t    fv_bufallocsiz;                                           
+	off_t     fv_soff;                                           
+	off_t     fv_eoff;                                         
+	int       fv_eofflag;                                  
 };
 
-/*
- * FV_DIRBUF_START_SIZ is the initial size of the buffer passed to VNOP_READDIR.
- * That may not be enough for some filesytems so the current algorithm works its
- * way upto FV_DIRBUF_MAX_SIZ
- */
+  
+                                                                                
+                                                                                
+                             
+   
 #define FV_DIRBUF_DIRENTRY_SIZ  (sizeof(struct direntry))
 #define FV_DIRBUF_START_SIZ     FV_DIRBUF_DIRENTRY_SIZ
 #define FV_DIRBUF_MAX_SIZ       (4*(sizeof(struct direntry)))
@@ -304,26 +304,26 @@ struct fd_vn_data {
 #define FV_LOCK(fvd) lck_mtx_lock(&(((struct fd_vn_data *)fvd)->fv_lock))
 #define FV_UNLOCK(fvd) lck_mtx_unlock(&(((struct fd_vn_data *)fvd)->fv_lock))
 
-/*
- * Global vnode data.
- */
-extern  struct vnode *rootvnode;        /* root (i.e. "/") vnode */
+  
+                     
+   
+extern  struct vnode *rootvnode;                                   
 
 #ifdef CONFIG_IMGSRC_ACCESS
 #define MAX_IMAGEBOOT_NESTING   2
 extern  struct vnode *imgsrc_rootvnodes[];
-#endif /* CONFIG_IMGSRC_ACCESS */
+#endif                           
 
 
-/*
- * Mods for exensibility.
- */
+  
+                         
+   
 
-/*
- * Flags for vdesc_flags:
- */
+  
+                         
+   
 #define VDESC_MAX_VPS           16
-/* Low order 16 flag bits are reserved for willrele flags for vp arguments. */
+                                                                              
 #define VDESC_VP0_WILLRELE      0x00001
 #define VDESC_VP1_WILLRELE      0x00002
 #define VDESC_VP2_WILLRELE      0x00004
@@ -331,55 +331,55 @@ extern  struct vnode *imgsrc_rootvnodes[];
 #define VDESC_NOMAP_VPP         0x00100
 #define VDESC_VPP_WILLRELE      0x00200
 
-#define VDESC_DISABLED          0x10000 /* descriptor defined but op is unused, has no op slot */
+#define VDESC_DISABLED          0x10000                                                          
 
-/*
- * VDESC_NO_OFFSET is used to identify the end of the offset list
- * and in places where no such field exists.
- */
+  
+                                                                 
+                                            
+   
 #define VDESC_NO_OFFSET -1
 
-/*
- * This structure describes the vnode operation taking place.
- */
+  
+                                                             
+   
 struct vnodeop_desc {
-	int     vdesc_offset;           /* offset in vector--first for speed */
-	const char *vdesc_name;         /* a readable name for debugging */
-	int     vdesc_flags;            /* VDESC_* flags */
+	int     vdesc_offset;                                                  
+	const char *vdesc_name;                                            
+	int     vdesc_flags;                               
 
-	/*
-	 * These ops are used by bypass routines to map and locate arguments.
-	 * Creds and procs are not needed in bypass routines, but sometimes
-	 * they are useful to (for example) transport layers.
-	 * Nameidata is useful because it has a cred in it.
-	 */
-	int     *vdesc_vp_offsets;      /* list ended by VDESC_NO_OFFSET */
-	int     vdesc_vpp_offset;       /* return vpp location */
-	int     vdesc_cred_offset;      /* cred location, if any */
-	int     vdesc_proc_offset;      /* proc location, if any */
-	int     vdesc_componentname_offset; /* if any */
-	int     vdesc_context_offset;   /* context location, if any */
-	/*
-	 * Finally, we've got a list of private data (about each operation)
-	 * for each transport layer.  (Support to manage this list is not
-	 * yet part of BSD.)
-	 */
+	  
+                                                                      
+                                                                    
+                                                      
+                                                    
+    
+	int     *vdesc_vp_offsets;                                         
+	int     vdesc_vpp_offset;                                
+	int     vdesc_cred_offset;                                 
+	int     vdesc_proc_offset;                                 
+	int     vdesc_componentname_offset;             
+	int     vdesc_context_offset;                                 
+	  
+                                                                    
+                                                                  
+                     
+    
 	caddr_t *vdesc_transports;
 };
 
-/*
- * A list of all the operation descs.
- */
+  
+                                     
+   
 extern struct vnodeop_desc *vnodeop_descs[];
 
 
-/*
- * This macro is very helpful in defining those offsets in the vdesc struct.
- *
- * This is stolen from X11R4.  I ingored all the fancy stuff for
- * Crays, so if you decide to port this to such a serious machine,
- * you might want to consult Intrisics.h's XtOffset{,Of,To}.
- */
+  
+                                                                            
+  
+                                                                
+                                                                  
+                                                            
+   
 #define VOPARG_OFFSET(p_type, field) \
 	((int) (((char *) (&(((p_type)NULL)->field))) - ((char *) NULL)))
 #define VOPARG_OFFSETOF(s_type, field) \
@@ -389,23 +389,23 @@ extern struct vnodeop_desc *vnodeop_descs[];
 
 
 
-/*
- * VOCALL calls an op given an ops vector.  We break it out because BSD's
- * vclean changes the ops vector and then wants to call ops with the old
- * vector.
- */
+  
+                                                                         
+                                                                        
+          
+   
 #define VOCALL(OPSV, OFF, AP) (( *((OPSV)[(OFF)])) (AP))
 
-/*
- * This call works for vnodes in the kernel.
- */
+  
+                                            
+   
 #define VCALL(VP, OFF, AP) VOCALL((VP)->v_op,(OFF),(AP))
 #define VDESC(OP) (& __CONCAT(OP,_desc))
 #define VOFFSET(OP) (VDESC(OP)->vdesc_offset)
 
 struct ostat;
 
-/* bdevvp moved to vnode.h as private KPI */
+                                            
 void    cvtstat(struct stat *st, struct ostat *ost);
 void    vprint(const char *label, struct vnode *vp);
 
@@ -438,7 +438,7 @@ void    lock_vnode_and_post(vnode_t, int);
 	        } \
 	} while (0)
 
-/* Authorization subroutines */
+                               
 int     vn_authorize_open_existing(vnode_t vp, struct componentname *cnp, int fmode, vfs_context_t ctx, void *reserved);
 int     vn_authorize_create(vnode_t, struct componentname *, struct vnode_attr *, vfs_context_t, void*);
 int     vn_attribute_prepare(vnode_t dvp, struct vnode_attr *vap, uint32_t *defaulted_fieldsp, vfs_context_t ctx);
@@ -459,7 +459,7 @@ int vn_authorize_null(vnode_t, struct componentname *, struct vnode_attr *, vfs_
 int vnode_attr_authorize_dir_clone(struct vnode_attr *vap, kauth_action_t action,
     struct vnode_attr *dvap, vnode_t sdvp, mount_t mp, dir_clone_authorizer_op_t vattr_op,
     uint32_t flags, vfs_context_t ctx, void *reserved);
-/* End of authorization subroutines */
+                                      
 
 void vnode_attr_handle_mnt_ignore_ownership(struct vnode_attr *vap, mount_t mp, vfs_context_t ctx);
 
@@ -467,7 +467,7 @@ void vnode_attr_handle_mnt_ignore_ownership(struct vnode_attr *vap, mount_t mp, 
 #define VN_CREATE_NOINHERIT             (1<<1)
 #define VN_CREATE_UNION                 (1<<2)
 #define VN_CREATE_NOLABEL               (1<<3)
-#define VN_CREATE_DOOPEN                (1<<4)  /* Open file if a batched operation is available */
+#define VN_CREATE_DOOPEN                (1<<4)                                                     
 errno_t vn_create(vnode_t, vnode_t *, struct nameidata *, struct vnode_attr *, uint32_t, int, uint32_t*, vfs_context_t);
 int     vn_mkdir(vnode_t dvp, vnode_t *vpp, struct nameidata *ndp, struct vnode_attr *vap, vfs_context_t ctx);
 int     vn_rmdir(vnode_t dvp, vnode_t *vpp, struct nameidata *ndp, struct vnode_attr *vap, vfs_context_t ctx);
@@ -514,12 +514,12 @@ int     vnode_getalways(vnode_t);
 int     vnode_getalways_from_pager(vnode_t);
 int     vget_internal(vnode_t, int, int);
 errno_t vnode_getiocount(vnode_t, unsigned int, int);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 int     vnode_get_locked(vnode_t);
 int     vnode_put_locked(vnode_t);
 #ifdef BSD_KERNEL_PRIVATE
 int     vnode_put_from_pager(vnode_t);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 int     vnode_issock(vnode_t);
 int     vnode_isaliased(vnode_t);
@@ -555,7 +555,7 @@ int     vnode_compound_mkdir_available(vnode_t vp);
 int     vnode_compound_remove_available(vnode_t vp);
 int     vnode_compound_open_available(vnode_t vp);
 int     vnode_compound_op_available(vnode_t, compound_vnop_id_t);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 void vn_setunionwait(vnode_t);
 void vn_checkunionwait(vnode_t);
@@ -570,7 +570,7 @@ void    vfsinit(void);
 void vnode_lock(vnode_t);
 void vnode_unlock(vnode_t);
 
-void vn_print_state(vnode_t /* vp */, const char * /* fmt */, ...)
+void vn_print_state(vnode_t         , const char *          , ...)
 __printflike(2, 3);
 
 #if DEVELOPMENT || DEBUG
@@ -584,18 +584,18 @@ do {                                                                    \
 } while (0)
 #else
 #define VNASSERT(exp, vp, msg)
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-/*
- * XXX exported symbols; should be static
- */
+  
+                                         
+   
 void    vfs_op_init(void);
 void    vfs_opv_init(void);
 
 #ifdef BSD_KERNEL_PRIVATE
 int vfs_sysctl_node SYSCTL_HANDLER_ARGS;
 void vnode_setneedinactive(vnode_t);
-int     vnode_hasnamedstreams(vnode_t); /* Does this vnode have associated named streams? */
+int     vnode_hasnamedstreams(vnode_t);                                                     
 
 errno_t
 vnode_readdir64(struct vnode *vp, struct uio *uio, int flags, int *eofflag,
@@ -607,13 +607,13 @@ int64_t vnode_getswappin_avail(vnode_t);
 int vnode_get_snapdir(vnode_t, vnode_t *, vfs_context_t);
 
 #if CONFIG_TRIGGERS
-/* VFS Internal Vnode Trigger Interfaces (Private) */
+                                                     
 int vnode_trigger_resolve(vnode_t, struct nameidata *, vfs_context_t);
 void vnode_trigger_rearm(vnode_t, vfs_context_t);
 void vfs_nested_trigger_unmounts(mount_t, int, vfs_context_t);
-#endif /* CONFIG_TRIGGERS */
+#endif                      
 
-int     build_path_with_parent(vnode_t, vnode_t /* parent */, char *, int, int *, size_t *, int, vfs_context_t);
+int     build_path_with_parent(vnode_t, vnode_t             , char *, int, int *, size_t *, int, vfs_context_t);
 
 void    nspace_resolver_init(void);
 void    nspace_resolver_exited(struct proc *);
@@ -622,21 +622,21 @@ int     vnode_materialize_dataless_file(vnode_t, uint64_t);
 
 int     vnode_isinuse_locked(vnode_t, int, int );
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #if CONFIG_IO_COMPRESSION_STATS
-/*
- * update the IO compression stats tracked at block granularity
- */
+  
+                                                               
+   
 int vnode_updateiocompressionblockstats(vnode_t vp, uint32_t size_bucket);
 
-/*
- * update the IO compression stats tracked for the buffer
- */
+  
+                                                         
+   
 int vnode_updateiocompressionbufferstats(vnode_t vp, uint64_t uncompressed_size, uint64_t compressed_size, uint32_t size_bucket, uint32_t compression_bucket);
 
-#endif /* CONFIG_IO_COMPRESSION_STATS */
+#endif                                  
 
 extern bool rootvp_is_ssd;
 
-#endif /* !_SYS_VNODE_INTERNAL_H_ */
+#endif                              

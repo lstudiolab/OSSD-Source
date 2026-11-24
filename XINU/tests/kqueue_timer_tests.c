@@ -33,9 +33,9 @@ static int kq, passed, failed;
 
 static struct timespec failure_timeout = { .tv_sec = 10, .tv_nsec = 0 };
 
-/*
- * Wait for given kevent, which should return in 'expected' usecs.
- */
+  
+                                                                  
+   
 static int
 do_simple_kevent(struct kevent64_s *kev, uint64_t expected)
 {
@@ -45,13 +45,13 @@ do_simple_kevent(struct kevent64_s *kev, uint64_t expected)
 	struct timespec timeout;
 	struct timeval before, after;
 
-	/* time out after 1 sec extra delay */
+	                                      
 	timeout.tv_sec = (expected / USEC_PER_SEC) + 1;
 	timeout.tv_nsec = (expected % USEC_PER_SEC) * 1000;
 
 	T_SETUPBEGIN;
 
-	/* measure time for the kevent */
+	                                 
 	gettimeofday(&before, NULL);
 	ret = kevent64(kq, kev, 1, kev, 1, 0, &timeout);
 	gettimeofday(&after, NULL);
@@ -64,12 +64,12 @@ do_simple_kevent(struct kevent64_s *kev, uint64_t expected)
 
 	T_SETUPEND;
 
-	/* did it work? */
+	                  
 	elapsed_usecs = (after.tv_sec - before.tv_sec) * (int64_t)USEC_PER_SEC +
 	    (after.tv_usec - before.tv_usec);
 	delta_usecs = (uint64_t)llabs(elapsed_usecs - ((int64_t)expected));
 
-	/* failure if we're 30% off, or 50 mics late */
+	                                               
 	if (delta_usecs > (30 * expected / 100.0) && delta_usecs > 50) {
 		T_LOG("\tfailure: expected %lld usec, measured %lld usec.\n",
 		    expected, elapsed_usecs);
@@ -125,7 +125,7 @@ test_absolute_kevent(int time, int scale)
 		deadline = (int64_t)(nowus / timescale) + time;
 	}
 
-	/* deadlines in the past should fire immediately */
+	                                                   
 	if (time < 0) {
 		expected = 0;
 	}
@@ -180,7 +180,7 @@ test_oneshot_kevent(int time, int scale)
 
 	T_SETUPEND;
 
-	/* deadlines in the past should fire immediately */
+	                                                   
 	if (time < 0) {
 		expected = 0;
 	}
@@ -198,7 +198,7 @@ test_oneshot_kevent(int time, int scale)
 	}
 }
 
-/* Test that the timer goes ding multiple times */
+                                                  
 static void
 test_interval_kevent(int usec)
 {
@@ -207,11 +207,11 @@ test_interval_kevent(int usec)
 
 	T_SETUPBEGIN;
 
-	uint64_t test_duration_us = USEC_PER_SEC; /* 1 second */
+	uint64_t test_duration_us = USEC_PER_SEC;               
 	uint64_t expected_pops;
 
 	if (usec < 0) {
-		expected_pops = 1; /* TODO: test 'and only once' */
+		expected_pops = 1;                                 
 	} else {
 		expected_pops = test_duration_us / (uint64_t)usec;
 	}
@@ -244,7 +244,7 @@ test_interval_kevent(int usec)
 			return;
 		}
 
-		//T_LOG("\t ding: %lld\n", kev.data);
+		                                     
 
 		pops += (uint64_t)kev.data;
 		gettimeofday(&after, NULL);
@@ -256,7 +256,7 @@ test_interval_kevent(int usec)
 		}
 	}
 
-	/* check how many times the timer fired: within 5%? */
+	                                                      
 	if (pops > expected_pops + (expected_pops / 20) ||
 	    pops < expected_pops - (expected_pops / 20)) {
 		T_FAIL("%s() usec:%d (saw %lld of %lld expected pops)", __func__, usec, pops, expected_pops);
@@ -273,7 +273,7 @@ test_interval_kevent(int usec)
 	}
 }
 
-/* Test that the repeating timer repeats even while not polling in kqueue */
+                                                                            
 static void
 test_repeating_kevent(int usec)
 {
@@ -282,7 +282,7 @@ test_repeating_kevent(int usec)
 
 	T_SETUPBEGIN;
 
-	uint64_t test_duration_us = USEC_PER_SEC; /* 1 second */
+	uint64_t test_duration_us = USEC_PER_SEC;               
 
 	uint64_t expected_pops = test_duration_us / (uint64_t)usec;
 	T_LOG("Testing repeating kevent at %d usec intervals (%lld pops/second)...\n",
@@ -309,7 +309,7 @@ test_repeating_kevent(int usec)
 
 	uint64_t pops = (uint64_t) kev.data;
 
-	/* check how many times the timer fired: within 5%? */
+	                                                      
 	if (pops > expected_pops + (expected_pops / 20) ||
 	    pops < expected_pops - (expected_pops / 20)) {
 		T_FAIL("%s() usec:%d (saw %lld of %lld expected pops)", __func__, usec, pops, expected_pops);
@@ -389,10 +389,10 @@ disable_timer_coalescing(void)
 T_DECL(kqueue_timer_tests,
     "Tests assorted kqueue operations for timer-related events")
 {
-	/*
-	 * Since we're trying to test timers here, disable timer coalescing
-	 * to improve the accuracy of timer fires for this process.
-	 */
+	  
+                                                                    
+                                                            
+    
 	disable_timer_coalescing();
 
 	mach_timebase_info(&timebase_info);
@@ -441,7 +441,7 @@ T_DECL(kqueue_timer_tests,
 
 	test_interval_kevent(-1000);
 
-	test_repeating_kevent(10000); /* 10ms */
+	test_repeating_kevent(10000);           
 
 	test_updated_kevent(1000, 2000);
 	test_updated_kevent(2000, 1000);

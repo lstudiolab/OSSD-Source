@@ -53,14 +53,14 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- *	File:	boolean.h
- *
- *	Boolean type, for I386.
- */
+  
+                  
+  
+                          
+   
 
 #ifndef _MACH_I386_BOOLEAN_H_
 #define _MACH_I386_BOOLEAN_H_
@@ -71,4 +71,4 @@ typedef unsigned int    boolean_t;
 typedef int             boolean_t;
 #endif
 
-#endif  /* _MACH_I386_BOOLEAN_H_ */
+#endif                             

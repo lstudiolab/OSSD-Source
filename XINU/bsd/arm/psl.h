@@ -11,6 +11,6 @@
 #ifndef _BSD_ARM_PSL_H_
 #define _BSD_ARM_PSL_H_
 
-#endif  /* _BSD_ARM_PSL_H_ */
+#endif                       
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

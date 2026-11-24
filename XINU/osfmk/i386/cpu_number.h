@@ -54,21 +54,21 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- *	Machine-dependent definitions for cpu identification.
- *
- */
+  
+                                                        
+  
+   
 #ifndef _I386_CPU_NUMBER_H_
 #define _I386_CPU_NUMBER_H_
 
 #ifdef  KERNEL_PRIVATE
 
-/* Use a function to do this less directly. */
+                                              
 extern int      cpu_number(void);
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
-#endif  /* _I386_CPU_NUMBER_H_ */
+#endif                           

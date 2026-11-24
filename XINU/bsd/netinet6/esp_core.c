@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp_core.c,v 1.1.2.4 2002/03/26 10:12:29 ume Exp $	*/
-/*	$KAME: esp_core.c,v 1.50 2000/11/02 12:27:38 itojun Exp $	*/
+                                                                                   
+                                                               
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -140,9 +140,9 @@ static int esp_gcm_mature(struct secasvar *);
 
 #define MAXIVLEN        16
 
-#define ESP_AESGCM_KEYLEN128 160 // 16-bytes key + 4 bytes salt
-#define ESP_AESGCM_KEYLEN192 224 // 24-bytes key + 4 bytes salt
-#define ESP_AESGCM_KEYLEN256 288 // 32-bytes key + 4 bytes salt
+#define ESP_AESGCM_KEYLEN128 160                               
+#define ESP_AESGCM_KEYLEN192 224                               
+#define ESP_AESGCM_KEYLEN256 288                               
 
 static const struct esp_algorithm des_cbc = {
 	.padbound = 8,
@@ -310,7 +310,7 @@ esp_schedule(const struct esp_algorithm *algo, struct secasvar *sav)
 {
 	int error;
 
-	/* check for key length */
+	                          
 	if (_KEYBITS(sav->key_enc) < algo->keymin ||
 	    _KEYBITS(sav->key_enc) > algo->keymax) {
 		ipseclog((LOG_ERR,
@@ -321,13 +321,13 @@ esp_schedule(const struct esp_algorithm *algo, struct secasvar *sav)
 	}
 
 	lck_mtx_lock(sadb_mutex);
-	/* already allocated */
+	                       
 	if (sav->sched && sav->schedlen != 0) {
 		lck_mtx_unlock(sadb_mutex);
 		return 0;
 	}
 
-	/* prevent disallowed implicit IV */
+	                                    
 	if (((sav->flags & SADB_X_EXT_IIV) != 0) &&
 	    (sav->alg_enc != SADB_X_EALG_AES_GCM) &&
 	    (sav->alg_enc != SADB_X_EALG_CHACHA20POLY1305)) {
@@ -338,7 +338,7 @@ esp_schedule(const struct esp_algorithm *algo, struct secasvar *sav)
 		return EINVAL;
 	}
 
-	/* no schedule necessary */
+	                           
 	if (!algo->schedule || !algo->schedlen) {
 		lck_mtx_unlock(sadb_mutex);
 		return 0;
@@ -350,7 +350,7 @@ esp_schedule(const struct esp_algorithm *algo, struct secasvar *sav)
 		return EINVAL;
 	}
 
-//#### that malloc should be replaced by a saved buffer...
+                                                          
 	sav->sched = _MALLOC(sav->schedlen, M_SECA, M_DONTWAIT);
 	if (!sav->sched) {
 		sav->schedlen = 0;
@@ -375,31 +375,31 @@ static int
 esp_null_mature(
 	__unused struct secasvar *sav)
 {
-	/* anything is okay */
+	                      
 	return 0;
 }
 
 static int
 esp_null_decrypt(
 	__unused struct mbuf *m,
-	__unused size_t off,            /* offset to ESP header */
+	__unused size_t off,                                      
 	__unused struct secasvar *sav,
 	__unused const struct esp_algorithm *algo,
 	__unused int ivlen)
 {
-	return 0; /* do nothing */
+	return 0;                 
 }
 
 static int
 esp_null_encrypt(
 	__unused struct mbuf *m,
-	__unused size_t off,    /* offset to ESP header */
-	__unused size_t plen,   /* payload length (to be encrypted) */
+	__unused size_t off,                              
+	__unused size_t plen,                                         
 	__unused struct secasvar *sav,
 	__unused const struct esp_algorithm *algo,
 	__unused int ivlen)
 {
-	return 0; /* do nothing */
+	return 0;                 
 }
 
 static int
@@ -433,7 +433,7 @@ esp_descbc_mature(struct secasvar *sav)
 		return 1;
 	}
 
-	/* weak key check */
+	                    
 	if (des_is_weak_key((des_cblock *)_KEYBUF(sav->key_enc))) {
 		ipseclog((LOG_ERR,
 		    "esp_descbc_mature: weak key was passed.\n"));
@@ -488,7 +488,7 @@ esp_des_blockdecrypt(
 	u_int8_t *s,
 	u_int8_t *d)
 {
-	/* assumption: d has a good alignment */
+	                                        
 	bcopy(s, d, sizeof(DES_LONG) * 2);
 	return des_ecb_encrypt((des_cblock *)d, (des_cblock *)d,
 	           (des_ecb_key_schedule *)sav->sched, DES_DECRYPT);
@@ -501,7 +501,7 @@ esp_des_blockencrypt(
 	u_int8_t *s,
 	u_int8_t *d)
 {
-	/* assumption: d has a good alignment */
+	                                        
 	bcopy(s, d, sizeof(DES_LONG) * 2);
 	return des_ecb_encrypt((des_cblock *)d, (des_cblock *)d,
 	           (des_ecb_key_schedule *)sav->sched, DES_ENCRYPT);
@@ -545,7 +545,7 @@ esp_cbc_mature(struct secasvar *sav)
 	}
 	switch (sav->alg_enc) {
 	case SADB_EALG_3DESCBC:
-		/* weak key check */
+		                    
 		if (des_is_weak_key((des_cblock *)_KEYBUF(sav->key_enc)) ||
 		    des_is_weak_key((des_cblock *)(_KEYBUF(sav->key_enc) + 8)) ||
 		    des_is_weak_key((des_cblock *)(_KEYBUF(sav->key_enc) + 16))) {
@@ -556,7 +556,7 @@ esp_cbc_mature(struct secasvar *sav)
 		}
 		break;
 	case SADB_X_EALG_RIJNDAELCBC:
-		/* allows specific key sizes only */
+		                                    
 		if (!(keylen == 128 || keylen == 192 || keylen == 256)) {
 			ipseclog((LOG_ERR,
 			    "esp_cbc_mature %s: invalid key length %d.\n",
@@ -612,7 +612,7 @@ esp_gcm_mature(struct secasvar *sav)
 	}
 	switch (sav->alg_enc) {
 	case SADB_X_EALG_AES_GCM:
-		/* allows specific key sizes only */
+		                                    
 		if (!(keylen == ESP_AESGCM_KEYLEN128 || keylen == ESP_AESGCM_KEYLEN192 || keylen == ESP_AESGCM_KEYLEN256)) {
 			ipseclog((LOG_ERR,
 			    "esp_gcm_mature %s: invalid key length %d.\n",
@@ -658,7 +658,7 @@ esp_3des_blockdecrypt(
 	u_int8_t *s,
 	u_int8_t *d)
 {
-	/* assumption: d has a good alignment */
+	                                        
 	bcopy(s, d, sizeof(DES_LONG) * 2);
 	return des3_ecb_encrypt((des_cblock *)d, (des_cblock *)d,
 	           (des3_ecb_key_schedule *)sav->sched, DES_DECRYPT);
@@ -671,7 +671,7 @@ esp_3des_blockencrypt(
 	u_int8_t *s,
 	u_int8_t *d)
 {
-	/* assumption: d has a good alignment */
+	                                        
 	bcopy(s, d, sizeof(DES_LONG) * 2);
 	return des3_ecb_encrypt((des_cblock *)d, (des_cblock *)d,
 	           (des3_ecb_key_schedule *)sav->sched, DES_ENCRYPT);
@@ -694,8 +694,8 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 {
 	struct mbuf *s;
 	struct mbuf *d, *d0, *dp;
-	int soff, doff; /* offset from the head of chain, to head of this mbuf */
-	int sn, dn;     /* offset from the head of the mbuf, to meat */
+	int soff, doff;                                                          
+	int sn, dn;                                                    
 	size_t ivoff, bodyoff;
 	u_int8_t iv[MAXIVLEN] __attribute__((aligned(4))), *ivp;
 	u_int8_t *sbuf = NULL, *sp, *sp_unaligned;
@@ -713,7 +713,7 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 		return EINVAL;
 	}
 
-	/* assumes blocklen == padbound */
+	                                  
 	blocklen = algo->padbound;
 
 #if DIAGNOSTIC
@@ -726,17 +726,17 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 #endif
 
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		ivoff = off + sizeof(struct esp);
 		bodyoff = off + sizeof(struct esp) + ivlen;
 		derived = 0;
 	} else {
-		/* RFC 2406 */
+		              
 		if (sav->flags & SADB_X_EXT_DERIV) {
-			/*
-			 * draft-ietf-ipsec-ciph-des-derived-00.txt
-			 * uses sequence number field as IV field.
-			 */
+			  
+                                              
+                                             
+      
 			ivoff = off + sizeof(struct esp);
 			bodyoff = off + sizeof(struct esp) + sizeof(u_int32_t);
 			ivlen = sizeof(u_int32_t);
@@ -749,10 +749,10 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 	}
 
 	VERIFY(ivoff <= INT_MAX);
-	/* grab iv */
+	             
 	m_copydata(m, (int)ivoff, ivlen, (caddr_t) iv);
 
-	/* extend iv */
+	               
 	if (ivlen == blocklen) {
 		;
 	} else if (ivlen == 4 && blocklen == 8) {
@@ -788,7 +788,7 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 	soff = doff = sn = dn = 0;
 	ivp = sp = NULL;
 
-	/* skip bodyoff */
+	                  
 	while (soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = (int)(bodyoff - soff);
@@ -801,28 +801,28 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 	scut = s;
 	scutoff = sn;
 
-	/* skip over empty mbuf */
+	                          
 	while (s && s->m_len == 0) {
 		s = s->m_next;
 	}
 
-	// Allocate blocksized buffer for unaligned or non-contiguous access
+	                                                                    
 	sbuf = (u_int8_t *)_MALLOC(blocklen, M_SECA, M_DONTWAIT);
 	if (sbuf == NULL) {
 		return ENOBUFS;
 	}
 	while (soff < m->m_pkthdr.len) {
-		/* source */
+		            
 		if (sn + blocklen <= s->m_len) {
-			/* body is continuous */
+			                        
 			sp = mtod(s, u_int8_t *) + sn;
 		} else {
-			/* body is non-continuous */
+			                            
 			m_copydata(s, sn, blocklen, (caddr_t) sbuf);
 			sp = sbuf;
 		}
 
-		/* destination */
+		                 
 		if (!d || dn + blocklen > d->m_len) {
 			if (d) {
 				dp = d;
@@ -851,7 +851,7 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 				dp->m_next = d;
 			}
 
-			// try to make mbuf data aligned
+			                                
 			if (!IPSEC_IS_P2ALIGNED(d->m_data)) {
 				m_adj(d, IPSEC_GET_P2UNALIGNED_OFS(d->m_data));
 			}
@@ -864,8 +864,8 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 			dn = 0;
 		}
 
-		/* decrypt */
-		// check input pointer alignment and use a separate aligned buffer (if sp is unaligned on 4-byte boundary).
+		             
+		                                                                                                           
 		if (IPSEC_IS_P2ALIGNED(sp)) {
 			sp_unaligned = NULL;
 		} else {
@@ -873,22 +873,22 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 			sp = sbuf;
 			memcpy(sp, sp_unaligned, blocklen);
 		}
-		// no need to check output pointer alignment
+		                                            
 		(*algo->blockdecrypt)(algo, sav, sp, mtod(d, u_int8_t *) + dn);
 
-		// update unaligned pointers
+		                            
 		if (!IPSEC_IS_P2ALIGNED(sp_unaligned)) {
 			sp = sp_unaligned;
 		}
 
-		/* xor */
+		         
 		p = ivp ? ivp : iv;
 		q = mtod(d, u_int8_t *) + dn;
 		for (i = 0; i < blocklen; i++) {
 			q[i] ^= p[i];
 		}
 
-		/* next iv */
+		             
 		if (sp == sbuf) {
 			bcopy(sbuf, iv, blocklen);
 			ivp = NULL;
@@ -899,7 +899,7 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 		sn += blocklen;
 		dn += blocklen;
 
-		/* find the next source block */
+		                                
 		while (s && sn >= s->m_len) {
 			sn -= s->m_len;
 			soff += s->m_len;
@@ -911,7 +911,7 @@ esp_cbc_decrypt(struct mbuf *m, size_t off, struct secasvar *sav,
 	scut->m_len = scutoff;
 	scut->m_next = d0;
 
-	/* just in case */
+	                  
 	bzero(iv, sizeof(iv));
 	bzero(sbuf, blocklen);
 end:
@@ -932,8 +932,8 @@ esp_cbc_encrypt(
 {
 	struct mbuf *s;
 	struct mbuf *d, *d0, *dp;
-	int soff, doff; /* offset from the head of chain, to head of this mbuf */
-	int sn, dn;     /* offset from the head of the mbuf, to meat */
+	int soff, doff;                                                          
+	int sn, dn;                                                    
 	size_t ivoff, bodyoff;
 	u_int8_t iv[MAXIVLEN] __attribute__((aligned(4))), *ivp;
 	u_int8_t *sbuf = NULL, *sp, *sp_unaligned;
@@ -951,7 +951,7 @@ esp_cbc_encrypt(
 		return EINVAL;
 	}
 
-	/* assumes blocklen == padbound */
+	                                  
 	blocklen = algo->padbound;
 
 #if DIAGNOSTIC
@@ -964,17 +964,17 @@ esp_cbc_encrypt(
 #endif
 
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		ivoff = off + sizeof(struct esp);
 		bodyoff = off + sizeof(struct esp) + ivlen;
 		derived = 0;
 	} else {
-		/* RFC 2406 */
+		              
 		if (sav->flags & SADB_X_EXT_DERIV) {
-			/*
-			 * draft-ietf-ipsec-ciph-des-derived-00.txt
-			 * uses sequence number field as IV field.
-			 */
+			  
+                                              
+                                             
+      
 			ivoff = off + sizeof(struct esp);
 			bodyoff = off + sizeof(struct esp) + sizeof(u_int32_t);
 			ivlen = sizeof(u_int32_t);
@@ -988,16 +988,16 @@ esp_cbc_encrypt(
 
 	VERIFY(ivoff <= INT_MAX);
 
-	/* put iv into the packet.  if we are in derived mode, use seqno. */
+	                                                                    
 	if (derived) {
 		m_copydata(m, (int)ivoff, ivlen, (caddr_t) iv);
 	} else {
 		bcopy(sav->iv, iv, ivlen);
-		/* maybe it is better to overwrite dest, not source */
+		                                                      
 		m_copyback(m, (int)ivoff, ivlen, (caddr_t) iv);
 	}
 
-	/* extend iv */
+	               
 	if (ivlen == blocklen) {
 		;
 	} else if (ivlen == 4 && blocklen == 8) {
@@ -1033,7 +1033,7 @@ esp_cbc_encrypt(
 	soff = doff = sn = dn = 0;
 	ivp = sp = NULL;
 
-	/* skip bodyoff */
+	                  
 	while (soff < bodyoff) {
 		if (soff + s->m_len > bodyoff) {
 			sn = (int)(bodyoff - soff);
@@ -1046,28 +1046,28 @@ esp_cbc_encrypt(
 	scut = s;
 	scutoff = sn;
 
-	/* skip over empty mbuf */
+	                          
 	while (s && s->m_len == 0) {
 		s = s->m_next;
 	}
 
-	// Allocate blocksized buffer for unaligned or non-contiguous access
+	                                                                    
 	sbuf = (u_int8_t *)_MALLOC(blocklen, M_SECA, M_DONTWAIT);
 	if (sbuf == NULL) {
 		return ENOBUFS;
 	}
 	while (soff < m->m_pkthdr.len) {
-		/* source */
+		            
 		if (sn + blocklen <= s->m_len) {
-			/* body is continuous */
+			                        
 			sp = mtod(s, u_int8_t *) + sn;
 		} else {
-			/* body is non-continuous */
+			                            
 			m_copydata(s, sn, blocklen, (caddr_t) sbuf);
 			sp = sbuf;
 		}
 
-		/* destination */
+		                 
 		if (!d || dn + blocklen > d->m_len) {
 			if (d) {
 				dp = d;
@@ -1096,7 +1096,7 @@ esp_cbc_encrypt(
 				dp->m_next = d;
 			}
 
-			// try to make mbuf data aligned
+			                                
 			if (!IPSEC_IS_P2ALIGNED(d->m_data)) {
 				m_adj(d, IPSEC_GET_P2UNALIGNED_OFS(d->m_data));
 			}
@@ -1109,15 +1109,15 @@ esp_cbc_encrypt(
 			dn = 0;
 		}
 
-		/* xor */
+		         
 		p = ivp ? ivp : iv;
 		q = sp;
 		for (i = 0; i < blocklen; i++) {
 			q[i] ^= p[i];
 		}
 
-		/* encrypt */
-		// check input pointer alignment and use a separate aligned buffer (if sp is not aligned on 4-byte boundary).
+		             
+		                                                                                                             
 		if (IPSEC_IS_P2ALIGNED(sp)) {
 			sp_unaligned = NULL;
 		} else {
@@ -1125,21 +1125,21 @@ esp_cbc_encrypt(
 			sp = sbuf;
 			memcpy(sp, sp_unaligned, blocklen);
 		}
-		// no need to check output pointer alignment
+		                                            
 		(*algo->blockencrypt)(algo, sav, sp, mtod(d, u_int8_t *) + dn);
 
-		// update unaligned pointers
+		                            
 		if (!IPSEC_IS_P2ALIGNED(sp_unaligned)) {
 			sp = sp_unaligned;
 		}
 
-		/* next iv */
+		             
 		ivp = mtod(d, u_int8_t *) + dn;
 
 		sn += blocklen;
 		dn += blocklen;
 
-		/* find the next source block */
+		                                
 		while (s && sn >= s->m_len) {
 			sn -= s->m_len;
 			soff += s->m_len;
@@ -1151,7 +1151,7 @@ esp_cbc_encrypt(
 	scut->m_len = scutoff;
 	scut->m_next = d0;
 
-	/* just in case */
+	                  
 	bzero(iv, sizeof(iv));
 	bzero(sbuf, blocklen);
 
@@ -1163,14 +1163,14 @@ end:
 	return result;
 }
 
-/*------------------------------------------------------------*/
+                                                                
 
-/* does not free m0 on error */
+                               
 int
 esp_auth(
 	struct mbuf *m0,
-	size_t skip,    /* offset to ESP header */
-	size_t length,  /* payload length */
+	size_t skip,                              
+	size_t length,                      
 	struct secasvar *sav,
 	u_char *sum)
 {
@@ -1182,7 +1182,7 @@ esp_auth(
 	size_t siz;
 	int error;
 
-	/* sanity checks */
+	                   
 	if (m0->m_pkthdr.len < skip) {
 		ipseclog((LOG_DEBUG, "esp_auth: mbuf length < skip\n"));
 		return EINVAL;
@@ -1194,10 +1194,10 @@ esp_auth(
 	}
 
 	KERNEL_DEBUG(DBG_FNC_ESPAUTH | DBG_FUNC_START, skip, length, 0, 0, 0);
-	/*
-	 * length of esp part (excluding authentication data) must be 4n,
-	 * since nexthdr must be at offset 4n+3.
-	 */
+	  
+                                                                  
+                                         
+    
 	if (length % 4) {
 		ipseclog((LOG_ERR, "esp_auth: length is not multiple of 4\n"));
 		KERNEL_DEBUG(DBG_FNC_ESPAUTH | DBG_FUNC_END, 1, 0, 0, 0, 0);
@@ -1229,7 +1229,7 @@ esp_auth(
 		return EINVAL;
 	}
 
-	/* skip the header */
+	                     
 	while (skip) {
 		if (!m) {
 			panic("mbuf chain?");
@@ -1266,7 +1266,7 @@ esp_auth(
 		}
 	}
 	(*algo->result)(&s, (caddr_t) sumbuf, sizeof(sumbuf));
-	bcopy(sumbuf, sum, siz);        /*XXX*/
+	bcopy(sumbuf, sum, siz);               
 	KERNEL_DEBUG(DBG_FNC_ESPAUTH | DBG_FUNC_END, 6, 0, 0, 0, 0);
 	return 0;
 }

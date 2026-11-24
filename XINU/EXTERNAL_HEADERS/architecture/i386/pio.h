@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/* 
- */
+   
+   
 #ifndef _ARCH_I386_PIO_H_
 #define _ARCH_I386_PIO_H_
 
@@ -105,5 +105,5 @@ static __inline__ void outb(
 {
 	__asm__ volatile("outb %b0, %w1" : : "a" (datum), "Nd" (port));
 }
-#endif /* defined(__GNUC__) */
-#endif /* _ARCH_I386_PIO_H_ */
+#endif                        
+#endif                        

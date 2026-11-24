@@ -73,14 +73,14 @@ __END_DECLS
 #define OSMETA_ACCUMSIZE(s)      do { OSAddAtomicLong((s), &debug_container_malloc_size); } while(0)
 #define OSIVAR_ACCUMSIZE(s)      do { OSAddAtomicLong((s), &debug_ivars_size);            } while(0)
 
-#else /* OSALLOCDEBUG */
+#else                   
 
 #define OSCONTAINER_ACCUMSIZE(s)
 #define OSMETA_ACCUMSIZE(s)
 #define OSIVAR_ACCUMSIZE(s)
 
-#endif  /* !OSALLOCDEBUG */
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                     
+#endif                          
 
 #ifndef NULL
 #if defined (__cplusplus)
@@ -94,4 +94,4 @@ __END_DECLS
 #endif
 #endif
 
-#endif /* _OS_OSLIB_H  */
+#endif                   

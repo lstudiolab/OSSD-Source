@@ -1,6 +1,6 @@
-/*
- * testname: pwrite_avoid_sigxfsz_28581610
- */
+  
+                                          
+   
 
 #include <darwintest.h>
 #include <fcntl.h>
@@ -36,25 +36,25 @@ T_DECL(pwrite, "Tests avoiding SIGXFSZ with pwrite and odd offsets",
 	static unsigned char buffer[1048576];
 
 	T_SETUPBEGIN;
-	/* We expect zero SIGXFSZ signals because we have no file size limits */
+	                                                                        
 	crl.rlim_cur = crl.rlim_max = RLIM_INFINITY;
 	ret = setrlimit(RLIMIT_FSIZE, &crl);
 	T_ASSERT_POSIX_SUCCESS(ret, "setting infinite file size limit");
 
-	/* we just needed root to setup unlimited file size */
+	                                                      
 	remove(TMP_FILE_PATH);
 	setuid(5000);
 
-	/* We just want an empty regular file to test with */
+	                                                     
 	fd = open(TMP_FILE_PATH, O_RDWR | O_CREAT | O_EXCL, 0777);
 	T_ASSERT_POSIX_SUCCESS(fd, "opening fd on temp file %s.", TMP_FILE_PATH);
 
-	/* sanity check that this new file is really zero bytes in size */
+	                                                                  
 	ret = fstat(fd, &f_stat);
 	T_ASSERT_POSIX_SUCCESS(ret, "stat() fd on temp file.");
 	T_ASSERT_TRUE(0 == f_stat.st_size, "ensure %s is empty", TMP_FILE_PATH);
 
-	/* sanity check that ftruncate() considers negative offsets an error */
+	                                                                       
 	for (x = 0; offs[x] != 0; x++) {
 		ret = ftruncate(fd, offs[x]);
 		T_ASSERT_TRUE(((ret == -1) && (errno == EINVAL)),
@@ -63,7 +63,7 @@ T_DECL(pwrite, "Tests avoiding SIGXFSZ with pwrite and odd offsets",
 
 	T_SETUPEND;
 
-	/* we want to get the EFBIG errno but without a SIGXFSZ signal */
+	                                                                 
 	if (!sigsetjmp(xfsz_jmpbuf, 1)) {
 		signal(SIGXFSZ, xfsz_signal);
 		ret = pwrite(fd, buffer, sizeof buffer, QUAD_MAX);
@@ -75,7 +75,7 @@ T_DECL(pwrite, "Tests avoiding SIGXFSZ with pwrite and odd offsets",
 		    "<rdar://problem/28581610>", LONG_MAX);
 	}
 
-	/* Negative offsets are invalid, no SIGXFSZ signals required */
+	                                                               
 	for (x = 0; offs[x] != 0; x++) {
 		if (!sigsetjmp(xfsz_jmpbuf, 1)) {
 			signal(SIGXFSZ, xfsz_signal);

@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOArray.m created by rsulack on Fri 12-Sep-1997 */
-/* IOArray.cpp converted to C++ by gvdl on Fri 1998-10-30 */
+                                                     
+                                                            
 
 
 #define IOKIT_ENABLE_SHARED_PTR
@@ -61,7 +61,7 @@ OSArray::initWithCapacity(unsigned int inCapacity)
 		return false;
 	}
 
-	// integer overflow check
+	                         
 	if (inCapacity > (UINT_MAX / sizeof(*array))) {
 		return false;
 	}
@@ -168,7 +168,7 @@ OSArray::withArray(const OSArray *array,
 void
 OSArray::free()
 {
-	// Clear immutability - assumes the container is doing the right thing
+	                                                                      
 	(void) super::setOptions(0, kImmutable);
 
 	flushCollection();
@@ -217,11 +217,11 @@ OSArray::ensureCapacity(unsigned int newCapacity)
 		return capacity;
 	}
 
-	// round up
+	           
 	finalCapacity = (((newCapacity - 1) / capacityIncrement) + 1)
 	    * capacityIncrement;
 
-	// integer overflow check
+	                         
 	if (finalCapacity < newCapacity) {
 		return capacity;
 	}
@@ -230,10 +230,10 @@ OSArray::ensureCapacity(unsigned int newCapacity)
 
 	newArray = (decltype(newArray))kallocp_container(&newSize);
 	if (newArray) {
-		// use all of the actual allocation size
+		                                        
 		finalCapacity = (newSize / sizeof(*newArray));
 		if (finalCapacity > UINT_MAX) {
-			// failure, too large
+			                     
 			kfree(newArray, newSize);
 			return capacity;
 		}
@@ -287,7 +287,7 @@ OSArray::setObject(unsigned int index, const OSMetaClassBase *anObject)
 		return false;
 	}
 
-	// do we need more space?
+	                         
 	if (newCount > capacity && newCount > ensureCapacity(newCount)) {
 		return false;
 	}
@@ -324,7 +324,7 @@ OSArray::merge(const OSArray * otherArray)
 		return false;
 	}
 
-	// do we need more space?
+	                         
 	if (newCount > capacity && newCount > ensureCapacity(newCount)) {
 		return false;
 	}
@@ -500,7 +500,7 @@ OSArray::setOptions(unsigned options, unsigned mask, void *)
 {
 	unsigned old = super::setOptions(options, mask);
 	if ((old ^ options) & mask) {
-		// Value changed need to recurse over all of the child collections
+		                                                                  
 		for (unsigned i = 0; i < count; i++) {
 			OSCollection *coll = OSDynamicCast(OSCollection, array[i].get());
 			if (coll) {
@@ -528,7 +528,7 @@ OSArray::copyCollection(OSDictionary *cycleDict)
 	}
 
 	do {
-		// Check for a cycle
+		                    
 		ret = super::copyCollection(cycleDict);
 		if (ret) {
 			continue;
@@ -539,7 +539,7 @@ OSArray::copyCollection(OSDictionary *cycleDict)
 			continue;
 		}
 
-		// Insert object into cycle Dictionary
+		                                      
 		cycleDict->setObject((const OSSymbol *) this, newArray.get());
 
 		for (unsigned int i = 0; i < count; i++) {

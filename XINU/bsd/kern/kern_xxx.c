@@ -60,12 +60,12 @@
  *
  *	@(#)kern_xxx.c	8.2 (Berkeley) 11/14/93
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -110,7 +110,7 @@ reboot(struct proc *p, struct reboot_args *uap, __unused int32_t *retval)
 	if ((error = suser(kauth_cred_get(), &p->p_acflag))) {
 #if (DEVELOPMENT || DEBUG)
 		if (uap->opt & RB_PANIC) {
-			/* clear 'error' to allow non-root users to call panic on dev/debug kernels */
+			                                                                              
 			error = 0;
 		} else {
 			return error;
@@ -132,7 +132,7 @@ reboot(struct proc *p, struct reboot_args *uap, __unused int32_t *retval)
 #if CONFIG_MACF
 #if (DEVELOPMENT || DEBUG)
 	if (uap->opt & RB_PANIC) {
-		/* on dev/debug kernels: allow anyone to call panic */
+		                                                      
 		goto skip_cred_check;
 	}
 #endif
@@ -147,7 +147,7 @@ skip_cred_check:
 #endif
 #endif
 	if (!error) {
-		OSBitOrAtomic(P_REBOOT, &p->p_flag);  /* No more signals for this proc */
+		OSBitOrAtomic(P_REBOOT, &p->p_flag);                                     
 		error = reboot_kernel(uap->opt, message);
 	}
 	return error;
@@ -171,14 +171,14 @@ usrctl(struct proc *p, __unused struct usrctl_args *uap, __unused int32_t *retva
 #endif
 
 #if CONFIG_EXT_RESOLVER
-	/*
-	 * We're doing a user space reboot.  We are guaranteed that the
-	 * external identity resolver is gone, so ensure that everything
-	 * comes back up as with fresh-boot just in case it didn't go
-	 * down cleanly.
-	 */
+	  
+                                                                
+                                                                 
+                                                              
+                 
+    
 	kauth_resolver_identity_reset();
-#endif /* CONFIG_EXT_RESOLVER */
+#endif                          
 
 	OSKextResetAfterUserspaceReboot();
 	int shm_error = pshm_cache_purge_all(p);

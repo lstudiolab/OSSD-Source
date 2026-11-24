@@ -25,13 +25,13 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * HISTORY
- */
+  
+          
+   
 
-/*
- * Core IOReturn values. Others may be family defined.
- */
+  
+                                                      
+   
 
 #ifndef __IOKIT_IORETURN_H
 #define __IOKIT_IORETURN_H
@@ -44,24 +44,24 @@ extern "C" {
 
 #include <mach/error.h>
 
-#else  /* PLATFORM_DriverKit */
+#else                          
 
 #ifdef DRIVERKIT_PRIVATE
 
 #include <mach/error.h>
 
-#else  /* DRIVERKIT_PRIVATE */
+#else                         
 
 typedef int             kern_return_t;
 
 #define KERN_SUCCESS                    0
 
-/*
- *	error number layout as follows:
- *
- *	hi		                       lo
- *	| system(6) | subsystem(12) | code(14) |
- */
+  
+                                  
+  
+                                
+                                           
+   
 
 #define err_none                (kern_return_t)0
 #define ERR_SUCCESS             (kern_return_t)0
@@ -79,15 +79,15 @@ typedef int             kern_return_t;
 #define sub_emask               (err_sub(0xfff))
 #define code_emask              (0x3fff)
 
-#endif  /* DRIVERKIT_PRIVATE */
+#endif                         
 
-#endif /* PLATFORM_DriverKit */
+#endif                         
 
 typedef kern_return_t           IOReturn;
 
 #ifndef sys_iokit
 #define sys_iokit                         err_system(0x38)
-#endif /* sys_iokit */
+#endif                
 #define sub_iokit_common                  err_sub(0)
 #define sub_iokit_usb                     err_sub(1)
 #define sub_iokit_firewire                err_sub(2)
@@ -104,7 +104,7 @@ typedef kern_return_t           IOReturn;
 #define sub_iokit_scsi                    err_sub(16)
 #define sub_iokit_usbaudio                err_sub(17)
 #define sub_iokit_wirelesscharging        err_sub(18)
-//#define sub_iokit_pccard                err_sub(21)
+                                                     
 #ifdef PRIVATE
 #define sub_iokit_nvme                    err_sub(28)
 #endif
@@ -136,68 +136,68 @@ typedef kern_return_t           IOReturn;
 #define iokit_family_err(sub, return )      (sys_iokit|sub|return)
 #define iokit_vendor_specific_err(return ) (sys_iokit|sub_iokit_vendor_specific|return)
 
-#define kIOReturnSuccess         KERN_SUCCESS            // OK
-#define kIOReturnError           iokit_common_err(0x2bc) // general error
-#define kIOReturnNoMemory        iokit_common_err(0x2bd) // can't allocate memory
-#define kIOReturnNoResources     iokit_common_err(0x2be) // resource shortage
-#define kIOReturnIPCError        iokit_common_err(0x2bf) // error during IPC
-#define kIOReturnNoDevice        iokit_common_err(0x2c0) // no such device
-#define kIOReturnNotPrivileged   iokit_common_err(0x2c1) // privilege violation
-#define kIOReturnBadArgument     iokit_common_err(0x2c2) // invalid argument
-#define kIOReturnLockedRead      iokit_common_err(0x2c3) // device read locked
-#define kIOReturnLockedWrite     iokit_common_err(0x2c4) // device write locked
-#define kIOReturnExclusiveAccess iokit_common_err(0x2c5) // exclusive access and
-                                                         //   device already open
-#define kIOReturnBadMessageID    iokit_common_err(0x2c6) // sent/received messages
-                                                         //   had different msg_id
-#define kIOReturnUnsupported     iokit_common_err(0x2c7) // unsupported function
-#define kIOReturnVMError         iokit_common_err(0x2c8) // misc. VM failure
-#define kIOReturnInternalError   iokit_common_err(0x2c9) // internal error
-#define kIOReturnIOError         iokit_common_err(0x2ca) // General I/O error
-//#define kIOReturn???Error      iokit_common_err(0x2cb) // ???
-#define kIOReturnCannotLock      iokit_common_err(0x2cc) // can't acquire lock
-#define kIOReturnNotOpen         iokit_common_err(0x2cd) // device not open
-#define kIOReturnNotReadable     iokit_common_err(0x2ce) // read not supported
-#define kIOReturnNotWritable     iokit_common_err(0x2cf) // write not supported
-#define kIOReturnNotAligned      iokit_common_err(0x2d0) // alignment error
-#define kIOReturnBadMedia        iokit_common_err(0x2d1) // Media Error
-#define kIOReturnStillOpen       iokit_common_err(0x2d2) // device(s) still open
-#define kIOReturnRLDError        iokit_common_err(0x2d3) // rld failure
-#define kIOReturnDMAError        iokit_common_err(0x2d4) // DMA failure
-#define kIOReturnBusy            iokit_common_err(0x2d5) // Device Busy
-#define kIOReturnTimeout         iokit_common_err(0x2d6) // I/O Timeout
-#define kIOReturnOffline         iokit_common_err(0x2d7) // device offline
-#define kIOReturnNotReady        iokit_common_err(0x2d8) // not ready
-#define kIOReturnNotAttached     iokit_common_err(0x2d9) // device not attached
-#define kIOReturnNoChannels      iokit_common_err(0x2da) // no DMA channels left
-#define kIOReturnNoSpace         iokit_common_err(0x2db) // no space for data
-//#define kIOReturn???Error      iokit_common_err(0x2dc) // ???
-#define kIOReturnPortExists      iokit_common_err(0x2dd) // port already exists
-#define kIOReturnCannotWire      iokit_common_err(0x2de) // can't wire down
-                                                         //   physical memory
-#define kIOReturnNoInterrupt     iokit_common_err(0x2df) // no interrupt attached
-#define kIOReturnNoFrames        iokit_common_err(0x2e0) // no DMA frames enqueued
-#define kIOReturnMessageTooLarge iokit_common_err(0x2e1) // oversized msg received
-                                                         //   on interrupt port
-#define kIOReturnNotPermitted    iokit_common_err(0x2e2) // not permitted
-#define kIOReturnNoPower         iokit_common_err(0x2e3) // no power to device
-#define kIOReturnNoMedia         iokit_common_err(0x2e4) // media not present
-#define kIOReturnUnformattedMedia iokit_common_err(0x2e5)// media not formatted
-#define kIOReturnUnsupportedMode iokit_common_err(0x2e6) // no such mode
-#define kIOReturnUnderrun        iokit_common_err(0x2e7) // data underrun
-#define kIOReturnOverrun         iokit_common_err(0x2e8) // data overrun
-#define kIOReturnDeviceError     iokit_common_err(0x2e9) // the device is not working properly!
-#define kIOReturnNoCompletion    iokit_common_err(0x2ea) // a completion routine is required
-#define kIOReturnAborted         iokit_common_err(0x2eb) // operation aborted
-#define kIOReturnNoBandwidth     iokit_common_err(0x2ec) // bus bandwidth would be exceeded
-#define kIOReturnNotResponding   iokit_common_err(0x2ed) // device not responding
-#define kIOReturnIsoTooOld       iokit_common_err(0x2ee) // isochronous I/O request for distant past!
-#define kIOReturnIsoTooNew       iokit_common_err(0x2ef) // isochronous I/O request for distant future
-#define kIOReturnNotFound        iokit_common_err(0x2f0) // data was not found
-#define kIOReturnInvalid         iokit_common_err(0x1)   // should never be seen
+#define kIOReturnSuccess         KERN_SUCCESS                 
+#define kIOReturnError           iokit_common_err(0x2bc)                 
+#define kIOReturnNoMemory        iokit_common_err(0x2bd)                         
+#define kIOReturnNoResources     iokit_common_err(0x2be)                     
+#define kIOReturnIPCError        iokit_common_err(0x2bf)                    
+#define kIOReturnNoDevice        iokit_common_err(0x2c0)                  
+#define kIOReturnNotPrivileged   iokit_common_err(0x2c1)                       
+#define kIOReturnBadArgument     iokit_common_err(0x2c2)                    
+#define kIOReturnLockedRead      iokit_common_err(0x2c3)                      
+#define kIOReturnLockedWrite     iokit_common_err(0x2c4)                       
+#define kIOReturnExclusiveAccess iokit_common_err(0x2c5)                        
+                                                                                 
+#define kIOReturnBadMessageID    iokit_common_err(0x2c6)                          
+                                                                                  
+#define kIOReturnUnsupported     iokit_common_err(0x2c7)                        
+#define kIOReturnVMError         iokit_common_err(0x2c8)                    
+#define kIOReturnInternalError   iokit_common_err(0x2c9)                  
+#define kIOReturnIOError         iokit_common_err(0x2ca)                     
+                                                               
+#define kIOReturnCannotLock      iokit_common_err(0x2cc)                      
+#define kIOReturnNotOpen         iokit_common_err(0x2cd)                   
+#define kIOReturnNotReadable     iokit_common_err(0x2ce)                      
+#define kIOReturnNotWritable     iokit_common_err(0x2cf)                       
+#define kIOReturnNotAligned      iokit_common_err(0x2d0)                   
+#define kIOReturnBadMedia        iokit_common_err(0x2d1)               
+#define kIOReturnStillOpen       iokit_common_err(0x2d2)                        
+#define kIOReturnRLDError        iokit_common_err(0x2d3)               
+#define kIOReturnDMAError        iokit_common_err(0x2d4)               
+#define kIOReturnBusy            iokit_common_err(0x2d5)               
+#define kIOReturnTimeout         iokit_common_err(0x2d6)               
+#define kIOReturnOffline         iokit_common_err(0x2d7)                  
+#define kIOReturnNotReady        iokit_common_err(0x2d8)             
+#define kIOReturnNotAttached     iokit_common_err(0x2d9)                       
+#define kIOReturnNoChannels      iokit_common_err(0x2da)                        
+#define kIOReturnNoSpace         iokit_common_err(0x2db)                     
+                                                               
+#define kIOReturnPortExists      iokit_common_err(0x2dd)                       
+#define kIOReturnCannotWire      iokit_common_err(0x2de)                   
+                                                                             
+#define kIOReturnNoInterrupt     iokit_common_err(0x2df)                         
+#define kIOReturnNoFrames        iokit_common_err(0x2e0)                          
+#define kIOReturnMessageTooLarge iokit_common_err(0x2e1)                          
+                                                                               
+#define kIOReturnNotPermitted    iokit_common_err(0x2e2)                 
+#define kIOReturnNoPower         iokit_common_err(0x2e3)                      
+#define kIOReturnNoMedia         iokit_common_err(0x2e4)                     
+#define kIOReturnUnformattedMedia iokit_common_err(0x2e5)                      
+#define kIOReturnUnsupportedMode iokit_common_err(0x2e6)                
+#define kIOReturnUnderrun        iokit_common_err(0x2e7)                 
+#define kIOReturnOverrun         iokit_common_err(0x2e8)                
+#define kIOReturnDeviceError     iokit_common_err(0x2e9)                                       
+#define kIOReturnNoCompletion    iokit_common_err(0x2ea)                                    
+#define kIOReturnAborted         iokit_common_err(0x2eb)                     
+#define kIOReturnNoBandwidth     iokit_common_err(0x2ec)                                   
+#define kIOReturnNotResponding   iokit_common_err(0x2ed)                         
+#define kIOReturnIsoTooOld       iokit_common_err(0x2ee)                                             
+#define kIOReturnIsoTooNew       iokit_common_err(0x2ef)                                              
+#define kIOReturnNotFound        iokit_common_err(0x2f0)                      
+#define kIOReturnInvalid         iokit_common_err(0x1)                          
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* ! __IOKIT_IORETURN_H */
+#endif                           

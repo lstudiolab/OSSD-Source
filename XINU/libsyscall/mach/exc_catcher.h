@@ -61,4 +61,4 @@ typedef kern_return_t (*_libkernel_exec_raise_state_identity_t)(mach_port_t,
 #define RTLD_DEFAULT    ((void *) -2)
 extern void* (*_dlsym)(void*, const char*);
 
-#endif // __EXC_CATCHER_H
+#endif                   

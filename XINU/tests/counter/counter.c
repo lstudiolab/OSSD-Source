@@ -52,11 +52,11 @@ static_scalable_counter_load(void)
 	return (int64_t) sysctl_read("kern.static_scalable_counter_test_load");
 }
 
-/*
- * A background thread that bangs on the percpu counter and then exits.
- * @param num_iterations How many times to bang on the counter. Each iteration makes the counter
- * bigger by 100.
- */
+  
+                                                                       
+                                                                                                
+                 
+   
 static void*
 background_scalable_counter_thread(void* num_iterations_ptr)
 {
@@ -101,7 +101,7 @@ T_DECL(test_scalable_counters_single_threaded, "Test single threaded operations 
 	darwin_test_setup();
 	T_QUIET; T_EXPECT_EQ(scalable_counter_load(), 0LL, "Counter starts at zero");
 
-	/* Simple add, subtract, and read */
+	                                    
 	scalable_counter_add(1);
 	T_QUIET; T_EXPECT_EQ(scalable_counter_load(), 1LL, "0 + 1 == 1");
 	scalable_counter_add(-1);

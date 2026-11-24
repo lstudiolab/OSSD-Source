@@ -32,57 +32,57 @@
 #include <os/base.h>
 #include <stdint.h>
 
-/* Architecture-independent definitions (exported to userland) */
+                                                                 
 
-/*
- * Apple Hypercall arguments
- */
+  
+                            
+   
 typedef struct hvg_hcall_args {
 	uint64_t args[6];
 } hvg_hcall_args_t;
 
 
-/*
- * Apple Hypercall return output
- */
+  
+                                
+   
 typedef struct hvg_hcall_output {
 	uint64_t regs[7];
 } hvg_hcall_output_t;
 
 
-/*
- * Apple Hypercall return code
- */
+  
+                              
+   
 
 OS_CLOSED_ENUM(hvg_hcall_return, uint32_t,
-    HVG_HCALL_SUCCESS             = 0x0000,       /* The call succeeded */
-    HVG_HCALL_ACCESS_DENIED       = 0x0001,       /* Invalid access right */
-    HVG_HCALL_INVALID_CODE        = 0x0002,       /* Hypercall code not recognized */
-    HVG_HCALL_INVALID_PARAMETER   = 0x0003,       /* Specified register value not valid */
-    HVG_HCALL_IO_FAILED           = 0x0004,       /* Input/output error */
-    HVG_HCALL_FEAT_DISABLED       = 0x0005,       /* Feature not available */
-    HVG_HCALL_UNSUPPORTED         = 0x0006,       /* Hypercall not supported */
+    HVG_HCALL_SUCCESS             = 0x0000,                               
+    HVG_HCALL_ACCESS_DENIED       = 0x0001,                                 
+    HVG_HCALL_INVALID_CODE        = 0x0002,                                          
+    HVG_HCALL_INVALID_PARAMETER   = 0x0003,                                               
+    HVG_HCALL_IO_FAILED           = 0x0004,                               
+    HVG_HCALL_FEAT_DISABLED       = 0x0005,                                  
+    HVG_HCALL_UNSUPPORTED         = 0x0006,                                    
     );
 
 
-/*
- * Apple Hypercall call code
- */
+  
+                            
+   
 
 OS_CLOSED_ENUM(hvg_hcall_code, uint32_t,
-    HVG_HCALL_TRIGGER_DUMP        = 0x0001,       /* Collect guest dump */
+    HVG_HCALL_TRIGGER_DUMP        = 0x0001,                               
     );
 
-/*
- * Options for collecting kernel vmcore
- */
+  
+                                       
+   
 
 OS_CLOSED_OPTIONS(hvg_hcall_dump_option, uint32_t,
-    HVG_HCALL_DUMP_OPTION_REGULAR   =  0x0001     /* Regular dump-guest-memory */
+    HVG_HCALL_DUMP_OPTION_REGULAR   =  0x0001                                    
     );
 
 typedef struct hvg_hcall_vmcore_file {
-	char tag[57];   /* 7 64-bit registers plus 1 byte for '\0' */
+	char tag[57];                                                
 } hvg_hcall_vmcore_file_t;
 
 extern hvg_hcall_return_t
@@ -92,15 +92,15 @@ hvg_hcall_trigger_dump(hvg_hcall_vmcore_file_t *vmcore,
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/*
- * For XNU kernel use only (omitted from userland headers)
- */
+  
+                                                          
+   
 
 #if defined (__x86_64__)
 #include <i386/cpuid.h>
 #include <i386/x86_hypercall.h>
 #endif
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _KERN_HV_HYPERCALL_H_ */
+#endif                            

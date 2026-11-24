@@ -103,5 +103,5 @@ extern int udp6_input(struct mbuf **, int *, int);
 extern int udp6_output(struct inpcb *, struct mbuf *, struct sockaddr *,
     struct mbuf *, struct proc *);
 extern int udp6_connect(struct socket *, struct sockaddr *, struct proc *);
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET6_UDP6_VAR_H_ */
+#endif                         
+#endif                            

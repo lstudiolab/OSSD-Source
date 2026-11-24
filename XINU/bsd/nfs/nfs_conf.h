@@ -31,15 +31,15 @@
 
 #if NFSCLIENT
 #define CONFIG_NFS_CLIENT     1
-#endif /* NFSCLIENT */
+#endif                
 
 #if NFSSERVER
 #define CONFIG_NFS_SERVER     1
-#endif /* NFSSERVER */
+#endif                
 
 
 #if CONFIG_NFS_CLIENT || CONFIG_NFS_SERVER
 #define CONFIG_NFS            1
-#endif /* CONFIG_NFS_CLIENT || CONFIG_NFS_SERVER */
+#endif                                             
 
-#endif /* _BSD_NFS_NFS_CONF_H_ */
+#endif                           

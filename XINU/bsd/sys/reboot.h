@@ -68,54 +68,54 @@
 #include <sys/cdefs.h>
 #include <stdint.h>
 
-/*
- * Arguments to reboot system call.
- */
+  
+                                   
+   
 
 #ifdef __APPLE_API_PRIVATE
-#define RB_AUTOBOOT     0       /* flags for system auto-booting itself */
+#define RB_AUTOBOOT     0                                                 
 
-#define RB_ASKNAME      0x01    /* ask for file name to reboot from */
-#define RB_SINGLE       0x02    /* reboot to single user only */
-#define RB_NOSYNC       0x04    /* dont sync before reboot */
-#define RB_HALT         0x08    /* don't reboot, just halt */
-#define RB_INITNAME     0x10    /* name given for /etc/init */
-#define RB_DFLTROOT     0x20    /* use compiled-in rootdev */
-#define RB_ALTBOOT      0x40    /* use /boot.old vs /boot */
-#define RB_UNIPROC      0x80    /* don't start slaves */
-#define RB_SAFEBOOT     0x100   /* booting safe */
-#define RB_UPSDELAY 0x200   /* Delays restart by 5 minutes */
-#define RB_QUICK        0x400   /* quick and ungraceful reboot with file system caches flushed*/
-#define RB_PANIC        0x800   /* panic the kernel */
-#define RB_PANIC_ZPRINT 0x1000   /* add zprint info to panic string */
+#define RB_ASKNAME      0x01                                          
+#define RB_SINGLE       0x02                                    
+#define RB_NOSYNC       0x04                                 
+#define RB_HALT         0x08                                 
+#define RB_INITNAME     0x10                                  
+#define RB_DFLTROOT     0x20                                 
+#define RB_ALTBOOT      0x40                                
+#define RB_UNIPROC      0x80                            
+#define RB_SAFEBOOT     0x100                     
+#define RB_UPSDELAY 0x200                                    
+#define RB_QUICK        0x400                                                                   
+#define RB_PANIC        0x800                         
+#define RB_PANIC_ZPRINT 0x1000                                        
 
 #ifndef KERNEL
 __BEGIN_DECLS
-/* userspace reboot control */
+                              
 int usrctl(uint32_t flags);
-/* The normal reboot syscall. */
+                                
 int reboot(int howto);
-/* Used with RB_PANIC to panic the kernel from userspace with a message.
- * Requires an entitlement on Release. */
+                                                                        
+                                         
 int reboot_np(int howto, const char *message);
 __END_DECLS
 #endif
 
-#endif /* __APPLE_API_PRIVATE */
+#endif                          
 
 #ifdef __APPLE_API_OBSOLETE
-/*
- * Constants for converting boot-style device number to type,
- * adaptor (uba, mba, etc), unit number and partition number.
- * Type (== major device number) is in the low byte
- * for backward compatibility.  Except for that of the "magic
- * number", each mask applies to the shifted value.
- * Format:
- *	 (4) (4) (4) (4)  (8)     (8)
- *	--------------------------------
- *	|MA | AD| CT| UN| PART  | TYPE |
- *	--------------------------------
- */
+  
+                                                             
+                                                             
+                                                   
+                                                             
+                                                   
+          
+                                
+                                   
+                                   
+                                   
+   
 #define B_ADAPTORSHIFT  24
 #define B_ADAPTORMASK   0x0f
 #define B_ADAPTOR(val)          (((val) >> B_ADAPTORSHIFT) & B_ADAPTORMASK)
@@ -139,7 +139,7 @@ __END_DECLS
 	((controller) << B_CONTROLLERSHIFT) | ((unit) << B_UNITSHIFT) | \
 	((partition) << B_PARTITIONSHIFT) | B_DEVMAGIC)
 
-#endif /* __APPLE_API_OBSOLETE */
+#endif                           
 
 #ifdef BSD_KERNEL_PRIVATE
 
@@ -149,12 +149,12 @@ __END_DECLS
 
 #define PROC_SHUTDOWN_LOG "/var/log/kernel-shutdown.log"
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #if KERNEL_PRIVATE
 __BEGIN_DECLS
 int get_system_inshutdown(void);
 __END_DECLS
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif  /* _SYS_REBOOT_H_ */
+#endif                      

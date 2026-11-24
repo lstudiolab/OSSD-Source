@@ -137,15 +137,15 @@
 #include <netinet6/esp.h>
 #include <netinet6/esp6.h>
 #endif
-#endif /*IPSEC*/
+#endif          
 
 #include <netinet6/ip6protosw.h>
 
 #include <net/net_osdep.h>
 
-/*
- * TCP/IP protocol family: IP6, ICMP6, UDP, TCP.
- */
+  
+                                                
+   
 
 extern struct domain inet6domain_s;
 struct domain *inet6domain = NULL;
@@ -173,9 +173,9 @@ struct ip6protosw inet6sw[] = {
 		.pr_input =             udp6_input,
 		.pr_ctlinput =          udp6_ctlinput,
 		.pr_ctloutput =         ip6_ctloutput,
-#if !INET       /* don't call initialization twice */
+#if !INET                                            
 		.pr_init =              udp_init,
-#endif /* !INET */
+#endif            
 		.pr_usrreqs =           &udp6_usrreqs,
 		.pr_lock =              udp_lock,
 		.pr_unlock =            udp_unlock,
@@ -192,9 +192,9 @@ struct ip6protosw inet6sw[] = {
 		.pr_input =             tcp6_input,
 		.pr_ctlinput =          tcp6_ctlinput,
 		.pr_ctloutput =         tcp_ctloutput,
-#if !INET       /* don't call initialization and timeout routines twice */
+#if !INET                                                                 
 		.pr_init =              tcp_init,
-#endif /* !INET */
+#endif            
 		.pr_drain =             tcp_drain,
 		.pr_usrreqs =           &tcp6_usrreqs,
 		.pr_lock =              tcp_lock,
@@ -211,9 +211,9 @@ struct ip6protosw inet6sw[] = {
 		.pr_output =            rip6_pr_output,
 		.pr_ctlinput =          rip6_ctlinput,
 		.pr_ctloutput =         rip6_ctloutput,
-#if !INET       /* don't call initialization and timeout routines twice */
+#if !INET                                                                 
 		.pr_init =              rip_init,
-#endif /* !INET */
+#endif            
 		.pr_usrreqs =           &rip6_usrreqs,
 		.pr_unlock =            rip_unlock,
 		.pr_update_last_owner = inp_update_last_owner,
@@ -285,8 +285,8 @@ struct ip6protosw inet6sw[] = {
 		.pr_ctlinput =          esp6_ctlinput,
 		.pr_usrreqs =           &nousrreqs,
 	},
-#endif /* IPSEC_ESP */
-#endif /* IPSEC */
+#endif                
+#endif            
 #if INET
 	{
 		.pr_type =              SOCK_RAW,
@@ -301,7 +301,7 @@ struct ip6protosw inet6sw[] = {
 		.pr_update_last_owner = inp_update_last_owner,
 		.pr_copy_last_owner =   inp_copy_last_owner,
 	},
-#endif /*INET*/
+#endif         
 	{
 		.pr_type =              SOCK_RAW,
 		.pr_protocol =          IPPROTO_IPV6,
@@ -315,7 +315,7 @@ struct ip6protosw inet6sw[] = {
 		.pr_update_last_owner = inp_update_last_owner,
 		.pr_copy_last_owner =   inp_copy_last_owner,
 	},
-/* raw wildcard */
+                  
 	{
 		.pr_type =              SOCK_RAW,
 		.pr_protocol =          0,
@@ -343,7 +343,7 @@ struct domain inet6domain_s = {
 	        .dom_protohdrlen =      sizeof(struct sockaddr_in6),
 };
 
-/* Initialize the PF_INET6 domain, and add in the pre-defined protos */
+                                                                       
 void
 in6_dinit(struct domain *dp)
 {
@@ -399,9 +399,9 @@ in6_dinit(struct domain *dp)
 	_CASSERT(offsetof(struct ip6protosw, pr_copy_last_owner) ==
 	    offsetof(struct protosw, pr_copy_last_owner));
 
-	/*
-	 * Attach first, then initialize.  ip6_init() needs raw IP6 handler.
-	 */
+	  
+                                                                     
+    
 	for (i = 0, pr = &inet6sw[0]; i < in6_proto_count; i++, pr++) {
 		net_add_proto((struct protosw *)pr, dp, 0);
 	}
@@ -418,91 +418,91 @@ rip6_pr_output(struct mbuf *m, struct socket *so, struct sockaddr_in6 *sin6,
 {
 #pragma unused(m, so, sin6, m1)
 	panic("%s\n", __func__);
-	/* NOTREACHED */
+	                
 	return 0;
 }
 
-/*
- * Internet configuration info
- */
+  
+                              
+   
 #ifndef IPV6FORWARDING
 #if GATEWAY6
-#define IPV6FORWARDING  1       /* forward IP6 packets not for us */
+#define IPV6FORWARDING  1                                           
 #else
-#define IPV6FORWARDING  0       /* don't forward IP6 packets not for us */
-#endif /* GATEWAY6 */
-#endif /* !IPV6FORWARDING */
+#define IPV6FORWARDING  0                                                 
+#endif               
+#endif                      
 
 #ifndef IPV6_SENDREDIRECTS
 #define IPV6_SENDREDIRECTS      1
 #endif
 
-int     ip6_forwarding = IPV6FORWARDING;        /* act as router? */
+int     ip6_forwarding = IPV6FORWARDING;                            
 int     ip6_sendredirects = IPV6_SENDREDIRECTS;
 int     ip6_defhlim = IPV6_DEFHLIM;
 int     ip6_defmcasthlim = IPV6_DEFAULT_MULTICAST_HOPS;
-int     ip6_accept_rtadv = 1;   /* deprecated */
+int     ip6_accept_rtadv = 1;                   
 int     ip6_log_interval = 5;
-int     ip6_hdrnestlimit = 15;  /* How many header options will we process? */
-int     ip6_dad_count = 1;      /* DupAddrDetectionTransmits */
+int     ip6_hdrnestlimit = 15;                                                
+int     ip6_dad_count = 1;                                     
 int     ip6_auto_flowlabel = 1;
 int     ip6_gif_hlim = 0;
-int     ip6_use_deprecated = 1; /* allow deprecated addr [RFC 4862, 5.5.4] */
-int     ip6_rr_prune = 5;       /* router renumbering prefix
-                                 * walk list every 5 sec.    */
-int     ip6_mcast_pmtu = 0;     /* enable pMTU discovery for multicast? */
-int     ip6_v6only = 0;         /* Mapped addresses off by default -  Radar 3347718  -- REVISITING FOR 10.7 -- TESTING WITH MAPPED@ OFF */
+int     ip6_use_deprecated = 1;                                              
+int     ip6_rr_prune = 5;                                   
+                                                               
+int     ip6_mcast_pmtu = 0;                                               
+int     ip6_v6only = 0;                                                                                                                   
 
-int     ip6_neighborgcthresh = 1024;    /* Threshold # of NDP entries for GC */
-int     ip6_maxifprefixes = 16;         /* Max acceptable prefixes via RA per IF */
-int     ip6_maxifdefrouters = 64;       /* Max acceptable default or RTI routers via RA */
-int     ip6_maxdynroutes = 1024;        /* Max # of routes created via redirect */
-int     ip6_only_allow_rfc4193_prefix = 0;      /* Only allow RFC4193 style Unique Local IPv6 Unicast prefixes */
+int     ip6_neighborgcthresh = 1024;                                           
+int     ip6_maxifprefixes = 16;                                                    
+int     ip6_maxifdefrouters = 64;                                                         
+int     ip6_maxdynroutes = 1024;                                                  
+int     ip6_only_allow_rfc4193_prefix = 0;                                                                       
 
 static int ip6_keepfaith = 0;
 uint64_t ip6_log_time = 0;
-int     nd6_onlink_ns_rfc4861 = 0; /* allow 'on-link' nd6 NS (as in RFC 4861) */
+int     nd6_onlink_ns_rfc4861 = 0;                                              
 
-/* icmp6 */
-/*
- * BSDI4 defines these variables in in_proto.c...
- * XXX: what if we don't define INET? Should we define pmtu6_expire
- * or so? (jinmei@kame.net 19990310)
- */
+           
+  
+                                                 
+                                                                   
+                                    
+   
 int pmtu_expire = 60 * 10;
 int pmtu_probe = 60 * 2;
 
-/* raw IP6 parameters */
-/*
- * Nominal space allocated to a raw ip socket.
- */
+                        
+  
+                                              
+   
 #define RIPV6SNDQ       8192
 #define RIPV6RCVQ       8192
 
 u_int32_t       rip6_sendspace = RIPV6SNDQ;
 u_int32_t       rip6_recvspace = RIPV6RCVQ;
 
-/* ICMPV6 parameters */
-int     icmp6_rediraccept = 1;          /* accept and process redirects */
-int     icmp6_redirtimeout = 10 * 60;   /* 10 minutes */
-uint32_t     icmp6errppslim = 500;           /* 500 packets per second */
-uint32_t     icmp6errppslim_random_incr = 500; /* We further randomize icmp6errppslim
-                                                *  with this during icmpv6 initialization*/
-int     icmp6rappslim = 10;             /* 10 packets per second */
-int     icmp6_nodeinfo = 0;             /* enable/disable NI response */
+                       
+int     icmp6_rediraccept = 1;                                            
+int     icmp6_redirtimeout = 10 * 60;                   
+uint32_t     icmp6errppslim = 500;                                       
+uint32_t     icmp6errppslim_random_incr = 500;                                       
+                                                                                           
+int     icmp6rappslim = 10;                                        
+int     icmp6_nodeinfo = 0;                                             
 
-/* UDP on IP6 parameters */
-int     udp6_sendspace = 9216;          /* really max datagram size */
+                           
+int     udp6_sendspace = 9216;                                        
 int     udp6_recvspace = 40 * (1024 + sizeof(struct sockaddr_in6));
-/* 40 1K datagrams */
+                     
 
-/*
- * sysctl related items.
- */
+  
+                        
+   
 SYSCTL_NODE(_net, PF_INET6, inet6,
     CTLFLAG_RW | CTLFLAG_LOCKED, 0, "Internet6 Family");
 
-/* net.inet6 */
+               
 SYSCTL_NODE(_net_inet6, IPPROTO_IPV6, ip6,
     CTLFLAG_RW | CTLFLAG_LOCKED, 0, "IP6");
 SYSCTL_NODE(_net_inet6, IPPROTO_ICMPV6, icmp6,
@@ -514,9 +514,9 @@ SYSCTL_NODE(_net_inet6, IPPROTO_TCP, tcp6,
 #if IPSEC
 SYSCTL_NODE(_net_inet6, IPPROTO_ESP, ipsec6,
     CTLFLAG_RW | CTLFLAG_LOCKED, 0, "IPSEC6");
-#endif /* IPSEC */
+#endif            
 
-/* net.inet6.ip6 */
+                   
 static int
 sysctl_ip6_temppltime SYSCTL_HANDLER_ARGS
 {
@@ -622,7 +622,7 @@ SYSCTL_INT(_net_inet6_ip6, IPV6CTL_ACCEPT_RTADV,
 SYSCTL_INT(_net_inet6_ip6, IPV6CTL_ACCEPT_RTADV,
     accept_rtadv, CTLFLAG_RD | CTLFLAG_LOCKED,
     &ip6_accept_rtadv, 0, "");
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 SYSCTL_INT(_net_inet6_ip6, IPV6CTL_KEEPFAITH,
     keepfaith, CTLFLAG_RD | CTLFLAG_LOCKED, &ip6_keepfaith, 0, "");
 SYSCTL_INT(_net_inet6_ip6, IPV6CTL_LOG_INTERVAL,
@@ -683,11 +683,11 @@ SYSCTL_PROC(_net_inet6_ip6, OID_AUTO,
     cga_conflict_retries, CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_LOCKED,
     &ip6_cga_conflict_retries, 0, sysctl_ip6_cga_conflict_retries, "IU", "");
 
-/*
- * One single sysctl to set v6 stack profile for IPv6 compliance testing.
- * A lot of compliance test suites are not aware of other enhancements in IPv6
- * protocol and expect some arguably obsolete behavior.
- */
+  
+                                                                         
+                                                                              
+                                                       
+   
 int v6_compliance_profile = 0;
 static int
 sysctl_set_v6_compliance_profile SYSCTL_HANDLER_ARGS
@@ -728,7 +728,7 @@ SYSCTL_PROC(_net_inet6_ip6, OID_AUTO, compliance_profile,
     &v6_compliance_profile, 0, sysctl_set_v6_compliance_profile,
     "I", "set IPv6 compliance profile");
 
-/* net.inet6.icmp6 */
+                     
 SYSCTL_INT(_net_inet6_icmp6, ICMPV6CTL_REDIRACCEPT,
     rediraccept, CTLFLAG_RW | CTLFLAG_LOCKED, &icmp6_rediraccept, 0, "");
 SYSCTL_INT(_net_inet6_icmp6, ICMPV6CTL_REDIRTIMEOUT,

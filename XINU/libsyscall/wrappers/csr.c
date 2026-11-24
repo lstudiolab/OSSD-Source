@@ -24,7 +24,7 @@
 #include <sys/csr.h>
 #include <sys/types.h>
 
-/* Syscall entry point */
+                         
 int __csrctl(csr_op_t op, void *buffer, size_t size);
 
 int

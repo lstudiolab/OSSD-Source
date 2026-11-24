@@ -53,10 +53,10 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 #ifndef I386_PIO_H
 #define I386_PIO_H
 #include <mach_assert.h>
 #include <architecture/i386/pio.h>
-#endif /* I386_PIO_H */
+#endif                 

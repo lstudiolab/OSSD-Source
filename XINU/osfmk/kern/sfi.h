@@ -50,20 +50,20 @@ kern_return_t sfi_class_offtime_cancel(sfi_class_id_t class_id);
 kern_return_t sfi_get_class_offtime(sfi_class_id_t class_id, uint64_t *offtime_usecs);
 
 #ifdef MACH_KERNEL_PRIVATE
-/*
- * Classifying a thread requires no special locks to be held (although attribute
- * changes that cause an inconsistent snapshot may cause a spurious AST). Final
- * evaluation will happen at the AST boundary with the thread locked. If possible,
- *
- */
+  
+                                                                                
+                                                                               
+                                                                                  
+  
+   
 sfi_class_id_t sfi_thread_classify(thread_t thread);
 sfi_class_id_t sfi_processor_active_thread_classify(processor_t processor);
-ast_t sfi_thread_needs_ast(thread_t thread, sfi_class_id_t *out_class /* optional */);
+ast_t sfi_thread_needs_ast(thread_t thread, sfi_class_id_t *out_class               );
 ast_t sfi_processor_needs_ast(processor_t processor);
 
 void sfi_ast(thread_t thread);
 void sfi_reevaluate(thread_t thread);
 kern_return_t sfi_defer(uint64_t);
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif /* _KERN_SFI_H_ */
+#endif                   

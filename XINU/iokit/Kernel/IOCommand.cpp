@@ -42,9 +42,9 @@
 OSDefineMetaClassAndStructors(IOCommand, OSObject);
 
 
-//--------------------------------------------------------------------------
-//	init -	initialize our data structures
-//--------------------------------------------------------------------------
+                                                                            
+                                        
+                                                                            
 
 bool
 IOCommand::init(void)

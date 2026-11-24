@@ -28,38 +28,38 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/*
- * HISTORY
- *
- * Revision 1.1.1.1  1998/09/22 21:05:29  wsanchez
- * Import of Mac OS X kernel (~semeria)
- *
- * Revision 1.1.1.1  1998/03/07 02:26:16  wsanchez
- * Import of OSF Mach kernel (~mburg)
- *
- * Revision 1.2.6.1  1994/09/23  02:14:23  ezf
- *      change marker to not FREE
- *      [1994/09/22  21:31:33  ezf]
- *
- * Revision 1.2.2.4  1993/08/03  18:29:18  gm
- *      CR9596: Change KERNEL to MACH_KERNEL.
- *      [1993/08/02  16:11:07  gm]
- *
- * Revision 1.2.2.3  1993/07/22  16:18:15  rod
- *      Add ANSI prototypes.  CR #9523.
- *      [1993/07/22  13:34:22  rod]
- *
- * Revision 1.2.2.2  1993/06/09  02:33:38  gm
- *      Added to OSF/1 R1.3 from NMK15.0.
- *      [1993/06/02  21:11:41  jeffc]
- *
- * Revision 1.2  1993/04/19  16:23:26  devrcs
- *      Untyped ipc merge:
- *      Support for logging and tracing within the MIG stubs
- *      [1993/02/24  14:49:29  travos]
- *
- * $EndLog$
- */
+  
+          
+  
+                                                  
+                                       
+  
+                                                  
+                                     
+  
+                                              
+                                 
+                                   
+  
+                                             
+                                             
+                                  
+  
+                                              
+                                       
+                                   
+  
+                                             
+                                         
+                                     
+  
+                                             
+                          
+                                                            
+                                      
+  
+           
+   
 
 #ifdef MACH_KERNEL
 #include <mig_debug.h>
@@ -70,24 +70,24 @@
 
 int mig_tracing, mig_errors, mig_full_tracing;
 
-/*
- * Tracing facilities for MIG generated stubs.
- *
- * At the moment, there is only a printf, which is
- * activated through the runtime switch:
- *      mig_tracing to call MigEventTracer
- *      mig_errors to call MigEventErrors
- * For this to work, MIG has to run with the -L option,
- * and the mig_debug flags has to be selected
- *
- * In the future, it will be possible to collect infos
- * on the use of MACH IPC with an application similar
- * to netstat.
- *
- * A new option will be generated accordingly to the
- * kernel configuration rules, e.g
- *	#include <mig_log.h>
- */
+  
+                                              
+  
+                                                  
+                                        
+                                          
+                                         
+                                                       
+                                             
+  
+                                                      
+                                                     
+              
+  
+                                                    
+                                  
+                       
+   
 
 void
 MigEventTracer(

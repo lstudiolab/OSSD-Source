@@ -32,10 +32,10 @@
 OSDefineMetaClassAndStructors(IOPMinformee, OSObject)
 
 
-//*********************************************************************************
-// static constructor
-//
-//*********************************************************************************
+                                                                                   
+                     
+  
+                                                                                   
 IOPMinformee *IOPMinformee::withObject( IOService * theObject )
 {
 	IOPMinformee        *newInformee = new IOPMinformee;
@@ -50,10 +50,10 @@ IOPMinformee *IOPMinformee::withObject( IOService * theObject )
 }
 
 
-//*********************************************************************************
-// constructor
-//
-//*********************************************************************************
+                                                                                   
+              
+  
+                                                                                   
 void
 IOPMinformee::initialize( IOService * theObject )
 {
@@ -64,10 +64,10 @@ IOPMinformee::initialize( IOService * theObject )
 }
 
 
-//*********************************************************************************
-// free
-//
-//*********************************************************************************
+                                                                                   
+       
+  
+                                                                                   
 void
 IOPMinformee::free(void )
 {

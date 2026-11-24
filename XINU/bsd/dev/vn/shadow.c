@@ -26,32 +26,32 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * shadow.c
- *
- * Implement copy-on-write shadow map to allow a disk image to be
- * mounted read-only, yet be writable by transferring writes to a
- * "shadow" file.  Subsequent reads from blocks that have been
- * written will then go the "shadow" file.
- *
- * The map has two parts:
- * 1) a bit map to track which blocks have been written
- * 2) a band map to map a "band" within the original file to a corresponding
- *    "band" in the shadow file.  Each band has the same size.
- *
- * The band map is used to ensure that blocks that are contiguous in the
- * original file will remain contiguous in the shadow file.
- *
- * For debugging purposes, this file can be compiled standalone using:
- * cc -o shadow shadow.c -DTEST_SHADOW
- */
+  
+           
+  
+                                                                 
+                                                                 
+                                                              
+                                          
+  
+                         
+                                                       
+                                                                            
+                                                              
+  
+                                                                        
+                                                           
+  
+                                                                      
+                                      
+   
 
-/*
- * Modification History
- *
- * December 21, 2001    Dieter Siegmund (dieter@apple.com)
- * - initial revision
- */
+  
+                       
+  
+                                                          
+                     
+   
 #include <sys/param.h>
 #include <sys/types.h>
 #include <mach/boolean.h>
@@ -63,12 +63,12 @@
 #include <stdlib.h>
 #define my_malloc(a)    malloc(a)
 #define my_free(a)      free(a)
-#else /* !TEST_SHADOW */
+#else                   
 #include <sys/malloc.h>
 #define my_malloc(a)    _MALLOC(a, M_TEMP, M_WAITOK)
 #define my_free(a)      FREE(a, M_TEMP)
 #include <libkern/libkern.h>
-#endif /* TEST_SHADOW */
+#endif                  
 
 #include "shadow.h"
 
@@ -78,7 +78,7 @@
 
 #define my_trunc(value, divisor)        ((value) / (divisor) * (divisor))
 
-/* a band size of 128K can represent a file up to 8GB */
+                                                        
 #define BAND_SIZE_DEFAULT_POWER_2       17
 #define BAND_SIZE_DEFAULT               (1 << BAND_SIZE_DEFAULT_POWER_2)
 
@@ -87,14 +87,14 @@ typedef u_short band_number_t;
 #define BAND_MAX                        ((band_number_t)65535)
 
 struct shadow_map {
-	uint32_t            blocks_per_band;/* size in blocks */
+	uint32_t            blocks_per_band;                    
 	uint32_t            block_size;
-	u_char *            block_bitmap;       /* 1 bit per block; 1=written */
-	band_number_t *     bands;              /* band map array */
-	uint32_t            file_size_blocks;   /* size of file in bands */
-	uint32_t            shadow_size_bands;  /* size of shadow in bands */
-	uint32_t            next_band;          /* next free band */
-	uint32_t            zeroth_band;        /* special-case 0th band */
+	u_char *            block_bitmap;                                       
+	band_number_t *     bands;                                  
+	uint32_t            file_size_blocks;                              
+	uint32_t            shadow_size_bands;                               
+	uint32_t            next_band;                              
+	uint32_t            zeroth_band;                                   
 };
 
 
@@ -109,22 +109,22 @@ bit(int b)
 	return (u_char)(1 << b);
 }
 
-/*
- * Function: bits_lower
- * Purpose:
- *   Return a byte value in which bits numbered lower than 'b' are set.
- */
+  
+                       
+           
+                                                                       
+   
 static __inline__ u_char
 bits_lower(int b)
 {
 	return (u_char)(bit(b) - 1);
 }
 
-/*
- * Function: byte_set_bits
- * Purpose:
- *   Set the given range of bits within a byte.
- */
+  
+                          
+           
+                                               
+   
 static __inline__ u_char
 byte_set_bits(int start, int end)
 {
@@ -141,15 +141,15 @@ bitmap_offset(off_t where)
 	return b;
 }
 
-/*
- * Function: bitmap_set
- *
- * Purpose:
- *   Set the given range of bits.
- *
- *   This algorithm tries to set the extents using the biggest
- *   units, using longs, then a short, then a byte, then bits.
- */
+  
+                       
+  
+           
+                                 
+  
+                                                              
+                                                              
+   
 static void
 bitmap_set(u_char * map, off_t start_bit, size_t bit_count)
 {
@@ -197,17 +197,17 @@ end:
 	return;
 }
 
-/*
- * Function: bitmap_get
- *
- * Purpose:
- *   Return the number of bits in the range that are the same e.g.
- *   11101 returns 3 because the first 3 bits are the same (1's), whereas
- *   001100 returns 2 because the first 2 bits are the same.
- *   This algorithm tries to count things in as big a chunk as possible,
- *   first aligning to a byte offset, then trying to count longs, a short,
- *   a byte, then any remaining bits to find the bit that is different.
- */
+  
+                       
+  
+           
+                                                                  
+                                                                         
+                                                            
+                                                                        
+                                                                          
+                                                                       
+   
 
 static uint32_t
 bitmap_get(u_char * map, off_t start_bit, size_t bit_count,
@@ -228,26 +228,26 @@ bitmap_get(u_char * map, off_t start_bit, size_t bit_count,
 	if (start.byte < end.byte) {
 		uint64_t n_bytes;
 
-		if (start.bit) { /* try to align to a byte */
+		if (start.bit) {                             
 			for (i = start.bit; i < NBBY; i++) {
 				boolean_t       this_is_set;
 
 				this_is_set = (map[start.byte] & bit(i)) ? TRUE : FALSE;
 				if (this_is_set != is_set) {
-					goto done; /* found bit that was different, we're done */
+					goto done;                                               
 				}
 				count++;
 			}
-			start.bit = 0; /* made it to the next byte */
+			start.bit = 0;                               
 			start.byte++;
 			if (start.byte == end.byte) {
-				goto end; /* no more bytes, check for any leftover bits */
+				goto end;                                                 
 			}
 		}
-		/* calculate how many bytes are left in the range */
+		                                                    
 		n_bytes = end.byte - start.byte;
 
-		/* check for 4 bytes of the same bits */
+		                                        
 		while (n_bytes >= sizeof(uint32_t)) {
 			uint32_t * valPtr = (uint32_t *)(map + start.byte);
 			if ((is_set && *valPtr == UINT32_ALL_ONES)
@@ -256,10 +256,10 @@ bitmap_get(u_char * map, off_t start_bit, size_t bit_count,
 				start.byte += sizeof(*valPtr);
 				n_bytes -= sizeof(*valPtr);
 			} else {
-				break; /* bits differ */
+				break;                  
 			}
 		}
-		/* check for 2 bytes of the same bits */
+		                                        
 		if (n_bytes >= sizeof(u_short)) {
 			u_short * valPtr = (u_short *)(map + start.byte);
 
@@ -271,7 +271,7 @@ bitmap_get(u_char * map, off_t start_bit, size_t bit_count,
 			}
 		}
 
-		/* check for 1 byte of the same bits */
+		                                       
 		if (n_bytes) {
 			if ((is_set && map[start.byte] == UCHAR_ALL_ONES)
 			    || (!is_set && map[start.byte] == 0)) {
@@ -279,7 +279,7 @@ bitmap_get(u_char * map, off_t start_bit, size_t bit_count,
 				start.byte++;
 				n_bytes--;
 			}
-			/* we found bits that were different, find the first one */
+			                                                           
 			if (n_bytes) {
 				for (i = 0; i < NBBY; i++) {
 					boolean_t   this_is_set;
@@ -316,13 +316,13 @@ shadow_map_block_to_band(shadow_map_t * map, off_t block)
 	return (band_number_t)(block / map->blocks_per_band);
 }
 
-/*
- * Function: shadow_map_mapped_band
- * Purpose:
- *   Return the mapped band for the given band.
- *   If map_it is FALSE, and the band is not mapped, return FALSE.
- *   If map_it is TRUE, then this function will always return TRUE.
- */
+  
+                                   
+           
+                                               
+                                                                  
+                                                                   
+   
 static boolean_t
 shadow_map_mapped_band(shadow_map_t * map, band_number_t band,
     boolean_t map_it, band_number_t * mapped_band)
@@ -336,9 +336,9 @@ shadow_map_mapped_band(shadow_map_t * map, band_number_t band,
 		*mapped_band = map->bands[band];
 		if (*mapped_band == BAND_ZERO) {
 			if (map_it) {
-				/* grow the file */
+				                   
 				if (map->next_band == 0) {
-					/* remember the zero'th band */
+					                               
 					map->zeroth_band = band;
 				}
 				*mapped_band = map->bands[band] = (band_number_t)map->next_band++;
@@ -351,15 +351,15 @@ shadow_map_mapped_band(shadow_map_t * map, band_number_t band,
 	return is_mapped;
 }
 
-/*
- * Function: shadow_map_contiguous
- *
- * Purpose:
- *   Return the first offset within the range position..(position + count)
- *   that is not a contiguous mapped band.
- *
- *   If called with is_write = TRUE, this function will map bands as it goes.
- */
+  
+                                  
+  
+           
+                                                                          
+                                          
+  
+                                                                             
+   
 static off_t
 shadow_map_contiguous(shadow_map_t * map, off_t start_block,
     size_t num_blocks, boolean_t is_write)
@@ -374,7 +374,7 @@ shadow_map_contiguous(shadow_map_t * map, off_t start_block,
 	is_mapped = shadow_map_mapped_band(map, band, is_write, &mapped_band);
 	if (is_write == FALSE && is_mapped == FALSE) {
 		static int happened = 0;
-		/* this can't happen */
+		                       
 		if (happened == 0) {
 			printf("shadow_map_contiguous: this can't happen!\n");
 			happened = 1;
@@ -393,7 +393,7 @@ shadow_map_contiguous(shadow_map_t * map, off_t start_block,
 			return p;
 		}
 		if ((mapped_band + 1) != next_mapped_band) {
-			/* not contiguous */
+			                    
 			ret_end_block = p;
 			break;
 		}
@@ -403,21 +403,21 @@ shadow_map_contiguous(shadow_map_t * map, off_t start_block,
 }
 
 
-/*
- * Function: block_bitmap_size
- * Purpose:
- *   The number of bytes required in a block bitmap to represent a file of size
- *   file_size.
- *
- *   The bytes required is the number of blocks in the file,
- *   divided by the number of bits per byte.
- * Note:
- *   An 8GB file requires (assuming 512 byte block):
- *   2^33 / 2^9 / 2^3 = 2^21 = 2MB
- *   of bitmap space.  This is a non-trival amount of memory,
- *   particularly since most of the bits will be zero.
- *   A sparse bitmap would really help in this case.
- */
+  
+                              
+           
+                                                                               
+               
+  
+                                                            
+                                            
+        
+                                                    
+                                  
+                                                             
+                                                      
+                                                    
+   
 static __inline__ size_t
 block_bitmap_size(off_t file_size, uint32_t block_size)
 {
@@ -425,27 +425,27 @@ block_bitmap_size(off_t file_size, uint32_t block_size)
 	return howmany(blocks, NBBY);
 }
 
-/*
- * Function: shadow_map_read
- *
- * Purpose:
- *   Calculate the block offset within the shadow to read, and the number
- *   blocks to read.  The input values (block_offset, block_count) refer
- *   to the original file.
- *
- *   The output values (*incr_block_offset, *incr_block_count) refer to the
- *   shadow file if the return value is TRUE.  They refer to the original
- *   file if the return value is FALSE.
- *
- *   Blocks within a band may or may not have been written, in addition,
- *   Bands are not necessarily contiguous, therefore:
- *      *incr_block_count <= block_count
- *   The caller must be prepared to call this function interatively
- *   to complete the whole i/o.
- * Returns:
- *   TRUE if the shadow file should be read, FALSE if the original file
- *   should be read.
- */
+  
+                            
+  
+           
+                                                                         
+                                                                        
+                          
+  
+                                                                           
+                                                                         
+                                       
+  
+                                                                        
+                                                     
+                                        
+                                                                   
+                               
+           
+                                                                       
+                    
+   
 boolean_t
 shadow_map_read(shadow_map_t * map, off_t block_offset, size_t block_count,
     off_t * incr_block_offset, size_t * incr_block_count)
@@ -464,7 +464,7 @@ shadow_map_read(shadow_map_t * map, off_t block_offset, size_t block_count,
 	if (written == FALSE) {
 		*incr_block_count = n_blocks;
 		*incr_block_offset = block_offset;
-	} else { /* start has been written, and therefore mapped */
+	} else {                                                   
 		band_number_t   mapped_band;
 		off_t           band_limit;
 
@@ -481,22 +481,22 @@ shadow_map_read(shadow_map_t * map, off_t block_offset, size_t block_count,
 	return written;
 }
 
-/*
- * Function: shadow_map_write
- *
- * Purpose:
- *   Calculate the block offset within the shadow to write, and the number
- *   blocks to write.  The input values (block_offset, block_count) refer
- *   to the original file.  The output values
- *   (*incr_block_offset, *incr_block_count) refer to the shadow file.
- *
- *   Bands are not necessarily contiguous, therefore:
- *      *incr_block_count <= block_count
- *   The caller must be prepared to call this function interatively
- *   to complete the whole i/o.
- * Returns:
- *   TRUE if the shadow file was grown, FALSE otherwise.
- */
+  
+                             
+  
+           
+                                                                          
+                                                                         
+                                             
+                                                                      
+  
+                                                     
+                                        
+                                                                   
+                               
+           
+                                                        
+   
 boolean_t
 shadow_map_write(shadow_map_t * map, off_t block_offset,
     size_t block_count, off_t * incr_block_offset,
@@ -519,7 +519,7 @@ shadow_map_write(shadow_map_t * map, off_t block_offset,
 	    + (block_offset % map->blocks_per_band);
 	*incr_block_count = band_limit - block_offset;
 
-	/* mark these blocks as written */
+	                                  
 	bitmap_set(map->block_bitmap, block_offset, *incr_block_count);
 
 	if (map->next_band > map->shadow_size_bands) {
@@ -538,27 +538,27 @@ shadow_map_is_written(shadow_map_t * map, off_t block_offset)
 	return (map->block_bitmap[b.byte] & bit(b.bit)) ? TRUE : FALSE;
 }
 
-/*
- * Function: shadow_map_shadow_size
- *
- * Purpose:
- *   To return the size of the shadow file in blocks.
- */
+  
+                                   
+  
+           
+                                                     
+   
 uint32_t
 shadow_map_shadow_size(shadow_map_t * map)
 {
 	return map->shadow_size_bands * map->blocks_per_band;
 }
 
-/*
- * Function: shadow_map_create
- *
- * Purpose:
- *   Allocate the dynamic data for keeping track of the shadow dirty blocks
- *   and the band mapping table.
- * Returns:
- *   NULL if an error occurred.
- */
+  
+                              
+  
+           
+                                                                           
+                                
+           
+                               
+   
 shadow_map_t *
 shadow_map_create(off_t file_size, off_t shadow_size,
     uint32_t band_size, uint32_t block_size)
@@ -581,7 +581,7 @@ shadow_map_create(off_t file_size, off_t shadow_size,
 	}
 	n_bands = (uint32_t)many;
 
-	/* create a block bitmap, one bit per block */
+	                                              
 	bitmap_size = block_bitmap_size(file_size, block_size);
 	block_bitmap = my_malloc(bitmap_size);
 	if (block_bitmap == NULL) {
@@ -590,7 +590,7 @@ shadow_map_create(off_t file_size, off_t shadow_size,
 	}
 	bzero(block_bitmap, bitmap_size);
 
-	/* get the band map */
+	                      
 	bands = (band_number_t *)my_malloc(n_bands * sizeof(band_number_t));
 	if (bands == NULL) {
 		printf("failed to allocate bands\n");
@@ -623,11 +623,11 @@ failure:
 	return NULL;
 }
 
-/*
- * Function: shadow_map_free
- * Purpose:
- *   Frees the data structure to deal with the shadow map.
- */
+  
+                            
+           
+                                                          
+   
 void
 shadow_map_free(shadow_map_t * map)
 {

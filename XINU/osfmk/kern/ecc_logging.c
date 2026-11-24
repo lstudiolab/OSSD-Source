@@ -33,17 +33,17 @@
 #include <pexpert/pexpert.h>
 #include <libkern/OSAtomic.h>
 
-/*
- * ECC data.  Not really KPCs, but this still seems like the
- * best home for this code.
- *
- * Circular buffer of events.  When we fill up, drop data.
- */
+  
+                                                            
+                           
+  
+                                                          
+   
 #define ECC_EVENT_BUFFER_COUNT  5
 struct ecc_event                ecc_data[ECC_EVENT_BUFFER_COUNT];
 static uint32_t                 ecc_data_next_read;
 static uint32_t                 ecc_data_next_write;
-static boolean_t                ecc_data_empty = TRUE; // next read == next write : empty or full?
+static boolean_t                ecc_data_empty = TRUE;                                            
 static LCK_GRP_DECLARE(ecc_data_lock_group, "ecc-data");
 static LCK_SPIN_DECLARE(ecc_data_lock, &ecc_data_lock_group);
 static uint32_t                 ecc_correction_count;

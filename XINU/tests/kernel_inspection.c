@@ -17,10 +17,10 @@
 T_GLOBAL_META(T_META_NAMESPACE("xnu.ipc"),
     T_META_RUN_CONCURRENTLY(true));
 
-/*
- * Attempt to inspect kernel_task using a task_inspect_t.  Interact with the
- * kernel in the same way top(1) and lsmp(1) do.
- */
+  
+                                                                            
+                                                
+   
 
 static int found_kernel_task = 0;
 
@@ -72,16 +72,16 @@ attempt_kernel_inspection(task_t task)
 
 		kr = thread_info(threads[i], THREAD_BASIC_INFO,
 		    (thread_info_t)&basic_info, &bi_count);
-		/*
-		 * Ignore threads that have gone away.
-		 */
+		  
+                                        
+     
 		if (kr == MACH_SEND_INVALID_DEST) {
 			T_LOG("ignoring thread that has been destroyed");
 			continue;
 		}
 		T_QUIET; T_EXPECT_MACH_SUCCESS(kr, "thread_info(... THREAD_BASIC_INFO ...)");
 
-		/* Now try out READ (skip eval) interfaces on kernel thread */
+		                                                              
 		mach_msg_type_number_t msk_count = EXC_TYPES_COUNT;
 		exception_mask_t masks[EXC_TYPES_COUNT];
 		ipc_info_port_t ports_info[EXC_TYPES_COUNT];
@@ -90,7 +90,7 @@ attempt_kernel_inspection(task_t task)
 		kr = thread_get_exception_ports_info(threads[i], EXC_MASK_ALL, masks, &msk_count, ports_info, behaviors, flavors);
 		T_QUIET; T_EXPECT_MACH_SUCCESS(kr, "thread_get_exception_ports_info() on kernel thread: 0x%x", kr);
 
-		/* READ (with eval) interfaces should fail */
+		                                             
 		mach_port_t voucher;
 		kr = thread_get_mach_voucher(threads[i], 0, &voucher);
 		T_QUIET; T_EXPECT_EQ(kr, KERN_INVALID_ARGUMENT, "thread_get_mach_voucher() should fail with KERN_INVALID_ARGUMENT");
@@ -121,7 +121,7 @@ attempt_kernel_inspection(task_t task)
 		    treecnt * sizeof(*tree));
 	}
 
-	/* Now try out READ (skip eval) interfaces on kernel task */
+	                                                            
 	mach_msg_type_number_t msk_count = EXC_TYPES_COUNT;
 	exception_mask_t masks[EXC_TYPES_COUNT];
 	ipc_info_port_t ports_info[EXC_TYPES_COUNT];
@@ -130,10 +130,10 @@ attempt_kernel_inspection(task_t task)
 	kern_return_t kr = task_get_exception_ports_info(task, EXC_MASK_ALL, masks, &msk_count, ports_info, behaviors, flavors);
 	T_EXPECT_MACH_SUCCESS(kr, "task_get_exception_ports_info() on kernel_task: 0x%x", kr);
 
-	/* READ (with eval) interfaces should fail */
+	                                             
 	vm_offset_t data;
 	mach_msg_type_number_t cnt;
-	mach_vm_address_t addr = 0x10000000; /* can be whatever, the call should fail before getting to VM */
+	mach_vm_address_t addr = 0x10000000;                                                                 
 
 	kr = mach_vm_read(task, (mach_vm_address_t)addr, 8, &data, &cnt);
 	T_EXPECT_EQ(kr, KERN_INVALID_ARGUMENT, "mach_vm_read() should fail with KERN_INVALID_ARGUMENT");
@@ -142,8 +142,8 @@ attempt_kernel_inspection(task_t task)
 	kr = task_get_mach_voucher(task, 0, &voucher);
 	T_EXPECT_EQ(kr, KERN_INVALID_TASK, "task_get_mach_voucher() should fail with KERN_INVALID_TASK");
 
-	/* Control interfaces should absolutely fail */
-	kr = task_set_mach_voucher(task, mach_task_self()); /* voucher arg is unused, can be whatever port */
+	                                               
+	kr = task_set_mach_voucher(task, mach_task_self());                                                  
 	T_EXPECT_EQ(kr, KERN_INVALID_TASK, "task_set_mach_voucher() should fail with KERN_INVALID_TASK");
 }
 
@@ -176,7 +176,7 @@ T_DECL(inspect_kernel_task,
 			mach_port_deallocate(self, tasks[j]);
 		}
 
-		/* free tasks array */
+		                      
 		mach_vm_deallocate(mach_task_self(),
 		    (mach_vm_address_t)(uintptr_t)tasks,
 		    tcnt * sizeof(*tasks));
@@ -201,7 +201,7 @@ T_DECL(inspect_kernel_task,
 	    pcnt * sizeof(*psets));
 
 	if (found_kernel_task != 2) {
-		/* One for kernel control port test, one for kernel read port test. */
+		                                                                      
 		T_FAIL("could not find kernel_task in list of tasks returned");
 	}
 }

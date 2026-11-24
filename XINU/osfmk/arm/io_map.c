@@ -51,8 +51,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon the
  * rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #include <mach/vm_param.h>
 #include <vm/vm_kern.h>
@@ -61,22 +61,22 @@
 #include <arm/io_map_entries.h>
 #include <san/kasan.h>
 
-extern vm_offset_t      virtual_space_start;     /* Next available kernel VA */
+extern vm_offset_t      virtual_space_start;                                   
 
-/*
- * Allocate and map memory for devices that may need to be mapped before
- * Mach VM is running.
- */
+  
+                                                                        
+                      
+   
 vm_offset_t
 io_map(vm_map_offset_t phys_addr, vm_size_t size, unsigned int flags)
 {
 	return io_map_with_prot(phys_addr, size, flags, VM_PROT_READ | VM_PROT_WRITE);
 }
 
-/*
- * Allocate and map memory for devices that may need to be mapped before
- * Mach VM is running. Allows caller to specify mapping protection
- */
+  
+                                                                        
+                                                                  
+   
 vm_offset_t
 io_map_with_prot(vm_map_offset_t phys_addr, vm_size_t size, unsigned int flags, vm_prot_t prot)
 {
@@ -87,9 +87,9 @@ io_map_with_prot(vm_map_offset_t phys_addr, vm_size_t size, unsigned int flags, 
 	phys_addr -= start_offset;
 
 	if (kernel_map == VM_MAP_NULL) {
-		/*
-		 * VM is not initialized.  Grab memory.
-		 */
+		  
+                                         
+     
 		start = virtual_space_start;
 		virtual_space_start += round_page(size);
 
@@ -113,7 +113,7 @@ io_map_with_prot(vm_map_offset_t phys_addr, vm_size_t size, unsigned int flags, 
 	return start + start_offset;
 }
 
-/* just wrap this since io_map handles it */
+                                            
 
 vm_offset_t
 io_map_spec(vm_map_offset_t phys_addr, vm_size_t size, unsigned int flags)

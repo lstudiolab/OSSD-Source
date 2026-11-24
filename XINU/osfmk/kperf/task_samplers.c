@@ -95,7 +95,7 @@ kperf_task_snapshot_log(struct kperf_task_snapshot *tksn)
 	    LOWER_32(tksn->kptksn_user_time_in_terminated_threads),
 	    UPPER_32(tksn->kptksn_system_time_in_terminated_threads),
 	    LOWER_32(tksn->kptksn_system_time_in_terminated_threads));
-#endif /* defined(__LP64__) */
+#endif                        
 }
 
 void

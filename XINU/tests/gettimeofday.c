@@ -27,7 +27,7 @@ T_DECL(gettimeofday, "gettimeofday()",
 	T_ASSERT_GE(tv_c.tv_sec, tv_b.tv_sec, NULL);
 }
 
-#if 0 // This symbol isn't exported so we can't test with stock libsyscall
+#if 0                                                                     
 extern int __gettimeofday_with_mach(struct timeval *, struct timezone *, uint64_t *mach_time);
 
 T_DECL(gettimeofday_with_mach, "gettimeofday_with_mach()",
@@ -49,4 +49,4 @@ T_DECL(gettimeofday_with_mach, "gettimeofday_with_mach()",
 	T_ASSERT_LT(mach_time_before, mach_time, NULL);
 	T_ASSERT_GT(mach_time_after, mach_time, NULL);
 }
-#endif // 0
+#endif     

@@ -31,4 +31,4 @@
 # else
 #        define OS_INLINE static __inline__
 # endif
-#endif /* OS_INLINE */
+#endif                

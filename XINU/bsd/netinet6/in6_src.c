@@ -199,12 +199,12 @@ do { \
 	            __FUNCTION__, __LINE__, ##__VA_ARGS__); \
 } while (0); \
 
-/*
- * Return an IPv6 address, which is the most appropriate for a given
- * destination and user specified options.
- * If necessary, this function lookups the routing table and returns
- * an entry to the caller for later use.
- */
+  
+                                                                    
+                                          
+                                                                    
+                                        
+   
 #define REPLACE(r) do {\
 	SASEL_LOG("REPLACE r %d ia %s ifp1 %s\n", \
 	    (r), s_src, ifp1->if_xname); \
@@ -215,14 +215,14 @@ do { \
 #define NEXTSRC(r) do {\
 	SASEL_LOG("NEXTSRC r %d ia %s ifp1 %s\n", \
 	    (r), s_src, ifp1->if_xname); \
-	goto next;              /* XXX: we can't use 'continue' here */ \
+	goto next;                                                      \
 } while (0)
 
 #define BREAK(r) do { \
 	SASEL_LOG("BREAK r %d ia %s ifp1 %s\n", \
 	    (r), s_src, ifp1->if_xname); \
 	srcrule = (r); \
-	goto out;               /* XXX: we can't use 'break' here */ \
+	goto out;                                                    \
 } while (0)
 
 
@@ -306,7 +306,7 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 		*ifapp = NULL;
 	}
 
-	dst = dstsock->sin6_addr; /* make a copy for local operation */
+	dst = dstsock->sin6_addr;                                      
 
 	if (srcsel_debug) {
 		(void) inet_ntop(AF_INET6, &dst, s_dst, sizeof(s_src));
@@ -339,20 +339,20 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 
 		IFA_LOCK(&ia->ia_ifa);
 
-		/*
-		 * Simply skip addresses reserved for CLAT46
-		 */
+		  
+                                              
+     
 		if (ia->ia6_flags & IN6_IFF_CLAT46) {
 			SASEL_LOG("NEXT ia %s address on ifp1 %s skipped as it is "
 			    "reserved for CLAT46", s_src, ifp1->if_xname);
 			goto next;
 		}
 
-		/*
-		 * XXX By default we are strong end system and will
-		 * limit candidate set of source address to the ones
-		 * configured on the outgoing interface.
-		 */
+		  
+                                                     
+                                                      
+                                          
+     
 		if (ip6_select_src_strong_end &&
 		    ifp1 != ifp) {
 			SASEL_LOG("NEXT ia %s ifp1 %s address is not on outgoing "
@@ -360,12 +360,12 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			goto next;
 		}
 
-		/*
-		 * We'll never take an address that breaks the scope zone
-		 * of the destination. We also skip an address if its zone
-		 * does not contain the outgoing interface.
-		 * XXX: we should probably use sin6_scope_id here.
-		 */
+		  
+                                                           
+                                                            
+                                             
+                                                    
+     
 		if (in6_setscope(&dst, ifp1, &dstzone) ||
 		    odstzone != dstzone) {
 			SASEL_LOG("NEXT ia %s ifp1 %s odstzone %d != dstzone %d\n",
@@ -380,7 +380,7 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			    s_src, ifp1->if_xname, osrczone, srczone);
 			goto next;
 		}
-		/* avoid unusable addresses */
+		                              
 		if ((ia->ia6_flags &
 		    (IN6_IFF_NOTREADY | IN6_IFF_ANYCAST | IN6_IFF_DETACHED))) {
 			SASEL_LOG("NEXT ia %s ifp1 %s ia6_flags 0x%x\n",
@@ -398,15 +398,15 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			    s_src, ifp1->if_xname);
 			goto next;
 		}
-		/* Rule 1: Prefer same address */
+		                                 
 		if (IN6_ARE_ADDR_EQUAL(&dst, &ia->ia_addr.sin6_addr)) {
-			BREAK(IP6S_SRCRULE_1); /* there should be no better candidate */
+			BREAK(IP6S_SRCRULE_1);                                          
 		}
 		if (ia_best == NULL) {
 			REPLACE(IP6S_SRCRULE_0);
 		}
 
-		/* Rule 2: Prefer appropriate scope */
+		                                      
 		if (dst_scope < 0) {
 			dst_scope = in6_addrscope(&dst);
 		}
@@ -423,10 +423,10 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			REPLACE(IP6S_SRCRULE_2);
 		}
 
-		/*
-		 * Rule 3: Avoid deprecated addresses.  Note that the case of
-		 * !ip6_use_deprecated is already rejected above.
-		 */
+		  
+                                                               
+                                                   
+     
 		if (!IFA6_IS_DEPRECATED(ia_best, secs) &&
 		    IFA6_IS_DEPRECATED(ia, secs)) {
 			NEXTSRC(IP6S_SRCRULE_3);
@@ -436,10 +436,10 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			REPLACE(IP6S_SRCRULE_3);
 		}
 
-		/*
-		 * RFC 4429 says that optimistic addresses are equivalent to
-		 * deprecated addresses, so avoid them here.
-		 */
+		  
+                                                              
+                                              
+     
 		if ((ia_best->ia6_flags & IN6_IFF_OPTIMISTIC) == 0 &&
 		    (ia->ia6_flags & IN6_IFF_OPTIMISTIC) != 0) {
 			NEXTSRC(IP6S_SRCRULE_3);
@@ -449,19 +449,19 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			REPLACE(IP6S_SRCRULE_3);
 		}
 
-		/* Rule 4: Prefer home addresses */
-		/*
-		 * XXX: This is a TODO.  We should probably merge the MIP6
-		 * case above.
-		 */
+		                                   
+		  
+                                                            
+                
+     
 
-		/* Rule 5: Prefer outgoing interface */
-		/*
-		 * XXX By default we are strong end with source address
-		 * selection. That means all address selection candidate
-		 * addresses will be the ones hosted on the outgoing interface
-		 * making the following check redundant.
-		 */
+		                                       
+		  
+                                                         
+                                                          
+                                                                
+                                          
+     
 		if (ip6_select_src_strong_end == 0) {
 			if (ia_best->ia_ifp == ifp && ia->ia_ifp != ifp) {
 				NEXTSRC(IP6S_SRCRULE_5);
@@ -471,10 +471,10 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			}
 		}
 
-		/*
-		 * Rule 6: Prefer matching label
-		 * Note that best_policy should be non-NULL here.
-		 */
+		  
+                                  
+                                                   
+     
 		if (dst_policy == NULL) {
 			dst_policy = in6_addrsel_lookup_policy(dstsock);
 		}
@@ -490,12 +490,12 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			}
 		}
 
-		/*
-		 * Rule 7: Prefer temporary addresses.
-		 * We allow users to reverse the logic by configuring
-		 * a sysctl variable, so that transparency conscious users can
-		 * always prefer stable addresses.
-		 */
+		  
+                                        
+                                                       
+                                                                
+                                    
+     
 		if (!(ia_best->ia6_flags & IN6_IFF_TEMPORARY) &&
 		    (ia->ia6_flags & IN6_IFF_TEMPORARY)) {
 			if (hint_mask & IPV6_SRCSEL_HINT_PREFER_TMPADDR) {
@@ -513,10 +513,10 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			}
 		}
 
-		/*
-		 * Rule 7x: prefer addresses on alive interfaces.
-		 * This is a KAME specific rule.
-		 */
+		  
+                                                   
+                                  
+     
 		if ((ia_best->ia_ifp->if_flags & IFF_UP) &&
 		    !(ia->ia_ifp->if_flags & IFF_UP)) {
 			NEXTSRC(IP6S_SRCRULE_7x);
@@ -526,9 +526,9 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			REPLACE(IP6S_SRCRULE_7x);
 		}
 
-		/*
-		 * Rule 8: Use longest matching prefix.
-		 */
+		  
+                                         
+     
 		new_matchlen = in6_matchlen(&ia->ia_addr.sin6_addr, &dst);
 		if (best_matchlen < new_matchlen) {
 			REPLACE(IP6S_SRCRULE_8);
@@ -537,10 +537,10 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 			NEXTSRC(IP6S_SRCRULE_8);
 		}
 
-		/*
-		 * Last resort: just keep the current candidate.
-		 * Or, do we need more rules?
-		 */
+		  
+                                                  
+                               
+     
 		if (ifp1 != ifp && (ifp1->if_eflags & IFEF_EXPENSIVE) &&
 		    ip6_select_src_expensive_secondary_if == 0) {
 			SASEL_LOG("NEXT ia %s ifp1 %s IFEF_EXPENSIVE\n",
@@ -554,10 +554,10 @@ in6_selectsrc_core(struct sockaddr_in6 *dstsock, uint32_t hint_mask,
 		continue;
 
 replace:
-		/*
-		 * Ignore addresses on secondary interfaces that are marked
-		 * expensive
-		 */
+		  
+                                                             
+              
+     
 		if (ifp1 != ifp && (ifp1->if_eflags & IFEF_EXPENSIVE) &&
 		    ip6_select_src_expensive_secondary_if == 0) {
 			SASEL_LOG("NEXT ia %s ifp1 %s IFEF_EXPENSIVE\n",
@@ -574,7 +574,7 @@ replace:
 		    in6_matchlen(&ia->ia_addr.sin6_addr, &dst));
 		SASEL_LOG("NEXT ia %s ifp1 %s best_scope %d new_scope %d dst_scope %d\n",
 		    s_src, ifp1->if_xname, best_scope, new_scope, dst_scope);
-		IFA_ADDREF_LOCKED(&ia->ia_ifa); /* for ia_best */
+		IFA_ADDREF_LOCKED(&ia->ia_ifa);                  
 		IFA_UNLOCK(&ia->ia_ifa);
 		if (ia_best != NULL) {
 			IFA_REMREF(&ia_best->ia_ifa);
@@ -587,7 +587,7 @@ next:
 		continue;
 
 out:
-		IFA_ADDREF_LOCKED(&ia->ia_ifa); /* for ia_best */
+		IFA_ADDREF_LOCKED(&ia->ia_ifa);                  
 		IFA_UNLOCK(&ia->ia_ifa);
 		if (ia_best != NULL) {
 			IFA_REMREF(&ia_best->ia_ifa);
@@ -638,11 +638,11 @@ done:
 	return src_storage;
 }
 
-/*
- * Regardless of error, it will return an ifp with a reference held if the
- * caller provides a non-NULL ifpp.  The caller is responsible for checking
- * if the returned ifp is valid and release its reference at all times.
- */
+  
+                                                                          
+                                                                           
+                                                                       
+   
 struct in6_addr *
 in6_selectsrc(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
     struct inpcb *inp, struct route_in6 *ro,
@@ -689,7 +689,7 @@ in6_selectsrc(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
 		}
 	} else {
 		mopts = NULL;
-		/* Allow the kernel to retransmit packets. */
+		                                             
 		ip6oa.ip6oa_flags |= IP6OAF_INTCOPROC_ALLOWED |
 		    IP6OAF_AWDL_UNRESTRICTED;
 	}
@@ -698,31 +698,31 @@ in6_selectsrc(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
 		ip6oa.ip6oa_flags |= IP6OAF_BOUND_IF;
 	}
 
-	/*
-	 * If the source address is explicitly specified by the caller,
-	 * check if the requested source address is indeed a unicast address
-	 * assigned to the node, and can be used as the packet's source
-	 * address.  If everything is okay, use the address as source.
-	 */
+	  
+                                                                
+                                                                     
+                                                                
+                                                               
+    
 	if (opts && (pi = opts->ip6po_pktinfo) &&
 	    !IN6_IS_ADDR_UNSPECIFIED(&pi->ipi6_addr)) {
 		struct sockaddr_in6 srcsock;
 		struct in6_ifaddr *ia6;
 
-		/* get the outgoing interface */
+		                                
 		if ((*errorp = in6_selectif(dstsock, opts, mopts, ro, &ip6oa,
 		    &ifp)) != 0) {
 			src_storage = NULL;
 			goto done;
 		}
 
-		/*
-		 * determine the appropriate zone id of the source based on
-		 * the zone of the destination and the outgoing interface.
-		 * If the specified address is ambiguous wrt the scope zone,
-		 * the interface must be specified; otherwise, ifa_ifwithaddr()
-		 * will fail matching the address.
-		 */
+		  
+                                                             
+                                                            
+                                                              
+                                                                 
+                                    
+     
 		bzero(&srcsock, sizeof(srcsock));
 		srcsock.sin6_family = AF_INET6;
 		srcsock.sin6_len = sizeof(srcsock);
@@ -757,19 +757,19 @@ in6_selectsrc(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
 		goto done;
 	}
 
-	/*
-	 * Otherwise, if the socket has already bound the source, just use it.
-	 */
+	  
+                                                                       
+    
 	if (inp != NULL && !IN6_IS_ADDR_UNSPECIFIED(&inp->in6p_laddr)) {
 		src_storage = &inp->in6p_laddr;
 		goto done;
 	}
 
-	/*
-	 * If the address is not specified, choose the best one based on
-	 * the outgoing interface and the destination address.
-	 */
-	/* get the outgoing interface */
+	  
+                                                                 
+                                                       
+    
+	                                
 	if ((*errorp = in6_selectif(dstsock, opts, mopts, ro, &ip6oa,
 	    &ifp)) != 0) {
 		src_storage = NULL;
@@ -810,7 +810,7 @@ in6_selectsrc(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
 
 done:
 	if (ifpp != NULL) {
-		/* if ifp is non-NULL, refcnt held in in6_selectif() */
+		                                                       
 		*ifpp = ifp;
 	} else if (ifp != NULL) {
 		ifnet_release(ifp);
@@ -818,22 +818,22 @@ done:
 	return src_storage;
 }
 
-/*
- * Given a source IPv6 address (and route, if available), determine the best
- * interface to send the packet from.  Checking for (and updating) the
- * ROF_SRCIF_SELECTED flag in the pcb-supplied route placeholder is done
- * without any locks, based on the assumption that in the event this is
- * called from ip6_output(), the output operation is single-threaded per-pcb,
- * i.e. for any given pcb there can only be one thread performing output at
- * the IPv6 layer.
- *
- * This routine is analogous to in_selectsrcif() for IPv4.  Regardless of
- * error, it will return an ifp with a reference held if the caller provides
- * a non-NULL retifp.  The caller is responsible for checking if the
- * returned ifp is valid and release its reference at all times.
- *
- * clone - meaningful only for bsdi and freebsd
- */
+  
+                                                                            
+                                                                      
+                                                                        
+                                                                       
+                                                                             
+                                                                           
+                  
+  
+                                                                         
+                                                                            
+                                                                    
+                                                                
+  
+                                               
+   
 static int
 selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
     struct ip6_pktopts *opts, struct ip6_moptions *mopts,
@@ -869,26 +869,26 @@ selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
 		(void) inet_ntop(AF_INET6, dst, s_dst, sizeof(s_dst));
 	}
 
-	/*
-	 * If the destination address is UNSPECIFIED addr, bail out.
-	 */
+	  
+                                                             
+    
 	if (IN6_IS_ADDR_UNSPECIFIED(dst)) {
 		error = EHOSTUNREACH;
 		goto done;
 	}
 
-	/*
-	 * Perform source interface selection if Scoped Routing
-	 * is enabled and a source address that isn't unspecified.
-	 */
+	  
+                                                        
+                                                           
+    
 	select_srcif = (srcsock != NULL &&
 	    !IN6_IS_ADDR_UNSPECIFIED(&srcsock->sin6_addr));
 
-	/*
-	 * For scoped routing, if interface scope is 0 or src/dst addr is linklocal
-	 * or dst addr is multicast, source interface selection should be performed even
-	 * if the destination is directly reachable.
-	 */
+	  
+                                                                            
+                                                                                 
+                                             
+    
 	if (ifscope != IFSCOPE_NONE &&
 	    !(srcsock != NULL && IN6_IS_ADDR_LINKLOCAL(&srcsock->sin6_addr)) &&
 	    !IN6_IS_ADDR_MULTICAST(dst) && !IN6_IS_ADDR_LINKLOCAL(dst)) {
@@ -899,16 +899,16 @@ selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
 		    NULL, rt_tables[AF_INET6], ifscope);
 		lck_mtx_unlock(rnh_lock);
 
-		/*
-		 * If the destination is directly reachable, relax
-		 * the behavior around select_srcif, i.e. don't force
-		 * the packet to go out from the interface that is hosting
-		 * the source address.
-		 * It happens when we share v6 with NAT66 and want
-		 * the external interface's v6 address to be reachable
-		 * to the clients we are sharing v6 connectivity with
-		 * using NAT.
-		 */
+		  
+                                                    
+                                                       
+                                                            
+                        
+                                                    
+                                                        
+                                                       
+               
+     
 		if (temp_rt != NULL) {
 			if ((temp_rt->rt_flags & RTF_GATEWAY) == 0) {
 				select_srcif = FALSE;
@@ -923,25 +923,25 @@ selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
 		    __func__, s_src, s_dst, ifscope, is_direct, select_srcif);
 	}
 
-	/* If the caller specified the outgoing interface explicitly, use it */
+	                                                                       
 	if (opts != NULL && (pi = opts->ip6po_pktinfo) != NULL &&
 	    pi->ipi6_ifindex != 0) {
-		/*
-		 * If IPV6_PKTINFO takes precedence over IPV6_BOUND_IF.
-		 */
+		  
+                                                         
+     
 		ifscope = pi->ipi6_ifindex;
 		ifnet_head_lock_shared();
-		/* ifp may be NULL if detached or out of range */
+		                                                 
 		ifp = ifp0 =
 		    ((ifscope <= if_index) ? ifindex2ifnet[ifscope] : NULL);
 		ifnet_head_done();
 		if (norouteok || retrt == NULL || IN6_IS_ADDR_MC_LINKLOCAL(dst)) {
-			/*
-			 * We do not have to check or get the route for
-			 * multicast.  If the caller didn't ask/care for
-			 * the route and we have no interface to use,
-			 * it's an error.
-			 */
+			  
+                                                  
+                                                   
+                                                
+                    
+      
 			if (ifp == NULL) {
 				error = EHOSTUNREACH;
 			}
@@ -951,37 +951,37 @@ selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
 		}
 	}
 
-	/*
-	 * If the destination address is a multicast address and the outgoing
-	 * interface for the address is specified by the caller, use it.
-	 */
+	  
+                                                                      
+                                                                 
+    
 	if (IN6_IS_ADDR_MULTICAST(dst) && mopts != NULL) {
 		IM6O_LOCK(mopts);
 		ifp = ifp0 = mopts->im6o_multicast_ifp;
 		if (ifp != NULL && IN6_IS_ADDR_MC_LINKLOCAL(dst)) {
 			IM6O_UNLOCK(mopts);
-			goto done; /* we don't need a route for link-local multicast */
+			goto done;                                                     
 		}
 		IM6O_UNLOCK(mopts);
 	}
 
 getsrcif:
-	/*
-	 * If the outgoing interface was not set via IPV6_BOUND_IF or
-	 * IPV6_PKTINFO, use the scope ID in the destination address.
-	 */
+	  
+                                                              
+                                                              
+    
 	if (ifscope == IFSCOPE_NONE) {
 		ifscope = dstsock->sin6_scope_id;
 	}
 
-	/*
-	 * Perform source interface selection; the source IPv6 address
-	 * must belong to one of the addresses of the interface used
-	 * by the route.  For performance reasons, do this only if
-	 * there is no route, or if the routing table has changed,
-	 * or if we haven't done source interface selection on this
-	 * route (for this PCB instance) before.
-	 */
+	  
+                                                               
+                                                             
+                                                           
+                                                           
+                                                            
+                                         
+    
 	if (!select_srcif) {
 		goto getroute;
 	} else if (!ROUTE_UNUSABLE(ro) && ro->ro_srcia != NULL &&
@@ -990,32 +990,32 @@ getsrcif:
 			local_dst = TRUE;
 		}
 		ifa = ro->ro_srcia;
-		IFA_ADDREF(ifa);        /* for caller */
+		IFA_ADDREF(ifa);                        
 		goto getroute;
 	}
 
-	/*
-	 * Given the source IPv6 address, find a suitable source interface
-	 * to use for transmission; if a scope ID has been specified,
-	 * optimize the search by looking at the addresses only for that
-	 * interface.  This is still suboptimal, however, as we need to
-	 * traverse the per-interface list.
-	 */
+	  
+                                                                   
+                                                              
+                                                                 
+                                                                
+                                    
+    
 	if (ifscope != IFSCOPE_NONE || (ro != NULL && ro->ro_rt != NULL)) {
 		unsigned int scope = ifscope;
 		struct ifnet *rt_ifp;
 
 		rt_ifp = (ro->ro_rt != NULL) ? ro->ro_rt->rt_ifp : NULL;
 
-		/*
-		 * If no scope is specified and the route is stale (pointing
-		 * to a defunct interface) use the current primary interface;
-		 * this happens when switching between interfaces configured
-		 * with the same IPv6 address.  Otherwise pick up the scope
-		 * information from the route; the ULP may have looked up a
-		 * correct route and we just need to verify it here and mark
-		 * it with the ROF_SRCIF_SELECTED flag below.
-		 */
+		  
+                                                              
+                                                               
+                                                              
+                                                             
+                                                             
+                                                              
+                                               
+     
 		if (scope == IFSCOPE_NONE) {
 			scope = rt_ifp->if_index;
 			if (scope != get_primary_ifscope(AF_INET6) &&
@@ -1027,11 +1027,11 @@ getsrcif:
 		ifa = (struct ifaddr *)
 		    ifa_foraddr6_scoped(&srcsock->sin6_addr, scope);
 
-		/*
-		 * If we are forwarding and proxying prefix(es), see if the
-		 * source address is one of ours and is a proxied address;
-		 * if so, use it.
-		 */
+		  
+                                                             
+                                                            
+                   
+     
 		if (ifa == NULL && ip6_forwarding && nd6_prproxy) {
 			ifa = (struct ifaddr *)
 			    ifa_foraddr6(&srcsock->sin6_addr);
@@ -1059,20 +1059,20 @@ getsrcif:
 		}
 	}
 
-	/*
-	 * Slow path; search for an interface having the corresponding source
-	 * IPv6 address if the scope was not specified by the caller, and:
-	 *
-	 *   1) There currently isn't any route, or,
-	 *   2) The interface used by the route does not own that source
-	 *	IPv6 address; in this case, the route will get blown away
-	 *	and we'll do a more specific scoped search using the newly
-	 *	found interface.
-	 */
+	  
+                                                                      
+                                                                   
+   
+                                             
+                                                                 
+                                                             
+                                                              
+                    
+    
 	if (ifa == NULL && ifscope == IFSCOPE_NONE) {
 		struct ifaddr *ifadst;
 
-		/* Check if the destination address is one of ours */
+		                                                     
 		ifadst = (struct ifaddr *)ifa_foraddr6(&dstsock->sin6_addr);
 		if (ifadst != NULL) {
 			local_dst = TRUE;
@@ -1097,25 +1097,25 @@ getroute:
 		ifscope = ifa->ifa_ifp->if_index;
 	}
 
-	/*
-	 * If the next hop address for the packet is specified by the caller,
-	 * use it as the gateway.
-	 */
+	  
+                                                                      
+                          
+    
 	if (opts != NULL && opts->ip6po_nexthop != NULL) {
 		struct route_in6 *ron;
 
 		sin6_next = satosin6(opts->ip6po_nexthop);
 
-		/* at this moment, we only support AF_INET6 next hops */
+		                                                        
 		if (sin6_next->sin6_family != AF_INET6) {
-			error = EAFNOSUPPORT; /* or should we proceed? */
+			error = EAFNOSUPPORT;                            
 			goto done;
 		}
 
-		/*
-		 * If the next hop is an IPv6 address, then the node identified
-		 * by that address must be a neighbor of the sending host.
-		 */
+		  
+                                                                 
+                                                            
+     
 		ron = &opts->ip6po_nextroute;
 		if (ron->ro_rt != NULL) {
 			RT_LOCK(ron->ro_rt);
@@ -1154,14 +1154,14 @@ getroute:
 		route = ron;
 		ifp = ifp0 = ron->ro_rt->rt_ifp;
 
-		/*
-		 * When cloning is required, try to allocate a route to the
-		 * destination so that the caller can store path MTU
-		 * information.
-		 */
+		  
+                                                             
+                                                      
+                 
+     
 		if (!clone) {
 			if (select_srcif) {
-				/* Keep the route locked */
+				                           
 				goto validateroute;
 			}
 			RT_UNLOCK(ron->ro_rt);
@@ -1170,11 +1170,11 @@ getroute:
 		RT_UNLOCK(ron->ro_rt);
 	}
 
-	/*
-	 * Use a cached route if it exists and is valid, else try to allocate
-	 * a new one.  Note that we should check the address family of the
-	 * cached destination, in case of sharing the cache with IPv4.
-	 */
+	  
+                                                                      
+                                                                   
+                                                               
+    
 	if (ro == NULL) {
 		goto done;
 	}
@@ -1195,7 +1195,7 @@ getroute:
 	if (ro->ro_rt == NULL) {
 		struct sockaddr_in6 *sa6;
 
-		/* No route yet, so try to acquire one */
+		                                         
 		bzero(&ro->ro_dst, sizeof(struct sockaddr_in6));
 		sa6 = (struct sockaddr_in6 *)&ro->ro_dst;
 		sa6->sin6_family = AF_INET6;
@@ -1212,10 +1212,10 @@ getroute:
 		}
 	}
 
-	/*
-	 * Do not care about the result if we have the nexthop
-	 * explicitly specified (in case we're asked to clone.)
-	 */
+	  
+                                                       
+                                                        
+    
 	if (opts != NULL && opts->ip6po_nexthop != NULL) {
 		if (ro->ro_rt != NULL) {
 			RT_UNLOCK(ro->ro_rt);
@@ -1239,21 +1239,21 @@ validateroute:
 		if (has_route) {
 			RT_LOCK_ASSERT_HELD(route->ro_rt);
 		}
-		/*
-		 * If there is a non-loopback route with the wrong interface,
-		 * or if there is no interface configured with such an address,
-		 * blow it away.  Except for local/loopback, we look for one
-		 * with a matching interface scope/index.
-		 */
+		  
+                                                               
+                                                                 
+                                                              
+                                           
+     
 		if (has_route && (ifa == NULL ||
 		    (ifa->ifa_ifp != ifp && ifp != lo_ifp) ||
 		    !(route->ro_rt->rt_flags & RTF_UP))) {
-			/*
-			 * If the destination address belongs to a proxied
-			 * prefix, relax the requirement and allow the packet
-			 * to come out of the proxy interface with the source
-			 * address of the real interface.
-			 */
+			  
+                                                     
+                                                        
+                                                        
+                                    
+      
 			if (ifa != NULL && proxied_ifa &&
 			    (route->ro_rt->rt_flags & (RTF_UP | RTF_PROXY)) ==
 			    (RTF_UP | RTF_PROXY)) {
@@ -1277,9 +1277,9 @@ validateroute:
 				RT_UNLOCK(route->ro_rt);
 				ROUTE_RELEASE(route);
 				error = EHOSTUNREACH;
-				/* Undo the settings done above */
+				                                  
 				route = NULL;
-				ifp = NULL;     /* ditch ifp; keep ifp0 */
+				ifp = NULL;                               
 				has_route = FALSE;
 			}
 		} else if (has_route) {
@@ -1292,7 +1292,7 @@ validateroute:
 			    !(route->ro_flags & ROF_SRCIF_SELECTED)) {
 				RT_CONVERT_LOCK(route->ro_rt);
 				if (ifa != NULL) {
-					IFA_ADDREF(ifa); /* for route_in6 */
+					IFA_ADDREF(ifa);                    
 				}
 				if (route->ro_srcia != NULL) {
 					IFA_REMREF(route->ro_srcia);
@@ -1310,13 +1310,13 @@ validateroute:
 		if (ifp != NULL && opts != NULL &&
 		    opts->ip6po_pktinfo != NULL &&
 		    opts->ip6po_pktinfo->ipi6_ifindex != 0) {
-			/*
-			 * Check if the outgoing interface conflicts with the
-			 * interface specified by ipi6_ifindex (if specified).
-			 * Note that loopback interface is always okay.
-			 * (this may happen when we are sending a packet to
-			 * one of our own addresses.)
-			 */
+			  
+                                                        
+                                                         
+                                                  
+                                                      
+                                
+      
 			if (!(ifp->if_flags & IFF_LOOPBACK) && ifp->if_index !=
 			    opts->ip6po_pktinfo->ipi6_ifindex) {
 				error = EHOSTUNREACH;
@@ -1326,9 +1326,9 @@ validateroute:
 	}
 
 done:
-	/*
-	 * Check for interface restrictions.
-	 */
+	  
+                                     
+    
 #define CHECK_RESTRICTIONS(_ip6oa, _ifp)                        \
 	((((_ip6oa)->ip6oa_flags & IP6OAF_NO_CELLULAR) &&       \
 	    IFNET_IS_CELLULAR(_ifp)) ||                         \
@@ -1349,54 +1349,54 @@ done:
 			ROUTE_RELEASE(route);
 			route = NULL;
 		}
-		ifp = NULL;     /* ditch ifp; keep ifp0 */
+		ifp = NULL;                               
 		error = EHOSTUNREACH;
 		ip6oa->ip6oa_retflags |= IP6OARF_IFDENIED;
 	}
 #undef CHECK_RESTRICTIONS
 
-	/*
-	 * If the interface is disabled for IPv6, then ENETDOWN error.
-	 */
+	  
+                                                               
+    
 	if (error == 0 &&
 	    ifp != NULL && (ifp->if_eflags & IFEF_IPV6_DISABLED)) {
 		error = ENETDOWN;
 	}
 
 	if (ifp == NULL && (route == NULL || route->ro_rt == NULL)) {
-		/*
-		 * This can happen if the caller did not pass a cached route
-		 * nor any other hints.  We treat this case an error.
-		 */
+		  
+                                                              
+                                                       
+     
 		error = EHOSTUNREACH;
 	}
 	if (error == EHOSTUNREACH || error == ENETDOWN) {
 		ip6stat.ip6s_noroute++;
 	}
 
-	/*
-	 * We'll return ifp regardless of error, so pick it up from ifp0
-	 * in case it was nullified above.  Caller is responsible for
-	 * releasing the ifp if it is non-NULL.
-	 */
+	  
+                                                                 
+                                                              
+                                        
+    
 	ifp = ifp0;
 	if (retifp != NULL) {
 		if (ifp != NULL) {
-			ifnet_reference(ifp);   /* for caller */
+			ifnet_reference(ifp);                   
 		}
 		*retifp = ifp;
 	}
 
 	if (retsrcia != NULL) {
 		if (ifa != NULL) {
-			IFA_ADDREF(ifa);        /* for caller */
+			IFA_ADDREF(ifa);                        
 		}
 		*retsrcia = (struct in6_ifaddr *)ifa;
 	}
 
 	if (error == 0) {
 		if (retrt != NULL && route != NULL) {
-			*retrt = route->ro_rt;  /* ro_rt may be NULL */
+			*retrt = route->ro_rt;                         
 		}
 	}
 	if (ip6_select_srcif_debug) {
@@ -1414,11 +1414,11 @@ done:
 	return error;
 }
 
-/*
- * Regardless of error, it will return an ifp with a reference held if the
- * caller provides a non-NULL retifp.  The caller is responsible for checking
- * if the returned ifp is valid and release its reference at all times.
- */
+  
+                                                                          
+                                                                             
+                                                                       
+   
 int
 in6_selectif(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
     struct ip6_moptions *mopts, struct route_in6 *ro,
@@ -1438,35 +1438,35 @@ in6_selectif(struct sockaddr_in6 *dstsock, struct ip6_pktopts *opts,
 		goto done;
 	}
 
-	/*
-	 * do not use a rejected or black hole route.
-	 * XXX: this check should be done in the L2 output routine.
-	 * However, if we skipped this check here, we'd see the following
-	 * scenario:
-	 * - install a rejected route for a scoped address prefix
-	 *   (like fe80::/10)
-	 * - send a packet to a destination that matches the scoped prefix,
-	 *   with ambiguity about the scope zone.
-	 * - pick the outgoing interface from the route, and disambiguate the
-	 *   scope zone with the interface.
-	 * - ip6_output() would try to get another route with the "new"
-	 *   destination, which may be valid.
-	 * - we'd see no error on output.
-	 * Although this may not be very harmful, it should still be confusing.
-	 * We thus reject the case here.
-	 */
+	  
+                                              
+                                                            
+                                                                  
+             
+                                                          
+                      
+                                                                    
+                                          
+                                                                      
+                                    
+                                                                
+                                      
+                                  
+                                                                        
+                                 
+    
 	if (rt && (rt->rt_flags & (RTF_REJECT | RTF_BLACKHOLE))) {
 		err = ((rt->rt_flags & RTF_HOST) ? EHOSTUNREACH : ENETUNREACH);
 		goto done;
 	}
 
-	/*
-	 * Adjust the "outgoing" interface.  If we're going to loop the packet
-	 * back to ourselves, the ifp would be the loopback interface.
-	 * However, we'd rather know the interface associated to the
-	 * destination address (which should probably be one of our own
-	 * addresses.)
-	 */
+	  
+                                                                       
+                                                               
+                                                             
+                                                                
+               
+    
 	if (rt != NULL && rt->rt_ifa != NULL && rt->rt_ifa->ifa_ifp != NULL &&
 	    retifp != NULL) {
 		ifnet_reference(rt->rt_ifa->ifa_ifp);
@@ -1482,20 +1482,20 @@ done:
 		ROUTE_RELEASE(ro);
 	}
 
-	/*
-	 * retifp might point to a valid ifp with a reference held;
-	 * caller is responsible for releasing it if non-NULL.
-	 */
+	  
+                                                            
+                                                       
+    
 	return err;
 }
 
-/*
- * Regardless of error, it will return an ifp with a reference held if the
- * caller provides a non-NULL retifp.  The caller is responsible for checking
- * if the returned ifp is valid and release its reference at all times.
- *
- * clone - meaningful only for bsdi and freebsd
- */
+  
+                                                                          
+                                                                             
+                                                                       
+  
+                                               
+   
 int
 in6_selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
     struct ip6_pktopts *opts, struct ip6_moptions *mopts,
@@ -1506,13 +1506,13 @@ in6_selectroute(struct sockaddr_in6 *srcsock, struct sockaddr_in6 *dstsock,
 	           retrt, clone, 0, ip6oa);
 }
 
-/*
- * Default hop limit selection. The precedence is as follows:
- * 1. Hoplimit value specified via socket option.
- * 2. (If the outgoing interface is detected) the current
- *     hop limit of the interface specified by router advertisement.
- * 3. The system default hoplimit.
- */
+  
+                                                             
+                                                 
+                                                         
+                                                                    
+                                  
+   
 uint8_t
 in6_selecthlim(struct in6pcb *in6p, struct ifnet *ifp)
 {
@@ -1522,7 +1522,7 @@ in6_selecthlim(struct in6pcb *in6p, struct ifnet *ifp)
 		uint8_t chlim;
 		struct nd_ifinfo *ndi = ND_IFINFO(ifp);
 		if (ndi && ndi->initialized) {
-			/* access chlim without lock, for performance */
+			                                                
 			chlim = ndi->chlim;
 		} else {
 			chlim = (uint8_t)ip6_defhlim;
@@ -1533,10 +1533,10 @@ in6_selecthlim(struct in6pcb *in6p, struct ifnet *ifp)
 	return (uint8_t)ip6_defhlim;
 }
 
-/*
- * XXX: this is borrowed from in6_pcbbind(). If possible, we should
- * share this function by all *bsd*...
- */
+  
+                                                                   
+                                      
+   
 int
 in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
     int locked)
@@ -1549,30 +1549,30 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 	struct inpcbinfo *pcbinfo = inp->inp_pcbinfo;
 	kauth_cred_t cred;
 #pragma unused(laddr)
-	if (!locked) { /* Make sure we don't run into a deadlock: 4052373 */
+	if (!locked) {                                                      
 		if (!lck_rw_try_lock_exclusive(pcbinfo->ipi_lock)) {
 			socket_unlock(inp->inp_socket, 0);
 			lck_rw_lock_exclusive(pcbinfo->ipi_lock);
 			socket_lock(inp->inp_socket, 0);
 		}
 
-		/*
-		 * Check if a local port was assigned to the inp while
-		 * this thread was waiting for the pcbinfo lock
-		 */
+		  
+                                                        
+                                                 
+     
 		if (inp->inp_lport != 0) {
 			VERIFY(inp->inp_flags2 & INP2_INHASHLIST);
 			lck_rw_done(pcbinfo->ipi_lock);
 
-			/*
-			 * It is not an error if another thread allocated
-			 * a port
-			 */
+			  
+                                                    
+            
+      
 			return 0;
 		}
 	}
 
-	/* XXX: this is redundant when called from in6_pcbbind */
+	                                                         
 	if ((so->so_options & (SO_REUSEADDR | SO_REUSEPORT)) == 0) {
 		wild = INPLOOKUP_WILDCARD;
 	}
@@ -1582,7 +1582,7 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 	    udp_use_randomport) > 0;
 
 	if (inp->inp_flags & INP_HIGHPORT) {
-		first = (uint16_t)ipport_hifirstauto;     /* sysctl */
+		first = (uint16_t)ipport_hifirstauto;                 
 		last  = (uint16_t)ipport_hilastauto;
 		lastport = &pcbinfo->ipi_lasthi;
 	} else if (inp->inp_flags & INP_LOWPORT) {
@@ -1595,11 +1595,11 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 			}
 			return error;
 		}
-		first = (uint16_t)ipport_lowfirstauto;    /* 1023 */
-		last  = (uint16_t)ipport_lowlastauto;     /* 600 */
+		first = (uint16_t)ipport_lowfirstauto;              
+		last  = (uint16_t)ipport_lowlastauto;              
 		lastport = &pcbinfo->ipi_lastlow;
 	} else {
-		first = (uint16_t)ipport_firstauto;       /* sysctl */
+		first = (uint16_t)ipport_firstauto;                   
 		last  = (uint16_t)ipport_lastauto;
 		lastport = &pcbinfo->ipi_lastport;
 	}
@@ -1607,13 +1607,13 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 	if (first == last) {
 		randomport = false;
 	}
-	/*
-	 * Simple check to ensure all ports are not used up causing
-	 * a deadlock here.
-	 */
+	  
+                                                            
+                    
+    
 	found = false;
 	if (first > last) {
-		/* counting down */
+		                   
 		if (randomport) {
 			read_frandom(&rand_port, sizeof(rand_port));
 			*lastport = first - (rand_port % (first - last));
@@ -1621,7 +1621,7 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 		count = first - last;
 		counting_down = TRUE;
 	} else {
-		/* counting up */
+		                 
 		if (randomport) {
 			read_frandom(&rand_port, sizeof(rand_port));
 			*lastport = first + (rand_port % (first - last));
@@ -1630,11 +1630,11 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 		counting_down = FALSE;
 	}
 	do {
-		if (count-- < 0) {      /* completely used? */
-			/*
-			 * Undo any address bind that may have
-			 * occurred above.
-			 */
+		if (count-- < 0) {                            
+			  
+                                         
+                     
+      
 			inp->in6p_laddr = in6addr_any;
 			inp->in6p_last_outifp = NULL;
 			if (!locked) {
@@ -1655,10 +1655,10 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 		}
 		lport = htons(*lastport);
 
-		/*
-		 * Skip if this is a restricted port as we do not want to
-		 * restricted ports as ephemeral
-		 */
+		  
+                                                           
+                                  
+     
 		if (IS_RESTRICTED_IN_PORT(lport)) {
 			continue;
 		}
@@ -1688,12 +1688,12 @@ in6_pcbsetport(struct in6_addr *laddr, struct inpcb *inp, struct proc *p,
 	return 0;
 }
 
-/*
- * The followings are implementation of the policy table using a
- * simple tail queue.
- * XXX such details should be hidden.
- * XXX implementation using binary tree should be more efficient.
- */
+  
+                                                                
+                     
+                                     
+                                                                 
+   
 struct addrsel_policyent {
 	TAILQ_ENTRY(addrsel_policyent) ape_entry;
 	struct in6_addrpolicy ape_policy;
@@ -1712,11 +1712,11 @@ init_policy_queue(void)
 void
 addrsel_policy_init(void)
 {
-	/*
-	 * Default address selection policy based on RFC 6724.
-	 */
+	  
+                                                       
+    
 	static const struct in6_addrpolicy defaddrsel[] = {
-		/* Loopback -- prefix=::1/128, precedence=50, label=0 */
+		                                                        
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1732,7 +1732,7 @@ addrsel_policy_init(void)
 			.label    = 0
 		},
 
-		/* Unspecified -- prefix=::/0, precedence=40, label=1 */
+		                                                        
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1748,7 +1748,7 @@ addrsel_policy_init(void)
 			.label    = 1
 		},
 
-		/* IPv4 Mapped -- prefix=::ffff:0:0/96, precedence=35, label=4 */
+		                                                                 
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1764,7 +1764,7 @@ addrsel_policy_init(void)
 			.label    = 4
 		},
 
-		/* 6to4 -- prefix=2002::/16, precedence=30, label=2 */
+		                                                      
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1780,7 +1780,7 @@ addrsel_policy_init(void)
 			.label    = 2
 		},
 
-		/* Teredo -- prefix=2001::/32, precedence=5, label=5 */
+		                                                       
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1796,7 +1796,7 @@ addrsel_policy_init(void)
 			.label    = 5
 		},
 
-		/* Unique Local (ULA) -- prefix=fc00::/7, precedence=3, label=13 */
+		                                                                   
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1812,7 +1812,7 @@ addrsel_policy_init(void)
 			.label    = 13
 		},
 
-		/* IPv4 Compatible -- prefix=::/96, precedence=1, label=3 */
+		                                                            
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1828,7 +1828,7 @@ addrsel_policy_init(void)
 			.label    = 3
 		},
 
-		/* Site-local (deprecated) -- prefix=fec0::/10, precedence=1, label=11 */
+		                                                                         
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1844,7 +1844,7 @@ addrsel_policy_init(void)
 			.label    = 11
 		},
 
-		/* 6bone (deprecated) -- prefix=3ffe::/16, precedence=1, label=12 */
+		                                                                    
 		{
 			.addr = {
 				.sin6_family = AF_INET6,
@@ -1864,7 +1864,7 @@ addrsel_policy_init(void)
 
 	init_policy_queue();
 
-	/* initialize the "last resort" policy */
+	                                         
 	bzero(&defaultaddrpolicy, sizeof(defaultaddrpolicy));
 	defaultaddrpolicy.label = ADDR_LABEL_NOTAPP;
 
@@ -1904,15 +1904,15 @@ match_addrsel_policy(struct sockaddr_in6 *key)
 
 		pol = &pent->ape_policy;
 		mp = (u_char *)&pol->addrmask.sin6_addr;
-		ep = mp + 16;   /* XXX: scope field? */
+		ep = mp + 16;                          
 		k = (u_char *)&key->sin6_addr;
 		p = (u_char *)&pol->addr.sin6_addr;
 		for (; mp < ep && *mp; mp++, k++, p++) {
 			m = *mp;
 			if ((*k & m) != *p) {
-				goto next; /* not match */
+				goto next;                
 			}
-			if (m == 0xff) { /* short cut for a typical case */
+			if (m == 0xff) {                                   
 				matchlen += 8;
 			} else {
 				while (m >= 0x80) {
@@ -1922,7 +1922,7 @@ match_addrsel_policy(struct sockaddr_in6 *key)
 			}
 		}
 
-		/* matched.  check if this is better than the current best. */
+		                                                              
 		if (bestpol == NULL ||
 		    matchlen > bestmatchlen) {
 			bestpol = pol;
@@ -1946,7 +1946,7 @@ add_addrsel_policyent(const struct in6_addrpolicy *newpolicy)
 
 	ADDRSEL_LOCK();
 
-	/* duplication check */
+	                       
 	TAILQ_FOREACH(pol, &addrsel_policytab, ape_entry) {
 		if (IN6_ARE_ADDR_EQUAL(&newpolicy->addr.sin6_addr,
 		    &pol->ape_policy.addr.sin6_addr) &&
@@ -1954,13 +1954,13 @@ add_addrsel_policyent(const struct in6_addrpolicy *newpolicy)
 		    &pol->ape_policy.addrmask.sin6_addr)) {
 			ADDRSEL_UNLOCK();
 			FREE(new, M_IFADDR);
-			return EEXIST;        /* or override it? */
+			return EEXIST;                             
 		}
 	}
 
 	bzero(new, sizeof(*new));
 
-	/* XXX: should validate entry */
+	                                
 	new->ape_policy = *newpolicy;
 
 	TAILQ_INSERT_TAIL(&addrsel_policytab, new, ape_entry);
@@ -1977,7 +1977,7 @@ delete_addrsel_policyent(const struct in6_addrpolicy *key)
 
 	ADDRSEL_LOCK();
 
-	/* search for the entry in the table */
+	                                       
 	TAILQ_FOREACH(pol, &addrsel_policytab, ape_entry) {
 		if (IN6_ARE_ADDR_EQUAL(&key->addr.sin6_addr,
 		    &pol->ape_policy.addr.sin6_addr) &&
@@ -1998,7 +1998,7 @@ delete_addrsel_policyent(const struct in6_addrpolicy *key)
 
 	return 0;
 }
-#endif /* ENABLE_ADDRSEL */
+#endif                     
 
 int
 walk_addrsel_policy(int (*callback)(const struct in6_addrpolicy *, void *),
@@ -2017,9 +2017,9 @@ walk_addrsel_policy(int (*callback)(const struct in6_addrpolicy *, void *),
 	ADDRSEL_UNLOCK();
 	return error;
 }
-/*
- * Subroutines to manage the address selection policy table via sysctl.
- */
+  
+                                                                       
+   
 struct walkarg {
 	struct sysctl_req *w_req;
 };
@@ -2061,18 +2061,18 @@ in6_src_ioctl(u_long cmd, caddr_t data)
 	struct in6_addrpolicy ent0;
 
 	if (cmd != SIOCAADDRCTL_POLICY && cmd != SIOCDADDRCTL_POLICY) {
-		return EOPNOTSUPP; /* check for safety */
+		return EOPNOTSUPP;                       
 	}
 	bcopy(data, &ent0, sizeof(ent0));
 
 	if (ent0.label == ADDR_LABEL_NOTAPP) {
 		return EINVAL;
 	}
-	/* check if the prefix mask is consecutive. */
+	                                              
 	if (in6_mask2len(&ent0.addrmask.sin6_addr, NULL) < 0) {
 		return EINVAL;
 	}
-	/* clear trailing garbages (if any) of the prefix address. */
+	                                                             
 	for (i = 0; i < 4; i++) {
 		ent0.addr.sin6_addr.s6_addr32[i] &=
 		    ent0.addrmask.sin6_addr.s6_addr32[i];
@@ -2094,24 +2094,24 @@ in6_src_ioctl(u_long cmd, caddr_t data)
 #endif
 	}
 
-	return 0;             /* XXX: compromise compilers */
+	return 0;                                            
 }
 
-/*
- * generate kernel-internal form (scopeid embedded into s6_addr16[1]).
- * If the address scope of is link-local, embed the interface index in the
- * address.  The routine determines our precedence
- * between advanced API scope/interface specification and basic API
- * specification.
- *
- * this function should be nuked in the future, when we get rid of
- * embedded scopeid thing.
- *
- * XXX actually, it is over-specification to return ifp against sin6_scope_id.
- * there can be multiple interfaces that belong to a particular scope zone
- * (in specification, we have 1:N mapping between a scope zone and interfaces).
- * we may want to change the function to return something other than ifp.
- */
+  
+                                                                      
+                                                                          
+                                                  
+                                                                   
+                 
+  
+                                                                  
+                          
+  
+                                                                              
+                                                                          
+                                                                               
+                                                                         
+   
 int
 in6_embedscope(struct in6_addr *in6, const struct sockaddr_in6 *sin6,
     struct in6pcb *in6p, struct ifnet **ifpp, struct ip6_pktopts *opt)
@@ -2126,10 +2126,10 @@ in6_embedscope(struct in6_addr *in6, const struct sockaddr_in6 *sin6,
 		*ifpp = NULL;
 	}
 
-	/*
-	 * don't try to read sin6->sin6_addr beyond here, since the caller may
-	 * ask us to overwrite existing sockaddr_in6
-	 */
+	  
+                                                                       
+                                             
+    
 
 #ifdef ENABLE_DEFAULT_SCOPE
 	if (scopeid == 0) {
@@ -2154,13 +2154,13 @@ in6_embedscope(struct in6_addr *in6, const struct sockaddr_in6 *sin6,
 		} else if (in6p != NULL) {
 			optp = in6p->in6p_outputopts;
 		}
-		/*
-		 * KAME assumption: link id == interface id
-		 */
+		  
+                                             
+     
 		if (in6p != NULL && optp != NULL &&
 		    (pi = optp->ip6po_pktinfo) != NULL &&
 		    pi->ipi6_ifindex != 0) {
-			/* ifp is needed here if only we're returning it */
+			                                                   
 			if (ifpp != NULL) {
 				ifnet_head_lock_shared();
 				ifp = ifindex2ifnet[pi->ipi6_ifindex];
@@ -2172,27 +2172,27 @@ in6_embedscope(struct in6_addr *in6, const struct sockaddr_in6 *sin6,
 			ifp = im6o_multicast_ifp;
 			in6->s6_addr16[1] = htons(ifp->if_index);
 		} else if (scopeid != 0) {
-			/*
-			 * Since scopeid is unsigned, we only have to check it
-			 * against if_index (ifnet_head_lock not needed since
-			 * if_index is an ever-increasing integer.)
-			 */
+			  
+                                                         
+                                                        
+                                              
+      
 			if (if_index < scopeid) {
-				return ENXIO;  /* XXX EINVAL? */
+				return ENXIO;                   
 			}
-			/* ifp is needed here only if we're returning it */
+			                                                   
 			if (ifpp != NULL) {
 				ifnet_head_lock_shared();
 				ifp = ifindex2ifnet[scopeid];
 				ifnet_head_done();
 			}
-			/* XXX assignment to 16bit from 32bit variable */
+			                                                 
 			in6->s6_addr16[1] = htons(scopeid & 0xffff);
 		}
 
 		if (ifpp != NULL) {
 			if (ifp != NULL) {
-				ifnet_reference(ifp);   /* for caller */
+				ifnet_reference(ifp);                   
 			}
 			*ifpp = ifp;
 		}
@@ -2201,13 +2201,13 @@ in6_embedscope(struct in6_addr *in6, const struct sockaddr_in6 *sin6,
 	return 0;
 }
 
-/*
- * generate standard sockaddr_in6 from embedded form.
- * touches sin6_addr and sin6_scope_id only.
- *
- * this function should be nuked in the future, when we get rid of
- * embedded scopeid thing.
- */
+  
+                                                     
+                                            
+  
+                                                                  
+                          
+   
 int
 in6_recoverscope(
 	struct sockaddr_in6 *sin6,
@@ -2218,24 +2218,24 @@ in6_recoverscope(
 
 	sin6->sin6_addr = *in6;
 
-	/*
-	 * don't try to read *in6 beyond here, since the caller may
-	 * ask us to overwrite existing sockaddr_in6
-	 */
+	  
+                                                            
+                                             
+    
 
 	sin6->sin6_scope_id = 0;
 	if (IN6_IS_SCOPE_LINKLOCAL(in6) || IN6_IS_ADDR_MC_INTFACELOCAL(in6)) {
-		/*
-		 * KAME assumption: link id == interface id
-		 */
+		  
+                                             
+     
 		scopeid = ntohs(sin6->sin6_addr.s6_addr16[1]);
 		if (scopeid) {
-			/*
-			 * sanity check
-			 *
-			 * Since scopeid is unsigned, we only have to check it
-			 * against if_index
-			 */
+			  
+                  
+     
+                                                         
+                      
+      
 			if (if_index < scopeid) {
 				return ENXIO;
 			}

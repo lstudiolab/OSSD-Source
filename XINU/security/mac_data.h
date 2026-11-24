@@ -58,45 +58,45 @@
 #warning "MAC policy is not KPI, see Technical Q&A QA1574, this header will be removed in next version"
 #endif
 
-/**
- *  @brief Mac policy module data
- *
- *  This structure specifies module data that is passed in to the
- *  TrustedBSD MAC policy module by the kernel module loader.  The
- *  data is made of up key/value pairs where the key is always a
- *  string and the value is a string, binary data or array.  An array
- *  may be a list of values (actually a similar set of key/value pairs,
- *  but in this case the keys are always null), and may also consist of
- *  a set of dictionaries, which in turn are made up of a list of key/value
- *  pairs.
- *
- *  Module data may be specified in the MAC policy module's
- *  Info.plist file as part of the OSModuleData dictionary.
- *
- *  E.g.
- *
- *  <key>OSModuleData</key>
- *  <dict>
- *       <key>foo</key>
- *       <string>bar</string>
- *       <key>Beers</key>
- *       <array>
- *       <dict>
- *               <key>type</key>
- *               <string>lager</string>
- *               <key>Name</key>
- *               <string>Anchor Steam</string>
- *       </dict>
- *       <dict>
- *               <key>type</key>
- *               <string>ale</string>
- *               <key>Name</key>
- *               <string>Sierra Nevada Pale Ale</string>
- *       </dict>
- *       </array>
- *  </dict>
- *
- */
+   
+                                 
+  
+                                                                 
+                                                                  
+                                                                
+                                                                     
+                                                                       
+                                                                       
+                                                                           
+          
+  
+                                                           
+                                                           
+  
+        
+  
+                           
+          
+                       
+                             
+                         
+                
+               
+                                
+                                       
+                                
+                                              
+                
+               
+                                
+                                     
+                                
+                                                        
+                
+                 
+           
+  
+   
 struct mac_module_data_element {
 	unsigned int key_size;
 	unsigned int value_size;
@@ -110,33 +110,33 @@ struct mac_module_data_list {
 	struct mac_module_data_element list[1];
 };
 struct mac_module_data {
-	void *base_addr;                /* Orig base address, for ptr fixup.  */
+	void *base_addr;                                                        
 	unsigned int size;
 	unsigned int count;
-	struct mac_module_data_element data[1]; /* actually bigger */
+	struct mac_module_data_element data[1];                      
 };
 
-#define MAC_DATA_TYPE_PRIMITIVE 0       /* Primitive type (int, string, etc.) */
-#define MAC_DATA_TYPE_ARRAY     1       /* Array type.                        */
-#define MAC_DATA_TYPE_DICT      2       /* Dictionary type.                   */
+#define MAC_DATA_TYPE_PRIMITIVE 0                                               
+#define MAC_DATA_TYPE_ARRAY     1                                               
+#define MAC_DATA_TYPE_DICT      2                                               
 
 #ifdef _SECURITY_MAC_POLICY_H_
-/* XXX mac_policy_handle_t is defined in mac_policy.h, move prototype there? */
+                                                                               
 int mac_find_policy_data(const mac_policy_handle_t, const char *key,
     void **valp, size_t *sizep);
 int mac_find_module_data(struct mac_module_data *mmd, const char *key,
     void **valp, size_t *sizep);
 
-/*
- * This is a routine to fix up pointers in a mac_module_data_element when the
- * mac_module_data has been copied to a new area.  It depends on the pointers
- * all being offset from base_addr.
- */
+  
+                                                                             
+                                                                             
+                                   
+   
 static __inline void
 mmd_fixup_ele(struct mac_module_data *oldbase,
     struct mac_module_data *newbase, struct mac_module_data_element *ele)
 {
-	if (ele->key != NULL) {         /* Array elements have no keys.       */
+	if (ele->key != NULL) {                                                 
 		ele->key -= (uintptr_t)oldbase;
 		ele->key += (uintptr_t)newbase;
 	}
@@ -146,4 +146,4 @@ mmd_fixup_ele(struct mac_module_data *oldbase,
 
 #endif
 
-#endif /* !_SECURITY_MAC_DATA_H_ */
+#endif                             

@@ -1,7 +1,7 @@
-//
-// This tests that the alignment and size of a class are the same whether
-// they have a `T*` or a shared pointer data member.
-//
+  
+                                                                         
+                                                    
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include "test_policy.h"

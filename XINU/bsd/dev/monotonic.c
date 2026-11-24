@@ -30,10 +30,10 @@
 #include <machine/machine_routines.h>
 #include <machine/monotonic.h>
 #include <pexpert/pexpert.h>
-#include <sys/param.h> /* NULL */
-#include <sys/stat.h> /* dev_t */
-#include <miscfs/devfs/devfs.h> /* must come after sys/stat.h */
-#include <sys/conf.h> /* must come after sys/stat.h */
+#include <sys/param.h>           
+#include <sys/stat.h>            
+#include <miscfs/devfs/devfs.h>                                 
+#include <sys/conf.h>                                 
 #include <sys/sysctl.h>
 #include <sys/sysproto.h>
 #include <sys/systm.h>
@@ -57,9 +57,9 @@ static const struct cdevsw mt_cdevsw = {
 	.d_mmap = eno_mmap, .d_strategy = eno_strat, .d_type = 0
 };
 
-/*
- * Written at initialization, read-only thereafter.
- */
+  
+                                                   
+   
 LCK_GRP_DECLARE(mt_lock_grp, MT_NODE);
 static int mt_dev_major;
 
@@ -96,7 +96,7 @@ mt_device_assert_inuse(__assert_only mt_device_t dev)
 int
 mt_dev_init(void)
 {
-	mt_dev_major = cdevsw_add(-1 /* allocate a major number */, &mt_cdevsw);
+	mt_dev_major = cdevsw_add(-1                              , &mt_cdevsw);
 	if (mt_dev_major < 0) {
 		panic("monotonic: cdevsw_add failed: %d", mt_dev_major);
 		__builtin_unreachable();
@@ -310,7 +310,7 @@ thread_selfcounts(__unused struct proc *p,
 
 #ifdef MT_CORE_INSTRS
 		counts[0] = thread_counts[MT_CORE_INSTRS];
-#endif /* defined(MT_CORE_INSTRS) */
+#endif                              
 		counts[1] = thread_counts[MT_CORE_CYCLES];
 
 		return copyout(counts, uap->buf, MIN(sizeof(counts), uap->nbytes));
@@ -408,7 +408,7 @@ copyout_counts:
 
 #ifdef MT_CORE_INSTRS
 	counts[0] = end[MT_CORE_INSTRS] - start[MT_CORE_INSTRS];
-#endif /* defined(MT_CORE_INSTRS) */
+#endif                              
 	counts[1] = end[MT_CORE_CYCLES] - start[MT_CORE_CYCLES];
 
 	return copyout(counts, req->oldptr, MIN(req->oldlen, sizeof(counts)));

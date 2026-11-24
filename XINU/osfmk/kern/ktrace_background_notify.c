@@ -36,9 +36,9 @@
 
 kern_return_t ktrace_background_available_notify_user(void);
 
-/*
- * If user space has registered for background notifications, send one.
- */
+  
+                                                                       
+   
 kern_return_t
 ktrace_background_available_notify_user(void)
 {

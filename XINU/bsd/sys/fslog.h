@@ -34,14 +34,14 @@
 #include <machine/limits.h>
 
 #ifdef XNU_KERNEL_PRIVATE
-/* Log information about external modification of a target process */
+                                                                     
 void fslog_extmod_msgtracer(proc_t caller, proc_t target);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/* Keys used by FSLog */
-#define FSLOG_KEY_LEVEL         "Level"         /* Priority level */
+                        
+#define FSLOG_KEY_LEVEL         "Level"                             
 
-/* Values used by FSLog */
-#define FSLOG_VAL_FACILITY      "com.apple.system.fs" /* Facility generating messages */
+                          
+#define FSLOG_VAL_FACILITY      "com.apple.system.fs"                                   
 
-#endif /* !_FSLOG_H_ */
+#endif                 

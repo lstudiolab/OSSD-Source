@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOSyncer.cpp created by wgulland on 2000-02-02 */
+                                                    
 
 #include <IOKit/IOLib.h>
 #include <IOKit/IOSyncer.h>
@@ -79,7 +79,7 @@ IOSyncer::reinit()
 void
 IOSyncer::free()
 {
-	// just in case a thread is blocked here:
+	                                         
 	privateSignal();
 
 	if (guardLock != NULL) {
@@ -102,7 +102,7 @@ IOSyncer::wait(bool autoRelease)
 		IOSimpleLockUnlockEnableInterrupt(guardLock, is);
 	}
 
-	IOReturn result = fResult; // Pick up before auto deleting!
+	IOReturn result = fResult;                                 
 
 	if (autoRelease) {
 		release();

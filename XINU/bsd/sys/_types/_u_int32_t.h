@@ -28,4 +28,4 @@
 #ifndef _U_INT32_T
 #define _U_INT32_T
 typedef unsigned int            u_int32_t;
-#endif /* _U_INT32_T */
+#endif                 

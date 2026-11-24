@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*!
- * ARM64-specific functions required to support hibernation entry, and also to
- * support hibernation exit after wired pages have already been restored.
- */
+   
+                                                                              
+                                                                         
+   
 
 #include <kern/machine.h>
 #include <kern/misc_protos.h>
@@ -72,13 +72,13 @@ set_dram_range(hibernate_bitmap_t *range, uint64_t start_addr, uint64_t size)
 	uint64_t last_page = first_page + page_count - 1;
 
 	range->first_page = (uint32_t)first_page;
-	assert(range->first_page == first_page); // make sure the truncation wasn't lossy
+	assert(range->first_page == first_page);                                         
 
 	range->last_page = (uint32_t)last_page;
-	assert(range->last_page == last_page); // make sure the truncation wasn't lossy
+	assert(range->last_page == last_page);                                         
 }
 
-// Comparison function used to sort the DRAM ranges list.
+                                                         
 static int
 dram_range_compare(const void *a, const void *b)
 {
@@ -94,18 +94,18 @@ hibernate_page_list_allocate(boolean_t log)
 	hibernate_page_list_t * list;
 	hibernate_bitmap_t *    bitmap;
 
-	// Allocate a single DRAM range to cover the kernel-managed memory.
+	                                                                   
 	hibernate_bitmap_t      dram_ranges[1];
 	uint32_t                num_banks = sizeof(dram_ranges) / sizeof(dram_ranges[0]);
 
-	// All of kernel-managed memory can be described by one DRAM range
+	                                                                  
 	set_dram_range(&dram_ranges[0], gPhysBase, gPhysSize);
 
-	// Sort the DRAM ranges based on the first page. Other parts of the hibernation
-	// flow expect these ranges to be in order.
+	                                                                               
+	                                           
 	qsort((void*)dram_ranges, num_banks, sizeof(dram_ranges[0]), dram_range_compare);
 
-	// size the hibernation bitmap
+	                              
 
 	size = sizeof(hibernate_page_list_t);
 	page_count = 0;
@@ -124,7 +124,7 @@ hibernate_page_list_allocate(boolean_t log)
 	list->page_count = page_count;
 	list->bank_count = num_banks;
 
-	// convert to hibernation bitmap.
+	                                 
 
 	bitmap = &list->bank_bitmap[0];
 	for (bank = 0; bank < num_banks; bank++) {
@@ -155,7 +155,7 @@ pal_hib_get_stack_pages(vm_offset_t *first_page, vm_offset_t *page_count)
 	*page_count = atop_64(round_page(stack_end) - trunc_page(stack_begin));
 }
 
-// mark pages not to be saved, but available for scratch usage during restore
+                                                                             
 void
 hibernate_page_list_setall_machine(hibernate_page_list_t * page_list,
     hibernate_page_list_t * page_list_wired,
@@ -169,18 +169,18 @@ hibernate_page_list_setall_machine(hibernate_page_list_t * page_list,
 	vm_offset_t pmap_stack_page_count = atop_64(pmap_stacks_end_pa - pmap_stacks_start_pa);
 
 	if (!preflight) {
-		// mark the stack as unavailable for clobbering during restore;
-		// we won't actually save it because we mark these pages as free
-		// in hibernate_page_list_set_volatile
+		                                                               
+		                                                                
+		                                      
 		hibernate_set_page_state(page_list, page_list_wired,
 		    stack_first_page, stack_page_count,
 		    kIOHibernatePageStateWiredSave);
 
-		// Mark the PPL stack as not needing to be saved. Any PPL memory that is
-		// excluded from the image will need to be explicitly checked for in
-		// pmap_check_ppl_hashed_flag_all(). That function ensures that all
-		// PPL pages are contained within the image (so any memory explicitly
-		// not being saved, needs to be removed from the check).
+		                                                                        
+		                                                                    
+		                                                                   
+		                                                                     
+		                                                        
 		hibernate_set_page_state(page_list, page_list_wired,
 		    atop_64(pmap_stacks_start_pa), pmap_stack_page_count,
 		    kIOHibernatePageStateFree);
@@ -189,7 +189,7 @@ hibernate_page_list_setall_machine(hibernate_page_list_t * page_list,
 	*pagesOut -= pmap_stack_page_count;
 }
 
-// mark pages not to be saved and not for scratch usage during restore
+                                                                      
 void
 hibernate_page_list_set_volatile(hibernate_page_list_t * page_list,
     hibernate_page_list_t * page_list_wired,
@@ -197,8 +197,8 @@ hibernate_page_list_set_volatile(hibernate_page_list_t * page_list,
 {
 	vm_offset_t page, count;
 
-	// hibernation restore runs on the interrupt stack,
-	// so we need to make sure we don't save it
+	                                                   
+	                                           
 	pal_hib_get_stack_pages(&page, &count);
 	hibernate_set_page_state(page_list, page_list_wired,
 	    page, count,
@@ -235,9 +235,9 @@ hibernate_vm_unlock(void)
 	ml_set_is_quiescing(TRUE);
 }
 
-// processor_doshutdown() calls hibernate_vm_lock() and hibernate_vm_unlock() on sleep with interrupts disabled.
-// ml_hibernate_active_post() calls hibernate_vm_lock_end() on wake before interrupts are enabled.
-// VM locks are safely single threaded between hibernate_vm_lock() and hibernate_vm_lock_end().
+                                                                                                                
+                                                                                                  
+                                                                                               
 
 void
 hibernate_vm_lock_end(void)

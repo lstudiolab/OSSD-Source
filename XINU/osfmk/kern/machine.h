@@ -41,9 +41,9 @@
 
 #include <kern/sched_urgency.h>
 
-/*
- * Machine support declarations.
- */
+  
+                                
+   
 
 extern void processor_up(
 	processor_t processor);
@@ -51,15 +51,15 @@ extern void processor_up(
 extern void processor_start_thread(void *machine_param,
     wait_result_t result);
 
-/*
- * Must be implemented in machine dependent code.
- */
+  
+                                                 
+   
 
-/* Initialize machine dependent ast code */
+                                           
 extern void init_ast_check(
 	processor_t         processor);
 
-/* Cause check for ast */
+                         
 extern void cause_ast_check(
 	processor_t         processor);
 
@@ -98,15 +98,15 @@ extern void machine_idle(void);
 
 extern void machine_track_platform_idle(boolean_t);
 
-/* Signals a processor to bring it out of idle */
+                                                 
 extern void machine_signal_idle(
 	processor_t         processor);
 
-/* Signals a processor to bring it out of idle unless canceled */
+                                                                 
 extern void machine_signal_idle_deferred(
 	processor_t         processor);
 
-/* Cancels an outstanding machine_signal_idle_deferred, if this is supported */
+                                                                               
 extern void machine_signal_idle_cancel(
 	processor_t         processor);
 
@@ -119,20 +119,20 @@ extern char *machine_boot_info(
 	char                *buf,
 	vm_size_t           buf_len);
 
-/*
- * Machine-dependent routine to fill in an array with up to callstack_max
- * levels of return pc information.
- */
+  
+                                                                         
+                                   
+   
 extern void machine_callstack(
 	uintptr_t           *buf,
 	vm_size_t           callstack_max);
 
 extern void consider_machine_collect(void);
 
-/*
- * Machine-dependent routine to inform platform layer and external
- * CPU power management about context switches
- */
+  
+                                                                  
+                                              
+   
 
 extern void     machine_thread_going_on_core(thread_t   new_thread,
     thread_urgency_t    urgency,
@@ -172,4 +172,4 @@ extern void machine_thread_group_blocked(struct thread_group *tg_blocked, struct
 extern void machine_thread_group_unblocked(struct thread_group *tg_unblocked, struct thread_group *tg_unblocking, uint32_t flags, thread_t unblocked_thread);
 #endif
 
-#endif  /* _KERN_MACHINE_H_ */
+#endif                        

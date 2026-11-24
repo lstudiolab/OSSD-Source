@@ -28,10 +28,10 @@
 
 #pragma once
 
-//  Common header to enable/disable the assembly code paths
-//  Rule: one define for each assembly source file
+                                                           
+                                                  
 
-//  To enable assembly
+                      
 #if defined __arm64__
 #define LZ4_ENABLE_ASSEMBLY_ENCODE_ARM64 1
 #define LZ4_ENABLE_ASSEMBLY_DECODE_ARM64 1
@@ -42,6 +42,6 @@
 #define LZ4_ENABLE_ASSEMBLY_DECODE_X86_64 1
 #endif
 
-//  To disable C
+                
 #define LZ4_ENABLE_ASSEMBLY_ENCODE ((LZ4_ENABLE_ASSEMBLY_ENCODE_ARMV7) || (LZ4_ENABLE_ASSEMBLY_ENCODE_ARM64))
 #define LZ4_ENABLE_ASSEMBLY_DECODE (LZ4_ENABLE_ASSEMBLY_DECODE_ARM64 || LZ4_ENABLE_ASSEMBLY_DECODE_ARMV7 || LZ4_ENABLE_ASSEMBLY_DECODE_X86_64)

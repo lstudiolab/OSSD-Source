@@ -67,7 +67,7 @@
 #endif
 
 #if TCPDEBUG
-/* load symbolic names */
+                         
 #define PRUREQUESTS
 #define TCPSTATES
 #define TCPTIMERS
@@ -101,9 +101,9 @@ SYSCTL_INT(_net_inet_tcp, OID_AUTO, tcpconsdebug, CTLFLAG_RW | CTLFLAG_LOCKED,
 static struct tcp_debug tcp_debug[TCP_NDEBUG];
 static int      tcp_debx;
 
-/*
- * Tcp debug routines
- */
+  
+                     
+   
 void
 tcp_trace(act, ostate, tp, ipgen, th, req)
 short act, ostate;
@@ -234,7 +234,7 @@ int req;
 	if (tp) {
 		printf(" -> %s", tcpstates[tp->t_state]);
 	}
-	/* print out internal state of tp !?! */
+	                                        
 	printf("\n");
 	if (tp == 0) {
 		return;
@@ -245,5 +245,5 @@ int req;
 		(uint32_t)tp->snd_una, (uint32_t)tp->snd_nxt, (uint32_t)tp->snd_max);
 	printf("\tsnd_(wl1,wl2,wnd) (%lx,%lx,%lx)\n",
 	    (uint32_t)tp->snd_wl1, (uint32_t)tp->snd_wl2, tp->snd_wnd);
-#endif /* TCPDEBUG */
+#endif               
 }

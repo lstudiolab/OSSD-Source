@@ -2,9 +2,9 @@
  * Copyright (c) 2000-2015 Apple Inc. All rights reserved.
  */
 
-/*
- * file: pe_serial.c Polled-mode UART0 driver for S3c2410 and PL011.
- */
+  
+                                                                    
+   
 
 
 #include <kern/clock.h>
@@ -30,7 +30,7 @@
 #endif
 #if HIBERNATION
 #include <machine/pal_hibernate.h>
-#endif /* HIBERNATION */
+#endif                  
 
 struct pe_serial_functions {
 	void            (*uart_init) (void);
@@ -44,10 +44,10 @@ struct pe_serial_functions {
 
 SECURITY_READ_ONLY_LATE(static struct pe_serial_functions*) gPESF = NULL;
 
-static int         uart_initted = 0;    /* 1 if init'ed */
+static int         uart_initted = 0;                      
 static vm_offset_t uart_base = 0;
 
-/*****************************************************************************/
+                                                                               
 
 #ifdef  S3CUART
 
@@ -60,22 +60,22 @@ static void ln2410_uart_set_baud_rate(__unused int unit, uint32_t baud_rate);
 static void
 ln2410_uart_init(void)
 {
-	uint32_t ucon0 = 0x405; /* NCLK, No interrupts, No DMA - just polled */
+	uint32_t ucon0 = 0x405;                                                
 
-	rULCON0 = 0x03;         /* 81N, not IR */
+	rULCON0 = 0x03;                          
 
-	// Override with pclk dt entry
+	                              
 	if (dt_pclk != -1) {
 		ucon0 = ucon0 & ~0x400;
 	}
 
 	rUCON0 = ucon0;
-	rUMCON0 = 0x00;         /* Clear Flow Control */
+	rUMCON0 = 0x00;                                 
 
 	ln2410_uart_set_baud_rate(0, 115200);
 
-	rUFCON0 = 0x03;         /* Clear & Enable FIFOs */
-	rUMCON0 = 0x01;         /* Assert RTS on UART0 */
+	rUFCON0 = 0x03;                                   
+	rUMCON0 = 0x01;                                  
 }
 
 static void
@@ -90,35 +90,35 @@ ln2410_uart_set_baud_rate(__unused int unit, uint32_t baud_rate)
 	}
 
 	if (rUCON0 & 0x400) {
-		// NCLK
+		       
 		uart_clock = (uint32_t)gPEClockFrequencyInfo.fix_frequency_hz;
 	} else {
-		// PCLK
+		       
 		uart_clock = (uint32_t)gPEClockFrequencyInfo.prf_frequency_hz;
 	}
 
 	if (dt_sampling != -1) {
-		// Use the sampling rate specified in the Device Tree
+		                                                     
 		sample_rate = dt_sampling & 0xf;
 	}
 
 	if (dt_ubrdiv != -1) {
-		// Use the ubrdiv specified in the Device Tree
+		                                              
 		div = dt_ubrdiv & 0xffff;
 	} else {
-		// Calculate ubrdiv. UBRDIV = (SourceClock / (BPS * Sample Rate)) - 1
+		                                                                     
 		div = uart_clock / (baud_rate * sample_rate);
 
 		uint32_t actual_baud = uart_clock / ((div + 0) * sample_rate);
 		uint32_t baud_low    = uart_clock / ((div + 1) * sample_rate);
 
-		// Adjust div to get the closest target baudrate
+		                                                
 		if ((baud_rate - baud_low) > (actual_baud - baud_rate)) {
 			div--;
 		}
 	}
 
-	// Sample Rate [19:16], UBRDIV [15:0]
+	                                     
 	rUBRDIV0 = ((16 - sample_rate) << 16) | div;
 }
 
@@ -153,9 +153,9 @@ SECURITY_READ_ONLY_LATE(static struct pe_serial_functions) ln2410_serial_functio
 	.rd0 = ln2410_rd0
 };
 
-#endif  /* S3CUART */
+#endif               
 
-/*****************************************************************************/
+                                                                               
 
 static void
 dcc_uart_init(void)
@@ -172,7 +172,7 @@ read_dtr(void)
  :               "=r"(c));
 	return c;
 #else
-	/* ARM64_TODO */
+	                
 	panic_unimplemented();
 	return 0;
 #endif
@@ -186,7 +186,7 @@ write_dtr(unsigned int c)
                  :
                  :"r"(c));
 #else
-	/* ARM64_TODO */
+	                
 	(void)c;
 	panic_unimplemented();
 #endif
@@ -198,7 +198,7 @@ dcc_tr0(void)
 #ifdef __arm__
 	return !(arm_debug_read_dscr() & ARM_DBGDSCR_TXFULL);
 #else
-	/* ARM64_TODO */
+	                
 	panic_unimplemented();
 	return 0;
 #endif
@@ -216,7 +216,7 @@ dcc_rr0(void)
 #ifdef __arm__
 	return arm_debug_read_dscr() & ARM_DBGDSCR_RXFULL;
 #else
-	/* ARM64_TODO */
+	                
 	panic_unimplemented();
 	return 0;
 #endif
@@ -238,7 +238,7 @@ SECURITY_READ_ONLY_LATE(static struct pe_serial_functions) dcc_serial_functions 
 	.rd0 = dcc_rd0
 };
 
-/*****************************************************************************/
+                                                                               
 
 #ifdef SHMCON
 
@@ -258,13 +258,13 @@ SECURITY_READ_ONLY_LATE(static struct pe_serial_functions) dcc_serial_functions 
 #define FLAG_CACHELINE_32       1
 #define FLAG_CACHELINE_64       2
 
-/* Defines to clarify the master/slave fields' use as circular buffer pointers */
+                                                                                 
 #define head_in         sidx[CBUF_IN]
 #define tail_in         midx[CBUF_IN]
 #define head_out        midx[CBUF_OUT]
 #define tail_out        sidx[CBUF_OUT]
 
-/* TODO: get from device tree/target */
+                                       
 #define NUM_CHILDREN            5
 
 #define WRAP_INCR(len, x) do{ (x)++; if((x) >= (len)) (x) = 0; } while(0)
@@ -284,19 +284,19 @@ struct shm_buffer_info {
 struct shmcon_header {
 	uint32_t        magic;
 	uint8_t         version;
-	uint8_t         children;       /* number of child entries in child_ent */
+	uint8_t         children;                                                 
 	uint16_t        flags;
-	uint64_t        buf_paddr[2];   /* Physical address for buffers (in, out) */
+	uint64_t        buf_paddr[2];                                               
 	uint32_t        buf_len[2];
 	uint8_t         name[8];
 
-	/* Slave-modified data - invalidate before read */
-	uint32_t        sidx[2] __attribute__((aligned(FULL_ALIGNMENT)));       /* In head, out tail */
+	                                                  
+	uint32_t        sidx[2] __attribute__((aligned(FULL_ALIGNMENT)));                              
 
-	/* Master-modified data - clean after write */
-	uint32_t        midx[2] __attribute__((aligned(FULL_ALIGNMENT)));       /* In tail, out head */
+	                                              
+	uint32_t        midx[2] __attribute__((aligned(FULL_ALIGNMENT)));                              
 
-	uint64_t        child[0];       /* Physical address of child header pointers */
+	uint64_t        child[0];                                                      
 };
 
 static volatile struct shmcon_header *shmcon = NULL;
@@ -326,7 +326,7 @@ shmcon_tr0(void)
 		return 1;
 	}
 
-	/* Full.  Is this buffer being serviced? */
+	                                           
 	if (full_timeout == 0) {
 		full_timeout = mach_absolute_time() + grace;
 		return 0;
@@ -335,7 +335,7 @@ shmcon_tr0(void)
 		return 0;
 	}
 
-	/* Timeout - slave not really there or not keeping up */
+	                                                        
 	tail += (len / 4);
 	if (tail >= len) {
 		tail -= len;
@@ -414,29 +414,29 @@ shmcon_init(void)
 		pa_buffer_base = ml_vtophys(va_buffer_base);
 		pa_buffer_end  = ml_vtophys(va_buffer_end);
 
-		/* Resume previous console session */
+		                                     
 		for (i = 0; i < 2; i++) {
 			vm_offset_t pa_buf;
 			uint32_t len;
 
 			pa_buf = (uintptr_t)shmcon->buf_paddr[i];
 			len = shmcon->buf_len[i];
-			/* Validate buffers */
+			                      
 			if ((pa_buf < pa_buffer_base) ||
 			    (pa_buf >= pa_buffer_end) ||
 			    ((pa_buf + len) > pa_buffer_end) ||
-			    (shmcon->midx[i] >= len) ||     /* Index out of bounds */
+			    (shmcon->midx[i] >= len) ||                              
 			    (shmcon->sidx[i] >= len) ||
-			    (pa_buf != ROUNDUP(pa_buf, CPU_CACHELINE_SIZE)) ||     /* Unaligned pa_buffer */
+			    (pa_buf != ROUNDUP(pa_buf, CPU_CACHELINE_SIZE)) ||                              
 			    (len < 1024) ||
 			    (len > (pa_buffer_end - pa_buffer_base)) ||
 			    (shmcon->children != NUM_CHILDREN)) {
 				goto validation_failure;
 			}
-			/* Compute the VA offset of the buffer */
+			                                         
 			shmbuf[i] = (uint8_t *)(uintptr_t)shmcon + ((uintptr_t)pa_buf - (uintptr_t)pa_panic_base);
 		}
-		/* Check that buffers don't overlap */
+		                                      
 		if ((uintptr_t)shmbuf[0] < (uintptr_t)shmbuf[1]) {
 			if ((uintptr_t)(shmbuf[0] + shmcon->buf_len[0]) > (uintptr_t)shmbuf[1]) {
 				goto validation_failure;
@@ -446,7 +446,7 @@ shmcon_init(void)
 				goto validation_failure;
 			}
 		}
-		shmcon->tail_in = shmcon->head_in; /* Clear input buffer */
+		shmcon->tail_in = shmcon->head_in;                         
 		shmcon_barrier();
 	} else {
 validation_failure:
@@ -510,9 +510,9 @@ pe_shmcon_set_child(uint64_t paddr, uint32_t entry)
 	return 0;
 }
 
-#endif /* SHMCON */
+#endif             
 
-/*****************************************************************************/
+                                                                               
 
 #ifdef DOCKCHANNEL_UART
 #define DOCKCHANNEL_WR_MAX_STALL_US     (30*1000)
@@ -521,25 +521,25 @@ static vm_offset_t      dock_agent_base;
 static uint32_t         max_dockchannel_drain_period;
 static bool             use_sw_drain;
 static uint32_t         dock_wstat_mask;
-static uint64_t         prev_dockchannel_drained_time;  // Last time we've seen the DockChannel drained by an external agent
-static uint64_t         prev_dockchannel_spaces;        // Previous w_stat level of the DockChannel.
+static uint64_t         prev_dockchannel_drained_time;                                                                      
+static uint64_t         prev_dockchannel_spaces;                                                    
 static uint64_t         dockchannel_stall_grace;
 static vm_offset_t      dockchannel_uart_base = 0;
 
-//=======================
-// Local funtions
-//=======================
+                         
+                 
+                         
 
 static int
 dockchannel_drain_on_stall()
 {
-	// Called when DockChannel runs out of spaces.
-	// Check if the DockChannel reader has stalled. If so, empty the DockChannel ourselves.
-	// Return number of bytes drained.
+	                                              
+	                                                                                       
+	                                  
 
 	if ((mach_absolute_time() - prev_dockchannel_drained_time) >= dockchannel_stall_grace) {
-		// It's been more than DOCKCHANEL_WR_MAX_STALL_US and nobody read from the FIFO
-		// Drop a character.
+		                                                                               
+		                    
 		(void)rDOCKCHANNELS_DOCK_RDATA1(DOCKCHANNEL_UART_CHANNEL);
 		os_atomic_inc(&prev_dockchannel_spaces, relaxed);
 		return 1;
@@ -553,16 +553,16 @@ dockchannel_uart_tr0(void)
 	if (use_sw_drain) {
 		uint32_t spaces = rDOCKCHANNELS_DEV_WSTAT(DOCKCHANNEL_UART_CHANNEL) & dock_wstat_mask;
 		if (spaces > prev_dockchannel_spaces) {
-			// More spaces showed up. That can only mean someone read the FIFO.
-			// Note that if the DockFIFO is empty we cannot tell if someone is listening,
-			// we can only give them the benefit of the doubt.
+			                                                                   
+			                                                                             
+			                                                  
 			prev_dockchannel_drained_time = mach_absolute_time();
 		}
 		prev_dockchannel_spaces = spaces;
 
 		return spaces || dockchannel_drain_on_stall();
 	} else {
-		// Returns spaces in dockchannel fifo
+		                                     
 		return rDOCKCHANNELS_DEV_WSTAT(DOCKCHANNEL_UART_CHANNEL) & dock_wstat_mask;
 	}
 }
@@ -572,7 +572,7 @@ dockchannel_uart_td0(int c)
 {
 	rDOCKCHANNELS_DEV_WDATA1(DOCKCHANNEL_UART_CHANNEL) = (unsigned)(c & 0xff);
 	if (use_sw_drain) {
-		os_atomic_dec(&prev_dockchannel_spaces, relaxed); // After writing a byte we have one fewer space than previously expected.
+		os_atomic_dec(&prev_dockchannel_spaces, relaxed);                                                                          
 	}
 }
 
@@ -604,14 +604,14 @@ dockchannel_uart_init(void)
 		nanoseconds_to_absolutetime(DOCKCHANNEL_WR_MAX_STALL_US * NSEC_PER_USEC, &dockchannel_stall_grace);
 	}
 
-	// Clear all interrupt enable and status bits
+	                                             
 	dockchannel_uart_clear_intr();
 
-	// Setup DRAIN timer
+	                    
 	rDOCKCHANNELS_DEV_DRAIN_CFG(DOCKCHANNEL_UART_CHANNEL) = max_dockchannel_drain_period;
 
-	// Drain timer doesn't get loaded with value from drain period register if fifo
-	// is already full. Drop a character from the fifo.
+	                                                                               
+	                                                   
 	rDOCKCHANNELS_DOCK_RDATA1(DOCKCHANNEL_UART_CHANNEL);
 }
 
@@ -625,9 +625,9 @@ SECURITY_READ_ONLY_LATE(static struct pe_serial_functions) dockchannel_uart_seri
 	.rd0 = dockchannel_uart_rd0
 };
 
-#endif /* DOCKCHANNEL_UART */
+#endif                       
 
-/****************************************************************************/
+                                                                              
 #ifdef  PI3_UART
 static vm_offset_t pi3_gpio_base_vaddr = 0;
 static vm_offset_t pi3_aux_base_vaddr = 0;
@@ -658,10 +658,10 @@ pi3_uart_rd0(void)
 static void
 pi3_uart_init(void)
 {
-	// Scratch variable
+	                   
 	uint32_t i;
 
-	// Reset mini uart registers
+	                            
 	BCM2837_PUT32(BCM2837_AUX_ENABLES_V, 1);
 	BCM2837_PUT32(BCM2837_AUX_MU_CNTL_REG_V, 0);
 	BCM2837_PUT32(BCM2837_AUX_MU_LCR_REG_V, 3);
@@ -671,7 +671,7 @@ pi3_uart_init(void)
 	BCM2837_PUT32(BCM2837_AUX_MU_BAUD_REG_V, 270);
 
 	i = (uint32_t)BCM2837_FSEL_REG(14);
-	// Configure GPIOs 14 & 15 for alternate function 5
+	                                                   
 	i &= ~(BCM2837_FSEL_MASK(14));
 	i |= (BCM2837_FSEL_ALT5 << BCM2837_FSEL_OFFS(14));
 	i &= ~(BCM2837_FSEL_MASK(15));
@@ -681,7 +681,7 @@ pi3_uart_init(void)
 
 	BCM2837_PUT32(BCM2837_GPPUD_V, 0);
 
-	// Barrier before AP spinning for 150 cycles
+	                                            
 	__builtin_arm_isb(ISB_SY);
 
 	for (i = 0; i < 150; i++) {
@@ -715,9 +715,9 @@ SECURITY_READ_ONLY_LATE(static struct pe_serial_functions) pi3_uart_serial_funct
 	.rd0 = pi3_uart_rd0
 };
 
-#endif /* PI3_UART */
+#endif               
 
-/*****************************************************************************/
+                                                                               
 
 #ifdef VMAPPLE_UART
 
@@ -805,9 +805,9 @@ SECURITY_READ_ONLY_LATE(static struct pe_serial_functions) vmapple_uart_serial_f
 	.rd0 = vmapple_uart_receive_data
 };
 
-#endif /* VMAPPLE_UART */
+#endif                   
 
-/*****************************************************************************/
+                                                                               
 
 static void
 register_serial_functions(struct pe_serial_functions *fns)
@@ -847,7 +847,7 @@ serial_init(void)
 	if (PE_parse_boot_argn("jcon", &jconmode, sizeof jconmode)) {
 		register_serial_functions(&shmcon_serial_functions);
 	}
-#endif /* SHMCON */
+#endif             
 
 	soc_base = pe_arm_get_soc_base_phys();
 
@@ -867,7 +867,7 @@ serial_init(void)
 	if ((pi3_gpio_base_vaddr != 0) && (pi3_aux_base_vaddr != 0)) {
 		register_serial_functions(&pi3_uart_serial_functions);
 	}
-#endif /* PI3_UART */
+#endif               
 
 #ifdef VMAPPLE_UART
 	if (SecureDTFindEntry("name", "uart0", &entryP) == kSuccess) {
@@ -878,20 +878,20 @@ serial_init(void)
 	if (vmapple_uart0_base_vaddr != 0) {
 		register_serial_functions(&vmapple_uart_serial_functions);
 	}
-#endif /* VMAPPLE_UART */
+#endif                   
 
 #ifdef DOCKCHANNEL_UART
 	uint32_t no_dockchannel_uart = 0;
 	if (SecureDTFindEntry("name", "dockchannel-uart", &entryP) == kSuccess) {
 		SecureDTGetProperty(entryP, "reg", (void const **)&reg_prop, &prop_size);
-		// Should be two reg entries
+		                            
 		if (prop_size / sizeof(uintptr_t) != 4) {
 			panic("Malformed dockchannel-uart property");
 		}
 		dockchannel_uart_base = ml_io_map(soc_base + *reg_prop, *(reg_prop + 1));
 		dock_agent_base = ml_io_map(soc_base + *(reg_prop + 2), *(reg_prop + 3));
 		PE_parse_boot_argn("no-dockfifo-uart", &no_dockchannel_uart, sizeof(no_dockchannel_uart));
-		// Keep the old name for boot-arg
+		                                 
 		if (no_dockchannel_uart == 0) {
 			register_serial_functions(&dockchannel_uart_serial_functions);
 			SecureDTGetProperty(entryP, "max-aop-clk", (void const **)&prop_value, &prop_size);
@@ -905,16 +905,16 @@ serial_init(void)
 		} else {
 			dockchannel_uart_clear_intr();
 		}
-		// If no dockchannel-uart is found in the device tree, fall back
-		// to looking for the traditional UART serial console.
+		                                                                
+		                                                      
 	}
 
-#endif /* DOCKCHANNEL_UART */
+#endif                       
 
-	/*
-	 * The boot serial port should have a property named "boot-console".
-	 * If we don't find it there, look for "uart0" and "uart1".
-	 */
+	  
+                                                                     
+                                                            
+    
 
 	if (SecureDTFindEntry("boot-console", NULL, &entryP) == kSuccess) {
 		SecureDTGetProperty(entryP, "reg", (void const **)&reg_prop, &prop_size);
@@ -966,7 +966,7 @@ serial_init(void)
 			register_serial_functions(&ln2410_serial_functions);
 		}
 	}
-#endif /* S3CUART */
+#endif              
 
 	if (gPESF == NULL) {
 		return 0;
@@ -979,7 +979,7 @@ serial_init(void)
 	}
 
 #if HIBERNATION
-	/* hibernation needs to know the UART register addresses since it can't directly use this serial driver */
+	                                                                                                          
 	if (dockchannel_uart_base) {
 		gHibernateGlobals.dockChannelRegBase = ml_vtophys(dockchannel_uart_base);
 		gHibernateGlobals.dockChannelWstatMask = dock_wstat_mask;
@@ -987,7 +987,7 @@ serial_init(void)
 	if (uart_base) {
 		gHibernateGlobals.hibUartRegBase = ml_vtophys(uart_base);
 	}
-#endif /* HIBERNATION */
+#endif                  
 
 	uart_initted = 1;
 
@@ -1000,10 +1000,10 @@ uart_putc(char c)
 	struct pe_serial_functions *fns = gPESF;
 	while (fns != NULL) {
 		while (!fns->tr0()) {
-#if __arm64__                           /* on arm64, we have a WFE timeout, so no need to hot-poll here */
+#if __arm64__                                                                                             
 			__builtin_arm_wfe()
 #endif
-			;               /* Wait until THR is empty. */
+			;                                             
 		}
 		fns->td0(c);
 		fns = fns->next;
@@ -1012,7 +1012,7 @@ uart_putc(char c)
 
 int
 uart_getc(void)
-{                               /* returns -1 if no data available */
+{                                                                    
 	struct pe_serial_functions *fns = gPESF;
 	while (fns != NULL) {
 		if (fns->rr0()) {

@@ -28,9 +28,9 @@
 #ifndef __CLANG_STDATOMIC_H
 #define __CLANG_STDATOMIC_H
 
-/* If we're hosted, fall back to the system's stdatomic.h. FreeBSD, for
- * example, already has a Clang-compatible stdatomic.h header.
- */
+                                                                       
+                                                              
+   
 #if __STDC_HOSTED__ && __has_include_next(<stdatomic.h>)
 # include_next <stdatomic.h>
 #else
@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-/* 7.17.1 Introduction */
+                         
 
 #define ATOMIC_BOOL_LOCK_FREE       __CLANG_ATOMIC_BOOL_LOCK_FREE
 #define ATOMIC_CHAR_LOCK_FREE       __CLANG_ATOMIC_CHAR_LOCK_FREE
@@ -55,12 +55,12 @@ extern "C" {
 #define ATOMIC_LLONG_LOCK_FREE      __CLANG_ATOMIC_LLONG_LOCK_FREE
 #define ATOMIC_POINTER_LOCK_FREE    __CLANG_ATOMIC_POINTER_LOCK_FREE
 
-/* 7.17.2 Initialization */
+                           
 
 #define ATOMIC_VAR_INIT(value) (value)
 #define atomic_init __c11_atomic_init
 
-/* 7.17.3 Order and consistency */
+                                  
 
 typedef enum memory_order {
   memory_order_relaxed = __ATOMIC_RELAXED,
@@ -73,10 +73,10 @@ typedef enum memory_order {
 
 #define kill_dependency(y) (y)
 
-/* 7.17.4 Fences */
+                   
 
 #ifndef KERNEL
-/* These should be provided by the libc implementation. */
+                                                          
 void atomic_thread_fence(memory_order);
 void atomic_signal_fence(memory_order);
 #endif
@@ -84,11 +84,11 @@ void atomic_signal_fence(memory_order);
 #define atomic_thread_fence(order) __c11_atomic_thread_fence(order)
 #define atomic_signal_fence(order) __c11_atomic_signal_fence(order)
 
-/* 7.17.5 Lock-free property */
+                               
 
 #define atomic_is_lock_free(obj) __c11_atomic_is_lock_free(sizeof(*(obj)))
 
-/* 7.17.6 Atomic integer types */
+                                 
 
 #ifdef __cplusplus
 typedef _Atomic(bool)               atomic_bool;
@@ -132,7 +132,7 @@ typedef _Atomic(ptrdiff_t)          atomic_ptrdiff_t;
 typedef _Atomic(intmax_t)           atomic_intmax_t;
 typedef _Atomic(uintmax_t)          atomic_uintmax_t;
 
-/* 7.17.7 Operations on atomic types */
+                                       
 
 #define atomic_store(object, desired) __c11_atomic_store(object, desired, __ATOMIC_SEQ_CST)
 #define atomic_store_explicit __c11_atomic_store
@@ -164,14 +164,14 @@ typedef _Atomic(uintmax_t)          atomic_uintmax_t;
 #define atomic_fetch_and(object, operand) __c11_atomic_fetch_and(object, operand, __ATOMIC_SEQ_CST)
 #define atomic_fetch_and_explicit __c11_atomic_fetch_and
 
-/* 7.17.8 Atomic flag type and operations */
+                                            
 
 typedef struct atomic_flag { atomic_bool _Value; } atomic_flag;
 
 #define ATOMIC_FLAG_INIT { 0 }
 
 #ifndef KERNEL
-/* These should be provided by the libc implementation. */
+                                                          
 #ifdef __cplusplus
 bool atomic_flag_test_and_set(volatile atomic_flag *);
 bool atomic_flag_test_and_set_explicit(volatile atomic_flag *, memory_order);
@@ -193,6 +193,6 @@ void atomic_flag_clear_explicit(volatile atomic_flag *, memory_order);
 }
 #endif
 
-#endif /* __STDC_HOSTED__ */
-#endif /* __CLANG_STDATOMIC_H */
+#endif                      
+#endif                          
 

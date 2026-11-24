@@ -1,11 +1,11 @@
-//
-// Tests for
-//  template <typename T, typename P1, typename U, typename P2>
-//  bool operator==(bounded_ptr<T, P1> const& a, bounded_ptr<U, P2> const& b);
-//
-//  template <typename T, typename P1, typename U, typename P2>
-//  bool operator!=(bounded_ptr<T, P1> const& a, bounded_ptr<U, P2> const& b);
-//
+  
+            
+                                                               
+                                                                              
+  
+                                                               
+                                                                              
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <array>
@@ -54,7 +54,7 @@ tests()
 {
 	std::array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 
-	// Pointers with the same bounds
+	                                
 	{
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin(), array.end());
 		test_bounded_ptr<TQual> const b(array.begin(), array.begin(), array.end());
@@ -81,7 +81,7 @@ tests()
 		check_eq(a, b);
 	}
 
-	// Compare null pointers
+	                        
 	{
 		test_bounded_ptr<TQual> const a;
 		test_bounded_ptr<TQual> const b(array.begin(), array.begin(), array.end());
@@ -93,33 +93,33 @@ tests()
 		check_eq(a, b);
 	}
 
-	// Pointers with different bounds
+	                                 
 	{
-		// Overlapping bounds, equal
+		                            
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin() + 2, array.end());
 		test_bounded_ptr<TQual> const b(array.begin(), array.begin(), array.end());
 		check_eq(a, b);
 	}
 	{
-		// Overlapping bounds, not equal
+		                                
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin() + 2, array.end());
 		test_bounded_ptr<TQual> const b(array.begin() + 2, array.begin(), array.end());
 		check_ne(a, b);
 	}
 	{
-		// Non-overlapping bounds, equal
+		                                
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin(), array.begin() + 1);
 		test_bounded_ptr<TQual> const b(array.begin(), array.begin() + 2, array.end());
 		check_eq(a, b);
 	}
 	{
-		// Non-overlapping bounds, not equal
+		                                    
 		test_bounded_ptr<TQual> const a(array.begin(), array.begin(), array.begin() + 1);
 		test_bounded_ptr<TQual> const b(array.begin() + 3, array.begin() + 2, array.end());
 		check_ne(a, b);
 	}
 
-	// Test with different policies
+	                               
 	{
 		libkern::bounded_ptr<TQual, dummy_policy1> const a(array.begin(), array.begin(), array.end());
 		libkern::bounded_ptr<TQual, dummy_policy2> const b(array.begin(), array.begin(), array.end());

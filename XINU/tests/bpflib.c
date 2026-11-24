@@ -41,7 +41,7 @@
 
 #ifdef TESTING
 #include "util.h"
-#endif /* TESTING */
+#endif              
 
 PRIVATE_EXTERN int
 bpf_set_timeout(int fd, struct timeval * tv_p)
@@ -90,7 +90,7 @@ bpf_new(void)
 #ifdef SO_TC_CTL
 			int tc = SO_TC_CTL;
 			(void) ioctl(fd, BIOCSETTC, &tc);
-#endif /* SO_TC_CTL */
+#endif                
 			break;
 		}
 		if (errno != EBUSY) {
@@ -204,4 +204,4 @@ main(int argc, char * argv[])
 	exit(0);
 	return 0;
 }
-#endif /* TESTING */
+#endif              

@@ -27,4 +27,4 @@
  */
 #ifndef offsetof
 #define offsetof(type, field) __offsetof(type, field)
-#endif /* offsetof */
+#endif               

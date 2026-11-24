@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* IOData.m created by rsulack on Thu 25-Sep-1997 */
+                                                    
 
 #include <string.h>
 
@@ -44,7 +44,7 @@ __END_DECLS
 #define super OSObject
 
 OSDefineMetaClassAndStructorsWithZone(OSData, OSObject, ZC_ZFREE_CLEARMEM)
-OSMetaClassDefineReservedUsedX86(OSData, 0);    // setDeallocFunction
+OSMetaClassDefineReservedUsedX86(OSData, 0);                         
 OSMetaClassDefineReservedUnused(OSData, 1);
 OSMetaClassDefineReservedUnused(OSData, 2);
 OSMetaClassDefineReservedUnused(OSData, 3);
@@ -63,7 +63,7 @@ OSData::initWithCapacity(unsigned int inCapacity)
 	if (data) {
 		OSCONTAINER_ACCUMSIZE(-((size_t)capacity));
 		if (!inCapacity || (capacity < inCapacity)) {
-			// clean out old data's storage if it isn't big enough
+			                                                      
 			if (capacity < page_size) {
 				kfree_data_container(data, capacity);
 			} else {
@@ -263,7 +263,7 @@ OSData::setCapacityIncrement(unsigned increment)
 	return capacityIncrement = increment;
 }
 
-// xx-review: does not check for capacity == EXTERNAL
+                                                     
 
 unsigned int
 OSData::ensureCapacity(unsigned int newCapacity)
@@ -280,7 +280,7 @@ OSData::ensureCapacity(unsigned int newCapacity)
 	finalCapacity = (((newCapacity - 1) / capacityIncrement) + 1)
 	    * capacityIncrement;
 
-	// integer overflow check
+	                         
 	if (finalCapacity < newCapacity) {
 		return capacity;
 	}
@@ -288,9 +288,9 @@ OSData::ensureCapacity(unsigned int newCapacity)
 	copydata = data;
 
 	if (finalCapacity >= page_size) {
-		// round up
+		           
 		finalCapacity = round_page_32(finalCapacity);
-		// integer overflow check
+		                         
 		if (finalCapacity < newCapacity) {
 			return capacity;
 		}
@@ -415,7 +415,7 @@ OSData::getBytesNoCopy(unsigned int start,
 
 	if (length
 	    && start < length
-	    && (start + inLength) >= inLength // overflow check
+	    && (start + inLength) >= inLength                  
 	    && (start + inLength) <= length) {
 		outData = (const void *) ((char *) data + start);
 	}
@@ -474,14 +474,14 @@ OSData::isEqualTo(const OSString *obj) const
 	dataPtr = (char *)data;
 
 	if (stringLen != checkLen) {
-		// check for the fact that OSData may be a buffer that
-		// that includes a termination byte and will thus have
-		// a length of the actual string length PLUS 1. In this
-		// case we verify that the additional byte is a terminator
-		// and if so count the two lengths as being the same.
+		                                                      
+		                                                      
+		                                                       
+		                                                          
+		                                                     
 
 		if ((checkLen - stringLen) == 1) {
-			if (dataPtr[checkLen - 1] != 0) { // non-zero means not a terminator and thus not likely the same
+			if (dataPtr[checkLen - 1] != 0) {                                                                
 				return false;
 			}
 			checkLen--;
@@ -501,7 +501,7 @@ OSData::isEqualTo(const OSString *obj) const
 	return true;
 }
 
-//this was taken from CFPropertyList.c
+                                      
 static const char __CFPLDataEncodeTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 bool
@@ -526,7 +526,7 @@ OSData::serialize(OSSerialize *s) const
 	}
 
 	for (i = 0, p = (unsigned char *)data; i < serializeLength; i++, p++) {
-		/* 3 bytes are encoded as 4 */
+		                              
 		switch (i % 3) {
 		case 0:
 			c = __CFPLDataEncodeTable[((p[0] >> 2) & 0x3f)];

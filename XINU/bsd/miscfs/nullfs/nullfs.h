@@ -78,7 +78,7 @@
 #include <System/libkern/tree.h>
 #endif
 
-// #define NULLFS_DEBUG 0
+                         
 
 #define NULLM_CACHE 0x0001
 #define NULLM_CASEINSENSITIVE 0x0000000000000002
@@ -87,16 +87,16 @@
 typedef int (*vop_t)(void *);
 
 struct null_mount {
-	struct vnode * nullm_rootvp;       /* Reference to root null_node (inode 1) */
-	struct vnode * nullm_secondvp;     /* Reference to virtual directory vnode to wrap app
-	                                    *  bundles (inode 2) */
-	struct vnode * nullm_thirdcovervp; /* Reference to vnode that covers
-	                                    *  lowerrootvp  (inode 3) */
-	struct vnode * nullm_lowerrootvp;  /* reference to the root of the tree we are
-	                                   *  relocating (in the other file system) */
-	uint32_t nullm_lowerrootvid;       /* store the lower root vid so we can check
-	                                    *  before we build the shadow vnode lazily*/
-	lck_mtx_t nullm_lock;              /* lock to protect vps above */
+	struct vnode * nullm_rootvp;                                                  
+	struct vnode * nullm_secondvp;                                                        
+                                                            
+	struct vnode * nullm_thirdcovervp;                                  
+                                                                 
+	struct vnode * nullm_lowerrootvp;                                             
+                                                                               
+	uint32_t nullm_lowerrootvid;                                                  
+                                                                                 
+	lck_mtx_t nullm_lock;                                             
 	uint64_t nullm_flags;
 	uid_t uid;
 	gid_t gid;
@@ -110,15 +110,15 @@ struct null_mount_conf {
 
 #define NULL_FLAG_HASHED 0x000000001
 
-/*
- * A cache of vnode references
- */
+  
+                              
+   
 struct null_node {
-	LIST_ENTRY(null_node) null_hash; /* Hash list */
-	struct vnode * null_lowervp;     /* VREFed once */
-	struct vnode * null_vnode;       /* Back pointer */
-	uint32_t null_lowervid;          /* vid for lowervp to detect lowervp getting recycled out
-	                                  *  from under us */
+	LIST_ENTRY(null_node) null_hash;                
+	struct vnode * null_lowervp;                      
+	struct vnode * null_vnode;                         
+	uint32_t null_lowervid;                                                                   
+                                                      
 	uint32_t null_myvid;
 	uint32_t null_flags;
 };
@@ -126,7 +126,7 @@ struct null_node {
 struct vnodeop_desc_fake {
 	int vdesc_offset;
 	const char * vdesc_name;
-	/* other stuff */
+	                 
 };
 
 #define NULLV_NOUNLOCK 0x0001
@@ -168,8 +168,8 @@ __END_DECLS
 #define NULLFSDEBUG(format, args...) printf(format, ##args)
 #else
 #define NULLFSDEBUG(format, args...)
-#endif /* NULLFS_DEBUG */
+#endif                   
 
-#endif /* KERNEL */
+#endif             
 
 #endif

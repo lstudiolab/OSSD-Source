@@ -28,14 +28,14 @@
 #ifndef _PEXPERT_I386_PROTOS_H
 #define _PEXPERT_I386_PROTOS_H
 
-//------------------------------------------------------------------------
-// x86 IN/OUT I/O inline functions.
-//
-// IN :  inb, inw, inl
-//       IN(port)
-//
-// OUT:  outb, outw, outl
-//       OUT(port, data)
+                                                                          
+                                   
+  
+                      
+                 
+  
+                         
+                        
 
 typedef unsigned short   i386_ioport_t;
 
@@ -72,9 +72,9 @@ __OUT(l, long)
 extern void cninit(void);
 extern int  sprintf(char * str, const char * format, ...);
 
-/* ------------------------------------------------------------------------
- * from osfmk/i386/serial_io.h
- */
+                                                                           
+                              
+   
 int switch_to_serial_console(void);
 void switch_to_old_console(int);
 boolean_t console_is_serial(void);
@@ -82,11 +82,11 @@ int serial_init(void);
 void serial_putc(char);
 int serial_getc(void);
 
-/* ------------------------------------------------------------------------
- * from osfmk/kern/misc_protos.h
- */
+                                                                           
+                                
+   
 void cnputc(char);
 void cnputc_unbuffered(char);
 int cngetc(void);
 
-#endif /* _PEXPERT_I386_PROTOS_H */
+#endif                             

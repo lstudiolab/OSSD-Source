@@ -94,7 +94,7 @@ public:
 	virtual IOReturn handleInterrupt(void *refCon, IOService *nub,
 	    int source);
 
-// Methods to be overridden for simplifed interrupt controller subclasses.
+                                                                          
 
 	virtual bool vectorCanBeShared(IOInterruptVectorNumber vectorNumber, IOInterruptVector *vector);
 	virtual void initVector(IOInterruptVectorNumber vectorNumber, IOInterruptVector *vector);
@@ -115,7 +115,7 @@ public:
 	OSMetaClassDeclareReservedUnused(IOInterruptController, 5);
 
 public:
-// Generic methods (not to be overriden).
+                                         
 
 	void timeStampSpuriousInterrupt(void);
 	void timeStampInterruptHandlerStart(IOInterruptVectorNumber vectorNumber, IOInterruptVector *vector);
@@ -166,4 +166,4 @@ public:
 };
 
 
-#endif /* ! _IOKIT_IOINTERRUPTCONTROLLER_H */
+#endif                                       

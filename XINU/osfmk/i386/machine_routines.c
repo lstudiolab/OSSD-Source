@@ -69,7 +69,7 @@
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 extern void     wakeup(void *);
 
@@ -98,9 +98,9 @@ static int max_cpus_initialized = 0;
 #define MAX_CPUS_SET    0x1
 #define MAX_CPUS_WAIT   0x2
 
-/* IO memory map services */
+                            
 
-/* Map memory map IO space */
+                             
 vm_offset_t
 ml_io_map(
 	vm_offset_t phys_addr,
@@ -109,7 +109,7 @@ ml_io_map(
 	return io_map(phys_addr, size, VM_WIMG_IO);
 }
 
-/* boot memory allocation */
+                            
 vm_offset_t
 ml_static_malloc(
 	__unused vm_size_t size)
@@ -144,9 +144,9 @@ ml_static_slide(
 	return VM_KERNEL_SLIDE(vaddr);
 }
 
-/*
- * base must be page-aligned, and size must be a multiple of PAGE_SIZE
- */
+  
+                                                                      
+   
 kern_return_t
 ml_static_verify_page_protections(
 	uint64_t base, uint64_t size, vm_prot_t prot)
@@ -156,13 +156,13 @@ ml_static_verify_page_protections(
 
 	DBG("ml_static_verify_page_protections: vaddr 0x%llx sz 0x%llx prot 0x%x\n", base, size, prot);
 
-	/*
-	 * base must be within the static bounds, defined to be:
-	 * (vm_kernel_stext, kc_highest_nonlinkedit_vmaddr)
-	 */
+	  
+                                                         
+                                                    
+    
 #if DEVELOPMENT || DEBUG || KASAN
 	assert(kc_highest_nonlinkedit_vmaddr > 0 && base > vm_kernel_stext && base < kc_highest_nonlinkedit_vmaddr);
-#else   /* On release kernels, assume this is a protection mismatch failure. */
+#else                                                                          
 	if (kc_highest_nonlinkedit_vmaddr == 0 || base < vm_kernel_stext || base >= kc_highest_nonlinkedit_vmaddr) {
 		return KERN_FAILURE;
 	}
@@ -187,10 +187,10 @@ ml_static_unslide(
 	return VM_KERNEL_UNSLIDE(vaddr);
 }
 
-/*
- * Reclaim memory, by virtual address, that was used in early boot that is no longer needed
- * by the kernel.
- */
+  
+                                                                                           
+                 
+   
 void
 ml_static_mfree(
 	vm_offset_t vaddr,
@@ -203,20 +203,20 @@ ml_static_mfree(
 
 	assert(vaddr >= VM_MIN_KERNEL_ADDRESS);
 
-	assert((vaddr & (PAGE_SIZE - 1)) == 0); /* must be page aligned */
+	assert((vaddr & (PAGE_SIZE - 1)) == 0);                           
 
 	for (vaddr_cur = vaddr; vaddr_cur < round_page_64(vaddr + size);) {
 		map_size = pmap_query_pagesize(kernel_pmap, vaddr_cur);
 
-		/* just skip if nothing mapped here */
+		                                      
 		if (map_size == 0) {
 			vaddr_cur += PAGE_SIZE;
 			continue;
 		}
 
-		/*
-		 * Can't free from the middle of a large page.
-		 */
+		  
+                                                
+     
 		assert((vaddr_cur & (map_size - 1)) == 0);
 
 		ppn = pmap_find_phys(kernel_pmap, vaddr_cur);
@@ -252,7 +252,7 @@ ml_static_mfree(
 #endif
 }
 
-/* Change page protections for addresses previously loaded by efiboot */
+                                                                        
 kern_return_t
 ml_static_protect(vm_offset_t vmaddr, vm_size_t size, vm_prot_t prot)
 {
@@ -265,7 +265,7 @@ ml_static_protect(vm_offset_t vmaddr, vm_size_t size, vm_prot_t prot)
 	return KERN_SUCCESS;
 }
 
-/* virtual to physical on wired pages */
+                                        
 vm_offset_t
 ml_vtophys(
 	vm_offset_t vaddr)
@@ -273,15 +273,15 @@ ml_vtophys(
 	return (vm_offset_t)kvtophys(vaddr);
 }
 
-/*
- *	Routine:        ml_nofault_copy
- *	Function:	Perform a physical mode copy if the source and
- *			destination have valid translations in the kernel pmap.
- *			If translations are present, they are assumed to
- *			be wired; i.e. no attempt is made to guarantee that the
- *			translations obtained remained valid for
- *			the duration of the copy process.
- */
+  
+                                  
+                                                           
+                                                            
+                                                     
+                                                            
+                                             
+                                      
+   
 
 vm_size_t
 ml_nofault_copy(
@@ -319,15 +319,15 @@ ml_nofault_copy(
 	return nbytes;
 }
 
-/*
- *	Routine:        ml_validate_nofault
- *	Function: Validate that ths address range has a valid translations
- *			in the kernel pmap.  If translations are present, they are
- *			assumed to be wired; i.e. no attempt is made to guarantee
- *			that the translation persist after the check.
- *  Returns: TRUE if the range is mapped and will not cause a fault,
- *			FALSE otherwise.
- */
+  
+                                      
+                                                                     
+                                                               
+                                                              
+                                                  
+                                                                    
+                     
+   
 
 boolean_t
 ml_validate_nofault(
@@ -355,9 +355,9 @@ ml_validate_nofault(
 	return TRUE;
 }
 
-/* Interrupt handling */
+                        
 
-/* Initialize Interrupts */
+                           
 void
 ml_init_interrupt(void)
 {
@@ -365,7 +365,7 @@ ml_init_interrupt(void)
 }
 
 
-/* Get Interrupts Enabled */
+                            
 boolean_t
 ml_get_interrupts_enabled(void)
 {
@@ -375,7 +375,7 @@ ml_get_interrupts_enabled(void)
 	return (flags & EFL_IF) != 0;
 }
 
-/* Set Interrupts Enabled */
+                            
 boolean_t
 ml_set_interrupts_enabled(boolean_t enable)
 {
@@ -403,7 +403,7 @@ ml_set_interrupts_enabled(boolean_t enable)
 	return istate;
 }
 
-/* Early Set Interrupts Enabled */
+                                  
 boolean_t
 ml_early_set_interrupts_enabled(boolean_t enable)
 {
@@ -411,14 +411,14 @@ ml_early_set_interrupts_enabled(boolean_t enable)
 		kprintf("Caller attempted to enable interrupts too early in "
 		    "kernel startup. Halting.\n");
 		hlt();
-		/*NOTREACHED*/
+		              
 	}
 
-	/* On x86, do not allow interrupts to be enabled very early */
+	                                                              
 	return FALSE;
 }
 
-/* Check if running at interrupt context */
+                                           
 boolean_t
 ml_at_interrupt_context(void)
 {
@@ -429,14 +429,14 @@ void
 ml_get_power_state(boolean_t *icp, boolean_t *pidlep)
 {
 	*icp = (get_interrupt_level() != 0);
-	/* These will be technically inaccurate for interrupts that occur
-	 * successively within a single "idle exit" event, but shouldn't
-	 * matter statistically.
-	 */
+	                                                                 
+                                                                 
+                         
+    
 	*pidlep = (current_cpu_datap()->lcpu.package->num_idle == topoParms.nLThreadsPerPackage);
 }
 
-/* Generate a fake interrupt */
+                               
 __dead2
 void
 ml_cause_interrupt(void)
@@ -444,10 +444,10 @@ ml_cause_interrupt(void)
 	panic("ml_cause_interrupt not defined yet on Intel");
 }
 
-/*
- * TODO: transition users of this to kernel_thread_start_priority
- * ml_thread_policy is an unsupported KPI
- */
+  
+                                                                 
+                                         
+   
 void
 ml_thread_policy(
 	thread_t thread,
@@ -467,7 +467,7 @@ ml_thread_policy(
 	}
 }
 
-/* Initialize Interrupts */
+                           
 void
 ml_install_interrupt_handler(
 	void *nub,
@@ -529,9 +529,9 @@ register_cpu(
 
 	lapic_cpu_map(lapic_id, target_cpu);
 
-	/* The cpu_id is not known at registration phase. Just do
-	 * lapic_id for now
-	 */
+	                                                         
+                    
+    
 	this_cpu_datap->cpu_phys_number = lapic_id;
 
 	this_cpu_datap->cpu_console_buf = console_cpu_alloc(boot_cpu);
@@ -552,11 +552,11 @@ register_cpu(
 		}
 	}
 
-	/*
-	 * processor_init() deferred to topology start
-	 * because "slot numbers" a.k.a. logical processor numbers
-	 * are not yet finalized.
-	 */
+	  
+                                               
+                                                           
+                          
+    
 	*processor_out = this_cpu_datap->cpu_processor;
 
 	return KERN_SUCCESS;
@@ -565,7 +565,7 @@ failed:
 	console_cpu_free(this_cpu_datap->cpu_console_buf);
 #if KPC
 	kpc_unregister_cpu(this_cpu_datap);
-#endif /* KPC */
+#endif          
 
 	return KERN_FAILURE;
 }
@@ -582,7 +582,7 @@ ml_processor_register(
 	static boolean_t done_topo_sort = FALSE;
 	static uint32_t num_registered = 0;
 
-	/* Register all CPUs first, and track max */
+	                                            
 	if (start == FALSE) {
 		num_registered++;
 
@@ -591,7 +591,7 @@ ml_processor_register(
 		return register_cpu( lapic_id, processor_out, boot_cpu );
 	}
 
-	/* Sort by topology before we start anything */
+	                                               
 	if (!done_topo_sort) {
 		DBG( "about to start CPUs. %d registered\n", num_registered );
 
@@ -599,32 +599,32 @@ ml_processor_register(
 		done_topo_sort = TRUE;
 	}
 
-	/* Assign the cpu ID */
+	                       
 	uint32_t cpunum = -1;
 	cpu_data_t  *this_cpu_datap = NULL;
 
-	/* find cpu num and pointer */
+	                              
 	cpunum = ml_get_cpuid( lapic_id );
 
-	if (cpunum == 0xFFFFFFFF) { /* never heard of it? */
+	if (cpunum == 0xFFFFFFFF) {                         
 		panic( "trying to start invalid/unregistered CPU %d\n", lapic_id );
 	}
 
 	this_cpu_datap = cpu_datap(cpunum);
 
-	/* fix the CPU id */
+	                    
 	this_cpu_datap->cpu_id = cpu_id;
 
-	/* allocate and initialize other per-cpu structures */
+	                                                      
 	if (!boot_cpu) {
 		mp_cpus_call_cpu_init(cpunum);
 		random_cpu_init(cpunum);
 	}
 
-	/* output arg */
+	                
 	*processor_out = this_cpu_datap->cpu_processor;
 
-	/* OK, try and start this CPU */
+	                                
 	return cpu_topology_start_cpu( cpunum );
 }
 
@@ -639,10 +639,10 @@ ml_cpu_get_info(ml_cpu_info_t *cpu_infop)
 		return;
 	}
 
-	/*
-	 * Are we supporting MMX/SSE/SSE2/SSE3?
-	 * As distinct from whether the cpu has these capabilities.
-	 */
+	  
+                                        
+                                                            
+    
 	os_supports_sse = !!(get_cr4() & CR4_OSXMM);
 
 	if (ml_fpu_avx_enabled()) {
@@ -707,12 +707,12 @@ ml_set_max_cpus(unsigned int max_cpus)
 	lck_mtx_lock(&max_cpus_lock);
 	if (max_cpus_initialized != MAX_CPUS_SET) {
 		if (max_cpus > 0 && max_cpus <= MAX_CPUS) {
-			/*
-			 * Note: max_cpus is the number of enabled processors
-			 * that ACPI found; max_ncpus is the maximum number
-			 * that the kernel supports or that the "cpus="
-			 * boot-arg has set. Here we take int minimum.
-			 */
+			  
+                                                        
+                                                      
+                                                  
+                                                 
+      
 			machine_info.max_cpus = (integer_t)MIN(max_cpus, max_ncpus);
 		}
 		if (max_cpus_initialized == MAX_CPUS_WAIT) {
@@ -778,16 +778,16 @@ virtual_timeout_inflate32(unsigned int vti, uint32_t timeout, uint32_t max_timeo
 	return timeout << vti;
 }
 
-/*
- * Some timeouts are later adjusted or used in calculations setting
- * other values. In order to avoid overflow, cap the max timeout as
- * 2^47ns (~39 hours).
- */
+  
+                                                                   
+                                                                   
+                      
+   
 static const uint64_t max_timeout_ns = 1ULL << 47;
 
-/*
- * Inflate a timeout in absolutetime.
- */
+  
+                                     
+   
 static uint64_t
 virtual_timeout_inflate_abs(unsigned int vti, uint64_t timeout)
 {
@@ -796,9 +796,9 @@ virtual_timeout_inflate_abs(unsigned int vti, uint64_t timeout)
 	return virtual_timeout_inflate64(vti, timeout, max_timeout);
 }
 
-/*
- * Inflate a value in TSC ticks.
- */
+  
+                                
+   
 static uint64_t
 virtual_timeout_inflate_tsc(unsigned int vti, uint64_t timeout)
 {
@@ -806,9 +806,9 @@ virtual_timeout_inflate_tsc(unsigned int vti, uint64_t timeout)
 	return virtual_timeout_inflate64(vti, timeout, max_timeout);
 }
 
-/*
- * Inflate a timeout in microseconds.
- */
+  
+                                     
+   
 static uint32_t
 virtual_timeout_inflate_us(unsigned int vti, uint64_t timeout)
 {
@@ -822,10 +822,10 @@ ml_get_timebase_entropy(void)
 	return __builtin_ia32_rdtsc();
 }
 
-/*
- *	Routine:        ml_init_lock_timeout
- *	Function:
- */
+  
+                                       
+            
+   
 void
 ml_init_lock_timeout(void)
 {
@@ -843,21 +843,21 @@ ml_init_lock_timeout(void)
 		default_timeout_ns = slto * NSEC_PER_USEC;
 	}
 
-	/*
-	 * LockTimeOut is absolutetime, LockTimeOutTSC is in TSC ticks,
-	 * and LockTimeOutUsec is in microseconds and it's 32-bits.
-	 */
+	  
+                                                                
+                                                            
+    
 	LockTimeOutUsec = (uint32_t) (default_timeout_ns / NSEC_PER_USEC);
 	nanoseconds_to_absolutetime(default_timeout_ns, &abstime);
 	LockTimeOut = abstime;
 	LockTimeOutTSC = tmrCvt(abstime, tscFCvtn2t);
 
-	/*
-	 * TLBTimeOut dictates the TLB flush timeout period. It defaults to
-	 * LockTimeOut but can be overriden separately. In particular, a
-	 * zero value inhibits the timeout-panic and cuts a trace evnt instead
-	 * - see pmap_flush_tlbs().
-	 */
+	  
+                                                                    
+                                                                 
+                                                                       
+                            
+    
 	if (PE_parse_boot_argn("tlbto_us", &slto, sizeof(slto))) {
 		default_timeout_ns = slto * NSEC_PER_USEC;
 		nanoseconds_to_absolutetime(default_timeout_ns, &abstime);
@@ -900,10 +900,10 @@ ml_init_lock_timeout(void)
 	}
 	MutexSpin = (unsigned int)abstime;
 	low_MutexSpin = MutexSpin;
-	/*
-	 * high_MutexSpin should be initialized as low_MutexSpin * real_ncpus, but
-	 * real_ncpus is not set at this time
-	 */
+	  
+                                                                           
+                                      
+    
 	high_MutexSpin = -1;
 
 	nanoseconds_to_absolutetime(4ULL * NSEC_PER_SEC, &LastDebuggerEntryAllowance);
@@ -952,10 +952,10 @@ MACRO_END
 	simple_lock_init(&ml_timer_evaluation_slock, 0);
 }
 
-/*
- * Threshold above which we should attempt to block
- * instead of spinning for clock_delay_until().
- */
+  
+                                                   
+                                               
+   
 
 void
 ml_init_delay_spin_threshold(int threshold_us)
@@ -981,20 +981,20 @@ ml_delay_on_yield(void)
 #endif
 }
 
-/*
- * This is called from the machine-independent layer
- * to perform machine-dependent info updates. Defer to cpu_thread_init().
- */
+  
+                                                    
+                                                                         
+   
 void
 ml_cpu_up(void)
 {
 	return;
 }
 
-/*
- * This is called from the machine-independent layer
- * to perform machine-dependent info updates.
- */
+  
+                                                    
+                                             
+   
 void
 ml_cpu_down(void)
 {
@@ -1003,10 +1003,10 @@ ml_cpu_down(void)
 	return;
 }
 
-/*
- * The following are required for parts of the kernel
- * that cannot resolve these functions as inlines:
- */
+  
+                                                     
+                                                  
+   
 extern thread_t current_act(void) __attribute__((const));
 thread_t
 current_act(void)
@@ -1046,10 +1046,10 @@ ml_state_is64bit(void *saved_state)
 void
 ml_cpu_set_ldt(int selector)
 {
-	/*
-	 * Avoid loading the LDT
-	 * if we're setting the KERNEL LDT and it's already set.
-	 */
+	  
+                         
+                                                         
+    
 	if (selector == KERNEL_LDT &&
 	    current_cpu_datap()->cpu_ldt == KERNEL_LDT) {
 		return;
@@ -1117,17 +1117,17 @@ kernel_preempt_check(void)
 	assert(get_preemption_level() == 0);
 
 	if (__improbable(*ast_pending() & AST_URGENT)) {
-		/*
-		 * can handle interrupts and preemptions
-		 * at this point
-		 */
+		  
+                                          
+                  
+     
 		__asm__ volatile ("pushf; pop	%0"  :  "=r" (flags));
 
 		intr = ((flags & EFL_IF) != 0);
 
-		/*
-		 * now cause the PRE-EMPTION trap
-		 */
+		  
+                                   
+     
 		if (intr == TRUE) {
 			__asm__ volatile ("int %0" :: "N" (T_PREEMPT));
 		}
@@ -1140,8 +1140,8 @@ machine_timeout_suspended(void)
 	return pmap_tlb_flush_timeout || spinlock_timed_out || panic_active() || mp_recent_debugger_activity() || ml_recent_wake();
 }
 
-/* Eagerly evaluate all pending timer and thread callouts
- */
+                                                         
+   
 void
 ml_timer_evaluate(void)
 {

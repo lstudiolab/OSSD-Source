@@ -65,6 +65,6 @@ T_DECL(thread_set_state_corrupted_pc,
 
 	err = thread_terminate(thread);
 	T_QUIET; T_EXPECT_EQ(err, KERN_SUCCESS, "Terminated thread");
-#endif // __arm64e__
+#endif              
 }
 

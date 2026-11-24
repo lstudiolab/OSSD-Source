@@ -40,8 +40,8 @@ extern "C" {
 #if PRAGMA_MARK
 #pragma mark C-based kext interface (loading/loaded kexts only)
 #endif
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 kern_return_t
 OSKextLoadKextWithIdentifier(const char * bundle_id)
 {
@@ -49,13 +49,13 @@ OSKextLoadKextWithIdentifier(const char * bundle_id)
 }
 
 uint32_t OSKextGetLoadTagForIdentifier(const char * kextIdentifier);
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 uint32_t
 OSKextGetLoadTagForIdentifier(const char * kextIdentifier)
 {
 	uint32_t result  = kOSKextInvalidLoadTag;
-	OSKext * theKext = NULL; // must release
+	OSKext * theKext = NULL;                
 
 	if (!kextIdentifier) {
 		goto finish;
@@ -72,19 +72,19 @@ finish:
 	return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
-// FIXME: Implementation of this function is hidden from the static analyzer.
-// The analyzer is worried about the lack of release and suggests
-// refactoring the code into the typical non-owning container pattern.
-// Feel free to remove the #ifndef and address the warning!
+                                                                             
+                                                                 
+                                                                      
+                                                           
 #ifndef __clang_analyzer__
 OSReturn
 OSKextRetainKextWithLoadTag(uint32_t loadTag)
 {
 	OSReturn   result = kOSKextReturnNotFound;
-	OSKext   * theKext = NULL;// do not release; as this function is a retain
+	OSKext   * theKext = NULL;                                               
 
 	if (loadTag == kOSKextInvalidLoadTag) {
 		result = kOSKextReturnInvalidArgument;
@@ -101,8 +101,8 @@ OSKextRetainKextWithLoadTag(uint32_t loadTag)
 		    theKext->getIdentifierCString(),
 		    loadTag);
 
-		/* Call this after so a log message about autounload comes second.
-		 */
+		                                                                  
+     
 		theKext->setAutounloadEnabled(true);
 	} else {
 		OSKextLog(theKext,
@@ -114,21 +114,21 @@ OSKextRetainKextWithLoadTag(uint32_t loadTag)
 finish:
 	return result;
 }
-#endif // __clang_analyzer__
+#endif                      
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
-// FIXME: Implementation of this function is hidden from the static analyzer.
-// The analyzer is worried about the double release and suggests
-// refactoring the code into the typical non-owning container pattern.
-// Feel free to remove the #ifndef and address the warning!
+                                                                             
+                                                                
+                                                                      
+                                                           
 #ifndef __clang_analyzer__
 OSReturn
 OSKextReleaseKextWithLoadTag(uint32_t loadTag)
 {
 	OSReturn result  = kOSKextReturnNotFound;
-	OSKext * theKext = NULL; // must release twice!
+	OSKext * theKext = NULL;                       
 
 	if (loadTag == kOSKextInvalidLoadTag) {
 		result = kOSKextReturnInvalidArgument;
@@ -137,9 +137,9 @@ OSKextReleaseKextWithLoadTag(uint32_t loadTag)
 	theKext = OSKext::lookupKextWithLoadTag(loadTag);
 	if (theKext) {
 		result = kOSReturnSuccess;
-		OSKext::considerUnloads(); // schedule autounload pass
-		theKext->release(); // do the release the caller wants
-		theKext->release(); // now do the release on the lookup
+		OSKext::considerUnloads();                            
+		theKext->release();                                   
+		theKext->release();                                    
 		OSKextLog(theKext,
 		    kOSKextLogDebugLevel |
 		    kOSKextLogKextBookkeepingFlag,
@@ -154,30 +154,30 @@ OSKextReleaseKextWithLoadTag(uint32_t loadTag)
 		    loadTag);
 	}
 
-	// xxx - should I check that the refcount of the OSKext is above the lower bound?
-	// xxx - do we want a OSKextGetRetainCountOfKextWithLoadTag()?
+	                                                                                 
+	                                                              
 finish:
 	return result;
 }
-#endif // __clang_analyzer__
+#endif                      
 
-/*********************************************************************
-* Not to be called by the kext being unloaded!
-*********************************************************************/
+                                                                      
+                                              
+                                                                      
 OSReturn
 OSKextUnloadKextWithLoadTag(uint32_t loadTag)
 {
 	return OSKext::removeKextWithLoadTag(loadTag,
-	           /* terminateServicesAndRemovePersonalitiesFlag */ false);
+	                                                             false);
 }
 
 
 #if PRAGMA_MARK
 #pragma mark Kext Requests
 #endif
-/*********************************************************************
-* Kext Requests
-*********************************************************************/
+                                                                      
+               
+                                                                      
 OSReturn
 OSKextRequestResource(
 	const char                    * kextIdentifier,
@@ -190,8 +190,8 @@ OSKextRequestResource(
 	           callback, context, requestTagOut);
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSReturn
 OSKextCancelRequest(
 	OSKextRequestTag    requestTag,
@@ -203,51 +203,51 @@ OSKextCancelRequest(
 #if PRAGMA_MARK
 #pragma mark MIG Functions & Wrappers
 #endif
-/*********************************************************************
-* IMPORTANT: vm_map_copyout_size() consumes the requestIn copy
-* object on success. Therefore once it has been invoked successfully,
-* this routine *must* return KERN_SUCCESS, regardless of our actual
-* result. Our contract with the caller is that requestIn must be
-* caller-deallocated if we return an error. We use op_result to return
-* the real result of our work.
-*********************************************************************/
+                                                                      
+                                                              
+                                                                     
+                                                                   
+                                                                
+                                                                      
+                              
+                                                                      
 kern_return_t
 kext_request(
 	host_priv_t                             hostPriv,
-	/* in only */ uint32_t                 clientLogSpec,
-	/* in only */ vm_offset_t              requestIn,
-	/* in only */ mach_msg_type_number_t   requestLengthIn,
-	/* out only */ vm_offset_t            * responseOut,
-	/* out only */ mach_msg_type_number_t * responseLengthOut,
-	/* out only */ vm_offset_t            * logDataOut,
-	/* out only */ mach_msg_type_number_t * logDataLengthOut,
-	/* out only */ kern_return_t          * op_result)
+	              uint32_t                 clientLogSpec,
+	              vm_offset_t              requestIn,
+	              mach_msg_type_number_t   requestLengthIn,
+	               vm_offset_t            * responseOut,
+	               mach_msg_type_number_t * responseLengthOut,
+	               vm_offset_t            * logDataOut,
+	               mach_msg_type_number_t * logDataLengthOut,
+	               kern_return_t          * op_result)
 {
 	kern_return_t     result          = KERN_FAILURE;
-	vm_map_address_t  map_addr        = 0; // do not free/deallocate
-	char            * request         = NULL;// must vm_deallocate
+	vm_map_address_t  map_addr        = 0;                          
+	char            * request         = NULL;                     
 
-	mkext2_header   * mkextHeader     = NULL;// do not release
+	mkext2_header   * mkextHeader     = NULL;                 
 	bool              isMkext         = false;
 
-	char            * response        = NULL;// must kmem_free
+	char            * response        = NULL;                 
 	uint32_t          responseLength  = 0;
-	char            * logData         = NULL;// must kmem_free
+	char            * logData         = NULL;                 
 	uint32_t          logDataLength   = 0;
 
-	/* MIG doesn't pass "out" parameters as empty, so clear them immediately
-	 * just in case, or MIG will try to copy out bogus data.
-	 */
+	                                                                        
+                                                         
+    
 	*op_result = KERN_FAILURE;
 	*responseOut = 0;
 	*responseLengthOut = 0;
 	*logDataOut = 0;
 	*logDataLengthOut = 0;
 
-	/* Check for input. Don't discard what isn't there, though.
-	 */
+	                                                           
+    
 	if (!requestLengthIn || !requestIn) {
-		OSKextLog(/* kext */ NULL,
+		OSKextLog(           NULL,
 		    kOSKextLogErrorLevel |
 		    kOSKextLogIPCFlag,
 		    "Invalid request from user space (no data).");
@@ -257,24 +257,24 @@ kext_request(
 
 	result = vm_map_copyout_size(kernel_map, &map_addr, (vm_map_copy_t)requestIn, requestLengthIn);
 	if (result != KERN_SUCCESS) {
-		OSKextLog(/* kext */ NULL,
+		OSKextLog(           NULL,
 		    kOSKextLogErrorLevel |
 		    kOSKextLogIPCFlag,
 		    "vm_map_copyout() failed for request from user space.");
-		/*
-		 * If we return an error it is our caller's responsibility to
-		 * deallocate the requestIn copy object, so do not deallocate it
-		 * here. See comment above.
-		 */
+		  
+                                                               
+                                                                  
+                             
+     
 		goto finish;
 	}
 	request = CAST_DOWN(char *, map_addr);
 
-	/* Check if request is an mkext; this is always a load request
-	 * and requires root access. If it isn't an mkext, see if it's
-	 * an XML request, and check the request to see if that requires
-	 * root access.
-	 */
+	                                                              
+                                                               
+                                                                 
+                
+    
 	if (requestLengthIn > sizeof(mkext2_header)) {
 		mkextHeader = (mkext2_header *)request;
 		if (MKEXT_GET_MAGIC(mkextHeader) == MKEXT_MAGIC &&
@@ -285,15 +285,15 @@ kext_request(
 
 	if (isMkext) {
 #if defined(SECURE_KERNEL) || !CONFIG_KXLD
-		// xxx - something tells me if we have a secure kernel we don't even
-		// xxx - want to log a message here. :-)
+		                                                                    
+		                                        
 		*op_result = KERN_NOT_SUPPORTED;
 		goto finish;
 #else
-		// xxx - can we find out if calling task is kextd?
-		// xxx - can we find the name of the calling task?
+		                                                  
+		                                                  
 		if (hostPriv == HOST_PRIV_NULL) {
-			OSKextLog(/* kext */ NULL,
+			OSKextLog(           NULL,
 			    kOSKextLogErrorLevel |
 			    kOSKextLogLoadFlag | kOSKextLogIPCFlag,
 			    "Attempt by non-root process to load a kext.");
@@ -305,11 +305,11 @@ kext_request(
 		    request, requestLengthIn,
 		    &logData, &logDataLength);
 
-#endif /* defined(SECURE_KERNEL) */
+#endif                             
 	} else {
-		/* If the request isn't an mkext, then is should be XML. Parse it
-		 * if possible and hand the request over to OSKext.
-		 */
+		                                                                 
+                                                     
+     
 		*op_result = OSKext::handleRequest(hostPriv,
 		    (OSKextLogSpec)clientLogSpec,
 		    request, requestLengthIn,
@@ -322,15 +322,15 @@ kext_request(
 
 		copyin_result = vm_map_copyin(kernel_map,
 		    CAST_USER_ADDR_T(response), responseLength,
-		    /* src_destroy */ false, (vm_map_copy_t *)responseOut);
+		                      false, (vm_map_copy_t *)responseOut);
 		if (copyin_result == KERN_SUCCESS) {
 			*responseLengthOut = responseLength;
 		} else {
-			OSKextLog(/* kext */ NULL,
+			OSKextLog(           NULL,
 			    kOSKextLogErrorLevel |
 			    kOSKextLogIPCFlag,
 			    "Failed to copy response to request from user space.");
-			*op_result = copyin_result; // xxx - should we map to our own code?
+			*op_result = copyin_result;                                        
 			*responseOut = 0;
 			*responseLengthOut = 0;
 			goto finish;
@@ -342,15 +342,15 @@ kext_request(
 
 		copyin_result = vm_map_copyin(kernel_map,
 		    CAST_USER_ADDR_T(logData), logDataLength,
-		    /* src_destroy */ false, (vm_map_copy_t *)logDataOut);
+		                      false, (vm_map_copy_t *)logDataOut);
 		if (copyin_result == KERN_SUCCESS) {
 			*logDataLengthOut = logDataLength;
 		} else {
-			OSKextLog(/* kext */ NULL,
+			OSKextLog(           NULL,
 			    kOSKextLogErrorLevel |
 			    kOSKextLogIPCFlag,
 			    "Failed to copy log data for request from user space.");
-			*op_result = copyin_result; // xxx - should we map to our own code?
+			*op_result = copyin_result;                                        
 			*logDataOut = 0;
 			*logDataLengthOut = 0;
 			goto finish;
@@ -362,20 +362,20 @@ finish:
 		(void)vm_deallocate(kernel_map, (vm_offset_t)request, requestLengthIn);
 	}
 	if (response) {
-		/* 11981737 - clear uninitialized data in last page */
+		                                                      
 		kmem_free(kernel_map, (vm_offset_t)response, round_page(responseLength));
 	}
 	if (logData) {
-		/* 11981737 - clear uninitialized data in last page */
+		                                                      
 		kmem_free(kernel_map, (vm_offset_t)logData, round_page(logDataLength));
 	}
 
 	return result;
 }
 
-/*********************************************************************
-* Gets the vm_map for the current kext
-*********************************************************************/
+                                                                      
+                                      
+                                                                      
 extern vm_offset_t segPRELINKTEXTB;
 extern vm_offset_t segLINKB;
 extern unsigned long segSizePRELINKTEXT;
@@ -388,7 +388,7 @@ kext_get_vm_map(kmod_info_t *info)
 	kc_format_t kcformat;
 
 	if (PE_get_primary_kc_format(&kcformat) && kcformat == KCFormatFileset) {
-		/* Check if the kext is from the boot KC */
+		                                           
 		assert(segLINKB >= (segPRELINKTEXTB + segSizePRELINKTEXT));
 		if ((info->address >= segPRELINKTEXTB) &&
 		    (info->address < segLINKB)) {
@@ -410,9 +410,9 @@ kext_get_vm_map(kmod_info_t *info)
 
 
 #if PRAGMA_MARK
-/********************************************************************/
+                                                                      
 #pragma mark Weak linking support
-/********************************************************************/
+                                                                      
 #endif
 void
 kext_weak_symbol_referenced(void)
@@ -425,9 +425,9 @@ const void * const gOSKextUnresolved = (const void *)&kext_weak_symbol_reference
 #if PRAGMA_MARK
 #pragma mark Kernel-Internal C Functions
 #endif
-/*********************************************************************
-* Called from startup.c.
-*********************************************************************/
+                                                                      
+                        
+                                                                      
 void
 OSKextRemoveKextBootstrap(void)
 {
@@ -436,18 +436,18 @@ OSKextRemoveKextBootstrap(void)
 }
 
 #if CONFIG_DTRACE
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSKextRegisterKextsWithDTrace(void)
 {
 	OSKext::registerKextsWithDTrace();
 	return;
 }
-#endif /* CONFIG_DTRACE */
+#endif                    
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 kext_dump_panic_lists(int (*printf_func)(const char * fmt, ...))
 {
@@ -458,19 +458,19 @@ kext_dump_panic_lists(int (*printf_func)(const char * fmt, ...))
 #if PRAGMA_MARK
 #pragma mark Kmod Compatibility Functions
 #endif
-/*********************************************************************
-**********************************************************************
-*                    KMOD COMPATIBILITY FUNCTIONS                    *
-*              (formerly in kmod.c, or C++ bridges from)             *
-**********************************************************************
-**********************************************************************
-* These two functions are used in various places in the kernel, but
-* are not exported. We might rename them at some point to start with
-* kext_ or OSKext.
-*
-* kmod_panic_dump() must not be called outside of a panic context.
-* kmod_dump_log() must not be called in a panic context.
-*********************************************************************/
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                   
+                                                                    
+                  
+ 
+                                                                  
+                                                        
+                                                                      
 void
 kmod_panic_dump(vm_offset_t * addr, unsigned int cnt)
 {
@@ -481,7 +481,7 @@ kmod_panic_dump(vm_offset_t * addr, unsigned int cnt)
 	return;
 }
 
-/********************************************************************/
+                                                                      
 void kmod_dump_log(vm_offset_t *addr, unsigned int cnt, boolean_t doUnslide);
 
 void
@@ -504,10 +504,10 @@ OSKextKextForAddress(const void *addr)
 }
 
 
-/*********************************************************************
-* Compatibility implementation for kmod_get_info() host_priv routine.
-* Only supported on old 32-bit architectures.
-*********************************************************************/
+                                                                      
+                                                                     
+                                             
+                                                                      
 
 #if PRAGMA_MARK
 #pragma mark Loaded Kext Summary
@@ -516,6 +516,6 @@ OSKextKextForAddress(const void *addr)
 void
 OSKextLoadedKextSummariesUpdated(void)
 {
-	// Do nothing.
+	              
 }
 };

@@ -37,31 +37,31 @@
 
 #ifdef  XNU_KERNEL_PRIVATE
 
-/*
- * The btlog subsystem allows for fast unobtrusive backtraces
- * to be recorded and maintained in chronological order.
- *
- * Each backtrace is associated with an element/object,
- * and an operation. For example, memory allocations and
- * frees can be tracked with this infrastructure. So
- * can refcounts. The "operation" namespace is maintained
- * by the caller.
- *
- * When the event buffer fills, records are reused in FIFO
- * order.
- *
- * When a btlog_t is created, callbacks can be provided
- * to ensure proper locking of the datastructures. If these
- * are not provided, the caller is responsible for
- * preventing simultaneous modification.
- */
+  
+                                                             
+                                                        
+  
+                                                       
+                                                        
+                                                    
+                                                         
+                 
+  
+                                                          
+         
+  
+                                                       
+                                                           
+                                                  
+                                        
+   
 
-/*
- * BTLOG_MAX_DEPTH configures how deep of a stack trace is stored.  15
- * levels is usually enough to get past all the layers of code in
- * kalloc and IOKit and see who the actual caller is up above these
- * lower levels, when used by the zone allocator logging code.
- */
+  
+                                                                      
+                                                                 
+                                                                   
+                                                              
+   
 
 #define BTLOG_MAX_DEPTH 15
 
@@ -95,8 +95,8 @@ void get_btlog_records(btlog_t *btlog,
     zone_btrecord_t *records,
     unsigned int *numrecs);
 
-#endif  /* DEBUG || DEVELOPMENT */
+#endif                            
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* _KERN_BTLOG_H_ */
+#endif                      

@@ -4,4 +4,4 @@
 int init_scalable_counter_test(void);
 int fini_scalable_counter_test(void);
 
-#endif /* !defined(_COUNTER_COMMON_H) */
+#endif                                  

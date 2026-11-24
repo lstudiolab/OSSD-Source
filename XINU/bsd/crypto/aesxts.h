@@ -20,8 +20,8 @@
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-/*
- * This header file is kept for legacy reasons and may be removed in
- * future; the interface resides in <libkern/crypto/aesxts.h>.
- */
+  
+                                                                    
+                                                              
+   
 #include <libkern/crypto/aesxts.h>

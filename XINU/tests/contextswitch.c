@@ -97,7 +97,7 @@ create_thread(uint32_t thread_id, uint32_t priority, bool fixpri,
 	return new_thread;
 }
 
-/* Spin until a specified number of seconds elapses */
+                                                      
 static void
 spin_for_duration(uint32_t seconds)
 {
@@ -193,13 +193,13 @@ record_perfcontrol_stats(const char *sysctlname, const char *units, const char *
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.scheduler"));
 
-/* Disable the test on MacOS for now */
+                                       
 T_DECL(perf_csw, "context switch performance", T_META_TAG_PERF, T_META_CHECK_LEAKS(false), T_META_ASROOT(true))
 {
 #if !defined (__arm__) && !defined(__arm64__)
 	T_SKIP("Not supported on Intel platforms");
 	return;
-#endif /* !defined (__arm__) && !defined(__arm64__) */
+#endif                                                
 	check_device_temperature();
 
 	T_ATEND(csw_perf_test_cleanup);
@@ -243,7 +243,7 @@ T_DECL(perf_csw, "context switch performance", T_META_TAG_PERF, T_META_CHECK_LEA
 	threads[n_spinners].measure_thread = true;
 	create_thread(n_spinners + 1, THR_MANAGER_PRI, true, &thread);
 
-	/* Allow the context switch threads to get into sem_wait() */
+	                                                             
 	for (uint32_t thread_id = 0; thread_id < n_spinners + 2; thread_id++) {
 		T_ASSERT_MACH_SUCCESS(semaphore_wait(worker_sem), "semaphore_wait");
 	}
@@ -252,7 +252,7 @@ T_DECL(perf_csw, "context switch performance", T_META_TAG_PERF, T_META_CHECK_LEA
 	size_t enable_size = sizeof(enable_callout_stats);
 
 	if (mt_supported) {
-		/* Enable callout stat collection */
+		                                    
 		T_ASSERT_POSIX_ZERO(sysctlbyname("kern.perfcontrol_callout.stats_enabled",
 		    NULL, 0, &enable_callout_stats, enable_size),
 		    "sysctlbyname kern.perfcontrol_callout.stats_enabled");
@@ -276,7 +276,7 @@ T_DECL(perf_csw, "context switch performance", T_META_TAG_PERF, T_META_CHECK_LEA
 		record_perfcontrol_stats("kern.perfcontrol_callout.offcore_cycles",
 		    "cycles", "offcore.cycles");
 
-		/* Disable callout stat collection */
+		                                     
 		enable_callout_stats = 0;
 		T_ASSERT_POSIX_ZERO(sysctlbyname("kern.perfcontrol_callout.stats_enabled",
 		    NULL, 0, &enable_callout_stats, enable_size),

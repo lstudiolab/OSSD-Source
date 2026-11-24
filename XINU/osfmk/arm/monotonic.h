@@ -34,4 +34,4 @@
 #define MT_CORE_CYCLES 0
 #define MT_CORE_MAXVAL UINT32_MAX
 
-#endif /* !defined(ARM_MONOTONIC_H) */
+#endif                                

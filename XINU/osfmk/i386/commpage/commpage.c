@@ -26,24 +26,24 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *	Here's what to do if you want to add a new routine to the comm page:
- *
- *		1. Add a definition for it's address in osfmk/i386/cpu_capabilities.h,
- *		   being careful to reserve room for future expansion.
- *
- *		2. Write one or more versions of the routine, each with it's own
- *		   commpage_descriptor.  The tricky part is getting the "special",
- *		   "musthave", and "canthave" fields right, so that exactly one
- *		   version of the routine is selected for every machine.
- *		   The source files should be in osfmk/i386/commpage/.
- *
- *		3. Add a ptr to your new commpage_descriptor(s) in the "routines"
- *		   array in osfmk/i386/commpage/commpage_asm.s.  There are two
- *		   arrays, one for the 32-bit and one for the 64-bit commpage.
- *
- *		4. Write the code in Libc to use the new routine.
- */
+  
+                                                                       
+  
+                                                                          
+                                                          
+  
+                                                                    
+                                                                      
+                                                                   
+                                                            
+                                                          
+  
+                                                                     
+                                                                  
+                                                                  
+  
+                                                     
+   
 
 #include <mach/mach_types.h>
 #include <mach/machine.h>
@@ -75,29 +75,29 @@
 #include <atm/atm_internal.h>
 #endif
 
-/* the lists of commpage routines are in commpage_asm.s  */
+                                                           
 extern  commpage_descriptor*    commpage_32_routines[];
 extern  commpage_descriptor*    commpage_64_routines[];
 
-extern vm_map_t commpage32_map; // the shared submap, set up in vm init
-extern vm_map_t commpage64_map; // the shared submap, set up in vm init
-extern vm_map_t commpage_text32_map;    // the shared submap, set up in vm init
-extern vm_map_t commpage_text64_map;    // the shared submap, set up in vm init
+extern vm_map_t commpage32_map;                                        
+extern vm_map_t commpage64_map;                                        
+extern vm_map_t commpage_text32_map;                                           
+extern vm_map_t commpage_text64_map;                                           
 
 
-char    *commPagePtr32 = NULL;          // virtual addr in kernel map of 32-bit commpage
-char    *commPagePtr64 = NULL;          // ...and of 64-bit commpage
-char    *commPageTextPtr32 = NULL;      // virtual addr in kernel map of 32-bit commpage
-char    *commPageTextPtr64 = NULL;      // ...and of 64-bit commpage
+char    *commPagePtr32 = NULL;                                                          
+char    *commPagePtr64 = NULL;                                      
+char    *commPageTextPtr32 = NULL;                                                      
+char    *commPageTextPtr64 = NULL;                                  
 
-uint64_t     _cpu_capabilities = 0;     // define the capability vector
+uint64_t     _cpu_capabilities = 0;                                    
 
 typedef uint32_t commpage_address_t;
 
-static commpage_address_t       next;   // next available address in comm page
+static commpage_address_t       next;                                         
 
-static char    *commPagePtr;            // virtual addr in kernel map of commpage we are working on
-static commpage_address_t       commPageBaseOffset; // subtract from 32-bit runtime address to get offset in virtual commpage in kernel map
+static char    *commPagePtr;                                                                       
+static commpage_address_t       commPageBaseOffset;                                                                                        
 
 static  commpage_time_data      *time_data32 = NULL;
 static  commpage_time_data      *time_data64 = NULL;
@@ -107,22 +107,22 @@ static  new_commpage_timeofday_data_t *gtod_time_data64 = NULL;
 
 decl_simple_lock_data(static, commpage_active_cpus_lock);
 
-/* Allocate the commpage and add to the shared submap created by vm:
- *      1. allocate a page in the kernel map (RW)
- *	2. wire it down
- *	3. make a memory entry out of it
- *	4. map that entry into the shared comm region map (R-only)
- */
+                                                                    
+                                                 
+                  
+                                   
+                                                             
+   
 
 static  void*
 commpage_allocate(
-	vm_map_t        submap,                 // commpage32_map or commpage_map64
-	size_t          area_used,              // _COMM_PAGE32_AREA_USED or _COMM_PAGE64_AREA_USED
+	vm_map_t        submap,                                                    
+	size_t          area_used,                                                                 
 	vm_prot_t       uperm)
 {
-	vm_offset_t     kernel_addr = 0;        // address of commpage in kernel map
+	vm_offset_t     kernel_addr = 0;                                            
 	vm_offset_t     zero = 0;
-	vm_size_t       size = area_used;       // size actually populated
+	vm_size_t       size = area_used;                                 
 	vm_map_entry_t  entry;
 	ipc_port_t      handle;
 	kern_return_t   kr;
@@ -157,68 +157,68 @@ commpage_allocate(
 		panic("cannot wire commpage: %d", kr);
 	}
 
-	/*
-	 * Now that the object is created and wired into the kernel map, mark it so that no delay
-	 * copy-on-write will ever be performed on it as a result of mapping it into user-space.
-	 * If such a delayed copy ever occurred, we could remove the kernel's wired mapping - and
-	 * that would be a real disaster.
-	 *
-	 * JMM - What we really need is a way to create it like this in the first place.
-	 */
+	  
+                                                                                          
+                                                                                         
+                                                                                          
+                                  
+   
+                                                                                 
+    
 	if (!(kr = vm_map_lookup_entry( kernel_map, vm_map_trunc_page(kernel_addr, VM_MAP_PAGE_MASK(kernel_map)), &entry) || entry->is_sub_map)) {
 		panic("cannot find commpage entry %d", kr);
 	}
 	VME_OBJECT(entry)->copy_strategy = MEMORY_OBJECT_COPY_NONE;
 
-	if ((kr = mach_make_memory_entry( kernel_map,           // target map
-	    &size,                                      // size
-	    kernel_addr,                                // offset (address in kernel map)
-	    uperm,                              // protections as specified
-	    &handle,                                    // this is the object handle we get
-	    NULL ))) {                                  // parent_entry (what is this?)
+	if ((kr = mach_make_memory_entry( kernel_map,                        
+	    &size,                                             
+	    kernel_addr,                                                                 
+	    uperm,                                                         
+	    &handle,                                                                       
+	    NULL ))) {                                                                 
 		panic("cannot make entry for commpage %d", kr);
 	}
 
 	vmk_flags = VM_MAP_KERNEL_FLAGS_NONE;
 	if (uperm == (VM_PROT_READ | VM_PROT_EXECUTE)) {
-		/*
-		 * Mark this unsigned executable mapping as "jit" to avoid
-		 * code-signing violations when attempting to execute unsigned
-		 * code.
-		 */
+		  
+                                                            
+                                                                
+          
+     
 		vmk_flags.vmkf_map_jit = TRUE;
 	}
 
 	kr = vm_map_64_kernel(
-		submap,                 // target map (shared submap)
-		&zero,                  // address (map into 1st page in submap)
-		area_used,              // size
-		0,                      // mask
-		VM_FLAGS_FIXED,         // flags (it must be 1st page in submap)
+		submap,                                              
+		&zero,                                                          
+		area_used,                     
+		0,                             
+		VM_FLAGS_FIXED,                                                 
 		vmk_flags,
 		VM_KERN_MEMORY_NONE,
-		handle,                 // port is the memory entry we just made
-		0,                      // offset (map 1st page in memory entry)
-		FALSE,                  // copy
-		uperm,                  // cur_protection (R-only in user map)
-		uperm,                  // max_protection
-		VM_INHERIT_SHARE);      // inheritance
+		handle,                                                         
+		0,                                                              
+		FALSE,                         
+		uperm,                                                        
+		uperm,                                   
+		VM_INHERIT_SHARE);                    
 	if (kr != KERN_SUCCESS) {
 		panic("cannot map commpage %d", kr);
 	}
 
 	ipc_port_release(handle);
-	/* Make the kernel mapping non-executable. This cannot be done
-	 * at the time of map entry creation as mach_make_memory_entry
-	 * cannot handle disjoint permissions at this time.
-	 */
+	                                                              
+                                                               
+                                                    
+    
 	kr = vm_protect(kernel_map, kernel_addr, area_used, FALSE, VM_PROT_READ | VM_PROT_WRITE);
 	assert(kr == KERN_SUCCESS);
 
-	return (void*)(intptr_t)kernel_addr;                     // return address in kernel map
+	return (void*)(intptr_t)kernel_addr;                                                    
 }
 
-/* Get address (in kernel map) of a commpage field. */
+                                                      
 
 static void*
 commpage_addr_of(
@@ -227,29 +227,29 @@ commpage_addr_of(
 	return (void*) ((uintptr_t)commPagePtr + (addr_at_runtime - commPageBaseOffset));
 }
 
-/*
- * Calculate address of data within 32- and 64-bit commpages (not to be used with commpage
- * text).
- */
+  
+                                                                                          
+         
+   
 static void*
 commpage_specific_addr_of(char *commPageBase, commpage_address_t addr_at_runtime)
 {
-	/*
-	 * Note that the base address (_COMM_PAGE32_BASE_ADDRESS) is the same for
-	 * 32- and 64-bit commpages
-	 */
+	  
+                                                                          
+                            
+    
 	return (void*) ((uintptr_t)commPageBase + (addr_at_runtime - _COMM_PAGE32_BASE_ADDRESS));
 }
 
-/* Determine number of CPUs on this system.  We cannot rely on
- * machine_info.max_cpus this early in the boot.
- */
+                                                              
+                                                
+   
 static int
 commpage_cpus( void )
 {
 	unsigned int cpus;
 
-	cpus = ml_wait_max_cpus();                   // NB: this call can block
+	cpus = ml_wait_max_cpus();                                             
 
 	if (cpus == 0) {
 		panic("commpage cpus==0");
@@ -261,7 +261,7 @@ commpage_cpus( void )
 	return cpus;
 }
 
-/* Initialize kernel version of _cpu_capabilities vector (used by KEXTs.) */
+                                                                            
 
 static void
 commpage_init_cpu_capabilities( void )
@@ -314,11 +314,11 @@ commpage_init_cpu_capabilities( void )
 	default:
 		break;
 	}
-	cpus = commpage_cpus();                 // how many CPUs do we have
+	cpus = commpage_cpus();                                            
 
 	bits |= (cpus << kNumCPUsShift);
 
-	bits |= kFastThreadLocalStorage;        // we use %gs for TLS
+	bits |= kFastThreadLocalStorage;                             
 
 #define setif(_bits, _bit, _condition) \
 	if (_condition) _bits |= _bit
@@ -340,7 +340,7 @@ commpage_init_cpu_capabilities( void )
 	    CPUID_LEAF7_FEATURE_BMI1);
 	setif(bits, kHasBMI2, cpuid_leaf7_features() &
 	    CPUID_LEAF7_FEATURE_BMI2);
-	/* Do not advertise RTM and HLE if the TSX FORCE ABORT WA is required */
+	                                                                        
 	if (cpuid_wa_required(CPU_INTEL_TSXFA) & CWA_OFF) {
 		setif(bits, kHasRTM, cpuid_leaf7_features() &
 		    CPUID_LEAF7_FEATURE_RTM);
@@ -354,7 +354,7 @@ commpage_init_cpu_capabilities( void )
 	setif(bits, kHasADX, cpuid_leaf7_features() &
 	    CPUID_LEAF7_FEATURE_ADX);
 
-#if 0   /* The kernel doesn't support MPX or SGX */
+#if 0                                              
 	setif(bits, kHasMPX, cpuid_leaf7_features() &
 	    CPUID_LEAF7_FEATURE_MPX);
 	setif(bits, kHasSGX, cpuid_leaf7_features() &
@@ -393,12 +393,12 @@ commpage_init_cpu_capabilities( void )
 	    (cpuid_leaf7_features() &
 	    CPUID_LEAF7_FEATURE_ERMS));
 
-	_cpu_capabilities = bits;               // set kernel version for use by drivers etc
+	_cpu_capabilities = bits;                                                           
 }
 
-/* initialize the approx_time_supported flag and set the approx time to 0.
- * Called during initial commpage population.
- */
+                                                                          
+                                             
+   
 static void
 commpage_mach_approximate_time_init(void)
 {
@@ -444,7 +444,7 @@ _get_cpu_capabilities(void)
 	return _cpu_capabilities;
 }
 
-/* Copy data into commpage. */
+                              
 
 static void
 commpage_stuff(
@@ -463,9 +463,9 @@ commpage_stuff(
 	next = address + length;
 }
 
-/*
- * Updates both the 32-bit and 64-bit commpages with the new data.
- */
+  
+                                                                  
+   
 static void
 commpage_update(commpage_address_t address, const void *source, int length)
 {
@@ -484,8 +484,8 @@ commpage_post_ucode_update(void)
 	commpage_update(_COMM_PAGE_CPU_CAPABILITIES, &_cpu_capabilities, sizeof(uint32_t));
 }
 
-/* Copy a routine into comm page if it matches running machine.
- */
+                                                               
+   
 static void
 commpage_stuff_routine(
 	commpage_descriptor *rd     )
@@ -494,18 +494,18 @@ commpage_stuff_routine(
 }
 
 
-/* Fill in the 32- or 64-bit commpage.  Called once for each.
- */
+                                                             
+   
 
 static void
 commpage_populate_one(
-	vm_map_t        submap,         // commpage32_map or compage64_map
-	char **         kernAddressPtr, // &commPagePtr32 or &commPagePtr64
-	size_t          area_used,      // _COMM_PAGE32_AREA_USED or _COMM_PAGE64_AREA_USED
-	commpage_address_t base_offset, // will become commPageBaseOffset
-	commpage_time_data** time_data, // &time_data32 or &time_data64
-	new_commpage_timeofday_data_t** gtod_time_data, // &gtod_time_data32 or &gtod_time_data64
-	const char*     signature,      // "commpage 32-bit" or "commpage 64-bit"
+	vm_map_t        submap,                                           
+	char **         kernAddressPtr,                                    
+	size_t          area_used,                                                         
+	commpage_address_t base_offset,                                  
+	commpage_time_data** time_data,                                
+	new_commpage_timeofday_data_t** gtod_time_data,                                          
+	const char*     signature,                                               
 	vm_prot_t       uperm)
 {
 	uint8_t         c1;
@@ -516,23 +516,23 @@ commpage_populate_one(
 
 	next = 0;
 	commPagePtr = (char *)commpage_allocate( submap, (vm_size_t) area_used, uperm );
-	*kernAddressPtr = commPagePtr;                          // save address either in commPagePtr32 or 64
+	*kernAddressPtr = commPagePtr;                                                                       
 	commPageBaseOffset = base_offset;
 
 	*time_data = commpage_addr_of( _COMM_PAGE_TIME_DATA_START );
 	*gtod_time_data = commpage_addr_of( _COMM_PAGE_NEWTIMEOFDAY_DATA );
 
-	/* Stuff in the constants.  We move things into the comm page in strictly
-	 * ascending order, so we can check for overlap and panic if so.
-	 * Note: the 32-bit cpu_capabilities vector is retained in addition to
-	 * the expanded 64-bit vector.
-	 */
+	                                                                         
+                                                                 
+                                                                       
+                               
+    
 	commpage_stuff(_COMM_PAGE_SIGNATURE, signature, (int)MIN(_COMM_PAGE_SIGNATURELEN, strlen(signature)));
 	commpage_stuff(_COMM_PAGE_CPU_CAPABILITIES64, &_cpu_capabilities, sizeof(_cpu_capabilities));
 	commpage_stuff(_COMM_PAGE_VERSION, &version, sizeof(short));
 	commpage_stuff(_COMM_PAGE_CPU_CAPABILITIES, &_cpu_capabilities, sizeof(uint32_t));
 
-	c2 = 32;  // default
+	c2 = 32;            
 	if (_cpu_capabilities & kCache64) {
 		c2 = 64;
 	} else if (_cpu_capabilities & kCache128) {
@@ -540,7 +540,7 @@ commpage_populate_one(
 	}
 	commpage_stuff(_COMM_PAGE_CACHE_LINESIZE, &c2, 2);
 
-	/* machine_info valid after ml_wait_max_cpus() */
+	                                                 
 	c1 = machine_info.physical_cpu_max;
 	commpage_stuff(_COMM_PAGE_PHYSICAL_CPUS, &c1, 1);
 	c1 = machine_info.logical_cpu_max;
@@ -561,12 +561,12 @@ commpage_populate_one(
 }
 
 
-/* Fill in commpages: called once, during kernel initialization, from the
- * startup thread before user-mode code is running.
- *
- * See the top of this file for a list of what you have to do to add
- * a new routine to the commpage.
- */
+                                                                         
+                                                   
+  
+                                                                    
+                                 
+   
 
 void
 commpage_populate( void )
@@ -585,14 +585,14 @@ commpage_populate( void )
 	pmap_commpage32_init((vm_offset_t) commPagePtr32, _COMM_PAGE32_BASE_ADDRESS,
 	    _COMM_PAGE32_AREA_USED / INTEL_PGBYTES);
 #endif
-	time_data64 = time_data32;                      /* if no 64-bit commpage, point to 32-bit */
+	time_data64 = time_data32;                                                                  
 	gtod_time_data64 = gtod_time_data32;
 
 	if (_cpu_capabilities & k64Bit) {
 		commpage_populate_one(  commpage64_map,
 		    &commPagePtr64,
 		    _COMM_PAGE64_AREA_USED,
-		    _COMM_PAGE32_START_ADDRESS,                     /* commpage address are relative to 32-bit commpage placement */
+		    _COMM_PAGE32_START_ADDRESS,                                                                                     
 		    &time_data64,
 		    &gtod_time_data64,
 		    _COMM_PAGE64_SIGNATURE_STRING,
@@ -616,9 +616,9 @@ commpage_populate( void )
 #endif
 }
 
-/* Fill in the common routines during kernel initialization.
- * This is called before user-mode code is running.
- */
+                                                            
+                                                   
+   
 void
 commpage_text_populate( void )
 {
@@ -669,10 +669,10 @@ commpage_text_populate( void )
 	}
 }
 
-/* Update commpage nanotime information.
- *
- * This routine must be serialized by some external means, ie a lock.
- */
+                                        
+  
+                                                                     
+   
 
 void
 commpage_set_nanotime(
@@ -686,12 +686,12 @@ commpage_set_nanotime(
 	static uint32_t generation = 0;
 	uint32_t        next_gen;
 
-	if (p32 == NULL) {              /* have commpages been allocated yet? */
+	if (p32 == NULL) {                                                      
 		return;
 	}
 
 	if (generation != p32->nt_generation) {
-		panic("nanotime trouble 1");    /* possibly not serialized */
+		panic("nanotime trouble 1");                                 
 	}
 	if (ns_base < p32->nt_ns_base) {
 		panic("nanotime trouble 2");
@@ -705,7 +705,7 @@ commpage_set_nanotime(
 		next_gen = ++generation;
 	}
 
-	p32->nt_generation = 0;         /* mark invalid, so commpage won't try to use it */
+	p32->nt_generation = 0;                                                            
 	p64->nt_generation = 0;
 
 	p32->nt_tsc_base = tsc_base;
@@ -720,16 +720,16 @@ commpage_set_nanotime(
 	p32->nt_shift = shift;
 	p64->nt_shift = shift;
 
-	p32->nt_generation = next_gen;  /* mark data as valid */
+	p32->nt_generation = next_gen;                          
 	p64->nt_generation = next_gen;
 }
 
-/* Update commpage gettimeofday() information.  As with nanotime(), we interleave
- * updates to the 32- and 64-bit commpage, in order to keep time more nearly in sync
- * between the two environments.
- *
- * This routine must be serializeed by some external means, ie a lock.
- */
+                                                                                 
+                                                                                    
+                                
+  
+                                                                      
+   
 
 void
 commpage_set_timestamp(
@@ -761,7 +761,7 @@ commpage_set_timestamp(
 	p64->TimeStamp_tick = abstime;
 }
 
-/* Update _COMM_PAGE_MEMORY_PRESSURE.  Called periodically from vm's compute_memory_pressure()  */
+                                                                                                  
 
 void
 commpage_set_memory_pressure(
@@ -785,14 +785,14 @@ commpage_set_memory_pressure(
 	}
 }
 
-/* Updated every time a logical CPU goes offline/online */
+                                                          
 void
 commpage_update_active_cpus(void)
 {
 	char        *cp;
 	volatile uint8_t    *ip;
 
-	/* At least 32-bit commpage must be initialized */
+	                                                  
 	if (!commPagePtr32) {
 		return;
 	}
@@ -814,14 +814,14 @@ commpage_update_active_cpus(void)
 	simple_unlock(&commpage_active_cpus_lock);
 }
 
-/*
- * Update the commpage with current kdebug state. This currently has bits for
- * global trace state, and typefilter enablement. It is likely additional state
- * will be tracked in the future.
- *
- * INVARIANT: This value will always be 0 if global tracing is disabled. This
- * allows simple guard tests of "if (*_COMM_PAGE_KDEBUG_ENABLE) { ... }"
- */
+  
+                                                                             
+                                                                               
+                                 
+  
+                                                                             
+                                                                        
+   
 void
 commpage_update_kdebug_state(void)
 {
@@ -843,7 +843,7 @@ commpage_update_kdebug_state(void)
 	}
 }
 
-/* Ditto for atm_diagnostic_config */
+                                     
 void
 commpage_update_atm_diagnostic_config(uint32_t diagnostic_config)
 {
@@ -865,9 +865,9 @@ commpage_update_atm_diagnostic_config(uint32_t diagnostic_config)
 	}
 }
 
-/*
- * update the commpage with if dtrace user land probes are enabled
- */
+  
+                                                                  
+   
 void
 commpage_update_dof(boolean_t enabled)
 {
@@ -891,9 +891,9 @@ commpage_update_dof(boolean_t enabled)
 }
 
 
-/*
- * update the dyld global config flags
- */
+  
+                                      
+   
 void
 commpage_update_dyld_flags(uint64_t value)
 {
@@ -913,9 +913,9 @@ commpage_update_dyld_flags(uint64_t value)
 }
 
 
-/*
- * update the commpage data for last known value of mach_absolute_time()
- */
+  
+                                                                        
+   
 
 void
 commpage_update_mach_approximate_time(uint64_t abstime)
@@ -929,10 +929,10 @@ commpage_update_mach_approximate_time(uint64_t abstime)
 		cp += (_COMM_PAGE_APPROX_TIME - _COMM_PAGE32_BASE_ADDRESS);
 		saved_data = atomic_load_explicit((_Atomic uint64_t *)(uintptr_t)cp, memory_order_relaxed);
 		if (saved_data < abstime) {
-			/* ignoring the success/fail return value assuming that
-			 * if the value has been updated since we last read it,
-			 * "someone" has a newer timestamp than us and ours is
-			 * now invalid. */
+			                                                       
+                                                          
+                                                         
+                     
 			atomic_compare_exchange_strong_explicit((_Atomic uint64_t *)(uintptr_t)cp,
 			    &saved_data, abstime, memory_order_relaxed, memory_order_relaxed);
 		}
@@ -942,10 +942,10 @@ commpage_update_mach_approximate_time(uint64_t abstime)
 		cp += (_COMM_PAGE_APPROX_TIME - _COMM_PAGE32_START_ADDRESS);
 		saved_data = atomic_load_explicit((_Atomic uint64_t *)(uintptr_t)cp, memory_order_relaxed);
 		if (saved_data < abstime) {
-			/* ignoring the success/fail return value assuming that
-			 * if the value has been updated since we last read it,
-			 * "someone" has a newer timestamp than us and ours is
-			 * now invalid. */
+			                                                       
+                                                          
+                                                         
+                     
 			atomic_compare_exchange_strong_explicit((_Atomic uint64_t *)(uintptr_t)cp,
 			    &saved_data, abstime, memory_order_relaxed, memory_order_relaxed);
 		}
@@ -993,7 +993,7 @@ commpage_update_boottime(uint64_t boottime)
 extern user32_addr_t commpage_text32_location;
 extern user64_addr_t commpage_text64_location;
 
-/* Check to see if a given address is in the Preemption Free Zone (PFZ) */
+                                                                          
 
 uint32_t
 commpage_is_in_pfz32(uint32_t addr32)

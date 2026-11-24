@@ -27,4 +27,4 @@
  */
 #ifndef FD_COPY
 #define FD_COPY(f, t)   __DARWIN_FD_COPY(f, t)
-#endif /* FD_COPY */
+#endif              

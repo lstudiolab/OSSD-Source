@@ -32,9 +32,9 @@
 #ifndef _BSM_AUDIT_SOCKET_TYPE_H_
 #define _BSM_AUDIT_SOCKET_TYPE_H_
 
-/*
- * BSM socket type constants.
- */
+  
+                             
+   
 #define BSM_SOCK_DGRAM          1
 #define BSM_SOCK_STREAM         2
 #define BSM_SOCK_RAW            4
@@ -43,4 +43,4 @@
 
 #define BSM_SOCK_UNKNOWN        500
 
-#endif /* !_BSM_AUDIT_SOCKET_TYPE_H_ */
+#endif                                 

@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef VM_VM_EXTERNAL_H_
 #define VM_VM_EXTERNAL_H_
@@ -63,13 +63,13 @@
 #include <mach/vm_types.h>
 #include <mach/machine/vm_types.h>
 
-/*
- *	The states that may be recorded for a page of external storage.
- */
+  
+                                                                  
+   
 
 typedef int     vm_external_state_t;
 #define VM_EXTERNAL_STATE_EXISTS                1
 #define VM_EXTERNAL_STATE_UNKNOWN               2
 #define VM_EXTERNAL_STATE_ABSENT                3
 
-#endif  /* VM_VM_EXTERNAL_H_ */
+#endif                         

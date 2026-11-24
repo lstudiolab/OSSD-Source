@@ -65,23 +65,23 @@ vm_offset_t kernel_vtop;
 
 static unsigned kasan_enabled;
 static unsigned quarantine_enabled;
-static unsigned enabled_checks = TYPE_ALL & ~TYPE_LEAK; /* bitmask of enabled checks */
-static unsigned report_ignored;                         /* issue non-fatal report for disabled/blacklisted checks */
-static unsigned free_yield = 0;                         /* ms yield after each free */
-static unsigned leak_threshold = 3;                     /* threshold for uninitialized memory leak detection */
-static unsigned leak_fatal_threshold = 0;               /* threshold for treating leaks as fatal errors (0 means never) */
+static unsigned enabled_checks = TYPE_ALL & ~TYPE_LEAK;                                
+static unsigned report_ignored;                                                                                     
+static unsigned free_yield = 0;                                                       
+static unsigned leak_threshold = 3;                                                                            
+static unsigned leak_fatal_threshold = 0;                                                                                 
 
-/* forward decls */
+                   
 static void kasan_crash_report(uptr p, uptr width, access_t access, violation_t reason);
 static void kasan_log_report(uptr p, uptr width, access_t access, violation_t reason);
 
-/* imported osfmk functions */
+                              
 extern vm_offset_t ml_stack_base(void);
 extern vm_size_t ml_stack_size(void);
 
-/*
- * unused: expected to be called, but (currently) does nothing
- */
+  
+                                                              
+   
 #define UNUSED_ABI(func, ...) \
 	_Pragma("clang diagnostic push") \
 	_Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
@@ -97,10 +97,10 @@ static vm_size_t kasan_alloc_retrieve_bt(vm_address_t addr, uintptr_t frames[sta
 decl_simple_lock_data(, kasan_vm_lock);
 static thread_t kasan_lock_holder;
 
-/*
- * kasan is called from the interrupt path, so we need to disable interrupts to
- * ensure atomicity manipulating the global objects
- */
+  
+                                                                               
+                                                   
+   
 void
 kasan_lock(boolean_t *b)
 {
@@ -117,8 +117,8 @@ kasan_unlock(boolean_t b)
 	ml_set_interrupts_enabled(b);
 }
 
-/* Return true if 'thread' holds the kasan lock. Only safe if 'thread' == current
- * thread */
+                                                                                 
+            
 bool
 kasan_lock_held(thread_t thread)
 {
@@ -147,9 +147,9 @@ kasan_poison_active(uint8_t flags)
 	}
 }
 
-/*
- * poison redzones in the shadow map
- */
+  
+                                    
+   
 void NOINLINE
 kasan_poison(vm_offset_t base, vm_size_t size, vm_size_t leftrz, vm_size_t rightrz, uint8_t flags)
 {
@@ -158,7 +158,7 @@ kasan_poison(vm_offset_t base, vm_size_t size, vm_size_t leftrz, vm_size_t right
 	vm_size_t total = leftrz + size + rightrz;
 	vm_size_t i = 0;
 
-	/* ensure base, leftrz and total allocation size are granule-aligned */
+	                                                                       
 	assert(kasan_granule_partial(base) == 0);
 	assert(kasan_granule_partial(leftrz) == 0);
 	assert(kasan_granule_partial(total) == 0);
@@ -182,14 +182,14 @@ kasan_poison(vm_offset_t base, vm_size_t size, vm_size_t leftrz, vm_size_t right
 		r_flags = ASAN_HEAP_RIGHT_RZ;
 	}
 
-	/*
-	 * poison the redzones and unpoison the valid bytes
-	 */
+	  
+                                                    
+    
 	for (; i < leftrz; i++) {
 		shadow[i] = l_flags;
 	}
 	for (; i < leftrz + size; i++) {
-		shadow[i] = ASAN_VALID; /* XXX: should not be necessary */
+		shadow[i] = ASAN_VALID;                                   
 	}
 	if (partial && (i < total)) {
 		shadow[i] = partial;
@@ -227,9 +227,9 @@ kasan_unpoison_stack(uintptr_t base, size_t size)
 	kasan_unpoison((void *)base, size);
 }
 
-/*
- * write junk into the redzones
- */
+  
+                               
+   
 static void NOINLINE
 kasan_rz_clobber(vm_offset_t base, vm_size_t size, vm_size_t leftrz, vm_size_t rightrz)
 {
@@ -258,14 +258,14 @@ kasan_rz_clobber(vm_offset_t base, vm_size_t size, vm_size_t leftrz, vm_size_t r
 #endif
 }
 
-/*
- * Report a violation that may be disabled and/or blacklisted. This can only be
- * called for dynamic checks (i.e. where the fault is recoverable). Use
- * kasan_crash_report() for static (unrecoverable) violations.
- *
- * access: what we were trying to do when the violation occured
- * reason: what failed about the access
- */
+  
+                                                                               
+                                                                       
+                                                              
+  
+                                                               
+                                       
+   
 static void
 kasan_violation(uintptr_t addr, size_t size, access_t access, violation_t reason)
 {
@@ -290,13 +290,13 @@ kasan_check_range(const void *x, size_t sz, access_t access)
 	}
 }
 
-/*
- * Return true if [base, base+sz) is unpoisoned or has given shadow value.
- */
+  
+                                                                          
+   
 bool
 kasan_check_shadow(vm_address_t addr, vm_size_t sz, uint8_t shadow)
 {
-	/* round 'base' up to skip any partial, which won't match 'shadow' */
+	                                                                     
 	uintptr_t base = kasan_granule_round(addr);
 	sz -= base - addr;
 
@@ -341,10 +341,10 @@ kasan_report_leak(vm_address_t base, vm_size_t sz, vm_offset_t offset, vm_size_t
 	    char *, string_rep);
 }
 
-/*
- * Initialize buffer by writing unique pattern that can be looked for
- * in copyout path to detect uninitialized memory leaks.
- */
+  
+                                                                     
+                                                        
+   
 void
 kasan_leak_init(vm_address_t addr, vm_size_t sz)
 {
@@ -353,9 +353,9 @@ kasan_leak_init(vm_address_t addr, vm_size_t sz)
 	}
 }
 
-/*
- * Check for possible uninitialized memory contained in [base, base+sz).
- */
+  
+                                                                        
+   
 void
 kasan_check_uninitialized(vm_address_t base, vm_size_t sz)
 {
@@ -385,11 +385,11 @@ kasan_check_uninitialized(vm_address_t base, vm_size_t sz)
 	}
 }
 
-/*
- *
- * KASAN violation reporting
- *
- */
+  
+  
+                            
+  
+   
 
 static const char *
 access_str(access_t type)
@@ -443,7 +443,7 @@ kasan_shadow_crashlog(uptr p, char *buf, size_t len)
 	uptr shadow_p = shadow;
 	uptr shadow_page = vm_map_round_page(shadow_p, HW_PAGE_MASK);
 
-	/* rewind to start of context block */
+	                                      
 	shadow &= ~((uptr)0xf);
 	shadow -= 16 * before;
 
@@ -452,7 +452,7 @@ kasan_shadow_crashlog(uptr p, char *buf, size_t len)
 
 	for (i = 0; i < 1 + before + after; i++, shadow += 16) {
 		if ((vm_map_round_page(shadow, HW_PAGE_MASK) != shadow_page) && !kasan_is_shadow_mapped(shadow)) {
-			/* avoid unmapped shadow when crossing page boundaries */
+			                                                         
 			continue;
 		}
 
@@ -519,7 +519,7 @@ kasan_crash_report(uptr p, uptr width, access_t access, violation_t reason)
 {
 	kasan_handle_test();
 	kasan_report_internal(p, width, access, reason, true);
-	__builtin_unreachable(); /* we cant handle this returning anyway */
+	__builtin_unreachable();                                           
 }
 
 static void
@@ -534,12 +534,12 @@ kasan_log_report(uptr p, uptr width, access_t access, violation_t reason)
 
 	kasan_report_internal(p, width, access, reason, false);
 
-	/*
-	 * print a backtrace
-	 */
+	  
+                     
+    
 
 	nframes = backtrace_frame(bt, nframes, __builtin_frame_address(0),
-	    NULL); /* ignore current frame */
+	    NULL);                           
 
 	buf[0] = '\0';
 	l += scnprintf(buf + l, len - l, "Backtrace: ");
@@ -574,7 +574,7 @@ __asan_report_store_n(uptr p, unsigned long sz)
 	kasan_crash_report(p, sz, TYPE_STORE, 0);
 }
 
-/* unpoison the current stack */
+                                
 void NOINLINE
 kasan_unpoison_curstack(bool whole_stack)
 {
@@ -587,7 +587,7 @@ kasan_unpoison_curstack(bool whole_stack)
 	}
 
 	if (cur >= base && cur < base + sz) {
-		/* unpoison from current stack depth to the top */
+		                                                  
 		size_t unused = cur - base;
 		kasan_unpoison_stack(cur, sz - unused);
 	}
@@ -598,11 +598,11 @@ __asan_handle_no_return(void)
 {
 	kasan_unpoison_curstack(false);
 
-	/*
-	 * No need to free any fakestack objects because they must stay alive until
-	 * we drop the real stack, at which point we can drop the entire fakestack
-	 * anyway.
-	 */
+	  
+                                                                            
+                                                                           
+           
+    
 }
 
 bool NOINLINE
@@ -621,13 +621,13 @@ kasan_range_poisoned(vm_offset_t base, vm_size_t size, vm_offset_t *first_invali
 	shadow = SHADOW_FOR_ADDRESS(base);
 	size_t limit = (size + KASAN_GRANULE - 1) / KASAN_GRANULE;
 
-	/* XXX: to make debugging easier, catch unmapped shadow here */
+	                                                               
 
 	for (i = 0; i < limit; i++, size -= KASAN_GRANULE) {
 		assert(size > 0);
 		uint8_t s = shadow[i];
 		if (s == 0 || (size < KASAN_GRANULE && s >= size && s < KASAN_GRANULE)) {
-			/* valid */
+			           
 		} else {
 			goto fail;
 		}
@@ -637,7 +637,7 @@ kasan_range_poisoned(vm_offset_t base, vm_size_t size, vm_offset_t *first_invali
 
 fail:
 	if (first_invalid) {
-		/* XXX: calculate the exact first byte that failed */
+		                                                     
 		*first_invalid = base + i * 8;
 	}
 	return true;
@@ -649,7 +649,7 @@ kasan_init_globals(vm_offset_t base, vm_size_t size)
 	struct asan_global *glob = (struct asan_global *)base;
 	struct asan_global *glob_end = (struct asan_global *)(base + size);
 	for (; glob < glob_end; glob++) {
-		/* handle one global */
+		                       
 		kasan_poison(glob->addr, glob->size, 0, glob->size_with_redzone - glob->size, ASAN_GLOBAL_RZ);
 	}
 }
@@ -664,7 +664,7 @@ kasan_load_kext(vm_offset_t base, vm_size_t __unused size, const void *bundleid)
 	kasan_dybl_load_kext(base, bundleid);
 #endif
 
-	/* find the kasan globals segment/section */
+	                                            
 	sect = getsectdatafromheader((void *)base, KASAN_GLOBAL_SEGNAME, KASAN_GLOBAL_SECTNAME, &sectsz);
 	if (sect) {
 		kasan_init_globals((vm_address_t)sect, (vm_size_t)sectsz);
@@ -678,7 +678,7 @@ kasan_unload_kext(vm_offset_t base, vm_size_t size)
 	unsigned long sectsz;
 	void *sect;
 
-	/* find the kasan globals segment/section */
+	                                            
 	sect = getsectdatafromheader((void *)base, KASAN_GLOBAL_SEGNAME, KASAN_GLOBAL_SECTNAME, &sectsz);
 	if (sect) {
 		kasan_unpoison((void *)base, size);
@@ -690,10 +690,10 @@ kasan_unload_kext(vm_offset_t base, vm_size_t size)
 #endif
 }
 
-/*
- * Turn off as much as possible for panic path etc. There's no way to turn it back
- * on.
- */
+  
+                                                                                  
+      
+   
 void NOINLINE
 kasan_disable(void)
 {
@@ -758,7 +758,7 @@ kasan_debug_touch_mappings(vm_offset_t base, vm_size_t sz)
 	vm_size_t i;
 	uint8_t tmp1, tmp2;
 
-	/* Hit every byte in the shadow map. Don't write due to the zero mappings. */
+	                                                                             
 	for (i = 0; i < sz; i += sizeof(uint64_t)) {
 		vm_offset_t addr = base + i;
 		uint8_t *x = SHADOW_FOR_ADDRESS(addr);
@@ -781,14 +781,14 @@ kasan_init(void)
 
 	simple_lock_init(&kasan_vm_lock, 0);
 
-	/* Map all of the kernel text and data */
+	                                         
 	kasan_map_shadow(kernel_vbase, kernel_vtop - kernel_vbase, false);
 
 	kasan_arch_init();
 
-	/*
-	 * handle KASan boot-args
-	 */
+	  
+                          
+    
 
 	if (PE_parse_boot_argn("kasan.checks", &arg, sizeof(arg))) {
 		enabled_checks = arg;
@@ -827,7 +827,7 @@ kasan_init(void)
 		leak_fatal_threshold = arg;
 	}
 
-	/* kasan.bl boot-arg handled in kasan_init_dybl() */
+	                                                    
 
 	quarantine_enabled = 1;
 	kasan_enabled = 1;
@@ -843,12 +843,12 @@ kasan_notify_address_internal(vm_offset_t address, vm_size_t size, bool is_zero)
 	}
 
 	if (address < VM_MIN_KERNEL_AND_KEXT_ADDRESS) {
-		/* only map kernel addresses */
+		                               
 		return;
 	}
 
 	if (!size) {
-		/* nothing to map */
+		                    
 		return;
 	}
 
@@ -865,20 +865,20 @@ kasan_notify_address(vm_offset_t address, vm_size_t size)
 	kasan_notify_address_internal(address, size, false);
 }
 
-/*
- * Allocate read-only, all-zeros shadow for memory that can never be poisoned
- */
+  
+                                                                             
+   
 void
 kasan_notify_address_nopoison(vm_offset_t address, vm_size_t size)
 {
 	kasan_notify_address_internal(address, size, true);
 }
 
-/*
- *
- * allocator hooks
- *
- */
+  
+  
+                  
+  
+   
 
 struct kasan_alloc_header {
 	uint16_t magic;
@@ -926,10 +926,10 @@ footer_for_user_addr(vm_offset_t addr, vm_size_t *size)
 	return (void *)(addr + h->user_size);
 }
 
-/*
- * size: user-requested allocation size
- * ret:  minimum size for the real allocation
- */
+  
+                                       
+                                             
+   
 vm_size_t
 kasan_alloc_resize(vm_size_t size)
 {
@@ -939,15 +939,15 @@ kasan_alloc_resize(vm_size_t size)
 	}
 
 	if (size >= 128) {
-		/* Add a little extra right redzone to larger objects. Gives us extra
-		 * overflow protection, and more space for the backtrace. */
+		                                                                     
+                                                              
 		size += 16;
 	}
 
-	/* add left and right redzones */
+	                                 
 	size += KASAN_GUARD_PAD;
 
-	/* ensure the final allocation is a multiple of the granule */
+	                                                              
 	size = kasan_granule_round(size);
 
 	return size;
@@ -974,8 +974,8 @@ kasan_alloc_bt(uint32_t *ptr, vm_size_t sz, vm_size_t skip)
 			skip--;
 		}
 
-		/* only store the offset from kernel base, and cram that into 32
-		 * bits */
+		                                                                
+            
 		for (vm_size_t i = 0; i < frames; i++) {
 			ptr[i] = (uint32_t)(bt[i] - vm_kernel_slid_base);
 		}
@@ -983,7 +983,7 @@ kasan_alloc_bt(uint32_t *ptr, vm_size_t sz, vm_size_t skip)
 	return frames;
 }
 
-/* addr: user address of allocation */
+                                      
 static uint16_t
 kasan_alloc_crc(vm_offset_t addr)
 {
@@ -1011,7 +1011,7 @@ kasan_alloc_retrieve_bt(vm_address_t addr, uintptr_t frames[static BACKTRACE_MAX
 	vm_address_t alloc_base = 0;
 	size_t fsize = 0;
 
-	/* walk the shadow backwards to find the allocation base */
+	                                                           
 	while (shadow >= max_search) {
 		if (*(uint8_t *)shadow == ASAN_HEAP_LEFT_RZ) {
 			alloc_base = ADDRESS_FOR_SHADOW(shadow) + 8;
@@ -1036,13 +1036,13 @@ kasan_alloc_retrieve_bt(vm_address_t addr, uintptr_t frames[static BACKTRACE_MAX
 	return num_frames;
 }
 
-/*
- * addr: base address of full allocation (including redzones)
- * size: total size of allocation (include redzones)
- * req:  user-requested allocation size
- * lrz:  size of the left redzone in bytes
- * ret:  address of usable allocation
- */
+  
+                                                             
+                                                    
+                                       
+                                          
+                                     
+   
 vm_address_t
 kasan_alloc(vm_offset_t addr, vm_size_t size, vm_size_t req, vm_size_t leftrz)
 {
@@ -1060,43 +1060,43 @@ kasan_alloc(vm_offset_t addr, vm_size_t size, vm_size_t req, vm_size_t leftrz)
 
 	addr += leftrz;
 
-	/* stash the allocation sizes in the left redzone */
+	                                                    
 	struct kasan_alloc_header *h = header_for_user_addr(addr);
 	h->magic = magic_for_addr(addr, LIVE_XOR);
 	h->left_rz = (uint32_t)leftrz;
 	h->alloc_size = (uint32_t)size;
 	h->user_size = (uint32_t)req;
 
-	/* ... and a backtrace in the right redzone */
+	                                              
 	vm_size_t fsize;
 	struct kasan_alloc_footer *f = footer_for_user_addr(addr, &fsize);
 	h->frames = (uint32_t)kasan_alloc_bt(f->backtrace, fsize, 2);
 
-	/* checksum the whole object, minus the user part */
+	                                                    
 	h->crc = kasan_alloc_crc(addr);
 
 	return addr;
 }
 
-/*
- * addr: user pointer
- * size: returns full original allocation size
- * ret:  original allocation ptr
- */
+  
+                     
+                                              
+                                
+   
 vm_address_t
 kasan_dealloc(vm_offset_t addr, vm_size_t *size)
 {
 	assert(size && addr);
 	struct kasan_alloc_header *h = header_for_user_addr(addr);
 	*size = h->alloc_size;
-	h->magic = 0; /* clear the magic so the debugger doesn't find a bogus object */
+	h->magic = 0;                                                                  
 	return addr - h->left_rz;
 }
 
-/*
- * return the original user-requested allocation size
- * addr: user alloc pointer
- */
+  
+                                                     
+                           
+   
 vm_size_t
 kasan_user_size(vm_offset_t addr)
 {
@@ -1105,20 +1105,20 @@ kasan_user_size(vm_offset_t addr)
 	return h->user_size;
 }
 
-/*
- * Verify that `addr' (user pointer) is a valid allocation of `type'
- */
+  
+                                                                    
+   
 void
 kasan_check_free(vm_offset_t addr, vm_size_t size, unsigned heap_type)
 {
 	struct kasan_alloc_header *h = header_for_user_addr(addr);
 
-	/* map heap type to an internal access type */
+	                                              
 	access_t type = heap_type == KASAN_HEAP_KALLOC    ? TYPE_KFREE  :
 	    heap_type == KASAN_HEAP_ZALLOC    ? TYPE_ZFREE  :
 	    heap_type == KASAN_HEAP_FAKESTACK ? TYPE_FSFREE : 0;
 
-	/* check the magic and crc match */
+	                                   
 	if (h->magic != magic_for_addr(addr, LIVE_XOR)) {
 		kasan_violation(addr, size, type, REASON_BAD_METADATA);
 	}
@@ -1126,28 +1126,28 @@ kasan_check_free(vm_offset_t addr, vm_size_t size, unsigned heap_type)
 		kasan_violation(addr, size, type, REASON_MOD_OOB);
 	}
 
-	/* check the freed size matches what we recorded at alloc time */
+	                                                                 
 	if (h->user_size != size) {
 		kasan_violation(addr, size, type, REASON_INVALID_SIZE);
 	}
 
 	vm_size_t rightrz_sz = h->alloc_size - h->left_rz - h->user_size;
 
-	/* Check that the redzones are valid */
+	                                       
 	if (!kasan_check_shadow(addr - h->left_rz, h->left_rz, ASAN_HEAP_LEFT_RZ) ||
 	    !kasan_check_shadow(addr + h->user_size, rightrz_sz, ASAN_HEAP_RIGHT_RZ)) {
 		kasan_violation(addr, size, type, REASON_BAD_METADATA);
 	}
 
-	/* Check the allocated range is not poisoned */
+	                                               
 	kasan_check_range((void *)addr, size, type);
 }
 
-/*
- *
- * Quarantine
- *
- */
+  
+  
+             
+  
+   
 
 struct freelist_entry {
 	uint16_t magic;
@@ -1157,7 +1157,7 @@ struct freelist_entry {
 		struct {
 			vm_size_t size      : 28;
 			vm_size_t user_size : 28;
-			vm_size_t frames    : BACKTRACE_BITS; /* number of frames in backtrace */
+			vm_size_t frames    : BACKTRACE_BITS;                                    
 			vm_size_t __unused  : 8 - BACKTRACE_BITS;
 		};
 		uint64_t bits;
@@ -1187,9 +1187,9 @@ fle_crc(struct freelist_entry *fle)
 	return __nosan_crc16(0, &fle->bits, fle->size - offsetof(struct freelist_entry, bits));
 }
 
-/*
- * addr, sizep: pointer/size of full allocation including redzone
- */
+  
+                                                                 
+   
 void NOINLINE
 kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
     zone_t *zone, vm_size_t user_size, int locked,
@@ -1200,7 +1200,7 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 
 	assert(type >= 0 && type < KASAN_HEAP_TYPES);
 	if (type == KASAN_HEAP_KALLOC) {
-		/* zero-size kalloc allocations are allowed */
+		                                              
 		assert(!zone);
 	} else if (type == KASAN_HEAP_ZALLOC) {
 		assert(zone && user_size);
@@ -1208,14 +1208,14 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 		assert(zone && user_size);
 	}
 
-	/* clobber the entire freed region */
+	                                     
 	kasan_rz_clobber(addr, 0, size, 0);
 
 	if (!doquarantine || !quarantine_enabled) {
 		goto free_current;
 	}
 
-	/* poison the entire freed region */
+	                                    
 	uint8_t flags = (type == KASAN_HEAP_FAKESTACK) ? ASAN_STACK_FREED : ASAN_HEAP_FREED;
 	kasan_poison(addr, 0, size, 0, flags);
 
@@ -1223,7 +1223,7 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 	struct quarantine *q = &quarantines[type];
 	assert(size >= sizeof(struct freelist_entry));
 
-	/* create a new freelist entry */
+	                                 
 	fle = (struct freelist_entry *)addr;
 	fle->magic = magic_for_addr((vm_offset_t)fle, FREE_XOR);
 	fle->size = size;
@@ -1234,7 +1234,7 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 		fle->zone = *zone;
 	}
 	if (type != KASAN_HEAP_FAKESTACK) {
-		/* don't do expensive things on the fakestack path */
+		                                                     
 		fle->frames = kasan_alloc_bt(fle->backtrace, fle->size - sizeof(struct freelist_entry), 3);
 		fle->crc = fle_crc(fle);
 	}
@@ -1245,10 +1245,10 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 	}
 
 	if (q->size + size > q->max_size) {
-		/*
-		 * Adding this entry would put us over the max quarantine size. Free the
-		 * larger of the current object and the quarantine head object.
-		 */
+		  
+                                                                          
+                                                                 
+     
 		tofree = STAILQ_FIRST(&q->freelist);
 		if (fle->size > tofree->size) {
 			goto free_current_locked;
@@ -1259,7 +1259,7 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 	q->entries++;
 	q->size += size;
 
-	/* free the oldest entry, if necessary */
+	                                         
 	if (tofree || q->entries > q->max_entries) {
 		tofree = STAILQ_FIRST(&q->freelist);
 		STAILQ_REMOVE_HEAD(&q->freelist, list);
@@ -1277,7 +1277,7 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 		size = tofree->size;
 		addr = (vm_offset_t)tofree;
 
-		/* check the magic and crc match */
+		                                   
 		if (tofree->magic != magic_for_addr(addr, FREE_XOR)) {
 			kasan_violation(addr, size, TYPE_UAF, REASON_MOD_AFTER_FREE);
 		}
@@ -1285,10 +1285,10 @@ kasan_free_internal(void **addrp, vm_size_t *sizep, int type,
 			kasan_violation(addr, size, TYPE_UAF, REASON_MOD_AFTER_FREE);
 		}
 
-		/* clobber the quarantine header */
+		                                   
 		__nosan_bzero((void *)addr, sizeof(struct freelist_entry));
 	} else {
-		/* quarantine is not full - don't really free anything */
+		                                                         
 		addr = 0;
 	}
 
@@ -1336,12 +1336,12 @@ __asan_poison_cxx_array_cookie(uptr p)
 	*shadow = ASAN_ARRAY_COOKIE;
 }
 
-/*
- * Unpoison the C++ array cookie (if it exists). We don't know exactly where it
- * lives relative to the start of the buffer, but it's always the word immediately
- * before the start of the array data, so for naturally-aligned objects we need to
- * search at most 2 shadow bytes.
- */
+  
+                                                                               
+                                                                                  
+                                                                                  
+                                 
+   
 void
 kasan_unpoison_cxx_array_cookie(void *ptr)
 {
@@ -1351,7 +1351,7 @@ kasan_unpoison_cxx_array_cookie(void *ptr)
 			shadow[i] = ASAN_VALID;
 			return;
 		} else if (shadow[i] != ASAN_VALID) {
-			/* must have seen the cookie by now */
+			                                      
 			return;
 		}
 	}
@@ -1405,10 +1405,10 @@ SET_SHADOW_DECLARE(f5)
 SET_SHADOW_DECLARE(f8)
 
 
-/*
- * Call 'cb' for each contiguous range of the shadow map. This could be more
- * efficient by walking the page table directly.
- */
+  
+                                                                            
+                                                
+   
 int
 kasan_traverse_mappings(pmap_traverse_callback cb, void *ctx)
 {
@@ -1438,9 +1438,9 @@ kasan_traverse_mappings(pmap_traverse_callback cb, void *ctx)
 	return 0;
 }
 
-/*
- * XXX: implement these
- */
+  
+                       
+   
 
 UNUSED_ABI(__asan_alloca_poison, uptr addr, uptr size);
 UNUSED_ABI(__asan_allocas_unpoison, uptr top, uptr bottom);
@@ -1450,9 +1450,9 @@ UNUSED_ABI(__sanitizer_annotate_contiguous_container, const void *a, const void 
 UNUSED_ABI(__asan_poison_stack_memory, uptr addr, size_t size);
 UNUSED_ABI(__asan_unpoison_stack_memory, uptr a, uptr b);
 
-/*
- * Miscellaneous unimplemented asan ABI
- */
+  
+                                       
+   
 
 UNUSED_ABI(__asan_init, void);
 UNUSED_ABI(__asan_register_image_globals, uptr a);
@@ -1479,11 +1479,11 @@ void OS_NORETURN UNSUPPORTED_API(__asan_exp_storeN, uptr addr, size_t sz, int32_
 void OS_NORETURN UNSUPPORTED_API(__asan_report_exp_load_n, uptr addr, unsigned long b, int32_t c);
 void OS_NORETURN UNSUPPORTED_API(__asan_report_exp_store_n, uptr addr, unsigned long b, int32_t c);
 
-/*
- *
- * SYSCTL
- *
- */
+  
+  
+         
+  
+   
 
 static int
 sysctl_kasan_test(__unused struct sysctl_oid *oidp, __unused void *arg1, int arg2, struct sysctl_req *req)

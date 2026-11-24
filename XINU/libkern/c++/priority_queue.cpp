@@ -34,19 +34,19 @@
 static_assert(PRIORITY_QUEUE_ENTRY_CHILD_BITS >= VM_KERNEL_POINTER_SIGNIFICANT_BITS,
     "Priority Queue child pointer packing failed");
 #endif
-#endif // KERNEL
+#endif          
 
 #pragma mark priority queue helpers
 
-/*
- * These traits allow to parametrize `struct pqueue` below.
- */
+  
+                                                           
+   
 
 template <typename queue_t, typename entry_t>
 struct pqueue_entry_traits {
-	/*
-	 * Explain how to compare two elements in the natural order.
-	 */
+	  
+                                                             
+    
 	static inline int
 	compare(queue_t que, entry_t a, entry_t b);
 };
@@ -86,18 +86,18 @@ struct pqueue_entry_traits<queue_t, priority_queue_entry_stable_t> {
 	compare(queue_t que __unused,
 	    priority_queue_entry_stable_t e1, priority_queue_entry_stable_t e2)
 	{
-		/*
-		 * the key is (2 * pri + preempted) so preempted entries
-		 * sort "higher" than non preempted entries at the same priority.
-		 */
+		  
+                                                          
+                                                                   
+     
 		if (e1->key != e2->key) {
 			return (int)e2->key - (int)e1->key;
 		}
 		if (e1->stamp != e2->stamp) {
-			/*
-			 * preempted entries:     younger (bigger timestamp)  is "higher"
-			 * non preempted entries: older   (smaller timestamp) is "higher"
-			 */
+			  
+                                                                    
+                                                                    
+      
 			if (e1->key & PRIORITY_QUEUE_ENTRY_PREEMPTED) {
 				return e1->stamp < e2->stamp ? 1 : -1;
 			} else {
@@ -110,17 +110,17 @@ struct pqueue_entry_traits<queue_t, priority_queue_entry_stable_t> {
 
 #pragma mark main template
 
-/*
- * Template for our priority queue.
- *
- * It is parametrized with:
- * - `queue_t`: the queue type
- * - `entry_t`: the element type
- *
- * It will use:
- * - priority_queue_is_min_heap() to determine if it is a min/max heap
- * - pqueue_entry_traits<queue_t, entry_t>::compare for the ordering
- */
+  
+                                   
+  
+                           
+                              
+                                
+  
+               
+                                                                      
+                                                                    
+   
 template <typename queue_t, typename entry_t>
 struct pqueue {
 	using entry_traits = pqueue_entry_traits<queue_t, entry_t>;
@@ -162,13 +162,13 @@ private:
 				parent = subtree_b;
 				child = subtree_a;
 			}
-			/* Insert the child as the first element in the parent's child list */
+			                                                                      
 			child->next = unpack_child(parent);
 			child->prev = parent;
 			if (unpack_child(parent) != NULL) {
 				unpack_child(parent)->prev = child;
 			}
-			/* Create the parent child relationship */
+			                                          
 			pack_child(parent, child);
 			parent->next = NULL;
 			parent->prev = NULL;
@@ -191,32 +191,32 @@ private:
 		entry_t pq_meld_result = NULL;
 		entry_t pair_list = NULL;
 
-		assert(elt); // caller needs to check this.
+		assert(elt);                               
 
-		/* Phase 1: */
-		/* Split the list into a set of pairs going front to back. */
-		/* Hook these pairs onto an intermediary list in reverse order of traversal.*/
+		              
+		                                                             
+		                                                                              
 
 		do {
-			/* Consider two elements at a time for pairing */
+			                                                 
 			entry_t pair_item_a = elt;
 			entry_t pair_item_b = elt->next;
 			if (pair_item_b == NULL) {
-				/* Odd number of elements in the list; link the odd element */
-				/* as it is on the intermediate list. */
+				                                                              
+				                                        
 				pair_item_a->prev = pair_list;
 				pair_list = pair_item_a;
 				break;
 			}
-			/* Found two elements to pair up */
+			                                   
 			elt = pair_item_b->next;
 			entry_t pair = merge_pair_inline(que, pair_item_a, pair_item_b);
-			/* Link the pair onto the intermediary list */
+			                                              
 			pair->prev = pair_list;
 			pair_list = pair;
 		} while (elt != NULL);
 
-		/* Phase 2: Merge all the pairs in the pair_list */
+		                                                   
 		do {
 			elt = pair_list->prev;
 			pq_meld_result = merge_pair_inline(que, pq_meld_result, pair_list);
@@ -230,15 +230,15 @@ private:
 	list_remove(entry_t elt)
 	{
 		assert(elt->prev != NULL);
-		/* Check if elt is head of list at its level;        */
-		/* If yes, make the next node the head at that level */
-		/* Else, remove elt from the list at that level      */
+		                                                       
+		                                                       
+		                                                       
 		if (unpack_child(elt->prev) == elt) {
 			pack_child(elt->prev, elt->next);
 		} else {
 			elt->prev->next = elt->next;
 		}
-		/* Update prev for next element in list */
+		                                          
 		if (elt->next != NULL) {
 			elt->next->prev = elt->prev;
 		}
@@ -259,9 +259,9 @@ private:
 			return true;
 		}
 
-		/* Remove the element from its current level list */
+		                                                    
 		list_remove(elt);
-		/* Re-insert the element into the heap with a merge */
+		                                                      
 		return insert(que, elt);
 	}
 
@@ -270,11 +270,11 @@ private:
 	{
 		entry_t child, new_root;
 
-		/* To remove a non-root element with children levels, */
-		/* - Remove element from its current level list */
-		/* - Pairwise split all the elements in the child level list */
-		/* - Meld all these splits (right-to-left) to form new subtree */
-		/* - Merge the root subtree with the newly formed subtree */
+		                                                        
+		                                                  
+		                                                               
+		                                                                 
+		                                                            
 		list_remove(elt);
 
 		child = unpack_child(elt);
@@ -289,9 +289,9 @@ private:
 
 public:
 
-	/*
-	 * exposed interfaces
-	 */
+	  
+                      
+    
 
 	OS_NOINLINE
 	static void
@@ -315,7 +315,7 @@ public:
 			callback((void *)((char *)elt - offset));
 		}
 
-		/* poison the queue now that it's destroyed */
+		                                              
 		que->pq_root = (entry_t)(~0ul);
 	}
 

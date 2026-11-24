@@ -39,14 +39,14 @@ extern void     *kdp_trans_off;
 extern void     *osversion;
 extern void     *flag_kdp_trigger_reboot;
 extern void     *manual_pkt;
-extern struct vm_object pmap_object_store;      /* store pt pages */
+extern struct vm_object pmap_object_store;                          
 
 lowglo lowGlo __attribute__ ((aligned(PAGE_MAX_SIZE))) = {
 	.lgVerCode = { 'O', 'c', 't', 'o', 'p', 'u', 's', ' ' },
-	// Increment the major version for changes that break the current Astris
-	// usage of lowGlo values
-	// Increment the minor version for changes that provide additonal info/function
-	// but does not break current usage
+	                                                                        
+	                         
+	                                                                               
+	                                   
 	.lgLayoutMajorVersion = 3,
 	.lgLayoutMinorVersion = 2,
 	.lgLayoutMagic = LOWGLO_LAYOUT_MAGIC,
@@ -84,10 +84,10 @@ patch_low_glo_static_region(uint32_t address, uint32_t size)
 	lowGlo.lgStaticAddr = address;
 	lowGlo.lgStaticSize = size;
 
-	/**
-	 * These values are set in pmap_bootstrap() and represent the range of
-	 * kernel managed memory.
-	 */
+	   
+                                                                       
+                          
+    
 	extern const pmap_paddr_t vm_first_phys;
 	extern const pmap_paddr_t vm_last_phys;
 	assertf((vm_first_phys != 0) && (vm_last_phys != 0),

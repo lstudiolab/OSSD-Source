@@ -1,7 +1,7 @@
-//
-// Tests for
-//  safe_allocation(safe_allocation&& other);
-//
+  
+            
+                                             
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>
@@ -16,7 +16,7 @@ template <typename T>
 static void
 tests()
 {
-	// Move-construct from a non-null allocation (with different syntaxes)
+	                                                                      
 	{
 		{
 			tracked_safe_allocation<T> from(10, libkern::allocate_memory);
@@ -78,7 +78,7 @@ tests()
 		CHECK(!tracking_allocator::did_deallocate);
 	}
 
-	// Move-construct from a null allocation
+	                                        
 	{
 		{
 			tracked_safe_allocation<T> from = nullptr;

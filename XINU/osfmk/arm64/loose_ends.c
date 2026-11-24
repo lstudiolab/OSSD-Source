@@ -38,7 +38,7 @@
 #include <kdp/kdp_udp.h>
 #if !MACH_KDP
 #include <kdp/kdp_callout.h>
-#endif /* !MACH_KDP */
+#endif                
 #include <arm/cpu_data.h>
 #include <arm/cpu_data_internal.h>
 #include <arm/caches_internal.h>
@@ -104,7 +104,7 @@ bcopy_phys_internal(addr64_t src, addr64_t dst, vm_size_t bytes, int flags)
 #endif
 		}
 		if (BCOPY_PHYS_DST_IS_PHYS(flags)) {
-			// write preflighting needed for things like dtrace which may write static read-only mappings
+			                                                                                             
 			use_copy_window_dst = (!pmap_valid_address(dst) || !mmu_kvtop_wpreflight(phystokv((pmap_paddr_t)dst)));
 			pn_dst = (ppnum_t)(dst >> PAGE_SHIFT);
 #if !defined(__ARM_COHERENT_IO__) && !__ARM_PTE_PHYSMAP__
@@ -192,7 +192,7 @@ bzero_phys_nc(addr64_t src64, vm_size_t bytes)
 
 extern void *secure_memset(void *, int, size_t);
 
-/* Zero bytes starting at a physical address */
+                                               
 void
 bzero_phys(addr64_t src, vm_size_t bytes)
 {
@@ -243,7 +243,7 @@ bzero_phys(addr64_t src, vm_size_t bytes)
 			bzero(buf, count);
 			break;
 		default:
-			/* 'dc zva' performed by bzero is not safe for device memory */
+			                                                               
 			secure_memset((void*)buf, 0, count);
 		}
 
@@ -258,9 +258,9 @@ bzero_phys(addr64_t src, vm_size_t bytes)
 	}
 }
 
-/*
- *  Read data from a physical address.
- */
+  
+                                      
+   
 
 
 static unsigned long long
@@ -400,9 +400,9 @@ ml_phys_read_double_64(addr64_t paddr64)
 
 
 
-/*
- *  Write data to a physical address.
- */
+  
+                                     
+   
 
 static void
 ml_phys_write_data(pmap_paddr_t paddr, unsigned long long data, int size)
@@ -530,36 +530,36 @@ ml_phys_write_double_64(addr64_t paddr64, unsigned long long data)
 }
 
 
-/*
- * Set indicated bit in bit string.
- */
+  
+                                   
+   
 void
 setbit(int bitno, int *s)
 {
 	s[bitno / INT_SIZE] |= 1U << (bitno % INT_SIZE);
 }
 
-/*
- * Clear indicated bit in bit string.
- */
+  
+                                     
+   
 void
 clrbit(int bitno, int *s)
 {
 	s[bitno / INT_SIZE] &= ~(1U << (bitno % INT_SIZE));
 }
 
-/*
- * Test if indicated bit is set in bit string.
- */
+  
+                                              
+   
 int
 testbit(int bitno, int *s)
 {
 	return s[bitno / INT_SIZE] & (1U << (bitno % INT_SIZE));
 }
 
-/*
- * Find first bit set in bit string.
- */
+  
+                                    
+   
 int
 ffsbit(int *s)
 {
@@ -578,10 +578,10 @@ ffs(unsigned int mask)
 		return 0;
 	}
 
-	/*
-	 * NOTE: cannot use __builtin_ffs because it generates a call to
-	 * 'ffs'
-	 */
+	  
+                                                                 
+         
+    
 	return 1 + __builtin_ctz(mask);
 }
 
@@ -592,16 +592,16 @@ ffsll(unsigned long long mask)
 		return 0;
 	}
 
-	/*
-	 * NOTE: cannot use __builtin_ffsll because it generates a call to
-	 * 'ffsll'
-	 */
+	  
+                                                                   
+           
+    
 	return 1 + __builtin_ctzll(mask);
 }
 
-/*
- * Find last bit set in bit string.
- */
+  
+                                   
+   
 int
 fls(unsigned int mask)
 {
@@ -642,11 +642,11 @@ bcmp(
 		}
 	} while (--len);
 
-	/*
-	 * Check for the overflow case but continue to handle the non-overflow
-	 * case the same way just in case someone is using the return value
-	 * as more than zero/non-zero
-	 */
+	  
+                                                                       
+                                                                    
+                              
+    
 	if ((len & 0xFFFFFFFF00000000ULL) && !(len & 0x00000000FFFFFFFFULL)) {
 		return 0xFFFFFFFFL;
 	} else {
@@ -674,7 +674,7 @@ memcmp(const void *s1, const void *s2, size_t n)
 kern_return_t
 copypv(addr64_t source, addr64_t sink, unsigned int size, int which)
 {
-	if ((which & (cppvPsrc | cppvPsnk)) == 0) {     /* Make sure that only one is virtual */
+	if ((which & (cppvPsrc | cppvPsnk)) == 0) {                                             
 		panic("%s: no more than 1 parameter may be virtual", __func__);
 	}
 
@@ -697,16 +697,16 @@ copypv(addr64_t source, addr64_t sink, unsigned int size, int which)
 
 extern int copyinframe(vm_address_t fp, char *frame, boolean_t is64bit);
 
-/*
- * Machine-dependent routine to fill in an array with up to callstack_max
- * levels of return pc information.
- */
+  
+                                                                         
+                                   
+   
 void
 machine_callstack(
 	uintptr_t * buf,
 	vm_size_t callstack_max)
 {
-	/* Captures the USER call stack */
+	                                  
 	uint32_t i = 0;
 
 	struct arm_saved_state *state = find_user_regs(current_thread());
@@ -744,7 +744,7 @@ machine_callstack(
 	}
 }
 
-#endif                          /* MACH_ASSERT */
+#endif                                           
 
 int
 clr_be_bit(void)
@@ -778,8 +778,8 @@ ml_thread_policy(
 	__unused unsigned policy_id,
 	__unused unsigned policy_info)
 {
-	//    <rdar://problem/7141284>: Reduce print noise
-	//	kprintf("ml_thread_policy() unimplemented\n");
+	                                                  
+	                                                 
 }
 
 __dead2
@@ -789,7 +789,7 @@ panic_unimplemented(void)
 	panic("Not yet implemented.");
 }
 
-/* ARM64_TODO <rdar://problem/9198953> */
+                                         
 void abort(void) __dead2;
 
 void
@@ -807,17 +807,17 @@ kdp_register_callout(kdp_callout_fn_t fn, void *arg)
 }
 #endif
 
-/*
- * Get a quick virtual mapping of a physical page and run a callback on that
- * page's virtual address.
- *
- * @param dst64 Physical address to access (doesn't need to be page-aligned).
- * @param bytes Number of bytes to be accessed. This cannot cross page boundaries.
- * @param func Callback function to call with the page's virtual address.
- * @param arg Argument passed directly to `func`.
- *
- * @return The return value from `func`.
- */
+  
+                                                                            
+                          
+  
+                                                                             
+                                                                                  
+                                                                         
+                                                 
+  
+                                        
+   
 int
 apply_func_phys(
 	addr64_t dst64,
@@ -825,13 +825,13 @@ apply_func_phys(
 	int (*func)(void * buffer, vm_size_t bytes, void * arg),
 	void * arg)
 {
-	/* The physical aperture is only guaranteed to work with kernel-managed addresses. */
+	                                                                                     
 	if (!pmap_valid_address(dst64)) {
 		panic("%s address error: passed in address (%#llx) not a kernel managed address",
 		    __FUNCTION__, dst64);
 	}
 
-	/* Ensure we stay within a single page */
+	                                         
 	if (((((uint32_t)dst64 & (ARM_PGBYTES - 1)) + bytes) > ARM_PGBYTES)) {
 		panic("%s alignment error: tried accessing addresses spanning more than one page %#llx %#lx",
 		    __FUNCTION__, dst64, bytes);

@@ -1,5 +1,5 @@
-/*	$FreeBSD: src/sys/netinet6/ah6.h,v 1.2.2.2 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: ah.h,v 1.13 2000/10/18 21:28:00 itojun Exp $	*/
+                                                                              
+                                                         
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -30,9 +30,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1826/2402 authentication header.
- */
+  
+                                      
+   
 
 #ifndef _NETINET6_AH6_H_
 #define _NETINET6_AH6_H_
@@ -48,5 +48,5 @@ extern int ah6_calccksum(struct mbuf *, caddr_t, size_t,
     const struct ah_algorithm *, struct secasvar *);
 
 extern void ah6_ctlinput(int, struct sockaddr *, void *);
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /*_NETINET6_AH6_H_*/
+#endif                         
+#endif                     

@@ -38,8 +38,8 @@
 
 #ifdef PROFILE
 
-/* These __llvm functions are defined in InstrProfiling.h in compiler_rt.  That
- * is a internal header, so we need to re-prototype them here.  */
+                                                                               
+                                                                  
 
 uint64_t __llvm_profile_get_size_for_buffer(void);
 int __llvm_profile_write_buffer(char *Buffer);
@@ -96,11 +96,11 @@ write_buffer(int flags, char *buffer)
 
 #endif
 
-/* this variable is used to signal to the debugger that we'd like it to reset
- * the counters */
+                                                                             
+                  
 int kdp_pgo_reset_counters = 0;
 
-/* called in debugger context */
+                                
 kern_return_t
 do_pgo_reset_counters()
 {
@@ -139,16 +139,16 @@ pgo_reset_counters()
 }
 
 
-/*
- * returns:
- *   EPERM  unless you are root
- *   EINVAL for invalid args.
- *   ENOSYS for not implemented
- *   ERANGE for integer overflow
- *   ENOENT if kext not found
- *   ENOTSUP kext does not support PGO
- *   EIO llvm returned an error.  shouldn't ever happen.
- */
+  
+           
+                               
+                             
+                               
+                                
+                             
+                                      
+                                                        
+   
 
 int
 grab_pgo_data(struct proc *p,

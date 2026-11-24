@@ -34,4 +34,4 @@ extern void mbuf_tag_id_first_last(mbuf_tag_id_t * first, mbuf_tag_id_t * last);
 extern errno_t mbuf_tag_id_find_internal(const char *string,
     mbuf_tag_id_t * out_id, int create);
 
-#endif /* __KPI_MBUF_INTERNAL_ */
+#endif                           

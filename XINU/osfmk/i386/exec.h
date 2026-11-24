@@ -53,48 +53,48 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- * exec stucture in an a.out file derived from FSF's
- * a.out.gnu.h file.
- */
+  
+   
+  
+                                                    
+                    
+   
 
 #ifndef _EXEC_
 #define _EXEC_  1
 
-/*
- * Header prepended to each a.out file.
- */
+  
+                                       
+   
 struct exec {
 #ifdef  sun
-	unsigned short  a_machtype;/* machine type */
-	unsigned short  a_info; /* Use macros N_MAGIC, etc for access */
-#else   /* sun */
-	unsigned long   a_info; /* Use macros N_MAGIC, etc for access */
-#endif  /* sun */
-	unsigned long a_text;   /* length of text, in bytes */
-	unsigned long a_data;   /* length of data, in bytes */
-	unsigned long a_bss;    /* length of uninitialized data area for file, in bytes */
-	unsigned long a_syms;   /* length of symbol table data in file, in bytes */
-	unsigned long a_entry;  /* start address */
-	unsigned long a_trsize; /* length of relocation info for text, in bytes */
-	unsigned long a_drsize; /* length of relocation info for data, in bytes */
+	unsigned short  a_machtype;                  
+	unsigned short  a_info;                                         
+#else            
+	unsigned long   a_info;                                         
+#endif           
+	unsigned long a_text;                                 
+	unsigned long a_data;                                 
+	unsigned long a_bss;                                                              
+	unsigned long a_syms;                                                      
+	unsigned long a_entry;                     
+	unsigned long a_trsize;                                                   
+	unsigned long a_drsize;                                                   
 };
 
-/* Code indicating object file or impure executable.  */
+                                                        
 #define OMAGIC 0407
-/* Code indicating pure executable.  */
+                                       
 #define NMAGIC 0410
-/* Code indicating demand-paged executable.  */
+                                               
 #define ZMAGIC 0413
 
 #ifdef sun
-/* Sun machine types */
+                       
 
-#define M_OLDSUN2       0       /* old sun-2 executable files */
-#define M_68010         1       /* runs on either 68010 or 68020 */
-#define M_68020         2       /* runs only on 68020 */
-#endif /* sun */
+#define M_OLDSUN2       0                                       
+#define M_68010         1                                          
+#define M_68020         2                               
+#endif          
 
-#endif  /* _EXEC_ */
+#endif              

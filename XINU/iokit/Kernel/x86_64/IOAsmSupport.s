@@ -28,9 +28,9 @@
 #include <architecture/i386/asm_help.h>
 
 
-/*
- * Seemingly unused references from cpp statically initialized objects.
- */
+  
+                                                                       
+   
 
 .globl .constructors_used
 .globl .destructors_used

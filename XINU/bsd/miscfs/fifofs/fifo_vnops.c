@@ -82,50 +82,50 @@
 int(**fifo_vnodeop_p)(void *);
 const struct vnodeopv_entry_desc fifo_vnodeop_entries[] = {
 	{ .opve_op = &vnop_default_desc, .opve_impl = (VOPFUNC)vn_default_error },
-	{ .opve_op = &vnop_lookup_desc, .opve_impl = (VOPFUNC)fifo_lookup },            /* lookup */
-	{ .opve_op = &vnop_create_desc, .opve_impl = (VOPFUNC)err_create },             /* create */
-	{ .opve_op = &vnop_mknod_desc, .opve_impl = (VOPFUNC)err_mknod },               /* mknod */
-	{ .opve_op = &vnop_open_desc, .opve_impl = (VOPFUNC)fifo_open },                        /* open */
-	{ .opve_op = &vnop_close_desc, .opve_impl = (VOPFUNC)fifo_close },              /* close */
-	{ .opve_op = &vnop_access_desc, .opve_impl = (VOPFUNC)fifo_access },            /* access */
-	{ .opve_op = &vnop_getattr_desc, .opve_impl = (VOPFUNC)fifo_getattr },          /* getattr */
-	{ .opve_op = &vnop_setattr_desc, .opve_impl = (VOPFUNC)fifo_setattr },          /* setattr */
-	{ .opve_op = &vnop_read_desc, .opve_impl = (VOPFUNC)fifo_read },                        /* read */
-	{ .opve_op = &vnop_write_desc, .opve_impl = (VOPFUNC)fifo_write },              /* write */
-	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (VOPFUNC)fifo_ioctl },              /* ioctl */
-	{ .opve_op = &vnop_select_desc, .opve_impl = (VOPFUNC)fifo_select },            /* select */
-	{ .opve_op = &vnop_revoke_desc, .opve_impl = (VOPFUNC)fifo_revoke },            /* revoke */
-	{ .opve_op = &vnop_mmap_desc, .opve_impl = (VOPFUNC)err_mmap },                 /* mmap */
-	{ .opve_op = &vnop_fsync_desc, .opve_impl = (VOPFUNC)fifo_fsync },              /* fsync */
-	{ .opve_op = &vnop_remove_desc, .opve_impl = (VOPFUNC)err_remove },             /* remove */
-	{ .opve_op = &vnop_link_desc, .opve_impl = (VOPFUNC)err_link },                 /* link */
-	{ .opve_op = &vnop_rename_desc, .opve_impl = (VOPFUNC)err_rename },             /* rename */
-	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (VOPFUNC)err_mkdir },               /* mkdir */
-	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (VOPFUNC)err_rmdir },               /* rmdir */
-	{ .opve_op = &vnop_symlink_desc, .opve_impl = (VOPFUNC)err_symlink },           /* symlink */
-	{ .opve_op = &vnop_readdir_desc, .opve_impl = (VOPFUNC)err_readdir },           /* readdir */
-	{ .opve_op = &vnop_readlink_desc, .opve_impl = (VOPFUNC)err_readlink },         /* readlink */
-	{ .opve_op = &vnop_inactive_desc, .opve_impl = (VOPFUNC)fifo_inactive },                /* inactive */
-	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (VOPFUNC)fifo_reclaim },          /* reclaim */
-	{ .opve_op = &vnop_strategy_desc, .opve_impl = (VOPFUNC)err_strategy },         /* strategy */
-	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (VOPFUNC)fifo_pathconf },                /* pathconf */
-	{ .opve_op = &vnop_advlock_desc, .opve_impl = (VOPFUNC)fifo_advlock },          /* advlock */
-	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (VOPFUNC)fifo_bwrite },            /* bwrite */
-	{ .opve_op = &vnop_pagein_desc, .opve_impl = (VOPFUNC)err_pagein },             /* Pagein */
-	{ .opve_op = &vnop_pageout_desc, .opve_impl = (VOPFUNC)err_pageout },           /* Pageout */
-	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (VOPFUNC)err_copyfile },         /* Copyfile */
-	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)err_blktooff },         /* blktooff */
-	{ .opve_op = &vnop_offtoblk_desc, .opve_impl = (VOPFUNC)err_offtoblk },         /* offtoblk */
-	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (VOPFUNC)err_blockmap },                 /* blockmap */
+	{ .opve_op = &vnop_lookup_desc, .opve_impl = (VOPFUNC)fifo_lookup },                        
+	{ .opve_op = &vnop_create_desc, .opve_impl = (VOPFUNC)err_create },                         
+	{ .opve_op = &vnop_mknod_desc, .opve_impl = (VOPFUNC)err_mknod },                          
+	{ .opve_op = &vnop_open_desc, .opve_impl = (VOPFUNC)fifo_open },                                  
+	{ .opve_op = &vnop_close_desc, .opve_impl = (VOPFUNC)fifo_close },                         
+	{ .opve_op = &vnop_access_desc, .opve_impl = (VOPFUNC)fifo_access },                        
+	{ .opve_op = &vnop_getattr_desc, .opve_impl = (VOPFUNC)fifo_getattr },                       
+	{ .opve_op = &vnop_setattr_desc, .opve_impl = (VOPFUNC)fifo_setattr },                       
+	{ .opve_op = &vnop_read_desc, .opve_impl = (VOPFUNC)fifo_read },                                  
+	{ .opve_op = &vnop_write_desc, .opve_impl = (VOPFUNC)fifo_write },                         
+	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (VOPFUNC)fifo_ioctl },                         
+	{ .opve_op = &vnop_select_desc, .opve_impl = (VOPFUNC)fifo_select },                        
+	{ .opve_op = &vnop_revoke_desc, .opve_impl = (VOPFUNC)fifo_revoke },                        
+	{ .opve_op = &vnop_mmap_desc, .opve_impl = (VOPFUNC)err_mmap },                           
+	{ .opve_op = &vnop_fsync_desc, .opve_impl = (VOPFUNC)fifo_fsync },                         
+	{ .opve_op = &vnop_remove_desc, .opve_impl = (VOPFUNC)err_remove },                         
+	{ .opve_op = &vnop_link_desc, .opve_impl = (VOPFUNC)err_link },                           
+	{ .opve_op = &vnop_rename_desc, .opve_impl = (VOPFUNC)err_rename },                         
+	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (VOPFUNC)err_mkdir },                          
+	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (VOPFUNC)err_rmdir },                          
+	{ .opve_op = &vnop_symlink_desc, .opve_impl = (VOPFUNC)err_symlink },                        
+	{ .opve_op = &vnop_readdir_desc, .opve_impl = (VOPFUNC)err_readdir },                        
+	{ .opve_op = &vnop_readlink_desc, .opve_impl = (VOPFUNC)err_readlink },                       
+	{ .opve_op = &vnop_inactive_desc, .opve_impl = (VOPFUNC)fifo_inactive },                              
+	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (VOPFUNC)fifo_reclaim },                       
+	{ .opve_op = &vnop_strategy_desc, .opve_impl = (VOPFUNC)err_strategy },                       
+	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (VOPFUNC)fifo_pathconf },                              
+	{ .opve_op = &vnop_advlock_desc, .opve_impl = (VOPFUNC)fifo_advlock },                       
+	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (VOPFUNC)fifo_bwrite },                        
+	{ .opve_op = &vnop_pagein_desc, .opve_impl = (VOPFUNC)err_pagein },                         
+	{ .opve_op = &vnop_pageout_desc, .opve_impl = (VOPFUNC)err_pageout },                        
+	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (VOPFUNC)err_copyfile },                       
+	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (VOPFUNC)err_blktooff },                       
+	{ .opve_op = &vnop_offtoblk_desc, .opve_impl = (VOPFUNC)err_offtoblk },                       
+	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (VOPFUNC)err_blockmap },                               
 	{ .opve_op = (struct vnodeop_desc*)NULL, .opve_impl = (int (*)(void *))NULL }
 };
 const struct vnodeopv_desc fifo_vnodeop_opv_desc =
 { .opv_desc_vector_p = &fifo_vnodeop_p, .opv_desc_ops = fifo_vnodeop_entries };
 
-/*
- * Trivial lookup routine that always fails.
- */
-/* ARGSUSED */
+  
+                                            
+   
+              
 int
 fifo_lookup(struct vnop_lookup_args *ap)
 {
@@ -133,11 +133,11 @@ fifo_lookup(struct vnop_lookup_args *ap)
 	return ENOTDIR;
 }
 
-/*
- * Open called to set up a new instance of a fifo or
- * to find an active instance of a fifo.
- */
-/* ARGSUSED */
+  
+                                                    
+                                        
+   
+              
 int
 fifo_open(struct vnop_open_args *ap)
 {
@@ -184,9 +184,9 @@ retry:
 			}
 			fip->fi_readers = fip->fi_writers = 0;
 
-			/* Lock ordering between wso and rso does not matter here
-			 * because they are just created and no one has a reference to them
-			 */
+			                                                         
+                                                                      
+      
 			socket_lock(wso, 1);
 			wso->so_state |= SS_CANTRCVMORE;
 			wso->so_snd.sb_lowat = PIPE_BUF;
@@ -207,12 +207,12 @@ retry:
 				fip->fi_flags &= ~FIFO_CREATEWAIT;
 				wakeup(&fip->fi_flags);
 			}
-			/* vnode lock is held  to process further */
+			                                            
 		}
 	}
 
-	/* vnode is locked at this point */
-	/* fifo in created already */
+	                                   
+	                             
 	if (ap->a_mode & FREAD) {
 		fip->fi_readers++;
 		if (fip->fi_readers == 1) {
@@ -294,9 +294,9 @@ bad1:
 	return error;
 }
 
-/*
- * Vnode op for read
- */
+  
+                    
+   
 int
 fifo_read(struct vnop_read_args *ap)
 {
@@ -319,11 +319,11 @@ fifo_read(struct vnop_read_args *ap)
 
 	startresid = uio_resid(uio);
 
-	/* fifo conformance - if we have a reader open on the fifo but no
-	 * writers then we need to make sure we do not block.  We do that by
-	 * checking the receive buffer and if empty set error to EWOULDBLOCK.
-	 * If error is set to EWOULDBLOCK we skip the call into soreceive
-	 */
+	                                                                 
+                                                                     
+                                                                      
+                                                                  
+    
 	error = 0;
 	if (ap->a_vp->v_fifoinfo->fi_writers < 1) {
 		socket_lock(rso, 1);
@@ -331,7 +331,7 @@ fifo_read(struct vnop_read_args *ap)
 		socket_unlock(rso, 1);
 	}
 
-	/* skip soreceive to avoid blocking when we have no writers */
+	                                                              
 	if (error != EWOULDBLOCK) {
 		error = soreceive(rso, (struct sockaddr **)0, uio, (struct mbuf **)0,
 		    (struct mbuf **)0, &rflags);
@@ -339,12 +339,12 @@ fifo_read(struct vnop_read_args *ap)
 			lock_vnode_and_post(ap->a_vp, 0);
 		}
 	} else {
-		/* clear EWOULDBLOCK and return EOF (zero) */
+		                                             
 		error = 0;
 	}
-	/*
-	 * Clear EOF indication after first such return.
-	 */
+	  
+                                                 
+    
 	if (uio_resid(uio) == startresid) {
 		socket_lock(rso, 1);
 		rso->so_state &= ~SS_CANTRCVMORE;
@@ -353,9 +353,9 @@ fifo_read(struct vnop_read_args *ap)
 	return error;
 }
 
-/*
- * Vnode op for write
- */
+  
+                     
+   
 int
 fifo_write(struct vnop_write_args *ap)
 {
@@ -376,9 +376,9 @@ fifo_write(struct vnop_write_args *ap)
 	return error;
 }
 
-/*
- * Device ioctl operation.
- */
+  
+                          
+   
 int
 fifo_ioctl(struct vnop_ioctl_args *ap)
 {
@@ -441,9 +441,9 @@ fifo_inactive(__unused struct vnop_inactive_args *ap)
 }
 
 
-/*
- * Device close routine
- */
+  
+                       
+   
 int
 fifo_close(struct vnop_close_args *ap)
 {
@@ -519,9 +519,9 @@ fifo_close_internal(vnode_t vp, int fflag, __unused vfs_context_t context, int l
 	return error2;
 }
 
-/*
- * Print out internal contents of a fifo vnode.
- */
+  
+                                               
+   
 void
 fifo_printinfo(struct vnode *vp)
 {
@@ -531,9 +531,9 @@ fifo_printinfo(struct vnode *vp)
 	    fip->fi_readers, fip->fi_writers);
 }
 
-/*
- * Return POSIX pathconf information applicable to fifo's.
- */
+  
+                                                          
+   
 int
 fifo_pathconf(struct vnop_pathconf_args *ap)
 {
@@ -545,26 +545,26 @@ fifo_pathconf(struct vnop_pathconf_args *ap)
 		*ap->a_retval = PIPE_BUF;
 		return 0;
 	case _PC_CHOWN_RESTRICTED:
-		*ap->a_retval = 200112;         /* _POSIX_CHOWN_RESTRICTED */
+		*ap->a_retval = 200112;                                      
 		return 0;
 	default:
 		return EINVAL;
 	}
-	/* NOTREACHED */
+	                
 }
 
-/*
- * Fifo failed operation
- */
+  
+                        
+   
 int
 fifo_ebadf(__unused void *dummy)
 {
 	return EBADF;
 }
 
-/*
- * Fifo advisory byte-level locks.
- */
+  
+                                  
+   
 int
 fifo_advlock(__unused struct vnop_advlock_args *ap)
 {
@@ -572,7 +572,7 @@ fifo_advlock(__unused struct vnop_advlock_args *ap)
 }
 
 
-/* You'd certainly better have an iocount on the vnode! */
+                                                          
 int
 fifo_freespace(struct vnode *vp, long *count)
 {

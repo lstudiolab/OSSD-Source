@@ -80,7 +80,7 @@ is_kernel_64_bit(void)
 	static bool k64 = false;
 	dispatch_once(&k64_once, ^{
 		int errb;
-		int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, 0 /* kernproc */ };
+		int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, 0                };
 
 		struct kinfo_proc kp;
 		size_t len = sizeof(kp);
@@ -95,14 +95,14 @@ is_kernel_64_bit(void)
 	return k64;
 }
 
-// Use an extra, non-inlineable function so that any frames after expect_stack
-// can be safely ignored.  This insulates the test from changes in how syscalls
-// are called by Libc and the kernel.
+                                                                              
+                                                                               
+                                     
 static int __attribute__((noinline, not_tail_called))
 backtrace_current_thread_wrapper(uint64_t *bt, size_t *bt_filled)
 {
 	int ret = sysctlbyname("kern.backtrace.user", bt, bt_filled, NULL, 0);
-	getpid(); // Really prevent tail calls.
+	getpid();                              
 	return ret;
 }
 
@@ -144,16 +144,16 @@ expect_callstack(void)
 	for (unsigned int i = 0; i < bt_len; i++) {
 		uintptr_t addr;
 #if !defined(__LP64__)
-		// Backtrace frames come out as kernel words; convert them back to user
-		// uintptr_t for 32-bit processes.
+		                                                                       
+		                                  
 		if (is_kernel_64_bit()) {
 			addr = (uintptr_t)(bt[i]);
 		} else {
 			addr = (uintptr_t)(((uint32_t *)bt)[i]);
 		}
-#else // defined(__LP32__)
+#else                     
 		addr = (uintptr_t)bt[i];
-#endif // defined(__LP32__)
+#endif                     
 
 		CSSymbolRef symbol = CSSymbolicatorGetSymbolWithAddressAtTime(
 			user_symb, addr, kCSNow);
@@ -174,7 +174,7 @@ recurse_a(unsigned int frames)
 {
 	if (frames == 1) {
 		expect_callstack();
-		getpid(); // Really prevent tail calls.
+		getpid();                              
 		return 0;
 	}
 
@@ -186,7 +186,7 @@ recurse_b(unsigned int frames)
 {
 	if (frames == 1) {
 		expect_callstack();
-		getpid(); // Really prevent tail calls.
+		getpid();                              
 		return 0;
 	}
 
@@ -199,9 +199,9 @@ backtrace_thread(void *arg)
 #pragma unused(arg)
 	unsigned int calls;
 
-	// backtrace_thread, recurse_a, recurse_b, ..., __sysctlbyname
-	//
-	// Always make one less call for this frame (backtrace_thread).
+	                                                              
+	  
+	                                                               
 	calls = USER_FRAMES - NON_RECURSE_FRAMES;
 
 	T_LOG("backtrace thread calling into %d frames (already at %d frames)",
@@ -215,8 +215,8 @@ T_DECL(backtrace_user, "test that the kernel can backtrace user stacks",
 {
 	pthread_t thread;
 
-	// Run the test from a different thread to insulate it from libdarwintest
-	// setup.
+	                                                                         
+	         
 	T_QUIET; T_ASSERT_POSIX_ZERO(pthread_create(&thread, NULL, backtrace_thread,
 	    NULL), "create additional thread to backtrace");
 
@@ -234,18 +234,18 @@ T_DECL(backtrace_user_bounds,
 	void *guard_page = NULL;
 	void *bt_start = NULL;
 
-	// The backtrace addresses come back as kernel words.
+	                                                     
 	size_t kword_size = is_kernel_64_bit() ? 8 : 4;
 
-	// Get an idea of how many frames to expect.
+	                                            
 	int ret = sysctlbyname("kern.backtrace.user", bt_init, &bt_filled, NULL, 0);
 	if (ret == -1 && errno == ENOENT) {
 		T_SKIP("release kernel: kern.backtrace.user missing");
 	}
 	T_ASSERT_POSIX_SUCCESS(error, "sysctlbyname(\"kern.backtrace.user\")");
 
-	// Allocate two pages -- a first one that's valid and a second that
-	// will be non-writeable to catch a copyout that's too large.
+	                                                                   
+	                                                             
 	bt_page = mmap(NULL, vm_page_size * 2, PROT_READ | PROT_WRITE,
 	    MAP_ANON | MAP_PRIVATE, -1, 0);
 	T_WITH_ERRNO;
@@ -255,7 +255,7 @@ T_DECL(backtrace_user_bounds,
 	error = mprotect(guard_page, vm_page_size, PROT_READ);
 	T_ASSERT_POSIX_SUCCESS(error, "mprotect(..., PROT_READ) guard page");
 
-	// Ensure the pages are set up as expected.
+	                                           
 	kr = vm_write(mach_task_self(), (vm_address_t)bt_page,
 	    (vm_offset_t)&(int){ 12345 }, sizeof(int));
 	T_ASSERT_MACH_SUCCESS(kr,
@@ -264,7 +264,7 @@ T_DECL(backtrace_user_bounds,
 	    (vm_offset_t)&(int){ 12345 }, sizeof(int));
 	T_ASSERT_NE(kr, KERN_SUCCESS, "should fail to write to guard page");
 
-	// Ask the kernel to write the backtrace just before the guard page.
+	                                                                    
 	bt_start = (char *)guard_page - (kword_size * bt_filled);
 	bt_filled_after = bt_filled;
 
@@ -276,7 +276,7 @@ T_DECL(backtrace_user_bounds,
 	    "both calls to backtrace should have filled in the same number of "
 	    "frames");
 
-	// Expect the kernel to fault when writing too far.
+	                                                   
 	bt_start = (char *)bt_start + 1;
 	bt_filled_after = bt_filled;
 	error = sysctlbyname("kern.backtrace.user", bt_start, &bt_filled_after,

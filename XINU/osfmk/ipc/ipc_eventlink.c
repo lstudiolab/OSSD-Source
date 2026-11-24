@@ -67,9 +67,9 @@ static LCK_SPIN_DECLARE(global_ipc_eventlink_lock, &ipc_eventlink_dev_lock_grp);
 #define global_ipc_eventlink_unlock() \
 	lck_spin_unlock(&global_ipc_eventlink_lock)
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-/* Forward declarations */
+                          
 static struct ipc_eventlink_base *
 ipc_eventlink_alloc(void);
 
@@ -120,16 +120,16 @@ port_name_to_eventlink(
 	mach_port_name_t              name,
 	struct ipc_eventlink          **ipc_eventlink_ptr);
 
-/*
- * Name: ipc_eventlink_alloc
- *
- * Description: Allocates an ipc_eventlink struct and initializes it.
- *
- * Args: None.
- *
- * Returns:
- *   ipc_eventlink_base on Success.
- */
+  
+                            
+  
+                                                                     
+  
+              
+  
+           
+                                   
+   
 static struct ipc_eventlink_base *
 ipc_eventlink_alloc(void)
 {
@@ -139,7 +139,7 @@ ipc_eventlink_alloc(void)
 	ipc_eventlink_initialize(ipc_eventlink_base);
 
 #if DEVELOPMENT || DEBUG
-	/* Add ipc_eventlink to global list */
+	                                      
 	global_ipc_eventlink_lock();
 	queue_enter(&ipc_eventlink_list, ipc_eventlink_base,
 	    struct ipc_eventlink_base *, elb_global_elm);
@@ -148,16 +148,16 @@ ipc_eventlink_alloc(void)
 	return ipc_eventlink_base;
 }
 
-/*
- * Name: ipc_eventlink_initialize
- *
- * Description: Initializes ipc eventlink struct.
- *
- * Args: ipc eventlink base.
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                                 
+  
+                                                 
+  
+                            
+  
+           
+                             
+   
 static void
 ipc_eventlink_initialize(
 	struct ipc_eventlink_base *ipc_eventlink_base)
@@ -168,7 +168,7 @@ ipc_eventlink_initialize(
 	kr = waitq_init(&ipc_eventlink_base->elb_waitq, SYNC_POLICY_DISABLE_IRQ);
 	assert(kr == KERN_SUCCESS);
 
-	/* Initialize the count to 2, refs for each ipc eventlink port */
+	                                                                 
 	os_ref_init_count(&ipc_eventlink_base->elb_ref_count, &ipc_eventlink_refgrp, 2);
 	ipc_eventlink_base->elb_active = TRUE;
 	ipc_eventlink_base->elb_type = IPC_EVENTLINK_TYPE_NO_COPYIN;
@@ -178,7 +178,7 @@ ipc_eventlink_initialize(
 
 		ipc_eventlink->el_port = ipc_kobject_alloc_port((ipc_kobject_t)ipc_eventlink,
 		    IKOT_EVENTLINK, IPC_KOBJECT_ALLOC_MAKE_SEND | IPC_KOBJECT_ALLOC_NSREQUEST);
-		/* ipc_kobject_alloc_port never fails */
+		                                        
 		ipc_eventlink->el_thread = THREAD_NULL;
 		ipc_eventlink->el_sync_counter = 0;
 		ipc_eventlink->el_wait_counter = UINT64_MAX;
@@ -186,19 +186,19 @@ ipc_eventlink_initialize(
 	}
 }
 
-/*
- * Name: mach_eventlink_create
- *
- * Description: Allocates an ipc_eventlink struct and initializes it.
- *
- * Args:
- *   task : task port of the process
- *   mach_eventlink_create_option_t: option
- *   eventlink_port_pair: eventlink port array
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                              
+  
+                                                                     
+  
+        
+                                    
+                                           
+                                              
+  
+           
+                             
+   
 kern_return_t
 mach_eventlink_create(
 	task_t                             task,
@@ -222,38 +222,38 @@ mach_eventlink_create(
 	return KERN_SUCCESS;
 }
 
-/*
- * Name: mach_eventlink_destroy
- *
- * Description: Destroy an ipc_eventlink, wakeup all threads.
- *
- * Args:
- *   eventlink: eventlink
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                               
+  
+                                                             
+  
+        
+                         
+  
+           
+                             
+   
 kern_return_t
 mach_eventlink_destroy(
 	struct ipc_eventlink *ipc_eventlink)
 {
 	ipc_eventlink_destroy_internal(ipc_eventlink);
 
-	/* mach_eventlink_destroy should succeed for terminated eventlink */
+	                                                                    
 	return KERN_SUCCESS;
 }
 
-/*
- * Name: ipc_eventlink_destroy_internal
- *
- * Description: Destroy an ipc_eventlink, wakeup all threads.
- *
- * Args:
- *   eventlink: eventlink
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                                       
+  
+                                                             
+  
+        
+                         
+  
+           
+                             
+   
 static kern_return_t
 ipc_eventlink_destroy_internal(
 	struct ipc_eventlink *ipc_eventlink)
@@ -274,7 +274,7 @@ ipc_eventlink_destroy_internal(
 
 	ipc_eventlink_base = ipc_eventlink->el_base;
 
-	/* Check if the eventlink is active */
+	                                      
 	if (!ipc_eventlink_active(ipc_eventlink)) {
 		ipc_eventlink_unlock(ipc_eventlink);
 		splx(s);
@@ -284,7 +284,7 @@ ipc_eventlink_destroy_internal(
 	for (i = 0; i < 2; i++) {
 		struct ipc_eventlink *temp_ipc_eventlink = &ipc_eventlink_base->elb_eventlink[i];
 
-		/* Wakeup threads sleeping on eventlink */
+		                                          
 		if (temp_ipc_eventlink->el_thread) {
 			associated_thread[i] = temp_ipc_eventlink->el_thread;
 			temp_ipc_eventlink->el_thread = THREAD_NULL;
@@ -293,35 +293,35 @@ ipc_eventlink_destroy_internal(
 			    IPC_EVENTLINK_FORCE_WAKEUP);
 		}
 
-		/* Only destroy the port on which destroy was called */
+		                                                       
 		if (temp_ipc_eventlink == ipc_eventlink) {
 			ipc_eventlink_port = temp_ipc_eventlink->el_port;
 			assert(ipc_eventlink_port != IPC_PORT_NULL);
 		} else {
-			/* Do not destory the remote port, else eventlink_destroy will fail */
+			                                                                      
 			ipc_eventlink_port_remote = temp_ipc_eventlink->el_port;
 			assert(ipc_eventlink_port_remote != IPC_PORT_NULL);
-			/*
-			 * Take a reference on the remote port, since it could go
-			 * away after eventlink lock is dropped.
-			 */
+			  
+                                                            
+                                           
+      
 			ip_reference(ipc_eventlink_port_remote);
 		}
 		assert(temp_ipc_eventlink->el_port != IPC_PORT_NULL);
 		temp_ipc_eventlink->el_port = IPC_PORT_NULL;
 	}
 
-	/* Mark the eventlink as inactive */
+	                                    
 	ipc_eventlink_base->elb_active = FALSE;
 
 	ipc_eventlink_unlock(ipc_eventlink);
 	splx(s);
 
-	/* Destroy the local eventlink port */
+	                                      
 	ipc_port_dealloc_kernel(ipc_eventlink_port);
-	/* Drops port reference */
+	                          
 
-	/* Clear the remote eventlink port without destroying it */
+	                                                           
 	ip_lock(ipc_eventlink_port_remote);
 	if (ip_active(ipc_eventlink_port_remote)) {
 		ipc_kobject_set_atomically(ipc_eventlink_port_remote, IKO_NULL, IKOT_EVENTLINK);
@@ -335,29 +335,29 @@ ipc_eventlink_destroy_internal(
 			thread_deallocate(associated_thread[i]);
 		}
 
-		/* Drop the eventlink reference given to port */
+		                                                
 		ipc_eventlink_deallocate(ipc_eventlink);
 	}
 	return KERN_SUCCESS;
 }
 
-/*
- * Name: mach_eventlink_associate
- *
- * Description: Associate a thread to eventlink.
- *
- * Args:
- *   eventlink: eventlink
- *   thread: thread needs to be associated
- *   copyin_addr_wait: copyin addr for wait
- *   copyin_mask_wait: copyin mask for wait
- *   copyin_addr_signal: copyin addr for signal
- *   copyin_mask_signal: copyin mask for signal
- *   mach_eventlink_associate_option_t: option for eventlink associate
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                                 
+  
+                                                
+  
+        
+                         
+                                          
+                                           
+                                           
+                                               
+                                               
+                                                                      
+  
+           
+                             
+   
 kern_return_t
 mach_eventlink_associate(
 	struct ipc_eventlink                  *ipc_eventlink,
@@ -387,7 +387,7 @@ mach_eventlink_associate(
 	s = splsched();
 	ipc_eventlink_lock(ipc_eventlink);
 
-	/* Check if eventlink is terminated */
+	                                      
 	if (!ipc_eventlink_active(ipc_eventlink)) {
 		ipc_eventlink_unlock(ipc_eventlink);
 		splx(s);
@@ -412,19 +412,19 @@ mach_eventlink_associate(
 	return KERN_SUCCESS;
 }
 
-/*
- * Name: mach_eventlink_disassociate
- *
- * Description: Disassociate a thread from eventlink.
- * Wake up the associated thread if blocked on eventlink.
- *
- * Args:
- *   eventlink: eventlink
- *   mach_eventlink_option_t: option for eventlink disassociate
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                                    
+  
+                                                     
+                                                         
+  
+        
+                         
+                                                               
+  
+           
+                             
+   
 kern_return_t
 mach_eventlink_disassociate(
 	struct ipc_eventlink                   *ipc_eventlink,
@@ -444,7 +444,7 @@ mach_eventlink_disassociate(
 	s = splsched();
 	ipc_eventlink_lock(ipc_eventlink);
 
-	/* Check if eventlink is terminated */
+	                                      
 	if (!ipc_eventlink_active(ipc_eventlink)) {
 		ipc_eventlink_unlock(ipc_eventlink);
 		splx(s);
@@ -460,7 +460,7 @@ mach_eventlink_disassociate(
 	thread = ipc_eventlink->el_thread;
 	ipc_eventlink->el_thread = NULL;
 
-	/* wake up the thread if blocked */
+	                                   
 	ipc_eventlink_signal_internal_locked(ipc_eventlink,
 	    IPC_EVENTLINK_FORCE_WAKEUP);
 
@@ -473,19 +473,19 @@ mach_eventlink_disassociate(
 	return KERN_SUCCESS;
 }
 
-/*
- * Name: mach_eventlink_signal_trap
- *
- * Description: Increment the sync count of eventlink and
- * wake up the thread waiting if sync counter is greater
- * than wake counter.
- *
- * Args:
- *   eventlink: eventlink
- *
- * Returns:
- *   uint64_t: Contains count and error codes.
- */
+  
+                                   
+  
+                                                         
+                                                        
+                     
+  
+        
+                         
+  
+           
+                                              
+   
 uint64_t
 mach_eventlink_signal_trap(
 	mach_port_name_t port,
@@ -497,10 +497,10 @@ mach_eventlink_signal_trap(
 
 	kr = port_name_to_eventlink(port, &ipc_eventlink);
 	if (kr == KERN_SUCCESS) {
-		/* Signal the remote side of the eventlink */
+		                                             
 		kr = ipc_eventlink_signal(eventlink_remote_side(ipc_eventlink));
 
-		/* Deallocate ref returned by port_name_to_eventlink */
+		                                                       
 		ipc_eventlink_deallocate(ipc_eventlink);
 	}
 
@@ -508,19 +508,19 @@ mach_eventlink_signal_trap(
 	return retval;
 }
 
-/*
- * Name: ipc_eventlink_signal
- *
- * Description: Increment the sync count of eventlink and
- * wake up the thread waiting if sync counter is greater
- * than wake counter.
- *
- * Args:
- *   eventlink: eventlink
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                             
+  
+                                                         
+                                                        
+                     
+  
+        
+                         
+  
+           
+                             
+   
 static kern_return_t
 ipc_eventlink_signal(
 	struct ipc_eventlink *ipc_eventlink)
@@ -535,7 +535,7 @@ ipc_eventlink_signal(
 	s = splsched();
 	ipc_eventlink_lock(ipc_eventlink);
 
-	/* Check if eventlink is terminated */
+	                                      
 	if (!ipc_eventlink_active(ipc_eventlink)) {
 		ipc_eventlink_unlock(ipc_eventlink);
 		splx(s);
@@ -555,22 +555,22 @@ ipc_eventlink_signal(
 	return kr;
 }
 
-/*
- * Name: mach_eventlink_wait_until_trap
- *
- * Description: Wait until local signal count exceeds the
- * specified count or deadline passes.
- *
- * Args:
- *   wait_port: eventlink port for wait
- *   count_ptr: signal count to wait on
- *   el_option: eventlink option
- *   clock_id: clock id
- *   deadline: deadline in mach_absolute_time
- *
- * Returns:
- *   uint64_t: contains count and error codes
- */
+  
+                                       
+  
+                                                         
+                                      
+  
+        
+                                       
+                                       
+                                
+                       
+                                             
+  
+           
+                                             
+   
 uint64_t
 mach_eventlink_wait_until_trap(
 	mach_port_name_t                    eventlink_port,
@@ -588,23 +588,23 @@ mach_eventlink_wait_until_trap(
 		deadline);
 }
 
-/*
- * Name: mach_eventlink_signal_wait_until
- *
- * Description: Signal the opposite side of the
- * eventlink and wait until local signal count exceeds the
- * specified count or deadline passes.
- *
- * Args:
- *   wait_port: eventlink port for wait
- *   count_ptr: signal count to wait on
- *   el_option: eventlink option
- *   clock_id: clock id
- *   deadline: deadline in mach_absolute_time
- *
- * Returns:
- *   uint64_t: contains count and error codes
- */
+  
+                                         
+  
+                                               
+                                                          
+                                      
+  
+        
+                                       
+                                       
+                                
+                       
+                                             
+  
+           
+                                             
+   
 uint64_t
 mach_eventlink_signal_wait_until_trap(
 	mach_port_name_t                    eventlink_port,
@@ -623,24 +623,24 @@ mach_eventlink_signal_wait_until_trap(
 		deadline);
 }
 
-/*
- * Name: ipc_eventlink_signal_wait_until_trap_internal
- *
- * Description: Signal the opposite side of the
- * eventlink and wait until local signal count exceeds the
- * specified count or deadline passes.
- *
- * Args:
- *   wait_port: eventlink port for wait
- *   signal_port: eventlink port for signal
- *   count: signal count to wait on
- *   el_option: eventlink option
- *   clock_id: clock id
- *   deadline: deadline in mach_absolute_time
- *
- * Returns:
- *   uint64_t: contains signal count and error codes
- */
+  
+                                                      
+  
+                                               
+                                                          
+                                      
+  
+        
+                                       
+                                           
+                                   
+                                
+                       
+                                             
+  
+           
+                                                    
+   
 static uint64_t
 ipc_eventlink_signal_wait_until_trap_internal(
 	mach_port_name_t                     wait_port,
@@ -663,7 +663,7 @@ ipc_eventlink_signal_wait_until_trap_internal(
 	if (kr == KERN_SUCCESS) {
 		assert(wait_ipc_eventlink != IPC_EVENTLINK_NULL);
 
-		/* Get the remote side of eventlink for signal */
+		                                                 
 		if (signal_port != MACH_PORT_NULL) {
 			signal_ipc_eventlink = eventlink_remote_side(wait_ipc_eventlink);
 		}
@@ -676,30 +676,30 @@ ipc_eventlink_signal_wait_until_trap_internal(
 		    signal_ipc_eventlink, deadline,
 		    &count, ipc_eventlink_option);
 
-		/* release ref returned by port_name_to_eventlink */
+		                                                    
 		ipc_eventlink_deallocate(wait_ipc_eventlink);
 	}
 	return encode_eventlink_count_and_error(count, kr);
 }
 
-/*
- * Name: ipc_eventlink_signal_wait_internal
- *
- * Description: Signal the opposite side of the
- * eventlink and wait until local signal count exceeds the
- * specified count or deadline passes.
- *
- * Args:
- *   wait_eventlink: eventlink for wait
- *   signal_eventlink: eventlink for signal
- *   deadline: deadline in mach_absolute_time
- *   count_ptr: signal count to wait on
- *   el_option: eventlink option
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- *   signal count is returned implicitly in count arg.
- */
+  
+                                           
+  
+                                               
+                                                          
+                                      
+  
+        
+                                       
+                                           
+                                             
+                                       
+                                
+  
+           
+                             
+                                                      
+   
 static kern_return_t
 ipc_eventlink_signal_wait_internal(
 	struct ipc_eventlink        *wait_eventlink,
@@ -720,36 +720,36 @@ ipc_eventlink_signal_wait_internal(
 	s = splsched();
 	ipc_eventlink_lock(wait_eventlink);
 
-	/* Check if eventlink is terminated */
+	                                      
 	if (!ipc_eventlink_active(wait_eventlink)) {
 		kr = KERN_TERMINATED;
 		goto unlock;
 	}
 
-	/* Check if waiting thread is associated to eventlink */
+	                                                        
 	if (wait_eventlink->el_thread != THREAD_ASSOCIATE_WILD &&
 	    wait_eventlink->el_thread != self) {
 		kr = KERN_INVALID_ARGUMENT;
 		goto unlock;
 	}
 
-	/* Check if thread already waiting for associate on wait case */
+	                                                                
 	if (wait_eventlink->el_thread == THREAD_ASSOCIATE_WILD &&
 	    wait_eventlink->el_wait_counter != UINT64_MAX) {
 		kr = KERN_INVALID_ARGUMENT;
 		goto unlock;
 	}
 
-	/* Check if the signal count exceeds the count provided */
+	                                                          
 	if (*count < wait_eventlink->el_sync_counter) {
 		*count = wait_eventlink->el_sync_counter;
 		kr = KERN_SUCCESS;
 	} else if (eventlink_option & IPC_EVENTLINK_NO_WAIT) {
-		/* Check if no block was passed */
+		                                  
 		*count =  wait_eventlink->el_sync_counter;
 		kr = KERN_OPERATION_TIMED_OUT;
 	} else {
-		/* Update the wait counter and add thread to waitq */
+		                                                     
 		wait_eventlink->el_wait_counter = *count;
 		old_signal_count = wait_eventlink->el_sync_counter;
 
@@ -765,7 +765,7 @@ ipc_eventlink_signal_wait_internal(
 		eventlink_option |= IPC_EVENTLINK_HANDOFF;
 	}
 
-	/* Check if we need to signal the other side of eventlink */
+	                                                            
 	if (signal_eventlink != IPC_EVENTLINK_NULL) {
 		kern_return_t signal_kr;
 		signal_kr = ipc_eventlink_signal_internal_locked(signal_eventlink,
@@ -794,7 +794,7 @@ ipc_eventlink_signal_wait_internal(
 
 	assert(self->handoff_thread == THREAD_NULL);
 
-	/* Increment the count value if eventlink_signal was called */
+	                                                              
 	if (kr == KERN_SUCCESS) {
 		*count += 1;
 	} else {
@@ -811,18 +811,18 @@ unlock:
 	return kr;
 }
 
-/*
- * Name: ipc_eventlink_convert_wait_result
- *
- * Description: Convert wait result to return value
- * for wait trap.
- *
- * Args:
- *   wait_result: result from thread handoff
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                                          
+  
+                                                   
+                 
+  
+        
+                                            
+  
+           
+                             
+   
 static kern_return_t
 ipc_eventlink_convert_wait_result(int wait_result)
 {
@@ -845,20 +845,20 @@ ipc_eventlink_convert_wait_result(int wait_result)
 	}
 }
 
-/*
- * Name: ipc_eventlink_signal_internal_locked
- *
- * Description: Increment the sync count of eventlink and
- * wake up the thread waiting if sync counter is greater
- * than wake counter.
- *
- * Args:
- *   eventlink: eventlink
- *   ipc_eventlink_option_t: options
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                                             
+  
+                                                         
+                                                        
+                     
+  
+        
+                         
+                                    
+  
+           
+                             
+   
 static kern_return_t
 ipc_eventlink_signal_internal_locked(
 	struct ipc_eventlink         *signal_eventlink,
@@ -868,7 +868,7 @@ ipc_eventlink_signal_internal_locked(
 	struct ipc_eventlink_base *ipc_eventlink_base = signal_eventlink->el_base;
 
 	if (eventlink_option & IPC_EVENTLINK_FORCE_WAKEUP) {
-		/* Adjust the wait counter */
+		                             
 		signal_eventlink->el_wait_counter = UINT64_MAX;
 
 		kr = waitq_wakeup64_all_locked(
@@ -880,15 +880,15 @@ ipc_eventlink_signal_internal_locked(
 		return kr;
 	}
 
-	/* Increment the eventlink sync count */
+	                                        
 	signal_eventlink->el_sync_counter++;
 
-	/* Check if thread needs to be woken up */
+	                                          
 	if (signal_eventlink->el_sync_counter > signal_eventlink->el_wait_counter) {
 		waitq_options_t wq_option = (eventlink_option & IPC_EVENTLINK_HANDOFF) ?
 		    WQ_OPTION_HANDOFF : WQ_OPTION_NONE;
 
-		/* Adjust the wait counter */
+		                             
 		signal_eventlink->el_wait_counter = UINT64_MAX;
 
 		kr = waitq_wakeup64_one_locked(
@@ -903,16 +903,16 @@ ipc_eventlink_signal_internal_locked(
 	return kr;
 }
 
-/*
- * Name: ipc_eventlink_reference
- *
- * Description: Increment ref on ipc eventlink struct
- *
- * Args:
- *   eventlink: eventlink
- *
- * Returns: None
- */
+  
+                                
+  
+                                                     
+  
+        
+                         
+  
+                
+   
 void
 ipc_eventlink_reference(
 	struct ipc_eventlink *ipc_eventlink)
@@ -920,16 +920,16 @@ ipc_eventlink_reference(
 	os_ref_retain(&ipc_eventlink->el_base->elb_ref_count);
 }
 
-/*
- * Name: ipc_eventlink_deallocate
- *
- * Description: Decrement ref on ipc eventlink struct
- *
- * Args:
- *   eventlink: eventlink
- *
- * Returns: None
- */
+  
+                                 
+  
+                                                     
+  
+        
+                         
+  
+                
+   
 void
 ipc_eventlink_deallocate(
 	struct ipc_eventlink *ipc_eventlink)
@@ -947,7 +947,7 @@ ipc_eventlink_deallocate(
 	assert(!ipc_eventlink_active(ipc_eventlink));
 
 #if DEVELOPMENT || DEBUG
-	/* Remove ipc_eventlink to global list */
+	                                         
 	global_ipc_eventlink_lock();
 	queue_remove(&ipc_eventlink_list, ipc_eventlink_base,
 	    struct ipc_eventlink_base *, elb_global_elm);
@@ -956,19 +956,19 @@ ipc_eventlink_deallocate(
 	zfree(ipc_eventlink_zone, ipc_eventlink_base);
 }
 
-/*
- * Name: convert_port_to_eventlink
- *
- * Description: Convert from a port name in the current
- * space to an ipc eventlink. Produces an ipc eventlink ref,
- * which may be null.
- *
- * Args:
- *   mach_port_t: eventlink port
- *
- * Returns:
- *   ipc_eventlink on Success.
- */
+  
+                                  
+  
+                                                       
+                                                            
+                     
+  
+        
+                                
+  
+           
+                              
+   
 struct ipc_eventlink *
 convert_port_to_eventlink(
 	mach_port_t     port)
@@ -984,21 +984,21 @@ convert_port_to_eventlink(
 	return ipc_eventlink;
 }
 
-/*
- * Name: convert_port_to_eventlink_locked
- *
- * Description: Convert from a port name in the current
- * space to an ipc eventlink. Produces an ipc eventlink ref,
- * which may be null.
- *
- * Args:
- *   mach_port_name_t: eventlink port name
- *   ipc_eventlink_ptr: pointer to return ipc_eventlink.
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- *   KERN_TERMINATED on inactive eventlink.
- */
+  
+                                         
+  
+                                                       
+                                                            
+                     
+  
+        
+                                          
+                                                        
+  
+           
+                             
+                                           
+   
 static kern_return_t
 convert_port_to_eventlink_locked(
 	ipc_port_t                      port,
@@ -1023,20 +1023,20 @@ convert_port_to_eventlink_locked(
 	return kr;
 }
 
-/*
- * Name: port_name_to_eventlink
- *
- * Description: Convert from a port name in the current
- * space to an ipc eventlink. Produces an ipc eventlink ref,
- * which may be null.
- *
- * Args:
- *   mach_port_name_t: eventlink port name
- *   ipc_eventlink_ptr: ptr to pass eventlink struct
- *
- * Returns:
- *   KERN_SUCCESS on Success.
- */
+  
+                               
+  
+                                                       
+                                                            
+                     
+  
+        
+                                          
+                                                    
+  
+           
+                             
+   
 static kern_return_t
 port_name_to_eventlink(
 	mach_port_name_t              name,
@@ -1055,7 +1055,7 @@ port_name_to_eventlink(
 		*ipc_eventlink_ptr = IPC_EVENTLINK_NULL;
 		return kr;
 	}
-	/* have the port locked */
+	                          
 	assert(IP_VALID(kern_port));
 
 	kr = convert_port_to_eventlink_locked(kern_port, ipc_eventlink_ptr);
@@ -1064,17 +1064,17 @@ port_name_to_eventlink(
 	return kr;
 }
 
-/*
- * Name: ipc_eventlink_notify
- *
- * Description: Destroy an ipc_eventlink, wakeup all threads.
- *
- * Args:
- *   msg: msg contaning eventlink port
- *
- * Returns:
- *   None.
- */
+  
+                             
+  
+                                                             
+  
+        
+                                      
+  
+           
+          
+   
 void
 ipc_eventlink_notify(
 	mach_msg_header_t *msg)
@@ -1088,10 +1088,10 @@ ipc_eventlink_notify(
 		return;
 	}
 
-	/* Get ipc_eventlink reference */
+	                                 
 	ip_lock(port);
 
-	/* Make sure port is still active */
+	                                    
 	if (!ip_active(port)) {
 		ip_unlock(port);
 		return;
@@ -1102,29 +1102,29 @@ ipc_eventlink_notify(
 
 	kr = ipc_eventlink_destroy_internal(ipc_eventlink);
 	if (kr == KERN_TERMINATED) {
-		/* eventlink is already inactive, destroy the port */
+		                                                     
 		ipc_port_dealloc_kernel(port);
 	}
 
-	/* Drop the reference returned by convert_port_to_eventlink_locked */
+	                                                                     
 	ipc_eventlink_deallocate(ipc_eventlink);
 }
 
 #define WAITQ_TO_EVENTLINK(wq) ((struct ipc_eventlink_base *) ((uintptr_t)(wq) - offsetof(struct ipc_eventlink_base, elb_waitq)))
 
-/*
- * Name: kdp_eventlink_find_owner
- *
- * Description: Find who will signal the waiting thread.
- *
- * Args:
- *   waitq: eventlink waitq
- *   wait_event: eventlink wait event
- *   waitinfo: waitinfo struct
- *
- * Returns:
- *   None.
- */
+  
+                                 
+  
+                                                        
+  
+        
+                           
+                                     
+                              
+  
+           
+          
+   
 void
 kdp_eventlink_find_owner(
 	struct waitq      *waitq,
@@ -1142,14 +1142,14 @@ kdp_eventlink_find_owner(
 	struct ipc_eventlink_base *ipc_eventlink_base = WAITQ_TO_EVENTLINK(waitq);
 
 	if (event == CAST_EVENT64_T(&ipc_eventlink_base->elb_eventlink[0])) {
-		/* Use the other end of eventlink for signal thread */
+		                                                      
 		if (ipc_eventlink_base->elb_eventlink[1].el_thread != THREAD_ASSOCIATE_WILD) {
 			waitinfo->owner = thread_tid(ipc_eventlink_base->elb_eventlink[1].el_thread);
 		} else {
 			waitinfo->owner = 0;
 		}
 	} else if (event == CAST_EVENT64_T(&ipc_eventlink_base->elb_eventlink[1])) {
-		/* Use the other end of eventlink for signal thread */
+		                                                      
 		if (ipc_eventlink_base->elb_eventlink[0].el_thread != THREAD_ASSOCIATE_WILD) {
 			waitinfo->owner = thread_tid(ipc_eventlink_base->elb_eventlink[0].el_thread);
 		} else {

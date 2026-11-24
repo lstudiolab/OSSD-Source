@@ -57,13 +57,13 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- *	File:	kern/simple_lock.h (derived from kern/lock.h)
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Atomic primitives and Simple Locking primitives definitions
- */
+  
+                                                      
+                                                    
+             
+  
+                                                              
+   
 
 #ifdef  KERNEL_PRIVATE
 
@@ -153,7 +153,7 @@ extern unsigned int             hw_lock_try_nopreempt(
 #define hw_lock_try_nopreempt(lck, grp) \
 	hw_lock_try_nopreempt(lck)
 
-#endif /* LOCK_STATS */
+#endif                 
 
 extern void                     hw_lock_unlock(
 	hw_lock_t);
@@ -174,7 +174,7 @@ extern boolean_t                hw_atomic_test_and_set32(
 extern void                     usimple_unlock_nopreempt(
 	usimple_lock_t);
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 struct usimple_lock_startup_spec {
 	usimple_lock_t  lck;
@@ -254,17 +254,17 @@ extern unsigned int     usimple_lock_try_lock_mp_signal_safe_loop_duration(
 	usimple_lock_try_lock_mp_signal_safe_loop_duration(lck, dur)
 #endif
 
-#endif /* LOCK_STATS */
+#endif                 
 
 extern void                     usimple_unlock(
 	usimple_lock_t);
 
 
-/*
- * If we got to here and we still don't have simple_lock_init
- * defined, then we must either be outside the osfmk component,
- * running on a true SMP, or need debug.
- */
+  
+                                                             
+                                                               
+                                        
+   
 #if !defined(simple_lock_init)
 #define simple_lock_init(l, t)               usimple_lock_init(l,t)
 #define simple_lock(l, grp)                  usimple_lock(l, grp)
@@ -276,7 +276,7 @@ extern void                     usimple_unlock(
 #define simple_lock_try_lock_mp_signal_safe_loop_duration(l, dur, grp) \
 	usimple_lock_try_lock_mp_signal_safe_loop_duration(l, dur, grp)
 #define simple_lock_addr(l)     (&(l))
-#endif /* !defined(simple_lock_init) */
+#endif                                 
 
 #ifdef MACH_KERNEL_PRIVATE
 
@@ -330,7 +330,7 @@ extern unsigned int hw_lock_bit_to(
 #define hw_lock_bit_to(lck, bit, timeout, grp) \
 	hw_lock_bit_to(lck, bit, timeout)
 
-#endif /* LOCK_STATS */
+#endif                 
 
 extern void     hw_unlock_bit(
 	hw_lock_bit_t *,
@@ -343,13 +343,13 @@ extern void     hw_unlock_bit_nopreempt(
 #define hw_lock_bit_held(l, b) \
 	(((*(l)) & (1 << (b))) != 0)
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 __END_DECLS
 
 #pragma GCC visibility pop
 
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /*!_KERN_SIMPLE_LOCK_H_*/
+#endif                         
+#endif                          
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

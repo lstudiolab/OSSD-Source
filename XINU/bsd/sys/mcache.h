@@ -48,9 +48,9 @@ extern "C" {
 #undef VERIFY
 #endif
 
-/*
- * Unlike VERIFY(), ASSERT() is evaluated only in DEBUG/DEVELOPMENT build.
- */
+  
+                                                                          
+   
 #define VERIFY(EX)      \
 	((void)(__probable((EX)) || assfail(#EX, __FILE__, __LINE__)))
 #if (DEBUG || DEVELOPMENT)
@@ -59,14 +59,14 @@ extern "C" {
 #define ASSERT(EX)      ((void)0)
 #endif
 
-/*
- * Compile time assert; this should be on its own someday.
- */
+  
+                                                          
+   
 #define _CASSERT(x)     _Static_assert(x, "compile-time assertion failed")
 
-/*
- * Atomic macros; these should be on their own someday.
- */
+  
+                                                       
+   
 #define atomic_add_16_ov(a, n)                                          \
 	((u_int16_t) OSAddAtomic16(n, (volatile SInt16 *)a))
 
@@ -109,7 +109,7 @@ extern "C" {
 #define atomic_get_64(n, a) do {                                        \
 	(n) = atomic_add_64_ov(a, 0);                                   \
 } while (0)
-#endif /* __LP64__ */
+#endif               
 
 #define atomic_test_set_ptr(a, o, n)                                    \
 	OSCompareAndSwapPtr(o, n, (void * volatile *)a)
@@ -178,102 +178,102 @@ extern "C" {
 
 #define membar_sync     OSMemoryBarrier
 
-/*
- * Use CPU_CACHE_LINE_SIZE instead of MAX_CPU_CACHE_LINE_SIZE, unless
- * wasting space is of no concern.
- */
+  
+                                                                     
+                                  
+   
 #define MAX_CPU_CACHE_LINE_SIZE 128
 #define CPU_CACHE_LINE_SIZE     mcache_cache_line_size()
 
 #ifndef IS_P2ALIGNED
 #define IS_P2ALIGNED(v, a) \
 	((((uintptr_t)(v)) & ((uintptr_t)(a) - 1)) == 0)
-#endif /* IS_P2ALIGNED */
+#endif                   
 
 #ifndef P2ROUNDUP
 #define P2ROUNDUP(x, align) \
 	(-(-((uintptr_t)(x)) & -((uintptr_t)align)))
-#endif /* P2ROUNDUP */
+#endif                
 
 #ifndef P2ROUNDDOWN
 #define P2ROUNDDOWN(x, align) \
 	(((uintptr_t)(x)) & ~((uintptr_t)(align) - 1))
-#endif /* P2ROUNDDOWN */
+#endif                  
 
 #ifndef P2ALIGN
 #define P2ALIGN(x, align) \
 	((uintptr_t)(x) & -((uintptr_t)(align)))
-#endif /* P2ALIGN */
+#endif              
 
 #define MCACHE_FREE_PATTERN             0xdeadbeefdeadbeefULL
 #define MCACHE_UNINITIALIZED_PATTERN    0xbaddcafebaddcafeULL
 
-/*
- * mcache allocation request flags.
- *
- * MCR_NOSLEEP and MCR_FAILOK are mutually exclusive.  The latter is used
- * by the mbuf allocator to handle the implementation of several caches that
- * involve multiple layers of mcache.  It implies a best effort blocking
- * allocation request; if the request cannot be satisfied, the caller will
- * be blocked until further notice, similar to MCR_SLEEP, except that upon
- * a wake up it will return immediately to the caller regardless of whether
- * the request can been fulfilled.
- *
- * MCR_TRYHARD implies a non-blocking allocation request, regardless of
- * whether MCR_NOSLEEP is set.  It informs the allocator that the request
- * should not cause the calling thread to block, and that it must have
- * exhausted all possible schemes to fulfill the request, including doing
- * reclaims and/or purges, before returning to the caller.
- *
- * Regular mcache clients should only use MCR_SLEEP or MCR_NOSLEEP.
- */
-#define MCR_SLEEP       0x0000          /* same as M_WAITOK */
-#define MCR_NOSLEEP     0x0001          /* same as M_NOWAIT */
-#define MCR_FAILOK      0x0100          /* private, for internal use only */
-#define MCR_TRYHARD     0x0200          /* private, for internal use only */
-#define MCR_USR1        0x1000          /* private, for internal use only */
+  
+                                   
+  
+                                                                         
+                                                                            
+                                                                        
+                                                                          
+                                                                          
+                                                                           
+                                  
+  
+                                                                       
+                                                                         
+                                                                      
+                                                                         
+                                                          
+  
+                                                                   
+   
+#define MCR_SLEEP       0x0000                                
+#define MCR_NOSLEEP     0x0001                                
+#define MCR_FAILOK      0x0100                                              
+#define MCR_TRYHARD     0x0200                                              
+#define MCR_USR1        0x1000                                              
 
 #define MCR_NONBLOCKING (MCR_NOSLEEP | MCR_FAILOK | MCR_TRYHARD)
 
-/*
- * Generic one-way linked list element structure.  This is used to handle
- * mcache_alloc_ext() requests in order to chain the allocated objects
- * together before returning them to the caller.
- */
+  
+                                                                         
+                                                                      
+                                                
+   
 typedef struct mcache_obj {
 	struct mcache_obj       *obj_next;
 } mcache_obj_t;
 
 typedef struct mcache_bkt {
-	void            *bkt_next;      /* next bucket in list */
-	struct mcache_bkttype *bkt_type; /* bucket type */
-	void            *bkt_obj[1];    /* one or more objects */
+	void            *bkt_next;                               
+	struct mcache_bkttype *bkt_type;                  
+	void            *bkt_obj[1];                             
 } mcache_bkt_t;
 
 typedef struct mcache_bktlist {
-	mcache_bkt_t    *bl_list;       /* bucket list */
-	u_int32_t       bl_total;       /* number of buckets */
-	u_int32_t       bl_min;         /* min since last update */
-	u_int32_t       bl_reaplimit;   /* max reapable buckets */
-	u_int64_t       bl_alloc;       /* allocations from this list */
+	mcache_bkt_t    *bl_list;                        
+	u_int32_t       bl_total;                              
+	u_int32_t       bl_min;                                    
+	u_int32_t       bl_reaplimit;                             
+	u_int64_t       bl_alloc;                                       
 } mcache_bktlist_t;
 
 typedef struct mcache_bkttype {
-	int             bt_bktsize;     /* bucket size (number of elements) */
-	size_t          bt_minbuf;      /* all smaller buffers qualify */
-	size_t          bt_maxbuf;      /* no larger bfufers qualify */
-	struct mcache   *bt_cache;      /* bucket cache */
+	int             bt_bktsize;                                           
+	size_t          bt_minbuf;                                       
+	size_t          bt_maxbuf;                                     
+	struct mcache   *bt_cache;                        
 } mcache_bkttype_t;
 
 typedef struct mcache_cpu {
 	decl_lck_mtx_data(, cc_lock);
-	mcache_bkt_t    *cc_filled;     /* the currently filled bucket */
-	mcache_bkt_t    *cc_pfilled;    /* the previously filled bucket */
-	u_int64_t       cc_alloc;       /* allocations from this cpu */
-	u_int64_t       cc_free;        /* frees to this cpu */
-	int             cc_objs;        /* number of objects in filled bkt */
-	int             cc_pobjs;       /* number of objects in previous bkt */
-	int             cc_bktsize;     /* number of elements in a full bkt */
+	mcache_bkt_t    *cc_filled;                                      
+	mcache_bkt_t    *cc_pfilled;                                      
+	u_int64_t       cc_alloc;                                      
+	u_int64_t       cc_free;                               
+	int             cc_objs;                                             
+	int             cc_pobjs;                                              
+	int             cc_bktsize;                                           
 } __attribute__((aligned(MAX_CPU_CACHE_LINE_SIZE))) mcache_cpu_t;
 
 typedef unsigned int (*mcache_allocfn_t)(void *, mcache_obj_t ***,
@@ -284,86 +284,86 @@ typedef void (*mcache_logfn_t)(u_int32_t, mcache_obj_t *, boolean_t);
 typedef void (*mcache_notifyfn_t)(void *, u_int32_t);
 
 typedef struct mcache {
-	/*
-	 * Cache properties
-	 */
-	LIST_ENTRY(mcache) mc_list;     /* cache linkage */
-	char            mc_name[32];    /* cache name */
-	struct zone     *mc_slab_zone;  /* backend zone allocator */
-	mcache_allocfn_t mc_slab_alloc; /* slab layer allocate callback */
-	mcache_freefn_t mc_slab_free;   /* slab layer free callback */
-	mcache_auditfn_t mc_slab_audit; /* slab layer audit callback */
-	mcache_logfn_t mc_slab_log;     /* slab layer log callback */
-	mcache_notifyfn_t mc_slab_notify; /* slab layer notify callback */
-	void            *mc_private;    /* opaque arg to callbacks */
-	size_t          mc_bufsize;     /* object size */
-	size_t          mc_align;       /* object alignment */
-	u_int32_t       mc_flags;       /* cache creation flags */
-	u_int32_t       mc_purge_cnt;   /* # of purges requested by slab */
-	u_int32_t       mc_enable_cnt;  /* # of reenables due to purges */
-	u_int32_t       mc_waiter_cnt;  /* # of slab layer waiters */
-	u_int32_t       mc_wretry_cnt;  /* # of wait retries */
-	u_int32_t       mc_nwretry_cnt; /* # of no-wait retry attempts */
-	u_int32_t       mc_nwfail_cnt;  /* # of no-wait retries that failed */
-	decl_lck_mtx_data(, mc_sync_lock); /* protects purges and reenables */
+	  
+                    
+    
+	LIST_ENTRY(mcache) mc_list;                        
+	char            mc_name[32];                    
+	struct zone     *mc_slab_zone;                              
+	mcache_allocfn_t mc_slab_alloc;                                   
+	mcache_freefn_t mc_slab_free;                                 
+	mcache_auditfn_t mc_slab_audit;                                
+	mcache_logfn_t mc_slab_log;                                  
+	mcache_notifyfn_t mc_slab_notify;                                 
+	void            *mc_private;                                 
+	size_t          mc_bufsize;                      
+	size_t          mc_align;                             
+	u_int32_t       mc_flags;                                 
+	u_int32_t       mc_purge_cnt;                                      
+	u_int32_t       mc_enable_cnt;                                    
+	u_int32_t       mc_waiter_cnt;                               
+	u_int32_t       mc_wretry_cnt;                         
+	u_int32_t       mc_nwretry_cnt;                                  
+	u_int32_t       mc_nwfail_cnt;                                        
+	decl_lck_mtx_data(, mc_sync_lock);                                    
 	lck_grp_t       *mc_sync_lock_grp;
-	/*
-	 * Keep CPU and buckets layers lock statistics separate.
-	 */
+	  
+                                                         
+    
 	lck_grp_t       *mc_cpu_lock_grp;
 
-	/*
-	 * Bucket layer common to all CPUs
-	 */
+	  
+                                   
+    
 	decl_lck_mtx_data(, mc_bkt_lock);
 	lck_grp_t       *mc_bkt_lock_grp;
-	mcache_bkttype_t *cache_bkttype;        /* bucket type */
-	mcache_bktlist_t mc_full;               /* full buckets */
-	mcache_bktlist_t mc_empty;              /* empty buckets */
-	size_t          mc_chunksize;           /* bufsize + alignment */
-	u_int32_t       mc_bkt_contention;      /* lock contention count */
-	u_int32_t       mc_bkt_contention_prev; /* previous snapshot */
+	mcache_bkttype_t *cache_bkttype;                         
+	mcache_bktlist_t mc_full;                                 
+	mcache_bktlist_t mc_empty;                                 
+	size_t          mc_chunksize;                                    
+	u_int32_t       mc_bkt_contention;                                 
+	u_int32_t       mc_bkt_contention_prev;                        
 
-	/*
-	 * Per-CPU layer, aligned at cache line boundary
-	 */
+	  
+                                                 
+    
 	mcache_cpu_t    mc_cpu[1]
 	__attribute__((aligned(MAX_CPU_CACHE_LINE_SIZE)));
 } mcache_t;
 
-#define MCACHE_ALIGN    8       /* default guaranteed alignment */
+#define MCACHE_ALIGN    8                                         
 
-/* Valid values for mc_flags */
-#define MCF_VERIFY      0x00000001      /* enable verification */
-#define MCF_TRACE       0x00000002      /* enable transaction auditing */
-#define MCF_NOCPUCACHE  0x00000010      /* disable CPU layer caching */
-#define MCF_NOLEAKLOG   0x00000100      /* disable leak logging */
-#define MCF_EXPLEAKLOG  0x00000200      /* expose leak info to user space */
+                               
+#define MCF_VERIFY      0x00000001                               
+#define MCF_TRACE       0x00000002                                       
+#define MCF_NOCPUCACHE  0x00000010                                     
+#define MCF_NOLEAKLOG   0x00000100                                
+#define MCF_EXPLEAKLOG  0x00000200                                          
 
 #define MCF_DEBUG       (MCF_VERIFY | MCF_TRACE)
 #define MCF_FLAGS_MASK  \
 	(MCF_DEBUG | MCF_NOCPUCACHE | MCF_NOLEAKLOG | MCF_EXPLEAKLOG)
 
-/* Valid values for notify callback */
-#define MCN_RETRYALLOC  0x00000001      /* Allocation should be retried */
+                                      
+#define MCN_RETRYALLOC  0x00000001                                        
 
 #define MCACHE_STACK_DEPTH 16
 
-#define MCA_TRN_MAX     2               /* Number of transactions to record */
+#define MCA_TRN_MAX     2                                                     
 
 #define DUMP_MCA_BUF_SIZE       512
 
 typedef struct mcache_audit {
-	struct mcache_audit *mca_next;  /* next audit struct */
-	void            *mca_addr;      /* address of buffer */
-	mcache_t        *mca_cache;     /* parent cache of the buffer */
-	size_t          mca_contents_size; /* size of saved contents */
-	void            *mca_contents;  /* user-specific saved contents */
-	void            *mca_uptr;      /* user-specific pointer */
-	uint32_t        mca_uflags;     /* user-specific flags */
+	struct mcache_audit *mca_next;                         
+	void            *mca_addr;                             
+	mcache_t        *mca_cache;                                     
+	size_t          mca_contents_size;                             
+	void            *mca_contents;                                    
+	void            *mca_uptr;                                 
+	uint32_t        mca_uflags;                              
 	uint32_t        mca_next_trn;
 	struct mca_trn {
-		struct thread   *mca_thread;    /* thread doing transaction */
+		struct thread   *mca_thread;                                  
 		uint32_t        mca_tstamp;
 		uint16_t        mca_depth;
 		void            *mca_stack[MCACHE_STACK_DEPTH];
@@ -414,6 +414,6 @@ extern mcache_t *mcache_audit_cache;
 }
 #endif
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* _SYS_MCACHE_H */
+#endif                    

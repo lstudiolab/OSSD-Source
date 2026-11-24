@@ -37,67 +37,67 @@
  *	Created from M68K sources
  */
  
-/*
- * All of the asm stubs in this file have been adjusted so the pre/post
- * fork handlers and dyld fixup are done in C inside Libc. As such, Libc
- * expects the __fork asm to fix up the return code to be -1, 0 or pid
- * and errno if needed.
- */
+  
+                                                                       
+                                                                        
+                                                                      
+                       
+   
 
 #include "SYS.h"
 
 #if defined(__i386__)
 
 LEAF(___fork, 0)
-	subl  $28, %esp   // Align the stack, with 16 bytes of extra padding that we'll need
+	subl  $28, %esp                                                                     
 
-	movl 	$ SYS_fork,%eax; 	// code for fork -> eax
-	UNIX_SYSCALL_TRAP		// do the system call
-	jnc	L1			// jump if CF==0
+	movl 	$ SYS_fork,%eax                          
+	UNIX_SYSCALL_TRAP		                     
+	jnc	L1			                
 
 	CALL_EXTERN(tramp_cerror)
 	movl	$-1,%eax
-	addl	$28, %esp   // restore the stack
+	addl	$28, %esp                       
 	ret
 	
 L1:
-	orl	%edx,%edx	// CF=OF=0,  ZF set if zero result	
-	jz	L2		// parent, since r1 == 0 in parent, 1 in child
+	orl	%edx,%edx	                                   
+	jz	L2		                                              
 	
-	//child here...
-	xorl	%eax,%eax	// zero eax
-	REG_TO_EXTERN(%eax, __current_pid);
+	               
+	xorl	%eax,%eax	           
+	REG_TO_EXTERN(%eax, __current_pid) 
 L2:
-	addl	$28, %esp   // restore the stack
-	// parent ends up here skipping child portion
+	addl	$28, %esp                       
+	                                             
 	ret
 
 #elif defined(__x86_64__)
 
 LEAF(___fork, 0)
-	subq  $24, %rsp   // Align the stack, plus room for local storage
+	subq  $24, %rsp                                                  
 
-	movl 	$ SYSCALL_CONSTRUCT_UNIX(SYS_fork),%eax; // code for fork -> rax
-	UNIX_SYSCALL_TRAP		// do the system call
-	jnc	L1			// jump if CF==0
+	movl 	$ SYSCALL_CONSTRUCT_UNIX(SYS_fork),%eax                         
+	UNIX_SYSCALL_TRAP		                     
+	jnc	L1			                
 
 	movq	%rax, %rdi
 	CALL_EXTERN(_cerror)
 	movq	$-1, %rax
-	addq	$24, %rsp   // restore the stack
+	addq	$24, %rsp                       
 	ret
 	
 L1:
-	orl	%edx,%edx	// CF=OF=0,  ZF set if zero result	
-	jz	L2		// parent, since r1 == 0 in parent, 1 in child
+	orl	%edx,%edx	                                   
+	jz	L2		                                              
 	
-	//child here...
+	               
 	xorq	%rax, %rax
 	PICIFY(__current_pid)
 	movl	%eax,(%r11)
 L2:
-	// parent ends up here skipping child portion
-	addq	$24, %rsp   // restore the stack
+	                                             
+	addq	$24, %rsp                       
 	ret
 
 #elif defined(__arm__)
@@ -106,26 +106,26 @@ MI_ENTRY_POINT(___fork)
 	stmfd	sp!, {r4, r7, lr}
 	add	r7, sp, #4
 
-	mov	r1, #1					// prime results
+	mov	r1, #1					                
 	mov	r12, #SYS_fork
-	swi	#SWI_SYSCALL				// make the syscall
-	bcs	Lbotch					// error?
+	swi	#SWI_SYSCALL				                   
+	bcs	Lbotch					         
 
-	cmp	r1, #0					// parent (r1=0) or child(r1=1)
+	cmp	r1, #0					                               
 	beq	Lparent
 
-	//child here...
+	               
 	MI_GET_ADDRESS(r3, __current_pid)
 	mov	r0, #0
-	str	r0, [r3]		// clear cached pid in child
+	str	r0, [r3]		                            
 	ldmfd   sp!, {r4, r7, pc}
 
 Lbotch:
-	MI_CALL_EXTERNAL(_cerror)			// jump here on error
-	mov	r0,#-1					// set the error
-	// fall thru
+	MI_CALL_EXTERNAL(_cerror)			                     
+	mov	r0,#-1					                
+	            
 Lparent:	
-	ldmfd   sp!, {r4, r7, pc}			// pop and return
+	ldmfd   sp!, {r4, r7, pc}			                 
 
 #elif defined(__arm64__)
 
@@ -134,24 +134,24 @@ Lparent:
 MI_ENTRY_POINT(___fork)
 	ARM64_STACK_PROLOG
 	PUSH_FRAME
-	// ARM moves a 1 in to r1 here, but I can't see why.
-	mov		x16, #SYS_fork				// Syscall code
-	svc		#SWI_SYSCALL				// Trap to kernel
-	b.cs	Lbotch						// Carry bit indicates failure
-	cbz		x1, Lparent					// x1 == 0 indicates that we are the parent
+	                                                    
+	mov		x16, #SYS_fork				               
+	svc		#SWI_SYSCALL				                 
+	b.cs	Lbotch						                              
+	cbz		x1, Lparent					                                           
 
-	// Child
-	MI_GET_ADDRESS(x9, __current_pid)	// Get address of cached "current pid"
+	        
+	MI_GET_ADDRESS(x9, __current_pid)	                                      
 	mov		w0, #0	
-	str		w0, [x9]					// Clear cached current pid				
-	POP_FRAME							// And done
+	str		w0, [x9]					                               
+	POP_FRAME							           
 	ARM64_STACK_EPILOG
 
 Lbotch:
-	MI_CALL_EXTERNAL(_cerror)			// Handle error
-	mov		w0, #-1						// Return value is -1
+	MI_CALL_EXTERNAL(_cerror)			               
+	mov		w0, #-1						                     
 Lparent:
-	POP_FRAME							// Return
+	POP_FRAME							         
 	ARM64_STACK_EPILOG
 
 #else

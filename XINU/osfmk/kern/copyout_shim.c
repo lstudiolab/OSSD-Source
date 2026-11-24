@@ -34,9 +34,9 @@
 #if (DEVELOPMENT || DEBUG)
 #define UNUSED_IN_RELEASE(x)
 #else
-//supress compiler warnings about unused variables
+                                                  
 #define UNUSED_IN_RELEASE(x) (void)(x)
-#endif /* (DEVELOPMENT || DEBUG) */
+#endif                             
 
 
 #if (DEVELOPMENT || DEBUG)
@@ -51,13 +51,13 @@ register_copyout_shim(void (*fn)(const void *, user_addr_t, vm_size_t, unsigned 
 	int copyout_shim_enabled = 0;
 
 	if (!fn) {
-		/* unregistration is always allowed */
+		                                      
 		copyout_shim_fn = NULL;
 		return KERN_SUCCESS;
 	}
 
 	if (copyout_shim_fn) {
-		//need to unregister first before registering a new one.
+		                                                        
 		return KERN_FAILURE;
 	}
 

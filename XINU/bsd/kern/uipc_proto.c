@@ -72,9 +72,9 @@
 #include <net/raw_cb.h>
 #include <sys/sysctl.h>
 
-/*
- * Definitions of protocols supported in the UNIX domain.
- */
+  
+                                                         
+   
 struct domain *localdomain = NULL;
 static void pre_unp_init(struct domain *);
 

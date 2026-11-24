@@ -70,9 +70,9 @@ extern int tcp_log_privacy;
 	X(TLEF_DROP_PKT,	0x4000, droppkt)       \
 	X(TLEF_FSW_FLOW,	0x8000, fswflow)
 
-/*
- * Flag values for tcp_log_enabled
- */
+  
+                                  
+   
 enum {
 #define X(name, value, ...) name = value,
 	TCP_ENABLE_FLAG_LIST
@@ -108,9 +108,9 @@ tcp_is_log_enabled(struct tcpcb *tp, uint32_t req_flags)
 			return false;
 		}
 	}
-	/*
-	 * First find out the kind of destination
-	 */
+	  
+                                          
+    
 	if (tp->t_log_flags == 0) {
 		if (tp->t_inpcb->inp_vflag & INP_IPV6) {
 			if (IN6_IS_ADDR_LOOPBACK(&tp->t_inpcb->in6p_laddr) ||
@@ -131,10 +131,10 @@ tcp_is_log_enabled(struct tcpcb *tp, uint32_t req_flags)
 			}
 		}
 	}
-	/*
-	 * Check separately the destination flags that are per TCP connection
-	 * and the other functional flags that are global
-	 */
+	  
+                                                                      
+                                                  
+    
 	return (tp->t_log_flags & tcp_log_enable_flags & TLEF_MASK_DST) &&
 	       (tcp_log_enable_flags & (req_flags & ~TLEF_MASK_DST));
 }
@@ -186,6 +186,6 @@ tcp_is_log_enabled(struct tcpcb *tp, uint32_t req_flags)
 
 
 
-#endif /* BSD_KERNEL_RPIVATE */
+#endif                         
 
-#endif /* _NETINET_TCP_LOG_H_ */
+#endif                          

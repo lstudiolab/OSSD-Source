@@ -76,6 +76,6 @@
 
 #include <kern/locks.h>
 
-#endif /* KERNEL */
+#endif             
 
-#endif  /* _SYS_LOCK_H_ */
+#endif                    

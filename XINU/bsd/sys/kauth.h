@@ -25,12 +25,12 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _SYS_KAUTH_H
 #define _SYS_KAUTH_H
@@ -38,25 +38,25 @@
 #include <sys/appleapiopts.h>
 #include <sys/cdefs.h>
 #include <mach/boolean.h>
-#include <machine/types.h>      /* u_int8_t, etc. */
-#include <sys/_types.h>         /* __offsetof() */
-#include <sys/_types/_uid_t.h>  /* uid_t */
-#include <sys/_types/_gid_t.h>     /* gid_t */
-#include <sys/syslimits.h>      /* NGROUPS_MAX */
+#include <machine/types.h>                          
+#include <sys/_types.h>                           
+#include <sys/_types/_uid_t.h>             
+#include <sys/_types/_gid_t.h>                
+#include <sys/syslimits.h>                       
 
 #ifdef __APPLE_API_EVOLVING
 
-/*
- * Identities.
- */
+  
+              
+   
 
-#define KAUTH_UID_NONE  (~(uid_t)0 - 100)       /* not a valid UID */
-#define KAUTH_GID_NONE  (~(gid_t)0 - 100)       /* not a valid GID */
+#define KAUTH_UID_NONE  (~(uid_t)0 - 100)                            
+#define KAUTH_GID_NONE  (~(gid_t)0 - 100)                            
 
 #include <sys/_types/_guid_t.h>
 
-/* NT Security Identifier, structure as defined by Microsoft */
-#pragma pack(1)    /* push packing of 1 byte */
+                                                               
+#pragma pack(1)                                
 typedef struct {
 	u_int8_t                sid_kind;
 	u_int8_t                sid_authcount;
@@ -64,28 +64,28 @@ typedef struct {
 #define KAUTH_NTSID_MAX_AUTHORITIES 16
 	u_int32_t       sid_authorities[KAUTH_NTSID_MAX_AUTHORITIES];
 } ntsid_t;
-#pragma pack()    /* pop packing to previous packing level */
+#pragma pack()                                               
 #define _NTSID_T
 
-/* valid byte count inside a SID structure */
+                                             
 #define KAUTH_NTSID_HDRSIZE     (8)
 #define KAUTH_NTSID_SIZE(_s)    (KAUTH_NTSID_HDRSIZE + ((_s)->sid_authcount * sizeof(u_int32_t)))
 
-/*
- * External lookup message payload; this structure is shared between the
- * kernel group membership resolver, and the user space group membership
- * resolver daemon, and is use to communicate resolution requests from the
- * kernel to user space, and the result of that request from user space to
- * the kernel.
- */
+  
+                                                                        
+                                                                        
+                                                                          
+                                                                          
+              
+   
 struct kauth_identity_extlookup {
-	u_int32_t       el_seqno;       /* request sequence number */
-	u_int32_t       el_result;      /* lookup result */
-#define KAUTH_EXTLOOKUP_SUCCESS         0       /* results here are good */
-#define KAUTH_EXTLOOKUP_BADRQ           1       /* request badly formatted */
-#define KAUTH_EXTLOOKUP_FAILURE         2       /* transient failure during lookup */
-#define KAUTH_EXTLOOKUP_FATAL           3       /* permanent failure during lookup */
-#define KAUTH_EXTLOOKUP_INPROG          100     /* request in progress */
+	u_int32_t       el_seqno;                                    
+	u_int32_t       el_result;                         
+#define KAUTH_EXTLOOKUP_SUCCESS         0                                  
+#define KAUTH_EXTLOOKUP_BADRQ           1                                    
+#define KAUTH_EXTLOOKUP_FAILURE         2                                            
+#define KAUTH_EXTLOOKUP_FATAL           3                                            
+#define KAUTH_EXTLOOKUP_INPROG          100                              
 	u_int32_t       el_flags;
 #define KAUTH_EXTLOOKUP_VALID_UID       (1<<0)
 #define KAUTH_EXTLOOKUP_VALID_UGUID     (1<<1)
@@ -109,23 +109,23 @@ struct kauth_identity_extlookup {
 #define KAUTH_EXTLOOKUP_VALID_SUPGRPS   (1<<19)
 #define KAUTH_EXTLOOKUP_WANT_SUPGRPS    (1<<20)
 
-	__darwin_pid_t  el_info_pid;            /* request on behalf of PID */
-	u_int64_t       el_extend;              /* extension field */
-	u_int32_t       el_info_reserved_1;     /* reserved (APPLE) */
+	__darwin_pid_t  el_info_pid;                                          
+	u_int64_t       el_extend;                                   
+	u_int32_t       el_info_reserved_1;                           
 
-	uid_t           el_uid;         /* user ID */
-	guid_t          el_uguid;       /* user GUID */
-	u_int32_t       el_uguid_valid; /* TTL on translation result (seconds) */
-	ntsid_t         el_usid;        /* user NT SID */
-	u_int32_t       el_usid_valid;  /* TTL on translation result (seconds) */
-	gid_t           el_gid;         /* group ID */
-	guid_t          el_gguid;       /* group GUID */
-	u_int32_t       el_gguid_valid; /* TTL on translation result (seconds) */
-	ntsid_t         el_gsid;        /* group SID */
-	u_int32_t       el_gsid_valid;  /* TTL on translation result (seconds) */
-	u_int32_t       el_member_valid; /* TTL on group lookup result */
-	u_int32_t       el_sup_grp_cnt;  /* count of supplemental groups up to NGROUPS */
-	gid_t           el_sup_groups[NGROUPS_MAX];     /* supplemental group list */
+	uid_t           el_uid;                      
+	guid_t          el_uguid;                      
+	u_int32_t       el_uguid_valid;                                          
+	ntsid_t         el_usid;                         
+	u_int32_t       el_usid_valid;                                           
+	gid_t           el_gid;                       
+	guid_t          el_gguid;                       
+	u_int32_t       el_gguid_valid;                                          
+	ntsid_t         el_gsid;                       
+	u_int32_t       el_gsid_valid;                                           
+	u_int32_t       el_member_valid;                                 
+	u_int32_t       el_sup_grp_cnt;                                                  
+	gid_t           el_sup_groups[NGROUPS_MAX];                                  
 };
 
 struct kauth_cache_sizes {
@@ -145,23 +145,23 @@ struct kauth_cache_sizes {
 
 
 #ifdef KERNEL
-/*
- * Credentials.
- */
+  
+               
+   
 
 #if 0
-/*
- * Supplemental credential data.
- *
- * This interface allows us to associate arbitrary data with a credential.
- * As with the credential, the data is considered immutable.
- */
+  
+                                
+  
+                                                                          
+                                                            
+   
 struct kauth_cred_supplement {
 	TAILQ_ENTRY(kauth_cred_supplement) kcs_link;
 
-	int     kcs_ref;                /* reference count */
-	int     kcs_id;                 /* vended identifier */
-	size_t  kcs_size;               /* size of data field */
+	int     kcs_ref;                                     
+	int     kcs_id;                                        
+	size_t  kcs_size;                                       
 	char    kcs_data[0];
 };
 
@@ -170,45 +170,45 @@ typedef struct kauth_cred_supplement *kauth_cred_supplement_t;
 struct kauth_cred {
 	TAILQ_ENTRY(kauth_cred) kc_link;
 
-	int     kc_ref;                 /* reference count */
-	uid_t   kc_uid;                 /* effective user id */
-	uid_t   kc_ruid;                /* real user id */
-	uid_t   kc_svuid;               /* saved user id */
-	gid_t   kc_gid;                 /* effective group id */
-	gid_t   kc_rgid;                /* real group id */
-	gid_t   kc_svgid;               /* saved group id */
+	int     kc_ref;                                      
+	uid_t   kc_uid;                                        
+	uid_t   kc_ruid;                                  
+	uid_t   kc_svuid;                                  
+	gid_t   kc_gid;                                         
+	gid_t   kc_rgid;                                   
+	gid_t   kc_svgid;                                   
 
 	int     kc_flags;
-#define KAUTH_CRED_GRPOVERRIDE          (1<<0)  /* private group list is authoritative */
+#define KAUTH_CRED_GRPOVERRIDE          (1<<0)                                           
 
-	int     kc_npvtgroups;          /* private group list, advisory or authoritative */
-	gid_t   kc_pvtgroups[NGROUPS];  /* based on KAUTH_CRED_GRPOVERRIDE flag */
+	int     kc_npvtgroups;                                                             
+	gid_t   kc_pvtgroups[NGROUPS];                                            
 
-	int     kc_nsuppgroups;         /* supplementary group list */
+	int     kc_nsuppgroups;                                       
 	gid_t   *kc_suppgroups;
 
-	int     kc_nwhtgroups;          /* whiteout group list */
+	int     kc_nwhtgroups;                                   
 	gid_t   *kc_whtgroups;
 
-	struct au_session cr_audit;     /* user auditing data */
+	struct au_session cr_audit;                             
 
-	int     kc_nsupplement;         /* entry count in supplemental data pointer array */
+	int     kc_nsupplement;                                                             
 	kauth_cred_supplement_t *kc_supplement;
 };
 #else
 
-/* XXX just for now */
+                      
 #include <sys/ucred.h>
-// typedef struct ucred *kauth_cred_t;
+                                      
 #endif
 
-/* Kernel SPI for now */
+                        
 __BEGIN_DECLS
-/*
- * Routines specific to credentials with POSIX credential labels attached
- *
- * XXX	Should be in policy_posix.h, with struct posix_cred
- */
+  
+                                                                         
+  
+                                                          
+   
 extern kauth_cred_t posix_cred_create(posix_cred_t pcred);
 extern posix_cred_t posix_cred_get(kauth_cred_t cred);
 extern void posix_cred_label(kauth_cred_t cred, posix_cred_t pcred);
@@ -223,7 +223,7 @@ extern kauth_cred_t kauth_cred_proc_ref(proc_t procp);
 extern kauth_cred_t kauth_cred_create(kauth_cred_t cred);
 extern void     kauth_cred_ref(kauth_cred_t _cred);
 #ifndef __LP64__
-/* Use kauth_cred_unref(), not kauth_cred_rele() */
+                                                   
 extern void     kauth_cred_rele(kauth_cred_t _cred) __deprecated;
 #endif
 extern void     kauth_cred_unref(kauth_cred_t *_cred);
@@ -233,10 +233,10 @@ struct label;
 extern kauth_cred_t     kauth_cred_label_update(kauth_cred_t cred, struct label *label);
 extern int kauth_proc_label_update(struct proc *p, struct label *label);
 #else
-/* this is a temp hack to cover us when MAC is not built in a kernel configuration.
- * Since we cannot build our export list based on the kernel configuration we need
- * to define a stub.
- */
+                                                                                   
+                                                                                  
+                    
+   
 extern kauth_cred_t     kauth_cred_label_update(kauth_cred_t cred, void *label);
 extern int kauth_proc_label_update(struct proc *p, void *label);
 #endif
@@ -272,18 +272,18 @@ extern int      kauth_cred_dsnode2nfs4domain(char *dsnode, char *nfs4domain);
 
 extern int      groupmember(gid_t gid, kauth_cred_t cred);
 
-/* currently only exported in unsupported for use by seatbelt */
+                                                                
 extern int      kauth_cred_issuser(kauth_cred_t _cred);
 
 
-/* GUID, NTSID helpers */
+                         
 extern guid_t   kauth_null_guid;
 extern int      kauth_guid_equal(guid_t *_guid1, guid_t *_guid2);
 #ifdef XNU_KERNEL_PRIVATE
 extern int      kauth_ntsid_equal(ntsid_t *_sid1, ntsid_t *_sid2);
 
 extern int      kauth_wellknown_guid(guid_t *_guid);
-#define KAUTH_WKG_NOT           0       /* not a well-known GUID */
+#define KAUTH_WKG_NOT           0                                  
 #define KAUTH_WKG_OWNER         1
 #define KAUTH_WKG_GROUP         2
 #define KAUTH_WKG_NOBODY        3
@@ -310,42 +310,42 @@ extern int      kauth_cred_supplementary_register(const char *name, int *ident);
 extern int      kauth_cred_supplementary_add(kauth_cred_t cred, int ident, const void *data, size_t datasize);
 extern int      kauth_cred_supplementary_remove(kauth_cred_t cred, int ident);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 __END_DECLS
 
-#endif /* KERNEL */
+#endif             
 
-/*
- * Generic Access Control Lists.
- */
+  
+                                
+   
 #if defined(KERNEL) || defined (_SYS_ACL_H)
 
 typedef u_int32_t kauth_ace_rights_t;
 
-/* Access Control List Entry (ACE) */
+                                     
 struct kauth_ace {
 	guid_t          ace_applicable;
 	u_int32_t       ace_flags;
 #define KAUTH_ACE_KINDMASK              0xf
 #define KAUTH_ACE_PERMIT                1
 #define KAUTH_ACE_DENY                  2
-#define KAUTH_ACE_AUDIT                 3       /* not implemented */
-#define KAUTH_ACE_ALARM                 4       /* not implemented */
+#define KAUTH_ACE_AUDIT                 3                            
+#define KAUTH_ACE_ALARM                 4                            
 #define KAUTH_ACE_INHERITED             (1<<4)
 #define KAUTH_ACE_FILE_INHERIT          (1<<5)
 #define KAUTH_ACE_DIRECTORY_INHERIT     (1<<6)
 #define KAUTH_ACE_LIMIT_INHERIT         (1<<7)
 #define KAUTH_ACE_ONLY_INHERIT          (1<<8)
-#define KAUTH_ACE_SUCCESS               (1<<9)  /* not implemented (AUDIT/ALARM) */
-#define KAUTH_ACE_FAILURE               (1<<10) /* not implemented (AUDIT/ALARM) */
-/* All flag bits controlling ACE inheritance */
+#define KAUTH_ACE_SUCCESS               (1<<9)                                     
+#define KAUTH_ACE_FAILURE               (1<<10)                                    
+                                               
 #define KAUTH_ACE_INHERIT_CONTROL_FLAGS         \
 	        (KAUTH_ACE_FILE_INHERIT |       \
 	         KAUTH_ACE_DIRECTORY_INHERIT |  \
 	         KAUTH_ACE_LIMIT_INHERIT |      \
 	         KAUTH_ACE_ONLY_INHERIT)
-	kauth_ace_rights_t ace_rights;          /* scope specific */
-	/* These rights are never tested, but may be present in an ACL */
+	kauth_ace_rights_t ace_rights;                              
+	                                                                 
 #define KAUTH_ACE_GENERIC_ALL           (1<<21)
 #define KAUTH_ACE_GENERIC_EXECUTE       (1<<22)
 #define KAUTH_ACE_GENERIC_WRITE         (1<<23)
@@ -358,7 +358,7 @@ typedef struct kauth_ace *kauth_ace_t;
 #endif
 
 
-/* Access Control List */
+                         
 struct kauth_acl {
 	u_int32_t       acl_entrycount;
 	u_int32_t       acl_flags;
@@ -366,38 +366,38 @@ struct kauth_acl {
 	struct kauth_ace acl_ace[1];
 };
 
-/*
- * XXX this value needs to be raised - 3893388
- */
+  
+                                              
+   
 #define KAUTH_ACL_MAX_ENTRIES           128
 
-/*
- * The low 16 bits of the flags field are reserved for filesystem
- * internal use and must be preserved by all APIs.  This includes
- * round-tripping flags through user-space interfaces.
- */
+  
+                                                                 
+                                                                 
+                                                      
+   
 #define KAUTH_ACL_FLAGS_PRIVATE (0xffff)
 
-/*
- * The high 16 bits of the flags are used to store attributes and
- * to request specific handling of the ACL.
- */
+  
+                                                                 
+                                           
+   
 
-/* inheritance will be deferred until the first rename operation */
+                                                                   
 #define KAUTH_ACL_DEFER_INHERIT (1<<16)
-/* this ACL must not be overwritten as part of an inheritance operation */
+                                                                          
 #define KAUTH_ACL_NO_INHERIT    (1<<17)
 
-/* acl_entrycount that tells us the ACL is not valid */
+                                                       
 #define KAUTH_FILESEC_NOACL ((u_int32_t)(-1))
 
-/*
- * If the acl_entrycount field is KAUTH_FILESEC_NOACL, then the size is the
- * same as a kauth_acl structure; the intent is to put an actual entrycount of
- * KAUTH_FILESEC_NOACL on disk to distinguish a kauth_filesec_t with an empty
- * entry (Windows treats this as "deny all") from one that merely indicates a
- * file group and/or owner guid values.
- */
+  
+                                                                           
+                                                                              
+                                                                             
+                                                                             
+                                       
+   
 #define KAUTH_ACL_SIZE(c)       (__offsetof(struct kauth_acl, acl_ace) + ((u_int32_t)(c) != KAUTH_FILESEC_NOACL ? ((c) * sizeof(struct kauth_ace)) : 0))
 #define KAUTH_ACL_COPYSIZE(p)   KAUTH_ACL_SIZE((p)->acl_entrycount)
 
@@ -415,11 +415,11 @@ __END_DECLS
 #endif
 
 
-/*
- * Extended File Security.
- */
+  
+                          
+   
 
-/* File Security information */
+                               
 struct kauth_filesec {
 	u_int32_t       fsec_magic;
 #define KAUTH_FILESEC_MAGIC     0x012cc16d
@@ -429,7 +429,7 @@ struct kauth_filesec {
 	struct kauth_acl fsec_acl;
 };
 
-/* backwards compatibility */
+                             
 #define fsec_entrycount fsec_acl.acl_entrycount
 #define fsec_flags      fsec_acl.acl_flags
 #define fsec_ace        fsec_acl.acl_ace
@@ -451,19 +451,19 @@ typedef struct kauth_filesec *kauth_filesec_t;
 
 #define KAUTH_FILESEC_XATTR     "com.apple.system.Security"
 
-/* Allowable first arguments to kauth_filesec_acl_setendian() */
-#define KAUTH_ENDIAN_HOST       0x00000001      /* set host endianness */
-#define KAUTH_ENDIAN_DISK       0x00000002      /* set disk endianness */
+                                                                
+#define KAUTH_ENDIAN_HOST       0x00000001                               
+#define KAUTH_ENDIAN_DISK       0x00000002                               
 
-#endif /* KERNEL || <sys/acl.h> */
+#endif                            
 
 
 #ifdef KERNEL
 
 
-/*
- * Scope management.
- */
+  
+                    
+   
 struct kauth_scope;
 typedef struct kauth_scope *kauth_scope_t;
 struct kauth_listener;
@@ -493,10 +493,10 @@ struct kauth_acl_eval {
 	int                     ae_result;
 	boolean_t               ae_found_deny;
 	int                     ae_options;
-#define KAUTH_AEVAL_IS_OWNER    (1<<0)          /* authorizing operation for owner */
-#define KAUTH_AEVAL_IN_GROUP    (1<<1)          /* authorizing operation for groupmember */
-#define KAUTH_AEVAL_IN_GROUP_UNKNOWN    (1<<2)          /* authorizing operation for unknown group membership */
-	/* expansions for 'generic' rights bits */
+#define KAUTH_AEVAL_IS_OWNER    (1<<0)                                               
+#define KAUTH_AEVAL_IN_GROUP    (1<<1)                                                     
+#define KAUTH_AEVAL_IN_GROUP_UNKNOWN    (1<<2)                                                                  
+	                                          
 	kauth_ace_rights_t      ae_exp_gall;
 	kauth_ace_rights_t      ae_exp_gread;
 	kauth_ace_rights_t      ae_exp_gwrite;
@@ -517,7 +517,7 @@ extern void     kauth_unlisten_scope(kauth_listener_t _scope);
 extern int      kauth_authorize_action(kauth_scope_t _scope, kauth_cred_t _credential, kauth_action_t _action,
     uintptr_t _arg0, uintptr_t _arg1, uintptr_t _arg2, uintptr_t _arg3);
 
-/* default scope handlers */
+                            
 extern int      kauth_authorize_allow(kauth_cred_t _credential, void *_idata, kauth_action_t _action,
     uintptr_t _arg0, uintptr_t _arg1, uintptr_t _arg2, uintptr_t _arg3);
 
@@ -528,31 +528,31 @@ int             kauth_copyinfilesec(user_addr_t xsecurity, kauth_filesec_t *xsec
 extern int      kauth_acl_evaluate(kauth_cred_t _credential, kauth_acl_eval_t _eval);
 extern int      kauth_acl_inherit(vnode_t _dvp, kauth_acl_t _initial, kauth_acl_t *_product, int _isdir, vfs_context_t _ctx);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 
 __END_DECLS
 
-/*
- * Generic scope.
- */
+  
+                 
+   
 #define KAUTH_SCOPE_GENERIC     "com.apple.kauth.generic"
 
-/* Actions */
+             
 #define KAUTH_GENERIC_ISSUSER                   1
 
 #ifdef XNU_KERNEL_PRIVATE
 __BEGIN_DECLS
 extern int      kauth_authorize_generic(kauth_cred_t credential, kauth_action_t action);
 __END_DECLS
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Process/task scope.
- */
+  
+                      
+   
 #define KAUTH_SCOPE_PROCESS     "com.apple.kauth.process"
 
-/* Actions */
+             
 #define KAUTH_PROCESS_CANSIGNAL                 1
 #define KAUTH_PROCESS_CANTRACE                  2
 
@@ -561,20 +561,20 @@ extern int      kauth_authorize_process(kauth_cred_t _credential, kauth_action_t
     struct proc *_process, uintptr_t _arg1, uintptr_t _arg2, uintptr_t _arg3);
 __END_DECLS
 
-/*
- * Vnode operation scope.
- *
- * Prototype for vnode_authorize is in vnode.h
- */
+  
+                         
+  
+                                              
+   
 #define KAUTH_SCOPE_VNODE       "com.apple.kauth.vnode"
 
-/*
- * File system operation scope.
- *
- */
+  
+                               
+  
+   
 #define KAUTH_SCOPE_FILEOP      "com.apple.kauth.fileop"
 
-/* Actions */
+             
 #define KAUTH_FILEOP_OPEN                       1
 #define KAUTH_FILEOP_CLOSE                      2
 #define KAUTH_FILEOP_RENAME                     3
@@ -584,49 +584,49 @@ __END_DECLS
 #define KAUTH_FILEOP_DELETE                     7
 #define KAUTH_FILEOP_WILL_RENAME                8
 
-/*
- * arguments passed to KAUTH_FILEOP_OPEN listeners
- *		arg0 is pointer to vnode (vnode *) for given user path.
- *		arg1 is pointer to path (char *) passed in to open.
- * arguments passed to KAUTH_FILEOP_CLOSE listeners
- *		arg0 is pointer to vnode (vnode *) for file to be closed.
- *		arg1 is pointer to path (char *) of file to be closed.
- *		arg2 is close flags.
- * arguments passed to KAUTH_FILEOP_WILL_RENAME listeners
- *		arg0 is pointer to vnode (vnode *) of the file being renamed
- *		arg1 is pointer to the "from" path (char *)
- *		arg2 is pointer to the "to" path (char *)
- * arguments passed to KAUTH_FILEOP_RENAME listeners
- *		arg0 is pointer to "from" path (char *).
- *		arg1 is pointer to "to" path (char *).
- * arguments passed to KAUTH_FILEOP_EXCHANGE listeners
- *		arg0 is pointer to file 1 path (char *).
- *		arg1 is pointer to file 2 path (char *).
- * arguments passed to KAUTH_FILEOP_LINK listeners
- *		arg0 is pointer to path to file we are linking to (char *).
- *		arg1 is pointer to path to the new link file (char *).
- * arguments passed to KAUTH_FILEOP_EXEC listeners
- *		arg0 is pointer to vnode (vnode *) for executable.
- *		arg1 is pointer to path (char *) to executable.
- * arguments passed to KAUTH_FILEOP_DELETE listeners
- *		arg0 is pointer to vnode (vnode *) of file/dir that was deleted.
- *		arg1 is pointer to path (char *) of file/dir that was deleted.
- */
+  
+                                                  
+                                                           
+                                                       
+                                                   
+                                                             
+                                                          
+                        
+                                                         
+                                                                
+                                               
+                                             
+                                                    
+                                            
+                                          
+                                                      
+                                            
+                                            
+                                                  
+                                                               
+                                                          
+                                                  
+                                                      
+                                                   
+                                                    
+                                                                    
+                                                                  
+   
 
-/* Flag values returned to close listeners. */
+                                              
 #define KAUTH_FILEOP_CLOSE_MODIFIED                     (1<<1)
 
 __BEGIN_DECLS
 #ifdef XNU_KERNEL_PRIVATE
 extern int      kauth_authorize_fileop_has_listeners(void);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 extern int      kauth_authorize_fileop(kauth_cred_t _credential, kauth_action_t _action,
     uintptr_t _arg0, uintptr_t _arg1);
 __END_DECLS
 
-#endif /* KERNEL */
+#endif             
 
-/* Actions, also rights bits in an ACE */
+                                         
 
 #if defined(KERNEL) || defined (_SYS_ACL_H)
 #define KAUTH_VNODE_READ_DATA                   (1U<<1)
@@ -647,69 +647,69 @@ __END_DECLS
 #define KAUTH_VNODE_WRITE_SECURITY              (1U<<12)
 #define KAUTH_VNODE_TAKE_OWNERSHIP              (1U<<13)
 
-/* backwards compatibility only */
+                                  
 #define KAUTH_VNODE_CHANGE_OWNER                KAUTH_VNODE_TAKE_OWNERSHIP
 
-/* For Windows interoperability only */
+                                       
 #define KAUTH_VNODE_SYNCHRONIZE                 (1U<<20)
 
-/* (1<<21) - (1<<24) are reserved for generic rights bits */
+                                                            
 
-/* Actions not expressed as rights bits */
-/*
- * Authorizes the vnode as the target of a hard link.
- */
+                                          
+  
+                                                     
+   
 #define KAUTH_VNODE_LINKTARGET                  (1U<<25)
 
-/*
- * Indicates that other steps have been taken to authorise the action,
- * but authorisation should be denied for immutable objects.
- */
+  
+                                                                      
+                                                            
+   
 #define KAUTH_VNODE_CHECKIMMUTABLE              (1U<<26)
 
-/* Action modifiers */
-/*
- * The KAUTH_VNODE_ACCESS bit is passed to the callback if the authorisation
- * request in progress is advisory, rather than authoritative.  Listeners
- * performing consequential work (i.e. not strictly checking authorisation)
- * may test this flag to avoid performing unnecessary work.
- *
- * This bit will never be present in an ACE.
- */
+                      
+  
+                                                                            
+                                                                         
+                                                                           
+                                                           
+  
+                                            
+   
 #define KAUTH_VNODE_ACCESS                      (1U<<31)
 
-/*
- * The KAUTH_VNODE_NOIMMUTABLE bit is passed to the callback along with the
- * KAUTH_VNODE_WRITE_SECURITY bit (and no others) to indicate that the
- * caller wishes to change one or more of the immutable flags, and the
- * state of these flags should not be considered when authorizing the request.
- * The system immutable flags are only ignored when the system securelevel
- * is low enough to allow their removal.
- */
+  
+                                                                           
+                                                                      
+                                                                      
+                                                                              
+                                                                          
+                                        
+   
 #define KAUTH_VNODE_NOIMMUTABLE                 (1U<<30)
 
 
-/*
- * fake right that is composed by the following...
- * vnode must have search for owner, group and world allowed
- * plus there must be no deny modes present for SEARCH... this fake
- * right is used by the fast lookup path to avoid checking
- * for an exact match on the last credential to lookup
- * the component being acted on
- */
+  
+                                                  
+                                                            
+                                                                   
+                                                          
+                                                      
+                               
+   
 #define KAUTH_VNODE_SEARCHBYANYONE              (1U<<29)
 
 
-/*
- * when passed as an 'action' to "vnode_uncache_authorized_actions"
- * it indicates that all of the cached authorizations for that
- * vnode should be invalidated
- */
+  
+                                                                   
+                                                              
+                              
+   
 #define KAUTH_INVALIDATE_CACHED_RIGHTS          ((kauth_action_t)~0)
 
 
 
-/* The expansions of the GENERIC bits at evaluation time */
+                                                           
 #define KAUTH_VNODE_GENERIC_READ_BITS   (KAUTH_VNODE_READ_DATA |                \
 	                                KAUTH_VNODE_READ_ATTRIBUTES |           \
 	                                KAUTH_VNODE_READ_EXTATTRIBUTES |        \
@@ -729,9 +729,9 @@ __END_DECLS
 	                                KAUTH_VNODE_GENERIC_WRITE_BITS |        \
 	                                KAUTH_VNODE_GENERIC_EXECUTE_BITS)
 
-/*
- * Some sets of bits, defined here for convenience.
- */
+  
+                                                   
+   
 #define KAUTH_VNODE_WRITE_RIGHTS        (KAUTH_VNODE_ADD_FILE |                         \
 	                                KAUTH_VNODE_ADD_SUBDIRECTORY |                  \
 	                                KAUTH_VNODE_DELETE_CHILD |                      \
@@ -746,21 +746,21 @@ __END_DECLS
 	                                KAUTH_VNODE_CHECKIMMUTABLE)
 
 
-#endif /* KERNEL || <sys/acl.h> */
+#endif                            
 
 #ifdef KERNEL
-#include <sys/lock.h>   /* lck_grp_t */
+#include <sys/lock.h>                  
 
-/*
- * Debugging
- *
- * XXX this wouldn't be necessary if we had a *real* debug-logging system.
- */
+  
+            
+  
+                                                                          
+   
 #if 0
 # ifndef _FN_KPRINTF
 #  define       _FN_KPRINTF
 void kprintf(const char *fmt, ...);
-# endif /* !_FN_KPRINTF */
+# endif                   
 # define KAUTH_DEBUG_ENABLE
 # define K_UUID_FMT "%08x:%08x:%08x:%08x"
 # define K_UUID_ARG(_u) &_u.g_guid_asint[0],&_u.g_guid_asint[1],&_u.g_guid_asint[2],&_u.g_guid_asint[3]
@@ -774,14 +774,14 @@ void kprintf(const char *fmt, ...);
 	            __PRETTY_FUNCTION__, __LINE__ ,                                     \
 	            ##args);                                                            \
 	} while(0)
-#else   /* !0 */
+#else           
 # define KAUTH_DEBUG(fmt, args...)              do { } while (0)
 # define VFS_DEBUG(ctx, vp, fmt, args...)       do { } while(0)
-#endif  /* !0 */
+#endif          
 
-/*
- * Initialisation.
- */
+  
+                  
+   
 #ifdef XNU_KERNEL_PRIVATE
 __BEGIN_DECLS
 
@@ -789,18 +789,18 @@ extern lck_grp_t kauth_lck_grp;
 
 extern void     kauth_init(void);
 extern void     kauth_cred_init(void);
-/*
- * If you need accounting for KM_KAUTH consider using
- * KALLOC_HEAP_DEFINE to define a view.
- */
+  
+                                                     
+                                       
+   
 #define KM_KAUTH     KHEAP_DEFAULT
 #if CONFIG_EXT_RESOLVER
 extern void     kauth_resolver_identity_reset(void);
 #endif
 __END_DECLS
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif  /* KERNEL */
+#endif              
 
-#endif /* __APPLE_API_EVOLVING */
-#endif /* _SYS_KAUTH_H */
+#endif                           
+#endif                   

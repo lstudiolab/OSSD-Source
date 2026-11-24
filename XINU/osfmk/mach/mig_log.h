@@ -68,9 +68,9 @@ extern void MigEventTracer
 	char *file,
 	unsigned int line
 );
-#else   /* !defined(__STDC__) */
+#else                           
 ();
-#endif  /* !defined(__STDC__) */
+#endif                          
 
 extern void MigEventErrors
 #if     defined(__STDC__)
@@ -81,9 +81,9 @@ extern void MigEventErrors
 	char *file,
 	unsigned int line
 );
-#else   /* !defined(__STDC__) */
+#else                           
 ();
-#endif  /* !defined(__STDC__) */
+#endif                          
 
 extern int mig_errors;
 extern int mig_tracing;
@@ -91,6 +91,6 @@ extern int mig_tracing;
 #define LOG_ERRORS      if (mig_errors)  MigEventErrors
 #define LOG_TRACE       if (mig_tracing) MigEventTracer
 
-#endif  /* __APPLE_API_OBSOLETE */
+#endif                            
 
-#endif  /* _mach_log_ */
+#endif                  

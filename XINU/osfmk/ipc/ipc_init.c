@@ -60,15 +60,15 @@
  * Version 2.0.
  * Copyright (c) 2005 SPARTA, Inc.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_init.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Functions to initialize the IPC system.
- */
+  
+   
+  
+                       
+                      
+             
+  
+                                          
+   
 
 #include <mach_debug.h>
 
@@ -108,21 +108,21 @@
 #include <ipc/ipc_importance.h>
 #include <ipc/ipc_eventlink.h>
 
-#include <mach/machine/ndr_def.h>   /* NDR_record */
+#include <mach/machine/ndr_def.h>                   
 
 #define IPC_KERNEL_MAP_SIZE      (CONFIG_IPC_KERNEL_MAP_SIZE * 1024 * 1024)
 SECURITY_READ_ONLY_LATE(vm_map_t) ipc_kernel_map;
 
-/* values to limit physical copy out-of-line memory descriptors */
+                                                                  
 SECURITY_READ_ONLY_LATE(vm_map_t) ipc_kernel_copy_map;
 #define IPC_KERNEL_COPY_MAP_SIZE (8 * 1024 * 1024)
 const vm_size_t ipc_kmsg_max_vm_space = ((IPC_KERNEL_COPY_MAP_SIZE * 7) / 8);
 
-/*
- * values to limit inline message body handling
- * avoid copyin/out limits - even after accounting for maximum descriptor expansion.
- */
-#define IPC_KMSG_MAX_SPACE (64 * 1024 * 1024) /* keep in sync with COPYSIZELIMIT_PANIC */
+  
+                                               
+                                                                                    
+   
+#define IPC_KMSG_MAX_SPACE (64 * 1024 * 1024)                                            
 const vm_size_t ipc_kmsg_max_body_space = ((IPC_KMSG_MAX_SPACE * 3) / 4 - MAX_TRAILER_SIZE);
 
 #if XNU_TARGET_OS_OSX
@@ -141,17 +141,17 @@ SECURITY_READ_ONLY_LATE(bool) immovable_control_port_enabled;
 LCK_GRP_DECLARE(ipc_lck_grp, "ipc");
 LCK_ATTR_DECLARE(ipc_lck_attr, 0, 0);
 
-/*
- * XXX tunable, belongs in mach.message.h
- */
+  
+                                         
+   
 #define MSG_OOL_SIZE_SMALL_MAX (2*PAGE_SIZE)
 SECURITY_READ_ONLY_LATE(vm_size_t) msg_ool_size_small;
 
-/*
- *	Routine:	ipc_init
- *	Purpose:
- *		Final initialization
- */
+  
+                    
+           
+                        
+   
 __startup_func
 static void
 ipc_init(void)
@@ -159,7 +159,7 @@ ipc_init(void)
 	kern_return_t kr;
 	vm_offset_t min;
 
-	/* create special spaces */
+	                           
 
 	kr = ipc_space_create_special(&ipc_space_kernel);
 	assert(kr == KERN_SUCCESS);
@@ -167,7 +167,7 @@ ipc_init(void)
 	kr = ipc_space_create_special(&ipc_space_reply);
 	assert(kr == KERN_SUCCESS);
 
-	/* initialize modules with hidden data structures */
+	                                                    
 
 #if IMPORTANCE_INHERITANCE
 	ipc_importance_init();
@@ -210,12 +210,12 @@ ipc_init(void)
 	ipc_kernel_copy_map->no_zero_fill = TRUE;
 	ipc_kernel_copy_map->wait_for_space = TRUE;
 
-	/*
-	 * As an optimization, 'small' out of line data regions using a
-	 * physical copy strategy are copied into kalloc'ed buffers.
-	 * The value of 'small' is determined here.  Requests kalloc()
-	 * with sizes greater or equal to kalloc_max_prerounded may fail.
-	 */
+	  
+                                                                
+                                                             
+                                                               
+                                                                  
+    
 	if (kalloc_max_prerounded <= MSG_OOL_SIZE_SMALL_MAX) {
 		msg_ool_size_small = kalloc_max_prerounded;
 	} else {
@@ -228,11 +228,11 @@ ipc_init(void)
 STARTUP(MACH_IPC, STARTUP_RANK_LAST, ipc_init);
 
 
-/*
- *	Routine:	ipc_thread_call_init
- *	Purpose:
- *		Initialize IPC logic that needs thread call support
- */
+  
+                                
+           
+                                                       
+   
 
 void
 ipc_thread_call_init(void)

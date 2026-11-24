@@ -45,27 +45,27 @@ extern void bt_params_add(struct bt_params *params);
 void
 mach_bridge_init_timestamp(void)
 {
-	/* This function should be called only once by the driver
-	 *  implementing the interrupt handler for receiving timestamps */
+	                                                         
+                                                                   
 	if (os_atomic_load(&bt_init_flag, relaxed)) {
 		return;
 	}
 
 	os_atomic_store(&bt_init_flag, 1, release);
 
-	/* Start the kernel thread only after all the locks have been initialized */
+	                                                                            
 	bt_calibration_thread_start();
 }
 
-/*
- * Conditions: Should be called from primary interrupt context
- */
+  
+                                                              
+   
 void
 mach_bridge_recv_timestamps(uint64_t remoteTimestamp, uint64_t localTimestamp)
 {
 	assert(ml_at_interrupt_context() == TRUE);
 
-	/* Ensure the locks have been initialized */
+	                                            
 	if (!os_atomic_load(&bt_init_flag, acquire)) {
 		panic("%s called before mach_bridge_init_timestamp", __func__);
 		return;
@@ -80,14 +80,14 @@ mach_bridge_recv_timestamps(uint64_t remoteTimestamp, uint64_t localTimestamp)
 	return;
 }
 
-/*
- * This function is used to set parameters, calculated externally,
- * needed for mach_bridge_remote_time.
- */
+  
+                                                                  
+                                      
+   
 void
 mach_bridge_set_params(uint64_t local_timestamp, uint64_t remote_timestamp, double rate)
 {
-	/* Ensure the locks have been initialized */
+	                                            
 	if (!os_atomic_load(&bt_init_flag, acquire)) {
 		panic("%s called before mach_bridge_init_timestamp", __func__);
 		return;

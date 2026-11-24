@@ -118,7 +118,7 @@ mac_pipe_check_kqfilter(kauth_cred_t cred, struct knote *kn,
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_pipe_enforce) {
 		return 0;
 	}
@@ -132,7 +132,7 @@ mac_pipe_check_ioctl(kauth_cred_t cred, struct pipe *cpipe, u_long cmd)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_pipe_enforce) {
 		return 0;
 	}
@@ -149,7 +149,7 @@ mac_pipe_check_read(kauth_cred_t cred, struct pipe *cpipe)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_pipe_enforce) {
 		return 0;
 	}
@@ -166,7 +166,7 @@ mac_pipe_check_select(kauth_cred_t cred, struct pipe *cpipe, int which)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_pipe_enforce) {
 		return 0;
 	}
@@ -183,7 +183,7 @@ mac_pipe_check_stat(kauth_cred_t cred, struct pipe *cpipe)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_pipe_enforce) {
 		return 0;
 	}
@@ -200,7 +200,7 @@ mac_pipe_check_write(kauth_cred_t cred, struct pipe *cpipe)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_pipe_enforce) {
 		return 0;
 	}

@@ -71,29 +71,29 @@
 MALLOC_DECLARE(M_RTABLE);
 #endif
 
-/*
- * Radix search tree node layout.
- */
+  
+                                 
+   
 
 struct radix_node {
-	struct  radix_mask *rn_mklist;  /* list of masks contained in subtree */
-	struct  radix_node *rn_parent;  /* parent */
-	short   rn_bit;                 /* bit offset; -1-index(netmask) */
-	char    rn_bmask;               /* node: mask for bit test*/
-	u_char  rn_flags;               /* enumerated next */
-#define RNF_NORMAL      1               /* leaf contains normal route */
-#define RNF_ROOT        2               /* leaf is root leaf for tree */
-#define RNF_ACTIVE      4               /* This node is alive (for rtfree) */
+	struct  radix_mask *rn_mklist;                                          
+	struct  radix_node *rn_parent;              
+	short   rn_bit;                                                    
+	char    rn_bmask;                                           
+	u_char  rn_flags;                                    
+#define RNF_NORMAL      1                                               
+#define RNF_ROOT        2                                               
+#define RNF_ACTIVE      4                                                    
 	union {
-		struct {                        /* leaf only data: */
-			caddr_t rn_Key;         /* object of search */
-			caddr_t rn_Mask;        /* netmask, if present */
+		struct {                                             
+			caddr_t rn_Key;                               
+			caddr_t rn_Mask;                                 
 			struct  radix_node *rn_Dupedkey;
 		} rn_leaf;
-		struct {                        /* node only data: */
-			int     rn_Off;         /* where to start compare */
-			struct  radix_node *rn_L;/* progeny */
-			struct  radix_node *rn_R;/* progeny */
+		struct {                                             
+			int     rn_Off;                                     
+			struct  radix_node *rn_L;             
+			struct  radix_node *rn_R;             
 		} rn_node;
 	}               rn_u;
 #ifdef RN_DEBUG
@@ -103,10 +103,10 @@ struct radix_node {
 #endif
 
 #if __arm__ && (__BIGGEST_ALIGNMENT__ > 4)
-/* For the newer ARMv7k ABI where 64-bit types are 64-bit aligned, but pointers
- * are 32-bit:
- * Aligned to 64-bit since this is cast to rtentry, which is 64-bit aligned.
- */
+                                                                               
+              
+                                                                            
+   
 } __attribute__ ((aligned(8)));
 #else
 };
@@ -119,24 +119,24 @@ struct radix_node {
 #define rn_left         rn_u.rn_node.rn_L
 #define rn_right        rn_u.rn_node.rn_R
 
-/*
- * Annotations to tree concerning potential routes applying to subtrees.
- */
+  
+                                                                        
+   
 
 struct radix_mask {
-	short   rm_bit;                 /* bit offset; -1-index(netmask) */
-	char    rm_unused;              /* cf. rn_bmask */
-	u_char  rm_flags;               /* cf. rn_flags */
-	struct  radix_mask *rm_mklist;  /* more masks to try */
+	short   rm_bit;                                                    
+	char    rm_unused;                                
+	u_char  rm_flags;                                 
+	struct  radix_mask *rm_mklist;                         
 	union   {
-		caddr_t rmu_mask;               /* the mask */
-		struct  radix_node *rmu_leaf;   /* for normal routes */
+		caddr_t rmu_mask;                             
+		struct  radix_node *rmu_leaf;                          
 	}       rm_rmu;
-	int     rm_refs;                /* # of references to this struct */
+	int     rm_refs;                                                    
 };
 
 #define rm_mask rm_rmu.rmu_mask
-#define rm_leaf rm_rmu.rmu_leaf         /* extra field would make 32 bytes */
+#define rm_leaf rm_rmu.rmu_leaf                                              
 
 
 #define MKGet(m) {\
@@ -153,41 +153,41 @@ typedef int rn_matchf_t(struct radix_node *, void *);
 
 struct radix_node_head {
 	struct  radix_node *rnh_treetop;
-	int     rnh_addrsize;           /* permit, but not require fixed keys */
-	int     rnh_pktsize;            /* permit, but not require fixed keys */
-	struct  radix_node *(*rnh_addaddr)      /* add based on sockaddr */
+	int     rnh_addrsize;                                                   
+	int     rnh_pktsize;                                                    
+	struct  radix_node *(*rnh_addaddr)                                 
 	(void *v, void *mask,
 	    struct radix_node_head *head, struct radix_node nodes[]);
-	struct  radix_node *(*rnh_addpkt)       /* add based on packet hdr */
+	struct  radix_node *(*rnh_addpkt)                                    
 	(void *v, void *mask,
 	    struct radix_node_head *head, struct radix_node nodes[]);
-	struct  radix_node *(*rnh_deladdr)      /* remove based on sockaddr */
+	struct  radix_node *(*rnh_deladdr)                                    
 	(void *v, void *mask, struct radix_node_head *head);
-	struct  radix_node *(*rnh_delpkt)       /* remove based on packet hdr */
+	struct  radix_node *(*rnh_delpkt)                                       
 	(void *v, void *mask, struct radix_node_head *head);
-	struct  radix_node *(*rnh_matchaddr)    /* locate based on sockaddr */
+	struct  radix_node *(*rnh_matchaddr)                                  
 	(void *v, struct radix_node_head *head);
-	/* locate based on sockaddr and rn_matchf_t() */
+	                                                
 	struct  radix_node *(*rnh_matchaddr_args)
 	(void *v, struct radix_node_head *head,
 	    rn_matchf_t *f, void *w);
-	struct  radix_node *(*rnh_lookup)       /* locate based on sockaddr */
+	struct  radix_node *(*rnh_lookup)                                     
 	(void *v, void *mask, struct radix_node_head *head);
-	/* locate based on sockaddr, mask and rn_matchf_t() */
+	                                                      
 	struct  radix_node *(*rnh_lookup_args)
 	(void *v, void *mask, struct radix_node_head *head,
 	    rn_matchf_t *f, void *);
-	struct  radix_node *(*rnh_matchpkt)     /* locate based on packet hdr */
+	struct  radix_node *(*rnh_matchpkt)                                     
 	(void *v, struct radix_node_head *head);
-	int     (*rnh_walktree)                 /* traverse tree */
+	int     (*rnh_walktree)                                    
 	(struct radix_node_head *head, walktree_f_t *f, void *w);
-	int     (*rnh_walktree_from)            /* traverse tree below a */
+	int     (*rnh_walktree_from)                                       
 	(struct radix_node_head *head, void *a, void *m,
 	walktree_f_t *f, void *w);
-	void    (*rnh_close)    /* do something when the last ref drops */
+	void    (*rnh_close)                                              
 	(struct radix_node *rn, struct radix_node_head *head);
-	struct  radix_node rnh_nodes[3];        /* empty tree for common case */
-	int     rnh_cnt;                        /* tree dimension */
+	struct  radix_node rnh_nodes[3];                                        
+	int     rnh_cnt;                                            
 };
 
 #ifndef KERNEL
@@ -202,7 +202,7 @@ struct radix_node_head {
 #define Bzero(p, n) bzero((caddr_t)(p), (unsigned)(n));
 #define R_Malloc(p, t, n) (p = (t) _MALLOC((uint32_t)(n), M_RTABLE, M_WAITOK))
 #define R_Free(p) _FREE((caddr_t)p, M_RTABLE);
-#endif /*KERNEL*/
+#endif           
 
 void     rn_init(void);
 int      rn_inithead(void **, int);
@@ -218,5 +218,5 @@ struct radix_node
 *rn_match(void *, struct radix_node_head *),
 *rn_match_args(void *, struct radix_node_head *, rn_matchf_t *, void *);
 
-#endif /* PRIVATE */
-#endif /* _RADIX_H_ */
+#endif              
+#endif                

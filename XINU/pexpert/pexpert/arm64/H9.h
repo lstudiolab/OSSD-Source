@@ -30,10 +30,10 @@
 #define _PEXPERT_ARM64_H9_H
 
 #define APPLEHURRICANE
-#define NO_MONITOR          1 /* No EL3 for this CPU -- ever */
-#define HAS_MIGSTS          1 /* Has MIGSTS register, and supports migration between p-core and e-core */
-#define HAS_KTRR            1 /* Has KTRR registers */
-#define HAS_CPMU_L2C_EVENTS 1 /* Has L2 cache events in CPMU */
+#define NO_MONITOR          1                                  
+#define HAS_MIGSTS          1                                                                            
+#define HAS_KTRR            1                         
+#define HAS_CPMU_L2C_EVENTS 1                                  
 
 #define CORE_NCTRS                           10
 #define CPMU_AIC_PMI                         1
@@ -44,9 +44,9 @@
 #define __ARM_PAN_AVAILABLE__                1
 
 
-// Hurricane and Zephyr require workaround for radar 20619637
+                                                             
 #define SINGLE_STEP_RETIRE_ERRATA            1
 
 #include <pexpert/arm64/apple_arm64_common.h>
 
-#endif /* !_PEXPERT_ARM64_H9_H */
+#endif                           

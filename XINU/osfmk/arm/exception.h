@@ -28,7 +28,7 @@
 /*
  * @OSF_COPYRIGHT@
  */
-/* CMU_ENDHIST */
+                 
 /*
  * Mach Operating System
  * Copyright (c) 1991,1990 Carnegie Mellon University
@@ -55,12 +55,12 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- * ARM Exception Info
- */
+  
+                     
+   
 #ifndef _ARM_EXCEPTION_H_
 #define _ARM_EXCEPTION_H_
 
@@ -71,7 +71,7 @@
 #define  VECT_DATA_ABT            0x10
 #define  VECT_IRQ                 0x18
 #define  VECT_FIQ                 0x1C
-/* can put actual code for FIQ here, avoiding extra fetch */
+                                                            
 
 
-#endif  /* _ARM_EXCEPTION_H_ */
+#endif                         

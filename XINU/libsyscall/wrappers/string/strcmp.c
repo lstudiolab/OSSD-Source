@@ -32,9 +32,9 @@
 
 #include "string.h"
 
-/*
- * Compare strings.
- */
+  
+                   
+   
 __attribute__((visibility("hidden")))
 int
 _libkernel_strcmp(const char *s1, const char *s2)

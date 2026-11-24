@@ -41,25 +41,25 @@
 #include        <machine/machine_routines.h>
 
 #if __x86_64__
-extern int bootarg_no32exec;    /* bsd_init.c */
+extern int bootarg_no32exec;                    
 #endif
 
-/**********************************************************************
-* Routine:	grade_binary()
-*
-* Function:	Say OK to CPU types that we can actually execute on the given
-*		system. 64-bit binaries have the highest preference, followed
-*		by 32-bit binaries. 0 means unsupported.
-**********************************************************************/
+                                                                       
+                         
+ 
+                                                                         
+                                                                
+                                           
+                                                                       
 int
 grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execfeatures __unused, bool allow_simulator_binary __unused)
 {
 	cpu_subtype_t hostsubtype = cpu_subtype();
 
 	switch (exectype) {
-	case CPU_TYPE_X86_64:           /* native 64-bit */
+	case CPU_TYPE_X86_64:                              
 		switch (hostsubtype) {
-		case CPU_SUBTYPE_X86_64_H:      /* x86_64h can execute anything */
+		case CPU_SUBTYPE_X86_64_H:                                        
 			switch (execsubtype) {
 			case CPU_SUBTYPE_X86_64_H:
 				return 3;
@@ -67,7 +67,7 @@ grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execf
 				return 2;
 			}
 			break;
-		case CPU_SUBTYPE_X86_ARCH1:     /* generic systems can only execute ALL subtype */
+		case CPU_SUBTYPE_X86_ARCH1:                                                       
 			switch (execsubtype) {
 			case CPU_SUBTYPE_X86_64_ALL:
 				return 2;
@@ -75,7 +75,7 @@ grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execf
 			break;
 		}
 		break;
-	case CPU_TYPE_X86:              /* native */
+	case CPU_TYPE_X86:                          
 #if __x86_64__
 		if (bootarg_no32exec && !allow_simulator_binary) {
 			return 0;

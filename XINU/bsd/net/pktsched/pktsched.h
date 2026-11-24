@@ -34,28 +34,28 @@
 extern "C" {
 #endif
 
-/* packet scheduler type */
-#define PKTSCHEDT_NONE          0       /* reserved */
-#define PKTSCHEDT_CBQ           1       /* cbq */
-#define PKTSCHEDT_HFSC          2       /* hfsc */
-#define PKTSCHEDT_PRIQ          3       /* priority queue */
-#define PKTSCHEDT_FAIRQ         4       /* fairq */
-#define PKTSCHEDT_TCQ           5       /* traffic class queue */
-#define PKTSCHEDT_QFQ           6       /* quick fair queueing */
-#define PKTSCHEDT_FQ_CODEL      7       /* Flow queues with CoDel */
-#define PKTSCHEDT_MAX           8       /* should be max sched type + 1 */
+                           
+#define PKTSCHEDT_NONE          0                     
+#define PKTSCHEDT_CBQ           1                
+#define PKTSCHEDT_HFSC          2                 
+#define PKTSCHEDT_PRIQ          3                           
+#define PKTSCHEDT_FAIRQ         4                  
+#define PKTSCHEDT_TCQ           5                                
+#define PKTSCHEDT_QFQ           6                                
+#define PKTSCHEDT_FQ_CODEL      7                                   
+#define PKTSCHEDT_MAX           8                                         
 
 #ifdef BSD_KERNEL_PRIVATE
 #include <mach/mach_time.h>
 #include <sys/sysctl.h>
 #include <libkern/libkern.h>
 
-/* flags for pktsched_setup */
-#define PKTSCHEDF_QALG_SFB      0x01    /* use SFB */
-#define PKTSCHEDF_QALG_ECN      0x02    /* enable ECN */
-#define PKTSCHEDF_QALG_FLOWCTL  0x04    /* enable flow control advisories */
-#define PKTSCHEDF_QALG_DELAYBASED       0x08    /* Delay based queueing */
-#define PKTSCHEDF_QALG_DRIVER_MANAGED   0x10    /* driver managed */
+                              
+#define PKTSCHEDF_QALG_SFB      0x01                 
+#define PKTSCHEDF_QALG_ECN      0x02                    
+#define PKTSCHEDF_QALG_FLOWCTL  0x04                                        
+#define PKTSCHEDF_QALG_DELAYBASED       0x08                              
+#define PKTSCHEDF_QALG_DRIVER_MANAGED   0x10                        
 
 typedef struct _pktsched_pkt_ {
 	classq_pkt_t            __pkt;
@@ -80,32 +80,32 @@ typedef struct _pktsched_pkt_ {
 	(_p)->pktsched_pcnt = 0;                                        \
 } while (0)
 
-/* macro for timeout/untimeout */
-/* use old-style timeout/untimeout */
-/* dummy callout structure */
+                                 
+                                     
+                             
 struct callout {
-	void            *c_arg;                 /* function argument */
-	void            (*c_func)(void *);      /* function to call */
+	void            *c_arg;                                        
+	void            (*c_func)(void *);                            
 };
 
 #define CALLOUT_INIT(c) do {                                    \
 	(void) memset((c), 0, sizeof (*(c)));                   \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define CALLOUT_RESET(c, t, f, a) do {                          \
 	(c)->c_arg = (a);                                       \
 	(c)->c_func = (f);                                      \
 	timeout((f), (a), (t));                                 \
-} while ( /*CONSTCOND*/ 0)
+} while (               0)
 
 #define CALLOUT_STOP(c)         untimeout((c)->c_func, (c)->c_arg)
 #define CALLOUT_INITIALIZER     { NULL, NULL }
 
 typedef void (timeout_t)(void *);
 
-/*
- * Bitmap operations
- */
+  
+                    
+   
 typedef u_int32_t pktsched_bitmap_t;
 
 static inline boolean_t
@@ -151,16 +151,16 @@ pktsched_get_pkt_len(pktsched_pkt_t *pkt)
 	return pkt->pktsched_plen;
 }
 
-/*
- * We can use mach_absolute_time which returns a 64-bit value with
- * granularity less than a microsecond even on the slowest processor.
- */
+  
+                                                                  
+                                                                     
+   
 #define read_machclk()          mach_absolute_time()
 
-/*
- * machine dependent clock
- * a 64bit high resolution time counter.
- */
+  
+                          
+                                        
+   
 extern uint32_t machclk_freq;
 extern uint64_t machclk_per_sec;
 extern uint32_t pktsched_verbose;
@@ -189,10 +189,10 @@ extern void pktsched_pkt_encap_chain(pktsched_pkt_t *, classq_pkt_t *,
 extern mbuf_svc_class_t pktsched_get_pkt_svc(pktsched_pkt_t *);
 extern struct flowadv_fcentry *pktsched_alloc_fcentry(pktsched_pkt_t *,
     struct ifnet *, int);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* _PKTSCHED_PKTSCHED_H_ */
+#endif              
+#endif                            

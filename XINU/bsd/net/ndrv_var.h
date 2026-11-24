@@ -26,19 +26,19 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 /* Copyright (c) 1997, 1998 Apple Computer, Inc. All Rights Reserved */
-/*
- *	@(#)ndrv.h	1.1 (MacOSX) 6/10/43
- * Justin Walker - 970604
- */
+  
+                                  
+                         
+   
 
 #ifndef _NET_NDRV_VAR_H
 #define _NET_NDRV_VAR_H
 #ifdef PRIVATE
 
-/*
- * structure for storing a linked list of multicast addresses
- * registered by this socket. May be variable in length.
- */
+  
+                                                             
+                                                        
+   
 
 struct ndrv_multiaddr {
 	struct ndrv_multiaddr*      next;
@@ -46,22 +46,22 @@ struct ndrv_multiaddr {
 	struct sockaddr                     addr;
 };
 
-/*
- * The cb is plugged into the socket (so_pcb), and the ifnet structure
- *  of BIND is plugged in here.
- * For now, it looks like a raw_cb up front...
- */
+  
+                                                                      
+                               
+                                              
+   
 struct ndrv_cb {
 	TAILQ_ENTRY(ndrv_cb)    nd_next;
-	struct socket *nd_socket;       /* Back to the socket */
-	u_int32_t nd_signature; /* Just double-checking */
+	struct socket *nd_socket;                               
+	u_int32_t nd_signature;                           
 	struct sockaddr_ndrv *nd_faddr;
 	struct sockaddr_ndrv *nd_laddr;
-	struct sockproto nd_proto;      /* proto family, protocol */
-	int nd_descrcnt;                /* # elements in nd_dlist - Obsolete */
-	TAILQ_HEAD(dlist, dlil_demux_desc) nd_dlist; /* Descr. list */
-	u_int32_t nd_dlist_cnt; /* Descr. list count */
-	struct ifnet *nd_if; /* obsolete, maintained for binary compatibility */
+	struct sockproto nd_proto;                                  
+	int nd_descrcnt;                                                       
+	TAILQ_HEAD(dlist, dlil_demux_desc) nd_dlist;                  
+	u_int32_t nd_dlist_cnt;                        
+	struct ifnet *nd_if;                                                    
 	u_int32_t nd_proto_family;
 	u_int32_t nd_family;
 	struct ndrv_multiaddr* nd_multiaddrs;
@@ -69,11 +69,11 @@ struct ndrv_cb {
 };
 
 #define sotondrvcb(so)          ((struct ndrv_cb *)(so)->so_pcb)
-#define NDRV_SIGNATURE  0x4e445256 /* "NDRV" */
+#define NDRV_SIGNATURE  0x4e445256             
 
-/* Nominal allocated space for NDRV sockets */
+                                              
 #define NDRVSNDQ         8192
 #define NDRVRCVQ         8192
 
-#endif /* PRIVATE */
-#endif  /* _NET_NDRV_VAR_H */
+#endif              
+#endif                       

@@ -59,7 +59,7 @@
 #ifndef _NET_IF_VLAN_VAR_H_
 #define _NET_IF_VLAN_VAR_H_     1
 
-#define ETHER_VLAN_ENCAP_LEN    4       /* len of 802.1Q VLAN encapsulation */
+#define ETHER_VLAN_ENCAP_LEN    4                                             
 struct  ether_vlan_header {
 	u_char  evl_dhost[ETHER_ADDR_LEN];
 	u_char  evl_shost[ETHER_ADDR_LEN];
@@ -73,14 +73,14 @@ struct  ether_vlan_header {
 #define EVL_PRIOFTAG(tag) (((tag) >> 13) & 7)
 
 #if 0
-/* sysctl(3) tags, for compatibility purposes */
+                                                
 #define VLANCTL_PROTO   1
 #define VLANCTL_MAX     2
 #endif
 
-/*
- * Configuration structure for SIOCSETVLAN and SIOCGETVLAN ioctls.
- */
+  
+                                                                  
+   
 struct  vlanreq {
 	char    vlr_parent[IFNAMSIZ];
 	u_short vlr_tag;
@@ -88,5 +88,5 @@ struct  vlanreq {
 
 #ifdef KERNEL_PRIVATE
 int vlan_family_init(void);
-#endif /* KERNEL_PRIVATE */
-#endif /* _NET_IF_VLAN_VAR_H_ */
+#endif                     
+#endif                          

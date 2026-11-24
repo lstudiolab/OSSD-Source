@@ -27,7 +27,7 @@
 #include <sys/fcntl.h>
 #include <sys/coalition.h>
 
-/* Syscall entry points */
+                          
 int __coalition(uint32_t operation, uint64_t *cid, uint32_t flags);
 int __coalition_info(uint32_t operation, uint64_t *cid, void *buffer, size_t *bufsize);
 int __coalition_ledger(uint32_t operation, uint64_t *cid, void *buffer, size_t *bufsize);

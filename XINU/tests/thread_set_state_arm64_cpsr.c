@@ -73,14 +73,14 @@ T_DECL(thread_set_state_arm64_cpsr,
 	err = thread_get_state(mach_thread_self(), ARM_THREAD_STATE64, (thread_state_t)&ts, &count);
 	T_QUIET; T_ASSERT_EQ(err, KERN_SUCCESS, "Got own thread state");
 
-	/*
-	 * jump to the second phase while attempting to set all the bits
-	 * in CPSR. If we survive the jump and read back CPSR without any
-	 * bits besides condition flags set, the test passes. If kernel
-	 * does not mask out the privileged CPSR bits correctly, we can
-	 * expect an illegal instruction set panic due to SPSR.IL being
-	 * set upon ERET to user mode.
-	 */
+	  
+                                                                 
+                                                                  
+                                                                
+                                                                
+                                                                
+                               
+    
 
 	void *new_pc = (void *)&phase2;
 	arm_thread_state64_set_pc_fptr(ts, new_pc);
@@ -88,7 +88,7 @@ T_DECL(thread_set_state_arm64_cpsr,
 
 	err = thread_set_state(mach_thread_self(), ARM_THREAD_STATE64, (thread_state_t)&ts, ARM_THREAD_STATE64_COUNT);
 
-	/* NOT REACHED */
+	                 
 
 	T_ASSERT_FAIL("Thread did not reach expected state. err = %d", err);
 

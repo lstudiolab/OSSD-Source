@@ -34,11 +34,11 @@
 #ifdef KERNEL_PRIVATE
 __private_extern__ void
 if_fake_init(void);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * SIOCSDRVSPEC
- */
+  
+               
+   
 enum {
 	IF_FAKE_S_CMD_NONE              = 0,
 	IF_FAKE_S_CMD_SET_PEER          = 1,
@@ -46,9 +46,9 @@ enum {
 	IF_FAKE_S_CMD_SET_DEQUEUE_STALL = 3,
 };
 
-/*
- * SIOCGDRVSPEC
- */
+  
+               
+   
 enum {
 	IF_FAKE_G_CMD_NONE              = 0,
 	IF_FAKE_G_CMD_GET_PEER          = 1,
@@ -66,13 +66,13 @@ struct if_fake_media {
 struct if_fake_request {
 	uint64_t        iffr_reserved[4];
 	union {
-		char    iffru_buf[128];         /* stable size */
+		char    iffru_buf[128];                          
 		struct if_fake_media    iffru_media;
-		char    iffru_peer_name[IFNAMSIZ]; /* if name, e.g. "en0" */
-		/*
-		 * control dequeue stall. 0: disable dequeue stall, else
-		 * enable dequeue stall.
-		 */
+		char    iffru_peer_name[IFNAMSIZ];                          
+		  
+                                                          
+                          
+     
 		uint32_t        iffru_dequeue_stall;
 	} iffr_u;
 #define iffr_peer_name  iffr_u.iffru_peer_name
@@ -80,4 +80,4 @@ struct if_fake_request {
 #define iffr_dequeue_stall      iffr_u.iffru_dequeue_stall
 };
 
-#endif /* _NET_IF_FAKE_VAR_H_ */
+#endif                          

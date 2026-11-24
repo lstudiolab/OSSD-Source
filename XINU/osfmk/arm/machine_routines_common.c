@@ -47,7 +47,7 @@
 #if MONOTONIC
 #include <kern/monotonic.h>
 #include <machine/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #include <mach/machine.h>
 
@@ -180,7 +180,7 @@ sched_perfcontrol_register_callbacks(sched_perfcontrol_callbacks_t callbacks, un
 			} else {
 				sched_perfcontrol_thread_group_deinit = sched_perfcontrol_thread_group_default;
 			}
-			// tell CLPC about existing thread groups
+			                                         
 			thread_group_resync(TRUE);
 		}
 
@@ -267,7 +267,7 @@ sched_perfcontrol_register_callbacks(sched_perfcontrol_callbacks_t callbacks, un
 			sched_perfcontrol_work_interval_notify = sched_perfcontrol_work_interval_notify_default;
 		}
 	} else {
-		/* reset to defaults */
+		                       
 #if CONFIG_THREAD_GROUPS
 		thread_group_resync(FALSE);
 #endif
@@ -311,10 +311,10 @@ machine_switch_populate_perfcontrol_cpu_counters(struct perfcontrol_cpu_counters
 {
 #if MONOTONIC
 	mt_perfcontrol(&cpu_counters->instructions, &cpu_counters->cycles);
-#else /* MONOTONIC */
+#else                
 	cpu_counters->instructions = 0;
 	cpu_counters->cycles = 0;
-#endif /* !MONOTONIC */
+#endif                 
 }
 
 int perfcontrol_callout_stats_enabled = 0;
@@ -345,10 +345,10 @@ perfcontrol_callout_counters_end(uint64_t *start_counters,
 #ifdef MT_CORE_INSTRS
 	os_atomic_add(&perfcontrol_callout_stats[type][PERFCONTROL_STAT_INSTRS],
 	    end_counters[MT_CORE_INSTRS] - start_counters[MT_CORE_INSTRS], relaxed);
-#endif /* defined(MT_CORE_INSTRS) */
+#endif                              
 	os_atomic_inc(&perfcontrol_callout_count[type], relaxed);
 }
-#endif /* MONOTONIC */
+#endif                
 
 uint64_t
 perfcontrol_callout_stat_avg(perfcontrol_callout_type_t type,
@@ -389,14 +389,14 @@ machine_switch_perfcontrol_context(perfcontrol_event event,
 #if MONOTONIC
 		uint64_t counters[MT_CORE_NFIXED];
 		bool ctrs_enabled = perfcontrol_callout_counters_begin(counters);
-#endif /* MONOTONIC */
+#endif                
 		sched_perfcontrol_csw(event, cpu_id, timestamp, flags,
 		    &offcore, &oncore, &cpu_counters, NULL);
 #if MONOTONIC
 		if (ctrs_enabled) {
 			perfcontrol_callout_counters_end(counters, PERFCONTROL_CALLOUT_CONTEXT);
 		}
-#endif /* MONOTONIC */
+#endif                
 
 #if __arm64__
 		old->machine.energy_estimate_nj += offcore.energy_estimate_nj;
@@ -422,14 +422,14 @@ machine_switch_perfcontrol_state_update(perfcontrol_event event,
 #if MONOTONIC
 	uint64_t counters[MT_CORE_NFIXED];
 	bool ctrs_enabled = perfcontrol_callout_counters_begin(counters);
-#endif /* MONOTONIC */
+#endif                
 	sched_perfcontrol_state_update(event, cpu_id, timestamp, flags,
 	    &data, NULL);
 #if MONOTONIC
 	if (ctrs_enabled) {
 		perfcontrol_callout_counters_end(counters, PERFCONTROL_CALLOUT_STATE_UPDATE);
 	}
-#endif /* MONOTONIC */
+#endif                
 
 #if __arm64__
 	thread->machine.energy_estimate_nj += data.energy_estimate_nj;
@@ -467,13 +467,13 @@ machine_thread_going_on_core(thread_t   new_thread,
 #if MONOTONIC
 	uint64_t counters[MT_CORE_NFIXED];
 	bool ctrs_enabled = perfcontrol_callout_counters_begin(counters);
-#endif /* MONOTONIC */
+#endif                
 	sched_perfcontrol_oncore(state, &on_core);
 #if MONOTONIC
 	if (ctrs_enabled) {
 		perfcontrol_callout_counters_end(counters, PERFCONTROL_CALLOUT_ON_CORE);
 	}
-#endif /* MONOTONIC */
+#endif                
 
 #if __arm64__
 	new_thread->machine.energy_estimate_nj += on_core.energy_estimate_nj;
@@ -502,13 +502,13 @@ machine_thread_going_off_core(thread_t old_thread, boolean_t thread_terminating,
 #if MONOTONIC
 	uint64_t counters[MT_CORE_NFIXED];
 	bool ctrs_enabled = perfcontrol_callout_counters_begin(counters);
-#endif /* MONOTONIC */
+#endif                
 	sched_perfcontrol_offcore(state, &off_core, thread_terminating);
 #if MONOTONIC
 	if (ctrs_enabled) {
 		perfcontrol_callout_counters_end(counters, PERFCONTROL_CALLOUT_OFF_CORE);
 	}
-#endif /* MONOTONIC */
+#endif                
 
 #if __arm64__
 	old_thread->machine.energy_estimate_nj += off_core.energy_estimate_nj;
@@ -579,10 +579,10 @@ machine_thread_group_blocked(struct thread_group *blocked_tg,
 	blocked_data.thread_group_size = thread_group_machine_data_size();
 
 	if (blocking_tg == NULL) {
-		/*
-		 * For special cases such as the render server, the blocking TG is a
-		 * well known TG. Only in that case, the blocking_tg should be NULL.
-		 */
+		  
+                                                                      
+                                                                      
+     
 		assert(flags & PERFCONTROL_CALLOUT_BLOCKING_TG_RENDER_SERVER);
 		sched_perfcontrol_thread_group_blocked(&blocked_data, NULL, flags, state);
 	} else {
@@ -621,10 +621,10 @@ machine_thread_group_unblocked(struct thread_group *unblocked_tg,
 	unblocked_data.thread_group_size = thread_group_machine_data_size();
 
 	if (unblocking_tg == NULL) {
-		/*
-		 * For special cases such as the render server, the unblocking TG is a
-		 * well known TG. Only in that case, the unblocking_tg should be NULL.
-		 */
+		  
+                                                                        
+                                                                        
+     
 		assert(flags & PERFCONTROL_CALLOUT_BLOCKING_TG_RENDER_SERVER);
 		sched_perfcontrol_thread_group_unblocked(&unblocked_data, NULL, flags, state);
 	} else {
@@ -642,7 +642,7 @@ machine_thread_group_unblocked(struct thread_group *unblocked_tg,
 	splx(s);
 }
 
-#endif /* CONFIG_THREAD_GROUPS */
+#endif                           
 
 void
 machine_max_runnable_latency(uint64_t bg_max_latency,
@@ -703,15 +703,15 @@ machine_perfcontrol_deadline_passed(uint64_t deadline)
 }
 
 #if INTERRUPT_MASKED_DEBUG
-/*
- * ml_spin_debug_reset()
- * Reset the timestamp on a thread that has been unscheduled
- * to avoid false alarms. Alarm will go off if interrupts are held
- * disabled for too long, starting from now.
- *
- * Call ml_get_timebase() directly to prevent extra overhead on newer
- * platforms that's enabled in DEVELOPMENT kernel configurations.
- */
+  
+                        
+                                                            
+                                                                  
+                                            
+  
+                                                                     
+                                                                 
+   
 void
 ml_spin_debug_reset(thread_t thread)
 {
@@ -720,22 +720,22 @@ ml_spin_debug_reset(thread_t thread)
 	}
 }
 
-/*
- * ml_spin_debug_clear()
- * Clear the timestamp on a thread that has been unscheduled
- * to avoid false alarms
- */
+  
+                        
+                                                            
+                        
+   
 void
 ml_spin_debug_clear(thread_t thread)
 {
 	thread->machine.intmask_timestamp = 0;
 }
 
-/*
- * ml_spin_debug_clear_self()
- * Clear the timestamp on the current thread to prevent
- * false alarms
- */
+  
+                             
+                                                       
+               
+   
 void
 ml_spin_debug_clear_self()
 {
@@ -757,10 +757,10 @@ __ml_check_interrupts_disabled_duration(thread_t thread, uint64_t timeout, bool 
 			clock_timebase_info(&timebase);
 
 #ifndef KASAN
-			/*
-			 * Disable the actual panic for KASAN due to the overhead of KASAN itself, leave the rest of the
-			 * mechanism enabled so that KASAN can catch any bugs in the mechanism itself.
-			 */
+			  
+                                                                                                   
+                                                                                 
+      
 			if (is_int_handler) {
 				panic("Processing of an interrupt (type = %u, handler address = %p, vector = %p) took %llu nanoseconds (timeout = %llu ns)",
 				    thread->machine.int_type, (void *)thread->machine.int_handler_addr, (void *)thread->machine.int_vector,
@@ -787,7 +787,7 @@ ml_check_interrupts_disabled_duration(thread_t thread)
 void
 ml_check_stackshot_interrupt_disabled_duration(thread_t thread)
 {
-	/* Use MAX() to let the user bump the timeout further if needed */
+	                                                                  
 	__ml_check_interrupts_disabled_duration(thread, MAX(stackshot_interrupt_masked_timeout, interrupt_masked_timeout), false);
 }
 
@@ -809,7 +809,7 @@ ml_irq_debug_end()
 {
 	INTERRUPT_MASKED_DEBUG_END();
 }
-#endif // INTERRUPT_MASKED_DEBUG
+#endif                          
 
 
 boolean_t
@@ -826,10 +826,10 @@ ml_set_interrupts_enabled(boolean_t enable)
 	state = __builtin_arm_rsr("DAIF");
 #endif
 	if (enable && (state & INTERRUPT_MASK)) {
-		assert(getCpuDatap()->cpu_int_state == NULL); // Make sure we're not enabling interrupts from primary interrupt context
+		assert(getCpuDatap()->cpu_int_state == NULL);                                                                          
 #if INTERRUPT_MASKED_DEBUG
 		if (interrupt_masked_debug) {
-			// Interrupts are currently masked, we will enable them (after finishing this check)
+			                                                                                    
 			thread = current_thread();
 			if (stackshot_active()) {
 				ml_check_stackshot_interrupt_disabled_duration(thread);
@@ -838,7 +838,7 @@ ml_set_interrupts_enabled(boolean_t enable)
 			}
 			thread->machine.intmask_timestamp = 0;
 		}
-#endif  // INTERRUPT_MASKED_DEBUG
+#endif                           
 		if (get_preemption_level() == 0) {
 			thread = current_thread();
 			while (thread->machine.CpuDatap->cpu_pending_ast & AST_URGENT) {
@@ -852,19 +852,19 @@ ml_set_interrupts_enabled(boolean_t enable)
 			}
 		}
 #if __arm__
-		__asm__ volatile ("cpsie if" ::: "memory"); // Enable IRQ FIQ
+		__asm__ volatile ("cpsie if" ::: "memory");                  
 #else
 		__builtin_arm_wsr("DAIFClr", DAIFSC_STANDARD_DISABLE);
 #endif
 	} else if (!enable && ((state & INTERRUPT_MASK) == 0)) {
 #if __arm__
-		__asm__ volatile ("cpsid if" ::: "memory"); // Mask IRQ FIQ
+		__asm__ volatile ("cpsid if" ::: "memory");                
 #else
 		__builtin_arm_wsr("DAIFSet", DAIFSC_STANDARD_DISABLE);
 #endif
 #if INTERRUPT_MASKED_DEBUG
 		if (interrupt_masked_debug) {
-			// Interrupts were enabled, we just masked them
+			                                               
 			current_thread()->machine.intmask_timestamp = ml_get_timebase();
 		}
 #endif
@@ -878,22 +878,22 @@ ml_early_set_interrupts_enabled(boolean_t enable)
 	return ml_set_interrupts_enabled(enable);
 }
 
-/*
- *	Routine:        ml_at_interrupt_context
- *	Function:	Check if running at interrupt context
- */
+  
+                                          
+                                                  
+   
 boolean_t
 ml_at_interrupt_context(void)
 {
-	/* Do not use a stack-based check here, as the top-level exception handler
-	 * is free to use some other stack besides the per-CPU interrupt stack.
-	 * Interrupts should always be disabled if we're at interrupt context.
-	 * Check that first, as we may be in a preemptible non-interrupt context, in
-	 * which case we could be migrated to a different CPU between obtaining
-	 * the per-cpu data pointer and loading cpu_int_state.  We then might end
-	 * up checking the interrupt state of a different CPU, resulting in a false
-	 * positive.  But if interrupts are disabled, we also know we cannot be
-	 * preempted. */
+	                                                                          
+                                                                        
+                                                                       
+                                                                             
+                                                                        
+                                                                          
+                                                                            
+                                                                        
+                 
 	return !ml_get_interrupts_enabled() && (getCpuDatap()->cpu_int_state != NULL);
 }
 
@@ -903,10 +903,10 @@ ml_stack_remaining(void)
 	uintptr_t local = (uintptr_t) &local;
 	vm_offset_t     intstack_top_ptr;
 
-	/* Since this is a stack-based check, we don't need to worry about
-	 * preemption as we do in ml_at_interrupt_context().  If we are preemptible,
-	 * then the sp should never be within any CPU's interrupt stack unless
-	 * something has gone horribly wrong. */
+	                                                                  
+                                                                             
+                                                                       
+                                         
 	intstack_top_ptr = getCpuDatap()->intstack_top;
 	if ((local < intstack_top_ptr) && (local > intstack_top_ptr - INTSTACK_SIZE)) {
 		return local - (getCpuDatap()->intstack_top - INTSTACK_SIZE);
@@ -978,7 +978,7 @@ ml_get_time_since_reset(void)
 		return mach_continuous_time() - wake_conttime;
 	}
 #else
-	/* The timebase resets across S2R, so just return the raw value. */
+	                                                                   
 	return ml_get_hwclock();
 #endif
 }
@@ -995,23 +995,23 @@ uint64_t
 ml_get_conttime_wake_time(void)
 {
 #if HAS_CONTINUOUS_HWCLOCK
-	/*
-	 * For now, we will reconstitute the timebase value from
-	 * cpu_timebase_init and use it as the wake time.
-	 */
+	  
+                                                         
+                                                  
+    
 	return wake_abstime - ml_get_abstime_offset();
-#else /* HAS_CONTINOUS_HWCLOCK */
-	/* The wake time is simply our continuous time offset. */
+#else                            
+	                                                         
 	return ml_get_conttime_offset();
-#endif /* HAS_CONTINOUS_HWCLOCK */
+#endif                            
 }
 
-/*
- * ml_snoop_thread_is_on_core(thread_t thread)
- * Check if the given thread is currently on core.  This function does not take
- * locks, disable preemption, or otherwise guarantee synchronization.  The
- * result should be considered advisory.
- */
+  
+                                              
+                                                                               
+                                                                          
+                                        
+   
 bool
 ml_snoop_thread_is_on_core(thread_t thread)
 {
@@ -1064,13 +1064,13 @@ ml_wait_max_cpus(void)
 void
 machine_conf(void)
 {
-	/*
-	 * This is known to be inaccurate. mem_size should always be capped at 2 GB
-	 */
+	  
+                                                                            
+    
 	machine_info.memory_size = (uint32_t)mem_size;
 
-	// rdar://problem/58285685: Userland expects _COMM_PAGE_LOGICAL_CPUS to report
-	// (max_cpu_id+1) rather than a literal *count* of logical CPUs.
+	                                                                              
+	                                                                
 	unsigned int num_cpus = ml_get_topology_info()->max_cpu_id + 1;
 	machine_info.max_cpus = num_cpus;
 	machine_info.physical_cpu_max = num_cpus;

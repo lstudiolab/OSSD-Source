@@ -38,25 +38,25 @@ uint32_t phantom_cache_eval_period_in_msecs = 250;
 uint32_t phantom_cache_thrashing_threshold_ssd = 1000;
 #if !XNU_TARGET_OS_OSX
 uint32_t phantom_cache_thrashing_threshold = 500;
-#else /* !XNU_TARGET_OS_OSX */
+#else                         
 uint32_t phantom_cache_thrashing_threshold = 50;
-#endif /* !XNU_TARGET_OS_OSX */
+#endif                         
 
-/*
- * Number of consecutive thrashing periods required before
- * vm_phantom_cache_check_pressure() returns true.
- */
+  
+                                                          
+                                                  
+   
 #if !XNU_TARGET_OS_OSX
 unsigned phantom_cache_contiguous_periods = 4;
-#else /* !XNU_TARGET_OS_OSX */
+#else                         
 unsigned phantom_cache_contiguous_periods = 2;
-#endif /* !XNU_TARGET_OS_OSX */
+#endif                         
 
 clock_sec_t     pc_start_of_eval_period_sec = 0;
 clock_nsec_t    pc_start_of_eval_period_nsec = 0;
 boolean_t       pc_need_eval_reset = FALSE;
 
-/* One bit per recent sampling period. Bit 0 = current period. */
+                                                                 
 uint32_t        pc_history = 0;
 
 uint32_t        sample_period_ghost_added_count = 0;
@@ -75,8 +75,8 @@ uint32_t        vm_phantom_cache_size;
 typedef uint32_t        vm_phantom_hash_entry_t;
 vm_phantom_hash_entry_t *vm_phantom_cache_hash;
 uint32_t        vm_phantom_cache_hash_size;
-uint32_t        vm_ghost_hash_mask;             /* Mask for hash function */
-uint32_t        vm_ghost_bucket_hash;           /* Basic bucket hash */
+uint32_t        vm_ghost_hash_mask;                                         
+uint32_t        vm_ghost_bucket_hash;                                  
 
 
 int pg_masks[4] = {
@@ -115,18 +115,18 @@ vm_phantom_cache_init()
 	}
 #if !XNU_TARGET_OS_OSX
 	num_entries = (uint32_t)(((max_mem / PAGE_SIZE) / 10) / VM_GHOST_PAGES_PER_ENTRY);
-#else /* !XNU_TARGET_OS_OSX */
+#else                         
 	num_entries = (uint32_t)(((max_mem / PAGE_SIZE) / 4) / VM_GHOST_PAGES_PER_ENTRY);
-#endif /* !XNU_TARGET_OS_OSX */
+#endif                         
 	vm_phantom_cache_num_entries = 1;
 
 	while (vm_phantom_cache_num_entries < num_entries) {
 		vm_phantom_cache_num_entries <<= 1;
 	}
 
-	/*
-	 * We index this with g_next_index, so don't exceed the width of that bitfield.
-	 */
+	  
+                                                                                
+    
 	if (vm_phantom_cache_num_entries > (1 << VM_GHOST_INDEX_BITS)) {
 		vm_phantom_cache_num_entries = (1 << VM_GHOST_INDEX_BITS);
 	}
@@ -147,21 +147,21 @@ vm_phantom_cache_init()
 
 	vm_ghost_hash_mask = vm_phantom_cache_num_entries - 1;
 
-	/*
-	 *	Calculate object_id shift value for hashing algorithm:
-	 *		O = log2(sizeof(struct vm_object))
-	 *		B = log2(vm_page_bucket_count)
-	 *	        hash shifts the object_id left by
-	 *		B/2 - O
-	 */
+	  
+                                                          
+                                       
+                                   
+                                             
+            
+    
 	size = vm_phantom_cache_num_entries;
 	for (log1 = 0; size > 1; log1++) {
 		size /= 2;
 	}
 
-	vm_ghost_bucket_hash = 1 << ((log1 + 1) >> 1);          /* Get (ceiling of sqrt of table size) */
-	vm_ghost_bucket_hash |= 1 << ((log1 + 1) >> 2);         /* Get (ceiling of quadroot of table size) */
-	vm_ghost_bucket_hash |= 1;                              /* Set bit and add 1 - always must be 1 to insure unique series */
+	vm_ghost_bucket_hash = 1 << ((log1 + 1) >> 1);                                                   
+	vm_ghost_bucket_hash |= 1 << ((log1 + 1) >> 2);                                                      
+	vm_ghost_bucket_hash |= 1;                                                                                                
 
 	if (vm_ghost_hash_mask & vm_phantom_cache_num_entries) {
 		printf("vm_phantom_cache_init: WARNING -- strange page hash\n");
@@ -210,12 +210,12 @@ vm_phantom_cache_add_ghost(vm_page_t m)
 			goto done;
 		}
 	}
-	/*
-	 * if we're here then the vm_ghost_t of this vm_page_t
-	 * is not present in the phantom cache... take the next
-	 * available entry in the LRU first evicting the existing
-	 * entry if we've wrapped the ring
-	 */
+	  
+                                                       
+                                                        
+                                                          
+                                   
+    
 	ghost_index = vm_phantom_cache_nindx++;
 
 	if (vm_phantom_cache_nindx == vm_phantom_cache_num_entries) {
@@ -226,10 +226,10 @@ vm_phantom_cache_add_ghost(vm_page_t m)
 	vpce = &vm_phantom_cache[ghost_index];
 
 	if (vpce->g_obj_id) {
-		/*
-		 * we're going to replace an existing entry
-		 * so first remove it from the hash
-		 */
+		  
+                                             
+                                     
+     
 		vm_ghost_t      nvpce;
 
 		ghost_hash_index = vm_phantom_hash(vpce->g_obj_id, vpce->g_obj_offset);
@@ -286,9 +286,9 @@ vm_phantom_cache_lookup_ghost(vm_page_t m, uint32_t pg_mask)
 	object = VM_PAGE_OBJECT(m);
 
 	if ((g_obj_id = object->phantom_object_id) == 0) {
-		/*
-		 * no entries in phantom cache for this object
-		 */
+		  
+                                                
+     
 		return NULL;
 	}
 	g_obj_offset = (m->vmp_offset >> (PAGE_SHIFT + VM_GHOST_PAGE_SHIFT)) & VM_GHOST_OFFSET_MASK;
@@ -369,33 +369,33 @@ struct {
 
 #endif
 
-/*
- * Determine if the file cache is thrashing from sampling interval statistics.
- *
- * Pages added to the phantom cache = pages evicted from the file cache.
- * Pages found in the phantom cache = reads of pages that were recently evicted.
- * Threshold is the latency-dependent number of reads we consider thrashing.
- */
+  
+                                                                              
+  
+                                                                        
+                                                                                
+                                                                            
+   
 static boolean_t
 is_thrashing(uint32_t added, uint32_t found, uint32_t threshold)
 {
-	/* Ignore normal activity below the threshold. */
+	                                                 
 	if (added < threshold || found < threshold) {
 		return FALSE;
 	}
 
-	/*
-	 * When thrashing in a way that we can mitigate, most of the pages read
-	 * into the file cache were recently evicted, and 'found' will be close
-	 * to 'added'.
-	 *
-	 * When replacing the current working set because a new app is
-	 * launched, we see very high read traffic with sporadic phantom cache
-	 * hits.
-	 *
-	 * This is not thrashing, or freeing up memory wouldn't help much
-	 * anyway.
-	 */
+	  
+                                                                        
+                                                                        
+               
+   
+                                                               
+                                                                       
+         
+   
+                                                                  
+           
+    
 	if (found < added / 2) {
 		return FALSE;
 	}
@@ -403,13 +403,13 @@ is_thrashing(uint32_t added, uint32_t found, uint32_t threshold)
 	return TRUE;
 }
 
-/*
- * the following function is never called
- * from multiple threads simultaneously due
- * to a condition variable used to serialize
- * at the compressor level... thus no need
- * to provide locking for the sample processing
- */
+  
+                                         
+                                           
+                                            
+                                          
+                                               
+   
 boolean_t
 vm_phantom_cache_check_pressure()
 {
@@ -422,19 +422,19 @@ vm_phantom_cache_check_pressure()
 
 	elapsed_msecs_in_eval = vm_compressor_compute_elapsed_msecs(cur_ts_sec, cur_ts_nsec, pc_start_of_eval_period_sec, pc_start_of_eval_period_nsec);
 
-	/*
-	 * Reset evaluation period after phantom_cache_eval_period_in_msecs or
-	 * whenever vm_phantom_cache_restart_sample has been called.
-	 */
+	  
+                                                                       
+                                                             
+    
 	if (elapsed_msecs_in_eval >= phantom_cache_eval_period_in_msecs) {
 		pc_need_eval_reset = TRUE;
 	}
 
 	if (pc_need_eval_reset == TRUE) {
 #if PHANTOM_CACHE_DEBUG
-		/*
-		 * maintain some info about the last 256 sample periods
-		 */
+		  
+                                                         
+     
 		sample_period_ghost_counts[sample_period_ghost_counts_indx].added = sample_period_ghost_added_count;
 		sample_period_ghost_counts[sample_period_ghost_counts_indx].found = sample_period_ghost_found_count;
 		sample_period_ghost_counts[sample_period_ghost_counts_indx].added_ssd = sample_period_ghost_added_count_ssd;
@@ -457,31 +457,31 @@ vm_phantom_cache_check_pressure()
 		pc_history <<= 1;
 		pc_need_eval_reset = FALSE;
 	} else {
-		/*
-		 * Since the trashing rate is really a function of the read latency of the disk
-		 * we have to consider both the SSD and spinning disk case since the file cache
-		 * could be backed by either or even both flavors.  When the object is first
-		 * assigned a phantom_object_id, we query the pager to determine if the backing
-		 * backing media is an SSD and remember that answer in the vm_object.  We use
-		 * that info to maintains counts for both the SSD and spinning disk cases.
-		 */
+		  
+                                                                                 
+                                                                                 
+                                                                              
+                                                                                 
+                                                                               
+                                                                            
+     
 		if (is_thrashing(sample_period_ghost_added_count,
 		    sample_period_ghost_found_count,
 		    phantom_cache_thrashing_threshold) ||
 		    is_thrashing(sample_period_ghost_added_count_ssd,
 		    sample_period_ghost_found_count_ssd,
 		    phantom_cache_thrashing_threshold_ssd)) {
-			/* Thrashing in the current period: Set bit 0. */
+			                                                 
 			pc_history |= 1;
 		}
 	}
 
-	/*
-	 * Declare pressure_detected after phantom_cache_contiguous_periods.
-	 *
-	 * Create a bitmask with the N low bits set. These bits must all be set
-	 * in pc_history. The high bits of pc_history are ignored.
-	 */
+	  
+                                                                     
+   
+                                                                        
+                                                           
+    
 	uint32_t bitmask = (1u << phantom_cache_contiguous_periods) - 1;
 	if ((pc_history & bitmask) == bitmask) {
 		pressure_detected = TRUE;
@@ -497,12 +497,12 @@ vm_phantom_cache_check_pressure()
 	return pressure_detected;
 }
 
-/*
- * Restart the current sampling because conditions have changed significantly,
- * and we don't want to react to old data.
- *
- * This function can be called from any thread.
- */
+  
+                                                                              
+                                          
+  
+                                               
+   
 void
 vm_phantom_cache_restart_sample(void)
 {

@@ -72,9 +72,9 @@ static void kpc_reset_atend(void);
 
 #if defined(__arm__) || defined(__arm64__)
 #define CYCLES_EVENT 0x02
-#else // defined(__arm__) || defined(__arm64__)
+#else                                          
 #define CYCLES_EVENT (0x10000 | 0x20000 | 0x3c)
-#endif // !defined(__arm__) && !defined(__arm64__)
+#endif                                            
 
 static void
 prepare_kpc(struct machine *mch, bool config, bool reset)
@@ -512,8 +512,8 @@ T_DECL(kpc_pmi_configurable,
 
 		T_LOG("saw pmis = %u, samples = %u, stacks = %u", npmis, nsamples,
 		    nstacks);
-		// Allow some slop in case the trace is cut-off midway through a
-		// sample.
+		                                                                
+		          
 		const unsigned int cutoff_leeway = 32;
 		T_EXPECT_GE(nsamples + cutoff_leeway, npmis,
 		    "saw as many samples as PMIs");

@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*!
- * i386/x86_64-specific functions required to support hibernation resume.
- */
+   
+                                                                         
+   
 
 #include <i386/pmap.h>
 #include <i386/proc_reg.h>
@@ -38,9 +38,9 @@
 
 extern pd_entry_t BootPTD[2048];
 
-// src is virtually mapped, not page aligned,
-// dst is a physical 4k page aligned ptr, len is one 4K page
-// src & dst will not overlap
+                                             
+                                                            
+                             
 
 uintptr_t
 hibernate_restore_phys_page(uint64_t src, uint64_t dst, uint32_t len, uint32_t procFlags)
@@ -85,8 +85,8 @@ pal_hib_map(uintptr_t virt, uint64_t phys)
 		break;
 	}
 	if (phys < WKDM_AREA) {
-		// first 4Gb is all mapped,
-		// and do not expect source areas to cross 4Gb
+		                           
+		                                              
 		return phys;
 	}
 	index = (virt >> I386_LPGSHIFT);

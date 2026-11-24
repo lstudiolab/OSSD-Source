@@ -1,7 +1,7 @@
-//
-// Tests for
-//  bounded_ptr(std::nullptr_t);
-//
+  
+            
+                                
+  
 
 #include <libkern/c++/bounded_ptr.h>
 #include <darwintest.h>
@@ -16,7 +16,7 @@ template <typename T>
 static void
 tests()
 {
-	// Test with nullptr
+	                    
 	{
 		test_bounded_ptr<T> p = nullptr;
 		_assert(p == nullptr);
@@ -40,7 +40,7 @@ tests()
 		f(nullptr);
 	}
 
-	// Test with NULL
+	                 
 	{
 		test_bounded_ptr<T> p = NULL;
 		_assert(p == nullptr);
@@ -64,7 +64,7 @@ tests()
 		f(NULL);
 	}
 
-	// Test with 0
+	              
 	{
 		test_bounded_ptr<T> p = 0;
 		_assert(p == nullptr);

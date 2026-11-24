@@ -37,23 +37,23 @@ typedef uintptr_t uptr;
 
 #define MiB(x) ((x) * 1024UL * 1024)
 
-/*
- * KASAN features and config
- */
+  
+                            
+   
 #define FAKESTACK     1
-/* KASAN_KALLOC defined in kasan.h */
-/* KASAN_ZALLOC defined in kasan.h */
+                                     
+                                     
 #define FAKESTACK_QUARANTINE (1 && FAKESTACK)
 
 #define QUARANTINE_ENTRIES 5000
 #define QUARANTINE_MAXSIZE MiB(10)
 
-/*
- * The amount of physical memory stolen by KASan at boot to back the shadow memory
- * and page tables. Larger memory systems need to steal proportionally less.
- */
+  
+                                                                                  
+                                                                            
+   
 #ifdef __arm64__
-/* Works out at about 25% of 512 MiB and 15% of 3GiB system */
+                                                              
 # define STOLEN_MEM_PERCENT  13UL
 # define STOLEN_MEM_BYTES    MiB(40)
 # define HW_PAGE_SIZE        (ARM_PGBYTES)
@@ -65,7 +65,7 @@ typedef uintptr_t uptr;
 # define HW_PAGE_MASK        (PAGE_MASK)
 #endif
 
-/* boot-args */
+               
 #define KASAN_ARGS_FAKESTACK       0x0010U
 #define KASAN_ARGS_REPORTIGNORED   0x0020U
 #define KASAN_ARGS_NODYCHECKS      0x0100U
@@ -73,7 +73,7 @@ typedef uintptr_t uptr;
 #define KASAN_ARGS_NOPOISON_GLOBAL 0x0400U
 #define KASAN_ARGS_CHECK_LEAKS     0x0800U
 
-/* uninitialized memory detection */
+                                    
 #define KASAN_UNINITIALIZED_HEAP   0xbe
 
 #ifndef KASAN
@@ -124,29 +124,29 @@ kasan_granule_partial(uintptr_t x)
 #define BIT(x) (1U << (x))
 
 enum __attribute__((flag_enum)) kasan_access_types {
-	TYPE_LOAD    = BIT(0),  /* regular memory load */
-	TYPE_STORE   = BIT(1),  /* regular store */
-	TYPE_MEMR    = BIT(2),  /* memory intrinsic (read) */
-	TYPE_MEMW    = BIT(3),  /* memory intrinsic (write) */
-	TYPE_STRR    = BIT(4),  /* string intrinsic (read) */
-	TYPE_STRW    = BIT(5),  /* string intrinsic (write) */
-	TYPE_KFREE   = BIT(6),  /* kfree() */
-	TYPE_ZFREE   = BIT(7),  /* zfree() */
-	TYPE_FSFREE  = BIT(8),  /* fakestack free */
+	TYPE_LOAD    = BIT(0),                           
+	TYPE_STORE   = BIT(1),                     
+	TYPE_MEMR    = BIT(2),                               
+	TYPE_MEMW    = BIT(3),                                
+	TYPE_STRR    = BIT(4),                               
+	TYPE_STRW    = BIT(5),                                
+	TYPE_KFREE   = BIT(6),               
+	TYPE_ZFREE   = BIT(7),               
+	TYPE_FSFREE  = BIT(8),                      
 
 	TYPE_UAF           = BIT(12),
 	TYPE_POISON_GLOBAL = BIT(13),
 	TYPE_POISON_HEAP   = BIT(14),
-	/* no TYPE_POISON_STACK, because the runtime does not control stack poisoning */
+	                                                                                
 	TYPE_TEST          = BIT(15),
 	TYPE_LEAK          = BIT(16),
 
-	/* masks */
-	TYPE_MEM     = TYPE_MEMR | TYPE_MEMW,            /* memory intrinsics */
-	TYPE_STR     = TYPE_STRR | TYPE_STRW,            /* string intrinsics */
-	TYPE_READ    = TYPE_LOAD | TYPE_MEMR | TYPE_STRR,  /* all reads */
-	TYPE_WRITE   = TYPE_STORE | TYPE_MEMW | TYPE_STRW, /* all writes */
-	TYPE_RW      = TYPE_READ | TYPE_WRITE,           /* reads and writes */
+	           
+	TYPE_MEM     = TYPE_MEMR | TYPE_MEMW,                                   
+	TYPE_STR     = TYPE_STRR | TYPE_STRW,                                   
+	TYPE_READ    = TYPE_LOAD | TYPE_MEMR | TYPE_STRR,                 
+	TYPE_WRITE   = TYPE_STORE | TYPE_MEMW | TYPE_STRW,                 
+	TYPE_RW      = TYPE_READ | TYPE_WRITE,                                 
 	TYPE_FREE    = TYPE_KFREE | TYPE_ZFREE | TYPE_FSFREE,
 	TYPE_NORMAL  = TYPE_RW | TYPE_FREE,
 	TYPE_DYNAMIC = TYPE_NORMAL | TYPE_UAF,
@@ -155,12 +155,12 @@ enum __attribute__((flag_enum)) kasan_access_types {
 };
 
 enum kasan_violation_types {
-	REASON_POISONED =       0, /* read or write of poisoned data */
-	REASON_BAD_METADATA =   1, /* incorrect kasan metadata */
-	REASON_INVALID_SIZE =   2, /* free size did not match alloc size */
-	REASON_MOD_AFTER_FREE = 3, /* object modified after free */
-	REASON_MOD_OOB =        4, /* out of bounds modification of object */
-	REASON_UNINITIALIZED =  5, /* leak of uninitialized kernel memory */
+	REASON_POISONED =       0,                                     
+	REASON_BAD_METADATA =   1,                               
+	REASON_INVALID_SIZE =   2,                                         
+	REASON_MOD_AFTER_FREE = 3,                                 
+	REASON_MOD_OOB =        4,                                           
+	REASON_UNINITIALIZED =  5,                                          
 };
 
 typedef enum kasan_access_types access_t;
@@ -177,13 +177,13 @@ void kasan_unlock(boolean_t b);
 bool kasan_lock_held(thread_t thread);
 void kasan_init_fakestack(void);
 
-/* dynamic blacklist */
+                       
 void kasan_init_dybl(void);
 bool kasan_is_blacklisted(access_t);
 void kasan_dybl_load_kext(uintptr_t addr, const char *kextname);
 void kasan_dybl_unload_kext(uintptr_t addr);
 
-/* arch-specific interface */
+                             
 void kasan_arch_init(void);
 bool kasan_is_shadow_mapped(uintptr_t shadowp);
 
@@ -192,17 +192,17 @@ extern vm_address_t kernel_vtop;
 
 extern unsigned shadow_pages_used;
 
-/* boot-arg configurable */
+                           
 extern int fakestack_enabled;
 
-/* Describes the source location where a global is defined. */
+                                                              
 struct asan_global_source_location {
 	const char *filename;
 	int line_no;
 	int column_no;
 };
 
-/* Describes an instrumented global variable. */
+                                                
 struct asan_global {
 	uptr addr;
 	uptr size;
@@ -228,4 +228,4 @@ typedef int jmp_buf[_JBLEN];
 void _longjmp(jmp_buf env, int val) OS_NORETURN;
 int _setjmp(jmp_buf env) __attribute__((returns_twice));
 
-#endif /* _KASAN_INTERNAL_H_ */
+#endif                         

@@ -70,10 +70,10 @@ T_DECL(data_protection,
 
 	setup();
 
-	/*
-	 * Ensure we can freely read and change
-	 * protection classes when unlocked.
-	 */
+	  
+                                        
+                                     
+    
 	for (
 		new_prot_class = PROTECTION_CLASS_A;
 		new_prot_class <= PROTECTION_CLASS_F;
@@ -95,7 +95,7 @@ T_DECL(data_protection,
 			);
 	}
 
-	/* Query the filesystem for the default CP level (Is it C?) */
+	                                                              
 #ifndef F_GETDEFAULTPROTLEVEL
 #define F_GETDEFAULTPROTLEVEL 79
 #endif
@@ -107,16 +107,16 @@ T_DECL(data_protection,
 		"Get default protection level for filesystem"
 		);
 
-	/* XXX: Do we want to do anything with the level? What should it be? */
+	                                                                       
 
-	/*
-	 * files are allowed to move into F, but not out of it. They can also
-	 * only do so when they do not have content.
-	 */
+	  
+                                                                      
+                                             
+    
 	close(g_fd);
 	unlink(g_filepath);
 
-	/* re-create the file */
+	                        
 	T_WITH_ERRNO;
 	T_ASSERT_GE(
 		g_fd = open(g_filepath, O_CREAT | O_EXCL | O_RDWR | O_CLOEXEC),
@@ -124,7 +124,7 @@ T_DECL(data_protection,
 		"Recreate test file"
 		);
 
-	/* Try making a class A file while locked. */
+	                                             
 	T_ASSERT_EQ(lock_device(), 0, "*** Lock device ***");
 
 	T_WITH_ERRNO;
@@ -136,7 +136,7 @@ T_DECL(data_protection,
 		);
 	T_ASSERT_EQ(unlock_device(TEST_PASSCODE), 0, "*** Unlock device ***");
 
-	/* Attempt opening/IO to a class A file while unlocked. */
+	                                                          
 	T_WITH_ERRNO;
 	T_ASSERT_EQ(
 		SET_PROT_CLASS(g_fd, PROTECTION_CLASS_A),
@@ -153,10 +153,10 @@ T_DECL(data_protection,
 		0,
 		"Should be able to open a class A file when unlocked");
 
-	/*
-	 * TODO: Write specific data we can check for. If we're going to do
-	 * that, the write scheme should be deliberately ugly.
-	 */
+	  
+                                                                    
+                                                       
+    
 	current_byte = 0;
 
 	while (current_byte < CPT_IO_SIZE) {
@@ -199,10 +199,10 @@ T_DECL(data_protection,
 		current_byte += local_result;
 	}
 
-	/*
-	 * Again, but now while locked; and try to change the file class
-	 * as well.
-	 */
+	  
+                                                                 
+            
+    
 	T_ASSERT_EQ(lock_device(), 0, "*** Lock device ***");
 
 	T_ASSERT_LE(
@@ -224,7 +224,7 @@ T_DECL(data_protection,
 		"from class A to class D when locked"
 		);
 
-	/* Try to open and truncate the file. */
+	                                        
 	close(g_fd);
 
 	T_ASSERT_EQ(
@@ -234,14 +234,14 @@ T_DECL(data_protection,
 		"a class A file when locked"
 		);
 
-	/* Try to open the file */
+	                          
 	T_ASSERT_EQ(
 		g_fd = open(g_filepath, O_RDWR | O_CLOEXEC),
 		-1,
 		"Should not be able to open a class A file when locked"
 		);
 
-	/* What about class B files? */
+	                               
 	T_ASSERT_EQ(unlock_device(TEST_PASSCODE), 0, "*** Unlock device ***");
 
 	T_ASSERT_GE(
@@ -260,7 +260,7 @@ T_DECL(data_protection,
 
 	T_ASSERT_EQ(lock_device(), 0, "*** Lock device ***");
 
-	/* Can we create a class B file while locked? */
+	                                                
 	T_ASSERT_EQ(
 		SET_PROT_CLASS(g_fd, PROTECTION_CLASS_B),
 		0,
@@ -274,10 +274,10 @@ T_DECL(data_protection,
 		"File should now have class B protection"
 		);
 
-	/*
-	 * We should also be able to read/write to the
-	 * file descriptor while it is open.
-	 */
+	  
+                                               
+                                     
+    
 	current_byte = 0;
 
 	while (current_byte < CPT_IO_SIZE) {
@@ -319,7 +319,7 @@ T_DECL(data_protection,
 		current_byte += local_result;
 	}
 
-	/* We should not be able to open a class B file under lock. */
+	                                                              
 	close(g_fd);
 	T_WITH_ERRNO;
 	T_ASSERT_EQ(
@@ -330,7 +330,7 @@ T_DECL(data_protection,
 
 	unlink(g_filepath);
 
-	/* We still need to test directory semantics. */
+	                                                
 	T_WITH_ERRNO;
 	T_ASSERT_NE(
 		mkdir(g_dirpath, 0x0777),
@@ -338,7 +338,7 @@ T_DECL(data_protection,
 		"Should be able to create a new directory when locked"
 		);
 
-	/* The newly created directory should not have a protection class. */
+	                                                                     
 	T_ASSERT_NE(
 		g_dir_fd = open(g_dirpath, O_RDONLY | O_CLOEXEC),
 		-1,
@@ -365,10 +365,10 @@ T_DECL(data_protection,
 		"class A to class D while locked"
 		);
 
-	/*
-	 * Do all files created in the directory properly inherit the
-	 * directory's protection class?
-	 */
+	  
+                                                              
+                                 
+    
 	T_SETUPBEGIN;
 	T_ASSERT_LT(
 		strlcpy(g_filepath, g_dirpath, PATH_MAX),
@@ -441,17 +441,17 @@ T_DECL(data_protection,
 		unlink(g_filepath);
 	}
 
-	/* Do we disallow creation of a class F directory? */
+	                                                     
 	T_ASSERT_NE(
 		SET_PROT_CLASS(g_dir_fd, PROTECTION_CLASS_F),
 		0,
 		"Should not be able to create class F directory"
 		);
 
-	/*
-	 * Are class A and class B semantics followed for when
-	 * we create these files during lock?
-	 */
+	  
+                                                       
+                                      
+    
 	T_WITH_ERRNO;
 	T_ASSERT_EQ(
 		SET_PROT_CLASS(g_dir_fd, PROTECTION_CLASS_A),
@@ -500,7 +500,7 @@ T_DECL(data_protection,
 		"File should inherit protection class of class B directory"
 		);
 
-	/* What happens when we try to create new subdirectories? */
+	                                                            
 	T_ASSERT_EQ(unlock_device(TEST_PASSCODE), 0, "*** Unlock device ***");
 
 	for (
@@ -675,7 +675,7 @@ set_passcode(char * new_passcode, char * old_passcode)
 	int result = -1;
 
 #ifdef KEYBAG_ENTITLEMENTS
-	/* If we're entitled, we can set the passcode ourselves. */
+	                                                           
 	uint64_t inputs[] = {device_keybag_handle};
 	uint32_t input_count = (sizeof(inputs) / sizeof(*inputs));
 	void * input_structs = NULL;
@@ -729,10 +729,10 @@ set_passcode(char * new_passcode, char * old_passcode)
 		NULL
 		);
 #else
-	/*
-	 * If we aren't entitled, we'll need to use
-	 * keystorectl to set the passcode.
-	 */
+	  
+                                            
+                                    
+    
 	T_LOG("%s(): using keystorectl", __func__);
 
 	if (
@@ -757,7 +757,7 @@ set_passcode(char * new_passcode, char * old_passcode)
 		NULL
 	};
 	result = spawn_proc(keystorectl_args);
-#endif /* KEYBAG_ENTITLEMENTS */
+#endif                          
 	if (result == 0 && new_passcode != NULL) {
 		g_passcode_set = 1;
 	} else if (result == 0 && new_passcode == NULL) {
@@ -770,11 +770,11 @@ set_passcode(char * new_passcode, char * old_passcode)
 int
 clear_passcode(char * passcode)
 {
-	/*
-	 * For the moment, this will set the passcode to the empty string
-	 * (a known value); this will most likely need to change, or running
-	 * this test may ruin everything™
-	 */
+	  
+                                                                  
+                                                                     
+                                  
+    
 	return set_passcode(NULL, passcode);
 }
 
@@ -789,28 +789,28 @@ lock_device(void)
 {
 	int result = -1;
 
-	/*
-	 * Pass in the path to keybagdTest instead. By doing this, we bypass
-	 * the shortcut to get in to the keybag via IOKit and instead use the
-	 * pre-existing command line tool.
-	 *
-	 * This also goes through the normal "lock → locking (10s) → locked"
-	 * flow that would normally occuring during system runtime when the
-	 * lock button is depressed. To ensure that our single threaded test
-	 * works properly in this case, poll until we can't create a class A
-	 * file to be safe.
-	 */
+	  
+                                                                     
+                                                                      
+                                   
+   
+                                                                     
+                                                                    
+                                                                     
+                                                                     
+                    
+    
 	char * const kbd_args[] = {KEYBAGDTEST_PATH, "lock", NULL};
 	result = spawn_proc(kbd_args);
 	if (result) {
 		return result;
 	}
 
-	/*
-	 * Delete the file if it is present. Note that this may fail if the
-	 * file is actually not there. So don't bomb out if we can't delete
-	 * this file right now.
-	 */
+	  
+                                                                    
+                                                                    
+                        
+    
 	(void) unlink("/private/var/foo_test_file");
 
 	while (1) {
@@ -824,7 +824,7 @@ lock_device(void)
 			);
 
 		if (dp_fd >= 0) {
-			/* delete it and sleep */
+			                         
 			close(dp_fd);
 			result = unlink("/private/var/foo_test_file");
 
@@ -835,17 +835,17 @@ lock_device(void)
 			sync();
 			sleep(1);
 		} else {
-			/* drop out of our polling loop. */
+			                                   
 			break;
 		}
 	}
 
-	/*
-	 * Note that our loop breakout condition is whether or not we can
-	 * create a class A file, so that loop may execute up to 10 times
-	 * (due to the 10s grace period). By the time we get here, we assume
-	 * that we didn't hit any of the error cases above.
-	 */
+	  
+                                                                  
+                                                                  
+                                                                     
+                                                    
+    
 
 	return 0;
 }
@@ -856,7 +856,7 @@ unlock_device(char * passcode)
 	int result = -1;
 
 #ifdef  KEYBAG_ENTITLEMENTS
-	/* If we're entitled, we can unlock the device ourselves. */
+	                                                            
 	uint64_t inputs[] = {device_keybag_handle};
 	uint32_t input_count = (sizeof(inputs) / sizeof(*inputs));
 	size_t input_struct_count = 0;
@@ -879,10 +879,10 @@ unlock_device(char * passcode)
 		NULL
 		);
 #else
-	/*
-	 * If we aren't entitled, we'll need to use
-	 * keystorectl to unlock the device.
-	 */
+	  
+                                            
+                                     
+    
 	T_LOG("%s(): using keystorectl", __func__);
 
 	if (
@@ -897,19 +897,19 @@ unlock_device(char * passcode)
 	};
 
 	result = spawn_proc(keystorectl_args);
-#endif /* KEYBAG_ENTITLEMENTS */
+#endif                          
 
 	return result;
 }
 
-/*
- * Code based on Mobile Key Bag; specifically
- * MKBDeviceSupportsContentProtection and
- * MKBDeviceFormattedForContentProtection.
- *
- * We want to verify that we support content protection, and that
- * we are formatted for it.
- */
+  
+                                             
+                                         
+                                          
+  
+                                                                 
+                           
+   
 int
 supports_content_prot(void)
 {
@@ -927,7 +927,7 @@ supports_content_prot(void)
 		);
 
 	if (defaults == IO_OBJECT_NULL) {
-		/* Assume data protection is unsupported */
+		                                           
 		T_LOG(
 			"%s(): no defaults entry in IORegistry",
 			__func__
@@ -943,7 +943,7 @@ supports_content_prot(void)
 		);
 
 	if (k_result != KERN_SUCCESS) {
-		/* Assume data protection is unsupported */
+		                                           
 		T_LOG(
 			"%s(): no content-protect property in IORegistry",
 			__func__
@@ -951,11 +951,11 @@ supports_content_prot(void)
 		return 0;
 	}
 
-	/*
-	 * At this point, we SUPPORT content protection… but are we
-	 * formatted for it? This is ugly; we should be testing the file
-	 * system we'll be testing in, not just /tmp/.
-	 */
+	  
+                                                            
+                                                                 
+                                               
+    
 	local_result = statfs(g_test_tempdir, &statfs_results);
 
 	if (local_result == -1) {
@@ -975,10 +975,10 @@ supports_content_prot(void)
 	}
 }
 
-/*
- * Shamelessly ripped from keystorectl routines;
- * a wrapper for invoking the AKS user client.
- */
+  
+                                                
+                                              
+   
 int
 apple_key_store(uint32_t command,
     uint64_t * inputs,
@@ -1052,9 +1052,9 @@ end:
 	return result;
 }
 
-/*
- * Helper function for launching tools
- */
+  
+                                      
+   
 int
 spawn_proc(char * const command[])
 {
@@ -1113,30 +1113,30 @@ dp_class_num_to_string(int num)
 int
 device_lock_state(void)
 {
-	/*
-	 * TODO: Actually implement this.
-	 *
-	 * We fail if a passcode already exists, and the methods being used
-	 * to lock/unlock the device in this test appear to be synchronous…
-	 * do we need this function?
-	 */
+	  
+                                  
+   
+                                                                    
+                                                                    
+                             
+    
 	int result = -1;
 
 	return result;
 }
 
-/* Determines if we will try to test class C semanatics. */
+                                                           
 int
 unlocked_since_boot()
 {
-	/*
-	 * TODO: Actually implement this.
-	 *
-	 * The actual semantics for CP mean that even with this primative,
-	 * we would need to set a passcode and then reboot the device in
-	 * order to test this; this function will probably be rather
-	 * worthless as a result.
-	 */
+	  
+                                  
+   
+                                                                   
+                                                                 
+                                                             
+                          
+    
 	int result = 1;
 
 	return result;

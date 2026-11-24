@@ -16,11 +16,11 @@ def GetBankElementSummary(bank_element):
     else:
       out_string = format_str.format(bank_element, "BANK_ACCOUNT", unsigned(bank_element.be_refs), unsigned(bank_element.be_made))
 
-    #if DEVELOPMENT
+                   
     format_str = "{0: <#020x} {1: <20s}"
     if hasattr(bank_element, 'be_task'):
       out_string += " " + format_str.format(bank_element.be_task, GetProcNameForTask(bank_element.be_task))
-    #endif
+          
 
     return out_string
 
@@ -36,11 +36,11 @@ def GetBankTaskSummary(bank_task):
     format_str = "{0: <#020x} {1: <16d} {2: <#020x} {3: <16d} {4: <16d} {5: <16d} {6: <16d} {7: <16d}"
     out_string = format_str.format(bank_task, bank_task.bt_proc_persona.pid, bank_task.bt_ledger, unsigned(bank_task.bt_elem.be_refs), unsigned(bank_task.bt_elem.be_made), bank_task.bt_proc_persona.persona_id, bank_task.bt_proc_persona.uid, bank_task.bt_proc_persona.gid)
 
-    #if DEVELOPMENT
+                   
     format_str = "{0: <#020x} {1: <20s}"
     if hasattr(bank_task.bt_elem, 'be_task'):
       out_string += " " + format_str.format(bank_task.bt_elem.be_task, GetProcNameForTask(bank_task.bt_elem.be_task))
-    #endif
+          
     return out_string
 
 
@@ -55,17 +55,17 @@ def GetBankAccountSummary(bank_account):
     format_str = "{0: <#020x} {1: <16d} {2: <16d} {3: <16d} {4: <16d} {5: <#020x} {6: <16d} {7: <16d}"
     out_string = format_str.format(bank_account, bank_account.ba_holder.bt_proc_persona.pid, bank_account.ba_merchant.bt_proc_persona.pid, bank_account.ba_secureoriginator.bt_proc_persona.pid, bank_account.ba_proximateprocess.bt_proc_persona.pid,bank_account.ba_bill, unsigned(bank_account.ba_elem.be_refs), unsigned(bank_account.ba_elem.be_made))
 
-    #if DEVELOPMENT
+                   
     format_str = "{0: <#020x} {1: <20s}"
     if hasattr(bank_account.ba_holder.bt_elem, 'be_task'):
       out_string += " " + format_str.format(bank_account.ba_holder.bt_elem.be_task, GetProcNameForTask(bank_account.ba_holder.bt_elem.be_task))
     if hasattr(bank_account.ba_merchant.bt_elem, 'be_task'):
       out_string += " " + format_str.format(bank_account.ba_merchant.bt_elem.be_task, GetProcNameForTask(bank_account.ba_merchant.bt_elem.be_task))
-    #endif
+          
     return out_string
 
 
-# Macro: showbankaccountstopay
+                              
 @lldb_command('showbankaccountstopay')
 def ShowBankAccountsToPay(cmd_args=None, cmd_options={}):
     """ show a list of merchant bank tasks for a bank_task object.
@@ -84,10 +84,10 @@ def ShowBankAccountsToPay(cmd_args=None, cmd_options={}):
     for bank_account in IterateQueue(bank_task.bt_accounts_to_pay, 'bank_account_t', 'ba_next_acc_to_pay'):
       print GetBankAccountSummary(bank_account)
     return
-# EndMacro: showbankaccountstopay
+                                 
 
 
-# Macro: showbankaccountstocharge
+                                 
 @lldb_command('showbankaccountstocharge')
 def ShowBankAccountsToCharge(cmd_args=None, cmd_options={}):
     """ show a list of holder bank tasks for a bank_task object.
@@ -106,12 +106,12 @@ def ShowBankAccountsToCharge(cmd_args=None, cmd_options={}):
     for bank_account in IterateQueue(bank_task.bt_accounts_to_charge, 'bank_account_t', 'ba_next_acc_to_charge'):
       print GetBankAccountSummary(bank_account)
     return
-# EndMacro: showbankaccountstocharge
+                                    
 
 
-#if DEVELOPMENT
+               
 
-# Macro: showallbanktasklist
+                            
 @lldb_command('showallbanktasklist')
 def ShowAllBankTaskList(cmd_args=None, cmd_options={}):
     """ A DEVELOPMENT macro that walks the list of all allocated bank_task objects
@@ -125,10 +125,10 @@ def ShowAllBankTaskList(cmd_args=None, cmd_options={}):
     for bank_task in IterateQueue(kern.globals.bank_tasks_list, 'bank_task_t', 'bt_global_elt'):
       print GetBankTaskSummary(bank_task)
     return True
-# EndMacro showallbanktasklist
+                              
 
 
-# Macro: showallbankaccountlist
+                               
 @lldb_command('showallbankaccountlist')
 def ShowAllBankAccountList(cmd_args=None, cmd_options={}):
     """ A DEVELOPMENT macro that walks the list of all allocated bank_account objects
@@ -142,5 +142,5 @@ def ShowAllBankAccountList(cmd_args=None, cmd_options={}):
     for bank_account in IterateQueue(kern.globals.bank_accounts_list, 'bank_account_t', 'ba_global_elt'):
       print GetBankAccountSummary(bank_account)
     return True
-# EndMacro showallbankaccountlist
-#endif
+                                 
+      

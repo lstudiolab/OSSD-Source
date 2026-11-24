@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* OSMetaClass.cpp created by gvdl on Fri 1998-11-17 */
+                                                       
 
 #include <string.h>
 
@@ -64,18 +64,18 @@ __BEGIN_DECLS
 
 #if PRAGMA_MARK
 #pragma mark Macros
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* Macros
-*********************************************************************/
+#endif                  
+                                                                      
+        
+                                                                      
 __END_DECLS
 
 #if PRAGMA_MARK
 #pragma mark Internal constants & data structs
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* Internal constants & data structs
-*********************************************************************/
+#endif                  
+                                                                      
+                                   
+                                                                      
 OSKextLogSpec kOSMetaClassLogSpec =
     kOSKextLogErrorLevel |
     kOSKextLogLoadFlag |
@@ -94,11 +94,11 @@ static unsigned int   sDeepestClass;
 IOLock              * sAllClassesLock = NULL;
 IOLock              * sInstancesLock  = NULL;
 
-/*
- * While loading a kext and running all its constructors to register
- * all OSMetaClass classes, the classes are queued up here. Only one
- * kext can be in flight at a time, guarded by sStalledClassesLock
- */
+  
+                                                                    
+                                                                    
+                                                                  
+   
 static struct StalledData {
 	const char   * kextIdentifier;
 	OSReturn       result;
@@ -120,15 +120,15 @@ struct ExpansionData {
 
 #if PRAGMA_MARK
 #pragma mark OSMetaClassBase
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* OSMetaClassBase.
-*********************************************************************/
+#endif                  
+                                                                      
+                  
+                                                                      
 
 #if APPLE_KEXT_VTABLE_PADDING
-/*********************************************************************
-* Reserved vtable functions.
-*********************************************************************/
+                                                                      
+                            
+                                                                      
 #if defined(__arm64__) || defined(__arm__)
 void
 OSMetaClassBase::_RESERVEDOSMetaClassBase0()
@@ -150,9 +150,9 @@ OSMetaClassBase::_RESERVEDOSMetaClassBase3()
 {
 	panic("OSMetaClassBase::_RESERVEDOSMetaClassBase%d called.", 3);
 }
-#endif /* defined(__arm64__) || defined(__arm__) */
+#endif                                             
 
-// As these slots are used move them up inside the #if above
+                                                            
 void
 OSMetaClassBase::_RESERVEDOSMetaClassBase4()
 {
@@ -170,30 +170,30 @@ OSMetaClassBase::_RESERVEDOSMetaClassBase6()
 }
 #endif
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
 #if defined(__arm__) || defined(__arm64__)
 
 #if defined(HAS_APPLE_PAC)
 #include <ptrauth.h>
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
-/*
- *  IHI0059A "C++ Application Binary Interface Standard for the ARM 64 - bit Architecture":
- *
- *  3.2.1 Representation of pointer to member function The generic C++ ABI [GC++ABI]
- *  specifies that a pointer to member function is a pair of words <ptr, adj>. The
- *  least significant bit of ptr discriminates between (0) the address of a non-
- *  virtual member function and (1) the offset in the class's virtual table of the
- *  address of a virtual function. This encoding cannot work for the AArch64
- *  instruction set where the architecture reserves all bits of code addresses. This
- *  ABI specifies that adj contains twice the this adjustment, plus 1 if the member
- *  function is virtual. The least significant bit of adj then makes exactly the
- *  same discrimination as the least significant bit of ptr does for Itanium. A
- *  pointer to member function is NULL when ptr = 0 and the least significant bit of
- *  adj is zero.
- */
+  
+                                                                                           
+  
+                                                                                    
+                                                                                  
+                                                                                
+                                                                                  
+                                                                            
+                                                                                    
+                                                                                   
+                                                                                
+                                                                               
+                                                                                    
+                
+   
 
 OSMetaClassBase::_ptf_t
 #if defined(HAS_APPLE_PAC) && \
@@ -220,10 +220,10 @@ OSMetaClassBase::_ptmf2ptf(const OSMetaClassBase *self,
 
 #if defined(HAS_APPLE_PAC) && \
 	__has_feature(ptrauth_member_function_pointer_type_discrimination)
-	// Authenticate 'pfn' using the member function pointer type discriminator
-	// and resign it as a C function pointer. 'pfn' can point to either a
-	// non-virtual function or a virtual member function thunk.
-	// It can also be NULL.
+	                                                                          
+	                                                                     
+	                                                           
+	                       
 	if (pfn) {
 		pfn = ptrauth_auth_and_resign(pfn, ptrauth_key_function_pointer,
 		    ptrauth_type_discriminator(__typeof__(func)),
@@ -233,17 +233,17 @@ OSMetaClassBase::_ptmf2ptf(const OSMetaClassBase *self,
 	return pfn;
 #else
 	if (map.pTMF.delta & 1) {
-		// virtual
+		          
 		union {
 			const OSMetaClassBase *fObj;
 			_ptf_t **vtablep;
 		} u;
 		u.fObj = self;
 
-		// Virtual member function so dereference table
+		                                               
 #if defined(HAS_APPLE_PAC)
-		// The entity hash is stored in the top 32-bits of the vtable offset of a
-		// member function pointer.
+		                                                                         
+		                           
 		uint32_t entity_hash = ((uintptr_t)pfn) >> 32;
 		pfn = (_ptf_t)(((uintptr_t) pfn) & 0xFFFFFFFF);
 
@@ -251,42 +251,42 @@ OSMetaClassBase::_ptmf2ptf(const OSMetaClassBase *self,
 		const _ptf_t *vtablep =
 		    (const _ptf_t *)__builtin_get_vtable_pointer(u.fObj);
 #else
-		// Authenticate the vtable pointer.
+		                                   
 		const _ptf_t *vtablep = ptrauth_auth_data(*u.vtablep,
 		    ptrauth_key_cxx_vtable_pointer, 0);
 #endif
-		// Calculate the address of the vtable entry.
+		                                             
 		_ptf_t *vtentryp = (_ptf_t *)(((uintptr_t)vtablep) + (uintptr_t)pfn);
-		// Load the pointer from the vtable entry.
+		                                          
 		pfn = *vtentryp;
 
-		// Finally, resign the vtable entry as a function pointer.
+		                                                          
 		uintptr_t auth_data = ptrauth_blend_discriminator(vtentryp, entity_hash);
 		pfn = ptrauth_auth_and_resign(pfn, ptrauth_key_function_pointer,
 		    auth_data, ptrauth_key_function_pointer,
 		    ptrauth_function_pointer_type_discriminator(_ptf_t));
-#else /* defined(HAS_APPLE_PAC) */
+#else                             
 		pfn = *(_ptf_t *)(((uintptr_t)*u.vtablep) + (uintptr_t)pfn);
-#endif /* !defined(HAS_APPLE_PAC) */
+#endif                              
 		return pfn;
 	} else {
-		// Not virtual, i.e. plain member func
+		                                      
 		return pfn;
 	}
 #endif
 }
 
-#endif /* defined(__arm__) || defined(__arm64__) */
-/*********************************************************************
-* These used to be inline in the header but gcc didn't believe us
-* Now we MUST pull the inline out at least until the compiler is
-* repaired.
-*
-* Helper inlines for runtime type preprocessor macros
-*********************************************************************/
+#endif                                             
+                                                                      
+                                                                 
+                                                                
+           
+ 
+                                                     
+                                                                      
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClassBase::safeMetaCast(
 	const OSMetaClassBase * me,
@@ -295,7 +295,7 @@ OSMetaClassBase::safeMetaCast(
 	return (me)? me->metaCast(toType) : NULL;
 }
 
-/// A helper function to crash with a kernel panic.
+                                                   
 __attribute__((cold, not_tail_called, noreturn))
 static inline void
 panic_crash_fail_cast(const OSMetaClassBase *me,
@@ -320,8 +320,8 @@ OSMetaClassBase::requiredMetaCast(
 	return tmp;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 bool
 OSMetaClassBase::checkTypeInst(
 	const OSMetaClassBase * inst,
@@ -331,8 +331,8 @@ OSMetaClassBase::checkTypeInst(
 	return typeinst && inst && (NULL != inst->metaCast(toType));
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSMetaClassBase::
 initialize()
@@ -343,11 +343,11 @@ initialize()
 }
 
 #if APPLE_KEXT_VTABLE_PADDING
-/*********************************************************************
-* If you need this slot you had better setup an IOCTL style interface.
-* 'Cause the whole kernel world depends on OSMetaClassBase and YOU
-* CANT change the VTABLE size ever.
-*********************************************************************/
+                                                                      
+                                                                      
+                                                                  
+                                   
+                                                                      
 void
 OSMetaClassBase::_RESERVEDOSMetaClassBase7()
 {
@@ -355,14 +355,14 @@ OSMetaClassBase::_RESERVEDOSMetaClassBase7()
 }
 #endif
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase::OSMetaClassBase()
 {
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase::~OSMetaClassBase()
 {
 	void ** thisVTable;
@@ -371,32 +371,32 @@ OSMetaClassBase::~OSMetaClassBase()
 	*thisVTable = (void *) -1UL;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 bool
 OSMetaClassBase::isEqualTo(const OSMetaClassBase * anObj) const
 {
 	return this == anObj;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClassBase::metaCast(const OSMetaClass * toMeta) const
 {
 	return toMeta->checkMetaCast(this);
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClassBase::metaCast(const OSSymbol * toMetaSymb) const
 {
 	return OSMetaClass::checkMetaCastWithName(toMetaSymb, this);
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClassBase::metaCast(const OSString * toMetaStr) const
 {
@@ -409,8 +409,8 @@ OSMetaClassBase::metaCast(const OSString * toMetaStr) const
 	return ret;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClassBase::metaCast(const char * toMetaCStr) const
 {
@@ -425,10 +425,10 @@ OSMetaClassBase::metaCast(const char * toMetaCStr) const
 
 #if PRAGMA_MARK
 #pragma mark OSMetaClassMeta
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* OSMetaClassMeta - the bootstrap metaclass of OSMetaClass
-*********************************************************************/
+#endif                  
+                                                                      
+                                                          
+                                                                      
 class OSMetaClassMeta : public OSMetaClass
 {
 public:
@@ -456,15 +456,15 @@ OSMetaClass::getMetaClass() const
 
 #if PRAGMA_MARK
 #pragma mark OSMetaClass
-#endif /* PRAGMA_MARK */
-/*********************************************************************
-* OSMetaClass
-*********************************************************************/
+#endif                  
+                                                                      
+             
+                                                                      
 
 #if APPLE_KEXT_VTABLE_PADDING
-/*********************************************************************
-* Reserved functions.
-*********************************************************************/
+                                                                      
+                     
+                                                                      
 void
 OSMetaClass::_RESERVEDOSMetaClass0()
 {
@@ -507,8 +507,8 @@ OSMetaClass::_RESERVEDOSMetaClass7()
 }
 #endif
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 static void
 OSMetaClassLogErrorForKext(
 	OSReturn   error,
@@ -519,7 +519,7 @@ OSMetaClassLogErrorForKext(
 	switch (error) {
 	case kOSReturnSuccess:
 		return;
-	case kOSMetaClassNoInit: // xxx - never returned; logged at fail site
+	case kOSMetaClassNoInit:                                             
 		message = "OSMetaClass: preModLoad() wasn't called (runtime internal error).";
 		break;
 	case kOSMetaClassNoDicts:
@@ -534,10 +534,10 @@ OSMetaClassLogErrorForKext(
 	case kOSMetaClassDuplicateClass:
 		message = "OSMetaClass: Duplicate class encountered.";
 		break;
-	case kOSMetaClassNoSuper: // xxx - never returned
+	case kOSMetaClassNoSuper:                        
 		message = "OSMetaClass: Can't associate a class with its superclass.";
 		break;
-	case kOSMetaClassInstNoSuper: // xxx - never returned
+	case kOSMetaClassInstNoSuper:                        
 		message = "OSMetaClass: Instance construction error; unknown superclass.";
 		break;
 	case kOSMetaClassNoKext:
@@ -561,15 +561,15 @@ OSMetaClass::logError(OSReturn error)
 	OSMetaClassLogErrorForKext(error, NULL);
 }
 
-/*********************************************************************
-* The core constructor for a MetaClass (defined with this name always
-* but within the scope of its represented class).
-*
-* MetaClass constructors are invoked in OSRuntimeInitializeCPP(),
-* in between calls to OSMetaClass::preModLoad(), which sets up for
-* registration, and OSMetaClass::postModLoad(), which actually
-* records all the class/kext relationships of the new MetaClasses.
-*********************************************************************/
+                                                                      
+                                                                     
+                                                 
+ 
+                                                                 
+                                                                  
+                                                              
+                                                                  
+                                                                      
 
 OSMetaClass::OSMetaClass(
 	const char        * inClassName,
@@ -600,22 +600,22 @@ OSMetaClass::OSMetaClass(
 	    numSiteQs);
 #endif
 
-	/* Hack alert: We are just casting inClassName and storing it in
-	 * an OSString * instance variable. This may be because you can't
-	 * create C++ objects in static constructors, but I really don't know!
-	 */
+	                                                                
+                                                                  
+                                                                       
+    
 	className = (const OSSymbol *)inClassName;
 
-	// sStalledClassesLock taken in preModLoad
+	                                          
 	if (!sStalled) {
-		/* There's no way we can look up the kext here, unfortunately.
-		 */
-		OSKextLog(/* kext */ NULL, kOSMetaClassLogSpec,
+		                                                              
+     
+		OSKextLog(           NULL, kOSMetaClassLogSpec,
 		    "OSMetaClass: preModLoad() wasn't called for class %s "
 		    "(runtime internal error).",
 		    inClassName);
 	} else if (!sStalled->result) {
-		// Grow stalled array if neccessary
+		                                   
 		if (sStalled->count >= sStalled->capacity) {
 			OSMetaClass **oldStalled = sStalled->classes;
 			int oldSize = sStalled->capacity * sizeof(OSMetaClass *);
@@ -654,20 +654,20 @@ OSMetaClass::OSMetaClass(
 	}
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClass::~OSMetaClass()
 {
-	OSKext * myKext = reserved->kext; // do not release
+	OSKext * myKext = reserved->kext;                  
 
-	/* Hack alert: 'className' is a C string during early C++ init, and
-	 * is converted to a real OSSymbol only when we record the OSKext in
-	 * OSMetaClass::postModLoad(). So only do this bit if we have an OSKext.
-	 * We can't safely cast or check 'className'.
-	 *
-	 * Also, release className *after* calling into the kext,
-	 * as removeClass() may access className.
-	 */
+	                                                                   
+                                                                     
+                                                                         
+                                              
+   
+                                                          
+                                          
+    
 	IOLockLock(sAllClassesLock);
 	if (sAllClassesDict) {
 		if (myKext) {
@@ -680,28 +680,28 @@ OSMetaClass::~OSMetaClass()
 
 	if (myKext) {
 		if (myKext->removeClass(this) != kOSReturnSuccess) {
-			// xxx - what can we do?
+			                        
 		}
 		className->release();
 	}
 
-	// sStalledClassesLock taken in preModLoad
+	                                          
 	if (sStalled) {
 		unsigned int i;
 
-		/* First pass find class in stalled list. If we find it that means
-		 * we started C++ init with constructors but now we're tearing down
-		 * because of some failure.
-		 */
+		                                                                  
+                                                                     
+                             
+     
 		for (i = 0; i < sStalled->count; i++) {
 			if (this == sStalled->classes[i]) {
 				break;
 			}
 		}
 
-		/* Remove this metaclass from the stalled list so postModLoad() doesn't
-		 * try to register it.
-		 */
+		                                                                       
+                        
+     
 		if (i < sStalled->count) {
 			sStalled->count--;
 			if (i < sStalled->count) {
@@ -716,9 +716,9 @@ OSMetaClass::~OSMetaClass()
 	IODelete(reserved, ExpansionData, 1);
 }
 
-/*********************************************************************
-* Empty overrides.
-*********************************************************************/
+                                                                      
+                  
+                                                                      
 void
 OSMetaClass::retain() const
 {
@@ -749,8 +749,8 @@ OSMetaClass::getRetainCount() const
 	return 0;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 const char *
 OSMetaClass::getClassName() const
 {
@@ -759,23 +759,23 @@ OSMetaClass::getClassName() const
 	}
 	return className->getCStringNoCopy();
 }
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 const OSSymbol *
 OSMetaClass::getClassNameSymbol() const
 {
 	return className;
 }
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 unsigned int
 OSMetaClass::getClassSize() const
 {
 	return classSize;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void *
 OSMetaClass::preModLoad(const char * kextIdentifier)
 {
@@ -800,13 +800,13 @@ OSMetaClass::preModLoad(const char * kextIdentifier)
 		bzero(sStalled->classes, kKModCapacityIncrement * sizeof(OSMetaClass *));
 	}
 
-	// keep sStalledClassesLock locked until postModLoad
+	                                                    
 
 	return sStalled;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 bool
 OSMetaClass::checkModLoad(void * loadHandle)
 {
@@ -814,14 +814,14 @@ OSMetaClass::checkModLoad(void * loadHandle)
 	       sStalled->result == kOSReturnSuccess;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSReturn
 OSMetaClass::postModLoad(void * loadHandle)
 {
 	OSReturn         result     = kOSReturnSuccess;
-	OSSymbol       * myKextName = NULL;// must release
-	OSKext         * myKext     = NULL;// must release
+	OSSymbol       * myKextName = NULL;               
+	OSKext         * myKext     = NULL;               
 
 	if (!sStalled || loadHandle != sStalled) {
 		result = kOSMetaClassInternal;
@@ -834,7 +834,7 @@ OSMetaClass::postModLoad(void * loadHandle)
 		switch (sBootstrapState) {
 		case kNoDictionaries:
 			sBootstrapState = kMakingDictionaries;
-			// No break; fall through
+			                         
 			[[clang::fallthrough]];
 
 		case kMakingDictionaries:
@@ -845,7 +845,7 @@ OSMetaClass::postModLoad(void * loadHandle)
 			}
 			sAllClassesDict->setOptions(OSCollection::kSort, OSCollection::kSort);
 
-			// No break; fall through
+			                         
 			[[clang::fallthrough]];
 
 		case kCompletedBootstrap:
@@ -855,28 +855,28 @@ OSMetaClass::postModLoad(void * loadHandle)
 				    sStalled->kextIdentifier));
 
 			if (!sStalled->count) {
-				break; // Nothing to do so just get out
+				break;                                 
 			}
 
 			myKext = OSKext::lookupKextWithIdentifier(myKextName);
 			if (!myKext) {
 				result = kOSMetaClassNoKext;
 
-				/* Log this error here so we can include the kext name.
-				 */
-				OSKextLog(/* kext */ NULL, kOSMetaClassLogSpec,
+				                                                       
+       
+				OSKextLog(           NULL, kOSMetaClassLogSpec,
 				    "OSMetaClass: Can't record classes for kext %s - kext not found.",
 				    sStalled->kextIdentifier);
 				break;
 			}
 
-			/* First pass checking classes aren't already loaded. If any already
-			 * exist, we don't register any, and so we don't technically have
-			 * to do any C++ teardown.
-			 *
-			 * Hack alert: me->className has been a C string until now.
-			 * We only release the OSSymbol if we store the kext.
-			 */
+			                                                                    
+                                                                    
+                             
+     
+                                                              
+                                                        
+      
 			IOLockLock(sAllClassesLock);
 			for (i = 0; i < sStalled->count; i++) {
 				const OSMetaClass * me = sStalled->classes[i];
@@ -884,14 +884,14 @@ OSMetaClass::postModLoad(void * loadHandle)
 				    sAllClassesDict->getObject((const char *)me->className));
 
 				if (orig) {
-					/* Log this error here so we can include the class name.
-					 * xxx - we should look up the other kext that defines the class
-					 */
+					                                                        
+                                                                     
+        
 #if defined(XNU_TARGET_OS_OSX)
 					OSKextLog(myKext, kOSMetaClassLogSpec,
 #else
 					panic(
-#endif /* defined(XNU_TARGET_OS_OSX) */
+#endif                                 
 					    "OSMetaClass: Kext %s class %s is a duplicate;"
 					    "kext %s already has a class by that name.",
 					    sStalled->kextIdentifier, (const char *)me->className,
@@ -909,35 +909,35 @@ OSMetaClass::postModLoad(void * loadHandle)
 			}
 			IOLockUnlock(sAllClassesLock);
 
-			/* Bail if we didn't go through the entire list of new classes
-			 * (if we hit a duplicate).
-			 */
+			                                                              
+                              
+      
 			if (i != sStalled->count) {
 			        break;
 			}
 
-			// Second pass symbolling strings and inserting classes in dictionary
+			                                                                     
 			IOLockLock(sAllClassesLock);
 			for (i = 0; i < sStalled->count; i++) {
 			        OSMetaClass * me = sStalled->classes[i];
 
-			        /* Hack alert: me->className has been a C string until now.
-			         * We only release the OSSymbol in ~OSMetaClass()
-			         * if we set the reference to the kext.
-			         */
+			                                                                   
+                                                            
+                                                  
+              
 			        me->className =
 			            OSSymbol::withCStringNoCopy((const char *)me->className);
 
-			        // xxx - I suppose if these fail we're going to panic soon....
+			                                                                      
 			        sAllClassesDict->setObject(me->className, me);
 
-			        /* Do not retain the kext object here.
-			         */
+			                                              
+              
 			        me->reserved->kext = myKext;
 			        if (myKext) {
 			                result = myKext->addClass(me, sStalled->count);
 			                if (result != kOSReturnSuccess) {
-			                        /* OSKext::addClass() logs with kOSMetaClassNoInsKModSet. */
+			                                                                                    
 			                        break;
 					}
 				}
@@ -954,9 +954,9 @@ OSMetaClass::postModLoad(void * loadHandle)
 	}
 
 finish:
-	/* Don't call logError() for success or the conditions logged above
-	 * or by called function.
-	 */
+	                                                                   
+                          
+    
 	if (result != kOSReturnSuccess &&
 	    result != kOSMetaClassNoInsKModSet &&
 	    result != kOSMetaClassDuplicateClass &&
@@ -981,19 +981,19 @@ finish:
 }
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSMetaClass::instanceConstructed() const
 {
-        // if ((0 == OSIncrementAtomic(&(((OSMetaClass *) this)->instanceCount))) && superClassLink)
+                                                                                                    
         if ((0 == OSIncrementAtomic(&instanceCount)) && superClassLink) {
                 superClassLink->instanceConstructed();
 	}
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSMetaClass::instanceDestructed() const
 {
@@ -1005,19 +1005,19 @@ OSMetaClass::instanceDestructed() const
                 OSKext * myKext = reserved->kext;
 
                 OSKextLog(myKext, kOSMetaClassLogSpec,
-                    // xxx - this phrasing is rather cryptic
+                                                            
                     "OSMetaClass: Class %s - bad retain (%d)",
                     getClassName(), instanceCount);
 	}
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 bool
 OSMetaClass::modHasInstance(const char * kextIdentifier)
 {
         bool     result  = false;
-        OSKext * theKext = NULL; // must release
+        OSKext * theKext = NULL;                
 
         theKext = OSKext::lookupKextWithIdentifier(kextIdentifier);
         if (!theKext) {
@@ -1031,8 +1031,8 @@ finish:
         return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSMetaClass::reportModInstances(const char * kextIdentifier)
 {
@@ -1040,8 +1040,8 @@ OSMetaClass::reportModInstances(const char * kextIdentifier)
             kOSKextLogExplicitLevel);
         return;
 }
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
 void
 OSMetaClass::addInstance(const OSObject * instance, bool super) const
@@ -1182,16 +1182,16 @@ OSMetaClass::applyToInstancesOfClassName(
         set->release();
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSMetaClass::considerUnloads()
 {
         OSKext::considerUnloads();
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 bool
 OSMetaClass::removeClasses(OSCollection * metaClasses)
 {
@@ -1229,8 +1229,8 @@ OSMetaClass::removeClasses(OSCollection * metaClasses)
 }
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 const OSMetaClass *
 OSMetaClass::getMetaClassWithName(const OSSymbol * name)
 {
@@ -1249,8 +1249,8 @@ OSMetaClass::getMetaClassWithName(const OSSymbol * name)
         return retMeta;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 const OSMetaClass *
 OSMetaClass::copyMetaClassWithName(const OSSymbol * name)
 {
@@ -1273,16 +1273,16 @@ OSMetaClass::copyMetaClassWithName(const OSSymbol * name)
         return meta;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 void
 OSMetaClass::releaseMetaClass() const
 {
         OSDecrementAtomic(&reserved->retain);
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSObject *
 OSMetaClass::allocClassWithName(const OSSymbol * name)
 {
@@ -1299,8 +1299,8 @@ OSMetaClass::allocClassWithName(const OSSymbol * name)
         return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSObject *
 OSMetaClass::allocClassWithName(const OSString * name)
 {
@@ -1310,8 +1310,8 @@ OSMetaClass::allocClassWithName(const OSString * name)
         return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSObject *
 OSMetaClass::allocClassWithName(const char * name)
 {
@@ -1322,8 +1322,8 @@ OSMetaClass::allocClassWithName(const char * name)
 }
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClass::checkMetaCastWithName(
 	const OSSymbol        * name,
@@ -1340,8 +1340,8 @@ OSMetaClass::checkMetaCastWithName(
         return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClass::
 checkMetaCastWithName(
@@ -1355,8 +1355,8 @@ checkMetaCastWithName(
         return result;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSMetaClassBase *
 OSMetaClass::checkMetaCastWithName(
 	const char            * name,
@@ -1369,16 +1369,16 @@ OSMetaClass::checkMetaCastWithName(
         return result;
 }
 
-/*********************************************************************
-* OSMetaClass::checkMetaCast()
-* Check to see if the 'check' object has this object in its metaclass chain.
-* Returns check if it is indeed a kind of the current meta class, 0 otherwise.
-*
-* Generally this method is not invoked directly but is used to implement
-* the OSMetaClassBase::metaCast member function.
-*
-* See also OSMetaClassBase::metaCast
-*********************************************************************/
+                                                                      
+                              
+                                                                            
+                                                                              
+ 
+                                                                        
+                                                
+ 
+                                    
+                                                                      
 OSMetaClassBase *
 OSMetaClass::checkMetaCast(
 	const OSMetaClassBase * check) const
@@ -1388,7 +1388,7 @@ OSMetaClass::checkMetaCast(
 
         for (fromMeta = check->getMetaClass();; fromMeta = fromMeta->superClassLink) {
                 if (toMeta == fromMeta) {
-                        return const_cast<OSMetaClassBase *>(check); // Discard const
+                        return const_cast<OSMetaClassBase *>(check);                 
 		}
                 if (!fromMeta->superClassLink) {
                         break;
@@ -1398,8 +1398,8 @@ OSMetaClass::checkMetaCast(
         return NULL;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 __dead2
 void
 OSMetaClass::reservedCalled(int ind) const
@@ -1408,8 +1408,8 @@ OSMetaClass::reservedCalled(int ind) const
         panic("%s::_RESERVED%s%d called.", cname, cname, ind);
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 const
 OSMetaClass *
 OSMetaClass::getSuperClass() const
@@ -1417,8 +1417,8 @@ OSMetaClass::getSuperClass() const
         return superClassLink;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 const OSSymbol *
 OSMetaClass::getKmodName() const
 {
@@ -1429,25 +1429,25 @@ OSMetaClass::getKmodName() const
         return OSSymbol::withCStringNoCopy("unknown");
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSKext *
 OSMetaClass::getKext() const
 {
         return reserved ? reserved->kext : NULL;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 unsigned int
 OSMetaClass::getInstanceCount() const
 {
         return instanceCount;
 }
 
-/*********************************************************************
-*********************************************************************/
-/* static */
+                                                                      
+                                                                      
+            
 void
 OSMetaClass::printInstanceCounts()
 {
@@ -1475,8 +1475,8 @@ OSMetaClass::printInstanceCounts()
         return;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 OSDictionary *
 OSMetaClass::getClassDictionary()
 {
@@ -1484,8 +1484,8 @@ OSMetaClass::getClassDictionary()
         return NULL;
 }
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 bool
 OSMetaClass::serialize(__unused OSSerialize * s) const
 {
@@ -1493,9 +1493,9 @@ OSMetaClass::serialize(__unused OSSerialize * s) const
         return false;
 }
 
-/*********************************************************************
-*********************************************************************/
-/* static */
+                                                                      
+                                                                      
+            
 void
 OSMetaClass::serializeClassDictionary(OSDictionary * serializeDictionary)
 {
@@ -1542,8 +1542,8 @@ finish:
 }
 
 
-/*********************************************************************
-*********************************************************************/
+                                                                      
+                                                                      
 
 #if IOTRACKING
 
@@ -1605,4 +1605,4 @@ OSMetaClass::getTracking() const
         return reserved->tracking;
 }
 
-#endif /* IOTRACKING */
+#endif                 

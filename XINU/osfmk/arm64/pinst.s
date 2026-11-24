@@ -29,31 +29,31 @@
 #include <pexpert/arm64/board_config.h>
 #include <arm64/proc_reg.h>
 
-/*
- * Compare two instructions with constant, spin on mismatch.
- *   arg0 - Constant scratch register
- *   arg1 - Instruction address scratch register
- *   arg2 - Instruction location
- *   arg3 - Instruction constant
- */
+  
+                                                            
+                                     
+                                                
+                                
+                                
+   
 .macro check_instruction
-	// construct 64-bit constant inline to make sure it is non-executable
+	                                                                     
 	movz	$0, #(($3 >> 48) & 0xffff), lsl #48
 	movk	$0, #(($3 >> 32) & 0xffff), lsl #32
 	movk	$0, #(($3 >> 16) & 0xffff), lsl #16
 	movk	$0, #(($3) & 0xffff)
-	// fetch instructions from "untrusted" memory
+	                                             
 	adrp	$1, $2@page
 	add		$1, $1, $2@pageoff
 	ldr		$1, [$1]
-	// spin forever if we do not find what we expect
+	                                                
 	cmp		$0, $1
 	b.ne	.
 .endmacro
 
 #if defined(KERNEL_INTEGRITY_KTRR)
 
-/* AMCC only KTRR protected text, non-executable once the MMU is enabled */
+                                                                           
 	.text
 	.section	__LAST,__pinst
 	.align 2
@@ -77,7 +77,7 @@ _pinst_set_sctlr_trap_addr:
 	ret
 
 
-/* MMU and AMCC KTRR protected text */
+                                      
 	.text
 	.section	__TEXT_EXEC,__text
 	.align 2
@@ -102,7 +102,7 @@ _pinst_set_sctlr:
 	check_instruction x2, x3, __pinst_set_sctlr, 0xd65f03c0d5181000
 	b __pinst_set_sctlr
 
-#endif /* defined(KERNEL_INTEGRITY_KTRR) */
+#endif                                     
 
 #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
 
@@ -123,5 +123,5 @@ _pinst_spsel_1:
 	check_instruction x2, x3, __pinst_spsel_1, 0xd65f03c0d50041bf
 	b __pinst_spsel_1
 
-#endif /* defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR) */
+#endif                                                                       
 

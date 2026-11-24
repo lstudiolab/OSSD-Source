@@ -251,9 +251,9 @@ def ShowTaskUserArgs(cmd_args=None, cmd_options={}):
     return True
 
 def ShowTaskUserStacks(task):
-    #print GetTaskSummary.header + " " + GetProcSummary.header
+                                                              
     pval = Cast(task.bsd_info, 'proc *')
-    #print GetTaskSummary(task) + " " + GetProcSummary(pval) + "\n \n"
+                                                                      
     crash_report_format_string = """\
 Process:         {pname:s} [{pid:d}]
 Path:            {path: <50s}
@@ -317,11 +317,11 @@ Synthetic crash log generated from Kernel userstacks
         )
     print "Binary Images:"
     ShowTaskUserLibraries([hex(task)])
-    usertask_lib_info = [] # will host [startaddr, endaddr, lib_name] entries
+    usertask_lib_info = []                                                   
     for entry in ShowTaskUserLibraries.found_images:
-        #print "processing line %s" % line
+                                          
         arr = user_lib_rex.findall(entry[3])
-        #print "%r" % arr
+                         
         if len(arr) == 0 :
             continue
         usertask_lib_info.append([int(arr[0][0],16), int(arr[0][1],16), str(arr[0][2]).strip()])
@@ -400,9 +400,9 @@ def GetUserDataAsString(task, addr, size):
             debuglog("Failed to reset in kdp_pmap from GetUserDataAsString.")
             return ""
     elif (kern.arch == 'x86_64' or kern.arch.startswith('arm')) and (long(size) < (2 * kern.globals.page_size)):
-        # Without the benefit of a KDP stub on the target, try to
-        # find the user task's physical mapping and memcpy the data.
-        # If it straddles a page boundary, copy in two passes
+                                                                 
+                                                                    
+                                                             
         range1_addr = long(addr)
         range1_size = long(size)
         if kern.StraddlesPage(range1_addr, range1_size):
@@ -513,7 +513,7 @@ def GetImageInfo(task, mh_image_address, mh_path_address, approx_end_address=Non
         image_end_load_address = int(mh_image_address) + 0xffffffff
 
     print_format = "0x{0:x} - 0x{1:x} {2: <50s} (??? - ???) <{3: <36s}> {4: <50s}"
-    # 32 bytes enough for mach_header/mach_header_64
+                                                    
     mh_data = GetUserDataAsString(task, mh_image_address, 32)
     if len(mh_data) == 0:
         debuglog("unable to get userdata for task 0x{:x} img_addr 0x{:x} path_address 0x{:x}".format(
@@ -539,7 +539,7 @@ def GetImageInfo(task, mh_image_address, mh_path_address, approx_end_address=Non
     found_uuid_data = False
     retval = None
     while lc_idx < mh_ncmds:
-        # 24 bytes is the size of uuid_command
+                                              
         lcmd_data = GetUserDataAsString(task, lc_address, 24)
         lc_cmd = _ExtractDataFromString(lcmd_data, 4 * 0, "uint32_t")
         lc_cmd_size = _ExtractDataFromString(lcmd_data, 4 * 1, "uint32_t")
@@ -549,11 +549,11 @@ def GetImageInfo(task, mh_image_address, mh_path_address, approx_end_address=Non
         path_out_string = ""
 
         if lc_cmd == 0x1b:
-            # need to print the uuid now.
+                                         
             uuid_data = [ord(x) for x in lc_data]
             found_uuid_data = True
             uuid_out_string = "{a[0]:02X}{a[1]:02X}{a[2]:02X}{a[3]:02X}-{a[4]:02X}{a[5]:02X}-{a[6]:02X}{a[7]:02X}-{a[8]:02X}{a[9]:02X}-{a[10]:02X}{a[11]:02X}{a[12]:02X}{a[13]:02X}{a[14]:02X}{a[15]:02X}".format(a=uuid_data)
-            #also print image path
+                                  
             path_out_string = GetUserspaceString(task, mh_path_address)
             path_base_name = path_out_string.split("/")[-1]
             retval = print_format.format(mh_image_address, image_end_load_address, path_base_name, uuid_out_string, path_out_string)
@@ -571,7 +571,7 @@ def GetImageInfo(task, mh_image_address, mh_path_address, approx_end_address=Non
         retval = print_format.format(mh_image_address, image_end_load_address, path_base_name, uuid_out_string, path_out_string)
     return retval
 
-@static_var("found_images", []) # holds entries of format (startaddr, endaddr, image_path_addr, infostring)
+@static_var("found_images", [])                                                                            
 @static_var("exec_load_path", 0)
 @lldb_command("showtaskuserlibraries")
 def ShowTaskUserLibraries(cmd_args=None):
@@ -584,7 +584,7 @@ def ShowTaskUserLibraries(cmd_args=None):
     if not cmd_args:
         raise ArgumentError("Insufficient arguments")
 
-    #reset the found_images array
+                                 
     ShowTaskUserLibraries.found_images = []
 
     task = kern.GetValueFromAddress(cmd_args[0], 'task_t')
@@ -617,7 +617,7 @@ def ShowTaskUserLibraries(cmd_args=None):
         image_info_array_address = _ExtractDataFromString(vers_info_data, 4*2, "uint32_t")
         dyld_load_address = _ExtractDataFromString(vers_info_data, 4*5, "uint32_t")
         dyld_all_image_infos_address_from_struct = _ExtractDataFromString(vers_info_data, 4*14, "uint32_t")
-    # Account for ASLR slide before dyld can fix the structure
+                                                              
     dyld_load_address = dyld_load_address + (dyld_all_image_infos_address - dyld_all_image_infos_address_from_struct)
 
     i = 0
@@ -666,7 +666,7 @@ def ShowTaskUserLibraries(cmd_args=None):
             if config['debug']:
                 raise e
 
-    # load_path might get set when the main executable is processed.
+                                                                    
     if ShowTaskUserLibraries.exec_load_path != 0:
         debuglog("main executable load_path is set.")
         image_print_s = GetImageInfo(task, dyld_load_address, ShowTaskUserLibraries.exec_load_path)
@@ -704,7 +704,7 @@ def ShowTaskUserDyldInfo(cmd_args=None):
     if dyld_all_image_infos_version > 14:
         out_str += "Unknown dyld all_image_infos version number %d" % dyld_all_image_infos_version
 
-    # Find fields by byte offset. We assume at least version 9 is supported
+                                                                           
     if is_task_64:
         dyld_all_image_infos_infoArrayCount = _ExtractDataFromString(vers_info_data, 4, "uint32_t")
         dyld_all_image_infos_infoArray = _ExtractDataFromString(vers_info_data, 8, "uint64_t")
@@ -833,7 +833,7 @@ def ShowTaskUserDyldInfo(cmd_args=None):
         out_str += "No dyld information available for task\n"
     print out_str
 
-# Macro: showosmalloc
+                     
 @lldb_type_summary(['OSMallocTag'])
 @header("{0: <20s} {1: >5s} {2: ^16s} {3: <5s} {4: <40s}".format("TAG", "COUNT", "STATE", "ATTR", "NAME"))
 def GetOSMallocTagSummary(malloc_tag):
@@ -865,7 +865,7 @@ def ShowOSMalloc(cmd_args=None):
 
     print summary_str
 
-# EndMacro: showosmalloc
+                        
 
 def SaveDataToFile(start_addr, length, outputfile, task=None,):
     """ Save the data at the specified address (of the specified length) to the file.

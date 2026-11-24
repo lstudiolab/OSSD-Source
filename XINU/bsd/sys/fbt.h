@@ -50,11 +50,11 @@ typedef struct fbt_probe {
         machine_inst_t  fbtp_currentval;
 	uintptr_t		fbtp_roffset;
 	dtrace_id_t		fbtp_id;
-	/* FIXME!
-	 * This field appears to only be used in error messages.
-	 * It puts this structure into the next size bucket in kmem_alloc
-	 * wasting 32 bytes per probe. (in i386 only)
-	 */
+	         
+                                                         
+                                                                  
+                                              
+    
 	char			fbtp_name[MAX_FBTP_NAME_CHARS];
 	struct modctl	*fbtp_ctl;
 	int		fbtp_loadcnt;
@@ -71,4 +71,4 @@ extern bool fbt_excluded(const char *);
 
 extern void fbt_blacklist_init(void);
 extern void fbt_provide_probe(struct modctl *ctl, const char *modname, const char *name, machine_inst_t *instr, machine_inst_t *limit);
-#endif /* _FBT_H */
+#endif             

@@ -25,83 +25,83 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * Bootstrap Protocol (BOOTP).  RFC 951.
- */
-/*
- * HISTORY
- *
- * 14 May 1992 ? at NeXT
- *	Added correct padding to struct nextvend.  This is
- *	needed for the i386 due to alignment differences wrt
- *	the m68k.  Also adjusted the size of the array fields
- *	because the NeXT vendor area was overflowing the bootp
- *	packet.
- */
+  
+                                        
+   
+  
+          
+  
+                        
+                                                     
+                                                       
+                                                        
+                                                         
+          
+   
 
 #include <netinet/udp.h>
 
 #define iaddr_t struct in_addr
 
 struct bootp {
-	u_char  bp_op;          /* packet opcode type */
+	u_char  bp_op;                                  
 #define BOOTREQUEST     1
 #define BOOTREPLY       2
-	u_char  bp_htype;       /* hardware addr type */
-	u_char  bp_hlen;        /* hardware addr length */
-	u_char  bp_hops;        /* gateway hops */
-	u_int32_t bp_xid;       /* transaction ID */
-	u_short bp_secs;        /* seconds since boot began */
+	u_char  bp_htype;                               
+	u_char  bp_hlen;                                  
+	u_char  bp_hops;                          
+	u_int32_t bp_xid;                           
+	u_short bp_secs;                                      
 	u_short bp_unused;
-	iaddr_t bp_ciaddr;      /* client IP address */
-	iaddr_t bp_yiaddr;      /* 'your' IP address */
-	iaddr_t bp_siaddr;      /* server IP address */
-	iaddr_t bp_giaddr;      /* gateway IP address */
-	u_char  bp_chaddr[16];  /* client hardware address */
-	u_char  bp_sname[64];   /* server host name */
-	u_char  bp_file[128];   /* boot file name */
-	u_char  bp_vend[64];    /* vendor-specific area */
+	iaddr_t bp_ciaddr;                             
+	iaddr_t bp_yiaddr;                             
+	iaddr_t bp_siaddr;                             
+	iaddr_t bp_giaddr;                              
+	u_char  bp_chaddr[16];                               
+	u_char  bp_sname[64];                         
+	u_char  bp_file[128];                       
+	u_char  bp_vend[64];                              
 };
 
-/*
- * UDP port numbers, server and client.
- */
+  
+                                       
+   
 #define IPPORT_BOOTPS           67
 #define IPPORT_BOOTPC           68
 
-/*
- * "vendor" data permitted for Stanford boot clients.
- */
+  
+                                                     
+   
 struct vend {
-	u_char  v_magic[4];     /* magic number */
-	u_int32_t v_flags;      /* flags/opcodes, etc. */
-	u_char  v_unused[56];   /* currently unused */
+	u_char  v_magic[4];                       
+	u_int32_t v_flags;                               
+	u_char  v_unused[56];                         
 };
-#define VM_STANFORD     "STAN"  /* v_magic for Stanford */
+#define VM_STANFORD     "STAN"                            
 
-/* v_flags values */
-#define VF_PCBOOT       1       /* an IBMPC or Mac wants environment info */
-#define VF_HELP         2       /* help me, I'm not registered */
+                    
+#define VF_PCBOOT       1                                                   
+#define VF_HELP         2                                        
 
-#define NVMAXTEXT       55      /* don't change this, it just fits RFC951 */
+#define NVMAXTEXT       55                                                  
 struct nextvend {
-	u_char nv_magic[4];     /* Magic number for vendor specificity */
-	u_char nv_version;      /* NeXT protocol version */
-	/*
-	 * Round the beginning
-	 * of the union to a 16
-	 * bit boundary due to
-	 * struct/union alignment
-	 * on the m68k.
-	 */
+	u_char nv_magic[4];                                              
+	u_char nv_version;                                 
+	  
+                       
+                        
+                       
+                          
+                
+    
 	unsigned short  :0;
 	union {
 		u_char NV0[58];
 		struct {
-			u_char NV1_opcode;      /* opcode - Version 1 */
-			u_char NV1_xid; /* transcation id */
-			u_char NV1_text[NVMAXTEXT];     /* text */
-			u_char NV1_null;        /* null terminator */
+			u_char NV1_opcode;                              
+			u_char NV1_xid;                     
+			u_char NV1_text[NVMAXTEXT];               
+			u_char NV1_null;                             
 		} NV1;
 	} nv_U;
 };
@@ -111,10 +111,10 @@ struct nextvend {
 #define nv_text         nv_U.NV1.NV1_text
 #define nv_null         nv_U.NV1.NV1_null
 
-/* Magic number */
-#define VM_NEXT         "NeXT"  /* v_magic for NeXT, Inc. */
+                  
+#define VM_NEXT         "NeXT"                              
 
-/* Opcodes */
+             
 #define BPOP_OK         0
 #define BPOP_QUERY      1
 #define BPOP_QUERY_NE   2
@@ -128,7 +128,7 @@ struct bootp_packet {
 
 #define BOOTP_PKTSIZE (sizeof (struct bootp_packet))
 
-/* backoffs must be masks */
-#define BOOTP_MIN_BACKOFF       0x7ff           /* 2.048 sec */
-#define BOOTP_MAX_BACKOFF       0xffff          /* 65.535 sec */
-#define BOOTP_RETRY             6               /* # retries */
+                            
+#define BOOTP_MIN_BACKOFF       0x7ff                          
+#define BOOTP_MAX_BACKOFF       0xffff                          
+#define BOOTP_RETRY             6                              

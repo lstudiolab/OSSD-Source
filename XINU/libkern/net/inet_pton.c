@@ -16,7 +16,7 @@
  */
 #if defined(LIBC_SCCS) && !defined(lint)
 static const char rcsid[] = "$Id: inet_pton.c,v 1.3.18.2 2005/07/28 07:38:07 marka Exp $";
-#endif /* LIBC_SCCS and not lint */
+#endif                             
 
 #include <string.h>
 
@@ -26,25 +26,25 @@ static const char rcsid[] = "$Id: inet_pton.c,v 1.3.18.2 2005/07/28 07:38:07 mar
 
 #include <netinet/in.h>
 
-/*%
- * WARNING: Don't even consider trying to compile this on a system where
- * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
- */
+   
+                                                                        
+                                                                        
+   
 
 static int      inet_pton4(const char *src, u_char *dst);
 static int      inet_pton6(const char *src, u_char *dst);
 
-/* int
- * inet_pton(af, src, dst)
- *	convert from presentation format (which usually means ASCII printable)
- *	to network format (which is usually some kind of binary format).
- * return:
- *	1 if the address was valid for the specified address family
- *	0 if the address wasn't valid (`dst' is untouched in this case)
- *	-1 if some other error occurred (`dst' is untouched in this case, too)
- * author:
- *	Paul Vixie, 1996.
- */
+      
+                          
+                                                                         
+                                                                   
+          
+                                                              
+                                                                  
+                                                                         
+          
+                    
+   
 int
 inet_pton(int af, const char *src, void *dst)
 {
@@ -56,19 +56,19 @@ inet_pton(int af, const char *src, void *dst)
 	default:
 		return -1;
 	}
-	/* NOTREACHED */
+	                
 }
 
-/* int
- * inet_pton4(src, dst)
- *	like inet_aton() but without all the hexadecimal and shorthand.
- * return:
- *	1 if `src' is a valid dotted quad, else 0.
- * notice:
- *	does not touch `dst' unless it's returning 1.
- * author:
- *	Paul Vixie, 1996.
- */
+      
+                       
+                                                                  
+          
+                                             
+          
+                                                
+          
+                    
+   
 static int
 inet_pton4(const char *src, u_char *dst)
 {
@@ -116,19 +116,19 @@ inet_pton4(const char *src, u_char *dst)
 	return 1;
 }
 
-/* int
- * inet_pton6(src, dst)
- *	convert presentation level address to network order binary form.
- * return:
- *	1 if `src' is a valid [RFC1884 2.2] address, else 0.
- * notice:
- *	(1) does not touch `dst' unless it's returning 1.
- *	(2) :: in a full address is silently ignored.
- * credit:
- *	inspired by Mark Andrews.
- * author:
- *	Paul Vixie, 1996.
- */
+      
+                       
+                                                                   
+          
+                                                       
+          
+                                                    
+                                                
+          
+                            
+          
+                    
+   
 static int
 inet_pton6(const char *src, u_char *dst)
 {
@@ -144,7 +144,7 @@ inet_pton6(const char *src, u_char *dst)
 	memset((tp = tmp), '\0', NS_IN6ADDRSZ);
 	endp = tp + NS_IN6ADDRSZ;
 	colonp = NULL;
-	/* Leading :: requires some special handling. */
+	                                                
 	if (*src == ':') {
 		if (*++src != ':') {
 			return 0;
@@ -191,7 +191,7 @@ inet_pton6(const char *src, u_char *dst)
 		    inet_pton4(curtok, tp) > 0) {
 			tp += NS_INADDRSZ;
 			seen_xdigits = 0;
-			break;  /*%< '\\0' was seen by inet_pton4(). */
+			break;                                         
 		}
 		return 0;
 	}
@@ -203,10 +203,10 @@ inet_pton6(const char *src, u_char *dst)
 		*tp++ = (u_char) val & 0xff;
 	}
 	if (colonp != NULL) {
-		/*
-		 * Since some memmove()'s erroneously fail to handle
-		 * overlapping regions, we'll do the shift by hand.
-		 */
+		  
+                                                      
+                                                     
+     
 		const long n = tp - colonp;
 		int i;
 

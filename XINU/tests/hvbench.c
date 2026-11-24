@@ -11,7 +11,7 @@
 T_GLOBAL_META(
 	T_META_NAMESPACE("xnu.arm.hv"),
 	T_META_REQUIRES_SYSCTL_EQ("kern.hv_support", 1),
-	// Temporary workaround for not providing an x86_64 slice
+	                                                         
 	T_META_REQUIRES_SYSCTL_EQ("hw.optional.arm64", 1)
 	);
 
@@ -22,10 +22,10 @@ T_GLOBAL_META(
 	(void)hv_vcpu_set_reg(vcpu, HV_REG_PC, entry_addr); \
 }
 
-// Note that expect_*(), set_reg(), and get_reg() cannot be used in benchmarks,
-// as the T_ASSERT() checks they perform are severely detrimental to results.
-//
-// The helpers below should be used in their place.
+                                                                               
+                                                                             
+  
+                                                   
 
 static void
 quick_bump_pc(hv_vcpu_t vcpu, const bool forward)
@@ -44,7 +44,7 @@ vtimer_benchmark(hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 	SET_PC(vcpu, spin_vcpu_entry);
 	set_sys_reg(vcpu, HV_SYS_REG_CNTV_CVAL_EL0, 0);
 	set_sys_reg(vcpu, HV_SYS_REG_CNTV_CTL_EL0, 1);
-	// Dry-run twice to ensure that the timer is re-armed.
+	                                                      
 	run_to_next_vm_fault(vcpu, exit);
 	T_ASSERT_EQ_UINT(exit->reason, HV_EXIT_REASON_VTIMER_ACTIVATED,
 	    "check for timer");
@@ -58,8 +58,8 @@ vtimer_benchmark(hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 		hv_vcpu_set_vtimer_mask(vcpu, false);
 	}
 	dt_stat_finalize(stat);
-	// Disable the timer before running other benchmarks, otherwise they will be
-	// interrupted.
+	                                                                            
+	               
 	set_sys_reg(vcpu, HV_SYS_REG_CNTV_CTL_EL0, 0);
 }
 
@@ -106,13 +106,13 @@ mrs_bench_kernel(hv_vcpu_t vcpu, hv_vcpu_exit_t *exit, const char *name)
 static void *
 trap_bench_monitor(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 {
-	// In all benchmark testcases using quick_run_vcpu(), dry run all guest code
-	// to fault in pages so that run_to_next_vm_fault() isn't needed while
-	// recording measurements.
+	                                                                            
+	                                                                      
+	                          
 
 	vtimer_benchmark(vcpu, exit);
 
-	// dry-run hvc_bench_loop
+	                         
 	SET_PC(vcpu, hvc_bench_loop);
 	set_reg(vcpu, HV_REG_X0, 1);
 	expect_hvc(vcpu, exit, 1);
@@ -122,7 +122,7 @@ trap_bench_monitor(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 	trap_benchmark(dt_stat_thread_cycles_create("HVC handled by VMM"),
 	    vcpu, exit, 1000, false);
 
-	// dry-run data_abort_bench_loop
+	                                
 	SET_PC(vcpu, data_abort_bench_loop);
 	set_reg(vcpu, HV_REG_X0, 1);
 	expect_trapped_store(vcpu, exit, get_reserved_start());
@@ -132,12 +132,12 @@ trap_bench_monitor(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 	trap_benchmark(dt_stat_thread_cycles_create("data abort handled by VMM"),
 	    vcpu, exit, 1000, true);
 
-	// dry-run mrs_actlr_bench_loop
+	                               
 	SET_PC(vcpu, mrs_actlr_bench_loop);
 	set_reg(vcpu, HV_REG_X0, 1);
 	set_control(vcpu, _HV_CONTROL_FIELD_HCR,
 	    get_control(vcpu, _HV_CONTROL_FIELD_HCR) & ~HCR_TACR);
-	// Confirm no visible trap from MRS
+	                                   
 	expect_hvc(vcpu, exit, 2);
 
 	mrs_bench_kernel(vcpu, exit, "MRS trap handled by kernel");
@@ -146,7 +146,7 @@ trap_bench_monitor(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 	set_reg(vcpu, HV_REG_X0, 1);
 	set_control(vcpu, _HV_CONTROL_FIELD_HCR,
 	    get_control(vcpu, _HV_CONTROL_FIELD_HCR) | HCR_TACR);
-	// Confirm MRS trap from test loop
+	                                  
 	expect_exception(vcpu, exit, 0x18);
 	quick_bump_pc(vcpu, true);
 	expect_hvc(vcpu, exit, 2);
@@ -182,7 +182,7 @@ static _Atomic uint32_t stage;
 static void
 switch_and_return(bool leader)
 {
-	// wait_semaphore, signal_semaphore
+	                                   
 	(void)semaphore_wait_signal(leader ? sem2 : sem1, leader ? sem1 : sem2);
 }
 
@@ -204,7 +204,7 @@ vcpu_switch_leader(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 
 	bind_to_cpu(0);
 
-	// Activate minimal VCPU state
+	                              
 	SET_PC(vcpu, hvc_loop);
 	expect_hvc(vcpu, exit, 0);
 	T_STAT_MEASURE_LOOP(baseline) {
@@ -258,17 +258,17 @@ vcpu_switch_follower(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 {
 	bind_to_cpu(0);
 
-	// Don't signal until we've been signaled once.
+	                                               
 	T_ASSERT_MACH_SUCCESS(semaphore_wait(sem1),
 	    "wait for first signal from leader");
 
-	// For a baseline, don't enter the VCPU at all. This should result in a
-	// negligible VCPU switch cost.
+	                                                                       
+	                               
 	while (atomic_load_explicit(&stage, memory_order_relaxed) == 0) {
 		switch_and_return(false);
 	}
 
-	// Enter the VCPU once to activate a minimal amount of state.
+	                                                             
 	SET_PC(vcpu, hvc_loop);
 	expect_hvc(vcpu, exit, 0);
 
@@ -277,7 +277,7 @@ vcpu_switch_follower(void *arg __unused, hv_vcpu_t vcpu, hv_vcpu_exit_t *exit)
 		switch_and_return(false);
 	}
 
-	// Use debug state
+	                  
 	SET_PC(vcpu, activate_debug);
 	expect_hvc(vcpu, exit, 0);
 	SET_PC(vcpu, hvc_loop);

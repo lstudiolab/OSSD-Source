@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$apfw: pf_ruleset.c,v 1.2 2007/08/10 03:00:16 jhw Exp $ */
-/*	$OpenBSD: pf_ruleset.c,v 1.1 2006/10/27 13:56:51 mcbride Exp $ */
+                                                             
+                                                                    
 
 /*
  * Copyright (c) 2001 Daniel Hartmeier
@@ -71,7 +71,7 @@
 #include <sys/systm.h>
 #include <sys/malloc.h>
 #include <libkern/libkern.h>
-#endif /* KERNEL */
+#endif             
 #include <sys/mbuf.h>
 
 #include <netinet/ip_dummynet.h>
@@ -94,7 +94,7 @@
 #define rs_free(x)              _FREE(x, M_TEMP)
 
 #else
-/* Userland equivalents so we can lend code to pfctl et al. */
+                                                              
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -109,8 +109,8 @@
 #define DPFPRINTF(format, x...) fprintf(stderr, format, ##x)
 #else
 #define DPFPRINTF(format, x...) ((void)0)
-#endif /* PFDEBUG */
-#endif /* KERNEL */
+#endif              
+#endif             
 
 
 struct pf_anchor_global  pf_anchors;
@@ -154,7 +154,7 @@ pf_get_ruleset_number(u_int8_t action)
 	case PF_DUMMYNET:
 	case PF_NODUMMYNET:
 		return PF_RULESET_DUMMYNET;
-#endif /* DUMMYNET */
+#endif               
 	default:
 		return PF_RULESET_MAX;
 	}
@@ -397,7 +397,7 @@ pf_anchor_setup(struct pf_rule *r, const struct pf_ruleset *s,
 	if (name[0] == '/') {
 		strlcpy(path, name + 1, MAXPATHLEN);
 	} else {
-		/* relative path */
+		                   
 		r->anchor_relative = 1;
 		if (s->anchor == NULL || !s->anchor->path[0]) {
 			path[0] = 0;

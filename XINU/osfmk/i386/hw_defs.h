@@ -47,4 +47,4 @@
 
 #define XeonCapID5      (0x80000000 | (1 << 16) | (30 << 11) | (3 << 8) | 0x98)
 
-#endif /* _I386_HW_DEFS_H_ */
+#endif                       

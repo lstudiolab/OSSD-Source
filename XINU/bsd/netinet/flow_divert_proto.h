@@ -96,4 +96,4 @@ struct flow_divert_packet_header {
 	uint32_t            conn_id;
 };
 
-#endif /* __FLOW_DIVERT_PROTO_H__ */
+#endif                              

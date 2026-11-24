@@ -1,9 +1,9 @@
-/*
- * rdar://63133398 (XNU: load_machfile improperly validates macho_size)
- *
- * Chris J-D <chrisjd@apple.com>
- * SEAR Red Team / 2020-May-18
- */
+  
+                                                                       
+  
+                                
+                              
+   
 #include <err.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -28,16 +28,16 @@
 
 #define ADJUSTMENT_SIZE (1337 * PAGE_SIZE)
 
-/*
- * The hexdumps below are for a minimal Mach-O:
- *
- *     int main(int argc, char *argv[]) { return 0; }
- *
- * We need a well-formed Mach-O to wrap inside a malicious fat binary.  The
- * steps required to make the malicious fat binary are included programmatically
- * to make it clear what we're testing for (slice size should take into account
- * the file offset).  See the line labelled "<-- bug".
- */
+  
+                                               
+  
+                                                     
+  
+                                                                           
+                                                                                
+                                                                               
+                                                      
+   
 #if __x86_64__
 static const unsigned char macho[] = {
 	0xcf, 0xfa, 0xed, 0xfe, 0x07, 0x00, 0x00, 0x01, 0x03, 0x00, 0x00, 0x00,
@@ -3173,22 +3173,22 @@ T_DECL(macho_size_63133398, "load_machfile improperly validates macho_size")
 
 	T_SETUPBEGIN;
 
-	/* prepare the temp file: */
+	                            
 	strcpy(bin_path, "/tmp/macho_size.XXXXXX");
 	T_ASSERT_POSIX_SUCCESS(fd = mkstemp(bin_path), NULL);
 	atexit(cleanup_bin);
 
-	/* size accordingly and map it in: */
+	                                     
 	T_ASSERT_POSIX_SUCCESS(ftruncate(fd, (off_t)dst_size), NULL);
 
 	dst_buf = mmap(NULL, (dst_size + PAGE_SIZE - 1) & ~PAGE_MASK, PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, fd, 0);
 	T_ASSERT_NE(MAP_FAILED, dst_buf, NULL);
 
-	/* put the mach-o in: */
+	                        
 	mach_header = (struct mach_header *)(void *)((char *)dst_buf + ADJUSTMENT_SIZE);
 	memcpy(mach_header, macho, macho_size);
 
-	/* fat binary with a single entry matching our mach-o: */
+	                                                         
 	fat_header = (struct fat_header *)(void *)dst_buf;
 	fat_header->magic       = htonl(FAT_MAGIC);
 	fat_header->nfat_arch   = htonl(1);
@@ -3197,18 +3197,18 @@ T_DECL(macho_size_63133398, "load_machfile improperly validates macho_size")
 	fat_arch->cputype       = (cpu_type_t)htonl(mach_header->cputype);
 	fat_arch->cpusubtype    = (cpu_subtype_t)htonl(mach_header->cpusubtype);
 	fat_arch->offset        = htonl(ADJUSTMENT_SIZE);
-	fat_arch->size          = htonl(dst_size); /* <-- bug */
+	fat_arch->size          = htonl(dst_size);              
 
-	/* make it executable: */
+	                         
 	T_ASSERT_POSIX_SUCCESS(fchmod(fd, 0755), NULL);
 
-	/* clear up anything we don't need: */
+	                                      
 	T_ASSERT_POSIX_SUCCESS(close(fd), NULL);
 	T_ASSERT_POSIX_SUCCESS(munmap(dst_buf, (dst_size + PAGE_SIZE - 1) & ~PAGE_MASK), NULL);
 
 	T_SETUPEND;
 
-	/* and let's give it a try: */
+	                              
 	T_ASSERT_NE(-1, child = fork(), NULL);
 	if (0 == child) {
 		execve(av[0], av, ev);

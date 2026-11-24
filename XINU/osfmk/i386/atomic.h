@@ -33,6 +33,6 @@
 #ifndef _I386_ATOMIC_H_
 #define _I386_ATOMIC_H_
 
-/* No special configuration for Intel */
+                                        
 
-#endif // _I386_ATOMIC_H_
+#endif                   

@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$NetBSD: shm.h,v 1.15 1994/06/29 06:45:17 cgd Exp $	*/
+                                                         
 
 /*
  * Copyright (c) 1994 Adam Glass
@@ -56,17 +56,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
-/*
- * As defined+described in "X/Open System Interfaces and Headers"
- *                         Issue 4, p. XXX
- */
+  
+                                                                 
+                                          
+   
 
 #ifndef _SYS_SHM_INTERNALH_
 #define _SYS_SHM_INTERNALH_
@@ -79,58 +79,58 @@
 #pragma pack(4)
 
 struct user_shmid_ds {
-	struct ipc_perm shm_perm;       /* operation permission structure */
-	user_size_t     shm_segsz;      /* size of segment in bytes */
-	pid_t           shm_lpid;       /* PID of last shared memory op */
-	pid_t           shm_cpid;       /* PID of creator */
-	short           shm_nattch;     /* number of current attaches */
-	user_time_t     shm_atime;      /* time of last shmat() */
-	user_time_t     shm_dtime;      /* time of last shmdt() */
-	user_time_t     shm_ctime;      /* time of last change by shmctl() */
-	user_addr_t     shm_internal;   /* reserved for kernel use */
+	struct ipc_perm shm_perm;                                           
+	user_size_t     shm_segsz;                                    
+	pid_t           shm_lpid;                                         
+	pid_t           shm_cpid;                           
+	short           shm_nattch;                                     
+	user_time_t     shm_atime;                                
+	user_time_t     shm_dtime;                                
+	user_time_t     shm_ctime;                                           
+	user_addr_t     shm_internal;                                
 };
 
 struct user32_shmid_ds {
-	struct ipc_perm shm_perm;       /* operation permission structure */
-	uint32_t        shm_segsz;      /* size of segment in bytes */
-	pid_t           shm_lpid;       /* PID of last shared memory op */
-	pid_t           shm_cpid;       /* PID of creator */
-	short           shm_nattch;     /* number of current attaches */
-	uint32_t                shm_atime;      /* time of last shmat() */
-	uint32_t                shm_dtime;      /* time of last shmdt() */
-	uint32_t                shm_ctime;      /* time of last change by shmctl() */
-	user32_addr_t   shm_internal;   /* reserved for kernel use */
+	struct ipc_perm shm_perm;                                           
+	uint32_t        shm_segsz;                                    
+	pid_t           shm_lpid;                                         
+	pid_t           shm_cpid;                           
+	short           shm_nattch;                                     
+	uint32_t                shm_atime;                                
+	uint32_t                shm_dtime;                                
+	uint32_t                shm_ctime;                                           
+	user32_addr_t   shm_internal;                                
 };
 
 #pragma pack()
 
-/*
- * System 5 style catch-all structure for shared memory constants that
- * might be of interest to user programs.  Also part of the ipcs interface.
- * Note: use of user_ssize_t intentional: permits 32 bit ipcs to provide
- * information about 64 bit programs shared segments.
- * Note 2: user_ssize_t is not that useful if it's not 64-bit,
- * so let's use int64_t explicitely...
- */
+  
+                                                                      
+                                                                           
+                                                                        
+                                                     
+                                                              
+                                      
+   
 struct shminfo {
-	int64_t shmmax;         /* max shm segment size (bytes) */
-	int64_t shmmin;         /* min shm segment size (bytes) */
-	int64_t shmmni;         /* max number of shm identifiers */
-	int64_t shmseg;         /* max shm segments per process */
-	int64_t shmall;         /* max amount of shm (pages) */
+	int64_t shmmax;                                           
+	int64_t shmmin;                                           
+	int64_t shmmni;                                            
+	int64_t shmseg;                                           
+	int64_t shmall;                                        
 };
 
 #ifdef KERNEL
 
 struct label;
 
-/*
- * Add a kernel wrapper to the shmid_ds struct so that private info (like the
- * MAC label) can be added to it, without changing the user interface.
- */
+  
+                                                                             
+                                                                      
+   
 struct shmid_kernel {
 	struct user_shmid_ds u;
-	struct label *label;    /* MAC label */
+	struct label *label;                   
 };
 
 extern struct shminfo shminfo;
@@ -146,6 +146,6 @@ __private_extern__ void shmexec(struct proc *);
 
 __END_DECLS
 
-#endif /* kernel */
+#endif             
 
-#endif /* !_SYS_SHM_INTERNALH_ */
+#endif                           

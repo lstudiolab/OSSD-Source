@@ -42,19 +42,19 @@
 
 #pragma mark - Building blocks
 
-//  Represents a position in the input stream
+                                             
 typedef struct { uint32_t offset; uint32_t word; } lz4_hash_entry_t;
 static const size_t lz4_hash_table_size = LZ4_COMPRESS_HASH_ENTRIES * sizeof(lz4_hash_entry_t);
 
-// Worker function for lz4 encode.  Underlies both the buffer and stream encode operations.
-// Performs lz4 encoding of up to 2gb of data, updates dst_ptr and src_ptr to point to the
-// first byte of output and input that couldn't be completely processed, respectively.
-//
-// If skip_final_literals is 0, the entire src buffer is encoded, by emitting a final sequence of literals
-// at the end of the compressed payload.
-//
-// If skip_final_literals is not 0, this final literal sequence is not emitted, and the src buffer is
-// partially encoded (the length of this literal sequence varies).
+                                                                                           
+                                                                                          
+                                                                                      
+  
+                                                                                                          
+                                        
+  
+                                                                                                     
+                                                                  
 extern void lz4_encode_2gb(uint8_t **dst_ptr, size_t dst_size,
     const uint8_t **src_ptr, const uint8_t *src_begin, size_t src_size,
     lz4_hash_entry_t hash_table[LZ4_COMPRESS_HASH_ENTRIES], int skip_final_literals);
@@ -101,7 +101,7 @@ typedef __attribute__((__ext_vector_type__(4))) uint32_t vector_uint4;
 
 #define UTIL_FUNCTION static inline __attribute__((__always_inline__)) __attribute__((__overloadable__))
 
-// Load N bytes from unaligned location PTR
+                                           
 UTIL_FUNCTION uint16_t
 load2(const void * ptr)
 {
@@ -133,7 +133,7 @@ load64(const void * ptr)
 	return (const vector_uchar64)*(const packed_uchar64 *)ptr;
 }
 
-// Store N bytes to unaligned location PTR
+                                          
 UTIL_FUNCTION void
 store2(void * ptr, uint16_t data)
 {
@@ -165,7 +165,7 @@ store64(void * ptr, vector_uchar64 data)
 	*(packed_uchar64 *)ptr = (packed_uchar64)data;
 }
 
-// Load+Store N bytes from unaligned locations SRC to DST. No overlap allowed.
+                                                                              
 UTIL_FUNCTION void
 copy8(void * dst, const void * src)
 {

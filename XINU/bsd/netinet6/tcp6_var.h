@@ -102,7 +102,7 @@
 SYSCTL_DECL(_net_inet6_tcp6);
 #endif
 
-extern  int tcp_v6mssdflt;      /* XXX */
+extern  int tcp_v6mssdflt;               
 
 struct  ip6_hdr;
 void    tcp6_ctlinput(int, struct sockaddr *, void *, struct ifnet *);
@@ -112,5 +112,5 @@ struct  rtentry *tcp_rtlookup6(struct inpcb *, unsigned int);
 
 extern struct   pr_usrreqs tcp6_usrreqs;
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET_TCP6_VAR_H_ */
+#endif                         
+#endif                           

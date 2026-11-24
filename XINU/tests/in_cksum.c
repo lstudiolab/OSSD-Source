@@ -88,7 +88,7 @@ in_cksum(void * pkt, int len)
 			sum += *w++;
 		}
 	}
-	if (len == -1) { /* odd-length packet */
+	if (len == -1) {                        
 		short_union_t s_util;
 
 		s_util.s = 0;

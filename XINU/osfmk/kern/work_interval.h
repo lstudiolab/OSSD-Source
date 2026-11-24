@@ -52,15 +52,15 @@ struct kern_work_interval_args {
 };
 
 struct kern_work_interval_create_args {
-	uint64_t        wica_id;          /* out param */
-	mach_port_name_t wica_port;        /* out param */
+	uint64_t        wica_id;                         
+	mach_port_name_t wica_port;                       
 	uint32_t        wica_create_flags;
 };
 
-/*
- * Allocate/assign a single work interval ID for a thread,
- * and support deallocating it.
- */
+  
+                                                          
+                               
+   
 extern kern_return_t
 kern_work_interval_create(thread_t thread, struct kern_work_interval_create_args *create_params);
 
@@ -86,11 +86,11 @@ bool work_interval_should_propagate(thread_t cthread, thread_t thread);
 void work_interval_auto_join_propagate(thread_t from, thread_t to);
 void work_interval_auto_join_unwind(thread_t thread);
 void work_interval_auto_join_demote(thread_t thread);
-#endif /* CONFIG_SCHED_AUTO_JOIN */
+#endif                             
 
 extern kern_return_t work_interval_thread_terminate(thread_t thread);
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 __END_DECLS
 
-#endif /* !defined(_KERN_WORK_INTERVAL_H_) */
+#endif                                       

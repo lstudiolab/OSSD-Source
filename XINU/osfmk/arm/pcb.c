@@ -54,23 +54,23 @@
 
 extern int      debug_task;
 
-/* zone for debug_state area */
+                               
 ZONE_DECLARE(ads_zone, "arm debug state", sizeof(arm_debug_state_t), ZC_NONE);
 
-/*
- * Routine:	consider_machine_collect
- *
- */
+  
+                                    
+  
+   
 void
 consider_machine_collect(void)
 {
 	pmap_gc();
 }
 
-/*
- * Routine:	consider_machine_adjust
- *
- */
+  
+                                   
+  
+   
 void
 consider_machine_adjust(void)
 {
@@ -79,29 +79,29 @@ consider_machine_adjust(void)
 static inline void
 machine_thread_switch_cpu_data(thread_t old, thread_t new)
 {
-	/*
-	 * We build with -fno-strict-aliasing, so the load through temporaries
-	 * is required so that this generates a single load / store pair.
-	 */
+	  
+                                                                       
+                                                                  
+    
 	cpu_data_t *datap = old->machine.CpuDatap;
 	vm_offset_t base  = old->machine.pcpu_data_base;
 
-	/* TODO: Should this be ordered? */
+	                                   
 
-	/*
-	 * arm relies on CpuDatap being set for a thread that has run,
-	 * so we only reset pcpu_data_base.
-	 */
+	  
+                                                               
+                                    
+    
 	old->machine.pcpu_data_base = -1;
 
 	new->machine.CpuDatap = datap;
 	new->machine.pcpu_data_base = base;
 }
 
-/*
- * Routine:	machine_switch_context
- *
- */
+  
+                                  
+  
+   
 thread_t
 machine_switch_context(
 	thread_t old,
@@ -111,7 +111,7 @@ machine_switch_context(
 	thread_t retval;
 
 #define machine_switch_context_kprintf(x...) \
-	/* kprintf("machine_switch_context: " x) */
+	                                           
 
 	if (old == new) {
 		panic("machine_switch_context");
@@ -119,15 +119,15 @@ machine_switch_context(
 
 	kpc_off_cpu(old);
 
-	/*
-	 * If the thread is preempted while performing cache or TLB maintenance,
-	 * it may be migrated to a different CPU between the completion of the relevant
-	 * maintenance instruction and the synchronizing DSB.   ARM requires that the
-	 * synchronizing DSB must be issued *on the PE that issued the maintenance instruction*
-	 * in order to guarantee completion of the instruction and visibility of its effects.
-	 * Issue DSB here to enforce that guarantee.  Note that due to __ARM_USER_PROTECT__,
-	 * pmap_set_pmap() will not update TTBR0 (which ordinarily would include DSB).
-	 */
+	  
+                                                                         
+                                                                                
+                                                                              
+                                                                                        
+                                                                                      
+                                                                                     
+                                                                               
+    
 	__builtin_arm_dsb(DSB_ISH);
 	pmap_set_pmap(new->map->pmap, new);
 
@@ -146,10 +146,10 @@ machine_thread_on_core(thread_t thread)
 	return thread->machine.pcpu_data_base != -1;
 }
 
-/*
- * Routine:	machine_thread_create
- *
- */
+  
+                                 
+  
+   
 kern_return_t
 machine_thread_create(
 	thread_t thread,
@@ -158,13 +158,13 @@ machine_thread_create(
 #endif
 	task_t task)
 {
-#define machine_thread_create_kprintf(x...)     /* kprintf("machine_thread_create: " x) */
+#define machine_thread_create_kprintf(x...)                                               
 
 	machine_thread_create_kprintf("thread = %x\n", thread);
 
 	if (current_thread() != thread) {
 		thread->machine.CpuDatap = (cpu_data_t *)0;
-		// setting this offset will cause trying to use it to panic
+		                                                           
 		thread->machine.pcpu_data_base = -1;
 	}
 	thread->machine.preemption_count = 0;
@@ -183,10 +183,10 @@ machine_thread_create(
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine:	machine_thread_destroy
- *
- */
+  
+                                  
+  
+   
 void
 machine_thread_destroy(
 	thread_t thread)
@@ -200,39 +200,39 @@ machine_thread_destroy(
 }
 
 
-/*
- * Routine:	machine_thread_init
- *
- */
+  
+                               
+  
+   
 void
 machine_thread_init(void)
 {
 }
 
-/*
- * Routine:	machine_thread_template_init
- *
- */
+  
+                                        
+  
+   
 void
 machine_thread_template_init(thread_t __unused thr_template)
 {
-	/* Nothing to do on this platform. */
+	                                     
 }
 
-/*
- * Routine:	get_useraddr
- *
- */
+  
+                        
+  
+   
 user_addr_t
 get_useraddr()
 {
 	return current_thread()->machine.PcbData.pc;
 }
 
-/*
- * Routine:	machine_stack_detach
- *
- */
+  
+                                
+  
+   
 vm_offset_t
 machine_stack_detach(
 	thread_t thread)
@@ -250,10 +250,10 @@ machine_stack_detach(
 }
 
 
-/*
- * Routine:	machine_stack_attach
- *
- */
+  
+                                
+  
+   
 void
 machine_stack_attach(
 	thread_t thread,
@@ -261,7 +261,7 @@ machine_stack_attach(
 {
 	struct arm_saved_state *savestate;
 
-#define machine_stack_attach_kprintf(x...)      /* kprintf("machine_stack_attach: " x) */
+#define machine_stack_attach_kprintf(x...)                                               
 
 	KERNEL_DEBUG(MACHDBG_CODE(DBG_MACH_SCHED, MACH_STACK_ATTACH),
 	    (uintptr_t)thread_tid(thread), thread->priority, thread->sched_pri, 0, 0);
@@ -281,10 +281,10 @@ machine_stack_attach(
 }
 
 
-/*
- * Routine:	machine_stack_handoff
- *
- */
+  
+                                 
+  
+   
 void
 machine_stack_handoff(
 	thread_t old,
@@ -303,15 +303,15 @@ machine_stack_handoff(
 		new->reserved_stack = stack;
 	}
 
-	/*
-	 * If the thread is preempted while performing cache or TLB maintenance,
-	 * it may be migrated to a different CPU between the completion of the relevant
-	 * maintenance instruction and the synchronizing DSB.   ARM requires that the
-	 * synchronizing DSB must be issued *on the PE that issued the maintenance instruction*
-	 * in order to guarantee completion of the instruction and visibility of its effects.
-	 * Issue DSB here to enforce that guarantee.  Note that due to __ARM_USER_PROTECT__,
-	 * pmap_set_pmap() will not update TTBR0 (which ordinarily would include DSB).
-	 */
+	  
+                                                                         
+                                                                                
+                                                                              
+                                                                                        
+                                                                                      
+                                                                                     
+                                                                               
+    
 	__builtin_arm_dsb(DSB_ISH);
 	pmap_set_pmap(new->map->pmap, new);
 
@@ -322,10 +322,10 @@ machine_stack_handoff(
 }
 
 
-/*
- * Routine:	call_continuation
- *
- */
+  
+                             
+  
+   
 void
 call_continuation(
 	thread_continue_t continuation,
@@ -333,8 +333,8 @@ call_continuation(
 	wait_result_t wresult,
 	boolean_t enable_interrupts)
 {
-#define call_continuation_kprintf(x...) /* kprintf("call_continuation_kprintf:
-	                                 *  " x) */
+#define call_continuation_kprintf(x...)                                       
+                                            
 
 	call_continuation_kprintf("thread = %x continuation = %x, stack = %x\n", current_thread(), continuation, current_thread()->machine.kstackptr);
 	Call_continuation(continuation, parameter, wresult, enable_interrupts);
@@ -343,10 +343,10 @@ call_continuation(
 void
 arm_debug_set(arm_debug_state_t *debug_state)
 {
-	/* If this CPU supports the memory-mapped debug interface, use it, otherwise
-	 * attempt the Extended CP14 interface.  The two routines need to be kept in sync,
-	 * functionality-wise.
-	 */
+	                                                                            
+                                                                                   
+                       
+    
 	struct cpu_data *cpu_data_ptr;
 	arm_debug_info_t *debug_info = arm_debug_info();
 	boolean_t       intr;
@@ -354,29 +354,29 @@ arm_debug_set(arm_debug_state_t *debug_state)
 	intr = ml_set_interrupts_enabled(FALSE);
 	cpu_data_ptr = getCpuDatap();
 
-	// Set current user debug
+	                         
 	cpu_data_ptr->cpu_user_debug = debug_state;
 
 	if (debug_info->memory_mapped_core_debug) {
 		int i;
 		uintptr_t debug_map = cpu_data_ptr->cpu_debug_interface_map;
 
-		// unlock debug registers
+		                         
 		*(volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGLAR) = ARM_DBG_LOCK_ACCESS_KEY;
 
-		// read DBGPRSR to clear the sticky power-down bit (necessary to access debug registers)
+		                                                                                        
 		*(volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGPRSR);
 
-		// enable monitor mode (needed to set and use debug registers)
+		                                                              
 		*(volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGDSCR) |= ARM_DBGDSCR_MDBGEN;
 
-		// first turn off all breakpoints/watchpoints
+		                                             
 		for (i = 0; i < 16; i++) {
 			((volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGBCR))[i] = 0;
 			((volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGWCR))[i] = 0;
 		}
 
-		// if (debug_state == NULL) disable monitor mode
+		                                                
 		if (debug_state == NULL) {
 			*(volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGDSCR) &= ~ARM_DBGDSCR_MDBGEN;
 		} else {
@@ -388,7 +388,7 @@ arm_debug_set(arm_debug_state_t *debug_state)
 			}
 		}
 
-		// lock debug registers
+		                       
 		*(volatile uint32_t *)(debug_map + ARM_DEBUG_OFFSET_DBGLAR) = 0;
 	} else if (debug_info->coprocessor_core_debug) {
 		arm_debug_set_cp14(debug_state);
@@ -397,10 +397,10 @@ arm_debug_set(arm_debug_state_t *debug_state)
 	(void) ml_set_interrupts_enabled(intr);
 }
 
-/*
- * Duplicate one arm_debug_state_t to another.  "all" parameter
- * is ignored in the case of ARM -- Is this the right assumption?
- */
+  
+                                                               
+                                                                 
+   
 void
 copy_debug_state(
 	arm_debug_state_t *src,
@@ -429,7 +429,7 @@ machine_thread_set_tsd_base(
 
 	thread->machine.cthread_self = tsd_base;
 
-	/* For current thread, make the TSD base active immediately */
+	                                                              
 	if (thread == current_thread()) {
 		mp_disable_preemption();
 		__asm__ volatile (
@@ -437,9 +437,9 @@ machine_thread_set_tsd_base(
                          "and	r6, r6, #3\n"
                          "orr	r6, r6, %0\n"
                          "mcr	p15, 0, r6, c13, c0, 3\n"
-                         :               /* output */
-                         : "r"((uint32_t)tsd_base)       /* input */
-                         : "r6"          /* clobbered register */
+                         :                           
+                         : "r"((uint32_t)tsd_base)                  
+                         : "r6"                                  
                 );
 		mp_enable_preemption();
 	}

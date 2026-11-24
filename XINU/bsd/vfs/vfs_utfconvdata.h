@@ -26,13 +26,13 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *       Derived from Core Foundation headers:
- *
- *               CFUniCharDecompData.h
- *               CFUniCharPrecompData.h
- *               CFUniCharNonBaseData.h
- */
+  
+                                              
+  
+                                      
+                                       
+                                       
+   
 
 static const u_int16_t
     __CFUniCharDecompositionTable[] = {

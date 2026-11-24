@@ -156,7 +156,7 @@
 #if defined(APPLETYPHOON) || defined(APPLETWISTER)
 #define ARM64_REG_CYC_CFG_skipInit     (1ULL<<30)
 #define ARM64_REG_CYC_CFG_deepSleep    (1ULL<<24)
-#else /* defined(APPLECYCLONE) || defined(APPLETYPHOON) || defined(APPLETWISTER) */
+#else                                                                              
 #define ARM64_REG_ACC_OVRD_enDeepSleep                 (1ULL << 34)
 #define ARM64_REG_ACC_OVRD_disPioOnWfiCpu              (1ULL << 32)
 #define ARM64_REG_ACC_OVRD_dsblClkDtr                  (1ULL << 29)
@@ -171,7 +171,7 @@
 #define ARM64_REG_ACC_OVRD_disL2Flush4AccSlp_deepsleep (2ULL << 15)
 #define ARM64_REG_ACC_OVRD_ok2PwrDnSRM_mask            (3ULL << 13)
 #define ARM64_REG_ACC_OVRD_ok2PwrDnSRM_deepsleep       (3ULL << 13)
-#endif /* defined(APPLECYCLONE) || defined(APPLETYPHOON) || defined(APPLETWISTER) */
+#endif                                                                              
 
 #define ARM64_REG_CYC_OVRD_irq_mask            (3<<22)
 #define ARM64_REG_CYC_OVRD_irq_disable         (2<<22)
@@ -183,8 +183,8 @@
 
 #if defined(APPLEMONSOON)
 #define ARM64_REG_CYC_OVRD_dsblSnoopTime_mask  (3ULL << 30)
-#define ARM64_REG_CYC_OVRD_dsblSnoopPTime      (1ULL << 31)  /// Don't fetch the timebase from the P-block
-#endif /* APPLEMONSOON */
+#define ARM64_REG_CYC_OVRD_dsblSnoopPTime      (1ULL << 31)                                               
+#endif                   
 
 #define ARM64_REG_LSU_ERR_STS_L1DTlbMultiHitEN (1ULL<<54)
 #define ARM64_REG_LSU_ERR_CTL_L1DTlbMultiHitEN (1ULL<<3)
@@ -195,17 +195,17 @@
 #define ARM64_REG_IPI_RR_TYPE_RETRACT   (1 << 28)
 #define ARM64_REG_IPI_RR_TYPE_DEFERRED  (2 << 28)
 #define ARM64_REG_IPI_RR_TYPE_NOWAKE    (3 << 28)
-#endif /* defined(HAS_IPI) */
+#endif                       
 
 
-#endif /* APPLE_ARM64_ARCH_FAMILY */
+#endif                              
 
 #if defined(HAS_NEX_PG)
 #define ARM64_REG_HID13_RstCyc_mask (0xfULL << 60)
 #define ARM64_REG_HID13_RstCyc_val  (0xcULL << 60)
 
 #define ARM64_REG_HID14_NexPwgEn    (1ULL << 32)
-#endif /* defined(HAS_NEX_PG) */
+#endif                          
 
 #define ARM64_REG_EHID20_forceNonSpecTargetedTimerSel_shift     (21)
 #define ARM64_REG_EHID20_forceNonSpecTargetedTimerSel_mask      (3ULL << ARM64_REG_EHID20_forceNonSpecTargetedTimerSel_shift)
@@ -220,7 +220,7 @@
 #define ARM64_REG_ACC_CFG_btpSlpEn    (1ULL << 3)
 #define ARM64_REG_ACC_CFG_bpSlp_mask  3
 #define ARM64_REG_ACC_CFG_bpSlp_shift 2
-#endif /* defined(HAS_BP_RET) */
+#endif                          
 
 #if defined(HAS_VMSA_LOCK)
 #define VMSA_LOCK_VBAR_EL1      (1ULL << 0)
@@ -229,9 +229,9 @@
 #define VMSA_LOCK_TTBR0_EL1     (1ULL << 3)
 #define VMSA_LOCK_TTBR1_EL1     (1ULL << 4)
 #define VMSA_LOCK_SCTLR_M_BIT   (1ULL << 63)
-#endif /* HAS_VMSA_LOCK */
+#endif                    
 
-#define MPIDR_PNE_SHIFT 16 // pcore not ecore
+#define MPIDR_PNE_SHIFT 16                   
 #define MPIDR_PNE       (1 << MPIDR_PNE_SHIFT)
 
 
@@ -241,57 +241,57 @@
 
 #ifdef ASSEMBLER
 
-/*
- * arg0: register in which to store result
- *   0=>not a p-core, non-zero=>p-core
- */
+  
+                                          
+                                      
+   
 .macro ARM64_IS_PCORE
 #if defined(APPLEMONSOON) || HAS_CLUSTER
 	mrs $0, MPIDR_EL1
 	and $0, $0, #(MPIDR_PNE)
-#endif /* defined(APPLEMONSOON) || HAS_CLUSTER */
+#endif                                           
 .endmacro
 
-/*
- * reads a special purpose register, using a different msr for e- vs. p-cores
- *   arg0: register indicating the current core type, see ARM64_IS_PCORE
- *   arg1: register in which to store the result of the read
- *   arg2: SPR to use for e-core
- *   arg3: SPR to use for p-core or non-AMP architecture
- */
+  
+                                                                             
+                                                                        
+                                                            
+                                
+                                                        
+   
 .macro ARM64_READ_EP_SPR
 #if defined(APPLEMONSOON) || HAS_CLUSTER
 	cbnz $0, 1f
-// e-core
+         
 	mrs  $1, $2
 	b    2f
-// p-core
+         
 1:
-#endif /* defined(APPLEMONSOON) || HAS_CLUSTER */
+#endif                                           
 	mrs  $1, $3
 2:
 .endmacro
 
-/*
- * writes a special purpose register, using a different msr for e- vs. p-cores
- * arg0: register indicating the current core type, see ARM64_IS_PCORE
- * arg1: register containing the value to write
- * arg2: SPR to use for e-core
- * arg3: SPR to use for p-core or non-AMP architecture
- */
+  
+                                                                              
+                                                                      
+                                               
+                              
+                                                      
+   
 .macro ARM64_WRITE_EP_SPR
 #if defined(APPLEMONSOON) || HAS_CLUSTER
 	cbnz $0, 1f
-// e-core
+         
 	msr  $2, $1
 	b    2f
-// p-core
+         
 1:
-#endif /* defined(APPLEMONSOON) || HAS_CLUSTER */
+#endif                                           
 	msr  $3, $1
 2:
 .endmacro
 
-#endif /* ASSEMBLER */
+#endif                
 
-#endif /* ! _PEXPERT_ARM_ARM64_H */
+#endif                             

@@ -40,8 +40,8 @@
 #ifndef __ASSEMBLER__
 #include <sys/commpage.h>
 
-extern  void    commpage_populate( void );      /* called once during startup */
+extern  void    commpage_populate( void );                                      
 extern  void    commpage_text_populate( void );
-#endif  /* __ASSEMBLER__ */
+#endif                     
 
-#endif  /* _MACHINE_COMMPAGE_H */
+#endif                           

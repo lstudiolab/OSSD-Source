@@ -29,12 +29,12 @@
  * @OSF_COPYRIGHT@
  *
  */
-/*
- *	File:	kern/sync_sema.c
- *	Author:	Joseph CaraDonna
- *
- *	Contains RT distributed semaphore synchronization services.
- */
+  
+                         
+                           
+  
+                                                              
+   
 
 #include <mach/mach_types.h>
 #include <mach/mach_traps.h>
@@ -67,7 +67,7 @@ ZONE_DECLARE(semaphore_zone, "semaphores", sizeof(struct semaphore), ZC_NONE);
 
 os_refgrp_decl(static, sema_refgrp, "semaphore", NULL);
 
-/* Forward declarations */
+                          
 
 
 kern_return_t
@@ -133,12 +133,12 @@ semaphore_deadline(
 	return abstime;
 }
 
-/*
- *	Routine:	semaphore_create
- *
- *	Creates a semaphore.
- *	The port representing the semaphore is returned as a parameter.
- */
+  
+                            
+  
+                       
+                                                                  
+   
 kern_return_t
 semaphore_create(
 	task_t                  task,
@@ -160,27 +160,27 @@ semaphore_create(
 		return KERN_RESOURCE_SHORTAGE;
 	}
 
-	kret = waitq_init(&s->waitq, policy | SYNC_POLICY_DISABLE_IRQ); /* also inits lock */
+	kret = waitq_init(&s->waitq, policy | SYNC_POLICY_DISABLE_IRQ);                      
 	if (kret != KERN_SUCCESS) {
 		zfree(semaphore_zone, s);
 		return kret;
 	}
 
-	/*
-	 * Initialize the semaphore values.
-	 */
+	  
+                                    
+    
 	s->port = IP_NULL;
 	os_ref_init(&s->ref_count, &sema_refgrp);
 	s->count = value;
 	s->active = TRUE;
 	s->owner = task;
 
-	/*
-	 *  Associate the new semaphore with the task by adding
-	 *  the new semaphore to the task's semaphore list.
-	 */
+	  
+                                                        
+                                                    
+    
 	task_lock(task);
-	/* Check for race with task_terminate */
+	                                        
 	if (!task->active) {
 		task_unlock(task);
 		zfree(semaphore_zone, s);
@@ -195,19 +195,19 @@ semaphore_create(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	semaphore_destroy_internal
- *
- *	Disassociate a semaphore from its owning task, mark it inactive,
- *	and set any waiting threads running with THREAD_RESTART.
- *
- *	Conditions:
- *			task is locked
- *			semaphore is locked
- *			semaphore is owned by the specified task
- *	Returns:
- *			with semaphore unlocked
- */
+  
+                                      
+  
+                                                                   
+                                                           
+  
+              
+                   
+                        
+                                             
+           
+                            
+   
 static void
 semaphore_destroy_internal(
 	task_t                  task,
@@ -215,21 +215,21 @@ semaphore_destroy_internal(
 {
 	int                     old_count;
 
-	/* unlink semaphore from owning task */
+	                                       
 	assert(semaphore->owner == task);
 	remqueue((queue_entry_t) semaphore);
 	semaphore->owner = TASK_NULL;
 	task->semaphores_owned--;
 
-	/*
-	 *  Deactivate semaphore
-	 */
+	  
+                         
+    
 	assert(semaphore->active);
 	semaphore->active = FALSE;
 
-	/*
-	 *  Wakeup blocked threads
-	 */
+	  
+                           
+    
 	old_count = semaphore->count;
 	semaphore->count = 0;
 
@@ -239,18 +239,18 @@ semaphore_destroy_internal(
 		    THREAD_RESTART, NULL,
 		    WAITQ_ALL_PRIORITIES,
 		    WAITQ_UNLOCK);
-		/* waitq/semaphore is unlocked */
+		                                 
 	} else {
 		semaphore_unlock(semaphore);
 	}
 }
 
-/*
- *	Routine:	semaphore_destroy
- *
- *	Destroys a semaphore and consume the caller's reference on the
- *	semaphore.
- */
+  
+                             
+  
+                                                                 
+             
+   
 kern_return_t
 semaphore_destroy(
 	task_t                  task,
@@ -280,7 +280,7 @@ semaphore_destroy(
 	}
 
 	semaphore_destroy_internal(task, semaphore);
-	/* semaphore unlocked */
+	                        
 
 	splx(spl_level);
 	task_unlock(task);
@@ -289,12 +289,12 @@ semaphore_destroy(
 	return KERN_SUCCESS;
 }
 
-/*
- *	Routine:	semaphore_destroy_all
- *
- *	Destroy all the semaphores associated with a given task.
- */
-#define SEMASPERSPL 20  /* max number of semaphores to destroy per spl hold */
+  
+                                 
+  
+                                                           
+   
+#define SEMASPERSPL 20                                                        
 
 void
 semaphore_destroy_all(
@@ -316,9 +316,9 @@ semaphore_destroy_all(
 		semaphore_lock(semaphore);
 
 		semaphore_destroy_internal(task, semaphore);
-		/* semaphore unlocked */
+		                        
 
-		/* throttle number of semaphores per interrupt disablement */
+		                                                             
 		if (++count == SEMASPERSPL) {
 			count = 0;
 			splx(spl_level);
@@ -331,13 +331,13 @@ semaphore_destroy_all(
 	task_unlock(task);
 }
 
-/*
- *	Routine:	semaphore_signal_internal
- *
- *		Signals the semaphore as direct.
- *	Assumptions:
- *		Semaphore is locked.
- */
+  
+                                     
+  
+                                    
+               
+                        
+   
 kern_return_t
 semaphore_signal_internal(
 	semaphore_t             semaphore,
@@ -364,7 +364,7 @@ semaphore_signal_internal(
 				thread,
 				THREAD_AWAKENED,
 				WAITQ_UNLOCK);
-			/* waitq/semaphore is unlocked */
+			                                 
 		} else {
 			kr = KERN_NOT_WAITING;
 			semaphore_unlock(semaphore);
@@ -378,14 +378,14 @@ semaphore_signal_internal(
 
 		kr = KERN_NOT_WAITING;
 		if (old_count < 0) {
-			semaphore->count = 0;  /* always reset */
+			semaphore->count = 0;                    
 			kr = waitq_wakeup64_all_locked(
 				&semaphore->waitq,
 				SEMAPHORE_EVENT,
 				THREAD_AWAKENED, NULL,
 				WAITQ_ALL_PRIORITIES,
 				WAITQ_UNLOCK);
-			/* waitq / semaphore is unlocked */
+			                                   
 		} else {
 			if (options & SEMAPHORE_SIGNAL_PREPOST) {
 				semaphore->count++;
@@ -412,7 +412,7 @@ semaphore_signal_internal(
 			splx(spl_level);
 			return KERN_SUCCESS;
 		} else {
-			semaphore->count = 0;  /* all waiters gone */
+			semaphore->count = 0;                        
 		}
 	}
 
@@ -425,14 +425,14 @@ semaphore_signal_internal(
 	return KERN_NOT_WAITING;
 }
 
-/*
- *	Routine:	semaphore_signal_thread
- *
- *	If the specified thread is blocked on the semaphore, it is
- *	woken up.  If a NULL thread was supplied, then any one
- *	thread is woken up.  Otherwise the caller gets KERN_NOT_WAITING
- *	and the	semaphore is unchanged.
- */
+  
+                                   
+  
+                                                             
+                                                         
+                                                                  
+                                  
+   
 kern_return_t
 semaphore_signal_thread(
 	semaphore_t     semaphore,
@@ -450,11 +450,11 @@ semaphore_signal_thread(
 	return ret;
 }
 
-/*
- *	Routine:	semaphore_signal_thread_trap
- *
- *	Trap interface to the semaphore_signal_thread function.
- */
+  
+                                        
+  
+                                                          
+   
 kern_return_t
 semaphore_signal_thread_trap(
 	struct semaphore_signal_thread_trap_args *args)
@@ -465,11 +465,11 @@ semaphore_signal_thread_trap(
 	thread_t        thread;
 	kern_return_t   kr;
 
-	/*
-	 * MACH_PORT_NULL is not an error. It means that we want to
-	 * select any one thread that is already waiting, but not to
-	 * pre-post the semaphore.
-	 */
+	  
+                                                            
+                                                             
+                           
+    
 	if (thread_name != MACH_PORT_NULL) {
 		thread = port_name_to_thread(thread_name, PORT_TO_THREAD_NONE);
 		if (thread == THREAD_NULL) {
@@ -494,17 +494,17 @@ semaphore_signal_thread_trap(
 
 
 
-/*
- *	Routine:	semaphore_signal
- *
- *		Traditional (in-kernel client and MIG interface) semaphore
- *		signal routine.  Most users will access the trap version.
- *
- *		This interface in not defined to return info about whether
- *		this call found a thread waiting or not.  The internal
- *		routines (and future external routines) do.  We have to
- *		convert those into plain KERN_SUCCESS returns.
- */
+  
+                            
+  
+                                                              
+                                                             
+  
+                                                              
+                                                          
+                                                           
+                                                  
+   
 kern_return_t
 semaphore_signal(
 	semaphore_t             semaphore)
@@ -524,11 +524,11 @@ semaphore_signal(
 	return kr;
 }
 
-/*
- *	Routine:	semaphore_signal_trap
- *
- *	Trap interface to the semaphore_signal function.
- */
+  
+                                 
+  
+                                                   
+   
 kern_return_t
 semaphore_signal_trap(
 	struct semaphore_signal_trap_args *args)
@@ -557,12 +557,12 @@ semaphore_signal_internal_trap(mach_port_name_t sema_name)
 	return kr;
 }
 
-/*
- *	Routine:	semaphore_signal_all
- *
- *	Awakens ALL threads currently blocked on the semaphore.
- *	The semaphore count returns to zero.
- */
+  
+                                
+  
+                                                          
+                                       
+   
 kern_return_t
 semaphore_signal_all(
 	semaphore_t             semaphore)
@@ -582,11 +582,11 @@ semaphore_signal_all(
 	return kr;
 }
 
-/*
- *	Routine:	semaphore_signal_all_trap
- *
- *	Trap interface to the semaphore_signal_all function.
- */
+  
+                                     
+  
+                                                       
+   
 kern_return_t
 semaphore_signal_all_trap(
 	struct semaphore_signal_all_trap_args *args)
@@ -608,13 +608,13 @@ semaphore_signal_all_trap(
 	return kr;
 }
 
-/*
- *	Routine:	semaphore_convert_wait_result
- *
- *	Generate the return code after a semaphore wait/block.  It
- *	takes the wait result as an input and coverts that to an
- *	appropriate result.
- */
+  
+                                         
+  
+                                                             
+                                                           
+                      
+   
 kern_return_t
 semaphore_convert_wait_result(int wait_result)
 {
@@ -637,12 +637,12 @@ semaphore_convert_wait_result(int wait_result)
 	}
 }
 
-/*
- *	Routine:	semaphore_wait_continue
- *
- *	Common continuation routine after waiting on a semphore.
- *	It returns directly to user space.
- */
+  
+                                   
+  
+                                                           
+                                     
+   
 void
 semaphore_wait_continue(void *arg __unused, wait_result_t wr)
 {
@@ -660,17 +660,17 @@ semaphore_wait_continue(void *arg __unused, wait_result_t wr)
 	(*caller_cont)(semaphore_convert_wait_result(wr));
 }
 
-/*
- *	Routine:	semaphore_wait_internal
- *
- *		Decrements the semaphore count by one.  If the count is
- *		negative after the decrement, the calling thread blocks
- *		(possibly at a continuation and/or with a timeout).
- *
- *	Assumptions:
- *		The reference
- *		A reference is held on the signal semaphore.
- */
+  
+                                   
+  
+                                                           
+                                                           
+                                                       
+  
+               
+                 
+                                                
+   
 static kern_return_t
 semaphore_wait_internal(
 	semaphore_t             wait_semaphore,
@@ -698,7 +698,7 @@ semaphore_wait_internal(
 	} else if (option & SEMAPHORE_TIMEOUT_NOBLOCK) {
 		kr = KERN_OPERATION_TIMED_OUT;
 	} else {
-		wait_semaphore->count = -1;  /* we don't keep an actual count */
+		wait_semaphore->count = -1;                                     
 
 		thread_set_pending_block_hint(self, kThreadWaitSemaphore);
 		(void)waitq_assert_wait64_locked(
@@ -714,18 +714,18 @@ semaphore_wait_internal(
 	semaphore_unlock(wait_semaphore);
 	splx(spl_level);
 
-	/*
-	 * wait_semaphore is unlocked so we are free to go ahead and
-	 * signal the signal_semaphore (if one was provided).
-	 */
+	  
+                                                             
+                                                      
+    
 	if (signal_semaphore != SEMAPHORE_NULL) {
 		kern_return_t signal_kr;
 
-		/*
-		 * lock the signal semaphore reference we got and signal it.
-		 * This will NOT block (we cannot block after having asserted
-		 * our intention to wait above).
-		 */
+		  
+                                                              
+                                                               
+                                  
+     
 		signal_kr = semaphore_signal_internal(signal_semaphore,
 		    THREAD_NULL, semaphore_signal_options);
 
@@ -733,19 +733,19 @@ semaphore_wait_internal(
 			assert(self->handoff_thread == THREAD_NULL);
 			signal_kr = KERN_SUCCESS;
 		} else if (signal_kr == KERN_TERMINATED) {
-			/*
-			 * Uh!Oh!  The semaphore we were to signal died.
-			 * We have to get ourselves out of the wait in
-			 * case we get stuck here forever (it is assumed
-			 * that the semaphore we were posting is gating
-			 * the decision by someone else to post the
-			 * semaphore we are waiting on).  People will
-			 * discover the other dead semaphore soon enough.
-			 * If we got out of the wait cleanly (someone
-			 * already posted a wakeup to us) then return that
-			 * (most important) result.  Otherwise,
-			 * return the KERN_TERMINATED status.
-			 */
+			  
+                                                   
+                                                 
+                                                   
+                                                  
+                                              
+                                                
+                                                    
+                                                
+                                                     
+                                          
+                                        
+      
 			assert(self->handoff_thread == THREAD_NULL);
 			clear_wait(self, THREAD_INTERRUPTED);
 			kr = semaphore_convert_wait_result(self->wait_result);
@@ -755,10 +755,10 @@ semaphore_wait_internal(
 		}
 	}
 
-	/*
-	 * If we had an error, or we didn't really need to wait we can
-	 * return now that we have signalled the signal semaphore.
-	 */
+	  
+                                                               
+                                                           
+    
 	if (kr != KERN_ALREADY_WAITING) {
 		assert(self->handoff_thread == THREAD_NULL);
 		return kr;
@@ -769,13 +769,13 @@ semaphore_wait_internal(
 		self->handoff_thread = THREAD_NULL;
 		handoff_option = THREAD_HANDOFF_SETRUN_NEEDED;
 	}
-	/*
-	 * Now, we can block.  If the caller supplied a continuation
-	 * pointer of his own for after the block, block with the
-	 * appropriate semaphore continuation.  This will gather the
-	 * semaphore results, release references on the semaphore(s),
-	 * and then call the caller's continuation.
-	 */
+	  
+                                                             
+                                                          
+                                                             
+                                                              
+                                            
+    
 	if (caller_cont) {
 		self->sth_continuation = caller_cont;
 		self->sth_waitsemaphore = wait_semaphore;
@@ -792,12 +792,12 @@ semaphore_wait_internal(
 }
 
 
-/*
- *	Routine:	semaphore_wait
- *
- *	Traditional (non-continuation) interface presented to
- *      in-kernel clients to wait on a semaphore.
- */
+  
+                          
+  
+                                                        
+                                                 
+   
 kern_return_t
 semaphore_wait(
 	semaphore_t             semaphore)
@@ -841,12 +841,12 @@ semaphore_wait_deadline(
 	           (void (*)(kern_return_t))0);
 }
 
-/*
- *	Trap:	semaphore_wait_trap
- *
- *	Trap version of semaphore wait.  Called on behalf of user-level
- *	clients.
- */
+  
+                            
+  
+                                                                  
+           
+   
 
 kern_return_t
 semaphore_wait_trap(
@@ -876,14 +876,14 @@ semaphore_wait_trap_internal(
 	return kr;
 }
 
-/*
- *	Routine:	semaphore_timedwait
- *
- *	Traditional (non-continuation) interface presented to
- *      in-kernel clients to wait on a semaphore with a timeout.
- *
- *	A timeout of {0,0} is considered non-blocking.
- */
+  
+                               
+  
+                                                        
+                                                                
+  
+                                                 
+   
 kern_return_t
 semaphore_timedwait(
 	semaphore_t             semaphore,
@@ -912,17 +912,17 @@ semaphore_timedwait(
 	           (void (*)(kern_return_t))0);
 }
 
-/*
- *	Trap:	semaphore_timedwait_trap
- *
- *	Trap version of a semaphore_timedwait.  The timeout parameter
- *	is passed in two distinct parts and re-assembled on this side
- *	of the trap interface (to accomodate calling conventions that
- *	pass structures as pointers instead of inline in registers without
- *	having to add a copyin).
- *
- *	A timeout of {0,0} is considered non-blocking.
- */
+  
+                                 
+  
+                                                                
+                                                                
+                                                                
+                                                                     
+                           
+  
+                                                 
+   
 kern_return_t
 semaphore_timedwait_trap(
 	struct semaphore_timedwait_trap_args *args)
@@ -968,14 +968,14 @@ semaphore_timedwait_trap_internal(
 	return kr;
 }
 
-/*
- *	Routine:	semaphore_wait_signal
- *
- *	Atomically register a wait on a semaphore and THEN signal
- *	another.  This is the in-kernel entry point that does not
- *	block at a continuation and does not free a signal_semaphore
- *      reference.
- */
+  
+                                 
+  
+                                                            
+                                                            
+                                                               
+                  
+   
 kern_return_t
 semaphore_wait_signal(
 	semaphore_t             wait_semaphore,
@@ -991,12 +991,12 @@ semaphore_wait_signal(
 	           (void (*)(kern_return_t))0);
 }
 
-/*
- *	Trap:	semaphore_wait_signal_trap
- *
- *	Atomically register a wait on a semaphore and THEN signal
- *	another.  This is the trap version from user space.
- */
+  
+                                   
+  
+                                                            
+                                                      
+   
 kern_return_t
 semaphore_wait_signal_trap(
 	struct semaphore_wait_signal_trap_args *args)
@@ -1030,15 +1030,15 @@ semaphore_wait_signal_trap_internal(
 }
 
 
-/*
- *	Routine:	semaphore_timedwait_signal
- *
- *	Atomically register a wait on a semaphore and THEN signal
- *	another.  This is the in-kernel entry point that does not
- *	block at a continuation.
- *
- *	A timeout of {0,0} is considered non-blocking.
- */
+  
+                                      
+  
+                                                            
+                                                            
+                           
+  
+                                                 
+   
 kern_return_t
 semaphore_timedwait_signal(
 	semaphore_t             wait_semaphore,
@@ -1068,12 +1068,12 @@ semaphore_timedwait_signal(
 	           (void (*)(kern_return_t))0);
 }
 
-/*
- *	Trap:	semaphore_timedwait_signal_trap
- *
- *	Atomically register a timed wait on a semaphore and THEN signal
- *	another.  This is the trap version from user space.
- */
+  
+                                        
+  
+                                                                  
+                                                      
+   
 kern_return_t
 semaphore_timedwait_signal_trap(
 	struct semaphore_timedwait_signal_trap_args *args)
@@ -1125,12 +1125,12 @@ semaphore_timedwait_signal_trap_internal(
 }
 
 
-/*
- *	Routine:	semaphore_reference
- *
- *	Take out a reference on a semaphore.  This keeps the data structure
- *	in existence (but the semaphore may be deactivated).
- */
+  
+                               
+  
+                                                                      
+                                                       
+   
 void
 semaphore_reference(
 	semaphore_t             semaphore)
@@ -1138,12 +1138,12 @@ semaphore_reference(
 	os_ref_retain(&semaphore->ref_count);
 }
 
-/*
- *	Routine:	semaphore_dereference
- *
- *	Release a reference on a semaphore.  If this is the last reference,
- *	the semaphore data structure is deallocated.
- */
+  
+                                 
+  
+                                                                      
+                                               
+   
 void
 semaphore_dereference(
 	semaphore_t             semaphore)
@@ -1159,12 +1159,12 @@ semaphore_dereference(
 		return;
 	}
 
-	/*
-	 * Last ref, clean up the port [if any]
-	 * associated with the semaphore, destroy
-	 * it (if still active) and then free
-	 * the semaphore.
-	 */
+	  
+                                        
+                                          
+                                      
+                  
+    
 	ipc_port_t port = semaphore->port;
 
 	if (IP_VALID(port)) {
@@ -1172,10 +1172,10 @@ semaphore_dereference(
 		ipc_port_dealloc_kernel(port);
 	}
 
-	/*
-	 * Lock the semaphore to lock in the owner task reference.
-	 * Then continue to try to lock the task (inverse order).
-	 */
+	  
+                                                           
+                                                          
+    
 	spl_level = splsched();
 	semaphore_lock(semaphore);
 	for (collisions = 0; semaphore->active; collisions++) {
@@ -1185,13 +1185,13 @@ semaphore_dereference(
 
 		if (task_lock_try(task)) {
 			semaphore_destroy_internal(task, semaphore);
-			/* semaphore unlocked */
+			                        
 			splx(spl_level);
 			task_unlock(task);
 			goto out;
 		}
 
-		/* failed to get out-of-order locks */
+		                                      
 		semaphore_unlock(semaphore);
 		splx(spl_level);
 		mutex_pause(collisions);

@@ -32,10 +32,10 @@
 #define super OSObject
 OSDefineMetaClassAndStructors(IOPMinformeeList, OSObject)
 
-//*********************************************************************************
-// init
-//
-//*********************************************************************************
+                                                                                   
+       
+  
+                                                                                   
 void
 IOPMinformeeList::initialize( void )
 {
@@ -43,25 +43,25 @@ IOPMinformeeList::initialize( void )
 	length = 0;
 }
 
-//******************************************************************************
-// getSharedRecursiveLock
-//
-//******************************************************************************
+                                                                                
+                         
+  
+                                                                                
 IORecursiveLock *
 IOPMinformeeList::getSharedRecursiveLock( void )
 {
 	static IORecursiveLock *sharedListLock = NULL;
 
-	/* A running system could have 50-60+ instances of IOPMInformeeList.
-	 * They'll share this lock, since list insertion and removal is relatively
-	 * rare, and generally tied to major events like device discovery.
-	 *
-	 * getSharedRecursiveLock() is called from IOStartIOKit to initialize
-	 * the sharedListLock before any IOPMinformeeLists are instantiated.
-	 *
-	 * The IOPMinformeeList class will be around for the lifetime of the system,
-	 * we don't worry about freeing this lock.
-	 */
+	                                                                    
+                                                                           
+                                                                   
+   
+                                                                      
+                                                                     
+   
+                                                                             
+                                           
+    
 
 	if (NULL == sharedListLock) {
 		sharedListLock = IORecursiveLockAlloc();
@@ -69,10 +69,10 @@ IOPMinformeeList::getSharedRecursiveLock( void )
 	return sharedListLock;
 }
 
-//*********************************************************************************
-// appendNewInformee
-//
-//*********************************************************************************
+                                                                                   
+                    
+  
+                                                                                   
 IOPMinformee *
 IOPMinformeeList::appendNewInformee( IOService * newObject )
 {
@@ -97,11 +97,11 @@ IOPMinformeeList::appendNewInformee( IOService * newObject )
 }
 
 
-//*********************************************************************************
-// addToList
-// *OBSOLETE* do not call from outside of this file.
-// Try appendNewInformee() instead
-//*********************************************************************************
+                                                                                   
+            
+                                                    
+                                  
+                                                                                   
 IOReturn
 IOPMinformeeList::addToList( IOPMinformee * newInformee )
 {
@@ -114,13 +114,13 @@ IOPMinformeeList::addToList( IOPMinformee * newInformee )
 
 	IORecursiveLockLock(listLock);
 
-	// Is new object already in the list?
+	                                     
 	if (findItem(newInformee->whatObject) != NULL) {
-		// object is present; just exit
+		                               
 		goto unlock_and_exit;
 	}
 
-	// add it to the front of the list
+	                                  
 	newInformee->nextInList = firstItem;
 	firstItem = newInformee;
 	length++;
@@ -132,11 +132,11 @@ unlock_and_exit:
 }
 
 
-//*********************************************************************************
-// removeFromList
-//
-// Find the item in the list, unlink it, and free it.
-//*********************************************************************************
+                                                                                   
+                 
+  
+                                                     
+                                                                                   
 
 IOReturn
 IOPMinformeeList::removeFromList( IOService * theItem )
@@ -178,10 +178,10 @@ unlock_and_exit:
 }
 
 
-//*********************************************************************************
-// firstInList
-//
-//*********************************************************************************
+                                                                                   
+              
+  
+                                                                                   
 
 IOPMinformee *
 IOPMinformeeList::firstInList( void )
@@ -189,10 +189,10 @@ IOPMinformeeList::firstInList( void )
 	return firstItem;
 }
 
-//*********************************************************************************
-// nextInList
-//
-//*********************************************************************************
+                                                                                   
+             
+  
+                                                                                   
 
 IOPMinformee *
 IOPMinformeeList::nextInList( IOPMinformee * currentItem )
@@ -203,10 +203,10 @@ IOPMinformeeList::nextInList( IOPMinformee * currentItem )
 	return NULL;
 }
 
-//*********************************************************************************
-// numberOfItems
-//
-//*********************************************************************************
+                                                                                   
+                
+  
+                                                                                   
 
 unsigned long
 IOPMinformeeList::numberOfItems( void )
@@ -214,12 +214,12 @@ IOPMinformeeList::numberOfItems( void )
 	return length;
 }
 
-//*********************************************************************************
-// findItem
-//
-// Look through the list for the one which points to the object identified
-// by the parameter.  Return a pointer to the list item or NULL.
-//*********************************************************************************
+                                                                                   
+           
+  
+                                                                          
+                                                                
+                                                                                   
 
 IOPMinformee *
 IOPMinformeeList::findItem( IOService * driverOrChild )
@@ -238,11 +238,11 @@ IOPMinformeeList::findItem( IOService * driverOrChild )
 
 
 
-//*********************************************************************************
-// free
-//
-// Free all items in the list, and then free the list itself
-//*********************************************************************************
+                                                                                   
+       
+  
+                                                            
+                                                                                   
 
 void
 IOPMinformeeList::free(void )

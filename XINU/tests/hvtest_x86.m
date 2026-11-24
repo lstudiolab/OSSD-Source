@@ -17,7 +17,7 @@
 T_GLOBAL_META(
 	T_META_NAMESPACE("xnu.intel.hv"),
 	T_META_RUN_CONCURRENTLY(true),
-	T_META_REQUIRES_SYSCTL_NE("hw.optional.arm64", 1) // Don't run translated.
+	T_META_REQUIRES_SYSCTL_NE("hw.optional.arm64", 1)                         
 	);
 
 static bool
@@ -78,10 +78,10 @@ static pthread_mutex_t page_cache_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static uint64_t next_phys = 0x4000000;
 
-/*
- * Map a page into guest's physical address space, return gpa of the
- * page.  If *host_uva is NULL, a new host user page is allocated.
- */
+  
+                                                                    
+                                                                  
+   
 static hv_gpaddr_t
 map_guest_phys(void **host_uva)
 {
@@ -111,7 +111,7 @@ map_guest_phys(void **host_uva)
 static uint64_t *pml4;
 static hv_gpaddr_t pml4_gpa;
 
-/* Stolen from kern/bits.h, which cannot be included outside the kernel. */
+                                                                           
 #define BIT(b)                          (1ULL << (b))
 
 #define mask(width)                     (width >= 64 ? (unsigned long long)-1 : (BIT(width) - 1))
@@ -119,10 +119,10 @@ static hv_gpaddr_t pml4_gpa;
 #define bits(x, hi, lo)                 extract((x), (lo), (hi) - (lo) + 1)
 
 
-/*
- * Enter a page in a level of long mode's PML4 paging structures.
- * Helper for fault_in_page.
- */
+  
+                                                                 
+                            
+   
 static void *
 enter_level(uint64_t *table, void *host_va, void *va, int hi, int lo) {
     uint64_t * const te = &table[bits(va, hi, lo)];
@@ -149,11 +149,11 @@ enter_level(uint64_t *table, void *host_va, void *va, int hi, int lo) {
     return host_va;
 }
 
-/*
- * Enters a page both into the guest paging structures and the EPT
- * (long mode PML4 only, real mode and protected mode support running
- * without paging, and that's what they use instead.)
- */
+  
+                                                                  
+                                                                     
+                                                     
+   
 static void *
 map_page(void *host_va, void *va) {
     uint64_t *pdpt = enter_level(pml4, NULL, va, 47, 39);
@@ -207,20 +207,20 @@ run_to_next_vm_fault(hv_vcpuid_t vcpu, bool on_demand_paging)
             if (exit_reason == VMX_REASON_EXC_NMI &&
                 (info & 0x800003ff) == 0x8000030e &&
                 (error_code & 0x1) == 0) {
-                // guest paging fault
+                                     
                 fault_in_page((void*)qual);
                 retry = true;
             }
             else if (exit_reason == VMX_REASON_EPT_VIOLATION) {
                 if ((qual & 0x86) == 0x82) {
-                    // EPT write fault
+                                      
                     T_QUIET; T_ASSERT_EQ(hv_vm_protect(gpa & ~(hv_gpaddr_t)PAGE_MASK, vm_page_size,
                                                        HV_MEMORY_READ | HV_MEMORY_WRITE),
                                          HV_SUCCESS, "make page writable");
                     retry = true;
                 }
                 else if ((qual & 0x86) == 0x84) {
-                    // EPT exec fault
+                                     
                     T_QUIET; T_ASSERT_EQ(hv_vm_protect(gpa & ~(hv_gpaddr_t)PAGE_MASK, vm_page_size,
                                                        HV_MEMORY_READ | HV_MEMORY_EXEC),
                                          HV_SUCCESS, "make page executable");
@@ -230,13 +230,13 @@ run_to_next_vm_fault(hv_vcpuid_t vcpu, bool on_demand_paging)
         }
 	} while (retry);
 
-    // printf("reason: %lld, qualification: %llx\n", exit_reason, qual);
-    // printf("gpa: %llx, gla: %llx\n", gpa, gla);
-    // printf("RIP: %llx\n", get_reg(vcpu, HV_X86_RIP));
-    // printf("CR3: %llx\n", get_reg(vcpu, HV_X86_CR3));
-    // printf("info: %llx\n", info);
-    // printf("vector_info: %llx\n", vector_info);
-    // printf("error_code: %llx\n", error_code);
+                                                                        
+                                                  
+                                                        
+                                                        
+                                    
+                                                  
+                                                
 
     return exit_reason;
 }
@@ -247,7 +247,7 @@ expect_vmcall(hv_vcpuid_t vcpu, bool on_demand_paging)
 	uint64_t reason = run_to_next_vm_fault(vcpu, on_demand_paging);
 	T_ASSERT_EQ(reason, (uint64_t)VMX_REASON_VMCALL, "expect vmcall exit");
 
-    // advance RIP to after VMCALL
+                                  
     set_vmcs(vcpu, VMCS_GUEST_RIP, get_reg(vcpu, HV_X86_RIP)+get_vmcs(vcpu, VMCS_RO_VMEXIT_INSTR_LEN));
 
     return get_reg(vcpu, HV_X86_RAX);
@@ -260,7 +260,7 @@ expect_vmcall_with_value(hv_vcpuid_t vcpu, uint64_t rax, bool on_demand_paging)
 	T_QUIET; T_ASSERT_EQ(reason, (uint64_t)VMX_REASON_VMCALL, "check for vmcall exit");
     T_ASSERT_EQ(get_reg(vcpu, HV_X86_RAX), rax, "vmcall exit with expected RAX value %llx", rax);
 
-    // advance RIP to after VMCALL
+                                  
     set_vmcs(vcpu, VMCS_GUEST_RIP, get_reg(vcpu, HV_X86_RIP)+get_vmcs(vcpu, VMCS_RO_VMEXIT_INSTR_LEN));
 
     return reason;
@@ -535,7 +535,7 @@ create_vcpu_thread(
 	test->monitor_param = monitor_param;
 	T_ASSERT_POSIX_SUCCESS(pthread_create(&thread, NULL, wrap_monitor, test),
 	    "create vcpu pthread");
-	// ownership of test struct moves to the thread
+	                                               
 	test = NULL;
 
 	return thread;
@@ -557,8 +557,8 @@ vm_setup()
 	T_ASSERT_EQ(hv_vm_create(HV_VM_DEFAULT), HV_SUCCESS, "Created vm");
 
 
-    // Set up root paging structures for long mode,
-    // where paging is mandatory.
+                                                   
+                                 
 
     pml4_gpa = map_guest_phys((void**)&pml4);
     memset(pml4, 0, vm_page_size);
@@ -600,14 +600,14 @@ multikill_vcpu_thread_function(void __unused *arg)
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pthread_mutex_unlock(&vcpus_ready_lock),
 	    "release vcpus_ready_lock");
 
-	// To cause the VCPU pointer to be cleared from the wrong thread, we need
-	// to get threads onto the thread deallocate queue. One way to accomplish
-	// this is to die while waiting for a lock.
+	                                                                         
+	                                                                         
+	                                           
 	T_ASSERT_POSIX_SUCCESS(pthread_mutex_lock(&vcpus_hang_lock),
 	    "acquire vcpus_hang_lock");
 
-	// Do not allow the thread to terminate. Exactly one thread will acquire
-	// the above lock successfully.
+	                                                                        
+	                               
 	while (true) {
 		pause();
 	}
@@ -648,7 +648,7 @@ T_DECL(regression_55524541,
 		T_ASSERT_POSIX_SUCCESS(pthread_mutex_unlock(&vcpus_ready_lock),
 		    "release vcpus_ready_lock");
 
-		// Indicate readiness to die, meditiate peacefully.
+		                                                   
 		uint8_t byte = 0;
 		T_ASSERT_EQ_LONG(write(pipedesc[1], &byte, 1), 1L, "notifying on pipe");
 		while (true) {
@@ -656,11 +656,11 @@ T_DECL(regression_55524541,
 		}
 	} else {
 		T_ASSERT_GT(child, 0, "successful fork");
-		// Wait for child to prepare.
+		                             
 		uint8_t byte;
 		T_ASSERT_EQ_LONG(read(pipedesc[0], &byte, 1), 1L, "waiting on pipe");
 		T_ASSERT_POSIX_SUCCESS(kill(child, SIGTERM), "kill child");
-		// Hope for no panic...
+		                       
 		T_ASSERT_POSIX_SUCCESS(wait(NULL), "reap child");
 	}
 	T_ASSERT_POSIX_SUCCESS(close(pipedesc[0]), "close pipedesc[0]");
@@ -700,7 +700,7 @@ T_DECL(smp_sanity, "Multiple VCPUs in the same VM")
 {
 	vm_setup();
 
-	// Use this region as shared memory between the VCPUs.
+	                                                      
 	void *shared = NULL;
     map_guest_phys((void**)&shared);
 
@@ -808,54 +808,54 @@ static void *
 radar61961809_monitor(void *gpaddr, hv_vcpuid_t vcpu)
 {
 	uint32_t const gdt_template[] = {
-		0, 0,                         /* Empty */
-		0x0000ffff, 0x00cf9200,       /* 0x08 CPL0 4GB writable data, 32bit */
-		0x0000ffff, 0x00cf9a00,       /* 0x10 CPL0 4GB readable code, 32bit */
-		0x0000ffff, 0x00af9200,       /* 0x18 CPL0 4GB writable data, 64bit */
-		0x0000ffff, 0x00af9a00,       /* 0x20 CPL0 4GB readable code, 64bit */
+		0, 0,                                    
+		0x0000ffff, 0x00cf9200,                                               
+		0x0000ffff, 0x00cf9a00,                                               
+		0x0000ffff, 0x00af9200,                                               
+		0x0000ffff, 0x00af9a00,                                               
 	};
 
-	// We start the test in protected mode.
+	                                       
     setup_protected_mode(vcpu);
 
-	// SAVE_EFER makes untrapped CR0.PG work.
+	                                         
     uint64_t exit_cap = get_cap(HV_VMX_CAP_EXIT);
 	set_vmcs(vcpu, VMCS_CTRL_VMEXIT_CONTROLS, canonicalize(VMEXIT_SAVE_EFER, exit_cap));
 
-	// Start with CR0.PG disabled.
+	                              
 	set_vmcs(vcpu, VMCS_GUEST_CR0, 0x00000021);
 	set_vmcs(vcpu, VMCS_CTRL_CR0_SHADOW, 0x00000021);
-	/*
-	 * Don't trap on modifying CR0.PG to reproduce the problem.
-	 * Otherwise, we'd have to handle the switch ourselves, and would
-	 * just do it right.
-	 */
+	  
+                                                            
+                                                                  
+                     
+    
 	set_vmcs(vcpu, VMCS_CTRL_CR0_MASK, ~0x80000000UL);
 
-	// PAE must be enabled for a switch into long mode to work.
+	                                                           
 	set_vmcs(vcpu, VMCS_GUEST_CR4, 0x2020);
 	set_vmcs(vcpu, VMCS_CTRL_CR4_MASK, ~0u);
 	set_vmcs(vcpu, VMCS_CTRL_CR4_SHADOW, 0x2020);
 
-	// Will use the harness managed page tables in long mode.
+	                                                         
 	set_vmcs(vcpu, VMCS_GUEST_CR3, pml4_gpa);
 
-	// Hypervisor fw wants this (for good, but unrelated reason).
+	                                                             
 	T_QUIET; T_ASSERT_EQ(hv_vcpu_enable_native_msr(vcpu, MSR_IA32_KERNEL_GS_BASE, true), HV_SUCCESS, "enable native GS_BASE");
 
-	// Far pointer array for our far jumps.
+	                                       
 	uint32_t *far_ptr = NULL;
 	hv_gpaddr_t far_ptr_gpaddr = map_guest_phys((void**)&far_ptr);
 	map_page(far_ptr, (void*)far_ptr_gpaddr);
 
 	far_ptr[0] = (uint32_t)(((uintptr_t)&radar61961809_prepare - (uintptr_t)&hvtest_begin) + (uintptr_t)gpaddr);
-	far_ptr[1] = 0x0010; // 32bit CS
+	far_ptr[1] = 0x0010;            
 	far_ptr[2] = (uint32_t)(((uintptr_t)&radar61961809_loop64 - (uintptr_t)&hvtest_begin) + (uintptr_t)gpaddr);
-	far_ptr[3] = 0x0020; // 64bit CS
+	far_ptr[3] = 0x0020;            
 
 	set_reg(vcpu, HV_X86_RDI, far_ptr_gpaddr);
 
-	// Setup GDT.
+	             
 	uint32_t *gdt = valloc(vm_page_size);
 	hv_gpaddr_t gdt_gpaddr = 0x70000000;
 	map_page(gdt, (void*)gdt_gpaddr);
@@ -865,8 +865,8 @@ radar61961809_monitor(void *gpaddr, hv_vcpuid_t vcpu)
 	set_vmcs(vcpu, VMCS_GUEST_GDTR_BASE, gdt_gpaddr);
 	set_vmcs(vcpu, VMCS_GUEST_GDTR_LIMIT, sizeof(gdt_template)+1);
 
-	// Map test code (because we start in protected mode without
-	// paging, we cannot use the harness's fault management yet.)
+	                                                            
+	                                                             
 	size_t guest_pages_size = round_page((uintptr_t)&hvtest_end - (uintptr_t)&hvtest_begin);
 
 	const size_t mem_size = 1 * 1024 * 1024;
@@ -878,7 +878,7 @@ radar61961809_monitor(void *gpaddr, hv_vcpuid_t vcpu)
 	T_ASSERT_EQ(hv_vm_map(guest_pages_shadow, (hv_gpaddr_t)gpaddr, mem_size, HV_MEMORY_READ | HV_MEMORY_EXEC),
 		HV_SUCCESS, "map guest memory");
 
-	// Create entries in PML4.
+	                          
 	uint8_t *host_va = guest_pages_shadow;
 	uint8_t *va = (uint8_t*)gpaddr;
 	for (unsigned long i = 0; i < guest_pages_size / vm_page_size; i++, va += vm_page_size, host_va += vm_page_size) {
@@ -902,10 +902,10 @@ radar61961809_monitor(void *gpaddr, hv_vcpuid_t vcpu)
 	set_vmcs(vcpu, VMCS_GUEST_IA32_EFER, 0x100);
 	set_vmcs(vcpu, VMCS_GUEST_RIP, get_reg(vcpu, HV_X86_RIP)+get_vmcs(vcpu, VMCS_RO_VMEXIT_INSTR_LEN));
 
-	// See assembly part of the test for checkpoints.
-	expect_vmcall_with_value(vcpu, 0x100, false /* PG disabled =>
-												 * no PFs expected */);
-	expect_vmcall_with_value(vcpu, 0x1111, true /* PG now enabled */);
+	                                                 
+	expect_vmcall_with_value(vcpu, 0x100, false                  
+                                 );
+	expect_vmcall_with_value(vcpu, 0x1111, true                     );
 	expect_vmcall_with_value(vcpu, 0x2222, true);
 
 	free(guest_pages_shadow);
@@ -943,12 +943,12 @@ superpage_2mb_backed_guest_monitor(void *arg __unused, hv_vcpuid_t vcpu)
                                        VM_FLAGS_SUPERPAGE_SIZE_2MB, 0);
 
     if (guest_pages_shadow == MAP_FAILED) {
-        /* Getting a 2MB superpage is hard in practice, because memory gets fragmented
-         * easily.
-         * T_META_REQUIRES_REBOOT in the T_DECL helps a lot in actually getting a page,
-         * but in the case that it still fails, we don't want the test to fail through
-         * no fault of the hypervisor.
-         */
+                                                                                      
+                  
+                                                                                       
+                                                                                      
+                                      
+           
         T_SKIP("Unable to attain a 2MB superpage. Skipping.");
     }
 
@@ -966,7 +966,7 @@ superpage_2mb_backed_guest_monitor(void *arg __unused, hv_vcpuid_t vcpu)
 }
 
 T_DECL(superpage_2mb_backed_guest, "guest backed by a 2MB superpage",
-       T_META_REQUIRES_REBOOT(true)) // Helps actually getting a superpage
+       T_META_REQUIRES_REBOOT(true))                                      
 {
     vm_setup();
 
@@ -1005,7 +1005,7 @@ save_restore_regs_monitor(void *arg __unused, hv_vcpuid_t vcpu)
     set_reg(vcpu, HV_X86_R14, 0x0e0e0e0e0e0e0e0e);
     set_reg(vcpu, HV_X86_R15, 0x0f0f0f0f0f0f0f0f);
 
-    // invalid selectors: ok as long as we don't try to use them
+                                                                
     set_reg(vcpu, HV_X86_DS, 0x1010);
     set_reg(vcpu, HV_X86_ES, 0x2020);
     set_reg(vcpu, HV_X86_FS, 0x3030);
@@ -1038,7 +1038,7 @@ save_restore_regs_monitor(void *arg __unused, hv_vcpuid_t vcpu)
     T_ASSERT_EQ(get_reg(vcpu, HV_X86_RCX), (uint64_t)~0x0303030303030303LL, "check if RCX negated");
     T_ASSERT_EQ(get_reg(vcpu, HV_X86_RDX), (uint64_t)~0x0404040404040404LL, "check if RDX negated");
 
-    // Cannot set selector to arbitrary value from the VM, but we have the RPL field to play with
+                                                                                                 
     T_ASSERT_EQ(get_reg(vcpu, HV_X86_DS), 1ULL, "check if DS == 1");
     T_ASSERT_EQ(get_reg(vcpu, HV_X86_ES), 2ULL, "check if ES == 2");
     T_ASSERT_EQ(get_reg(vcpu, HV_X86_FS), 3ULL, "check if FS == 3");
@@ -1074,7 +1074,7 @@ save_restore_debug_regs_monitor(void *arg __unused, hv_vcpuid_t vcpu)
     set_reg(vcpu, HV_X86_DR2, 0x3333333333333333);
     set_reg(vcpu, HV_X86_DR3, 0x4444444444444444);
 
-    // debug status and control regs (some bits are reserved, one other bit would generate an exception)
+                                                                                                        
     const uint64_t dr6_force_clear = 0xffffffff00001000ULL;
     const uint64_t dr6_force_set = 0xffff0ff0ULL;
     const uint64_t dr7_force_clear = 0xffffffff0000f000ULL;
@@ -1195,7 +1195,7 @@ radar60691363_monitor(void *arg __unused, hv_vcpuid_t vcpu)
 		"read updated VMCS_RO_IO_RCX in shadow");
 	T_ASSERT_EQ(value, 0x7979LL, "VMCS_RO_IO_RCX value is updated");
 
-	// This must not work.
+	                      
 	T_ASSERT_EQ(hv_vmx_vcpu_set_shadow_access(vcpu, VMCS_CTRL_EPTP,
 			HV_SHADOW_VMCS_READ | HV_SHADOW_VMCS_WRITE), HV_SUCCESS,
 		"enable VMCS_CTRL_EPTP shadow access");
@@ -1228,7 +1228,7 @@ T_DECL(radar63641279, "rdar://63641279 (Evaluate \"no SMT\" scheduling option/si
 	    HV_VM_MITIGATION_B_ENABLE |
 	    HV_VM_MITIGATION_C_ENABLE |
 	    HV_VM_MITIGATION_D_ENABLE |
-	    HV_VM_MITIGATION_E_ENABLE; // NO_SMT
+	    HV_VM_MITIGATION_E_ENABLE;          
 
 	T_SETUPBEGIN;
 
@@ -1250,7 +1250,7 @@ T_DECL(radar63641279, "rdar://63641279 (Evaluate \"no SMT\" scheduling option/si
 	vm_cleanup();
 }
 
-// Get the number of  messages waiting for the specified port
+                                                             
 static int
 get_count(mach_port_t port)
 {
@@ -1351,7 +1351,7 @@ T_DECL(pio_notifier_arguments, "test adding and removing port IO notifiers")
 
 	T_SETUPBEGIN;
 
-	/* Setup notification port. */
+	                              
 	kret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE,
 	    &notify_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "allocate mach port");
@@ -1360,32 +1360,32 @@ T_DECL(pio_notifier_arguments, "test adding and removing port IO notifiers")
 	   MACH_MSG_TYPE_MAKE_SEND);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "insert send right");
 
-	/* Setup VM */
+	              
 	vm_setup();
 
 	T_SETUPEND;
 
-	/* Add with bad size. */
+	                        
 	hret = hv_vm_add_pio_notifier(0xab, 7, 1, notify_port, HV_ION_NONE);
 	T_ASSERT_NE(hret, HV_SUCCESS, "adding notifier with bad size");
 
-	/* Add with bad data. */
+	                        
 	hret = hv_vm_add_pio_notifier(0xab, 1, UINT16_MAX, notify_port, HV_ION_NONE);
 	T_ASSERT_NE(hret, HV_SUCCESS, "adding notifier with bad data");
 
-	/* Add with bad mach port. */
+	                             
 	hret = hv_vm_add_pio_notifier(0xab, 1, UINT16_MAX, MACH_PORT_NULL, HV_ION_NONE);
 	T_ASSERT_NE(hret, HV_SUCCESS, "adding notifier with bad port");
 
-	/* Add with bad flags. */
+	                         
 	hret = hv_vm_add_pio_notifier(0xab, 1, 1, notify_port, 0xffff);
 	T_ASSERT_NE(hret, HV_SUCCESS, "adding notifier with bad flags");
 
-	/* Remove when none are installed. */
+	                                     
 	hret = hv_vm_remove_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_ASSERT_NE(hret, HV_SUCCESS, "removing a non-existent notifier");
 
-	/* Add duplicate. */
+	                    
 	hret = hv_vm_add_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier");
 	hret = hv_vm_add_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
@@ -1393,13 +1393,13 @@ T_DECL(pio_notifier_arguments, "test adding and removing port IO notifiers")
 	hret = hv_vm_remove_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "removing notifier");
 
-	/* Add then remove. */
+	                      
 	hret = hv_vm_add_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier");
 	hret = hv_vm_remove_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_ASSERT_EQ(hret, HV_SUCCESS, "removing notifier");
 
-	/* Add two, remove in reverse order. */
+	                                       
 	hret = hv_vm_add_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding 1st notifier");
 	hret = hv_vm_add_pio_notifier(0xab, 2, 1, notify_port, HV_ION_NONE);
@@ -1409,13 +1409,13 @@ T_DECL(pio_notifier_arguments, "test adding and removing port IO notifiers")
 	hret = hv_vm_remove_pio_notifier(0xab, 1, 1, notify_port, HV_ION_NONE);
 	T_ASSERT_EQ(hret, HV_SUCCESS, "removing notifier in reverse order");
 
-	/* Add with ANY_SIZE and remove. */
+	                                   
 	hret = hv_vm_add_pio_notifier(0xab, 0, 1, notify_port, HV_ION_ANY_SIZE);
 	T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier with ANY_SIZE");
 	hret = hv_vm_remove_pio_notifier(0xab, 0, 1, notify_port, HV_ION_ANY_SIZE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "removing notifier with ANY_SIZE");
 
-	/* Add with ANY_VALUE and remove. */
+	                                    
 	hret = hv_vm_add_pio_notifier(0xab, 1, 1, notify_port, HV_ION_ANY_VALUE);
 	T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier with ANY_VALUE");
 	hret = hv_vm_remove_pio_notifier(0xab, 1, 1, notify_port, HV_ION_ANY_VALUE);
@@ -1434,31 +1434,31 @@ T_DECL(pio_notifier_bad_port, "test port IO notifiers when the port is destroyed
 	kern_return_t kret = KERN_FAILURE;
 	hv_return_t hret = HV_ERROR;
 
-	/* Setup VM */
+	              
 	vm_setup();
 
-	/*
-	 * Test that nothing bad happens when the notification port is
-	 * added and mach_port_destroy() is called.
-	 */
+	  
+                                                               
+                                            
+    
 
-	/* Add a notification port. */
+	                              
 	kret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE,
 	    &notify_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "allocate mach port");
 
-	/* Insert send right. */
+	                        
 	kret = mach_port_insert_right(mach_task_self(), notify_port, notify_port,
 	   MACH_MSG_TYPE_MAKE_SEND);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "insert send right");
 
-	/* All port writes to 0xef. */
+	                              
 	hret = hv_vm_add_pio_notifier(0xef, 0, 0, notify_port,
 	    HV_ION_ANY_VALUE | HV_ION_ANY_SIZE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for all writes "
 	    "to port 0xef");
 
-	/* After adding, destroy the port. */
+	                                     
 	kret = mach_port_destroy(mach_task_self(), notify_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "destroying notify port");
 
@@ -1467,7 +1467,7 @@ T_DECL(pio_notifier_bad_port, "test port IO notifiers when the port is destroyed
 	    &handle_io_count);
 	T_ASSERT_POSIX_SUCCESS(pthread_join(vcpu_thread, NULL), "join vcpu");
 
-	/* Expect the messages to be lost. */
+	                                     
 	T_ASSERT_EQ(0, handle_io_count, "0 expected IO exits when port destroyed");
 
 	hret = hv_vm_remove_pio_notifier(0xef, 0, 0, notify_port, HV_ION_ANY_SIZE | HV_ION_ANY_VALUE);
@@ -1477,28 +1477,28 @@ T_DECL(pio_notifier_bad_port, "test port IO notifiers when the port is destroyed
 
 
 	vm_setup();
-	/*
-	 * Test that nothing bad happens when the notification port is added and
-	 * mach_port_mod_refs() is called.
-	 */
+	  
+                                                                         
+                                   
+    
 
-	/* Add a notification port. */
+	                              
 	kret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE,
 	    &notify_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "allocate mach port");
 
-	/* Insert send right. */
+	                        
 	kret = mach_port_insert_right(mach_task_self(), notify_port, notify_port,
 	   MACH_MSG_TYPE_MAKE_SEND);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "insert send right");
 
-	/* All port writes to 0xef. */
+	                              
 	hret = hv_vm_add_pio_notifier(0xef, 0, 0, notify_port,
 	    HV_ION_ANY_VALUE | HV_ION_ANY_SIZE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for all writes "
 	    "to port 0xef");
 
-	/* After adding, remove receive right. */
+	                                         
 	mach_port_mod_refs(mach_task_self(), notify_port, MACH_PORT_RIGHT_RECEIVE, -1);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "removing receive right");
 
@@ -1507,7 +1507,7 @@ T_DECL(pio_notifier_bad_port, "test port IO notifiers when the port is destroyed
 	    &handle_io_count);
 	T_ASSERT_POSIX_SUCCESS(pthread_join(vcpu_thread, NULL), "join vcpu");
 
-	/* Expect messages to be lost. */
+	                                 
 	T_ASSERT_EQ(0, handle_io_count, "0 expected IO exits when receive right removed");
 
 	hret = hv_vm_remove_pio_notifier(0xef, 0, 0, notify_port, HV_ION_ANY_SIZE | HV_ION_ANY_VALUE);
@@ -1517,28 +1517,28 @@ T_DECL(pio_notifier_bad_port, "test port IO notifiers when the port is destroyed
 
 
 	vm_setup();
-	/*
-	 * Test that nothing bad happens when the notification port is added and
-	 * mach_port_deallocate() is called.
-	 */
+	  
+                                                                         
+                                     
+    
 
-	/* Add a notification port. */
+	                              
 	kret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE,
 	    &notify_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "allocate mach port");
 
-	/* Insert send right. */
+	                        
 	kret = mach_port_insert_right(mach_task_self(), notify_port, notify_port,
 	   MACH_MSG_TYPE_MAKE_SEND);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "insert send right");
 
-	/* All port writes to 0xef. */
+	                              
 	hret = hv_vm_add_pio_notifier(0xef, 0, 0, notify_port,
 	    HV_ION_ANY_VALUE | HV_ION_ANY_SIZE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for all writes "
 	    "to port 0xef");
 
-	/* After adding, call mach_port_deallocate(). */
+	                                                
 	kret = mach_port_deallocate(mach_task_self(), notify_port);
 	T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "destroying notify port");
 
@@ -1547,7 +1547,7 @@ T_DECL(pio_notifier_bad_port, "test port IO notifiers when the port is destroyed
 	    &handle_io_count);
 	T_ASSERT_POSIX_SUCCESS(pthread_join(vcpu_thread, NULL), "join vcpu");
 
-	/* Expect messages to be lost. */
+	                                 
 	T_ASSERT_EQ(0, handle_io_count, "0 expected IO exits when port deallocated");
 
 	hret = hv_vm_remove_pio_notifier(0xef, 0, 0, notify_port, HV_ION_ANY_SIZE | HV_ION_ANY_VALUE);
@@ -1566,7 +1566,7 @@ T_DECL(pio_notifier, "test port IO notifiers")
 
 	T_SETUPBEGIN;
 
-	/* Setup notification ports. */
+	                               
 	for (int i = 0; i  < MACH_PORT_COUNT; i++) {
 		kret = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE,
 		    &notify_port[i]);
@@ -1576,31 +1576,31 @@ T_DECL(pio_notifier, "test port IO notifiers")
 		   MACH_MSG_TYPE_MAKE_SEND);
 		T_QUIET; T_ASSERT_MACH_SUCCESS(kret, "insert send right");
 	}
-	/* Setup VM */
+	              
 	vm_setup();
 
 	T_SETUPEND;
 
-	/* Test that messages are properly sent to mach port notifiers. */
+	                                                                  
 
-	/* One for all port writes to 0xab. */
+	                                      
 	hret = hv_vm_add_pio_notifier(0xab, 0, 0, notify_port[0],
 	    HV_ION_ANY_VALUE | HV_ION_ANY_SIZE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for all writes "
 	    "to port 0xab");
 
-	/* One for for 4 byte writes of 0xaa. */
+	                                        
 	hret = hv_vm_add_pio_notifier(0xab, 4, 0xaa, notify_port[1], HV_ION_NONE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for 4 byte writes "
 	    "to port 0xab");
 
-	/* One for all writes to 0xcd (ignoring queue full errors). */
+	                                                              
 	hret = hv_vm_add_pio_notifier(0xcd, 0, 0, notify_port[2],
 	    HV_ION_ANY_SIZE | HV_ION_ANY_VALUE);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for all writes "
 	    "to port 0xcd, ignoring if the queue fills");
 
-	/* One for writes to 0xef asking for exits when the queue is full. */
+	                                                                     
 	hret = hv_vm_add_pio_notifier(0xef, 0, 0, notify_port[3],
 	    HV_ION_ANY_SIZE | HV_ION_ANY_VALUE | HV_ION_EXIT_FULL);
 	T_QUIET; T_ASSERT_EQ(hret, HV_SUCCESS, "adding notifier for all writes "
@@ -1611,7 +1611,7 @@ T_DECL(pio_notifier, "test port IO notifiers")
 	    &handle_io_count);
 	T_ASSERT_POSIX_SUCCESS(pthread_join(vcpu_thread, NULL), "join vcpu");
 
-	/* Expect messages to be waiting. */
+	                                    
 	T_ASSERT_EQ(4, get_count(notify_port[0]), "expected 4 messages");
 	T_ASSERT_EQ(1, get_count(notify_port[1]), "expected 1 messages");
 	T_ASSERT_EQ(10, get_count(notify_port[2]) + handle_io_count, "expected IO exits");

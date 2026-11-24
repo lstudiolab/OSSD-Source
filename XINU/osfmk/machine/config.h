@@ -37,4 +37,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_CONFIG_H */
+#endif                        

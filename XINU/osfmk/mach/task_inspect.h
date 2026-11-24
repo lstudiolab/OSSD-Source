@@ -29,10 +29,10 @@
 #ifndef MACH_TASK_INSPECT_H
 #define MACH_TASK_INSPECT_H
 
-/*
- * XXX These interfaces are still in development -- they are subject to change
- * without notice.
- */
+  
+                                                                              
+                  
+   
 
 typedef natural_t task_inspect_flavor_t;
 
@@ -51,4 +51,4 @@ typedef struct task_inspect_basic_counts *task_inspect_basic_counts_t;
 
 typedef integer_t *task_inspect_info_t;
 
-#endif /* !defined(MACH_TASK_INSPECT_H) */
+#endif                                    

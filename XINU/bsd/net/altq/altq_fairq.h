@@ -69,4 +69,4 @@
 #include <net/altq/altq.h>
 #include <net/pktsched/pktsched_fairq.h>
 
-#endif /* _NET_ALTQ_ALTQ_FAIRQ_H_ */
+#endif                              

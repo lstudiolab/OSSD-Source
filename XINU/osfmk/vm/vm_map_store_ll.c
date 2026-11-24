@@ -57,13 +57,13 @@ first_free_is_valid_ll( vm_map_t map )
 	return TRUE;
 }
 
-/*
- *	UPDATE_FIRST_FREE:
- *
- *	Updates the map->first_free pointer to the
- *	entry immediately before the first hole in the map.
- *      The map should be locked.
- */
+  
+                     
+  
+                                             
+                                                      
+                                 
+   
 #define UPDATE_FIRST_FREE_LL(map, new_first_free)                       \
 	MACRO_BEGIN                                                     \
 	if( map->disable_vmentry_reuse == FALSE){                       \
@@ -112,17 +112,17 @@ first_free_is_valid_ll( vm_map_t map )
 	(entry)->vme_next->vme_prev = (entry)->vme_prev;                \
 	(entry)->vme_prev->vme_next = (entry)->vme_next;                \
 	MACRO_END
-/*
- *	Macro:		vm_map_copy_insert
- *
- *	Description:
- *		Link a copy chain ("copy") into a map at the
- *		specified location (after "where").
- *	Side effects:
- *		The copy chain is destroyed.
- *	Warning:
- *		The arguments are evaluated multiple times.
- */
+  
+                             
+  
+               
+                                                
+                                       
+                
+                                
+           
+                                               
+   
 #define _vm_map_copy_insert_ll(map, where, copy)                                \
 MACRO_BEGIN                                                             \
 	vm_map_t VMCI_map;                                              \
@@ -147,28 +147,28 @@ vm_map_store_init_ll( __unused struct vm_map_header *hdr)
 	return;
 }
 
-/*
- *	vm_map_lookup_entry_ll:	[ internal use only ]
- *	Use the linked list to find the map entry containing (or
- *	immediately preceding) the specified address
- *	in the given map; the entry is returned
- *	in the "entry" parameter.  The boolean
- *	result indicates whether the address is
- *	actually contained in the map.
- */
+  
+                                                
+                                                           
+                                               
+                                          
+                                         
+                                          
+                                 
+   
 boolean_t
 vm_map_store_lookup_entry_ll(
 	vm_map_t                map,
 	vm_map_offset_t         address,
-	vm_map_entry_t          *entry)         /* OUT */
+	vm_map_entry_t          *entry)                  
 {
 	vm_map_entry_t          cur;
 	vm_map_entry_t          last;
 
-	/*
-	 *	Start looking either from the head of the
-	 *	list, or from the hint.
-	 */
+	  
+                                             
+                           
+    
 	cur = map->hint;
 
 	if (cur == vm_map_to_entry(map)) {
@@ -176,41 +176,41 @@ vm_map_store_lookup_entry_ll(
 	}
 
 	if (address >= cur->vme_start) {
-		/*
-		 *	Go from hint to end of list.
-		 *
-		 *	But first, make a quick check to see if
-		 *	we are already looking at the entry we
-		 *	want (which is usually the case).
-		 *	Note also that we don't need to save the hint
-		 *	here... it is the same hint (unless we are
-		 *	at the header, in which case the hint didn't
-		 *	buy us anything anyway).
-		 */
+		  
+                                 
+    
+                                            
+                                           
+                                      
+                                                  
+                                               
+                                                 
+                             
+     
 		last = vm_map_to_entry(map);
 		if ((cur != last) && (cur->vme_end > address)) {
 			*entry = cur;
 			return TRUE;
 		}
 	} else {
-		/*
-		 *	Go from start to hint, *inclusively*
-		 */
+		  
+                                         
+     
 		last = cur->vme_next;
 		cur = vm_map_first_entry(map);
 	}
 
-	/*
-	 *	Search linearly
-	 */
+	  
+                   
+    
 
 	while (cur != last) {
 		if (cur->vme_end > address) {
 			if (address >= cur->vme_start) {
-				/*
-				 *	Save this lookup for future
-				 *	hints, and return
-				 */
+				  
+                                  
+                        
+       
 
 				*entry = cur;
 				SAVE_HINT_MAP_READ(map, cur);
@@ -227,16 +227,16 @@ vm_map_store_lookup_entry_ll(
 	return FALSE;
 }
 
-/*
- *  vm_map_store_find_last_free_ll:
- *
- *  Finds and returns in O_ENTRY the entry *after* the last hole (if one exists) in MAP.
- *  Returns NULL if map is full and no hole can be found.
- */
+  
+                                   
+  
+                                                                                        
+                                                         
+   
 void
 vm_map_store_find_last_free_ll(
 	vm_map_t map,
-	vm_map_entry_t *o_entry)        /* OUT */
+	vm_map_entry_t *o_entry)                 
 {
 	vm_map_entry_t  entry, prev_entry;
 	vm_offset_t     end;
@@ -244,7 +244,7 @@ vm_map_store_find_last_free_ll(
 	entry = vm_map_to_entry(map);
 	end = map->max_offset;
 
-	/* Skip over contiguous entries from end of map until wraps around */
+	                                                                     
 	while ((prev_entry = entry->vme_prev) != vm_map_to_entry(map)
 	    && (prev_entry->vme_end == end || prev_entry->vme_end > map->max_offset)) {
 		entry = prev_entry;
@@ -252,7 +252,7 @@ vm_map_store_find_last_free_ll(
 	}
 
 	if (entry != vm_map_to_entry(map) && entry->vme_start == map->min_offset) {
-		/* Map is completely full, no holes exist */
+		                                            
 		*o_entry = NULL;
 		return;
 	}

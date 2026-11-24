@@ -70,7 +70,7 @@
 #include <sys/uio.h>
 #include <sys/sysproto.h>
 
-#include <sys/signalvar.h>              /* for psignal() */
+#include <sys/signalvar.h>                                 
 #include <kern/debug.h>
 
 #if DEVELOPMENT || DEBUG
@@ -79,36 +79,36 @@ bool send_sigsys = true;
 #define send_sigsys true
 #endif
 
-/*
- * Unsupported device function (e.g. writing to read-only device).
- */
+  
+                                                                  
+   
 int
 enodev(void)
 {
 	return ENODEV;
 }
 
-/*
- * Unsupported strategy function.
- */
+  
+                                 
+   
 void
 enodev_strat(void)
 {
 	return;
 }
 
-/*
- * Unconfigured device function; driver not configured.
- */
+  
+                                                       
+   
 int
 enxio(void)
 {
 	return ENXIO;
 }
 
-/*
- * Unsupported ioctl function.
- */
+  
+                              
+   
 int
 enoioctl(void)
 {
@@ -116,32 +116,32 @@ enoioctl(void)
 }
 
 
-/*
- * Unsupported system function.
- * This is used for an otherwise-reasonable operation
- * that is not supported by the current system binary.
- */
+  
+                               
+                                                     
+                                                      
+   
 int
 enosys(void)
 {
 	return ENOSYS;
 }
 
-/*
- * Return error for operation not supported
- * on a specific object or file type.
- *
- * XXX Name of this routine is wrong.
- */
+  
+                                           
+                                     
+  
+                                     
+   
 int
 eopnotsupp(void)
 {
 	return ENOTSUP;
 }
 
-/*
- * Generic null operation, always returns success.
- */
+  
+                                                  
+   
 int
 nullop(void)
 {
@@ -149,19 +149,19 @@ nullop(void)
 }
 
 
-/*
- * Null routine; placed in insignificant entries
- * in the bdevsw and cdevsw tables.
- */
+  
+                                                
+                                   
+   
 int
 nulldev(void)
 {
 	return 0;
 }
 
-/*
- * Null system calls. Not invalid, just not configured.
- */
+  
+                                                       
+   
 int
 errsys(void)
 {
@@ -173,12 +173,12 @@ nullsys(void)
 {
 }
 
-/*
- * nonexistent system call-- signal process (may want to handle it)
- * flag error if process won't see signal immediately
- * Q: should we do that all the time ??
- */
-/* ARGSUSED */
+  
+                                                                   
+                                                     
+                                       
+   
+              
 int
 nosys(__unused struct proc *p, __unused struct nosys_args *args, __unused int32_t *retval)
 {

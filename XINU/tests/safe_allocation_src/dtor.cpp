@@ -1,7 +1,7 @@
-//
-// Tests for
-//  ~safe_allocation();
-//
+  
+            
+                       
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <darwintest.h>
@@ -22,7 +22,7 @@ template <typename T>
 static void
 tests()
 {
-	// Destroy a non-null allocation
+	                                
 	{
 		{
 			tracked_safe_allocation<T> array(10, libkern::allocate_memory);
@@ -31,7 +31,7 @@ tests()
 		CHECK(tracking_allocator::deallocated_size == 10 * sizeof(T));
 	}
 
-	// Destroy a null allocation
+	                            
 	{
 		{
 			tracked_safe_allocation<T> array = nullptr;

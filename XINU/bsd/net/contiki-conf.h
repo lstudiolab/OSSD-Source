@@ -30,4 +30,4 @@
 
 #define NETSTACK_CONF_NETWORK sicslowpan_driver
 
-#endif /* contiki_conf_h */
+#endif                     

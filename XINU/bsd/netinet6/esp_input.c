@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp_input.c,v 1.1.2.3 2001/07/03 11:01:50 ume Exp $	*/
-/*	$KAME: esp_input.c,v 1.55 2001/03/23 08:08:47 itojun Exp $	*/
+                                                                                    
+                                                                
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -60,9 +60,9 @@
 
 #define _IP_VHL
 
-/*
- * RFC1827/2406 Encapsulated Security Payload.
- */
+  
+                                              
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -134,7 +134,7 @@ extern lck_mtx_t  *sadb_mutex;
 static struct ip *
 esp4_input_strip_udp_encap(struct mbuf *m, int iphlen)
 {
-	// strip the udp header that's encapsulating ESP
+	                                                
 	struct ip *ip;
 	u_int8_t stripsiz = (u_int8_t)sizeof(struct udphdr);
 
@@ -152,7 +152,7 @@ esp4_input_strip_udp_encap(struct mbuf *m, int iphlen)
 static struct ip6_hdr *
 esp6_input_strip_udp_encap(struct mbuf *m, int ip6hlen)
 {
-	// strip the udp header that's encapsulating ESP
+	                                                
 	struct ip6_hdr *ip6;
 	u_int8_t stripsiz = (u_int8_t)sizeof(struct udphdr);
 
@@ -228,7 +228,7 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 	mbuf_traffic_class_t traffic_class = 0;
 
 	KERNEL_DEBUG(DBG_FNC_ESPIN | DBG_FUNC_START, 0, 0, 0, 0, 0);
-	/* sanity check for alignment. */
+	                                 
 	if (off % 4 != 0 || m->m_pkthdr.len % 4 != 0) {
 		ipseclog((LOG_ERR, "IPv4 ESP input: packet alignment problem "
 		    "(off=%d, pktlen=%d)\n", off, m->m_pkthdr.len));
@@ -248,11 +248,11 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 
 	m->m_pkthdr.csum_flags &= ~CSUM_RX_FLAGS;
 
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip = mtod(m, struct ip *);
-	// expect udp-encap and esp packets only
+	                                        
 	if (ip->ip_p != IPPROTO_ESP &&
 	    !(ip->ip_p == IPPROTO_UDP && off >= sizeof(struct udphdr))) {
 		ipseclog((LOG_DEBUG,
@@ -267,7 +267,7 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 	hlen = ip->ip_hl << 2;
 #endif
 
-	/* find the sassoc. */
+	                      
 	spi = esp->esp_spi;
 
 	if ((sav = key_allocsa_extended(AF_INET,
@@ -299,7 +299,7 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 		goto bad;
 	}
 
-	/* check if we have proper ivlen information */
+	                                               
 	ivlen = sav->ivlen;
 	if (ivlen < 0) {
 		ipseclog((LOG_ERR, "inproper ivlen in IPv4 ESP input: %s %s\n",
@@ -316,7 +316,7 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 		traffic_class = rfc4594_dscp_to_tc(dscp);
 	}
 
-	/* Save ICV from packet for verification later */
+	                                                 
 	size_t siz = 0;
 	unsigned char saved_icv[AH_MAXSUMSIZE];
 	if (algo->finalizedecrypt) {
@@ -336,12 +336,12 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 		goto noreplaycheck;
 	}
 
-	/*
-	 * check for sequence number.
-	 */
+	  
+                              
+    
 	_CASSERT(MBUF_TC_MAX <= UINT8_MAX);
 	if (ipsec_chkreplay(seq, sav, (u_int8_t)traffic_class)) {
-		; /*okey*/
+		;         
 	} else {
 		IPSEC_STAT_INCREMENT(ipsecstat.in_espreplay);
 		ipseclog((LOG_WARNING,
@@ -350,7 +350,7 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 		goto bad;
 	}
 
-	/* check ICV */
+	               
 	{
 		u_char sum0[AH_MAXSUMSIZE] __attribute__((aligned(4)));
 		u_char sum[AH_MAXSUMSIZE] __attribute__((aligned(4)));
@@ -391,7 +391,7 @@ esp4_input_extended(struct mbuf *m, int off, ifnet_t interface)
 
 delay_icv:
 
-		/* strip off the authentication data */
+		                                       
 		m_adj(m, (int)-siz);
 		ip = mtod(m, struct ip *);
 #ifdef IPLEN_FLIPPED
@@ -403,9 +403,9 @@ delay_icv:
 		IPSEC_STAT_INCREMENT(ipsecstat.in_espauthsucc);
 	}
 
-	/*
-	 * update sequence number.
-	 */
+	  
+                           
+    
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[traffic_class] != NULL) {
 		if (ipsec_updatereplay(seq, sav, (u_int8_t)traffic_class)) {
 			IPSEC_STAT_INCREMENT(ipsecstat.in_espreplay);
@@ -415,12 +415,12 @@ delay_icv:
 
 noreplaycheck:
 
-	/* process main esp header. */
+	                              
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		esplen = sizeof(struct esp);
 	} else {
-		/* RFC 2406 */
+		              
 		if (sav->flags & SADB_X_EXT_DERIV) {
 			esplen = sizeof(struct esp);
 		} else {
@@ -445,23 +445,23 @@ noreplaycheck:
 		}
 	}
 
-	/*
-	 * pre-compute and cache intermediate key
-	 */
+	  
+                                          
+    
 	if (esp_schedule(algo, sav) != 0) {
 		IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 		goto bad;
 	}
 
-	/*
-	 * decrypt the packet.
-	 */
+	  
+                       
+    
 	if (!algo->decrypt) {
 		panic("internal error: no decrypt function");
 	}
 	KERNEL_DEBUG(DBG_FNC_DECRYPT | DBG_FUNC_START, 0, 0, 0, 0, 0);
 	if ((*algo->decrypt)(m, off, sav, algo, ivlen)) {
-		/* m is already freed */
+		                        
 		m = NULL;
 		ipseclog((LOG_ERR, "decrypt fail in IPv4 ESP input: %s\n",
 		    ipsec_logsastr(sav)));
@@ -483,16 +483,16 @@ noreplaycheck:
 		}
 	}
 
-	/*
-	 * find the trailer of the ESP.
-	 */
+	  
+                                
+    
 	m_copydata(m, m->m_pkthdr.len - sizeof(esptail), sizeof(esptail),
 	    (caddr_t)&esptail);
 	nxt = esptail.esp_nxt;
 	taillen = esptail.esp_padlen + sizeof(esptail);
 
 	if (m->m_pkthdr.len < taillen
-	    || m->m_pkthdr.len - taillen < hlen) { /*?*/
+	    || m->m_pkthdr.len - taillen < hlen) {      
 		ipseclog((LOG_WARNING,
 		    "bad pad length in IPv4 ESP input: %s %s\n",
 		    ipsec4_logpacketstr(ip, spi), ipsec_logsastr(sav)));
@@ -500,7 +500,7 @@ noreplaycheck:
 		goto bad;
 	}
 
-	/* strip off the trailing pad area. */
+	                                      
 	m_adj(m, (int)-taillen);
 	ip = mtod(m, struct ip *);
 #ifdef IPLEN_FLIPPED
@@ -509,7 +509,7 @@ noreplaycheck:
 	ip->ip_len = htons(ntohs(ip->ip_len) - taillen);
 #endif
 	if (ip->ip_p == IPPROTO_UDP) {
-		// offset includes the outer ip and udp header lengths.
+		                                                       
 		if (m->m_len < off) {
 			m = m_pullup(m, off);
 			if (!m) {
@@ -521,9 +521,9 @@ noreplaycheck:
 			ip = mtod(m, struct ip *);
 		}
 
-		// check the UDP encap header to detect changes in the source port, and then strip the header
-		off -= sizeof(struct udphdr); // off no longer includes the udphdr's size
-		// if peer is behind nat and this is the latest esp packet
+		                                                                                             
+		off -= sizeof(struct udphdr);                                            
+		                                                          
 		if ((sav->flags & SADB_X_EXT_NATT_DETECTED_PEER) != 0 &&
 		    (sav->flags & SADB_X_EXT_OLD) == 0 &&
 		    seq && sav->replay[traffic_class] &&
@@ -538,18 +538,18 @@ noreplaycheck:
 		esp = (struct esp *)(void *)(((u_int8_t *)ip) + off);
 	}
 
-	/* was it transmitted over the IPsec tunnel SA? */
+	                                                  
 	if (ipsec4_tunnel_validate(m, (int)(off + esplen + ivlen), nxt, sav, &ifamily)) {
 		ifaddr_t ifa;
 		struct sockaddr_storage addr;
 
-		/*
-		 * strip off all the headers that precedes ESP header.
-		 *	IP4 xx ESP IP4' payload -> IP4' payload
-		 *
-		 * XXX more sanity checks
-		 * XXX relationship with gif?
-		 */
+		  
+                                                        
+                                            
+    
+                           
+                               
+     
 		u_int8_t tos, otos;
 		int sum;
 
@@ -566,7 +566,7 @@ noreplaycheck:
 				}
 			}
 			ip = mtod(m, struct ip *);
-			/* ECN consideration. */
+			                        
 
 			otos = ip->ip_tos;
 			if (ip_ecn_egress(ip4_ipsec_ecn, &tos, &ip->ip_tos) == 0) {
@@ -578,7 +578,7 @@ noreplaycheck:
 				sum = ~ntohs(ip->ip_sum) & 0xffff;
 				sum += (~otos & 0xffff) + ip->ip_tos;
 				sum = (sum >> 16) + (sum & 0xffff);
-				sum += (sum >> 16); /* add carry */
+				sum += (sum >> 16);                
 				ip->ip_sum = htons(~sum & 0xffff);
 			}
 
@@ -599,10 +599,10 @@ noreplaycheck:
 		} else if (ifamily == AF_INET6) {
 			struct sockaddr_in6 *ip6addr;
 
-			/*
-			 * m_pullup is prohibited in KAME IPv6 input processing
-			 * but there's no other way!
-			 */
+			  
+                                                          
+                               
+      
 			if (m->m_len < sizeof(*ip6)) {
 				m = m_pullup(m, sizeof(*ip6));
 				if (!m) {
@@ -611,15 +611,15 @@ noreplaycheck:
 				}
 			}
 
-			/*
-			 * Expect 32-bit aligned data pointer on strict-align
-			 * platforms.
-			 */
+			  
+                                                        
+                
+      
 			MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 			ip6 = mtod(m, struct ip6_hdr *);
 
-			/* ECN consideration. */
+			                        
 			if (ip64_ecn_egress(ip4_ipsec_ecn, &tos, &ip6->ip6_flow) == 0) {
 				IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 				goto bad;
@@ -652,21 +652,21 @@ noreplaycheck:
 			goto bad;
 		}
 
-		// update the receiving interface address based on the inner address
+		                                                                    
 		ifa = ifa_ifwithaddr((struct sockaddr *)&addr);
 		if (ifa) {
 			m->m_pkthdr.rcvif = ifa->ifa_ifp;
 			IFA_REMREF(ifa);
 		}
 
-		/* Clear the csum flags, they can't be valid for the inner headers */
+		                                                                     
 		m->m_pkthdr.csum_flags = 0;
 
-		// Input via IPsec interface
+		                            
 		lck_mtx_lock(sadb_mutex);
 		ifnet_t ipsec_if = sav->sah->ipsec_if;
 		if (ipsec_if != NULL) {
-			// If an interface is found, add a reference count before dropping the lock
+			                                                                           
 			ifnet_reference(ipsec_if);
 		}
 		lck_mtx_unlock(sadb_mutex);
@@ -674,7 +674,7 @@ noreplaycheck:
 			esp_input_log(m, sav, spi, seq);
 			ipsec_save_wake_packet(m, ntohl(spi), seq);
 
-			// Return mbuf
+			              
 			if (interface != NULL &&
 			    interface == ipsec_if) {
 				out_m = m;
@@ -700,11 +700,11 @@ noreplaycheck:
 		nxt = IPPROTO_DONE;
 		KERNEL_DEBUG(DBG_FNC_ESPIN | DBG_FUNC_END, 2, 0, 0, 0, 0);
 	} else {
-		/*
-		 * strip off ESP header and IV.
-		 * even in m_pulldown case, we need to strip off ESP so that
-		 * we can always compute checksum for AH correctly.
-		 */
+		  
+                                 
+                                                              
+                                                     
+     
 		size_t stripsiz;
 
 		stripsiz = esplen + ivlen;
@@ -729,12 +729,12 @@ noreplaycheck:
 			goto bad;
 		}
 
-		/*
-		 * Set the csum valid flag, if we authenticated the
-		 * packet, the payload shouldn't be corrupt unless
-		 * it was corrupted before being signed on the other
-		 * side.
-		 */
+		  
+                                                     
+                                                    
+                                                      
+          
+     
 		if (nxt == IPPROTO_TCP || nxt == IPPROTO_UDP) {
 			m->m_pkthdr.csum_flags = CSUM_DATA_VALID | CSUM_PSEUDO_HDR;
 			m->m_pkthdr.csum_data = 0xFFFF;
@@ -749,11 +749,11 @@ noreplaycheck:
 			}
 			KERNEL_DEBUG(DBG_FNC_ESPIN | DBG_FUNC_END, 3, 0, 0, 0, 0);
 
-			/* translate encapsulated UDP port ? */
+			                                       
 			if ((sav->flags & SADB_X_EXT_NATT_MULTIPLEUSERS) != 0) {
 				struct udphdr   *udp;
 
-				if (nxt != IPPROTO_UDP) {       /* not UPD packet - drop it */
+				if (nxt != IPPROTO_UDP) {                                     
 					IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 					goto bad;
 				}
@@ -773,7 +773,7 @@ noreplaycheck:
 				lck_mtx_lock(sadb_mutex);
 				if (sav->natt_encapsulated_src_port == 0) {
 					sav->natt_encapsulated_src_port = udp->uh_sport;
-				} else if (sav->natt_encapsulated_src_port != udp->uh_sport) {  /* something wrong */
+				} else if (sav->natt_encapsulated_src_port != udp->uh_sport) {                       
 					IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 					lck_mtx_unlock(sadb_mutex);
 					goto bad;
@@ -787,11 +787,11 @@ noreplaycheck:
 			    struct ip *, ip, struct ifnet *, m->m_pkthdr.rcvif,
 			    struct ip *, ip, struct ip6_hdr *, NULL);
 
-			// Input via IPsec interface legacy path
+			                                        
 			lck_mtx_lock(sadb_mutex);
 			ifnet_t ipsec_if = sav->sah->ipsec_if;
 			if (ipsec_if != NULL) {
-				// If an interface is found, add a reference count before dropping the lock
+				                                                                           
 				ifnet_reference(ipsec_if);
 			}
 			lck_mtx_unlock(sadb_mutex);
@@ -813,7 +813,7 @@ noreplaycheck:
 				esp_input_log(m, sav, spi, seq);
 				ipsec_save_wake_packet(m, ntohl(spi), seq);
 
-				// Return mbuf
+				              
 				if (interface != NULL &&
 				    interface == ipsec_if) {
 					out_m = m;
@@ -890,7 +890,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 	sa_family_t ifamily;
 	mbuf_traffic_class_t traffic_class = 0;
 
-	/* sanity check for alignment. */
+	                                 
 	if (off % 4 != 0 || m->m_pkthdr.len % 4 != 0) {
 		ipseclog((LOG_ERR, "IPv6 ESP input: packet alignment problem "
 		    "(off=%d, pktlen=%d)\n", off, m->m_pkthdr.len));
@@ -910,7 +910,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 #endif
 	m->m_pkthdr.csum_flags &= ~CSUM_RX_FLAGS;
 
-	/* Expect 32-bit data aligned pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip6 = mtod(m, struct ip6_hdr *);
@@ -930,7 +930,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 		goto bad;
 	}
 
-	/* find the sassoc. */
+	                      
 	spi = esp->esp_spi;
 
 	if ((sav = key_allocsa_extended(AF_INET6,
@@ -973,7 +973,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 		goto bad;
 	}
 
-	/* check if we have proper ivlen information */
+	                                               
 	ivlen = sav->ivlen;
 	if (ivlen < 0) {
 		ipseclog((LOG_ERR, "inproper ivlen in IPv6 ESP input: %s %s\n",
@@ -990,7 +990,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 		traffic_class = rfc4594_dscp_to_tc(dscp);
 	}
 
-	/* Save ICV from packet for verification later */
+	                                                 
 	size_t siz = 0;
 	unsigned char saved_icv[AH_MAXSUMSIZE];
 	if (algo->finalizedecrypt) {
@@ -1011,11 +1011,11 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 		goto noreplaycheck;
 	}
 
-	/*
-	 * check for sequence number.
-	 */
+	  
+                              
+    
 	if (ipsec_chkreplay(seq, sav, (u_int8_t)traffic_class)) {
-		; /*okey*/
+		;         
 	} else {
 		IPSEC_STAT_INCREMENT(ipsec6stat.in_espreplay);
 		ipseclog((LOG_WARNING,
@@ -1024,7 +1024,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 		goto bad;
 	}
 
-	/* check ICV */
+	               
 	{
 		u_char sum0[AH_MAXSUMSIZE] __attribute__((aligned(4)));
 		u_char sum[AH_MAXSUMSIZE] __attribute__((aligned(4)));
@@ -1065,7 +1065,7 @@ esp6_input_extended(struct mbuf **mp, int *offp, int proto, ifnet_t interface)
 
 delay_icv:
 
-		/* strip off the authentication data */
+		                                       
 		m_adj(m, (int)-siz);
 		ip6 = mtod(m, struct ip6_hdr *);
 		ip6->ip6_plen = htons(ntohs(ip6->ip6_plen) - (u_int16_t)siz);
@@ -1074,9 +1074,9 @@ delay_icv:
 		IPSEC_STAT_INCREMENT(ipsec6stat.in_espauthsucc);
 	}
 
-	/*
-	 * update sequence number.
-	 */
+	  
+                           
+    
 	if ((sav->flags & SADB_X_EXT_OLD) == 0 && sav->replay[traffic_class] != NULL) {
 		if (ipsec_updatereplay(seq, sav, (u_int8_t)traffic_class)) {
 			IPSEC_STAT_INCREMENT(ipsec6stat.in_espreplay);
@@ -1086,12 +1086,12 @@ delay_icv:
 
 noreplaycheck:
 
-	/* process main esp header. */
+	                              
 	if (sav->flags & SADB_X_EXT_OLD) {
-		/* RFC 1827 */
+		              
 		esplen = sizeof(struct esp);
 	} else {
-		/* RFC 2406 */
+		              
 		if (sav->flags & SADB_X_EXT_DERIV) {
 			esplen = sizeof(struct esp);
 		} else {
@@ -1107,7 +1107,7 @@ noreplaycheck:
 	}
 
 #ifndef PULLDOWN_TEST
-	IP6_EXTHDR_CHECK(m, off, (int)(esplen + ivlen), return IPPROTO_DONE);  /*XXX*/
+	IP6_EXTHDR_CHECK(m, off, (int)(esplen + ivlen), return IPPROTO_DONE);         
 #else
 	IP6_EXTHDR_GET(esp, struct esp *, m, off, esplen + ivlen);
 	if (esp == NULL) {
@@ -1116,24 +1116,24 @@ noreplaycheck:
 		goto bad;
 	}
 #endif
-	ip6 = mtod(m, struct ip6_hdr *);        /*set it again just in case*/
+	ip6 = mtod(m, struct ip6_hdr *);                                     
 
-	/*
-	 * pre-compute and cache intermediate key
-	 */
+	  
+                                          
+    
 	if (esp_schedule(algo, sav) != 0) {
 		IPSEC_STAT_INCREMENT(ipsec6stat.in_inval);
 		goto bad;
 	}
 
-	/*
-	 * decrypt the packet.
-	 */
+	  
+                       
+    
 	if (!algo->decrypt) {
 		panic("internal error: no decrypt function");
 	}
 	if ((*algo->decrypt)(m, off, sav, algo, ivlen)) {
-		/* m is already freed */
+		                        
 		m = NULL;
 		ipseclog((LOG_ERR, "decrypt fail in IPv6 ESP input: %s\n",
 		    ipsec_logsastr(sav)));
@@ -1153,16 +1153,16 @@ noreplaycheck:
 		}
 	}
 
-	/*
-	 * find the trailer of the ESP.
-	 */
+	  
+                                
+    
 	m_copydata(m, m->m_pkthdr.len - sizeof(esptail), sizeof(esptail),
 	    (caddr_t)&esptail);
 	nxt = esptail.esp_nxt;
 	taillen = esptail.esp_padlen + sizeof(esptail);
 
 	if (m->m_pkthdr.len < taillen
-	    || m->m_pkthdr.len - taillen < sizeof(struct ip6_hdr)) {    /*?*/
+	    || m->m_pkthdr.len - taillen < sizeof(struct ip6_hdr)) {         
 		ipseclog((LOG_WARNING,
 		    "bad pad length in IPv6 ESP input: %s %s\n",
 		    ipsec6_logpacketstr(ip6, spi), ipsec_logsastr(sav)));
@@ -1170,13 +1170,13 @@ noreplaycheck:
 		goto bad;
 	}
 
-	/* strip off the trailing pad area. */
+	                                      
 	m_adj(m, -taillen);
 	ip6 = mtod(m, struct ip6_hdr *);
 	ip6->ip6_plen = htons(ntohs(ip6->ip6_plen) - taillen);
 
 	if (*nproto == IPPROTO_UDP) {
-		// offset includes the outer ip and udp header lengths.
+		                                                       
 		if (m->m_len < off) {
 			m = m_pullup(m, off);
 			if (!m) {
@@ -1188,9 +1188,9 @@ noreplaycheck:
 			ip6 = mtod(m, struct ip6_hdr *);
 		}
 
-		// check the UDP encap header to detect changes in the source port, and then strip the header
-		off -= sizeof(struct udphdr); // off no longer includes the udphdr's size
-		// if peer is behind nat and this is the latest esp packet
+		                                                                                             
+		off -= sizeof(struct udphdr);                                            
+		                                                          
 		if ((sav->flags & SADB_X_EXT_NATT_DETECTED_PEER) != 0 &&
 		    (sav->flags & SADB_X_EXT_OLD) == 0 &&
 		    seq && sav->replay[traffic_class] &&
@@ -1206,19 +1206,19 @@ noreplaycheck:
 	}
 
 
-	/* was it transmitted over the IPsec tunnel SA? */
+	                                                  
 	if (ipsec6_tunnel_validate(m, (int)(off + esplen + ivlen), nxt, sav, &ifamily)) {
 		ifaddr_t ifa;
 		struct sockaddr_storage addr;
 
-		/*
-		 * strip off all the headers that precedes ESP header.
-		 *	IP6 xx ESP IP6' payload -> IP6' payload
-		 *
-		 * XXX more sanity checks
-		 * XXX relationship with gif?
-		 */
-		u_int32_t flowinfo;     /*net endian*/
+		  
+                                                        
+                                            
+    
+                           
+                               
+     
+		u_int32_t flowinfo;                   
 		flowinfo = ip6->ip6_flow;
 		m_adj(m, (int)(off + esplen + ivlen));
 		if (ifamily == AF_INET6) {
@@ -1226,12 +1226,12 @@ noreplaycheck:
 
 			if (m->m_len < sizeof(*ip6)) {
 #ifndef PULLDOWN_TEST
-				/*
-				 * m_pullup is prohibited in KAME IPv6 input processing
-				 * but there's no other way!
-				 */
+				  
+                                                           
+                                
+       
 #else
-				/* okay to pullup in m_pulldown style */
+				                                        
 #endif
 				m = m_pullup(m, sizeof(*ip6));
 				if (!m) {
@@ -1240,7 +1240,7 @@ noreplaycheck:
 				}
 			}
 			ip6 = mtod(m, struct ip6_hdr *);
-			/* ECN consideration. */
+			                        
 			if (ip6_ecn_egress(ip6_ipsec_ecn, &flowinfo, &ip6->ip6_flow) == 0) {
 				IPSEC_STAT_INCREMENT(ipsec6stat.in_inval);
 				goto bad;
@@ -1276,7 +1276,7 @@ noreplaycheck:
 
 			ip = mtod(m, struct ip *);
 			otos = ip->ip_tos;
-			/* ECN consideration. */
+			                        
 			if (ip46_ecn_egress(ip6_ipsec_ecn, &flowinfo, &ip->ip_tos) == 0) {
 				IPSEC_STAT_INCREMENT(ipsecstat.in_inval);
 				goto bad;
@@ -1286,7 +1286,7 @@ noreplaycheck:
 				sum = ~ntohs(ip->ip_sum) & 0xffff;
 				sum += (~otos & 0xffff) + ip->ip_tos;
 				sum = (sum >> 16) + (sum & 0xffff);
-				sum += (sum >> 16); /* add carry */
+				sum += (sum >> 16);                
 				ip->ip_sum = htons(~sum & 0xffff);
 			}
 
@@ -1313,18 +1313,18 @@ noreplaycheck:
 			goto bad;
 		}
 
-		// update the receiving interface address based on the inner address
+		                                                                    
 		ifa = ifa_ifwithaddr((struct sockaddr *)&addr);
 		if (ifa) {
 			m->m_pkthdr.rcvif = ifa->ifa_ifp;
 			IFA_REMREF(ifa);
 		}
 
-		// Input via IPsec interface
+		                            
 		lck_mtx_lock(sadb_mutex);
 		ifnet_t ipsec_if = sav->sah->ipsec_if;
 		if (ipsec_if != NULL) {
-			// If an interface is found, add a reference count before dropping the lock
+			                                                                           
 			ifnet_reference(ipsec_if);
 		}
 		lck_mtx_unlock(sadb_mutex);
@@ -1332,7 +1332,7 @@ noreplaycheck:
 			esp_input_log(m, sav, spi, seq);
 			ipsec_save_wake_packet(m, ntohl(spi), seq);
 
-			// Return mbuf
+			              
 			if (interface != NULL &&
 			    interface == ipsec_if) {
 				ifnet_release(ipsec_if);
@@ -1356,18 +1356,18 @@ noreplaycheck:
 		}
 		nxt = IPPROTO_DONE;
 	} else {
-		/*
-		 * strip off ESP header and IV.
-		 * even in m_pulldown case, we need to strip off ESP so that
-		 * we can always compute checksum for AH correctly.
-		 */
+		  
+                                 
+                                                              
+                                                     
+     
 		u_int16_t stripsiz;
 		char *prvnxtp;
 
-		/*
-		 * Set the next header field of the previous header correctly.
-		 */
-		prvnxtp = ip6_get_prevhdr(m, off); /* XXX */
+		  
+                                                                
+     
+		prvnxtp = ip6_get_prevhdr(m, off);          
 		*prvnxtp = (u_int8_t)nxt;
 
 		VERIFY(esplen + ivlen <= UINT16_MAX);
@@ -1380,35 +1380,35 @@ noreplaycheck:
 			m->m_len -= stripsiz;
 			m->m_pkthdr.len -= stripsiz;
 		} else {
-			/*
-			 * this comes with no copy if the boundary is on
-			 * cluster
-			 */
+			  
+                                                   
+             
+      
 			struct mbuf *n;
 
 			n = m_split(m, off, M_DONTWAIT);
 			if (n == NULL) {
-				/* m is retained by m_split */
+				                              
 				goto bad;
 			}
 			m_adj(n, stripsiz);
-			/* m_cat does not update m_pkthdr.len */
+			                                        
 			m->m_pkthdr.len += n->m_pkthdr.len;
 			m_cat(m, n);
 		}
 
 #ifndef PULLDOWN_TEST
-		/*
-		 * KAME requires that the packet to be contiguous on the
-		 * mbuf.  We need to make that sure.
-		 * this kind of code should be avoided.
-		 * XXX other conditions to avoid running this part?
-		 */
+		  
+                                                          
+                                      
+                                         
+                                                     
+     
 		if (m->m_len != m->m_pkthdr.len) {
 			struct mbuf *n = NULL;
 			int maxlen;
 
-			MGETHDR(n, M_DONTWAIT, MT_HEADER);      /* MAC-OK */
+			MGETHDR(n, M_DONTWAIT, MT_HEADER);                  
 			maxlen = MHLEN;
 			if (n) {
 				M_COPY_PKTHDR(n, m);
@@ -1452,23 +1452,23 @@ noreplaycheck:
 			goto bad;
 		}
 
-		/*
-		 * Set the csum valid flag, if we authenticated the
-		 * packet, the payload shouldn't be corrupt unless
-		 * it was corrupted before being signed on the other
-		 * side.
-		 */
+		  
+                                                     
+                                                    
+                                                      
+          
+     
 		if (nxt == IPPROTO_TCP || nxt == IPPROTO_UDP) {
 			m->m_pkthdr.csum_flags = CSUM_DATA_VALID | CSUM_PSEUDO_HDR;
 			m->m_pkthdr.csum_data = 0xFFFF;
 			_CASSERT(offsetof(struct pkthdr, csum_data) == offsetof(struct pkthdr, csum_rx_val));
 		}
 
-		// Input via IPsec interface
+		                            
 		lck_mtx_lock(sadb_mutex);
 		ifnet_t ipsec_if = sav->sah->ipsec_if;
 		if (ipsec_if != NULL) {
-			// If an interface is found, add a reference count before dropping the lock
+			                                                                           
 			ifnet_reference(ipsec_if);
 		}
 		lck_mtx_unlock(sadb_mutex);
@@ -1476,7 +1476,7 @@ noreplaycheck:
 			esp_input_log(m, sav, spi, seq);
 			ipsec_save_wake_packet(m, ntohl(spi), seq);
 
-			// Return mbuf
+			              
 			if (interface != NULL &&
 			    interface == ipsec_if) {
 				ifnet_release(ipsec_if);
@@ -1544,7 +1544,7 @@ esp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 		return;
 	}
 
-	/* if the parameter is from icmp6, decode it. */
+	                                                
 	if (d != NULL) {
 		ip6cp = (struct ip6ctlparam *)d;
 		m = ip6cp->ip6c_m;
@@ -1556,39 +1556,39 @@ esp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 	}
 
 	if (ip6) {
-		/*
-		 * Notify the error to all possible sockets via pfctlinput2.
-		 * Since the upper layer information (such as protocol type,
-		 * source and destination ports) is embedded in the encrypted
-		 * data and might have been cut, we can't directly call
-		 * an upper layer ctlinput function. However, the pcbnotify
-		 * function will consider source and destination addresses
-		 * as well as the flow info value, and may be able to find
-		 * some PCB that should be notified.
-		 * Although pfctlinput2 will call esp6_ctlinput(), there is
-		 * no possibility of an infinite loop of function calls,
-		 * because we don't pass the inner IPv6 header.
-		 */
+		  
+                                                              
+                                                              
+                                                               
+                                                         
+                                                             
+                                                            
+                                                            
+                                      
+                                                             
+                                                          
+                                                 
+     
 		bzero(&ip6cp1, sizeof(ip6cp1));
 		ip6cp1.ip6c_src = ip6cp->ip6c_src;
 		pfctlinput2(cmd, sa, (void *)&ip6cp1);
 
-		/*
-		 * Then go to special cases that need ESP header information.
-		 * XXX: We assume that when ip6 is non NULL,
-		 * M and OFF are valid.
-		 */
+		  
+                                                               
+                                              
+                         
+     
 
-		/* check if we can safely examine src and dst ports */
+		                                                      
 		if (m->m_pkthdr.len < off + sizeof(esp)) {
 			return;
 		}
 
 		if (m->m_len < off + sizeof(esp)) {
-			/*
-			 * this should be rare case,
-			 * so we compromise on this copy...
-			 */
+			  
+                               
+                                      
+      
 			m_copydata(m, off, sizeof(esp), (caddr_t)&esp);
 			espp = &esp;
 		} else {
@@ -1598,10 +1598,10 @@ esp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 		if (cmd == PRC_MSGSIZE) {
 			int valid = 0;
 
-			/*
-			 * Check to see if we have a valid SA corresponding to
-			 * the address in the ICMP message payload.
-			 */
+			  
+                                                         
+                                              
+      
 			sa6_src = ip6cp->ip6c_src;
 			sa6_dst = (struct sockaddr_in6 *)(void *)sa;
 			sav = key_allocsa(AF_INET6,
@@ -1616,18 +1616,18 @@ esp6_ctlinput(int cmd, struct sockaddr *sa, void *d, __unused struct ifnet *ifp)
 				key_freesav(sav, KEY_SADB_UNLOCKED);
 			}
 
-			/* XXX Further validation? */
+			                             
 
-			/*
-			 * Depending on the value of "valid" and routing table
-			 * size (mtudisc_{hi,lo}wat), we will:
-			 * - recalcurate the new MTU and create the
-			 *   corresponding routing entry, or
-			 * - ignore the MTU change notification.
-			 */
+			  
+                                                         
+                                         
+                                              
+                                       
+                                           
+      
 			icmp6_mtudisc_update((struct ip6ctlparam *)d, valid);
 		}
 	} else {
-		/* we normally notify any pcb here */
+		                                     
 	}
 }

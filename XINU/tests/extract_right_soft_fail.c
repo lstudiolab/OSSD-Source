@@ -22,8 +22,8 @@ test_extract_immovable_task_port(pid_t pid)
 	ipc_info_space_t space_info;
 	ipc_info_name_array_t table;
 	mach_msg_type_number_t tableCount;
-	ipc_info_tree_name_array_t tree; /* unused */
-	mach_msg_type_number_t treeCount; /* unused */
+	ipc_info_tree_name_array_t tree;             
+	mach_msg_type_number_t treeCount;             
 
 	mach_port_t extracted;
 	mach_msg_type_name_t right;
@@ -35,7 +35,7 @@ test_extract_immovable_task_port(pid_t pid)
 	T_LOG("Target pid: %d", pid);
 
 	if (pid == getpid()) {
-		/* self extraction should succeed */
+		                                    
 		kr = mach_port_extract_right(mach_task_self(), mach_task_self(), MACH_MSG_TYPE_COPY_SEND, &extracted, &right);
 		T_EXPECT_MACH_SUCCESS(kr, "mach_port_extract_right() on immovable port in current space should succeed");
 	} else {
@@ -82,7 +82,7 @@ T_DECL(extract_right_soft_fail, "Test mach_port_extract_right() fail on extracti
 		T_SKIP("immovable control port hard enforcement isn't enabled");
 	}
 
-	/* extracting mach_task_self() should succeed */
+	                                                
 	test_extract_immovable_task_port(getpid());
 
 	ret = pipe(fd);
@@ -102,10 +102,10 @@ T_DECL(extract_right_soft_fail, "Test mach_port_extract_right() fail on extracti
 	} else {
 		close(fd[1]);
 		char data[6];
-		read(fd[0], data, 6); /* blocks until data available */
+		read(fd[0], data, 6);                                  
 		close(fd[0]);
 
-		/* extracting child's immovable task port should fail without crash */
+		                                                                      
 		test_extract_immovable_task_port(child_pid);
 
 		kill(child_pid, SIGKILL);

@@ -27,6 +27,6 @@
  */
 #ifndef _OFF_T
 #define _OFF_T
-#include <sys/_types.h> /* __darwin_off_t */
+#include <sys/_types.h>                     
 typedef __darwin_off_t          off_t;
-#endif  /* _OFF_T */
+#endif              

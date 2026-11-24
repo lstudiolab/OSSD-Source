@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_kern.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Kernel memory management definitions.
- */
+  
+   
+  
+                     
+                                                    
+             
+  
+                                        
+   
 
 #ifndef _VM_VM_KERN_H_
 #define _VM_VM_KERN_H_
@@ -94,15 +94,15 @@ __options_decl(kma_flags_t, uint32_t, {
 	KMA_NOENCRYPT   = 0x00000080,
 	KMA_KSTACK      = 0x00000100,
 	KMA_VAONLY      = 0x00000200,
-	/*
-	 * Pages belonging to the compressor are not on the paging queues,
-	 * nor are they counted as wired.
-	 */
+	  
+                                                                   
+                                  
+    
 	KMA_COMPRESSOR  = 0x00000400,
 	KMA_ATOMIC      = 0x00000800,
 	KMA_ZERO        = 0x00001000,
 	KMA_PAGEABLE    = 0x00002000,
-	KMA_KHEAP       = 0x00004000,  /* Pages belonging to zones backing one of kalloc_heap. */
+	KMA_KHEAP       = 0x00004000,                                                            
 });
 
 extern kern_return_t    kernel_memory_allocate(
@@ -223,11 +223,11 @@ extern kern_return_t    mach_memory_info_check(void);
 
 extern kern_return_t    vm_kern_allocation_info(uintptr_t addr, vm_size_t * size, vm_tag_t * tag, vm_size_t * zone_size);
 
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 #if HIBERNATION
 extern void             hibernate_rebuild_vm_structs(void);
-#endif /* HIBERNATION */
+#endif                  
 
 extern vm_tag_t         vm_tag_bt(void);
 
@@ -243,7 +243,7 @@ extern void             vm_allocation_zones_init(void);
 extern vm_tag_t         vm_tag_will_update_zone(vm_tag_t tag, uint32_t zidx, uint32_t zflags);
 extern void             vm_tag_update_zone_size(vm_tag_t tag, uint32_t zidx, long delta);
 
-#endif /* VM_MAX_TAG_ZONES */
+#endif                       
 
 extern vm_tag_t         vm_tag_bt_debug(void);
 
@@ -253,7 +253,7 @@ extern boolean_t        vm_kernel_map_is_kernel(vm_map_t map);
 
 extern ppnum_t          kernel_pmap_present_mapping(uint64_t vaddr, uint64_t * pvincr, uintptr_t * pvphysaddr);
 
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 
 extern kern_return_t    kmem_alloc(
 	vm_map_t        map,
@@ -275,16 +275,16 @@ extern void             kmem_free(
 	vm_offset_t     addr,
 	vm_size_t       size);
 
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 
 
 #ifdef XNU_KERNEL_PRIVATE
 typedef struct vm_allocation_site kern_allocation_name;
 typedef kern_allocation_name * kern_allocation_name_t;
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 struct kern_allocation_name;
 typedef struct kern_allocation_name * kern_allocation_name_t;
-#endif /* !XNU_KERNEL_PRIVATE */
+#endif                          
 
 extern kern_allocation_name_t   kern_allocation_name_allocate(const char * name, uint16_t suballocs);
 extern void                     kern_allocation_name_release(kern_allocation_name_t allocation);
@@ -293,7 +293,7 @@ extern const char *             kern_allocation_get_name(kern_allocation_name_t 
 extern void                     kern_allocation_update_size(kern_allocation_name_t allocation, int64_t delta);
 extern void                     kern_allocation_update_subtotal(kern_allocation_name_t allocation, uint32_t subtag, int64_t delta);
 extern vm_tag_t                 kern_allocation_name_get_vm_tag(kern_allocation_name_t allocation);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef  MACH_KERNEL_PRIVATE
 
@@ -338,7 +338,7 @@ extern kern_return_t    kmem_alloc_pageable_external(
 	vm_offset_t     *addrp,
 	vm_size_t       size);
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -455,14 +455,14 @@ extern kern_return_t vm_map_wire_and_extract_kernel(
 	boolean_t       user_wire,
 	ppnum_t         *physpage_p);
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
 extern vm_map_t kernel_map;
 extern vm_map_t kernel_pageable_map;
 extern vm_map_t ipc_kernel_map;
 extern vm_map_t g_kext_map;
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 #ifdef KERNEL
 
@@ -496,14 +496,14 @@ extern uint64_t vm_kernel_addrhash_salt_ext;
 extern void vm_kernel_addrhash_external(
 	vm_offset_t addr,
 	vm_offset_t *perm_addr);
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 extern void vm_init_before_launchd(void);
 
-#endif /* KERNEL */
+#endif             
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* _VM_VM_KERN_H_ */
+#endif                      

@@ -82,5 +82,5 @@ pmap_pcid_validate_cpu(pmap_t tpmap, int ccpu)
 {
 	tpmap->pmap_pcid_coherency_vector[ccpu] = 0;
 }
-#endif /* x86_64 */
+#endif             
 #endif

@@ -1,8 +1,8 @@
-/* quick and dirty hack to grab credential backtrace info from kernel via sysctl.
- * sysctl is only defined if xnu is built with DEBUG_CRED defined.
- * The current version of this is used to target a specific credential and gather
- * backtrace info on all references and unreferences.
- */
+                                                                                 
+                                                                  
+                                                                                 
+                                                     
+   
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,9 +16,9 @@
 #include <sys/sysctl.h>
 #include <bsm/audit.h>
 
-/* bad!  this is replicated in kern_credential.c.  make sure they stay in sync!
- * Or better yet have commone header file?
- */
+                                                                               
+                                          
+   
 #define MAX_STACK_DEPTH 8
 struct cred_backtrace {
 	int                             depth;
@@ -41,7 +41,7 @@ main( int argc, char *argv[] )
 	cred_debug_buffer       *bt_buffp;
 	cred_backtrace          *btp;
 
-	/* get size of buffer we will need */
+	                                     
 	len = 0;
 	err = sysctlbyname( "kern.cred_bt", NULL, &len, NULL, 0 );
 	if (err != 0) {
@@ -50,7 +50,7 @@ main( int argc, char *argv[] )
 		return;
 	}
 
-	/* get a buffer for our back traces */
+	                                      
 	my_bufferp = malloc( len );
 	if (my_bufferp == NULL) {
 		printf( "malloc error %d - \"%s\" \n", errno, strerror( errno ));

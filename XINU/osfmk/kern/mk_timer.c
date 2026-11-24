@@ -80,7 +80,7 @@ mk_timer_create_trap(
 	ipc_port_t            port;
 	kern_return_t         result;
 
-	/* Allocate and initialize local state of a timer object */
+	                                                           
 	timer = (struct mk_timer*)zalloc(mk_timer_zone);
 	if (timer == NULL) {
 		return MACH_PORT_NULL;
@@ -90,7 +90,7 @@ mk_timer_create_trap(
 	timer->is_armed = timer->is_dead = FALSE;
 	timer->active = 0;
 
-	/* Pre-allocate a kmsg for the timer messages */
+	                                                
 	ipc_kmsg_t kmsg;
 	kmsg = ipc_kmsg_prealloc(mk_timer_qos.len + MAX_TRAILER_SIZE);
 	if (kmsg == IKM_NULL) {
@@ -106,13 +106,13 @@ mk_timer_create_trap(
 		return MACH_PORT_NULL;
 	}
 
-	/* Associate the pre-allocated kmsg with the port */
+	                                                    
 	ipc_kmsg_set_prealloc(kmsg, port);
 
-	/* port locked, receive right at user-space */
+	                                              
 	ipc_kobject_set_atomically(port, (ipc_kobject_t)timer, IKOT_TIMER);
 
-	/* make a (naked) send right for the timer to keep */
+	                                                     
 	timer->port = ipc_port_make_send_locked(port);
 
 	ip_unlock(port);
@@ -205,18 +205,18 @@ mk_timer_expire(
 	simple_unlock(&timer->lock);
 }
 
-/*
- * mk_timer_destroy_trap: Destroy the Mach port associated with a timer
- *
- * Parameters:  args                     User argument descriptor (see below)
- *
- * Indirect:     args->name               Mach port name
- *
- *
- * Returns:        0                      Success
- *                !0                      Not success
- *
- */
+  
+                                                                       
+  
+                                                                             
+  
+                                                        
+  
+  
+                                                 
+                                                     
+  
+   
 kern_return_t
 mk_timer_destroy_trap(
 	struct mk_timer_destroy_trap_args *args)
@@ -233,7 +233,7 @@ mk_timer_destroy_trap(
 
 	if (ip_kotype(port) == IKOT_TIMER) {
 		ip_unlock(port);
-		/* TODO: this should be mach_port_mod_refs */
+		                                             
 		result = mach_port_destroy(myspace, name);
 	} else {
 		ip_unlock(port);
@@ -243,19 +243,19 @@ mk_timer_destroy_trap(
 	return result;
 }
 
-/*
- * mk_timer_arm_trap: Start (arm) a timer
- *
- * Parameters:  args                     User argument descriptor (see below)
- *
- * Indirect:     args->name               Mach port name
- *               args->expire_time        Time when timer expires
- *
- *
- * Returns:        0                      Success
- *                !0                      Not success
- *
- */
+  
+                                         
+  
+                                                                             
+  
+                                                        
+                                                                 
+  
+  
+                                                 
+                                                     
+  
+   
 
 static kern_return_t
 mk_timer_arm_trap_internal(mach_port_name_t name, uint64_t expire_time, uint64_t mk_leeway, uint64_t mk_timer_flags)
@@ -325,19 +325,19 @@ mk_timer_arm_leeway_trap(struct mk_timer_arm_leeway_trap_args *args)
 	return mk_timer_arm_trap_internal(args->name, args->expire_time, args->mk_leeway, args->mk_timer_flags);
 }
 
-/*
- * mk_timer_cancel_trap: Cancel a timer
- *
- * Parameters:  args                     User argument descriptor (see below)
- *
- * Indirect:     args->name               Mach port name
- *               args->result_time        The armed time of the cancelled timer (return value)
- *
- *
- * Returns:        0                      Success
- *                !0                      Not success
- *
- */
+  
+                                       
+  
+                                                                             
+  
+                                                        
+                                                                                              
+  
+  
+                                                 
+                                                     
+  
+   
 kern_return_t
 mk_timer_cancel_trap(
 	struct mk_timer_cancel_trap_args *args)

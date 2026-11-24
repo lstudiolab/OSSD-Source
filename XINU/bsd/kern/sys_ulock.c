@@ -67,28 +67,28 @@
 #include <os/hash.h>
 #include <sys/ulock.h>
 
-/*
- * How ulock promotion works:
- *
- * There’s a requested policy field on every thread called ‘promotions’, which
- * expresses which ulock promotions are happening to this thread.
- * The promotion priority saturates until the promotion count goes to 0.
- *
- * We also track effective promotion qos, which is the qos before clamping.
- * This value is used for promoting a thread that another thread is waiting on,
- * so that the lock owner reinflates to the right priority after unclamping.
- *
- * This also works for non-QoS threads, which can donate base priority to QoS
- * and non-QoS threads alike.
- *
- * ulock wait applies a promotion to the owner communicated through
- * UL_UNFAIR_LOCK as waiters block, and that promotion is saturated as long as
- * there is still an owner.  In ulock wake, if the waker is still the owner,
- * then it clears its ownership and drops the boost.  It does NOT transfer
- * ownership/priority boost to the new thread.  Instead, it selects the
- * waiting thread with the highest base priority to be woken next, and
- * relies on that thread to carry the torch for the other waiting threads.
- */
+  
+                             
+  
+                                                                              
+                                                                 
+                                                                        
+  
+                                                                           
+                                                                               
+                                                                            
+  
+                                                                             
+                             
+  
+                                                                   
+                                                                              
+                                                                            
+                                                                          
+                                                                       
+                                                                      
+                                                                          
+   
 
 static LCK_GRP_DECLARE(ull_lck_grp, "ulocks");
 
@@ -144,11 +144,11 @@ ull_key_match(ulk_t *a, ulk_t *b)
 }
 
 typedef struct ull {
-	/*
-	 * ull_owner is the most recent known value for the owner of this ulock
-	 * i.e. it may be out of date WRT the real value in userspace.
-	 */
-	thread_t        ull_owner; /* holds +1 thread reference */
+	  
+                                                                        
+                                                               
+    
+	thread_t        ull_owner;                                
 	ulk_t           ull_key;
 	ull_lock_t      ull_lock;
 	uint            ull_bucket_index;
@@ -228,9 +228,9 @@ void
 ulock_initialize(void)
 {
 	assert(thread_max > 16);
-	/* Size ull_hash_buckets based on thread_max.
-	 * Round up to nearest power of 2, then divide by 4
-	 */
+	                                             
+                                                    
+    
 	ull_hash_buckets = (1 << (bit_ceiling(thread_max) - 2));
 
 	kprintf("%s>thread_max=%d, ull_hash_buckets=%d\n", __FUNCTION__, thread_max, ull_hash_buckets);
@@ -247,9 +247,9 @@ ulock_initialize(void)
 }
 
 #if DEVELOPMENT || DEBUG
-/* Count the number of hash entries for a given pid.
- * if pid==0, dump the whole table.
- */
+                                                    
+                                   
+   
 static int
 ull_hash_dump(pid_t pid)
 {
@@ -316,10 +316,10 @@ ull_free(ull_t *ull)
 	zfree(ull_zone, ull);
 }
 
-/* Finds an existing ulock structure (ull_t), or creates a new one.
- * If MUST_EXIST flag is set, returns NULL instead of creating a new one.
- * The ulock structure is returned with ull_lock locked
- */
+                                                                   
+                                                                         
+                                                       
+   
 static ull_t *
 ull_get(ulk_t *key, uint32_t flags, ull_t **unused_ull)
 {
@@ -340,7 +340,7 @@ ull_get(ulk_t *key, uint32_t flags, ull_t **unused_ull)
 	}
 	if (ull == NULL) {
 		if (flags & ULL_MUST_EXIST) {
-			/* Must already exist (called from wake) */
+			                                           
 			ull_bucket_unlock(i);
 			assert(new_ull == NULL);
 			assert(unused_ull == NULL);
@@ -348,7 +348,7 @@ ull_get(ulk_t *key, uint32_t flags, ull_t **unused_ull)
 		}
 
 		if (new_ull == NULL) {
-			/* Alloc above failed */
+			                        
 			ull_bucket_unlock(i);
 			return NULL;
 		}
@@ -367,12 +367,12 @@ ull_get(ulk_t *key, uint32_t flags, ull_t **unused_ull)
 
 	ull_bucket_unlock(i);
 
-	return ull; /* still locked */
+	return ull;                   
 }
 
-/*
- * Must be called with ull_lock held
- */
+  
+                                    
+   
 static void
 ull_put(ull_t *ull)
 {
@@ -450,10 +450,10 @@ ulock_resolve_owner(uint32_t value, thread_t *owner)
 	    PORT_TO_THREAD_IN_CURRENT_TASK |
 	    PORT_TO_THREAD_NOT_CURRENT_THREAD);
 	if (*owner == THREAD_NULL) {
-		/*
-		 * Translation failed - even though the lock value is up to date,
-		 * whatever was stored in the lock wasn't actually a thread port.
-		 */
+		  
+                                                                   
+                                                                   
+     
 		return owner_name == MACH_PORT_DEAD ? ESRCH : EOWNERDEAD;
 	}
 	return 0;
@@ -487,7 +487,7 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 	thread_t self = current_thread();
 	ulk_t key;
 
-	/* involved threads - each variable holds +1 ref if not null */
+	                                                               
 	thread_t owner_thread   = THREAD_NULL;
 	thread_t old_owner      = THREAD_NULL;
 
@@ -550,16 +550,16 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 	}
 
 	if ((flags & ULF_WAIT_ADAPTIVE_SPIN) && set_owner) {
-		/*
-		 * Attempt the copyin outside of the lock once,
-		 *
-		 * If it doesn't match (which is common), return right away.
-		 *
-		 * If it matches, resolve the current owner, and if it is on core,
-		 * spin a bit waiting for the value to change. If the owner isn't on
-		 * core, or if the value stays stable, then go on with the regular
-		 * blocking code.
-		 */
+		  
+                                                 
+    
+                                                              
+    
+                                                                    
+                                                                      
+                                                                    
+                   
+     
 		uint64_t end = 0;
 		uint32_t u32;
 
@@ -572,7 +572,7 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 				break;
 			}
 
-			/* owner_thread may have a +1 starting here */
+			                                              
 
 			if (!machine_thread_on_core(owner_thread)) {
 				break;
@@ -594,7 +594,7 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 		ret = ENOMEM;
 		goto munge_retval;
 	}
-	/* ull is locked */
+	                   
 
 	ull->ull_nwaiters++;
 
@@ -605,16 +605,16 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 		goto out_locked;
 	}
 
-	/*
-	 * We don't want this copyin to get wedged behind VM operations,
-	 * but we have to read the userspace value under the ull lock for correctness.
-	 *
-	 * Until <rdar://problem/24999882> exists,
-	 * holding the ull spinlock across copyin forces any
-	 * vm_fault we encounter to fail.
-	 */
+	  
+                                                                 
+                                                                               
+   
+                                           
+                                                     
+                                  
+    
 
-	/* copyin_atomicXX always checks alignment */
+	                                             
 
 	if (lock_size == 4) {
 		uint32_t u32;
@@ -625,7 +625,7 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 	}
 
 #if DEVELOPMENT || DEBUG
-	/* Occasionally simulate copyin finding the user address paged out */
+	                                                                     
 	if (((ull_simulate_copyin_fault == p->p_pid) || (ull_simulate_copyin_fault == 1)) && (copy_ret == 0)) {
 		static _Atomic int fault_inject = 0;
 		if (os_atomic_inc_orig(&fault_inject, relaxed) % 73 == 0) {
@@ -634,15 +634,15 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 	}
 #endif
 	if (copy_ret != 0) {
-		/* copyin() will return an error if the access to the user addr would have faulted,
-		 * so just return and let the user level code fault it in.
-		 */
+		                                                                                   
+                                                            
+     
 		ret = copy_ret;
 		goto out_locked;
 	}
 
 	if (value != args->value) {
-		/* Lock value has changed from expected so bail out */
+		                                                      
 		goto out_locked;
 	}
 
@@ -650,43 +650,43 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 		if (owner_thread == THREAD_NULL) {
 			ret = ulock_resolve_owner((uint32_t)args->value, &owner_thread);
 			if (ret == EOWNERDEAD) {
-				/*
-				 * Translation failed - even though the lock value is up to date,
-				 * whatever was stored in the lock wasn't actually a thread port.
-				 */
+				  
+                                                                     
+                                                                     
+       
 				goto out_locked;
 			}
-			/* HACK: don't bail on MACH_PORT_DEAD, to avoid blowing up the no-tsd pthread lock */
+			                                                                                     
 			ret = 0;
 		}
-		/* owner_thread has a +1 reference */
+		                                     
 
-		/*
-		 * At this point, I know:
-		 * a) owner_thread is definitely the current owner, because I just read the value
-		 * b) owner_thread is either:
-		 *      i) holding the user lock or
-		 *      ii) has just unlocked the user lock after I looked
-		 *              and is heading toward the kernel to call ull_wake.
-		 *              If so, it's going to have to wait for the ull mutex.
-		 *
-		 * Therefore, I can ask the turnstile to promote its priority, and I can rely
-		 * on it to come by later to issue the wakeup and lose its promotion.
-		 */
+		  
+                           
+                                                                                   
+                               
+                                     
+                                                            
+                                                                    
+                                                                      
+    
+                                                                               
+                                                                       
+     
 
-		/* Return the +1 ref from the ull_owner field */
+		                                                
 		old_owner = ull->ull_owner;
 		ull->ull_owner = THREAD_NULL;
 
 		if (owner_thread != THREAD_NULL) {
-			/* The ull_owner field now owns a +1 ref on owner_thread */
+			                                                           
 			thread_reference(owner_thread);
 			ull->ull_owner = owner_thread;
 		}
 	}
 
 	wait_result_t wr;
-	uint64_t timeout = args->timeout; /* nanoseconds */
+	uint64_t timeout = args->timeout;                  
 	uint64_t deadline = TIMEOUT_WAIT_FOREVER;
 	wait_interrupt_t interruptible = THREAD_ABORTSAFE;
 	struct turnstile *ts;
@@ -734,7 +734,7 @@ ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
 			assert(owner_thread == THREAD_NULL);
 			thread_block_parameter(ulock_wait_continue, ull);
 		}
-		/* NOT REACHED */
+		                 
 	}
 
 	ret = wait_result_to_return_code(wr);
@@ -767,9 +767,9 @@ munge_retval:
 	return ret;
 }
 
-/*
- * Must be called with ull_lock held
- */
+  
+                                    
+   
 static void
 ulock_wait_cleanup(ull_t *ull, thread_t owner_thread, thread_t old_owner, int32_t *retval)
 {
@@ -779,11 +779,11 @@ ulock_wait_cleanup(ull_t *ull, thread_t owner_thread, thread_t old_owner, int32_
 
 	*retval = --ull->ull_nwaiters;
 	if (ull->ull_nwaiters == 0) {
-		/*
-		 * If the wait was canceled early, we might need to
-		 * clear out the lingering owner reference before
-		 * freeing the ull.
-		 */
+		  
+                                                     
+                                                   
+                     
+     
 		old_lingering_owner = ull->ull_owner;
 		ull->ull_owner = THREAD_NULL;
 
@@ -793,7 +793,7 @@ ulock_wait_cleanup(ull_t *ull, thread_t owner_thread, thread_t old_owner, int32_
 	}
 	ull_put(ull);
 
-	/* Need to be called after dropping the interlock */
+	                                                    
 	turnstile_cleanup();
 
 	if (owner_thread != THREAD_NULL) {
@@ -848,7 +848,7 @@ ulock_wake(struct proc *p, struct ulock_wake_args *args, __unused int32_t *retva
 	int ret = 0;
 	ulk_t key;
 
-	/* involved threads - each variable holds +1 ref if not null */
+	                                                               
 	thread_t wake_thread    = THREAD_NULL;
 
 #if DEVELOPMENT || DEBUG
@@ -946,7 +946,7 @@ ulock_wake(struct proc *p, struct ulock_wake_args *args, __unused int32_t *retva
 		ret = ENOENT;
 		goto munge_retval;
 	}
-	/* ull is locked */
+	                   
 
 	if (opcode != ull->ull_opcode) {
 		ret = EDOM;
@@ -955,14 +955,14 @@ ulock_wake(struct proc *p, struct ulock_wake_args *args, __unused int32_t *retva
 
 	if (set_owner) {
 		if ((ull->ull_owner != current_thread()) && !allow_non_owner) {
-			/*
-			 * If the current thread isn't the known owner,
-			 * then this wake call was late to the party,
-			 * and the kernel already knows who owns the lock.
-			 *
-			 * This current owner already knows the lock is contended
-			 * and will redrive wakes, just bail out.
-			 */
+			  
+                                                  
+                                                
+                                                     
+     
+                                                            
+                                            
+      
 			goto out_ull_put;
 		}
 	} else {
@@ -989,11 +989,11 @@ ulock_wake(struct proc *p, struct ulock_wake_args *args, __unused int32_t *retva
 		waitq_wakeup64_all(&ts->ts_waitq, CAST_EVENT64_T(ULOCK_TO_EVENT(ull)),
 		    THREAD_AWAKENED, 0);
 	} else if (set_owner) {
-		/*
-		 * The turnstile waitq is priority ordered,
-		 * and will wake up the highest priority waiter
-		 * and set it as the inheritor for us.
-		 */
+		  
+                                             
+                                                 
+                                        
+     
 		new_owner = waitq_wakeup64_identify(&ts->ts_waitq,
 		    CAST_EVENT64_T(ULOCK_TO_EVENT(ull)),
 		    THREAD_AWAKENED, WAITQ_PROMOTE_ON_WAKE);
@@ -1014,7 +1014,7 @@ out_ull_put:
 	ull_put(ull);
 
 	if (ts != TURNSTILE_NULL) {
-		/* Need to be called after dropping the interlock */
+		                                                    
 		turnstile_cleanup();
 	}
 

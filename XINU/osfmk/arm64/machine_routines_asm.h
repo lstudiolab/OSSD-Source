@@ -34,29 +34,29 @@
 #error "This header should only be used in .s files"
 #endif
 
-/**
- * Loads the following values from the thread_kernel_state pointer in x0:
- *
- * x1: $x0->ss_64.pc
- * w2: $x0->ss_64.cpsr
- * x16: $x0->ss_64.x16
- * x17: $x0->ss_64.x17
- * lr: $x0->ss_64.lr
- *
- * On CPUs with PAC support, this macro will auth the above values with ml_check_signed_state().
- *
- * tmp1 - scratch register 1
- * tmp2 - scratch register 2
- * tmp3 - scratch register 3
- * tmp4 - scratch register 4
- * tmp5 - scratch register 5
- */
-/* BEGIN IGNORE CODESTYLE */
+   
+                                                                         
+  
+                    
+                      
+                      
+                      
+                    
+  
+                                                                                                
+  
+                            
+                            
+                            
+                            
+                            
+   
+                            
 .macro AUTH_THREAD_STATE_IN_X0_COMMON tmp1, tmp2, tmp3, tmp4, tmp5, el0_state_allowed=0, PC_OFF=SS64_PC, CPSR_OFF=SS64_CPSR, X16_OFF=SS64_X16, LR_OFF=SS64_LR, check_func=ml_check_signed_state
 	ldr		w2, [x0, \CPSR_OFF]
 .if \el0_state_allowed==0
 #if __has_feature(ptrauth_calls)
-	// If testing for a canary CPSR value, ensure that we do not observe writes to other fields without it
+	                                                                                                      
 	dmb		ld
 #endif
 .endif
@@ -64,20 +64,20 @@
 	ldp		x16, x17, [x0, \X16_OFF]
 
 #if defined(HAS_APPLE_PAC)
-	// Save x3-x5 to preserve across call
+	                                     
 	mov		\tmp3, x3
 	mov		\tmp4, x4
 	mov		\tmp5, x5
 
-	/*
-	* Arg0: The ARM context pointer (already in x0)
-	* Arg1: PC to check (loaded above)
-	* Arg2: CPSR to check (loaded above)
-	* Arg3: the LR to check
-	*
-	* Stash saved state PC and CPSR in other registers to avoid reloading potentially unauthed
-	* values from memory.  (ml_check_signed_state will clobber x1 and x2.)
-	*/
+	  
+                                                
+                                   
+                                     
+                        
+  
+                                                                                           
+                                                                       
+   
 	mov		\tmp1, x1
 	mov		\tmp2, x2
 	ldr		x3, [x0, \LR_OFF]
@@ -94,14 +94,14 @@
 1:
 .endif
 
-	// LR was already loaded/authed earlier, if we reload it we might be loading a potentially unauthed value
+	                                                                                                         
 	mov		lr, x3
 	mov		x3, \tmp3
 	mov		x4, \tmp4
 	mov		x5, \tmp5
 #else
 	ldr		lr, [x0, \LR_OFF]
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 .endmacro
 
 .macro  AUTH_THREAD_STATE_IN_X0 tmp1, tmp2, tmp3, tmp4, tmp5, el0_state_allowed=0
@@ -111,6 +111,6 @@
 .macro  AUTH_KERNEL_THREAD_STATE_IN_X0 tmp1, tmp2, tmp3, tmp4, tmp5, el0_state_allowed=0
 	AUTH_THREAD_STATE_IN_X0_COMMON \tmp1, \tmp2, \tmp3, \tmp4, \tmp5, \el0_state_allowed, SS64_KERNEL_PC, SS64_KERNEL_CPSR, SS64_KERNEL_X16, SS64_KERNEL_LR, ml_check_kernel_signed_state
 .endmacro
-/* END IGNORE CODESTYLE */
+                          
 
-/* vim: set ft=asm: */
+                      

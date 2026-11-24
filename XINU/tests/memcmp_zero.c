@@ -20,16 +20,16 @@ free_guarded_page(unsigned char *p)
 	munmap(p - PAGE_SIZE, 3 * PAGE_SIZE);
 }
 
-/* memcmp_zero_ptr_aligned() checks string s of n bytes contains all zeros.
- * Address and size of the string s must be pointer-aligned.
- * Return 0 if true, 1 otherwise. Also return 0 if n is 0.
- */
+                                                                           
+                                                            
+                                                          
+   
 extern int
 memcmp_zero_ptr_aligned(const void *s, size_t n);
 
 T_DECL(memcmp_zero, "memcmp_zero")
 {
-	// the assembly version is for the kernel and doesn't support arm64_32
+	                                                                      
 #if defined(__arm64__) && __LP64__
 	unsigned char *buffer = get_guarded_page();
 	unsigned char *right = buffer + PAGE_SIZE - 512;

@@ -65,24 +65,24 @@
 #ifdef BSD_KERNEL_PRIVATE
 #include <sys/queue.h>
 
-/*
- * Raw protocol interface control block.  Used
- * to tie a socket to the generic raw interface.
- */
+  
+                                              
+                                                
+   
 struct rawcb {
 	LIST_ENTRY(rawcb) list;
-	struct  socket *rcb_socket;     /* back pointer to socket */
-	struct  sockaddr *rcb_faddr;    /* destination address */
-	struct  sockaddr *rcb_laddr;    /* socket's address */
-	struct  sockproto rcb_proto;    /* protocol family, protocol */
-	uint32_t        reserved[4];            /* for future use */
+	struct  socket *rcb_socket;                                 
+	struct  sockaddr *rcb_faddr;                             
+	struct  sockaddr *rcb_laddr;                          
+	struct  sockproto rcb_proto;                                   
+	uint32_t        reserved[4];                                
 };
 
 #define sotorawcb(so)           ((struct rawcb *)(so)->so_pcb)
 
-/*
- * Nominal space allocated to a raw socket.
- */
+  
+                                           
+   
 #define RAWSNDQ         8192
 #define RAWRCVQ         8192
 
@@ -99,5 +99,5 @@ extern void raw_input(struct mbuf *, struct sockproto *, struct sockaddr *,
 __END_DECLS
 
 extern  struct pr_usrreqs raw_usrreqs;
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NET_RAW_CB_H_ */
+#endif                         
+#endif                     

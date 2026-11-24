@@ -31,7 +31,7 @@
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 
-/* These externs can be removed once the prototypes make it to the SDK */
+                                                                         
 extern mach_port_name_t mk_timer_create(void);
 extern kern_return_t mk_timer_arm(mach_port_name_t name, uint64_t expire_time);
 

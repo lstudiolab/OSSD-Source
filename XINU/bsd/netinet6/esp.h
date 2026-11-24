@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/esp.h,v 1.2.2.2 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: esp.h,v 1.16 2000/10/18 21:28:00 itojun Exp $	*/
+                                                                              
+                                                          
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -58,9 +58,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1827/2406 Encapsulated Security Payload.
- */
+  
+                                              
+   
 
 #ifndef _NETINET6_ESP_H_
 #define _NETINET6_ESP_H_
@@ -68,42 +68,42 @@
 #include <net/multi_layer_pkt_log.h>
 
 struct esp {
-	u_int32_t       esp_spi;        /* ESP */
-	/*variable size, 32bit bound*/	/* Initialization Vector */
-	/*variable size*/		/* Payload data */
-	/*variable size*/		/* padding */
-	/*8bit*/			/* pad size */
-	/*8bit*/			/* next header */
-	/*8bit*/			/* next header */
-	/*variable size, 32bit bound*/	/* Authentication data (new IPsec) */
+	u_int32_t       esp_spi;                 
+	                              	                           
+	                 		                  
+	                 		             
+	        			              
+	        			                 
+	        			                 
+	                              	                                     
 };
 
 struct newesp {
-	u_int32_t       esp_spi;        /* ESP */
-	u_int32_t       esp_seq;        /* Sequence number */
-	/*variable size*/		/* (IV and) Payload data */
-	/*variable size*/		/* padding */
-	/*8bit*/			/* pad size */
-	/*8bit*/			/* next header */
-	/*8bit*/			/* next header */
-	/*variable size, 32bit bound*/	/* Authentication data */
+	u_int32_t       esp_spi;                 
+	u_int32_t       esp_seq;                             
+	                 		                           
+	                 		             
+	        			              
+	        			                 
+	        			                 
+	                              	                         
 };
 
 struct esptail {
-	u_int8_t        esp_padlen;     /* pad length */
-	u_int8_t        esp_nxt;        /* Next header */
-	/*variable size, 32bit bound*/	/* Authentication data (new IPsec)*/
+	u_int8_t        esp_padlen;                     
+	u_int8_t        esp_nxt;                         
+	                              	                                    
 };
 
 #ifdef BSD_KERNEL_PRIVATE
 struct secasvar;
 
 struct esp_algorithm {
-	uint32_t padbound;        /* pad boundary, in byte */
-	int ivlenval;           /* iv length, in byte */
+	uint32_t padbound;                                   
+	int ivlenval;                                   
 	int (*mature)(struct secasvar *);
-	u_int16_t keymin;     /* in bits */
-	u_int16_t keymax;     /* in bits */
+	u_int16_t keymin;                  
+	u_int16_t keymax;                  
 	size_t (*schedlen)(const struct esp_algorithm *);
 	const char *name;
 	int (*ivlen)(const struct esp_algorithm *, struct secasvar *);
@@ -111,13 +111,13 @@ struct esp_algorithm {
 	    struct secasvar *, const struct esp_algorithm *, int);
 	int (*encrypt)(struct mbuf *, size_t, size_t,
 	    struct secasvar *, const struct esp_algorithm *, int);
-	/* not supposed to be called directly */
+	                                        
 	int (*schedule)(const struct esp_algorithm *, struct secasvar *);
 	int (*blockdecrypt)(const struct esp_algorithm *,
 	    struct secasvar *, u_int8_t *, u_int8_t *);
 	int (*blockencrypt)(const struct esp_algorithm *,
 	    struct secasvar *, u_int8_t *, u_int8_t *);
-	/* For Authenticated Encryption Methods */
+	                                          
 	size_t icvlen;
 	int (*finalizedecrypt)(struct secasvar *, u_int8_t *, size_t);
 	int (*finalizeencrypt)(struct secasvar *, u_int8_t *, size_t);
@@ -128,7 +128,7 @@ extern os_log_t esp_mpkl_log_object;
 extern const struct esp_algorithm *esp_algorithm_lookup(int);
 extern int esp_max_ivlen(void);
 
-/* crypt routines */
+                    
 extern int esp4_output(struct mbuf *, struct secasvar *);
 extern void esp4_input(struct mbuf *, int off);
 extern struct mbuf *esp4_input_extended(struct mbuf *, int off, ifnet_t interface);
@@ -139,6 +139,6 @@ extern int esp_auth(struct mbuf *, size_t, size_t,
     struct secasvar *, u_char *);
 
 extern void esp_init(void);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _NETINET6_ESP_H_ */
+#endif                       

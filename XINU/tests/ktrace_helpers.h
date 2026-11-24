@@ -72,4 +72,4 @@ relns_from_abs(ktrace_session_t s, uint64_t abstime)
 	return ns_from_abs(s, abstime - ktrace_get_earliest_timestamp(s));
 }
 
-#endif /* !defined(KTRACE_HELPERS_H) */
+#endif                                 

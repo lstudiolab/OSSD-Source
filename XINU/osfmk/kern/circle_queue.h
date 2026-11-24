@@ -34,13 +34,13 @@
 
 __BEGIN_DECLS
 
-/*
- * Circle Queue Management APIs
- *
- * These are similar to the queues from queue.h,
- * but the circle queue head is a single pointer to the first element
- * of the queue.
- */
+  
+                               
+  
+                                                
+                                                                     
+                
+   
 
 typedef struct circle_queue_head {
 	queue_entry_t head;
@@ -167,103 +167,103 @@ circle_queue_rotate_head_backward(circle_queue_t cq)
 	}
 }
 
-/*
- *	Macro:		cqe_element
- *	Function:
- *		Convert a cirle_queue_entry_t pointer to a queue element pointer.
- *		Get a pointer to the user-defined element containing
- *		a given cirle_queue_entry_t
- *	Header:
- *		<type> * cqe_element(cirle_queue_entry_t qe, <type>, field)
- *			qe      - queue entry to convert
- *			<type>  - what's in the queue (e.g., struct some_data)
- *			<field> - is the chain field in <type>
- *	Note:
- *		Do not use pointer types for <type>
- */
+  
+                      
+            
+                                                                     
+                                                        
+                               
+          
+                                                               
+                                     
+                                                           
+                                           
+        
+                                       
+   
 #define cqe_element(qe, type, field) __container_of(qe, type, field)
 
-/*
- *	Macro:		cqe_foreach
- *	Function:
- *		Iterate over each queue_entry_t structure.
- *		Generates a 'for' loop, setting 'qe' to
- *		each queue_entry_t in the queue.
- *	Header:
- *		cqe_foreach(queue_entry_t qe, queue_t head)
- *			qe   - iteration variable
- *			head - pointer to queue_head_t (head of queue)
- *	Note:
- *		This should only be used with Method 1 queue iteration (linkage chains)
- */
+  
+                      
+            
+                                              
+                                           
+                                    
+          
+                                               
+                              
+                                                   
+        
+                                                                           
+   
 #define cqe_foreach(qe, head) \
 	for (qe = circle_queue_first(head); qe; qe = circle_queue_next(head, qe))
 
-/*
- *	Macro:		cqe_foreach_safe
- *	Function:
- *		Safely iterate over each queue_entry_t structure.
- *
- *		Use this iterator macro if you plan to remove the
- *		queue_entry_t, qe, from the queue during the
- *		iteration.
- *	Header:
- *		cqe_foreach_safe(queue_entry_t qe, queue_t head)
- *			qe   - iteration variable
- *			head - pointer to queue_head_t (head of queue)
- *	Note:
- *		This should only be used with Method 1 queue iteration (linkage chains)
- */
+  
+                           
+            
+                                                     
+  
+                                                     
+                                                
+              
+          
+                                                    
+                              
+                                                   
+        
+                                                                           
+   
 #define cqe_foreach_safe(qe, head) \
 	for (queue_entry_t _ne, _qe = circle_queue_first(head); \
 	     (qe = _qe) && (_ne = circle_queue_next(head, _qe), 1); \
 	     _qe = _ne)
 
-/*
- *	Macro:		cqe_foreach_element
- *	Function:
- *		Iterate over each _element_ in a queue
- *		where each queue_entry_t points to another
- *		queue_entry_t, i.e., managed by the [de|en]queue_head/
- *		[de|en]queue_tail / remqueue / etc. function.
- *	Header:
- *		cqe_foreach_element(<type> *elt, queue_t head, <field>)
- *			elt     - iteration variable
- *			<type>  - what's in the queue (e.g., struct some_data)
- *			<field> - is the chain field in <type>
- *	Note:
- *		This should only be used with Method 1 queue iteration (linkage chains)
- */
+  
+                              
+            
+                                          
+                                              
+                                                          
+                                                 
+          
+                                                           
+                                 
+                                                           
+                                           
+        
+                                                                           
+   
 #define cqe_foreach_element(elt, head, field) \
 	for (queue_entry_t _qe = circle_queue_first(head); \
 	     _qe && (elt = cqe_element(_qe, typeof(*(elt)), field), 1); \
 	     _qe = circle_queue_next(head, _qe))
 
-/*
- *	Macro:		cqe_foreach_element_safe
- *	Function:
- *		Safely iterate over each _element_ in a queue
- *		where each queue_entry_t points to another
- *		queue_entry_t, i.e., managed by the [de|en]queue_head/
- *		[de|en]queue_tail / remqueue / etc. function.
- *
- *		Use this iterator macro if you plan to remove the
- *		element, elt, from the queue during the iteration.
- *	Header:
- *		cqe_foreach_element_safe(<type> *elt, queue_t head, <field>)
- *			elt     - iteration variable
- *			<type>  - what's in the queue (e.g., struct some_data)
- *			<field> - is the chain field in <type>
- *	Note:
- *		This should only be used with Method 1 queue iteration (linkage chains)
- */
+  
+                                   
+            
+                                                 
+                                              
+                                                          
+                                                 
+  
+                                                     
+                                                      
+          
+                                                                
+                                 
+                                                           
+                                           
+        
+                                                                           
+   
 #define cqe_foreach_element_safe(elt, head, field) \
 	for (queue_entry_t _ne, _qe = circle_queue_first(head); \
 	     _qe && (elt = cqe_element(_qe, typeof(*(elt)), field), \
 	     _ne = circle_queue_next(head, _qe), 1); \
 	     _qe = _ne)
 
-/* Dequeue an element from head, or return NULL if the queue is empty */
+                                                                        
 #define cqe_dequeue_head(head, type, field) ({ \
 	queue_entry_t _tmp_entry = circle_dequeue_head((head)); \
 	type *_tmp_element = (type*) NULL; \
@@ -272,7 +272,7 @@ circle_queue_rotate_head_backward(circle_queue_t cq)
 	_tmp_element; \
 })
 
-/* Dequeue an element from tail, or return NULL if the queue is empty */
+                                                                        
 #define cqe_dequeue_tail(head, type, field) ({ \
 	queue_entry_t _tmp_entry = circle_dequeue_tail((head)); \
 	type *_tmp_element = (type*) NULL; \
@@ -281,7 +281,7 @@ circle_queue_rotate_head_backward(circle_queue_t cq)
 	_tmp_element; \
 })
 
-/* Peek at the first element, or return NULL if the queue is empty */
+                                                                     
 #define cqe_queue_first(head, type, field) ({ \
 	queue_entry_t _tmp_entry = circle_queue_first((head)); \
 	type *_tmp_element = (type*) NULL; \
@@ -290,7 +290,7 @@ circle_queue_rotate_head_backward(circle_queue_t cq)
 	_tmp_element; \
 })
 
-/* Peek at the next element, or return NULL if it is last */
+                                                            
 #define cqe_queue_next(elt, head, type, field) ({ \
 	queue_entry_t _tmp_entry = circle_queue_next((head), (elt)); \
 	type *_tmp_element = (type*) NULL; \
@@ -299,7 +299,7 @@ circle_queue_rotate_head_backward(circle_queue_t cq)
 	_tmp_element; \
 })
 
-/* Peek at the tail element, or return NULL if the queue is empty */
+                                                                    
 #define cqe_queue_last(head, type, field) ({ \
 	queue_entry_t _tmp_entry = circle_queue_last((head)); \
 	type *_tmp_element = (type*) NULL; \
@@ -308,14 +308,14 @@ circle_queue_rotate_head_backward(circle_queue_t cq)
 	_tmp_element; \
 })
 
-/*
- *	Macro:		circle_queue_init
- *	Function:
- *		Initialize the given circle queue.
- *	Header:
- *		void circle_queue_init(q)
- *			circle_queue_t		q;	\* MODIFIED *\
- */
+  
+                            
+            
+                                      
+          
+                             
+                                      
+   
 #define circle_queue_init(q)   \
 MACRO_BEGIN             \
 	(q)->head = NULL; \
@@ -323,4 +323,4 @@ MACRO_END
 
 __END_DECLS
 
-#endif  /* _KERN_QUEUE_H_ */
+#endif                      

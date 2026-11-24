@@ -67,7 +67,7 @@ extern kern_return_t hv_io_notifier_grp_fire(hv_ion_grp_t *, uint64_t, size_t, u
 extern kern_return_t hv_io_notifier_grp_alloc(hv_ion_grp_t **);
 extern void hv_io_notifier_grp_free(hv_ion_grp_t **);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef __cplusplus
 }

@@ -30,36 +30,36 @@
 #include <stdio.h>
 #include <mach/mach_time.h>
 
-/*!
- * @function kcdata_get_typedescription
- *
- * @abstract
- * Search the known type definitions for type with id type_id.
- *
- * @param type_id
- * A unsinged int type specified by the KCDATA.
- *
- * @param buffer
- * pointer to data area where type definition will be saved.
- *
- * @param buffer_size
- * size of the buffer provided.
- *
- * @return struct kcdata_type_definition *
- * pointer to a malloc'ed buffer holding the type definition and each subtype defintion for its fields.
- * It may return NULL if no type with id == type_id is found.
- * Note: The caller is responsible to free() the memory when its no longer used.
- *
- * @discussion
- * This function queries the known type definitions table. If found the defintion data is returned
- * else NULL is returned. It is advised to cache the return value from this function since the data
- * is always going to be the same for same type_id. The definition setup requires memory on heap.
- * The caller should make sure to free() the data once its done with using it.
- *
- */
+   
+                                       
+  
+            
+                                                              
+  
+                 
+                                               
+  
+                
+                                                            
+  
+                     
+                               
+  
+                                          
+                                                                                                       
+                                                             
+                                                                                
+  
+              
+                                                                                                  
+                                                                                                   
+                                                                                                 
+                                                                              
+  
+   
 struct kcdata_type_definition * kcdata_get_typedescription(unsigned type_id, uint8_t * buffer, uint32_t buffer_size);
 
-/* forward declarations for helper routines */
+                                              
 static uint32_t get_kctype_subtype_size(kctype_subtype_t type);
 static void setup_subtype_description(kcdata_subtype_descriptor_t desc, kctype_subtype_t type, uint32_t offset, char * name);
 static void setup_subtype_array_description(
@@ -127,7 +127,7 @@ kcdata_get_typedescription(unsigned type_id, uint8_t * buffer, uint32_t buffer_s
 		setup_subtype_description(&subtypes[i++], KC_ST_UINT32, offsetof(struct kcdata_type_definition, kct_type_identifier), "typeID");
 		setup_subtype_description(&subtypes[i++], KC_ST_UINT32, offsetof(struct kcdata_type_definition, kct_num_elements), "numOfFields");
 		setup_subtype_array_description(&subtypes[i++], KC_ST_CHAR, offsetof(struct kcdata_type_definition, kct_name), KCDATA_DESC_MAXLEN, "name");
-		// Note "fields" is an array of run time defined length. So we populate fields at parsing time.
+		                                                                                               
 		setup_type_definition(retval, type_id, i, "typedef");
 		break;
 	}
@@ -157,10 +157,10 @@ kcdata_get_typedescription(unsigned type_id, uint8_t * buffer, uint32_t buffer_s
 
 	case STACKSHOT_KCTYPE_SHAREDCACHE_LOADINFO: {
 		i = 0;
-		/*
-		 * for backwards compatibility, we keep the old field names, but the
-		 * new data is being put in dyld_shared_cache_loadinfo
-		 */
+		  
+                                                                      
+                                                        
+     
 		_SUBTYPE(KC_ST_UINT64, struct dyld_uuid_info_64_v2, imageLoadAddress);
 		_SUBTYPE_ARRAY(KC_ST_UINT8, struct dyld_uuid_info_64_v2, imageUUID, 16);
 		_SUBTYPE(KC_ST_UINT64, struct dyld_uuid_info_64_v2, imageSlidBaseAddress);
@@ -214,7 +214,7 @@ kcdata_get_typedescription(unsigned type_id, uint8_t * buffer, uint32_t buffer_s
 		setup_type_definition(retval, type_id, i, "proc_name");
 		break;
 
-	/* stackshot specific types */
+	                              
 	case STACKSHOT_KCTYPE_IOSTATS: {
 		i = 0;
 		_SUBTYPE(KC_ST_UINT64, struct io_stats_snapshot, ss_disk_reads_count);
@@ -472,13 +472,13 @@ kcdata_get_typedescription(unsigned type_id, uint8_t * buffer, uint32_t buffer_s
 		break;
 	}
 
-	/* crashinfo types */
+	                     
 	case TASK_CRASHINFO_BSDINFOWITHUNIQID: {
 		i = 0;
 		_SUBTYPE_ARRAY(KC_ST_UINT8, struct crashinfo_proc_uniqidentifierinfo, p_uuid, 16);
 		_SUBTYPE(KC_ST_UINT64, struct crashinfo_proc_uniqidentifierinfo, p_uniqueid);
 		_SUBTYPE(KC_ST_UINT64, struct crashinfo_proc_uniqidentifierinfo, p_puniqueid);
-		/* Ignore the p_reserve fields */
+		                                 
 		setup_type_definition(retval, type_id, i, "proc_uniqidentifierinfo");
 		break;
 	}
@@ -495,16 +495,16 @@ kcdata_get_typedescription(unsigned type_id, uint8_t * buffer, uint32_t buffer_s
 		break;
 	}
 
-	/* case TASK_CRASHINFO_RUSAGE: { */
-	/*      /\* */
-	/*       * rusage is a complex structure and is only for legacy use for crashed processes rusage info. */
-	/*       * So we just consider it as opaque data. */
-	/*       *\/ */
-	/*      i = 0; */
-	/*      setup_subtype_array_description(&subtypes[i++], KC_ST_UINT8, 0, sizeof(struct rusage), "rusage"); */
-	/*      setup_type_definition(retval, type_id, i, "rusage"); */
-	/*      break; */
-	/* } */
+	                                   
+	              
+	                                                                                                         
+	                                                    
+	               
+	                 
+	                                                                                                            
+	                                                               
+	                 
+	       
 
 	case TASK_CRASHINFO_RUSAGE_INFO: {
 		i = 0;

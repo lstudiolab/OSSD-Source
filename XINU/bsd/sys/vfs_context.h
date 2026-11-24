@@ -10,9 +10,9 @@
 #endif
 #include <stdint.h>
 
-/*
- * XXX should go away; pulls in vfs_context structure definition from
- * XXX <sys/user.h>
- */
+  
+                                                                     
+                   
+   
 
-#endif /* !_BSD_SYS_VFS_CONTEXT_H_ */
+#endif                               

@@ -227,7 +227,7 @@ found:
 
 __BEGIN_DECLS
 
-// These are C accessors to the system mapper for non-IOKit clients
+                                                                   
 ppnum_t
 IOMapperIOVMAlloc(unsigned pages)
 {
@@ -278,13 +278,13 @@ IOMapperInsertPage(ppnum_t addr, unsigned offset, ppnum_t page)
 	return addr + offset;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//
-//
-//	IOLib.h APIs
-//
-//
-/////////////////////////////////////////////////////////////////////////////
+                                                                             
+  
+  
+               
+  
+  
+                                                                             
 
 #include <machine/machine_routines.h>
 

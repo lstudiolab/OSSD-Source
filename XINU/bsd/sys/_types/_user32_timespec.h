@@ -30,8 +30,8 @@
 #define _STRUCT_USER32_TIMESPEC struct user32_timespec
 _STRUCT_USER32_TIMESPEC
 {
-	user32_time_t   tv_sec;         /* seconds */
-	user32_long_t   tv_nsec;        /* and nanoseconds */
+	user32_time_t   tv_sec;                      
+	user32_long_t   tv_nsec;                             
 };
-#endif /* _STRUCT_USER32_TIMESPEC */
-#endif /* KERNEL */
+#endif                              
+#endif             

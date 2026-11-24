@@ -34,16 +34,16 @@
 
 #ifdef KERNEL_PRIVATE
 
-/*
- * struct representing a document "tombstone" that's recorded
- * when a thread manipulates files marked with a document-id.
- * if the thread recreates the same item, this tombstone is
- * used to preserve the document_id on the new file.
- *
- * It is a separate structure because of its size - we want to
- * allocate it on demand instead of just stuffing it into the
- * uthread structure.
- */
+  
+                                                             
+                                                             
+                                                           
+                                                    
+  
+                                                              
+                                                             
+                     
+   
 struct doc_tombstone {
 	struct vnode     *t_lastop_parent;
 	struct vnode     *t_lastop_item;
@@ -65,6 +65,6 @@ bool doc_tombstone_should_ignore_name(const char *nameptr, int len);
 bool doc_tombstone_should_save(struct doc_tombstone *ut, struct vnode *vp,
     struct componentname *cnp);
 
-#endif // defined(KERNEL_PRIVATE)
+#endif                           
 
-#endif // SYS_DOC_TOMBSTONE_H_
+#endif                        

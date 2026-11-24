@@ -59,6 +59,6 @@ extern int                      machdep_call_count;
 extern vm_address_t             thread_get_cthread_self(void);
 extern kern_return_t            thread_set_cthread_self(vm_address_t);
 
-// Read and write raw TPIDRURO / TPIDRRO_EL0
+                                            
 uintptr_t                       get_tpidrro(void);
 void                            set_tpidrro(uintptr_t);

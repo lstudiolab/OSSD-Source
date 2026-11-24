@@ -53,36 +53,36 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/boolean.h
- *
- *	Boolean data type.
- *
- */
+  
+   
+  
+                       
+  
+                     
+  
+   
 
 #ifndef _MACH_BOOLEAN_H_
 #define _MACH_BOOLEAN_H_
 
-/*
- *	Pick up "boolean_t" type definition
- */
+  
+                                      
+   
 
 #ifndef ASSEMBLER
 #include <mach/machine/boolean.h>
-#endif  /* ASSEMBLER */
+#endif                 
 
-/*
- *	Define TRUE and FALSE if not defined.
- */
+  
+                                        
+   
 
 #ifndef TRUE
 #define TRUE    1
-#endif  /* TRUE */
+#endif            
 
 #ifndef FALSE
 #define FALSE   0
-#endif  /* FALSE */
+#endif             
 
-#endif  /* _MACH_BOOLEAN_H_ */
+#endif                        

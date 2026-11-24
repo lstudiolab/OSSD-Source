@@ -53,87 +53,87 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 #ifndef _MACH_EXCEPTION_TYPES_H_
 #define _MACH_EXCEPTION_TYPES_H_
 
 #include <mach/machine/exception.h>
 
-/*
- *	Machine-independent exception definitions.
- */
+  
+                                             
+   
 
-#define EXC_BAD_ACCESS          1       /* Could not access memory */
-/* Code contains kern_return_t describing error. */
-/* Subcode contains bad memory address. */
+#define EXC_BAD_ACCESS          1                                    
+                                                   
+                                          
 
-#define EXC_BAD_INSTRUCTION     2       /* Instruction failed */
-/* Illegal or undefined instruction or operand */
+#define EXC_BAD_INSTRUCTION     2                               
+                                                 
 
-#define EXC_ARITHMETIC          3       /* Arithmetic exception */
-/* Exact nature of exception is in code field */
+#define EXC_ARITHMETIC          3                                 
+                                                
 
-#define EXC_EMULATION           4       /* Emulation instruction */
-/* Emulation support instruction encountered */
-/* Details in code and subcode fields	*/
+#define EXC_EMULATION           4                                  
+                                               
+                                        
 
-#define EXC_SOFTWARE            5       /* Software generated exception */
-/* Exact exception is in code field. */
-/* Codes 0 - 0xFFFF reserved to hardware */
-/* Codes 0x10000 - 0x1FFFF reserved for OS emulation (Unix) */
+#define EXC_SOFTWARE            5                                         
+                                       
+                                           
+                                                              
 
-#define EXC_BREAKPOINT          6       /* Trace, breakpoint, etc. */
-/* Details in code field. */
+#define EXC_BREAKPOINT          6                                    
+                            
 
-#define EXC_SYSCALL             7       /* System calls. */
+#define EXC_SYSCALL             7                          
 
-#define EXC_MACH_SYSCALL        8       /* Mach system calls. */
+#define EXC_MACH_SYSCALL        8                               
 
-#define EXC_RPC_ALERT           9       /* RPC alert */
+#define EXC_RPC_ALERT           9                      
 
-#define EXC_CRASH               10      /* Abnormal process exit */
+#define EXC_CRASH               10                                 
 
-#define EXC_RESOURCE            11      /* Hit resource consumption limit */
-/* Exact resource is in code field. */
+#define EXC_RESOURCE            11                                          
+                                      
 
-#define EXC_GUARD               12      /* Violated guarded resource protections */
+#define EXC_GUARD               12                                                 
 
-#define EXC_CORPSE_NOTIFY       13      /* Abnormal process exited to corpse state */
+#define EXC_CORPSE_NOTIFY       13                                                   
 
-#define EXC_CORPSE_VARIANT_BIT  0x100  /* bit set for EXC_*_CORPSE variants of EXC_* */
+#define EXC_CORPSE_VARIANT_BIT  0x100                                                  
 
 
-/*
- *	Machine-independent exception behaviors
- */
+  
+                                          
+   
 
 # define EXCEPTION_DEFAULT              1
-/*	Send a catch_exception_raise message including the identity.
- */
+                                                               
+   
 
 # define EXCEPTION_STATE                2
-/*	Send a catch_exception_raise_state message including the
- *	thread state.
- */
+                                                           
+                
+   
 
 # define EXCEPTION_STATE_IDENTITY       3
-/*	Send a catch_exception_raise_state_identity message including
- *	the thread identity and state.
- */
+                                                                
+                                 
+   
 
 #define MACH_EXCEPTION_ERRORS           0x40000000
-/*	include additional exception specific errors, not used yet.  */
+                                                                  
 
 #define MACH_EXCEPTION_CODES            0x80000000
-/*	Send 64-bit code and subcode in the exception header */
+                                                          
 
 #define MACH_EXCEPTION_MASK             (MACH_EXCEPTION_CODES | MACH_EXCEPTION_ERRORS)
-/*
- * Masks for exception definitions, above
- * bit zero is unused, therefore 1 word = 31 exception types
- */
+  
+                                         
+                                                            
+   
 
 #define EXC_MASK_BAD_ACCESS             (1 << EXC_BAD_ACCESS)
 #define EXC_MASK_BAD_INSTRUCTION        (1 << EXC_BAD_INSTRUCTION)
@@ -164,19 +164,19 @@
 
 #ifdef  KERNEL_PRIVATE
 #define EXC_MASK_VALID  (EXC_MASK_ALL | EXC_MASK_CRASH | EXC_MASK_CORPSE_NOTIFY)
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#define FIRST_EXCEPTION         1       /* ZERO is illegal */
+#define FIRST_EXCEPTION         1                            
 
-/*
- * Machine independent codes for EXC_SOFTWARE
- * Codes 0x10000 - 0x1FFFF reserved for OS emulation (Unix)
- * 0x10000 - 0x10002 in use for unix signals
- * 0x20000 - 0x2FFFF reserved for MACF
- */
-#define EXC_SOFT_SIGNAL         0x10003 /* Unix signal exceptions */
+  
+                                             
+                                                           
+                                            
+                                      
+   
+#define EXC_SOFT_SIGNAL         0x10003                             
 
-#define EXC_MACF_MIN            0x20000 /* MACF exceptions */
+#define EXC_MACF_MIN            0x20000                      
 #define EXC_MACF_MAX            0x2FFFF
 
 #ifndef ASSEMBLER
@@ -185,9 +185,9 @@
 #include <mach/thread_status.h>
 #include <mach/machine/vm_types.h>
 #include <mach_debug/ipc_info.h>
-/*
- * Exported types
- */
+  
+                 
+   
 
 typedef int                             exception_type_t;
 typedef integer_t                       exception_data_type_t;
@@ -204,6 +204,6 @@ typedef ipc_info_port_t                 *exception_port_info_array_t;
 typedef mach_exception_data_type_t      mach_exception_code_t;
 typedef mach_exception_data_type_t      mach_exception_subcode_t;
 
-#endif  /* ASSEMBLER */
+#endif                 
 
-#endif  /* _MACH_EXCEPTION_TYPES_H_ */
+#endif                                

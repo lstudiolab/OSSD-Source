@@ -38,9 +38,9 @@
 
 .globl _strncmp
 
-/*****************************************************************************
- *  Macros                                                                   *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 .macro EstablishFrame
 	ARM64_STACK_PROLOG
@@ -56,112 +56,112 @@
 #include "../mach/arm/vm_param.h"
 #define kVectorSize 16
 
-/*****************************************************************************
- *  Constants                                                                *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 .text
 .align 5
 L_mask:
 .quad 0x0706050403020100, 0x0f0e0d0c0b0a0908
 
-/*****************************************************************************
- *  Entrypoints                                                              *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 _strncmp:
 	EstablishFrame
 	eor       x3,      x3, x3
 	cbz       x2,      L_scalarDone
-//	Compare one byte at a time until s1 has vector alignment.
+                                                            
 0:	tst       x0,      #(kVectorSize-1)
 	b.eq      L_s1aligned
-	ldrb      w4,     [x0],#1  // load byte from src1
-	ldrb      w5,     [x1],#1  // load byte from src2
-	subs      x3,      x4, x5  // if the are not equal
-	ccmp      w4,  #0, #4, eq  //    or we find an EOS
-	b.eq      L_scalarDone     // return the difference
-	subs      x2,      x2, #1  // decrement length
-	b.ne      0b               // continue loop if non-zero
+	ldrb      w4,     [x0],#1                        
+	ldrb      w5,     [x1],#1                        
+	subs      x3,      x4, x5                         
+	ccmp      w4,  #0, #4, eq                         
+	b.eq      L_scalarDone                             
+	subs      x2,      x2, #1                     
+	b.ne      0b                                           
 
-//	We found a mismatch or EOS before s1 became aligned.  Simply return the
-//	difference between the last bytes that we loaded.
+                                                                          
+                                                    
 L_scalarDone:
 	mov       x0,      x3
 	ClearFrameAndReturn
 
 L_s1aligned:
-//	If s2 is similarly aligned to s1, then we can use a naive vector comparison
-//	from this point on without worrying about spurious page faults; none of our
-//	loads will ever cross a page boundary, because they are all aligned.
+                                                                              
+                                                                              
+                                                                       
 	tst       x1,      #(kVectorSize-1)
 	b.eq      L_naiveVector
 
-/*****************************************************************************
- *  Careful chunk comparison                                                 *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
-//	Otherwise, we need to be careful; although vector loads from s1 cannot
-//	cross a page boundary because they are aligned, s2 is not aligned.  We
-//	compute the multiple of vector size that we can safely load before reaching
-//	a page boundary, and compare only that far before switching over to scalar
-//	comparisons to step across the page boundary.  If this number happens to
-//	be zero, we jump directly to the scalar comparison.
+                                                                         
+                                                                         
+                                                                              
+                                                                             
+                                                                           
+                                                      
 	neg       x7,      x1
 	ands      x7,      x7, #(PAGE_MIN_SIZE-kVectorSize)
 	b.eq      2f
 
 .align 4
-//	If n is less than the number of bytes before a page-crossing load, jump
-//	into the naive vector path instead, since we will not even reach a page
-//	crossing.  Otherwise, decrement n by that number before we monkey with it,
-//	and set the decremented value aside.
+                                                                          
+                                                                          
+                                                                             
+                                       
 0:	cmp       x2,      x7
 	b.ls      L_naiveVector
 	sub       x6,      x2, x7
-//	Use vector comparisons until a mismatch or EOS is encountered, or the next
-//	vector load from s2 would be page-crossing.
+                                                                             
+                                              
 1:	ldr       q0,     [x0],#(kVectorSize)
 	ldr       q1,     [x1],#(kVectorSize)
 	cmeq.16b  v1,      v0, v1
-	and.16b   v0,      v0, v1   // contains zero byte iff mismatch or EOS
+	and.16b   v0,      v0, v1                                            
 	uminv.16b b1,      v0
-	fmov      w3,      s1       // zero only iff comparison is finished
+	fmov      w3,      s1                                              
 	cbz       w3,      L_vectorDone
 	subs      x7,      x7, #(kVectorSize)
 	b.ne      1b
-//	Restore the updated n to x2
+                              
 	mov       x2,      x6
-//	The next vector load will cross a page boundary.  Instead, compare one byte
-//	at a time until s1 again has vector alignment, at which point we will have
-//	compared exactly 16 bytes.
-2:	ldrb      w4,     [x0],#1  // load byte from src1
-	ldrb      w5,     [x1],#1  // load byte from src2
-	subs      x3,      x4, x5  // if the are not equal
-	ccmp      w4,  #0, #4, eq  //    or we find an EOS
-	b.eq      L_scalarDone     // return the difference
-	subs      x2,      x2, #1  // decrement length
-	b.eq      L_scalarDone     // exit loop if zero.
+                                                                              
+                                                                             
+                             
+2:	ldrb      w4,     [x0],#1                        
+	ldrb      w5,     [x1],#1                        
+	subs      x3,      x4, x5                         
+	ccmp      w4,  #0, #4, eq                         
+	b.eq      L_scalarDone                             
+	subs      x2,      x2, #1                     
+	b.eq      L_scalarDone                          
 	tst       x0,      #(kVectorSize-1)
 	b.ne      2b
-//	Having compared one vector's worth of bytes using a scalar comparison, we
-//	know that we are safely across the page boundary.  Initialize x7 and jump
-//	back into the vector comparison part of the loop.
+                                                                            
+                                                                            
+                                                    
 	mov       x7,      #(PAGE_MIN_SIZE-kVectorSize)
 	b         0b
 
-/*****************************************************************************
- *  Naive vector comparison                                                  *
- *****************************************************************************/
+                                                                              
+                                                                              
+                                                                               
 
 .align 4
 L_naiveVector:
 	ldr       q0,     [x0],#(kVectorSize)
 	ldr       q1,     [x1],#(kVectorSize)
 	cmeq.16b  v1,      v0, v1
-	and.16b   v0,      v0, v1   // contains zero byte iff mismatch or EOS
+	and.16b   v0,      v0, v1                                            
 	uminv.16b b1,      v0
-	fmov      w3,      s1       // zero only iff comparison is finished
+	fmov      w3,      s1                                              
 	cbz       w3,      L_vectorDone
 	subs      x2,      x2, #16
 	b.hi      L_naiveVector
@@ -171,16 +171,16 @@ L_readNBytes:
 	ClearFrameAndReturn
 
 L_vectorDone:
-//	Load the bytes corresponding to the first mismatch or EOS and return
-//  their difference.
+                                                                       
+                     
 	eor.16b   v1,      v1, v1
-	cmhi.16b  v0,      v0, v1   // force non-zero lanes to 0xff
+	cmhi.16b  v0,      v0, v1                                  
 	ldr       q1,      L_mask
-	orr.16b   v0,      v0, v1   // lane index in lanes containing mismatch or EOS
+	orr.16b   v0,      v0, v1                                                    
 	uminv.16b b1,      v0
 	fmov      w3,      s1
-//	If the index of the mismatch or EOS is greater than or equal to n, it
-//	occurs after the first n bytes of the string, and doesn't count.
+                                                                        
+                                                                   
 	cmp       x3,      x2
 	b.cs      L_readNBytes
 	sub       x3,      x3, #(kVectorSize)

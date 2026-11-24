@@ -28,7 +28,7 @@
 
 #define IOKIT_ENABLE_SHARED_PTR
 
-#define __STDC_LIMIT_MACROS     // what are the C++ equivalents?
+#define __STDC_LIMIT_MACROS                                     
 #include <stdint.h>
 
 #include <IOKit/IOKernelReportStructs.h>
@@ -39,7 +39,7 @@
 #define super IOReporter
 OSDefineMetaClassAndStructors(IOHistogramReporter, IOReporter);
 
-/* static */
+            
 OSSharedPtr<IOHistogramReporter>
 IOHistogramReporter::with(IOService *reportingService,
     IOReportCategories categories,
@@ -78,23 +78,23 @@ IOHistogramReporter::initWith(IOService *reportingService,
     IOHistogramSegmentConfig *config)
 {
 	bool            result = false;
-	IOReturn        res;    // for PREFL_MEMOP
+	IOReturn        res;                      
 	size_t          configSize, elementsSize, eCountsSize, boundsSize;
 	int             cnt, cnt2, cnt3 = 0;
 	int64_t        bucketBound = 0, previousBucketBound = 0;
 
-	// analyzer appeasement
+	                       
 	configSize = elementsSize = eCountsSize = boundsSize = 0;
 
 	IORLOG("IOHistogramReporter::initWith");
 
-	// For now, this reporter is currently limited to a single channel
+	                                                                  
 	_nChannels = 1;
 
 	IOReportChannelType channelType = {
 		.categories = categories,
 		.report_format = kIOReportFormatHistogram,
-		.nelements = 0, // Initialized when Config is unpacked
+		.nelements = 0,                                       
 		.element_idx = 0
 	};
 
@@ -104,7 +104,7 @@ IOHistogramReporter::initWith(IOService *reportingService,
 		goto finish;
 	}
 
-	// Make sure to call this after the commit init phase
+	                                                     
 	if (channelName) {
 		_channelNames->setObject(channelName);
 	}
@@ -126,7 +126,7 @@ IOHistogramReporter::initWith(IOService *reportingService,
 	}
 	memcpy(_histogramSegmentsConfig, config, configSize);
 
-	// Find out how many elements are need to store the histogram
+	                                                             
 	for (cnt = 0; cnt < _segmentCount; cnt++) {
 		_nElements += _histogramSegmentsConfig[cnt].segment_bucket_count;
 		_channelDimension += _histogramSegmentsConfig[cnt].segment_bucket_count;
@@ -143,7 +143,7 @@ IOHistogramReporter::initWith(IOService *reportingService,
 		}
 	}
 
-	// Update the channel type with discovered dimension
+	                                                    
 	_channelType.nelements = _channelDimension;
 
 	IORLOG("%s - %u channel(s) of dimension %u",
@@ -152,7 +152,7 @@ IOHistogramReporter::initWith(IOService *reportingService,
 	IORLOG("%s %d segments for a total dimension of %d elements",
 	    __func__, _nChannels, _nElements);
 
-	// Allocate memory for the array of report elements
+	                                                   
 	PREFL_MEMOP_FAIL(_nElements, IOReportElement);
 	elementsSize = (size_t)_nElements * sizeof(IOReportElement);
 	_elements = (IOReportElement *)IOMalloc(elementsSize);
@@ -161,7 +161,7 @@ IOHistogramReporter::initWith(IOService *reportingService,
 	}
 	memset(_elements, 0, elementsSize);
 
-	// Allocate memory for the array of element watch count
+	                                                       
 	PREFL_MEMOP_FAIL(_nElements, int);
 	eCountsSize = (size_t)_nChannels * sizeof(int);
 	_enableCounts = (int *)IOMalloc(eCountsSize);
@@ -183,21 +183,21 @@ IOHistogramReporter::initWith(IOService *reportingService,
 			goto finish;
 		}
 
-		// Setup IOReporter's channel IDs
+		                                 
 		_elements[cnt2].channel_id = channelID;
 
-		// Setup IOReporter's reporting provider service
+		                                                
 		_elements[cnt2].provider_id = _driver_id;
 
-		// Setup IOReporter's channel type
+		                                  
 		_elements[cnt2].channel_type = _channelType;
 		_elements[cnt2].channel_type.element_idx = ((int16_t) cnt2);
 
-		//IOREPORTER_DEBUG_ELEMENT(cnt2);
+		                                 
 	}
 	unlockReporter();
 
-	// Allocate memory for the bucket upper bounds
+	                                              
 	PREFL_MEMOP_FAIL(_nElements, uint64_t);
 	boundsSize = (size_t)_nElements * sizeof(uint64_t);
 	_bucketBounds = (int64_t*)IOMalloc(boundsSize);
@@ -220,7 +220,7 @@ IOHistogramReporter::initWith(IOService *reportingService,
 			}
 
 			if (_histogramSegmentsConfig[cnt].scale_flag) {
-				// FIXME: Could use pow() but not sure how to include math.h
+				                                                            
 				int64_t power = 1;
 				int exponent = cnt2 + 1;
 				while (exponent) {
@@ -241,13 +241,13 @@ IOHistogramReporter::initWith(IOService *reportingService,
 			}
 
 			_bucketBounds[cnt3] = bucketBound;
-			// IORLOG("_bucketBounds[%u] = %llu", cnt3, bucketBound);
+			                                                         
 			previousBucketBound = _bucketBounds[cnt3];
 			cnt3++;
 		}
 	}
 
-	// success
+	          
 	result = true;
 
 finish:
@@ -277,7 +277,7 @@ IOHistogramReporter::handleCreateLegend(void)
 {
 	OSSharedPtr<IOReportLegendEntry>        legendEntry;
 	OSSharedPtr<OSData>                     tmpConfigData;
-	OSDictionary                            *tmpDict;   // no refcount
+	OSDictionary                            *tmpDict;                 
 
 	legendEntry = super::handleCreateLegend();
 	if (!legendEntry) {
@@ -339,7 +339,7 @@ IOHistogramReporter::tallyValue(int64_t value)
 
 	lockReporter();
 
-	// Iterate over _bucketCount minus one to make last bucket of infinite width
+	                                                                            
 	for (cnt = 0; cnt < _bucketCount - 1; cnt++) {
 		if (value <= _bucketBounds[cnt]) {
 			break;
@@ -352,13 +352,13 @@ IOHistogramReporter::tallyValue(int64_t value)
 		goto finish;
 	}
 
-	// init stats on first hit
+	                          
 	if (hist_values.bucket_hits == 0) {
 		hist_values.bucket_min = hist_values.bucket_max = value;
-		hist_values.bucket_sum = 0; // += is below
+		hist_values.bucket_sum = 0;               
 	}
 
-	// update all values
+	                    
 	if (value < hist_values.bucket_min) {
 		hist_values.bucket_min = value;
 	} else if (value > hist_values.bucket_max) {
@@ -372,7 +372,7 @@ IOHistogramReporter::tallyValue(int64_t value)
 		goto finish;
 	}
 
-	// success!
+	           
 	result = element_index;
 
 finish:

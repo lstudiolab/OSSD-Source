@@ -32,12 +32,12 @@
 #include <mach/mach_init.h>
 #include "stack_logging_internal.h"
 
-/*
- * Stub function to account for the differences in standard compliance
- * while maintaining binary backward compatibility.
- *
- * This is only the legacy behavior.
- */
+  
+                                                                      
+                                                   
+  
+                                    
+   
 extern int __munmap(void *, size_t);
 
 int
@@ -46,18 +46,18 @@ munmap(void *addr, size_t len)
 	size_t  offset;
 
 	if (len == 0) {
-		/*
-		 * Standard compliance now requires the system to return EINVAL
-		 * for munmap(addr, 0).  Return success now to maintain
-		 * backwards compatibility.
-		 */
+		  
+                                                                 
+                                                         
+                             
+     
 		return 0;
 	}
-	/*
-	 * Page-align "addr" since the system now requires it
-	 * for standards compliance.
-	 * Update "len" to reflect the adjustment and still cover the same area.
-	 */
+	  
+                                                      
+                             
+                                                                         
+    
 	offset = ((uintptr_t) addr) & PAGE_MASK;
 	addr = (void *) (((uintptr_t) addr) & ~PAGE_MASK);
 	len += offset;
@@ -70,4 +70,4 @@ munmap(void *addr, size_t len)
 
 	return result;
 }
-#endif /* NO_SYSCALL_LEGACY */
+#endif                        

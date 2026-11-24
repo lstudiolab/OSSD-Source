@@ -54,14 +54,14 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- *	Scheduler parameters.
- */
+  
+                        
+   
 
 #ifndef _ARM_SCHED_PARAM_H_
 #define _ARM_SCHED_PARAM_H_
 
-#endif /* _ARM_SCHED_PARAM_H_ */
+#endif                          

@@ -32,16 +32,16 @@
 #include "pexpert/i386/boot.h"
 #elif defined (__arm64__)
 #ifdef PRIVATE
-/* pexpert/arm64/boot.h isn't installed into the public SDK. */
+                                                               
 #include "pexpert/arm64/boot.h"
-#endif /* PRIVATE */
+#endif              
 #elif defined (__arm__)
 #ifdef PRIVATE
-/* pexpert/arm/boot.h isn't installed into the public SDK. */
+                                                             
 #include "pexpert/arm/boot.h"
-#endif /* PRIVATE */
+#endif              
 #else
 #error architecture not supported
 #endif
 
-#endif /* _PEXPERT_MACHINE_BOOT_H */
+#endif                              

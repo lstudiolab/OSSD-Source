@@ -91,7 +91,7 @@ PassthruInterruptController::registerInterrupt(IOService *nub,
 	child_target = target;
 	child_refCon = refCon;
 
-	// Wake up waitForChildController() to tell it that AIC is registered
+	                                                                     
 	semaphore_signal(child_sentinel);
 	return kIOReturnSuccess;
 }
@@ -99,17 +99,17 @@ PassthruInterruptController::registerInterrupt(IOService *nub,
 void *
 PassthruInterruptController::waitForChildController(void)
 {
-	// Block if child controller isn't registered yet.  Assumes that this
-	// is only called from one place.
+	                                                                     
+	                                 
 	semaphore_wait(child_sentinel);
 
-	// NOTE: Assumes that AppleInterruptController passes |this| as the target argument.
+	                                                                                    
 	return child_target;
 }
 
 IOReturn
-PassthruInterruptController::getInterruptType(IOService */*nub*/,
-    int /*source*/,
+PassthruInterruptController::getInterruptType(IOService *       ,
+    int           ,
     int *interruptType)
 {
 	if (interruptType == NULL) {
@@ -122,30 +122,30 @@ PassthruInterruptController::getInterruptType(IOService */*nub*/,
 }
 
 IOReturn
-PassthruInterruptController::enableInterrupt(IOService */*nub*/,
-    int /*source*/)
+PassthruInterruptController::enableInterrupt(IOService *       ,
+    int           )
 {
 	return kIOReturnSuccess;
 }
 
 IOReturn
-PassthruInterruptController::disableInterrupt(IOService */*nub*/,
-    int /*source*/)
+PassthruInterruptController::disableInterrupt(IOService *       ,
+    int           )
 {
 	return kIOReturnSuccess;
 }
 
 IOReturn
-PassthruInterruptController::causeInterrupt(IOService */*nub*/,
-    int /*source*/)
+PassthruInterruptController::causeInterrupt(IOService *       ,
+    int           )
 {
 	ml_cause_interrupt();
 	return kIOReturnSuccess;
 }
 
 IOReturn
-PassthruInterruptController::handleInterrupt(void */*refCon*/,
-    IOService */*nub*/,
+PassthruInterruptController::handleInterrupt(void *          ,
+    IOService *       ,
     int source)
 {
 	panic("handleInterrupt shouldn't be invoked directly");

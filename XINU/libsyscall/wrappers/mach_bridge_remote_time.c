@@ -27,7 +27,7 @@
 #include "strings.h"
 #include <TargetConditionals.h>
 
-#define BT_RESET_SENTINEL_TS  (~3ULL) /* from machine/machine_remote_time.h */
+#define BT_RESET_SENTINEL_TS  (~3ULL)                                         
 
 extern uint64_t __mach_bridge_remote_time(uint64_t local_time);
 
@@ -61,17 +61,17 @@ mach_bridge_remote_time(__unused uint64_t local_time)
 		if (*base_local_ts_p == BT_RESET_SENTINEL_TS) {
 			return 0;
 		}
-		/*
-		 * This call contains an instruction barrier that ensures the second read of
-		 * base_local_ts is not speculated above the first read of base_local_ts.
-		 */
+		  
+                                                                              
+                                                                           
+     
 		now = mach_absolute_time();
 		params.base_remote_ts = *base_remote_ts_p;
 		params.rate = *rate_p;
-		/*
-		 * This barrier prevents the second read of base_local_ts from being reordered
-		 * w.r.t the reads of other values in bt_params.
-		 */
+		  
+                                                                                
+                                                  
+     
 		__asm__ volatile ("dmb ishld" ::: "memory");
 	} while (params.base_local_ts && (params.base_local_ts != commpage_bt_params_p->base_local_ts));
 
@@ -86,4 +86,4 @@ mach_bridge_remote_time(__unused uint64_t local_time)
 	}
 	return remote_time;
 }
-#endif /* TARGET_OS_BRIDGE && defined(__arm64__) */
+#endif                                             

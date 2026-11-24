@@ -21,9 +21,9 @@
 
 #if ENTITLED
 #define TESTNAME entitlement_increased_memory_limit_entitled
-#else /* ENTITLED */
+#else               
 #define TESTNAME entitlement_increased_memory_limit_unentitled
-#endif /* ENTITLED */
+#endif               
 
 T_GLOBAL_META(T_META_NAMESPACE("xnu.vm"));
 
@@ -34,14 +34,14 @@ reset_old_entitled_max_task_mem()
 {
 	int ret;
 	size_t size_old_entitled_max_task_pmem = sizeof(old_entitled_max_task_pmem);
-	// Use sysctl to change entitled limit
+	                                      
 	ret = sysctlbyname(MAX_TASK_MEM_ENTITLED, NULL, 0, &old_entitled_max_task_pmem, size_old_entitled_max_task_pmem);
 }
 
 T_HELPER_DECL(child, "Child") {
-	// Doesn't do anything. Will start suspended
-	// so that its parent can check its memlimits
-	// and then kill it.
+	                                            
+	                                             
+	                    
 	T_PASS("Child exiting");
 }
 
@@ -96,43 +96,43 @@ T_DECL(TESTNAME,
 
 	int ret = 0;
 
-	// Get the unentitled limit
+	                           
 	ret = sysctlbyname(MAX_TASK_MEM, &max_task_pmem, &size_max_task_pmem, NULL, 0);
 	T_ASSERT_POSIX_SUCCESS(ret, "call sysctlbyname to get max task physical memory.");
 	if (max_task_pmem >= MAX_TASK_MEM_ENTITLED_VALUE) {
 		T_SKIP("max_task_pmem (%lld) is larger than entitled value (%lld). Skipping test on this device.", max_task_pmem, MAX_TASK_MEM_ENTITLED_VALUE);
 	}
 
-	// Use sysctl to change entitled limit
+	                                      
 	ret = sysctlbyname(MAX_TASK_MEM_ENTITLED, &old_entitled_max_task_pmem, &size_old_entitled_max_task_pmem, &entitled_max_task_pmem, size_entitled_max_task_pmem);
 	T_ASSERT_POSIX_SUCCESS(ret, "call sysctlbyname to set entitled hardware mem size.");
 
 	T_ATEND(reset_old_entitled_max_task_mem);
 
-	/*
-	 * Spawn child with the normal task limit (just as launchd does for an app)
-	 * The child will start suspended, so we can check its memlimit.
-	 */
+	  
+                                                                            
+                                                                 
+    
 
 	pid = spawn_child_with_memlimit(max_task_pmem);
 	T_ASSERT_POSIX_SUCCESS(pid, "spawn child with task limit");
 
-	// Check its memlimt
+	                    
 	ret = memorystatus_control(MEMORYSTATUS_CMD_GET_MEMLIMIT_PROPERTIES, pid, 0, &mmprops, sizeof(mmprops));
 	T_ASSERT_POSIX_SUCCESS(ret, "memorystatus_control");
 #if ENTITLED
 	expected_limit = MAX_TASK_MEM_ENTITLED_VALUE;
-#else /* ENTITLED */
+#else               
 	expected_limit = max_task_pmem;
-#endif /* ENTITLED */
+#endif               
 	T_ASSERT_EQ(mmprops.v1.memlimit_active, expected_limit, "active limit");
 	T_ASSERT_EQ(mmprops.v1.memlimit_inactive, expected_limit, "inactive limit");
 
-	// Resume the child. It should exit immediately.
+	                                                
 	ret = kill(pid, SIGCONT);
 	T_ASSERT_POSIX_SUCCESS(ret, "kill child");
 
-	// Check child's exit code.
+	                           
 	while (true) {
 		rc = waitpid(pid, &status, 0);
 		if (rc == -1 && errno == EINTR) {

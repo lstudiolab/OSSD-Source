@@ -34,9 +34,9 @@
 
 typedef int sync_policy_t;
 
-/*
- *	These options define the wait ordering of the synchronizers
- */
+  
+                                                              
+   
 #define SYNC_POLICY_FIFO                0x0
 #define SYNC_POLICY_FIXED_PRIORITY      0x1
 #define SYNC_POLICY_REVERSED            0x2
@@ -45,17 +45,17 @@ typedef int sync_policy_t;
 
 #ifdef  KERNEL_PRIVATE
 
-/*
- *	These options provide addition (kernel-private) behaviors
- */
+  
+                                                            
+   
 
 #define SYNC_POLICY_PREPOST             0x4
 #define SYNC_POLICY_DISABLE_IRQ         0x8
 #define SYNC_POLICY_TURNSTILE           0x10
 #define SYNC_POLICY_TURNSTILE_PROXY     0x20
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 #define SYNC_POLICY_MAX                 0x7
 
-#endif  /* _MACH_SYNC_POLICY_H_ */
+#endif                            

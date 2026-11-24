@@ -26,27 +26,27 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * kperf's kdebug trigger is a precise mechanism for taking samples of the
- * thread tracing a kdebug event.
- *
- * The filter used by kperf differs from kdebug's typefilter. kperf's filter
- * is small -- only around 140 bytes, as opposed to kdebug's 8KB filter.  It
- * can also target precise debug IDs, instead of only being able to specify
- * an entire subclass in a kdebug typefilter.  Function specifiers can be
- * provided to match against along with a class or subclass.  For instance, this
- * allows the kperf filter to only trigger a sample if an ending syscall event
- * (DBG_BSD, DBG_BSD_EXCP_SC) occurs.
- *
- * The tradeoff for this flexibility is that only KPERF_KDEBUG_DEBUGIDS_MAX (32)
- * classes, subclasses, or exact debug IDs can be filtered at one time.
- *
- * The filter consists of up to 32 debug IDs and an array of 2-bit type codes
- * packed into a 64-bit value.  To determine if a given debug ID should trigger
- * a kperf sample, each debug ID is checked.  The type code is unpacked from the
- * 64-bit value to apply a mask to the debug ID.  Then, a sample occurs if the
- * masked debug ID is equal to the debug ID in the filter's list.
- */
+  
+                                                                          
+                                 
+  
+                                                                            
+                                                                            
+                                                                           
+                                                                         
+                                                                                
+                                                                              
+                                     
+  
+                                                                                
+                                                                       
+  
+                                                                             
+                                                                               
+                                                                                
+                                                                              
+                                                                 
+   
 
 #include <kern/kalloc.h>
 #include <kperf/action.h>
@@ -85,13 +85,13 @@ const static uint32_t debugid_masks[] = {
 	[KPERF_KDEBUG_FILTER_DEBUGID_FN] = UINT32_MAX,
 };
 
-/*
- * Types are packed into 2 64-bit fields in the filter, with 4-bits for each
- * type.  Only 3 bits are strictly necessary, but using 4 simplifies the
- * unpacking.
- */
+  
+                                                                            
+                                                                        
+             
+   
 
-/* UNSAFE */
+            
 #define DECODE_TYPE(TYPES, I) ((((uint8_t *)(TYPES))[(I) / 2] >> ((I) % 2) * 4) & 0xf)
 
 void
@@ -115,16 +115,16 @@ kperf_kdebug_reset(void)
 boolean_t
 kperf_kdebug_should_trigger(uint32_t debugid)
 {
-	/* ignore kperf events */
+	                         
 	if (KDBG_EXTRACT_CLASS(debugid) == DBG_PERF) {
 		return FALSE;
 	}
 
-	/*
-	 * Search linearly through list of debugids and masks.  If the filter
-	 * gets larger than 128 bytes, change this to either a binary search or
-	 * a sparse bitmap on the uint32_t range, depending on the new size.
-	 */
+	  
+                                                                      
+                                                                        
+                                                                     
+    
 	for (uint8_t i = 0; i < kperf_kdebug_filter->n_debugids; i++) {
 		uint32_t check_debugid =
 		    kperf_kdebug_filter->debugids[i];
@@ -148,7 +148,7 @@ kperf_kdebug_set_filter(user_addr_t user_filter, uint32_t user_size)
 
 	n_debugids_provided = (uint32_t)KPERF_KDEBUG_N_DEBUGIDS(user_size);
 
-	/* detect disabling the filter completely */
+	                                            
 	if (n_debugids_provided == 0) {
 		bzero(kperf_kdebug_filter, sizeof(*kperf_kdebug_filter));
 		goto out;

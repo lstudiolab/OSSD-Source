@@ -109,10 +109,10 @@ personas_bootstrap(void)
 
 	g_next_persona_id = FIRST_PERSONA_ID;
 
-	/*
-	 * setup the default credentials that a persona temporarily
-	 * inherits (to work around kauth APIs)
-	 */
+	  
+                                                            
+                                        
+    
 	bzero(&pcred, sizeof(pcred));
 	pcred.cr_uid = pcred.cr_ruid = pcred.cr_svuid = TEMP_PERSONA_ID;
 	pcred.cr_rgid = pcred.cr_svgid = TEMP_PERSONA_ID;
@@ -126,7 +126,7 @@ personas_bootstrap(void)
 		panic("couldn't create default persona credentials!");
 	}
 #if CONFIG_AUDIT
-	/* posix_cred_create() sets this value to NULL */
+	                                                 
 	g_default_persona_cred->cr_audit.as_aia_p = audit_default_aia_p;
 #endif
 	if (PE_parse_boot_argn("unique_persona", &unique_persona_bootarg, sizeof(unique_persona_bootarg))) {
@@ -167,7 +167,7 @@ persona_alloc(uid_t id, const char *login, persona_type_t type, char *path, int 
 	bzero(persona, sizeof(*persona));
 
 	if (os_atomic_inc(&g_total_personas, relaxed) > MAX_PERSONAS) {
-		/* too many personas! */
+		                        
 		pna_err("too many active personas!");
 		err = EBUSY;
 		goto out_error;
@@ -180,11 +180,11 @@ persona_alloc(uid_t id, const char *login, persona_type_t type, char *path, int 
 	lck_mtx_init(&persona->pna_lock, &persona_lck_grp, LCK_ATTR_NULL);
 	os_ref_init(&persona->pna_refcount, &persona_refgrp);
 
-	/*
-	 * Setup initial (temporary) kauth_cred structure
-	 * We need to do this here because all kauth calls require
-	 * an existing cred structure.
-	 */
+	  
+                                                  
+                                                           
+                               
+    
 	persona->pna_cred = kauth_cred_create(g_default_persona_cred);
 	if (!persona->pna_cred) {
 		pna_err("could not copy initial credentials!");
@@ -197,11 +197,11 @@ persona_alloc(uid_t id, const char *login, persona_type_t type, char *path, int 
 	persona->pna_valid = PERSONA_ALLOC_TOKEN;
 	persona->pna_path = path;
 
-	/*
-	 * NOTE: this persona has not been fully initialized. A subsequent
-	 * call to persona_init_begin() followed by persona_init_end() will make
-	 * the persona visible to the rest of the system.
-	 */
+	  
+                                                                   
+                                                                         
+                                                  
+    
 	if (error) {
 		*error = 0;
 	}
@@ -216,22 +216,22 @@ out_error:
 	return NULL;
 }
 
-/**
- * persona_init_begin
- *
- * This function begins initialization of a persona. It first acquires the
- * global persona list lock via lock_personas(), then selects an appropriate
- * persona ID and sets up the persona's credentials. This function *must* be
- * followed by a call to persona_init_end() which will mark the persona
- * structure as valid
- *
- * Conditions:
- *      persona has been allocated via persona_alloc()
- *      nothing locked
- *
- * Returns:
- *      global persona list is locked (even on error)
- */
+   
+                     
+  
+                                                                          
+                                                                            
+                                                                            
+                                                                       
+                     
+  
+              
+                                                      
+                      
+  
+           
+                                                     
+   
 int
 persona_init_begin(struct persona *persona)
 {
@@ -260,20 +260,20 @@ try_again:
 		persona_lock(tmp);
 		if (id == PERSONA_ID_NONE && tmp->pna_id == persona->pna_id) {
 			persona_unlock(tmp);
-			/*
-			 * someone else manually claimed this ID, and we're
-			 * trying to allocate an ID for the caller: try again
-			 */
+			  
+                                                      
+                                                        
+      
 			g_next_persona_id += PERSONA_ID_STEP;
 			goto try_again;
 		}
 		if (strncmp(tmp->pna_login, persona->pna_login, sizeof(tmp->pna_login)) == 0 ||
 		    tmp->pna_id == persona->pna_id) {
 			persona_unlock(tmp);
-			/*
-			 * Disallow use of identical login names and re-use
-			 * of previously allocated persona IDs
-			 */
+			  
+                                                      
+                                         
+      
 			err = EEXIST;
 			break;
 		}
@@ -283,7 +283,7 @@ try_again:
 		goto out;
 	}
 
-	/* ensure the cred has proper UID/GID defaults */
+	                                                 
 	kauth_cred_ref(persona->pna_cred);
 	tmp_cred = kauth_cred_setuidgid(persona->pna_cred,
 	    persona->pna_id,
@@ -298,11 +298,11 @@ try_again:
 		goto out;
 	}
 
-	/* it should be a member of exactly 1 group (equal to its UID) */
+	                                                                 
 	new_group = (gid_t)persona->pna_id;
 
 	kauth_cred_ref(persona->pna_cred);
-	/* opt _out_ of memberd as a default */
+	                                       
 	tmp_cred = kauth_cred_setgroups(persona->pna_cred,
 	    &new_group, 1, KAUTH_UID_NONE);
 	kauth_cred_unref(&persona->pna_cred);
@@ -315,7 +315,7 @@ try_again:
 		goto out;
 	}
 
-	/* if the kernel supplied the persona ID, increment for next time */
+	                                                                    
 	if (id == PERSONA_ID_NONE) {
 		g_next_persona_id += PERSONA_ID_STEP;
 	}
@@ -325,35 +325,35 @@ try_again:
 out:
 	if (err != 0) {
 		persona_dbg("ERROR:%d while initializing %d:%d (%s)...", err, id, persona->pna_id, persona->pna_login);
-		/*
-		 * mark the persona with an error so that persona_init_end()
-		 * will *not* add it to the global list.
-		 */
+		  
+                                                              
+                                          
+     
 		persona->pna_id = PERSONA_ID_NONE;
 	}
 
-	/*
-	 * leave the global persona list locked: it will be
-	 * unlocked in a call to persona_init_end()
-	 */
+	  
+                                                    
+                                            
+    
 	return err;
 }
 
-/**
- * persona_init_end
- *
- * This function finalizes the persona initialization by marking it valid and
- * adding it to the global list of personas. After unlocking the global list,
- * the persona will be visible to the reset of the system. The function will
- * only mark the persona valid if the input parameter 'error' is 0.
- *
- * Conditions:
- *      persona is initialized via persona_init_begin()
- *      global persona list is locked via lock_personas()
- *
- * Returns:
- *      global persona list is unlocked
- */
+   
+                   
+  
+                                                                             
+                                                                             
+                                                                            
+                                                                   
+  
+              
+                                                       
+                                                         
+  
+           
+                                       
+   
 void
 persona_init_end(struct persona *persona, int error)
 {
@@ -361,17 +361,17 @@ persona_init_end(struct persona *persona, int error)
 		return;
 	}
 
-	/*
-	 * If the pna_valid member is set to the INIT_TOKEN value, then it has
-	 * successfully gone through persona_init_begin(), and we can mark it
-	 * valid and make it visible to the rest of the system. However, if
-	 * there was an error either during initialization or otherwise, we
-	 * need to decrement the global count of personas because this one
-	 * will be disposed-of by the callers invocation of persona_put().
-	 */
+	  
+                                                                       
+                                                                      
+                                                                    
+                                                                    
+                                                                   
+                                                                   
+    
 	if (error != 0 || persona->pna_valid == PERSONA_ALLOC_TOKEN) {
 		persona_dbg("ERROR:%d after initialization of %d (%s)", error, persona->pna_id, persona->pna_login);
-		/* remove this persona from the global count */
+		                                               
 		os_atomic_dec(&g_total_personas, relaxed);
 	} else if (error == 0 &&
 	    persona->pna_valid == PERSONA_INIT_TOKEN) {
@@ -383,19 +383,19 @@ persona_init_end(struct persona *persona, int error)
 	unlock_personas();
 }
 
-/**
- * persona_verify_and_set_uniqueness
- *
- * This function checks the persona, if the one being spawned is of type
- * PERSONA_SYSTEM or PERSONA_SYSTEM_PROXY, is unique.
- *
- * Conditions:
- *      global persona list is locked on entry and return.
- *
- * Returns:
- *      EEXIST: if persona is system/system-proxy and is not unique.
- *      0: Otherwise.
- */
+   
+                                    
+  
+                                                                        
+                                                     
+  
+              
+                                                          
+  
+           
+                                                                    
+                     
+   
 int
 persona_verify_and_set_uniqueness(struct persona *persona)
 {
@@ -425,15 +425,15 @@ persona_verify_and_set_uniqueness(struct persona *persona)
 	return 0;
 }
 
-/**
- * persona_is_unique
- *
- * This function checks if the persona spawned is unique.
- *
- * Returns:
- *      TRUE: if unique.
- *      FALSE: otherwise.
- */
+   
+                    
+  
+                                                         
+  
+           
+                        
+                         
+   
 boolean_t
 persona_is_unique(struct persona *persona)
 {
@@ -495,12 +495,12 @@ persona_put(struct persona *persona)
 
 	persona_dbg("Destroying persona %s", persona_desc(persona, 0));
 
-	/* release our credential reference */
+	                                      
 	if (persona->pna_cred) {
 		kauth_cred_unref(&persona->pna_cred);
 	}
 
-	/* remove it from the global list and decrement the count */
+	                                                            
 	lock_personas();
 	persona_lock(persona);
 	if (persona_valid(persona)) {
@@ -537,10 +537,10 @@ persona_lookup(uid_t id)
 
 	persona = NULL;
 
-	/*
-	 * simple, linear lookup for now: there shouldn't be too many
-	 * of these in memory at any given time.
-	 */
+	  
+                                                              
+                                         
+    
 	lock_personas();
 	LIST_FOREACH(tmp, &all_personas, pna_list) {
 		persona_lock(tmp);
@@ -689,19 +689,19 @@ current_persona_get(void)
 	ipc_voucher_t voucher;
 
 	thread_get_mach_voucher(current_thread(), 0, &voucher);
-	/* returns a voucher ref */
+	                           
 	if (voucher != IPC_VOUCHER_NULL) {
-		/*
-		 * If the voucher doesn't contain a bank attribute, it uses
-		 * the default bank task value to determine the persona id
-		 * which is the same as the proc's persona id
-		 */
+		  
+                                                             
+                                                            
+                                               
+     
 		bank_get_bank_ledger_thread_group_and_persona(voucher, NULL,
 		    NULL, &current_persona_id);
 		ipc_voucher_release(voucher);
 		persona = persona_lookup(current_persona_id);
 	} else {
-		/* Fallback - get the proc's persona */
+		                                       
 		proc_t p = current_proc();
 		proc_lock(p);
 		persona = persona_get(p->p_persona);
@@ -710,9 +710,9 @@ current_persona_get(void)
 	return persona;
 }
 
-/**
- * inherit a persona from parent to child
- */
+   
+                                         
+   
 int
 persona_proc_inherit(proc_t child, proc_t parent)
 {
@@ -722,7 +722,7 @@ persona_proc_inherit(proc_t child, proc_t parent)
 		return -1;
 	}
 
-	/* no persona to inherit */
+	                           
 	if (parent->p_persona == NULL) {
 		return 0;
 	}
@@ -743,7 +743,7 @@ persona_proc_adopt_id(proc_t p, uid_t id, kauth_cred_t auth_override)
 
 	ret = persona_proc_adopt(p, persona, auth_override);
 
-	/* put the reference from the lookup() */
+	                                         
 	persona_put(persona);
 
 	return ret;
@@ -755,10 +755,10 @@ typedef enum e_persona_reset_op {
 	PROC_RESET_OLD_PERSONA = 2,
 } persona_reset_op_t;
 
-/*
- * internal cleanup routine for proc_set_cred_internal
- *
- */
+  
+                                                      
+  
+   
 static struct persona *
 proc_reset_persona_internal(proc_t p, persona_reset_op_t op,
     struct persona *old_persona,
@@ -775,13 +775,13 @@ proc_reset_persona_internal(proc_t p, persona_reset_op_t op,
 	case PROC_RESET_OLD_PERSONA:
 		break;
 	default:
-		/* invalid arguments */
+		                       
 		return NULL;
 	}
 
-	/* unlock the new persona (locked on entry) */
+	                                              
 	persona_unlock(new_persona);
-	/* lock the old persona and the process */
+	                                          
 	assert(old_persona != NULL);
 	persona_lock(old_persona);
 	proc_lock(p);
@@ -800,17 +800,17 @@ proc_reset_persona_internal(proc_t p, persona_reset_op_t op,
 	proc_unlock(p);
 	persona_unlock(old_persona);
 
-	/* re-lock the new persona */
+	                             
 	persona_lock(new_persona);
 	return old_persona;
 }
 
-/*
- * Assumes persona is locked.
- * On success, takes a reference to 'persona' and returns the
- * previous persona the process had adopted. The caller is
- * responsible to release the reference.
- */
+  
+                             
+                                                             
+                                                          
+                                        
+   
 static struct persona *
 proc_set_cred_internal(proc_t p, struct persona *persona,
     kauth_cred_t auth_override, int *rlim_error)
@@ -821,24 +821,24 @@ proc_set_cred_internal(proc_t p, struct persona *persona,
 	size_t count;
 	rlim_t nproc = proc_limitgetcur(p, RLIMIT_NPROC, TRUE);
 
-	/*
-	 * This operation must be done under the proc trans lock
-	 * by the thread which took the trans lock!
-	 */
+	  
+                                                         
+                                            
+    
 	assert(((p->p_lflag & P_LINTRANSIT) == P_LINTRANSIT) &&
 	    p->p_transholder == current_thread());
 	assert(persona != NULL);
 
-	/* no work to do if we "re-adopt" the same persona */
+	                                                     
 	if (p->p_persona == persona) {
 		return NULL;
 	}
 
-	/*
-	 * If p is in a persona, then we need to remove 'p' from the list of
-	 * processes in that persona. To do this, we need to drop the lock
-	 * held on the incoming (new) persona and lock the old one.
-	 */
+	  
+                                                                     
+                                                                   
+                                                            
+    
 	if (p->p_persona) {
 		old_persona = proc_reset_persona_internal(p, PROC_REMOVE_PERSONA,
 		    NULL, persona);
@@ -860,11 +860,11 @@ proc_set_cred_internal(proc_t p, struct persona *persona,
 
 	new_uid = persona->pna_id;
 
-	/*
-	 * Check to see if we will hit a proc rlimit by moving the process
-	 * into the persona. If so, we'll bail early before actually moving
-	 * the process or changing its credentials.
-	 */
+	  
+                                                                   
+                                                                    
+                                            
+    
 	if (new_uid != 0 &&
 	    (rlim_t)chgproccnt(new_uid, 0) > nproc) {
 		pna_err("PID:%d hit proc rlimit in new persona(%d): %s",
@@ -878,9 +878,9 @@ proc_set_cred_internal(proc_t p, struct persona *persona,
 		return NULL;
 	}
 
-	/*
-	 * Set the new credentials on the proc
-	 */
+	  
+                                       
+    
 set_proc_cred:
 	my_cred = kauth_cred_proc_ref(p);
 	persona_dbg("proc_adopt PID:%d, %s -> %s",
@@ -894,39 +894,39 @@ set_proc_cred:
 		kauth_cred_t old_cred = my_cred;
 
 		proc_ucred_lock(p);
-		/*
-		 * We need to protect against a race where another thread
-		 * also changed the credential after we took our
-		 * reference.  If p_ucred has changed then we should
-		 * restart this again with the new cred.
-		 */
+		  
+                                                           
+                                                  
+                                                      
+                                          
+     
 		if (p->p_ucred != my_cred) {
 			proc_ucred_unlock(p);
 			kauth_cred_unref(&my_cred);
-			/* try again */
+			               
 			goto set_proc_cred;
 		}
 
-		/* update the credential and take a ref for the proc */
+		                                                       
 		kauth_cred_ref(my_new_cred);
 		p->p_ucred = my_new_cred;
 
-		/* update cred on proc (and current thread) */
+		                                              
 		mach_kauth_cred_uthread_update();
 		PROC_UPDATE_CREDS_ONPROC(p);
 
-		/* drop the proc's old ref on the credential */
+		                                               
 		kauth_cred_unref(&old_cred);
 		proc_ucred_unlock(p);
 	}
 
-	/* drop this function's reference to the old cred */
+	                                                    
 	kauth_cred_unref(&my_cred);
 
-	/*
-	 * Update the proc count.
-	 * If the UIDs are the same, then there is no work to do.
-	 */
+	  
+                          
+                                                          
+    
 	if (old_persona) {
 		old_uid = old_persona->pna_id;
 	}
@@ -936,11 +936,11 @@ set_proc_cred:
 		persona_dbg("Decrement %s:%d proc_count to: %lu",
 		    old_persona ? "Persona" : "UID", old_uid, count);
 
-		/*
-		 * Increment the proc count on the UID associated with
-		 * the new persona. Enforce the resource limit just
-		 * as in fork1()
-		 */
+		  
+                                                        
+                                                     
+                  
+     
 		count = chgproccnt(new_uid, 1);
 		persona_dbg("Increment Persona:%d (UID:%d) proc_count to: %lu",
 		    new_uid, kauth_cred_getuid(my_new_cred), count);
@@ -978,16 +978,16 @@ persona_proc_adopt(proc_t p, struct persona *persona, kauth_cred_t auth_override
 		return EINVAL;
 	}
 
-	/* the persona credentials can no longer be adjusted */
+	                                                       
 	persona->pna_cred_locked = 1;
 
-	/*
-	 * assume the persona: this may drop and re-acquire the persona lock!
-	 */
+	  
+                                                                      
+    
 	error = 0;
 	old_persona = proc_set_cred_internal(p, persona, auth_override, &error);
 
-	/* join the process group associated with the persona */
+	                                                        
 	if (persona->pna_pgid) {
 		uid_t uid = kauth_cred_getuid(persona->pna_cred);
 		persona_dbg(" PID:%d, pgid:%d%s",
@@ -996,10 +996,10 @@ persona_proc_adopt(proc_t p, struct persona *persona, kauth_cred_t auth_override
 		enterpgrp(p, persona->pna_pgid, persona->pna_pgid == uid);
 	}
 
-	/* Only Multiuser Mode needs to update the session login name to the persona name */
+	                                                                                    
 #if (TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR)
 	uint32_t multiuser_flags = COMM_PAGE_READ(uint32_t, MULTIUSER_CONFIG);
-	/* set the login name of the session */
+	                                       
 	if (multiuser_flags) {
 		struct session * sessp = proc_session(p);
 		if (sessp != SESSION_NULL) {
@@ -1014,9 +1014,9 @@ persona_proc_adopt(proc_t p, struct persona *persona, kauth_cred_t auth_override
 
 	set_security_token(p);
 
-	/*
-	 * Drop the reference to the old persona.
-	 */
+	  
+                                          
+    
 	if (old_persona) {
 		persona_put(old_persona);
 	}
@@ -1032,23 +1032,23 @@ persona_proc_drop(proc_t p)
 
 	persona_dbg("PID:%d, %s -> <none>", p->p_pid, persona_desc(p->p_persona, 0));
 
-	/*
-	 * There are really no other credentials for us to assume,
-	 * so we'll just continue running with the credentials
-	 * we got from the persona.
-	 */
+	  
+                                                           
+                                                       
+                            
+    
 
-	/*
-	 * the locks must be taken in reverse order here, so
-	 * we have to be careful not to cause deadlock
-	 */
+	  
+                                                     
+                                               
+    
 try_again:
 	proc_lock(p);
 	if (p->p_persona) {
 		uid_t puid, ruid;
 		if (!persona_try_lock(p->p_persona)) {
 			proc_unlock(p);
-			mutex_pause(0); /* back-off time */
+			mutex_pause(0);                    
 			goto try_again;
 		}
 		persona = p->p_persona;
@@ -1064,10 +1064,10 @@ try_again:
 		proc_unlock(p);
 	}
 
-	/*
-	 * if the proc had a persona, then it is still locked here
-	 * (preserving proper lock ordering)
-	 */
+	  
+                                                           
+                                     
+    
 
 	if (persona) {
 		persona_unlock(persona);
@@ -1116,17 +1116,17 @@ persona_set_cred(struct persona *persona, kauth_cred_t cred)
 		goto out_unlock;
 	}
 
-	/* create a new cred from the passed-in cred */
+	                                               
 	my_cred = kauth_cred_create(cred);
 
-	/* ensure that the UID matches the persona ID */
+	                                                
 	my_cred = kauth_cred_setresuid(my_cred, persona->pna_id,
 	    persona->pna_id, persona->pna_id,
 	    KAUTH_UID_NONE);
 
-	/* TODO: clear the saved GID?! */
+	                                 
 
-	/* replace the persona's cred with the new one */
+	                                                 
 	if (persona->pna_cred) {
 		kauth_cred_unref(&persona->pna_cred);
 	}
@@ -1158,17 +1158,17 @@ persona_set_cred_from_proc(struct persona *persona, proc_t proc)
 
 	parent_cred = kauth_cred_proc_ref(proc);
 
-	/* TODO: clear the saved UID/GID! */
+	                                    
 
-	/* create a new cred from the proc's cred */
+	                                            
 	my_cred = kauth_cred_create(parent_cred);
 
-	/* ensure that the UID matches the persona ID */
+	                                                
 	my_cred = kauth_cred_setresuid(my_cred, persona->pna_id,
 	    persona->pna_id, persona->pna_id,
 	    KAUTH_UID_NONE);
 
-	/* replace the persona's cred with the new one */
+	                                                 
 	if (persona->pna_cred) {
 		kauth_cred_unref(&persona->pna_cred);
 	}
@@ -1377,11 +1377,11 @@ out_unlock:
 	return ret;
 }
 
-#else /* !CONFIG_PERSONAS */
+#else                       
 
-/*
- * symbol exports for kext compatibility
- */
+  
+                                        
+   
 
 struct persona *system_persona = NULL;
 struct persona *proxy_system_persona = NULL;

@@ -15,7 +15,7 @@
 #include <corecrypto/cc.h>
 #include <corecrypto/ccdigest.h>
 
-/* An hmac_ctx_t is normally allocated as an array of these. */
+                                                               
 struct cchmac_ctx {
     uint8_t b[1];
 } CC_ALIGNED(8);
@@ -32,17 +32,17 @@ typedef struct cchmac_ctx* cchmac_ctx_t;
 #define cchmac_di_decl(_di_, _name_) cchmac_ctx_decl((_di_)->state_size, (_di_)->block_size, _name_)
 #define cchmac_di_clear(_di_, _name_) cchmac_ctx_clear((_di_)->state_size, (_di_)->block_size, _name_)
 
-/* Return a ccdigest_ctx_t which can be accesed with the macros in ccdigest.h */
+                                                                                
 #define cchmac_digest_ctx(_di_, HC)    ((ccdigest_ctx_t)(HC))
 
-/* Accesors for ostate fields, this is all cchmac_ctx_t adds to the ccdigest_ctx_t. */
+                                                                                      
 #define cchmac_ostate(_di_, HC)    ((struct ccdigest_state *)(((cchmac_ctx_t)(HC))->b + cc_pad_align(ccdigest_di_size(_di_))))
 #define cchmac_ostate8(_di_, HC)   (ccdigest_u8(cchmac_ostate(_di_, HC)))
 #define cchmac_ostate32(_di_, HC)  (ccdigest_u32(cchmac_ostate(_di_, HC)))
 #define cchmac_ostate64(_di_, HC)  (ccdigest_u64(cchmac_ostate(_di_, HC)))
 #define cchmac_ostateccn(_di_, HC) (ccdigest_ccn(cchmac_ostate(_di_, HC)))
 
-/* Convenience accessors for ccdigest_ctx_t fields. */
+                                                      
 #define cchmac_istate(_di_, HC)    ccdigest_state(_di_, ((ccdigest_ctx_t)(HC)))
 #define cchmac_istate8(_di_, HC)   ccdigest_u8(cchmac_istate(_di_, HC))
 #define cchmac_istate32(_di_, HC)  ccdigest_u32(cchmac_istate(_di_, HC))
@@ -64,4 +64,4 @@ void cchmac(const struct ccdigest_info *di, size_t key_len,
             const void *key, size_t data_len, const void *data,
             unsigned char *mac);
 
-#endif /* _CORECRYPTO_CCHMAC_H_ */
+#endif                            

@@ -40,7 +40,7 @@ _get_sudo_invoker(const char *var)
 	T_QUIET; T_ASSERT_LT_ULONG(value, ID_MAX, "%s invalid", var);
 	return (unsigned)value;
 }
-#endif /* TARGET_OS_OSX */
+#endif                    
 
 void
 drop_priv(void)

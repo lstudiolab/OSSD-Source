@@ -69,12 +69,12 @@
 #include <mach/exception_types.h>
 #include <config_dtrace.h>
 
-#define _ARCH_I386_ASM_HELP_H_          /* Prevent inclusion of user header */
+#define _ARCH_I386_ASM_HELP_H_                                                
 #include <mach/i386/syscall_sw.h>
 
-/*
- * Fault recovery.
- */
+  
+                  
+   
 
 #ifdef	__MACHO__
 #define	RECOVERY_SECTION	.section	__VECTORS, __recover 
@@ -83,33 +83,33 @@
 #endif
 
 #define	RECOVER_TABLE_START	\
-	.align 3		; \
-	.globl	EXT(recover_table) ;\
-LEXT(recover_table)		;\
+	.align 3		   
+	.globl	EXT(recover_table)   
+LEXT(recover_table)		  
 	.text
 
 #define	RECOVER(addr)		\
-	.align	3;		\
-	.quad	9f		;\
-	.quad	addr		;\
-	.text			;\
+	.align	3    
+	.quad	9f		  
+	.quad	addr		  
+	.text			  
 9:
 
 #define	RECOVER_TABLE_END		\
-	.align	3			;\
-	.globl	EXT(recover_table_end)	;\
-LEXT(recover_table_end)			;\
+	.align	3			  
+	.globl	EXT(recover_table_end)	  
+LEXT(recover_table_end)			  
 	.text
 
-/*
- * Allocate recovery and table.
- */
+  
+                               
+   
 	RECOVERY_SECTION
 	RECOVER_TABLE_START
 
-/*
- * int rdmsr_carefully(uint32_t msr, uint32_t *lo, uint32_t *hi)
- */
+  
+                                                                
+   
 ENTRY(rdmsr_carefully)
 	movl	%edi, %ecx
 	movq	%rdx, %rdi
@@ -124,9 +124,9 @@ ENTRY(rdmsr_carefully)
 rdmsr_fail:
 	movq	$1, %rax
 	ret
-/*
- * int rdmsr64_carefully(uint32_t msr, uint64_t *val);
- */
+  
+                                                      
+   
 
 ENTRY(rdmsr64_carefully)
 	movl	%edi, %ecx
@@ -140,9 +140,9 @@ ENTRY(rdmsr64_carefully)
 rdmsr64_carefully_fail:
 	movl	$1, %eax
 	ret
-/*
- * int wrmsr64_carefully(uint32_t msr, uint64_t val);
- */
+  
+                                                     
+   
 
 ENTRY(wrmsr_carefully)
 	movl	%edi, %ecx
@@ -181,38 +181,38 @@ LEXT(thread_exception_return_internal)
 LEXT(thread_exception_return)
 #endif
 	cli
-	xorl	%ecx, %ecx		/* don't check if we're in the PFZ */
+	xorl	%ecx, %ecx		                                     
 	jmp	EXT(return_from_trap)
 
-/*
- * Copyin/out from user/kernel address space.
- * rdi:	source address
- * rsi:	destination address
- * rdx:	byte count (in fact, always < 64MB -- see copyio)
- */
+  
+                                             
+                      
+                           
+                                                         
+   
 Entry(_bcopy)
-	xchg	%rdi, %rsi		/* source %rsi, dest %rdi */
+	xchg	%rdi, %rsi		                            
 
-	cld				/* count up */
-	mov	%rdx, %rcx		/* move by longwords first */
+	cld				              
+	mov	%rdx, %rcx		                             
 	shr	$3, %rcx
 	RECOVERY_SECTION
 	RECOVER(_bcopy_fail)
 	rep
-	movsq				/* move longwords */
+	movsq				                    
 
-	movl	%edx, %ecx		/* now move remaining bytes */
+	movl	%edx, %ecx		                              
 	andl	$7, %ecx
 	RECOVERY_SECTION
 	RECOVER(_bcopy_fail)
 	rep
 	movsb
 
-	xorl	%eax,%eax		/* return 0 for success */
-	ret				/* and return */
+	xorl	%eax,%eax		                          
+	ret				                
 
 _bcopy_fail:
-	movl	$(EFAULT),%eax		/* return error for failure */
+	movl	$(EFAULT),%eax		                              
 	ret
 
 Entry(pmap_safe_read)
@@ -226,11 +226,11 @@ _pmap_safe_read_fail:
 	xor	%eax, %eax
 	ret
 
-/*
- * 2-byte copy used by ml_copy_phys().
- * rdi:	source address
- * rsi:	destination address
- */
+  
+                                      
+                      
+                           
+   
 Entry(_bcopy2)
 	RECOVERY_SECTION
 	RECOVER(_bcopy_fail)
@@ -239,14 +239,14 @@ Entry(_bcopy2)
 	RECOVER(_bcopy_fail)
 	movw	%cx, (%rsi)
 
-	xorl	%eax,%eax		/* return 0 for success */
-	ret				/* and return */
+	xorl	%eax,%eax		                          
+	ret				                
 
-/*
- * 4-byte copy used by ml_copy_phys().
- * rdi:	source address
- * rsi:	destination address
- */
+  
+                                      
+                      
+                           
+   
 Entry(_bcopy4)
 	RECOVERY_SECTION
 	RECOVER(_bcopy_fail)
@@ -255,14 +255,14 @@ Entry(_bcopy4)
 	RECOVER(_bcopy_fail)
 	mov	%ecx, (%rsi)
 
-	xorl	%eax,%eax		/* return 0 for success */
-	ret				/* and return */
+	xorl	%eax,%eax		                          
+	ret				                
 
-/*
- * 8-byte copy used by ml_copy_phys().
- * rdi:	source address
- * rsi:	destination address
- */
+  
+                                      
+                      
+                           
+   
 Entry(_bcopy8)
 	RECOVERY_SECTION
 	RECOVER(_bcopy_fail)
@@ -271,149 +271,149 @@ Entry(_bcopy8)
 	RECOVER(_bcopy_fail)
 	mov	%rcx, (%rsi)
 
-	xorl	%eax,%eax		/* return 0 for success */
-	ret				/* and return */
+	xorl	%eax,%eax		                          
+	ret				                
 
 
 	
-/*
- * Copyin string from user/kern address space.
- * rdi:	source address
- * rsi:	destination address
- * rdx:	max byte count
- * rcx:	actual byte count (OUT)
- */
+  
+                                              
+                      
+                           
+                      
+                               
+   
 Entry(_bcopystr)
 	pushq	%rdi
-	xchgq	%rdi, %rsi		/* source %rsi, dest %rdi */
+	xchgq	%rdi, %rsi		                            
 
-	xorl	%eax,%eax		/* set to 0 here so that high 24 bits */
-					/* are 0 for the cmpl against 0 */
+	xorl	%eax,%eax		                                        
+					                                  
 2:
 	RECOVERY_SECTION
-	RECOVER(_bcopystr_fail)		/* copy bytes... */
+	RECOVER(_bcopystr_fail)		                   
 	movb	(%rsi),%al
 	incq	%rsi
-	testq	%rdi,%rdi		/* if kernel address is ... */
-	jz	3f			/* not NULL */
-	movb	%al,(%rdi)		/* copy the byte */
+	testq	%rdi,%rdi		                              
+	jz	3f			              
+	movb	%al,(%rdi)		                   
 	incq	%rdi
 3:
-	testl	%eax,%eax		/* did we just stuff the 0-byte? */
-	jz	4f			/* yes, return 0 already in %eax */
-	decq	%rdx			/* decrement #bytes left in buffer */
-	jnz	2b			/* buffer not full, copy another byte */
-	movl	$(ENAMETOOLONG),%eax	/* buffer full, no \0: ENAMETOOLONG */
+	testl	%eax,%eax		                                   
+	jz	4f			                                   
+	decq	%rdx			                                     
+	jnz	2b			                                        
+	movl	$(ENAMETOOLONG),%eax	                                      
 4:
-	cmpq	$0,%rcx			/* get OUT len ptr */
-	jz	_bcopystr_ret		/* if null, just return */
+	cmpq	$0,%rcx			                     
+	jz	_bcopystr_ret		                          
 	subq	(%rsp),%rsi
-	movq	%rsi,(%rcx)		/* else set OUT arg to xfer len */
-	popq	%rdi			/* restore registers */
+	movq	%rsi,(%rcx)		                                  
+	popq	%rdi			                       
 _bcopystr_ret:
-	ret				/* and return */
+	ret				                
 
 _bcopystr_fail:
-	popq	%rdi			/* restore registers */
-	movl	$(EFAULT),%eax		/* return error for failure */
+	popq	%rdi			                       
+	movl	$(EFAULT),%eax		                              
 	ret
 
-/*
- * Copyin 32 bit aligned word as a single transaction
- * rdi: source address (user)
- * rsi: destination address (kernel)
- */
+  
+                                                     
+                             
+                                    
+   
 Entry(_copyin_atomic32)
-	pushq	%rbp			/* Save registers */
+	pushq	%rbp			                    
 	movq	%rsp, %rbp
 	RECOVERY_SECTION
-	RECOVER(L_copyin_atomic32_fail)	/* Set up recovery handler for next instruction */
-	movl	(%rdi), %eax		/* Load long from user */
-	movl	%eax, (%rsi)		/* Store to kernel */
-	xorl	%eax, %eax		/* Return success */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	RECOVER(L_copyin_atomic32_fail)	                                                  
+	movl	(%rdi), %eax		                         
+	movl	%eax, (%rsi)		                     
+	xorl	%eax, %eax		                    
+	popq	%rbp			                       
+	retq				            
 
 L_copyin_atomic32_fail:
-	movl	$(EFAULT), %eax		/* Return error for failure */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	movl	$(EFAULT), %eax		                              
+	popq	%rbp			                       
+	retq				            
 
-/*
- * Copyin 64 bit aligned word as a single transaction
- * rdi: source address (user)
- * rsi: destination address (kernel)
- */
+  
+                                                     
+                             
+                                    
+   
 Entry(_copyin_atomic64)
-	pushq	%rbp			/* Save registers */
+	pushq	%rbp			                    
 	movq	%rsp, %rbp
 	RECOVERY_SECTION
-	RECOVER(L_copyin_atomic64_fail)	/* Set up recovery handler for next instruction*/
-	movq	(%rdi), %rax		/* Load quad from user */
-	movq	%rax, (%rsi)		/* Store to kernel */
-	xorl	%eax, %eax		/* Return success */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	RECOVER(L_copyin_atomic64_fail)	                                                 
+	movq	(%rdi), %rax		                         
+	movq	%rax, (%rsi)		                     
+	xorl	%eax, %eax		                    
+	popq	%rbp			                       
+	retq				            
 
 L_copyin_atomic64_fail:
-	movl	$(EFAULT), %eax		/* Return error for failure */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	movl	$(EFAULT), %eax		                              
+	popq	%rbp			                       
+	retq				            
 
-/*
- * Copyin 32 bit aligned word as a single transaction
- * rdi: source address (kernel)
- * rsi: destination address (user)
- */
+  
+                                                     
+                               
+                                  
+   
 Entry(_copyout_atomic32)
-	pushq	%rbp			/* Save registers */
+	pushq	%rbp			                    
 	movq	%rsp, %rbp
-	movl    (%rdi), %eax            /* Load long from kernel */
+	movl    (%rdi), %eax                                       
 	RECOVERY_SECTION
-	RECOVER(L_copyout_atomic32_fail)	/* Set up recovery handler for next instruction*/
-	movl	%eax, (%rsi)		/* Store long to user */
-	xorl	%eax, %eax		/* Return success */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	RECOVER(L_copyout_atomic32_fail)	                                                 
+	movl	%eax, (%rsi)		                        
+	xorl	%eax, %eax		                    
+	popq	%rbp			                       
+	retq				            
 
 L_copyout_atomic32_fail:
-	movl	$(EFAULT), %eax		/* Return error for failure */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	movl	$(EFAULT), %eax		                              
+	popq	%rbp			                       
+	retq				            
 
-/*
- * Copyin 64 bit aligned word as a single transaction
- * rdi: source address (kernel)
- * rsi: destination address (user)
- */
+  
+                                                     
+                               
+                                  
+   
 Entry(_copyout_atomic64)
-	pushq	%rbp			/* Save registers */
+	pushq	%rbp			                    
 	movq	%rsp, %rbp
-	movq    (%rdi), %rax            /* Load quad from kernel */
+	movq    (%rdi), %rax                                       
 	RECOVERY_SECTION
-	RECOVER(L_copyout_atomic64_fail)	/* Set up recovery handler for next instruction*/
-	movq	%rax, (%rsi)		/* Store quad to user */
-	xorl	%eax, %eax		/* Return success */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	RECOVER(L_copyout_atomic64_fail)	                                                 
+	movq	%rax, (%rsi)		                        
+	xorl	%eax, %eax		                    
+	popq	%rbp			                       
+	retq				            
 
 L_copyout_atomic64_fail:
-	movl	$(EFAULT), %eax		/* Return error for failure */
-	popq	%rbp			/* Restore registers */
-	retq				/* Return */
+	movl	$(EFAULT), %eax		                              
+	popq	%rbp			                       
+	retq				            
 
 
-/*
- * Done with recovery table.
- */
+  
+                            
+   
 	RECOVERY_SECTION
 	RECOVER_TABLE_END
 
 
-/*
- * Vector here on any exception at startup prior to switching to
- * the kernel's idle page-tables and installing the kernel master IDT.
- */
+  
+                                                                
+                                                                      
+   
 Entry(vstart_trap_handler)
 	POSTCODE(BOOT_TRAP_HLT)
 	hlt

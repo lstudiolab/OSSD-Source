@@ -46,31 +46,31 @@ typedef enum lck_type {
 #include <kern/startup.h>
 #include <os/refcnt.h>
 
-/*
- * Arguments wrapped in LCK_GRP_ARG() will be elided
- * when LOCK_STATS is not set.
- *
- * Arguments wrapped with LCK_GRP_PROBEARG() will be
- * NULL when LOCK_STATS is not set
- */
+  
+                                                    
+                              
+  
+                                                    
+                                  
+   
 #if LOCK_STATS
 #define LCK_GRP_ARG(expr) ,expr
 #define LCK_GRP_PROBEARG(grp) grp
 #else
 #define LCK_GRP_ARG(expr)
 #define LCK_GRP_PROBEARG(grp) LCK_GRP_NULL
-#endif /* LOCK_STATS */
+#endif                 
 
 typedef struct _lck_grp_stat_ {
 	uint64_t lgs_count;
 	uint32_t lgs_enablings;
 #if CONFIG_DTRACE
-	/*
-	 * Protected by dtrace_lock
-	 */
+	  
+                            
+    
 	uint32_t lgs_probeid;
 	uint64_t lgs_limit;
-#endif /* CONFIG_DTRACE */
+#endif                    
 } lck_grp_stat_t;
 
 typedef struct _lck_grp_stats_ {
@@ -81,7 +81,7 @@ typedef struct _lck_grp_stats_ {
 	lck_grp_stat_t          lgss_ticket_held;
 	lck_grp_stat_t          lgss_ticket_miss;
 	lck_grp_stat_t          lgss_ticket_spin;
-#endif /* LOCK_STATS */
+#endif                 
 
 	lck_grp_stat_t          lgss_mtx_held;
 	lck_grp_stat_t          lgss_mtx_direct_wait;
@@ -105,7 +105,7 @@ typedef struct _lck_grp_ {
 
 #else
 typedef struct _lck_grp_ lck_grp_t;
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #define LCK_GRP_ATTR_STAT       0x1
 #define LCK_GRP_ATTR_TIME_STAT  0x2
@@ -133,18 +133,18 @@ extern void lck_grp_attr_startup_init(
 extern void lck_grp_startup_init(
 	struct lck_grp_startup_spec *spec);
 
-/*
- * Auto-initializing lock group declarations
- * -----------------------------------------
- *
- * Use LCK_GRP_DECLARE to declare an automatically initialized group.
- *
- * Unless you need to configure your lock groups in very specific ways,
- * there is no point creating explicit lock group attributes. If however
- * you do need to tune the group, then LCK_GRP_DECLARE_ATTR can be used
- * and takes an extra lock group attr argument previously declared with
- * LCK_GRP_ATTR_DECLARE.
- */
+  
+                                            
+                                            
+  
+                                                                     
+  
+                                                                       
+                                                                        
+                                                                       
+                                                                       
+                        
+   
 #define LCK_GRP_ATTR_DECLARE(var, set_flags, clear_flags) \
 	SECURITY_READ_ONLY_LATE(lck_grp_attr_t) var; \
 	static __startup_data struct lck_grp_attr_startup_spec \
@@ -164,7 +164,7 @@ extern void lck_grp_startup_init(
 
 #else
 typedef struct __lck_grp_attr__ lck_grp_attr_t;
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #define LCK_GRP_ATTR_NULL       (lck_grp_attr_t *)NULL
 
@@ -206,8 +206,8 @@ extern  void            lck_grp_lckcnt_incr(
 extern  void            lck_grp_lckcnt_decr(
 	lck_grp_t               *grp,
 	lck_type_t              lck_type);
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 __END_DECLS
 
-#endif /* _KERN_LOCK_GROUP_H */
+#endif                         

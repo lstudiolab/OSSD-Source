@@ -57,11 +57,11 @@ static mach_vm_offset_t kext_post_boot_base = 0;
 #endif
 #endif
 
-/*
- * On x86_64 systems, kernel extension text must remain within 2GB of the
- * kernel's text segment.  To ensure this happens, we snag 2GB of kernel VM
- * as early as possible for kext allocations.
- */
+  
+                                                                         
+                                                                           
+                                             
+   
 __startup_func
 void
 kext_alloc_init(void)
@@ -74,9 +74,9 @@ kext_alloc_init(void)
 	mach_vm_size_t text_size;
 	mach_vm_size_t kext_alloc_size;
 
-	/* Determine the start of the kernel's __TEXT segment and determine the
-	 * lower bound of the allocated submap for kext allocations.
-	 */
+	                                                                       
+                                                             
+    
 
 	text = getsegbyname(SEG_TEXT);
 	text_start = vm_map_trunc_page(text->vmaddr,
@@ -90,12 +90,12 @@ kext_alloc_init(void)
 	kext_alloc_size = KEXT_ALLOC_SIZE(text_size);
 	kext_alloc_max = kext_alloc_base + kext_alloc_size;
 
-	/* Post boot kext allocation will start after the prelinked kexts */
+	                                                                    
 	prelinkTextSegment = getsegbyname("__PRELINK_TEXT");
 	if (prelinkTextSegment) {
-		/* use kext_post_boot_base to start allocations past all the prelinked
-		 * kexts
-		 */
+		                                                                      
+          
+     
 		kext_post_boot_base =
 		    vm_map_round_page(kext_alloc_base + prelinkTextSegment->vmsize,
 		    VM_MAP_PAGE_MASK(kernel_map));
@@ -103,9 +103,9 @@ kext_alloc_init(void)
 		kext_post_boot_base = kext_alloc_base;
 	}
 
-	/* Allocate the sub block of the kernel map */
+	                                              
 	rval = kmem_suballoc(kernel_map, (vm_offset_t *) &kext_alloc_base,
-	    kext_alloc_size, /* pageable */ TRUE,
+	    kext_alloc_size,                TRUE,
 	    VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE,
 	    VM_MAP_KERNEL_FLAGS_NONE, VM_KERN_MEMORY_KEXT,
 	    &g_kext_map);
@@ -131,13 +131,13 @@ kext_alloc_init(void)
 	g_kext_map = kernel_map;
 	kext_alloc_base = VM_MIN_KERNEL_ADDRESS;
 	kext_alloc_max = VM_MAX_KERNEL_ADDRESS;
-#endif /* CONFIG_KEXT_BASEMENT */
+#endif                           
 }
 
-/*
- * Get a vm addr in the kext submap where a kext
- * collection of given size could be mapped.
- */
+  
+                                                
+                                            
+   
 vm_offset_t
 get_address_from_kext_map(vm_size_t fsize)
 {
@@ -173,10 +173,10 @@ kext_alloc(vm_offset_t *_addr, vm_size_t size, boolean_t fixed)
 #if CONFIG_KEXT_BASEMENT
 	kc_format_t kcformat;
 	if (PE_get_primary_kc_format(&kcformat) && kcformat == KCFormatFileset) {
-		/*
-		 * There is no need for a kext basement when booting with the
-		 * new MH_FILESET format kext collection.
-		 */
+		  
+                                                               
+                                           
+     
 		rval = mach_vm_allocate_kernel(g_kext_map, &addr, size, flags, VM_KERN_MEMORY_KEXT);
 		if (rval != KERN_SUCCESS) {
 			printf("vm_allocate failed - %d\n", rval);
@@ -185,13 +185,13 @@ kext_alloc(vm_offset_t *_addr, vm_size_t size, boolean_t fixed)
 		goto check_reachable;
 	}
 
-	/* Allocate the kext virtual memory
-	 * 10608884 - use mach_vm_map since we want VM_FLAGS_ANYWHERE allocated past
-	 * kext_post_boot_base (when possible).  mach_vm_allocate will always
-	 * start at 0 into the map no matter what you pass in addr.  We want non
-	 * fixed (post boot) kext allocations to start looking for free space
-	 * just past where prelinked kexts have loaded.
-	 */
+	                                   
+                                                                             
+                                                                      
+                                                                         
+                                                                      
+                                                
+    
 	rval = mach_vm_map_kernel(g_kext_map,
 	    &addr,
 	    size,
@@ -218,7 +218,7 @@ check_reachable:
 	}
 #endif
 
-	/* Check that the memory is reachable by kernel text */
+	                                                       
 	if ((addr + size) > kext_alloc_max) {
 		kext_free((vm_offset_t)addr, size);
 		rval = KERN_INVALID_ADDRESS;
@@ -258,12 +258,12 @@ kext_receipt(void **addrp, size_t *sizep)
 		goto finish;
 	}
 
-	/*
-	 * This will be set in early boot once we've successfully checked that
-	 * the AuxKC is properly linked against the BootKC. If this isn't set,
-	 * and we have a valid AuxKC mach header, then the booter gave us a
-	 * bad KC.
-	 */
+	  
+                                                                       
+                                                                       
+                                                                    
+           
+    
 	if (auxkc_uuid_valid == FALSE) {
 		ret = KERN_INVALID_KC;
 		goto finish;
@@ -282,20 +282,20 @@ kext_receipt(void **addrp, size_t *sizep)
 	ret = KERN_SUCCESS;
 
 finish:
-	/*
-	 * If we do return success, we'll want to wait for the other side to
-	 * call kext_receipt_set_queried themselves, so we can confirm that
-	 * it made the roundtrip before allowing third party kexts to load.
-	 */
+	  
+                                                                     
+                                                                    
+                                                                    
+    
 	if (ret != KERN_SUCCESS) {
 		kext_receipt_set_queried();
 	}
 	return ret;
 }
 
-/*
- * Returns KERN_FAILURE if the variable was already set.
- */
+  
+                                                        
+   
 kern_return_t
 kext_receipt_set_queried()
 {

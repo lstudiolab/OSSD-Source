@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* $KAME: in_gif.c,v 1.54 2001/05/14 14:02:16 itojun Exp $ */
+                                                             
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -105,7 +105,7 @@ in_gif_output(
 	    (void *)sc->gif_psrc;
 	struct sockaddr_in *sin_dst = (struct sockaddr_in *)
 	    (void *)sc->gif_pdst;
-	struct ip iphdr;        /* capsule IP header, host byte ordered */
+	struct ip iphdr;                                                  
 	int proto, error;
 	u_int8_t tos;
 	struct ip_out_args ipoa;
@@ -142,7 +142,7 @@ in_gif_output(
 		tos = ip->ip_tos;
 		break;
 	}
-#endif /* INET */
+#endif           
 	case AF_INET6:
 	{
 		struct ip6_hdr *ip6;
@@ -168,7 +168,7 @@ in_gif_output(
 
 	bzero(&iphdr, sizeof(iphdr));
 	iphdr.ip_src = sin_src->sin_addr;
-	/* bidirectional configured tunnel mode */
+	                                          
 	if (sin_dst->sin_addr.s_addr != INADDR_ANY) {
 		iphdr.ip_dst = sin_dst->sin_addr;
 	} else {
@@ -176,7 +176,7 @@ in_gif_output(
 		return ENETUNREACH;
 	}
 	iphdr.ip_p = proto;
-	/* version will be set in ip_output() */
+	                                        
 	iphdr.ip_ttl = ip_gif_ttl;
 	iphdr.ip_len = m->m_pkthdr.len + sizeof(struct ip);
 	if (ifp->if_flags & IFF_LINK1) {
@@ -185,7 +185,7 @@ in_gif_output(
 		ip_ecn_ingress(ECN_NOCARE, &iphdr.ip_tos, &tos);
 	}
 
-	/* prepend new IP header */
+	                           
 	M_PREPEND(m, sizeof(struct ip), M_DONTWAIT, 0);
 	if (m && mbuf_len(m) < sizeof(struct ip)) {
 		m = m_pullup(m, sizeof(struct ip));
@@ -200,7 +200,7 @@ in_gif_output(
 	    dst->sin_family != sin_dst->sin_family ||
 	    dst->sin_addr.s_addr != sin_dst->sin_addr.s_addr ||
 	    (sc->gif_ro.ro_rt != NULL && sc->gif_ro.ro_rt->rt_ifp == ifp)) {
-		/* cache route doesn't match or recursive route */
+		                                                  
 		dst->sin_family = sin_dst->sin_family;
 		dst->sin_len = sizeof(struct sockaddr_in);
 		dst->sin_addr = sin_dst->sin_addr;
@@ -217,12 +217,12 @@ in_gif_output(
 			return ENETUNREACH;
 		}
 
-		/* if it constitutes infinite encapsulation, punt. */
+		                                                     
 		RT_LOCK(sc->gif_ro.ro_rt);
 		if (sc->gif_ro.ro_rt->rt_ifp == ifp) {
 			RT_UNLOCK(sc->gif_ro.ro_rt);
 			m_freem(m);
-			return ENETUNREACH; /* XXX */
+			return ENETUNREACH;          
 		}
 #if 0
 		ifp->if_mtu = sc->gif_ro.ro_rt->rt_ifp->if_mtu
@@ -280,7 +280,7 @@ in_gif_input(struct mbuf *m, int off)
 				sum = ~ntohs(ip->ip_sum) & 0xffff;
 				sum += (~otos & 0xffff) + ip->ip_tos;
 				sum = (sum >> 16) + (sum & 0xffff);
-				sum += (sum >> 16); /* add carry */
+				sum += (sum >> 16);                
 				ip->ip_sum = htons(~sum & 0xffff);
 			}
 		} else {
@@ -324,7 +324,7 @@ in_gif_input(struct mbuf *m, int off)
 	}
 
 #ifdef __APPLE__
-	/* Replace the rcvif by gifp for dlil to route it correctly */
+	                                                              
 	if (m->m_pkthdr.rcvif) {
 		m->m_pkthdr.rcvif = gifp;
 	}
@@ -334,10 +334,10 @@ in_gif_input(struct mbuf *m, int off)
 #endif
 }
 
-/*
- * We know that we are in IFF_UP, outer address available, and outer family
- * matched the physical addr family.  see gif_encapcheck().
- */
+  
+                                                                           
+                                                           
+   
 int
 gif_encapcheck4(
 	const struct mbuf *m,
@@ -351,7 +351,7 @@ gif_encapcheck4(
 	int addrmatch;
 	struct in_ifaddr *ia4;
 
-	/* sanity check done in caller */
+	                                 
 	sc = (struct gif_softc *)arg;
 	src = (struct sockaddr_in *)(void *)sc->gif_psrc;
 	dst = (struct sockaddr_in *)(void *)sc->gif_pdst;
@@ -360,7 +360,7 @@ gif_encapcheck4(
 
 	mbuf_copydata((struct mbuf *)(size_t)m, 0, sizeof(ip), &ip);
 
-	/* check for address match */
+	                             
 	addrmatch = 0;
 	if (src->sin_addr.s_addr == ip.ip_dst.s_addr) {
 		addrmatch |= 1;
@@ -372,7 +372,7 @@ gif_encapcheck4(
 		return 0;
 	}
 
-	/* martian filters on outer source - NOT done in ip_input! */
+	                                                             
 	if (IN_MULTICAST(ntohl(ip.ip_src.s_addr))) {
 		return 0;
 	}
@@ -380,7 +380,7 @@ gif_encapcheck4(
 	case 0: case 127: case 255:
 		return 0;
 	}
-	/* reject packets with broadcast on source */
+	                                             
 	lck_rw_lock_shared(in_ifaddr_rwlock);
 	for (ia4 = TAILQ_FIRST(&in_ifaddrhead); ia4;
 	    ia4 = TAILQ_NEXT(ia4, ia_link)) {
@@ -397,7 +397,7 @@ gif_encapcheck4(
 	}
 	lck_rw_done(in_ifaddr_rwlock);
 
-	/* ingress filters on outer source */
+	                                     
 	if ((ifnet_flags(sc->gif_if) & IFF_LINK2) == 0 &&
 	    (m->m_flags & M_PKTHDR) != 0 && m->m_pkthdr.rcvif) {
 		struct sockaddr_in sin;

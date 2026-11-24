@@ -53,19 +53,19 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	Author: David B. Golub, Carnegie Mellon University
- *	Date:   3/89
- */
+  
+   
+  
+                                                     
+               
+   
 
 #ifndef DEVICE_TYPES_H
 #define DEVICE_TYPES_H
 
-/*
- * Types for device interface.
- */
+  
+                              
+   
 #include <mach/std_types.h>
 #include <mach/mach_types.h>
 #include <mach/message.h>
@@ -79,18 +79,18 @@
 #endif
 
 
-/*
- * IO buffer - out-of-line array of characters.
- */
+  
+                                               
+   
 typedef char *  io_buf_ptr_t;
 
-/*
- * Some types for IOKit.
- */
+  
+                        
+   
 
 #ifdef IOKIT
 
-/* must match device_types.defs */
+                                  
 typedef char                    io_name_t[128];
 typedef char                    io_string_t[512];
 typedef char                    io_string_inband_t[4096];
@@ -100,7 +100,7 @@ typedef char                    io_struct_inband_t[4096];
 typedef uint64_t                io_user_scalar_t;
 typedef uint64_t                io_user_reference_t;
 typedef int                     io_scalar_inband_t[16];
-// must be the same type as OSAsyncReference
+                                            
 typedef natural_t               io_async_ref_t[8];
 typedef io_user_scalar_t        io_scalar_inband64_t[16];
 typedef io_user_reference_t     io_async_ref64_t[8];
@@ -118,7 +118,7 @@ typedef io_user_scalar_t        io_scalar_inband_t[16];
 typedef io_user_reference_t     io_async_ref_t[8];
 typedef uint64_t                io_scalar_inband64_t[16];
 typedef uint64_t                io_async_ref64_t[8];
-#endif // __LP64__
+#endif            
 
 #ifdef MACH_KERNEL_PRIVATE
 
@@ -145,10 +145,10 @@ extern boolean_t iokit_notify( mach_msg_header_t *msg );
 #ifndef __IOKIT_PORTS_DEFINED__
 #define __IOKIT_PORTS_DEFINED__
 typedef mach_port_t     io_object_t;
-#endif  /* __IOKIT_PORTS_DEFINED__ */
+#endif                               
 
-#endif  /* MACH_KERNEL */
+#endif                   
 
-#endif  /* IOKIT */
+#endif             
 
-#endif  /* DEVICE_TYPES_H */
+#endif                      

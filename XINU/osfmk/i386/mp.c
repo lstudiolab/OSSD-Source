@@ -81,7 +81,7 @@
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #if     MP_DEBUG
 #define PAUSE           delay(1000000)
@@ -89,9 +89,9 @@
 #else
 #define DBG(x...)
 #define PAUSE
-#endif  /* MP_DEBUG */
+#endif                
 
-/* Debugging/test trace events: */
+                                  
 #define TRACE_MP_TLB_FLUSH              MACHDBG_CODE(DBG_MACH_MP, 0)
 #define TRACE_MP_CPUS_CALL              MACHDBG_CODE(DBG_MACH_MP, 1)
 #define TRACE_MP_CPUS_CALL_LOCAL        MACHDBG_CODE(DBG_MACH_MP, 2)
@@ -108,11 +108,11 @@ void            i386_cpu_IPI(int cpu);
 
 #if MACH_KDP
 static void     mp_kdp_wait(boolean_t flush, boolean_t isNMI);
-#endif /* MACH_KDP */
+#endif               
 
 #if MACH_KDP
 static boolean_t        cpu_signal_pending(int cpu, mp_event_t event);
-#endif /* MACH_KDP */
+#endif               
 static int              NMIInterruptHandler(x86_saved_state_t *regs);
 
 boolean_t               smp_initialized = FALSE;
@@ -130,14 +130,14 @@ struct debugger_callback *debugger_callback = NULL;
 static LCK_GRP_DECLARE(smp_lck_grp, "i386_smp");
 static LCK_MTX_EARLY_DECLARE(mp_cpu_boot_lock, &smp_lck_grp);
 
-/* Variables needed for MP rendezvous. */
+                                         
 SIMPLE_LOCK_DECLARE(mp_rv_lock, 0);
 static void     (*mp_rv_setup_func)(void *arg);
 static void     (*mp_rv_action_func)(void *arg);
 static void     (*mp_rv_teardown_func)(void *arg);
 static void     *mp_rv_func_arg;
 static volatile int     mp_rv_ncpus;
-/* Cache-aligned barriers: */
+                             
 static volatile long    mp_rv_entry    __attribute__((aligned(64)));
 static volatile long    mp_rv_exit     __attribute__((aligned(64)));
 static volatile long    mp_rv_complete __attribute__((aligned(64)));
@@ -158,7 +158,7 @@ static struct _kdp_xcpu_call_func {
 
 #endif
 
-/* Variables needed for MP broadcast. */
+                                        
 static void        (*mp_bc_action_func)(void *arg);
 static void        *mp_bc_func_arg;
 static int      mp_bc_ncpus;
@@ -176,9 +176,9 @@ static void     mp_cpus_call_init(void);
 static void     mp_cpus_call_action(void);
 static void     mp_call_PM(void);
 
-char            mp_slave_stack[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE))); // Temp stack for slave init
+char            mp_slave_stack[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));                             
 
-/* PAL-related routines */
+                          
 boolean_t i386_smp_init(int nmi_vector, i386_intr_func_t nmi_handler,
     int ipi_vector, i386_intr_func_t ipi_handler);
 void i386_start_cpu(int lapic_id, int cpu_num);
@@ -249,16 +249,16 @@ typedef struct {
 } processor_start_info_t;
 static processor_start_info_t   start_info        __attribute__((aligned(64)));
 
-/*
- * Cache-alignment is to avoid cross-cpu false-sharing interference.
- */
+  
+                                                                    
+   
 static volatile long            tsc_entry_barrier __attribute__((aligned(64)));
 static volatile long            tsc_exit_barrier  __attribute__((aligned(64)));
 static volatile uint64_t        tsc_target        __attribute__((aligned(64)));
 
-/*
- * Poll a CPU to see when it has marked itself as running.
- */
+  
+                                                          
+   
 static void
 mp_wait_for_cpu_up(int slot_num, unsigned int iters, unsigned int usecdelay)
 {
@@ -270,22 +270,22 @@ mp_wait_for_cpu_up(int slot_num, unsigned int iters, unsigned int usecdelay)
 	}
 }
 
-/*
- * Quickly bring a CPU back online which has been halted.
- */
+  
+                                                         
+   
 kern_return_t
 intel_startCPU_fast(int slot_num)
 {
 	kern_return_t   rc;
 
-	/*
-	 * Try to perform a fast restart
-	 */
+	  
+                                 
+    
 	rc = pmCPUExitHalt(slot_num);
 	if (rc != KERN_SUCCESS) {
-		/*
-		 * The CPU was not eligible for a fast restart.
-		 */
+		  
+                                                 
+     
 		return rc;
 	}
 
@@ -293,16 +293,16 @@ intel_startCPU_fast(int slot_num)
 		TRACE_MP_CPU_FAST_START | DBG_FUNC_START,
 		slot_num, 0, 0, 0, 0);
 
-	/*
-	 * Wait until the CPU is back online.
-	 */
+	  
+                                      
+    
 	mp_disable_preemption();
 
-	/*
-	 * We use short pauses (1us) for low latency.  30,000 iterations is
-	 * longer than a full restart would require so it should be more
-	 * than long enough.
-	 */
+	  
+                                                                    
+                                                                 
+                     
+    
 
 	mp_wait_for_cpu_up(slot_num, 30000, 1);
 	mp_enable_preemption();
@@ -311,10 +311,10 @@ intel_startCPU_fast(int slot_num)
 		TRACE_MP_CPU_FAST_START | DBG_FUNC_END,
 		slot_num, cpu_datap(slot_num)->cpu_running, 0, 0, 0);
 
-	/*
-	 * Check to make sure that the CPU is really running.  If not,
-	 * go through the slow path.
-	 */
+	  
+                                                               
+                             
+    
 	if (cpu_datap(slot_num)->cpu_running) {
 		return KERN_SUCCESS;
 	} else {
@@ -325,18 +325,18 @@ intel_startCPU_fast(int slot_num)
 static void
 started_cpu(void)
 {
-	/* Here on the started cpu with cpu_running set TRUE */
+	                                                       
 
 	if (TSC_sync_margin &&
 	    start_info.target_cpu == cpu_number()) {
-		/*
-		 * I've just started-up, synchronize again with the starter cpu
-		 * and then snap my TSC.
-		 */
+		  
+                                                                 
+                          
+     
 		tsc_target   = 0;
 		atomic_decl(&tsc_entry_barrier, 1);
 		while (tsc_entry_barrier != 0) {
-			;       /* spin for starter and target at barrier */
+			;                                                   
 		}
 		tsc_target = rdtsc64();
 		atomic_decl(&tsc_exit_barrier, 1);
@@ -349,7 +349,7 @@ start_cpu(void *arg)
 	int                     i = 1000;
 	processor_start_info_t  *psip = (processor_start_info_t *) arg;
 
-	/* Ignore this if the current processor is not the starter */
+	                                                             
 	if (cpu_number() != psip->starter_cpu) {
 		return;
 	}
@@ -365,7 +365,7 @@ start_cpu(void *arg)
 	i386_start_cpu(psip->target_lapic, psip->target_cpu);
 
 #ifdef  POSTCODE_DELAY
-	/* Wait much longer if postcodes are displayed for a delay period. */
+	                                                                     
 	i *= 10000;
 #endif
 	DBG("start_cpu(%p) about to wait for cpu %d\n",
@@ -380,31 +380,31 @@ start_cpu(void *arg)
 
 	if (TSC_sync_margin &&
 	    cpu_datap(psip->target_cpu)->cpu_running) {
-		/*
-		 * Compare the TSC from the started processor with ours.
-		 * Report and log/panic if it diverges by more than
-		 * TSC_sync_margin (TSC_SYNC_MARGIN) ticks. This margin
-		 * can be overriden by boot-arg (with 0 meaning no checking).
-		 */
+		  
+                                                          
+                                                     
+                                                         
+                                                               
+     
 		uint64_t        tsc_starter;
 		int64_t         tsc_delta;
 		atomic_decl(&tsc_entry_barrier, 1);
 		while (tsc_entry_barrier != 0) {
-			;       /* spin for both processors at barrier */
+			;                                                
 		}
 		tsc_starter = rdtsc64();
 		atomic_decl(&tsc_exit_barrier, 1);
 		while (tsc_exit_barrier != 0) {
-			;       /* spin for target to store its TSC */
+			;                                             
 		}
 		tsc_delta = tsc_target - tsc_starter;
 		kprintf("TSC sync for cpu %d: 0x%016llx delta 0x%llx (%lld)\n",
 		    psip->target_cpu, tsc_target, tsc_delta, tsc_delta);
 #if DEBUG || DEVELOPMENT
-		/*
-		 * Stash the delta for inspection later, since we can no
-		 * longer print/log it with interrupts disabled.
-		 */
+		  
+                                                          
+                                                  
+     
 		cpu_datap(psip->target_cpu)->tsc_sync_delta = tsc_delta;
 #endif
 		if (ABS(tsc_delta) > (int64_t) TSC_sync_margin) {
@@ -434,13 +434,13 @@ intel_startCPU(
 	DBG("intel_startCPU(%d) lapic_id=%d\n", slot_num, lapic);
 	DBG("IdlePTD(%p): 0x%x\n", &IdlePTD, (int) (uintptr_t)IdlePTD);
 
-	/*
-	 * Initialize (or re-initialize) the descriptor tables for this cpu.
-	 * Propagate processor mode to slave.
-	 */
+	  
+                                                                     
+                                      
+    
 	cpu_desc_init(cpu_datap(slot_num));
 
-	/* Serialize use of the slave boot stack, etc. */
+	                                                 
 	lck_mtx_lock(&mp_cpu_boot_lock);
 
 	istate = ml_set_interrupts_enabled(FALSE);
@@ -456,11 +456,11 @@ intel_startCPU(
 	tsc_entry_barrier = 2;
 	tsc_exit_barrier = 2;
 
-	/*
-	 * Perform the processor startup sequence with all running
-	 * processors rendezvous'ed. This is required during periods when
-	 * the cache-disable bit is set for MTRR/PAT initialization.
-	 */
+	  
+                                                           
+                                                                  
+                                                             
+    
 	mp_rendezvous_no_intrs(start_cpu, (void *) &start_info);
 
 	start_info.target_cpu = 0;
@@ -486,17 +486,17 @@ cpu_signal_event_log_t  *cpu_handle[MAX_CPUS];
 
 MP_EVENT_NAME_DECL();
 
-#endif  /* MP_DEBUG */
+#endif                
 
-/*
- * Note: called with NULL state when polling for TLB flush and cross-calls.
- */
+  
+                                                                           
+   
 int
 cpu_signal_handler(x86_saved_state_t *regs)
 {
 #if     !MACH_KDP
 #pragma unused (regs)
-#endif /* !MACH_KDP */
+#endif                
 	int             my_cpu;
 	volatile int    *my_word;
 
@@ -504,10 +504,10 @@ cpu_signal_handler(x86_saved_state_t *regs)
 
 	my_cpu = cpu_number();
 	my_word = &cpu_data_ptr[my_cpu]->cpu_signals;
-	/* Store the initial set of signals for diagnostics. New
-	 * signals could arrive while these are being processed
-	 * so it's no more than a hint.
-	 */
+	                                                        
+                                                        
+                                
+    
 
 	cpu_data_ptr[my_cpu]->cpu_prior_signals = *my_word;
 
@@ -516,11 +516,11 @@ cpu_signal_handler(x86_saved_state_t *regs)
 		if (i_bit(MP_KDP, my_word)) {
 			DBGLOG(cpu_handle, my_cpu, MP_KDP);
 			i_bit_clear(MP_KDP, my_word);
-/* Ensure that the i386_kernel_state at the base of the
- * current thread's stack (if any) is synchronized with the
- * context at the moment of the interrupt, to facilitate
- * access through the debugger.
- */
+                                                       
+                                                           
+                                                        
+                               
+   
 			sync_iss_to_iks(regs);
 			if (pmsafe_debug && !kdp_snapshot) {
 				pmSafeMode(&current_cpu_datap()->lcpu, PM_SAFE_FL_SAFE);
@@ -530,7 +530,7 @@ cpu_signal_handler(x86_saved_state_t *regs)
 				pmSafeMode(&current_cpu_datap()->lcpu, PM_SAFE_FL_NORMAL);
 			}
 		} else
-#endif  /* MACH_KDP */
+#endif                
 		if (i_bit(MP_TLB_FLUSH, my_word)) {
 			DBGLOG(cpu_handle, my_cpu, MP_TLB_FLUSH);
 			i_bit_clear(MP_TLB_FLUSH, my_word);
@@ -545,7 +545,7 @@ cpu_signal_handler(x86_saved_state_t *regs)
 			mp_call_PM();
 		}
 		if (regs == NULL) {
-			/* Called to poll only for cross-calls and TLB flush */
+			                                                       
 			break;
 		} else if (i_bit(MP_AST, my_word)) {
 			DBGLOG(cpu_handle, my_cpu, MP_AST);
@@ -616,12 +616,12 @@ NMIInterruptHandler(x86_saved_state_t *regs)
 	} else if (!mp_kdp_trap &&
 	    !mp_kdp_is_NMI &&
 	    virtualized && (debug_boot_arg & DB_NMI)) {
-		/*
-		 * Under a VMM with the debug boot-arg set, drop into kdp.
-		 * Since an NMI is involved, there's a risk of contending with
-		 * a panic. And side-effects of NMIs may result in entry into,
-		 * and continuing from, the debugger being unreliable.
-		 */
+		  
+                                                            
+                                                                
+                                                                
+                                                        
+     
 		if (__sync_bool_compare_and_swap(&mp_kdp_is_NMI, FALSE, TRUE)) {
 			kprintf_break_lock();
 			kprintf("Debugger entry requested by NMI\n");
@@ -643,11 +643,11 @@ NMExit:
 }
 
 
-/*
- * cpu_interrupt is really just to be used by the scheduler to
- * get a CPU's attention it may not always issue an IPI.  If an
- * IPI is always needed then use i386_cpu_IPI.
- */
+  
+                                                              
+                                                               
+                                              
+   
 void
 cpu_interrupt(int cpu)
 {
@@ -662,9 +662,9 @@ cpu_interrupt(int cpu)
 	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_REMOTE_AST), cpu, did_IPI, 0, 0, 0);
 }
 
-/*
- * Send a true NMI via the local APIC to the specified CPU.
- */
+  
+                                                           
+   
 void
 cpu_NMI_interrupt(int cpu)
 {
@@ -775,10 +775,10 @@ again:
 	}
 }
 
-/*
- * Helper function called when busy-waiting: panic if too long
- * a TSC-based time has elapsed since the start of the spin.
- */
+  
+                                                              
+                                                            
+   
 static boolean_t
 mp_spin_timeout(uint64_t tsc_start)
 {
@@ -789,21 +789,21 @@ mp_spin_timeout(uint64_t tsc_start)
 		return FALSE;
 	}
 
-	/*
-	 * The timeout is 4 * the spinlock timeout period
-	 * unless we have serial console printing (kprintf) enabled
-	 * in which case we allow an even greater margin.
-	 */
+	  
+                                                  
+                                                            
+                                                  
+    
 	tsc_timeout = disable_serial_output ? LockTimeOutTSC << 2
 	        : LockTimeOutTSC << 4;
 	return rdtsc64() > tsc_start + tsc_timeout;
 }
 
-/*
- * Helper function to take a spinlock while ensuring that incoming IPIs
- * are still serviced if interrupts are masked while we spin.
- * Returns current interrupt state.
- */
+  
+                                                                       
+                                                             
+                                   
+   
 boolean_t
 mp_safe_spin_lock(usimple_lock_t lock)
 {
@@ -829,19 +829,19 @@ mp_safe_spin_lock(usimple_lock_t lock)
 	}
 }
 
-/*
- * All-CPU rendezvous:
- *      - CPUs are signalled,
- *	- all execute the setup function (if specified),
- *	- rendezvous (i.e. all cpus reach a barrier),
- *	- all execute the action function (if specified),
- *	- rendezvous again,
- *	- execute the teardown function (if specified), and then
- *	- resume.
- *
- * Note that the supplied external functions _must_ be reentrant and aware
- * that they are running in parallel and in an unknown lock context.
- */
+  
+                      
+                             
+                                                   
+                                                
+                                                    
+                      
+                                                           
+            
+  
+                                                                          
+                                                                    
+   
 
 static void
 mp_rendezvous_action(__unused void *null)
@@ -849,26 +849,26 @@ mp_rendezvous_action(__unused void *null)
 	boolean_t       intrs_enabled;
 	uint64_t        tsc_spin_start;
 
-	/*
-	 * Note that mp_rv_lock was acquired by the thread that initiated the
-	 * rendezvous and must have been acquired before we enter
-	 * mp_rendezvous_action().
-	 */
+	  
+                                                                      
+                                                          
+                           
+    
 	current_cpu_datap()->cpu_rendezvous_in_progress = TRUE;
 
-	/* setup function */
+	                    
 	if (mp_rv_setup_func != NULL) {
 		mp_rv_setup_func(mp_rv_func_arg);
 	}
 
 	intrs_enabled = ml_get_interrupts_enabled();
 
-	/* spin on entry rendezvous */
+	                              
 	atomic_incl(&mp_rv_entry, 1);
 	tsc_spin_start = rdtsc64();
 
 	while (mp_rv_entry < mp_rv_ncpus) {
-		/* poll for pesky tlb flushes if interrupts disabled */
+		                                                       
 		if (!intrs_enabled) {
 			handle_pending_TLB_flushes();
 		}
@@ -877,12 +877,12 @@ mp_rendezvous_action(__unused void *null)
 		}
 	}
 
-	/* action function */
+	                     
 	if (mp_rv_action_func != NULL) {
 		mp_rv_action_func(mp_rv_func_arg);
 	}
 
-	/* spin on exit rendezvous */
+	                             
 	atomic_incl(&mp_rv_exit, 1);
 	tsc_spin_start = rdtsc64();
 	while (mp_rv_exit < mp_rv_ncpus) {
@@ -894,14 +894,14 @@ mp_rendezvous_action(__unused void *null)
 		}
 	}
 
-	/* teardown function */
+	                       
 	if (mp_rv_teardown_func != NULL) {
 		mp_rv_teardown_func(mp_rv_func_arg);
 	}
 
 	current_cpu_datap()->cpu_rendezvous_in_progress = FALSE;
 
-	/* Bump completion count */
+	                           
 	atomic_incl(&mp_rv_complete, 1);
 }
 
@@ -926,10 +926,10 @@ mp_rendezvous(void (*setup_func)(void *),
 		return;
 	}
 
-	/* obtain rendezvous lock */
+	                            
 	mp_rendezvous_lock();
 
-	/* set static function pointers */
+	                                  
 	mp_rv_setup_func = setup_func;
 	mp_rv_action_func = action_func;
 	mp_rv_teardown_func = teardown_func;
@@ -939,20 +939,20 @@ mp_rendezvous(void (*setup_func)(void *),
 	mp_rv_exit     = 0;
 	mp_rv_complete = 0;
 
-	/*
-	 * signal other processors, which will call mp_rendezvous_action()
-	 * with interrupts disabled
-	 */
+	  
+                                                                   
+                            
+    
 	mp_rv_ncpus = mp_cpus_call(CPUMASK_OTHERS, NOSYNC, &mp_rendezvous_action, NULL) + 1;
 
-	/* call executor function on this cpu */
+	                                        
 	mp_rendezvous_action(NULL);
 
-	/*
-	 * Spin for everyone to complete.
-	 * This is necessary to ensure that all processors have proceeded
-	 * from the exit barrier before we release the rendezvous structure.
-	 */
+	  
+                                  
+                                                                  
+                                                                     
+    
 	tsc_spin_start = rdtsc64();
 	while (mp_rv_complete < mp_rv_ncpus) {
 		if (mp_spin_timeout(tsc_spin_start)) {
@@ -960,13 +960,13 @@ mp_rendezvous(void (*setup_func)(void *),
 		}
 	}
 
-	/* Tidy up */
+	             
 	mp_rv_setup_func = NULL;
 	mp_rv_action_func = NULL;
 	mp_rv_teardown_func = NULL;
 	mp_rv_func_arg = NULL;
 
-	/* release lock */
+	                  
 	mp_rendezvous_unlock();
 }
 
@@ -991,7 +991,7 @@ mp_rendezvous_break_lock(void)
 static void
 setup_disable_intrs(__unused void * param_not_used)
 {
-	/* disable interrupts before the first barrier */
+	                                                 
 	boolean_t intr = ml_set_interrupts_enabled(FALSE);
 
 	current_cpu_datap()->cpu_iflag = intr;
@@ -1001,15 +1001,15 @@ setup_disable_intrs(__unused void * param_not_used)
 static void
 teardown_restore_intrs(__unused void * param_not_used)
 {
-	/* restore interrupt flag following MTRR changes */
+	                                                   
 	ml_set_interrupts_enabled(current_cpu_datap()->cpu_iflag);
 	DBG("CPU%d: %s\n", get_cpu_number(), __FUNCTION__);
 }
 
-/*
- * A wrapper to mp_rendezvous() to call action_func() with interrupts disabled.
- * This is exported for use by kexts.
- */
+  
+                                                                               
+                                     
+   
 void
 mp_rendezvous_no_intrs(
 	void (*action_func)(void *),
@@ -1023,11 +1023,11 @@ mp_rendezvous_no_intrs(
 
 
 typedef struct {
-	queue_chain_t   link;                   /* queue linkage */
-	void            (*func)(void *, void *); /* routine to call */
-	void            *arg0;                  /* routine's 1st arg */
-	void            *arg1;                  /* routine's 2nd arg */
-	cpumask_t       *maskp;                 /* completion response mask */
+	queue_chain_t   link;                                      
+	void            (*func)(void *, void *);                      
+	void            *arg0;                                         
+	void            *arg1;                                         
+	cpumask_t       *maskp;                                               
 } mp_call_t;
 
 
@@ -1050,9 +1050,9 @@ mp_call_head_lock(mp_call_queue_t *cqp)
 	return intrs_enabled;
 }
 
-/*
- * Deliver an NMIPI to a set of processors to cause them to panic .
- */
+  
+                                                                   
+   
 void
 NMIPI_panic(cpumask_t cpu_mask, NMI_reason_t why)
 {
@@ -1071,7 +1071,7 @@ NMIPI_panic(cpumask_t cpu_mask, NMI_reason_t why)
 		cpu_NMI_interrupt(cpu);
 	}
 
-	/* Wait (only so long) for NMi'ed cpus to respond */
+	                                                    
 	deadline = mach_absolute_time() + LockTimeOut;
 	for (cpu = 0, cpu_bit = 1; cpu < real_ncpus; cpu++, cpu_bit <<= 1) {
 		if ((cpu_mask & cpu_bit) == 0) {
@@ -1147,7 +1147,7 @@ mp_call_enqueue_locked(
 	queue_enter(&cqp->queue, callp, typeof(callp), link);
 }
 
-/* Called on the boot processor to initialize global structures */
+                                                                  
 static void
 mp_cpus_call_init(void)
 {
@@ -1158,10 +1158,10 @@ mp_cpus_call_init(void)
 	queue_init(&cqp->queue);
 }
 
-/*
- * Called at processor registration to add call buffers to the free list
- * and to initialize the per-cpu call queue.
- */
+  
+                                                                        
+                                            
+   
 void
 mp_cpus_call_cpu_init(int cpu)
 {
@@ -1179,10 +1179,10 @@ mp_cpus_call_cpu_init(int cpu)
 	DBG("mp_cpus_call_init(%d) done\n", cpu);
 }
 
-/*
- * This is called from cpu_signal_handler() to process an MP_CALL signal.
- * And also from i386_deactivate_cpu() when a cpu is being taken offline.
- */
+  
+                                                                         
+                                                                         
+   
 static void
 mp_cpus_call_action(void)
 {
@@ -1195,7 +1195,7 @@ mp_cpus_call_action(void)
 	cqp = &mp_cpus_call_head[cpu_number()];
 	intrs_enabled = mp_call_head_lock(cqp);
 	while ((callp = mp_call_dequeue_locked(cqp)) != NULL) {
-		/* Copy call request to the stack to free buffer */
+		                                                   
 		call = *callp;
 		mp_call_free(callp);
 		if (call.func != NULL) {
@@ -1214,19 +1214,19 @@ mp_cpus_call_action(void)
 	mp_call_head_unlock(cqp, intrs_enabled);
 }
 
-/*
- * mp_cpus_call() runs a given function on cpus specified in a given cpu mask.
- * Possible modes are:
- *  SYNC:   function is called serially on target cpus in logical cpu order
- *	    waiting for each call to be acknowledged before proceeding
- *  ASYNC:  function call is queued to the specified cpus
- *	    waiting for all calls to complete in parallel before returning
- *  NOSYNC: function calls are queued
- *	    but we return before confirmation of calls completing.
- * The action function may be NULL.
- * The cpu mask may include the local cpu. Offline cpus are ignored.
- * The return value is the number of cpus on which the call was made or queued.
- */
+  
+                                                                              
+                      
+                                                                           
+                                                                 
+                                                         
+                                                                     
+                                     
+                                                             
+                                   
+                                                                    
+                                                                               
+   
 cpu_t
 mp_cpus_call(
 	cpumask_t       cpus,
@@ -1257,7 +1257,7 @@ mp_cpus_call_wait(boolean_t     intrs_enabled,
 	tsc_spin_start = rdtsc64();
 	while (*cpus_responded != cpus_called) {
 		if (!intrs_enabled) {
-			/* Sniffing w/o locking */
+			                          
 			if (!queue_empty(&cqp->queue)) {
 				mp_cpus_call_action();
 			}
@@ -1309,14 +1309,14 @@ mp_cpus_call1(
 		goto out;
 	}
 
-	/*
-	 * Queue the call for each non-local requested cpu.
-	 * This is performed under the topo lock to prevent changes to
-	 * cpus online state and to prevent concurrent rendezvouses --
-	 * although an exception is made if we're calling only the master
-	 * processor since that always remains active. Note: this exception
-	 * is expected for longterm timer nosync cross-calls to the master cpu.
-	 */
+	  
+                                                    
+                                                               
+                                                               
+                                                                  
+                                                                    
+                                                                        
+    
 	mp_disable_preemption();
 	intrs_enabled = ml_get_interrupts_enabled();
 	topo_lock = (cpus != cpu_to_cpumask(master_cpu));
@@ -1331,10 +1331,10 @@ mp_cpus_call1(
 		}
 		tsc_spin_start = rdtsc64();
 		if (cpu == (cpu_t) cpu_number()) {
-			/*
-			 * We don't IPI ourself and if calling asynchronously,
-			 * we defer our call until we have signalled all others.
-			 */
+			  
+                                                         
+                                                           
+      
 			call_self = TRUE;
 			if (mode == SYNC && action_func != NULL) {
 				KERNEL_DEBUG_CONSTANT(
@@ -1344,9 +1344,9 @@ mp_cpus_call1(
 				action_func(arg0, arg1);
 			}
 		} else {
-			/*
-			 * Here to queue a call to cpu and IPI.
-			 */
+			  
+                                          
+      
 			mp_call_t       *callp = NULL;
 			mp_call_queue_t *cqp = &mp_cpus_call_head[cpu];
 			boolean_t       intrs_inner;
@@ -1362,7 +1362,7 @@ queue_call:
 					TRACE_MP_CPUS_CALL_NOBUF,
 					cpu, 0, 0, 0, 0);
 				if (!intrs_inner) {
-					/* Sniffing w/o locking */
+					                          
 					if (!queue_empty(&cqp->queue)) {
 						mp_cpus_call_action();
 					}
@@ -1393,7 +1393,7 @@ queue_call:
 		ml_set_interrupts_enabled(intrs_enabled);
 	}
 
-	/* Call locally if mode not SYNC */
+	                                   
 	if (mode != SYNC && call_self) {
 		KERNEL_DEBUG_CONSTANT(
 			TRACE_MP_CPUS_CALL_LOCAL,
@@ -1405,12 +1405,12 @@ queue_call:
 		}
 	}
 
-	/* For ASYNC, now wait for all signaled cpus to complete their calls */
+	                                                                       
 	if (mode == ASYNC) {
 		mp_cpus_call_wait(intrs_enabled, cpus_called, &cpus_responded);
 	}
 
-	/* Safe to allow pre-emption now */
+	                                   
 	mp_enable_preemption();
 
 out:
@@ -1434,22 +1434,22 @@ out:
 static void
 mp_broadcast_action(__unused void *null)
 {
-	/* call action function */
+	                          
 	if (mp_bc_action_func != NULL) {
 		mp_bc_action_func(mp_bc_func_arg);
 	}
 
-	/* if we're the last one through, wake up the instigator */
+	                                                           
 	if (atomic_decl_and_test(&mp_bc_count, 1)) {
 		thread_wakeup(((event_t)(uintptr_t) &mp_bc_count));
 	}
 }
 
-/*
- * mp_broadcast() runs a given function on all active cpus.
- * The caller blocks until the functions has run on all cpus.
- * The caller will also block if there is another pending broadcast.
- */
+  
+                                                           
+                                                             
+                                                                    
+   
 void
 mp_broadcast(
 	void (*action_func)(void *),
@@ -1462,30 +1462,30 @@ mp_broadcast(
 		return;
 	}
 
-	/* obtain broadcast lock */
+	                           
 	lck_mtx_lock(&mp_bc_lock);
 
-	/* set static function pointers */
+	                                  
 	mp_bc_action_func = action_func;
 	mp_bc_func_arg = arg;
 
 	assert_wait((event_t)(uintptr_t)&mp_bc_count, THREAD_UNINT);
 
-	/*
-	 * signal other processors, which will call mp_broadcast_action()
-	 */
-	mp_bc_count = real_ncpus;                       /* assume max possible active */
+	  
+                                                                  
+    
+	mp_bc_count = real_ncpus;                                                       
 	mp_bc_ncpus = mp_cpus_call(CPUMASK_ALL, NOSYNC, *mp_broadcast_action, NULL);
-	atomic_decl(&mp_bc_count, real_ncpus - mp_bc_ncpus); /* subtract inactive */
+	atomic_decl(&mp_bc_count, real_ncpus - mp_bc_ncpus);                        
 
-	/* block for other cpus to have run action_func */
+	                                                  
 	if (mp_bc_ncpus > 1) {
 		thread_block(THREAD_CONTINUE_NULL);
 	} else {
 		clear_wait(current_thread(), THREAD_AWAKENED);
 	}
 
-	/* release lock */
+	                  
 	lck_mtx_unlock(&mp_bc_lock);
 }
 
@@ -1545,31 +1545,31 @@ i386_deactivate_cpu(void)
 	cdp->cpu_running = FALSE;
 	simple_unlock(&x86_topo_lock);
 
-	/*
-	 * Move all of this cpu's timers to the master/boot cpu,
-	 * and poke it in case there's a sooner deadline for it to schedule.
-	 */
+	  
+                                                         
+                                                                     
+    
 	timer_queue_shutdown(&cdp->rtclock_timer.queue);
 	mp_cpus_call(cpu_to_cpumask(master_cpu), ASYNC, timer_queue_expire_local, NULL);
 
 #if MONOTONIC
 	mt_cpu_down(cdp);
-#endif /* MONOTONIC */
+#endif                
 
-	/*
-	 * Open an interrupt window
-	 * and ensure any pending IPI or timer is serviced
-	 */
+	  
+                            
+                                                   
+    
 	mp_disable_preemption();
 	ml_set_interrupts_enabled(TRUE);
 
 	while (cdp->cpu_signals && x86_lcpu()->rtcDeadline != EndOfAllTime) {
 		cpu_pause();
 	}
-	/*
-	 * Ensure there's no remaining timer deadline set
-	 * - AICPM may have left one active.
-	 */
+	  
+                                                  
+                                     
+    
 	setPop(0);
 
 	ml_set_interrupts_enabled(FALSE);
@@ -1599,11 +1599,11 @@ mp_kdp_enter(boolean_t proceed_on_failure)
 
 	DBG("mp_kdp_enter()\n");
 
-	/*
-	 * Here to enter the debugger.
-	 * In case of races, only one cpu is allowed to enter kdp after
-	 * stopping others.
-	 */
+	  
+                               
+                                                                
+                    
+    
 	mp_kdp_state = ml_set_interrupts_enabled(FALSE);
 	my_cpu = cpu_number();
 
@@ -1653,9 +1653,9 @@ mp_kdp_enter(boolean_t proceed_on_failure)
 	mp_kdp_trap = TRUE;
 	debugger_entry_time = cpu_datap(my_cpu)->debugger_entry_time;
 
-	/*
-	 * Deliver a nudge to other cpus, counting how many
-	 */
+	  
+                                                    
+    
 	DBG("mp_kdp_enter() signaling other processors\n");
 	if (force_immediate_debugger_NMI == FALSE) {
 		for (cpu = 0; cpu < real_ncpus; cpu++) {
@@ -1665,33 +1665,33 @@ mp_kdp_enter(boolean_t proceed_on_failure)
 			ncpus++;
 			i386_signal_cpu(cpu, MP_KDP, ASYNC);
 		}
-		/*
-		 * Wait other processors to synchronize
-		 */
+		  
+                                         
+     
 		DBG("mp_kdp_enter() waiting for (%d) processors to suspend\n", ncpus);
 
-		/*
-		 * This timeout is rather arbitrary; we don't want to NMI
-		 * processors that are executing at potentially
-		 * "unsafe-to-interrupt" points such as the trampolines,
-		 * but neither do we want to lose state by waiting too long.
-		 */
+		  
+                                                           
+                                                 
+                                                          
+                                                              
+     
 		tsc_timeout = rdtsc64() + (LockTimeOutTSC);
 
 		while (mp_kdp_ncpus != ncpus && rdtsc64() < tsc_timeout) {
-			/*
-			 * A TLB shootdown request may be pending--this would
-			 * result in the requesting processor waiting in
-			 * PMAP_UPDATE_TLBS() until this processor deals with it.
-			 * Process it, so it can now enter mp_kdp_wait()
-			 */
+			  
+                                                        
+                                                   
+                                                            
+                                                   
+      
 			handle_pending_TLB_flushes();
 			cpu_pause();
 		}
-		/* If we've timed out, and some processor(s) are still unresponsive,
-		 * interrupt them with an NMI via the local APIC, iff a panic is
-		 * in progress.
-		 */
+		                                                                    
+                                                                  
+                 
+     
 		if (panic_active()) {
 			NMIPI_enable(TRUE);
 		}
@@ -1711,7 +1711,7 @@ mp_kdp_enter(boolean_t proceed_on_failure)
 					cpu_NMI_interrupt(cpu);
 				}
 			}
-			/* Wait again for the same timeout */
+			                                     
 			tsc_timeout = rdtsc64() + (LockTimeOutTSC);
 			while (mp_kdp_ncpus != ncpus && rdtsc64() < tsc_timeout) {
 				handle_pending_TLB_flushes();
@@ -1762,7 +1762,7 @@ mp_kdp_all_cpus_halted()
 	unsigned int ncpus = 0, cpu = 0, my_cpu = 0;
 
 	my_cpu = cpu_number();
-	ncpus = 1; /* current CPU */
+	ncpus = 1;                  
 	for (cpu = 0; cpu < real_ncpus; cpu++) {
 		if (cpu == my_cpu || !cpu_is_running(cpu)) {
 			continue;
@@ -1828,18 +1828,18 @@ mp_kdp_wait(boolean_t flush, boolean_t isNMI)
 
 	current_cpu_datap()->debugger_ipi_time = mach_absolute_time();
 #if CONFIG_MCA
-	/* If we've trapped due to a machine-check, save MCA registers */
+	                                                                 
 	mca_check_save();
 #endif
 
 	atomic_incl((volatile long *)&mp_kdp_ncpus, 1);
 	while (mp_kdp_trap || (isNMI == TRUE)) {
-		/*
-		 * A TLB shootdown request may be pending--this would result
-		 * in the requesting processor waiting in PMAP_UPDATE_TLBS()
-		 * until this processor handles it.
-		 * Process it, so it can now enter mp_kdp_wait()
-		 */
+		  
+                                                              
+                                                              
+                                     
+                                                  
+     
 		if (flush) {
 			handle_pending_TLB_flushes();
 		}
@@ -1864,14 +1864,14 @@ mp_kdp_exit(void)
 	mp_kdp_trap = FALSE;
 	mfence();
 
-	/* Wait other processors to stop spinning. XXX needs timeout */
+	                                                               
 	DBG("mp_kdp_exit() waiting for processors to resume\n");
 	while (mp_kdp_ncpus > 0) {
-		/*
-		 * a TLB shootdown request may be pending... this would result in the requesting
-		 * processor waiting in PMAP_UPDATE_TLBS() until this processor deals with it.
-		 * Process it, so it can now enter mp_kdp_wait()
-		 */
+		  
+                                                                                  
+                                                                                
+                                                  
+     
 		handle_pending_TLB_flushes();
 
 		cpu_pause();
@@ -1888,7 +1888,7 @@ mp_kdp_exit(void)
 	postcode(MP_KDP_EXIT);
 }
 
-#endif  /* MACH_KDP */
+#endif                
 
 boolean_t
 mp_recent_debugger_activity(void)
@@ -1898,7 +1898,7 @@ mp_recent_debugger_activity(void)
 	       ((abstime - debugger_exit_time) < LastDebuggerEntryAllowance);
 }
 
-/*ARGSUSED*/
+            
 void
 init_ast_check(
 	__unused processor_t    processor)
@@ -1920,18 +1920,18 @@ cause_ast_check(
 void
 slave_machine_init(void *param)
 {
-	/*
-	 * Here in process context, but with interrupts disabled.
-	 */
+	  
+                                                          
+    
 	DBG("slave_machine_init() CPU%d\n", get_cpu_number());
 
 	if (param == FULL_SLAVE_INIT) {
-		/*
-		 * Cold start
-		 */
+		  
+               
+     
 		clock_init();
 	}
-	cpu_machine_init();     /* Interrupts enabled hereafter */
+	cpu_machine_init();                                       
 }
 
 #undef cpu_number
@@ -1988,9 +1988,9 @@ free_warm_timer_call(timer_call_t call)
 	splx(x);
 }
 
-/*
- * Runs in timer call context (interrupts disabled).
- */
+  
+                                                    
+   
 static void
 cpu_warm_timer_call_func(
 	timer_call_param_t p0,
@@ -2000,9 +2000,9 @@ cpu_warm_timer_call_func(
 	return;
 }
 
-/*
- * Runs with interrupts disabled on the CPU we wish to warm (i.e. CPU 0).
- */
+  
+                                                                         
+   
 static void
 _cpu_warm_setup(
 	void *arg)
@@ -2015,9 +2015,9 @@ _cpu_warm_setup(
 	return;
 }
 
-/*
- * Not safe to call with interrupts disabled.
- */
+  
+                                             
+   
 kern_return_t
 ml_interrupt_prewarm(
 	uint64_t        deadline)
@@ -2030,16 +2030,16 @@ ml_interrupt_prewarm(
 		panic("%s: Interrupts disabled?\n", __FUNCTION__);
 	}
 
-	/*
-	 * If the platform doesn't need our help, say that we succeeded.
-	 */
+	  
+                                                                 
+    
 	if (!ml_get_interrupt_prewake_applicable()) {
 		return KERN_SUCCESS;
 	}
 
-	/*
-	 * Grab a timer call to use.
-	 */
+	  
+                             
+    
 	call = grab_warm_timer_call();
 	if (call == NULL) {
 		return KERN_RESOURCE_SHORTAGE;
@@ -2050,9 +2050,9 @@ ml_interrupt_prewarm(
 	cwd.cwd_deadline = deadline;
 	cwd.cwd_result = 0;
 
-	/*
-	 * For now, non-local interrupts happen on the master processor.
-	 */
+	  
+                                                                 
+    
 	ct = mp_cpus_call(cpu_to_cpumask(master_cpu), SYNC, _cpu_warm_setup, &cwd);
 	if (ct == 0) {
 		free_warm_timer_call(call);
@@ -2076,7 +2076,7 @@ kernel_spin(uint64_t spin_ns)
 	cdp = current_cpu_datap();
 	nanoseconds_to_absolutetime(spin_ns, &spin_abs);
 
-	/* Fake interrupt handler entry for testing mp_interrupt_watchdog() */
+	                                                                      
 	cdp->cpu_int_event_time = mach_absolute_time();
 	cdp->cpu_int_state = (void *) USER_STATE(current_thread());
 
@@ -2092,12 +2092,12 @@ kernel_spin(uint64_t spin_ns)
 	kprintf("kernel_spin() continuing\n");
 }
 
-/*
- * Called from the scheduler's maintenance thread,
- * scan running processors for long-running ISRs and:
- *  - panic if longer than LockTimeOut, or
- *  - log if more than a quantum.
- */
+  
+                                                  
+                                                     
+                                          
+                                 
+   
 void
 mp_interrupt_watchdog(void)
 {
@@ -2116,10 +2116,10 @@ mp_interrupt_watchdog(void)
 
 	intrs_enabled = ml_set_interrupts_enabled(FALSE);
 	now = mach_absolute_time();
-	/*
-	 * While timeouts are not suspended,
-	 * check all other processors for long outstanding interrupt handling.
-	 */
+	  
+                                     
+                                                                       
+    
 	for (cpu = 0;
 	    cpu < (cpu_t) real_ncpus && !machine_timeout_suspended();
 	    cpu++) {
@@ -2132,15 +2132,15 @@ mp_interrupt_watchdog(void)
 			continue;
 		}
 		if (__improbable(now < cpu_int_event_time)) {
-			continue;       /* skip due to inter-processor skew */
+			continue;                                             
 		}
 		cpu_int_state = cpu_datap(cpu)->cpu_int_state;
 		if (__improbable(cpu_int_state == NULL)) {
-			/* The interrupt may have been dismissed */
+			                                           
 			continue;
 		}
 
-		/* Here with a cpu handling an interrupt */
+		                                           
 
 		cpu_int_duration = now - cpu_int_event_time;
 		if (__improbable(cpu_int_duration > LockTimeOut)) {
@@ -2151,7 +2151,7 @@ mp_interrupt_watchdog(void)
 			panic("Interrupt watchdog, "
 			    "cpu: %d interrupt: 0x%x time: %llu..%llu state: %p RIP: 0x%llx",
 			    cpu, cpu_int_num, cpu_int_event_time, now, cpu_int_state, cpu_rip);
-			/* NOT REACHED */
+			                 
 		} else if (__improbable(cpu_int_duration > (uint64_t) std_quantum)) {
 			mp_interrupt_watchdog_events++;
 			cpu_int_num = saved_state64(cpu_int_state)->isf.trapno;

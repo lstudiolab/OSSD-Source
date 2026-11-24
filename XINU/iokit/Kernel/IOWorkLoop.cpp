@@ -41,7 +41,7 @@
 
 OSDefineMetaClassAndStructors(IOWorkLoop, OSObject);
 
-// Block of unused functions intended for future use
+                                                    
 #if __LP64__
 OSMetaClassDefineReservedUnused(IOWorkLoop, 0);
 OSMetaClassDefineReservedUnused(IOWorkLoop, 1);
@@ -121,17 +121,17 @@ do { \
 #define IOStatisticsAttachEventSource()
 #define IOStatisticsDetachEventSource()
 
-#endif /* IOKITSTATS */
+#endif                 
 
 bool
 IOWorkLoop::init()
 {
-	// The super init and gateLock allocation MUST be done first.
+	                                                             
 	if (!super::init()) {
 		return false;
 	}
 
-	// Allocate our ExpansionData if it hasn't been allocated already.
+	                                                                  
 	if (!reserved) {
 		reserved = IONew(ExpansionData, 1);
 		if (!reserved) {
@@ -168,9 +168,9 @@ IOWorkLoop::init()
 		if (!controlG) {
 			return false;
 		}
-		// Point the controlGate at the workLoop.  Usually addEventSource
-		// does this automatically.  The problem is in this case addEventSource
-		// uses the control gate and it has to be bootstrapped.
+		                                                                 
+		                                                                       
+		                                                       
 		controlG->setWorkLoop(this);
 		if (addEventSource(controlG) != kIOReturnSuccess) {
 			return false;
@@ -227,13 +227,13 @@ IOWorkLoop::releaseEventChain(LIBKERN_CONSUMED IOEventSource *eventChain)
 	for (event = eventChain; event; event = next) {
 		next = event->getNext();
 #ifdef __clang_analyzer__
-		// Unlike the usual IOKit memory management convention, IOWorkLoop
-		// manages the retain count for the IOEventSource instances in the
-		// the chain rather than have IOEventSource do that itself. This means
-		// it is safe to call release() on the result of getNext() while the
-		// chain is being torn down. However, the analyzer doesn't
-		// realize this. We add an extra retain under analysis to suppress
-		// an analyzer diagnostic about violations of the memory management rules.
+		                                                                  
+		                                                                  
+		                                                                      
+		                                                                    
+		                                                          
+		                                                                  
+		                                                                          
 		if (next) {
 			next->retain();
 		}
@@ -243,21 +243,21 @@ IOWorkLoop::releaseEventChain(LIBKERN_CONSUMED IOEventSource *eventChain)
 		event->release();
 	}
 }
-// Free is called twice:
-// First when the atomic retainCount transitions from 1 -> 0
-// Secondly when the work loop itself is commiting hari kari
-// Hence the each leg of the free must be single threaded.
+                        
+                                                            
+                                                            
+                                                          
 void
 IOWorkLoop::free()
 {
 	if (workThread) {
 		IOInterruptState is;
 
-		// If we are here then we must be trying to shut down this work loop
-		// in this case disable all of the event source, mark the loop
-		// as terminating and wakeup the work thread itself and return
-		// Note: we hold the gate across the entire operation mainly for the
-		// benefit of our event sources so we can disable them cleanly.
+		                                                                    
+		                                                              
+		                                                              
+		                                                                    
+		                                                               
 		closeGate();
 
 		disableAllEventSources();
@@ -268,16 +268,16 @@ IOWorkLoop::free()
 		IOSimpleLockUnlockEnableInterrupt(workToDoLock, is);
 
 		openGate();
-	} else { /* !workThread */
+	} else {                  
 		releaseEventChain(eventChain);
 		eventChain = NULL;
 
 		releaseEventChain(passiveEventChain);
 		passiveEventChain = NULL;
 
-		// Either we have a partial initialization to clean up
-		// or the workThread itself is performing hari-kari.
-		// Either way clean up all of our resources and return.
+		                                                      
+		                                                    
+		                                                       
 
 		if (controlG) {
 			controlG->workLoop = NULL;
@@ -348,9 +348,9 @@ IOWorkLoop::disableAllEventSources() const
 		event->disable();
 	}
 
-	/* NOTE: controlG is in passiveEventChain since it's an IOCommandGate */
+	                                                                        
 	for (event = passiveEventChain; event; event = event->getNext()) {
-		if (event != controlG) { // Don't disable the control gate
+		if (event != controlG) {                                  
 			event->disable();
 		}
 	}
@@ -381,7 +381,7 @@ IOWorkLoop::disableAllInterrupts() const
 }
 
 
-/* virtual */ bool
+              bool
 IOWorkLoop::runEventSources()
 {
 	bool res = false;
@@ -404,7 +404,7 @@ IOWorkLoop::runEventSources()
 		IOInterruptState is = IOSimpleLockLockDisableInterrupt(workToDoLock);
 		workToDo = false;
 		IOSimpleLockUnlockEnableInterrupt(workToDoLock, is);
-		/* NOTE: only loop over event sources in eventChain. Bypass "passive" event sources for performance */
+		                                                                                                      
 		for (IOEventSource *evnt = eventChain; evnt; evnt = evnt->getNext()) {
 			if (traceES) {
 				IOTimeStampStartConstant(IODBG_WORKLOOP(IOWL_CLIENT), VM_KERNEL_ADDRHIDE(this), VM_KERNEL_ADDRHIDE(evnt));
@@ -436,7 +436,7 @@ abort:
 	return res;
 }
 
-/* virtual */ void
+              void
 IOWorkLoop::threadMain()
 {
 restartThread:
@@ -456,19 +456,19 @@ restartThread:
 			}
 			thread_block_parameter(cptr, this);
 			goto restartThread;
-			/* NOTREACHED */
+			                
 		}
 
-		// At this point we either have work to do or we need
-		// to commit suicide.  But no matter
-		// Clear the simple lock and retore the interrupt state
+		                                                     
+		                                    
+		                                                       
 		IOSimpleLockUnlockEnableInterrupt(workToDoLock, is);
 	} while (workToDo);
 
 exitThread:
 	closeGate();
 	thread_t thread = workThread;
-	workThread = NULL; // Say we don't have a loop and free ourselves
+	workThread = NULL;                                               
 	openGate();
 
 	free();
@@ -495,7 +495,7 @@ IOWorkLoop::inGate() const
 	return IORecursiveLockHaveLock(gateLock);
 }
 
-// Internal APIs used by event sources to control the thread
+                                                            
 void
 IOWorkLoop::signalWorkAvailable()
 {
@@ -578,7 +578,7 @@ IOWorkLoop::runAction(Action inAction, OSObject *target,
 {
 	IOReturn res;
 
-	// closeGate is recursive so don't worry if we already hold the lock.
+	                                                                     
 	closeGate();
 	res = (*inAction)(target, arg0, arg1, arg2, arg3);
 	openGate();
@@ -602,7 +602,7 @@ IOWorkLoop::_maintRequest(void *inC, void *inD, void *, void *)
 			inEvent->setWorkLoop(this);
 			inEvent->setNext(NULL);
 
-			/* Check if this is a passive or active event source being added */
+			                                                                   
 			if (eventSourcePerformsWork(inEvent)) {
 				if (!eventChain) {
 					eventChain = inEvent;
@@ -693,24 +693,24 @@ IOWorkLoop::eventSourcePerformsWork(IOEventSource *inEventSource)
 {
 	bool    result = true;
 
-	/*
-	 * The idea here is to see if the subclass of IOEventSource has overridden checkForWork().
-	 * The assumption is that if you override checkForWork(), you need to be
-	 * active and not passive.
-	 *
-	 * We picked a known quantity controlG that does not override
-	 * IOEventSource::checkForWork(), namely the IOCommandGate associated with
-	 * the workloop to which this event source is getting attached.
-	 *
-	 * We do a pointer comparison on the offset in the vtable for inNewEvent against
-	 * the offset in the vtable for inReferenceEvent. This works because
-	 * IOCommandGate's slot for checkForWork() has the address of
-	 * IOEventSource::checkForWork() in it.
-	 *
-	 * Think of OSMemberFunctionCast yielding the value at the vtable offset for
-	 * checkForWork() here. We're just testing to see if it's the same or not.
-	 *
-	 */
+	  
+                                                                                           
+                                                                         
+                           
+   
+                                                              
+                                                                           
+                                                                
+   
+                                                                                 
+                                                                     
+                                                              
+                                        
+   
+                                                                             
+                                                                           
+   
+    
 
 	if (IOEventSource::kPassive & inEventSource->flags) {
 		result = false;

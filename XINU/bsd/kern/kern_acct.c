@@ -65,17 +65,17 @@
  *
  *	@(#)kern_acct.c	8.1 (Berkeley) 6/14/93
  */
-/* HISTORY
- * 08-May-95  Mac Gillon (mgillon) at NeXT
- *	Purged old history
- *      New version based on 4.4
- */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+          
+                                          
+                     
+                                
+   
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 
 #include <sys/param.h>
@@ -97,45 +97,45 @@
 #include <security/mac_framework.h>
 #endif
 
-/*
- * The routines implemented in this file are described in:
- *      Leffler, et al.: The Design and Implementation of the 4.3BSD
- *	    UNIX Operating System (Addison Welley, 1989)
- * on pages 62-63.
- *
- * Arguably, to simplify accounting operations, this mechanism should
- * be replaced by one in which an accounting log file (similar to /dev/klog)
- * is read by a user process, etc.  However, that has its own problems.
- */
+  
+                                                          
+                                                                    
+                                                   
+                  
+  
+                                                                     
+                                                                            
+                                                                       
+   
 
-/*
- * Internal accounting functions.
- * The former's operation is described in Leffler, et al., and the latter
- * was provided by UCB with the 4.4BSD-Lite release
- */
+  
+                                 
+                                                                         
+                                                   
+   
 comp_t  encode_comp_t(uint32_t, uint32_t);
 void    acctwatch(void *);
 
-/*
- * Accounting vnode pointer, and suspended accounting vnode pointer.  States
- * are as follows:
- *
- *	acctp		suspend_acctp	state
- *	-------------	------------	------------------------------
- *	NULL		NULL		Accounting disabled
- *	!NULL		NULL		Accounting enabled
- *	NULL		!NULL		Accounting enabled, but suspended
- *	!NULL		!NULL		<not allowed>
- */
+  
+                                                                            
+                  
+  
+                             
+                                                            
+                                  
+                                  
+                                                 
+                              
+   
 struct  vnode *acctp;
 struct  vnode *suspend_acctp;
 
-/*
- * Values associated with enabling and disabling accounting
- */
-int     acctsuspend = 2;        /* stop accounting when < 2% free space left */
-int     acctresume = 4;         /* resume when free space risen to > 4% */
-int     acctchkfreq = 15;       /* frequency (in seconds) to check space */
+  
+                                                           
+   
+int     acctsuspend = 2;                                                       
+int     acctresume = 4;                                                   
+int     acctchkfreq = 15;                                                  
 
 
 static LCK_GRP_DECLARE(acct_subsys_lck_grp, "acct");
@@ -145,10 +145,10 @@ static LCK_MTX_DECLARE(acct_subsys_mutex, &acct_subsys_lck_grp);
 #define ACCT_SUBSYS_UNLOCK() lck_mtx_unlock(&acct_subsys_mutex)
 
 
-/*
- * Accounting system call.  Written based on the specification and
- * previous implementation done by Mark Tinguely.
- */
+  
+                                                                  
+                                                 
+   
 int
 acct(proc_t p, struct acct_args *uap, __unused int *retval)
 {
@@ -158,15 +158,15 @@ acct(proc_t p, struct acct_args *uap, __unused int *retval)
 
 	ctx = vfs_context_current();
 
-	/* Make sure that the caller is root. */
+	                                        
 	if ((error = suser(vfs_context_ucred(ctx), &p->p_acflag))) {
 		return error;
 	}
 
-	/*
-	 * If accounting is to be started to a file, open that file for
-	 * writing and make sure it's a 'normal'.
-	 */
+	  
+                                                                
+                                          
+    
 	if (uap->path != USER_ADDR_NULL) {
 		NDINIT(&nd, LOOKUP, OP_OPEN, NOFOLLOW, UIO_USERSPACE, uap->path, ctx);
 		if ((error = vn_open(&nd, FWRITE, 0))) {
@@ -196,10 +196,10 @@ acct(proc_t p, struct acct_args *uap, __unused int *retval)
 	}
 #endif
 
-	/*
-	 * If accounting was previously enabled, kill the old space-watcher,
-	 * close the file, and (if no new file was specified, leave).
-	 */
+	  
+                                                                     
+                                                              
+    
 	ACCT_SUBSYS_LOCK();
 	if (acctp != NULLVP || suspend_acctp != NULLVP) {
 		untimeout(acctwatch, NULL);
@@ -213,10 +213,10 @@ acct(proc_t p, struct acct_args *uap, __unused int *retval)
 		return error;
 	}
 
-	/*
-	 * Save the new accounting file vnode, and schedule the new
-	 * free space watcher.
-	 */
+	  
+                                                            
+                       
+    
 	acctp = nd.ni_vp;
 	ACCT_SUBSYS_UNLOCK();
 
@@ -224,12 +224,12 @@ acct(proc_t p, struct acct_args *uap, __unused int *retval)
 	return error;
 }
 
-/*
- * Write out process accounting information, on process exit.
- * Data to be written out is specified in Leffler, et al.
- * and are enumerated below.  (They're also noted in the system
- * "acct.h" header file.)
- */
+  
+                                                             
+                                                         
+                                                               
+                         
+   
 int
 acct_process(proc_t p)
 {
@@ -243,7 +243,7 @@ acct_process(proc_t p)
 	struct session * sessp;
 	struct  tty *tp;
 
-	/* If accounting isn't enabled, don't bother */
+	                                               
 	ACCT_SUBSYS_LOCK();
 	vp = acctp;
 	if (vp == NULLVP) {
@@ -251,25 +251,25 @@ acct_process(proc_t p)
 		return 0;
 	}
 
-	/*
-	 * Get process accounting information.
-	 */
+	  
+                                       
+    
 
-	/* (1) The name of the command that ran */
+	                                          
 	bcopy(p->p_comm, an_acct.ac_comm, sizeof an_acct.ac_comm);
 
-	/* (2) The amount of user and system time that was used */
+	                                                          
 	calcru(p, &ut, &st, NULL);
 	an_acct.ac_utime = encode_comp_t((uint32_t)ut.tv_sec, ut.tv_usec);
 	an_acct.ac_stime = encode_comp_t((uint32_t)st.tv_sec, st.tv_usec);
 
-	/* (3) The elapsed time the commmand ran (and its starting time) */
+	                                                                   
 	an_acct.ac_btime = (u_int32_t)p->p_start.tv_sec;
 	microtime(&tmp);
 	timevalsub(&tmp, &p->p_start);
 	an_acct.ac_etime = encode_comp_t((uint32_t)tmp.tv_sec, tmp.tv_usec);
 
-	/* (4) The average amount of memory used */
+	                                           
 	proc_lock(p);
 	rup = p->p_stats->p_ru;
 	proc_unlock(p);
@@ -283,16 +283,16 @@ acct_process(proc_t p)
 		an_acct.ac_mem = 0;
 	}
 
-	/* (5) The number of disk I/O operations done */
+	                                                
 	an_acct.ac_io = encode_comp_t((uint32_t)(r->ru_inblock + r->ru_oublock), 0);
 
-	/* (6) The UID and GID of the process */
+	                                        
 	safecred = kauth_cred_proc_ref(p);
 
 	an_acct.ac_uid = kauth_cred_getruid(safecred);
 	an_acct.ac_gid = kauth_cred_getrgid(safecred);
 
-	/* (7) The terminal from which the process was started */
+	                                                         
 
 	sessp = proc_session(p);
 	if ((p->p_flag & P_CONTROLT) && (sessp != SESSION_NULL) && ((tp = SESSION_TP(sessp)) != TTY_NULL)) {
@@ -307,12 +307,12 @@ acct_process(proc_t p)
 		session_rele(sessp);
 	}
 
-	/* (8) The boolean flags that tell how the process terminated, etc. */
+	                                                                      
 	an_acct.ac_flag = (u_int8_t)p->p_acflag;
 
-	/*
-	 * Now, just write the accounting information to the file.
-	 */
+	  
+                                                           
+    
 	if ((error = vnode_getwithref(vp)) == 0) {
 		error = vn_rdwr(UIO_WRITE, vp, (caddr_t)&an_acct, sizeof(an_acct),
 		    (off_t)0, UIO_SYSSPACE, IO_APPEND | IO_UNIT, safecred,
@@ -326,15 +326,15 @@ acct_process(proc_t p)
 	return error;
 }
 
-/*
- * Encode_comp_t converts from ticks in seconds and microseconds
- * to ticks in 1/AHZ seconds.  The encoding is described in
- * Leffler, et al., on page 63.
- */
+  
+                                                                
+                                                           
+                               
+   
 
-#define MANTSIZE        13                      /* 13 bit mantissa. */
-#define EXPSIZE         3                       /* Base 8 (3 bit) exponent. */
-#define MAXFRACT        ((1 << MANTSIZE) - 1)   /* Maximum fractional value. */
+#define MANTSIZE        13                                            
+#define EXPSIZE         3                                                     
+#define MAXFRACT        ((1 << MANTSIZE) - 1)                                  
 
 comp_t
 encode_comp_t(uint32_t s, uint32_t us)
@@ -344,33 +344,33 @@ encode_comp_t(uint32_t s, uint32_t us)
 	exp = 0;
 	rnd = 0;
 	s *= AHZ;
-	s += us / (1000000 / AHZ);      /* Maximize precision. */
+	s += us / (1000000 / AHZ);                               
 
 	while (s > MAXFRACT) {
-		rnd = s & (1 << (EXPSIZE - 1)); /* Round up? */
-		s >>= EXPSIZE;          /* Base 8 exponent == 3 bit shift. */
+		rnd = s & (1 << (EXPSIZE - 1));                
+		s >>= EXPSIZE;                                               
 		exp++;
 	}
 
-	/* If we need to round up, do it (and handle overflow correctly). */
+	                                                                    
 	if (rnd && (++s > MAXFRACT)) {
 		s >>= EXPSIZE;
 		exp++;
 	}
 
-	/* Clean it up and polish it off. */
-	exp <<= MANTSIZE;               /* Shift the exponent into place */
-	exp += s;                       /* and add on the mantissa. */
+	                                    
+	exp <<= MANTSIZE;                                                  
+	exp += s;                                                     
 	return (comp_t)exp;
 }
 
-/*
- * Periodically check the file system to see if accounting
- * should be turned on or off.  Beware the case where the vnode
- * has been vgone()'d out from underneath us, e.g. when the file
- * system containing the accounting file has been forcibly unmounted.
- */
-/* ARGSUSED */
+  
+                                                          
+                                                               
+                                                                
+                                                                     
+   
+              
 void
 acctwatch(__unused void *a)
 {
@@ -383,11 +383,11 @@ acctwatch(__unused void *a)
 
 	ACCT_SUBSYS_LOCK();
 	if (suspend_acctp != NULLVP) {
-		/*
-		 * Resuming accounting when accounting is suspended, and the
-		 * filesystem containing the suspended accounting file goes
-		 * below a low watermark
-		 */
+		  
+                                                              
+                                                             
+                          
+     
 		if (suspend_acctp->v_type == VBAD) {
 			(void) vn_close(suspend_acctp, FWRITE, vfs_context_kernel());
 			suspend_acctp = NULLVP;
@@ -401,11 +401,11 @@ acctwatch(__unused void *a)
 			log(LOG_NOTICE, "Accounting resumed\n");
 		}
 	} else if (acctp != NULLVP) {
-		/*
-		 * Suspending accounting when accounting is currently active,
-		 * and the filesystem containing the active accounting file
-		 * goes over a high watermark
-		 */
+		  
+                                                               
+                                                             
+                               
+     
 		if (acctp->v_type == VBAD) {
 			(void) vn_close(acctp, FWRITE, vfs_context_kernel());
 			acctp = NULLVP;

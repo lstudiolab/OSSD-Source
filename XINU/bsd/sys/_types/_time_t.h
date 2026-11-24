@@ -27,6 +27,6 @@
  */
 #ifndef _TIME_T
 #define _TIME_T
-#include <machine/types.h> /* __darwin_time_t */
+#include <machine/types.h>                      
 typedef __darwin_time_t         time_t;
-#endif  /* _TIME_T */
+#endif               

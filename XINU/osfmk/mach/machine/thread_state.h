@@ -37,4 +37,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACH_MACHINE_THREAD_STATE_H_ */
+#endif                                    

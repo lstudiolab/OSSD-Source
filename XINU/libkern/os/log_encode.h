@@ -30,4 +30,4 @@ void os_log_context_init(os_log_context_t, logmem_t *, uint8_t *, size_t);
 void os_log_context_free(os_log_context_t);
 bool os_log_context_encode(os_log_context_t, const char *, va_list, void *, void *, bool);
 
-#endif /* log_encode_h */
+#endif                   

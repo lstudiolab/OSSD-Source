@@ -185,43 +185,43 @@ mac_cred_label_internalize(struct label *label, char *string)
 	return error;
 }
 
-/*
- * By default, fork just adds a reference to the parent
- * credential.  Policies may need to know about this reference
- * if they are tracking exit calls to know when to free the
- * label.
- */
+  
+                                                       
+                                                              
+                                                           
+         
+   
 void
 mac_cred_label_associate_fork(kauth_cred_t cred, proc_t proc)
 {
 	MAC_PERFORM(cred_label_associate_fork, cred, proc);
 }
 
-/*
- * Initialize MAC label for the first kernel process, from which other
- * kernel processes and threads are spawned.
- */
+  
+                                                                      
+                                            
+   
 void
 mac_cred_label_associate_kernel(kauth_cred_t cred)
 {
 	MAC_PERFORM(cred_label_associate_kernel, cred);
 }
 
-/*
- * Initialize MAC label for the first userland process, from which other
- * userland processes and threads are spawned.
- */
+  
+                                                                        
+                                              
+   
 void
 mac_cred_label_associate_user(kauth_cred_t cred)
 {
 	MAC_PERFORM(cred_label_associate_user, cred);
 }
 
-/*
- * When a new process is created, its label must be initialized.  Generally,
- * this involves inheritence from the parent process, modulo possible
- * deltas.  This function allows that processing to take place.
- */
+  
+                                                                            
+                                                                     
+                                                               
+   
 void
 mac_cred_label_associate(struct ucred *parent_cred, struct ucred *child_cred)
 {
@@ -280,23 +280,23 @@ out:
 	return error;
 }
 
-/*
- * When the subject's label changes, it may require revocation of privilege
- * to mapped objects.  This can't be done on-the-fly later with a unified
- * buffer cache.
- *
- * XXX:		CRF_MAC_ENFORCE should be in a kauth_cred_t field, rather
- * XXX:		than a posix_cred_t field.
- */
+  
+                                                                           
+                                                                         
+                
+  
+                                                                  
+                                   
+   
 void
 mac_cred_label_update(kauth_cred_t cred, struct label *newlabel)
 {
 	posix_cred_t pcred = posix_cred_get(cred);
 
-	/* force label to be part of "matching" for credential */
+	                                                         
 	pcred->cr_flags |= CRF_MAC_ENFORCE;
 
-	/* inform the policies of the update */
+	                                       
 	MAC_PERFORM(cred_label_update, cred, newlabel);
 }
 
@@ -306,7 +306,7 @@ mac_cred_check_label_update(kauth_cred_t cred, struct label *newlabel)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -323,7 +323,7 @@ mac_cred_check_visible(kauth_cred_t u1, kauth_cred_t u2)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -342,15 +342,15 @@ mac_proc_check_debug(proc_ident_t tracing_ident, kauth_cred_t tracing_cred, proc
 	proc_t tracingp;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
 #endif
-	/*
-	 * Once all mac hooks adopt proc_ident_t, finding proc_t and releasing
-	 * it below should go to mac_proc_check_enforce().
-	 */
+	  
+                                                                       
+                                                   
+    
 	if ((tracingp = proc_find_ident(tracing_ident)) == PROC_NULL) {
 		return ESRCH;
 	}
@@ -371,7 +371,7 @@ mac_proc_check_dump_core(struct proc *proc)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -394,7 +394,7 @@ mac_proc_check_remote_thread_create(struct task *task, int flavor, thread_state_
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -423,7 +423,7 @@ mac_proc_check_fork(proc_t curp)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -446,7 +446,7 @@ mac_proc_check_get_task(struct ucred *cred, proc_ident_t pident, mach_task_flavo
 
 	assert(flavor <= TASK_FLAVOR_NAME);
 
-	/* Also call the old hook for compatability, deprecating in rdar://66356944. */
+	                                                                               
 	if (flavor == TASK_FLAVOR_CONTROL) {
 		MAC_CHECK(proc_check_get_task, cred, pident);
 		if (error) {
@@ -473,7 +473,7 @@ mac_proc_check_expose_task(struct ucred *cred, proc_ident_t pident, mach_task_fl
 
 	assert(flavor <= TASK_FLAVOR_NAME);
 
-	/* Also call the old hook for compatability, deprecating in rdar://66356944. */
+	                                                                               
 	if (flavor == TASK_FLAVOR_CONTROL) {
 		MAC_CHECK(proc_check_expose_task, cred, pident);
 		if (error) {
@@ -496,11 +496,11 @@ mac_proc_check_inherit_ipc_ports(struct proc *p, struct vnode *cur_vp, off_t cur
 	return error;
 }
 
-/*
- * The type of maxprot in proc_check_map_anon must be equivalent to vm_prot_t
- * (defined in <mach/vm_prot.h>). mac_policy.h does not include any header
- * files, so cannot use the typedef itself.
- */
+  
+                                                                             
+                                                                          
+                                           
+   
 int
 mac_proc_check_map_anon(proc_t proc, user_addr_t u_addr,
     user_size_t u_size, int prot, int flags, int *maxprot)
@@ -509,7 +509,7 @@ mac_proc_check_map_anon(proc_t proc, user_addr_t u_addr,
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_vm_enforce) {
 		return 0;
 	}
@@ -533,7 +533,7 @@ mac_proc_check_memorystatus_control(proc_t proc, uint32_t command, pid_t pid)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -557,7 +557,7 @@ mac_proc_check_mprotect(proc_t proc,
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_vm_enforce) {
 		return 0;
 	}
@@ -579,7 +579,7 @@ mac_proc_check_run_cs_invalid(proc_t proc)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_vm_enforce) {
 		return 0;
 	}
@@ -603,7 +603,7 @@ mac_proc_check_sched(proc_t curp, struct proc *proc)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -626,7 +626,7 @@ mac_proc_check_signal(proc_t curp, struct proc *proc, int signum)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -648,7 +648,7 @@ mac_proc_check_syscall_unix(proc_t curp, int scnum)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -669,7 +669,7 @@ mac_proc_check_wait(proc_t curp, struct proc *proc)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -692,7 +692,7 @@ mac_proc_check_work_interval_ctl(proc_t proc, uint32_t operation)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -721,7 +721,7 @@ mac_proc_check_suspend_resume(proc_t proc, int sr)
 	int error;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -744,7 +744,7 @@ mac_proc_check_ledger(proc_t curp, proc_t proc, int ledger_op)
 	int error = 0;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -767,7 +767,7 @@ mac_proc_check_proc_info(proc_t curp, proc_t target, int callnum, int flavor)
 	int error = 0;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -790,7 +790,7 @@ mac_proc_check_get_cs_info(proc_t curp, proc_t target, unsigned int op)
 	int error = 0;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}
@@ -813,7 +813,7 @@ mac_proc_check_set_cs_info(proc_t curp, proc_t target, unsigned int op)
 	int error = 0;
 
 #if SECURITY_MAC_CHECK_ENFORCE
-	/* 21167099 - only check if we allow write */
+	                                             
 	if (!mac_proc_enforce) {
 		return 0;
 	}

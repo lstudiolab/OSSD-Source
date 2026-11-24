@@ -1,9 +1,9 @@
 #include <sys/cdefs.h>
 #include "WKdm.h"
 
-/***************************************************************************
- *          THE UNPACKING ROUTINES should GO HERE
- */
+                                                                            
+                                                 
+   
 
 const char hashLookupTable[] = HASH_LOOKUP_TABLE_CONTENTS;
 
@@ -14,11 +14,11 @@ const char hashLookupTable[] = HASH_LOOKUP_TABLE_CONTENTS;
 #define GET_NEXT_DICTIONARY_INDEX dictionaryIndices[dictionaryIndicesIndex++]
 #endif
 
-/*  WK_unpack_2bits takes any number of words containing 16 two-bit values
- *  and unpacks them into four times as many words containg those
- *  two bit values as bytes (with the low two bits of each byte holding
- *  the actual value.
- */
+                                                                          
+                                                                 
+                                                                       
+                     
+   
 static WK_word*
 WK_unpack_2bits(WK_word *input_buf,
     WK_word *input_end,
@@ -28,10 +28,10 @@ WK_unpack_2bits(WK_word *input_buf,
 	WK_word *output_next = output_buf;
 	WK_word packing_mask = TWO_BITS_PACKING_MASK;
 
-	/* loop to repeatedly grab one input word and unpack it into
-	 * 4 output words.  This loop could be unrolled a little---it's
-	 * designed to be easy to do that.
-	 */
+	                                                            
+                                                                
+                                   
+    
 	while (input_next < input_end) {
 		WK_word temp = input_next[0];
 		DEBUG_PRINT_2("Unpacked tags word: %.8x\n", temp);
@@ -47,12 +47,12 @@ WK_unpack_2bits(WK_word *input_buf,
 	return output_next;
 }
 
-/* unpack four bits consumes any number of words (between input_buf
- * and input_end) holding 8 4-bit values per word, and unpacks them
- * into twice as many words, with each value in a separate byte.
- * (The four-bit values occupy the low halves of the bytes in the
- * result).
- */
+                                                                   
+                                                                   
+                                                                
+                                                                 
+           
+   
 static WK_word*
 WK_unpack_4bits(WK_word *input_buf,
     WK_word *input_end,
@@ -63,10 +63,10 @@ WK_unpack_4bits(WK_word *input_buf,
 	WK_word packing_mask = FOUR_BITS_PACKING_MASK;
 
 
-	/* loop to repeatedly grab one input word and unpack it into
-	 * 4 output words.  This loop should probably be unrolled
-	 * a little---it's designed to be easy to do that.
-	 */
+	                                                            
+                                                          
+                                                   
+    
 	while (input_next < input_end) {
 		WK_word temp = input_next[0];
 		DEBUG_PRINT_2("Unpacked dictionary indices word: %.8x\n", temp);
@@ -80,9 +80,9 @@ WK_unpack_4bits(WK_word *input_buf,
 	return output_next;
 }
 
-/* unpack_3_tenbits unpacks three 10-bit items from (the low 30 bits of)
- * a 32-bit word
- */
+                                                                        
+                
+   
 static WK_word*
 WK_unpack_3_tenbits(WK_word *input_buf,
     WK_word *input_end,
@@ -92,10 +92,10 @@ WK_unpack_3_tenbits(WK_word *input_buf,
 	WK_word *output_next = output_buf;
 	WK_word packing_mask = LOW_BITS_MASK;
 
-	/* loop to fetch words of input, splitting each into three
-	 * words of output with 10 meaningful low bits.  This loop
-	 * probably ought to be unrolled and maybe coiled
-	 */
+	                                                          
+                                                           
+                                                  
+    
 	while (input_next < input_end) {
 		WK_word temp = input_next[0];
 
@@ -110,13 +110,13 @@ WK_unpack_3_tenbits(WK_word *input_buf,
 	return output_next;
 }
 
-/*********************************************************************
- * WKdm_decompress --- THE DECOMPRESSOR
- * Expects WORD pointers to the source and destination buffers
- * and a page size in words.  The page size had better be 1024 unless
- * somebody finds the places that are dependent on the page size and
- * fixes them
- */
+                                                                      
+                                       
+                                                              
+                                                                     
+                                                                    
+             
+   
 
 void
 WKdm_decompress(WK_word* src_buf,
@@ -125,15 +125,15 @@ WKdm_decompress(WK_word* src_buf,
 {
 	DictionaryElement dictionary[DICTIONARY_SIZE];
 
-	/* arrays that hold output data in intermediate form during modeling */
-	/* and whose contents are packed into the actual output after modeling */
+	                                                                       
+	                                                                         
 
-	/* sizes of these arrays should be increased if you want to compress
-	 * pages larger than 4KB
-	 */
-	WK_word tempTagsArray[300];  /* tags for everything          */
-	WK_word tempQPosArray[300];  /* queue positions for matches  */
-	WK_word tempLowBitsArray[1200]; /* low bits for partial matches */
+	                                                                    
+                         
+    
+	WK_word tempTagsArray[300];                                    
+	WK_word tempQPosArray[300];                                    
+	WK_word tempLowBitsArray[1200];                                   
 
 	PRELOAD_DICTIONARY;
 
@@ -215,10 +215,10 @@ WKdm_decompress(WK_word* src_buf,
 		printf("next_full_word is %u\n", next_full_word);
 #endif
 
-		/* this loop should probably be unrolled. Maybe we should unpack
-		 * as 4 bit values, giving two consecutive tags, and switch on
-		 * that 16 ways to decompress 2 words at a whack
-		 */
+		                                                                
+                                                                
+                                                  
+     
 		while (next_tag < tags_area_end) {
 			char tag = next_tag[0];
 
@@ -229,7 +229,7 @@ WKdm_decompress(WK_word* src_buf,
 			}
 			case EXACT_TAG: {
 				WK_word *dict_location = dictionary + *(next_q_pos++);
-				/* no need to replace dict. entry if matched exactly */
+				                                                       
 				*next_output = *dict_location;
 				break;
 			}
@@ -238,14 +238,14 @@ WKdm_decompress(WK_word* src_buf,
 				{
 					WK_word temp = *dict_location;
 
-					/* strip out low bits */
+					                        
 					temp = ((temp >> NUM_LOW_BITS) << NUM_LOW_BITS);
 
-					/* add in stored low bits from temp array */
+					                                            
 					temp = temp | *(next_low_bits++);
 
-					*dict_location = temp; /* replace old value in dict. */
-					*next_output = temp; /* and echo it to output */
+					*dict_location = temp;                                 
+					*next_output = temp;                            
 				}
 				break;
 			}

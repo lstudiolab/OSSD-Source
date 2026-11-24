@@ -124,5 +124,5 @@ extern int in6_pcbsetport(struct in6_addr *, struct inpcb *,
 extern void init_sin6(struct sockaddr_in6 *sin6, struct mbuf *m);
 extern void in6p_route_copyout(struct inpcb *, struct route_in6 *);
 extern void in6p_route_copyin(struct inpcb *, struct route_in6 *);
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* !_NETINET6_IN6_PCB_H_ */
+#endif                         
+#endif                            

@@ -29,7 +29,7 @@
 #ifndef _KERN_COALITION_H_
 #define _KERN_COALITION_H_
 
-/* only kernel-private interfaces */
+                                    
 #ifdef XNU_KERNEL_PRIVATE
 #include <mach/coalition.h>
 #include <kern/thread_group.h>
@@ -38,23 +38,23 @@
 
 void coalitions_init(void);
 
-/* These may return:
- * KERN_ALREADY_IN_SET	task is already in a coalition (maybe this one, maybe a different one)
- * KERN_TERMINATED	coalition is already terminated (so it may not adopt any more tasks)
- */
+                    
+                                                                                             
+                                                                                       
+   
 kern_return_t coalitions_adopt_task(coalition_t *coaltions, task_t task);
 kern_return_t coalitions_adopt_init_task(task_t task);
 kern_return_t coalitions_adopt_corpse_task(task_t task);
 
-/* Currently, no error conditions. If task is not already in a coalition,
- * KERN_SUCCESS is returned because removing it did not fail.
- */
+                                                                         
+                                                             
+   
 kern_return_t coalitions_remove_task(task_t task);
 void          task_release_coalitions(task_t task);
 
-/*
- *
- */
+  
+  
+   
 kern_return_t coalitions_set_roles(coalition_t coalitions[COALITION_NUM_TYPES],
     task_t task, int roles[COALITION_NUM_TYPES]);
 
@@ -79,7 +79,7 @@ void coalition_for_each_task(coalition_t coal, void *ctx,
 
 void coalition_set_efficient(coalition_t coal);
 
-/*  Coalition ledger  */
+                        
 struct coalition_ledger_indices {
 	int logical_writes;
 };
@@ -90,54 +90,54 @@ ledger_t coalition_ledger_get_from_task(task_t task);
 void coalition_io_rate_exceeded(int warning, const void *param0, __unused const void *param1);
 void coalition_io_ledger_update(task_t task, int32_t flavor, boolean_t is_credit, uint32_t io_size);
 
-/* Max limit for coalition logical_writes ledger in MB. Setting to 16 TB */
+                                                                           
 #define COALITION_MAX_LOGICAL_WRITES_LIMIT ((ledger_amount_t)(1ULL << 24))
-/* logical_writes ledger's refill time interval */
+                                                  
 #define COALITION_LEDGER_MONITOR_INTERVAL_SECS (24 * 60 * 60)
 
 
 typedef void (*coalition_iterate_fn_t)(void*, int, coalition_t);
 kern_return_t coalition_iterate_stackshot(coalition_iterate_fn_t callout, void *arg, uint32_t coalition_type);
 
-/* Returns with a reference, or COALITION_NULL.
- * There is no coalition with id 0.
- */
+                                               
+                                   
+   
 coalition_t coalition_find_by_id(uint64_t coal_id);
 
-/* Returns with a reference and an activation, or COALITION_NULL.
- * There is no coalition with id 0.
- */
+                                                                 
+                                   
+   
 coalition_t coalition_find_and_activate_by_id(uint64_t coal_id);
 
 void coalition_remove_active(coalition_t coal);
 
 void coalition_release(coalition_t coal);
 
-/*
- * The following functions are to be used by the syscall wrapper
- * in bsd/kern/kern_proc.c, after it has verified the caller's privilege.
- */
+  
+                                                                
+                                                                         
+   
 
-/* This may return:
- * KERN_DEFAULT_SET	The default coalition, which contains the kernel, may
- *			not be terminated.
- * KERN_TERMINATED	The coalition was already reaped.
- * KERN_FAILURE		The coalition was not empty or has never been terminated.
- */
+                   
+                                                                         
+                       
+                                                    
+                                                                          
+   
 kern_return_t coalition_reap_internal(coalition_t coal);
 
-/* This may return:
- * KERN_DEFAULT_SET	The default coalition, which contains the kernel, may
- *			not be terminated.
- * KERN_TERMINATED	The coalition was already terminated (or even reaped)
- * KERN_INVALID_NAME	The coalition was already reaped.
- */
+                   
+                                                                         
+                       
+                                                                        
+                                                      
+   
 kern_return_t coalition_request_terminate_internal(coalition_t coal);
 
-/* This may return:
- * KERN_RESOURCE_SHORTAGE	Unable to allocate kernel resources for a
- *				new coalition.
- */
+                   
+                                                                   
+                    
+   
 kern_return_t coalition_create_internal(int type, int role, boolean_t privileged, coalition_t *out, uint64_t *cid);
 
 boolean_t coalition_term_requested(coalition_t coal);
@@ -150,15 +150,15 @@ kern_return_t coalition_resource_usage_internal(coalition_t coal, struct coaliti
 
 task_t kdp_coalition_get_leader(coalition_t coal);
 
-/*
- * development/debug interfaces
- */
+  
+                               
+   
 #if DEVELOPMENT || DEBUG
 int coalition_should_notify(coalition_t coal);
 void coalition_set_notify(coalition_t coal, int notify);
 #endif
 
-#else /* !CONFIG_COALITIONS */
+#else                         
 
 static inline void
 task_coalition_update_gpu_stats(__unused task_t task,
@@ -197,6 +197,6 @@ coalition_for_each_task(__unused coalition_t coal,
 	return;
 }
 
-#endif /* CONFIG_COALITIONS */
-#endif /* XNU_KERNEL_PRIVATE */
-#endif /* _KERN_COALITION_H */
+#endif                        
+#endif                         
+#endif                        

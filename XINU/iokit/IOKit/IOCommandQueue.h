@@ -79,15 +79,15 @@ public:
 	    void *field2 = NULL, void *field3 = NULL)
 	APPLE_KEXT_DEPRECATED;
 
-// WARNING:  This function can only be safely called from the appropriate
-// work loop context.  You should check IOWorkLoop::onThread is true.
-//
-// For each entry in the commandQueue call the target/action.
-// Lockout all new entries to the queue while iterating.
-// If the input fields are zero then the queue's owner/action will be used.
+                                                                         
+                                                                     
+  
+                                                             
+                                                        
+                                                                           
 	virtual int performAndFlush(OSObject *target = NULL,
 	    IOCommandQueueAction inAction = NULL)
 	APPLE_KEXT_DEPRECATED;
 };
 
-#endif /* !_IOKIT_IOCOMMANDQUEUE_H */
+#endif                               

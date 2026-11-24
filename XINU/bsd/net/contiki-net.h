@@ -76,7 +76,7 @@
 #if NETSTACK_CONF_WITH_IPV6
 #include "net/ipv6/uip-icmp6.h"
 #include "net/ipv6/uip-ds6.h"
-#endif /* NETSTACK_CONF_WITH_IPV6 */
+#endif                              
 
 #include "net/ip/resolv.h"
 
@@ -89,4 +89,4 @@
 
 #include "net/netstack.h"
 
-#endif /* CONTIKI_NET_H_ */
+#endif                     

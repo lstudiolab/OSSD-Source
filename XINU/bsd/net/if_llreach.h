@@ -36,23 +36,23 @@ extern "C" {
 
 #include <sys/types.h>
 
-/*
- * Per-interface link-layer reachability information (private).
- */
-#define IF_LLREACHINFO_ADDRLEN          64      /* max ll addr len */
-#define IF_LLREACHINFO_RESERVED2        16      /* more reserved bits */
+  
+                                                               
+   
+#define IF_LLREACHINFO_ADDRLEN          64                           
+#define IF_LLREACHINFO_RESERVED2        16                              
 
 struct if_llreach_info {
-	u_int32_t               lri_refcnt;     /* reference count */
-	u_int32_t               lri_ifindex;    /* interface index */
-	u_int64_t               lri_expire;     /* expiration (calendar) time */
-	u_int32_t               lri_probes;     /* total # of probes */
-	u_int16_t               lri_reserved;   /* for future use */
-	u_int16_t               lri_proto;      /* ll proto */
-	u_int8_t                lri_addr[IF_LLREACHINFO_ADDRLEN]; /* ll addr */
-	int32_t                 lri_rssi;       /* received signal strength */
-	int32_t                 lri_lqm;        /* link quality metric */
-	int32_t                 lri_npm;        /* node proximity metric */
+	u_int32_t               lri_refcnt;                          
+	u_int32_t               lri_ifindex;                         
+	u_int64_t               lri_expire;                                     
+	u_int32_t               lri_probes;                            
+	u_int16_t               lri_reserved;                       
+	u_int16_t               lri_proto;                    
+	u_int8_t                lri_addr[IF_LLREACHINFO_ADDRLEN];              
+	int32_t                 lri_rssi;                                     
+	int32_t                 lri_lqm;                                 
+	int32_t                 lri_npm;                                   
 	u_int8_t                lri_reserved2[IF_LLREACHINFO_RESERVED2];
 };
 
@@ -64,31 +64,31 @@ struct if_llreach_info {
 #include <netinet6/in6_var.h>
 #include <netinet6/nd6.h>
 
-/*
- * Per-interface link-layer reachability.  (Currently only for ARP/NDP/Ethernet.)
- */
+  
+                                                                                 
+   
 #define IF_LLREACH_MAXLEN       ETHER_ADDR_LEN
 
 struct if_llreach {
 	decl_lck_mtx_data(, lr_lock);
-	RB_ENTRY(if_llreach)    lr_link;        /* RB tree links */
-	struct ifnet            *lr_ifp;        /* back pointer to ifnet */
-	u_int32_t               lr_refcnt;      /* reference count */
-	u_int32_t               lr_reqcnt;      /* RB tree request count */
-	u_int32_t               lr_debug;       /* see ifa_debug flags */
-	u_int32_t               lr_probes;      /* number of probes so far */
-	u_int64_t               lr_basecal;     /* base calendar time */
-	u_int64_t               lr_baseup;      /* base uptime */
-	u_int64_t               lr_lastrcvd;    /* last-heard-of timestamp */
-	u_int32_t               lr_basereachable; /* baseline time */
-	u_int32_t               lr_reachable;   /* reachable time */
+	RB_ENTRY(if_llreach)    lr_link;                           
+	struct ifnet            *lr_ifp;                                   
+	u_int32_t               lr_refcnt;                           
+	u_int32_t               lr_reqcnt;                                 
+	u_int32_t               lr_debug;                                
+	u_int32_t               lr_probes;                                   
+	u_int64_t               lr_basecal;                             
+	u_int64_t               lr_baseup;                       
+	u_int64_t               lr_lastrcvd;                                 
+	u_int32_t               lr_basereachable;                    
+	u_int32_t               lr_reachable;                       
 	struct lr_key_s {
-		u_int16_t       proto;          /* ll proto */
-		u_int8_t        addr[IF_LLREACH_MAXLEN]; /* ll addr */
+		u_int16_t       proto;                        
+		u_int8_t        addr[IF_LLREACH_MAXLEN];              
 	} lr_key;
-	int32_t                 lr_rssi;        /* received signal strength */
-	int32_t                 lr_lqm;         /* link quality metric */
-	int32_t                 lr_npm;         /* node proximity metric */
+	int32_t                 lr_rssi;                                      
+	int32_t                 lr_lqm;                                  
+	int32_t                 lr_npm;                                    
 };
 
 RB_PROTOTYPE_SC_PREV(__private_extern__, ll_reach_tree, if_llreach,
@@ -123,7 +123,7 @@ RB_PROTOTYPE_SC_PREV(__private_extern__, ll_reach_tree, if_llreach,
 #define IFLR_REMREF(_iflr)                                              \
 	iflr_remref(_iflr)
 
-struct ifnet_llreach_info;      /* forward declaration */
+struct ifnet_llreach_info;                               
 
 extern void ifnet_llreach_ifattach(struct ifnet *, boolean_t);
 extern void ifnet_llreach_ifdetach(struct ifnet *);
@@ -143,10 +143,10 @@ extern void ifnet_lr2iflri(struct if_llreach *, struct ifnet_llreach_info *);
 extern void ifnet_lr2lri(struct if_llreach *, struct if_llreach_info *);
 extern void iflr_addref(struct if_llreach *, int);
 extern void iflr_remref(struct if_llreach *);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef  __cplusplus
 }
 #endif
-#endif /* PRIVATE */
-#endif /* !_NET_IF_LLREACH_H_ */
+#endif              
+#endif                          

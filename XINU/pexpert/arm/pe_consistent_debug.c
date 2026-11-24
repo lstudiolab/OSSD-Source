@@ -45,7 +45,7 @@ consistent_debug_allocate_entry(void)
 	for (i = 0; i < consistent_debug_registry->top_level_header.num_records; i++) {
 		dbg_record_header_t *record = &consistent_debug_registry->records[i];
 		if (OSCompareAndSwap64(kDbgIdUnusedEntry, kDbgIdReservedEntry, &record->record_id)) {
-			// Reserved an entry at position i.
+			                                   
 			return (dbg_record_header_t*)record;
 		}
 	}
@@ -99,7 +99,7 @@ PE_consistent_debug_register(uint64_t record_id, uint64_t physaddr, uint64_t len
 	}
 	allocated_header->length = length;
 	allocated_header->physaddr = physaddr;
-	// Make sure the hdr/length are visible before the record_id.
+	                                                             
 	__asm__ volatile ("dmb ish" : : : "memory");
 	allocated_header->record_id = record_id;
 	return 0;

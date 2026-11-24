@@ -29,7 +29,7 @@
 #ifndef __ARM_MCONTEXT_H_
 #define __ARM_MCONTEXT_H_
 
-#include <sys/cdefs.h> /* __DARWIN_UNIX03 */
+#include <sys/cdefs.h>                      
 #include <sys/appleapiopts.h>
 #include <mach/machine/_structs.h>
 
@@ -43,7 +43,7 @@ _STRUCT_MCONTEXT32
 	_STRUCT_ARM_VFP_STATE           __fs;
 };
 
-#else /* !__DARWIN_UNIX03 */
+#else                       
 #define _STRUCT_MCONTEXT32        struct mcontext32
 _STRUCT_MCONTEXT32
 {
@@ -52,8 +52,8 @@ _STRUCT_MCONTEXT32
 	_STRUCT_ARM_VFP_STATE           fs;
 };
 
-#endif /* __DARWIN_UNIX03 */
-#endif /* _STRUCT_MCONTEXT32 */
+#endif                      
+#endif                         
 
 
 #ifndef _STRUCT_MCONTEXT64
@@ -66,7 +66,7 @@ _STRUCT_MCONTEXT64
 	_STRUCT_ARM_NEON_STATE64        __ns;
 };
 
-#else /* !__DARWIN_UNIX03 */
+#else                       
 #define _STRUCT_MCONTEXT64      struct mcontext64
 _STRUCT_MCONTEXT64
 {
@@ -74,8 +74,8 @@ _STRUCT_MCONTEXT64
 	_STRUCT_ARM_THREAD_STATE64      ss;
 	_STRUCT_ARM_NEON_STATE64        ns;
 };
-#endif /* __DARWIN_UNIX03 */
-#endif /* _STRUCT_MCONTEXT32 */
+#endif                      
+#endif                         
 
 #ifndef _MCONTEXT_T
 #define _MCONTEXT_T
@@ -86,6 +86,6 @@ typedef _STRUCT_MCONTEXT64      *mcontext_t;
 typedef _STRUCT_MCONTEXT32      *mcontext_t;
 #define _STRUCT_MCONTEXT        _STRUCT_MCONTEXT32
 #endif
-#endif /* _MCONTEXT_T */
+#endif                  
 
-#endif /* __ARM_MCONTEXT_H_ */
+#endif                        

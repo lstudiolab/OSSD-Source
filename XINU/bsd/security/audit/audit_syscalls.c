@@ -25,12 +25,12 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/*
- * NOTICE: This file was modified by McAfee Research in 2004 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                         
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/fcntl.h>
@@ -92,10 +92,10 @@
 #define IS_NOT_VALID_PID(p)     ((p) < 1 || (p) > PID_MAX)
 
 #ifdef AUDIT_API_WARNINGS
-/*
- * Macro to warn about auditinfo_addr_t/auditpinfo_addr_t changing sizes
- * to encourage the userland code to be recompiled and updated.
- */
+  
+                                                                        
+                                                               
+   
 #define WARN_IF_AINFO_ADDR_CHANGED(sz1, sz2, scall, tp) do {            \
 	if ((size_t)(sz1) != (size_t)(sz2)) {                           \
 	        char pn[MAXCOMLEN + 1];                                 \
@@ -107,10 +107,10 @@
 	}                                                               \
 } while (0)
 
-/*
- * Macro to warn about using ASID's outside the range [1 to PID_MAX] to
- * encourage userland code changes.
- */
+  
+                                                                       
+                                   
+   
 #define WARN_IF_BAD_ASID(asid, scall) do {                              \
 	if (((asid) < 1 || (asid) > PID_MAX) &&                         \
 	     (asid) != AU_ASSIGN_ASID) {                                \
@@ -124,7 +124,7 @@
 	}                                                               \
 } while (0)
 
-#else /* ! AUDIT_API_WARNINGS */
+#else                           
 
 #define WARN_IF_AINFO_ADDR_CHANGED(sz1, sz2, scall, tp) do {            \
 } while (0)
@@ -132,18 +132,18 @@
 #define WARN_IF_BAD_ASID(asid, scall) do {                              \
 } while (0)
 
-#endif /* AUDIT_API_WARNINGS */
+#endif                         
 
-/*
- * System call to allow a user space application to submit a BSM audit record
- * to the kernel for inclusion in the audit log.  This function does little
- * verification on the audit record that is submitted.
- *
- * XXXAUDIT: Audit preselection for user records does not currently work,
- * since we pre-select only based on the AUE_audit event type, not the event
- * type submitted as part of the user audit data.
- */
-/* ARGSUSED */
+  
+                                                                             
+                                                                           
+                                                      
+  
+                                                                         
+                                                                            
+                                                 
+   
+              
 int
 audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 {
@@ -173,10 +173,10 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 
 	error = suser(kauth_cred_get(), &p->p_acflag);
 	if (error) {
-		/*
-		 * If a process is not running as root but is properly
-		 * entitled, allow it to audit non-kernel events only.
-		 */
+		  
+                                                        
+                                                        
+     
 		if (!IOTaskHasEntitlement(current_task(),
 		    AU_AUDIT_USER_ENTITLEMENT)) {
 			goto free_out;
@@ -191,13 +191,13 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 
 	if (IOTaskHasEntitlement(current_task(),
 	    AU_CLASS_RESERVED_ENTITLEMENT)) {
-		/* Entitled tasks are trusted to add appropriate identity info */
+		                                                                 
 		add_identity_token = 0;
 	} else {
-		/*
-		 * If the caller is unentitled, an identity token will be added and
-		 * the space must be accounted for
-		 */
+		  
+                                                                     
+                                    
+     
 		max_record_length -= MAX_AUDIT_IDENTITY_SIZE;
 	}
 
@@ -208,23 +208,23 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 
 	ar = currecord();
 
-	/*
-	 * If there's no current audit record (audit() itself not audited)
-	 * commit the user audit record.
-	 */
+	  
+                                                                   
+                                 
+    
 	if (ar == NULL) {
 		uthr = curthread();
 		if (uthr == NULL) {
-			/* can this happen? */
+			                      
 			error = ENOTSUP;
 			goto free_out;
 		}
 
-		/*
-		 * This is not very efficient; we're required to allocate a
-		 * complete kernel audit record just so the user record can
-		 * tag along.
-		 */
+		  
+                                                             
+                                                             
+               
+     
 		uthr->uu_ar = audit_new(AUE_NULL, p, uthr);
 		if (uthr->uu_ar == NULL) {
 			error = ENOTSUP;
@@ -251,7 +251,7 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 	}
 #endif
 
-	/* Verify the record. */
+	                        
 	if (bsm_rec_verify(rec, uap->length, kern_events_allowed) == 0) {
 		error = EINVAL;
 		goto free_out;
@@ -262,7 +262,7 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 		struct trl_tok_partial *trl;
 		int bytes_copied = 0;
 
-		/* Create a new identity token for this buffer */
+		                                                 
 		audit_identity_info_construct(&id_info);
 		id_tok = au_to_identity(id_info.signer_type, id_info.signing_id,
 		    id_info.signing_id_trunc, id_info.team_id, id_info.team_id_trunc,
@@ -272,7 +272,7 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 			goto free_out;
 		}
 
-		/* Splice the record together using a new buffer */
+		                                                   
 		full_rec = malloc(uap->length + id_tok->len, M_AUDITDATA, M_WAITOK);
 		if (!full_rec) {
 			error = ENOMEM;
@@ -282,24 +282,24 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 		signing_id = id_info.signing_id;
 		signer_type = id_info.signer_type;
 
-		/* Copy the original buffer up to but not including the trailer */
+		                                                                  
 		memcpy(full_rec, rec, uap->length - AUDIT_TRAILER_SIZE);
 		bytes_copied = uap->length - AUDIT_TRAILER_SIZE;
 
-		/* Copy the identity token */
+		                             
 		memcpy(full_rec + bytes_copied, id_tok->t_data, id_tok->len);
 		bytes_copied += id_tok->len;
 
-		/* Copy the old trailer */
+		                          
 		memcpy(full_rec + bytes_copied,
 		    rec + (uap->length - AUDIT_TRAILER_SIZE), AUDIT_TRAILER_SIZE);
 		bytes_copied += AUDIT_TRAILER_SIZE;
 
-		/* Fix the record size stored in the header token */
+		                                                    
 		hdr = (struct hdr_tok_partial*)full_rec;
 		hdr->len = htonl(bytes_copied);
 
-		/* Fix the record size stored in the trailer token */
+		                                                     
 		trl = (struct trl_tok_partial*)
 		    (full_rec + bytes_copied - AUDIT_TRAILER_SIZE);
 		trl->len = htonl(bytes_copied);
@@ -311,43 +311,43 @@ audit(proc_t p, struct audit_args *uap, __unused int32_t *retval)
 		ulen = uap->length;
 	}
 
-	/*
-	 * Attach the user audit record to the kernel audit record.  Because
-	 * this system call is an auditable event, we will write the user
-	 * record along with the record for this audit event.
-	 *
-	 * XXXAUDIT: KASSERT appropriate starting values of k_udata, k_ulen,
-	 * k_ar_commit & AR_COMMIT_USER?
-	 */
+	  
+                                                                     
+                                                                  
+                                                      
+   
+                                                                     
+                                 
+    
 	ar->k_udata = udata;
 	ar->k_ulen  = ulen;
 	ar->k_ar_commit |= AR_COMMIT_USER;
 
-	/*
-	 * Currently we assume that all preselection has been performed in
-	 * userspace.  We unconditionally set these masks so that the records
-	 * get committed both to the trail and pipe.  In the future we will
-	 * want to setup kernel based preselection.
-	 */
+	  
+                                                                   
+                                                                      
+                                                                    
+                                            
+    
 	ar->k_ar_commit |= (AR_PRESELECT_USER_TRAIL | AR_PRESELECT_USER_PIPE);
 
-	// Send data for analytics for non-platform binaries only
+	                                                         
 	if (signer_type == 0 && add_identity_token) {
 		proc_name(proc_pid(p), process_name, sizeof(process_name));
 		(void)audit_send_analytics(signing_id, process_name);
 	}
 
 free_out:
-	/*
-	 * If rec was allocated, it must be freed if an identity token was added
-	 * (since full_rec will be used) OR there was an error (since nothing
-	 * will be attached to the kernel structure).
-	 */
+	  
+                                                                         
+                                                                      
+                                              
+    
 	if (rec && (add_identity_token || error)) {
 		free(rec, M_AUDITDATA);
 	}
 
-	/* Only free full_rec if an error occurred */
+	                                             
 	if (full_rec && error) {
 		free(full_rec, M_AUDITDATA);
 	}
@@ -363,10 +363,10 @@ free_out:
 	return error;
 }
 
-/*
- *  System call to manipulate auditing.
- */
-/* ARGSUSED */
+  
+                                       
+   
+              
 int
 auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 {
@@ -392,9 +392,9 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 
 	memset((void *)&udata, 0, sizeof(udata));
 
-	/*
-	 * Some of the GET commands use the arguments too.
-	 */
+	  
+                                                   
+    
 	switch (uap->cmd) {
 	case A_SETPOLICY:
 	case A_OLDSETPOLICY:
@@ -428,12 +428,12 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		break;
 	}
 
-	/* Check appropriate privilege. */
+	                                  
 	switch (uap->cmd) {
-	/*
-	 * A_GETSINFO doesn't require priviledge but only superuser
-	 * gets to see the audit masks.
-	 */
+	  
+                                                            
+                                
+    
 	case A_GETSINFO_ADDR:
 		if ((sizeof(udata.au_kau_info) != uap->length) ||
 		    (audit_session_lookup(udata.au_kau_info.ai_asid,
@@ -446,10 +446,10 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		break;
 	case A_GETSFLAGS:
 	case A_SETSFLAGS:
-		/* Getting one's own audit session flags requires no
-		 * privilege.  Setting the flags is subject to access
-		 * control implemented in audit_session_setaia().
-		 */
+		                                                    
+                                                       
+                                                   
+     
 		break;
 	case A_SETCTLMODE:
 	case A_SETEXPAFTER:
@@ -466,10 +466,10 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		return error;
 	}
 
-	/*
-	 * If the audit subsytem is in external control mode, additional
-	 * privilege checks are required for a subset of auditon commands
-	 */
+	  
+                                                                 
+                                                                  
+    
 	if (audit_ctl_mode == AUDIT_CTLMODE_EXTERNAL) {
 		switch (uap->cmd) {
 		case A_SETCOND:
@@ -487,10 +487,10 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		}
 	}
 
-	/*
-	 * XXX Need to implement these commands by accessing the global
-	 * values associated with the commands.
-	 */
+	  
+                                                                
+                                        
+    
 	switch (uap->cmd) {
 	case A_OLDGETPOLICY:
 	case A_GETPOLICY:
@@ -552,9 +552,9 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		    AUDIT_ARGE))) {
 			return EINVAL;
 		}
-		/*
-		 * XXX - Need to wake up waiters if the policy relaxes?
-		 */
+		  
+                                                         
+     
 		mtx_lock(&audit_mtx);
 		audit_fail_stop = ((udata.au_policy & AUDIT_CNT) == 0);
 		audit_panic_on_write_fail = (udata.au_policy & AUDIT_AHLT);
@@ -627,7 +627,7 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 			    (int)udata.au_qctrl64.aq64_bufsz;
 			audit_qctrl.aq_minfree =
 			    (int)udata.au_qctrl64.aq64_minfree;
-			audit_qctrl.aq_delay = -1;  /* Not used. */
+			audit_qctrl.aq_delay = -1;                 
 			mtx_unlock(&audit_mtx);
 			break;
 		}
@@ -642,7 +642,7 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 
 		mtx_lock(&audit_mtx);
 		audit_qctrl = udata.au_qctrl;
-		/* XXX The queue delay value isn't used with the kernel. */
+		                                                           
 		audit_qctrl.aq_delay = -1;
 		mtx_unlock(&audit_mtx);
 		break;
@@ -876,7 +876,7 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		return audit_send_trigger(udata.au_trigger);
 
 	case A_GETSINFO_ADDR:
-		/* Handled above before switch(). */
+		                                    
 		break;
 
 	case A_GETSFLAGS:
@@ -953,9 +953,9 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 		return EINVAL;
 	}
 
-	/*
-	 * Copy data back to userspace for the GET comands.
-	 */
+	  
+                                                    
+    
 	switch (uap->cmd) {
 	case A_GETPOLICY:
 	case A_OLDGETPOLICY:
@@ -986,10 +986,10 @@ auditon(proc_t p, struct auditon_args *uap, __unused int32_t *retval)
 	return 0;
 }
 
-/*
- * System calls to manage the user audit information.
- */
-/* ARGSUSED */
+  
+                                                     
+   
+              
 int
 getauid(proc_t p, struct getauid_args *uap, __unused int32_t *retval)
 {
@@ -1015,7 +1015,7 @@ getauid(proc_t p, struct getauid_args *uap, __unused int32_t *retval)
 	return 0;
 }
 
-/* ARGSUSED */
+              
 int
 setauid(proc_t p, struct setauid_args *uap, __unused int32_t *retval)
 {
@@ -1064,9 +1064,9 @@ getaudit_addr_internal(proc_t p, user_addr_t user_addr, size_t length)
 
 	scred = kauth_cred_proc_ref(p);
 	bcopy(scred->cr_audit.as_aia_p, &aia, sizeof(auditinfo_addr_t));
-	/*
-	 * Only superuser gets to see the real mask.
-	 */
+	  
+                                             
+    
 	if (suser(scred, &p->p_acflag)) {
 		aia.ai_mask.am_success = ~0;
 		aia.ai_mask.am_failure = ~0;
@@ -1076,7 +1076,7 @@ getaudit_addr_internal(proc_t p, user_addr_t user_addr, size_t length)
 	return copyout(&aia, user_addr, min(sizeof(aia), length));
 }
 
-/* ARGSUSED */
+              
 int
 getaudit_addr(proc_t p, struct getaudit_addr_args *uap,
     __unused int32_t *retval)
@@ -1087,14 +1087,14 @@ getaudit_addr(proc_t p, struct getaudit_addr_args *uap,
 	if (error) {
 		return error;
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 	WARN_IF_AINFO_ADDR_CHANGED(uap->length, sizeof(auditinfo_addr_t),
 	    "getaudit_addr(2)", "auditinfo_addr_t");
 
 	return getaudit_addr_internal(p, uap->auditinfo_addr, uap->length);
 }
 
-/* ARGSUSED */
+              
 int
 setaudit_addr(proc_t p, struct setaudit_addr_args *uap,
     __unused int32_t *retval)
@@ -1148,10 +1148,10 @@ setaudit_addr(proc_t p, struct setaudit_addr_args *uap,
 		return error;
 	}
 
-	/*
-	 * If asked to assign an ASID then let the user know what the ASID is
-	 * by copying the auditinfo_addr struct back out.
-	 */
+	  
+                                                                      
+                                                  
+    
 	if (aia.ai_asid == AU_ASSIGN_ASID) {
 		error = getaudit_addr_internal(p, uap->auditinfo_addr,
 		    uap->length);
@@ -1160,11 +1160,11 @@ setaudit_addr(proc_t p, struct setaudit_addr_args *uap,
 	return error;
 }
 
-/*
- * Syscall to manage audit files.
- *
- */
-/* ARGSUSED */
+  
+                                 
+  
+   
+              
 int
 auditctl(proc_t p, struct auditctl_args *uap, __unused int32_t *retval)
 {
@@ -1181,9 +1181,9 @@ auditctl(proc_t p, struct auditctl_args *uap, __unused int32_t *retval)
 
 	ctlmode = audit_ctl_mode;
 
-	/*
-	 * Do not allow setting of a path when auditing is in reserved mode
-	 */
+	  
+                                                                    
+    
 	if (ctlmode == AUDIT_CTLMODE_EXTERNAL &&
 	    !IOTaskHasEntitlement(current_task(), AU_AUDITCTL_RESERVED_ENTITLEMENT)) {
 		return EPERM;
@@ -1192,14 +1192,14 @@ auditctl(proc_t p, struct auditctl_args *uap, __unused int32_t *retval)
 	vp = NULL;
 	cred = NULL;
 
-	/*
-	 * If a path is specified, open the replacement vnode, perform
-	 * validity checks, and grab another reference to the current
-	 * credential.
-	 *
-	 * XXX Changes API slightly.  NULL path no longer disables audit but
-	 * returns EINVAL.
-	 */
+	  
+                                                               
+                                                              
+               
+   
+                                                                     
+                   
+    
 	if (uap->path == USER_ADDR_NULL) {
 		return EINVAL;
 	}
@@ -1213,14 +1213,14 @@ auditctl(proc_t p, struct auditctl_args *uap, __unused int32_t *retval)
 	}
 	vp = nd.ni_vp;
 #if CONFIG_MACF
-	/*
-	 * Accessibility of the vnode was determined in vn_open; the
-	 * mac_system_check_auditctl should only determine whether that vnode
-	 * is appropriate for storing audit data, or that the caller was
-	 * permitted to control the auditing system at all.  For example, a
-	 * confidentiality policy may want to ensure that audit files are
-	 * always high sensitivity.
-	 */
+	  
+                                                             
+                                                                      
+                                                                 
+                                                                    
+                                                                  
+                            
+    
 	error = mac_system_check_auditctl(kauth_cred_get(), vp);
 	if (error) {
 		vn_close(vp, AUDIT_CLOSE_FLAGS, vfs_context_current());
@@ -1234,17 +1234,17 @@ auditctl(proc_t p, struct auditctl_args *uap, __unused int32_t *retval)
 		return EINVAL;
 	}
 	mtx_lock(&audit_mtx);
-	/*
-	 * XXXAUDIT: Should audit_suspended actually be cleared by
-	 * audit_worker?
-	 */
+	  
+                                                           
+                 
+    
 	audit_suspended = 0;
 	mtx_unlock(&audit_mtx);
 
-	/*
-	 * The following gets unreferenced in audit_rotate_vnode()
-	 * after the rotation and it is no longer needed.
-	 */
+	  
+                                                           
+                                                  
+    
 	cred = kauth_cred_get_with_ref();
 	audit_rotate_vnode(cred, vp);
 	vnode_put(vp);
@@ -1252,7 +1252,7 @@ auditctl(proc_t p, struct auditctl_args *uap, __unused int32_t *retval)
 	return error;
 }
 
-#else /* !CONFIG_AUDIT */
+#else                    
 
 int
 audit(proc_t p, struct audit_args *uap, int32_t *retval)
@@ -1310,4 +1310,4 @@ auditctl(proc_t p, struct auditctl_args *uap, int32_t *retval)
 	return ENOSYS;
 }
 
-#endif /* CONFIG_AUDIT */
+#endif                   

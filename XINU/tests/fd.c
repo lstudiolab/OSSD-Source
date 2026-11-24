@@ -16,7 +16,7 @@ fd_select_close_helper(void *ctx)
 {
 	int fd = *(int *)ctx;
 
-	// wait for the thread to enter select
+	                                      
 	usleep(500000);
 	close(fd);
 
@@ -123,7 +123,7 @@ T_DECL(confined_fileport_race, "test for rdar://69922255")
 	    "pthread_create");
 
 	for (int i = 0; i < 100 * 1000; i++) {
-		fd = open("/dev/null", O_RDONLY | 0x08000000 /* O_CLOFORK */);
+		fd = open("/dev/null", O_RDONLY | 0x08000000                );
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(fd, "open(/dev/null)");
 		if (fileport_makeport(fd, &p) == 0) {
 			T_QUIET; T_ASSERT_EQ(fcntl(fd, F_GETCONFINED), 0,

@@ -36,4 +36,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACH_MACHINE_TYPES_H */
+#endif                            

@@ -64,16 +64,16 @@
 #else
 #define DBG(x...)
 #define PAUSE
-#endif  /* MP_DEBUG */
+#endif                
 
-lapic_ops_table_t       *lapic_ops;     /* Lapic operations switch */
+lapic_ops_table_t       *lapic_ops;                                  
 
-static vm_map_offset_t  lapic_pbase;    /* Physical base memory-mapped regs */
-static vm_offset_t      lapic_vbase;    /* Virtual base memory-mapped regs */
+static vm_map_offset_t  lapic_pbase;                                          
+static vm_offset_t      lapic_vbase;                                         
 
 static i386_intr_func_t lapic_intr_func[LAPIC_FUNC_TABLE_SIZE];
 
-/* TRUE if local APIC was enabled by the OS not by the BIOS */
+                                                              
 static boolean_t lapic_os_enabled = FALSE;
 
 static boolean_t lapic_errors_masked = FALSE;
@@ -113,7 +113,7 @@ lapic_cpu_map_dump(void)
 		    i, lapic_to_cpu[i]);
 	}
 }
-#endif /* MP_DEBUG */
+#endif               
 
 static void
 map_local_apic(void)
@@ -132,21 +132,21 @@ map_local_apic(void)
 		    VM_MAP_KERNEL_FLAGS_NONE,
 		    VM_KERN_MEMORY_IOKIT,
 		    &entry);
-		/* Convert 64-bit vm_map_offset_t to "pointer sized" vm_offset_t
-		 */
+		                                                                
+     
 		lapic_vbase = (vm_offset_t) lapic_vbase64;
 		if (result != KERN_SUCCESS) {
 			panic("legacy_init: vm_map_find_entry FAILED (err=%d)", result);
 		}
 		vm_map_unlock(kernel_map);
 
-		/*
-		 * Map in the local APIC non-cacheable, as recommended by Intel
-		 * in section 8.4.1 of the "System Programming Guide".
-		 * In fact, this is redundant because EFI will have assigned an
-		 * MTRR physical range containing the local APIC's MMIO space as
-		 * UC and this will override the default PAT setting.
-		 */
+		  
+                                                                 
+                                                        
+                                                                 
+                                                                  
+                                                       
+     
 		kr = pmap_enter(pmap_kernel(),
 		    lapic_vbase,
 		    (ppnum_t) i386_btop(lapic_pbase),
@@ -166,18 +166,18 @@ legacy_init(void)
 
 	rdmsr(MSR_IA32_APIC_BASE, lo, hi);
 	if ((lo & MSR_IA32_APIC_BASE_EXTENDED) != 0) {
-		/*
-		 * If we're already in x2APIC mode, we MUST disable the local APIC
-		 * before transitioning back to legacy APIC mode.
-		 */
+		  
+                                                                    
+                                                   
+     
 		lo &= ~(MSR_IA32_APIC_BASE_ENABLE | MSR_IA32_APIC_BASE_EXTENDED);
 		wrmsr64(MSR_IA32_APIC_BASE, ((uint64_t)hi) << 32 | lo);
 		wrmsr64(MSR_IA32_APIC_BASE, ((uint64_t)hi) << 32 | lo | MSR_IA32_APIC_BASE_ENABLE);
 	}
-	/*
-	 * Set flat delivery model, logical processor id
-	 * This should already be the default set.
-	 */
+	  
+                                                 
+                                           
+    
 	LAPIC_WRITE(DFR, LAPIC_DFR_FLAT);
 	LAPIC_WRITE(LDR, (get_cpu_number()) << LAPIC_LDR_SHIFT);
 }
@@ -268,10 +268,10 @@ static lapic_ops_table_t x2apic_ops = {
 	x2apic_write_icr
 };
 
-/*
- * Used by APs to determine their APIC IDs; assumes master CPU has initialized
- * the local APIC interfaces.
- */
+  
+                                                                              
+                             
+   
 uint32_t
 lapic_safe_apicid(void)
 {
@@ -289,7 +289,7 @@ lapic_safe_apicid(void)
 		return (*LAPIC_MMIO(ID) >> LAPIC_ID_SHIFT) & LAPIC_ID_MASK;
 	} else {
 		panic("Unknown Local APIC state!");
-		/*NORETURN*/
+		            
 	}
 }
 
@@ -307,14 +307,14 @@ lapic_reinit(bool for_wake)
 	is_lapic_enabled  = (lo & MSR_IA32_APIC_BASE_ENABLE) != 0;
 	is_local_x2apic   = (lo & MSR_IA32_APIC_BASE_EXTENDED) != 0;
 
-	/*
-	 * If we're configured for x2apic mode and we're being asked to transition
-	 * to legacy APIC mode, OR if we're in legacy APIC mode and we're being
-	 * asked to transition to x2apic mode, call LAPIC_INIT().
-	 */
+	  
+                                                                           
+                                                                        
+                                                          
+    
 	if ((!is_local_x2apic && is_x2apic) || (is_local_x2apic && !is_x2apic)) {
 		LAPIC_INIT();
-		/* Now re-read after LAPIC_INIT() */
+		                                    
 		rdmsr(MSR_IA32_APIC_BASE, lo, hi);
 		is_lapic_enabled  = (lo & MSR_IA32_APIC_BASE_ENABLE) != 0;
 		is_local_x2apic   = (lo & MSR_IA32_APIC_BASE_EXTENDED) != 0;
@@ -324,13 +324,13 @@ lapic_reinit(bool for_wake)
 		panic("Unexpected local APIC state\n");
 	}
 
-	/*
-	 * If we did not select the same APIC mode as we had before sleep, flag
-	 * that as an error (and panic on debug/development kernels).  Note that
-	 * we might get here with for_wake == true for the first boot case.  In
-	 * that case, apic_mode_before_sleep will be UNKNOWN (since we haven't
-	 * slept yet), so we do not need to do any APIC checks.
-	 */
+	  
+                                                                        
+                                                                         
+                                                                        
+                                                                       
+                                                        
+    
 	if (for_wake &&
 	    ((apic_mode_before_sleep == APIC_MODE_XAPIC && !is_lapic_enabled) ||
 	    (apic_mode_before_sleep == APIC_MODE_X2APIC && !is_local_x2apic))) {
@@ -339,12 +339,12 @@ lapic_reinit(bool for_wake)
 		    is_lapic_enabled ? APIC_MODE_XAPIC : APIC_MODE_X2APIC);
 #if DEBUG || DEVELOPMENT
 		kprintf("HALTING.\n");
-		/*
-		 * Unfortunately, we cannot safely panic here because the
-		 * executing CPU might not be fully initialized.  The best
-		 * we can do is just print a message to the console and
-		 * halt.
-		 */
+		  
+                                                           
+                                                            
+                                                         
+          
+     
 		asm volatile ("cli; hlt;" ::: "memory");
 #endif
 	}
@@ -369,7 +369,7 @@ lapic_init(void)
 	boolean_t       is_boot_processor;
 	boolean_t       is_lapic_enabled;
 
-	/* Examine the local APIC state */
+	                                  
 	rdmsr(MSR_IA32_APIC_BASE, lo, hi);
 	is_boot_processor = (lo & MSR_IA32_APIC_BASE_BSP) != 0;
 	is_lapic_enabled  = (lo & MSR_IA32_APIC_BASE_ENABLE) != 0;
@@ -383,15 +383,15 @@ lapic_init(void)
 		panic("Unexpected local APIC state\n");
 	}
 
-	/*
-	 * If x2APIC is available and not already enabled, enable it.
-	 * Unless overriden by boot-arg.
-	 */
+	  
+                                                              
+                                 
+    
 	if (!is_x2apic && (cpuid_features() & CPUID_FEATURE_x2APIC)) {
-		/*
-		 * If no x2apic boot-arg was set and if we're running under a VMM,
-		 * autoenable x2APIC mode.
-		 */
+		  
+                                                                    
+                            
+     
 		if (PE_parse_boot_argn("x2apic", &is_x2apic, sizeof(is_x2apic)) == FALSE &&
 		    cpuid_vmm_info()->cpuid_vmm_family != CPUID_VMM_FAMILY_NONE) {
 			is_x2apic = TRUE;
@@ -403,10 +403,10 @@ lapic_init(void)
 	lapic_ops = is_x2apic ? &x2apic_ops : &legacy_ops;
 
 	if (lapic_pbase != 0) {
-		/*
-		 * APs might need to consult the local APIC via the MMIO interface
-		 * to get their APIC IDs.
-		 */
+		  
+                                                                    
+                           
+     
 		map_local_apic();
 	} else if (!is_x2apic) {
 		panic("Local APIC physical address was not set.");
@@ -420,7 +420,7 @@ lapic_init(void)
 		    (LAPIC_READ(VERSION) & LAPIC_VERSION_MASK));
 	}
 
-	/* Set up the lapic_id <-> cpu_number map and add this boot processor */
+	                                                                        
 	lapic_cpu_map_init();
 	lapic_cpu_map(lapic_safe_apicid(), 0);
 	current_cpu_datap()->cpu_phys_number = cpu_to_lapic[0];
@@ -431,7 +431,7 @@ lapic_init(void)
 static int
 lapic_esr_read(void)
 {
-	/* write-read register */
+	                         
 	LAPIC_WRITE(ERROR_STATUS, 0);
 	return LAPIC_READ(ERROR_STATUS);
 }
@@ -575,25 +575,25 @@ lapic_probe(void)
 	}
 
 	if (cpuid_family() == 6 || cpuid_family() == 15) {
-		/*
-		 * Mobile Pentiums:
-		 * There may be a local APIC which wasn't enabled by BIOS.
-		 * So we try to enable it explicitly.
-		 */
+		  
+                     
+                                                            
+                                       
+     
 		rdmsr(MSR_IA32_APIC_BASE, lo, hi);
 		lo &= ~MSR_IA32_APIC_BASE_BASE;
 		lo |= MSR_IA32_APIC_BASE_ENABLE | LAPIC_START;
 		lo |= MSR_IA32_APIC_BASE_ENABLE;
 		wrmsr(MSR_IA32_APIC_BASE, lo, hi);
 
-		/*
-		 * Re-initialize cpu features info and re-check.
-		 */
+		  
+                                                  
+     
 		cpuid_set_info();
-		/* We expect this codepath will never be traversed
-		 * due to EFI enabling the APIC. Reducing the APIC
-		 * interrupt base dynamically is not supported.
-		 */
+		                                                  
+                                                    
+                                                 
+     
 		if (cpuid_features() & CPUID_FEATURE_APIC) {
 			printf("Local APIC discovered and enabled\n");
 			lapic_os_enabled = TRUE;
@@ -616,33 +616,33 @@ lapic_shutdown(bool for_sleep)
 		apic_mode_before_sleep = (is_x2apic ? APIC_MODE_X2APIC : APIC_MODE_XAPIC);
 	}
 
-	/* Shutdown if local APIC was enabled by OS */
+	                                              
 	if (lapic_os_enabled == FALSE) {
 		return;
 	}
 
 	mp_disable_preemption();
 
-	/* ExtINT: masked */
+	                    
 	if (get_cpu_number() <= lapic_max_interrupt_cpunum) {
 		value = LAPIC_READ(LVT_LINT0);
 		value |= LAPIC_LVT_MASKED;
 		LAPIC_WRITE(LVT_LINT0, value);
 	}
 
-	/* Error: masked */
+	                   
 	LAPIC_WRITE(LVT_ERROR, LAPIC_READ(LVT_ERROR) | LAPIC_LVT_MASKED);
 
-	/* Timer: masked */
+	                   
 	LAPIC_WRITE(LVT_TIMER, LAPIC_READ(LVT_TIMER) | LAPIC_LVT_MASKED);
 
-	/* Perfmon: masked */
+	                     
 	LAPIC_WRITE(LVT_PERFCNT, LAPIC_READ(LVT_PERFCNT) | LAPIC_LVT_MASKED);
 
-	/* APIC software disabled */
+	                            
 	LAPIC_WRITE(SVR, LAPIC_READ(SVR) & ~LAPIC_SVR_ENABLE);
 
-	/* Bypass the APIC completely and update cpu features */
+	                                                        
 	rdmsr(MSR_IA32_APIC_BASE, lo, hi);
 	lo &= ~MSR_IA32_APIC_BASE_ENABLE;
 	wrmsr(MSR_IA32_APIC_BASE, lo, hi);
@@ -675,18 +675,18 @@ lapic_configure(bool for_wake)
 		}
 	}
 
-	/*
-	 * Reinitialize the APIC (handles the case where we're configured to use the X2APIC
-	 * but firmware configured the Legacy APIC):
-	 */
+	  
+                                                                                    
+                                             
+    
 	lapic_reinit(for_wake);
 
-	/* Accept all */
+	                
 	LAPIC_WRITE(TPR, 0);
 
 	LAPIC_WRITE(SVR, LAPIC_VECTOR(SPURIOUS) | LAPIC_SVR_ENABLE);
 
-	/* ExtINT */
+	            
 	if (get_cpu_number() <= lapic_max_interrupt_cpunum) {
 		value = LAPIC_READ(LVT_LINT0);
 		value &= ~LAPIC_LVT_MASKED;
@@ -694,17 +694,17 @@ lapic_configure(bool for_wake)
 		LAPIC_WRITE(LVT_LINT0, value);
 	}
 
-	/* Timer: unmasked, one-shot */
+	                               
 	LAPIC_WRITE(LVT_TIMER, LAPIC_VECTOR(TIMER));
 
-	/* Perfmon: unmasked */
+	                       
 	LAPIC_WRITE(LVT_PERFCNT, LAPIC_VECTOR(PERFCNT));
 
-	/* Thermal: unmasked */
+	                       
 	LAPIC_WRITE(LVT_THERMAL, LAPIC_VECTOR(THERMAL));
 
 #if CONFIG_MCA
-	/* CMCI, if available */
+	                        
 	if (mca_is_cmci_present()) {
 		LAPIC_WRITE(LVT_CMCI, LAPIC_VECTOR(CMCI));
 	}
@@ -757,9 +757,9 @@ lapic_config_timer(
 	mp_enable_preemption();
 }
 
-/*
- * Configure TSC-deadline timer mode. The lapic interrupt is always unmasked.
- */
+  
+                                                                             
+   
 void
 lapic_config_tsc_deadline_timer(void)
 {
@@ -773,7 +773,7 @@ lapic_config_tsc_deadline_timer(void)
 	timer_vector |= LAPIC_LVT_TSC_DEADLINE;
 	LAPIC_WRITE(LVT_TIMER, timer_vector);
 
-	/* Serialize writes per Intel OSWG */
+	                                     
 	do {
 		lapic_set_tsc_deadline_timer(rdtsc64() + (1ULL << 32));
 	} while (lapic_get_tsc_deadline_timer() == 0);
@@ -794,7 +794,7 @@ lapic_set_timer_fast(
 void
 lapic_set_tsc_deadline_timer(uint64_t deadline)
 {
-	/* Don't bother disarming: wrmsr64(MSR_IA32_TSC_DEADLINE, 0); */
+	                                                                
 	wrmsr64(MSR_IA32_TSC_DEADLINE, deadline);
 }
 
@@ -911,14 +911,14 @@ lapic_interrupt(int interrupt_num, x86_saved_state_t *state)
 		retval = 1;
 		break;
 	case LAPIC_PERFCNT_INTERRUPT:
-		/* If a function has been registered, invoke it.  Otherwise,
-		 * pass up to IOKit.
-		 */
+		                                                            
+                      
+     
 		if (lapic_intr_func[interrupt_num] != NULL) {
 			(void) (*lapic_intr_func[interrupt_num])(state);
-			/* Unmask the interrupt since we don't expect legacy users
-			 * to be responsible for it.
-			 */
+			                                                          
+                               
+      
 			lapic_unmask_perfcnt_interrupt();
 			_lapic_end_of_interrupt();
 			retval = 1;
@@ -928,27 +928,27 @@ lapic_interrupt(int interrupt_num, x86_saved_state_t *state)
 		if (lapic_intr_func[interrupt_num] != NULL) {
 			(void) (*lapic_intr_func[interrupt_num])(state);
 		}
-		/* return 0 for plaform expert to handle */
+		                                           
 		break;
 	case LAPIC_ERROR_INTERRUPT:
-		/* We treat error interrupts on APs as fatal.
-		 * The current interrupt steering scheme directs most
-		 * external interrupts to the BSP (HPET interrupts being
-		 * a notable exception); hence, such an error
-		 * on an AP may signify LVT corruption (with "may" being
-		 * the operative word). On the BSP, we adopt a more
-		 * lenient approach, in the interests of enhancing
-		 * debuggability and reducing fragility.
-		 * If "lapic_error_count_threshold" error interrupts
-		 * occur within "lapic_error_time_threshold" absolute
-		 * time units, we mask the error vector and log. The
-		 * error interrupts themselves are likely
-		 * side effects of issues which are beyond the purview of
-		 * the local APIC interrupt handler, however. The Error
-		 * Status Register value (the illegal destination
-		 * vector code is one observed in practice) indicates
-		 * the immediate cause of the error.
-		 */
+		                                             
+                                                       
+                                                          
+                                               
+                                                          
+                                                     
+                                                    
+                                          
+                                                      
+                                                       
+                                                      
+                                           
+                                                           
+                                                         
+                                                   
+                                                       
+                                      
+     
 		esr = lapic_esr_read();
 		lapic_dump();
 
@@ -977,7 +977,7 @@ lapic_interrupt(int interrupt_num, x86_saved_state_t *state)
 		break;
 	case LAPIC_SPURIOUS_INTERRUPT:
 		kprintf("SPIV\n");
-		/* No EOI required here */
+		                          
 		retval = 1;
 		break;
 	case LAPIC_PMC_SW_INTERRUPT:
@@ -1005,18 +1005,18 @@ lapic_smm_restore(void)
 	state = ml_set_interrupts_enabled(FALSE);
 
 	if (LAPIC_ISR_IS_SET(LAPIC_REDUCED_INTERRUPT_BASE, TIMER)) {
-		/*
-		 * Bogus SMI handler enables interrupts but does not know about
-		 * local APIC interrupt sources. When APIC timer counts down to
-		 * zero while in SMM, local APIC will end up waiting for an EOI
-		 * but no interrupt was delivered to the OS.
-		 */
+		  
+                                                                 
+                                                                 
+                                                                 
+                                              
+     
 		_lapic_end_of_interrupt();
 
-		/*
-		 * timer is one-shot, trigger another quick countdown to trigger
-		 * another timer interrupt.
-		 */
+		  
+                                                                  
+                             
+     
 		if (LAPIC_READ(TIMER_CURRENT_COUNT) == 0) {
 			LAPIC_WRITE(TIMER_INITIAL_COUNT, 1);
 		}
@@ -1038,9 +1038,9 @@ lapic_send_ipi(int cpu, int vector)
 
 	state = ml_set_interrupts_enabled(FALSE);
 
-	/* X2APIC's ICR doesn't have a pending bit. */
+	                                              
 	if (!is_x2apic) {
-		/* Wait for pending outgoing send to complete */
+		                                                
 		while (LAPIC_READ_ICR() & LAPIC_ICR_DS_PENDING) {
 			cpu_pause();
 		}
@@ -1051,9 +1051,9 @@ lapic_send_ipi(int cpu, int vector)
 	(void) ml_set_interrupts_enabled(state);
 }
 
-/*
- * The following interfaces are privately exported to AICPM.
- */
+  
+                                                            
+   
 
 boolean_t
 lapic_is_interrupt_pending(void)
@@ -1126,11 +1126,11 @@ lapic_disable_timer(void)
 {
 	uint32_t        lvt_timer;
 
-	/*
-	 * If we're in deadline timer mode,
-	 * simply clear the deadline timer, otherwise
-	 * mask the timer interrupt and clear the countdown.
-	 */
+	  
+                                    
+                                              
+                                                     
+    
 	lvt_timer = LAPIC_READ(LVT_TIMER);
 	if (lvt_timer & LAPIC_LVT_TSC_DEADLINE) {
 		wrmsr64(MSR_IA32_TSC_DEADLINE, 0);
@@ -1141,13 +1141,13 @@ lapic_disable_timer(void)
 	}
 }
 
-/* SPI returning the CMCI vector */
+                                   
 uint8_t
 lapic_get_cmci_vector(void)
 {
 	uint8_t cmci_vector = 0;
 #if CONFIG_MCA
-	/* CMCI, if available */
+	                        
 	if (mca_is_cmci_present()) {
 		cmci_vector = LAPIC_VECTOR(CMCI);
 	}
@@ -1160,7 +1160,7 @@ extern void lapic_trigger_MC(void);
 void
 lapic_trigger_MC(void)
 {
-	/* A 64-bit access to any register will do it. */
+	                                                 
 	volatile uint64_t dummy = *(volatile uint64_t *) (volatile void *) LAPIC_MMIO(ID);
 	dummy++;
 }

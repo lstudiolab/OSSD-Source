@@ -38,4 +38,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_LOWGLOBALS_H */
+#endif                            

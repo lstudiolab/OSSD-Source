@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	priority.c
- *	Author:	Avadis Tevanian, Jr.
- *	Date:	1986
- *
- *	Priority related scheduler bits.
- */
+  
+   
+  
+                   
+                               
+             
+  
+                                   
+   
 
 #include <mach/boolean.h>
 #include <mach/kern_return.h>
@@ -80,20 +80,20 @@
 #include <kern/sched_clutch.h>
 
 #ifdef CONFIG_MACH_APPROXIMATE_TIME
-#include <machine/commpage.h>  /* for commpage_update_mach_approximate_time */
+#include <machine/commpage.h>                                                 
 #endif
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
-/*
- *	thread_quantum_expire:
- *
- *	Recalculate the quantum and priority for a thread.
- *
- *	Called at splsched.
- */
+  
+                         
+  
+                                                     
+  
+                      
+   
 
 void
 thread_quantum_expire(
@@ -112,18 +112,18 @@ thread_quantum_expire(
 
 	SCHED_STATS_INC(quantum_timer_expirations);
 
-	/*
-	 * We bill CPU time to both the individual thread and its task.
-	 *
-	 * Because this balance adjustment could potentially attempt to wake this
-	 * very thread, we must credit the ledger before taking the thread lock.
-	 * The ledger pointers are only manipulated by the thread itself at the ast
-	 * boundary.
-	 *
-	 * TODO: This fails to account for the time between when the timer was
-	 * armed and when it fired.  It should be based on the system_timer and
-	 * running a timer_update operation here.
-	 */
+	  
+                                                                
+   
+                                                                          
+                                                                         
+                                                                            
+             
+   
+                                                                       
+                                                                        
+                                          
+    
 	ledger_credit(thread->t_ledger, task_ledgers.cpu_time, thread->quantum_remaining);
 	ledger_credit(thread->t_threadledger, thread_ledgers.cpu_time, thread->quantum_remaining);
 	if (thread->t_bankledger) {
@@ -140,20 +140,20 @@ thread_quantum_expire(
 
 #if MONOTONIC
 	mt_sched_update(thread);
-#endif /* MONOTONIC */
+#endif                
 
 	thread_lock(thread);
 
-	/*
-	 * We've run up until our quantum expiration, and will (potentially)
-	 * continue without re-entering the scheduler, so update this now.
-	 */
+	  
+                                                                     
+                                                                   
+    
 	processor->last_dispatch = ctime;
 	thread->last_run_time = ctime;
 
-	/*
-	 *	Check for fail-safe trip.
-	 */
+	  
+                             
+    
 	if ((thread->sched_mode == TH_MODE_REALTIME || thread->sched_mode == TH_MODE_FIXED) &&
 	    !(thread->sched_flags & TH_SFLAG_PROMOTED) &&
 	    !(thread->kern_promotion_schedpri != 0) &&
@@ -173,9 +173,9 @@ thread_quantum_expire(
 		}
 	}
 
-	/*
-	 *	Recompute scheduled priority if appropriate.
-	 */
+	  
+                                                
+    
 	if (SCHED(can_update_priority)(thread)) {
 		SCHED(update_priority)(thread);
 	} else {
@@ -186,20 +186,20 @@ thread_quantum_expire(
 		SCHED(quantum_expire)(thread);
 	}
 
-	/*
-	 *	This quantum is up, give this thread another.
-	 */
+	  
+                                                 
+    
 	processor->first_timeslice = FALSE;
 
 	thread_quantum_init(thread);
 
-	/* Reload precise timing global policy to thread-local policy */
+	                                                                
 	thread->precise_user_kernel_time = use_precise_user_kernel_time(thread);
 
-	/*
-	 * Since non-precise user/kernel time doesn't update the state/thread timer
-	 * during privilege transitions, synthesize an event now.
-	 */
+	  
+                                                                            
+                                                          
+    
 	if (!thread->precise_user_kernel_time) {
 		timer_update(processor->current_state, ctime);
 		timer_update(processor->thread_timer, ctime);
@@ -209,12 +209,12 @@ thread_quantum_expire(
 
 	processor->quantum_end = ctime + thread->quantum_remaining;
 
-	/*
-	 * Context switch check
-	 *
-	 * non-urgent flags don't affect kernel threads, so upgrade to urgent
-	 * to ensure that rebalancing and non-recommendation kick in quickly.
-	 */
+	  
+                        
+   
+                                                                      
+                                                                      
+    
 
 	ast_t check_reason = AST_QUANTUM;
 	if (thread->task == kernel_task) {
@@ -225,18 +225,18 @@ thread_quantum_expire(
 		ast_on(preempt);
 	}
 
-	/*
-	 * AST_KEVENT does not send an IPI when setting the AST,
-	 * to avoid waiting for the next context switch to propagate the AST,
-	 * the AST is propagated here at quantum expiration.
-	 */
+	  
+                                                         
+                                                                      
+                                                     
+    
 	ast_propagate(thread);
 
 	thread_unlock(thread);
 	running_timer_enter(processor, RUNNING_TIMER_QUANTUM, thread,
 	    processor->quantum_end, ctime);
 
-	/* Tell platform layer that we are still running this thread */
+	                                                               
 	thread_urgency_t urgency = thread_get_urgency(thread, NULL, NULL);
 	machine_thread_going_on_core(thread, urgency, 0, 0, ctime);
 	machine_switch_perfcontrol_state_update(QUANTUM_EXPIRY, ctime,
@@ -244,27 +244,27 @@ thread_quantum_expire(
 
 #if defined(CONFIG_SCHED_TIMESHARE_CORE)
 	sched_timeshare_consider_maintenance(ctime);
-#endif /* CONFIG_SCHED_TIMESHARE_CORE */
+#endif                                  
 
 #if __arm__ || __arm64__
 	if (thread->sched_mode == TH_MODE_REALTIME) {
 		sched_consider_recommended_cores(ctime, thread);
 	}
-#endif /* __arm__ || __arm64__ */
+#endif                           
 
 	KERNEL_DEBUG_CONSTANT(MACHDBG_CODE(DBG_MACH_SCHED, MACH_SCHED_QUANTUM_EXPIRED) | DBG_FUNC_END, preempt, 0, 0, 0, 0);
 }
 
-/*
- *	sched_set_thread_base_priority:
- *
- *	Set the base priority of the thread
- *	and reset its scheduled priority.
- *
- *	This is the only path to change base_pri.
- *
- *	Called with the thread locked.
- */
+  
+                                  
+  
+                                      
+                                    
+  
+                                            
+  
+                                 
+   
 void
 sched_set_thread_base_priority(thread_t thread, int priority)
 {
@@ -293,11 +293,11 @@ sched_set_thread_base_priority(thread_t thread, int priority)
 		assert(thread->last_made_runnable_time == THREAD_NOT_RUNNABLE);
 	}
 
-	/*
-	 * Currently the perfcontrol_attr depends on the base pri of the
-	 * thread. Therefore, we use this function as the hook for the
-	 * perfcontrol callout.
-	 */
+	  
+                                                                 
+                                                               
+                        
+    
 	if (thread == current_thread() && old_base_pri != priority) {
 		if (!ctime) {
 			ctime = mach_approximate_time();
@@ -306,21 +306,21 @@ sched_set_thread_base_priority(thread_t thread, int priority)
 		    ctime, PERFCONTROL_CALLOUT_WAKE_UNSAFE, thread);
 	}
 #if !CONFIG_SCHED_CLUTCH
-	/* For the clutch scheduler, this operation is done in set_sched_pri() */
+	                                                                         
 	SCHED(update_thread_bucket)(thread);
-#endif /* !CONFIG_SCHED_CLUTCH */
+#endif                           
 
 	thread_recompute_sched_pri(thread, SETPRI_DEFAULT);
 }
 
-/*
- *	sched_set_kernel_thread_priority:
- *
- *	Set the absolute base priority of the thread
- *	and reset its scheduled priority.
- *
- *	Called with the thread unlocked.
- */
+  
+                                    
+  
+                                               
+                                    
+  
+                                   
+   
 void
 sched_set_kernel_thread_priority(thread_t thread, int new_priority)
 {
@@ -338,7 +338,7 @@ sched_set_kernel_thread_priority(thread_t thread, int new_priority)
 	if (new_priority < MAXPRI_THROTTLE) {
 		new_priority = MAXPRI_THROTTLE;
 	}
-#endif /* !defined(XNU_TARGET_OS_OSX) */
+#endif                                  
 
 	thread->importance = new_priority - thread->task_priority;
 
@@ -348,21 +348,21 @@ sched_set_kernel_thread_priority(thread_t thread, int new_priority)
 	splx(s);
 }
 
-/*
- *	thread_recompute_sched_pri:
- *
- *	Reset the scheduled priority of the thread
- *	according to its base priority if the
- *	thread has not been promoted or depressed.
- *
- *	This is the only way to push base_pri changes into sched_pri,
- *	or to recalculate the appropriate sched_pri after changing
- *	a promotion or depression.
- *
- *	Called at splsched with the thread locked.
- *
- *	TODO: Add an 'update urgency' flag to avoid urgency callouts on every rwlock operation
- */
+  
+                              
+  
+                                             
+                                        
+                                             
+  
+                                                                
+                                                             
+                             
+  
+                                             
+  
+                                                                                         
+   
 void
 thread_recompute_sched_pri(thread_t thread, set_sched_pri_options_t options)
 {
@@ -376,10 +376,10 @@ thread_recompute_sched_pri(thread_t thread, set_sched_pri_options_t options)
 	}
 
 	if (sched_flags & TH_SFLAG_DEPRESS) {
-		/* thread_yield_internal overrides kernel mutex promotion */
+		                                                            
 		priority = DEPRESSPRI;
 	} else {
-		/* poll-depress is overridden by mutex promotion and promote-reasons */
+		                                                                       
 		if ((sched_flags & TH_SFLAG_POLLDEPRESS)) {
 			priority = DEPRESSPRI;
 		}
@@ -421,10 +421,10 @@ thread_recompute_sched_pri(thread_t thread, set_sched_pri_options_t options)
 void
 sched_default_quantum_expire(thread_t thread __unused)
 {
-	/*
-	 * No special behavior when a timeshare, fixed, or realtime thread
-	 * uses up its entire quantum
-	 */
+	  
+                                                                   
+                              
+    
 }
 
 int smt_timeshare_enabled = 1;
@@ -432,16 +432,16 @@ int smt_sched_bonus_16ths = 8;
 
 #if defined(CONFIG_SCHED_TIMESHARE_CORE)
 
-/*
- *	lightweight_update_priority:
- *
- *	Update the scheduled priority for
- *	a timesharing thread.
- *
- *	Only for use on the current thread.
- *
- *	Called with the thread locked.
- */
+  
+                               
+  
+                                    
+                        
+  
+                                      
+  
+                                 
+   
 void
 lightweight_update_priority(thread_t thread)
 {
@@ -454,11 +454,11 @@ lightweight_update_priority(thread_t thread)
 
 		thread_timer_delta(thread, delta);
 
-		/*
-		 *	Accumulate timesharing usage only
-		 *	during contention for processor
-		 *	resources.
-		 */
+		  
+                                      
+                                    
+               
+     
 		if (thread->pri_shift < INT8_MAX) {
 			if (thread_no_smt(thread) && smt_timeshare_enabled) {
 				thread->sched_usage += (delta + ((delta * smt_sched_bonus_16ths) >> 4));
@@ -470,13 +470,13 @@ lightweight_update_priority(thread_t thread)
 		thread->cpu_delta += delta;
 
 #if CONFIG_SCHED_CLUTCH
-		/*
-		 * Update the CPU usage for the thread group to which the thread belongs.
-		 * The implementation assumes that the thread ran for the entire delta
-		 * as part of the same thread group.
-		 */
+		  
+                                                                           
+                                                                        
+                                      
+     
 		sched_clutch_cpu_usage_update(thread, delta);
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 
 		priority = sched_compute_timeshare_priority(thread);
 
@@ -486,13 +486,13 @@ lightweight_update_priority(thread_t thread)
 	}
 }
 
-/*
- *	Define shifts for simulating (5/8) ** n
- *
- *	Shift structures for holding update shifts.  Actual computation
- *	is  usage = (usage >> shift1) +/- (usage >> abs(shift2))  where the
- *	+/- is determined by the sign of shift 2.
- */
+  
+                                          
+  
+                                                                  
+                                                                      
+                                            
+   
 
 const struct shift_data        sched_decay_shifts[SCHED_DECAY_TICKS] = {
 	{ .shift1 = 1, .shift2 = 1 },
@@ -529,15 +529,15 @@ const struct shift_data        sched_decay_shifts[SCHED_DECAY_TICKS] = {
 	{ .shift1 = 21, .shift2 = -27 }
 };
 
-/*
- *	sched_compute_timeshare_priority:
- *
- *	Calculate the timesharing priority based upon usage and load.
- */
+  
+                                    
+  
+                                                                
+   
 extern int sched_pri_decay_band_limit;
 
 
-/* Only use the decay floor logic on non-macOS and non-clutch schedulers */
+                                                                           
 #if !defined(XNU_TARGET_OS_OSX) && !CONFIG_SCHED_CLUTCH
 
 int
@@ -560,7 +560,7 @@ sched_compute_timeshare_priority(thread_t thread)
 		decay_amount = decay_limit;
 	}
 
-	/* start with base priority */
+	                              
 	int priority = thread->base_pri - decay_amount;
 
 	if (priority < MAXPRI_THROTTLE) {
@@ -576,12 +576,12 @@ sched_compute_timeshare_priority(thread_t thread)
 	return priority;
 }
 
-#else /* !defined(XNU_TARGET_OS_OSX) && !CONFIG_SCHED_CLUTCH */
+#else                                                          
 
 int
 sched_compute_timeshare_priority(thread_t thread)
 {
-	/* start with base priority */
+	                              
 	int priority = thread->base_pri;
 
 	if (thread->pri_shift != INT8_MAX) {
@@ -597,15 +597,15 @@ sched_compute_timeshare_priority(thread_t thread)
 	return priority;
 }
 
-#endif /* !defined(XNU_TARGET_OS_OSX) && !CONFIG_SCHED_CLUTCH */
+#endif                                                          
 
-/*
- *	can_update_priority
- *
- *	Make sure we don't do re-dispatches more frequently than a scheduler tick.
- *
- *	Called with the thread locked.
- */
+  
+                      
+  
+                                                                             
+  
+                                 
+   
 boolean_t
 can_update_priority(
 	thread_t        thread)
@@ -617,13 +617,13 @@ can_update_priority(
 	}
 }
 
-/*
- *	update_priority
- *
- *	Perform housekeeping operations driven by scheduler tick.
- *
- *	Called with the thread locked.
- */
+  
+                  
+  
+                                                            
+  
+                                 
+   
 void
 update_priority(
 	thread_t        thread)
@@ -635,21 +635,21 @@ update_priority(
 
 	thread->sched_stamp += ticks;
 
-	/* If requested, accelerate aging of sched_usage */
+	                                                   
 	if (sched_decay_usage_age_factor > 1) {
 		ticks *= sched_decay_usage_age_factor;
 	}
 
-	/*
-	 *	Gather cpu usage data.
-	 */
+	  
+                          
+    
 	thread_timer_delta(thread, delta);
 	if (ticks < SCHED_DECAY_TICKS) {
-		/*
-		 *	Accumulate timesharing usage only during contention for processor
-		 *	resources. Use the pri_shift from the previous tick window to
-		 *	determine if the system was in a contended state.
-		 */
+		  
+                                                                      
+                                                                  
+                                                      
+     
 		if (thread->pri_shift < INT8_MAX) {
 			if (thread_no_smt(thread) && smt_timeshare_enabled) {
 				thread->sched_usage += (delta + ((delta * smt_sched_bonus_16ths) >> 4));
@@ -662,13 +662,13 @@ update_priority(
 		thread->cpu_delta = 0;
 
 #if CONFIG_SCHED_CLUTCH
-		/*
-		 * Update the CPU usage for the thread group to which the thread belongs.
-		 * The implementation assumes that the thread ran for the entire delta
-		 * as part of the same thread group.
-		 */
+		  
+                                                                           
+                                                                        
+                                      
+     
 		sched_clutch_cpu_usage_update(thread, delta);
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 
 		const struct shift_data *shiftp = &sched_decay_shifts[ticks];
 
@@ -688,45 +688,45 @@ update_priority(
 		thread->sched_usage = 0;
 	}
 
-	/*
-	 *	Check for fail-safe release.
-	 */
+	  
+                                
+    
 	if ((thread->sched_flags & TH_SFLAG_FAILSAFE) &&
 	    mach_absolute_time() >= thread->safe_release) {
 		sched_thread_mode_undemote(thread, TH_SFLAG_FAILSAFE);
 	}
 
-	/*
-	 * Now that the thread's CPU usage has been accumulated and aged
-	 * based on contention of the previous tick window, update the
-	 * pri_shift of the thread to match the current global load/shift
-	 * values. The updated pri_shift would be used to calculate the
-	 * new priority of the thread.
-	 */
+	  
+                                                                 
+                                                               
+                                                                  
+                                                                
+                               
+    
 #if CONFIG_SCHED_CLUTCH
 	thread->pri_shift = sched_clutch_thread_pri_shift(thread, thread->th_sched_bucket);
-#else /* CONFIG_SCHED_CLUTCH */
+#else                          
 	thread->pri_shift = sched_pri_shifts[thread->th_sched_bucket];
-#endif /* CONFIG_SCHED_CLUTCH */
+#endif                          
 
-	/* Recompute scheduled priority if appropriate. */
+	                                                  
 	if (thread->sched_mode == TH_MODE_TIMESHARE) {
 		thread_recompute_sched_pri(thread, SETPRI_LAZY);
 	}
 }
 
-#endif /* CONFIG_SCHED_TIMESHARE_CORE */
+#endif                                  
 
 
-/*
- * TH_BUCKET_RUN is a count of *all* runnable non-idle threads.
- * Each other bucket is a count of the runnable non-idle threads
- * with that property. All updates to these counts should be
- * performed with os_atomic_* operations.
- *
- * For the clutch scheduler, this global bucket is used only for
- * keeping the total global run count.
- */
+  
+                                                               
+                                                                
+                                                            
+                                         
+  
+                                                                
+                                      
+   
 uint32_t       sched_run_buckets[TH_BUCKET_MAX];
 
 static void
@@ -902,13 +902,13 @@ sched_smt_update_thread_bucket(thread_t thread)
 	}
 }
 
-/*
- * Set the thread's true scheduling mode
- * Called with thread mutex and thread locked
- * The thread has already been removed from the runqueue.
- *
- * (saved_mode is handled before this point)
- */
+  
+                                        
+                                             
+                                                         
+  
+                                            
+   
 void
 sched_set_thread_mode(thread_t thread, sched_mode_t new_mode)
 {
@@ -926,25 +926,25 @@ sched_set_thread_mode(thread_t thread, sched_mode_t new_mode)
 	}
 
 #if CONFIG_SCHED_AUTO_JOIN
-	/*
-	 * Realtime threads might have auto-joined a work interval based on
-	 * make runnable relationships. If such an RT thread is now being demoted
-	 * to non-RT, unjoin the thread from the work interval.
-	 */
+	  
+                                                                    
+                                                                          
+                                                        
+    
 	if ((thread->sched_flags & TH_SFLAG_THREAD_GROUP_AUTO_JOIN) && (new_mode != TH_MODE_REALTIME)) {
 		assert((thread->sched_mode == TH_MODE_REALTIME) || (thread->th_work_interval_flags & TH_WORK_INTERVAL_FLAGS_AUTO_JOIN_LEAK));
 		work_interval_auto_join_demote(thread);
 	}
-#endif /* CONFIG_SCHED_AUTO_JOIN */
+#endif                             
 
 	thread->sched_mode = new_mode;
 
 	SCHED(update_thread_bucket)(thread);
 }
 
-/*
- * Demote the true scheduler mode to timeshare (called with the thread locked)
- */
+  
+                                                                              
+   
 void
 sched_thread_mode_demote(thread_t thread, uint32_t reason)
 {
@@ -956,7 +956,7 @@ sched_thread_mode_demote(thread_t thread, uint32_t reason)
 	}
 
 	if (thread->sched_flags & TH_SFLAG_DEMOTED_MASK) {
-		/* Another demotion reason is already active */
+		                                               
 		thread->sched_flags |= reason;
 		return;
 	}
@@ -978,9 +978,9 @@ sched_thread_mode_demote(thread_t thread, uint32_t reason)
 	}
 }
 
-/*
- * Un-demote the true scheduler mode back to the saved mode (called with the thread locked)
- */
+  
+                                                                                           
+   
 void
 sched_thread_mode_undemote(thread_t thread, uint32_t reason)
 {
@@ -993,7 +993,7 @@ sched_thread_mode_undemote(thread_t thread, uint32_t reason)
 	thread->sched_flags &= ~reason;
 
 	if (thread->sched_flags & TH_SFLAG_DEMOTED_MASK) {
-		/* Another demotion reason is still active */
+		                                             
 		return;
 	}
 
@@ -1010,19 +1010,19 @@ sched_thread_mode_undemote(thread_t thread, uint32_t reason)
 	}
 }
 
-/*
- * Promote thread to have a sched pri floor for a specific reason
- *
- * Promotion must not last past syscall boundary
- * Clients must always pair promote and demote 1:1,
- * Handling nesting of the same promote reason is the client's responsibility
- *
- * Called at splsched with thread locked
- */
+  
+                                                                 
+  
+                                                
+                                                   
+                                                                             
+  
+                                        
+   
 void
 sched_thread_promote_reason(thread_t    thread,
     uint32_t    reason,
-    __kdebug_only uintptr_t   trace_obj /* already unslid */)
+    __kdebug_only uintptr_t   trace_obj                     )
 {
 	assert(reason & TH_SFLAG_PROMOTE_REASON_MASK);
 	assert((thread->sched_flags & reason) != reason);
@@ -1050,16 +1050,16 @@ sched_thread_promote_reason(thread_t    thread,
 	thread_recompute_sched_pri(thread, SETPRI_DEFAULT);
 }
 
-/*
- * End a specific promotion reason
- * Demotes a thread back to its expected priority without the promotion in place
- *
- * Called at splsched with thread locked
- */
+  
+                                  
+                                                                                
+  
+                                        
+   
 void
 sched_thread_unpromote_reason(thread_t  thread,
     uint32_t  reason,
-    __kdebug_only uintptr_t trace_obj /* already unslid */)
+    __kdebug_only uintptr_t trace_obj                     )
 {
 	assert(reason & TH_SFLAG_PROMOTE_REASON_MASK);
 	assert((thread->sched_flags & reason) == reason);

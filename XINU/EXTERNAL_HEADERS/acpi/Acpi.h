@@ -1,9 +1,9 @@
-/******************************************************************************
- *
- * Name: actbl.h - Basic ACPI Table Definitions
- *       $Revision: 1.7 $
- *
- *****************************************************************************/
+                                                                               
+  
+                                               
+                         
+  
+                                                                               
 
 /******************************************************************************
  *
@@ -117,144 +117,144 @@
 #ifndef __ACTBL_H__
 #define __ACTBL_H__
 
-/*
- * Values for description table header signatures. Useful because they make
- * it more difficult to inadvertently type in the wrong signature.
- */
-#define DSDT_SIG                "DSDT"      /* Differentiated System Description Table */
-#define FADT_SIG                "FACP"      /* Fixed ACPI Description Table */
-#define FACS_SIG                "FACS"      /* Firmware ACPI Control Structure */
-#define PSDT_SIG                "PSDT"      /* Persistent System Description Table */
-#define RSDP_SIG                "RSD PTR "  /* Root System Description Pointer */
-#define RSDT_SIG                "RSDT"      /* Root System Description Table */
-#define XSDT_SIG                "XSDT"      /* Extended  System Description Table */
-#define SSDT_SIG                "SSDT"      /* Secondary System Description Table */
+  
+                                                                           
+                                                                  
+   
+#define DSDT_SIG                "DSDT"                                                   
+#define FADT_SIG                "FACP"                                        
+#define FACS_SIG                "FACS"                                           
+#define PSDT_SIG                "PSDT"                                               
+#define RSDP_SIG                "RSD PTR "                                       
+#define RSDT_SIG                "RSDT"                                         
+#define XSDT_SIG                "XSDT"                                              
+#define SSDT_SIG                "SSDT"                                              
 #define RSDP_NAME               "RSDP"
 
 
-/*
- * All tables and structures must be byte-packed to match the ACPI
- * specification, since the tables are provided by the system BIOS
- */
+  
+                                                                  
+                                                                  
+   
 #pragma pack(1)
 
 
-/*
- * These are the ACPI tables that are directly consumed by the subsystem.
- *
- * The RSDP and FACS do not use the common ACPI table header. All other ACPI
- * tables use the header.
- *
- * Note about bitfields: The UINT8 type is used for bitfields in ACPI tables.
- * This is the only type that is even remotely portable. Anything else is not
- * portable, so do not use any other bitfield types.
- */
+  
+                                                                         
+  
+                                                                            
+                         
+  
+                                                                             
+                                                                             
+                                                    
+   
 
-/*******************************************************************************
- *
- * ACPI Table Header. This common header is used by all tables except the
- * RSDP and FACS. The define is used for direct inclusion of header into
- * other ACPI tables
- *
- ******************************************************************************/
+                                                                                
+  
+                                                                         
+                                                                        
+                    
+  
+                                                                                
 
 #define ACPI_TABLE_HEADER_DEF \
-char                    Signature[4];           /* ASCII table signature */ \
-UINT32                  Length;                 /* Length of table in bytes, including this header */ \
-UINT8                   Revision;               /* ACPI Specification minor version # */ \
-UINT8                   Checksum;               /* To make sum of entire table == 0 */ \
-char                    OemId[6];               /* ASCII OEM identification */ \
-char                    OemTableId[8];          /* ASCII OEM table identification */ \
-UINT32                  OemRevision;            /* OEM revision number */ \
-char                    AslCompilerId[4];       /* ASCII ASL compiler vendor ID */ \
-UINT32                  AslCompilerRevision;    /* ASL compiler version */
+char                    Signature[4];                                       \
+UINT32                  Length;                                                                       \
+UINT8                   Revision;                                                        \
+UINT8                   Checksum;                                                      \
+char                    OemId[6];                                              \
+char                    OemTableId[8];                                               \
+UINT32                  OemRevision;                                      \
+char                    AslCompilerId[4];                                          \
+UINT32                  AslCompilerRevision;                              
 
 typedef struct acpi_table_header {
 	ACPI_TABLE_HEADER_DEF
 } ACPI_TABLE_HEADER;
 
 
-/*
- * GAS - Generic Address Structure (ACPI 2.0+)
- */
+  
+                                              
+   
 typedef struct acpi_generic_address {
-	UINT8                   AddressSpaceId;     /* Address space where struct or register exists */
-	UINT8                   RegisterBitWidth;   /* Size in bits of given register */
-	UINT8                   RegisterBitOffset;  /* Bit offset within the register */
-	UINT8                   AccessWidth;        /* Minimum Access size (ACPI 3.0) */
-	UINT64                  Address;            /* 64-bit address of struct or register */
+	UINT8                   AddressSpaceId;                                                        
+	UINT8                   RegisterBitWidth;                                       
+	UINT8                   RegisterBitOffset;                                      
+	UINT8                   AccessWidth;                                            
+	UINT64                  Address;                                                      
 } ACPI_GENERIC_ADDRESS;
 
 
-/*******************************************************************************
- *
- * RSDP - Root System Description Pointer (Signature is "RSD PTR ")
- *
- ******************************************************************************/
+                                                                                
+  
+                                                                   
+  
+                                                                                
 
 typedef struct rsdp_descriptor {
-	char                    Signature[8];       /* ACPI signature, contains "RSD PTR " */
-	UINT8                   Checksum;           /* ACPI 1.0 checksum */
-	char                    OemId[6];           /* OEM identification */
-	UINT8                   Revision;           /* Must be (0) for ACPI 1.0 or (2) for ACPI 2.0+ */
-	UINT32                  RsdtPhysicalAddress;/* 32-bit physical address of the RSDT */
-	UINT32                  Length;             /* Table length in bytes, including header (ACPI 2.0+) */
-	UINT64                  XsdtPhysicalAddress;/* 64-bit physical address of the XSDT (ACPI 2.0+) */
-	UINT8                   ExtendedChecksum;   /* Checksum of entire table (ACPI 2.0+) */
-	UINT8                   Reserved[3];        /* Reserved, must be zero */
+	char                    Signature[8];                                                
+	UINT8                   Checksum;                                  
+	char                    OemId[6];                                   
+	UINT8                   Revision;                                                              
+	UINT32                  RsdtPhysicalAddress;                                         
+	UINT32                  Length;                                                                      
+	UINT64                  XsdtPhysicalAddress;                                                     
+	UINT8                   ExtendedChecksum;                                             
+	UINT8                   Reserved[3];                                    
 } RSDP_DESCRIPTOR;
 
-#define ACPI_RSDP_REV0_SIZE     20                  /* Size of original ACPI 1.0 RSDP */
+#define ACPI_RSDP_REV0_SIZE     20                                                      
 
 
-/*******************************************************************************
- *
- * RSDT/XSDT - Root System Description Tables
- *
- ******************************************************************************/
+                                                                                
+  
+                                             
+  
+                                                                                
 
 typedef struct rsdt_descriptor {
 	ACPI_TABLE_HEADER_DEF
-	UINT32                  TableOffsetEntry[1];/* Array of pointers to ACPI tables */
+	UINT32                  TableOffsetEntry[1];                                      
 } RSDT_DESCRIPTOR;
 
 typedef struct xsdt_descriptor {
 	ACPI_TABLE_HEADER_DEF
-	UINT64                  TableOffsetEntry[1];/* Array of pointers to ACPI tables */
+	UINT64                  TableOffsetEntry[1];                                      
 } XSDT_DESCRIPTOR;
 
 
-/*******************************************************************************
- *
- * FACS - Firmware ACPI Control Structure (FACS)
- *
- ******************************************************************************/
+                                                                                
+  
+                                                
+  
+                                                                                
 
 typedef struct facs_descriptor {
-	char                    Signature[4];       /* ASCII table signature */
-	UINT32                  Length;             /* Length of structure, in bytes */
-	UINT32                  HardwareSignature;  /* Hardware configuration signature */
-	UINT32                  FirmwareWakingVector;/* 32-bit physical address of the Firmware Waking Vector */
-	UINT32                  GlobalLock;         /* Global Lock for shared hardware resources */
+	char                    Signature[4];                                  
+	UINT32                  Length;                                                
+	UINT32                  HardwareSignature;                                        
+	UINT32                  FirmwareWakingVector;                                                           
+	UINT32                  GlobalLock;                                                        
 
-	/* Flags (32 bits) */
+	                     
 
-	UINT8                   S4Bios_f        : 1;/* 00:    S4BIOS support is present */
-	UINT8                                   : 7;/* 01-07: Reserved, must be zero */
-	UINT8                   Reserved1[3];       /* 08-31: Reserved, must be zero */
+	UINT8                   S4Bios_f        : 1;                                      
+	UINT8                                   : 7;                                   
+	UINT8                   Reserved1[3];                                          
 
-	UINT64                  XFirmwareWakingVector;/* 64-bit version of the Firmware Waking Vector (ACPI 2.0+) */
-	UINT8                   Version;            /* Version of this table (ACPI 2.0+) */
-	UINT8                   Reserved[31];       /* Reserved, must be zero */
+	UINT64                  XFirmwareWakingVector;                                                              
+	UINT8                   Version;                                                   
+	UINT8                   Reserved[31];                                   
 } FACS_DESCRIPTOR;
 
-#define ACPI_GLOCK_PENDING      0x01                /* 00: Pending global lock ownership */
-#define ACPI_GLOCK_OWNED        0x02                /* 01: Global lock is owned */
+#define ACPI_GLOCK_PENDING      0x01                                                       
+#define ACPI_GLOCK_OWNED        0x02                                              
 
 
-/*
- * Common FACS - This is a version-independent FACS structure used for internal use only
- */
+  
+                                                                                        
+   
 typedef struct acpi_common_facs {
 	UINT32                  *GlobalLock;
 	UINT64                  *FirmwareWakingVector;
@@ -262,127 +262,127 @@ typedef struct acpi_common_facs {
 } ACPI_COMMON_FACS;
 
 
-/*******************************************************************************
- *
- * FADT - Fixed ACPI Description Table (Signature "FACP")
- *
- ******************************************************************************/
+                                                                                
+  
+                                                         
+  
+                                                                                
 
-/* Fields common to all versions of the FADT */
+                                               
 
 #define ACPI_FADT_COMMON \
 ACPI_TABLE_HEADER_DEF \
-UINT32                  V1_FirmwareCtrl;    /* 32-bit physical address of FACS */ \
-UINT32                  V1_Dsdt;            /* 32-bit physical address of DSDT */ \
-UINT8                   Reserved1;          /* System Interrupt Model isn't used in ACPI 2.0*/ \
-UINT8                   Prefer_PM_Profile;  /* Conveys preferred power management profile to OSPM. */ \
-UINT16                  SciInt;             /* System vector of SCI interrupt */ \
-UINT32                  SmiCmd;             /* Port address of SMI command port */ \
-UINT8                   AcpiEnable;         /* Value to write to smi_cmd to enable ACPI */ \
-UINT8                   AcpiDisable;        /* Value to write to smi_cmd to disable ACPI */ \
-UINT8                   S4BiosReq;          /* Value to write to SMI CMD to enter S4BIOS state */ \
-UINT8                   PstateCnt;          /* Processor performance state control*/ \
-UINT32                  V1_Pm1aEvtBlk;      /* Port address of Power Mgt 1a Event Reg Blk */ \
-UINT32                  V1_Pm1bEvtBlk;      /* Port address of Power Mgt 1b Event Reg Blk */ \
-UINT32                  V1_Pm1aCntBlk;      /* Port address of Power Mgt 1a Control Reg Blk */ \
-UINT32                  V1_Pm1bCntBlk;      /* Port address of Power Mgt 1b Control Reg Blk */ \
-UINT32                  V1_Pm2CntBlk;       /* Port address of Power Mgt 2 Control Reg Blk */ \
-UINT32                  V1_PmTmrBlk;        /* Port address of Power Mgt Timer Ctrl Reg Blk */ \
-UINT32                  V1_Gpe0Blk;         /* Port addr of General Purpose AcpiEvent 0 Reg Blk */ \
-UINT32                  V1_Gpe1Blk;         /* Port addr of General Purpose AcpiEvent 1 Reg Blk */ \
-UINT8                   Pm1EvtLen;          /* Byte Length of ports at pm1X_evt_blk */ \
-UINT8                   Pm1CntLen;          /* Byte Length of ports at pm1X_cnt_blk */ \
-UINT8                   Pm2CntLen;          /* Byte Length of ports at pm2_cnt_blk */ \
-UINT8                   PmTmLen;            /* Byte Length of ports at pm_tm_blk */ \
-UINT8                   Gpe0BlkLen;         /* Byte Length of ports at gpe0_blk */ \
-UINT8                   Gpe1BlkLen;         /* Byte Length of ports at gpe1_blk */ \
-UINT8                   Gpe1Base;           /* Offset in gpe model where gpe1 events start */ \
-UINT8                   CstCnt;             /* Support for the _CST object and C States change notification.*/ \
-UINT16                  Plvl2Lat;           /* Worst case HW latency to enter/exit C2 state */ \
-UINT16                  Plvl3Lat;           /* Worst case HW latency to enter/exit C3 state */ \
-UINT16                  FlushSize;          /* Processor's memory cache line width, in bytes */ \
-UINT16                  FlushStride;        /* Number of flush strides that need to be read */ \
-UINT8                   DutyOffset;         /* Processor's duty cycle index in processor's P_CNT reg*/ \
-UINT8                   DutyWidth;          /* Processor's duty cycle value bit width in P_CNT register.*/ \
-UINT8                   DayAlrm;            /* Index to day-of-month alarm in RTC CMOS RAM */ \
-UINT8                   MonAlrm;            /* Index to month-of-year alarm in RTC CMOS RAM */ \
-UINT8                   Century;            /* Index to century in RTC CMOS RAM */ \
-UINT16                  IapcBootArch;       /* IA-PC Boot Architecture Flags. See Table 5-10 for description*/ \
-UINT8                   Reserved2;          /* Reserved, must be zero */
+UINT32                  V1_FirmwareCtrl;                                          \
+UINT32                  V1_Dsdt;                                                  \
+UINT8                   Reserved1;                                                             \
+UINT8                   Prefer_PM_Profile;                                                            \
+UINT16                  SciInt;                                                  \
+UINT32                  SmiCmd;                                                    \
+UINT8                   AcpiEnable;                                                        \
+UINT8                   AcpiDisable;                                                        \
+UINT8                   S4BiosReq;                                                                \
+UINT8                   PstateCnt;                                                   \
+UINT32                  V1_Pm1aEvtBlk;                                                       \
+UINT32                  V1_Pm1bEvtBlk;                                                       \
+UINT32                  V1_Pm1aCntBlk;                                                         \
+UINT32                  V1_Pm1bCntBlk;                                                         \
+UINT32                  V1_Pm2CntBlk;                                                         \
+UINT32                  V1_PmTmrBlk;                                                           \
+UINT32                  V1_Gpe0Blk;                                                                \
+UINT32                  V1_Gpe1Blk;                                                                \
+UINT8                   Pm1EvtLen;                                                     \
+UINT8                   Pm1CntLen;                                                     \
+UINT8                   Pm2CntLen;                                                    \
+UINT8                   PmTmLen;                                                    \
+UINT8                   Gpe0BlkLen;                                                \
+UINT8                   Gpe1BlkLen;                                                \
+UINT8                   Gpe1Base;                                                             \
+UINT8                   CstCnt;                                                                                \
+UINT16                  Plvl2Lat;                                                              \
+UINT16                  Plvl3Lat;                                                              \
+UINT16                  FlushSize;                                                              \
+UINT16                  FlushStride;                                                           \
+UINT8                   DutyOffset;                                                                    \
+UINT8                   DutyWidth;                                                                         \
+UINT8                   DayAlrm;                                                              \
+UINT8                   MonAlrm;                                                               \
+UINT8                   Century;                                                   \
+UINT16                  IapcBootArch;                                                                          \
+UINT8                   Reserved2;                                      
 
 
-/*
- * ACPI 2.0+ FADT
- */
+  
+                 
+   
 typedef struct fadt_descriptor {
 	ACPI_FADT_COMMON
 
-	/* Flags (32 bits) */
+	                     
 
-	UINT8                   WbInvd      : 1;/* 00:    The wbinvd instruction works properly */
-	UINT8                   WbInvdFlush : 1;/* 01:    The wbinvd flushes but does not invalidate */
-	UINT8                   ProcC1      : 1;/* 02:    All processors support C1 state */
-	UINT8                   Plvl2Up     : 1;/* 03:    C2 state works on MP system */
-	UINT8                   PwrButton   : 1;/* 04:    Power button is handled as a generic feature */
-	UINT8                   SleepButton : 1;/* 05:    Sleep button is handled as a generic feature, or not present */
-	UINT8                   FixedRTC    : 1;/* 06:    RTC wakeup stat not in fixed register space */
-	UINT8                   Rtcs4       : 1;/* 07:    RTC wakeup stat not possible from S4 */
-	UINT8                   TmrValExt   : 1;/* 08:    tmr_val is 32 bits 0=24-bits */
-	UINT8                   DockCap     : 1;/* 09:    Docking supported */
-	UINT8                   ResetRegSup : 1;/* 10:    System reset via the FADT RESET_REG supported */
-	UINT8                   SealedCase  : 1;/* 11:    No internal expansion capabilities and case is sealed */
-	UINT8                   Headless    : 1;/* 12:    No local video capabilities or local input devices */
-	UINT8                   CpuSwSleep  : 1;/* 13:    Must execute native instruction after writing SLP_TYPx register */
+	UINT8                   WbInvd      : 1;                                                  
+	UINT8                   WbInvdFlush : 1;                                                       
+	UINT8                   ProcC1      : 1;                                            
+	UINT8                   Plvl2Up     : 1;                                        
+	UINT8                   PwrButton   : 1;                                                         
+	UINT8                   SleepButton : 1;                                                                         
+	UINT8                   FixedRTC    : 1;                                                        
+	UINT8                   Rtcs4       : 1;                                                 
+	UINT8                   TmrValExt   : 1;                                         
+	UINT8                   DockCap     : 1;                              
+	UINT8                   ResetRegSup : 1;                                                          
+	UINT8                   SealedCase  : 1;                                                                  
+	UINT8                   Headless    : 1;                                                               
+	UINT8                   CpuSwSleep  : 1;                                                                            
 
-	UINT8                   PciExpWak                           : 1;/* 14:    System supports PCIEXP_WAKE (STS/EN) bits (ACPI 3.0) */
-	UINT8                   UsePlatformClock                    : 1;/* 15:    OSPM should use platform-provided timer (ACPI 3.0) */
-	UINT8                   S4RtcStsValid                       : 1;/* 16:    Contents of RTC_STS valid after S4 wake (ACPI 3.0) */
-	UINT8                   RemotePowerOnCapable                : 1;/* 17:    System is compatible with remote power on (ACPI 3.0) */
-	UINT8                   ForceApicClusterModel               : 1;/* 18:    All local APICs must use cluster model (ACPI 3.0) */
-	UINT8                   ForceApicPhysicalDestinationMode    : 1;/* 19:    All local xAPICs must use physical dest mode (ACPI 3.0) */
-	UINT8                                                       : 4;/* 20-23: Reserved, must be zero */
-	UINT8                   Reserved3;                           /* 24-31: Reserved, must be zero */
+	UINT8                   PciExpWak                           : 1;                                                                 
+	UINT8                   UsePlatformClock                    : 1;                                                               
+	UINT8                   S4RtcStsValid                       : 1;                                                               
+	UINT8                   RemotePowerOnCapable                : 1;                                                                 
+	UINT8                   ForceApicClusterModel               : 1;                                                              
+	UINT8                   ForceApicPhysicalDestinationMode    : 1;                                                                    
+	UINT8                                                       : 4;                                   
+	UINT8                   Reserved3;                                                              
 
-	ACPI_GENERIC_ADDRESS    ResetRegister;  /* Reset register address in GAS format */
-	UINT8                   ResetValue;     /* Value to write to the ResetRegister port to reset the system */
-	UINT8                   Reserved4[3];   /* These three bytes must be zero */
-	UINT64                  XFirmwareCtrl;  /* 64-bit physical address of FACS */
-	UINT64                  XDsdt;          /* 64-bit physical address of DSDT */
-	ACPI_GENERIC_ADDRESS    XPm1aEvtBlk;    /* Extended Power Mgt 1a AcpiEvent Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XPm1bEvtBlk;    /* Extended Power Mgt 1b AcpiEvent Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XPm1aCntBlk;    /* Extended Power Mgt 1a Control Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XPm1bCntBlk;    /* Extended Power Mgt 1b Control Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XPm2CntBlk;     /* Extended Power Mgt 2 Control Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XPmTmrBlk;      /* Extended Power Mgt Timer Ctrl Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XGpe0Blk;       /* Extended General Purpose AcpiEvent 0 Reg Blk address */
-	ACPI_GENERIC_ADDRESS    XGpe1Blk;       /* Extended General Purpose AcpiEvent 1 Reg Blk address */
+	ACPI_GENERIC_ADDRESS    ResetRegister;                                            
+	UINT8                   ResetValue;                                                                       
+	UINT8                   Reserved4[3];                                       
+	UINT64                  XFirmwareCtrl;                                       
+	UINT64                  XDsdt;                                               
+	ACPI_GENERIC_ADDRESS    XPm1aEvtBlk;                                                         
+	ACPI_GENERIC_ADDRESS    XPm1bEvtBlk;                                                         
+	ACPI_GENERIC_ADDRESS    XPm1aCntBlk;                                                       
+	ACPI_GENERIC_ADDRESS    XPm1bCntBlk;                                                       
+	ACPI_GENERIC_ADDRESS    XPm2CntBlk;                                                       
+	ACPI_GENERIC_ADDRESS    XPmTmrBlk;                                                         
+	ACPI_GENERIC_ADDRESS    XGpe0Blk;                                                                 
+	ACPI_GENERIC_ADDRESS    XGpe1Blk;                                                                 
 } FADT_DESCRIPTOR;
 
 
-/*
- * "Down-revved" ACPI 2.0 FADT descriptor
- * Defined here to allow compiler to generate the length of the struct
- */
+  
+                                         
+                                                                      
+   
 typedef struct fadt_descriptor_rev2_minus {
 	ACPI_FADT_COMMON
 	UINT32                  Flags;
-	ACPI_GENERIC_ADDRESS    ResetRegister;  /* Reset register address in GAS format */
-	UINT8                   ResetValue;     /* Value to write to the ResetRegister port to reset the system. */
-	UINT8                   Reserved7[3];   /* Reserved, must be zero */
+	ACPI_GENERIC_ADDRESS    ResetRegister;                                            
+	UINT8                   ResetValue;                                                                        
+	UINT8                   Reserved7[3];                               
 } FADT_DESCRIPTOR_REV2_MINUS;
 
 
-/*
- * ACPI 1.0 FADT
- * Defined here to allow compiler to generate the length of the struct
- */
+  
+                
+                                                                      
+   
 typedef struct fadt_descriptor_rev1 {
 	ACPI_FADT_COMMON
 	UINT32                  Flags;
 } FADT_DESCRIPTOR_REV1;
 
 
-/* FADT: Prefered Power Management Profiles */
+                                              
 
 #define PM_UNSPECIFIED                  0
 #define PM_DESKTOP                      1
@@ -392,7 +392,7 @@ typedef struct fadt_descriptor_rev1 {
 #define PM_SOHO_SERVER                  5
 #define PM_APPLIANCE_PC                 6
 
-/* FADT: Boot Arch Flags */
+                           
 
 #define BAF_LEGACY_DEVICES              0x0001
 #define BAF_8042_KEYBOARD_CONTROLLER    0x0002
@@ -401,31 +401,31 @@ typedef struct fadt_descriptor_rev1 {
 #define FADT2_MINUS_REVISION_ID         2
 
 
-/* Reset to default packing */
+                              
 
 #pragma pack()
 
-/*
- * This macro is temporary until the table bitfield flag definitions
- * are removed and replaced by a Flags field.
- */
+  
+                                                                    
+                                             
+   
 #define ACPI_FLAG_OFFSET(d, f, o)         (UINT8) (ACPI_OFFSET (d,f) +\
 	                                         sizeof(((d *)0)->f) + o)
-/*
- * Get the remaining ACPI tables
- */
+  
+                                
+   
 #include "Acpi_v1.h"
 
-/*
- * ACPI Table information.  We save the table address, length,
- * and type of memory allocation (mapped or allocated) for each
- * table for 1) when we exit, and 2) if a new table is installed
- */
+  
+                                                              
+                                                               
+                                                                
+   
 #define ACPI_MEM_NOT_ALLOCATED  0
 #define ACPI_MEM_ALLOCATED      1
 #define ACPI_MEM_MAPPED         2
 
-/* Definitions for the Flags bitfield member of ACPI_TABLE_SUPPORT */
+                                                                     
 
 #define ACPI_TABLE_SINGLE       0x00
 #define ACPI_TABLE_MULTIPLE     0x01
@@ -437,7 +437,7 @@ typedef struct fadt_descriptor_rev1 {
 #define ACPI_TABLE_ALL          0x30
 #define ACPI_TABLE_TYPE_MASK    0x30
 
-/* Data about each known table type */
+                                      
 
 typedef struct acpi_table_support {
 	char                    *Name;
@@ -448,7 +448,7 @@ typedef struct acpi_table_support {
 } ACPI_TABLE_SUPPORT;
 
 
-/* Macros used to generate offsets to specific table fields */
+                                                              
 
 #define ACPI_FACS_OFFSET(f)             (UINT8) ACPI_OFFSET (FACS_DESCRIPTOR,f)
 #define ACPI_FADT_OFFSET(f)             (UINT8) ACPI_OFFSET (FADT_DESCRIPTOR, f)
@@ -459,4 +459,4 @@ typedef struct acpi_table_support {
 #define ACPI_FADT_FLAG_OFFSET(f, o)      ACPI_FLAG_OFFSET (FADT_DESCRIPTOR,f,o)
 #define ACPI_FACS_FLAG_OFFSET(f, o)      ACPI_FLAG_OFFSET (FACS_DESCRIPTOR,f,o)
 
-#endif /* __ACTBL_H__ */
+#endif                  

@@ -34,9 +34,9 @@
  * the terms and conditions for use and redistribution.
  */
 
-/*
- *	Codes for Unix software exceptions under EXC_SOFTWARE.
- */
+  
+                                                         
+   
 
 #ifndef _SYS_UX_EXCEPTION_H_
 #define _SYS_UX_EXCEPTION_H_
@@ -45,17 +45,17 @@
 
 #ifdef __APPLE_API_UNSTABLE
 
-#define EXC_UNIX_BAD_SYSCALL    0x10000         /* SIGSYS */
+#define EXC_UNIX_BAD_SYSCALL    0x10000                     
 
-#define EXC_UNIX_BAD_PIPE       0x10001         /* SIGPIPE */
+#define EXC_UNIX_BAD_PIPE       0x10001                      
 
-#define EXC_UNIX_ABORT          0x10002         /* SIGABRT */
+#define EXC_UNIX_ABORT          0x10002                      
 
-#endif /* __APPLE_API_UNSTABLE */
+#endif                           
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/* Kernel functions for Unix exception handler. */
+                                                  
 
 #include <mach/mach_types.h>
 
@@ -68,6 +68,6 @@ handle_ux_exception(thread_t thread, int exception,
     mach_exception_code_t code,
     mach_exception_subcode_t subcode);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif  /* _SYS_UX_EXCEPTION_H_ */
+#endif                            

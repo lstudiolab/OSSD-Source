@@ -8,14 +8,14 @@
 
 T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
-/*
- * <rdar://problem/30231213> close() of kqueue FD races with kqueue_scan park
- *
- * When close concurrent with poll goes wrong, the close hangs
- * and the kevent never gets any more events.
- */
+  
+                                                                             
+  
+                                                              
+                                             
+   
 
-/* Both events should fire at about the same time */
+                                                    
 static uint32_t timeout_ms = 10;
 
 static void *
@@ -32,7 +32,7 @@ poll_kqueue(void *arg)
 	int rv = kevent(fd, &kev, 1, NULL, 0, NULL);
 
 	if (rv == -1 && errno == EBADF) {
-		/* The close may race with this thread spawning */
+		                                                  
 		T_LOG("kqueue already closed?");
 		return NULL;
 	} else {

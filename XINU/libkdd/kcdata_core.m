@@ -73,23 +73,23 @@ mergedict(NSMutableDictionary * container, NSDictionary * object, NSError ** err
 	return TRUE;
 }
 
-/*!
- * @function getTypeFromTypeDef
- *
- * @abstract
- * Build a KCDataType from a type definition.
- *
- * @param typeDef
- * A pointer to kcdata_type_definition_t that specifies the type fields and has subtype definitions
- * in the memory immediately following the type_definition.
- *
- * @return KCDataType * type object which can be used to parse data into dictionaries.
- * This may return nil if it finds the data to be invalid.
- *
- * @discussion
- * This routine tries to decode the typeDef structure and create either a basic type (KCDBasicTypeDescription)
- * or a struct type.
- */
+   
+                               
+  
+            
+                                             
+  
+                 
+                                                                                                   
+                                                           
+  
+                                                                                      
+                                                          
+  
+              
+                                                                                                              
+                    
+   
 static KCDataType * getTypeFromTypeDef(struct kcdata_type_definition * typeDef);
 
 static KCDataType *
@@ -105,7 +105,7 @@ getTypeFromTypeDef(struct kcdata_type_definition * typeDef)
 	} else {
 		KCDStructTypeDescription * retval =
 		    [[KCDStructTypeDescription alloc] initWithType:typeDef->kct_type_identifier withName:kct_name];
-		/* need to do work here to get the array of elements setup here */
+		                                                                  
 		KCDBasicTypeDescription * curField = nil;
 		for (unsigned int i = 0; i < typeDef->kct_num_elements; i++) {
 			curField = [[KCDBasicTypeDescription alloc] initWithKCTypeDesc:&typeDef->kct_elements[i]];
@@ -137,7 +137,7 @@ getKCDataTypeForID(uint32_t typeID)
 			knownTypes[type] = [[KCDEmbeddedBufferDescription alloc] init];
 			return knownTypes[type];
 		}
-		/* code to query system for type information */
+		                                               
 		uint8_t buffer[MAX_KCDATATYPE_BUFFER_SIZE];
 		struct kcdata_type_definition * sys_def = kcdata_get_typedescription(typeID, buffer, MAX_KCDATATYPE_BUFFER_SIZE);
 		if (sys_def == NULL) {
@@ -232,7 +232,7 @@ parseKCDataContainer(kcdata_iter_t *iter_p, NSError **error)
 	}
 	uint64_t containerID = kcdata_iter_container_id(iter);
 
-	/* setup collection object for sub containers */
+	                                                
 	NSMutableDictionary * sub_containers = [[NSMutableDictionary alloc] init];
 	NSMutableDictionary * retval         = [[NSMutableDictionary alloc] init];
 	NSMutableDictionary * container      = [[NSMutableDictionary alloc] init];
@@ -340,7 +340,7 @@ parseKCDataBuffer(void * dataBuffer, uint32_t size, NSError ** error)
 	uint32_t rootType     = _type;
 	BOOL ok;
 
-	/* validate begin tag and get root key */
+	                                         
 	switch (_type) {
 	case KCDATA_BUFFER_BEGIN_CRASHINFO:
 		rootKey = @"kcdata_crashinfo";
@@ -378,7 +378,7 @@ parseKCDataBuffer(void * dataBuffer, uint32_t size, NSError ** error)
 	NSMutableDictionary * rootObject = [NSMutableDictionary dictionary];
 	NSDictionary * retval            = [NSMutableDictionary dictionaryWithObject:rootObject forKey:rootKey];
 
-	/* iterate over each kcdata item */
+	                                   
 	KCDATA_ITER_FOREACH(iter)
 	{
 		_type  = kcdata_iter_type(iter);

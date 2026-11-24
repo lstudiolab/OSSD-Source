@@ -21,9 +21,9 @@ T_DECL(ioconnectasyncmethod_referenceCnt,
 	T_ASSERT_NE(service, MACH_PORT_NULL, "got " kAppleKeyStoreServiceName " service");
 	T_ASSERT_MACH_SUCCESS(IOServiceOpen(service, mach_task_self(), 0, &conn), "opened connection to service");
 	T_ASSERT_MACH_SUCCESS(mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &wakePort), "allocated wake port");
-	T_ASSERT_MACH_ERROR(IOConnectCallAsyncMethod(conn, 0 /* selector */, wakePort, &reference, 0 /* referenceCnt */,
-	    NULL /* input */, 0 /* inputCnt */, NULL /* inputStruct */, 0 /* inputStructCnt */,
-	    NULL /* output */, 0 /* outputCnt */, NULL /* outputStruct */, 0 /* outputStructCntP */), kIOReturnBadArgument, "IOConnectCallAsyncMethod should fail with kIOReturnBadArgument");
+	T_ASSERT_MACH_ERROR(IOConnectCallAsyncMethod(conn, 0               , wakePort, &reference, 0                   ,
+	    NULL            , 0               , NULL                  , 0                     ,
+	    NULL             , 0                , NULL                   , 0                       ), kIOReturnBadArgument, "IOConnectCallAsyncMethod should fail with kIOReturnBadArgument");
 	IOServiceClose(conn);
 	mach_port_mod_refs(mach_task_self(), wakePort, MACH_PORT_RIGHT_RECEIVE, -1);
 }

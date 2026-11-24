@@ -53,8 +53,8 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 #include <mach/mach_types.h>
 #include <mach/error.h>
 #include <mach/vm_param.h>
@@ -68,16 +68,16 @@
 #include <vm/vm_map.h>
 #include <vm/vm_kern.h>
 
-/*
- * Exported interface
- */
+  
+                     
+   
 
-/*
- *	task_set_emulation_vector:  [Server Entry]
- *
- *	Set the list of emulated system calls for this task.
- *	The list is out-of-line.
- */
+  
+                                             
+  
+                                                       
+                           
+   
 kern_return_t
 task_set_emulation_vector(
 	__unused task_t                 task,
@@ -88,26 +88,26 @@ task_set_emulation_vector(
 	return KERN_NOT_SUPPORTED;
 }
 
-/*
- *	task_get_emulation_vector: [Server Entry]
- *
- *	Get the list of emulated system calls for this task.
- *	List is returned out-of-line.
- */
+  
+                                            
+  
+                                                       
+                                
+   
 kern_return_t
 task_get_emulation_vector(
 	__unused task_t                 task,
-	__unused int                    *vector_start,          /* out */
-	__unused emulation_vector_t     *emulation_vector,      /* out */
-	__unused mach_msg_type_number_t *emulation_vector_count)/* out */
+	__unused int                    *vector_start,                   
+	__unused emulation_vector_t     *emulation_vector,               
+	__unused mach_msg_type_number_t *emulation_vector_count)         
 {
 	return KERN_NOT_SUPPORTED;
 }
 
-/*
- *   task_set_emulation:  [Server Entry]
- *   set up for user space emulation of syscalls within this task.
- */
+  
+                                        
+                                                                  
+   
 kern_return_t
 task_set_emulation(
 	__unused task_t         task,

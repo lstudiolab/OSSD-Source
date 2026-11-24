@@ -65,58 +65,58 @@
 
 #ifndef DRIVERKIT
 #include <sys/appleapiopts.h>
-#include <sys/types.h>          /* u_short */
+#include <sys/types.h>                       
 #else
 #include <sys/_types.h>
 #include <sys/_types/_u_char.h>
 #include <sys/_types/_u_short.h>
-#endif /* DRIVERKIT */
+#endif                
 
-/*
- * Udp protocol header.
- * Per RFC 768, September, 1981.
- */
+  
+                       
+                                
+   
 struct udphdr {
-	u_short uh_sport;               /* source port */
-	u_short uh_dport;               /* destination port */
-	u_short uh_ulen;                /* udp length */
-	u_short uh_sum;                 /* udp checksum */
+	u_short uh_sport;                                
+	u_short uh_dport;                                     
+	u_short uh_ulen;                                
+	u_short uh_sum;                                   
 };
 
-/*
- * User-settable options (used with setsockopt).
- */
-#define UDP_NOCKSUM     0x01    /* don't checksum outbound payloads */
+  
+                                                
+   
+#define UDP_NOCKSUM     0x01                                          
 #ifdef PRIVATE
-#define UDP_KEEPALIVE_OFFLOAD   0x02 /* Send keep-alive at a given interval */
-#endif /* PRIVATE */
+#define UDP_KEEPALIVE_OFFLOAD   0x02                                          
+#endif              
 
 #ifdef PRIVATE
-/*
- * This is a mechanism to offload keep-alive or heartbeat messages
- * to the Wifi driver when the host processor is sleeping. The application
- * will give a small amount of data that can be placed in the message. The
- * application will also specify an interval at which these messages
- * should be sent.
- *
- * The purpose of these messages is to detect loss of connectivity in
- * peer-to-peer communication without keeping the host processor awake.
- *
- * The application will pass this data to the kernel using setsockopt. It
- * can set the interval to 0 to disable keepalive offload.
- */
+  
+                                                                  
+                                                                          
+                                                                          
+                                                                    
+                  
+  
+                                                                     
+                                                                       
+  
+                                                                         
+                                                          
+   
 #define UDP_KEEPALIVE_OFFLOAD_DATA_SIZE 32
 
-/* Maximum keep alive interval in seconds */
+                                            
 #define UDP_KEEPALIVE_INTERVAL_MAX_SECONDS      65536
 
 struct udp_keepalive_offload {
 	u_char ka_data[UDP_KEEPALIVE_OFFLOAD_DATA_SIZE];
-	u_int16_t ka_interval;          /* interval in seconds */
-	u_int8_t ka_data_len;           /* valid length of ka_data */
-	u_int8_t ka_type;               /* type of application */
+	u_int16_t ka_interval;                                   
+	u_int8_t ka_data_len;                                        
+	u_int8_t ka_type;                                        
 #define UDP_KEEPALIVE_OFFLOAD_TYPE_AIRPLAY      0x1
 };
 
-#endif /* PRIVATE */
-#endif /* _NETINET_UDP_H */
+#endif              
+#endif                     

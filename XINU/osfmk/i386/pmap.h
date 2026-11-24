@@ -53,17 +53,17 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- *	File:	pmap.h
- *
- *	Authors:  Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Machine-dependent structures for the physical map module.
- */
+  
+               
+  
+                                                      
+             
+  
+                                                            
+   
 #ifdef KERNEL_PRIVATE
 #ifndef _PMAP_MACHINE_
 #define _PMAP_MACHINE_  1
@@ -84,9 +84,9 @@
 
 #include <i386/pal_routines.h>
 
-/*
- *	Define the generic in terms of the specific
- */
+  
+                                              
+   
 
 #define INTEL_PGBYTES           I386_PGBYTES
 #define INTEL_PGSHIFT           I386_PGSHIFT
@@ -95,11 +95,11 @@
 #define intel_round_page(x)     i386_round_page(x)
 #define intel_trunc_page(x)     i386_trunc_page(x)
 
-/*
- *	i386/i486/i860 Page Table Entry
- */
+  
+                                  
+   
 
-#endif  /* ASSEMBLER */
+#endif                 
 
 #define NPGPTD          4ULL
 #define PDESHIFT        21ULL
@@ -110,8 +110,8 @@
 
 #define LOW_4GB_MASK    ((vm_offset_t)0x00000000FFFFFFFFUL)
 
-#define PDESIZE         sizeof(pd_entry_t) /* for assembly files */
-#define PTESIZE         sizeof(pt_entry_t) /* for assembly files */
+#define PDESIZE         sizeof(pd_entry_t)                         
+#define PTESIZE         sizeof(pt_entry_t)                         
 
 #define INTEL_OFFMASK   (I386_PGBYTES - 1)
 #define INTEL_LOFFMASK  (I386_LPGBYTES - 1)
@@ -125,9 +125,9 @@
 #define NBPDE           (1ULL << PDESHIFT)
 #define PDEMASK         (NBPDE - 1)
 
-#define PTE_PER_PAGE    512 /* number of PTE's per page on any level */
+#define PTE_PER_PAGE    512                                            
 
-/* cleanly define parameters for all the page table levels */
+                                                             
 typedef uint64_t        pml4_entry_t;
 #define NPML4PG         (PAGE_SIZE/(sizeof (pml4_entry_t)))
 #define PML4SHIFT       39
@@ -188,23 +188,23 @@ extern int pmap_asserts_traced;
 #define pmap_assert2(ex, fmt, args...)
 #endif
 
-/* superpages */
+                
 #define SUPERPAGE_NBASEPAGES 512
 
-/*
- * Atomic 64-bit store of a page table entry.
- */
+  
+                                             
+   
 static inline void
 pmap_store_pte(pt_entry_t *entryp, pt_entry_t value)
 {
-	/*
-	 * In the 32-bit kernel a compare-and-exchange loop was
-	 * required to provide atomicity. For K64, life is easier:
-	 */
+	  
+                                                        
+                                                           
+    
 	*entryp = value;
 }
 
-/* in 64 bit spaces, the number of each type of page in the page tables */
+                                                                          
 #define NPML4PGS        (1ULL * (PAGE_SIZE/(sizeof (pml4_entry_t))))
 #define NPDPTPGS        (NPML4PGS * (PAGE_SIZE/(sizeof (pdpt_entry_t))))
 #define NPDEPGS         (NPDPTPGS * (PAGE_SIZE/(sizeof (pd_entry_t))))
@@ -214,21 +214,21 @@ extern int      kernPhysPML4Index;
 extern int      kernPhysPML4EntryCount;
 
 #define KERNEL_PML4_INDEX               511
-#define KERNEL_KEXTS_INDEX              (KERNEL_PML4_INDEX - 1)         /* 510: Home of KEXTs - the basement */
-#define KERNEL_PHYSMAP_PML4_INDEX       (kernPhysPML4Index)             /* 50X: virtual to physical map */
+#define KERNEL_KEXTS_INDEX              (KERNEL_PML4_INDEX - 1)                                                
+#define KERNEL_PHYSMAP_PML4_INDEX       (kernPhysPML4Index)                                               
 #define KERNEL_PHYSMAP_PML4_COUNT       (kernPhysPML4EntryCount)
-#define KERNEL_PHYSMAP_PML4_COUNT_MAX   (16 - 2)        /* 1 for KERNEL, 1 for BASEMENT */
-/* 2 PML4s for KASAN to cover a maximum of 16 PML4s {PHYSMAP + BASEMENT + KVA} */
-#define KERNEL_KASAN_PML4_LAST          (495) /* 511 - 16 */
-#define KERNEL_KASAN_PML4_FIRST         (494) /* 511 - 17 */
+#define KERNEL_PHYSMAP_PML4_COUNT_MAX   (16 - 2)                                          
+                                                                                 
+#define KERNEL_KASAN_PML4_LAST          (495)               
+#define KERNEL_KASAN_PML4_FIRST         (494)               
 #define KERNEL_DBLMAP_PML4_INDEX        (KERNEL_KASAN_PML4_FIRST - 1)
 #define KERNEL_PML4_COUNT               1
 #define KERNEL_BASE                     (0ULL - (NBPML4 * KERNEL_PML4_COUNT))
-#define KERNEL_BASEMENT                 (KERNEL_BASE - NBPML4)  /* Basement uses one PML4 entry */
+#define KERNEL_BASEMENT                 (KERNEL_BASE - NBPML4)                                    
 
-/*
- * Pte related macros
- */
+  
+                     
+   
 #define KVADDR(pmi, pdpi, pdi, pti)               \
 	 ((vm_offset_t)                   \
 	        ((uint64_t) -1    << 47)        | \
@@ -239,14 +239,14 @@ extern int      kernPhysPML4EntryCount;
 
 
 #ifndef NKPT
-#define NKPT            500     /* actual number of bootstrap kernel page tables */
+#define NKPT            500                                                        
 #endif
 
 
 
-/*
- *	Convert address offset to page descriptor index
- */
+  
+                                                  
+   
 #define pdptnum(pmap, a) (((vm_offset_t)(a) >> PDPTSHIFT) & PDPTMASK)
 #define pdenum(pmap, a) (((vm_offset_t)(a) >> PDESHIFT) & PDEMASK)
 #define PMAP_INVALID_PDPTNUM (~0ULL)
@@ -256,20 +256,20 @@ extern int      kernPhysPML4EntryCount;
 #define pml4idx(pmap, a)   (((a) >> PML4SHIFT) & ((1ULL<<(48 - PML4SHIFT)) -1))
 
 
-/*
- *	Convert page descriptor index to user virtual address
- */
+  
+                                                        
+   
 #define pdetova(a)      ((vm_offset_t)(a) << PDESHIFT)
 
-/*
- *	Convert address offset to page table index
- */
+  
+                                             
+   
 #define ptenum(a)       (((vm_offset_t)(a) >> PTESHIFT) & PTEMASK)
 
-/*
- *	Hardware pte bit definitions (to be used directly on the ptes
- *	without using the bit fields).
- */
+  
+                                                                
+                                 
+   
 
 #define INTEL_PTE_VALID         0x00000001ULL
 
@@ -289,38 +289,38 @@ extern int      kernPhysPML4EntryCount;
 
 #define INTEL_PTE_GLOBAL        0x00000100ULL
 
-/* These markers use software available bits ignored by the
- * processor's 4-level and EPT pagetable walkers.
- * N.B.: WIRED was originally bit 10, but that conflicts with
- * execute permissions for EPT entries iff mode-based execute controls
- * are enabled.
- */
+                                                           
+                                                 
+                                                             
+                                                                      
+               
+   
 #define INTEL_PTE_SWLOCK        (0x1ULL << 52)
 #define INTEL_PDPTE_NESTED      (0x1ULL << 53)
 #define INTEL_PTE_WIRED         (0x1ULL << 54)
-/* TODO: Compressed markers, potential conflict with protection keys? */
-#define INTEL_PTE_COMPRESSED_ALT (1ULL << 61) /* compressed but with "alternate accounting" */
-#define INTEL_PTE_COMPRESSED    (1ULL << 62) /* marker, for invalid PTE only -- ignored by hardware for both regular/EPT entries*/
+                                                                        
+#define INTEL_PTE_COMPRESSED_ALT (1ULL << 61)                                                 
+#define INTEL_PTE_COMPRESSED    (1ULL << 62)                                                                                      
 
 #define INTEL_PTE_PFN           PG_FRAME
-/* TODO: these should be internal definitions */
+                                                
 #define INTEL_PTE_NX            (1ULL << 63)
 
 #define INTEL_PTE_INVALID       0
-/* This is conservative, but suffices */
+                                        
 #define INTEL_PTE_RSVD          ((1ULL << 10) | (1ULL << 11))
 
 
 #define INTEL_PTE_COMPRESSED_MASK (INTEL_PTE_COMPRESSED | \
 	                           INTEL_PTE_COMPRESSED_ALT | INTEL_PTE_SWLOCK)
 #define PTE_IS_COMPRESSED(x, ptep, pmap, vaddr)                            \
-	((((x) & INTEL_PTE_VALID) == 0) && /* PTE is not valid... */       \
-	 ((x) & INTEL_PTE_COMPRESSED) && /* ...has "compressed" marker" */ \
-	 ((!((x) & ~INTEL_PTE_COMPRESSED_MASK)) || /* ...no other bits */  \
+	((((x) & INTEL_PTE_VALID) == 0) &&                                 \
+	 ((x) & INTEL_PTE_COMPRESSED) &&                                   \
+	 ((!((x) & ~INTEL_PTE_COMPRESSED_MASK)) ||                         \
 	  pmap_compressed_pte_corruption_repair((x), &(x), (ptep), (pmap), (vaddr))))
 
-#define pa_to_pte(a)            ((a) & INTEL_PTE_PFN) /* XXX */
-#define pte_to_pa(p)            ((p) & INTEL_PTE_PFN) /* XXX */
+#define pa_to_pte(a)            ((a) & INTEL_PTE_PFN)          
+#define pte_to_pa(p)            ((p) & INTEL_PTE_PFN)          
 #define pte_increment_pa(p)     ((p) += INTEL_OFFMASK+1)
 
 #define pte_kernel_rw(p)          ((pt_entry_t)(pa_to_pte(p) | INTEL_PTE_VALID|INTEL_PTE_RW))
@@ -348,9 +348,9 @@ extern int      kernPhysPML4EntryCount;
 #define INTEL_EPT_WP            0x00000028ULL
 #define INTEL_EPT_WB            0x00000030ULL
 
-/*
- * Routines to filter correct bits depending on the pmap type
- */
+  
+                                                             
+   
 
 static inline pt_entry_t
 pte_remove_ex(pt_entry_t pte, boolean_t is_ept)
@@ -406,11 +406,11 @@ ept_refmod_to_physmap(pt_entry_t ept_pte)
 	return physmap_pte;
 }
 
-/*
- * Note: Not all Intel processors support EPT referenced access and dirty bits.
- *	 During pmap_init() we check the VMX capability for the current hardware
- *	 and update this variable accordingly.
- */
+  
+                                                                               
+                                                                           
+                                         
+   
 extern boolean_t pmap_ept_support_ad;
 
 #define PTE_VALID_MASK(is_ept)  ((is_ept) ? (INTEL_EPT_READ | INTEL_EPT_WRITE | INTEL_EPT_EX) : INTEL_PTE_VALID)
@@ -433,7 +433,7 @@ extern boolean_t pmap_ept_support_ad;
 #define PMAP_ACTIVATE_CACHE     4
 #define PMAP_NO_GUARD_CACHE     8
 
-/* Per-pmap ledger operations */
+                                
 #define pmap_ledger_debit(p, e, a) ledger_debit((p)->ledger, e, a)
 #define pmap_ledger_credit(p, e, a) ledger_credit((p)->ledger, e, a)
 
@@ -441,16 +441,16 @@ extern boolean_t pmap_ept_support_ad;
 
 #include <sys/queue.h>
 
-/*
- * Address of current and alternate address space page table maps
- * and directories.
- */
+  
+                                                                 
+                   
+   
 
 extern pt_entry_t       *PTmap;
 extern pdpt_entry_t     *IdlePDPT;
 extern pml4_entry_t     *IdlePML4;
 extern boolean_t        no_shared_cr3;
-extern pd_entry_t       *IdlePTD;       /* physical addr of "Idle" state PTD */
+extern pd_entry_t       *IdlePTD;                                              
 
 extern uint64_t         pmap_pv_hashlist_walks;
 extern uint64_t         pmap_pv_hashlist_cnts;
@@ -512,18 +512,18 @@ LDTALIAS_CHECK(uintptr_t x)
 #define LDTALIAS(x) (LDTALIAS_CHECK((uint64_t) x))
 #endif
 
-/*
- * For KASLR, we alias the master processor's IDT and GDT at fixed
- * virtual addresses to defeat SIDT/SGDT address leakage.
- * And non-boot processor's GDT aliases likewise (skipping LOWGLOBAL_ALIAS)
- * The low global vector page is mapped at a fixed alias also.
- */
+  
+                                                                  
+                                                         
+                                                                           
+                                                              
+   
 #define LOWGLOBAL_ALIAS         (VM_MIN_KERNEL_ADDRESS + 0x2000)
 
-/*
- * This indicates (roughly) where there is free space for the VM
- * to use for the heap; this does not need to be precise.
- */
+  
+                                                                
+                                                         
+   
 #define KERNEL_PMAP_HEAP_RANGE_START VM_MIN_KERNEL_AND_KEXT_ADDRESS
 
 #if MACH_KERNEL_PRIVATE
@@ -532,43 +532,43 @@ pmap_tlbi_range(uint64_t startv, uint64_t endv, bool global, uint16_t pcid);
 
 #include <vm/vm_page.h>
 
-/*
- *	For each vm_page_t, there is a list of all currently
- *	valid virtual mappings of that page.  An entry is
- *	a pv_entry_t; the list is the pv_table.
- */
+  
+                                                       
+                                                    
+                                          
+   
 
 struct pmap {
 	lck_rw_t        pmap_rwl __attribute((aligned(64)));
-	pmap_paddr_t    pm_cr3 __attribute((aligned(64))); /* Kernel+user shared PML4 physical*/
-	pmap_paddr_t    pm_ucr3;        /* Mirrored user PML4 physical */
-	pml4_entry_t    *pm_pml4;       /* VKA of top level */
-	pml4_entry_t    *pm_upml4;      /* Shadow VKA of top level */
-	pmap_paddr_t    pm_eptp;        /* EPTP */
+	pmap_paddr_t    pm_cr3 __attribute((aligned(64)));                                      
+	pmap_paddr_t    pm_ucr3;                                         
+	pml4_entry_t    *pm_pml4;                             
+	pml4_entry_t    *pm_upml4;                                   
+	pmap_paddr_t    pm_eptp;                  
 
 	task_map_t      pm_task_map;
 	boolean_t       pagezero_accessible;
-	boolean_t       pm_vm_map_cs_enforced; /* is vm_map cs_enforced? */
-#define PMAP_PCID_MAX_CPUS      MAX_CPUS        /* Must be a multiple of 8 */
+	boolean_t       pm_vm_map_cs_enforced;                             
+#define PMAP_PCID_MAX_CPUS      MAX_CPUS                                     
 	pcid_t          pmap_pcid_cpus[PMAP_PCID_MAX_CPUS];
 	volatile uint8_t pmap_pcid_coherency_vector[PMAP_PCID_MAX_CPUS];
 	boolean_t       pm_shared;
 	os_refcnt_t     ref_count;
-	pdpt_entry_t    *pm_pdpt;       /* KVA of 3rd level page */
-	vm_object_t     pm_obj;         /* object to hold pde's */
-	vm_object_t     pm_obj_pdpt;    /* holds pdpt pages */
-	vm_object_t     pm_obj_pml4;    /* holds pml4 pages */
+	pdpt_entry_t    *pm_pdpt;                                  
+	vm_object_t     pm_obj;                                   
+	vm_object_t     pm_obj_pdpt;                          
+	vm_object_t     pm_obj_pml4;                          
 #if     DEVELOPMENT || DEBUG
 	int             nx_enabled;
 #endif
-	ledger_t        ledger;         /* ledger tracking phys mappings */
-	struct pmap_statistics  stats;  /* map statistics */
+	ledger_t        ledger;                                            
+	struct pmap_statistics  stats;                      
 	uint64_t        corrected_compressed_ptes_count;
 #if MACH_ASSERT
 	boolean_t       pmap_stats_assert;
 	int             pmap_pid;
 	char            pmap_procname[17];
-#endif /* MACH_ASSERT */
+#endif                  
 };
 
 static inline boolean_t
@@ -587,12 +587,12 @@ is_ept_pmap(pmap_t p)
 void hv_ept_pmap_create(void **ept_pmap, void **eptp);
 
 typedef struct pmap_memory_regions {
-	ppnum_t base;            /* first page of this region */
-	ppnum_t alloc_up;        /* pages below this one have been "stolen" */
-	ppnum_t alloc_down;      /* pages above this one have been "stolen" */
-	ppnum_t alloc_frag_up;   /* low page of fragment after large page alloc */
-	ppnum_t alloc_frag_down; /* high page of fragment after large page alloc */
-	ppnum_t end;             /* last page of this region */
+	ppnum_t base;                                           
+	ppnum_t alloc_up;                                                     
+	ppnum_t alloc_down;                                                   
+	ppnum_t alloc_frag_up;                                                    
+	ppnum_t alloc_frag_down;                                                   
+	ppnum_t end;                                           
 	uint32_t type;
 	uint64_t attribute;
 } pmap_memory_region_t;
@@ -621,11 +621,11 @@ set_dirbase(pmap_t tpmap, thread_t thread, int my_cpu)
 
 	assert((get_preemption_level() > 0) || (ml_get_interrupts_enabled() == FALSE));
 	assert(ccpu == cpu_number());
-	/*
-	 * Switch cr3 if necessary
-	 * - unless running with no_shared_cr3 debugging mode
-	 *   and we're not on the kernel's cr3 (after pre-empted copyio)
-	 */
+	  
+                           
+                                                      
+                                                                 
+    
 	boolean_t nopagezero = tpmap->pagezero_accessible;
 	boolean_t priorpagezero = cpu_datap(ccpu)->cpu_pagezero_mapped;
 	cpu_datap(ccpu)->cpu_pagezero_mapped = nopagezero;
@@ -658,9 +658,9 @@ set_dirbase(pmap_t tpmap, thread_t thread, int my_cpu)
 	}
 }
 
-/*
- *	External declarations for PMAP_ACTIVATE.
- */
+  
+                                           
+   
 
 extern void             pmap_update_interrupt(void);
 
@@ -701,9 +701,9 @@ extern void
 pmap_mark_range(pmap_t npmap, uint64_t sv, uint64_t nxrosz, boolean_t NX,
     boolean_t ro);
 
-/*
- * Get cache attributes (as pagetable bits) for the specified phys page
- */
+  
+                                                                       
+   
 extern  unsigned        pmap_get_cache_attributes(ppnum_t, boolean_t is_ept);
 
 extern kern_return_t    pmap_map_block_addr(
@@ -740,9 +740,9 @@ extern void x86_64_protect_data_const(void);
 
 extern uint64_t pmap_commpage_size_min(pmap_t pmap);
 
-/*
- *	Macros for speed.
- */
+  
+                    
+   
 
 
 #include <kern/spl.h>
@@ -772,13 +772,13 @@ extern uint64_t pmap_commpage_size_min(pmap_t pmap);
 	splx(spl);                                                      \
 }
 
-/*
- * Marking the current cpu's cr3 inactive is achieved by setting its lsb.
- * Marking the current cpu's cr3 active once more involves clearng this bit.
- * Note that valid page tables are page-aligned and so the bottom 12 bits
- * are normally zero, modulo PCID.
- * We can only mark the current cpu active/inactive but we can test any cpu.
- */
+  
+                                                                         
+                                                                            
+                                                                         
+                                  
+                                                                            
+   
 #define CPU_CR3_MARK_INACTIVE()                                         \
 	current_cpu_datap()->cpu_active_cr3 |= 1
 
@@ -794,13 +794,13 @@ extern uint64_t pmap_commpage_size_min(pmap_t pmap);
 #define CPU_GET_TASK_CR3(cpu)                                           \
 	(cpu_datap(cpu)->cpu_task_cr3)
 
-/*
- *	Mark this cpu idle, and remove it from the active set,
- *	since it is not actively using any pmap.  Signal_cpus
- *	will notice that it is idle, and avoid signaling it,
- *	but will queue the update request for when the cpu
- *	becomes active.
- */
+  
+                                                         
+                                                        
+                                                       
+                                                     
+                  
+   
 #define MARK_CPU_IDLE(my_cpu)   {                                       \
 	assert(ml_get_interrupts_enabled() == FALSE);                   \
 	CPU_CR3_MARK_INACTIVE();                                        \
@@ -809,16 +809,16 @@ extern uint64_t pmap_commpage_size_min(pmap_t pmap);
 
 #define MARK_CPU_ACTIVE(my_cpu) {                                       \
 	assert(ml_get_interrupts_enabled() == FALSE);                   \
-	/* \
-	 *	If a kernel_pmap update was requested while this cpu \
-	 *	was idle, process it as if we got the interrupt. \
-	 *	Before doing so, remove this cpu from the idle set. \
-	 *	Since we do not grab any pmap locks while we flush \
-	 *	our TLB, another cpu may start an update operation \
-	 *	before we finish.  Removing this cpu from the idle \
-	 *	set assures that we will receive another update \
-	 *	interrupt if this happens. \
-	 */                                                             \
+	    
+                                                          
+                                                      
+                                                         
+                                                        
+                                                        
+                                                        
+                                                     
+                                
+                                                                 \
 	CPU_CR3_MARK_ACTIVE();                                          \
 	mfence();                                                       \
 	pmap_update_interrupt();                                        \
@@ -845,14 +845,14 @@ extern boolean_t pmap_is_empty(pmap_t           pmap,
     vm_map_offset_t  start,
     vm_map_offset_t  end);
 
-#define MACHINE_BOOTSTRAPPTD    1       /* Static bootstrap page-tables */
+#define MACHINE_BOOTSTRAPPTD    1                                         
 
 kern_return_t
     pmap_permissions_verify(pmap_t, vm_map_t, vm_offset_t, vm_offset_t);
 
 #if DEVELOPMENT || DEBUG
 extern kern_return_t pmap_test_text_corruption(pmap_paddr_t);
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 #if MACH_ASSERT
 extern int pmap_stats_assert;
@@ -860,10 +860,10 @@ extern int pmap_stats_assert;
 	MACRO_BEGIN                             \
 	if (pmap_stats_assert) assertf args;    \
 	MACRO_END
-#else /* MACH_ASSERT */
+#else                  
 #define PMAP_STATS_ASSERTF(args)
-#endif /* MACH_ASSERT */
-#endif /* MACH_KERNEL_PRIVATE */
-#endif  /* ASSEMBLER */
-#endif  /* _PMAP_MACHINE_ */
-#endif  /* KERNEL_PRIVATE */
+#endif                  
+#endif                          
+#endif                 
+#endif                      
+#endif                      

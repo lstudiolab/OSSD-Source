@@ -53,140 +53,140 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
 
 #include <i386/asm.h>
 #include <i386/proc_reg.h>
 #include <assym.s>
 
-/*
- * void Load_context(
- *                   thread_t thread)    // %rdi
- *
- * Loads the first thread context to run on a CPU,
- * i.e. without switching from a previous thread.
- *
- * returns 'old' thread in %rax (which is always NULL)
- */
+  
+                     
+                                                
+  
+                                                  
+                                                 
+  
+                                                      
+   
 Entry(Load_context)
-	movq    %rdi, %rdx                      /* move thread arg to rdx */
+	movq    %rdi, %rdx                                                  
 
-	movq    %rdx,%gs:CPU_ACTIVE_THREAD      /* new thread is active */
-	movq    TH_KERNEL_STACK(%rdx),%rdx      /* get its kernel stack */
+	movq    %rdx,%gs:CPU_ACTIVE_THREAD                                
+	movq    TH_KERNEL_STACK(%rdx),%rdx                                
 	lea     -IKS_SIZE(%rdx),%rcx
-	add     EXT(kernel_stack_size)(%rip),%rcx /* point to stack top */
+	add     EXT(kernel_stack_size)(%rip),%rcx                         
 
-	movq    %rdx,%gs:CPU_ACTIVE_STACK       /* set current stack */
-	movq    %rcx,%gs:CPU_KERNEL_STACK       /* set stack top */
+	movq    %rdx,%gs:CPU_ACTIVE_STACK                              
+	movq    %rcx,%gs:CPU_KERNEL_STACK                          
 
-	movq    KSS_RSP(%rcx),%rsp              /* switch stacks */
-	movq    KSS_RBX(%rcx),%rbx              /* restore registers */
+	movq    KSS_RSP(%rcx),%rsp                                 
+	movq    KSS_RBX(%rcx),%rbx                                     
 	movq    KSS_RBP(%rcx),%rbp
 	movq    KSS_R12(%rcx),%r12
 	movq    KSS_R13(%rcx),%r13
 	movq    KSS_R14(%rcx),%r14
 	movq    KSS_R15(%rcx),%r15
 
-	xorl    %eax, %eax                      /* set return value to zero (no old thread) */
+	xorl    %eax, %eax                                                                    
 
-	jmp    *KSS_RIP(%rcx)                   /* return old thread */
+	jmp    *KSS_RIP(%rcx)                                          
 
-/*
- * thread_t Switch_context(
- *		thread_t old,				// %rdi
- *		thread_continue_t continuation,		// %rsi
- *		thread_t new)				// %rdx
- *
- * returns 'old' thread in %rax
- */
+  
+                           
+                            
+                                            
+                            
+  
+                               
+   
 Entry(Switch_context)
-	popq	%rax				/* pop return PC */
+	popq	%rax				                   
 
-	/* Test for a continuation and skip all state saving if so... */
+	                                                                
 	cmpq	$0, %rsi
 	jne 	5f
-	movq	%gs:CPU_KERNEL_STACK,%rcx	/* get old kernel stack top */
-	movq	%rbx,KSS_RBX(%rcx)		/* save registers */
+	movq	%gs:CPU_KERNEL_STACK,%rcx	                              
+	movq	%rbx,KSS_RBX(%rcx)		                    
 	movq	%rbp,KSS_RBP(%rcx)
 	movq	%r12,KSS_R12(%rcx)
 	movq	%r13,KSS_R13(%rcx)
 	movq	%r14,KSS_R14(%rcx)
 	movq	%r15,KSS_R15(%rcx)
-	movq	%rax,KSS_RIP(%rcx)		/* save return PC */
-	movq	%rsp,KSS_RSP(%rcx)		/* save SP */
+	movq	%rax,KSS_RIP(%rcx)		                    
+	movq	%rsp,KSS_RSP(%rcx)		             
 5:
-	movq	%rdi,%rax			/* return old thread */
-	/* new thread in %rdx */
-	movq    %rdx,%gs:CPU_ACTIVE_THREAD      /* new thread is active */
-	movq	TH_KERNEL_STACK(%rdx),%rdx	/* get its kernel stack */
+	movq	%rdi,%rax			                       
+	                        
+	movq    %rdx,%gs:CPU_ACTIVE_THREAD                                
+	movq	TH_KERNEL_STACK(%rdx),%rdx	                          
 	lea	-IKS_SIZE(%rdx),%rcx
-	add	EXT(kernel_stack_size)(%rip),%rcx /* point to stack top */
+	add	EXT(kernel_stack_size)(%rip),%rcx                         
 
-	movq	%rdx,%gs:CPU_ACTIVE_STACK	/* set current stack */
-	movq	%rcx,%gs:CPU_KERNEL_STACK	/* set stack top */
+	movq	%rdx,%gs:CPU_ACTIVE_STACK	                       
+	movq	%rcx,%gs:CPU_KERNEL_STACK	                   
 
-	movq	KSS_RSP(%rcx),%rsp		/* switch stacks */
-	movq	KSS_RBX(%rcx),%rbx		/* restore registers */
+	movq	KSS_RSP(%rcx),%rsp		                   
+	movq	KSS_RBX(%rcx),%rbx		                       
 	movq	KSS_RBP(%rcx),%rbp
 	movq	KSS_R12(%rcx),%r12
 	movq	KSS_R13(%rcx),%r13
 	movq	KSS_R14(%rcx),%r14
 	movq	KSS_R15(%rcx),%r15
-	jmp	*KSS_RIP(%rcx)			/* return old thread in %rax */
+	jmp	*KSS_RIP(%rcx)			                               
 
-/*
- * machine_stack_attach sets this as the RIP of newly-attached stacks
- * %rbx is the C routine to call
- * %rax is the parameter to pass to the C routine
- *
- * This stub is needed to convert the return value of the old thread from Switch_context
- * in %rax into a parameter to thread_continue passed in %rdi, because using the
- * same register for the first argument and first retval makes too much sense for the SysV ABI.
- */
+  
+                                                                     
+                                
+                                                 
+  
+                                                                                        
+                                                                                
+                                                                                               
+   
 Entry(Thread_continue)
-	movq	%rax, %rdi			/* this is the old thread from Switch_context */
-	call	*%rbx				/* call real continuation */
-	int3					/* (should never return) */
+	movq	%rax, %rdi			                                                
+	call	*%rbx				                            
+	int3					                           
 
-/*
- * thread_t Shutdown_context(
- *		thread_t thread,		// %rdi
- *		void (*routine)(processor_t),	// %rsi
- *		processor_t processor)		// %rdx
- *
- * saves the kernel context of the thread,
- * switches to the interrupt stack,
- * then runs routine on the interrupt stack.
- */
+  
+                             
+                             
+                                         
+                                   
+  
+                                          
+                                   
+                                            
+   
 Entry(Shutdown_context)
-	movq	%gs:CPU_KERNEL_STACK,%rcx	/* get old kernel stack top */
-	movq	%rbx,KSS_RBX(%rcx)		/* save registers */
+	movq	%gs:CPU_KERNEL_STACK,%rcx	                              
+	movq	%rbx,KSS_RBX(%rcx)		                    
 	movq	%rbp,KSS_RBP(%rcx)
 	movq	%r12,KSS_R12(%rcx)
 	movq	%r13,KSS_R13(%rcx)
 	movq	%r14,KSS_R14(%rcx)
 	movq	%r15,KSS_R15(%rcx)
-	popq	%r8				/* extract return PC */
-	movq	%r8,KSS_RIP(%rcx)		/* save return PC */
-	movq	%rsp,KSS_RSP(%rcx)		/* save SP */
+	popq	%r8				                       
+	movq	%r8,KSS_RIP(%rcx)		                    
+	movq	%rsp,KSS_RSP(%rcx)		             
 
-	movq	%gs:CPU_ACTIVE_STACK,%rcx	/* get old kernel stack */
-	movq	%rdi,%rax			/* get old thread */
-	movq	%rcx,TH_KERNEL_STACK(%rax)	/* save old stack */
+	movq	%gs:CPU_ACTIVE_STACK,%rcx	                          
+	movq	%rdi,%rax			                    
+	movq	%rcx,TH_KERNEL_STACK(%rax)	                    
 
-	movq	%gs:CPU_INT_STACK_TOP,%rsp 	/* switch to interrupt stack */
+	movq	%gs:CPU_INT_STACK_TOP,%rsp 	                               
 
 	movq	%rsp, %gs:CPU_ACTIVE_STACK
-	movq	EXT(kernel_stack_size)(%rip),%rcx /* point to stack top */
+	movq	EXT(kernel_stack_size)(%rip),%rcx                         
 	subq	%rcx, %gs:CPU_ACTIVE_STACK
 
-	pushq   %r8                             /* set up a call frame on new stack */
+	pushq   %r8                                                                   
 	pushq   %rbp
 	movq    %rsp, %rbp
 
-	movq	%rdx,%rdi			/* processor arg to routine */
-	call	*%rsi				/* call routine to run */
-	int3					/* (should never return) */
+	movq	%rdx,%rdi			                              
+	call	*%rsi				                         
+	int3					                           
 

@@ -30,12 +30,12 @@
 #define __VM_VM_OPTIONS_H__
 
 #define UPL_DEBUG DEBUG
-// #define VM_PIP_DEBUG
+                       
 
 #define VM_PAGE_BUCKETS_CHECK DEBUG
 #if VM_PAGE_BUCKETS_CHECK
 #define VM_PAGE_FAKE_BUCKETS 1
-#endif /* VM_PAGE_BUCKETS_CHECK */
+#endif                            
 
 #define VM_OBJECT_TRACKING 0
 #define VM_SCAN_FOR_SHADOW_CHAIN (DEVELOPMENT || DEBUG)
@@ -44,4 +44,4 @@
 
 #define VM_NAMED_ENTRY_LIST (DEVELOPMENT || DEBUG)
 
-#endif /* __VM_VM_OPTIONS_H__ */
+#endif                          

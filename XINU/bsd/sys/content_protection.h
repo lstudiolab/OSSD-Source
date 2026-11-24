@@ -31,15 +31,15 @@
 
 #ifdef PRIVATE
 
-/*
- * Protection classes vary in their restrictions on read/writability.  A is generally
- * the strictest, and D is effectively no restriction.
- */
+  
+                                                                                     
+                                                      
+   
 
-/*
- * dir_none forces new items created in the directory to pick up the mount point default
- * protection level. it is only allowed for directories.
- */
+  
+                                                                                        
+                                                        
+   
 #define PROTECTION_CLASS_DIR_NONE 0
 
 #define PROTECTION_CLASS_A 1
@@ -49,12 +49,12 @@
 #define PROTECTION_CLASS_E 5
 #define PROTECTION_CLASS_F 6
 
-/*
- * This forces open_dprotected_np to behave as though the file were created with
- * the traditional open(2) semantics.
- */
+  
+                                                                                
+                                     
+   
 #define PROTECTION_CLASS_DEFAULT  (-1)
 
-#endif /* PRIVATE */
+#endif              
 
-#endif /* _SYS_CONTENT_PROTECTION_H_ */
+#endif                                 

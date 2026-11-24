@@ -34,7 +34,7 @@
 
 extern lck_grp_t kperf_lck_grp;
 
-/* the trigger types supported by kperf */
+                                          
 #define TRIGGER_TYPE_TIMER     (0)
 #define TRIGGER_TYPE_PMI       (1)
 #define TRIGGER_TYPE_KDEBUG    (2)
@@ -44,22 +44,22 @@ extern lck_grp_t kperf_lck_grp;
 uint32_t kperf_get_thread_ast(thread_t thread);
 void kperf_set_thread_ast(thread_t thread, uint32_t flags);
 
-/*
- * Get and set dirtiness of thread, so kperf can track whether the thread
- * has been dispatched since it last looked.
- */
+  
+                                                                         
+                                            
+   
 boolean_t kperf_thread_get_dirty(thread_t thread);
 void kperf_thread_set_dirty(thread_t thread, boolean_t dirty);
 
-/*
- * Initialize the rest of kperf lazily, upon first use.  May be called multiple times.
- * The ktrace_lock must be held.
- */
+  
+                                                                                      
+                                
+   
 void kperf_setup(void);
 
-/*
- * Configure kperf during boot and check the boot args.
- */
+  
+                                                       
+   
 extern void kperf_init_early(void);
 
 bool kperf_is_sampling(void);
@@ -67,7 +67,7 @@ int kperf_enable_sampling(void);
 int kperf_disable_sampling(void);
 int kperf_port_to_pid(mach_port_name_t portname);
 
-/* get a per-CPU sample buffer */
+                                 
 struct kperf_sample *kperf_intr_sample_buffer(void);
 
 enum kperf_sampling {
@@ -80,27 +80,27 @@ extern enum kperf_sampling kperf_status;
 
 #pragma mark - external callbacks
 
-/*
- * Set up kperf during system startup.
- */
+  
+                                      
+   
 void kperf_init(void);
 
-/*
- * kperf AST handler
- *
- * Prevent inlining, since the sampling function allocates on the stack and
- * branches calling ast_taken (but never on a kperf AST) may blow their stacks.
- */
+  
+                    
+  
+                                                                           
+                                                                               
+   
 extern __attribute__((noinline)) void kperf_thread_ast_handler(thread_t thread);
 
-/*
- * Update whether the on-CPU callback should be called.
- */
+  
+                                                       
+   
 void kperf_on_cpu_update(void);
 
-/*
- * Should only be called by the scheduler when `thread` is switching on-CPU.
- */
+  
+                                                                            
+   
 static inline void
 kperf_on_cpu(thread_t thread, thread_continue_t continuation,
     uintptr_t *starting_fp)
@@ -114,9 +114,9 @@ kperf_on_cpu(thread_t thread, thread_continue_t continuation,
 	}
 }
 
-/*
- * Should only be called by the scheduler when `thread` is switching off-CPU.
- */
+  
+                                                                             
+   
 static inline void
 kperf_off_cpu(thread_t thread)
 {
@@ -128,9 +128,9 @@ kperf_off_cpu(thread_t thread)
 	}
 }
 
-/*
- * Should only be called by the scheduler when `thread` is made runnable.
- */
+  
+                                                                         
+   
 static inline void
 kperf_make_runnable(thread_t thread, int interrupt)
 {
@@ -151,9 +151,9 @@ kperf_running_setup(processor_t processor, uint64_t now)
 	}
 }
 
-/*
- * Should only be called by platform code at the end of each interrupt.
- */
+  
+                                                                       
+   
 static inline void
 kperf_interrupt(void)
 {
@@ -166,10 +166,10 @@ kperf_interrupt(void)
 	}
 }
 
-/*
- * Should only be called by kdebug when an event with `debugid` is emitted
- * from the frame starting at `starting_fp`.
- */
+  
+                                                                          
+                                            
+   
 static inline void
 kperf_kdebug_callback(uint32_t debugid, uintptr_t *starting_fp)
 {
@@ -181,20 +181,20 @@ kperf_kdebug_callback(uint32_t debugid, uintptr_t *starting_fp)
 	}
 }
 
-/*
- * Should only be called by platform code to indicate kperf's per-CPU timer
- * has expired on the current CPU `cpuid` at time `now`.
- */
+  
+                                                                           
+                                                        
+   
 void kperf_timer_expire(void *param0, void *param1);
 
-/*
- * Used by ktrace to reset kperf.  ktrace_lock must be held.
- */
+  
+                                                            
+   
 extern void kperf_reset(void);
 
-/*
- * Configure kperf from the kernel (e.g. during boot).
- */
+  
+                                                      
+   
 void kperf_kernel_configure(const char *config);
 
-#endif /* !defined(KPERF_H) */
+#endif                        

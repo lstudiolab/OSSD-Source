@@ -70,9 +70,9 @@
  *	@(#)ipc.h	8.4 (Berkeley) 2/19/95
  */
 
-/*
- * SVID compatible ipc.h file
- */
+  
+                             
+   
 #ifndef _SYS_IPC_H_
 #define _SYS_IPC_H_
 
@@ -81,10 +81,10 @@
 
 #include <sys/_types.h>
 
-/*
- * [XSI] The uid_t, gid_t, mode_t, and key_t types SHALL be defined as
- * described in <sys/types.h>.
- */
+  
+                                                                      
+                              
+   
 #include <sys/_types/_uid_t.h>
 #include <sys/_types/_gid_t.h>
 #include <sys/_types/_mode_t.h>
@@ -93,85 +93,85 @@
 
 #pragma pack(4)
 
-/*
- * Technically, we should force all code references to the new structure
- * definition, not in just the standards conformance case, and leave the
- * legacy interface there for binary compatibility only.  Currently, we
- * are only forcing this for programs requesting standards conformance.
- */
+  
+                                                                        
+                                                                        
+                                                                       
+                                                                       
+   
 #if __DARWIN_UNIX03 || defined(KERNEL)
-/*
- * [XSI] Information used in determining permission to perform an IPC
- * operation
- */
+  
+                                                                     
+            
+   
 struct ipc_perm {
-	uid_t           uid;            /* [XSI] Owner's user ID */
-	gid_t           gid;            /* [XSI] Owner's group ID */
-	uid_t           cuid;           /* [XSI] Creator's user ID */
-	gid_t           cgid;           /* [XSI] Creator's group ID */
-	mode_t          mode;           /* [XSI] Read/write permission */
-	unsigned short  _seq;           /* Reserved for internal use */
-	key_t           _key;           /* Reserved for internal use */
+	uid_t           uid;                                       
+	gid_t           gid;                                        
+	uid_t           cuid;                                        
+	gid_t           cgid;                                         
+	mode_t          mode;                                            
+	unsigned short  _seq;                                          
+	key_t           _key;                                          
 };
 #define __ipc_perm_new  ipc_perm
-#else   /* !__DARWIN_UNIX03 */
+#else                         
 #define ipc_perm        __ipc_perm_old
-#endif  /* !__DARWIN_UNIX03 */
+#endif                        
 
 #if !__DARWIN_UNIX03
-/*
- * Legacy structure; this structure is maintained for binary backward
- * compatability with previous versions of the interface.  New code
- * should not use this interface, since ID values may be truncated.
- */
+  
+                                                                     
+                                                                   
+                                                                   
+   
 struct __ipc_perm_old {
-	__uint16_t      cuid;           /* Creator's user ID */
-	__uint16_t      cgid;           /* Creator's group ID */
-	__uint16_t      uid;            /* Owner's user ID */
-	__uint16_t      gid;            /* Owner's group ID */
-	mode_t          mode;           /* Read/Write permission */
-	__uint16_t      seq;            /* Reserved for internal use */
-	key_t           key;            /* Reserved for internal use */
+	__uint16_t      cuid;                                  
+	__uint16_t      cgid;                                   
+	__uint16_t      uid;                                 
+	__uint16_t      gid;                                  
+	mode_t          mode;                                      
+	__uint16_t      seq;                                           
+	key_t           key;                                           
 };
-#endif  /* !__DARWIN_UNIX03 */
+#endif                        
 
 #pragma pack()
 
-/*
- * [XSI] Definitions shall be provided for the following constants:
- */
+  
+                                                                   
+   
 
-/* Mode bits */
-#define IPC_CREAT       001000          /* Create entry if key does not exist */
-#define IPC_EXCL        002000          /* Fail if key exists */
-#define IPC_NOWAIT      004000          /* Error if request must wait */
+               
+#define IPC_CREAT       001000                                                  
+#define IPC_EXCL        002000                                  
+#define IPC_NOWAIT      004000                                          
 
-/* Keys */
-#define IPC_PRIVATE     ((key_t)0)      /* Private key */
+          
+#define IPC_PRIVATE     ((key_t)0)                       
 
-/* Control commands */
-#define IPC_RMID        0               /* Remove identifier */
-#define IPC_SET         1               /* Set options */
-#define IPC_STAT        2               /* Get options */
+                      
+#define IPC_RMID        0                                      
+#define IPC_SET         1                                
+#define IPC_STAT        2                                
 
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 
-/* common mode bits */
-#define IPC_R           000400          /* Read permission */
-#define IPC_W           000200          /* Write/alter permission */
-#define IPC_M           010000          /* Modify control info permission */
+                      
+#define IPC_R           000400                               
+#define IPC_W           000200                                      
+#define IPC_M           010000                                              
 
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * Kernel implementation details which should not be utilized by user
- * space programs.
- */
+  
+                                                                     
+                  
+   
 
-/* Macros to convert between ipc ids and array indices or sequence ids */
+                                                                         
 #define IPCID_TO_IX(id)         ((id) & 0xffff)
 #define IPCID_TO_SEQ(id)        (((id) >> 16) & 0xffff)
 #define IXSEQ_TO_IPCID(ix, perm) (((perm._seq) << 16L) | ((ix) & 0xffff))
@@ -179,15 +179,15 @@ struct __ipc_perm_old {
 struct ucred;
 
 int     ipcperm(struct ucred *, struct ipc_perm *, int);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifndef KERNEL
 
 __BEGIN_DECLS
-/* [XSI] */
+           
 key_t   ftok(const char *, int);
 __END_DECLS
 
-#endif  /* !KERNEL */
+#endif               
 
-#endif /* !_SYS_IPC_H_ */
+#endif                   

@@ -112,7 +112,7 @@ def dumpTimerList(mpqueue):
         strip_func = kern.StripKernelPAC(unsigned(timer_call.tc_func))
 
         func_syms = kern.SymbolicateFromAddress(strip_func)
-        # returns an array of SBSymbol
+                                      
 
         if func_syms and func_syms[0] :
             func_sym = func_syms[0]
@@ -123,7 +123,7 @@ def dumpTimerList(mpqueue):
                     group = Cast(timer_call.tc_param0, 'struct thread_call_group *')
                     flavor = Cast(timer_call.tc_param1, 'thread_call_flavor_t')
 
-                    # There's got to be a better way to stringify the enum
+                                                                          
                     flavorname = str(flavor).partition(" = ")[2]
 
                     extra_string += "{:s} {:s}".format(group.tcg_name, flavorname)
@@ -263,32 +263,32 @@ def showTimerWakeupStats(cmd_args=None):
         print '{:d}({:s}), terminated thread timer wakeups: {:d} {:d} 2ms: {:d} 5ms: {:d} UT: {:d} ST: {:d}'.format(
             proc.p_pid,
             GetProcName(proc),
-# Commented-out references below to be addressed by rdar://13009660.
-            0, #task.task_interrupt_wakeups,
-            0, #task.task_platform_idle_wakeups,
+                                                                    
+            0,                              
+            0,                                  
             task.task_timer_wakeups_bin_1,
             task.task_timer_wakeups_bin_2,
             task.total_user_time,
             task.total_system_time)
-        tot_wakes = 0 #task.task_interrupt_wakeups
-        tot_platform_wakes = 0 #task.task_platform_idle_wakeups
+        tot_wakes = 0                             
+        tot_platform_wakes = 0                                 
         for thread in IterateQueue(task.threads, 'thread_t', 'task_threads'):
-##        if thread.thread_interrupt_wakeups == 0:
-##              continue
+                                                  
+                        
             print '\tThread ID 0x{:x}, Tag 0x{:x}, timer wakeups: {:d} {:d} {:d} {:d} <2ms: {:d}, <5ms: {:d} UT: {:d} ST: {:d}'.format(
                 thread.thread_id,
                 thread.thread_tag,
-                0, #thread.thread_interrupt_wakeups,
-                0, #thread.thread_platform_idle_wakeups,
-                0, #thread.thread_callout_interrupt_wakeups,
-                0, #thread.thread_callout_platform_idle_wakeups,
+                0,                                  
+                0,                                      
+                0,                                          
+                0,                                              
                 0,0,0,0,
                 thread.thread_timer_wakeups_bin_1,
                 thread.thread_timer_wakeups_bin_2,
                 thread.user_timer.all_bits,
                 thread.system_timer.all_bits)
-            tot_wakes += 0 #thread.thread_interrupt_wakeups
-            tot_platform_wakes += 0 #thread.thread_platform_idle_wakeups
+            tot_wakes += 0                                 
+            tot_platform_wakes += 0                                     
         print 'Task total wakeups: {:d} {:d}'.format(
             tot_wakes, tot_platform_wakes)
 
@@ -494,11 +494,11 @@ def GetKernelDebugBufferEntry(kdbg_entry):
     elif kdebug_qual == 3:
         kdebug_qual = '?'
 
-    # preamble and qual
+                       
     out_str += "{:<#20x} {:>6d} {:>#12x} ".format(kdebug_entry, kdebug_cpu, kdebug_entry.arg5)
     out_str += " {:#010x}{:08x} {:>6s} ".format(ts_hi, ts_lo, kdebug_qual)
     
-    # class
+           
     kdbg_class = ""
     if kdebug_class == 1:
         kdbg_class = "MACH"
@@ -568,16 +568,16 @@ def GetKernelDebugBufferEntry(kdbg_entry):
     if kdbg_class:
         out_str += "{:^10s} ".format(kdbg_class)
 
-    # subclass and code
+                       
     out_str += " {:>#5x} {:>8d}   ".format(kdebug_subclass, kdebug_code)
 
-    # space for debugid-specific processing
+                                           
     code_info_str += "arg1={:#010x} ".format(kdebug_arg1)
     code_info_str += "arg2={:#010x} ".format(kdebug_arg2)
     code_info_str += "arg3={:#010x} ".format(kdebug_arg3)
     code_info_str += "arg4={:#010x} ".format(kdebug_arg4)
 
-    # finish up
+               
     out_str += "{:<25s}\n".format(code_info_str)
     return out_str
 
@@ -596,7 +596,7 @@ def ShowKernelDebugBufferCPU(cmd_args=None):
     cpu_number = ArgumentStringToInt(cmd_args[0])
     entry_count = ArgumentStringToInt(cmd_args[1])
     debugentriesfound = 0
-    #  Check if KDBG_BFINIT (0x80000000) is set in kdebug_flags
+                                                               
     if (kern.globals.kd_ctrl_page.kdebug_flags & 0x80000000):   
         out_str += ShowKernelDebugBufferCPU.header + "\n"
         if entry_count == 0:
@@ -635,7 +635,7 @@ def ShowKernelDebugBuffer(cmd_args=None):
     if cmd_args == None or len(cmd_args) < 1:
         raise ArgumentError("Invalid arguments passed.")
     
-    #  Check if KDBG_BFINIT (0x80000000) is set in kdebug_flags
+                                                               
     if (kern.globals.kd_ctrl_page.kdebug_flags & 0x80000000):
         entrycount = ArgumentStringToInt(cmd_args[0])
         if entrycount == 0:
@@ -664,7 +664,7 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
         cf. kdbg_read()\bsd/kern/kdebug.c
     """
 
-    #  Check if KDBG_BFINIT (0x80000000) is set in kdebug_flags 
+                                                                
     if (kern.globals.kd_ctrl_page.kdebug_flags & xnudefines.KDBG_BFINIT) == 0 :
         print "Trace buffer not enabled\n"
         return
@@ -677,12 +677,12 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
         print "unknown kern.arch {:s}\n".format(kern.arch)
         return
 
-    # Various kern.globals are hashed by address, to
-    #  a) avoid redundant kdp fetch from, and
-    #  b) avoid all stores to
-    # the target system kernel structures.
-    # Stores to hashed structures remain strictly local to the lldb host,
-    # they are never written back to the target.
+                                                    
+                                             
+                             
+                                          
+                                                                         
+                                                
     htab = {}
 
     if lp64 :
@@ -697,7 +697,7 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
     out_of_events       = False
     lostevents      = False
     lostevent_timestamp = 0
-    lostevent_debugid   = (((xnudefines.DBG_TRACE & 0xff) << 24) | ((xnudefines.DBG_TRACE_INFO & 0xff) << 16) | ((2 & 0x3fff)  << 2)) # 0x01020008
+    lostevent_debugid   = (((xnudefines.DBG_TRACE & 0xff) << 24) | ((xnudefines.DBG_TRACE_INFO & 0xff) << 16) | ((2 & 0x3fff)  << 2))             
     events_count_lost   = 0
     events_count_found  = 0
 
@@ -757,7 +757,7 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
             htab[kdsp_actual].kds_lostevents = False
 
 
-    # generate trace file header; threadmap is stubbed/TBD
+                                                          
     version_no = xnudefines.RAW_VERSION1
     thread_count = 0
     TOD_secs = uptime
@@ -773,7 +773,7 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
         tempbuf_number = 0
         tempbuf_count = min(count, xnudefines.KDCOPYBUF_COUNT)
 
-        # while space
+                     
         while tempbuf_count != 0 :
 
             if opt_progress == True :
@@ -786,21 +786,21 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
             min_kdbp = None
             min_cpu = 0
 
-            # Check all CPUs
+                            
             for cpu in range(htab[kd_ctrl_page].kdebug_cpus) :
 
                 kdbp = unsigned(addressof(kern.globals.kdbip[cpu]))
                 if not kdbp in htab :
                     htab[kdbp] = kern.globals.kdbip[cpu]
 
-                # Skip CPUs without data.
+                                         
                 kdsp = htab[kdbp].kd_list_head
                 if kdsp.raw == xnudefines.KDS_PTR_NULL :
                     continue
 
                 kdsp_shadow = kdsp
 
-                # Get from cpu data to buffer header to buffer
+                                                              
                 ix = kdsp.buffer_index
                 off = kdsp.offset
                 kdsp_actual = unsigned(addressof(kern.globals.kd_bufs[ix].kdsb_addr[off]))
@@ -809,14 +809,14 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
 
                 kdsp_actual_shadow = kdsp_actual
 
-                # Skip buffer if there are no events left.
+                                                          
                 rcursor = htab[kdsp_actual].kds_readlast
                 if rcursor == htab[kdsp_actual].kds_bufindx :
                     continue
 
                 t = htab[kdsp_actual].kds_records[rcursor].timestamp & KDBG_TIMESTAMP_MASK
 
-                # Ignore events that have aged out due to wrapping.
+                                                                   
                 goto_next_cpu = False;
                 while (t < unsigned(barrier_min)) :
                     r = htab[kdsp_actual].kds_readlast
@@ -845,22 +845,22 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
                     continue
 
                 if (t > barrier_max) and (barrier_max > 0) :
-                    # Need to flush IOPs again before we
-                    # can sort any more data from the
-                    # buffers.  
+                                                        
+                                                     
+                                
                     out_of_events = True
                     break
 
                 if t < (htab[kdsp_actual].kds_timestamp & KDBG_TIMESTAMP_MASK) :
-                    # indicates we've not yet completed filling
-                    # in this event...
-                    # this should only occur when we're looking
-                    # at the buf that the record head is utilizing
-                    # we'll pick these events up on the next
-                    # call to kdbg_read
-                    # we bail at this point so that we don't
-                    # get an out-of-order timestream by continuing
-                    # to read events from the other CPUs' timestream(s)
+                                                               
+                                      
+                                                               
+                                                                  
+                                                            
+                                       
+                                                            
+                                                                  
+                                                                       
                     out_of_events = True
                     break
 
@@ -871,7 +871,7 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
 
 
             if (min_kdbp is None) or (out_of_events == True) :
-                # all buffers ran empty
+                                       
                                 out_of_events = True
                                 break
 
@@ -883,13 +883,13 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
             if not kdsp_actual in htab :
                 htab[kdsp_actual] = kern.globals.kd_bufs[ix].kdsb_addr[off]
 
-            # Copy earliest event into merged events scratch buffer.
+                                                                    
             r = htab[kdsp_actual].kds_readlast
             htab[kdsp_actual].kds_readlast = r + 1
             e = htab[kdsp_actual].kds_records[r]
 
-            # Concatenate event into buffer
-            # XXX condition here is on __LP64__
+                                           
+                                               
             if lp64 :
                 tempbuf += struct.pack('QQQQQQIIQ', 
                         unsigned(e.timestamp),
@@ -911,9 +911,9 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
                         unsigned(e.arg5),
                         unsigned(e.debugid))
 
-            # Watch for out of order timestamps
+                                               
             if earliest_time < (htab[min_kdbp].kd_prev_timebase & KDBG_TIMESTAMP_MASK) :
-                ## if so, use the previous timestamp + 1 cycle
+                                                              
                 htab[min_kdbp].kd_prev_timebase += 1
 
                 e.timestamp = htab[min_kdbp].kd_prev_timebase & KDBG_TIMESTAMP_MASK
@@ -928,7 +928,7 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
 
             events_count_found += 1
 
-            # nextevent:
+                        
             tempbuf_count -= 1
             tempbuf_number += 1
 
@@ -939,13 +939,13 @@ def DumpRawTraceFile(cmd_args=[], cmd_options={}):
         if opt_verbose > vHUMAN :
             print "events_count_lost {0:#x}, events_count_found {1:#x}, progress_count {2:#x}".format(events_count_lost, events_count_found, progress_count)
 
-        # write trace events to output file
+                                           
         if tempbuf_number != 0 :
             count -= tempbuf_number
             wfd.write(buffer(tempbuf))
 
         if out_of_events == True :
-            # all trace buffers are empty
+                                         
             if opt_verbose > vHUMAN :
                 print "out of events"
             break
@@ -962,7 +962,7 @@ def GetTimebaseInfo():
         numer = tb.numer
         denom = tb.denom
     except NameError:
-        # Intel -- use the 1-1 timebase.
+                                        
         numer = 1
         denom = 1
     return numer, denom

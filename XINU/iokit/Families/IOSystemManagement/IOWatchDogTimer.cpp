@@ -109,11 +109,11 @@ IOWatchDogTimer::setProperties(OSObject *properties)
 }
 
 static IOReturn
-IOWatchDogTimerSleepHandler(void *target, void */*refCon*/,
+IOWatchDogTimerSleepHandler(void *target, void *          ,
     UInt32 messageType,
-    IOService */*provider*/,
+    IOService *            ,
     void *messageArgument,
-    vm_size_t /*argSize*/)
+    vm_size_t            )
 {
 	IOWatchDogTimer *watchDogTimer = (IOWatchDogTimer *)target;
 	sleepWakeNote *swNote = (sleepWakeNote *)messageArgument;

@@ -55,13 +55,13 @@
  * the rights to redistribute these changes.
  */
 
-/*
- * Machine dependent task fields
- */
+  
+                                
+   
 
 #ifdef MACH_KERNEL_PRIVATE
-/* Provide access to target-specific defintions which may be used by
- * consuming code, e.g. HYPERVISOR. */
+                                                                    
+                                      
 #include <arm/proc_reg.h>
 #endif
 

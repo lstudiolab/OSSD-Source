@@ -21,10 +21,10 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/*
- * json_compilation_db is a helper tool that takes a compiler invocation, and
- * appends it in JSON format to the specified database.
- */
+  
+                                                                             
+                                                       
+   
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,19 +42,19 @@
 void usage(void);
 char *escape_string(const char *);
 
-/*
- * We support appending to two databases.
- *
- * 0-byte: ""
- *
- * or
- *
- * "["
- * "{"
- * "  ..."
- * "}"
- * "]"
- */
+  
+                                         
+  
+             
+  
+     
+  
+      
+      
+          
+      
+      
+   
 
 int
 main(int argc, char * argv[])
@@ -86,7 +86,7 @@ main(int argc, char * argv[])
 	if (!(input_file_len > 2 && 0 == strcmp(".c", input_file + input_file_len - 2)) &&
 	    !(input_file_len > 3 && 0 == strcmp(".cp", input_file + input_file_len - 3)) &&
 	    !(input_file_len > 4 && 0 == strcmp(".cpp", input_file + input_file_len - 4))) {
-		/* Not a C/C++ file, just skip it */
+		                                    
 		return 0;
 	}
 
@@ -111,7 +111,7 @@ main(int argc, char * argv[])
 
 	read_bytes = fread(start, sizeof(start[0]), sizeof(start) / sizeof(start[0]), dst);
 	if ((read_bytes != sizeof(start)) || (0 != memcmp(start, "[\n", sizeof(start) / sizeof(start[0])))) {
-		/* no JSON start, we don't really care why */
+		                                             
 		ret = fseeko(dst, 0, SEEK_SET);
 		if (ret < 0) {
 			err(EX_UNAVAILABLE, "fseeko");
@@ -122,7 +122,7 @@ main(int argc, char * argv[])
 			err(EX_UNAVAILABLE, "fputs");
 		}
 	} else {
-		/* has at least two bytes at the start. Seek to 3 bytes before the end */
+		                                                                         
 		ret = fseeko(dst, -3, SEEK_END);
 		if (ret < 0) {
 			err(EX_UNAVAILABLE, "fseeko");
@@ -187,8 +187,8 @@ escape_string(const char *input)
 
 		if (ch == '\\' || ch == '"') {
 			output[j++] = '\\';
-			output[j++] = '\\'; /* output \\ in JSON, which the final shell will see as \ */
-			output[j++] = '\\'; /* escape \ or ", which the final shell will see and pass to the compiler */
+			output[j++] = '\\';                                                             
+			output[j++] = '\\';                                                                             
 		}
 		output[j++] = ch;
 	}

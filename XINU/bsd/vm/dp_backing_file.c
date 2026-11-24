@@ -25,12 +25,12 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -76,13 +76,13 @@
 #include <pexpert/pexpert.h>
 
 
-/*
- *	Routine:	macx_backing_store_recovery
- *	Function:
- *		Syscall interface to set a tasks privilege
- *		level so that it is not subject to
- *		macx_backing_store_suspend
- */
+  
+                                       
+            
+                                              
+                                      
+                              
+   
 int
 macx_backing_store_recovery(
 	__unused struct macx_backing_store_recovery_args *args)
@@ -90,12 +90,12 @@ macx_backing_store_recovery(
 	return ENOTSUP;
 }
 
-/*
- *	Routine:	macx_backing_store_suspend
- *	Function:
- *		Syscall interface to stop new demand for
- *		backing store when backing store is low
- */
+  
+                                      
+            
+                                            
+                                           
+   
 
 int
 macx_backing_store_suspend(
@@ -107,20 +107,20 @@ macx_backing_store_suspend(
 
 extern boolean_t compressor_store_stop_compaction;
 
-/*
- *	Routine:	macx_backing_store_compaction
- *	Function:
- *		Turn compaction of swap space on or off.  This is
- *		used during shutdown/restart so	that the kernel
- *		doesn't waste time compacting swap files that are
- *		about to be deleted anyway.  Compaction	is always
- *		on by default when the system comes up and is turned
- *		off when a shutdown/restart is requested.  It is
- *		re-enabled if the shutdown/restart is aborted for any reason.
- *
- *  This routine assumes macx_lock has been locked by macx_triggers ->
- *      mach_macx_triggers -> macx_backing_store_compaction
- */
+  
+                                         
+            
+                                                     
+                                                   
+                                                     
+                                                     
+                                                        
+                                                    
+                                                                 
+  
+                                                                      
+                                                           
+   
 
 int
 macx_backing_store_compaction(int flags)
@@ -144,12 +144,12 @@ macx_backing_store_compaction(int flags)
 	return 0;
 }
 
-/*
- *	Routine:	macx_triggers
- *	Function:
- *		Syscall interface to set the call backs for low and
- *		high water marks.
- */
+  
+                         
+            
+                                                       
+                     
+   
 int
 macx_triggers(
 	struct macx_triggers_args *args)
@@ -172,11 +172,11 @@ macx_swapon(
 }
 
 
-/*
- *	Routine:	macx_swapoff
- *	Function:
- *		Syscall interface to remove a file from backing store
- */
+  
+                        
+            
+                                                         
+   
 int
 macx_swapoff(
 	__unused struct macx_swapoff_args *args)
@@ -184,11 +184,11 @@ macx_swapoff(
 	return ENOTSUP;
 }
 
-/*
- *	Routine:	macx_swapinfo
- *	Function:
- *		Syscall interface to get general swap statistics
- */
+  
+                         
+            
+                                                    
+   
 extern uint64_t vm_swap_get_total_space(void);
 extern uint64_t vm_swap_get_free_space(void);
 extern boolean_t vm_swap_up;

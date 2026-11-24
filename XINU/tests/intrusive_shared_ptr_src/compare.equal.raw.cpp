@@ -1,17 +1,17 @@
-//
-// Tests for
-//  template <typename T, typename U, typename R>
-//  bool operator==(intrusive_shared_ptr<T, R> const& x, U* y);
-//
-//  template <typename T, typename U, typename R>
-//  bool operator!=(intrusive_shared_ptr<T, R> const& x, U* y);
-//
-//  template <typename T, typename U, typename R>
-//  bool operator==(T* x, intrusive_shared_ptr<U, R> const& y);
-//
-//  template <typename T, typename U, typename R>
-//  bool operator!=(T* x, intrusive_shared_ptr<U, R> const& y);
-//
+  
+            
+                                                 
+                                                               
+  
+                                                 
+                                                               
+  
+                                                 
+                                                               
+  
+                                                 
+                                                               
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <darwintest.h>

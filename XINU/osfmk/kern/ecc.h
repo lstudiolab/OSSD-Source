@@ -35,9 +35,9 @@ __BEGIN_DECLS
 
 #define ECC_EVENT_INFO_DATA_ENTRIES     8
 struct ecc_event {
-	uint8_t         id;     // ID of memory (e.g. L2C), platform-specific
-	uint8_t         count;  // Of uint64_t's used, starting at index 0
-	uint64_t        data[ECC_EVENT_INFO_DATA_ENTRIES] __attribute__((aligned(8))); // Event-specific data
+	uint8_t         id;                                                  
+	uint8_t         count;                                            
+	uint64_t        data[ECC_EVENT_INFO_DATA_ENTRIES] __attribute__((aligned(8)));                       
 };
 
 
@@ -52,4 +52,4 @@ extern uint32_t         ecc_log_get_correction_count(void);
 
 __END_DECLS
 
-#endif /* !defined(_KERN_ECC_H) */
+#endif                            

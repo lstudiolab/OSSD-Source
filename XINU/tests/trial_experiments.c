@@ -16,10 +16,10 @@
 #if ENTITLED
 #define SET_TREATMENT_ID set_treatment_id_entitled
 #define SET_TREATMENT_ID_DESCR "Can set treatment id with entitlement"
-#else /* ENTITLED */
+#else               
 #define SET_TREATMENT_ID set_treatment_id_unentitled
 #define SET_TREATMENT_ID_DESCR "Can't set treatment id without entitlement"
-#endif /* ENTITLED */
+#endif               
 
 T_DECL(SET_TREATMENT_ID, "Verifies that EXPERIMENT sysctls can only be set with the entitlement", T_META_ASROOT(false))
 {
@@ -45,22 +45,22 @@ T_DECL(SET_TREATMENT_ID, "Verifies that EXPERIMENT sysctls can only be set with 
 	len = sizeof(val);
 	memset(new_val, 0, sizeof(new_val));
 	T_ASSERT_POSIX_SUCCESS(ret, "set kern.trial_treatment_id");
-	/* Cleanup. Set it back to the empty string. */
+	                                               
 	ret = sysctlbyname("kern.trial_treatment_id", val, &len, new_val, 1);
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "reset kern.trial_treatment_id");
 #else
 	T_ASSERT_POSIX_FAILURE(ret, EPERM, "set kern.trial_treatment_id");
-#endif /* ENTITLED */
+#endif               
 }
 
 #if ENTITLED
-/* Check min and max value limits on numeric factors */
+                                                       
 T_DECL(experiment_factor_numeric_limits,
     "Can only set factors within the legal range.",
     T_META_ASROOT(false))
 {
-#define kMinVal 5 /* The min value allowed for the testing factor. */
-#define kMaxVal 10 /* The max value allowed for the testing factor. */
+#define kMinVal 5                                                    
+#define kMaxVal 10                                                    
 	errno_t err;
 	int ret;
 	unsigned int current_val;
@@ -107,10 +107,10 @@ set_libmalloc_experiment(uint64_t val)
 }
 
 #define PRINT_APPLE_ARRAY_TOOL "tools/print_apple_array"
-/*
- * Spawns a new binary and returns the contents of its apple array
- * (after libsystem initialization).
- */
+  
+                                                                  
+                                    
+   
 static char **
 get_apple_array(size_t *num_array_entries)
 {
@@ -170,10 +170,10 @@ get_apple_array(size_t *num_array_entries)
 
 #define LIBMALLOC_EXPERIMENT_FACTORS_KEY "MallocExperiment="
 
-/*
- * Get the value of the MallocExperiment key in the apple array.
- * Returns true iff the key is present.
- */
+  
+                                                                
+                                       
+   
 static bool
 get_libmalloc_experiment_factors(char **apple_array, size_t num_array_entries, uint64_t *factors)
 {
@@ -230,4 +230,4 @@ T_DECL(libmalloc_experiment_not_in_array,
 	T_ASSERT_TRUE(!found, "Did not find " LIBMALLOC_EXPERIMENT_FACTORS_KEY " in apple array");
 	free(apple_array);
 }
-#endif /* ENTITLED */
+#endif               

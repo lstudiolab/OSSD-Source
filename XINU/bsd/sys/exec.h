@@ -71,12 +71,12 @@
 
 #include <sys/appleapiopts.h>
 
-/*
- * XXX at this point, this file only exists for backward compatability with
- * XXX software which includes <sys/exec.h> instead of the more correct
- * XXX <machine/exec.h> and/or need the inclusion of <sys/appleapiopts.h>
- * XXX as a side effect.
- */
+  
+                                                                           
+                                                                       
+                                                                         
+                        
+   
 #include <machine/exec.h>
 
-#endif /* !_SYS_EXEC_H_ */
+#endif                    

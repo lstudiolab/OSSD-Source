@@ -41,11 +41,11 @@
 #include <kern/simple_lock.h>
 #include <voucher/ipc_pthread_priority_types.h>
 
-/* locking */
+             
 extern lck_grp_t        ipc_lck_grp;
 extern lck_attr_t       ipc_lck_attr;
 
-/* some shorthand for longer types */
+                                     
 typedef mach_voucher_attr_value_handle_t        iv_value_handle_t;
 typedef mach_voucher_attr_value_reference_t     iv_value_refs_t;
 
@@ -58,72 +58,72 @@ typedef iv_index_t              *iv_entry_t;
 
 #define IV_ENTRIES_INLINE MACH_VOUCHER_ATTR_KEY_NUM_WELL_KNOWN
 
-/*
- * IPC Voucher
- *
- * Vouchers are a reference counted immutable (once-created) set of
- * indexes to particular resource manager attribute values
- * (which themselves are reference counted).
- */
+  
+              
+  
+                                                                   
+                                                          
+                                            
+   
 struct ipc_voucher {
-	iv_index_t              iv_hash;        /* checksum hash */
-	iv_index_t              iv_sum;         /* checksum of values */
-	os_refcnt_t             iv_refs;        /* reference count */
-	iv_index_t              iv_table_size;  /* size of the voucher table */
+	iv_index_t              iv_hash;                           
+	iv_index_t              iv_sum;                                 
+	os_refcnt_t             iv_refs;                             
+	iv_index_t              iv_table_size;                                 
 	iv_index_t              iv_inline_table[IV_ENTRIES_INLINE];
-	iv_entry_t              iv_table;       /* table of voucher attr entries */
-	ipc_port_t              iv_port;        /* port representing the voucher */
-	queue_chain_t           iv_hash_link;   /* link on hash chain */
+	iv_entry_t              iv_table;                                          
+	ipc_port_t              iv_port;                                           
+	queue_chain_t           iv_hash_link;                           
 };
 
 #define IV_NULL         IPC_VOUCHER_NULL
 
 
-/*
- * Voucher Attribute Cache Control Object
- *
- * This is where the Voucher system stores its caches/references to
- * returned resource manager attribute values.  Each value only appears
- * once in the table.  If a value is returned more than once by the
- * resource manager, the voucher system will increase the reference
- * on the previous value.
- *
- * The voucher itself contains one entry per key, that indexes into
- * this table.
- *
- * A voucher that does not have an explicit index for a given key
- * is assumed to have a reference on slot zero - which is where the
- * voucher system stores the default value for the given attribute
- * (specified at the time of resource manager registration).
- *
- * The ivace_releasing field limits the entry to a single concurrent
- * return. Without it, a previous release's reply might still be
- * working its way back to the voucher code, and a subsequent get-
- * value could return the same value as was previously returned.  If
- * the resource manager already knew that, it would return a failure
- * on the return, and all is well.  We just treat the additional made
- * references on the value as we normally would.  However, if the resource
- * manager accepted the return, and the get-value response raced the
- * release's reply, the newly made references will look like an extension
- * of the old value's cache lifetime, rather than a new one.  Dropping
- * that new lifetime's references to zero would result in a second
- * release callback to the resource manager - this time with the wrong
- * "made" reference count.  We avoid the race with this flag.
- */
+  
+                                         
+  
+                                                                   
+                                                                       
+                                                                   
+                                                                   
+                         
+  
+                                                                   
+              
+  
+                                                                 
+                                                                   
+                                                                  
+                                                            
+  
+                                                                    
+                                                                
+                                                                  
+                                                                    
+                                                                    
+                                                                     
+                                                                          
+                                                                    
+                                                                         
+                                                                      
+                                                                  
+                                                                      
+                                                             
+   
 
 struct ivac_entry_s {
 	iv_value_handle_t       ivace_value;
-	iv_value_refs_t         ivace_layered:1,     /* layered effective entry */
-	    ivace_releasing:1,                       /* release in progress */
-	    ivace_free:1,                            /* on freelist */
-	    ivace_persist:1,                         /* Persist the entry, don't count made refs */
-	    ivace_refs:28;                           /* reference count */
+	iv_value_refs_t         ivace_layered:1,                                  
+	    ivace_releasing:1,                                                
+	    ivace_free:1,                                             
+	    ivace_persist:1,                                                                       
+	    ivace_refs:28;                                                
 	union {
-		iv_value_refs_t ivaceu_made;         /* made count (non-layered) */
-		iv_index_t      ivaceu_layer;        /* next effective layer (layered) */
+		iv_value_refs_t ivaceu_made;                                       
+		iv_index_t      ivaceu_layer;                                            
 	} ivace_u;
-	iv_index_t              ivace_next;          /* hash or freelist */
-	iv_index_t              ivace_index;         /* hash head (independent) */
+	iv_index_t              ivace_next;                                
+	iv_index_t              ivace_index;                                      
 };
 typedef struct ivac_entry_s       ivac_entry;
 typedef ivac_entry              *ivac_entry_t;
@@ -140,14 +140,14 @@ typedef ivac_entry              *ivac_entry_t;
 
 struct ipc_voucher_attr_control {
 	os_refcnt_t             ivac_refs;
-	boolean_t               ivac_is_growing;        /* is the table being grown */
-	ivac_entry_t            ivac_table;             /* table of voucher attr value entries */
-	iv_index_t              ivac_table_size;        /* size of the attr value table */
-	iv_index_t              ivac_init_table_size;   /* size of the attr value table */
-	iv_index_t              ivac_freelist;          /* index of the first free element */
-	ipc_port_t              ivac_port;              /* port for accessing the cache control  */
+	boolean_t               ivac_is_growing;                                      
+	ivac_entry_t            ivac_table;                                                      
+	iv_index_t              ivac_table_size;                                          
+	iv_index_t              ivac_init_table_size;                                     
+	iv_index_t              ivac_freelist;                                               
+	ipc_port_t              ivac_port;                                                         
 	lck_spin_t              ivac_lock_data;
-	iv_index_t              ivac_key_index;         /* key index for this value */
+	iv_index_t              ivac_key_index;                                       
 };
 typedef ipc_voucher_attr_control_t iv_attr_control_t;
 
@@ -199,17 +199,17 @@ ivac_release(ipc_voucher_attr_control_t ivac)
 
 #define IVAM_NULL IPC_VOUCHER_ATTR_MANAGER_NULL
 
-/*
- * IPC voucher Resource Manager table element
- *
- * Information Associated with a specific registration of
- * a voucher resource manager.
- *
- * NOTE: For now, this table is indexed directly by the key.  In the future,
- * it will have to be growable and sparse by key.  When that is implemented
- * the index will be independent from the key (but there will be a hash to
- * find the index by key).
- */
+  
+                                             
+  
+                                                         
+                              
+  
+                                                                            
+                                                                           
+                                                                          
+                          
+   
 typedef struct ipc_voucher_global_table_element {
 	ipc_voucher_attr_manager_t      ivgte_manager;
 	ipc_voucher_attr_control_t      ivgte_control;
@@ -218,14 +218,14 @@ typedef struct ipc_voucher_global_table_element {
 
 typedef ipc_voucher_global_table_element *ipc_voucher_global_table_element_t;
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-/*
- * IPC voucher attribute recipe
- *
- * In-kernel recipe format with an ipc_voucher_t pointer for the previous
- * voucher reference.
- */
+  
+                               
+  
+                                                                         
+                     
+   
 #pragma pack(1)
 typedef struct ipc_voucher_attr_recipe_data {
 	mach_voucher_attr_key_t                 key;
@@ -244,15 +244,15 @@ typedef mach_msg_type_number_t ipc_voucher_attr_raw_recipe_array_size_t;
 
 #pragma pack()
 
-/*
- * In-kernel Resource Manager Definition
- *
- * In-kernel resource managers are defined by a v-table like structure for
- * the three callouts supported by a resource manager (and release function).
- *
- * There is a single in-kernel resource manager that represents all the
- * outside kernel managers (and reflects the calls through MIG to user-space).
- */
+  
+                                        
+  
+                                                                          
+                                                                             
+  
+                                                                       
+                                                                              
+   
 
 typedef kern_return_t (*ipc_voucher_attr_manager_release_value_t)(ipc_voucher_attr_manager_t,
     mach_voucher_attr_key_t,
@@ -307,57 +307,57 @@ struct ipc_voucher_attr_manager {
 
 __BEGIN_DECLS
 
-/* DEBUG/TRACE Convert from a port to a voucher */
+                                                  
 extern uintptr_t unsafe_convert_port_to_voucher(
 	ipc_port_t              port);
 
-/* Convert from a port to a voucher */
+                                      
 extern ipc_voucher_t convert_port_to_voucher(
 	ipc_port_t              port);
 
-/* Convert from a port name to an ipc_voucher */
+                                                
 extern ipc_voucher_t convert_port_name_to_voucher(
 	mach_port_name_t        name);
 
-/* add a reference to the specified voucher */
+                                              
 extern void ipc_voucher_reference(
 	ipc_voucher_t           voucher);
 
-/* drop the voucher reference picked up above */
+                                                
 extern void ipc_voucher_release(
 	ipc_voucher_t           voucher);
 
-/* deliver voucher notifications */
+                                   
 extern void ipc_voucher_notify(
 	mach_msg_header_t       *msg);
 
-/* Convert from a voucher to a port */
+                                      
 extern ipc_port_t convert_voucher_to_port(
 	ipc_voucher_t           voucher);
 
-/* convert from a voucher attribute control to a port */
+                                                        
 extern ipc_port_t convert_voucher_attr_control_to_port(
 	ipc_voucher_attr_control_t      control);
 
-/* add a reference to the specified voucher */
+                                              
 extern void ipc_voucher_attr_control_reference(
 	ipc_voucher_attr_control_t      control);
 
-/* drop the reference picked up above */
+                                        
 extern void ipc_voucher_attr_control_release(
 	ipc_voucher_attr_control_t      control);
 
-/* deliver voucher control notifications */
+                                           
 extern void ipc_voucher_attr_control_notify(
 	mach_msg_header_t       *msg);
 
-/* convert from a port to a voucher attribute control */
+                                                        
 extern ipc_voucher_attr_control_t convert_port_to_voucher_attr_control(
 	ipc_port_t              port);
 
-/*
- * In-kernel equivalents to the user syscalls
- */
+  
+                                             
+   
 extern kern_return_t
 ipc_create_mach_voucher(
 	ipc_voucher_attr_raw_recipe_array_t             recipes,
@@ -388,4 +388,4 @@ ipc_register_mach_voucher_attr_manager(
 
 __END_DECLS
 
-#endif  /* _IPC_IPC_VOUCHER_H_ */
+#endif                           

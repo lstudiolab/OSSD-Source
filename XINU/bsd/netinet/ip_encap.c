@@ -25,8 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	$FreeBSD: src/sys/netinet/ip_encap.c,v 1.1.2.2 2001/07/03 11:01:46 ume Exp $	*/
-/*	$KAME: ip_encap.c,v 1.41 2001/03/15 08:35:08 itojun Exp $	*/
+                                                                                  
+                                                               
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -56,32 +56,32 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/*
- * My grandfather said that there's a devil inside tunnelling technology...
- *
- * We have surprisingly many protocols that want packets with IP protocol
- * #4 or #41.  Here's a list of protocols that want protocol #41:
- *	RFC1933 configured tunnel
- *	RFC1933 automatic tunnel
- *	RFC2401 IPsec tunnel
- *	RFC2473 IPv6 generic packet tunnelling
- *	RFC2529 6over4 tunnel
- *	mobile-ip6 (uses RFC2473)
- *	6to4 tunnel
- * Here's a list of protocol that want protocol #4:
- *	RFC1853 IPv4-in-IPv4 tunnelling
- *	RFC2003 IPv4 encapsulation within IPv4
- *	RFC2344 reverse tunnelling for mobile-ip4
- *	RFC2401 IPsec tunnel
- * Well, what can I say.  They impose different en/decapsulation mechanism
- * from each other, so they need separate protocol handler.  The only one
- * we can easily determine by protocol # is IPsec, which always has
- * AH/ESP header right after outer IP header.
- *
- * So, clearly good old protosw does not work for protocol #4 and #41.
- * The code will let you match protocol via src/dst address pair.
- */
-/* XXX is M_NETADDR correct? */
+  
+                                                                           
+  
+                                                                         
+                                                                 
+                            
+                           
+                       
+                                         
+                        
+                            
+              
+                                                   
+                                  
+                                         
+                                            
+                       
+                                                                          
+                                                                         
+                                                                   
+                                             
+  
+                                                                      
+                                                                 
+   
+                               
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -122,7 +122,7 @@ static int mask_match(const struct encaptab *, const struct sockaddr *,
 static void encap_fillarg(struct mbuf *, void *arg);
 
 #ifndef LIST_HEAD_INITIALIZER
-/* rely upon BSS initialization */
+                                  
 LIST_HEAD(, encaptab) encaptab;
 #else
 LIST_HEAD(, encaptab) encaptab = LIST_HEAD_INITIALIZER(&encaptab);
@@ -141,7 +141,7 @@ encap_init(struct protosw *pp, struct domain *dp)
 
 	VERIFY((pp->pr_flags & (PR_INITIALIZED | PR_ATTACHED)) == PR_ATTACHED);
 
-	/* This gets called by more than one protocols, so initialize once */
+	                                                                     
 	if (encap_initialized) {
 		return;
 	}
@@ -158,13 +158,13 @@ encap_init(struct protosw *pp, struct domain *dp)
 
 	encap_initialized = 1;
 #if 0
-	/*
-	 * we cannot use LIST_INIT() here, since drivers may want to call
-	 * encap_attach(), on driver attach.  encap_init() will be called
-	 * on AF_INET{,6} initialization, which happens after driver
-	 * initialization - using LIST_INIT() here can nuke encap_attach()
-	 * from drivers.
-	 */
+	  
+                                                                  
+                                                                  
+                                                             
+                                                                   
+                 
+    
 	LIST_INIT(&encaptab);
 #endif
 }
@@ -200,7 +200,7 @@ encap4_input(struct mbuf *m, int off)
 	va_end(ap);
 #endif
 
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip = mtod(m, struct ip *);
@@ -231,32 +231,32 @@ encap4_input(struct mbuf *m, int off)
 		if (ep->func) {
 			prio = (*ep->func)(m, off, proto, ep->arg);
 		} else {
-			/*
-			 * it's inbound traffic, we need to match in reverse
-			 * order
-			 */
+			  
+                                                       
+           
+      
 			prio = mask_match(ep, (struct sockaddr *)&d,
 			    (struct sockaddr *)&s);
 		}
 
-		/*
-		 * We prioritize the matches by using bit length of the
-		 * matches.  mask_match() and user-supplied matching function
-		 * should return the bit length of the matches (for example,
-		 * if both src/dst are matched for IPv4, 64 should be returned).
-		 * 0 or negative return value means "it did not match".
-		 *
-		 * The question is, since we have two "mask" portion, we
-		 * cannot really define total order between entries.
-		 * For example, which of these should be preferred?
-		 * mask_match() returns 48 (32 + 16) for both of them.
-		 *	src=3ffe::/16, dst=3ffe:501::/32
-		 *	src=3ffe:501::/32, dst=3ffe::/16
-		 *
-		 * We need to loop through all the possible candidates
-		 * to get the best match - the search takes O(n) for
-		 * n attachments (i.e. interfaces).
-		 */
+		  
+                                                         
+                                                               
+                                                              
+                                                                  
+                                                         
+    
+                                                          
+                                                      
+                                                     
+                                                        
+                                     
+                                     
+    
+                                                        
+                                                      
+                                     
+     
 		if (prio <= 0) {
 			continue;
 		}
@@ -270,7 +270,7 @@ encap4_input(struct mbuf *m, int off)
 	lck_rw_unlock_shared(&encaptab_lock);
 
 	if (match) {
-		/* found a match, "match" has the best one */
+		                                             
 		if (psw && psw->pr_input) {
 			encap_fillarg(m, match_arg);
 			(*psw->pr_input)(m, off);
@@ -280,7 +280,7 @@ encap4_input(struct mbuf *m, int off)
 		return;
 	}
 
-	/* last resort: inject to raw socket */
+	                                       
 	rip_input(m, off);
 }
 #endif
@@ -296,7 +296,7 @@ encap6_input(struct mbuf **mp, int *offp, int proto)
 	int prio, matchprio;
 	void *match_arg = NULL;
 
-	/* Expect 32-bit aligned data pointer on strict-align platforms */
+	                                                                  
 	MBUF_STRICT_DATA_ALIGNMENT_CHECK_32(m);
 
 	ip6 = mtod(m, struct ip6_hdr *);
@@ -323,15 +323,15 @@ encap6_input(struct mbuf **mp, int *offp, int proto)
 		if (ep->func) {
 			prio = (*ep->func)(m, *offp, proto, ep->arg);
 		} else {
-			/*
-			 * it's inbound traffic, we need to match in reverse
-			 * order
-			 */
+			  
+                                                       
+           
+      
 			prio = mask_match(ep, (struct sockaddr *)&d,
 			    (struct sockaddr *)&s);
 		}
 
-		/* see encap4_input() for issues here */
+		                                        
 		if (prio <= 0) {
 			continue;
 		}
@@ -345,7 +345,7 @@ encap6_input(struct mbuf **mp, int *offp, int proto)
 	lck_rw_unlock_shared(&encaptab_lock);
 
 	if (match) {
-		/* found a match */
+		                   
 		if (psw && psw->pr_input) {
 			encap_fillarg(m, match_arg);
 			return (*psw->pr_input)(mp, offp, proto);
@@ -355,7 +355,7 @@ encap6_input(struct mbuf **mp, int *offp, int proto)
 		}
 	}
 
-	/* last resort: inject to raw socket */
+	                                       
 	return rip6_input(mp, offp, proto);
 }
 
@@ -366,11 +366,11 @@ encap_add_locked(struct encaptab *ep)
 	LIST_INSERT_HEAD(&encaptab, ep, chain);
 }
 
-/*
- * sp (src ptr) is always my side, and dp (dst ptr) is always remote side.
- * length of mask (sm and dm) is assumed to be same as sp/dp.
- * Return value will be necessary as input (cookie) for encap_detach().
- */
+  
+                                                                          
+                                                             
+                                                                       
+   
 const struct encaptab *
 encap_attach(int af, int proto, const struct sockaddr *sp,
     const struct sockaddr *sm, const struct sockaddr *dp,
@@ -380,7 +380,7 @@ encap_attach(int af, int proto, const struct sockaddr *sp,
 	struct encaptab *new_ep = NULL;
 	int error;
 
-	/* sanity check on args */
+	                          
 	if (sp->sa_len > sizeof(new_ep->src) || dp->sa_len > sizeof(new_ep->dst)) {
 		error = EINVAL;
 		goto fail;
@@ -400,7 +400,7 @@ encap_attach(int af, int proto, const struct sockaddr *sp,
 		goto fail;
 	}
 
-	/* check if anyone have already attached with exactly same config */
+	                                                                    
 	lck_rw_lock_exclusive(&encaptab_lock);
 	for (ep = LIST_FIRST(&encaptab); ep; ep = LIST_NEXT(ep, chain)) {
 		if (ep->af != af) {
@@ -456,13 +456,13 @@ encap_attach_func( int af, int proto,
 	struct encaptab *ep;
 	int error;
 
-	/* sanity check on args */
+	                          
 	if (!func) {
 		error = EINVAL;
 		goto fail;
 	}
 
-	ep = _MALLOC(sizeof(*ep), M_NETADDR, M_WAITOK | M_ZERO); /* XXX */
+	ep = _MALLOC(sizeof(*ep), M_NETADDR, M_WAITOK | M_ZERO);          
 	if (ep == NULL) {
 		error = ENOBUFS;
 		goto fail;
@@ -496,7 +496,7 @@ encap_detach(const struct encaptab *cookie)
 		if (p == ep) {
 			LIST_REMOVE(p, chain);
 			lck_rw_unlock_exclusive(&encaptab_lock);
-			_FREE(p, M_NETADDR);    /*XXX*/
+			_FREE(p, M_NETADDR);           
 			return 0;
 		}
 	}
@@ -533,7 +533,7 @@ mask_match(const struct encaptab *ep, const struct sockaddr *sp,
 	r = (u_int8_t *)&s;
 	for (i = 0; i < sp->sa_len; i++) {
 		r[i] = p[i] & q[i];
-		/* XXX estimate */
+		                  
 		matchlen += (q[i] ? 8 : 0);
 	}
 
@@ -542,11 +542,11 @@ mask_match(const struct encaptab *ep, const struct sockaddr *sp,
 	r = (u_int8_t *)&d;
 	for (i = 0; i < dp->sa_len; i++) {
 		r[i] = p[i] & q[i];
-		/* XXX rough estimate */
+		                        
 		matchlen += (q[i] ? 8 : 0);
 	}
 
-	/* need to overwrite len/family portion as we don't compare them */
+	                                                                   
 	s.ss_len = sp->sa_len;
 	s.ss_family = sp->sa_family;
 	d.ss_len = dp->sa_len;

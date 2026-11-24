@@ -34,20 +34,20 @@
 #include <mach/kern_return.h>
 #include <mach/sync_policy.h>
 
-/*
- *	Forward Declarations
- *
- *	The semaphore creation and deallocation routines are
- *	defined with the Mach task APIs in <mach/task.h>.
- *
- *      kern_return_t	semaphore_create(task_t task,
- *                                       semaphore_t *new_semaphore,
- *					 sync_policy_t policy,
- *					 int value);
- *
- *	kern_return_t	semaphore_destroy(task_t task,
- *					  semaphore_t semaphore);
- */
+  
+                       
+  
+                                                       
+                                                    
+  
+                                                   
+                                                                    
+                             
+                   
+  
+                                               
+                                
+   
 
 #include <sys/cdefs.h>
 __BEGIN_DECLS
@@ -66,14 +66,14 @@ extern  kern_return_t   semaphore_wait(semaphore_t semaphore);
 extern  kern_return_t   semaphore_timedwait(semaphore_t semaphore,
     mach_timespec_t wait_time);
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
-#else   /* __LP64__ */
+#else                 
 
 extern  kern_return_t   semaphore_timedwait(semaphore_t semaphore,
     mach_timespec_t wait_time);
 
-#endif  /* __LP64__ */
+#endif                
 
 extern  kern_return_t   semaphore_wait_deadline(semaphore_t semaphore,
     uint64_t deadline);
@@ -91,9 +91,9 @@ extern  kern_return_t   semaphore_timedwait_signal(semaphore_t wait_semaphore,
 extern  kern_return_t   semaphore_signal_thread(semaphore_t semaphore,
     thread_t thread);
 
-#endif  /* XNU_KERNEL_PRIVATE */
+#endif                          
 
-#else   /* KERNEL */
+#else               
 
 extern  kern_return_t   semaphore_timedwait(semaphore_t semaphore,
     mach_timespec_t wait_time);
@@ -108,7 +108,7 @@ extern  kern_return_t   semaphore_wait_signal(semaphore_t wait_semaphore,
 extern  kern_return_t   semaphore_signal_thread(semaphore_t semaphore,
     thread_t thread);
 
-#endif  /* KERNEL */
+#endif              
 
 __END_DECLS
 
@@ -122,19 +122,19 @@ __END_DECLS
 
 #define SEMAPHORE_SIGNAL_TIMEOUT        0x00000010
 #define SEMAPHORE_SIGNAL_ALL            0x00000020
-#define SEMAPHORE_SIGNAL_INTERRUPT      0x00000040      /* libmach implements */
+#define SEMAPHORE_SIGNAL_INTERRUPT      0x00000040                              
 #define SEMAPHORE_SIGNAL_PREPOST        0x00000080
 
 #define SEMAPHORE_WAIT_TIMEOUT          0x00000100
-#define SEMAPHORE_WAIT_INTERRUPT        0x00000400      /* libmach implements */
+#define SEMAPHORE_WAIT_INTERRUPT        0x00000400                              
 
 #define SEMAPHORE_TIMEOUT_NOBLOCK       0x00100000
 #define SEMAPHORE_TIMEOUT_RELATIVE      0x00200000
 
-#define SEMAPHORE_USE_SAVED_RESULT      0x01000000      /* internal use only */
-#define SEMAPHORE_SIGNAL_RELEASE        0x02000000      /* internal use only */
+#define SEMAPHORE_USE_SAVED_RESULT      0x01000000                             
+#define SEMAPHORE_SIGNAL_RELEASE        0x02000000                             
 #define SEMAPHORE_THREAD_HANDOFF        0x04000000
 
-#endif  /* PRIVATE */
+#endif               
 
-#endif  /* _MACH_SEMAPHORE_H_ */
+#endif                          

@@ -63,8 +63,8 @@ log_trace(const struct ccdigest_info *di)
 	}
 }
 
-#endif // CC_FEATURE_FLAGS_AVAILABLE
-#endif // CC_LOGGING_AVAILABLE
+#endif                              
+#endif                        
 #endif
 
 void
@@ -74,8 +74,8 @@ ccdigest_init(const struct ccdigest_info *di, ccdigest_ctx_t ctx)
 #if CC_LOGGING_AVAILABLE
 #if CC_FEATURE_FLAGS_AVAILABLE
 	log_trace(di);
-#endif // CC_FEATURE_FLAGS_AVAILABLE
-#endif // CC_LOGGING_AVAILABLE
+#endif                              
+#endif                        
 #endif
 
 	ccdigest_copy_state(di, ccdigest_state_ccn(di, ctx), di->initial_state);

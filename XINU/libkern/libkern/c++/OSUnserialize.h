@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* OSUnserialize.h created by rsulack on Mon 23-Nov-1998 */
+                                                           
 
 #ifndef _OS_OSUNSERIALIZE_H
 #define _OS_OSUNSERIALIZE_H
@@ -40,34 +40,34 @@
 class OSObject;
 class OSString;
 
-/*!
- * @header
- *
- * @abstract
- * This header declares the <code>OSUnserializeXML</code> function.
- */
+   
+          
+  
+            
+                                                                   
+   
 
 
-/*!
- * @function OSUnserializeXML
- *
- * @abstract
- * Recreates an OSContainer object
- * from its previously serialized OSContainer class instance data.
- *
- * @param buffer      A buffer containing nul-terminated XML data
- *                    representing the object to be recreated.
- * @param errorString If non-<code>NULL</code>, and the XML parser
- *                    finds an error in <code>buffer</code>,
- *                    <code>*errorString</code> indicates the line number
- *                    and type of error encountered.
- *
- * @result
- * The recreated object, or <code>NULL</code> on failure.
- *
- * @discussion
- * <b>Not safe</b> to call in a primary interrupt handler.
- */
+   
+                             
+  
+            
+                                  
+                                                                  
+  
+                                                                 
+                                                              
+                                                                  
+                                                            
+                                                                         
+                                                    
+  
+          
+                                                         
+  
+              
+                                                          
+   
 extern "C++" OSPtr<OSObject> OSUnserializeXML(
 	const char  * buffer,
 	OSString * * errorString = NULL);
@@ -76,28 +76,28 @@ extern "C++" OSPtr<OSObject> OSUnserializeXML(
 	const char  * buffer,
 	OSSharedPtr<OSString>& errorString);
 
-/*!
- * @function OSUnserializeXML
- *
- * @abstract
- * Recreates an OSContainer object
- * from its previously serialized OSContainer class instance data.
- *
- * @param buffer      A buffer containing nul-terminated XML data
- *                    representing the object to be recreated.
- * @param bufferSize  The size of the block of memory. The function
- *                    never scans beyond the first bufferSize bytes.
- * @param errorString If non-<code>NULL</code>, and the XML parser
- *                    finds an error in <code>buffer</code>,
- *                    <code>*errorString</code> indicates the line number
- *                    and type of error encountered.
- *
- * @result
- * The recreated object, or <code>NULL</code> on failure.
- *
- * @discussion
- * <b>Not safe</b> to call in a primary interrupt handler.
- */
+   
+                             
+  
+            
+                                  
+                                                                  
+  
+                                                                 
+                                                              
+                                                                   
+                                                                    
+                                                                  
+                                                            
+                                                                         
+                                                    
+  
+          
+                                                         
+  
+              
+                                                          
+   
 extern "C++" OSPtr<OSObject> OSUnserializeXML(
 	const char  * buffer,
 	size_t        bufferSize,
@@ -119,6 +119,6 @@ extern OSPtr<OSObject> OSUnserialize(const char *buffer, OSString * *errorString
 
 extern OSPtr<OSObject> OSUnserialize(const char *buffer, OSSharedPtr<OSString>&  errorString);
 
-#endif /* __APPLE_API_OBSOLETE */
+#endif                           
 
-#endif /* _OS_OSUNSERIALIZE_H */
+#endif                          

@@ -32,20 +32,20 @@
 
 #include "string.h"
 
-/*
- * sizeof(word) MUST BE A POWER OF TWO
- * SO THAT wmask BELOW IS ALL ONES
- */
-typedef int word;               /* "word" used for optimal copy speed */
+  
+                                      
+                                  
+   
+typedef int word;                                                       
 
 #define wsize   sizeof(word)
 #define wmask   (wsize - 1)
 
-/*
- * Copy a block of memory, handling overlap.
- * This is the routine that actually implements
- * (the portable versions of) bcopy, memcpy, and memmove.
- */
+  
+                                            
+                                               
+                                                         
+   
 
 __attribute__((visibility("hidden")))
 void *
@@ -55,26 +55,26 @@ _libkernel_memmove(void *dst0, const void *src0, size_t length)
 	const char *src = src0;
 	size_t t;
 
-	if (length == 0 || dst == src) {        /* nothing to do */
+	if (length == 0 || dst == src) {                           
 		goto done;
 	}
 
-	/*
-	 * Macros: loop-t-times; and loop-t-times, t>0
-	 */
+	  
+                                               
+    
 #define TLOOP(s) if (t) TLOOP1(s)
 #define TLOOP1(s) do { s; } while (--t)
 
 	if ((unsigned long)dst < (unsigned long)src) {
-		/*
-		 * Copy forward.
-		 */
-		t = (uintptr_t)src;     /* only need low bits */
+		  
+                  
+     
+		t = (uintptr_t)src;                             
 		if ((t | (uintptr_t)dst) & wmask) {
-			/*
-			 * Try to align operands.  This cannot be done
-			 * unless the low bits match.
-			 */
+			  
+                                                 
+                                
+      
 			if ((t ^ (uintptr_t)dst) & wmask || length < wsize) {
 				t = length;
 			} else {
@@ -83,19 +83,19 @@ _libkernel_memmove(void *dst0, const void *src0, size_t length)
 			length -= t;
 			TLOOP1(*dst++ = *src++);
 		}
-		/*
-		 * Copy whole words, then mop up any trailing bytes.
-		 */
+		  
+                                                      
+     
 		t = length / wsize;
 		TLOOP(*(word *)dst = *(word *)src; src += wsize; dst += wsize);
 		t = length & wmask;
 		TLOOP(*dst++ = *src++);
 	} else {
-		/*
-		 * Copy backwards.  Otherwise essentially the same.
-		 * Alignment works as before, except that it takes
-		 * (t&wmask) bytes to align, not wsize-(t&wmask).
-		 */
+		  
+                                                     
+                                                    
+                                                   
+     
 		src += length;
 		dst += length;
 		t = (uintptr_t)src;

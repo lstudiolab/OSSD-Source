@@ -52,25 +52,25 @@
 char copyright[] =
     "@(#) Copyright (c) 1980 Regents of the University of California.\n\
  All rights reserved.\n";
-#endif /* not lint */
+#endif               
 
 #ifndef lint
 static char sccsid[] __attribute__((used)) = "@(#)main.c	5.9 (Berkeley) 6/18/88";
-#endif /* not lint */
+#endif               
 
 #include <stdio.h>
 #include <ctype.h>
 #include "parser.h"
 #include "config.h"
 
-/*
- * Config builds a set of files for building a UNIX
- * system given a description of the desired system.
- */
+  
+                                                   
+                                                    
+   
 int
 main(int argc, char *argv[])
 {
-	source_directory = "..";        /* default */
+	source_directory = "..";                     
 	object_directory = "..";
 	config_directory = (char *) 0;
 	while ((argc > 1) && (argv[1][0] == '-')) {
@@ -133,19 +133,19 @@ usage_error:    ;
 		exit(3);
 	}
 
-	mkioconf();                     /* ioconf.c */
-	makefile();                     /* build Makefile */
-	headers();                      /* make a lot of .h files */
+	mkioconf();                                   
+	makefile();                                         
+	headers();                                                  
 
 	return 0;
 }
 
-/*
- * get_word
- *	returns EOF on end of file
- *	NULL on end of line
- *	pointer to the word otherwise
- */
+  
+           
+                             
+                      
+                                
+   
 const char *
 get_word(FILE *fp)
 {
@@ -183,12 +183,12 @@ get_word(FILE *fp)
 	return line;
 }
 
-/*
- * get_rest
- *	returns EOF on end of file
- *	NULL on end of line
- *	pointer to the word otherwise
- */
+  
+           
+                             
+                      
+                                
+   
 char *
 get_rest(FILE *fp)
 {
@@ -210,9 +210,9 @@ get_rest(FILE *fp)
 	return line;
 }
 
-/*
- * prepend the path to a filename
- */
+  
+                                 
+   
 char *
 path(const char *file)
 {

@@ -49,13 +49,13 @@
  */
 
 #include <stdio.h>
-#include <unistd.h>     /* for unlink */
+#include <unistd.h>                     
 #include "parser.h"
 #include "config.h"
 
-/*
- * build the ioconf.c file
- */
+  
+                          
+   
 void    pseudo_inits(FILE *fp);
 
 void

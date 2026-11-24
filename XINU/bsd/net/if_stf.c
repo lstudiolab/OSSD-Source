@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/net/if_stf.c,v 1.1.2.6 2001/07/24 19:10:18 brooks Exp $	*/
-/*	$KAME: if_stf.c,v 1.62 2001/06/07 22:32:16 itojun Exp $	*/
+                                                                               
+                                                             
 
 /*
  * Copyright (C) 2000 WIDE Project.
@@ -57,56 +57,56 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2006 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
-/*
- * 6to4 interface, based on RFC3056.
- *
- * 6to4 interface is NOT capable of link-layer (I mean, IPv4) multicasting.
- * There is no address mapping defined from IPv6 multicast address to IPv4
- * address.  Therefore, we do not have IFF_MULTICAST on the interface.
- *
- * Due to the lack of address mapping for link-local addresses, we cannot
- * throw packets toward link-local addresses (fe80::x).  Also, we cannot throw
- * packets to link-local multicast addresses (ff02::x).
- *
- * Here are interesting symptoms due to the lack of link-local address:
- *
- * Unicast routing exchange:
- * - RIPng: Impossible.  Uses link-local multicast packet toward ff02::9,
- *   and link-local addresses as nexthop.
- * - OSPFv6: Impossible.  OSPFv6 assumes that there's link-local address
- *   assigned to the link, and makes use of them.  Also, HELLO packets use
- *   link-local multicast addresses (ff02::5 and ff02::6).
- * - BGP4+: Maybe.  You can only use global address as nexthop, and global
- *   address as TCP endpoint address.
- *
- * Multicast routing protocols:
- * - PIM: Hello packet cannot be used to discover adjacent PIM routers.
- *   Adjacent PIM routers must be configured manually (is it really spec-wise
- *   correct thing to do?).
- *
- * ICMPv6:
- * - Redirects cannot be used due to the lack of link-local address.
- *
- * stf interface does not have, and will not need, a link-local address.
- * It seems to have no real benefit and does not help the above symptoms much.
- * Even if we assign link-locals to interface, we cannot really
- * use link-local unicast/multicast on top of 6to4 cloud (since there's no
- * encapsulation defined for link-local address), and the above analysis does
- * not change.  RFC3056 does not mandate the assignment of link-local address
- * either.
- *
- * 6to4 interface has security issues.  Refer to
- * http://playground.iijlab.net/i-d/draft-itojun-ipv6-transition-abuse-00.txt
- * for details.  The code tries to filter out some of malicious packets.
- * Note that there is no way to be 100% secure.
- */
+  
+                                    
+  
+                                                                           
+                                                                          
+                                                                      
+  
+                                                                         
+                                                                              
+                                                       
+  
+                                                                       
+  
+                            
+                                                                         
+                                         
+                                                                        
+                                                                          
+                                                          
+                                                                          
+                                     
+  
+                               
+                                                                       
+                                                                             
+                           
+  
+          
+                                                                    
+  
+                                                                        
+                                                                              
+                                                               
+                                                                          
+                                                                             
+                                                                             
+          
+  
+                                                
+                                                                             
+                                                                        
+                                               
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -151,11 +151,11 @@
 static lck_grp_t *stf_mtx_grp;
 
 struct stf_softc {
-	ifnet_t                         sc_if;     /* common area */
-	u_int32_t                               sc_protocol_family; /* dlil protocol attached */
+	ifnet_t                         sc_if;                      
+	u_int32_t                               sc_protocol_family;                             
 	union {
 		struct route  __sc_ro4;
-		struct route_in6 __sc_ro6; /* just for safety */
+		struct route_in6 __sc_ro6;                      
 	} __sc_ro46;
 #define sc_ro   __sc_ro46.__sc_ro4
 	decl_lck_mtx_data(, sc_ro_mtx);
@@ -204,9 +204,9 @@ stfinit(void)
 	}
 }
 
-/*
- * gif_input is the input handler for IP and IPv6 attached to gif
- */
+  
+                                                                 
+   
 static errno_t
 stf_media_input(
 	__unused ifnet_t        ifp,
@@ -230,7 +230,7 @@ stf_add_proto(
 	__unused const struct ifnet_demux_desc  *demux_array,
 	__unused u_int32_t                                              demux_count)
 {
-	/* Only one protocol may be attached at a time */
+	                                                 
 	struct stf_softc* stf = ifnet_softc(ifp);
 	if (stf->sc_protocol_family == 0) {
 		stf->sc_protocol_family = protocol_family;
@@ -362,9 +362,9 @@ stfattach(void)
 		return;
 	}
 	ifnet_set_mtu(sc->sc_if, IPV6_MMTU);
-	ifnet_set_flags(sc->sc_if, 0, 0xffff); /* clear all flags */
+	ifnet_set_flags(sc->sc_if, 0, 0xffff);                      
 #if 0
-	/* turn off ingress filter */
+	                             
 	ifnet_set_flags(sc->sc_if, IFF_LINK2, IFF_LINK2);
 #endif
 
@@ -404,7 +404,7 @@ stf_encapcheck(
 		return 0;
 	}
 
-	/* IFF_LINK0 means "no decapsulation" */
+	                                        
 	if ((ifnet_flags(sc->sc_if) & IFF_LINK0) != 0) {
 		return 0;
 	}
@@ -424,11 +424,11 @@ stf_encapcheck(
 		return 0;
 	}
 
-	/*
-	 * check if IPv4 dst matches the IPv4 address derived from the
-	 * local 6to4 address.
-	 * success on: dst = 10.1.1.1, ia6->ia_addr = 2002:0a01:0101:...
-	 */
+	  
+                                                               
+                       
+                                                                 
+    
 	IFA_LOCK(&ia6->ia_ifa);
 	if (bcmp(GET_V4(&ia6->ia_addr.sin6_addr), &ip.ip_dst,
 	    sizeof(ip.ip_dst)) != 0) {
@@ -436,12 +436,12 @@ stf_encapcheck(
 		IFA_REMREF(&ia6->ia_ifa);
 		return 0;
 	}
-	/*
-	 * check if IPv4 src matches the IPv4 address derived from the
-	 * local 6to4 address masked by prefixmask.
-	 * success on: src = 10.1.1.1, ia6->ia_addr = 2002:0a00:.../24
-	 * fail on: src = 10.1.1.1, ia6->ia_addr = 2002:0b00:.../24
-	 */
+	  
+                                                               
+                                            
+                                                               
+                                                            
+    
 	bzero(&a, sizeof(a));
 	a.s_addr = GET_V4(&ia6->ia_addr.sin6_addr)->s_addr;
 	a.s_addr &= GET_V4(&ia6->ia_prefixmask.sin6_addr)->s_addr;
@@ -452,7 +452,7 @@ stf_encapcheck(
 		IFA_REMREF(&ia6->ia_ifa);
 		return 0;
 	}
-	/* stf interface makes single side match only */
+	                                                
 	IFA_UNLOCK(&ia6->ia_ifa);
 	IFA_REMREF(&ia6->ia_ifa);
 	return 32;
@@ -500,7 +500,7 @@ stf_getsrcifa6(struct ifnet *ifp)
 			continue;
 		}
 
-		IFA_ADDREF(ia);         /* for caller */
+		IFA_ADDREF(ia);                         
 		ifnet_lock_done(ifp);
 		return (struct in6_ifaddr *)ia;
 	}
@@ -540,17 +540,17 @@ stf_pre_output(
 	sc = ifnet_softc(ifp);
 	dst6 = (const struct sockaddr_in6 *)(const void *)dst;
 
-	/* just in case */
+	                  
 	if ((ifnet_flags(ifp) & IFF_UP) == 0) {
 		printf("stf: IFF_DOWN\n");
 		return ENETDOWN;
 	}
 
-	/*
-	 * If we don't have an ip4 address that match my inner ip6 address,
-	 * we shouldn't generate output.  Without this check, we'll end up
-	 * using wrong IPv4 source.
-	 */
+	  
+                                                                    
+                                                                   
+                            
+    
 	ia6 = stf_getsrcifa6(ifp);
 	if (ia6 == NULL) {
 		return ENETDOWN;
@@ -559,7 +559,7 @@ stf_pre_output(
 	if (mbuf_len(m) < sizeof(*ip6)) {
 		m = m_pullup(m, sizeof(*ip6));
 		if (!m) {
-			*m0 = NULL; /* makes sure this won't be double freed */
+			*m0 = NULL;                                            
 			IFA_REMREF(&ia6->ia_ifa);
 			return ENOBUFS;
 		}
@@ -568,10 +568,10 @@ stf_pre_output(
 	ip6 = mtod(m, struct ip6_hdr *);
 	tos = (ntohl(ip6->ip6_flow) >> 20) & 0xff;
 
-	/*
-	 * Pickup the right outer dst addr from the list of candidates.
-	 * ip6_dst has priority as it may be able to give us shorter IPv4 hops.
-	 */
+	  
+                                                                
+                                                                        
+    
 	if (IN6_IS_ADDR_6TO4(&ip6->ip6_dst)) {
 		in4 = GET_V4(&ip6->ip6_dst);
 	} else if (IN6_IS_ADDR_6TO4(&dst6->sin6_addr)) {
@@ -582,7 +582,7 @@ stf_pre_output(
 	}
 
 	if (ifp->if_bpf) {
-		/* We need to prepend the address family as a four byte field. */
+		                                                                 
 		u_int32_t af = AF_INET6;
 
 		bpf_tap_out(ifp, 0, m, &af, sizeof(af));
@@ -610,7 +610,7 @@ stf_pre_output(
 	bcopy(in4, &ip->ip_dst, sizeof(ip->ip_dst));
 	ip->ip_p = IPPROTO_IPV6;
 	ip->ip_ttl = ip_stf_ttl;
-	ip->ip_len = m->m_pkthdr.len;   /*host order*/
+	ip->ip_len = m->m_pkthdr.len;                 
 	if (ifp->if_flags & IFF_LINK1) {
 		ip_ecn_ingress(ECN_NORMAL, &ip->ip_tos, &tos);
 	} else {
@@ -622,7 +622,7 @@ stf_pre_output(
 	if (ROUTE_UNUSABLE(&sc->sc_ro) || dst4->sin_family != AF_INET ||
 	    bcmp(&dst4->sin_addr, &ip->ip_dst, sizeof(ip->ip_dst)) != 0) {
 		ROUTE_RELEASE(&sc->sc_ro);
-		/* cache route doesn't match: always the case during the first use */
+		                                                                     
 		dst4->sin_family = AF_INET;
 		dst4->sin_len = sizeof(struct sockaddr_in);
 		bcopy(&ip->ip_dst, &dst4->sin_addr, sizeof(dst4->sin_addr));
@@ -631,8 +631,8 @@ stf_pre_output(
 	result = ip_output(m, NULL, &sc->sc_ro, IP_OUTARGS, NULL, &ipoa);
 	lck_mtx_unlock(&sc->sc_ro_mtx);
 
-	/* Assumption: ip_output will free mbuf on errors */
-	/* All the output processing is done here, don't let stf_output be called */
+	                                                    
+	                                                                            
 	if (result == 0) {
 		result = EJUSTRETURN;
 	}
@@ -645,9 +645,9 @@ stf_output(
 	__unused ifnet_t        ifp,
 	__unused mbuf_t m)
 {
-	/* All processing is done in stf_pre_output
-	 * this shouldn't be called as the pre_output returns "EJUSTRETURN"
-	 */
+	                                           
+                                                                    
+    
 	return 0;
 }
 
@@ -655,14 +655,14 @@ static int
 stf_checkaddr4(
 	struct stf_softc *sc,
 	const struct in_addr *in,
-	struct ifnet *inifp)    /* incoming interface */
+	struct ifnet *inifp)                            
 {
 	struct in_ifaddr *ia4;
 
-	/*
-	 * reject packets with the following address:
-	 * 224.0.0.0/4 0.0.0.0/8 127.0.0.0/8 255.0.0.0/8
-	 */
+	  
+                                              
+                                                 
+    
 	if (IN_MULTICAST(ntohl(in->s_addr))) {
 		return -1;
 	}
@@ -671,9 +671,9 @@ stf_checkaddr4(
 		return -1;
 	}
 
-	/*
-	 * reject packets with broadcast
-	 */
+	  
+                                 
+    
 	lck_rw_lock_shared(in_ifaddr_rwlock);
 	for (ia4 = TAILQ_FIRST(&in_ifaddrhead);
 	    ia4;
@@ -692,9 +692,9 @@ stf_checkaddr4(
 	}
 	lck_rw_done(in_ifaddr_rwlock);
 
-	/*
-	 * perform ingress filter
-	 */
+	  
+                          
+    
 	if (sc && (ifnet_flags(sc->sc_if) & IFF_LINK2) == 0 && inifp) {
 		struct sockaddr_in sin;
 		struct rtentry *rt;
@@ -730,21 +730,21 @@ static int
 stf_checkaddr6(
 	struct stf_softc *sc,
 	struct in6_addr *in6,
-	struct ifnet *inifp)    /* incoming interface */
+	struct ifnet *inifp)                            
 {
-	/*
-	 * check 6to4 addresses
-	 */
+	  
+                        
+    
 	if (IN6_IS_ADDR_6TO4(in6)) {
 		return stf_checkaddr4(sc, GET_V4(in6), inifp);
 	}
 
-	/*
-	 * reject anything that look suspicious.  the test is implemented
-	 * in ip6_input too, but we check here as well to
-	 * (1) reject bad packets earlier, and
-	 * (2) to be safe against future ip6_input change.
-	 */
+	  
+                                                                  
+                                                  
+                                       
+                                                   
+    
 	if (IN6_IS_ADDR_V4COMPAT(in6) || IN6_IS_ADDR_V4MAPPED(in6)) {
 		return -1;
 	}
@@ -784,10 +784,10 @@ in_stf_input(
 
 	ifp = sc->sc_if;
 
-	/*
-	 * perform sanity check against outer src/dst.
-	 * for source, perform ingress filter as well.
-	 */
+	  
+                                               
+                                               
+    
 	if (stf_checkaddr4(sc, &ip->ip_dst, NULL) < 0 ||
 	    stf_checkaddr4(sc, &ip->ip_src, m->m_pkthdr.rcvif) < 0) {
 		m_freem(m);
@@ -797,10 +797,10 @@ in_stf_input(
 	otos = ip->ip_tos;
 	mbuf_copydata(m, off, sizeof(ip6), &ip6);
 
-	/*
-	 * perform sanity check against inner src/dst.
-	 * for source, perform ingress filter as well.
-	 */
+	  
+                                               
+                                               
+    
 	if (stf_checkaddr6(sc, &ip6.ip6_dst, NULL) < 0 ||
 	    stf_checkaddr6(sc, &ip6.ip6_src, m->m_pkthdr.rcvif) < 0) {
 		m_freem(m);
@@ -821,17 +821,17 @@ in_stf_input(
 	mbuf_adj(m, off);
 
 	if (ifp->if_bpf) {
-		/* We need to prepend the address family as a four byte field. */
+		                                                                 
 		u_int32_t af = AF_INET6;
 		bpf_tap_in(ifp, 0, m, &af, sizeof(af));
 	}
 
-	/*
-	 * Put the packet to the network layer input queue according to the
-	 * specified address family.
-	 * See net/if_gif.c for possible issues with packet processing
-	 * reorder due to extra queueing.
-	 */
+	  
+                                                                    
+                             
+                                                               
+                                  
+    
 	bzero(&stats, sizeof(stats));
 	stats.packets_in = 1;
 	stats.bytes_in = mbuf_pkthdr_len(m);
@@ -881,7 +881,7 @@ stf_ioctl(
 		sin6 = (struct sockaddr_in6 *)(void *)ifa->ifa_addr;
 		if (IN6_IS_ADDR_6TO4(&sin6->sin6_addr)) {
 			if (!(ifnet_flags( ifp ) & IFF_UP)) {
-				/* do this only if the interface is not already up */
+				                                                     
 				ifa->ifa_rtrequest = stf_rtrequest;
 				IFA_UNLOCK(ifa);
 				ifnet_set_flags(ifp, IFF_UP, IFF_UP);

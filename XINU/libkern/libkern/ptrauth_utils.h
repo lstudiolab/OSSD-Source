@@ -31,31 +31,31 @@
 
 #include <ptrauth.h>
 
-/* ptrauth_utils flags */
-#define PTRAUTH_ADDR_DIVERSIFY  0x0001  /* Mix storage address in to signature */
-#define PTRAUTH_NON_NULL        0x0002  /* ptr must not be NULL */
+                         
+#define PTRAUTH_ADDR_DIVERSIFY  0x0001                                           
+#define PTRAUTH_NON_NULL        0x0002                            
 
-/* ptrauth_utils_sign_blob_generic
- *
- * Description:	Sign a blob of data with the GA key and extra data, optionally
- * diversified by its storage address.
- *
- * Caveat: A race window exists between the blob being written to memory and its signature being
- * calculated by this function. In normal operation, standard thread safety semantics prevent this being
- * an issue, however in the malicious case it should be acknowledged that an attacker may be able to accurately
- * time overwriting parts/all of the blob and we would generate a signature for that modified data. It is
- * therefore important that users of this API minimise that window by calculating signatures immediately
- * after modification to the blob.
- *
- *
- * Parameters:	ptr				Address of data to sign
- *				len_bytes		Length in bytes of data to sign
- *				data			Salt to mix in signature when signing
- *				flags               Signing options
- *
- * Returns:		ptrauth_generic_signature_t		Signature of blob
- *
- */
+                                  
+  
+                                                                              
+                                      
+  
+                                                                                                
+                                                                                                        
+                                                                                                               
+                                                                                                         
+                                                                                                        
+                                  
+  
+  
+                                             
+                                                
+                                                  
+                                         
+  
+                                                           
+  
+   
 #if __has_feature(ptrauth_calls)
 ptrauth_generic_signature_t
 ptrauth_utils_sign_blob_generic(const void * ptr, size_t len_bytes, uint64_t data, int flags);
@@ -65,28 +65,28 @@ ptrauth_utils_sign_blob_generic(__unused const void * ptr, __unused size_t len_b
 {
 	return 0;
 }
-#endif // __has_feature(ptrauth_calls)
+#endif                                
 
 
-/* ptrauth_utils_auth_blob_generic
- *
- * Description:	Authenticates a signature for a blob of data
- *
- * Caveat: As with ptrauth_utils_sign_blob_generic, an attacker who is able to accurately time access between
- * authenticating blobs and its use may be able to modify its contents. Failure to time this correctly will
- * result in a panic. Care should be taken to authenticate immediately before reading data from the blob to
- * minimise this window.
- *
- * Parameters:	ptr				Address of data being authenticated
- *				len_bytes		Length of data being authenticated
- *				data			Salt to mix with digest when authenticating
- *				flags           Signing options
- *				signature		The signature to verify
- *
- * Returns:		void			If the function returns, the authentication succeeded,
- *								else we panic as something's gone awry
- *
- */
+                                  
+  
+                                                            
+  
+                                                                                                             
+                                                                                                           
+                                                                                                           
+                        
+  
+                                                         
+                                                   
+                                                        
+                                     
+                                        
+  
+                                                                          
+                                                
+  
+   
 #if __has_feature(ptrauth_calls)
 void
 ptrauth_utils_auth_blob_generic(const void * ptr, size_t len_bytes, uint64_t data, int flags, ptrauth_generic_signature_t signature);
@@ -96,7 +96,7 @@ ptrauth_utils_auth_blob_generic(__unused const void * ptr, __unused size_t len_b
 {
 	return;
 }
-#endif // __has_feature(ptrauth_calls)
+#endif                                
 
 
-#endif // __PTRAUTH_UTILS_H
+#endif                     

@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* OSSerialize.cpp created by rsulack on Wen 25-Nov-1998 */
+                                                           
 
 #define IOKIT_ENABLE_SHARED_PTR
 
@@ -86,11 +86,11 @@ OSSerialize::previouslySerialized(const OSMetaClassBase *o)
 		return binarySerialize(o);
 	}
 
-	// look it up
+	             
 	tagIdx = tags->getNextIndexOfObject(o, 0);
 
-// xx-review: no error checking here for addString calls!
-	// does it exist?
+                                                         
+	                 
 	if (tagIdx != -1U) {
 		addString("<reference IDREF=\"");
 		snprintf(temp, sizeof(temp), "%u", tagIdx);
@@ -99,8 +99,8 @@ OSSerialize::previouslySerialized(const OSMetaClassBase *o)
 		return true;
 	}
 
-	// add to tag array
-	tags->setObject(o);// XXX check return
+	                   
+	tags->setObject(o);                   
 
 	return false;
 }

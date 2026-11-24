@@ -66,50 +66,50 @@
 
 #include <sys/cdefs.h>
 
-/*
- * Although we have saved user/group IDs, we do not use them in setuid
- * as described in POSIX 1003.1, because the feature does not work for
- * root.  We use the saved IDs in seteuid/setegid, which are not currently
- * part of the POSIX 1003.1 specification.
- */
+  
+                                                                      
+                                                                      
+                                                                          
+                                          
+   
 #ifdef  _NOT_AVAILABLE
-#define _POSIX_SAVED_IDS        /* saved set-user-ID and set-group-ID */
+#define _POSIX_SAVED_IDS                                                
 #endif
 
 #define _POSIX_VERSION          200112L
 #define _POSIX2_VERSION         200112L
 
-/* execution-time symbolic constants */
-/* may disable terminal special characters */
+                                       
+                                             
 #include <sys/_types/_posix_vdisable.h>
 
 #define _POSIX_THREAD_KEYS_MAX 128
 
-/* access function */
-#define F_OK            0       /* test for existence of file */
-#define X_OK            (1<<0)  /* test for execute or search permission */
-#define W_OK            (1<<1)  /* test for write permission */
-#define R_OK            (1<<2)  /* test for read permission */
+                     
+#define F_OK            0                                       
+#define X_OK            (1<<0)                                             
+#define W_OK            (1<<1)                                 
+#define R_OK            (1<<2)                                
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-/*
- * Extended access functions.
- * Note that we depend on these matching the definitions in sys/kauth.h,
- * but with the bits shifted left by 8.
- */
-#define _READ_OK        (1<<9)  /* read file data / read directory */
-#define _WRITE_OK       (1<<10) /* write file data / add file to directory */
-#define _EXECUTE_OK     (1<<11) /* execute file / search in directory*/
-#define _DELETE_OK      (1<<12) /* delete file / delete directory */
-#define _APPEND_OK      (1<<13) /* append to file / add subdirectory to directory */
-#define _RMFILE_OK      (1<<14) /* - / remove file from directory */
-#define _RATTR_OK       (1<<15) /* read basic attributes */
-#define _WATTR_OK       (1<<16) /* write basic attributes */
-#define _REXT_OK        (1<<17) /* read extended attributes */
-#define _WEXT_OK        (1<<18) /* write extended attributes */
-#define _RPERM_OK       (1<<19) /* read permissions */
-#define _WPERM_OK       (1<<20) /* write permissions */
-#define _CHOWN_OK       (1<<21) /* change ownership */
+  
+                             
+                                                                        
+                                       
+   
+#define _READ_OK        (1<<9)                                       
+#define _WRITE_OK       (1<<10)                                              
+#define _EXECUTE_OK     (1<<11)                                        
+#define _DELETE_OK      (1<<12)                                     
+#define _APPEND_OK      (1<<13)                                                     
+#define _RMFILE_OK      (1<<14)                                     
+#define _RATTR_OK       (1<<15)                            
+#define _WATTR_OK       (1<<16)                             
+#define _REXT_OK        (1<<17)                               
+#define _WEXT_OK        (1<<18)                                
+#define _RPERM_OK       (1<<19)                       
+#define _WPERM_OK       (1<<20)                        
+#define _CHOWN_OK       (1<<21)                       
 
 #define _ACCESS_EXTENDED_MASK (_READ_OK | _WRITE_OK | _EXECUTE_OK | \
 	                        _DELETE_OK | _APPEND_OK | \
@@ -118,11 +118,11 @@
 	                        _WPERM_OK | _CHOWN_OK)
 #endif
 
-/* whence values for lseek(2) */
+                                
 #include <sys/_types/_seek_set.h>
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-/* whence values for lseek(2); renamed by POSIX 1003.1 */
+                                                         
 #define L_SET           SEEK_SET
 #define L_INCR          SEEK_CUR
 #define L_XTND          SEEK_END
@@ -138,7 +138,7 @@ struct accessx_descriptor {
 #define ACCESSX_MAX_TABLESIZE   (16 * 1024)
 #endif
 
-/* configurable pathname variables */
+                                     
 #define _PC_LINK_MAX             1
 #define _PC_MAX_CANON            2
 #define _PC_MAX_INPUT            3
@@ -157,21 +157,21 @@ struct accessx_descriptor {
 #define _PC_AUTH_OPAQUE_NP      14
 #endif
 
-#define _PC_2_SYMLINKS          15      /* Symlink supported in directory */
-#define _PC_ALLOC_SIZE_MIN      16      /* Minimum storage actually allocated */
-#define _PC_ASYNC_IO            17      /* Async I/O [AIO] supported? */
-#define _PC_FILESIZEBITS        18      /* # of bits to represent file size */
-#define _PC_PRIO_IO             19      /* Priority I/O [PIO] supported? */
-#define _PC_REC_INCR_XFER_SIZE  20      /* Recommended increment for next two */
-#define _PC_REC_MAX_XFER_SIZE   21      /* Recommended max file transfer size */
-#define _PC_REC_MIN_XFER_SIZE   22      /* Recommended min file transfer size */
-#define _PC_REC_XFER_ALIGN      23      /* Recommended buffer alignment */
-#define _PC_SYMLINK_MAX         24      /* Max # of bytes in symlink name */
-#define _PC_SYNC_IO             25      /* Sync I/O [SIO] supported? */
-#define _PC_XATTR_SIZE_BITS     26      /* # of bits to represent maximum xattr size */
-#define _PC_MIN_HOLE_SIZE       27      /* Recommended minimum hole size for sparse files */
+#define _PC_2_SYMLINKS          15                                          
+#define _PC_ALLOC_SIZE_MIN      16                                              
+#define _PC_ASYNC_IO            17                                      
+#define _PC_FILESIZEBITS        18                                            
+#define _PC_PRIO_IO             19                                         
+#define _PC_REC_INCR_XFER_SIZE  20                                              
+#define _PC_REC_MAX_XFER_SIZE   21                                              
+#define _PC_REC_MIN_XFER_SIZE   22                                              
+#define _PC_REC_XFER_ALIGN      23                                        
+#define _PC_SYMLINK_MAX         24                                          
+#define _PC_SYNC_IO             25                                     
+#define _PC_XATTR_SIZE_BITS     26                                                     
+#define _PC_MIN_HOLE_SIZE       27                                                          
 
-/* configurable system strings */
+                                 
 #define _CS_PATH                 1
 
 #ifndef KERNEL
@@ -191,7 +191,7 @@ int     setattrlistat(int, const char *, void *, void *, size_t, uint32_t) __OSX
 
 __END_DECLS
 
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL */
+#endif                                          
 
 #if __DARWIN_C_LEVEL >= 200809L
 
@@ -214,7 +214,7 @@ int     unlinkat(int, const char *, int) __OSX_AVAILABLE_STARTING(__MAC_10_10, _
 
 __END_DECLS
 
-#endif /* __DARWIN_C_LEVEL >= 200809L */
-#endif /* !KERNEL */
+#endif                                  
+#endif              
 
-#endif /* !_SYS_UNISTD_H_ */
+#endif                      

@@ -43,7 +43,7 @@ typedef u_int32_t       nstat_provider_id_t;
 typedef u_int64_t       nstat_src_ref_t;
 typedef u_int64_t       nstat_event_flags_t;
 
-// The following event definitions are very provisional..
+                                                         
 enum{
 	NSTAT_EVENT_SRC_ADDED                    = 0x00000001
 	, NSTAT_EVENT_SRC_REMOVED                = 0x00000002
@@ -60,11 +60,11 @@ enum{
 #if (DEBUG || DEVELOPMENT)
 	, NSTAT_EVENT_SRC_RESERVED_1             = 0x00001000
 	, NSTAT_EVENT_SRC_RESERVED_2             = 0x00002000
-#endif /* (DEBUG || DEVELOPMENT) */
+#endif                             
 };
 
 typedef struct nstat_counts {
-	/* Counters */
+	              
 	u_int64_t       nstat_rxpackets __attribute__((aligned(sizeof(u_int64_t))));
 	u_int64_t       nstat_rxbytes   __attribute__((aligned(sizeof(u_int64_t))));
 	u_int64_t       nstat_txpackets __attribute__((aligned(sizeof(u_int64_t))));
@@ -109,7 +109,7 @@ typedef struct nstat_sysinfo_keyval {
 #define NSTAT_MAX_MSG_SIZE      4096
 
 typedef struct nstat_sysinfo_counts {
-	/* Counters */
+	              
 	u_int32_t       nstat_sysinfo_len;
 	u_int32_t       pad;
 	u_int8_t        nstat_sysinfo_keyvals[];
@@ -291,7 +291,7 @@ enum{
 	, NSTAT_SYSINFO_MPTCP_HANDOVER_ATTEMPT = 158
 	, NSTAT_SYSINFO_MPTCP_INTERACTIVE_ATTEMPT = 159
 	, NSTAT_SYSINFO_MPTCP_AGGREGATE_ATTEMPT = 160
-	, NSTAT_SYSINFO_MPTCP_FP_HANDOVER_ATTEMPT = 161 /* _FP_ stands for first-party */
+	, NSTAT_SYSINFO_MPTCP_FP_HANDOVER_ATTEMPT = 161                                  
 	, NSTAT_SYSINFO_MPTCP_FP_INTERACTIVE_ATTEMPT = 162
 	, NSTAT_SYSINFO_MPTCP_FP_AGGREGATE_ATTEMPT = 163
 	, NSTAT_SYSINFO_MPTCP_HEURISTIC_FALLBACK = 164
@@ -319,7 +319,7 @@ enum{
 	, NSTAT_SYSINFO_ECN_IFNET_FALLBACK_SYNRST = 186
 	, NSTAT_SYSINFO_MPTCP_TRIGGERED_CELL = 187
 
-// NSTAT_SYSINFO_ENUM_VERSION must be updated any time a value is added
+                                                                       
 #define NSTAT_SYSINFO_ENUM_VERSION      20180416
 };
 
@@ -329,7 +329,7 @@ enum{
 #pragma mark -- Network Statistics Providers --
 
 
-// Interface properties
+                       
 
 #define NSTAT_IFNET_IS_UNKNOWN_TYPE      0x0001
 #define NSTAT_IFNET_IS_LOOPBACK          0x0002
@@ -342,11 +342,11 @@ enum{
 #define NSTAT_IFNET_VIA_CELLFALLBACK     0x0100
 #define NSTAT_IFNET_IS_COMPANIONLINK     0x0200
 #define NSTAT_IFNET_IS_CONSTRAINED       0x0400
-// The following local and non-local flags are set only if fully known
-// They are mutually exclusive but there is no guarantee that one or the other will be set
+                                                                      
+                                                                                          
 #define NSTAT_IFNET_IS_LOCAL             0x0800
 #define NSTAT_IFNET_IS_NON_LOCAL         0x1000
-// Temporary properties of use for bringing up userland providers
+                                                                 
 #define NSTAT_IFNET_ROUTE_VALUE_UNOBTAINABLE      0x2000
 #define NSTAT_IFNET_FLOWSWITCH_VALUE_UNOBTAINABLE 0x4000
 
@@ -434,7 +434,7 @@ typedef struct nstat_tcp_descriptor {
 	uuid_t          fuuid;
 	union {
 		struct tcp_conn_status connstatus;
-		// On armv7k, tcp_conn_status is 1 byte instead of 4
+		                                                    
 		uint8_t                                 __pad_connstatus[4];
 	};
 	uint16_t        ifnet_properties        __attribute__((aligned(4)));
@@ -481,12 +481,12 @@ typedef struct nstat_udp_descriptor {
 	u_int8_t        reserved[6];
 } nstat_udp_descriptor;
 
-/*
- * XXX For now just typedef'ing TCP Nstat descriptor to nstat_quic_descriptor
- * as for now they report very similar data.
- * Later when we extend the QUIC descriptor we can just declare its own
- * descriptor struct.
- */
+  
+                                                                             
+                                            
+                                                                       
+                     
+   
 typedef struct nstat_tcp_add_param      nstat_quic_add_param;
 typedef struct nstat_tcp_descriptor     nstat_quic_descriptor;
 
@@ -527,7 +527,7 @@ typedef struct nstat_ifnet_add_param {
 } nstat_ifnet_add_param;
 
 typedef struct nstat_ifnet_desc_cellular_status {
-	u_int32_t valid_bitmask; /* indicates which fields are valid */
+	u_int32_t valid_bitmask;                                       
 #define NSTAT_IFNET_DESC_CELL_LINK_QUALITY_METRIC_VALID         0x1
 #define NSTAT_IFNET_DESC_CELL_UL_EFFECTIVE_BANDWIDTH_VALID      0x2
 #define NSTAT_IFNET_DESC_CELL_UL_MAX_BANDWIDTH_VALID            0x4
@@ -545,37 +545,37 @@ typedef struct nstat_ifnet_desc_cellular_status {
 #define NSTAT_IFNET_DESC_CELL_CONFIG_BACKOFF_TIME_VALID         0x4000
 #define NSTAT_IFNET_DESC_CELL_MSS_RECOMMENDED_VALID             0x8000
 	u_int32_t link_quality_metric;
-	u_int32_t ul_effective_bandwidth; /* Measured uplink bandwidth based on
-	                                   *  current activity (bps) */
-	u_int32_t ul_max_bandwidth; /* Maximum supported uplink bandwidth
-	                             *  (bps) */
-	u_int32_t ul_min_latency; /* min expected uplink latency for first hop
-	                           *  (ms) */
-	u_int32_t ul_effective_latency; /* current expected uplink latency for
-	                                 *  first hop (ms) */
-	u_int32_t ul_max_latency; /* max expected uplink latency first hop
-	                           *  (ms) */
-	u_int32_t ul_retxt_level; /* Retransmission metric */
+	u_int32_t ul_effective_bandwidth;                                      
+                                                                
+	u_int32_t ul_max_bandwidth;                                      
+                                         
+	u_int32_t ul_min_latency;                                             
+                                      
+	u_int32_t ul_effective_latency;                                       
+                                                      
+	u_int32_t ul_max_latency;                                         
+                                      
+	u_int32_t ul_retxt_level;                            
 #define NSTAT_IFNET_DESC_CELL_UL_RETXT_LEVEL_NONE       1
 #define NSTAT_IFNET_DESC_CELL_UL_RETXT_LEVEL_LOW        2
 #define NSTAT_IFNET_DESC_CELL_UL_RETXT_LEVEL_MEDIUM     3
 #define NSTAT_IFNET_DESC_CELL_UL_RETXT_LEVEL_HIGH       4
 
-	u_int32_t ul_bytes_lost; /* % of total bytes lost on uplink in Q10
-	                          *  format */
-	u_int32_t ul_min_queue_size; /* minimum bytes in queue */
-	u_int32_t ul_avg_queue_size; /* average bytes in queue */
-	u_int32_t ul_max_queue_size; /* maximum bytes in queue */
-	u_int32_t dl_effective_bandwidth; /* Measured downlink bandwidth based
-	                                   *  on current activity (bps) */
-	u_int32_t dl_max_bandwidth; /* Maximum supported downlink bandwidth
-	                             *  (bps) */
-	u_int32_t config_inactivity_time; /* ms */
-	u_int32_t config_backoff_time; /* new connections backoff time in ms */
+	u_int32_t ul_bytes_lost;                                          
+                                       
+	u_int32_t ul_min_queue_size;                             
+	u_int32_t ul_avg_queue_size;                             
+	u_int32_t ul_max_queue_size;                             
+	u_int32_t dl_effective_bandwidth;                                     
+                                                                   
+	u_int32_t dl_max_bandwidth;                                        
+                                         
+	u_int32_t config_inactivity_time;         
+	u_int32_t config_backoff_time;                                         
 #define NSTAT_IFNET_DESC_MSS_RECOMMENDED_NONE   0x0
 #define NSTAT_IFNET_DESC_MSS_RECOMMENDED_MEDIUM 0x1
 #define NSTAT_IFNET_DESC_MSS_RECOMMENDED_LOW    0x2
-	u_int16_t mss_recommended; /* recommended MSS */
+	u_int16_t mss_recommended;                      
 	u_int8_t        reserved[2];
 } nstat_ifnet_desc_cellular_status;
 
@@ -600,48 +600,48 @@ typedef struct nstat_ifnet_desc_wifi_status {
 #define NSTAT_IFNET_DESC_WIFI_CONFIG_MULTICAST_RATE_VALID       0x10000
 #define NSTAT_IFNET_DESC_WIFI_CONFIG_SCAN_COUNT_VALID           0x20000
 #define NSTAT_IFNET_DESC_WIFI_CONFIG_SCAN_DURATION_VALID        0x40000
-	u_int32_t link_quality_metric; /* link quality metric */
-	u_int32_t ul_effective_bandwidth; /* Measured uplink bandwidth based on
-	                                   *  current activity (bps) */
-	u_int32_t ul_max_bandwidth; /* Maximum supported uplink bandwidth
-	                             *  (bps) */
-	u_int32_t ul_min_latency; /* min expected uplink latency for first hop
-	                           *  (ms) */
-	u_int32_t ul_effective_latency; /* current expected uplink latency for
-	                                 *  first hop (ms) */
-	u_int32_t ul_max_latency; /* max expected uplink latency for first hop
-	                           *  (ms) */
-	u_int32_t ul_retxt_level; /* Retransmission metric */
+	u_int32_t link_quality_metric;                          
+	u_int32_t ul_effective_bandwidth;                                      
+                                                                
+	u_int32_t ul_max_bandwidth;                                      
+                                         
+	u_int32_t ul_min_latency;                                             
+                                      
+	u_int32_t ul_effective_latency;                                       
+                                                      
+	u_int32_t ul_max_latency;                                             
+                                      
+	u_int32_t ul_retxt_level;                            
 #define NSTAT_IFNET_DESC_WIFI_UL_RETXT_LEVEL_NONE       1
 #define NSTAT_IFNET_DESC_WIFI_UL_RETXT_LEVEL_LOW        2
 #define NSTAT_IFNET_DESC_WIFI_UL_RETXT_LEVEL_MEDIUM     3
 #define NSTAT_IFNET_DESC_WIFI_UL_RETXT_LEVEL_HIGH       4
 
-	u_int32_t ul_bytes_lost; /* % of total bytes lost on uplink in Q10
-	                          *  format */
-	u_int32_t ul_error_rate; /* % of bytes dropped on uplink after many
-	                          *  retransmissions in Q10 format */
-	u_int32_t dl_effective_bandwidth; /* Measured downlink bandwidth based
-	                                   *  on current activity (bps) */
-	u_int32_t dl_max_bandwidth; /* Maximum supported downlink bandwidth
-	                             *  (bps) */
-	/*
-	 * The download latency values indicate the time AP may have to wait
-	 * for the  driver to receive the packet. These values give the range
-	 * of expected latency mainly due to co-existence events and channel
-	 * hopping where the interface becomes unavailable.
-	 */
-	u_int32_t dl_min_latency; /* min expected latency for first hop in ms */
-	u_int32_t dl_effective_latency; /* current expected latency for first
-	                                 *  hop in ms */
-	u_int32_t dl_max_latency; /* max expected latency for first hop in ms */
-	u_int32_t dl_error_rate; /* % of CRC or other errors in Q10 format */
-	u_int32_t config_frequency; /* 2.4 or 5 GHz */
+	u_int32_t ul_bytes_lost;                                          
+                                       
+	u_int32_t ul_error_rate;                                           
+                                                              
+	u_int32_t dl_effective_bandwidth;                                     
+                                                                   
+	u_int32_t dl_max_bandwidth;                                        
+                                         
+	  
+                                                                     
+                                                                      
+                                                                     
+                                                    
+    
+	u_int32_t dl_min_latency;                                               
+	u_int32_t dl_effective_latency;                                      
+                                                 
+	u_int32_t dl_max_latency;                                               
+	u_int32_t dl_error_rate;                                             
+	u_int32_t config_frequency;                   
 #define NSTAT_IFNET_DESC_WIFI_CONFIG_FREQUENCY_2_4_GHZ  1
 #define NSTAT_IFNET_DESC_WIFI_CONFIG_FREQUENCY_5_0_GHZ  2
-	u_int32_t config_multicast_rate; /* bps */
-	u_int32_t scan_count; /* scan count during the previous period */
-	u_int32_t scan_duration; /* scan duration in ms */
+	u_int32_t config_multicast_rate;          
+	u_int32_t scan_count;                                            
+	u_int32_t scan_duration;                          
 } nstat_ifnet_desc_wifi_status;
 
 enum{
@@ -677,36 +677,36 @@ typedef struct nstat_sysinfo_descriptor {
 } nstat_sysinfo_descriptor;
 
 typedef struct nstat_sysinfo_add_param {
-	/* To indicate which system level information should be collected */
+	                                                                    
 	u_int32_t       flags;
 } nstat_sysinfo_add_param;
 
 #define NSTAT_SYSINFO_MBUF_STATS        0x0001
 #define NSTAT_SYSINFO_TCP_STATS         0x0002
 #define NSTAT_SYSINFO_IFNET_ECN_STATS   0x0003
-#define NSTAT_SYSINFO_LIM_STATS         0x0004  /* Low Internet mode stats */
-#define NSTAT_SYSINFO_NET_API_STATS     0x0005  /* API and KPI stats */
+#define NSTAT_SYSINFO_LIM_STATS         0x0004                               
+#define NSTAT_SYSINFO_NET_API_STATS     0x0005                         
 
 #pragma mark -- Network Statistics User Client --
 
 #define NET_STAT_CONTROL_NAME   "com.apple.network.statistics"
 
 enum{
-	// generic response messages
+	                            
 	NSTAT_MSG_TYPE_SUCCESS               = 0
 	, NSTAT_MSG_TYPE_ERROR               = 1
 
-	    // Requests
+	               
 	, NSTAT_MSG_TYPE_ADD_SRC             = 1001
 	, NSTAT_MSG_TYPE_ADD_ALL_SRCS        = 1002
 	, NSTAT_MSG_TYPE_REM_SRC             = 1003
 	, NSTAT_MSG_TYPE_QUERY_SRC           = 1004
 	, NSTAT_MSG_TYPE_GET_SRC_DESC        = 1005
-	, NSTAT_MSG_TYPE_SET_FILTER          = 1006 // Obsolete
+	, NSTAT_MSG_TYPE_SET_FILTER          = 1006            
 	, NSTAT_MSG_TYPE_GET_UPDATE          = 1007
 	, NSTAT_MSG_TYPE_SUBSCRIBE_SYSINFO   = 1008
 
-	    // Responses/Notfications
+	                             
 	, NSTAT_MSG_TYPE_SRC_ADDED           = 10001
 	, NSTAT_MSG_TYPE_SRC_REMOVED         = 10002
 	, NSTAT_MSG_TYPE_SRC_DESC            = 10003
@@ -720,12 +720,12 @@ enum{
 	, NSTAT_SRC_REF_INVALID  = 0
 };
 
-/* Source-level filters */
+                          
 enum{
 	NSTAT_FILTER_NOZEROBYTES             = 0x00000001
 };
 
-/* Provider-level filters */
+                            
 enum{
 	NSTAT_FILTER_ACCEPT_UNKNOWN           = 0x00000001
 	, NSTAT_FILTER_ACCEPT_LOOPBACK        = 0x00000002
@@ -778,7 +778,7 @@ typedef struct nstat_msg_hdr {
 
 typedef struct nstat_msg_error {
 	nstat_msg_hdr   hdr;
-	u_int32_t               error;  // errno error
+	u_int32_t               error;                
 	u_int8_t                reserved[4];
 } nstat_msg_error;
 
@@ -947,7 +947,7 @@ struct nstat_stats {
 	u_int32_t nstat_handle_msg_failures;
 };
 
-#endif /* PRIVATE */
+#endif              
 
 #ifdef XNU_KERNEL_PRIVATE
 #include <sys/mcache.h>
@@ -955,92 +955,92 @@ struct nstat_stats {
 #pragma mark -- System Information Internal Support --
 
 typedef struct nstat_sysinfo_mbuf_stats {
-	u_int32_t       total_256b;     /* Peak usage, 256B pool */
-	u_int32_t       total_2kb;      /* Peak usage, 2KB pool */
-	u_int32_t       total_4kb;      /* Peak usage, 4KB pool */
-	u_int32_t       total_16kb;     /* Peak usage, 16KB pool */
-	u_int32_t       sbmb_total;     /* Total mbufs in sock buffer pool */
-	u_int32_t       sb_atmbuflimit; /* Memory limit reached for socket buffer autoscaling */
-	u_int32_t       draincnt;       /* Number of times mbuf pool has been drained under memory pressure */
-	u_int32_t       memreleased;    /* Memory (bytes) released from mbuf pool to VM */
-	u_int32_t       sbmb_floor;     /* Lowest mbufs in sock buffer pool */
+	u_int32_t       total_256b;                                
+	u_int32_t       total_2kb;                                
+	u_int32_t       total_4kb;                                
+	u_int32_t       total_16kb;                                
+	u_int32_t       sbmb_total;                                          
+	u_int32_t       sb_atmbuflimit;                                                         
+	u_int32_t       draincnt;                                                                             
+	u_int32_t       memreleased;                                                      
+	u_int32_t       sbmb_floor;                                           
 } nstat_sysinfo_mbuf_stats;
 
 typedef struct nstat_sysinfo_tcp_stats {
-	/* When adding/removing here, also adjust NSTAT_SYSINFO_TCP_STATS_COUNT */
-	u_int32_t       ipv4_avgrtt;    /* Average RTT for IPv4 */
-	u_int32_t       ipv6_avgrtt;    /* Average RTT for IPv6 */
-	u_int32_t       send_plr;       /* Average uplink packet loss rate */
-	u_int32_t       recv_plr;       /* Average downlink packet loss rate */
-	u_int32_t       send_tlrto_rate; /* Average rxt timeout after tail loss */
-	u_int32_t       send_reorder_rate; /* Average packet reordering rate */
-	u_int32_t       connection_attempts; /* TCP client connection attempts */
-	u_int32_t       connection_accepts; /* TCP server connection accepts */
-	u_int32_t       ecn_client_enabled; /* Global setting for ECN client side */
-	u_int32_t       ecn_server_enabled; /* Global setting for ECN server side */
-	u_int32_t       ecn_client_setup; /* Attempts to setup TCP client connection with ECN */
-	u_int32_t       ecn_server_setup; /* Attempts to setup TCP server connection with ECN */
-	u_int32_t       ecn_client_success; /* Number of successful negotiations of ECN for a client connection */
-	u_int32_t       ecn_server_success; /* Number of successful negotiations of ECN for a server connection */
-	u_int32_t       ecn_not_supported; /* Number of falbacks to Non-ECN, no support from peer */
-	u_int32_t       ecn_lost_syn;   /* Number of SYNs lost with ECN bits */
-	u_int32_t       ecn_lost_synack; /* Number of SYN-ACKs lost with ECN bits */
-	u_int32_t       ecn_recv_ce;    /* Number of CEs received from network */
-	u_int32_t       ecn_recv_ece;   /* Number of ECEs received from receiver */
-	u_int32_t       ecn_sent_ece;   /* Number of ECEs sent in response to CE */
-	u_int32_t       ecn_conn_recv_ce; /* Number of connections using ECN received CE at least once */
-	u_int32_t       ecn_conn_recv_ece; /* Number of connections using ECN received ECE at least once */
-	u_int32_t       ecn_conn_plnoce; /* Number of connections using ECN seen packet loss but never received CE */
-	u_int32_t       ecn_conn_pl_ce; /* Number of connections using ECN seen packet loss and CE */
-	u_int32_t       ecn_conn_nopl_ce; /* Number of connections using ECN with no packet loss but received CE */
-	u_int32_t       ecn_fallback_synloss; /* Number of times we did fall back due to SYN-Loss */
-	u_int32_t       ecn_fallback_reorder; /* Number of times we fallback because we detected the PAWS-issue */
-	u_int32_t       ecn_fallback_ce; /* Number of times we fallback because we received too many CEs */
-	u_int32_t       tfo_syn_data_rcv;       /* Number of SYN+data received with valid cookie */
-	u_int32_t       tfo_cookie_req_rcv;/* Number of TFO cookie-requests received */
-	u_int32_t       tfo_cookie_sent;        /* Number of TFO-cookies offered to the client */
-	u_int32_t       tfo_cookie_invalid;/* Number of invalid TFO-cookies received */
-	u_int32_t       tfo_cookie_req; /* Number of SYNs with cookie request received*/
-	u_int32_t       tfo_cookie_rcv; /* Number of SYN/ACKs with Cookie received */
-	u_int32_t       tfo_syn_data_sent;      /* Number of SYNs+data+cookie sent */
-	u_int32_t       tfo_syn_data_acked;/* Number of times our SYN+data has been acknowledged */
-	u_int32_t       tfo_syn_loss;   /* Number of times SYN+TFO has been lost and we fallback */
-	u_int32_t       tfo_blackhole;  /* Number of times SYN+TFO has been lost and we fallback */
-	u_int32_t       tfo_cookie_wrong;       /* TFO-cookie we sent was wrong */
-	u_int32_t       tfo_no_cookie_rcv;      /* We asked for a cookie but didn't get one */
-	u_int32_t       tfo_heuristics_disable; /* TFO got disabled due to heuristics */
-	u_int32_t       tfo_sndblackhole;       /* TFO got blackholed in the sending direction */
-	u_int32_t       mptcp_handover_attempt; /* Total number of MPTCP-attempts using handover mode */
-	u_int32_t       mptcp_interactive_attempt;      /* Total number of MPTCP-attempts using interactive mode */
-	u_int32_t       mptcp_aggregate_attempt;        /* Total number of MPTCP-attempts using aggregate mode */
-	u_int32_t       mptcp_fp_handover_attempt; /* Same as previous three but only for first-party apps */
+	                                                                          
+	u_int32_t       ipv4_avgrtt;                              
+	u_int32_t       ipv6_avgrtt;                              
+	u_int32_t       send_plr;                                            
+	u_int32_t       recv_plr;                                              
+	u_int32_t       send_tlrto_rate;                                          
+	u_int32_t       send_reorder_rate;                                     
+	u_int32_t       connection_attempts;                                     
+	u_int32_t       connection_accepts;                                    
+	u_int32_t       ecn_client_enabled;                                         
+	u_int32_t       ecn_server_enabled;                                         
+	u_int32_t       ecn_client_setup;                                                       
+	u_int32_t       ecn_server_setup;                                                       
+	u_int32_t       ecn_client_success;                                                                       
+	u_int32_t       ecn_server_success;                                                                       
+	u_int32_t       ecn_not_supported;                                                          
+	u_int32_t       ecn_lost_syn;                                          
+	u_int32_t       ecn_lost_synack;                                            
+	u_int32_t       ecn_recv_ce;                                             
+	u_int32_t       ecn_recv_ece;                                              
+	u_int32_t       ecn_sent_ece;                                              
+	u_int32_t       ecn_conn_recv_ce;                                                                
+	u_int32_t       ecn_conn_recv_ece;                                                                 
+	u_int32_t       ecn_conn_plnoce;                                                                             
+	u_int32_t       ecn_conn_pl_ce;                                                              
+	u_int32_t       ecn_conn_nopl_ce;                                                                          
+	u_int32_t       ecn_fallback_synloss;                                                       
+	u_int32_t       ecn_fallback_reorder;                                                                     
+	u_int32_t       ecn_fallback_ce;                                                                   
+	u_int32_t       tfo_syn_data_rcv;                                                          
+	u_int32_t       tfo_cookie_req_rcv;                                            
+	u_int32_t       tfo_cookie_sent;                                                         
+	u_int32_t       tfo_cookie_invalid;                                            
+	u_int32_t       tfo_cookie_req;                                                 
+	u_int32_t       tfo_cookie_rcv;                                              
+	u_int32_t       tfo_syn_data_sent;                                           
+	u_int32_t       tfo_syn_data_acked;                                                        
+	u_int32_t       tfo_syn_loss;                                                              
+	u_int32_t       tfo_blackhole;                                                             
+	u_int32_t       tfo_cookie_wrong;                                         
+	u_int32_t       tfo_no_cookie_rcv;                                                    
+	u_int32_t       tfo_heuristics_disable;                                         
+	u_int32_t       tfo_sndblackhole;                                                        
+	u_int32_t       mptcp_handover_attempt;                                                         
+	u_int32_t       mptcp_interactive_attempt;                                                                 
+	u_int32_t       mptcp_aggregate_attempt;                                                                 
+	u_int32_t       mptcp_fp_handover_attempt;                                                           
 	u_int32_t       mptcp_fp_interactive_attempt;
 	u_int32_t       mptcp_fp_aggregate_attempt;
-	u_int32_t       mptcp_heuristic_fallback;       /* Total number of MPTCP-connections that fell back due to heuristics */
-	u_int32_t       mptcp_fp_heuristic_fallback;    /* Same as previous but for first-party apps */
-	u_int32_t       mptcp_handover_success_wifi;    /* Total number of successfull handover-mode connections that *started* on WiFi */
-	u_int32_t       mptcp_handover_success_cell;    /* Total number of successfull handover-mode connections that *started* on Cell */
-	u_int32_t       mptcp_interactive_success;              /* Total number of interactive-mode connections that negotiated MPTCP */
-	u_int32_t       mptcp_aggregate_success;                /* Same as previous but for aggregate */
-	u_int32_t       mptcp_fp_handover_success_wifi; /* Same as previous four, but for first-party apps */
+	u_int32_t       mptcp_heuristic_fallback;                                                                               
+	u_int32_t       mptcp_fp_heuristic_fallback;                                                   
+	u_int32_t       mptcp_handover_success_wifi;                                                                                      
+	u_int32_t       mptcp_handover_success_cell;                                                                                      
+	u_int32_t       mptcp_interactive_success;                                                                                      
+	u_int32_t       mptcp_aggregate_success;                                                        
+	u_int32_t       mptcp_fp_handover_success_wifi;                                                      
 	u_int32_t       mptcp_fp_handover_success_cell;
 	u_int32_t       mptcp_fp_interactive_success;
 	u_int32_t       mptcp_fp_aggregate_success;
-	u_int32_t       mptcp_handover_cell_from_wifi;  /* Total number of connections that use cell in handover-mode (coming from WiFi) */
-	u_int32_t       mptcp_handover_wifi_from_cell;  /* Total number of connections that use WiFi in handover-mode (coming from cell) */
-	u_int32_t       mptcp_interactive_cell_from_wifi;       /* Total number of connections that use cell in interactive mode (coming from WiFi) */
-	u_int32_t       mptcp_back_to_wifi;     /* Total number of connections that succeed to move traffic away from cell (when starting on cell) */
-	u_int64_t       mptcp_handover_cell_bytes;              /* Total number of bytes sent on cell in handover-mode (on new subflows, ignoring initial one) */
-	u_int64_t       mptcp_interactive_cell_bytes;   /* Same as previous but for interactive */
+	u_int32_t       mptcp_handover_cell_from_wifi;                                                                                     
+	u_int32_t       mptcp_handover_wifi_from_cell;                                                                                     
+	u_int32_t       mptcp_interactive_cell_from_wifi;                                                                                             
+	u_int32_t       mptcp_back_to_wifi;                                                                                                          
+	u_int64_t       mptcp_handover_cell_bytes;                                                                                                               
+	u_int64_t       mptcp_interactive_cell_bytes;                                             
 	u_int64_t       mptcp_aggregate_cell_bytes;
-	u_int64_t       mptcp_handover_all_bytes;               /* Total number of bytes sent in handover */
+	u_int64_t       mptcp_handover_all_bytes;                                                           
 	u_int64_t       mptcp_interactive_all_bytes;
 	u_int64_t       mptcp_aggregate_all_bytes;
-	u_int32_t       mptcp_wifi_proxy;               /* Total number of new subflows that fell back to regular TCP on cell */
-	u_int32_t       mptcp_cell_proxy;               /* Total number of new subflows that fell back to regular TCP on WiFi */
-	u_int32_t       mptcp_triggered_cell;           /* Total number of times an MPTCP-connection triggered cell bringup */
+	u_int32_t       mptcp_wifi_proxy;                                                                                       
+	u_int32_t       mptcp_cell_proxy;                                                                                       
+	u_int32_t       mptcp_triggered_cell;                                                                                 
 	u_int32_t       _padding;
-	/* When adding/removing here, also adjust NSTAT_SYSINFO_TCP_STATS_COUNT */
+	                                                                          
 } nstat_sysinfo_tcp_stats;
 #define NSTAT_SYSINFO_TCP_STATS_COUNT   71
 
@@ -1061,7 +1061,7 @@ typedef struct nstat_sysinfo_ifnet_ecn_stats {
 	struct if_tcp_ecn_stat  ecn_stat;
 } nstat_sysinfo_ifnet_ecn_stats;
 
-/* Total number of Low Internet stats that will be reported */
+                                                              
 #define NSTAT_LIM_STAT_KEYVAL_COUNT     12
 typedef struct nstat_sysinfo_lim_stats {
 	u_int8_t                ifnet_signature[NSTAT_SYSINFO_KEYVAL_STRING_MAXSIZE];
@@ -1079,7 +1079,7 @@ typedef struct nstat_sysinfo_net_api_stats {
 
 typedef struct nstat_sysinfo_data {
 	uint32_t                flags;
-	uint32_t                unsent_data_cnt; /* Before sleeping */
+	uint32_t                unsent_data_cnt;                      
 	union {
 		nstat_sysinfo_mbuf_stats mb_stats;
 		nstat_sysinfo_tcp_stats tcp_stats;
@@ -1105,12 +1105,12 @@ enum{
 	NSTAT_RX_FLAG_OUT_OF_ORDER      = 2
 };
 
-// indicates whether or not collection of statistics is enabled
+                                                               
 extern int      nstat_collect;
 
 void nstat_init(void);
 
-// Route collection routines
+                            
 void nstat_route_connect_attempt(struct rtentry *rte);
 void nstat_route_connect_success(struct rtentry *rte);
 void nstat_route_tx(struct rtentry *rte, u_int32_t packets, u_int32_t bytes, u_int32_t flags);
@@ -1123,7 +1123,7 @@ void nstat_route_update(struct rtentry *rte, uint32_t connect_attempts, uint32_t
 struct nstat_counts* nstat_route_attach(struct rtentry  *rte);
 void nstat_route_detach(struct rtentry *rte);
 
-// watcher support
+                  
 struct inpcb;
 void nstat_tcp_new_pcb(struct inpcb *inp);
 void nstat_udp_new_pcb(struct inpcb *inp);
@@ -1141,13 +1141,13 @@ void nstat_sysinfo_send_data(struct nstat_sysinfo_data *);
 int ntstat_tcp_progress_indicators(struct sysctl_req *req);
 
 
-// Utilities for userland stats reporting
+                                         
 u_int16_t nstat_ifnet_to_flags(struct ifnet *ifp);
 
-// locked_add_64 uses atomic operations on 32bit so the 64bit
-// value can be properly read. The values are only ever incremented
-// while under the socket lock, so on 64bit we don't actually need
-// atomic operations to increment.
+                                                             
+                                                                   
+                                                                  
+                                  
 #if defined(__LP64__)
 #define locked_add_64(__addr, __count) do { \
 	*(__addr) += (__count); \
@@ -1158,6 +1158,6 @@ u_int16_t nstat_ifnet_to_flags(struct ifnet *ifp);
 } while (0)
 #endif
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* __NTSTAT_H__ */
+#endif                   

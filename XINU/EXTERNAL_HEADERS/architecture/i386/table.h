@@ -39,10 +39,10 @@
 #include <architecture/i386/desc.h>
 #include <architecture/i386/tss.h>
 
-/*
- * A totally generic descriptor
- * table entry.
- */
+  
+                               
+               
+   
 
 typedef union dt_entry {
     code_desc_t		code;
@@ -57,9 +57,9 @@ typedef union dt_entry {
 
 #define DESC_TBL_MAX	8192
 
-/*
- * Global descriptor table.
- */
+  
+                           
+   
 
 typedef union gdt_entry {
     code_desc_t		code;
@@ -72,9 +72,9 @@ typedef union gdt_entry {
 
 typedef gdt_entry_t	gdt_t;
 
-/*
- * Interrupt descriptor table.
- */
+  
+                              
+   
 
 typedef union idt_entry {
     trap_gate_t		trap_gate;
@@ -84,9 +84,9 @@ typedef union idt_entry {
 
 typedef idt_entry_t	idt_t;
 
-/*
- * Local descriptor table.
- */
+  
+                          
+   
 
 typedef union ldt_entry {
     code_desc_t		code;

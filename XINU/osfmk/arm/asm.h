@@ -63,10 +63,10 @@
 #define EMARF	leave
 
 
-/* There is another definition of ALIGN for .c sources */
+                                                         
 #ifdef ASSEMBLER
 #define ALIGN 2
-#endif /* ASSEMBLER */
+#endif                
 
 #ifndef FALIGN
 #define FALIGN ALIGN
@@ -86,27 +86,27 @@
 #define LBc(x,n) n ## :
 #define LBb(x,n) n ## b
 #define LBf(x,n) n ## f
-#else /* __STDC__ */
+#else               
 #ifndef __NO_UNDERSCORES__
-#define LCL(x) L/**/x
-#define EXT(x) _/**/x
-#define LEXT(x) _/**/x/**/:
-#else /* __NO_UNDERSCORES__ */
-#define	LCL(x)	.L/**/x
+#define LCL(x) L    x
+#define EXT(x) _    x
+#define LEXT(x) _    x    :
+#else                         
+#define	LCL(x)	.L    x
 #define EXT(x) x
-#define LEXT(x) x/**/:
-#endif /* __NO_UNDERSCORES__ */
-#define LBc(x,n) n/**/:
-#define LBb(x,n) n/**/b
-#define LBf(x,n) n/**/f
-#endif /* __STDC__ */
+#define LEXT(x) x    :
+#endif                         
+#define LBc(x,n) n    :
+#define LBb(x,n) n    b
+#define LBf(x,n) n    f
+#endif               
 
 #define String	.asciz
 #define Value	.word
 #define Times(a,b) (a*b)
 #define Divide(a,b) (a/b)
 
-#if 0 /* TOTOJK */
+#if 0             
 #ifdef __ELF__
 #define ELF_FUNC(x)	.type x,@function
 #define ELF_DATA(x)	.type x,@object
@@ -120,7 +120,7 @@
 #define ELF_FUNC(x)
 #define ELF_DATA(x)
 #define ELF_SIZE(x,s)
-#endif /* TODOJK */
+#endif             
 
 #define	Entry(x)	.globl EXT(x); ELF_FUNC(EXT(x)); .align FALIGN; LEXT(x)
 #define	ENTRY(x)	Entry(x) MCOUNT
@@ -132,7 +132,7 @@
 #define	ASENTRY(x) 	.globl x; .align FALIGN; x ## : ELF_FUNC(x) MCOUNT
 #else
 #define	ASENTRY(x) 	.globl x; .align FALIGN; x: ELF_FUNC(x) MCOUNT
-#endif /* __STDC__ */
+#endif               
 
 #define	DATA(x)		.globl EXT(x); ELF_DATA(EXT(x)); .align ALIGN; LEXT(x)
 
@@ -145,17 +145,17 @@
 
 #define MCOUNT
 
-#else /* NOT ASSEMBLER */
+#else                    
 
-/* These defines are here for .c files that wish to reference global symbols
- * within __asm__ statements. 
- */
+                                                                            
+                              
+   
 #ifndef __NO_UNDERSCORES__
 #define CC_SYM_PREFIX "_"
 #else
 #define CC_SYM_PREFIX ""
-#endif /* __NO_UNDERSCORES__ */
-#endif /* ASSEMBLER */
+#endif                         
+#endif                
 
 #ifdef ASSEMBLER
 
@@ -166,7 +166,7 @@
 # ifdef __STDC__
 #  define RETc(c) bx##c lr
 # else
-#  define RETc(c) bx/**/c       lr
+#  define RETc(c) bx    c       lr
 # endif
 #else
 # define RET    mov     pc, lr
@@ -175,59 +175,59 @@
 # ifdef __STDC__
 #  define RETc(c) mov##c        pc, lr
 # else
-#  define RETc(c) mov/**/c      pc, lr
+#  define RETc(c) mov    c      pc, lr
 # endif
 #endif
 
 #if defined (__thumb__)
-/* Provide a PI mechanism for thumb branching. */
+                                                 
 # define BRANCH_EXTERN(x)	ldr	pc, [pc, #-4] ;	\
 				.long	EXT(x)
 #else
 # define BRANCH_EXTERN(x)	b	EXT(x)
 #endif
 
-/*
- * arg0: Register for thread pointer
- */
+  
+                                    
+   
 .macro READ_THREAD
-	mrc p15, 0, $0, c13, c0, 4  /* Read TPIDRPRW */
+	mrc p15, 0, $0, c13, c0, 4                     
 .endmacro
 
 
-/* Macros for loading up addresses that are external to the .s file.
- * LOAD_ADDR:  loads the address for (label) into (reg). Not safe for
- *   loading to the PC.
- * LOAD_ADDR_PC:  Variant for loading to the PC; load the address of (label)
- *   into the pc.
- * LOAD_ADDR_GEN_DEF:  The general definition needed to support loading
- *   a label address.
- *
- * Usage:  For any label accessed, we require one (and only one) instance
- *   of LOAD_ADDR_GEN_DEF(label).
- * 
- * Example:
- *   LOAD_ADDR(r0, arm_init)
- *   LOAD_ADDR(lr, arm_init_cpu)
- *   LOAD_ADDR_PC(arm_init)
- *   ...
- *
- *   LOAD_ADDR_GEN_DEF(arm_init)
- *   LOAD_ADDR_GEN_DEF(arm_init_cpu)
- */
+                                                                    
+                                                                     
+                       
+                                                                            
+                 
+                                                                       
+                     
+  
+                                                                         
+                                 
+   
+           
+                            
+                                
+                           
+        
+  
+                                
+                                    
+   
 
 #if SLIDABLE
-/* Definitions for a position dependent kernel using non-lazy pointers.
- */
+                                                                       
+   
 
-/* TODO: Make this work with thumb .s files. */
+                                               
 #define PC_INC	0x8
 
-/* We need wrapper macros in order to ensure that __LINE__ is expanded.
- *
- * There is some small potential for duplicate labels here, but because
- *   we do not export the generated labels, it should not be an issue.
- */
+                                                                       
+  
+                                                                       
+                                                                      
+   
 
 #define GLUE_LABEL_GUTS(label, tag) L_##label##_##tag##_glue
 #define GLUE_LABEL(label, tag) GLUE_LABEL_GUTS(label, tag)
@@ -238,15 +238,15 @@
 GLUE_LABEL(label, __LINE__): ;                                                                  \
 	ldr	reg, [pc, reg]
 
-/* Designed with the understanding that directly branching to thumb code
- *   is unreliable; this should allow for dealing with __thumb__ in
- *   assembly; the non-thumb variant still needs to provide the glue label
- *   to avoid failing to build on undefined symbols.
- *
- * TODO: Make this actually use a scratch register; this macro is convenient
- *   for translating (ldr pc, [?]) to a slidable format without the risk of
- *   clobbering registers, but it is also wasteful.
- */
+                                                                        
+                                                                   
+                                                                          
+                                                    
+  
+                                                                            
+                                                                           
+                                                   
+   
 #if defined(__thumb__)
 #define LOAD_ADDR_PC(label)    \
 	stmfd	sp!, { r0 } ;  \
@@ -267,9 +267,9 @@ label##$non_lazy_ptr: ;                                            \
 	.indirect_symbol	EXT(label) ;                       \
 	.long			0
 
-#else /* !SLIDABLE */
+#else                
 
-/* Definitions for a position dependent kernel */
+                                                 
 #define LOAD_ADDR(reg, label)  \
 	ldr	reg, L_##label
 
@@ -287,15 +287,15 @@ label##$non_lazy_ptr: ;                                            \
 L_##label: ;                      \
 	.long	EXT(label)
 
-#endif /* SLIDABLE */
+#endif               
 
-/* The linker can deal with branching from ARM to thumb in unconditional
- *   branches, but not in conditional branches.  To support this in our
- *   assembly (which allows us to build xnu without -mno-thumb), use the
- *   following macros for branching conditionally to external symbols.
- *   These macros are used just like the corresponding conditional branch
- *   instructions.
- */
+                                                                        
+                                                                       
+                                                                        
+                                                                      
+                                                                         
+                  
+   
 
 #define SHIM_LABEL_GUTS(line_num) L_cond_extern_##line_num##_shim
 #define SHIM_LABEL(line_num) SHIM_LABEL_GUTS(line_num)
@@ -315,6 +315,6 @@ SHIM_LABEL(__LINE__):
 	bl	EXT(label) ;           \
 SHIM_LABEL(__LINE__):
 
-#endif /* ASSEMBLER */
+#endif                
 
-#endif /* _ARM_ASM_H_ */
+#endif                  

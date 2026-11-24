@@ -91,12 +91,12 @@
  *
  *	@(#)igmp.c	8.1 (Berkeley) 7/19/93
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/cdefs.h>
 
@@ -127,41 +127,41 @@
 #include <netinet6/mld6.h>
 #include <netinet6/mld6_var.h>
 
-/* Lock group and attribute for mld_mtx */
+                                          
 static lck_attr_t       *mld_mtx_attr;
 static lck_grp_t        *mld_mtx_grp;
 static lck_grp_attr_t   *mld_mtx_grp_attr;
 
-/*
- * Locking and reference counting:
- *
- * mld_mtx mainly protects mli_head.  In cases where both mld_mtx and
- * in6_multihead_lock must be held, the former must be acquired first in order
- * to maintain lock ordering.  It is not a requirement that mld_mtx be
- * acquired first before in6_multihead_lock, but in case both must be acquired
- * in succession, the correct lock ordering must be followed.
- *
- * Instead of walking the if_multiaddrs list at the interface and returning
- * the ifma_protospec value of a matching entry, we search the global list
- * of in6_multi records and find it that way; this is done with in6_multihead
- * lock held.  Doing so avoids the race condition issues that many other BSDs
- * suffer from (therefore in our implementation, ifma_protospec will never be
- * NULL for as long as the in6_multi is valid.)
- *
- * The above creates a requirement for the in6_multi to stay in in6_multihead
- * list even after the final MLD leave (in MLDv2 mode) until no longer needs
- * be retransmitted (this is not required for MLDv1.)  In order to handle
- * this, the request and reference counts of the in6_multi are bumped up when
- * the state changes to MLD_LEAVING_MEMBER, and later dropped in the timeout
- * handler.  Each in6_multi holds a reference to the underlying mld_ifinfo.
- *
- * Thus, the permitted lock order is:
- *
- *	mld_mtx, in6_multihead_lock, inm6_lock, mli_lock
- *
- * Any may be taken independently, but if any are held at the same time,
- * the above lock order must be followed.
- */
+  
+                                  
+  
+                                                                     
+                                                                              
+                                                                      
+                                                                              
+                                                             
+  
+                                                                           
+                                                                          
+                                                                             
+                                                                             
+                                                                             
+                                               
+  
+                                                                             
+                                                                            
+                                                                         
+                                                                             
+                                                                            
+                                                                           
+  
+                                     
+  
+                                                   
+  
+                                                                        
+                                         
+   
 static decl_lck_mtx_data(, mld_mtx);
 
 SLIST_HEAD(mld_in6m_relhead, in6_multi);
@@ -184,9 +184,9 @@ static uint32_t mld_set_version(struct mld_ifinfo *, const int);
 static void     mld_flush_relq(struct mld_ifinfo *, struct mld_in6m_relhead *);
 static void     mld_dispatch_queue_locked(struct mld_ifinfo *, struct ifqueue *, int);
 static int      mld_v1_input_query(struct ifnet *, const struct ip6_hdr *,
-    /*const*/ struct mld_hdr *);
+              struct mld_hdr *);
 static int      mld_v1_input_report(struct ifnet *, struct mbuf *,
-    const struct ip6_hdr *, /*const*/ struct mld_hdr *);
+    const struct ip6_hdr *,           struct mld_hdr *);
 static void     mld_v1_process_group_timer(struct in6_multi *, const int);
 static void     mld_v1_process_querier_timers(struct mld_ifinfo *);
 static int      mld_v1_transmit_report(struct in6_multi *, const uint8_t);
@@ -213,13 +213,13 @@ static int      sysctl_mld_gsr SYSCTL_HANDLER_ARGS;
 static int      sysctl_mld_ifinfo SYSCTL_HANDLER_ARGS;
 static int      sysctl_mld_v2enable SYSCTL_HANDLER_ARGS;
 
-static int mld_timeout_run;             /* MLD timer is scheduled to run */
+static int mld_timeout_run;                                                
 static void mld_timeout(void *);
 static void mld_sched_timeout(void);
 
-/*
- * Normative references: RFC 2710, RFC 3590, RFC 3810.
- */
+  
+                                                      
+   
 static struct timeval mld_gsrdelay = {.tv_sec = 10, .tv_usec = 0};
 static LIST_HEAD(, mld_ifinfo) mli_head;
 
@@ -229,9 +229,9 @@ static int state_change_timers_running6;
 static int current_state_timers_running6;
 
 static unsigned int mld_mli_list_genid;
-/*
- * Subsystem lock macros.
- */
+  
+                         
+   
 #define MLD_LOCK()                      \
 	lck_mtx_lock(&mld_mtx)
 #define MLD_LOCK_ASSERT_HELD()          \
@@ -257,7 +257,7 @@ static unsigned int mld_mli_list_genid;
 static ZONE_DECLARE(mli_zone, "mld_ifinfo",
     sizeof(struct mld_ifinfo), ZC_ZFREE_CLEARMEM);
 
-SYSCTL_DECL(_net_inet6);        /* Note: Not in any common header. */
+SYSCTL_DECL(_net_inet6);                                             
 
 SYSCTL_NODE(_net_inet6, OID_AUTO, mld, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "IPv6 Multicast Listener Discovery");
@@ -288,18 +288,18 @@ int mld_debug = 0;
 SYSCTL_INT(_net_inet6_mld, OID_AUTO,
     debug, CTLFLAG_RW | CTLFLAG_LOCKED, &mld_debug, 0, "");
 #endif
-/*
- * Packed Router Alert option structure declaration.
- */
+  
+                                                    
+   
 struct mld_raopt {
 	struct ip6_hbh          hbh;
 	struct ip6_opt          pad;
 	struct ip6_opt_router   ra;
 } __packed;
 
-/*
- * Router Alert hop-by-hop option header.
- */
+  
+                                         
+   
 static struct mld_raopt mld_ra = {
 	.hbh = { .ip6h_nxt = 0, .ip6h_len = 0 },
 	.pad = { .ip6o_type = IP6OPT_PADN, .ip6o_len = 0 },
@@ -312,7 +312,7 @@ static struct mld_raopt mld_ra = {
 };
 static struct ip6_pktopts mld_po;
 
-/* Store MLDv2 record count in the module private scratch space */
+                                                                  
 #define vt_nrecs        pkt_mpriv.__mpriv_u.__mpriv32[0].__mpriv32_u.__val16[0]
 
 static __inline void
@@ -327,19 +327,19 @@ mld_scrub_context(struct mbuf *m)
 	m->m_pkthdr.rcvif = NULL;
 }
 
-/*
- * Restore context from a queued output chain.
- * Return saved ifp.
- */
+  
+                                              
+                    
+   
 static __inline struct ifnet *
 mld_restore_context(struct mbuf *m)
 {
 	return m->m_pkthdr.rcvif;
 }
 
-/*
- * Retrieve or set threshold between group-source queries in seconds.
- */
+  
+                                                                     
+   
 static int
 sysctl_mld_gsr SYSCTL_HANDLER_ARGS
 {
@@ -367,11 +367,11 @@ out_locked:
 	MLD_UNLOCK();
 	return error;
 }
-/*
- * Expose struct mld_ifinfo to userland, keyed by ifindex.
- * For use by ifmcstat(8).
- *
- */
+  
+                                                          
+                          
+  
+   
 static int
 sysctl_mld_ifinfo SYSCTL_HANDLER_ARGS
 {
@@ -463,11 +463,11 @@ sysctl_mld_v2enable SYSCTL_HANDLER_ARGS
 	}
 
 	mld_v2enable = i;
-	/*
-	 * If we enabled v2, the state transition will take care of upgrading
-	 * the MLD version back to v2. Otherwise, we have to explicitly
-	 * downgrade. Note that this functionality is to be used for debugging.
-	 */
+	  
+                                                                      
+                                                                
+                                                                        
+    
 	if (mld_v2enable == 1) {
 		goto out_locked;
 	}
@@ -488,17 +488,17 @@ out_locked:
 	return error;
 }
 
-/*
- * Dispatch an entire queue of pending packet chains.
- *
- * Must not be called with in6m_lock held.
- * XXX This routine unlocks MLD global lock and also mli locks.
- * Make sure that the calling routine takes reference on the mli
- * before calling this routine.
- * Also if we are traversing mli_head, remember to check for
- * mli list generation count and restart the loop if generation count
- * has changed.
- */
+  
+                                                     
+  
+                                          
+                                                               
+                                                                
+                               
+                                                            
+                                                                     
+               
+   
 static void
 mld_dispatch_queue_locked(struct mld_ifinfo *mli, struct ifqueue *ifq, int limit)
 {
@@ -541,18 +541,18 @@ mld_dispatch_queue_locked(struct mld_ifinfo *mli, struct ifqueue *ifq, int limit
 	}
 }
 
-/*
- * Filter outgoing MLD report state by group.
- *
- * Reports are ALWAYS suppressed for ALL-HOSTS (ff02::1)
- * and node-local addresses. However, kernel and socket consumers
- * always embed the KAME scope ID in the address provided, so strip it
- * when performing comparison.
- * Note: This is not the same as the *multicast* scope.
- *
- * Return zero if the given group is one for which MLD reports
- * should be suppressed, or non-zero if reports should be issued.
- */
+  
+                                             
+  
+                                                        
+                                                                 
+                                                                      
+                              
+                                                       
+  
+                                                              
+                                                                 
+   
 static __inline__ int
 mld_is_addr_reported(const struct in6_addr *addr)
 {
@@ -573,9 +573,9 @@ mld_is_addr_reported(const struct in6_addr *addr)
 	return 1;
 }
 
-/*
- * Attach MLD when PF_INET6 is attached to an interface.
- */
+  
+                                                        
+   
 struct mld_ifinfo *
 mld_domifattach(struct ifnet *ifp, zalloc_flags_t how)
 {
@@ -594,8 +594,8 @@ mld_domifattach(struct ifnet *ifp, zalloc_flags_t how)
 	MLI_LOCK(mli);
 	mli_initvar(mli, ifp, 0);
 	mli->mli_debug |= IFD_ATTACHED;
-	MLI_ADDREF_LOCKED(mli); /* hold a reference for mli_head */
-	MLI_ADDREF_LOCKED(mli); /* hold a reference for caller */
+	MLI_ADDREF_LOCKED(mli);                                    
+	MLI_ADDREF_LOCKED(mli);                                  
 	MLI_UNLOCK(mli);
 	ifnet_lock_shared(ifp);
 	mld6_initsilent(ifp, mli);
@@ -612,10 +612,10 @@ mld_domifattach(struct ifnet *ifp, zalloc_flags_t how)
 	return mli;
 }
 
-/*
- * Attach MLD when PF_INET6 is reattached to an interface.  Caller is
- * expected to have an outstanding reference to the mli.
- */
+  
+                                                                     
+                                                        
+   
 void
 mld_domifreattach(struct mld_ifinfo *mli)
 {
@@ -629,7 +629,7 @@ mld_domifreattach(struct mld_ifinfo *mli)
 	VERIFY(ifp != NULL);
 	mli_initvar(mli, ifp, 1);
 	mli->mli_debug |= IFD_ATTACHED;
-	MLI_ADDREF_LOCKED(mli); /* hold a reference for mli_head */
+	MLI_ADDREF_LOCKED(mli);                                    
 	MLI_UNLOCK(mli);
 	ifnet_lock_shared(ifp);
 	mld6_initsilent(ifp, mli);
@@ -644,9 +644,9 @@ mld_domifreattach(struct mld_ifinfo *mli)
 	    __func__, (uint64_t)VM_KERNEL_ADDRPERM(ifp), if_name(ifp)));
 }
 
-/*
- * Hook for domifdetach.
- */
+  
+                        
+   
 void
 mld_domifdetach(struct ifnet *ifp)
 {
@@ -661,16 +661,16 @@ mld_domifdetach(struct ifnet *ifp)
 	mli_delete(ifp, (struct mld_in6m_relhead *)&in6m_dthead);
 	MLD_UNLOCK();
 
-	/* Now that we're dropped all locks, release detached records */
+	                                                                
 	MLD_REMOVE_DETACHED_IN6M(&in6m_dthead);
 }
 
-/*
- * Called at interface detach time.  Note that we only flush all deferred
- * responses and record releases; all remaining inm records and their source
- * entries related to this interface are left intact, in order to handle
- * the reattach case.
- */
+  
+                                                                         
+                                                                            
+                                                                        
+                     
+   
 static void
 mli_delete(const struct ifnet *ifp, struct mld_in6m_relhead *in6m_dthead)
 {
@@ -681,9 +681,9 @@ mli_delete(const struct ifnet *ifp, struct mld_in6m_relhead *in6m_dthead)
 	LIST_FOREACH_SAFE(mli, &mli_head, mli_link, tmli) {
 		MLI_LOCK(mli);
 		if (mli->mli_ifp == ifp) {
-			/*
-			 * Free deferred General Query responses.
-			 */
+			  
+                                            
+      
 			IF_DRAIN(&mli->mli_gq);
 			IF_DRAIN(&mli->mli_v1q);
 			mld_flush_relq(mli, in6m_dthead);
@@ -692,7 +692,7 @@ mli_delete(const struct ifnet *ifp, struct mld_in6m_relhead *in6m_dthead)
 			MLI_UNLOCK(mli);
 
 			LIST_REMOVE(mli, mli_link);
-			MLI_REMREF(mli); /* release mli_head reference */
+			MLI_REMREF(mli);                                 
 			mld_mli_list_genid++;
 			return;
 		}
@@ -742,9 +742,9 @@ mli_initvar(struct mld_ifinfo *mli, struct ifnet *ifp, int reattach)
 		SLIST_INIT(&mli->mli_relinmhead);
 	}
 
-	/*
-	 * Responses to general queries are subject to bounds.
-	 */
+	  
+                                                       
+    
 	mli->mli_gq.ifq_maxlen = MLD_MAX_RESPONSE_PACKETS;
 	mli->mli_v1q.ifq_maxlen = MLD_MAX_RESPONSE_PACKETS;
 }
@@ -766,16 +766,16 @@ mli_free(struct mld_ifinfo *mli)
 	MLI_LOCK(mli);
 	if (mli->mli_debug & IFD_ATTACHED) {
 		panic("%s: attached mli=%p is being freed", __func__, mli);
-		/* NOTREACHED */
+		                
 	} else if (mli->mli_ifp != NULL) {
 		panic("%s: ifp not NULL for mli=%p", __func__, mli);
-		/* NOTREACHED */
+		                
 	} else if (!(mli->mli_debug & IFD_ALLOC)) {
 		panic("%s: mli %p cannot be freed", __func__, mli);
-		/* NOTREACHED */
+		                
 	} else if (mli->mli_refcnt != 0) {
 		panic("%s: non-zero refcnt mli=%p", __func__, mli);
-		/* NOTREACHED */
+		                
 	}
 	mli->mli_debug &= ~IFD_ALLOC;
 	MLI_UNLOCK(mli);
@@ -795,7 +795,7 @@ mli_addref(struct mld_ifinfo *mli, int locked)
 
 	if (++mli->mli_refcnt == 0) {
 		panic("%s: mli=%p wraparound refcnt", __func__, mli);
-		/* NOTREACHED */
+		                
 	}
 	if (!locked) {
 		MLI_UNLOCK(mli);
@@ -812,7 +812,7 @@ mli_remref(struct mld_ifinfo *mli)
 
 	if (mli->mli_refcnt == 0) {
 		panic("%s: mli=%p negative refcnt", __func__, mli);
-		/* NOTREACHED */
+		                
 	}
 
 	--mli->mli_refcnt;
@@ -830,7 +830,7 @@ mli_remref(struct mld_ifinfo *mli)
 	VERIFY(SLIST_EMPTY(&mli->mli_relinmhead));
 	MLI_UNLOCK(mli);
 
-	/* Now that we're dropped all locks, release detached records */
+	                                                                
 	MLD_REMOVE_DETACHED_IN6M(&in6m_dthead);
 
 	MLD_PRINTF(("%s: freeing mld_ifinfo for ifp 0x%llx(%s)\n",
@@ -839,16 +839,16 @@ mli_remref(struct mld_ifinfo *mli)
 	mli_free(mli);
 }
 
-/*
- * Process a received MLDv1 general or address-specific query.
- * Assumes that the query header has been pulled up to sizeof(mld_hdr).
- *
- * NOTE: Can't be fully const correct as we temporarily embed scope ID in
- * mld_addr. This is OK as we own the mbuf chain.
- */
+  
+                                                              
+                                                                       
+  
+                                                                         
+                                                 
+   
 static int
 mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
-    /*const*/ struct mld_hdr *mld)
+              struct mld_hdr *mld)
 {
 	struct mld_ifinfo       *mli;
 	struct in6_multi        *inm;
@@ -867,10 +867,10 @@ mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		goto done;
 	}
 
-	/*
-	 * RFC3810 Section 6.2: MLD queries must originate from
-	 * a router's link-local address.
-	 */
+	  
+                                                        
+                                  
+    
 	if (!IN6_IS_SCOPE_LINKLOCAL(&ip6->ip6_src)) {
 		MLD_PRINTF(("%s: ignore v1 query src %s on ifp 0x%llx(%s)\n",
 		    __func__, ip6_sprintf(&ip6->ip6_src),
@@ -878,15 +878,15 @@ mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		goto done;
 	}
 
-	/*
-	 * Do address field validation upfront before we accept
-	 * the query.
-	 */
+	  
+                                                        
+              
+    
 	if (IN6_IS_ADDR_UNSPECIFIED(&mld->mld_addr)) {
-		/*
-		 * MLDv1 General Query.
-		 * If this was not sent to the all-nodes group, ignore it.
-		 */
+		  
+                         
+                                                            
+     
 		struct in6_addr          dst;
 
 		dst = ip6->ip6_dst;
@@ -897,16 +897,16 @@ mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		}
 		is_general_query = 1;
 	} else {
-		/*
-		 * Embed scope ID of receiving interface in MLD query for
-		 * lookup whilst we don't hold other locks.
-		 */
+		  
+                                                           
+                                             
+     
 		(void)in6_setscope(&mld->mld_addr, ifp, NULL);
 	}
 
-	/*
-	 * Switch to MLDv1 host compatibility mode.
-	 */
+	  
+                                            
+    
 	mli = MLD_IFINFO(ifp);
 	VERIFY(mli != NULL);
 
@@ -924,10 +924,10 @@ mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 
 		MLD_PRINTF(("%s: process v1 general query on ifp 0x%llx(%s)\n",
 		    __func__, (uint64_t)VM_KERNEL_ADDRPERM(ifp), if_name(ifp)));
-		/*
-		 * For each reporting group joined on this
-		 * interface, kick the report timer.
-		 */
+		  
+                                            
+                                      
+     
 		in6_multihead_lock_shared();
 		IN6_FIRST_MULTI(step, inm);
 		while (inm != NULL) {
@@ -940,11 +940,11 @@ mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		}
 		in6_multihead_lock_done();
 	} else {
-		/*
-		 * MLDv1 Group-Specific Query.
-		 * If this is a group-specific MLDv1 query, we need only
-		 * look up the single group to process it.
-		 */
+		  
+                                
+                                                          
+                                            
+     
 		in6_multihead_lock_shared();
 		IN6_LOOKUP_MULTI(&mld->mld_addr, ifp, inm);
 		in6_multihead_lock_done();
@@ -957,9 +957,9 @@ mld_v1_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 			    (uint64_t)VM_KERNEL_ADDRPERM(ifp), if_name(ifp)));
 			mtp.cst = mld_v1_update_group(inm, timer);
 			IN6M_UNLOCK(inm);
-			IN6M_REMREF(inm); /* from IN6_LOOKUP_MULTI */
+			IN6M_REMREF(inm);                            
 		}
-		/* XXX Clear embedded scope ID as userland won't expect it. */
+		                                                              
 		in6_clearscope(&mld->mld_addr);
 	}
 done:
@@ -968,21 +968,21 @@ done:
 	return err;
 }
 
-/*
- * Update the report timer on a group in response to an MLDv1 query.
- *
- * If we are becoming the reporting member for this group, start the timer.
- * If we already are the reporting member for this group, and timer is
- * below the threshold, reset it.
- *
- * We may be updating the group for the first time since we switched
- * to MLDv2. If we are, then we must clear any recorded source lists,
- * and transition to REPORTING state; the group timer is overloaded
- * for group and group-source query responses.
- *
- * Unlike MLDv2, the delay per group should be jittered
- * to avoid bursts of MLDv1 reports.
- */
+  
+                                                                    
+  
+                                                                           
+                                                                      
+                                 
+  
+                                                                    
+                                                                     
+                                                                   
+                                              
+  
+                                                       
+                                    
+   
 static uint32_t
 mld_v1_update_group(struct in6_multi *inm, const int timer)
 {
@@ -1024,14 +1024,14 @@ mld_v1_update_group(struct in6_multi *inm, const int timer)
 	return inm->in6m_timer;
 }
 
-/*
- * Process a received MLDv2 general, group-specific or
- * group-and-source-specific query.
- *
- * Assumes that the query header has been pulled up to sizeof(mldv2_query).
- *
- * Return 0 if successful, otherwise an appropriate error code is returned.
- */
+  
+                                                      
+                                   
+  
+                                                                           
+  
+                                                                           
+   
 static int
 mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
     struct mbuf *m, const int off, const int icmp6len)
@@ -1055,10 +1055,10 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		goto done;
 	}
 
-	/*
-	 * RFC3810 Section 6.2: MLD queries must originate from
-	 * a router's link-local address.
-	 */
+	  
+                                                        
+                                  
+    
 	if (!IN6_IS_SCOPE_LINKLOCAL(&ip6->ip6_src)) {
 		MLD_PRINTF(("%s: ignore v1 query src %s on ifp 0x%llx(%s)\n",
 		    __func__, ip6_sprintf(&ip6->ip6_src),
@@ -1071,7 +1071,7 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 
 	mld = (struct mldv2_query *)(mtod(m, uint8_t *) + off);
 
-	maxdelay = ntohs(mld->mld_maxdelay);    /* in 1/10ths of a second */
+	maxdelay = ntohs(mld->mld_maxdelay);                                
 	if (maxdelay > SHRT_MAX) {
 		maxdelay = (MLD_MRC_MANT((uint16_t)maxdelay) | 0x1000) <<
 		    (MLD_MRC_EXP((uint16_t)maxdelay) + 3);
@@ -1105,26 +1105,26 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		goto done;
 	}
 
-	/*
-	 * Do further input validation upfront to avoid resetting timers
-	 * should we need to discard this query.
-	 */
+	  
+                                                                 
+                                         
+    
 	if (IN6_IS_ADDR_UNSPECIFIED(&mld->mld_addr)) {
-		/*
-		 * A general query with a source list has undefined
-		 * behaviour; discard it.
-		 */
+		  
+                                                     
+                           
+     
 		if (nsrc > 0) {
 			err = EINVAL;
 			goto done;
 		}
 		is_general_query = 1;
 	} else {
-		/*
-		 * Embed scope ID of receiving interface in MLD query for
-		 * lookup whilst we don't hold other locks (due to KAME
-		 * locking lameness). We own this mbuf chain just now.
-		 */
+		  
+                                                           
+                                                         
+                                                        
+     
 		(void)in6_setscope(&mld->mld_addr, ifp, NULL);
 	}
 
@@ -1132,11 +1132,11 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 	VERIFY(mli != NULL);
 
 	MLI_LOCK(mli);
-	/*
-	 * Discard the v2 query if we're in Compatibility Mode.
-	 * The RFC is pretty clear that hosts need to stay in MLDv1 mode
-	 * until the Old Version Querier Present timer expires.
-	 */
+	  
+                                                        
+                                                                 
+                                                        
+    
 	if (mli->mli_version != MLD_VERSION_2) {
 		MLI_UNLOCK(mli);
 		goto done;
@@ -1151,17 +1151,17 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 	    mli->mli_qi, mli->mli_qri));
 
 	if (is_general_query) {
-		/*
-		 * MLDv2 General Query.
-		 *
-		 * Schedule a current-state report on this ifp for
-		 * all groups, possibly containing source lists.
-		 *
-		 * If there is a pending General Query response
-		 * scheduled earlier than the selected delay, do
-		 * not schedule any other reports.
-		 * Otherwise, reset the interface timer.
-		 */
+		  
+                         
+    
+                                                    
+                                                  
+    
+                                                 
+                                                  
+                                    
+                                          
+     
 		MLD_PRINTF(("%s: process v2 general query on ifp 0x%llx(%s)\n",
 		    __func__, (uint64_t)VM_KERNEL_ADDRPERM(ifp), if_name(ifp)));
 		if (mli->mli_v2_timer == 0 || mli->mli_v2_timer >= timer) {
@@ -1170,14 +1170,14 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 		MLI_UNLOCK(mli);
 	} else {
 		MLI_UNLOCK(mli);
-		/*
-		 * MLDv2 Group-specific or Group-and-source-specific Query.
-		 *
-		 * Group-source-specific queries are throttled on
-		 * a per-group basis to defeat denial-of-service attempts.
-		 * Queries for groups we are not a member of on this
-		 * link are simply ignored.
-		 */
+		  
+                                                             
+    
+                                                   
+                                                            
+                                                      
+                             
+     
 		in6_multihead_lock_shared();
 		IN6_LOOKUP_MULTI(&mld->mld_addr, ifp, inm);
 		in6_multihead_lock_done();
@@ -1192,19 +1192,19 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 				MLD_PRINTF(("%s: GS query throttled.\n",
 				    __func__));
 				IN6M_UNLOCK(inm);
-				IN6M_REMREF(inm); /* from IN6_LOOKUP_MULTI */
+				IN6M_REMREF(inm);                            
 				goto done;
 			}
 		}
 		MLD_PRINTF(("%s: process v2 group query on ifp 0x%llx(%s)\n",
 		    __func__, (uint64_t)VM_KERNEL_ADDRPERM(ifp), if_name(ifp)));
-		/*
-		 * If there is a pending General Query response
-		 * scheduled sooner than the selected delay, no
-		 * further report need be scheduled.
-		 * Otherwise, prepare to respond to the
-		 * group-specific or group-and-source query.
-		 */
+		  
+                                                 
+                                                 
+                                      
+                                         
+                                              
+     
 		MLI_LOCK(mli);
 		mtp.it = mli->mli_v2_timer;
 		MLI_UNLOCK(mli);
@@ -1213,8 +1213,8 @@ mld_v2_input_query(struct ifnet *ifp, const struct ip6_hdr *ip6,
 			mtp.cst = inm->in6m_timer;
 		}
 		IN6M_UNLOCK(inm);
-		IN6M_REMREF(inm); /* from IN6_LOOKUP_MULTI */
-		/* XXX Clear embedded scope ID as userland won't expect it. */
+		IN6M_REMREF(inm);                            
+		                                                              
 		in6_clearscope(&mld->mld_addr);
 	}
 done:
@@ -1228,11 +1228,11 @@ done:
 	return err;
 }
 
-/*
- * Process a recieved MLDv2 group-specific or group-and-source-specific
- * query.
- * Return <0 if any error occured. Currently this is ignored.
- */
+  
+                                                                       
+         
+                                                             
+   
 static int
 mld_v2_process_group_query(struct in6_multi *inm, int timer, struct mbuf *m0,
     const int off)
@@ -1263,12 +1263,12 @@ mld_v2_process_group_query(struct in6_multi *inm, int timer, struct mbuf *m0,
 
 	nsrc = ntohs(mld->mld_numsrc);
 
-	/*
-	 * Deal with group-specific queries upfront.
-	 * If any group query is already pending, purge any recorded
-	 * source-list state if it exists, and schedule a query response
-	 * for this group-specific query.
-	 */
+	  
+                                             
+                                                             
+                                                                 
+                                  
+    
 	if (nsrc == 0) {
 		if (inm->in6m_state == MLD_G_QUERY_PENDING_MEMBER ||
 		    inm->in6m_state == MLD_SG_QUERY_PENDING_MEMBER) {
@@ -1280,27 +1280,27 @@ mld_v2_process_group_query(struct in6_multi *inm, int timer, struct mbuf *m0,
 		return retval;
 	}
 
-	/*
-	 * Deal with the case where a group-and-source-specific query has
-	 * been received but a group-specific query is already pending.
-	 */
+	  
+                                                                  
+                                                                
+    
 	if (inm->in6m_state == MLD_G_QUERY_PENDING_MEMBER) {
 		timer = min(inm->in6m_timer, timer);
 		inm->in6m_timer = MLD_RANDOM_DELAY(timer);
 		return retval;
 	}
 
-	/*
-	 * Finally, deal with the case where a group-and-source-specific
-	 * query has been received, where a response to a previous g-s-r
-	 * query exists, or none exists.
-	 * In this case, we need to parse the source-list which the Querier
-	 * has provided us with and check if we have any source list filter
-	 * entries at T1 for these sources. If we do not, there is no need
-	 * schedule a report and the query may be dropped.
-	 * If we do, we must record them and schedule a current-state
-	 * report for those sources.
-	 */
+	  
+                                                                 
+                                                                 
+                                 
+                                                                    
+                                                                    
+                                                                   
+                                                   
+                                                              
+                             
+    
 	if (inm->in6m_nsrc > 0) {
 		struct mbuf             *m;
 		uint8_t                 *sp;
@@ -1338,16 +1338,16 @@ mld_v2_process_group_query(struct in6_multi *inm, int timer, struct mbuf *m0,
 	return retval;
 }
 
-/*
- * Process a received MLDv1 host membership report.
- * Assumes mld points to mld_hdr in pulled up mbuf chain.
- *
- * NOTE: Can't be fully const correct as we temporarily embed scope ID in
- * mld_addr. This is OK as we own the mbuf chain.
- */
+  
+                                                   
+                                                         
+  
+                                                                         
+                                                 
+   
 static int
 mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
-    const struct ip6_hdr *ip6, /*const*/ struct mld_hdr *mld)
+    const struct ip6_hdr *ip6,           struct mld_hdr *mld)
 {
 	struct in6_addr          src, dst;
 	struct in6_ifaddr       *ia;
@@ -1365,10 +1365,10 @@ mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
 		return 0;
 	}
 
-	/*
-	 * MLDv1 reports must originate from a host's link-local address,
-	 * or the unspecified address (when booting).
-	 */
+	  
+                                                                  
+                                              
+    
 	src = ip6->ip6_src;
 	in6_clearscope(&src);
 	if (!IN6_IS_SCOPE_LINKLOCAL(&src) && !IN6_IS_ADDR_UNSPECIFIED(&src)) {
@@ -1378,10 +1378,10 @@ mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
 		return EINVAL;
 	}
 
-	/*
-	 * RFC2710 Section 4: MLDv1 reports must pertain to a multicast
-	 * group, and must be directed to the group itself.
-	 */
+	  
+                                                                
+                                                    
+    
 	dst = ip6->ip6_dst;
 	in6_clearscope(&dst);
 	if (!IN6_IS_ADDR_MULTICAST(&mld->mld_addr) ||
@@ -1392,16 +1392,16 @@ mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
 		return EINVAL;
 	}
 
-	/*
-	 * Make sure we don't hear our own membership report, as fast
-	 * leave requires knowing that we are the only member of a
-	 * group. Assume we used the link-local address if available,
-	 * otherwise look for ::.
-	 *
-	 * XXX Note that scope ID comparison is needed for the address
-	 * returned by in6ifa_ifpforlinklocal(), but SHOULD NOT be
-	 * performed for the on-wire address.
-	 */
+	  
+                                                              
+                                                           
+                                                              
+                          
+   
+                                                               
+                                                           
+                                      
+    
 	ia = in6ifa_ifpforlinklocal(ifp, IN6_IFF_NOTREADY | IN6_IFF_ANYCAST);
 	if (ia != NULL) {
 		IFA_LOCK(&ia->ia_ifa);
@@ -1420,20 +1420,20 @@ mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
 	    __func__, ip6_sprintf(&mld->mld_addr),
 	    (uint64_t)VM_KERNEL_ADDRPERM(ifp), if_name(ifp)));
 
-	/*
-	 * Embed scope ID of receiving interface in MLD query for lookup
-	 * whilst we don't hold other locks (due to KAME locking lameness).
-	 */
+	  
+                                                                 
+                                                                    
+    
 	if (!IN6_IS_ADDR_UNSPECIFIED(&mld->mld_addr)) {
 		(void)in6_setscope(&mld->mld_addr, ifp, NULL);
 	}
 
-	/*
-	 * MLDv1 report suppression.
-	 * If we are a member of this group, and our membership should be
-	 * reported, and our group timer is pending or about to be reset,
-	 * stop our group timer by transitioning to the 'lazy' state.
-	 */
+	  
+                             
+                                                                  
+                                                                  
+                                                              
+    
 	in6_multihead_lock_shared();
 	IN6_LOOKUP_MULTI(&mld->mld_addr, ifp, inm);
 	in6_multihead_lock_done();
@@ -1446,14 +1446,14 @@ mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
 		VERIFY(mli != NULL);
 
 		MLI_LOCK(mli);
-		/*
-		 * If we are in MLDv2 host mode, do not allow the
-		 * other host's MLDv1 report to suppress our reports.
-		 */
+		  
+                                                   
+                                                       
+     
 		if (mli->mli_version == MLD_VERSION_2) {
 			MLI_UNLOCK(mli);
 			IN6M_UNLOCK(inm);
-			IN6M_REMREF(inm); /* from IN6_LOOKUP_MULTI */
+			IN6M_REMREF(inm);                            
 			goto out;
 		}
 		MLI_UNLOCK(mli);
@@ -1482,27 +1482,27 @@ mld_v1_input_report(struct ifnet *ifp, struct mbuf *m,
 			break;
 		}
 		IN6M_UNLOCK(inm);
-		IN6M_REMREF(inm); /* from IN6_LOOKUP_MULTI */
+		IN6M_REMREF(inm);                            
 	}
 
 out:
-	/* XXX Clear embedded scope ID as userland won't expect it. */
+	                                                              
 	in6_clearscope(&mld->mld_addr);
 
 	return 0;
 }
 
-/*
- * MLD input path.
- *
- * Assume query messages which fit in a single ICMPv6 message header
- * have been pulled up.
- * Assume that userland will want to see the message, even if it
- * otherwise fails kernel input validation; do not free it.
- * Pullup may however free the mbuf chain m if it fails.
- *
- * Return IPPROTO_DONE if we freed m. Otherwise, return 0.
- */
+  
+                  
+  
+                                                                    
+                       
+                                                                
+                                                           
+                                                        
+  
+                                                          
+   
 int
 mld_input(struct mbuf *m, int off, int icmp6len)
 {
@@ -1516,7 +1516,7 @@ mld_input(struct mbuf *m, int off, int icmp6len)
 
 	ifp = m->m_pkthdr.rcvif;
 
-	/* Pullup to appropriate size. */
+	                                 
 	mld = (struct mld_hdr *)(mtod(m, uint8_t *) + off);
 	if (mld->mld_type == MLD_LISTENER_QUERY &&
 	    icmp6len >= sizeof(struct mldv2_query)) {
@@ -1524,7 +1524,7 @@ mld_input(struct mbuf *m, int off, int icmp6len)
 	} else {
 		mldlen = sizeof(struct mld_hdr);
 	}
-	// check if mldv2_query/mld_hdr fits in the first mbuf
+	                                                      
 	IP6_EXTHDR_CHECK(m, off, mldlen, return IPPROTO_DONE);
 	IP6_EXTHDR_GET(mld, struct mld_hdr *, m, off, mldlen);
 	if (mld == NULL) {
@@ -1533,10 +1533,10 @@ mld_input(struct mbuf *m, int off, int icmp6len)
 	}
 	ip6 = mtod(m, struct ip6_hdr *);
 
-	/*
-	 * Userland needs to see all of this traffic for implementing
-	 * the endpoint discovery portion of multicast routing.
-	 */
+	  
+                                                              
+                                                        
+    
 	switch (mld->mld_type) {
 	case MLD_LISTENER_QUERY:
 		icmp6_ifstat_inc(ifp, ifs6_in_mldquery);
@@ -1570,10 +1570,10 @@ mld_input(struct mbuf *m, int off, int icmp6len)
 	return 0;
 }
 
-/*
- * Schedule MLD timer based on various parameters; caller must ensure that
- * lock ordering is maintained as this routine acquires MLD global lock.
- */
+  
+                                                                          
+                                                                        
+   
 void
 mld_set_timeout(struct mld_tparams *mtp)
 {
@@ -1599,15 +1599,15 @@ mld_set_timeout(struct mld_tparams *mtp)
 	}
 }
 
-/*
- * MLD6 timer handler (per 1 second).
- */
+  
+                                     
+   
 static void
 mld_timeout(void *arg)
 {
 #pragma unused(arg)
-	struct ifqueue           scq;   /* State-change packets */
-	struct ifqueue           qrq;   /* Query response packets */
+	struct ifqueue           scq;                             
+	struct ifqueue           qrq;                               
 	struct ifnet            *ifp;
 	struct mld_ifinfo       *mli;
 	struct in6_multi        *inm;
@@ -1618,11 +1618,11 @@ mld_timeout(void *arg)
 
 	SLIST_INIT(&in6m_dthead);
 
-	/*
-	 * Update coarse-grained networking timestamp (in sec.); the idea
-	 * is to piggy-back on the timeout callout to update the counter
-	 * returnable via net_uptime().
-	 */
+	  
+                                                                  
+                                                                 
+                                
+    
 	net_update_uptime();
 
 	MLD_LOCK();
@@ -1631,9 +1631,9 @@ mld_timeout(void *arg)
 	    querier_present_timers_running6, interface_timers_running6,
 	    current_state_timers_running6, state_change_timers_running6));
 
-	/*
-	 * MLDv1 querier present timer processing.
-	 */
+	  
+                                           
+    
 	if (querier_present_timers_running6) {
 		querier_present_timers_running6 = 0;
 		LIST_FOREACH(mli, &mli_head, mli_link) {
@@ -1646,9 +1646,9 @@ mld_timeout(void *arg)
 		}
 	}
 
-	/*
-	 * MLDv2 General Query response timer processing.
-	 */
+	  
+                                                  
+    
 	if (interface_timers_running6) {
 		MLD_PRINTF(("%s: interface timers running\n", __func__));
 		interface_timers_running6 = 0;
@@ -1666,18 +1666,18 @@ mld_timeout(void *arg)
 				mli = LIST_NEXT(mli, mli_link);
 				continue;
 			}
-			/*
-			 * XXX The logic below ends up calling
-			 * mld_dispatch_packet which can unlock mli
-			 * and the global MLD lock.
-			 * Therefore grab a reference on MLI and also
-			 * check for generation count to see if we should
-			 * iterate the list again.
-			 */
+			  
+                                         
+                                              
+                              
+                                                
+                                                    
+                             
+      
 			MLI_ADDREF_LOCKED(mli);
 
 			if (mli->mli_v2_timer == 0) {
-				/* Do nothing. */
+				                 
 			} else if (--mli->mli_v2_timer == 0) {
 				if (mld_v2_dispatch_general_query(mli) > 0) {
 					interface_timers_running6 = 1;
@@ -1722,10 +1722,10 @@ mld_timeout(void *arg)
 	memset(&scq, 0, sizeof(struct ifqueue));
 	scq.ifq_maxlen = MLD_MAX_STATE_CHANGE_PACKETS;
 
-	/*
-	 * MLD host report and state-change timer processing.
-	 * Note: Processing a v2 group timer may remove a node.
-	 */
+	  
+                                                      
+                                                        
+    
 	mli = LIST_FIRST(&mli_head);
 
 	while (mli != NULL) {
@@ -1767,14 +1767,14 @@ next:
 		}
 		in6_multihead_lock_done();
 
-		/*
-		 * XXX The logic below ends up calling
-		 * mld_dispatch_packet which can unlock mli
-		 * and the global MLD lock.
-		 * Therefore grab a reference on MLI and also
-		 * check for generation count to see if we should
-		 * iterate the list again.
-		 */
+		  
+                                        
+                                             
+                             
+                                               
+                                                   
+                            
+     
 		MLI_LOCK(mli);
 		MLI_ADDREF_LOCKED(mli);
 		if (mli->mli_version == MLD_VERSION_1) {
@@ -1787,17 +1787,17 @@ next:
 			VERIFY(scq.ifq_len == 0);
 			MLI_LOCK(mli);
 		}
-		/*
-		 * In case there are still any pending membership reports
-		 * which didn't get drained at version change time.
-		 */
+		  
+                                                           
+                                                     
+     
 		IF_DRAIN(&mli->mli_v1q);
-		/*
-		 * Release all deferred inm records, and drain any locally
-		 * enqueued packets; do it even if the current MLD version
-		 * for the link is no longer MLDv2, in order to handle the
-		 * version change case.
-		 */
+		  
+                                                            
+                                                            
+                                                            
+                         
+     
 		mld_flush_relq(mli, (struct mld_in6m_relhead *)&in6m_dthead);
 		VERIFY(SLIST_EMPTY(&mli->mli_relinmhead));
 		mli->mli_flags |= MLIF_PROCESSED;
@@ -1822,12 +1822,12 @@ next:
 	mli->mli_flags &= ~MLIF_PROCESSED;
 
 out_locked:
-	/* re-arm the timer if there's work to do */
+	                                            
 	mld_timeout_run = 0;
 	mld_sched_timeout();
 	MLD_UNLOCK();
 
-	/* Now that we're dropped all locks, release detached records */
+	                                                                
 	MLD_REMOVE_DETACHED_IN6M(&in6m_dthead);
 }
 
@@ -1844,11 +1844,11 @@ mld_sched_timeout(void)
 	}
 }
 
-/*
- * Free the in6_multi reference(s) for this MLD lifecycle.
- *
- * Caller must be holding mli_lock.
- */
+  
+                                                          
+  
+                                   
+   
 static void
 mld_flush_relq(struct mld_ifinfo *mli, struct mld_in6m_relhead *in6m_dthead)
 {
@@ -1872,18 +1872,18 @@ again:
 		    inm->in6m_reqcnt == 0));
 		IN6M_UNLOCK(inm);
 		in6_multihead_lock_done();
-		/* from mli_relinmhead */
+		                         
 		IN6M_REMREF(inm);
-		/* from in6_multihead_list */
+		                             
 		if (lastref) {
-			/*
-			 * Defer releasing our final reference, as we
-			 * are holding the MLD lock at this point, and
-			 * we could end up with locking issues later on
-			 * (while issuing SIOCDELMULTI) when this is the
-			 * final reference count.  Let the caller do it
-			 * when it is safe.
-			 */
+			  
+                                                
+                                                 
+                                                  
+                                                   
+                                                  
+                      
+      
 			MLD_ADD_DETACHED_IN6M(in6m_dthead, inm);
 		}
 		MLI_LOCK(mli);
@@ -1891,10 +1891,10 @@ again:
 	}
 }
 
-/*
- * Update host report group timer.
- * Will update the global pending timer flags.
- */
+  
+                                  
+                                              
+   
 static void
 mld_v1_process_group_timer(struct in6_multi *inm, const int mld_version)
 {
@@ -1911,7 +1911,7 @@ mld_v1_process_group_timer(struct in6_multi *inm, const int mld_version)
 		report_timer_expired = 1;
 	} else {
 		current_state_timers_running6 = 1;
-		/* caller will schedule timer */
+		                                
 		return;
 	}
 
@@ -1939,11 +1939,11 @@ mld_v1_process_group_timer(struct in6_multi *inm, const int mld_version)
 	}
 }
 
-/*
- * Update a group's timers for MLDv2.
- * Will update the global pending timer flags.
- * Note: Unlocked read from mli.
- */
+  
+                                     
+                                              
+                                
+   
 static void
 mld_v2_process_group_timers(struct mld_ifinfo *mli,
     struct ifqueue *qrq, struct ifqueue *scq,
@@ -1960,19 +1960,19 @@ mld_v2_process_group_timers(struct mld_ifinfo *mli,
 	query_response_timer_expired = 0;
 	state_change_retransmit_timer_expired = 0;
 
-	/*
-	 * During a transition from compatibility mode back to MLDv2,
-	 * a group record in REPORTING state may still have its group
-	 * timer active. This is a no-op in this function; it is easier
-	 * to deal with it here than to complicate the timeout path.
-	 */
+	  
+                                                              
+                                                              
+                                                                
+                                                             
+    
 	if (inm->in6m_timer == 0) {
 		query_response_timer_expired = 0;
 	} else if (--inm->in6m_timer == 0) {
 		query_response_timer_expired = 1;
 	} else {
 		current_state_timers_running6 = 1;
-		/* caller will schedule timer */
+		                                
 	}
 
 	if (inm->in6m_sctimer == 0) {
@@ -1981,10 +1981,10 @@ mld_v2_process_group_timers(struct mld_ifinfo *mli,
 		state_change_retransmit_timer_expired = 1;
 	} else {
 		state_change_timers_running6 = 1;
-		/* caller will schedule timer */
+		                                
 	}
 
-	/* We are in timer callback, so be quick about it. */
+	                                                     
 	if (!state_change_retransmit_timer_expired &&
 	    !query_response_timer_expired) {
 		return;
@@ -2000,12 +2000,12 @@ mld_v2_process_group_timers(struct mld_ifinfo *mli,
 		break;
 	case MLD_G_QUERY_PENDING_MEMBER:
 	case MLD_SG_QUERY_PENDING_MEMBER:
-		/*
-		 * Respond to a previously pending Group-Specific
-		 * or Group-and-Source-Specific query by enqueueing
-		 * the appropriate Current-State report for
-		 * immediate transmission.
-		 */
+		  
+                                                   
+                                                     
+                                             
+                            
+     
 		if (query_response_timer_expired) {
 			int retval;
 
@@ -2021,24 +2021,24 @@ mld_v2_process_group_timers(struct mld_ifinfo *mli,
 	case MLD_REPORTING_MEMBER:
 	case MLD_LEAVING_MEMBER:
 		if (state_change_retransmit_timer_expired) {
-			/*
-			 * State-change retransmission timer fired.
-			 * If there are any further pending retransmissions,
-			 * set the global pending state-change flag, and
-			 * reset the timer.
-			 */
+			  
+                                              
+                                                       
+                                                   
+                      
+      
 			if (--inm->in6m_scrv > 0) {
 				inm->in6m_sctimer = (uint16_t)uri_sec;
 				state_change_timers_running6 = 1;
-				/* caller will schedule timer */
+				                                
 			}
-			/*
-			 * Retransmit the previously computed state-change
-			 * report. If there are no further pending
-			 * retransmissions, the mbuf queue will be consumed.
-			 * Update T0 state to T1 as we have now sent
-			 * a state-change.
-			 */
+			  
+                                                     
+                                             
+                                                       
+                                               
+                     
+      
 			(void) mld_v2_merge_state_changes(inm, scq);
 
 			in6m_commit(inm);
@@ -2046,25 +2046,25 @@ mld_v2_process_group_timers(struct mld_ifinfo *mli,
 			    ip6_sprintf(&inm->in6m_addr),
 			    if_name(inm->in6m_ifp)));
 
-			/*
-			 * If we are leaving the group for good, make sure
-			 * we release MLD's reference to it.
-			 * This release must be deferred using a SLIST,
-			 * as we are called from a loop which traverses
-			 * the in_ifmultiaddr TAILQ.
-			 */
+			  
+                                                     
+                                       
+                                                  
+                                                  
+                               
+      
 			if (inm->in6m_state == MLD_LEAVING_MEMBER &&
 			    inm->in6m_scrv == 0) {
 				inm->in6m_state = MLD_NOT_MEMBER;
-				/*
-				 * A reference has already been held in
-				 * mld_final_leave() for this inm, so
-				 * no need to hold another one.  We also
-				 * bumped up its request count then, so
-				 * that it stays in in6_multihead.  Both
-				 * of them will be released when it is
-				 * dequeued later on.
-				 */
+				  
+                                           
+                                         
+                                            
+                                           
+                                            
+                                          
+                         
+       
 				VERIFY(inm->in6m_nrelecnt != 0);
 				SLIST_INSERT_HEAD(&mli->mli_relinmhead,
 				    inm, in6m_nrele);
@@ -2074,10 +2074,10 @@ mld_v2_process_group_timers(struct mld_ifinfo *mli,
 	}
 }
 
-/*
- * Switch to a different version on the given interface,
- * as per Section 9.12.
- */
+  
+                                                        
+                       
+   
 static uint32_t
 mld_set_version(struct mld_ifinfo *mli, const int mld_version)
 {
@@ -2090,10 +2090,10 @@ mld_set_version(struct mld_ifinfo *mli, const int mld_version)
 	    if_name(mli->mli_ifp)));
 
 	if (mld_version == MLD_VERSION_1) {
-		/*
-		 * Compute the "Older Version Querier Present" timer as per
-		 * Section 9.12, in seconds.
-		 */
+		  
+                                                             
+                              
+     
 		old_version_timer = (mli->mli_rv * mli->mli_qi) + mli->mli_qri;
 		mli->mli_v1_timer = old_version_timer;
 	}
@@ -2108,15 +2108,15 @@ mld_set_version(struct mld_ifinfo *mli, const int mld_version)
 	return mli->mli_v1_timer;
 }
 
-/*
- * Cancel pending MLDv2 timers for the given link and all groups
- * joined on it; state-change, general-query, and group-query timers.
- *
- * Only ever called on a transition from v2 to Compatibility mode. Kill
- * the timers stone dead (this may be expensive for large N groups), they
- * will be restarted if Compatibility Mode deems that they must be due to
- * query processing.
- */
+  
+                                                                
+                                                                     
+  
+                                                                       
+                                                                         
+                                                                         
+                    
+   
 static void
 mld_v2_cancel_link_timers(struct mld_ifinfo *mli)
 {
@@ -2129,17 +2129,17 @@ mld_v2_cancel_link_timers(struct mld_ifinfo *mli)
 	MLD_PRINTF(("%s: cancel v2 timers on ifp 0x%llx(%s)\n", __func__,
 	    (uint64_t)VM_KERNEL_ADDRPERM(mli->mli_ifp), if_name(mli->mli_ifp)));
 
-	/*
-	 * Stop the v2 General Query Response on this link stone dead.
-	 * If timer is woken up due to interface_timers_running6,
-	 * the flag will be cleared if there are no pending link timers.
-	 */
+	  
+                                                               
+                                                          
+                                                                 
+    
 	mli->mli_v2_timer = 0;
 
-	/*
-	 * Now clear the current-state and state-change report timers
-	 * for all memberships scoped to this link.
-	 */
+	  
+                                                              
+                                            
+    
 	ifp = mli->mli_ifp;
 	MLI_UNLOCK(mli);
 
@@ -2158,21 +2158,21 @@ mld_v2_cancel_link_timers(struct mld_ifinfo *mli)
 		case MLD_LAZY_MEMBER:
 		case MLD_SLEEPING_MEMBER:
 		case MLD_AWAKENING_MEMBER:
-			/*
-			 * These states are either not relevant in v2 mode,
-			 * or are unreported. Do nothing.
-			 */
+			  
+                                                      
+                                    
+      
 			break;
 		case MLD_LEAVING_MEMBER:
-			/*
-			 * If we are leaving the group and switching
-			 * version, we need to release the final
-			 * reference held for issuing the INCLUDE {}.
-			 * During mld_final_leave(), we bumped up both the
-			 * request and reference counts.  Since we cannot
-			 * call in6_multi_detach() here, defer this task to
-			 * the timer routine.
-			 */
+			  
+                                               
+                                           
+                                                
+                                                     
+                                                    
+                                                      
+                        
+      
 			VERIFY(inm->in6m_nrelecnt != 0);
 			MLI_LOCK(mli);
 			SLIST_INSERT_HEAD(&mli->mli_relinmhead, inm,
@@ -2187,10 +2187,10 @@ mld_v2_cancel_link_timers(struct mld_ifinfo *mli)
 			inm->in6m_state = MLD_REPORTING_MEMBER;
 			break;
 		}
-		/*
-		 * Always clear state-change and group report timers.
-		 * Free any pending MLDv2 state-change records.
-		 */
+		  
+                                                       
+                                                 
+     
 		inm->in6m_sctimer = 0;
 		inm->in6m_timer = 0;
 		IF_DRAIN(&inm->in6m_scq);
@@ -2203,10 +2203,10 @@ next:
 	MLI_LOCK(mli);
 }
 
-/*
- * Update the Older Version Querier Present timers for a link.
- * See Section 9.12 of RFC 3810.
- */
+  
+                                                              
+                                
+   
 static void
 mld_v1_process_querier_timers(struct mld_ifinfo *mli)
 {
@@ -2214,9 +2214,9 @@ mld_v1_process_querier_timers(struct mld_ifinfo *mli)
 
 	if (mld_v2enable && mli->mli_version != MLD_VERSION_2 &&
 	    --mli->mli_v1_timer == 0) {
-		/*
-		 * MLDv1 Querier Present timer expired; revert to MLDv2.
-		 */
+		  
+                                                          
+     
 		MLD_PRINTF(("%s: transition from v%d -> v%d on 0x%llx(%s)\n",
 		    __func__, mli->mli_version, MLD_VERSION_2,
 		    (uint64_t)VM_KERNEL_ADDRPERM(mli->mli_ifp),
@@ -2225,9 +2225,9 @@ mld_v1_process_querier_timers(struct mld_ifinfo *mli)
 	}
 }
 
-/*
- * Transmit an MLDv1 report immediately.
- */
+  
+                                        
+   
 static int
 mld_v1_transmit_report(struct in6_multi *in6m, const uint8_t type)
 {
@@ -2242,7 +2242,7 @@ mld_v1_transmit_report(struct in6_multi *in6m, const uint8_t type)
 	MLI_LOCK_ASSERT_HELD(in6m->in6m_mli);
 
 	ifp = in6m->in6m_ifp;
-	/* ia may be NULL if link-local address is tentative. */
+	                                                        
 	ia = in6ifa_ifpforlinklocal(ifp, IN6_IFF_NOTREADY | IN6_IFF_ANYCAST);
 
 	MGETHDR(mh, M_DONTWAIT, MT_HEADER);
@@ -2262,11 +2262,11 @@ mld_v1_transmit_report(struct in6_multi *in6m, const uint8_t type)
 	}
 	mh->m_next = md;
 
-	/*
-	 * FUTURE: Consider increasing alignment by ETHER_HDR_LEN, so
-	 * that ether_output() does not need to allocate another mbuf
-	 * for the header in the most common case.
-	 */
+	  
+                                                              
+                                                              
+                                           
+    
 	MH_ALIGN(mh, sizeof(struct ip6_hdr));
 	mh->m_pkthdr.len = sizeof(struct ip6_hdr) + sizeof(struct mld_hdr);
 	mh->m_len = sizeof(struct ip6_hdr);
@@ -2302,15 +2302,15 @@ mld_v1_transmit_report(struct in6_multi *in6m, const uint8_t type)
 	mld_save_context(mh, ifp);
 	mh->m_flags |= M_MLDV1;
 
-	/*
-	 * Due to the fact that at this point we are possibly holding
-	 * in6_multihead_lock in shared or exclusive mode, we can't call
-	 * mld_dispatch_packet() here since that will eventually call
-	 * ip6_output(), which will try to lock in6_multihead_lock and cause
-	 * a deadlock.
-	 * Instead we defer the work to the mld_timeout() thread, thus
-	 * avoiding unlocking in_multihead_lock here.
-	 */
+	  
+                                                              
+                                                                 
+                                                              
+                                                                     
+               
+                                                               
+                                              
+    
 	if (IF_QFULL(&in6m->in6m_mli->mli_v1q)) {
 		MLD_PRINTF(("%s: v1 outbound queue full\n", __func__));
 		error = ENOMEM;
@@ -2323,26 +2323,26 @@ mld_v1_transmit_report(struct in6_multi *in6m, const uint8_t type)
 	return error;
 }
 
-/*
- * Process a state change from the upper layer for the given IPv6 group.
- *
- * Each socket holds a reference on the in6_multi in its own ip_moptions.
- * The socket layer will have made the necessary updates to.the group
- * state, it is now up to MLD to issue a state change report if there
- * has been any change between T0 (when the last state-change was issued)
- * and T1 (now).
- *
- * We use the MLDv2 state machine at group level. The MLd module
- * however makes the decision as to which MLD protocol version to speak.
- * A state change *from* INCLUDE {} always means an initial join.
- * A state change *to* INCLUDE {} always means a final leave.
- *
- * If delay is non-zero, and the state change is an initial multicast
- * join, the state change report will be delayed by 'delay' ticks
- * in units of seconds if MLDv1 is active on the link; otherwise
- * the initial MLDv2 state change report will be delayed by whichever
- * is sooner, a pending state-change timer or delay itself.
- */
+  
+                                                                        
+  
+                                                                         
+                                                                     
+                                                                     
+                                                                         
+                
+  
+                                                                
+                                                                        
+                                                                 
+                                                             
+  
+                                                                     
+                                                                 
+                                                                
+                                                                     
+                                                           
+   
 int
 mld_change_state(struct in6_multi *inm, struct mld_tparams *mtp,
     const int delay)
@@ -2358,25 +2358,25 @@ mld_change_state(struct in6_multi *inm, struct mld_tparams *mtp,
 	VERIFY(inm->in6m_mli != NULL);
 	MLI_LOCK_ASSERT_NOTHELD(inm->in6m_mli);
 
-	/*
-	 * Try to detect if the upper layer just asked us to change state
-	 * for an interface which has now gone away.
-	 */
+	  
+                                                                  
+                                             
+    
 	VERIFY(inm->in6m_ifma != NULL);
 	ifp = inm->in6m_ifma->ifma_ifp;
-	/*
-	 * Sanity check that netinet6's notion of ifp is the same as net's.
-	 */
+	  
+                                                                    
+    
 	VERIFY(inm->in6m_ifp == ifp);
 
 	mli = MLD_IFINFO(ifp);
 	VERIFY(mli != NULL);
 
-	/*
-	 * If we detect a state transition to or from MCAST_UNDEFINED
-	 * for this group, then we are starting or finishing an MLD
-	 * life cycle for this group.
-	 */
+	  
+                                                              
+                                                            
+                              
+    
 	if (inm->in6m_st[1].iss_fmode != inm->in6m_st[0].iss_fmode) {
 		MLD_PRINTF(("%s: inm transition %d -> %d\n", __func__,
 		    inm->in6m_st[0].iss_fmode, inm->in6m_st[1].iss_fmode));
@@ -2398,18 +2398,18 @@ out:
 	return error;
 }
 
-/*
- * Perform the initial join for an MLD group.
- *
- * When joining a group:
- *  If the group should have its MLD traffic suppressed, do nothing.
- *  MLDv1 starts sending MLDv1 host membership reports.
- *  MLDv2 will schedule an MLDv2 state-change report containing the
- *  initial state of the membership.
- *
- * If the delay argument is non-zero, then we must delay sending the
- * initial state change for delay ticks (in units of seconds).
- */
+  
+                                             
+  
+                        
+                                                                    
+                                                       
+                                                                   
+                                    
+  
+                                                                    
+                                                              
+   
 static int
 mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
     struct mld_tparams *mtp, const int delay)
@@ -2436,17 +2436,17 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 	MLI_LOCK(mli);
 	VERIFY(mli->mli_ifp == ifp);
 
-	/*
-	 * Avoid MLD if group is :
-	 * 1. Joined on loopback, OR
-	 * 2. On a link that is marked MLIF_SILENT
-	 * 3. rdar://problem/19227650 Is link local scoped and
-	 *    on cellular interface
-	 * 4. Is a type that should not be reported (node local
-	 *    or all node link local multicast.
-	 * All other groups enter the appropriate state machine
-	 * for the version in use on this link.
-	 */
+	  
+                           
+                             
+                                           
+                                                       
+                            
+                                                        
+                                        
+                                                        
+                                        
+    
 	if ((ifp->if_flags & IFF_LOOPBACK) ||
 	    (mli->mli_flags & MLIF_SILENT) ||
 	    (IFNET_IS_CELLULAR(ifp) &&
@@ -2457,14 +2457,14 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 		inm->in6m_state = MLD_SILENT_MEMBER;
 		inm->in6m_timer = 0;
 	} else {
-		/*
-		 * Deal with overlapping in6_multi lifecycle.
-		 * If this group was LEAVING, then make sure
-		 * we drop the reference we picked up to keep the
-		 * group around for the final INCLUDE {} enqueue.
-		 * Since we cannot call in6_multi_detach() here,
-		 * defer this task to the timer routine.
-		 */
+		  
+                                               
+                                              
+                                                   
+                                                   
+                                                  
+                                          
+     
 		if (mli->mli_version == MLD_VERSION_2 &&
 		    inm->in6m_state == MLD_LEAVING_MEMBER) {
 			VERIFY(inm->in6m_nrelecnt != 0);
@@ -2476,13 +2476,13 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 
 		switch (mli->mli_version) {
 		case MLD_VERSION_1:
-			/*
-			 * If a delay was provided, only use it if
-			 * it is greater than the delay normally
-			 * used for an MLDv1 state change report,
-			 * and delay sending the initial MLDv1 report
-			 * by not transitioning to the IDLE state.
-			 */
+			  
+                                             
+                                           
+                                            
+                                                
+                                             
+      
 			odelay = MLD_RANDOM_DELAY(MLD_V1_MAX_RI);
 			if (delay) {
 				inm->in6m_timer = max(delay, odelay);
@@ -2503,18 +2503,18 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 			break;
 
 		case MLD_VERSION_2:
-			/*
-			 * Defer update of T0 to T1, until the first copy
-			 * of the state change has been transmitted.
-			 */
+			  
+                                                    
+                                               
+      
 			syncstates = 0;
 
-			/*
-			 * Immediately enqueue a State-Change Report for
-			 * this interface, freeing any previous reports.
-			 * Don't kick the timers if there is nothing to do,
-			 * or if an error occurred.
-			 */
+			  
+                                                   
+                                                   
+                                                      
+                              
+      
 			ifq = &inm->in6m_scq;
 			IF_DRAIN(ifq);
 			retval = mld_v2_enqueue_group_record(ifq, inm, 1,
@@ -2527,15 +2527,15 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 				break;
 			}
 
-			/*
-			 * Schedule transmission of pending state-change
-			 * report up to RV times for this link. The timer
-			 * will fire at the next mld_timeout (1 second)),
-			 * giving us an opportunity to merge the reports.
-			 *
-			 * If a delay was provided to this function, only
-			 * use this delay if sooner than the existing one.
-			 */
+			  
+                                                   
+                                                    
+                                                    
+                                                    
+     
+                                                    
+                                                     
+      
 			VERIFY(mli->mli_rv > 1);
 			inm->in6m_scrv = (uint16_t)mli->mli_rv;
 			if (delay) {
@@ -2555,11 +2555,11 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 	}
 	MLI_UNLOCK(mli);
 
-	/*
-	 * Only update the T0 state if state change is atomic,
-	 * i.e. we don't need to wait for a timer to fire before we
-	 * can consider the state change to have been communicated.
-	 */
+	  
+                                                       
+                                                            
+                                                            
+    
 	if (syncstates) {
 		in6m_commit(inm);
 		MLD_PRINTF(("%s: T1 -> T0 for %s/%s\n", __func__,
@@ -2570,9 +2570,9 @@ mld_initial_join(struct in6_multi *inm, struct mld_ifinfo *mli,
 	return error;
 }
 
-/*
- * Issue an intermediate state change during the life-cycle.
- */
+  
+                                                            
+   
 static int
 mld_handle_state_change(struct in6_multi *inm, struct mld_ifinfo *mli,
     struct mld_tparams *mtp)
@@ -2625,10 +2625,10 @@ mld_handle_state_change(struct in6_multi *inm, struct mld_ifinfo *mli,
 		retval = 0;
 	}
 
-	/*
-	 * If record(s) were enqueued, start the state-change
-	 * report timer for this group.
-	 */
+	  
+                                                      
+                                
+    
 	inm->in6m_scrv = (uint16_t)mli->mli_rv;
 	inm->in6m_sctimer = 1;
 	mtp->sct = 1;
@@ -2638,14 +2638,14 @@ done:
 	return retval;
 }
 
-/*
- * Perform the final leave for a multicast address.
- *
- * When leaving a group:
- *  MLDv1 sends a DONE message, if and only if we are the reporter.
- *  MLDv2 enqueues a state-change report containing a transition
- *  to INCLUDE {} for immediate transmission.
- */
+  
+                                                   
+  
+                        
+                                                                   
+                                                                
+                                             
+   
 static void
 mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
     struct mld_tparams *mtp)
@@ -2665,7 +2665,7 @@ mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
 	case MLD_NOT_MEMBER:
 	case MLD_SILENT_MEMBER:
 	case MLD_LEAVING_MEMBER:
-		/* Already leaving or left; do nothing. */
+		                                          
 		MLD_PRINTF(("%s: not kicking state machine for silent group\n",
 		    __func__));
 		break;
@@ -2679,9 +2679,9 @@ mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
 			    inm->in6m_state == MLD_SG_QUERY_PENDING_MEMBER) {
 				panic("%s: MLDv2 state reached, not MLDv2 "
 				    "mode\n", __func__);
-				/* NOTREACHED */
+				                
 			}
-			/* scheduler timer if enqueue is successful */
+			                                              
 			mtp->cst = (mld_v1_transmit_report(inm,
 			    MLD_LISTENER_DONE) == 0);
 
@@ -2690,12 +2690,12 @@ mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
 
 			inm->in6m_state = MLD_NOT_MEMBER;
 		} else if (mli->mli_version == MLD_VERSION_2) {
-			/*
-			 * Stop group timer and all pending reports.
-			 * Immediately enqueue a state-change report
-			 * TO_IN {} to be sent on the next timeout,
-			 * giving us an opportunity to merge reports.
-			 */
+			  
+                                               
+                                               
+                                              
+                                                
+      
 			IF_DRAIN(&inm->in6m_scq);
 			inm->in6m_timer = 0;
 			inm->in6m_scrv = (uint16_t)mli->mli_rv;
@@ -2709,12 +2709,12 @@ mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
 				inm->in6m_sctimer = 0;
 			} else {
 				int retval;
-				/*
-				 * Stick around in the in6_multihead list;
-				 * the final detach will be issued by
-				 * mld_v2_process_group_timers() when
-				 * the retransmit timer expires.
-				 */
+				  
+                                              
+                                         
+                                         
+                                    
+       
 				IN6M_ADDREF_LOCKED(inm);
 				VERIFY(inm->in6m_debug & IFD_ATTACHED);
 				inm->in6m_reqcnt++;
@@ -2741,7 +2741,7 @@ mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
 	case MLD_LAZY_MEMBER:
 	case MLD_SLEEPING_MEMBER:
 	case MLD_AWAKENING_MEMBER:
-		/* Our reports are suppressed; do nothing. */
+		                                             
 		break;
 	}
 
@@ -2757,33 +2757,33 @@ mld_final_leave(struct in6_multi *inm, struct mld_ifinfo *mli,
 	}
 }
 
-/*
- * Enqueue an MLDv2 group record to the given output queue.
- *
- * If is_state_change is zero, a current-state record is appended.
- * If is_state_change is non-zero, a state-change report is appended.
- *
- * If is_group_query is non-zero, an mbuf packet chain is allocated.
- * If is_group_query is zero, and if there is a packet with free space
- * at the tail of the queue, it will be appended to providing there
- * is enough free space.
- * Otherwise a new mbuf packet chain is allocated.
- *
- * If is_source_query is non-zero, each source is checked to see if
- * it was recorded for a Group-Source query, and will be omitted if
- * it is not both in-mode and recorded.
- *
- * If use_block_allow is non-zero, state change reports for initial join
- * and final leave, on an inclusive mode group with a source list, will be
- * rewritten to use the ALLOW_NEW and BLOCK_OLD record types, respectively.
- *
- * The function will attempt to allocate leading space in the packet
- * for the IPv6+ICMP headers to be prepended without fragmenting the chain.
- *
- * If successful the size of all data appended to the queue is returned,
- * otherwise an error code less than zero is returned, or zero if
- * no record(s) were appended.
- */
+  
+                                                           
+  
+                                                                  
+                                                                     
+  
+                                                                    
+                                                                      
+                                                                   
+                        
+                                                  
+  
+                                                                   
+                                                                   
+                                       
+  
+                                                                        
+                                                                          
+                                                                           
+  
+                                                                    
+                                                                           
+  
+                                                                        
+                                                                 
+                              
+   
 static int
 mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
     const int is_state_change, const int is_group_query,
@@ -2818,33 +2818,33 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 	type = MLD_DO_NOTHING;
 	mode = (uint8_t)inm->in6m_st[1].iss_fmode;
 
-	/*
-	 * If we did not transition out of ASM mode during t0->t1,
-	 * and there are no source nodes to process, we can skip
-	 * the generation of source records.
-	 */
+	  
+                                                           
+                                                         
+                                     
+    
 	if (inm->in6m_st[0].iss_asm > 0 && inm->in6m_st[1].iss_asm > 0 &&
 	    inm->in6m_nsrc == 0) {
 		record_has_sources = 0;
 	}
 
 	if (is_state_change) {
-		/*
-		 * Queue a state change record.
-		 * If the mode did not change, and there are non-ASM
-		 * listeners or source filters present,
-		 * we potentially need to issue two records for the group.
-		 * If there are ASM listeners, and there was no filter
-		 * mode transition of any kind, do nothing.
-		 *
-		 * If we are transitioning to MCAST_UNDEFINED, we need
-		 * not send any sources. A transition to/from this state is
-		 * considered inclusive with some special treatment.
-		 *
-		 * If we are rewriting initial joins/leaves to use
-		 * ALLOW/BLOCK, and the group's membership is inclusive,
-		 * we need to send sources in all cases.
-		 */
+		  
+                                 
+                                                      
+                                         
+                                                            
+                                                        
+                                             
+    
+                                                        
+                                                             
+                                                      
+    
+                                                    
+                                                          
+                                          
+     
 		if (mode != inm->in6m_st[0].iss_fmode) {
 			if (mode == MCAST_EXCLUDE) {
 				MLD_PRINTF(("%s: change to EXCLUDE\n",
@@ -2854,15 +2854,15 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 				MLD_PRINTF(("%s: change to INCLUDE\n",
 				    __func__));
 				if (use_block_allow) {
-					/*
-					 * XXX
-					 * Here we're interested in state
-					 * edges either direction between
-					 * MCAST_UNDEFINED and MCAST_INCLUDE.
-					 * Perhaps we should just check
-					 * the group state, rather than
-					 * the filter mode.
-					 */
+					  
+           
+                                      
+                                      
+                                          
+                                    
+                                    
+                        
+        
 					if (mode == MCAST_UNDEFINED) {
 						type = MLD_BLOCK_OLD_SOURCES;
 					} else {
@@ -2883,9 +2883,9 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 			}
 		}
 	} else {
-		/*
-		 * Queue a current state record.
-		 */
+		  
+                                  
+     
 		if (mode == MCAST_EXCLUDE) {
 			type = MLD_MODE_IS_EXCLUDE;
 		} else if (mode == MCAST_INCLUDE) {
@@ -2894,9 +2894,9 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 		}
 	}
 
-	/*
-	 * Generate the filter list changes using a separate function.
-	 */
+	  
+                                                               
+    
 	if (is_filter_list_change) {
 		return mld_v2_enqueue_filter_change(ifq, inm);
 	}
@@ -2908,11 +2908,11 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 		return 0;
 	}
 
-	/*
-	 * If any sources are present, we must be able to fit at least
-	 * one in the trailing space of the tail packet's mbuf,
-	 * ideally more.
-	 */
+	  
+                                                               
+                                                        
+                 
+    
 	minrec0len = sizeof(struct mldv2_record);
 	if (record_has_sources) {
 		minrec0len += sizeof(struct in6_addr);
@@ -2922,14 +2922,14 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 	    ip6_sprintf(&inm->in6m_addr),
 	    if_name(inm->in6m_ifp)));
 
-	/*
-	 * Check if we have a packet in the tail of the queue for this
-	 * group into which the first group record for this group will fit.
-	 * Otherwise allocate a new packet.
-	 * Always allocate leading space for IP6+RA+ICMPV6+REPORT.
-	 * Note: Group records for G/GSR query responses MUST be sent
-	 * in their own packet.
-	 */
+	  
+                                                               
+                                                                    
+                                    
+                                                           
+                                                              
+                        
+    
 	m0 = ifq->ifq_tail;
 	if (!is_group_query &&
 	    m0 != NULL &&
@@ -2964,10 +2964,10 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 		MLD_PRINTF(("%s: allocated first packet\n", __func__));
 	}
 
-	/*
-	 * Append group record.
-	 * If we have sources, we don't know how many yet.
-	 */
+	  
+                        
+                                                   
+    
 	mr.mr_type = type;
 	mr.mr_datalen = 0;
 	mr.mr_numsrc = 0;
@@ -2982,22 +2982,22 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 	}
 	nbytes += sizeof(struct mldv2_record);
 
-	/*
-	 * Append as many sources as will fit in the first packet.
-	 * If we are appending to a new packet, the chain allocation
-	 * may potentially use clusters; use m_getptr() in this case.
-	 * If we are appending to an existing packet, we need to obtain
-	 * a pointer to the group record after m_append(), in case a new
-	 * mbuf was allocated.
-	 *
-	 * Only append sources which are in-mode at t1. If we are
-	 * transitioning to MCAST_UNDEFINED state on the group, and
-	 * use_block_allow is zero, do not include source entries.
-	 * Otherwise, we need to include this source in the report.
-	 *
-	 * Only report recorded sources in our filter set when responding
-	 * to a group-source query.
-	 */
+	  
+                                                           
+                                                             
+                                                              
+                                                                
+                                                                 
+                       
+   
+                                                          
+                                                            
+                                                           
+                                                            
+   
+                                                                  
+                            
+    
 	if (record_has_sources) {
 		if (m == m0) {
 			md = m_last(m);
@@ -3056,9 +3056,9 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 		return 0;
 	}
 
-	/*
-	 * We are good to go with first packet.
-	 */
+	  
+                                        
+    
 	if (m != m0) {
 		MLD_PRINTF(("%s: enqueueing first packet\n", __func__));
 		m->m_pkthdr.vt_nrecs = 1;
@@ -3066,18 +3066,18 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 	} else {
 		m->m_pkthdr.vt_nrecs++;
 	}
-	/*
-	 * No further work needed if no source list in packet(s).
-	 */
+	  
+                                                          
+    
 	if (!record_has_sources) {
 		return nbytes;
 	}
 
-	/*
-	 * Whilst sources remain to be announced, we need to allocate
-	 * a new packet and fill out as many sources as will fit.
-	 * Always try for a cluster first.
-	 */
+	  
+                                                              
+                                                          
+                                   
+    
 	while (nims != NULL) {
 		if (IF_QFULL(ifq)) {
 			MLD_PRINTF(("%s: outbound queue full\n", __func__));
@@ -3149,39 +3149,39 @@ mld_v2_enqueue_group_record(struct ifqueue *ifq, struct in6_multi *inm,
 	return nbytes;
 }
 
-/*
- * Type used to mark record pass completion.
- * We exploit the fact we can cast to this easily from the
- * current filter modes on each ip_msource node.
- */
+  
+                                            
+                                                          
+                                                
+   
 typedef enum {
-	REC_NONE = 0x00,        /* MCAST_UNDEFINED */
-	REC_ALLOW = 0x01,       /* MCAST_INCLUDE */
-	REC_BLOCK = 0x02,       /* MCAST_EXCLUDE */
+	REC_NONE = 0x00,                             
+	REC_ALLOW = 0x01,                          
+	REC_BLOCK = 0x02,                          
 	REC_FULL = REC_ALLOW | REC_BLOCK
 } rectype_t;
 
-/*
- * Enqueue an MLDv2 filter list change to the given output queue.
- *
- * Source list filter state is held in an RB-tree. When the filter list
- * for a group is changed without changing its mode, we need to compute
- * the deltas between T0 and T1 for each source in the filter set,
- * and enqueue the appropriate ALLOW_NEW/BLOCK_OLD records.
- *
- * As we may potentially queue two record types, and the entire R-B tree
- * needs to be walked at once, we break this out into its own function
- * so we can generate a tightly packed queue of packets.
- *
- * XXX This could be written to only use one tree walk, although that makes
- * serializing into the mbuf chains a bit harder. For now we do two walks
- * which makes things easier on us, and it may or may not be harder on
- * the L2 cache.
- *
- * If successful the size of all data appended to the queue is returned,
- * otherwise an error code less than zero is returned, or zero if
- * no record(s) were appended.
- */
+  
+                                                                 
+  
+                                                                       
+                                                                       
+                                                                  
+                                                           
+  
+                                                                        
+                                                                      
+                                                        
+  
+                                                                           
+                                                                         
+                                                                      
+                
+  
+                                                                        
+                                                                 
+                              
+   
 static int
 mld_v2_enqueue_filter_change(struct ifqueue *ifq, struct in6_multi *inm)
 {
@@ -3204,27 +3204,27 @@ mld_v2_enqueue_filter_change(struct ifqueue *ifq, struct in6_multi *inm)
 		return 0;
 	}
 
-	ifp = inm->in6m_ifp;                    /* interface */
-	mode = (uint8_t)inm->in6m_st[1].iss_fmode;       /* filter mode at t1 */
-	crt = REC_NONE; /* current group record type */
-	drt = REC_NONE; /* mask of completed group record types */
-	nrt = REC_NONE; /* record type for current node */
-	m0srcs = 0;     /* # source which will fit in current mbuf chain */
-	npbytes = 0;    /* # of bytes appended this packet */
-	nbytes = 0;     /* # of bytes appended to group's state-change queue */
-	rsrcs = 0;      /* # sources encoded in current record */
-	schanged = 0;   /* # nodes encoded in overall filter change */
-	nallow = 0;     /* # of source entries in ALLOW_NEW */
-	nblock = 0;     /* # of source entries in BLOCK_OLD */
-	nims = NULL;    /* next tree node pointer */
+	ifp = inm->in6m_ifp;                                   
+	mode = (uint8_t)inm->in6m_st[1].iss_fmode;                              
+	crt = REC_NONE;                                
+	drt = REC_NONE;                                           
+	nrt = REC_NONE;                                   
+	m0srcs = 0;                                                        
+	npbytes = 0;                                         
+	nbytes = 0;                                                            
+	rsrcs = 0;                                               
+	schanged = 0;                                                 
+	nallow = 0;                                           
+	nblock = 0;                                           
+	nims = NULL;                                
 
-	/*
-	 * For each possible filter record mode.
-	 * The first kind of source we encounter tells us which
-	 * is the first kind of record we start appending.
-	 * If a node transitioned to UNDEFINED at t1, its mode is treated
-	 * as the inverse of the group's filter mode.
-	 */
+	  
+                                         
+                                                        
+                                                   
+                                                                  
+                                              
+    
 	while (drt != REC_FULL) {
 		do {
 			m0 = ifq->ifq_tail;
@@ -3258,13 +3258,13 @@ mld_v2_enqueue_filter_change(struct ifqueue *ifq, struct in6_multi *inm)
 				MLD_PRINTF(("%s: allocated new packet\n",
 				    __func__));
 			}
-			/*
-			 * Append the MLD group record header to the
-			 * current packet's data area.
-			 * Recalculate pointer to free space for next
-			 * group record, in case m_append() allocated
-			 * a new mbuf or cluster.
-			 */
+			  
+                                               
+                                 
+                                                
+                                                
+                            
+      
 			memset(&mr, 0, sizeof(mr));
 			mr.mr_addr = inm->in6m_addr;
 			in6_clearscope(&mr.mr_addr);
@@ -3278,27 +3278,27 @@ mld_v2_enqueue_filter_change(struct ifqueue *ifq, struct in6_multi *inm)
 			}
 			npbytes += sizeof(struct mldv2_record);
 			if (m != m0) {
-				/* new packet; offset in chain */
+				                                 
 				md = m_getptr(m, npbytes -
 				    sizeof(struct mldv2_record), &off);
 				pmr = (struct mldv2_record *)(mtod(md,
 				    uint8_t *) + off);
 			} else {
-				/* current packet; offset from last append */
+				                                             
 				md = m_last(m);
 				pmr = (struct mldv2_record *)(mtod(md,
 				    uint8_t *) + md->m_len -
 				    sizeof(struct mldv2_record));
 			}
-			/*
-			 * Begin walking the tree for this record type
-			 * pass, or continue from where we left off
-			 * previously if we had to allocate a new packet.
-			 * Only report deltas in-mode at t1.
-			 * We need not report included sources as allowed
-			 * if we are in inclusive mode on the group,
-			 * however the converse is not true.
-			 */
+			  
+                                                 
+                                              
+                                                    
+                                       
+                                                    
+                                               
+                                       
+      
 			rsrcs = 0;
 			if (nims == NULL) {
 				nims = RB_MIN(ip6_msource_tree,
@@ -3346,10 +3346,10 @@ mld_v2_enqueue_filter_change(struct ifqueue *ifq, struct in6_multi *inm)
 					break;
 				}
 			}
-			/*
-			 * If we did not append any tree nodes on this
-			 * pass, back out of allocations.
-			 */
+			  
+                                                 
+                                    
+      
 			if (rsrcs == 0) {
 				npbytes -= sizeof(struct mldv2_record);
 				if (m != m0) {
@@ -3371,10 +3371,10 @@ mld_v2_enqueue_filter_change(struct ifqueue *ifq, struct in6_multi *inm)
 				pmr->mr_type = MLD_BLOCK_OLD_SOURCES;
 			}
 			pmr->mr_numsrc = htons((uint16_t)rsrcs);
-			/*
-			 * Count the new group record, and enqueue this
-			 * packet if it wasn't already queued.
-			 */
+			  
+                                                  
+                                         
+      
 			m->m_pkthdr.vt_nrecs++;
 			if (m != m0) {
 				IF_ENQUEUE(ifq, m);
@@ -3395,9 +3395,9 @@ static int
 mld_v2_merge_state_changes(struct in6_multi *inm, struct ifqueue *ifscq)
 {
 	struct ifqueue  *gq;
-	struct mbuf     *m;             /* pending state-change */
-	struct mbuf     *m0;            /* copy of pending state-change */
-	struct mbuf     *mt;            /* last state-change in packet */
+	struct mbuf     *m;                                       
+	struct mbuf     *m0;                                              
+	struct mbuf     *mt;                                             
 	struct mbuf     *n;
 	int              docopy, domerge;
 	u_int            recslen;
@@ -3408,10 +3408,10 @@ mld_v2_merge_state_changes(struct in6_multi *inm, struct ifqueue *ifscq)
 	domerge = 0;
 	recslen = 0;
 
-	/*
-	 * If there are further pending retransmissions, make a writable
-	 * copy of each queued state-change message before merging.
-	 */
+	  
+                                                                 
+                                                            
+    
 	if (inm->in6m_scrv > 0) {
 		docopy = 1;
 	}
@@ -3424,20 +3424,20 @@ mld_v2_merge_state_changes(struct in6_multi *inm, struct ifqueue *ifscq)
 	}
 #endif
 
-	/*
-	 * Use IF_REMQUEUE() instead of IF_DEQUEUE() below, since the
-	 * packet might not always be at the head of the ifqueue.
-	 */
+	  
+                                                              
+                                                          
+    
 	m = gq->ifq_head;
 	while (m != NULL) {
-		/*
-		 * Only merge the report into the current packet if
-		 * there is sufficient space to do so; an MLDv2 report
-		 * packet may only contain 65,535 group records.
-		 * Always use a simple mbuf chain concatentation to do this,
-		 * as large state changes for single groups may have
-		 * allocated clusters.
-		 */
+		  
+                                                     
+                                                        
+                                                  
+                                                              
+                                                      
+                        
+     
 		domerge = 0;
 		mt = ifscq->ifq_tail;
 		if (mt != NULL) {
@@ -3489,7 +3489,7 @@ mld_v2_merge_state_changes(struct in6_multi *inm, struct ifqueue *ifscq)
 			    (uint64_t)VM_KERNEL_ADDRPERM(ifscq)));
 			IF_ENQUEUE(ifscq, m0);
 		} else {
-			struct mbuf *mtl;       /* last mbuf of packet mt */
+			struct mbuf *mtl;                                   
 
 			MLD_PRINTF(("%s: merging 0x%llx with ifscq tail "
 			    "0x%llx)\n", __func__,
@@ -3509,9 +3509,9 @@ mld_v2_merge_state_changes(struct in6_multi *inm, struct ifqueue *ifscq)
 	return 0;
 }
 
-/*
- * Respond to a pending MLDv2 General Query.
- */
+  
+                                            
+   
 static uint32_t
 mld_v2_dispatch_general_query(struct mld_ifinfo *mli)
 {
@@ -3567,9 +3567,9 @@ next:
 	mld_dispatch_queue_locked(mli, &mli->mli_gq, MLD_MAX_RESPONSE_BURST);
 	MLI_LOCK_ASSERT_HELD(mli);
 
-	/*
-	 * Slew transmission of bursts over 1 second intervals.
-	 */
+	  
+                                                        
+    
 	if (mli->mli_gq.ifq_head != NULL) {
 		mli->mli_v2_timer = 1 + MLD_RANDOM_DELAY(
 			MLD_RESPONSE_BURST_INTERVAL);
@@ -3578,11 +3578,11 @@ next:
 	return mli->mli_v2_timer;
 }
 
-/*
- * Transmit the next pending message in the output queue.
- *
- * Must not be called with in6m_lockm or mli_lock held.
- */
+  
+                                                         
+  
+                                                       
+   
 static void
 mld_dispatch_packet(struct mbuf *m)
 {
@@ -3600,9 +3600,9 @@ mld_dispatch_packet(struct mbuf *m)
 	MLD_PRINTF(("%s: transmit 0x%llx\n", __func__,
 	    (uint64_t)VM_KERNEL_ADDRPERM(m)));
 
-	/*
-	 * Check if the ifnet is still attached.
-	 */
+	  
+                                         
+    
 	ifp = mld_restore_context(m);
 	if (ifp == NULL || !ifnet_is_attached(ifp, 0)) {
 		MLD_PRINTF(("%s: dropped 0x%llx as ifindex %u went away.\n",
@@ -3630,9 +3630,9 @@ mld_dispatch_packet(struct mbuf *m)
 		if (m0 == NULL) {
 			MLD_PRINTF(("%s: dropped 0x%llx\n", __func__,
 			    (uint64_t)VM_KERNEL_ADDRPERM(m)));
-			/*
-			 * mld_v2_encap_report() has already freed our mbuf.
-			 */
+			  
+                                                       
+      
 			IM6O_REMREF(im6o);
 			ip6stat.ip6s_odropped++;
 			return;
@@ -3646,19 +3646,19 @@ mld_dispatch_packet(struct mbuf *m)
 	ip6 = mtod(m0, struct ip6_hdr *);
 	(void)in6_setscope(&ip6->ip6_dst, ifp, NULL);
 
-	/*
-	 * Retrieve the ICMPv6 type before handoff to ip6_output(),
-	 * so we can bump the stats.
-	 */
+	  
+                                                            
+                             
+    
 	md = m_getptr(m0, sizeof(struct ip6_hdr), &off);
 	mld = (struct mld_hdr *)(mtod(md, uint8_t *) + off);
 	type = mld->mld_type;
 
 	if (ifp->if_eflags & IFEF_TXSTART) {
-		/*
-		 * Use control service class if the outgoing
-		 * interface supports transmit-start model.
-		 */
+		  
+                                              
+                                             
+     
 		(void) m_set_service_class(m0, MBUF_SC_CTL);
 	}
 
@@ -3692,15 +3692,15 @@ mld_dispatch_packet(struct mbuf *m)
 	}
 }
 
-/*
- * Encapsulate an MLDv2 report.
- *
- * KAME IPv6 requires that hop-by-hop options be passed separately,
- * and that the IPv6 header be prepended in a separate mbuf.
- *
- * Returns a pointer to the new mbuf chain head, or NULL if the
- * allocation failed.
- */
+  
+                               
+  
+                                                                   
+                                                            
+  
+                                                               
+                     
+   
 static struct mbuf *
 mld_v2_encap_report(struct ifnet *ifp, struct mbuf *m)
 {
@@ -3712,9 +3712,9 @@ mld_v2_encap_report(struct ifnet *ifp, struct mbuf *m)
 
 	VERIFY(m->m_flags & M_PKTHDR);
 
-	/*
-	 * RFC3590: OK to send as :: or tentative during DAD.
-	 */
+	  
+                                                      
+    
 	ia = in6ifa_ifpforlinklocal(ifp, IN6_IFF_NOTREADY | IN6_IFF_ANYCAST);
 	if (ia == NULL) {
 		MLD_PRINTF(("%s: warning: ia is NULL\n", __func__));
@@ -3752,7 +3752,7 @@ mld_v2_encap_report(struct ifnet *ifp, struct mbuf *m)
 		ia = NULL;
 	}
 	ip6->ip6_dst = in6addr_linklocal_allv2routers;
-	/* scope ID will be set in netisr */
+	                                    
 
 	mld = (struct mldv2_report *)(ip6 + 1);
 	mld->mld_type = MLDV2_LISTENER_REPORT;
@@ -3798,7 +3798,7 @@ mld_init(void)
 {
 	MLD_PRINTF(("%s: initializing\n", __func__));
 
-	/* Setup lock group and attribute for mld_mtx */
+	                                                
 	mld_mtx_grp_attr = lck_grp_attr_alloc_init();
 	mld_mtx_grp = lck_grp_alloc_init("mld_mtx\n", mld_mtx_grp_attr);
 	mld_mtx_attr = lck_attr_alloc_init();

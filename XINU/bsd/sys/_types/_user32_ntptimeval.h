@@ -36,5 +36,5 @@ _STRUCT_USER32_NTPTIMEVAL
 	user32_long_t tai;
 	__int32_t time_state;
 };
-#endif /* _STRUCT_USER32_NTPTIMEVAL */
-#endif /* KERNEL */
+#endif                                
+#endif             

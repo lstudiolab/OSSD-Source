@@ -28,19 +28,19 @@
 
 #include "SYS.h"
 
-/*
- * A third argument, of type uint64_t*, was added to the gettimeofday syscall
- * for use cases that also want to know the mach_absolute_time that matches the
- * time value returned.
- *
- * __gettimeofday takes the traditional two arguments.  It will zero out the
- * third argument argument before entering the kernel, behaving like the old
- * call.
- *
- * __gettimeofday_with_mach will pass it through and supporting kernels will
- * copy-out the mach_absolute_time.  Old kernels will leave the pointed to
- * value alone.
- */
+  
+                                                                             
+                                                                               
+                       
+  
+                                                                            
+                                                                            
+        
+  
+                                                                            
+                                                                          
+               
+   
 
 .private_extern ___gettimeofday_with_mach
 
@@ -56,11 +56,11 @@ LABEL(___gettimeofday)
 
 LABEL(___gettimeofday_with_mach)
     UNIX_SYSCALL_INT_NONAME(gettimeofday,0)
-    /*
-     * <rdar://problem/26410029>
-     * If eax is 0, we're on a new kernel and timeval was written by the kernel.
-     * Otherwise, eax:edx contains the timeval and we marshal into timeval.
-     */
+      
+                                
+                                                                                
+                                                                           
+       
     cmp     $0, %eax
     je      2f
     mov     4(%esp),%ecx
@@ -75,14 +75,14 @@ LABEL(___gettimeofday_with_mach)
 __SYSCALL(___gettimeofday_with_mach, gettimeofday, 3)
 
 LABEL(___gettimeofday)
-    movq   $0x0, %rdx // zero out third argument
+    movq   $0x0, %rdx                           
 
     UNIX_SYSCALL_NONAME(gettimeofday,0,cerror_nocancel)
-    /*
-     * <rdar://problem/26410029>
-     * If rax is 0, we're on a new kernel and timeval was written by the kernel.
-     * Otherwise, rax:rdx contains the timeval and we marshal into timeval.
-     */
+      
+                                
+                                                                                
+                                                                           
+       
     cmp     $0, %rax
     je      2f
     movq    %rax, (%rdi)

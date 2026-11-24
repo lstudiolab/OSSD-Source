@@ -33,4 +33,4 @@ void systrace_args(int sysnum, void *params, uint64_t *uarg);
 void systrace_entry_setargdesc(int sysnum, int ndx, char *desc, size_t descsz);
 void systrace_return_setargdesc(int sysnum, int ndx, char *desc, size_t descsz);
 
-#endif /* _SYS_SYSTRACE_ARGS_H */
+#endif                           

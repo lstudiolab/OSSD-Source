@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * This header file is kept for legacy reasons and may be removed in
- * future; the supported interface resides in <libkern/crypto/sha1.h>.
- */
+  
+                                                                    
+                                                                      
+   
 #include <libkern/crypto/sha1.h>

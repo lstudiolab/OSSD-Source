@@ -31,7 +31,7 @@
 
 #include <kperf/context.h>
 
-/* legacy thread info */
+                        
 struct kperf_thread_info {
 	uint64_t kpthi_pid;
 	uint64_t kpthi_tid;
@@ -43,10 +43,10 @@ void kperf_thread_info_sample(struct kperf_thread_info *,
     struct kperf_context *);
 void kperf_thread_info_log(struct kperf_thread_info *);
 
-// legacy names
+               
 #define kpthsc_requested_qos_ipc_override kpthsc_requested_qos_kevent_override
 
-/* scheduling information */
+                            
 struct kperf_thread_scheduling {
 	uint64_t kpthsc_user_time;
 	uint64_t kpthsc_system_time;
@@ -59,7 +59,7 @@ struct kperf_thread_scheduling {
 	    kpthsc_requested_qos_override :3,
 	    kpthsc_requested_qos_promote :3,
 	    kpthsc_requested_qos_kevent_override :3,
-	    kpthsc_requested_qos_sync_ipc_override :3,             /* obsolete */
+	    kpthsc_requested_qos_sync_ipc_override :3,                           
 	    kpthsc_effective_latency_qos :3;
 };
 
@@ -67,7 +67,7 @@ void kperf_thread_scheduling_sample(struct kperf_thread_scheduling *,
     struct kperf_context *);
 void kperf_thread_scheduling_log(struct kperf_thread_scheduling *);
 
-/* thread snapshot information */
+                                 
 struct kperf_thread_snapshot {
 	uint64_t kpthsn_last_made_runnable_time;
 	int16_t kpthsn_suspend_count;
@@ -79,7 +79,7 @@ void kperf_thread_snapshot_sample(struct kperf_thread_snapshot *,
     struct kperf_context *);
 void kperf_thread_snapshot_log(struct kperf_thread_snapshot *);
 
-/* libdispatch information */
+                             
 struct kperf_thread_dispatch {
 	uint64_t kpthdi_dq_serialno;
 };
@@ -91,4 +91,4 @@ void kperf_thread_dispatch_log(struct kperf_thread_dispatch *);
 
 void kperf_thread_inscyc_log(struct kperf_context *);
 
-#endif /* !defined(KPERF_THREAD_SAMPLERS_H) */
+#endif                                        

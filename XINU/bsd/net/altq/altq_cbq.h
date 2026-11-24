@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$NetBSD: altq_cbq.h,v 1.8 2006/10/12 19:59:08 peter Exp $	*/
-/*	$KAME: altq_cbq.h,v 1.12 2003/10/03 05:05:15 kjc Exp $	*/
+                                                               
+                                                            
 
 /*
  * Copyright (c) Sun Microsystems, Inc. 1993-1998 All rights reserved.
@@ -66,4 +66,4 @@
 #include <net/altq/altq.h>
 #include <net/pktsched/pktsched_cbq.h>
 
-#endif /* !_NET_ALTQ_ALTQ_CBQ_H_ */
+#endif                             

@@ -36,21 +36,21 @@
 
 #include <mach/message.h>
 
-#else /* !PLATFORM_DriverKit */
+#else                          
 
 #ifndef _MACH_MESSAGE_H_
 #define _MACH_MESSAGE_H_
 
-#define MACH_MSG_TYPE_MOVE_RECEIVE      16      /* Must hold receive right */
-#define MACH_MSG_TYPE_MOVE_SEND         17      /* Must hold send right(s) */
-#define MACH_MSG_TYPE_MOVE_SEND_ONCE    18      /* Must hold sendonce right */
-#define MACH_MSG_TYPE_COPY_SEND         19      /* Must hold send right(s) */
-#define MACH_MSG_TYPE_MAKE_SEND         20      /* Must hold receive right */
-#define MACH_MSG_TYPE_MAKE_SEND_ONCE    21      /* Must hold receive right */
-#define MACH_MSG_TYPE_COPY_RECEIVE      22      /* NOT VALID */
-#define MACH_MSG_TYPE_DISPOSE_RECEIVE   24      /* must hold receive right */
-#define MACH_MSG_TYPE_DISPOSE_SEND      25      /* must hold send right(s) */
-#define MACH_MSG_TYPE_DISPOSE_SEND_ONCE 26      /* must hold sendonce right */
+#define MACH_MSG_TYPE_MOVE_RECEIVE      16                                   
+#define MACH_MSG_TYPE_MOVE_SEND         17                                   
+#define MACH_MSG_TYPE_MOVE_SEND_ONCE    18                                    
+#define MACH_MSG_TYPE_COPY_SEND         19                                   
+#define MACH_MSG_TYPE_MAKE_SEND         20                                   
+#define MACH_MSG_TYPE_MAKE_SEND_ONCE    21                                   
+#define MACH_MSG_TYPE_COPY_RECEIVE      22                     
+#define MACH_MSG_TYPE_DISPOSE_RECEIVE   24                                   
+#define MACH_MSG_TYPE_DISPOSE_SEND      25                                   
+#define MACH_MSG_TYPE_DISPOSE_SEND_ONCE 26                                    
 
 #define MACH_MSG_TYPE_PORT_NONE         0
 
@@ -72,10 +72,10 @@ typedef unsigned int mach_msg_descriptor_type_t;
 #if KERNEL
 typedef void * mach_port_t;
 #define MACH_PORT_NULL  NULL
-#else /* !KERNEL */
+#else              
 typedef natural_t mach_port_t;
 #define MACH_PORT_NULL  0
-#endif /* !KERNEL */
+#endif              
 
 typedef natural_t mach_port_name_t;
 
@@ -101,7 +101,7 @@ typedef struct{
 typedef struct{
 	mach_port_t                   name;
 #if !(defined(KERNEL) && defined(__LP64__))
-// Pad to 8 bytes everywhere except the K64 kernel where mach_port_t is 8 bytes
+                                                                               
 	mach_msg_size_t               pad1;
 #endif
 	unsigned int                  pad2 : 16;
@@ -135,13 +135,13 @@ typedef struct{
 
 #pragma pack(pop)
 
-#endif  /* _MACH_MESSAGE_H_ */
+#endif                        
 
-#endif /* PLATFORM_DriverKit */
+#endif                         
 
 #if KERNEL
 class IOUserServer;
-#endif /* KERNEL */
+#endif             
 
 typedef uint64_t OSObjectRef;
 
@@ -155,7 +155,7 @@ enum {
 
 	kIORPCVersionCurrent      = kIORPCVersion190615,
 	kIORPCVersionCurrentReply = kIORPCVersion190615Reply
-#endif /* DRIVERKIT_PRIVATE */
+#endif                        
 };
 
 enum{
@@ -250,4 +250,4 @@ struct OSClassDescription {
 	char        metaMethodNames[0];
 };
 
-#endif /* _IORPC_H */
+#endif               

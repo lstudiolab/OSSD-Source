@@ -53,12 +53,12 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- * Setjmp/longjmp buffer for ARM.
- */
+  
+                                 
+   
 #ifndef _ARM_SETJMP_H_
 #define _ARM_SETJMP_H_
 
@@ -66,4 +66,4 @@ typedef struct jmp_buf {
 	int   jmp_buf[28];
 } jmp_buf_t;
 
-#endif  /* _ARM_SETJMP_H_ */
+#endif                      

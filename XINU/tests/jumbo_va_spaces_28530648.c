@@ -11,13 +11,13 @@ T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
 #define GB (1ULL * 1024 * 1024 * 1024)
 
-/*
- * This test expects the entitlement to be the enabling factor for a process to
- * allocate at least this many GB of VA space. i.e. with the entitlement, n GB
- * must be allocatable; whereas without it, it must be less.
- * This value was determined experimentally to fit on applicable devices and to
- * be clearly distinguishable from the default VA limit.
- */
+  
+                                                                               
+                                                                              
+                                                            
+                                                                               
+                                                        
+   
 #define ALLOC_TEST_GB 53
 
 T_DECL(TESTNAME,

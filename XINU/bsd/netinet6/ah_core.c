@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*	$FreeBSD: src/sys/netinet6/ah_core.c,v 1.2.2.4 2001/07/03 11:01:49 ume Exp $	*/
-/*	$KAME: ah_core.c,v 1.44 2001/03/12 11:24:39 itojun Exp $	*/
+                                                                                  
+                                                              
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -58,11 +58,11 @@
  * SUCH DAMAGE.
  */
 
-/*
- * RFC1826/2402 authentication header.
- */
+  
+                                      
+   
 
-/* TODO: have shared routines  for hmac-* algorithms */
+                                                       
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -147,7 +147,7 @@ static int ah_hmac_sha2_512_init(struct ah_algorithm_state *,
     struct secasvar *);
 static void ah_hmac_sha2_512_loop(struct ah_algorithm_state *, caddr_t, size_t);
 static void ah_hmac_sha2_512_result(struct ah_algorithm_state *, caddr_t, size_t);
-#endif /* AH_ALL_CRYPTO */
+#endif                    
 
 static void ah_update_mbuf(struct mbuf *, int, int,
     const struct ah_algorithm *, struct ah_algorithm_state *);
@@ -155,7 +155,7 @@ static void ah_update_mbuf(struct mbuf *, int, int,
 const struct ah_algorithm *
 ah_algorithm_lookup(int idx)
 {
-	/* checksum algorithms */
+	                         
 	static const struct ah_algorithm hmac_md5 =
 	{ ah_sumsiz_1216, ah_hmac_md5_mature, 128, 128, "hmac-md5",
 	  ah_hmac_md5_init, ah_hmac_md5_loop,
@@ -191,7 +191,7 @@ ah_algorithm_lookup(int idx)
 	  "hmac-sha2-512",
 	  ah_hmac_sha2_512_init, ah_hmac_sha2_512_loop,
 	  ah_hmac_sha2_512_result, };
-#endif /* AH_ALL_CRYPTO */
+#endif                    
 
 	switch (idx) {
 	case SADB_AALG_MD5HMAC:
@@ -211,7 +211,7 @@ ah_algorithm_lookup(int idx)
 		return &hmac_sha2_384;
 	case SADB_X_AALG_SHA2_512:
 		return &hmac_sha2_512;
-#endif /* AH_ALL_CRYPTO */
+#endif                    
 	default:
 		return NULL;
 	}
@@ -280,7 +280,7 @@ static int
 ah_keyed_md5_mature(
 	__unused struct secasvar *sav)
 {
-	/* anything is okay */
+	                      
 	return 0;
 }
 
@@ -307,11 +307,11 @@ ah_keyed_md5_init(struct ah_algorithm_state *state, struct secasvar *sav)
 		    (u_int8_t *)_KEYBUF(state->sav->key_auth),
 		    (u_int)_KEYLEN(state->sav->key_auth));
 
-		/*
-		 * Pad after the key.
-		 * We cannot simply use md5_pad() since the function
-		 * won't update the total length.
-		 */
+		  
+                       
+                                                      
+                                   
+     
 		if (_KEYLEN(state->sav->key_auth) < 56) {
 			padlen = 64 - 8 - _KEYLEN(state->sav->key_auth);
 		} else {
@@ -425,9 +425,9 @@ ah_keyed_sha1_init(struct ah_algorithm_state *state, struct secasvar *sav)
 		SHA1Update(ctxt, (u_int8_t *)_KEYBUF(state->sav->key_auth),
 		    (u_int)_KEYLEN(state->sav->key_auth));
 
-		/*
-		 * Pad after the key.
-		 */
+		  
+                       
+     
 		if (_KEYLEN(state->sav->key_auth) < 56) {
 			padlen = 64 - 8 - _KEYLEN(state->sav->key_auth);
 		} else {
@@ -475,7 +475,7 @@ ah_keyed_sha1_loop(struct ah_algorithm_state *state, caddr_t addr, size_t len)
 static void
 ah_keyed_sha1_result(struct ah_algorithm_state *state, caddr_t addr, size_t l)
 {
-	u_char digest[SHA1_RESULTLEN] __attribute__((aligned(4)));      /* SHA-1 generates 160 bits */
+	u_char digest[SHA1_RESULTLEN] __attribute__((aligned(4)));                                    
 	SHA1_CTX *ctxt;
 
 	if (!state || !state->foo) {
@@ -545,7 +545,7 @@ ah_hmac_md5_init(struct ah_algorithm_state *state, struct secasvar *sav)
 	opad = (u_char *)(ipad + 64);
 	ctxt = (MD5_CTX *)(void *)(opad + 64);
 
-	/* compress the key if necessery */
+	                                   
 	if (64 < _KEYLEN(state->sav->key_auth)) {
 		MD5Init(ctxt);
 		MD5Update(ctxt, _KEYBUF(state->sav->key_auth),
@@ -647,7 +647,7 @@ ah_hmac_sha1_init(struct ah_algorithm_state *state, struct secasvar *sav)
 	u_char *ipad;
 	u_char *opad;
 	SHA1_CTX *ctxt;
-	u_char tk[SHA1_RESULTLEN] __attribute__((aligned(4)));  /* SHA-1 generates 160 bits */
+	u_char tk[SHA1_RESULTLEN] __attribute__((aligned(4)));                                
 	u_char *key;
 	size_t keylen;
 	size_t i;
@@ -667,7 +667,7 @@ ah_hmac_sha1_init(struct ah_algorithm_state *state, struct secasvar *sav)
 	opad = (u_char *)(ipad + 64);
 	ctxt = (SHA1_CTX *)(void *)(opad + 64);
 
-	/* compress the key if necessery */
+	                                   
 	if (64 < _KEYLEN(state->sav->key_auth)) {
 		SHA1Init(ctxt);
 		SHA1Update(ctxt, _KEYBUF(state->sav->key_auth),
@@ -711,7 +711,7 @@ ah_hmac_sha1_loop(struct ah_algorithm_state *state, caddr_t addr, size_t len)
 static void
 ah_hmac_sha1_result(struct ah_algorithm_state *state, caddr_t addr, size_t l)
 {
-	u_char digest[SHA1_RESULTLEN] __attribute__((aligned(4)));      /* SHA-1 generates 160 bits */
+	u_char digest[SHA1_RESULTLEN] __attribute__((aligned(4)));                                    
 	u_char *ipad;
 	u_char *opad;
 	SHA1_CTX *ctxt;
@@ -743,8 +743,8 @@ ah_sumsiz_sha2_256(struct secasvar *sav)
 	if (!sav) {
 		return -1;
 	}
-	// return half the output size (in bytes), as per rfc 4868
-	return 16; // 256/(8*2)
+	                                                          
+	return 16;             
 }
 
 static int
@@ -802,7 +802,7 @@ ah_hmac_sha2_256_init(struct ah_algorithm_state *state, struct secasvar *sav)
 	opad = (u_char *)(ipad + 64);
 	ctxt = (SHA256_CTX *)(void *)(opad + 64);
 
-	/* compress the key if necessery */
+	                                   
 	if (64 < _KEYLEN(state->sav->key_auth)) {
 		bzero(tk, sizeof(tk));
 		bzero(ctxt, sizeof(*ctxt));
@@ -884,8 +884,8 @@ ah_sumsiz_sha2_384(struct secasvar *sav)
 	if (!sav) {
 		return -1;
 	}
-	// return half the output size (in bytes), as per rfc 4868
-	return 24; // 384/(8*2)
+	                                                          
+	return 24;             
 }
 
 static int
@@ -943,7 +943,7 @@ ah_hmac_sha2_384_init(struct ah_algorithm_state *state, struct secasvar *sav)
 	opad = (u_char *)(ipad + 128);
 	ctxt = (SHA384_CTX *)(void *)(opad + 128);
 
-	/* compress the key if necessery */
+	                                   
 	if (128 < _KEYLEN(state->sav->key_auth)) {
 		bzero(tk, sizeof(tk));
 		bzero(ctxt, sizeof(*ctxt));
@@ -1025,8 +1025,8 @@ ah_sumsiz_sha2_512(struct secasvar *sav)
 	if (!sav) {
 		return -1;
 	}
-	// return half the output size (in bytes), as per rfc 4868
-	return 32; // 512/(8*2)
+	                                                          
+	return 32;             
 }
 
 static int
@@ -1084,7 +1084,7 @@ ah_hmac_sha2_512_init(struct ah_algorithm_state *state, struct secasvar *sav)
 	opad = (u_char *)(ipad + 128);
 	ctxt = (SHA512_CTX *)(void *)(opad + 128);
 
-	/* compress the key if necessery */
+	                                   
 	if (128 < _KEYLEN(state->sav->key_auth)) {
 		bzero(tk, sizeof(tk));
 		bzero(ctxt, sizeof(*ctxt));
@@ -1159,13 +1159,13 @@ ah_hmac_sha2_512_result(struct ah_algorithm_state *state,
 
 	FREE(state->foo, M_TEMP);
 }
-#endif /* AH_ALL_CRYPTO */
+#endif                    
 
-/*------------------------------------------------------------*/
+                                                                
 
-/*
- * go generate the checksum.
- */
+  
+                            
+   
 static void
 ah_update_mbuf(struct mbuf *m, int off, int len,
     const struct ah_algorithm *algo,
@@ -1174,7 +1174,7 @@ ah_update_mbuf(struct mbuf *m, int off, int len,
 	struct mbuf *n;
 	int tlen;
 
-	/* easy case first */
+	                     
 	if (off + len <= m->m_len) {
 		(algo->update)(algos, mtod(m, caddr_t) + off, len);
 		return;
@@ -1192,7 +1192,7 @@ ah_update_mbuf(struct mbuf *m, int off, int len,
 		panic("ah_update_mbuf: wrong offset specified");
 	}
 
-	for (/*nothing*/; n && len > 0; n = n->m_next) {
+	for (           ; n && len > 0; n = n->m_next) {
 		if (n->m_len == 0) {
 			continue;
 		}
@@ -1210,13 +1210,13 @@ ah_update_mbuf(struct mbuf *m, int off, int len,
 }
 
 #if INET
-/*
- * Go generate the checksum. This function won't modify the mbuf chain
- * except AH itself.
- *
- * NOTE: the function does not free mbuf on failure.
- * Don't use m_copy(), it will try to share cluster mbuf by using refcnt.
- */
+  
+                                                                      
+                    
+  
+                                                    
+                                                                         
+   
 int
 ah4_calccksum(struct mbuf *m, caddr_t ahdat, size_t len,
     const struct ah_algorithm *algo, struct secasvar *sav)
@@ -1235,7 +1235,7 @@ ah4_calccksum(struct mbuf *m, caddr_t ahdat, size_t len,
 	}
 
 	ahseen = 0;
-	hdrtype = -1;   /*dummy, it is called IPPROTO_IP*/
+	hdrtype = -1;                                     
 
 	off = 0;
 
@@ -1244,17 +1244,17 @@ ah4_calccksum(struct mbuf *m, caddr_t ahdat, size_t len,
 		return error;
 	}
 
-	advancewidth = 0;       /*safety*/
+	advancewidth = 0;                 
 
 again:
-	/* gory. */
+	           
 	switch (hdrtype) {
-	case -1:        /*first one only*/
+	case -1:                          
 	{
-		/*
-		 * copy ip hdr, modify to fit the AH checksum rule,
-		 * then take a checksum.
-		 */
+		  
+                                                     
+                          
+     
 		struct ip iphdr;
 		size_t hlen;
 
@@ -1295,10 +1295,10 @@ again:
 			VERIFY(hlen <= INT_MAX);
 			m_copydata(m, off, (int)hlen, mtod(n, caddr_t));
 
-			/*
-			 * IP options processing.
-			 * See RFC2402 appendix A.
-			 */
+			  
+                            
+                             
+      
 			p = mtod(n, u_char *);
 			i = sizeof(struct ip);
 			while (i < hlen) {
@@ -1328,11 +1328,11 @@ again:
 					l = 1;
 					skip = 0;
 					break;
-				case IPOPT_SECURITY:    /* 0x82 */
-				case 0x85:      /* Extended security */
-				case 0x86:      /* Commercial security */
-				case 0x94:      /* Router alert */
-				case 0x95:      /* RFC1770 */
+				case IPOPT_SECURITY:              
+				case 0x85:                             
+				case 0x86:                               
+				case 0x94:                        
+				case 0x95:                   
 					l = p[i + IPOPT_OLEN];
 					if (l < 2) {
 						goto invalopt;
@@ -1392,9 +1392,9 @@ invalopt:
 		siz = (*algo->sumsiz)(sav);
 		totlen = (ah.ah_len + 2) << 2;
 
-		/*
-		 * special treatment is necessary for the first one, not others
-		 */
+		  
+                                                                 
+     
 		if (!ahseen) {
 			if (totlen > m->m_pkthdr.len - off ||
 			    totlen > MCLBYTES) {
@@ -1461,13 +1461,13 @@ fail:
 }
 #endif
 
-/*
- * Go generate the checksum. This function won't modify the mbuf chain
- * except AH itself.
- *
- * NOTE: the function does not free mbuf on failure.
- * Don't use m_copy(), it will try to share cluster mbuf by using refcnt.
- */
+  
+                                                                      
+                    
+  
+                                                    
+                                                                         
+   
 int
 ah6_calccksum(struct mbuf *m, caddr_t ahdat, size_t len,
     const struct ah_algorithm *algo, struct secasvar *sav)
@@ -1508,9 +1508,9 @@ again:
 
 	switch (proto) {
 	case IPPROTO_IPV6:
-		/*
-		 * special treatment is necessary for the first one, not others
-		 */
+		  
+                                                                 
+     
 		if (off == 0) {
 			struct ip6_hdr ip6copy;
 
@@ -1520,7 +1520,7 @@ again:
 			}
 
 			m_copydata(m, off, newoff - off, (caddr_t)&ip6copy);
-			/* RFC2402 */
+			             
 			ip6copy.ip6_flow = 0;
 			ip6copy.ip6_vfc &= ~IPV6_VERSION_MASK;
 			ip6copy.ip6_vfc |= IPV6_VERSION;
@@ -1550,9 +1550,9 @@ again:
 		    : sizeof(struct newah);
 		siz = (*algo->sumsiz)(sav);
 
-		/*
-		 * special treatment is necessary for the first one, not others
-		 */
+		  
+                                                                 
+     
 		if (!ahseen) {
 			if (newoff - off > MCLBYTES) {
 				error = EMSGSIZE;
@@ -1620,12 +1620,12 @@ again:
 		p = mtod(n, u_int8_t *);
 		optend = p + hdrlen;
 
-		/*
-		 * ICV calculation for the options header including all
-		 * options.  This part is a little tricky since there are
-		 * two type of options; mutable and immutable.  We try to
-		 * null-out mutable ones here.
-		 */
+		  
+                                                         
+                                                           
+                                                           
+                                
+     
 		optp = p + 2;
 		while (optp < optend) {
 			if (optp[0] == IP6OPT_PAD1) {
@@ -1660,13 +1660,13 @@ again:
 	}
 
 	case IPPROTO_ROUTING:
-	/*
-	 * For an input packet, we can just calculate `as is'.
-	 * For an output packet, we assume ip6_output have already
-	 * made packet how it will be received at the final
-	 * destination.
-	 */
-	/* FALLTHROUGH */
+	  
+                                                       
+                                                           
+                                                    
+                
+    
+	                 
 
 	default:
 		ah_update_mbuf(m, off, newoff - off, algo, &algos);
@@ -1687,13 +1687,13 @@ again:
 	(algo->result)(&algos, (caddr_t) &sumbuf[0], sizeof(sumbuf));
 	bcopy(&sumbuf[0], ahdat, (*algo->sumsiz)(sav));
 
-	/* just in case */
+	                  
 	if (n) {
 		m_free(n);
 	}
 	return 0;
 fail:
-	/* just in case */
+	                  
 	if (n) {
 		m_free(n);
 	}

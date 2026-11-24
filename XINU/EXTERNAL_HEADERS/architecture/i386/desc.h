@@ -36,9 +36,9 @@
  *	Created.
  */
  
-/*
- * Code segment descriptor.
- */
+  
+                           
+   
 
 typedef struct code_desc {
     unsigned short	limit00;
@@ -61,9 +61,9 @@ typedef struct code_desc {
     unsigned char	base24;
 } code_desc_t;
  
-/*
- * Data segment descriptor.
- */
+  
+                           
+   
 
 typedef struct data_desc {
     unsigned short	limit00;
@@ -83,9 +83,9 @@ typedef struct data_desc {
     unsigned char	base24;
 } data_desc_t;
 
-/*
- * LDT segment descriptor.
- */
+  
+                          
+   
 
 typedef struct ldt_desc {
     unsigned short	limit00;
@@ -103,9 +103,9 @@ typedef struct ldt_desc {
 
 #include <architecture/i386/sel.h>
 
-/*
- * Call gate descriptor.
- */
+  
+                        
+   
  
 typedef struct call_gate {
     unsigned short	offset00;
@@ -119,9 +119,9 @@ typedef struct call_gate {
 			offset16:16;
 } call_gate_t;
 
-/*
- * Trap gate descriptor.
- */
+  
+                        
+   
  
 typedef struct trap_gate {
     unsigned short	offset00;
@@ -135,9 +135,9 @@ typedef struct trap_gate {
 } trap_gate_t;
 
 
-/*
- * Interrupt gate descriptor.
- */
+  
+                             
+   
  
 typedef struct intr_gate {
     unsigned short	offset00;

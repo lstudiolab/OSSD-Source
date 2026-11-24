@@ -58,21 +58,21 @@
 
 #if MONOTONIC
 #include <machine/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #include <machine/pal_routines.h>
 
-/*
- * Data structures referenced (anonymously) from per-cpu data:
- */
+  
+                                                              
+   
 struct cpu_cons_buffer;
 struct cpu_desc_table;
 struct mca_state;
 struct prngContext;
 
-/*
- * Data structures embedded in per-cpu data:
- */
+  
+                                            
+   
 typedef struct rtclock_timer {
 	mpqueue_head_t          queue;
 	uint64_t                deadline;
@@ -81,7 +81,7 @@ typedef struct rtclock_timer {
 } rtclock_timer_t;
 
 typedef struct {
-	/* The 'u' suffixed fields store the double-mapped descriptor addresses */
+	                                                                          
 	struct x86_64_tss       *cdi_ktssu;
 	struct x86_64_tss       *cdi_ktssb;
 	x86_64_desc_register_t  cdi_gdtu;
@@ -95,20 +95,20 @@ typedef struct {
 } cpu_desc_index_t;
 
 typedef enum {
-	TASK_MAP_32BIT,                 /* 32-bit user, compatibility mode */
-	TASK_MAP_64BIT,                 /* 64-bit user thread, shared space */
+	TASK_MAP_32BIT,                                                      
+	TASK_MAP_64BIT,                                                       
 } task_map_t;
 
 
-/*
- * This structure is used on entry into the (uber-)kernel on syscall from
- * a 64-bit user. It contains the address of the machine state save area
- * for the current thread and a temporary place to save the user's rsp
- * before loading this address into rsp.
- */
+  
+                                                                         
+                                                                        
+                                                                      
+                                        
+   
 typedef struct {
-	addr64_t        cu_isf;         /* thread->pcb->iss.isf */
-	uint64_t        cu_tmp;         /* temporary scratch */
+	addr64_t        cu_isf;                                   
+	uint64_t        cu_tmp;                                
 	addr64_t        cu_user_gs_base;
 } cpu_uber_t;
 
@@ -147,11 +147,11 @@ typedef struct {
 } iotrace_entry_t;
 
 typedef struct {
-	int             vector;                 /* Vector number of interrupt */
-	thread_t        curthread;              /* Current thread at the time of the interrupt */
+	int             vector;                                                 
+	thread_t        curthread;                                                               
 	uint64_t        interrupted_pc;
-	int             curpl;                  /* Current preemption level */
-	int             curil;                  /* Current interrupt level */
+	int             curpl;                                                
+	int             curil;                                               
 	uint64_t        start_time_abs;
 	uint64_t        duration;
 	uint64_t        backtrace[MAX_TRACE_BTFRAMES];
@@ -173,21 +173,21 @@ extern int traptrace_generators;
 extern int traptrace_entries_per_cpu;
 extern int *traptrace_next;
 extern traptrace_entry_t **traptrace_ring;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
-/*
- * Per-cpu data.
- *
- * Each processor has a per-cpu data area which is dereferenced through the
- * current_cpu_datap() macro. For speed, the %gs segment is based here, and
- * using this, inlines provides single-instruction access to frequently used
- * members - such as get_cpu_number()/cpu_number(), and get_active_thread()/
- * current_thread().
- *
- * Cpu data owned by another processor can be accessed using the
- * cpu_datap(cpu_number) macro which uses the cpu_data_ptr[] array of per-cpu
- * pointers.
- */
+  
+                
+  
+                                                                           
+                                                                           
+                                                                            
+                                                                            
+                    
+  
+                                                                
+                                                                             
+            
+   
 typedef struct {
 	pcid_t                  cpu_pcid_free_hint;
 #define PMAP_PCID_MAX_PCID      (0x800)
@@ -196,34 +196,34 @@ typedef struct {
 } pcid_cdata_t;
 
 typedef struct cpu_data {
-	struct pal_cpu_data     cpu_pal_data;           /* PAL-specific data */
-#define                         cpu_pd cpu_pal_data     /* convenience alias */
-	struct cpu_data         *cpu_this;              /* pointer to myself */
+	struct pal_cpu_data     cpu_pal_data;                                  
+#define                         cpu_pd cpu_pal_data                            
+	struct cpu_data         *cpu_this;                                     
 	vm_offset_t             cpu_pcpu_base;
 	thread_t                cpu_active_thread;
 	thread_t                cpu_nthread;
-	int                     cpu_number;             /* Logical CPU */
-	void                    *cpu_int_state;         /* interrupt state */
-	vm_offset_t             cpu_active_stack;       /* kernel stack base */
-	vm_offset_t             cpu_kernel_stack;       /* kernel stack top */
+	int                     cpu_number;                              
+	void                    *cpu_int_state;                              
+	vm_offset_t             cpu_active_stack;                              
+	vm_offset_t             cpu_kernel_stack;                             
 	vm_offset_t             cpu_int_stack_top;
-	volatile int            cpu_signals;            /* IPI events */
-	volatile int            cpu_prior_signals;      /* Last set of events,
-	                                                 * debugging
-	                                                 */
+	volatile int            cpu_signals;                            
+	volatile int            cpu_prior_signals;                            
+                                                             
+                                                    
 	ast_t                   cpu_pending_ast;
-	/*
-	 * Note if rearranging fields:
-	 * We want cpu_preemption_level on a different
-	 * cache line than cpu_active_thread
-	 * for optimizing mtx_spin phase.
-	 */
+	  
+                               
+                                               
+                                     
+                                  
+    
 	int                     cpu_interrupt_level;
 	volatile int            cpu_preemption_level;
 	volatile int            cpu_running;
 #if !MONOTONIC
 	boolean_t               cpu_fixed_pmcs_enabled;
-#endif /* !MONOTONIC */
+#endif                 
 	rtclock_timer_t         rtclock_timer;
 	volatile addr64_t       cpu_active_cr3 __attribute((aligned(64)));
 	union {
@@ -241,14 +241,14 @@ typedef struct cpu_data {
 	volatile addr64_t       cpu_shadowtask_cr3;
 	boolean_t               cpu_pagezero_mapped;
 	cpu_uber_t              cpu_uber;
-/* Double-mapped per-CPU exception stack address */
+                                                   
 	uintptr_t               cd_estack;
 	int                     cpu_xstate;
 	int                     cpu_curtask_has_ldt;
 	int                     cpu_curthread_do_segchk;
-/* Address of shadowed, partially mirrored CPU data structures located
- * in the double mapped PML4
- */
+                                                                      
+                            
+   
 	void                    *cd_shadow;
 	union {
 		volatile uint32_t cpu_tlb_invalid_count;
@@ -268,21 +268,21 @@ typedef struct cpu_data {
 	int                     cpu_ldt;
 
 #define HWINTCNT_SIZE 256
-	uint32_t                cpu_hwIntCnt[HWINTCNT_SIZE];    /* Interrupt counts */
+	uint32_t                cpu_hwIntCnt[HWINTCNT_SIZE];                          
 	uint64_t                cpu_hwIntpexits[HWINTCNT_SIZE];
-	uint64_t                cpu_dr7; /* debug control register */
-	uint64_t                cpu_int_event_time;     /* intr entry/exit time */
-	pal_rtc_nanotime_t      *cpu_nanotime;          /* Nanotime info */
+	uint64_t                cpu_dr7;                             
+	uint64_t                cpu_int_event_time;                               
+	pal_rtc_nanotime_t      *cpu_nanotime;                             
 #if KPC
-	/* double-buffered performance counter data */
+	                                              
 	uint64_t                *cpu_kpc_buf[2];
-	/* PMC shadow and reload value buffers */
+	                                         
 	uint64_t                *cpu_kpc_shadow;
 	uint64_t                *cpu_kpc_reload;
 #endif
 #if MONOTONIC
 	struct mt_cpu cpu_monotonic;
-#endif /* MONOTONIC */
+#endif                
 	uint32_t                cpu_pmap_pcid_enabled;
 	pcid_t                  cpu_active_pcid;
 	pcid_t                  cpu_last_pcid;
@@ -303,39 +303,39 @@ typedef struct cpu_data {
 	uint64_t                cpu_rtime_total;
 	uint64_t                cpu_ixtime;
 	uint64_t                cpu_idle_exits;
-	/*
-	 * Note that the cacheline-copy mechanism uses the cpu_rtimes field in the shadow CPU
-	 * structures to temporarily stash the code cacheline that includes the instruction
-	 * pointer at the time of the fault (this field is otherwise unused in the shadow
-	 * CPU structures).
-	 */
+	  
+                                                                                      
+                                                                                    
+                                                                                  
+                    
+    
 	uint64_t                cpu_rtimes[CPU_RTIME_BINS];
 	uint64_t                cpu_itimes[CPU_ITIME_BINS];
 #if !MONOTONIC
 	uint64_t                cpu_cur_insns;
 	uint64_t                cpu_cur_ucc;
 	uint64_t                cpu_cur_urc;
-#endif /* !MONOTONIC */
+#endif                 
 	uint64_t                cpu_gpmcs[4];
 	uint64_t                cpu_max_observed_int_latency;
 	int                     cpu_max_observed_int_latency_vector;
 	volatile boolean_t      cpu_NMI_acknowledged;
 	uint64_t                debugger_entry_time;
 	uint64_t                debugger_ipi_time;
-	/* A separate nested interrupt stack flag, to account
-	 * for non-nested interrupts arriving while on the interrupt stack
-	 * Currently only occurs when AICPM enables interrupts on the
-	 * interrupt stack during processor offlining.
-	 */
+	                                                     
+                                                                   
+                                                              
+                                               
+    
 	uint32_t                cpu_nested_istack;
 	uint32_t                cpu_nested_istack_events;
 	x86_saved_state64_t     *cpu_fatal_trap_state;
 	x86_saved_state64_t     *cpu_post_fatal_trap_state;
 #if CONFIG_VMX
-	vmx_cpu_t               cpu_vmx;                /* wonderful world of virtualization */
+	vmx_cpu_t               cpu_vmx;                                                       
 #endif
 #if CONFIG_MCA
-	struct mca_state        *cpu_mca_state;         /* State at MC fault */
+	struct mca_state        *cpu_mca_state;                                
 #endif
 	int                     cpu_type;
 	int                     cpu_subtype;
@@ -350,8 +350,8 @@ typedef struct cpu_data {
 #endif
 	void                    *cpu_console_buf;
 	struct x86_lcpu         lcpu;
-	int                     cpu_phys_number;        /* Physical CPU */
-	cpu_id_t                cpu_id;                 /* Platform Expert */
+	int                     cpu_phys_number;                          
+	cpu_id_t                cpu_id;                                      
 #if DEBUG
 	uint64_t                cpu_entry_cr3;
 	uint64_t                cpu_exit_cr3;
@@ -359,7 +359,7 @@ typedef struct cpu_data {
 #endif
 	boolean_t               cpu_rendezvous_in_progress;
 #if CST_DEMOTION_DEBUG
-	/* Count of thread wakeups issued by this processor */
+	                                                      
 	uint64_t                cpu_wakeups_issued_total;
 #endif
 #if DEBUG || DEVELOPMENT
@@ -369,13 +369,13 @@ typedef struct cpu_data {
 
 extern cpu_data_t       *cpu_data_ptr[];
 
-/*
- * __SEG_GS marks %gs-relative operations:
- *   https://clang.llvm.org/docs/LanguageExtensions.html#memory-references-to-specified-segments
- *   https://gcc.gnu.org/onlinedocs/gcc/Named-Address-Spaces.html#x86-Named-Address-Spaces
- */
+  
+                                          
+                                                                                                
+                                                                                          
+   
 #if defined(__SEG_GS)
-// __seg_gs exists
+                  
 #elif defined(__clang__)
 #define __seg_gs __attribute__((address_space(256)))
 #else
@@ -384,28 +384,28 @@ extern cpu_data_t       *cpu_data_ptr[];
 
 #define CPU_DATA()            ((cpu_data_t __seg_gs *)0UL)
 
-/*
- * Everyone within the osfmk part of the kernel can use the fast
- * inline versions of these routines.  Everyone outside, must call
- * the real thing,
- */
+  
+                                                                
+                                                                  
+                  
+   
 
 
-/*
- * The "volatile" flavor of current_thread() is intended for use by
- * scheduler code which may need to update the thread pointer in the
- * course of a context switch.  Any call to current_thread() made
- * prior to the thread pointer update should be safe to optimize away
- * as it should be consistent with that thread's state to the extent
- * the compiler can reason about it.  Likewise, the context switch
- * path will eventually result in an arbitrary branch to the new
- * thread's pc, about which the compiler won't be able to reason.
- * Thus any compile-time optimization of current_thread() calls made
- * within the new thread should be safely encapsulated in its
- * register/stack state.  The volatile form therefore exists to cover
- * the window between the thread pointer update and the branch to
- * the new pc.
- */
+  
+                                                                   
+                                                                    
+                                                                 
+                                                                     
+                                                                    
+                                                                  
+                                                                
+                                                                 
+                                                                    
+                                                             
+                                                                     
+                                                                 
+              
+   
 static inline thread_t
 get_active_thread_volatile(void)
 {
@@ -456,33 +456,33 @@ current_cpu_datap(void)
 	return CPU_DATA()->cpu_this;
 }
 
-/*
- * Facility to diagnose preemption-level imbalances, which are otherwise
- * challenging to debug. On each operation that enables or disables preemption,
- * we record a backtrace into a per-CPU ring buffer, along with the current
- * preemption level and operation type. Thus, if an imbalance is observed,
- * one can examine these per-CPU records to determine which codepath failed
- * to re-enable preemption, enabled premption without a corresponding
- * disablement etc. The backtracer determines which stack is currently active,
- * and uses that to perform bounds checks on unterminated stacks.
- * To enable, sysctl -w machdep.pltrace=1 on DEVELOPMENT or DEBUG kernels (DRK '15)
- * The bounds check currently doesn't account for non-default thread stack sizes.
- */
+  
+                                                                        
+                                                                               
+                                                                           
+                                                                          
+                                                                           
+                                                                     
+                                                                              
+                                                                 
+                                                                                   
+                                                                                 
+   
 #if DEVELOPMENT || DEBUG
 static inline void
 rbtrace_bt(uint64_t *rets, int maxframes, cpu_data_t *cdata, uint64_t frameptr, bool use_cursp)
 {
-	extern uint32_t         low_intstack[];         /* bottom */
-	extern uint32_t         low_eintstack[];        /* top */
+	extern uint32_t         low_intstack[];                     
+	extern uint32_t         low_eintstack[];                 
 	extern char             mp_slave_stack[];
 	int                     btidx = 0;
 
 	uint64_t kstackb, kstackt;
 
-	/* Obtain the 'current' program counter, initial backtrace
-	 * element. This will also indicate if we were unable to
-	 * trace further up the stack for some reason
-	 */
+	                                                          
+                                                         
+                                              
+    
 	if (use_cursp) {
 		__asm__ volatile ("leaq 1f(%%rip), %%rax; mov %%rax, %0\n1:"
                      : "=m" (rets[btidx++])
@@ -498,10 +498,10 @@ rbtrace_bt(uint64_t *rets, int maxframes, cpu_data_t *cdata, uint64_t frameptr, 
 		} else {
 			csp = frameptr;
 		}
-		/* Determine which stack we're on to populate stack bounds.
-		 * We don't need to trace across stack boundaries for this
-		 * routine.
-		 */
+		                                                           
+                                                            
+             
+     
 		kstackb = cdata->cpu_active_stack;
 		kstackt = kstackb + KERNEL_STACK_SIZE;
 		if (csp < kstackb || csp > kstackt) {
@@ -615,7 +615,7 @@ traptrace_start(int vecnum, uint64_t ipc, uint64_t sabs, uint64_t frameptr)
 	cdata = current_cpu_datap();
 	cpu_num = (unsigned int)cdata->cpu_number;
 	nextidx = (unsigned int)traptrace_next[cpu_num];
-	/* prevent nested interrupts from clobbering this record */
+	                                                           
 	traptrace_next[cpu_num] = (int)(((nextidx + 1) >= (unsigned int)traptrace_entries_per_cpu) ? 0 : (nextidx + 1));
 
 	cur_traptrace_ring = traptrace_ring[cpu_num];
@@ -646,7 +646,7 @@ traptrace_end(uint32_t index, uint64_t eabs)
 	}
 }
 
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 __header_always_inline void
 pltrace(boolean_t plenable)
@@ -765,4 +765,4 @@ cpu_shadowp(int cpu)
 extern cpu_data_t *cpu_data_alloc(boolean_t is_boot_cpu);
 extern void cpu_data_realloc(void);
 
-#endif  /* I386_CPU_DATA */
+#endif                     

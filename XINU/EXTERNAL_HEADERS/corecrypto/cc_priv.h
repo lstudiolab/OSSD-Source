@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Fork handlers for the stateful components of corecrypto.
+                                                           
 void cc_atfork_prepare(void);
 void cc_atfork_parent(void);
 void cc_atfork_child(void);
@@ -29,48 +29,48 @@ void cc_atfork_child(void);
 #define __DECONST(type, var) ((type)(uintptr_t)(const void *)(var))
 #endif
 
-/* defines the following macros :
+                                 
 
- CC_ARRAY_LEN: returns the number of elements in an array
+                                                         
 
- CC_STORE32_BE : store 32 bit value in big endian in unaligned buffer.
- CC_STORE32_LE : store 32 bit value in little endian in unaligned buffer.
- CC_STORE64_BE : store 64 bit value in big endian in unaligned buffer.
- CC_STORE64_LE : store 64 bit value in little endian in unaligned buffer.
+                                                                      
+                                                                         
+                                                                      
+                                                                         
 
- CC_LOAD32_BE : load 32 bit value in big endian from unaligned buffer.
- CC_LOAD32_LE : load 32 bit value in little endian from unaligned buffer.
- CC_LOAD64_BE : load 64 bit value in big endian from unaligned buffer.
- CC_LOAD64_LE : load 64 bit value in little endian from unaligned buffer.
+                                                                      
+                                                                         
+                                                                      
+                                                                         
 
- CC_ROR  : Rotate Right 32 bits. Rotate count can be a variable.
- CC_ROL  : Rotate Left 32 bits. Rotate count can be a variable.
- CC_RORc : Rotate Right 32 bits. Rotate count must be a constant.
- CC_ROLc : Rotate Left 32 bits. Rotate count must be a constant.
+                                                                
+                                                               
+                                                                 
+                                                                
 
- CC_ROR64  : Rotate Right 64 bits. Rotate count can be a variable.
- CC_ROL64  : Rotate Left 64 bits. Rotate count can be a variable.
- CC_ROR64c : Rotate Right 64 bits. Rotate count must be a constant.
- CC_ROL64c : Rotate Left 64 bits. Rotate count must be a constant.
+                                                                  
+                                                                 
+                                                                   
+                                                                  
 
- CC_BSWAP  : byte swap a 32 bits variable.
+                                          
 
- CC_H2BE32 : convert a 32 bits value between host and big endian order.
- CC_H2LE32 : convert a 32 bits value between host and little endian order.
+                                                                       
+                                                                          
 
- CC_BSWAP64  : byte swap a 64 bits variable
+                                           
 
- CC_READ_LE32 : read a 32 bits little endian value
+                                                  
 
- CC_WRITE_LE32 : write a 32 bits little endian value
- CC_WRITE_LE64 : write a 64 bits little endian value
+                                                    
+                                                    
 
- CC_H2BE64 : convert a 64 bits value between host and big endian order
- CC_H2LE64 : convert a 64 bits value between host and little endian order
+                                                                      
+                                                                         
 
-*/
+  
 
-// RTKitOSPlatform should replace CC_MEMCPY with memcpy
+                                                       
 #define CC_MEMCPY(D,S,L) cc_memcpy((D),(S),(L))
 #define CC_MEMMOVE(D,S,L) cc_memmove((D),(S),(L))
 #define CC_MEMSET(D,V,L) cc_memset((D),(V),(L))
@@ -97,11 +97,11 @@ void cc_atfork_child(void);
 
 #define CC_ARRAY_LEN(x) (sizeof((x))/sizeof((x)[0]))
 
-// MARK: - Loads and Store
+                          
 
-// MARK: -- 32 bits - little endian
+                                   
 
-// MARK: --- Default version
+                            
 
 #define	CC_STORE32_LE(x, y) do {                                    \
     ((unsigned char *)(y))[3] = (unsigned char)(((x)>>24)&255);		\
@@ -117,7 +117,7 @@ x = ((uint32_t)(((const unsigned char *)(y))[3] & 255)<<24) |			    \
     ((uint32_t)(((const unsigned char *)(y))[0] & 255));				    \
 } while(0)
 
-// MARK: -- 64 bits - little endian
+                                   
 
 #define	CC_STORE64_LE(x, y) do {                                    \
     ((unsigned char *)(y))[7] = (unsigned char)(((x)>>56)&255);     \
@@ -141,8 +141,8 @@ x = (((uint64_t)(((const unsigned char *)(y))[7] & 255))<<56) |           \
     (((uint64_t)(((const unsigned char *)(y))[0] & 255)));                \
 } while(0)
 
-// MARK: -- 32 bits - big endian
-// MARK: --- intel version
+                                
+                          
 
 #if (defined(__i386__) || defined(__x86_64__)) && !defined(_MSC_VER)
 
@@ -160,7 +160,7 @@ x = (((uint64_t)(((const unsigned char *)(y))[7] & 255))<<56) |           \
     :"=r"(x): "r"(y))
 
 #else
-// MARK: --- default version
+                            
 #define	CC_STORE32_BE(x, y) do {                                \
     ((unsigned char *)(y))[0] = (unsigned char)(((x)>>24)&255);	\
     ((unsigned char *)(y))[1] = (unsigned char)(((x)>>16)&255);	\
@@ -177,9 +177,9 @@ x = ((uint32_t)(((const unsigned char *)(y))[0] & 255)<<24) |	    \
 
 #endif
 
-// MARK: -- 64 bits - big endian
+                                
 
-// MARK: --- intel 64 bits version
+                                  
 
 #if defined(__x86_64__) && !defined (_MSC_VER)
 
@@ -198,7 +198,7 @@ __asm__ __volatile__ (        \
 
 #else
 
-// MARK: --- default version
+                            
 
 #define CC_STORE64_BE(x, y) do {                                    \
     ((unsigned char *)(y))[0] = (unsigned char)(((x)>>56)&255);		\
@@ -224,10 +224,10 @@ x = (((uint64_t)(((const unsigned char *)(y))[0] & 255))<<56) |           \
 
 #endif
 
-// MARK: - 32-bit Rotates
+                         
 
 #if defined(_MSC_VER)
-// MARK: -- MSVC version
+                        
 
 #include <stdlib.h>
 #if !defined(__clang__)
@@ -239,7 +239,7 @@ x = (((uint64_t)(((const unsigned char *)(y))[0] & 255))<<56) |           \
 #define	CC_ROLc(x,n) _lrotl(x,n)
 
 #elif (defined(__i386__) || defined(__x86_64__))
-// MARK: -- intel asm version
+                             
 
 CC_INLINE uint32_t CC_ROL(uint32_t word, int i)
 {
@@ -257,7 +257,7 @@ CC_INLINE uint32_t CC_ROR(uint32_t word, int i)
     return word;
 }
 
-/* Need to be a macro here, because 'i' is an immediate (constant) */
+                                                                     
 #define CC_ROLc(word, i)                \
 ({  uint32_t _word=(word);              \
     __asm__ __volatile__ ("roll %2,%0"  \
@@ -277,7 +277,7 @@ CC_INLINE uint32_t CC_ROR(uint32_t word, int i)
 
 #else
 
-// MARK: -- default version
+                           
 
 CC_INLINE uint32_t CC_ROL(uint32_t word, int i)
 {
@@ -294,10 +294,10 @@ CC_INLINE uint32_t CC_ROR(uint32_t word, int i)
 
 #endif
 
-// MARK: - 64 bits rotates
+                          
 
-#if defined(__x86_64__) && !defined(_MSC_VER) //clang _MSVC doesn't support GNU-style inline assembly
-// MARK: -- intel 64 asm version
+#if defined(__x86_64__) && !defined(_MSC_VER)                                                        
+                                
 
 CC_INLINE uint64_t CC_ROL64(uint64_t word, int i)
 {
@@ -315,7 +315,7 @@ CC_INLINE uint64_t CC_ROR64(uint64_t word, int i)
     return word;
 }
 
-/* Need to be a macro here, because 'i' is an immediate (constant) */
+                                                                     
 #define CC_ROL64c(word, i)      \
 ({                              \
     uint64_t _word=(word);      \
@@ -335,9 +335,9 @@ CC_INLINE uint64_t CC_ROR64(uint64_t word, int i)
 })
 
 
-#else /* Not x86_64  */
+#else                  
 
-// MARK: -- default C version
+                             
 
 CC_INLINE uint64_t CC_ROL64(uint64_t word, int i)
 {
@@ -355,7 +355,7 @@ CC_INLINE uint64_t CC_ROR64(uint64_t word, int i)
 #endif
 
 
-// MARK: - Byte Swaps
+                     
 
 #if __has_builtin(__builtin_bswap32)
 #define CC_BSWAP32(x) __builtin_bswap32(x)
@@ -426,52 +426,52 @@ do { \
 ((uint8_t *)(ptr))[7] = (uint8_t)(((x) >> 56) & 0xFF); \
 } while(0)
 
-/* extract a byte portably */
+                             
 #ifdef _MSC_VER
 #define cc_byte(x, n) ((unsigned char)((x) >> (8 * (n))))
 #else
 #define cc_byte(x, n) (((x) >> (8 * (n))) & 255)
 #endif
 
-/* Count leading zeros (for nonzero inputs) */
+                                              
 
-/*
- *  On i386 and x86_64, we know clang and GCC will generate BSR for
- *  __builtin_clzl.  This instruction IS NOT constant time on all micro-
- *  architectures, but it *is* constant time on all micro-architectures that
- *  have been used by Apple, and we expect that to continue to be the case.
- *
- *  When building for x86_64h with clang, this produces LZCNT, which is exactly
- *  what we want.
- *
- *  On arm and arm64, we know that clang and GCC generate the constant-time CLZ
- *  instruction from __builtin_clzl( ).
- */
+  
+                                                                   
+                                                                        
+                                                                            
+                                                                           
+  
+                                                                               
+                 
+  
+                                                                               
+                                       
+   
 
 #if defined(_WIN32)
-/* We use the Windows implementations below. */
+                                               
 #elif defined(__x86_64__) || defined(__i386__) || defined(__arm64__) || defined(__arm__)
-/* We use a thought-to-be-good version of __builtin_clz. */
+                                                           
 #elif defined __GNUC__
 #warning Using __builtin_clz() on an unknown architecture; it may not be constant-time.
-/* If you find yourself seeing this warning, file a radar for someone to
- * check whether or not __builtin_clz() generates a constant-time
- * implementation on the architecture you are targeting.  If it does, append
- * the name of that architecture to the list of "safe" architectures above.  */
+                                                                        
+                                                                 
+                                                                            
+                                                                               
 #endif
 
 CC_INLINE CC_CONST unsigned cc_clz32_fallback(uint32_t data)
 {
     unsigned int b = 0;
     unsigned int bit = 0;
-    // Work from LSB to MSB
+                           
     for (int i = 0; i < 32; i++) {
         bit = (data >> i) & 1;
-        // If the bit is 0, update the "leading bits are zero" counter "b".
+                                                                           
         b += (1 - bit);
-        /* If the bit is 0, (bit - 1) is 0xffff... therefore b is retained.
-         * If the bit is 1, (bit - 1) is 0 therefore b is set to 0.
-         */
+                                                                           
+                                                                   
+           
         b &= (bit - 1);
     }
     return b;
@@ -481,14 +481,14 @@ CC_INLINE CC_CONST unsigned cc_clz64_fallback(uint64_t data)
 {
     unsigned int b = 0;
     unsigned int bit = 0;
-    // Work from LSB to MSB
+                           
     for (int i = 0; i < 64; i++) {
         bit = (data >> i) & 1;
-        // If the bit is 0, update the "leading bits are zero" counter.
+                                                                       
         b += (1 - bit);
-        /* If the bit is 0, (bit - 1) is 0xffff... therefore b is retained.
-         * If the bit is 1, (bit - 1) is 0 therefore b is set to 0.
-         */
+                                                                           
+                                                                   
+           
         b &= (bit - 1);
     }
     return b;
@@ -498,14 +498,14 @@ CC_INLINE CC_CONST unsigned cc_ctz32_fallback(uint32_t data)
 {
     unsigned int b = 0;
     unsigned int bit = 0;
-    // Work from MSB to LSB
+                           
     for (int i = 31; i >= 0; i--) {
         bit = (data >> i) & 1;
-        // If the bit is 0, update the "trailing zero bits" counter.
+                                                                    
         b += (1 - bit);
-        /* If the bit is 0, (bit - 1) is 0xffff... therefore b is retained.
-         * If the bit is 1, (bit - 1) is 0 therefore b is set to 0.
-         */
+                                                                           
+                                                                   
+           
         b &= (bit - 1);
     }
     return b;
@@ -515,29 +515,29 @@ CC_INLINE CC_CONST unsigned cc_ctz64_fallback(uint64_t data)
 {
     unsigned int b = 0;
     unsigned int bit = 0;
-    // Work from MSB to LSB
+                           
     for (int i = 63; i >= 0; i--) {
         bit = (data >> i) & 1;
-        // If the bit is 0, update the "trailing zero bits" counter.
+                                                                    
         b += (1 - bit);
-        /* If the bit is 0, (bit - 1) is 0xffff... therefore b is retained.
-         * If the bit is 1, (bit - 1) is 0 therefore b is set to 0.
-         */
+                                                                           
+                                                                   
+           
         b &= (bit - 1);
     }
     return b;
 }
 
-/*!
-  @function cc_clz32
-  @abstract Count leading zeros of a nonzero 32-bit value
+   
+                    
+                                                         
 
-  @param data A nonzero 32-bit value
+                                    
 
-  @result Count of leading zeros of @p data
+                                           
 
-  @discussion @p data is assumed to be nonzero.
-*/
+                                               
+  
 CC_INLINE CC_CONST unsigned cc_clz32(uint32_t data) {
     cc_assert(data != 0);
 #if defined(_WIN32)
@@ -550,16 +550,16 @@ CC_INLINE CC_CONST unsigned cc_clz32(uint32_t data) {
 #endif
 }
 
-/*!
-  @function cc_clz64
-  @abstract Count leading zeros of a nonzero 64-bit value
+   
+                    
+                                                         
 
-  @param data A nonzero 64-bit value
+                                    
 
-  @result Count of leading zeros of @p data
+                                           
 
-  @discussion @p data is assumed to be nonzero.
-*/
+                                               
+  
 CC_INLINE CC_CONST unsigned cc_clz64(uint64_t data) {
     cc_assert(data != 0);
 #if defined(_WIN32)
@@ -571,16 +571,16 @@ CC_INLINE CC_CONST unsigned cc_clz64(uint64_t data) {
 #endif
 }
 
-/*!
-  @function cc_ctz32
-  @abstract Count trailing zeros of a nonzero 32-bit value
+   
+                    
+                                                          
 
-  @param data A nonzero 32-bit value
+                                    
 
-  @result Count of trailing zeros of @p data
+                                            
 
-  @discussion @p data is assumed to be nonzero.
-*/
+                                               
+  
 CC_INLINE CC_CONST unsigned cc_ctz32(uint32_t data) {
     cc_assert(data != 0);
 #if defined(_WIN32)
@@ -593,16 +593,16 @@ CC_INLINE CC_CONST unsigned cc_ctz32(uint32_t data) {
 #endif
 }
 
-/*!
-  @function cc_ctz64
-  @abstract Count trailing zeros of a nonzero 64-bit value
+   
+                    
+                                                          
 
-  @param data A nonzero 64-bit value
+                                    
 
-  @result Count of trailing zeros of @p data
+                                            
 
-  @discussion @p data is assumed to be nonzero.
-*/
+                                               
+  
 CC_INLINE CC_CONST unsigned cc_ctz64(uint64_t data) {
     cc_assert(data != 0);
 #if defined(_WIN32)
@@ -614,72 +614,72 @@ CC_INLINE CC_CONST unsigned cc_ctz64(uint64_t data) {
 #endif
 }
 
-/*!
-  @function cc_ffs32_fallback
-  @abstract Find first bit set in a 32-bit value
+   
+                             
+                                                
 
-  @param data A 32-bit value
+                            
 
-  @result One plus the index of the least-significant bit set in @p data or, if @p data is zero, zero
- */
+                                                                                                     
+   
 CC_INLINE CC_CONST unsigned cc_ffs32_fallback(int32_t data)
 {
     unsigned b = 0;
     unsigned bit = 0;
     unsigned seen = 0;
 
-    // Work from LSB to MSB
+                           
     for (int i = 0; i < 32; i++) {
         bit = ((uint32_t)data >> i) & 1;
 
-        // Track whether we've seen a 1 bit.
+                                            
         seen |= bit;
 
-        // If the bit is 0 and we haven't seen a 1 yet, increment b.
+                                                                    
         b += (1 - bit) & (seen - 1);
     }
 
-    // If we saw a 1, return b + 1, else 0.
+                                           
     return (~(seen - 1)) & (b + 1);
 }
 
-/*!
-  @function cc_ffs64_fallback
-  @abstract Find first bit set in a 64-bit value
+   
+                             
+                                                
 
-  @param data A 64-bit value
+                            
 
-  @result One plus the index of the least-significant bit set in @p data or, if @p data is zero, zero
- */
+                                                                                                     
+   
 CC_INLINE CC_CONST unsigned cc_ffs64_fallback(int64_t data)
 {
     unsigned b = 0;
     unsigned bit = 0;
     unsigned seen = 0;
 
-    // Work from LSB to MSB
+                           
     for (int i = 0; i < 64; i++) {
         bit = ((uint64_t)data >> i) & 1;
 
-        // Track whether we've seen a 1 bit.
+                                            
         seen |= bit;
 
-        // If the bit is 0 and we haven't seen a 1 yet, increment b.
+                                                                    
         b += (1 - bit) & (seen - 1);
     }
 
-    // If we saw a 1, return b + 1, else 0.
+                                           
     return (~(seen - 1)) & (b + 1);
 }
 
-/*!
-  @function cc_ffs32
-  @abstract Find first bit set in a 32-bit value
+   
+                    
+                                                
 
-  @param data A 32-bit value
+                            
 
-  @result One plus the index of the least-significant bit set in @p data or, if @p data is zero, zero
- */
+                                                                                                     
+   
 CC_INLINE CC_CONST unsigned cc_ffs32(int32_t data)
 {
     cc_static_assert(sizeof(int) == 4, "ffs relies on an int being 4 bytes");
@@ -690,14 +690,14 @@ CC_INLINE CC_CONST unsigned cc_ffs32(int32_t data)
 #endif
 }
 
-/*!
-  @function cc_ffs64
-  @abstract Find first bit set in a 64-bit value
+   
+                    
+                                                
 
-  @param data A 64-bit value
+                            
 
-  @result One plus the index of the least-significant bit set in @p data or, if @p data is zero, zero
- */
+                                                                                                     
+   
 CC_INLINE CC_CONST unsigned cc_ffs64(int64_t data)
 {
 #ifdef _WIN32
@@ -710,45 +710,45 @@ CC_INLINE CC_CONST unsigned cc_ffs64(int64_t data)
 #define cc_add_overflow __builtin_add_overflow
 #define cc_mul_overflow __builtin_mul_overflow
 
-/* HEAVISIDE_STEP (shifted by one)
-   function f(x): x->0, when x=0
-                  x->1, when x>0
-   Can also be seen as a bitwise operation:
-      f(x): x -> y
-        y[0]=(OR x[i]) for all i (all bits)
-        y[i]=0 for all i>0
-   Run in constant time (log2(<bitsize of x>))
-   Useful to run constant time checks
-*/
+                                  
+                                
+                                
+                                           
+                  
+                                           
+                          
+                                              
+                                     
+  
 #define CC_HEAVISIDE_STEP(r, s) {                       \
     const uint64_t _s = (uint64_t)s;                    \
     const uint64_t _t = (_s & 0xffffffff) | (_s >> 32); \
     r = (__typeof__(r))((0xffffffff + _t) >> 32);       \
 }
 
-/* Return 1 if x mod 4 =1,2,3, 0 otherwise */
+                                             
 #define CC_CARRY_2BITS(x) (((x>>1) | x) & 0x1)
 #define CC_CARRY_3BITS(x) (((x>>2) | (x>>1) | x) & 0x1)
 
 #define cc_ceiling(a,b)  (((a)+((b)-1))/(b))
 #define CC_BITLEN_TO_BYTELEN(x) cc_ceiling((x), 8)
 
-/*!
- @brief     cc_muxp(s, a, b) is equivalent to z = s ? a : b, but it executes in constant time
- @param a	input pointer
- @param b	input pointer
- @param s	The selection parameter s must be 0 or 1. if s is integer 1 a is returned. If s is integer 0, b is returned. Otherwise, the output is undefined.
- @return    Returns a, if s is 1 and b if s is 0
- */
+   
+                                                                                             
+                       
+                       
+                                                                                                                                                          
+                                                
+   
 void *cc_muxp(int s, const void *a, const void *b);
 
-/*!
- @brief     CC_MUXU(r, s, a, b) is equivalent to r = s ? a : b, but executes in constant time
- @param a   Input a
- @param b   Input b
- @param s   Selection parameter s. Must be 0 or 1.
- @param r   Output, set to a if s=1, or b if s=0.
- */
+   
+                                                                                             
+                   
+                   
+                                                  
+                                                 
+   
 #define CC_MUXU(r, s, a, b)                           \
     {                                                 \
         __typeof__(r) _cond = (__typeof__(r))((s)-1); \
@@ -757,19 +757,19 @@ void *cc_muxp(int s, const void *a, const void *b);
 
 #define CC_PROVIDES_ABORT (!(CC_USE_SEPROM || CC_USE_S3 || CC_BASEBAND || CC_EFI || CC_IBOOT || CC_RTKITROM))
 
-/*!
- @function cc_abort
- @abstract Abort execution unconditionally
- */
+   
+                   
+                                          
+   
 CC_NORETURN
 void cc_abort(const char *msg);
 
-/*!
-  @function cc_try_abort
-  @abstract Abort execution iff the platform provides a function like @p abort() or @p panic()
+   
+                        
+                                                                                              
 
-  @discussion If the platform does not provide a means to abort execution, this function does nothing; therefore, callers should return an error code after calling this function.
-*/
+                                                                                                                                                                                  
+  
 #if CC_PROVIDES_ABORT
 
 #pragma clang diagnostic push
@@ -807,12 +807,12 @@ void cc_try_abort_if(bool condition, const char *msg)
     }
 }
 
-/*
-  Unfortunately, since we export this symbol, this declaration needs
-  to be in a public header to satisfy TAPI.
+  
+                                                                    
+                                           
 
-  See fipspost_trace_priv.h for more details.
-*/
+                                             
+  
 extern const void *fipspost_trace_vtable;
 
-#endif /* _CORECRYPTO_CC_PRIV_H_ */
+#endif                             

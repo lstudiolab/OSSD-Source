@@ -40,7 +40,7 @@ struct net_str_id_entry {
 	SLIST_ENTRY(net_str_id_entry)   nsi_next;
 	u_int32_t                                               nsi_flags;
 	u_int32_t                                               nsi_id;
-	char                                                    nsi_string[1]; /* variable lenght string */
+	char                                                    nsi_string[1];                             
 };
 
 enum {
@@ -56,6 +56,6 @@ extern errno_t net_str_id_find_internal(const char *, u_int32_t *, u_int32_t, in
 
 extern void net_str_id_init(void);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* __NSI_STR_ID__ */
+#endif                     

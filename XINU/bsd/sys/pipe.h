@@ -47,12 +47,12 @@
  *
  * $FreeBSD: src/sys/sys/pipe.h,v 1.24 2003/08/13 20:01:38 alc Exp $
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2006 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #ifndef _SYS_PIPE_H_
 #define _SYS_PIPE_H_
@@ -61,15 +61,15 @@
 #include <libkern/locks.h>
 #include <os/base.h>
 #endif
-#include <sys/queue.h>                  /* for TAILQ macros */
+#include <sys/queue.h>                                        
 #include <sys/ev.h>
 #include <sys/cdefs.h>
 #include <sys/_types/_caddr_t.h>
 #include <sys/_types/_u_int.h>
 
-/*
- * Pipe buffer size, keep moderate in value, pipes take kva space.
- */
+  
+                                                                  
+   
 #ifndef PIPE_SIZE
 #define PIPE_SIZE       16384
 #endif
@@ -84,89 +84,89 @@
 #define SMALL_PIPE_SIZE PAGE_SIZE
 #endif
 
-/*
- * PIPE_MINDIRECT MUST be smaller than PIPE_SIZE and MUST be bigger
- * than PIPE_BUF.
- */
+  
+                                                                   
+                 
+   
 #ifndef PIPE_MINDIRECT
 #define PIPE_MINDIRECT  8192
 #endif
 
 #define PIPENPAGES      (BIG_PIPE_SIZE / PAGE_SIZE + 1)
 
-/*
- * Pipe buffer information.
- * Separate in, out, cnt are used to simplify calculations.
- * Buffered write is active when the buffer.cnt field is set.
- */
+  
+                           
+                                                           
+                                                             
+   
 struct pipebuf {
-	u_int   cnt;            /* number of chars currently in buffer */
-	u_int   in;             /* in pointer */
-	u_int   out;            /* out pointer */
-	u_int   size;           /* size of buffer */
+	u_int   cnt;                                                     
+	u_int   in;                             
+	u_int   out;                             
+	u_int   size;                               
 #if KERNEL
-	caddr_t OS_PTRAUTH_SIGNED_PTR("pipe.buffer") buffer; /* kva of buffer */
+	caddr_t OS_PTRAUTH_SIGNED_PTR("pipe.buffer") buffer;                    
 #else
-	caddr_t buffer; /* kva of buffer */
-#endif /* KERNEL */
+	caddr_t buffer;                    
+#endif             
 };
 
 
 #ifdef PIPE_DIRECT
-/*
- * Information to support direct transfers between processes for pipes.
- */
+  
+                                                                       
+   
 struct pipemapping {
-	vm_offset_t     kva;            /* kernel virtual address */
-	vm_size_t       cnt;            /* number of chars in buffer */
-	vm_size_t       pos;            /* current position of transfer */
-	int             npages;         /* number of pages */
-	vm_page_t       ms[PIPENPAGES]; /* pages in source process */
+	vm_offset_t     kva;                                        
+	vm_size_t       cnt;                                           
+	vm_size_t       pos;                                              
+	int             npages;                              
+	vm_page_t       ms[PIPENPAGES];                              
 };
 #endif
 
-/*
- * Bits in pipe_state.
- */
-#define PIPE_ASYNC      0x004   /* Async? I/O. */
-#define PIPE_WANTR      0x008   /* Reader wants some characters. */
-#define PIPE_WANTW      0x010   /* Writer wants space to put characters. */
-#define PIPE_WANT       0x020   /* Pipe is wanted to be run-down. */
-#define PIPE_SEL        0x040   /* Pipe has a select active. */
-#define PIPE_EOF        0x080   /* Pipe is in EOF condition. */
-#define PIPE_LOCKFL     0x100   /* Process has exclusive access to pointers/data. */
-#define PIPE_LWANT      0x200   /* Process wants exclusive access to pointers/data. */
-#define PIPE_DIRECTW    0x400   /* Pipe direct write active. */
-#define PIPE_DIRECTOK   0x800   /* Direct mode ok. */
-// was  PIPE_KNOTE      0x1000
-#define PIPE_DRAIN      0x2000  /* Waiting for I/O to drop for a close.  Treated like EOF;
-	                         *       only separate for easier debugging. */
-#define PIPE_WSELECT    0x4000  /* Some thread has done an FWRITE select on the pipe */
-#define PIPE_DEAD       0x8000  /* Pipe is dead and needs garbage collection */
+  
+                      
+   
+#define PIPE_ASYNC      0x004                    
+#define PIPE_WANTR      0x008                                      
+#define PIPE_WANTW      0x010                                              
+#define PIPE_WANT       0x020                                       
+#define PIPE_SEL        0x040                                  
+#define PIPE_EOF        0x080                                  
+#define PIPE_LOCKFL     0x100                                                       
+#define PIPE_LWANT      0x200                                                         
+#define PIPE_DIRECTW    0x400                                  
+#define PIPE_DIRECTOK   0x800                        
+                              
+#define PIPE_DRAIN      0x2000                                                            
+                                                                        
+#define PIPE_WSELECT    0x4000                                                         
+#define PIPE_DEAD       0x8000                                                 
 
 #ifdef  KERNEL
 
 struct label;
 
-/*
- * Per-pipe data structure.
- * Two of these are linked together to produce bi-directional pipes.
- */
+  
+                           
+                                                                    
+   
 struct pipe {
-	struct  pipebuf pipe_buffer;    /* data storage */
+	struct  pipebuf pipe_buffer;                      
 #ifdef PIPE_DIRECT
-	struct  pipemapping pipe_map;   /* pipe mapping for direct I/O */
+	struct  pipemapping pipe_map;                                    
 #endif
-	struct  selinfo pipe_sel;       /* for compat with select */
-	pid_t   pipe_pgid;              /* information for async I/O */
-	struct  pipe *pipe_peer;        /* link with other direction */
-	u_int   pipe_state;             /* pipe status info */
-	int     pipe_busy;              /* busy flag, mostly to handle rundown sanely */
-	lck_mtx_t *pipe_mtxp;           /* shared mutex between both pipes */
-	struct  timespec st_atimespec;  /* time of last access */
-	struct  timespec st_mtimespec;  /* time of last data modification */
-	struct  timespec st_ctimespec;  /* time of last status change */
-	struct  label *pipe_label;      /* pipe MAC label - shared */
+	struct  selinfo pipe_sel;                                   
+	pid_t   pipe_pgid;                                             
+	struct  pipe *pipe_peer;                                       
+	u_int   pipe_state;                                   
+	int     pipe_busy;                                                              
+	lck_mtx_t *pipe_mtxp;                                                
+	struct  timespec st_atimespec;                           
+	struct  timespec st_mtimespec;                                      
+	struct  timespec st_ctimespec;                                  
+	struct  label *pipe_label;                                   
 };
 
 #define PIPE_MTX(pipe)          ((pipe)->pipe_mtxp)
@@ -182,6 +182,6 @@ extern uint64_t pipe_id(struct pipe *);
 #endif
 __END_DECLS
 
-#endif  /* KERNEL */
+#endif              
 
-#endif /* !_SYS_PIPE_H_ */
+#endif                    

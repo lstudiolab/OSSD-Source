@@ -26,10 +26,10 @@
 #define _NONSTD_SOURCE
 #include <sys/cdefs.h>
 
-/*
- * We need conformance on so that EOPNOTSUPP=102.  But the routine symbol
- * will still be the legacy (undecorated) one.
- */
+  
+                                                                         
+                                              
+   
 #undef __DARWIN_UNIX03
 #define __DARWIN_UNIX03 1
 
@@ -38,15 +38,15 @@
 
 ssize_t __recvfrom_nocancel(int, void *, size_t, int, struct sockaddr * __restrict, socklen_t * __restrict);
 
-/*
- * recvfrom stub, legacy version
- */
+  
+                                
+   
 ssize_t
 recvfrom(int s, void *buf, size_t len, int flags, struct sockaddr * __restrict from, socklen_t * __restrict fromlen)
 {
 	int ret = __recvfrom_nocancel(s, buf, len, flags, from, fromlen);
 
-	/* use ENOTSUP for legacy behavior */
+	                                     
 	if (ret < 0 && errno == EOPNOTSUPP) {
 		errno = ENOTSUP;
 	}

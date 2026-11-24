@@ -72,15 +72,15 @@
 #include <sys/appleapiopts.h>
 
 #ifdef __APPLE_API_PRIVATE
-/*
- * Definitions for Sun RPC Version 2, from
- * "RPC: Remote Procedure Call Protocol Specification" RFC1057
- */
+  
+                                          
+                                                              
+   
 
-/* Version # */
+               
 #define RPC_VER2        2
 
-/* Authentication */
+                    
 #define RPCAUTH_NULL    0
 #define RPCAUTH_NONE    RPCAUTH_NULL
 #define RPCAUTH_UNIX    1
@@ -96,13 +96,13 @@
 #define RPCAUTH_MAXSIZ  400
 #define RPCAUTH_UNIXGIDS 16
 
-/*
- * Constants associated with authentication flavours.
- */
+  
+                                                     
+   
 #define RPCAKN_FULLNAME 0
 #define RPCAKN_NICKNAME 1
 
-/* Rpc Constants */
+                   
 #define RPC_CALL        0
 #define RPC_REPLY       1
 #define RPC_MSGACCEPTED 0
@@ -111,17 +111,17 @@
 #define RPC_PROGUNAVAIL 1
 #define RPC_PROGMISMATCH        2
 #define RPC_PROCUNAVAIL 3
-#define RPC_GARBAGE     4               /* I like this one */
+#define RPC_GARBAGE     4                                    
 #define RPC_SYSTEM_ERR  5
 #define RPC_MISMATCH    0
 #define RPC_AUTHERR     1
 
-/* Authentication failures */
+                             
 #define AUTH_BADCRED            1
 #define AUTH_REJECTCRED         2
 #define AUTH_BADVERF            3
 #define AUTH_REJECTVERF         4
-#define AUTH_TOOWEAK            5       /* Give em wheaties */
+#define AUTH_TOOWEAK            5                             
 #define AUTH_INVALIDRESP        6
 #define AUTH_FAILED             7
 #define AUTH_KERB_GENERIC       8
@@ -132,11 +132,11 @@
 #define RPCSEC_GSS_CREDPROBLEM  13
 #define RPCSEC_GSS_CTXPROBLEM   14
 
-/* Sizes of rpc header parts */
+                               
 #define RPC_SIZ         24
 #define RPC_REPLYSIZ    28
 
-/* RPC Prog definitions */
+                          
 #define RPCPROG_MNT     100005
 #define RPCMNT_VER1     1
 #define RPCMNT_VER3     3
@@ -158,13 +158,13 @@
 #define RQUOTA_STAT_NOQUOTA     2
 #define RQUOTA_STAT_EPERM       3
 
-/* Local transports for rpcbind */
+                                  
 #define RPCB_TICOTSORD_PATH "/var/run/rpcb.ticotsord"
 #define RPCB_TICLTS_PATH "/var/run/rpcb.ticlst"
 
-/* Local transport for nfs */
+                             
 #define NFS_TICOTSORD_PATH "/var/ran/nfs.ticotsord"
 #define NFS_TICLTS_PATH "/var/run/nfs.ticlts"
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* _NFS_RPCV2_H_ */
+#endif                          
+#endif                    

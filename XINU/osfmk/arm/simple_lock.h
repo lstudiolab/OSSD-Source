@@ -73,23 +73,23 @@
 
 #ifdef MACH_KERNEL_PRIVATE
 
-extern uint32_t LockTimeOut;                    /* Number of hardware ticks of a lock timeout */
-extern uint32_t LockTimeOutUsec;                /* Number of microseconds for lock timeout */
+extern uint32_t LockTimeOut;                                                                    
+extern uint32_t LockTimeOutUsec;                                                             
 
 typedef lck_spin_t usimple_lock_data_t, *usimple_lock_t;
-#else /* MACH_KERNEL_PRIVATE */
+#else                          
 
 #if defined(__arm__)
 typedef struct slock {
 	unsigned int    lock_data[10];
 } usimple_lock_data_t, *usimple_lock_t;
 #elif defined(__arm64__)
-/*
- * ARM64_TODO: this is quite a waste of space (and a
- * poorly packed data structure).  See if anyone's
- * using these outside of osfmk.
- * NOTE: only osfmk uses this structure in xnu-2624
- */
+  
+                                                    
+                                                  
+                                
+                                                   
+   
 typedef struct slock {
 	uint64_t lock_data[9];
 } usimple_lock_data_t, *usimple_lock_t;
@@ -97,7 +97,7 @@ typedef struct slock {
 #error Unknown architecture.
 #endif
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 #define USIMPLE_LOCK_NULL       ((usimple_lock_t) 0)
 
@@ -109,7 +109,7 @@ typedef usimple_lock_data_t     simple_lock_data_t;
 #define decl_simple_lock_data(class, name) \
 	class	simple_lock_data_t	name
 
-#endif  /* !defined(decl_simple_lock_data) */
+#endif                                       
 
 #ifdef  MACH_KERNEL_PRIVATE
 
@@ -131,7 +131,7 @@ extern void     arm_usimple_lock_init(simple_lock_t, __unused unsigned short);
 #define simple_lock_try_nopreempt(l, grp)    lck_spin_try_lock_nopreempt(l)
 
 
-#endif /* LOCK_STATS */
+#endif                 
 #define simple_unlock(l)                lck_spin_unlock(l)
 #define simple_unlock_nopreempt(l)      lck_spin_unlock_nopreempt(l)
 
@@ -141,9 +141,9 @@ extern void     arm_usimple_lock_init(simple_lock_t, __unused unsigned short);
 #define simple_lock_assert(l, t) lck_spin_assert(l,t)
 #define kdp_simple_lock_is_acquired(l) kdp_lck_spin_is_acquired(l)
 
-#endif  /* MACH_KERNEL_PRIVATE */
-#endif  /* KERNEL_PRIVATE */
+#endif                           
+#endif                      
 
-#endif /* !_ARM_SIMPLE_LOCK_TYPES_H_ */
+#endif                                 
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

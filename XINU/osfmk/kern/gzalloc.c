@@ -25,46 +25,46 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	File:	kern/gzalloc.c
- *	Author:	Derek Kumar
- *
- *	"Guard mode" zone allocator, used to trap use-after-free errors,
- *	overruns, underruns, mismatched allocations/frees, uninitialized
- *	zone element use, timing dependent races etc.
- *
- *	The allocator is configured by these boot-args:
- *	gzalloc_size=<size>: target all zones with elements of <size> bytes
- *	gzalloc_min=<size>: target zones with elements >= size
- *	gzalloc_max=<size>: target zones with elements <= size
- *      gzalloc_min/max can be specified in conjunction to target a range of
- *	sizes
- *	gzalloc_fc_size=<size>: number of zone elements (effectively page
- *	multiple sized) to retain in the free VA cache. This cache is evicted
- *	(backing pages and VA released) in a least-recently-freed fashion.
- *	Larger free VA caches allow for a longer window of opportunity to trap
- *	delayed use-after-free operations, but use more memory.
- *	-gzalloc_wp: Write protect, rather than unmap, freed allocations
- *	lingering in the free VA cache. Useful to disambiguate between
- *	read-after-frees/read overruns and writes. Also permits direct inspection
- *	of the freed element in the cache via the kernel debugger. As each
- *	element has a "header" (trailer in underflow detection mode), the zone
- *	of origin of the element can be easily determined in this mode.
- *	-gzalloc_uf_mode: Underflow detection mode, where the guard page
- *	adjoining each element is placed *before* the element page rather than
- *	after. The element is also located at the top of the page, rather than
- *	abutting the bottom as with the standard overflow detection mode.
- *	-gzalloc_noconsistency: disable consistency checks that flag mismatched
- *	frees, corruptions of the header/trailer signatures etc.
- *	-nogzalloc_mode: Disables the guard mode allocator. The DEBUG kernel
- *	enables the guard allocator for zones sized 1K (if present) by
- *	default, this option can disable that behaviour.
- *	gzname=<name> target a zone by name. Can be coupled with size-based
- *	targeting. Naming conventions match those of the zlog boot-arg, i.e.
- *	"a period in the logname will match a space in the zone name"
- *	-gzalloc_no_dfree_check Eliminate double free checks
- *	gzalloc_zscale=<value> specify size multiplier for the dedicated gzalloc submap
- */
+  
+                       
+                      
+  
+                                                                   
+                                                                   
+                                                
+  
+                                                  
+                                                                      
+                                                         
+                                                         
+                                                                            
+        
+                                                                    
+                                                                        
+                                                                     
+                                                                         
+                                                          
+                                                                   
+                                                                 
+                                                                            
+                                                                     
+                                                                         
+                                                                  
+                                                                   
+                                                                         
+                                                                         
+                                                                    
+                                                                          
+                                                           
+                                                                       
+                                                                 
+                                                   
+                                                                      
+                                                                       
+                                                                
+                                                       
+                                                                                  
+   
 
 #include <mach/mach_types.h>
 #include <mach/vm_param.h>
@@ -102,7 +102,7 @@ uint32_t pdzalloc_count, pdzfree_count;
 #define GZALLOC_RESERVE_SIZE_DEFAULT (2 * 1024 * 1024)
 #define GZFC_DEFAULT_SIZE (1536)
 
-char gzalloc_fill_pattern = 0x67; /* 'g' */
+char gzalloc_fill_pattern = 0x67;          
 
 uint32_t gzalloc_min = ~0U;
 uint32_t gzalloc_max = 0;
@@ -160,10 +160,10 @@ gzalloc_zone_init(zone_t z)
 		vm_size_t gzfcsz = round_page(sizeof(*z->gz.gzfc) * gzfc_size);
 		kern_return_t kr;
 
-		/* If the VM/kmem system aren't yet configured, carve
-		 * out the free element cache structure directly from the
-		 * gzalloc_reserve supplied by the pmap layer.
-		 */
+		                                                     
+                                                           
+                                                
+     
 		if (__improbable(startup_phase < STARTUP_SUB_KMEM)) {
 			if (gzalloc_reserve_size < gzfcsz) {
 				panic("gzalloc reserve exhausted");
@@ -185,7 +185,7 @@ gzalloc_zone_init(zone_t z)
 	}
 }
 
-/* Called by zdestroy() to dump the free cache elements so the zone count can drop to zero. */
+                                                                                              
 void
 gzalloc_empty_free_cache(zone_t zone)
 {
@@ -196,21 +196,21 @@ gzalloc_empty_free_cache(zone_t zone)
 	vm_offset_t gzfcsz = round_page(sizeof(*zone->gz.gzfc) * gzfc_size);
 	vm_offset_t gzfc_copy;
 
-	assert(zone->gzalloc_tracked); // the caller is responsible for checking
+	assert(zone->gzalloc_tracked);                                          
 
 	kr = kmem_alloc(kernel_map, &gzfc_copy, gzfcsz, VM_KERN_MEMORY_OSFMK);
 	if (kr != KERN_SUCCESS) {
 		panic("gzalloc_empty_free_cache: kmem_alloc: 0x%x", kr);
 	}
 
-	/* Reset gzalloc_data. */
+	                         
 	zone_lock(zone);
 	memcpy((void *)gzfc_copy, (void *)zone->gz.gzfc, gzfcsz);
 	bzero((void *)zone->gz.gzfc, gzfcsz);
 	zone->gz.gzfc_index = 0;
 	zone_unlock(zone);
 
-	/* Free up all the cached elements. */
+	                                      
 	for (uint32_t index = 0; index < gzfc_size; index++) {
 		free_addr = ((vm_offset_t *)gzfc_copy)[index];
 		if (free_addr && free_addr >= gzalloc_map_min && free_addr < gzalloc_map_max) {
@@ -226,13 +226,13 @@ gzalloc_empty_free_cache(zone_t zone)
 			freed_elements++;
 		}
 	}
-	/*
-	 * TODO: Consider freeing up zone->gz.gzfc as well if it didn't come from the gzalloc_reserve pool.
-	 * For now we're reusing this buffer across zdestroy's. We would have to allocate it again on a
-	 * subsequent zinit() as well.
-	 */
+	  
+                                                                                                    
+                                                                                                
+                               
+    
 
-	/* Decrement zone counters. */
+	                              
 	zone_lock(zone);
 	zone->z_elems_free += freed_elements;
 	zone->z_wired_cur -= freed_elements;
@@ -343,7 +343,7 @@ gzalloc_alloc(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
 {
 	vm_offset_t addr = 0;
 
-	assert(zone->gzalloc_tracked); // the caller is responsible for checking
+	assert(zone->gzalloc_tracked);                                          
 
 	if (get_preemption_level() != 0) {
 		if (flags & Z_NOWAIT) {
@@ -360,16 +360,16 @@ gzalloc_alloc(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
 	bool new_va = false;
 
 	if (!kmem_ready || (vm_page_zone == ZONE_NULL)) {
-		/* Early allocations are supplied directly from the
-		 * reserve.
-		 */
+		                                                   
+             
+     
 		if (gzalloc_reserve_size < (rounded_size + PAGE_SIZE)) {
 			panic("gzalloc reserve exhausted");
 		}
 		gzaddr = gzalloc_reserve;
-		/* No guard page for these early allocations, just
-		 * waste an additional page.
-		 */
+		                                                  
+                              
+     
 		gzalloc_reserve += rounded_size + PAGE_SIZE;
 		gzalloc_reserve_size -= rounded_size + PAGE_SIZE;
 		OSAddAtomic64((SInt32) (rounded_size), &gzalloc_early_alloc);
@@ -387,9 +387,9 @@ gzalloc_alloc(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
 
 	if (gzalloc_uf_mode) {
 		gzaddr += PAGE_SIZE;
-		/* The "header" becomes a "footer" in underflow
-		 * mode.
-		 */
+		                                               
+          
+     
 		gzh = (gzhdr_t *) (gzaddr + zone_elem_size(zone));
 		addr = gzaddr;
 		gzhcopy = (gzhdr_t *) (gzaddr + rounded_size - sizeof(gzhdr_t));
@@ -401,16 +401,16 @@ gzalloc_alloc(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
 	if (zone->z_free_zeroes) {
 		bzero((void *)gzaddr, rounded_size);
 	} else {
-		/* Fill with a pattern on allocation to trap uninitialized
-		 * data use. Since the element size may be "rounded up"
-		 * by higher layers such as the kalloc layer, this may
-		 * also identify overruns between the originally requested
-		 * size and the rounded size via visual inspection.
-		 * TBD: plumb through the originally requested size,
-		 * prior to rounding by kalloc/IOMalloc etc.
-		 * We also add a signature and the zone of origin in a header
-		 * prefixed to the allocation.
-		 */
+		                                                          
+                                                         
+                                                        
+                                                            
+                                                     
+                                                      
+                                              
+                                                               
+                                
+     
 		memset((void *)gzaddr, gzalloc_fill_pattern, rounded_size);
 	}
 
@@ -418,10 +418,10 @@ gzalloc_alloc(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
 	gzh->gzsize = (uint32_t)zone_elem_size(zone);
 	gzh->gzsig = GZALLOC_SIGNATURE;
 
-	/* In underflow detection mode, stash away a copy of the
-	 * metadata at the edge of the allocated range, for
-	 * retrieval by gzalloc_element_size()
-	 */
+	                                                        
+                                                    
+                                       
+    
 	if (gzhcopy) {
 		*gzhcopy = *gzh;
 	}
@@ -447,7 +447,7 @@ gzalloc_free(zone_t zone, zone_stats_t zstats, void *addr)
 {
 	kern_return_t kr;
 
-	assert(zone->gzalloc_tracked); // the caller is responsible for checking
+	assert(zone->gzalloc_tracked);                                          
 
 	gzhdr_t *gzh;
 	vm_offset_t rounded_size = round_page(zone_elem_size(zone) + GZHEADER_SIZE);
@@ -495,7 +495,7 @@ gzalloc_free(zone_t zone, zone_stats_t zstats, void *addr)
 			    "current zone: %p, recorded zone: %p, address: %p",
 			    __func__, zone, gzh->gzone, (void *)addr);
 		}
-		/* Partially redundant given the zone check, but may flag header corruption */
+		                                                                              
 		if (gzh->gzsize != zone_elem_size(zone)) {
 			panic("Mismatched zfree or under/overflow for zone %p, "
 			    "recorded size: 0x%x, element size: 0x%x, address: %p",
@@ -524,11 +524,11 @@ gzalloc_free(zone_t zone, zone_stats_t zstats, void *addr)
 	}
 
 	if ((startup_phase < STARTUP_SUB_KMEM) || gzh->gzone == GZDEADZONE) {
-		/* For now, just leak frees of early allocations
-		 * performed before kmem is fully configured.
-		 * They don't seem to get freed currently;
-		 * consider ml_static_mfree in the future.
-		 */
+		                                                
+                                               
+                                            
+                                            
+     
 		OSAddAtomic64((SInt32) (rounded_size), &gzalloc_early_free);
 		return;
 	}
@@ -538,9 +538,9 @@ gzalloc_free(zone_t zone, zone_stats_t zstats, void *addr)
 	}
 
 	if (gzfc_size) {
-		/* Either write protect or unmap the newly freed
-		 * allocation
-		 */
+		                                                
+               
+     
 		kr = vm_map_protect(gzalloc_map, saddr,
 		    saddr + rounded_size + (1 * PAGE_SIZE),
 		    gzalloc_prot, FALSE);
@@ -554,9 +554,9 @@ gzalloc_free(zone_t zone, zone_stats_t zstats, void *addr)
 	zone_lock(zone);
 	assert(zone->z_self == zone);
 
-	/* Insert newly freed element into the protected free element
-	 * cache, and rotate out the LRU element.
-	 */
+	                                                             
+                                          
+    
 	if (gzfc_size) {
 		if (zone->gz.gzfc_index >= gzfc_size) {
 			zone->gz.gzfc_index = 0;
@@ -574,16 +574,16 @@ gzalloc_free(zone_t zone, zone_stats_t zstats, void *addr)
 	zone_unlock(zone);
 
 	if (free_addr) {
-		// TODO: consider using physical reads to check for
-		// corruption while on the protected freelist
-		// (i.e. physical corruption)
+		                                                   
+		                                             
+		                             
 		kr = vm_map_remove(gzalloc_map, free_addr,
 		    free_addr + rounded_size + (1 * PAGE_SIZE),
 		    VM_MAP_REMOVE_KUNWIRE);
 		if (kr != KERN_SUCCESS) {
 			panic("gzfree: vm_map_remove: %p, 0x%x", (void *)free_addr, kr);
 		}
-		// TODO: sysctl-ize for quick reference
+		                                       
 		OSAddAtomic64((SInt32)rounded_size, &gzalloc_freed);
 		OSAddAtomic64(-((SInt32) (rounded_size - zone_elem_size(zone))),
 		    &gzalloc_wasted);
@@ -607,18 +607,18 @@ gzalloc_element_size(void *gzaddr, zone_t *z, vm_size_t *gzsz)
 		assertf(gzvme->vme_atomic != 0, "GZALLOC: VM map entry inconsistency, "
 		    "vme: %p, start: %llu end: %llu", gzvme, gzvme->vme_start, gzvme->vme_end);
 
-		/* Locate the gzalloc metadata adjoining the element */
+		                                                       
 		if (gzalloc_uf_mode == TRUE) {
-			/* In underflow detection mode, locate the map entry describing
-			 * the element, and then locate the copy of the gzalloc
-			 * header at the trailing edge of the range.
-			 */
+			                                                               
+                                                          
+                                               
+      
 			gzh = (gzhdr_t *)(gzvme->vme_end - GZHEADER_SIZE);
 		} else {
-			/* In overflow detection mode, scan forward from
-			 * the base of the map entry to locate the
-			 * gzalloc header.
-			 */
+			                                                
+                                             
+                     
+      
 			uint32_t *p = (uint32_t*) gzvme->vme_start;
 			while (p < (uint32_t *) gzvme->vme_end) {
 				if (*p == GZALLOC_SIGNATURE) {

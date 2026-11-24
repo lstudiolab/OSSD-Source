@@ -61,7 +61,7 @@ T_DECL(mct_monotonic, "Testing mach_continuous_time returns sane, monotonic valu
 		tmp = to_ms(tmp);
 		T_ASSERT_GE(tmp, multiple_test, "mach_continuous_time (%s) must be monotonic", test_type);
 
-		// each successive call shouldn't be more than 100ms in the future
+		                                                                  
 		T_ASSERT_LE(tmp - multiple_test, 100ULL, "mach_continuous_time (%s) should not jump forward too fast", test_type);
 
 		multiple_test = tmp;
@@ -93,7 +93,7 @@ T_DECL(mat_monotonic, "Testing mach_absolute_time returns sane, monotonic values
 		tmp = to_ms(tmp);
 		T_ASSERT_GE(tmp, multiple_test, "mach_absolute_time (%s) must be monotonic", test_type);
 
-		// each successive call shouldn't be more than 100ms in the future
+		                                                                  
 		T_ASSERT_LE(tmp - multiple_test, 100ULL, "mach_absolute_time (%s) should not jump forward too fast", test_type);
 
 		multiple_test = tmp;
@@ -173,9 +173,9 @@ T_DECL(mct_sleep, "Testing mach_continuous_time behavior over system sleep"){
 	update(&abs_now, &cnt_now);
 	before_diff = (int)(to_ms(cnt_now) - to_ms(abs_now));
 
-	// performs:
-	// pmset relative wake 5
-	// pmset sleepnow
+	            
+	                        
+	                 
 
 	pid_t pid;
 	int spawn_ret = 0;
@@ -195,13 +195,13 @@ T_DECL(mct_sleep, "Testing mach_continuous_time behavior over system sleep"){
 	T_ASSERT_EQ(waitpid(pid, &spawn_ret, 0), pid, "waitpid failed");
 	T_ASSERT_EQ(spawn_ret, 0, "pmset relative wait 5 failed");
 
-	// wait for device to sleep (up to 30 seconds)
+	                                              
 	for (int i = 0; i < 30; i++) {
 		update(&abs_now, &cnt_now);
 		after_diff = (int)(to_ms(cnt_now) - to_ms(abs_now));
 
-		// on OSX, there's enough latency between calls to MCT and MAT
-		// when the system is going down for sleep for values to diverge a few ms
+		                                                              
+		                                                                         
 		if (abs(before_diff - after_diff) > 2) {
 			break;
 		}
@@ -241,8 +241,8 @@ T_DECL(mct_settimeofday, "Testing mach_continuous_time behavior over settimeofda
 	T_ASSERT_POSIX_ZERO(gettimeofday(&saved_tv, &saved_tz), NULL);
 
 	struct timeval forward_tv = saved_tv;
-	// move time forward by two minutes, ensure mach_continuous_time keeps
-	// chugging along with mach_absolute_time
+	                                                                      
+	                                         
 	forward_tv.tv_sec += 2 * 60;
 
 	before = (int)to_ms(mach_continuous_time());
@@ -268,8 +268,8 @@ T_DECL(mct_settimeofday_kern, "Testing kernel mach_continuous_time behavior over
 	T_ASSERT_POSIX_ZERO(gettimeofday(&saved_tv, &saved_tz), NULL);
 
 	struct timeval forward_tv = saved_tv;
-	// move time forward by two minutes, ensure mach_continuous_time keeps
-	// chugging along with mach_absolute_time
+	                                                                      
+	                                         
 	forward_tv.tv_sec += 2 * 60;
 
 	before = (int)to_ms(mach_continuous_time_kernel());

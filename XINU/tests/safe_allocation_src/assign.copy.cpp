@@ -1,7 +1,7 @@
-//
-// Tests for
-//  safe_allocation& operator=(safe_allocation const&) = delete;
-//
+  
+            
+                                                                
+  
 
 #include <libkern/c++/safe_allocation.h>
 #include <type_traits>

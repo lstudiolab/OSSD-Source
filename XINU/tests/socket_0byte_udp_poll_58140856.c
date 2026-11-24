@@ -77,7 +77,7 @@ server_poll(void)
 	kq = kqueue();
 	T_ASSERT_POSIX_SUCCESS(kq, "kqueue");
 
-	/* Add and poll */
+	                  
 	r = kevent(kq, &event, 1, &event, 1, NULL);
 	T_EXPECT_EQ(r, 1, "should return an event");
 
@@ -89,17 +89,17 @@ T_DECL(socket_0byte_udp_poll_58140856,
 {
 	T_LOG("Starting...\n");
 
-	/* Listen on UDP port */
+	                        
 	server_listen();
 
 	T_LOG("Server bound to [%s]:%d\n", TEST_ADDR, TEST_PORT);
 
-	/* Send 0-UDP packet to that port */
+	                                    
 	send_message();
 
 	T_LOG("Sent message to server\n");
 
-	/* Poll kqueue events */
+	                        
 	server_poll();
 
 	T_LOG("Got kqueue event\n");

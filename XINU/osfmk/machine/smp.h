@@ -33,11 +33,11 @@
 #include "i386/smp.h"
 #elif defined (__arm__) || defined (__arm64__)
 #ifdef KERNEL_PRIVATE
-/* arm/smp.h isn't installed into the public SDK. */
+                                                    
 #include "arm/smp.h"
-#endif /* KERNEL_PRIVATE */
+#endif                     
 #else
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_SMP_H */
+#endif                     

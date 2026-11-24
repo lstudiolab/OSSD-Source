@@ -34,8 +34,8 @@
 
 #ifdef KERNEL_PRIVATE
 
-/* Private data structure, stripped out by ifdef tool */
-/* Implementation specific bits */
+                                                        
+                                  
 
 #include <sys/queue.h>
 
@@ -58,6 +58,6 @@ extern int ipf_init(void);
 extern void ip_proto_dispatch_in(struct mbuf *m, int hlen, u_int8_t proto,
     ipfilter_t ipfref);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /*__KPI_IPFILTER_VAR__*/
+#endif                         

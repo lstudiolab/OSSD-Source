@@ -26,31 +26,31 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* A pool of threads which attempt to verify multiprocessor TLB coherency.
- * Creates -t threads, by default 4
- * Creates -s separate mmap(MAP_ANON) R/W mappings, sized at 1 page each but
- * alterable via -z <npages>
- * Initially read-faults each mapping in, verifying first-word zerofill--
- * The kernel typically uses the physical aperture to perform the zerofill
- * Writes map_address (page_aligned) | low 12 bits of the PID at the first word
- * This can help verify ASID related inconsistencies
- * Records a timestamp in a Structure associated with each mapping
- * With a custom kernel, it has the option of creating a remapping of the page in
- * the kernel's address space to exercise shared kernel mapping coherency.
- * Each thread subsequently loops around on the set of mappings. One thread is designated
- * the observer thread. The thread acquires a lock on the arena element,
- * verifies that the mapping has the expected pattern (Address | PID), if the
- * element is in the MAPPED state. Can optionally tell the kernel to check its
- * alias as well. If it notices a mismatch, it has the option to issue a syscall
- * to  stop kernel tracing. If the -f option is supplied, the test is terminated.
- * If the page has lingered beyond -l microseconds, non-observer threads will
- * unmap the page, optionally calling into the kernel to unmap its alias, and
- * repopulate the element.
- * After this sequence, the thread will optionally usleep for -p microseconds,
- * to allow for idle power management to engage if possible (errata might exist
- * in those areas), or context switches to occur.
- * Created Derek Kumar, 2011.
- */
+                                                                          
+                                   
+                                                                            
+                            
+                                                                         
+                                                                          
+                                                                               
+                                                    
+                                                                  
+                                                                                 
+                                                                          
+                                                                                         
+                                                                        
+                                                                             
+                                                                              
+                                                                                
+                                                                                 
+                                                                             
+                                                                             
+                          
+                                                                              
+                                                                               
+                                                 
+                             
+   
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,14 +136,14 @@ initialize_arena_element(int i)
 #if     !defined(__LP64__)
 	uint32_t pattern = parray[i].taddr;
 	pattern |= cpid & 0xFFF;
-//	memset_pattern4((void *)parray[i].taddr, &pattern, PAGE_SIZE); //
-//	uncomment to fill the whole page, but a sufficiently unique first word
-//	gets the job done without slowing down the test
+                                                                    
+                                                                         
+                                                  
 
 #else
 	uint64_t pattern = parray[i].taddr;
 	pattern |= (cpid & 0xFFF);
-//	memset_pattern8(parray[i].taddr, &pattern, PAGE_SIZE);
+                                                         
 #endif
 
 	uint64_t val =  (*(uintptr_t *)parray[i].taddr);
@@ -233,7 +233,7 @@ tlbexerciser(void *targs)
 				}
 			}
 
-			parray[i].tlock = 0; //unlock
+			parray[i].tlock = 0;         
 
 			if (sleepus) {
 				usleep(sleepus);
@@ -262,8 +262,8 @@ main(int argc, char **argv)
 			nthreads = atoi(optarg);
 			break;
 		case 's':
-			arenasize = atoi(optarg); // we typically want this to
-			                          // be sized < 2nd level TLB
+			arenasize = atoi(optarg);                             
+			                                                     
 			break;
 		case 'f':
 			stop_on_failure = true;

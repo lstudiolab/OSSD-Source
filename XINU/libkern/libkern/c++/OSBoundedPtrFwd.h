@@ -39,4 +39,4 @@ struct panic_trapping_policy;
 template <typename T>
 using OSBoundedPtr = libkern::bounded_ptr<T, os_detail::panic_trapping_policy>;
 
-#endif /* !XNU_LIBKERN_LIBKERN_CXX_OS_BOUNDED_PTR_FWD_H */
+#endif                                                    

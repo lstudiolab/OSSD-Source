@@ -54,8 +54,8 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
 #ifndef _I386_MP_DESC_H_
 #define _I386_MP_DESC_H_
@@ -64,22 +64,22 @@
 
 __BEGIN_DECLS
 
-/*
- * Multiprocessor i386/i486 systems use a separate copy of the
- * GDT, IDT, LDT, and kernel TSS per processor.  The first three
- * are separate to avoid lock contention: the i386 uses locked
- * memory cycles to access the descriptor tables.  The TSS is
- * separate since each processor needs its own kernel stack,
- * and since using a TSS marks it busy.
- */
+  
+                                                              
+                                                                
+                                                              
+                                                             
+                                                            
+                                       
+   
 
 #include <i386/seg.h>
 #include <i386/tss.h>
 
-/*
- * The descriptor tables are together in a structure
- * allocated one per processor (except for the boot processor).
- */
+  
+                                                    
+                                                               
+   
 #define FSTK_SZ (PAGE_SIZE/2)
 typedef struct cpu_desc_table64 {
 	struct fake_descriptor  gdt[GDTSZ]       __attribute__ ((aligned(16)));
@@ -130,4 +130,4 @@ valid_user_segment_selectors(uint16_t cs,
 
 __END_DECLS
 
-#endif  /* _X86_64_MP_DESC_H_ */
+#endif                          

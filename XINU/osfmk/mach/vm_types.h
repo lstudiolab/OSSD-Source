@@ -40,32 +40,32 @@
 typedef vm_offset_t             pointer_t;
 typedef vm_offset_t             vm_address_t;
 
-/*
- * We use addr64_t for 64-bit addresses that are used on both
- * 32 and 64-bit machines.  On PPC, they are passed and returned as
- * two adjacent 32-bit GPRs.  We use addr64_t in places where
- * common code must be useable both on 32 and 64-bit machines.
- */
-typedef uint64_t addr64_t;              /* Basic effective address */
+  
+                                                             
+                                                                   
+                                                             
+                                                              
+   
+typedef uint64_t addr64_t;                                           
 
-/*
- * We use reg64_t for addresses that are 32 bits on a 32-bit
- * machine, and 64 bits on a 64-bit machine, but are always
- * passed and returned in a single GPR on PPC.  This type
- * cannot be used in generic 32-bit c, since on a 64-bit
- * machine the upper half of the register will be ignored
- * by the c compiler in 32-bit mode.  In c, we can only use the
- * type in prototypes of functions that are written in and called
- * from assembly language.  This type is basically a comment.
- */
+  
+                                                            
+                                                           
+                                                         
+                                                        
+                                                         
+                                                               
+                                                                 
+                                                             
+   
 typedef uint32_t        reg64_t;
 
-/*
- * To minimize the use of 64-bit fields, we keep some physical
- * addresses (that are page aligned) as 32-bit page numbers.
- * This limits the physical address space to 16TB of RAM.
- */
-typedef uint32_t ppnum_t;               /* Physical page number */
+  
+                                                              
+                                                            
+                                                         
+   
+typedef uint32_t ppnum_t;                                         
 #define PPNUM_MAX UINT32_MAX
 
 
@@ -74,12 +74,12 @@ typedef uint32_t ppnum_t;               /* Physical page number */
 #include <sys/cdefs.h>
 
 #ifndef MACH_KERNEL_PRIVATE
-/*
- * Use specifically typed null structures for these in
- * other parts of the kernel to enable compiler warnings
- * about type mismatches, etc...  Otherwise, these would
- * be void*.
- */
+  
+                                                      
+                                                        
+                                                        
+            
+   
 __BEGIN_DECLS
 
 struct pmap;
@@ -88,7 +88,7 @@ struct vm_object;
 
 __END_DECLS
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 typedef struct pmap             *pmap_t;
 typedef struct _vm_map          *vm_map_t, *vm_map_read_t, *vm_map_inspect_t;
@@ -98,11 +98,11 @@ typedef struct vm_object_fault_info     *vm_object_fault_info_t;
 #define PMAP_NULL               ((pmap_t) NULL)
 #define VM_OBJECT_NULL  ((vm_object_t) NULL)
 
-#else   /* KERNEL_PRIVATE */
+#else                       
 
 typedef mach_port_t             vm_map_t, vm_map_read_t, vm_map_inspect_t;
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 #ifdef KERNEL
 #define VM_MAP_NULL             ((vm_map_t) NULL)
@@ -114,9 +114,9 @@ typedef mach_port_t             vm_map_t, vm_map_read_t, vm_map_inspect_t;
 #define VM_MAP_READ_NULL        ((vm_map_read_t) 0)
 #endif
 
-/*
- * Evolving definitions, likely to change.
- */
+  
+                                          
+   
 
 typedef uint64_t                vm_object_offset_t;
 typedef uint64_t                vm_object_size_t;
@@ -145,7 +145,7 @@ typedef uint16_t vm_tag_t;
 #endif
 
 #if VM_MAX_TAG_ZONES
-// must be multiple of 64
+                         
 #define VM_MAX_TAG_VALUE        1536
 #else
 #define VM_MAX_TAG_VALUE        256
@@ -169,14 +169,14 @@ struct vm_allocation_site {
 	uint64_t  total;
 #if DEBUG || DEVELOPMENT
 	uint64_t  peak;
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	uint64_t  mapped;
 	int16_t   refcount;
 	vm_tag_t  tag;
 	uint16_t  flags;
 	uint16_t  subtotalscount;
 	struct vm_allocation_total subtotals[0];
-	/* char      name[0]; -- this is placed after subtotals, see KA_NAME() */
+	                                                                         
 };
 typedef struct vm_allocation_site vm_allocation_site_t;
 
@@ -187,7 +187,7 @@ typedef struct vm_allocation_site vm_allocation_site_t;
 extern int vmrtf_extract(uint64_t, boolean_t, unsigned long, void *, unsigned long *);
 extern unsigned int vmrtfaultinfo_bufsz(void);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef  KERNEL_PRIVATE
 
@@ -201,7 +201,7 @@ struct vm_named_entry;
 
 __END_DECLS
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 typedef struct upl              *upl_t;
 typedef struct vm_map_copy      *vm_map_copy_t;
@@ -209,12 +209,12 @@ typedef struct vm_named_entry   *vm_named_entry_t;
 
 #define VM_MAP_COPY_NULL        ((vm_map_copy_t) NULL)
 
-#else   /* KERNEL_PRIVATE */
+#else                       
 
 typedef mach_port_t             upl_t;
 typedef mach_port_t             vm_named_entry_t;
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      
 
 #ifdef KERNEL
 #define UPL_NULL                ((upl_t) NULL)
@@ -226,13 +226,13 @@ typedef mach_port_t             vm_named_entry_t;
 
 #ifdef PRIVATE
 typedef struct {
-	uint64_t rtfabstime; // mach_continuous_time at start of fault
-	uint64_t rtfduration; // fault service duration
-	uint64_t rtfaddr; // fault address
-	uint64_t rtfpc; // userspace program counter of thread incurring the fault
-	uint64_t rtftid; // thread ID
-	uint64_t rtfupid; // process identifier
-	uint64_t rtftype; // fault type
+	uint64_t rtfabstime;                                          
+	uint64_t rtfduration;                          
+	uint64_t rtfaddr;                 
+	uint64_t rtfpc;                                                           
+	uint64_t rtftid;             
+	uint64_t rtfupid;                      
+	uint64_t rtftype;              
 } vm_rtfault_record_t;
 #endif
-#endif  /* _MACH_VM_TYPES_H_ */
+#endif                         

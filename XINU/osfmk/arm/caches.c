@@ -47,9 +47,9 @@
 
 #include <arm/misc_protos.h>
 
-/*
- * dcache_incoherent_io_flush64() dcache_incoherent_io_store64() result info
- */
+  
+                                                                            
+   
 #define LWOpDone 1
 #define BWOpDone 3
 
@@ -349,12 +349,12 @@ platform_cache_disable(void)
 #if (__ARM_ARCH__ < 8)
 	uint32_t sctlr_value = 0;
 
-	/* Disable dcache allocation. */
+	                                
 	sctlr_value = __builtin_arm_mrc(MRC_SCTLR);
 	sctlr_value &= ~SCTLR_DCACHE;
 	__builtin_arm_mcr(MCR_SCTLR(sctlr_value));
 	__builtin_arm_isb(ISB_SY);
-#endif /* (__ARM_ARCH__ < 8) */
+#endif                         
 }
 
 void
@@ -363,12 +363,12 @@ platform_cache_idle_enter(
 {
 	platform_cache_disable();
 
-	/*
-	 * If we're only using a single CPU, just write back any
-	 * dirty cachelines.  We can avoid doing housekeeping
-	 * on CPU data that would normally be modified by other
-	 * CPUs.
-	 */
+	  
+                                                         
+                                                      
+                                                        
+         
+    
 	if (up_style_idle_exit && (real_ncpus == 1)) {
 		CleanPoU_Dcache();
 	} else {
@@ -381,25 +381,25 @@ platform_cache_idle_enter(
 		cpu_data_ptr->cpu_CLWFlush_req = 0;
 		cpu_data_ptr->cpu_CLWClean_req = 0;
 		CleanPoC_DcacheRegion((vm_offset_t) cpu_data_ptr, sizeof(cpu_data_t));
-#endif /* (__ARM_ARCH__ < 8) */
+#endif                         
 	}
 
 #if defined(ARMA7)
 	uint32_t actlr_value = 0;
 
-	/* Leave the coherency domain */
+	                                
 	__builtin_arm_clrex();
 	actlr_value = __builtin_arm_mrc(MRC_ACTLR);
 	actlr_value &= ~0x40;
 
 	__builtin_arm_mcr(MCR_ACTLR(actlr_value));
-	/* Ensures any pending fwd request gets serviced and ends up */
+	                                                               
 	__builtin_arm_dsb(DSB_SY);
-	/* Forces the processor to re-fetch, so any pending fwd request gets into the core */
+	                                                                                     
 	__builtin_arm_isb(ISB_SY);
-	/* Ensures the second possible pending fwd request ends up. */
+	                                                              
 	__builtin_arm_dsb(DSB_SY);
-#endif /* defined(ARMA7) */
+#endif                     
 }
 
 void
@@ -409,21 +409,21 @@ platform_cache_idle_exit(
 #if defined(ARMA7)
 	uint32_t actlr_value = 0;
 
-	/* Flush L1 caches and TLB before rejoining the coherency domain */
+	                                                                   
 	FlushPoU_Dcache();
-	/*
-	 * If we're only using a single CPU, we can avoid flushing the
-	 * I-cache or the TLB, as neither program text nor pagetables
-	 * should have been changed during the idle period.  We still
-	 * want to flush the D-cache to PoU (above), as memory contents
-	 * may have been changed by DMA.
-	 */
+	  
+                                                               
+                                                              
+                                                              
+                                                                
+                                 
+    
 	if (!up_style_idle_exit || (real_ncpus > 1)) {
 		InvalidatePoU_Icache();
 		flush_core_tlb();
 	}
 
-	/* Rejoin the coherency domain */
+	                                 
 	actlr_value = __builtin_arm_mrc(MRC_ACTLR);
 	actlr_value |= 0x40;
 	__builtin_arm_mcr(MCR_ACTLR(actlr_value));
@@ -431,13 +431,13 @@ platform_cache_idle_exit(
 
 	uint32_t sctlr_value = 0;
 
-	/* Enable dcache allocation. */
+	                               
 	sctlr_value = __builtin_arm_mrc(MRC_SCTLR);
 	sctlr_value |= SCTLR_DCACHE;
 	__builtin_arm_mcr(MCR_SCTLR(sctlr_value));
 	__builtin_arm_isb(ISB_SY);
 	getCpuDatap()->cpu_CLW_active = 1;
-#endif /* defined(ARMA7) */
+#endif                     
 }
 
 boolean_t
@@ -591,7 +591,7 @@ cache_xcall(unsigned int op)
 #endif
 
 
-#else   /* __ARM_COHERENT_IO__ */
+#else                            
 
 void
 flush_dcache(
@@ -707,4 +707,4 @@ platform_cache_flush_wimg(
 {
 }
 
-#endif  /* __ARM_COHERENT_IO__ */
+#endif                           

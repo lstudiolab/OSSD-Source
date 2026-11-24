@@ -57,4 +57,4 @@ public:
 	OSMetaClassDeclareReservedUnused(AppleMacIODevice, 3);
 };
 
-#endif /* ! _IOKIT_APPLEMACIODEVICE_H */
+#endif                                  

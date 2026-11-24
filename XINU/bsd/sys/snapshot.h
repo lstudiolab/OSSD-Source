@@ -58,7 +58,7 @@ int fs_snapshot_root(int, const char *, uint32_t) __OSX_AVAILABLE(10.12.4) __IOS
 
 __END_DECLS
 
-#endif /* !KERNEL */
+#endif              
 
 #ifdef PRIVATE
 
@@ -71,4 +71,4 @@ __END_DECLS
 
 #endif
 
-#endif /* !_SYS_SNAPSHOT_H_ */
+#endif                        

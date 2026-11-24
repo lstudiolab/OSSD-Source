@@ -54,4 +54,4 @@ void kperf_task_snapshot_sample(task_t task, struct kperf_task_snapshot *tksn);
 void kperf_task_snapshot_log(struct kperf_task_snapshot *tksn);
 void kperf_task_info_log(struct kperf_context *ctx);
 
-#endif /* !defined(KPERF_TASK_SAMPLERS_H) */
+#endif                                      

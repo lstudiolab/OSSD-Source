@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Changes to this API are expected.
- */
+  
+                                    
+   
 
 #ifndef _IOKIT_IOUSERCLIENT_H
 #define _IOKIT_IOUSERCLIENT_H
@@ -55,10 +55,10 @@ enum {
 	kIOUCForegroundOnly = 0x00000010,
 };
 
-/*! @enum
- *   @abstract Constant to denote a variable length structure argument to IOUserClient.
- *   @constant kIOUCVariableStructureSize Use in the structures IOExternalMethod, IOExternalAsyncMethod, IOExternalMethodDispatch to specify the size of the structure is variable.
- */
+         
+                                                                                       
+                                                                                                                                                                                   
+   
 enum {
 	kIOUCVariableStructureSize = 0xffffffff
 };
@@ -100,19 +100,19 @@ enum {
 };
 
 enum {
-	kIOUserNotifyOptionCanDrop = 0x1 /* Fail if queue is full, rather than infinitely queuing. */
+	kIOUserNotifyOptionCanDrop = 0x1                                                             
 };
 
-// keys for clientHasPrivilege
+                              
 #define kIOClientPrivilegeAdministrator "root"
 #define kIOClientPrivilegeLocalUser     "local"
 #define kIOClientPrivilegeForeground    "foreground"
 
-/*! @enum
- *   @abstract Constants to specify the maximum number of scalar arguments in the IOExternalMethodArguments structure. These constants are documentary since the scalarInputCount, scalarOutputCount fields reflect the actual number passed.
- *   @constant kIOExternalMethodScalarInputCountMax The maximum number of scalars able to passed on input.
- *   @constant kIOExternalMethodScalarOutputCountMax The maximum number of scalars able to passed on output.
- */
+         
+                                                                                                                                                                                                                                             
+                                                                                                          
+                                                                                                            
+   
 enum {
 	kIOExternalMethodScalarInputCountMax  = 16,
 	kIOExternalMethodScalarOutputCountMax = 16,
@@ -184,12 +184,12 @@ struct io_filter_callbacks {
 	const io_filter_release_t       io_filter_release;
 };
 struct IOUCFilterPolicy;
-#endif /* PRIVATE */
+#endif              
 
-/*!
- *   @class IOUserClient
- *   @abstract   Provides a basis for communication between client applications and I/O Kit objects.
- */
+   
+                        
+                                                                                                    
+   
 
 class IOUserClient : public IOService
 {
@@ -200,12 +200,12 @@ class IOUserClient : public IOService
 
 #if XNU_KERNEL_PRIVATE
 public:
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 protected:
-#endif /* !XNU_KERNEL_PRIVATE */
-/*! @struct ExpansionData
- *   @discussion This structure will be used to expand the capablilties of this class in the future.
- */
+#endif                          
+                         
+                                                                                                    
+   
 	struct ExpansionData {
 #if IOKITSTATS
 		IOUserClientCounter *counter;
@@ -219,9 +219,9 @@ protected:
 #endif
 	};
 
-/*! @var reserved
- *   Reserved for future use.  (Internal use only)
- */
+                 
+                                                  
+   
 	APPLE_KEXT_WSHADOW_PUSH;
 	ExpansionData * reserved;
 	APPLE_KEXT_WSHADOW_POP;
@@ -248,10 +248,10 @@ public:
 	void  * __reserved[2];
 #endif
 
-#else /* XNU_KERNEL_PRIVATE */
+#else                         
 private:
 	void  * __reserved[9];
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 public:
 	MIG_SERVER_ROUTINE virtual IOReturn
@@ -287,7 +287,7 @@ private:
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/* Available within xnu source only */
+                                      
 public:
 	static void initialize( void );
 	static void destroyUserReferences( OSObject * obj );
@@ -299,12 +299,12 @@ public:
 	IOReturn registerOwner(task_t task);
 	void     noMoreSenders(void);
 	io_filter_policy_t filterForTask(task_t task, io_filter_policy_t addFilterPolicy);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #if PRIVATE
 public:
 	static IOReturn registerFilterCallbacks(const struct io_filter_callbacks *callbacks, size_t size);
-#endif /* PRIVATE */
+#endif              
 
 protected:
 	static IOReturn sendAsyncResult(OSAsyncReference reference,
@@ -316,13 +316,13 @@ protected:
 	static IOReturn sendAsyncResult64(OSAsyncReference64 reference,
 	    IOReturn result, io_user_reference_t args[], UInt32 numArgs);
 
-/*!
- *   @function sendAsyncResult64WithOptions
- *   @abstract Send a notification as with sendAsyncResult, but with finite queueing.
- *   @discussion IOUserClient::sendAsyncResult64() will infitely queue messages if the client
- *           is not processing them in a timely fashion.  This variant will not, for simple
- *           handling of situations where clients may be expected to stop processing messages.
- */
+   
+                                           
+                                                                                     
+                                                                                             
+                                                                                           
+                                                                                              
+   
 	static IOReturn sendAsyncResult64WithOptions(OSAsyncReference64 reference,
 	    IOReturn result, io_user_reference_t args[], UInt32 numArgs,
 	    IOOptionBits options);
@@ -351,26 +351,26 @@ public:
 	static OSPtr<OSDictionary>  copyClientEntitlementsVnode(struct vnode *vnode, off_t offset);
 	static OSPtr<OSDictionary>  copyEntitlementsFromBlob(void *blob, size_t len);
 
-/*!
- *   @function releaseAsyncReference64
- *   @abstract Release the mach_port_t reference held within the OSAsyncReference64 structure.
- *   @discussion The OSAsyncReference64 structure passed to async methods holds a reference to the wakeup mach port, which should be released to balance each async method call. Behavior is undefined if these calls are not correctly balanced.
- *   @param reference The reference passed to the subclass IOAsyncMethod, or externalMethod() in the IOExternalMethodArguments.asyncReference field.
- *   @result A return code.
- */
+   
+                                      
+                                                                                              
+                                                                                                                                                                                                                                                 
+                                                                                                                                                    
+                           
+   
 	static IOReturn releaseAsyncReference64(OSAsyncReference64 reference);
-/*!
- *   @function releaseNotificationPort
- *   @abstract Release the mach_port_t passed to registerNotificationPort().
- *   @discussion The mach_port_t passed to the registerNotificationPort() methods should be released to balance each call to registerNotificationPort(). Behavior is undefined if these calls are not correctly balanced.
- *   @param port The mach_port_t argument previously passed to the subclass implementation of registerNotificationPort().
- *   @result A return code.
- */
+   
+                                      
+                                                                            
+                                                                                                                                                                                                                         
+                                                                                                                         
+                           
+   
 	static IOReturn releaseNotificationPort(mach_port_t port);
 
 	virtual bool init() APPLE_KEXT_OVERRIDE;
 	virtual bool init( OSDictionary * dictionary ) APPLE_KEXT_OVERRIDE;
-// Currently ignores the all args, just passes up to IOService::init()
+                                                                      
 	virtual bool initWithTask(
 		task_t owningTask, void * securityToken, UInt32 type,
 		OSDictionary * properties);
@@ -393,7 +393,7 @@ public:
 
 	virtual IOReturn connectClient( IOUserClient * client );
 
-// memory will be released by user client when last map is destroyed
+                                                                    
 	virtual IOReturn clientMemoryForType( UInt32 type,
 	    IOOptionBits * options,
 	    IOMemoryDescriptor ** memory );
@@ -415,68 +415,68 @@ private:
 	    IOReturn result, io_user_reference_t args[], UInt32 numArgs, IOOptionBits options);
 public:
 
-/*!
- *   @function removeMappingForDescriptor
- *   Remove the first mapping created from the memory descriptor returned by clientMemoryForType() from IOUserClient's list of mappings. If such a mapping exists, it is retained and the reference currently held by IOUserClient is returned to the caller.
- *   @param memory The memory descriptor instance previously returned by the implementation of clientMemoryForType().
- *   @result A reference to the first IOMemoryMap instance found in the list of mappings created by IOUserClient from that passed memory descriptor is returned, or zero if none exist. The caller should release this reference.
- */
+   
+                                         
+                                                                                                                                                                                                                                                             
+                                                                                                                     
+                                                                                                                                                                                                                                 
+   
 	OSPtr<IOMemoryMap>  removeMappingForDescriptor(IOMemoryDescriptor * memory);
 
-/*!
- *   @function exportObjectToClient
- *   Make an arbitrary OSObject available to the client task.
- *   @param task The task.
- *   @param obj The object we want to export to the client.
- *   @param clientObj Returned value is the client's port name.
- */
+   
+                                   
+                                                             
+                          
+                                                           
+                                                               
+   
 	virtual IOReturn exportObjectToClient(task_t task,
 	    LIBKERN_CONSUMED OSObject *obj, io_object_t *clientObj);
 
 #if KERNEL_PRIVATE
 
-/*!
- *   @function copyPortNameForObjectInTask
- *   Make an arbitrary OSObject available to the client task as a port name.
- *   The port does not respond to any IOKit IPC calls.
- *   @param task The task.
- *   @param object The object we want to export to the client.
- *   The port holds a reference on the object, this function does not consume any reference on the object.
- *   @param port_name Returned value is the task's port name. It has one send right created by this function.
- *   @result A return code.
- */
+   
+                                          
+                                                                            
+                                                      
+                          
+                                                              
+                                                                                                          
+                                                                                                             
+                           
+   
 	static IOReturn copyPortNameForObjectInTask(task_t task, OSObject *object,
 	    mach_port_name_t * port_name);
 
-/*!
- *   @function copyObjectForPortNameInTask
- *   Look up an OSObject given a task's port name created with copyPortNameForObjectInTask().
- *   @param task The task.
- *   @param port_name The task's port name. This function does not consume any reference on the port name.
- *   @param object If the port name is valid, a reference to the object is returned. It should be released by the caller.
- *   @result A return code.
- */
+   
+                                          
+                                                                                             
+                          
+                                                                                                          
+                                                                                                                         
+                           
+   
 	static IOReturn copyObjectForPortNameInTask(task_t task, mach_port_name_t port_name,
 	    OSObject **object);
 
 	static IOReturn copyObjectForPortNameInTask(task_t task, mach_port_name_t port_name,
 	    OSSharedPtr<OSObject>& object);
 
-/*!
- *   @function adjustPortNameReferencesInTask
- *   Adjust the send rights for a port name created with copyPortNameForObjectInTask().
- *   @param task The task.
- *   @param port_name The task's port name.
- *   @param delta Signed value change to the number of user references.
- *   @result A return code.
- */
+   
+                                             
+                                                                                       
+                          
+                                           
+                                                                       
+                           
+   
 	static IOReturn adjustPortNameReferencesInTask(task_t task, mach_port_name_t port_name, mach_port_delta_t delta);
 
 #define IOUC_COPYPORTNAMEFOROBJECTINTASK    1
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-// Old methods for accessing method vector backward compatiblility only
+                                                                       
 	virtual IOExternalMethod *
 	getExternalMethodForIndex( UInt32 index )
 	APPLE_KEXT_DEPRECATED;
@@ -484,7 +484,7 @@ public:
 	getExternalAsyncMethodForIndex( UInt32 index )
 	APPLE_KEXT_DEPRECATED;
 
-// Methods for accessing method vector.
+                                       
 	virtual IOExternalMethod *
 	getTargetAndMethodForIndex(
 		LIBKERN_RETURNS_NOT_RETAINED IOService ** targetP, UInt32 index );
@@ -498,7 +498,7 @@ public:
 	getAsyncTargetAndMethodForIndex(
 		OSSharedPtr<IOService>& targetP, UInt32 index );
 
-// Methods for accessing trap vector - old and new style
+                                                        
 	virtual IOExternalTrap *
 	getExternalTrapForIndex( UInt32 index )
 	APPLE_KEXT_DEPRECATED;
@@ -510,6 +510,6 @@ public:
 
 #ifdef XNU_KERNEL_PRIVATE
 extern "C" void IOMachPortDestroyUserReferences(OSObject * obj, natural_t type);
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* ! _IOKIT_IOUSERCLIENT_H */
+#endif                              

@@ -35,8 +35,8 @@
 #include <net/pktsched/pktsched.h>
 #include <net/pktsched/pktsched_netem.h>
 
-/* <rdar://problem/55953523> M8 Perf: Remove norm_dist_table on armv7k (16K wired win) */
-/* compile out netem on platforms where skywalk is not enabled by default */
+                                                                                         
+                                                                            
 #if __LP64__
 #define CONFIG_NETEM 1
 #else
@@ -71,7 +71,7 @@ static lck_grp_attr_t   *netem_lock_group_attr;
 static int              __netem_inited = 0;
 
 static const int32_t NORM_DIST_SCALE = 8192;
-/* normal distribution lookup table */
+                                      
 static int32_t norm_dist_table[] =
 {
 	-32768, -28307, -26871, -25967, -25298, -24765, -24320, -23937,
@@ -596,8 +596,8 @@ struct heap_elem {
 };
 
 struct heap {
-	uint64_t        limit;  /* max size */
-	uint64_t        size;   /* current size */
+	uint64_t        limit;                
+	uint64_t        size;                     
 	struct heap_elem p[0];
 };
 
@@ -609,7 +609,7 @@ static int heap_extract(struct heap *h, uint64_t *k, pktsched_pkt_t *p);
 struct netem {
 	decl_lck_mtx_data(, netem_lock);
 
-	/* Init Time Constants */
+	                         
 	char            netem_name[MAXTHREADNAMESIZE];
 	uint32_t        netem_flags;
 	struct thread   *netem_output_thread;
@@ -621,8 +621,8 @@ struct netem {
 
 	struct heap     *netem_heap;
 
-	/* Parameters variables */
-	/* bandwidth token bucket limit */
+	                          
+	                                  
 #define TOKEN_INVALID   UINT64_MAX
 	struct token_bucket {
 		uint64_t        depth;
@@ -631,24 +631,24 @@ struct netem {
 		uint64_t        rate;
 	} netem_bandwidth_model;
 
-	/* XXX (need correlated) naive corruption model */
+	                                                  
 	struct corruption {
 		uint32_t        corruption_p;
 	} netem_corruption_model;
 
-	/* naive duplication model */
+	                             
 	struct duplication {
 		uint32_t        duplication_p;
 	} netem_duplication_model;
 
-	/* latency (with jitter following random distribution) */
+	                                                         
 	struct latency {
 		uint32_t        latency_ms;
 		uint32_t        jitter_ms;
 		uint64_t        last_time_to_send;
 	} netem_latency_model;
 
-	/* 4 state Markov packet loss model */
+	                                      
 	struct loss {
 		enum _4state_markov_packet_loss_state {
 			__NO_LOSS = 0,
@@ -658,27 +658,27 @@ struct netem {
 			BURST_LOSS,
 		} state;
 
-		uint32_t        p_gr_gl; /* P( gap_loss   | gap_rx     ) */
-		uint32_t        p_gr_bl; /* P( burst_loss | gap_rx     ) */
-		uint32_t        p_bl_br; /* P( burst_rx   | burst_loss ) */
-		uint32_t        p_bl_gr; /* P( gap_rx     | burst_loss ) */
-		uint32_t        p_br_bl; /* P( burst_loss | burst_rx   ) */
+		uint32_t        p_gr_gl;                                   
+		uint32_t        p_gr_bl;                                   
+		uint32_t        p_bl_br;                                   
+		uint32_t        p_bl_gr;                                   
+		uint32_t        p_br_bl;                                   
 	} netem_loss_model;
 
-	/*
-	 * Reordering Model --
-	 * randomly select packets and re-inject with additional delay
-	 */
+	  
+                       
+                                                               
+    
 	struct reordering {
 		uint32_t        reordering_p;
 	} netem_reordering_model;
 };
 
-#define NETEMF_INITIALIZED      0x00000001      /* has been initialized */
-#define NETEMF_RUNNING          0x00000002      /* thread is running */
-#define NETEMF_TERMINATEBLOCK   0x20000000      /* block waiting terminate */
-#define NETEMF_TERMINATING      0x40000000      /* thread is terminating */
-#define NETEMF_TERMINATED       0x80000000      /* thread is terminated */
+#define NETEMF_INITIALIZED      0x00000001                                
+#define NETEMF_RUNNING          0x00000002                             
+#define NETEMF_TERMINATEBLOCK   0x20000000                                   
+#define NETEMF_TERMINATING      0x40000000                                 
+#define NETEMF_TERMINATED       0x80000000                                
 
 #define NETEM_MTX_LOCK(_sch)                    \
 	lck_mtx_lock(&(_sch)->netem_lock)
@@ -694,7 +694,7 @@ heap_create(uint64_t limit)
 {
 	struct heap *h = NULL;
 
-	// verify limit
+	               
 	size_t size = sizeof(struct heap) + sizeof(struct heap_elem) * limit;
 
 	h = _MALLOC(size, M_DEVBUF, M_WAITOK | M_ZERO);
@@ -778,25 +778,25 @@ heap_extract(struct heap *h, uint64_t *key, pktsched_pkt_t *pkt)
 	*key = h->p[0].key;
 	*pkt = h->p[0].pkt;
 
-	/* re-heapify */
+	                
 	parent = 0;
-	child = HEAP_LEFT(parent);      /* start from left child */
+	child = HEAP_LEFT(parent);                                 
 	max = h->size - 1;
 	while (child <= max) {
 		if (child != max && h->p[child + 1].key < h->p[child].key) {
-			child = child + 1;        /* right child */
+			child = child + 1;                         
 		}
 		h->p[parent] = h->p[child];
 		parent = child;
-		child = HEAP_LEFT(child);       /* left child for next loop */
+		child = HEAP_LEFT(child);                                     
 	}
 
 	h->size--;
 	if (parent != max) {
-		/* Fill hole with last entry, bubble up reusing insert code */
+		                                                              
 		h->p[parent] = h->p[max];
 		_PKTSCHED_PKT_INIT(&h->p[max].pkt);
-		heap_insert(h, parent, NULL); /* this one cannot fail */
+		heap_insert(h, parent, NULL);                           
 	}
 
 	return 0;
@@ -907,12 +907,12 @@ latency_event(struct netem *ne, boolean_t reordering)
 
 	if (l->last_time_to_send != 0) {
 		if (reordering) {
-			/* reorder with last packet */
+			                              
 			time_to_send = l->last_time_to_send - 1;
 		} else {
-			/* make sure packet time to send is monotonic */
+			                                                
 			if (time_to_send < l->last_time_to_send) {
-				/* send this one immediately afterwards */
+				                                          
 				time_to_send = l->last_time_to_send + 1;
 			}
 		}
@@ -970,13 +970,13 @@ loss_event(struct netem *ne)
 			return FALSE;
 		}
 	case GAP_LOSS:
-	/* This is instantaneous (stateless), should not be reached */
+	                                                              
 	default:
 		VERIFY(0);
 		break;
 	}
 
-	/* not reached */
+	                 
 	VERIFY(0);
 	return FALSE;
 }
@@ -1090,7 +1090,7 @@ netem_dequeue_internal_locked(struct netem *ne, pktsched_pkt_t *pp,
 		goto done;
 	}
 
-	/* latency limit */
+	                   
 	if (time_to_send > mach_absolute_time()) {
 		netem_log(NETEM_LOG_DEBUG,
 		    "held back: time_to_send %llu now %llu",
@@ -1099,7 +1099,7 @@ netem_dequeue_internal_locked(struct netem *ne, pktsched_pkt_t *pp,
 		goto done;
 	}
 
-	/* bandwidth limited */
+	                       
 	if (bandwidth_limited(ne, pkt.pktsched_plen)) {
 		ret = EAGAIN;
 		goto done;
@@ -1147,11 +1147,11 @@ __attribute__((optnone))
 
 		NETEM_MTX_UNLOCK(ne);
 
-		/* for the extra refcnt from kernel_thread_start() */
+		                                                     
 		thread_deallocate(current_thread());
-		/* this is the end */
+		                     
 		thread_terminate(current_thread());
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 
@@ -1186,7 +1186,7 @@ __attribute__((optnone))
 	ne->netem_flags &= ~NETEMF_RUNNING;
 	NETEM_MTX_UNLOCK(ne);
 	(void) thread_block_parameter(netem_output_thread_cont, ne);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -1205,7 +1205,7 @@ netem_output_thread_func(void *v, wait_result_t w)
 	(void) assert_wait(&ne->netem_flags, THREAD_UNINT);
 	NETEM_MTX_UNLOCK(ne);
 	thread_block_parameter(netem_output_thread_cont, ne);
-	/* NOTREACHED */
+	                
 	__builtin_unreachable();
 }
 
@@ -1255,8 +1255,8 @@ netem_create(const char *name, void *output_handle,
 void
 netem_destroy(struct netem *ne)
 {
-	uint64_t f = (1 * NSEC_PER_MSEC);       /* 1 ms */
-	uint64_t s = (1000 * NSEC_PER_MSEC);    /* 1 sec */
+	uint64_t f = (1 * NSEC_PER_MSEC);                 
+	uint64_t s = (1000 * NSEC_PER_MSEC);               
 	uint32_t i = 0;
 	int ret = 0;
 	uint64_t key = 0;
@@ -1266,11 +1266,11 @@ netem_destroy(struct netem *ne)
 
 	if (ne->netem_output_thread != THREAD_NULL) {
 		ASSERT(ne->netem_flags & NETEMF_INITIALIZED);
-		/* signal thread to begin self-termination */
+		                                             
 		NETEM_MTX_LOCK(ne);
 		ne->netem_flags |= NETEMF_TERMINATING;
 
-		/* and wait for thread to terminate */
+		                                      
 		while (!(ne->netem_flags & NETEMF_TERMINATED)) {
 			uint64_t t = 0;
 			nanoseconds_to_absolutetime((i++ == 0) ? f : s, &t);
@@ -1321,7 +1321,7 @@ netem_check_params(const struct if_netem_params *p)
 
 	if (p->ifnetem_duplication_p > 0 &&
 	    p->ifnetem_latency_ms == 0) {
-		/* we need to insert dup'ed packet with latency */
+		                                                  
 		netem_log(NETEM_LOG_ERROR,
 		    "error: duplication needs latency param");
 		return EINVAL;
@@ -1341,7 +1341,7 @@ netem_check_params(const struct if_netem_params *p)
 		return EINVAL;
 	}
 
-	/* if gr_gl == 0 (no loss), other prob should all be zero */
+	                                                            
 	if (p->ifnetem_loss_p_gr_gl == 0 &&
 	    (p->ifnetem_loss_p_gr_bl != 0 ||
 	    p->ifnetem_loss_p_bl_br != 0 ||
@@ -1352,9 +1352,9 @@ netem_check_params(const struct if_netem_params *p)
 		return EINVAL;
 	}
 
-	/* check state machine transition prob integrity */
+	                                                   
 	if (p->ifnetem_loss_p_gr_gl > NETEM_PSCALE ||
-	    /* gr_gl = NETEM_PSCALE for total loss */
+	                                             
 	    p->ifnetem_loss_p_gr_bl > NETEM_PSCALE ||
 	    p->ifnetem_loss_p_bl_br > NETEM_PSCALE ||
 	    p->ifnetem_loss_p_bl_gr > NETEM_PSCALE ||
@@ -1518,7 +1518,7 @@ done:
 	return ret;
 }
 
-#else /* !CONFIG_NETEM */
+#else                    
 
 int
 netem_init(void)
@@ -1560,4 +1560,4 @@ netem_enqueue(struct netem *ne, classq_pkt_t *p, boolean_t *pdrop)
 	panic("unexpected netem call");
 	return 0;
 }
-#endif /* !CONFIG_NETEM */
+#endif                    

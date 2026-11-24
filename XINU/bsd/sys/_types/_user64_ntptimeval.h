@@ -36,5 +36,5 @@ _STRUCT_USER64_NTPTIMEVAL
 	user64_long_t tai;
 	__int64_t time_state;
 };
-#endif /* _STRUCT_USER64_NTPTIMEVAL */
-#endif /* KERNEL */
+#endif                                
+#endif             

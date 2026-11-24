@@ -1,11 +1,11 @@
-//
-// Tests for
-//  template<typename To, typename From, typename R>
-//  intrusive_shared_ptr<To, R> static_pointer_cast(intrusive_shared_ptr<From, R> const& ptr) noexcept;
-//
-//  template<typename To, typename From, typename R>
-//  intrusive_shared_ptr<To, R> static_pointer_cast(intrusive_shared_ptr<From, R>&& ptr) noexcept
-//
+  
+            
+                                                    
+                                                                                                       
+  
+                                                    
+                                                                                                 
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <utility>
@@ -48,7 +48,7 @@ tests()
 		CHECK(from.get() == nullptr);
 	}
 
-	// Test `static_pointer_cast`ing a null pointer
+	                                               
 	{
 		tracked_shared_ptr<From> const from = nullptr;
 		tracking_policy::reset();
@@ -70,9 +70,9 @@ tests()
 }
 
 T_DECL(cast_static, "intrusive_shared_ptr.cast.static") {
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Base>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ Base const>();
+	tests<           Derived,          Derived,        Base>();
+	tests<           Derived,          Derived const,        Base const>();
 
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple, /*to*/ Base1>();
-	tests</*stored*/ DerivedMultiple, /*from*/ DerivedMultiple const, /*to*/ Base1 const>();
+	tests<           DerivedMultiple,          DerivedMultiple,        Base1>();
+	tests<           DerivedMultiple,          DerivedMultiple const,        Base1 const>();
 }

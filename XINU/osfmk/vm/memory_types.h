@@ -25,19 +25,19 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/* machine independent WIMG bits */
+                                   
 
 #ifndef _VM_MEMORY_TYPES_H_
 #define _VM_MEMORY_TYPES_H_
 
 #include <machine/memory_types.h>
 
-#define VM_MEM_GUARDED          0x1             /* (G) Guarded Storage */
-#define VM_MEM_COHERENT         0x2             /* (M) Memory Coherency */
-#define VM_MEM_NOT_CACHEABLE    0x4             /* (I) Cache Inhibit */
-#define VM_MEM_WRITE_THROUGH    0x8             /* (W) Write-Through */
+#define VM_MEM_GUARDED          0x1                                      
+#define VM_MEM_COHERENT         0x2                                       
+#define VM_MEM_NOT_CACHEABLE    0x4                                    
+#define VM_MEM_WRITE_THROUGH    0x8                                    
 
 #define VM_WIMG_USE_DEFAULT     0x80
 #define VM_WIMG_MASK            0xFF
 
-#endif /* _VM_MEMORY_TYPES_H_ */
+#endif                          

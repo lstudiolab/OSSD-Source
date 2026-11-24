@@ -118,7 +118,7 @@ cfil_crypto_update_context(const struct ccdigest_info *di,
     cchmac_ctx_t ctx,
     cfil_crypto_data_t data)
 {
-	const uint8_t context[32] = {[0 ... 31] = 0x20}; // 0x20 repeated 32 times
+	const uint8_t context[32] = {[0 ... 31] = 0x20};                          
 	const char *context_string = "NEFilterCrypto";
 	uint8_t separator = 0;
 	cchmac_update(di, ctx, sizeof(context), context);

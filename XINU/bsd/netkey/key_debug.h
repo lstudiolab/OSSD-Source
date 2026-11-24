@@ -1,4 +1,4 @@
-/*	$KAME: key_debug.h,v 1.7 2000/07/04 04:08:16 itojun Exp $	*/
+                                                               
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -33,14 +33,14 @@
 #define _NETKEY_KEY_DEBUG_H_
 #include <sys/appleapiopts.h>
 
-/* debug flags */
-#define KEYDEBUG_STAMP          0x00000001 /* path */
-#define KEYDEBUG_DATA           0x00000002 /* data */
-#define KEYDEBUG_DUMP           0x00000004 /* dump */
+                 
+#define KEYDEBUG_STAMP          0x00000001           
+#define KEYDEBUG_DATA           0x00000002           
+#define KEYDEBUG_DUMP           0x00000004           
 
-#define KEYDEBUG_KEY            0x00000010 /* key processing */
-#define KEYDEBUG_ALG            0x00000020 /* ciph & auth algorithm */
-#define KEYDEBUG_IPSEC          0x00000040 /* ipsec processing */
+#define KEYDEBUG_KEY            0x00000010                     
+#define KEYDEBUG_ALG            0x00000020                            
+#define KEYDEBUG_IPSEC          0x00000040                       
 
 #define KEYDEBUG_KEY_STAMP      (KEYDEBUG_KEY | KEYDEBUG_STAMP)
 #define KEYDEBUG_KEY_DATA       (KEYDEBUG_KEY | KEYDEBUG_DATA)
@@ -79,7 +79,7 @@ extern void kdebug_secasindex(struct secasindex *);
 extern void kdebug_secasv(struct secasvar *);
 extern void kdebug_mbufhdr(struct mbuf *);
 extern void kdebug_mbuf(struct mbuf *);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 struct sockaddr;
 extern void kdebug_sockaddr(struct sockaddr *);
@@ -88,4 +88,4 @@ extern void ipsec_hexdump(caddr_t, int);
 extern void ipsec_bindump(caddr_t, int);
 
 
-#endif /* _NETKEY_KEY_DEBUG_H_ */
+#endif                           

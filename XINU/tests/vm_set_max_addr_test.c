@@ -52,7 +52,7 @@ T_DECL(set_max_addr,
 
 	posix_spawnattr_destroy(&attrp);
 	T_ASSERT_POSIX_SUCCESS(result, "posix_spawnattr_destroy");
-#else /* !defined(__arm64__) || !defined(__LP64__) */
+#else                                                
 	T_SKIP("Not supported on this architecture");
-#endif /* (defined(__arm64__) && defined(__LP64__)) */
+#endif                                                
 }

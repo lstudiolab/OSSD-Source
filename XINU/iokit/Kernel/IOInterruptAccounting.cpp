@@ -33,7 +33,7 @@
 
 uint32_t gInterruptAccountingStatisticBitmask =
 #if !defined(__arm__)
-    /* Disable timestamps for older ARM platforms; they are expensive. */
+                                                                         
     IA_GET_ENABLE_BIT(kInterruptAccountingFirstLevelTimeIndex) |
     IA_GET_ENABLE_BIT(kInterruptAccountingSecondLevelCPUTimeIndex) |
     IA_GET_ENABLE_BIT(kInterruptAccountingSecondLevelSystemTimeIndex) |

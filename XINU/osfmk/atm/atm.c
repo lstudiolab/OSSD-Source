@@ -30,24 +30,24 @@
 #include <machine/commpage.h>
 #include <pexpert/pexpert.h>
 
-/*
- * Global that is set by diagnosticd and readable by userspace
- * via the commpage.
- */
+  
+                                                              
+                    
+   
 static uint32_t atm_diagnostic_config;
 static bool disable_atm;
 
-/*
- * Routine: atm_init
- * Purpose: Initialize the atm subsystem.
- * Returns: None.
- */
+  
+                    
+                                         
+                 
+   
 void
 atm_init(void)
 {
 	char temp_buf[20];
 
-	/* Disable atm if disable_atm present in device-tree properties or in boot-args */
+	                                                                                  
 	if ((PE_get_default("kern.disable_atm", temp_buf, sizeof(temp_buf))) ||
 	    (PE_parse_boot_argn("-disable_atm", temp_buf, sizeof(temp_buf)))) {
 		disable_atm = true;
@@ -62,11 +62,11 @@ atm_init(void)
 	kprintf("ATM subsystem is initialized\n");
 }
 
-/*
- * Routine: atm_reset
- * Purpose: re-initialize the atm subsystem (e.g. for userspace reboot)
- * Returns: None.
- */
+  
+                     
+                                                                       
+                 
+   
 void
 atm_reset(void)
 {
@@ -74,12 +74,12 @@ atm_reset(void)
 	commpage_update_atm_diagnostic_config(atm_diagnostic_config);
 }
 
-/*
- * Routine: atm_set_diagnostic_config
- * Purpose: Set global atm_diagnostic_config and update the commpage to reflect
- *          the new value.
- * Returns: Error if ATM is disabled.
- */
+  
+                                     
+                                                                               
+                          
+                                     
+   
 kern_return_t
 atm_set_diagnostic_config(uint32_t diagnostic_config)
 {
@@ -93,11 +93,11 @@ atm_set_diagnostic_config(uint32_t diagnostic_config)
 	return KERN_SUCCESS;
 }
 
-/*
- * Routine: atm_get_diagnostic_config
- * Purpose: Get global atm_diagnostic_config.
- * Returns: Diagnostic value
- */
+  
+                                     
+                                             
+                            
+   
 uint32_t
 atm_get_diagnostic_config(void)
 {

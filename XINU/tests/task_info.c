@@ -17,22 +17,22 @@
 
 T_GLOBAL_META(T_META_RUN_CONCURRENTLY(true));
 
-/* *************************************************************************************
- * Test the task_info API.
- *
- * This is a functional test of the following APIs:
- * TASK_BASIC_INFO_32
- * TASK_BASIC2_INFO_32
- * TASK_BASIC_INFO_64
- * TASK_BASIC_INFO_64_2
- * TASK_POWER_INFO_V2
- * TASK_FLAGS_INFO
- * TASK_AFFINITY_TAG_INFO
- * TASK_THREAD_TIMES_INFO
- * TASK_ABSOLUTE_TIME_INFO
- * <rdar://problem/22242021> Add tests to increase code coverage for the task_info API
- * *************************************************************************************
- */
+                                                                                        
+                          
+  
+                                                   
+                     
+                      
+                     
+                       
+                     
+                  
+                         
+                         
+                          
+                                                                                      
+                                                                                        
+   
 #define TESTPHYSFOOTPRINTVAL 5
 #define CANARY 0x0f0f0f0f0f0f0f0fULL
 #if !defined(CONFIG_EMBEDDED)
@@ -44,9 +44,9 @@ enum info_kind { INFO_32, INFO_64, INFO_32_2, INFO_64_2, INFO_MACH, INFO_MAX };
 
 enum info_get { GET_SUSPEND_COUNT, GET_RESIDENT_SIZE, GET_VIRTUAL_SIZE, GET_USER_TIME, GET_SYS_TIME, GET_POLICY, GET_MAX_RES };
 
-/*
- * This function uses CPU cycles by doing a factorial computation.
- */
+  
+                                                                  
+   
 static void do_factorial_task(void);
 
 void test_task_basic_info_32(void);
@@ -71,9 +71,9 @@ T_DECL(task_vm_info, "tests task vm info", T_META_ASROOT(true), T_META_LTEPHASE(
 
 	T_EXPECT_NE(vm_info.phys_footprint, 0ULL, "task_info return value !=0 for phys_footprint\n");
 
-	/*
-	 * Test the REV0 version of TASK_VM_INFO. It should not change the value of phys_footprint.
-	 */
+	  
+                                                                                            
+    
 
 	count                  = TASK_VM_INFO_REV0_COUNT;
 	vm_info.phys_footprint = TESTPHYSFOOTPRINTVAL;
@@ -103,9 +103,9 @@ T_DECL(task_vm_info, "tests task vm info", T_META_ASROOT(true), T_META_LTEPHASE(
 	    "be modified by rev0",
 	    vm_info.max_address, CANARY);
 
-	/*
-	 * Test the REV1 version of TASK_VM_INFO.
-	 */
+	  
+                                          
+    
 
 	count                  = TASK_VM_INFO_REV1_COUNT;
 	vm_info.phys_footprint = TESTPHYSFOOTPRINTVAL;
@@ -135,9 +135,9 @@ T_DECL(task_vm_info, "tests task vm info", T_META_ASROOT(true), T_META_LTEPHASE(
 	    "be modified by rev1",
 	    vm_info.max_address, CANARY);
 
-	/*
-	 * Test the REV2 version of TASK_VM_INFO.
-	 */
+	  
+                                          
+    
 
 	count                  = TASK_VM_INFO_REV2_COUNT;
 	vm_info.phys_footprint = TESTPHYSFOOTPRINTVAL;
@@ -167,9 +167,9 @@ T_DECL(task_vm_info, "tests task vm info", T_META_ASROOT(true), T_META_LTEPHASE(
 	    "this value should be modified by rev2",
 	    vm_info.max_address, CANARY);
 
-	/*
-	 * Test the REV4 version of TASK_VM_INFO.
-	 */
+	  
+                                          
+    
 
 	count                         = TASK_VM_INFO_REV4_COUNT;
 	vm_info.phys_footprint        = TESTPHYSFOOTPRINTVAL;
@@ -294,19 +294,19 @@ T_DECL(task_thread_times_info, "tests task thread times info", T_META_ASROOT(tru
 
 	T_ASSERT_MACH_SUCCESS(err, "verify task_info call succeeded");
 
-	/*
-	 * The difference is observed to be less than 30 microseconds for user_time
-	 * and less than 50 microseconds for system_time. This observation was done for over
-	 * 1000 runs.
-	 */
+	  
+                                                                            
+                                                                                     
+              
+    
 
 	T_EXPECT_FALSE((thread_times_info_data_new.user_time.seconds - thread_times_info_data.user_time.seconds) != 0 ||
 	    (thread_times_info_data_new.system_time.seconds - thread_times_info_data.system_time.seconds) != 0,
 	    "Tests whether the difference between thread times is greater than the allowed limit");
 
-	/*
-	 * This is a negative case.
-	 */
+	  
+                            
+    
 
 	count--;
 	err = task_info(mach_task_self(), TASK_THREAD_TIMES_INFO, (task_info_t)&thread_times_info_data, &count);
@@ -342,10 +342,10 @@ T_DECL(task_absolutetime_info, "tests task absolute time info", T_META_ASROOT(tr
 	system_time_diff = absolute_time_info_data_new.total_system - absolute_time_info_data.total_system;
 
 #if !(defined(__arm__) || defined(__arm64__))
-	/*
-	 * On embedded devices the difference is always zero.
-	 * On non-embedded devices the difference occurs in this range. This was observed over ~10000 runs.
-	 */
+	  
+                                                      
+                                                                                                    
+    
 
 	T_EXPECT_FALSE(user_time_diff < ABSOLUTE_MIN_USER_TIME_DIFF || system_time_diff < ABSOLUTE_MIN_SYSTEM_TIME_DIFF,
 	    "Tests whether the difference between thread times is greater than the expected range");
@@ -369,17 +369,17 @@ T_DECL(task_absolutetime_info, "tests task absolute time info", T_META_ASROOT(tr
 	}
 
 #if !(defined(__arm__) || defined(__arm64__))
-	/*
-	 * On iOS, system threads are always zero. On OS X this value can be some large positive number.
-	 * There is no real way to estimate the exact amount.
-	 */
+	  
+                                                                                                 
+                                                      
+    
 	T_EXPECT_NE(absolute_time_info_data.threads_system, 0ULL,
 	    "task_info should return non-zero value for system threads time = %llu", absolute_time_info_data.threads_system);
 #endif
 
-	/*
-	 * This is a negative case.
-	 */
+	  
+                            
+    
 	count--;
 	err = task_info(mach_task_self(), TASK_ABSOLUTETIME_INFO, (task_info_t)&absolute_time_info_data_new, &count);
 	T_ASSERT_MACH_ERROR(err, KERN_INVALID_ARGUMENT,
@@ -402,15 +402,15 @@ T_DECL(task_affinity_tag_info, "tests task_affinity_tag_info", T_META_ASROOT(tru
 
 	T_ASSERT_MACH_SUCCESS(err, "verify task_info call succeeded");
 
-	/*
-	 * The affinity is not set by default, hence expecting a zero value.
-	 */
+	  
+                                                                     
+    
 	T_ASSERT_FALSE(affinity_tag_info_data.min != 0 || affinity_tag_info_data.max != 0,
 	    "task_info call returns non-zero min or max value");
 
-	/*
-	 * This is a negative case.
-	 */
+	  
+                            
+    
 	count--;
 	err = task_info(mach_task_self(), TASK_AFFINITY_TAG_INFO, (task_info_t)&affinity_tag_info_data, &count);
 	T_ASSERT_MACH_ERROR(err, KERN_INVALID_ARGUMENT,
@@ -433,13 +433,13 @@ T_DECL(task_flags_info, "tests task_flags_info", T_META_ASROOT(true), T_META_LTE
 
 	T_ASSERT_MACH_SUCCESS(err, "verify task_info call succeeded");
 
-	/* Change for 32-bit arch possibility?*/
+	                                        
 	T_ASSERT_EQ((flags_info_data.flags & (unsigned int)(~(TF_LP64 | TF_64B_DATA))), 0U,
 	    "task_info should only give out 64-bit addr/data flags");
 
-	/*
-	 * This is a negative case.
-	 */
+	  
+                            
+    
 
 	count--;
 	err = task_info(mach_task_self(), TASK_FLAGS_INFO, (task_info_t)&flags_info_data, &count);
@@ -471,16 +471,16 @@ T_DECL(task_power_info_v2, "tests task_power_info_v2", T_META_ASROOT(true), T_ME
 
 	do_factorial_task();
 
-	/*
-	 * Verify the cpu_energy parameters.
-	 */
+	  
+                                     
+    
 	err = task_info(mach_task_self(), TASK_POWER_INFO_V2, (task_info_t)&power_info_data_v2_new, &count);
 	T_ASSERT_MACH_SUCCESS(err, "verify task_info call succeeded");
 
 #if !(defined(__arm__) || defined(__arm64__))
-	/*
-	 * iOS does not have system_time.
-	 */
+	  
+                                  
+    
 	T_ASSERT_GT(power_info_data_v2_new.cpu_energy.total_user, power_info_data_v2.cpu_energy.total_user,
 	    "task_info call returns valid user time");
 	T_ASSERT_GT(power_info_data_v2_new.cpu_energy.total_system, power_info_data_v2.cpu_energy.total_system,
@@ -502,9 +502,9 @@ T_DECL(task_power_info_v2, "tests task_power_info_v2", T_META_ASROOT(true), T_ME
 
 	T_ASSERT_MACH_SUCCESS(err, "verify task_info call succeeded");
 
-	/*
-	 * This is a negative case.
-	 */
+	  
+                            
+    
 	count--;
 	err = task_info(mach_task_self(), TASK_POWER_INFO_V2, (task_info_t)&power_info_data_v2, &count);
 
@@ -534,7 +534,7 @@ T_DECL(test_task_basic_info_64, "tests TASK_BASIC_INFO_64", T_META_ASROOT(true),
 {
 	test_task_basic_info(INFO_64);
 }
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 
 T_DECL(test_mach_task_basic_info, "tests MACH_TASK_BASIC_INFO", T_META_ASROOT(true), T_META_LTEPHASE(LTE_POSTINIT))
 {
@@ -559,7 +559,7 @@ test_task_basic_info(enum info_kind kind)
 	task_basic_info_64_2_data_t basic_info_64_2_data[2];
 #else
 	task_basic_info_64_data_t basic_info_64_data[2];
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 	mach_task_basic_info_data_t mach_basic_info_data[2];
 
 	kern_return_t kr;
@@ -572,8 +572,8 @@ test_task_basic_info(enum info_kind kind)
 	void * tmp_map = NULL;
 	pid_t child_pid;
 	mach_port_name_t child_task;
-	/*for dt_waitpid*/
-	int timeout     = 10; // change to max timeout
+	                  
+	int timeout     = 10;                         
 	int exit_status = 0;
 
 	switch (kind) {
@@ -612,7 +612,7 @@ test_task_basic_info(enum info_kind kind)
 	case INFO_64_2:
 		T_ASSERT_FAIL("invalid basic info kind");
 		break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 	case INFO_MACH:
 		info_data[BEFORE] = (task_info_t)&mach_basic_info_data[BEFORE];
 		info_data[AFTER]  = (task_info_t)&mach_basic_info_data[AFTER];
@@ -631,9 +631,9 @@ test_task_basic_info(enum info_kind kind)
 
 	do_factorial_task();
 
-	/*
-	 * Allocate virtual and resident memory.
-	 */
+	  
+                                         
+    
 	tmp_map = mmap(0, PAGE_SIZE, PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 
 	T_WITH_ERRNO;
@@ -646,24 +646,24 @@ test_task_basic_info(enum info_kind kind)
 	T_ASSERT_POSIX_SUCCESS(child_pid, "verify process can be forked");
 
 	if (child_pid == 0) {
-		/*
-		 * This will suspend the child process.
-		 */
+		  
+                                         
+     
 		kr = task_suspend(mach_task_self());
 		exit(kr);
 	}
 
-	/*
-	 * Wait for the child process to suspend itself.
-	 */
+	  
+                                                 
+    
 	sleep(1);
 
 	kr = task_for_pid(mach_task_self(), child_pid, &child_task);
 	T_ASSERT_MACH_SUCCESS(kr, "verify task_for_pid succeeded.  check sudo if failed");
 
-	/*
-	 * Verify the suspend_count for child and resume it.
-	 */
+	  
+                                                     
+    
 
 	kr = task_info(child_task, flavor, info_data[AFTER], &count);
 	T_ASSERT_MACH_SUCCESS(kr, "verify task_info call succeeded");
@@ -674,9 +674,9 @@ test_task_basic_info(enum info_kind kind)
 	kr = task_resume(child_task);
 	T_ASSERT_MACH_SUCCESS(kr, "verify task_resume succeeded");
 
-	/*
-	 * reap kr from task_suspend call in child
-	 */
+	  
+                                           
+    
 	if (dt_waitpid(child_pid, &exit_status, NULL, timeout)) {
 		T_ASSERT_MACH_SUCCESS(exit_status, "verify child task_suspend is successful");
 	} else {
@@ -689,12 +689,12 @@ test_task_basic_info(enum info_kind kind)
 	resident_size_diff = info_get(kind, GET_RESIDENT_SIZE, info_data[AFTER]) - info_get(kind, GET_RESIDENT_SIZE, info_data[BEFORE]);
 	virtual_size_diff  = info_get(kind, GET_VIRTUAL_SIZE, info_data[AFTER]) - info_get(kind, GET_VIRTUAL_SIZE, info_data[BEFORE]);
 
-	/*
-	 * INFO_32_2 gets the max resident size instead of the current resident size
-	 * 32 KB tolerance built into test.  The returned value is generally between 0 and 16384
-	 *
-	 * max resident size is a discrete field in INFO_MACH, so it's handled differently
-	 */
+	  
+                                                                             
+                                                                                         
+   
+                                                                                   
+    
 	if (kind == INFO_32_2) {
 		T_EXPECT_EQ(resident_size_diff % 4096, 0ULL, "verify task_info returns valid max resident_size");
 		T_EXPECT_GE(resident_size_diff, 0ULL, "verify task_info returns non-negative max resident_size");
@@ -714,9 +714,9 @@ test_task_basic_info(enum info_kind kind)
 
 	do_factorial_task();
 
-	/*
-	 * These counters give time for threads that have terminated. We dont have any, so checking for zero.
-	 */
+	  
+                                                                                                      
+    
 
 	time_value_t * user_tv = (time_value_t *)(info_get(kind, GET_USER_TIME, info_data[BEFORE]));
 	T_EXPECT_EQ((user_tv->seconds + user_tv->microseconds / 1000000), 0, "verify task_info shows valid user time");
@@ -724,17 +724,17 @@ test_task_basic_info(enum info_kind kind)
 	time_value_t * sys_tv = (time_value_t *)(info_get(kind, GET_SYS_TIME, info_data[BEFORE]));
 	T_EXPECT_EQ(sys_tv->seconds + (sys_tv->microseconds / 1000000), 0, "verify task_info shows valid system time");
 
-	/*
-	 * The default value for non-kernel tasks is TIMESHARE.
-	 */
+	  
+                                                        
+    
 
 	policy_t pt = (policy_t)info_get(kind, GET_POLICY, info_data[BEFORE]);
 
 	T_EXPECT_EQ(pt, POLICY_TIMESHARE, "verify task_info shows valid policy");
 
-	/*
-	 * This is a negative case.
-	 */
+	  
+                            
+    
 
 	count--;
 	kr = task_info(mach_task_self(), flavor, info_data[AFTER], &count);
@@ -742,9 +742,9 @@ test_task_basic_info(enum info_kind kind)
 	T_ASSERT_MACH_ERROR(kr, KERN_INVALID_ARGUMENT,
 	    "Negative test case: task_info should verify that count is at least equal to what is defined in API");
 
-	/*
-	 * deallocate memory
-	 */
+	  
+                     
+    
 	munmap(tmp_map, PAGE_SIZE);
 
 	return;
@@ -778,7 +778,7 @@ T_DECL(test_sigcont_task_suspend_resume,
 	integer_t debug_suspend_count;
 	pid_t child_pid = 0;
 	mach_port_name_t child_task;
-	/*for dt_waitpid*/
+	                  
 	int timeout     = 5;
 	int exit_status = 0;
 	int signal_no   = 0;
@@ -788,29 +788,29 @@ T_DECL(test_sigcont_task_suspend_resume,
 	T_ASSERT_POSIX_SUCCESS(child_pid, "verify process can be forked");
 
 	if (child_pid == 0) {
-		/*
-		 * This will suspend the child process.
-		 */
+		  
+                                         
+     
 		kr = task_suspend(mach_task_self());
 
-		/*
-		 * When child resumes, it exits immediately
-		 */
+		  
+                                             
+     
 
 		exit(kr);
 	}
 
-	/*
-	 * Wait for the child process to suspend itself.
-	 */
+	  
+                                                 
+    
 	sleep(1);
 
 	kr = task_for_pid(mach_task_self(), child_pid, &child_task);
 	T_ASSERT_MACH_SUCCESS(kr, "verify task_for_pid succeeded.  check sudo if failed");
 
-	/*
-	 * Verify the suspend_count for child and resume it.
-	 */
+	  
+                                                     
+    
 
 	kr = task_info(child_task, flavor, info_data, &count);
 	T_ASSERT_MACH_SUCCESS(kr, "verify task_info call succeeded");
@@ -827,9 +827,9 @@ T_DECL(test_sigcont_task_suspend_resume,
 	posix_ret = kill(child_pid, SIGCONT);
 	T_ASSERT_POSIX_SUCCESS(posix_ret, "verify signal call succeeded");
 
-	/*
-	 * reap kr from task_suspend call in child
-	 */
+	  
+                                           
+    
 	dt_waitpid(child_pid, &exit_status, &signal_no, timeout);
 
 	T_ASSERT_EQ(signal_no, 0, "child should be resumed and exit without signal");
@@ -863,16 +863,16 @@ T_DECL(test_sigcont_task_suspend2_resume,
 	mach_port_name_t child_task;
 	task_suspension_token_t child_token = 0xFFFFF;
 
-	/*
-	 * for dt_waitpid
-	 * We expect the test to fail right now, so I've set timeout to
-	 * be shorter than we may want it to be when the issue is fixed
-	 */
+	  
+                  
+                                                                
+                                                                
+    
 	int timeout     = 1;
 	int exit_status = 0;
 	int signal_no   = 0;
 
-	/* for pipe */
+	              
 	int fd[2];
 	pipe(fd);
 	int pipe_msg = 0;
@@ -888,9 +888,9 @@ T_DECL(test_sigcont_task_suspend2_resume,
 		T_LOG("Done reading from parent, about to exit...");
 		exit(0);
 	}
-	/*
-	 * Wait for child to fork and block on read
-	 */
+	  
+                                            
+    
 	sleep(1);
 
 	close(fd[0]);
@@ -913,9 +913,9 @@ T_DECL(test_sigcont_task_suspend2_resume,
 	debug_suspend_count = debug_info.suspend_count;
 	T_ASSERT_EQ(debug_suspend_count, 1, "verify debug_info shows correct (true) suspend_count(1)");
 
-	/*
-	 * Verify the suspend_count for child and resume it.
-	 */
+	  
+                                                     
+    
 
 	kr = task_info(child_task, flavor, info_data, &count);
 	T_ASSERT_MACH_SUCCESS(kr, "verify task_info call succeeded");
@@ -940,15 +940,15 @@ T_DECL(test_sigcont_task_suspend2_resume,
 	T_EXPECTFAIL_WITH_RADAR(33166654);
 	T_EXPECT_MACH_SUCCESS(kr, "verify task_resume succeeded");
 
-	/*
-	 * reap kr from task_suspend call in child
-	 */
+	  
+                                           
+    
 
 	dt_waitpid(child_pid, &exit_status, &signal_no, timeout);
 
 	T_ASSERT_EQ(signal_no, SIG_DT_TIMEOUT, "dt_waitpid timed out as expected");
 
-	// Resume properly using token and then wait
+	                                            
 
 	kr = task_resume2(child_token);
 	T_EXPECTFAIL_WITH_RADAR(33166654);
@@ -956,9 +956,9 @@ T_DECL(test_sigcont_task_suspend2_resume,
 
 	write(fd[1], &pipe_msg, sizeof(pipe_msg));
 
-	/*
-	 * reap kr from task_suspend call in child
-	 */
+	  
+                                           
+    
 	dt_waitpid(child_pid, &exit_status, &signal_no, timeout);
 
 	T_ASSERT_EQ(signal_no, 0, "child should be resumed and no signal should be returned");
@@ -988,7 +988,7 @@ info_get(enum info_kind kind, enum info_get get, void * data)
 		case INFO_64_2:
 			T_ASSERT_FAIL("illegal info_get %d %d", kind, get);
 			break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		case INFO_MACH:
 			return (uint64_t)(((mach_task_basic_info_t)data)->suspend_count);
 		case INFO_MAX:
@@ -1014,7 +1014,7 @@ info_get(enum info_kind kind, enum info_get get, void * data)
 		case INFO_64_2:
 			T_ASSERT_FAIL("illegal info_get %d %d", kind, get);
 			break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		case INFO_MACH:
 			return (uint64_t)(((mach_task_basic_info_t)data)->resident_size);
 		case INFO_MAX:
@@ -1040,7 +1040,7 @@ info_get(enum info_kind kind, enum info_get get, void * data)
 		case INFO_64_2:
 			T_ASSERT_FAIL("illegal info_get %d %d", kind, get);
 			break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		case INFO_MACH:
 			return (uint64_t)(((mach_task_basic_info_t)data)->virtual_size);
 
@@ -1067,7 +1067,7 @@ info_get(enum info_kind kind, enum info_get get, void * data)
 		case INFO_64_2:
 			T_ASSERT_FAIL("illegal info_get %d %d", kind, get);
 			break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		case INFO_MACH:
 			return (uint64_t) &(((mach_task_basic_info_t)data)->user_time);
 
@@ -1094,7 +1094,7 @@ info_get(enum info_kind kind, enum info_get get, void * data)
 		case INFO_64_2:
 			T_ASSERT_FAIL("illegal info_get %d %d", kind, get);
 			break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		case INFO_MACH:
 			return (uint64_t) &(((mach_task_basic_info_t)data)->user_time);
 		case INFO_MAX:
@@ -1120,7 +1120,7 @@ info_get(enum info_kind kind, enum info_get get, void * data)
 		case INFO_64_2:
 			T_ASSERT_FAIL("illegal info_get %d %d", kind, get);
 			break;
-#endif /* defined(__arm__) || defined(__arm64__) */
+#endif                                             
 		case INFO_MACH:
 			return (uint64_t)(((mach_task_basic_info_t)data)->policy);
 

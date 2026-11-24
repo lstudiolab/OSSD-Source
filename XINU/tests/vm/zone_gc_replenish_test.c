@@ -14,13 +14,13 @@ gc_thread_func(__unused void *arg)
 	time_t start = time(NULL);
 	time_t end = time(NULL);
 
-	/*
-	 * Keep kicking the test for 15 seconds to see if we can panic() the kernel
-	 */
+	  
+                                                                            
+    
 	while (time(&end) < start + 15) {
 		err = sysctlbyname("kern.zone_gc_replenish_test", &count, &s, &count, s);
 
-		/* If the sysctl isn't supported, test succeeds */
+		                                                  
 		if (err != 0) {
 			T_SKIP("sysctl kern.zone_gc_replenish_test not found, skipping test");
 			break;
@@ -38,13 +38,13 @@ alloc_thread_func(__unused void *arg)
 	time_t start = time(NULL);
 	time_t end = time(NULL);
 
-	/*
-	 * Keep kicking the test for 15 seconds to see if we can panic() the kernel
-	 */
+	  
+                                                                            
+    
 	while (time(&end) < start + 15) {
 		err = sysctlbyname("kern.zone_alloc_replenish_test", &count, &s, &count, s);
 
-		/* If the sysctl isn't supported, test succeeds */
+		                                                  
 		if (err != 0) {
 			T_SKIP("sysctl kern.zone_alloc_replenish_test not found, skipping test");
 			break;

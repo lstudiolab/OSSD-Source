@@ -26,17 +26,17 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 #ifdef KERNEL
-/* LP64 version of struct timespec.  time_t is a long and must grow when
- * we're dealing with a 64-bit process.
- * WARNING - keep in sync with struct timespec
- */
+                                                                        
+                                       
+                                              
+   
 
 #ifndef _STRUCT_USER_TIMESPEC
 #define _STRUCT_USER_TIMESPEC   struct user_timespec
 _STRUCT_USER_TIMESPEC
 {
-	user_time_t     tv_sec;         /* seconds */
-	user_long_t     tv_nsec;        /* and nanoseconds */
+	user_time_t     tv_sec;                      
+	user_long_t     tv_nsec;                             
 };
-#endif /* _STRUCT_USER_TIMESPEC */
-#endif /* KERNEL */
+#endif                            
+#endif             

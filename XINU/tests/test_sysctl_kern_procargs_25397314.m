@@ -55,8 +55,8 @@ static procargs_t getProcArgs(int type, pid_t pid, size_t allocSize)
 
 	T_ASSERT_TRUE(type == KERN_PROCARGS || type == KERN_PROCARGS2, "type is valid");
 
-	/* Determine how much memory to allocate. If allocSize is 0 we will use the size
-	 * we get from the sysctl for our buffer. */
+	                                                                                
+                                             
 	T_ASSERT_POSIX_SUCCESS(sysctl(sysctlArgs, 3, NULL, &preflightSize, NULL, 0), "sysctl %s", name);
 	T_LOG("procargs data should be %lu bytes", preflightSize);
 
@@ -72,7 +72,7 @@ static procargs_t getProcArgs(int type, pid_t pid, size_t allocSize)
 	T_ASSERT_LE(bufferSize, allocSize, "returned buffer size should be less than allocated size");
 	T_LOG("sysctl wrote %lu bytes", bufferSize);
 	if (allocSize >= bufferSize) {
-		/* Allocated buffer is larger than what kernel wrote, so it should match preflightSize */
+		                                                                                         
 		T_ASSERT_EQ(bufferSize, preflightSize, "buffer size should be the same as preflight size");
 	}
 
@@ -82,20 +82,20 @@ static procargs_t getProcArgs(int type, pid_t pid, size_t allocSize)
 		argc = *(int *)buffer;
 		cursor = (const char *)buffer + sizeof(int);
 	} else {
-		/* Without KERN_PROCARGS2, we can't tell where argv ends and environ begins.
-		 * Set argc to -1 to indicate this */
+		                                                                            
+                                       
 		argc = -1;
 		cursor = buffer;
 	}
 
 	while ((uintptr_t)cursor < (uintptr_t)buffer + bufferSize) {
-		/* Ensure alignment and check if the uint16_t at cursor is the magic value */
+		                                                                             
 		if (!((uintptr_t)cursor & (sizeof(uint16_t) - 1)) && 
 			(uintptr_t)buffer + bufferSize - (uintptr_t)cursor > sizeof(uint16_t)) {
-			/* Silence -Wcast-align by casting to const void * */
+			                                                     
 			uint16_t value = *(const uint16_t *)(const void *)cursor;
 			if (value == 0xBFFF) {
-				/* Magic value that specifies the end of the argument/environ section */
+				                                                                        
 				cursor += sizeof(uint16_t) + sizeof(uint32_t);
 				legacyPathPresent = true;
 				break;
@@ -212,7 +212,7 @@ launch_child_process(NSArray *args, bool cs_restrict)
 
 	T_ASSERT_POSIX_SUCCESS(_NSGetExecutablePath(path, &path_size), "get executable path");
 	
-	/* We need to add 4 arguments to the beginning and NULL at the end */
+	                                                                     
 	dt_args_count = [args count] + 5;
 	dt_args = malloc(sizeof(char *) * dt_args_count);
 	dt_args[0] = path;

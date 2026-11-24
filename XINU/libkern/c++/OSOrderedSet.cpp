@@ -148,7 +148,7 @@ OSOrderedSet::ensureCapacity(unsigned int newCapacity)
 		return capacity;
 	}
 
-	// round up
+	           
 	finalCapacity = (((newCapacity - 1) / capacityIncrement) + 1)
 	    * capacityIncrement;
 	if (finalCapacity < newCapacity) {
@@ -158,10 +158,10 @@ OSOrderedSet::ensureCapacity(unsigned int newCapacity)
 
 	newArray = (_Element *) kallocp_container(&newSize);
 	if (newArray) {
-		// use all of the actual allocation size
+		                                        
 		finalCapacity = (newSize / sizeof(_Element));
 		if (finalCapacity > UINT_MAX) {
-			// failure, too large
+			                     
 			kfree(newArray, newSize);
 			return capacity;
 		}
@@ -194,7 +194,7 @@ OSOrderedSet::flushCollection()
 	count = 0;
 }
 
-/* internal */
+              
 bool
 OSOrderedSet::setObject(unsigned int index, const OSMetaClassBase *anObject)
 {
@@ -209,7 +209,7 @@ OSOrderedSet::setObject(unsigned int index, const OSMetaClassBase *anObject)
 		return false;
 	}
 
-	// do we need more space?
+	                         
 	if (newCount > capacity && newCount > ensureCapacity(newCount)) {
 		return false;
 	}
@@ -265,7 +265,7 @@ OSOrderedSet::setObject(const OSMetaClassBase *anObject )
 {
 	unsigned int i;
 
-	// queue it behind those with same priority
+	                                           
 	for (i = 0;
 	    (i < count) && (ORDER(array[i].obj.get(), anObject) >= 0);
 	    i++) {
@@ -291,7 +291,7 @@ OSOrderedSet::removeObject(const OSMetaClassBase *anObject)
 			array[i - 1] = os::move(array[i]);
 		} else if (array[i].obj == anObject) {
 			deleted = true;
-			haveUpdated(); // Pity we can't flush the log
+			haveUpdated();                               
 			array[i].obj.reset();
 		}
 	}
@@ -326,7 +326,7 @@ OSOrderedSet::member(const OSMetaClassBase *anObject) const
 	return i < count;
 }
 
-/* internal */
+              
 OSObject *
 OSOrderedSet::getObject( unsigned int index ) const
 {
@@ -441,7 +441,7 @@ OSOrderedSet::setOptions(unsigned options, unsigned mask, void *)
 {
 	unsigned old = super::setOptions(options, mask);
 	if ((old ^ options) & mask) {
-		// Value changed need to recurse over all of the child collections
+		                                                                  
 		for (unsigned i = 0; i < count; i++) {
 			OSCollection *coll = OSDynamicCast(OSCollection, array[i].obj.get());
 			if (coll) {
@@ -469,31 +469,31 @@ OSOrderedSet::copyCollection(OSDictionary *cycleDict)
 	}
 
 	do {
-		// Check for a cycle
+		                    
 		ret = super::copyCollection(cycleDict);
 		if (ret) {
 			continue;
 		}
 
-		// Duplicate the set with no contents
+		                                     
 		newSet = OSOrderedSet::withCapacity(capacity, ordering, orderingRef);
 		if (!newSet) {
 			continue;
 		}
 
-		// Insert object into cycle Dictionary
+		                                      
 		cycleDict->setObject((const OSSymbol *) this, newSet.get());
 
 		newSet->capacityIncrement = capacityIncrement;
 
-		// Now copy over the contents to the new duplicate
+		                                                  
 		for (unsigned int i = 0; i < count; i++) {
 			OSObject *obj = EXT_CAST(array[i].obj.get());
 			OSCollection *coll = OSDynamicCast(OSCollection, obj);
 			if (coll) {
 				OSSharedPtr<OSCollection> newColl = coll->copyCollection(cycleDict);
 				if (newColl) {
-					obj = newColl.get(); // Rely on cycleDict ref for a bit
+					obj = newColl.get();                                   
 				} else {
 					return ret;
 				}

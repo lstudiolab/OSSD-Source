@@ -33,21 +33,21 @@
 #ifndef _MACHINE_ENDIAN_H_
 #define _MACHINE_ENDIAN_H_
 
-/*
- * Definitions for byte order,
- * according to byte significance from low address to high.
- */
-#define LITTLE_ENDIAN   1234    /* least-significant byte first (vax) */
-#define BIG_ENDIAN      4321    /* most-significant byte first (IBM, net) */
-#define PDP_ENDIAN      3412    /* LSB first in word, MSW first in long (pdp) */
+  
+                              
+                                                           
+   
+#define LITTLE_ENDIAN   1234                                            
+#define BIG_ENDIAN      4321                                                
+#define PDP_ENDIAN      3412                                                    
 
-#define BYTE_ORDER      LITTLE_ENDIAN   /* byte order on i386 */
+#define BYTE_ORDER      LITTLE_ENDIAN                           
 #define ENDIAN          LITTLE
 
-/*
- * Macros for network/external number representation conversion.
- * Use GNUC support to inline the byteswappers.
- */
+  
+                                                                
+                                               
+   
 
 #if !defined(ntohs)
 static __inline__ unsigned short        ntohs(unsigned short);

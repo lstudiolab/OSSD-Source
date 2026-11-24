@@ -98,7 +98,7 @@ allocate_random_pages(char **buf, int num_pages, int vmpgsize)
 	}
 }
 
-// Gives us the compression ratio we see in the typical case (~2.7)
+                                                                   
 void
 allocate_representative_pages(char **buf, int num_pages, int vmpgsize)
 {
@@ -151,7 +151,7 @@ freeze_helper_process(void)
 		errno = errno_sysctl_freeze;
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(ret, "sysctl kern.memorystatus_freeze failed");
 	} else {
-		/* If freezer is disabled, skip the test. This can happen due to disk space shortage. */
+		                                                                                        
 		T_LOG("Freeze has been disabled. Terminating early.");
 		T_END;
 	}
@@ -167,11 +167,11 @@ freeze_helper_process(void)
 void
 cleanup(void)
 {
-	/* No helper process. */
+	                        
 	if (pid == -1) {
 		return;
 	}
-	/* Kill the helper process. */
+	                              
 	kill(pid, SIGKILL);
 }
 
@@ -193,7 +193,7 @@ run_compressor_test(int size_mb, int page_type)
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(sysctlbyname("vm.freeze_enabled", &freeze_enabled, &length, NULL, 0),
 	    "failed to query vm.freeze_enabled");
 	if (!freeze_enabled) {
-		/* If freezer is disabled, skip the test. This can happen due to disk space shortage. */
+		                                                                                        
 		T_SKIP("Freeze has been disabled. Skipping test.");
 	}
 
@@ -202,7 +202,7 @@ run_compressor_test(int size_mb, int page_type)
 	ratio = dt_stat_create("(input bytes / compressed bytes)", "compression_ratio");
 	compr_time = dt_stat_time_create("compressor_latency");
 
-	// This sets the A/B failure threshold at 50% of baseline for compressor_latency
+	                                                                                
 	dt_stat_set_variable((struct dt_stat *)compr_time, kPCFailureThresholdPctVar, 50.0);
 
 	signal(SIGUSR2, SIG_IGN);
@@ -249,7 +249,7 @@ run_compressor_test(int size_mb, int page_type)
 		NULL
 	};
 
-	/* Spawn the child process. Suspend after launch until the exit proc handler has been set up. */
+	                                                                                                
 	ret = dt_launch_tool(&pid, launch_tool_args, true, NULL, NULL);
 	if (ret != 0) {
 		T_LOG("dt_launch tool returned %d with error code %d", ret, errno);
@@ -304,7 +304,7 @@ T_HELPER_DECL(allocate_pages, "allocates pages to compress") {
 	num_pages = size_mb * 1024 * 1024 / vmpgsize;
 	buf = (char**)malloc(sizeof(char*) * (size_t)num_pages);
 
-	// Switch on the type of page requested
+	                                       
 	switch (page_type) {
 	case ALL_ZEROS:
 		allocate_zero_pages(buf, num_pages, vmpgsize);
@@ -328,20 +328,20 @@ T_HELPER_DECL(allocate_pages, "allocates pages to compress") {
 
 	decompr_time = dt_stat_time_create("decompression_latency");
 
-	/* Opt in to freezing. */
+	                         
 	printf("[%d] Setting state to freezable\n", getpid());
 	if (memorystatus_control(MEMORYSTATUS_CMD_SET_PROCESS_IS_FREEZABLE, getpid(), 1, NULL, 0) != KERN_SUCCESS) {
 		exit(MEMORYSTATUS_CONTROL_FAILED);
 	}
 
-	/* Verify that the state has been set correctly */
+	                                                  
 	freezable_state = memorystatus_control(MEMORYSTATUS_CMD_GET_PROCESS_IS_FREEZABLE, getpid(), 0, NULL, 0);
 	if (freezable_state != 1) {
 		exit(IS_FREEZABLE_NOT_AS_EXPECTED);
 	}
 
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-		/* Signal to the parent that we're done allocating and it's ok to freeze us */
+		                                                                              
 		printf("[%d] Sending initial signal to parent to begin freezing\n", getpid());
 		if (kill(getppid(), SIGUSR1) != 0) {
 		        exit(INITIAL_SIGNAL_TO_PARENT_FAILED);
@@ -362,7 +362,7 @@ T_HELPER_DECL(allocate_pages, "allocates pages to compress") {
 
 		decompr_start_time = mach_absolute_time();
 
-		/* Make sure all the pages are accessed before trying to freeze again */
+		                                                                        
 		for (int x = 0; x < num_pages; x++) {
 		        tmp = buf[x][0];
 		}
@@ -390,9 +390,9 @@ T_HELPER_DECL(allocate_pages, "allocates pages to compress") {
 	dispatch_main();
 }
 
-// Numbers for 10MB and above are fairly reproducible. Anything smaller shows a lot of variation.
+                                                                                                 
 
-// Keeping just the 100MB version for iOSMark
+                                             
 #ifndef DT_IOSMARK
 T_DECL(compr_10MB_zero,
     "Compression latency for 10MB - zero pages",

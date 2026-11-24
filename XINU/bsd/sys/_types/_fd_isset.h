@@ -27,4 +27,4 @@
  */
 #ifndef FD_ISSET
 #define FD_ISSET(n, p)  __DARWIN_FD_ISSET(n, p)
-#endif /* FD_ISSET */
+#endif               

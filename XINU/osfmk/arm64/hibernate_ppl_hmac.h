@@ -47,9 +47,9 @@ void ppl_hmac_hibernate_end(void);
 vm_address_t ppl_hmac_get_reg_base(void);
 int ppl_hmac_update_and_compress_page(ppnum_t pageNumber, void **uncompressed, void *compressed);
 void ppl_hmac_final(uint8_t *output, size_t outputLen);
-void ppl_hmac_fetch_hibseg_and_info(/* out */ void *buffer,
-    /* in */ uint64_t bufferLen,
-    /* out */ IOHibernateHibSegInfo *info);
+void ppl_hmac_fetch_hibseg_and_info(          void *buffer,
+             uint64_t bufferLen,
+              IOHibernateHibSegInfo *info);
 void ppl_hmac_compute_rorgn_hmac(void);
 void ppl_hmac_fetch_rorgn_sha(uint8_t *output, size_t outputLen);
 void ppl_hmac_fetch_rorgn_hmac(uint8_t *output, size_t outputLen);
@@ -58,4 +58,4 @@ void ppl_hmac_get_io_ranges(const ppl_hib_io_range **io_ranges, uint16_t *num_io
 
 __END_DECLS
 
-#endif /* _ARM64_HIBERNATE_PPL_HMAC_H_ */
+#endif                                   

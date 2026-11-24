@@ -54,21 +54,21 @@
 #include <vm/vm_protos.h>
 #include <kern/kcdata.h>
 
-/* version number of the in-kernel shims given to pthread.kext */
+                                                                 
 #define PTHREAD_SHIMS_VERSION 1
 
-/* on arm, the callbacks function has two #ifdef arm pointers */
+                                                                
 #if defined(__arm__)
 #define PTHREAD_CALLBACK_MEMBER __unused_was_map_is_1gb
 #else
 #define PTHREAD_CALLBACK_MEMBER kevent_workq_internal
 #endif
 
-/* compile time asserts to check the length of structures in pthread_shims.h */
+                                                                               
 static_assert((sizeof(struct pthread_functions_s) - offsetof(struct pthread_functions_s, psynch_rw_yieldwrlock) - sizeof(void*)) == (sizeof(void*) * 100));
 static_assert((sizeof(struct pthread_callbacks_s) - offsetof(struct pthread_callbacks_s, PTHREAD_CALLBACK_MEMBER) - sizeof(void*)) == (sizeof(void*) * 100));
 
-/* old pthread code had definitions for these as they don't exist in headers */
+                                                                               
 extern kern_return_t mach_port_deallocate(ipc_space_t, mach_port_name_t);
 extern kern_return_t semaphore_signal_internal_trap(mach_port_name_t);
 extern void thread_deallocate_safe(thread_t thread);
@@ -181,12 +181,12 @@ proc_usynch_get_requested_thread_qos(struct uthread *uth)
 
 	requested_qos = proc_get_thread_policy(thread, TASK_POLICY_ATTRIBUTE, TASK_POLICY_QOS);
 
-	/*
-	 * For the purposes of userspace synchronization, it doesn't make sense to
-	 * place an override of UNSPECIFIED on another thread, if the current thread
-	 * doesn't have any QoS set. In these cases, upgrade to
-	 * THREAD_QOS_USER_INTERACTIVE.
-	 */
+	  
+                                                                           
+                                                                             
+                                                        
+                                
+    
 	if (requested_qos == THREAD_QOS_UNSPECIFIED) {
 		requested_qos = THREAD_QOS_USER_INTERACTIVE;
 	}
@@ -308,7 +308,7 @@ psynch_wait_wakeup(uintptr_t kwq, struct ksyn_waitq_element *kwe,
 	return kr;
 }
 
-/* kernel (core) to kext shims */
+                                 
 
 void
 pthread_init(void)
@@ -331,7 +331,7 @@ pth_proc_hashdelete(proc_t p)
 	pthread_functions->pth_proc_hashdelete(p);
 }
 
-/* syscall shims */
+                   
 int
 bsdthread_create(struct proc *p, struct bsdthread_create_args *uap, user_addr_t *retval)
 {
@@ -376,7 +376,7 @@ thread_selfid(struct proc *p, __unused struct thread_selfid_args *uap, uint64_t 
 	return pthread_functions->thread_selfid(p, retval);
 }
 
-/* pthread synchroniser syscalls */
+                                   
 
 int
 psynch_mutexwait(proc_t p, struct psynch_mutexwait_args *uap, uint32_t *retval)
@@ -485,12 +485,12 @@ thread_will_park_or_terminate(__unused thread_t thread)
 {
 }
 
-/*
- * The callbacks structure (defined in pthread_shims.h) contains a collection
- * of kernel functions that were not deemed sensible to expose as a KPI to all
- * kernel extensions. So the kext is given them in the form of a structure of
- * function pointers.
- */
+  
+                                                                             
+                                                                              
+                                                                             
+                     
+   
 static const struct pthread_callbacks_s pthread_callbacks = {
 	.version = PTHREAD_SHIMS_VERSION,
 	.config_thread_max = CONFIG_THREAD_MAX,
@@ -509,7 +509,7 @@ static const struct pthread_callbacks_s pthread_callbacks = {
 	.proc_set_register = proc_set_register,
 	.proc_get_pthread_jit_allowlist = proc_get_pthread_jit_allowlist,
 
-	/* kernel IPI interfaces */
+	                           
 	.ipc_port_copyout_send = ipc_port_copyout_send,
 	.task_get_ipcspace = get_task_ipcspace,
 	.vm_map_page_info = vm_map_page_info,
@@ -537,7 +537,7 @@ static const struct pthread_callbacks_s pthread_callbacks = {
 	.semaphore_signal_internal_trap = semaphore_signal_internal_trap,
 	.current_map = _current_map,
 	.thread_create = thread_create,
-	/* should be removed once rdar://70892168 lands */
+	                                                  
 	.thread_create_pinned = thread_create_pinned,
 	.thread_create_immovable = thread_create_immovable,
 	.thread_terminate_pinned = thread_terminate_pinned,
@@ -586,11 +586,11 @@ static const struct pthread_callbacks_s pthread_callbacks = {
 pthread_callbacks_t pthread_kern = &pthread_callbacks;
 pthread_functions_t pthread_functions = NULL;
 
-/*
- * pthread_kext_register is called by pthread.kext upon load, it has to provide
- * us with a function pointer table of pthread internal calls. In return, this
- * file provides it with a table of function pointers it needs.
- */
+  
+                                                                               
+                                                                              
+                                                               
+   
 
 void
 pthread_kext_register(pthread_functions_t fns, pthread_callbacks_t *callbacks)

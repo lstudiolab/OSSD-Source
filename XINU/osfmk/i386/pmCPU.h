@@ -33,22 +33,22 @@
 
 #ifndef ASSEMBLER
 
-/*
- * This value should be changed each time that pmDispatch_t or pmCallBacks_t
- * changes.
- */
+  
+                                                                            
+           
+   
 #define PM_DISPATCH_VERSION     102
 
-/*
- * Dispatch table for functions that get installed when the power
- * management KEXT loads.
- *
- * pmDispatch_t is the set of functions that the kernel can use to call
- * into the power management KEXT.
- *
- * pmCallBacks_t is the set of functions that the power management kext
- * can call to get at specific kernel functions.
- */
+  
+                                                                 
+                         
+  
+                                                                       
+                                  
+  
+                                                                       
+                                                
+   
 typedef struct{
 	kern_return_t       (*pmCPUStateInit)(void);
 	void                (*cstateInit)(void);
@@ -82,15 +82,15 @@ typedef struct{
 	    uint64_t last_dispatch, boolean_t thread_runnable);
 } pmDispatch_t;
 
-/* common time fields exported to PM code. This structure may be
- * allocated on the stack, so avoid making it unnecessarily large.
- */
+                                                                
+                                                                  
+   
 typedef struct pm_rtc_nanotime {
-	uint64_t        tsc_base;               /* timestamp */
-	uint64_t        ns_base;                /* nanoseconds */
-	uint32_t        scale;                  /* tsc -> nanosec multiplier */
-	uint32_t        shift;                  /* tsc -> nanosec shift/div */
-	uint32_t        generation;             /* 0 == being updated */
+	uint64_t        tsc_base;                              
+	uint64_t        ns_base;                                 
+	uint32_t        scale;                                                 
+	uint32_t        shift;                                                
+	uint32_t        generation;                                     
 } pm_rtc_nanotime_t;
 
 typedef struct {
@@ -144,20 +144,20 @@ kern_return_t pmCPUExitHalt(int cpu);
 kern_return_t pmCPUExitHaltToOff(int cpu);
 uint32_t pmTimerQueueMigrate(int);
 
-#define PM_HALT_NORMAL          0               /* normal halt path */
-#define PM_HALT_DEBUG           1               /* debug code wants to halt */
-#define PM_HALT_PANIC           2               /* panic code wants to halt */
-#define PM_HALT_SLEEP           3               /* sleep code wants to halt */
+#define PM_HALT_NORMAL          0                                     
+#define PM_HALT_DEBUG           1                                             
+#define PM_HALT_PANIC           2                                             
+#define PM_HALT_SLEEP           3                                             
 
 void pmSafeMode(x86_lcpu_t *lcpu, uint32_t flags);
 
-#define PM_SAFE_FL_NORMAL       0x00000001      /* put CPU into "normal" power mode */
-#define PM_SAFE_FL_SAFE         0x00000002      /* put CPU into a "safe" power mode */
-#define PM_SAFE_FL_PAUSE        0x00000010      /* pause execution on the CPU */
-#define PM_SAFE_FL_RESUME       0x00000020      /* resume execution on the CPU */
+#define PM_SAFE_FL_NORMAL       0x00000001                                            
+#define PM_SAFE_FL_SAFE         0x00000002                                            
+#define PM_SAFE_FL_PAUSE        0x00000010                                      
+#define PM_SAFE_FL_RESUME       0x00000020                                       
 
 extern int pmsafe_debug;
-/* Default urgency timing threshold for the DEBUG build */
+                                                          
 #define         URGENCY_NOTIFICATION_ASSERT_NS (5 * 1000 * 1000)
 extern uint64_t urgency_notification_assert_abstime_threshold;
 
@@ -171,14 +171,14 @@ x86_pkg_t *
 pmGetPkgRoot(void);
 
 
-/******************************************************************************
-*
-* All of the following are deprecated interfaces and no longer used.
-*
-******************************************************************************/
+                                                                               
+ 
+                                                                    
+ 
+                                                                               
 
 
-#endif /* ASSEMBLER */
+#endif                
 
-#endif /* _I386_PMCPU_H_ */
-#endif /* KERNEL_PRIVATE */
+#endif                     
+#endif                     

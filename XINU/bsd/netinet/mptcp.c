@@ -26,58 +26,58 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * A note on the MPTCP/NECP-interactions:
- *
- * MPTCP uses NECP-callbacks to get notified of interface/policy events.
- * MPTCP registers to these events at the MPTCP-layer for interface-events
- * through a call to necp_client_register_multipath_cb.
- * To get per-flow events (aka per TCP-subflow), we register to it with
- * necp_client_register_socket_flow. Both registrations happen by using the
- * necp-client-uuid that comes from the app.
- *
- * The locking is rather tricky. In general, we expect the lock-ordering to
- * happen from necp-fd -> necp->client -> mpp_lock.
- *
- * There are however some subtleties.
- *
- * 1. When registering the multipath_cb, we are holding the mpp_lock. This is
- * safe, because it is the very first time this MPTCP-connection goes into NECP.
- * As we go into NECP we take the NECP-locks and thus are guaranteed that no
- * NECP-locks will deadlock us. Because these NECP-events will also first take
- * the NECP-locks. Either they win the race and thus won't find our
- * MPTCP-connection. Or, MPTCP wins the race and thus it will safely install
- * the callbacks while holding the NECP lock.
- *
- * 2. When registering the subflow-callbacks we must unlock the mpp_lock. This,
- * because we have already registered callbacks and we might race against an
- * NECP-event that will match on our socket. So, we have to unlock to be safe.
- *
- * 3. When removing the multipath_cb, we do it in mp_pcbdispose(). The
- * so_usecount has reached 0. We must be careful to not remove the mpp_socket
- * pointers before we unregistered the callback. Because, again we might be
- * racing against an NECP-event. Unregistering must happen with an unlocked
- * mpp_lock, because of the lock-ordering constraint. It could be that
- * before we had a chance to unregister an NECP-event triggers. That's why
- * we need to check for the so_usecount in mptcp_session_necp_cb. If we get
- * there while the socket is being garbage-collected, the use-count will go
- * down to 0 and we exit. Removal of the multipath_cb again happens by taking
- * the NECP-locks so any running NECP-events will finish first and exit cleanly.
- *
- * 4. When removing the subflow-callback, we do it in in_pcbdispose(). Again,
- * the socket-lock must be unlocked for lock-ordering constraints. This gets a
- * bit tricky here, as in tcp_garbage_collect we hold the mp_so and so lock.
- * So, we drop the mp_so-lock as soon as the subflow is unlinked with
- * mptcp_subflow_del. Then, in in_pcbdispose we drop the subflow-lock.
- * If an NECP-event was waiting on the lock in mptcp_subflow_necp_cb, when it
- * gets it, it will realize that the subflow became non-MPTCP and retry (see
- * tcp_lock). Then it waits again on the subflow-lock. When we drop this lock
- * in in_pcbdispose, and enter necp_inpcb_dispose, this one will have to wait
- * for the NECP-lock (held by the other thread that is taking care of the NECP-
- * event). So, the event now finally gets the subflow-lock and then hits an
- * so_usecount that is 0 and exits. Eventually, we can remove the subflow from
- * the NECP callback.
- */
+  
+                                         
+  
+                                                                        
+                                                                          
+                                                       
+                                                                       
+                                                                           
+                                            
+  
+                                                                           
+                                                   
+  
+                                     
+  
+                                                                             
+                                                                                
+                                                                            
+                                                                              
+                                                                   
+                                                                            
+                                             
+  
+                                                                               
+                                                                            
+                                                                              
+  
+                                                                      
+                                                                             
+                                                                           
+                                                                           
+                                                                      
+                                                                          
+                                                                           
+                                                                           
+                                                                             
+                                                                                
+  
+                                                                             
+                                                                              
+                                                                            
+                                                                     
+                                                                      
+                                                                             
+                                                                            
+                                                                             
+                                                                             
+                                                                               
+                                                                           
+                                                                              
+                     
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -111,37 +111,37 @@ int mptcp_enable = 1;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, enable, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_enable, 0, "Enable Multipath TCP Support");
 
-/*
- * Number of times to try negotiating MPTCP on SYN retransmissions.
- * We haven't seen any reports of a middlebox that is dropping all SYN-segments
- * that have an MPTCP-option. Thus, let's be generous and retransmit it 4 times.
- */
+  
+                                                                   
+                                                                               
+                                                                                
+   
 int mptcp_mpcap_retries = 4;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, mptcp_cap_retr,
     CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_mpcap_retries, 0, "Number of MP Capable SYN Retries");
 
-/*
- * By default, DSS checksum is turned off, revisit if we ever do
- * MPTCP for non SSL Traffic.
- */
+  
+                                                                
+                             
+   
 int mptcp_dss_csum = 0;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, dss_csum, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_dss_csum, 0, "Enable DSS checksum");
 
-/*
- * When mptcp_fail_thresh number of retransmissions are sent, subflow failover
- * is attempted on a different path.
- */
+  
+                                                                              
+                                    
+   
 int mptcp_fail_thresh = 1;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, fail, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_fail_thresh, 0, "Failover threshold");
 
-/*
- * MPTCP subflows have TCP keepalives set to ON. Set a conservative keeptime
- * as carrier networks mostly have a 30 minute to 60 minute NAT Timeout.
- * Some carrier networks have a timeout of 10 or 15 minutes.
- */
+  
+                                                                            
+                                                                        
+                                                            
+   
 int mptcp_subflow_keeptime = 60 * 14;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, keepalive, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_subflow_keeptime, 0, "Keepalive in seconds");
@@ -154,9 +154,9 @@ int mptcp_rtothresh = 1500;
 SYSCTL_INT(_net_inet_mptcp, OID_AUTO, rto_thresh, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_rtothresh, 0, "RTO threshold");
 
-/*
- * Probe the preferred path, when it is not in use
- */
+  
+                                                  
+   
 uint32_t mptcp_probeto = 1000;
 SYSCTL_UINT(_net_inet_mptcp, OID_AUTO, probeto, CTLFLAG_RW | CTLFLAG_LOCKED,
     &mptcp_probeto, 0, "Disable probing by setting to 0");
@@ -174,10 +174,10 @@ mptcp_reass_present(struct socket *mp_so)
 	int dowakeup = 0;
 	int flags = 0;
 
-	/*
-	 * Present data to user, advancing rcv_nxt through
-	 * completed sequence space.
-	 */
+	  
+                                                   
+                             
+    
 	if (mp_tp->mpt_state < MPTCPS_ESTABLISHED) {
 		return flags;
 	}
@@ -186,11 +186,11 @@ mptcp_reass_present(struct socket *mp_so)
 		return flags;
 	}
 
-	/*
-	 * If there is already another thread doing reassembly for this
-	 * connection, it is better to let it finish the job --
-	 * (radar 16316196)
-	 */
+	  
+                                                                
+                                                        
+                    
+    
 	if (mp_tp->mpt_flags & MPTCPF_REASS_INPROG) {
 		return flags;
 	}
@@ -215,7 +215,7 @@ mptcp_reass_present(struct socket *mp_so)
 	mp_tp->mpt_flags &= ~MPTCPF_REASS_INPROG;
 
 	if (dowakeup) {
-		sorwakeup(mp_so); /* done with socket lock held */
+		sorwakeup(mp_so);                                 
 	}
 	return flags;
 }
@@ -231,13 +231,13 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 	struct tseg_qent *te = NULL;
 	uint32_t qlimit;
 
-	/*
-	 * Limit the number of segments in the reassembly queue to prevent
-	 * holding on to too many segments (and thus running out of mbufs).
-	 * Make sure to let the missing segment through which caused this
-	 * queue.  Always keep one global queue entry spare to be able to
-	 * process the missing segment.
-	 */
+	  
+                                                                   
+                                                                    
+                                                                  
+                                                                  
+                                
+    
 	qlimit = MIN(MAX(100, mp_so->so_rcv.sb_hiwat >> 10),
 	    (tcp_autorcvbuf_max >> 10));
 	if (mb_dsn != mp_tp->mpt_rcvnxt &&
@@ -248,7 +248,7 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 		return 0;
 	}
 
-	/* Allocate a new queue entry. If we can't, just drop the pkt. XXX */
+	                                                                     
 	te = (struct tseg_qent *) zalloc(tcp_reass_zone);
 	if (te == NULL) {
 		tcpstat.tcps_mptcp_rcvmemdrop++;
@@ -258,9 +258,9 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 
 	mp_tp->mpt_reassqlen++;
 
-	/*
-	 * Find a segment which begins after this one does.
-	 */
+	  
+                                                    
+    
 	LIST_FOREACH(q, &mp_tp->mpt_segq, tqe_q) {
 		if (MPTCP_SEQ_GT(q->tqe_m->m_pkthdr.mp_dsn, mb_dsn)) {
 			break;
@@ -268,14 +268,14 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 		p = q;
 	}
 
-	/*
-	 * If there is a preceding segment, it may provide some of
-	 * our data already.  If so, drop the data from the incoming
-	 * segment.  If it provides all of our data, drop us.
-	 */
+	  
+                                                           
+                                                             
+                                                      
+    
 	if (p != NULL) {
 		int64_t i;
-		/* conversion to int (in i) handles seq wraparound */
+		                                                     
 		i = p->tqe_m->m_pkthdr.mp_dsn + p->tqe_len - mb_dsn;
 		if (i > 0) {
 			if (i >= *tlenp) {
@@ -284,12 +284,12 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 				zfree(tcp_reass_zone, te);
 				te = NULL;
 				mp_tp->mpt_reassqlen--;
-				/*
-				 * Try to present any queued data
-				 * at the left window edge to the user.
-				 * This is needed after the 3-WHS
-				 * completes.
-				 */
+				  
+                                     
+                                           
+                                     
+                 
+       
 				goto out;
 			}
 			VERIFY(i <= INT_MAX);
@@ -301,10 +301,10 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 
 	tcpstat.tcps_mp_oodata++;
 
-	/*
-	 * While we overlap succeeding segments trim them or,
-	 * if they are completely covered, dequeue them.
-	 */
+	  
+                                                      
+                                                 
+    
 	while (q) {
 		int64_t i = (mb_dsn + *tlenp) - q->tqe_m->m_pkthdr.mp_dsn;
 		if (i <= 0) {
@@ -328,7 +328,7 @@ mptcp_reass(struct socket *mp_so, struct pkthdr *phdr, int *tlenp, struct mbuf *
 		q = nq;
 	}
 
-	/* Insert the new segment queue entry into place. */
+	                                                    
 	te->tqe_m = m;
 	te->tqe_th = NULL;
 	te->tqe_len = *tlenp;
@@ -343,9 +343,9 @@ out:
 	return mptcp_reass_present(mp_so);
 }
 
-/*
- * MPTCP input, called when data has been read from a subflow socket.
- */
+  
+                                                                     
+   
 void
 mptcp_input(struct mptses *mpte, struct mbuf *m)
 {
@@ -366,17 +366,17 @@ mptcp_input(struct mptses *mpte, struct mbuf *m)
 
 	mp_tp->mpt_rcvwnd = mptcp_sbspace(mp_tp);
 
-	/*
-	 * Each mbuf contains MPTCP Data Sequence Map
-	 * Process the data for reassembly, delivery to MPTCP socket
-	 * client, etc.
-	 *
-	 */
+	  
+                                              
+                                                             
+                
+   
+    
 	count = mp_so->so_rcv.sb_cc;
 
-	/*
-	 * In the degraded fallback case, data is accepted without DSS map
-	 */
+	  
+                                                                   
+    
 	if (mp_tp->mpt_flags & MPTCPF_FALLBACK_TO_TCP) {
 		struct mbuf *iter;
 		int mb_dfin = 0;
@@ -391,7 +391,7 @@ fallback:
 			}
 
 			if ((iter->m_flags & M_PKTHDR) && m_pktlen(iter) == 0) {
-				/* Don't add zero-length packets, so jump it! */
+				                                                
 				if (prev == NULL) {
 					m = iter->m_next;
 					m_free(iter);
@@ -402,7 +402,7 @@ fallback:
 					iter = prev->m_next;
 				}
 
-				/* It was a zero-length packet so next one must be a pkthdr */
+				                                                              
 				VERIFY(iter == NULL || iter->m_flags & M_PKTHDR);
 			} else {
 				prev = iter;
@@ -410,10 +410,10 @@ fallback:
 			}
 		}
 
-		/*
-		 * assume degraded flow as this may be the first packet
-		 * without DSS, and the subflow state is not updated yet.
-		 */
+		  
+                                                         
+                                                           
+     
 		if (sbappendstream_rcvdemux(mp_so, m)) {
 			sorwakeup(mp_so);
 		}
@@ -442,21 +442,21 @@ fallback:
 
 		VERIFY(m->m_flags & M_PKTHDR);
 
-		/* If fallback occurs, mbufs will not have PKTF_MPTCP set */
+		                                                            
 		if (!(m->m_pkthdr.pkt_flags & PKTF_MPTCP)) {
 			goto fallback;
 		}
 
 		save = m->m_next;
-		/*
-		 * A single TCP packet formed of multiple mbufs
-		 * holds DSS mapping in the first mbuf of the chain.
-		 * Other mbufs in the chain may have M_PKTHDR set
-		 * even though they belong to the same TCP packet
-		 * and therefore use the DSS mapping stored in the
-		 * first mbuf of the mbuf chain. mptcp_input() can
-		 * get an mbuf chain with multiple TCP packets.
-		 */
+		  
+                                                 
+                                                      
+                                                   
+                                                   
+                                                    
+                                                    
+                                                 
+     
 		while (save && (!(save->m_flags & M_PKTHDR) ||
 		    !(save->m_pkthdr.pkt_flags & PKTF_MPTCP))) {
 			prev = save;
@@ -503,10 +503,10 @@ fallback:
 				m->m_pkthdr.mp_rlen -= todrop;
 			}
 
-			/*
-			 * We drop from the right edge of the mbuf, thus the
-			 * DATA_FIN is dropped as well
-			 */
+			  
+                                                       
+                                 
+      
 			m->m_pkthdr.pkt_flags &= ~PKTF_MPTCP_DFIN;
 		}
 
@@ -588,21 +588,21 @@ mptcp_can_send_more(struct mptcb *mp_tp, boolean_t ignore_reinject)
 {
 	struct socket *mp_so = mptetoso(mp_tp->mpt_mpte);
 
-	/*
-	 * Always send if there is data in the reinject-queue.
-	 */
+	  
+                                                       
+    
 	if (!ignore_reinject && mp_tp->mpt_mpte->mpte_reinjectq) {
 		return TRUE;
 	}
 
-	/*
-	 * Don't send, if:
-	 *
-	 * 1. snd_nxt >= snd_max : Means, basically everything has been sent.
-	 *    Except when using TFO, we might be doing a 0-byte write.
-	 * 2. snd_una + snd_wnd <= snd_nxt: No space in the receiver's window
-	 * 3. snd_nxt + 1 == snd_max and we are closing: A DATA_FIN is scheduled.
-	 */
+	  
+                   
+   
+                                                                      
+                                                               
+                                                                      
+                                                                          
+    
 
 	if (!(mp_so->so_flags1 & SOF1_PRECONNECT_DATA) && MPTCP_SEQ_GEQ(mp_tp->mpt_sndnxt, mp_tp->mpt_sndmax)) {
 		return FALSE;
@@ -623,9 +623,9 @@ mptcp_can_send_more(struct mptcb *mp_tp, boolean_t ignore_reinject)
 	return TRUE;
 }
 
-/*
- * MPTCP output.
- */
+  
+                
+   
 int
 mptcp_output(struct mptses *mpte)
 {
@@ -651,7 +651,7 @@ mptcp_output(struct mptses *mpte)
 
 	old_snd_nxt = mp_tp->mpt_sndnxt;
 	while (mptcp_can_send_more(mp_tp, FALSE)) {
-		/* get the "best" subflow to be used for transmission */
+		                                                        
 		mpts = mptcp_get_subflow(mpte, &preferred_mpts);
 		if (mpts == NULL) {
 			mptcplog((LOG_INFO, "%s: no subflow\n", __func__),
@@ -659,7 +659,7 @@ mptcp_output(struct mptses *mpte)
 			break;
 		}
 
-		/* In case there's just one flow, we reattempt later */
+		                                                       
 		if (mpts_tried != NULL &&
 		    (mpts == mpts_tried || (mpts->mpts_flags & MPTSF_FAILINGOVER))) {
 			mpts_tried->mpts_flags &= ~MPTSF_FAILINGOVER;
@@ -668,13 +668,13 @@ mptcp_output(struct mptses *mpte)
 			break;
 		}
 
-		/*
-		 * Automatic sizing of send socket buffer. Increase the send
-		 * socket buffer size if all of the following criteria are met
-		 *	1. the receiver has enough buffer space for this data
-		 *	2. send buffer is filled to 7/8th with data (so we actually
-		 *	   have data to make use of it);
-		 */
+		  
+                                                              
+                                                                
+                                                          
+                                                                
+                                     
+     
 		if ((mp_so->so_snd.sb_flags & (SB_AUTOSIZE | SB_TRIM)) == SB_AUTOSIZE &&
 		    tcp_cansbgrow(&mp_so->so_snd)) {
 			if ((mp_tp->mpt_sndwnd / 4 * 5) >= mp_so->so_snd.sb_hiwat &&
@@ -691,7 +691,7 @@ mptcp_output(struct mptses *mpte)
 		    struct socket *, mp_so);
 		error = mptcp_subflow_output(mpte, mpts, 0);
 		if (error) {
-			/* can be a temporary loss of source address or other error */
+			                                                              
 			mpts->mpts_flags |= MPTSF_FAILINGOVER;
 			mpts->mpts_flags &= ~MPTSF_ACTIVE;
 			mpts_tried = mpts;
@@ -702,11 +702,11 @@ mptcp_output(struct mptses *mpte)
 			}
 			break;
 		}
-		/* The model is to have only one active flow at a time */
+		                                                         
 		mpts->mpts_flags |= MPTSF_ACTIVE;
 		mpts->mpts_probesoon = mpts->mpts_probecnt = 0;
 
-		/* Allows us to update the smoothed rtt */
+		                                          
 		if (mptcp_probeto && mpts != preferred_mpts && preferred_mpts != NULL) {
 			if (preferred_mpts->mpts_probesoon) {
 				if ((tcp_now - preferred_mpts->mpts_probesoon) > mptcp_probeto) {
@@ -741,7 +741,7 @@ mptcp_output(struct mptses *mpte)
 
 	mptcp_handle_deferred_upcalls(mpte->mpte_mppcb, MPP_WUPCALL);
 
-	/* subflow errors should not be percolated back up */
+	                                                     
 	return 0;
 }
 
@@ -751,11 +751,11 @@ mptcp_choose_subflow(struct mptsub *mpts, struct mptsub *curbest, int *currtt)
 {
 	struct tcpcb *tp = sototcpcb(mpts->mpts_socket);
 
-	/*
-	 * Lower RTT? Take it, if it's our first one, or
-	 * it doesn't has any loss, or the current one has
-	 * loss as well.
-	 */
+	  
+                                                 
+                                                   
+                 
+    
 	if (tp->t_srtt && *currtt > tp->t_srtt &&
 	    (curbest == NULL || tp->t_rxtshift == 0 ||
 	    sototcpcb(curbest->mpts_socket)->t_rxtshift)) {
@@ -763,9 +763,9 @@ mptcp_choose_subflow(struct mptsub *mpts, struct mptsub *curbest, int *currtt)
 		return mpts;
 	}
 
-	/*
-	 * If we find a subflow without loss, take it always!
-	 */
+	  
+                                                      
+    
 	if (curbest &&
 	    sototcpcb(curbest->mpts_socket)->t_rxtshift &&
 	    tp->t_rxtshift == 0) {
@@ -800,9 +800,9 @@ mptcp_subflow_is_slow(struct mptses *mpte, struct mptsub *mpts)
 	       (mptetoso(mpte)->so_snd.sb_cc || mpte->mpte_reinjectq);
 }
 
-/*
- * Return the most eligible subflow to be used for sending data.
- */
+  
+                                                                
+   
 struct mptsub *
 mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 {
@@ -813,10 +813,10 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 	struct mptsub *second_best = NULL;
 	int exp_rtt = INT_MAX, cheap_rtt = INT_MAX;
 
-	/*
-	 * First Step:
-	 * Choose the best subflow for cellular and non-cellular interfaces.
-	 */
+	  
+               
+                                                                     
+    
 
 	TAILQ_FOREACH(mpts, &mpte->mpte_subflows, mpts_entry) {
 		struct socket *so = mpts->mpts_socket;
@@ -831,10 +831,10 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 		    mptcp_subflow_cwnd_space(so)),
 		    MPTCP_SOCKET_DBG, MPTCP_LOGLVL_VERBOSE);
 
-		/*
-		 * First, the hard conditions to reject subflows
-		 * (e.g., not connected,...)
-		 */
+		  
+                                                  
+                              
+     
 		if (inp->inp_last_outifp == NULL) {
 			continue;
 		}
@@ -843,23 +843,23 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 			continue;
 		}
 
-		/* There can only be one subflow in degraded state */
+		                                                     
 		if (mpts->mpts_flags & MPTSF_MP_DEGRADED) {
 			best = mpts;
 			break;
 		}
 
-		/*
-		 * If this subflow is waiting to finally send, do it!
-		 */
+		  
+                                                       
+     
 		if (so->so_flags1 & SOF1_PRECONNECT_DATA) {
 			return mptcp_return_subflow(mpts);
 		}
 
-		/*
-		 * Only send if the subflow is MP_CAPABLE. The exceptions to
-		 * this rule (degraded or TFO) have been taken care of above.
-		 */
+		  
+                                                              
+                                                               
+     
 		if (!(mpts->mpts_flags & MPTSF_MP_CAPABLE)) {
 			continue;
 		}
@@ -871,10 +871,10 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 			continue;
 		}
 
-		/*
-		 * Second, the soft conditions to find the subflow with best
-		 * conditions for each set (aka cellular vs non-cellular)
-		 */
+		  
+                                                              
+                                                           
+     
 		if (IFNET_IS_CELLULAR(inp->inp_last_outifp)) {
 			second_best = mptcp_choose_subflow(mpts, second_best,
 			    &exp_rtt);
@@ -883,10 +883,10 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 		}
 	}
 
-	/*
-	 * If there is no preferred or backup subflow, and there is no active
-	 * subflow use the last usable subflow.
-	 */
+	  
+                                                                      
+                                        
+    
 	if (best == NULL) {
 		return mptcp_return_subflow(second_best);
 	}
@@ -904,16 +904,16 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 		*preferred = mptcp_return_subflow(best);
 	}
 
-	/*
-	 * Second Step: Among best and second_best. Choose the one that is
-	 * most appropriate for this particular service-type.
-	 */
+	  
+                                                                   
+                                                      
+    
 	if (mpte->mpte_svctype == MPTCP_SVCTYPE_PURE_HANDOVER) {
 		return mptcp_return_subflow(best);
 	} else if (mpte->mpte_svctype == MPTCP_SVCTYPE_HANDOVER) {
-		/*
-		 * Only handover if Symptoms tells us to do so.
-		 */
+		  
+                                                 
+     
 		if (!IFNET_IS_CELLULAR(bestinp->inp_last_outifp) &&
 		    mptcp_is_wifi_unusable_for_session(mpte) != 0 && mptcp_subflow_is_slow(mpte, best)) {
 			return mptcp_return_subflow(second_best);
@@ -924,7 +924,7 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 		int rtt_thresh = mptcp_rtthist_rtthresh << TCP_RTT_SHIFT;
 		int rto_thresh = mptcp_rtothresh;
 
-		/* Adjust with symptoms information */
+		                                      
 		if (!IFNET_IS_CELLULAR(bestinp->inp_last_outifp) &&
 		    mptcp_is_wifi_unusable_for_session(mpte) != 0) {
 			rtt_thresh /= 2;
@@ -948,7 +948,7 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 			return mptcp_return_subflow(second_best);
 		}
 
-		/* Compare RTOs, select second_best if best's rto exceeds rtothresh */
+		                                                                      
 		if (besttp->t_rxtcur && secondtp->t_rxtcur &&
 		    besttp->t_rxtcur >= rto_thresh &&
 		    secondtp->t_rxtcur < rto_thresh) {
@@ -961,18 +961,18 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 			return mptcp_return_subflow(second_best);
 		}
 
-		/*
-		 * None of the above conditions for sending on the secondary
-		 * were true. So, let's schedule on the best one, if he still
-		 * has some space in the congestion-window.
-		 */
+		  
+                                                              
+                                                               
+                                             
+     
 		return mptcp_return_subflow(best);
 	} else if (mpte->mpte_svctype >= MPTCP_SVCTYPE_AGGREGATE) {
 		struct mptsub *tmp;
 
-		/*
-		 * We only care about RTT when aggregating
-		 */
+		  
+                                            
+     
 		if (besttp->t_srtt > secondtp->t_srtt) {
 			tmp = best;
 			best = second_best;
@@ -984,7 +984,7 @@ mptcp_get_subflow(struct mptses *mpte, struct mptsub **preferred)
 			secondinp = sotoinpcb(second_best->mpts_socket);
 		}
 
-		/* Is there still space in the congestion window? */
+		                                                    
 		if (mptcp_subflow_cwnd_space(bestinp->inp_socket) <= 0) {
 			return mptcp_return_subflow(second_best);
 		}
@@ -1075,9 +1075,9 @@ mptcp_close_fsm(struct mptcb *mp_tp, uint32_t event)
 	case MPTCPS_ESTABLISHED:
 		if (event == MPCE_CLOSE) {
 			mp_tp->mpt_state = MPTCPS_FIN_WAIT_1;
-			mp_tp->mpt_sndmax += 1; /* adjust for Data FIN */
+			mp_tp->mpt_sndmax += 1;                          
 		} else if (event == MPCE_RECV_DATA_FIN) {
-			mp_tp->mpt_rcvnxt += 1; /* adj remote data FIN */
+			mp_tp->mpt_rcvnxt += 1;                          
 			mp_tp->mpt_state = MPTCPS_CLOSE_WAIT;
 		}
 		break;
@@ -1085,7 +1085,7 @@ mptcp_close_fsm(struct mptcb *mp_tp, uint32_t event)
 	case MPTCPS_CLOSE_WAIT:
 		if (event == MPCE_CLOSE) {
 			mp_tp->mpt_state = MPTCPS_LAST_ACK;
-			mp_tp->mpt_sndmax += 1; /* adjust for Data FIN */
+			mp_tp->mpt_sndmax += 1;                          
 		}
 		break;
 
@@ -1093,7 +1093,7 @@ mptcp_close_fsm(struct mptcb *mp_tp, uint32_t event)
 		if (event == MPCE_RECV_DATA_ACK) {
 			mp_tp->mpt_state = MPTCPS_FIN_WAIT_2;
 		} else if (event == MPCE_RECV_DATA_FIN) {
-			mp_tp->mpt_rcvnxt += 1; /* adj remote data FIN */
+			mp_tp->mpt_rcvnxt += 1;                          
 			mp_tp->mpt_state = MPTCPS_CLOSING;
 		}
 		break;
@@ -1112,7 +1112,7 @@ mptcp_close_fsm(struct mptcb *mp_tp, uint32_t event)
 
 	case MPTCPS_FIN_WAIT_2:
 		if (event == MPCE_RECV_DATA_FIN) {
-			mp_tp->mpt_rcvnxt += 1; /* adj remote data FIN */
+			mp_tp->mpt_rcvnxt += 1;                          
 			mp_tp->mpt_state = MPTCPS_TIME_WAIT;
 		}
 		break;
@@ -1123,7 +1123,7 @@ mptcp_close_fsm(struct mptcb *mp_tp, uint32_t event)
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 	}
 	DTRACE_MPTCP2(state__change, struct mptcb *, mp_tp,
 	    uint32_t, event);
@@ -1134,7 +1134,7 @@ mptcp_close_fsm(struct mptcb *mp_tp, uint32_t event)
 	    MPTCP_STATE_DBG, MPTCP_LOGLVL_LOG);
 }
 
-/* If you change this function, match up mptcp_update_rcv_state_f */
+                                                                    
 void
 mptcp_update_dss_rcv_state(struct mptcp_dsn_opt *dss_info, struct tcpcb *tp,
     uint16_t csum)
@@ -1146,7 +1146,7 @@ mptcp_update_dss_rcv_state(struct mptcp_dsn_opt *dss_info, struct tcpcb *tp,
 	NTOHL(dss_info->mdss_subflow_seqn);
 	NTOHS(dss_info->mdss_data_len);
 
-	/* XXX for autosndbuf grow sb here */
+	                                     
 	MPTCP_EXTEND_DSN(mp_tp->mpt_rcvnxt, dss_info->mdss_dsn, full_dsn);
 	mptcp_update_rcv_state_meat(mp_tp, tp,
 	    full_dsn, dss_info->mdss_subflow_seqn, dss_info->mdss_data_len,
@@ -1192,7 +1192,7 @@ mptcp_validate_dss_map(struct socket *so, struct tcpcb *tp, struct mbuf *m,
 
 	datalen = m->m_pkthdr.mp_rlen;
 
-	/* unacceptable DSS option, fallback to TCP */
+	                                              
 	if (m->m_pkthdr.len > ((int) datalen + hdrlen)) {
 		os_log_error(mptcp_log_handle, "%s - %lx: mbuf len %d, MPTCP expected %d",
 		    __func__, (unsigned long)VM_KERNEL_ADDRPERM(tptomptp(tp)->mpt_mpte), m->m_pkthdr.len, datalen);
@@ -1239,10 +1239,10 @@ mptcp_input_csum(struct tcpcb *tp, struct mbuf *m, uint64_t dsn, uint32_t sseq,
 		return 0;
 	}
 
-	/*
-	 * The remote side may send a packet with fewer bytes than the
-	 * claimed DSS checksum length.
-	 */
+	  
+                                                               
+                                
+    
 	if ((int)m_length2(m, NULL) < real_len) {
 		return 0xffff;
 	}
@@ -1260,13 +1260,13 @@ mptcp_input_csum(struct tcpcb *tp, struct mbuf *m, uint64_t dsn, uint32_t sseq,
 	return ~sum & 0xffff;
 }
 
-/*
- * MPTCP Checksum support
- * The checksum is calculated whenever the MPTCP DSS option is included
- * in the TCP packet. The checksum includes the sum of the MPTCP psuedo
- * header and the actual data indicated by the length specified in the
- * DSS option.
- */
+  
+                         
+                                                                       
+                                                                       
+                                                                      
+              
+   
 
 int
 mptcp_validate_csum(struct tcpcb *tp, struct mbuf *m, uint64_t dsn,
@@ -1308,11 +1308,11 @@ mptcp_output_csum(struct mbuf *m, uint64_t dss_val, uint32_t sseq, uint16_t dlen
 	return (uint16_t)sum;
 }
 
-/*
- * When WiFi signal starts fading, there's more loss and RTT spikes.
- * Check if there has been a large spike by comparing against
- * a tolerable RTT spike threshold.
- */
+  
+                                                                    
+                                                             
+                                   
+   
 boolean_t
 mptcp_no_rto_spike(struct socket *so)
 {
@@ -1390,7 +1390,7 @@ mptcp_session_necp_cb(void *handle, int action, uint32_t interface_index,
 	ifindex = interface_index;
 	VERIFY(ifindex != IFSCOPE_NONE);
 
-	/* About to be garbage-collected (see note about MPTCP/NECP interactions) */
+	                                                                            
 	if (mp->mpp_socket->so_usecount == 0) {
 		return;
 	}
@@ -1401,7 +1401,7 @@ mptcp_session_necp_cb(void *handle, int action, uint32_t interface_index,
 		socket_lock(mp_so, 1);
 		locked = 1;
 
-		/* Check again, because it might have changed while waiting */
+		                                                              
 		if (mp->mpp_socket->so_usecount == 0) {
 			goto out;
 		}
@@ -1421,15 +1421,15 @@ mptcp_session_necp_cb(void *handle, int action, uint32_t interface_index,
 	    mp->mpp_socket->so_usecount, mp_tp->mpt_flags, mp_tp->mpt_state,
 	    has_v4, has_v6, has_nat64, low_power);
 
-	/* No need on fallen back sockets */
+	                                    
 	if (mp_tp->mpt_flags & MPTCPF_FALLBACK_TO_TCP) {
 		goto out;
 	}
 
-	/*
-	 * When the interface goes in low-power mode we don't want to establish
-	 * new subflows on it. Thus, mark it internally as non-viable.
-	 */
+	  
+                                                                        
+                                                               
+    
 	if (low_power) {
 		action = NECP_CLIENT_CBACTION_NONVIABLE;
 	}
@@ -1478,18 +1478,18 @@ mptcp_session_necp_cb(void *handle, int action, uint32_t interface_index,
 			has_v4 = FALSE;
 		}
 
-		/* Look for the slot on where to store/update the interface-info. */
+		                                                                    
 		for (i = 0; i < mpte->mpte_itfinfo_size; i++) {
-			/* Found a potential empty slot where we can put it */
+			                                                      
 			if (mpte->mpte_itfinfo[i].ifindex == 0) {
 				found_slot = 1;
 				slot_index = i;
 			}
 
-			/*
-			 * The interface is already in our array. Check if we
-			 * need to update it.
-			 */
+			  
+                                                        
+                        
+      
 			if (mpte->mpte_itfinfo[i].ifindex == ifindex &&
 			    (mpte->mpte_itfinfo[i].has_v4_conn != has_v4 ||
 			    mpte->mpte_itfinfo[i].has_v6_conn != has_v6 ||
@@ -1500,10 +1500,10 @@ mptcp_session_necp_cb(void *handle, int action, uint32_t interface_index,
 			}
 
 			if (mpte->mpte_itfinfo[i].ifindex == ifindex) {
-				/*
-				 * Ok, it's already there and we don't need
-				 * to update it
-				 */
+				  
+                                               
+                   
+       
 				goto out;
 			}
 		}
@@ -1536,7 +1536,7 @@ mptcp_session_necp_cb(void *handle, int action, uint32_t interface_index,
 				_FREE(mpte->mpte_itfinfo, M_TEMP);
 			}
 
-			/* We allocated a new one, thus the first must be empty */
+			                                                          
 			slot_index = mpte->mpte_itfinfo_size;
 
 			mpte->mpte_itfinfo = info;

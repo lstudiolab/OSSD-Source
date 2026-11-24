@@ -37,7 +37,7 @@
 struct kperf_kdebug_filter;
 
 #define KPERF_KDEBUG_FILTER_SIZE(N_DEBUGIDS) ((2 * sizeof(uint64_t)) + ((N_DEBUGIDS) * sizeof(uint32_t)))
-/* UNSAFE */
+            
 #define KPERF_KDEBUG_N_DEBUGIDS(FILTER_SIZE) \
 	(((FILTER_SIZE) <= (2 * sizeof(uint64_t))) ? 0 : \
 	  (((FILTER_SIZE) - (2 * sizeof(uint64_t))) / sizeof(uint32_t)))
@@ -54,4 +54,4 @@ int kperf_kdebug_set_n_debugids(uint32_t n_debugids_in);
 int kperf_kdebug_set_filter(user_addr_t user_filter, uint32_t user_size);
 uint32_t kperf_kdebug_get_filter(struct kperf_kdebug_filter **filter);
 
-#endif /* !defined(KPERF_KDEBUG_TRIGGER_H) */
+#endif                                       

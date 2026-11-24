@@ -59,35 +59,35 @@ extern void profile_init(void);
 
 static dtrace_provider_id_t profile_id;
 
-/*
- * Regardless of platform, the stack frames look like this in the case of the
- * profile provider:
- *
- *	profile_fire
- *	cyclic_expire
- *	cyclic_fire
- *	[ cbe ]
- *	[ interrupt code ]
- *
- * On x86, there are five frames from the generic interrupt code; further, the
- * interrupted instruction appears as its own stack frame, giving us a total of
- * 10.
- *
- * On SPARC, the picture is further complicated because the compiler
- * optimizes away tail-calls -- so the following frames are optimized away:
- *
- *      profile_fire
- *	cyclic_expire
- *
- * This gives three frames.  However, on DEBUG kernels, the cyclic_expire
- * frame cannot be tail-call eliminated, yielding four frames in this case.
- *
- * All of the above constraints lead to the mess below.  Yes, the profile
- * provider should ideally figure this out on-the-fly by hitting one of its own
- * probes and then walking its own stack trace.  This is complicated, however,
- * and the static definition doesn't seem to be overly brittle.  Still, we
- * allow for a manual override in case we get it completely wrong.
- */
+  
+                                                                             
+                    
+  
+               
+                
+              
+          
+                     
+  
+                                                                              
+                                                                               
+      
+  
+                                                                    
+                                                                           
+  
+                    
+                
+  
+                                                                         
+                                                                           
+  
+                                                                         
+                                                                               
+                                                                              
+                                                                          
+                                                                  
+   
 
 #if defined(__x86_64__)
 #define PROF_ARTIFICIAL_FRAMES  9
@@ -118,8 +118,8 @@ typedef struct profile_probe_percpu {
 	profile_probe_t *profc_probe;
 } profile_probe_percpu_t;
 
-hrtime_t        profile_interval_min = NANOSEC / 5000;          /* 5000 hz */
-int             profile_aframes = 0;                            /* override */
+hrtime_t        profile_interval_min = NANOSEC / 5000;                       
+int             profile_aframes = 0;                                          
 
 static int profile_rates[] = {
 	97, 199, 499, 997, 1999,
@@ -134,16 +134,16 @@ static int profile_ticks[] = {
 	0, 0, 0, 0, 0
 };
 
-/*
- * profile_max defines the upper bound on the number of profile probes that
- * can exist (this is to prevent malicious or clumsy users from exhausing
- * system resources by creating a slew of profile probes). At mod load time,
- * this gets its value from PROFILE_MAX_DEFAULT or profile-max-probes if it's
- * present in the profile.conf file.
- */
-#define PROFILE_MAX_DEFAULT     1000    /* default max. number of probes */
-static uint32_t profile_max;            /* maximum number of profile probes */
-static uint32_t profile_total;  /* current number of profile probes */
+  
+                                                                           
+                                                                         
+                                                                            
+                                                                             
+                                    
+   
+#define PROFILE_MAX_DEFAULT     1000                                       
+static uint32_t profile_max;                                                  
+static uint32_t profile_total;                                        
 
 static void
 profile_fire(void *arg)
@@ -159,17 +159,17 @@ profile_fire(void *arg)
 	x86_saved_state_t *kern_regs = find_kern_regs(current_thread());
 
 	if (NULL != kern_regs) {
-		/* Kernel was interrupted. */
+		                             
 		dtrace_probe(prof->prof_id, saved_state64(kern_regs)->isf.rip, 0x0, late, 0, 0);
 	} else {
 		pal_register_cache_state(current_thread(), VALID);
-		/* Possibly a user interrupt */
+		                               
 		x86_saved_state_t   *tagged_regs = (x86_saved_state_t *)find_user_regs(current_thread());
 
 		if (NULL == tagged_regs) {
-			/* Too bad, so sad, no useful interrupt state. */
+			                                                 
 			dtrace_probe(prof->prof_id, 0xcafebabe,
-			    0x0, late, 0, 0); /* XXX_BOGUS also see profile_usermode() below. */
+			    0x0, late, 0, 0);                                                   
 		} else if (is_saved_state64(tagged_regs)) {
 			x86_saved_state64_t *regs = saved_state64(tagged_regs);
 
@@ -184,19 +184,19 @@ profile_fire(void *arg)
 	{
 		arm_saved_state_t *arm_kern_regs = (arm_saved_state_t *) find_kern_regs(current_thread());
 
-		// We should only come in here from interrupt context, so we should always have valid kernel regs
+		                                                                                                 
 		assert(NULL != arm_kern_regs);
 
 		if (arm_kern_regs->cpsr & 0xF) {
-			/* Kernel was interrupted. */
+			                             
 			dtrace_probe(prof->prof_id, arm_kern_regs->pc, 0x0, late, 0, 0);
 		} else {
-			/* Possibly a user interrupt */
+			                               
 			arm_saved_state_t   *arm_user_regs = (arm_saved_state_t *)find_user_regs(current_thread());
 
 			if (NULL == arm_user_regs) {
-				/* Too bad, so sad, no useful interrupt state. */
-				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, late, 0, 0); /* XXX_BOGUS also see profile_usermode() below. */
+				                                                 
+				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, late, 0, 0);                                                   
 			} else {
 				dtrace_probe(prof->prof_id, 0x0, arm_user_regs->pc, late, 0, 0);
 			}
@@ -206,19 +206,19 @@ profile_fire(void *arg)
 	{
 		arm_saved_state_t *arm_kern_regs = (arm_saved_state_t *) find_kern_regs(current_thread());
 
-		// We should only come in here from interrupt context, so we should always have valid kernel regs
+		                                                                                                 
 		assert(NULL != arm_kern_regs);
 
 		if (saved_state64(arm_kern_regs)->cpsr & 0xF) {
-			/* Kernel was interrupted. */
+			                             
 			dtrace_probe(prof->prof_id, saved_state64(arm_kern_regs)->pc, 0x0, late, 0, 0);
 		} else {
-			/* Possibly a user interrupt */
+			                               
 			arm_saved_state_t   *arm_user_regs = (arm_saved_state_t *)find_user_regs(current_thread());
 
 			if (NULL == arm_user_regs) {
-				/* Too bad, so sad, no useful interrupt state. */
-				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, late, 0, 0); /* XXX_BOGUS also see profile_usermode() below. */
+				                                                 
+				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, late, 0, 0);                                                   
 			} else {
 				dtrace_probe(prof->prof_id, 0x0, get_saved_state_pc(arm_user_regs), late, 0, 0);
 			}
@@ -238,17 +238,17 @@ profile_tick(void *arg)
 	x86_saved_state_t *kern_regs = find_kern_regs(current_thread());
 
 	if (NULL != kern_regs) {
-		/* Kernel was interrupted. */
+		                             
 		dtrace_probe(prof->prof_id, saved_state64(kern_regs)->isf.rip, 0x0, 0, 0, 0);
 	} else {
 		pal_register_cache_state(current_thread(), VALID);
-		/* Possibly a user interrupt */
+		                               
 		x86_saved_state_t   *tagged_regs = (x86_saved_state_t *)find_user_regs(current_thread());
 
 		if (NULL == tagged_regs) {
-			/* Too bad, so sad, no useful interrupt state. */
+			                                                 
 			dtrace_probe(prof->prof_id, 0xcafebabe,
-			    0x0, 0, 0, 0); /* XXX_BOGUS also see profile_usermode() below. */
+			    0x0, 0, 0, 0);                                                   
 		} else if (is_saved_state64(tagged_regs)) {
 			x86_saved_state64_t *regs = saved_state64(tagged_regs);
 
@@ -264,15 +264,15 @@ profile_tick(void *arg)
 		arm_saved_state_t *arm_kern_regs = (arm_saved_state_t *) find_kern_regs(current_thread());
 
 		if (NULL != arm_kern_regs) {
-			/* Kernel was interrupted. */
+			                             
 			dtrace_probe(prof->prof_id, arm_kern_regs->pc, 0x0, 0, 0, 0);
 		} else {
-			/* Possibly a user interrupt */
+			                               
 			arm_saved_state_t   *arm_user_regs = (arm_saved_state_t *)find_user_regs(current_thread());
 
 			if (NULL == arm_user_regs) {
-				/* Too bad, so sad, no useful interrupt state. */
-				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, 0, 0, 0); /* XXX_BOGUS also see profile_usermode() below. */
+				                                                 
+				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, 0, 0, 0);                                                   
 			} else {
 				dtrace_probe(prof->prof_id, 0x0, arm_user_regs->pc, 0, 0, 0);
 			}
@@ -283,15 +283,15 @@ profile_tick(void *arg)
 		arm_saved_state_t *arm_kern_regs = (arm_saved_state_t *) find_kern_regs(current_thread());
 
 		if (NULL != arm_kern_regs) {
-			/* Kernel was interrupted. */
+			                             
 			dtrace_probe(prof->prof_id, saved_state64(arm_kern_regs)->pc, 0x0, 0, 0, 0);
 		} else {
-			/* Possibly a user interrupt */
+			                               
 			arm_saved_state_t   *arm_user_regs = (arm_saved_state_t *)find_user_regs(current_thread());
 
 			if (NULL == arm_user_regs) {
-				/* Too bad, so sad, no useful interrupt state. */
-				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, 0, 0, 0); /* XXX_BOGUS also see profile_usermode() below. */
+				                                                 
+				dtrace_probe(prof->prof_id, 0xcafebabe, 0x0, 0, 0, 0);                                                   
 			} else {
 				dtrace_probe(prof->prof_id, 0x0, get_saved_state_pc(arm_user_regs), 0, 0, 0);
 			}
@@ -337,11 +337,11 @@ profile_create(hrtime_t interval, const char *name, int kind)
 	    profile_aframes ? profile_aframes : PROF_ARTIFICIAL_FRAMES, prof);
 }
 
-/*ARGSUSED*/
+            
 static void
 profile_provide(void *arg, const dtrace_probedesc_t *desc)
 {
-#pragma unused(arg) /* __APPLE__ */
+#pragma unused(arg)                
 	int i, j, rate, kind;
 	hrtime_t val = 0, mult = 1, len;
 	const char *name, *suffix = NULL;
@@ -380,9 +380,9 @@ profile_provide(void *arg, const dtrace_probedesc_t *desc)
 	if (desc == NULL) {
 		char n[PROF_NAMELEN];
 
-		/*
-		 * If no description was provided, provide all of our probes.
-		 */
+		  
+                                                               
+     
 		for (i = 0; i < (int)(sizeof(profile_rates) / sizeof(int)); i++) {
 			if ((rate = profile_rates[i]) == 0) {
 				continue;
@@ -424,9 +424,9 @@ profile_provide(void *arg, const dtrace_probedesc_t *desc)
 	kind = types[i].kind;
 	j = strlen(name) - len;
 
-	/*
-	 * We need to start before any time suffix.
-	 */
+	  
+                                            
+    
 	for (j = strlen(name); j >= len; j--) {
 		if (name[j] >= '0' && name[j] <= '9') {
 			break;
@@ -436,9 +436,9 @@ profile_provide(void *arg, const dtrace_probedesc_t *desc)
 
 	ASSERT(suffix != NULL);
 
-	/*
-	 * Now determine the numerical value present in the probe name.
-	 */
+	  
+                                                                
+    
 	for (; j >= len; j--) {
 		if (name[j] < '0' || name[j] > '9') {
 			return;
@@ -452,11 +452,11 @@ profile_provide(void *arg, const dtrace_probedesc_t *desc)
 		return;
 	}
 
-	/*
-	 * Look-up the suffix to determine the multiplier.
-	 */
+	  
+                                                   
+    
 	for (i = 0, mult = 0; suffixes[i].name != NULL; i++) {
-		/* APPLE NOTE: Darwin employs size bounded string operations */
+		                                                               
 		if (strncasecmp(suffixes[i].name, suffix, strlen(suffixes[i].name) + 1) == 0) {
 			mult = suffixes[i].mult;
 			break;
@@ -468,9 +468,9 @@ profile_provide(void *arg, const dtrace_probedesc_t *desc)
 	}
 
 	if (mult == 0) {
-		/*
-		 * The default is frequency-per-second.
-		 */
+		  
+                                         
+     
 		val = NANOSEC / val;
 	} else {
 		val *= mult;
@@ -479,11 +479,11 @@ profile_provide(void *arg, const dtrace_probedesc_t *desc)
 	profile_create(val, name, kind);
 }
 
-/*ARGSUSED*/
+            
 static void
 profile_destroy(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg,id) /* __APPLE__ */
+#pragma unused(arg,id)                
 	profile_probe_t *prof = parg;
 
 	ASSERT(prof->prof_cyclic == CYCLIC_NONE);
@@ -498,11 +498,11 @@ profile_destroy(void *arg, dtrace_id_t id, void *parg)
 	os_atomic_dec(&profile_total, relaxed);
 }
 
-/*ARGSUSED*/
+            
 static void
 profile_online(void *arg, dtrace_cpu_t *cpu, cyc_handler_t *hdlr, cyc_time_t *when)
 {
-#pragma unused(cpu) /* __APPLE__ */
+#pragma unused(cpu)                
 	profile_probe_t *prof = arg;
 	profile_probe_percpu_t *pcpu;
 
@@ -520,21 +520,21 @@ profile_online(void *arg, dtrace_cpu_t *cpu, cyc_handler_t *hdlr, cyc_time_t *wh
 	pcpu->profc_interval = when->cyt_interval;
 }
 
-/*ARGSUSED*/
+            
 static void
 profile_offline(void *arg, dtrace_cpu_t *cpu, void *oarg)
 {
 	profile_probe_percpu_t *pcpu = oarg;
 
 	ASSERT(pcpu->profc_probe == arg);
-#pragma unused(pcpu,arg,cpu) /* __APPLE__ */
+#pragma unused(pcpu,arg,cpu)                
 }
 
-/*ARGSUSED*/
+            
 static int
 profile_enable(void *arg, dtrace_id_t id, void *parg)
 {
-#pragma unused(arg,id) /* __APPLE__ */
+#pragma unused(arg,id)                
 	profile_probe_t *prof = parg;
 	cyc_omni_handler_t omni;
 	cyc_handler_t hdlr;
@@ -553,7 +553,7 @@ profile_enable(void *arg, dtrace_id_t id, void *parg)
 		when.cyt_when = dtrace_gethrtime() + when.cyt_interval;
 #else
 		when.cyt_when = 0;
-#endif /* __APPLE__ */
+#endif                
 	} else {
 		ASSERT(prof->prof_kind == PROF_PROFILE);
 		omni.cyo_online = profile_online;
@@ -564,13 +564,13 @@ profile_enable(void *arg, dtrace_id_t id, void *parg)
 	if (prof->prof_kind == PROF_TICK) {
 		prof->prof_cyclic = cyclic_timer_add(&hdlr, &when);
 	} else {
-		prof->prof_cyclic = (cyclic_id_t)cyclic_add_omni(&omni); /* cast puns cyclic_id_list_t with cyclic_id_t */
+		prof->prof_cyclic = (cyclic_id_t)cyclic_add_omni(&omni);                                                  
 	}
 
 	return 0;
 }
 
-/*ARGSUSED*/
+            
 static void
 profile_disable(void *arg, dtrace_id_t id, void *parg)
 {
@@ -583,7 +583,7 @@ profile_disable(void *arg, dtrace_id_t id, void *parg)
 	if (prof->prof_kind == PROF_TICK) {
 		cyclic_timer_remove(prof->prof_cyclic);
 	} else {
-		cyclic_remove_omni((cyclic_id_list_t)prof->prof_cyclic); /* cast puns cyclic_id_list_t with cyclic_id_t */
+		cyclic_remove_omni((cyclic_id_list_t)prof->prof_cyclic);                                                  
 	}
 	prof->prof_cyclic = CYCLIC_NONE;
 }
@@ -592,12 +592,12 @@ static uint64_t
 profile_getarg(void *arg, dtrace_id_t id, void *parg, int argno, int aframes)
 {
 #pragma unused(arg, id, parg, argno, aframes)
-	/*
-	 * All the required arguments for the profile probe are passed directly
-	 * to dtrace_probe, and we do not go through dtrace_getarg which doesn't
-	 * know how to hop to the kernel stack from the interrupt stack like
-	 * dtrace_getpcstack
-	 */
+	  
+                                                                        
+                                                                         
+                                                                     
+                     
+    
 	return 0;
 }
 
@@ -627,14 +627,14 @@ profile_getargdesc(void *arg, dtrace_id_t id, void *parg, dtrace_argdesc_t *desc
 	}
 }
 
-/*
- * APPLE NOTE:  profile_usermode call not supported.
- */
+  
+                                                    
+   
 static int
 profile_usermode(void *arg, dtrace_id_t id, void *parg)
 {
 #pragma unused(arg,id,parg)
-	return 1; /* XXX_BOGUS */
+	return 1;                
 }
 
 static dtrace_pattr_t profile_attr = {
@@ -675,9 +675,9 @@ profile_attach(dev_info_t *devi)
 	return DDI_SUCCESS;
 }
 
-/*
- * APPLE NOTE:  profile_detach not implemented
- */
+  
+                                              
+   
 #if !defined(__APPLE__)
 static int
 profile_detach(dev_info_t *devi, ddi_detach_cmd_t cmd)
@@ -698,7 +698,7 @@ profile_detach(dev_info_t *devi, ddi_detach_cmd_t cmd)
 	ddi_remove_minor_node(devi, NULL);
 	return DDI_SUCCESS;
 }
-#endif /* __APPLE__ */
+#endif                
 
 d_open_t _profile_open;
 
@@ -709,7 +709,7 @@ _profile_open(dev_t dev, int flags, int devtype, struct proc *p)
 	return 0;
 }
 
-#define PROFILE_MAJOR  -24 /* let the kernel pick the device number */
+#define PROFILE_MAJOR  -24                                            
 
 static const struct cdevsw profile_cdevsw =
 {

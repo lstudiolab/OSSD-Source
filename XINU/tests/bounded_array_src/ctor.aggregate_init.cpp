@@ -1,7 +1,7 @@
-//
-// Tests for
-//  aggregate-initialization of `bounded_array`
-//
+  
+            
+                                               
+  
 
 #include <libkern/c++/bounded_array.h>
 #include <darwintest.h>
@@ -47,7 +47,7 @@ tests()
 		CHECK(array[4] == T(5));
 	}
 
-	// Check with a 0-sized array
+	                             
 	{
 		test_bounded_array<T, 0> array = {};
 		CHECK(array.size() == 0);

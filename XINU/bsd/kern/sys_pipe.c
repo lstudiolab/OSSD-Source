@@ -43,79 +43,79 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
-/*
- * This file contains a high-performance replacement for the socket-based
- * pipes scheme originally used in FreeBSD/4.4Lite.  It does not support
- * all features of sockets, but does do everything that pipes normally
- * do.
- *
- * Pipes are implemented as circular buffers. Following are the valid states in pipes operations
- *
- *      _________________________________
- * 1.  |_________________________________| r=w, c=0
- *
- *      _________________________________
- * 2.  |__r:::::wc_______________________| r <= w , c > 0
- *
- *      _________________________________
- * 3.  |::::wc_____r:::::::::::::::::::::| r>w , c > 0
- *
- *      _________________________________
- * 4.  |:::::::wrc:::::::::::::::::::::::| w=r, c = Max size
- *
- *
- *  Nomenclature:-
- *  a-z define the steps in a program flow
- *  1-4 are the states as defined aboe
- *  Action: is what file operation is done on the pipe
- *
- *  Current:None  Action: initialize with size M=200
- *  a. State 1 ( r=0, w=0, c=0)
- *
- *  Current: a    Action: write(100) (w < M)
- *  b. State 2 (r=0, w=100, c=100)
- *
- *  Current: b    Action: write(100) (w = M-w)
- *  c. State 4 (r=0,w=0,c=200)
- *
- *  Current: b    Action: read(70)  ( r < c )
- *  d. State 2(r=70,w=100,c=30)
- *
- *  Current: d	  Action: write(75) ( w < (m-w))
- *  e. State 2 (r=70,w=175,c=105)
- *
- *  Current: d    Action: write(110) ( w > (m-w))
- *  f. State 3 (r=70,w=10,c=140)
- *
- *  Current: d	  Action: read(30) (r >= c )
- *  g. State 1 (r=100,w=100,c=0)
- *
- */
+  
+                                                                         
+                                                                        
+                                                                      
+      
+  
+                                                                                                
+  
+                                         
+                                                   
+  
+                                         
+                                                         
+  
+                                         
+                                                      
+  
+                                         
+                                                            
+  
+  
+                  
+                                          
+                                      
+                                                      
+  
+                                                    
+                               
+  
+                                            
+                                  
+  
+                                              
+                              
+  
+                                             
+                               
+  
+                                               
+                                 
+  
+                                                 
+                                
+  
+                                           
+                                
+  
+   
 
-/*
- * This code create half duplex pipe buffers for facilitating file like
- * operations on pipes. The initial buffer is very small, but this can
- * dynamically change to larger sizes based on usage. The buffer size is never
- * reduced. The total amount of kernel memory used is governed by maxpipekva.
- * In case of dynamic expansion limit is reached, the output thread is blocked
- * until the pipe buffer empties enough to continue.
- *
- * In order to limit the resource use of pipes, two sysctls exist:
- *
- * kern.ipc.maxpipekva - This is a hard limit on the amount of pageable
- * address space available to us in pipe_map.
- *
- * Memory usage may be monitored through the sysctls
- * kern.ipc.pipes, kern.ipc.pipekva.
- *
- */
+  
+                                                                       
+                                                                      
+                                                                              
+                                                                             
+                                                                              
+                                                    
+  
+                                                                  
+  
+                                                                       
+                                             
+  
+                                                    
+                                    
+  
+   
 
 #include <sys/param.h>
 #include <sys/systm.h>
@@ -160,15 +160,15 @@ struct pipepair {
 	lck_mtx_t     pp_mtx;
 	struct pipe   pp_rpipe;
 	struct pipe   pp_wpipe;
-	uint64_t      pp_pipe_id;       /* unique ID shared by both pipe ends */
+	uint64_t      pp_pipe_id;                                               
 };
 
 #define PIPE_PAIR(pipe) \
 	        __container_of(PIPE_MTX(pipe), struct pipepair, pp_mtx)
 
-/*
- * interfaces to the outside world exported through file operations
- */
+  
+                                                                   
+   
 static int pipe_read(struct fileproc *fp, struct uio *uio,
     int flags, vfs_context_t ctx);
 static int pipe_write(struct fileproc *fp, struct uio *uio,
@@ -232,14 +232,14 @@ SECURITY_READ_ONLY_EARLY(struct filterops) pipe_wfiltops = {
 };
 
 #if PIPE_SYSCTLS
-static int nbigpipe;      /* for compatibility sake. no longer used */
+static int nbigpipe;                                                  
 #endif
-static int amountpipes;   /* total number of pipes in system */
-static int amountpipekva; /* total memory used by pipes */
+static int amountpipes;                                        
+static int amountpipekva;                                 
 
 static _Atomic uint64_t pipe_unique_id = 1;
 
-int maxpipekva __attribute__((used)) = PIPE_KVAMAX;  /* allowing 16MB max. */
+int maxpipekva __attribute__((used)) = PIPE_KVAMAX;                          
 
 #if PIPE_SYSCTLS
 SYSCTL_DECL(_kern_ipc);
@@ -276,10 +276,10 @@ static ZONE_DECLARE(pipe_zone, "pipe zone", sizeof(struct pipepair), ZC_NONE);
 SYSINIT(vfs, SI_SUB_VFS, SI_ORDER_ANY, pipeinit, NULL);
 
 #if defined(XNU_TARGET_OS_OSX)
-/* Bitmap for things to touch in pipe_touch() */
-#define PIPE_ATIME      0x00000001      /* time of last access */
-#define PIPE_MTIME      0x00000002      /* time of last modification */
-#define PIPE_CTIME      0x00000004      /* time of last status change */
+                                                
+#define PIPE_ATIME      0x00000001                               
+#define PIPE_MTIME      0x00000002                                     
+#define PIPE_CTIME      0x00000004                                      
 
 static void
 pipe_touch(struct pipe *tpipe, int touch)
@@ -307,20 +307,20 @@ pipe_touch(struct pipe *tpipe, int touch)
 
 static const unsigned int pipesize_blocks[] = {512, 1024, 2048, 4096, 4096 * 2, PIPE_SIZE, PIPE_SIZE * 4 };
 
-/*
- * finds the right size from possible sizes in pipesize_blocks
- * returns the size which matches max(current,expected)
- */
+  
+                                                              
+                                                       
+   
 static int
 choose_pipespace(unsigned long current, unsigned long expected)
 {
 	int i = sizeof(pipesize_blocks) / sizeof(unsigned int) - 1;
 	unsigned long target;
 
-	/*
-	 * assert that we always get an atomic transaction sized pipe buffer,
-	 * even if the system pipe buffer high-water mark has been crossed.
-	 */
+	  
+                                                                      
+                                                                    
+    
 	assert(PIPE_BUF == pipesize_blocks[0]);
 
 	if (expected > current) {
@@ -337,13 +337,13 @@ choose_pipespace(unsigned long current, unsigned long expected)
 }
 
 
-/*
- * expand the size of pipe while there is data to be read,
- * and then free the old buffer once the current buffered
- * data has been transferred to new storage.
- * Required: PIPE_LOCK and io lock to be held by caller.
- * returns 0 on success or no expansion possible
- */
+  
+                                                          
+                                                         
+                                            
+                                                        
+                                                
+   
 static int
 expand_pipespace(struct pipe *p, int target_size)
 {
@@ -352,10 +352,10 @@ expand_pipespace(struct pipe *p, int target_size)
 	tmp.pipe_buffer.buffer = 0;
 
 	if (p->pipe_buffer.size >= (unsigned) target_size) {
-		return 0; /* the existing buffer is max size possible */
+		return 0;                                               
 	}
 
-	/* create enough space in the target */
+	                                       
 	error = pipespace(&tmp, target_size);
 	if (error != 0) {
 		return error;
@@ -366,7 +366,7 @@ expand_pipespace(struct pipe *p, int target_size)
 
 	memcpy(tmp.pipe_buffer.buffer, p->pipe_buffer.buffer, p->pipe_buffer.size);
 	if (p->pipe_buffer.cnt > 0 && p->pipe_buffer.in <= p->pipe_buffer.out) {
-		/* we are in State 3 and need extra copying for read to be consistent */
+		                                                                        
 		memcpy(&tmp.pipe_buffer.buffer[p->pipe_buffer.size], p->pipe_buffer.buffer, p->pipe_buffer.size);
 		p->pipe_buffer.in += p->pipe_buffer.size;
 	}
@@ -379,16 +379,16 @@ expand_pipespace(struct pipe *p, int target_size)
 	return 0;
 }
 
-/*
- * The pipe system call for the DTYPE_PIPE type of pipes
- *
- * returns:
- *  FREAD  | fd0 | -->[struct rpipe] --> |~~buffer~~| \
- *                                                    (pipe_mutex)
- *  FWRITE | fd1 | -->[struct wpipe] --X              /
- */
+  
+                                                        
+  
+           
+                                                       
+                                                                  
+                                                       
+   
 
-/* ARGSUSED */
+              
 int
 pipe(proc_t p, __unused struct pipe_args *uap, int32_t *retval)
 {
@@ -401,10 +401,10 @@ pipe(proc_t p, __unused struct pipe_args *uap, int32_t *retval)
 		return error;
 	}
 
-	/*
-	 * for now we'll create half-duplex pipes(refer returns section above).
-	 * this is what we've always supported..
-	 */
+	  
+                                                                        
+                                         
+    
 
 	error = falloc(p, &rf, &retval[0], vfs_context_current());
 	if (error) {
@@ -427,14 +427,14 @@ pipe(proc_t p, __unused struct pipe_args *uap, int32_t *retval)
 	wpipe->pipe_peer = rpipe;
 
 #if CONFIG_MACF
-	/*
-	 * XXXXXXXX SHOULD NOT HOLD FILE_LOCK() XXXXXXXXXXXX
-	 *
-	 * struct pipe represents a pipe endpoint.  The MAC label is shared
-	 * between the connected endpoints.  As a result mac_pipe_label_init() and
-	 * mac_pipe_label_associate() should only be called on one of the endpoints
-	 * after they have been connected.
-	 */
+	  
+                                                     
+   
+                                                                    
+                                                                           
+                                                                            
+                                   
+    
 	mac_pipe_label_init(rpipe);
 	mac_pipe_label_associate(kauth_cred_get(), rpipe);
 	wpipe->pipe_label = rpipe->pipe_label;
@@ -461,8 +461,8 @@ pipe_stat(struct pipe *cpipe, void *ub, int isstat64)
 #endif
 	int     pipe_size = 0;
 	int     pipe_count;
-	struct stat *sb = (struct stat *)0;     /* warning avoidance ; protected by isstat64 */
-	struct stat64 * sb64 = (struct stat64 *)0;  /* warning avoidance ; protected by isstat64 */
+	struct stat *sb = (struct stat *)0;                                                    
+	struct stat64 * sb64 = (struct stat64 *)0;                                                 
 
 	if (cpipe == NULL) {
 		return EBADF;
@@ -477,9 +477,9 @@ pipe_stat(struct pipe *cpipe, void *ub, int isstat64)
 	}
 #endif
 	if (cpipe->pipe_buffer.buffer == 0) {
-		/* must be stat'ing the write fd */
+		                                   
 		if (cpipe->pipe_peer) {
-			/* the peer still exists, use it's info */
+			                                          
 			pipe_size  = MAX_PIPESIZE(cpipe->pipe_peer);
 			pipe_count = cpipe->pipe_peer->pipe_buffer.cnt;
 		} else {
@@ -489,10 +489,10 @@ pipe_stat(struct pipe *cpipe, void *ub, int isstat64)
 		pipe_size  = MAX_PIPESIZE(cpipe);
 		pipe_count = cpipe->pipe_buffer.cnt;
 	}
-	/*
-	 * since peer's buffer is setup ouside of lock
-	 * we might catch it in transient state
-	 */
+	  
+                                               
+                                        
+    
 	if (pipe_size == 0) {
 		pipe_size  = MAX(PIPE_SIZE, pipesize_blocks[0]);
 	}
@@ -518,11 +518,11 @@ pipe_stat(struct pipe *cpipe, void *ub, int isstat64)
 		sb64->st_ctimespec.tv_sec  = cpipe->st_ctimespec.tv_sec;
 		sb64->st_ctimespec.tv_nsec = cpipe->st_ctimespec.tv_nsec;
 
-		/*
-		 * Return a relatively unique inode number based on the current
-		 * address of this pipe's struct pipe.  This number may be recycled
-		 * relatively quickly.
-		 */
+		  
+                                                                 
+                                                                     
+                        
+     
 		sb64->st_ino = (ino64_t)VM_KERNEL_ADDRHASH((uintptr_t)cpipe);
 	} else {
 		sb = (struct stat *)ub;
@@ -545,23 +545,23 @@ pipe_stat(struct pipe *cpipe, void *ub, int isstat64)
 		sb->st_ctimespec.tv_sec  = cpipe->st_ctimespec.tv_sec;
 		sb->st_ctimespec.tv_nsec = cpipe->st_ctimespec.tv_nsec;
 
-		/*
-		 * Return a relatively unique inode number based on the current
-		 * address of this pipe's struct pipe.  This number may be recycled
-		 * relatively quickly.
-		 */
+		  
+                                                                 
+                                                                     
+                        
+     
 		sb->st_ino = (ino_t)VM_KERNEL_ADDRHASH((uintptr_t)cpipe);
 	}
 	PIPE_UNLOCK(cpipe);
 
-	/*
-	 * POSIX: Left as 0: st_dev, st_nlink, st_rdev, st_flags, st_gen,
-	 * st_uid, st_gid.
-	 *
-	 * XXX (st_dev) should be unique, but there is no device driver that
-	 * XXX is associated with pipes, since they are implemented via a
-	 * XXX struct fileops indirection rather than as FS objects.
-	 */
+	  
+                                                                  
+                   
+   
+                                                                     
+                                                                  
+                                                             
+    
 	return 0;
 }
 
@@ -571,12 +571,12 @@ pipe_id(struct pipe *p)
 	return PIPE_PAIR(p)->pp_pipe_id;
 }
 
-/*
- * Allocate kva for pipe circular buffer, the space is pageable
- * This routine will 'realloc' the size of a pipe safely, if it fails
- * it will retain the old buffer.
- * If it fails it will return ENOMEM.
- */
+  
+                                                               
+                                                                     
+                                 
+                                     
+   
 static int
 pipespace(struct pipe *cpipe, int size)
 {
@@ -591,7 +591,7 @@ pipespace(struct pipe *cpipe, int size)
 		return ENOMEM;
 	}
 
-	/* free old resources if we're resizing */
+	                                          
 	pipe_free_kmem(cpipe);
 	cpipe->pipe_buffer.buffer = (caddr_t)buffer;
 	cpipe->pipe_buffer.size = size;
@@ -605,9 +605,9 @@ pipespace(struct pipe *cpipe, int size)
 	return 0;
 }
 
-/*
- * initialize and allocate VM and memory for pipe
- */
+  
+                                                 
+   
 static int
 pipepair_alloc(struct pipe **rp_out, struct pipe **wp_out)
 {
@@ -619,10 +619,10 @@ pipepair_alloc(struct pipe **rp_out, struct pipe **wp_out)
 		return ENOMEM;
 	}
 
-	/*
-	 * protect so pipespace or pipeclose don't follow a junk pointer
-	 * if pipespace() fails.
-	 */
+	  
+                                                                 
+                         
+    
 	bzero(pp, sizeof(struct pipepair));
 	pp->pp_pipe_id = os_atomic_inc_orig(&pipe_unique_id, relaxed);
 	lck_mtx_init(&pp->pp_mtx, &pipe_mtx_grp, LCK_ATTR_NULL);
@@ -631,16 +631,16 @@ pipepair_alloc(struct pipe **rp_out, struct pipe **wp_out)
 	wpipe->pipe_mtxp = &pp->pp_mtx;
 
 #if defined(XNU_TARGET_OS_OSX)
-	/* Initial times are all the time of creation of the pipe */
+	                                                            
 	pipe_touch(rpipe, PIPE_ATIME | PIPE_MTIME | PIPE_CTIME);
 	pipe_touch(wpipe, PIPE_ATIME | PIPE_MTIME | PIPE_CTIME);
 #endif
 
-	/*
-	 * allocate the space for the normal I/O direction up
-	 * front... we'll delay the allocation for the other
-	 * direction until a write actually occurs (most likely it won't)...
-	 */
+	  
+                                                      
+                                                     
+                                                                     
+    
 	int error = pipespace(rpipe, choose_pipespace(rpipe->pipe_buffer.size, 0));
 	if (__improbable(error)) {
 		lck_mtx_destroy(&pp->pp_mtx, &pipe_mtx_grp);
@@ -677,9 +677,9 @@ pipepair_destroy_pipe(struct pipepair *pp, struct pipe *cpipe)
 	}
 }
 
-/*
- * lock a pipe for I/O, blocking other access
- */
+  
+                                             
+   
 static inline int
 pipeio_lock(struct pipe *cpipe, int catch)
 {
@@ -696,9 +696,9 @@ pipeio_lock(struct pipe *cpipe, int catch)
 	return 0;
 }
 
-/*
- * unlock a pipe I/O lock
- */
+  
+                         
+   
 static inline void
 pipeio_unlock(struct pipe *cpipe)
 {
@@ -709,9 +709,9 @@ pipeio_unlock(struct pipe *cpipe)
 	}
 }
 
-/*
- * wakeup anyone whos blocked in select
- */
+  
+                                       
+   
 static void
 pipeselwakeup(struct pipe *cpipe, struct pipe *spipe)
 {
@@ -731,11 +731,11 @@ pipeselwakeup(struct pipe *cpipe, struct pipe *spipe)
 	}
 }
 
-/*
- * Read n bytes from the buffer. Semantics are similar to file read.
- * returns: number of bytes read from the buffer
- */
-/* ARGSUSED */
+  
+                                                                    
+                                                
+   
+              
 static int
 pipe_read(struct fileproc *fp, struct uio *uio, __unused int flags,
     __unused vfs_context_t ctx)
@@ -762,15 +762,15 @@ pipe_read(struct fileproc *fp, struct uio *uio, __unused int flags,
 
 
 	while (uio_resid(uio)) {
-		/*
-		 * normal pipe buffer receive
-		 */
+		  
+                               
+     
 		if (rpipe->pipe_buffer.cnt > 0) {
-			/*
-			 * # bytes to read is min( bytes from read pointer until end of buffer,
-			 *                         total unread bytes,
-			 *                         user requested byte count)
-			 */
+			  
+                                                                          
+                                                 
+                                                        
+      
 			size = rpipe->pipe_buffer.size - rpipe->pipe_buffer.out;
 			if (size > rpipe->pipe_buffer.cnt) {
 				size = rpipe->pipe_buffer.cnt;
@@ -779,7 +779,7 @@ pipe_read(struct fileproc *fp, struct uio *uio, __unused int flags,
 			size = (u_int) MIN(INT_MAX, MIN((user_size_t)size,
 			    (user_size_t)uio_resid(uio)));
 
-			PIPE_UNLOCK(rpipe); /* we still hold io lock.*/
+			PIPE_UNLOCK(rpipe);                            
 			error = uiomove(
 				&rpipe->pipe_buffer.buffer[rpipe->pipe_buffer.out],
 				size, uio);
@@ -795,52 +795,52 @@ pipe_read(struct fileproc *fp, struct uio *uio, __unused int flags,
 
 			rpipe->pipe_buffer.cnt -= size;
 
-			/*
-			 * If there is no more to read in the pipe, reset
-			 * its pointers to the beginning.  This improves
-			 * cache hit stats.
-			 */
+			  
+                                                    
+                                                   
+                      
+      
 			if (rpipe->pipe_buffer.cnt == 0) {
 				rpipe->pipe_buffer.in = 0;
 				rpipe->pipe_buffer.out = 0;
 			}
 			nread += size;
 		} else {
-			/*
-			 * detect EOF condition
-			 * read returns 0 on EOF, no need to set error
-			 */
+			  
+                          
+                                                 
+      
 			if ((rpipe->pipe_state & (PIPE_DRAIN | PIPE_EOF)) ||
 			    (fileproc_get_vflags(fp) & FPV_DRAIN)) {
 				break;
 			}
 
-			/*
-			 * If the "write-side" has been blocked, wake it up now.
-			 */
+			  
+                                                           
+      
 			if (rpipe->pipe_state & PIPE_WANTW) {
 				rpipe->pipe_state &= ~PIPE_WANTW;
 				wakeup(rpipe);
 			}
 
-			/*
-			 * Break if some data was read in previous iteration.
-			 */
+			  
+                                                        
+      
 			if (nread > 0) {
 				break;
 			}
 
-			/*
-			 * Unlock the pipe buffer for our remaining processing.
-			 * We will either break out with an error or we will
-			 * sleep and relock to loop.
-			 */
+			  
+                                                          
+                                                       
+                               
+      
 			pipeio_unlock(rpipe);
 
-			/*
-			 * Handle non-blocking mode operation or
-			 * wait for more data.
-			 */
+			  
+                                           
+                         
+      
 			if (fp->f_flag & FNONBLOCK) {
 				error = EAGAIN;
 			} else {
@@ -863,16 +863,16 @@ locked_error:
 unlocked_error:
 	--rpipe->pipe_busy;
 
-	/*
-	 * PIPE_WANT processing only makes sense if pipe_busy is 0.
-	 */
+	  
+                                                            
+    
 	if ((rpipe->pipe_busy == 0) && (rpipe->pipe_state & PIPE_WANT)) {
 		rpipe->pipe_state &= ~(PIPE_WANT | PIPE_WANTW);
 		wakeup(rpipe);
 	} else if (rpipe->pipe_buffer.cnt < rpipe->pipe_buffer.size) {
-		/*
-		 * Handle write blocking hysteresis.
-		 */
+		  
+                                      
+     
 		if (rpipe->pipe_state & PIPE_WANTW) {
 			rpipe->pipe_state &= ~PIPE_WANTW;
 			wakeup(rpipe);
@@ -884,7 +884,7 @@ unlocked_error:
 	}
 
 #if defined(XNU_TARGET_OS_OSX)
-	/* update last read time */
+	                           
 	pipe_touch(rpipe, PIPE_ATIME);
 #endif
 
@@ -893,10 +893,10 @@ unlocked_error:
 	return error;
 }
 
-/*
- * perform a write of n bytes into the read side of buffer. Since
- * pipes are unidirectional a write is meant to be read by the otherside only.
- */
+  
+                                                                 
+                                                                              
+   
 static int
 pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
     __unused vfs_context_t ctx)
@@ -905,7 +905,7 @@ pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 	size_t orig_resid;
 	int pipe_size;
 	struct pipe *wpipe, *rpipe;
-	// LP64todo - fix this!
+	                       
 	orig_resid = (size_t)uio_resid(uio);
 	if (orig_resid > LONG_MAX) {
 		return EINVAL;
@@ -917,9 +917,9 @@ pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 	PIPE_LOCK(rpipe);
 	wpipe = rpipe->pipe_peer;
 
-	/*
-	 * detect loss of pipe read side, issue SIGPIPE if lost.
-	 */
+	  
+                                                         
+    
 	if (wpipe == NULL || (wpipe->pipe_state & (PIPE_DRAIN | PIPE_EOF)) ||
 	    (fileproc_get_vflags(fp) & FPV_DRAIN)) {
 		PIPE_UNLOCK(rpipe);
@@ -936,12 +936,12 @@ pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 
 	pipe_size = 0;
 
-	/*
-	 * need to allocate some storage... we delay the allocation
-	 * until the first write on fd[0] to avoid allocating storage for both
-	 * 'pipe ends'... most pipes are half-duplex with the writes targeting
-	 * fd[1], so allocating space for both ends is a waste...
-	 */
+	  
+                                                            
+                                                                       
+                                                                       
+                                                          
+    
 
 	if (wpipe->pipe_buffer.buffer == 0 || (
 		    (unsigned)orig_resid > wpipe->pipe_buffer.size - wpipe->pipe_buffer.cnt &&
@@ -949,10 +949,10 @@ pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 		pipe_size = choose_pipespace(wpipe->pipe_buffer.size, wpipe->pipe_buffer.cnt + orig_resid);
 	}
 	if (pipe_size) {
-		/*
-		 * need to do initial allocation or resizing of pipe
-		 * holding both structure and io locks.
-		 */
+		  
+                                                      
+                                         
+     
 		if ((error = pipeio_lock(wpipe, 1)) == 0) {
 			if (wpipe->pipe_buffer.cnt == 0) {
 				error = pipespace(wpipe, pipe_size);
@@ -962,16 +962,16 @@ pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 
 			pipeio_unlock(wpipe);
 
-			/* allocation failed */
+			                       
 			if (wpipe->pipe_buffer.buffer == 0) {
 				error = ENOMEM;
 			}
 		}
 		if (error) {
-			/*
-			 * If an error occurred unbusy and return, waking up any pending
-			 * readers.
-			 */
+			  
+                                                                   
+              
+      
 			--wpipe->pipe_busy;
 			if ((wpipe->pipe_busy == 0) &&
 			    (wpipe->pipe_state & PIPE_WANT)) {
@@ -987,15 +987,15 @@ pipe_write(struct fileproc *fp, struct uio *uio, __unused int flags,
 retrywrite:
 		space = wpipe->pipe_buffer.size - wpipe->pipe_buffer.cnt;
 
-		/* Writes of size <= PIPE_BUF must be atomic. */
+		                                                
 		if ((space < uio_resid(uio)) && (orig_resid <= PIPE_BUF)) {
 			space = 0;
 		}
 
 		if (space > 0) {
 			if ((error = pipeio_lock(wpipe, 1)) == 0) {
-				size_t size;       /* Transfer size */
-				size_t segsize;    /* first segment to transfer */
+				size_t size;                          
+				size_t segsize;                                   
 
 				if ((wpipe->pipe_state & (PIPE_DRAIN | PIPE_EOF)) ||
 				    (fileproc_get_vflags(fp) & FPV_DRAIN)) {
@@ -1003,22 +1003,22 @@ retrywrite:
 					error = EPIPE;
 					break;
 				}
-				/*
-				 * If a process blocked in pipeio_lock, our
-				 * value for space might be bad... the mutex
-				 * is dropped while we're blocked
-				 */
+				  
+                                               
+                                                
+                                     
+       
 				if (space > (int)(wpipe->pipe_buffer.size -
 				    wpipe->pipe_buffer.cnt)) {
 					pipeio_unlock(wpipe);
 					goto retrywrite;
 				}
 
-				/*
-				 * Transfer size is minimum of uio transfer
-				 * and free space in pipe buffer.
-				 */
-				// LP64todo - fix this!
+				  
+                                               
+                                     
+       
+				                       
 				if (space > uio_resid(uio)) {
 					size = (size_t)uio_resid(uio);
 					if (size > LONG_MAX) {
@@ -1027,20 +1027,20 @@ retrywrite:
 				} else {
 					size = space;
 				}
-				/*
-				 * First segment to transfer is minimum of
-				 * transfer size and contiguous space in
-				 * pipe buffer.  If first segment to transfer
-				 * is less than the transfer size, we've got
-				 * a wraparound in the buffer.
-				 */
+				  
+                                              
+                                            
+                                                 
+                                                
+                                  
+       
 				segsize = wpipe->pipe_buffer.size -
 				    wpipe->pipe_buffer.in;
 				if (segsize > size) {
 					segsize = size;
 				}
 
-				/* Transfer first segment */
+				                            
 
 				PIPE_UNLOCK(rpipe);
 				error = uiomove(&wpipe->pipe_buffer.buffer[wpipe->pipe_buffer.in],
@@ -1048,11 +1048,11 @@ retrywrite:
 				PIPE_LOCK(rpipe);
 
 				if (error == 0 && segsize < size) {
-					/*
-					 * Transfer remaining part now, to
-					 * support atomic writes.  Wraparound
-					 * happened. (State 3)
-					 */
+					  
+                                       
+                                          
+                           
+        
 					if (wpipe->pipe_buffer.in + segsize !=
 					    wpipe->pipe_buffer.size) {
 						panic("Expected pipe buffer "
@@ -1065,9 +1065,9 @@ retrywrite:
 						(int)(size - segsize), uio);
 					PIPE_LOCK(rpipe);
 				}
-				/*
-				 * readers never know to read until count is updated.
-				 */
+				  
+                                                         
+       
 				if (error == 0) {
 					wpipe->pipe_buffer.in += size;
 					if (wpipe->pipe_buffer.in >
@@ -1094,37 +1094,37 @@ retrywrite:
 				break;
 			}
 		} else {
-			/*
-			 * If the "read-side" has been blocked, wake it up now.
-			 */
+			  
+                                                          
+      
 			if (wpipe->pipe_state & PIPE_WANTR) {
 				wpipe->pipe_state &= ~PIPE_WANTR;
 				wakeup(wpipe);
 			}
 
-			/*
-			 * If read side wants to go away, we just issue a signal
-			 * to ourselves.
-			 */
+			  
+                                                           
+                   
+      
 			if ((wpipe->pipe_state & (PIPE_DRAIN | PIPE_EOF)) ||
 			    (fileproc_get_vflags(fp) & FPV_DRAIN)) {
 				error = EPIPE;
 				break;
 			}
 
-			/*
-			 * don't block on non-blocking I/O
-			 * we'll do the pipeselwakeup on the way out
-			 */
+			  
+                                     
+                                               
+      
 			if (fp->f_flag & FNONBLOCK) {
 				error = EAGAIN;
 				break;
 			}
 
-			/*
-			 * We have no more space and have something to offer,
-			 * wake up select/poll.
-			 */
+			  
+                                                        
+                          
+      
 			pipeselwakeup(wpipe, wpipe);
 
 			wpipe->pipe_state |= PIPE_WANTW;
@@ -1143,22 +1143,22 @@ retrywrite:
 		wakeup(wpipe);
 	}
 	if (wpipe->pipe_buffer.cnt > 0) {
-		/*
-		 * If there are any characters in the buffer, we wake up
-		 * the reader if it was blocked waiting for data.
-		 */
+		  
+                                                          
+                                                   
+     
 		if (wpipe->pipe_state & PIPE_WANTR) {
 			wpipe->pipe_state &= ~PIPE_WANTR;
 			wakeup(wpipe);
 		}
-		/*
-		 * wake up thread blocked in select/poll or post the notification
-		 */
+		  
+                                                                   
+     
 		pipeselwakeup(wpipe, wpipe);
 	}
 
 #if defined(XNU_TARGET_OS_OSX)
-	/* Update modification, status change (# of bytes in pipe) times */
+	                                                                   
 	pipe_touch(rpipe, PIPE_MTIME | PIPE_CTIME);
 	pipe_touch(wpipe, PIPE_MTIME | PIPE_CTIME);
 #endif
@@ -1167,10 +1167,10 @@ retrywrite:
 	return error;
 }
 
-/*
- * we implement a very minimal set of ioctls for compatibility with sockets.
- */
-/* ARGSUSED 3 */
+  
+                                                                            
+   
+                
 static int
 pipe_ioctl(struct fileproc *fp, u_long cmd, caddr_t data,
     __unused vfs_context_t ctx)
@@ -1244,11 +1244,11 @@ pipe_select(struct fileproc *fp, int which, void *wql, vfs_context_t ctx)
 
 
 #if CONFIG_MACF
-	/*
-	 * XXX We should use a per thread credential here; minimally, the
-	 * XXX process credential should have a persistent reference on it
-	 * XXX before being passed in here.
-	 */
+	  
+                                                                  
+                                                                   
+                                    
+    
 	if (mac_pipe_check_select(vfs_context_ucred(ctx), rpipe, which)) {
 		PIPE_UNLOCK(rpipe);
 		return 0;
@@ -1292,7 +1292,7 @@ pipe_select(struct fileproc *fp, int which, void *wql, vfs_context_t ctx)
 }
 
 
-/* ARGSUSED 1 */
+                
 static int
 pipe_close(struct fileglob *fg, __unused vfs_context_t ctx)
 {
@@ -1322,9 +1322,9 @@ pipe_free_kmem(struct pipe *cpipe)
 	}
 }
 
-/*
- * shutdown the pipe
- */
+  
+                    
+   
 static void
 pipeclose(struct pipe *cpipe)
 {
@@ -1332,10 +1332,10 @@ pipeclose(struct pipe *cpipe)
 
 	PIPE_LOCK(cpipe);
 
-	/*
-	 * If the other side is blocked, wake it up saying that
-	 * we want to close it down.
-	 */
+	  
+                                                        
+                             
+    
 	cpipe->pipe_state &= ~PIPE_DRAIN;
 	cpipe->pipe_state |= PIPE_EOF;
 	pipeselwakeup(cpipe, cpipe);
@@ -1348,17 +1348,17 @@ pipeclose(struct pipe *cpipe)
 	}
 
 #if CONFIG_MACF
-	/*
-	 * Free the shared pipe label only after the two ends are disconnected.
-	 */
+	  
+                                                                        
+    
 	if (cpipe->pipe_label != NULL && cpipe->pipe_peer == NULL) {
 		mac_pipe_label_destroy(cpipe);
 	}
 #endif
 
-	/*
-	 * Disconnect from peer
-	 */
+	  
+                        
+    
 	if ((ppipe = cpipe->pipe_peer) != NULL) {
 		ppipe->pipe_state &= ~(PIPE_DRAIN);
 		ppipe->pipe_state |= PIPE_EOF;
@@ -1371,9 +1371,9 @@ pipeclose(struct pipe *cpipe)
 		ppipe->pipe_peer = NULL;
 	}
 
-	/*
-	 * free resources
-	 */
+	  
+                  
+    
 
 	PIPE_UNLOCK(cpipe);
 
@@ -1423,11 +1423,11 @@ filt_pipenotsuptouch(struct knote *kn, struct kevent_qos_s *kev)
 
 	PIPE_LOCK(rpipe);
 
-	/* accept new kevent data (and save off lowat threshold and flag) */
+	                                                                    
 	kn->kn_sfflags = kev->fflags;
 	kn->kn_sdata = kev->data;
 
-	/* determine if any event is now deemed fired */
+	                                                
 	res = filt_pipe_draincommon(kn, rpipe);
 
 	PIPE_UNLOCK(rpipe);
@@ -1451,7 +1451,7 @@ filt_pipenotsupprocess(struct knote *kn, struct kevent_qos_s *kev)
 	return res;
 }
 
-/*ARGSUSED*/
+            
 static int
 filt_piperead_common(struct knote *kn, struct kevent_qos_s *kev, struct pipe *rpipe)
 {
@@ -1486,11 +1486,11 @@ filt_pipereadtouch(struct knote *kn, struct kevent_qos_s *kev)
 
 	PIPE_LOCK(rpipe);
 
-	/* accept new inputs (and save the low water threshold and flag) */
+	                                                                   
 	kn->kn_sdata = kev->data;
 	kn->kn_sfflags = kev->fflags;
 
-	/* identify if any events are now fired */
+	                                          
 	retval = filt_piperead_common(kn, NULL, rpipe);
 
 	PIPE_UNLOCK(rpipe);
@@ -1511,7 +1511,7 @@ filt_pipereadprocess(struct knote *kn, struct kevent_qos_s *kev)
 	return retval;
 }
 
-/*ARGSUSED*/
+            
 static int
 filt_pipewrite_common(struct knote *kn, struct kevent_qos_s *kev, struct pipe *rpipe)
 {
@@ -1530,7 +1530,7 @@ filt_pipewrite_common(struct knote *kn, struct kevent_qos_s *kev, struct pipe *r
 	return res;
 }
 
-/*ARGSUSED*/
+            
 static int
 filt_pipewrite(struct knote *kn, long hint)
 {
@@ -1549,11 +1549,11 @@ filt_pipewritetouch(struct knote *kn, struct kevent_qos_s *kev)
 
 	PIPE_LOCK(rpipe);
 
-	/* accept new kevent data (and save off lowat threshold and flag) */
+	                                                                    
 	kn->kn_sfflags = kev->fflags;
 	kn->kn_sdata = kev->data;
 
-	/* determine if any event is now deemed fired */
+	                                                
 	res = filt_pipewrite_common(kn, NULL, rpipe);
 
 	PIPE_UNLOCK(rpipe);
@@ -1574,7 +1574,7 @@ filt_pipewriteprocess(struct knote *kn, struct kevent_qos_s *kev)
 	return res;
 }
 
-/*ARGSUSED*/
+            
 static int
 pipe_kqfilter(struct fileproc *fp, struct knote *kn,
     __unused struct kevent_qos_s *kev)
@@ -1585,11 +1585,11 @@ pipe_kqfilter(struct fileproc *fp, struct knote *kn,
 
 	PIPE_LOCK(cpipe);
 #if CONFIG_MACF
-	/*
-	 * XXX We should use a per thread credential here; minimally, the
-	 * XXX process credential should have a persistent reference on it
-	 * XXX before being passed in here.
-	 */
+	  
+                                                                  
+                                                                   
+                                    
+    
 	kauth_cred_t cred = vfs_context_ucred(vfs_context_current());
 	if (mac_pipe_check_kqfilter(cred, kn, cpipe) != 0) {
 		PIPE_UNLOCK(cpipe);
@@ -1598,19 +1598,19 @@ pipe_kqfilter(struct fileproc *fp, struct knote *kn,
 	}
 #endif
 
-	/*
-	 * FreeBSD will fail the attach with EPIPE if the peer pipe is detached,
-	 * however, this isn't a programming error as the other side closing
-	 * could race with the kevent registration.
-	 *
-	 * Attach should only fail for programming mistakes else it will break
-	 * libdispatch.
-	 *
-	 * Like FreeBSD, have a "Neutered" filter that will not fire until
-	 * the pipe dies if the wrong filter is attached to the wrong end.
-	 *
-	 * Knotes are always attached to the "rpipe".
-	 */
+	  
+                                                                         
+                                                                     
+                                            
+   
+                                                                       
+                
+   
+                                                                   
+                                                                   
+   
+                                              
+    
 	switch (kn->kn_filter) {
 	case EVFILT_READ:
 		if (fp->f_flag & FREAD) {
@@ -1680,13 +1680,13 @@ fill_pipeinfo(struct pipe * cpipe, struct pipe_info * pinfo)
 	}
 #endif
 	if (cpipe->pipe_buffer.buffer == 0) {
-		/*
-		 * must be stat'ing the write fd
-		 */
+		  
+                                  
+     
 		if (cpipe->pipe_peer) {
-			/*
-			 * the peer still exists, use it's info
-			 */
+			  
+                                          
+      
 			pipe_size  = MAX_PIPESIZE(cpipe->pipe_peer);
 			pipe_count = cpipe->pipe_peer->pipe_buffer.cnt;
 		} else {
@@ -1696,10 +1696,10 @@ fill_pipeinfo(struct pipe * cpipe, struct pipe_info * pinfo)
 		pipe_size  = MAX_PIPESIZE(cpipe);
 		pipe_count = cpipe->pipe_buffer.cnt;
 	}
-	/*
-	 * since peer's buffer is setup ouside of lock
-	 * we might catch it in transient state
-	 */
+	  
+                                               
+                                        
+    
 	if (pipe_size == 0) {
 		pipe_size  = PIPE_SIZE;
 	}
@@ -1728,10 +1728,10 @@ fill_pipeinfo(struct pipe * cpipe, struct pipe_info * pinfo)
 	ub->vst_ctime  = now.tv_sec;
 	ub->vst_ctimensec = now.tv_nsec;
 
-	/*
-	 * Left as 0: st_dev, st_ino, st_nlink, st_rdev, st_flags, st_gen, st_uid, st_gid.
-	 * XXX (st_dev, st_ino) should be unique.
-	 */
+	  
+                                                                                   
+                                          
+    
 
 	pinfo->pipe_handle = (uint64_t)VM_KERNEL_ADDRHASH((uintptr_t)cpipe);
 	pinfo->pipe_peerhandle = (uint64_t)VM_KERNEL_ADDRHASH((uintptr_t)(cpipe->pipe_peer));
@@ -1746,11 +1746,11 @@ fill_pipeinfo(struct pipe * cpipe, struct pipe_info * pinfo)
 static int
 pipe_drain(struct fileproc *fp, __unused vfs_context_t ctx)
 {
-	/* Note: fdlock already held */
+	                               
 	struct pipe *ppipe, *cpipe = (struct pipe *)(fp->fp_glob->fg_data);
 	boolean_t drain_pipe = FALSE;
 
-	/* Check if the pipe is going away */
+	                                     
 	lck_mtx_lock_spin(&fp->fp_glob->fg_lock);
 	if (os_ref_get_count_raw(&fp->fp_glob->fg_count) == 1) {
 		drain_pipe = TRUE;
@@ -1766,7 +1766,7 @@ pipe_drain(struct fileproc *fp, __unused vfs_context_t ctx)
 		}
 		wakeup(cpipe);
 
-		/* Must wake up peer: a writer sleeps on the read side */
+		                                                         
 		if ((ppipe = cpipe->pipe_peer)) {
 			if (drain_pipe) {
 				ppipe->pipe_state |= PIPE_DRAIN;

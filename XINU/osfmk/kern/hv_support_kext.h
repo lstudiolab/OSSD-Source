@@ -98,4 +98,4 @@ extern void hv_trace_guest_error(uint32_t vcpu_id, uint64_t *vcpu_regs,
 }
 #endif
 
-#endif /* _KERN_HV_SUPPORT_KEXT_H_ */
+#endif                               

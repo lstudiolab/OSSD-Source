@@ -26,10 +26,10 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * netboot.h
- * - definitions for network booting/rooting
- */
+  
+            
+                                            
+   
 
 #ifndef _SYS_NETBOOT_H
 #define _SYS_NETBOOT_H
@@ -47,4 +47,4 @@ boolean_t       netboot_rootpath(struct in_addr * server_ip,
     char * name, size_t name_len,
     char * path, size_t path_len);
 
-#endif /* _SYS_NETBOOT_H */
+#endif                     

@@ -106,8 +106,8 @@ IOSharedDataQueue::initWithCapacity(UInt32 size)
 	bzero(dataQueue, allocSize);
 
 	dataQueue->queueSize    = size;
-//  dataQueue->head         = 0;
-//  dataQueue->tail         = 0;
+                                
+                                
 
 	if (!setQueueSize(size)) {
 		return false;
@@ -173,8 +173,8 @@ IOSharedDataQueue::peek()
 		return NULL;
 	}
 
-	// Read head and tail with acquire barrier
-	// See rdar://problem/40780584 for an explanation of relaxed/acquire barriers
+	                                          
+	                                                                             
 	headOffset = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->head, __ATOMIC_RELAXED);
 	tailOffset = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->tail, __ATOMIC_ACQUIRE);
 
@@ -191,17 +191,17 @@ IOSharedDataQueue::peek()
 		head         = (IODataQueueEntry *)((char *)dataQueue->queue + headOffset);
 		headSize     = head->size;
 
-		// Check if there's enough room before the end of the queue for a header.
-		// If there is room, check if there's enough room to hold the header and
-		// the data.
+		                                                                         
+		                                                                        
+		            
 
 		if ((headOffset > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) ||
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize) ||
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > UINT32_MAX - headSize) ||
 		    (headOffset + headSize + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize)) {
-			// No room for the header or the data, wrap to the beginning of the queue.
-			// Note: wrapping even with the UINT32_MAX checks, as we have to support
-			// queueSize of UINT32_MAX
+			                                                                          
+			                                                                        
+			                          
 			entry = dataQueue->queue;
 		} else {
 			entry = (IODataQueueEntry *)head;
@@ -220,22 +220,22 @@ IOSharedDataQueue::enqueue(void * data, UInt32 dataSize)
 	const UInt32       entrySize = dataSize + DATA_QUEUE_ENTRY_HEADER_SIZE;
 	IODataQueueEntry * entry;
 
-	// Force a single read of head and tail
-	// See rdar://problem/40780584 for an explanation of relaxed/acquire barriers
+	                                       
+	                                                                             
 	tail = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->tail, __ATOMIC_RELAXED);
 	head = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->head, __ATOMIC_ACQUIRE);
 
-	// Check for overflow of entrySize
+	                                  
 	if (dataSize > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) {
 		return false;
 	}
-	// Check for underflow of (getQueueSize() - tail)
+	                                                 
 	if (getQueueSize() < tail || getQueueSize() < head) {
 		return false;
 	}
 
 	if (tail >= head) {
-		// Is there enough room at the end for the entry?
+		                                                 
 		if ((entrySize <= UINT32_MAX - tail) &&
 		    ((tail + entrySize) <= getQueueSize())) {
 			entry = (IODataQueueEntry *)((UInt8 *)dataQueue->queue + tail);
@@ -243,20 +243,20 @@ IOSharedDataQueue::enqueue(void * data, UInt32 dataSize)
 			entry->size = dataSize;
 			__nochk_memcpy(&entry->data, data, dataSize);
 
-			// The tail can be out of bound when the size of the new entry
-			// exactly matches the available space at the end of the queue.
-			// The tail can range from 0 to dataQueue->queueSize inclusive.
+			                                                              
+			                                                               
+			                                                               
 
 			newTail = tail + entrySize;
-		} else if (head > entrySize) { // Is there enough room at the beginning?
-			// Wrap around to the beginning, but do not allow the tail to catch
-			// up to the head.
+		} else if (head > entrySize) {                                          
+			                                                                   
+			                  
 
 			dataQueue->queue->size = dataSize;
 
-			// We need to make sure that there is enough room to set the size before
-			// doing this. The user client checks for this and will look for the size
-			// at the beginning if there isn't room for it at the end.
+			                                                                        
+			                                                                         
+			                                                          
 
 			if ((getQueueSize() - tail) >= DATA_QUEUE_ENTRY_HEADER_SIZE) {
 				((IODataQueueEntry *)((UInt8 *)dataQueue->queue + tail))->size = dataSize;
@@ -265,11 +265,11 @@ IOSharedDataQueue::enqueue(void * data, UInt32 dataSize)
 			__nochk_memcpy(&dataQueue->queue->data, data, dataSize);
 			newTail = entrySize;
 		} else {
-			return false; // queue is full
+			return false;                 
 		}
 	} else {
-		// Do not allow the tail to catch up to the head when the queue is full.
-		// That's why the comparison uses a '>' rather than '>='.
+		                                                                        
+		                                                         
 
 		if ((head - tail) > entrySize) {
 			entry = (IODataQueueEntry *)((UInt8 *)dataQueue->queue + tail);
@@ -278,29 +278,29 @@ IOSharedDataQueue::enqueue(void * data, UInt32 dataSize)
 			__nochk_memcpy(&entry->data, data, dataSize);
 			newTail = tail + entrySize;
 		} else {
-			return false; // queue is full
+			return false;                 
 		}
 	}
 
-	// Publish the data we just enqueued
+	                                    
 	__c11_atomic_store((_Atomic UInt32 *)&dataQueue->tail, newTail, __ATOMIC_RELEASE);
 
 	if (tail != head) {
-		//
-		// The memory barrier below paris with the one in ::dequeue
-		// so that either our store to the tail cannot be missed by
-		// the next dequeue attempt, or we will observe the dequeuer
-		// making the queue empty.
-		//
-		// Of course, if we already think the queue is empty,
-		// there's no point paying this extra cost.
-		//
+		  
+		                                                           
+		                                                           
+		                                                            
+		                          
+		  
+		                                                     
+		                                           
+		  
 		__c11_atomic_thread_fence(__ATOMIC_SEQ_CST);
 		head = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->head, __ATOMIC_RELAXED);
 	}
 
 	if (tail == head) {
-		// Send notification (via mach message) that data is now available.
+		                                                                   
 		sendDataAvailableNotification();
 	}
 	return true;
@@ -320,8 +320,8 @@ IOSharedDataQueue::dequeue(void *data, UInt32 *dataSize)
 		return false;
 	}
 
-	// Read head and tail with acquire barrier
-	// See rdar://problem/40780584 for an explanation of relaxed/acquire barriers
+	                                          
+	                                                                             
 	headOffset = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->head, __ATOMIC_RELAXED);
 	tailOffset = __c11_atomic_load((_Atomic UInt32 *)&dataQueue->tail, __ATOMIC_ACQUIRE);
 
@@ -337,15 +337,15 @@ IOSharedDataQueue::dequeue(void *data, UInt32 *dataSize)
 		head         = (IODataQueueEntry *)((char *)dataQueue->queue + headOffset);
 		headSize     = head->size;
 
-		// we wrapped around to beginning, so read from there
-		// either there was not even room for the header
+		                                                     
+		                                                
 		if ((headOffset > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) ||
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize) ||
-		    // or there was room for the header, but not for the data
+		                                                             
 		    (headOffset + DATA_QUEUE_ENTRY_HEADER_SIZE > UINT32_MAX - headSize) ||
 		    (headOffset + headSize + DATA_QUEUE_ENTRY_HEADER_SIZE > queueSize)) {
-			// Note: we have to wrap to the beginning even with the UINT32_MAX checks
-			// because we have to support a queueSize of UINT32_MAX.
+			                                                                         
+			                                                        
 			entry           = dataQueue->queue;
 			entrySize       = entry->size;
 			if ((entrySize > UINT32_MAX - DATA_QUEUE_ENTRY_HEADER_SIZE) ||
@@ -353,7 +353,7 @@ IOSharedDataQueue::dequeue(void *data, UInt32 *dataSize)
 				return false;
 			}
 			newHeadOffset   = entrySize + DATA_QUEUE_ENTRY_HEADER_SIZE;
-			// else it is at the end
+			                        
 		} else {
 			entry           = head;
 			entrySize       = entry->size;
@@ -365,13 +365,13 @@ IOSharedDataQueue::dequeue(void *data, UInt32 *dataSize)
 			newHeadOffset   = headOffset + entrySize + DATA_QUEUE_ENTRY_HEADER_SIZE;
 		}
 	} else {
-		// empty queue
+		              
 		return false;
 	}
 
 	if (data) {
 		if (entrySize > *dataSize) {
-			// not enough space
+			                   
 			return false;
 		}
 		__nochk_memcpy(data, (void *)entry->data, entrySize);
@@ -381,11 +381,11 @@ IOSharedDataQueue::dequeue(void *data, UInt32 *dataSize)
 	__c11_atomic_store((_Atomic UInt32 *)&dataQueue->head, newHeadOffset, __ATOMIC_RELEASE);
 
 	if (newHeadOffset == tailOffset) {
-		//
-		// If we are making the queue empty, then we need to make sure
-		// that either the enqueuer notices, or we notice the enqueue
-		// that raced with our making of the queue empty.
-		//
+		  
+		                                                              
+		                                                             
+		                                                 
+		  
 		__c11_atomic_thread_fence(__ATOMIC_SEQ_CST);
 	}
 

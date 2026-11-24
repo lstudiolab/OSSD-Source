@@ -18,10 +18,10 @@ __asm__("    .align 4\n"
 		"    .text\n"
 		"    .private_extern _restartable_function\n"
 		"_restartable_function:\n"
-		// this should use $arg1 but I don't know intel calling conventions
-		// so the argument to restartable_function() is actually ignored
-		// as we know what it is anyway, and Intel PC-relative addressing,
-		// unlike ARM, is pretty readable
+		                                                                   
+		                                                                
+		                                                                  
+		                                 
 		"    incl _step(%rip)\n"
 		"1:\n"
 		"    pause\n"
@@ -86,7 +86,7 @@ static void *
 task_restartable_ranges_thread(void *_ctx)
 {
 	int *stepp = _ctx;
-	restartable_function(stepp); // increments step
+	restartable_function(stepp);                   
 	T_PASS("was successfully restarted\n");
 	(*stepp)++;
 	return NULL;

@@ -26,8 +26,8 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/* $apfw: if_pflog.h,v 1.3 2007/08/13 22:18:33 jhw Exp $ */
-/* $OpenBSD: if_pflog.h,v 1.14 2006/10/25 11:27:01 henning Exp $ */
+                                                           
+                                                                   
 /*
  * Copyright 2001 Niels Provos <provos@citi.umich.edu>
  * All rights reserved.
@@ -67,13 +67,13 @@ extern "C" {
 
 #if KERNEL_PRIVATE
 struct pflog_softc {
-	struct ifnet            *sc_if;         /* back ptr to interface */
+	struct ifnet            *sc_if;                                    
 	u_int32_t               sc_flags;
 #define IFPFLF_DETACHING        0x1
 	int                     sc_unit;
 	LIST_ENTRY(pflog_softc) sc_list;
 };
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #define PFLOG_RULESET_NAME_SIZE 16
 
@@ -95,7 +95,7 @@ struct pfloghdr {
 };
 
 #define PFLOG_HDRLEN            sizeof(struct pfloghdr)
-/* minus pad, also used as a signature */
+                                         
 #define PFLOG_REAL_HDRLEN       offsetof(struct pfloghdr, pad)
 
 #ifdef KERNEL_PRIVATE
@@ -104,13 +104,13 @@ struct pfloghdr {
 #define PFLOG_PACKET(i, x, a, b, c, d, e, f, g, h) pflog_packet(i,a,b,c,d,e,f,g,h)
 #else
 #define PFLOG_PACKET(i, x, a, b, c, d, e, f, g, h) ((void)0)
-#endif /* PFLOG */
+#endif            
 
 __private_extern__ void pfloginit(void);
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #ifdef  __cplusplus
 }
 #endif
-#endif /* PF || !KERNEL */
-#endif /* _NET_IF_PFLOG_H_ */
+#endif                    
+#endif                       

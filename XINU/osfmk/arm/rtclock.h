@@ -64,7 +64,7 @@ typedef struct _rtclock_data_ {
 	}                                                               rtc_adj;
 	tbd_ops_data_t                                  rtc_timebase_func;
 
-	/* Only needed for AIC manipulation */
+	                                      
 	vm_offset_t                                             rtc_timebase_addr;
 	vm_offset_t                                             rtc_timebase_val;
 } rtclock_data_t;
@@ -81,7 +81,7 @@ extern rtclock_data_t                                   RTClockData;
 #define rtclock_adj_abstime_high                RTClockData.rtc_adj.abstime_val.high
 #define rtclock_timebase_func                   RTClockData.rtc_timebase_func
 
-/* Only needed for AIC manipulation */
+                                      
 #define rtclock_timebase_addr                   RTClockData.rtc_timebase_addr
 #define rtclock_timebase_val                    RTClockData.rtc_timebase_val
 
@@ -93,4 +93,4 @@ extern boolean_t SetIdlePop(void);
 extern void ClearIdlePop(boolean_t);
 extern void rtclock_early_init(void);
 
-#endif /* _ARM_RTCLOCK_H_ */
+#endif                      

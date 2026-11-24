@@ -49,7 +49,7 @@ T_DECL(pipe_noblock_kevent,
 	write_fd = fd[1];
 	__block int iter = 1;
 
-	/* Make sure the pipe is No block */
+	                                    
 	fcntl(write_fd, F_SETFL, (O_NONBLOCK));
 
 	dispatch_source_t write_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, (uintptr_t)write_fd, 0, dq1);

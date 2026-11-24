@@ -58,19 +58,19 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
-/*
- * This structure is used as a flow mask and a flow id for various
- * parts of the code.
- */
+  
+                                                                  
+                     
+   
 struct ip_flow_id {
 	u_int32_t       dst_ip;
 	u_int32_t       src_ip;
 	u_int16_t       dst_port;
 	u_int16_t       src_port;
 	u_int8_t        proto;
-	u_int8_t        flags;  /* protocol-specific flags */
-	u_int8_t        addr_type; /* 4 = ipv4, 6 = ipv6, 1=ether ? */
-	struct in6_addr dst_ip6;        /* could also store MAC addr! */
+	u_int8_t        flags;                               
+	u_int8_t        addr_type;                                    
+	struct in6_addr dst_ip6;                                        
 	struct in6_addr src_ip6;
 	u_int32_t       flow_id6;
 	u_int32_t       frag_id6;
@@ -83,36 +83,36 @@ struct route_in6;
 struct sockaddr_in6;
 struct pf_rule;
 
-/*
- * Arguments for calling ipfw_chk() and dummynet_io(). We put them
- * all into a structure because this way it is easier and more
- * efficient to pass variables around and extend the interface.
- */
+  
+                                                                  
+                                                              
+                                                               
+   
 struct ip_fw_args {
-	struct mbuf             *fwa_m;         /* the mbuf chain               */
-	struct ifnet            *fwa_oif;       /* output interface             */
-	struct pf_rule          *fwa_pf_rule;   /* matching PF rule             */
-	struct ether_header     *fwa_eh;        /* for bridged packets          */
-	int                     fwa_flags;      /* for dummynet                 */
-	int                     fwa_oflags;     /* for dummynet         */
+	struct mbuf             *fwa_m;                                           
+	struct ifnet            *fwa_oif;                                         
+	struct pf_rule          *fwa_pf_rule;                                     
+	struct ether_header     *fwa_eh;                                          
+	int                     fwa_flags;                                        
+	int                     fwa_oflags;                               
 	union {
-		struct ip_out_args  *_fwa_ipoa;     /* for dummynet                */
-		struct ip6_out_args *_fwa_ip6oa;    /* for dummynet               */
+		struct ip_out_args  *_fwa_ipoa;                                      
+		struct ip6_out_args *_fwa_ip6oa;                                    
 	} fwa_ipoa_;
 	union {
-		struct route        *_fwa_ro;       /* for dummynet         */
-		struct route_in6    *_fwa_ro6;      /* for dummynet         */
+		struct route        *_fwa_ro;                                 
+		struct route_in6    *_fwa_ro6;                                
 	} fwa_ro_;
 	union {
-		struct sockaddr_in  *_fwa_dst;      /* for dummynet         */
-		struct sockaddr_in6 *_fwa_dst6;     /* for IPv6 dummynet         */
+		struct sockaddr_in  *_fwa_dst;                                
+		struct sockaddr_in6 *_fwa_dst6;                                    
 	} fwa_dst_;
-	struct route_in6        *fwa_ro6_pmtu;  /* for IPv6 output */
-	struct ifnet            *fwa_origifp;   /* for IPv6 output */
-	u_int32_t               fwa_mtu;        /* for IPv6 output */
-	u_int32_t               fwa_unfragpartlen;  /* for IPv6 output */
-	struct ip6_exthdrs      *fwa_exthdrs;   /* for IPv6 output */
-	struct ip_flow_id       fwa_id;         /* grabbed from IP header       */
+	struct route_in6        *fwa_ro6_pmtu;                       
+	struct ifnet            *fwa_origifp;                        
+	u_int32_t               fwa_mtu;                             
+	u_int32_t               fwa_unfragpartlen;                       
+	struct ip6_exthdrs      *fwa_exthdrs;                        
+	struct ip_flow_id       fwa_id;                                           
 	u_int32_t               fwa_cookie;
 };
 #define fwa_ipoa fwa_ipoa_._fwa_ipoa
@@ -122,11 +122,11 @@ struct ip_fw_args {
 #define fwa_dst fwa_dst_._fwa_dst
 #define fwa_dst6 fwa_dst_._fwa_dst6
 
-/* Allocate a separate structure for inputs args to save space and bzero time */
+                                                                                
 struct ip_fw_in_args {
-	struct pf_rule          *fwai_pf_rule;  /* matching PF rule           */
+	struct pf_rule          *fwai_pf_rule;                                  
 };
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* __IP_FLOWID_H__ */
+#endif                      

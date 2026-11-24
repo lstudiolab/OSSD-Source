@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * FILE_ID: thread_status.h
- */
+  
+                           
+   
 
 
 #ifndef _ARM_THREAD_STATUS_H_
@@ -38,31 +38,31 @@
 #include <mach/vm_types.h>
 #include <mach/arm/thread_state.h>
 
-/*
- *    Support for determining the state of a thread
- */
+  
+                                                   
+   
 
 
-/*
- *  Flavors
- */
+  
+           
+   
 
 #define ARM_THREAD_STATE         1
 #define ARM_UNIFIED_THREAD_STATE ARM_THREAD_STATE
 #define ARM_VFP_STATE            2
 #define ARM_EXCEPTION_STATE      3
-#define ARM_DEBUG_STATE          4 /* pre-armv8 */
+#define ARM_DEBUG_STATE          4                
 #define THREAD_STATE_NONE        5
 #define ARM_THREAD_STATE64       6
 #define ARM_EXCEPTION_STATE64    7
-//      ARM_THREAD_STATE_LAST    8 /* legacy */
+                                               
 #define ARM_THREAD_STATE32       9
 
 #ifdef XNU_KERNEL_PRIVATE
-#define X86_THREAD_STATE_NONE    13 /* i386/thread_status.h THREAD_STATE_NONE */
-#endif /* XNU_KERNEL_PRIVATE */
+#define X86_THREAD_STATE_NONE    13                                             
+#endif                         
 
-/* API */
+         
 #define ARM_DEBUG_STATE32        14
 #define ARM_DEBUG_STATE64        15
 #define ARM_NEON_STATE           16
@@ -70,12 +70,12 @@
 #define ARM_CPMU_STATE64         18
 
 #ifdef XNU_KERNEL_PRIVATE
-/* For kernel use */
+                    
 #define ARM_SAVED_STATE32        20
 #define ARM_SAVED_STATE64        21
 #define ARM_NEON_SAVED_STATE32   22
 #define ARM_NEON_SAVED_STATE64   23
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 
 #define ARM_STATE_FLAVOR_IS_OTHER_VALID(_flavor_) 0
@@ -111,48 +111,48 @@ typedef _STRUCT_ARM_THREAD_STATE64 arm_thread_state64_t;
 #if !defined(KERNEL)
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL && defined(__arm64__)
 
-/* Accessor macros for arm_thread_state64_t pointer fields */
+                                                             
 
-/* Return pc field of arm_thread_state64_t as a data pointer value */
+                                                                     
 #define arm_thread_state64_get_pc(ts) \
 	        __darwin_arm_thread_state64_get_pc(ts)
-/* Return pc field of arm_thread_state64_t as a function pointer. May return
- * NULL if a valid function pointer cannot be constructed, the caller should
- * fall back to the arm_thread_state64_get_pc() macro in that case. */
+                                                                            
+                                                                            
+                                                                      
 #define arm_thread_state64_get_pc_fptr(ts) \
 	        __darwin_arm_thread_state64_get_pc_fptr(ts)
-/* Set pc field of arm_thread_state64_t to a function pointer */
+                                                                
 #define arm_thread_state64_set_pc_fptr(ts, fptr) \
 	        __darwin_arm_thread_state64_set_pc_fptr(ts, fptr)
-/* Return lr field of arm_thread_state64_t as a data pointer value */
+                                                                     
 #define arm_thread_state64_get_lr(ts) \
 	        __darwin_arm_thread_state64_get_lr(ts)
-/* Return lr field of arm_thread_state64_t as a function pointer. May return
- * NULL if a valid function pointer cannot be constructed, the caller should
- * fall back to the arm_thread_state64_get_lr() macro in that case. */
+                                                                            
+                                                                            
+                                                                      
 #define arm_thread_state64_get_lr_fptr(ts) \
 	        __darwin_arm_thread_state64_get_lr_fptr(ts)
-/* Set lr field of arm_thread_state64_t to a function pointer */
+                                                                
 #define arm_thread_state64_set_lr_fptr(ts, fptr) \
 	        __darwin_arm_thread_state64_set_lr_fptr(ts, fptr)
-/* Return sp field of arm_thread_state64_t as a data pointer value */
+                                                                     
 #define arm_thread_state64_get_sp(ts) \
 	        __darwin_arm_thread_state64_get_sp(ts)
-/* Set sp field of arm_thread_state64_t to a data pointer value */
+                                                                  
 #define arm_thread_state64_set_sp(ts, ptr) \
 	        __darwin_arm_thread_state64_set_sp(ts, ptr)
-/* Return fp field of arm_thread_state64_t as a data pointer value */
+                                                                     
 #define arm_thread_state64_get_fp(ts) \
 	        __darwin_arm_thread_state64_get_fp(ts)
-/* Set fp field of arm_thread_state64_t to a data pointer value */
+                                                                  
 #define arm_thread_state64_set_fp(ts, ptr) \
 	        __darwin_arm_thread_state64_set_fp(ts, ptr)
-/* Strip ptr auth bits from pc, lr, sp and fp field of arm_thread_state64_t */
+                                                                              
 #define arm_thread_state64_ptrauth_strip(ts) \
 	        __darwin_arm_thread_state64_ptrauth_strip(ts)
 
-#endif /* __DARWIN_C_LEVEL >= __DARWIN_C_FULL && defined(__arm64__) */
-#endif /* !defined(KERNEL) */
+#endif                                                                
+#endif                       
 
 struct arm_unified_thread_state {
 	arm_state_hdr_t ash;
@@ -191,20 +191,20 @@ typedef _STRUCT_ARM_DEBUG_STATE64     arm_debug_state64_t;
 typedef _STRUCT_ARM_PAGEIN_STATE      arm_pagein_state_t;
 
 #if defined(XNU_KERNEL_PRIVATE) && defined(__arm64__)
-/* See below for ARM64 kernel structure definition for arm_debug_state. */
-#else /* defined(XNU_KERNEL_PRIVATE) && defined(__arm64__) */
-/*
- * Otherwise not ARM64 kernel and we must preserve legacy ARM definitions of
- * arm_debug_state for binary compatability of userland consumers of this file.
- */
+                                                                          
+#else                                                        
+  
+                                                                            
+                                                                               
+   
 #if defined(__arm__)
 typedef _STRUCT_ARM_DEBUG_STATE        arm_debug_state_t;
 #elif defined(__arm64__)
 typedef _STRUCT_ARM_LEGACY_DEBUG_STATE arm_debug_state_t;
-#else /* defined(__arm__) */
+#else                       
 #error Undefined architecture
-#endif /* defined(__arm__) */
-#endif /* defined(XNU_KERNEL_PRIVATE) && defined(__arm64__) */
+#endif                       
+#endif                                                        
 
 #define ARM_VFP_STATE_COUNT ((mach_msg_type_number_t) \
 	(sizeof (arm_vfp_state_t)/sizeof(uint32_t)))
@@ -237,9 +237,9 @@ typedef _STRUCT_ARM_LEGACY_DEBUG_STATE arm_debug_state_t;
 #define MACHINE_THREAD_STATE_COUNT ARM_UNIFIED_THREAD_STATE_COUNT
 
 
-/*
- * Largest state on this machine:
- */
+  
+                                 
+   
 #define THREAD_MACHINE_STATE_MAX THREAD_STATE_MAX
 
 #ifdef XNU_KERNEL_PRIVATE
@@ -290,9 +290,9 @@ const_thread_state64(const arm_unified_thread_state_t *its)
 #define VFPSAVE_ATTRIB __attribute__((aligned (VFPSAVE_ALIGN)))
 #define THREAD_ALIGN   VFPSAVE_ALIGN
 
-/*
- * vector floating point saved state
- */
+  
+                                    
+   
 struct arm_vfpsaved_state {
 	uint32_t r[64];
 	uint32_t fpscr;
@@ -301,29 +301,29 @@ struct arm_vfpsaved_state {
 #endif
 
 struct arm_saved_state {
-	uint32_t r[13];     /* General purpose register r0-r12 */
-	uint32_t sp;        /* Stack pointer r13 */
-	uint32_t lr;        /* Link register r14 */
-	uint32_t pc;        /* Program counter r15 */
-	uint32_t cpsr;      /* Current program status register */
-	uint32_t fsr;       /* Fault status */
-	uint32_t far;       /* Virtual Fault Address */
-	uint32_t exception; /* exception number */
+	uint32_t r[13];                                          
+	uint32_t sp;                               
+	uint32_t lr;                               
+	uint32_t pc;                                 
+	uint32_t cpsr;                                           
+	uint32_t fsr;                         
+	uint32_t far;                                  
+	uint32_t exception;                       
 
 #if __ARM_VFP__
-	/* VFP state */
+	               
 	struct arm_vfpsaved_state VFPdata VFPSAVE_ATTRIB;
-	// for packing reasons chtread_self and DebugData
-	// are inside the the PcbData when __ARM_VFP__ is set
+	                                                 
+	                                                     
 	arm_debug_state_t        *VFPpadding_DebugData;
 	vm_address_t              VFPpadding_cthread_self;
 #endif
 };
 typedef struct arm_saved_state arm_saved_state_t;
 
-/*
- * Just for coexistence with AArch64 code.
- */
+  
+                                          
+   
 typedef struct arm_saved_state arm_saved_state32_t;
 
 static inline void
@@ -446,19 +446,19 @@ set_saved_state_reg(arm_saved_state_t *iss, unsigned regno, register_t val)
 #include <arm64/proc_reg.h>
 #define CAST_ASSERT_SAFE(type, val) (assert((val) == ((type)(val))), (type)(val))
 
-/*
- * GPR context
- */
+  
+              
+   
 
 struct arm_saved_state32 {
-	uint32_t r[13];     /* General purpose register r0-r12 */
-	uint32_t sp;        /* Stack pointer r13 */
-	uint32_t lr;        /* Link register r14 */
-	uint32_t pc;        /* Program counter r15 */
-	uint32_t cpsr;      /* Current program status register */
-	uint32_t far;       /* Virtual fault address */
-	uint32_t esr;       /* Exception syndrome register */
-	uint32_t exception; /* Exception number */
+	uint32_t r[13];                                          
+	uint32_t sp;                               
+	uint32_t lr;                               
+	uint32_t pc;                                 
+	uint32_t cpsr;                                           
+	uint32_t far;                                  
+	uint32_t esr;                                        
+	uint32_t exception;                       
 };
 typedef struct arm_saved_state32 arm_saved_state32_t;
 
@@ -472,19 +472,19 @@ typedef struct arm_saved_state32_tagged arm_saved_state32_tagged_t;
 	        (sizeof(arm_saved_state32_t)/sizeof(unsigned int)))
 
 struct arm_saved_state64 {
-	uint64_t x[29];     /* General purpose registers x0-x28 */
-	uint64_t fp;        /* Frame pointer x29 */
-	uint64_t lr;        /* Link register x30 */
-	uint64_t sp;        /* Stack pointer x31 */
-	uint64_t pc;        /* Program counter */
-	uint32_t cpsr;      /* Current program status register */
-	uint32_t reserved;  /* Reserved padding */
-	uint64_t far;       /* Virtual fault address */
-	uint32_t esr;       /* Exception syndrome register */
-	uint32_t exception; /* Exception number */
+	uint64_t x[29];                                           
+	uint64_t fp;                               
+	uint64_t lr;                               
+	uint64_t sp;                               
+	uint64_t pc;                             
+	uint32_t cpsr;                                           
+	uint32_t reserved;                        
+	uint64_t far;                                  
+	uint32_t esr;                                        
+	uint32_t exception;                       
 #if defined(HAS_APPLE_PAC)
 	uint64_t jophash;
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 };
 typedef struct arm_saved_state64 arm_saved_state64_t;
 
@@ -510,16 +510,16 @@ struct arm_saved_state {
 typedef struct arm_saved_state arm_saved_state_t;
 
 struct arm_kernel_saved_state {
-	uint64_t x[12];     /* General purpose registers x16-x28 */
-	uint64_t fp;        /* Frame pointer x29 */
-	uint64_t lr;        /* Link register x30 */
-	uint64_t sp;        /* Stack pointer x31 */
-	uint64_t pc;        /* Program counter */
-	uint32_t cpsr;      /* Current program status register */
-	uint32_t reserved;  /* Reserved padding */
+	uint64_t x[12];                                            
+	uint64_t fp;                               
+	uint64_t lr;                               
+	uint64_t sp;                               
+	uint64_t pc;                             
+	uint32_t cpsr;                                           
+	uint32_t reserved;                        
 #if defined(HAS_APPLE_PAC)
 	uint64_t jophash;
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 } __attribute__((aligned(16)));
 
 typedef struct arm_kernel_saved_state arm_kernel_saved_state_t;
@@ -529,42 +529,42 @@ typedef struct arm_kernel_saved_state arm_kernel_saved_state_t;
 
 #include <sys/cdefs.h>
 
-/*
- * Used by MANIPULATE_SIGNED_THREAD_STATE(), potentially from C++ (IOKit) code.
- * Open-coded to prevent a circular dependency between mach/arm/thread_status.h
- * and osfmk/arm/machine_routines.h.
- */
+  
+                                                                               
+                                                                               
+                                    
+   
 __BEGIN_DECLS
 extern boolean_t ml_set_interrupts_enabled(boolean_t);
 __END_DECLS
 
-/*
- * Methods used to sign and check thread state to detect corruptions of saved
- * thread state across exceptions and context switches.
- */
+  
+                                                                             
+                                                       
+   
 extern void ml_sign_thread_state(arm_saved_state_t *, uint64_t, uint32_t, uint64_t, uint64_t, uint64_t);
 
 extern void ml_check_signed_state(const arm_saved_state_t *, uint64_t, uint32_t, uint64_t, uint64_t, uint64_t);
 
-/* XXX: including stddef.f here breaks ctfmerge on some builds, so use __builtin_offsetof() instead of offsetof() */
+                                                                                                                    
 #define ss64_offsetof(x) __builtin_offsetof(struct arm_saved_state, ss_64.x)
 
-/**
- * Verify the signed thread state in _iss, execute the assembly instructions
- * _instr, and re-sign the modified thread state.  Varargs specify additional
- * inputs.
- *
- * _instr may read or modify the thread state in the following registers:
- *
- * x0: _iss
- * x1: authed _iss->ss_64.pc
- * w2: authed _iss->ss_64.cpsr
- * x3: authed _iss->ss_64.lr
- * x4: authed _iss->ss_64.x16
- * x5: authed _iss->ss_64.x17
- * x6: scratch register
- * x7: scratch register
- */
+   
+                                                                            
+                                                                             
+          
+  
+                                                                         
+  
+           
+                            
+                              
+                            
+                             
+                             
+                       
+                       
+   
 #define MANIPULATE_SIGNED_THREAD_STATE(_iss, _instr, ...)                       \
 	do {                                                                    \
 	        boolean_t _intr = ml_set_interrupts_enabled(FALSE);             \
@@ -602,7 +602,7 @@ check_and_sign_copied_thread_state(arm_saved_state_t *dst, const arm_saved_state
 	    [dst] "r"(dst)
 	    );
 }
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 static inline void
 copy_signed_thread_state(arm_saved_state_t *dst, const arm_saved_state_t *src)
@@ -613,7 +613,7 @@ copy_signed_thread_state(arm_saved_state_t *dst, const arm_saved_state_t *src)
 #endif
 }
 
-#endif /* defined(XNU_KERNEL_PRIVATE) */
+#endif                                  
 
 static inline boolean_t
 is_saved_state32(const arm_saved_state_t *iss)
@@ -673,7 +673,7 @@ add_saved_state_pc(arm_saved_state_t *iss, int diff)
 		    );
 #else
 		saved_state64(iss)->pc += (unsigned long)diff;
-#endif /* defined(XNU_KERNEL_PRIVATE) && defined(HAS_APPLE_PAC) */
+#endif                                                            
 	}
 }
 
@@ -691,7 +691,7 @@ set_saved_state_pc(arm_saved_state_t *iss, register_t pc)
 		    );
 #else
 		saved_state64(iss)->pc = (unsigned long)pc;
-#endif /* defined(XNU_KERNEL_PRIVATE) && defined(HAS_APPLE_PAC) */
+#endif                                                            
 	}
 }
 
@@ -731,7 +731,7 @@ set_saved_state_lr(arm_saved_state_t *iss, register_t lr)
 		    );
 #else
 		saved_state64(iss)->lr = (unsigned long)lr;
-#endif /* defined(XNU_KERNEL_PRIVATE) && defined(HAS_APPLE_PAC) */
+#endif                                                            
 	}
 }
 
@@ -778,7 +778,7 @@ set_saved_state_reg(arm_saved_state_t *iss, unsigned reg, register_t value)
 		saved_state32(iss)->r[reg] = CAST_ASSERT_SAFE(uint32_t, value);
 	} else {
 #if defined(XNU_KERNEL_PRIVATE) && defined(HAS_APPLE_PAC)
-		/* x16 and x17 are part of the jophash */
+		                                         
 		if (reg == 16) {
 			MANIPULATE_SIGNED_THREAD_STATE(iss,
 			    "mov	x4, %[value]		\n"
@@ -827,7 +827,7 @@ mask_saved_state_cpsr(arm_saved_state_t *iss, uint32_t set_bits, uint32_t clear_
 #else
 		saved_state64(iss)->cpsr |= set_bits;
 		saved_state64(iss)->cpsr &= ~clear_bits;
-#endif /* defined(XNU_KERNEL_PRIVATE) && defined(HAS_APPLE_PAC) */
+#endif                                                            
 	}
 }
 
@@ -845,7 +845,7 @@ set_saved_state_cpsr(arm_saved_state_t *iss, uint32_t cpsr)
 		    );
 #else
 		saved_state64(iss)->cpsr = cpsr;
-#endif /* defined(XNU_KERNEL_PRIVATE) && defined(HAS_APPLE_PAC) */
+#endif                                                            
 	}
 }
 
@@ -902,7 +902,7 @@ extern void panic_unimplemented(void);
 static inline int
 get_saved_state_svc_number(const arm_saved_state_t *iss)
 {
-	return is_saved_state32(iss) ? (int)const_saved_state32(iss)->r[12] : (int)const_saved_state64(iss)->x[ARM64_SYSCALL_CODE_REG_NUM]; /* Only first word counts here */
+	return is_saved_state32(iss) ? (int)const_saved_state32(iss)->r[12] : (int)const_saved_state64(iss)->x[ARM64_SYSCALL_CODE_REG_NUM];                                  
 }
 
 typedef _STRUCT_ARM_LEGACY_DEBUG_STATE arm_legacy_debug_state_t;
@@ -920,9 +920,9 @@ typedef struct arm_debug_aggregate_state arm_debug_state_t;
 #define ARM_LEGACY_DEBUG_STATE_COUNT ((mach_msg_type_number_t) \
 	(sizeof (arm_legacy_debug_state_t)/sizeof(uint32_t)))
 
-/*
- * NEON context
- */
+  
+               
+   
 typedef __uint128_t uint128_t;
 typedef uint64_t uint64x2_t __attribute__((ext_vector_type(2)));
 typedef uint32_t uint32x4_t __attribute__((ext_vector_type(4)));
@@ -997,9 +997,9 @@ neon_state64(arm_neon_saved_state_t *state)
 }
 
 
-/*
- * Aggregated context
- */
+  
+                     
+   
 
 struct arm_context {
 	struct arm_saved_state ss;
@@ -1016,13 +1016,13 @@ typedef struct arm_kernel_context arm_kernel_context_t;
 extern void saved_state_to_thread_state64(const arm_saved_state_t*, arm_thread_state64_t*);
 extern void thread_state64_to_saved_state(const arm_thread_state64_t*, arm_saved_state_t*);
 
-#else /* defined(__arm__) */
+#else                       
 #error Unknown arch
-#endif /* defined(__arm__) */
+#endif                       
 
 extern void saved_state_to_thread_state32(const arm_saved_state_t*, arm_thread_state32_t*);
 extern void thread_state32_to_saved_state(const arm_thread_state32_t*, arm_saved_state_t*);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _ARM_THREAD_STATUS_H_ */
+#endif                            

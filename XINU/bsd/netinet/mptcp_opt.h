@@ -47,5 +47,5 @@ extern void mptcp_update_rcv_state_meat(struct mptcb *, struct tcpcb *,
     u_int64_t, u_int32_t, u_int16_t, uint16_t);
 __END_DECLS
 
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* !_NETINET_MPTCP_OPT_H_ */
+#endif                         
+#endif                             

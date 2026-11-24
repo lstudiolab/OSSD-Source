@@ -27,8 +27,8 @@
  */
 
 
-/*	$FreeBSD: src/sys/netinet6/udp6_output.c,v 1.1.2.3 2001/08/31 13:49:58 jlemon Exp $	*/
-/*	$KAME: udp6_output.c,v 1.31 2001/05/21 16:39:15 jinmei Exp $	*/
+                                                                                         
+                                                                  
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -132,18 +132,18 @@
 
 #if NECP
 #include <net/necp.h>
-#endif /* NECP */
+#endif           
 
 #include <net/net_osdep.h>
 
 #if CONTENT_FILTER
 #include <net/content_filter.h>
-#endif /* CONTENT_FILTER */
+#endif                     
 
-/*
- * UDP protocol inplementation.
- * Per RFC 768, August, 1980.
- */
+  
+                               
+                             
+   
 extern int soreserveheadroom;
 
 int
@@ -184,7 +184,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 	ip6oa.ip6oa_boundif = IFSCOPE_NONE;
 	ip6oa.ip6oa_flags = IP6OAF_SELECT_SRCIF;
 
-	/* Enable flow advisory only when connected */
+	                                              
 	flowadv = (so->so_state & SS_ISCONNECTED) ? 1 : 0;
 
 	if (flowadv && INP_WAIT_FOR_IF_FEEDBACK(in6p)) {
@@ -213,10 +213,10 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 	}
 
 #if CONTENT_FILTER
-	/*
-	 * If socket is subject to UDP Content Filter and no addr is passed in,
-	 * retrieve CFIL saved state from mbuf and use it if necessary.
-	 */
+	  
+                                                                        
+                                                                
+    
 	if (so->so_cfil_db && !addr6) {
 		cfil_tag = cfil_dgram_get_socket_state(m, &cfil_so_state_change_cnt, NULL, &cfil_faddr, NULL);
 		if (cfil_tag) {
@@ -224,10 +224,10 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			if ((so->so_state_change_cnt != cfil_so_state_change_cnt) &&
 			    (in6p->in6p_fport != cfil_sin6->sin6_port ||
 			    !IN6_ARE_ADDR_EQUAL(&in6p->in6p_faddr, &cfil_sin6->sin6_addr))) {
-				/*
-				 * Socket is connected but socket state and dest addr/port changed.
-				 * We need to use the saved faddr info.
-				 */
+				  
+                                                                       
+                                           
+       
 				cfil_faddr_use = true;
 			}
 		}
@@ -256,15 +256,15 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 	sndinprog_cnt_used = true;
 
 	if (addr6) {
-		/*
-		 * IPv4 version of udp_output calls in_pcbconnect in this case,
-		 * which has its costs.
-		 *
-		 * Since we saw no essential reason for calling in_pcbconnect,
-		 * we get rid of such kind of logic, and call in6_selectsrc
-		 * and in6_pcbsetport in order to fill in the local address
-		 * and the local port.
-		 */
+		  
+                                                                 
+                         
+    
+                                                                
+                                                             
+                                                             
+                        
+     
 		struct sockaddr_in6 *sin6 =
 		    (struct sockaddr_in6 *)(void *)addr6;
 
@@ -274,30 +274,30 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 		}
 
 		if (!IN6_IS_ADDR_UNSPECIFIED(&in6p->in6p_faddr)) {
-			/* how about ::ffff:0.0.0.0 case? */
+			                                    
 			error = EISCONN;
 			goto release;
 		}
 
-		/* protect *sin6 from overwrites */
+		                                   
 		tmp = *sin6;
 		sin6 = &tmp;
 
 		faddr = &sin6->sin6_addr;
-		fport = sin6->sin6_port; /* allow 0 port */
+		fport = sin6->sin6_port;                   
 
 		if (IN6_IS_ADDR_V4MAPPED(faddr)) {
 			if ((in6p->in6p_flags & IN6P_IPV6_V6ONLY)) {
-				/*
-				 * I believe we should explicitly discard the
-				 * packet when mapped addresses are disabled,
-				 * rather than send the packet as an IPv6 one.
-				 * If we chose the latter approach, the packet
-				 * might be sent out on the wire based on the
-				 * default route, the situation which we'd
-				 * probably want to avoid.
-				 * (20010421 jinmei@kame.net)
-				 */
+				  
+                                                 
+                                                 
+                                                  
+                                                  
+                                                 
+                                              
+                              
+                                 
+       
 				error = EINVAL;
 				goto release;
 			} else {
@@ -305,7 +305,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			}
 		}
 
-		/* KAME hack: embed scopeid */
+		                              
 		if (in6_embedscope(&sin6->sin6_addr, sin6, in6p, NULL,
 		    optp) != 0) {
 			error = EINVAL;
@@ -317,7 +317,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			    in6p, &in6p->in6p_route, NULL, &storage,
 			    ip6oa.ip6oa_boundif, &error);
 		} else {
-			laddr = &in6p->in6p_laddr;      /* XXX */
+			laddr = &in6p->in6p_laddr;               
 		}
 		if (laddr == NULL) {
 			if (error == 0) {
@@ -342,19 +342,19 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			faddr = &((struct sockaddr_in6 *)(void *)cfil_faddr)->sin6_addr;
 			fport = ((struct sockaddr_in6 *)(void *)cfil_faddr)->sin6_port;
 
-			/* Do not use cached route */
+			                             
 			ROUTE_RELEASE(&in6p->in6p_route);
 		}
 #endif
 		if (IN6_IS_ADDR_V4MAPPED(faddr)) {
 			if ((in6p->in6p_flags & IN6P_IPV6_V6ONLY)) {
-				/*
-				 * XXX: this case would happen when the
-				 * application sets the V6ONLY flag after
-				 * connecting the foreign address.
-				 * Such applications should be fixed,
-				 * so we bark here.
-				 */
+				  
+                                           
+                                             
+                                      
+                                         
+                       
+       
 				log(LOG_INFO, "udp6_output: IPV6_V6ONLY "
 				    "option was set for a connected socket\n");
 				error = EINVAL;
@@ -368,7 +368,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 	if (in6p->inp_flowhash == 0) {
 		in6p->inp_flowhash = inp_calc_flowhash(in6p);
 	}
-	/* update flowinfo - RFC 6437 */
+	                                
 	if (in6p->inp_flow == 0 && in6p->in6p_flags & IN6P_AUTOFLOWLABEL) {
 		in6p->inp_flow &= ~IPV6_FLOWLABEL_MASK;
 		in6p->inp_flow |=
@@ -384,21 +384,21 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 		INC_ATOMIC_INT64_LIM(net_api_stats.nas_socket_inet_dgram_dns);
 	}
 
-	/*
-	 * Calculate data length and get a mbuf
-	 * for UDP and IP6 headers.
-	 */
+	  
+                                        
+                            
+    
 	M_PREPEND(m, hlen + sizeof(struct udphdr), M_DONTWAIT, 1);
 	if (m == 0) {
 		error = ENOBUFS;
 		goto release;
 	}
 
-	/*
-	 * Stuff checksum and output datagram.
-	 */
+	  
+                                       
+    
 	udp6 = (struct udphdr *)(void *)(mtod(m, caddr_t) + hlen);
-	udp6->uh_sport = in6p->in6p_lport; /* lport is always set in the PCB */
+	udp6->uh_sport = in6p->in6p_lport;                                     
 	udp6->uh_dport = fport;
 	if (plen <= 0xffff) {
 		udp6->uh_ulen = htons((u_short)plen);
@@ -413,7 +413,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 		ip6->ip6_flow   = in6p->inp_flow & IPV6_FLOWINFO_MASK;
 		ip6->ip6_vfc    &= ~IPV6_VERSION_MASK;
 		ip6->ip6_vfc    |= IPV6_VERSION;
-#if 0           /* ip6_plen will be filled in ip6_output. */
+#if 0                                                       
 		ip6->ip6_plen   = htons((u_short)plen);
 #endif
 		ip6->ip6_nxt    = IPPROTO_UDP;
@@ -442,9 +442,9 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			u_int32_t route_rule_id;
 			u_int32_t pass_flags;
 
-			/*
-			 * We need a route to perform NECP route rule checks
-			 */
+			  
+                                                       
+      
 			if (net_qos_policy_restricted != 0 &&
 			    ROUTE_UNUSABLE(&in6p->inp_route)) {
 				struct sockaddr_in6 to;
@@ -485,7 +485,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 				necp_socket_update_qos_marking(in6p, in6p->in6p_route.ro_rt, route_rule_id);
 			}
 		}
-#endif /* NECP */
+#endif           
 		if ((so->so_flags1 & SOF1_QOSMARKING_ALLOWED)) {
 			ip6oa.ip6oa_flags |= IP6OAF_QOSMARKING_ALLOWED;
 		}
@@ -499,15 +499,15 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			error = ENOBUFS;
 			goto release;
 		}
-#endif /*IPSEC*/
+#endif          
 
-		/* In case of IPv4-mapped address used in previous send */
+		                                                          
 		if (ROUTE_UNUSABLE(&in6p->in6p_route) ||
 		    rt_key(in6p->in6p_route.ro_rt)->sa_family != AF_INET6) {
 			ROUTE_RELEASE(&in6p->in6p_route);
 		}
 
-		/* Copy the cached route and take an extra reference */
+		                                                       
 		in6p_route_copyout(in6p, &ro);
 
 		set_packet_service_class(m, so, sotc, PKT_SCF_IPV6);
@@ -576,10 +576,10 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 
 		if (flowadv && (adv->code == FADV_FLOW_CONTROLLED ||
 		    adv->code == FADV_SUSPENDED)) {
-			/*
-			 * Return an error to indicate
-			 * that the packet has been dropped.
-			 */
+			  
+                                 
+                                       
+      
 			error = ENOBUFS;
 			inp_set_fc_state(in6p, adv->code);
 		}
@@ -595,7 +595,7 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 				sizeof(u_int32_t));
 		}
 
-		/* Synchronize PCB cached route */
+		                                  
 		in6p_route_copyin(in6p, &ro);
 
 		if (in6p->in6p_route.ro_rt != NULL) {
@@ -603,35 +603,35 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			struct ifnet *outif;
 
 			if (rt->rt_flags & RTF_MULTICAST) {
-				rt = NULL;      /* unusable */
+				rt = NULL;                    
 			}
 #if CONTENT_FILTER
-			/*
-			 * Discard temporary route for cfil case
-			 */
+			  
+                                           
+      
 			if (cfil_faddr_use) {
-				rt = NULL;      /* unusable */
+				rt = NULL;                    
 			}
 #endif
 
-			/*
-			 * Always discard the cached route for unconnected
-			 * socket or if it is a multicast route.
-			 */
+			  
+                                                     
+                                           
+      
 			if (rt == NULL) {
 				ROUTE_RELEASE(&in6p->in6p_route);
 			}
 
-			/*
-			 * If the destination route is unicast, update outif
-			 * with that of the route interface used by IP.
-			 */
+			  
+                                                       
+                                                  
+      
 			if (rt != NULL) {
-				/*
-				 * When an NECP IP tunnel policy forces the outbound interface,
-				 * ip6_output_list() informs the transport layer what is the actual
-				 * outgoing interface
-				 */
+				  
+                                                                   
+                                                                       
+                         
+       
 				if (ip6oa.ip6oa_flags & IP6OAF_BOUND_IF) {
 					outif = ifindex2ifnet[ip6oa.ip6oa_boundif];
 				} else {
@@ -652,10 +652,10 @@ udp6_output(struct in6pcb *in6p, struct mbuf *m, struct sockaddr *addr6,
 			ROUTE_RELEASE(&in6p->in6p_route);
 		}
 
-		/*
-		 * If output interface was cellular/expensive, and this
-		 * socket is denied access to it, generate an event.
-		 */
+		  
+                                                         
+                                                      
+     
 		if (error != 0 && (ip6oa.ip6oa_retflags & IP6OARF_IFDENIED) &&
 		    (INP_NO_CELLULAR(in6p) || INP_NO_EXPENSIVE(in6p) || INP_NO_CONSTRAINED(in6p))) {
 			soevent(in6p->inp_socket, (SO_FILT_HINT_LOCKED |

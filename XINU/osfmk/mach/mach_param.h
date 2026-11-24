@@ -53,30 +53,30 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/mach_param.h
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1986
- *
- *	Mach system sizing parameters
- */
+  
+   
+  
+                          
+                                                    
+             
+  
+                                
+   
 
 #ifndef _MACH_MACH_PARAM_H_
 #define _MACH_MACH_PARAM_H_
 
-/* Number of "registered" ports */
+                                  
 
 #define TASK_PORT_REGISTER_MAX  3
 
-/* Number of watchport for task */
+                                  
 #define TASK_MAX_WATCHPORT_COUNT 32
 
-/* Number of different task port flavor */
+                                          
 #define TASK_SELF_PORT_COUNT 4
 
-/* Number of different thread port flavor */
+                                            
 #define THREAD_SELF_PORT_COUNT 3
 
-#endif  /* _MACH_MACH_PARAM_H_ */
+#endif                           

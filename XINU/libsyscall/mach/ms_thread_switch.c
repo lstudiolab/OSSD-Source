@@ -61,7 +61,7 @@
 #include <mach/mach_syscalls.h>
 #include <mach/thread_switch.h>
 
-extern kern_return_t syscall_thread_switch(mach_port_name_t, int, mach_msg_timeout_t);  // From pthread_internals.h
+extern kern_return_t syscall_thread_switch(mach_port_name_t, int, mach_msg_timeout_t);                             
 
 kern_return_t
 thread_switch(

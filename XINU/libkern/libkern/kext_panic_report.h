@@ -32,21 +32,21 @@
 
 __BEGIN_DECLS
 
-/*******************************************************************************
-* String-compaction tables for panic reports' kext listing.
-*******************************************************************************/
+                                                                                
+                                                           
+                                                                                
 
 typedef struct subs_entry_t {
 	const char * substring;
 	char         substitute;
 } subs_entry_t;
 
-/* Prefix substitution list. Common prefixes are replaced with a single
- * nonalphanumeric character at the beginning of the identifier.
- *
- * List should be in descending order of # components, and should then
- * be in descending frequency order.
- */
+                                                                       
+                                                                
+  
+                                                                      
+                                    
+   
 subs_entry_t kext_identifier_prefix_subs[] = {
 	{ "com.apple.driver.", '>' },
 	{ "com.apple.iokit.", '|' },
@@ -56,12 +56,12 @@ subs_entry_t kext_identifier_prefix_subs[] = {
 	{ (char *)NULL, '\0' }
 };
 
-/* Substring substitution list. Substrings are replaced with a '!' followed
- * by a single letter mapping to the original string.
- *
- * List should be in descending frequency order, and within
- * groups containing same prefix, in descending length order.
- */
+                                                                           
+                                                     
+  
+                                                           
+                                                             
+   
 subs_entry_t kext_identifier_substring_subs[] = {
 	{ "AppleUSB", 'U' },
 	{ "Apple", 'A' },
@@ -75,4 +75,4 @@ subs_entry_t kext_identifier_substring_subs[] = {
 };
 
 __END_DECLS
-#endif /* _KEXT_PANIC_REPORT_H_ */
+#endif                            

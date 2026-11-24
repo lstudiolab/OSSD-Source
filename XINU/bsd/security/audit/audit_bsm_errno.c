@@ -37,15 +37,15 @@
 #include <sys/errno.h>
 
 #if CONFIG_AUDIT
-/*
- * Different operating systems use different numeric constants for different
- * error numbers, and sometimes error numbers don't exist in more than one
- * operating system.  These routines convert between BSM and local error
- * number spaces, subject to the above realities.  BSM error numbers are
- * stored in a single 8-bit character, so don't have a byte order.
- *
- * Don't include string definitions when this code is compiled into a kernel.
- */
+  
+                                                                            
+                                                                          
+                                                                        
+                                                                        
+                                                                  
+  
+                                                                             
+   
 struct bsm_errno {
 	int              be_bsm_errno;
 	int              be_local_errno;
@@ -62,21 +62,21 @@ struct bsm_errno {
 #define ES(x)
 #endif
 
-/*
- * Mapping table -- please maintain in numeric sorted order with respect to
- * the BSM constant.  Today we do a linear lookup, but could switch to a
- * binary search if it makes sense.  We only ifdef errors that aren't
- * generally available, but it does make the table a lot more ugly.
- *
- * XXXRW: It would be nice to have a similar ordered table mapping to BSM
- * constant from local constant, but the order of local constants varies by
- * OS.  Really we need to build that table at compile-time but don't do that
- * yet.
- *
- * XXXRW: We currently embed English-language error strings here, but should
- * support catalogues; these are only used if the OS doesn't have an error
- * string using strerror(3).
- */
+  
+                                                                           
+                                                                        
+                                                                     
+                                                                   
+  
+                                                                         
+                                                                           
+                                                                            
+       
+  
+                                                                            
+                                                                          
+                            
+   
 static const struct bsm_errno bsm_errnos[] = {
 	{ .be_bsm_errno = BSM_ERRNO_ESUCCESS, .be_local_errno = 0, ES("Success") },
 	{ .be_bsm_errno = BSM_ERRNO_EPERM, .be_local_errno = EPERM, ES("Operation not permitted") },
@@ -601,10 +601,10 @@ bsm_lookup_errno_local(int local_errno)
 	return NULL;
 }
 
-/*
- * Conversion to the BSM errno space isn't allowed to fail; we simply map to
- * BSM_ERRNO_UNKNOWN and let the remote endpoint deal with it.
- */
+  
+                                                                            
+                                                              
+   
 u_char
 au_errno_to_bsm(int local_errno)
 {
@@ -630,11 +630,11 @@ bsm_lookup_errno_bsm(u_char bsm_errno)
 	return NULL;
 }
 
-/*
- * Converstion from a BSM error to a local error number may fail if either
- * OpenBSM doesn't recognize the error on the wire, or because there is no
- * appropriate local mapping.
- */
+  
+                                                                          
+                                                                          
+                             
+   
 int
 au_bsm_to_errno(u_char bsm_errno, int *errorp)
 {
@@ -664,4 +664,4 @@ au_strerror(u_char bsm_errno)
 	return bsme->be_strerror;
 }
 #endif
-#endif /* CONFIG_AUDIT */
+#endif                   

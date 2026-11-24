@@ -37,7 +37,7 @@ struct kperf_sample;
 struct kperf_usample;
 struct kperf_context;
 
-/* bits for defining what to do on an action */
+                                               
 #define SAMPLER_TH_INFO       (1U << 0)
 #define SAMPLER_TH_SNAPSHOT   (1U << 1)
 #define SAMPLER_KSTACK        (1U << 2)
@@ -59,55 +59,55 @@ struct kperf_context;
 	        SAMPLER_KSTACK | SAMPLER_USTACK | SAMPLER_PMC_THREAD | \
 	        SAMPLER_TH_SCHEDULING | SAMPLER_TH_DISPATCH | SAMPLER_TH_INSCYC)
 
-/* flags for sample calls */
+                            
 
-/* pend samplers requiring copyin until AST boundary */
+                                                       
 #define SAMPLE_FLAG_PEND_USER       (1U << 0)
-/* sample idle threads */
+                         
 #define SAMPLE_FLAG_IDLE_THREADS    (1U << 1)
-/* do not sample callstacks */
+                              
 #define SAMPLE_FLAG_EMPTY_CALLSTACK (1U << 2)
-/* use the continuation as a kernel backtrace */
+                                                
 #define SAMPLE_FLAG_CONTINUATION    (1U << 3)
-/* sample is occurring outside of interrupt context */
+                                                      
 #define SAMPLE_FLAG_NON_INTERRUPT   (1U << 4)
-/* sample should include system samplers */
+                                           
 #define SAMPLE_FLAG_SYSTEM          (1U << 5)
-/* sample should not include non-system samplers */
+                                                   
 #define SAMPLE_FLAG_ONLY_SYSTEM     (1U << 6)
-/* sample should only include task samplers */
+                                              
 #define SAMPLE_FLAG_TASK_ONLY       (1U << 7)
-/* sample should only include thread samplers */
+                                                
 #define SAMPLE_FLAG_THREAD_ONLY     (1U << 8)
 
-/*  Take a sample into "sbuf" using current thread "cur_thread" */
+                                                                  
 kern_return_t kperf_sample(struct kperf_sample *sbuf,
     struct kperf_context *ctx,
     unsigned actionid,
     unsigned sample_flags);
 
-/*
- * Sample user space.
- */
+  
+                     
+   
 void kperf_sample_user(struct kperf_usample *sbuf, struct kperf_context *ctx,
     unsigned int actionid, unsigned int sample_flags);
 
-/* Whether the action provided samples non-system values. */
+                                                            
 bool kperf_action_has_non_system(unsigned actionid);
 bool kperf_action_has_thread(unsigned int actionid);
 bool kperf_action_has_task(unsigned int actionid);
 
-/* return codes from taking a sample
- * either keep trigger, or something went wrong (or we're shutting down)
- * so turn off.
- */
+                                    
+                                                                        
+               
+   
 #define SAMPLE_CONTINUE (0)
 #define SAMPLE_SHUTDOWN (1)
 #define SAMPLE_OFF      (2)
 
 void kperf_action_reset(void);
 
-/* Interface functions  */
+                          
 unsigned kperf_action_get_count(void);
 int kperf_action_set_count(unsigned count);
 
@@ -127,9 +127,9 @@ int kperf_action_get_filter(unsigned int actionid, int *pid_out);
 
 void kperf_kdebug_handler(uint32_t debugid, uintptr_t *starting_fp);
 
-/* whether to output tracepoints on context-switch */
+                                                     
 extern int kperf_kdebug_cswitch;
 int kperf_kdbg_cswitch_get(void);
 int kperf_kdbg_cswitch_set(int newval);
 
-#endif /* !defined(KPERF_ACTION_H) */
+#endif                               

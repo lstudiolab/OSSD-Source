@@ -36,7 +36,7 @@
 
 typedef struct kcdata_item      *task_crashinfo_item_t;
 
-/* Deprecated: use the KCDATA_* macros for all future use */
+                                                            
 #define CRASHINFO_ITEM_TYPE(item)                 KCDATA_ITEM_TYPE(item)
 #define CRASHINFO_ITEM_SIZE(item)                 KCDATA_ITEM_SIZE(item)
 #define CRASHINFO_ITEM_DATA_PTR(item)     KCDATA_ITEM_DATA_PTR(item)
@@ -49,7 +49,7 @@ typedef struct kcdata_item      *task_crashinfo_item_t;
 #ifndef KERNEL
 #define task_crashinfo_get_data_with_desc kcdata_get_data_with_desc
 
-#endif /* KERNEL */
+#endif             
 
 #ifdef XNU_KERNEL_PRIVATE
 
@@ -62,7 +62,7 @@ extern kern_return_t task_mark_corpse(task_t task);
 
 extern kern_return_t task_deliver_crash_notification(task_t, thread_t, exception_type_t, mach_exception_subcode_t);
 
-/* In the corpseinfo kcd_user_flags */
+                                      
 __options_closed_decl(corpse_flags_t, uint16_t, {
 	CORPSE_CRASHINFO_HAS_REF    = 0x1,
 	CORPSE_CRASHINFO_USER_FAULT = 0x2
@@ -112,6 +112,6 @@ void task_remove_from_corpse_task_list(task_t corpse_task);
 void task_purge_all_corpses(void);
 extern uint64_t task_corpse_get_crashed_thread_id(task_t corpse_task);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _TASK_CORPSE_H_ */
+#endif                      

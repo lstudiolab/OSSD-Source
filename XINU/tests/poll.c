@@ -18,11 +18,11 @@ T_GLOBAL_META(T_META_NAMESPACE("xnu.poll"),
 static_assert(POLL_TIMEOUT_MS > (SLEEP_TIME_SECS * 1000),
     "poll timeout should be longer than sleep time");
 
-/*
- * This matches the behavior of other UNIXes, but is under-specified in POSIX.
- *
- * See <rdar://problem/28372390>.
- */
+  
+                                                                              
+  
+                                 
+   
 T_DECL(sleep_with_no_fds,
     "poll() called with no fds provided should act like sleep")
 {
@@ -46,9 +46,9 @@ T_DECL(sleep_with_no_fds,
 #define LAUNCHD_PATH "/sbin/launchd"
 #define PIPE_DIR_TIMEOUT_SECS 1
 
-/*
- * See <rdar://problem/28539155>.
- */
+  
+                                 
+   
 T_DECL(directories,
     "poll() with directories should return an error")
 {
@@ -65,13 +65,13 @@ T_DECL(directories,
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(dir, "open(\".\")");
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(pipe(pipes), NULL);
 
-	/* just directory */
+	                    
 	pfd[0].fd = dir;
 	T_EXPECT_POSIX_SUCCESS(poll(pfd, 1, -1), "poll() with a directory");
 	T_QUIET; T_EXPECT_TRUE(pfd[0].revents & POLLNVAL,
 	    "directory should be an invalid event");
 
-	/* file and directory */
+	                        
 	pfd[0].fd = file; pfd[0].revents = 0;
 	pfd[1].fd = dir; pfd[1].revents = 0;
 	T_EXPECT_POSIX_SUCCESS(poll(pfd, 2, -1),
@@ -80,7 +80,7 @@ T_DECL(directories,
 	T_QUIET; T_EXPECT_TRUE(pfd[1].revents & POLLNVAL,
 	    "directory should be an invalid event");
 
-	/* directory and file */
+	                        
 	pfd[0].fd = dir; pfd[0].revents = 0;
 	pfd[1].fd = file; pfd[1].revents = 0;
 	T_EXPECT_POSIX_SUCCESS(poll(pfd, 2, -1),
@@ -89,7 +89,7 @@ T_DECL(directories,
 	    "directory should be an invalid event");
 	T_QUIET; T_EXPECT_TRUE(pfd[1].revents & POLLIN, "file should be readable");
 
-	/* file and pipe */
+	                   
 	pfd[0].fd = file; pfd[0].revents = 0;
 	pfd[1].fd = pipes[0]; pfd[0].revents = 0;
 	T_EXPECT_POSIX_SUCCESS(poll(pfd, 2, -1),
@@ -98,7 +98,7 @@ T_DECL(directories,
 	T_QUIET; T_EXPECT_FALSE(pfd[1].revents & POLLIN,
 	    "pipe should not be readable");
 
-	/* file, directory, and pipe */
+	                               
 	pfd[0].fd = file; pfd[0].revents = 0;
 	pfd[1].fd = dir; pfd[1].revents = 0;
 	pfd[2].fd = pipes[0]; pfd[2].revents = 0;
@@ -109,7 +109,7 @@ T_DECL(directories,
 	    "directory should be an invalid event");
 	T_QUIET; T_EXPECT_FALSE(pfd[2].revents & POLLIN, "pipe should not be readable");
 
-	/* directory and pipe */
+	                        
 	__block bool timed_out = true;
 	pfd[0].fd = dir; pfd[0].revents = 0;
 	pfd[1].fd = pipes[0]; pfd[1].revents = 0;

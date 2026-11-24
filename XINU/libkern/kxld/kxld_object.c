@@ -33,17 +33,17 @@
     #include <mach/machine.h>
     #include <mach/vm_param.h>
     #include <mach-o/fat.h>
-#else /* !KERNEL */
-/* Get machine.h from the kernel source so we can support all platforms
- * that the kernel supports. Otherwise we're at the mercy of the host.
- */
+#else              
+                                                                       
+                                                                      
+   
     #include "../../osfmk/mach/machine.h"
 
     #include <architecture/byte_order.h>
     #include <mach/mach_init.h>
     #include <mach-o/arch.h>
     #include <mach-o/swap.h>
-#endif /* KERNEL */
+#endif             
 
 #include <mach-o/loader.h>
 #include <mach-o/nlist.h>
@@ -71,13 +71,13 @@
 extern boolean_t isSplitKext;
 extern boolean_t isOldInterface;
 
-/*******************************************************************************
-* Data structures
-*******************************************************************************/
+                                                                                
+                 
+                                                                                
 
 struct kxld_object {
-	u_char *file;   // used by old interface
-	u_long size;    // used by old interface
+	u_char *file;                           
+	u_long size;                            
 	const char *name;
 	uint32_t filetype;
 	cpu_type_t cputype;
@@ -112,9 +112,9 @@ struct kxld_object {
 #endif
 };
 
-/*******************************************************************************
-* Prototypes
-*******************************************************************************/
+                                                                                
+            
+                                                                                
 
 static kern_return_t get_target_machine_info(KXLDObject *object,
     cpu_type_t cputype, cpu_subtype_t cpusubtype);
@@ -141,18 +141,18 @@ static KXLDSeg *get_seg_by_base_addr(KXLDObject *object,
     kxld_addr_t base_addr);
 static kern_return_t process_symbol_pointers(KXLDObject *object);
 static void add_to_ptr(u_char *symptr, kxld_addr_t val, boolean_t is_32_bit);
-#endif /* KXLD_USER_OR_BUNDLE */
+#endif                          
 
 #if KXLD_USER_OR_OBJECT
 static boolean_t target_supports_object(const KXLDObject *object)
 __attribute((pure));
 static kern_return_t init_from_object(KXLDObject *object);
 static kern_return_t process_relocs_from_sections(KXLDObject *object);
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
 #if KXLD_PIC_KEXTS
 static boolean_t target_supports_slideable_kexts(const KXLDObject *object);
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
 
 
 static kern_return_t export_macho_header(const KXLDObject *object, u_char *buf,
@@ -162,50 +162,50 @@ static u_long get_macho_cmd_data_32(u_char *file, u_long offset,
     u_int *filetype, u_int *ncmds);
 static kern_return_t export_macho_header_32(const KXLDObject *object,
     u_char *buf, u_int ncmds, u_long *header_offset, u_long header_size);
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 #if KXLD_USER_OR_LP64
 static u_long get_macho_cmd_data_64(u_char *file, u_long offset,
     u_int *filetype, u_int *ncmds);
 static kern_return_t export_macho_header_64(const KXLDObject *object,
     u_char *buf, u_int ncmds, u_long *header_offset, u_long header_size);
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
 #if KXLD_USER_OR_GOT || KXLD_USER_OR_COMMON
 static kern_return_t add_section(KXLDObject *object, KXLDSect **sect);
-#endif /* KXLD_USER_OR_GOT || KXLD_USER_OR_COMMON */
+#endif                                              
 
 #if KXLD_USER_OR_COMMON
 static kern_return_t resolve_common_symbols(KXLDObject *object);
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
 #if KXLD_USER_OR_GOT
 static boolean_t target_has_got(const KXLDObject *object) __attribute__((pure));
 static kern_return_t create_got(KXLDObject *object);
 static kern_return_t populate_got(KXLDObject *object);
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
 static KXLDSym *get_mutable_sym(const KXLDObject *object, const KXLDSym *sym);
 
 static kern_return_t populate_kmod_info(KXLDObject *object);
 
-/*******************************************************************************
-* Prototypes that may need to be exported
-*******************************************************************************/
+                                                                                
+                                         
+                                                                                
 static boolean_t kxld_object_target_needs_swap(const KXLDObject *object __unused);
 static KXLDSeg * kxld_object_get_seg_by_name(const KXLDObject *object, const char *segname);
 static KXLDSect * kxld_object_get_sect_by_name(const KXLDObject *object, const char *segname,
     const char *sectname);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 size_t
 kxld_object_sizeof(void)
 {
 	return sizeof(KXLDObject);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_init_from_macho(KXLDObject *object, u_char *file, u_long size,
     const char *name, KXLDArray *section_order __unused,
@@ -229,12 +229,12 @@ kxld_object_init_from_macho(KXLDObject *object, u_char *file, u_long size,
 	object->include_kaslr_relocs = ((flags & kKXLDFlagIncludeRelocs) == kKXLDFlagIncludeRelocs);
 #endif
 
-	/* Find the local architecture */
+	                                 
 
 	rval = get_target_machine_info(object, cputype, cpusubtype);
 	require_noerr(rval, finish);
 
-	/* Find the Mach-O slice for the target architecture */
+	                                                       
 
 	rval = get_macho_slice_for_arch(object, file, size);
 	require_noerr(rval, finish);
@@ -245,14 +245,14 @@ kxld_object_init_from_macho(KXLDObject *object, u_char *file, u_long size,
 		my_file = object->split_info.kextExecutable;
 	}
 
-	/* Allocate the symbol table */
+	                               
 
 	if (!object->symtab) {
 		object->symtab = kxld_calloc(kxld_symtab_sizeof());
 		require_action(object->symtab, finish, rval = KERN_RESOURCE_SHORTAGE);
 	}
 
-	/* Build the relocator */
+	                         
 
 	rval = kxld_relocator_init(&object->relocator,
 	    my_file,
@@ -262,12 +262,12 @@ kxld_object_init_from_macho(KXLDObject *object, u_char *file, u_long size,
 	    kxld_object_target_needs_swap(object));
 	require_noerr(rval, finish);
 
-	/* There are four types of Mach-O files that we can support:
-	 *   1) 32-bit MH_OBJECT      - Snow Leopard and earlier
-	 *   2) 32-bit MH_KEXT_BUNDLE - Lion and Later
-	 *   3) 64-bit MH_OBJECT      - Unsupported
-	 *   4) 64-bit MH_KEXT_BUNDLE - Snow Leopard and Later
-	 */
+	                                                            
+                                                         
+                                               
+                                            
+                                                       
+    
 
 	if (kxld_object_is_32_bit(object)) {
 		struct mach_header *mach_hdr = (struct mach_header *) ((void *) my_file);
@@ -283,13 +283,13 @@ kxld_object_init_from_macho(KXLDObject *object, u_char *file, u_long size,
 		rval = init_from_bundle(object);
 		require_noerr(rval, finish);
 		break;
-#endif /* KXLD_USER_OR_BUNDLE */
+#endif                          
 #if KXLD_USER_OR_OBJECT
 	case MH_OBJECT:
 		rval = init_from_object(object);
 		require_noerr(rval, finish);
 		break;
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 	case MH_EXECUTE:
 		object->is_kernel = TRUE;
 		rval = init_from_execute(object);
@@ -329,8 +329,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 splitKextLinkInfo *
 kxld_object_get_link_info(KXLDObject *object)
 {
@@ -340,8 +340,8 @@ kxld_object_get_link_info(KXLDObject *object)
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_object_set_link_info(KXLDObject *object, splitKextLinkInfo *link_info)
 {
@@ -358,25 +358,25 @@ kxld_object_set_link_info(KXLDObject *object, splitKextLinkInfo *link_info)
 	return;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 get_target_machine_info(KXLDObject *object, cpu_type_t cputype __unused,
     cpu_subtype_t cpusubtype __unused)
 {
 #if KERNEL
 
-	/* Because the kernel can only link for its own architecture, we know what
-	 * the host and target architectures are at compile time, so we can use
-	 * a vastly simplified version of this function.
-	 */
+	                                                                          
+                                                                        
+                                                 
+    
 
 	check(object);
 
 #if   defined(__x86_64__)
 	object->cputype = CPU_TYPE_X86_64;
-/* FIXME: we need clang to provide a __x86_64h__ macro for the sub-type. Using
- * __AVX2__ is a temporary solution until this is available. */
+                                                                              
+                                                               
 #if   defined(__AVX2__)
 	object->cpusubtype = CPU_SUBTYPE_X86_64_H;
 #else
@@ -395,14 +395,14 @@ get_target_machine_info(KXLDObject *object, cpu_type_t cputype __unused,
 	kxld_log(kKxldLogLinking, kKxldLogErr,
 	    kKxldLogArchNotSupported, _mh_execute_header->cputype);
 	return KERN_NOT_SUPPORTED;
-#endif /* Supported architecture defines */
+#endif                                     
 
 
-#else /* !KERNEL */
+#else              
 
-	/* User-space must look up the architecture it's running on and the target
-	 * architecture at run-time.
-	 */
+	                                                                          
+                             
+    
 
 	kern_return_t rval = KERN_FAILURE;
 	const NXArchInfo *host_arch = NULL;
@@ -414,8 +414,8 @@ get_target_machine_info(KXLDObject *object, cpu_type_t cputype __unused,
 
 	object->host_order = host_arch->byteorder;
 
-	/* If the user did not specify a cputype, use the local architecture.
-	 */
+	                                                                     
+    
 
 	if (cputype) {
 		object->cputype = cputype;
@@ -443,9 +443,9 @@ get_target_machine_info(KXLDObject *object, cpu_type_t cputype __unused,
 		}
 	}
 
-	/* Validate that we support the target architecture and record its
-	 * endianness.
-	 */
+	                                                                  
+               
+    
 
 	switch (object->cputype) {
 	case CPU_TYPE_ARM:
@@ -465,11 +465,11 @@ get_target_machine_info(KXLDObject *object, cpu_type_t cputype __unused,
 
 finish:
 	return rval;
-#endif /* KERNEL */
+#endif             
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 get_macho_slice_for_arch(KXLDObject *object, u_char *file, u_long size)
 {
@@ -479,7 +479,7 @@ get_macho_slice_for_arch(KXLDObject *object, u_char *file, u_long size)
 	struct fat_header *fat = (struct fat_header *) ((void *) file);
 	struct fat_arch *archs = (struct fat_arch *) &fat[1];
 	boolean_t swap = FALSE;
-#endif /* KERNEL */
+#endif             
 	u_char *my_file = file;
 	u_long my_file_size = size;
 
@@ -487,14 +487,14 @@ get_macho_slice_for_arch(KXLDObject *object, u_char *file, u_long size)
 	check(file);
 	check(size);
 
-	/* We are assuming that we will never receive a fat file in the kernel */
+	                                                                         
 
 #if !KERNEL
 	require_action(size >= sizeof(*fat), finish,
 	    rval = KERN_FAILURE;
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-	/* The fat header is always big endian, so swap if necessary */
+	                                                               
 	if (fat->magic == FAT_CIGAM) {
 		(void) swap_fat_header(fat, object->host_order);
 		swap = TRUE;
@@ -510,12 +510,12 @@ get_macho_slice_for_arch(KXLDObject *object, u_char *file, u_long size)
 		    rval = KERN_FAILURE;
 		    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
 
-		/* Swap the fat_arch structures if necessary */
+		                                               
 		if (swap) {
 			(void) swap_fat_arch(archs, fat->nfat_arch, object->host_order);
 		}
 
-		/* Locate the Mach-O for the requested architecture */
+		                                                      
 
 		arch = NXFindBestFatArch(object->cputype, object->cpusubtype, archs, fat->nfat_arch);
 		require_action(arch, finish, rval = KERN_FAILURE;
@@ -527,20 +527,20 @@ get_macho_slice_for_arch(KXLDObject *object, u_char *file, u_long size)
 		my_file = my_file + arch->offset;
 		my_file_size = arch->size;
 	}
-#endif /* !KERNEL */
+#endif              
 
-	/* Swap the Mach-O's headers to this architecture if necessary */
+	                                                                 
 	if (kxld_object_is_32_bit(object)) {
 		rval = validate_and_swap_macho_32(my_file, my_file_size
 #if !KERNEL
 		    , object->host_order
-#endif /* !KERNEL */
+#endif              
 		    );
 	} else {
 		rval = validate_and_swap_macho_64(my_file, my_file_size
 #if !KERNEL
 		    , object->host_order
-#endif /* !KERNEL */
+#endif              
 		    );
 	}
 	require_noerr(rval, finish);
@@ -549,7 +549,7 @@ get_macho_slice_for_arch(KXLDObject *object, u_char *file, u_long size)
 	require_action(object->cputype == mach_hdr->cputype, finish,
 	    rval = KERN_FAILURE;
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogTruncatedMachO));
-	object->cpusubtype = mach_hdr->cpusubtype; /* <rdar://problem/16008438> */
+	object->cpusubtype = mach_hdr->cpusubtype;                                
 
 	if (isOldInterface) {
 		object->file = my_file;
@@ -564,8 +564,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
     struct symtab_command **symtab_hdr_out)
@@ -602,7 +602,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 	    get_macho_cmd_data_32, get_macho_cmd_data_64,
 	    my_file, offset, &filetype, &ncmds);
 
-	/* First pass to count segments and sections */
+	                                               
 
 	offset = base_offset;
 	for (i = 0; i < ncmds; ++i, offset += cmd_hdr->cmdsize) {
@@ -615,7 +615,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			struct segment_command *seg_hdr =
 			    (struct segment_command *) cmd_hdr;
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
@@ -624,14 +624,14 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			nsects += seg_hdr->nsects;
 		}
 		break;
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 #if KXLD_USER_OR_LP64
 		case LC_SEGMENT_64:
 		{
 			struct segment_command_64 *seg_hdr =
 			    (struct segment_command_64 *) ((void *) cmd_hdr);
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
@@ -640,13 +640,13 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			nsects += seg_hdr->nsects;
 		}
 		break;
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 		default:
 			continue;
 		}
 	}
 
-	/* Allocate the segments and sections */
+	                                        
 
 	if (nsegs) {
 		rval = kxld_array_init(&object->segs, sizeof(KXLDSeg), nsegs);
@@ -656,7 +656,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 		require_noerr(rval, finish);
 	}
 
-	/* Initialize the segments and sections */
+	                                          
 
 	offset = base_offset;
 	for (i = 0; i < ncmds; ++i, offset += cmd_hdr->cmdsize) {
@@ -670,7 +670,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			struct segment_command *seg_hdr =
 			    (struct segment_command *) cmd_hdr;
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
@@ -683,14 +683,14 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			sect_offset = offset + sizeof(*seg_hdr);
 		}
 		break;
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 #if KXLD_USER_OR_LP64
 		case LC_SEGMENT_64:
 		{
 			struct segment_command_64 *seg_hdr =
 			    (struct segment_command_64 *) ((void *) cmd_hdr);
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
@@ -703,7 +703,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			sect_offset = offset + sizeof(*seg_hdr);
 		}
 		break;
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 		case LC_SYMTAB:
 			symtab_hdr = (struct symtab_command *) cmd_hdr;
 			break;
@@ -741,7 +741,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			break;
 		case LC_UNIXTHREAD:
 		case LC_MAIN:
-			/* Don't need to do anything with UNIXTHREAD or MAIN for the kernel */
+			                                                                      
 			require_action(kxld_object_is_kernel(object),
 			    finish, rval = KERN_FAILURE;
 			    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
@@ -755,7 +755,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 			}
 			break;
 		case LC_NOTE:
-			/* binary blob of data */
+			                         
 			break;
 		case LC_CODE_SIGNATURE:
 		case LC_DYLD_INFO:
@@ -763,7 +763,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 		case LC_FUNCTION_STARTS:
 		case LC_DATA_IN_CODE:
 		case LC_DYLIB_CODE_SIGN_DRS:
-			/* Various metadata that might be stored in the linkedit segment */
+			                                                                   
 			break;
 		default:
 			rval = KERN_FAILURE;
@@ -773,7 +773,7 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 		}
 
 		if (seg) {
-			/* Initialize the sections */
+			                             
 			for (j = 0; j < seg->sects.nitems; ++j, ++secti) {
 				sect = kxld_array_get_item(&object->sects, secti);
 
@@ -782,9 +782,9 @@ init_from_final_linked_image(KXLDObject *object, u_int *filetype_out,
 				    sect, my_file, &sect_offset, secti, &object->relocator);
 				require_noerr(rval, finish);
 
-				/* Add the section to the segment.  This will also make sure
-				 * that the sections and segments have the same segname.
-				 */
+				                                                            
+                                                            
+       
 				rval = kxld_seg_add_section(seg, sect);
 				require_noerr(rval, finish);
 			}
@@ -805,21 +805,21 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_from_execute(KXLDObject *object)
 {
 	kern_return_t rval = KERN_FAILURE;
 	struct symtab_command *symtab_hdr = NULL;
 	u_int filetype = 0;
-	KXLDSeg * kernel_linkedit_seg = NULL; // used if running kernel
+	KXLDSeg * kernel_linkedit_seg = NULL;                          
 #if KXLD_USER_OR_OBJECT
 	KXLDSeg *seg = NULL;
 	KXLDSect *sect = NULL;
 	KXLDSectionName *sname = NULL;
 	u_int i = 0, j = 0, k = 0;
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 	u_char *my_file;
 
 	check(object);
@@ -839,10 +839,10 @@ init_from_execute(KXLDObject *object)
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
 	    "The kernel file is not of type MH_EXECUTE."));
 
-	/* Initialize the symbol table. If this is the running kernel
-	 * we  will work from the in-memory linkedit segment;
-	 * otherwise we work from the whole mach-o image.
-	 */
+	                                                             
+                                                      
+                                                  
+    
 #if KERNEL
 	kernel_linkedit_seg = kxld_object_get_seg_by_name(object, SEG_LINKEDIT);
 	require_action(kernel_linkedit_seg, finish, rval = KERN_FAILURE;
@@ -855,17 +855,17 @@ init_from_execute(KXLDObject *object)
 	require_noerr(rval, finish);
 
 #if KXLD_USER_OR_OBJECT
-	/* Save off the order of section names so that we can lay out kext
-	 * sections for MH_OBJECT-based systems.
-	 */
+	                                                                  
+                                         
+    
 	if (target_supports_object(object)) {
 		rval = kxld_array_init(object->section_order, sizeof(KXLDSectionName),
 		    object->sects.nitems);
 		require_noerr(rval, finish);
 
-		/* Copy the section names into the section_order array for future kext
-		 * section ordering.
-		 */
+		                                                                      
+                      
+     
 		for (i = 0, k = 0; i < object->segs.nitems; ++i) {
 			seg = kxld_array_get_item(&object->segs, i);
 
@@ -878,7 +878,7 @@ init_from_execute(KXLDObject *object)
 			}
 		}
 	}
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
 	rval = KERN_SUCCESS;
 finish:
@@ -886,16 +886,16 @@ finish:
 }
 
 #if KXLD_USER_OR_BUNDLE
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 target_supports_bundle(const KXLDObject *object __unused)
 {
 	return TRUE;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_from_bundle(KXLDObject *object)
 {
@@ -926,26 +926,26 @@ init_from_bundle(KXLDObject *object)
 	KXLD_3264_FUNC(kxld_object_is_32_bit(object), rval,
 	    kxld_symtab_init_from_macho_32, kxld_symtab_init_from_macho_64,
 	    object->symtab, symtab_hdr, my_file,
-	    /* kernel_linkedit_seg */ NULL);
+	                              NULL);
 	require_noerr(rval, finish);
 
 	rval = KERN_SUCCESS;
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_BUNDLE */
+#endif                          
 
 #if KXLD_USER_OR_OBJECT
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 target_supports_object(const KXLDObject *object)
 {
 	return object->cputype == CPU_TYPE_I386;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 init_from_object(KXLDObject *object)
 {
@@ -982,11 +982,11 @@ init_from_object(KXLDObject *object)
 
 	require_action(filetype == MH_OBJECT, finish, rval = KERN_FAILURE);
 
-	/* MH_OBJECTs use one unnamed segment to contain all of the sections.  We
-	 * loop over all of the load commands to initialize the structures we
-	 * expect.  Then, we'll use the unnamed segment to get to all of the
-	 * sections, and then use those sections to create the actual segments.
-	 */
+	                                                                         
+                                                                      
+                                                                     
+                                                                        
+    
 
 	for (; i < ncmds; ++i, offset += cmd_hdr->cmdsize) {
 		cmd_hdr = (struct load_command *) ((void *) (my_file + offset));
@@ -998,12 +998,12 @@ init_from_object(KXLDObject *object)
 			struct segment_command *seg_hdr =
 			    (struct segment_command *) cmd_hdr;
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
 
-			/* Ignore LINKEDIT segments */
+			                              
 			if (streq_safe(seg_hdr->segname, SEG_LINKEDIT,
 			    const_strlen(SEG_LINKEDIT))) {
 				continue;
@@ -1021,19 +1021,19 @@ init_from_object(KXLDObject *object)
 			has_segment = TRUE;
 		}
 		break;
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 #if KXLD_USER_OR_LP64
 		case LC_SEGMENT_64:
 		{
 			struct segment_command_64 *seg_hdr =
 			    (struct segment_command_64 *) ((void *) cmd_hdr);
 
-			/* Ignore segments with no vm size */
+			                                     
 			if (!seg_hdr->vmsize) {
 				continue;
 			}
 
-			/* Ignore LINKEDIT segments */
+			                              
 			if (streq_safe(seg_hdr->segname, SEG_LINKEDIT,
 			    const_strlen(SEG_LINKEDIT))) {
 				continue;
@@ -1051,14 +1051,14 @@ init_from_object(KXLDObject *object)
 			has_segment = TRUE;
 		}
 		break;
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 		case LC_SYMTAB:
 			symtab_hdr = (struct symtab_command *) cmd_hdr;
 
 			KXLD_3264_FUNC(kxld_object_is_32_bit(object), rval,
 			    kxld_symtab_init_from_macho_32, kxld_symtab_init_from_macho_64,
 			    object->symtab, symtab_hdr, my_file,
-			    /* kernel_linkedit_seg */ NULL);
+			                              NULL);
 			require_noerr(rval, finish);
 			break;
 		case LC_UUID:
@@ -1067,7 +1067,7 @@ init_from_object(KXLDObject *object)
 			break;
 		case LC_UNIXTHREAD:
 		case LC_MAIN:
-			/* Don't need to do anything with UNIXTHREAD or MAIN */
+			                                                       
 			break;
 		case LC_CODE_SIGNATURE:
 		case LC_DYLD_INFO:
@@ -1075,13 +1075,13 @@ init_from_object(KXLDObject *object)
 		case LC_FUNCTION_STARTS:
 		case LC_DATA_IN_CODE:
 		case LC_DYLIB_CODE_SIGN_DRS:
-			/* Various metadata that might be stored in the linkedit segment */
+			                                                                   
 			break;
 		case LC_NOTE:
-			/* bag-of-bits carried with the binary: ignore */
+			                                                 
 			break;
 		case LC_BUILD_VERSION:
-			/* should be able to ignore build version commands */
+			                                                     
 			kxld_log(kKxldLogLinking, kKxldLogWarn,
 			    "Ignoring LC_BUILD_VERSION (%u) in MH_OBJECT kext: (platform:%d)",
 			    cmd_hdr->cmd, ((struct build_version_command *)cmd_hdr)->platform);
@@ -1091,7 +1091,7 @@ init_from_object(KXLDObject *object)
 		case LC_VERSION_MIN_TVOS:
 		case LC_VERSION_MIN_WATCHOS:
 		case LC_SOURCE_VERSION:
-		/* Not supported for object files, fall through */
+		                                                  
 		default:
 			rval = KERN_FAILURE;
 			kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
@@ -1101,12 +1101,12 @@ init_from_object(KXLDObject *object)
 	}
 
 	if (has_segment) {
-		/* Get the number of sections from the segment and build the section index */
+		                                                                             
 
 		rval = kxld_array_init(&object->sects, sizeof(KXLDSect), nsects);
 		require_noerr(rval, finish);
 
-		/* Loop over all of the sections to initialize the section index */
+		                                                                   
 
 		for (i = 0; i < nsects; ++i) {
 			sect = kxld_array_get_item(&object->sects, i);
@@ -1117,19 +1117,19 @@ init_from_object(KXLDObject *object)
 			require_noerr(rval, finish);
 		}
 
-		/* Create special sections */
+		                             
 
 #if KXLD_USER_OR_GOT
 		rval = create_got(object);
 		require_noerr(rval, finish);
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
 #if KXLD_USER_OR_COMMON
 		rval = resolve_common_symbols(object);
 		require_noerr(rval, finish);
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
-		/* Create the segments from the section index */
+		                                                
 
 		rval = kxld_seg_create_seg_from_sections(&object->segs, &object->sects);
 		require_noerr(rval, finish);
@@ -1146,11 +1146,11 @@ init_from_object(KXLDObject *object)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static u_long
 get_macho_cmd_data_32(u_char *file, u_long offset, u_int *filetype, u_int *ncmds)
 {
@@ -1166,11 +1166,11 @@ get_macho_cmd_data_32(u_char *file, u_long offset, u_int *filetype, u_int *ncmds
 	return sizeof(*mach_hdr);
 }
 
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static u_long
 get_macho_cmd_data_64(u_char *file, u_long offset, u_int *filetype, u_int *ncmds)
 {
@@ -1185,10 +1185,10 @@ get_macho_cmd_data_64(u_char *file, u_long offset, u_int *filetype, u_int *ncmds
 
 	return sizeof(*mach_hdr);
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static u_long
 get_macho_header_size(const KXLDObject *object)
 {
@@ -1199,7 +1199,7 @@ get_macho_header_size(const KXLDObject *object)
 
 	check(object);
 
-	/* Mach, segment, symtab, and UUID headers */
+	                                             
 
 	header_size += object_is_32_bit ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
 
@@ -1214,7 +1214,7 @@ get_macho_header_size(const KXLDObject *object)
 	if (target_supports_slideable_kexts(object)) {
 		header_size += kxld_reloc_get_macho_header_size();
 	}
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
 
 	if (object->uuid.has_uuid) {
 		header_size += kxld_uuid_get_macho_header_size();
@@ -1235,8 +1235,8 @@ get_macho_header_size(const KXLDObject *object)
 	return header_size;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static u_long
 get_macho_data_size(const KXLDObject *object)
 {
@@ -1246,7 +1246,7 @@ get_macho_data_size(const KXLDObject *object)
 
 	check(object);
 
-	/* total all segment vmsize values */
+	                                     
 	for (i = 0; i < object->segs.nitems; ++i) {
 		seg = kxld_array_get_item(&object->segs, i);
 		data_size += (u_long) kxld_seg_get_vmsize(seg);
@@ -1254,46 +1254,46 @@ get_macho_data_size(const KXLDObject *object)
 
 #if KXLD_PIC_KEXTS
 	{
-		/* ensure that when we eventually emit the final linked object,
-		 * appending the __DYSYMTAB data after the __LINKEDIT data will
-		 * not overflow the space allocated for the __LINKEDIT segment
-		 */
+		                                                               
+                                                                 
+                                                                
+     
 
 		u_long  seg_vmsize = 0;
 		u_long  symtab_size = 0;
 		u_long  reloc_size = 0;
 
-		/* get current __LINKEDIT sizes */
+		                                  
 		seg = kxld_object_get_seg_by_name(object, SEG_LINKEDIT);
 
 		seg_vmsize = (u_long) kxld_seg_get_vmsize(seg);
 
-		/* get size of symbol table data that will eventually be dumped
-		 * into the __LINKEDIT segment
-		 */
+		                                                               
+                                
+     
 		symtab_size = kxld_symtab_get_macho_data_size(object->symtab, kxld_object_is_32_bit(object));
 
 		if (target_supports_slideable_kexts(object)) {
-			/* get size of __DYSYMTAB relocation entries */
+			                                               
 			reloc_size = kxld_reloc_get_macho_data_size(&object->locrelocs, &object->extrelocs);
 		}
 
-		/* combine, and ensure they'll both fit within the page(s)
-		 * allocated for the __LINKEDIT segment. If they'd overflow,
-		 * increase the vmsize appropriately so no overflow will occur
-		 */
+		                                                          
+                                                              
+                                                                
+     
 		if ((symtab_size + reloc_size) > seg_vmsize) {
 			u_long  overflow = (symtab_size + reloc_size) - seg_vmsize;
 			data_size += kxld_round_page_cross_safe(overflow);
 		}
 	}
-#endif  // KXLD_PIC_KEXTS
+#endif                   
 
 	return data_size;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_target_needs_swap(const KXLDObject *object __unused)
 {
@@ -1301,11 +1301,11 @@ kxld_object_target_needs_swap(const KXLDObject *object __unused)
 	return FALSE;
 #else
 	return object->target_order != object->host_order;
-#endif /* KERNEL */
+#endif             
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSeg *
 kxld_object_get_seg_by_name(const KXLDObject *object, const char *segname)
 {
@@ -1325,8 +1325,8 @@ kxld_object_get_seg_by_name(const KXLDObject *object, const char *segname)
 	return seg;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const KXLDRelocator *
 kxld_object_get_relocator(const KXLDObject * object)
 {
@@ -1335,8 +1335,8 @@ kxld_object_get_relocator(const KXLDObject * object)
 	return &object->relocator;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDSect *
 kxld_object_get_sect_by_name(const KXLDObject *object, const char *segname,
     const char *sectname)
@@ -1358,8 +1358,8 @@ kxld_object_get_sect_by_name(const KXLDObject *object, const char *segname,
 	return sect;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const KXLDReloc *
 kxld_object_get_reloc_at_symbol(const KXLDObject *object, const KXLDSym *sym)
 {
@@ -1389,8 +1389,8 @@ finish:
 	return reloc;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const KXLDSym *
 kxld_object_get_symbol_of_reloc(const KXLDObject *object,
     const KXLDReloc *reloc, const KXLDSect *sect)
@@ -1412,8 +1412,8 @@ kxld_object_get_symbol_of_reloc(const KXLDObject *object,
 	return sym;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const KXLDSect *
 kxld_object_get_section_by_index(const KXLDObject *object, u_int sectnum)
 {
@@ -1428,8 +1428,8 @@ kxld_object_get_section_by_index(const KXLDObject *object, u_int sectnum)
 	return sect;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const KXLDArray  *
 kxld_object_get_extrelocs(const KXLDObject *object)
 {
@@ -1444,8 +1444,8 @@ kxld_object_get_extrelocs(const KXLDObject *object)
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const KXLDSymtab *
 kxld_object_get_symtab(const KXLDObject *object)
 {
@@ -1455,8 +1455,8 @@ kxld_object_get_symtab(const KXLDObject *object)
 }
 
 #if KXLD_USER_OR_GOT || KXLD_USER_OR_COMMON
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 add_section(KXLDObject *object, KXLDSect **sect)
 {
@@ -1473,14 +1473,14 @@ add_section(KXLDObject *object, KXLDSect **sect)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_GOT || KXLD_USER_OR_COMMON */
+#endif                                              
 
 #if KXLD_USER_OR_COMMON
-/*******************************************************************************
-* If there are common symbols, calculate how much space they'll need
-* and create/grow the __DATA __common section to accommodate them.
-* Then, resolve them against that section.
-*******************************************************************************/
+                                                                                
+                                                                    
+                                                                  
+                                          
+                                                                                
 static kern_return_t
 resolve_common_symbols(KXLDObject *object)
 {
@@ -1500,7 +1500,7 @@ resolve_common_symbols(KXLDObject *object)
 		goto finish;
 	}
 
-	/* Iterate over the common symbols to calculate their total aligned size */
+	                                                                           
 	kxld_symtab_iterator_init(&iter, object->symtab, kxld_sym_is_common, FALSE);
 	while ((sym = kxld_symtab_iterator_get_next(&iter))) {
 		align = kxld_sym_get_common_align(sym);
@@ -1513,9 +1513,9 @@ resolve_common_symbols(KXLDObject *object)
 		total_size = kxld_align_address(total_size, align) + size;
 	}
 
-	/* If there are common symbols, grow or create the __DATA __common section
-	 * to hold them.
-	 */
+	                                                                          
+                 
+    
 	if (total_size) {
 		sect = kxld_object_get_sect_by_name(object, SEG_DATA, SECT_COMMON);
 		if (sect) {
@@ -1532,7 +1532,7 @@ resolve_common_symbols(KXLDObject *object)
 			    total_size, max_align);
 		}
 
-		/* Resolve the common symbols against the new section */
+		                                                        
 		rval = kxld_array_get_index(&object->sects, sect, &sectnum);
 		require_noerr(rval, finish);
 
@@ -1553,20 +1553,20 @@ resolve_common_symbols(KXLDObject *object)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_COMMON */
+#endif                          
 
 #if KXLD_USER_OR_GOT
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 target_has_got(const KXLDObject *object)
 {
 	return FALSE:
 }
 
-/*******************************************************************************
-* Create and initialize the Global Offset Table
-*******************************************************************************/
+                                                                                
+                                               
+                                                                                
 static kern_return_t
 create_got(KXLDObject *object)
 {
@@ -1599,8 +1599,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 populate_got(KXLDObject *object)
 {
@@ -1630,10 +1630,10 @@ populate_got(KXLDObject *object)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 target_supports_protected_segments(const KXLDObject *object)
 {
@@ -1643,8 +1643,8 @@ target_supports_protected_segments(const KXLDObject *object)
 	       object->cputype == CPU_TYPE_ARM64);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 set_is_object_linked(KXLDObject *object)
 {
@@ -1671,8 +1671,8 @@ set_is_object_linked(KXLDObject *object)
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_object_clear(KXLDObject *object)
 {
@@ -1693,7 +1693,7 @@ kxld_object_clear(KXLDObject *object)
 	if (kxld_object_is_kernel(object)) {
 		unswap_macho(my_file, object->host_order, object->target_order);
 	}
-#endif /* !KERNEL */
+#endif              
 
 	for (i = 0; i < object->segs.nitems; ++i) {
 		seg = kxld_array_get_item(&object->segs, i);
@@ -1743,8 +1743,8 @@ kxld_object_clear(KXLDObject *object)
 #endif
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_object_deinit(KXLDObject *object __unused)
 {
@@ -1765,7 +1765,7 @@ kxld_object_deinit(KXLDObject *object __unused)
 	if (my_file && kxld_object_is_kernel(object)) {
 		unswap_macho(my_file, object->host_order, object->target_order);
 	}
-#endif /* !KERNEL */
+#endif              
 
 	for (i = 0; i < object->segs.maxitems; ++i) {
 		seg = kxld_array_get_slot(&object->segs, i);
@@ -1790,8 +1790,8 @@ kxld_object_deinit(KXLDObject *object __unused)
 	bzero(object, sizeof(*object));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const u_char *
 kxld_object_get_file(const KXLDObject *object)
 {
@@ -1808,8 +1808,8 @@ kxld_object_get_file(const KXLDObject *object)
 	return my_file;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 const char *
 kxld_object_get_name(const KXLDObject *object)
 {
@@ -1818,8 +1818,8 @@ kxld_object_get_name(const KXLDObject *object)
 	return object->name;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_is_32_bit(const KXLDObject *object)
 {
@@ -1828,8 +1828,8 @@ kxld_object_is_32_bit(const KXLDObject *object)
 	return kxld_is_32_bit(object->cputype);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_is_final_image(const KXLDObject *object)
 {
@@ -1838,8 +1838,8 @@ kxld_object_is_final_image(const KXLDObject *object)
 	return object->is_final_image;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_is_kernel(const KXLDObject *object)
 {
@@ -1848,8 +1848,8 @@ kxld_object_is_kernel(const KXLDObject *object)
 	return object->is_kernel;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_is_linked(const KXLDObject *object)
 {
@@ -1858,8 +1858,8 @@ kxld_object_is_linked(const KXLDObject *object)
 	return object->is_linked;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_target_supports_strict_patching(const KXLDObject *object)
 {
@@ -1868,8 +1868,8 @@ kxld_object_target_supports_strict_patching(const KXLDObject *object)
 	return object->cputype != CPU_TYPE_I386;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 boolean_t
 kxld_object_target_supports_common_symbols(const KXLDObject *object)
 {
@@ -1879,8 +1879,8 @@ kxld_object_target_supports_common_symbols(const KXLDObject *object)
 }
 
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_object_get_vmsize_for_seg_by_name(const KXLDObject *object,
     const char *segname,
@@ -1893,7 +1893,7 @@ kxld_object_get_vmsize_for_seg_by_name(const KXLDObject *object,
 	KXLDSeg *seg = NULL;
 	u_long  my_size = 0;
 
-	/* segment vmsize */
+	                    
 	seg = kxld_object_get_seg_by_name(object, segname);
 
 	my_size = (u_long) kxld_seg_get_vmsize(seg);
@@ -1903,7 +1903,7 @@ kxld_object_get_vmsize_for_seg_by_name(const KXLDObject *object,
 		u_long  reloc_size = 0;
 
 		if (target_supports_slideable_kexts(object)) {
-			/* get size of __DYSYMTAB relocation entries */
+			                                               
 			reloc_size = kxld_reloc_get_macho_data_size(&object->locrelocs, &object->extrelocs);
 			my_size += reloc_size;
 		}
@@ -1913,8 +1913,8 @@ kxld_object_get_vmsize_for_seg_by_name(const KXLDObject *object,
 	*vmsize = my_size;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_object_get_vmsize(const KXLDObject *object, u_long *header_size,
     u_long *vmsize)
@@ -1925,7 +1925,7 @@ kxld_object_get_vmsize(const KXLDObject *object, u_long *header_size,
 	*header_size = 0;
 	*vmsize = 0;
 
-	/* vmsize is the padded header page(s) + segment vmsizes */
+	                                                           
 
 	*header_size = (object->is_final_image) ?
 	    0 : (u_long)kxld_round_page_cross_safe(get_macho_header_size(object));
@@ -1933,23 +1933,23 @@ kxld_object_get_vmsize(const KXLDObject *object, u_long *header_size,
 	*vmsize = *header_size + get_macho_data_size(object);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_object_set_linked_object_size(KXLDObject *object, u_long vmsize)
 {
 	check(object);
 
 	if (isOldInterface) {
-		object->output_buffer_size = vmsize; /* cache this for use later */
+		object->output_buffer_size = vmsize;                               
 	} else {
 		object->split_info.linkedKextSize = vmsize;
 	}
 	return;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_export_linked_object(const KXLDObject *object,
     void *linked_object
@@ -1980,21 +1980,21 @@ kxld_object_export_linked_object(const KXLDObject *object,
 		my_linked_object = ((splitKextLinkInfo *)linked_object)->linkedKext;
 	}
 
-	/* Calculate the size of the headers and data */
+	                                                
 
 	header_size = get_macho_header_size(object);
 
-	/* Copy data to the file */
+	                           
 
-	ncmds = object->segs.nitems + 1 /* LC_SYMTAB */;
+	ncmds = object->segs.nitems + 1                ;
 
 #if KXLD_PIC_KEXTS
-	/* don't write out a DYSYMTAB segment for targets that can't digest it
-	 */
+	                                                                      
+    
 	if (target_supports_slideable_kexts(object)) {
-		ncmds++; /* dysymtab */
+		ncmds++;               
 	}
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
 
 	if (object->uuid.has_uuid == TRUE) {
 		ncmds++;
@@ -2026,7 +2026,7 @@ kxld_object_export_linked_object(const KXLDObject *object,
 	seg = kxld_object_get_seg_by_name(object, SEG_LINKEDIT);
 	data_offset = (u_long) (seg->link_addr - link_addr);
 
-	// data_offset is used to set the fileoff in the macho header load commands
+	                                                                           
 	rval = kxld_symtab_export_macho(object->symtab,
 	    my_linked_object,
 	    &header_offset,
@@ -2034,8 +2034,8 @@ kxld_object_export_linked_object(const KXLDObject *object,
 	    &data_offset, size, is_32bit_object);
 	require_noerr(rval, finish);
 
-	// data_offset now points past the symbol tab and strings data in the linkedit
-	// segment - (it was used to set new values for symoff and stroff)
+	                                                                              
+	                                                                  
 
 #if KXLD_PIC_KEXTS
 	if (target_supports_slideable_kexts(object)) {
@@ -2048,7 +2048,7 @@ kxld_object_export_linked_object(const KXLDObject *object,
 		    &data_offset, size);
 		require_noerr(rval, finish);
 	}
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      
 
 	if (object->uuid.has_uuid) {
 		rval = kxld_uuid_export_macho(&object->uuid, my_linked_object, &header_offset, header_size);
@@ -2077,7 +2077,7 @@ kxld_object_export_linked_object(const KXLDObject *object,
 
 #if !KERNEL
 	unswap_macho(my_linked_object, object->host_order, object->target_order);
-#endif /* KERNEL */
+#endif             
 
 	rval = KERN_SUCCESS;
 
@@ -2085,8 +2085,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 export_macho_header(const KXLDObject *object, u_char *buf, u_int ncmds,
     u_long *header_offset, u_long header_size)
@@ -2109,8 +2109,8 @@ finish:
 }
 
 #if KXLD_USER_OR_ILP32
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 export_macho_header_32(const KXLDObject *object, u_char *buf, u_int ncmds,
     u_long *header_offset, u_long header_size)
@@ -2141,11 +2141,11 @@ export_macho_header_32(const KXLDObject *object, u_char *buf, u_int ncmds,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_ILP32 */
+#endif                         
 
 #if KXLD_USER_OR_LP64
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 export_macho_header_64(const KXLDObject *object, u_char *buf, u_int ncmds,
     u_long *header_offset, u_long header_size)
@@ -2190,26 +2190,26 @@ export_macho_header_64(const KXLDObject *object, u_char *buf, u_int ncmds,
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_LP64 */
+#endif                        
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_index_symbols_by_name(KXLDObject *object)
 {
 	return kxld_symtab_index_symbols_by_name(object->symtab);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_index_cxx_symbols_by_value(KXLDObject *object)
 {
 	return kxld_symtab_index_cxx_symbols_by_value(object->symtab);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_relocate(KXLDObject *object, kxld_addr_t link_address)
 {
@@ -2221,13 +2221,13 @@ kxld_object_relocate(KXLDObject *object, kxld_addr_t link_address)
 
 	object->link_addr = link_address;
 
-	/* Relocate segments (which relocates the sections) */
+	                                                      
 	for (i = 0; i < object->segs.nitems; ++i) {
 		seg = kxld_array_get_item(&object->segs, i);
 		kxld_seg_relocate(seg, link_address);
-	} // for...
+	}          
 
-	/* Relocate symbols */
+	                      
 	rval = kxld_symtab_relocate(object->symtab, &object->sects);
 	require_noerr(rval, finish);
 
@@ -2236,8 +2236,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static KXLDSym *
 get_mutable_sym(const KXLDObject *object, const KXLDSym *sym)
 {
@@ -2255,8 +2255,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_resolve_symbol(KXLDObject *object,
     const KXLDSym *sym, kxld_addr_t addr)
@@ -2275,8 +2275,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_patch_symbol(KXLDObject *object, const struct kxld_sym *sym)
 {
@@ -2292,8 +2292,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_add_symbol(KXLDObject *object, char *name, kxld_addr_t link_addr,
     const KXLDSym **sym_out)
@@ -2310,8 +2310,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_object_process_relocations(KXLDObject *object,
     const KXLDDict *patched_vtables)
@@ -2320,16 +2320,16 @@ kxld_object_process_relocations(KXLDObject *object,
 
 	(void) kxld_relocator_set_vtables(&object->relocator, patched_vtables);
 
-	/* Process relocation entries and populate the global offset table.
-	 *
-	 * For final linked images: the relocation entries are contained in a couple
-	 * of tables hanging off the end of the symbol table.  The GOT has its own
-	 * section created by the linker; we simply need to fill it.
-	 *
-	 * For object files: the relocation entries are bound to each section.
-	 * The GOT, if it exists for the target architecture, is created by kxld,
-	 * and we must populate it according to our internal structures.
-	 */
+	                                                                   
+   
+                                                                             
+                                                                           
+                                                             
+   
+                                                                       
+                                                                          
+                                                                 
+    
 	if (object->is_final_image) {
 #if KXLD_USER_OR_BUNDLE
 		rval = process_symbol_pointers(object);
@@ -2339,22 +2339,22 @@ kxld_object_process_relocations(KXLDObject *object,
 		require_noerr(rval, finish);
 #else
 		require_action(FALSE, finish, rval = KERN_FAILURE);
-#endif /* KXLD_USER_OR_BUNDLE */
+#endif                          
 	} else {
 #if KXLD_USER_OR_GOT
-		/* Populate GOT */
+		                  
 		rval = populate_got(object);
 		require_noerr(rval, finish);
-#endif /* KXLD_USER_OR_GOT */
+#endif                       
 #if KXLD_USER_OR_OBJECT
 		rval = process_relocs_from_sections(object);
 		require_noerr(rval, finish);
 #else
 		require_action(FALSE, finish, rval = KERN_FAILURE);
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 	}
 
-	/* Populate kmod info structure */
+	                                  
 	rval = populate_kmod_info(object);
 	require_noerr(rval, finish);
 
@@ -2371,13 +2371,13 @@ static boolean_t  kxld_show_ptr_value;
 
 #define SECT_SYM_PTRS "__nl_symbol_ptr"
 
-/*******************************************************************************
-* Final linked images create an __nl_symbol_ptr section for the global offset
-* table and for symbol pointer lookups in general.  Rather than use relocation
-* entries, the linker creates an "indirect symbol table" which stores indexes
-* into the symbol table corresponding to the entries of this section.  This
-* function populates the section with the relocated addresses of those symbols.
-*******************************************************************************/
+                                                                                
+                                                                             
+                                                                              
+                                                                             
+                                                                           
+                                                                               
+                                                                                
 static kern_return_t
 process_symbol_pointers(KXLDObject *object)
 {
@@ -2396,9 +2396,9 @@ process_symbol_pointers(KXLDObject *object)
 	require_action(object->is_final_image && object->dysymtab_hdr,
 	    finish, rval = KERN_FAILURE);
 
-	/* Get the __DATA,__nl_symbol_ptr section.  If it doesn't exist, we have
-	 * nothing to do.
-	 */
+	                                                                        
+                  
+    
 
 	sect = kxld_object_get_sect_by_name(object, SEG_DATA, SECT_SYM_PTRS);
 	if (!sect || !(sect->flags & S_NON_LAZY_SYMBOL_POINTERS)) {
@@ -2406,7 +2406,7 @@ process_symbol_pointers(KXLDObject *object)
 		goto finish;
 	}
 
-	/* Calculate the table offset and number of entries in the section */
+	                                                                     
 
 	if (kxld_object_is_32_bit(object)) {
 		symptrsize = sizeof(uint32_t);
@@ -2422,15 +2422,15 @@ process_symbol_pointers(KXLDObject *object)
 	    kxld_log(kKxldLogLinking, kKxldLogErr, kKxldLogMalformedMachO
 	    "firstsym + nsyms > object->dysymtab_hdr->nindirectsyms"));
 
-	/* Iterate through the indirect symbol table and fill in the section of
-	 * symbol pointers.  There are three cases:
-	 *   1) A normal symbol - put its value directly in the table
-	 *   2) An INDIRECT_SYMBOL_LOCAL - symbols that are local and already have
-	 *      their offset from the start of the file in the section.  Simply
-	 *      add the file's link address to fill this entry.
-	 *   3) An INDIRECT_SYMBOL_ABS - prepopulated absolute symbols.  No
-	 *      action is required.
-	 */
+	                                                                       
+                                            
+                                                              
+                                                                           
+                                                                        
+                                                        
+                                                                    
+                            
+    
 
 	if (isOldInterface) {
 		symidx = (int32_t *) ((void *) (object->file + object->dysymtab_hdr->indirectsymoff));
@@ -2468,8 +2468,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static KXLDSeg *
 get_seg_by_base_addr(KXLDObject *object, kxld_addr_t base_addr)
 {
@@ -2491,8 +2491,8 @@ get_seg_by_base_addr(KXLDObject *object, kxld_addr_t base_addr)
 	return NULL;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 process_relocs_from_tables(KXLDObject *object)
 {
@@ -2501,7 +2501,7 @@ process_relocs_from_tables(KXLDObject *object)
 	KXLDSeg *seg = NULL;
 	u_int i = 0;
 
-	/* Process external relocations */
+	                                  
 	for (i = 0; i < object->extrelocs.nitems; ++i) {
 		reloc = kxld_array_get_item(&object->extrelocs, i);
 
@@ -2534,7 +2534,7 @@ process_relocs_from_tables(KXLDObject *object)
 		require_noerr(rval, finish);
 	}
 
-	/* Process local relocations */
+	                               
 	for (i = 0; i < object->locrelocs.nitems; ++i) {
 		reloc = kxld_array_get_item(&object->locrelocs, i);
 
@@ -2572,8 +2572,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 add_to_ptr(u_char *symptr, kxld_addr_t val, boolean_t is_32_bit)
 {
@@ -2591,11 +2591,11 @@ add_to_ptr(u_char *symptr, kxld_addr_t val, boolean_t is_32_bit)
 	kxld_show_ptr_value = FALSE;
 #endif
 }
-#endif /* KXLD_USER_OR_BUNDLE */
+#endif                          
 
 #if KXLD_USER_OR_OBJECT
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 process_relocs_from_sections(KXLDObject *object)
 {
@@ -2613,10 +2613,10 @@ process_relocs_from_sections(KXLDObject *object)
 finish:
 	return rval;
 }
-#endif /* KXLD_USER_OR_OBJECT */
+#endif                          
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static kern_return_t
 populate_kmod_info(KXLDObject *object)
 {
@@ -2663,7 +2663,7 @@ populate_kmod_info(KXLDObject *object)
 			kmod->size = OSSwapInt32(kmod->size);
 			kmod->hdr_size = OSSwapInt32(kmod->hdr_size);
 		}
-#endif /* !KERNEL */
+#endif              
 	} else {
 		kmod_info_64_v1_t *kmod = (kmod_info_64_v1_t *) (kmod_info);
 
@@ -2682,7 +2682,7 @@ populate_kmod_info(KXLDObject *object)
 			kmod->size = OSSwapInt64(kmod->size);
 			kmod->hdr_size = OSSwapInt64(kmod->hdr_size);
 		}
-#endif /* !KERNEL */
+#endif              
 
 #if SPLIT_KEXTS_DEBUG
 		{
@@ -2713,8 +2713,8 @@ finish:
 }
 
 #if KXLD_PIC_KEXTS
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static boolean_t
 target_supports_slideable_kexts(const KXLDObject *object)
 {
@@ -2722,4 +2722,4 @@ target_supports_slideable_kexts(const KXLDObject *object)
 
 	return object->cputype != CPU_TYPE_I386 && object->include_kaslr_relocs;
 }
-#endif  /* KXLD_PIC_KEXTS */
+#endif                      

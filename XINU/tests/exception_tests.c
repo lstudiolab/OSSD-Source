@@ -40,11 +40,11 @@ T_DECL(exc_immovable, "Test that exceptions receive immovable ports")
 	T_EXPECT_MACH_SUCCESS(kr, "task_get_special_port");
 	T_EXPECT_NE(mp, mach_task_self(), "should receive movable port");
 
-	/*
-	 * do not deallocate the port we received on purpose to check
-	 * that the exception will not coalesce with the movable port
-	 * we have in our space now
-	 */
+	  
+                                                              
+                                                              
+                            
+    
 
 	run_exception_handler(exc_port, exc_immovable_handler);
 	*(void *volatile*)0 = 0;

@@ -53,53 +53,53 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/task_special_ports.h
- *
- *	Defines codes for special_purpose task ports.  These are NOT
- *	port identifiers - they are only used for the task_get_special_port
- *	and task_set_special_port routines.
- *
- */
+  
+   
+  
+                                  
+  
+                                                               
+                                                                      
+                                      
+  
+   
 
 #ifndef _MACH_TASK_SPECIAL_PORTS_H_
 #define _MACH_TASK_SPECIAL_PORTS_H_
 
 typedef int     task_special_port_t;
 
-#define TASK_KERNEL_PORT        1       /* The full task port for task. */
+#define TASK_KERNEL_PORT        1                                         
 
-#define TASK_HOST_PORT          2       /* The host (priv) port for task.  */
+#define TASK_HOST_PORT          2                                            
 
-#define TASK_NAME_PORT          3       /* The name port for task. */
+#define TASK_NAME_PORT          3                                    
 
-#define TASK_BOOTSTRAP_PORT     4       /* Bootstrap environment for task. */
+#define TASK_BOOTSTRAP_PORT     4                                            
 
-#define TASK_INSPECT_PORT       5       /* The inspect port for task. */
+#define TASK_INSPECT_PORT       5                                       
 
-#define TASK_READ_PORT          6       /* The read port for task. */
+#define TASK_READ_PORT          6                                    
 
-/*
- * Evolving and likely to change.
- */
+  
+                                 
+   
 
-#define TASK_SEATBELT_PORT      7       /* Seatbelt compiler/DEM port for task. */
+#define TASK_SEATBELT_PORT      7                                                 
 
-/* PORT 8 was the GSSD TASK PORT which transformed to a host port */
+                                                                    
 
-#define TASK_ACCESS_PORT        9       /* Permission check for task_for_pid. */
+#define TASK_ACCESS_PORT        9                                               
 
-#define TASK_DEBUG_CONTROL_PORT 10      /* debug control port */
+#define TASK_DEBUG_CONTROL_PORT 10                              
 
-#define TASK_RESOURCE_NOTIFY_PORT   11  /* overrides host special RN port */
+#define TASK_RESOURCE_NOTIFY_PORT   11                                      
 
 #define TASK_MAX_SPECIAL_PORT TASK_RESOURCE_NOTIFY_PORT
 
-/*
- *	Definitions for ease of use
- */
+  
+                              
+   
 
 #define task_get_kernel_port(task, port)        \
 	        (task_get_special_port((task), TASK_KERNEL_PORT, (port)))
@@ -133,6 +133,6 @@ typedef int     task_special_port_t;
 
 #ifdef XNU_KERNEL_PRIVATE
 #define DEBUG_PORT_ENTITLEMENT "com.apple.private.debug_port"
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif  /* _MACH_TASK_SPECIAL_PORTS_H_ */
+#endif                                   

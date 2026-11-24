@@ -36,7 +36,7 @@
 #define super IOReporter
 OSDefineMetaClassAndStructors(IOSimpleReporter, IOReporter);
 
-/* static */
+            
 OSSharedPtr<IOSimpleReporter>
 IOSimpleReporter::with(IOService *reportingService,
     IOReportCategories categories,
@@ -61,7 +61,7 @@ IOSimpleReporter::initWith(IOService *reportingService,
     IOReportCategories categories,
     IOReportUnit unit)
 {
-	// fully specify the channel type for the superclass
+	                                                    
 	IOReportChannelType channelType = {
 		.categories = categories,
 		.report_format = kIOReportFormatSimple,

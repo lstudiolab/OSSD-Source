@@ -38,6 +38,6 @@
 #error architecture not supported
 #endif
 
-#endif /* _MACHINE_CPUID_H */
+#endif                       
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

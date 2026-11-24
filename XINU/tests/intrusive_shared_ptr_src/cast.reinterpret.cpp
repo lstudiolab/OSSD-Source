@@ -1,11 +1,11 @@
-//
-// Tests for
-//  template<typename To, typename From, typename R>
-//  intrusive_shared_ptr<To, R> reinterpret_pointer_cast(intrusive_shared_ptr<From, R> const& ptr) noexcept;
-//
-//  template<typename To, typename From, typename R>
-//  intrusive_shared_ptr<To, R> reinterpret_pointer_cast(intrusive_shared_ptr<From, R>&& ptr) noexcept
-//
+  
+            
+                                                    
+                                                                                                            
+  
+                                                    
+                                                                                                      
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <utility>
@@ -15,7 +15,7 @@
 struct Base { int i; };
 struct Derived : Base { };
 
-// Layout compatible with Derived
+                                 
 struct Unrelated { int i; };
 
 template <typename Stored, typename From, typename To>
@@ -43,7 +43,7 @@ tests()
 		CHECK(from.get() == nullptr);
 	}
 
-	// Test `reinterpret_pointer_cast`ing a null pointer
+	                                                    
 	{
 		tracked_shared_ptr<From> const from = nullptr;
 		tracking_policy::reset();
@@ -65,12 +65,12 @@ tests()
 }
 
 T_DECL(cast_reinterpret, "intrusive_shared_ptr.cast.reinterpret") {
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Base>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ Base const>();
+	tests<           Derived,          Derived,        Base>();
+	tests<           Derived,          Derived const,        Base const>();
 
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ char>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ char const>();
+	tests<           Derived,          Derived,        char>();
+	tests<           Derived,          Derived const,        char const>();
 
-	tests</*stored*/ Derived, /*from*/ Derived, /*to*/ Unrelated>();
-	tests</*stored*/ Derived, /*from*/ Derived const, /*to*/ Unrelated const>();
+	tests<           Derived,          Derived,        Unrelated>();
+	tests<           Derived,          Derived const,        Unrelated const>();
 }

@@ -15,27 +15,27 @@
 #include <pexpert/arm/consistent_debug.h>
 #include <pexpert/arm/protos.h>
 
-/*
- * Maximum size of an environment variable value. This particular value is
- * chosen to accommodate the maximum encoded size of the system token as
- * computed in https://confluence.sd.apple.com/display/TK/System+Token.
- *
- * This value matches iBoot's IBOOT_MAX_ENV_VAR_DATA_SIZE.
- * There are no iBoot headers so have to duplicate it here for now.
- */
+  
+                                                                          
+                                                                        
+                                                                       
+  
+                                                          
+                                                                   
+   
 #define BOOT_LINE_LENGTH        608
 
-/*
- * Video information..
- */
+  
+                      
+   
 
 struct Boot_Video {
-	unsigned long   v_baseAddr;     /* Base address of video memory */
-	unsigned long   v_display;      /* Display Code (if Applicable */
-	unsigned long   v_rowBytes;     /* Number of bytes per pixel row */
-	unsigned long   v_width;        /* Width */
-	unsigned long   v_height;       /* Height */
-	unsigned long   v_depth;        /* Pixel Depth and other parameters */
+	unsigned long   v_baseAddr;                                       
+	unsigned long   v_display;                                       
+	unsigned long   v_rowBytes;                                        
+	unsigned long   v_width;                   
+	unsigned long   v_height;                   
+	unsigned long   v_depth;                                              
 };
 
 #define kBootVideoDepthMask             (0xFF)
@@ -48,27 +48,27 @@ struct Boot_Video {
 
 typedef struct Boot_Video       Boot_Video;
 
-/* Boot argument structure - passed into Mach kernel at boot time.
- */
+                                                                  
+   
 #define kBootArgsRevision               1
-#define kBootArgsRevision2              2       /* added boot_args.bootFlags */
+#define kBootArgsRevision2              2                                      
 #define kBootArgsVersion1               1
 #define kBootArgsVersion2               2
 
 typedef struct boot_args {
-	uint16_t                Revision;                       /* Revision of boot_args structure */
-	uint16_t                Version;                        /* Version of boot_args structure */
-	uint64_t                virtBase;                       /* Virtual base of memory */
-	uint64_t                physBase;                       /* Physical base of memory */
-	uint64_t                memSize;                        /* Size of memory */
-	uint64_t                topOfKernelData;        /* Highest physical address used in kernel data area */
-	Boot_Video              Video;                          /* Video Information */
-	uint32_t                machineType;            /* Machine Type */
-	void                    *deviceTreeP;           /* Base of flattened device tree */
-	uint32_t                deviceTreeLength;       /* Length of flattened tree */
-	char                    CommandLine[BOOT_LINE_LENGTH];  /* Passed in command line */
-	uint64_t                bootFlags;              /* Additional flags specified by the bootloader */
-	uint64_t                memSizeActual;          /* Actual size of memory */
+	uint16_t                Revision;                                                            
+	uint16_t                Version;                                                            
+	uint64_t                virtBase;                                                   
+	uint64_t                physBase;                                                    
+	uint64_t                memSize;                                            
+	uint64_t                topOfKernelData;                                                               
+	Boot_Video              Video;                                                 
+	uint32_t                machineType;                              
+	void                    *deviceTreeP;                                              
+	uint32_t                deviceTreeLength;                                     
+	char                    CommandLine[BOOT_LINE_LENGTH];                              
+	uint64_t                bootFlags;                                                                
+	uint64_t                memSizeActual;                                     
 } boot_args;
 
 #define SOC_DEVICE_TYPE_BUFFER_SIZE     32
@@ -85,4 +85,4 @@ typedef struct boot_args {
 
 #define PE_EARLY_BOOT_VA (SHMCON_MEM + CDBG_MEM)
 
-#endif /* _PEXPERT_ARM64_BOOT_H_ */
+#endif                             

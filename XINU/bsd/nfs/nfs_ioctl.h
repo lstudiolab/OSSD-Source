@@ -26,46 +26,46 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Header file to export nfs defined ioctls for nfs_vnop_ioctls
- */
+  
+                                                               
+   
 
 #ifndef _NFS_NFS_IOCTL_H_
 #define _NFS_NFS_IOCTL_H_
 #include <sys/ioccom.h>
 
-/*
- * fsctl (vnop_ioctl) to detroy the callers credentials associated with the vnode's mount
- */
+  
+                                                                                         
+   
 #define NFS_IOC_DESTROY_CRED            _IO('n', 1)
 
-/*
- * fsctl (vnop_ioctl) to set the callers credentials associated with the vnode's mount
- */
+  
+                                                                                      
+   
 struct nfs_gss_principal {
-	size_t          princlen;       /* length of data */
-	uint32_t        nametype;       /* nametype of data */
+	size_t          princlen;                           
+	uint32_t        nametype;                             
 #ifdef KERNEL
-	user32_addr_t   principal;      /* principal data in userspace */
+	user32_addr_t   principal;                                       
 #else
 	uint8_t         *principal;
 #endif
-	uint32_t        flags;          /* Return flags */
+	uint32_t        flags;                            
 };
 
 #ifdef KERNEL
-/* LP64 version of nfs_gss_principal */
+                                       
 struct user_nfs_gss_principal {
-	size_t          princlen;       /* length of data */
-	uint32_t        nametype;       /* nametype of data */
-	user64_addr_t   principal;      /* principal data in userspace */
-	uint32_t        flags;          /* Returned flags */
+	size_t          princlen;                           
+	uint32_t        nametype;                             
+	user64_addr_t   principal;                                       
+	uint32_t        flags;                              
 };
 #endif
 
-/* If no credential was found returned NFS_IOC_NO_CRED_FLAG in the flags field. */
-#define NFS_IOC_NO_CRED_FLAG            1       /* No credential was found */
-#define NFS_IOC_INVALID_CRED_FLAG       2       /* Found a credential, but its not valid */
+                                                                                  
+#define NFS_IOC_NO_CRED_FLAG            1                                    
+#define NFS_IOC_INVALID_CRED_FLAG       2                                                  
 
 #define NFS_IOC_SET_CRED                _IOW('n', 2, struct nfs_gss_principal)
 

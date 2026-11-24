@@ -59,7 +59,7 @@ struct if_bond_partner_state {
 #define IF_BOND_STATUS_SELECTED_STATE_STANDBY           2
 
 struct if_bond_status {
-	char                        ibs_if_name[IFNAMSIZ];/* interface name */
+	char                        ibs_if_name[IFNAMSIZ];                    
 	lacp_port_priority          ibs_port_priority;
 	lacp_actor_partner_state    ibs_state;
 	u_char                      ibs_selected_state;
@@ -70,25 +70,25 @@ struct if_bond_status {
 #define IF_BOND_STATUS_REQ_VERSION      1
 
 struct if_bond_status_req {
-	int         ibsr_version;/* version */
-	int         ibsr_total; /* returned number of struct if_bond_status's */
-	int         ibsr_count; /* number that will fit in ibsr_buffer */
-	union {                 /* buffer to hold if_bond_status's */
+	int         ibsr_version;             
+	int         ibsr_total;                                                 
+	int         ibsr_count;                                          
+	union {                                                      
 		void *          ibsru_buffer;
 		u_int64_t       ibsru_buffer64;
 	} ibsr_ibsru;
-	lacp_key    ibsr_key;   /* returned */
-	u_int8_t    ibsr_mode;  /* returned (IF_BOND_MODE_{LACP, STATIC}) */
-	u_int8_t    ibsr_reserved0;/* for future use */
-	u_int32_t   ibsr_reserved[3];/* for future use */
+	lacp_key    ibsr_key;                 
+	u_int8_t    ibsr_mode;                                              
+	u_int8_t    ibsr_reserved0;                    
+	u_int32_t   ibsr_reserved[3];                    
 };
 #define ibsr_buffer     ibsr_ibsru.ibsru_buffer
 
 struct if_bond_req {
-	u_int32_t   ibr_op;                     /* operation */
+	u_int32_t   ibr_op;                                    
 	union {
-		char    ibru_if_name[IFNAMSIZ]; /* interface name */
-		struct if_bond_status_req ibru_status; /* status information */
+		char    ibru_if_name[IFNAMSIZ];                     
+		struct if_bond_status_req ibru_status;                         
 		int     ibru_int_val;
 	} ibr_ibru;
 };
@@ -97,4 +97,4 @@ struct if_bond_req {
 
 #include <net/if_bond_internal.h>
 
-#endif /* _NET_IF_BOND_VAR_H_ */
+#endif                          

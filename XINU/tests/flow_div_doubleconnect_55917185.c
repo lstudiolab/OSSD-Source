@@ -8,7 +8,7 @@
 
 #include <darwintest.h>
 
-/* we should win the race in this window: */
+                                            
 #define NTRIES 200000
 
 static void *
@@ -16,7 +16,7 @@ connect_race(void *data)
 {
 	int *ps = data;
 	struct sockaddr_ctl sc = {
-		.sc_id = 1 /* com.apple.flow-divert */
+		.sc_id = 1                            
 	};
 	int n;
 
@@ -32,7 +32,7 @@ T_DECL(flow_div_doubleconnect_55917185, "Bad error path in double-connect for fl
 	int s = -1;
 	int tmp_s;
 	struct sockaddr_ctl sc = {
-		.sc_id = 1 /* com.apple.flow-divert */
+		.sc_id = 1                            
 	};
 	pthread_t t;
 	int n;
@@ -44,13 +44,13 @@ T_DECL(flow_div_doubleconnect_55917185, "Bad error path in double-connect for fl
 	for (n = 0; n < NTRIES; ++n) {
 		T_ASSERT_POSIX_SUCCESS(tmp_s = socket(AF_SYSTEM, SOCK_DGRAM, SYSPROTO_CONTROL), NULL);
 
-		/*
-		 * this bind will fail, but that's ok because it initialises
-		 * kctl:
-		 */
+		  
+                                                              
+          
+     
 		bind(tmp_s, (const struct sockaddr *)&sc, sizeof(sc));
 
-		/* this is what we're racing the other thread for: */
+		                                                     
 		s = tmp_s;
 		connect(s, (const struct sockaddr *)&sc, sizeof(sc));
 

@@ -16,21 +16,21 @@
 
 #define BUFFLEN  2048
 #define EVILLEN  19
-#define TIMEOUT  420 /* Timeout in seconds to wait for coredumps to appear */
+#define TIMEOUT  420                                                         
 
 static const char corefile_ctl[]     = "kern.corefile";
 static const char coredump_ctl[]     = "kern.coredump";
-/* The directory where coredumps will be */
+                                           
 static const char dump_dir[]         = "/cores";
-/* The default coredump location if the kern.coredump ctl is invalid */
+                                                                       
 static const char default_dump_fmt[] = "/cores/core.%d";
-/* The coredump location when we set kern.coredump ctl to something valid */
+                                                                            
 static const char valid_dump_fmt[]   = "/cores/test-core.%d";
 static const char ls_path[]          = "/bin/ls";
 
-/* /cores/core.%(null), then BORK immediately after. */
+                                                       
 static char evil[] = "/cores/core.%\0BORK";
-/* A valid coredump location to test. */
+                                        
 static char valid_dump_loc[]   = "/cores/test-core.%P";
 
 static const struct rlimit lim_infty = {
@@ -75,7 +75,7 @@ fork_and_wait_for_segfault()
 	int pid, ret;
 	pid = fork();
 	if (pid == 0) {
-		unsigned int *ptr = NULL; /* Cause a segfault so that we get a coredump */
+		unsigned int *ptr = NULL;                                                 
 		*ptr = 0xdeadd00d;
 		T_FAIL("Expected segmentation fault on write to NULL pointer");
 	}
@@ -108,13 +108,13 @@ look_for_coredump(const char *format, int pid, int kqfd, struct kevent *kev)
 	int i = 0;
 	char buf[BUFFLEN];
 	memset(buf, 0, BUFFLEN);
-	/*
-	 * Something else might touch this directory. If we get notified and don't see
-	 * anything, try a few more times before failing.
-	 */
+	  
+                                                                               
+                                                  
+    
 	alarm(TIMEOUT);
 	while (!stop_looking) {
-		/* Wait for kevent to tell us the coredump folder was modified */
+		                                                                 
 		ret = kevent(kqfd, NULL, 0, kev, 1, &timeout);
 		T_ASSERT_POSIX_SUCCESS(ret, "kevent: Waiting for coredump to appear");
 
@@ -131,7 +131,7 @@ look_for_coredump(const char *format, int pid, int kqfd, struct kevent *kev)
 	alarm(0);
 
 	if (ret == -1) {
-		/* Couldn't find the coredump -- list contents of /cores */
+		                                                           
 		list_coredump_files();
 	}
 	T_ASSERT_POSIX_SUCCESS(ret, "Removing coredump file (should be at %s)", buf);

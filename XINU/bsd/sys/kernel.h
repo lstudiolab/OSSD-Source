@@ -78,31 +78,31 @@
 #include <stdbool.h>
 #include <kern/locks.h>
 
-/* Global variables for the kernel. */
+                                      
 
-/* 1.1 */
+         
 extern long hostid;
 extern char hostname[MAXHOSTNAMELEN];
 extern lck_mtx_t hostname_lock;
 extern char domainname[MAXHOSTNAMELEN];
 extern lck_mtx_t domainname_lock;
 
-/* 1.2 */
-extern int stathz;              /* statistics clock's frequency */
-extern int profhz;              /* profiling clock's frequency */
+         
+extern int stathz;                                                
+extern int profhz;                                               
 
 extern bool send_sigsys;
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 
 #ifdef KERNEL_PRIVATE
-extern struct timezone tz;                      /* XXX */
+extern struct timezone tz;                               
 
-extern int tick;                /* usec per tick (1000000 / hz) */
-extern int hz;                  /* system clock's frequency */
+extern int tick;                                                  
+extern int hz;                                                
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif  /* KERNEL */
+#endif              
 
-#endif  /* !_SYS_KERNEL_H_ */
+#endif                       

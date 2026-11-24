@@ -44,9 +44,9 @@ typedef struct {
 	    reserved                                : 52;
 } arm_feature_bits_t;
 
-/* Debug identification */
+                          
 
-/* ID_AA64DFR0_EL1 */
+                     
 typedef union {
 	struct {
 		uint64_t debug_arch_version             : 4,
@@ -67,4 +67,4 @@ typedef struct {
 	uint32_t        num_breakpoint_pairs;
 } arm_debug_info_t;
 
-#endif /* _MACHINE_CPUID_H_ */
+#endif                        

@@ -31,16 +31,16 @@
 #include <assym.s>
 
 Entry(mcount)
-        pushq   %rbp            	// setup mcount's frame
+        pushq   %rbp            	                       
         movq    %rsp,%rbp
-        pushq	%rax			// save %eax
-        pushf				// save interrupt state
-        cli				// disable interrupts
+        pushq	%rax			            
+        pushf				                       
+        cli				                     
 
-	//
-	// Check that this cpu is ready.
-	// This delays the start of mcounting until a cpu is really prepared.
-	//
+	  
+	                                
+	                                                                     
+	  
         mov		%gs,%ax
         test	%ax,%ax
 	jz	1f
@@ -49,27 +49,27 @@ Entry(mcount)
         testl	%eax,%eax
 	jz	1f
 
-	//
-	// Test for recursion as indicated by a per-cpu flag.
-	// Skip if nested, otherwise set the flag and call the C mount().
-	//
+	  
+	                                                     
+	                                                                 
+	  
         movl	%gs:CPU_MCOUNT_OFF,%eax
-        testl	%eax,%eax		// test for recursion
+        testl	%eax,%eax		                     
         jnz	1f
 
-        incl	%gs:CPU_MCOUNT_OFF	// set recursion flag
+        incl	%gs:CPU_MCOUNT_OFF	                     
 
-        movq    (%rbp),%rax     	// frame pointer of mcount's caller
+        movq    (%rbp),%rax     	                                   
 		pushq	%rdi
 		pushq	%rsi
 		pushq	%rdx
 		pushq	%rcx
 		pushq	%r8
 		pushq	%r9
-        movq    8(%rax),%rdi    	// mcount's caller's return address
-        movq    8(%rbp),%rsi         	// push selfpc parameter for mcount()
+        movq    8(%rax),%rdi    	                                   
+        movq    8(%rbp),%rsi         	                                     
 
-        call	_mcount			// call the C mcount
+        call	_mcount			                    
 
 		popq	%r9
 		popq	%r8
@@ -78,10 +78,10 @@ Entry(mcount)
 		popq	%rsi
 		popq	%rdi
 
-        decl	%gs:CPU_MCOUNT_OFF	// turn off recursion flag
+        decl	%gs:CPU_MCOUNT_OFF	                          
 1:
-        popf				// restore interrupt state
+        popf				                          
         popq	%rax
-        movq    %rbp,%rsp       	// tear down mcount's frame
+        movq    %rbp,%rsp       	                           
         popq    %rbp
         ret

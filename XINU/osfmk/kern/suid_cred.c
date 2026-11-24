@@ -26,18 +26,18 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *
- * An SUID credential is a port type which allows a process to create a new
- * process with a specific user id. It provides an alternative means to acheive
- * this to the more traditional SUID bit file permission.
- *
- * To create a new SUID credential the process must be running as root and must
- * have a special entitlement. When created, the credential is associated with a
- * specific vnode and UID so the unprivileged owner of the credential may only
- * create a new process from the file associated with that vnode and the
- * resulting effective UID will be that of the UID in the credential.
- */
+  
+  
+                                                                           
+                                                                               
+                                                         
+  
+                                                                               
+                                                                                
+                                                                              
+                                                                        
+                                                                     
+   
 
 #include <kern/ipc_kobject.h>
 #include <kern/queue.h>
@@ -48,7 +48,7 @@
 
 #include <IOKit/IOBSD.h>
 
-/* Declarations necessary to call vnode_lookup()/vnode_put(). */
+                                                                
 struct vnode;
 struct vfs_context;
 extern int vnode_lookup(const char *, int, struct vnode **,
@@ -56,12 +56,12 @@ extern int vnode_lookup(const char *, int, struct vnode **,
 extern struct vfs_context * vfs_context_current(void);
 extern int vnode_put(struct vnode *);
 
-/* Declarations necessary to call kauth_cred_issuser(). */
+                                                          
 struct ucred;
 extern int kauth_cred_issuser(struct ucred *);
 extern struct ucred *kauth_cred_get(void);
 
-/* Data associated with the suid cred port. Consumed during posix_spawn(). */
+                                                                             
 struct suid_cred {
 	ipc_port_t port;
 	struct vnode *vnode;
@@ -71,8 +71,8 @@ struct suid_cred {
 static ZONE_DECLARE(suid_cred_zone, "suid_cred",
     sizeof(struct suid_cred), ZC_NONE);
 
-/* Allocs a new suid credential. The vnode reference will be owned by the newly
- * created suid_cred_t. */
+                                                                               
+                          
 static suid_cred_t
 suid_cred_alloc(struct vnode *vnode, uint32_t uid)
 {
@@ -82,7 +82,7 @@ suid_cred_alloc(struct vnode *vnode, uint32_t uid)
 
 	sc = zalloc(suid_cred_zone);
 	if (sc != NULL) {
-		// Lazily allocated in convert_suid_cred_to_port().
+		                                                   
 		sc->port = IP_NULL;
 		sc->vnode = vnode;
 		sc->uid = uid;
@@ -151,10 +151,10 @@ convert_suid_cred_to_port(suid_cred_t sc)
 	return sc->port;
 }
 
-/*
- * Verify the suid cred port. The cached vnode should match the passed vnode.
- * The uid to be used to spawn the new process is returned in 'uid'.
- */
+  
+                                                                             
+                                                                    
+   
 int
 suid_cred_verify(ipc_port_t port, struct vnode *vnode, uint32_t *uid)
 {
@@ -206,17 +206,17 @@ task_create_suid_cred(
 		return KERN_INVALID_ARGUMENT;
 	}
 
-	// Task must have entitlement.
+	                              
 	if (!IOTaskHasEntitlement(task, "com.apple.private.suid_cred")) {
 		return KERN_NO_ACCESS;
 	}
 
-	// Thread must be root owned.
+	                             
 	if (!kauth_cred_issuser(kauth_cred_get())) {
 		return KERN_NO_ACCESS;
 	}
 
-	// Find the vnode for the path.
+	                               
 	err = vnode_lookup(path, 0, &vnode, vfs_context_current());
 	if (err != 0) {
 		return KERN_INVALID_ARGUMENT;

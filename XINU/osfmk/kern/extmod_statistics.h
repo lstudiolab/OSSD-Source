@@ -25,13 +25,13 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- *	kern/extmod_statistics.h
- *
- *	Definitions for statistics related to external
- *  modification of a task by another agent on the system.
- *
- */
+  
+                           
+  
+                                                 
+                                                          
+  
+   
 
 #ifndef _KERN_EXTMOD_STATISTICS_H_
 #define _KERN_EXTMOD_STATISTICS_H_
@@ -43,4 +43,4 @@ extern void extmod_statistics_incr_task_for_pid(task_t target);
 extern void extmod_statistics_incr_thread_set_state(thread_t target);
 extern void extmod_statistics_incr_thread_create(task_t target);
 
-#endif  /* _KERN_EXTMOD_STATISTICS_H_ */
+#endif                                  

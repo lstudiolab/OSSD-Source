@@ -33,6 +33,6 @@
 
 #include <machine/smp.h>
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
-#endif  /* _KERN_SMP_H_ */
+#endif                    

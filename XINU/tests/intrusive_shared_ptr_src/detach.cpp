@@ -1,7 +1,7 @@
-//
-// Tests for
-//  pointer detach() noexcept;
-//
+  
+            
+                              
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include <darwintest.h>
@@ -21,7 +21,7 @@ tests()
 	tracked_shared_ptr<T> ptr(&obj, libkern::retain);
 	T* raw = ptr.detach();
 	CHECK(raw == &obj);
-	CHECK(ptr.get() == nullptr); // ptr was set to null
+	CHECK(ptr.get() == nullptr);                       
 	CHECK(tracking_policy::retains == 1);
 	CHECK(tracking_policy::releases == 0);
 }

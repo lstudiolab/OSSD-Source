@@ -30,11 +30,11 @@
 #define _PEXPERT_ARM64_H7_H
 
 #define APPLETYPHOON
-#define MONITOR                 1 /* Use EL3 monitor */
+#define MONITOR                 1                      
 #define NO_ECORE                1
 #define HAS_32BIT_DBGWRAP       1
-#define HAS_CPMU_BIU_EVENTS     1 /* Has BIU events in CPMU */
-#define HAS_CPMU_L2C_EVENTS     1 /* Has L2 cache events in CPMU */
+#define HAS_CPMU_BIU_EVENTS     1                             
+#define HAS_CPMU_L2C_EVENTS     1                                  
 
 #define CORE_NCTRS                           8
 #define CPMU_AIC_PMI                         1
@@ -44,4 +44,4 @@
 
 #include <pexpert/arm64/apple_arm64_common.h>
 
-#endif /* !_PEXPERT_ARM64_H7_H */
+#endif                           

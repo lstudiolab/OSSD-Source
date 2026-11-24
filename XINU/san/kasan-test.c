@@ -93,7 +93,7 @@ static int
 test_global_overflow(struct kasan_test __unused *t)
 {
 	int i;
-	/* rookie error */
+	                  
 	for (i = 0; i <= STATIC_ARRAY_SZ; i++) {
 		static_array[i] = i;
 	}
@@ -197,7 +197,7 @@ test_stack_overflow(struct kasan_test *t)
 	}
 
 	TEST_FAULT(t);
-	a[i] = i; /* rookie error */
+	a[i] = i;                   
 	TEST_NOFAULT(t);
 
 	TEST_BARRIER();
@@ -215,7 +215,7 @@ test_stack_underflow(struct kasan_test *t)
 
 	__nosan_memset(a, 0, STACK_ARRAY_SZ);
 
-	/* generate a negative index without the compiler noticing */
+	                                                             
 #if __x86_64__
 	__asm__ __volatile__ ("movq $-1, %0" : "=r"(idx) :: "memory");
 #else
@@ -237,12 +237,12 @@ test_memcpy(struct kasan_test *t)
 	uint8_t a1[STACK_ARRAY_SZ];
 	uint8_t a2[STACK_ARRAY_SZ];
 
-	/* should work */
+	                 
 	memcpy(a1, a2, STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	memcpy(a2, a1, STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -257,12 +257,12 @@ test_memmove(struct kasan_test *t)
 	uint8_t a1[STACK_ARRAY_SZ];
 	uint8_t a2[STACK_ARRAY_SZ];
 
-	/* should work */
+	                 
 	memmove(a1, a2, STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	memmove(a2, a1, STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -277,12 +277,12 @@ test_bcopy(struct kasan_test *t)
 	uint8_t a1[STACK_ARRAY_SZ];
 	uint8_t a2[STACK_ARRAY_SZ];
 
-	/* should work */
+	                 
 	bcopy(a1, a2, STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	bcopy(a2, a1, STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -296,12 +296,12 @@ test_memset(struct kasan_test *t)
 	TEST_START(t);
 	uint8_t a1[STACK_ARRAY_SZ];
 
-	/* should work */
+	                 
 	memset(a1, 'e', STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	memset(a1, 'f', STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -325,13 +325,13 @@ test_memcmp(struct kasan_test *t)
 		return 1;
 	}
 
-	/* should work */
+	                 
 	memcmp(a1, a2, STACK_ARRAY_SZ);
 	memcmp(a1, a2 + 1, STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	memcmp(a1, a2, STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -355,13 +355,13 @@ test_bcmp(struct kasan_test *t)
 		return 1;
 	}
 
-	/* should work */
+	                 
 	bcmp(a1, a2, STACK_ARRAY_SZ);
 	bcmp(a1, a2 + 1, STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	bcmp(a1, a2, STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -375,12 +375,12 @@ test_bzero(struct kasan_test *t)
 	TEST_START(t);
 	uint8_t a1[STACK_ARRAY_SZ];
 
-	/* should work */
+	                 
 	bzero(a1, STACK_ARRAY_SZ);
 
 	TEST_BARRIER();
 
-	/* should fail */
+	                 
 	TEST_FAULT(t);
 	bzero(a1, STACK_ARRAY_SZ + 1);
 	TEST_NOFAULT(t);
@@ -394,7 +394,7 @@ test_strlcpy(struct kasan_test *t)
 	TEST_START(t);
 	char a1[8];
 
-	/* should not fault */
+	                      
 	strlcpy(a1, "small", 8);
 	strlcpy(a1, "looooonnnnggg", 8);
 
@@ -411,7 +411,7 @@ test_strncpy(struct kasan_test *t)
 	TEST_START(t);
 	char a1[9];
 
-	/* should not fault */
+	                      
 	strncpy(a1, "small", 9);
 	strncpy(a1, "looooonnnnggg", 9);
 
@@ -428,7 +428,7 @@ test_strlcat(struct kasan_test *t)
 	TEST_START(t);
 	char a1[9] = {};
 
-	/* should not fault */
+	                      
 	strlcat(a1, "abcd", 9);
 	strlcat(a1, "efgh", 9);
 	strlcat(a1, "ijkl", 9);
@@ -449,7 +449,7 @@ test_strncat(struct kasan_test *t)
 	TEST_START(t);
 	char a1[9] = {};
 
-	/* should not fault */
+	                      
 	strncat(a1, "abcd", 4);
 	strncat(a1, "efgh", 4);
 
@@ -460,7 +460,7 @@ test_strncat(struct kasan_test *t)
 	return a1[0] != 'a';
 }
 
-/* we ignore the top *two* frames in backtrace - so add an extra one */
+                                                                       
 static int OS_NOINLINE
 test_blacklist_helper(void)
 {
@@ -484,7 +484,7 @@ test_blacklist_str(struct kasan_test *t)
 
 	bcopy("123456", a1, 8);
 
-	TEST_DONE(t, 0); /* success */
+	TEST_DONE(t, 0);              
 	return 0;
 }
 
@@ -495,7 +495,7 @@ test_strnlen(struct kasan_test *t)
 	TEST_START(t);
 	const char *a1 = "abcdef";
 
-	/* should not fault */
+	                      
 	if (strnlen(a1, 6) != 6) {
 		return 1;
 	}
@@ -527,7 +527,7 @@ test_fakestack_helper(struct kasan_test *t, char *x)
 
 	x[0] = 0x55;
 
-	/* ensure that 'x' is on the fakestack */
+	                                         
 	uintptr_t base = dtrace_get_kernel_stack(current_thread());
 	uintptr_t p = (uintptr_t)x;
 	if (p >= base && p < base + kernel_stack_size) {
@@ -536,7 +536,7 @@ test_fakestack_helper(struct kasan_test *t, char *x)
 
 	__asan_handle_no_return();
 
-	/* x better still be accessible */
+	                                  
 	TEST_NOFAULT(t);
 	if (x[0] != 0x55) {
 		TEST_DONE(t, 1);
@@ -601,7 +601,7 @@ static struct kasan_test xnu_tests[] = {
 	DECLARE_TEST(test_blacklist, "blacklist"),
 	DECLARE_TEST(test_blacklist_str, "blacklist_str"),
 	DECLARE_TEST(test_fakestack, "fakestack"),
-	// DECLARE_TEST(test_strnlen,         "strnlen"),
+	                                                 
 };
 static int num_xnutests = sizeof(xnu_tests) / sizeof(xnu_tests[0]);
 
@@ -616,7 +616,7 @@ kasan_run_test(struct kasan_test *test_list, int testno, int fail)
 		return TEST_INVALID;
 	}
 
-	// printf("KASan: test.%02d RUNNING (%s)\n", testno, t->name);
+	                                                              
 
 	if (!fail) {
 		in_test = 1;
@@ -629,13 +629,13 @@ kasan_run_test(struct kasan_test *test_list, int testno, int fail)
 			printf("KASan: test.%02d SETUP FAIL (%s)\n", testno, t->name);
 			status = ret;
 		} else {
-			/* did not fault when it should have */
+			                                       
 			printf("KASan: test.%02d FAIL (%s)\n", testno, t->name);
 			status = TEST_FAIL_NOFAULT;
 		}
 	} else {
 		if (t->result) {
-			/* faulted, but at the wrong place */
+			                                     
 			printf("KASan: test.%02d FAIL %d (%s)\n", testno, t->result, t->name);
 			status = TEST_FAIL_BADFAULT;
 		} else {
@@ -659,7 +659,7 @@ kasan_test(int testno, int fail)
 	int ret;
 
 	if (testno == -1) {
-		/* shorthand for all tests */
+		                             
 		testno = (1U << (num_xnutests - 1)) - 1;
 	}
 
@@ -685,7 +685,7 @@ kasan_handle_test(void)
 {
 	if (in_test) {
 		_longjmp(jbuf, 1);
-		/* NOTREACHED */
+		                
 	}
 }
 

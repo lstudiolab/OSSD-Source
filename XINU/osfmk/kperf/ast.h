@@ -26,13 +26,13 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Ensure that kperf is informed the next time this thread goes back to user
- * space, to handle an action.
- */
+  
+                                                                            
+                              
+   
 int kperf_ast_pend(thread_t thread, uint32_t flags, unsigned int actionid);
 
-/*
- * Set the depth for the user callstack sample.
- */
+  
+                                               
+   
 void kperf_ast_set_callstack_depth(thread_t thread, uint32_t depth);

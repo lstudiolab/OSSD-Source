@@ -71,11 +71,11 @@
 
 #include <sys/ttycom.h>
 
-/*
- * Pun for SunOS prior to 3.2.  SunOS 3.2 and later support TIOCGWINSZ
- * and TIOCSWINSZ (yes, even 3.2-3.5, the fact that it wasn't documented
- * nonwithstanding).
- */
+  
+                                                                      
+                                                                        
+                    
+   
 struct ttysize {
 	unsigned short  ts_lines;
 	unsigned short  ts_cols;
@@ -97,16 +97,16 @@ struct ttysize {
 __BEGIN_DECLS
 int     ioctl(int, unsigned long, ...);
 __END_DECLS
-#endif /* !KERNEL */
-#endif /* !_SYS_IOCTL_H_ */
+#endif              
+#endif                     
 
-/*
- * Keep outside _SYS_IOCTL_H_
- * Compatability with old terminal driver
- *
- * Source level -> #define USE_OLD_TTY
- * Kernel level -> always on
- */
+  
+                             
+                                         
+  
+                                      
+                            
+   
 #if defined(USE_OLD_TTY) || defined(BSD_KERNEL_PRIVATE)
 #include <sys/ioctl_compat.h>
-#endif /* !_SYS_IOCTL_H_ */
+#endif                     

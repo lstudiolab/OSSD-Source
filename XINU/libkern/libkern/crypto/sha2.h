@@ -35,7 +35,7 @@ extern "C" {
 
 #include <corecrypto/ccsha2.h>
 
-/*** SHA-256/384/512 Various Length Definitions ***********************/
+                                                                        
 #define SHA256_BLOCK_LENGTH             CCSHA256_BLOCK_SIZE
 #define SHA256_DIGEST_LENGTH    CCSHA256_OUTPUT_SIZE
 #define SHA256_DIGEST_STRING_LENGTH     (SHA256_DIGEST_LENGTH * 2 + 1)
@@ -56,7 +56,7 @@ typedef struct SHA512_CTX {
 
 typedef SHA512_CTX SHA384_CTX;
 
-/*** SHA-256/384/512 Function Prototypes ******************************/
+                                                                        
 
 void SHA256_Init(SHA256_CTX *ctx);
 void SHA256_Update(SHA256_CTX *ctx, const void *data, size_t len);
@@ -72,6 +72,6 @@ void SHA512_Final(void *digest, SHA512_CTX *ctx);
 
 #ifdef  __cplusplus
 }
-#endif /* __cplusplus */
+#endif                  
 
-#endif /* _CRYPTO_SHA2_H__ */
+#endif                       

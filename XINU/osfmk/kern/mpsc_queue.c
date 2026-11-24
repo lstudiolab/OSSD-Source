@@ -79,21 +79,21 @@ mpsc_queue_dequeue_batch(mpsc_queue_head_t q, mpsc_queue_chain_t *tail_out,
 		head = _mpsc_queue_wait_for_enqueuer(&q->mpqh_head.mpqc_next);
 	}
 	os_atomic_store(&q->mpqh_head.mpqc_next, NULL, relaxed);
-	/*
-	 * 22708742: set tail to &q->mpqh_head with release, so that NULL write
-	 * to head above doesn't clobber the head set by concurrent enqueuer
-	 *
-	 * The other half of the seq_cst is required to pair with any enqueuer that
-	 * contributed to an element in this list (pairs with the release fence in
-	 * __mpsc_queue_append_update_tail().
-	 *
-	 * Making this seq_cst instead of acq_rel makes mpsc_queue_append*()
-	 * visibility transitive (when items hop from one queue to the next)
-	 * which is expected by clients implicitly.
-	 *
-	 * Note that this is the same number of fences that a traditional lock
-	 * would have, but as a once-per-batch cost.
-	 */
+	  
+                                                                        
+                                                                     
+   
+                                                                            
+                                                                           
+                                      
+   
+                                                                     
+                                                                     
+                                            
+   
+                                                                       
+                                             
+    
 	*tail_out = os_atomic_xchg(&q->mpqh_tail, &q->mpqh_head, seq_cst);
 
 	return head;
@@ -119,7 +119,7 @@ mpsc_queue_batch_next(mpsc_queue_chain_t cur, mpsc_queue_chain_t tail)
 static void _mpsc_daemon_queue_drain(mpsc_daemon_queue_t, thread_t);
 static void _mpsc_daemon_queue_enqueue(mpsc_daemon_queue_t, mpsc_queue_chain_t);
 
-/* thread based queues */
+                         
 
 static void
 _mpsc_queue_thread_continue(void *param, wait_result_t wr __unused)
@@ -182,7 +182,7 @@ mpsc_daemon_queue_init_with_thread(mpsc_daemon_queue_t dq,
 	           MPSC_QUEUE_KIND_THREAD);
 }
 
-/* thread-call based queues */
+                              
 
 static void
 _mpsc_queue_thread_call_drain(thread_call_param_t arg0,
@@ -211,7 +211,7 @@ mpsc_daemon_queue_init_with_thread_call(mpsc_daemon_queue_t dq,
 		_mpsc_queue_thread_call_drain, dq, pri, THREAD_CALL_OPTIONS_ONCE);
 }
 
-/* nested queues */
+                   
 
 void
 mpsc_daemon_queue_nested_invoke(mpsc_queue_chain_t elm,
@@ -241,7 +241,7 @@ mpsc_daemon_queue_init_with_target(mpsc_daemon_queue_t dq,
 	};
 }
 
-/* enqueue, drain & cancelation */
+                                  
 
 static void
 _mpsc_daemon_queue_drain(mpsc_daemon_queue_t dq, thread_t self)
@@ -251,21 +251,21 @@ _mpsc_daemon_queue_drain(mpsc_daemon_queue_t dq, thread_t self)
 	mpsc_daemon_queue_state_t st;
 
 again:
-	/*
-	 * Most of the time we're woken up because we're dirty,
-	 * This atomic xor sets DRAINING and clears WAKEUP in a single atomic
-	 * in that case.
-	 *
-	 * However, if we're woken up for cancelation, the state may be reduced to
-	 * the CANCELED bit set only, and then the xor will actually set WAKEUP.
-	 * We need to correct this and clear it back to avoid looping below.
-	 * This is safe to do as no one is allowed to enqueue more work after
-	 * cancelation has happened.
-	 *
-	 * We use `st` as a dependency token to pair with the release fence in
-	 * _mpsc_daemon_queue_enqueue() which gives us the guarantee that the update
-	 * to the tail of the MPSC queue that made it non empty is visible to us.
-	 */
+	  
+                                                        
+                                                                      
+                 
+   
+                                                                           
+                                                                         
+                                                                     
+                                                                      
+                             
+   
+                                                                       
+                                                                             
+                                                                          
+    
 	st = os_atomic_xor(&dq->mpd_state,
 	    MPSC_QUEUE_STATE_DRAINING | MPSC_QUEUE_STATE_WAKEUP, dependency);
 	assert(st & MPSC_QUEUE_STATE_DRAINING);
@@ -287,26 +287,26 @@ again:
 		assert_wait((event_t)dq, THREAD_UNINT);
 	}
 
-	/*
-	 * Unlike GCD no fence is necessary here: there is no concept similar
-	 * to "dispatch_sync()" that would require changes this thread made to be
-	 * visible to other threads as part of the mpsc_daemon_queue machinery.
-	 *
-	 * Making updates that happened on the daemon queue visible to other threads
-	 * is the responsibility of the client.
-	 */
+	  
+                                                                      
+                                                                          
+                                                                        
+   
+                                                                             
+                                        
+    
 	st = os_atomic_andnot(&dq->mpd_state, MPSC_QUEUE_STATE_DRAINING, relaxed);
 
-	/*
-	 * A wakeup has happened while we were draining,
-	 * which means that the queue did an [ empty -> non empty ]
-	 * transition during our drain.
-	 *
-	 * Chances are we already observed and drained everything,
-	 * but we need to be absolutely sure, so start a drain again
-	 * as the enqueuer observed the DRAINING bit and has skipped calling
-	 * _mpsc_daemon_queue_wakeup().
-	 */
+	  
+                                                 
+                                                            
+                                
+   
+                                                           
+                                                             
+                                                                     
+                                
+    
 	if (__improbable(st & MPSC_QUEUE_STATE_WAKEUP)) {
 		if (self) {
 			clear_wait(self, THREAD_AWAKENED);
@@ -314,7 +314,7 @@ again:
 		goto again;
 	}
 
-	/* dereferencing `dq` past this point is unsafe */
+	                                                  
 
 	if (__improbable(st & MPSC_QUEUE_STATE_CANCELED)) {
 		thread_wakeup(&dq->mpd_state);
@@ -351,9 +351,9 @@ _mpsc_daemon_queue_enqueue(mpsc_daemon_queue_t dq, mpsc_queue_chain_t elm)
 	mpsc_daemon_queue_state_t st;
 
 	if (mpsc_queue_append(&dq->mpd_queue, elm)) {
-		/*
-		 * Pairs with the acquire fence in _mpsc_daemon_queue_drain().
-		 */
+		  
+                                                                
+     
 		st = os_atomic_or_orig(&dq->mpd_state, MPSC_QUEUE_STATE_WAKEUP, release);
 		if (__improbable(st & MPSC_QUEUE_STATE_CANCELED)) {
 			panic("mpsc_queue[%p]: use after cancelation", dq);

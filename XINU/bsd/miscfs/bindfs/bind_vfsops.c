@@ -101,9 +101,9 @@ bindfs_vfs_getlowerattr(mount_t mp, struct vfs_attr * vfap, vfs_context_t ctx)
 	return vfs_getattr(mp, vfap, ctx);
 }
 
-/*
- * Mount bind layer
- */
+  
+                   
+   
 static int
 bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, vfs_context_t ctx)
 {
@@ -114,7 +114,7 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 	char data[MAXPATHLEN];
 	size_t count;
 	struct vfs_attr vfa;
-	/* set defaults (arbitrary since this file system is readonly) */
+	                                                                 
 	uint32_t bsize  = BLKDEV_IOSIZE;
 	size_t iosize   = BLKDEV_IOSIZE;
 	uint64_t blocks = 4711 * 4711;
@@ -132,29 +132,29 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		return EOPNOTSUPP;
 	}
 
-	/*
-	 * Update is a no-op
-	 */
+	  
+                     
+    
 	if (vfs_isupdate(mp)) {
 		return ENOTSUP;
 	}
 
-	/* check entitlement */
+	                       
 	if (!IOTaskHasEntitlement(current_task(), BINDFS_ENTITLEMENT)) {
 		return EPERM;
 	}
 
-	/*
-	 * Get argument
-	 */
+	  
+                
+    
 	error = copyinstr(user_data, data, MAXPATHLEN - 1, &count);
 	if (error) {
 		BINDFSERROR("error copying data from user %d\n", error);
 		goto error;
 	}
 
-	/* This could happen if the system is configured for 32 bit inodes instead of
-	 * 64 bit */
+	                                                                             
+             
 	if (count > MAX_MNT_FROM_LENGTH) {
 		error = EINVAL;
 		BINDFSERROR("path to mount too large for this system %zu vs %lu\n", count, MAX_MNT_FROM_LENGTH);
@@ -167,13 +167,13 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		goto error;
 	}
 
-	/* lowervrootvp has an iocount after vnode_lookup, drop that for a usecount.
-	 *  Keep this to signal what we want to keep around the thing we are mirroring.
-	 *  Drop it in unmount.*/
+	                                                                            
+                                                                                
+                          
 	error = vnode_ref(lowerrootvp);
 	vnode_put(lowerrootvp);
 	if (error) {
-		// If vnode_ref failed, then bind it out so it can't be used anymore in cleanup.
+		                                                                                
 		lowerrootvp = NULL;
 		goto error;
 	}
@@ -186,9 +186,9 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		goto error;
 	}
 
-	/*
-	 * Save reference to underlying FS
-	 */
+	  
+                                   
+    
 	xmp->bindm_lowerrootvp  = lowerrootvp;
 	xmp->bindm_lowerrootvid = vnode_vid(lowerrootvp);
 
@@ -196,22 +196,22 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 	if (error) {
 		goto error;
 	}
-	/* After bind_nodeget our root vnode is in the hash table and we have to usecounts on lowerrootvp
-	 * One use count will get dropped when we reclaim the root during unmount.
-	 * The other will get dropped in unmount */
+	                                                                                                 
+                                                                           
+                                            
 
 
-	/* vp has an iocount on it from vnode_create. drop that for a usecount. This
-	 * is our root vnode so we drop the ref in unmount
-	 *
-	 * Assuming for now that because we created this vnode and we aren't finished mounting we can get a ref*/
+	                                                                            
+                                                   
+   
+                                                                                                          
 	vnode_ref(vp);
 	vnode_put(vp);
 
 	xmp->bindm_rootvp = vp;
 
-	/* read the flags the user set, but then ignore some of them, we will only
-	 * allow them if they are set on the lower file system */
+	                                                                          
+                                                          
 	uint64_t flags      = vfs_flags(mp) & (~(MNT_IGNORE_OWNERSHIP | MNT_LOCAL));
 	uint64_t lowerflags = vfs_flags(vnode_mount(lowerrootvp)) & (MNT_LOCAL | MNT_QUARANTINE | MNT_IGNORE_OWNERSHIP | MNT_NOEXEC);
 
@@ -219,7 +219,7 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		flags |= lowerflags;
 	}
 
-	/* force these flags */
+	                       
 	flags |= (MNT_DONTBROWSE | MNT_MULTILABEL | MNT_NOSUID | MNT_RDONLY);
 	vfs_setflags(mp, flags);
 
@@ -227,13 +227,13 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 	vfs_getnewfsid(mp);
 	vfs_setlocklocal(mp);
 
-	/* fill in the stat block */
+	                            
 	sp = vfs_statfs(mp);
 	strlcpy(sp->f_mntfromname, data, MAX_MNT_FROM_LENGTH);
 
 	sp->f_flags = flags;
 
-	xmp->bindm_flags = BINDM_CASEINSENSITIVE; /* default to case insensitive */
+	xmp->bindm_flags = BINDM_CASEINSENSITIVE;                                  
 
 	error = bindfs_vfs_getlowerattr(vnode_mount(lowerrootvp), &vfa, ctx);
 	if (error == 0) {
@@ -280,8 +280,8 @@ bindfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 	sp->f_files  = files;
 	sp->f_ffree  = ffree;
 
-	/* Associate the mac label information from the mirrored filesystem with the
-	 * mirror */
+	                                                                            
+             
 	MAC_PERFORM(mount_label_associate, cred, vnode_mount(lowerrootvp), vfs_mntlabel(mp));
 
 	BINDFSDEBUG("lower %s, alias at %s\n", sp->f_mntfromname, sp->f_mntonname);
@@ -297,19 +297,19 @@ error:
 		vnode_put(lowerrootvp);
 	}
 	if (vp) {
-		/* we made the root vnode but the mount is failed, so clean it up */
+		                                                                    
 		vnode_getwithref(vp);
 		vnode_rele(vp);
-		/* give vp back */
+		                  
 		vnode_recycle(vp);
 		vnode_put(vp);
 	}
 	return error;
 }
 
-/*
- * Free reference to bind layer
- */
+  
+                               
+   
 static int
 bindfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 {
@@ -319,7 +319,7 @@ bindfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 
 	BINDFSDEBUG("mp = %p\n", (void *)mp);
 
-	/* check entitlement or superuser*/
+	                                   
 	if (!IOTaskHasEntitlement(current_task(), BINDFS_ENTITLEMENT) &&
 	    vfs_context_suser(ctx) != 0) {
 		return EPERM;
@@ -334,8 +334,8 @@ bindfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 	mntdata = MOUNTTOBINDMOUNT(mp);
 	vp      = mntdata->bindm_rootvp;
 
-	// release our reference on the root before flushing.
-	// it will get pulled out of the mount structure by reclaim
+	                                                     
+	                                                           
 	vnode_getalways(vp);
 
 	error = vflush(mp, vp, flags);
@@ -349,13 +349,13 @@ bindfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 		return EBUSY;
 	}
 
-	vnode_rele(vp); // Drop reference taken by bindfs_mount
-	vnode_put(vp); // Drop ref taken above
+	vnode_rele(vp);                                        
+	vnode_put(vp);                        
 
-	//Force close to get rid of the last vnode
+	                                          
 	(void)vflush(mp, NULL, FORCECLOSE);
 
-	/* no more vnodes, so tear down the mountpoint */
+	                                                 
 
 	vfs_setfsprivate(mp, NULL);
 
@@ -379,9 +379,9 @@ bindfs_root(struct mount * mp, struct vnode ** vpp, __unused vfs_context_t ctx)
 
 	BINDFSDEBUG("mp = %p, vp = %p\n", (void *)mp, (void *)MOUNTTOBINDMOUNT(mp)->bindm_rootvp);
 
-	/*
-	 * Return locked reference to root.
-	 */
+	  
+                                    
+    
 	vp = MOUNTTOBINDMOUNT(mp)->bindm_rootvp;
 
 	error = vnode_get(vp);
@@ -406,7 +406,7 @@ bindfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 
 	BINDFSDEBUG("\n");
 
-	/* Set default capabilities in case the lower file system is gone */
+	                                                                    
 	memset(&capabilities, 0, sizeof(capabilities));
 	capabilities.capabilities[VOL_CAPABILITIES_FORMAT] = VOL_CAP_FMT_FAST_STATFS | VOL_CAP_FMT_HIDDEN_FILES;
 	capabilities.valid[VOL_CAPABILITIES_FORMAT]        = VOL_CAP_FMT_FAST_STATFS | VOL_CAP_FMT_HIDDEN_FILES;
@@ -414,17 +414,17 @@ bindfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 	if (bindfs_vfs_getlowerattr(vnode_mount(bind_mp->bindm_lowerrootvp), &vfa, ctx) == 0) {
 		if (VFSATTR_IS_SUPPORTED(&vfa, f_capabilities)) {
 			memcpy(&capabilities, &vfa.f_capabilities, sizeof(capabilities));
-			/* don't support vget */
+			                        
 			capabilities.capabilities[VOL_CAPABILITIES_FORMAT] &= ~(VOL_CAP_FMT_PERSISTENTOBJECTIDS | VOL_CAP_FMT_PATH_FROM_ID);
 
-			capabilities.capabilities[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES; /* Always support UF_HIDDEN */
+			capabilities.capabilities[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES;                               
 
 			capabilities.valid[VOL_CAPABILITIES_FORMAT] &= ~(VOL_CAP_FMT_PERSISTENTOBJECTIDS | VOL_CAP_FMT_PATH_FROM_ID);
 
-			capabilities.valid[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES; /* Always support UF_HIDDEN */
+			capabilities.valid[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES;                               
 
-			/* dont' support interfaces that only make sense on a writable file system
-			 * or one with specific vnops implemented */
+			                                                                          
+                                               
 			capabilities.capabilities[VOL_CAPABILITIES_INTERFACES] = 0;
 
 			capabilities.valid[VOL_CAPABILITIES_INTERFACES] &=
@@ -510,7 +510,7 @@ bindfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 	}
 
 	if (VFSATTR_IS_ACTIVE(vfap, f_vol_name)) {
-		/* The name of the volume is the same as the directory we mounted on */
+		                                                                       
 		coveredvp = vfs_vnodecovered(mp);
 		if (coveredvp) {
 			const char * name = vnode_getname_printable(coveredvp);

@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/*
- * This is a test helper that just has to run for a while.
- */
+  
+                                                          
+   
 int
 main(int argc, char **argv)
 {

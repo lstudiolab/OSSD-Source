@@ -45,7 +45,7 @@
 
 #define VSOCK_PORT_RESERVED 1024
 
-/* VSock Protocol Globals */
+                            
 
 static struct vsock_transport * _Atomic the_vsock_transport = NULL;
 static ZONE_DECLARE(vsockpcb_zone, "vsockpcbzone",
@@ -56,7 +56,7 @@ static struct vsockpcbinfo vsockinfo;
 static uint32_t vsock_sendspace = VSOCK_MAX_PACKET_SIZE * 8;
 static uint32_t vsock_recvspace = VSOCK_MAX_PACKET_SIZE * 8;
 
-/* VSock PCB Helpers */
+                       
 
 static uint32_t
 vsock_get_peer_space(struct vsockpcb *pcb)
@@ -73,7 +73,7 @@ vsock_get_matching_pcb(struct vsock_address src, struct vsock_address dst)
 
 	lck_rw_lock_shared(&vsockinfo.bound_lock);
 	LIST_FOREACH(pcb, &vsockinfo.bound, bound) {
-		// Source cid and port must match. Only destination port must match. (Allows for a changing CID during migration)
+		                                                                                                                 
 		socket_lock(pcb->so, 1);
 		if ((pcb->so->so_state & SS_ISCONNECTED || pcb->so->so_state & SS_ISCONNECTING) &&
 		    pcb->local_address.cid == src.cid && pcb->local_address.port == src.port &&
@@ -100,7 +100,7 @@ vsock_bind_address_if_free(struct vsockpcb *pcb, uint32_t local_cid, uint32_t lo
 {
 	socket_lock_assert_owned(pcb->so);
 
-	// Privileged ports.
+	                    
 	if (local_port != VMADDR_PORT_ANY && local_port < VSOCK_PORT_RESERVED &&
 	    current_task() != kernel_task && proc_suser(current_proc()) != 0) {
 		return EACCES;
@@ -145,17 +145,17 @@ vsock_bind_address(struct vsockpcb *pcb, struct vsock_address laddr, struct vsoc
 
 	socket_lock_assert_owned(pcb->so);
 
-	// Certain CIDs are reserved.
+	                             
 	if (laddr.cid == VMADDR_CID_HYPERVISOR || laddr.cid == VMADDR_CID_RESERVED || laddr.cid == VMADDR_CID_HOST) {
 		return EADDRNOTAVAIL;
 	}
 
-	// Remote address must be fully specified or not specified at all.
+	                                                                  
 	if ((raddr.cid == VMADDR_CID_ANY) ^ (raddr.port == VMADDR_PORT_ANY)) {
 		return EINVAL;
 	}
 
-	// Cannot bind if already bound.
+	                                
 	if (pcb->local_address.port != VMADDR_PORT_ANY) {
 		return EINVAL;
 	}
@@ -167,7 +167,7 @@ vsock_bind_address(struct vsockpcb *pcb, struct vsock_address laddr, struct vsoc
 		return error;
 	}
 
-	// Local CID must be this transport's CID or any.
+	                                                 
 	if (laddr.cid != transport_cid && laddr.cid != VMADDR_CID_ANY) {
 		return EINVAL;
 	}
@@ -446,24 +446,24 @@ vsock_sockaddr_vm_validate(struct vsockpcb *pcb, struct sockaddr_vm *addr)
 		return EINVAL;
 	}
 
-	// Validate address length.
+	                           
 	if (addr->svm_len < sizeof(struct sockaddr_vm)) {
 		return EINVAL;
 	}
 
-	// Validate address family.
+	                           
 	if (addr->svm_family != AF_UNSPEC && addr->svm_family != AF_VSOCK) {
 		return EAFNOSUPPORT;
 	}
 
-	// Only stream is supported currently.
+	                                      
 	if (pcb->so->so_type != SOCK_STREAM) {
 		return EAFNOSUPPORT;
 	}
 
 	return 0;
 }
-/* VSock Receive Handlers */
+                            
 
 static errno_t
 vsock_put_message_connected(struct vsockpcb *pcb, enum vsock_operation op, mbuf_t m)
@@ -483,7 +483,7 @@ vsock_put_message_connected(struct vsockpcb *pcb, enum vsock_operation op, mbuf_
 		socantrcvmore(pcb->so);
 		break;
 	case VSOCK_PAYLOAD:
-		// Add data to the receive queue then wakeup any reading threads.
+		                                                                 
 		error = !sbappendstream(&pcb->so->so_rcv, m);
 		if (!error) {
 			sorwakeup(pcb->so);
@@ -546,7 +546,7 @@ vsock_put_message_listening(struct vsockpcb *pcb, enum vsock_operation op, struc
 		};
 		so2 = sonewconn(pcb->so, 0, (struct sockaddr *)&addr);
 		if (!so2) {
-			// It is likely that the backlog is full. Deny this request.
+			                                                            
 			vsock_pcb_safe_reset_address(pcb, dst, src);
 			error = ECONNREFUSED;
 			break;
@@ -596,7 +596,7 @@ done:
 	return error;
 }
 
-/* VSock Transport */
+                     
 
 errno_t
 vsock_add_transport(struct vsock_transport *transport)
@@ -632,7 +632,7 @@ vsock_reset_transport(struct vsock_transport *transport)
 
 	lck_rw_lock_exclusive(&vsockinfo.bound_lock);
 	LIST_FOREACH_SAFE(pcb, &vsockinfo.bound, bound, tmp_pcb) {
-		// Disconnect this transport's sockets. Listen and bind sockets must stay alive.
+		                                                                                
 		socket_lock(pcb->so, 1);
 		if (pcb->transport == transport && pcb->so->so_state & (SS_ISCONNECTED | SS_ISCONNECTING | SS_ISDISCONNECTING)) {
 			errno_t dc_error = vsock_disconnect_pcb_locked(pcb);
@@ -666,12 +666,12 @@ vsock_put_message(struct vsock_address src, struct vsock_address dst, enum vsock
 	struct socket *so = pcb->so;
 	errno_t error = 0;
 
-	// Check if the peer's buffer has changed. Update our view of the peer's forwarded bytes.
+	                                                                                         
 	int buffers_changed = (pcb->peer_buf_alloc != buf_alloc) || (pcb->peer_fwd_cnt) != fwd_cnt;
 	pcb->peer_buf_alloc = buf_alloc;
 	pcb->peer_fwd_cnt = fwd_cnt;
 
-	// Peer's buffer has enough space for the next packet. Notify any threads waiting for space.
+	                                                                                            
 	if (buffers_changed && vsock_get_peer_space(pcb) >= pcb->waiting_send_size) {
 		sowwakeup(so);
 	}
@@ -691,7 +691,7 @@ vsock_put_message(struct vsock_address src, struct vsock_address dst, enum vsock
 		} else if (so->so_options & SO_ACCEPTCONN) {
 			error = vsock_put_message_listening(pcb, op, src, dst);
 		} else {
-			// Reset the connection for other states such as 'disconnecting'.
+			                                                                 
 			error = vsock_disconnect_pcb(pcb);
 			if (!error) {
 				error = ENODEV;
@@ -708,7 +708,7 @@ vsock_put_message(struct vsock_address src, struct vsock_address dst, enum vsock
 	return error;
 }
 
-/* VSock Sysctl */
+                  
 
 static int
 vsock_pcblist SYSCTL_HANDLER_ARGS
@@ -717,12 +717,12 @@ vsock_pcblist SYSCTL_HANDLER_ARGS
 
 	int error;
 
-	// Only stream is supported.
+	                            
 	if ((intptr_t)arg1 != SOCK_STREAM) {
 		return EINVAL;
 	}
 
-	// Get the generation count and the count of all vsock sockets.
+	                                                               
 	lck_rw_lock_shared(&vsockinfo.all_lock);
 	uint64_t n = vsockinfo.all_pcb_count;
 	vsock_gen_t gen_count = vsockinfo.vsock_gencnt;
@@ -731,10 +731,10 @@ vsock_pcblist SYSCTL_HANDLER_ARGS
 	const size_t xpcb_len = sizeof(struct xvsockpcb);
 	struct xvsockpgen xvg;
 
-	/*
-	 * The process of preparing the PCB list is too time-consuming and
-	 * resource-intensive to repeat twice on every request.
-	 */
+	  
+                                                                   
+                                                        
+    
 	if (req->oldptr == USER_ADDR_NULL) {
 		req->oldidx = (size_t)(2 * sizeof(xvg) + (n + n / 8) * xpcb_len);
 		return 0;
@@ -754,7 +754,7 @@ vsock_pcblist SYSCTL_HANDLER_ARGS
 		return error;
 	}
 
-	// Return if no sockets exist.
+	                              
 	if (n == 0) {
 		return 0;
 	}
@@ -764,12 +764,12 @@ vsock_pcblist SYSCTL_HANDLER_ARGS
 	n = 0;
 	struct vsockpcb *pcb = NULL;
 	TAILQ_FOREACH(pcb, &vsockinfo.all, all) {
-		// Bail if there is not enough user buffer for this next socket.
+		                                                                
 		if (req->oldlen - req->oldidx - sizeof(xvg) < xpcb_len) {
 			break;
 		}
 
-		// Populate the socket structure.
+		                                 
 		socket_lock(pcb->so, 1);
 		if (pcb->vsock_gencnt <= gen_count) {
 			struct xvsockpcb xpcb;
@@ -801,19 +801,19 @@ vsock_pcblist SYSCTL_HANDLER_ARGS
 		}
 	}
 
-	// Update the generation count to match the sockets being returned.
+	                                                                   
 	gen_count = vsockinfo.vsock_gencnt;
 
 	lck_rw_done(&vsockinfo.all_lock);
 
 	if (!error) {
-		/*
-		 * Give the user an updated idea of our state.
-		 * If the generation differs from what we told
-		 * her before, she knows that something happened
-		 * while we were processing this request, and it
-		 * might be necessary to retry.
-		 */
+		  
+                                                
+                                                
+                                                  
+                                                  
+                                 
+     
 		bzero(&xvg, sizeof(xvg));
 		xvg.xvg_len = sizeof(xvg);
 		xvg.xvg_count = n;
@@ -837,32 +837,32 @@ SYSCTL_PROC(_net_vsock, OID_AUTO, pcblist,
     "List of active vsock sockets");
 #endif
 
-/* VSock Protocol */
+                    
 
 static int
 vsock_attach(struct socket *so, int proto, struct proc *p)
 {
 	#pragma unused(proto, p)
 
-	// Attach should only be run once per socket.
+	                                             
 	struct vsockpcb *pcb = sotovsockpcb(so);
 	if (pcb) {
 		return EINVAL;
 	}
 
-	// Get the transport for this socket.
+	                                     
 	struct vsock_transport *transport = os_atomic_load(&the_vsock_transport, relaxed);
 	if (transport == NULL) {
 		return ENODEV;
 	}
 
-	// Reserve send and receive buffers.
+	                                    
 	errno_t error = soreserve(so, vsock_sendspace, vsock_recvspace);
 	if (error) {
 		return error;
 	}
 
-	// Initialize the vsock protocol control block.
+	                                               
 	pcb = zalloc(vsockpcb_zone);
 	if (pcb == NULL) {
 		return ENOBUFS;
@@ -880,13 +880,13 @@ vsock_attach(struct socket *so, int proto, struct proc *p)
 	};
 	so->so_pcb = pcb;
 
-	// Tell the transport that this socket has attached.
+	                                                    
 	error = transport->attach_socket(transport->provider);
 	if (error) {
 		return error;
 	}
 
-	// Add to the list of all vsock sockets.
+	                                        
 	lck_rw_lock_exclusive(&vsockinfo.all_lock);
 	TAILQ_INSERT_TAIL(&vsockinfo.all, pcb, all);
 	vsockinfo.all_pcb_count++;
@@ -943,14 +943,14 @@ vsock_detach(struct socket *so)
 
 	vsock_unbind_pcb(pcb, false);
 
-	// Tell the transport that this socket has detached.
+	                                                    
 	struct vsock_transport *transport = pcb->transport;
 	errno_t error = transport->detach_socket(transport->provider);
 	if (error) {
 		return error;
 	}
 
-	// Remove from the list of all vsock sockets.
+	                                             
 	lck_rw_lock_exclusive(&vsockinfo.all_lock);
 	TAILQ_REMOVE(&vsockinfo.all, pcb, all);
 	pcb->all.tqe_next = NULL;
@@ -959,7 +959,7 @@ vsock_detach(struct socket *so)
 	vsockinfo.vsock_gencnt++;
 	lck_rw_done(&vsockinfo.all_lock);
 
-	// Deallocate any resources.
+	                            
 	zfree(vsockpcb_zone, pcb);
 	so->so_pcb = 0;
 	so->so_flags |= SOF_PCBCLEARING;
@@ -1020,7 +1020,7 @@ vsock_listen(struct socket *so, struct proc *p)
 		return EINVAL;
 	}
 
-	// Only stream is supported currently.
+	                                      
 	if (so->so_type != SOCK_STREAM) {
 		return EAFNOSUPPORT;
 	}
@@ -1038,7 +1038,7 @@ vsock_listen(struct socket *so, struct proc *p)
 		return error;
 	}
 
-	// Can listen on the transport's cid or any.
+	                                            
 	if (addr->cid != transport_cid && addr->cid != VMADDR_CID_ANY) {
 		return EFAULT;
 	}
@@ -1054,7 +1054,7 @@ vsock_accept(struct socket *so, struct sockaddr **nam)
 		return EINVAL;
 	}
 
-	// Do not accept disconnected sockets.
+	                                      
 	if (so->so_state & SS_ISDISCONNECTED) {
 		return ECONNABORTED;
 	}
@@ -1088,7 +1088,7 @@ vsock_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		return error;
 	}
 
-	// Only supporting connections to the host, hypervisor, or self for now.
+	                                                                        
 	if (addr->svm_cid != VMADDR_CID_HOST &&
 	    addr->svm_cid != VMADDR_CID_HYPERVISOR &&
 	    addr->svm_cid != transport_cid) {
@@ -1097,7 +1097,7 @@ vsock_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 
 	soisconnecting(so);
 
-	// Set the remote and local address.
+	                                    
 	struct vsock_address remote_addr = (struct vsock_address) {
 		.cid = addr->svm_cid,
 		.port = addr->svm_port,
@@ -1108,20 +1108,20 @@ vsock_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 		.port = VMADDR_PORT_ANY,
 	};
 
-	// Bind to the address.
+	                       
 	error = vsock_bind_address(pcb, local_addr, remote_addr);
 	if (error) {
 		goto cleanup;
 	}
 
-	// Attempt a connection using the socket's transport.
+	                                                     
 	error = vsock_pcb_connect(pcb);
 	if (error) {
 		goto cleanup;
 	}
 
 	if ((so->so_state & SS_ISCONNECTED) == 0) {
-		// Don't wait for peer's response if non-blocking.
+		                                                  
 		if (so->so_state & SS_NBIO) {
 			error = EINPROGRESS;
 			goto done;
@@ -1139,7 +1139,7 @@ vsock_connect(struct socket *so, struct sockaddr *nam, struct proc *p)
 			mutex_held = so->so_proto->pr_domain->dom_mtx;
 		}
 
-		// Wait until we receive a response to the connect request.
+		                                                           
 		error = msleep((caddr_t)&so->so_timeo, mutex_held, PSOCK | PCATCH, "vsock_connect", &ts);
 		if (error) {
 			if (error == EAGAIN) {
@@ -1217,7 +1217,7 @@ vsock_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam, s
 		return EOPNOTSUPP;
 	}
 
-	// Ensure this socket is connected.
+	                                   
 	if ((so->so_state & SS_ISCONNECTED) == 0) {
 		if (m != NULL) {
 			mbuf_freem_list(m);
@@ -1230,14 +1230,14 @@ vsock_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam, s
 	const size_t len = mbuf_pkthdr_len(m);
 	uint32_t free_space = vsock_get_peer_space(pcb);
 
-	// Ensure the peer has enough space in their receive buffer.
+	                                                            
 	while (len > free_space) {
-		// Record the number of free peer bytes necessary before we can send.
+		                                                                     
 		if (len > pcb->waiting_send_size) {
 			pcb->waiting_send_size = len;
 		}
 
-		// Send a credit request.
+		                         
 		error = vsock_pcb_credit_request(pcb);
 		if (error) {
 			if (m != NULL) {
@@ -1246,14 +1246,14 @@ vsock_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam, s
 			return error;
 		}
 
-		// Check again in case free space was automatically updated in loopback case.
+		                                                                             
 		free_space = vsock_get_peer_space(pcb);
 		if (len <= free_space) {
 			pcb->waiting_send_size = 0;
 			break;
 		}
 
-		// Bail if this is a non-blocking socket.
+		                                         
 		if (so->so_state & SS_NBIO) {
 			if (m != NULL) {
 				mbuf_freem_list(m);
@@ -1261,7 +1261,7 @@ vsock_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam, s
 			return EWOULDBLOCK;
 		}
 
-		// Wait until our peer has enough free space in their receive buffer.
+		                                                                     
 		error = sbwait(&so->so_snd);
 		pcb->waiting_send_size = 0;
 		if (error) {
@@ -1271,7 +1271,7 @@ vsock_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam, s
 			return error;
 		}
 
-		// Bail if an error occured or we can't send more.
+		                                                  
 		if (so->so_state & SS_CANTSENDMORE) {
 			if (m != NULL) {
 				mbuf_freem_list(m);
@@ -1289,7 +1289,7 @@ vsock_send(struct socket *so, int flags, struct mbuf *m, struct sockaddr *nam, s
 		free_space = vsock_get_peer_space(pcb);
 	}
 
-	// Send a payload over the transport.
+	                                     
 	error = vsock_pcb_send(pcb, m);
 	if (error) {
 		return error;
@@ -1310,7 +1310,7 @@ vsock_shutdown(struct socket *so)
 
 	socantsendmore(so);
 
-	// Tell peer we will no longer send.
+	                                    
 	errno_t error = vsock_pcb_shutdown_send(pcb);
 	if (error) {
 		return error;
@@ -1338,7 +1338,7 @@ vsock_soreceive(struct socket *so, struct sockaddr **psa, struct uio *uio,
 
 	const uint32_t threshold = VSOCK_MAX_PACKET_SIZE;
 
-	// Send a credit update if is possible that the peer will no longer send.
+	                                                                         
 	if ((pcb->fwd_cnt - pcb->last_fwd_cnt + threshold) >= pcb->last_buf_alloc) {
 		errno_t error = vsock_pcb_credit_update(pcb);
 		if (!result && error) {
@@ -1380,7 +1380,7 @@ vsock_init(struct protosw *pp, struct domain *dp)
 		return;
 	}
 
-	// Setup VSock protocol info struct.
+	                                    
 	lck_rw_init(&vsockinfo.all_lock, &vsock_lock_grp, LCK_ATTR_NULL);
 	lck_rw_init(&vsockinfo.bound_lock, &vsock_lock_grp, LCK_ATTR_NULL);
 	lck_mtx_init(&vsockinfo.port_lock, &vsock_lock_grp, LCK_ATTR_NULL);
@@ -1401,19 +1401,19 @@ static struct protosw vsocksw[] = {
 
 static const int vsock_proto_count = (sizeof(vsocksw) / sizeof(struct protosw));
 
-/* VSock Domain */
+                  
 
 static struct domain *vsock_domain = NULL;
 
 static void
 vsock_dinit(struct domain *dp)
 {
-	// The VSock domain is initialized with a singleton pattern.
+	                                                            
 	VERIFY(!(dp->dom_flags & DOM_INITIALIZED));
 	VERIFY(vsock_domain == NULL);
 	vsock_domain = dp;
 
-	// Add protocols and initialize.
+	                                
 	for (int i = 0; i < vsock_proto_count; i++) {
 		net_add_proto((struct protosw *)&vsocksw[i], dp, 1);
 	}

@@ -1,8 +1,8 @@
 #include <spawn.h>
-/*
- * Returns the subcpu type for the architecture for which the
- * binary was compiled.
- */
+  
+                                                             
+                       
+   
 int
 main(void)
 {

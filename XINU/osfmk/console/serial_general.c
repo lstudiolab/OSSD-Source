@@ -39,14 +39,14 @@
 #include <console/serial_protos.h>
 #include <libkern/section_keywords.h>
 
-extern void cons_cinput(char ch);               /* The BSD routine that gets characters */
+extern void cons_cinput(char ch);                                                         
 
-SECURITY_READ_ONLY_LATE(unsigned int) serialmode;                               /* Serial mode keyboard and console control */
+SECURITY_READ_ONLY_LATE(unsigned int) serialmode;                                                                             
 
-/*
- *  This routine will start a thread that polls the serial port, listening for
- *  characters that have been typed.
- */
+  
+                                                                              
+                                    
+   
 
 void
 serial_keyboard_init(void)
@@ -54,7 +54,7 @@ serial_keyboard_init(void)
 	kern_return_t   result;
 	thread_t                thread;
 
-	if (!(serialmode & SERIALMODE_INPUT)) { /* Leave if we do not want a serial console */
+	if (!(serialmode & SERIALMODE_INPUT)) {                                               
 		return;
 	}
 
@@ -70,7 +70,7 @@ serial_keyboard_init(void)
 void
 serial_keyboard_start(void)
 {
-	/* Go see if there are any characters pending now */
+	                                                    
 	serial_keyboard_poll();
 }
 
@@ -82,17 +82,17 @@ serial_keyboard_poll(void)
 	uint64_t next;
 
 	while (1) {
-		chr = _serial_getc(0, 1, 0, 1); /* Get a character if there is one */
-		if (chr < 0) { /* The serial buffer is empty */
+		chr = _serial_getc(0, 1, 0, 1);                                      
+		if (chr < 0) {                                 
 			break;
 		}
-		cons_cinput((char)chr);                 /* Buffer up the character */
+		cons_cinput((char)chr);                                              
 	}
 
-	clock_interval_to_deadline(16, 1000000, &next); /* Get time of pop */
+	clock_interval_to_deadline(16, 1000000, &next);                      
 
-	assert_wait_deadline((event_t)serial_keyboard_poll, THREAD_UNINT, next);        /* Show we are "waiting" */
-	thread_block((thread_continue_t)serial_keyboard_poll);  /* Wait for it */
+	assert_wait_deadline((event_t)serial_keyboard_poll, THREAD_UNINT, next);                                   
+	thread_block((thread_continue_t)serial_keyboard_poll);                   
 	panic("serial_keyboard_poll: Shouldn't never ever get here...\n");
 }
 
@@ -123,9 +123,9 @@ switch_to_serial_console(void)
 	return old_cons_ops;
 }
 
-/* The switch_to_{video,serial,kgdb}_console functions return a cookie that
- *  can be used to restore the console to whatever it was before, in the
- *  same way that splwhatever() and splx() work.  */
+                                                                           
+                                                                        
+                                                    
 void
 switch_to_old_console(int old_console)
 {
@@ -164,11 +164,11 @@ console_printbuf_putc(int ch, void * arg)
 		info->str[info->pos] = (char)ch;
 		info->pos += 1;
 	} else {
-		/*
-		 * when len(line) > SERIAL_CONS_BUF_SIZE, we truncate the message
-		 * if boot-arg 'drain_uart_sync=1' is set, then
-		 * drain all the buffer right now and append new ch
-		 */
+		  
+                                                                   
+                                                 
+                                                     
+     
 		if (serialmode & SERIALMODE_SYNCDRAIN) {
 			info->str[info->pos] = '\0';
 			console_write(info->str, info->pos);
@@ -179,7 +179,7 @@ console_printbuf_putc(int ch, void * arg)
 	}
 
 	info->str[info->pos] = '\0';
-	/* if newline, then try output to console */
+	                                            
 	if (ch == '\n' && info->flags & CONS_PB_WRITE_NEWLINE) {
 		console_write(info->str, info->pos);
 		info->pos            = 0;

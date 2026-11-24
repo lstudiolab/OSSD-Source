@@ -1,7 +1,7 @@
-//
-// Tests for
-//  size_t size() const;
-//
+  
+            
+                        
+  
 
 #include <libkern/c++/bounded_array.h>
 #include "test_policy.h"

@@ -73,8 +73,8 @@ static kern_return_t init_by_entries_and_relocs(KXLDVTable *vtable,
 static kern_return_t init_by_entries(KXLDVTable *vtable,
     const KXLDRelocator *relocator, const KXLDDict *defined_cxx_symbols);
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 kern_return_t
 kxld_vtable_init(KXLDVTable *vtable, const KXLDSym *vtable_sym,
     const KXLDObject *object, const KXLDDict *defined_cxx_symbols)
@@ -144,8 +144,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 static void
 get_vtable_base_sizes(boolean_t is_32_bit, u_int *vtable_entry_size,
     u_int *vtable_header_size)
@@ -162,10 +162,10 @@ get_vtable_base_sizes(boolean_t is_32_bit, u_int *vtable_entry_size,
 	}
 }
 
-/*******************************************************************************
-* Initializes a vtable object by matching up relocation entries to the vtable's
-* entries and finding the corresponding symbols.
-*******************************************************************************/
+                                                                                
+                                                                               
+                                                
+                                                                                
 static kern_return_t
 init_by_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
     const KXLDSect *sect, const KXLDRelocator *relocator)
@@ -188,7 +188,7 @@ init_by_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 	check(sect);
 	check(relocator);
 
-	/* Find the first entry past the vtable padding */
+	                                                  
 
 	(void) get_vtable_base_sizes(relocator->is_32_bit,
 	    &vtable_entry_size, &vtable_header_size);
@@ -196,17 +196,17 @@ init_by_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 	vtable_base_offset = kxld_sym_get_section_offset(vtable_sym, sect) +
 	    vtable_header_size;
 
-	/* Find the relocation entry at the start of the vtable */
+	                                                          
 
 	rval = kxld_reloc_get_reloc_index_by_offset(&sect->relocs,
 	    vtable_base_offset, &base_reloc_index);
 	require_noerr(rval, finish);
 
-	/* Count the number of consecutive relocation entries to find the number of
-	 * vtable entries.  For some reason, the __TEXT,__const relocations are
-	 * sorted in descending order, so we have to walk backwards.  Also, make
-	 * sure we don't run off the end of the section's relocs.
-	 */
+	                                                                           
+                                                                        
+                                                                         
+                                                          
+    
 
 	reloc_index = base_reloc_index;
 	entry_offset = vtable_base_offset;
@@ -223,23 +223,23 @@ init_by_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 		entry_offset += vtable_entry_size;
 	}
 
-	/* Allocate the symbol index */
+	                               
 
 	rval = kxld_array_init(&vtable->entries, sizeof(KXLDVTableEntry), nentries);
 	require_noerr(rval, finish);
 
-	/* Find the symbols for each vtable entry */
+	                                            
 
 	for (i = 0; i < vtable->entries.nitems; ++i) {
 		reloc = kxld_array_get_item(&sect->relocs, base_reloc_index - i);
 		entry = kxld_array_get_item(&vtable->entries, i);
 
-		/* If we can't find a symbol, it means it is a locally-defined,
-		 * non-external symbol that has been stripped.  We don't patch over
-		 * locally-defined symbols, so we leave the symbol as NULL and just
-		 * skip it.  We won't be able to patch subclasses with this symbol,
-		 * but there isn't much we can do about that.
-		 */
+		                                                               
+                                                                     
+                                                                     
+                                                                     
+                                               
+     
 		sym = kxld_reloc_get_symbol(relocator, reloc, sect->data);
 
 		entry->unpatched.sym = sym;
@@ -251,10 +251,10 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* Initializes a vtable object by reading the symbol values out of the vtable
-* entries and performing reverse symbol lookups on those values.
-*******************************************************************************/
+                                                                                
+                                                                            
+                                                                
+                                                                                
 static kern_return_t
 init_by_entries(KXLDVTable *vtable, const KXLDRelocator *relocator,
     const KXLDDict *defined_cxx_symbols)
@@ -275,7 +275,7 @@ init_by_entries(KXLDVTable *vtable, const KXLDRelocator *relocator,
 	(void) get_vtable_base_sizes(relocator->is_32_bit,
 	    &vtable_entry_size, &vtable_header_size);
 
-	/* Count the number of entries (the vtable is null-terminated) */
+	                                                                 
 
 	entry_offset = vtable_header_size;
 	while (1) {
@@ -289,12 +289,12 @@ init_by_entries(KXLDVTable *vtable, const KXLDRelocator *relocator,
 		++nentries;
 	}
 
-	/* Allocate the symbol index */
+	                               
 
 	rval = kxld_array_init(&vtable->entries, sizeof(KXLDVTableEntry), nentries);
 	require_noerr(rval, finish);
 
-	/* Look up the symbols for each entry */
+	                                        
 
 	for (i = 0, entry_offset = vtable_header_size;
 	    i < vtable->entries.nitems;
@@ -302,10 +302,10 @@ init_by_entries(KXLDVTable *vtable, const KXLDRelocator *relocator,
 		entry_value = kxld_relocator_get_pointer_at_addr(relocator,
 		    vtable->vtable, entry_offset);
 
-		/* If we can't find the symbol, it means that the virtual function was
-		 * defined inline.  There's not much I can do about this; it just means
-		 * I can't patch this function.
-		 */
+		                                                                      
+                                                                         
+                                 
+     
 		tmpentry = kxld_array_get_item(&vtable->entries, i);
 		sym = kxld_dict_find(defined_cxx_symbols, &entry_value);
 
@@ -323,16 +323,16 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* Initializes vtables by performing a reverse lookup on symbol values when
-* they exist in the vtable entry, and by looking through a matching relocation
-* entry when the vtable entry is NULL.
-*
-* Final linked images require this hybrid vtable initialization approach
-* because they are already internally resolved.  This means that the vtables
-* contain valid entries to local symbols, but still have relocation entries for
-* external symbols.
-*******************************************************************************/
+                                                                                
+                                                                          
+                                                                              
+                                      
+ 
+                                                                        
+                                                                            
+                                                                               
+                   
+                                                                                
 static kern_return_t
 init_by_entries_and_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
     const KXLDRelocator *relocator, const KXLDArray *relocs,
@@ -356,16 +356,16 @@ init_by_entries_and_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 	check(relocator);
 	check(relocs);
 
-	/* Find the first entry and its offset past the vtable padding */
+	                                                                 
 
 	(void) get_vtable_base_sizes(relocator->is_32_bit,
 	    &vtable_entry_size, &vtable_header_size);
 
-	/* In a final linked image, a vtable slot is valid if it is nonzero
-	 * (meaning the userspace linker has already resolved it) or if it has
-	 * a relocation entry.  We'll know the end of the vtable when we find a
-	 * slot that meets neither of these conditions.
-	 */
+	                                                                   
+                                                                       
+                                                                        
+                                                
+    
 	entry_offset = vtable_header_size;
 	while (1) {
 		entry_value = kxld_relocator_get_pointer_at_addr(relocator,
@@ -382,12 +382,12 @@ init_by_entries_and_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 		entry_offset += vtable_entry_size;
 	}
 
-	/* Allocate the symbol index */
+	                               
 
 	rval = kxld_array_init(&vtable->entries, sizeof(KXLDVTableEntry), nentries);
 	require_noerr(rval, finish);
 
-	/* Find the symbols for each vtable entry */
+	                                            
 
 	for (i = 0, entry_offset = vtable_header_size;
 	    i < vtable->entries.nitems;
@@ -395,12 +395,12 @@ init_by_entries_and_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 		entry_value = kxld_relocator_get_pointer_at_addr(relocator,
 		    vtable->vtable, entry_offset);
 
-		/* If we can't find a symbol, it means it is a locally-defined,
-		 * non-external symbol that has been stripped.  We don't patch over
-		 * locally-defined symbols, so we leave the symbol as NULL and just
-		 * skip it.  We won't be able to patch subclasses with this symbol,
-		 * but there isn't much we can do about that.
-		 */
+		                                                               
+                                                                     
+                                                                     
+                                                                     
+                                               
+     
 		if (entry_value) {
 			reloc = NULL;
 			sym = kxld_dict_find(defined_cxx_symbols, &entry_value);
@@ -415,7 +415,7 @@ init_by_entries_and_relocs(KXLDVTable *vtable, const KXLDSym *vtable_sym,
 			    kxld_demangle(vtable->name, &demangled_name1,
 			    &demangled_length1)));
 
-			sym = kxld_reloc_get_symbol(relocator, reloc, /* data */ NULL);
+			sym = kxld_reloc_get_symbol(relocator, reloc,            NULL);
 		}
 
 		tmpentry = kxld_array_get_item(&vtable->entries, i);
@@ -428,8 +428,8 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_vtable_clear(KXLDVTable *vtable)
 {
@@ -441,8 +441,8 @@ kxld_vtable_clear(KXLDVTable *vtable)
 	kxld_array_clear(&vtable->entries);
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 void
 kxld_vtable_deinit(KXLDVTable *vtable)
 {
@@ -452,8 +452,8 @@ kxld_vtable_deinit(KXLDVTable *vtable)
 	bzero(vtable, sizeof(*vtable));
 }
 
-/*******************************************************************************
-*******************************************************************************/
+                                                                                
+                                                                                
 KXLDVTableEntry *
 kxld_vtable_get_entry_for_offset(const KXLDVTable *vtable, u_long offset,
     boolean_t is_32_bit)
@@ -476,9 +476,9 @@ finish:
 	return rval;
 }
 
-/*******************************************************************************
-* Patching vtables allows us to preserve binary compatibility across releases.
-*******************************************************************************/
+                                                                                
+                                                                              
+                                                                                
 kern_return_t
 kxld_vtable_patch(KXLDVTable *vtable, const KXLDVTable *super_vtable,
     KXLDObject *object)
@@ -514,53 +514,53 @@ kxld_vtable_patch(KXLDVTable *vtable, const KXLDVTable *super_vtable,
 		child_entry = kxld_array_get_item(&vtable->entries, i);
 		parent_entry = kxld_array_get_item(&super_vtable->entries, i);
 
-		/* The child entry can be NULL when a locally-defined, non-external
-		 * symbol is stripped.  We wouldn't patch this entry anyway, so we
-		 * just skip it.
-		 */
+		                                                                   
+                                                                    
+                  
+     
 
 		if (!child_entry->unpatched.sym) {
 			continue;
 		}
 
-		/* It's possible for the patched parent entry not to have a symbol
-		 * (e.g. when the definition is inlined).  We can't patch this entry no
-		 * matter what, so we'll just skip it and die later if it's a problem
-		 * (which is not likely).
-		 */
+		                                                                  
+                                                                         
+                                                                       
+                           
+     
 
 		if (!parent_entry->patched.name) {
 			continue;
 		}
 
-		/* 1) If the symbol is defined locally, do not patch */
+		                                                       
 
 		if (kxld_sym_is_defined_locally(child_entry->unpatched.sym)) {
 			continue;
 		}
 
-		/* 2) If the child is a pure virtual function, do not patch.
-		 * In general, we want to proceed with patching when the symbol is
-		 * externally defined because pad slots fall into this category.
-		 * The pure virtual function symbol is special case, as the pure
-		 * virtual property itself overrides the parent's implementation.
-		 */
+		                                                            
+                                                                    
+                                                                  
+                                                                  
+                                                                   
+     
 
 		if (kxld_sym_is_pure_virtual(child_entry->unpatched.sym)) {
 			continue;
 		}
 
-		/* 3) If the symbols are the same, do not patch */
+		                                                  
 
 		if (streq(child_entry->unpatched.sym->name,
 		    parent_entry->patched.name)) {
 			continue;
 		}
 
-		/* 4) If the parent vtable entry is a pad slot, and the child does not
-		 * match it, then the child was built against a newer version of the
-		 * libraries, so it is binary-incompatible.
-		 */
+		                                                                      
+                                                                      
+                                             
+     
 
 		require_action(!kxld_sym_name_is_padslot(parent_entry->patched.name),
 		    finish, rval = KERN_FAILURE;
@@ -572,15 +572,15 @@ kxld_vtable_patch(KXLDVTable *vtable, const KXLDVTable *super_vtable,
 		    &demangled_length2)));
 
 #if KXLD_USER_OR_STRICT_PATCHING
-		/* 5) If we are doing strict patching, we prevent kexts from declaring
-		 * virtual functions and not implementing them.  We can tell if a
-		 * virtual function is declared but not implemented because we resolve
-		 * symbols before patching; an unimplemented function will still be
-		 * undefined at this point.  We then look at whether the symbol has
-		 * the same class prefix as the vtable.  If it does, the symbol was
-		 * declared as part of the class and not inherited, which means we
-		 * should not patch it.
-		 */
+		                                                                      
+                                                                   
+                                                                        
+                                                                     
+                                                                     
+                                                                     
+                                                                    
+                         
+     
 
 		if (kxld_object_target_supports_strict_patching(object) &&
 		    !kxld_sym_is_defined(child_entry->unpatched.sym)) {
@@ -610,16 +610,16 @@ kxld_vtable_patch(KXLDVTable *vtable, const KXLDVTable *super_vtable,
 				continue;
 			}
 		}
-#endif /* KXLD_USER_OR_STRICT_PATCHING */
+#endif                                   
 
-		/* 6) The child symbol is unresolved and different from its parent, so
-		 * we need to patch it up.  We do this by modifying the relocation
-		 * entry of the vtable entry to point to the symbol of the parent
-		 * vtable entry.  If that symbol does not exist (i.e. we got the data
-		 * from a link state object's vtable representation), then we create a
-		 * new symbol in the symbol table and point the relocation entry to
-		 * that.
-		 */
+		                                                                      
+                                                                    
+                                                                   
+                                                                       
+                                                                        
+                                                                     
+          
+     
 
 		sym = kxld_symtab_get_locally_defined_symbol_by_name(symtab,
 		    parent_entry->patched.name);
@@ -648,22 +648,22 @@ kxld_vtable_patch(KXLDVTable *vtable, const KXLDVTable *super_vtable,
 
 		child_entry->unpatched.sym = sym;
 
-		/*
-		 * The C++ ABI requires that functions be aligned on a 2-byte boundary:
-		 * http://www.codesourcery.com/public/cxx-abi/abi.html#member-pointers
-		 * If the LSB of any virtual function's link address is 1, then the
-		 * compiler has violated that part of the ABI, and we're going to panic
-		 * in _ptmf2ptf() (in OSMetaClass.h). Better to panic here with some
-		 * context.
-		 */
+		  
+                                                                         
+                                                                        
+                                                                     
+                                                                         
+                                                                      
+             
+     
 		assert(kxld_sym_is_pure_virtual(sym) || !(sym->link_addr & 1));
 	}
 
 	require_action(!failure, finish, rval = KERN_FAILURE);
 
-	/* Change the vtable representation from the unpatched layout to the
-	 * patched layout.
-	 */
+	                                                                    
+                   
+    
 
 	for (i = 0; i < vtable->entries.nitems; ++i) {
 		char *name;

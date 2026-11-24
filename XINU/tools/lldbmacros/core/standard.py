@@ -224,11 +224,11 @@ class CommandOutput(object):
             self.target_cmd_args = args
         except getopt.GetoptError,err:
             raise ArgumentError(str(err))
-        #continue with processing
+                                 
         for o,a in opts :
             if o == "-h":
-                # This is misuse of exception but 'self' has no info on doc string.
-                # The caller may handle exception and display appropriate info
+                                                                                   
+                                                                              
                 raise ArgumentError("HELP")
             if o == "-o" and len(a) > 0:
                 self.fname=os.path.normpath(os.path.expanduser(a.strip()))
@@ -243,7 +243,7 @@ class CommandOutput(object):
             elif o == "-p" and len(a) > 0:
                 self.pluginRequired = True
                 self.pluginName = a.strip()
-                #print "passing output to " + a.strip()
+                                                       
             elif o == "-v":
                 self.verbose_level += 1
             elif o == "-c":

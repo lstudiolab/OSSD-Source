@@ -63,7 +63,7 @@ struct netsrc_repv1 {
 	uint16_t nrp_precedence;
 	uint16_t nrp_dstlabel;
 	uint16_t nrp_dstprecedence;
-	uint16_t nrp_unused;    // Padding
+	uint16_t nrp_unused;              
 };
 
 struct netsrc_repv2 {
@@ -74,7 +74,7 @@ struct netsrc_repv2 {
 	uint32_t nrp_min_rtt;
 	uint32_t nrp_connection_attempts;
 	uint32_t nrp_connection_successes;
-	// Continues from above, fixes naming
+	                                     
 #define NETSRC_FLAG_IP6_TENTATIVE       NETSRC_IP6_FLAG_TENTATIVE
 #define NETSRC_FLAG_IP6_TEMPORARY       NETSRC_IP6_FLAG_TEMPORARY
 #define NETSRC_FLAG_IP6_DEPRECATED      NETSRC_IP6_FLAG_DEPRECATED
@@ -91,7 +91,7 @@ struct netsrc_repv2 {
 	uint16_t nrp_dstlabel;
 	uint16_t nrp_dstprecedence;
 	uint16_t nrp_ifindex;
-	uint16_t nrp_unused; // Padding
+	uint16_t nrp_unused;           
 };
 
 #define netsrc_rep netsrc_repv2
@@ -103,4 +103,4 @@ struct netsrc_repv2 {
 __private_extern__ void netsrc_init(void);
 #endif
 
-#endif /* __NET_NETSRC_H__ */
+#endif                       

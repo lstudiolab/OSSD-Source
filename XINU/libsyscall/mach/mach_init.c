@@ -92,10 +92,10 @@ host_page_size(__unused host_t host, vm_size_t *out_page_size)
 	return KERN_SUCCESS;
 }
 
-/*
- * mach_init() must be called explicitly in static executables (including dyld).
- * called by libSystem_initializer() in dynamic executables
- */
+  
+                                                                                
+                                                           
+   
 int
 mach_init(void)
 {
@@ -107,7 +107,7 @@ mach_init(void)
 	return 0;
 }
 
-// called by libSystem_atfork_child()
+                                     
 int
 _mach_fork_child(void)
 {
@@ -131,7 +131,7 @@ _mach_fork_child(void)
 void
 mach_init_doit(void)
 {
-	// Initialize cached mach ports defined in mach_init.h
+	                                                      
 	mach_task_self_ = task_self_trap();
 	_task_reply_port = mach_reply_port();
 

@@ -1,7 +1,7 @@
-//
-// Tests for
-//  bounded_ptr& operator=(std::nullptr_t);
-//
+  
+            
+                                           
+  
 
 #include <cstddef>
 #include <libkern/c++/bounded_ptr.h>
@@ -19,7 +19,7 @@ tests()
 {
 	T obj{};
 
-	// Assign from nullptr
+	                      
 	{
 		test_bounded_ptr<TQual> p(&obj, &obj, &obj + 1);
 		_assert(p != nullptr);
@@ -28,7 +28,7 @@ tests()
 		_assert(p == nullptr);
 	}
 
-	// Assign from NULL
+	                   
 	{
 		test_bounded_ptr<TQual> p(&obj, &obj, &obj + 1);
 		_assert(p != nullptr);
@@ -37,7 +37,7 @@ tests()
 		_assert(p == nullptr);
 	}
 
-	// Assign from 0
+	                
 	{
 		test_bounded_ptr<TQual> p(&obj, &obj, &obj + 1);
 		_assert(p != nullptr);

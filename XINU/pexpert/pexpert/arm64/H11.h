@@ -30,15 +30,15 @@
 #define _PEXPERT_ARM64_H11_H
 
 #define APPLEVORTEX
-#define NO_MONITOR              1 /* No EL3 for this CPU -- ever */
-#define HAS_CTRR                1 /* Has CTRR registers */
-#define HAS_NEX_PG              1 /* Supports p-Core NEX powergating during Neon inactivity */
-#define HAS_BP_RET              1 /* Supports branch predictor state retention across ACC sleep */
-#define HAS_CONTINUOUS_HWCLOCK  1 /* Has a hardware clock that ticks during sleep */
-#define HAS_IPI                 1 /* Has IPI registers */
-#define HAS_CLUSTER             1 /* Has eCores and pCores in separate clusters */
-#define HAS_RETENTION_STATE     1 /* Supports architectural state retention */
-#define HAS_VMSA_LOCK           1 /* Supports lockable MMU config registers */
+#define NO_MONITOR              1                                  
+#define HAS_CTRR                1                         
+#define HAS_NEX_PG              1                                                             
+#define HAS_BP_RET              1                                                                 
+#define HAS_CONTINUOUS_HWCLOCK  1                                                   
+#define HAS_IPI                 1                        
+#define HAS_CLUSTER             1                                                 
+#define HAS_RETENTION_STATE     1                                             
+#define HAS_VMSA_LOCK           1                                             
 
 #define CPU_HAS_APPLE_PAC                    1
 #define HAS_UNCORE_CTRS                      1
@@ -58,4 +58,4 @@
 
 #include <pexpert/arm64/apple_arm64_common.h>
 
-#endif /* !_PEXPERT_ARM64_H11_H */
+#endif                            

@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Private functions for kdp.c
- */
+  
+                              
+   
 
 static boolean_t
 kdp_unknown(

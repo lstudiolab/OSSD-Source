@@ -11,9 +11,9 @@
 #define SUPERPAGE_ROUND_UP(a) ((a + SUPERPAGE_SIZE-1) & SUPERPAGE_MASK)
 
 #define RUNS0 100000
-#define STEP 4 /* KB */
+#define STEP 4         
 #define START STEP
-#define MAX (1024*1024) /* KB */
+#define MAX (1024*1024)         
 
 #define RUNS1 RUNS0
 #define RUNS2 (RUNS0/20)
@@ -26,7 +26,7 @@ testt(boolean_t superpages, int mode, int write, int kb)
 	unsigned int run, p, p2, i, res;
 	mach_vm_address_t addr = 0;
 	int pages = kb / 4;
-	mach_vm_size_t  size = SUPERPAGE_ROUND_UP(pages * PAGE_SIZE); /* allocate full superpages */
+	mach_vm_size_t  size = SUPERPAGE_ROUND_UP(pages * PAGE_SIZE);                               
 	int kr;
 
 	kr = mach_vm_allocate(mach_task_self(), &addr, size, VM_FLAGS_ANYWHERE | (superpages? VM_FLAGS_SUPERPAGE_SIZE_2MB : VM_FLAGS_SUPERPAGE_NONE));
@@ -37,14 +37,14 @@ testt(boolean_t superpages, int mode, int write, int kb)
 
 	data = (char*)(long)addr;
 
-	/* touch every base page to make sure everything is mapped and zero-filled */
+	                                                                             
 	for (p = 0; p < pages; p++) {
 		sum += data[p * PAGE_SIZE];
 	}
 
-	clock_t a = clock(); /* start timing */
+	clock_t a = clock();                   
 	switch (mode) {
-	case 0:         /* one byte every 4096 */
+	case 0:                                  
 		if (write) {
 			for (run = 0; run < RUNS0; run++) {
 				for (p = 0; p < pages; p++) {
@@ -59,7 +59,7 @@ testt(boolean_t superpages, int mode, int write, int kb)
 			}
 		}
 		break;
-	case 1:         /* every byte */
+	case 1:                         
 		if (write) {
 			for (run = 0; run < RUNS1 / PAGE_SIZE; run++) {
 				for (i = 0; i < pages * PAGE_SIZE; i++) {
@@ -74,16 +74,16 @@ testt(boolean_t superpages, int mode, int write, int kb)
 			}
 		}
 		break;
-	case 2:         /* random */
+	case 2:                     
 #define PRIME 15485863
-#define NODE_SIZE 128           /* bytes per node */
-#define NODE_ACCESSES 16        /* accesses per node */
+#define NODE_SIZE 128                               
+#define NODE_ACCESSES 16                               
 		p = 0;
 		if (write) {
 			for (run = 0; run < RUNS2 * pages; run++) {
 				p += PRIME;
 				p2 = p % (pages * PAGE_SIZE / NODE_SIZE);
-//printf("p2 = %d\n", p2);
+                          
 				for (i = 0; i < NODE_ACCESSES; i++) {
 					data[p2 * NODE_SIZE + i] = run & 0xFF;
 				}
@@ -99,7 +99,7 @@ testt(boolean_t superpages, int mode, int write, int kb)
 		}
 		break;
 	}
-	clock_t b = clock(); /* stop timing */
+	clock_t b = clock();                  
 	mach_vm_deallocate(mach_task_self(), addr, size);
 	res = b - a;
 	res /= pages;
@@ -119,10 +119,10 @@ main(int argc, char **argv)
 		printf("%d", kb);
 		for (mode = 0; mode <= 2; mode++) {
 			time1 = time2 = time3 = time4 = -1;
-			time1 = testt(TRUE, mode, 0, kb);       // read super
-			time2 = testt(FALSE, mode, 0, kb);      // read base
-			time3 = testt(TRUE, mode, 1, kb);       // write super
-			time4 = testt(FALSE, mode, 1, kb);      // write base
+			time1 = testt(TRUE, mode, 0, kb);                    
+			time2 = testt(FALSE, mode, 0, kb);                  
+			time3 = testt(TRUE, mode, 1, kb);                     
+			time4 = testt(FALSE, mode, 1, kb);                   
 			printf("; %lld; %lld; %lld; %lld", time1, time2, time3, time4);
 			fflush(stdout);
 		}

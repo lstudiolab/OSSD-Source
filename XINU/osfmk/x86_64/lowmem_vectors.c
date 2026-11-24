@@ -59,10 +59,10 @@
 #include <mach/vm_param.h>
 #include <x86_64/lowglobals.h>
 
-/*
- * on x86_64 the low mem vectors live here and get mapped to 0xffffff8000002000 at
- * system startup time
- */
+  
+                                                                                  
+                      
+   
 
 extern void     *version;
 extern void     *kmod;

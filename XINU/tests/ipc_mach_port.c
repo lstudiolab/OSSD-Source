@@ -17,7 +17,7 @@ struct one_port_msg {
 	mach_msg_header_t          header;
 	mach_msg_body_t            body;
 	mach_msg_port_descriptor_t port_descriptor;
-	mach_msg_trailer_t         trailer;            // subtract this when sending
+	mach_msg_trailer_t         trailer;                                         
 };
 
 static mach_port_t

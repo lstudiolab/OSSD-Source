@@ -41,5 +41,5 @@ ml_affinity_to_pset(__unused int affinity_num)
 	return PROCESSOR_SET_NULL;
 }
 
-#endif /* _ARM_CPU_AFFINITY_H_ */
-#endif /* KERNEL_PRIVATE */
+#endif                           
+#endif                     

@@ -38,12 +38,12 @@ hvg_live_coredump_enabled(void)
 	return cpuid_vmm_present() && (cpuid_vmm_get_applepv_features() & CPUID_LEAF_FEATURE_COREDUMP) != 0;
 }
 
-/*
- * This routine issues an Apple hypercall that notifies the hypervisor to
- * take a guest kernel coredump. If the vmcore argument is not NULL, the
- * name tag of the vmcore file is copied into the caller's vmcore tag array.
- * Otherwise the name tag is ignored.
- */
+  
+                                                                         
+                                                                        
+                                                                            
+                                     
+   
 
 hvg_hcall_return_t
 hvg_hcall_trigger_dump(hvg_hcall_vmcore_file_t *vmcore,
@@ -53,12 +53,12 @@ hvg_hcall_trigger_dump(hvg_hcall_vmcore_file_t *vmcore,
 	hvg_hcall_output_regs_t output;
 	const size_t reg_size = sizeof(output.rax);
 
-	/* Does the hypervisor support feature: live kernel core dump? */
+	                                                                 
 	if (!hvg_live_coredump_enabled()) {
 		return HVG_HCALL_FEAT_DISABLED;
 	}
 
-	/* Make sure that we don't overflow vmcore tag array with hypercall output */
+	                                                                             
 	if (vmcore && (reg_size != sizeof(uint64_t))) {
 		os_log_error(OS_LOG_DEFAULT, "%s: invalid hcall register size, %zu bytes (expect %zu bytes)\n",
 		    __func__, reg_size, sizeof(uint64_t));
@@ -67,13 +67,13 @@ hvg_hcall_trigger_dump(hvg_hcall_vmcore_file_t *vmcore,
 
 	switch (dump_option) {
 	case HVG_HCALL_DUMP_OPTION_REGULAR:
-		/* Only regular dump-guest-memory is supported for now */
+		                                                         
 		break;
 	default:
 		return HVG_HCALL_INVALID_PARAMETER;
 	}
 
-	/* Everything checks out, issue hypercall */
+	                                            
 	memset(&output, 0, sizeof(hvg_hcall_output_regs_t));
 	ret = hvg_hypercall1(HVG_HCALL_TRIGGER_DUMP,
 	    dump_option,
@@ -81,7 +81,7 @@ hvg_hcall_trigger_dump(hvg_hcall_vmcore_file_t *vmcore,
 
 	if (ret == HVG_HCALL_SUCCESS) {
 		if (vmcore) {
-			/* Caller requested vmcore tag to be returned */
+			                                                
 			memcpy(&vmcore->tag[0], &output.rax, reg_size);
 			memcpy(&vmcore->tag[reg_size], &output.rdi, reg_size);
 			memcpy(&vmcore->tag[reg_size * 2], &output.rsi, reg_size);

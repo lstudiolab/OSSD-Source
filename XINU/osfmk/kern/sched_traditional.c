@@ -129,7 +129,7 @@ sched_traditional_initial_thread_sched_mode(task_t parent_task);
 static thread_t
 sched_traditional_choose_thread(processor_t processor, int priority, ast_t reason);
 
-/* Choose a thread from a processor's priority-based runq */
+                                                            
 static thread_t sched_traditional_choose_thread_from_runq(processor_t processor, run_queue_t runq, int priority);
 
 const struct sched_dispatch_table sched_traditional_dispatch = {
@@ -330,16 +330,16 @@ sched_traditional_choose_thread(
 	return thread;
 }
 
-/*
- *	sched_traditional_choose_thread_from_runq:
- *
- *	Locate a thread to execute from the processor run queue
- *	and return it.  Only choose a thread with greater or equal
- *	priority.
- *
- *	Associated pset must be locked.  Returns THREAD_NULL
- *	on failure.
- */
+  
+                                             
+  
+                                                          
+                                                             
+            
+  
+                                                       
+              
+   
 static thread_t
 sched_traditional_choose_thread_from_runq(
 	processor_t     processor,
@@ -388,18 +388,18 @@ sched_traditional_initial_thread_sched_mode(task_t parent_task)
 	}
 }
 
-/*
- *	sched_traditional_processor_enqueue:
- *
- *	Enqueue thread on a processor run queue.  Thread must be locked,
- *	and not already be on a run queue.
- *
- *	Returns TRUE if a preemption is indicated based on the state
- *	of the run queue.
- *
- *	The run queue must be locked (see thread_run_queue_remove()
- *	for more info).
- */
+  
+                                       
+  
+                                                                   
+                                     
+  
+                                                               
+                    
+  
+                                                              
+                  
+   
 static boolean_t
 sched_traditional_processor_enqueue(processor_t   processor,
     thread_t        thread,
@@ -427,17 +427,17 @@ sched_traditional_with_pset_runqueue_processor_queue_empty(processor_t processor
 	processor_set_t pset = processor->processor_set;
 	int count = runq_for_processor(processor)->count;
 
-	/*
-	 * The pset runq contains the count of all runnable threads
-	 * for all processors in the pset. However, for threads that
-	 * are bound to another processor, the current "processor"
-	 * is not eligible to execute the thread. So we only
-	 * include bound threads that our bound to the current
-	 * "processor". This allows the processor to idle when the
-	 * count of eligible threads drops to 0, even if there's
-	 * a runnable thread bound to a different processor in the
-	 * shared runq.
-	 */
+	  
+                                                            
+                                                             
+                                                           
+                                                     
+                                                       
+                                                           
+                                                         
+                                                           
+                
+    
 
 	count -= pset->pset_runq_bound_count;
 	count += processor->runq_bound_count;
@@ -512,15 +512,15 @@ sched_traditional_processor_bound_count(processor_t processor)
 	return processor->runq_bound_count;
 }
 
-/*
- *	sched_traditional_processor_queue_shutdown:
- *
- *	Shutdown a processor run queue by
- *	re-dispatching non-bound threads.
- *
- *	Associated pset must be locked, and is
- *	returned unlocked.
- */
+  
+                                              
+  
+                                    
+                                    
+  
+                                         
+                     
+   
 static void
 sched_traditional_processor_queue_shutdown(processor_t processor)
 {
@@ -599,13 +599,13 @@ run_queue_check(
 
 	panic("run_queue_check: end");
 }
-#endif /* 0 */
+#endif        
 
-/*
- * Locks the runqueue itself.
- *
- * Thread must be locked.
- */
+  
+                             
+  
+                         
+   
 static boolean_t
 sched_traditional_processor_queue_remove(processor_t processor,
     thread_t thread)
@@ -619,17 +619,17 @@ sched_traditional_processor_queue_remove(processor_t processor,
 	rq = runq_for_processor(processor);
 
 	if (processor == thread->runq) {
-		/*
-		 * Thread is on a run queue and we have a lock on
-		 * that run queue.
-		 */
+		  
+                                                   
+                    
+     
 		runq_consider_decr_bound_count(processor, thread);
 		run_queue_remove(rq, thread);
 	} else {
-		/*
-		 * The thread left the run queue before we could
-		 * lock the run queue.
-		 */
+		  
+                                                  
+                        
+     
 		assert(thread->runq == PROCESSOR_NULL);
 		processor = PROCESSOR_NULL;
 	}
@@ -639,15 +639,15 @@ sched_traditional_processor_queue_remove(processor_t processor,
 	return processor != PROCESSOR_NULL;
 }
 
-/*
- *	sched_traditional_steal_processor_thread:
- *
- *	Locate a thread to steal from the processor and
- *	return it.
- *
- *	Associated pset must be locked.  Returns THREAD_NULL
- *	on failure.
- */
+  
+                                            
+  
+                                                  
+             
+  
+                                                       
+              
+   
 static thread_t
 sched_traditional_steal_processor_thread(processor_t processor)
 {
@@ -692,16 +692,16 @@ sched_traditional_steal_thread_enabled(processor_set_t pset)
 	return true;
 }
 
-/*
- *	Locate and steal a thread, beginning
- *	at the pset.
- *
- *	The pset must be locked, and is returned
- *	unlocked.
- *
- *	Returns the stolen thread, or THREAD_NULL on
- *	failure.
- */
+  
+                                       
+               
+  
+                                           
+            
+  
+                                               
+           
+   
 static thread_t
 sched_traditional_steal_thread(processor_set_t pset)
 {
@@ -750,10 +750,10 @@ sched_traditional_thread_update_scan(sched_update_scan_context_t scan_context)
 
 	do {
 		do {
-			/*
-			 * TODO: in sched_traditional_use_pset_runqueue case,
-			 *  avoid scanning the same runq multiple times
-			 */
+			  
+                                                        
+                                                  
+      
 			pset = processor->processor_set;
 
 			s = splsched();
@@ -777,7 +777,7 @@ sched_traditional_thread_update_scan(sched_update_scan_context_t scan_context)
 			}
 		} while ((processor = processor->processor_list) != NULL);
 
-		/* Ok, we now have a collection of candidates -- fix them. */
+		                                                             
 		thread_update_process_threads();
 	} while (restart_needed);
 }

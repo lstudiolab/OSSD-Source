@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * catch_exception_raise will be implemented by user programs
- * This implementation is provided to resolve the reference in
- * exc_server().
- */
+  
+                                                             
+                                                              
+                
+   
 
 #include <mach/boolean.h>
 #include <mach/message.h>
@@ -55,7 +55,7 @@ internal_catch_exception_raise(
 		exc_raise_func = _dlsym(RTLD_DEFAULT, "catch_exception_raise");
 	}
 	if (exc_raise_func == 0) {
-		/* The user hasn't defined catch_exception_raise in their binary */
+		                                                                   
 		abort();
 	}
 	return (*exc_raise_func)(exception_port, thread, task, exception, code, codeCnt);

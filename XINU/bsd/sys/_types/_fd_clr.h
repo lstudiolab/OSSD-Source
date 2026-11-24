@@ -27,4 +27,4 @@
  */
 #ifndef FD_CLR
 #define FD_CLR(n, p)    __DARWIN_FD_CLR(n, p)
-#endif /* FD_CLR */
+#endif             

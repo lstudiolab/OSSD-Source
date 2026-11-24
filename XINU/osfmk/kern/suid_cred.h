@@ -44,6 +44,6 @@ extern int suid_cred_verify(ipc_port_t port, struct vnode *vnode, uint32_t *uid)
 
 extern void suid_cred_destroy(ipc_port_t port);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* _KERN_SUID_CRED_H */
+#endif                        

@@ -54,13 +54,13 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
-/*
- *	Machine-dependent definitions for cpu identification.
- *
- */
+  
+                                                        
+  
+   
 #ifdef  KERNEL_PRIVATE
 
 #ifndef _ARM_CPU_NUMBER_H_
@@ -75,6 +75,6 @@ extern int      cpu_cluster_id(void);
 
 __END_DECLS
 
-#endif  /* _ARM_CPU_NUMBER_H_ */
+#endif                          
 
-#endif  /* KERNEL_PRIVATE */
+#endif                      

@@ -41,11 +41,11 @@
 
 #define super IOUserClient
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 OSDefineMetaClassAndStructors(RootDomainUserClient, IOUserClient)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 bool
 RootDomainUserClient::initWithTask(task_t owningTask, void *security_id,
@@ -103,7 +103,7 @@ RootDomainUserClient::secureSleepSystemOptions(
 	if ((local_priv || admin_priv) && fOwner) {
 		OSString        *unserializeErrorString = NULL;
 		OSObject        *unserializedObject = NULL;
-		OSDictionary    *sleepOptionsDict = NULL; // do not release
+		OSDictionary    *sleepOptionsDict = NULL;                  
 
 		proc_t p;
 		p = (proc_t)get_bsdtask_info(fOwningTask);
@@ -121,11 +121,11 @@ RootDomainUserClient::secureSleepSystemOptions(
 		}
 
 		if (sleepOptionsDict) {
-			// Publish Sleep Options in registry under root_domain
+			                                                      
 			fOwner->setProperty( kRootDomainSleepOptionsKey, sleepOptionsDict);
 		} else {
-			// No options
-			// Clear any pre-existing options
+			             
+			                                 
 			fOwner->removeProperty( kRootDomainSleepOptionsKey );
 		}
 
@@ -289,12 +289,12 @@ RootDomainUserClient::externalMethod(
 		break;
 
 	case kPMShutdownSystem:
-		// deperecated interface
+		                        
 		ret = kIOReturnUnsupported;
 		break;
 
 	case kPMRestartSystem:
-		// deperecated interface
+		                        
 		ret = kIOReturnUnsupported;
 		break;
 
@@ -368,31 +368,31 @@ RootDomainUserClient::externalMethod(
 		break;
 
 	default:
-		// bad selector
+		               
 		return kIOReturnBadArgument;
 	}
 
 	return ret;
 }
 
-/* getTargetAndMethodForIndex
- * Not used. We prefer to use externalMethod() for user client invocations.
- * We maintain getTargetAndExternalMethod since it's an exported symbol,
- * and only for that reason.
- */
+                             
+                                                                           
+                                                                        
+                            
+   
 IOExternalMethod *
 RootDomainUserClient::getTargetAndMethodForIndex(
 	IOService ** targetP, UInt32 index )
 {
-	// DO NOT EDIT
+	              
 	return super::getTargetAndMethodForIndex(targetP, index);
 }
 
-/* setPreventative
- * Does nothing. Exists only for exported symbol compatibility.
- */
+                  
+                                                               
+   
 void
 RootDomainUserClient::setPreventative(UInt32 on_off, UInt32 types_of_sleep)
 {
 	return;
-}           // DO NOT EDIT
+}                         

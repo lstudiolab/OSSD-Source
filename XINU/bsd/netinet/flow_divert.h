@@ -99,4 +99,4 @@ errno_t         flow_divert_pcb_init(struct socket *so);
 errno_t         flow_divert_connect_out(struct socket *so, struct sockaddr *to, proc_t p);
 errno_t         flow_divert_implicit_data_out(struct socket *so, int flags, mbuf_t data, struct sockaddr *to, mbuf_t control, struct proc *p);
 
-#endif /* __FLOW_DIVERT_H__ */
+#endif                        

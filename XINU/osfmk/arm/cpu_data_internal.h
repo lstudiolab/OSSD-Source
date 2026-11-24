@@ -47,21 +47,21 @@
 
 #if MONOTONIC
 #include <machine/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #define NSEC_PER_HZ     (NSEC_PER_SEC / 100)
 
 typedef struct reset_handler_data {
-	vm_offset_t     assist_reset_handler;           /* Assist handler phys address */
-	vm_offset_t     cpu_data_entries;                       /* CpuDataEntries phys address */
+	vm_offset_t     assist_reset_handler;                                            
+	vm_offset_t     cpu_data_entries;                                                        
 #if !__arm64__
-	vm_offset_t     boot_args;                                      /* BootArgs phys address */
+	vm_offset_t     boot_args;                                                                 
 #endif
 } reset_handler_data_t;
 
 extern  reset_handler_data_t    ResetHandlerData;
 
-/* Put the static check for cpumap_t here as it's defined in <kern/processor.h> */
+                                                                                  
 static_assert(sizeof(cpumap_t) * CHAR_BIT >= MAX_CPUS, "cpumap_t bitvector is too small for current MAX_CPUS value");
 
 #ifdef  __arm__
@@ -76,8 +76,8 @@ static_assert((CPUWINDOWS_BASE >= VM_MIN_KERNEL_ADDRESS) && ((CPUWINDOWS_TOP - 1
     "CPU copy windows too large for CPUWINDOWS_BASE_MASK value");
 
 typedef struct cpu_data_entry {
-	void                           *cpu_data_paddr;         /* Cpu data physical address */
-	struct  cpu_data               *cpu_data_vaddr;         /* Cpu data virtual address */
+	void                           *cpu_data_paddr;                                        
+	struct  cpu_data               *cpu_data_vaddr;                                       
 #if __arm__
 	uint32_t                        cpu_data_offset_8;
 	uint32_t                        cpu_data_offset_12;
@@ -97,9 +97,9 @@ typedef struct rtclock_timer {
 } rtclock_timer_t;
 
 typedef struct {
-	/*
-	 * The wake variants of these counters are reset to 0 when the CPU wakes.
-	 */
+	  
+                                                                          
+    
 	uint64_t irq_ex_cnt;
 	uint64_t irq_ex_cnt_wake;
 	uint64_t ipi_cnt;
@@ -107,7 +107,7 @@ typedef struct {
 	uint64_t timer_cnt;
 #if MONOTONIC
 	uint64_t pmi_cnt_wake;
-#endif /* MONOTONIC */
+#endif                
 	uint64_t undef_ex_cnt;
 	uint64_t unaligned_cnt;
 	uint64_t vfp_cnt;
@@ -166,13 +166,13 @@ typedef struct cpu_data {
 #define cpu_timebase_low ctb.split.low
 #define cpu_timebase_high ctb.split.high
 #endif
-	bool                            cpu_hibernate; /* This cpu is currently hibernating the system */
+	bool                            cpu_hibernate;                                                   
 	bool                            cpu_running;
 	bool                            cluster_master;
 #if __ARM_ARCH_8_5__
 	bool                            sync_on_cswitch;
-#endif /* __ARM_ARCH_8_5__ */
-	/* true if processor_start() or processor_exit() is operating on this CPU */
+#endif                       
+	                                                                            
 	bool                            in_state_transition;
 
 	uint32_t                        cpu_decrementer;
@@ -191,7 +191,7 @@ typedef struct cpu_data {
 
 #if     __arm__ || __ARM_KERNEL_PROTECT__
 	vm_offset_t                     cpu_exc_vectors;
-#endif /* __ARM_KERNEL_PROTECT__ */
+#endif                             
 	vm_offset_t                     cpu_reset_handler;
 	uintptr_t                       cpu_reset_assist;
 	uint32_t                        cpu_reset_type;
@@ -211,11 +211,11 @@ typedef struct cpu_data {
 	rtclock_timer_t                 rtclock_timer;
 	struct _rtclock_data_           *rtclock_datap;
 
-	arm_debug_state_t               *cpu_user_debug; /* Current debug state */
+	arm_debug_state_t               *cpu_user_debug;                          
 	vm_offset_t                     cpu_debug_interface_map;
 
 	volatile int                    debugger_active;
-	volatile int                    PAB_active; /* Tells the console if we are dumping backtraces */
+	volatile int                    PAB_active;                                                     
 
 	void                            *cpu_xcall_p0;
 	void                            *cpu_xcall_p1;
@@ -234,7 +234,7 @@ typedef struct cpu_data {
 	vm_offset_t                     coresight_base[CORESIGHT_REGIONS];
 #endif
 
-	/* CCC ARMv8 registers */
+	                         
 	uint64_t                        cpu_regmap_paddr;
 
 	uint32_t                        cpu_phys_id;
@@ -262,19 +262,19 @@ typedef struct cpu_data {
 #if defined(HAS_APPLE_PAC)
 	uint64_t                        rop_key;
 	uint64_t                        jop_key;
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
-	/* large structs with large alignment requirements */
+	                                                     
 #if KPC
-	/* double-buffered performance counter data */
+	                                              
 	uint64_t                        *cpu_kpc_buf[2];
-	/* PMC shadow and reload value buffers */
+	                                         
 	uint64_t                        *cpu_kpc_shadow;
 	uint64_t                        *cpu_kpc_reload;
 #endif
 #if MONOTONIC
 	struct mt_cpu                   cpu_monotonic;
-#endif /* MONOTONIC */
+#endif                
 	cpu_stat_t                      cpu_stat;
 #if !XNU_MONITOR
 	struct pmap_cpu_data            cpu_pmap_cpu_data;
@@ -287,9 +287,9 @@ typedef struct cpu_data {
 #endif
 } cpu_data_t;
 
-/*
- * cpu_flags
- */
+  
+            
+   
 #define SleepState                      0x0800
 #define StartedState                    0x1000
 
@@ -326,6 +326,6 @@ typedef struct sysreg_restore {
 } sysreg_restore_t;
 
 extern sysreg_restore_t sysreg_restore;
-#endif  /* __arm64__ */
+#endif                 
 
-#endif  /* ARM_CPU_DATA_INTERNAL */
+#endif                             

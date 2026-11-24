@@ -48,9 +48,9 @@ __END_DECLS
 
 __BEGIN_DECLS
 
-/*
- * XXX These declarations are subject to change at any time.
- */
+  
+                                                            
+   
 
 #define MT_IOC(x) _IO('m', (x))
 #define MT_IOC_RESET MT_IOC(0)
@@ -61,7 +61,7 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-#endif /* !MACH_KERNEL_PRIVATE */
+#endif                           
 
 __BEGIN_DECLS
 
@@ -121,20 +121,20 @@ __BEGIN_DECLS
 
 #ifdef MT_CORE_INSTRS
 #define COUNTS_INSTRS __counts[MT_CORE_INSTRS]
-#else /* defined(MT_CORE_INSTRS) */
+#else                              
 #define COUNTS_INSTRS 0
-#endif /* !defined(MT_CORE_INSTRS) */
+#endif                               
 
-/*
- * MT_KDBG_TMP* macros are meant for temporary (i.e. not checked-in)
- * performance investigations.
- */
+  
+                                                                    
+                              
+   
 
-/*
- * Record the current CPU counters.
- *
- * Preemption must be disabled.
- */
+  
+                                   
+  
+                               
+   
 #define MT_KDBG_TMPCPU_EVT(CODE) \
 	KDBG_EVENTID(DBG_MONOTONIC, DBG_MT_TMPCPU, CODE)
 
@@ -153,11 +153,11 @@ __BEGIN_DECLS
 #define MT_KDBG_TMPCPU_START(CODE) MT_KDBG_TMPCPU_(CODE, DBG_FUNC_START)
 #define MT_KDBG_TMPCPU_END(CODE) MT_KDBG_TMPCPU_(CODE, DBG_FUNC_END)
 
-/*
- * Record the current thread counters.
- *
- * Interrupts must be disabled.
- */
+  
+                                      
+  
+                               
+   
 #define MT_KDBG_TMPTH_EVT(CODE) \
 	KDBG_EVENTID(DBG_MONOTONIC, DBG_MT_TMPTH, CODE)
 
@@ -199,8 +199,8 @@ extern struct mt_device mt_devices[];
 
 __END_DECLS
 
-#endif /* MONOTONIC */
+#endif                
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-#endif /* !defined(SYS_MONOTONIC_H) */
+#endif                                

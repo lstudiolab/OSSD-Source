@@ -22,8 +22,8 @@ class GDBServer(object):
         logging.debug('Starting gdb server.')
 
         while True:
-            #loop for running the server.
-            #read command
+                                         
+                         
             readBytes = ""
 
             while True:
@@ -39,13 +39,13 @@ class GDBServer(object):
                 p_end = readBytes.find('#')
                 if p_begin >= 0 and p_end >= 0 and p_end > p_begin:
                     break
-            # ignore if empty or ack messages
+                                             
             if readBytes in ('', '+'):
                 logging.debug('ignoring message: %s' % readBytes)
                 continue
             req_msg = rsprotocol.Message.fromRSPByteData(readBytes)
             resp = self.handleMessage(req_msg)
-            #in case resp is to detach
+                                      
             if resp is None:
                 return True
             for r_msg in resp:
@@ -82,7 +82,7 @@ class GDBServer(object):
             replymsgs.append(self.getRegisterData(query))
 
         elif query[0] in ('P', 'G'):
-            # we do not support writing into registers
+                                                      
             replymsgs.append(rsprotocol.Message('E05'))
 
         elif query in ('QStartNoAckMode'):
@@ -96,7 +96,7 @@ class GDBServer(object):
             replymsgs.append(rsprotocol.Message(self.version_string))
 
         elif query == 'qShlibInfoAddr':
-            #return shared library info address if any
+                                                      
             replymsgs.append(self.getSharedLibInfoAddress(query))
 
         elif query == 'qProcessInfo':
@@ -150,11 +150,11 @@ class GDBServer(object):
 
     def getRegisterData(self, query):
         if query[0] == 'g':
-            #TODO should implement this sometime. Considering getThreadRegistersInfo is there
-            #we wont need this one.
+                                                                                             
+                                   
             return rsprotocol.UnSupportedMessage
 
-        #the query is of type p<regnum>;thread:<id>;
+                                                    
         bytes = ''
         try:
             args = query[1:].split(';')

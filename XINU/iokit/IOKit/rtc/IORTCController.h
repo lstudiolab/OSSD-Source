@@ -25,9 +25,9 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * 24 Nov  1998 suurballe  Created.
- */
+  
+                                   
+   
 #ifndef _IORTCCONTROLLER_H
 #define _IORTCCONTROLLER_H
 
@@ -52,8 +52,8 @@ class IORTC : public IOService
 
 protected:
 
-/*! @var reserved
- *   Reserved for future use.  (Internal use only)  */
+                 
+                                                      
 	struct ExpansionData { };
 	ExpansionData *iortc_reserved __unused;
 
@@ -82,4 +82,4 @@ public:
 	OSMetaClassDeclareReservedUnused(IORTC, 7);
 };
 
-#endif /* !_IORTCCONTROLLER_H */
+#endif                          

@@ -39,12 +39,12 @@
 
 #include <machine/pal_hibernate.h>
 
-/*
- *  This code is linked into the kernel but part of the "__HIB" section, which means
- *  its used by code running in the special context of restoring the kernel text and data
- *  from the hibernation image read by the booter. hibernate_kernel_entrypoint() and everything
- *  it calls or references needs to be careful to only touch memory also in the "__HIB" section.
- */
+  
+                                                                                    
+                                                                                         
+                                                                                               
+                                                                                                
+   
 
 #define HIB_ROUND_PAGE(x) (((x) + PAGE_MASK) & ~PAGE_MASK)
 
@@ -72,7 +72,7 @@ extern void acpi_wake_prot_entry(void);
 #endif
 #endif
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <i386/proc_reg.h>
@@ -84,7 +84,7 @@ rdtsc64(void)
 	return 0;
 }
 
-#endif /* defined(__i386__) || defined(__x86_64__) */
+#endif                                               
 
 #if defined(__i386__) || defined(__x86_64__)
 
@@ -92,26 +92,26 @@ rdtsc64(void)
 
 #include <architecture/i386/pio.h>
 
-/* standard port addresses */
+                             
 enum {
 	COM1_PORT_ADDR = 0x3f8,
 	COM2_PORT_ADDR = 0x2f8
 };
 
-/* UART register offsets */
+                           
 enum {
-	UART_RBR = 0, /* receive buffer Register   (R) */
-	UART_THR = 0, /* transmit holding register (W) */
-	UART_DLL = 0, /* DLAB = 1, divisor latch (LSB) */
-	UART_IER = 1, /* interrupt enable register     */
-	UART_DLM = 1, /* DLAB = 1, divisor latch (MSB) */
-	UART_IIR = 2, /* interrupt ident register (R)  */
-	UART_FCR = 2, /* fifo control register (W)     */
-	UART_LCR = 3, /* line control register         */
-	UART_MCR = 4, /* modem control register        */
-	UART_LSR = 5, /* line status register          */
-	UART_MSR = 6, /* modem status register         */
-	UART_SCR = 7 /* scratch register              */
+	UART_RBR = 0,                                    
+	UART_THR = 0,                                    
+	UART_DLL = 0,                                    
+	UART_IER = 1,                                    
+	UART_DLM = 1,                                    
+	UART_IIR = 2,                                    
+	UART_FCR = 2,                                    
+	UART_LCR = 3,                                    
+	UART_MCR = 4,                                    
+	UART_LSR = 5,                                    
+	UART_MSR = 6,                                    
+	UART_SCR = 7                                    
 };
 
 enum {
@@ -146,7 +146,7 @@ hib_uart_putc(char c)
 static int
 debug_probe( void )
 {
-	/* Verify that the Scratch Register is accessible */
+	                                                    
 	outb(COM1_PORT_ADDR + UART_SCR, 0x5a);
 	if (inb(COM1_PORT_ADDR + UART_SCR) != 0x5a) {
 		return false;
@@ -178,7 +178,7 @@ hib_uart_putc(char c)
 	}
 	if (uart_base) {
 		while ((rUTRSTAT0 & 0x04) == 0) {
-			// wait for space in the uart
+			                             
 		}
 		rUTXH0 = c;
 	}
@@ -187,11 +187,11 @@ hib_uart_putc(char c)
 static int
 debug_probe( void )
 {
-	// todo
+	       
 	return false;
 }
 
-#endif /* defined(__arm64__) */
+#endif                         
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__arm64__)
 
@@ -264,7 +264,7 @@ debug_code(uint32_t code, uint64_t value)
 	hib_uart_putc('\r');
 }
 
-#endif /* defined(__i386__) || defined(__x86_64__) || defined(__arm64__) */
+#endif                                                                     
 
 #if !defined(DBGLOG)
 #define debug_probe()       (false)
@@ -289,7 +289,7 @@ enum{
 	kIOHibernateRestoreCodeHandoffCount     = 'hndc',
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 
 void
@@ -303,12 +303,12 @@ __hib_assert(const char *file, int line, const char *expression)
 	hib_uart_putc('\n');
 #if defined(__i386__) || defined(__x86_64__)
 	outb(0xcf9, 6);
-#endif /* defined(__i386__) || defined(__x86_64__) */
+#endif                                               
 	while (true) {
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 uint32_t
 hibernate_sum_page(uint8_t *buf, uint32_t ppnum)
@@ -316,7 +316,7 @@ hibernate_sum_page(uint8_t *buf, uint32_t ppnum)
 	return ((uint32_t *)buf)[((PAGE_SIZE >> 2) - 1) & ppnum];
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 static hibernate_bitmap_t *
 hibernate_page_bitmap(hibernate_page_list_t * list, uint32_t page)
@@ -371,11 +371,11 @@ hibernate_page_bitset(hibernate_page_list_t * list, boolean_t set, uint32_t page
 		if (set) {
 			bitmap->bitmap[page >> 5] |= (0x80000000 >> (page & 31));
 		}
-		//setbit(page - bitmap->first_page, (int *) &bitmap->bitmap[0]);
+		                                                                
 		else {
 			bitmap->bitmap[page >> 5] &= ~(0x80000000 >> (page & 31));
 		}
-		//clrbit(page - bitmap->first_page, (int *) &bitmap->bitmap[0]);
+		                                                                
 	}
 }
 
@@ -393,7 +393,7 @@ hibernate_page_bittst(hibernate_page_list_t * list, uint32_t page)
 	return result;
 }
 
-// count bits clear or set (set == TRUE) starting at page.
+                                                          
 uint32_t
 hibernate_page_bitmap_count(hibernate_bitmap_t * bitmap, uint32_t set, uint32_t page)
 {
@@ -464,7 +464,7 @@ hibernate_page_list_grab(hibernate_page_list_t * list, uint32_t * pNextFree)
 void
 hibernate_scratch_init(hibernate_scratch_t * scratch, hibernate_page_list_t * map, uint32_t * nextFree)
 {
-	// initialize "scratch" so we can start writing into it
+	                                                       
 	__nosan_bzero(scratch, sizeof(*scratch));
 	scratch->map = map;
 	scratch->nextFree = nextFree;
@@ -475,7 +475,7 @@ hibernate_scratch_init(hibernate_scratch_t * scratch, hibernate_page_list_t * ma
 void
 hibernate_scratch_start_read(hibernate_scratch_t * scratch)
 {
-	// re-initialize "scratch" so we can start reading from it it
+	                                                             
 	hibernate_scratch_t result;
 	__nosan_bzero(&result, sizeof(result));
 	result.headPage = scratch->headPage;
@@ -487,17 +487,17 @@ hibernate_scratch_start_read(hibernate_scratch_t * scratch)
 static void
 hibernate_scratch_io(hibernate_scratch_t * scratch, void * buffer, size_t size, bool write)
 {
-	// copy data to or from "scratch" based on the value of "write"
+	                                                               
 	if (!write) {
-		// check that we are in bounds
+		                              
 		HIB_ASSERT(scratch->curPos + size <= scratch->totalLength);
 	}
 	while (size) {
-		// if we got to the end of a page (leaving room for our chain pointer), advance to the next page
+		                                                                                                
 		if (scratch->curPagePos == PAGE_SIZE - sizeof(ppnum_t)) {
 			ppnum_t *nextPage = (ppnum_t *)(scratch->curPage + scratch->curPagePos);
 			if (write) {
-				// allocate the next page and store the page number
+				                                                   
 				*nextPage = hibernate_page_list_grab(scratch->map, scratch->nextFree);
 			}
 			scratch->curPage = (uint8_t *)pal_hib_map(SCRATCH_AREA, ptoa_64(*nextPage));
@@ -506,10 +506,10 @@ hibernate_scratch_io(hibernate_scratch_t * scratch, void * buffer, size_t size, 
 		size_t curPageRemaining = PAGE_SIZE - sizeof(ppnum_t) - scratch->curPagePos;
 		size_t toCopy = MIN(size, curPageRemaining);
 		if (write) {
-			// copy from "buffer" into "scratch"
+			                                    
 			__nosan_memcpy(scratch->curPage + scratch->curPagePos, buffer, toCopy);
 		} else {
-			// copy from "scratch" into "buffer"
+			                                    
 			__nosan_memcpy(buffer, scratch->curPage + scratch->curPagePos, toCopy);
 		}
 		scratch->curPos += toCopy;
@@ -572,11 +572,11 @@ hibernate_reserve_restore_pages(uint64_t headerPhys, IOHibernateImageHeader *hea
 	uint32_t handoffPageCount = header->handoffPageCount;
 	uint32_t ppnum;
 
-	// knock all the image pages to be used out of free map
+	                                                       
 	for (ppnum = atop_64_ppnum(headerPhys); ppnum <= lastImagePage; ppnum++) {
 		hibernate_page_bitset(map, FALSE, ppnum);
 	}
-	// knock all the handoff pages to be used out of free map
+	                                                         
 	for (ppnum = handoffPages; ppnum < (handoffPages + handoffPageCount); ppnum++) {
 		hibernate_page_bitset(map, FALSE, ppnum);
 	}
@@ -618,7 +618,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 
 #if !defined(__arm64__)
 	static_assert(sizeof(IOHibernateImageHeader) == 512);
-#endif /* !defined(__arm64__) */
+#endif                          
 
 	headerPhys = ptoa_64(p1);
 
@@ -643,7 +643,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 	map = (hibernate_page_list_t *) pal_hib_map(BITMAP_AREA, mapPhys);
 
 
-	// make the rest of the image is safe for atop()
+	                                                
 	uint64_t imageEnd;
 	if (os_add_overflow(headerPhys, gIOHibernateCurrentHeader->image1Size, &imageEnd) || (imageEnd > IO_MAX_PAGE_ADDR)) {
 		HIB_ASSERT(0);
@@ -664,17 +664,17 @@ hibernate_kernel_entrypoint(uint32_t p1,
 	debug_code(kIOHibernateRestoreCodeHandoffCount, handoffPageCount);
 
 #if defined(__arm64__)
-	// on arm64 we've already done this in pal_hib_resume_tramp
-#else /* !defined(__arm64__) */
+	                                                           
+#else                          
 	hibernate_reserve_restore_pages(headerPhys, gIOHibernateCurrentHeader, map);
-#endif /* !defined(__arm64__) */
+#endif                          
 
 	nextFree = 0;
 	hibernate_page_list_grab(map, &nextFree);
 
 	pal_hib_resume_init(&palHibCtx, map, &nextFree);
 
-	// allocate scratch space for wkdm
+	                                  
 	wkdmScratch = (uint8_t *)pal_hib_map(WKDM_AREA, ptoa_64(hibernate_page_list_grab(map, &nextFree)));
 
 	sum = gIOHibernateCurrentHeader->actualRestore1Sum;
@@ -710,7 +710,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 	while (1) {
 		switch (stage) {
 		case pal_hib_restore_stage_handoff_data:
-			// copy handoff data
+			                    
 			count = srcPhys ? 0 : handoffPageCount;
 			if (!count) {
 				break;
@@ -722,7 +722,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 			break;
 
 		case pal_hib_restore_stage_preview_pages:
-			// copy pageIndexSource pages == preview image data
+			                                                   
 			if (!srcPhys) {
 				if (!pageIndexPhys) {
 					break;
@@ -737,7 +737,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 			break;
 
 		case pal_hib_restore_stage_dram_pages:
-			// copy pages
+			             
 			if (!srcPhys) {
 				srcPhys = (mapPhys + gIOHibernateCurrentHeader->bitmapSize);
 			}
@@ -770,7 +770,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 			} else if (stage == pal_hib_restore_stage_dram_pages) {
 				tag = *src++;
 				HIB_ASSERT((tag & ~kIOHibernateTagLength) == kIOHibernateTagSignature);
-//		debug_code(kIOHibernateRestoreCodeTag, (uintptr_t) tag);
+                                                            
 				srcPhys += sizeof(*src);
 				compressedSize = kIOHibernateTagLength & tag;
 				HIB_ASSERT(compressedSize <= PAGE_SIZE);
@@ -796,8 +796,8 @@ hibernate_kernel_entrypoint(uint32_t p1,
 				}
 				uncompressedPages++;
 			} else {
-//		debug_code(kIOHibernateRestoreCodeConflictPage,   ppnum);
-//		debug_code(kIOHibernateRestoreCodeConflictSource, (uintptr_t) src);
+                                                             
+                                                                       
 				conflictCount++;
 				if (!conflictList.headPage) {
 					hibernate_scratch_init(&conflictList, map, &nextFree);
@@ -813,10 +813,10 @@ hibernate_kernel_entrypoint(uint32_t p1,
 		}
 	}
 
-	/* src points to the last page restored, so we need to skip over that */
+	                                                                        
 	pal_hib_restore_pal_state(src);
 
-	// -- copy back conflicts
+	                         
 
 	if (conflictCount) {
 		src = (uint32_t *)pal_hib_map(COPY_PAGE_AREA, ptoa_64(hibernate_page_list_grab(map, &nextFree)));
@@ -838,7 +838,7 @@ hibernate_kernel_entrypoint(uint32_t p1,
 
 	pal_hib_patchup(&palHibCtx);
 
-	// -- image has been destroyed...
+	                                 
 
 	gIOHibernateCurrentHeader->actualImage1Sum         = sum;
 	gIOHibernateCurrentHeader->actualUncompressedPages = uncompressedPages;
@@ -849,28 +849,28 @@ hibernate_kernel_entrypoint(uint32_t p1,
 
 	gIOHibernateCurrentHeader->trampolineTime = ((uint32_t) (((rdtsc64() - timeStart)) >> 8));
 
-//  debug_code('done', 0);
+                          
 
 #if CONFIG_SLEEP
 #if defined(__i386__) || defined(__x86_64__)
 	typedef void (*ResetProc)(void);
 	ResetProc proc;
 	proc = HIB_ENTRYPOINT;
-	// flush caches
+	               
 	__asm__("wbinvd");
 	proc();
 	return -1;
 #elif defined(__arm64__)
-	// return control to hibernate_machine_entrypoint
+	                                                 
 	return 0;
 #else
-// implement me
+               
 #endif
 #endif
 }
 
 #if CONFIG_DEBUG
-/* standalone printf implementation */
+                                      
 /*-
  * Copyright (c) 1986, 1988, 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -921,21 +921,21 @@ hibstrlen(const char *s)
 	return l;
 }
 
-/* Max number conversion buffer length: a u_quad_t in base 2, plus NUL byte. */
+                                                                               
 #define MAXNBUF (sizeof(intmax_t) * NBBY + 1)
 
-/*
- * Put a NUL-terminated ASCII number (base <= 36) in a buffer in reverse
- * order; return an optional length and a pointer to the last character
- * written in the buffer (i.e., the first character of the string).
- * The buffer pointed to by `nbuf' must have length >= MAXNBUF.
- */
+  
+                                                                        
+                                                                       
+                                                                   
+                                                               
+   
 static char *
 ksprintn(char *nbuf, uintmax_t num, int base, int *lenp, int upper)
 {
 	char *p, c;
 
-	/* Truncate so we don't call umoddi3, which isn't in __HIB */
+	                                                             
 #if !defined(__LP64__)
 	uint32_t num2 = (uint32_t) num;
 #else
@@ -954,32 +954,32 @@ ksprintn(char *nbuf, uintmax_t num, int base, int *lenp, int upper)
 	return p;
 }
 
-/*
- * Scaled down version of printf(3).
- *
- * Two additional formats:
- *
- * The format %b is supported to decode error registers.
- * Its usage is:
- *
- *	printf("reg=%b\n", regval, "<base><arg>*");
- *
- * where <base> is the output base expressed as a control character, e.g.
- * \10 gives octal; \20 gives hex.  Each arg is a sequence of characters,
- * the first of which gives the bit number to be inspected (origin 1), and
- * the next characters (up to a control character, i.e. a character <= 32),
- * give the name of the register.  Thus:
- *
- *	kvprintf("reg=%b\n", 3, "\10\2BITTWO\1BITONE");
- *
- * would produce output:
- *
- *	reg=3<BITTWO,BITONE>
- *
- * XXX:  %D  -- Hexdump, takes pointer and separator string:
- *		("%6D", ptr, ":")   -> XX:XX:XX:XX:XX:XX
- *		("%*D", len, ptr, " " -> XX XX XX XX ...
- */
+  
+                                    
+  
+                          
+  
+                                                        
+                
+  
+                                              
+  
+                                                                         
+                                                                         
+                                                                          
+                                                                           
+                                        
+  
+                                                  
+  
+                        
+  
+                       
+  
+                                                            
+                                            
+                                            
+   
 static int
 hibkvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap)
 {
@@ -1319,12 +1319,12 @@ number:
 			while (percent < fmt) {
 				PCHAR(*percent++);
 			}
-			/*
-			 * Since we ignore a formatting argument it is no
-			 * longer safe to obey the remaining formatting
-			 * arguments as the arguments will no longer match
-			 * the format specs.
-			 */
+			  
+                                                    
+                                                  
+                                                     
+                       
+      
 			stop = 1;
 			break;
 		}
@@ -1343,24 +1343,24 @@ putchar(int c, void *arg)
 void
 hibprintf(const char *fmt, ...)
 {
-	/* http://www.pagetable.com/?p=298 */
+	                                     
 	va_list ap;
 
 	va_start(ap, fmt);
 	hibkvprintf(fmt, putchar, NULL, 10, ap);
 	va_end(ap);
 }
-#endif /* CONFIG_DEBUG */
+#endif                   
 
 #if __arm64__ && HIBERNATE_TRAP_HANDLER
 void
 hibernate_trap(__unused arm_context_t *context, __unused uint64_t trap_addr)
 __attribute__((optnone))
 {
-	// enable logging
+	                 
 	gIOHibernateDebugFlags |= kIOHibernateDebugRestoreLogs;
 
-	// dump some interesting registers
+	                                  
 	for (int i = 0; i < 29; i++) {
 		debug_code(' r00' + (i / 10 * 256) + (i % 10), context->ss.ss_64.x[i]);
 	}
@@ -1372,15 +1372,15 @@ __attribute__((optnone))
 	debug_code(' far', context->ss.ss_64.far);
 	debug_code(' esr', context->ss.ss_64.esr);
 
-	// dump the trap_addr
+	                     
 	debug_code('trap', trap_addr);
 
-	// dump the kernel slide
+	                        
 	debug_code('slid', _hibernateHeader.kernVirtSlide);
 
-	// loop forever
+	               
 	while (true) {
 		;
 	}
 }
-#endif /* __arm64__ && HIBERNATE_TRAP_HANDLER */
+#endif                                          

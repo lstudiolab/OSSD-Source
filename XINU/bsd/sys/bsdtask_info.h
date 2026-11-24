@@ -32,40 +32,40 @@
 #include <vm/vm_map.h>
 
 struct proc_taskinfo_internal {
-	uint64_t                pti_virtual_size;   /* virtual memory size (bytes) */
-	uint64_t                pti_resident_size;  /* resident memory size (bytes) */
-	uint64_t                pti_total_user;         /* total time */
+	uint64_t                pti_virtual_size;                                    
+	uint64_t                pti_resident_size;                                    
+	uint64_t                pti_total_user;                         
 	uint64_t                pti_total_system;
-	uint64_t                pti_threads_user;       /* existing threads only */
+	uint64_t                pti_threads_user;                                  
 	uint64_t                pti_threads_system;
-	int32_t                 pti_policy;             /* default policy for new threads */
-	int32_t                 pti_faults;             /* number of page faults */
-	int32_t                 pti_pageins;    /* number of actual pageins */
-	int32_t                 pti_cow_faults; /* number of copy-on-write faults */
-	int32_t                 pti_messages_sent;      /* number of messages sent */
-	int32_t                 pti_messages_received; /* number of messages received */
-	int32_t                 pti_syscalls_mach;  /* number of mach system calls */
-	int32_t                 pti_syscalls_unix;  /* number of unix system calls */
-	int32_t                 pti_csw;            /* number of context switches */
-	int32_t                 pti_threadnum;          /* number of threads in the task */
-	int32_t                 pti_numrunning;         /* number of running threads */
-	int32_t                 pti_priority;           /* task priority*/
+	int32_t                 pti_policy;                                                 
+	int32_t                 pti_faults;                                        
+	int32_t                 pti_pageins;                                  
+	int32_t                 pti_cow_faults;                                     
+	int32_t                 pti_messages_sent;                                   
+	int32_t                 pti_messages_received;                                  
+	int32_t                 pti_syscalls_mach;                                   
+	int32_t                 pti_syscalls_unix;                                   
+	int32_t                 pti_csw;                                            
+	int32_t                 pti_threadnum;                                             
+	int32_t                 pti_numrunning;                                        
+	int32_t                 pti_priority;                             
 };
 
 #define MAXTHREADNAMESIZE 64
 
 struct proc_threadinfo_internal {
-	uint64_t                pth_user_time;      /* user run time */
-	uint64_t                pth_system_time;    /* system run time */
-	int32_t                 pth_cpu_usage;      /* scaled cpu usage percentage */
-	int32_t                 pth_policy;             /* scheduling policy in effect */
-	int32_t                 pth_run_state;      /* run state (see below) */
-	int32_t                 pth_flags;          /* various flags (see below) */
-	int32_t                 pth_sleep_time;     /* number of seconds that thread */
-	int32_t                 pth_curpri;             /* cur priority*/
-	int32_t                 pth_priority;           /*  priority*/
-	int32_t                 pth_maxpriority;                /* max priority*/
-	char                    pth_name[MAXTHREADNAMESIZE];            /* thread name, if any */
+	uint64_t                pth_user_time;                         
+	uint64_t                pth_system_time;                         
+	int32_t                 pth_cpu_usage;                                       
+	int32_t                 pth_policy;                                              
+	int32_t                 pth_run_state;                                 
+	int32_t                 pth_flags;                                         
+	int32_t                 pth_sleep_time;                                        
+	int32_t                 pth_curpri;                              
+	int32_t                 pth_priority;                         
+	int32_t                 pth_maxpriority;                                 
+	char                    pth_name[MAXTHREADNAMESIZE];                                     
 };
 
 
@@ -74,7 +74,7 @@ struct proc_regioninfo_internal {
 	uint32_t                pri_protection;
 	uint32_t                pri_max_protection;
 	uint32_t                pri_inheritance;
-	uint32_t                pri_flags;              /* shared, external pager, is submap */
+	uint32_t                pri_flags;                                                     
 	uint64_t                pri_offset;
 	uint32_t                pri_behavior;
 	uint32_t                pri_user_wired_count;
@@ -108,7 +108,7 @@ extern struct vnode *vnode_mountdevvp(struct vnode *);
 
 extern boolean_t vnode_isonexternalstorage(void *vp);
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
 extern int fill_procregioninfo(task_t t, uint64_t arg, struct proc_regioninfo_internal *pinfo, uintptr_t *vp, uint32_t *vid);
 extern int fill_procregioninfo_onlymappedvnodes(task_t t, uint64_t arg, struct proc_regioninfo_internal *pinfo, uintptr_t *vp, uint32_t *vid);
@@ -124,4 +124,4 @@ void bsd_threadcdir(void * uth, void *vptr, int *vidp);
 extern void bsd_copythreadname(void *dst_uth, void *src_uth);
 int fill_taskipctableinfo(task_t task, uint32_t *table_size, uint32_t *table_free);
 
-#endif /*_SYS_BSDTASK_INFO_H */
+#endif                         

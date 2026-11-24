@@ -43,9 +43,9 @@ int krpc_portmap(struct sockaddr_in *sin,
     u_int prog, u_int vers, u_int proto, u_int16_t *portp);
 
 
-/*
- * RPC definitions for the portmapper (portmap and rpcbind)
- */
+  
+                                                           
+   
 #define PMAPPORT                111
 #define PMAPPROG                100000
 #define PMAPVERS                2
@@ -75,13 +75,13 @@ int krpc_portmap(struct sockaddr_in *sin,
 #define RPCBPROC_GETSTAT        12
 
 
-/*
- * RPC definitions for bootparamd
- */
+  
+                                 
+   
 #define BOOTPARAM_PROG          100026
 #define BOOTPARAM_VERS          1
 #define BOOTPARAM_WHOAMI        1
 #define BOOTPARAM_GETFILE       2
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* __NFS_KRPC_H__ */
+#endif                          
+#endif                     

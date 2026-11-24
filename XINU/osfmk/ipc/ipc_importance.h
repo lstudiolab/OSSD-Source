@@ -34,60 +34,60 @@
 #include <ipc/ipc_types.h>
 #include <ipc/ipc_voucher.h>
 
-/*
- * IPC Importance - All definitions are MACH_KERNEL_PRIVATE
- */
+  
+                                                           
+   
 #ifdef MACH_KERNEL_PRIVATE
 
 #include <kern/locks.h>
 #include <kern/simple_lock.h>
 
-/*
- * IPC Importance Value Element
- *
- * This element represents a single task's (base) importance,
- * or in the case of inherited importance, the inheritance
- * linkage from the source to the destination task.  In the
- * inheritance case, this source can be a base importance or
- * another inherited importace.
- *
- * Whenever the task importance is adjusted, it walks the
- * list of IPC-related items it influences (ports and downstream
- * tasks doing work on its behalf) and makes adjustments to
- * their importance attributes accordingly.
- *
- */
+  
+                               
+  
+                                                             
+                                                          
+                                                           
+                                                            
+                               
+  
+                                                         
+                                                                
+                                                           
+                                           
+  
+   
 
 struct ipc_importance_elem {
-	uint32_t                                iie_bits;       /* type and refs */
-	mach_voucher_attr_value_reference_t     iie_made;       /* references given to vouchers */
-	queue_head_t                            iie_kmsgs;      /* list of kmsgs inheriting from this */
-	uint32_t                                iie_externcnt;  /* number of externalized boosts */
-	uint32_t                                iie_externdrop; /* number of those dropped already */
+	uint32_t                                iie_bits;                          
+	mach_voucher_attr_value_reference_t     iie_made;                                         
+	queue_head_t                            iie_kmsgs;                                              
+	uint32_t                                iie_externcnt;                                     
+	uint32_t                                iie_externdrop;                                      
 #define IIE_REF_DEBUG 0
 #if IIE_REF_DEBUG
-	uint32_t iie_refs_added;                        /* all refs added via all means */
-	uint32_t iie_refs_dropped;                      /* all refs dropped via all means */
-	uint32_t iie_kmsg_refs_added;                   /* all refs added by kmsgs taking a ref */
-	uint32_t iie_kmsg_refs_inherited;               /* kmsg refs consumed by a new inherit */
-	uint32_t iie_kmsg_refs_coalesced;               /* kmsg refs coalesced into an existing inherit */
-	uint32_t iie_kmsg_refs_dropped;                 /* kmsg refs dropped by not accepting msg importance */
-	uint32_t iie_task_refs_added;                   /* refs added by a task reference call */
-	uint32_t iie_task_refs_added_inherit_from;      /* task references added by inherit from */
-	uint32_t iie_task_refs_added_transition;        /* task references added by imp transition code */
-	uint32_t iie_task_refs_self_added;              /* task refs added by self-boost */
-	uint32_t iie_task_refs_inherited;               /* task refs consumed by a new inherit */
-	uint32_t iie_task_refs_coalesced;               /* task refs coalesced into an existing inherit */
-	uint32_t iie_task_refs_dropped;                 /* all refs dropped via all task means */
+	uint32_t iie_refs_added;                                                          
+	uint32_t iie_refs_dropped;                                                          
+	uint32_t iie_kmsg_refs_added;                                                             
+	uint32_t iie_kmsg_refs_inherited;                                                        
+	uint32_t iie_kmsg_refs_coalesced;                                                                 
+	uint32_t iie_kmsg_refs_dropped;                                                                        
+	uint32_t iie_task_refs_added;                                                            
+	uint32_t iie_task_refs_added_inherit_from;                                                 
+	uint32_t iie_task_refs_added_transition;                                                          
+	uint32_t iie_task_refs_self_added;                                                 
+	uint32_t iie_task_refs_inherited;                                                        
+	uint32_t iie_task_refs_coalesced;                                                                 
+	uint32_t iie_task_refs_dropped;                                                          
 #endif
 };
 
-#define IIE_TYPE_MASK           0x80000000      /* Just the high bit for now */
-#define IIE_TYPE_TASK           0x00000000      /* Element is a task element */
-#define IIE_TYPE_INHERIT        0x80000000      /* Element inherits from a previous element */
+#define IIE_TYPE_MASK           0x80000000                                     
+#define IIE_TYPE_TASK           0x00000000                                     
+#define IIE_TYPE_INHERIT        0x80000000                                                    
 #define IIE_TYPE(e)             ((e)->iie_bits & IIE_TYPE_MASK)
 
-#define IIE_REFS_MASK           0x7FFFFFFF      /* Mask to extract references */
+#define IIE_REFS_MASK           0x7FFFFFFF                                      
 #define IIE_REFS_MAX            0x7FFFFFFF
 #define IIE_REFS(e)             ((e)->iie_bits & IIE_REFS_MASK)
 
@@ -102,28 +102,28 @@ struct ipc_importance_elem {
 #endif
 
 struct ipc_importance_task {
-	struct ipc_importance_elem iit_elem;    /* common element parts */
-	task_t                  iit_task;       /* task associated with */
-	queue_head_t            iit_inherits;   /* list of inherit elems hung off this */
-	queue_t                 iit_updateq;    /* queue chained on for task policy updates */
-	queue_chain_t           iit_updates;    /* link on update chain */
-	queue_chain_t           iit_props;      /* link on propagation chain */
-	uint64_t                iit_updatetime; /* timestamp of our last policy update request */
-	uint64_t                iit_transitions;/* total number of boost transitions (lifetime) */
-	uint32_t                iit_assertcnt;  /* net number of boost assertions (internal, external and legacy) */
-	uint32_t                iit_legacy_externcnt;  /* Legacy external boost count */
-	uint32_t                iit_legacy_externdrop; /* Legacy external boost drop count */
-	uint32_t                iit_receiver:1, /* the task can receive importance boost */
-	    iit_denap:1,                        /* the task can be awaked from App Nap */
-	    iit_donor:1,                        /* the task always sends boosts regardless of boost status */
-	    iit_live_donor:1,                          /* the task temporarily sends boosts regardless of boost status */
-	    iit_updatepolicy:1,                        /* enqueue for policy update at the end of propagation */
-	    iit_reserved:3,                            /* reserved for future use */
-	    iit_filelocks:24;                          /* number of file lock boosts */
+	struct ipc_importance_elem iit_elem;                              
+	task_t                  iit_task;                                 
+	queue_head_t            iit_inherits;                                            
+	queue_t                 iit_updateq;                                                  
+	queue_chain_t           iit_updates;                              
+	queue_chain_t           iit_props;                                     
+	uint64_t                iit_updatetime;                                                  
+	uint64_t                iit_transitions;                                                  
+	uint32_t                iit_assertcnt;                                                                      
+	uint32_t                iit_legacy_externcnt;                                   
+	uint32_t                iit_legacy_externdrop;                                       
+	uint32_t                iit_receiver:1,                                            
+	    iit_denap:1,                                                                 
+	    iit_donor:1,                                                                                     
+	    iit_live_donor:1,                                                                                            
+	    iit_updatepolicy:1,                                                                                 
+	    iit_reserved:3,                                                         
+	    iit_filelocks:24;                                                          
 #if DEVELOPMENT || DEBUG
-	char                    iit_procname[20];      /* name of proc */
-	uint32_t                iit_bsd_pid;           /* pid of proc creating this iit */
-	queue_chain_t           iit_allocation;        /* link on global iit allocation chain */
+	char                    iit_procname[20];                        
+	uint32_t                iit_bsd_pid;                                              
+	queue_chain_t           iit_allocation;                                                 
 #endif
 };
 #define iit_bits                iit_elem.iie_bits
@@ -150,12 +150,12 @@ typedef int iit_update_type_t;
 #define IIT_UPDATE_DROP                 ((iit_update_type_t)2)
 
 struct ipc_importance_inherit {
-	struct ipc_importance_elem      iii_elem;         /* common element partss */
-	boolean_t                       iii_donating;     /* is this donating importance */
-	uint32_t                        iii_depth;        /* nesting depth */
-	ipc_importance_task_t           iii_to_task;      /* donating to */
-	ipc_importance_elem_t           iii_from_elem;    /* other elem contributing */
-	queue_chain_t                   iii_inheritance;  /* inherited from link */
+	struct ipc_importance_elem      iii_elem;                                    
+	boolean_t                       iii_donating;                                      
+	uint32_t                        iii_depth;                           
+	ipc_importance_task_t           iii_to_task;                       
+	ipc_importance_elem_t           iii_from_elem;                                 
+	queue_chain_t                   iii_inheritance;                           
 };
 #define iii_bits                        iii_elem.iie_bits
 #define iii_made                        iii_elem.iie_made
@@ -169,26 +169,26 @@ struct ipc_importance_inherit {
 #define III_DEPTH_RESET                 0x80000000
 #define III_DEPTH_MASK                  0x000000FF
 #define III_DEPTH(i)                    ((i)->iii_depth & III_DEPTH_MASK)
-#define III_DEPTH_MAX                   32      /* maximum inherit->inherit chain depth */
+#define III_DEPTH_MAX                   32                                                
 
 #define ipc_importance_inherit_reference_internal(inherit)      \
 	(ipc_importance_reference_internal(&(inherit)->iii_elem))
 
 __BEGIN_DECLS
 
-/* add a reference to an importance attribute */
+                                                
 extern void ipc_importance_reference(ipc_importance_elem_t elem);
 
-/* release an importance attribute reference */
+                                               
 extern void ipc_importance_release(ipc_importance_elem_t elem);
 
-/* retain a task importance attribute reference */
+                                                  
 extern void ipc_importance_task_reference(ipc_importance_task_t task_elem);
 
-/* release a task importance attribute reference */
+                                                   
 extern void ipc_importance_task_release(ipc_importance_task_t task_imp);
 
-/* reset the influence of the task on the importance */
+                                                       
 extern void ipc_importance_reset(ipc_importance_task_t task_imp, boolean_t donor);
 
 extern ipc_importance_task_t ipc_importance_for_task(task_t task, boolean_t made);
@@ -224,31 +224,31 @@ extern kern_return_t ipc_importance_task_drop_legacy_external_assertion(ipc_impo
 
 extern boolean_t ipc_importance_check_circularity(ipc_port_t port, ipc_port_t dest);
 
-/* prepare importance attributes for sending */
+                                               
 extern boolean_t ipc_importance_send(
 	ipc_kmsg_t              kmsg,
 	mach_msg_option_t       option);
 
-/* receive importance attributes from message */
+                                                
 extern void ipc_importance_receive(
 	ipc_kmsg_t              kmsg,
 	mach_msg_option_t       option);
 
-/* undo receive of importance attributes from message */
+                                                        
 extern void ipc_importance_unreceive(
 	ipc_kmsg_t              kmsg,
 	mach_msg_option_t       option);
 
-/* clean importance attributes out of destroyed message */
+                                                          
 extern void ipc_importance_clean(ipc_kmsg_t kmsg);
 
-/* assert a message is clean w.r.t. importance attributes */
+                                                            
 extern void ipc_importance_assert_clean(ipc_kmsg_t kmsg);
 
-/* initialize the ipc importance subsystem */
+                                             
 extern void ipc_importance_init(void);
 
-/* initialize the ipc importance delayed calls */
+                                                 
 extern void ipc_importance_thread_call_init(void);
 
 #if DEVELOPMENT || DEBUG
@@ -262,6 +262,6 @@ extern int task_importance_list_pids(task_t task, int flags, char *pid_list, uns
 
 __END_DECLS
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif  /* _IPC_IPC_IMPORTANCE_H_ */
+#endif                              

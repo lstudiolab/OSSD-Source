@@ -41,7 +41,7 @@ struct work_interval {
 
 extern uint64_t __thread_selfid(void);
 
-/* Create a new work interval handle (currently for the current thread only). */
+                                                                                
 int
 work_interval_create(work_interval_t *interval_handle, uint32_t create_flags)
 {
@@ -150,27 +150,27 @@ work_interval_destroy(work_interval_t interval_handle)
 	if (interval_handle->create_flags & WORK_INTERVAL_FLAG_JOINABLE) {
 		mach_port_t wi_port = interval_handle->wi_port;
 
-		/*
-		 * A joinable work interval's lifetime is tied to the port lifetime.
-		 * When the last port reference is destroyed, the work interval
-		 * is destroyed via no-senders notification.
-		 *
-		 * Note however that after destroy it can no longer be notified
-		 * because the userspace token is gone.
-		 *
-		 * Additionally, this function does not cause the thread to un-join
-		 * the interval.
-		 */
+		  
+                                                                      
+                                                                 
+                                              
+    
+                                                                 
+                                         
+    
+                                                                     
+                  
+     
 		kern_return_t kr = mach_port_deallocate(mach_task_self(), wi_port);
 
 		if (kr != KERN_SUCCESS) {
-			/*
-			 * If the deallocate fails, then someone got their port
-			 * lifecycle wrong and over-released a port right.
-			 *
-			 * Return an error so the client can assert on this,
-			 * and still find the port name in the interval handle.
-			 */
+			  
+                                                          
+                                                     
+     
+                                                       
+                                                          
+      
 			errno = EINVAL;
 			return -1;
 		}

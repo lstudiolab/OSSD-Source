@@ -88,8 +88,8 @@ try_write(volatile uint32_t *word __unused)
              "str		%w0, %1\n"
              "mov		%0, 0\n"
              : "+r"(val) : "m"(*word));
-	// The exception handler skips over the instruction that zeroes val when a
-	// decompression failure is detected.
+	                                                                          
+	                                     
 	return val == 0;
 #else
 	return false;
@@ -102,7 +102,7 @@ run_test(vm_address_t buffer_start, vm_address_t buffer_length)
 	bool fault = false;
 	for (size_t buffer_offset = 0; buffer_offset < buffer_length;
 	    buffer_offset += page_size) {
-		// Access pages until the fault is detected.
+		                                            
 		if (!try_write((volatile uint32_t *)(buffer_start +
 		    buffer_offset))) {
 			T_LOG("test_thread breaking");
@@ -129,8 +129,8 @@ kern_memory_failure_handler(
 	    "Verified bad address exception");
 	T_EXPECT_EQ((int)code[0], KERN_MEMORY_FAILURE, "caught KERN_MEMORY_FAILURE");
 	T_PASS("received KERN_MEMORY_FAILURE from test thread");
-	// Skip the next instruction as well so that the faulting code can detect
-	// the exception.
+	                                                                         
+	                 
 	return 8;
 }
 
@@ -150,8 +150,8 @@ run_test_expect_fault()
 
 T_DECL(decompression_failure,
     "Confirm that exception is raised on decompression failure",
-    // Disable software checks in development builds, as these would result in
-    // panics.
+                                                                              
+              
     T_META_BOOTARGS_SET("vm_compressor_validation=0"))
 {
 	if (pid_hibernate(-2) != 0) {

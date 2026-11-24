@@ -25,7 +25,7 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*	@(#)paths.h	1.0	11/13/00	*/
+                              
 
 #ifndef _SYS_PATHS_H_
 #define _SYS_PATHS_H_
@@ -34,11 +34,11 @@
 
 #ifdef __APPLE_API_PRIVATE
 
-/* Provides support for system wide forks */
+                                            
 #define _PATH_FORKSPECIFIER    "/..namedfork/"
 #define _PATH_DATANAME         "data"
 #define _PATH_RSRCNAME         "rsrc"
 #define _PATH_RSRCFORKSPEC     "/..namedfork/rsrc"
 
-#endif /* __APPLE_API_PRIVATE */
-#endif /* !_SYS_PATHS_H_ */
+#endif                          
+#endif                     

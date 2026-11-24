@@ -77,4 +77,4 @@ using test_shared_ptr = libkern::intrusive_shared_ptr<T, test_policy>;
 
 #define CHECK(...) T_ASSERT_TRUE((__VA_ARGS__), # __VA_ARGS__)
 
-#endif // !TESTS_INTRUSIVE_SHARED_PTR_TEST_POLICY_H
+#endif                                             

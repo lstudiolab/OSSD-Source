@@ -18,4 +18,4 @@ extern int
 cfil_crypto_sign_data(cfil_crypto_state_t state, cfil_crypto_data_t data,
     cfil_crypto_signature signature, u_int32_t *signature_length);
 
-#endif // __content_filter_crypto_h
+#endif                             

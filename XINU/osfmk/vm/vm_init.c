@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	vm/vm_init.c
- *	Author:	Avadis Tevanian, Jr., Michael Wayne Young
- *	Date:	1985
- *
- *	Initialize the Virtual Memory subsystem.
- */
+  
+   
+  
+                     
+                                                    
+             
+  
+                                           
+   
 
 #include <mach/machine/vm_types.h>
 #include <mach/vm_map.h>
@@ -90,31 +90,31 @@ TUNABLE(bool, iokit_iomd_setownership_enabled,
 static inline void
 vm_mem_bootstrap_log(const char *message)
 {
-//	kprintf("vm_mem_bootstrap: %s\n", message);
+                                              
 	kernel_debug_string_early(message);
 }
 
-/*
- *	vm_mem_bootstrap initializes the virtual memory system.
- *	This is done only by the first cpu up.
- */
+  
+                                                          
+                                         
+   
 __startup_func
 void
 vm_mem_bootstrap(void)
 {
 	vm_offset_t start, end, kmapoff_kaddr;
 
-	/*
-	 *	Initializes resident memory structures.
-	 *	From here on, all physical memory is accounted for,
-	 *	and we use only virtual addresses.
-	 */
+	  
+                                           
+                                                       
+                                      
+    
 	vm_mem_bootstrap_log("vm_page_bootstrap");
 	vm_page_bootstrap(&start, &end);
 
-	/*
-	 *	Initialize other VM packages
-	 */
+	  
+                                
+    
 
 	vm_mem_bootstrap_log("zone_bootstrap");
 	zone_bootstrap();
@@ -134,16 +134,16 @@ vm_mem_bootstrap(void)
 
 	kernel_startup_initialize_upto(STARTUP_SUB_KMEM);
 
-	/*
-	 * Eat a random amount of kernel_map to fuzz subsequent heap, zone and
-	 * stack addresses. (With a 4K page and 9 bits of randomness, this
-	 * eats about 2M of VA from the map)
-	 *
-	 * Note that we always need to slide by at least one page because the VM
-	 * pointer packing schemes using KERNEL_PMAP_HEAP_RANGE_START as a base
-	 * do not admit this address to be part of any zone submap.
-	 */
-	uint32_t kmapoff_pgcnt = (early_random() & 0x1ff) + 1; /* 9 bits */
+	  
+                                                                       
+                                                                   
+                                     
+   
+                                                                         
+                                                                        
+                                                            
+    
+	uint32_t kmapoff_pgcnt = (early_random() & 0x1ff) + 1;             
 	if (kernel_memory_allocate(kernel_map, &kmapoff_kaddr,
 	    ptoa(kmapoff_pgcnt), 0, KMA_KOBJECT | KMA_PERMANENT | KMA_VAONLY,
 	    VM_KERN_MEMORY_OSFMK) != KERN_SUCCESS) {

@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_table.c
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Functions to manipulate tables of IPC capabilities.
- */
+  
+   
+  
+                        
+                      
+             
+  
+                                                      
+   
 
 #include <mach/kern_return.h>
 #include <mach/vm_param.h>
@@ -79,17 +79,17 @@ SECURITY_READ_ONLY_LATE(struct ipc_table_size) ipc_table_requests[IPC_TABLE_REQU
 
 static void
 ipc_table_fill(
-	ipc_table_size_t        its,         /* array to fill */
-	unsigned int            num,         /* size of array */
-	unsigned int            min,         /* at least this many elements */
-	vm_size_t               elemsize)    /* size of elements */
+	ipc_table_size_t        its,                            
+	unsigned int            num,                            
+	unsigned int            min,                                          
+	vm_size_t               elemsize)                          
 {
 	unsigned int index;
 	vm_size_t minsize = min * elemsize;
 	vm_size_t size;
 	vm_size_t incrsize;
 
-	/* first use powers of two, up to the page size */
+	                                                  
 
 	for (index = 0, size = 1;
 	    (index < num) && (size < PAGE_MAX_SIZE);
@@ -100,7 +100,7 @@ ipc_table_fill(
 		}
 	}
 
-	/* then increments of a page, then two pages, etc. */
+	                                                     
 
 	for (incrsize = PAGE_MAX_SIZE; index < num;) {
 		unsigned int period;
@@ -126,33 +126,33 @@ ipc_table_init(void)
 	ipc_table_fill(ipc_table_entries, IPC_TABLE_ENTRIES_SIZE - 1,
 	    16, sizeof(struct ipc_entry));
 
-	/* the last two elements should have the same size */
+	                                                     
 
 	ipc_table_entries[IPC_TABLE_ENTRIES_SIZE - 1].its_size =
 	    ipc_table_entries[IPC_TABLE_ENTRIES_SIZE - 2].its_size;
 
-	/* make sure the robin hood hashing in ipc hash will work */
+	                                                            
 	assert(ipc_table_entries[IPC_TABLE_ENTRIES_SIZE - 1].its_size <=
 	    IPC_ENTRY_INDEX_MAX);
 
 	ipc_table_fill(ipc_table_requests, IPC_TABLE_REQUESTS_SIZE - 1,
 	    2, sizeof(struct ipc_port_request));
 
-	/* the last element should have zero size */
+	                                            
 
 	ipc_table_requests[IPC_TABLE_REQUESTS_SIZE - 1].its_size = 0;
 }
 STARTUP(MACH_IPC, STARTUP_RANK_FIRST, ipc_table_init);
 
 
-/*
- *	Routine: ipc_table_max_entries
- *	Purpose:
- *		returns the maximum number of entries an IPC space
- *		is allowed to contain (the maximum size to which it will grow)
- *	Conditions:
- *		none
- */
+  
+                                 
+           
+                                                      
+                                                                  
+              
+        
+   
 unsigned int
 ipc_table_max_entries(void)
 {
@@ -161,14 +161,14 @@ ipc_table_max_entries(void)
 }
 
 
-/*
- *	Routine: ipc_table_max_requests
- *	Purpose:
- *		returns the maximum number of requests an IPC request table
- *		is allowed to contain (the maximum size to which it will grow)
- *	Conditions:
- *		none
- */
+  
+                                  
+           
+                                                               
+                                                                  
+              
+        
+   
 unsigned int
 ipc_table_max_requests(void)
 {
@@ -177,13 +177,13 @@ ipc_table_max_requests(void)
 }
 
 
-/*
- *	Routine:	ipc_table_alloc
- *	Purpose:
- *		Allocate a table.
- *	Conditions:
- *		May block.
- */
+  
+                           
+           
+                     
+              
+              
+   
 
 void *
 ipc_table_alloc(
@@ -193,13 +193,13 @@ ipc_table_alloc(
 }
 
 
-/*
- *	Routine:	ipc_table_free
- *	Purpose:
- *		Free a table allocated with ipc_table_alloc.
- *	Conditions:
- *		May block.
- */
+  
+                          
+           
+                                                
+              
+              
+   
 
 void
 ipc_table_free(

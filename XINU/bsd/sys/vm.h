@@ -60,10 +60,10 @@
  *
  *	@(#)vm.h	8.5 (Berkeley) 5/11/95
  */
-/* HISTORY
- *  05-Jun-95  Mac Gillon (mgillon) at NeXT
- *      4.4 code uses this file to import MACH API
- */
+          
+                                           
+                                                  
+   
 
 #ifndef _SYS_VM_H
 #define _SYS_VM_H
@@ -73,75 +73,75 @@
 
 #ifdef BSD_KERNEL_PRIVATE
 
-/* Machine specific config stuff */
+                                   
 #if     defined(KERNEL) && !defined(MACH_USER_API)
 #include <sys/vmmeter.h>
 #include <sys/queue.h>
 #include <mach/vm_param.h>
 #endif
 
-/*
- * Shareable process virtual address space.
- * May eventually be merged with vm_map.
- * Several fields are temporary (text, data stuff).
- */
+  
+                                           
+                                        
+                                                   
+   
 struct vmspace {
-	int     vm_refcnt;      /* number of references */
-	caddr_t vm_shm;         /* SYS5 shared memory private data XXX */
-/* we copy from vm_startcopy to the end of the structure on fork */
+	int     vm_refcnt;                                
+	caddr_t vm_shm;                                                  
+                                                                   
 #define vm_startcopy vm_rssize
-	segsz_t vm_rssize;      /* current resident set size in pages */
-	segsz_t vm_swrss;       /* resident set size before last swap */
-	segsz_t vm_tsize;       /* text size (pages) XXX */
-	segsz_t vm_dsize;       /* data size (pages) XXX */
-	segsz_t vm_ssize;       /* stack size (pages) */
-	caddr_t vm_taddr;       /* user virtual address of text XXX */
-	caddr_t vm_daddr;       /* user virtual address of data XXX */
-	caddr_t vm_maxsaddr;    /* user VA at max stack growth */
+	segsz_t vm_rssize;                                              
+	segsz_t vm_swrss;                                               
+	segsz_t vm_tsize;                                  
+	segsz_t vm_dsize;                                  
+	segsz_t vm_ssize;                               
+	caddr_t vm_taddr;                                             
+	caddr_t vm_daddr;                                             
+	caddr_t vm_maxsaddr;                                     
 };
 
 #ifdef KERNEL
-/* LP64 version of vmspace.  all pointers
- * grow when we're dealing with a 64-bit process.
- * WARNING - keep in sync with vmspace
- */
+                                         
+                                                 
+                                      
+   
 
 struct user32_vmspace {
-	int             vm_refcnt;      /* number of references */
-	uint32_t        vm_shm;                 /* SYS5 shared memory private data XXX */
-	segsz_t         vm_rssize;              /* current resident set size in pages */
-	segsz_t         vm_swrss;               /* resident set size before last swap */
-	segsz_t         vm_tsize;               /* text size (pages) XXX */
-	segsz_t         vm_dsize;               /* data size (pages) XXX */
-	segsz_t         vm_ssize;               /* stack size (pages) */
-	uint32_t        vm_taddr;       /* user virtual address of text XXX */
-	uint32_t        vm_daddr;       /* user virtual address of data XXX */
-	uint32_t vm_maxsaddr;   /* user VA at max stack growth */
+	int             vm_refcnt;                                
+	uint32_t        vm_shm;                                                          
+	segsz_t         vm_rssize;                                                      
+	segsz_t         vm_swrss;                                                       
+	segsz_t         vm_tsize;                                          
+	segsz_t         vm_dsize;                                          
+	segsz_t         vm_ssize;                                       
+	uint32_t        vm_taddr;                                             
+	uint32_t        vm_daddr;                                             
+	uint32_t vm_maxsaddr;                                    
 };
 struct user_vmspace {
-	int             vm_refcnt;      /* number of references */
-	user_addr_t     vm_shm __attribute((aligned(8)));                       /* SYS5 shared memory private data XXX */
-	segsz_t         vm_rssize;              /* current resident set size in pages */
-	segsz_t         vm_swrss;               /* resident set size before last swap */
-	segsz_t         vm_tsize;               /* text size (pages) XXX */
-	segsz_t         vm_dsize;               /* data size (pages) XXX */
-	segsz_t         vm_ssize;               /* stack size (pages) */
-	user_addr_t     vm_taddr __attribute((aligned(8)));       /* user virtual address of text XXX */
-	user_addr_t     vm_daddr;       /* user virtual address of data XXX */
-	user_addr_t vm_maxsaddr;        /* user VA at max stack growth */
+	int             vm_refcnt;                                
+	user_addr_t     vm_shm __attribute((aligned(8)));                                                                
+	segsz_t         vm_rssize;                                                      
+	segsz_t         vm_swrss;                                                       
+	segsz_t         vm_tsize;                                          
+	segsz_t         vm_dsize;                                          
+	segsz_t         vm_ssize;                                       
+	user_addr_t     vm_taddr __attribute((aligned(8)));                                             
+	user_addr_t     vm_daddr;                                             
+	user_addr_t vm_maxsaddr;                                         
 };
 
-#endif /* KERNEL */
+#endif             
 
 #include <kern/thread.h>
 
-#else /* BSD_KERNEL_PRIVATE */
+#else                         
 
-#include <sys/_types/_caddr_t.h> /* caddr_t */
-#include <sys/_types/_int32_t.h> /* int32_t */
+#include <sys/_types/_caddr_t.h>              
+#include <sys/_types/_int32_t.h>              
 
-/* just to keep kinfo_proc happy */
-/* NOTE: Pointer fields are size variant for LP64 */
+                                   
+                                                    
 struct vmspace {
 	int32_t dummy;
 	caddr_t dummy2;
@@ -149,7 +149,7 @@ struct vmspace {
 	caddr_t dummy4[3];
 };
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef KERNEL
 
@@ -157,6 +157,6 @@ __BEGIN_DECLS
 struct proc *current_proc(void);
 __END_DECLS
 
-#endif /* KERNEL */
+#endif             
 
-#endif /* _SYS_VM_H */
+#endif                

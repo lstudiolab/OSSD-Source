@@ -33,65 +33,65 @@
 #include "assym.s"
 
 
-/*
- *	void invalidate_mmu_cache(void)
- *
- *		Invalidate d-cache and i-cache
- */
+  
+                                  
+  
+                                  
+   
 	.text
 	.align 2
 	.globl EXT(invalidate_mmu_cache)
 LEXT(invalidate_mmu_cache)
 	mov		r0, #0
 	dsb
-	mcr		p15, 0, r0, c7, c7, 0				// Invalidate caches
+	mcr		p15, 0, r0, c7, c7, 0				                    
 	dsb
 	isb
 	bx		lr
 
-/*
- *	void invalidate_mmu_dcache(void)
- *
- *		Invalidate d-cache
- */
+  
+                                   
+  
+                      
+   
 	.text
 	.align 2
 	.globl EXT(invalidate_mmu_dcache)
 LEXT(invalidate_mmu_dcache)
 	mov		r0, #0
 	dsb
-	mcr		p15, 0, r0, c7, c6, 0				// Invalidate dcache
+	mcr		p15, 0, r0, c7, c6, 0				                    
 	dsb
 	bx		lr
 
-/*
- *	void invalidate_mmu_dcache_region(vm_offset_t va, unsigned length)
- *
- *		Invalidate d-cache region
- */
+  
+                                                                     
+  
+                             
+   
 	.text
 	.align 2
 	.globl EXT(invalidate_mmu_dcache_region)
 LEXT(invalidate_mmu_dcache_region)
 	and		r2, r0, #((1<<MMU_CLINE)-1)
-	bic		r0, r0, #((1<<MMU_CLINE)-1)			// Cached aligned 
+	bic		r0, r0, #((1<<MMU_CLINE)-1)			                  
 	add		r1, r1, r2
 	sub		r1, r1, #1
-	mov		r1, r1, LSR #MMU_CLINE				// Set cache line counter
+	mov		r1, r1, LSR #MMU_CLINE				                         
 	dsb
 fmdr_loop:
-	mcr		p15, 0, r0, c7, c14, 1				// Invalidate dcache line
-	add		r0, r0, #1<<MMU_CLINE				// Get next cache aligned addr
-	subs	r1, r1, #1							// Decrementer cache line counter
-	bpl		fmdr_loop							// Loop in counter not null
+	mcr		p15, 0, r0, c7, c14, 1				                         
+	add		r0, r0, #1<<MMU_CLINE				                              
+	subs	r1, r1, #1							                                 
+	bpl		fmdr_loop							                           
 	dsb
 	bx		lr
 
-/*
- *	void InvalidatePoU_Icache(void)
- *
- *		Invalidate i-cache
- */
+  
+                                  
+  
+                      
+   
 	.text
 	.align 2
 	.globl EXT(InvalidatePoU_Icache)
@@ -100,16 +100,16 @@ LEXT(InvalidatePoU_Icache)
 LEXT(invalidate_mmu_icache)
 	mov     r0, #0
 	dsb
-	mcr     p15, 0, r0, c7, c5, 0				// Invalidate icache
+	mcr     p15, 0, r0, c7, c5, 0				                    
 	dsb
 	isb
 	bx		lr
 
-/*
- *	void InvalidatePoU_IcacheRegion(vm_offset_t va, unsigned length)
- *
- *		Invalidate icache region
- */
+  
+                                                                   
+  
+                            
+   
 	.text
 	.align 2
 	.globl EXT(InvalidatePoU_IcacheRegion)
@@ -118,24 +118,24 @@ LEXT(InvalidatePoU_IcacheRegion)
 	mov		r7, sp
 	bl		EXT(CleanPoU_DcacheRegion)
 	and		r2, r0, #((1<<MMU_I_CLINE)-1)
-	bic		r0, r0, #((1<<MMU_I_CLINE)-1)			// Cached aligned 
+	bic		r0, r0, #((1<<MMU_I_CLINE)-1)			                  
 	add		r1, r1, r2
 	sub		r1, r1, #1
-	mov		r1, r1, LSR #MMU_I_CLINE			// Set cache line counter
+	mov		r1, r1, LSR #MMU_I_CLINE			                         
 fmir_loop:
-	mcr		p15, 0, r0, c7, c5, 1				// Invalidate icache line
-	add		r0, r0, #1<<MMU_I_CLINE				// Get next cache aligned addr
-	subs	r1, r1, #1							// Decrementer cache line counter
-	bpl		fmir_loop							// Loop in counter not null
+	mcr		p15, 0, r0, c7, c5, 1				                         
+	add		r0, r0, #1<<MMU_I_CLINE				                              
+	subs	r1, r1, #1							                                 
+	bpl		fmir_loop							                           
 	dsb
 	isb
 	pop		{r7,pc}
 
-/*
- * void CleanPoC_Dcache(void)
- *
- *		Clean all d-caches
- */
+  
+                             
+  
+                      
+   
 	.text
 	.align 2
 	.globl EXT(CleanPoC_Dcache)
@@ -147,35 +147,35 @@ LEXT(clean_mmu_dcache)
 	dsb
 clean_dcacheway:
 clean_dcacheline:		
-	mcr		p15, 0, r0, c7, c10, 2				 // clean dcache line by way/set
-	add		r0, r0, #1 << MMU_I7SET				 // increment set index
-	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	 // look for overflow
+	mcr		p15, 0, r0, c7, c10, 2				                                
+	add		r0, r0, #1 << MMU_I7SET				                       
+	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	                     
 	beq		clean_dcacheline
-	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET) // clear set overflow
-	adds	r0, r0, #1 << MMU_I7WAY				 // increment way
-	bcc		clean_dcacheway						 // loop
+	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET)                      
+	adds	r0, r0, #1 << MMU_I7WAY				                 
+	bcc		clean_dcacheway						        
 #endif
 #if __ARM_L2CACHE__
 	dsb
 	mov		r0, #2
 clean_l2dcacheway:
 clean_l2dcacheline:		
-	mcr		p15, 0, r0, c7, c10, 2				 // clean dcache line by way/set
-	add		r0, r0, #1 << L2_I7SET				 // increment set index
-	tst		r0, #1 << (L2_NSET + L2_I7SET)		 // look for overflow
+	mcr		p15, 0, r0, c7, c10, 2				                                
+	add		r0, r0, #1 << L2_I7SET				                       
+	tst		r0, #1 << (L2_NSET + L2_I7SET)		                     
 	beq		clean_l2dcacheline
-	bic		r0, r0, #1 << (L2_NSET + L2_I7SET)	 // clear set overflow
-	adds	r0, r0, #1 << L2_I7WAY				 // increment way
-	bcc		clean_l2dcacheway					 // loop
+	bic		r0, r0, #1 << (L2_NSET + L2_I7SET)	                      
+	adds	r0, r0, #1 << L2_I7WAY				                 
+	bcc		clean_l2dcacheway					        
 #endif
 	dsb
 	bx		lr
 		
-/*
- * void CleanPoU_Dcache(void)
- *
- *		Clean D-cache to Point of Unification
- */
+  
+                             
+  
+                                         
+   
 	.text
 	.align 2
 	.globl EXT(CleanPoU_Dcache)
@@ -185,22 +185,22 @@ LEXT(CleanPoU_Dcache)
 	dsb
 clean_dcacheway_idle:
 clean_dcacheline_idle:		
-	mcr		p15, 0, r0, c7, c10, 2				 // clean dcache line by way/set
-	add		r0, r0, #1 << MMU_I7SET				 // increment set index
-	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	 // look for overflow
+	mcr		p15, 0, r0, c7, c10, 2				                                
+	add		r0, r0, #1 << MMU_I7SET				                       
+	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	                     
 	beq		clean_dcacheline_idle
-	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET) // clear set overflow
-	adds	r0, r0, #1 << MMU_I7WAY				 // increment way
-	bcc		clean_dcacheway_idle				 // loop
+	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET)                      
+	adds	r0, r0, #1 << MMU_I7WAY				                 
+	bcc		clean_dcacheway_idle				        
 #endif
 	dsb
 	bx		lr
 
-/*
- *	void CleanPoU_DcacheRegion(vm_offset_t va, unsigned length)
- *
- *		Clean d-cache region to Point of Unification
- */
+  
+                                                              
+  
+                                                
+   
 	.text
 	.align 2
 	.globl EXT(CleanPoU_DcacheRegion)
@@ -208,26 +208,26 @@ LEXT(CleanPoU_DcacheRegion)
 #if	!defined(__ARM_PoU_WT_CACHE__)
 
 	and		r2, r0, #((1<<MMU_CLINE)-1)
-	bic		r3, r0, #((1<<MMU_CLINE)-1)			// Cached aligned 
+	bic		r3, r0, #((1<<MMU_CLINE)-1)			                  
 	add		r12, r1, r2
 	sub		r12, r12, #1
-	mov		r12, r12, LSR #MMU_CLINE				// Set cache line counter
+	mov		r12, r12, LSR #MMU_CLINE				                         
 	dsb
 cudr_loop:
-	mcr		p15, 0, r3, c7, c11, 1				// Clean dcache line to PoU
-	add		r3, r3, #1<<MMU_CLINE				// Get next cache aligned addr
-	subs	r12, r12, #1							// Decrementer cache line counter
-	bpl		cudr_loop							// Loop in counter not null
+	mcr		p15, 0, r3, c7, c11, 1				                           
+	add		r3, r3, #1<<MMU_CLINE				                              
+	subs	r12, r12, #1							                                 
+	bpl		cudr_loop							                           
 
 #endif
 	dsb
 	bx		lr
 
-/*
- *	void CleanPoC_DcacheRegion(vm_offset_t va, size_t length)
- *
- *		Clean d-cache region to Point of Coherency
- */
+  
+                                                            
+  
+                                              
+   
 	.text
 	.align 2
 	.globl EXT(CleanPoC_DcacheRegion)
@@ -235,24 +235,24 @@ cudr_loop:
 LEXT(CleanPoC_DcacheRegion)
 LEXT(CleanPoC_DcacheRegion_Force)
 	and		r2, r0, #((1<<MMU_CLINE)-1)
-	bic		r0, r0, #((1<<MMU_CLINE)-1)			// Cached aligned 
+	bic		r0, r0, #((1<<MMU_CLINE)-1)			                  
 	add		r1, r1, r2
 	sub		r1, r1, #1
-	mov		r1, r1, LSR #MMU_CLINE				// Set cache line counter
+	mov		r1, r1, LSR #MMU_CLINE				                         
 	dsb
 ccdr_loop:
-	mcr		p15, 0, r0, c7, c10, 1				// Clean dcache line to PoC
-	add		r0, r0, #1<<MMU_CLINE				// Get next cache aligned addr
-	subs	r1, r1, #1							// Decrementer cache line counter
-	bpl		ccdr_loop							// Loop in counter not null
+	mcr		p15, 0, r0, c7, c10, 1				                           
+	add		r0, r0, #1<<MMU_CLINE				                              
+	subs	r1, r1, #1							                                 
+	bpl		ccdr_loop							                           
 	dsb
 	bx		lr
 
-/*
- *	void FlushPoC_Dcache(void)
- *
- *		Clean and Invalidate dcaches to Point of Coherency
- */
+  
+                             
+  
+                                                      
+   
 	.text
 	.align 2
 	.globl EXT(FlushPoC_Dcache)
@@ -261,34 +261,34 @@ LEXT(FlushPoC_Dcache)
 	dsb
 cleanflush_dcacheway:
 cleanflush_dcacheline:		
-	mcr		p15, 0, r0, c7, c14, 2				 // cleanflush dcache line by way/set
-	add		r0, r0, #1 << MMU_I7SET				 // increment set index
-	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	 // look for overflow
+	mcr		p15, 0, r0, c7, c14, 2				                                     
+	add		r0, r0, #1 << MMU_I7SET				                       
+	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	                     
 	beq		cleanflush_dcacheline
-	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET) // clear set overflow
-	adds	r0, r0, #1 << MMU_I7WAY				 // increment way
-	bcc		cleanflush_dcacheway				 // loop
+	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET)                      
+	adds	r0, r0, #1 << MMU_I7WAY				                 
+	bcc		cleanflush_dcacheway				        
 #if __ARM_L2CACHE__
 	dsb
 	mov		r0, #2
 cleanflush_l2dcacheway:
 cleanflush_l2dcacheline:		
-	mcr		p15, 0, r0, c7, c14, 2				 // cleanflush dcache line by way/set
-	add		r0, r0, #1 << L2_I7SET				 // increment set index
-	tst		r0, #1 << (L2_NSET + L2_I7SET)	 	// look for overflow
+	mcr		p15, 0, r0, c7, c14, 2				                                     
+	add		r0, r0, #1 << L2_I7SET				                       
+	tst		r0, #1 << (L2_NSET + L2_I7SET)	 	                    
 	beq		cleanflush_l2dcacheline
-	bic		r0, r0, #1 << (L2_NSET + L2_I7SET)	 // clear set overflow
-	adds	r0, r0, #1 << L2_I7WAY				 // increment way
-	bcc		cleanflush_l2dcacheway				 // loop
+	bic		r0, r0, #1 << (L2_NSET + L2_I7SET)	                      
+	adds	r0, r0, #1 << L2_I7WAY				                 
+	bcc		cleanflush_l2dcacheway				        
 #endif
 	dsb
 	bx		lr
 
-/*
- * void FlushPoU_Dcache(void)
- *
- *		Flush D-cache to Point of Unification
- */
+  
+                             
+  
+                                         
+   
 	.text
 	.align 2
 	.globl EXT(FlushPoU_Dcache)
@@ -297,42 +297,42 @@ LEXT(FlushPoU_Dcache)
 	dsb
 fpud_way:
 fpud_line:		
-	mcr		p15, 0, r0, c7, c14, 2				 // cleanflush dcache line by way/set
-	add		r0, r0, #1 << MMU_I7SET				 // increment set index
-	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	 // look for overflow
+	mcr		p15, 0, r0, c7, c14, 2				                                     
+	add		r0, r0, #1 << MMU_I7SET				                       
+	tst		r0, #1 << (MMU_NSET + MMU_I7SET)	                     
 	beq		fpud_line
-	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET) // clear set overflow
-	adds	r0, r0, #1 << MMU_I7WAY				 // increment way
-	bcc		fpud_way							 // loop
+	bic		r0, r0, #1 << (MMU_NSET + MMU_I7SET)                      
+	adds	r0, r0, #1 << MMU_I7WAY				                 
+	bcc		fpud_way							        
 	dsb
 	bx		lr
 
-/*
- *	void FlushPoC_DcacheRegion(vm_offset_t va, unsigned length)
- *
- *		Clean and Invalidate d-cache region to Point of Coherency
- */
+  
+                                                              
+  
+                                                             
+   
 	.text
 	.align 2
 	.globl EXT(FlushPoC_DcacheRegion)
 LEXT(FlushPoC_DcacheRegion)
 	and		r2, r0, #((1<<MMU_CLINE)-1)
-	bic		r0, r0, #((1<<MMU_CLINE)-1)			// Cached aligned 
+	bic		r0, r0, #((1<<MMU_CLINE)-1)			                  
 	add		r1, r1, r2
 	sub		r1, r1, #1
-	mov		r1, r1, LSR #MMU_CLINE				// Set cache line counter
+	mov		r1, r1, LSR #MMU_CLINE				                         
 	dsb
 cfmdr_loop:
-	mcr		p15, 0, r0, c7, c14, 1				// Clean & invalidate dcache line
-	add		r0, r0, #1<<MMU_CLINE				// Get next cache aligned addr
-	subs	r1, r1, #1							// Decrementer cache line counter
-	bpl		cfmdr_loop							// Loop in counter not null
+	mcr		p15, 0, r0, c7, c14, 1				                                 
+	add		r0, r0, #1<<MMU_CLINE				                              
+	subs	r1, r1, #1							                                 
+	bpl		cfmdr_loop							                           
 	dsb
 	bx		lr
 
-/*
- *      void flush_dcache64(addr64_t addr, unsigned length, boolean_t phys)
- */
+  
+                                                                           
+   
         .text
         .align 2
         .globl EXT(flush_dcache64)
@@ -341,9 +341,9 @@ LEXT(flush_dcache64)
 	mov	r2, r3
 	LOAD_ADDR_PC(flush_dcache)
 
-/*
- *      void clean_dcache64(addr64_t addr, unsigned length, boolean_t phys)
- */
+  
+                                                                           
+   
         .text
         .align 2
         .globl EXT(clean_dcache64)
@@ -352,10 +352,10 @@ LEXT(clean_dcache64)
 	mov	r2, r3
 	LOAD_ADDR_PC(clean_dcache)
 
-/*
- *      void invalidate_icache(vm_offset_t va, unsigned length, boolean_t phys)
- *      void invalidate_icache64(addr64_t va, unsigned length, boolean_t phys)
- */
+  
+                                                                               
+                                                                              
+   
         .text
         .align 2
         .globl EXT(invalidate_icache64)
@@ -364,7 +364,7 @@ LEXT(invalidate_icache64)
 	mov	r1, r2
 	mov	r2, r3
 LEXT(invalidate_icache)
-	cmp		r2, #0		// Is it physical?
+	cmp		r2, #0		                  
 	COND_EXTERN_BEQ(InvalidatePoU_IcacheRegion)
 	LOAD_ADDR(r2, gPhysBase)
 	ldr		r2, [r2]
@@ -380,4 +380,4 @@ LEXT(invalidate_icache)
 LOAD_ADDR_GEN_DEF(flush_dcache)
 LOAD_ADDR_GEN_DEF(clean_dcache)
 
-/* vim: set ts=4: */
+                    

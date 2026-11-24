@@ -64,10 +64,10 @@ SYSCTL_PROC(_machdep, OID_AUTO, wake_conttime,
     0, 0, sysctl_wake_conttime, "I",
     "Continuous Time at the last wakeup");
 
-/*
- * For source compatibility, here's some machdep.cpu mibs that
- * use host_info() to simulate reasonable answers.
- */
+  
+                                                              
+                                                  
+   
 
 SYSCTL_NODE(_machdep, OID_AUTO, cpu, CTLFLAG_RW | CTLFLAG_LOCKED, 0,
     "CPU info");
@@ -95,12 +95,12 @@ arm_host_info SYSCTL_HANDLER_ARGS
 	return SYSCTL_OUT(req, &datum, sizeof(datum));
 }
 
-/*
- * machdep.cpu.cores_per_package
- *
- * x86: derived from CPUID data.
- * ARM: how many physical cores we have in the AP; aka hw.physicalcpu_max
- */
+  
+                                
+  
+                                
+                                                                         
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, cores_per_package,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -108,12 +108,12 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, cores_per_package,
     sizeof(integer_t),
     arm_host_info, "I", "CPU cores per package");
 
-/*
- * machdep.cpu.core_count
- *
- * x86: derived from CPUID data.
- * ARM: # active physical cores in the AP; aka hw.physicalcpu
- */
+  
+                         
+  
+                                
+                                                             
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, core_count,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -121,13 +121,13 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, core_count,
     sizeof(integer_t),
     arm_host_info, "I", "Number of enabled cores per package");
 
-/*
- * machdep.cpu.logical_per_package
- *
- * x86: derived from CPUID data. Returns ENOENT if HTT bit not set, but
- *      most x64 CPUs have that, so assume it's available.
- * ARM: total # logical cores in the AP; aka hw.logicalcpu_max
- */
+  
+                                  
+  
+                                                                       
+                                                          
+                                                              
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, logical_per_package,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -135,12 +135,12 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, logical_per_package,
     sizeof(integer_t),
     arm_host_info, "I", "CPU logical cpus per package");
 
-/*
- * machdep.cpu.thread_count
- *
- * x86: derived from CPUID data.
- * ARM: # active logical cores in the AP; aka hw.logicalcpu
- */
+  
+                           
+  
+                                
+                                                           
+   
 static
 SYSCTL_PROC(_machdep_cpu, OID_AUTO, thread_count,
     CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_LOCKED,
@@ -148,14 +148,14 @@ SYSCTL_PROC(_machdep_cpu, OID_AUTO, thread_count,
     sizeof(integer_t),
     arm_host_info, "I", "Number of enabled threads per package");
 
-/*
- * machdep.cpu.brand_string
- *
- * x86: derived from CPUID data.
- * ARM: cons something up from the CPUID register. Could include cpufamily
- *	here and map it to a "marketing" name, but there's no obvious need;
- *      the value is already exported via the commpage. So keep it simple.
- */
+  
+                           
+  
+                                
+                                                                          
+                                                                      
+                                                                          
+   
 static int
 make_brand_string SYSCTL_HANDLER_ARGS
 {

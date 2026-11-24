@@ -38,9 +38,9 @@
 
 #include <security/mac_internal.h>
 
-/*
- * Caller holds I/O reference on vnode
- */
+  
+                                      
+   
 int
 vnode_label(struct mount *mp, struct vnode *dvp, struct vnode *vp,
     struct componentname *cnp, int flags, vfs_context_t ctx)
@@ -48,9 +48,9 @@ vnode_label(struct mount *mp, struct vnode *dvp, struct vnode *vp,
 	int error = 0;
 	bool exit_fast;
 
-	/* fast path checks... */
+	                         
 
-	/* are we labeling vnodes? If not still notify of create */
+	                                                           
 #if CONFIG_MACF_LAZY_VNODE_LABELS
 	exit_fast = true;
 #else
@@ -64,18 +64,18 @@ vnode_label(struct mount *mp, struct vnode *dvp, struct vnode *vp,
 		return 0;
 	}
 
-	/* if already VL_LABELED */
+	                           
 	if (vp->v_lflag & VL_LABELED) {
 		return 0;
 	}
 
 	vnode_lock_spin(vp);
 
-	/*
-	 * must revalidate state once we hold the lock
-	 * since we could have blocked and someone else
-	 * has since labeled this vnode
-	 */
+	  
+                                               
+                                                
+                                
+    
 	if (vp->v_lflag & VL_LABELED) {
 		vnode_unlock(vp);
 		return 0;
@@ -84,7 +84,7 @@ vnode_label(struct mount *mp, struct vnode *dvp, struct vnode *vp,
 	if ((vp->v_lflag & VL_LABEL) == 0) {
 		vp->v_lflag |= VL_LABEL;
 
-		/* Could sleep on disk I/O, drop lock. */
+		                                         
 		vnode_unlock(vp);
 
 		if (vp->v_label == NULL) {
@@ -127,7 +127,7 @@ vnode_label(struct mount *mp, struct vnode *dvp, struct vnode *vp,
 				break;
 			}
 		}
-		/* XXX: what should be done if labeling failed (above)? */
+		                                                          
 	}
 	vnode_unlock(vp);
 
@@ -135,32 +135,32 @@ vnode_label(struct mount *mp, struct vnode *dvp, struct vnode *vp,
 }
 
 
-/*
- * Clear the "labeled" flag on a VNODE.
- * VNODE will have label re-associated upon
- * next call to lookup().
- *
- * Caller verifies vfs_flags(vnode_mount(vp)) & MNT_MULTILABEL
- * Caller holds vnode lock.
- */
+  
+                                       
+                                           
+                         
+  
+                                                              
+                           
+   
 void
 vnode_relabel(struct vnode *vp)
 {
-	/* Wait for any other labeling to complete. */
+	                                              
 	while (vp->v_lflag & VL_LABEL) {
 		vp->v_lflag |= VL_LABELWAIT;
 		(void)msleep(&vp->v_label, &vp->v_lock, PVFS, "vnode_relabel", 0);
 	}
 
-	/* Clear labeled flag */
+	                        
 	vp->v_lflag &= ~VL_LABELED;
 
 	return;
 }
 
-/*
- * VFS XATTR helpers.
- */
+  
+                     
+   
 
 int
 mac_vnop_setxattr(struct vnode *vp, const char *name, char *buf, size_t len)

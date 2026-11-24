@@ -37,10 +37,10 @@ spawn_process(char *action, char *serviceName, char *extraArg,
 			T_LOG("Using %s to spawn process with 4k", VM_SPAWN_TOOL);
 			argv[arg_index++] = VM_SPAWN_TOOL;
 		} else {
-			/*
-			 * We didnt find debug.vm.mixed_page.supported OR its set to 0.
-			 * Skip the test.
-			 */
+			  
+                                                                  
+                    
+      
 			T_SKIP("Hardware doesn't support 4K pages, skipping test...");
 			exit(0);
 		}
@@ -109,10 +109,10 @@ mach_client()
 	message.header.msgh_local_port = replyPort;
 	message.header.msgh_size = sizeof(message);
 
-	/* reply creation is not necessary in this case.
-	 *  mach_msg_size_t replySize = sizeof(ipc_message_t) + sizeof(mach_msg_trailer_t) + 64;
-	 *  ipc_message_t *reply = calloc(1, replySize);
-	 */
+	                                                
+                                                                                         
+                                                 
+    
 	T_LOG("sending message to %d of size %u", message.header.msgh_remote_port, message.header.msgh_size);
 	kern_return_t ret = mach_msg(&message.header, MACH_SEND_MSG, message.header.msgh_size, 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 	T_ASSERT_MACH_SUCCESS(ret, "mach_msg to serverProcess");
@@ -150,14 +150,14 @@ T_DECL(memory_share_tests,
 	mach_client();
 }
 
-/*
- * This posix spawn attribute used in the 4K test should only be valid on apple
- * silicon macs. But we've had issues in the past where it would accidently
- * trigger incorrect behavior on other platforms.
- * So we run the test on all platforms to catch issues like that.
- * On all non apple silcon mac platforms, this test should be identical to
- * running without the 4K flag.
- */
+  
+                                                                               
+                                                                           
+                                                 
+                                                                 
+                                                                          
+                               
+   
 T_DECL_REF(memory_share_tests_4k, memory_share_tests, "vm memory sharing with 4k processes",
     T_META_ENVVAR("USE4K=YES"),
     T_META_ASROOT(true)

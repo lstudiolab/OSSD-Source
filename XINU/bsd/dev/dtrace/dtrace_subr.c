@@ -45,20 +45,20 @@ extern bool csr_unsafe_kernel_text;
 #endif
 #endif
 
-/*
- * APPLE NOTE: Solaris proc_t is the struct.
- * Darwin's proc_t is a pointer to it.
- */
-#define proc_t struct proc /* Steer clear of the Darwin typedef for proc_t */
+  
+                                            
+                                      
+   
+#define proc_t struct proc                                                   
 
 
-/* Copied from an arch specific dtrace_subr.c. */
+                                                 
 int (*dtrace_fasttrap_probe_ptr)(struct regs *);
 
-/*
- * Following DTrace hooks are taken from Solaris' dtrace_subr.c
- * They're assigned in dtrace.c but Darwin never calls them.
- */
+  
+                                                               
+                                                            
+   
 void (*dtrace_cpu_init)(processorid_t);
 int (*dtrace_modload)(struct kmod_info *, uint32_t);
 int (*dtrace_modunload)(struct kmod_info *);
@@ -77,15 +77,15 @@ void (*dtrace_fasttrap_fork_ptr)(proc_t *, proc_t *);
 void (*dtrace_fasttrap_exec_ptr)(proc_t *);
 void (*dtrace_fasttrap_exit_ptr)(proc_t *);
 
-/*
- * This function is called by cfork() in the event that it appears that
- * there may be dtrace tracepoints active in the parent process's address
- * space. This first confirms the existence of dtrace tracepoints in the
- * parent process and calls into the fasttrap module to remove the
- * corresponding tracepoints from the child. By knowing that there are
- * existing tracepoints, and ensuring they can't be removed, we can rely
- * on the fasttrap module remaining loaded.
- */
+  
+                                                                       
+                                                                         
+                                                                        
+                                                                  
+                                                                      
+                                                                        
+                                           
+   
 void
 dtrace_fasttrap_fork(proc_t *p, proc_t *cp)
 {
@@ -95,18 +95,18 @@ dtrace_fasttrap_fork(proc_t *p, proc_t *cp)
 }
 
 
-/*
- * DTrace wait for process execution
- *
- * This feature is using a list of entries, each entry containing a pointer
- * on a process description. The description is provided by a client, and it
- * contains the command we want to wait for along with a reserved space for
- * the caught process id.
- *
- * Once an awaited process has been spawned, it will be suspended before
- * notifying the client. Once the client has been back to userland, it's its
- * duty to resume the task.
- */
+  
+                                    
+  
+                                                                           
+                                                                            
+                                                                           
+                         
+  
+                                                                        
+                                                                            
+                           
+   
 
 LCK_MTX_DECLARE_ATTR(dtrace_procwaitfor_lock, &dtrace_lck_grp, &dtrace_lck_attr);
 
@@ -162,23 +162,23 @@ dtrace_proc_exec_notification(proc_t *p) {
 	lck_mtx_lock(&dtrace_procwaitfor_lock);
 
 	LIST_FOREACH_SAFE(entry, &dtrace_proc_awaited_head, entries, tmp) {
-		/* By default consider we're using p_comm. */
+		                                             
 		char *pname = p->p_comm;
 
-		/* Already matched with another process. */
+		                                           
 		if ((entry->pdesc->p_pid != -1))
 			continue;
 
-		/* p_comm is too short, use the execpath. */
+		                                            
 		if (entry->pdesc->p_name_length >= MAXCOMLEN) {
-			/*
-			 * Retrieve the executable path. After the call, length contains
-			 * the length of the string + 1.
-			 */
+			  
+                                                                   
+                                   
+      
 			int length = sizeof(execpath);
 			if (dtrace_proc_get_execpath(p, execpath, &length) != 0)
 				continue;
-			/* Move the cursor to the position after the last / */
+			                                                      
 			pname = &execpath[length - 1];
 			while (pname != execpath && *pname != '/')
 				pname--;
@@ -203,26 +203,26 @@ dtrace_proc_waitfor(dtrace_procdesc_t* pdesc) {
 	ASSERT(pdesc);
 	ASSERT(pdesc->p_name);
 
-	/*
-	 * Never trust user input, compute the length of the process name and ensure the
-	 * string is null terminated.
-	 */
+	  
+                                                                                 
+                              
+    
 	pdesc->p_name_length = (int) strnlen(pdesc->p_name, sizeof(pdesc->p_name));
 	if (pdesc->p_name_length >= (int) sizeof(pdesc->p_name))
 		return -1;
 
 	lck_mtx_lock(&dtrace_procwaitfor_lock);
 
-	/* Initialize and insert the entry, then install the hook. */
+	                                                             
 	pdesc->p_pid = -1;
 	entry.pdesc = pdesc;
 	LIST_INSERT_HEAD(&dtrace_proc_awaited_head, &entry, entries);
 	dtrace_proc_waitfor_exec_ptr = &dtrace_proc_exec_notification;
 
-	/* Sleep until the process has been executed */
+	                                               
 	res = msleep(&entry, &dtrace_procwaitfor_lock, PCATCH, "dtrace_proc_waitfor", NULL);
 
-	/* Remove the entry and the hook if it is not needed anymore. */
+	                                                                
 	LIST_REMOVE(&entry, entries);
 	if (LIST_EMPTY(&dtrace_proc_awaited_head))
 		dtrace_proc_waitfor_exec_ptr = NULL;
@@ -300,10 +300,10 @@ dtrace_ptrauth_strip(void *ptr, uint64_t key)
 {
 #pragma unused(key)
 #if __has_feature(ptrauth_calls)
-	/*
-	 * The key argument to ptrauth_strip needs to be a compile-time
-	 * constant
-	 */
+	  
+                                                                
+            
+    
 	switch (key) {
 	case ptrauth_key_asia:
 		return ptrauth_strip(ptr, ptrauth_key_asia);
@@ -318,7 +318,7 @@ dtrace_ptrauth_strip(void *ptr, uint64_t key)
 	}
 #else
 	return ptr;
-#endif // __has_feature(ptrauth_calls)
+#endif                                
 }
 
 int
@@ -330,7 +330,7 @@ dtrace_is_valid_ptrauth_key(uint64_t key)
 	    (key == ptrauth_key_asda) || (key == ptrauth_key_asdb);
 #else
 	return (0);
-#endif /* __has_feature(ptrauth_calls) */
+#endif                                   
 }
 
 uint64_t
@@ -399,7 +399,7 @@ dtrace_state_allocate(minor_t minor)
 {
 	dtrace_state_t *state = _MALLOC(sizeof(dtrace_state_t), M_TEMP, M_ZERO | M_WAITOK);
 	if (dtrace_casptr(&dtrace_clients[minor], NULL, state) != NULL) {
-		// We have been raced by another client for this number, abort
+		                                                              
 		_FREE(state, M_TEMP);
 		return NULL;
 	}
@@ -421,9 +421,9 @@ dtrace_restriction_policy_load(void)
 {
 }
 
-/*
- * Check if DTrace has been restricted by the current security policy.
- */
+  
+                                                                      
+   
 boolean_t
 dtrace_is_restricted(void)
 {
@@ -465,9 +465,9 @@ dtrace_sdt_probes_restricted(void)
 	return FALSE;
 }
 
-/*
- * Check if the process can be attached.
- */
+  
+                                        
+   
 boolean_t
 dtrace_can_attach_to_proc(proc_t *proc)
 {

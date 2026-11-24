@@ -32,65 +32,65 @@
 #include <sys/cdefs.h>
 #include <machine/_types.h>
 
-/*
- * Type definitions; takes common type definitions that must be used
- * in multiple header files due to [XSI], removes them from the system
- * space, and puts them in the implementation space.
- */
+  
+                                                                    
+                                                                      
+                                                    
+   
 
 #ifdef __cplusplus
 #ifdef __GNUG__
 #define __DARWIN_NULL __null
-#else /* ! __GNUG__ */
+#else                 
 #ifdef __LP64__
 #define __DARWIN_NULL (0L)
-#else /* !__LP64__ */
+#else                
 #define __DARWIN_NULL 0
-#endif /* __LP64__ */
-#endif /* __GNUG__ */
-#else /* ! __cplusplus */
+#endif               
+#endif               
+#else                    
 #define __DARWIN_NULL ((void *)0)
-#endif /* __cplusplus */
+#endif                  
 
 #if !defined(DRIVERKIT)
-typedef __int64_t       __darwin_blkcnt_t;      /* total blocks */
-typedef __int32_t       __darwin_blksize_t;     /* preferred block size */
-typedef __int32_t       __darwin_dev_t;         /* dev_t */
-typedef unsigned int    __darwin_fsblkcnt_t;    /* Used by statvfs and fstatvfs */
-typedef unsigned int    __darwin_fsfilcnt_t;    /* Used by statvfs and fstatvfs */
-typedef __uint32_t      __darwin_gid_t;         /* [???] process and group IDs */
-typedef __uint32_t      __darwin_id_t;          /* [XSI] pid_t, uid_t, or gid_t*/
-typedef __uint64_t      __darwin_ino64_t;       /* [???] Used for 64 bit inodes */
+typedef __int64_t       __darwin_blkcnt_t;                        
+typedef __int32_t       __darwin_blksize_t;                               
+typedef __int32_t       __darwin_dev_t;                    
+typedef unsigned int    __darwin_fsblkcnt_t;                                      
+typedef unsigned int    __darwin_fsfilcnt_t;                                      
+typedef __uint32_t      __darwin_gid_t;                                          
+typedef __uint32_t      __darwin_id_t;                                           
+typedef __uint64_t      __darwin_ino64_t;                                         
 #if __DARWIN_64_BIT_INO_T
-typedef __darwin_ino64_t __darwin_ino_t;        /* [???] Used for inodes */
-#else /* !__DARWIN_64_BIT_INO_T */
-typedef __uint32_t      __darwin_ino_t;         /* [???] Used for inodes */
-#endif /* __DARWIN_64_BIT_INO_T */
-typedef __darwin_natural_t __darwin_mach_port_name_t; /* Used by mach */
-typedef __darwin_mach_port_name_t __darwin_mach_port_t; /* Used by mach */
-typedef __uint16_t      __darwin_mode_t;        /* [???] Some file attributes */
-typedef __int64_t       __darwin_off_t;         /* [???] Used for file sizes */
-typedef __int32_t       __darwin_pid_t;         /* [???] process and group IDs */
-typedef __uint32_t      __darwin_sigset_t;      /* [???] signal set */
-typedef __int32_t       __darwin_suseconds_t;   /* [???] microseconds */
-typedef __uint32_t      __darwin_uid_t;         /* [???] user IDs */
-typedef __uint32_t      __darwin_useconds_t;    /* [???] microseconds */
-#endif /* !defined(DRIVERKIT) */
+typedef __darwin_ino64_t __darwin_ino_t;                                   
+#else                             
+typedef __uint32_t      __darwin_ino_t;                                    
+#endif                            
+typedef __darwin_natural_t __darwin_mach_port_name_t;                   
+typedef __darwin_mach_port_name_t __darwin_mach_port_t;                   
+typedef __uint16_t      __darwin_mode_t;                                        
+typedef __int64_t       __darwin_off_t;                                        
+typedef __int32_t       __darwin_pid_t;                                          
+typedef __uint32_t      __darwin_sigset_t;                            
+typedef __int32_t       __darwin_suseconds_t;                           
+typedef __uint32_t      __darwin_uid_t;                             
+typedef __uint32_t      __darwin_useconds_t;                            
+#endif                          
 typedef unsigned char   __darwin_uuid_t[16];
 typedef char    __darwin_uuid_string_t[37];
 
 #if !defined(KERNEL) && !defined(DRIVERKIT)
 #include <sys/_pthread/_pthread_types.h>
-#endif /* !defined(KERNEL) && !defined(DRIVERKIT) */
+#endif                                              
 
 #if defined(__GNUC__) && (__GNUC__ == 3 && __GNUC_MINOR__ >= 5 || __GNUC__ > 3)
 #define __offsetof(type, field) __builtin_offsetof(type, field)
-#else /* !(gcc >= 3.5) */
+#else                    
 #define __offsetof(type, field) ((size_t)(&((type *)0)->field))
-#endif /* (gcc >= 3.5) */
+#endif                   
 
 #ifdef KERNEL
 #include <sys/_types/_offsetof.h>
-#endif /* KERNEL */
+#endif             
 
-#endif  /* _SYS__TYPES_H_ */
+#endif                      

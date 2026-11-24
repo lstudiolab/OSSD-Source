@@ -20,22 +20,22 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-/*
- * Relocation types used in the arm64 implementation.
- */
+  
+                                                     
+   
 enum reloc_type_arm64
 {
-    ARM64_RELOC_UNSIGNED,	  // for pointers
-    ARM64_RELOC_SUBTRACTOR,       // must be followed by a ARM64_RELOC_UNSIGNED
-    ARM64_RELOC_BRANCH26,         // a B/BL instruction with 26-bit displacement
-    ARM64_RELOC_PAGE21,           // pc-rel distance to page of target
-    ARM64_RELOC_PAGEOFF12,        // offset within page, scaled by r_length
-    ARM64_RELOC_GOT_LOAD_PAGE21,  // pc-rel distance to page of GOT slot
-    ARM64_RELOC_GOT_LOAD_PAGEOFF12, // offset within page of GOT slot,
-                                    //  scaled by r_length
-    ARM64_RELOC_POINTER_TO_GOT,   // for pointers to GOT slots
-    ARM64_RELOC_TLVP_LOAD_PAGE21, // pc-rel distance to page of TLVP slot
-    ARM64_RELOC_TLVP_LOAD_PAGEOFF12, // offset within page of TLVP slot,
-                                     //  scaled by r_length
-    ARM64_RELOC_ADDEND		  // must be followed by PAGE21 or PAGEOFF12
+    ARM64_RELOC_UNSIGNED,	                 
+    ARM64_RELOC_SUBTRACTOR,                                                    
+    ARM64_RELOC_BRANCH26,                                                       
+    ARM64_RELOC_PAGE21,                                               
+    ARM64_RELOC_PAGEOFF12,                                                 
+    ARM64_RELOC_GOT_LOAD_PAGE21,                                        
+    ARM64_RELOC_GOT_LOAD_PAGEOFF12,                                   
+                                                          
+    ARM64_RELOC_POINTER_TO_GOT,                               
+    ARM64_RELOC_TLVP_LOAD_PAGE21,                                        
+    ARM64_RELOC_TLVP_LOAD_PAGEOFF12,                                    
+                                                           
+    ARM64_RELOC_ADDEND		                                            
 };

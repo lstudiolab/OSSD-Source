@@ -43,7 +43,7 @@
 #define kReceiptInfoSegment                "__RECEIPT_INFO"
 #define kAuxKCReceiptSection               "__aux_kc_receipt"
 
-// __DATA segment
+                 
 #define kBuiltinInitSection                "__kmod_init"
 #define kBuiltinTermSection                "__kmod_term"
 
@@ -64,4 +64,4 @@
 #define kKCBranchStubs                     "__BRANCH_STUBS"
 #define kKCBranchGots                      "__BRANCH_GOTS"
 
-#endif /* _PRELINK_H_ */
+#endif                  

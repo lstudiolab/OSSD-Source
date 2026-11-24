@@ -46,7 +46,7 @@ for line in bl.readlines():
 	}},""".format(kext, func, type_map(ty))
 	nentries += 1
 
-# add space for new entries added at runtime
+                                            
 print ''
 print r'	/* Unused entries that can be populated at runtime */'
 for i in xrange(0, extra_entries):

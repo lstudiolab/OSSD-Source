@@ -47,7 +47,7 @@ IOGetBootKeyStoreData(void);
 void
 IOSetKeyStoreData(IOMemoryDescriptor * data);
 
-// APFS
+       
 static volatile UInt32 apfsKeyFetched = 0;
 static IOMemoryDescriptor* apfsKeyData = NULL;
 
@@ -125,36 +125,36 @@ IOGetBootKeyStoreData(void)
 	return memoryDescriptor;
 }
 
-// APFS volume key fetcher
+                          
 
-// Store in-memory key (could be used by IOHibernateDone)
+                                                         
 void
 IOSetAPFSKeyStoreData(IOMemoryDescriptor* data)
 {
-	// Do not allow re-fetching of the boot_args key by passing NULL here.
+	                                                                      
 	if (data != NULL) {
 		apfsKeyData = data;
 		apfsKeyFetched = 0;
 	}
 }
 
-// Retrieve any key we may have (stored in boot_args or by Hibernate)
+                                                                     
 IOMemoryDescriptor*
 IOGetAPFSKeyStoreData()
 {
-	// Check if someone got the key before us
+	                                         
 	if (!OSCompareAndSwap(0, 1, &apfsKeyFetched)) {
 		return NULL;
 	}
 
-	// Do we have in-memory key?
+	                            
 	if (apfsKeyData) {
 		IOMemoryDescriptor* data = apfsKeyData;
 		apfsKeyData = NULL;
 		return data;
 	}
 
-	// Looks like there was no in-memory key and it's the first call - try boot_args
+	                                                                                
 	boot_args* args = (boot_args*)PE_state.bootArgs;
 
 	DEBG("%s: data at address %u size %u\n", __func__, args->apfsDataStart, args->apfsDataSize);
@@ -162,7 +162,7 @@ IOGetAPFSKeyStoreData()
 		return NULL;
 	}
 
-	// We have the key in the boot_args, create IOMemoryDescriptor for the blob
+	                                                                           
 	IOAddressRange ranges;
 	ranges.address = args->apfsDataStart;
 	ranges.length = args->apfsDataSize;
@@ -174,13 +174,13 @@ IOGetAPFSKeyStoreData()
 	return memoryDescriptor;
 }
 
-// ARV Root Hash fetcher
+                        
 
-// Retrieve any root hash we may have (stored in boot_args)
+                                                           
 IOMemoryDescriptor*
 IOGetARVRootHashData(void)
 {
-	// Check if someone got the root hash before us
+	                                               
 	if (!OSCompareAndSwap(0, 1, &ARVRootHashFetched)) {
 		return NULL;
 	}
@@ -192,7 +192,7 @@ IOGetARVRootHashData(void)
 		return NULL;
 	}
 
-	// We have the root hash in the boot_args, create IOMemoryDescriptor for the blob
+	                                                                                 
 	IOAddressRange ranges;
 	ranges.address = args->arvRootHashStart;
 	ranges.length = args->arvRootHashSize;
@@ -204,12 +204,12 @@ IOGetARVRootHashData(void)
 	return memoryDescriptor;
 }
 
-// Base System Analogue
+                       
 
 IOMemoryDescriptor*
 IOGetBaseSystemARVRootHashData(void)
 {
-	// Check if someone got the base system root hash before us
+	                                                           
 	if (!OSCompareAndSwap(0, 1, &bsARVRootHashFetched)) {
 		return NULL;
 	}
@@ -221,7 +221,7 @@ IOGetBaseSystemARVRootHashData(void)
 		return NULL;
 	}
 
-	// We have the base system root hash in the boot_args, create IOMemoryDescriptor for the blob
+	                                                                                             
 	IOAddressRange ranges;
 	ranges.address = args->bsARVRootHashStart;
 	ranges.length = args->bsARVRootHashSize;
@@ -249,13 +249,13 @@ IOBaseSystemARVRootHashAvailable(void)
 	return true;
 }
 
-// ARV Manifest fetcher
+                       
 
-// Retrieve any manifest we may have (stored in boot_args)
+                                                          
 IOMemoryDescriptor*
 IOGetARVManifestData(void)
 {
-	// Check if someone got the manifest before us
+	                                              
 	if (!OSCompareAndSwap(0, 1, &ARVManifestFetched)) {
 		return NULL;
 	}
@@ -267,7 +267,7 @@ IOGetARVManifestData(void)
 		return NULL;
 	}
 
-	// We have the manifest in the boot_args, create IOMemoryDescriptor for the blob
+	                                                                                
 	IOAddressRange ranges;
 	ranges.address = args->arvManifestStart;
 	ranges.length = args->arvManifestSize;
@@ -279,12 +279,12 @@ IOGetARVManifestData(void)
 	return memoryDescriptor;
 }
 
-// Base System Analogue
+                       
 
 IOMemoryDescriptor*
 IOGetBaseSystemARVManifestData(void)
 {
-	// Check if someone got the base system manifest before us
+	                                                          
 	if (!OSCompareAndSwap(0, 1, &bsARVManifestFetched)) {
 		return NULL;
 	}
@@ -296,7 +296,7 @@ IOGetBaseSystemARVManifestData(void)
 		return NULL;
 	}
 
-	// We have the manifest in the boot_args, create IOMemoryDescriptor for the blob
+	                                                                                
 	IOAddressRange ranges;
 	ranges.address = args->bsARVManifestStart;
 	ranges.length = args->bsARVManifestSize;

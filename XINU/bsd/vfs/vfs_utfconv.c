@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- *      Includes Unicode 3.2 decomposition code derived from Core Foundation
- */
+  
+                                                                            
+   
 
 #include <sys/param.h>
 #include <sys/utfconv.h>
@@ -42,23 +42,23 @@
 #include <assert.h>
 #endif
 
-/*
- * UTF-8 (Unicode Transformation Format)
- *
- * UTF-8 is the Unicode Transformation Format that serializes a Unicode
- * character as a sequence of one to four bytes. Only the shortest form
- * required to represent the significant Unicode bits is legal.
- *
- * UTF-8 Multibyte Codes
- *
- * Bytes   Bits   Unicode Min  Unicode Max   UTF-8 Byte Sequence (binary)
- * -----------------------------------------------------------------------------
- *   1       7       0x0000        0x007F    0xxxxxxx
- *   2      11       0x0080        0x07FF    110xxxxx 10xxxxxx
- *   3      16       0x0800        0xFFFF    1110xxxx 10xxxxxx 10xxxxxx
- *   4      21      0x10000      0x10FFFF    11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
- * -----------------------------------------------------------------------------
- */
+  
+                                        
+  
+                                                                       
+                                                                       
+                                                               
+  
+                        
+  
+                                                                         
+                                                                                
+                                                     
+                                                              
+                                                                       
+                                                                                
+                                                                                
+   
 
 
 #define UNICODE_TO_UTF8_LEN(c)  \
@@ -66,7 +66,7 @@
 
 #define UCS_ALT_NULL    0x2400
 
-/* Surrogate Pair Constants */
+                              
 #define SP_HALF_SHIFT   10
 #define SP_HALF_BASE    0x0010000u
 #define SP_HALF_MASK    0x3FFu
@@ -80,12 +80,12 @@
 #include "vfs_utfconvdata.h"
 
 
-/*
- * Test for a combining character.
- *
- * Similar to __CFUniCharIsNonBaseCharacter except that
- * unicode_combinable also includes Hangul Jamo characters.
- */
+  
+                                  
+  
+                                                       
+                                                           
+   
 int
 unicode_combinable(u_int16_t character)
 {
@@ -107,11 +107,11 @@ unicode_combinable(u_int16_t character)
 	return 0;
 }
 
-/*
- * Test for a precomposed character.
- *
- * Similar to __CFUniCharIsDecomposableCharacter.
- */
+  
+                                    
+  
+                                                 
+   
 int
 unicode_decomposeable(u_int16_t character)
 {
@@ -134,11 +134,11 @@ unicode_decomposeable(u_int16_t character)
 }
 
 
-/*
- * Get the combing class.
- *
- * Similar to CFUniCharGetCombiningPropertyForCharacter.
- */
+  
+                         
+  
+                                                        
+   
 static inline u_int8_t
 get_combining_class(u_int16_t character)
 {
@@ -175,30 +175,30 @@ const char hexdigits[16] = {
 	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 };
 
-/*
- * utf8_encodelen - Calculate the UTF-8 encoding length
- *
- * This function takes a Unicode input string, ucsp, of ucslen bytes
- * and calculates the size of the UTF-8 output in bytes (not including
- * a NULL termination byte). The string must reside in kernel memory.
- *
- * If '/' chars are possible in the Unicode input then an alternate
- * (replacement) char should be provided in altslash.
- *
- * FLAGS
- *    UTF_REVERSE_ENDIAN:  Unicode byte order is opposite current runtime
- *
- *    UTF_BIG_ENDIAN:  Unicode byte order is always big endian
- *
- *    UTF_LITTLE_ENDIAN:  Unicode byte order is always little endian
- *
- *    UTF_DECOMPOSED:  generate fully decomposed output
- *
- *    UTF_PRECOMPOSED is ignored since utf8_encodestr doesn't support it
- *
- * ERRORS
- *    None
- */
+  
+                                                       
+  
+                                                                    
+                                                                      
+                                                                     
+  
+                                                                   
+                                                     
+  
+        
+                                                                         
+  
+                                                              
+  
+                                                                    
+  
+                                                       
+  
+                                                                        
+  
+         
+          
+   
 size_t
 utf8_encodelen(const u_int16_t * ucsp, size_t ucslen, u_int16_t altslash, int flags)
 {
@@ -241,31 +241,31 @@ utf8_encodelen(const u_int16_t * ucsp, size_t ucslen, u_int16_t altslash, int fl
 }
 
 
-/*
- * utf8_encodestr - Encodes a Unicode string to UTF-8
- *
- * NOTES:
- *    The resulting UTF-8 string is NULL terminated.
- *
- *    If '/' chars are allowed on disk then an alternate
- *    (replacement) char must be provided in altslash.
- *
- * input flags:
- *    UTF_REVERSE_ENDIAN: Unicode byteorder is opposite current runtime
- *
- *    UTF_BIG_ENDIAN:  Unicode byte order is always big endian
- *
- *    UTF_LITTLE_ENDIAN:  Unicode byte order is always little endian
- *
- *    UTF_DECOMPOSED:  generate fully decomposed output
- *
- *    UTF_NO_NULL_TERM:  don't add NULL termination to UTF-8 output
- *
- * result:
- *    ENAMETOOLONG: Name didn't fit; only buflen bytes were encoded
- *
- *    EINVAL: Illegal char found; char was replaced by an '_'.
- */
+  
+                                                     
+  
+         
+                                                    
+  
+                                                        
+                                                      
+  
+               
+                                                                       
+  
+                                                              
+  
+                                                                    
+  
+                                                       
+  
+                                                                   
+  
+          
+                                                                   
+  
+                                                              
+   
 int
 utf8_encodestr(const u_int16_t * ucsp, size_t ucslen, u_int8_t * utf8p,
     size_t * utf8len, size_t buflen, u_int16_t altslash, int flags)
@@ -305,7 +305,7 @@ utf8_encodestr(const u_int16_t * ucsp, size_t ucslen, u_int8_t * utf8p,
 			}
 		}
 
-		/* Slash and NULL are not permitted */
+		                                      
 		if (ucs_ch == '/') {
 			if (altslash) {
 				ucs_ch = altslash;
@@ -331,13 +331,13 @@ utf8_encodestr(const u_int16_t * ucsp, size_t ucslen, u_int8_t * utf8p,
 			*utf8p++ = 0xc0 | (u_int8_t)(ucs_ch >> 6);
 			*utf8p++ = 0x80 | (0x3f & ucs_ch);
 		} else {
-			/* These chars never valid Unicode. */
+			                                      
 			if (ucs_ch == 0xFFFE || ucs_ch == 0xFFFF) {
 				result = EINVAL;
 				break;
 			}
 
-			/* Combine valid surrogate pairs */
+			                                   
 			if (ucs_ch >= SP_HIGH_FIRST && ucs_ch <= SP_HIGH_LAST
 			    && charcnt > 0) {
 				u_int16_t ch2;
@@ -388,53 +388,53 @@ utf8_encodestr(const u_int16_t * ucsp, size_t ucslen, u_int8_t * utf8p,
 	return result;
 }
 
-// Pushes a character taking account of combining character sequences
+                                                                     
 static void
 push(uint16_t ucs_ch, int *combcharcnt, uint16_t **ucsp)
 {
-	/*
-	 * Make multiple combining character sequences canonical
-	 */
+	  
+                                                         
+    
 	if (unicode_combinable(ucs_ch)) {
-		++*combcharcnt;         /* start tracking a run */
+		++*combcharcnt;                                   
 	} else if (*combcharcnt) {
 		if (*combcharcnt > 1) {
 			prioritysort(*ucsp - *combcharcnt, *combcharcnt);
 		}
-		*combcharcnt = 0;       /* start over */
+		*combcharcnt = 0;                       
 	}
 
 	*(*ucsp)++ = ucs_ch;
 }
 
-/*
- * utf8_decodestr - Decodes a UTF-8 string back to Unicode
- *
- * NOTES:
- *    The input UTF-8 string does not need to be null terminated
- *    if utf8len is set.
- *
- *    If '/' chars are allowed on disk then an alternate
- *    (replacement) char must be provided in altslash.
- *
- * input flags:
- *    UTF_REV_ENDIAN:  Unicode byte order is opposite current runtime
- *
- *    UTF_BIG_ENDIAN:  Unicode byte order is always big endian
- *
- *    UTF_LITTLE_ENDIAN:  Unicode byte order is always little endian
- *
- *    UTF_DECOMPOSED:  generate fully decomposed output (NFD)
- *
- *    UTF_PRECOMPOSED:  generate precomposed output (NFC)
- *
- *    UTF_ESCAPE_ILLEGAL:  percent escape any illegal UTF-8 input
- *
- * result:
- *    ENAMETOOLONG: Name didn't fit; only ucslen chars were decoded.
- *
- *    EINVAL: Illegal UTF-8 sequence found.
- */
+  
+                                                          
+  
+         
+                                                                
+                        
+  
+                                                        
+                                                      
+  
+               
+                                                                     
+  
+                                                              
+  
+                                                                    
+  
+                                                             
+  
+                                                         
+  
+                                                                 
+  
+          
+                                                                    
+  
+                                           
+   
 int
 utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
     size_t *ucslen, size_t buflen, u_int16_t altslash, int flags)
@@ -462,7 +462,7 @@ utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
 			goto toolong;
 		}
 
-		/* check for ascii */
+		                     
 		if (byte < 0x80) {
 			ucs_ch = sfmconv ? ucs_to_sfm((u_int16_t)byte, utf8len == 0) : byte;
 		} else {
@@ -476,8 +476,8 @@ utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
 
 			switch (extrabytes) {
 			case 1:
-				ch = byte; ch <<= 6;   /* 1st byte */
-				byte = *utf8p++;       /* 2nd byte */
+				ch = byte; ch <<= 6;                 
+				byte = *utf8p++;                     
 				if ((byte >> 6) != 2) {
 					goto escape2;
 				}
@@ -489,13 +489,13 @@ utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
 				ucs_ch = ch;
 				break;
 			case 2:
-				ch = byte; ch <<= 6;   /* 1st byte */
-				byte = *utf8p++;       /* 2nd byte */
+				ch = byte; ch <<= 6;                 
+				byte = *utf8p++;                     
 				if ((byte >> 6) != 2) {
 					goto escape2;
 				}
 				ch += byte; ch <<= 6;
-				byte = *utf8p++;       /* 3rd byte */
+				byte = *utf8p++;                     
 				if ((byte >> 6) != 2) {
 					goto escape3;
 				}
@@ -515,18 +515,18 @@ utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
 				ucs_ch = ch;
 				break;
 			case 3:
-				ch = byte; ch <<= 6;   /* 1st byte */
-				byte = *utf8p++;       /* 2nd byte */
+				ch = byte; ch <<= 6;                 
+				byte = *utf8p++;                     
 				if ((byte >> 6) != 2) {
 					goto escape2;
 				}
 				ch += byte; ch <<= 6;
-				byte = *utf8p++;       /* 3rd byte */
+				byte = *utf8p++;                     
 				if ((byte >> 6) != 2) {
 					goto escape3;
 				}
 				ch += byte; ch <<= 6;
-				byte = *utf8p++;       /* 4th byte */
+				byte = *utf8p++;                     
 				if ((byte >> 6) != 2) {
 					goto escape4;
 				}
@@ -591,9 +591,9 @@ utf8_decodestr(const u_int8_t* utf8p, size_t utf8len, u_int16_t* ucsp,
 		push((u_int16_t)ucs_ch, &combcharcnt, &ucsp);
 		continue;
 
-		/*
-		 * Escape illegal UTF-8 into something legal.
-		 */
+		  
+                                               
+     
 escape4:
 		utf8p -= 3;
 		goto escape;
@@ -616,7 +616,7 @@ escape:
 			goto toolong;
 		}
 
-		/* Make a previous combining sequence canonical. */
+		                                                   
 		if (combcharcnt > 1) {
 			prioritysort(ucsp - combcharcnt, combcharcnt);
 		}
@@ -629,9 +629,9 @@ escape:
 		ucs_ch =  hexdigits[byte & 0x0F];
 		*ucsp++ = (u_int16_t)ucs_ch;
 	}
-	/*
-	 * Make a previous combining sequence canonical
-	 */
+	  
+                                                
+    
 	if (combcharcnt > 1) {
 		prioritysort(ucsp - combcharcnt, combcharcnt);
 	}
@@ -655,9 +655,9 @@ toolong:
 }
 
 
-/*
- * utf8_validatestr - Check for a valid UTF-8 string.
- */
+  
+                                                     
+   
 int
 utf8_validatestr(const u_int8_t* utf8p, size_t utf8len)
 {
@@ -668,7 +668,7 @@ utf8_validatestr(const u_int8_t* utf8p, size_t utf8len)
 
 	while (utf8len-- > 0 && (byte = *utf8p++) != '\0') {
 		if (byte < 0x80) {
-			continue;  /* plain ascii */
+			continue;                   
 		}
 		extrabytes = utf_extrabytes[byte >> 3];
 
@@ -679,8 +679,8 @@ utf8_validatestr(const u_int8_t* utf8p, size_t utf8len)
 
 		switch (extrabytes) {
 		case 1:
-			ch = byte; ch <<= 6;   /* 1st byte */
-			byte = *utf8p++;       /* 2nd byte */
+			ch = byte; ch <<= 6;                 
+			byte = *utf8p++;                     
 			if ((byte >> 6) != 2) {
 				goto invalid;
 			}
@@ -691,13 +691,13 @@ utf8_validatestr(const u_int8_t* utf8p, size_t utf8len)
 			}
 			break;
 		case 2:
-			ch = byte; ch <<= 6;   /* 1st byte */
-			byte = *utf8p++;       /* 2nd byte */
+			ch = byte; ch <<= 6;                 
+			byte = *utf8p++;                     
 			if ((byte >> 6) != 2) {
 				goto invalid;
 			}
 			ch += byte; ch <<= 6;
-			byte = *utf8p++;       /* 3rd byte */
+			byte = *utf8p++;                     
 			if ((byte >> 6) != 2) {
 				goto invalid;
 			}
@@ -716,18 +716,18 @@ utf8_validatestr(const u_int8_t* utf8p, size_t utf8len)
 			}
 			break;
 		case 3:
-			ch = byte; ch <<= 6;   /* 1st byte */
-			byte = *utf8p++;       /* 2nd byte */
+			ch = byte; ch <<= 6;                 
+			byte = *utf8p++;                     
 			if ((byte >> 6) != 2) {
 				goto invalid;
 			}
 			ch += byte; ch <<= 6;
-			byte = *utf8p++;       /* 3rd byte */
+			byte = *utf8p++;                     
 			if ((byte >> 6) != 2) {
 				goto invalid;
 			}
 			ch += byte; ch <<= 6;
-			byte = *utf8p++;       /* 4th byte */
+			byte = *utf8p++;                     
 			if ((byte >> 6) != 2) {
 				goto invalid;
 			}
@@ -751,29 +751,29 @@ invalid:
 	return EINVAL;
 }
 
-/*
- * utf8_normalizestr - Normalize a UTF-8 string (NFC or NFD)
- *
- * This function takes an UTF-8 input string, instr, of inlen bytes
- * and produces normalized UTF-8 output into a buffer of buflen bytes
- * pointed to by outstr. The size of the output in bytes (not including
- * a NULL termination byte) is returned in outlen. In-place conversions
- * are not supported (i.e. instr != outstr).]
- *
- * FLAGS
- *    UTF_DECOMPOSED:  output string will be fully decomposed (NFD)
- *
- *    UTF_PRECOMPOSED:  output string will be precomposed (NFC)
- *
- *    UTF_NO_NULL_TERM:  do not add null termination to output string
- *
- *    UTF_ESCAPE_ILLEGAL:  percent escape any illegal UTF-8 input
- *
- * ERRORS
- *    ENAMETOOLONG:  output did not fit or input exceeded MAXPATHLEN bytes
- *
- *    EINVAL:  illegal UTF-8 sequence encountered or invalid flags
- */
+  
+                                                            
+  
+                                                                   
+                                                                     
+                                                                       
+                                                                       
+                                             
+  
+        
+                                                                   
+  
+                                                               
+  
+                                                                     
+  
+                                                                 
+  
+         
+                                                                          
+  
+                                                                  
+   
 int
 utf8_normalizestr(const u_int8_t* instr, size_t inlen, u_int8_t* outstr,
     size_t *outlen, size_t buflen, int flags)
@@ -810,7 +810,7 @@ utf8_normalizestr(const u_int8_t* instr, size_t inlen, u_int8_t* outstr,
 		if (byte >= 0x80) {
 			goto nonASCII;
 		}
-		/* ASCII is already normalized. */
+		                                  
 		*outstr++ = (u_int8_t)byte;
 	}
 exit:
@@ -825,27 +825,27 @@ exit:
 	return result;
 
 
-	/*
-	 * Non-ASCII uses the existing utf8_encodestr/utf8_decodestr
-	 * functions to perform the normalization.  Since this will
-	 * presumably be used to normalize filenames in the back-end
-	 * (on disk or over-the-wire), it should be fast enough.
-	 */
+	  
+                                                             
+                                                            
+                                                             
+                                                         
+    
 nonASCII:
 
-	/* Make sure the input size is reasonable. */
+	                                             
 	if (inbuflen > MAXPATHLEN) {
 		result = ENAMETOOLONG;
 		goto exit;
 	}
-	/*
-	 * Compute worst case Unicode buffer size.
-	 *
-	 * For pre-composed output, every UTF-8 input byte will be at
-	 * most 2 Unicode bytes.  For decomposed output, 2 UTF-8 bytes
-	 * (smallest composite char sequence) may yield 6 Unicode bytes
-	 * (1 base char + 2 combining chars).
-	 */
+	  
+                                           
+   
+                                                              
+                                                               
+                                                                
+                                      
+    
 	unicode_bytes = precompose ? (inbuflen * 2) : (inbuflen * 3);
 
 	if (unicode_bytes <= sizeof(unicodebuf)) {
@@ -854,11 +854,11 @@ nonASCII:
 		unistr = kheap_alloc(KHEAP_DATA_BUFFERS, unicode_bytes, Z_WAITOK);
 	}
 
-	/* Normalize the string. */
+	                           
 	result = utf8_decodestr(inbufstart, inbuflen, unistr, &unicode_bytes,
 	    unicode_bytes, 0, flags & ~UTF_NO_NULL_TERM);
 	if (result == 0) {
-		/* Put results back into UTF-8. */
+		                                  
 		result = utf8_encodestr(unistr, unicode_bytes, outbufstart,
 		    &uft8_bytes, buflen, 0, UTF_NO_NULL_TERM);
 		outstr = outbufstart + uft8_bytes;
@@ -870,9 +870,9 @@ nonASCII:
 }
 
 
-/*
- * Unicode 3.2 decomposition code (derived from Core Foundation)
- */
+  
+                                                                
+   
 
 typedef struct {
 	u_int32_t _key;
@@ -892,7 +892,7 @@ getmappedvalue32(const unicode_mappings32 *theTable, u_int32_t numElem,
 	p = theTable;
 	q = p + (numElem - 1);
 	while (p <= q) {
-		divider = p + ((q - p) >> 1);   /* divide by 2 */
+		divider = p + ((q - p) >> 1);                    
 		if (character < divider->_key) {
 			q = divider - 1;
 		} else if (character > divider->_key) {
@@ -925,7 +925,7 @@ getmappedvalue16(const unicode_mappings16 *theTable, u_int32_t numElem,
 	p = theTable;
 	q = p + (numElem - 1);
 	while (p <= q) {
-		divider = p + ((q - p) >> 1);   /* divide by 2 */
+		divider = p + ((q - p) >> 1);                    
 		if (character < divider->_key) {
 			q = divider - 1;
 		} else if (character > divider->_key) {
@@ -960,7 +960,7 @@ unicode_recursive_decompose(u_int16_t character, u_int16_t *convertedChars)
 	if (value & RECURSIVE_DECOMPOSITION) {
 		usedLength = unicode_recursive_decompose((u_int16_t)*bmpMappings, convertedChars);
 
-		--length; /* Decrement for the first char */
+		--length;                                   
 		if (!usedLength) {
 			return 0;
 		}
@@ -988,16 +988,16 @@ unicode_recursive_decompose(u_int16_t character, u_int16_t *convertedChars)
 #define HANGUL_TCOUNT 28
 #define HANGUL_NCOUNT (HANGUL_VCOUNT * HANGUL_TCOUNT)
 
-/*
- * unicode_decompose - decompose a composed Unicode char
- *
- * Composed Unicode characters are forbidden on
- * HFS Plus volumes. ucs_decompose will convert a
- * composed character into its correct decomposed
- * sequence.
- *
- * Similar to CFUniCharDecomposeCharacter
- */
+  
+                                                        
+  
+                                               
+                                                 
+                                                 
+            
+  
+                                         
+   
 static int
 unicode_decompose(u_int16_t character, u_int16_t *convertedChars)
 {
@@ -1021,25 +1021,25 @@ unicode_decompose(u_int16_t character, u_int16_t *convertedChars)
 	}
 }
 
-/*
- * unicode_combine - generate a precomposed Unicode char
- *
- * Precomposed Unicode characters are required for some volume
- * formats and network protocols.  unicode_combine will combine
- * a decomposed character sequence into a single precomposed
- * (composite) character.
- *
- * Similar toCFUniCharPrecomposeCharacter but unicode_combine
- * also handles Hangul Jamo characters.
- */
+  
+                                                        
+  
+                                                              
+                                                               
+                                                            
+                         
+  
+                                                             
+                                       
+   
 static u_int16_t
 unicode_combine(u_int16_t base, u_int16_t combining)
 {
 	u_int32_t value;
 
-	/* Check HANGUL */
+	                  
 	if ((combining >= HANGUL_VBASE) && (combining < (HANGUL_TBASE + HANGUL_TCOUNT))) {
-		/* 2 char Hangul sequences */
+		                             
 		if ((combining < (HANGUL_VBASE + HANGUL_VCOUNT)) &&
 		    (base >= HANGUL_LBASE && base < (HANGUL_LBASE + HANGUL_LCOUNT))) {
 			return HANGUL_SBASE +
@@ -1047,7 +1047,7 @@ unicode_combine(u_int16_t base, u_int16_t combining)
 			       ((combining  - HANGUL_VBASE) * HANGUL_TCOUNT);
 		}
 
-		/* 3 char Hangul sequences */
+		                             
 		if ((combining > HANGUL_TBASE) &&
 		    (base >= HANGUL_SBASE && base < (HANGUL_SBASE + HANGUL_SCOUNT))) {
 			if ((base - HANGUL_SBASE) % HANGUL_TCOUNT) {
@@ -1072,11 +1072,11 @@ unicode_combine(u_int16_t base, u_int16_t combining)
 }
 
 
-/*
- * prioritysort - order combining chars into canonical order
- *
- * Similar to CFUniCharPrioritySort
- */
+  
+                                                            
+  
+                                   
+   
 static void
 prioritysort(u_int16_t* characters, int count)
 {
@@ -1102,13 +1102,13 @@ prioritysort(u_int16_t* characters, int count)
 				*ch2 = tmp;
 				changes = 1;
 
-				/*
-				 * Make sure that p2 contains the combining class for the
-				 * character now stored at *ch2.  This isn't required for
-				 * correctness, but it will be more efficient if a character
-				 * with a large combining class has to "bubble past" several
-				 * characters with lower combining classes.
-				 */
+				  
+                                                             
+                                                             
+                                                                
+                                                                
+                                               
+       
 				p2 = p1;
 			}
 			++ch1;
@@ -1118,78 +1118,78 @@ prioritysort(u_int16_t* characters, int count)
 }
 
 
-/*
- * Invalid NTFS filename characters are encodeded using the
- * SFM (Services for Macintosh) private use Unicode characters.
- *
- * These should only be used for SMB, MSDOS or NTFS.
- *
- *    Illegal NTFS Char   SFM Unicode Char
- *  ----------------------------------------
- *    0x01-0x1f           0xf001-0xf01f
- *    '"'                 0xf020
- *    '*'                 0xf021
- *    '/'                 0xf022
- *    '<'                 0xf023
- *    '>'                 0xf024
- *    '?'                 0xf025
- *    '\'                 0xf026
- *    '|'                 0xf027
- *    ' '                 0xf028  (Only if last char of the name)
- *    '.'                 0xf029  (Only if last char of the name)
- *  ----------------------------------------
- *
- *  Reference: http://support.microsoft.com/kb/q117258/
- */
+  
+                                                           
+                                                               
+  
+                                                    
+  
+                                          
+                                            
+                                       
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                                                 
+                                                                 
+                                            
+  
+                                                       
+   
 
 #define MAX_SFM2MAC           0x29
 #define SFMCODE_PREFIX_MASK   0xf000
 
-/*
- * In the Mac OS 9 days the colon was illegal in a file name. For that reason
- * SFM had no conversion for the colon. There is a conversion for the
- * slash. In Mac OS X the slash is illegal in a file name. So for us the colon
- * is a slash and a slash is a colon. So we can just replace the slash with the
- * colon in our tables and everything will just work.
- */
+  
+                                                                             
+                                                                     
+                                                                              
+                                                                               
+                                                     
+   
 static u_int8_t
     sfm2mac[] = {
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,   /* 00 - 07 */
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,   /* 08 - 0F */
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,   /* 10 - 17 */
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,   /* 18 - 1F */
-	0x22, 0x2a, 0x3a, 0x3c, 0x3e, 0x3f, 0x5c, 0x7c,   /* 20 - 27 */
-	0x20, 0x2e                                        /* 28 - 29 */
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,                
+	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,                
+	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,                
+	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,                
+	0x22, 0x2a, 0x3a, 0x3c, 0x3e, 0x3f, 0x5c, 0x7c,                
+	0x20, 0x2e                                                     
 };
 #define SFM2MAC_LEN     ((sizeof(sfm2mac))/sizeof(sfm2mac[0]))
 
 static u_int8_t
     mac2sfm[] = {
-	0x20, 0x21, 0x20, 0x23, 0x24, 0x25, 0x26, 0x27,   /* 20 - 27 */
-	0x28, 0x29, 0x21, 0x2b, 0x2c, 0x2d, 0x2e, 0x22,   /* 28 - 2f */
-	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,   /* 30 - 37 */
-	0x38, 0x39, 0x22, 0x3b, 0x23, 0x3d, 0x24, 0x25,   /* 38 - 3f */
-	0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,   /* 40 - 47 */
-	0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,   /* 48 - 4f */
-	0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,   /* 50 - 57 */
-	0x58, 0x59, 0x5a, 0x5b, 0x26, 0x5d, 0x5e, 0x5f,   /* 58 - 5f */
-	0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,   /* 60 - 67 */
-	0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f,   /* 68 - 6f */
-	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77,   /* 70 - 77 */
-	0x78, 0x79, 0x7a, 0x7b, 0x27, 0x7d, 0x7e, 0x7f    /* 78 - 7f */
+	0x20, 0x21, 0x20, 0x23, 0x24, 0x25, 0x26, 0x27,                
+	0x28, 0x29, 0x21, 0x2b, 0x2c, 0x2d, 0x2e, 0x22,                
+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,                
+	0x38, 0x39, 0x22, 0x3b, 0x23, 0x3d, 0x24, 0x25,                
+	0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,                
+	0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,                
+	0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,                
+	0x58, 0x59, 0x5a, 0x5b, 0x26, 0x5d, 0x5e, 0x5f,                
+	0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,                
+	0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f,                
+	0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77,                
+	0x78, 0x79, 0x7a, 0x7b, 0x27, 0x7d, 0x7e, 0x7f                 
 };
 #define MAC2SFM_LEN     ((sizeof(mac2sfm))/sizeof(mac2sfm[0]))
 
 
-/*
- * Encode illegal NTFS filename characters into SFM Private Unicode characters
- *
- * Assumes non-zero ASCII input.
- */
+  
+                                                                              
+  
+                                
+   
 static u_int16_t
 ucs_to_sfm(u_int16_t ucs_ch, int lastchar)
 {
-	/* The last character of filename cannot be a space or period. */
+	                                                                 
 	if (lastchar) {
 		if (ucs_ch == 0x20) {
 			return 0xf028;
@@ -1197,10 +1197,10 @@ ucs_to_sfm(u_int16_t ucs_ch, int lastchar)
 			return 0xf029;
 		}
 	}
-	/* 0x01 - 0x1f is simple transformation. */
+	                                           
 	if (ucs_ch <= 0x1f) {
 		return ucs_ch | 0xf000;
-	} else { /* 0x20 - 0x7f */
+	} else {                  
 		u_int16_t lsb;
 
 		assert((ucs_ch - 0x0020) < MAC2SFM_LEN);
@@ -1212,9 +1212,9 @@ ucs_to_sfm(u_int16_t ucs_ch, int lastchar)
 	return ucs_ch;
 }
 
-/*
- * Decode any SFM Private Unicode characters
- */
+  
+                                            
+   
 static u_int16_t
 sfm_to_ucs(u_int16_t ucs_ch)
 {

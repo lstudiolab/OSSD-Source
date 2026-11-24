@@ -53,15 +53,15 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	ipc/ipc_pset.h
- *	Author:	Rich Draves
- *	Date:	1989
- *
- *	Definitions for port sets.
- */
+  
+   
+  
+                       
+                      
+             
+  
+                             
+   
 
 #ifndef _IPC_IPC_PSET_H_
 #define _IPC_IPC_PSET_H_
@@ -75,9 +75,9 @@
 #include <ipc/ipc_mqueue.h>
 
 struct ipc_pset {
-	/*
-	 * Initial sub-structure in common with all ipc_objects.
-	 */
+	  
+                                                         
+    
 	struct ipc_object       ips_object;
 	struct ipc_mqueue       ips_messages;
 };
@@ -94,53 +94,53 @@ struct ipc_pset {
 #define ips_reference(pset)     io_reference(ips_to_object(pset))
 #define ips_release(pset)       io_release(ips_to_object(pset))
 
-/* get an ipc_pset pointer from an ipc_mqueue pointer */
+                                                        
 #define ips_from_mq(mq) \
 	        __container_of(mq, struct ipc_pset, ips_messages)
 
-/* Allocate a port set */
+                         
 extern kern_return_t ipc_pset_alloc(
 	ipc_space_t             space,
 	mach_port_name_t        *namep,
 	ipc_pset_t              *psetp);
 
-/* Allocate a port set, with a specific name */
+                                               
 extern kern_return_t ipc_pset_alloc_name(
 	ipc_space_t             space,
 	mach_port_name_t        name,
 	ipc_pset_t              *psetp);
 
-/* Allocate a port set in a special space */
+                                            
 extern ipc_pset_t ipc_pset_alloc_special(
 	ipc_space_t             space);
 
-/* Add a port to a port set */
+                              
 extern kern_return_t ipc_pset_add(
 	ipc_pset_t      pset,
 	ipc_port_t      port,
 	uint64_t        *reserved_link,
 	uint64_t        *reserved_prepost);
 
-/* determine if port is a member of set */
+                                          
 extern boolean_t ipc_pset_member(
 	ipc_pset_t      pset,
 	ipc_port_t      port);
 
-/* Remove a port from a port set */
+                                   
 extern kern_return_t ipc_pset_remove(
 	ipc_pset_t      pset,
 	ipc_port_t      port);
 
-/* lazily initialize the wqset of a port set */
+                                               
 extern kern_return_t ipc_pset_lazy_allocate(
 	ipc_space_t      space,
 	mach_port_name_t psname);
 
-/* Remove a port from all its current port sets */
+                                                  
 extern kern_return_t ipc_pset_remove_from_all(
 	ipc_port_t      port);
 
-/* Destroy a port_set */
+                        
 extern void ipc_pset_destroy(
 	ipc_space_t     space,
 	ipc_pset_t      pset);
@@ -163,4 +163,4 @@ extern struct turnstile *filt_machport_stash_port(
 	int *link);
 #endif
 
-#endif  /* _IPC_IPC_PSET_H_ */
+#endif                        

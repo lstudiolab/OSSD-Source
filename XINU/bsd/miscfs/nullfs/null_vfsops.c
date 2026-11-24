@@ -101,9 +101,9 @@ nullfs_vfs_getlowerattr(mount_t mp, struct vfs_attr * vfap, vfs_context_t ctx)
 	return vfs_getattr(mp, vfap, ctx);
 }
 
-/*
- * Mount null layer
- */
+  
+                   
+   
 static int
 nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, vfs_context_t ctx)
 {
@@ -116,7 +116,7 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 
 	size_t count;
 	struct vfs_attr vfa;
-	/* set defaults (arbitrary since this file system is readonly) */
+	                                                                 
 	uint32_t bsize  = BLKDEV_IOSIZE;
 	size_t iosize   = BLKDEV_IOSIZE;
 	uint64_t blocks = 4711 * 4711;
@@ -134,38 +134,38 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		return EOPNOTSUPP;
 	}
 
-	/*
-	 * Update is a no-op
-	 */
+	  
+                     
+    
 	if (vfs_isupdate(mp)) {
 		return ENOTSUP;
 	}
 
-	/* check entitlement */
+	                       
 	if (!IOTaskHasEntitlement(current_task(), NULLFS_ENTITLEMENT)) {
 		return EPERM;
 	}
 
-	/*
-	 * Get configuration
-	 */
+	  
+                     
+    
 	error = copyin(user_data, &conf, sizeof(conf));
 	if (error) {
 		NULLFSDEBUG("nullfs: error copying configuration form user %d\n", error);
 		goto error;
 	}
 
-	/*
-	 * Get argument
-	 */
+	  
+                
+    
 	error = copyinstr(user_data + sizeof(conf), path, MAXPATHLEN - 1, &count);
 	if (error) {
 		NULLFSDEBUG("nullfs: error copying data form user %d\n", error);
 		goto error;
 	}
 
-	/* This could happen if the system is configured for 32 bit inodes instead of
-	 * 64 bit */
+	                                                                             
+             
 	if (count > MAX_MNT_FROM_LENGTH) {
 		error = EINVAL;
 		NULLFSDEBUG("nullfs: path to translocate too large for this system %ld vs %ld\n", count, MAX_MNT_FROM_LENGTH);
@@ -178,13 +178,13 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		goto error;
 	}
 
-	/* lowervrootvp has an iocount after vnode_lookup, drop that for a usecount.
-	 *  Keep this to signal what we want to keep around the thing we are mirroring.
-	 *  Drop it in unmount.*/
+	                                                                            
+                                                                                
+                          
 	error = vnode_ref(lowerrootvp);
 	vnode_put(lowerrootvp);
 	if (error) {
-		// If vnode_ref failed, then null it out so it can't be used anymore in cleanup.
+		                                                                                
 		lowerrootvp = NULL;
 		goto error;
 	}
@@ -197,15 +197,15 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		goto error;
 	}
 
-	/*
-	 * Grab the uid/gid of the caller, which may be used for unveil later
-	 */
+	  
+                                                                      
+    
 	xmp->uid = kauth_cred_getuid(cred);
 	xmp->gid = kauth_cred_getgid(cred);
 
-	/*
-	 * Save reference to underlying FS
-	 */
+	  
+                                   
+    
 	xmp->nullm_lowerrootvp  = lowerrootvp;
 	xmp->nullm_lowerrootvid = vnode_vid(lowerrootvp);
 
@@ -214,10 +214,10 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		goto error;
 	}
 
-	/* vp has an iocount on it from vnode_create. drop that for a usecount. This
-	 * is our root vnode so we drop the ref in unmount
-	 *
-	 * Assuming for now that because we created this vnode and we aren't finished mounting we can get a ref*/
+	                                                                            
+                                                   
+   
+                                                                                                          
 	vnode_ref(vp);
 	vnode_put(vp);
 
@@ -225,8 +225,8 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 
 	xmp->nullm_rootvp = vp;
 
-	/* read the flags the user set, but then ignore some of them, we will only
-	 *  allow them if they are set on the lower file system */
+	                                                                          
+                                                           
 	uint64_t flags      = vfs_flags(mp) & (~(MNT_IGNORE_OWNERSHIP | MNT_LOCAL));
 	uint64_t lowerflags = vfs_flags(vnode_mount(lowerrootvp)) & (MNT_LOCAL | MNT_QUARANTINE | MNT_IGNORE_OWNERSHIP | MNT_NOEXEC);
 
@@ -234,7 +234,7 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 		flags |= lowerflags;
 	}
 
-	/* force these flags */
+	                       
 	flags |= (MNT_DONTBROWSE | MNT_MULTILABEL | MNT_NOSUID | MNT_RDONLY);
 	vfs_setflags(mp, flags);
 
@@ -242,15 +242,15 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 	vfs_getnewfsid(mp);
 	vfs_setlocklocal(mp);
 
-	/* fill in the stat block */
+	                            
 	sp = vfs_statfs(mp);
 	strlcpy(sp->f_mntfromname, path, MAX_MNT_FROM_LENGTH);
 
 	sp->f_flags = flags;
 
-	xmp->nullm_flags = NULLM_CASEINSENSITIVE; /* default to case insensitive */
+	xmp->nullm_flags = NULLM_CASEINSENSITIVE;                                  
 
-	// Set the flags that are requested
+	                                   
 	xmp->nullm_flags |= conf.flags & NULLM_UNVEIL;
 
 	error = nullfs_vfs_getlowerattr(vnode_mount(lowerrootvp), &vfa, ctx);
@@ -298,8 +298,8 @@ nullfs_mount(struct mount * mp, __unused vnode_t devvp, user_addr_t user_data, v
 	sp->f_files  = files;
 	sp->f_ffree  = ffree;
 
-	/* Associate the mac label information from the mirrored filesystem with the
-	 * mirror */
+	                                                                            
+             
 	MAC_PERFORM(mount_label_associate, cred, vnode_mount(lowerrootvp), vfs_mntlabel(mp));
 
 	NULLFSDEBUG("nullfs_mount: lower %s, alias at %s\n", sp->f_mntfromname, sp->f_mntonname);
@@ -315,19 +315,19 @@ error:
 		vnode_put(lowerrootvp);
 	}
 	if (vp) {
-		/* we made the root vnode but the mount is failed, so clean it up */
+		                                                                    
 		vnode_getwithref(vp);
 		vnode_rele(vp);
-		/* give vp back */
+		                  
 		vnode_recycle(vp);
 		vnode_put(vp);
 	}
 	return error;
 }
 
-/*
- * Free reference to null layer
- */
+  
+                               
+   
 static int
 nullfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 {
@@ -337,7 +337,7 @@ nullfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 
 	NULLFSDEBUG("nullfs_unmount: mp = %p\n", (void *)mp);
 
-	/* check entitlement or superuser*/
+	                                   
 	if (!IOTaskHasEntitlement(current_task(), NULLFS_ENTITLEMENT) &&
 	    vfs_context_suser(ctx) != 0) {
 		return EPERM;
@@ -352,8 +352,8 @@ nullfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 	mntdata = MOUNTTONULLMOUNT(mp);
 	vp      = mntdata->nullm_rootvp;
 
-	// release our reference on the root before flushing.
-	// it will get pulled out of the mount structure by reclaim
+	                                                     
+	                                                           
 	vnode_getalways(vp);
 
 	error = vflush(mp, vp, flags);
@@ -367,13 +367,13 @@ nullfs_unmount(struct mount * mp, int mntflags, __unused vfs_context_t ctx)
 		return EBUSY;
 	}
 
-	vnode_rele(vp); // Drop reference taken by nullfs_mount
-	vnode_put(vp); // Drop ref taken above
+	vnode_rele(vp);                                        
+	vnode_put(vp);                        
 
-	//Force close to get rid of the last vnode
+	                                          
 	(void)vflush(mp, NULL, FORCECLOSE);
 
-	/* no more vnodes, so tear down the mountpoint */
+	                                                 
 
 	lck_mtx_lock(&mntdata->nullm_lock);
 
@@ -403,9 +403,9 @@ nullfs_root(struct mount * mp, struct vnode ** vpp, __unused vfs_context_t ctx)
 
 	NULLFSDEBUG("nullfs_root(mp = %p, vp = %p)\n", (void *)mp, (void *)MOUNTTONULLMOUNT(mp)->nullm_rootvp);
 
-	/*
-	 * Return locked reference to root.
-	 */
+	  
+                                    
+    
 	vp = MOUNTTONULLMOUNT(mp)->nullm_rootvp;
 
 	error = vnode_get(vp);
@@ -431,7 +431,7 @@ nullfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 
 	NULLFSDEBUG("%s\n", __FUNCTION__);
 
-	/* Set default capabilities in case the lower file system is gone */
+	                                                                    
 	memset(&capabilities, 0, sizeof(capabilities));
 	capabilities.capabilities[VOL_CAPABILITIES_FORMAT] = VOL_CAP_FMT_FAST_STATFS | VOL_CAP_FMT_HIDDEN_FILES;
 	capabilities.valid[VOL_CAPABILITIES_FORMAT]        = VOL_CAP_FMT_FAST_STATFS | VOL_CAP_FMT_HIDDEN_FILES;
@@ -439,17 +439,17 @@ nullfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 	if (nullfs_vfs_getlowerattr(vnode_mount(null_mp->nullm_lowerrootvp), &vfa, ectx) == 0) {
 		if (VFSATTR_IS_SUPPORTED(&vfa, f_capabilities)) {
 			memcpy(&capabilities, &vfa.f_capabilities, sizeof(capabilities));
-			/* don't support vget */
+			                        
 			capabilities.capabilities[VOL_CAPABILITIES_FORMAT] &= ~(VOL_CAP_FMT_PERSISTENTOBJECTIDS | VOL_CAP_FMT_PATH_FROM_ID);
 
-			capabilities.capabilities[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES; /* Always support UF_HIDDEN */
+			capabilities.capabilities[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES;                               
 
 			capabilities.valid[VOL_CAPABILITIES_FORMAT] &= ~(VOL_CAP_FMT_PERSISTENTOBJECTIDS | VOL_CAP_FMT_PATH_FROM_ID);
 
-			capabilities.valid[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES; /* Always support UF_HIDDEN */
+			capabilities.valid[VOL_CAPABILITIES_FORMAT] |= VOL_CAP_FMT_HIDDEN_FILES;                               
 
-			/* dont' support interfaces that only make sense on a writable file system
-			 * or one with specific vnops implemented */
+			                                                                          
+                                               
 			capabilities.capabilities[VOL_CAPABILITIES_INTERFACES] = 0;
 
 			capabilities.valid[VOL_CAPABILITIES_INTERFACES] &=
@@ -535,7 +535,7 @@ nullfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 	}
 
 	if (VFSATTR_IS_ACTIVE(vfap, f_vol_name)) {
-		/* The name of the volume is the same as the directory we mounted on */
+		                                                                       
 		coveredvp = vfs_vnodecovered(mp);
 		if (coveredvp) {
 			const char * name = vnode_getname_printable(coveredvp);
@@ -555,9 +555,9 @@ nullfs_vfs_getattr(struct mount * mp, struct vfs_attr * vfap, vfs_context_t ctx)
 static int
 nullfs_sync(__unused struct mount * mp, __unused int waitfor, __unused vfs_context_t ctx)
 {
-	/*
-	 * XXX - Assumes no data cached at null layer.
-	 */
+	  
+                                               
+    
 	return 0;
 }
 

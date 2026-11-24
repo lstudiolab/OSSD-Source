@@ -53,7 +53,7 @@ IODMAController::getController(IOService *provider, UInt32 dmaIndex)
 	OSSharedPtr<const OSSymbol> dmaParentName;
 	IODMAController *dmaController;
 
-	// Find the name of the parent dma controller
+	                                             
 	OSSharedPtr<OSObject> prop = provider->copyProperty("dma-parent");
 	dmaParentData = OSDynamicCast(OSData, prop.get());
 	if (dmaParentData == NULL) {
@@ -72,7 +72,7 @@ IODMAController::getController(IOService *provider, UInt32 dmaIndex)
 		return NULL;
 	}
 
-	// Wait for the parent dma controller
+	                                     
 	dmaController = OSDynamicCast(IODMAController, IOService::waitForService( IOService::nameMatching(dmaParentName.get()).detach()));
 
 	return dmaController;
@@ -92,7 +92,7 @@ IODMAController::start(IOService *provider)
 }
 
 
-// protected
+            
 
 void
 IODMAController::registerDMAController(IOOptionBits options)
@@ -122,4 +122,4 @@ IODMAController::notifyDMACommand(IODMAEventSource *dmaES, IODMACommand *dmaComm
 }
 
 
-// private
+          

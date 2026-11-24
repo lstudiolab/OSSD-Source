@@ -13,6 +13,6 @@
 
 #ifndef _ANSI_SOURCE
 typedef int sig_atomic_t;
-#endif /* ! _ANSI_SOURCE */
+#endif                     
 
-#endif  /* _ARM_SIGNAL_ */
+#endif                    

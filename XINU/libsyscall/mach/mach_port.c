@@ -320,12 +320,12 @@ mach_port_get_attributes(
 	    port_info_out, port_info_outCnt);
 
 #ifdef __x86_64__
-	/* REMOVE once XBS kernel has new trap */
-	if (rv == ((1 << 24) | 40)) { /* see mach/i386/syscall_sw.h */
+	                                         
+	if (rv == ((1 << 24) | 40)) {                                 
 		rv = MACH_SEND_INVALID_DEST;
 	}
 #elif defined(__i386__)
-	/* REMOVE once XBS kernel has new trap */
+	                                         
 	if (rv == (kern_return_t)(-40)) {
 		rv = MACH_SEND_INVALID_DEST;
 	}
@@ -513,11 +513,11 @@ mach_sync_ipc_link_monitoring_stop(mach_port_t srp, boolean_t* in_effect)
 
 	kr = _kernelrpc_mach_port_special_reply_port_reset_link(mach_task_self(), srp, &link_broken);
 
-	/*
-	 * We return if the sync IPC priority inversion avoidance facility took
-	 * effect, so if the link was broken it didn't take effect.
-	 * Flip the return.
-	 */
+	  
+                                                                        
+                                                            
+                    
+    
 	*in_effect = !link_broken;
 
 	mach_port_deallocate(mach_task_self(), srp);

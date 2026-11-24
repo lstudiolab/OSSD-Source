@@ -85,7 +85,7 @@ size_t          debug_iomalloc_size;
 
 vm_size_t       debug_iomallocpageable_size;
 size_t          debug_container_malloc_size;
-// int          debug_ivars_size; // in OSObject.cpp
+                                                    
 
 extern "C" {
 #if 0
@@ -126,7 +126,7 @@ IOPrintPlane( const IORegistryPlane * plane )
 			DEBG(", busy %ld", (long) service->getBusyState());
 		}
 		DEBG( ">\n");
-//      IOSleep(250);
+                     
 	}
 	iter->release();
 }
@@ -144,7 +144,7 @@ db_dumpiojunk( const IORegistryPlane * plane __unused )
 void
 IOPrintMemory( void )
 {
-//    OSMetaClass::printInstanceCounts();
+                                         
 
 	IOLog("\n"
 	    "ivar kalloc()       0x%08lx\n"
@@ -158,14 +158,14 @@ IOPrintMemory( void )
 	    debug_iomalloc_size
 	    );
 }
-} /* extern "C" */
+}                 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #define super OSObject
 OSDefineMetaClassAndStructors(IOKitDiagnostics, OSObject)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 OSObject * IOKitDiagnostics::diagnostics( void )
 {
@@ -220,7 +220,7 @@ IOKitDiagnostics::serialize(OSSerialize *s) const
 	return ok;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #if IOTRACKING
 
@@ -237,7 +237,7 @@ __private_extern__ "C" void qsort(
 extern "C" ppnum_t pmap_find_phys(pmap_t pmap, addr64_t va);
 extern "C" ppnum_t pmap_valid_page(ppnum_t pn);
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 struct IOTRecursiveLock {
 	lck_mtx_t * mutex;
@@ -308,7 +308,7 @@ enum{
 #define IOTrackingAddressFlags(ptr)     (ptr->tracking.flags)
 #endif
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static void
 IOTRecursiveLockLock(IOTRecursiveLock * lock)
@@ -334,7 +334,7 @@ IOTRecursiveLockUnlock(IOTRecursiveLock * lock)
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingInit(void)
@@ -343,7 +343,7 @@ IOTrackingInit(void)
 	gIOTrackingLock = lck_mtx_alloc_init(IOLockGroup, LCK_ATTR_NULL);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOTrackingQueue *
 IOTrackingQueueAlloc(const char * name, uintptr_t btEntry,
@@ -388,7 +388,7 @@ IOTrackingQueueCollectUser(IOTrackingQueue * queue)
 	queue->type |= kIOTrackingQueueTypeUser;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingQueueFree(IOTrackingQueue * queue)
@@ -403,7 +403,7 @@ IOTrackingQueueFree(IOTrackingQueue * queue)
 	kfree(queue, sizeof(IOTrackingQueue) + queue->numSiteQs * sizeof(queue->sites[0]));
 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 /* fasthash
  *  The MIT License
@@ -432,8 +432,8 @@ IOTrackingQueueFree(IOTrackingQueue * queue)
  */
 
 
-// Compression function for Merkle-Damgard construction.
-// This function is generated using the framework provided.
+                                                        
+                                                           
 #define mix(h) ({                               \
 	          (h) ^= (h) >> 23;             \
 	          (h) *= 0x2127599bf4325c37ULL; \
@@ -479,19 +479,19 @@ fasthash64(const void *buf, size_t len, uint64_t seed)
 	return mix(h);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static uint32_t
 fasthash32(const void *buf, size_t len, uint32_t seed)
 {
-	// the following trick converts the 64-bit hashcode to Fermat
-	// residue, which shall retain information from both the higher
-	// and lower parts of hashcode.
+	                                                             
+	                                                               
+	                               
 	uint64_t h = fasthash64(buf, len, seed);
 	return (uint32_t) (h - (h >> 32));
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingAddUser(IOTrackingQueue * queue, IOTrackingUser * mem, vm_size_t size)
@@ -522,7 +522,7 @@ IOTrackingAddUser(IOTrackingQueue * queue, IOTrackingUser * mem, vm_size_t size)
 	mem->userCount = ((uint8_t) num);
 
 	IOTRecursiveLockLock(&queue->lock);
-	queue_enter/*last*/ (&queue->sites[0], mem, IOTrackingUser *, link);
+	queue_enter         (&queue->sites[0], mem, IOTrackingUser *, link);
 	queue->siteCount++;
 	IOTRecursiveLockUnlock(&queue->lock);
 }
@@ -636,7 +636,7 @@ IOTrackingAdd(IOTrackingQueue * queue, IOTracking * mem, size_t size, bool addre
 	}
 
 	if (address) {
-		queue_enter/*last*/ (&site->instances, mem, IOTracking *, link);
+		queue_enter         (&site->instances, mem, IOTracking *, link);
 		if (queue_end(&site->instances, (queue_entry_t)site->addresses)) {
 			site->addresses = mem;
 		}
@@ -651,7 +651,7 @@ IOTrackingAdd(IOTrackingQueue * queue, IOTracking * mem, size_t size, bool addre
 	IOTRecursiveLockUnlock(&queue->lock);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingRemove(IOTrackingQueue * queue, IOTracking * mem, size_t size)
@@ -692,7 +692,7 @@ IOTrackingRemove(IOTrackingQueue * queue, IOTracking * mem, size_t size)
 	IOTRecursiveLockUnlock(&queue->lock);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingAlloc(IOTrackingQueue * queue, uintptr_t address, size_t size)
@@ -716,7 +716,7 @@ IOTrackingAlloc(IOTrackingQueue * queue, uintptr_t address, size_t size)
 	IOTrackingAdd(queue, &tracking->tracking, size, true, VM_KERN_MEMORY_NONE);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingFree(IOTrackingQueue * queue, uintptr_t address, size_t size)
@@ -753,7 +753,7 @@ IOTrackingFree(IOTrackingQueue * queue, uintptr_t address, size_t size)
 	IOTRecursiveLockUnlock(&queue->lock);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingAccumSize(IOTrackingQueue * queue, IOTracking * mem, size_t size)
@@ -768,7 +768,7 @@ IOTrackingAccumSize(IOTrackingQueue * queue, IOTracking * mem, size_t size)
 	IOTRecursiveLockUnlock(&queue->lock);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 void
 IOTrackingReset(IOTrackingQueue * queue)
@@ -813,7 +813,7 @@ IOTrackingReset(IOTrackingQueue * queue)
 	IOTRecursiveLockUnlock(&queue->lock);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static int
 IOTrackingCallSiteInfoCompare(const void * left, const void * right)
@@ -828,7 +828,7 @@ IOTrackingCallSiteInfoCompare(const void * left, const void * right)
 	return (rsize > lsize) ? 1 : ((rsize == lsize) ? 0 : -1);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static int
 IOTrackingAddressCompare(const void * left, const void * right)
@@ -869,7 +869,7 @@ IOTrackingZoneElementCompare(const void * left, const void * right)
 	return (laddr > raddr) ? 1 : ((laddr == raddr) ? 0 : -1);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static void
 CopyOutBacktraces(IOTrackingCallSite * site, IOTrackingCallSiteInfo * siteInfo)
@@ -905,7 +905,7 @@ CopyOutBacktraces(IOTrackingCallSite * site, IOTrackingCallSiteInfo * siteInfo)
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static void
 IOTrackingLeakScan(void * refcon)
@@ -941,7 +941,7 @@ IOTrackingLeakScan(void * refcon)
 		}
 
 		ppn = kernel_pmap_present_mapping(vaddr, &vincr, &vphysaddr);
-		// check noencrypt to avoid VM structs (map entries) with pointers
+		                                                                  
 		if (ppn && (!pmap_valid_page(ppn) || (!ref->zoneSize && pmap_is_noencrypt(ppn)))) {
 			ppn = 0;
 		}
@@ -952,9 +952,9 @@ IOTrackingLeakScan(void * refcon)
 		for (ptrIdx = 0; ptrIdx < (page_size / sizeof(uintptr_t)); ptrIdx++) {
 			ptr = ((uintptr_t *)vphysaddr)[ptrIdx];
 #if defined(HAS_APPLE_PAC)
-			// strip possible ptrauth signature from candidate data pointer
+			                                                               
 			ptr = (uintptr_t)ptrauth_strip((void*)ptr, ptrauth_key_process_independent_data);
-#endif /* defined(HAS_APPLE_PAC) */
+#endif                             
 
 			for (lim = count, baseIdx = 0; lim; lim >>= 1) {
 				inst = instances[baseIdx + (lim >> 1)];
@@ -987,18 +987,18 @@ IOTrackingLeakScan(void * refcon)
 					break;
 				}
 				if (ptr > addr) {
-					// move right
+					             
 					baseIdx += (lim >> 1) + 1;
 					lim--;
 				}
-				// else move left
+				                 
 			}
 		}
 		ref->bytes += page_size;
 	}
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 extern "C" void
 zone_leaks_scan(uintptr_t * instances, uint32_t count, uint32_t zoneSize, uint32_t * found)
@@ -1027,7 +1027,7 @@ zone_leaks_scan(uintptr_t * instances, uint32_t count, uint32_t zoneSize, uint32
 	*found = ref.found;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static void
 ZoneSiteProc(void * refCon, uint32_t siteCount, uint32_t zoneSize,
@@ -1051,7 +1051,7 @@ ZoneSiteProc(void * refCon, uint32_t siteCount, uint32_t zoneSize,
 }
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static OSData *
 IOTrackingLeaks(LIBKERN_CONSUMED OSData * data)
@@ -1118,7 +1118,7 @@ IOTrackingLeaks(LIBKERN_CONSUMED OSData * data)
 	return leakData;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static bool
 SkipName(uint32_t options, const char * name, size_t namesLen, const char * names)
@@ -1131,7 +1131,7 @@ SkipName(uint32_t options, const char * name, size_t namesLen, const char * name
 	if (!namesLen || !names) {
 		return false;
 	}
-	// <len><name>...<len><name><0>
+	                               
 	exclude = (0 != (kIOTrackingExcludeNames & options));
 	qLen    = strlen(name);
 	scan    = names;
@@ -1150,9 +1150,9 @@ SkipName(uint32_t options, const char * name, size_t namesLen, const char * name
 	return !(exclude ^ found);
 }
 
-#endif /* IOTRACKING */
+#endif                 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 static kern_return_t
 IOTrackingDebug(uint32_t selector, uint32_t options, uint64_t value,
@@ -1259,7 +1259,7 @@ IOTrackingDebug(uint32_t selector, uint32_t options, uint64_t value,
 					}
 				}
 			}
-			// queue is locked
+			                  
 			ret = kIOReturnSuccess;
 			break;
 		}
@@ -1440,7 +1440,7 @@ IOTrackingDebug(uint32_t selector, uint32_t options, uint64_t value,
 			data = OSData::withCapacity(4096 * sizeof(uintptr_t));
 		}
 
-		// <len><name>...<len><name><0>
+		                               
 		scan    = names;
 		do{
 			sLen = ((uint8_t) scan[0]);
@@ -1480,23 +1480,23 @@ IOTrackingDebug(uint32_t selector, uint32_t options, uint64_t value,
 		proc_rele(proc);
 	}
 
-#endif /* IOTRACKING */
+#endif                 
 
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #include <IOKit/IOKitDiagnosticsUserClient.h>
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 #undef super
 #define super IOUserClient
 
 OSDefineMetaClassAndStructors(IOKitDiagnosticsClient, IOUserClient)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         
 
 IOUserClient * IOKitDiagnosticsClient::withTask(task_t owningTask)
 {
@@ -1560,4 +1560,4 @@ IOKitDiagnosticsClient::externalMethod(uint32_t selector, IOExternalMethodArgume
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                                         

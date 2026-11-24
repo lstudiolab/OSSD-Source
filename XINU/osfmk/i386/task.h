@@ -54,9 +54,9 @@
  * the rights to redistribute these changes.
  */
 
-/*
- * Machine dependant task fields
- */
+  
+                                
+   
 
 #include <i386/user_ldt.h>
 #include <i386/fpu.h>

@@ -81,7 +81,7 @@ bit_rol64(uint64_t bitmap, uint n)
 #endif
 }
 
-/* Non-atomically clear the bit and returns whether the bit value was changed */
+                                                                                
 inline static bool
 bit_clear_if_set(uint64_t *bitmap, int bit)
 {
@@ -90,7 +90,7 @@ bit_clear_if_set(uint64_t *bitmap, int bit)
 	return bit_is_set;
 }
 
-/* Non-atomically set the bit and returns whether the bit value was changed */
+                                                                              
 inline static bool
 bit_set_if_clear(uint64_t *bitmap, int bit)
 {
@@ -99,7 +99,7 @@ bit_set_if_clear(uint64_t *bitmap, int bit)
 	return !bit_is_set;
 }
 
-/* Returns the most significant '1' bit, or -1 if all zeros */
+                                                              
 inline static int
 bit_first(uint64_t bitmap)
 {
@@ -121,9 +121,9 @@ __bit_next(uint64_t bitmap, int previous_bit)
 	return bit_first(bitmap & mask);
 }
 
-/* Returns the most significant '1' bit that is less significant than previous_bit,
- * or -1 if no such bit exists.
- */
+                                                                                   
+                               
+   
 inline static int
 bit_next(uint64_t bitmap, int previous_bit)
 {
@@ -134,17 +134,17 @@ bit_next(uint64_t bitmap, int previous_bit)
 	}
 }
 
-/* Returns the least significant '1' bit, or -1 if all zeros */
+                                                               
 inline static int
 lsb_first(uint64_t bitmap)
 {
 	return __builtin_ffsll((long long)bitmap) - 1;
 }
 
-/* Returns the least significant '1' bit that is more significant than previous_bit,
- * or -1 if no such bit exists.
- * previous_bit may be -1, in which case this is equivalent to lsb_first()
- */
+                                                                                    
+                               
+                                                                          
+   
 inline static int
 lsb_next(uint64_t bitmap, int previous_bit)
 {
@@ -159,14 +159,14 @@ bit_count(uint64_t x)
 	return __builtin_popcountll(x);
 }
 
-/* Return the highest power of 2 that is <= n, or -1 if n == 0 */
+                                                                 
 inline static int
 bit_floor(uint64_t n)
 {
 	return bit_first(n);
 }
 
-/* Return the lowest power of 2 that is >= n, or -1 if n == 0 */
+                                                                
 inline static int
 bit_ceiling(uint64_t n)
 {
@@ -176,7 +176,7 @@ bit_ceiling(uint64_t n)
 	return bit_first(n - 1) + 1;
 }
 
-/* If n is a power of 2, bit_log2(n) == bit_floor(n) == bit_ceiling(n) */
+                                                                         
 #define bit_log2(n)             bit_floor((uint64_t)(n))
 
 typedef uint64_t                bitmap_t;
@@ -199,8 +199,8 @@ atomic_bit_clear(_Atomic bitmap_t *map, int n, int mem_order)
 }
 
 
-#define BITMAP_LEN(n)   (((uint)(n) + 63) >> 6)         /* Round to 64bit bitmap_t */
-#define BITMAP_SIZE(n)  (size_t)(BITMAP_LEN(n) << 3)            /* Round to 64bit bitmap_t, then convert to bytes */
+#define BITMAP_LEN(n)   (((uint)(n) + 63) >> 6)                                      
+#define BITMAP_SIZE(n)  (size_t)(BITMAP_LEN(n) << 3)                                                                
 #define bitmap_bit(n)   bits(n, 5, 0)
 #define bitmap_index(n) bits(n, 63, 6)
 

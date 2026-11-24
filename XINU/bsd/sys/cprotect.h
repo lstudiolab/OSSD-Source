@@ -43,23 +43,23 @@
 __BEGIN_DECLS
 
 #define CP_CODE(code) FSDBG_CODE(DBG_CONTENT_PROT, code)
-/*
- * Class DBG_FSYSTEM == 0x03
- * Subclass DBG_CONTENT_PROT == 0xCF
- * These debug codes are of the form 0x03CFzzzz
- */
+  
+                            
+                                    
+                                               
+   
 
 enum {
-	CPDBG_OFFSET_IO = CP_CODE(0),   /* 0x03CF0000 */
+	CPDBG_OFFSET_IO = CP_CODE(0),                   
 };
 
-/* normally the debug events are no-ops */
+                                          
 #define CP_DEBUG(x, a, b, c, d, e) do {} while (0);
 
-/* dev kernels only! */
+                       
 #if !SECURE_KERNEL
 
-/* KDEBUG events used by content protection subsystem */
+                                                        
 #if 0
 #undef CP_DEBUG
 #define CP_DEBUG KERNEL_DEBUG_CONSTANT
@@ -67,26 +67,26 @@ enum {
 
 #endif
 
-#define CP_MAX_WRAPPEDKEYSIZE     128   /* The size of the largest allowed key */
-#define VFS_CP_MAX_CACHEBUFLEN    64    /* Maximum size of the cached key */
+#define CP_MAX_WRAPPEDKEYSIZE     128                                            
+#define VFS_CP_MAX_CACHEBUFLEN    64                                        
 
-/* lock events from AppleKeyStore */
+                                    
 enum {
 	CP_ACTION_LOCKED        = 0,
 	CP_ACTION_UNLOCKED      = 1,
 };
-/*
- * Ideally, cp_key_store_action_t would be an enum, but we cannot fix
- * that until AppleKeyStore is updated.
- */
+  
+                                                                     
+                                       
+   
 typedef int cp_key_store_action_t;
 
-/*
- * It was once the case (and it may still be the case) where the lock
- * state got conflated with the possible actions/events that
- * AppleKeyStore can send.  For that reason, the locked states below
- * should numerically match their corresponding actions above.
- */
+  
+                                                                     
+                                                            
+                                                                    
+                                                              
+   
 typedef unsigned char cp_lock_state_t;
 enum {
 	CP_LOCKED_STATE         = 0,
@@ -102,32 +102,32 @@ typedef struct cprotect *cprotect_t;
 typedef struct cpx *cpx_t;
 
 #ifdef BSD_KERNEL_PRIVATE
-/* Not for consumption outside of XNU */
+                                        
 typedef uint32_t cpx_flags_t;
-/*
- * This is a CPX structure with a fixed-length key buffer. We need this defined in a header
- * so that we can use this structure to allocate the memory for the zone(s) properly.
- */
+  
+                                                                                           
+                                                                                     
+   
 typedef struct fcpx {
 #ifdef DEBUG
 	uint32_t                cpx_magic1;
-#endif // DEBUG
-	aes_encrypt_ctx         *cpx_iv_aes_ctx_ptr;// Context used for generating the IV
+#endif         
+	aes_encrypt_ctx         *cpx_iv_aes_ctx_ptr;                                     
 	cpx_flags_t             cpx_flags;
 	uint16_t                cpx_max_key_len;
 	uint16_t                cpx_key_len;
 	uint8_t                 cpx_cached_key[VFS_CP_MAX_CACHEBUFLEN];
-	//Fixed length all the way through
+	                                  
 } fcpx_t;
 
-#endif // BSD_KERNEL_PRIVATE
+#endif                      
 
 typedef struct cp_key {
 	uint8_t len;
 	void *key;
 } cp_key_t;
 
-/* Interface to AKS kext */
+                           
 typedef struct {
 	void     *key;
 	unsigned key_len;
@@ -159,25 +159,25 @@ typedef struct {
 
 typedef cp_cred_s* cp_cred_t;
 
-/* The wrappers are invoked on the AKS kext */
+                                              
 typedef int unwrapper_t(cp_cred_t access, const cp_wrapped_key_t wrapped_key_in, cp_raw_key_t key_out);
 typedef int rewrapper_t(cp_cred_t access, cp_key_class_t dp_class, const cp_wrapped_key_t wrapped_key_in, cp_wrapped_key_t wrapped_key_out);
 typedef int new_key_t(cp_cred_t access, cp_key_class_t dp_class, cp_raw_key_t key_out, cp_wrapped_key_t wrapped_key_out);
-typedef int invalidater_t(cp_cred_t access); /* invalidates keys */
+typedef int invalidater_t(cp_cred_t access);                       
 typedef int backup_key_t(cp_cred_t access, const cp_wrapped_key_t wrapped_key_in, cp_wrapped_key_t wrapped_key_out);
 
-/*
- * Flags for Interaction between AKS / Kernel
- * These are twiddled via the input/output structs in the above
- * wrapper/unwrapper functions.
- */
+  
+                                             
+                                                               
+                               
+   
 #define CP_RAW_KEY_WRAPPEDKEY   0x00000001
 
-/*
- * Function prototypes for kexts to interface with our internal cprotect
- * fields;  cpx provides opacity and allows us to modify behavior internally
- * without requiring kext changes.
- */
+  
+                                                                        
+                                                                            
+                                  
+   
 cpx_t cpx_alloc(size_t key_size, bool needs_ctx);
 int cpx_alloc_ctx(cpx_t cpx);
 void cpx_free_ctx(cpx_t cpx);
@@ -209,10 +209,10 @@ void cpx_set_aes_iv_key(struct cpx *cpx, void *iv_key);
 int cp_key_store_action(cp_key_store_action_t);
 int cp_key_store_action_for_volume(uuid_t volume_uuid, cp_key_store_action_t action);
 cp_key_os_version_t cp_os_version(void);
-// Should be cp_key_class_t but HFS has a conflicting definition
+                                                                
 int cp_is_valid_class(int isdir, int32_t protectionclass);
 
 __END_DECLS
 
-#endif /* KERNEL_PRIVATE */
-#endif /* !_SYS_CPROTECT_H_ */
+#endif                     
+#endif                        

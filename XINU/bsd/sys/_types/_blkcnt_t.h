@@ -27,6 +27,6 @@
  */
 #ifndef _BLKCNT_T
 #define _BLKCNT_T
-#include <sys/_types.h> /* __darwin_blkcnt_t */
+#include <sys/_types.h>                        
 typedef __darwin_blkcnt_t        blkcnt_t;
-#endif  /* _BLKCNT_T */
+#endif                 

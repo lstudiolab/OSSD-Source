@@ -65,34 +65,34 @@
 #define _NETINET_ICMP_VAR_H_
 #include <sys/appleapiopts.h>
 
-/*
- * Variables related to this implementation
- * of the internet control message protocol.
- */
+  
+                                           
+                                            
+   
 struct  icmpstat {
-/* statistics related to icmp packets generated */
-	u_int32_t       icps_error;     /* # of calls to icmp_error */
-	u_int32_t       icps_oldshort;  /* no error 'cuz old ip too short */
-	u_int32_t       icps_oldicmp;   /* no error 'cuz old was icmp */
+                                                  
+	u_int32_t       icps_error;                                   
+	u_int32_t       icps_oldshort;                                      
+	u_int32_t       icps_oldicmp;                                   
 	u_int32_t       icps_outhist[ICMP_MAXTYPE + 1];
-/* statistics related to input messages processed */
-	u_int32_t       icps_badcode;   /* icmp_code out of range */
-	u_int32_t       icps_tooshort;  /* packet < ICMP_MINLEN */
-	u_int32_t       icps_checksum;  /* bad checksum */
-	u_int32_t       icps_badlen;    /* calculated bound mismatch */
-	u_int32_t       icps_reflect;   /* number of responses */
+                                                    
+	u_int32_t       icps_badcode;                               
+	u_int32_t       icps_tooshort;                            
+	u_int32_t       icps_checksum;                    
+	u_int32_t       icps_badlen;                                   
+	u_int32_t       icps_reflect;                            
 	u_int32_t       icps_inhist[ICMP_MAXTYPE + 1];
-	u_int32_t       icps_bmcastecho;/* b/mcast echo requests dropped */
-	u_int32_t       icps_bmcasttstamp; /* b/mcast tstamp requests dropped */
+	u_int32_t       icps_bmcastecho;                                   
+	u_int32_t       icps_bmcasttstamp;                                      
 };
 
-/*
- * Names for ICMP sysctl objects
- */
-#define ICMPCTL_MASKREPL        1       /* allow replies to netmask requests */
-#define ICMPCTL_STATS           2       /* statistics (read-only) */
+  
+                                
+   
+#define ICMPCTL_MASKREPL        1                                              
+#define ICMPCTL_STATS           2                                   
 #define ICMPCTL_ICMPLIM         3
-#define ICMPCTL_TIMESTAMP       4       /* allow replies to time stamp requests */
+#define ICMPCTL_TIMESTAMP       4                                                 
 #define ICMPCTL_ICMPLIM_INCR    5
 #define ICMPCTL_MAXID           6
 
@@ -115,5 +115,5 @@ extern boolean_t badport_bandlim(int which);
 #define BANDLIM_MAX 4
 
 extern struct   icmpstat icmpstat;
-#endif /* BSD_KERNEL_PRIVATE */
-#endif /* _NETINET_ICMP_VAR_H_ */
+#endif                         
+#endif                           

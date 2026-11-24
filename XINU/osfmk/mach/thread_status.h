@@ -53,39 +53,39 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
-/*
- *	File:	mach/thread_status.h
- *	Author:	Avadis Tevanian, Jr.
- *
- *	This file contains the structure definitions for the user-visible
- *	thread state.  This thread state is examined with the thread_get_state
- *	kernel call and may be changed with the thread_set_state kernel call.
- *
- */
+  
+   
+  
+                             
+                               
+  
+                                                                    
+                                                                         
+                                                                        
+  
+   
 
 #ifndef _MACH_THREAD_STATUS_H_
 #define _MACH_THREAD_STATUS_H_
 
-/*
- *	The actual structure that comprises the thread state is defined
- *	in the machine dependent module.
- */
+  
+                                                                  
+                                   
+   
 #include <mach/machine/vm_types.h>
 #include <mach/machine/thread_status.h>
 #include <mach/machine/thread_state.h>
 
-/*
- *	Generic definition for machine-dependent thread status.
- */
+  
+                                                          
+   
 
-typedef natural_t       *thread_state_t;        /* Variable-length array */
+typedef natural_t       *thread_state_t;                                   
 
-/* THREAD_STATE_MAX is now defined in <mach/machine/thread_state.h> */
+                                                                      
 typedef natural_t       thread_state_data_t[THREAD_STATE_MAX];
 
-#define THREAD_STATE_FLAVOR_LIST        0       /* List of valid flavors */
+#define THREAD_STATE_FLAVOR_LIST        0                                  
 #define THREAD_STATE_FLAVOR_LIST_NEW    128
 #define THREAD_STATE_FLAVOR_LIST_10_9   129
 #define THREAD_STATE_FLAVOR_LIST_10_13  130
@@ -97,4 +97,4 @@ typedef thread_state_flavor_t   *thread_state_flavor_array_t;
 #define THREAD_CONVERT_THREAD_STATE_TO_SELF   1
 #define THREAD_CONVERT_THREAD_STATE_FROM_SELF 2
 
-#endif  /* _MACH_THREAD_STATUS_H_ */
+#endif                              

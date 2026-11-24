@@ -27,27 +27,27 @@
 #include <sysexits.h>
 #include <unistd.h>
 #include <util.h>
-#include <System/sys/event.h> /* kevent_qos */
+#include <System/sys/event.h>                 
 
 T_GLOBAL_META(
 	T_META_NAMESPACE("xnu.kevent"),
 	T_META_CHECK_LEAKS(false),
 	T_META_LTEPHASE(LTE_POSTINIT));
 
-/*
- * Test to validate that monitoring a PTY device, FIFO, pipe, or socket pair in
- * a dispatch source, kqueue, poll, or select delivers read events within and
- * between processes as expected.
- *
- * This test catches issues with watching special devices in kqueue(),
- * which has tricky special cases for character devices like PTYs.
- *
- * It also exercises the path to wake up a dispatch worker thread from the
- * special device kqueue event, which is also a special case in kqueue().
- *
- * See rdar://problem/26240299&26220074&26226862&28625427 for examples and
- * history.
- */
+  
+                                                                               
+                                                                             
+                                 
+  
+                                                                      
+                                                                  
+  
+                                                                          
+                                                                         
+  
+                                                                          
+           
+   
 
 #define EXPECTED_STRING    "abcdefghijklmnopqrstuvwxyz. ABCDEFGHIJKLMNOPQRSTUVWXYZ. 1234567890"
 #define EXPECTED_LEN       strlen(EXPECTED_STRING)
@@ -101,8 +101,8 @@ static struct {
 	int rd_fd;
 
 	enum writer_kind {
-		THREAD_WRITER, /* sem */
-		PROCESS_WRITER /* fd */
+		THREAD_WRITER,          
+		PROCESS_WRITER         
 	} wr_kind;
 	union {
 		semaphore_t sem;
@@ -203,11 +203,11 @@ reenable_workq(int fd, int16_t filt)
 static void
 workqueue_write_fn(void ** __unused buf, int * __unused count)
 {
-	// T_MAYFAIL;
-	// T_QUIET; T_ASSERT_EFFECTIVE_QOS_EQ(EXPECTED_QOS,
-	// "writer thread should be woken up at correct QoS");
+	             
+	                                                   
+	                                                      
 	if (!handle_writing(shared.fd_pair, shared.wr_fd)) {
-		/* finished handling the fd, tear down the source */
+		                                                    
 		T_LOG("signal shared.wr_finished");
 		semaphore_signal(shared.wr_finished);
 		return;
@@ -248,7 +248,7 @@ drive_kq(bool reading, union mode mode, enum fd_pair fd_pair, int fd)
 						    .data = READ_TIMEOUT_SECS
 					    }};
 
-	/* determine which variant of kevent to use */
+	                                              
 	enum read_mode which_kevent;
 	if (reading) {
 		which_kevent = mode.rd;
@@ -278,10 +278,10 @@ drive_kq(bool reading, union mode mode, enum fd_pair fd_pair, int fd)
 	case KEVENT_QOS_READ:
 		kev = kevent_qos(kq_fd, events_qos, 2, NULL, 0, NULL, NULL, 0);
 		break;
-	case POLL_READ: /* FALLTHROUGH */
-	case SELECT_READ: /* FALLTHROUGH */
-	case DISPATCH_READ: /* FALLTHROUGH */
-	case WORKQ_READ: /* FALLTHROUGH */
+	case POLL_READ:                  
+	case SELECT_READ:                  
+	case DISPATCH_READ:                  
+	case WORKQ_READ:                  
 	default:
 		T_ASSERT_FAIL("unexpected mode: %d", reading ? mode.rd : mode.wr);
 		break;
@@ -304,17 +304,17 @@ drive_kq(bool reading, union mode mode, enum fd_pair fd_pair, int fd)
 		case KEVENT_QOS_READ:
 			kev = kevent_qos(kq_fd, NULL, 0, events_qos, 2, NULL, NULL, 0);
 
-			/* check for a timeout */
+			                         
 			for (int i = 0; i < kev; i++) {
 				if (events_qos[i].filter == EVFILT_TIMER) {
 					kev = 0;
 				}
 			}
 			break;
-		case POLL_READ: /* FALLTHROUGH */
-		case SELECT_READ: /* FALLTHROUGH */
-		case DISPATCH_READ: /* FALLTHROUGH */
-		case WORKQ_READ: /* FALLTHROUGH */
+		case POLL_READ:                  
+		case SELECT_READ:                  
+		case DISPATCH_READ:                  
+		case WORKQ_READ:                  
 		default:
 			T_ASSERT_FAIL("unexpected mode: %d", reading ? mode.rd : mode.wr);
 			break;
@@ -371,8 +371,8 @@ write_to_fd(void * __unused ctx)
 		}
 		break;
 
-	case KEVENT_INCREMENTAL_WRITE: /* FALLTHROUGH */
-	case KEVENT64_INCREMENTAL_WRITE: /* FALLTHROUGH */
+	case KEVENT_INCREMENTAL_WRITE:                  
+	case KEVENT64_INCREMENTAL_WRITE:                  
 	case KEVENT_QOS_INCREMENTAL_WRITE: {
 		union mode mode = { .wr = shared.wr_mode };
 		drive_kq(false, mode, shared.fd_pair, shared.wr_fd);
@@ -380,7 +380,7 @@ write_to_fd(void * __unused ctx)
 	}
 
 	case WORKQ_INCREMENTAL_WRITE: {
-		// prohibit ourselves from going multi-threaded see:rdar://33296008
+		                                                                   
 		_dispatch_prohibit_transition_to_multithreaded(true);
 		int changes = 1;
 
@@ -435,11 +435,11 @@ write_to_fd(void * __unused ctx)
 
 		dispatch_block_t handler = dispatch_block_create_with_qos_class(
 			DISPATCH_BLOCK_ENFORCE_QOS_CLASS, EXPECTED_QOS, 0, ^{
-				// T_MAYFAIL;
-				// T_QUIET; T_ASSERT_EFFECTIVE_QOS_EQ(EXPECTED_QOS,
-				// "write handler block should run at correct QoS");
+				             
+				                                                   
+				                                                    
 				if (!handle_writing(shared.fd_pair, shared.wr_fd)) {
-				        /* finished handling the fd, tear down the source */
+				                                                            
 				        dispatch_source_cancel(write_src);
 				        dispatch_release(write_src);
 				        T_LOG("signal shared.wr_finished");
@@ -480,11 +480,11 @@ write_to_fd(void * __unused ctx)
 static char final_string[BUF_LEN];
 static size_t final_length;
 
-/*
- * Read from the master PTY descriptor.
- *
- * Returns false if EOF is encountered, and true otherwise.
- */
+  
+                                       
+  
+                                                           
+   
 static bool
 handle_reading(enum fd_pair fd_pair, int fd)
 {
@@ -498,7 +498,7 @@ handle_reading(enum fd_pair fd_pair, int fd)
 		bytes_rd = read(fd, read_buf, sizeof(read_buf) - 1);
 	} while (bytes_rd == -1 && errno == EINTR);
 
-	// T_LOG("read %zd bytes: '%s'", bytes_rd, read_buf);
+	                                                     
 
 	T_QUIET; T_ASSERT_POSIX_SUCCESS(bytes_rd, "reading from file");
 	T_QUIET; T_ASSERT_LE(bytes_rd, (ssize_t)EXPECTED_LEN,
@@ -517,7 +517,7 @@ handle_reading(enum fd_pair fd_pair, int fd)
 	T_QUIET; T_ASSERT_LE(final_length, EXPECTED_LEN,
 	    "should not read more from file than what can be sent");
 
-	/* FIFOs don't send EOF when the write side closes */
+	                                                     
 	if (final_length == strlen(EXPECTED_STRING) &&
 	    (fd_pair == FIFO_PAIR)) {
 		T_LOG("read all expected bytes from FIFO");
@@ -529,9 +529,9 @@ handle_reading(enum fd_pair fd_pair, int fd)
 static void
 workqueue_read_fn(void ** __unused buf, int * __unused count)
 {
-	// T_MAYFAIL;
-	// T_QUIET; T_ASSERT_EFFECTIVE_QOS_EQ(EXPECTED_QOS,
-	// "reader thread should be requested at correct QoS");
+	             
+	                                                   
+	                                                       
 	if (!handle_reading(shared.fd_pair, shared.rd_fd)) {
 		T_LOG("signal shared.rd_finished");
 		semaphore_signal(shared.rd_finished);
@@ -596,7 +596,7 @@ read_from_fd(int fd, enum fd_pair fd_pair, enum read_mode mode)
 			FD_ZERO(&err_fd);
 			FD_SET(fd, &err_fd);
 
-			int sel = select(fd + 1, &read_fd, NULL, NULL /*&err_fd*/, &tv);
+			int sel = select(fd + 1, &read_fd, NULL, NULL            , &tv);
 			if (sel == -1 && errno == EINTR) {
 				T_LOG("select interrupted");
 				continue;
@@ -609,7 +609,7 @@ read_from_fd(int fd, enum fd_pair fd_pair, enum read_mode mode)
 			    "select waited for %d seconds and timed out",
 			    READ_TIMEOUT_SECS);
 
-			/* didn't fail or time out, therefore data is ready */
+			                                                      
 			T_QUIET; T_ASSERT_NE(FD_ISSET(fd, &read_fd), 0,
 			    "select should show reading fd as readable");
 
@@ -619,8 +619,8 @@ read_from_fd(int fd, enum fd_pair fd_pair, enum read_mode mode)
 		}
 		break;
 
-	case KEVENT_READ: /* FALLTHROUGH */
-	case KEVENT64_READ: /* FALLTHROUGH */
+	case KEVENT_READ:                  
+	case KEVENT64_READ:                  
 	case KEVENT_QOS_READ: {
 		union mode rd_mode = { .rd = shared.rd_mode };
 		drive_kq(true, rd_mode, fd_pair, shared.rd_fd);
@@ -628,7 +628,7 @@ read_from_fd(int fd, enum fd_pair fd_pair, enum read_mode mode)
 	}
 
 	case WORKQ_READ: {
-		// prohibit ourselves from going multi-threaded see:rdar://33296008
+		                                                                   
 		_dispatch_prohibit_transition_to_multithreaded(true);
 		T_ASSERT_POSIX_ZERO(_pthread_workqueue_init_with_kevent(
 			    workqueue_fn, workqueue_read_fn, 0, 0), NULL);
@@ -684,12 +684,12 @@ read_from_fd(int fd, enum fd_pair fd_pair, enum read_mode mode)
 
 		dispatch_block_t handler = dispatch_block_create_with_qos_class(
 			DISPATCH_BLOCK_ENFORCE_QOS_CLASS, EXPECTED_QOS, 0, ^{
-				// T_MAYFAIL;
-				// T_QUIET; T_ASSERT_EFFECTIVE_QOS_EQ(EXPECTED_QOS,
-				// "read handler block should run at correct QoS");
+				             
+				                                                   
+				                                                   
 
 				if (!handle_reading(fd_pair, fd)) {
-				        /* finished handling the fd, tear down the source */
+				                                                            
 				        dispatch_source_cancel(read_src);
 				        dispatch_release(read_src);
 				        T_LOG("signal shared.rd_finished");
@@ -741,10 +741,10 @@ fd_pair_init(enum fd_pair fd_pair, int *rd_fd, int *wr_fd)
 
 		T_ASSERT_POSIX_SUCCESS(mkfifo(fifo_path, 0700), "mkfifo(%s, 0700)",
 		    fifo_path);
-		/*
-		 * Opening the read side of a pipe will block until the write
-		 * side opens -- use O_NONBLOCK.
-		 */
+		  
+                                                               
+                                  
+     
 		*rd_fd = open(fifo_path, O_RDONLY | O_NONBLOCK);
 		T_QUIET; T_ASSERT_POSIX_SUCCESS(*rd_fd, "open(... O_RDONLY)");
 		*wr_fd = open(fifo_path, O_WRONLY | O_NONBLOCK);
@@ -893,28 +893,28 @@ T_HELPER_DECL(writer_helper, "Write asynchronously")
 #define RD_DECL(desc_name, fd_pair, read_name, read_mode) \
 	        RD_DECL_SAFE(desc_name, fd_pair, read_name, read_mode) \
 	        RD_DECL_DISPATCH_ONLY(, desc_name, fd_pair, read_name, read_mode)
-// RD_DECL_WORKQ_ONLY(, desc_name, fd_pair, read_name, read_mode)
+                                                                 
 
-/*
- * dispatch_source tests cannot share the same process as other workqueue
- * tests.
- */
+  
+                                                                         
+         
+   
 #define RD_DECL_DISPATCH(desc_name, fd_pair, read_name, read_mode) \
 	        RD_DECL_SAFE(desc_name, fd_pair, read_name, read_mode) \
 	        RD_DECL_DISPATCH_ONLY(, desc_name, fd_pair, read_name, read_mode) \
 	        RD_DECL_WORKQ_ONLY(_PROCESSES, desc_name, fd_pair, read_name, \
 	                        read_mode)
 
-/*
- * Workqueue tests cannot share the same process as other workqueue or
- * dispatch_source tests.
- #define RD_DECL_WORKQ(desc_name, fd_pair, read_name, read_mode) \
- *               RD_DECL_SAFE(desc_name, fd_pair, read_name, read_mode) \
- *               RD_DECL_DISPATCH_ONLY(_PROCESSES, desc_name, fd_pair, read_name, \
- *                               read_mode) \
- *               RD_DECL_WORKQ_ONLY(_PROCESSES, desc_name, fd_pair, read_name, \
- *                               read_mode)
- */
+  
+                                                                      
+                         
+                                                                  
+                                                                         
+                                                                                   
+                                             
+                                                                                
+                                           
+   
 
 #define PAIR_DECL(desc_name, fd_pair) \
 	RD_DECL(desc_name, fd_pair, poll, POLL_READ) \
@@ -923,7 +923,7 @@ T_HELPER_DECL(writer_helper, "Write asynchronously")
 	RD_DECL(desc_name, fd_pair, kevent64, KEVENT64_READ) \
 	RD_DECL(desc_name, fd_pair, kevent_qos, KEVENT_QOS_READ) \
 	RD_DECL_DISPATCH(desc_name, fd_pair, dispatch_source, DISPATCH_READ)
-// RD_DECL_WORKQ(desc_name, fd_pair, workq, WORKQ_READ)
+                                                       
 
 PAIR_DECL(tty, PTY_PAIR)
 PAIR_DECL(pipe, PIPE_PAIR)

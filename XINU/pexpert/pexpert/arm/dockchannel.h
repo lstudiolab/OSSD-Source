@@ -31,7 +31,7 @@
 #define DOCKCHANNEL_UART                        (1)
 #define DOCKCHANNEL_STRIDE                      (0x10000)
 
-// Channel index
+                
 #define DOCKCHANNEL_UART_CHANNEL                (0)
 
 #define rDOCKCHANNELS_AGENT_AP_INTR_CTRL        (*(volatile uint32_t *) (dock_agent_base + 0x00))
@@ -49,4 +49,4 @@
 #define rDOCKCHANNELS_DOCK_RDATA1(_ch)          (*(volatile uint32_t *) (dockchannel_uart_base + ((_ch) * DOCKCHANNEL_STRIDE) + 0xc01c))
 #define rDOCKCHANNELS_DOCK_RDATA3(_ch)          (*(volatile uint32_t *) (dockchannel_uart_base + ((_ch) * DOCKCHANNEL_STRIDE) + 0xc024))
 
-#endif  /* !_PEXPERT_ARM_DOCKCHANNEL_H */
+#endif                                   

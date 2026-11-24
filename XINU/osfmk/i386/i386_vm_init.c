@@ -88,17 +88,17 @@
 #define P2ROUNDUP(x, align)             (-(-(x) & -(align)))
 
 vm_size_t       mem_size = 0;
-pmap_paddr_t    first_avail = 0;/* first after page tables */
+pmap_paddr_t    first_avail = 0;                             
 
-uint64_t        max_mem;        /* Size of physical memory minus carveouts (bytes), adjusted by maxmem */
-uint64_t        max_mem_actual; /* Actual size of physical memory (bytes) adjusted by
-                                 * the maxmem boot-arg */
+uint64_t        max_mem;                                                                                 
+uint64_t        max_mem_actual;                                                      
+                                                         
 uint64_t        mem_actual;
-uint64_t        sane_size = 0;  /* Memory size for defaults calculations */
+uint64_t        sane_size = 0;                                             
 
-/*
- * KASLR parameters
- */
+  
+                   
+   
 ppnum_t         vm_kernel_base_page;
 vm_offset_t     vm_kernel_base;
 vm_offset_t     vm_kernel_top;
@@ -125,14 +125,14 @@ vm_offset_t vm_kernel_builtinkmod_text_end;
 
 ppnum_t         max_ppnum = 0;
 
-/*
- * pmap_high_used* are the highest range of physical memory used for kernel
- * internals (page tables, vm_pages) via pmap_steal_memory() that don't
- * need to be encrypted in hibernation images. There can be one gap in
- * the middle of this due to fragmentation when using a mix of small
- * and large pages.  In that case, the fragment lives between the high
- * and middle ranges.
- */
+  
+                                                                           
+                                                                       
+                                                                      
+                                                                    
+                                                                      
+                     
+   
 ppnum_t pmap_high_used_top = 0;
 ppnum_t pmap_high_used_bottom = 0;
 ppnum_t pmap_middle_used_top = 0;
@@ -153,9 +153,9 @@ vm_offset_t     static_memory_end = 0;
 
 vm_offset_t     sHIB, eHIB, stext, etext, sdata, edata, end, sconst, econst;
 
-/*
- * _mh_execute_header is the mach_header for the currently executing kernel
- */
+  
+                                                                           
+   
 vm_offset_t segTEXTB; unsigned long segSizeTEXT;
 vm_offset_t segDATAB; unsigned long segSizeDATA;
 vm_offset_t segLINKB; unsigned long segSizeLINK;
@@ -178,15 +178,15 @@ extern uint64_t firmware_Unusable_bytes;
 extern uint64_t firmware_other_bytes;
 uint64_t firmware_MMIO_bytes;
 
-/*
- * Linker magic to establish the highest address in the kernel.
- */
+  
+                                                               
+   
 extern void     *last_kernel_symbol;
 
 #define LG_PPNUM_PAGES (I386_LPGBYTES >> PAGE_SHIFT)
 #define LG_PPNUM_MASK (I386_LPGMASK >> PAGE_SHIFT)
 
-/* set so no region large page fragment pages exist */
+                                                      
 #define RESET_FRAG(r) (((r)->alloc_frag_up = 1), ((r)->alloc_frag_down = 0))
 
 boolean_t       memmap = FALSE;
@@ -243,11 +243,11 @@ kprint_memmap(vm_offset_t maddr, unsigned int msize, unsigned int mcount)
 }
 
 #define DPRINTF(x...)
-#endif /* DEBUG */
+#endif            
 
-/*
- * Basic VM initialization.
- */
+  
+                           
+   
 void
 i386_vm_init(uint64_t   maxmem,
     boolean_t  IA32e,
@@ -274,9 +274,9 @@ i386_vm_init(uint64_t   maxmem,
 
 	PE_parse_boot_argn("memmap", &memmap, sizeof(memmap));
 
-	/*
-	 * Establish the KASLR parameters.
-	 */
+	  
+                                   
+    
 	static_base_address = ml_static_ptovirt(KERNEL_BASE_OFFSET);
 	base_address        = ml_static_ptovirt(args->kaddr);
 	vm_kernel_slide     = base_address - static_base_address;
@@ -286,16 +286,16 @@ i386_vm_init(uint64_t   maxmem,
 			panic("Kernel base inconsistent with slide - rebased?");
 		}
 	} else {
-		/* No slide relative to on-disk symbols */
+		                                          
 		kprintf("KASLR slide: 0x%016lx static and ignored\n",
 		    vm_kernel_slide);
 		vm_kernel_slide = 0;
 	}
 
-	/*
-	 * Zero out local relocations to avoid confusing kxld.
-	 * TODO: might be better to move this code to OSKext::initialize
-	 */
+	  
+                                                       
+                                                                 
+    
 	if (_mh_execute_header.flags & MH_PIE) {
 		struct load_command *loadcmd;
 		uint32_t cmd;
@@ -317,10 +317,10 @@ i386_vm_init(uint64_t   maxmem,
 		}
 	}
 
-	/*
-	 * Now retrieve addresses for end, edata, and etext
-	 * from MACH-O headers.
-	 */
+	  
+                                                    
+                        
+    
 	segTEXTB = (vm_offset_t) getsegdatafromheader(&_mh_execute_header,
 	    "__TEXT", &segSizeTEXT);
 	segDATAB = (vm_offset_t) getsegdatafromheader(&_mh_execute_header,
@@ -340,7 +340,7 @@ i386_vm_init(uint64_t   maxmem,
 	segCONST = getsegbynamefromheader(&_mh_execute_header,
 	    "__DATA_CONST");
 	cursectTEXT = lastsectTEXT = firstsect(segTEXT);
-	/* Discover the last TEXT section within the TEXT segment */
+	                                                            
 	while ((cursectTEXT = nextsect(segTEXT, cursectTEXT)) != NULL) {
 		lastsectTEXT = cursectTEXT;
 	}
@@ -348,11 +348,11 @@ i386_vm_init(uint64_t   maxmem,
 	sHIB  = segHIBB;
 	eHIB  = segHIBB + segSizeHIB;
 	vm_hib_base = sHIB;
-	/* Zero-padded from ehib to stext if text is 2M-aligned */
+	                                                          
 	stext = segTEXTB;
 	lowGlo.lgStext = stext;
 	etext = (vm_offset_t) round_page_64(lastsectTEXT->addr + lastsectTEXT->size);
-	/* Zero-padded from etext to sdata if text is 2M-aligned */
+	                                                           
 	sdata = segDATAB;
 	edata = segDATAB + segSizeDATA;
 
@@ -362,9 +362,9 @@ i386_vm_init(uint64_t   maxmem,
 
 	kc_format_t kc_format = KCFormatUnknown;
 
-	/* XXX: FIXME_IN_dyld: For new-style kernel caches, the ending address of __DATA_CONST may not be page-aligned */
+	                                                                                                                 
 	if (PE_get_primary_kc_format(&kc_format) && kc_format == KCFormatFileset) {
-		/* Round up the end */
+		                      
 		econst = P2ROUNDUP(econst, PAGE_SIZE);
 		edata = P2ROUNDUP(edata, PAGE_SIZE);
 	} else {
@@ -399,31 +399,31 @@ i386_vm_init(uint64_t   maxmem,
 	vm_slinkedit = segLINKB;
 	vm_elinkedit = segLINKB + segSizeLINK;
 
-	/*
-	 * In the fileset world, we want to be able to (un)slide addresses from
-	 * the kernel or any of the kexts (e.g., for kernel logging metadata
-	 * passed between the kernel and logd in userspace). VM_KERNEL_UNSLIDE
-	 * (via VM_KERNEL_IS_SLID) should apply to the addresses in the range
-	 * from the first basement address to the last boot kc address.
-	 *
-	 *                     ^
-	 *                     :
-	 *                     |
-	 *  vm_kernel_slid_top - ---------------------------------------------
-	 *                     |
-	 *                     :
-	 *                     : Boot kc (kexts in the boot kc here)
-	 *                     : - - - - - - - - - - - - - - - - - - - - - - -
-	 *                     :
-	 *                     :
-	 *                     | Boot kc (kernel here)
-	 *                     - ---------------------------------------------
-	 *                     |
-	 *                     :
-	 *                     | Basement (kexts in pageable and aux kcs here)
-	 * vm_kernel_slid_base - ---------------------------------------------
-	 *                     0
-	 */
+	  
+                                                                        
+                                                                     
+                                                                       
+                                                                      
+                                                                
+   
+                         
+                         
+                         
+                                                                       
+                         
+                         
+                                                             
+                                                                       
+                         
+                         
+                                               
+                                                                       
+                         
+                         
+                                                                       
+                                                                       
+                         
+    
 
 	vm_kernel_slid_base = vm_kext_base + vm_kernel_slide;
 	vm_kernel_slid_top = (kc_format == KCFormatFileset) ?
@@ -433,9 +433,9 @@ i386_vm_init(uint64_t   maxmem,
 
 	vm_set_page_size();
 
-	/*
-	 * Compute the memory size.
-	 */
+	  
+                            
+    
 
 	avail_remaining = 0;
 	avail_end = 0;
@@ -467,28 +467,28 @@ i386_vm_init(uint64_t   maxmem,
 		top = (ppnum_t) (((mptr->PhysicalStart) >> I386_PGSHIFT) + mptr->NumberOfPages - 1);
 
 		if (base == 0) {
-			/*
-			 * Avoid having to deal with the edge case of the
-			 * very first possible physical page and the roll-over
-			 * to -1; just ignore that page.
-			 */
+			  
+                                                    
+                                                         
+                                   
+      
 			kprintf("WARNING: ignoring first page in [0x%llx:0x%llx]\n", (uint64_t) base, (uint64_t) top);
 			base++;
 		}
 		if (top + 1 == 0) {
-			/*
-			 * Avoid having to deal with the edge case of the
-			 * very last possible physical page and the roll-over
-			 * to 0; just ignore that page.
-			 */
+			  
+                                                    
+                                                        
+                                  
+      
 			kprintf("WARNING: ignoring last page in [0x%llx:0x%llx]\n", (uint64_t) base, (uint64_t) top);
 			top--;
 		}
 		if (top < base) {
-			/*
-			 * That was the only page in that region, so
-			 * ignore the whole region.
-			 */
+			  
+                                               
+                              
+      
 			continue;
 		}
 
@@ -507,22 +507,22 @@ i386_vm_init(uint64_t   maxmem,
 		case kEfiBootServicesCode:
 		case kEfiBootServicesData:
 		case kEfiConventionalMemory:
-			/*
-			 * Consolidate usable memory types into one.
-			 */
+			  
+                                               
+      
 			pmap_type = kEfiConventionalMemory;
 			sane_size += region_bytes;
 			firmware_Conventional_bytes += region_bytes;
 			break;
-		/*
-		 * sane_size should reflect the total amount of physical
-		 * RAM in the system, not just the amount that is
-		 * available for the OS to use.
-		 * We now get this value from SMBIOS tables
-		 * rather than reverse engineering the memory map.
-		 * But the legacy computation of "sane_size" is kept
-		 * for diagnostic information.
-		 */
+		  
+                                                          
+                                                   
+                                 
+                                             
+                                                    
+                                                      
+                                
+     
 
 		case kEfiRuntimeServicesCode:
 		case kEfiRuntimeServicesData:
@@ -569,28 +569,28 @@ i386_vm_init(uint64_t   maxmem,
 			top = (top > maxpg) ? maxpg : top;
 		}
 
-		/*
-		 * handle each region
-		 */
+		  
+                       
+     
 		if ((mptr->Attribute & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME ||
 		    pmap_type != kEfiConventionalMemory) {
 			prev_pmptr = 0;
 			continue;
 		} else {
-			/*
-			 * Usable memory region
-			 */
+			  
+                          
+      
 			if (top < I386_LOWMEM_RESERVED ||
 			    !pal_is_usable_memory(base, top)) {
 				prev_pmptr = 0;
 				continue;
 			}
-			/*
-			 * A range may be marked with with the
-			 * EFI_MEMORY_KERN_RESERVED attribute
-			 * on some systems, to indicate that the range
-			 * must not be made available to devices.
-			 */
+			  
+                                         
+                                        
+                                                 
+                                            
+      
 
 			if (mptr->Attribute & EFI_MEMORY_KERN_RESERVED) {
 				if (++pmap_reserved_ranges > PMAP_MAX_RESERVED_RANGES) {
@@ -599,12 +599,12 @@ i386_vm_init(uint64_t   maxmem,
 			}
 
 			if (top < fap) {
-				/*
-				 * entire range below first_avail
-				 * salvage some low memory pages
-				 * we use some very low memory at startup
-				 * mark as already allocated here
-				 */
+				  
+                                     
+                                    
+                                             
+                                     
+       
 				if (base >= I386_LOWMEM_RESERVED) {
 					pmptr->base = base;
 				} else {
@@ -621,9 +621,9 @@ i386_vm_init(uint64_t   maxmem,
 					RESET_FRAG(pmptr);
 					pmap_reserved_range_indices[pmap_last_reserved_range_index++] = pmap_memory_region_count;
 				} else {
-					/*
-					 * mark as already mapped
-					 */
+					  
+                              
+        
 					pmptr->alloc_up = top + 1;
 					pmptr->alloc_down = top;
 					RESET_FRAG(pmptr);
@@ -631,11 +631,11 @@ i386_vm_init(uint64_t   maxmem,
 				pmptr->type = pmap_type;
 				pmptr->attribute = mptr->Attribute;
 			} else if ((base < fap) && (top > fap)) {
-				/*
-				 * spans first_avail
-				 * put mem below first avail in table but
-				 * mark already allocated
-				 */
+				  
+                        
+                                             
+                             
+       
 				pmptr->base = base;
 				pmptr->end = (fap - 1);
 				pmptr->alloc_up = pmptr->end + 1;
@@ -643,10 +643,10 @@ i386_vm_init(uint64_t   maxmem,
 				RESET_FRAG(pmptr);
 				pmptr->type = pmap_type;
 				pmptr->attribute = mptr->Attribute;
-				/*
-				 * we bump these here inline so the accounting
-				 * below works correctly
-				 */
+				  
+                                                  
+                            
+       
 				pmptr++;
 				pmap_memory_region_count++;
 
@@ -660,9 +660,9 @@ i386_vm_init(uint64_t   maxmem,
 					pmap_reserved_range_indices[pmap_last_reserved_range_index++] = pmap_memory_region_count;
 				}
 			} else {
-				/*
-				 * entire range useable
-				 */
+				  
+                           
+       
 				pmptr->alloc_up = pmptr->base = base;
 				pmptr->type = pmap_type;
 				pmptr->attribute = mptr->Attribute;
@@ -679,9 +679,9 @@ i386_vm_init(uint64_t   maxmem,
 
 			avail_remaining += (pmptr->end - pmptr->base);
 			coalescing_permitted = (prev_pmptr && (pmptr->attribute == prev_pmptr->attribute) && ((pmptr->attribute & EFI_MEMORY_KERN_RESERVED) == 0));
-			/*
-			 * Consolidate contiguous memory regions, if possible
-			 */
+			  
+                                                        
+      
 			if (prev_pmptr &&
 			    (pmptr->type == prev_pmptr->type) &&
 			    (coalescing_permitted) &&
@@ -706,12 +706,12 @@ i386_vm_init(uint64_t   maxmem,
 	avail_start = first_avail;
 	mem_actual = args->PhysicalMemorySize;
 
-	/*
-	 * For user visible memory size, round up to 128 Mb
-	 * - accounting for the various stolen memory not reported by EFI.
-	 * This is maintained for historical, comparison purposes but
-	 * we now use the memory size reported by EFI/Booter.
-	 */
+	  
+                                                    
+                                                                   
+                                                              
+                                                      
+    
 	sane_size = (sane_size + 128 * MB - 1) & ~((uint64_t)(128 * MB - 1));
 	if (sane_size != mem_actual) {
 		printf("mem_actual: 0x%llx\n legacy sane_size: 0x%llx\n",
@@ -719,20 +719,20 @@ i386_vm_init(uint64_t   maxmem,
 	}
 	sane_size = mem_actual;
 
-	/*
-	 * We cap at KERNEL_MAXMEM bytes (currently 1536GB).
-	 * Unless overriden by the maxmem= boot-arg
-	 * -- which is a non-zero maxmem argument to this function.
-	 */
+	  
+                                                     
+                                            
+                                                            
+    
 	if (maxmem == 0 && sane_size > KERNEL_MAXMEM) {
 		maxmem = KERNEL_MAXMEM;
 		printf("Physical memory %lld bytes capped at %dGB\n",
 		    sane_size, (uint32_t) (KERNEL_MAXMEM / GB));
 	}
 
-	/*
-	 * if user set maxmem, reduce memory sizes
-	 */
+	  
+                                           
+    
 	if ((maxmem > (uint64_t)first_avail) && (maxmem < sane_size)) {
 		ppnum_t discarded_pages  = (ppnum_t)((sane_size - maxmem) >> I386_PGSHIFT);
 		ppnum_t highest_pn = 0;
@@ -772,10 +772,10 @@ i386_vm_init(uint64_t   maxmem,
 		avail_end = i386_ptob(highest_pn + 1);
 	}
 
-	/*
-	 * mem_size is only a 32 bit container... follow the PPC route
-	 * and pin it to a 2 Gbyte maximum
-	 */
+	  
+                                                               
+                                   
+    
 	if (sane_size > (FOURGIG >> 1)) {
 		mem_size = (vm_size_t)(FOURGIG >> 1);
 	} else {
@@ -829,10 +829,10 @@ i386_vm_init(uint64_t   maxmem,
 		}
 	}
 
-	/*
-	 *	Initialize kernel physical map.
-	 *	Kernel virtual address starts at VM_KERNEL_MIN_ADDRESS.
-	 */
+	  
+                                   
+                                                           
+    
 	kprintf("avail_remaining = 0x%lx\n", (unsigned long)avail_remaining);
 	pmap_bootstrap(0, IA32e);
 }
@@ -846,13 +846,13 @@ pmap_free_pages(void)
 
 boolean_t pmap_next_page_reserved(ppnum_t *);
 
-/*
- * Pick a page from a "kernel private" reserved range; works around
- * errata on some hardware. EFI marks pages which can't be used for
- * certain kinds of I/O-ish activities as reserved. We reserve them for
- * kernel internal usage and prevent them from ever going on regular
- * free list.
- */
+  
+                                                                   
+                                                                   
+                                                                       
+                                                                    
+             
+   
 boolean_t
 pmap_next_page_reserved(
 	ppnum_t              *pn)
@@ -890,9 +890,9 @@ pmap_next_page_reserved(
 	return FALSE;
 }
 
-/*
- * Return the highest large page available. Fails once there are no more large pages.
- */
+  
+                                                                                     
+   
 kern_return_t
 pmap_next_page_large(
 	ppnum_t              *pn)
@@ -909,26 +909,26 @@ pmap_next_page_large(
 	for (r = pmap_memory_region_count - 1; r >= 0; r--) {
 		region = &pmap_memory_regions[r];
 
-		/*
-		 * First check if there is enough memory.
-		 */
+		  
+                                           
+     
 		if (region->alloc_down < region->alloc_up ||
 		    (region->alloc_down - region->alloc_up + 1) < LG_PPNUM_PAGES) {
 			continue;
 		}
 
-		/*
-		 * Find the starting large page, creating a fragment if needed.
-		 */
+		  
+                                                                 
+     
 		if ((region->alloc_down & LG_PPNUM_MASK) == LG_PPNUM_MASK) {
 			lgpg = (region->alloc_down & ~LG_PPNUM_MASK);
 		} else {
-			/* Can only have 1 fragment per region at a time */
+			                                                   
 			if (region->alloc_frag_up <= region->alloc_frag_down) {
 				continue;
 			}
 
-			/* Check for enough room below any fragment. */
+			                                               
 			frag_start = (region->alloc_down & ~LG_PPNUM_MASK);
 			if (frag_start < region->alloc_up ||
 			    frag_start - region->alloc_up < LG_PPNUM_PAGES) {
@@ -989,19 +989,19 @@ pmap_next_page_hi(
 	return FALSE;
 }
 
-/*
- * Record which high pages have been allocated so far,
- * so that pmap_init() can mark them PMAP_NOENCRYPT, which
- * makes hibernation faster.
- *
- * Because of the code in pmap_next_page_large(), we could
- * theoretically have fragments in several regions.
- * In practice that just doesn't happen. The last pmap region
- * is normally the largest and will satisfy all pmap_next_hi/large()
- * allocations. Since this information is used as an optimization
- * and it's ok to be conservative, we'll just record the information
- * for the final region.
- */
+  
+                                                      
+                                                          
+                            
+  
+                                                          
+                                                   
+                                                             
+                                                                    
+                                                                 
+                                                                    
+                        
+   
 void
 pmap_hi_pages_done(void)
 {
@@ -1032,9 +1032,9 @@ pmap_hi_pages_done(void)
 #endif
 }
 
-/*
- * Return the next available page from lowest memory for general use.
- */
+  
+                                                                     
+   
 boolean_t
 pmap_next_page(
 	ppnum_t              *pn)

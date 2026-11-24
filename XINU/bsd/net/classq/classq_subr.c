@@ -65,13 +65,13 @@ SYSCTL_QUAD(_net_classq, OID_AUTO, update_interval,
     "update interval in nanoseconds");
 
 #if DEBUG || DEVELOPMENT
-uint32_t ifclassq_flow_control_adv = 1; /* flow control advisory */
+uint32_t ifclassq_flow_control_adv = 1;                            
 SYSCTL_UINT(_net_classq, OID_AUTO, flow_control_adv,
     CTLFLAG_RW | CTLFLAG_LOCKED, &ifclassq_flow_control_adv, 1,
     "enable/disable flow control advisory");
 
 uint16_t fq_codel_quantum = 0;
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 void
 classq_init(void)
@@ -86,7 +86,7 @@ classq_init(void)
 	    sizeof(ifclassq_target_qdelay));
 	PE_parse_boot_argn("ifclassq_update_interval",
 	    &ifclassq_update_interval, sizeof(ifclassq_update_interval));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 	fq_codel_init();
 }
 
@@ -121,10 +121,10 @@ ifclassq_setup(struct ifnet *ifp, u_int32_t sflags, boolean_t reuse)
 
 		if (IFCQ_MAXLEN(ifq) != if_sndq_maxlen &&
 		    IFCQ_TARGET_QDELAY(ifq) == 0) {
-			/*
-			 * Choose static queues because the interface has
-			 * maximum queue size set
-			 */
+			  
+                                                    
+                            
+      
 			sflags &= ~PKTSCHEDF_QALG_DELAYBASED;
 		}
 		ifq->ifcq_sflags = sflags;
@@ -251,7 +251,7 @@ ifclassq_set_packet_metadata(struct ifclassq *ifq, struct ifnet *ifp,
 
 	default:
 		VERIFY(0);
-		/* NOTREACHED */
+		                
 		__builtin_unreachable();
 	}
 }
@@ -297,10 +297,10 @@ ifclassq_dequeue_common_default(struct ifclassq *ifq, mbuf_svc_class_t sc,
 		goto dequeue_loop;
 	}
 
-	/*
-	 * If the scheduler support dequeueing multiple packets at the
-	 * same time, call that one instead.
-	 */
+	  
+                                                               
+                                     
+    
 	if (drvmgt) {
 		int err;
 
@@ -367,7 +367,7 @@ dequeue_loop:
 
 		default:
 			VERIFY(0);
-			/* NOTREACHED */
+			                
 			__builtin_unreachable();
 		}
 
@@ -507,13 +507,13 @@ ifclassq_ev2str(cqev_t ev)
 	return c;
 }
 
-/*
- * internal representation of token bucket parameters
- *	rate:	byte_per_unittime << 32
- *		(((bits_per_sec) / 8) << 32) / machclk_freq
- *	depth:	byte << 32
- *
- */
+  
+                                                     
+                                
+                                               
+                    
+  
+   
 #define TBR_SHIFT       32
 #define TBR_SCALE(x)    ((int64_t)(x) << TBR_SHIFT)
 #define TBR_UNSCALE(x)  ((x) >> TBR_SHIFT)
@@ -546,7 +546,7 @@ ifclassq_tbr_dequeue_common(struct ifclassq *ifq, mbuf_svc_class_t sc,
 
 	*pkt = CLASSQ_PKT_INITIALIZER(*pkt);
 	tbr = &ifq->ifcq_tbr;
-	/* update token only when it is negative */
+	                                           
 	if (tbr->tbr_token <= 0) {
 		now = read_machclk();
 		interval = now - tbr->tbr_last;
@@ -560,15 +560,15 @@ ifclassq_tbr_dequeue_common(struct ifclassq *ifq, mbuf_svc_class_t sc,
 		}
 		tbr->tbr_last = now;
 	}
-	/* if token is still negative, don't allow dequeue */
+	                                                     
 	if (tbr->tbr_token <= 0) {
 		return;
 	}
 
-	/*
-	 * ifclassq takes precedence over ALTQ queue;
-	 * ifcq_drain count is adjusted by the caller.
-	 */
+	  
+                                              
+                                               
+    
 	if (drvmgt) {
 		fq_if_dequeue_sc_classq(ifq, sc, pkt);
 	} else {
@@ -584,15 +584,15 @@ ifclassq_tbr_dequeue_common(struct ifclassq *ifq, mbuf_svc_class_t sc,
 
 		default:
 			VERIFY(0);
-			/* NOTREACHED */
+			                
 		}
 	}
 }
 
-/*
- * set a token bucket regulator.
- * if the specified rate is zero, the token bucket regulator is deleted.
- */
+  
+                                
+                                                                        
+   
 int
 ifclassq_tbr_set(struct ifclassq *ifq, struct tb_profile *profile,
     boolean_t update)
@@ -631,7 +631,7 @@ ifclassq_tbr_set(struct ifclassq *ifq, struct tb_profile *profile,
 			printf("%s: TBR disabled\n", if_name(ifp));
 		}
 
-		/* disable this TBR */
+		                      
 		ifq->ifcq_flags &= ~IFCQF_TBR;
 		bzero(tbr, sizeof(*tbr));
 		ifnet_set_start_cycle(ifp, NULL);
@@ -647,22 +647,22 @@ ifclassq_tbr_set(struct ifclassq *ifq, struct tb_profile *profile,
 		    "enabled", rate, profile->depth);
 	}
 
-	/* set the new TBR */
+	                     
 	bzero(tbr, sizeof(*tbr));
 	tbr->tbr_rate_raw = rate;
 	tbr->tbr_percent = profile->percent;
 	ifq->ifcq_flags |= IFCQF_TBR;
 
-	/*
-	 * Note that the TBR fill up time (hence the ifnet restart time)
-	 * is directly related to the specified TBR depth.  The ideal
-	 * depth value should be computed such that the interval time
-	 * between each successive wakeup is adequately spaced apart,
-	 * in order to reduce scheduling overheads.  A target interval
-	 * of 10 ms seems to provide good performance balance.  This can be
-	 * overridden by specifying the depth profile.  Values smaller than
-	 * the ideal depth will reduce delay at the expense of CPU cycles.
-	 */
+	  
+                                                                 
+                                                              
+                                                              
+                                                              
+                                                               
+                                                                    
+                                                                    
+                                                                   
+    
 	tbr->tbr_rate = TBR_SCALE(rate / 8) / machclk_freq;
 	if (tbr->tbr_rate > 0) {
 		u_int32_t mtu = ifp->if_mtu;
@@ -673,7 +673,7 @@ ifclassq_tbr_set(struct ifclassq *ifq, struct tb_profile *profile,
 			mtu = IF_MINMTU;
 		}
 
-		ival = pktsched_nsecs_to_abstime(10 * NSEC_PER_MSEC); /* 10ms */
+		ival = pktsched_nsecs_to_abstime(10 * NSEC_PER_MSEC);           
 
 		for (i = 1;; i++) {
 			idepth = TBR_SCALE(i * mtu);
@@ -686,7 +686,7 @@ ifclassq_tbr_set(struct ifclassq *ifq, struct tb_profile *profile,
 		tbr->tbr_depth = TBR_SCALE(profile->depth);
 		if (tbr->tbr_depth == 0) {
 			tbr->tbr_filluptime = idepth / tbr->tbr_rate;
-			/* a little fudge factor to get closer to rate */
+			                                                 
 			tbr->tbr_depth = idepth + (idepth >> 3);
 		} else {
 			tbr->tbr_filluptime = tbr->tbr_depth / tbr->tbr_rate;
@@ -738,19 +738,19 @@ ifclassq_calc_target_qdelay(struct ifnet *ifp, u_int64_t *if_target_qdelay)
 		qdelay = ifclassq_target_qdelay;
 	}
 
-	/*
-	 * If we do not know the effective bandwidth, use the default
-	 * target queue delay.
-	 */
+	  
+                                                              
+                       
+    
 	if (qdelay == 0) {
 		qdelay = IFQ_TARGET_DELAY;
 	}
 
-	/*
-	 * If a delay has been added to ifnet start callback for
-	 * coalescing, we have to add that to the pre-set target delay
-	 * because the packets can be in the queue longer.
-	 */
+	  
+                                                         
+                                                               
+                                                   
+    
 	if ((ifp->if_eflags & IFEF_ENQUEUE_MULTI) &&
 	    ifp->if_start_delay_timeout > 0) {
 		qdelay += ifp->if_start_delay_timeout;
@@ -764,12 +764,12 @@ ifclassq_calc_update_interval(u_int64_t *update_interval)
 {
 	u_int64_t uint = 0;
 
-	/* If the system level override is set, use it */
+	                                                 
 	if (ifclassq_update_interval != 0) {
 		uint = ifclassq_update_interval;
 	}
 
-	/* Otherwise use the default value */
+	                                     
 	if (uint == 0) {
 		uint = IFQ_UPDATE_INTERVAL;
 	}

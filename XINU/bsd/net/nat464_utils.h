@@ -89,7 +89,7 @@ struct nat464_addr {
 		uint8_t         _addr8[16];
 		uint16_t                _addr16[8];
 		uint32_t                _addr32[4];
-	} nat464a;                  /* 128-bit address */
+	} nat464a;                                       
 #define natv4addr       nat464a._v4addr
 #define natv6addr       nat464a._v6addr
 #define nataddr8        nat464a._addr8
@@ -131,4 +131,4 @@ int
 
 uint16_t
     nat464_cksum_fixup(uint16_t, uint16_t, uint16_t, uint8_t);
-#endif /* !_NET_NAT464_UTILS_H_ */
+#endif                            

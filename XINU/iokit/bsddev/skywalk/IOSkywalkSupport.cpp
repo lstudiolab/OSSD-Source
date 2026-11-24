@@ -26,7 +26,7 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 #if defined(__x86_64__)
-#include <libkern/c++/OSKext.h> // IOSKCopyKextIdentifierWithAddress()
+#include <libkern/c++/OSKext.h>                                       
 #endif
 
 
@@ -49,4 +49,4 @@ IOSKCopyKextIdentifierWithAddress( vm_address_t address )
 	}
 	return id;
 }
-#endif /* __x86_64__ */
+#endif                 

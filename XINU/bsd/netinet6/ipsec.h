@@ -1,5 +1,5 @@
-/*	$FreeBSD: src/sys/netinet6/ipsec.h,v 1.4.2.2 2001/07/03 11:01:54 ume Exp $	*/
-/*	$KAME: ipsec.h,v 1.44 2001/03/23 08:08:47 itojun Exp $	*/
+                                                                                
+                                                            
 
 /*
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
@@ -30,9 +30,9 @@
  * SUCH DAMAGE.
  */
 
-/*
- * IPsec controller part.
- */
+  
+                         
+   
 
 #ifndef _NETINET6_IPSEC_H_
 #define _NETINET6_IPSEC_H_
@@ -47,7 +47,7 @@
 
 #include <os/log.h>
 
-/* lock for IPsec stats */
+                          
 extern lck_grp_t         *sadb_stat_mutex_grp;
 extern lck_grp_attr_t    *sadb_stat_mutex_grp_attr;
 extern lck_attr_t        *sadb_stat_mutex_attr;
@@ -58,26 +58,26 @@ extern lck_mtx_t         *sadb_stat_mutex;
 	OSIncrementAtomic64((SInt64 *)&x)
 
 struct secpolicyaddrrange {
-	struct sockaddr_storage start;  /* Start (low values) of address range */
-	struct sockaddr_storage end;    /* End (high values) of address range */
+	struct sockaddr_storage start;                                           
+	struct sockaddr_storage end;                                            
 };
 
-/*
- * Security Policy Index
- * Ensure that both address families in the "src" and "dst" are same.
- * When the value of the ul_proto is ICMPv6, the port field in "src"
- * specifies ICMPv6 type, and the port field in "dst" specifies ICMPv6 code.
- */
+  
+                        
+                                                                     
+                                                                    
+                                                                            
+   
 struct secpolicyindex {
-	u_int8_t dir;                   /* direction of packet flow, see below */
-	struct sockaddr_storage src;    /* IP src address for SP */
-	struct sockaddr_storage dst;    /* IP dst address for SP */
-	u_int8_t prefs;                 /* prefix length in bits for src */
-	u_int8_t prefd;                 /* prefix length in bits for dst */
-	u_int8_t ul_proto;             /* upper layer Protocol */
-	ifnet_t internal_if; /* Interface a matching packet is bound to */
-	struct secpolicyaddrrange src_range;    /* IP src address range for SP */
-	struct secpolicyaddrrange dst_range;    /* IP dst address range for SP */
+	u_int8_t dir;                                                            
+	struct sockaddr_storage src;                               
+	struct sockaddr_storage dst;                               
+	u_int8_t prefs;                                                    
+	u_int8_t prefd;                                                    
+	u_int8_t ul_proto;                                       
+	ifnet_t internal_if;                                              
+	struct secpolicyaddrrange src_range;                                     
+	struct secpolicyaddrrange dst_range;                                     
 #ifdef notyet
 	uid_t uids;
 	uid_t uidd;
@@ -86,150 +86,150 @@ struct secpolicyindex {
 #endif
 };
 
-/* Security Policy Data Base */
+                               
 struct secpolicy {
 	LIST_ENTRY(secpolicy) chain;
 
-	int refcnt;                     /* reference count */
-	struct secpolicyindex spidx;    /* selector */
-	u_int32_t id;                   /* It's unique number on the system. */
-	u_int state;                    /* 0: dead, others: alive */
+	int refcnt;                                          
+	struct secpolicyindex spidx;                  
+	u_int32_t id;                                                          
+	u_int state;                                                
 #define IPSEC_SPSTATE_DEAD      0
 #define IPSEC_SPSTATE_ALIVE     1
 
-	u_int policy;           /* DISCARD, NONE or IPSEC, see keyv2.h */
+	u_int policy;                                                    
 	struct ipsecrequest *req;
-	/* pointer to the ipsec request tree, */
-	/* if policy == IPSEC else this value == NULL.*/
+	                                        
+	                                                
 
-	ifnet_t ipsec_if; /* IPsec interface to use */
-	ifnet_t outgoing_if; /* Outgoing interface for encrypted traffic */
+	ifnet_t ipsec_if;                             
+	ifnet_t outgoing_if;                                               
 
-	char disabled; /* Set to ignore policy */
+	char disabled;                           
 
-	/*
-	 * lifetime handler.
-	 * the policy can be used without limitiation if both lifetime and
-	 * validtime are zero.
-	 * "lifetime" is passed by sadb_lifetime.sadb_lifetime_addtime.
-	 * "validtime" is passed by sadb_lifetime.sadb_lifetime_usetime.
-	 */
-	long created;           /* time created the policy */
-	long lastused;          /* updated every when kernel sends a packet */
-	long lifetime;          /* duration of the lifetime of this policy */
-	long validtime;         /* duration this policy is valid without use */
+	  
+                     
+                                                                   
+                       
+                                                                
+                                                                 
+    
+	long created;                                        
+	long lastused;                                                        
+	long lifetime;                                                       
+	long validtime;                                                        
 };
 
-/* Request for IPsec */
+                       
 struct ipsecrequest {
 	struct ipsecrequest *next;
-	/* pointer to next structure */
-	/* If NULL, it means the end of chain. */
-	struct secasindex saidx;/* hint for search proper SA */
-	                        /* if __ss_len == 0 then no address specified.*/
-	u_int level;            /* IPsec level defined below. */
+	                               
+	                                         
+	struct secasindex saidx;                               
+	                                                                        
+	u_int level;                                            
 
-	struct secpolicy *sp;   /* back pointer to SP */
+	struct secpolicy *sp;                           
 };
 
-/* security policy in PCB */
+                            
 struct inpcbpolicy {
 	struct secpolicy *sp_in;
 	struct secpolicy *sp_out;
-	int priv;                       /* privileged socket ? */
+	int priv;                                                
 };
 
-/* SP acquiring list table. */
+                              
 struct secspacq {
 	LIST_ENTRY(secspacq) chain;
 
 	struct secpolicyindex spidx;
 
-	long created;           /* for lifetime */
-	int count;              /* for lifetime */
-	/* XXX: here is mbuf place holder to be sent ? */
+	long created;                             
+	int count;                                
+	                                                 
 };
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
-/* according to IANA assignment, port 0x0000 and proto 0xff are reserved. */
+                                                                            
 #define IPSEC_PORT_ANY          0
 #define IPSEC_ULPROTO_ANY       255
 #define IPSEC_PROTO_ANY         255
 
-/* mode of security protocol */
-/* NOTE: DON'T use IPSEC_MODE_ANY at SPD.  It's only use in SAD */
-#define IPSEC_MODE_ANY          0       /* i.e. wildcard. */
+                               
+                                                                  
+#define IPSEC_MODE_ANY          0                           
 #define IPSEC_MODE_TRANSPORT    1
 #define IPSEC_MODE_TUNNEL       2
 
-/*
- * Direction of security policy.
- * NOTE: Since INVALID is used just as flag.
- * The other are used for loop counter too.
- */
+  
+                                
+                                            
+                                           
+   
 #define IPSEC_DIR_ANY           0
 #define IPSEC_DIR_INBOUND       1
 #define IPSEC_DIR_OUTBOUND      2
 #define IPSEC_DIR_MAX           3
 #define IPSEC_DIR_INVALID       4
 
-/* Policy level */
-/*
- * IPSEC, ENTRUST and BYPASS are allowed for setsockopt() in PCB,
- * DISCARD, IPSEC and NONE are allowed for setkey() in SPD.
- * DISCARD and NONE are allowed for system default.
- */
-#define IPSEC_POLICY_DISCARD    0       /* discarding packet */
-#define IPSEC_POLICY_NONE       1       /* through IPsec engine */
-#define IPSEC_POLICY_IPSEC      2       /* do IPsec */
-#define IPSEC_POLICY_ENTRUST    3       /* consulting SPD if present. */
-#define IPSEC_POLICY_BYPASS     4       /* only for privileged socket. */
-#define IPSEC_POLICY_GENERATE   5       /* same as discard - IKE daemon can override with generated policy */
+                  
+  
+                                                                 
+                                                           
+                                                   
+   
+#define IPSEC_POLICY_DISCARD    0                              
+#define IPSEC_POLICY_NONE       1                                 
+#define IPSEC_POLICY_IPSEC      2                     
+#define IPSEC_POLICY_ENTRUST    3                                       
+#define IPSEC_POLICY_BYPASS     4                                        
+#define IPSEC_POLICY_GENERATE   5                                                                            
 
-/* Security protocol level */
-#define IPSEC_LEVEL_DEFAULT     0       /* reference to system default */
-#define IPSEC_LEVEL_USE         1       /* use SA if present. */
-#define IPSEC_LEVEL_REQUIRE     2       /* require SA. */
-#define IPSEC_LEVEL_UNIQUE      3       /* unique SA. */
+                             
+#define IPSEC_LEVEL_DEFAULT     0                                        
+#define IPSEC_LEVEL_USE         1                               
+#define IPSEC_LEVEL_REQUIRE     2                        
+#define IPSEC_LEVEL_UNIQUE      3                       
 
 #define IPSEC_MANUAL_REQID_MAX  0x3fff
-/*
- * if security policy level == unique, this id
- * indicate to a relative SA for use, else is
- * zero.
- * 1 - 0x3fff are reserved for manual keying.
- * 0 are reserved for above reason.  Others is
- * for kernel use.
- * Note that this id doesn't identify SA
- * by only itself.
- */
+  
+                                              
+                                             
+        
+                                             
+                                              
+                  
+                                        
+                  
+   
 #define IPSEC_REPLAYWSIZE  32
 
-/* statistics for ipsec processing */
+                                     
 struct ipsecstat {
-	u_quad_t in_success __attribute__ ((aligned(8)));  /* succeeded inbound process */
+	u_quad_t in_success __attribute__ ((aligned(8)));                                 
 	u_quad_t in_polvio __attribute__ ((aligned(8)));
-	/* security policy violation for inbound process */
-	u_quad_t in_nosa __attribute__ ((aligned(8)));      /* inbound SA is unavailable */
-	u_quad_t in_inval __attribute__ ((aligned(8)));     /* inbound processing failed due to EINVAL */
-	u_quad_t in_nomem __attribute__ ((aligned(8)));     /* inbound processing failed due to ENOBUFS */
-	u_quad_t in_badspi __attribute__ ((aligned(8)));    /* failed getting a SPI */
-	u_quad_t in_ahreplay __attribute__ ((aligned(8)));  /* AH replay check failed */
-	u_quad_t in_espreplay __attribute__ ((aligned(8)));  /* ESP replay check failed */
-	u_quad_t in_ahauthsucc __attribute__ ((aligned(8)));  /* AH authentication success */
-	u_quad_t in_ahauthfail __attribute__ ((aligned(8)));  /* AH authentication failure */
-	u_quad_t in_espauthsucc __attribute__ ((aligned(8)));  /* ESP authentication success */
-	u_quad_t in_espauthfail __attribute__ ((aligned(8)));  /* ESP authentication failure */
+	                                                   
+	u_quad_t in_nosa __attribute__ ((aligned(8)));                                     
+	u_quad_t in_inval __attribute__ ((aligned(8)));                                                  
+	u_quad_t in_nomem __attribute__ ((aligned(8)));                                                   
+	u_quad_t in_badspi __attribute__ ((aligned(8)));                              
+	u_quad_t in_ahreplay __attribute__ ((aligned(8)));                              
+	u_quad_t in_espreplay __attribute__ ((aligned(8)));                               
+	u_quad_t in_ahauthsucc __attribute__ ((aligned(8)));                                 
+	u_quad_t in_ahauthfail __attribute__ ((aligned(8)));                                 
+	u_quad_t in_espauthsucc __attribute__ ((aligned(8)));                                  
+	u_quad_t in_espauthfail __attribute__ ((aligned(8)));                                  
 	u_quad_t in_esphist[256] __attribute__ ((aligned(8)));
 	u_quad_t in_ahhist[256] __attribute__ ((aligned(8)));
 	u_quad_t in_comphist[256] __attribute__ ((aligned(8)));
-	u_quad_t out_success __attribute__ ((aligned(8)));  /* succeeded outbound process */
+	u_quad_t out_success __attribute__ ((aligned(8)));                                  
 	u_quad_t out_polvio __attribute__ ((aligned(8)));
-	/* security policy violation for outbound process */
-	u_quad_t out_nosa __attribute__ ((aligned(8)));     /* outbound SA is unavailable */
-	u_quad_t out_inval __attribute__ ((aligned(8)));    /* outbound process failed due to EINVAL */
-	u_quad_t out_nomem __attribute__ ((aligned(8)));     /* inbound processing failed due to ENOBUFS */
-	u_quad_t out_noroute __attribute__ ((aligned(8)));  /* there is no route */
+	                                                    
+	u_quad_t out_nosa __attribute__ ((aligned(8)));                                     
+	u_quad_t out_inval __attribute__ ((aligned(8)));                                               
+	u_quad_t out_nomem __attribute__ ((aligned(8)));                                                   
+	u_quad_t out_noroute __attribute__ ((aligned(8)));                         
 	u_quad_t out_esphist[256] __attribute__ ((aligned(8)));
 	u_quad_t out_ahhist[256] __attribute__ ((aligned(8)));
 	u_quad_t out_comphist[256] __attribute__ ((aligned(8)));
@@ -249,19 +249,19 @@ struct ipsec_wake_pkt_event_data {
 };
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * Definitions for IPsec & Key sysctl operations.
- */
-/*
- * Names for IPsec & Key sysctl objects
- */
-#define IPSECCTL_STATS                  1       /* stats */
+  
+                                                 
+   
+  
+                                       
+   
+#define IPSECCTL_STATS                  1                  
 #define IPSECCTL_DEF_POLICY             2
-#define IPSECCTL_DEF_ESP_TRANSLEV       3       /* int; ESP transport mode */
-#define IPSECCTL_DEF_ESP_NETLEV         4       /* int; ESP tunnel mode */
-#define IPSECCTL_DEF_AH_TRANSLEV        5       /* int; AH transport mode */
-#define IPSECCTL_DEF_AH_NETLEV          6       /* int; AH tunnel mode */
-#if 0   /* obsolete, do not reuse */
+#define IPSECCTL_DEF_ESP_TRANSLEV       3                                    
+#define IPSECCTL_DEF_ESP_NETLEV         4                                 
+#define IPSECCTL_DEF_AH_TRANSLEV        5                                   
+#define IPSECCTL_DEF_AH_NETLEV          6                                
+#if 0                               
 #define IPSECCTL_INBOUND_CALL_IKE       7
 #endif
 #define IPSECCTL_AH_CLEARTOS            8
@@ -417,7 +417,7 @@ extern struct ipsec_history *ipsec_gethist(struct mbuf *, int *);
 extern void ipsec_clearhist(struct mbuf *);
 extern void ipsec_monitor_sleep_wake(void);
 extern void ipsec_save_wake_packet(struct mbuf *, u_int32_t, u_int32_t);
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #ifndef KERNEL
 __BEGIN_DECLS
@@ -427,6 +427,6 @@ extern char *ipsec_dump_policy(caddr_t, char *);
 
 extern const char *ipsec_strerror(void);
 __END_DECLS
-#endif /* KERNEL */
+#endif             
 
-#endif /* _NETINET6_IPSEC_H_ */
+#endif                         

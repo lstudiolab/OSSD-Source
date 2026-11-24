@@ -106,4 +106,4 @@ au_bsm_to_socket_type(u_short bsm_socket_type, int *local_socket_typep)
 	*local_socket_typep = bstp->bst_local_socket_type;
 	return 0;
 }
-#endif /* CONFIG_AUDIT */
+#endif                   

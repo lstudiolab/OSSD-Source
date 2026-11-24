@@ -69,9 +69,9 @@ deadline_to_decrementer(
 }
 
 
-/*
- * Regular local APIC timer case:
- */
+  
+                                 
+   
 static void
 rtc_lapic_config_timer(void)
 {
@@ -84,10 +84,10 @@ rtc_lapic_set_timer(uint64_t deadline, uint64_t now)
 	uint64_t set = 0;
 
 	if (deadline > 0) {
-		/*
-		 * Convert delta to bus ticks
-		 * - time now is not relevant
-		 */
+		  
+                               
+                               
+     
 		count = deadline_to_decrementer(deadline, now);
 		set = now + count;
 		lapic_set_timer_fast((uint32_t) tmrCvt(count, busFCvtn2t));
@@ -104,9 +104,9 @@ rtc_lapic_set_timer(uint64_t deadline, uint64_t now)
 	return set;
 }
 
-/*
- * TSC-deadline timer case:
- */
+  
+                           
+   
 static void
 rtc_lapic_config_tsc_deadline_timer(void)
 {
@@ -121,9 +121,9 @@ rtc_lapic_set_tsc_deadline_timer(uint64_t deadline, uint64_t now)
 	uint64_t set = 0;
 
 	if (deadline > 0) {
-		/*
-		 * Convert to TSC
-		 */
+		  
+                   
+     
 		delta = deadline_to_decrementer(deadline, now);
 		set = now + delta;
 		delta_tsc = tmrCvt(delta, tscFCvtn2t);
@@ -141,9 +141,9 @@ rtc_lapic_set_tsc_deadline_timer(uint64_t deadline, uint64_t now)
 	return set;
 }
 
-/*
- * Definitions for timer operations table
- */
+  
+                                         
+   
 
 rtc_timer_t rtc_timer_lapic = {
 	.rtc_config = rtc_lapic_config_timer,
@@ -155,17 +155,17 @@ rtc_timer_t rtc_timer_tsc_deadline = {
 	.rtc_set    = rtc_lapic_set_tsc_deadline_timer,
 };
 
-rtc_timer_t     *rtc_timer = &rtc_timer_lapic; /* defaults to LAPIC timer */
+rtc_timer_t     *rtc_timer = &rtc_timer_lapic;                              
 
-/*
- * rtc_timer_init() is called at startup on the boot processor only.
- */
+  
+                                                                    
+   
 void
 rtc_timer_init(void)
 {
 	int     TSC_deadline_timer = 0;
 
-	/* See whether we can use the local apic in TSC-deadline mode */
+	                                                                
 	if ((cpuid_features() & CPUID_FEATURE_TSCTMR)) {
 		TSC_deadline_timer = 1;
 		PE_parse_boot_argn("TSC_deadline_timer", &TSC_deadline_timer,
@@ -176,22 +176,22 @@ rtc_timer_init(void)
 
 	if (TSC_deadline_timer) {
 		rtc_timer = &rtc_timer_tsc_deadline;
-		rtc_decrementer_max = UINT64_MAX;       /* effectively none */
-		/*
-		 * The min could be as low as 1nsec,
-		 * but we're being conservative for now and making it the same
-		 * as for the local apic timer.
-		 */
-		rtc_decrementer_min = 1 * NSEC_PER_USEC;  /* 1 usec */
+		rtc_decrementer_max = UINT64_MAX;                             
+		  
+                                      
+                                                                
+                                 
+     
+		rtc_decrementer_min = 1 * NSEC_PER_USEC;              
 	} else {
-		/*
-		 * Compute the longest interval using LAPIC timer.
-		 */
+		  
+                                                    
+     
 		rtc_decrementer_max = tmrCvt(0x7fffffffULL, busFCvtt2n);
 		kprintf("maxDec: %lld\n", rtc_decrementer_max);
-		rtc_decrementer_min = 1 * NSEC_PER_USEC;  /* 1 usec */
+		rtc_decrementer_min = 1 * NSEC_PER_USEC;              
 	}
 
-	/* Point LAPIC interrupts to hardclock() */
+	                                           
 	lapic_set_timer_func((i386_intr_func_t) rtclock_intr);
 }

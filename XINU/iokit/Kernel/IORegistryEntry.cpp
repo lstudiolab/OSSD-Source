@@ -40,13 +40,13 @@
 
 #include "IOKitKernelInternal.h"
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #define super OSObject
 
 OSDefineMetaClassAndStructors(IORegistryEntry, OSObject)
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #define kIORegPlaneParentSuffix         "ParentLinks"
 #define kIORegPlaneChildSuffix          "ChildLinks"
@@ -114,7 +114,7 @@ static SInt32                   gIORegistryGenerationCount;
 #define RLOCK   lck_rw_lock_shared( &gIORegistryLock )
 #define WLOCK   lck_rw_lock_exclusive( &gIORegistryLock );      \
 	        gIORegistryGenerationCount++
-// make atomic
+              
 
 #define PUNLOCK IORecursiveLockUnlock( reserved->fLock )
 #define PLOCK   IORecursiveLockLock( reserved->fLock )
@@ -129,7 +129,7 @@ static SInt32                   gIORegistryGenerationCount;
 
 #define DEBUG_FREE      1
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 lck_rw_t        gIORegistryLock;
 lck_grp_t       *gIORegistryLockGrp;
@@ -137,7 +137,7 @@ lck_grp_attr_t  *gIORegistryLockGrpAttr;
 lck_attr_t      *gIORegistryLockAttr;
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IORegistryEntry *
 IORegistryEntry::initialize( void )
@@ -337,12 +337,12 @@ IORegistryEntry::init( OSDictionary * dict )
 
 	if ((prop = OSDynamicCast( OSString, getProperty( gIONameKey)))) {
 		OSSymbol * sym = (OSSymbol *)OSSymbol::withString( prop);
-		// ok for OSSymbol too
+		                      
 		setName( sym);
 		sym->release();
 	}
 
-#endif /* IOREGSPLITTABLES */
+#endif                       
 
 	return true;
 }
@@ -379,7 +379,7 @@ IORegistryEntry::init( IORegistryEntry * old,
 #ifdef IOREGSPLITTABLES
 	fRegistryTable = old->fRegistryTable;
 	old->fRegistryTable = (OSDictionary *) fRegistryTable->copyCollection();
-#endif /* IOREGSPLITTABLES */
+#endif                       
 
 	old->registryTable()->removeObject( plane->keys[kParentSetIndex] );
 	old->registryTable()->removeObject( plane->keys[kChildSetIndex] );
@@ -429,7 +429,7 @@ IORegistryEntry::free( void )
 	if (registryTable()) {
 		registryTable()->release();
 	}
-#endif /* IOREGSPLITTABLES */
+#endif                       
 
 	if (reserved) {
 		OSObject ** array = os_atomic_load(&reserved->fIndexedProperties, acquire);
@@ -465,9 +465,9 @@ IORegistryEntry::setPropertyTable( OSDictionary * dict )
 	PUNLOCK;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/* Wrappers to synchronize property table */
+                                            
 
 #define wrap2(type, constant)                                           \
 OSObject *                                                              \
@@ -535,7 +535,7 @@ IORegistryEntry::copyProperty( type *                  aKey, \
 bool
 IORegistryEntry::serializeProperties( OSSerialize * s ) const
 {
-//    setProperty( getRetainCount(), 32, "__retain" );
+                                                      
 
 	PLOCK;
 	OSCollection *snapshotProperties = getPropertyTable()->copyCollection();
@@ -579,17 +579,17 @@ IORegistryEntry::setProperties( OSObject * properties )
 	return kIOReturnUnsupported;
 }
 
-wrap2(const OSSymbol, const)       // copyProperty() definition
-wrap2(const OSString, const)       // copyProperty() definition
-wrap2(const char, const)           // copyProperty() definition
+wrap2(const OSSymbol, const)                                   
+wrap2(const OSString, const)                                   
+wrap2(const char, const)                                       
 
-wrap4(const OSSymbol, const)       // getProperty() w/plane definition
-wrap4(const OSString, const)       // getProperty() w/plane definition
-wrap4(const char, const)           // getProperty() w/plane definition
+wrap4(const OSSymbol, const)                                          
+wrap4(const OSString, const)                                          
+wrap4(const char, const)                                              
 
-wrap5(const OSSymbol, const)       // copyProperty() w/plane definition
-wrap5(const OSString, const)       // copyProperty() w/plane definition
-wrap5(const char, const)           // copyProperty() w/plane definition
+wrap5(const OSSymbol, const)                                           
+wrap5(const OSString, const)                                           
+wrap5(const char, const)                                               
 
 
 bool
@@ -745,7 +745,7 @@ IORegistryEntry::removeProperty( const OSSymbol * aKey)
 extern "C" {
 bool ScanForAddrInObject(OSObject * theObject,
     int indent);
-}; /* extern "C" */
+};                 
 #endif
 
 bool
@@ -753,9 +753,9 @@ IORegistryEntry::setProperty( const OSSymbol * aKey, OSObject * anObject)
 {
 	bool ret = false;
 
-	// If we are inserting a collection class and the current entry
-	// is attached into the registry (inPlane()) then mark the collection
-	// as immutable.
+	                                                               
+	                                                                     
+	                
 	OSCollection *coll = OSDynamicCast(OSCollection, anObject);
 	bool makeImmutable = (coll && inPlane());
 
@@ -788,7 +788,7 @@ runPropertyAction(Action inAction, OSObject *target,
 {
 	IOReturn res;
 
-	// closeGate is recursive so don't worry if we already hold the lock.
+	                                                                     
 	PLOCK;
 	res = (*inAction)(target, arg0, arg1, arg2, arg3);
 	PUNLOCK;
@@ -940,7 +940,7 @@ IORegistryEntry::setProperty( const char *      aKey,
 	return ret;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 OSObject *
 IORegistryEntry::setIndexedProperty(uint32_t index, OSObject * anObject)
@@ -993,9 +993,9 @@ IORegistryEntry::getIndexedProperty(uint32_t index) const
 	return array[index];
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
-/* Name, location, paths */
+                           
 
 const char *
 IORegistryEntry::getName( const IORegistryPlane * plane ) const
@@ -1280,7 +1280,7 @@ IORegistryEntry::getPath(  char * path, int * length,
 	parent = entry = this;
 	root = gRegistryRoot->getChildEntry( plane );
 	while (parent && (parent != root)) {
-		// stop below root
+		                  
 		entry = parent;
 		parent = entry->getParentEntry( plane );
 		stack->setObject((OSObject *) entry );
@@ -1491,7 +1491,7 @@ IORegistryEntry::hasAlias( const IORegistryPlane * plane,
 					if (this == entry2) {
 						if (!bestKey
 						    || (bestKey->getLength() > key->getLength())) {
-							// pick the smallest alias
+							                          
 							bestKey = key;
 						}
 					}
@@ -1523,7 +1523,7 @@ IORegistryEntry::dealiasPath(
 		return rpath;
 	}
 
-	// check for alias
+	                  
 	end = path;
 	while ((c = *end++) && (c != '/') && (c != ':')) {
 	}
@@ -1572,7 +1572,7 @@ IORegistryEntry::fromPath(
 	}
 
 	if (NULL == plane) {
-		// get plane name
+		                 
 		end = strchr( path, ':' );
 		if (end && ((end - path) < kIOMaxPlaneName)) {
 			strlcpy( temp, path, end - path + 1 );
@@ -1584,7 +1584,7 @@ IORegistryEntry::fromPath(
 		return NULL;
 	}
 
-	// check for alias
+	                  
 	end = path;
 	if ((alias = dealiasPath( &end, plane))) {
 		if (length) {
@@ -1614,7 +1614,7 @@ IORegistryEntry::fromPath(
 		} else {
 			c = *path++;
 			if (c != '/') {
-				if (c && (c != ':')) { // check valid terminator
+				if (c && (c != ':')) {                          
 					where = NULL;
 				}
 				break;
@@ -1627,20 +1627,20 @@ IORegistryEntry::fromPath(
 	} while (next);
 
 	if (where) {
-		// check residual path
+		                      
 		if (where != fromEntry) {
 			path--;
 		}
 
 		if (opath && length) {
-			// copy out residual path
+			                         
 			len2 = (int) strnlen(path, 65536);
 			if ((len + len2) < *length) {
 				strlcpy( opath + len, path, len2 + 1 );
 			}
 			*length = (len + len2);
 		} else if (path[0]) {
-			// no residual path => must be no tail for success
+			                                                  
 			where = NULL;
 		}
 	}
@@ -1667,7 +1667,7 @@ IORegistryEntry::childFromPath(
 	return IORegistryEntry::fromPath( path, plane, opath, len, this );
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #define IOLinkIterator OSCollectionIterator
 
@@ -1888,10 +1888,10 @@ IORegistryEntry::copyChildEntry(
 	return entry;
 }
 
-// FIXME: Implementation of this function is hidden from the static analyzer.
-// The analyzer is worried that this release might as well be the last release.
-// Feel free to remove the #ifndef and address the warning!
-// See also rdar://problem/63023165.
+                                                                             
+                                                                               
+                                                           
+                                    
 #ifndef __clang_analyzer__
 IORegistryEntry *
 IORegistryEntry::getChildEntry(
@@ -1906,7 +1906,7 @@ IORegistryEntry::getChildEntry(
 
 	return entry;
 }
-#endif // __clang_analyzer__
+#endif                      
 
 void
 IORegistryEntry::applyToChildren( IORegistryEntryApplierFunction applier,
@@ -2018,9 +2018,9 @@ IORegistryEntry::inPlane( const IORegistryPlane * plane ) const
 	if (plane) {
 		ret = (NULL != getParentSetReference( plane ));
 	} else {
-		// Check to see if this is in any plane.  If it is in a plane
-		// then the registryTable will contain a key with the ParentLinks
-		// suffix.  When we iterate over the keys looking for that suffix
+		                                                             
+		                                                                 
+		                                                                 
 		ret = false;
 
 		OSCollectionIterator *iter =
@@ -2031,7 +2031,7 @@ IORegistryEntry::inPlane( const IORegistryPlane * plane ) const
 			while ((key = (OSSymbol *) iter->getNextObject())) {
 				size_t keysuffix;
 
-				// Get a pointer to this keys suffix
+				                                    
 				keysuffix = key->getLength();
 				if (keysuffix <= kIORegPlaneParentSuffixLen) {
 					continue;
@@ -2097,7 +2097,7 @@ IORegistryEntry::attachToParent( IORegistryEntry * parent,
 
 	PLOCK;
 
-	// Mark any collections in the property list as immutable
+	                                                         
 	OSDictionary *ptable = getPropertyTable();
 	OSCollectionIterator *iter =
 	    OSCollectionIterator::withCollection( ptable );
@@ -2105,12 +2105,12 @@ IORegistryEntry::attachToParent( IORegistryEntry * parent,
 		const OSSymbol *key;
 
 		while ((key = (OSSymbol *) iter->getNextObject())) {
-			// Is object for key a collection?
+			                                  
 			OSCollection *coll =
 			    OSDynamicCast( OSCollection, ptable->getObject( key ));
 
 			if (coll) {
-				// Yup so mark it as immutable
+				                              
 				coll->setOptions( OSCollection::kMASK,
 				    OSCollection::kImmutable );
 			}
@@ -2187,7 +2187,7 @@ IORegistryEntry::detachFromParent( IORegistryEntry * parent,
 		needParent = false;
 	}
 
-//    parent->breakLink( this, kChildSetIndex, plane );
+                                                       
 
 	UNLOCK;
 
@@ -2288,7 +2288,7 @@ IORegistryEntry::getDepth( const IORegistryPlane * plane ) const
 			depth++;
 			next = (IORegistryEntry *) parents->getObject( 0 );
 		} else {
-			// painful
+			          
 			maxParentDepth = 0;
 			for (index = 0;
 			    (one = (IORegistryEntry *) parents->getObject( index ));
@@ -2308,7 +2308,7 @@ IORegistryEntry::getDepth( const IORegistryPlane * plane ) const
 	return depth;
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 #undef super
 #define super OSIterator
@@ -2317,7 +2317,7 @@ OSDefineMetaClassAndStructors(IORegistryIterator, OSIterator)
 
 enum { kIORegistryIteratorInvalidFlag = 0x80000000 };
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                                                                           
 
 IORegistryIterator *
 IORegistryIterator::iterateOver( IORegistryEntry * root,
@@ -2411,7 +2411,7 @@ IORegistryIterator::exitEntry( void )
 	if (where->iter) {
 		where->iter->release();
 		where->iter = NULL;
-		if (where->current) {// && (where != &start))
+		if (where->current) {                        
 			where->current->release();
 		}
 	}
@@ -2463,7 +2463,7 @@ IORegistryIterator::getNextObjectFlat( void )
 	RLOCK;
 
 	if ((NULL == where->iter)) {
-		// just entered - create new iter
+		                                 
 		if (isValid()
 		    && where->current
 		    && (links = ((options & kIORegistryIterateParents) ?
@@ -2472,7 +2472,7 @@ IORegistryIterator::getNextObjectFlat( void )
 			where->iter = OSCollectionIterator::withCollection( links );
 		}
 	} else
-	// next sibling - release current
+	                                 
 	if (where->current) {
 		where->current->release();
 	}
@@ -2508,7 +2508,7 @@ IORegistryIterator::getNextObjectRecursive( void )
 			done = OSOrderedSet::withCapacity( 10 );
 		}
 		if (done->setObject((OSObject *) next)) {
-			// done set didn't contain this one, so recurse
+			                                               
 			enterEntry();
 		}
 	}
@@ -2589,7 +2589,7 @@ OSMetaClassDefineReservedUnused(IORegistryEntry, 29);
 OSMetaClassDefineReservedUnused(IORegistryEntry, 30);
 OSMetaClassDefineReservedUnused(IORegistryEntry, 31);
 
-/* inline function implementation */
+                                    
 OSDictionary *
 IORegistryEntry::getPropertyTable( void ) const
 {

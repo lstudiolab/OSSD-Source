@@ -83,30 +83,30 @@
 static l_ioctl_t        l_noioctl;
 static l_start_t        l_nostart;
 
-/*
- * XXX it probably doesn't matter what the entries other than the l_open
- * entry are here.  The l_noioctl and ttymodem entries still look fishy.
- * Reconsider the removal of nullmodem anyway.  It was too much like
- * ttymodem, but a completely null version might be useful.
- */
+  
+                                                                        
+                                                                        
+                                                                    
+                                                           
+   
 #define NODISC(n) \
 	{ l_noopen,	l_noclose,	l_noread,	l_nowrite, \
 	  l_noioctl,	l_norint,	l_nostart,	ttymodem }
 
 struct  linesw linesw[MAXLDISC] =
 {
-	/* 0- termios */
+	                
 	{ ttyopen, ttylclose, ttread, ttwrite,
 	  l_noioctl, ttyinput, ttwwakeup, ttymodem },
-	NODISC(1),              /* 1- defunct */
-	                        /* 2- NTTYDISC */
+	NODISC(1),                              
+	                                         
 	{ ttyopen, ttylclose, ttread, ttwrite,
 	  l_noioctl, ttyinput, ttwwakeup, ttymodem },
-	NODISC(3),              /* TABLDISC */
-	NODISC(4),              /* SLIPDISC */
-	NODISC(5),              /* PPPDISC */
-	NODISC(6),              /* loadable */
-	NODISC(7),              /* loadable */
+	NODISC(3),                            
+	NODISC(4),                            
+	NODISC(5),                           
+	NODISC(6),                            
+	NODISC(7),                            
 };
 
 const int nlinesw = sizeof(linesw) / sizeof(linesw[0]);
@@ -114,14 +114,14 @@ const int nlinesw = sizeof(linesw) / sizeof(linesw[0]);
 static struct linesw nodisc = NODISC(0);
 
 #define LOADABLE_LDISC 6
-/*
- * ldisc_register: Register a line discipline.
- *
- * discipline: Index for discipline to load, or LDISC_LOAD for us to choose.
- * linesw_p:   Pointer to linesw_p.
- *
- * Returns: Index used or -1 on failure.
- */
+  
+                                              
+  
+                                                                            
+                                   
+  
+                                        
+   
 int
 ldisc_register(int discipline, struct linesw *linesw_p)
 {
@@ -145,12 +145,12 @@ ldisc_register(int discipline, struct linesw *linesw_p)
 	return slot;
 }
 
-/*
- * ldisc_deregister: Deregister a line discipline obtained with
- * ldisc_register.  Can only deregister "loadable" ones now.
- *
- * discipline: Index for discipline to unload.
- */
+  
+                                                               
+                                                            
+  
+                                              
+   
 void
 ldisc_deregister(int discipline)
 {
@@ -159,10 +159,10 @@ ldisc_deregister(int discipline)
 	}
 }
 
-/*
- * Do nothing specific version of line
- * discipline specific ioctl command.
- */
+  
+                                      
+                                     
+   
 static int
 l_noioctl(__unused struct tty *tp, __unused u_long cmd, __unused caddr_t data,
     __unused int flags, __unused struct proc *p)

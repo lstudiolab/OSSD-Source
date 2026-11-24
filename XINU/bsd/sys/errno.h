@@ -83,208 +83,208 @@ extern int * __error(void);
 __END_DECLS
 #endif
 
-/*
- * Error codes
- */
+  
+              
+   
 
-#define EPERM           1               /* Operation not permitted */
-#define ENOENT          2               /* No such file or directory */
-#define ESRCH           3               /* No such process */
-#define EINTR           4               /* Interrupted system call */
-#define EIO             5               /* Input/output error */
-#define ENXIO           6               /* Device not configured */
-#define E2BIG           7               /* Argument list too long */
-#define ENOEXEC         8               /* Exec format error */
-#define EBADF           9               /* Bad file descriptor */
-#define ECHILD          10              /* No child processes */
-#define EDEADLK         11              /* Resource deadlock avoided */
-                                        /* 11 was EAGAIN */
-#define ENOMEM          12              /* Cannot allocate memory */
-#define EACCES          13              /* Permission denied */
-#define EFAULT          14              /* Bad address */
+#define EPERM           1                                            
+#define ENOENT          2                                              
+#define ESRCH           3                                    
+#define EINTR           4                                            
+#define EIO             5                                       
+#define ENXIO           6                                          
+#define E2BIG           7                                           
+#define ENOEXEC         8                                      
+#define EBADF           9                                        
+#define ECHILD          10                                      
+#define EDEADLK         11                                             
+                                                           
+#define ENOMEM          12                                          
+#define EACCES          13                                     
+#define EFAULT          14                               
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define ENOTBLK         15              /* Block device required */
+#define ENOTBLK         15                                         
 #endif
-#define EBUSY           16              /* Device / Resource busy */
-#define EEXIST          17              /* File exists */
-#define EXDEV           18              /* Cross-device link */
-#define ENODEV          19              /* Operation not supported by device */
-#define ENOTDIR         20              /* Not a directory */
-#define EISDIR          21              /* Is a directory */
-#define EINVAL          22              /* Invalid argument */
-#define ENFILE          23              /* Too many open files in system */
-#define EMFILE          24              /* Too many open files */
-#define ENOTTY          25              /* Inappropriate ioctl for device */
-#define ETXTBSY         26              /* Text file busy */
-#define EFBIG           27              /* File too large */
-#define ENOSPC          28              /* No space left on device */
-#define ESPIPE          29              /* Illegal seek */
-#define EROFS           30              /* Read-only file system */
-#define EMLINK          31              /* Too many links */
-#define EPIPE           32              /* Broken pipe */
+#define EBUSY           16                                          
+#define EEXIST          17                               
+#define EXDEV           18                                     
+#define ENODEV          19                                                     
+#define ENOTDIR         20                                   
+#define EISDIR          21                                  
+#define EINVAL          22                                    
+#define ENFILE          23                                                 
+#define EMFILE          24                                       
+#define ENOTTY          25                                                  
+#define ETXTBSY         26                                  
+#define EFBIG           27                                  
+#define ENOSPC          28                                           
+#define ESPIPE          29                                
+#define EROFS           30                                         
+#define EMLINK          31                                  
+#define EPIPE           32                               
 
-/* math software */
-#define EDOM            33              /* Numerical argument out of domain */
-#define ERANGE          34              /* Result too large */
+                   
+#define EDOM            33                                                    
+#define ERANGE          34                                    
 
-/* non-blocking and interrupt i/o */
-#define EAGAIN          35              /* Resource temporarily unavailable */
-#define EWOULDBLOCK     EAGAIN          /* Operation would block */
-#define EINPROGRESS     36              /* Operation now in progress */
-#define EALREADY        37              /* Operation already in progress */
+                                    
+#define EAGAIN          35                                                    
+#define EWOULDBLOCK     EAGAIN                                     
+#define EINPROGRESS     36                                             
+#define EALREADY        37                                                 
 
-/* ipc/network software -- argument errors */
-#define ENOTSOCK        38              /* Socket operation on non-socket */
-#define EDESTADDRREQ    39              /* Destination address required */
-#define EMSGSIZE        40              /* Message too long */
-#define EPROTOTYPE      41              /* Protocol wrong type for socket */
-#define ENOPROTOOPT     42              /* Protocol not available */
-#define EPROTONOSUPPORT 43              /* Protocol not supported */
+                                             
+#define ENOTSOCK        38                                                  
+#define EDESTADDRREQ    39                                                
+#define EMSGSIZE        40                                    
+#define EPROTOTYPE      41                                                  
+#define ENOPROTOOPT     42                                          
+#define EPROTONOSUPPORT 43                                          
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define ESOCKTNOSUPPORT 44              /* Socket type not supported */
+#define ESOCKTNOSUPPORT 44                                             
 #endif
-#define ENOTSUP         45              /* Operation not supported */
+#define ENOTSUP         45                                           
 #if !__DARWIN_UNIX03 && !defined(KERNEL)
-/*
- * This is the same for binary and source copmpatability, unless compiling
- * the kernel itself, or compiling __DARWIN_UNIX03; if compiling for the
- * kernel, the correct value will be returned.  If compiling non-POSIX
- * source, the kernel return value will be converted by a stub in libc, and
- * if compiling source with __DARWIN_UNIX03, the conversion in libc is not
- * done, and the caller gets the expected (discrete) value.
- */
-#define EOPNOTSUPP       ENOTSUP        /* Operation not supported on socket */
-#endif /* !__DARWIN_UNIX03 && !KERNEL */
+  
+                                                                          
+                                                                        
+                                                                      
+                                                                           
+                                                                          
+                                                           
+   
+#define EOPNOTSUPP       ENOTSUP                                               
+#endif                                  
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EPFNOSUPPORT    46              /* Protocol family not supported */
+#define EPFNOSUPPORT    46                                                 
 #endif
-#define EAFNOSUPPORT    47              /* Address family not supported by protocol family */
-#define EADDRINUSE      48              /* Address already in use */
-#define EADDRNOTAVAIL   49              /* Can't assign requested address */
+#define EAFNOSUPPORT    47                                                                   
+#define EADDRINUSE      48                                          
+#define EADDRNOTAVAIL   49                                                  
 
-/* ipc/network software -- operational errors */
-#define ENETDOWN        50              /* Network is down */
-#define ENETUNREACH     51              /* Network is unreachable */
-#define ENETRESET       52              /* Network dropped connection on reset */
-#define ECONNABORTED    53              /* Software caused connection abort */
-#define ECONNRESET      54              /* Connection reset by peer */
-#define ENOBUFS         55              /* No buffer space available */
-#define EISCONN         56              /* Socket is already connected */
-#define ENOTCONN        57              /* Socket is not connected */
+                                                
+#define ENETDOWN        50                                   
+#define ENETUNREACH     51                                          
+#define ENETRESET       52                                                       
+#define ECONNABORTED    53                                                    
+#define ECONNRESET      54                                            
+#define ENOBUFS         55                                             
+#define EISCONN         56                                               
+#define ENOTCONN        57                                           
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define ESHUTDOWN       58              /* Can't send after socket shutdown */
-#define ETOOMANYREFS    59              /* Too many references: can't splice */
+#define ESHUTDOWN       58                                                    
+#define ETOOMANYREFS    59                                                     
 #endif
-#define ETIMEDOUT       60              /* Operation timed out */
-#define ECONNREFUSED    61              /* Connection refused */
+#define ETIMEDOUT       60                                       
+#define ECONNREFUSED    61                                      
 
-#define ELOOP           62              /* Too many levels of symbolic links */
-#define ENAMETOOLONG    63              /* File name too long */
+#define ELOOP           62                                                     
+#define ENAMETOOLONG    63                                      
 
-/* should be rearranged */
+                          
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EHOSTDOWN       64              /* Host is down */
+#define EHOSTDOWN       64                                
 #endif
-#define EHOSTUNREACH    65              /* No route to host */
-#define ENOTEMPTY       66              /* Directory not empty */
+#define EHOSTUNREACH    65                                    
+#define ENOTEMPTY       66                                       
 
-/* quotas & mush */
+                   
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EPROCLIM        67              /* Too many processes */
-#define EUSERS          68              /* Too many users */
+#define EPROCLIM        67                                      
+#define EUSERS          68                                  
 #endif
-#define EDQUOT          69              /* Disc quota exceeded */
+#define EDQUOT          69                                       
 
-/* Network File System */
-#define ESTALE          70              /* Stale NFS file handle */
+                         
+#define ESTALE          70                                         
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EREMOTE         71              /* Too many levels of remote in path */
-#define EBADRPC         72              /* RPC struct is bad */
-#define ERPCMISMATCH    73              /* RPC version wrong */
-#define EPROGUNAVAIL    74              /* RPC prog. not avail */
-#define EPROGMISMATCH   75              /* Program version wrong */
-#define EPROCUNAVAIL    76              /* Bad procedure for program */
+#define EREMOTE         71                                                     
+#define EBADRPC         72                                     
+#define ERPCMISMATCH    73                                     
+#define EPROGUNAVAIL    74                                       
+#define EPROGMISMATCH   75                                         
+#define EPROCUNAVAIL    76                                             
 #endif
 
-#define ENOLCK          77              /* No locks available */
-#define ENOSYS          78              /* Function not implemented */
+#define ENOLCK          77                                      
+#define ENOSYS          78                                            
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EFTYPE          79              /* Inappropriate file type or format */
-#define EAUTH           80              /* Authentication error */
-#define ENEEDAUTH       81              /* Need authenticator */
+#define EFTYPE          79                                                     
+#define EAUTH           80                                        
+#define ENEEDAUTH       81                                      
 
-/* Intelligent device errors */
-#define EPWROFF         82      /* Device power is off */
-#define EDEVERR         83      /* Device error, e.g. paper out */
+                               
+#define EPWROFF         82                               
+#define EDEVERR         83                                        
 #endif
 
-#define EOVERFLOW       84              /* Value too large to be stored in data type */
+#define EOVERFLOW       84                                                             
 
-/* Program loading errors */
+                            
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EBADEXEC        85      /* Bad executable */
-#define EBADARCH        86      /* Bad CPU type in executable */
-#define ESHLIBVERS      87      /* Shared library version mismatch */
-#define EBADMACHO       88      /* Malformed Macho file */
+#define EBADEXEC        85                          
+#define EBADARCH        86                                      
+#define ESHLIBVERS      87                                           
+#define EBADMACHO       88                                
 #endif
 
-#define ECANCELED       89              /* Operation canceled */
+#define ECANCELED       89                                      
 
-#define EIDRM           90              /* Identifier removed */
-#define ENOMSG          91              /* No message of desired type */
-#define EILSEQ          92              /* Illegal byte sequence */
+#define EIDRM           90                                      
+#define ENOMSG          91                                              
+#define EILSEQ          92                                         
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define ENOATTR         93              /* Attribute not found */
+#define ENOATTR         93                                       
 #endif
 
-#define EBADMSG         94              /* Bad message */
-#define EMULTIHOP       95              /* Reserved */
-#define ENODATA         96              /* No message available on STREAM */
-#define ENOLINK         97              /* Reserved */
-#define ENOSR           98              /* No STREAM resources */
-#define ENOSTR          99              /* Not a STREAM */
-#define EPROTO          100             /* Protocol error */
-#define ETIME           101             /* STREAM ioctl timeout */
+#define EBADMSG         94                               
+#define EMULTIHOP       95                            
+#define ENODATA         96                                                  
+#define ENOLINK         97                            
+#define ENOSR           98                                       
+#define ENOSTR          99                                
+#define EPROTO          100                                 
+#define ETIME           101                                       
 
 #if __DARWIN_UNIX03 || defined(KERNEL)
-/* This value is only discrete when compiling __DARWIN_UNIX03, or KERNEL */
-#define EOPNOTSUPP      102             /* Operation not supported on socket */
-#endif /* __DARWIN_UNIX03 || KERNEL */
+                                                                           
+#define EOPNOTSUPP      102                                                    
+#endif                                
 
-#define ENOPOLICY       103             /* No such policy registered */
+#define ENOPOLICY       103                                            
 
 #if __DARWIN_C_LEVEL >= 200809L
-#define ENOTRECOVERABLE 104             /* State not recoverable */
-#define EOWNERDEAD      105             /* Previous owner died */
+#define ENOTRECOVERABLE 104                                        
+#define EOWNERDEAD      105                                      
 #endif
 
 #if __DARWIN_C_LEVEL >= __DARWIN_C_FULL
-#define EQFULL          106             /* Interface output queue is full */
-#define ELAST           106             /* Must be equal largest errno */
+#define EQFULL          106                                                 
+#define ELAST           106                                              
 #endif
 
 #ifdef KERNEL
-/* pseudo-errors returned inside kernel to modify return to process */
-#define ERESTART        (-1)            /* restart syscall */
-#define EJUSTRETURN     (-2)            /* don't modify regs, just return */
+                                                                      
+#define ERESTART        (-1)                                 
+#define EJUSTRETURN     (-2)                                                
 
 #ifdef KERNEL_PRIVATE
-#define ERECYCLE    (-5)                /* restart lookup under heavy vnode pressure/recycling */
+#define ERECYCLE    (-5)                                                                         
 #endif
 #ifdef BSD_KERNEL_PRIVATE
 #define EREDRIVEOPEN    (-6)
 #define EKEEPLOOKING    (-7)
 #define EDATALESS       (-8)
-/* used for cvwait error returns to Libc */
+                                           
 #define ECVCERORR       256
 #define ECVPERORR       512
-#else /* BSD_KERNEL_PRIVATE */
-/* -5, -6 and -7 and -106 are reserved for kernel internal use */
-#endif /* BSD_KERNEL_PRIVATE */
+#else                         
+                                                                 
+#endif                         
 #ifdef PRIVATE
-#define EQSUSPENDED     (-EQFULL)       /* Output queue is suspended */
-#endif /* PRIVATE */
-#endif /* KERNEL */
-#endif /* _SYS_ERRNO_H_ */
+#define EQSUSPENDED     (-EQFULL)                                      
+#endif              
+#endif             
+#endif                    

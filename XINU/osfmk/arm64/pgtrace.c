@@ -45,16 +45,16 @@ typedef struct {
 #if CONFIG_PGTRACE_NONKEXT
 #include "pgtrace_decoder.h"
 
-//--------------------------------------------
-// Macros
-//
+                                              
+         
+  
 #define RBUF_DEFAULT_SIZE   1024
 #define RBUF_IDX(idx, mask) ((idx) & (mask))
 #define MSG_MAX             130
 
-//--------------------------------------------
-// Types
-//
+                                              
+        
+  
 typedef uint8_t RWLOCK;
 
 typedef struct {
@@ -63,29 +63,29 @@ typedef struct {
 	void                    *stack[PGTRACE_STACK_DEPTH];
 } log_t;
 
-//--------------------------------------------
-// Statics
-//
+                                              
+          
+  
 static struct {
-	log_t           *logs;          // Protect
-	uint32_t        size;           // Protect
-	uint64_t        rdidx, wridx;   // Protect
+	log_t           *logs;                    
+	uint32_t        size;                     
+	uint64_t        rdidx, wridx;             
 
 	uint64_t id;
 	uint32_t option;
 	uint32_t enabled;
 	uint32_t bytes;
 
-	queue_head_t    probes;         // Protect
+	queue_head_t    probes;                   
 } pgtrace;
 
 static LCK_GRP_DECLARE(pgtrace_lock_grp, "pgtrace_lock");
 static LCK_MTX_DECLARE(pgtrace_probelock, &pgtrace_lock_grp);
 static SIMPLE_LOCK_DECLARE(pgtrace_loglock, 0);
 
-//--------------------------------------------
-// Globals
-//
+                                              
+          
+  
 void
 pgtrace_init(void)
 {
@@ -197,11 +197,11 @@ pgtrace_set_size(uint32_t size)
 	log_t *old_buf, *new_buf;
 	uint32_t old_size, new_size = 1;
 
-	// round up to next power of 2
+	                              
 	while (size > new_size) {
 		new_size <<= 1;
 		if (new_size > 0x100000) {
-			// over million entries
+			                       
 			kprintf("%s: size=%x new_size=%x is too big\n", __func__, size, new_size);
 			return false;
 		}
@@ -256,7 +256,7 @@ pgtrace_set_option(uint32_t option)
 	pgtrace.option = option;
 }
 
-// pgtrace_write_log() is in interrupt disabled context
+                                                       
 void
 pgtrace_write_log(pgtrace_run_result_t res)
 {
@@ -294,14 +294,14 @@ pgtrace_write_log(pgtrace_run_result_t res)
 
 	pgtrace.logs[RBUF_IDX(pgtrace.wridx, pgtrace.size - 1)] = log;
 
-	// Advance rdidx if ring is full
+	                                
 	if (RBUF_IDX(pgtrace.wridx, pgtrace.size - 1) == RBUF_IDX(pgtrace.rdidx, pgtrace.size - 1) &&
 	    (pgtrace.wridx != pgtrace.rdidx)) {
 		pgtrace.rdidx++;
 	}
 	pgtrace.wridx++;
 
-	// Signal if ring was empty
+	                           
 	if (pgtrace.wridx == (pgtrace.rdidx + 1)) {
 		thread_wakeup(pgtrace.logs);
 	}
@@ -309,7 +309,7 @@ pgtrace_write_log(pgtrace_run_result_t res)
 	simple_unlock(&pgtrace_loglock);
 }
 
-// pgtrace_read_log() is in user thread
+                                       
 int64_t
 pgtrace_read_log(uint8_t *buf, uint32_t size)
 {
@@ -323,7 +323,7 @@ pgtrace_read_log(uint8_t *buf, uint32_t size)
 
 	total = size / sizeof(log_t);
 
-	// Check if buf is too small
+	                            
 	if (buf && total == 0) {
 		return -EINVAL;
 	}
@@ -331,7 +331,7 @@ pgtrace_read_log(uint8_t *buf, uint32_t size)
 	ints = ml_set_interrupts_enabled(FALSE);
 	simple_lock(&pgtrace_loglock);
 
-	// Wait if ring is empty
+	                        
 	if (pgtrace.rdidx == pgtrace.wridx) {
 		assert_wait(pgtrace.logs, THREAD_ABORTSAFE);
 
@@ -347,12 +347,12 @@ pgtrace_read_log(uint8_t *buf, uint32_t size)
 		simple_lock(&pgtrace_loglock);
 	}
 
-	// Trim the size
+	                
 	if ((pgtrace.rdidx + total) > pgtrace.wridx) {
 		total = (int)(pgtrace.wridx - pgtrace.rdidx);
 	}
 
-	// Copy front
+	             
 	if ((RBUF_IDX(pgtrace.rdidx, pgtrace.size - 1) + total) >= pgtrace.size) {
 		front = pgtrace.size - RBUF_IDX(pgtrace.rdidx, pgtrace.size - 1);
 	} else {
@@ -361,7 +361,7 @@ pgtrace_read_log(uint8_t *buf, uint32_t size)
 
 	memcpy(buf, &(pgtrace.logs[RBUF_IDX(pgtrace.rdidx, pgtrace.size - 1)]), front * sizeof(log_t));
 
-	// Copy back if any
+	                   
 	back = total - front;
 	if (back) {
 		buf += front * sizeof(log_t);
@@ -389,7 +389,7 @@ pgtrace_get_stats(pgtrace_stats_t *stats)
 	return 0;
 }
 
-#else // CONFIG_PGTRACE_NONKEXT
+#else                          
 
 static struct {
 	bool            active;
@@ -401,11 +401,11 @@ static struct {
 static LCK_GRP_DECLARE(pgtrace_lock_grp, "pgtrace_lock");
 static LCK_MTX_DECLARE(pgtrace_probelock, &pgtrace_lock_grp);
 
-//------------------------------------
-// functions for pmap fault handler
-// - pgtrace_decode_and_run
-// - pgtrace_write_log
-//------------------------------------
+                                      
+                                   
+                           
+                      
+                                      
 int
 pgtrace_decode_and_run(uint32_t inst, vm_offset_t fva, vm_map_offset_t *cva_page, arm_saved_state_t *ss, pgtrace_run_result_t *res)
 {
@@ -419,7 +419,7 @@ pgtrace_decode_and_run(uint32_t inst, vm_offset_t fva, vm_map_offset_t *cva_page
 	if (info.addr == fva) {
 		cva = cva_cur_page + (fva & ARM_PGMASK);
 	} else {
-		// which means a front page is not a tracing page
+		                                                 
 		cva = cva_front_page + (fva & ARM_PGMASK);
 	}
 
@@ -442,15 +442,15 @@ pgtrace_write_log(pgtrace_run_result_t res)
 	return 0;
 }
 
-//------------------------------------
-// functions for kext
-//  - pgtrace_init
-//  - pgtrace_add_probe
-//  - pgtrace_clear_probe
-//  - pgtrace_start
-//  - pgtrace_stop
-//  - pgtrace_active
-//------------------------------------
+                                      
+                     
+                  
+                       
+                         
+                   
+                  
+                    
+                                      
 int
 pgtrace_init(decoder_t *decoder, logger_t *logger)
 {
@@ -570,9 +570,9 @@ pgtrace_active(void)
 {
 	return pgtrace.active;
 }
-#endif // CONFIG_PGTRACE_NONKEXT
+#endif                          
 #else
-// empty funcs for release kernel
+                                 
 extern void pgtrace_stop(void);
 extern void pgtrace_start(void);
 extern void pgtrace_clear_probe(void);

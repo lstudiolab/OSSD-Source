@@ -44,5 +44,5 @@ _libkernel_strchr(const char *p, int ch)
 			return NULL;
 		}
 	}
-	/* NOTREACHED */
+	                
 }

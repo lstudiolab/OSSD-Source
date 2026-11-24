@@ -1,10 +1,10 @@
-/*
- * This tests the Mac OS X Superpage API introduced in 10.7
- *
- * Note that most of these calls go through the mach_vm_allocate() interface,
- * but the actually supported and documented interface is the mmap() one
- * (see mmap(2)).
- */
+  
+                                                           
+  
+                                                                             
+                                                                        
+                 
+   
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -20,11 +20,11 @@
 #define SUPERPAGE_MASK (-SUPERPAGE_SIZE)
 
 #ifdef __LP64__
-#define FIXED_ADDRESS1 (0x100000000ULL+500*1024*1024) /* at 4 GB + 500 MB virtual */
-#define FIXED_ADDRESS2 (0x100000000ULL+502*1024*1024 + 4*1024) /* at 4 GB + 502 MB + 4 KB virtual */
+#define FIXED_ADDRESS1 (0x100000000ULL+500*1024*1024)                               
+#define FIXED_ADDRESS2 (0x100000000ULL+502*1024*1024 + 4*1024)                                      
 #else
-#define FIXED_ADDRESS1 (500*1024*1024) /* at 500 MB virtual */
-#define FIXED_ADDRESS2 (502*1024*1024 + 4*1024) /* at 502 MB + 4 KB virtual */
+#define FIXED_ADDRESS1 (500*1024*1024)                        
+#define FIXED_ADDRESS2 (502*1024*1024 + 4*1024)                               
 #endif
 
 char error[100];
@@ -108,7 +108,7 @@ check_r(mach_vm_address_t addr, mach_vm_size_t size, int *res)
 	return TRUE;
 }
 
-/* check that no subpage of the superpage is readable */
+                                                        
 boolean_t
 check_nr(mach_vm_address_t addr, mach_vm_size_t size, int *res)
 {
@@ -178,13 +178,13 @@ check_rw(mach_vm_address_t addr, mach_vm_size_t size)
 mach_vm_address_t global_addr = 0;
 mach_vm_size_t  global_size = 0;
 
-/*
- * If we allocate a 2 MB superpage read-write without specifying an address,
- * - the call should succeed
- * - not return 0
- * - return a 2 MB aligned address
- * - the memory should be readable and writable
- */
+  
+                                                                            
+                            
+                 
+                                  
+                                               
+   
 boolean_t
 test_allocate()
 {
@@ -210,11 +210,11 @@ test_allocate()
 	return TRUE;
 }
 
-/*
- * If we deallocate a superpage,
- * - the call should succeed
- * - make the memory inaccessible
- */
+  
+                                
+                            
+                                 
+   
 boolean_t
 test_deallocate()
 {
@@ -235,22 +235,22 @@ test_deallocate()
 	return TRUE;
 }
 
-/*
- * If we allocate a superpage of any size read-write without specifying an address
- * - the call should succeed
- * - not return 0
- * - the memory should be readable and writable
- * If we deallocate it,
- * - the call should succeed
- * - make the memory inaccessible
- */
+  
+                                                                                  
+                            
+                 
+                                               
+                       
+                            
+                                 
+   
 boolean_t
 test_allocate_size_any()
 {
 	int kr;
 	int ret;
 	mach_vm_address_t addr = 0;
-	mach_vm_size_t  size = 2 * PAGE_SIZE; /* will be rounded up to some superpage size */
+	mach_vm_size_t  size = 2 * PAGE_SIZE;                                                
 
 	kr = mach_vm_allocate(mach_task_self(), &addr, size, VM_FLAGS_ANYWHERE | VM_FLAGS_SUPERPAGE_SIZE_ANY);
 	if (!(ret = check_kr(kr, "mach_vm_allocate"))) {
@@ -272,15 +272,15 @@ test_allocate_size_any()
 	return TRUE;
 }
 
-/*
- * If we allocate a 2 MB superpage read-write at a 2 MB aligned address,
- * - the call should succeed
- * - return the address we wished for
- * - the memory should be readable and writable
- * If we deallocate it,
- * - the call should succeed
- * - make the memory inaccessible
- */
+  
+                                                                        
+                            
+                                     
+                                               
+                       
+                            
+                                 
+   
 boolean_t
 test_allocatefixed()
 {
@@ -309,10 +309,10 @@ test_allocatefixed()
 	return TRUE;
 }
 
-/*
- * If we allocate a 2 MB superpage read-write at an unaligned address,
- * - the call should fail
- */
+  
+                                                                      
+                         
+   
 boolean_t
 test_allocateunalignedfixed()
 {
@@ -322,7 +322,7 @@ test_allocateunalignedfixed()
 	mach_vm_size_t  size = SUPERPAGE_SIZE;
 
 	kr = mach_vm_allocate(mach_task_self(), &addr, size, VM_FLAGS_SUPERPAGE_SIZE_2MB);
-	/* is supposed to fail */
+	                         
 	if ((ret = check_kr(kr, "mach_vm_allocate"))) {
 		sprintf(error, "mach_vm_allocate() should have failed");
 		return FALSE;
@@ -330,20 +330,20 @@ test_allocateunalignedfixed()
 	return TRUE;
 }
 
-/*
- * If we allocate an amount of memory not divisible by 2 MB as a 2 MB superpage
- * - the call should fail
- */
+  
+                                                                               
+                         
+   
 boolean_t
 test_allocateoddsize()
 {
 	int kr;
 	int ret;
 	mach_vm_address_t addr = FIXED_ADDRESS1;
-	mach_vm_size_t  size = PAGE_SIZE; /* != 2 MB */
+	mach_vm_size_t  size = PAGE_SIZE;              
 
 	kr = mach_vm_allocate(mach_task_self(), &addr, size, VM_FLAGS_SUPERPAGE_SIZE_2MB);
-	/* is supposed to fail */
+	                         
 	if ((ret = check_kr(kr, "mach_vm_allocate"))) {
 		sprintf(error, "mach_vm_allocate() should have failed");
 		return FALSE;
@@ -351,11 +351,11 @@ test_allocateoddsize()
 	return TRUE;
 }
 
-/*
- * If we deallocate a sub-page of a superpage,
- * - the call should succeed
- * - make the complete memory inaccessible
- */
+  
+                                              
+                            
+                                          
+   
 boolean_t
 test_deallocatesubpage()
 {
@@ -378,10 +378,10 @@ test_deallocatesubpage()
 	return TRUE;
 }
 
-/*
- * If we try to allocate memory occupied by superpages as normal pages
- * - the call should fail
- */
+  
+                                                                      
+                         
+   
 boolean_t
 test_reallocate()
 {
@@ -395,7 +395,7 @@ test_reallocate()
 		return ret;
 	}
 
-	/* attempt to allocate every sub-page of superpage */
+	                                                     
 	for (i = 0; i < SUPERPAGE_SIZE / PAGE_SIZE; i++) {
 		addr2 = addr + i * PAGE_SIZE;
 		size = PAGE_SIZE;
@@ -413,11 +413,11 @@ test_reallocate()
 	return TRUE;
 }
 
-/*
- * If we try to wire superpages
- * - the call should succeed
- * - the memory should remain readable and writable
- */
+  
+                               
+                            
+                                                   
+   
 boolean_t
 test_wire()
 {
@@ -433,7 +433,7 @@ test_wire()
 
 	kr = mach_vm_wire(mach_host_self(), mach_task_self(), addr, size, VM_PROT_WRITE | VM_PROT_READ);
 
-	if (!geteuid()) { /* may fail as user */
+	if (!geteuid()) {                       
 		if (!(ret = check_kr(kr, "mach_vm_wire"))) {
 			return ret;
 		}
@@ -451,12 +451,12 @@ test_wire()
 	return TRUE;
 }
 
-/*
- * If we try to wire superpages
- * - the call should fail
- * - the memory should remain readable and writable
- * Currently, superpages are always wired.
- */
+  
+                               
+                         
+                                                   
+                                          
+   
 boolean_t
 test_unwire()
 {
@@ -488,12 +488,12 @@ test_unwire()
 	return TRUE;
 }
 
-/*
- * If we try to write-protect superpages
- * - the call should succeed
- * - the memory should remain readable
- * - the memory should not be writable
- */
+  
+                                        
+                            
+                                      
+                                      
+   
 boolean_t
 test_readonly()
 {
@@ -527,12 +527,12 @@ test_readonly()
 	return TRUE;
 }
 
-/*
- * If we try to write-protect a sub-page of a superpage
- * - the call should succeed
- * - the complete memory should remain readable
- * - the complete memory should not be writable
- */
+  
+                                                       
+                            
+                                               
+                                               
+   
 boolean_t
 test_readonlysubpage()
 {
@@ -566,11 +566,11 @@ test_readonlysubpage()
 	return TRUE;
 }
 
-/*
- * If we fork with active superpages
- * - the parent should still be able to access the superpages
- * - the child should not be able to access the superpages
- */
+  
+                                    
+                                                             
+                                                          
+   
 boolean_t
 test_fork()
 {
@@ -585,7 +585,7 @@ test_fork()
 	}
 
 	fflush(stdout);
-	if ((pid = fork())) { /* parent */
+	if ((pid = fork())) {             
 		if (!(ret = check_rw(addr, size))) {
 			return ret;
 		}
@@ -594,7 +594,7 @@ test_fork()
 			sprintf(error, "child could access superpage");
 			return ret;
 		}
-	} else { /* child */
+	} else {            
 		if (!(ret = check_nr(addr, size, NULL))) {
 			exit(ret);
 		}
@@ -608,11 +608,11 @@ test_fork()
 	return TRUE;
 }
 
-/*
- * Doing file I/O with superpages
- * - should succeed
- * - should behave the same as with base pages (i.e. no bad data)
- */
+  
+                                 
+                   
+                                                                 
+   
 #define FILENAME "/System/Library/Kernels/kernel"
 boolean_t
 test_fileio()
@@ -624,13 +624,13 @@ test_fileio()
 	int fd;
 	unsigned int bytes;
 
-	/* allocate one superpage */
+	                            
 	kr = mach_vm_allocate(mach_task_self(), &addr1, size, VM_FLAGS_ANYWHERE | VM_FLAGS_SUPERPAGE_SIZE_2MB);
 	if (!(ret = check_kr(kr, "mach_vm_allocate (1)"))) {
 		return ret;
 	}
 
-	/* allocate base pages (superpage-sized) */
+	                                           
 	kr = mach_vm_allocate(mach_task_self(), &addr2, size, VM_FLAGS_ANYWHERE);
 	if (!(ret = check_kr(kr, "mach_vm_allocate (2)"))) {
 		return ret;
@@ -641,20 +641,20 @@ test_fileio()
 		return FALSE;
 	}
 	fcntl(fd, F_NOCACHE, 1);
-	/* read kernel into superpage */
+	                                
 	if ((bytes = read(fd, (void*)(uintptr_t)addr1, SUPERPAGE_SIZE)) < SUPERPAGE_SIZE) {
 		sprintf(error, "short read (1)");
 		return FALSE;
 	}
 	lseek(fd, 0, SEEK_SET);
-	/* read kernel into base pages */
+	                                 
 	if ((bytes = read(fd, (void*)(uintptr_t)addr2, SUPERPAGE_SIZE)) < SUPERPAGE_SIZE) {
 		sprintf(error, "short read (2)");
 		return FALSE;
 	}
 	close(fd);
 
-	/* compare */
+	             
 	if (memcmp((void*)(uintptr_t)addr1, (void*)(uintptr_t)addr2, bytes)) {
 		sprintf(error, "read data corrupt");
 		return FALSE;
@@ -671,9 +671,9 @@ test_fileio()
 	return TRUE;
 }
 
-/*
- * The mmap() interface should work just as well!
- */
+  
+                                                 
+   
 boolean_t
 test_mmap()
 {
@@ -709,9 +709,9 @@ test_mmap()
 	return TRUE;
 }
 
-/*
- * Tests one allocation/deallocaton cycle; used in a loop this tests for leaks
- */
+  
+                                                                              
+   
 boolean_t
 test_alloc_dealloc()
 {
@@ -795,7 +795,7 @@ main(int argc, char **argv)
 		mode = atoi(argv[1]);
 	}
 
-	/* install SIGBUS handler */
+	                            
 	struct sigaction my_sigaction;
 	my_sigaction.sa_handler = test_signal_handler;
 	my_sigaction.sa_flags = SA_RESTART;
@@ -803,17 +803,17 @@ main(int argc, char **argv)
 	sigaction( SIGBUS, &my_sigaction, NULL );
 	sigaction( SIGSEGV, &my_sigaction, NULL );
 
-	if (mode > 0) {           /* one specific test */
+	if (mode > 0) {                                  
 		testit(mode - 1);
 	}
 
-	if (mode == 0) {  /* test all cases */
+	if (mode == 0) {                      
 		printf("Running %d tests:\n", TESTS);
 		for (i = 0; i < TESTS; i++) {
 			testit(i);
 		}
 	}
-	if (mode == -1) { /* alloc/dealloc */
+	if (mode == -1) {                    
 		boolean_t ret;
 		do {
 			ret = test_alloc_dealloc(TRUE);

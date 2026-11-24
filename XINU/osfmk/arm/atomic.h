@@ -35,7 +35,7 @@
 
 #include <mach/boolean.h>
 
-// Parameter for __builtin_arm_dmb
+                                  
 #define DMB_OSHLD       0x1
 #define DMB_OSHST       0x2
 #define DMB_OSH         0x3
@@ -49,7 +49,7 @@
 #define DMB_ST          0xe
 #define DMB_SY          0xf
 
-// Parameter for __builtin_arm_dsb
+                                  
 #define DSB_OSHLD       0x1
 #define DSB_OSHST       0x2
 #define DSB_OSH         0x3
@@ -63,7 +63,7 @@
 #define DSB_ST          0xe
 #define DSB_SY          0xf
 
-// Parameter for __builtin_arm_isb
+                                  
 #define ISB_SY          0xf
 
-#endif // _ARM_ATOMIC_H_
+#endif                  

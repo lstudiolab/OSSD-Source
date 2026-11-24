@@ -25,10 +25,10 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * file: pe_kprintf.c
- *    i386 platform expert debugging output initialization.
- */
+  
+                     
+                                                           
+   
 #include <stdarg.h>
 #include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
@@ -46,7 +46,7 @@
 
 extern uint64_t LockTimeOut;
 
-/* Globals */
+             
 typedef void (*PE_kputc_t)(char);
 
 #if XNU_TARGET_OS_OSX
@@ -56,9 +56,9 @@ SECURITY_READ_ONLY_LATE(PE_kputc_t) PE_kputc;
 #endif
 
 #if DEVELOPMENT || DEBUG
-/* DEBUG kernel starts with true serial, but
- * may later disable or switch to video
- * console */
+                                            
+                                       
+             
 SECURITY_READ_ONLY_LATE(unsigned int) disable_serial_output = FALSE;
 #else
 SECURITY_READ_ONLY_LATE(unsigned int) disable_serial_output = TRUE;
@@ -80,9 +80,9 @@ PE_init_kprintf(void)
 		new_disable_serial_output = FALSE;
 	}
 
-	/* If we are newly enabling serial, make sure we only
-	 * call pal_serial_init() if our previous state was
-	 * not enabled */
+	                                                     
+                                                    
+                  
 	if (!new_disable_serial_output && (!disable_serial_output || pal_serial_init())) {
 		PE_kputc = pal_serial_putc;
 	} else {
@@ -94,7 +94,7 @@ PE_init_kprintf(void)
 STARTUP(KPRINTF, STARTUP_RANK_FIRST, PE_init_kprintf);
 
 #if CONFIG_NO_KPRINTF_STRINGS
-/* Prevent CPP from breaking the definition below */
+                                                    
 #undef kprintf
 #endif
 
@@ -109,9 +109,9 @@ _kprintf(const char *format, ...)
 	va_end(listp);
 }
 #define MP_DEBUG_KPRINTF(x...)  _kprintf(x)
-#else  /* MP_DEBUG */
+#else                
 #define MP_DEBUG_KPRINTF(x...)
-#endif /* MP_DEBUG */
+#endif               
 
 static int cpu_last_locked = 0;
 
@@ -135,8 +135,8 @@ kprintf(const char *fmt, ...)
 		if (gsbase == EARLY_GSBASE_MAGIC || gsbase == 0) {
 			early = TRUE;
 		}
-		/* If PE_kputc has not yet been initialized, don't
-		 * take any locks, just dump to serial */
+		                                                  
+                                           
 		if (!PE_kputc || early) {
 			va_start(listp, fmt);
 			va_copy(listp2, listp);
@@ -144,7 +144,7 @@ kprintf(const char *fmt, ...)
 			_doprnt_log(fmt, &listp, pal_serial_putc, 16);
 			va_end(listp);
 
-			// If interrupts are enabled
+			                            
 			if (ml_get_interrupts_enabled()) {
 				os_log_with_args(OS_LOG_DEFAULT, OS_LOG_TYPE_DEFAULT, fmt, listp2, caller);
 			}
@@ -161,7 +161,7 @@ kprintf(const char *fmt, ...)
 
 		in_panic_context = debug_is_current_cpu_in_panic_state();
 
-		// If current CPU is in panic context, be a little more impatient.
+		                                                                  
 		kprintf_lock_grabbed = simple_lock_try_lock_mp_signal_safe_loop_duration(&kprintf_lock,
 		    in_panic_context ? KPRINTF_LOCKWAIT_IMPATIENT : KPRINTF_LOCKWAIT_PATIENT,
 		    LCK_GRP_NULL);
@@ -181,7 +181,7 @@ kprintf(const char *fmt, ...)
 
 		va_end(listp);
 
-		// If interrupts are enabled
+		                            
 		if (ml_get_interrupts_enabled()) {
 			os_log_with_args(OS_LOG_DEFAULT, OS_LOG_TYPE_DEFAULT, fmt, listp2, caller);
 		}

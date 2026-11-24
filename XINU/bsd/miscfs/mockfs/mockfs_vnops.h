@@ -33,6 +33,6 @@
 
 extern int(**mockfs_vnodeop_p)(void *);
 
-#endif /* MOCKFS */
+#endif             
 
-#endif /* MOCKFS_VNOPS_H */
+#endif                     

@@ -28,32 +28,32 @@
 
 #if ALTERNATE_DEBUGGER
 
-/*
- *
- *  The alternate debugger feature is enabled by setting the boot arg "alternate_debugger_init"
- *  to the size of memory that should be set aside for the debugger.  The boot arg
- *  "alternate_debugger_init_pages" is used to allocate more vmpages that the alternate debugger
- *  may use to do additional VA->PA mappings. The boot-arg "alternate_debugger_pause_for_load_at_boot"
- *  will halt the system so that the debugger can be loaded early in the boot cycle -- once the
- *  alternate debugger code is loaded, a register must be set to a 1 to continue the boot process.
- *
- *  Here's an example:
- *  nvram boot-arg="alternate_debugger_init=0x800000 alternate_debugger_init_pages=0x8000 alternate_debugger_pause_for_load_at_boot=1"
- *
- *  The low memory global lgAltDebugger will contain the address of the allocated memory for
- *  the alternate debugger.  On arm64, the address of this low memory global is 0xffffff8000002048.
- *
- *  At any point after the low memory global is non-zero, Astris may be used to halt the cpu
- *  and load the alternate debugger:
- *
- *  If no alternate debugger is given, but alternate_debugger_init has been specified, and the
- *  kernel debugger is entered, the string ">MT<" is printed and normal processing continues.
- *
- *  Anytime the alternate debugger is entered, the osversion string is modified to start with "ALT"
- *  so that panic reports can clearly indicated that some kernel poking may have occurred, and
- *  the panic should be weighted accordingly.
- *
- */
+  
+  
+                                                                                               
+                                                                                  
+                                                                                                
+                                                                                                      
+                                                                                               
+                                                                                                  
+  
+                      
+                                                                                                                                      
+  
+                                                                                            
+                                                                                                   
+  
+                                                                                            
+                                    
+  
+                                                                                              
+                                                                                             
+  
+                                                                                                   
+                                                                                              
+                                             
+  
+   
 
 #include <arm64/alternate_debugger.h>
 
@@ -78,11 +78,11 @@ static mach_vm_size_t    alt_pages_size;
 typedef void (*t_putc_fn)(char c);
 typedef void (*t_call_altdbg_fn)(mach_vm_size_t size, mach_vm_address_t pages, mach_vm_size_t pages_size, t_putc_fn putc_address );
 
-// used as a temporary alternate debugger until another is loaded
+                                                                 
 extern void alternate_debugger_just_return(__unused mach_vm_size_t size, __unused mach_vm_address_t pages, __unused mach_vm_size_t pages_size, t_putc_fn putc_address);
 extern void *alternate_debugger_just_return_end;
 
-// public entry to the alternate debugger
+                                         
 void
 alternate_debugger_enter(void)
 {
@@ -91,16 +91,16 @@ alternate_debugger_enter(void)
 
 		printf("########## Going to call ALTERNATE DEBUGGER\n");
 
-		// make sure it isn't in the cache
+		                                  
 		assert((alt_size & 0xFFFFFFFF00000000) == 0);
 		flush_dcache(alt_code, (unsigned int)alt_size, 0);
 
-		// set the code to execute
+		                          
 		pmap_protect(kernel_map->pmap, alt_code, alt_code + alt_size, VM_PROT_READ | VM_PROT_EXECUTE);
 
-		// black-spot the OS version for any panic reports that occur because of entering the alternate debugger
+		                                                                                                        
 		if (*osversion) {
-			memcpy(osversion, "ALT", 3);        // Version set, stomp on the begining of it
+			memcpy(osversion, "ALT", 3);                                                   
 		} else {
 			strncpy(osversion, "ALT - Version Not Set Yet", OSVERSIZE);
 		}
@@ -113,11 +113,11 @@ alternate_debugger_enter(void)
 	}
 }
 
-// public entry to check boot args and init accordingly
+                                                       
 void
 alternate_debugger_init(void)
 {
-	// use the alternate debugger
+	                             
 	if (PE_parse_boot_argn("alternate_debugger_init", (void*)&alt_size, sizeof(alt_size))) {
 		vm_offset_t     alt_va = 0;
 
@@ -146,18 +146,18 @@ alternate_debugger_init(void)
 
 		if (alt_va) {
 			uintptr_t just_return_size = (uintptr_t)&alternate_debugger_just_return_end - (uintptr_t)&alternate_debugger_just_return;
-			assert(just_return_size <= alt_size); // alt_size is page-rounded, just_return_size should be much less than a page.
-			// install a simple return vector
+			assert(just_return_size <= alt_size);                                                                               
+			                                 
 			memcpy((void*)alt_va, &alternate_debugger_just_return, just_return_size);
 
-			// code is ready, enable the pointers to it
+			                                           
 			lowGlo.lgAltDebugger = alt_code = alt_va;
 
 #if 1
-			// DEBUG for BRING-UP testing
+			                             
 			unsigned int alt_init_test;
 			if (PE_parse_boot_argn("alternate_debugger_pause_for_load_at_boot", &alt_init_test, sizeof(alt_init_test))) {
-				// debug!!
+				          
 				kprintf("########## Waiting for ALTERNATE DEBUGGER to load (in file %s).... to continue, set register to 1", __FILE__ );
 				volatile int ii = 0;
 				while (!ii) {
@@ -171,4 +171,4 @@ alternate_debugger_init(void)
 	}
 }
 
-#endif /* ALTERNATE_DEBUGGER */
+#endif                         

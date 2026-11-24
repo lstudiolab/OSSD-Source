@@ -68,9 +68,9 @@
 #include <nfs/nfs_conf.h>
 #if CONFIG_NFS_CLIENT
 
-/*
- * vnode op calls for Sun NFS version 2 and 3
- */
+  
+                                             
+   
 #include <sys/param.h>
 #include <sys/kernel.h>
 #include <sys/systm.h>
@@ -125,9 +125,9 @@
 #define NFS_VNOP_DBG(...) NFS_DBG(NFS_FAC_VNOP, 7, ## __VA_ARGS__)
 #define DEFAULT_READLINK_NOCACHE 0
 
-/*
- * NFS vnode ops
- */
+  
+                
+   
 int     nfs_vnop_lookup(struct vnop_lookup_args *);
 int     nfsspec_vnop_read(struct vnop_read_args *);
 int     nfsspec_vnop_write(struct vnop_write_args *);
@@ -164,44 +164,44 @@ int     nfs3_vnop_symlink(struct vnop_symlink_args *);
 vnop_t **nfsv2_vnodeop_p;
 static const struct vnodeopv_entry_desc nfsv2_vnodeop_entries[] = {
 	{ .opve_op = &vnop_default_desc, .opve_impl = (vnop_t *)vn_default_error },
-	{ .opve_op = &vnop_lookup_desc, .opve_impl = (vnop_t *)nfs_vnop_lookup },         /* lookup */
-	{ .opve_op = &vnop_create_desc, .opve_impl = (vnop_t *)nfs3_vnop_create },        /* create */
-	{ .opve_op = &vnop_mknod_desc, .opve_impl = (vnop_t *)nfs3_vnop_mknod },          /* mknod */
-	{ .opve_op = &vnop_open_desc, .opve_impl = (vnop_t *)nfs_vnop_open },             /* open */
-	{ .opve_op = &vnop_close_desc, .opve_impl = (vnop_t *)nfs_vnop_close },           /* close */
-	{ .opve_op = &vnop_access_desc, .opve_impl = (vnop_t *)nfs_vnop_access },         /* access */
-	{ .opve_op = &vnop_getattr_desc, .opve_impl = (vnop_t *)nfs3_vnop_getattr },      /* getattr */
-	{ .opve_op = &vnop_setattr_desc, .opve_impl = (vnop_t *)nfs_vnop_setattr },       /* setattr */
-	{ .opve_op = &vnop_read_desc, .opve_impl = (vnop_t *)nfs_vnop_read },             /* read */
-	{ .opve_op = &vnop_write_desc, .opve_impl = (vnop_t *)nfs_vnop_write },           /* write */
-	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (vnop_t *)nfs_vnop_ioctl },           /* ioctl */
-	{ .opve_op = &vnop_select_desc, .opve_impl = (vnop_t *)nfs_vnop_select },         /* select */
-	{ .opve_op = &vnop_revoke_desc, .opve_impl = (vnop_t *)nfs_vnop_revoke },         /* revoke */
-	{ .opve_op = &vnop_mmap_desc, .opve_impl = (vnop_t *)nfs_vnop_mmap },             /* mmap */
-	{ .opve_op = &vnop_mmap_check_desc, .opve_impl = (vnop_t *)nfs_vnop_mmap_check }, /* mmap_check */
-	{ .opve_op = &vnop_mnomap_desc, .opve_impl = (vnop_t *)nfs_vnop_mnomap },         /* mnomap */
-	{ .opve_op = &vnop_fsync_desc, .opve_impl = (vnop_t *)nfs_vnop_fsync },           /* fsync */
-	{ .opve_op = &vnop_remove_desc, .opve_impl = (vnop_t *)nfs_vnop_remove },         /* remove */
-	{ .opve_op = &vnop_link_desc, .opve_impl = (vnop_t *)nfs3_vnop_link },            /* link */
-	{ .opve_op = &vnop_rename_desc, .opve_impl = (vnop_t *)nfs_vnop_rename },         /* rename */
-	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (vnop_t *)nfs3_vnop_mkdir },          /* mkdir */
-	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (vnop_t *)nfs3_vnop_rmdir },          /* rmdir */
-	{ .opve_op = &vnop_symlink_desc, .opve_impl = (vnop_t *)nfs3_vnop_symlink },      /* symlink */
-	{ .opve_op = &vnop_readdir_desc, .opve_impl = (vnop_t *)nfs_vnop_readdir },       /* readdir */
-	{ .opve_op = &vnop_readlink_desc, .opve_impl = (vnop_t *)nfs_vnop_readlink },     /* readlink */
-	{ .opve_op = &vnop_inactive_desc, .opve_impl = (vnop_t *)nfs_vnop_inactive },     /* inactive */
-	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (vnop_t *)nfs_vnop_reclaim },       /* reclaim */
-	{ .opve_op = &vnop_strategy_desc, .opve_impl = (vnop_t *)err_strategy },          /* strategy */
-	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (vnop_t *)nfs_vnop_pathconf },     /* pathconf */
-	{ .opve_op = &vnop_advlock_desc, .opve_impl = (vnop_t *)nfs_vnop_advlock },       /* advlock */
-	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (vnop_t *)err_bwrite },              /* bwrite */
-	{ .opve_op = &vnop_pagein_desc, .opve_impl = (vnop_t *)nfs_vnop_pagein },         /* Pagein */
-	{ .opve_op = &vnop_pageout_desc, .opve_impl = (vnop_t *)nfs_vnop_pageout },       /* Pageout */
-	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (vnop_t *)err_copyfile },          /* Copyfile */
-	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (vnop_t *)nfs_vnop_blktooff },     /* blktooff */
-	{ .opve_op = &vnop_offtoblk_desc, .opve_impl = (vnop_t *)nfs_vnop_offtoblk },     /* offtoblk */
-	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (vnop_t *)nfs_vnop_blockmap },     /* blockmap */
-	{ .opve_op = &vnop_monitor_desc, .opve_impl = (vnop_t *)nfs_vnop_monitor },       /* monitor */
+	{ .opve_op = &vnop_lookup_desc, .opve_impl = (vnop_t *)nfs_vnop_lookup },                     
+	{ .opve_op = &vnop_create_desc, .opve_impl = (vnop_t *)nfs3_vnop_create },                    
+	{ .opve_op = &vnop_mknod_desc, .opve_impl = (vnop_t *)nfs3_vnop_mknod },                     
+	{ .opve_op = &vnop_open_desc, .opve_impl = (vnop_t *)nfs_vnop_open },                       
+	{ .opve_op = &vnop_close_desc, .opve_impl = (vnop_t *)nfs_vnop_close },                      
+	{ .opve_op = &vnop_access_desc, .opve_impl = (vnop_t *)nfs_vnop_access },                     
+	{ .opve_op = &vnop_getattr_desc, .opve_impl = (vnop_t *)nfs3_vnop_getattr },                   
+	{ .opve_op = &vnop_setattr_desc, .opve_impl = (vnop_t *)nfs_vnop_setattr },                    
+	{ .opve_op = &vnop_read_desc, .opve_impl = (vnop_t *)nfs_vnop_read },                       
+	{ .opve_op = &vnop_write_desc, .opve_impl = (vnop_t *)nfs_vnop_write },                      
+	{ .opve_op = &vnop_ioctl_desc, .opve_impl = (vnop_t *)nfs_vnop_ioctl },                      
+	{ .opve_op = &vnop_select_desc, .opve_impl = (vnop_t *)nfs_vnop_select },                     
+	{ .opve_op = &vnop_revoke_desc, .opve_impl = (vnop_t *)nfs_vnop_revoke },                     
+	{ .opve_op = &vnop_mmap_desc, .opve_impl = (vnop_t *)nfs_vnop_mmap },                       
+	{ .opve_op = &vnop_mmap_check_desc, .opve_impl = (vnop_t *)nfs_vnop_mmap_check },                 
+	{ .opve_op = &vnop_mnomap_desc, .opve_impl = (vnop_t *)nfs_vnop_mnomap },                     
+	{ .opve_op = &vnop_fsync_desc, .opve_impl = (vnop_t *)nfs_vnop_fsync },                      
+	{ .opve_op = &vnop_remove_desc, .opve_impl = (vnop_t *)nfs_vnop_remove },                     
+	{ .opve_op = &vnop_link_desc, .opve_impl = (vnop_t *)nfs3_vnop_link },                      
+	{ .opve_op = &vnop_rename_desc, .opve_impl = (vnop_t *)nfs_vnop_rename },                     
+	{ .opve_op = &vnop_mkdir_desc, .opve_impl = (vnop_t *)nfs3_vnop_mkdir },                     
+	{ .opve_op = &vnop_rmdir_desc, .opve_impl = (vnop_t *)nfs3_vnop_rmdir },                     
+	{ .opve_op = &vnop_symlink_desc, .opve_impl = (vnop_t *)nfs3_vnop_symlink },                   
+	{ .opve_op = &vnop_readdir_desc, .opve_impl = (vnop_t *)nfs_vnop_readdir },                    
+	{ .opve_op = &vnop_readlink_desc, .opve_impl = (vnop_t *)nfs_vnop_readlink },                   
+	{ .opve_op = &vnop_inactive_desc, .opve_impl = (vnop_t *)nfs_vnop_inactive },                   
+	{ .opve_op = &vnop_reclaim_desc, .opve_impl = (vnop_t *)nfs_vnop_reclaim },                    
+	{ .opve_op = &vnop_strategy_desc, .opve_impl = (vnop_t *)err_strategy },                        
+	{ .opve_op = &vnop_pathconf_desc, .opve_impl = (vnop_t *)nfs_vnop_pathconf },                   
+	{ .opve_op = &vnop_advlock_desc, .opve_impl = (vnop_t *)nfs_vnop_advlock },                    
+	{ .opve_op = &vnop_bwrite_desc, .opve_impl = (vnop_t *)err_bwrite },                          
+	{ .opve_op = &vnop_pagein_desc, .opve_impl = (vnop_t *)nfs_vnop_pagein },                     
+	{ .opve_op = &vnop_pageout_desc, .opve_impl = (vnop_t *)nfs_vnop_pageout },                    
+	{ .opve_op = &vnop_copyfile_desc, .opve_impl = (vnop_t *)err_copyfile },                        
+	{ .opve_op = &vnop_blktooff_desc, .opve_impl = (vnop_t *)nfs_vnop_blktooff },                   
+	{ .opve_op = &vnop_offtoblk_desc, .opve_impl = (vnop_t *)nfs_vnop_offtoblk },                   
+	{ .opve_op = &vnop_blockmap_desc, .opve_impl = (vnop_t *)nfs_vnop_blockmap },                   
+	{ .opve_op = &vnop_monitor_desc, .opve_impl = (vnop_t *)nfs_vnop_monitor },                    
 	{ .opve_op = NULL, .opve_impl = NULL }
 };
 const struct vnodeopv_desc nfsv2_vnodeop_opv_desc =
@@ -212,99 +212,99 @@ const struct vnodeopv_desc nfsv2_vnodeop_opv_desc =
 vnop_t **nfsv4_vnodeop_p;
 static const struct vnodeopv_entry_desc nfsv4_vnodeop_entries[] = {
 	{ &vnop_default_desc, (vnop_t *)vn_default_error },
-	{ &vnop_lookup_desc, (vnop_t *)nfs_vnop_lookup },                        /* lookup */
-	{ &vnop_create_desc, (vnop_t *)nfs4_vnop_create },                       /* create */
-	{ &vnop_mknod_desc, (vnop_t *)nfs4_vnop_mknod },                         /* mknod */
-	{ &vnop_open_desc, (vnop_t *)nfs_vnop_open },                            /* open */
-	{ &vnop_close_desc, (vnop_t *)nfs_vnop_close },                          /* close */
-	{ &vnop_access_desc, (vnop_t *)nfs_vnop_access },                        /* access */
-	{ &vnop_getattr_desc, (vnop_t *)nfs4_vnop_getattr },                     /* getattr */
-	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },                      /* setattr */
-	{ &vnop_read_desc, (vnop_t *)nfs_vnop_read },                            /* read */
-	{ &vnop_write_desc, (vnop_t *)nfs_vnop_write },                          /* write */
-	{ &vnop_ioctl_desc, (vnop_t *)nfs_vnop_ioctl },                          /* ioctl */
-	{ &vnop_select_desc, (vnop_t *)nfs_vnop_select },                        /* select */
-	{ &vnop_revoke_desc, (vnop_t *)nfs_vnop_revoke },                        /* revoke */
-	{ &vnop_mmap_desc, (vnop_t *)nfs_vnop_mmap },                            /* mmap */
-	{ &vnop_mmap_check_desc, (vnop_t *)nfs_vnop_mmap_check },                /* mmap_check */
-	{ &vnop_mnomap_desc, (vnop_t *)nfs_vnop_mnomap },                        /* mnomap */
-	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },                          /* fsync */
-	{ &vnop_remove_desc, (vnop_t *)nfs_vnop_remove },                        /* remove */
-	{ &vnop_link_desc, (vnop_t *)nfs4_vnop_link },                           /* link */
-	{ &vnop_rename_desc, (vnop_t *)nfs_vnop_rename },                        /* rename */
-	{ &vnop_mkdir_desc, (vnop_t *)nfs4_vnop_mkdir },                         /* mkdir */
-	{ &vnop_rmdir_desc, (vnop_t *)nfs4_vnop_rmdir },                         /* rmdir */
-	{ &vnop_symlink_desc, (vnop_t *)nfs4_vnop_symlink },                     /* symlink */
-	{ &vnop_readdir_desc, (vnop_t *)nfs_vnop_readdir },                      /* readdir */
-	{ &vnop_readlink_desc, (vnop_t *)nfs_vnop_readlink },                    /* readlink */
-	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },                    /* inactive */
-	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },                      /* reclaim */
-	{ &vnop_strategy_desc, (vnop_t *)err_strategy },                         /* strategy */
-	{ &vnop_pathconf_desc, (vnop_t *)nfs_vnop_pathconf },                    /* pathconf */
-	{ &vnop_advlock_desc, (vnop_t *)nfs_vnop_advlock },                      /* advlock */
-	{ &vnop_bwrite_desc, (vnop_t *)err_bwrite },                             /* bwrite */
-	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },                        /* Pagein */
-	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },                      /* Pageout */
-	{ &vnop_copyfile_desc, (vnop_t *)err_copyfile },                         /* Copyfile */
-	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },                    /* blktooff */
-	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },                    /* offtoblk */
-	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },                    /* blockmap */
-	{ &vnop_getxattr_desc, (vnop_t *)nfs4_vnop_getxattr },                   /* getxattr */
-	{ &vnop_setxattr_desc, (vnop_t *)nfs4_vnop_setxattr },                   /* setxattr */
-	{ &vnop_removexattr_desc, (vnop_t *)nfs4_vnop_removexattr },             /* removexattr */
-	{ &vnop_listxattr_desc, (vnop_t *)nfs4_vnop_listxattr },                 /* listxattr */
+	{ &vnop_lookup_desc, (vnop_t *)nfs_vnop_lookup },                                    
+	{ &vnop_create_desc, (vnop_t *)nfs4_vnop_create },                                   
+	{ &vnop_mknod_desc, (vnop_t *)nfs4_vnop_mknod },                                    
+	{ &vnop_open_desc, (vnop_t *)nfs_vnop_open },                                      
+	{ &vnop_close_desc, (vnop_t *)nfs_vnop_close },                                     
+	{ &vnop_access_desc, (vnop_t *)nfs_vnop_access },                                    
+	{ &vnop_getattr_desc, (vnop_t *)nfs4_vnop_getattr },                                  
+	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },                                   
+	{ &vnop_read_desc, (vnop_t *)nfs_vnop_read },                                      
+	{ &vnop_write_desc, (vnop_t *)nfs_vnop_write },                                     
+	{ &vnop_ioctl_desc, (vnop_t *)nfs_vnop_ioctl },                                     
+	{ &vnop_select_desc, (vnop_t *)nfs_vnop_select },                                    
+	{ &vnop_revoke_desc, (vnop_t *)nfs_vnop_revoke },                                    
+	{ &vnop_mmap_desc, (vnop_t *)nfs_vnop_mmap },                                      
+	{ &vnop_mmap_check_desc, (vnop_t *)nfs_vnop_mmap_check },                                
+	{ &vnop_mnomap_desc, (vnop_t *)nfs_vnop_mnomap },                                    
+	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },                                     
+	{ &vnop_remove_desc, (vnop_t *)nfs_vnop_remove },                                    
+	{ &vnop_link_desc, (vnop_t *)nfs4_vnop_link },                                     
+	{ &vnop_rename_desc, (vnop_t *)nfs_vnop_rename },                                    
+	{ &vnop_mkdir_desc, (vnop_t *)nfs4_vnop_mkdir },                                    
+	{ &vnop_rmdir_desc, (vnop_t *)nfs4_vnop_rmdir },                                    
+	{ &vnop_symlink_desc, (vnop_t *)nfs4_vnop_symlink },                                  
+	{ &vnop_readdir_desc, (vnop_t *)nfs_vnop_readdir },                                   
+	{ &vnop_readlink_desc, (vnop_t *)nfs_vnop_readlink },                                  
+	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },                                  
+	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },                                   
+	{ &vnop_strategy_desc, (vnop_t *)err_strategy },                                       
+	{ &vnop_pathconf_desc, (vnop_t *)nfs_vnop_pathconf },                                  
+	{ &vnop_advlock_desc, (vnop_t *)nfs_vnop_advlock },                                   
+	{ &vnop_bwrite_desc, (vnop_t *)err_bwrite },                                         
+	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },                                    
+	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },                                   
+	{ &vnop_copyfile_desc, (vnop_t *)err_copyfile },                                       
+	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },                                  
+	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },                                  
+	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },                                  
+	{ &vnop_getxattr_desc, (vnop_t *)nfs4_vnop_getxattr },                                 
+	{ &vnop_setxattr_desc, (vnop_t *)nfs4_vnop_setxattr },                                 
+	{ &vnop_removexattr_desc, (vnop_t *)nfs4_vnop_removexattr },                              
+	{ &vnop_listxattr_desc, (vnop_t *)nfs4_vnop_listxattr },                                
 #if NAMEDSTREAMS
-	{ &vnop_getnamedstream_desc, (vnop_t *)nfs4_vnop_getnamedstream },       /* getnamedstream */
-	{ &vnop_makenamedstream_desc, (vnop_t *)nfs4_vnop_makenamedstream },     /* makenamedstream */
-	{ &vnop_removenamedstream_desc, (vnop_t *)nfs4_vnop_removenamedstream }, /* removenamedstream */
+	{ &vnop_getnamedstream_desc, (vnop_t *)nfs4_vnop_getnamedstream },                           
+	{ &vnop_makenamedstream_desc, (vnop_t *)nfs4_vnop_makenamedstream },                          
+	{ &vnop_removenamedstream_desc, (vnop_t *)nfs4_vnop_removenamedstream },                        
 #endif
-	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },                      /* monitor */
+	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },                                   
 	{ NULL, NULL }
 };
 const struct vnodeopv_desc nfsv4_vnodeop_opv_desc =
 { &nfsv4_vnodeop_p, nfsv4_vnodeop_entries };
 #endif
 
-/*
- * Special device vnode ops
- */
+  
+                           
+   
 vnop_t **spec_nfsv2nodeop_p;
 static const struct vnodeopv_entry_desc spec_nfsv2nodeop_entries[] = {
 	{ &vnop_default_desc, (vnop_t *)vn_default_error },
-	{ &vnop_lookup_desc, (vnop_t *)spec_lookup },           /* lookup */
-	{ &vnop_create_desc, (vnop_t *)spec_create },           /* create */
-	{ &vnop_mknod_desc, (vnop_t *)spec_mknod },             /* mknod */
-	{ &vnop_open_desc, (vnop_t *)spec_open },               /* open */
-	{ &vnop_close_desc, (vnop_t *)nfsspec_vnop_close },     /* close */
-	{ &vnop_getattr_desc, (vnop_t *)nfs3_vnop_getattr },    /* getattr */
-	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },     /* setattr */
-	{ &vnop_read_desc, (vnop_t *)nfsspec_vnop_read },       /* read */
-	{ &vnop_write_desc, (vnop_t *)nfsspec_vnop_write },     /* write */
-	{ &vnop_ioctl_desc, (vnop_t *)spec_ioctl },             /* ioctl */
-	{ &vnop_select_desc, (vnop_t *)spec_select },           /* select */
-	{ &vnop_revoke_desc, (vnop_t *)spec_revoke },           /* revoke */
-	{ &vnop_mmap_desc, (vnop_t *)spec_mmap },               /* mmap */
-	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },         /* fsync */
-	{ &vnop_remove_desc, (vnop_t *)spec_remove },           /* remove */
-	{ &vnop_link_desc, (vnop_t *)spec_link },               /* link */
-	{ &vnop_rename_desc, (vnop_t *)spec_rename },           /* rename */
-	{ &vnop_mkdir_desc, (vnop_t *)spec_mkdir },             /* mkdir */
-	{ &vnop_rmdir_desc, (vnop_t *)spec_rmdir },             /* rmdir */
-	{ &vnop_symlink_desc, (vnop_t *)spec_symlink },         /* symlink */
-	{ &vnop_readdir_desc, (vnop_t *)spec_readdir },         /* readdir */
-	{ &vnop_readlink_desc, (vnop_t *)spec_readlink },       /* readlink */
-	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },   /* inactive */
-	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },     /* reclaim */
-	{ &vnop_strategy_desc, (vnop_t *)spec_strategy },       /* strategy */
-	{ &vnop_pathconf_desc, (vnop_t *)spec_pathconf },       /* pathconf */
-	{ &vnop_advlock_desc, (vnop_t *)spec_advlock },         /* advlock */
-	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },             /* bwrite */
-	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },       /* Pagein */
-	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },     /* Pageout */
-	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },   /* blktooff */
-	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },   /* offtoblk */
-	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },   /* blockmap */
-	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },     /* monitor */
+	{ &vnop_lookup_desc, (vnop_t *)spec_lookup },                       
+	{ &vnop_create_desc, (vnop_t *)spec_create },                       
+	{ &vnop_mknod_desc, (vnop_t *)spec_mknod },                        
+	{ &vnop_open_desc, (vnop_t *)spec_open },                         
+	{ &vnop_close_desc, (vnop_t *)nfsspec_vnop_close },                
+	{ &vnop_getattr_desc, (vnop_t *)nfs3_vnop_getattr },                 
+	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },                  
+	{ &vnop_read_desc, (vnop_t *)nfsspec_vnop_read },                 
+	{ &vnop_write_desc, (vnop_t *)nfsspec_vnop_write },                
+	{ &vnop_ioctl_desc, (vnop_t *)spec_ioctl },                        
+	{ &vnop_select_desc, (vnop_t *)spec_select },                       
+	{ &vnop_revoke_desc, (vnop_t *)spec_revoke },                       
+	{ &vnop_mmap_desc, (vnop_t *)spec_mmap },                         
+	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },                    
+	{ &vnop_remove_desc, (vnop_t *)spec_remove },                       
+	{ &vnop_link_desc, (vnop_t *)spec_link },                         
+	{ &vnop_rename_desc, (vnop_t *)spec_rename },                       
+	{ &vnop_mkdir_desc, (vnop_t *)spec_mkdir },                        
+	{ &vnop_rmdir_desc, (vnop_t *)spec_rmdir },                        
+	{ &vnop_symlink_desc, (vnop_t *)spec_symlink },                      
+	{ &vnop_readdir_desc, (vnop_t *)spec_readdir },                      
+	{ &vnop_readlink_desc, (vnop_t *)spec_readlink },                     
+	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },                 
+	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },                  
+	{ &vnop_strategy_desc, (vnop_t *)spec_strategy },                     
+	{ &vnop_pathconf_desc, (vnop_t *)spec_pathconf },                     
+	{ &vnop_advlock_desc, (vnop_t *)spec_advlock },                      
+	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },                         
+	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },                   
+	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },                  
+	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },                 
+	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },                 
+	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },                 
+	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },                  
 	{ NULL, NULL }
 };
 const struct vnodeopv_desc spec_nfsv2nodeop_opv_desc =
@@ -313,93 +313,93 @@ const struct vnodeopv_desc spec_nfsv2nodeop_opv_desc =
 vnop_t **spec_nfsv4nodeop_p;
 static const struct vnodeopv_entry_desc spec_nfsv4nodeop_entries[] = {
 	{ &vnop_default_desc, (vnop_t *)vn_default_error },
-	{ &vnop_lookup_desc, (vnop_t *)spec_lookup },           /* lookup */
-	{ &vnop_create_desc, (vnop_t *)spec_create },           /* create */
-	{ &vnop_mknod_desc, (vnop_t *)spec_mknod },             /* mknod */
-	{ &vnop_open_desc, (vnop_t *)spec_open },               /* open */
-	{ &vnop_close_desc, (vnop_t *)nfsspec_vnop_close },     /* close */
-	{ &vnop_getattr_desc, (vnop_t *)nfs4_vnop_getattr },    /* getattr */
-	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },     /* setattr */
-	{ &vnop_read_desc, (vnop_t *)nfsspec_vnop_read },       /* read */
-	{ &vnop_write_desc, (vnop_t *)nfsspec_vnop_write },     /* write */
-	{ &vnop_ioctl_desc, (vnop_t *)spec_ioctl },             /* ioctl */
-	{ &vnop_select_desc, (vnop_t *)spec_select },           /* select */
-	{ &vnop_revoke_desc, (vnop_t *)spec_revoke },           /* revoke */
-	{ &vnop_mmap_desc, (vnop_t *)spec_mmap },               /* mmap */
-	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },         /* fsync */
-	{ &vnop_remove_desc, (vnop_t *)spec_remove },           /* remove */
-	{ &vnop_link_desc, (vnop_t *)spec_link },               /* link */
-	{ &vnop_rename_desc, (vnop_t *)spec_rename },           /* rename */
-	{ &vnop_mkdir_desc, (vnop_t *)spec_mkdir },             /* mkdir */
-	{ &vnop_rmdir_desc, (vnop_t *)spec_rmdir },             /* rmdir */
-	{ &vnop_symlink_desc, (vnop_t *)spec_symlink },         /* symlink */
-	{ &vnop_readdir_desc, (vnop_t *)spec_readdir },         /* readdir */
-	{ &vnop_readlink_desc, (vnop_t *)spec_readlink },       /* readlink */
-	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },   /* inactive */
-	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },     /* reclaim */
-	{ &vnop_strategy_desc, (vnop_t *)spec_strategy },       /* strategy */
-	{ &vnop_pathconf_desc, (vnop_t *)spec_pathconf },       /* pathconf */
-	{ &vnop_advlock_desc, (vnop_t *)spec_advlock },         /* advlock */
-	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },             /* bwrite */
-	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },       /* Pagein */
-	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },     /* Pageout */
-	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },   /* blktooff */
-	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },   /* offtoblk */
-	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },   /* blockmap */
-	{ &vnop_getxattr_desc, (vnop_t *)nfs4_vnop_getxattr },  /* getxattr */
-	{ &vnop_setxattr_desc, (vnop_t *)nfs4_vnop_setxattr },  /* setxattr */
-	{ &vnop_removexattr_desc, (vnop_t *)nfs4_vnop_removexattr },/* removexattr */
-	{ &vnop_listxattr_desc, (vnop_t *)nfs4_vnop_listxattr },/* listxattr */
+	{ &vnop_lookup_desc, (vnop_t *)spec_lookup },                       
+	{ &vnop_create_desc, (vnop_t *)spec_create },                       
+	{ &vnop_mknod_desc, (vnop_t *)spec_mknod },                        
+	{ &vnop_open_desc, (vnop_t *)spec_open },                         
+	{ &vnop_close_desc, (vnop_t *)nfsspec_vnop_close },                
+	{ &vnop_getattr_desc, (vnop_t *)nfs4_vnop_getattr },                 
+	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },                  
+	{ &vnop_read_desc, (vnop_t *)nfsspec_vnop_read },                 
+	{ &vnop_write_desc, (vnop_t *)nfsspec_vnop_write },                
+	{ &vnop_ioctl_desc, (vnop_t *)spec_ioctl },                        
+	{ &vnop_select_desc, (vnop_t *)spec_select },                       
+	{ &vnop_revoke_desc, (vnop_t *)spec_revoke },                       
+	{ &vnop_mmap_desc, (vnop_t *)spec_mmap },                         
+	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },                    
+	{ &vnop_remove_desc, (vnop_t *)spec_remove },                       
+	{ &vnop_link_desc, (vnop_t *)spec_link },                         
+	{ &vnop_rename_desc, (vnop_t *)spec_rename },                       
+	{ &vnop_mkdir_desc, (vnop_t *)spec_mkdir },                        
+	{ &vnop_rmdir_desc, (vnop_t *)spec_rmdir },                        
+	{ &vnop_symlink_desc, (vnop_t *)spec_symlink },                      
+	{ &vnop_readdir_desc, (vnop_t *)spec_readdir },                      
+	{ &vnop_readlink_desc, (vnop_t *)spec_readlink },                     
+	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },                 
+	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },                  
+	{ &vnop_strategy_desc, (vnop_t *)spec_strategy },                     
+	{ &vnop_pathconf_desc, (vnop_t *)spec_pathconf },                     
+	{ &vnop_advlock_desc, (vnop_t *)spec_advlock },                      
+	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },                         
+	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },                   
+	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },                  
+	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },                 
+	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },                 
+	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },                 
+	{ &vnop_getxattr_desc, (vnop_t *)nfs4_vnop_getxattr },                
+	{ &vnop_setxattr_desc, (vnop_t *)nfs4_vnop_setxattr },                
+	{ &vnop_removexattr_desc, (vnop_t *)nfs4_vnop_removexattr },                 
+	{ &vnop_listxattr_desc, (vnop_t *)nfs4_vnop_listxattr },               
 #if NAMEDSTREAMS
-	{ &vnop_getnamedstream_desc, (vnop_t *)nfs4_vnop_getnamedstream },      /* getnamedstream */
-	{ &vnop_makenamedstream_desc, (vnop_t *)nfs4_vnop_makenamedstream },    /* makenamedstream */
-	{ &vnop_removenamedstream_desc, (vnop_t *)nfs4_vnop_removenamedstream },/* removenamedstream */
+	{ &vnop_getnamedstream_desc, (vnop_t *)nfs4_vnop_getnamedstream },                          
+	{ &vnop_makenamedstream_desc, (vnop_t *)nfs4_vnop_makenamedstream },                         
+	{ &vnop_removenamedstream_desc, (vnop_t *)nfs4_vnop_removenamedstream },                       
 #endif
-	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },     /* monitor */
+	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },                  
 	{ NULL, NULL }
 };
 const struct vnodeopv_desc spec_nfsv4nodeop_opv_desc =
 { &spec_nfsv4nodeop_p, spec_nfsv4nodeop_entries };
-#endif /* CONFIG_NFS4 */
+#endif                  
 
 #if FIFO
 vnop_t **fifo_nfsv2nodeop_p;
 static const struct vnodeopv_entry_desc fifo_nfsv2nodeop_entries[] = {
 	{ &vnop_default_desc, (vnop_t *)vn_default_error },
-	{ &vnop_lookup_desc, (vnop_t *)fifo_lookup },           /* lookup */
-	{ &vnop_create_desc, (vnop_t *)fifo_create },           /* create */
-	{ &vnop_mknod_desc, (vnop_t *)fifo_mknod },             /* mknod */
-	{ &vnop_open_desc, (vnop_t *)fifo_open },               /* open */
-	{ &vnop_close_desc, (vnop_t *)nfsfifo_vnop_close },     /* close */
-	{ &vnop_getattr_desc, (vnop_t *)nfs3_vnop_getattr },    /* getattr */
-	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },     /* setattr */
-	{ &vnop_read_desc, (vnop_t *)nfsfifo_vnop_read },       /* read */
-	{ &vnop_write_desc, (vnop_t *)nfsfifo_vnop_write },     /* write */
-	{ &vnop_ioctl_desc, (vnop_t *)fifo_ioctl },             /* ioctl */
-	{ &vnop_select_desc, (vnop_t *)fifo_select },           /* select */
-	{ &vnop_revoke_desc, (vnop_t *)fifo_revoke },           /* revoke */
-	{ &vnop_mmap_desc, (vnop_t *)fifo_mmap },               /* mmap */
-	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },         /* fsync */
-	{ &vnop_remove_desc, (vnop_t *)fifo_remove },           /* remove */
-	{ &vnop_link_desc, (vnop_t *)fifo_link },               /* link */
-	{ &vnop_rename_desc, (vnop_t *)fifo_rename },           /* rename */
-	{ &vnop_mkdir_desc, (vnop_t *)fifo_mkdir },             /* mkdir */
-	{ &vnop_rmdir_desc, (vnop_t *)fifo_rmdir },             /* rmdir */
-	{ &vnop_symlink_desc, (vnop_t *)fifo_symlink },         /* symlink */
-	{ &vnop_readdir_desc, (vnop_t *)fifo_readdir },         /* readdir */
-	{ &vnop_readlink_desc, (vnop_t *)fifo_readlink },       /* readlink */
-	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },   /* inactive */
-	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },     /* reclaim */
-	{ &vnop_strategy_desc, (vnop_t *)fifo_strategy },       /* strategy */
-	{ &vnop_pathconf_desc, (vnop_t *)fifo_pathconf },       /* pathconf */
-	{ &vnop_advlock_desc, (vnop_t *)fifo_advlock },         /* advlock */
-	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },             /* bwrite */
-	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },       /* Pagein */
-	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },     /* Pageout */
-	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },   /* blktooff */
-	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },   /* offtoblk */
-	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },   /* blockmap */
-	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },     /* monitor */
+	{ &vnop_lookup_desc, (vnop_t *)fifo_lookup },                       
+	{ &vnop_create_desc, (vnop_t *)fifo_create },                       
+	{ &vnop_mknod_desc, (vnop_t *)fifo_mknod },                        
+	{ &vnop_open_desc, (vnop_t *)fifo_open },                         
+	{ &vnop_close_desc, (vnop_t *)nfsfifo_vnop_close },                
+	{ &vnop_getattr_desc, (vnop_t *)nfs3_vnop_getattr },                 
+	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },                  
+	{ &vnop_read_desc, (vnop_t *)nfsfifo_vnop_read },                 
+	{ &vnop_write_desc, (vnop_t *)nfsfifo_vnop_write },                
+	{ &vnop_ioctl_desc, (vnop_t *)fifo_ioctl },                        
+	{ &vnop_select_desc, (vnop_t *)fifo_select },                       
+	{ &vnop_revoke_desc, (vnop_t *)fifo_revoke },                       
+	{ &vnop_mmap_desc, (vnop_t *)fifo_mmap },                         
+	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },                    
+	{ &vnop_remove_desc, (vnop_t *)fifo_remove },                       
+	{ &vnop_link_desc, (vnop_t *)fifo_link },                         
+	{ &vnop_rename_desc, (vnop_t *)fifo_rename },                       
+	{ &vnop_mkdir_desc, (vnop_t *)fifo_mkdir },                        
+	{ &vnop_rmdir_desc, (vnop_t *)fifo_rmdir },                        
+	{ &vnop_symlink_desc, (vnop_t *)fifo_symlink },                      
+	{ &vnop_readdir_desc, (vnop_t *)fifo_readdir },                      
+	{ &vnop_readlink_desc, (vnop_t *)fifo_readlink },                     
+	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },                 
+	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },                  
+	{ &vnop_strategy_desc, (vnop_t *)fifo_strategy },                     
+	{ &vnop_pathconf_desc, (vnop_t *)fifo_pathconf },                     
+	{ &vnop_advlock_desc, (vnop_t *)fifo_advlock },                      
+	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },                         
+	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },                   
+	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },                  
+	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },                 
+	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },                 
+	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },                 
+	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },                  
 	{ NULL, NULL }
 };
 const struct vnodeopv_desc fifo_nfsv2nodeop_opv_desc =
@@ -411,55 +411,55 @@ const struct vnodeopv_desc fifo_nfsv2nodeop_opv_desc =
 vnop_t **fifo_nfsv4nodeop_p;
 static const struct vnodeopv_entry_desc fifo_nfsv4nodeop_entries[] = {
 	{ &vnop_default_desc, (vnop_t *)vn_default_error },
-	{ &vnop_lookup_desc, (vnop_t *)fifo_lookup },           /* lookup */
-	{ &vnop_create_desc, (vnop_t *)fifo_create },           /* create */
-	{ &vnop_mknod_desc, (vnop_t *)fifo_mknod },             /* mknod */
-	{ &vnop_open_desc, (vnop_t *)fifo_open },               /* open */
-	{ &vnop_close_desc, (vnop_t *)nfsfifo_vnop_close },     /* close */
-	{ &vnop_getattr_desc, (vnop_t *)nfs4_vnop_getattr },    /* getattr */
-	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },     /* setattr */
-	{ &vnop_read_desc, (vnop_t *)nfsfifo_vnop_read },       /* read */
-	{ &vnop_write_desc, (vnop_t *)nfsfifo_vnop_write },     /* write */
-	{ &vnop_ioctl_desc, (vnop_t *)fifo_ioctl },             /* ioctl */
-	{ &vnop_select_desc, (vnop_t *)fifo_select },           /* select */
-	{ &vnop_revoke_desc, (vnop_t *)fifo_revoke },           /* revoke */
-	{ &vnop_mmap_desc, (vnop_t *)fifo_mmap },               /* mmap */
-	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },         /* fsync */
-	{ &vnop_remove_desc, (vnop_t *)fifo_remove },           /* remove */
-	{ &vnop_link_desc, (vnop_t *)fifo_link },               /* link */
-	{ &vnop_rename_desc, (vnop_t *)fifo_rename },           /* rename */
-	{ &vnop_mkdir_desc, (vnop_t *)fifo_mkdir },             /* mkdir */
-	{ &vnop_rmdir_desc, (vnop_t *)fifo_rmdir },             /* rmdir */
-	{ &vnop_symlink_desc, (vnop_t *)fifo_symlink },         /* symlink */
-	{ &vnop_readdir_desc, (vnop_t *)fifo_readdir },         /* readdir */
-	{ &vnop_readlink_desc, (vnop_t *)fifo_readlink },       /* readlink */
-	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },   /* inactive */
-	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },     /* reclaim */
-	{ &vnop_strategy_desc, (vnop_t *)fifo_strategy },       /* strategy */
-	{ &vnop_pathconf_desc, (vnop_t *)fifo_pathconf },       /* pathconf */
-	{ &vnop_advlock_desc, (vnop_t *)fifo_advlock },         /* advlock */
-	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },             /* bwrite */
-	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },       /* Pagein */
-	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },     /* Pageout */
-	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },   /* blktooff */
-	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },   /* offtoblk */
-	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },   /* blockmap */
-	{ &vnop_getxattr_desc, (vnop_t *)nfs4_vnop_getxattr },  /* getxattr */
-	{ &vnop_setxattr_desc, (vnop_t *)nfs4_vnop_setxattr },  /* setxattr */
-	{ &vnop_removexattr_desc, (vnop_t *)nfs4_vnop_removexattr },/* removexattr */
-	{ &vnop_listxattr_desc, (vnop_t *)nfs4_vnop_listxattr },/* listxattr */
+	{ &vnop_lookup_desc, (vnop_t *)fifo_lookup },                       
+	{ &vnop_create_desc, (vnop_t *)fifo_create },                       
+	{ &vnop_mknod_desc, (vnop_t *)fifo_mknod },                        
+	{ &vnop_open_desc, (vnop_t *)fifo_open },                         
+	{ &vnop_close_desc, (vnop_t *)nfsfifo_vnop_close },                
+	{ &vnop_getattr_desc, (vnop_t *)nfs4_vnop_getattr },                 
+	{ &vnop_setattr_desc, (vnop_t *)nfs_vnop_setattr },                  
+	{ &vnop_read_desc, (vnop_t *)nfsfifo_vnop_read },                 
+	{ &vnop_write_desc, (vnop_t *)nfsfifo_vnop_write },                
+	{ &vnop_ioctl_desc, (vnop_t *)fifo_ioctl },                        
+	{ &vnop_select_desc, (vnop_t *)fifo_select },                       
+	{ &vnop_revoke_desc, (vnop_t *)fifo_revoke },                       
+	{ &vnop_mmap_desc, (vnop_t *)fifo_mmap },                         
+	{ &vnop_fsync_desc, (vnop_t *)nfs_vnop_fsync },                    
+	{ &vnop_remove_desc, (vnop_t *)fifo_remove },                       
+	{ &vnop_link_desc, (vnop_t *)fifo_link },                         
+	{ &vnop_rename_desc, (vnop_t *)fifo_rename },                       
+	{ &vnop_mkdir_desc, (vnop_t *)fifo_mkdir },                        
+	{ &vnop_rmdir_desc, (vnop_t *)fifo_rmdir },                        
+	{ &vnop_symlink_desc, (vnop_t *)fifo_symlink },                      
+	{ &vnop_readdir_desc, (vnop_t *)fifo_readdir },                      
+	{ &vnop_readlink_desc, (vnop_t *)fifo_readlink },                     
+	{ &vnop_inactive_desc, (vnop_t *)nfs_vnop_inactive },                 
+	{ &vnop_reclaim_desc, (vnop_t *)nfs_vnop_reclaim },                  
+	{ &vnop_strategy_desc, (vnop_t *)fifo_strategy },                     
+	{ &vnop_pathconf_desc, (vnop_t *)fifo_pathconf },                     
+	{ &vnop_advlock_desc, (vnop_t *)fifo_advlock },                      
+	{ &vnop_bwrite_desc, (vnop_t *)vn_bwrite },                         
+	{ &vnop_pagein_desc, (vnop_t *)nfs_vnop_pagein },                   
+	{ &vnop_pageout_desc, (vnop_t *)nfs_vnop_pageout },                  
+	{ &vnop_blktooff_desc, (vnop_t *)nfs_vnop_blktooff },                 
+	{ &vnop_offtoblk_desc, (vnop_t *)nfs_vnop_offtoblk },                 
+	{ &vnop_blockmap_desc, (vnop_t *)nfs_vnop_blockmap },                 
+	{ &vnop_getxattr_desc, (vnop_t *)nfs4_vnop_getxattr },                
+	{ &vnop_setxattr_desc, (vnop_t *)nfs4_vnop_setxattr },                
+	{ &vnop_removexattr_desc, (vnop_t *)nfs4_vnop_removexattr },                 
+	{ &vnop_listxattr_desc, (vnop_t *)nfs4_vnop_listxattr },               
 #if NAMEDSTREAMS
-	{ &vnop_getnamedstream_desc, (vnop_t *)nfs4_vnop_getnamedstream },      /* getnamedstream */
-	{ &vnop_makenamedstream_desc, (vnop_t *)nfs4_vnop_makenamedstream },    /* makenamedstream */
-	{ &vnop_removenamedstream_desc, (vnop_t *)nfs4_vnop_removenamedstream },/* removenamedstream */
+	{ &vnop_getnamedstream_desc, (vnop_t *)nfs4_vnop_getnamedstream },                          
+	{ &vnop_makenamedstream_desc, (vnop_t *)nfs4_vnop_makenamedstream },                         
+	{ &vnop_removenamedstream_desc, (vnop_t *)nfs4_vnop_removenamedstream },                       
 #endif
-	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },     /* monitor */
+	{ &vnop_monitor_desc, (vnop_t *)nfs_vnop_monitor },                  
 	{ NULL, NULL }
 };
 const struct vnodeopv_desc fifo_nfsv4nodeop_opv_desc =
 { &fifo_nfsv4nodeop_p, fifo_nfsv4nodeop_entries };
-#endif /* FIFO */
-#endif /* CONFIG_NFS4 */
+#endif           
+#endif                  
 
 int     nfs_sillyrename(nfsnode_t, nfsnode_t, struct componentname *, vfs_context_t);
 int     nfs_getattr_internal(nfsnode_t, struct nfs_vattr *, vfs_context_t, int);
@@ -483,10 +483,10 @@ nfs_dir_buf_cache_lookup_boundaries(struct nfsbuf *bp, int *sof, int *eof)
 	}
 }
 
-/*
- * Update nfsnode attributes to avoid extra getattr calls for each direntry.
- * This function should be called only if RDIRPLUS flag is enabled.
- */
+  
+                                                                            
+                                                                   
+   
 void
 nfs_rdirplus_update_node_attrs(nfsnode_t dnp, struct direntry *dp, fhandle_t *fhp, struct nfs_vattr *nvattrp, uint64_t *savedxidp)
 {
@@ -507,7 +507,7 @@ nfs_rdirplus_update_node_attrs(nfsnode_t dnp, struct direntry *dp, fhandle_t *fh
 	cn.cn_namelen = dp->d_namlen;
 	cn.cn_nameiop = LOOKUP;
 
-	/* xid might be stashed in nva_fileid is rdirplus is enabled */
+	                                                               
 	if (should_update_fileid) {
 		xid = nvattrp->nva_fileid;
 		nvattrp->nva_fileid = dp->d_fileno;
@@ -522,11 +522,11 @@ nfs_rdirplus_update_node_attrs(nfsnode_t dnp, struct direntry *dp, fhandle_t *fh
 	}
 }
 
-/*
- * Find the slot in the access cache for this UID.
- * If adding and no existing slot is found, reuse slots in FIFO order.
- * The index of the next slot to use is kept in the last entry of the n_access array.
- */
+  
+                                                  
+                                                                      
+                                                                                     
+   
 int
 nfs_node_access_slot(nfsnode_t np, uid_t uid, int add)
 {
@@ -579,7 +579,7 @@ nfs3_access_rpc(nfsnode_t np, u_int32_t *access, int rpcflags, vfs_context_t ctx
 	nfsm_chain_get_32(error, &nmrep, access_result);
 	nfsmout_if(error);
 
-	/* XXXab do we really need mount here, also why are we doing access cache management here? */
+	                                                                                             
 	nmp = NFSTONMP(np);
 	if (nfs_mount_gone(nmp)) {
 		error = ENXIO;
@@ -594,29 +594,29 @@ nfs3_access_rpc(nfsnode_t np, u_int32_t *access, int rpcflags, vfs_context_t ctx
 	}
 #else
 	uid = kauth_cred_getuid(vfs_context_ucred(ctx));
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	slot = nfs_node_access_slot(np, uid, 1);
 	np->n_accessuid[slot] = uid;
 	microuptime(&now);
 	np->n_accessstamp[slot] = now.tv_sec;
 	np->n_access[slot] = access_result;
 
-	/*
-	 * If we asked for DELETE but didn't get it, the server
-	 * may simply not support returning that bit (possible
-	 * on UNIX systems).  So, we'll assume that it is OK,
-	 * and just let any subsequent delete action fail if it
-	 * really isn't deletable.
-	 */
+	  
+                                                        
+                                                       
+                                                      
+                                                        
+                           
+    
 	if ((*access & NFS_ACCESS_DELETE) &&
 	    !(np->n_access[slot] & NFS_ACCESS_DELETE)) {
 		np->n_access[slot] |= NFS_ACCESS_DELETE;
 	}
-	/* ".zfs" subdirectories may erroneously give a denied answer for add/remove */
+	                                                                               
 	if (nfs_access_dotzfs && (np->n_flag & NISDOTZFSCHILD)) {
 		np->n_access[slot] |= (NFS_ACCESS_MODIFY | NFS_ACCESS_EXTEND | NFS_ACCESS_DELETE);
 	}
-	/* pass back the access returned with this request */
+	                                                     
 	*access = np->n_access[slot];
 nfsmout:
 	if (!lockerror) {
@@ -628,20 +628,20 @@ nfsmout:
 }
 
 
-/*
- * NFS access vnode op.
- * For NFS version 2, just return ok. File accesses may fail later.
- * For NFS version 3+, use the access RPC to check accessibility. If file
- * permissions are changed on the server, accesses might still fail later.
- */
+  
+                       
+                                                                   
+                                                                         
+                                                                          
+   
 int
 nfs_vnop_access(
-	struct vnop_access_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_vp;
-                                 *  int a_action;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_access_args     
+                                                                
+                                                 
+                                                 
+                                                            
+                                        *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -668,21 +668,21 @@ nfs_vnop_access(
 		return 0;
 	}
 
-	/*
-	 * For NFS v3, do an access rpc, otherwise you are stuck emulating
-	 * ufs_access() locally using the vattr. This may not be correct,
-	 * since the server may apply other access criteria such as
-	 * client uid-->server uid mapping that we do not know about, but
-	 * this is better than just returning anything that is lying about
-	 * in the cache.
-	 */
+	  
+                                                                   
+                                                                  
+                                                            
+                                                                  
+                                                                   
+                 
+    
 
-	/*
-	 * Convert KAUTH primitives to NFS access rights.
-	 */
+	  
+                                                  
+    
 	access = 0;
 	if (vnode_isdir(vp)) {
-		/* directory */
+		               
 		if (ap->a_action &
 		    (KAUTH_VNODE_LIST_DIRECTORY |
 		    KAUTH_VNODE_READ_EXTATTRIBUTES)) {
@@ -700,7 +700,7 @@ nfs_vnop_access(
 			access |= NFS_ACCESS_MODIFY;
 		}
 	} else {
-		/* file */
+		          
 		if (ap->a_action &
 		    (KAUTH_VNODE_READ_DATA |
 		    KAUTH_VNODE_READ_EXTATTRIBUTES)) {
@@ -716,7 +716,7 @@ nfs_vnop_access(
 			access |= NFS_ACCESS_EXECUTE;
 		}
 	}
-	/* common */
+	            
 	if (ap->a_action & KAUTH_VNODE_DELETE) {
 		access |= NFS_ACCESS_DELETE;
 	}
@@ -726,12 +726,12 @@ nfs_vnop_access(
 	    KAUTH_VNODE_WRITE_SECURITY)) {
 		access |= NFS_ACCESS_MODIFY;
 	}
-	/* XXX this is pretty dubious */
+	                                
 	if (ap->a_action & KAUTH_VNODE_CHANGE_OWNER) {
 		access |= NFS_ACCESS_MODIFY;
 	}
 
-	/* if caching, always ask for every right */
+	                                            
 	if (nfs_access_cache_timeout > 0) {
 		waccess = NFS_ACCESS_READ | NFS_ACCESS_MODIFY |
 		    NFS_ACCESS_EXTEND | NFS_ACCESS_EXECUTE |
@@ -744,10 +744,10 @@ nfs_vnop_access(
 		return error;
 	}
 
-	/*
-	 * Does our cached result allow us to give a definite yes to
-	 * this request?
-	 */
+	  
+                                                             
+                 
+    
 #if CONFIG_NFS_GSS
 	if (auth_is_kerberized(np->n_auth) || auth_is_kerberized(nmp->nm_auth)) {
 		uid = nfs_cred_getasid2uid(vfs_context_ucred(ctx));
@@ -756,41 +756,41 @@ nfs_vnop_access(
 	}
 #else
 	uid = kauth_cred_getuid(vfs_context_ucred(ctx));
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	slot = nfs_node_access_slot(np, uid, 0);
 	dorpc = 1;
 	if (access == 0) {
-		/* not asking for any rights understood by NFS, so don't bother doing an RPC */
-		/* OSAddAtomic(1, &nfsstats.accesscache_hits); */
+		                                                                               
+		                                                 
 		dorpc = 0;
 		waccess = 0;
 	} else if (NACCESSVALID(np, slot)) {
 		microuptime(&now);
 		if (((now.tv_sec < (np->n_accessstamp[slot] + nfs_access_cache_timeout)) &&
 		    ((np->n_access[slot] & access) == access)) || nfs_use_cache(nmp)) {
-			/* OSAddAtomic(1, &nfsstats.accesscache_hits); */
+			                                                 
 			dorpc = 0;
 			waccess = np->n_access[slot];
 		}
 	}
 	nfs_node_unlock(np);
 	if (dorpc) {
-		/* Either a no, or a don't know.  Go to the wire. */
-		/* OSAddAtomic(1, &nfsstats.accesscache_misses); */
+		                                                    
+		                                                   
 
-		/*
-		 * Allow an access call to timeout if we have it cached
-		 * so we won't hang if the server isn't responding.
-		 */
+		  
+                                                         
+                                                     
+     
 		if (NACCESSVALID(np, slot)) {
 			rpcflags |= R_SOFT;
 		}
 
 		error = nmp->nm_funcs->nf_access_rpc(np, &waccess, rpcflags, ctx);
 
-		/*
-		 * If the server didn't respond return the cached access.
-		 */
+		  
+                                                           
+     
 		if ((error == ETIMEDOUT) && (rpcflags & R_SOFT)) {
 			error = 0;
 			waccess = np->n_access[slot];
@@ -804,21 +804,21 @@ nfs_vnop_access(
 }
 
 
-/*
- * NFS open vnode op
- *
- * Perform various update/invalidation checks and then add the
- * open to the node.  Regular files will have an open file structure
- * on the node and, for NFSv4, perform an OPEN request on the server.
- */
+  
+                    
+  
+                                                              
+                                                                    
+                                                                     
+   
 int
 nfs_vnop_open(
-	struct vnop_open_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  int a_mode;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_open_args     
+                                                              
+                                               
+                                             
+                                                          
+                                      *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -846,7 +846,7 @@ nfs_vnop_open(
 		return EACCES;
 	}
 
-	/* First, check if we need to update/invalidate */
+	                                                  
 	if (ISSET(np->n_flag, NUPDATESIZE)) {
 		nfs_data_update_size(np, 0);
 	}
@@ -879,20 +879,20 @@ nfs_vnop_open(
 		nfs_node_unlock(np);
 	}
 
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	if ((error = nfs_getattr(np, NULL, ctx, NGA_UNCACHED))) {
 		return error;
 	}
 
 	if (vtype != VREG) {
-		/* Just mark that it was opened */
+		                                  
 		lck_mtx_lock(&np->n_openlock);
 		np->n_openrefcnt++;
 		lck_mtx_unlock(&np->n_openlock);
 		return 0;
 	}
 
-	/* mode contains some combination of: FREAD, FWRITE, O_SHLOCK, O_EXLOCK */
+	                                                                          
 	accessMode = 0;
 	if (ap->a_mode & FREAD) {
 		accessMode |= NFS_OPEN_SHARE_ACCESS_READ;
@@ -907,7 +907,7 @@ nfs_vnop_open(
 	} else {
 		denyMode = NFS_OPEN_SHARE_DENY_NONE;
 	}
-	// XXX don't do deny modes just yet (and never do it for !v4)
+	                                                             
 	denyMode = NFS_OPEN_SHARE_DENY_NONE;
 
 	noop = nfs_open_owner_find(nmp, vfs_context_ucred(ctx), 1);
@@ -952,17 +952,17 @@ restart:
 	}
 
 	if (nmp->nm_vers < NFS_VER4) {
-		/*
-		 * NFS v2/v3 opens are always allowed - so just add it.
-		 */
+		  
+                                                         
+     
 		nfs_open_file_add_open(nofp, accessMode, denyMode, 0);
 		goto out;
 	}
 
-	/*
-	 * If we just created the file and the modes match, then we simply use
-	 * the open performed in the create.  Otherwise, send the request.
-	 */
+	  
+                                                                       
+                                                                   
+    
 	if ((nofp->nof_flags & NFS_OPEN_FILE_CREATE) &&
 	    (nofp->nof_creator == current_thread()) &&
 	    (accessMode == NFS_OPEN_SHARE_ACCESS_BOTH) &&
@@ -977,15 +977,15 @@ restart:
 #endif
 		if ((error == EACCES) && (nofp->nof_flags & NFS_OPEN_FILE_CREATE) &&
 		    (nofp->nof_creator == current_thread())) {
-			/*
-			 * Ugh.  This can happen if we just created the file with read-only
-			 * perms and we're trying to open it for real with different modes
-			 * (e.g. write-only or with a deny mode) and the server decides to
-			 * not allow the second open because of the read-only perms.
-			 * The best we can do is to just use the create's open.
-			 * We may have access we don't need or we may not have a requested
-			 * deny mode.  We may log complaints later, but we'll try to avoid it.
-			 */
+			  
+                                                                      
+                                                                     
+                                                                     
+                                                               
+                                                          
+                                                                     
+                                                                         
+      
 			if (denyMode != NFS_OPEN_SHARE_DENY_NONE) {
 				NP(np, "nfs_vnop_open: deny mode foregone on create, %d", kauth_cred_getuid(nofp->nof_owner->noo_cred));
 			}
@@ -996,11 +996,11 @@ restart:
 			goto out;
 		}
 		opened = 1;
-		/*
-		 * If we had just created the file, we already had it open.
-		 * If the actual open mode is less than what we grabbed at
-		 * create time, then we'll downgrade the open here.
-		 */
+		  
+                                                             
+                                                            
+                                                     
+     
 		if ((nofp->nof_flags & NFS_OPEN_FILE_CREATE) &&
 		    (nofp->nof_creator == current_thread())) {
 			error = nfs_close(np, nofp, NFS_OPEN_SHARE_ACCESS_BOTH, NFS_OPEN_SHARE_DENY_NONE, ctx);
@@ -1058,37 +1058,37 @@ nfs_no_of_open_file_writers(nfsnode_t np)
 	return writers;
 }
 
-/*
- * NFS close vnode op
- *
- * What an NFS client should do upon close after writing is a debatable issue.
- * Most NFS clients push delayed writes to the server upon close, basically for
- * two reasons:
- * 1 - So that any write errors may be reported back to the client process
- *     doing the close system call. By far the two most likely errors are
- *     NFSERR_NOSPC and NFSERR_DQUOT to indicate space allocation failure.
- * 2 - To put a worst case upper bound on cache inconsistency between
- *     multiple clients for the file.
- * There is also a consistency problem for Version 2 of the protocol w.r.t.
- * not being able to tell if other clients are writing a file concurrently,
- * since there is no way of knowing if the changed modify time in the reply
- * is only due to the write for this client.
- * (NFS Version 3 provides weak cache consistency data in the reply that
- *  should be sufficient to detect and handle this case.)
- *
- * The current code does the following:
- * for NFS Version 2 - play it safe and flush/invalidate all dirty buffers
- * for NFS Version 3 - flush dirty buffers to the server but don't invalidate them.
- * for NFS Version 4 - basically the same as NFSv3
- */
+  
+                     
+  
+                                                                              
+                                                                               
+               
+                                                                          
+                                                                         
+                                                                          
+                                                                     
+                                     
+                                                                           
+                                                                           
+                                                                           
+                                            
+                                                                        
+                                                         
+  
+                                       
+                                                                          
+                                                                                   
+                                                  
+   
 int
 nfs_vnop_close(
-	struct vnop_close_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  int a_fflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_close_args     
+                                                               
+                                                
+                                               
+                                                           
+                                       *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -1108,7 +1108,7 @@ nfs_vnop_close(
 	nfsvers = nmp->nm_vers;
 	vtype = vnode_vtype(vp);
 
-	/* First, check if we need to update/flush/invalidate */
+	                                                        
 	if (ISSET(np->n_flag, NUPDATESIZE)) {
 		nfs_data_update_size(np, 0);
 	}
@@ -1120,7 +1120,7 @@ nfs_vnop_close(
 		nfs_node_lock_force(np);
 	}
 	if ((vtype == VREG) && (np->n_flag & NMODIFIED) && (fflag & FWRITE)) {
-		/* we're closing an open for write and the file is modified, so flush it */
+		                                                                           
 		nfs_node_unlock(np);
 		if (nfsvers != NFS_VER2) {
 			error = nfs_flush(np, MNT_WAIT, vfs_context_thread(ctx), 0);
@@ -1137,7 +1137,7 @@ nfs_vnop_close(
 	nfs_node_unlock(np);
 
 	if (vtype != VREG) {
-		/* Just mark that it was closed */
+		                                  
 		lck_mtx_lock(&np->n_openlock);
 		if (np->n_openrefcnt == 0) {
 			if (fflag & (FREAD | FWRITE)) {
@@ -1147,7 +1147,7 @@ nfs_vnop_close(
 		} else if (fflag & (FREAD | FWRITE)) {
 			np->n_openrefcnt--;
 		} else {
-			/* No FREAD/FWRITE set - probably the final close */
+			                                                    
 			np->n_openrefcnt = 0;
 		}
 		lck_mtx_unlock(&np->n_openlock);
@@ -1155,7 +1155,7 @@ nfs_vnop_close(
 	}
 	error1 = error;
 
-	/* fflag should contain some combination of: FREAD, FWRITE */
+	                                                             
 	accessMode = 0;
 	if (fflag & FREAD) {
 		accessMode |= NFS_OPEN_SHARE_ACCESS_READ;
@@ -1163,22 +1163,22 @@ nfs_vnop_close(
 	if (fflag & FWRITE) {
 		accessMode |= NFS_OPEN_SHARE_ACCESS_WRITE;
 	}
-// XXX It would be nice if we still had the O_EXLOCK/O_SHLOCK flags that were on the open
-//	if (fflag & O_EXLOCK)
-//		denyMode = NFS_OPEN_SHARE_DENY_BOTH;
-//	else if (fflag & O_SHLOCK)
-//		denyMode = NFS_OPEN_SHARE_DENY_WRITE;
-//	else
-//		denyMode = NFS_OPEN_SHARE_DENY_NONE;
-	// XXX don't do deny modes just yet (and never do it for !v4)
+                                                                                         
+                        
+                                        
+                             
+                                         
+       
+                                        
+	                                                             
 	denyMode = NFS_OPEN_SHARE_DENY_NONE;
 
 	if (!accessMode) {
-		/*
-		 * No mode given to close?
-		 * Guess this is the final close.
-		 * We should unlock all locks and close all opens.
-		 */
+		  
+                            
+                                   
+                                                    
+     
 		uint32_t writers;
 		mount_t mp = vnode_mount(vp);
 		int force = (!mp || vfs_isforce(mp));
@@ -1212,7 +1212,7 @@ nfs_vnop_close(
 
 	noop = nfs_open_owner_find(nmp, vfs_context_ucred(ctx), 0);
 	if (!noop) {
-		// printf("nfs_vnop_close: can't get open owner!\n");
+		                                                     
 		return EIO;
 	}
 
@@ -1270,12 +1270,12 @@ out:
 	return error;
 }
 
-/*
- * nfs_close(): common function that does all the heavy lifting of file closure
- *
- * Takes an open file structure and a set of access/deny modes and figures out how
- * to update the open file structure (and the state on the server) appropriately.
- */
+  
+                                                                               
+  
+                                                                                  
+                                                                                 
+   
 int
 nfs_close(
 	nfsnode_t np,
@@ -1290,17 +1290,17 @@ nfs_close(
 	int error = 0, changed = 0, delegated = 0, closed = 0, downgrade = 0;
 	uint8_t newAccessMode, newDenyMode;
 
-	/* warn if modes don't match current state */
+	                                             
 	if (((accessMode & nofp->nof_access) != accessMode) || ((denyMode & nofp->nof_deny) != denyMode)) {
 		NP(np, "nfs_close: mode mismatch %d %d, current %d %d, %d",
 		    accessMode, denyMode, nofp->nof_access, nofp->nof_deny,
 		    kauth_cred_getuid(nofp->nof_owner->noo_cred));
 	}
 
-	/*
-	 * If we're closing a write-only open, we may not have a write-only count
-	 * if we also grabbed read access.  So, check the read-write count.
-	 */
+	  
+                                                                          
+                                                                    
+    
 	if (denyMode == NFS_OPEN_SHARE_DENY_NONE) {
 		if ((accessMode == NFS_OPEN_SHARE_ACCESS_WRITE) &&
 		    (nofp->nof_w == 0) && (nofp->nof_d_w == 0) &&
@@ -1313,7 +1313,7 @@ nfs_close(
 		    (nofp->nof_rw_dw || nofp->nof_d_rw_dw)) {
 			accessMode = NFS_OPEN_SHARE_ACCESS_BOTH;
 		}
-	} else { /* NFS_OPEN_SHARE_DENY_BOTH */
+	} else {                               
 		if ((accessMode == NFS_OPEN_SHARE_ACCESS_WRITE) &&
 		    (nofp->nof_w_drw == 0) && (nofp->nof_d_w_drw == 0) &&
 		    (nofp->nof_rw_drw || nofp->nof_d_rw_drw)) {
@@ -1329,25 +1329,25 @@ nfs_close(
 	}
 
 	if (NFSTONMP(np)->nm_vers < NFS_VER4) {
-		/* NFS v2/v3 closes simply need to remove the open. */
+		                                                      
 		goto v3close;
 	}
 #if CONFIG_NFS4
 	if ((newAccessMode == 0) || (nofp->nof_opencnt == 1)) {
-		/*
-		 * No more access after this close, so clean up and close it.
-		 * Don't send a close RPC if we're closing a delegated open.
-		 */
+		  
+                                                               
+                                                              
+     
 		nfs_wait_bufs(np);
 		closed = 1;
 		if (!delegated && !(nofp->nof_flags & NFS_OPEN_FILE_LOST)) {
 			error = nfs4_close_rpc(np, nofp, vfs_context_thread(ctx), vfs_context_ucred(ctx), 0);
 		}
 		if (error == NFSERR_LOCKS_HELD) {
-			/*
-			 * Hmm... the server says we have locks we need to release first
-			 * Find the lock owner and try to unlock everything.
-			 */
+			  
+                                                                   
+                                                       
+      
 			nlop = nfs_lock_owner_find(np, vfs_context_proc(ctx), 0);
 			if (nlop) {
 				nfs4_unlock_rpc(np, nlop, F_WRLCK, 0, UINT64_MAX,
@@ -1357,25 +1357,25 @@ nfs_close(
 			error = nfs4_close_rpc(np, nofp, vfs_context_thread(ctx), vfs_context_ucred(ctx), 0);
 		}
 	} else if (changed) {
-		/*
-		 * File is still open but with less access, so downgrade the open.
-		 * Don't send a downgrade RPC if we're closing a delegated open.
-		 */
+		  
+                                                                    
+                                                                  
+     
 		if (!delegated && !(nofp->nof_flags & NFS_OPEN_FILE_LOST)) {
 			downgrade = 1;
-			/*
-			 * If we have delegated opens, we should probably claim them before sending
-			 * the downgrade because the server may not know the open we are downgrading to.
-			 */
+			  
+                                                                              
+                                                                                   
+      
 			if (nofp->nof_d_rw_drw || nofp->nof_d_w_drw || nofp->nof_d_r_drw ||
 			    nofp->nof_d_rw_dw || nofp->nof_d_w_dw || nofp->nof_d_r_dw ||
 			    nofp->nof_d_rw || nofp->nof_d_w || nofp->nof_d_r) {
 				nfs4_claim_delegated_state_for_open_file(nofp, 0);
 			}
-			/* need to remove the open before sending the downgrade */
+			                                                          
 			nfs_open_file_remove_open(nofp, accessMode, denyMode);
 			error = nfs4_open_downgrade_rpc(np, nofp, ctx);
-			if (error) { /* Hmm.. that didn't work. Add the open back in. */
+			if (error) {                                                    
 				nfs_open_file_add_open(nofp, accessMode, denyMode, delegated);
 			}
 		}
@@ -1406,7 +1406,7 @@ v3close:
 			    nofp->nof_rw_drw, nofp->nof_d_rw_drw, nofp->nof_flags,
 			    kauth_cred_getuid(nofp->nof_owner->noo_cred));
 		}
-		/* clear out all open info, just to be safe */
+		                                              
 		nofp->nof_access = nofp->nof_deny = 0;
 		nofp->nof_mmap_access = nofp->nof_mmap_deny = 0;
 		nofp->nof_r = nofp->nof_d_r = 0;
@@ -1420,7 +1420,7 @@ v3close:
 		nofp->nof_rw_drw = nofp->nof_d_rw_drw = 0;
 		nofp->nof_flags &= ~NFS_OPEN_FILE_CREATE;
 		lck_mtx_unlock(&nofp->nof_lock);
-		/* XXX we may potentially want to clean up idle/unused open file structures */
+		                                                                              
 	}
 	if (nofp->nof_flags & NFS_OPEN_FILE_LOST) {
 		error = EIO;
@@ -1452,11 +1452,11 @@ nfs3_getattr_rpc(
 	}
 	nfsvers = nmp->nm_vers;
 
-	if (flags & NGA_MONITOR) { /* vnode monitor requests should be soft */
+	if (flags & NGA_MONITOR) {                                            
 		rpcflags = R_RECOVER;
 	}
 
-	if (flags & NGA_SOFT) { /* Return ETIMEDOUT if server not responding */
+	if (flags & NGA_SOFT) {                                                
 		rpcflags |= R_SOFT;
 	}
 
@@ -1484,13 +1484,13 @@ nfsmout:
 	return error;
 }
 
-/*
- * nfs_refresh_fh will attempt to update the file handle for the node.
- *
- * It only does this for symbolic links and regular files that are not currently opened.
- *
- * On Success returns 0 and the nodes file handle is updated, or ESTALE on failure.
- */
+  
+                                                                      
+  
+                                                                                        
+  
+                                                                                   
+   
 int
 nfs_refresh_fh(nfsnode_t np, vfs_context_t ctx)
 {
@@ -1526,7 +1526,7 @@ nfs_refresh_fh(nfsnode_t np, vfs_context_t ctx)
 	NFS_VNOP_DBG("Trying to refresh %s : %s\n", v_name, name);
 	vnode_putname(v_name);
 
-	/* Allocate the maximum size file handle */
+	                                           
 	MALLOC(fhp, uint8_t *, NFS4_FHSIZE, M_FHANDLE, M_WAITOK);
 	if (fhp == NULL) {
 		FREE(name, M_TEMP);
@@ -1558,7 +1558,7 @@ nfs_refresh_fh(nfsnode_t np, vfs_context_t ctx)
 		goto nfsmout;
 	}
 
-	/* Check that there are no open references for this file */
+	                                                           
 	lck_mtx_lock(&np->n_openlock);
 	if (np->n_openrefcnt || !TAILQ_EMPTY(&np->n_opens) || !TAILQ_EMPTY(&np->n_lock_owners)) {
 		int cnt = 0;
@@ -1577,20 +1577,20 @@ nfs_refresh_fh(nfsnode_t np, vfs_context_t ctx)
 		}
 	}
 	lck_mtx_unlock(&np->n_openlock);
-	/*
-	 * Since the FH is currently stale we should not be able to
-	 * establish any open state until the FH is refreshed.
-	 */
+	  
+                                                            
+                                                       
+    
 
 	error = nfs_node_lock(np);
 	nfsmout_if(error);
-	/*
-	 * Symlinks should never need invalidations and are holding
-	 * the one and only nfsbuf in an uncached acquired state
-	 * trying to do a readlink. So we will hang if we invalidate
-	 * in that case. Only in in the VREG case do we need to
-	 * invalidate.
-	 */
+	  
+                                                            
+                                                         
+                                                             
+                                                        
+               
+    
 	if (vnode_vtype(vp) == VREG) {
 		np->n_flag &= ~NNEEDINVALIDATE;
 		nfs_node_unlock(np);
@@ -1668,13 +1668,13 @@ nfs_getattr_internal(nfsnode_t np, struct nfs_vattr *nvap, vfs_context_t ctx, in
 	}
 	NVATTR_INIT(nvap);
 
-	/* Update local times for special files. */
+	                                           
 	if (np->n_flag & (NACC | NUPD)) {
 		nfs_node_lock_force(np);
 		np->n_flag |= NCHG;
 		nfs_node_unlock(np);
 	}
-	/* Update size, if necessary */
+	                               
 	if (ISSET(np->n_flag, NUPDATESIZE)) {
 		nfs_data_update_size(np, 0);
 	}
@@ -1682,12 +1682,12 @@ nfs_getattr_internal(nfsnode_t np, struct nfs_vattr *nvap, vfs_context_t ctx, in
 	error = nfs_node_lock(np);
 	nfsmout_if(error);
 	if (!(flags & (NGA_UNCACHED | NGA_MONITOR)) || ((nfsvers >= NFS_VER4) && (np->n_openflags & N_DELEG_MASK))) {
-		/*
-		 * Use the cache or wait for any getattr in progress if:
-		 * - it's a cached request, or
-		 * - we have a delegation, or
-		 * - the server isn't responding
-		 */
+		  
+                                                          
+                                
+                               
+                                  
+     
 		while (1) {
 			error = nfs_getattrcache(np, nvap, flags);
 			if (!error || (error != ENOENT)) {
@@ -1699,7 +1699,7 @@ nfs_getattr_internal(nfsnode_t np, struct nfs_vattr *nvap, vfs_context_t ctx, in
 				break;
 			}
 			if (flags & NGA_MONITOR) {
-				/* no need to wait if a request is pending */
+				                                             
 				error = EINPROGRESS;
 				nfs_node_unlock(np);
 				goto nfsmout;
@@ -1717,7 +1717,7 @@ nfs_getattr_internal(nfsnode_t np, struct nfs_vattr *nvap, vfs_context_t ctx, in
 		SET(np->n_flag, NGETATTRINPROG);
 		inprogset = 1;
 	} else if (flags & NGA_MONITOR) {
-		/* no need to make a request if one is pending */
+		                                                 
 		error = EINPROGRESS;
 	}
 	nfs_node_unlock(np);
@@ -1730,28 +1730,28 @@ nfs_getattr_internal(nfsnode_t np, struct nfs_vattr *nvap, vfs_context_t ctx, in
 		goto nfsmout;
 	}
 
-	/*
-	 * Return cached attributes if they are valid,
-	 * if the server doesn't respond, and this is
-	 * some softened up style of mount.
-	 */
+	  
+                                               
+                                              
+                                    
+    
 	if (NATTRVALID(np) && nfs_use_cache(nmp)) {
 		flags |= NGA_SOFT;
 	}
 
-	/*
-	 * We might want to try to get both the attributes and access info by
-	 * making an ACCESS call and seeing if it returns updated attributes.
-	 * But don't bother if we aren't caching access info or if the
-	 * attributes returned wouldn't be cached.
-	 */
+	  
+                                                                      
+                                                                      
+                                                               
+                                           
+    
 	if (!(flags & NGA_ACL) && (nfsvers != NFS_VER2) && nfs_access_for_getattr && (nfs_access_cache_timeout > 0)) {
 		if (nfs_attrcachetimeout(np) > 0) {
-			/*  OSAddAtomic(1, &nfsstats.accesscache_misses); */
+			                                                    
 			u_int32_t access = NFS_ACCESS_ALL;
 			int rpcflags = 0;
 
-			/* Return cached attrs if server doesn't respond */
+			                                                   
 			if (flags & NGA_SOFT) {
 				rpcflags |= R_SOFT;
 			}
@@ -1771,7 +1771,7 @@ nfs_getattr_internal(nfsnode_t np, struct nfs_vattr *nvap, vfs_context_t ctx, in
 			if (!error || (error != ENOENT)) {
 				goto nfsmout;
 			}
-			/* Well, that didn't work... just do a getattr... */
+			                                                    
 			error = 0;
 		}
 	}
@@ -1786,9 +1786,9 @@ tryagain:
 		nfs_node_unlock(np);
 	}
 
-	/*
-	 * If the server didn't respond, return cached attributes.
-	 */
+	  
+                                                           
+    
 returncached:
 	if ((flags & NGA_SOFT) && (error == ETIMEDOUT)) {
 		nfs_node_lock_force(np);
@@ -1801,13 +1801,13 @@ returncached:
 	}
 	nfsmout_if(error);
 
-	if (!xid) { /* out-of-order rpc - attributes were dropped */
+	if (!xid) {                                                 
 		FSDBG(513, -1, np, np->n_xid >> 32, np->n_xid);
 		if (avoidfloods++ < 20) {
 			goto tryagain;
 		}
-		/* avoidfloods>1 is bizarre.  at 20 pull the plug */
-		/* just return the last attributes we got */
+		                                                    
+		                                            
 	}
 nfsmout:
 	nfs_node_lock_force(np);
@@ -1816,7 +1816,7 @@ nfsmout:
 		CLR(np->n_flag, (NGETATTRINPROG | NGETATTRWANT));
 	}
 	if (!error) {
-		/* check if the node changed on us */
+		                                     
 		vnode_t vp = NFSTOV(np);
 		enum vtype vtype = vnode_vtype(vp);
 		if ((vtype == VDIR) && NFS_CHANGED_NC(nfsvers, np, nvap)) {
@@ -1863,7 +1863,7 @@ nfsmout:
 		NVATTR_CLEANUP(nvap);
 		FREE(nvattr, M_TEMP);
 	} else if (!(flags & NGA_ACL)) {
-		/* make sure we don't return an ACL if it wasn't asked for */
+		                                                             
 		NFS_BITMAP_CLR(nvap->nva_bitmap, NFS_FATTR_ACL);
 		if (nvap->nva_acl) {
 			kauth_acl_free(nvap->nva_acl);
@@ -1875,17 +1875,17 @@ nfsmout:
 }
 
 
-/*
- * NFS getattr call from vfs.
- */
+  
+                             
+   
 
-/*
- * The attributes we support over the wire.
- * We also get fsid but the vfs layer gets it out of the mount
- * structure after this calling us so there's no need to return it,
- * and Finder expects to call getattrlist just looking for the FSID
- * with out hanging on a non responsive server.
- */
+  
+                                           
+                                                              
+                                                                   
+                                                                   
+                                               
+   
 #define NFS3_SUPPORTED_VATTRS \
 	(VNODE_ATTR_va_rdev |           \
 	 VNODE_ATTR_va_nlink |          \
@@ -1903,12 +1903,12 @@ nfsmout:
 
 int
 nfs3_vnop_getattr(
-	struct vnop_getattr_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  struct vnode_attr *a_vap;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_getattr_args     
+                                                                 
+                                                  
+                                                              
+                                                             
+                                         *ap)
 {
 	int error;
 	nfsnode_t np;
@@ -1920,11 +1920,11 @@ nfs3_vnop_getattr(
 
 	nmp = VTONMP(ap->a_vp);
 
-	/*
-	 * Lets don't go over the wire if we don't support any of the attributes.
-	 * Just fall through at the VFS layer and let it cons up what it needs.
-	 */
-	/* Return the io size no matter what, since we don't go over the wire for this */
+	  
+                                                                          
+                                                                        
+    
+	                                                                                 
 	VATTR_RETURN(vap, va_iosize, nfs_iosize);
 
 	supported_attrs = NFS3_SUPPORTED_VATTRS;
@@ -1939,9 +1939,9 @@ nfs3_vnop_getattr(
 		    ap->a_vp->v_name ? ap->a_vp->v_name : "empty");
 	}
 
-	/*
-	 * We should not go over the wire if only fileid was requested and has ever been populated.
-	 */
+	  
+                                                                                            
+    
 	if ((vap->va_active & supported_attrs) == VNODE_ATTR_va_fileid) {
 		np = VTONFS(ap->a_vp);
 		if (np->n_attrstamp) {
@@ -1956,7 +1956,7 @@ nfs3_vnop_getattr(
 		goto out;
 	}
 
-	/* copy nva to *a_vap */
+	                        
 	VATTR_RETURN(vap, va_type, nva->nva_type);
 	VATTR_RETURN(vap, va_mode, nva->nva_mode);
 	rdev = makedev(nva->nva_rawdev.specdata1, nva->nva_rawdev.specdata2);
@@ -1978,23 +1978,23 @@ nfs3_vnop_getattr(
 	VATTR_SET_SUPPORTED(vap, va_change_time);
 
 
-	// VATTR_RETURN(vap, va_encoding, 0xffff /* kTextEncodingUnknown */);
+	                                                                     
 out:
 	FREE(nva, M_TEMP);
 	return error;
 }
 
-/*
- * NFS setattr call.
- */
+  
+                    
+   
 int
 nfs_vnop_setattr(
-	struct vnop_setattr_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  struct vnode_attr *a_vap;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_setattr_args     
+                                                                 
+                                                  
+                                                              
+                                                             
+                                         *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -2021,7 +2021,7 @@ nfs_vnop_setattr(
 	namedattrs = (nmp->nm_fsattr.nfsa_flags & NFS_FSFLAG_NAMED_ATTR);
 	biosize = nmp->nm_biosize;
 
-	/* Disallow write attempts if the filesystem is mounted read-only. */
+	                                                                     
 	if (vnode_vfsisrdonly(vp)) {
 		return EROFS;
 	}
@@ -2045,16 +2045,16 @@ nfs_vnop_setattr(
 			VATTR_CLEAR_ACTIVE(vap, va_data_size);
 			break;
 		default:
-			/*
-			 * Disallow write attempts if the filesystem is
-			 * mounted read-only.
-			 */
+			  
+                                                  
+                        
+      
 			if (vnode_vfsisrdonly(vp)) {
 				return EROFS;
 			}
 			FSDBG_TOP(512, np->n_size, vap->va_data_size,
 			    np->n_vattr.nva_size, np->n_flag);
-			/* clear NNEEDINVALIDATE, if set */
+			                                   
 			if ((error = nfs_node_lock(np))) {
 				return error;
 			}
@@ -2062,7 +2062,7 @@ nfs_vnop_setattr(
 				np->n_flag &= ~NNEEDINVALIDATE;
 			}
 			nfs_node_unlock(np);
-			/* flush everything */
+			                      
 			error = nfs_vinvalbuf(vp, (vap->va_data_size ? V_SAVE : 0), ctx, 1);
 			if (error) {
 				NP(np, "nfs_setattr: nfs_vinvalbuf %d", error);
@@ -2071,7 +2071,7 @@ nfs_vnop_setattr(
 			}
 #if CONFIG_NFS4
 			if (nfsvers >= NFS_VER4) {
-				/* setting file size requires having the file open for write access */
+				                                                                      
 				if (np->n_flag & NREVOKE) {
 					return EIO;
 				}
@@ -2109,7 +2109,7 @@ restart:
 					return error;
 				}
 				if (!(nofp->nof_access & NFS_OPEN_SHARE_ACCESS_WRITE)) {
-					/* we don't have the file open for write access, so open it */
+					                                                              
 					error = nfs4_open(np, nofp, NFS_OPEN_SHARE_ACCESS_WRITE, NFS_OPEN_SHARE_DENY_NONE, ctx);
 					if (!error) {
 						nofp->nof_flags |= NFS_OPEN_FILE_SETATTR;
@@ -2124,7 +2124,7 @@ restart:
 			}
 #endif
 			nfs_data_lock(np, NFS_DATA_LOCK_EXCLUSIVE);
-			if (np->n_size > vap->va_data_size) { /* shrinking? */
+			if (np->n_size > vap->va_data_size) {                 
 				daddr64_t obn, bn;
 				int mustwrite;
 				off_t neweofoff;
@@ -2149,9 +2149,9 @@ restart:
 					}
 					mustwrite = 0;
 					neweofoff = vap->va_data_size - NBOFF(bp);
-					/* check for any dirty data before the new EOF */
+					                                                 
 					if ((bp->nb_dirtyend > 0) && (bp->nb_dirtyoff < neweofoff)) {
-						/* clip dirty range to EOF */
+						                             
 						if (bp->nb_dirtyend > neweofoff) {
 							bp->nb_dirtyend = neweofoff;
 							if (bp->nb_dirtyoff >= bp->nb_dirtyend) {
@@ -2173,9 +2173,9 @@ restart:
 						nfs_buf_release(bp, 1);
 						continue;
 					}
-					/* gotta write out dirty data before invalidating */
-					/* (NB_STABLE indicates that data writes should be FILESYNC) */
-					/* (NB_NOCACHE indicates buffer should be discarded) */
+					                                                    
+					                                                               
+					                                                       
 					CLR(bp->nb_flags, (NB_DONE | NB_ERROR | NB_INVAL | NB_ASYNC | NB_READ));
 					SET(bp->nb_flags, NB_STABLE | NB_NOCACHE);
 					if (!IS_VALID_CRED(bp->nb_wcred)) {
@@ -2184,19 +2184,19 @@ restart:
 						bp->nb_wcred = cred;
 					}
 					error = nfs_buf_write(bp);
-					// Note: bp has been released
+					                             
 					if (error) {
 						FSDBG(512, bp, 0xd00dee, 0xbad, error);
 						nfs_node_lock_force(np);
 						np->n_error = error;
 						np->n_flag |= NWRITEERR;
-						/*
-						 * There was a write error and we need to
-						 * invalidate attrs and flush buffers in
-						 * order to sync up with the server.
-						 * (if this write was extending the file,
-						 * we may no longer know the correct size)
-						 */
+						  
+                                               
+                                              
+                                          
+                                               
+                                                
+         
 						NATTRINVALIDATE(np);
 						nfs_node_unlock(np);
 						nfs_data_unlock(np);
@@ -2207,7 +2207,7 @@ restart:
 				}
 			}
 			if (vap->va_data_size != np->n_size) {
-				ubc_setsize(vp, (off_t)vap->va_data_size); /* XXX error? */
+				ubc_setsize(vp, (off_t)vap->va_data_size);                 
 			}
 			origsize = np->n_size;
 			np->n_size = np->n_vattr.nva_size = vap->va_data_size;
@@ -2290,15 +2290,15 @@ restart:
 	if (VATTR_IS_ACTIVE(vap, va_data_size)) {
 		if (error && (origsize != np->n_size) &&
 		    ((nfsvers < NFS_VER4) || !nfs_mount_state_error_should_restart(error))) {
-			/* make every effort to resync file size w/ server... */
-			/* (don't bother if we'll be restarting the operation) */
-			int err; /* preserve "error" for return */
+			                                                        
+			                                                         
+			int err;                                  
 			np->n_size = np->n_vattr.nva_size = origsize;
 			nfs_node_lock_force(np);
 			CLR(np->n_flag, NUPDATESIZE);
 			nfs_node_unlock(np);
 			FSDBG(512, np, np->n_size, np->n_vattr.nva_size, 0xf00d0002);
-			ubc_setsize(vp, (off_t)np->n_size); /* XXX check error */
+			ubc_setsize(vp, (off_t)np->n_size);                      
 			vapsize = vap->va_data_size;
 			vap->va_data_size = origsize;
 			err = nmp->nm_funcs->nf_setattr_rpc(np, vap, ctx);
@@ -2308,12 +2308,12 @@ restart:
 			vap->va_data_size = vapsize;
 		}
 		nfs_node_lock_force(np);
-		/*
-		 * The size was just set.  If the size is already marked for update, don't
-		 * trust the newsize (it may have been set while the setattr was in progress).
-		 * Clear the update flag and make sure we fetch new attributes so we are sure
-		 * we have the latest size.
-		 */
+		  
+                                                                            
+                                                                                
+                                                                               
+                             
+     
 		if (ISSET(np->n_flag, NUPDATESIZE)) {
 			CLR(np->n_flag, NUPDATESIZE);
 			NATTRINVALIDATE(np);
@@ -2326,7 +2326,7 @@ restart:
 #if CONFIG_NFS4
 		if (nfsvers >= NFS_VER4) {
 			if (nofp) {
-				/* don't close our setattr open if we'll be restarting... */
+				                                                            
 				if (!nfs_mount_state_error_should_restart(error) &&
 				    (nofp->nof_flags & NFS_OPEN_FILE_SETATTR)) {
 					int err = nfs_close(np, nofp, NFS_OPEN_SHARE_ACCESS_WRITE, NFS_OPEN_SHARE_DENY_NONE, ctx);
@@ -2348,9 +2348,9 @@ restart:
 	return error;
 }
 
-/*
- * Do an NFS setattr RPC.
- */
+  
+                         
+   
 int
 nfs3_setattr_rpc(
 	nfsnode_t np,
@@ -2377,16 +2377,16 @@ nfs3_setattr_rpc(
 
 	if (VATTR_IS_ACTIVE(vap, va_flags)
 	    ) {
-		if (vap->va_flags) {    /* we don't support setting flags */
+		if (vap->va_flags) {                                        
 			if (vap->va_active & ~VNODE_ATTR_va_flags) {
-				return EINVAL;        /* return EINVAL if other attributes also set */
+				return EINVAL;                                                        
 			} else {
-				return ENOTSUP;       /* return ENOTSUP for chflags(2) */
+				return ENOTSUP;                                          
 			}
 		}
-		/* no flags set, so we'll just ignore it */
+		                                           
 		if (!(vap->va_active & ~VNODE_ATTR_va_flags)) {
-			return 0; /* no (other) attributes to set, so nothing to do */
+			return 0;                                                     
 		}
 	}
 
@@ -2477,11 +2477,11 @@ nfs3_setattr_rpc(
 		struct timespec premtime = { .tv_sec = 0, .tv_nsec = 0 };
 		nfsm_chain_get_wcc_data(error, &nmrep, np, &premtime, &wccpostattr, &xid);
 		nfsmout_if(error);
-		/* if file hadn't changed, update cached mtime */
+		                                                 
 		if (nfstimespeccmp(&np->n_mtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE(nfsvers, np, &np->n_vattr);
 		}
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if ((vnode_vtype(NFSTOV(np)) == VDIR) &&
 		    nfstimespeccmp(&np->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, np, &np->n_vattr);
@@ -2496,15 +2496,15 @@ nfs3_setattr_rpc(
 		}
 		nfsm_chain_loadattr(error, &nmrep, np, nfsvers, &xid);
 	}
-	/*
-	 * We just changed the attributes and we want to make sure that we
-	 * see the latest attributes.  Get the next XID.  If it's not the
-	 * next XID after the SETATTR XID, then it's possible that another
-	 * RPC was in flight at the same time and it might put stale attributes
-	 * in the cache.  In that case, we invalidate the attributes and set
-	 * the attribute cache XID to guarantee that newer attributes will
-	 * get loaded next.
-	 */
+	  
+                                                                   
+                                                                  
+                                                                   
+                                                                        
+                                                                     
+                                                                   
+                    
+    
 	nextxid = 0;
 	nfs_get_xid(&nextxid);
 	if (nextxid != (xid + 1)) {
@@ -2520,20 +2520,20 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS lookup call, one step at a time...
- * First look in cache
- * If not found, unlock the directory nfsnode and do the RPC
- */
+  
+                                         
+                      
+                                                            
+   
 int
 nfs_vnop_lookup(
-	struct vnop_lookup_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_dvp;
-                                 *  vnode_t *a_vpp;
-                                 *  struct componentname *a_cnp;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_lookup_args     
+                                                                
+                                                  
+                                                   
+                                                                
+                                                            
+                                        *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	struct componentname *cnp = ap->a_cnp;
@@ -2573,7 +2573,7 @@ nfs_vnop_lookup(
 	if ((error = busyerror = nfs_node_set_busy(dnp, vfs_context_thread(ctx)))) {
 		goto error_return;
 	}
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	if ((error = nfs_getattr(dnp, NULL, ctx, NGA_CACHED))) {
 		goto error_return;
 	}
@@ -2581,49 +2581,49 @@ nfs_vnop_lookup(
 	error = cache_lookup(dvp, vpp, cnp);
 	switch (error) {
 	case ENOENT:
-		/* negative cache entry */
+		                          
 		goto error_return;
 	case 0:
-		/* cache miss */
+		                
 		if ((nfsvers > NFS_VER2) && NMFLAG(nmp, RDIRPLUS)) {
-			/* if rdirplus, try dir buf cache lookup */
+			                                           
 			error = nfs_dir_buf_cache_lookup(dnp, &np, cnp, ctx, 0, &skipdu);
 			if (!error && np) {
-				/* dir buf cache hit */
+				                       
 				*vpp = NFSTOV(np);
 				error = -1;
 			} else if (skipdu) {
-				/* Skip lookup for du files */
+				                              
 				error = ENOENT;
 				goto error_return;
 			}
 		}
-		if (error != -1) { /* cache miss */
+		if (error != -1) {                 
 			break;
 		}
 		OS_FALLTHROUGH;
 	case -1:
-		/* cache hit, not really an error */
+		                                    
 		OSAddAtomic64(1, &nfsstats.lookupcache_hits);
 
 		nfs_node_clear_busy(dnp);
 		busyerror = ENOENT;
 
-		/* check for directory access */
+		                                
 		naa.a_desc = &vnop_access_desc;
 		naa.a_vp = dvp;
 		naa.a_action = KAUTH_VNODE_SEARCH;
 		naa.a_context = ctx;
 
-		/* compute actual success/failure based on accessibility */
+		                                                           
 		error = nfs_vnop_access(&naa);
 		OS_FALLTHROUGH;
 	default:
-		/* unexpected error from cache_lookup */
+		                                        
 		goto error_return;
 	}
 
-	/* skip lookup, if we know who we are: "." or ".." */
+	                                                     
 	isdot = isdotdot = 0;
 	if (cnp->cn_nameptr[0] == '.') {
 		if (cnp->cn_namelen == 1) {
@@ -2639,13 +2639,13 @@ nfs_vnop_lookup(
 	}
 #if CONFIG_NFS4
 	if ((nfsvers >= NFS_VER4) && (dnp->n_vattr.nva_flags & NFS_FFLAG_TRIGGER)) {
-		/* we should never be looking things up in a trigger directory, return nothing */
+		                                                                                 
 		error = ENOENT;
 		goto error_return;
 	}
 #endif
 
-	/* do we know this name is too long? */
+	                                       
 	nmp = VTONMP(dvp);
 	if (nfs_mount_gone(nmp)) {
 		error = ENXIO;
@@ -2667,7 +2667,7 @@ nfs_vnop_lookup(
 	error = nmp->nm_funcs->nf_lookup_rpc_async_finish(dnp, cnp->cn_nameptr, cnp->cn_namelen, ctx, req, &xid, fh, nvattr);
 	nfsmout_if(error);
 
-	/* is the file handle the same as this directory's file handle? */
+	                                                                  
 	isdot = NFS_CMPFH(dnp, fh->fh_data, fh->fh_len);
 
 found:
@@ -2727,7 +2727,7 @@ nfsmout:
 	}
 	if ((error == ENOENT) && (cnp->cn_flags & MAKEENTRY) &&
 	    (cnp->cn_nameiop != CREATE) && negnamecache) {
-		/* add a negative entry in the name cache */
+		                                            
 		nfs_node_lock_force(dnp);
 		cache_enter(dvp, NULL, cnp);
 		dnp->n_flag |= NNEGNCENTRIES;
@@ -2750,17 +2750,17 @@ error_return:
 
 int nfs_readlink_nocache = DEFAULT_READLINK_NOCACHE;
 
-/*
- * NFS readlink call
- */
+  
+                    
+   
 int
 nfs_vnop_readlink(
-	struct vnop_readlink_args /* {
-                                   *  struct vnodeop_desc *a_desc;
-                                   *  vnode_t a_vp;
-                                   *  struct uio *a_uio;
-                                   *  vfs_context_t a_context;
-                                   *  } */*ap)
+	struct vnop_readlink_args     
+                                                                  
+                                                   
+                                                        
+                                                              
+                                          *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	nfsnode_t np = VTONFS(ap->a_vp);
@@ -2790,7 +2790,7 @@ nfs_vnop_readlink(
 	nfsvers = nmp->nm_vers;
 
 
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	if ((error = nfs_getattr(np, NULL, ctx, nfs_readlink_nocache ? NGA_UNCACHED : NGA_CACHED))) {
 		FSDBG(531, np, 0xd1e0001, 0, error);
 		return error;
@@ -2813,7 +2813,7 @@ retry:
 		NFS_VNOP_DBG("timeo = %ld ts.tv_sec = %ld need refresh = %d cached = %d\n", timeo, ts.tv_sec,
 		    (np->n_rltim.tv_sec + timeo) < ts.tv_sec || nfs_readlink_nocache > 1,
 		    ISSET(bp->nb_flags, NB_CACHE) == NB_CACHE);
-		/* n_rltim is synchronized by the associated nfs buf */
+		                                                       
 		if (ISSET(bp->nb_flags, NB_CACHE) && ((nfs_readlink_nocache > 1) || ((np->n_rltim.tv_sec + timeo) < ts.tv_sec))) {
 			SET(bp->nb_flags, NB_INVAL);
 			nfs_buf_release(bp, 0);
@@ -2858,9 +2858,9 @@ readagain:
 	return error;
 }
 
-/*
- * Do a readlink RPC.
- */
+  
+                     
+   
 int
 nfs3_readlink_rpc(nfsnode_t np, char *buf, size_t *buflenp, vfs_context_t ctx)
 {
@@ -2918,10 +2918,10 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS read RPC call
- * Ditto above
- */
+  
+                    
+              
+   
 int
 nfs_read_rpc(nfsnode_t np, uio_t uio, vfs_context_t ctx)
 {
@@ -2969,7 +2969,7 @@ nfs_read_rpc(nfsnode_t np, uio_t uio, vfs_context_t ctx)
 		}
 #if CONFIG_NFS4
 		if ((nmp->nm_vers >= NFS_VER4) && nfs_mount_state_error_should_restart(error) &&
-		    (++restart <= nfs_mount_state_max_restarts(nmp))) { /* guard against no progress */
+		    (++restart <= nfs_mount_state_max_restarts(nmp))) {                                
 			lck_mtx_lock(&nmp->nm_lock);
 			if ((error != NFSERR_GRACE) && (stategenid == nmp->nm_stategenid)) {
 				NP(np, "nfs_read_rpc: error %d, initiating recovery", error);
@@ -3070,7 +3070,7 @@ nfs3_read_rpc_async_finish(
 	nfsm_chain_null(&nmrep);
 
 	error = nfs_request_async_finish(req, &nmrep, &xid, &status);
-	if (error == EINPROGRESS) { /* async request restarted */
+	if (error == EINPROGRESS) {                              
 		return error;
 	}
 
@@ -3114,18 +3114,18 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS write call
- */
+  
+                 
+   
 int
 nfs_vnop_write(
-	struct vnop_write_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  struct uio *a_uio;
-                                *  int a_ioflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_write_args     
+                                                               
+                                                
+                                                     
+                                                
+                                                           
+                                       *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	uio_t uio = ap->a_uio;
@@ -3200,9 +3200,9 @@ nfs_vnop_write(
 		}
 		if (ioflag & IO_APPEND) {
 			nfs_data_unlock(np);
-			/* nfs_getattr() will check changed and purge caches */
+			                                                       
 			error = nfs_getattr(np, NULL, ctx, NGA_UNCACHED);
-			/* we'll be extending the file, so take the data lock exclusive */
+			                                                                  
 			nfs_data_lock(np, NFS_DATA_LOCK_EXCLUSIVE);
 			if (error) {
 				FSDBG(515, np, uio_offset(uio), 0x10bad02, error);
@@ -3221,16 +3221,16 @@ nfs_vnop_write(
 	}
 
 	if (((uio_offset(uio) + uio_resid(uio)) > (off_t)np->n_size) && !(ioflag & IO_APPEND)) {
-		/*
-		 * It looks like we'll be extending the file, so take the data lock exclusive.
-		 */
+		  
+                                                                                
+     
 		nfs_data_unlock(np);
 		nfs_data_lock(np, NFS_DATA_LOCK_EXCLUSIVE);
 
-		/*
-		 * Also, if the write begins after the previous EOF buffer, make sure to zero
-		 * and validate the new bytes in that buffer.
-		 */
+		  
+                                                                               
+                                               
+     
 		struct nfsbuf *eofbp = NULL;
 		daddr64_t eofbn = np->n_size / biosize;
 		uint32_t eofoff = np->n_size % biosize;
@@ -3246,15 +3246,15 @@ nfs_vnop_write(
 			np->n_flag |= NMODIFIED;
 			nfs_node_unlock(np);
 			FSDBG(516, np, np->n_size, np->n_vattr.nva_size, 0xf00d0001);
-			ubc_setsize(vp, (off_t)np->n_size); /* XXX errors */
+			ubc_setsize(vp, (off_t)np->n_size);                 
 			if (eofbp) {
-				/*
-				 * For the old last page, don't zero bytes if there
-				 * are invalid bytes in that page (i.e. the page isn't
-				 * currently valid).
-				 * For pages after the old last page, zero them and
-				 * mark them as valid.
-				 */
+				  
+                                                       
+                                                          
+                        
+                                                       
+                          
+       
 				char *d;
 				int i;
 				if (ioflag & IO_NOCACHE) {
@@ -3287,17 +3287,17 @@ nfs_vnop_write(
 			n = uio_resid(uio);
 		}
 again:
-		/*
-		 * Get a cache block for writing.  The range to be written is
-		 * (off..off+n) within the block.  We ensure that the block
-		 * either has no dirty region or that the given range is
-		 * contiguous with the existing dirty region.
-		 */
+		  
+                                                               
+                                                             
+                                                          
+                                               
+     
 		error = nfs_buf_get(np, lbn, biosize, thd, NBLK_WRITE, &bp);
 		if (error) {
 			goto out;
 		}
-		/* map the block because we know we're going to write to it */
+		                                                              
 		NFS_BUF_MAP(bp);
 
 		if (ioflag & IO_NOCACHE) {
@@ -3309,24 +3309,24 @@ again:
 			bp->nb_wcred = cred;
 		}
 
-		/*
-		 * If there's already a dirty range AND dirty pages in this block we
-		 * need to send a commit AND write the dirty pages before continuing.
-		 *
-		 * If there's already a dirty range OR dirty pages in this block
-		 * and the new write range is not contiguous with the existing range,
-		 * then force the buffer to be written out now.
-		 * (We used to just extend the dirty range to cover the valid,
-		 * but unwritten, data in between also.  But writing ranges
-		 * of data that weren't actually written by an application
-		 * risks overwriting some other client's data with stale data
-		 * that's just masquerading as new written data.)
-		 */
+		  
+                                                                      
+                                                                       
+    
+                                                                  
+                                                                       
+                                                 
+                                                                
+                                                             
+                                                            
+                                                               
+                                                   
+     
 		if (bp->nb_dirtyend > 0) {
 			if (on > bp->nb_dirtyend || (on + n) < bp->nb_dirtyoff || nfs_buf_pgs_is_set(&bp->nb_dirty)) {
 				FSDBG(515, np, uio_offset(uio), bp, 0xd15c001);
-				/* write/commit buffer "synchronously" */
-				/* (NB_STABLE indicates that data writes should be FILESYNC) */
+				                                         
+				                                                               
 				CLR(bp->nb_flags, (NB_DONE | NB_ERROR | NB_INVAL));
 				SET(bp->nb_flags, (NB_ASYNC | NB_STABLE));
 				error = nfs_buf_write(bp);
@@ -3338,7 +3338,7 @@ again:
 		} else if (nfs_buf_pgs_is_set(&bp->nb_dirty)) {
 			off_t firstpg = 0, lastpg = 0;
 			nfsbufpgs pagemask, pagemaskand;
-			/* calculate write range pagemask */
+			                                    
 			if (n > 0) {
 				firstpg = on / PAGE_SIZE;
 				lastpg = (on + n - 1) / PAGE_SIZE;
@@ -3346,13 +3346,13 @@ again:
 			} else {
 				NBPGS_ERASE(&pagemask);
 			}
-			/* check if there are dirty pages outside the write range */
+			                                                            
 			nfs_buf_pgs_bit_not(&pagemask);
 			nfs_buf_pgs_bit_and(&bp->nb_dirty, &pagemask, &pagemaskand);
 			if (nfs_buf_pgs_is_set(&pagemaskand)) {
 				FSDBG(515, np, uio_offset(uio), bp, 0xd15c002);
-				/* write/commit buffer "synchronously" */
-				/* (NB_STABLE indicates that data writes should be FILESYNC) */
+				                                         
+				                                                               
 				CLR(bp->nb_flags, (NB_DONE | NB_ERROR | NB_INVAL));
 				SET(bp->nb_flags, (NB_ASYNC | NB_STABLE));
 				error = nfs_buf_write(bp);
@@ -3361,14 +3361,14 @@ again:
 				}
 				goto again;
 			}
-			/* if the first or last pages are already dirty */
-			/* make sure that the dirty range encompasses those pages */
+			                                                  
+			                                                            
 			if (NBPGDIRTY(bp, firstpg) || NBPGDIRTY(bp, lastpg)) {
 				FSDBG(515, np, uio_offset(uio), bp, 0xd15c003);
 				bp->nb_dirtyoff = MIN(on, firstpg * PAGE_SIZE);
 				if (NBPGDIRTY(bp, lastpg)) {
 					bp->nb_dirtyend = (lastpg + 1) * PAGE_SIZE;
-					/* clip to EOF */
+					                 
 					if (NBOFF(bp) + bp->nb_dirtyend > (off_t)np->n_size) {
 						bp->nb_dirtyend = np->n_size - NBOFF(bp);
 						if (bp->nb_dirtyoff >= bp->nb_dirtyend) {
@@ -3381,30 +3381,30 @@ again:
 			}
 		}
 
-		/*
-		 * Are we extending the size of the file with this write?
-		 * If so, update file size now that we have the block.
-		 * If there was a partial buf at the old eof, validate
-		 * and zero the new bytes.
-		 */
+		  
+                                                           
+                                                        
+                                                        
+                            
+     
 		if ((uio_offset(uio) + n) > (off_t)np->n_size) {
 			daddr64_t eofbn = np->n_size / biosize;
 			int neweofoff = (uio_offset(uio) + n) % biosize;
 
 			FSDBG(515, 0xb1ffa000, uio_offset(uio) + n, eofoff, neweofoff);
 
-			/* if we're extending within the same last block */
-			/* and the block is flagged as being cached... */
+			                                                   
+			                                                 
 			if ((lbn == eofbn) && ISSET(bp->nb_flags, NB_CACHE)) {
-				/* ...check that all pages in buffer are valid */
+				                                                 
 				int endpg = ((neweofoff ? neweofoff : biosize) - 1) / PAGE_SIZE;
 				nfsbufpgs pagemask, pagemaskand;
-				/* pagemask only has to extend to last page being written to */
+				                                                               
 				nfs_buf_pgs_get_page_mask(&pagemask, endpg + 1);
 				FSDBG(515, 0xb1ffa001, bp->nb_valid, pagemask, 0);
 				nfs_buf_pgs_bit_and(&bp->nb_valid, &pagemask, &pagemaskand);
 				if (!NBPGS_IS_EQUAL(&pagemaskand, &pagemask)) {
-					/* zerofill any hole */
+					                       
 					if (on > bp->nb_validend) {
 						for (off_t i = bp->nb_validend / PAGE_SIZE; i <= (on - 1) / PAGE_SIZE; i++) {
 							NBPGVALID_SET(bp, i);
@@ -3413,7 +3413,7 @@ again:
 						FSDBG(516, bp, bp->nb_validend, on - bp->nb_validend, 0xf01e);
 						NFS_BZERO((char *)bp->nb_data + bp->nb_validend, on - bp->nb_validend);
 					}
-					/* zerofill any trailing data in the last page */
+					                                                 
 					if (neweofoff) {
 						NFS_BUF_MAP(bp);
 						FSDBG(516, bp, neweofoff, PAGE_SIZE - (neweofoff & PAGE_MASK), 0xe0f);
@@ -3428,41 +3428,41 @@ again:
 			np->n_flag |= NMODIFIED;
 			nfs_node_unlock(np);
 			FSDBG(516, np, np->n_size, np->n_vattr.nva_size, 0xf00d0001);
-			ubc_setsize(vp, (off_t)np->n_size); /* XXX errors */
+			ubc_setsize(vp, (off_t)np->n_size);                 
 		}
-		/*
-		 * If dirtyend exceeds file size, chop it down.  This should
-		 * not occur unless there is a race.
-		 */
+		  
+                                                              
+                                      
+     
 		if (NBOFF(bp) + bp->nb_dirtyend > (off_t)np->n_size) {
 			bp->nb_dirtyend = np->n_size - NBOFF(bp);
 			if (bp->nb_dirtyoff >= bp->nb_dirtyend) {
 				bp->nb_dirtyoff = bp->nb_dirtyend = 0;
 			}
 		}
-		/*
-		 * UBC doesn't handle partial pages, so we need to make sure
-		 * that any pages left in the page cache are completely valid.
-		 *
-		 * Writes that are smaller than a block are delayed if they
-		 * don't extend to the end of the block.
-		 *
-		 * If the block isn't (completely) cached, we may need to read
-		 * in some parts of pages that aren't covered by the write.
-		 * If the write offset (on) isn't page aligned, we'll need to
-		 * read the start of the first page being written to.  Likewise,
-		 * if the offset of the end of the write (on+n) isn't page aligned,
-		 * we'll need to read the end of the last page being written to.
-		 *
-		 * Notes:
-		 * We don't want to read anything we're just going to write over.
-		 * We don't want to read anything we're just going drop when the
-		 *   I/O is complete (i.e. don't do reads for NOCACHE requests).
-		 * We don't want to issue multiple I/Os if we don't have to
-		 *   (because they're synchronous rpcs).
-		 * We don't want to read anything we already have modified in the
-		 *   page cache.
-		 */
+		  
+                                                              
+                                                                
+    
+                                                             
+                                          
+    
+                                                                
+                                                             
+                                                               
+                                                                  
+                                                                     
+                                                                  
+    
+           
+                                                                   
+                                                                  
+                                                                  
+                                                             
+                                          
+                                                                   
+                  
+     
 		if (!ISSET(bp->nb_flags, NB_CACHE) && (n < biosize)) {
 			off_t firstpgoff, lastpgoff, firstpg, lastpg, dirtypg;
 			start = end = -1;
@@ -3471,50 +3471,50 @@ again:
 			lastpg = (on + n - 1) / PAGE_SIZE;
 			lastpgoff = (on + n) & PAGE_MASK;
 			if (firstpgoff && !NBPGVALID(bp, firstpg)) {
-				/* need to read start of first page */
+				                                      
 				start = firstpg * PAGE_SIZE;
 				end = start + firstpgoff;
 			}
 			if (lastpgoff && !NBPGVALID(bp, lastpg)) {
-				/* need to read end of last page */
+				                                   
 				if (start < 0) {
 					start = (lastpg * PAGE_SIZE) + lastpgoff;
 				}
 				end = (lastpg + 1) * PAGE_SIZE;
 			}
 			if (ISSET(bp->nb_flags, NB_NOCACHE)) {
-				/*
-				 * For nocache writes, if there is any partial page at the
-				 * start or end of the write range, then we do the write
-				 * synchronously to make sure that we can drop the data
-				 * from the cache as soon as the WRITE finishes.  Normally,
-				 * we would do an unstable write and not drop the data until
-				 * it was committed.  But doing that here would risk allowing
-				 * invalid data to be read from the cache between the WRITE
-				 * and the COMMIT.
-				 * (NB_STABLE indicates that data writes should be FILESYNC)
-				 */
+				  
+                                                              
+                                                            
+                                                           
+                                                               
+                                                                
+                                                                 
+                                                               
+                      
+                                                                
+       
 				if (end > start) {
 					SET(bp->nb_flags, NB_STABLE);
 				}
 				goto skipread;
 			}
 			if (end > start) {
-				/* need to read the data in range: start...end-1 */
+				                                                   
 
-				/* first, check for dirty pages in between */
-				/* if there are, we'll have to do two reads because */
-				/* we don't want to overwrite the dirty pages. */
+				                                             
+				                                                      
+				                                                 
 				for (dirtypg = start / PAGE_SIZE; dirtypg <= (end - 1) / PAGE_SIZE; dirtypg++) {
 					if (NBPGDIRTY(bp, dirtypg)) {
 						break;
 					}
 				}
 
-				/* if start is at beginning of page, try */
-				/* to get any preceeding pages as well. */
+				                                           
+				                                          
 				if (!(start & PAGE_MASK)) {
-					/* stop at next dirty/valid page or start of block */
+					                                                     
 					for (; start > 0; start -= PAGE_SIZE) {
 						if (NBPGVALID(bp, ((start - 1) / PAGE_SIZE))) {
 							break;
@@ -3523,19 +3523,19 @@ again:
 				}
 
 				NFS_BUF_MAP(bp);
-				/* setup uio for read(s) */
+				                           
 				boff = NBOFF(bp);
 				auio = uio_createwithbuffer(1, 0, UIO_SYSSPACE, UIO_READ,
 				    &auio_buf, sizeof(auio_buf));
 
 				if (dirtypg <= (end - 1) / PAGE_SIZE) {
-					/* there's a dirty page in the way, so just do two reads */
-					/* we'll read the preceding data here */
+					                                                           
+					                                        
 					uio_reset(auio, boff + start, UIO_SYSSPACE, UIO_READ);
 					NFS_UIO_ADDIOV(auio, CAST_USER_ADDR_T(bp->nb_data + start), on - start);
 					error = nfs_read_rpc(np, auio, ctx);
 					if (error) {
-						/* couldn't read the data, so treat buffer as synchronous NOCACHE */
+						                                                                    
 						SET(bp->nb_flags, (NB_NOCACHE | NB_STABLE));
 						goto skipread;
 					}
@@ -3544,7 +3544,7 @@ again:
 						bzero(CAST_DOWN(caddr_t, uio_curriovbase(auio)), uio_resid(auio));
 					}
 					if (!error) {
-						/* update validoff/validend if necessary */
+						                                           
 						if ((bp->nb_validoff < 0) || (bp->nb_validoff > start)) {
 							bp->nb_validoff = start;
 						}
@@ -3554,19 +3554,19 @@ again:
 						if ((off_t)np->n_size > boff + bp->nb_validend) {
 							bp->nb_validend = MIN(np->n_size - (boff + start), biosize);
 						}
-						/* validate any pages before the write offset */
+						                                                
 						for (; start < on / PAGE_SIZE; start += PAGE_SIZE) {
 							NBPGVALID_SET(bp, start / PAGE_SIZE);
 						}
 					}
-					/* adjust start to read any trailing data */
+					                                            
 					start = on + n;
 				}
 
-				/* if end is at end of page, try to */
-				/* get any following pages as well. */
+				                                      
+				                                      
 				if (!(end & PAGE_MASK)) {
-					/* stop at next valid page or end of block */
+					                                             
 					for (; end < biosize; end += PAGE_SIZE) {
 						if (NBPGVALID(bp, end / PAGE_SIZE)) {
 							break;
@@ -3576,23 +3576,23 @@ again:
 
 				if (((boff + start) >= (off_t)np->n_size) ||
 				    ((start >= on) && ((boff + on + n) >= (off_t)np->n_size))) {
-					/*
-					 * Either this entire read is beyond the current EOF
-					 * or the range that we won't be modifying (on+n...end)
-					 * is all beyond the current EOF.
-					 * No need to make a trip across the network to
-					 * read nothing.  So, just zero the buffer instead.
-					 */
+					  
+                                                         
+                                                            
+                                      
+                                                    
+                                                        
+        
 					FSDBG(516, bp, start, end - start, 0xd00dee00);
 					NFS_BZERO(bp->nb_data + start, end - start);
 					error = 0;
 				} else {
-					/* now we'll read the (rest of the) data */
+					                                           
 					uio_reset(auio, boff + start, UIO_SYSSPACE, UIO_READ);
 					NFS_UIO_ADDIOV(auio, CAST_USER_ADDR_T(bp->nb_data + start), end - start);
 					error = nfs_read_rpc(np, auio, ctx);
 					if (error) {
-						/* couldn't read the data, so treat buffer as synchronous NOCACHE */
+						                                                                    
 						SET(bp->nb_flags, (NB_NOCACHE | NB_STABLE));
 						goto skipread;
 					}
@@ -3602,7 +3602,7 @@ again:
 					}
 				}
 				if (!error) {
-					/* update validoff/validend if necessary */
+					                                           
 					if ((bp->nb_validoff < 0) || (bp->nb_validoff > start)) {
 						bp->nb_validoff = start;
 					}
@@ -3612,16 +3612,16 @@ again:
 					if ((off_t)np->n_size > boff + bp->nb_validend) {
 						bp->nb_validend = MIN(np->n_size - (boff + start), biosize);
 					}
-					/* validate any pages before the write offset's page */
+					                                                       
 					for (; start < (off_t)trunc_page_64(on); start += PAGE_SIZE) {
 						NBPGVALID_SET(bp, start / PAGE_SIZE);
 					}
-					/* validate any pages after the range of pages being written to */
+					                                                                  
 					for (; (end - 1) > (off_t)round_page_64(on + n - 1); end -= PAGE_SIZE) {
 						NBPGVALID_SET(bp, (end - 1) / PAGE_SIZE);
 					}
 				}
-				/* Note: pages being written to will be validated when written */
+				                                                                 
 			}
 		}
 skipread:
@@ -3652,19 +3652,19 @@ skipread:
 			goto out;
 		}
 
-		/* validate any pages written to */
+		                                   
 		start = on & ~PAGE_MASK;
 		for (; start < on + n; start += PAGE_SIZE) {
 			NBPGVALID_SET(bp, start / PAGE_SIZE);
-			/*
-			 * This may seem a little weird, but we don't actually set the
-			 * dirty bits for writes.  This is because we keep the dirty range
-			 * in the nb_dirtyoff/nb_dirtyend fields.  Also, particularly for
-			 * delayed writes, when we give the pages back to the VM we don't
-			 * want to keep them marked dirty, because when we later write the
-			 * buffer we won't be able to tell which pages were written dirty
-			 * and which pages were mmapped and dirtied.
-			 */
+			  
+                                                                 
+                                                                     
+                                                                    
+                                                                    
+                                                                     
+                                                                    
+                                               
+      
 		}
 		if (bp->nb_dirtyend > 0) {
 			bp->nb_dirtyoff = MIN(on, bp->nb_dirtyoff);
@@ -3685,10 +3685,10 @@ skipread:
 			nfs_buf_normalize_valid_range(np, bp);
 		}
 
-		/*
-		 * Since this block is being modified, it must be written
-		 * again and not just committed.
-		 */
+		  
+                                                           
+                                  
+     
 		if (ISSET(bp->nb_flags, NB_NEEDCOMMIT)) {
 			nfs_node_lock_force(np);
 			if (ISSET(bp->nb_flags, NB_NEEDCOMMIT)) {
@@ -3715,7 +3715,7 @@ skipread:
 				goto out;
 			}
 		} else {
-			/* If the block wasn't already delayed: charge for the write */
+			                                                               
 			if (!ISSET(bp->nb_flags, NB_DELWRI)) {
 				proc_t p = vfs_context_proc(ctx);
 				if (p && p->p_stats) {
@@ -3740,9 +3740,9 @@ out:
 }
 
 
-/*
- * NFS write call
- */
+  
+                 
+   
 int
 nfs_write_rpc(
 	nfsnode_t np,
@@ -3776,7 +3776,7 @@ nfs_write_rpc2(
 	uio_t uio_save = NULL;
 
 #if DIAGNOSTIC
-	/* XXX limitation based on need to back up uio on short write */
+	                                                                
 	if (uio_iovcnt(uio) != 1) {
 		panic("nfs3_write_rpc: iovcnt > 1");
 	}
@@ -3826,7 +3826,7 @@ nfs_write_rpc2(
 		}
 #if CONFIG_NFS4
 		if ((nmp->nm_vers >= NFS_VER4) && nfs_mount_state_error_should_restart(error) &&
-		    (++restart <= nfs_mount_state_max_restarts(nmp))) { /* guard against no progress */
+		    (++restart <= nfs_mount_state_max_restarts(nmp))) {                                
 			lck_mtx_lock(&nmp->nm_lock);
 			if ((error != NFSERR_GRACE) && (stategenid == nmp->nm_stategenid)) {
 				NP(np, "nfs_write_rpc: error %d, initiating recovery", error);
@@ -3853,33 +3853,33 @@ nfs_write_rpc2(
 			continue;
 		}
 
-		/* check for a short write */
+		                             
 		if (rlen < len) {
-			/* Reset the uio to reflect the actual transfer */
+			                                                  
 			*uio = *uio_save;
 			uio_update(uio, totalsize - (tsiz - rlen));
 			len = rlen;
 		}
 
-		/* return lowest commit level returned */
+		                                         
 		if (commit < committed) {
 			committed = commit;
 		}
 
 		tsiz -= len;
 
-		/* check write verifier */
+		                          
 		if (!wverfset) {
 			wverf = wverf2;
 			wverfset = 1;
 		} else if (wverf != wverf2) {
-			/* verifier changed, so we need to restart all the writes */
+			                                                            
 			if (++vrestart > 100) {
-				/* give up after too many restarts */
+				                                     
 				error = EIO;
 				break;
 			}
-			*uio = *uio_save;       // Reset the uio back to the start
+			*uio = *uio_save;                                         
 			committed = NFS_WRITE_FILESYNC;
 			wverfset = 0;
 			tsiz = totalsize;
@@ -3922,7 +3922,7 @@ nfs3_write_rpc_async(
 	}
 	nfsvers = nmp->nm_vers;
 
-	/* for async mounts, don't bother sending sync write requests */
+	                                                                
 	if ((iomode != NFS_WRITE_UNSTABLE) && nfs_allow_async &&
 	    ((mp = NFSTOMP(np))) && (vfs_flags(mp) & MNT_ASYNC)) {
 		iomode = NFS_WRITE_UNSTABLE;
@@ -3977,7 +3977,7 @@ nfs3_write_rpc_async_finish(
 	nfsm_chain_null(&nmrep);
 
 	error = nfs_request_async_finish(req, &nmrep, &xid, &status);
-	if (error == EINPROGRESS) { /* async request restarted */
+	if (error == EINPROGRESS) {                              
 		return error;
 	}
 	nmp = NFSTONMP(np);
@@ -4039,22 +4039,22 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS mknod vnode op
- *
- * For NFS v2 this is a kludge. Use a create RPC but with the IFMT bits of the
- * mode set to specify the file type and the size field for rdev.
- */
+  
+                     
+  
+                                                                              
+                                                                 
+   
 int
 nfs3_vnop_mknod(
-	struct vnop_mknod_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_dvp;
-                                *  vnode_t *a_vpp;
-                                *  struct componentname *a_cnp;
-                                *  struct vnode_attr *a_vap;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_mknod_args     
+                                                               
+                                                 
+                                                  
+                                                               
+                                                            
+                                                           
+                                       *ap)
 {
 	vnode_t dvp = ap->a_dvp;
 	vnode_t *vpp = ap->a_vpp;
@@ -4146,7 +4146,7 @@ nfs3_vnop_mknod(
 	if ((lockerror = nfs_node_lock(dnp))) {
 		error = lockerror;
 	}
-	/* XXX no EEXIST kludge here? */
+	                                
 	dxid = xid;
 	if (!error && !status) {
 		if (dnp->n_flag & NNEGNCENTRIES) {
@@ -4167,12 +4167,12 @@ nfsmout:
 
 	if (!lockerror) {
 		dnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&dnp->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, dnp, &dnp->n_vattr);
 		}
 		nfs_node_unlock(dnp);
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		nfs_getattr(dnp, NULL, ctx, wccpostattr ? NGA_CACHED : NGA_UNCACHED);
 	}
 
@@ -4193,7 +4193,7 @@ nfsmout:
 	    (!newvp || nfs_getattrcache(np, nvattr, 0) ||
 	    (gotuid && (nvattr->nva_uid != vap->va_uid)) ||
 	    (gotgid && (nvattr->nva_gid != vap->va_gid)))) {
-		/* clear ID bits if server didn't use them (or we can't tell) */
+		                                                                
 		VATTR_CLEAR_SUPPORTED(vap, va_uid);
 		VATTR_CLEAR_SUPPORTED(vap, va_gid);
 	}
@@ -4213,19 +4213,19 @@ nfsmout:
 }
 
 static uint32_t create_verf;
-/*
- * NFS file create call
- */
+  
+                       
+   
 int
 nfs3_vnop_create(
-	struct vnop_create_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_dvp;
-                                 *  vnode_t *a_vpp;
-                                 *  struct componentname *a_cnp;
-                                 *  struct vnode_attr *a_vap;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_create_args     
+                                                                
+                                                  
+                                                   
+                                                                
+                                                             
+                                                            
+                                        *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t dvp = ap->a_dvp;
@@ -4353,12 +4353,12 @@ nfsmout:
 
 	if (!lockerror) {
 		dnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&dnp->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, dnp, &dnp->n_vattr);
 		}
 		nfs_node_unlock(dnp);
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		nfs_getattr(dnp, NULL, ctx, wccpostattr ? NGA_CACHED : NGA_UNCACHED);
 	}
 
@@ -4392,8 +4392,8 @@ nfsmout:
 		nfs_node_unlock(np);
 		error = nfs3_setattr_rpc(np, vap, ctx);
 		if (error && (gotuid || gotgid)) {
-			/* it's possible the server didn't like our attempt to set IDs. */
-			/* so, let's try it again without those */
+			                                                                  
+			                                          
 			VATTR_CLEAR_ACTIVE(vap, va_uid);
 			VATTR_CLEAR_ACTIVE(vap, va_gid);
 			error = nfs3_setattr_rpc(np, vap, ctx);
@@ -4411,7 +4411,7 @@ nfsmout:
 	    (!newvp || nfs_getattrcache(np, nvattr, 0) ||
 	    (gotuid && (nvattr->nva_uid != vap->va_uid)) ||
 	    (gotgid && (nvattr->nva_gid != vap->va_gid)))) {
-		/* clear ID bits if server didn't use them (or we can't tell) */
+		                                                                
 		VATTR_CLEAR_SUPPORTED(vap, va_uid);
 		VATTR_CLEAR_SUPPORTED(vap, va_gid);
 	}
@@ -4425,27 +4425,27 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS file remove call
- * To try and make NFS semantics closer to UFS semantics, a file that has
- * other processes using the vnode is renamed instead of removed and then
- * removed later on the last close.
- * - If vnode_isinuse()
- *	  If a rename is not already in the works
- *	     call nfs_sillyrename() to set it up
- *     else
- *	  do the remove RPC
- */
+  
+                       
+                                                                         
+                                                                         
+                                   
+                       
+                                            
+                                           
+           
+                      
+   
 int
 nfs_vnop_remove(
-	struct vnop_remove_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_dvp;
-                                 *  vnode_t a_vp;
-                                 *  struct componentname *a_cnp;
-                                 *  int a_flags;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_remove_args     
+                                                                
+                                                  
+                                                 
+                                                                
+                                                
+                                                            
+                                        *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -4458,7 +4458,7 @@ nfs_vnop_remove(
 	struct nfsmount *nmp;
 	struct nfs_dulookup *dul;
 
-	/* XXX prevent removing a sillyrenamed file? */
+	                                               
 
 	nmp = NFSTONMP(dnp);
 	if (nfs_mount_gone(nmp)) {
@@ -4480,7 +4480,7 @@ again_relock:
 		goto out_free;
 	}
 
-	/* lock the node while we remove the file */
+	                                            
 	lck_mtx_lock(&nfs_node_hash_mutex);
 	while (np->n_hflag & NHLOCKED) {
 		np->n_hflag |= NHLOCKWANT;
@@ -4496,7 +4496,7 @@ again_relock:
 again:
 	inuse = vnode_isinuse(vp, 0);
 	if ((ap->a_flags & VNODE_REMOVE_NODELETEBUSY) && inuse) {
-		/* Caller requested Carbon delete semantics, but file is busy */
+		                                                                
 		error = EBUSY;
 		goto out;
 	}
@@ -4508,8 +4508,8 @@ again:
 		goto again;
 	}
 	if (!inuse || (np->n_sillyrename && (nvattr->nva_nlink > 1))) {
-		if (!inuse && !flushed) { /* flush all the buffers first */
-			/* unlock the node */
+		if (!inuse && !flushed) {                                  
+			                     
 			lck_mtx_lock(&nfs_node_hash_mutex);
 			np->n_hflag &= ~NHLOCKED;
 			if (np->n_hflag & NHLOCKWANT) {
@@ -4537,38 +4537,38 @@ again:
 			nfs4_delegation_return(np, 0, vfs_context_thread(ctx), vfs_context_ucred(ctx));
 		}
 #endif
-		/*
-		 * Purge the name cache so that the chance of a lookup for
-		 * the name succeeding while the remove is in progress is
-		 * minimized.
-		 */
+		  
+                                                            
+                                                           
+               
+     
 		nfs_name_cache_purge(dnp, np, cnp, ctx);
 
 		if (!namedattrs) {
 			nfs_dulookup_start(dul, dnp, ctx);
 		}
 
-		/* Do the rpc */
+		                
 		error = nmp->nm_funcs->nf_remove_rpc(dnp, cnp->cn_nameptr, cnp->cn_namelen,
 		    vfs_context_thread(ctx), vfs_context_ucred(ctx));
 
-		/*
-		 * Kludge City: If the first reply to the remove rpc is lost..
-		 *   the reply to the retransmitted request will be ENOENT
-		 *   since the file was in fact removed
-		 *   Therefore, we cheat and return success.
-		 */
+		  
+                                                                
+                                                            
+                                         
+                                              
+     
 		if (error == ENOENT) {
 			error = 0;
 		}
 
 		if (!error && !inuse && !np->n_sillyrename) {
-			/*
-			 * removal succeeded, it's not in use, and not silly renamed so
-			 * remove nfsnode from hash now so we can't accidentally find it
-			 * again if another object gets created with the same filehandle
-			 * before this vnode gets reclaimed
-			 */
+			  
+                                                                  
+                                                                   
+                                                                   
+                                      
+      
 			lck_mtx_lock(&nfs_node_hash_mutex);
 			if (np->n_hflag & NHHASHED) {
 				LIST_REMOVE(np, n_hash);
@@ -4576,8 +4576,8 @@ again:
 				FSDBG(266, 0, np, np->n_flag, 0xb1eb1e);
 			}
 			lck_mtx_unlock(&nfs_node_hash_mutex);
-			/* clear flags now: won't get nfs_vnop_inactive for recycled vnode */
-			/* clear all flags other than these */
+			                                                                     
+			                                      
 			nfs_node_lock_force(np);
 			np->n_flag &= (NMODIFIED);
 			NATTRINVALIDATE(np);
@@ -4606,13 +4606,13 @@ again:
 		}
 	}
 
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	nfs_getattr(dnp, NULL, ctx, NGA_CACHED);
 	if (!namedattrs) {
 		nfs_dulookup_finish(dul, dnp, ctx);
 	}
 out:
-	/* unlock the node */
+	                     
 	lck_mtx_lock(&nfs_node_hash_mutex);
 	np->n_hflag &= ~NHLOCKED;
 	if (np->n_hflag & NHLOCKWANT) {
@@ -4630,9 +4630,9 @@ out_free:
 	return error;
 }
 
-/*
- * NFS silly-renamed file removal function called from nfs_vnop_inactive
- */
+  
+                                                                        
+   
 int
 nfs_removeit(struct nfs_sillyrename *nsp)
 {
@@ -4643,9 +4643,9 @@ nfs_removeit(struct nfs_sillyrename *nsp)
 	return nmp->nm_funcs->nf_remove_rpc(nsp->nsr_dnp, nsp->nsr_name, nsp->nsr_namlen, NULL, nsp->nsr_cred);
 }
 
-/*
- * NFS remove rpc, called from nfs_remove() and nfs_removeit().
- */
+  
+                                                               
+   
 int
 nfs3_remove_rpc(
 	nfsnode_t dnp,
@@ -4690,7 +4690,7 @@ nfs3_remove_rpc(
 	}
 	nfsmout_if(error);
 	dnp->n_flag |= NMODIFIED;
-	/* if directory hadn't changed, update namecache mtime */
+	                                                         
 	if (nfstimespeccmp(&dnp->n_ncmtime, &premtime, ==)) {
 		NFS_CHANGED_UPDATE_NC(nfsvers, dnp, &dnp->n_vattr);
 	}
@@ -4709,21 +4709,21 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS file rename call
- */
+  
+                       
+   
 int
 nfs_vnop_rename(
-	struct vnop_rename_args  /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_fdvp;
-                                  *  vnode_t a_fvp;
-                                  *  struct componentname *a_fcnp;
-                                  *  vnode_t a_tdvp;
-                                  *  vnode_t a_tvp;
-                                  *  struct componentname *a_tcnp;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_rename_args      
+                                                                 
+                                                    
+                                                   
+                                                                  
+                                                    
+                                                   
+                                                                  
+                                                             
+                                         *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t fdvp = ap->a_fdvp;
@@ -4757,7 +4757,7 @@ nfs_vnop_rename(
 	MALLOC(nvattr, struct nfs_vattr *, sizeof(*nvattr), M_TEMP, M_WAITOK);
 
 	if (tvp && (tvp != fvp)) {
-		/* lock the node while we rename over the existing file */
+		                                                          
 		lck_mtx_lock(&nfs_node_hash_mutex);
 		while (tnp->n_hflag & NHLOCKED) {
 			tnp->n_hflag |= NHLOCKWANT;
@@ -4768,7 +4768,7 @@ nfs_vnop_rename(
 		locked = 1;
 	}
 
-	/* Check for cross-device rename */
+	                                   
 	fmp = vnode_mount(fvp);
 	tmp = tvp ? vnode_mount(tvp) : NULL;
 	tdmp = vnode_mount(tdvp);
@@ -4777,25 +4777,25 @@ nfs_vnop_rename(
 		goto out;
 	}
 
-	/* XXX prevent renaming from/over a sillyrenamed file? */
+	                                                         
 
-	/*
-	 * If the tvp exists and is in use, sillyrename it before doing the
-	 * rename of the new file over it.
-	 * XXX Can't sillyrename a directory.
-	 * Don't sillyrename if source and target are same vnode (hard
-	 * links or case-variants)
-	 */
+	  
+                                                                    
+                                   
+                                      
+                                                               
+                           
+    
 	if (tvp && (tvp != fvp)) {
 		inuse = vnode_isinuse(tvp, 0);
 	}
 	if (inuse && !tnp->n_sillyrename && (vnode_vtype(tvp) != VDIR)) {
 		error = nfs_sillyrename(tdnp, tnp, tcnp, ctx);
 		if (error) {
-			/* sillyrename failed. Instead of pressing on, return error */
-			goto out; /* should not be ENOENT. */
+			                                                              
+			goto out;                            
 		} else {
-			/* sillyrename succeeded.*/
+			                           
 			tvp = NULL;
 		}
 	}
@@ -4807,9 +4807,9 @@ nfs_vnop_rename(
 	error = nmp->nm_funcs->nf_rename_rpc(fdnp, fcnp->cn_nameptr, fcnp->cn_namelen,
 	    tdnp, tcnp->cn_nameptr, tcnp->cn_namelen, ctx);
 
-	/*
-	 * Kludge: Map ENOENT => 0 assuming that it is a reply to a retry.
-	 */
+	  
+                                                                   
+    
 	if (error == ENOENT) {
 		error = 0;
 	}
@@ -4821,11 +4821,11 @@ nfs_vnop_rename(
 		nfs_node_unlock(tnp);
 		lck_mtx_lock(&nfs_node_hash_mutex);
 		if (tvprecycle && (tnp->n_hflag & NHHASHED)) {
-			/*
-			 * remove nfsnode from hash now so we can't accidentally find it
-			 * again if another object gets created with the same filehandle
-			 * before this vnode gets reclaimed
-			 */
+			  
+                                                                   
+                                                                   
+                                      
+      
 			LIST_REMOVE(tnp, n_hash);
 			tnp->n_hflag &= ~NHHASHED;
 			FSDBG(266, 0, tnp, tnp->n_flag, 0xb1eb1e);
@@ -4833,13 +4833,13 @@ nfs_vnop_rename(
 		lck_mtx_unlock(&nfs_node_hash_mutex);
 	}
 
-	/* purge the old name cache entries and enter the new one */
+	                                                            
 	nfs_name_cache_purge(fdnp, fnp, fcnp, ctx);
 	if (tvp) {
 		nfs_name_cache_purge(tdnp, tnp, tcnp, ctx);
 		if (tvprecycle) {
-			/* clear flags now: won't get nfs_vnop_inactive for recycled vnode */
-			/* clear all flags other than these */
+			                                                                     
+			                                      
 			nfs_node_lock_force(tnp);
 			tnp->n_flag &= (NMODIFIED);
 			nfs_node_unlock(tnp);
@@ -4855,15 +4855,15 @@ nfs_vnop_rename(
 		nfs_node_unlock(tdnp);
 		nfs_node_lock_force(fnp);
 		cache_enter(tdvp, fvp, tcnp);
-		if (tdvp != fdvp) {     /* update parent pointer */
+		if (tdvp != fdvp) {                                
 			if (fnp->n_parent && !vnode_get(fnp->n_parent)) {
-				/* remove ref from old parent */
+				                                
 				vnode_rele(fnp->n_parent);
 				vnode_put(fnp->n_parent);
 			}
 			fnp->n_parent = tdvp;
 			if (tdvp && !vnode_get(tdvp)) {
-				/* add ref to new parent */
+				                           
 				vnode_ref(tdvp);
 				vnode_put(tdvp);
 			} else {
@@ -4873,11 +4873,11 @@ nfs_vnop_rename(
 		nfs_node_unlock(fnp);
 	}
 out:
-	/* nfs_getattr() will check changed and purge caches */
+	                                                       
 	nfs_getattr(fdnp, NULL, ctx, NGA_CACHED);
 	nfs_getattr(tdnp, NULL, ctx, NGA_CACHED);
 	if (locked) {
-		/* unlock node */
+		                 
 		lck_mtx_lock(&nfs_node_hash_mutex);
 		tnp->n_hflag &= ~NHLOCKED;
 		if (tnp->n_hflag & NHLOCKWANT) {
@@ -4891,9 +4891,9 @@ out:
 	return error;
 }
 
-/*
- * Do an NFS rename rpc. Called from nfs_vnop_rename() and nfs_sillyrename().
- */
+  
+                                                                             
+   
 int
 nfs3_rename_rpc(
 	nfsnode_t fdnp,
@@ -4952,7 +4952,7 @@ nfsmout:
 	nfsm_chain_cleanup(&nmrep);
 	if (!lockerror) {
 		fdnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&fdnp->n_ncmtime, &fpremtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, fdnp, &fdnp->n_vattr);
 		}
@@ -4960,7 +4960,7 @@ nfsmout:
 			NATTRINVALIDATE(fdnp);
 		}
 		tdnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&tdnp->n_ncmtime, &tpremtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, tdnp, &tdnp->n_vattr);
 		}
@@ -4972,18 +4972,18 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS hard link create call
- */
+  
+                            
+   
 int
 nfs3_vnop_link(
-	struct vnop_link_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  vnode_t a_tdvp;
-                               *  struct componentname *a_cnp;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_link_args     
+                                                              
+                                               
+                                                 
+                                                              
+                                                          
+                                      *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -5011,11 +5011,11 @@ nfs3_vnop_link(
 		return ENAMETOOLONG;
 	}
 
-	/*
-	 * Push all writes to the server, so that the attribute cache
-	 * doesn't get "out of sync" with the server.
-	 * XXX There should be a better way!
-	 */
+	  
+                                                              
+                                              
+                                     
+    
 	nfs_flush(np, MNT_WAIT, vfs_context_thread(ctx), V_IGNORE_WRITEERR);
 
 	error = nfs_node_set_busy2(tdnp, np, vfs_context_thread(ctx));
@@ -5055,7 +5055,7 @@ nfsmout:
 			NATTRINVALIDATE(np);
 		}
 		tdnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&tdnp->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, tdnp, &tdnp->n_vattr);
 		}
@@ -5069,29 +5069,29 @@ nfsmout:
 		nfs_node_unlock2(tdnp, np);
 	}
 	nfs_node_clear_busy2(tdnp, np);
-	/*
-	 * Kludge: Map EEXIST => 0 assuming that it is a reply to a retry.
-	 */
+	  
+                                                                   
+    
 	if (error == EEXIST) {
 		error = 0;
 	}
 	return error;
 }
 
-/*
- * NFS symbolic link create call
- */
+  
+                                
+   
 int
 nfs3_vnop_symlink(
-	struct vnop_symlink_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_dvp;
-                                  *  vnode_t *a_vpp;
-                                  *  struct componentname *a_cnp;
-                                  *  struct vnode_attr *a_vap;
-                                  *  char *a_target;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_symlink_args     
+                                                                 
+                                                   
+                                                    
+                                                                 
+                                                              
+                                                    
+                                                             
+                                         *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t dvp = ap->a_dvp;
@@ -5203,12 +5203,12 @@ nfsmout:
 
 	if (!lockerror) {
 		dnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&dnp->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, dnp, &dnp->n_vattr);
 		}
 		nfs_node_unlock(dnp);
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		nfs_getattr(dnp, NULL, ctx, wccpostattr ? NGA_CACHED : NGA_UNCACHED);
 	}
 
@@ -5223,10 +5223,10 @@ nfsmout:
 		nfs_dulookup_finish(dul, dnp, ctx);
 	}
 
-	/*
-	 * Kludge: Map EEXIST => 0 assuming that you have a reply to a retry
-	 * if we can succeed in looking up the symlink.
-	 */
+	  
+                                                                     
+                                                
+    
 	if ((error == EEXIST) || (!error && !newvp)) {
 		if (newvp) {
 			nfs_node_unlock(np);
@@ -5248,7 +5248,7 @@ nfsmout:
 	    (!newvp || nfs_getattrcache(np, nvattr, 0) ||
 	    (gotuid && (nvattr->nva_uid != vap->va_uid)) ||
 	    (gotgid && (nvattr->nva_gid != vap->va_gid)))) {
-		/* clear ID bits if server didn't use them (or we can't tell) */
+		                                                                
 		VATTR_CLEAR_SUPPORTED(vap, va_uid);
 		VATTR_CLEAR_SUPPORTED(vap, va_gid);
 	}
@@ -5268,19 +5268,19 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS make dir call
- */
+  
+                    
+   
 int
 nfs3_vnop_mkdir(
-	struct vnop_mkdir_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_dvp;
-                                *  vnode_t *a_vpp;
-                                *  struct componentname *a_cnp;
-                                *  struct vnode_attr *a_vap;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_mkdir_args     
+                                                               
+                                                 
+                                                  
+                                                               
+                                                            
+                                                           
+                                       *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t dvp = ap->a_dvp;
@@ -5383,12 +5383,12 @@ nfsmout:
 
 	if (!lockerror) {
 		dnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&dnp->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, dnp, &dnp->n_vattr);
 		}
 		nfs_node_unlock(dnp);
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		nfs_getattr(dnp, NULL, ctx, wccpostattr ? NGA_CACHED : NGA_UNCACHED);
 	}
 
@@ -5403,10 +5403,10 @@ nfsmout:
 		nfs_dulookup_finish(dul, dnp, ctx);
 	}
 
-	/*
-	 * Kludge: Map EEXIST => 0 assuming that you have a reply to a retry
-	 * if we can succeed in looking up the directory.
-	 */
+	  
+                                                                     
+                                                  
+    
 	if ((error == EEXIST) || (!error && !newvp)) {
 		if (newvp) {
 			nfs_node_unlock(np);
@@ -5428,7 +5428,7 @@ nfsmout:
 	    (!newvp || nfs_getattrcache(np, nvattr, 0) ||
 	    (gotuid && (nvattr->nva_uid != vap->va_uid)) ||
 	    (gotgid && (nvattr->nva_gid != vap->va_gid)))) {
-		/* clear ID bits if server didn't use them (or we can't tell) */
+		                                                                
 		VATTR_CLEAR_SUPPORTED(vap, va_uid);
 		VATTR_CLEAR_SUPPORTED(vap, va_gid);
 	}
@@ -5448,18 +5448,18 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS remove directory call
- */
+  
+                            
+   
 int
 nfs3_vnop_rmdir(
-	struct vnop_rmdir_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_dvp;
-                                *  vnode_t a_vp;
-                                *  struct componentname *a_cnp;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_rmdir_args     
+                                                               
+                                                 
+                                                
+                                                               
+                                                           
+                                       *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -5535,13 +5535,13 @@ nfsmout:
 
 	if (!lockerror) {
 		dnp->n_flag |= NMODIFIED;
-		/* if directory hadn't changed, update namecache mtime */
+		                                                         
 		if (nfstimespeccmp(&dnp->n_ncmtime, &premtime, ==)) {
 			NFS_CHANGED_UPDATE_NC(nfsvers, dnp, &dnp->n_vattr);
 		}
 		nfs_node_unlock(dnp);
 		nfs_name_cache_purge(dnp, np, cnp, ctx);
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		nfs_getattr(dnp, NULL, ctx, wccpostattr ? NGA_CACHED : NGA_UNCACHED);
 	}
 	if (dul_in_progress) {
@@ -5549,18 +5549,18 @@ nfsmout:
 	}
 	nfs_node_clear_busy2(dnp, np);
 
-	/*
-	 * Kludge: Map ENOENT => 0 assuming that you have a reply to a retry.
-	 */
+	  
+                                                                      
+    
 	if (error == ENOENT) {
 		error = 0;
 	}
 	if (!error) {
-		/*
-		 * remove nfsnode from hash now so we can't accidentally find it
-		 * again if another object gets created with the same filehandle
-		 * before this vnode gets reclaimed
-		 */
+		  
+                                                                  
+                                                                  
+                                     
+     
 		lck_mtx_lock(&nfs_node_hash_mutex);
 		if (np->n_hflag & NHHASHED) {
 			LIST_REMOVE(np, n_hash);
@@ -5574,39 +5574,39 @@ nfsmout:
 	return error;
 }
 
-/*
- * NFS readdir call
- *
- * The incoming "offset" is a directory cookie indicating where in the
- * directory entries should be read from.  A zero cookie means start at
- * the beginning of the directory.  Any other cookie will be a cookie
- * returned from the server.
- *
- * Using that cookie, determine which buffer (and where in that buffer)
- * to start returning entries from.  Buffer logical block numbers are
- * the cookies they start at.  If a buffer is found that is not full,
- * call into the bio/RPC code to fill it.  The RPC code will probably
- * fill several buffers (dropping the first, requiring a re-get).
- *
- * When done copying entries to the buffer, set the offset to the current
- * entry's cookie and enter that cookie in the cookie cache.
- *
- * Note: because the getdirentries(2) API returns a long-typed offset,
- * the incoming offset is a potentially truncated cookie (ptc).
- * The cookie matching code is aware of this and will fall back to
- * matching only 32 bits of the cookie.
- */
+  
+                   
+  
+                                                                      
+                                                                       
+                                                                     
+                            
+  
+                                                                       
+                                                                     
+                                                                     
+                                                                     
+                                                                 
+  
+                                                                         
+                                                            
+  
+                                                                      
+                                                               
+                                                                  
+                                       
+   
 int
 nfs_vnop_readdir(
-	struct vnop_readdir_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  struct uio *a_uio;
-                                  *  int a_flags;
-                                  *  int *a_eofflag;
-                                  *  int *a_numdirent;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_readdir_args     
+                                                                 
+                                                  
+                                                       
+                                                 
+                                                    
+                                                      
+                                                             
+                                         *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t dvp = ap->a_vp;
@@ -5646,7 +5646,7 @@ nfs_vnop_readdir(
 	}
 #if CONFIG_NFS4
 	if ((nfsvers >= NFS_VER4) && (dnp->n_vattr.nva_flags & NFS_FFLAG_TRIGGER)) {
-		/* trigger directories should never be read, return nothing */
+		                                                              
 		return 0;
 	}
 #endif
@@ -5689,9 +5689,9 @@ nfs_vnop_readdir(
 		}
 	}
 
-	/*
-	 * check for need to invalidate when (re)starting at beginning
-	 */
+	  
+                                                               
+    
 	if (!nextcookie) {
 		if (dnp->n_flag & NMODIFIED) {
 			nfs_invaldir(dnp);
@@ -5702,7 +5702,7 @@ nfs_vnop_readdir(
 		} else {
 			nfs_node_unlock(dnp);
 		}
-		/* nfs_getattr() will check changed and purge caches */
+		                                                       
 		if ((error = nfs_getattr(dnp, NULL, ctx, NGA_UNCACHED))) {
 			goto out;
 		}
@@ -5712,7 +5712,7 @@ nfs_vnop_readdir(
 
 	error = nfs_dir_cookie_to_lbn(dnp, nextcookie, &ptc, &lbn);
 	if (error) {
-		if (error < 0) { /* just hit EOF cookie */
+		if (error < 0) {                          
 			done = 1;
 			error = 0;
 		}
@@ -5731,7 +5731,7 @@ getbuffer:
 		}
 		ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 		if (!ISSET(bp->nb_flags, NB_CACHE) || !ISSET(ndbhp->ndbh_flags, NDB_FULL)) {
-			if (!ISSET(bp->nb_flags, NB_CACHE)) { /* initialize the buffer */
+			if (!ISSET(bp->nb_flags, NB_CACHE)) {                            
 				ndbhp->ndbh_flags = 0;
 				ndbhp->ndbh_count = 0;
 				ndbhp->ndbh_entry_end = sizeof(*ndbhp);
@@ -5759,7 +5759,7 @@ getbuffer:
 			}
 		}
 
-		/* find next entry to return */
+		                               
 		dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
 		i = 0;
 		if ((lbn != cookie) && !(ptc && NFS_DIR_COOKIE_SAME32(lbn, cookie))) {
@@ -5783,9 +5783,9 @@ getbuffer:
 				i++;
 			}
 		}
-		ptc = 0;  /* only have to deal with ptc on first cookie */
+		ptc = 0;                                                  
 
-		/* return as many entries as we can */
+		                                      
 		for (; i < ndbhp->ndbh_count; i++) {
 			if (extended) {
 				rlen = dp->d_reclen;
@@ -5807,7 +5807,7 @@ getbuffer:
 				dent.d_namlen = (uint8_t)nlen;
 				strlcpy(dent.d_name, dp->d_name, nlen + 1);
 			}
-			/* check that the record fits */
+			                                
 			if (rlen > uio_resid(uio)) {
 				done = 1;
 				break;
@@ -5821,9 +5821,9 @@ getbuffer:
 		}
 
 		if (i == ndbhp->ndbh_count) {
-			/* hit end of buffer, move to next buffer */
+			                                            
 			lbn = nextcookie;
-			/* if we also hit EOF, we're done */
+			                                    
 			if (ISSET(ndbhp->ndbh_flags, NDB_EOF)) {
 				done = 1;
 				if (ap->a_eofflag) {
@@ -5853,10 +5853,10 @@ out:
 }
 
 
-/*
- * Invalidate cached directory information, except for the actual directory
- * blocks (which are invalidated separately).
- */
+  
+                                                                           
+                                             
+   
 static void
 nfs_invaldir_cookies(nfsnode_t dnp)
 {
@@ -5880,9 +5880,9 @@ nfs_invaldir(nfsnode_t dnp)
 	nfs_invaldir_cookies(dnp);
 }
 
-/*
- * calculate how much space is available for additional directory entries.
- */
+  
+                                                                          
+   
 uint64_t
 nfs_dir_buf_freespace(struct nfsbuf *bp, int rdirplus)
 {
@@ -5899,9 +5899,9 @@ nfs_dir_buf_freespace(struct nfsbuf *bp, int rdirplus)
 	return space;
 }
 
-/*
- * add/update a cookie->lbn entry in the directory cookie cache
- */
+  
+                                                               
+   
 void
 nfs_dir_cookie_cache(nfsnode_t dnp, uint64_t cookie, uint64_t lbn)
 {
@@ -5916,42 +5916,42 @@ nfs_dir_cookie_cache(nfsnode_t dnp, uint64_t cookie, uint64_t lbn)
 		return;
 	}
 
-	if (cookie == dnp->n_eofcookie) { /* EOF cookie */
+	if (cookie == dnp->n_eofcookie) {                 
 		nfs_node_unlock(dnp);
 		return;
 	}
 
 	ndcc = dnp->n_cookiecache;
 	if (!ndcc) {
-		/* allocate the cookie cache structure */
+		                                         
 		ndcc = dnp->n_cookiecache = zalloc(ZV_NFSDIROFF);
 		ndcc->free = 0;
 		ndcc->mru = -1;
 		memset(ndcc->next, -1, NFSNUMCOOKIES);
 	}
 
-	/*
-	 * Search the list for this cookie.
-	 * Keep track of previous and last entries.
-	 */
+	  
+                                    
+                                            
+    
 	prev = -1;
 	i = ndcc->mru;
 	while ((i != -1) && (cookie != ndcc->cookies[i].key)) {
-		if (ndcc->next[i] == -1) { /* stop on last entry so we can reuse */
+		if (ndcc->next[i] == -1) {                                         
 			break;
 		}
 		prev = i;
 		i = ndcc->next[i];
 	}
 	if ((i != -1) && (cookie == ndcc->cookies[i].key)) {
-		/* found it, remove from list */
+		                                
 		if (prev != -1) {
 			ndcc->next[prev] = ndcc->next[i];
 		} else {
 			ndcc->mru = ndcc->next[i];
 		}
 	} else {
-		/* not found, use next free entry or reuse last entry */
+		                                                        
 		if (ndcc->free != NFSNUMCOOKIES) {
 			i = ndcc->free++;
 		} else {
@@ -5960,16 +5960,16 @@ nfs_dir_cookie_cache(nfsnode_t dnp, uint64_t cookie, uint64_t lbn)
 		ndcc->cookies[i].key = cookie;
 		ndcc->cookies[i].lbn = lbn;
 	}
-	/* insert cookie at head of MRU list */
+	                                       
 	ndcc->next[i] = ndcc->mru;
 	ndcc->mru = i;
 	nfs_node_unlock(dnp);
 }
 
-/*
- * Try to map the given directory cookie to a directory buffer (return lbn).
- * If we have a possibly truncated cookie (ptc), check for 32-bit matches too.
- */
+  
+                                                                            
+                                                                              
+   
 int
 nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 {
@@ -5982,7 +5982,7 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 	struct direntry *dp, *dpptc;
 	struct nfs_dir_buf_header *ndbhp;
 
-	if (!cookie) {  /* initial cookie */
+	if (!cookie) {                      
 		*lbnp = 0;
 		*ptc = 0;
 		return 0;
@@ -5992,40 +5992,40 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 		return ENOENT;
 	}
 
-	if (cookie == dnp->n_eofcookie) { /* EOF cookie */
+	if (cookie == dnp->n_eofcookie) {                 
 		nfs_node_unlock(dnp);
 		OSAddAtomic64(1, &nfsstats.direofcache_hits);
 		*ptc = 0;
 		return -1;
 	}
-	/* note if cookie is a 32-bit match with the EOF cookie */
+	                                                          
 	eofptc = *ptc ? NFS_DIR_COOKIE_SAME32(cookie, dnp->n_eofcookie) : 0;
 	iptc = -1;
 
-	/* search the list for the cookie */
+	                                    
 	for (i = ndcc ? ndcc->mru : -1; i >= 0; i = ndcc->next[i]) {
 		if (ndcc->cookies[i].key == cookie) {
-			/* found a match for this cookie */
+			                                   
 			*lbnp = ndcc->cookies[i].lbn;
 			nfs_node_unlock(dnp);
 			OSAddAtomic64(1, &nfsstats.direofcache_hits);
 			*ptc = 0;
 			return 0;
 		}
-		/* check for 32-bit match */
+		                            
 		if (*ptc && (iptc == -1) && NFS_DIR_COOKIE_SAME32(ndcc->cookies[i].key, cookie)) {
 			iptc = i;
 		}
 	}
-	/* exact match not found */
+	                           
 	if (eofptc) {
-		/* but 32-bit match hit the EOF cookie */
+		                                         
 		nfs_node_unlock(dnp);
 		OSAddAtomic64(1, &nfsstats.direofcache_hits);
 		return -1;
 	}
 	if (iptc >= 0) {
-		/* but 32-bit match got a hit */
+		                                
 		*lbnp = ndcc->cookies[iptc].lbn;
 		nfs_node_unlock(dnp);
 		OSAddAtomic64(1, &nfsstats.direofcache_hits);
@@ -6033,10 +6033,10 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 	}
 	nfs_node_unlock(dnp);
 
-	/*
-	 * No match found in the cookie cache... hmm...
-	 * Let's search the directory's buffers for the cookie.
-	 */
+	  
+                                                
+                                                        
+    
 	nmp = NFSTONMP(dnp);
 	if (nfs_mount_gone(nmp)) {
 		return ENXIO;
@@ -6045,15 +6045,15 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 	found = 0;
 
 	lck_mtx_lock(&nfs_buf_mutex);
-	/*
-	 * Scan the list of buffers, keeping them in order.
-	 * Note that itercomplete inserts each of the remaining buffers
-	 * into the head of list (thus reversing the elements).  So, we
-	 * make sure to iterate through all buffers, inserting them after
-	 * each other, to keep them in order.
-	 * Also note: the LIST_INSERT_AFTER(lastbp) is only safe because
-	 * we don't drop nfs_buf_mutex.
-	 */
+	  
+                                                    
+                                                                
+                                                                
+                                                                  
+                                      
+                                                                 
+                                
+    
 	if (!nfs_buf_iterprepare(dnp, &blist, NBI_CLEAN)) {
 		lastbp = NULL;
 		while ((bp = LIST_FIRST(&blist))) {
@@ -6069,13 +6069,13 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 			}
 			nfs_buf_refget(bp);
 			if (nfs_buf_acquire(bp, NBAC_NOWAIT, 0, 0)) {
-				/* just skip this buffer */
+				                           
 				nfs_buf_refrele(bp);
 				continue;
 			}
 			nfs_buf_refrele(bp);
 
-			/* scan the buffer for the cookie */
+			                                    
 			ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 			dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
 			dpptc = NULL;
@@ -6087,18 +6087,18 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 				dp = NFS_DIRENTRY_NEXT(dp);
 			}
 			if ((i == ndbhp->ndbh_count) && dpptc) {
-				/* found only a PTC match */
+				                            
 				dp = dpptc;
 				i = iptc;
 			} else if (i < ndbhp->ndbh_count) {
 				*ptc = 0;
 			}
 			if (i < (ndbhp->ndbh_count - 1)) {
-				/* next entry is *in* this buffer: return this block */
+				                                                       
 				*lbnp = bp->nb_lblkno;
 				found = 1;
 			} else if (i == (ndbhp->ndbh_count - 1)) {
-				/* next entry refers to *next* buffer: return next block */
+				                                                           
 				*lbnp = dp->d_seekoff;
 				found = 1;
 			}
@@ -6112,17 +6112,17 @@ nfs_dir_cookie_to_lbn(nfsnode_t dnp, uint64_t cookie, int *ptc, uint64_t *lbnp)
 		return 0;
 	}
 
-	/* still not found... oh well, just start a new block */
+	                                                        
 	*lbnp = cookie;
 	OSAddAtomic64(1, &nfsstats.direofcache_misses);
 	return 0;
 }
 
-/*
- * scan a directory buffer for the given name
- * Returns: ESRCH if not found, ENOENT if found invalid, 0 if found
- * Note: should only be called with RDIRPLUS directory buffers
- */
+  
+                                             
+                                                                   
+                                                              
+   
 
 #define NDBS_PURGE      1
 #define NDBS_UPDATE     2
@@ -6145,7 +6145,7 @@ nfs_dir_buf_search(
 	int i, error = ESRCH;
 	uint32_t fhlen;
 
-	/* scan the buffer for the name */
+	                                  
 	ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 	dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
 	for (i = 0; i < ndbhp->ndbh_count; i++) {
@@ -6155,7 +6155,7 @@ nfs_dir_buf_search(
 			nvattrp = NFS_DIR_BUF_NVATTR(bp, i);
 			if ((ndbhp->ndbh_ncgen != bp->nb_np->n_ncgen) || (fhlen == 0) ||
 			    (nvattrp->nva_type == VNON) || (nvattrp->nva_fileid == 0)) {
-				/* entry is not valid */
+				                        
 				error = ENOENT;
 				break;
 			}
@@ -6166,7 +6166,7 @@ nfs_dir_buf_search(
 				break;
 			}
 			if (flags == NDBS_UPDATE) {
-				/* update direntry's attrs if fh matches */
+				                                           
 				if ((fhp->fh_len == fhlen) && !bcmp(&dp->d_name[dp->d_namlen + 2], fhp->fh_data, fhlen)) {
 					bcopy(nvap, nvattrp, sizeof(*nvap));
 					dp->d_fileno = nvattrp->nva_fileid;
@@ -6177,7 +6177,7 @@ nfs_dir_buf_search(
 				error = 0;
 				break;
 			}
-			/* copy out fh, attrs, attrstamp, and xid */
+			                                            
 			fhp->fh_len = fhlen;
 			bcopy(&dp->d_name[dp->d_namlen + 2], fhp->fh_data, MAX(fhp->fh_len, (int)sizeof(fhp->fh_data)));
 			*attrstampp = *(time_t*)(&dp->d_name[dp->d_namlen + 2 + fhp->fh_len]);
@@ -6196,10 +6196,10 @@ nfs_dir_buf_search(
 	return error;
 }
 
-/*
- * Look up a name in a directory's buffers.
- * Note: should only be called with RDIRPLUS directory buffers
- */
+  
+                                           
+                                                              
+   
 int
 nfs_dir_buf_cache_lookup(nfsnode_t dnp, nfsnode_t *npp, struct componentname *cnp, vfs_context_t ctx, int purge, int *skipdu)
 {
@@ -6234,7 +6234,7 @@ nfs_dir_buf_cache_lookup(nfsnode_t dnp, nfsnode_t *npp, struct componentname *cn
 	fh = zalloc(nfs_fhandle_zone);
 	MALLOC(nvattr, struct nfs_vattr *, sizeof(*nvattr), M_TEMP, M_WAITOK);
 
-	/* first check most recent buffer (and next one too) */
+	                                                       
 	lbn = dnp->n_lastdbl;
 	for (i = 0; i < 2; i++) {
 		if ((error = nfs_buf_get(dnp, lbn, NFS_DIRBLKSIZ, thd, NBLK_READ | NBLK_ONLYVALID, &bp))) {
@@ -6263,20 +6263,20 @@ nfs_dir_buf_cache_lookup(nfsnode_t dnp, nfsnode_t *npp, struct componentname *cn
 		goto done;
 	}
 
-	/* If we detect that we fetched full directory listing we should avoid sending lookups for ._ files */
+	                                                                                                      
 	if (dotunder && !found && !error && eof && sof && !skipped && skipdu) {
 		*skipdu = 1;
 	}
 
-	/*
-	 * Scan the list of buffers, keeping them in order.
-	 * Note that itercomplete inserts each of the remaining buffers
-	 * into the head of list (thus reversing the elements).  So, we
-	 * make sure to iterate through all buffers, inserting them after
-	 * each other, to keep them in order.
-	 * Also note: the LIST_INSERT_AFTER(lastbp) is only safe because
-	 * we don't drop nfs_buf_mutex.
-	 */
+	  
+                                                    
+                                                                
+                                                                
+                                                                  
+                                      
+                                                                 
+                                
+    
 	eof = sof = skipped = 0;
 	if (!nfs_buf_iterprepare(dnp, &blist, NBI_CLEAN)) {
 		lastbp = foundbp = NULL;
@@ -6292,14 +6292,14 @@ nfs_dir_buf_cache_lookup(nfsnode_t dnp, nfsnode_t *npp, struct componentname *cn
 				skipped = 1;
 				continue;
 			}
-			if (!purge && dotunder && (count > 100)) { /* don't waste too much time looking for ._ files */
+			if (!purge && dotunder && (count > 100)) {                                                     
 				skipped = 1;
 				continue;
 			}
 			nfs_buf_refget(bp);
 			lbn = bp->nb_lblkno;
 			if (nfs_buf_acquire(bp, NBAC_NOWAIT, 0, 0)) {
-				/* just skip this buffer */
+				                           
 				nfs_buf_refrele(bp);
 				skipped = 1;
 				continue;
@@ -6324,7 +6324,7 @@ nfs_dir_buf_cache_lookup(nfsnode_t dnp, nfsnode_t *npp, struct componentname *cn
 		nfs_buf_itercomplete(dnp, &blist, NBI_CLEAN);
 	}
 
-	/* If we detect that we fetched full directory listing we should avoid sending lookups for ._ files */
+	                                                                                                      
 	if (dotunder && !found && !error && eof && sof && !skipped && skipdu) {
 		*skipdu = 1;
 	}
@@ -6342,10 +6342,10 @@ done:
 		newnp->n_attrstamp = attrstamp;
 		*npp = newnp;
 		nfs_node_unlock(newnp);
-		/* check if the dir buffer's attrs are out of date */
+		                                                     
 		if (!nfs_getattr(newnp, nvattr, ctx, NGA_CACHED) &&
 		    (newnp->n_attrstamp != attrstamp)) {
-			/* they are, so update them */
+			                              
 			error = nfs_buf_get(dnp, lbn, NFS_DIRBLKSIZ, thd, NBLK_READ | NBLK_ONLYVALID, &bp);
 			if (!error && bp) {
 				attrstamp = newnp->n_attrstamp;
@@ -6363,10 +6363,10 @@ out:
 	return error;
 }
 
-/*
- * Purge name cache entries for the given node.
- * For RDIRPLUS, also invalidate the entry in the directory's buffers.
- */
+  
+                                               
+                                                                      
+   
 void
 nfs_name_cache_purge(nfsnode_t dnp, nfsnode_t np, struct componentname *cnp, vfs_context_t ctx)
 {
@@ -6378,9 +6378,9 @@ nfs_name_cache_purge(nfsnode_t dnp, nfsnode_t np, struct componentname *cnp, vfs
 	}
 }
 
-/*
- * NFS V3 readdir (plus) RPC.
- */
+  
+                             
+   
 int
 nfs3_readdir_rpc(nfsnode_t dnp, struct nfsbuf *bp, vfs_context_t ctx)
 {
@@ -6417,7 +6417,7 @@ resend:
 		return lockerror;
 	}
 
-	/* determine cookie to use, and move dp to the right offset */
+	                                                              
 	ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 	dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
 	if (ndbhp->ndbh_count) {
@@ -6428,16 +6428,16 @@ resend:
 		dp = NFS_DIRENTRY_NEXT(dp);
 	} else {
 		cookie = bp->nb_lblkno;
-		/* increment with every buffer read */
+		                                      
 		OSAddAtomic64(1, &nfsstats.readdir_bios);
 	}
 	lastcookie = cookie;
 
-	/*
-	 * Loop around doing readdir(plus) RPCs of size nm_readdirsize until
-	 * the buffer is full (or we hit EOF).  Then put the remainder of the
-	 * results in the next buffer(s).
-	 */
+	  
+                                                                     
+                                                                      
+                                  
+    
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 	while (nfs_dir_buf_freespace(bp, rdirplus) && !(ndbhp->ndbh_flags & NDB_FULL)) {
@@ -6445,8 +6445,8 @@ resend:
 		    NFSX_FH(nfsvers) + NFSX_READDIR(nfsvers) + NFSX_UNSIGNED);
 		nfsm_chain_add_fh(error, &nmreq, nfsvers, dnp->n_fhp, dnp->n_fhsize);
 		if (nfsvers == NFS_VER3) {
-			/* opaque values don't need swapping, but as long */
-			/* as we are consistent about it, it should be ok */
+			                                                    
+			                                                    
 			nfsm_chain_add_64(error, &nmreq, cookie);
 			nfsm_chain_add_64(error, &nmreq, dnp->n_cookieverf);
 		} else {
@@ -6486,7 +6486,7 @@ resend:
 			lockerror = ENOENT;
 		}
 		if (error == NFSERR_NOTSUPP) {
-			/* oops... it doesn't look like readdirplus is supported */
+			                                                           
 			lck_mtx_lock(&nmp->nm_lock);
 			NFS_BITMAP_CLR(nmp->nm_flags, NFS_MFLAG_RDIRPLUS);
 			lck_mtx_unlock(&nmp->nm_lock);
@@ -6504,7 +6504,7 @@ resend:
 			}
 		}
 
-		/* loop through the entries packing them into the buffer */
+		                                                           
 		while (more_entries) {
 			if (nfsvers == NFS_VER3) {
 				nfsm_chain_get_64(error, &nmrep, fileno);
@@ -6513,7 +6513,7 @@ resend:
 			}
 			nfsm_chain_get_32(error, &nmrep, namlen);
 			nfsmout_if(error);
-			/* just truncate names that don't fit in direntry.d_name */
+			                                                           
 			if (namlen <= 0) {
 				error = EBADRPC;
 				goto nfsmout;
@@ -6524,7 +6524,7 @@ resend:
 			} else {
 				skiplen = 0;
 			}
-			/* guess that fh size will be same as parent */
+			                                               
 			fhlen = rdirplus ? (1 + dnp->n_fhsize) : 0;
 			xlen = rdirplus ? (fhlen + sizeof(time_t)) : 0;
 			attrlen = rdirplus ? sizeof(struct nfs_vattr) : 0;
@@ -6532,13 +6532,13 @@ resend:
 			space_needed = reclen + attrlen;
 			space_free = nfs_dir_buf_freespace(bp, rdirplus);
 			if (space_needed > space_free) {
-				/*
-				 * We still have entries to pack, but we've
-				 * run out of room in the current buffer.
-				 * So we need to move to the next buffer.
-				 * The block# for the next buffer is the
-				 * last cookie in the current buffer.
-				 */
+				  
+                                               
+                                             
+                                             
+                                            
+                                         
+       
 nextbuffer:
 				ndbhp->ndbh_flags |= NDB_FULL;
 				nfs_buf_release(bp, 0);
@@ -6546,7 +6546,7 @@ nextbuffer:
 				bp = NULL;
 				error = nfs_buf_get(dnp, lastcookie, NFS_DIRBLKSIZ, vfs_context_thread(ctx), NBLK_READ, &bp);
 				nfsmout_if(error);
-				/* initialize buffer */
+				                       
 				ndbhp = (struct nfs_dir_buf_header*)bp->nb_data;
 				ndbhp->ndbh_flags = 0;
 				ndbhp->ndbh_count = 0;
@@ -6554,7 +6554,7 @@ nextbuffer:
 				ndbhp->ndbh_ncgen = dnp->n_ncgen;
 				space_free = nfs_dir_buf_freespace(bp, rdirplus);
 				dp = NFS_DIR_BUF_FIRST_DIRENTRY(bp);
-				/* increment with every buffer read */
+				                                      
 				OSAddAtomic64(1, &nfsstats.readdir_bios);
 			}
 			nmrepsave = nmrep;
@@ -6577,7 +6577,7 @@ nextbuffer:
 			nfsmout_if(error);
 			dp->d_seekoff = cookie;
 			if (!bigcookies && (cookie >> 32) && (nmp == NFSTONMP(dnp))) {
-				/* we've got a big cookie, make sure flag is set */
+				                                                   
 				lck_mtx_lock(&nmp->nm_lock);
 				nmp->nm_state |= NFSSTA_BIGCOOKIES;
 				lck_mtx_unlock(&nmp->nm_lock);
@@ -6585,22 +6585,22 @@ nextbuffer:
 			}
 			if (rdirplus) {
 				nvattrp = NFS_DIR_BUF_NVATTR(bp, ndbhp->ndbh_count);
-				/* check for attributes */
+				                          
 				nfsm_chain_get_32(error, &nmrep, attrflag);
 				nfsmout_if(error);
 				if (attrflag) {
-					/* grab attributes */
+					                     
 					error = nfs_parsefattr(nmp, &nmrep, NFS_VER3, nvattrp);
 					nfsmout_if(error);
 					dp->d_type = IFTODT(VTTOIF(nvattrp->nva_type));
-					/* fileid is already in d_fileno, so stash xid in attrs */
+					                                                          
 					nvattrp->nva_fileid = savedxid;
 					nvattrp->nva_flags |= NFS_FFLAG_FILEID_CONTAINS_XID;
 				} else {
-					/* mark the attributes invalid */
+					                                 
 					bzero(nvattrp, sizeof(struct nfs_vattr));
 				}
-				/* check for file handle */
+				                           
 				nfsm_chain_get_32(error, &nmrep, fhflag);
 				nfsmout_if(error);
 				if (fhflag) {
@@ -6611,15 +6611,15 @@ nextbuffer:
 					reclen = NFS_DIRENTRY_LEN_16(namlen + xlen);
 					space_needed = reclen + attrlen;
 					if (space_needed > space_free) {
-						/* didn't actually have the room... move on to next buffer */
+						                                                             
 						nmrep = nmrepsave;
 						goto nextbuffer;
 					}
-					/* pack the file handle into the record */
-					dp->d_name[dp->d_namlen + 1] = (unsigned char)fh->fh_len; /* No truncation because fh_len's value is checked during nfsm_chain_get_fh() */
+					                                          
+					dp->d_name[dp->d_namlen + 1] = (unsigned char)fh->fh_len;                                                                                 
 					bcopy(fh->fh_data, &dp->d_name[dp->d_namlen + 2], fh->fh_len);
 				} else {
-					/* mark the file handle invalid */
+					                                  
 					fh->fh_len = 0;
 					fhlen = fh->fh_len + 1;
 					xlen = fhlen + sizeof(time_t);
@@ -6633,19 +6633,19 @@ nextbuffer:
 			padstart = dp->d_name + dp->d_namlen + 1 + xlen;
 			ndbhp->ndbh_count++;
 			lastcookie = cookie;
-			/* advance to next direntry in buffer */
+			                                        
 			dp = NFS_DIRENTRY_NEXT(dp);
 			ndbhp->ndbh_entry_end = (char*)dp - bp->nb_data;
-			/* zero out the pad bytes */
+			                            
 			padlen = (char*)dp - padstart;
 			if (padlen > 0) {
 				bzero(padstart, padlen);
 			}
-			/* check for more entries */
+			                            
 			nfsm_chain_get_32(error, &nmrep, more_entries);
 			nfsmout_if(error);
 		}
-		/* Finally, get the eof boolean */
+		                                  
 		nfsm_chain_get_32(error, &nmrep, eof);
 		nfsmout_if(error);
 		if (eof) {
@@ -6684,19 +6684,19 @@ nfsmout:
 	return bp_dropped ? NFSERR_DIRBUFDROPPED : error;
 }
 
-/*
- * Silly rename. To make the NFS filesystem that is stateless look a little
- * more like the "ufs" a remove of an active vnode is translated to a rename
- * to a funny looking filename that is removed by nfs_vnop_inactive on the
- * nfsnode. There is the potential for another process on a different client
- * to create the same funny name between when the lookitup() fails and the
- * rename() completes, but...
- */
+  
+                                                                           
+                                                                            
+                                                                          
+                                                                            
+                                                                          
+                             
+   
 
-/* format of "random" silly names - includes a number and pid */
-/* (note: shouldn't exceed size of nfs_sillyrename.nsr_name) */
+                                                                
+                                                               
 #define NFS_SILLYNAME_FORMAT ".nfs.%08x.%04x"
-/* starting from zero isn't silly enough */
+                                           
 static uint32_t nfs_sillyrename_number = 0x20051025;
 
 int
@@ -6734,7 +6734,7 @@ nfs_sillyrename(
 		goto bad_norele;
 	}
 
-	/* Fudge together a funny name */
+	                                 
 	pid = vfs_context_pid(ctx);
 	num = OSAddAtomic(1, &nfs_sillyrename_number);
 	nsp->nsr_namlen = snprintf(nsp->nsr_name, sizeof(nsp->nsr_name),
@@ -6743,7 +6743,7 @@ nfs_sillyrename(
 		nsp->nsr_namlen = sizeof(nsp->nsr_name) - 1;
 	}
 
-	/* Try lookitups until we get one that isn't there */
+	                                                     
 	while (nfs_lookitup(dnp, nsp->nsr_name, nsp->nsr_namlen, ctx, NULL) == 0) {
 		num = OSAddAtomic(1, &nfs_sillyrename_number);
 		nsp->nsr_namlen = snprintf(nsp->nsr_name, sizeof(nsp->nsr_name),
@@ -6753,11 +6753,11 @@ nfs_sillyrename(
 		}
 	}
 
-	/* now, do the rename */
+	                        
 	error = nmp->nm_funcs->nf_rename_rpc(dnp, cnp->cn_nameptr, cnp->cn_namelen,
 	    dnp, nsp->nsr_name, nsp->nsr_namlen, ctx);
 
-	/* Kludge: Map ENOENT => 0 assuming that it is a reply to a retry. */
+	                                                                     
 	if (error == ENOENT) {
 		error = 0;
 	}
@@ -6862,10 +6862,10 @@ nfs3_lookup_rpc_async_finish(
 
 	nfsmout_if(error || !fhp || !nvap);
 
-	/* get the file handle */
+	                         
 	nfsm_chain_get_fh(error, &nmrep, nfsvers, fhp);
 
-	/* get the attributes */
+	                        
 	if (nfsvers == NFS_VER3) {
 		nfsm_chain_postop_attr_get(nmp, error, &nmrep, attrflag, nvap);
 		nfsm_chain_postop_attr_update(error, &nmrep, dnp, &xid);
@@ -6883,14 +6883,14 @@ nfsmout:
 	return error;
 }
 
-/*
- * Look up a file name and optionally either update the file handle or
- * allocate an nfsnode, depending on the value of npp.
- * npp == NULL	--> just do the lookup
- * *npp == NULL --> allocate a new nfsnode and make sure attributes are
- *			handled too
- * *npp != NULL --> update the file handle in the vnode
- */
+  
+                                                                      
+                                                      
+                                     
+                                                                       
+                
+                                                       
+   
 int
 nfs_lookitup(
 	nfsnode_t dnp,
@@ -6922,9 +6922,9 @@ nfs_lookitup(
 	MALLOC(nvattr, struct nfs_vattr *, sizeof(*nvattr), M_TEMP, M_WAITOK);
 	NVATTR_INIT(nvattr);
 
-	/* check for lookup of "." */
+	                             
 	if ((name[0] == '.') && (namelen == 1)) {
-		/* skip lookup, we know who we are */
+		                                     
 		fh->fh_len = 0;
 		newnp = dnp;
 		goto nfsmout;
@@ -6990,10 +6990,10 @@ nfsmout:
 	return error;
 }
 
-/*
- * set up and initialize a "._" file lookup structure used for
- * performing async lookups.
- */
+  
+                                                              
+                            
+   
 void
 nfs_dulookup_init(struct nfs_dulookup *dulp, nfsnode_t dnp, const char *name, int namelen, vfs_context_t ctx)
 {
@@ -7001,7 +7001,7 @@ nfs_dulookup_init(struct nfs_dulookup *dulp, nfsnode_t dnp, const char *name, in
 	vnode_t du_vp;
 	struct nfsmount *nmp = NFSTONMP(dnp);
 
-	/* check for ._ file in name cache */
+	                                     
 	dulp->du_flags = 0;
 	bzero(&dulp->du_cn, sizeof(dulp->du_cn));
 	du_namelen = namelen + 2;
@@ -7031,10 +7031,10 @@ nfs_dulookup_init(struct nfs_dulookup *dulp, nfsnode_t dnp, const char *name, in
 	} else if (!error) {
 		nmp = NFSTONMP(dnp);
 		if (nmp && (nmp->nm_vers > NFS_VER2) && NMFLAG(nmp, RDIRPLUS)) {
-			/* if rdirplus, try dir buf cache lookup */
+			                                           
 			nfsnode_t du_np = NULL;
 			if (!nfs_dir_buf_cache_lookup(dnp, &du_np, &dulp->du_cn, ctx, 0, NULL) && du_np) {
-				/* dir buf cache hit */
+				                       
 				du_vp = NFSTOV(du_np);
 				vnode_put(du_vp);
 				error = -1;
@@ -7046,9 +7046,9 @@ nfs_dulookup_init(struct nfs_dulookup *dulp, nfsnode_t dnp, const char *name, in
 	}
 }
 
-/*
- * start an async "._" file lookup request
- */
+  
+                                          
+   
 void
 nfs_dulookup_start(struct nfs_dulookup *dulp, nfsnode_t dnp, vfs_context_t ctx)
 {
@@ -7064,9 +7064,9 @@ nfs_dulookup_start(struct nfs_dulookup *dulp, nfsnode_t dnp, vfs_context_t ctx)
 	}
 }
 
-/*
- * finish an async "._" file lookup request and clean up the structure
- */
+  
+                                                                      
+   
 void
 nfs_dulookup_finish(struct nfs_dulookup *dulp, nfsnode_t dnp, vfs_context_t ctx)
 {
@@ -7088,7 +7088,7 @@ nfs_dulookup_finish(struct nfs_dulookup *dulp, nfsnode_t dnp, vfs_context_t ctx)
 	    dulp->du_cn.cn_namelen, ctx, &dulp->du_req, &xid, fh, nvattr);
 	dulp->du_flags &= ~NFS_DULOOKUP_INPROG;
 	if (error == ENOENT) {
-		/* add a negative entry in the name cache */
+		                                            
 		nfs_node_lock_force(dnp);
 		cache_enter(NFSTOV(dnp), NULL, &dulp->du_cn);
 		dnp->n_flag |= NNEGNCENTRIES;
@@ -7114,9 +7114,9 @@ out:
 }
 
 
-/*
- * NFS Version 3 commit RPC
- */
+  
+                           
+   
 int
 nfs3_commit_rpc(
 	nfsnode_t np,
@@ -7157,7 +7157,7 @@ nfs3_commit_rpc(
 	if ((lockerror = nfs_node_lock(np))) {
 		error = lockerror;
 	}
-	/* can we do anything useful with the wcc info? */
+	                                                  
 	nfsm_chain_get_wcc_data(error, &nmrep, np, &premtime, &wccpostattr, &xid);
 	if (!lockerror) {
 		nfs_node_unlock(np);
@@ -7184,41 +7184,41 @@ nfsmout:
 
 int
 nfs_vnop_blockmap(
-	__unused struct vnop_blockmap_args /* {
-                                            *  struct vnodeop_desc *a_desc;
-                                            *  vnode_t a_vp;
-                                            *  off_t a_foffset;
-                                            *  size_t a_size;
-                                            *  daddr64_t *a_bpn;
-                                            *  size_t *a_run;
-                                            *  void *a_poff;
-                                            *  int a_flags;
-                                            *  } */*ap)
+	__unused struct vnop_blockmap_args     
+                                                                           
+                                                            
+                                                               
+                                                             
+                                                                
+                                                             
+                                                            
+                                                           
+                                                   *ap)
 {
 	return ENOTSUP;
 }
 
 
-/*
- * fsync vnode op. Just call nfs_flush().
- */
-/* ARGSUSED */
+  
+                                         
+   
+              
 int
 nfs_vnop_fsync(
-	struct vnop_fsync_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  int a_waitfor;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_fsync_args     
+                                                               
+                                                
+                                                 
+                                                           
+                                       *ap)
 {
 	return nfs_flush(VTONFS(ap->a_vp), ap->a_waitfor, vfs_context_thread(ap->a_context), 0);
 }
 
 
-/*
- * Do an NFS pathconf RPC.
- */
+  
+                          
+   
 int
 nfs3_pathconf_rpc(
 	nfsnode_t np,
@@ -7239,7 +7239,7 @@ nfs3_pathconf_rpc(
 	nfsm_chain_null(&nmreq);
 	nfsm_chain_null(&nmrep);
 
-	/* fetch pathconf info from server */
+	                                     
 	nfsm_chain_build_alloc_init(error, &nmreq, NFSX_FH(NFS_VER3));
 	nfsm_chain_add_fh(error, &nmreq, nfsvers, np->n_fhp, np->n_fhsize);
 	nfsm_chain_build_done(error, &nmreq);
@@ -7286,7 +7286,7 @@ nfsmout:
 	return error;
 }
 
-/* save pathconf info for NFSv3 mount */
+                                        
 void
 nfs3_pathconf_cache(struct nfsmount *nmp, struct nfs_fsattr *nfsap)
 {
@@ -7306,22 +7306,22 @@ nfs3_pathconf_cache(struct nfsmount *nmp, struct nfs_fsattr *nfsap)
 	nmp->nm_state |= NFSSTA_GOTPATHCONF;
 }
 
-/*
- * Return POSIX pathconf information applicable to nfs.
- *
- * The NFS V2 protocol doesn't support this, so just return EINVAL
- * for V2.
- */
-/* ARGSUSED */
+  
+                                                       
+  
+                                                                  
+          
+   
+              
 int
 nfs_vnop_pathconf(
-	struct vnop_pathconf_args /* {
-                                   *  struct vnodeop_desc *a_desc;
-                                   *  vnode_t a_vp;
-                                   *  int a_name;
-                                   *  int32_t *a_retval;
-                                   *  vfs_context_t a_context;
-                                   *  } */*ap)
+	struct vnop_pathconf_args     
+                                                                  
+                                                   
+                                                 
+                                                        
+                                                              
+                                          *ap)
 {
 	vnode_t vp = ap->a_vp;
 	nfsnode_t np = VTONFS(vp);
@@ -7351,14 +7351,14 @@ nfs_vnop_pathconf(
 		}
 		break;
 	case _PC_XATTR_SIZE_BITS:
-		/* Do we support xattrs natively? */
+		                                    
 		if (nmp->nm_fsattr.nfsa_flags & NFS_FSFLAG_NAMED_ATTR) {
-			break;  /* Yes */
+			break;           
 		}
-		/* No... so just return an error */
+		                                   
 		return EINVAL;
 	default:
-		/* don't bother contacting the server if we know the answer */
+		                                                              
 		return EINVAL;
 	}
 
@@ -7369,7 +7369,7 @@ nfs_vnop_pathconf(
 	lck_mtx_lock(&nmp->nm_lock);
 	if (nmp->nm_vers == NFS_VER3) {
 		if (!(nmp->nm_state & NFSSTA_GOTPATHCONF) || (!(nmp->nm_fsattr.nfsa_flags & NFS_FSFLAG_HOMOGENEOUS) && nmp->nm_dnp != np)) {
-			/* no pathconf info cached OR we were asked for non-root pathconf and filesystem does not support FSF_HOMOGENEOUS */
+			                                                                                                                    
 			lck_mtx_unlock(&nmp->nm_lock);
 			NFS_CLEAR_ATTRIBUTES(nfsa.nfsa_bitmap);
 			error = nfs3_pathconf_rpc(np, &nfsa, ap->a_context);
@@ -7382,8 +7382,8 @@ nfs_vnop_pathconf(
 			}
 			lck_mtx_lock(&nmp->nm_lock);
 			if (nmp->nm_fsattr.nfsa_flags & NFS_FSFLAG_HOMOGENEOUS) {
-				/* all files have the same pathconf info, */
-				/* so cache a copy of the results */
+				                                            
+				                                    
 				nfs3_pathconf_cache(nmp, &nfsa);
 			}
 			nfsap = &nfsa;
@@ -7393,7 +7393,7 @@ nfs_vnop_pathconf(
 	}
 #if CONFIG_NFS4
 	else if (!(nmp->nm_fsattr.nfsa_flags & NFS_FSFLAG_HOMOGENEOUS)) {
-		/* no pathconf info cached */
+		                             
 		lck_mtx_unlock(&nmp->nm_lock);
 		NFS_CLEAR_ATTRIBUTES(nfsa.nfsa_bitmap);
 		error = nfs4_pathconf_rpc(np, &nfsa, ap->a_context);
@@ -7432,14 +7432,14 @@ nfs_vnop_pathconf(
 		break;
 	case _PC_CHOWN_RESTRICTED:
 		if (NFS_BITMAP_ISSET(nfsap->nfsa_bitmap, NFS_FATTR_CHOWN_RESTRICTED)) {
-			*ap->a_retval = (nfsap->nfsa_flags & NFS_FSFLAG_CHOWN_RESTRICTED) ? 200112 /* _POSIX_CHOWN_RESTRICTED */ : 0;
+			*ap->a_retval = (nfsap->nfsa_flags & NFS_FSFLAG_CHOWN_RESTRICTED) ? 200112                               : 0;
 		} else {
 			error = EINVAL;
 		}
 		break;
 	case _PC_NO_TRUNC:
 		if (NFS_BITMAP_ISSET(nfsap->nfsa_bitmap, NFS_FATTR_NO_TRUNC)) {
-			*ap->a_retval = (nfsap->nfsa_flags & NFS_FSFLAG_NO_TRUNC) ? 200112 /* _POSIX_NO_TRUNC */ : 0;
+			*ap->a_retval = (nfsap->nfsa_flags & NFS_FSFLAG_NO_TRUNC) ? 200112                       : 0;
 		} else {
 			error = EINVAL;
 		}
@@ -7458,7 +7458,7 @@ nfs_vnop_pathconf(
 			error = EINVAL;
 		}
 		break;
-	case _PC_XATTR_SIZE_BITS: /* same as file size bits if named attrs supported */
+	case _PC_XATTR_SIZE_BITS:                                                      
 	case _PC_FILESIZEBITS:
 		if (!NFS_BITMAP_ISSET(nfsap->nfsa_bitmap, NFS_FATTR_MAXFILESIZE)) {
 			*ap->a_retval = 64;
@@ -7501,26 +7501,26 @@ nfs_vnop_pathconf(
 	return error;
 }
 
-/*
- * Read wrapper for special devices.
- */
+  
+                                    
+   
 int
 nfsspec_vnop_read(
-	struct vnop_read_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  struct uio *a_uio;
-                               *  int a_ioflag;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_read_args     
+                                                              
+                                               
+                                                    
+                                               
+                                                          
+                                      *ap)
 {
 	nfsnode_t np = VTONFS(ap->a_vp);
 	struct timespec now;
 	int error;
 
-	/*
-	 * Set access flag.
-	 */
+	  
+                    
+    
 	if ((error = nfs_node_lock(np))) {
 		return error;
 	}
@@ -7532,26 +7532,26 @@ nfsspec_vnop_read(
 	return VOCALL(spec_vnodeop_p, VOFFSET(vnop_read), ap);
 }
 
-/*
- * Write wrapper for special devices.
- */
+  
+                                     
+   
 int
 nfsspec_vnop_write(
-	struct vnop_write_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  struct uio *a_uio;
-                                *  int a_ioflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_write_args     
+                                                               
+                                                
+                                                     
+                                                
+                                                           
+                                       *ap)
 {
 	nfsnode_t np = VTONFS(ap->a_vp);
 	struct timespec now;
 	int error;
 
-	/*
-	 * Set update flag.
-	 */
+	  
+                    
+    
 	if ((error = nfs_node_lock(np))) {
 		return error;
 	}
@@ -7563,19 +7563,19 @@ nfsspec_vnop_write(
 	return VOCALL(spec_vnodeop_p, VOFFSET(vnop_write), ap);
 }
 
-/*
- * Close wrapper for special devices.
- *
- * Update the times on the nfsnode then do device close.
- */
+  
+                                     
+  
+                                                        
+   
 int
 nfsspec_vnop_close(
-	struct vnop_close_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  int a_fflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_close_args     
+                                                               
+                                                
+                                               
+                                                           
+                                       *ap)
 {
 	vnode_t vp = ap->a_vp;
 	nfsnode_t np = VTONFS(vp);
@@ -7612,26 +7612,26 @@ nfsspec_vnop_close(
 #if FIFO
 extern vnop_t **fifo_vnodeop_p;
 
-/*
- * Read wrapper for fifos.
- */
+  
+                          
+   
 int
 nfsfifo_vnop_read(
-	struct vnop_read_args /* {
-                               *  struct vnodeop_desc *a_desc;
-                               *  vnode_t a_vp;
-                               *  struct uio *a_uio;
-                               *  int a_ioflag;
-                               *  vfs_context_t a_context;
-                               *  } */*ap)
+	struct vnop_read_args     
+                                                              
+                                               
+                                                    
+                                               
+                                                          
+                                      *ap)
 {
 	nfsnode_t np = VTONFS(ap->a_vp);
 	struct timespec now;
 	int error;
 
-	/*
-	 * Set access flag.
-	 */
+	  
+                    
+    
 	if ((error = nfs_node_lock(np))) {
 		return error;
 	}
@@ -7643,26 +7643,26 @@ nfsfifo_vnop_read(
 	return VOCALL(fifo_vnodeop_p, VOFFSET(vnop_read), ap);
 }
 
-/*
- * Write wrapper for fifos.
- */
+  
+                           
+   
 int
 nfsfifo_vnop_write(
-	struct vnop_write_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  struct uio *a_uio;
-                                *  int a_ioflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_write_args     
+                                                               
+                                                
+                                                     
+                                                
+                                                           
+                                       *ap)
 {
 	nfsnode_t np = VTONFS(ap->a_vp);
 	struct timespec now;
 	int error;
 
-	/*
-	 * Set update flag.
-	 */
+	  
+                    
+    
 	if ((error = nfs_node_lock(np))) {
 		return error;
 	}
@@ -7674,19 +7674,19 @@ nfsfifo_vnop_write(
 	return VOCALL(fifo_vnodeop_p, VOFFSET(vnop_write), ap);
 }
 
-/*
- * Close wrapper for fifos.
- *
- * Update the times on the nfsnode then do fifo close.
- */
+  
+                           
+  
+                                                      
+   
 int
 nfsfifo_vnop_close(
-	struct vnop_close_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  int a_fflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_close_args     
+                                                               
+                                                
+                                               
+                                                           
+                                       *ap)
 {
 	vnode_t vp = ap->a_vp;
 	nfsnode_t np = VTONFS(vp);
@@ -7729,19 +7729,19 @@ nfsfifo_vnop_close(
 	}
 	return VOCALL(fifo_vnodeop_p, VOFFSET(vnop_close), ap);
 }
-#endif /* FIFO */
+#endif           
 
-/*ARGSUSED*/
+            
 int
 nfs_vnop_ioctl(
-	struct vnop_ioctl_args /* {
-                                *  struct vnodeop_desc *a_desc;
-                                *  vnode_t a_vp;
-                                *  u_int32_t a_command;
-                                *  caddr_t a_data;
-                                *  int a_fflag;
-                                *  vfs_context_t a_context;
-                                *  } */*ap)
+	struct vnop_ioctl_args     
+                                                               
+                                                
+                                                       
+                                                  
+                                               
+                                                           
+                                       *ap)
 {
 	vfs_context_t ctx = ap->a_context;
 	vnode_t vp = ap->a_vp;
@@ -7863,47 +7863,47 @@ nfs_vnop_ioctl(
 			gprinc.principal = 0;
 			FREE(ptr, M_TEMP);
 		}
-#endif /* CONFIG_NFS_GSS */
+#endif                     
 	}
 
 	return error;
 }
 
-/*ARGSUSED*/
+            
 int
 nfs_vnop_select(
-	__unused struct vnop_select_args /* {
-                                          *  struct vnodeop_desc *a_desc;
-                                          *  vnode_t a_vp;
-                                          *  int a_which;
-                                          *  int a_fflags;
-                                          *  void *a_wql;
-                                          *  vfs_context_t a_context;
-                                          *  } */*ap)
+	__unused struct vnop_select_args     
+                                                                         
+                                                          
+                                                         
+                                                          
+                                                         
+                                                                     
+                                                 *ap)
 {
-	/*
-	 * We were once bogusly seltrue() which returns 1.  Is this right?
-	 */
+	  
+                                                                   
+    
 	return 1;
 }
 
-/*
- * vnode OP for pagein using UPL
- *
- * No buffer I/O, just RPCs straight into the mapped pages.
- */
+  
+                                
+  
+                                                           
+   
 int
 nfs_vnop_pagein(
-	struct vnop_pagein_args /* {
-                                 *  struct vnodeop_desc *a_desc;
-                                 *  vnode_t a_vp;
-                                 *  upl_t a_pl;
-                                 *  vm_offset_t a_pl_offset;
-                                 *  off_t a_f_offset;
-                                 *  size_t a_size;
-                                 *  int a_flags;
-                                 *  vfs_context_t a_context;
-                                 *  } */*ap)
+	struct vnop_pagein_args     
+                                                                
+                                                 
+                                               
+                                                            
+                                                     
+                                                  
+                                                
+                                                            
+                                        *ap)
 {
 	vnode_t vp = ap->a_vp;
 	upl_t pl = ap->a_pl;
@@ -7923,7 +7923,7 @@ nfs_vnop_pagein(
 	char uio_buf[UIO_SIZEOF(1)];
 	int nofreeupl = flags & UPL_NOCOMMIT;
 	upl_page_info_t *plinfo;
-#define MAXPAGINGREQS   16      /* max outstanding RPCs for pagein/pageout */
+#define MAXPAGINGREQS   16                                                   
 	struct nfsreq *req[MAXPAGINGREQS];
 	int nextsend, nextwait;
 #if CONFIG_NFS4
@@ -7995,7 +7995,7 @@ tryagain:
 			error = EIO;
 			break;
 		}
-		/* send requests while we need to and have available slots */
+		                                                             
 		while ((txsize > 0) && (req[nextsend] == NULL)) {
 			iosize = MIN(nmrsize, txsize);
 			if ((error = nmp->nm_funcs->nf_read_rpc_async(np, txoffset, iosize, thd, cred, NULL, &req[nextsend]))) {
@@ -8006,7 +8006,7 @@ tryagain:
 			txsize -= iosize;
 			nextsend = (nextsend + 1) % MAXPAGINGREQS;
 		}
-		/* wait while we need to and break out if more requests to send */
+		                                                                  
 		while ((rxsize > 0) && req[nextwait]) {
 			iosize = retsize = MIN(nmrsize, rxsize);
 			uio_reset(uio, uio_offset(uio), UIO_SYSSPACE, UIO_READ);
@@ -8014,7 +8014,7 @@ tryagain:
 			FSDBG(322, uio_offset(uio), uio_resid(uio), rxaddr, rxsize);
 #if UPL_DEBUG
 			upl_ubc_alias_set(pl, (uintptr_t) current_thread(), (uintptr_t) 2);
-#endif /* UPL_DEBUG */
+#endif                
 			OSAddAtomic64(1, &nfsstats.pageins);
 			error = nmp->nm_funcs->nf_read_rpc_async_finish(np, req[nextwait], uio, &retsize, NULL);
 			req[nextwait] = NULL;
@@ -8036,7 +8036,7 @@ tryagain:
 				break;
 			}
 			if (retsize < iosize) {
-				/* Just zero fill the rest of the valid area. */
+				                                                
 				size_t zcnt = iosize - retsize;
 				bzero((char *)rxaddr + retsize, zcnt);
 				FSDBG(324, uio_offset(uio), retsize, zcnt, rxaddr);
@@ -8056,7 +8056,7 @@ tryagain:
 #if CONFIG_NFS4
 cancel:
 #endif
-		/* cancel any outstanding requests */
+		                                     
 		while (req[nextwait]) {
 			nfs_request_async_cancel(req[nextwait]);
 			req[nextwait] = NULL;
@@ -8065,7 +8065,7 @@ cancel:
 		if (np->n_flag & NREVOKE) {
 			error = EIO;
 		} else if (restart) {
-			if (restart <= nfs_mount_state_max_restarts(nmp)) { /* guard against no progress */
+			if (restart <= nfs_mount_state_max_restarts(nmp)) {                                
 				if (error == NFSERR_GRACE) {
 					tsleep(&nmp->nm_state, (PZERO - 1), "nfsgrace", 2 * hz);
 				}
@@ -8082,10 +8082,10 @@ cancel:
 
 	if (!nofreeupl) {
 		if (error) {
-			/*
-			 * See comment in vnode_pagein() on handling EAGAIN, even though UPL_NOCOMMIT flag
-			 * is not set, we will not abort this upl, since VM subsystem will handle it.
-			 */
+			  
+                                                                                     
+                                                                                
+      
 			if (error != EAGAIN && error != EPERM) {
 				ubc_upl_abort_range(pl, pl_offset, size,
 				    UPL_ABORT_ERROR |
@@ -8101,116 +8101,116 @@ cancel:
 }
 
 
-/*
- * the following are needed only by nfs_pageout to know how to handle errors
- * see nfs_pageout comments on explanation of actions.
- * the errors here are copied from errno.h and errors returned by servers
- * are expected to match the same numbers here. If not, our actions maybe
- * erroneous.
- */
+  
+                                                                            
+                                                      
+                                                                         
+                                                                         
+             
+   
 char nfs_pageouterrorhandler(int);
 enum actiontype {NOACTION, DUMP, DUMPANDLOG, RETRY, SEVER};
 #define NFS_ELAST 88
-static u_char errorcount[NFS_ELAST + 1]; /* better be zeros when initialized */
+static u_char errorcount[NFS_ELAST + 1];                                       
 static const char errortooutcome[NFS_ELAST + 1] = {
 	NOACTION,
-	DUMP,                   /* EPERM	1	Operation not permitted */
-	DUMP,                   /* ENOENT	2	No such file or directory */
-	DUMPANDLOG,             /* ESRCH	3	No such process */
-	RETRY,                  /* EINTR        4	Interrupted system call */
-	DUMP,                   /* EIO		5	Input/output error */
-	DUMP,                   /* ENXIO	6	Device not configured */
-	DUMPANDLOG,             /* E2BIG	7	Argument list too long */
-	DUMPANDLOG,             /* ENOEXEC	8	Exec format error */
-	DUMPANDLOG,             /* EBADF	9	Bad file descriptor */
-	DUMPANDLOG,             /* ECHILD	10	No child processes */
-	DUMPANDLOG,             /* EDEADLK	11	Resource deadlock avoided - was EAGAIN */
-	RETRY,                  /* ENOMEM	12	Cannot allocate memory */
-	DUMP,                   /* EACCES	13	Permission denied */
-	DUMPANDLOG,             /* EFAULT	14	Bad address */
-	DUMPANDLOG,             /* ENOTBLK	15	POSIX - Block device required */
-	RETRY,                  /* EBUSY	16	Device busy */
-	DUMP,                   /* EEXIST	17	File exists */
-	DUMP,                   /* EXDEV	18	Cross-device link */
-	DUMP,                   /* ENODEV	19	Operation not supported by device */
-	DUMP,                   /* ENOTDIR	20	Not a directory */
-	DUMP,                   /* EISDIR       21	Is a directory */
-	DUMP,                   /* EINVAL	22	Invalid argument */
-	DUMPANDLOG,             /* ENFILE	23	Too many open files in system */
-	DUMPANDLOG,             /* EMFILE	24	Too many open files */
-	DUMPANDLOG,             /* ENOTTY	25	Inappropriate ioctl for device */
-	DUMPANDLOG,             /* ETXTBSY	26	Text file busy - POSIX */
-	DUMP,                   /* EFBIG	27	File too large */
-	DUMP,                   /* ENOSPC	28	No space left on device */
-	DUMPANDLOG,             /* ESPIPE	29	Illegal seek */
-	DUMP,                   /* EROFS	30	Read-only file system */
-	DUMP,                   /* EMLINK	31	Too many links */
-	RETRY,                  /* EPIPE	32	Broken pipe */
-	/* math software */
-	DUMPANDLOG,             /* EDOM				33	Numerical argument out of domain */
-	DUMPANDLOG,             /* ERANGE			34	Result too large */
-	RETRY,                  /* EAGAIN/EWOULDBLOCK	35	Resource temporarily unavailable */
-	DUMPANDLOG,             /* EINPROGRESS		36	Operation now in progress */
-	DUMPANDLOG,             /* EALREADY			37	Operation already in progress */
-	/* ipc/network software -- argument errors */
-	DUMPANDLOG,             /* ENOTSOC			38	Socket operation on non-socket */
-	DUMPANDLOG,             /* EDESTADDRREQ		39	Destination address required */
-	DUMPANDLOG,             /* EMSGSIZE			40	Message too long */
-	DUMPANDLOG,             /* EPROTOTYPE		41	Protocol wrong type for socket */
-	DUMPANDLOG,             /* ENOPROTOOPT		42	Protocol not available */
-	DUMPANDLOG,             /* EPROTONOSUPPORT	43	Protocol not supported */
-	DUMPANDLOG,             /* ESOCKTNOSUPPORT	44	Socket type not supported */
-	DUMPANDLOG,             /* ENOTSUP			45	Operation not supported */
-	DUMPANDLOG,             /* EPFNOSUPPORT		46	Protocol family not supported */
-	DUMPANDLOG,             /* EAFNOSUPPORT		47	Address family not supported by protocol family */
-	DUMPANDLOG,             /* EADDRINUSE		48	Address already in use */
-	DUMPANDLOG,             /* EADDRNOTAVAIL	49	Can't assign requested address */
-	/* ipc/network software -- operational errors */
-	RETRY,                  /* ENETDOWN			50	Network is down */
-	RETRY,                  /* ENETUNREACH		51	Network is unreachable */
-	RETRY,                  /* ENETRESET		52	Network dropped connection on reset */
-	RETRY,                  /* ECONNABORTED		53	Software caused connection abort */
-	RETRY,                  /* ECONNRESET		54	Connection reset by peer */
-	RETRY,                  /* ENOBUFS			55	No buffer space available */
-	RETRY,                  /* EISCONN			56	Socket is already connected */
-	RETRY,                  /* ENOTCONN			57	Socket is not connected */
-	RETRY,                  /* ESHUTDOWN		58	Can't send after socket shutdown */
-	RETRY,                  /* ETOOMANYREFS		59	Too many references: can't splice */
-	RETRY,                  /* ETIMEDOUT		60	Operation timed out */
-	RETRY,                  /* ECONNREFUSED		61	Connection refused */
+	DUMP,                                                        
+	DUMP,                                                           
+	DUMPANDLOG,                                          
+	RETRY,                                                              
+	DUMP,                                                  
+	DUMP,                                                      
+	DUMPANDLOG,                                                 
+	DUMPANDLOG,                                              
+	DUMPANDLOG,                                              
+	DUMPANDLOG,                                               
+	DUMPANDLOG,                                                                    
+	RETRY,                                                        
+	DUMP,                                                    
+	DUMPANDLOG,                                        
+	DUMPANDLOG,                                                           
+	RETRY,                                            
+	DUMP,                                              
+	DUMP,                                                   
+	DUMP,                                                                    
+	DUMP,                                                   
+	DUMP,                                                       
+	DUMP,                                                   
+	DUMPANDLOG,                                                          
+	DUMPANDLOG,                                                
+	DUMPANDLOG,                                                           
+	DUMPANDLOG,                                                    
+	DUMP,                                                
+	DUMP,                                                          
+	DUMPANDLOG,                                         
+	DUMP,                                                       
+	DUMP,                                                 
+	RETRY,                                            
+	                   
+	DUMPANDLOG,                                                              
+	DUMPANDLOG,                                               
+	RETRY,                                                                              
+	DUMPANDLOG,                                                            
+	DUMPANDLOG,                                                              
+	                                             
+	DUMPANDLOG,                                                              
+	DUMPANDLOG,                                                                
+	DUMPANDLOG,                                                 
+	DUMPANDLOG,                                                                
+	DUMPANDLOG,                                                         
+	DUMPANDLOG,                                                            
+	DUMPANDLOG,                                                               
+	DUMPANDLOG,                                                       
+	DUMPANDLOG,                                                                 
+	DUMPANDLOG,                                                                                   
+	DUMPANDLOG,                                                        
+	DUMPANDLOG,                                                                  
+	                                                
+	RETRY,                                                     
+	RETRY,                                                              
+	RETRY,                                                                         
+	RETRY,                                                                         
+	RETRY,                                                               
+	RETRY,                                                              
+	RETRY,                                                                
+	RETRY,                                                             
+	RETRY,                                                                      
+	RETRY,                                                                          
+	RETRY,                                                         
+	RETRY,                                                           
 
-	DUMPANDLOG,             /* ELOOP			62	Too many levels of symbolic links */
-	DUMP,                   /* ENAMETOOLONG		63	File name too long */
-	RETRY,                  /* EHOSTDOWN		64	Host is down */
-	RETRY,                  /* EHOSTUNREACH		65	No route to host */
-	DUMP,                   /* ENOTEMPTY		66	Directory not empty */
-	/* quotas & mush */
-	DUMPANDLOG,             /* PROCLIM			67	Too many processes */
-	DUMPANDLOG,             /* EUSERS			68	Too many users */
-	DUMPANDLOG,             /* EDQUOT			69	Disc quota exceeded */
-	/* Network File System */
-	DUMP,                   /* ESTALE			70	Stale NFS file handle */
-	DUMP,                   /* EREMOTE			71	Too many levels of remote in path */
-	DUMPANDLOG,             /* EBADRPC			72	RPC struct is bad */
-	DUMPANDLOG,             /* ERPCMISMATCH		73	RPC version wrong */
-	DUMPANDLOG,             /* EPROGUNAVAIL		74	RPC prog. not avail */
-	DUMPANDLOG,             /* EPROGMISMATCH	75	Program version wrong */
-	DUMPANDLOG,             /* EPROCUNAVAIL		76	Bad procedure for program */
+	DUMPANDLOG,                                                               
+	DUMP,                                                            
+	RETRY,                                                  
+	RETRY,                                                         
+	DUMP,                                                          
+	                   
+	DUMPANDLOG,                                                  
+	DUMPANDLOG,                                             
+	DUMPANDLOG,                                                  
+	                         
+	DUMP,                                                          
+	DUMP,                                                                       
+	DUMPANDLOG,                                                 
+	DUMPANDLOG,                                                     
+	DUMPANDLOG,                                                       
+	DUMPANDLOG,                                                         
+	DUMPANDLOG,                                                             
 
-	DUMPANDLOG,             /* ENOLCK			77	No locks available */
-	DUMPANDLOG,             /* ENOSYS			78	Function not implemented */
-	DUMPANDLOG,             /* EFTYPE			79	Inappropriate file type or format */
-	DUMPANDLOG,             /* EAUTH			80	Authentication error */
-	DUMPANDLOG,             /* ENEEDAUTH		81	Need authenticator */
-	/* Intelligent device errors */
-	DUMPANDLOG,             /* EPWROFF			82	Device power is off */
-	DUMPANDLOG,             /* EDEVERR			83	Device error, e.g. paper out */
-	DUMPANDLOG,             /* EOVERFLOW		84	Value too large to be stored in data type */
-	/* Program loading errors */
-	DUMPANDLOG,             /* EBADEXEC			85	Bad executable */
-	DUMPANDLOG,             /* EBADARCH			86	Bad CPU type in executable */
-	DUMPANDLOG,             /* ESHLIBVERS		87	Shared library version mismatch */
-	DUMPANDLOG,             /* EBADMACHO		88	Malformed Macho file */
+	DUMPANDLOG,                                                 
+	DUMPANDLOG,                                                       
+	DUMPANDLOG,                                                                
+	DUMPANDLOG,                                                  
+	DUMPANDLOG,                                                   
+	                               
+	DUMPANDLOG,                                                   
+	DUMPANDLOG,                                                            
+	DUMPANDLOG,                                                                          
+	                            
+	DUMPANDLOG,                                               
+	DUMPANDLOG,                                                           
+	DUMPANDLOG,                                                                 
+	DUMPANDLOG,                                                     
 };
 
 char
@@ -8224,24 +8224,24 @@ nfs_pageouterrorhandler(int error)
 }
 
 
-/*
- * vnode OP for pageout using UPL
- *
- * No buffer I/O, just RPCs straight from the mapped pages.
- * File size changes are not permitted in pageout.
- */
+  
+                                 
+  
+                                                           
+                                                  
+   
 int
 nfs_vnop_pageout(
-	struct vnop_pageout_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  upl_t a_pl;
-                                  *  vm_offset_t a_pl_offset;
-                                  *  off_t a_f_offset;
-                                  *  size_t a_size;
-                                  *  int a_flags;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_pageout_args     
+                                                                 
+                                                  
+                                                
+                                                             
+                                                      
+                                                   
+                                                 
+                                                             
+                                         *ap)
 {
 	vnode_t vp = ap->a_vp;
 	upl_t pl = ap->a_pl;
@@ -8297,13 +8297,13 @@ nfs_vnop_pageout(
 
 	nfs_data_lock_noupdate(np, NFS_DATA_LOCK_SHARED);
 
-	/*
-	 * Check to see whether the buffer is incore.
-	 * If incore and not busy, invalidate it from the cache.
-	 */
+	  
+                                              
+                                                         
+    
 	for (iosize = 0; iosize < size; iosize += xsize) {
 		off = f_offset + iosize;
-		/* need make sure we do things on block boundaries */
+		                                                     
 		xsize = biosize - (off % biosize);
 		if (off + (off_t)xsize > f_offset + (off_t)size) {
 			xsize = f_offset + size - off;
@@ -8315,33 +8315,33 @@ nfs_vnop_pageout(
 			if (nfs_buf_acquire(bp, NBAC_NOWAIT, 0, 0)) {
 				lck_mtx_unlock(&nfs_buf_mutex);
 				nfs_data_unlock_noupdate(np);
-				/* no panic. just tell vm we are busy */
+				                                        
 				if (!nofreeupl) {
 					ubc_upl_abort_range(pl, pl_offset, size, 0);
 				}
 				return EBUSY;
 			}
 			if (bp->nb_dirtyend > 0) {
-				/*
-				 * if there's a dirty range in the buffer, check
-				 * to see if it extends beyond the pageout region
-				 *
-				 * if the dirty region lies completely within the
-				 * pageout region, we just invalidate the buffer
-				 * because it's all being written out now anyway.
-				 *
-				 * if any of the dirty region lies outside the
-				 * pageout region, we'll try to clip the dirty
-				 * region to eliminate the portion that's being
-				 * paged out.  If that's not possible, because
-				 * the dirty region extends before and after the
-				 * pageout region, then we'll just return EBUSY.
-				 */
+				  
+                                                    
+                                                     
+      
+                                                     
+                                                    
+                                                     
+      
+                                                  
+                                                  
+                                                   
+                                                  
+                                                    
+                                                    
+       
 				off_t boff, start, end;
 				boff = NBOFF(bp);
 				start = off;
 				end = off + xsize;
-				/* clip end to EOF */
+				                     
 				if (end > (off_t)np->n_size) {
 					end = np->n_size;
 				}
@@ -8349,14 +8349,14 @@ nfs_vnop_pageout(
 				end -= boff;
 				if ((bp->nb_dirtyoff < start) &&
 				    (bp->nb_dirtyend > end)) {
-					/*
-					 * not gonna be able to clip the dirty region
-					 *
-					 * But before returning the bad news, move the
-					 * buffer to the start of the delwri list and
-					 * give the list a push to try to flush the
-					 * buffer out.
-					 */
+					  
+                                                  
+       
+                                                   
+                                                  
+                                                
+                   
+        
 					FSDBG(323, np, bp, 0xd00deebc, EBUSY);
 					nfs_buf_remfree(bp);
 					TAILQ_INSERT_HEAD(&nfsbufdelwri, bp, nb_free);
@@ -8372,7 +8372,7 @@ nfs_vnop_pageout(
 				}
 				if ((bp->nb_dirtyoff < start) ||
 				    (bp->nb_dirtyend > end)) {
-					/* clip dirty region, if necessary */
+					                                     
 					if (bp->nb_dirtyoff < start) {
 						bp->nb_dirtyend = MIN(bp->nb_dirtyend, start);
 					}
@@ -8380,7 +8380,7 @@ nfs_vnop_pageout(
 						bp->nb_dirtyoff = MAX(bp->nb_dirtyoff, end);
 					}
 					FSDBG(323, bp, bp->nb_dirtyoff, bp->nb_dirtyend, 0xd00dee00);
-					/* we're leaving this block dirty */
+					                                    
 					nfs_buf_drop(bp);
 					lck_mtx_unlock(&nfs_buf_mutex);
 					continue;
@@ -8449,11 +8449,11 @@ nfs_vnop_pageout(
 		    UPL_ABORT_FREE_ON_EMPTY);
 	}
 
-	/*
-	 * check for partial page and clear the
-	 * contents past end of the file before
-	 * releasing it in the VM page cache
-	 */
+	  
+                                        
+                                        
+                                     
+    
 	if ((u_quad_t)f_offset < np->n_size && (u_quad_t)f_offset + size > np->n_size) {
 		uint64_t io = np->n_size - f_offset;
 		NFS_BZERO((caddr_t)(ioaddr + io), size - io);
@@ -8483,7 +8483,7 @@ tryagain:
 			error = EIO;
 			break;
 		}
-		/* send requests while we need to and have available slots */
+		                                                             
 		while ((txsize > 0) && (req[nextsend] == NULL)) {
 			iosize = (size_t)MIN(nmwsize, txsize);
 			uio_reset(auio, txoffset, UIO_SYSSPACE, UIO_WRITE);
@@ -8508,7 +8508,7 @@ tryagain:
 			txsize -= iosize;
 			nextsend = (nextsend + 1) % MAXPAGINGREQS;
 		}
-		/* wait while we need to and break out if more requests to send */
+		                                                                  
 		while ((rxsize > 0) && req[nextwait]) {
 			iosize = remsize = (size_t)MIN(nmwsize, rxsize);
 			error = nmp->nm_funcs->nf_write_rpc_async_finish(np, req[nextwait], &iomode, &iosize, &wverf2);
@@ -8538,11 +8538,11 @@ tryagain:
 				wverf = wverf2;
 				wverfset = 1;
 			} else if (wverf != wverf2) {
-				/* verifier changed, so we need to restart all the writes */
+				                                                            
 				vrestart = 1;
 				goto cancel;
 			}
-			/* Retain the lowest commitment level returned. */
+			                                                  
 			if (iomode < commit) {
 				commit = iomode;
 			}
@@ -8551,7 +8551,7 @@ tryagain:
 			rxsize -= iosize;
 			remsize -= iosize;
 			if (remsize > 0) {
-				/* need to try sending the remainder */
+				                                       
 				iosize = remsize;
 				uio_reset(auio, rxoffset, UIO_SYSSPACE, UIO_WRITE);
 				uio_addiov(auio, CAST_USER_ADDR_T(rxaddr), remsize);
@@ -8575,7 +8575,7 @@ tryagain:
 					break;
 				}
 				if (wverf != wverf2) {
-					/* verifier changed, so we need to restart all the writes */
+					                                                            
 					vrestart = 1;
 					goto cancel;
 				}
@@ -8604,7 +8604,7 @@ tryagain:
 
 	if (error) {
 cancel:
-		/* cancel any outstanding requests */
+		                                     
 		while (req[nextwait]) {
 			nfs_request_async_cancel(req[nextwait]);
 			req[nextwait] = NULL;
@@ -8618,14 +8618,14 @@ cancel:
 			error = EIO;
 		} else {
 			if (vrestart) {
-				if (++vrestarts <= 100) { /* guard against no progress */
+				if (++vrestarts <= 100) {                                
 					goto tryagain;
 				}
 				NP(np, "nfs_pageout: too many restarts, aborting");
 				FSDBG(323, f_offset, xsize, ERESTART, -1);
 			}
 			if (restart) {
-				if (restarts <= nfs_mount_state_max_restarts(nmp)) { /* guard against no progress */
+				if (restarts <= nfs_mount_state_max_restarts(nmp)) {                                
 					if (error == NFSERR_GRACE) {
 						tsleep(&nmp->nm_state, (PZERO - 1), "nfsgrace", 2 * hz);
 					}
@@ -8642,30 +8642,30 @@ cancel:
 
 	ubc_upl_unmap(pl);
 
-	/*
-	 * We've had several different solutions on what to do when the pageout
-	 * gets an error. If we don't handle it, and return an error to the
-	 * caller, vm, it will retry . This can end in endless looping
-	 * between vm and here doing retries of the same page. Doing a dump
-	 * back to vm, will get it out of vm's knowledge and we lose whatever
-	 * data existed. This is risky, but in some cases necessary. For
-	 * example, the initial fix here was to do that for ESTALE. In that case
-	 * the server is telling us that the file is no longer the same. We
-	 * would not want to keep paging out to that. We also saw some 151
-	 * errors from Auspex server and NFSv3 can return errors higher than
-	 * ELAST. Those along with NFS known server errors we will "dump" from
-	 * vm.  Errors we don't expect to occur, we dump and log for further
-	 * analysis. Errors that could be transient, networking ones,
-	 * we let vm "retry". Lastly, errors that we retry, but may have potential
-	 * to storm the network, we "retrywithsleep". "sever" will be used in
-	 * in the future to dump all pages of object for cases like ESTALE.
-	 * All this is the basis for the states returned and first guesses on
-	 * error handling. Tweaking expected as more statistics are gathered.
-	 * Note, in the long run we may need another more robust solution to
-	 * have some kind of persistant store when the vm cannot dump nor keep
-	 * retrying as a solution, but this would be a file architectural change
-	 */
-	if (!nofreeupl) { /* otherwise stacked file system has to handle this */
+	  
+                                                                        
+                                                                    
+                                                               
+                                                                    
+                                                                      
+                                                                 
+                                                                         
+                                                                    
+                                                                   
+                                                                     
+                                                                       
+                                                                     
+                                                              
+                                                                           
+                                                                      
+                                                                    
+                                                                      
+                                                                      
+                                                                     
+                                                                       
+                                                                         
+    
+	if (!nofreeupl) {                                                       
 		if (error) {
 			int abortflags = 0;
 			char action = nfs_pageouterrorhandler(error);
@@ -8686,14 +8686,14 @@ cancel:
 			case RETRY:
 				abortflags = UPL_ABORT_FREE_ON_EMPTY;
 				break;
-			case SEVER:         /* not implemented */
+			case SEVER:                              
 			default:
 				NP(np, "nfs_pageout: action %d not expected", action);
 				break;
 			}
 
 			ubc_upl_abort_range(pl, pl_offset, pgsize, abortflags);
-			/* return error in all cases above */
+			                                     
 		} else {
 			ubc_upl_commit_range(pl, pl_offset, pgsize,
 			    UPL_COMMIT_CLEAR_DIRTY |
@@ -8703,15 +8703,15 @@ cancel:
 	return error;
 }
 
-/* Blktooff derives file offset given a logical block number */
+                                                               
 int
 nfs_vnop_blktooff(
-	struct vnop_blktooff_args /* {
-                                   *  struct vnodeop_desc *a_desc;
-                                   *  vnode_t a_vp;
-                                   *  daddr64_t a_lblkno;
-                                   *  off_t *a_offset;
-                                   *  } */*ap)
+	struct vnop_blktooff_args     
+                                                                  
+                                                   
+                                                         
+                                                      
+                                          *ap)
 {
 	int biosize;
 	vnode_t vp = ap->a_vp;
@@ -8729,12 +8729,12 @@ nfs_vnop_blktooff(
 
 int
 nfs_vnop_offtoblk(
-	struct vnop_offtoblk_args /* {
-                                   *  struct vnodeop_desc *a_desc;
-                                   *  vnode_t a_vp;
-                                   *  off_t a_offset;
-                                   *  daddr64_t *a_lblkno;
-                                   *  } */*ap)
+	struct vnop_offtoblk_args     
+                                                                  
+                                                   
+                                                     
+                                                          
+                                          *ap)
 {
 	int biosize;
 	vnode_t vp = ap->a_vp;
@@ -8750,19 +8750,19 @@ nfs_vnop_offtoblk(
 	return 0;
 }
 
-/*
- * vnode change monitoring
- */
+  
+                          
+   
 int
 nfs_vnop_monitor(
-	struct vnop_monitor_args /* {
-                                  *  struct vnodeop_desc *a_desc;
-                                  *  vnode_t a_vp;
-                                  *  uint32_t a_events;
-                                  *  uint32_t a_flags;
-                                  *  void *a_handle;
-                                  *  vfs_context_t a_context;
-                                  *  } */*ap)
+	struct vnop_monitor_args     
+                                                                 
+                                                  
+                                                       
+                                                      
+                                                    
+                                                             
+                                         *ap)
 {
 	nfsnode_t np = VTONFS(ap->a_vp);
 	struct nfsmount *nmp = VTONMP(ap->a_vp);
@@ -8772,17 +8772,17 @@ nfs_vnop_monitor(
 		return ENXIO;
 	}
 
-	/* make sure that the vnode's monitoring status is up to date */
+	                                                                
 	lck_mtx_lock(&nmp->nm_lock);
 	if (vnode_ismonitored(ap->a_vp)) {
-		/* This vnode is currently being monitored, make sure we're tracking it. */
+		                                                                           
 		if (np->n_monlink.le_next == NFSNOLIST) {
 			LIST_INSERT_HEAD(&nmp->nm_monlist, np, n_monlink);
 			nfs_mount_sock_thread_wake(nmp);
 		}
 	} else {
-		/* This vnode is no longer being monitored, make sure we're not tracking it. */
-		/* Wait for any in-progress getattr to complete first. */
+		                                                                               
+		                                                         
 		while (np->n_mflag & NMMONSCANINPROG) {
 			struct timespec ts = { .tv_sec = 1, .tv_nsec = 0 };
 			np->n_mflag |= NMMONSCANWANT;
@@ -8798,9 +8798,9 @@ nfs_vnop_monitor(
 	return error;
 }
 
-/*
- * Send a vnode notification for the given events.
- */
+  
+                                                  
+   
 void
 nfs_vnode_notify(nfsnode_t np, uint32_t events)
 {
@@ -8811,7 +8811,7 @@ nfs_vnode_notify(nfsnode_t np, uint32_t events)
 
 	microuptime(&now);
 	if ((np->n_evtstamp == now.tv_sec) || !nmp) {
-		/* delay sending this notify */
+		                               
 		np->n_events |= events;
 		return;
 	}
@@ -8836,4 +8836,4 @@ nfs_vnode_notify(nfsnode_t np, uint32_t events)
 	FREE(nvattr, M_TEMP);
 }
 
-#endif /* CONFIG_NFS_CLIENT */
+#endif                        

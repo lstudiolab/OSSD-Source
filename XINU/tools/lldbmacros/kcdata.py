@@ -16,7 +16,7 @@ import contextlib
 import base64
 import zlib
 
-# can be removed once we move to Python3.1+
+                                           
 from future.utils.surrogateescape import register_surrogateescape
 register_surrogateescape()
 
@@ -124,8 +124,8 @@ kcdata_type_def = {
     'TASK_CRASHINFO_PID':                  0x805,
     'TASK_CRASHINFO_PPID':                 0x806,
 
-    # Don't want anyone using this.  It's struct rusage from whatever machine generated the data
-    #'TASK_CRASHINFO_RUSAGE':               0x807,
+                                                                                                
+                                                  
     'Type_0x807':               0x807,
 
     'TASK_CRASHINFO_RUSAGE_INFO':          0x808,
@@ -169,17 +169,17 @@ KNOWN_TOPLEVEL_CONTAINER_TYPES = ()
 def enum(**args):
     return type('enum', (), args)
 
-#
-# Decode bytes as UTF-8, using surrogateescape if there are invalid UTF-8
-# sequences; see PEP-383
-#
+ 
+                                                                         
+                        
+ 
 def BytesToString(b):
     return b.decode('utf-8', errors="surrogateescape")
 
-# important keys
+                
 SC_SLID_FIRSTMAPPING_KEY = 'sharedCacheSlidFirstMapping'
 
-# important builtin types
+                         
 KCSUBTYPE_TYPE = enum(KC_ST_CHAR=1, KC_ST_INT8=2, KC_ST_UINT8=3, KC_ST_INT16=4, KC_ST_UINT16=5, KC_ST_INT32=6, KC_ST_UINT32=7, KC_ST_INT64=8, KC_ST_UINT64=9)
 
 
@@ -559,7 +559,7 @@ class KCObject(object):
             self.obj['numOfElements'] = e_c
             self.obj['sizeOfElement'] = e_s
             logging.info("0x%08x: %sARRAY: %s" % (self.offset, INDENT(), self.i_name))
-            #populate the array here by recursive creation of KCObject
+                                                                      
             with INDENT.indent():
                 for _i in range(e_c):
                     _o = KCObject(e_t, self.i_data[(_i * e_s):(_i * e_s) + e_s], self.offset + _i*e_s)
@@ -576,7 +576,7 @@ class KCObject(object):
             self.obj['numOfElements'] = e_c
             self.obj['sizeOfElement'] = e_s
             logging.info("0x%08x: %sARRAY: %s" % (self.offset, INDENT(), self.i_name))
-            #populate the array here by recursive creation of KCObject
+                                                                      
             with INDENT.indent():
                 for _i in range(e_c):
                     _o = KCObject(e_t, self.i_data[(_i * e_s):(_i * e_s) + e_s], self.offset + _i*e_s)
@@ -598,8 +598,8 @@ class KCObject(object):
             logging.info("0x%08x: %s%s" % (self.offset, INDENT(), self.i_name))
         else:
             self.is_naked_type = True
-            #self.obj = "data of len %d" % len(self.i_data)
-            #self.obj = ''.join(["%x" % ki for ki in struct.unpack('%dB' % len(self.i_data), self.i_data)])
+                                                           
+                                                                                                           
             self.obj = map(ord, self.i_data)
             logging.info("0x%08x: %s%s" % (self.offset, INDENT(), self.i_name))
 
@@ -616,7 +616,7 @@ class KCContainerObject(KCObject):
         return True
 
     def GetJsonRepr(self):
-        # o = '"%s"' % self.obj['uniqID'] + ' : { "typeID" : %d ,' % self.obj['typeID']
+                                                                                       
         o = '"%s"' % self.obj['uniqID'] + ' : { '
         for (k, v) in self.obj_container_dict.items():
             if v.ShouldMerge():
@@ -724,7 +724,7 @@ class KCCompressedBufferObject(KCContainerObject):
 class KCData_item:
     """ a basic kcdata_item type object.
     """
-    header_size = 16  # (uint32_t + uint32_t + uint64_t)
+    header_size = 16                                    
 
     def __init__(self, item_type, item_size, item_flags, item_data):
         self.i_type = item_type
@@ -738,9 +738,9 @@ class KCData_item:
             returns : obj - if data is readable
                       raises ValueError if something is not ok.
         """
-        self.i_type = struct.unpack('I', barray[pos:pos+4])[0]     # int.from_bytes(barray[pos:pos+4])
-        self.i_size = struct.unpack('I', barray[pos+4:pos+8])[0]   # int.from_bytes(barray[pos+4:pos+8])
-        self.i_flags = struct.unpack('Q', barray[pos+8:pos+16])[0]  # int.from_bytes(barray[pos+8:pos+16])
+        self.i_type = struct.unpack('I', barray[pos:pos+4])[0]                                        
+        self.i_size = struct.unpack('I', barray[pos+4:pos+8])[0]                                        
+        self.i_flags = struct.unpack('Q', barray[pos+8:pos+16])[0]                                        
         self.i_data = barray[pos+16: (pos + 16 + self.i_size)]
         self.i_offset = pos
 
@@ -1169,7 +1169,7 @@ set_type('STACKSHOT_KCTYPE_USER_STACKTOP',
          ),
          'user_stacktop')
 
-#KNOWN_TYPES_COLLECTION[0x907] = KCSubTypeElement('donating_pids', KCSUBTYPE_TYPE.KC_ST_UINT32, 4, 0, 0, KCSubTypeElement._get_naked_element_value)
+                                                                                                                                                   
 KNOWN_TYPES_COLLECTION[GetTypeForName('TASK_CRASHINFO_PID')] = KCSubTypeElement('pid', KCSUBTYPE_TYPE.KC_ST_INT32, 4, 0, 0)
 KNOWN_TYPES_COLLECTION[GetTypeForName('TASK_CRASHINFO_PPID')] = KCSubTypeElement('ppid', KCSUBTYPE_TYPE.KC_ST_INT32, 4, 0, 0)
 KNOWN_TYPES_COLLECTION[GetTypeForName('TASK_CRASHINFO_PROC_NAME')] = KCSubTypeElement('p_comm', KCSUBTYPE_TYPE.KC_ST_CHAR,
@@ -1596,15 +1596,15 @@ def SaveStackshotReport(j, outfile_name, incomplete):
     shared_cache_info = ss.get('shared_cache_dyld_load_info')
     if shared_cache_info:
         shared_cache_base_addr = shared_cache_info['imageSlidBaseAddress']
-        # If we have a slidFirstMapping and it's >= base_address, use that.
-        #
-        # Otherwise we're processing a stackshot from before the slidFirstMapping
-        # field was introduced and corrected.  On ARM the SlidBaseAddress is the
-        # same, but on x86 it's off by 0x20000000.  We use 'X86_64' in the
-        # kernel version string plus checking kern_page_size == 4k' as
-        # proxy for x86_64, and only adjust SlidBaseAddress if the unslid
-        # address is precisely the expected incorrect value.
-        #
+                                                                           
+         
+                                                                                 
+                                                                                
+                                                                          
+                                                                      
+                                                                         
+                                                            
+         
         is_intel = ('X86_64' in ss.get('osversion', "") and
            ss.get('kernel_page_size', 0) == 4096)
         slidFirstMapping = shared_cache_info.get(SC_SLID_FIRSTMAPPING_KEY, -1);
@@ -1792,7 +1792,7 @@ def SaveStackshotReport(j, outfile_name, incomplete):
     fh.write(json.dumps(obj, sort_keys=False, indent=2, separators=(',', ': ')))
     fh.close()
 
-## Base utils for interacting with shell ##
+                                           
 def RunCommand(bash_cmd_string, get_stderr = True):
     """
         returns: (int,str) : exit_code and output_str
@@ -1836,7 +1836,7 @@ def iterate_kcdatas(kcdata_file):
             kcdata_buffer = KCObject.FromKCItem(iterator.next())
 
         if not isinstance(kcdata_buffer, KCBufferObject):
-            # ktrace stackshot chunk
+                                    
             iterator = kcdata_item_iterator(data[16:])
             kcdata_buffer = KCObject.FromKCItem(iterator.next())
 
@@ -1966,7 +1966,7 @@ if __name__ == '__main__':
             import Foundation
             plist = Foundation.NSPropertyListSerialization.dataWithPropertyList_format_options_error_(
                 json_obj, Foundation.NSPropertyListXMLFormat_v1_0, 0, None)[0].bytes().tobytes()
-            #sigh.  on some pythons long integers are getting output with L's in the plist.
+                                                                                           
             plist = re.sub(r'^(\s*<integer>\d+)L(</integer>\s*)$', r"\1\2", plist, flags=re.MULTILINE)
             print plist,
         else:

@@ -157,7 +157,7 @@ CC = clang
 		    if (path) {
 			    int pid = fork();
 			    if (pid == 0) {
-				    /* child */
+				               
 
 				    ret = ksancov_thread_self(fd);
 				    if (ret) {
@@ -172,7 +172,7 @@ CC = clang
 
 				    exit(1);
 			    } else {
-				    /* parent */
+				                
 				    waitpid(pid, NULL, 0);
 				    ksancov_stop(header);
 			    }
@@ -212,6 +212,6 @@ CC = clang
 		    return 0;
 	    }
 
-/*
- *  endif
- # */
+  
+         
+     

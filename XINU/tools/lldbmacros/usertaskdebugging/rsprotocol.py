@@ -11,7 +11,7 @@ class Message(object):
         return "Message: %s" % (self.data)
 
     def getData(self):
-        #TODO need to parse data and unescape
+                                             
         return self.data
     
     def getRSPByteData(self):
@@ -35,7 +35,7 @@ class Message(object):
             logging.error('Invalid bytedata considered as message %s' % bytedata)
             return None
                 
-        #validate the data
+                          
         if data_begin + 1 >= data_end:
             logging.debug("empty message %s"%bytedata)
             data_begin -= 1

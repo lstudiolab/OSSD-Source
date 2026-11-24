@@ -26,11 +26,11 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * This header provides some gory details to implement the <os/atomic_private.h>
- * interfaces. Nothing in this header should be called directly, no promise is
- * made to keep this interface stable.
- */
+  
+                                                                                
+                                                                              
+                                      
+   
 
 #ifndef __OS_ATOMIC_PRIVATE_H__
 #error "Do not include <os/atomic_private_impl.h> directly, use <os/atomic_private.h>"
@@ -75,16 +75,16 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_atomic_mo_consume               os_atomic_std(memory_order_consume)
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_atomic_mo_dependency            os_atomic_std(memory_order_acquire)
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_atomic_mo_acquire               os_atomic_std(memory_order_acquire)
 #define _os_atomic_mo_release               os_atomic_std(memory_order_release)
 #define _os_atomic_mo_acq_rel               os_atomic_std(memory_order_acq_rel)
 #define _os_atomic_mo_seq_cst               os_atomic_std(memory_order_seq_cst)
 
-/*
- * Mapping between symbolic memory orderings and actual ones
- * to take SMP into account.
- */
+  
+                                                            
+                            
+   
 #if OS_ATOMIC_CONFIG_SMP
 #define _os_atomic_mo_relaxed_smp           _os_atomic_mo_relaxed
 #define _os_atomic_mo_compiler_acquire_smp  _os_atomic_mo_relaxed
@@ -93,7 +93,7 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_atomic_mo_consume_smp           _os_atomic_mo_consume
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_atomic_mo_dependency_smp        _os_atomic_mo_dependency
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_atomic_mo_acquire_smp           _os_atomic_mo_acquire
 #define _os_atomic_mo_release_smp           _os_atomic_mo_release
 #define _os_atomic_mo_acq_rel_smp           _os_atomic_mo_acq_rel
@@ -106,7 +106,7 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_atomic_mo_consume_smp           _os_atomic_mo_relaxed
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_atomic_mo_dependency_smp        _os_atomic_mo_relaxed
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_atomic_mo_acquire_smp           _os_atomic_mo_relaxed
 #define _os_atomic_mo_release_smp           _os_atomic_mo_relaxed
 #define _os_atomic_mo_acq_rel_smp           _os_atomic_mo_relaxed
@@ -122,27 +122,27 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define memory_order_dependency             _os_atomic_mo_dependency
 #define memory_order_dependency_smp         _os_atomic_mo_dependency_smp
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define memory_order_acquire_smp            _os_atomic_mo_acquire_smp
 #define memory_order_release_smp            _os_atomic_mo_release_smp
 #define memory_order_acq_rel_smp            _os_atomic_mo_acq_rel_smp
 #define memory_order_seq_cst_smp            _os_atomic_mo_seq_cst_smp
 #endif
 
-/*
- * Hack needed for os_compiler_barrier() to work (including with empty argument)
- */
+  
+                                                                                
+   
 #define _os_compiler_barrier_relaxed        _os_atomic_mo_relaxed
 #define _os_compiler_barrier_acquire        _os_atomic_mo_acquire
 #define _os_compiler_barrier_release        _os_atomic_mo_release
 #define _os_compiler_barrier_acq_rel        _os_atomic_mo_acq_rel
 #define _os_compiler_barrier_               _os_atomic_mo_acq_rel
 
-/*
- * Mapping between compiler barrier/memory orders and:
- * - compiler barriers before atomics ("rel_barrier")
- * - compiler barriers after atomics ("acq_barrier")
- */
+  
+                                                      
+                                                     
+                                                    
+   
 #define _os_rel_barrier_relaxed             _os_atomic_mo_relaxed
 #define _os_rel_barrier_compiler_acquire    _os_atomic_mo_relaxed
 #define _os_rel_barrier_compiler_release    _os_atomic_mo_release
@@ -150,7 +150,7 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_rel_barrier_consume             _os_atomic_mo_relaxed
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_rel_barrier_dependency          _os_atomic_mo_relaxed
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_rel_barrier_acquire             _os_atomic_mo_relaxed
 #define _os_rel_barrier_release             _os_atomic_mo_release
 #define _os_rel_barrier_acq_rel             _os_atomic_mo_release
@@ -163,7 +163,7 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_acq_barrier_consume             _os_atomic_mo_acquire
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_acq_barrier_dependency          _os_atomic_mo_acquire
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_acq_barrier_acquire             _os_atomic_mo_acquire
 #define _os_acq_barrier_release             _os_atomic_mo_relaxed
 #define _os_acq_barrier_acq_rel             _os_atomic_mo_acquire
@@ -174,11 +174,11 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_compiler_barrier_after_atomic(m) \
 	os_atomic_std(atomic_signal_fence)(_os_acq_barrier_##m)
 
-/*
- * Mapping between compiler barrier/memmory orders and:
- * - memory fences before atomics ("rel_fence")
- * - memory fences after atomics ("acq_fence")
- */
+  
+                                                       
+                                               
+                                              
+   
 #define _os_rel_fence_relaxed               _os_atomic_mo_relaxed
 #define _os_rel_fence_compiler_acquire      _os_atomic_mo_relaxed
 #define _os_rel_fence_compiler_release      _os_atomic_mo_release
@@ -186,7 +186,7 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_rel_fence_consume               _os_atomic_mo_relaxed_smp
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_rel_fence_dependency            _os_atomic_mo_relaxed_smp
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_rel_fence_acquire               _os_atomic_mo_relaxed_smp
 #define _os_rel_fence_release               _os_atomic_mo_release_smp
 #define _os_rel_fence_acq_rel               _os_atomic_mo_release_smp
@@ -199,7 +199,7 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_acq_fence_consume               _os_atomic_mo_acquire_smp
 #if OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
 #define _os_acq_fence_dependency            _os_atomic_mo_dependency_smp
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 #define _os_acq_fence_acquire               _os_atomic_mo_acquire_smp
 #define _os_acq_fence_release               _os_atomic_mo_relaxed_smp
 #define _os_acq_fence_acq_rel               _os_atomic_mo_acquire_smp
@@ -210,9 +210,9 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 #define _os_memory_fence_after_atomic(m) \
 	os_atomic_std(atomic_thread_fence)(_os_acq_fence_##m)
 
-/*
- * Misc. helpers
- */
+  
+                
+   
 
 #define _os_atomic_value_cast(p, v) \
 	({ typeof(*os_cast_to_nonatomic_pointer(p)) ___v = (v); ___v; })
@@ -252,6 +252,6 @@ _os_atomic_mo_has_release(OS_ATOMIC_STD memory_order ord)
 	_Generic(e, \
 	    os_atomic_dependency_t: (e), \
 	    default: os_atomic_make_dependency(e))
-#endif // OS_ATOMIC_CONFIG_MEMORY_ORDER_DEPENDENCY
+#endif                                            
 
-#endif /* __OS_ATOMIC_PRIVATE_IMPL_H__ */
+#endif                                   

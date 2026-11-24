@@ -34,10 +34,10 @@ class IOPMPowerSourceList : public OSObject
 {
 	OSDeclareDefaultStructors(IOPMPowerSourceList);
 private:
-// pointer to first power source in list
+                                        
 	IOPMPowerSource         *firstItem;
 
-// how many power sources are in the list
+                                         
 	unsigned long           length;
 
 public:

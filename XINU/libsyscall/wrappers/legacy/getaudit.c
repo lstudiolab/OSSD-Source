@@ -23,9 +23,9 @@
 
 #include <bsm/audit.h>
 
-/*
- * Wrappers for the legacy getaudit() and setaudit() syscalls.
- */
+  
+                                                              
+   
 
 int
 getaudit(struct auditinfo *ainfo)
@@ -53,7 +53,7 @@ setaudit(const struct auditinfo *ainfo)
 	struct auditinfo *ai = (struct auditinfo *)ainfo;
 	auditinfo_addr_t aia;
 
-	/* Get the current ai_flags so they are preserved. */
+	                                                     
 	if ((err = getaudit_addr(&aia, sizeof(aia))) != 0) {
 		return err;
 	}
@@ -69,7 +69,7 @@ setaudit(const struct auditinfo *ainfo)
 		return err;
 	}
 
-	/* The session ID may have been assigned by kernel so copy that back. */
+	                                                                        
 	ai->ai_asid = aia.ai_asid;
 
 	return 0;

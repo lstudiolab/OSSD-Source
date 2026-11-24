@@ -38,33 +38,33 @@ _mach_approximate_time:
 
 	movw	r0, #((_COMM_PAGE_APPROX_TIME_SUPPORTED>>0)&0x0FFFF)
 	movt	r0, #((_COMM_PAGE_APPROX_TIME_SUPPORTED>>16)&0x0FFFF)
-	ldrb	r0, [r0]		// load COMM_PAGE_APPROX_TIME_SUPPORTED
-	cmp	r0, #1			// check if approx time is supported
+	ldrb	r0, [r0]		                                       
+	cmp	r0, #1			                                    
         
-        bne      _mach_absolute_time	// if not supported, fall through to
-					//   absolute_time
+        bne      _mach_absolute_time	                                    
+					                  
 
 	movw	r2, #((_COMM_PAGE_APPROX_TIME>>0)&0x0FFFF)
 	movt	r2, #((_COMM_PAGE_APPROX_TIME>>16)&0x0FFFF)
 
-        // at this point, r2->COMM_PAGE_APPROX_TIME, which is a 64-bit value.
-        // Since this is a 32-bit architecture, and the commpage is readonly,
-        // there is no "guaranteed" atomic way to read all 64-bits with
-        // hardware protection. Even the ldrd instruction is not guaranteed to
-        // complete atomically. The solution is to use a 32-bit high/low/high
-        // read with a consistency check on the high bits. To further
-        // complicate things, reading the same location in memory back to back
-        // could trigger a predictive read, which would defeat the purpose of
-        // doing the consistency check so we insert a data memory barrier to
-        // prevent this.
+                                                                             
+                                                                             
+                                                                       
+                                                                              
+                                                                             
+                                                                     
+                                                                              
+                                                                             
+                                                                            
+                        
 _consistency_check:
-        ldr     r1, [r2,#4]		// load high
-        ldr     r0, [r2]		// load low
-        dsb				// avoid predictive reads that could
-					//   be invalid if interrupted
-        ldr     r3, [r2,#4]		// load high again
-        cmp     r1, r3			// check that high1 == high2
-	bne	_consistency_check	// try again if not
+        ldr     r1, [r2,#4]		            
+        ldr     r0, [r2]		           
+        dsb				                                    
+					                              
+        ldr     r3, [r2,#4]		                  
+        cmp     r1, r3			                            
+	bne	_consistency_check	                   
         bx      lr
 
 #elif defined(__i386__)
@@ -73,23 +73,23 @@ _consistency_check:
 	.align	4, 0x90
 	.globl	_mach_approximate_time
 _mach_approximate_time:
-	pushl	%ebp				// push a frame
+	pushl	%ebp				               
 	movl	%esp, %ebp
-	cmpb	$0, _COMM_PAGE_APPROX_TIME_SUPPORTED // check commpage
-						//   "is supported" flag.
-	je	_approx_time_not_supported	// if zero, fall through to
-						//   absolute_time
-        // note the comment above for 32-bit ARM applies equally to 32-bit i386.
+	cmpb	$0, _COMM_PAGE_APPROX_TIME_SUPPORTED                  
+						                         
+	je	_approx_time_not_supported	                           
+						                  
+                                                                                
 	.align	4, 0x90
 _approx_time_consistency_check:
-	movl	_COMM_PAGE_APPROX_TIME+4, %edx	// load high
-	movl	_COMM_PAGE_APPROX_TIME, %eax	// load low
-        lfence					// avoid predictive reads that
-						//   could be invalid if
-						//   interrupted 
-	cmpl	_COMM_PAGE_APPROX_TIME+4, %edx  // load high and check if equal
-						// to the first read
-	jne	_approx_time_consistency_check	// if not, try again.
+	movl	_COMM_PAGE_APPROX_TIME+4, %edx	            
+	movl	_COMM_PAGE_APPROX_TIME, %eax	           
+        lfence					                              
+						                        
+						                 
+	cmpl	_COMM_PAGE_APPROX_TIME+4, %edx                                 
+						                    
+	jne	_approx_time_consistency_check	                     
 	popl	%ebp
 	ret
 

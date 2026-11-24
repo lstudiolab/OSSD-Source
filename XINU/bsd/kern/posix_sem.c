@@ -29,23 +29,23 @@
  *	Copyright (c) 1990, 1996-1998 Apple Computer, Inc.
  *	All Rights Reserved.
  */
-/*
- * posix_sem.c : Support for POSIX semaphore APIs
- *
- *	File:	posix_sem.c
- *	Author:	Ananthakrishna Ramesh
- *
- * HISTORY
- * 2-Sep-1999	A.Ramesh
- *	Created for MacOSX
- *
- */
-/*
- * NOTICE: This file was modified by SPARTA, Inc. in 2005 to introduce
- * support for mandatory and extensible security protections.  This notice
- * is included in support of clause 2.2 (b) of the Apple Public License,
- * Version 2.0.
- */
+  
+                                                 
+  
+                    
+                                
+  
+          
+                      
+                     
+  
+   
+  
+                                                                      
+                                                                          
+                                                                        
+               
+   
 
 #include <sys/cdefs.h>
 #include <sys/param.h>
@@ -87,7 +87,7 @@
 #define f_ops fp_glob->fg_ops
 #define f_data fp_glob->fg_data
 
-#define PSEMNAMLEN      31      /* maximum name segment length we bother with */
+#define PSEMNAMLEN      31                                                      
 
 struct pseminfo {
 	unsigned int    psem_flags;
@@ -95,7 +95,7 @@ struct pseminfo {
 	mode_t          psem_mode;
 	uid_t           psem_uid;
 	gid_t           psem_gid;
-	char            psem_name[PSEMNAMLEN + 1];      /* segment name */
+	char            psem_name[PSEMNAMLEN + 1];                        
 	semaphore_t     psem_semobject;
 	struct label *  psem_label;
 	pid_t           psem_creator_pid;
@@ -113,10 +113,10 @@ struct pseminfo {
 #define PSEM_INDELETE   0x80
 
 struct  psemcache {
-	LIST_ENTRY(psemcache) psem_hash;        /* hash chain */
-	struct  pseminfo *pseminfo;             /* vnode the name refers to */
-	size_t  psem_nlen;              /* length of name */
-	char    psem_name[PSEMNAMLEN + 1];      /* segment name */
+	LIST_ENTRY(psemcache) psem_hash;                        
+	struct  pseminfo *pseminfo;                                           
+	size_t  psem_nlen;                                  
+	char    psem_name[PSEMNAMLEN + 1];                        
 };
 #define PSEMCACHE_NULL (struct psemcache *)0
 
@@ -125,18 +125,18 @@ struct  psemcache {
 #define PSEMCACHE_NEGATIVE (ENOENT)
 
 struct  psemstats {
-	long    goodhits;               /* hits that we can really use */
-	long    neghits;                /* negative hits that we can use */
-	long    badhits;                /* hits we must drop */
-	long    falsehits;              /* hits with id mismatch */
-	long    miss;           /* misses */
-	long    longnames;              /* long names that ignore cache */
+	long    goodhits;                                                
+	long    neghits;                                                   
+	long    badhits;                                       
+	long    falsehits;                                         
+	long    miss;                       
+	long    longnames;                                                
 };
 
 struct psemname {
-	char    *psem_nameptr;  /* pointer to looked up name */
-	size_t  psem_namelen;   /* length of looked up component */
-	u_int32_t       psem_hash;      /* hash value of looked up name */
+	char    *psem_nameptr;                                 
+	size_t  psem_namelen;                                      
+	u_int32_t       psem_hash;                                        
 };
 
 struct psemnode {
@@ -151,16 +151,16 @@ struct psemnode {
 
 #define PSEMHASH(pnp) \
 	(&psemhashtbl[(pnp)->psem_hash & psemhash])
-LIST_HEAD(psemhashhead, psemcache) * psemhashtbl;        /* Hash Table */
-u_long  psemhash;                               /* size of hash table - 1 */
-long    psemnument;                     /* number of cache entries allocated */
-long    posix_sem_max = 10000;          /* tunable for max POSIX semaphores */
-                                        /* 10000 limits to ~1M of memory */
+LIST_HEAD(psemhashhead, psemcache) * psemhashtbl;                        
+u_long  psemhash;                                                           
+long    psemnument;                                                            
+long    posix_sem_max = 10000;                                                
+                                                                           
 SYSCTL_NODE(_kern, KERN_POSIX, posix, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "Posix");
 SYSCTL_NODE(_kern_posix, OID_AUTO, sem, CTLFLAG_RW | CTLFLAG_LOCKED, 0, "Semaphores");
 SYSCTL_LONG(_kern_posix_sem, OID_AUTO, max, CTLFLAG_RW | CTLFLAG_LOCKED, &posix_sem_max, "max");
 
-struct psemstats psemstats;             /* cache effectiveness statistics */
+struct psemstats psemstats;                                                 
 
 static int psem_access(struct pseminfo *pinfo, mode_t mode, kauth_cred_t cred);
 static int psem_cache_search(struct pseminfo **,
@@ -193,15 +193,15 @@ static int psem_cache_add(struct pseminfo *psemp, struct psemname *pnp, struct p
 static void psem_cache_delete(struct psemcache *pcp);
 int psem_cache_purge_all(proc_t);
 
-/*
- * Lookup an entry in the cache
- *
- *
- * status of -1 is returned if matches
- * If the lookup determines that the name does not exist
- * (negative cacheing), a status of ENOENT is returned. If the lookup
- * fails, a status of zero is returned.
- */
+  
+                               
+  
+  
+                                      
+                                                        
+                                                                     
+                                       
+   
 
 static int
 psem_cache_search(struct pseminfo **psemp, struct psemname *pnp,
@@ -229,26 +229,26 @@ psem_cache_search(struct pseminfo **psemp, struct psemname *pnp,
 		return PSEMCACHE_NOTFOUND;
 	}
 
-	/* We found a "positive" match, return the vnode */
+	                                                   
 	if (pcp->pseminfo) {
 		psemstats.goodhits++;
-		/* TOUCH(ncp); */
+		                 
 		*psemp = pcp->pseminfo;
 		*pcache = pcp;
 		return PSEMCACHE_FOUND;
 	}
 
-	/*
-	 * We found a "negative" match, ENOENT notifies client of this match.
-	 * The nc_vpid field records whether this is a whiteout.
-	 */
+	  
+                                                                      
+                                                         
+    
 	psemstats.neghits++;
 	return PSEMCACHE_NEGATIVE;
 }
 
-/*
- * Add an entry to the cache.
- */
+  
+                             
+   
 static int
 psem_cache_add(struct pseminfo *psemp, struct psemname *pnp, struct psemcache *pcp)
 {
@@ -263,7 +263,7 @@ psem_cache_add(struct pseminfo *psemp, struct psemname *pnp, struct psemcache *p
 #endif
 
 
-	/*  if the entry has already been added by some one else return */
+	                                                                  
 	if (psem_cache_search(&dpinfo, pnp, &dpcp) == PSEMCACHE_FOUND) {
 		return EEXIST;
 	}
@@ -271,12 +271,12 @@ psem_cache_add(struct pseminfo *psemp, struct psemname *pnp, struct psemcache *p
 		return ENOSPC;
 	}
 	psemnument++;
-	/*
-	 * Fill in cache info, if vp is NULL this is a "negative" cache entry.
-	 * For negative entries, we have to record whether it is a whiteout.
-	 * the whiteout flag is stored in the nc_vpid field which is
-	 * otherwise unused.
-	 */
+	  
+                                                                       
+                                                                     
+                                                             
+                     
+    
 	pcp->pseminfo = psemp;
 	pcp->psem_nlen = pnp->psem_namelen;
 	bcopy(pnp->psem_nameptr, pcp->psem_name, pcp->psem_nlen);
@@ -296,9 +296,9 @@ psem_cache_add(struct pseminfo *psemp, struct psemname *pnp, struct psemcache *p
 	return 0;
 }
 
-/*
- * Name cache initialization, from vfs_init() when we are booting
- */
+  
+                                                                 
+   
 void
 psem_cache_init(void)
 {
@@ -315,17 +315,17 @@ psem_cache_delete(struct psemcache *pcp)
 	if (pcp->psem_hash.le_next == pcp) {
 		panic("namecache purge le_next");
 	}
-#endif /* DIAGNOSTIC */
+#endif                 
 	LIST_REMOVE(pcp, psem_hash);
 	pcp->psem_hash.le_prev = NULL;
 	psemnument--;
 }
 
-/*
- * Remove all cached psem entries. Open semaphores (with a positive refcount)
- * will continue to exist, but their cache entries tying them to a particular
- * name/path will be removed making all future lookups on the name fail.
- */
+  
+                                                                             
+                                                                             
+                                                                        
+   
 int
 psem_cache_purge_all(__unused proc_t p)
 {
@@ -341,9 +341,9 @@ psem_cache_purge_all(__unused proc_t p)
 	for (pcpp = &psemhashtbl[psemhash]; pcpp >= psemhashtbl; pcpp--) {
 		LIST_FOREACH_SAFE(pcp, pcpp, psem_hash, tmppcp) {
 			assert(pcp->psem_nlen);
-			/*
-			 * unconditionally unlink the cache entry
-			 */
+			  
+                                            
+      
 			error = psem_unlink_internal(pcp->pseminfo, pcp);
 			if (error) {
 				goto out;
@@ -362,16 +362,16 @@ out:
 	return error;
 }
 
-/*
- *		In order to support unnamed POSIX semaphores, the named
- *		POSIX semaphores will have to move out of the per-process
- *		open filetable, and into a global table that is shared with
- *		unnamed POSIX semaphores, since unnamed POSIX semaphores
- *		are typically used by declaring instances in shared memory,
- *		and there's no other way to do this without changing the
- *		underlying type, which would introduce binary compatibility
- *		issues.
- */
+  
+                                                           
+                                                             
+                                                               
+                                                            
+                                                               
+                                                            
+                                                               
+           
+   
 int
 sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 {
@@ -392,7 +392,7 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 	int value = uap->value;
 	int incache = 0;
 	struct psemcache *pcp = PSEMCACHE_NULL;
-	kern_return_t kret = KERN_INVALID_ADDRESS;      /* default fail */
+	kern_return_t kret = KERN_INVALID_ADDRESS;                        
 
 	AUDIT_ARG(fflags, uap->oflag);
 	AUDIT_ARG(mode, (mode_t)uap->mode);
@@ -400,10 +400,10 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 
 	pinfo = PSEMINFO_NULL;
 
-	/*
-	 * Preallocate everything we might need up front to avoid taking
-	 * and dropping the lock, opening us up to race conditions.
-	 */
+	  
+                                                                 
+                                                            
+    
 	pnbuf = zalloc_flags(ZV_NAMEI, Z_WAITOK | Z_ZERO);
 
 	pathlen = MAXPATHLEN;
@@ -429,7 +429,7 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 		error = EINVAL;
 		goto bad;
 	}
-#endif /* PSXSEM_NAME_RESTRICT */
+#endif                           
 
 	plen = pathlen;
 	nameptr = pnbuf;
@@ -441,20 +441,20 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 		nd.psem_hash += (unsigned char)*cp * i;
 	}
 
-	/*
-	 * attempt to allocate a new fp; if unsuccessful, the fp will be
-	 * left unmodified (NULL).
-	 */
+	  
+                                                                 
+                           
+    
 	error = falloc(p, &fp, &indx, vfs_context_current());
 	if (error) {
 		goto bad;
 	}
 
-	/*
-	 * We allocate a new entry if we are less than the maximum
-	 * allowed and the one at the front of the LRU list is in use.
-	 * Otherwise we use the one at the front of the LRU list.
-	 */
+	  
+                                                           
+                                                               
+                                                          
+    
 	pcp = kheap_alloc(KM_SHM, sizeof(struct psemcache), Z_WAITOK | Z_ZERO);
 	if (pcp == PSEMCACHE_NULL) {
 		error = ENOMEM;
@@ -470,12 +470,12 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 	mac_posixsem_label_init(new_pinfo);
 #endif
 
-	/*
-	 * Provisionally create the semaphore in the new_pinfo; we have to do
-	 * this here to prevent locking later.  We use the value of kret to
-	 * signal success or failure, which is why we set its default value
-	 * to KERN_INVALID_ADDRESS, above.
-	 */
+	  
+                                                                      
+                                                                    
+                                                                    
+                                   
+    
 
 	fmode = (mode_t)FFLAGS(uap->oflag);
 
@@ -525,7 +525,7 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 	cmode &=  ALLPERMS;
 
 	if (((fmode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) && incache) {
-		/* sem exists and opened O_EXCL */
+		                                  
 #if notyet
 		if (pinfo->psem_flags & PSEM_INDELETE) {
 		}
@@ -536,12 +536,12 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 		goto bad_locked;
 	}
 	if (((fmode & (O_CREAT | O_EXCL)) == O_CREAT) && incache) {
-		/* As per POSIX, O_CREAT has no effect */
+		                                         
 		fmode &= ~O_CREAT;
 	}
 
 	if ((fmode & O_CREAT)) {
-		/* create a new one (commit the allocation) */
+		                                              
 		pinfo = new_pinfo;
 		pinfo->psem_flags = PSEM_DEFINED | PSEM_INCREATE;
 		pinfo->psem_usecount = 1;
@@ -563,7 +563,7 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 		mac_posixsem_label_associate(kauth_cred_get(), pinfo, nameptr);
 #endif
 	} else {
-		/* semaphore should exist as it is without  O_CREAT */
+		                                                      
 		if (!incache) {
 			error = ENOENT;
 			goto bad_locked;
@@ -586,7 +586,7 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 	}
 
 	if (!incache) {
-		/* if successful, this will consume the pcp */
+		                                              
 		if ((error = psem_cache_add(pinfo, &nd, pcp))) {
 			goto bad_locked;
 		}
@@ -596,15 +596,15 @@ sem_open(proc_t p, struct sem_open_args *uap, user_addr_t *retval)
 	new_pnode->pinfo = pinfo;
 	PSEM_SUBSYS_UNLOCK();
 
-	/*
-	 * if incache, we did not use the new pcp or the new pcp or the
-	 * new . and we must free them.
-	 */
+	  
+                                                                
+                                
+    
 	if (incache) {
 		kheap_free(KM_SHM, pcp, sizeof(struct psemcache));
 		pcp = PSEMCACHE_NULL;
 		if (new_pinfo != PSEMINFO_NULL) {
-			/* return value ignored - we can't _not_ do this */
+			                                                   
 			(void)semaphore_destroy(kernel_task, new_pinfo->psem_semobject);
 #if CONFIG_MACF
 			mac_posixsem_label_destroy(new_pinfo);
@@ -638,13 +638,13 @@ bad:
 	}
 
 	if (new_pinfo != PSEMINFO_NULL) {
-		/*
-		 * kret signals whether or not we successfully created a
-		 * Mach semaphore for this semaphore; if so, we need to
-		 * destroy it here.
-		 */
+		  
+                                                          
+                                                         
+                     
+     
 		if (kret == KERN_SUCCESS) {
-			/* return value ignored - we can't _not_ do this */
+			                                                   
 			(void)semaphore_destroy(kernel_task, new_pinfo->psem_semobject);
 		}
 #if CONFIG_MACF
@@ -659,16 +659,16 @@ bad:
 	return error;
 }
 
-/*
- * XXX This code is repeated in several places
- */
+  
+                                              
+   
 static int
 psem_access(struct pseminfo *pinfo, mode_t mode, kauth_cred_t cred)
 {
 	mode_t mode_req = ((mode & FREAD) ? S_IRUSR : 0) |
 	    ((mode & FWRITE) ? S_IWUSR : 0);
 
-	/* Otherwise, user id 0 always gets access. */
+	                                              
 	if (!suser(cred, NULL)) {
 		return 0;
 	}
@@ -753,7 +753,7 @@ sem_unlink(__unused proc_t p, struct sem_unlink_args *uap, __unused int32_t *ret
 		error = EINVAL;
 		goto bad;
 	}
-#endif /* PSXSEM_NAME_RESTRICT */
+#endif                           
 
 	nd.psem_nameptr = nameptr;
 	nd.psem_namelen = pathlen;
@@ -798,7 +798,7 @@ sem_close(proc_t p, struct sem_close_args *uap, __unused int32_t *retval)
 	int fd = CAST_DOWN_EXPLICIT(int, uap->sem);
 	struct fileproc *fp;
 
-	AUDIT_ARG(fd, fd); /* XXX This seems wrong; uap->sem is a pointer */
+	AUDIT_ARG(fd, fd);                                                  
 
 	proc_fdlock(p);
 	if ((fp = fp_get_noref_locked(p, fd)) == NULL) {
@@ -1019,18 +1019,18 @@ psem_close(struct psemnode *pnode)
 	if (!pinfo->psem_usecount) {
 		kprintf("negative usecount in psem_close\n");
 	}
-#endif /* DIAGNOSTIC */
+#endif                 
 	pinfo->psem_usecount--;
 
 	if ((pinfo->psem_flags & PSEM_REMOVED) && !pinfo->psem_usecount) {
 		PSEM_SUBSYS_UNLOCK();
-		/* lock dropped as only semaphore is destroyed here */
+		                                                      
 		error = psem_delete(pinfo);
 		kheap_free(KM_SHM, pinfo, sizeof(struct pseminfo));
 	} else {
 		PSEM_SUBSYS_UNLOCK();
 	}
-	/* subsystem lock is dropped when we get here */
+	                                                
 	kheap_free(KM_SHM, pnode, sizeof(struct psemnode));
 	return error;
 }
@@ -1038,10 +1038,10 @@ psem_close(struct psemnode *pnode)
 static int
 psem_closefile(struct fileglob *fg, __unused vfs_context_t ctx)
 {
-	/*
-	 * Not locked as psem_close is called only from here and is locked
-	 * properly
-	 */
+	  
+                                                                   
+            
+    
 	return psem_close((struct psemnode *)fg->fg_data);
 }
 

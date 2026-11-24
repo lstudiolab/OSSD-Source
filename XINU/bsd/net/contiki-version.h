@@ -63,6 +63,6 @@
 
 #ifndef CONTIKI_VERSION_STRING
 #define CONTIKI_VERSION_STRING "Contiki 3.x"
-#endif /* CONTIKI_VERSION_STRING */
+#endif                             
 
-#endif /* __CONTIKI_VERSION__ */
+#endif                          

@@ -40,15 +40,15 @@ __BEGIN_DECLS
 
 #if MONOTONIC && !CPMU_AIC_PMI
 #define MONOTONIC_FIQ 1
-#endif /* MONOTONIC && !CPMU_AIC_PMI */
+#endif                                 
 
 #include <stdint.h>
 
 #if HAS_UNCORE_CTRS
 #define MT_NDEVS 2
-#else /* HAS_UNCORE_CTRS */
+#else                      
 #define MT_NDEVS 1
-#endif /* !HAS_UNCORE_CTRS */
+#endif                       
 
 #define MT_CORE_CYCLES 0
 #define MT_CORE_INSTRS 1
@@ -57,7 +57,7 @@ __BEGIN_DECLS
 
 __END_DECLS
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
 #if MACH_KERNEL_PRIVATE
 
@@ -65,7 +65,7 @@ __END_DECLS
 
 __BEGIN_DECLS
 
-/* set by hardware if a PMI was delivered */
+                                            
 #define PMCR0_PMAI (UINT64_C(1) << 11)
 #define PMCR0_PMI(REG) ((REG) & PMCR0_PMAI)
 
@@ -73,7 +73,7 @@ __BEGIN_DECLS
 
 #define UPMSR_PMI(REG) ((REG) & 0x1)
 
-#endif /* HAS_UNCORE_CTRS */
+#endif                      
 
 static inline bool
 mt_pmi_pending(uint64_t * restrict pmcr0_out,
@@ -82,9 +82,9 @@ mt_pmi_pending(uint64_t * restrict pmcr0_out,
 	uint64_t pmcr0 = __builtin_arm_rsr64("PMCR0_EL1");
 	bool pmi = PMCR0_PMI(pmcr0);
 	if (pmi) {
-		/*
-		 * Acknowledge the PMI by clearing the pmai bit.
-		 */
+		  
+                                                  
+     
 		__builtin_arm_wsr64("PMCR0_EL1", pmcr0 & ~PMCR0_PMAI);
 	}
 	*pmcr0_out = pmcr0;
@@ -98,9 +98,9 @@ mt_pmi_pending(uint64_t * restrict pmcr0_out,
 		}
 		*upmsr_out = upmsr;
 	}
-#else /* HAS_UNCORE_CTRS */
+#else                      
 #pragma unused(upmsr_out)
-#endif /* !HAS_UNCORE_CTRS */
+#endif                       
 
 	return pmi;
 }
@@ -109,12 +109,12 @@ void mt_fiq(void *cpu, uint64_t pmcr0, uint64_t upmsr);
 
 #if CPMU_AIC_PMI
 void mt_cpmu_aic_pmi(void *source);
-#endif /* CPMU_AIC_PMI */
+#endif                   
 
 __END_DECLS
 
-#endif /* MACH_KERNEL_PRIVATE */
+#endif                          
 
-#endif /* MONOTONIC */
+#endif                
 
-#endif /* !defined(ARM64_MONOTONIC_H) */
+#endif                                  

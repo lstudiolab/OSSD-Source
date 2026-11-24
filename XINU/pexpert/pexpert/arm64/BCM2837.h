@@ -61,7 +61,7 @@
 #define BCM2837_GET32(addr) *((volatile uint32_t *) addr)
 
 #define PLATFORM_PANIC_LOG_PADDR        0x3c0fc000
-#define PLATFORM_PANIC_LOG_SIZE         16384        // 16kb
-#endif /* ! ASSEMBLER */
+#define PLATFORM_PANIC_LOG_SIZE         16384               
+#endif                  
 
-#endif /* ! _PEXPERT_ARM_BCM2837_H */
+#endif                               

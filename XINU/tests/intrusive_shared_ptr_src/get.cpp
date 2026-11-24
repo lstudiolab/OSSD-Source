@@ -1,7 +1,7 @@
-//
-// Tests for
-//  pointer get() const noexcept;
-//
+  
+            
+                                 
+  
 
 #include <libkern/c++/intrusive_shared_ptr.h>
 #include "test_policy.h"
@@ -36,7 +36,7 @@ tests()
 		tracked_shared_ptr<T> const ptr(&obj, libkern::retain);
 		T* raw = ptr.get();
 		CHECK(raw == &obj);
-		CHECK(ptr.get() == raw); // ptr didn't change
+		CHECK(ptr.get() == raw);                     
 		CHECK(tracking_policy::retains == 1);
 		CHECK(tracking_policy::releases == 0);
 	}

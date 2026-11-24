@@ -25,11 +25,11 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-/*
- * History :
- *	29-Sep-1997  Umesh Vaishampayan
- *		Created.
- */
+  
+            
+                                  
+            
+   
 #ifndef _BSD_MACHINE_PROFILE_H_
 #define _BSD_MACHINE_PROFILE_H_
 
@@ -41,4 +41,4 @@
 #error architecture not supported
 #endif
 
-#endif /* _BSD_MACHINE_PROFILE_H_ */
+#endif                              

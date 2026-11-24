@@ -1,8 +1,8 @@
-//
-// Tests for
-//  T* data();
-//  T const* data() const;
-//
+  
+            
+              
+                          
+  
 
 #include <libkern/c++/bounded_array.h>
 #include "test_policy.h"

@@ -54,20 +54,20 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 #ifdef  KERNEL_PRIVATE
 
 #ifndef _I386_MP_H_
 #define _I386_MP_H_
 
-//#define	MP_DEBUG 1
+                    
 
 #include <i386/apic.h>
 #include <i386/mp_events.h>
 #include <machine/limits.h>
 
-#define MAX_CPUS        64              /* 8 * sizeof(cpumask_t) */
+#define MAX_CPUS        64                                         
 
 #ifndef ASSEMBLER
 #include <stdint.h>
@@ -90,10 +90,10 @@ extern void smp_init(void);
 extern void cpu_interrupt(int cpu);
 __END_DECLS
 
-extern  unsigned int    real_ncpus;             /* real number of cpus */
-extern  unsigned int    max_ncpus;              /* max number of cpus */
-extern  unsigned int    max_cpus_from_firmware; /* actual max cpus, from firmware (ACPI) */
-decl_simple_lock_data(extern, kdb_lock); /* kdb lock		*/
+extern  unsigned int    real_ncpus;                                      
+extern  unsigned int    max_ncpus;                                      
+extern  unsigned int    max_cpus_from_firmware;                                            
+decl_simple_lock_data(extern, kdb_lock);                
 
 __BEGIN_DECLS
 
@@ -101,7 +101,7 @@ extern  void    console_init(void);
 extern  void    *console_cpu_alloc(boolean_t boot_cpu);
 extern  void    console_cpu_free(void *console_buf);
 
-extern  int     kdb_cpu;                /* current cpu running kdb	*/
+extern  int     kdb_cpu;                                             
 extern  int     kdb_debug;
 extern  int     kdb_active[];
 
@@ -122,9 +122,9 @@ extern  boolean_t mp_kdp_all_cpus_halted(void);
 extern  boolean_t       mp_recent_debugger_activity(void);
 extern  void    kernel_spin(uint64_t spin_ns);
 
-/*
- * All cpu rendezvous:
- */
+  
+                      
+   
 extern void mp_rendezvous(
 	void (*setup_func)(void *),
 	void (*action_func)(void *),
@@ -137,11 +137,11 @@ extern void mp_rendezvous_break_lock(void);
 extern void mp_rendezvous_lock(void);
 extern void mp_rendezvous_unlock(void);
 
-/*
- * All cpu broadcast.
- * Called from thread context, this blocks until all active cpus have
- * run action_func:
- */
+  
+                     
+                                                                     
+                   
+   
 extern void mp_broadcast(
 	void (*action_func)(void *),
 	void *arg);
@@ -168,21 +168,21 @@ cpu_to_cpumask(cpu_t cpu)
 #define CPUMASK_SELF    cpu_to_cpumask(cpu_number())
 #define CPUMASK_OTHERS  (CPUMASK_ALL & ~CPUMASK_SELF)
 
-/* Initialation routing called at processor registration */
+                                                           
 extern void mp_cpus_call_cpu_init(int cpu);
 
-/*
- * Invoke a function (possibly NULL) on a set of cpus specified by a mask.
- * The mask may include the local cpu.
- * If the mode is:
- *	- ASYNC:  other cpus make their calls in parallel
- *      - SYNC:   the calls are performed serially in logical cpu order
- *      - NOSYNC: the calls are queued
- * Unless the mode is NOSYNC, mp_cpus_call() returns when the function has been
- * called on all specified cpus.
- * The return value is the number of cpus where the call was made or queued.
- * The action function is called with interrupts disabled.
- */
+  
+                                                                          
+                                      
+                  
+                                                    
+                                                                       
+                                      
+                                                                               
+                                
+                                                                            
+                                                          
+   
 extern cpu_t mp_cpus_call(
 	cpumask_t       cpus,
 	mp_sync_t       mode,
@@ -205,13 +205,13 @@ typedef enum {
 } NMI_reason_t;
 extern void NMIPI_panic(cpumask_t cpus, NMI_reason_t reason);
 
-/* Interrupt a set of cpus, forcing an exit out of non-root mode */
+                                                                   
 extern void mp_cpus_kick(cpumask_t cpus);
-/*
- * Power-management-specific SPI to:
- *  - register a callout function, and
- *  - request the callout (if registered) on a given cpu.
- */
+  
+                                    
+                                      
+                                                         
+   
 extern void PM_interrupt_register(void (*fn)(void));
 extern void cpu_PM_interrupt(int cpu);
 
@@ -270,12 +270,12 @@ extern cpu_signal_event_log_t   *cpu_handle[];
 	        panic("DBGLOG_CPU_INIT cpu_handle allocation failed\n");\
 	bzero(*hdl_logpp, sizeof(cpu_signal_event_log_t));              \
 }
-#else   /* MP_DEBUG */
+#else                 
 #define DBGLOG(log, _cpu, _event)
 #define DBGLOG_CPU_INIT(cpu)
-#endif  /* MP_DEBUG */
+#endif                
 
-#endif  /* ASSEMBLER */
+#endif                 
 
 #ifdef ASSEMBLER
 #define i_bit(bit, word)        ((long)(*(word)) & (1L << (bit)))
@@ -290,6 +290,6 @@ i_bit_impl(long word, long bit)
 #endif
 
 
-#endif /* _I386_MP_H_ */
+#endif                  
 
-#endif /* KERNEL_PRIVATE */
+#endif                     

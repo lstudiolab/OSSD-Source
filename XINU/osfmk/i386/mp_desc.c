@@ -54,8 +54,8 @@
  * the rights to redistribute these changes.
  */
 
-/*
- */
+  
+   
 
 #include <kern/cpu_number.h>
 #include <kern/cpu_data.h>
@@ -82,13 +82,13 @@
 
 #if MONOTONIC
 #include <kern/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 #include <san/kasan.h>
 
 #define K_INTR_GATE (ACC_P|ACC_PL_K|ACC_INTR_GATE)
 #define U_INTR_GATE (ACC_P|ACC_PL_U|ACC_INTR_GATE)
 
-// Declare macros that will declare the externs
+                                               
 #define TRAP(n, name)           extern void *name ;
 #define TRAP_ERR(n, name)       extern void *name ;
 #define TRAP_SPC(n, name)       extern void *name ;
@@ -98,10 +98,10 @@
 #define USER_TRAP(n, name)      extern void *name ;
 #define USER_TRAP_SPC(n, name)  extern void *name ;
 
-// Include the table to declare the externs
+                                           
 #include "../x86_64/idt_table.h"
 
-// Undef the macros, then redefine them so we can declare the table
+                                                                   
 #undef TRAP
 #undef TRAP_ERR
 #undef TRAP_SPC
@@ -161,22 +161,22 @@
 
 #define USER_TRAP_SPC USER_TRAP
 
-// Declare the table using the macros we just set up
+                                                    
 struct fake_descriptor64 master_idt64[IDTSZ]
 __attribute__ ((section("__HIB,__desc")))
 __attribute__ ((aligned(PAGE_SIZE))) = {
 #include "../x86_64/idt_table.h"
 };
 
-/*
- * First cpu`s interrupt stack.
- */
-extern uint32_t         low_intstack[];         /* bottom */
-extern uint32_t         low_eintstack[];        /* top */
+  
+                               
+   
+extern uint32_t         low_intstack[];                     
+extern uint32_t         low_eintstack[];                 
 
-/*
- * Per-cpu data area pointers.
- */
+  
+                              
+   
 cpu_data_t cpshadows[MAX_CPUS] __attribute__((aligned(64))) __attribute__((section("__HIB, __desc")));
 cpu_data_t scdatas[MAX_CPUS] __attribute__((aligned(64))) = {
 	[0].cpu_this = &scdatas[0],
@@ -190,7 +190,7 @@ cpu_data_t      *cpu_data_ptr[MAX_CPUS] = {[0] = &scdatas[0] };
 
 SECURITY_READ_ONLY_LATE(struct percpu_base) percpu_base;
 
-decl_simple_lock_data(, ncpus_lock);     /* protects real_ncpus */
+decl_simple_lock_data(, ncpus_lock);                              
 unsigned int    real_ncpus = 1;
 unsigned int    max_ncpus = MAX_CPUS;
 unsigned int    max_cpus_from_firmware = 0;
@@ -207,25 +207,25 @@ cpu_fault_stack_t scfstks[MAX_CPUS] __attribute__((aligned(64))) __attribute__((
 
 cldt_t *dyn_ldts;
 
-/*
- * Multiprocessor i386/i486 systems use a separate copy of the
- * GDT, IDT, LDT, and kernel TSS per processor.  The first three
- * are separate to avoid lock contention: the i386 uses locked
- * memory cycles to access the descriptor tables.  The TSS is
- * separate since each processor needs its own kernel stack,
- * and since using a TSS marks it busy.
- */
+  
+                                                              
+                                                                
+                                                              
+                                                             
+                                                            
+                                       
+   
 
-/*
- * Allocate and initialize the per-processor descriptor tables.
- */
+  
+                                                               
+   
 
-/*
- * This is the expanded, 64-bit variant of the kernel LDT descriptor.
- * When switching to 64-bit mode this replaces KERNEL_LDT entry
- * and the following empty slot. This enables the LDT to be referenced
- * in the uber-space remapping window on the kernel.
- */
+  
+                                                                     
+                                                               
+                                                                      
+                                                    
+   
 struct fake_descriptor64 kernel_ldt_desc64 = {
 	.offset64 = 0,
 	.lim_or_seg = LDTSZ_MIN * sizeof(struct fake_descriptor) - 1,
@@ -234,10 +234,10 @@ struct fake_descriptor64 kernel_ldt_desc64 = {
 	.reserved = 0
 };
 
-/*
- * This is the expanded, 64-bit variant of the kernel TSS descriptor.
- * It is follows pattern of the KERNEL_LDT.
- */
+  
+                                                                     
+                                           
+   
 struct fake_descriptor64 kernel_tss_desc64 = {
 	.offset64 = 0,
 	.lim_or_seg = sizeof(struct x86_64_tss) - 1,
@@ -246,43 +246,43 @@ struct fake_descriptor64 kernel_tss_desc64 = {
 	.reserved = 0
 };
 
-/*
- * Convert a descriptor from fake to real format.
- *
- * Fake descriptor format:
- *	bytes 0..3		base 31..0
- *	bytes 4..5		limit 15..0
- *	byte  6			access byte 2 | limit 19..16
- *	byte  7			access byte 1
- *
- * Real descriptor format:
- *	bytes 0..1		limit 15..0
- *	bytes 2..3		base 15..0
- *	byte  4			base 23..16
- *	byte  5			access byte 1
- *	byte  6			access byte 2 | limit 19..16
- *	byte  7			base 31..24
- *
- * Fake gate format:
- *	bytes 0..3		offset
- *	bytes 4..5		selector
- *	byte  6			word count << 4 (to match fake descriptor)
- *	byte  7			access byte 1
- *
- * Real gate format:
- *	bytes 0..1		offset 15..0
- *	bytes 2..3		selector
- *	byte  4			word count
- *	byte  5			access byte 1
- *	bytes 6..7		offset 31..16
- */
+  
+                                                 
+  
+                          
+                         
+                          
+                                         
+                          
+  
+                          
+                          
+                         
+                        
+                          
+                                         
+                        
+  
+                    
+                     
+                       
+                                                       
+                          
+  
+                    
+                           
+                       
+                       
+                          
+                            
+   
 void
 fix_desc(void *d, int num_desc)
 {
 	uint8_t *desc = (uint8_t*) d;
 
 	do {
-		if ((desc[7] & 0x14) == 0x04) { /* gate */
+		if ((desc[7] & 0x14) == 0x04) {           
 			uint32_t offset;
 			uint16_t selector;
 			uint8_t wordcount;
@@ -298,7 +298,7 @@ fix_desc(void *d, int num_desc)
 			desc[4] = wordcount;
 			desc[5] = acc;
 			*((uint16_t*)(desc + 6)) = offset >> 16;
-		} else { /* descriptor */
+		} else {                 
 			uint32_t base;
 			uint16_t limit;
 			uint8_t acc1, acc2;
@@ -332,9 +332,9 @@ fix_desc64(void *descp, int count)
 	fakep = (struct fake_descriptor64 *) descp;
 
 	for (i = 0; i < count; i++, fakep++) {
-		/*
-		 * Construct the real decriptor locally.
-		 */
+		  
+                                          
+     
 
 		bzero((void *) &real, sizeof(real));
 
@@ -351,7 +351,7 @@ fix_desc64(void *descp, int count)
 			real.gate.offset_high16 = (uint16_t)((fakep->offset64 >> 16) & 0xFFFF);
 			real.gate.offset_top32 = (uint32_t)(fakep->offset64 >> 32);
 			break;
-		default:        /* Otherwise */
+		default:                       
 			real.desc.limit_low16 = fakep->lim_or_seg & 0xFFFF;
 			real.desc.base_low16 = (uint16_t)(fakep->offset64 & 0xFFFF);
 			real.desc.base_med8 = (uint8_t)((fakep->offset64 >> 16) & 0xFF);
@@ -362,9 +362,9 @@ fix_desc64(void *descp, int count)
 			real.desc.base_top32 = (uint32_t)(fakep->offset64 >> 32);
 		}
 
-		/*
-		 * Now copy back over the fake structure.
-		 */
+		  
+                                           
+     
 		bcopy((void *) &real, (void *) fakep, sizeof(real));
 	}
 }
@@ -376,10 +376,10 @@ cpu_desc_init(cpu_data_t *cdp)
 	cpu_desc_index_t        *cdi = &cdp->cpu_desc_index;
 
 	if (cdp == cpu_data_master) {
-		/*
-		 * Populate the double-mapped 'u' and base 'b' fields in the
-		 * KTSS with I/G/LDT and sysenter stack data.
-		 */
+		  
+                                                              
+                                               
+     
 		cdi->cdi_ktssu = (void *)DBLMAP(&master_ktss64);
 		cdi->cdi_ktssb = (void *)&master_ktss64;
 		cdi->cdi_sstku = (vm_offset_t) DBLMAP(&master_sstk.top);
@@ -392,7 +392,7 @@ cpu_desc_init(cpu_data_t *cdp)
 		cdi->cdi_ldtu  = (struct real_descriptor *)DBLMAP((uintptr_t)&master_ldt[0]);
 		cdi->cdi_ldtb  = &master_ldt[0];
 
-		/* Replace the expanded LDTs and TSS slots in the GDT */
+		                                                        
 		kernel_ldt_desc64.offset64 = (uintptr_t) cdi->cdi_ldtu;
 		*(struct fake_descriptor64 *) &master_gdt[sel_idx(KERNEL_LDT)] =
 		    kernel_ldt_desc64;
@@ -402,18 +402,18 @@ cpu_desc_init(cpu_data_t *cdp)
 		*(struct fake_descriptor64 *) &master_gdt[sel_idx(KERNEL_TSS)] =
 		    kernel_tss_desc64;
 
-		/* Fix up the expanded descriptors for 64-bit. */
+		                                                 
 		fix_desc64((void *) &master_idt64, IDTSZ);
 		fix_desc64((void *) &master_gdt[sel_idx(KERNEL_LDT)], 1);
 		fix_desc64((void *) &master_gdt[sel_idx(USER_LDT)], 1);
 		fix_desc64((void *) &master_gdt[sel_idx(KERNEL_TSS)], 1);
 
-		/*
-		 * Set the NMI/fault stacks as IST2/IST1 in the 64-bit TSS
-		 */
+		  
+                                                            
+     
 		master_ktss64.ist2 = (uintptr_t) low_eintstack;
 		master_ktss64.ist1 = (uintptr_t) low_eintstack - sizeof(x86_64_intr_stack_frame_t);
-	} else if (cdi->cdi_ktssu == NULL) {    /* Skipping re-init on wake */
+	} else if (cdi->cdi_ktssu == NULL) {                                  
 		cpu_desc_table64_t      *cdt = (cpu_desc_table64_t *) cdp->cpu_desc_tablep;
 
 		cdi->cdi_idtu.ptr  = (void *)DBLMAP((uintptr_t) &master_idt64);
@@ -425,20 +425,20 @@ cpu_desc_init(cpu_data_t *cdp)
 		cdi->cdi_ldtu  = (void *)LDTALIAS(cdp->cpu_ldtp);
 		cdi->cdi_ldtb  = (void *)(cdp->cpu_ldtp);
 
-		/*
-		 * Copy the tables
-		 */
+		  
+                    
+     
 		bcopy((char *)master_gdt, (char *)cdt->gdt, sizeof(master_gdt));
 		bcopy((char *)master_ldt, (char *)cdp->cpu_ldtp, mldtsz);
 		bcopy((char *)&master_ktss64, (char *)&cdt->ktss, sizeof(struct x86_64_tss));
 		cdi->cdi_gdtu.ptr  = (void *)DBLMAP(cdt->gdt);
 		cdi->cdi_gdtb.ptr  = (void *)(cdt->gdt);
-		/*
-		 * Fix up the entries in the GDT to point to
-		 * this LDT and this TSS.
-		 * Note reuse of global 'kernel_ldt_desc64, which is not
-		 * concurrency-safe. Higher level synchronization is expected
-		 */
+		  
+                                              
+                           
+                                                          
+                                                               
+     
 		kernel_ldt_desc64.offset64 = (uintptr_t) cdi->cdi_ldtu;
 		*(struct fake_descriptor64 *) &cdt->gdt[sel_idx(KERNEL_LDT)] =
 		    kernel_ldt_desc64;
@@ -454,7 +454,7 @@ cpu_desc_init(cpu_data_t *cdp)
 		    kernel_tss_desc64;
 		fix_desc64(&cdt->gdt[sel_idx(KERNEL_TSS)], 1);
 
-		/* Set (zeroed) fault stack as IST1, NMI intr stack IST2 */
+		                                                           
 		uint8_t *cfstk = &scfstks[cdp->cpu_number].fstk[0];
 		cdt->fstkp = cfstk;
 		bzero((void *) cfstk, FSTK_SZ);
@@ -462,7 +462,7 @@ cpu_desc_init(cpu_data_t *cdp)
 		cdt->ktss.ist1 = cdt->ktss.ist2 - sizeof(x86_64_intr_stack_frame_t);
 	}
 
-	/* Require that the top of the sysenter stack is 16-byte aligned */
+	                                                                   
 	if ((cdi->cdi_sstku % 16) != 0) {
 		panic("cpu_desc_init() sysenter stack not 16-byte aligned");
 	}
@@ -474,20 +474,20 @@ cpu_desc_load(cpu_data_t *cdp)
 
 	postcode(CPU_DESC_LOAD_ENTRY);
 
-	/* Stuff the kernel per-cpu data area address into the MSRs */
+	                                                              
 	postcode(CPU_DESC_LOAD_GS_BASE);
 	wrmsr64(MSR_IA32_GS_BASE, (uintptr_t) cdp);
 	postcode(CPU_DESC_LOAD_KERNEL_GS_BASE);
 	wrmsr64(MSR_IA32_KERNEL_GS_BASE, (uintptr_t) cdp);
 
-	/*
-	 * Ensure the TSS segment's busy bit is clear. This is required
-	 * for the case of reloading descriptors at wake to avoid
-	 * their complete re-initialization.
-	 */
+	  
+                                                                
+                                                          
+                                     
+    
 	gdt_desc_p(KERNEL_TSS)->access &= ~ACC_TSS_BUSY;
 
-	/* Load the GDT, LDT, IDT and TSS */
+	                                    
 	cdi->cdi_gdtb.size = sizeof(struct real_descriptor) * GDTSZ - 1;
 	cdi->cdi_gdtu.size = cdi->cdi_gdtb.size;
 	cdi->cdi_idtb.size = 0x1000 + cdp->cpu_number;
@@ -505,9 +505,9 @@ cpu_desc_load(cpu_data_t *cdp)
 	postcode(CPU_DESC_LOAD_EXIT);
 }
 
-/*
- * Set MSRs for sysenter/sysexit and syscall/sysret for 64-bit.
- */
+  
+                                                               
+   
 void
 cpu_syscall_init(cpu_data_t *cdp)
 {
@@ -516,23 +516,23 @@ cpu_syscall_init(cpu_data_t *cdp)
 	wrmsr64(MSR_IA32_SYSENTER_CS, SYSENTER_CS);
 	wrmsr64(MSR_IA32_SYSENTER_EIP, DBLMAP((uintptr_t) hi64_sysenter));
 	wrmsr64(MSR_IA32_SYSENTER_ESP, current_cpu_datap()->cpu_desc_index.cdi_sstku);
-	/* Enable syscall/sysret */
+	                           
 	wrmsr64(MSR_IA32_EFER, rdmsr64(MSR_IA32_EFER) | MSR_IA32_EFER_SCE);
 
-	/*
-	 * MSRs for 64-bit syscall/sysret
-	 * Note USER_CS because sysret uses this + 16 when returning to
-	 * 64-bit code.
-	 */
+	  
+                                  
+                                                                
+                
+    
 	wrmsr64(MSR_IA32_LSTAR, DBLMAP((uintptr_t) hi64_syscall));
 	wrmsr64(MSR_IA32_STAR, (((uint64_t)USER_CS) << 48) | (((uint64_t)KERNEL64_CS) << 32));
-	/*
-	 * Emulate eflags cleared by sysenter but note that
-	 * we also clear the trace trap to avoid the complications
-	 * of single-stepping into a syscall. The nested task bit
-	 * is also cleared to avoid a spurious "task switch"
-	 * should we choose to return via an IRET.
-	 */
+	  
+                                                    
+                                                           
+                                                          
+                                                     
+                                           
+    
 	wrmsr64(MSR_IA32_FMASK, EFL_DF | EFL_IF | EFL_TF | EFL_NT);
 }
 extern vm_offset_t dyn_dblmap(vm_offset_t, vm_offset_t);
@@ -593,9 +593,9 @@ cpu_data_alloc(boolean_t is_boot_cpu)
 	}
 	simple_unlock(&ncpus_lock);
 
-	/*
-	 * Allocate per-cpu data:
-	 */
+	  
+                          
+    
 
 	cdp = &scdatas[cnum];
 	bzero((void*) cdp, sizeof(cpu_data_t));
@@ -605,9 +605,9 @@ cpu_data_alloc(boolean_t is_boot_cpu)
 	cdp->cpu_pcpu_base = percpu_base.start + (cnum - 1) * percpu_section_size();
 	cdp->cpu_processor = PERCPU_GET_WITH_BASE(cdp->cpu_pcpu_base, processor);
 
-	/*
-	 * Allocate interrupt stack:
-	 */
+	  
+                             
+    
 	ret = kmem_alloc(kernel_map,
 	    (vm_offset_t *) &cdp->cpu_int_stack_top,
 	    INTSTACK_SIZE, VM_KERN_MEMORY_CPU);
@@ -617,20 +617,20 @@ cpu_data_alloc(boolean_t is_boot_cpu)
 	bzero((void*) cdp->cpu_int_stack_top, INTSTACK_SIZE);
 	cdp->cpu_int_stack_top += INTSTACK_SIZE;
 
-	/*
-	 * Allocate descriptor table:
-	 */
+	  
+                              
+    
 
 	cdp->cpu_desc_tablep = (struct cpu_desc_table *) &scdtables[cnum];
-	/*
-	 * Allocate LDT
-	 */
+	  
+                
+    
 	if (do_ldt_alloc) {
 		boolean_t do_ldt_free = FALSE;
 		vm_offset_t sldtoffset = 0;
-		/*
-		 * Allocate LDT
-		 */
+		  
+                 
+     
 		vm_offset_t ldtalloc = 0, ldtallocsz = round_page_64(MAX_CPUS * sizeof(struct real_descriptor) * LDTSZ);
 		ret = kmem_alloc(kernel_map, (vm_offset_t *) &ldtalloc, ldtallocsz, VM_KERN_MEMORY_CPU);
 		if (ret != KERN_SUCCESS) {
@@ -648,10 +648,10 @@ cpu_data_alloc(boolean_t is_boot_cpu)
 		if (do_ldt_free) {
 			kmem_free(kernel_map, ldtalloc, ldtallocsz);
 		} else {
-			/* CPU registration and startup are expected to execute
-			 * serially, as invoked by the platform driver.
-			 * Create trampoline alias of LDT region.
-			 */
+			                                                       
+                                                  
+                                            
+      
 			sldtoffset = dyn_dblmap(ldtalloc, ldtallocsz);
 			ldt_alias_offset = sldtoffset;
 		}
@@ -659,18 +659,18 @@ cpu_data_alloc(boolean_t is_boot_cpu)
 	cdp->cpu_ldtp = &dyn_ldts[cnum].pcldts[0];
 
 #if CONFIG_MCA
-	/* Machine-check shadow register allocation. */
+	                                               
 	mca_cpu_alloc(cdp);
 #endif
 
-	/*
-	 * Before this cpu has been assigned a real thread context,
-	 * we give it a fake, unique, non-zero thread id which the locking
-	 * primitives use as their lock value.
-	 * Note that this does not apply to the boot processor, cpu 0, which
-	 * transitions to a thread context well before other processors are
-	 * started.
-	 */
+	  
+                                                            
+                                                                   
+                                       
+                                                                     
+                                                                    
+            
+    
 	cdp->cpu_active_thread = (thread_t) (uintptr_t) cdp->cpu_number;
 	cdp->cpu_NMI_acknowledged = TRUE;
 	cdp->cpu_nanotime = &pal_rtc_nanotime_info;
@@ -721,11 +721,11 @@ valid_user_code_selector(uint16_t selector)
 		if ((gdt_desc_p(selector)->access & ACC_PL_U) == ACC_PL_U) {
 			return TRUE;
 		}
-		/* Explicitly validate the system code selectors
-		 * even if not instantaneously privileged,
-		 * since they are dynamically re-privileged
-		 * at context switch
-		 */
+		                                                
+                                            
+                                             
+                      
+     
 		if ((selector == USER_CS) || (selector == USER64_CS)) {
 			return TRUE;
 		}
@@ -772,11 +772,11 @@ valid_user_segment_selectors(uint16_t cs,
 	       valid_user_data_selector(gs);
 }
 
-/*
- * Allocate a new interrupt stack for the boot processor from the
- * heap rather than continue to use the statically allocated space.
- * Also switch to a dynamically allocated cpu data area.
- */
+  
+                                                                 
+                                                                   
+                                                        
+   
 void
 cpu_data_realloc(void)
 {
@@ -794,7 +794,7 @@ cpu_data_realloc(void)
 
 	cdp = &scdatas[0];
 
-	/* Copy old contents into new area and make fix-ups */
+	                                                      
 	assert(cpu_number() == 0);
 	bcopy((void *) cpu_data_ptr[0], (void*) cdp, sizeof(cpu_data_t));
 	cdp->cpu_this = cdp;
@@ -807,9 +807,9 @@ cpu_data_realloc(void)
 	cdt->fstkp = cfstk;
 	cfstk += FSTK_SZ;
 
-	/*
-	 * With interrupts disabled commmit the new areas.
-	 */
+	  
+                                                   
+    
 	istate = ml_set_interrupts_enabled(FALSE);
 	cpu_data_ptr[0] = cdp;
 	master_ktss64.ist2 = DBLMAP((uintptr_t) cfstk);

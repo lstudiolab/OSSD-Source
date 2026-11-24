@@ -41,7 +41,7 @@
 #include <vm/vm_map.h>
 #include <vm/vm_kern.h>
 #include <vm/pmap.h>
-#include <vm/vm_protos.h> /* last */
+#include <vm/vm_protos.h>           
 #include <sys/resource.h>
 #include <sys/signal.h>
 #include <sys/errno.h>
@@ -50,16 +50,16 @@
 #if MONOTONIC
 #include <kern/monotonic.h>
 #include <machine/monotonic.h>
-#endif /* MONOTONIC */
+#endif                
 
 #include <machine/limits.h>
-#include <sys/codesign.h> /* CS_CDHASH_LEN */
+#include <sys/codesign.h>                    
 
 #undef thread_should_halt
 
-/* BSD KERN COMPONENT INTERFACE */
+                                  
 
-extern unsigned int not_in_kdp; /* Skip acquiring locks if we're in kdp */
+extern unsigned int not_in_kdp;                                           
 
 thread_t get_firstthread(task_t);
 int get_task_userstop(task_t);
@@ -85,9 +85,9 @@ extern int proc_getcdhash(void *p, char *cdhash);
 extern void psignal(void *, int);
 #endif
 
-/*
- *
- */
+  
+  
+   
 void  *
 get_bsdtask_info(task_t t)
 {
@@ -103,9 +103,9 @@ task_bsdtask_kill(task_t t)
 		psignal(bsd_info, SIGKILL);
 	}
 }
-/*
- *
- */
+  
+  
+   
 void *
 get_bsdthreadtask_info(thread_t th)
 {
@@ -117,29 +117,29 @@ get_bsdthreadtask_info(thread_t th)
 	return bsd_info;
 }
 
-/*
- *
- */
+  
+  
+   
 void
 set_bsdtask_info(task_t t, void * v)
 {
 	t->bsd_info = v;
 }
 
-/*
- *
- */
+  
+  
+   
 void *
 get_bsdthread_info(thread_t th)
 {
 	return th->uthread;
 }
 
-/*
- * This is used to remember any FS error from VNOP_PAGEIN code when
- * invoked under vm_fault(). The value is an errno style value. It can
- * be retrieved by exception handlers using thread_get_state().
- */
+  
+                                                                   
+                                                                      
+                                                               
+   
 void
 set_thread_pagein_error(thread_t th, int error)
 {
@@ -150,33 +150,33 @@ set_thread_pagein_error(thread_t th, int error)
 }
 
 #if defined(__x86_64__)
-/*
- * Returns non-zero if the thread has a non-NULL task
- * and that task has an LDT.
- */
+  
+                                                     
+                            
+   
 int
 thread_task_has_ldt(thread_t th)
 {
 	return th->task && th->task->i386_ldt != 0;
 }
-#endif /* __x86_64__ */
+#endif                 
 
-/*
- * XXX
- */
-int get_thread_lock_count(thread_t th);         /* forced forward */
+  
+      
+   
+int get_thread_lock_count(thread_t th);                             
 int
 get_thread_lock_count(thread_t th)
 {
 	return th->mutex_count;
 }
 
-/*
- * XXX: wait for BSD to  fix signal code
- * Until then, we cannot block here.  We know the task
- * can't go away, so we make sure it is still active after
- * retrieving the first thread for extra safety.
- */
+  
+                                        
+                                                      
+                                                          
+                                                
+   
 thread_t
 get_firstthread(task_t task)
 {
@@ -297,12 +297,12 @@ get_task_ledger(task_t t)
 	return t->ledger;
 }
 
-/*
- * This is only safe to call from a thread executing in
- * in the task's context or if the task is locked. Otherwise,
- * the map could be switched for the task (and freed) before
- * we go to return it here.
- */
+  
+                                                       
+                                                             
+                                                            
+                           
+   
 vm_map_t
 get_task_map(task_t t)
 {
@@ -329,9 +329,9 @@ get_task_map_reference(task_t t)
 	return m;
 }
 
-/*
- *
- */
+  
+  
+   
 ipc_space_t
 get_task_ipcspace(task_t t)
 {
@@ -344,7 +344,7 @@ get_task_numacts(task_t t)
 	return t->thread_count;
 }
 
-/* does this machine need  64bit register set for signal handler */
+                                                                   
 int
 is_64signalregset(void)
 {
@@ -355,10 +355,10 @@ is_64signalregset(void)
 	return 0;
 }
 
-/*
- * Swap in a new map for the task/thread pair; the old map reference is
- * returned. Also does a pmap switch if thread provided is current thread.
- */
+  
+                                                                       
+                                                                          
+   
 vm_map_t
 swap_task_map(task_t task, thread_t thread, vm_map_t map)
 {
@@ -385,22 +385,22 @@ swap_task_map(task_t task, thread_t thread, vm_map_t map)
 	return old_map;
 }
 
-/*
- *
- * This is only safe to call from a thread executing in
- * in the task's context or if the task is locked. Otherwise,
- * the map could be switched for the task (and freed) before
- * we go to return it here.
- */
+  
+  
+                                                       
+                                                             
+                                                            
+                           
+   
 pmap_t
 get_task_pmap(task_t t)
 {
 	return t->map->pmap;
 }
 
-/*
- *
- */
+  
+  
+   
 uint64_t
 get_task_resident_size(task_t task)
 {
@@ -428,10 +428,10 @@ get_task_resident_max(task_t task)
 	return (uint64_t)pmap_resident_max(map->pmap) * PAGE_SIZE_64;
 }
 
-/*
- * Get the balance for a given field in the task ledger.
- * Returns 0 if the entry is invalid.
- */
+  
+                                                        
+                                     
+   
 static uint64_t
 get_task_ledger_balance(task_t task, int entry)
 {
@@ -465,9 +465,9 @@ get_task_purgeable_size(task_t task)
 	return volatile_size;
 }
 
-/*
- *
- */
+  
+  
+   
 uint64_t
 get_task_phys_footprint(task_t task)
 {
@@ -475,9 +475,9 @@ get_task_phys_footprint(task_t task)
 }
 
 #if CONFIG_LEDGER_INTERVAL_MAX
-/*
- *
- */
+  
+  
+   
 uint64_t
 get_task_phys_footprint_interval_max(task_t task, int reset)
 {
@@ -492,11 +492,11 @@ get_task_phys_footprint_interval_max(task_t task, int reset)
 
 	return 0;
 }
-#endif /* CONFIG_LEDGER_INTERVAL_MAX */
+#endif                                 
 
-/*
- *
- */
+  
+  
+   
 uint64_t
 get_task_phys_footprint_lifetime_max(task_t task)
 {
@@ -512,9 +512,9 @@ get_task_phys_footprint_lifetime_max(task_t task)
 	return 0;
 }
 
-/*
- *
- */
+  
+  
+   
 uint64_t
 get_task_phys_footprint_limit(task_t task)
 {
@@ -577,7 +577,7 @@ get_task_frozen_to_swap(task_t task)
 {
 	return get_task_ledger_balance(task, task_ledgers.frozen_to_swap);
 }
-#endif /* CONFIG_FREEZE */
+#endif                    
 
 uint64_t
 get_task_iokit_mapped(task_t task)
@@ -734,18 +734,18 @@ set_task_loadTag(task_t task, uint32_t loadTag)
 	return os_atomic_xchg(&task->loadTag, loadTag, relaxed);
 }
 
-/*
- *
- */
+  
+  
+   
 task_t
 get_threadtask(thread_t th)
 {
 	return th->task;
 }
 
-/*
- *
- */
+  
+  
+   
 vm_map_offset_t
 get_map_min(
 	vm_map_t        map)
@@ -753,9 +753,9 @@ get_map_min(
 	return vm_map_min(map);
 }
 
-/*
- *
- */
+  
+  
+   
 vm_map_offset_t
 get_map_max(
 	vm_map_t        map)
@@ -843,14 +843,14 @@ get_vmmap_entries(
 	}
 	return total_entries;
 }
-#endif /* CONFIG_COREDUMP */
+#endif                      
 
-/*
- *
- */
-/*
- *
- */
+  
+  
+   
+  
+  
+   
 int
 get_task_userstop(
 	task_t task)
@@ -858,9 +858,9 @@ get_task_userstop(
 	return task->user_stop_count;
 }
 
-/*
- *
- */
+  
+  
+   
 int
 get_thread_userstop(
 	thread_t th)
@@ -868,9 +868,9 @@ get_thread_userstop(
 	return th->user_stop_count;
 }
 
-/*
- *
- */
+  
+  
+   
 boolean_t
 get_task_pidsuspended(
 	task_t task)
@@ -878,9 +878,9 @@ get_task_pidsuspended(
 	return task->pidsuspended;
 }
 
-/*
- *
- */
+  
+  
+   
 boolean_t
 get_task_frozen(
 	task_t task)
@@ -888,9 +888,9 @@ get_task_frozen(
 	return task->frozen;
 }
 
-/*
- *
- */
+  
+  
+   
 boolean_t
 thread_should_abort(
 	thread_t th)
@@ -898,14 +898,14 @@ thread_should_abort(
 	return (th->sched_flags & TH_SFLAG_ABORTED_MASK) == TH_SFLAG_ABORT;
 }
 
-/*
- * This routine is like thread_should_abort() above.  It checks to
- * see if the current thread is aborted.  But unlike above, it also
- * checks to see if thread is safely aborted.  If so, it returns
- * that fact, and clears the condition (safe aborts only should
- * have a single effect, and a poll of the abort status
- * qualifies.
- */
+  
+                                                                  
+                                                                   
+                                                                
+                                                               
+                                                       
+             
+   
 boolean_t
 current_thread_aborted(
 	void)
@@ -929,9 +929,9 @@ current_thread_aborted(
 	return FALSE;
 }
 
-/*
- *
- */
+  
+  
+   
 void
 task_act_iterate_wth_args(
 	task_t                  task,
@@ -1005,7 +1005,7 @@ fill_taskprocinfo(task_t task, struct proc_taskinfo_internal * ptinfo)
 			tinfo.threads_system += tval;
 			tinfo.total_system += tval;
 		} else {
-			/* system_timer may represent either sys or user */
+			                                                   
 			tinfo.threads_user += tval;
 			tinfo.total_user += tval;
 		}
@@ -1120,10 +1120,10 @@ get_numthreads(task_t task)
 	return task->thread_count;
 }
 
-/*
- * Gather the various pieces of info about the designated task,
- * and collect it all into a single rusage_info.
- */
+  
+                                                               
+                                                
+   
 int
 fill_task_rusage(task_t task, rusage_info_current *ri)
 {
@@ -1169,7 +1169,7 @@ fill_task_io_rusage(task_t task, rusage_info_current *ri)
 		ri->ri_diskio_bytesread = task->task_io_stats->disk_reads.size;
 		ri->ri_diskio_byteswritten = (task->task_io_stats->total_io.size - task->task_io_stats->disk_reads.size);
 	} else {
-		/* I/O Stats unavailable */
+		                           
 		ri->ri_diskio_bytesread = 0;
 		ri->ri_diskio_byteswritten = 0;
 	}
@@ -1185,7 +1185,7 @@ fill_task_qos_rusage(task_t task, rusage_info_current *ri)
 	assert(task != TASK_NULL);
 	task_lock(task);
 
-	/* Rollup QoS time of all the threads to task */
+	                                                
 	queue_iterate(&task->threads, thread, thread_t, task_threads) {
 		if (thread->options & TH_OPT_IDLE_THREAD) {
 			continue;
@@ -1219,11 +1219,11 @@ fill_task_monotonic_rusage(task_t task, rusage_info_current *ri)
 	mt_fixed_task_counts(task, counts);
 #ifdef MT_CORE_INSTRS
 	ri->ri_instructions = counts[MT_CORE_INSTRS];
-#endif /* defined(MT_CORE_INSTRS) */
+#endif                              
 	ri->ri_cycles = counts[MT_CORE_CYCLES];
-#else /* MONOTONIC */
+#else                
 #pragma unused(task, ri)
-#endif /* !MONOTONIC */
+#endif                 
 }
 
 uint64_t

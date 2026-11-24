@@ -38,4 +38,4 @@ errno_t sixxlowpan_uncompress(struct frame802154 *, u_int8_t *);
 errno_t sixxlowpan_output(struct frame802154 *, u_int8_t *);
 errno_t sixxlowpan_input(struct frame802154 *, u_int8_t *);
 
-#endif /* sixxlowpan_h */
+#endif                   

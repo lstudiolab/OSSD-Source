@@ -40,7 +40,7 @@
 #define __has_extension(x) 0
 #endif
 
-#undef OS_INLINE // <sys/_types/_os_inline.h>
+#undef OS_INLINE                             
 #if __GNUC__
 #define OS_NORETURN __attribute__((__noreturn__))
 #define OS_NOTHROW __attribute__((__nothrow__))
@@ -157,20 +157,20 @@
 #else
 #define __OS_ENUM_ATTR
 #define __OS_ENUM_ATTR_CLOSED
-#endif // __has_attribute(enum_extensibility)
+#endif                                       
 
 #if __has_attribute(flag_enum)
-/*!
- * Compile with -Wflag-enum and -Wassign-enum to enforce at definition and
- * assignment, respectively, i.e. -Wflag-enum prevents you from creating new
- * enumeration values from illegal values within the enum definition, and
- * -Wassign-enum prevents you from assigning illegal values to a variable of the
- * enum type.
- */
+   
+                                                                          
+                                                                            
+                                                                         
+                                                                                
+             
+   
 #define __OS_OPTIONS_ATTR __attribute__((flag_enum))
 #else
 #define __OS_OPTIONS_ATTR
-#endif // __has_attribute(flag_enum)
+#endif                              
 
 #if __has_feature(objc_fixed_enum) || __has_extension(cxx_fixed_enum) || \
         __has_extension(cxx_strong_enums)
@@ -183,36 +183,36 @@
 #define OS_CLOSED_OPTIONS(_name, _type, ...) \
 	typedef enum : _type { __VA_ARGS__ } __OS_ENUM_ATTR_CLOSED __OS_OPTIONS_ATTR _name##_t
 #else
-/*!
- * There is unfortunately no good way in plain C to have both fixed-type enums
- * and enforcement for clang's enum_extensibility extensions. The primary goal
- * of these macros is to allow you to define an enum and specify its width in a
- * single statement, and for plain C that is accomplished by defining an
- * anonymous enum and then separately typedef'ing the requested type name to the
- * requested underlying integer type. So the type emitted actually has no
- * relationship at all to the enum, and therefore while the compiler could
- * enforce enum extensibility if you used the enum type, it cannot do so if you
- * use the "_t" type resulting from this expression.
- *
- * But we still define a named enum type and decorate it appropriately for you,
- * so if you really want the enum extensibility enforcement, you can use the
- * enum type yourself, i.e. when compiling with a C compiler:
- *
- *     OS_CLOSED_ENUM(my_type, uint64_t,
- *         FOO,
- *         BAR,
- *         BAZ,
- *     );
- *
- *     my_type_t mt = 98; // legal
- *     enum my_type emt = 98; // illegal
- *
- * But be aware that the underlying enum type's width is subject only to the C
- * language's guarantees -- namely that it will be compatible with int, char,
- * and unsigned char. It is not safe to rely on the size of this type.
- *
- * When compiling in ObjC or C++, both of the above assignments are illegal.
- */
+   
+                                                                              
+                                                                              
+                                                                               
+                                                                        
+                                                                                
+                                                                         
+                                                                          
+                                                                               
+                                                    
+  
+                                                                               
+                                                                            
+                                                             
+  
+                                        
+               
+               
+               
+         
+  
+                                  
+                                        
+  
+                                                                              
+                                                                             
+                                                                      
+  
+                                                                            
+   
 #define __OS_ENUM_C_FALLBACK(_name, _type, ...) \
 	typedef _type _name##_t; enum _name { __VA_ARGS__ }
 
@@ -227,10 +227,10 @@
 #define OS_CLOSED_OPTIONS(_name, _type, ...) \
 	__OS_ENUM_C_FALLBACK(_name, _type, ## __VA_ARGS__) \
 	__OS_ENUM_ATTR_CLOSED __OS_OPTIONS_ATTR
-#endif // __has_feature(objc_fixed_enum) || __has_extension(cxx_strong_enums)
+#endif                                                                       
 
 #if __has_feature(attribute_availability_swift)
-// equivalent to __SWIFT_UNAVAILABLE from Availability.h
+                                                        
 #define OS_SWIFT_UNAVAILABLE(_msg) \
 	__attribute__((__availability__(swift, unavailable, message=_msg)))
 #else
@@ -271,12 +271,12 @@
 #endif
 
 #if KERNEL
-/*
- * LIBKERN_ALWAYS_DESTROY attribute can be applied to global variables with
- * destructors. It specifies that and object should have its exit-time
- * destructor run. This attribute is the default unless clang was invoked with
- * -fno-c++-static-destructors.
- */
+  
+                                                                           
+                                                                      
+                                                                              
+                               
+   
 #if __has_attribute(always_destroy)
 #define LIBKERN_ALWAYS_DESTROY __attribute__((__always_destroy__))
 #else
@@ -287,46 +287,46 @@
 typedef void (*os_function_t)(void *_Nullable);
 
 #ifdef __BLOCKS__
-/*!
- * @typedef os_block_t
- *
- * @abstract
- * Generic type for a block taking no arguments and returning no value.
- *
- * @discussion
- * When not building with Objective-C ARC, a block object allocated on or
- * copied to the heap must be released with a -[release] message or the
- * Block_release() function.
- *
- * The declaration of a block literal allocates storage on the stack.
- * Therefore, this is an invalid construct:
- * <code>
- * os_block_t block;
- * if (x) {
- *     block = ^{ printf("true\n"); };
- * } else {
- *     block = ^{ printf("false\n"); };
- * }
- * block(); // unsafe!!!
- * </code>
- *
- * What is happening behind the scenes:
- * <code>
- * if (x) {
- *     struct Block __tmp_1 = ...; // setup details
- *     block = &__tmp_1;
- * } else {
- *     struct Block __tmp_2 = ...; // setup details
- *     block = &__tmp_2;
- * }
- * </code>
- *
- * As the example demonstrates, the address of a stack variable is escaping the
- * scope in which it is allocated. That is a classic C bug.
- *
- * Instead, the block literal must be copied to the heap with the Block_copy()
- * function or by sending it a -[copy] message.
- */
+   
+                      
+  
+            
+                                                                       
+  
+              
+                                                                         
+                                                                       
+                            
+  
+                                                                     
+                                           
+         
+                    
+           
+                                      
+           
+                                       
+    
+                        
+          
+  
+                                       
+         
+           
+                                                   
+                        
+           
+                                                   
+                        
+    
+          
+  
+                                                                               
+                                                           
+  
+                                                                              
+                                               
+   
 typedef void (^os_block_t)(void);
 #endif
 
@@ -336,15 +336,15 @@ typedef void (^os_block_t)(void);
 #define OS_PTRAUTH_SIGNED_PTR(type) __ptrauth(ptrauth_key_process_independent_data, 1, ptrauth_string_discriminator(type))
 #define OS_PTRAUTH_DISCRIMINATOR(str) ptrauth_string_discriminator(str)
 #define __ptrauth_only
-#else //  __has_feature(ptrauth_calls)
+#else                                 
 #define OS_PTRAUTH_SIGNED_PTR(type)
 #define OS_PTRAUTH_DISCRIMINATOR(str) 0
 #define __ptrauth_only __unused
-#endif // __has_feature(ptrauth_calls)
-#endif // KERNEL
+#endif                                
+#endif          
 
 #if KERNEL_PRIVATE
 #define XNU_PTRAUTH_SIGNED_PTR OS_PTRAUTH_SIGNED_PTR
-#endif // KERNEL_PRIVATE
+#endif                  
 
-#endif // __OS_BASE__
+#endif               

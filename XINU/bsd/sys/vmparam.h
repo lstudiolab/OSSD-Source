@@ -32,17 +32,17 @@
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
  */
-/*
- * HISTORY
- */
+  
+          
+   
 
 #ifndef _SYS_VMPARAM_H_
 #define _SYS_VMPARAM_H_
 
-/*
- * Machine dependent constants
- */
+  
+                              
+   
 
 #include <machine/vmparam.h>
 
-#endif  /* _SYS_VMPARAM_H_ */
+#endif                       

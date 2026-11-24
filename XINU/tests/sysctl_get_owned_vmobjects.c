@@ -17,7 +17,7 @@ main_test(void)
 	vmobject_list_output_t out_buffer;
 	size_t out_size;
 	size_t output_size;
-	const vm_size_t tmp_size = 16 * 1024 * 1024; /* arbitrary size */
+	const vm_size_t tmp_size = 16 * 1024 * 1024;                     
 	vm_address_t tmp_buf;
 	vm_address_t tmp_buf2;
 	mach_vm_size_t addr_size;
@@ -28,7 +28,7 @@ main_test(void)
 	uint32_t nestingDepth;
 	mach_msg_type_number_t count;
 
-	/* allocate a temporary buffer */
+	                                 
 	kr = vm_allocate(__self, &tmp_buf, tmp_size, VM_FLAGS_ANYWHERE | VM_FLAGS_PURGABLE);
 	T_QUIET;
 	T_EXPECT_EQ(kr, KERN_SUCCESS, "vm_allocate(%zu) error 0x%x (%s)",
@@ -43,7 +43,7 @@ main_test(void)
 	T_QUIET;
 	T_EXPECT_NE(tmp_buf2, (vm_address_t) 0, "failed to allocate temporary purgable buffer\n");
 
-	/* expected failures */
+	                       
 	out_size = tmp_size;
 	ret = sysctlbyname(g_sysctl_name, NULL, 0, NULL, 0);
 	T_EXPECT_EQ(ret, -1, "expected failure with 0 parameters\n");
@@ -63,7 +63,7 @@ main_test(void)
 	T_EXPECT_EQ(ret, -1, "expected failure with task_name == MACH_PORT_NULL in new parameters\n");
 	T_EXPECT_EQ(errno, ESRCH, "expected ESRCH with invalid task port name\n");
 
-	/* we should get the number of entries we should allocate for */
+	                                                                
 	out_size = 0;
 	output_size = 0;
 	task_name = mach_task_self();
@@ -72,13 +72,13 @@ main_test(void)
 	T_EXPECT_EQ(ret, 0, "failed getting the number of entries\n");
 	T_EXPECT_EQ(out_size, 2 * sizeof(vm_object_query_data_t) + sizeof(int64_t), "expeccted one entry\n");
 
-	/* calculcate and allocate the proper sized output buffer */
+	                                                            
 	output_size = out_size;
 	out_buffer = (vmobject_list_output_t)calloc(output_size, 1);
 	T_QUIET;
 	T_EXPECT_NE(out_buffer, NULL, "failed to allocate the output buffer for sysctlbyname\n");
 
-	/* get the truncated list for the current process */
+	                                                    
 	memset(out_buffer, 0, output_size);
 	out_size = 1 * sizeof(vm_object_query_data_t) + sizeof(int64_t);
 	ret = sysctlbyname(g_sysctl_name, out_buffer, &out_size, &task_name, sizeof(task_name));
@@ -89,7 +89,7 @@ main_test(void)
 	T_EXPECT_EQ(out_buffer->entries, 1ULL, "should have 1 vm object\n");
 	T_EXPECT_NE(out_buffer->data[0].object_id, 0ULL, "vm_object_id should not be 0\n");
 
-	/* get the list for the current process with an overly large size */
+	                                                                    
 	out_size = SIZE_MAX;
 	memset(out_buffer, 0, output_size);
 	ret = sysctlbyname(g_sysctl_name, out_buffer, &out_size, &task_name, sizeof(task_name));
@@ -100,7 +100,7 @@ main_test(void)
 	T_EXPECT_EQ(out_buffer->entries, 2ULL, "should have 2 vm objects\n");
 	T_EXPECT_NE(out_buffer->data[0].object_id, 0ULL, "vm_object_id should not be 0\n");
 
-	/* get the list for the current process with the correct output size */
+	                                                                       
 	out_size = output_size;
 	memset(out_buffer, 0, output_size);
 	ret = sysctlbyname(g_sysctl_name, out_buffer, &out_size, &task_name, sizeof(task_name));

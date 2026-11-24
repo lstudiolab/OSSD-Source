@@ -29,8 +29,8 @@
 #include "kpi_interface.h"
 
 #include <sys/queue.h>
-#include <sys/param.h>  /* for definition of NULL */
-#include <kern/debug.h> /* for panic */
+#include <sys/param.h>                              
+#include <kern/debug.h>                
 #include <sys/errno.h>
 #include <sys/socket.h>
 #include <sys/kern_event.h>
@@ -102,14 +102,14 @@ static errno_t ifnet_set_lladdr_internal(ifnet_t, const void *, size_t,
     u_char, int);
 static errno_t ifnet_awdl_check_eflags(ifnet_t, u_int32_t *, u_int32_t *);
 
-/*
- * Temporary work around until we have real reference counting
- *
- * We keep the bits about calling dlil_if_release (which should be
- * called recycle) transparent by calling it from our if_free function
- * pointer. We have to keep the client's original detach function
- * somewhere so we can call it.
- */
+  
+                                                              
+  
+                                                                  
+                                                                      
+                                                                 
+                               
+   
 static void
 ifnet_kpi_free(ifnet_t ifp)
 {
@@ -233,7 +233,7 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 		return EINVAL;
 	}
 
-	/* Initialize external name (name + unit) */
+	                                            
 	(void) snprintf(if_xname, sizeof(if_xname), "%s%d",
 	    einit.name, einit.unit);
 
@@ -248,11 +248,11 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 	if (error == 0) {
 		uint64_t br;
 
-		/*
-		 * Cast ifp->if_name as non const. dlil_if_acquire sets it up
-		 * to point to storage of at least IFNAMSIZ bytes. It is safe
-		 * to write to this.
-		 */
+		  
+                                                               
+                                                               
+                      
+     
 		strlcpy(__DECONST(char *, ifp->if_name), einit.name, IFNAMSIZ);
 		ifp->if_type            = (u_char)einit.type;
 		ifp->if_family          = einit.family;
@@ -286,35 +286,35 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 		ifp->if_event           = einit.event;
 		ifp->if_kpi_storage     = einit.detach;
 
-		/* Initialize Network ID */
+		                           
 		ifp->network_id_len     = 0;
 		bzero(&ifp->network_id, sizeof(ifp->network_id));
 
-		/* Initialize external name (name + unit) */
+		                                            
 		snprintf(__DECONST(char *, ifp->if_xname), IFXNAMSIZ,
 		    "%s", if_xname);
 
-		/*
-		 * On embedded, framer() is already in the extended form;
-		 * we simply use it as is, unless the caller specifies
-		 * framer_extended() which will then override it.
-		 *
-		 * On non-embedded, framer() has long been exposed as part
-		 * of the public KPI, and therefore its signature must
-		 * remain the same (without the pre- and postpend length
-		 * parameters.)  We special case ether_frameout, such that
-		 * it gets mapped to its extended variant.  All other cases
-		 * utilize the stub routine which will simply return zeroes
-		 * for those new parameters.
-		 *
-		 * Internally, DLIL will only use the extended callback
-		 * variant which is represented by if_framer.
-		 */
+		  
+                                                           
+                                                        
+                                                   
+    
+                                                            
+                                                        
+                                                          
+                                                            
+                                                             
+                                                             
+                              
+    
+                                                         
+                                               
+     
 #if !XNU_TARGET_OS_OSX
 		if (ifp->if_framer == NULL && ifp->if_framer_legacy != NULL) {
 			ifp->if_framer = ifp->if_framer_legacy;
 		}
-#else /* XNU_TARGET_OS_OSX */
+#else                        
 		if (ifp->if_framer == NULL && ifp->if_framer_legacy != NULL) {
 			if (ifp->if_framer_legacy == ether_frameout) {
 				ifp->if_framer = ether_frameout_extended;
@@ -322,7 +322,7 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 				ifp->if_framer = ifnet_framer_stub;
 			}
 		}
-#endif /* XNU_TARGET_OS_OSX */
+#endif                        
 
 		if (ifp->if_output_bw.eff_bw > ifp->if_output_bw.max_bw) {
 			ifp->if_output_bw.max_bw = ifp->if_output_bw.eff_bw;
@@ -342,7 +342,7 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 			ifp->if_input_bw = ifp->if_output_bw;
 		}
 
-		/* Pin if_baudrate to 32 bits */
+		                                
 		br = MAX(ifp->if_output_bw.max_bw, ifp->if_input_bw.max_bw);
 		if (br != 0) {
 			ifp->if_baudrate = (br > UINT32_MAX) ? UINT32_MAX : (uint32_t)br;
@@ -416,13 +416,13 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 		}
 
 		if_clear_xflags(ifp, -1);
-		/* legacy interface */
+		                      
 		if_set_xflags(ifp, IFXF_LEGACY);
 
-		/*
-		 * output target queue delay is specified in millisecond
-		 * convert it to nanoseconds
-		 */
+		  
+                                                          
+                              
+     
 		IFCQ_TARGET_QDELAY(&ifp->if_snd) =
 		    einit.output_target_qdelay * 1000 * 1000;
 		IFCQ_MAXLEN(&ifp->if_snd) = einit.sndq_maxlen;
@@ -432,15 +432,15 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 
 		IFCQ_PKT_DROP_LIMIT(&ifp->if_snd) = IFCQ_DEFAULT_PKT_DROP_LIMIT;
 
-		/*
-		 * Set embryonic flag; this will be cleared
-		 * later when it is fully attached.
-		 */
+		  
+                                             
+                                     
+     
 		ifp->if_refflags = IFRF_EMBRYONIC;
 
-		/*
-		 * Count the newly allocated ifnet
-		 */
+		  
+                                    
+     
 		OSIncrementAtomic64(&net_api_stats.nas_ifnet_alloc_count);
 		INC_ATOMIC_INT64_LIM(net_api_stats.nas_ifnet_alloc_total);
 		if ((einit.flags & IFNET_INIT_ALLOC_KPI) != 0) {
@@ -454,7 +454,7 @@ ifnet_allocate_extended(const struct ifnet_init_eparams *einit0,
 
 		if (error == 0) {
 			*interface = ifp;
-			// temporary - this should be done in dlil_if_acquire
+			                                                     
 			ifnet_reference(ifp);
 		} else {
 			dlil_if_release(ifp);
@@ -548,21 +548,21 @@ ifnet_set_flags(ifnet_t interface, u_int16_t new_flags, u_int16_t mask)
 
 	ifnet_lock_exclusive(interface);
 
-	/* If we are modifying the up/down state, call if_updown */
+	                                                           
 	if ((mask & IFF_UP) != 0) {
 		if_updown(interface, (new_flags & IFF_UP) == IFF_UP);
 	}
 
 	old_flags = interface->if_flags;
 	interface->if_flags = (new_flags & mask) | (interface->if_flags & ~mask);
-	/* If we are modifying the multicast flag, set/unset the silent flag */
+	                                                                       
 	if ((old_flags & IFF_MULTICAST) !=
 	    (interface->if_flags & IFF_MULTICAST)) {
 #if INET
 		if (IGMP_IFINFO(interface) != NULL) {
 			igmp_initsilent(interface, IGMP_IFINFO(interface));
 		}
-#endif /* INET */
+#endif           
 		if (MLD_IFINFO(interface) != NULL) {
 			mld6_initsilent(interface, MLD_IFINFO(interface));
 		}
@@ -579,23 +579,23 @@ ifnet_flags(ifnet_t interface)
 	return (interface == NULL) ? 0 : interface->if_flags;
 }
 
-/*
- * This routine ensures the following:
- *
- * If IFEF_AWDL is set by the caller, also set the rest of flags as
- * defined in IFEF_AWDL_MASK.
- *
- * If IFEF_AWDL has been set on the interface and the caller attempts
- * to clear one or more of the associated flags in IFEF_AWDL_MASK,
- * return failure.
- *
- * If IFEF_AWDL_RESTRICTED is set by the caller, make sure IFEF_AWDL is set
- * on the interface.
- *
- * All other flags not associated with AWDL are not affected.
- *
- * See <net/if.h> for current definition of IFEF_AWDL_MASK.
- */
+  
+                                      
+  
+                                                                   
+                             
+  
+                                                                     
+                                                                  
+                  
+  
+                                                                           
+                    
+  
+                                                             
+  
+                                                           
+   
 static errno_t
 ifnet_awdl_check_eflags(ifnet_t ifp, u_int32_t *new_eflags, u_int32_t *mask)
 {
@@ -638,17 +638,17 @@ ifnet_set_eflags(ifnet_t interface, u_int32_t new_flags, u_int32_t mask)
 
 	bzero(&ev_msg, sizeof(ev_msg));
 	ifnet_lock_exclusive(interface);
-	/*
-	 * Sanity checks for IFEF_AWDL and its related flags.
-	 */
+	  
+                                                      
+    
 	if (ifnet_awdl_check_eflags(interface, &new_flags, &mask) != 0) {
 		ifnet_lock_done(interface);
 		return EINVAL;
 	}
-	/*
-	 * Currently Interface advisory reporting is supported only for
-	 * skywalk interface.
-	 */
+	  
+                                                                
+                      
+    
 	if ((((new_flags & mask) & IFEF_ADV_REPORT) != 0) &&
 	    ((interface->if_eflags & IFEF_SKYWALK_NATIVE) == 0)) {
 		ifnet_lock_done(interface);
@@ -663,20 +663,20 @@ ifnet_set_eflags(ifnet_t interface, u_int32_t new_flags, u_int32_t mask)
 	if (interface->if_eflags & IFEF_AWDL_RESTRICTED &&
 	    !(oeflags & IFEF_AWDL_RESTRICTED)) {
 		ev_msg.event_code = KEV_DL_AWDL_RESTRICTED;
-		/*
-		 * The interface is now restricted to applications that have
-		 * the entitlement.
-		 * The check for the entitlement will be done in the data
-		 * path, so we don't have to do anything here.
-		 */
+		  
+                                                              
+                     
+                                                           
+                                                
+     
 	} else if (oeflags & IFEF_AWDL_RESTRICTED &&
 	    !(interface->if_eflags & IFEF_AWDL_RESTRICTED)) {
 		ev_msg.event_code = KEV_DL_AWDL_UNRESTRICTED;
 	}
-	/*
-	 * Notify configd so that it has a chance to perform better
-	 * reachability detection.
-	 */
+	  
+                                                            
+                           
+    
 	if (ev_msg.event_code) {
 		bzero(&ev_data, sizeof(ev_data));
 		ev_msg.vendor_code = KEV_VENDOR_APPLE;
@@ -712,11 +712,11 @@ ifnet_set_idle_flags_locked(ifnet_t ifp, u_int32_t new_flags, u_int32_t mask)
 	LCK_MTX_ASSERT(rnh_lock, LCK_MTX_ASSERT_OWNED);
 	ifnet_lock_assert(ifp, IFNET_LCK_ASSERT_EXCLUSIVE);
 
-	/*
-	 * If this is called prior to ifnet attach, the actual work will
-	 * be done at attach time.  Otherwise, if it is called after
-	 * ifnet detach, then it is a no-op.
-	 */
+	  
+                                                                 
+                                                             
+                                     
+    
 	if (!ifnet_is_attached(ifp, 0)) {
 		ifp->if_idle_new_flags = new_flags;
 		ifp->if_idle_new_flags_mask = mask;
@@ -918,7 +918,7 @@ ifnet_set_capabilities_enabled(ifnet_t ifp, u_int32_t new_caps,
 	}
 	ifnet_lock_done(ifp);
 
-	/* Notify application of the change */
+	                                      
 	bzero(&ev_data, sizeof(struct net_event_data));
 	bzero(&ev_msg, sizeof(struct kev_msg));
 	ev_msg.vendor_code      = KEV_VENDOR_APPLE;
@@ -965,12 +965,12 @@ ifnet_set_offload(ifnet_t interface, ifnet_offload_t offload)
 	ifnet_lock_exclusive(interface);
 	interface->if_hwassist = (offload & offload_mask);
 
-	/*
-	 * Hardware capable of partial checksum offload is
-	 * flexible enough to handle any transports utilizing
-	 * Internet Checksumming.  Include those transports
-	 * here, and leave the final decision to IP.
-	 */
+	  
+                                                   
+                                                      
+                                                    
+                                             
+    
 	if (interface->if_hwassist & IFNET_CSUM_PARTIAL) {
 		interface->if_hwassist |= (IFNET_CSUM_TCP | IFNET_CSUM_UDP |
 		    IFNET_CSUM_TCPIPV6 | IFNET_CSUM_UDPIPV6);
@@ -1110,7 +1110,7 @@ ifnet_set_wake_flags(ifnet_t interface, u_int32_t properties, u_int32_t mask)
 		return EINVAL;
 	}
 
-	/* Do not accept wacky values */
+	                                
 	if ((properties & mask) & ~IF_WAKE_VALID_FLAGS) {
 		return EINVAL;
 	}
@@ -1125,7 +1125,7 @@ ifnet_set_wake_flags(ifnet_t interface, u_int32_t properties, u_int32_t mask)
 
 	(void) ifnet_touch_lastchange(interface);
 
-	/* Notify application of the change */
+	                                      
 	ev_msg.vendor_code      = KEV_VENDOR_APPLE;
 	ev_msg.kev_class        = KEV_NETWORK_CLASS;
 	ev_msg.kev_subclass     = KEV_DL_SUBCLASS;
@@ -1158,9 +1158,9 @@ ifnet_get_wake_flags(ifnet_t interface)
 	return flags;
 }
 
-/*
- * Should MIB data store a copy?
- */
+  
+                                
+   
 errno_t
 ifnet_set_link_mib_data(ifnet_t interface, void *mibData, uint32_t mibLen)
 {
@@ -1316,7 +1316,7 @@ ifnet_set_baudrate(struct ifnet *ifp, uint64_t baudrate)
 	ifp->if_output_bw.max_bw = ifp->if_input_bw.max_bw =
 	    ifp->if_output_bw.eff_bw = ifp->if_input_bw.eff_bw = baudrate;
 
-	/* Pin if_baudrate to 32 bits until we can change the storage size */
+	                                                                     
 	ifp->if_baudrate = (baudrate > UINT32_MAX) ? UINT32_MAX : (uint32_t)baudrate;
 
 	return 0;
@@ -1336,7 +1336,7 @@ ifnet_set_bandwidths(struct ifnet *ifp, struct if_bandwidths *output_bw,
 		return EINVAL;
 	}
 
-	/* set input values first (if any), as output values depend on them */
+	                                                                      
 	if (input_bw != NULL) {
 		(void) ifnet_set_input_bandwidths(ifp, input_bw);
 	}
@@ -1400,13 +1400,13 @@ ifnet_set_output_bandwidths(struct ifnet *ifp, struct if_bandwidths *bw,
 		ifp->if_output_bw.eff_bw = ifp->if_output_bw.max_bw;
 	}
 
-	/* Pin if_baudrate to 32 bits */
+	                                
 	br = MAX(ifp->if_output_bw.max_bw, ifp->if_input_bw.max_bw);
 	if (br != 0) {
 		ifp->if_baudrate = (br > UINT32_MAX) ? UINT32_MAX : (uint32_t)br;
 	}
 
-	/* Adjust queue parameters if needed */
+	                                       
 	if (old_bw.eff_bw != ifp->if_output_bw.eff_bw ||
 	    old_bw.max_bw != ifp->if_output_bw.max_bw) {
 		ifnet_update_sndq(ifq, CLASSQ_EV_LINK_BANDWIDTH);
@@ -1416,10 +1416,10 @@ ifnet_set_output_bandwidths(struct ifnet *ifp, struct if_bandwidths *bw,
 		IFCQ_UNLOCK(ifq);
 	}
 
-	/*
-	 * If this is a Wifi interface, update the values in
-	 * if_link_status structure also.
-	 */
+	  
+                                                     
+                                  
+    
 	if (IFNET_IS_WIFI(ifp) && ifp->if_link_status != NULL) {
 		lck_rw_lock_exclusive(&ifp->if_link_status_lock);
 		ifnet_set_link_status_outbw(ifp);
@@ -1575,7 +1575,7 @@ ifnet_set_output_latencies(struct ifnet *ifp, struct if_latencies *lt,
 		ifp->if_output_lt.eff_lt = ifp->if_output_lt.max_lt;
 	}
 
-	/* Adjust queue parameters if needed */
+	                                       
 	if (old_lt.eff_lt != ifp->if_output_lt.eff_lt ||
 	    old_lt.max_lt != ifp->if_output_lt.max_lt) {
 		ifnet_update_sndq(ifq, CLASSQ_EV_LINK_LATENCY);
@@ -1647,7 +1647,7 @@ ifnet_set_poll_params(struct ifnet *ifp, struct ifnet_poll_params *p)
 
 	err = dlil_rxpoll_set_params(ifp, p, FALSE);
 
-	/* Release the io ref count */
+	                              
 	ifnet_decr_iorefcnt(ifp);
 
 	return err;
@@ -1666,7 +1666,7 @@ ifnet_poll_params(struct ifnet *ifp, struct ifnet_poll_params *p)
 
 	err = dlil_rxpoll_get_params(ifp, p);
 
-	/* Release the io ref count */
+	                              
 	ifnet_decr_iorefcnt(ifp);
 
 	return err;
@@ -1707,7 +1707,7 @@ ifnet_stat_increment(struct ifnet *ifp,
 		atomic_add_64(&ifp->if_data.ifi_iqdrops, s->dropped);
 	}
 
-	/* Touch the last change time. */
+	                                 
 	TOUCHLASTCHANGE(&ifp->if_lastchange);
 
 	if (ifp->if_data_threshold != 0) {
@@ -1792,7 +1792,7 @@ ifnet_set_stat(struct ifnet *ifp, const struct ifnet_stats_param *s)
 	atomic_set_64(&ifp->if_data.ifi_iqdrops, s->dropped);
 	atomic_set_64(&ifp->if_data.ifi_noproto, s->no_protocol);
 
-	/* Touch the last change time. */
+	                                 
 	TOUCHLASTCHANGE(&ifp->if_lastchange);
 
 	if (ifp->if_data_threshold != 0) {
@@ -1850,7 +1850,7 @@ ifnet_lastchange(ifnet_t interface, struct timeval *last_change)
 	}
 
 	*last_change = interface->if_data.ifi_lastchange;
-	/* Crude conversion from uptime to calendar time */
+	                                                   
 	last_change->tv_sec += boottime_sec();
 
 	return 0;
@@ -1875,7 +1875,7 @@ ifnet_updown_delta(ifnet_t interface, struct timeval *updown_delta)
 		return EINVAL;
 	}
 
-	/* Calculate the delta */
+	                         
 	updown_delta->tv_sec = (time_t)net_uptime();
 	if (updown_delta->tv_sec > interface->if_data.ifi_lastupdown.tv_sec) {
 		updown_delta->tv_sec -= interface->if_data.ifi_lastupdown.tv_sec;
@@ -1938,10 +1938,10 @@ ifnet_get_address_list_family_internal(ifnet_t interface, ifaddr_t **addresses,
 	*addresses = NULL;
 
 	if (detached) {
-		/*
-		 * Interface has been detached, so skip the lookup
-		 * at ifnet_head and go directly to inner loop.
-		 */
+		  
+                                                    
+                                                 
+     
 		ifp = interface;
 		if (ifp == NULL) {
 			err = EINVAL;
@@ -2062,11 +2062,11 @@ ifnet_lladdr(ifnet_t interface)
 		return NULL;
 	}
 
-	/*
-	 * if_lladdr points to the permanent link address of
-	 * the interface and it never gets deallocated; internal
-	 * code should simply use IF_LLADDR() for performance.
-	 */
+	  
+                                                     
+                                                         
+                                                       
+    
 	ifa = interface->if_lladdr;
 	IFA_LOCK_SPIN(ifa);
 	lladdr = LLADDR(SDL((void *)ifa->ifa_addr));
@@ -2115,10 +2115,10 @@ ifnet_lladdr_copy_bytes_internal(ifnet_t interface, void *lladdr,
 	uint8_t sdlbuf[SOCK_MAXADDRLEN + 1];
 	errno_t error = 0;
 
-	/*
-	 * Make sure to accomodate the largest possible
-	 * size of SA(if_lladdr)->sa_len.
-	 */
+	  
+                                                
+                                  
+    
 	_CASSERT(sizeof(sdlbuf) == (SOCK_MAXADDRLEN + 1));
 
 	if (interface == NULL || lladdr == NULL) {
@@ -2208,7 +2208,7 @@ ifnet_set_lladdr_internal(ifnet_t interface, const void *lladdr,
 		} else {
 			bzero(LLADDR(sdl), interface->if_addrlen);
 		}
-		/* lladdr_len-check with if_addrlen makes sure it fits in u_char */
+		                                                                   
 		sdl->sdl_alen = (u_char)lladdr_len;
 
 		if (apply_type) {
@@ -2221,7 +2221,7 @@ ifnet_set_lladdr_internal(ifnet_t interface, const void *lladdr,
 	ifnet_lock_done(interface);
 	ifnet_head_done();
 
-	/* Generate a kernel event */
+	                             
 	if (error == 0) {
 		intf_event_enqueue_nwk_wq_entry(interface, NULL,
 		    INTF_EVENT_CODE_LLADDR_UPDATE);
@@ -2254,7 +2254,7 @@ ifnet_add_multicast(ifnet_t interface, const struct sockaddr *maddr,
 		return EINVAL;
 	}
 
-	/* Don't let users screw up protocols' entries. */
+	                                                  
 	switch (maddr->sa_family) {
 	case AF_LINK: {
 		const struct sockaddr_dl *sdl =
@@ -2289,7 +2289,7 @@ ifnet_remove_multicast(ifmultiaddr_t ifma)
 	}
 
 	maddr = ifma->ifma_addr;
-	/* Don't let users screw up protocols' entries. */
+	                                                  
 	if (maddr->sa_family != AF_UNSPEC && maddr->sa_family != AF_LINK) {
 		return EINVAL;
 	}
@@ -2490,9 +2490,9 @@ ifnet_list_free(ifnet_t *interfaces)
 	FREE(interfaces, M_TEMP);
 }
 
-/*************************************************************************/
-/* ifaddr_t accessors						*/
-/*************************************************************************/
+                                                                           
+                             
+                                                                           
 
 errno_t
 ifaddr_reference(ifaddr_t ifa)
@@ -2624,7 +2624,7 @@ ifaddr_ifnet(ifaddr_t ifa)
 		return NULL;
 	}
 
-	/* ifa_ifp is set once at creation time; it is never changed */
+	                                                               
 	ifp = ifa->ifa_ifp;
 
 	return ifp;
@@ -2753,9 +2753,9 @@ ifmaddr_ifnet(ifmultiaddr_t ifma)
 	return (ifma == NULL) ? NULL : ifma->ifma_ifp;
 }
 
-/**************************************************************************/
-/* interface cloner						*/
-/**************************************************************************/
+                                                                            
+                           
+                                                                            
 
 errno_t
 ifnet_clone_attach(struct ifnet_clone_params *cloner_params,
@@ -2781,7 +2781,7 @@ ifnet_clone_attach(struct ifnet_clone_params *cloner_params,
 		goto fail;
 	}
 
-	/* Make room for name string */
+	                               
 	ifc = _MALLOC(sizeof(struct if_clone) + IFNAMSIZ + 1, M_CLONE,
 	    M_WAITOK | M_ZERO);
 	if (ifc == NULL) {
@@ -2835,9 +2835,9 @@ fail:
 	return error;
 }
 
-/**************************************************************************/
-/* misc							*/
-/**************************************************************************/
+                                                                            
+                
+                                                                            
 
 errno_t
 ifnet_get_local_ports_extended(ifnet_t ifp, protocol_family_t protocol,
@@ -2858,7 +2858,7 @@ ifnet_get_local_ports_extended(ifnet_t ifp, protocol_family_t protocol,
 		return EINVAL;
 	}
 
-	/* bit string is long enough to hold 16-bit port values */
+	                                                          
 	bzero(bitfield, bitstr_size(IP_PORTRANGE_SIZE));
 
 	if_ports_used_update_wakeuuid(ifp);
@@ -2908,7 +2908,7 @@ errno_t
 ifnet_notice_node_presence_v2(ifnet_t ifp, struct sockaddr *sa, struct sockaddr_dl *sdl,
     int32_t rssi, int lqm, int npm, u_int8_t srvinfo[48])
 {
-	/* Support older version if sdl is NULL */
+	                                          
 	if (sdl == NULL) {
 		return ifnet_notice_node_presence(ifp, sa, rssi, lqm, npm, srvinfo);
 	}
@@ -3003,11 +3003,11 @@ ifnet_set_delegate(ifnet_t ifp, ifnet_t delegated_ifp)
 	ifnet_lock_exclusive(ifp);
 	odifp = ifp->if_delegated.ifp;
 	if (odifp != NULL && odifp == delegated_ifp) {
-		/* delegate info is unchanged; nothing more to do */
+		                                                    
 		ifnet_lock_done(ifp);
 		goto done;
 	}
-	// Test if this delegate interface would cause a loop
+	                                                     
 	ifnet_t delegate_check_ifp = delegated_ifp;
 	while (delegate_check_ifp != NULL) {
 		if (delegate_check_ifp == ifp) {
@@ -3032,9 +3032,9 @@ ifnet_set_delegate(ifnet_t ifp, ifnet_t delegated_ifp)
 		ifp->if_delegated.constrained =
 		    delegated_ifp->if_xflags & IFXF_CONSTRAINED ? 1 : 0;
 
-		/*
-		 * Propogate flags related to ECN from delegated interface
-		 */
+		  
+                                                            
+     
 		if_clear_eflags(ifp, IFEF_ECN_ENABLE | IFEF_ECN_DISABLE);
 		set_eflags = (delegated_ifp->if_eflags &
 		    (IFEF_ECN_ENABLE | IFEF_ECN_DISABLE));
@@ -3055,11 +3055,11 @@ ifnet_set_delegate(ifnet_t ifp, ifnet_t delegated_ifp)
 		ifnet_release(odifp);
 	}
 
-	/* Generate a kernel event */
+	                             
 	dlil_post_msg(ifp, KEV_DL_SUBCLASS, KEV_DL_IFDELEGATE_CHANGED, NULL, 0);
 
 done:
-	/* Release the io ref count */
+	                              
 	ifnet_decr_iorefcnt(ifp);
 
 	return 0;
@@ -3081,7 +3081,7 @@ ifnet_get_delegate(ifnet_t ifp, ifnet_t *pdelegated_ifp)
 	*pdelegated_ifp = ifp->if_delegated.ifp;
 	ifnet_lock_done(ifp);
 
-	/* Release the io ref count */
+	                              
 	ifnet_decr_iorefcnt(ifp);
 
 	return 0;
@@ -3100,7 +3100,7 @@ ifnet_get_keepalive_offload_frames(ifnet_t ifp,
 		return EINVAL;
 	}
 
-	/* frame_data_offset should be 32-bit aligned */
+	                                                
 	if (P2ROUNDUP(frame_data_offset, sizeof(u_int32_t)) !=
 	    frame_data_offset) {
 		return EINVAL;
@@ -3111,7 +3111,7 @@ ifnet_get_keepalive_offload_frames(ifnet_t ifp,
 		return 0;
 	}
 
-	/* Keep-alive offload not required for CLAT interface */
+	                                                        
 	if (IS_INTF_CLAT46(ifp)) {
 		return 0;
 	}
@@ -3122,18 +3122,18 @@ ifnet_get_keepalive_offload_frames(ifnet_t ifp,
 		bzero(frame, sizeof(struct ifnet_keepalive_offload_frame));
 	}
 
-	/* First collect IPsec related keep-alive frames */
+	                                                   
 	*used_frames_count = key_fill_offload_frames_for_savs(ifp,
 	    frames_array, frames_array_count, frame_data_offset);
 
-	/* If there is more room, collect other UDP keep-alive frames */
+	                                                                
 	if (*used_frames_count < frames_array_count) {
 		udp_fill_keepalive_offload_frames(ifp, frames_array,
 		    frames_array_count, frame_data_offset,
 		    used_frames_count);
 	}
 
-	/* If there is more room, collect other TCP keep-alive frames */
+	                                                                
 	if (*used_frames_count < frames_array_count) {
 		tcp_fill_keepalive_offload_frames(ifp, frames_array,
 		    frames_array_count, frame_data_offset,
@@ -3184,10 +3184,10 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 
 	ifnet_lock_shared(ifp);
 
-	/*
-	 * Make sure that the interface is attached but there is no need
-	 * to take a reference because this call is coming from the driver.
-	 */
+	  
+                                                                 
+                                                                    
+    
 	if (!ifnet_is_attached(ifp, 0)) {
 		ifnet_lock_done(ifp);
 		return ENXIO;
@@ -3195,10 +3195,10 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 
 	lck_rw_lock_exclusive(&ifp->if_link_status_lock);
 
-	/*
-	 * If this is the first status report then allocate memory
-	 * to store it.
-	 */
+	  
+                                                           
+                
+    
 	if (ifp->if_link_status == NULL) {
 		MALLOC(ifp->if_link_status, struct if_link_status *,
 		    sizeof(struct if_link_status), M_TEMP, M_ZERO);
@@ -3212,10 +3212,10 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 
 	if (ifp->if_type == IFT_CELLULAR) {
 		struct if_cellular_status_v1 *if_cell_sr, *new_cell_sr;
-		/*
-		 * Currently we have a single version -- if it does
-		 * not match, just return.
-		 */
+		  
+                                                     
+                            
+     
 		if (ifsr->ifsr_version !=
 		    IF_CELLULAR_STATUS_REPORT_CURRENT_VERSION) {
 			err = ENOTSUP;
@@ -3230,7 +3230,7 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 		if_cell_sr =
 		    &ifp->if_link_status->ifsr_u.ifsr_cell.if_cell_u.if_status_v1;
 		new_cell_sr = &ifsr->ifsr_u.ifsr_cell.if_cell_u.if_status_v1;
-		/* Check if we need to act on any new notifications */
+		                                                      
 		if ((new_cell_sr->valid_bitmask &
 		    IF_CELL_UL_MSS_RECOMMENDED_VALID) &&
 		    new_cell_sr->mss_recommended !=
@@ -3243,7 +3243,7 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 #endif
 		}
 
-		/* Finally copy the new information */
+		                                      
 		ifp->if_link_status->ifsr_version = ifsr->ifsr_version;
 		ifp->if_link_status->ifsr_len = ifsr->ifsr_len;
 		if_cell_sr->valid_bitmask = 0;
@@ -3251,7 +3251,7 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 	} else if (IFNET_IS_WIFI(ifp)) {
 		struct if_wifi_status_v1 *if_wifi_sr, *new_wifi_sr;
 
-		/* Check version */
+		                   
 		if (ifsr->ifsr_version !=
 		    IF_WIFI_STATUS_REPORT_CURRENT_VERSION) {
 			err = ENOTSUP;
@@ -3272,10 +3272,10 @@ ifnet_link_status_report(ifnet_t ifp, const void *buffer,
 		if_wifi_sr->valid_bitmask = 0;
 		bcopy(new_wifi_sr, if_wifi_sr, sizeof(*if_wifi_sr));
 
-		/*
-		 * Update the bandwidth values if we got recent values
-		 * reported through the other KPI.
-		 */
+		  
+                                                        
+                                    
+     
 		if (!(new_wifi_sr->valid_bitmask &
 		    IF_WIFI_UL_MAX_BANDWIDTH_VALID) &&
 		    ifp->if_output_bw.max_bw > 0) {
@@ -3324,9 +3324,9 @@ done:
 	return err;
 }
 
-/*************************************************************************/
-/* Fastlane QoS Ca						*/
-/*************************************************************************/
+                                                                           
+                          
+                                                                           
 
 errno_t
 ifnet_set_fastlane_capable(ifnet_t interface, boolean_t capable)
@@ -3451,9 +3451,9 @@ ifnet_get_low_power_mode(ifnet_t ifp, boolean_t *on)
 	return 0;
 }
 
-/*************************************************************************/
-/* Interface advisory notifications                                      */
-/*************************************************************************/
+                                                                           
+                                                                           
+                                                                           
 errno_t
 ifnet_interface_advisory_report(ifnet_t ifp,
     const struct ifnet_interface_advisory *advisory)

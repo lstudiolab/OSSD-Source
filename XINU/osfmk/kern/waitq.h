@@ -31,22 +31,22 @@
 
 #include <mach/mach_types.h>
 #include <mach/sync_policy.h>
-#include <mach/kern_return.h>           /* for kern_return_t */
+#include <mach/kern_return.h>                                  
 
-#include <kern/kern_types.h>            /* for wait_queue_t */
+#include <kern/kern_types.h>                                  
 #include <kern/queue.h>
 #include <kern/assert.h>
 
 #include <sys/cdefs.h>
 
 #ifdef XNU_KERNEL_PRIVATE
-/* priority queue static asserts fail for __ARM64_ARCH_8_32__ kext builds */
+                                                                            
 #include <kern/priority_queue.h>
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
-/*
- * Constants and types used in the waitq APIs
- */
+  
+                                             
+   
 #define WAITQ_ALL_PRIORITIES   (-1)
 #define WAITQ_PROMOTE_PRIORITY (-2)
 #define WAITQ_PROMOTE_ON_WAKE  (-3)
@@ -59,7 +59,7 @@ typedef enum e_waitq_lock_state {
 	WAITQ_DONT_LOCK      = 0x10,
 } waitq_lock_state_t;
 
-/* Opaque sizes and alignment used for struct verification */
+                                                             
 #if __arm__ || __arm64__
 	#define WQ_OPAQUE_ALIGN   __BIGGEST_ALIGNMENT__
 	#define WQS_OPAQUE_ALIGN  __BIGGEST_ALIGNMENT__
@@ -85,17 +85,17 @@ typedef enum e_waitq_lock_state {
 #include <kern/simple_lock.h>
 
 #include <machine/cpu_number.h>
-#include <machine/machine_routines.h> /* machine_timeout_suspended() */
+#include <machine/machine_routines.h>                                  
 
-/*
- * The event mask is of 57 bits on 64 bit architeture and 25 bits on
- * 32 bit architecture and so we calculate its size using sizeof(long).
- * If the bitfield for wq_type and wq_fifo is changed, then value of
- * EVENT_MASK_BITS will also change.
- *
- * New plan: this is an optimization anyway, so I'm stealing 32bits
- * from the mask to shrink the waitq object even further.
- */
+  
+                                                                    
+                                                                       
+                                                                    
+                                    
+  
+                                                                   
+                                                         
+   
 #define _EVENT_MASK_BITS   ((sizeof(uint32_t) * 8) - 7)
 
 
@@ -125,49 +125,49 @@ struct wq_stats {
 };
 #endif
 
-/*
- *	struct waitq
- *
- *	This is the definition of the common event wait queue
- *	that the scheduler APIs understand.  It is used
- *	internally by the gerneralized event waiting mechanism
- *	(assert_wait), and also for items that maintain their
- *	own wait queues (such as ports and semaphores).
- *
- *	It is not published to other kernel components.
- *
- *	NOTE:  Hardware locks are used to protect event wait
- *	queues since interrupt code is free to post events to
- *	them.
- */
+  
+               
+  
+                                                        
+                                                  
+                                                         
+                                                        
+                                                  
+  
+                                                  
+  
+                                                       
+                                                        
+        
+   
 struct waitq {
-	uint32_t /* flags */
-	    waitq_type:2,        /* only public field */
-	    waitq_fifo:1,        /* fifo wakeup policy? */
-	    waitq_prepost:1,     /* waitq supports prepost? */
-	    waitq_irq:1,         /* waitq requires interrupts disabled */
-	    waitq_isvalid:1,     /* waitq structure is valid */
-	    waitq_turnstile:1,   /* waitq is embedded in a turnstile */
+	uint32_t            
+	    waitq_type:2,                               
+	    waitq_fifo:1,                                 
+	    waitq_prepost:1,                                  
+	    waitq_irq:1,                                                 
+	    waitq_isvalid:1,                                   
+	    waitq_turnstile:1,                                         
 	    waitq_eventmask:_EVENT_MASK_BITS;
-	/* the wait queue set (set-of-sets) to which this queue belongs */
+	                                                                  
 #if __arm64__
-	hw_lock_bit_t   waitq_interlock;        /* interlock */
+	hw_lock_bit_t   waitq_interlock;                       
 #else
-	hw_lock_data_t  waitq_interlock;        /* interlock */
-#endif /* __arm64__ */
+	hw_lock_data_t  waitq_interlock;                       
+#endif                
 
 	uint64_t waitq_set_id;
 	uint64_t waitq_prepost_id;
 	union {
-		queue_head_t            waitq_queue;               /* queue of elements - used for waitq not embedded in turnstile or ports */
-		struct priority_queue_sched_max waitq_prio_queue;  /* priority ordered queue of elements - used for waitqs embedded in turnstiles */
-		struct {                                           /* used for waitqs embedded in ports */
-			struct turnstile   *waitq_ts;              /* used to store receive turnstile of the port */
+		queue_head_t            waitq_queue;                                                                                          
+		struct priority_queue_sched_max waitq_prio_queue;                                                                                   
+		struct {                                                                                  
+			struct turnstile   *waitq_ts;                                                               
 			union {
-				void               *waitq_tspriv;  /* non special-reply port, used to store the watchport element for port used to store
-				                                    * receive turnstile of the port */
-				int                waitq_priv_pid; /* special-reply port, used to store the pid that copies out the send once right of the
-				                                    * special-reply port. */
+				void               *waitq_tspriv;                                                                                       
+                                                                          
+				int                waitq_priv_pid;                                                                                        
+                                                                
 			};
 		};
 	};
@@ -176,11 +176,11 @@ struct waitq {
 static_assert(sizeof(struct waitq) == WQ_OPAQUE_SIZE, "waitq structure size mismatch");
 static_assert(__alignof(struct waitq) == WQ_OPAQUE_ALIGN, "waitq structure alignment mismatch");
 
-/*
- *	struct waitq_set
- *
- *	This is the common definition for a set wait queue.
- */
+  
+                   
+  
+                                                      
+   
 struct waitq_set {
 	struct waitq wqset_q;
 	uint64_t     wqset_id;
@@ -217,11 +217,11 @@ extern void waitq_bootstrap(void);
 #define waitqs_is_linked(wqs) \
 	(((wqs)->wqset_id != WQSET_NOT_LINKED) && ((wqs)->wqset_id != 0))
 
-/*
- * Invalidate a waitq. The only valid waitq functions to call after this are:
- *      waitq_deinit()
- *      waitq_set_deinit()
- */
+  
+                                                                             
+                      
+                          
+   
 extern void waitq_invalidate_locked(struct waitq *wq);
 
 extern lck_grp_t waitq_lck_grp;
@@ -242,7 +242,7 @@ extern lck_grp_t waitq_lck_grp;
 #define waitq_lock_try(wq) \
 	(hw_lock_try(&(wq)->waitq_interlock, &waitq_lck_grp))
 
-#endif /* __arm64__ */
+#endif                
 
 #define waitq_wait_possible(thread) \
 	((thread)->waitq == NULL)
@@ -260,7 +260,7 @@ extern void waitq_lock(struct waitq *wq);
 	                                 !((wqs)->wqset_q.waitq_prepost) && \
 	                                 (wqs)->wqset_prepost_hook)
 
-/* assert intent to wait on a locked wait queue */
+                                                  
 extern wait_result_t waitq_assert_wait64_locked(struct waitq *waitq,
     event64_t wait_event,
     wait_interrupt_t interruptible,
@@ -269,10 +269,10 @@ extern wait_result_t waitq_assert_wait64_locked(struct waitq *waitq,
     uint64_t leeway,
     thread_t thread);
 
-/* pull a thread from its wait queue */
+                                       
 extern int waitq_pull_thread_locked(struct waitq *waitq, thread_t thread);
 
-/* wakeup all threads waiting for a particular event on locked queue */
+                                                                       
 extern kern_return_t waitq_wakeup64_all_locked(struct waitq *waitq,
     event64_t wake_event,
     wait_result_t result,
@@ -280,7 +280,7 @@ extern kern_return_t waitq_wakeup64_all_locked(struct waitq *waitq,
     int priority,
     waitq_lock_state_t lock_state);
 
-/* wakeup one thread waiting for a particular event on locked queue */
+                                                                      
 extern kern_return_t waitq_wakeup64_one_locked(struct waitq *waitq,
     event64_t wake_event,
     wait_result_t result,
@@ -289,7 +289,7 @@ extern kern_return_t waitq_wakeup64_one_locked(struct waitq *waitq,
     waitq_lock_state_t lock_state,
     waitq_options_t options);
 
-/* return identity of a thread awakened for a particular <wait_queue,event> */
+                                                                              
 extern thread_t
 waitq_wakeup64_identify_locked(struct waitq     *waitq,
     event64_t        wake_event,
@@ -299,37 +299,37 @@ waitq_wakeup64_identify_locked(struct waitq     *waitq,
     int              priority,
     waitq_lock_state_t lock_state);
 
-/* wakeup thread iff its still waiting for a particular event on locked queue */
+                                                                                
 extern kern_return_t waitq_wakeup64_thread_locked(struct waitq *waitq,
     event64_t wake_event,
     thread_t thread,
     wait_result_t result,
     waitq_lock_state_t lock_state);
 
-/* clear all preposts generated by the given waitq */
+                                                     
 extern int waitq_clear_prepost_locked(struct waitq *waitq);
 
-/* clear all preposts from the given wait queue set */
+                                                      
 extern void waitq_set_clear_preposts_locked(struct waitq_set *wqset);
 
-/* unlink the given waitq from all sets - returns unlocked */
+                                                             
 extern kern_return_t waitq_unlink_all_unlock(struct waitq *waitq);
 
-/* unlink the given waitq set from all waitqs and waitq sets - returns unlocked */
+                                                                                  
 extern kern_return_t waitq_set_unlink_all_unlock(struct waitq_set *wqset);
 
 
 
-/*
- * clear a thread's boosted priority
- * (given via WAITQ_PROMOTE_PRIORITY in the wakeup function)
- */
+  
+                                    
+                                                            
+   
 extern void waitq_clear_promotion_locked(struct waitq *waitq,
     thread_t thread);
 
-/*
- * waitq iteration
- */
+  
+                  
+   
 
 enum waitq_iteration_constant {
 	WQ_ITERATE_DROPPED             = -4,
@@ -346,49 +346,49 @@ enum waitq_iteration_constant {
 	WQ_ITERATE_UNLINKED            =  7,
 };
 
-/* callback invoked with both 'waitq' and 'wqset' locked */
+                                                           
 typedef int (*waitq_iterator_t)(void *ctx, struct waitq *waitq,
     struct waitq_set *wqset);
 
-/* iterate over all sets to which waitq belongs */
+                                                  
 extern int waitq_iterate_sets(struct waitq *waitq, void *ctx,
     waitq_iterator_t it);
 
-/* iterator over all waitqs that have preposted to wqset */
+                                                           
 extern int waitq_set_iterate_preposts(struct waitq_set *wqset,
     void *ctx, waitq_iterator_t it);
 
-/*
- * prepost reservation
- */
+  
+                      
+   
 extern uint64_t waitq_prepost_reserve(struct waitq *waitq, int extra,
     waitq_lock_state_t lock_state);
 
 extern void waitq_prepost_release_reserve(uint64_t id);
 
-#else /* !MACH_KERNEL_PRIVATE */
+#else                           
 
-/*
- * The opaque waitq structure is here mostly for AIO and selinfo,
- * but could potentially be used by other BSD subsystems.
- */
+  
+                                                                 
+                                                         
+   
 struct waitq { char opaque[WQ_OPAQUE_SIZE]; } __attribute__((aligned(WQ_OPAQUE_ALIGN)));
 struct waitq_set { char opaque[WQS_OPAQUE_SIZE]; } __attribute__((aligned(WQS_OPAQUE_ALIGN)));
 
-#endif  /* MACH_KERNEL_PRIVATE */
+#endif                           
 
 
 __BEGIN_DECLS
 
-/*
- * waitq init
- */
+  
+             
+   
 extern kern_return_t waitq_init(struct waitq *waitq, int policy);
 extern void waitq_deinit(struct waitq *waitq);
 
-/*
- * global waitqs
- */
+  
+                
+   
 extern struct waitq *_global_eventq(char *event, size_t event_length);
 #define global_eventq(event) _global_eventq((char *)&(event), sizeof(event))
 
@@ -396,9 +396,9 @@ extern struct waitq *global_waitq(int index);
 
 typedef uint16_t waitq_set_prepost_hook_t;
 
-/*
- * set alloc/init/free
- */
+  
+                      
+   
 extern struct waitq_set *waitq_set_alloc(int policy,
     waitq_set_prepost_hook_t *prepost_hook);
 
@@ -416,13 +416,13 @@ extern int sysctl_helper_waitq_set_nelem(void);
 extern uint64_t wqset_id(struct waitq_set *wqset);
 
 struct waitq *wqset_waitq(struct waitq_set *wqset);
-#endif /* CONFIG_WAITQ_DEBUG */
-#endif /* DEVELOPMENT || DEBUG */
+#endif                         
+#endif                           
 
 
-/*
- * set membership
- */
+  
+                 
+   
 extern uint64_t waitq_link_reserve(struct waitq *waitq);
 extern void waitq_set_lazy_init_link(struct waitq_set *wqset);
 extern boolean_t waitq_set_should_lazy_init_link(struct waitq_set *wqset);
@@ -431,11 +431,11 @@ extern void waitq_link_release(uint64_t id);
 
 extern boolean_t waitq_member(struct waitq *waitq, struct waitq_set *wqset);
 
-/* returns true if the waitq is in at least 1 set */
+                                                    
 extern boolean_t waitq_in_set(struct waitq *waitq);
 
 
-/* on success, consumes an reserved_link reference */
+                                                     
 extern kern_return_t waitq_link(struct waitq *waitq,
     struct waitq_set *wqset,
     waitq_lock_state_t lock_state,
@@ -447,23 +447,23 @@ extern kern_return_t waitq_unlink_all(struct waitq *waitq);
 
 extern kern_return_t waitq_set_unlink_all(struct waitq_set *wqset);
 
-/*
- * preposts
- */
+  
+           
+   
 extern void waitq_clear_prepost(struct waitq *waitq);
 
 extern void waitq_set_clear_preposts(struct waitq_set *wqset);
 
-/*
- * interfaces used primarily by the select/kqueue subsystems
- */
+  
+                                                            
+   
 extern uint64_t waitq_get_prepost_id(struct waitq *waitq);
 extern void     waitq_unlink_by_prepost_id(uint64_t wqp_id, struct waitq_set *wqset);
 extern struct waitq *waitq_lock_by_prepost_id(uint64_t wqp_id);
 
-/*
- * waitq attributes
- */
+  
+                   
+   
 extern int waitq_is_valid(struct waitq *waitq);
 
 extern int waitq_set_is_valid(struct waitq_set *wqset);
@@ -473,9 +473,9 @@ extern int waitq_is_global(struct waitq *waitq);
 extern int waitq_irq_safe(struct waitq *waitq);
 
 #if CONFIG_WAITQ_STATS
-/*
- * waitq statistics
- */
+  
+                   
+   
 #define WAITQ_STATS_VERSION 1
 struct wq_table_stats {
 	uint32_t version;
@@ -497,15 +497,15 @@ struct wq_table_stats {
 
 extern void waitq_link_stats(struct wq_table_stats *stats);
 extern void waitq_prepost_stats(struct wq_table_stats *stats);
-#endif /* CONFIG_WAITQ_STATS */
+#endif                         
 
-/*
- *
- * higher-level waiting APIs
- *
- */
+  
+  
+                            
+  
+   
 
-/* assert intent to wait on <waitq,event64> pair */
+                                                   
 extern wait_result_t waitq_assert_wait64(struct waitq *waitq,
     event64_t wait_event,
     wait_interrupt_t interruptible,
@@ -518,13 +518,13 @@ extern wait_result_t waitq_assert_wait64_leeway(struct waitq *waitq,
     uint64_t deadline,
     uint64_t leeway);
 
-/* wakeup the most appropriate thread waiting on <waitq,event64> pair */
+                                                                        
 extern kern_return_t waitq_wakeup64_one(struct waitq *waitq,
     event64_t wake_event,
     wait_result_t result,
     int priority);
 
-/* wakeup all the threads waiting on <waitq,event64> pair */
+                                                            
 extern kern_return_t waitq_wakeup64_all(struct waitq *waitq,
     event64_t wake_event,
     wait_result_t result,
@@ -532,25 +532,25 @@ extern kern_return_t waitq_wakeup64_all(struct waitq *waitq,
 
 #ifdef  XNU_KERNEL_PRIVATE
 
-/* wakeup a specified thread iff it's waiting on <waitq,event64> pair */
+                                                                        
 extern kern_return_t waitq_wakeup64_thread(struct waitq *waitq,
     event64_t wake_event,
     thread_t thread,
     wait_result_t result);
 
-/* return a reference to the thread that was woken up */
+                                                        
 extern thread_t
 waitq_wakeup64_identify(struct waitq    *waitq,
     event64_t       wake_event,
     wait_result_t   result,
     int             priority);
 
-/* take the waitq lock */
+                         
 extern void waitq_unlock(struct waitq *wq);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 __END_DECLS
 
-#endif  /* KERNEL_PRIVATE */
-#endif  /* _WAITQ_H_ */
+#endif                      
+#endif                 

@@ -90,8 +90,8 @@ using tracked_safe_allocation = libkern::safe_allocation<T, tracking_allocator, 
 
 template <typename T>
 using test_bounded_ptr = libkern::bounded_ptr<T, assert_trapping_policy>;
-} // end anonymous namespace
+}                           
 
 #define CHECK(...) T_ASSERT_TRUE((__VA_ARGS__), # __VA_ARGS__)
 
-#endif // !TESTS_SAFE_ALLOCATION_TEST_UTILS_H
+#endif                                       

@@ -39,132 +39,132 @@ __BEGIN_DECLS
 
 #ifdef KERNEL
 
-/*
- * To use kdebug in the kernel:
- *
- * #include <sys/kdebug_kernel.h>
- *
- * #define DBG_NETIPINIT NETDBG_CODE(DBG_NETIP, 1)
- *
- * void
- * ip_init(void)
- * {
- *     KDBG(DBG_NETIPINIT | DBG_FUNC_START, 1, 2, 3, 4);
- *     ...
- *     KDBG(DBG_NETIPINIT);
- *     ...
- *     KDBG(DBG_NETIPINIT | DBG_FUNC_END);
- * }
- */
+  
+                               
+  
+                                 
+  
+                                                  
+  
+       
+                
+    
+                                                        
+          
+                           
+          
+                                          
+    
+   
 
 #pragma mark - kernel tracepoints
 
-/*
- * The KDBG{,_DEBUG,_RELEASE,_FILTERED} macros are the preferred method of
- * making tracepoints.
- *
- * Kernel pointers must be unslid or permuted using VM_KERNEL_UNSLIDE_OR_PERM.
- * Do not trace any sensitive data.
- */
+  
+                                                                          
+                      
+  
+                                                                              
+                                   
+   
 
-/*
- * Traced on debug and development (and release macOS) kernels.
- */
+  
+                                                               
+   
 #define KDBG(x, ...) KDBG_(, x, ## __VA_ARGS__, 4, 3, 2, 1, 0)
 
-/*
- * Traced on debug and development (and release macOS) kernels if explicitly
- * requested.  Omitted from tracing without a typefilter.
- */
+  
+                                                                            
+                                                         
+   
 #define KDBG_FILTERED(x, ...) KDBG_(_FILTERED, x, ## __VA_ARGS__, 4, 3, 2, 1, 0)
 
 #ifdef KERNEL_PRIVATE
 
-/*
- * Traced on debug and development (and release macOS) kernels, even if the
- * process filter would reject it.
- */
+  
+                                                                           
+                                  
+   
 #define KDBG_RELEASE_NOPROCFILT(x, ...) \
 	        KDBG_(_RELEASE_NOPROCFILT, x, ## __VA_ARGS__, 4, 3, 2, 1, 0)
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * Traced on debug, development, and release kernels.
- *
- * Only use this tracepoint if the events are required for a shipping trace
- * tool.
- */
+  
+                                                     
+  
+                                                                           
+        
+   
 #define KDBG_RELEASE(x, ...) KDBG_(_RELEASE, x, ## __VA_ARGS__, 4, 3, 2, 1, 0)
 
-/*
- * Traced only on debug kernels.
- */
+  
+                                
+   
 #define KDBG_DEBUG(x, ...) KDBG_(_DEBUG, x, ## __VA_ARGS__, 4, 3, 2, 1, 0)
 
 #pragma mark - kernel API
 
 #ifdef KERNEL_PRIVATE
 
-/*
- * kernel_debug_string provides the same functionality as the
- * kdebug_trace_string syscall as a KPI.  str_id is an in/out
- * parameter that, if it's pointing to a string ID of 0, will
- * receive a generated ID.  If it provides a value in str_id,
- * then that will be used, instead.
- *
- * Returns an errno indicating the type of failure.
- */
+  
+                                                             
+                                                             
+                                                             
+                                                             
+                                   
+  
+                                                   
+   
 int kernel_debug_string(uint32_t debugid, uint64_t *str_id, const char *str);
 
-/*
- * kernel_debug_disable disables event logging, but leaves any buffers
- * intact.
- */
+  
+                                                                      
+          
+   
 void kernel_debug_disable(void);
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-/*
- * Returns true if kdebug is using continuous time for its events, and false
- * otherwise.
- */
+  
+                                                                            
+             
+   
 bool kdebug_using_continuous_time(void);
 
-/*
- * Returns true if kdebug will log an event with the provided debugid, and
- * false otherwise.
- */
+  
+                                                                          
+                   
+   
 bool kdebug_debugid_enabled(uint32_t debugid);
 
-/*
- * Returns true only if the debugid is explicitly enabled by filters.  Returns
- * false otherwise, including when no filters are active.
- */
+  
+                                                                              
+                                                         
+   
 bool kdebug_debugid_explicitly_enabled(uint32_t debugid);
 
 uint32_t kdebug_commpage_state(void);
 
 #pragma mark - IOP tracing
 
-/*
- * Definitions to support IOP tracing.
- */
+  
+                                      
+   
 
 typedef enum {
-	/* Trace is now enabled; no arguments.  */
+	                                          
 	KD_CALLBACK_KDEBUG_ENABLED,
-	/* Trace is now disabled; no arguments.  */
+	                                           
 	KD_CALLBACK_KDEBUG_DISABLED,
-	/*
-	 * Request the latest entries from the IOP and block until complete; no
-	 * arguments.
-	 */
+	  
+                                                                        
+              
+    
 	KD_CALLBACK_SYNC_FLUSH,
-	/*
-	 * The typefilter is enabled; a read-only pointer to the typefilter is
-	 * provided, valid only while in the callback.
-	 */
+	  
+                                                                       
+                                               
+    
 	KD_CALLBACK_TYPEFILTER_CHANGED,
 } kd_callback_type;
 
@@ -174,28 +174,28 @@ typedef void (*kd_callback_fn) (void *context, kd_callback_type reason,
 struct kd_callback {
 	kd_callback_fn func;
 	void *context;
-	/* name of IOP, NUL-terminated */
+	                                 
 	char iop_name[8];
 };
 
 typedef struct kd_callback kd_callback_t;
 
-/*
- * Registers an IOP for participation in tracing.
- *
- * The registered callback function will be called with the
- * supplied context as the first argument, followed by a
- * kd_callback_type and an associated void* argument.
- *
- * The return value is a nonzero coreid that shall be used in
- * kernel_debug_enter() to refer to your IOP. If the allocation
- * failed, then 0 will be returned.
- *
- * Caveats:
- * Note that not all callback calls will indicate a change in
- * state (e.g. disabling trace twice would send two disable
- * notifications).
- */
+  
+                                                 
+  
+                                                           
+                                                        
+                                                     
+  
+                                                             
+                                                               
+                                   
+  
+           
+                                                             
+                                                           
+                  
+   
 int kernel_debug_register_callback(kd_callback_t callback);
 
 void kernel_debug_enter(uint32_t coreid, uint32_t debugid, uint64_t timestamp,
@@ -219,14 +219,14 @@ void kernel_debug_enter(uint32_t coreid, uint32_t debugid, uint64_t timestamp,
 
 extern unsigned int kdebug_enable;
 
-/*
- * The kernel debug configuration level.  These values control which events are
- * compiled in under different build configurations.
- *
- * Infer the supported kernel debug event level from config option.  Use
- * (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD) as a guard to protect unaudited debug
- * code.
- */
+  
+                                                                               
+                                                    
+  
+                                                                        
+                                                                                
+        
+   
 #define KDEBUG_LEVEL_NONE     0
 #define KDEBUG_LEVEL_IST      1
 #define KDEBUG_LEVEL_STANDARD 2
@@ -240,17 +240,17 @@ extern unsigned int kdebug_enable;
 #define KDEBUG_LEVEL KDEBUG_LEVEL_FULL
 #else
 #define KDEBUG_LEVEL KDEBUG_LEVEL_STANDARD
-/*
- * Currently, all other kernel configurations (development, etc) build with
- * KDEBUG_LEVEL_STANDARD.
- */
+  
+                                                                           
+                         
+   
 #endif
 
-/*
- * KERNEL_DEBUG_CONSTANT_FILTERED events are omitted from tracing unless they
- * are explicitly requested in the typefilter.  They are not emitted when
- * tracing without a typefilter.
- */
+  
+                                                                             
+                                                                         
+                                
+   
 #if (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
 #define KERNEL_DEBUG_CONSTANT_FILTERED(x, a, b, c, d, ...)           \
 	do {                                                             \
@@ -259,9 +259,9 @@ extern unsigned int kdebug_enable;
 	                        (uintptr_t)(c), (uintptr_t)(d)); \
 	        }                                                            \
 	} while (0)
-#else /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD) */
+#else                                              
 #define KERNEL_DEBUG_CONSTANT_FILTERED(type, x, a, b, c, d, ...) do {} while (0)
-#endif /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD) */
+#endif                                              
 
 #if (KDEBUG_LEVEL >= KDEBUG_LEVEL_IST)
 #define KERNEL_DEBUG_CONSTANT_RELEASE_NOPROCFILT(x, a, b, c, d, ...)   \
@@ -271,10 +271,10 @@ extern unsigned int kdebug_enable;
 	                        (uintptr_t)(c), (uintptr_t)(d), KDBG_FLAG_NOPROCFILT); \
 	        }                                                              \
 	} while (0)
-#else /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_IST) */
+#else                                         
 #define KERNEL_DEBUG_CONSTANT_RELEASE_NOPROCFILT(x, a, b, c, d, ...) \
 	do { } while (0)
-#endif /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_IST) */
+#endif                                         
 
 
 #if (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD)
@@ -286,11 +286,11 @@ extern unsigned int kdebug_enable;
 	        }                                                                     \
 	} while (0)
 
-/*
- * DO NOT USE THIS MACRO -- it breaks fundamental assumptions about ktrace and
- * is only meant to be used by the pthread kext and other points in the kernel
- * where the thread ID must be provided explicitly.
- */
+  
+                                                                              
+                                                                              
+                                                   
+   
 #define KERNEL_DEBUG_CONSTANT1(x, a, b, c, d, e)                               \
 	do {                                                                       \
 	        if (KDBG_IMPROBABLE(kdebug_enable & ~KDEBUG_ENABLE_PPT)) {             \
@@ -299,19 +299,19 @@ extern unsigned int kdebug_enable;
 	        }                                                                      \
 	} while (0)
 
-#else /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD) */
+#else                                              
 #define KERNEL_DEBUG_CONSTANT(x, a, b, c, d, e) do {} while (0)
 #define KERNEL_DEBUG_CONSTANT1(x, a, b, c, d, e) do {} while (0)
-#endif /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_STANDARD) */
+#endif                                              
 
-/*
- * KERNEL_DEBUG_CONSTANT_IST (in-system trace) events provide an audited subset
- * of tracepoints for userland system tracing tools.  This tracing level was
- * created by 8857227 to protect fairplayd and other PT_DENY_ATTACH processes.
- * It has two effects: only KERNEL_DEBUG_CONSTANT_IST() traces are emitted and
- * any PT_DENY_ATTACH processes will only emit basic traces as defined by the
- * kernel_debug_filter() routine.
- */
+  
+                                                                               
+                                                                            
+                                                                              
+                                                                              
+                                                                             
+                                 
+   
 #define KERNEL_DEBUG_CONSTANT_RELEASE(x, a, b, c, d, e) \
 	KERNEL_DEBUG_CONSTANT_IST(~KDEBUG_ENABLE_PPT, x, a, b, c, d, 0)
 
@@ -338,19 +338,19 @@ extern unsigned int kdebug_enable;
 	                (uintptr_t)(c), (uintptr_t)(d));                              \
 	} while (0)
 
-#else /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_IST) */
+#else                                         
 #define KERNEL_DEBUG_CONSTANT_IST(type, x, a, b, c, d, e) do {} while (0)
 #define KERNEL_DEBUG_CONSTANT_IST1(x, a, b, c, d, e) do {} while (0)
 #define KERNEL_DEBUG_EARLY(x, a, b, c, d) do {} while (0)
-#endif /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_IST) */
+#endif                                         
 
 #if NO_KDEBUG
 #define __kdebug_constant_only __unused
 #endif
 
-/*
- * KERNEL_DEBUG events are only traced for DEBUG kernels.
- */
+  
+                                                         
+   
 #define KERNEL_DEBUG_CONSTANT_DEBUG(x, a, b, c, d, e) \
 	KERNEL_DEBUG(x, a, b, c, d, e)
 
@@ -366,9 +366,9 @@ extern unsigned int kdebug_enable;
 	        }                                                               \
 	} while (0)
 
-/*
- * DO NOT USE THIS MACRO -- see warning above for KERNEL_DEBUG_CONSTANT1.
- */
+  
+                                                                         
+   
 #define KERNEL_DEBUG1(x, a, b, c, d, e)                                  \
 	do {                                                                 \
 	        if (KDBG_IMPROBABLE(kdebug_enable & ~KDEBUG_ENABLE_PPT)) {       \
@@ -377,13 +377,13 @@ extern unsigned int kdebug_enable;
 	        }                                                                \
 	} while (0)
 
-#else /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_FULL) */
+#else                                          
 #define __kdebug_only __unused
 
 #undef KERNEL_DEBUG
 #define KERNEL_DEBUG(x, a, b, c, d, e) do {} while (0)
 #define KERNEL_DEBUG1(x, a, b, c, d, e) do {} while (0)
-#endif /* (KDEBUG_LEVEL >= KDEBUG_LEVEL_FULL) */
+#endif                                          
 
 void kernel_debug(uint32_t debugid, uintptr_t arg1, uintptr_t arg2,
     uintptr_t arg3, uintptr_t arg4, uintptr_t arg5);
@@ -404,14 +404,14 @@ void kernel_debug_filtered(uint32_t debugid, uintptr_t arg1, uintptr_t arg2,
 
 #ifdef XNU_KERNEL_PRIVATE
 
-/* Used in early boot to log events. */
+                                       
 void kernel_debug_early(uint32_t  debugid, uintptr_t arg1, uintptr_t arg2,
     uintptr_t arg3, uintptr_t arg4);
-/* Used in early boot to log strings spanning only a single tracepoint. */
+                                                                          
 void kernel_debug_string_early(const char *message);
-/* Used to trace strings within kdebug tracepoints on arbitrary eventids. */
+                                                                            
 void kernel_debug_string_simple(uint32_t eventid, const char *str);
-/* Only used by ktrace to reset kdebug.  ktrace_lock must be held. */
+                                                                     
 extern void kdebug_reset(void);
 
 void kdbg_dump_trace_to_file(const char *);
@@ -440,7 +440,7 @@ void kdbg_trace_string(struct proc *proc, long *arg1, long *arg2, long *arg3,
 void kdebug_vfs_lookup(unsigned long *path_words, int path_len, void *vnp,
     uint32_t flags);
 
-#endif /* XNU_KERNEL_PRIVATE */
+#endif                         
 
 #ifdef KERNEL_PRIVATE
 
@@ -453,7 +453,7 @@ void kdebug_lookup_gen_events(long *path_words, int path_len, void *vnp,
 #define KERNEL_DBG_IST_SANE KDBG_RELEASE
 #define ENTR_KDTRACEFUNC KDBG_RELEASE
 
-// value is int64_t, quality is uint32_t
+                                        
 #define KERNEL_ENERGYTRACE(opcode, lifespan, id, quality, value)        \
 	    ENTR_KDTRACE(kEnTrCompKernel, opcode, lifespan, id,         \
 	                 quality, value)
@@ -461,10 +461,10 @@ void kdebug_lookup_gen_events(long *path_words, int path_len, void *vnp,
 	    ENTR_KDASSOCIATE(kEnTrCompKernel, par_opcode, par_act_id,   \
 	                     kEnTrCompKernel, sub_opcode, sub_act_id)
 
-#endif /* KERNEL_PRIVATE */
+#endif                     
 
-#endif /* KERNEL */
+#endif             
 
 __END_DECLS
 
-#endif /* !defined(BSD_SYS_KDEBUG_KERNEL_H) */
+#endif                                        

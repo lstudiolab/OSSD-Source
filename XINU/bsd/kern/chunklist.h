@@ -3,28 +3,28 @@
 
 #include <libkern/crypto/sha2.h>
 
-/*
- * Boot argument for disabling trust in rev2 development key(s)
- * Set by boot.efi
- */
+  
+                                                               
+                  
+   
 #define CHUNKLIST_NO_REV2_DEV           "-chunklist-no-rev2-dev"
 
-/*
- * Boot argument for disabling trust in rev1 chunklists
- * Set by boot.efi
- */
+  
+                                                       
+                  
+   
 #define CHUNKLIST_NO_REV1               "-chunklist-no-rev1"
 
-/*
- * Boot argument for obtaining current security epoch
- * Set by boot.efi
- */
+  
+                                                     
+                  
+   
 #define CHUNKLIST_SECURITY_EPOCH        "chunklist-security-epoch"
 #define CHUNKLIST_MIN_SECURITY_EPOCH    0
 
-/*
- * Chunklist file format
- */
+  
+                        
+   
 #define CHUNKLIST_MAGIC                 0x4C4B4E43
 #define CHUNKLIST_FILE_VERSION_10       1
 #define CHUNKLIST_CHUNK_METHOD_10       1
@@ -42,13 +42,13 @@ struct efi_guid_t {
 	uint8_t  data4[8];
 } __attribute__((packed));
 
-// 45E7BC51-913C-42AC-96A2-10712FFBEBA7
+                                       
 #define CHUNKLIST_REV2_SIG_HASH_GUID \
 { \
     0x45E7BC51, 0x913C, 0x42AC, { 0x96, 0xA2, 0x10, 0x71, 0x2F, 0xFB, 0xEB, 0xA7 } \
 };
 
-// A7717414-C616-4977-9420-844712A735BF
+                                       
 #define EFI_CERT_TYPE_RSA2048_SHA256 \
 { \
     0xa7717414, 0xc616, 0x4977, { 0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf } \
@@ -93,4 +93,4 @@ int authenticate_root_with_chunklist(const char *rootdmg_path, boolean_t *out_en
 int authenticate_root_version_check(void);
 int authenticate_bootkc_uuid(void);
 int authenticate_libkern_uuid(void);
-#endif /* _CHUNKLIST_H */
+#endif                   

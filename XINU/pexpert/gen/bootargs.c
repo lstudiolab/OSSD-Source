@@ -108,7 +108,7 @@ PE_parse_boot_argn_internal(
 		if (arg_boolean) {
 			if (!force_string) {
 				if (max_len > 0) {
-					argnumcpy(1, arg_ptr, max_len);/* max_len of 0 performs no copy at all*/
+					argnumcpy(1, arg_ptr, max_len);                                         
 					arg_found = TRUE;
 				} else if (max_len == 0) {
 					arg_found = TRUE;
@@ -123,10 +123,10 @@ PE_parse_boot_argn_internal(
 				args = cp + 1;
 				goto gotit;
 			}
-			if ('_' == *arg_string) { /* Force a string copy if the argument name begins with an underscore */
+			if ('_' == *arg_string) {                                                                         
 				if (max_len > 0) {
 					int hacklen = 17 > max_len ? 17 : max_len;
-					argstrcpy2(++cp, (char *)arg_ptr, hacklen - 1);  /* Hack - terminate after 16 characters */
+					argstrcpy2(++cp, (char *)arg_ptr, hacklen - 1);                                            
 					arg_found = TRUE;
 				} else if (max_len == 0) {
 					arg_found = TRUE;
@@ -144,13 +144,13 @@ PE_parse_boot_argn_internal(
 				break;
 			case STR:
 				if (max_len > 0) {
-					argstrcpy2(++cp, (char *)arg_ptr, max_len - 1);        /*max_len of 0 performs no copy at all*/
+					argstrcpy2(++cp, (char *)arg_ptr, max_len - 1);                                                
 					arg_found = TRUE;
 				} else if (max_len == 0) {
 					arg_found = TRUE;
 				}
 #if defined(__x86_64__)
-				else if (max_len == -1) {         /* unreachable on embedded */
+				else if (max_len == -1) {                                      
 					argstrcpy(++cp, (char *)arg_ptr);
 					arg_found = TRUE;
 				}
@@ -160,12 +160,12 @@ PE_parse_boot_argn_internal(
 			goto gotit;
 		}
 gotit:
-		/* Skip over current arg */
+		                           
 		while (!isargsep(*args)) {
 			args++;
 		}
 
-		/* Skip leading white space (catch end of args) */
+		                                                  
 		while (*args && isargsep(*args)) {
 			args++;
 		}
@@ -250,7 +250,7 @@ argnumcpy(long long val, void *to, unsigned maxlen)
 {
 	switch (maxlen) {
 	case 0:
-		/* No write-back, caller just wants to know if arg was found */
+		                                                               
 		break;
 	case 1:
 		*(int8_t *)to = (int8_t)val;
@@ -259,7 +259,7 @@ argnumcpy(long long val, void *to, unsigned maxlen)
 		*(int16_t *)to = (int16_t)val;
 		break;
 	case 3:
-		/* Unlikely in practice */
+		                          
 		((struct i24 *)to)->i24 = (int32_t)val;
 		break;
 	case 4:
@@ -377,11 +377,11 @@ boolean_t
 PE_imgsrc_mount_supported()
 {
 #if CONFIG_LOCKERBOOT
-	/*
-	 * Booting from a locker requires that we be able to mount the containing
-	 * volume inside the locker. This looks redundant, but this is here in case
-	 * the other conditional needs to be modified for some reason.
-	 */
+	  
+                                                                          
+                                                                            
+                                                               
+    
 	return TRUE;
 #else
 	return TRUE;
@@ -398,45 +398,45 @@ PE_get_default(
 	void const      *property_data;
 	unsigned int property_size;
 
-	/*
-	 * Look for the property using the PE DT support.
-	 */
+	  
+                                                  
+    
 	if (kSuccess == SecureDTLookupEntry(NULL, "/defaults", &dte)) {
-		/*
-		 * We have a /defaults node, look for the named property.
-		 */
+		  
+                                                           
+     
 		if (kSuccess != SecureDTGetProperty(dte, property_name, &property_data, &property_size)) {
 			return FALSE;
 		}
 
-		/*
-		 * This would be a fine place to do smart argument size management for 32/64
-		 * translation, but for now we'll insist that callers know how big their
-		 * default values are.
-		 */
+		  
+                                                                              
+                                                                          
+                        
+     
 		if (property_size > max_property) {
 			return FALSE;
 		}
 
-		/*
-		 * Copy back the precisely-sized result.
-		 */
+		  
+                                          
+     
 		memcpy(property_ptr, property_data, property_size);
 		return TRUE;
 	}
 
-	/*
-	 * Look for the property using I/O Kit's DT support.
-	 */
+	  
+                                                     
+    
 	return IODTGetDefault(property_name, property_ptr, max_property) ? FALSE : TRUE;
 }
 
-/* function: get_range_bounds
- * Parse a range string like "1_3,5_20" and return 1,3 as lower and upper.
- * Note: '_' is separator for bounds integer delimiter and
- *       ',' is considered as separator for range pair.
- * returns TRUE when both range values are found
- */
+                             
+                                                                          
+                                                          
+                                                       
+                                                
+   
 boolean_t
 get_range_bounds(char *c, int64_t *lower, int64_t *upper)
 {

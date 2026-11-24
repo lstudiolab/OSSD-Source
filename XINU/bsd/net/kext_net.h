@@ -26,9 +26,9 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
-/*
- * Support for socket filter kernel extensions
- */
+  
+                                              
+   
 
 #ifndef NET_KEXT_NET_H
 #define NET_KEXT_NET_H
@@ -39,16 +39,16 @@
 #include <sys/cdefs.h>
 
 #ifdef BSD_KERNEL_PRIVATE
-/*
- * Internal implementation bits
- */
+  
+                               
+   
 #include <sys/kpi_socketfilter.h>
 
 struct socket;
 struct sockopt;
 struct inpcb;
 
-/* Private, internal implementation functions */
+                                                
 extern int      sflt_permission_check(struct inpcb *inp);
 extern void     sflt_initsock(struct socket *so);
 extern void     sflt_termsock(struct socket *so);
@@ -72,7 +72,7 @@ extern int      sflt_data_out(struct socket *so, const struct sockaddr  *to,
 extern int      sflt_data_in(struct socket *so, const struct sockaddr *from,
     mbuf_t *data, mbuf_t *control, sflt_data_flag_t flags);
 
-#endif /* BSD_KERNEL_PRIVATE */
+#endif                         
 
 #define NFF_BEFORE              0x01
 #define NFF_AFTER               0x02
@@ -80,22 +80,22 @@ extern int      sflt_data_in(struct socket *so, const struct sockaddr *from,
 #define NKE_OK                  0
 #define NKE_REMOVE              (-1)
 
-/*
- * Interface structure for inserting an installed socket NKE into an
- *  existing socket.
- * 'handle' is the NKE to be inserted, 'where' is an insertion point,
- *  and flags dictate the position of the to-be-inserted NKE relative to
- *  the 'where' NKE.  If the latter is NULL, the flags indicate "first"
- *  or "last"
- */
+  
+                                                                    
+                    
+                                                                     
+                                                                        
+                                                                       
+             
+   
 #pragma pack(4)
 
 struct so_nke {
 	unsigned int nke_handle;
 	unsigned int nke_where;
-	int nke_flags; /* NFF_BEFORE, NFF_AFTER: net/kext_net.h */
-	u_int32_t reserved[4];  /* for future use */
+	int nke_flags;                                            
+	u_int32_t reserved[4];                      
 };
 
 #pragma pack()
-#endif /* NET_KEXT_NET_H */
+#endif                     

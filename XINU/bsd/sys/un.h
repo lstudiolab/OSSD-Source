@@ -67,32 +67,32 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
-/* [XSI] The sa_family_t type shall be defined as described in <sys/socket.h> */
+                                                                                
 #include <sys/_types/_sa_family_t.h>
 
-/*
- * [XSI] Definitions for UNIX IPC domain.
- */
+  
+                                         
+   
 struct  sockaddr_un {
-	unsigned char   sun_len;        /* sockaddr len including null */
-	sa_family_t     sun_family;     /* [XSI] AF_UNIX */
-	char            sun_path[104];  /* [XSI] path name (gag) */
+	unsigned char   sun_len;                                         
+	sa_family_t     sun_family;                        
+	char            sun_path[104];                             
 };
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
 
-/* Level number of get/setsockopt for local domain sockets */
+                                                             
 #define SOL_LOCAL               0
 
-/* Socket options. */
-#define LOCAL_PEERCRED          0x001           /* retrieve peer credentials */
-#define LOCAL_PEERPID           0x002           /* retrieve peer pid */
-#define LOCAL_PEEREPID          0x003           /* retrieve eff. peer pid */
-#define LOCAL_PEERUUID          0x004           /* retrieve peer UUID */
-#define LOCAL_PEEREUUID         0x005           /* retrieve eff. peer UUID */
-#define LOCAL_PEERTOKEN         0x006           /* retrieve peer audit token */
+                     
+#define LOCAL_PEERCRED          0x001                                          
+#define LOCAL_PEERPID           0x002                                  
+#define LOCAL_PEEREPID          0x003                                       
+#define LOCAL_PEERUUID          0x004                                   
+#define LOCAL_PEEREUUID         0x005                                        
+#define LOCAL_PEERTOKEN         0x006                                          
 
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
 
 #ifdef KERNEL
@@ -115,15 +115,15 @@ int     unp_lock(struct socket *, int, void *);
 int     unp_unlock(struct socket *, int, void *);
 lck_mtx_t* unp_getlock(struct socket *, int);
 __END_DECLS
-#endif /* PRIVATE */
-#else /* !KERNEL */
+#endif              
+#else              
 
 #if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
-/* actual length of an initialized sockaddr_un */
+                                                 
 #define SUN_LEN(su) \
 	(sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
-#endif  /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+#endif                                              
 
-#endif /* KERNEL */
+#endif             
 
-#endif /* !_SYS_UN_H_ */
+#endif                  

@@ -84,12 +84,12 @@ unsigned int get_msr_nbits(void);
 
 unsigned int get_msr_rbits(void);
 
-/*
- * thread_userstack:
- *
- * Return the user stack pointer from the machine
- * dependent thread state info.
- */
+  
+                    
+  
+                                                 
+                               
+   
 kern_return_t
 thread_userstack(
 	__unused thread_t   thread,
@@ -185,12 +185,12 @@ thread_userstack(
 	return KERN_SUCCESS;
 }
 
-/*
- * thread_userstackdefault:
- *
- * Return the default stack location for the
- * thread, if otherwise unknown.
- */
+  
+                           
+  
+                                            
+                                
+   
 kern_return_t
 thread_userstackdefault(
 	mach_vm_offset_t *default_user_stack,
@@ -213,9 +213,9 @@ thread_entrypoint(
 	mach_vm_offset_t    *entry_point
 	)
 {
-	/*
-	 * Set a default.
-	 */
+	  
+                  
+    
 	if (*entry_point == 0) {
 		*entry_point = VM_MIN_ADDRESS;
 	}
@@ -250,9 +250,9 @@ thread_entrypoint(
 	return KERN_SUCCESS;
 }
 
-/*
- * FIXME - thread_set_child
- */
+  
+                           
+   
 
 void thread_set_child(thread_t child, int pid);
 void
@@ -281,9 +281,9 @@ thread_set_child(thread_t child, int pid)
 
 
 
-/*
- * System Call handling code
- */
+  
+                            
+   
 
 extern long fuword(vm_offset_t);
 
@@ -312,7 +312,7 @@ machdep_syscall(x86_saved_state_t *state)
 		regs->eax = (unsigned int)kern_invalid(NULL);
 
 		thread_exception_return();
-		/* NOTREACHED */
+		                
 	}
 	entry = &machdep_call_table[trapno];
 	nargs = entry->nargs;
@@ -323,7 +323,7 @@ machdep_syscall(x86_saved_state_t *state)
 			regs->eax = KERN_INVALID_ADDRESS;
 
 			thread_exception_return();
-			/* NOTREACHED */
+			                
 		}
 	}
 	switch (nargs) {
@@ -346,7 +346,7 @@ machdep_syscall(x86_saved_state_t *state)
 			error = (*entry->routine.args_bsd_3)(&rval, args[0], args[1], args[2]);
 			if (error) {
 				regs->eax = error;
-				regs->efl |= EFL_CF;    /* carry bit */
+				regs->efl |= EFL_CF;                   
 			} else {
 				regs->eax = rval;
 				regs->efl &= ~EFL_CF;
@@ -367,12 +367,12 @@ machdep_syscall(x86_saved_state_t *state)
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(current_thread())->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	throttle_lowpri_io(1);
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }
 
 __attribute__((noreturn))
@@ -395,7 +395,7 @@ machdep_syscall64(x86_saved_state_t *state)
 		regs->rax = (unsigned int)kern_invalid(NULL);
 
 		thread_exception_return();
-		/* NOTREACHED */
+		                
 	}
 	entry = &machdep_call_table64[trapno];
 
@@ -419,7 +419,7 @@ machdep_syscall64(x86_saved_state_t *state)
 			error = (*entry->routine.args64_bsd_3)(&rval, regs->rdi, regs->rsi, regs->rdx);
 			if (error) {
 				regs->rax = (uint64_t)error;
-				regs->isf.rflags |= EFL_CF;    /* carry bit */
+				regs->isf.rflags |= EFL_CF;                   
 			} else {
 				regs->rax = rval;
 				regs->isf.rflags &= ~(uint64_t)EFL_CF;
@@ -436,15 +436,15 @@ machdep_syscall64(x86_saved_state_t *state)
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(current_thread())->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	throttle_lowpri_io(1);
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }
 
-#endif  /* MACH_BSD */
+#endif                
 
 
 typedef kern_return_t (*mach_call_t)(void *);
@@ -522,7 +522,7 @@ mach_call_munger(x86_saved_state_t *state)
 
 	if (call_number < 0 || call_number >= mach_trap_count) {
 		i386_exception(EXC_SYSCALL, call_number, 1);
-		/* NOTREACHED */
+		                
 	}
 	mach_call = (mach_call_t)mach_trap_table[call_number].mach_trap_function;
 
@@ -530,7 +530,7 @@ mach_call_munger(x86_saved_state_t *state)
 		DEBUG_KPRINT_SYSCALL_MACH(
 			"mach_call_munger: kern_invalid 0x%x\n", regs->eax);
 		i386_exception(EXC_SYSCALL, call_number, 1);
-		/* NOTREACHED */
+		                
 	}
 
 	argc = mach_trap_table[call_number].mach_trap_arg_count;
@@ -543,7 +543,7 @@ mach_call_munger(x86_saved_state_t *state)
 				"mach_call_munger: retval=0x%x\n", retval);
 
 			thread_exception_return();
-			/* NOTREACHED */
+			                
 		}
 	}
 
@@ -556,13 +556,13 @@ mach_call_munger(x86_saved_state_t *state)
 	    args.arg1, args.arg2, args.arg3, args.arg4, 0);
 
 #if CONFIG_MACF
-	/* Check mach trap filter mask, if exists. */
+	                                             
 	task_t task = current_task();
 	uint8_t *filter_mask = task->mach_trap_filter_mask;
 
 	if (__improbable(filter_mask != NULL &&
 	    !bitstr_test(filter_mask, call_number))) {
-		/* Not in filter mask, evaluate policy. */
+		                                          
 		if (mac_task_mach_trap_evaluate != NULL) {
 			retval = mac_task_mach_trap_evaluate(get_bsdtask_info(task),
 			    call_number);
@@ -571,7 +571,7 @@ mach_call_munger(x86_saved_state_t *state)
 			}
 		}
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 
 	retval = mach_call(&args);
 
@@ -591,7 +591,7 @@ skip_machcall:
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(current_thread())->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	throttle_lowpri_io(1);
 
@@ -602,7 +602,7 @@ skip_machcall:
 #endif
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }
 
 
@@ -646,13 +646,13 @@ mach_call_munger64(x86_saved_state_t *state)
 
 	if (call_number < 0 || call_number >= mach_trap_count) {
 		i386_exception(EXC_SYSCALL, regs->rax, 1);
-		/* NOTREACHED */
+		                
 	}
 	mach_call = (mach_call_t)mach_trap_table[call_number].mach_trap_function;
 
 	if (mach_call == (mach_call_t)kern_invalid) {
 		i386_exception(EXC_SYSCALL, regs->rax, 1);
-		/* NOTREACHED */
+		                
 	}
 	argc = mach_trap_table[call_number].mach_trap_arg_count;
 	if (argc) {
@@ -669,7 +669,7 @@ mach_call_munger64(x86_saved_state_t *state)
 				regs->rax = KERN_INVALID_ARGUMENT;
 
 				thread_exception_return();
-				/* NOTREACHED */
+				                
 			}
 		}
 	}
@@ -679,13 +679,13 @@ mach_call_munger64(x86_saved_state_t *state)
 #endif
 
 #if CONFIG_MACF
-	/* Check syscall filter mask, if exists. */
+	                                           
 	task_t task = current_task();
 	uint8_t *filter_mask = task->mach_trap_filter_mask;
 
 	if (__improbable(filter_mask != NULL &&
 	    !bitstr_test(filter_mask, call_number))) {
-		/* Not in filter mask, evaluate policy. */
+		                                          
 		if (mac_task_mach_trap_evaluate != NULL) {
 			regs->rax = mac_task_mach_trap_evaluate(get_bsdtask_info(task),
 			    call_number);
@@ -694,7 +694,7 @@ mach_call_munger64(x86_saved_state_t *state)
 			}
 		}
 	}
-#endif /* CONFIG_MACF */
+#endif                  
 
 	regs->rax = (uint64_t)mach_call((void *)&args);
 
@@ -712,7 +712,7 @@ skip_machcall:
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(current_thread())->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	throttle_lowpri_io(1);
 
@@ -723,16 +723,16 @@ skip_machcall:
 #endif
 
 	thread_exception_return();
-	/* NOTREACHED */
+	                
 }
 
 
-/*
- * thread_setuserstack:
- *
- * Sets the user stack pointer into the machine
- * dependent thread state info.
- */
+  
+                       
+  
+                                               
+                               
+   
 void
 thread_setuserstack(
 	thread_t        thread,
@@ -754,12 +754,12 @@ thread_setuserstack(
 	}
 }
 
-/*
- * thread_adjuserstack:
- *
- * Returns the adjusted user stack pointer from the machine
- * dependent thread state info.  Used for small (<2G) deltas.
- */
+  
+                       
+  
+                                                           
+                                                             
+   
 user_addr_t
 thread_adjuserstack(
 	thread_t        thread,
@@ -785,12 +785,12 @@ thread_adjuserstack(
 	}
 }
 
-/*
- * thread_setentrypoint:
- *
- * Sets the user PC into the machine
- * dependent thread state info.
- */
+  
+                        
+  
+                                    
+                               
+   
 void
 thread_setentrypoint(thread_t thread, mach_vm_address_t entry)
 {
@@ -832,7 +832,7 @@ thread_setsinglestep(thread_t thread, int on)
 
 		if (on) {
 			iss32->efl |= EFL_TF;
-			/* Ensure IRET */
+			                 
 			if (iss32->cs == SYSENTER_CS) {
 				iss32->cs = SYSENTER_TF_CS;
 			}
@@ -858,9 +858,9 @@ find_user_regs(thread_t thread)
 }
 
 #if CONFIG_DTRACE
-/*
- * DTrace would like to have a peek at the kernel interrupt state, if available.
- */
+  
+                                                                                
+   
 x86_saved_state_t *find_kern_regs(thread_t);
 
 x86_saved_state_t *

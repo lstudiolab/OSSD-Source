@@ -46,4 +46,4 @@ public:
 	    IOByteCount length) = 0;
 };
 
-#endif /* !_IOKIT_IONVRAMCONTROLLER_H */
+#endif                                  

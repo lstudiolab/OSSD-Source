@@ -42,17 +42,17 @@ extern "C" {
 typedef uint8_t         fasttrap_instr_t;
 
 typedef struct fasttrap_machtp {
-	uint8_t         ftmt_instr[FASTTRAP_MAX_INSTR_SIZE]; /* orig. instr. */
-	uint8_t         ftmt_size;      /* instruction size */
-	uint8_t         ftmt_ripmode;   /* %rip-relative handling mode */
-	uint8_t         ftmt_modrm;     /* saved modrm byte */
-	uint8_t         ftmt_type;      /* emulation type */
-	uint8_t         ftmt_code;      /* branch condition */
-	uint8_t         ftmt_base;      /* branch base */
-	uint8_t         ftmt_index;     /* branch index */
-	uint8_t         ftmt_scale;     /* branch scale */
-	uint8_t         ftmt_segment;   /* segment for memory accesses */
-	user_addr_t     ftmt_dest;      /* destination of control flow */
+	uint8_t         ftmt_instr[FASTTRAP_MAX_INSTR_SIZE];                   
+	uint8_t         ftmt_size;                            
+	uint8_t         ftmt_ripmode;                                    
+	uint8_t         ftmt_modrm;                           
+	uint8_t         ftmt_type;                          
+	uint8_t         ftmt_code;                            
+	uint8_t         ftmt_base;                       
+	uint8_t         ftmt_index;                       
+	uint8_t         ftmt_scale;                       
+	uint8_t         ftmt_segment;                                    
+	user_addr_t     ftmt_dest;                                       
 	uint8_t         ftmt_installed:1;
 	uint8_t         ftmt_retired:1;
 } fasttrap_machtp_t;
@@ -72,28 +72,28 @@ typedef struct fasttrap_machtp {
 #define ftt_retired     ftt_mtp.ftmt_retired
 
 
-#define FASTTRAP_T_COMMON       0x00    /* common case -- no emulation */
-#define FASTTRAP_T_JCC          0x01    /* near and far conditional jumps */
-#define FASTTRAP_T_LOOP         0x02    /* loop instructions */
-#define FASTTRAP_T_JCXZ         0x03    /* jump if %ecx/%rcx is zero */
-#define FASTTRAP_T_JMP          0x04    /* relative jump */
-#define FASTTRAP_T_CALL         0x05    /* near call (and link) */
-#define FASTTRAP_T_RET          0x06    /* ret */
-#define FASTTRAP_T_RET16        0x07    /* ret <imm16> */
+#define FASTTRAP_T_COMMON       0x00                                     
+#define FASTTRAP_T_JCC          0x01                                        
+#define FASTTRAP_T_LOOP         0x02                           
+#define FASTTRAP_T_JCXZ         0x03                                   
+#define FASTTRAP_T_JMP          0x04                       
+#define FASTTRAP_T_CALL         0x05                              
+#define FASTTRAP_T_RET          0x06             
+#define FASTTRAP_T_RET16        0x07                     
 
-/*
- * For performance rather than correctness.
- */
-#define FASTTRAP_T_PUSHL_EBP    0x10    /* pushl %ebp (for function entry) */
-#define FASTTRAP_T_NOP          0x11    /* nop */
+  
+                                           
+   
+#define FASTTRAP_T_PUSHL_EBP    0x10                                         
+#define FASTTRAP_T_NOP          0x11             
 
 #define FASTTRAP_RIP_1          0x1
 #define FASTTRAP_RIP_2          0x2
 #define FASTTRAP_RIP_X          0x4
 
-/*
- * Segment values.
- */
+  
+                  
+   
 #define FASTTRAP_SEG_NONE               0
 #define FASTTRAP_SEG_CS                 1
 #define FASTTRAP_SEG_DS                 2
@@ -110,4 +110,4 @@ typedef struct fasttrap_machtp {
 }
 #endif
 
-#endif  /* _FASTTRAP_ISA_H */
+#endif                       

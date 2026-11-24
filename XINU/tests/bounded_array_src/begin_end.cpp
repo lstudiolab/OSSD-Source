@@ -1,11 +1,11 @@
-//
-// Tests for
-//  iterator begin();
-//  const_iterator begin() const;
-//
-//  iterator end();
-//  const_iterator end() const;
-//
+  
+            
+                     
+                                 
+  
+                   
+                               
+  
 
 #include <libkern/c++/bounded_array.h>
 #include "test_policy.h"
@@ -18,7 +18,7 @@ template <typename T>
 static void
 tests()
 {
-	// Check begin()/end() for a non-empty array
+	                                            
 	{
 		test_bounded_array<T, 5> array = {T{0}, T{1}, T{2}, T{3}, T{4}};
 		test_bounded_ptr<T> begin = array.begin();
@@ -34,7 +34,7 @@ tests()
 		CHECK(end.unsafe_discard_bounds() == array.data() + 5);
 	}
 
-	// Check begin()/end() for an empty array
+	                                         
 	{
 		test_bounded_array<T, 0> array = {};
 		test_bounded_ptr<T> begin = array.begin();
@@ -50,7 +50,7 @@ tests()
 		CHECK(end.unsafe_discard_bounds() == array.data());
 	}
 
-	// Check associated types
+	                         
 	{
 		using A = test_bounded_array<T, 10>;
 		static_assert(std::is_same_v<typename A::iterator, test_bounded_ptr<T> >);

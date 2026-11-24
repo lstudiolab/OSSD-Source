@@ -23,9 +23,9 @@
 
 #include <sys/proc.h>
 
-/*
- * Wrapper for pid_shutdown_sockets.
- */
+  
+                                    
+   
 int
 pid_shutdown_networking(int pid, int level)
 {

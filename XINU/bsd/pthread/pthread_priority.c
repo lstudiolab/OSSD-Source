@@ -29,7 +29,7 @@
 
 #include <pthread/priority_private.h>
 
-#ifndef QOS_MIN_RELATIVE_PRIORITY // from <sys/qos.h> in userspace
+#ifndef QOS_MIN_RELATIVE_PRIORITY                                 
 #define QOS_MIN_RELATIVE_PRIORITY -15
 #endif
 

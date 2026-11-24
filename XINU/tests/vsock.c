@@ -119,7 +119,7 @@ vsock_close(int socket)
 static void
 vsock_connect_peers(uint32_t cid, uint32_t port, int backlog, int *socketA, int *socketB)
 {
-	// Listen.
+	          
 	struct sockaddr_vm addr;
 	int listen_socket;
 	int result = vsock_listen(cid, port, &addr, backlog, &listen_socket);
@@ -127,12 +127,12 @@ vsock_connect_peers(uint32_t cid, uint32_t port, int backlog, int *socketA, int 
 
 	const uint32_t connection_cid = vsock_get_local_cid(listen_socket);
 
-	// Connect.
+	           
 	int connect_socket;
 	result = vsock_connect(connection_cid, addr.svm_port, &connect_socket);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock connect");
 
-	// Accept.
+	          
 	struct sockaddr_vm accepted_addr;
 	socklen_t addrlen = sizeof(accepted_addr);
 	int accepted_socket = accept(listen_socket, (struct sockaddr *)&accepted_addr, &addrlen);
@@ -174,7 +174,7 @@ vsock_address_exists(struct xvsockpgen *buffer, struct sockaddr_vm addr)
 	    xvg = (struct xvsockpgen *)((char *)xvg + xvg->xvg_len)) {
 		struct xvsockpcb *xpcb = (struct xvsockpcb *)xvg;
 
-		/* Ignore PCBs which were freed during copyout. */
+		                                                  
 		if (xpcb->xvp_gencnt > oxvg->xvg_gen) {
 			continue;
 		}
@@ -191,7 +191,7 @@ vsock_address_exists(struct xvsockpgen *buffer, struct sockaddr_vm addr)
 	return found;
 }
 
-/* New Socket */
+                
 
 T_DECL(new_socket_getsockname, "vsock new - getsockname")
 {
@@ -215,7 +215,7 @@ T_DECL(new_socket_getpeername, "vsock new - getpeername")
 	T_ASSERT_POSIX_FAILURE(result, ENOTCONN, "vsock getpeername");
 }
 
-/* Ioctl */
+           
 
 T_DECL(ioctl_cid, "vsock ioctl cid")
 {
@@ -223,7 +223,7 @@ T_DECL(ioctl_cid, "vsock ioctl cid")
 	vsock_get_local_cid(socket);
 }
 
-/* Socketpair */
+                
 
 T_DECL(socketpair, "vsock socketpair")
 {
@@ -235,7 +235,7 @@ T_DECL(socketpair, "vsock socketpair")
 	T_ASSERT_POSIX_FAILURE(error, EOPNOTSUPP, "vsock socketpair not supported");
 }
 
-/* Bind */
+          
 
 T_DECL(bind, "vsock bind to specific port")
 {
@@ -416,7 +416,7 @@ T_DECL(bind_wrong_family, "vsock bind with wrong family")
 	T_ASSERT_POSIX_FAILURE(result, EAFNOSUPPORT, "vsock bind with wrong family");
 }
 
-/* Listen */
+            
 
 T_DECL(listen, "vsock listen on specific port")
 {
@@ -434,7 +434,7 @@ T_DECL(listen_any, "vsock listen on any port")
 	T_ASSERT_POSIX_SUCCESS(result, "vsock listen");
 }
 
-/* Connect */
+             
 
 T_DECL(connect_non_hypervisor, "vsock connect to remote other than hypervisor")
 {
@@ -492,20 +492,20 @@ T_DECL(connect_non_blocking, "vsock connect non-blocking")
 	const uint32_t port = 4321;
 	const uint32_t cid = vsock_get_local_cid(socket);
 
-	// Listen.
+	          
 	struct sockaddr_vm listen_addr;
 	int listen_socket;
 	long result = vsock_listen(cid, port, &listen_addr, 10, &listen_socket);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock listen");
 
-	// Set non-blocking.
+	                    
 	long arg = fcntl(socket, F_GETFL, NULL);
 	T_ASSERT_GT(arg, -1L, "vsock get args");
 	arg |= O_NONBLOCK;
 	result = fcntl(socket, F_SETFL, arg);
 	T_ASSERT_GT(arg, -1L, "vsock set args");
 
-	// Connect.
+	           
 	struct sockaddr_vm addr = (struct sockaddr_vm) {
 		.svm_cid = cid,
 		.svm_port = port,
@@ -519,7 +519,7 @@ T_DECL(connect_non_blocking, "vsock connect non-blocking")
 	vsock_close(listen_socket);
 }
 
-/* Shutdown */
+              
 
 T_DECL(shutdown_not_connected, "vsock shutdown - not connected")
 {
@@ -538,19 +538,19 @@ T_DECL(shutdown_reads, "vsock shutdown - reads")
 
 	char *msg = "This is test message.\n";
 
-	// 'A' sends a message.
+	                       
 	vsock_send(socketA, msg);
 
-	// 'B' shutsdown reads.
+	                       
 	int result = shutdown(socketB, SHUT_RD);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock shutdown reads");
 
-	// 'B' reads nothing.
+	                     
 	char buffer[1024] = {0};
 	ssize_t read_bytes = read(socketB, buffer, 1024);
 	T_ASSERT_EQ_LONG(0L, read_bytes, "read zero bytes");
 
-	// 'B' can still send.
+	                      
 	vsock_send(socketB, msg);
 
 	vsock_close(socketA);
@@ -564,24 +564,24 @@ T_DECL(shutdown_writes, "vsock shutdown - writes")
 
 	char *msg = "This is test message.\n";
 
-	// 'A' sends a message.
+	                       
 	vsock_send(socketA, msg);
 
-	// 'B' sends a message.
+	                       
 	vsock_send(socketB, msg);
 
-	// send() hits us with a SIGPIPE if peer closes. ignore this and catch the error code.
+	                                                                                      
 	vsock_disable_sigpipe(socketB);
 
-	// 'B' shutsdown writes.
+	                        
 	int result = shutdown(socketB, SHUT_WR);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock shutdown writes");
 
-	// 'B' fails to write.
+	                      
 	ssize_t sent_bytes = send(socketB, msg, strlen(msg), 0);
 	T_ASSERT_POSIX_FAILURE(sent_bytes, EPIPE, "vsock cannot write");
 
-	// 'B' can still read.
+	                      
 	char buffer[1024] = {0};
 	ssize_t read_bytes = read(socketB, buffer, 1024);
 	T_ASSERT_EQ_LONG(strlen(msg), (unsigned long)read_bytes, "read all bytes");
@@ -598,32 +598,32 @@ T_DECL(shutdown_both, "vsock shutdown - both")
 	char *msg = "This is test message.\n";
 	char buffer[1024] = {0};
 
-	// 'A' sends a message.
+	                       
 	vsock_send(socketA, msg);
 
-	// 'B' sends a message.
+	                       
 	vsock_send(socketB, msg);
 
-	// 'B' reads a message.
+	                       
 	ssize_t read_bytes = read(socketB, buffer, 1024);
 	T_ASSERT_EQ_LONG(strlen(msg), (unsigned long)read_bytes, "read all bytes");
 	T_ASSERT_EQ_STR(msg, buffer, "same message");
 
-	// 'A' sends a message.
+	                       
 	vsock_send(socketA, msg);
 
-	// send() hits us with a SIGPIPE if peer closes. ignore this and catch the error code.
+	                                                                                      
 	vsock_disable_sigpipe(socketB);
 
-	// 'B' shutsdown reads and writes.
+	                                  
 	int result = shutdown(socketB, SHUT_RDWR);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock shutdown reads and writes");
 
-	// 'B' fails to write.
+	                      
 	ssize_t sent_bytes = send(socketB, msg, strlen(msg), 0);
 	T_ASSERT_POSIX_FAILURE(sent_bytes, EPIPE, "vsock cannot write");
 
-	// 'B' reads nothing.
+	                     
 	read_bytes = read(socketB, buffer, 1024);
 	T_ASSERT_EQ_LONG(0L, read_bytes, "read zero bytes");
 
@@ -631,7 +631,7 @@ T_DECL(shutdown_both, "vsock shutdown - both")
 	vsock_close(socketB);
 }
 
-/* Communication */
+                   
 
 T_DECL(talk_self, "vsock talk to self")
 {
@@ -641,12 +641,12 @@ T_DECL(talk_self, "vsock talk to self")
 	char buffer[1024] = {0};
 
 	for (int i = 0; i < 64; i++) {
-		// Send a message.
+		                  
 		char *msg = (char*)malloc(64 * sizeof(char));
 		sprintf(msg, "This is test message %d\n", i);
 		vsock_send(socketA, msg);
 
-		// Receive a message.
+		                     
 		ssize_t read_bytes = read(socketB, buffer, 1024);
 		T_ASSERT_EQ_LONG(strlen(msg), (unsigned long)read_bytes, "read all bytes");
 		T_ASSERT_EQ_STR(msg, buffer, "same message");
@@ -665,15 +665,15 @@ T_DECL(talk_self_double, "vsock talk to self - double sends")
 	char buffer[1024] = {0};
 
 	for (int i = 0; i < 64; i++) {
-		// Send a message.
+		                  
 		char *msg = (char*)malloc(64 * sizeof(char));
 		sprintf(msg, "This is test message %d\n", i);
 		vsock_send(socketA, msg);
 
-		// Send the same message.
+		                         
 		vsock_send(socketA, msg);
 
-		// Receive a message.
+		                     
 		ssize_t read_bytes = read(socketB, buffer, 1024);
 		T_ASSERT_EQ_LONG(strlen(msg) * 2, (unsigned long)read_bytes, "read all bytes");
 		char *expected_msg = (char*)malloc(64 * sizeof(char));
@@ -695,7 +695,7 @@ T_DECL(talk_self_early_close, "vsock talk to self - peer closes early")
 	char *msg = "This is a message.";
 	vsock_send(socketA, msg);
 
-	// send() hits us with a SIGPIPE if peer closes. ignore this and catch the error code.
+	                                                                                      
 	vsock_disable_sigpipe(socketA);
 
 	vsock_close(socketB);
@@ -718,7 +718,7 @@ T_DECL(talk_self_connections, "vsock talk to self - too many connections")
 
 	const uint32_t connection_cid = vsock_get_local_cid(listen_socket);
 
-	// One backlog.
+	               
 	int connected_socket = vsock_new_socket();
 	struct sockaddr_vm addr = (struct sockaddr_vm) {
 		.svm_cid = connection_cid,
@@ -735,19 +735,19 @@ T_DECL(talk_self_connections, "vsock talk to self - too many connections")
 	vsock_close(listen_socket);
 }
 
-/* Sysctl */
+            
 
 static const char* pcblist = "net.vsock.pcblist";
 
 T_DECL(vsock_pcblist_simple, "vsock pcblist sysctl - simple")
 {
-	// Create some socket to discover in the pcblist.
+	                                                 
 	struct sockaddr_vm addr;
 	int socket;
 	int result = vsock_listen(VMADDR_CID_ANY, 88899, &addr, 10, &socket);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock listen on a port");
 
-	// Get the buffer length for the pcblist.
+	                                         
 	size_t length = 0;
 	result = sysctlbyname(pcblist, 0, &length, 0, 0);
 	if (result == ENOENT) {
@@ -755,15 +755,15 @@ T_DECL(vsock_pcblist_simple, "vsock pcblist sysctl - simple")
 	}
 	T_ASSERT_POSIX_SUCCESS(result, "vsock pcblist get buffer size (result %d)", result);
 
-	// Allocate the buffer.
+	                       
 	struct xvsockpgen *buffer = malloc(length);
 	T_ASSERT_NOTNULL(buffer, "allocated buffer is not null");
 
-	// Populate the buffer with the pcblist.
+	                                        
 	result = sysctlbyname(pcblist, buffer, &length, 0, 0);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock pcblist populate buffer");
 
-	// The socket should exist in the list.
+	                                       
 	bool exists = vsock_address_exists(buffer, addr);
 	T_ASSERT_TRUE(exists, "vsock pcblist contains the specified socket");
 
@@ -773,7 +773,7 @@ T_DECL(vsock_pcblist_simple, "vsock pcblist sysctl - simple")
 
 T_DECL(vsock_pcblist_added, "vsock pcblist sysctl - socket added")
 {
-	// Get the buffer length for the pcblist.
+	                                         
 	size_t length = 0;
 	int result = sysctlbyname(pcblist, 0, &length, 0, 0);
 	if (result == ENOENT) {
@@ -781,21 +781,21 @@ T_DECL(vsock_pcblist_added, "vsock pcblist sysctl - socket added")
 	}
 	T_ASSERT_POSIX_SUCCESS(result, "vsock pcblist get buffer size (result %d)", result);
 
-	// Create some socket to discover in the pcblist after making the first sysctl.
+	                                                                               
 	struct sockaddr_vm addr;
 	int socket;
 	result = vsock_listen(VMADDR_CID_ANY, 77799, &addr, 10, &socket);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock listen on a port");
 
-	// Allocate the buffer.
+	                       
 	struct xvsockpgen *buffer = malloc(length);
 	T_ASSERT_NOTNULL(buffer, "allocated buffer is not null");
 
-	// Populate the buffer with the pcblist.
+	                                        
 	result = sysctlbyname(pcblist, buffer, &length, 0, 0);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock pcblist populate buffer");
 
-	// The socket was created after the buffer and cannot fit.
+	                                                          
 	bool exists = vsock_address_exists(buffer, addr);
 	T_ASSERT_FALSE(exists, "vsock pcblist should not contain the new socket");
 
@@ -805,13 +805,13 @@ T_DECL(vsock_pcblist_added, "vsock pcblist sysctl - socket added")
 
 T_DECL(vsock_pcblist_removed, "vsock pcblist sysctl - socket removed")
 {
-	// Create some socket to be removed after making the first sysctl.
+	                                                                  
 	struct sockaddr_vm addr;
 	int socket;
 	int result = vsock_listen(VMADDR_CID_ANY, 66699, &addr, 10, &socket);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock listen on a port");
 
-	// Get the buffer length for the pcblist.
+	                                         
 	size_t length = 0;
 	result = sysctlbyname(pcblist, 0, &length, 0, 0);
 	if (result == ENOENT) {
@@ -819,18 +819,18 @@ T_DECL(vsock_pcblist_removed, "vsock pcblist sysctl - socket removed")
 	}
 	T_ASSERT_POSIX_SUCCESS(result, "vsock pcblist get buffer size (result %d)", result);
 
-	// Close the socket early.
+	                          
 	vsock_close(socket);
 
-	// Allocate the buffer.
+	                       
 	struct xvsockpgen *buffer = malloc(length);
 	T_ASSERT_NOTNULL(buffer, "allocated buffer is not null");
 
-	// Populate the buffer with the pcblist.
+	                                        
 	result = sysctlbyname(pcblist, buffer, &length, 0, 0);
 	T_ASSERT_POSIX_SUCCESS(result, "vsock pcblist populate buffer");
 
-	// The socket was destroyed before populating the list and should not exist.
+	                                                                            
 	bool exists = vsock_address_exists(buffer, addr);
 	T_ASSERT_FALSE(exists, "vsock pcblist should not contain the deleted socket");
 

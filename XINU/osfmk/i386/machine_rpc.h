@@ -31,4 +31,4 @@
 #ifndef _MACHINE_RPC_H_
 #define _MACHINE_RPC_H_
 
-#endif /* _MACHINE_RPC_H_ */
+#endif                      

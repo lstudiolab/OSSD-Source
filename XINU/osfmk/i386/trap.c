@@ -53,12 +53,12 @@
  * any improvements or extensions that they make and grant Carnegie Mellon
  * the rights to redistribute these changes.
  */
-/*
- */
+  
+   
 
-/*
- * Hardware trap/fault handler.
- */
+  
+                               
+   
 
 #include <mach_kdp.h>
 #include <mach_ldebug.h>
@@ -123,9 +123,9 @@ extern uint32_t panic_on_trap_mask;
 
 extern int insn_copyin_count;
 
-/*
- * Forward declarations
- */
+  
+                       
+   
 static void panic_trap(x86_saved_state64_t *saved_state, uint32_t pl, kern_return_t fault_result) __dead2;
 static void set_recovery_ip(x86_saved_state64_t *saved_state, vm_offset_t ip);
 #if DEVELOPMENT || DEBUG
@@ -135,8 +135,8 @@ static __attribute__((noinline)) void copy_instruction_stream(thread_t thread, u
 #endif
 
 #if CONFIG_DTRACE
-/* See <rdar://problem/4613924> */
-perfCallback tempDTraceTrapHook = NULL; /* Pointer to DTrace fbt trap hook routine */
+                                  
+perfCallback tempDTraceTrapHook = NULL;                                              
 
 extern boolean_t dtrace_tally_fault(user_addr_t);
 extern boolean_t dtrace_handle_trap(int, x86_saved_state_t *);
@@ -144,7 +144,7 @@ extern boolean_t dtrace_handle_trap(int, x86_saved_state_t *);
 
 #ifdef MACH_BSD
 extern char *   proc_name_address(void *p);
-#endif /* MACH_BSD */
+#endif               
 
 extern boolean_t pmap_smep_enabled;
 extern boolean_t pmap_smap_enabled;
@@ -169,7 +169,7 @@ thread_syscall_return(
 		is_mach = (regs->rax & SYSCALL_CLASS_MASK)
 		    == (SYSCALL_CLASS_MACH << SYSCALL_CLASS_SHIFT);
 		if (kdebug_enable && is_mach) {
-			/* Mach trap */
+			               
 			KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,
 			    MACHDBG_CODE(DBG_MACH_EXCP_SC, code) | DBG_FUNC_END,
 			    ret, 0, 0, 0, 0);
@@ -194,7 +194,7 @@ thread_syscall_return(
 		code = ((int) regs->eax);
 		is_mach = (code < 0);
 		if (kdebug_enable && is_mach) {
-			/* Mach trap */
+			               
 			KERNEL_DEBUG_CONSTANT_IST(KDEBUG_TRACE,
 			    MACHDBG_CODE(DBG_MACH_EXCP_SC, -code) | DBG_FUNC_END,
 			    ret, 0, 0, 0, 0);
@@ -217,17 +217,17 @@ thread_syscall_return(
 	kern_allocation_name_t
 	prior __assert_only = thread_get_kernel_state(thr_act)->allocation_name;
 	assertf(prior == NULL, "thread_set_allocation_name(\"%s\") not cleared", kern_allocation_get_name(prior));
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 
 	throttle_lowpri_io(1);
 
 	thread_exception_return();
-	/*NOTREACHED*/
+	              
 }
 
-/*
- * Fault recovery in copyin/copyout routines.
- */
+  
+                                             
+   
 struct recovery {
 	uintptr_t       fault_addr;
 	uintptr_t       recover_addr;
@@ -285,10 +285,10 @@ kprint_state(x86_saved_state64_t        *saved_state)
 #endif
 
 
-/*
- * Non-zero indicates latency assert is enabled and capped at valued
- * absolute time units.
- */
+  
+                                                                    
+                       
+   
 
 uint64_t interrupt_latency_cap = 0;
 boolean_t ilat_assert = FALSE;
@@ -337,11 +337,11 @@ interrupt_populate_latency_stats(char *buf, unsigned bufsize)
 uint32_t interrupt_timer_coalescing_enabled = 1;
 uint64_t interrupt_coalesced_timers;
 
-/*
- * Handle interrupts:
- *  - local APIC interrupts (IPIs, timers, etc) are handled by the kernel,
- *  - device interrupts go to the platform expert.
- */
+  
+                     
+                                                                          
+                                                  
+   
 void
 interrupt(x86_saved_state_t *state)
 {
@@ -396,21 +396,21 @@ interrupt(x86_saved_state_t *state)
 
 	ipl = get_preemption_level();
 
-	/*
-	 * Handle local APIC interrupts
-	 * else call platform expert for devices.
-	 */
+	  
+                                
+                                          
+    
 	handled = lapic_interrupt(interrupt_num, state);
 
 	if (!handled) {
 		if (interrupt_num == (LAPIC_DEFAULT_INTERRUPT_BASE + LAPIC_CMCI_INTERRUPT)) {
-			/*
-			 * CMCI can be signalled on any logical processor, and the kexts
-			 * that implement handling CMCI use IOKit to register handlers for
-			 * the CMCI vector, so if we see a CMCI, do not encode a CPU
-			 * number in bits 8:31 (since the vector is the same regardless of
-			 * the handling CPU).
-			 */
+			  
+                                                                   
+                                                                     
+                                                               
+                                                                     
+                        
+      
 			PE_incoming_interrupt(interrupt_num);
 		} else if (cnum <= lapic_max_interrupt_cpunum) {
 			PE_incoming_interrupt((cnum << 8) | interrupt_num);
@@ -428,10 +428,10 @@ interrupt(x86_saved_state_t *state)
 		uint64_t ctime = mach_absolute_time();
 		uint64_t int_latency = ctime - cdp->cpu_int_event_time;
 		uint64_t esdeadline, ehdeadline;
-		/* Attempt to process deferred timers in the context of
-		 * this interrupt, unless interrupt time has already exceeded
-		 * TCOAL_ILAT_THRESHOLD.
-		 */
+		                                                       
+                                                               
+                          
+     
 #define TCOAL_ILAT_THRESHOLD (30000ULL)
 
 		if ((int_latency < TCOAL_ILAT_THRESHOLD) &&
@@ -458,9 +458,9 @@ interrupt(x86_saved_state_t *state)
 		}
 	}
 
-	/*
-	 * Having serviced the interrupt first, look at the interrupted stack depth.
-	 */
+	  
+                                                                             
+    
 	if (!user_mode) {
 		uint64_t depth = cdp->cpu_kernel_stack
 		    + sizeof(struct thread_kernel_state)
@@ -480,7 +480,7 @@ interrupt(x86_saved_state_t *state)
 
 #if KPERF
 	kperf_interrupt();
-#endif /* KPERF */
+#endif            
 
 	KDBG_RELEASE(MACHDBG_CODE(DBG_MACH_EXCP_INTR, 0) | DBG_FUNC_END,
 	    interrupt_num);
@@ -497,7 +497,7 @@ interrupt(x86_saved_state_t *state)
 static inline void
 reset_dr7(void)
 {
-	long dr7 = 0x400; /* magic dr7 reset value; 32 bit on i386, 64 bit on x86_64 */
+	long dr7 = 0x400;                                                              
 	__asm__ volatile ("mov %0,%%dr7" : : "r" (dr7));
 }
 #if MACH_KDP
@@ -506,11 +506,11 @@ unsigned kdp_has_active_watchpoints = 0;
 #else
 #define NO_WATCHPOINTS 1
 #endif
-/*
- * Trap from kernel mode.  Only page-fault errors are recoverable,
- * and then only in special circumstances.  All other errors are
- * fatal.  Return value indicates if trap was handled.
- */
+  
+                                                                  
+                                                                
+                                                      
+   
 
 void
 kernel_trap(
@@ -521,7 +521,7 @@ kernel_trap(
 	int                     code;
 	user_addr_t             vaddr;
 	int                     type;
-	vm_map_t                map = 0;        /* protected by T_PAGE_FAULT */
+	vm_map_t                map = 0;                                       
 	kern_return_t           result = KERN_FAILURE;
 	kern_return_t           fault_result = KERN_SUCCESS;
 	thread_t                thread;
@@ -539,13 +539,13 @@ kernel_trap(
 	}
 	saved_state = saved_state64(state);
 
-	/* Record cpu where state was captured */
+	                                         
 	saved_state->isf.cpu = cpu_number();
 
 	vaddr = (user_addr_t)saved_state->cr2;
 	type  = saved_state->isf.trapno;
 	code  = (int)(saved_state->isf.err & 0xffff);
-	intr  = (saved_state->isf.rflags & EFL_IF) != 0;        /* state of ints at trap */
+	intr  = (saved_state->isf.rflags & EFL_IF) != 0;                                   
 	kern_ip = (vm_offset_t)saved_state->isf.rip;
 
 	is_user = (vaddr < VM_MAX_USER_PAGE_ADDRESS);
@@ -555,32 +555,32 @@ kernel_trap(
 #endif
 
 #if CONFIG_DTRACE
-	/*
-	 * Is there a DTrace hook?
-	 */
+	  
+                           
+    
 	if (__improbable(tempDTraceTrapHook != NULL)) {
 		if (tempDTraceTrapHook(type, state, lo_spp, 0) == KERN_SUCCESS) {
-			/*
-			 * If it succeeds, we are done...
-			 */
+			  
+                                    
+      
 			goto common_return;
 		}
 	}
 
-	/* Handle traps originated from probe context. */
+	                                                 
 	if (thread != THREAD_NULL && thread->t_dtrace_inprobe) {
 		if (dtrace_handle_trap(type, state)) {
 			goto common_return;
 		}
 	}
 
-#endif /* CONFIG_DTRACE */
+#endif                    
 
-	/*
-	 * we come here with interrupts off as we don't want to recurse
-	 * on preemption below.  but we do want to re-enable interrupts
-	 * as soon we possibly can to hold latency down
-	 */
+	  
+                                                                
+                                                                
+                                                
+    
 	if (__improbable(T_PREEMPT == type)) {
 		ast_taken_kernel();
 
@@ -599,44 +599,44 @@ kernel_trap(
 
 
 	if (T_PAGE_FAULT == type) {
-		/*
-		 * assume we're faulting in the kernel map
-		 */
+		  
+                                            
+     
 		map = kernel_map;
 
 		if (__probable((thread != THREAD_NULL) && (thread->map != kernel_map) &&
 		    (vaddr < VM_MAX_USER_PAGE_ADDRESS))) {
-			/* fault occurred in userspace */
+			                                 
 			map = thread->map;
 
-			/* Intercept a potential Supervisor Mode Execute
-			 * Protection fault. These criteria identify
-			 * both NX faults and SMEP faults, but both
-			 * are fatal. We avoid checking PTEs (racy).
-			 * (The VM could just redrive a SMEP fault, hence
-			 * the intercept).
-			 */
+			                                                
+                                               
+                                              
+                                               
+                                                    
+                     
+      
 			if (__improbable((code == (T_PF_PROT | T_PF_EXECUTE)) &&
 			    (pmap_smep_enabled) && (saved_state->isf.rip == vaddr))) {
 				goto debugger_entry;
 			}
 
-			/*
-			 * Additionally check for SMAP faults...
-			 * which are characterized by page-present and
-			 * the AC bit unset (i.e. not from copyin/out path).
-			 */
+			  
+                                           
+                                                 
+                                                       
+      
 			if (__improbable(code & T_PF_PROT &&
 			    pmap_smap_enabled &&
 			    (saved_state->isf.rflags & EFL_AC) == 0)) {
 				goto debugger_entry;
 			}
 
-			/*
-			 * If we're not sharing cr3 with the user
-			 * and we faulted in copyio,
-			 * then switch cr3 here and dismiss the fault.
-			 */
+			  
+                                            
+                               
+                                                 
+      
 			if (no_shared_cr3 &&
 			    (thread->machine.specFlags & CopyIOActive) &&
 			    map->pmap->pm_cr3 != get_cr3_base()) {
@@ -676,11 +676,11 @@ kernel_trap(
 
 	case T_DEBUG:
 		if ((saved_state->isf.rflags & EFL_TF) == 0 && NO_WATCHPOINTS) {
-			/* We've somehow encountered a debug
-			 * register match that does not belong
-			 * to the kernel debugger.
-			 * This isn't supposed to happen.
-			 */
+			                                    
+                                         
+                             
+                                    
+      
 			reset_dr7();
 			goto common_return;
 		}
@@ -690,17 +690,17 @@ kernel_trap(
 	case T_PAGE_FAULT:
 
 #if CONFIG_DTRACE
-		if (thread != THREAD_NULL && thread->t_dtrace_inprobe) { /* Executing under dtrace_probe? */
-			if (dtrace_tally_fault(vaddr)) { /* Should a fault under dtrace be ignored? */
-				/*
-				 * DTrace has "anticipated" the possibility of this fault, and has
-				 * established the suitable recovery state. Drop down now into the
-				 * recovery handling code in "case T_GENERAL_PROTECTION:".
-				 */
+		if (thread != THREAD_NULL && thread->t_dtrace_inprobe) {                                    
+			if (dtrace_tally_fault(vaddr)) {                                              
+				  
+                                                                      
+                                                                      
+                                                              
+       
 				goto FALL_THROUGH;
 			}
 		}
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 		prot = VM_PROT_READ;
 
@@ -720,18 +720,18 @@ kernel_trap(
 		if (result == KERN_SUCCESS) {
 			goto common_return;
 		}
-		/*
-		 * fall through
-		 */
+		  
+                 
+     
 #if CONFIG_DTRACE
 FALL_THROUGH:
-#endif /* CONFIG_DTRACE */
+#endif                    
 
 	case T_GENERAL_PROTECTION:
-		/*
-		 * If there is a failure recovery address
-		 * for this fault, go there.
-		 */
+		  
+                                           
+                              
+     
 		for (rp = recover_table; rp < recover_table_end; rp++) {
 			if (kern_ip == rp->fault_addr) {
 				set_recovery_ip(saved_state, rp->recover_addr);
@@ -739,36 +739,36 @@ FALL_THROUGH:
 			}
 		}
 
-		/*
-		 * Check thread recovery address also.
-		 */
+		  
+                                        
+     
 		if (thread != THREAD_NULL && thread->recover) {
 			set_recovery_ip(saved_state, thread->recover);
 			thread->recover = 0;
 			goto common_return;
 		}
-		/*
-		 * Unanticipated page-fault errors in kernel
-		 * should not happen.
-		 *
-		 * fall through...
-		 */
+		  
+                                              
+                       
+    
+                    
+     
 		OS_FALLTHROUGH;
 	default:
-		/*
-		 * Exception 15 is reserved but some chips may generate it
-		 * spuriously. Seen at startup on AMD Athlon-64.
-		 */
+		  
+                                                            
+                                                  
+     
 		if (type == 15) {
 			kprintf("kernel_trap() ignoring spurious trap 15\n");
 			goto common_return;
 		}
 debugger_entry:
-		/* Ensure that the i386_kernel_state at the base of the
-		 * current thread's stack (if any) is synchronized with the
-		 * context at the moment of the trap, to facilitate
-		 * access through the debugger.
-		 */
+		                                                       
+                                                             
+                                                     
+                                 
+     
 		sync_iss_to_iks(state);
 #if  MACH_KDP
 		if (kdp_i386_trap(type, saved_state, result, (vm_offset_t)vaddr)) {
@@ -778,9 +778,9 @@ debugger_entry:
 	}
 	pal_cli();
 	panic_trap(saved_state, trap_pl, fault_result);
-	/*
-	 * NO RETURN
-	 */
+	  
+             
+    
 
 common_return:
 #if DEVELOPMENT || DEBUG
@@ -808,10 +808,10 @@ panic_trap(x86_saved_state64_t *regs, uint32_t pl, kern_return_t fault_result)
 	pal_get_control_registers( &cr0, &cr2, &cr3, &cr4 );
 	assert(ml_get_interrupts_enabled() == FALSE);
 	current_cpu_datap()->cpu_fatal_trap_state = regs;
-	/*
-	 * Issue an I/O port read if one has been requested - this is an
-	 * event logic analyzers can use as a trigger point.
-	 */
+	  
+                                                                 
+                                                     
+    
 	panic_notify();
 
 	kprintf("CPU %d panic trap number 0x%x, rip 0x%016llx\n",
@@ -871,9 +871,9 @@ uint32_t fsigs[2];
 uint32_t fsigns, fsigcs;
 #endif
 
-/*
- *	Trap from user mode.
- */
+  
+                       
+   
 void
 user_trap(
 	x86_saved_state_t *saved_state)
@@ -888,7 +888,7 @@ user_trap(
 	thread_t                thread = current_thread();
 	kern_return_t           kret;
 	user_addr_t             rip;
-	unsigned long           dr6 = 0; /* 32 bit for i386, 64 bit for x86_64 */
+	unsigned long           dr6 = 0;                                         
 	int                     current_cpu = cpu_number();
 #if DEVELOPMENT || DEBUG
 	bool                    inspect_cacheline = false;
@@ -902,7 +902,7 @@ user_trap(
 
 		regs = saved_state64(saved_state);
 
-		/* Record cpu where state was captured */
+		                                         
 		regs->isf.cpu = current_cpu;
 
 		type = regs->isf.trapno;
@@ -917,7 +917,7 @@ user_trap(
 
 		regs = saved_state32(saved_state);
 
-		/* Record cpu where state was captured */
+		                                         
 		regs->cpu = current_cpu;
 
 		type  = regs->trapno;
@@ -930,12 +930,12 @@ user_trap(
 	}
 
 #if DEVELOPMENT || DEBUG
-	/*
-	 * Copy the cacheline of code into the thread's instruction stream save area
-	 * before enabling interrupts (the assumption is that we have not otherwise faulted or
-	 * trapped since the original cache line stores).  If the saved code is not valid,
-	 * we'll catch it below when we process the copyin() for unhandled faults.
-	 */
+	  
+                                                                             
+                                                                                       
+                                                                                   
+                                                                           
+    
 	if (thread->machine.insn_copy_optout == false &&
 	    (type == T_PAGE_FAULT || type == T_INVALID_OPCODE || type == T_GENERAL_PROTECTION)) {
 #define CACHELINE_SIZE 64
@@ -950,13 +950,13 @@ user_trap(
 	if (type == T_DEBUG) {
 		if (thread->machine.ids) {
 			unsigned long clear = 0;
-			/* Stash and clear this processor's DR6 value, in the event
-			 * this was a debug register match
-			 */
+			                                                           
+                                     
+      
 			__asm__ volatile ("mov %%db6, %0" : "=r" (dr6));
 			__asm__ volatile ("mov %0, %%db6" : : "r" (clear));
 		}
-		/* [Re]Enable LBRs *BEFORE* enabling interrupts to ensure we hit the right CPU */
+		                                                                                 
 		i386_lbr_enable();
 	}
 
@@ -972,11 +972,11 @@ user_trap(
 	exc = 0;
 
 #if CONFIG_DTRACE
-	/*
-	 * DTrace does not consume all user traps, only INT_3's for now.
-	 * Avoid needlessly calling tempDTraceTrapHook here, and let the
-	 * INT_3 case handle them.
-	 */
+	  
+                                                                 
+                                                                 
+                           
+    
 #endif
 
 	DEBUG_KPRINT_SYSCALL_MASK(1,
@@ -992,22 +992,22 @@ user_trap(
 	case T_DEBUG:
 	{
 		pcb_t   pcb;
-		/*
-		 * Update the PCB with this processor's DR6 value
-		 * in the event this was a debug register match.
-		 */
+		  
+                                                   
+                                                  
+     
 		pcb = THREAD_TO_PCB(thread);
 		if (pcb->ids) {
-			/*
-			 * We can get and set the status register
-			 * in 32-bit mode even on a 64-bit thread
-			 * because the high order bits are not
-			 * used on x86_64
-			 */
+			  
+                                            
+                                            
+                                         
+                    
+      
 			if (thread_is_64bit_addr(thread)) {
 				x86_debug_state64_t *ids = pcb->ids;
 				ids->dr6 = dr6;
-			} else {         /* 32 bit thread */
+			} else {                            
 				x86_debug_state32_t *ids = pcb->ids;
 				ids->dr6 = (uint32_t) dr6;
 			}
@@ -1019,7 +1019,7 @@ user_trap(
 	case T_INT3:
 #if CONFIG_DTRACE
 		if (dtrace_user_probe(saved_state) == KERN_SUCCESS) {
-			return; /* If it succeeds, we are done... */
+			return;                                     
 		}
 #endif
 		exc = EXC_BREAKPOINT;
@@ -1049,15 +1049,15 @@ user_trap(
 
 	case T_FPU_FAULT:
 		fpextovrflt();
-		/*
-		 * Raise exception.
-		 */
+		  
+                     
+     
 		exc = EXC_BAD_ACCESS;
 		code = VM_PROT_READ | VM_PROT_EXECUTE;
 		subcode = 0;
 		break;
 
-	case T_INVALID_TSS:     /* invalid TSS == iret with NT flag set */
+	case T_INVALID_TSS:                                               
 		exc = EXC_BAD_INSTRUCTION;
 		code = EXC_I386_INVTSSFLT;
 		subcode = err;
@@ -1076,20 +1076,20 @@ user_trap(
 		break;
 
 	case T_GENERAL_PROTECTION:
-		/*
-		 * There's a wide range of circumstances which generate this
-		 * class of exception. From user-space, many involve bad
-		 * addresses (such as a non-canonical 64-bit address).
-		 * So we map this to EXC_BAD_ACCESS (and thereby SIGSEGV).
-		 * The trouble is cr2 doesn't contain the faulting address;
-		 * we'd need to decode the faulting instruction to really
-		 * determine this. We'll leave that to debuggers.
-		 * However, attempted execution of privileged instructions
-		 * (e.g. cli) also generate GP faults and so we map these to
-		 * to EXC_BAD_ACCESS (and thence SIGSEGV) also - rather than
-		 * EXC_BAD_INSTRUCTION which is more accurate. We just can't
-		 * win!
-		 */
+		  
+                                                              
+                                                          
+                                                        
+                                                            
+                                                             
+                                                           
+                                                   
+                                                            
+                                                              
+                                                              
+                                                              
+         
+     
 		exc = EXC_BAD_ACCESS;
 		code = EXC_I386_GPFLT;
 		subcode = err;
@@ -1135,14 +1135,14 @@ user_trap(
 		if (__probable((kret == KERN_SUCCESS) || (kret == KERN_ABORTED))) {
 			break;
 		} else if (__improbable(kret == KERN_FAILURE)) {
-			/*
-			 * For a user trap, vm_fault() should never return KERN_FAILURE.
-			 * If it does, we're leaking preemption disables somewhere in the kernel.
-			 */
+			  
+                                                                   
+                                                                            
+      
 			panic("vm_fault() KERN_FAILURE from user fault on thread %p", thread);
 		}
 
-		/* PAL debug hook (empty on x86) */
+		                                   
 		pal_dbg_page_fault(thread, vaddr, kret);
 		exc = EXC_BAD_ACCESS;
 		code = kret;
@@ -1168,13 +1168,13 @@ user_trap(
 	case T_DTRACE_RET:
 #if CONFIG_DTRACE
 		if (dtrace_user_probe(saved_state) == KERN_SUCCESS) {
-			return; /* If it succeeds, we are done... */
+			return;                                     
 		}
 #endif
-		/*
-		 * If we get an INT 0x7f when we do not expect to,
-		 * treat it as an illegal instruction
-		 */
+		  
+                                                    
+                                       
+     
 		exc = EXC_BAD_INSTRUCTION;
 		code = EXC_I386_INVOP;
 		break;
@@ -1195,24 +1195,24 @@ user_trap(
 
 		if (last_branch_support_enabled) {
 			intrs = ml_set_interrupts_enabled(FALSE);
-			/*
-			 * This is a bit racy (it's possible for this thread to migrate to another CPU, then
-			 * migrate back, but that seems rather rare in practice), but good enough to ensure
-			 * the LBRs are saved before proceeding with exception/signal dispatch.
-			 */
+			  
+                                                                                       
+                                                                                      
+                                                                          
+      
 			if (current_cpu == cpu_number()) {
 				i386_lbr_synch(thread);
 			}
 			ml_set_interrupts_enabled(intrs);
 		}
 
-		/*
-		 * Do not try to copyin from the instruction stream if the page fault was due
-		 * to an access to rip and was unhandled.
-		 * Do not deal with cases when %cs != USER[64]_CS
-		 * And of course there's no need to copy the instruction stream if the boot-arg
-		 * was set to 0.
-		 */
+		  
+                                                                               
+                                           
+                                                   
+                                                                                 
+                  
+     
 		if (thread->machine.insn_copy_optout == false && insn_copyin_count > 0 &&
 		    (cs == USER64_CS || cs == USER_CS) && (type != T_PAGE_FAULT || vaddr != rip)) {
 #if DEVELOPMENT || DEBUG
@@ -1227,12 +1227,12 @@ user_trap(
 			traptrace_end(traptrace_index, mach_absolute_time());
 		}
 #endif
-		/*
-		 * Note: Codepaths that directly return from user_trap() have pending
-		 * ASTs processed in locore
-		 */
+		  
+                                                                       
+                             
+     
 		i386_exception(exc, code, subcode);
-		/* NOTREACHED */
+		                
 	} else {
 #if DEVELOPMENT || DEBUG
 		if (traptrace_index != TRAPTRACE_INVALID_INDEX) {
@@ -1242,12 +1242,12 @@ user_trap(
 	}
 }
 
-/*
- * Copyin up to x86_INSTRUCTION_STATE_MAX_INSN_BYTES bytes from the page that includes `rip`,
- * ensuring that we stay on the same page, clipping the start or end, as needed.
- * Add the clipped amount back at the start or end, depending on where it fits.
- * Consult the variable populated by the boot-arg `insn_capcnt'
- */
+  
+                                                                                             
+                                                                                
+                                                                               
+                                                               
+   
 static __attribute__((noinline)) void
 copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 #if DEVELOPMENT || DEBUG
@@ -1274,7 +1274,7 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 	assert(insn_copyin_count <= x86_INSTRUCTION_STATE_MAX_INSN_BYTES);
 #else
 	if (insn_copyin_count > x86_INSTRUCTION_STATE_MAX_INSN_BYTES ||
-	    insn_copyin_count < 64 /* CACHELINE_SIZE */) {
+	    insn_copyin_count < 64                     ) {
 		return;
 	}
 #endif
@@ -1295,15 +1295,15 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 		end_addr += (rip_page - start_addr);
 		start_addr = rip_page;
 	} else if (end_addr >= (rip_page + (~pagemask + 1))) {
-		start_addr -= (end_addr - (rip_page + (~pagemask + 1))); /* Adjust start address backward */
-		/* Adjust instruction offset due to start address change */
+		start_addr -= (end_addr - (rip_page + (~pagemask + 1)));                                    
+		                                                           
 		insn_offset = (insn_copyin_count / 2) + (end_addr - (rip_page + (~pagemask + 1)));
-		end_addr = rip_page + (~pagemask + 1);  /* clip to the start of the next page (non-inclusive */
+		end_addr = rip_page + (~pagemask + 1);                                                         
 	} else {
 		insn_offset = insn_copyin_count / 2;
 	}
 
-	disable_preemption();   /* Prevent copyin from faulting in the instruction stream */
+	disable_preemption();                                                               
 	if (
 #if DEVELOPMENT || DEBUG
 		(insnstream_force_cacheline_mismatch < 2) &&
@@ -1324,21 +1324,21 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 			pcb->insn_state->insn_offset = (int)insn_offset;
 
 #if DEVELOPMENT || DEBUG
-			/* Now try to validate the cacheline we read at early-fault time matches the code
-			 * copied in. Before we do that, we have to make sure the buffer contains a valid
-			 * cacheline by looking for the 2 sentinel values written in the event the cacheline
-			 * could not be copied.
-			 */
+			                                                                                 
+                                                                                    
+                                                                                       
+                          
+      
 #define CACHELINE_DATA_NOT_PRESENT 0xdeadc0debeefcafeULL
 #define CACHELINE_MASK (CACHELINE_SIZE - 1)
 
 			if (inspect_cacheline &&
 			    (*(uint64_t *)(uintptr_t)&pcb->insn_cacheline[0] != CACHELINE_DATA_NOT_PRESENT &&
 			    *(uint64_t *)(uintptr_t)&pcb->insn_cacheline[8] != CACHELINE_DATA_NOT_PRESENT)) {
-				/*
-				 * The position of the cacheline in the instruction buffer is at offset
-				 * insn_offset - (rip & CACHELINE_MASK)
-				 */
+				  
+                                                                           
+                                           
+       
 				if (__improbable((rip & CACHELINE_MASK) > insn_offset)) {
 					printf("thread %p code cacheline @ %p clipped wrt copied-in code (offset %d)\n",
 					    thread, (void *)(rip & ~CACHELINE_MASK), (int)(rip & CACHELINE_MASK));
@@ -1351,7 +1351,7 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 #endif
 					bcopy(&pcb->insn_cacheline[0], &pcb->insn_state->insn_cacheline[0],
 					    x86_INSTRUCTION_STATE_CACHELINE_SIZE);
-					/* Mark the instruction stream as being out-of-synch */
+					                                                       
 					pcb->insn_state->out_of_synch = 1;
 
 					printf("thread %p code cacheline @ %p mismatches with copied-in code [trap 0x%x]\n",
@@ -1373,7 +1373,7 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 			}
 #else
 			pcb->insn_state->out_of_synch = 0;
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 
 #if defined(MACH_BSD) && (DEVELOPMENT || DEBUG)
 			if (panic_on_trap_procname[0] != 0) {
@@ -1387,11 +1387,11 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 					    ((1U << trap_code) & panic_on_trap_mask) != 0) {
 						panic("Panic requested on trap type 0x%x for process `%s'", trap_code,
 						    panic_on_trap_procname);
-						/*NORETURN*/
+						            
 					}
 				}
 			}
-#endif /* MACH_BSD && (DEVELOPMENT || DEBUG) */
+#endif                                         
 		}
 	} else {
 		enable_preemption();
@@ -1408,29 +1408,29 @@ copy_instruction_stream(thread_t thread, uint64_t rip, int __unused trap_code
 			if (inspect_cacheline &&
 			    (*(uint64_t *)(uintptr_t)&pcb->insn_cacheline[0] != CACHELINE_DATA_NOT_PRESENT &&
 			    *(uint64_t *)(uintptr_t)&pcb->insn_cacheline[8] != CACHELINE_DATA_NOT_PRESENT)) {
-				/*
-				 * We can still copy the cacheline into the instruction state structure
-				 * if it contains valid data
-				 */
+				  
+                                                                           
+                                
+       
 				pcb->insn_state->out_of_synch = 1;
 				bcopy(&pcb->insn_cacheline[0], &pcb->insn_state->insn_cacheline[0],
 				    x86_INSTRUCTION_STATE_CACHELINE_SIZE);
 			}
 		}
-#endif /* DEVELOPMENT || DEBUG */
+#endif                           
 	}
 }
 
-/*
- * Handle exceptions for i386.
- *
- * If we are an AT bus machine, we must turn off the AST for a
- * delayed floating-point exception.
- *
- * If we are providing floating-point emulation, we may have
- * to retrieve the real register values from the floating point
- * emulator.
- */
+  
+                              
+  
+                                                              
+                                    
+  
+                                                            
+                                                               
+            
+   
 void
 i386_exception(
 	int     exc,
@@ -1441,19 +1441,19 @@ i386_exception(
 
 	DEBUG_KPRINT_SYSCALL_MACH("i386_exception: exc=%d code=0x%llx subcode=0x%llx\n",
 	    exc, code, subcode);
-	codes[0] = code;                /* new exception interface */
+	codes[0] = code;                                             
 	codes[1] = subcode;
 	exception_triage(exc, codes, 2);
-	/*NOTREACHED*/
+	              
 }
 
 
-/* Synchronize a thread's x86_kernel_state (if any) with the given
- * x86_saved_state_t obtained from the trap/IPI handler; called in
- * kernel_trap() prior to entering the debugger, and when receiving
- * an "MP_KDP" IPI. Called with null saved_state if an incoming IPI
- * was detected from the kernel while spinning with interrupts masked.
- */
+                                                                  
+                                                                  
+                                                                   
+                                                                   
+                                                                      
+   
 
 void
 sync_iss_to_iks(x86_saved_state_t *saved_state)
@@ -1462,7 +1462,7 @@ sync_iss_to_iks(x86_saved_state_t *saved_state)
 	vm_offset_t kstack;
 	boolean_t record_active_regs = FALSE;
 
-	/* The PAL may have a special way to sync registers */
+	                                                      
 	if (saved_state && saved_state->flavor == THREAD_STATE_NONE) {
 		pal_get_kern_regs( saved_state );
 	}
@@ -1473,8 +1473,8 @@ sync_iss_to_iks(x86_saved_state_t *saved_state)
 
 		iks = STACK_IKS(kstack);
 
-		/* Did we take the trap/interrupt in kernel mode? */
-		if (saved_state == NULL || /* NULL => polling in kernel */
+		                                                    
+		if (saved_state == NULL ||                                
 		    regs == USER_REGS64(current_thread())) {
 			record_active_regs = TRUE;
 		} else {
@@ -1490,7 +1490,7 @@ sync_iss_to_iks(x86_saved_state_t *saved_state)
 	}
 
 	if (record_active_regs == TRUE) {
-		/* Show the trap handler path */
+		                                
 		__asm__ volatile ("movq %%rbx, %0" : "=m" (iks->k_rbx));
 		__asm__ volatile ("movq %%rsp, %0" : "=m" (iks->k_rsp));
 		__asm__ volatile ("movq %%rbp, %0" : "=m" (iks->k_rbp));
@@ -1498,7 +1498,7 @@ sync_iss_to_iks(x86_saved_state_t *saved_state)
 		__asm__ volatile ("movq %%r13, %0" : "=m" (iks->k_r13));
 		__asm__ volatile ("movq %%r14, %0" : "=m" (iks->k_r14));
 		__asm__ volatile ("movq %%r15, %0" : "=m" (iks->k_r15));
-		/* "Current" instruction pointer */
+		                                   
 		__asm__ volatile ("leaq 1f(%%rip), %%rax; mov %%rax, %0\n1:"
                                   : "=m" (iks->k_rip)
                                   :
@@ -1506,12 +1506,12 @@ sync_iss_to_iks(x86_saved_state_t *saved_state)
 	}
 }
 
-/*
- * This is used by the NMI interrupt handler (from mp.c) to
- * uncondtionally sync the trap handler context to the IKS
- * irrespective of whether the NMI was fielded in kernel
- * or user space.
- */
+  
+                                                           
+                                                          
+                                                        
+                 
+   
 void
 sync_iss_to_iks_unconditionally(__unused x86_saved_state_t *saved_state)
 {
@@ -1520,7 +1520,7 @@ sync_iss_to_iks_unconditionally(__unused x86_saved_state_t *saved_state)
 
 	if ((kstack = current_thread()->kernel_stack) != 0) {
 		iks = STACK_IKS(kstack);
-		/* Display the trap handler path */
+		                                   
 		__asm__ volatile ("movq %%rbx, %0" : "=m" (iks->k_rbx));
 		__asm__ volatile ("movq %%rsp, %0" : "=m" (iks->k_rsp));
 		__asm__ volatile ("movq %%rbp, %0" : "=m" (iks->k_rbp));
@@ -1528,7 +1528,7 @@ sync_iss_to_iks_unconditionally(__unused x86_saved_state_t *saved_state)
 		__asm__ volatile ("movq %%r13, %0" : "=m" (iks->k_r13));
 		__asm__ volatile ("movq %%r14, %0" : "=m" (iks->k_r14));
 		__asm__ volatile ("movq %%r15, %0" : "=m" (iks->k_r15));
-		/* "Current" instruction pointer */
+		                                   
 		__asm__ volatile ("leaq 1f(%%rip), %%rax; mov %%rax, %0\n1:" : "=m" (iks->k_rip)::"rax");
 	}
 }

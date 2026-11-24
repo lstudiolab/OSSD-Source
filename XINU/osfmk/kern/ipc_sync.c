@@ -44,14 +44,14 @@
 #include <mach/port.h>
 
 
-/*
- *	Routine:	port_name_to_semaphore
- *	Purpose:
- *		Convert from a port name in the current space to a semaphore.
- *		Produces a semaphore ref, which may be null.
- *	Conditions:
- *		Nothing locked.
- */
+  
+                                  
+           
+                                                                 
+                                                
+              
+                   
+   
 kern_return_t
 port_name_to_semaphore(
 	mach_port_name_t        name,
@@ -70,12 +70,12 @@ port_name_to_semaphore(
 		*semaphorep = SEMAPHORE_NULL;
 		return kr;
 	}
-	/* have the port locked */
+	                          
 	assert(IP_VALID(kern_port));
 
 	*semaphorep = convert_port_to_semaphore(kern_port);
 	if (*semaphorep == SEMAPHORE_NULL) {
-		/* the port is valid, but doesn't denote a semaphore */
+		                                                       
 		kr = KERN_INVALID_CAPABILITY;
 	} else {
 		kr = KERN_SUCCESS;
@@ -85,27 +85,27 @@ port_name_to_semaphore(
 	return kr;
 }
 
-/*
- *	Routine:	convert_port_to_semaphore
- *	Purpose:
- *		Convert from a port to a semaphore.
- *		Doesn't consume the port [send-right] ref;
- *		produces a semaphore ref, which may be null.
- *	Conditions:
- *		Caller has a send-right reference to port.
- *		Port may or may not be locked.
- */
+  
+                                     
+           
+                                       
+                                              
+                                                
+              
+                                              
+                                  
+   
 semaphore_t
 convert_port_to_semaphore(ipc_port_t port)
 {
 	if (IP_VALID(port)) {
 		semaphore_t semaphore;
 
-		/*
-		 * No need to lock because we have a reference on the
-		 * port, and if it is a true semaphore port, that reference
-		 * keeps the semaphore bound to the port (and active).
-		 */
+		  
+                                                       
+                                                             
+                                                        
+     
 		if (ip_kotype(port) == IKOT_SEMAPHORE) {
 			require_ip_active(port);
 			semaphore = (semaphore_t) ip_get_kobject(port);
@@ -117,17 +117,17 @@ convert_port_to_semaphore(ipc_port_t port)
 }
 
 
-/*
- *	Routine:	convert_semaphore_to_port
- *	Purpose:
- *		Convert a semaphore reference to a send right to a
- *		semaphore port.
- *
- *		Consumes the semaphore reference.  If the semaphore
- *		port currently has no send rights (or doesn't exist
- *		yet), the reference is donated to the port to represent
- *		all extant send rights collectively.
- */
+  
+                                     
+           
+                                                      
+                   
+  
+                                                       
+                                                       
+                                                           
+                                        
+   
 ipc_port_t
 convert_semaphore_to_port(semaphore_t semaphore)
 {
@@ -135,10 +135,10 @@ convert_semaphore_to_port(semaphore_t semaphore)
 		return IP_NULL;
 	}
 
-	/*
-	 * make a send right and donate our reference for
-	 * semaphore_notify if this is the first send right
-	 */
+	  
+                                                  
+                                                    
+    
 	if (!ipc_kobject_make_send_lazy_alloc_port(&semaphore->port,
 	    (ipc_kobject_t) semaphore, IKOT_SEMAPHORE, IPC_KOBJECT_ALLOC_NONE, false, 0)) {
 		semaphore_dereference(semaphore);
@@ -146,20 +146,20 @@ convert_semaphore_to_port(semaphore_t semaphore)
 	return semaphore->port;
 }
 
-/*
- * Routine:	semaphore_notify
- * Purpose:
- *	Called whenever the Mach port system detects no-senders
- *	on the semaphore port.
- *
- *	When a send-right is first created, a no-senders
- *	notification is armed (and a semaphore reference is donated).
- *
- *	A no-senders notification will be posted when no one else holds a
- *	send-right (reference) to the semaphore's port. This notification function
- *	will consume the semaphore reference donated to the extant collection of
- *	send-rights.
- */
+  
+                            
+           
+                                                          
+                         
+  
+                                                   
+                                                                
+  
+                                                                    
+                                                                             
+                                                                           
+               
+   
 void
 semaphore_notify(mach_msg_header_t *msg)
 {

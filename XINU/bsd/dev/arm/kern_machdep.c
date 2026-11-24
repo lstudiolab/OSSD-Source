@@ -19,13 +19,13 @@
 
 #if __arm64__
 static cpu_subtype_t cpu_subtype32(void);
-#endif /* __arm64__ */
+#endif                
 
 #if __arm64__
-/*
- * When an arm64 CPU is executing an arm32 binary, we need to map from the
- * host's 64-bit subtype to the appropriate 32-bit subtype.
- */
+  
+                                                                          
+                                                           
+   
 static cpu_subtype_t
 cpu_subtype32()
 {
@@ -41,37 +41,37 @@ static int
 grade_arm64e_binary(cpu_subtype_t execfeatures)
 {
 #if XNU_TARGET_OS_IOS
-	/*
-	 * iOS 13 toolchains produced unversioned arm64e slices which are not
-	 * ABI compatible with this release.
-	 */
+	  
+                                                                      
+                                     
+    
 	if ((execfeatures & CPU_SUBTYPE_PTRAUTH_ABI) == 0) {
 #if DEBUG || DEVELOPMENT
 		printf("%s: arm64e prerelease ABI cannot be used with this kernel\n", __func__);
-#endif /* DEBUG || DEVELOPMENT */
+#endif                           
 		return 0;
 	}
-#endif /* XNU_TARGET_OS_IOS */
+#endif                        
 
-	/* The current ABI version is preferred over arm64 */
+	                                                     
 	if (CPU_SUBTYPE_ARM64_PTR_AUTH_VERSION(execfeatures) ==
 	    CPU_SUBTYPE_ARM64_PTR_AUTH_CURRENT_VERSION) {
 		return 12;
 	}
 
-	/* Future ABIs are allowed, but exec_mach_imgact will treat it like an arm64 slice */
+	                                                                                     
 	return 11;
 }
-#endif /* __arm64__ */
+#endif                
 
-/**********************************************************************
-* Routine:	grade_binary()
-*
-* Function:	Return a relative preference for exectypes and
-*		execsubtypes in fat executable files.  The higher the
-*		grade, the higher the preference.  A grade of 0 means
-*		not acceptable.
-**********************************************************************/
+                                                                       
+                         
+ 
+                                                          
+                                                        
+                                                        
+                  
+                                                                       
 int
 grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execfeatures __unused, bool allow_simulator_binary __unused)
 {
@@ -80,7 +80,7 @@ grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execf
 	    (exectype & CPU_ARCH_ABI64) ? cpu_subtype() : cpu_subtype32();
 #else
 	cpu_subtype_t hostsubtype = cpu_subtype();
-#endif /* __arm64__ */
+#endif                
 
 	switch (exectype) {
 #if __arm64__
@@ -104,16 +104,16 @@ grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execf
 			case CPU_SUBTYPE_ARM64_ALL:
 				return 9;
 			}
-		} /* switch (hostsubtype) */
+		}                           
 		break;
 
-#else /* __arm64__ */
+#else                
 
 	case CPU_TYPE_ARM:
 		switch (hostsubtype) {
-		/*
-		 * For 32-bit ARMv8, try the ARMv8 slice before falling back to Swift.
-		 */
+		  
+                                                                        
+     
 		case CPU_SUBTYPE_ARM_V8:
 			switch (execsubtype) {
 			case CPU_SUBTYPE_ARM_V8:
@@ -121,10 +121,10 @@ grade_binary(cpu_type_t exectype, cpu_subtype_t execsubtype, cpu_subtype_t execf
 			}
 			goto v7s;
 
-			/*
-			 * For Swift and later, we prefer to run a swift slice, but fall back
-			 * to v7 as Cortex A9 errata should not apply
-			 */
+			  
+                                                                        
+                                                
+      
 v7s:
 		case CPU_SUBTYPE_ARM_V7S:
 			switch (execsubtype) {
@@ -133,9 +133,9 @@ v7s:
 			}
 			goto v7;
 
-		/*
-		 * For Cortex A7, accept v7k only due to differing ABI
-		 */
+		  
+                                                        
+     
 		case CPU_SUBTYPE_ARM_V7K:
 			switch (execsubtype) {
 			case CPU_SUBTYPE_ARM_V7K:
@@ -143,10 +143,10 @@ v7s:
 			}
 			break;
 
-		/*
-		 * For Cortex A9, we prefer the A9 slice, but will run v7 albeit
-		 * under the risk of hitting the NEON load/store errata
-		 */
+		  
+                                                                  
+                                                         
+     
 		case CPU_SUBTYPE_ARM_V7F:
 			switch (execsubtype) {
 			case CPU_SUBTYPE_ARM_V7F:
@@ -160,21 +160,21 @@ v7:
 			case CPU_SUBTYPE_ARM_V7:
 				return 5;
 			}
-		// fall through...
+		                  
 
 		case CPU_SUBTYPE_ARM_V6:
 			switch (execsubtype) {
 			case CPU_SUBTYPE_ARM_V6:
 				return 4;
 			}
-		// fall through...
+		                  
 
 		case CPU_SUBTYPE_ARM_V5TEJ:
 			switch (execsubtype) {
 			case CPU_SUBTYPE_ARM_V5TEJ:
 				return 3;
 			}
-		// fall through
+		               
 
 		case CPU_SUBTYPE_ARM_V4T:
 			switch (execsubtype) {
@@ -198,7 +198,7 @@ v7:
 			}
 			break;
 		}
-#endif /* __arm64__ */
+#endif                
 	}
 
 	return 0;

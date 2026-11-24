@@ -29,7 +29,7 @@
 #include <darwintest.h>
 #include <darwintest_utils.h>
 
-// This can either test libkern's sscanf, or stdio.h's.
+                                                       
 #define TEST_LIBKERN
 
 #if defined(TEST_LIBKERN)

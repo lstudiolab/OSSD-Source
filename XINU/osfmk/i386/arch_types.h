@@ -34,13 +34,13 @@
 #define _MACHINE_ARCH_TYPES_H_
 
 
-typedef signed char     bit8_t;         /* signed 8-bit quantity */
-typedef unsigned char   u_bit8_t;       /* unsigned 8-bit quantity */
+typedef signed char     bit8_t;                                    
+typedef unsigned char   u_bit8_t;                                    
 
-typedef short           bit16_t;        /* signed 16-bit quantity */
-typedef unsigned short  u_bit16_t;      /* unsigned 16-bit quantity */
+typedef short           bit16_t;                                    
+typedef unsigned short  u_bit16_t;                                    
 
-typedef int             bit32_t;        /* signed 32-bit quantity */
-typedef unsigned int    u_bit32_t;      /* unsigned 32-bit quantity */
+typedef int             bit32_t;                                    
+typedef unsigned int    u_bit32_t;                                    
 
 #endif

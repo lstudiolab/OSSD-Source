@@ -52,52 +52,52 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * IP ID generation is a fascinating topic.
- *
- * In order to avoid ID collisions during packet reassembly, common sense
- * dictates that the period between reuse of IDs be as large as possible.
- * This leads to the classic implementation of a system-wide counter, thereby
- * ensuring that IDs repeat only once every 2^16 packets.
- *
- * Subsequent security researchers have pointed out that using a global
- * counter makes ID values predictable.  This predictability allows traffic
- * analysis, idle scanning, and even packet injection in specific cases.
- * These results suggest that IP IDs should be as random as possible.
- *
- * The "searchable queues" algorithm used in this IP ID implementation was
- * proposed by Amit Klein.  It is a compromise between the above two
- * viewpoints that has provable behavior that can be tuned to the user's
- * requirements.
- *
- * The basic concept is that we supplement a standard random number generator
- * with a queue of the last L IDs that we have handed out to ensure that all
- * IDs have a period of at least L.
- *
- * To efficiently implement this idea, we keep two data structures: a
- * circular array of IDs of size L and a bitstring of 65536 bits.
- *
- * To start, we ask the RNG for a new ID.  A quick index into the bitstring
- * is used to determine if this is a recently used value.  The process is
- * repeated until a value is returned that is not in the bitstring.
- *
- * Having found a usable ID, we remove the ID stored at the current position
- * in the queue from the bitstring and replace it with our new ID.  Our new
- * ID is then added to the bitstring and the queue pointer is incremented.
- *
- * The lower limit of 512 was chosen because there doesn't seem to be much
- * point to having a smaller value.  The upper limit of 32768 was chosen for
- * two reasons.  First, every step above 32768 decreases the entropy.  Taken
- * to an extreme, 65533 would offer 1 bit of entropy.  Second, the number of
- * attempts it takes the algorithm to find an unused ID drastically
- * increases, killing performance.  The default value of 4096 was chosen
- * because it provides a good tradeoff between randomness and non-repetition,
- * while taking performance into account.
- *
- * With L=4096, the queue will use 8K of memory.  The bitstring always uses
- * 8K of memory (2^16/8).  This yields to around 7% ID collisions.  No memory
- * is allocated until the use of random ids is enabled.
- */
+  
+                                           
+  
+                                                                         
+                                                                         
+                                                                             
+                                                         
+  
+                                                                       
+                                                                           
+                                                                        
+                                                                     
+  
+                                                                          
+                                                                    
+                                                                        
+                
+  
+                                                                             
+                                                                            
+                                   
+  
+                                                                     
+                                                                 
+  
+                                                                           
+                                                                         
+                                                                   
+  
+                                                                            
+                                                                           
+                                                                          
+  
+                                                                          
+                                                                            
+                                                                            
+                                                                            
+                                                                   
+                                                                        
+                                                                             
+                                         
+  
+                                                                           
+                                                                             
+                                                       
+   
 
 #include <sys/param.h>
 #include <sys/time.h>
@@ -112,9 +112,9 @@
 #include <netinet/ip_var.h>
 #include <dev/random/randomdev.h>
 
-/*
- * Size of L (see comments above on the lower and upper limits.)
- */
+  
+                                                                
+   
 #define ARRAY_SIZE      (4096)
 
 static uint16_t *id_array = NULL;
@@ -139,9 +139,9 @@ SYSCTL_QUAD(_net_inet_ip, OID_AUTO, random_id_total,
     CTLFLAG_RD | CTLFLAG_LOCKED, &random_id_total,
     "Count of IP IDs created");
 
-/*
- * Called once from ip_init().
- */
+  
+                              
+   
 void
 ip_initid(void)
 {
@@ -160,7 +160,7 @@ ip_initid(void)
 	id_bits = (bitstr_t *)_MALLOC(bitstr_size(65536), M_TEMP,
 	    M_WAITOK | M_ZERO);
 	if (id_array == NULL || id_bits == NULL) {
-		/* Just in case; neither or both. */
+		                                    
 		if (id_array != NULL) {
 			_FREE(id_array, M_TEMP);
 			id_array = NULL;
@@ -177,20 +177,20 @@ ip_randomid(void)
 {
 	uint16_t new_id;
 
-	/*
-	 * If net.inet.ip.random_id is disabled, revert to incrementing ip_id.
-	 * Given that we don't allow the size of the array to change, accessing
-	 * id_array and id_bits prior to acquiring the lock below is safe.
-	 */
+	  
+                                                                       
+                                                                        
+                                                                   
+    
 	if (id_array == NULL || ip_use_randomid == 0) {
 		return htons(ip_id++);
 	}
 
-	/*
-	 * To avoid a conflict with the zeros that the array is initially
-	 * filled with, we never hand out an id of zero.  bit_test() below
-	 * uses single memory access, therefore no lock is needed.
-	 */
+	  
+                                                                  
+                                                                   
+                                                           
+    
 	new_id = 0;
 	do {
 		if (random_id_statistics && new_id != 0) {
@@ -199,9 +199,9 @@ ip_randomid(void)
 		read_random(&new_id, sizeof(new_id));
 	} while (bitstr_test(id_bits, new_id) || new_id == 0);
 
-	/*
-	 * These require serialization to maintain correctness.
-	 */
+	  
+                                                        
+    
 	lck_mtx_lock_spin(&ipid_lock);
 	bitstr_clear(id_bits, id_array[array_ptr]);
 	bitstr_set(id_bits, new_id);

@@ -31,10 +31,10 @@
  * All rights reserved.  The CMU software License Agreement specifies
  * the terms and conditions for use and redistribution.
  */
-/*
- *  Includes all the types that a normal user
- *  of Mach programs should need
- */
+  
+                                             
+                                
+   
 
 #ifndef _MACH_H_
 #define _MACH_H_
@@ -44,4 +44,4 @@
 #include <mach/thread_switch.h>
 #include <mach/mach_interface.h>
 
-#endif  /* _MACH_H_ */
+#endif                

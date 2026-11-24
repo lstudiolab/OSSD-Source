@@ -59,9 +59,9 @@ ubsan_buf_log_loc(struct ubsan_buf *ub, const char *desc, struct san_src_loc *lo
 	    loc->col);
 }
 
-/*
- * return true for the first visit to this loc, false every subsequent time
- */
+  
+                                                                           
+   
 static bool
 ubsan_loc_acquire(struct san_src_loc *loc)
 {
@@ -133,15 +133,15 @@ format_type_mismatch(struct ubsan_violation *v, struct ubsan_buf *ub)
 	const char *kind = get_type_check_kind(v->align->kind);
 
 	if (NULL == ptr) {
-		//null pointer use
+		                  
 		ubsan_buf_log(ub, "problem:\"%s NULL pointer\", ty:\"%s\"", kind, v->align->ty->name);
 	} else if (alignment && ((uintptr_t)ptr & (alignment - 1))) {
-		//misaligned pointer use
+		                        
 		ubsan_buf_log(ub, "problem:\"%s mis-aligned\", address:%p, ty:\"%s\", ",
 		    kind, (void*)v->lhs, v->align->ty->name);
 		ubsan_buf_log(ub, "required_alignment:%d", 1 << v->align->align);
 	} else {
-		//insufficient object size
+		                          
 		ubsan_buf_log(ub, "problem:\"%s insufficient object size\", ty:\"%s\", address:%p",
 		    kind, v->align->ty->name, ptr);
 	}
@@ -199,10 +199,10 @@ static void
 format_float_cast_overflow(struct ubsan_violation *v, struct ubsan_buf *ub)
 {
 	struct ubsan_float_desc *data = v->flt;
-	/*
-	 * Cannot print out offending value (e.g. using %A, %f and so on) as kernel logging
-	 * does not support float types (yet).
-	 */
+	  
+                                                                                    
+                                       
+    
 	ubsan_buf_log(ub, "problem:\"%s type value outside the range of %s\"",
 	    data->type_from->name, data->type_to->name);
 }
@@ -323,7 +323,7 @@ static void
 ubsan_handle(struct ubsan_violation *v, enum UBFatality fatality)
 {
 	if (!ubsan_loc_acquire(v->loc)) {
-		/* violation site already reported */
+		                                     
 		return;
 	}
 

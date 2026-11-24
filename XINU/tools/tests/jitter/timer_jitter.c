@@ -49,13 +49,13 @@
 
 #include <libproc_internal.h>
 
-#include <os/tsd.h> /* private header for _os_cpu_number */
+#include <os/tsd.h>                                        
 
 typedef enum my_policy_type { MY_POLICY_REALTIME, MY_POLICY_TIMESHARE, MY_POLICY_FIXEDPRI } my_policy_type_t;
 
-#define DEFAULT_MAX_SLEEP_NS    2000000000ll /* Two seconds */
-#define CONSTRAINT_NANOS        (20000000ll)    /* 20 ms */
-#define COMPUTATION_NANOS       (10000000ll)    /* 10 ms */
+#define DEFAULT_MAX_SLEEP_NS    2000000000ll                  
+#define CONSTRAINT_NANOS        (20000000ll)               
+#define COMPUTATION_NANOS       (10000000ll)               
 
 struct mach_timebase_info g_mti;
 
@@ -111,11 +111,11 @@ thread_setup(my_policy_type_t pol)
 	{
 		thread_time_constraint_policy_data_t pol;
 
-		/* Hard-coded realtime parameters (similar to what Digi uses) */
+		                                                                
 		pol.period = 100000;
 		pol.constraint =  CONSTRAINT_NANOS * g_mti.denom / g_mti.numer;
 		pol.computation = COMPUTATION_NANOS * g_mti.denom / g_mti.numer;
-		pol.preemptible = 0;         /* Ignored by OS */
+		pol.preemptible = 0;                            
 
 		res = thread_policy_set(mach_thread_self(), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) &pol, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
 		assert(res == 0, fail);
@@ -151,7 +151,7 @@ get_random_sleep_length_abs_ns(uint64_t min_sleep_ns, uint64_t max_sleep_ns)
 	tmp <<= 32;
 	tmp |= (uint32_t)random();
 
-	/* Now use the random number to sleep amount within the window */
+	                                                                 
 	tmp %= (max_sleep_ns - min_sleep_ns);
 
 	return min_sleep_ns + tmp;
@@ -238,26 +238,26 @@ main(int argc, char **argv)
 
 	mach_timebase_info(&g_mti);
 
-	/* Seed random */
+	                 
 	opterr = 0;
 	while ((ch = getopt(argc, argv, "m:n:hs:w")) != -1 && ch != '?') {
 		switch (ch) {
 		case 's':
-			/* Specified seed for random)() */
+			                                  
 			random_seed = (unsigned)atoi(optarg);
 			srandom(random_seed);
 			need_seed = FALSE;
 			break;
 		case 'm':
-			/* How long per timer? */
+			                         
 			max_sleep_ns = strtoull(optarg, NULL, 10);
 			break;
 		case 'n':
-			/* How long per timer? */
+			                         
 			min_sleep_ns = strtoull(optarg, NULL, 10);
 			break;
 		case 'w':
-			/* After each timed wait, wakeup another thread */
+			                                                  
 			wakeup_second_thread = TRUE;
 			break;
 		case 'h':
@@ -288,16 +288,16 @@ main(int argc, char **argv)
 		srandom(time(NULL));
 	}
 
-	/* What scheduling policy? */
+	                             
 	pol = parse_thread_policy(argv[0]);
 
-	/* How many timers? */
+	                      
 	iterations = strtoull(argv[1], NULL, 10);
 
-	/* How much jitter is so extreme that we should cut a trace point */
+	                                                                    
 	too_much = strtoull(argv[2], NULL, 10);
 
-	/* Array for data */
+	                    
 	jitter_arr = (double*)malloc(sizeof(*jitter_arr) * iterations);
 	if (jitter_arr == NULL) {
 		printf("Couldn't allocate array to store results.\n");
@@ -311,7 +311,7 @@ main(int argc, char **argv)
 	}
 
 	if (wakeup_second_thread) {
-		/* Array for data */
+		                    
 		wakeup_second_jitter_arr = (double*)malloc(sizeof(*jitter_arr) * iterations);
 		if (wakeup_second_jitter_arr == NULL) {
 			printf("Couldn't allocate array to store results.\n");
@@ -346,44 +346,44 @@ main(int argc, char **argv)
 			err(1, "pthread_create");
 		}
 
-		sleep(1); /* Time for other thread to start up */
+		sleep(1);                                        
 	}
 
-	/* Set scheduling policy */
+	                           
 	res = thread_setup(pol);
 	if (res != 0) {
 		printf("Couldn't set thread policy.\n");
 		exit(1);
 	}
 
-	/*
-	 * Disable the wake monitor.  If we are
-	 * performing a large number of
-	 * iterations, the wake monitor may
-	 * cause this process to get suspended,
-	 * thus causing a large jitter value.
-	 */
+	  
+                                        
+                                
+                                    
+                                        
+                                      
+    
 	if (proc_disable_wakemon(getpid()) != KERN_SUCCESS) {
 		printf("Couldn't disable wake monitor.\n");
-		/* For now, do not exit; this call could be locked down */
+		                                                          
 	}
 
-	/*
-	 * Repeatedly pick a random timer length and
-	 * try to sleep exactly that long
-	 */
+	  
+                                             
+                                  
+    
 	for (i = 0; i < iterations; i++) {
 		sleep_length_abs = (uint64_t) (get_random_sleep_length_abs_ns(min_sleep_ns, max_sleep_ns) * (((double)g_mti.denom) / ((double)g_mti.numer)));
 		target_time = mach_absolute_time() + sleep_length_abs;
 
-		/* Sleep */
+		           
 		kret = mach_wait_until(target_time);
 		wake_time = mach_absolute_time();
 
 		jitter_arr[i] = (double)(wake_time - target_time);
 		fraction_arr[i] = jitter_arr[i] / ((double)sleep_length_abs);
 
-		/* Too much: cut a tracepoint for a debugger */
+		                                               
 		if (jitter_arr[i] >= too_much) {
 			kdebug_trace(0xeeeee0 | DBG_FUNC_NONE, 0, 0, 0, 0);
 		}
@@ -404,9 +404,9 @@ main(int argc, char **argv)
 		}
 	}
 
-	/*
-	 * Compute statistics and output results.
-	 */
+	  
+                                          
+    
 	compute_stats(jitter_arr, iterations, &avg, &max, &min, &stddev);
 	compute_stats(fraction_arr, iterations, &avg_fract, &max_fract, &min_fract, &stddev_fract);
 
@@ -443,19 +443,19 @@ second_thread(void *args)
 	uint64_t wake_time;
 	int cpuno;
 
-	/* Set scheduling policy */
+	                           
 	res = thread_setup(secargs->pol);
 	if (res != 0) {
 		printf("Couldn't set thread policy.\n");
 		exit(1);
 	}
 
-	/*
-	 * Repeatedly pick a random timer length and
-	 * try to sleep exactly that long
-	 */
+	  
+                                             
+                                  
+    
 	for (i = 0; i < secargs->iterations; i++) {
-		/* Wake up when poked by main thread */
+		                                       
 		kret = semaphore_wait(secargs->wakeup_semaphore);
 		if (kret != KERN_SUCCESS) {
 			errx(1, "semaphore_wait %d", kret);
@@ -464,7 +464,7 @@ second_thread(void *args)
 		wake_time = mach_absolute_time();
 		cpuno = _os_cpu_number();
 		if (wake_time < secargs->last_poke_time) {
-			/* Woke in past, unsynchronized mach_absolute_time()? */
+			                                                        
 
 			errx(1, "woke in past %llu (%d) < %llu (%d)", wake_time, cpuno, secargs->last_poke_time, secargs->cpuno);
 		}
@@ -475,7 +475,7 @@ second_thread(void *args)
 
 		secargs->wakeup_second_jitter_arr[i] = (double)(wake_time - secargs->last_poke_time);
 
-		/* Too much: cut a tracepoint for a debugger */
+		                                               
 		if (secargs->wakeup_second_jitter_arr[i] >= secargs->too_much) {
 			kdebug_trace(0xeeeee4 | DBG_FUNC_NONE, 0, 0, 0, 0);
 		}
